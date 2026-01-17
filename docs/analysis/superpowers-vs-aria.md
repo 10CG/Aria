@@ -1,7 +1,11 @@
 # Superpowers vs Aria 深度对比分析与优化建议
 
 > 基于 obra/superpowers (GitHub 27k stars) 与 Aria 项目的深度架构对比
+> 参考 Agent Skills 官方规范 (agentskills.io) 与 Anthropic 官方示例
 > 分析日期: 2026-01-17
+
+**文档更新记录：**
+- v1.1 (2026-01-17): 根据 Agent Skills 官方规范重新评估技能目录结构，确认无需重构
 
 ---
 
@@ -343,66 +347,9 @@ aria/
 }
 ```
 
-#### 6. 简化技能目录结构
-
-```
-当前结构:
-claude/skills/
-├── arch-common/
-├── arch-search/
-├── arch-update/
-├── arch-scaffolder/
-├── commit-msg-generator/
-├── strategic-commit-orchestrator/
-├── branch-manager/
-├── phase-a-planner/
-├── phase-b-developer/
-├── phase-c-integrator/
-├── phase-d-closer/
-├── requirements-validator/
-├── requirements-sync/
-├── forgejo-sync/
-├── progress-updater/
-├── spec-drafter/
-├── task-planner/
-├── api-doc-generator/
-├── state-scanner/
-└── workflow-runner/
-
-建议结构:
-claude/skills/
-├── core/
-│   ├── state-scanner/
-│   └── workflow-runner/
-├── architecture/           # 合并 4 个架构技能
-│   ├── search/
-│   ├── update/
-│   ├── scaffolder/
-│   └── common/
-├── development/
-│   ├── tdd-enforcer/       # 新增
-│   ├── phase-a/
-│   ├── phase-b/
-│   ├── phase-c/
-│   └── phase-d/
-├── git/
-│   ├── commit/
-│   ├── branch/
-│   └── orchestrate/
-├── requirements/
-│   ├── validator/
-│   ├── sync/
-│   └── forgejo/
-└── docs/
-    ├── spec/
-    ├── task/
-    ├── progress/
-    └── api/
-```
-
 ### 🔵 低优先级
 
-#### 7. 添加 YAGNI 原则检查
+#### 6. 添加 YAGNI 原则检查
 
 ```yaml
 # 新技能: yagni-validator
@@ -425,7 +372,7 @@ checks:
     suggestion: "YAGNI - 只实现当前需要的功能"
 ```
 
-#### 8. 改进 Agent 继承机制
+#### 7. 改进 Agent 继承机制
 
 ```
 Superpowers 实现: "fix: inherit agent model"
@@ -448,7 +395,7 @@ specialization:
 # Backend Architect Agent 继承 Tech Lead 的基础配置...
 ```
 
-#### 9. 添加 Brainstorming 技能
+#### 8. 添加 Brainstorming 技能
 
 ```yaml
 # 新技能: brainstorming
@@ -482,8 +429,7 @@ process:
 阶段2 (短期 - 1个月内)
 ├── 实现 git-worktree 支持
 ├── 添加两阶段评审机制
-├── 创建 session-start hook
-└── 优化技能目录结构
+└── 创建 session-start hook
 
 阶段3 (中期 - 3个月内)
 ├── 添加 brainstorming skill
@@ -518,6 +464,45 @@ process:
 4. **外部集成** - Forgejo Issue/PR/Wiki 同步
 5. **模块化架构** - 独立子模块便于维护和扩展
 6. **多语言支持** - 中英文双语触发
+
+### Aria 技能目录结构评估 ✅
+
+**结论：无需重构，已符合 Agent Skills 官方最佳实践**
+
+#### 对比 Agent Skills 官方规范
+
+| 规范要求 | Aria 实现 | 状态 |
+|---------|----------|------|
+| 扁平结构 | 20个技能全部在 skills/ 根目录 | ✅ 符合 |
+| kebab-case 命名 | arch-search, phase-b-planner 等 | ✅ 符合 |
+| SKILL.md 必需 | 每个技能都有 SKILL.md | ✅ 符合 |
+| Progressive Disclosure | 详细的 references/ 和 assets/ | ✅ 符合 |
+
+#### 与生态对比
+
+| 项目 | 技能数量 | 目录结构 | 分组方式 |
+|------|---------|---------|----------|
+| **Anthropic 官方** | 30+ | 完全扁平 | marketplace.json 分组 |
+| **Superpowers** | 13 | 完全扁平 | 无分组 |
+| **Aria** | 20 | 完全扁平 | 前缀命名分组 |
+
+**Aria 的前缀分组策略优于子目录分组：**
+
+```bash
+# 前缀分组 (Aria) ✅
+skills/arch-search/     # 路径短，扫描快
+skills/phase-b-developer/
+
+# 子目录分组 (不推荐)
+skills/architecture/search/  # 路径长，引用复杂
+skills/development/phase-b/
+```
+
+**优势：**
+- 一眼可见所有技能
+- 路径引用更简洁
+- 无需递归扫描
+- 符合官方 Progressive Disclosure 原则
 
 ### 最终建议
 
@@ -581,5 +566,43 @@ process:
 
 ---
 
+## 附录：Agent Skills 官方规范要点
+
+### 目录结构规范 (agentskills.io)
+
+```
+skill-name/
+└── SKILL.md  # 必需
+
+可选目录:
+├── scripts/     # 可执行代码
+├── references/  # 参考文档 (按需加载)
+└── assets/      # 静态资源
+```
+
+### 命名规范
+
+```
+name: skill-name  # 1-64字符，小写字母+数字+连字符
+description: 清晰描述技能功能和使用场景
+```
+
+### Progressive Disclosure 原则
+
+| 层级 | 内容 | Token 预算 |
+|------|------|-----------|
+| Metadata | name + description | ~100 tokens |
+| Instructions | SKILL.md 主体 | < 5000 tokens |
+| Resources | scripts/references/assets | 按需加载 |
+
+### 关键原则
+
+1. **扁平优于嵌套** - 所有技能在同一层级
+2. **保持 SKILL.md < 500 行** - 详细内容放 references/
+3. **相对路径引用** - 最多一层嵌套
+
+---
+
 *文档生成: Claude Opus 4.5*
-*分析基于: obra/superpowers@main (2026-01-17)*
+*分析基于: obra/superpowers@main + agentskills.io + anthropics/skills*
+*最后更新: 2026-01-17 (v1.1)*
