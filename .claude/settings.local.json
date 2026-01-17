@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git submodule add:*)",
+      "Bash(git submodule status:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_run_code",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(git add:*)"
+    ]
+  }
+}
