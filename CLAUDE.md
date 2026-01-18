@@ -181,20 +181,20 @@ D. 收尾 (Closure)
 2. **十步循环不能跳过 Phase A** - 必须先理解现状再行动
 3. **文档与代码必须同步更新** - 架构文档与代码一致
 4. **每个提交必须遵循规范** - Conventional Commits 格式
-5. **项目变更必须在项目的 specs/ 目录** - 不得放在 `standards/openspec/changes/`
+5. **项目变更必须在项目的 openspec/changes/ 目录** - 不得放在 `standards/openspec/changes/`
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  规则 #5: 变更位置边界                                           │
+│  规则 #5: 变更位置边界 (OpenSpec 兼容)                           │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  aria-standards/openspec/changes/                               │
-│  └── 仅限 Aria 自身的方法论改进                                  │
+│  aria-standards/openspec/changes/  → 已废弃，不应使用           │
 │                                                                 │
-│  用户项目/specs/                                                │
-│  └── 用户项目的功能变更                                          │
+│  项目/openspec/changes/            ← 正确位置                   │
+│  ├── Aria/openspec/changes/        → Aria 自身的变更            │
+│  └── your-project/openspec/changes/ → 用户项目的变更            │
 │                                                                 │
-│  原因: aria-standards 是共享子模块，不应包含用户项目变更         │
+│  原因: aria-standards 是共享子模块，变更应属于项目自身           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
