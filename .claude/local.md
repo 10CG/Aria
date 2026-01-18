@@ -1,81 +1,23 @@
-# Aria 项目配置
+# Aria - AI-DDD Methodology
 
-> **Claude Code 项目级配置**
-> **版本**: 1.0.0
+> **版本**: 1.1.0
 > **更新**: 2026-01-18
+> **性质**: 方法论研究项目
 
 ---
 
-## 自动触发规则 (Auto-Trigger Rules)
+## 项目定位
 
-当用户请求中包含以下关键词时，自动激活对应的 Skill：
+Aria 是一个基于 AI 辅助的领域驱动设计 (AI-DDD) 方法论研究项目，旨在探索 AI Agent 在软件工程全流程中的深度集成模式。
 
-### 测试相关
+### 核心特征
 
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `test`, `测试`, `单元测试` | `tdd-enforcer` | 0.9 |
-| `tdd`, `test-driven` | `tdd-enforcer` | 1.0 |
-| `coverage`, `覆盖率` | `tdd-enforcer` | 0.8 |
-| `spec`, `规范`, `proposal` | `spec-drafter` | 0.85 |
-
-### Git 相关
-
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `branch`, `分支`, `创建分支` | `branch-manager` | 0.9 |
-| `commit`, `提交` | `commit-msg-generator` | 0.8 |
-| `pr`, `pull request`, `合并` | `branch-manager` (C.2) | 0.85 |
-| `worktree` | `branch-manager` (worktree) | 1.0 |
-
-### 规划相关
-
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `plan`, `规划`, `任务` | `task-planner` | 0.85 |
-| `state`, `状态`, `进度` | `state-scanner` | 0.9 |
-| `workflow`, `工作流`, `执行` | `workflow-runner` | 0.8 |
-
-### 开发相关
-
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `develop`, `开发`, `实现` | `phase-b-developer` | 0.75 |
-| `review`, `评审`, `审查` | `phase-b-developer` (review) | 0.85 |
-| `integrate`, `集成` | `phase-c-integrator` | 0.8 |
-| `close`, `收尾`, `完成` | `phase-d-closer` | 0.8 |
-
-### 架构相关
-
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `arch`, `架构`, `设计` | `arch-update` | 0.8 |
-| `arch search`, `查找`, `定位` | `arch-search` | 0.85 |
-| `arch scaffold`, `骨架` | `arch-scaffolder` | 0.9 |
-
-### 文档相关
-
-| 关键词 | 触发 Skill | 置信度 |
-|--------|-----------|--------|
-| `progress update`, `进度更新` | `progress-updater` | 0.9 |
-| `validate`, `验证`, `检查` | `requirements-validator` | 0.8 |
-
----
-
-## 匹配策略
-
-```yaml
-算法: 模糊匹配 + 置信度阈值
-
-触发条件:
-  - 关键词匹配 >= 0.8 置信度 → 自动激活
-  - 关键词匹配 0.6-0.8 置信度 → 提示确认
-  - 关键词匹配 < 0.6 置信度 → 不触发
-
-多关键词匹配:
-  - 取最高置信度
-  - 累积匹配 (同一 Skill 多个关键词) +0.1 加成
-```
+| 特征 | 说明 |
+|------|------|
+| **方法论优先** | 定义规范而非实现框架 |
+| **AI-Native** | 设计 AI Agent 协作模式 |
+| **十步循环** | 结构化开发工作流 |
+| **OpenSpec** | 标准化需求规范格式 |
 
 ---
 
@@ -84,92 +26,124 @@
 ```
 Aria/
 ├── .claude/
-│   ├── CLAUDE.md          # 本配置文件
-│   ├── agents/            # Agents (子模块)
-│   ├── skills/            # Skills (子模块)
-│   └── trigger-rules.json # 自动触发规则
-├── aria/
-│   └── hooks/             # Hooks 系统
-├── backend/               # Python FastAPI 后端
-├── mobile/                # Flutter 应用
-├── shared/                # API 契约、schemas
-├── standards/             # AI-DDD 规范 (子模块)
-└── docs/                  # 项目文档
+│   ├── local.md              # 本配置文件
+│   ├── agents/               # AI-DDD 专用 Agents (子模块)
+│   ├── skills/               # 十步循环 Skills (子模块)
+│   └── trigger-rules.json    # 自动触发规则
+├── standards/                # AI-DDD 规范体系 (子模块)
+│   ├── core/                 # 核心方法论
+│   ├── openspec/             # 需求规范标准
+│   ├── workflow/             # 工作流定义
+│   └── conventions/          # 约定和格式
+├── docs/                     # 研究文档
+└── aria/                     # 辅助工具 (hooks)
 ```
 
 ---
 
-## 模块上下文
+## 核心概念
 
-### Backend (Python/FastAPI)
-- 主要目录: `backend/src/`
-- 测试目录: `backend/tests/`
-- 数据库迁移: `backend/migrations/`
-- OpenAPI: `backend/openapi.json`
+### 十步循环 (Ten-Step Cycle)
 
-### Mobile (Flutter)
-- 主要目录: `mobile/lib/`
-- 测试目录: `mobile/test/`
-- 资源: `mobile/assets/`
+```
+A. 规划阶段 (Spec & Planning)
+├── A.0 状态扫描      → state-scanner
+├── A.1 规范创建      → spec-drafter
+├── A.2 任务规划      → task-planner
+└── A.3 Agent 分配    → task-planner
 
-### Standards (子模块)
-- OpenSpec: `standards/openspec/`
-- 工作流: `standards/workflow/`
-- 核心: `standards/core/`
+B. 开发阶段 (Development)
+├── B.1 分支创建      → branch-manager
+├── B.2 执行验证      → phase-b-developer
+└── B.Review 两阶段评审
+
+C. 集成阶段 (Integration)
+├── C.1 Git 提交      → commit-msg-generator
+└── C.2 PR 创建       → branch-manager
+
+D. 收尾阶段 (Closure)
+├── D.1 进度更新      → progress-updater
+└── D.2 归档          → phase-d-closer
+```
+
+### OpenSpec 需求规范
+
+- **Level 1**: Skip - 简单修复，无需规范
+- **Level 2**: Minimal - 中等功能，proposal.md
+- **Level 3**: Full - 架构变更，proposal.md + tasks.md
 
 ---
 
-## 默认行为
+## AI-DDD 工作流
 
-### 开发任务默认流程
+### 状态感知入口
 
-当用户请求开发功能时，按以下流程引导：
+任何开发任务从 **A.0 状态扫描** 开始：
 
-1. **A.0 状态扫描** → `state-scanner`
-2. **A.1 规范创建** → `spec-drafter` (如需要)
-3. **A.2 任务规划** → `task-planner`
-4. **B.1 分支创建** → `branch-manager`
-5. **B.2 开发执行** → `phase-b-developer`
-6. **C.1 提交** → `commit-msg-generator`
-7. **C.2 集成** → `phase-c-integrator`
-8. **D.1 进度更新** → `progress-updater`
+```
+用户: "我要开发一个新功能"
+   ↓
+state-scanner: 分析当前状态 → 推荐工作流
+   ↓
+用户确认 → 执行相应 Phase
+```
 
-### Bugfix 默认流程
+### 自动触发规则
 
-当用户报告 bug 时，按以下流程引导：
+| 用户意图关键词 | 推荐技能 |
+|----------------|----------|
+| 状态、进度、扫描 | state-scanner |
+| 规范、提案、spec | spec-drafter |
+| 任务、规划、分解 | task-planner |
+| 分支、worktree | branch-manager |
+| 测试、tdd | tdd-enforcer |
+| 提交、commit | commit-msg-generator |
+| 架构、设计文档 | arch-search / arch-update |
+| 进度更新 | progress-updater |
 
-1. **问题确认** → 理解问题
-2. **分支创建** → `branch-manager` (bugfix)
-3. **测试编写** → `tdd-enforcer` (RED)
-4. **修复实现** → `tdd-enforcer` (GREEN)
-5. **提交推送** → `commit-msg-generator`
-6. **PR 创建** → `branch-manager` (C.2)
+```
+禁用自动触发: 请求前加 NO_AUTO_TRIGGER
+```
 
 ---
 
-## 禁用自动触发
+## 子模块说明
 
-如果需要禁用自动触发功能，在请求前添加：
+### standards (规范子模块)
 
-```
-NO_AUTO_TRIGGER
-```
+AI-DDD 方法论的核心定义，包含：
 
-或设置环境变量：
-```bash
-export CLAUDE_AUTO_TRIGGER=false
-```
+- `core/` - 十步循环、进度管理、Agent 规范
+- `openspec/` - 需求规范格式和模板
+- `workflow/` - 工作流定义和最佳实践
+- `conventions/` - Git commit、changelog 等格式约定
+
+### skills (技能子模块)
+
+十步循环的执行单元，每个 Phase 对应一个或多个 Skill。
+
+### agents (代理子模块)
+
+专业领域的 AI Agent 定义。
+
+---
+
+## 开发原则
+
+1. **规范先行** - 需求变更先写 OpenSpec
+2. **小步提交** - 每个任务独立提交
+3. **文档同步** - 代码与架构文档同步更新
+4. **向后兼容** - 所有变更保持兼容性
 
 ---
 
 ## 相关文档
 
 - [十步循环概览](standards/core/ten-step-cycle/README.md)
-- [Skill 目录](.claude/skills/)
-- [Workflow Enhancement](standards/openspec/changes/aria-workflow-enhancement/proposal.md)
+- [OpenSpec 项目定义](standards/openspec/project.md)
+- [AI-DDD 进度管理](standards/core/progress-management/)
 
 ---
 
-**版本**: 1.0.0
-**最后更新**: 2026-01-18
-**维护**: Aria Team
+**维护**: 10CG Lab
+**仓库**: https://forgejo.10cg.pub/10CG/Aria
