@@ -1,0 +1,189 @@
+{
+  "$schema": "./trigger-rules-schema.json",
+  "version": "1.0.0",
+  "description": "Claude Code Skill 自动触发规则配置",
+  "confidence_threshold": 0.8,
+  "rules": {
+    "testing": {
+      "skill": "tdd-enforcer",
+      "keywords": [
+        {"word": "test", "weight": 0.9},
+        {"word": "测试", "weight": 0.9},
+        {"word": "tdd", "weight": 1.0},
+        {"word": "test-driven", "weight": 1.0},
+        {"word": "单元测试", "weight": 0.95},
+        {"word": "coverage", "weight": 0.8},
+        {"word": "覆盖率", "weight": 0.8},
+        {"word": "spec", "weight": 0.7},
+        {"word": "规范", "weight": 0.7},
+        {"word": "proposal", "weight": 0.85}
+      ],
+      "context_boost": {
+        "before": ["write", "create", "add", "implement"],
+        "after": ["first", "before", "先"]
+      }
+    },
+    "git": {
+      "skill": "branch-manager",
+      "keywords": [
+        {"word": "branch", "weight": 0.9},
+        {"word": "分支", "weight": 0.9},
+        {"word": "创建分支", "weight": 0.95},
+        {"word": "pr", "weight": 0.85},
+        {"word": "pull request", "weight": 0.9},
+        {"word": "合并", "weight": 0.85},
+        {"word": "merge", "weight": 0.85},
+        {"word": "worktree", "weight": 1.0}
+      ],
+      "context_boost": {
+        "before": ["create", "new", "make"],
+        "after": ["for", "with"]
+      }
+    },
+    "commit": {
+      "skill": "commit-msg-generator",
+      "keywords": [
+        {"word": "commit", "weight": 0.8},
+        {"word": "提交", "weight": 0.8},
+        {"word": "save", "weight": 0.6},
+        {"word": "保存", "weight": 0.6}
+      ]
+    },
+    "planning": {
+      "skill": "task-planner",
+      "keywords": [
+        {"word": "plan", "weight": 0.85},
+        {"word": "规划", "weight": 0.85},
+        {"word": "任务", "weight": 0.8},
+        {"word": "task", "weight": 0.8},
+        {"word": "breakdown", "weight": 0.9},
+        {"word": "分解", "weight": 0.9}
+      ]
+    },
+    "state_scan": {
+      "skill": "state-scanner",
+      "keywords": [
+        {"word": "state", "weight": 0.9},
+        {"word": "状态", "weight": 0.9},
+        {"word": "progress", "weight": 0.85},
+        {"word": "进度", "weight": 0.85},
+        {"word": "current", "weight": 0.7},
+        {"word": "当前", "weight": 0.7},
+        {"word": "overview", "weight": 0.8},
+        {"word": "概览", "weight": 0.8}
+      ]
+    },
+    "workflow": {
+      "skill": "workflow-runner",
+      "keywords": [
+        {"word": "workflow", "weight": 0.8},
+        {"word": "工作流", "weight": 0.8},
+        {"word": "execute", "weight": 0.75},
+        {"word": "执行", "weight": 0.75},
+        {"word": "run", "weight": 0.7}
+      ]
+    },
+    "development": {
+      "skill": "phase-b-developer",
+      "keywords": [
+        {"word": "develop", "weight": 0.75},
+        {"word": "开发", "weight": 0.75},
+        {"word": "implement", "weight": 0.8},
+        {"word": "实现", "weight": 0.8},
+        {"word": "code", "weight": 0.6},
+        {"word": "代码", "weight": 0.6}
+      ]
+    },
+    "review": {
+      "skill": "phase-b-developer",
+      "keywords": [
+        {"word": "review", "weight": 0.85},
+        {"word": "评审", "weight": 0.85},
+        {"word": "审查", "weight": 0.85},
+        {"word": "check", "weight": 0.7},
+        {"word": "检查", "weight": 0.7},
+        {"word": "validate", "weight": 0.8},
+        {"word": "验证", "weight": 0.8}
+      ]
+    },
+    "integration": {
+      "skill": "phase-c-integrator",
+      "keywords": [
+        {"word": "integrate", "weight": 0.8},
+        {"word": "集成", "weight": 0.8},
+        {"word": "merge", "weight": 0.75}
+      ]
+    },
+    "close": {
+      "skill": "phase-d-closer",
+      "keywords": [
+        {"word": "close", "weight": 0.8},
+        {"word": "收尾", "weight": 0.8},
+        {"word": "完成", "weight": 0.75},
+        {"word": "finish", "weight": 0.75},
+        {"word": "complete", "weight": 0.8}
+      ]
+    },
+    "architecture": {
+      "skill": "arch-update",
+      "keywords": [
+        {"word": "arch", "weight": 0.8},
+        {"word": "架构", "weight": 0.8},
+        {"word": "design", "weight": 0.75},
+        {"word": "设计", "weight": 0.75}
+      ]
+    },
+    "arch_search": {
+      "skill": "arch-search",
+      "keywords": [
+        {"word": "arch search", "weight": 0.9},
+        {"word": "查找", "weight": 0.8},
+        {"word": "定位", "weight": 0.85},
+        {"word": "where", "weight": 0.75},
+        {"word": "find", "weight": 0.7}
+      ]
+    },
+    "arch_scaffold": {
+      "skill": "arch-scaffolder",
+      "keywords": [
+        {"word": "arch scaffold", "weight": 0.9},
+        {"word": "骨架", "weight": 0.85},
+        {"word": "template", "weight": 0.75}
+      ]
+    },
+    "progress_update": {
+      "skill": "progress-updater",
+      "keywords": [
+        {"word": "progress update", "weight": 0.9},
+        {"word": "进度更新", "weight": 0.9},
+        {"word": "update progress", "weight": 0.85}
+      ]
+    },
+    "requirements": {
+      "skill": "requirements-validator",
+      "keywords": [
+        {"word": "validate", "weight": 0.8},
+        {"word": "验证", "weight": 0.8},
+        {"word": "requirement", "weight": 0.75},
+        {"word": "需求", "weight": 0.75}
+      ]
+    }
+  },
+  "matching": {
+    "algorithm": "fuzzy",
+    "boost_rules": {
+      "same_skill_multiple_keywords": 0.1,
+      "exact_phrase_match": 0.15
+    },
+    "thresholds": {
+      "auto_trigger": 0.8,
+      "confirm_trigger": 0.6,
+      "no_trigger": 0.0
+    }
+  },
+  "fallback": {
+    "default_skill": null,
+    "ask_on_ambiguous": true,
+    "log_matches": true
+  }
+}
