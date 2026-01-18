@@ -84,16 +84,16 @@
 ```
 Aria/
 ├── .claude/
-│   └── CLAUDE.md          # 本配置文件
+│   ├── CLAUDE.md          # 本配置文件
+│   ├── agents/            # Agents (子模块)
+│   ├── skills/            # Skills (子模块)
+│   └── trigger-rules.json # 自动触发规则
 ├── aria/
 │   └── hooks/             # Hooks 系统
 ├── backend/               # Python FastAPI 后端
 ├── mobile/                # Flutter 应用
 ├── shared/                # API 契约、schemas
 ├── standards/             # AI-DDD 规范 (子模块)
-├── claude/
-│   ├── agents/            # Agents (子模块)
-│   └── skills/            # Skills (子模块)
 └── docs/                  # 项目文档
 ```
 
@@ -165,7 +165,7 @@ export CLAUDE_AUTO_TRIGGER=false
 ## 相关文档
 
 - [十步循环概览](standards/core/ten-step-cycle/README.md)
-- [Skill 目录](claude/skills/)
+- [Skill 目录](.claude/skills/)
 - [Workflow Enhancement](standards/openspec/changes/aria-workflow-enhancement/proposal.md)
 
 ---

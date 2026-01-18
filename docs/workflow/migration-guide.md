@@ -69,7 +69,7 @@ git config --local --list > git-config-backup.txt
 
 阅读相关文档：
 
-1. [TDD Enforcer](../claude/skills/tdd-enforcer/SKILL.md)
+1. [TDD Enforcer](../../.claude/skills/tdd-enforcer/SKILL.md)
 2. [自动触发指南](../docs/workflow/auto-trigger-guide.md)
 3. [Hooks 系统](../aria/hooks/README.md)
 

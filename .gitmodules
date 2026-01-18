@@ -1,9 +1,9 @@
 [submodule "standards"]
 	path = standards
 	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-standards.git
-[submodule "claude/agents"]
-	path = claude/agents
+[submodule ".claude/agents"]
+	path = .claude/agents
 	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-agents.git
-[submodule "claude/skills"]
-	path = claude/skills
+[submodule ".claude/skills"]
+	path = .claude/skills
 	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-skills.git

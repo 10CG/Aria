@@ -50,7 +50,7 @@
 #### 保持不变
 
 ```
-claude/skills/
+.claude/skills/
 ├── tdd-enforcer/           # 新增，不影响现有
 ├── branch-manager/          # 已有，更新版本
 ├── phase-b-developer/       # 已有，更新版本

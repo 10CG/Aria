@@ -620,7 +620,7 @@ description: 清晰描述技能功能和使用场景
 
 | 功能 | 来源 | 状态 | 相关文件 |
 |------|------|------|----------|
-| **TDD Enforcer Skill** | Superpowers TDD | ✅ 完整实现 | `claude/skills/tdd-enforcer/` |
+| **TDD Enforcer Skill** | Superpowers TDD | ✅ 完整实现 | `.claude/skills/tdd-enforcer/` |
 | **Git Worktrees 集成** | Superpowers Worktrees | ✅ 完整实现 | `branch-manager/` + 模板脚本 |
 | **自动触发系统** | Superpowers Auto-Trigger | ✅ 完整实现 | `.claude/CLAUDE.md` + `trigger-rules.json` |
 | **两阶段评审机制** | Superpowers Two-Phase Review | ✅ 完整实现 | `phase-b-developer/validators/` |
