@@ -4,11 +4,12 @@
 
 metadata:
   feature: aria-workflow-enhancement
-  version: "1.1"
+  version: "1.2"
   datasource: "tasks.md"
   generated_at: "2026-01-18"
-  total_tasks: 28
-  estimated_hours: 84
+  completed_at: "2026-01-20"
+  total_tasks: 31
+  estimated_hours: 152
 
 tasks:
   # ========================================
@@ -17,7 +18,7 @@ tasks:
   - id: TASK-001
     parent: "1.1"
     title: 创建 tdd-enforcer SKILL.md 文件
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: []
@@ -34,7 +35,7 @@ tasks:
   - id: TASK-002
     parent: "1.2"
     title: 定义 RED-GREEN-REFACTOR 工作流程
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-001]
@@ -53,7 +54,7 @@ tasks:
   - id: TASK-003
     parent: "1.3"
     title: 实现测试先于代码的强制检查
-    status: pending
+    status: completed
     complexity: XL
     priority: P0
     dependencies: [TASK-002]
@@ -72,7 +73,7 @@ tasks:
   - id: TASK-004
     parent: "1.4"
     title: 添加删除测试前代码的验证规则
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-003]
@@ -88,7 +89,7 @@ tasks:
   - id: TASK-005
     parent: "1.5"
     title: 编写测试示例和使用文档
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-004]
@@ -107,7 +108,7 @@ tasks:
   - id: TASK-006
     parent: "2.1"
     title: 更新 branch-manager SKILL.md
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: []
@@ -123,7 +124,7 @@ tasks:
   - id: TASK-007
     parent: "2.2"
     title: 添加 worktree 创建逻辑
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-006]
@@ -142,7 +143,7 @@ tasks:
   - id: TASK-008
     parent: "2.3"
     title: 添加 worktree 清理功能
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-007]
@@ -158,7 +159,7 @@ tasks:
   - id: TASK-009
     parent: "2.4"
     title: 更新 phase-b-developer SKILL.md
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: []
@@ -173,7 +174,7 @@ tasks:
   - id: TASK-010
     parent: "2.5"
     title: 集成 worktree 路径切换
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-009]
@@ -189,7 +190,7 @@ tasks:
   - id: TASK-011
     parent: "2.6"
     title: 添加 worktree 状态检查
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-010]
@@ -207,7 +208,7 @@ tasks:
   - id: TASK-012
     parent: "3.1"
     title: 创建 .claude/CLAUDE.md 配置
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: []
@@ -223,7 +224,7 @@ tasks:
   - id: TASK-013
     parent: "3.2"
     title: 定义意图关键词映射规则
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-012]
@@ -242,7 +243,7 @@ tasks:
   - id: TASK-014
     parent: "3.3"
     title: 实现 skill 自动激活逻辑
-    status: pending
+    status: completed
     complexity: XL
     priority: P0
     dependencies: [TASK-013]
@@ -259,7 +260,7 @@ tasks:
   - id: TASK-015
     parent: "3.4"
     title: 添加触发规则测试
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-014]
@@ -275,7 +276,7 @@ tasks:
   - id: TASK-016
     parent: "3.5"
     title: 编写自动触发用户指南
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-015]
@@ -294,7 +295,7 @@ tasks:
   - id: TASK-017
     parent: "4.1"
     title: 扩展 phase-b-developer 评审流程
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: [TASK-009]
@@ -309,7 +310,7 @@ tasks:
   - id: TASK-018
     parent: "4.2"
     title: 定义 Phase 1: 规范合规性检查
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-017]
@@ -328,7 +329,7 @@ tasks:
   - id: TASK-019
     parent: "4.3"
     title: 定义 Phase 2: 代码质量检查
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-018]
@@ -346,7 +347,7 @@ tasks:
   - id: TASK-020
     parent: "4.4"
     title: 实现阻塞机制（关键问题）
-    status: pending
+    status: completed
     complexity: XL
     priority: P0
     dependencies: [TASK-019]
@@ -362,7 +363,7 @@ tasks:
   - id: TASK-021
     parent: "4.5"
     title: 添加评审报告生成
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-020]
@@ -381,7 +382,7 @@ tasks:
   - id: TASK-022
     parent: "5.1"
     title: 创建 aria/hooks/ 目录
-    status: pending
+    status: completed
     complexity: S
     priority: P1
     dependencies: []
@@ -397,7 +398,7 @@ tasks:
   - id: TASK-023
     parent: "5.2"
     title: 创建 hooks.json 配置文件
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-022]
@@ -413,7 +414,7 @@ tasks:
   - id: TASK-024
     parent: "5.3"
     title: 实现 session-start.sh 脚本
-    status: pending
+    status: completed
     complexity: XL
     priority: P0
     dependencies: [TASK-023]
@@ -429,7 +430,7 @@ tasks:
   - id: TASK-025
     parent: "5.4"
     title: 创建 run-hook.cmd Windows 支持
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-024]
@@ -445,7 +446,7 @@ tasks:
   - id: TASK-026
     parent: "5.5"
     title: 添加 hook 验证测试
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-025]
@@ -464,7 +465,7 @@ tasks:
   - id: TASK-027
     parent: "6.1"
     title: 更新 superpowers-vs-aria.md 对比文档
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-001, TASK-006, TASK-012, TASK-017, TASK-022]
@@ -480,7 +481,7 @@ tasks:
   - id: TASK-028
     parent: "6.2"
     title: 创建 migration guide
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-027]
@@ -496,7 +497,7 @@ tasks:
   - id: TASK-029
     parent: "6.3"
     title: 编写向后兼容性说明
-    status: pending
+    status: completed
     complexity: S
     priority: P2
     dependencies: [TASK-028]
@@ -512,7 +513,7 @@ tasks:
   - id: TASK-030
     parent: "6.4"
     title: 集成测试覆盖
-    status: pending
+    status: completed
     complexity: XL
     priority: P0
     dependencies: [TASK-029]
@@ -528,7 +529,7 @@ tasks:
   - id: TASK-031
     parent: "6.5"
     title: 用户验收测试
-    status: pending
+    status: completed
     complexity: M
     priority: P1
     dependencies: [TASK-030]

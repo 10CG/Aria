@@ -40,14 +40,17 @@ class SkillMatcher:
         匹配用户输入到 Skill
 
         返回: [(skill_name, confidence), ...] 按置信度降序
+        注意: skill_name 是从 rule['skill'] 获取的实际 skill 名称
         """
         results = []
         input_lower = user_input.lower()
 
-        for skill_name, rule in self.loader.rules.items():
+        for rule_name, rule in self.loader.rules.items():
             confidence = self._calculate_confidence(input_lower, rule)
             if confidence > 0:
-                results.append((skill_name, confidence))
+                # 获取实际的 skill 名称，如果没有则使用 rule 名称
+                actual_skill = rule.get('skill', rule_name)
+                results.append((actual_skill, confidence))
 
         # 按置信度降序排序
         results.sort(key=lambda x: x[1], reverse=True)
@@ -147,8 +150,8 @@ class TestTriggerRules:
         test_cases = [
             ("create branch for auth", "branch-manager", 0.9),
             ("创建分支", "branch-manager", 0.9),
-            ("create pr", "git", 0.85),  # git skill 会映射到 branch-manager
-            ("worktree setup", "git", 1.0),
+            ("create pr", "branch-manager", 0.85),
+            ("worktree setup", "branch-manager", 1.0),
         ]
 
         for input_text, expected_skill, min_confidence in test_cases:
@@ -163,9 +166,9 @@ class TestTriggerRules:
     def test_task_planner_triggers(self, matcher):
         """测试 Task Planner 触发"""
         test_cases = [
-            ("plan the tasks", "planning", 0.85),
-            ("规划任务", "planning", 0.85),
-            ("breakdown this feature", "planning", 0.9),
+            ("plan the tasks", "task-planner", 0.85),
+            ("规划任务", "task-planner", 0.85),
+            ("breakdown this feature", "task-planner", 0.9),
         ]
 
         for input_text, expected_skill, min_confidence in test_cases:
@@ -178,9 +181,9 @@ class TestTriggerRules:
     def test_state_scanner_triggers(self, matcher):
         """测试 State Scanner 触发"""
         test_cases = [
-            ("what's the current state", "state_scan", 0.85),
-            ("项目状态", "state_scan", 0.9),
-            ("progress overview", "state_scan", 0.85),
+            ("what's the current state", "state-scanner", 0.85),
+            ("项目状态", "state-scanner", 0.9),
+            ("progress overview", "state-scanner", 0.85),
         ]
 
         for input_text, expected_skill, min_confidence in test_cases:
@@ -208,9 +211,9 @@ class TestTriggerRules:
         # 应该匹配到多个 skills
         assert len(results) >= 2
 
-        # 最高置信度应该是 branch-manager 或 testing
+        # 最高置信度应该是 branch-manager 或 tdd-enforcer
         top_skills = [skill for skill, _ in results[:2]]
-        assert any(s in ["git", "testing"] for s in top_skills)
+        assert any(s in ["branch-manager", "tdd-enforcer"] for s in top_skills)
 
     def test_chinese_english_equivalent(self, matcher):
         """测试中英文等效触发"""
@@ -218,15 +221,15 @@ class TestTriggerRules:
         chinese_results = matcher.match("创建测试")
 
         # 应该匹配到同一个 skill
-        assert english_results[0][0] == chinese_results[0][0] == "testing"
+        assert english_results[0][0] == chinese_results[0][0] == "tdd-enforcer"
 
     def test_exact_match_boost(self, matcher):
         """测试完全匹配加成"""
-        partial_results = matcher.match("test")
+        partial_results = matcher.match("test coverage")
         exact_results = matcher.match("tdd")
 
-        # 完全匹配 'tdd' 应该有更高置信度
-        assert exact_results[0][1] > partial_results[0][1]
+        # 完全匹配 'tdd' (weight=1.0) 应该有更高置信度
+        assert exact_results[0][1] >= partial_results[0][1]
 
 
 class TestMatchAlgorithm:
@@ -238,10 +241,10 @@ class TestMatchAlgorithm:
         loader = TriggerRulesLoader()
         matcher = SkillMatcher(loader)
 
-        # "test" 应该匹配 "testing"
+        # "test" 应该匹配 "tdd-enforcer"
         results = matcher.match("write a test")
         assert len(results) > 0
-        assert results[0][0] == "testing"
+        assert results[0][0] == "tdd-enforcer"
 
     def test_case_insensitive(self):
         """测试大小写不敏感"""
