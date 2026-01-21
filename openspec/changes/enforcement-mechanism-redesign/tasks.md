@@ -63,12 +63,12 @@
 
 ## 6. 验证和测试
 
-- [ ] 6.1 验证 branch-manager 模式决策正确性
-- [ ] 6.2 验证 worktree 创建和清理流程
-- [ ] 6.3 验证 subagent-driver 任务执行链
-- [ ] 6.4 验证技能间数据传递
-- [ ] 6.5 端到端测试 Level 2-4 工作流
-- [ ] 6.6 验证与现有 tdd-enforcer 兼容性
+- [x] 6.1 验证 branch-manager 模式决策正确性
+- [x] 6.2 验证 worktree 创建和清理流程
+- [x] 6.3 验证 subagent-driver 任务执行链
+- [x] 6.4 验证技能间数据传递
+- [x] 6.5 端到端测试 Level 2-4 工作流
+- [x] 6.6 验证与现有 tdd-enforcer 兼容性
 
 ---
 
