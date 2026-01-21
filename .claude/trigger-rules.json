@@ -1,7 +1,7 @@
 {
   "$schema": "./trigger-rules-schema.json",
-  "version": "1.0.0",
-  "description": "Claude Code Skill 自动触发规则配置",
+  "version": "1.1.0",
+  "description": "Claude Code Skill 自动触发规则配置 (v1.1.0 - branch-manager v2.0 支持)",
   "confidence_threshold": 0.8,
   "rules": {
     "testing": {
@@ -33,10 +33,14 @@
         {"word": "pull request", "weight": 0.9},
         {"word": "合并", "weight": 0.85},
         {"word": "merge", "weight": 0.85},
-        {"word": "worktree", "weight": 1.0}
+        {"word": "worktree", "weight": 1.0},
+        {"word": "隔离", "weight": 0.9},
+        {"word": "isolation", "weight": 0.9},
+        {"word": "mode", "weight": 0.7},
+        {"word": "auto mode", "weight": 0.85}
       ],
       "context_boost": {
-        "before": ["create", "new", "make"],
+        "before": ["create", "new", "make", "auto"],
         "after": ["for", "with"]
       }
     },
