@@ -12,54 +12,54 @@
 
 ## 1. branch-manager 技能增强
 
-- [ ] 1.1 设计并实现模式决策逻辑 (评分系统)
-- [ ] 1.2 实现模式 A: 常规分支创建流程
-- [ ] 1.3 实现模式 B: Worktree 创建流程
-- [ ] 1.4 实现目录优先级选择逻辑
-- [ ] 1.5 实现 .gitignore 强制验证和自动修复
-- [ ] 1.6 实现环境验证 (npm/cargo/pnpm + 测试基线)
-- [ ] 1.7 更新 SKILL.md 文档 (包含两种模式说明)
-- [ ] 1.8 添加 Red Flags 和职责边界章节
-- [ ] 1.9 更新 hooks.json 配置
+- [x] 1.1 设计并实现模式决策逻辑 (评分系统)
+- [x] 1.2 实现模式 A: 常规分支创建流程
+- [x] 1.3 实现模式 B: Worktree 创建流程
+- [x] 1.4 实现目录优先级选择逻辑
+- [x] 1.5 实现 .gitignore 强制验证和自动修复
+- [x] 1.6 实现环境验证 (npm/cargo/pnpm + 测试基线)
+- [x] 1.7 更新 SKILL.md 文档 (包含两种模式说明)
+- [x] 1.8 添加 Red Flags 和职责边界章节
+- [x] 1.9 更新 hooks.json 配置
 
 ## 2. subagent-driver 技能实现
 
-- [ ] 2.1 创建 subagent-driver/SKILL.md 主文档
-- [ ] 2.2 实现计划加载功能 (tasks.md/detailed-tasks.yaml)
-- [ ] 2.3 实现 TodoWrite 创建和维护逻辑
-- [ ] 2.4 实现 fresh subagent 调用机制
-- [ ] 2.5 实现逐任务执行流程
-- [ ] 2.6 实现任务间代码审查机制
-- [ ] 2.7 实现问题优先级分类 (Critical/Major/Minor)
-- [ ] 2.8 实现 Critical 问题阻塞逻辑
-- [ ] 2.9 实现最终审查流程
-- [ ] 2.10 配置 REQUIRED branch-finisher 调用
-- [ ] 2.11 实现与 branch-manager 的输入输出集成
-- [ ] 2.12 添加公告模式文档
+- [x] 2.1 创建 subagent-driver/SKILL.md 主文档
+- [x] 2.2 实现计划加载功能 (tasks.md/detailed-tasks.yaml)
+- [x] 2.3 实现 TodoWrite 创建和维护逻辑
+- [x] 2.4 实现 fresh subagent 调用机制
+- [x] 2.5 实现逐任务执行流程
+- [x] 2.6 实现任务间代码审查机制
+- [x] 2.7 实现问题优先级分类 (Critical/Major/Minor)
+- [x] 2.8 实现 Critical 问题阻塞逻辑
+- [x] 2.9 实现最终审查流程
+- [x] 2.10 配置 REQUIRED branch-finisher 调用
+- [x] 2.11 实现与 branch-manager 的输入输出集成
+- [x] 2.12 添加公告模式文档
 
 ## 3. branch-finisher 技能实现
 
-- [ ] 3.1 创建 branch-finisher/SKILL.md 主文档
-- [ ] 3.2 实现测试前置验证逻辑
-- [ ] 3.3 实现 4 选项完成流程 UI
-- [ ] 3.4 实现 worktree 清理决策逻辑
-- [ ] 3.5 实现与 subagent-driver 的输入集成
-- [ ] 3.6 添加 Red Flags 和职责边界章节
+- [x] 3.1 创建 branch-finisher/SKILL.md 主文档
+- [x] 3.2 实现测试前置验证逻辑
+- [x] 3.3 实现 4 选项完成流程 UI
+- [x] 3.4 实现 worktree 清理决策逻辑
+- [x] 3.5 实现与 subagent-driver 的输入集成
+- [x] 3.6 添加 Red Flags 和职责边界章节
 
 ## 4. 现有技能集成更新
 
-- [ ] 4.1 更新 phase-b-developer 与新技能集成
-- [ ] 4.2 更新 phase-c-integrator 与 branch-finisher 集成
-- [ ] 4.3 更新 strategic-commit-orchestrator 协作逻辑
-- [ ] 4.4 验证与 tdd-enforcer 无冲突
+- [x] 4.1 更新 phase-b-developer 与新技能集成
+- [x] 4.2 更新 phase-c-integrator 与 branch-finisher 集成
+- [x] 4.3 更新 strategic-commit-orchestrator 协作逻辑
+- [x] 4.4 验证与 tdd-enforcer 无冲突
 
 ## 5. 文档和对比分析
 
-- [ ] 5.1 创建 superpowers-vs-aria.md 对比文档
-- [ ] 5.2 创建 dual-isolation-strategy.md 策略文档
-- [ ] 5.3 更新 AGENTS_ARCHITECTURE.md 添加 SDD 模式
-- [ ] 5.4 更新 system-architecture.md 添加强制执行章节
-- [ ] 5.5 创建渐进式隔离策略图示
+- [x] 5.1 创建 superpowers-vs-aria.md 对比文档
+- [x] 5.2 创建 dual-isolation-strategy.md 策略文档
+- [x] 5.3 更新 AGENTS_ARCHITECTURE.md 添加 SDD 模式
+- [x] 5.4 更新 system-architecture.md 添加强制执行章节
+- [x] 5.5 创建渐进式隔离策略图示
 
 ## 6. 验证和测试
 
