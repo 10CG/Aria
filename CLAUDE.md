@@ -120,13 +120,36 @@ D. 收尾 (Closure)
 ```
 需要理解 X? 找这里:
 
-├── 项目定位     → standards/openspec/changes/aria-proposal.md
-├── 工作流程     → standards/core/ten-step-cycle/
-├── 需求规范     → standards/openspec/project.md
-├── 提交规范     → standards/conventions/git-commit.md
-├── 进度管理     → standards/core/progress-management/
-└── 研究文档     → docs/
+├── 项目定位       → standards/openspec/changes/aria-proposal.md
+├── 工作流程       → standards/core/ten-step-cycle/
+├── 需求规范       → standards/openspec/project.md
+├── 提交规范       → standards/conventions/git-commit.md
+├── 进度管理       → standards/core/progress-management/
+└── 研究文档       → docs/
 ```
+
+### 插件使用 (其他项目)
+
+对于非 Aria 项目，推荐使用 Plugin Marketplace 安装：
+
+```bash
+# 添加 marketplace
+/plugin marketplace add 10CG/aria-plugin
+
+# 安装
+/plugin install aria@10cg-aria-plugin
+
+# 使用 (统一前缀 /aria:)
+/aria:state-scanner
+/aria:spec-drafter
+/aria:tech-lead
+```
+
+| 类型 | Aria 项目自身 | 其他项目 (Plugin) |
+|------|--------------|-------------------|
+| **Skills** | `/state-scanner` | `/aria:state-scanner` |
+| **Agents** | `/tech-lead` | `/aria:tech-lead` |
+| **更新方式** | `git submodule update` | `/plugin marketplace update` |
 
 ---
 
@@ -205,10 +228,13 @@ D. 收尾 (Closure)
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
+插件版本: v1.0.0 (aria-plugin)
 ```
 
 ---
 
-**更新**: 2026-01-18
+**更新**: 2026-01-23
 **维护**: 10CG Lab
-**仓库**: https://forgejo.10cg.pub/10CG/Aria
+**主仓库**: https://forgejo.10cg.pub/10CG/Aria
+**插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
+**规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards

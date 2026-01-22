@@ -68,16 +68,35 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 
 ## 快速开始
 
-### 1. 复制项目文件
+### 方式一: 使用 Plugin (推荐，用于其他项目)
 
 ```bash
+# 添加 marketplace
+/plugin marketplace add 10CG/aria-plugin
+
+# 安装
+/plugin install aria@10cg-aria-plugin
+
+# 使用
+/aria:state-scanner    # 扫描项目状态
+/aria:spec-drafter     # 创建需求规范
+/aria:tech-lead        # 调用专业 Agent
+```
+
+### 方式二: 使用 Submodule (用于 Aria 项目自身)
+
+```bash
+# 克隆 Aria 仓库
+git clone ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git
+cd Aria
+git submodule update --init --recursive
+
 # 复制到你的项目根目录
-git clone https://forgejo.10cg.pub/10CG/Aria.git
 cp -r Aria/.claude your-project/
 cp Aria/CLAUDE.md your-project/
 ```
 
-### 2. 配置项目
+### 配置项目
 
 编辑 `.claude/local.md`，添加你的项目信息：
 
@@ -91,32 +110,42 @@ cp Aria/CLAUDE.md your-project/
 - Frontend: React/Vue
 ```
 
-### 3. 开始使用
-
-```bash
-# 在 Claude Code 中
-/state-scanner    # 扫描项目状态
-```
-
 ---
 
 ## 项目结构
 
 ```
-Aria/
-├── CLAUDE.md              # AI 项目上下文
-├── README.md              # 本文档
+Aria/                          # Aria 主项目 (方法论研究)
+├── CLAUDE.md                  # AI 项目上下文
+├── README.md                  # 本文档
 ├── .claude/
-│   ├── local.md           # AI 工作流配置
-│   ├── agents/            # 专业 Agents
-│   └── skills/            # 十步循环 Skills
-├── standards/             # 方法论规范
-│   ├── core/              # 核心定义
-│   ├── openspec/          # 需求规范
-│   └── workflow/          # 工作流
-├── docs/                  # 研究文档
-└── aria/                  # 辅助工具
+│   ├── local.md               # AI 工作流配置
+│   ├── agents/                # 专业 Agents (子模块)
+│   └── skills/                # 十步循环 Skills (子模块)
+├── standards/                 # 方法论规范 (子模块)
+│   ├── core/                  # 核心定义
+│   ├── openspec/              # 需求规范
+│   └── workflow/              # 工作流
+├── docs/                      # 研究文档
+└── aria/                      # 辅助工具
+
+aria-plugin/                   # Aria 插件 (其他项目使用)
+├── .claude-plugin/
+│   ├── plugin.json            # 插件元数据
+│   └── marketplace.json       # Marketplace 配置
+├── skills/                    # 23 个 Skills
+└── agents/                    # 9 个 Agents
 ```
+
+### 两种使用方式对比
+
+| | Aria 项目自身 | 其他项目 |
+|---|--------------|----------|
+| **安装方式** | Git Submodule | Plugin Marketplace |
+| **Skills** | `.claude/skills/` | `/plugin install aria@10cg-aria-plugin` |
+| **Agents** | `.claude/agents/` | (已包含在 plugin 中) |
+| **调用格式** | `/state-scanner` | `/aria:state-scanner` |
+| **更新方式** | `git submodule update` | `/plugin marketplace update` |
 
 ---
 
@@ -187,7 +216,9 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ## 联系方式
 
-- **仓库**: https://forgejo.10cg.pub/10CG/Aria
+- **主仓库**: https://forgejo.10cg.pub/10CG/Aria
+- **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
+- **规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards
 - **维护**: 10CG Lab
 
 ---
