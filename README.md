@@ -72,15 +72,27 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 
 ```bash
 # 添加 marketplace
-/plugin marketplace add 10CG/aria-plugin
+/plugin marketplace add https://github.com/10CG/aria-plugin
 
-# 安装
+# 安装 Skills
 /plugin install aria@10cg-aria-plugin
+
+# 安装 Agents (手动复制)
+# Linux/macOS
+git clone https://github.com/10CG/aria-agents.git /tmp/aria-agents
+cp -r /tmp/aria-agents/* ~/.claude/agents/
+rm -rf /tmp/aria-agents
+
+# Windows
+git clone https://github.com/10CG/aria-agents.git %TEMP%\aria-agents
+xcopy /E /I %TEMP%\aria-agents %USERPROFILE%\.claude\agents
+rmdir %TEMP%\aria-agents
 
 # 使用
 /aria:state-scanner    # 扫描项目状态
 /aria:spec-drafter     # 创建需求规范
-/aria:tech-lead        # 调用专业 Agent
+# 直接调用 Agent
+请使用 tech-lead 规划这个功能的架构
 ```
 
 ### 方式二: 使用 Submodule (用于 Aria 项目自身)
@@ -143,7 +155,7 @@ aria-plugin/                   # Aria 插件 (其他项目使用)
 |---|--------------|----------|
 | **安装方式** | Git Submodule | Plugin Marketplace |
 | **Skills** | `.claude/skills/` | `/plugin install aria@10cg-aria-plugin` |
-| **Agents** | `.claude/agents/` | (已包含在 plugin 中) |
+| **Agents** | `.claude/agents/` | 复制到 `~/.claude/agents/` |
 | **调用格式** | `/state-scanner` | `/aria:state-scanner` |
 | **更新方式** | `git submodule update` | `/plugin marketplace update` |
 
