@@ -79,14 +79,14 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 
 # 安装 Agents (手动复制)
 # Linux/macOS
-git clone https://github.com/10CG/aria-agents.git /tmp/aria-agents
-cp -r /tmp/aria-agents/* ~/.claude/agents/
-rm -rf /tmp/aria-agents
+git clone https://github.com/10CG/aria-plugin.git /tmp/aria-plugin
+cp -r /tmp/aria-plugin/agents/* ~/.claude/agents/
+rm -rf /tmp/aria-plugin
 
 # Windows
-git clone https://github.com/10CG/aria-agents.git %TEMP%\aria-agents
-xcopy /E /I %TEMP%\aria-agents %USERPROFILE%\.claude\agents
-rmdir %TEMP%\aria-agents
+git clone https://github.com/10CG/aria-plugin.git %TEMP%\aria-plugin
+xcopy /E /I %TEMP%\aria-plugin\agents %USERPROFILE%\.claude\agents
+rmdir /S /Q %TEMP%\aria-plugin
 
 # 使用
 /aria:state-scanner    # 扫描项目状态
