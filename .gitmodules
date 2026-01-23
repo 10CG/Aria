@@ -7,3 +7,6 @@
 [submodule ".claude/skills"]
 	path = .claude/skills
 	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-skills.git
+[submodule "aria"]
+	path = aria
+	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-plugin.git
