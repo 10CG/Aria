@@ -103,9 +103,10 @@ git clone ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git
 cd Aria
 git submodule update --init --recursive
 
-# 复制到你的项目根目录
-cp -r Aria/.claude your-project/
-cp Aria/CLAUDE.md your-project/
+# 使用
+/state-scanner              # 扫描项目状态
+/spec-drafter              # 创建需求规范
+请使用 tech-lead 规划这个功能的架构
 ```
 
 ### 配置项目
@@ -131,33 +132,26 @@ Aria/                          # Aria 主项目 (方法论研究)
 ├── CLAUDE.md                  # AI 项目上下文
 ├── README.md                  # 本文档
 ├── .claude/
-│   ├── local.md               # AI 工作流配置
-│   ├── agents/                # 专业 Agents (子模块)
-│   └── skills/                # 十步循环 Skills (子模块)
+│   └── local.md               # AI 工作流配置
 ├── standards/                 # 方法论规范 (子模块)
 │   ├── core/                  # 核心定义
 │   ├── openspec/              # 需求规范
 │   └── workflow/              # 工作流
-├── docs/                      # 研究文档
-└── aria/                      # 辅助工具
-
-aria-plugin/                   # Aria 插件 (其他项目使用)
-├── .claude-plugin/
-│   ├── plugin.json            # 插件元数据
-│   └── marketplace.json       # Marketplace 配置
-├── skills/                    # 23 个 Skills
-└── agents/                    # 9 个 Agents
+├── aria/                      # Aria 插件 (子模块)
+│   ├── skills/                # 23 个 Skills
+│   ├── agents/                # 9 个 Agents
+│   └── .claude-plugin/        # Plugin 配置
+└── docs/                      # 研究文档
 ```
 
-### 两种使用方式对比
+### 使用方式对比
 
 | | Aria 项目自身 | 其他项目 |
 |---|--------------|----------|
 | **安装方式** | Git Submodule | Plugin Marketplace |
-| **Skills** | `.claude/skills/` | `/plugin install aria@10cg-aria-plugin` |
-| **Agents** | `.claude/agents/` | 复制到 `~/.claude/agents/` |
-| **调用格式** | `/state-scanner` | `/aria:state-scanner` |
-| **更新方式** | `git submodule update` | `/plugin marketplace update` |
+| **来源** | `aria/` 子模块 | `/plugin install aria@10cg-aria-plugin` |
+| **调用格式** | `/state-scanner` 或 `aria/skills/state-scanner` | `/aria:state-scanner` |
+| **更新方式** | `git submodule update --remote` | `/plugin marketplace update` |
 
 ---
 
