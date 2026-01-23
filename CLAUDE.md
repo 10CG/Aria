@@ -112,8 +112,11 @@ D. 收尾 (Closure)
 | 子模块 | 职责 | 关键内容 |
 |--------|------|----------|
 | `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 |
-| `.claude/skills/` | 工作流执行 | 每个 Phase 对应的 Skill |
-| `.claude/agents/` | 专业代理 | 领域特定的 AI Agent |
+| `aria/` | 工具集 (主要) | Skills + Agents + Plugin 配置 |
+| `.claude/skills/` | 工作流执行 (保留测试) | 每个 Phase 对应的 Skill |
+| `.claude/agents/` | 专业代理 (保留测试) | 领域特定的 AI Agent |
+
+> **实验中**: 同时保留 `aria/` 和独立的 `skills/`/`agents/` 子模块，用于对比测试更新便利性。
 
 ### 目录导航
 
@@ -147,9 +150,9 @@ D. 收尾 (Closure)
 
 | 类型 | Aria 项目自身 | 其他项目 (Plugin) |
 |------|--------------|-------------------|
-| **Skills** | `/state-scanner` | `/aria:state-scanner` |
-| **Agents** | `/tech-lead` | `/aria:tech-lead` |
-| **更新方式** | `git submodule update` | `/plugin marketplace update` |
+| **Skills** | `/state-scanner` 或 `aria/skills/state-scanner` | `/aria:state-scanner` |
+| **Agents** | `/tech-lead` 或 `aria/agents/tech-lead` | `/aria:tech-lead` |
+| **更新方式** | `git submodule update --remote` | `/plugin marketplace update` |
 
 ---
 
