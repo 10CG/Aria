@@ -1,0 +1,52 @@
+# Aria 项目版本信息
+
+> **版本**: 1.0.0
+> **最后更新**: 2026-01-23
+
+## 版本号
+
+```
+1.0.0
+```
+
+## 说明
+
+- **Major (1)**: 方法论核心框架稳定
+- **Minor (0)**: 十步循环、OpenSpec 已验证
+- **Patch (0)**: 初始正式发布
+
+## 子模块版本
+
+| 子模块 | 版本 | 仓库 |
+|--------|------|------|
+| aria-standards | v2.1.0 | https://forgejo.10cg.pub/10CG/aria-standards |
+| aria-skills | v1.1.0 | https://forgejo.10cg.pub/10CG/aria-skills |
+| aria-agents | v2.0.2 | https://forgejo.10cg.pub/10CG/aria-agents |
+
+## 插件版本
+
+| 插件 | 版本 | 仓库 |
+|------|------|------|
+| aria-plugin | v1.0.0 | https://forgejo.10cg.pub/10CG/aria-plugin |
+
+## 对应 Tag
+
+```
+v1.0.0
+```
+
+## 发布说明
+
+这是 Aria 方法论的第一个正式发布版本，包含：
+
+- ✅ 十步循环工作流定义
+- ✅ OpenSpec v2.1.0 需求规范
+- ✅ Skills + Agents 框架
+- ✅ TDD 强制执行机制
+- ✅ 架构文档同步规范
+
+## 下一步
+
+- [ ] v1.1.0 - 增强工作流自动化
+- [ ] v1.2.0 - 扩展到更多 AI 平台
+- [ ] v2.0.0 - 企业级功能支持
