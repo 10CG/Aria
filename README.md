@@ -68,46 +68,27 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 
 ## 快速开始
 
-### 方式一: 使用 Plugin (推荐，用于其他项目)
+### 安装 Aria 插件
 
 ```bash
 # 添加 marketplace
-/plugin marketplace add https://github.com/10CG/aria-plugin
+/plugin marketplace add 10CG/aria-plugin
 
-# 安装 Skills
+# 安装 (Skills + Agents 一起安装)
 /plugin install aria@10cg-aria-plugin
-
-# 安装 Agents (手动复制)
-# Linux/macOS
-git clone https://github.com/10CG/aria-plugin.git /tmp/aria-plugin
-cp -r /tmp/aria-plugin/agents/* ~/.claude/agents/
-rm -rf /tmp/aria-plugin
-
-# Windows
-git clone https://github.com/10CG/aria-plugin.git %TEMP%\aria-plugin
-xcopy /E /I %TEMP%\aria-plugin\agents %USERPROFILE%\.claude\agents
-rmdir /S /Q %TEMP%\aria-plugin
-
-# 使用
-/aria:state-scanner    # 扫描项目状态
-/aria:spec-drafter     # 创建需求规范
-# 直接调用 Agent
-请使用 tech-lead 规划这个功能的架构
 ```
 
-### 方式二: 使用 Submodule (用于 Aria 项目自身)
+### 安装 Standards (可选，用于需求规范)
 
 ```bash
-# 克隆 Aria 仓库
-git clone ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git
-cd Aria
-git submodule update --init --recursive
+# 添加到项目根目录
+git submodule add ssh://forgejo@forgejo.10cg.pub/10CG/aria-standards.git standards
 
-# 使用
-/state-scanner              # 扫描项目状态
-/spec-drafter              # 创建需求规范
-请使用 tech-lead 规划这个功能的架构
+# 或使用 HTTPS
+git submodule add https://forgejo.10cg.pub/10CG/aria-standards.git standards
 ```
+
+**说明**：`aria` 插件依赖 `standards/openspec` 目录来存放需求规范。如果不需要规范功能，可以跳过此步骤。
 
 ### 配置项目
 
@@ -123,6 +104,19 @@ git submodule update --init --recursive
 - Frontend: React/Vue
 ```
 
+### 使用
+
+```bash
+# 扫描项目状态
+/aria:state-scanner
+
+# 创建需求规范
+/aria:spec-drafter
+
+# 调用专业 Agent
+/aria:tech-lead 请规划这个功能的架构
+```
+
 ---
 
 ## 项目结构
@@ -131,12 +125,10 @@ git submodule update --init --recursive
 Aria/                          # Aria 主项目 (方法论研究)
 ├── CLAUDE.md                  # AI 项目上下文
 ├── README.md                  # 本文档
-├── .claude/
-│   └── local.md               # AI 工作流配置
 ├── standards/                 # 方法论规范 (子模块)
 │   ├── core/                  # 核心定义
 │   ├── openspec/              # 需求规范
-│   └── workflow/              # 工作流
+│   └── conventions/           # 约定规范
 ├── aria/                      # Aria 插件 (子模块)
 │   ├── skills/                # 23 个 Skills
 │   ├── agents/                # 9 个 Agents
@@ -144,14 +136,19 @@ Aria/                          # Aria 主项目 (方法论研究)
 └── docs/                      # 研究文档
 ```
 
-### 使用方式对比
+**你的项目结构** (使用 Aria 后)：
 
-| | Aria 项目自身 | 其他项目 |
-|---|--------------|----------|
-| **安装方式** | Git Submodule | Plugin Marketplace |
-| **来源** | `aria/` 子模块 | `/plugin install aria@10cg-aria-plugin` |
-| **调用格式** | `/state-scanner` 或 `aria/skills/state-scanner` | `/aria:state-scanner` |
-| **更新方式** | `git submodule update --remote` | `/plugin marketplace update` |
+```
+your-project/
+├── .claude/
+│   └── local.md               # 项目特定配置
+├── standards/                 # (可选) 方法论规范子模块
+│   └── openspec/
+│       └── changes/           # 项目需求规范存放处
+├── docs/                      # (推荐) 架构文档
+│   └── architecture/          # 与代码同步的架构设计
+└── [你的代码...]
+```
 
 ---
 
@@ -166,6 +163,8 @@ Aria/                          # Aria 主项目 (方法论研究)
 | 1 | 简单修复 | 无需规范 |
 | 2 | 中等功能 | `proposal.md` |
 | 3 | 架构变更 | `proposal.md` + `tasks.md` |
+
+**依赖关系**：Aria 插件依赖 `standards/openspec` 目录来存放和读取需求规范。如果不添加 `standards` 子模块，规范相关功能将无法正常工作。
 
 ### Skills 工作流
 

@@ -6,6 +6,18 @@
 
 ---
 
+## 文档边界
+
+| 文档 | 受众 | 目的 |
+|------|------|------|
+| **README.md** | 人类用户 | 项目介绍、快速开始、使用指南 |
+| **CLAUDE.md** | AI 助手 | 项目定位、上下文地图、不可协商规则 |
+
+**README.md** = "用户如何使用 Aria"
+**CLAUDE.md** = "AI 如何理解 Aria 项目"
+
+---
+
 ## 项目定位
 
 Aria 是一个**方法论研究项目**，而非框架实现。它探索如何让 AI Agent 深度参与软件工程全流程，从需求到交付的完整协作模式。
@@ -112,11 +124,7 @@ D. 收尾 (Closure)
 | 子模块 | 职责 | 关键内容 |
 |--------|------|----------|
 | `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 |
-| `aria/` | 工具集 (主要) | Skills + Agents + Plugin 配置 |
-| `.claude/skills/` | 工作流执行 (保留测试) | 每个 Phase 对应的 Skill |
-| `.claude/agents/` | 专业代理 (保留测试) | 领域特定的 AI Agent |
-
-> **实验中**: 同时保留 `aria/` 和独立的 `skills/`/`agents/` 子模块，用于对比测试更新便利性。
+| `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
 
 ### 目录导航
 
@@ -131,28 +139,23 @@ D. 收尾 (Closure)
 └── 研究文档       → docs/
 ```
 
-### 插件使用 (其他项目)
+### Plugin 调用方式 (Aria 项目内部)
 
-对于非 Aria 项目，推荐使用 Plugin Marketplace 安装：
+在 Aria 项目内部，Skills 和 Agents 可以直接调用：
 
-```bash
-# 添加 marketplace
-/plugin marketplace add 10CG/aria-plugin
+```
+Skills:
+  /state-scanner
+  /spec-drafter
+  /workflow-runner
 
-# 安装
-/plugin install aria@10cg-aria-plugin
-
-# 使用 (统一前缀 /aria:)
-/aria:state-scanner
-/aria:spec-drafter
-/aria:tech-lead
+Agents:
+  /tech-lead
+  /backend-architect
+  /knowledge-manager
 ```
 
-| 类型 | Aria 项目自身 | 其他项目 (Plugin) |
-|------|--------------|-------------------|
-| **Skills** | `/state-scanner` 或 `aria/skills/state-scanner` | `/aria:state-scanner` |
-| **Agents** | `/tech-lead` 或 `aria/agents/tech-lead` | `/aria:tech-lead` |
-| **更新方式** | `git submodule update --remote` | `/plugin marketplace update` |
+其他项目通过 Plugin 安装后使用 `/aria:` 前缀。
 
 ---
 
@@ -236,7 +239,7 @@ D. 收尾 (Closure)
 
 ---
 
-**更新**: 2026-01-23
+**更新**: 2026-01-24
 **维护**: 10CG Lab
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
