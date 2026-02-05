@@ -115,54 +115,54 @@
 
 ## Phase 2: 集成 (Week 3)
 
-### 2.1 state-scanner 集成 (2天)
+### 2.1 state-scanner 集成 (2天) ✅
 
-- [ ] **2.1.1** 实现模糊度检测
-  - [ ] 用户输入分析
-  - [ ] 模糊度评分算法
+- [x] **2.1.1** 实现模糊度检测
+  - [x] 用户输入分析
+  - [x] 模糊度评分算法
 
-- [ ] **2.1.2** 新增推荐规则
-  - [ ] fuzziness_requirement
-  - [ ] missing_prd
-  - [ ] prd_refinement
-  - [ ] tech_design_needed
+- [x] **2.1.2** 新增推荐规则
+  - [x] fuzziness_requirement
+  - [x] missing_prd
+  - [x] prd_refinement
+  - [x] tech_design_needed
 
-- [ ] **2.1.3** 状态报告增强
-  - [ ] 头脑风暴建议段落
-  - [ ] 交互式选项
+- [x] **2.1.3** 状态报告增强
+  - [x] 头脑风暴建议段落
+  - [x] 交互式选项
 
 - [ ] **2.1.4** 集成测试
 
-### 2.2 spec-drafter 增强 (2天)
+### 2.2 spec-drafter 增强 (2天) ✅
 
-- [ ] **2.2.1** PRD 创建集成
-  - [ ] 检测 decision-log
-  - [ ] 触发 requirements 模式
-  - [ ] 基于讨论结果生成 PRD
+- [x] **2.2.1** PRD 创建集成
+  - [x] 检测 decision-log
+  - [x] 触发 requirements 模式
+  - [x] 基于讨论结果生成 PRD
 
-- [ ] **2.2.2** OpenSpec 创建集成
-  - [ ] 检测 technical decision-log
-  - [ ] 触发 technical 模式
-  - [ ] 预填充 proposal.md
+- [x] **2.2.2** OpenSpec 创建集成
+  - [x] 检测 technical decision-log
+  - [x] 触发 technical 模式
+  - [x] 预填充 proposal.md
 
-- [ ] **2.2.3** 决策引用系统
-  - [ ] 引用格式定义
-  - [ ] 链接生成
-  - [ ] 追溯链维护
+- [x] **2.2.3** 决策引用系统
+  - [x] 引用格式定义
+  - [x] 链接生成
+  - [x] 追溯链维护
 
 - [ ] **2.2.4** 集成测试
 
-### 2.3 workflow-runner 更新 (1天)
+### 2.3 workflow-runner 更新 (1天) ✅
 
-- [ ] **2.3.1** 新增 A.0.5 步骤
-  - [ ] problem-brainstorm 调用点
-  - [ ] 条件判断
-  - [ ] 结果传递
+- [x] **2.3.1** 新增 A.0.5 步骤
+  - [x] problem-brainstorm 调用点
+  - [x] 条件判断
+  - [x] 结果传递
 
-- [ ] **2.3.2** 更新步骤编排
-  - [ ] A.1 内置头脑风暴
-  - [ ] 流程调整
-  - [ ] 文档更新
+- [x] **2.3.2** 更新步骤编排
+  - [x] A.1 内置头脑风暴
+  - [x] 流程调整
+  - [x] 文档更新
 
 - [ ] **2.3.3** 集成测试
 
@@ -170,27 +170,27 @@
 
 ## Phase 3: 文档和验证 (Week 4)
 
-### 3.1 文档编写 (2天)
+### 3.1 文档编写 (2天) ✅
 
-- [ ] **3.1.1** 用户文档
-  - [ ] SKILL.md 完成
-  - [ ] 快速开始指南
-  - [ ] 配置说明
+- [x] **3.1.1** 用户文档
+  - [x] SKILL.md 完成
+  - [x] 快速开始指南
+  - [x] 配置说明
 
-- [ ] **3.1.2** 设计文档
-  - [ ] SKILL_DESIGN.md 完成
-  - [ ] 架构图
-  - [ ] 状态机图
+- [x] **3.1.2** 设计文档
+  - [x] SKILL_DESIGN.md 完成
+  - [x] 架构图
+  - [x] 状态机图
 
-- [ ] **3.1.3** 示例文档
-  - [ ] problem 模式示例对话
-  - [ ] requirements 模式示例对话
-  - [ ] technical 模式示例对话
+- [x] **3.1.3** 示例文档
+  - [x] problem 模式示例对话
+  - [x] requirements 模式示例对话
+  - [x] technical 模式示例对话
 
-- [ ] **3.1.4** 配置文档
-  - [ ] config-example.md 完成
-  - [ ] 小型项目配置
-  - [ ] 企业级项目配置
+- [x] **3.1.4** 配置文档
+  - [x] config-example.md 完成
+  - [x] 小型项目配置
+  - [x] 企业级项目配置
 
 ### 3.2 用户测试 (2天)
 
@@ -303,4 +303,4 @@
 ---
 
 **更新日期**: 2026-02-05
-**状态**: Draft
+**状态**: In Progress (Phase 3.1 文档已完成，Phase 2 集成已完成)
