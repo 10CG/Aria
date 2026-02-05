@@ -1,0 +1,864 @@
+# Brainstorm Skill - 详细任务分解
+# 自动生成于: 2026-02-05
+# 基于: tasks.md
+
+metadata:
+  feature: brainstorm-skill
+  datasource: "tasks.md"
+  spec_level: Full (Level 3)
+  total_tasks: 24
+  estimated_hours: 104
+  module: aria-plugin
+
+# ============================================================================
+# Phase 1: 核心框架 (Week 1-2)
+# ============================================================================
+
+tasks:
+  # ------------------------------------------------------------------------
+  # 1.1 对话状态机 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-001
+    parent: "1.1.1"
+    title: 定义对话状态机接口和类型
+    status: pending
+    complexity: M
+    dependencies: []
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/types.ts
+      - aria/skills/brainstorm/src/interfaces.ts
+    description: |
+      定义 ConversationState, Constraint, Option, Decision 等核心接口
+      定义状态枚举: INIT, CLARIFY, EXPLORE, CONVERGE, SUMMARY, COMPLETE
+      定义状态转换规则和元数据结构
+    verification:
+      - TypeScript 类型检查通过
+      - 接口文档完整
+
+  - id: TASK-002
+    parent: "1.1.2"
+    title: 实现状态转换引擎
+    status: pending
+    complexity: L
+    dependencies: [TASK-001]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/state-machine.ts
+      - aria/skills/brainstorm/src/transitions.ts
+    description: |
+      实现 INIT → CLARIFY → EXPLORE → CONVERGE → SUMMARY → COMPLETE 流转
+      实现异常处理: 超时、无法收敛、用户中断
+      实现状态历史记录
+    verification:
+      - 所有状态转换路径可执行
+      - 异常情况有正确处理
+
+  - id: TASK-003
+    parent: "1.1.3"
+    title: 对话状态机单元测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-002]
+    hours: 6
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/src/__tests__/state-machine.test.ts
+    description: |
+      测试所有状态转换
+      测试最大轮次强制收敛
+      测试异常情况处理
+    verification:
+      - 测试覆盖率 >= 90%
+      - 所有测试通过
+
+  # ------------------------------------------------------------------------
+  # 1.2 问题生成器 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-004
+    parent: "1.2.1"
+    title: 实现问题模板系统
+    status: pending
+    complexity: M
+    dependencies: []
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/templates/question-templates.ts
+      - aria/skills/brainstorm/src/templates/template-engine.ts
+    description: |
+      定义 QuestionTemplate 接口
+      实现条件匹配逻辑
+      实现占位符填充功能
+    verification:
+      - 模板正确实例化
+      - 占位符正确替换
+
+  - id: TASK-005
+    parent: "1.2.2"
+    title: 实现三种模式的问题生成
+    status: pending
+    complexity: L
+    dependencies: [TASK-004]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/generators/problem-generator.ts
+      - aria/skills/brainstorm/src/generators/requirements-generator.ts
+      - aria/skills/brainstorm/src/generators/technical-generator.ts
+    description: |
+      实现 problem 模式问题序列 (澄清问题本质)
+      实现 requirements 模式问题序列 (分解功能)
+      实现 technical 模式问题序列 (方案对比)
+    verification:
+      - 每种模式有独立问题序列
+      - 问题序列逻辑正确
+
+  - id: TASK-006
+    parent: "1.2.3"
+    title: 问题生成器单元测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-005]
+    hours: 4
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/src/__tests__/generators.test.ts
+    description: |
+      测试模板选择逻辑
+      测试问题生成
+      测试边界条件
+    verification:
+      - 测试覆盖率 >= 85%
+      - 所有测试通过
+
+  # ------------------------------------------------------------------------
+  # 1.3 深度控制器 (1天 = 8h)
+  # ------------------------------------------------------------------------
+  - id: TASK-007
+    parent: "1.3.1"
+    title: 实现深度计算和收敛检测
+    status: pending
+    complexity: M
+    dependencies: []
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/controllers/depth-controller.ts
+    description: |
+      计算 fuzziness (模糊度)
+      计算 coverage (覆盖面)
+      计算 consensus (共识度)
+      实现深度判断逻辑
+    verification:
+      - 各指标计算正确
+      - 深度判断符合预期
+
+  - id: TASK-008
+    parent: "1.3.2"
+    title: 实现收敛控制和建议生成
+    status: pending
+    complexity: S
+    dependencies: [TASK-007]
+    hours: 2
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/controllers/convergence-detector.ts
+    description: |
+      实现多条件收敛判断
+      实现强制收敛逻辑
+      实现收敛建议生成
+    verification:
+      - 收敛检测准确
+      - 建议合理
+
+  - id: TASK-009
+    parent: "1.3.3"
+    title: 深度控制器单元测试
+    status: pending
+    complexity: S
+    dependencies: [TASK-008]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/src/__tests__/depth-controller.test.ts
+    description: |
+      测试深度计算
+      测试收敛检测
+      测试强制收敛
+    verification:
+      - 测试覆盖率 >= 80%
+      - 所有测试通过
+
+  # ------------------------------------------------------------------------
+  # 1.4 决策记录系统 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-010
+    parent: "1.4.1"
+    title: 实现决策识别逻辑
+    status: pending
+    complexity: M
+    dependencies: []
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/recognizers/decision-recognizer.ts
+    description: |
+      识别明确选择 ("我选择方案A")
+      识别隐式选择 ("方案A更适合")
+      识别约束导致的选择
+    verification:
+      - 三种选择模式都能识别
+      - 识别准确率 >= 90%
+
+  - id: TASK-011
+    parent: "1.4.2"
+    title: 实现决策日志生成
+    status: pending
+    complexity: M
+    dependencies: [TASK-010]
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/generators/decision-logger.ts
+    description: |
+      实现 Markdown 格式化
+      实现决策 ID 生成
+      实现文件写入逻辑
+    verification:
+      - 生成的 Markdown 格式正确
+      - 文件成功写入
+
+  - id: TASK-012
+    parent: "1.4.3"
+    title: 创建决策记录模板
+    status: pending
+    complexity: S
+    dependencies: []
+    hours: 2
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/brainstorm/templates/decision-template.md
+    description: |
+      创建决策记录模板
+      定义占位符
+      提供示例填充
+    verification:
+      - 模板完整可用
+      - 占位符清晰
+
+  - id: TASK-013
+    parent: "1.4.4"
+    title: 决策记录系统单元测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-011, TASK-012]
+    hours: 4
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/src/__tests__/decision-logger.test.ts
+    description: |
+      测试决策识别
+      测试日志生成
+      测试模板填充
+    verification:
+      - 测试覆盖率 >= 85%
+      - 所有测试通过
+
+  # ------------------------------------------------------------------------
+  # 1.5 约束管理系统 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-014
+    parent: "1.5.1"
+    title: 定义约束库
+    status: pending
+    complexity: M
+    dependencies: []
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/constraints/constraint-library.ts
+      - aria/skills/brainstorm/src/constraints/schemas.ts
+    description: |
+      定义 business 约束 (预算, 时间, 合规)
+      定义 technical 约束 (架构, 技术栈, 性能)
+      定义 team 约束 (技能, 工时)
+    verification:
+      - 约束定义完整
+      - 约束类型正确
+
+  - id: TASK-015
+    parent: "1.5.2"
+    title: 实现约束验证
+    status: pending
+    complexity: M
+    dependencies: [TASK-014]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/constraints/constraint-validator.ts
+    description: |
+      实现约束匹配逻辑
+      实现可行性检查
+      实现违规原因记录
+    verification:
+      - 约束验证正确
+      - 违规原因清晰
+
+  - id: TASK-016
+    parent: "1.5.3"
+    title: 实现方案过滤
+    status: pending
+    complexity: M
+    dependencies: [TASK-015]
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/constraints/option-filter.ts
+    description: |
+      实现硬约束过滤
+      实现软约束评分
+      实现排序输出
+    verification:
+      - 过滤逻辑正确
+      - 评分合理
+
+  - id: TASK-017
+    parent: "1.5.4"
+    title: 约束管理系统单元测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-016]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/src/__tests__/constraints.test.ts
+    description: |
+      测试约束验证
+      测试方案过滤
+      测试评分逻辑
+    verification:
+      - 测试覆盖率 >= 85%
+      - 所有测试通过
+
+  # ------------------------------------------------------------------------
+  # 1.6 端到端测试 (1天 = 8h)
+  # ------------------------------------------------------------------------
+  - id: TASK-018
+    parent: "1.6.1"
+    title: 端到端场景测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-003, TASK-006, TASK-009, TASK-013, TASK-017]
+    hours: 4
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/e2e/scenarios/problem-mode.e2e.ts
+      - aria/skills/brainstorm/e2e/scenarios/requirements-mode.e2e.ts
+      - aria/skills/brainstorm/e2e/scenarios/technical-mode.e2e.ts
+    description: |
+      测试 problem 模式完整流程
+      测试 requirements 模式完整流程
+      测试 technical 模式完整流程
+      测试跨模式切换
+    verification:
+      - 所有场景测试通过
+      - 跨模式切换正常
+
+  - id: TASK-019
+    parent: "1.6.2"
+    title: 边界和异常测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-018]
+    hours: 4
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/e2e/edge-cases.test.ts
+    description: |
+      测试无法收敛场景
+      测试约束冲突场景
+      测试用户放弃场景
+      测试超时场景
+    verification:
+      - 边界情况有正确处理
+      - 异常不会导致崩溃
+
+# ============================================================================
+# Phase 2: 集成 (Week 3)
+# ============================================================================
+
+  # ------------------------------------------------------------------------
+  # 2.1 state-scanner 集成 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-020
+    parent: "2.1.1"
+    title: 实现模糊度检测和推荐规则
+    status: pending
+    complexity: M
+    dependencies: [TASK-019]
+    hours: 8
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/state-scanner/src/fuzziness-detector.ts
+      - aria/skills/state-scanner/src/rules/brainstorm-rules.ts
+    description: |
+      实现用户输入模糊度分析
+      实现 fuzziness_requirement 规则
+      实现 missing_prd 规则
+      实现 prd_refinement 规则
+      实现 tech_design_needed 规则
+    verification:
+      - 模糊度计算准确
+      - 推荐规则触发正确
+
+  - id: TASK-021
+    parent: "2.1.3"
+    title: state-scanner 状态报告增强
+    status: pending
+    complexity: S
+    dependencies: [TASK-020]
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/state-scanner/src/reporters/brainstorm-reporter.ts
+    description: |
+      添加头脑风暴建议段落
+      添加交互式选项
+    verification:
+      - 状态报告正确显示
+      - 交互式选项可用
+
+  - id: TASK-022
+    parent: "2.1.4"
+    title: state-scanner 集成测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-021]
+    hours: 4
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/state-scanner/__tests__/brainstorm-integration.test.ts
+    description: |
+      测试 state-scanner 与 brainstorm 集成
+      测试推荐触发
+      测试状态报告
+    verification:
+      - 集成测试通过
+      - 无回归问题
+
+  # ------------------------------------------------------------------------
+  # 2.2 spec-drafter 增强 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-023
+    parent: "2.2.1"
+    title: PRD 创建集成头脑风暴
+    status: pending
+    complexity: M
+    dependencies: [TASK-019]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/spec-drafter/src/integrations/requirements-brainstorm.ts
+    description: |
+      检测 decision-log
+      触发 requirements 模式
+      基于讨论结果生成 PRD
+    verification:
+      - 集成正确触发
+      - PRD 生成正确
+
+  - id: TASK-024
+    parent: "2.2.2"
+    title: OpenSpec 创建集成头脑风暴
+    status: pending
+    complexity: M
+    dependencies: [TASK-023]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/spec-drafter/src/integrations/technical-brainstorm.ts
+    description: |
+      检测 technical decision-log
+      触发 technical 模式
+      预填充 proposal.md
+    verification:
+      - 集成正确触发
+      - 预填充正确
+
+  - id: TASK-025
+    parent: "2.2.3"
+    title: 决策引用系统
+    status: pending
+    complexity: S
+    dependencies: [TASK-024]
+    hours: 2
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/spec-drafter/src/integrations/decision-references.ts
+    description: |
+      定义引用格式
+      生成链接
+      维护追溯链
+    verification:
+      - 引用格式正确
+      - 链接有效
+
+  - id: TASK-026
+    parent: "2.2.4"
+    title: spec-drafter 集成测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-025]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/spec-drafter/__tests__/brainstorm-integration.test.ts
+    description: |
+      测试 PRD 集成
+      测试 OpenSpec 集成
+      测试决策引用
+    verification:
+      - 集成测试通过
+      - 无回归问题
+
+  # ------------------------------------------------------------------------
+  # 2.3 workflow-runner 更新 (1天 = 8h)
+  # ------------------------------------------------------------------------
+  - id: TASK-027
+    parent: "2.3.1"
+    title: 新增 A.0.5 头脑风暴步骤
+    status: pending
+    complexity: M
+    dependencies: [TASK-022, TASK-026]
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/workflow-runner/src/steps/a05-brainstorm.ts
+      - aria/skills/workflow-runner/src/steps/index.ts
+    description: |
+      添加 problem-brainstorm 调用点
+      实现条件判断
+      实现结果传递
+    verification:
+      - 步骤正确调用
+      - 结果正确传递
+
+  - id: TASK-028
+    parent: "2.3.2"
+    title: 更新工作流编排和文档
+    status: pending
+    complexity: S
+    dependencies: [TASK-027]
+    hours: 2
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/workflow-runner/SKILL.md (更新)
+      - aria/skills/workflow-runner/docs/workflow-v2.md
+    description: |
+      更新 A.1 内置头脑风暴
+      更新流程编排
+      更新文档
+    verification:
+      - 文档更新完整
+      - 流程图正确
+
+  - id: TASK-029
+    parent: "2.3.3"
+    title: workflow-runner 集成测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-028]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/workflow-runner/__tests__/workflow-a05-brainstorm.test.ts
+    description: |
+      测试 A.0.5 步骤
+      测试完整工作流
+    verification:
+      - 集成测试通过
+      - 无回归问题
+
+# ============================================================================
+# Phase 3: 文档和验证 (Week 4)
+# ============================================================================
+
+  # ------------------------------------------------------------------------
+  # 3.1 文档编写 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-030
+    parent: "3.1.1"
+    title: 完成用户文档
+    status: pending
+    complexity: S
+    dependencies: [TASK-029]
+    hours: 4
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/brainstorm/SKILL.md (最终版)
+      - aria/skills/brainstorm/docs/quick-start.md
+      - aria/skills/brainstorm/docs/configuration.md
+    description: |
+      完成 SKILL.md
+      编写快速开始指南
+      编写配置说明
+    verification:
+      - 文档完整清晰
+      - 示例可运行
+
+  - id: TASK-031
+    parent: "3.1.2"
+    title: 完成设计文档
+    status: pending
+    complexity: M
+    dependencies: [TASK-029]
+    hours: 4
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/brainstorm/SKILL_DESIGN.md (最终版)
+      - aria/skills/brainstorm/docs/architecture.md
+      - aria/skills/brainstorm/docs/state-machine.md
+    description: |
+      完成 SKILL_DESIGN.md
+      绘制架构图
+      绘制状态机图
+    verification:
+      - 文档完整
+      - 图表清晰
+
+  - id: TASK-032
+    parent: "3.1.3"
+    title: 编写示例对话文档
+    status: pending
+    complexity: S
+    dependencies: [TASK-030]
+    hours: 4
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/brainstorm/docs/examples/problem-mode-example.md
+      - aria/skills/brainstorm/docs/examples/requirements-mode-example.md
+      - aria/skills/brainstorm/docs/examples/technical-mode-example.md
+    description: |
+      编写 problem 模式示例对话
+      编写 requirements 模式示例对话
+      编写 technical 模式示例对话
+    verification:
+      - 示例真实可信
+      - 对话流程清晰
+
+  - id: TASK-033
+    parent: "3.1.4"
+    title: 完成配置文档
+    status: pending
+    complexity: S
+    dependencies: [TASK-030]
+    hours: 4
+    agent: aria:knowledge-manager
+    deliverables:
+      - aria/skills/brainstorm/config-example.md (最终版)
+      - aria/skills/brainstorm/docs/config-small-project.md
+      - aria/skills/brainstorm/docs/config-enterprise.md
+    description: |
+      完成 config-example.md
+      提供小型项目配置示例
+      提供企业级配置示例
+    verification:
+      - 配置示例完整
+      - 注释清晰
+
+  # ------------------------------------------------------------------------
+  # 3.2 用户测试 (2天 = 16h)
+  # ------------------------------------------------------------------------
+  - id: TASK-034
+    parent: "3.2.1"
+    title: 测试准备
+    status: pending
+    complexity: S
+    dependencies: [TASK-033]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/testing/test-plan.md
+      - aria/skills/brainstorm/testing/test-scenarios.md
+    description: |
+      选择试点用户
+      准备测试场景
+      设置测试环境
+    verification:
+      - 测试计划完整
+      - 测试环境就绪
+
+  - id: TASK-035
+    parent: "3.2.2"
+    title: 执行用户测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-034]
+    hours: 8
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/testing/feedback/feedback-summary.md
+    description: |
+      观察 3-5 个用户
+      收集反馈
+      记录问题
+    verification:
+      - 至少 3 个用户测试
+      - 反馈已记录
+
+  - id: TASK-036
+    parent: "3.2.3"
+    title: 反馈处理和关键问题修复
+    status: pending
+    complexity: M
+    dependencies: [TASK-035]
+    hours: 6
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/testing/feedback/bug-fixes.md
+    description: |
+      问题分类
+      优先级排序
+      修复关键问题
+    verification:
+      - Critical 问题已修复
+      - Major 问题已评估
+
+  # ------------------------------------------------------------------------
+  # 3.3 优化和发布 (1天 = 8h)
+  # ------------------------------------------------------------------------
+  - id: TASK-037
+    parent: "3.3.1"
+    title: 性能优化
+    status: pending
+    complexity: M
+    dependencies: [TASK-036]
+    hours: 4
+    agent: aria:backend-architect
+    deliverables:
+      - aria/skills/brainstorm/src/optimizations/cache.ts
+      - aria/skills/brainstorm/docs/performance.md
+    description: |
+      优化对话响应速度
+      优化文件写入
+      实现缓存策略
+    verification:
+      - 响应时间 < 2s
+      - 无明显卡顿
+
+  - id: TASK-038
+    parent: "3.3.2"
+    title: 最终检查
+    status: pending
+    complexity: S
+    dependencies: [TASK-037]
+    hours: 2
+    agent: aria:qa-engineer
+    deliverables:
+      - aria/skills/brainstorm/testing/final-checklist.md
+    description: |
+      确认所有测试通过
+      确认文档完整
+      确认版本标记
+    verification:
+      - 所有检查项通过
+      - 版本号正确
+
+  - id: TASK-039
+    parent: "3.3.3"
+    title: 发布 v1.0.0
+    status: pending
+    complexity: S
+    dependencies: [TASK-038]
+    hours: 2
+    agent: aria:tech-lead
+    deliverables:
+      - CHANGELOG.md
+      - release-notes/v1.0.0.md
+    description: |
+      更新 CHANGELOG
+      创建版本发布
+      编写发布说明
+    verification:
+      - 发布成功
+      - 发布说明完整
+
+# ============================================================================
+# 执行顺序
+# ============================================================================
+
+execution_order:
+  parallel_groups:
+    - group: 1
+      tasks: [TASK-001, TASK-004, TASK-007, TASK-010, TASK-012, TASK-014]
+      description: "Phase 1 基础组件并行开发"
+
+    - group: 2
+      tasks: [TASK-002, TASK-005, TASK-008, TASK-011, TASK-015, TASK-016]
+      description: "Phase 1 核心逻辑实现"
+      depends_on: [TASK-001, TASK-004, TASK-007, TASK-010, TASK-012, TASK-014]
+
+    - group: 3
+      tasks: [TASK-003, TASK-006, TASK-009, TASK-013, TASK-017]
+      description: "Phase 1 单元测试"
+      depends_on: [TASK-002, TASK-005, TASK-008, TASK-011, TASK-016]
+
+    - group: 4
+      tasks: [TASK-018, TASK-019]
+      description: "Phase 1 端到端测试"
+      depends_on: [TASK-003, TASK-006, TASK-009, TASK-013, TASK-017]
+
+    - group: 5
+      tasks: [TASK-020, TASK-023]
+      description: "Phase 2 集成开发"
+      depends_on: [TASK-019]
+
+    - group: 6
+      tasks: [TASK-021, TASK-024, TASK-025]
+      description: "Phase 2 集成完善"
+      depends_on: [TASK-020, TASK-023]
+
+    - group: 7
+      tasks: [TASK-022, TASK-026]
+      description: "Phase 2 集成测试"
+      depends_on: [TASK_021, TASK_025]
+
+    - group: 8
+      tasks: [TASK-027]
+      description: "Phase 2 workflow-runner 更新"
+      depends_on: [TASK-022, TASK-026]
+
+    - group: 9
+      tasks: [TASK-028, TASK-029]
+      description: "Phase 2 完成"
+      depends_on: [TASK-027]
+
+    - group: 10
+      tasks: [TASK-030, TASK-031, TASK-032, TASK-033]
+      description: "Phase 3 文档编写"
+      depends_on: [TASK-029]
+
+    - group: 11
+      tasks: [TASK-034, TASK-035]
+      description: "Phase 3 用户测试"
+      depends_on: [TASK-033]
+
+    - group: 12
+      tasks: [TASK-036, TASK-037, TASK-038, TASK-039]
+      description: "Phase 3 发布"
+      depends_on: [TASK-035]
+
+# ============================================================================
+# 复杂度汇总
+# ============================================================================
+
+complexity_summary:
+  S: 11  # 4h each = 44h
+  M: 25  # 6h each = 150h
+  L: 3   # 8h each = 24h
+  total_hours: 218h (原估计 80-120h 为开发时间，这里包含测试和文档)
+
+# 注: 实际开发会调整任务粒度，此为完整分解参考
