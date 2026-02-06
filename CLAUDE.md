@@ -182,6 +182,80 @@ Agents:
 
 ---
 
+## 版本管理规范
+
+### 版本号语义
+
+遵循 [Semantic Versioning 2.0.0](https://semver.org/):
+
+```
+MAJOR.MINOR.PATCH
+
+MAJOR: 破坏性变更 / 架构重构
+MINOR: 新功能 / 向后兼容
+PATCH: Bug 修复 / 小改进
+```
+
+### Aria 特殊约定
+
+| 变更类型 | 版本变更 | 示例 |
+|----------|----------|------|
+| 新增 Skill | MINOR+ | 1.2.0 → 1.3.0 |
+| Skill 架构重构 | MINOR+ | 1.2.0 → 1.3.0 |
+| 文档更新 | PATCH | 1.3.0 → 1.3.1 |
+| Bug 修复 | PATCH | 1.3.0 → 1.3.1 |
+| 破坏性变更 | MAJOR+ | 1.x → 2.0 |
+
+### 版本信息文件架构
+
+```
+aria/
+├── .claude-plugin/
+│   ├── plugin.json       # 主版本文件 (真理来源 Source of Truth)
+│   ├── marketplace.json   # 市场发布配置
+│   └── hooks.json        # Hooks 配置
+├── VERSION               # 人类可读版本快照
+├── CHANGELOG.md          # 版本变更记录
+└── README.md             # 包含版本号
+```
+
+### 版本发布检查清单
+
+每次发布新版本时，必须更新以下文件：
+
+```yaml
+真理来源 (Source of Truth):
+  - [ ] aria/.claude-plugin/plugin.json (version 字段)
+
+派生文件 (必须同步):
+  - [ ] aria/.claude-plugin/marketplace.json (version, plugins[].version)
+  - [ ] aria/.claude-plugin/hooks.json (version 字段)
+  - [ ] aria/VERSION (创建或更新)
+  - [ ] aria/CHANGELOG.md (添加新版本条目)
+  - [ ] aria/README.md (更新版本号和 Skills 数量)
+
+主项目:
+  - [ ] 更新子模块指针 (git add aria)
+  - [ ] 主项目/VERSION 更新插件版本记录
+```
+
+### 版本信息一致性
+
+所有版本信息文件必须保持一致：
+
+| 文件 | 字段 | 示例 |
+|------|------|------|
+| plugin.json | `version` | `"1.3.0"` |
+| marketplace.json | `version`, `plugins[].version` | `"1.3.0"` |
+| hooks.json | `version` | `"1.3.0"` |
+| VERSION | `版本` | `1.3.0` |
+| CHANGELOG.md | `## [X.Y.Z]` | `## [1.3.0]` |
+| README.md | `**Version**: X.Y.Z` | `**Version**: 1.3.0` |
+
+**重要**: `plugin.json` 是版本号的**真理来源 (Source of Truth)**，其他文件必须与其保持一致。
+
+---
+
 ## 与其他方法论的关系
 
 ```
@@ -234,12 +308,13 @@ Agents:
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
-插件版本: v1.0.0 (aria-plugin)
+插件版本: v1.3.0 (aria-plugin)
+主项目版本: v1.0.0
 ```
 
 ---
 
-**更新**: 2026-01-24
+**更新**: 2026-02-06
 **维护**: 10CG Lab
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
