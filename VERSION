@@ -25,12 +25,13 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.3.1 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-06 |
+| aria (子模块) | v1.3.2 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-06 |
 
-### aria v1.3.1 变更摘要
+### aria v1.3.2 变更摘要
 
-- state-scanner 跨平台兼容性指南 (新增 references/cross-platform-commands.md)
-- Progressive Disclosure 优化 (SKILL.md 精简至 1,362 词)
+- brainstorm v2.0.0: 基于 Superpowers 最佳实践重构对话流程
+- 新增"不可协商规则"强制对话控制
+- 修复 AI 跳过对话直接生成 User Stories 的问题
 
 ## 对应 Tag
 

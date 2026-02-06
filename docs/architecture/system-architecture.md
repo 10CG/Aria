@@ -1,6 +1,6 @@
 # Aria System Architecture
 
-> **Version**: 1.3.1
+> **Version**: 1.3.2
 > **Status**: Active
 > **Created**: 2026-01-18
 > **Last Updated**: 2026-02-06
@@ -607,6 +607,7 @@ tdd-enforcer v1.1.0:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 1.3.2 | 2026-02-06 | brainstorm v2.0.0: 基于 Superpowers 最佳实践重构对话流程; 新增"不可协商规则"强制对话控制; 修复 AI 跳过对话直接生成 User Stories 的问题 |
 | 1.3.1 | 2026-02-06 | state-scanner 跨平台兼容性指南; Progressive Disclosure 优化; 新增 references/cross-platform-commands.md |
 | 1.3.0 | 2026-02-06 | TDD Enforcer v2.0: 文档驱动重构 (移除 17+ Python 模块); Brainstorm Skill v1.1.0: 结构优化完成 (SKILL.md -79%) |
 | 1.2.0 | 2026-01-21 | 添加强制执行机制 (branch-manager v2.0, subagent-driver v1.0, branch-finisher v1.0) |
