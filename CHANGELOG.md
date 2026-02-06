@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2026-02-06
+
+### Changed
+- **aria 子模块** - 更新至 v1.3.1
+  - state-scanner: 新增跨平台兼容性指南
+  - 新增 references/cross-platform-commands.md
+  - Progressive Disclosure 优化 (SKILL.md 精简至 1,362 词)
+
+---
+
 ## [1.0.0] - 2026-01-23
 
 ### Added
@@ -92,9 +102,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 1.0.1 | 2026-02-06 | aria 子模块更新至 v1.3.1 |
 | 1.0.0 | 2026-01-23 | 首个正式发布 |
 
 ---
 
-[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.0...HEAD
+[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.1...HEAD
+[1.0.1]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.1
 [1.0.0]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.0
