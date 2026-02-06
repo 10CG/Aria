@@ -1,10 +1,11 @@
 # 版本信息规范化 (Version Standardization)
 
 > **Change ID**: 2026-02-06-version-standardization
-> **Status**: Draft
+> **Status**: Completed
 > **Priority**: P0
 > **Complexity**: S
 > **Estimated**: 2-4h
+> **Completed**: 2026-02-06
 
 ---
 
