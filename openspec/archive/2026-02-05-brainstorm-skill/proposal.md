@@ -1,7 +1,7 @@
 # Brainstorm Skill - AI-DDD 协作思考引擎
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Completed
 > **Created**: 2026-02-05
 > **Reference**: [Superpowers brainstorming](https://github.com/obra/superpowers)
 > **Design Docs**: [brainstorming-in-ai-ddd.md](../../docs/analysis/brainstorming-in-ai-ddd.md)
