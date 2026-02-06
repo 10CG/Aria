@@ -25,13 +25,12 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.3.0 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-06 |
+| aria (子模块) | v1.3.1 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-06 |
 
-### aria v1.3.0 变更摘要
+### aria v1.3.1 变更摘要
 
-- TDD Enforcer v2.0: 文档驱动重构 (移除 17+ Python 模块)
-- Brainstorm Skill v1.1.0: 结构优化完成 (SKILL.md -79%)
-- 版本信息规范化: 统一 plugin.json/marketplace.json/hooks.json/VERSION
+- state-scanner 跨平台兼容性指南 (新增 references/cross-platform-commands.md)
+- Progressive Disclosure 优化 (SKILL.md 精简至 1,362 词)
 
 ## 对应 Tag
 
