@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.2] - 2026-02-06
+
+### Changed
+- **aria 子模块** - 更新至 v1.3.2
+  - brainstorm v2.0.0: 基于 Superpowers 最佳实践重构对话流程
+  - 新增"不可协商规则"强制对话控制
+  - 修复 AI 跳过对话直接生成 User Stories 的问题
+
+---
+
 ## [1.0.1] - 2026-02-06
 
 ### Changed
@@ -102,11 +112,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 1.0.2 | 2026-02-06 | aria 子模块更新至 v1.3.2 (brainstorm v2.0.0) |
 | 1.0.1 | 2026-02-06 | aria 子模块更新至 v1.3.1 |
 | 1.0.0 | 2026-01-23 | 首个正式发布 |
 
 ---
 
-[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.1...HEAD
+[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.2...HEAD
+[1.0.2]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.2
 [1.0.1]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.1
 [1.0.0]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.0
