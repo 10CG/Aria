@@ -1,0 +1,423 @@
+# TDD 执行严格度增强 - 详细任务规格 (v2.0 文档驱动)
+# Layer 2: AI-executable task specifications
+# 生成自: tasks.md (Layer 1)
+
+> **Spec**: changes/2026-02-05-tdd-strictness-enhancement/proposal.md
+> **Generated**: 2026-02-06
+> **Format**: detailed-tasks.yaml v1.0
+> **Design**: Document-Driven (文档驱动)
+
+---
+metadata:
+  feature: tdd-strictness-enhancement-v2
+  datasource: "tasks.md"
+  total_tasks: 23
+  estimated_hours: "8-16h"
+  priority: High
+  design_approach: "document-driven"  # 新增：设计方法标识
+
+# ============================================================================
+# Phase 1: 文档重构
+# ============================================================================
+tasks:
+  # ==================== SKILL.md 重写 ====================
+  - id: TASK-001
+    parent: "1.1"
+    title: 重写 SKILL.md (文档驱动设计)
+    status: pending
+    complexity: L
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/SKILL.md
+    agent: knowledge-manager
+    verification:
+      - "文档描述三级严格度 (Advisory/Strict/Superpowers)"
+      - "包含跨语言检测命令示例"
+      - "包含 Hook 配置说明"
+      - "SKILL.md < 500 行"
+      - "符合 Agent Skills 设计原则"
+
+  - id: TASK-002
+    parent: "1.2"
+    title: 更新 EXAMPLES.md (使用示例)
+    status: pending
+    complexity: S
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/EXAMPLES.md
+    agent: knowledge-manager
+    verification:
+      - "包含 Advisory 模式示例"
+      - "包含 Strict 模式示例"
+      - "包含 Superpowers 模式示例"
+      - "包含配置示例"
+
+  # ==================== references/ 详细文档 ====================
+  - id: TASK-003
+    parent: "1.3"
+    title: 编写 references/strictness-levels.md
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/references/strictness-levels.md
+    agent: knowledge-manager
+    verification:
+      - "详细说明三个严格度级别"
+      - "包含检查规则对比表"
+      - "包含使用场景说明"
+      - "包含配置示例"
+
+  - id: TASK-004
+    parent: "1.4"
+    title: 编写 references/red-state-detection.md
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/references/red-state-detection.md
+    agent: knowledge-manager
+    verification:
+      - "说明 RED 状态检测原理"
+      - "包含 Python/JS/Dart 检测命令"
+      - "包含状态判断逻辑说明"
+
+  - id: TASK-005
+    parent: "1.5"
+    title: 编写 references/green-phase-check.md
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/references/green-phase-check.md
+    agent: knowledge-manager
+    verification:
+      - "说明 GREEN 阶段验证规则"
+      - "包含代码增量检测说明"
+      - "包含金装甲测试检测说明"
+
+  - id: TASK-006
+    parent: "1.6"
+    title: 编写 references/migration-guide.md
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/references/migration-guide.md
+    agent: knowledge-manager
+    verification:
+      - "包含 v1.x → v2.0 迁移步骤"
+      - "说明配置变更"
+      - "说明功能变化"
+      - "包含常见问题解答"
+
+  - id: TASK-007
+    parent: "1.7"
+    title: 更新 tdd-config-schema.json
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/tdd-enforcer/tdd-config-schema.json
+    agent: knowledge-manager
+    verification:
+      - "包含 strictness 字段"
+      - "包含语言特定配置"
+      - "包含 GREEN 阶段配置"
+      - "包含金装甲测试配置"
+
+# ============================================================================
+# Phase 2: 清理旧实现
+# ============================================================================
+  # ==================== 删除 Python 模块 ====================
+  - id: TASK-008
+    parent: "2.1"
+    title: 删除 cache.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/cache.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "无引用残留"
+
+  - id: TASK-009
+    parent: "2.2"
+    title: 删除 config.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/config.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "无引用残留"
+
+  - id: TASK-010
+    parent: "2.3"
+    title: 删除 diff_analyzer.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/diff_analyzer.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "无引用残留"
+
+  - id: TASK-011
+    parent: "2.4"
+    title: 删除 state_persistence.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/state_persistence.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "无引用残留"
+
+  - id: TASK-012
+    parent: "2.5"
+    title: 删除 state_tracker.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/state_tracker.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "无引用残留"
+
+  # ==================== 删除目录 ====================
+  - id: TASK-013
+    parent: "2.6"
+    title: 删除 test_runners/ 目录
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/test_runners/ (删除)
+    agent: knowledge-manager
+    verification:
+      - "目录已删除"
+      - "包含 base.py, python_runner.py, js_runner.py, dart_runner.py, go_runner.py"
+
+  - id: TASK-014
+    parent: "2.7"
+    title: 删除 validators/ 目录
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/validators/ (删除)
+    agent: knowledge-manager
+    verification:
+      - "目录已删除"
+      - "包含 green_validator.py, golden_test_detector.py"
+
+  - id: TASK-015
+    parent: "2.8"
+    title: 删除 hooks/pre_tool_use_hook.py
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/hooks/pre_tool_use_hook.py (删除)
+    agent: knowledge-manager
+    verification:
+      - "文件已删除"
+      - "hooks/ 目录可能保留用于配置说明"
+
+  - id: TASK-016
+    parent: "2.9"
+    title: 删除 tests/ 目录
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - aria/skills/tdd-enforcer/tests/ (删除)
+    agent: knowledge-manager
+    verification:
+      - "目录已删除"
+      - "Python 单元测试不再需要"
+
+# ============================================================================
+# Phase 3: 示例更新
+# ============================================================================
+  - id: TASK-017
+    parent: "3.1"
+    title: 更新 Python 示例
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-007]
+    deliverables:
+      - aria/skills/tdd-enforcer/examples/python/README.md
+      - aria/skills/tdd-enforcer/examples/python/.claude/tdd-config.json
+    agent: backend-architect
+    verification:
+      - "演示 RED-GREEN-REFACTOR 流程"
+      - "包含 pytest 配置"
+      - "包含 tdd-config.json 示例"
+      - "示例可运行"
+
+  - id: TASK-018
+    parent: "3.2"
+    title: 更新 JavaScript 示例
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-007]
+    deliverables:
+      - aria/skills/tdd-enforcer/examples/javascript/README.md
+      - aria/skills/tdd-enforcer/examples/javascript/.claude/tdd-config.json
+    agent: backend-architect
+    verification:
+      - "演示 RED-GREEN-REFACTOR 流程"
+      - "包含 jest 配置"
+      - "包含 tdd-config.json 示例"
+      - "示例可运行"
+
+  - id: TASK-019
+    parent: "3.3"
+    title: 更新 Dart 示例
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-007]
+    deliverables:
+      - aria/skills/tdd-enforcer/examples/dart/README.md
+      - aria/skills/tdd-enforcer/examples/dart/.claude/tdd-config.json
+    agent: backend-architect
+    verification:
+      - "演示 RED-GREEN-REFACTOR 流程"
+      - "包含 flutter test 配置"
+      - "包含 tdd-config.json 示例"
+      - "示例可运行"
+
+  - id: TASK-020
+    parent: "3.4"
+    title: 添加配置文件示例
+    status: pending
+    complexity: S
+    dependencies: [TASK-007]
+    deliverables:
+      - aria/skills/tdd-enforcer/examples/config-examples/
+    agent: backend-architect
+    verification:
+      - "包含 Advisory 配置示例"
+      - "包含 Strict 配置示例"
+      - "包含 Superpowers 配置示例"
+      - "包含各语言配置示例"
+
+# ============================================================================
+# Phase 4: 验证和发布
+# ============================================================================
+  - id: TASK-021
+    parent: "4.1"
+    title: 文档格式验证
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007]
+    deliverables:
+      - aria/skills/tdd-enforcer/docs/validation-report.md
+    agent: qa-engineer
+    verification:
+      - "SKILL.md 符合 Agent Skills 规范"
+      - "所有 references/ 文档格式正确"
+      - "配置 JSON Schema 验证通过"
+      - "无内部链接错误"
+
+  - id: TASK-022
+    parent: "4.2"
+    title: 示例项目可运行性测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-017, TASK-018, TASK-019]
+    deliverables:
+      - aria/skills/tdd-enforcer/docs/example-test-report.md
+    agent: qa-engineer
+    verification:
+      - "Python 示例可运行"
+      - "JavaScript 示例可运行"
+      - "Dart 示例可运行"
+      - "配置文件有效"
+
+  - id: TASK-023
+    parent: "4.3"
+    title: v2.0.0 发布准备
+    status: pending
+    complexity: L
+    dependencies: [TASK-021, TASK-022]
+    deliverables:
+      - aria/skills/tdd-enforcer/CHANGELOG.md (更新)
+      - aria/skills/tdd-enforcer/VERSION (更新为 2.0.0)
+    agent: qa-engineer
+    verification:
+      - "CHANGELOG 包含 v2.0.0 变更说明"
+      - "VERSION 文件更新为 2.0.0"
+      - "迁移指南完整"
+      - "发布就绪"
+
+# ============================================================================
+# 配置和元数据
+# ============================================================================
+config:
+  default_agent: knowledge-manager
+  test_agent: qa-engineer
+  docs_agent: knowledge-manager
+
+  design_philosophy:
+    approach: "document-driven"
+    reference: "Superpowers test-driven-development"
+    principle: "AI 读取文档理解并执行，而非运行代码"
+
+  strictness_levels:
+    advisory:
+      description: "警告模式，允许绕过"
+      checks: ["test_file_exists"]
+      violation_action: "warning"
+
+    strict:
+      description: "严格模式，强制 RED 状态"
+      checks: ["test_file_exists", "test_in_red_state"]
+      violation_action: "block"
+
+    superpowers:
+      description: "完全模式，完整 TDD 循环"
+      checks: ["test_file_exists", "test_in_red_state", "minimal_implementation", "no_golden_testing"]
+      violation_action: "block_enforce"
+
+  languages:
+    python:
+      frameworks: ["pytest", "unittest"]
+      test_patterns: ["test_*.py", "*_test.py"]
+    javascript:
+      frameworks: ["jest", "mocha", "vitest"]
+      test_patterns: ["*.test.js", "*.spec.js"]
+    dart:
+      frameworks: ["flutter", "dart"]
+      test_patterns: ["*_test.dart"]
+
+  # 文件删除清单 (v2.0 重构)
+  files_to_delete:
+    modules:
+      - "cache.py"
+      - "config.py"
+      - "diff_analyzer.py"
+      - "state_persistence.py"
+      - "state_tracker.py"
+    directories:
+      - "test_runners/"
+      - "validators/"
+      - "hooks/"
+      - "tests/"
+
+---
+**Version**: 2.0 (文档驱动重构)
+**Schema**: detailed-tasks.yaml v1.0
+**Maintained By**: 10CG Lab
