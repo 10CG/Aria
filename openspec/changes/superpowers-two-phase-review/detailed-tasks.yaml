@@ -1,0 +1,232 @@
+# detailed-tasks.yaml: 两阶段代码审查实现 (Superpowers Two-Phase Review)
+
+> **Feature**: superpowers-two-phase-review
+> **Created**: 2026-02-06
+> **Updated**: 2026-02-07
+> **Spec**: openspec/changes/superpowers-two-phase-review/proposal.md
+> **Status**: Implemented
+
+---
+
+## Tasks
+
+### Phase 1: 核心 Agent 和 Skill 创建
+
+```yaml
+- id: TASK-001
+  parent: "1.1"
+  title: 创建 aria:code-reviewer Agent
+  complexity: L (Large, 4-8h)
+  dependencies: []
+  deliverables:
+    - aria/agents/code-reviewer.md
+  agent: tech-lead
+  reason: Agent 架构设计，两阶段审查流程定义，需要技术领导决策
+  verification:
+    - Agent 文件符合 Aria Agent 规范
+    - 两阶段审查流程清晰定义
+    - 输出格式与 Superpowers 兼容
+    - 中英双语支持验证通过
+
+- id: TASK-002
+  parent: "1.2"
+  title: 创建 requesting-code-review Skill
+  complexity: M (Medium, 2-4h)
+  dependencies: []
+  deliverables:
+    - aria/skills/requesting-code-review/SKILL.md
+  agent: tech-lead
+  reason: Skill 规格定义，使用场景设计，需要技术领导决策
+  verification:
+    - Skill 文件符合 Aria Skill 规范
+    - 触发条件清晰定义
+    - 调用示例完整可用
+    - 中英双语支持验证通过
+
+- id: TASK-003
+  parent: "1.3"
+  title: 创建 Agent 模板文件
+  complexity: M (Medium, 2-4h)
+  dependencies: [TASK-001]
+  deliverables:
+    - aria/skills/requesting-code-review/code-reviewer.md
+  agent: tech-lead
+  reason: 模板设计依赖 Agent 规范，需要技术一致性
+  verification:
+    - 占位符变量完整定义
+    - Phase 1/2 检查清单完整
+    - 输出格式模板可独立使用
+    - 与 Superpowers 模板对比验证通过
+```
+
+### Phase 2: 集成与文档
+
+```yaml
+- id: TASK-004
+  parent: "2.1"
+  title: 更新 subagent-driver Skill 集成
+  complexity: M (Medium, 2-4h)
+  dependencies: [TASK-001, TASK-002]
+  deliverables:
+    - aria/skills/subagent-driver/SKILL.md
+  agent: tech-lead
+  reason: 集成设计需要理解两个新组件，向后兼容需要技术决策
+  verification:
+    - 两阶段审查选项正确集成
+    - 工作流文档更新
+    - 现有功能不受影响
+    - 向后兼容性验证通过
+
+- id: TASK-005
+  parent: "2.2"
+  title: 编写使用文档和示例
+  complexity: L (Large, 4-8h)
+  dependencies: [TASK-001, TASK-002, TASK-003]
+  deliverables:
+    - aria/skills/requesting-code-review/examples/phase1-pass-phase2-pass.md
+    - aria/skills/requesting-code-review/examples/phase1-fail-blocking.md
+    - aria/skills/requesting-code-review/examples/phase2-fail-with-warnings.md
+    - aria/skills/requesting-code-review/examples/no-plan-fallback.md
+    - aria/skills/requesting-code-review/examples/large-changeset-batching.md
+    - aria/skills/requesting-code-review/examples/skill-invocation.md
+    - aria/skills/requesting-code-review/examples/direct-agent-call.md
+    - aria/skills/requesting-code-review/examples/best-practices.md
+  agent: knowledge-manager
+  reason: 文档组织和知识管理，需要知识管理 Agent 专长
+  verification:
+    - 7 个示例场景覆盖主要使用场景
+    - 每个示例包含输入输出和预期结果
+    - 最佳实践指南完整
+    - 中英双语支持验证通过
+
+- id: TASK-006
+  parent: "2.3"
+  title: 手动集成测试
+  complexity: L (Large, 4-8h)
+  dependencies: [TASK-004, TASK-005]
+  deliverables:
+    - aria/skills/requesting-code-review/testing/test-scenarios.md
+    - aria/skills/requesting-code-review/testing/test-report.md
+  agent: qa-engineer
+  reason: 质量保证和测试场景设计，需要 QA 专长
+  verification:
+    - 7 个测试场景全部执行
+    - 测试报告完整记录结果
+    - 发现的问题已修复或记录
+    - 测试场景可作为用户参考
+```
+
+### Phase 3: 验证与发布
+
+```yaml
+- id: TASK-007
+  parent: "3.1"
+  title: 文档完善
+  complexity: M (Medium, 2-4h)
+  dependencies: [TASK-006]
+  deliverables:
+    - aria/CHANGELOG.md
+    - aria/README.md
+    - docs/architecture/system-architecture.md
+    - aria/.claude-plugin/plugin.json
+  agent: knowledge-manager
+  reason: 跨文档一致性维护和知识管理，需要知识管理 Agent
+  verification:
+    - CHANGELOG.md 包含 v1.4.0 条目
+    - README.md Skills 数量更新
+    - 系统架构文档包含新组件
+    - plugin.json 版本号更新
+
+- id: TASK-008
+  parent: "3.2"
+  title: 版本发布准备
+  complexity: M (Medium, 2-4h)
+  dependencies: [TASK-007]
+  deliverables:
+    - aria/VERSION
+    - aria/RELEASE_NOTES.md
+  agent: tech-lead
+  reason: 发布决策和版本验证，需要技术领导
+  verification:
+    - VERSION 文件更新为 v1.4.0
+    - 所有文件版本号一致性验证
+    - Release Notes 完整描述变更
+    - 发布检查清单全部通过
+```
+
+---
+
+## Dependency Graph
+
+```
+Phase 1:
+TASK-001 ──┐
+           ├──> TASK-004 ──┬──> TASK-006 ──┬──> TASK-007 ──┬──> TASK-008
+TASK-002 ──┤               │              │              │
+           │               │              │              │
+TASK-003 ──┴───────────────┴──────> TASK-005 ─┴──────────────┘
+```
+
+**关键路径**: TASK-001 → TASK-004 → TASK-006 → TASK-007 → TASK-008
+
+**可并行执行**:
+- TASK-001 和 TASK-002 可并行
+- TASK-005 和 TASK-006 可部分并行（场景编写可先于测试执行）
+
+---
+
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| **Total Tasks** | 8 |
+| **Total Estimated** | 32-40h |
+| **Critical Path** | 5 tasks (26-32h) |
+| **Max Parallelization** | 2 tasks (Phase 1) |
+
+---
+
+## Agent Assignment Rationale
+
+| Agent | Tasks | Rationale |
+|-------|-------|-----------|
+| **tech-lead** | TASK-001, TASK-002, TASK-004, TASK-008 | Agent/Skill 架构设计、集成决策、发布决策需要技术领导 |
+| **knowledge-manager** | TASK-005, TASK-007 | 文档组织和知识管理是知识管理 Agent 的核心能力 |
+| **qa-engineer** | TASK-006 | 测试场景设计和质量保证是 QA 工程师的专长 |
+
+---
+
+## Task Complexity Breakdown
+
+| Complexity | Count | Total Hours |
+|------------|-------|-------------|
+| **S (Small, 1-2h)** | 0 | 0h |
+| **M (Medium, 2-4h)** | 5 | 10-20h |
+| **L (Large, 4-8h)** | 3 | 12-24h |
+| **XL (Extra Large, 8+ h)** | 0 | 0h |
+| **Total** | 8 | 22-44h (average: 32-40h) |
+
+---
+
+## Verification Summary
+
+| Phase | Tasks | Verification Criteria |
+|-------|-------|----------------------|
+| **Phase 1** | 3 | Agent/Skill 规范合规、两阶段流程清晰、中英双语 |
+| **Phase 2** | 3 | 集成向后兼容、示例完整、测试覆盖 7 场景 |
+| **Phase 3** | 2 | 文档一致性、版本号一致性、发布检查清单 |
+
+---
+
+## Notes
+
+1. **Manual Testing Approach**: TASK-006 采用手动测试方案，测试场景将作为用户示例的一部分
+2. **Backward Compatibility**: TASK-004 确保现有 subagent-driver 审查机制不受影响
+3. **Bilingual Support**: 所有新组件支持中英双语
+4. **Version Consistency**: TASK-007 和 TASK-008 确保所有版本信息文件一致
+
+---
+
+**Format Version**: detailed-tasks.yaml v1.0.0
+**Generated**: 2026-02-06
+**Maintainer**: Aria Project Team
