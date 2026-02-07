@@ -1,7 +1,7 @@
 # Aria 项目版本信息
 
 > **版本**: 1.0.0
-> **最后更新**: 2026-02-06
+> **最后更新**: 2026-02-07
 
 ## 版本号
 
@@ -25,13 +25,16 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.3.2 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-06 |
+| aria (子模块) | v1.4.0 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-07 |
 
-### aria v1.3.2 变更摘要
+### aria v1.4.0 变更摘要
 
-- brainstorm v2.0.0: 基于 Superpowers 最佳实践重构对话流程
-- 新增"不可协商规则"强制对话控制
-- 修复 AI 跳过对话直接生成 User Stories 的问题
+- **两阶段代码审查** - Superpowers 风格的代码审查机制
+  - 新增 `aria:code-reviewer` Agent - Phase 1 (规范合规性) + Phase 2 (代码质量)
+  - 新增 `requesting-code-review` Skill - 用户可调用入口
+  - **subagent-driver** 集成两阶段审查 - 新增 `enable_two_phase` 参数 (默认: true)
+- **Skills 总数**: 25 → 26
+- **Agents 总数**: 10 → 11
 
 ## 对应 Tag
 

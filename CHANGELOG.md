@@ -15,6 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.3] - 2026-02-07
+
+### Changed
+- **aria 子模块** - 更新至 v1.4.0
+  - **两阶段代码审查** - Superpowers 风格的代码审查机制
+    - 新增 `aria:code-reviewer` Agent - Phase 1 (规范合规性) + Phase 2 (代码质量)
+    - 新增 `requesting-code-review` Skill - 用户可调用入口
+    - **subagent-driver** 集成两阶段审查 - 新增 `enable_two_phase` 参数 (默认: true)
+    - 审查结果分类: Critical (必须修复) / Important (应该修复) / Minor (建议修复)
+  - **Skills 总数**: 25 → 26
+  - **Agents 总数**: 10 → 11
+
+---
+
 ## [1.0.2] - 2026-02-06
 
 ### Changed
@@ -112,13 +126,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 1.0.3 | 2026-02-07 | aria 子模块更新至 v1.4.0 (两阶段代码审查) |
 | 1.0.2 | 2026-02-06 | aria 子模块更新至 v1.3.2 (brainstorm v2.0.0) |
 | 1.0.1 | 2026-02-06 | aria 子模块更新至 v1.3.1 |
 | 1.0.0 | 2026-01-23 | 首个正式发布 |
 
 ---
 
-[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.2...HEAD
+[Unreleased]: https://forgejo.10cg.pub/10CG/Aria/compare/v1.0.3...HEAD
+[1.0.3]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.3
 [1.0.2]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.2
 [1.0.1]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.1
 [1.0.0]: https://forgejo.10cg.pub/10CG/Aria/releases/tag/v1.0.0
