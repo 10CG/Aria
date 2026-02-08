@@ -1,19 +1,19 @@
 # Aria 项目版本信息
 
-> **版本**: 1.0.0
-> **最后更新**: 2026-02-07
+> **版本**: 1.0.1
+> **最后更新**: 2026-02-08
 
 ## 版本号
 
 ```
-1.0.0
+1.0.1
 ```
 
 ## 说明
 
 - **Major (1)**: 方法论核心框架稳定
 - **Minor (0)**: 十步循环、OpenSpec 已验证
-- **Patch (0)**: 初始正式发布
+- **Patch (1)**: aria-plugin v1.5.1 同步更新
 
 ## 子模块版本
 
@@ -25,21 +25,22 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.4.0 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-07 |
+| aria (子模块) | v1.5.1 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-08 |
 
-### aria v1.4.0 变更摘要
+### aria v1.5.1 变更摘要
 
-- **两阶段代码审查** - Superpowers 风格的代码审查机制
-  - 新增 `aria:code-reviewer` Agent - Phase 1 (规范合规性) + Phase 2 (代码质量)
-  - 新增 `requesting-code-review` Skill - 用户可调用入口
-  - **subagent-driver** 集成两阶段审查 - 新增 `enable_two_phase` 参数 (默认: true)
-- **Skills 总数**: 25 → 26
-- **Agents 总数**: 10 → 11
+- **state-scanner 修复** - OpenSpec 检测逻辑新增 archive 目录扫描支持
+  - 明确区分 `standards/openspec/` (格式定义库) 和项目 `openspec/` (工作区)
+  - 新增待归档 Spec 检测 (Status=Complete 但仍在 changes/)
+  - 新增 OpenSpec 状态输出格式（活跃变更、已归档、待归档）
+- **Skills 总数**: 27
+- **Agents 总数**: 11
 
 ## 对应 Tag
 
 ```
-v1.0.0
+v1.0.0 (初始发布)
+v1.0.1 (当前)
 ```
 
 ## 发布说明
