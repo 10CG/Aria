@@ -1,0 +1,25 @@
+{
+  "eval_id": 1,
+  "eval_name": "single-module-grouping",
+  "timestamp": "2026-03-16T14:00:30Z",
+  "assertions": [
+    {
+      "text": "groups_by_concern",
+      "passed": true,
+      "evidence": "Output contains 'auth' and 'Group 1', 'Group 2' indicating grouping by concern"
+    },
+    {
+      "text": "identifies_module",
+      "passed": true,
+      "evidence": "Output explicitly references 'backend' module boundary"
+    },
+    {
+      "text": "suggests_commit_types",
+      "passed": true,
+      "evidence": "Output suggests 'feat' for implementation group and 'test' for test group"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Single-module grouping correctly separates implementation from tests into 2 commit groups"
+}

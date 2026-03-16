@@ -1,0 +1,38 @@
+Here's the authentication implementation architecture:
+
+## Authentication Architecture
+
+### Layers
+
+```
+Request → middleware/auth.js (protect) → routes → authController → authRepository → SQLite DB
+```
+
+### Files
+
+| File | Role |
+|------|------|
+| `backend/middleware/auth.js` | JWT validation middleware (`protect`, `authorize`) |
+| `backend/src/auth/authRoutes.js` | Route definitions |
+| `backend/src/auth/authController.js` | Business logic (class-based, DI) |
+| `backend/src/auth/authRepository.js` | DB access layer |
+| `backend/src/auth/authControllerLegacy.js` | Legacy controller (unused) |
+
+### Routes
+
+**Public:** `POST /register`, `POST /login`, `POST /logout`, `POST /forgot-password`, `PUT /reset-password/:token`, `POST /social-login`
+
+**Protected:** `GET /verify-token`, `GET /me`
+
+### Key Design Decisions
+
+- **JWT** tokens (30d expiry), accepted via `Authorization: Bearer` header or cookie
+- **`Database.getInstance()`** singleton used in middleware to share the connection pool
+- `AuthRepository` supports both its own SQLite connection and an injected external `dbInstance` — the `_isExternalDb` flag prevents closing shared connections
+- `AuthController` uses constructor dependency injection (`repository`, `getSecretKey`, `sendEmailFn`) for testability
+- Password reset uses `crypto.randomBytes(20)` + SHA-256 hash stored in DB, expires in 1 hour
+- Social login via `social_accounts` table linking `provider` + `provider_user_id` to users
+
+### Notable Detail
+
+The middleware (`auth.js`) uses `Database.getInstance()` (singleton pattern) while `AuthController` creates a fresh `AuthRepository` per request and calls `repository.close()` in a `finally` block. This is a deliberate split: middleware reuses a shared connection, controller uses isolated connections per operation.

@@ -1,0 +1,28 @@
+Here's the task breakdown from the Phase 3 spec:
+
+---
+
+## FR-FE-003: 暗色模式支持 (P1)
+
+- **1.1** 重构 `design-tokens.css` — 建立完整的 CSS 变量体系，定义亮色/暗色两套颜色方案
+- **1.2** 实现主题切换组件 — header 区域切换开关 UI + JS 逻辑，检测 `prefers-color-scheme`，偏好存入 `localStorage`
+- **1.3** 适配所有页面暗色样式 — 逐页验证 `todos.css`、`statistics.css`、`auth.css`、`base.css` 及所有 HTML
+
+## FR-FE-004: 响应式布局优化 (P1)
+
+- **2.1** 实现移动端响应式断点和底部导航栏 — 修改 `base.css`、`todos.css`、`statistics.css`
+- **2.2** 优化触摸体验 — 触摸目标区域 ≥44px，小屏表格/列表优化，滑动删除 todo 手势支持
+
+## FR-FE-005: 加载状态与骨架屏 (P2)
+
+- **3.1** 实现骨架屏和全局加载指示器 — 新增 `skeleton.css`，页面初始加载占位，顶部进度条
+- **3.2** 按钮加载态和网络状态提示 — 按钮 disabled + spinner，网络异常提示，修改 API 服务层
+
+## FR-FE-006: 可访问性改进 (P2)
+
+- **4.1** 语义化 HTML + ARIA 属性 — 全页面添加 `nav`/`main`/`section`/`article`，`aria-label`/`aria-live`/`role`
+- **4.2** 键盘导航和焦点管理 — Tab/Enter/Escape 支持，模态框焦点陷阱，动态内容焦点恢复，高对比度模式兼容
+
+---
+
+**执行顺序建议**: 1.1 → 1.2 → 1.3 → 2.1 → 2.2（P1 先完成），然后 3.1 → 3.2 → 4.1 → 4.2（P2）。1.1 是基础，所有样式适配依赖它先完成。

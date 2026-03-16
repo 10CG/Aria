@@ -1,0 +1,202 @@
+{
+  "skill_name": "branch-manager",
+  "skill_path": "aria/skills/branch-manager",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for branch-manager skill - Git branch and PR management",
+  "metrics": [
+    "mode_decision_accuracy",
+    "branch_naming_compliance",
+    "environment_validation",
+    "pr_format_compliance"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "simple-feature-branch-creation",
+      "category": "branch-creation",
+      "prompt": "创建 feature 分支: module=backend, task_id=TASK-001, description=user-auth",
+      "setup": {
+        "mode": "auto",
+        "expected_mode": "branch",
+        "complexity_score": 0
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "correct_branch_name",
+          "description": "Should generate correct branch name format",
+          "check": "output.includes('feature/backend/TASK-001-user-auth')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "mentions_branch_mode",
+          "description": "Should indicate Branch mode was selected",
+          "check": "output.includes('Branch') || output.includes('branch')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "complex-worktree-decision",
+      "category": "mode-decision",
+      "prompt": "创建分支: module=cross, task_id=TASK-002, description=api-refactor, files=[backend/api.py, frontend/api.ts, shared/types.ts], task_count=5, risk_level=high",
+      "setup": {
+        "mode": "auto",
+        "expected_mode": "worktree",
+        "complexity_score": 7
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "selects_worktree_mode",
+          "description": "Should select Worktree mode for complex tasks",
+          "check": "output.includes('Worktree') || output.includes('worktree')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "explains_decision",
+          "description": "Should explain mode decision reasoning",
+          "check": "output.includes('理由') || output.includes('reason') || output.includes('评分')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "bugfix-branch-naming",
+      "category": "branch-naming",
+      "prompt": "创建 bugfix 分支: module=mobile, issue=ISSUE-42, description=login-crash",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "correct_bugfix_format",
+          "description": "Should use bugfix prefix in branch name",
+          "check": "output.includes('bugfix/mobile/ISSUE-42-login-crash')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "hotfix-branch-naming",
+      "category": "branch-naming",
+      "prompt": "创建 hotfix 分支: version=v1.2.1, description=security-patch, branch_type=hotfix",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "correct_hotfix_format",
+          "description": "Should use hotfix prefix with version",
+          "check": "output.includes('hotfix/v1.2.1-security-patch')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "environment-validation",
+      "category": "validation",
+      "prompt": "在创建分支前验证环境: module=backend",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "checks_gitignore",
+          "description": "Should check .gitignore rules",
+          "check": "output.includes('gitignore') || output.includes('.gitignore')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "checks_package_manager",
+          "description": "Should check package manager availability",
+          "check": "output.includes('npm') || output.includes('pnpm') || output.includes('poetry') || output.includes('manager')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "forced-branch-mode",
+      "category": "mode-override",
+      "prompt": "创建分支: module=backend, task_id=TASK-003, description=test, mode=branch (强制使用 Branch 模式)",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "respects_mode_override",
+          "description": "Should use Branch mode when explicitly specified",
+          "check": "output.includes('Branch') && !output.includes('Worktree')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "forced-worktree-mode",
+      "category": "mode-override",
+      "prompt": "创建分支: module=backend, task_id=TASK-004, description=simple, mode=worktree (强制使用 Worktree 模式)",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "respects_worktree_override",
+          "description": "Should use Worktree mode when explicitly specified",
+          "check": "output.includes('Worktree') && output.includes('.git/worktrees')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "pr-format-compliance",
+      "category": "pr-creation",
+      "prompt": "创建 PR: branch=feature/backend/TASK-001-user-auth, base=develop, spec_path=openspec/changes/user-auth/proposal.md",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_pr_title_format",
+          "description": "PR title should follow format: type(scope): description",
+          "check": "output.includes('feat') || output.includes('feature')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "mentions_spec_reference",
+          "description": "Should reference the Spec path",
+          "check": "output.includes('Spec') || output.includes('spec') || output.includes('proposal')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "risk-level-detection",
+      "category": "mode-decision",
+      "prompt": "创建分支: module=backend, task_id=TASK-005, description=api-breaking-change, 风险等级应该为 high",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_high_risk",
+          "description": "Should detect high risk from breaking/api keywords",
+          "check": "output.includes('high') || output.includes('高风险') || output.includes('High')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "module-identifier-validation",
+      "category": "validation",
+      "prompt": "列出支持的模块标识符",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "lists_modules",
+          "description": "Should list valid module identifiers",
+          "check": "output.includes('backend') && output.includes('mobile') && output.includes('shared')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

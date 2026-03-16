@@ -1,0 +1,29 @@
+arch-update: Change Detection Report
+=====================================
+
+Scanning project for new source files lacking architecture documentation...
+
+NEW FILES DETECTED (3 files):
+  [UNDOCUMENTED] src/services/payment/PaymentService.ts
+  [UNDOCUMENTED] src/services/payment/PaymentGateway.ts
+  [UNDOCUMENTED] src/models/Payment.ts
+
+EXISTING ARCHITECTURE DOCS:
+  - docs/ARCHITECTURE.md (L0 - project level)
+  - src/services/auth/auth.arch.md (L1 - module level)
+
+ANALYSIS:
+  The 3 new payment-related files have no corresponding architecture documentation.
+  These files belong to Layer L1 (module level) based on their location under
+  src/services/payment/.
+
+MISSING DOCUMENTATION:
+  - src/services/payment/ directory has no arch.md file
+  - src/models/ directory has no arch.md file
+
+RECOMMENDED DOC LOCATIONS:
+  - Create: src/services/payment/payment.arch.md  (L1 - module level)
+  - Update: docs/ARCHITECTURE.md  (L0 - add payment module reference)
+
+ACTION REQUIRED:
+  Run `arch-update generate src/services/payment/` to create the missing documentation.

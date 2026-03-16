@@ -1,0 +1,48 @@
+Here is the validation report:
+
+---
+
+## PRD Validation Report: `docs/requirements/prd-todo-optimization-v1.md`
+
+### Critical Issues
+
+**1. Version inconsistency (3 places disagree)**
+- Frontmatter: `version: 1.5.0`
+- Document title: `# Todo App 优化 PRD v1.3`
+- Header block: `**版本**: 1.3.0`
+
+**2. Date mismatch**
+- Frontmatter `updated_at: 2026-02-26`
+- Header block `**最后更新**: 2026-02-15`
+
+**3. Phase 4 status is wrong**
+- PRD line 38 shows `🔄 进行中`
+- Actual OpenSpec (`openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`) shows `Status: Complete ✅` (completed 2026-02-26)
+
+**4. Broken Phase 4 OpenSpec link (file does not exist)**
+- PRD points to: `openspec/changes/phase4-acceptance-release/proposal.md`
+- Actual path: `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`
+
+**5. FR-BE-003 and FR-BE-004 still marked `🔄 进行中 (Phase 2)`**
+- Phase 2 OpenSpec is archived and complete — these requirement statuses were never updated
+
+### Moderate Issues
+
+**6. Changelog missing versions 1.2.0–1.5.0**
+- Only entries for 1.0.0 and 1.1.0 exist, but frontmatter claims version 1.5.0
+
+**7. Frontmatter `relationships` missing Phase 3 and Phase 4 OpenSpec refs**
+- Phase 3 (`openspec/archive/2026-02-24-phase3-ux-optimization/proposal.md`) and Phase 4 are not listed
+
+### Minor Issues
+
+**8. Section 10.2 references 3 contract docs that don't exist**
+- `docs/contracts/api/todo-api-contract.md`
+- `docs/contracts/data/todo-data-contract.md`
+- `docs/contracts/ui/todo-list-page-contract.md`
+
+---
+
+**Summary**: 4 critical issues (version conflict, stale Phase 4 status, broken link, stale FR statuses), 2 moderate, 1 minor. The most impactful fix is updating Phase 4 to `✅ 已完成` and correcting its OpenSpec path.
+
+Would you like me to fix these issues in the document?

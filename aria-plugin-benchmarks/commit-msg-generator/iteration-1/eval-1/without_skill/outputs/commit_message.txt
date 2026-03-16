@@ -1,0 +1,3 @@
+Added authentication files
+
+This commit adds new authentication routes and integrates them into the main app.

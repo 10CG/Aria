@@ -1,0 +1,27 @@
+{
+  "eval_id": 11,
+  "eval_name": "eval-11",
+  "timestamp": "2026-03-16T22:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Scope should reflect cross-module nature (api/cross/tasks)",
+      "expected": "Scope should mention 'tasks' or 'cross' to indicate multi-module change",
+      "actual": "Scope is 'tasks' which clearly indicates the feature being modified across modules",
+      "passed": true,
+      "text": "cross_module_scope",
+      "evidence": "No evidence recorded"
+    },
+    {
+      "id": "A2",
+      "description": "Complex changes should have body explaining modules affected",
+      "expected": "Body should list changes per module (API, backend, mobile)",
+      "actual": "Body has 4 bullet points explaining changes in API contract, backend, mobile model, and mobile UI",
+      "passed": true,
+      "text": "has_body",
+      "evidence": "No evidence recorded"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

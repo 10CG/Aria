@@ -1,0 +1,44 @@
+{
+  "eval_id": 1,
+  "eval_name": "state-block-generation",
+  "category": "state-format",
+  "prompt": "Generate a UPMv2-STATE block for a project with 3 tasks: T1 (completed), T2 (in_progress), T3 (pending). Project: 'refactor-api'. Overall completion: 33%.",
+  "setup": {
+    "tasks": [
+      {"id": "T1", "status": "completed"},
+      {"id": "T2", "status": "in_progress"},
+      {"id": "T3", "status": "pending"}
+    ],
+    "project_name": "refactor-api"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_upmv2_header",
+      "description": "State block must start with UPMv2-STATE marker",
+      "check": "output.includes('UPMv2-STATE')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "lists_all_tasks",
+      "description": "State block must include all 3 task IDs",
+      "check": "output.includes('T1') && output.includes('T2') && output.includes('T3')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "correct_statuses",
+      "description": "Task statuses must match input",
+      "check": "output.match(/T1.*completed/i) && output.match(/T2.*in_progress/i) && output.match(/T3.*pending/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "machine_readable_format",
+      "description": "Block must be enclosed in code fence or structured block for machine parsing",
+      "check": "output.includes('```') || output.includes('<!-- UPMv2') || output.includes('---')",
+      "severity": "high"
+    }
+  ]
+}

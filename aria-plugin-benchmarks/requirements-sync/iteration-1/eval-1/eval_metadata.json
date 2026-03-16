@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "status-sync",
+  "category": "sync-flow",
+  "prompt": "同步状态: US-005 状态已更新为 Done，将此状态同步到 UPM requirements 章节对应条目",
+  "setup": {
+    "story_id": "US-005",
+    "new_status": "Done",
+    "upm_current_status": "In Progress"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "updates_upm_status",
+      "description": "Should update UPM requirements entry status to Done",
+      "check": "output.includes('Done') || output.includes('完成') || output.includes('synced')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_changed_entry",
+      "description": "Should identify the specific UPM entry that was changed",
+      "check": "output.includes('US-005') || output.includes('REQ-005')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "records_previous_status",
+      "description": "Should record the previous status (In Progress) for audit trail",
+      "check": "output.includes('In Progress') || output.includes('previous') || output.includes('before')",
+      "severity": "medium"
+    }
+  ]
+}

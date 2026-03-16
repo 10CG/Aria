@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "already-archived-detection",
+  "timestamp": "2026-03-16T14:17:00Z",
+  "assertions": [
+    {
+      "text": "detects_already_archived",
+      "passed": true,
+      "evidence": "Output contains '已归档 (already archived)', 'exists', '已存在', and 'duplicate detected'"
+    },
+    {
+      "text": "prevents_duplicate_archive",
+      "passed": true,
+      "evidence": "Output contains 'skip (跳过归档操作)', 'warn', '警告', and '跳过 (skip)' preventing duplicate archive"
+    },
+    {
+      "text": "reports_archive_location",
+      "passed": true,
+      "evidence": "Output reports 'location: openspec/archive/user-auth' in detection result table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Duplicate archive detected: openspec/archive/user-auth already exists. Skip action taken, warning issued, location reported."
+}

@@ -1,0 +1,19 @@
+{
+  "eval_id": 1,
+  "eval_name": "level-judgment",
+  "timestamp": "2026-03-16T14:24:30Z",
+  "assertions": [
+    {
+      "text": "judges_level_1",
+      "passed": true,
+      "evidence": "Output states 'Level Judgment: Level 1 (Skip)' in the heading and 'Recommended level: Level 1 (Skip)' in the assessment table"
+    },
+    {
+      "text": "explains_reasoning",
+      "passed": true,
+      "evidence": "Output explains reasoning: 'trivial, cosmetic text correction', 'typo', and 'Complexity: Trivial' in the assessment table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

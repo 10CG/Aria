@@ -1,0 +1,40 @@
+{
+  "eval_id": 2,
+  "eval_name": "naming-convention",
+  "category": "naming",
+  "prompt": "What are the architecture document naming conventions defined by arch-common? How should I name a project-level doc vs a module-level doc vs a component-level doc?",
+  "setup": {
+    "query_type": "naming_rules",
+    "context": "user wants to create new architecture docs"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "specifies_architecture_md_for_l0",
+      "description": "L0 project-level doc should be named ARCHITECTURE.md",
+      "check": "output.match(/ARCHITECTURE\\.md/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "specifies_arch_md_extension_for_l1_l2",
+      "description": "L1/L2 docs should use *.arch.md naming pattern",
+      "check": "output.match(/\\*\\.arch\\.md|\\.arch\\.md/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "gives_naming_examples",
+      "description": "Should give concrete naming examples (e.g. auth.arch.md, payment.arch.md)",
+      "check": "output.match(/[a-z]+\\.arch\\.md/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "explains_case_convention",
+      "description": "Should clarify case convention (uppercase ARCHITECTURE.md vs lowercase *.arch.md)",
+      "check": "output.match(/uppercase|ARCHITECTURE|lowercase|kebab/i)",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "eval_id": 10,
+  "eval_name": "test-addition",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "commit_message": "feat(unit): add date formatting unit tests\n\nAdded unit tests for date formatting functionality including timezone conversion and edge cases.",
+  "expectations": [
+    {
+      "text": "type_is_test",
+      "passed": false,
+      "evidence": "Message starts with 'feat(', not 'test('"
+    },
+    {
+      "text": "not_feat",
+      "passed": false,
+      "evidence": "Message incorrectly uses 'feat' type for test additions"
+    }
+  ],
+  "verdict": "fail",
+  "pass_rate": 0.0
+}

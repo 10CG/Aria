@@ -1,0 +1,18 @@
+{
+  "eval_id": "eval-12",
+  "eval_name": "eval-eval-12",
+  "timestamp": "2026-03-13T00:00:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Type must be 'chore' for config changes",
+      "expected": "chore",
+      "actual": "chore",
+      "passed": true,
+      "text": "type_is_chore",
+      "evidence": "No evidence recorded"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

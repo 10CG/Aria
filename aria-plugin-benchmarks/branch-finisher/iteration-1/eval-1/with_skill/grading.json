@@ -1,0 +1,25 @@
+{
+  "eval_id": 1,
+  "eval_name": "test-verification",
+  "timestamp": "2026-03-16T14:05:30Z",
+  "assertions": [
+    {
+      "text": "runs_test_suite",
+      "passed": true,
+      "evidence": "Output shows 'test session starts' and lists 12 test cases with 'PASSED' status"
+    },
+    {
+      "text": "reports_pass_status",
+      "passed": true,
+      "evidence": "Output contains '12 passed' and '**PASS**' in summary table"
+    },
+    {
+      "text": "identifies_branch",
+      "passed": true,
+      "evidence": "Output references 'feature/backend/TASK-101-user-auth' and 'TASK-101' in branch info section"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Test verification successful: 12/12 tests passed on branch feature/backend/TASK-101-user-auth"
+}

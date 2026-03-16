@@ -1,0 +1,6 @@
+feat(tasks): add priority field across all modules
+
+- Add priority field to Task API contract (1=low, 2=medium, 3=high)
+- Update backend TaskCreate and TaskUpdate models with priority
+- Add priority to mobile Task model with default fallback
+- Update mobile UI to display priority icons

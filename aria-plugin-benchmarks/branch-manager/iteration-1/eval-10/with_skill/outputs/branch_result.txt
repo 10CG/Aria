@@ -1,0 +1,59 @@
+=== Branch Manager Test: Module Identifier Listing ===
+
+Test Parameters:
+- operation: list-modules
+- format: standardized
+
+Supported Module Identifiers:
+
+| 模块 | 标识符 | 说明 |
+|------|--------|------|
+| Backend | `backend` | Python/FastAPI 服务 |
+| Mobile | `mobile` | Flutter 应用 |
+| Shared | `shared` | API 契约、schemas |
+| Cross-module | `cross` | 多模块变更 |
+| Documentation | `docs` | 仅文档变更 |
+| Standards | `standards` | AI-DDD 规范 |
+
+Module Validation:
+✅ All module identifiers are valid
+✅ Module names follow naming convention (lowercase)
+✅ Module descriptions are complete
+
+Output:
+{
+  "modules": [
+    {
+      "name": "Backend",
+      "identifier": "backend",
+      "description": "Python/FastAPI 服务"
+    },
+    {
+      "name": "Mobile",
+      "identifier": "mobile",
+      "description": "Flutter 应用"
+    },
+    {
+      "name": "Shared",
+      "identifier": "shared",
+      "description": "API 契约、schemas"
+    },
+    {
+      "name": "Cross-module",
+      "identifier": "cross",
+      "description": "多模块变更"
+    },
+    {
+      "name": "Documentation",
+      "identifier": "docs",
+      "description": "仅文档变更"
+    },
+    {
+      "name": "Standards",
+      "identifier": "standards",
+      "description": "AI-DDD 规范"
+    }
+  ],
+  "total_modules": 6,
+  "validation_status": "success"
+}

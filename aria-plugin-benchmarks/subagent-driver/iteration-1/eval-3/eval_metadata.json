@@ -1,0 +1,34 @@
+{
+  "eval_id": 3,
+  "eval_name": "inter-task-review",
+  "category": "code-review",
+  "prompt": "TASK-002 已完成，TASK-003 依赖于 TASK-002 的输出。在 TASK-003 开始前，subagent-driver 应触发任务间代码评审。",
+  "setup": {
+    "completed_task": "TASK-002",
+    "next_task": "TASK-003",
+    "dependency": "TASK-003 depends on TASK-002"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "triggers_code_review",
+      "description": "Should trigger code review before starting dependent task",
+      "check": "output.includes('review') || output.includes('评审') || output.includes('code-review') || output.includes('检查')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "invokes_reviewer_agent",
+      "description": "Should invoke code-reviewer agent for the review",
+      "check": "output.includes('code-reviewer') || output.includes('reviewer') || output.includes('评审员') || output.includes('agent')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "blocks_next_task_pending_review",
+      "description": "Should block TASK-003 until review is complete",
+      "check": "output.includes('block') || output.includes('wait') || output.includes('等待') || output.includes('完成后')",
+      "severity": "high"
+    }
+  ]
+}

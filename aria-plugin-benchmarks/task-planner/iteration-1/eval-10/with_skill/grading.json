@@ -1,0 +1,21 @@
+{
+  "eval_id": 10,
+  "eval_name": "deliverables-identification",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains multiple '.py' files (otp_service.py, otp_login.py, etc.), '.dart' files (OTPLoginPage.dart, OTPInput.dart), and '交付物清单' / '交付物分类汇总' sections",
+      "text": "lists_deliverables"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output contains 'migration' in section title '数据库迁移文件', 'add_otp_table.sql' and 'alter_users_add_phone.sql' migration files, and '迁移说明' section",
+      "text": "includes_migration"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

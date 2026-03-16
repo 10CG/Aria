@@ -1,0 +1,69 @@
+## Database Design & Data Model Architecture
+
+The todo-web app uses **SQLite3** with a repository pattern (no ORM). Here's the overview:
+
+---
+
+### Schema (10 Tables)
+
+| Table | Purpose |
+|---|---|
+| `users` | Accounts with email/password auth, role, avatar |
+| `social_accounts` | OAuth providers (Google, GitHub, etc.) |
+| `todos` | Core task data with time estimation, hierarchy, priority |
+| `notes` | Long-form content attached to todos |
+| `tags` | Label definitions with hex color |
+| `todo_tags` | Many-to-many junction: todos ↔ tags |
+| `subtasks` | Explicit parent-child todo relationships |
+| `user_settings` | Per-user preferences (theme, language, display) |
+| `cache_table` | In-DB TTL cache (5-min default) |
+| `db_stats` | Aggregated runtime statistics |
+
+---
+
+### Key Relationships
+
+```
+users (1)
+├── todos (1-many, user_id FK)
+│   ├── notes (1-many, todoId FK)
+│   ├── subtasks (self-ref via parentId + subtasks table)
+│   └── tags (many-many via todo_tags)
+├── social_accounts (1-many)
+└── user_settings (1-to-1)
+```
+
+---
+
+### Indexes
+
+```sql
+idx_todos_user_parent    -- (user_id, parentId)
+idx_todos_user_completed -- (user_id, completed)
+idx_todos_completed_at   -- (completed_at)
+idx_todos_timestamp      -- (timestamp)
+idx_notes_todoId         -- (todoId)
+```
+
+---
+
+### Architecture Modules
+
+`backend/src/database/` contains 9 specialized managers:
+- **BackupManager/Scheduler** — daily full + 6h incremental, AES-256-GCM encrypted
+- **CacheManager** — TTL-based in-DB caching
+- **StatsManager** — aggregate metrics
+- **DataValidator** — orphan detection & cleanup
+- **QueryAnalyzer** — `EXPLAIN QUERY PLAN` + VACUUM
+- **TransactionManager** — BEGIN/COMMIT/ROLLBACK
+- **DatabaseMonitor** — slow query detection (>500ms threshold)
+
+---
+
+### Notable Design Decisions
+
+- **Dual subtask tracking**: `todos.parentId` (self-ref) + separate `subtasks` table — redundant but explicit
+- **Timestamps in ms** throughout, Beijing timezone (Asia/Shanghai)
+- **All foreign keys** use `ON DELETE CASCADE`
+- Foreign keys enforced via `PRAGMA foreign_keys = ON`
+- Raw SQL via parameterized queries, no ORM

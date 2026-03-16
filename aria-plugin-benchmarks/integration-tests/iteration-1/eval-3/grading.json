@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "cross-module-worktree-coordination",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "selects_worktree_mode",
+      "passed": true,
+      "evidence": "branch-manager scored 5 (3 modules +2, >5 files +1, breaking change +1, HIGH risk +1) and output shows 'Worktree mode selected (score=5, threshold=3)'. Two worktrees created under .worktrees/."
+    },
+    {
+      "text": "agent_router_assigns_correctly",
+      "passed": true,
+      "evidence": "agent-router explicitly assigned backend-architect to Python API versioning (TASK-325) and mobile-developer to Flutter client versioning (TASK-326)"
+    },
+    {
+      "text": "strategic_commit_groups_by_module",
+      "passed": true,
+      "evidence": "strategic-commit-orchestrator created 3 groups: Group 1 (backend API, 8 files), Group 2 (mobile, 6 files), Group 3 (db migration, 2 files). Output matches 'backend commit + mobile commit + migration commit' pattern."
+    },
+    {
+      "text": "commit_messages_have_correct_scopes",
+      "passed": true,
+      "evidence": "commit-msg-generator produced: 'feat(api): implement v2 API versioning...', 'feat(mobile): add API version header interceptor...', 'feat(db): add api_version column...' - all three scopes present."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

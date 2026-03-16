@@ -1,0 +1,46 @@
+{
+  "eval_id": 4,
+  "eval_name": "tech-stack-detection",
+  "category": "analysis",
+  "prompt": "From the task management SaaS PRD, detect or infer the appropriate technology stack. The PRD mentions: REST API, relational database, 10k concurrent users, Slack integration, GitHub integration, and SaaS deployment.",
+  "setup": {
+    "prd_hints": [
+      "REST API",
+      "relational database",
+      "10,000 concurrent users",
+      "Slack integration via webhooks",
+      "GitHub integration",
+      "SaaS deployment"
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "identifies_api_framework",
+      "description": "Should detect or suggest an appropriate API framework",
+      "check": "output.match(/Express|FastAPI|Django|Rails|Spring|NestJS|Fastify|framework/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_database",
+      "description": "Should identify a relational database technology",
+      "check": "output.match(/PostgreSQL|MySQL|SQLite|SQL Server|relational|RDBMS/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "addresses_scalability_tech",
+      "description": "Should address technology choices for the 10k concurrent users requirement",
+      "check": "output.match(/load.*balanc|horizontal.*scal|Redis|cache|queue|async/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "mentions_integration_tech",
+      "description": "Should mention integration technology (webhooks, OAuth, SDK)",
+      "check": "output.match(/webhook|OAuth|SDK|API.*key|integration.*technolog/i)",
+      "severity": "high"
+    }
+  ]
+}

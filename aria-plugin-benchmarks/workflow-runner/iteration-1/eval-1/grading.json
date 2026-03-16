@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-cycle-execution",
+  "timestamp": "2026-03-16T10:21:30Z",
+  "assertions": [
+    {
+      "text": "executes_phase_a",
+      "passed": true,
+      "evidence": "Output shows A.0, A.1, A.2, A.3 all executed with checkmarks"
+    },
+    {
+      "text": "executes_phase_b",
+      "passed": true,
+      "evidence": "Output shows B.1 and B.2 executed under PHASE B section"
+    },
+    {
+      "text": "executes_phase_c",
+      "passed": true,
+      "evidence": "Output shows C.1 and C.2 executed under PHASE C section"
+    },
+    {
+      "text": "executes_phase_d",
+      "passed": true,
+      "evidence": "Output shows D.1 and D.2 executed under PHASE D section"
+    },
+    {
+      "text": "correct_order",
+      "passed": true,
+      "evidence": "A.0 appears before B.1, B.1 before C.1, C.1 before D.1 — correct A→B→C→D sequence"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

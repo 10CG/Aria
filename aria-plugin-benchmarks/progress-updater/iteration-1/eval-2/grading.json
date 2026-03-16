@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "task-status-update",
+  "timestamp": "2026-03-16T10:12:30Z",
+  "assertions": [
+    {
+      "text": "t2_updated_to_completed",
+      "passed": true,
+      "evidence": "Output shows 'T2: completed' in the updated state block"
+    },
+    {
+      "text": "other_tasks_unchanged",
+      "passed": true,
+      "evidence": "T1: completed and T3: pending remain unchanged in the updated block"
+    },
+    {
+      "text": "percentage_recalculated",
+      "passed": true,
+      "evidence": "Completion updated to 66.7% (2/3 tasks completed)"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

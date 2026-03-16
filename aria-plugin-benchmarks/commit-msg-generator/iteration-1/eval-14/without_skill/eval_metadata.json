@@ -1,0 +1,21 @@
+{
+  "eval_id": 14,
+  "eval_name": "scope-extraction-path-based",
+  "category": "scope-detection",
+  "prompt": "Generate a commit message. Modified backend/src/api/users.py to add user profile endpoint.",
+  "setup": {
+    "staged_files": [
+      {"status": "M", "path": "backend/src/api/users.py"}
+    ],
+    "diff_summary": "Add user profile endpoint"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "scope_from_path",
+      "description": "Scope should be derived from file path (api, users, or backend)",
+      "check": "commit_message.match(/\\((api|users|backend|api\\/users)\\)/)",
+      "severity": "high"
+    }
+  ]
+}

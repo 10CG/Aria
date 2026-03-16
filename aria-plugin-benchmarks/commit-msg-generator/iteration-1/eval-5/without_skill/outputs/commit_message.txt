@@ -1,0 +1,7 @@
+Added authentication backend
+
+This commit adds JWT authentication service and middleware.
+
+- Added AuthService for token handling
+- Added AuthMiddleware for request authentication
+- Added tests for auth service

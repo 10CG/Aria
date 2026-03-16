@@ -1,0 +1,23 @@
+{
+  "eval_id": 7,
+  "eval_name": "layer3-fallback-rare-keyword",
+  "category": "layer-3-fallback",
+  "prompt": "搜索 foo-bar-baz 这个功能在哪",
+  "expected_layer": 3,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "indicates_layer3",
+      "description": "Should indicate Layer 3 fallback",
+      "check": "output.includes('Layer 3') || output.includes('传统搜索') || output.includes('未找到')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "still_provides_results",
+      "description": "Should still attempt to provide useful results",
+      "check": "output.length > 100",
+      "severity": "high"
+    }
+  ]
+}

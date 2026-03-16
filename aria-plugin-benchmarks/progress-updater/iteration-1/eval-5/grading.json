@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "incremental-update",
+  "timestamp": "2026-03-16T10:15:30Z",
+  "assertions": [
+    {
+      "text": "t3_updated_not_overwritten",
+      "passed": true,
+      "evidence": "T3: completed, T1: completed, T2: completed all present in updated block"
+    },
+    {
+      "text": "t6_added",
+      "passed": true,
+      "evidence": "T6: pending appears in tasks section as a newly added task"
+    },
+    {
+      "text": "incremental_not_full_rewrite",
+      "passed": true,
+      "evidence": "Output explicitly states 'Mode: incremental (patched, not full rewrite)' and shows delta"
+    },
+    {
+      "text": "updated_percentage",
+      "passed": true,
+      "evidence": "Output shows '50%' and '3 of 6 tasks completed (50%)'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

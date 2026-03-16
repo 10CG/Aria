@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "test-verification",
+  "category": "testing",
+  "prompt": "Phase B B.3: Verify test results for completed TASK-006 (OAuth2 integration tests). Run test suite and validate all tests pass before proceeding to Phase C.",
+  "setup": {
+    "task_id": "TASK-006",
+    "test_command": "pytest tests/integration/test_oauth2.py",
+    "expected_result": "all_pass"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "runs_test_suite",
+      "description": "Should execute the test suite for the completed task",
+      "check": "output.includes('pytest') || output.includes('running tests') || output.includes('test suite') || output.includes('npm test')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reports_test_results",
+      "description": "Should report test counts and pass/fail status",
+      "check": "output.includes('passed') || output.includes('failed') || output.includes('PASSED') || output.includes('test results')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "gates_phase_c_on_passing",
+      "description": "Should gate Phase C entry on all tests passing",
+      "check": "output.includes('Phase C') || output.includes('proceed') || output.includes('ready') || output.includes('gate')",
+      "severity": "high"
+    }
+  ]
+}

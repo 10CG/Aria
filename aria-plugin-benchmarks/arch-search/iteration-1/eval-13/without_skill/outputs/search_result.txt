@@ -1,0 +1,116 @@
+# Mobile Module Architecture Search Results
+
+**Query**: "mobile 模块的整体架构"
+**Search Method**: Traditional file system exploration (Glob, Bash) and content reading
+**Date**: 2026-03-13
+
+## 搜索方法
+
+1. **文件系统探索**: 使用 `Glob` 和 `Bash find` 查找 mobile 目录下的文件
+2. **内容搜索**: 使用 `Grep` 搜索包含 "mobile" 的文件
+3. **文档读取**: 读取所有找到的架构文档
+
+## 找到的文档
+
+### 主要架构文档
+- `F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project/mobile/docs/ARCHITECTURE.md`
+  - Mobile 模块的整体架构概览
+  - 技术栈和架构分层
+  - 子模块导航
+
+### 子模块架构文档
+1. **安全架构** - `architecture/security.md`
+   - JWT 认证流程
+   - Token 存储
+   - 安全措施（TLS 1.3、SSL Pinning、代码混淆、Root检测）
+
+2. **状态管理** - `architecture/state.md`
+   - Riverpod 2.0 响应式状态管理
+   - 状态分层（UI → ViewModel → Repository → Data Source）
+   - Provider 组织策略
+
+3. **网络通信** - `architecture/network.md`
+   - Dio + Retrofit 技术栈
+   - 网络层架构（API Service → Interceptors → Dio Client）
+   - 错误处理策略
+
+4. **导航路由** - `architecture/navigation.md`
+   - go_router 声明式路由
+   - 深层链接支持
+   - 路由守卫机制
+
+5. **数据同步** - `architecture/sync.md`
+   - 离线优先策略
+   - 自动同步机制
+   - 冲突解决（Last-Write-Wins、三向合并）
+
+6. **缓存架构** - `architecture/cache.md`
+   - 多级缓存（内存、磁盘、网络）
+   - 缓存失效策略（LRU、TTL、手动失效）
+   - 性能优化特性
+
+7. **AI 记忆系统** - `architecture/ai-memory.md`
+   - 短期记忆和长期记忆
+   - 向量存储和上下文组装
+   - 隐私保护机制
+
+## 代码指针识别
+
+### 核心架构文件
+- `mobile/docs/ARCHITECTURE.md` - 主入口文档
+- `mobile/docs/architecture/` - 所有子模块架构
+
+### 实现代码位置
+```
+mobile/
+├── lib/
+│   ├── src/
+│   │   ├── services/
+│   │   │   ├── auth/           # 认证服务
+│   │   │   ├── api/            # API 服务
+│   │   │   ├── cache/          # 缓存服务
+│   │   │   ├── sync/           # 同步服务
+│   │   │   └── ai/             # AI 服务
+│   │   ├── providers/          # Riverpod providers
+│   │   ├── screens/            # 页面
+│   │   └── routes/             # 路由配置
+│   └── core/                   # 核心工具
+└── tests/
+```
+
+### 关键代码文件
+- `mobile/src/routes/app_router.dart` - 路由配置
+- `mobile/src/providers/global_providers.dart` - 全局状态管理
+- `mobile/src/services/api/task_api_service.dart` - API 服务接口
+- `mobile/src/services/ai/memory_manager.dart` - AI 记忆管理
+
+## 技术栈总结
+
+- **前端框架**: Flutter 3.x + Dart 3.x
+- **状态管理**: Riverpod 2.0
+- **网络**: Dio + Retrofit
+- **存储**: Drift (SQLite) + flutter_secure_storage
+- **路由**: go_router
+- **AI**: LLM API 集成 + 向量存储
+
+## 架构特点
+
+1. **分层架构**: Presentation → Domain → Data → Infrastructure
+2. **模块化设计**: 每个功能独立，通过文档导航
+3. **离线优先**: 支持离线操作和自动同步
+4. **安全优先**: JWT 认证 + 多重安全措施
+5. **AI 增强**: 智能记忆系统和上下文感知
+
+## Token 使用估计
+
+- 文档读取: ~15,000 tokens
+- 代码示例: ~3,000 tokens
+- 结构化输出: ~1,000 tokens
+- **总计**: ~19,000 tokens
+
+## 搜索限制
+
+1. 需要预先知道 mobile 目录存在
+2. 需要手动逐个读取文档
+3. 没有自动化的架构分析
+4. 无法识别隐藏的依赖关系

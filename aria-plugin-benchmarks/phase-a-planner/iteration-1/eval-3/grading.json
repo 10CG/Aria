@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "existing-spec-detection",
+  "timestamp": "2026-03-16T14:03:22Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'proposal.md ← FOUND (existing spec detected)' and 'Existing proposal summary' section",
+      "text": "detects_existing_proposal"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output explicitly states 'A.1: skip — proposal.md found' and 'Status: SKIP (proposal.md exists)'",
+      "text": "skips_a1_step"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'Proceeding to A.2 — task-planner invoked with existing proposal' and shows completed A.2 task generation",
+      "text": "proceeds_to_a2"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

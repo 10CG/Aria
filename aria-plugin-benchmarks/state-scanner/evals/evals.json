@@ -1,0 +1,194 @@
+{
+  "skill_name": "state-scanner",
+  "skill_path": "aria/skills/state-scanner",
+  "skill_version": "2.4.0",
+  "description": "Benchmark tests for state-scanner skill - Project status and workflow recommendation",
+  "metrics": [
+    "state_collection_completeness",
+    "recommendation_accuracy",
+    "output_format_compliance",
+    "cross_platform_compatibility"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "basic-state-collection",
+      "category": "state-collection",
+      "prompt": "查看项目当前状态",
+      "setup": {
+        "expected_outputs": ["git_status", "project_info", "recommendation"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_git_status",
+          "description": "Output should include Git status information",
+          "check": "output.includes('分支') || output.includes('branch') || output.includes('Git')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_recommendation",
+          "description": "Should provide workflow recommendation",
+          "check": "output.includes('推荐') || output.includes('recommend') || output.includes('工作流')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "structured_format",
+          "description": "Output should use structured format with sections",
+          "check": "output.includes('📍') || output.includes('📊') || output.includes('🎯')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "staged-changes-detection",
+      "category": "change-analysis",
+      "prompt": "我有暂存的变更，想提交代码",
+      "setup": {
+        "mock_staged_files": ["lib/auth.py", "tests/test_auth.py"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_staged_changes",
+          "description": "Should detect staged changes",
+          "check": "output.includes('暂存') || output.includes('staged') || output.includes('变更')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "recommends_commit",
+          "description": "Should recommend commit-related workflow",
+          "check": "output.includes('C.1') || output.includes('提交') || output.includes('commit')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "openspec-status-check",
+      "category": "openspec-integration",
+      "prompt": "检查 OpenSpec 状态",
+      "setup": {
+        "check_openspec": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "reports_openspec_status",
+          "description": "Should report OpenSpec status section",
+          "check": "output.includes('OpenSpec') || output.includes('Spec')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "shows_active_changes",
+          "description": "Should show active changes count if any",
+          "check": "output.includes('活跃') || output.includes('active') || output.includes('changes')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "architecture-status-check",
+      "category": "architecture-integration",
+      "prompt": "检查架构文档状态",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "reports_architecture_status",
+          "description": "Should report architecture status section",
+          "check": "output.includes('架构') || output.includes('Architecture')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "quick-fix-recommendation",
+      "category": "recommendation",
+      "prompt": "我只修改了一个 typo",
+      "setup": {
+        "mock_changes": {
+          "file_count": 1,
+          "change_type": "typo"
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "recommends_quick_fix",
+          "description": "Should recommend quick-fix workflow for simple changes",
+          "check": "output.includes('quick') || output.includes('快速') || output.includes('Level 1')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "feature-development-recommendation",
+      "category": "recommendation",
+      "prompt": "我要开发新功能",
+      "setup": {
+        "mock_complexity": "Level2"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "recommends_feature_workflow",
+          "description": "Should recommend feature development workflow",
+          "check": "output.includes('feature') || output.includes('功能') || output.includes('开发')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "mentions_phase_steps",
+          "description": "Should mention phase steps",
+          "check": "output.includes('Phase') || output.includes('B.') || output.includes('A.')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 7,
+          "name": "requirements-status-check",
+      "category": "requirements-integration",
+      "prompt": "检查需求状态",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "reports_requirements_status",
+          "description": "Should report requirements status section",
+          "check": "output.includes('需求') || output.includes('requirement') || output.includes('PRD') || output.includes('Story')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "user-options-display",
+      "category": "user-interaction",
+      "prompt": "查看项目状态",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "shows_numbered_options",
+          "description": "Should show numbered options for user selection",
+          "check": "output.includes('[1]') || output.includes('[2]') || output.includes('选择')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "allows_custom_input",
+          "description": "Should mention custom input option",
+          "check": "output.includes('自定义') || output.includes('custom') || output.includes('输入')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

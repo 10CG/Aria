@@ -1,0 +1,43 @@
+arch-common: Cross-Skill Integration
+======================================
+
+arch-common provides shared configuration consumed by both arch-search and arch-update.
+
+INTEGRATION WITH arch-search:
+  arch-search uses arch-common to:
+    - Know which files are architecture docs (ARCHITECTURE.md, *.arch.md patterns)
+    - Apply L0/L1/L2 layer classification during search routing
+    - Determine search scope: L0 for project queries, L1 for module queries
+    - Build the DOMAINS.md index using the layer naming conventions
+
+  Without arch-common, arch-search would need to hardcode file patterns and
+  layer definitions, leading to inconsistency if conventions change.
+
+INTEGRATION WITH arch-update:
+  arch-update uses arch-common to:
+    - Generate new docs with correct naming (*.arch.md vs ARCHITECTURE.md)
+    - Place generated docs at correct locations (colocation rules)
+    - Classify new source files into the right layer for doc generation
+    - Validate sync using known architecture doc patterns
+
+  Without arch-common, arch-update might create docs with inconsistent naming
+  or place them in incorrect locations.
+
+SHARED CONFIGURATION ELEMENTS:
+
+  | Config Element       | Used by arch-search | Used by arch-update |
+  |----------------------|---------------------|---------------------|
+  | Layer definitions    | Yes (routing)       | Yes (classification)|
+  | Naming conventions   | Yes (file search)   | Yes (doc generation)|
+  | Placement rules      | Yes (path lookup)   | Yes (doc placement) |
+  | File glob patterns   | Yes (L2/L3 search)  | Yes (change detect) |
+
+WHY SHARED CONFIG MATTERS:
+  arch-common acts as a single source of truth for all architecture-related
+  Skills. When conventions are updated in arch-common, both arch-search and
+  arch-update automatically inherit the change. This ensures consistent
+  behavior across the entire architecture toolchain and prevents drift
+  between skills over time.
+
+  The unified, shared standard also means teams only need to learn one
+  convention set, regardless of which architecture skill they are using.

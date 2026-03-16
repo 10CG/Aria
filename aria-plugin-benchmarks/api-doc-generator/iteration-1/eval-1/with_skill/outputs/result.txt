@@ -1,0 +1,65 @@
+## API Doc Generator — OpenAPI 3.0 Spec
+
+Framework detected: FastAPI
+Source: backend/src/routes/users.py
+Generated: 2026-03-16T10:31:00Z
+
+```yaml
+openapi: 3.0.3
+info:
+  title: Users API
+  version: 1.0.0
+  description: Auto-generated from backend/src/routes/users.py
+
+paths:
+  /users:
+    post:
+      summary: Create a new user account
+      operationId: create_user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+
+  /users/{user_id}:
+    get:
+      summary: Get user by ID
+      operationId: get_user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    UserCreate:
+      type: object
+      description: Request schema for creating a user
+    UserResponse:
+      type: object
+      description: Response schema for user data
+```
+
+OpenAPI 3.0 specification generated successfully. 2 endpoints documented.

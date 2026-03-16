@@ -1,0 +1,3 @@
+```
+chore: add benchmark comment to app.js
+```

@@ -1,0 +1,33 @@
+{
+  "eval_id": 1,
+  "eval_name": "prd-format-validation",
+  "category": "format-check",
+  "prompt": "验证以下 PRD 文档格式是否符合规范: 文档缺少 Background、Scope 和 Acceptance Criteria 章节",
+  "setup": {
+    "document_type": "PRD",
+    "expected_violations": "3+"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_missing_sections",
+      "description": "Should detect missing required PRD sections",
+      "check": "output.includes('missing') || output.includes('缺少') || output.includes('required')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "names_specific_sections",
+      "description": "Should name the specific missing sections",
+      "check": "output.includes('Background') || output.includes('Scope') || output.includes('Acceptance')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "provides_violation_count",
+      "description": "Should report the number of violations found",
+      "check": "output.includes('violation') || output.includes('error') || output.includes('问题') || output.includes('3')",
+      "severity": "medium"
+    }
+  ]
+}

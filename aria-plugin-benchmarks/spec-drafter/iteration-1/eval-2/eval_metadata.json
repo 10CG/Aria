@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "proposal-generation",
+  "category": "doc-creation",
+  "prompt": "生成 proposal.md: 为用户认证功能 (登录/注册/密码重置) 创建 OpenSpec proposal",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "generates_proposal_file",
+      "description": "Should generate a proposal.md document",
+      "check": "output.includes('proposal') || output.includes('# ') || output.includes('## ')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "has_required_sections",
+      "description": "Should include Background, Scope, and Goals sections",
+      "check": "output.includes('Background') && output.includes('Scope') && (output.includes('Goal') || output.includes('目标'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "covers_all_features",
+      "description": "Should cover login, register, and password reset in the proposal",
+      "check": "(output.includes('login') || output.includes('登录')) && (output.includes('register') || output.includes('注册'))",
+      "severity": "high"
+    }
+  ]
+}

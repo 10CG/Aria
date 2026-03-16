@@ -1,0 +1,26 @@
+{
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "cross_module_scope",
+      "description": "Scope should reflect cross-module nature (api/cross/tasks)",
+      "expected": "Scope should mention 'tasks' or 'cross' to indicate multi-module change",
+      "actual": "No scope in commit message (just 'feat:' without parentheses)",
+      "passed": false
+    },
+    {
+      "id": "A2",
+      "name": "has_body",
+      "description": "Complex changes should have body explaining modules affected",
+      "expected": "Body should list changes per module (API, backend, mobile)",
+      "actual": "Body has only 1 sentence, does not detail which modules were affected (API contract, backend models, mobile models/UI)",
+      "passed": false
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 0,
+    "failed": 2,
+    "passed_pct": 0
+  }
+}

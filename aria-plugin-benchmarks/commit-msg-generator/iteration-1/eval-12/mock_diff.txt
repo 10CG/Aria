@@ -1,0 +1,25 @@
+diff --git a/.gitignore b/.gitignore
+index 1234567..abcdefg 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,5 +1,6 @@
+ node_modules/
+ dist/
+ .env
++.env.local
+ *.log
+
+diff --git a/.eslintrc.json b/.eslintrc.json
+index 9876543..fedcba9 100644
+--- a/.eslintrc.json
++++ b/.eslintrc.json
+@@ -1,5 +1,5 @@
+ {
+   "rules": {
+-    "no-console": "warn",
+-    "no-debugger": "warn"
++    "no-console": "error",
++    "no-debugger": "error",
++    "prefer-const": "error"
+   }
+ }

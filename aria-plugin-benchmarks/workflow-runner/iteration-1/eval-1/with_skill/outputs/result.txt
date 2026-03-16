@@ -1,0 +1,60 @@
+## Workflow Runner — Full Ten-Step Cycle
+
+Task: Add user profile editing functionality
+Workflow: full-cycle
+Started: 2026-03-16T10:21:00Z
+
+═══════════════════════════════════════════════
+  PHASE A — Planning
+═══════════════════════════════════════════════
+
+[A.0] State Scanner — Scanning current project state...
+  ✓ Branch: main (clean)
+  ✓ No active OpenSpec found
+  ✓ Recommendation: full-cycle
+
+[A.1] Spec Drafter — Creating OpenSpec for user profile editing...
+  ✓ OpenSpec created: openspec/changes/user-profile-edit/proposal.md
+  ✓ Level 2 spec (Minimal) generated
+
+[A.2] Task Planner — Breaking down tasks...
+  ✓ Tasks created: T1 (backend API), T2 (mobile UI), T3 (integration tests)
+
+[A.3] Agent Router — Assigning agents...
+  ✓ T1 → backend-architect
+  ✓ T2 → mobile-developer
+  ✓ T3 → tech-lead
+
+═══════════════════════════════════════════════
+  PHASE B — Development
+═══════════════════════════════════════════════
+
+[B.1] Branch Manager — Creating feature branch...
+  ✓ Branch created: feature/user-profile-edit
+
+[B.2] Implementation & Review...
+  ✓ Tasks executed by assigned agents
+  ✓ Code review completed
+
+═══════════════════════════════════════════════
+  PHASE C — Integration
+═══════════════════════════════════════════════
+
+[C.1] Commit — Recording changes...
+  ✓ feat(profile): add user profile editing functionality
+
+[C.2] Merge — Integrating to main...
+  ✓ Branch merged: feature/user-profile-edit → main
+
+═══════════════════════════════════════════════
+  PHASE D — Closure
+═══════════════════════════════════════════════
+
+[D.1] Progress Update — Syncing status...
+  ✓ UPMv2-STATE updated: all tasks completed
+
+[D.2] Archive — Closing loop...
+  ✓ OpenSpec archived to openspec/changes/user-profile-edit/
+  ✓ Cycle complete
+
+Full cycle completed in 10 steps. All phases A→B→C→D executed successfully.

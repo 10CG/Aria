@@ -1,0 +1,40 @@
+{
+  "benchmark_name": "requirements-validator",
+  "test_type": "real_execution",
+  "test_project": "todo-web",
+  "timestamp": "2026-03-16T15:38:10.038985+00:00",
+  "total_evals": 2,
+  "passed": 0,
+  "failed": 2,
+  "pass_rate": 0.0,
+  "total_tokens": 5091,
+  "total_duration_ms": 200296,
+  "total_cost_usd": 0.1899,
+  "eval_results": [
+    {
+      "eval_id": "real-1",
+      "eval_name": "validate-prd-format",
+      "verdict": "FAIL",
+      "pass_rate": 0.3333333333333333,
+      "tokens": 5091,
+      "duration_ms": 80296,
+      "failed_assertions": [
+        "checks_format",
+        "reports_result"
+      ]
+    },
+    {
+      "eval_id": "real-2",
+      "eval_name": "validate-architecture-doc",
+      "verdict": "FAIL",
+      "pass_rate": 0.0,
+      "tokens": 0,
+      "duration_ms": 120000,
+      "failed_assertions": [
+        "finds_arch_file",
+        "checks_structure",
+        "reports_result"
+      ]
+    }
+  ]
+}

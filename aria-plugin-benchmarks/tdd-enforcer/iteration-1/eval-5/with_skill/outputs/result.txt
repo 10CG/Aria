@@ -1,0 +1,77 @@
+# TDD Enforcer - Strict Mode
+
+> **Mode**: Strict
+> **Violation**: Commit without test coverage
+> **Action**: BLOCKED - Commit rejected
+
+---
+
+## COMMIT BLOCKED
+
+TDD Enforcer (Strict Mode) has rejected your commit.
+
+**Reason**: `services/payment_service.py` has no corresponding test coverage.
+
+In Strict mode, all code committed must have been developed using the TDD RED-GREEN-REFACTOR cycle.
+
+---
+
+## Violation Details
+
+```
+STRICT MODE VIOLATION
+---------------------
+File:          services/payment_service.py
+Coverage:      0% (no tests found)
+Required:      100% TDD compliance
+Status:        BLOCKED
+
+Associated test file not found:
+  tests/test_payment_service.py  [MISSING]
+```
+
+---
+
+## Remediation Steps
+
+To resolve this violation and unblock your commit, follow these steps:
+
+**Step 1: Write failing tests (RED phase)**
+```bash
+touch tests/test_payment_service.py
+# Add test cases for all public methods in payment_service.py
+```
+
+**Step 2: Verify tests fail**
+```bash
+pytest tests/test_payment_service.py
+# All tests should FAIL at this point (RED confirmed)
+```
+
+**Step 3: Confirm your implementation passes the tests**
+```bash
+pytest tests/test_payment_service.py
+# All tests should PASS (GREEN confirmed)
+```
+
+**Step 4: Stage the test file and retry commit**
+```bash
+git add tests/test_payment_service.py
+git commit -m "feat(payment): add payment service with TDD coverage"
+```
+
+---
+
+## Methods Requiring Coverage
+
+TDD Enforcer detected the following untested public methods in `services/payment_service.py`:
+
+- `PaymentService.process_payment()` - 0% coverage
+- `PaymentService.refund()` - 0% coverage
+- `PaymentService.get_transaction_status()` - 0% coverage
+
+All 3 methods must have corresponding tests before this commit can proceed.
+
+---
+
+**Commit is blocked until TDD compliance is achieved.**

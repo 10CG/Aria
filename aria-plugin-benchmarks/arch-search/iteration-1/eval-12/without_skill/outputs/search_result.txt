@@ -1,0 +1,128 @@
+# API端点搜索结果 - 基准测试 (不使用arch-search技能)
+
+## 搜索方法
+使用传统 Grep/Glob 方法：
+1. `Grep` 搜索关键词：API endpoints, endpoint, route, controller
+2. `Grep` 搜索 API 相关模式：interface.*API, class.*API, def.*endpoint, @route, @app.route
+3. `Glob` 查找 controller 和 service 文件
+4. `Grep` 搜索 api/API/service 关键词
+5. 检查项目结构中的 API 定义位置
+
+## 发现的文档
+
+### 1. OpenAPI 规范文件
+**位置**: `shared/contracts/openapi/api.yaml`
+
+**包含的 API 端点**:
+- `/auth/login` - POST 用户登录
+- `/auth/register` - POST 用户注册
+- `/tasks` - GET 获取任务列表, POST 创建任务
+- `/tasks/{id}` - GET 获取单个任务, PUT 更新任务, DELETE 删除任务
+
+**技术栈**: FastAPI (Python 3.11+)
+
+### 2. 后端架构文档
+**位置**: `backend/docs/ARCHITECTURE.md`
+
+**架构分层**:
+```
+┌─────────────────────────────────────────────┐
+│                  API Layer                  │
+│         (Routes, Controllers)               │
+├─────────────────────────────────────────────┤
+│                Service Layer                │
+│         (Business Logic)                    │
+├─────────────────────────────────────────────┤
+│              Repository Layer               │
+│         (Data Access)                       │
+├─────────────────────────────────────────────┤
+│               Data Layer                    │
+│         (Models, Schemas)                   │
+└─────────────────────────────────────────────┘
+```
+
+**目录结构**:
+```
+backend/
+├── src/
+│   ├── api/           # API路由
+│   ├── services/      # 业务逻辑
+│   ├── repositories/  # 数据访问
+│   ├── models/        # 数据模型
+│   └── middleware/    # 中间件
+├── tests/
+└── docs/
+```
+
+### 3. 移动端网络架构文档
+**位置**: `mobile/docs/architecture/network.md`
+
+**技术选型**:
+- HTTP Client: Dio
+- API 定义: Retrofit (代码生成)
+- 序列化: json_serializable
+
+**API Service 示例**:
+```dart
+@RestApi(baseUrl: '/api/v1')
+abstract class TaskApiService {
+  @GET('/tasks')
+  Future<List<Task>> getTasks();
+
+  @POST('/tasks')
+  Future<Task> createTask(@Body() CreateTaskRequest request);
+
+  @GET('/tasks/{id}')
+  Future<Task> getTask(@Path('id') String id);
+}
+```
+
+**相关代码位置**:
+- API 服务: `mobile/src/services/api/`
+- 拦截器: `mobile/src/services/api/interceptors/`
+- 网络配置: `mobile/src/config/network_config.dart`
+- 错误处理: `mobile/src/services/api/error_handler.dart`
+
+## 代码指针
+
+### 主要 API 定义位置
+1. **OpenAPI 规范**: `shared/contracts/openapi/api.yaml` - 完整的 API 契约定义
+2. **后端 API 路由**: `backend/src/api/` (目录存在，但文件未找到)
+3. **移动端 API 服务**: `mobile/src/services/api/` (目录存在，但文件未找到)
+
+### 发现的架构文档
+- `mobile/docs/ARCHITECTURE.md` - 整体架构视图
+- `mobile/docs/architecture/` - 各模块架构文档
+- `DOMAINS.md` - 领域定义文档
+
+## 搜索结果总结
+
+### 成功找到的信息
+1. ✅ API 端点的完整定义（通过 OpenAPI 规范）
+2. ✅ 技术栈信息（FastAPI, Dio, Retrofit）
+3. ✅ 架构分层设计
+4. ✅ 网络通信策略
+5. ✅ 代码组织结构
+
+### 未找到的信息
+1. ❌ 具体的控制器实现文件（可能项目未完成或文件未生成）
+2. ❌ 服务层的具体实现
+
+### Token 使用估计
+- 搜索命令: ~100 tokens
+- 文档读取: ~3000 tokens
+- 输出生成: ~400 tokens
+- **总计**: ~3500 tokens (符合基准测试预期)
+
+## 建议
+
+传统方法能够找到 API 端点的定义位置，但需要：
+1. 了解项目结构（知道在 `shared/contracts/openapi/` 目录查找）
+2. 检查多个相关文档（架构文档、网络文档等）
+3. 使用多种搜索模式（Grep + Glob）
+4. 手动关联不同文件中的信息
+
+相比之下，arch-search 技能可能能够更快速地：
+1. 一次性理解整个项目结构
+2. 自动关联相关文档
+3. 提供更完整的上下文信息

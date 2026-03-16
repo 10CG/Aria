@@ -1,0 +1,9 @@
+feat(auth): Add JWT authentication implementation
+
+Implemented JWT token service and authentication middleware for the backend.
+Added comprehensive unit tests for the authentication module.
+
+Changes include:
+- JWTService class with token generation and validation
+- AuthMiddleware for FastAPI request authentication
+- Unit tests covering token generation, validation, and edge cases

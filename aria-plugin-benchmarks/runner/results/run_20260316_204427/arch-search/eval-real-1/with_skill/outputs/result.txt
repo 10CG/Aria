@@ -1,0 +1,49 @@
+Here's the authentication implementation architecture for the todo-web project:
+
+---
+
+## Authentication Architecture Overview
+
+### Backend Components
+
+| File | Role |
+|------|------|
+| `backend/middleware/auth.js` | JWT verification (`protect` + `authorize` middleware) |
+| `backend/src/auth/authController.js` | Register, login, logout, forgot/reset password, social login |
+| `backend/src/auth/authRepository.js` | All user DB operations (find, create, update, reset tokens) |
+| `backend/src/auth/authRoutes.js` | Route definitions with rate limiting and Zod validation |
+| `backend/src/routes.js` | Dependency injection wiring, shared DB connection |
+
+### Frontend Components
+
+| File | Role |
+|------|------|
+| `frontend/src/js/authApp.js` | Auth UI, form handling, cross-tab sync, token validation |
+| `frontend/src/js/todoService.js` | `login()`, `register()`, `logout()`, token storage |
+| `frontend/src/js/services/api.js` | HTTP client, auto-attaches `Authorization: Bearer`, 401 handling |
+
+### Authentication Flow
+
+**Login:**
+1. `authApp.handleLogin()` → validates input
+2. `todoService.login()` → `POST /api/auth/login`
+3. Backend: Zod validation → `bcrypt.compare()` → `jwt.sign({ id, name, email }, JWT_SECRET, { expiresIn: '30d' })`
+4. Frontend stores token in both `sessionStorage` and `localStorage` (backup)
+
+**Authenticated requests:**
+1. `api.js` adds `Authorization: Bearer <token>` header
+2. `protect` middleware: `jwt.verify()` → fetches user from SQLite → attaches to `req.user`
+
+### Database Schema
+
+- **`users`** table: id, name, email, password (bcrypt), avatar_url, role, last_login, reset_password_token/expire
+- **`social_accounts`** table: provider (google/github/wechat/qq), provider_user_id, user_id FK
+- **No server-side sessions** — pure stateless JWT
+
+### Key Design Decisions
+
+- **30-day JWT expiry**, no refresh tokens
+- Token validated on load, every 30 minutes via timer, and on tab focus
+- `sessionStorage` primary (clears on close), `localStorage` as fallback
+- Rate limiting on `/login` and `/register` via `authLimiter`
+- Password reset uses `crypto.randomBytes(20)` → SHA256 stored hash, 1-hour expiry

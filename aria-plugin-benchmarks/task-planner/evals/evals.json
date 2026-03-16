@@ -1,0 +1,209 @@
+{
+  "skill_name": "task-planner",
+  "skill_path": "aria/skills/task-planner",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for task-planner skill - OpenSpec task decomposition",
+  "metrics": [
+    "task_decomposition_quality",
+    "complexity_assessment_accuracy",
+    "dependency_analysis",
+    "agent_allocation_correctness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "basic-task-decomposition",
+      "category": "decomposition",
+      "prompt": "将以下功能分解为任务: 添加用户认证功能，包括登录、注册、密码重置",
+      "setup": {
+        "expected_task_count": "3-6"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "generates_task_list",
+          "description": "Should generate a list of tasks",
+          "check": "output.includes('TASK-') || output.includes('任务')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_complexity_labels",
+          "description": "Should include complexity labels (S/M/L/XL)",
+          "check": "output.includes('S') || output.includes('M') || output.includes('L') || output.includes('Complexity')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "reasonable_granularity",
+          "description": "Tasks should be 4-8 hour granularity",
+          "check": "output.includes('h') || output.includes('hour') || output.includes('小时')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "complexity-assessment-small",
+      "category": "complexity",
+      "prompt": "评估复杂度: 修改一个 typo，影响 1 个文件",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "assesses_as_small",
+          "description": "Should assess as S complexity",
+          "check": "output.includes('S') || output.includes('Small') || output.includes('小')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "complexity-assessment-large",
+      "category": "complexity",
+      "prompt": "评估复杂度: 重构 API 架构，影响 10+ 文件，涉及 3 个模块",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "assesses_as_large",
+          "description": "Should assess as L or XL complexity",
+          "check": "output.includes('L') || output.includes('XL') || output.includes('Large') || output.includes('大')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "dependency-analysis",
+      "category": "dependency",
+      "prompt": "分析任务依赖: [实现登录功能, 编写登录测试, 更新登录文档]",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "identifies_test_dependency",
+          "description": "Should identify test depends on implementation",
+          "check": "output.includes('依赖') || output.includes('depend') || output.includes('→') || output.includes('顺序')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_doc_dependency",
+          "description": "Should identify doc depends on feature",
+          "check": "output.includes('文档') || output.includes('doc')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "agent-allocation",
+      "category": "agent-mapping",
+      "prompt": "分配 Agent: 后端 API 开发任务",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "allocates_backend_agent",
+          "description": "Should allocate backend-architect or similar agent",
+          "check": "output.includes('backend') || output.includes('Backend') || output.includes('architect')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "agent-allocation-frontend",
+      "category": "agent-mapping",
+      "prompt": "分配 Agent: Flutter UI 开发任务",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "allocates_mobile_agent",
+          "description": "Should allocate mobile-developer or similar agent",
+          "check": "output.includes('mobile') || output.includes('Mobile') || output.includes('frontend') || output.includes('UI')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "yaml-output-format",
+      "category": "output-format",
+      "prompt": "生成任务列表 YAML 格式: 用户认证功能",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "yaml_structure",
+          "description": "Should output YAML structure",
+          "check": "output.includes('tasks:') || output.includes('metadata:') || output.includes('- id:')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "has_required_fields",
+          "description": "Should have id, title, complexity fields",
+          "check": "output.includes('id:') && output.includes('title:') && output.includes('complexity:')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "execution-order-generation",
+      "category": "ordering",
+      "prompt": "生成执行顺序: [API 设计, 数据库迁移, 服务实现, 集成测试]",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "shows_execution_order",
+          "description": "Should show execution order",
+          "check": "output.includes('执行') || output.includes('order') || output.includes('顺序') || output.includes('→')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "correct_dependency_order",
+          "description": "Should order API before implementation",
+          "check": "output.indexOf('API') < output.indexOf('实现') || output.indexOf('设计') < output.indexOf('实现')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "test-task-inclusion",
+      "category": "test-integration",
+      "prompt": "分解任务: 用户注册功能 (include_tests=true)",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "includes_test_tasks",
+          "description": "Should include test tasks",
+          "check": "output.includes('test') || output.includes('测试') || output.includes('Test')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "deliverables-identification",
+      "category": "deliverables",
+      "prompt": "识别交付物: 添加 OTP 登录功能",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "lists_deliverables",
+          "description": "Should list deliverable files",
+          "check": "output.includes('.py') || output.includes('.dart') || output.includes('deliver') || output.includes('交付')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "includes_migration",
+          "description": "Should include database migration for OTP",
+          "check": "output.includes('migration') || output.includes('迁移') || output.includes('.sql')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "correct-archive-path",
+  "category": "path-resolution",
+  "prompt": "归档已完成的 OpenSpec: spec_path=openspec/changes/user-auth, project_root=/workspace/my-project, expected_archive=openspec/archive/user-auth",
+  "setup": {
+    "spec_path": "openspec/changes/user-auth",
+    "project_root": "/workspace/my-project",
+    "correct_archive": "openspec/archive/user-auth",
+    "incorrect_archive": "standards/openspec/archive/user-auth"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "uses_project_archive_path",
+      "description": "Should archive to project/openspec/archive/ not standards/",
+      "check": "output.includes('openspec/archive') && !output.includes('standards/openspec/archive')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "resolves_project_root",
+      "description": "Should correctly resolve project root for archive path",
+      "check": "output.includes('my-project') || output.includes('project_root') || output.includes('/workspace')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "confirms_archive_destination",
+      "description": "Should confirm the archive destination path",
+      "check": "output.includes('archive') && (output.includes('user-auth') || output.includes('destination') || output.includes('目标'))",
+      "severity": "high"
+    }
+  ]
+}

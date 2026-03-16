@@ -1,0 +1,9 @@
+{
+  "duration_ms": 2450,
+  "steps": {
+    "skill_load": 150,
+    "diff_analysis": 800,
+    "message_generation": 1200,
+    "output_write": 300
+  }
+}

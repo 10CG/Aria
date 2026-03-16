@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "user-story-validation",
+  "timestamp": "2026-03-16T14:02:30Z",
+  "assertions": [
+    {
+      "text": "detects_missing_ac",
+      "passed": true,
+      "evidence": "Output contains 'Acceptance Criteria (AC)' as a CRITICAL violation with rule US_FORMAT_001"
+    },
+    {
+      "text": "detects_missing_points",
+      "passed": true,
+      "evidence": "Output contains 'Story Points (SP)' as a HIGH violation with rule US_FORMAT_002"
+    },
+    {
+      "text": "format_is_valid",
+      "passed": true,
+      "evidence": "Output confirms 'As a / I want to' format structure is present and valid in the Format Structure Check table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

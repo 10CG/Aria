@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "percentage-calculation",
+  "timestamp": "2026-03-16T10:14:30Z",
+  "assertions": [
+    {
+      "text": "correct_percentage_with_partial",
+      "passed": true,
+      "evidence": "Output shows 'Overall Completion: 60%' and formula result '6.0 / 10 = 60.0%'"
+    },
+    {
+      "text": "shows_calculation_breakdown",
+      "passed": true,
+      "evidence": "Table shows 'completed: 5' and 'in_progress: 2' counts explicitly"
+    },
+    {
+      "text": "handles_partial_credit",
+      "passed": true,
+      "evidence": "Output explicitly notes '0.5 partial credit weight' and column header '0.5 (partial credit)'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

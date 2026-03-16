@@ -1,0 +1,130 @@
+Here is the OpenSpec proposal:
+
+---
+
+```markdown
+# Phase 5: Todo 标签功能
+
+> **Level**: Standard (Level 3 Spec)
+> **Status**: Draft
+> **Module**: backend, frontend
+> **PRD Reference**: docs/requirements/prd-todo-optimization-v1.md
+> **Created**: 2026-03-16
+
+## Why
+
+当前 todo 列表以单一文本字段 `tag` 做粗粒度分类，无法满足多维度组织需求：
+
+- 一个 todo 只能属于一个分类，无法同时打多个标签（如"紧急"+"工作"）
+- 分类字符串无颜色/样式区分，视觉辨识度低
+- 无按标签筛选入口，找特定类别任务依赖全文搜索
+- 数据库已存在 `tags` 表和 `todo_tags` 关联表，但完全未被使用
+
+标签功能将填补这一缺口，让用户可以自定义多彩标签、批量打标、按标签过滤。
+
+## What
+
+### FR-TAG-001: 标签管理 CRUD (P1)
+
+后端提供完整的标签生命周期 API：
+
+- `GET /api/tags` — 获取当前用户的所有标签
+- `POST /api/tags` — 创建标签（`name`, `color`）
+- `PATCH /api/tags/:id` — 修改标签名或颜色
+- `DELETE /api/tags/:id` — 删除标签（级联清除 `todo_tags` 关联）
+- 标签 `name` 在用户维度唯一，禁止重复
+- `color` 格式为 CSS hex（如 `#3b82f6`），默认 `#cccccc`
+
+### FR-TAG-002: 为 Todo 分配/取消标签 (P1)
+
+- `POST /api/todos/:id/tags` — 为 todo 绑定一个或多个 tagId
+- `DELETE /api/todos/:id/tags/:tagId` — 取消单个标签绑定
+- Todo 详情响应中包含 `tags` 数组（`[{id, name, color}]`）
+- `getAllTodos` 查询 JOIN `todo_tags` + `tags`，返回完整标签信息
+
+### FR-TAG-003: 按标签过滤 Todo 列表 (P1)
+
+- `GET /api/todos?tagId=1&tagId=2` — 支持多标签 AND 过滤
+- 前端筛选栏新增标签胶囊选择器，可多选
+- 选中标签时 URL query string 同步更新，支持刷新保持状态
+
+### FR-TAG-004: 标签管理 UI (P2)
+
+- 设置弹窗（或独立页面区块）展示全部标签列表
+- 支持增删改，颜色用 color-picker 或预设色板选取
+- 标签名重复时前端即时提示
+
+### FR-TAG-005: Todo 卡片标签分配 UI (P1)
+
+- Todo 行/卡片上显示已分配标签胶囊（色块 + 名称）
+- 点击 todo 编辑时可打开标签选择下拉，勾选/取消标签
+- 最多显示 3 个胶囊，超出用 "+N" 折叠
+
+## Key Deliverables
+
+| 交付物 | 类型 | 文件 |
+|--------|------|------|
+| Tags API 路由 | 新增 | `backend/src/routes.js` |
+| TagService 服务层 | 新增 | `backend/src/tagService.js` |
+| TagController 控制器 | 新增 | `backend/src/tagController.js` |
+| Tags 请求校验器 | 新增 | `backend/middleware/validators/tag.js` |
+| `getAllTodos` JOIN 标签 | 修改 | `backend/src/todoService.js` |
+| 标签胶囊组件 | 新增 | `frontend/src/js/components/TagChip.js` |
+| 标签选择器组件 | 新增 | `frontend/src/js/components/TagPicker.js` |
+| 标签过滤栏 | 修改 | `frontend/src/js/app.js` |
+| 标签管理弹窗 | 新增 | `frontend/src/js/components/TagManager.js` |
+| 标签相关 CSS | 新增 | `frontend/src/css/tags.css` |
+| 数据库 user_id 迁移 | 修改 | `backend/src/database.js` — 为 `tags` 表加 `user_id` 列 |
+
+## Impact
+
+- **影响范围**: 后端新增 5 个路由 + 服务层；前端新增 3 个组件；`getAllTodos` 查询变更
+- **数据库**: `tags` 表缺少 `user_id` 字段，需迁移脚本补充（不破坏现有数据）
+- **向后兼容**: `todos.tag` 旧字段保留不动，标签功能通过独立关联表实现，互不干扰
+- **风险**: `getAllTodos` JOIN 可能影响大数据量下的查询性能，需评估 `todo_tags` 索引
+
+## Tasks
+
+**后端**
+- [ ] 1.1 为 `tags` 表添加 `user_id` 列（迁移脚本 + database.js schema 更新）
+- [ ] 1.2 创建 `tagService.js`：CRUD 方法 + 用户维度唯一名校验
+- [ ] 1.3 创建 `tagController.js`：处理请求/响应，调用 tagService
+- [ ] 1.4 创建 `backend/middleware/validators/tag.js`：name/color 字段校验
+- [ ] 1.5 在 `routes.js` 注册 Tags CRUD 路由和 Todo 标签绑定路由
+- [ ] 1.6 修改 `todoService.getAllTodos`：LEFT JOIN `todo_tags` + `tags`，结果聚合 tags 数组
+- [ ] 1.7 修改 `todoService.getTodoById`（如有）：同样 JOIN 并返回 tags
+
+**前端**
+- [ ] 2.1 创建 `TagChip.js` 组件：色块 + 名称胶囊，支持删除回调
+- [ ] 2.2 创建 `TagPicker.js` 组件：下拉多选，带搜索，调用 tags API
+- [ ] 2.3 创建 `TagManager.js` 组件：标签 CRUD 弹窗，color picker
+- [ ] 2.4 在 todo 列表行集成 `TagChip`（最多 3 个 + 折叠）
+- [ ] 2.5 在 todo 编辑流程集成 `TagPicker`（分配/取消标签）
+- [ ] 2.6 在过滤栏集成标签多选器（`TagPicker` 过滤模式），更新 URL query
+- [ ] 2.7 新增 `tags.css`，更新 `todos.html` script 版本号
+
+**测试**
+- [ ] 3.1 `tagService` 单元测试（CRUD、唯一性校验、级联删除）
+- [ ] 3.2 Tags API 集成测试（鉴权、CRUD、绑定/解绑、过滤）
+
+## Success Criteria
+
+- [ ] 用户可创建最多 20 个自定义标签，每个标签有名称和颜色
+- [ ] 单个 todo 可分配 0 到多个标签，标签数无硬性上限
+- [ ] `GET /api/todos` 响应中每个 todo 包含完整 `tags` 数组
+- [ ] 按标签过滤时，仅返回同时拥有所有选中标签的 todo
+- [ ] 删除标签后，所有相关 todo 的该标签自动移除
+- [ ] 标签名在同一用户下不可重复，接口返回 409 冲突
+- [ ] 标签胶囊在亮色/暗色模式下均清晰可见
+- [ ] `getAllTodos` 在 1000 条 todos 下响应时间 < 200ms
+```
+
+---
+
+**Key design notes:**
+
+1. **DB schema already exists** — `tags` and `todo_tags` tables are in `database.js:216-231`. The only missing piece is a `user_id` column on `tags` (currently multi-tenant todos but tags are unscoped).
+
+2. **Legacy `todos.tag` field** (`VARCHAR(50)`, line 183) is a separate single-string field unrelated to this feature — left untouched to avoid breaking existing data.
+
+3. **Naming** — Following the OpenSpec directory convention, the archive path would be `openspec/archive/2026-03-16-phase5-todo-tags/`.

@@ -1,0 +1,61 @@
+{
+  "eval_id": 2,
+  "eval_name": "template-population",
+  "category": "template",
+  "prompt": "Given the PRD for the task management SaaS platform, populate the standard architecture template with sections: Overview, System Context, Modules, Technology Stack, Non-Functional Requirements, and Integration Points.",
+  "setup": {
+    "template_sections": [
+      "Overview",
+      "System Context",
+      "Modules",
+      "Technology Stack",
+      "Non-Functional Requirements",
+      "Integration Points"
+    ],
+    "prd_summary": "SaaS task management platform"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_overview_section",
+      "description": "Should have a populated Overview section",
+      "check": "output.match(/## Overview|# Overview/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "has_modules_section",
+      "description": "Should have a populated Modules section",
+      "check": "output.match(/## Modules|## Module|# Modules/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "has_tech_stack_section",
+      "description": "Should have a populated Technology Stack section",
+      "check": "output.match(/## Technology|## Tech Stack|## Stack/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "has_nfr_section",
+      "description": "Should have a Non-Functional Requirements section",
+      "check": "output.match(/Non-Functional|NFR|non.*functional/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "has_integration_section",
+      "description": "Should have an Integration Points section",
+      "check": "output.match(/## Integration|Integration.*Points/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A6",
+      "name": "no_unfilled_placeholders",
+      "description": "Should not have any unfilled template placeholders like [TBD] or {{placeholder}}",
+      "check": "!output.match(/\\[TBD\\]|\\{\\{.*\\}\\}|\\[PLACEHOLDER\\]/i)",
+      "severity": "high"
+    }
+  ]
+}

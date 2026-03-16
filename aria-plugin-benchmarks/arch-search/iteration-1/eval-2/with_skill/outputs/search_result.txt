@@ -1,0 +1,36 @@
+## 🔍 架构搜索结果
+
+**查询**: 查找数据库设计文档
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+**Token 使用**: 约 400 (完成于 Layer 1)
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `backend/docs/architecture/database.md` | ⭐⭐⭐ | PostgreSQL + Redis 数据库架构，包含用户表和任务表 SQL 定义 |
+
+### 📝 信息摘要
+
+后端数据库采用 PostgreSQL 15 作为主数据库，Redis 7 作为缓存层，遵循第三范式 (3NF) 设计原则。核心表包括 users 和 tasks，使用 UUID 作为主键，包含审计字段（created_at, updated_at），并支持软删除。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `backend/src/config/database.py` - 数据库配置
+- `backend/src/models/user.py` - 用户模型实现
+- `backend/src/models/task.py` - 任务模型实现
+- `backend/migrations/` - 数据库迁移脚本
+
+### 💡 建议下一步
+
+- [ ] 读取 `backend/docs/architecture/database.md` 了解完整设计细节
+- [ ] 查看 `backend/src/config/database.py` 实现配置
+- [ ] 查看 `backend/migrations/` 了解数据库变更历史
+
+---
+
+**搜索完成时间**: 2026-03-13
+**完成状态**: ✅ 成功在 Layer 1 找到目标文档
+**Token 节省**: 相比传统搜索节省约 80% (2500 → 400 tokens)

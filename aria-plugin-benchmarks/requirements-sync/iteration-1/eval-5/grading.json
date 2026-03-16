@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "conflict-resolution",
+  "timestamp": "2026-03-16T14:20:30Z",
+  "assertions": [
+    {
+      "text": "detects_three_way_conflict",
+      "passed": true,
+      "evidence": "Output header states 'A 3-way conflict was detected for US-030' and the Conflict Details table shows 3 sources"
+    },
+    {
+      "text": "shows_all_conflicting_values",
+      "passed": true,
+      "evidence": "Output shows all three values: 'Done' (Git), 'In Review' (UPM), and 'In Progress' (Jira) in the Conflict Details table"
+    },
+    {
+      "text": "proposes_resolution",
+      "passed": true,
+      "evidence": "Output provides two resolution options (latest-wins and manual review) and explicitly recommends manual review as the safe approach"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

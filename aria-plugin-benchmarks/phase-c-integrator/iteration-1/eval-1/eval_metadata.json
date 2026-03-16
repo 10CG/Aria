@@ -1,0 +1,38 @@
+{
+  "eval_id": 1,
+  "eval_name": "commit-generation",
+  "category": "commit-flow",
+  "prompt": "Execute Phase C C.1: Generate conventional commits from staged changes. Files changed: backend/api/auth/github_oauth.py (new), backend/tests/test_github_oauth.py (new), backend/models/oauth_account.py (new). Feature: oauth2-social-login.",
+  "setup": {
+    "staged_files": [
+      {"status": "A", "path": "backend/api/auth/github_oauth.py"},
+      {"status": "A", "path": "backend/tests/test_github_oauth.py"},
+      {"status": "A", "path": "backend/models/oauth_account.py"}
+    ],
+    "spec_name": "oauth2-social-login",
+    "expected_type": "feat"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "uses_conventional_commit_type",
+      "description": "Commit message must start with conventional type (feat/fix/refactor/test)",
+      "check": "output.includes('feat') || output.includes('fix') || output.includes('refactor') || output.includes('test')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_scope",
+      "description": "Commit should include a scope in parentheses",
+      "check": "output.includes('(auth)') || output.includes('(oauth') || output.includes('(oauth2)')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "references_spec",
+      "description": "Commit body or footer should reference the OpenSpec",
+      "check": "output.includes('oauth2-social-login') || output.includes('Spec:') || output.includes('Refs:')",
+      "severity": "medium"
+    }
+  ]
+}

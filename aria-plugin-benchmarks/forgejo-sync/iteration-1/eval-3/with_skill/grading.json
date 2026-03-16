@@ -1,0 +1,25 @@
+{
+  "eval_id": 3,
+  "eval_name": "bidirectional-status-sync",
+  "timestamp": "2026-03-16T14:11:30Z",
+  "assertions": [
+    {
+      "text": "syncs_status_to_issue",
+      "passed": true,
+      "evidence": "Output updates Issue #42 with 'status:in-progress' label and shows 'in-progress' sync in results table"
+    },
+    {
+      "text": "reflects_issue_back_to_story",
+      "passed": true,
+      "evidence": "Output explicitly shows 'bidirectional' sync direction and 'Story ↔ Issue 状态已同步' conclusion"
+    },
+    {
+      "text": "identifies_both_entities",
+      "passed": true,
+      "evidence": "Output references 'US-001' and 'Issue #42' throughout, including in sync result table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Bidirectional sync completed: Story US-001 in-progress -> Issue #42 label updated, bidirectional verification passed"
+}

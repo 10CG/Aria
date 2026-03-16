@@ -1,0 +1,70 @@
+{
+  "eval_id": 5,
+  "eval_name": "orchestrated-mode-full-params",
+  "category": "orchestrated-mode",
+  "prompt": "Generate a commit message with enhanced markers. Parameters: subagent_type='backend-architect', phase_cycle='Phase3-Cycle7', module='backend', context='Backend API authentication implementation'. The staged changes add JWT token generation and validation.",
+  "setup": {
+    "staged_files": [
+      {"status": "A", "path": "backend/src/services/auth_service.py"},
+      {"status": "A", "path": "backend/src/middleware/auth.py"},
+      {"status": "A", "path": "backend/tests/test_auth.py"}
+    ],
+    "diff_summary": "JWT authentication implementation",
+    "orchestrator_params": {
+      "subagent_type": "backend-architect",
+      "phase_cycle": "Phase3-Cycle7",
+      "module": "backend",
+      "context": "Backend API authentication implementation"
+    }
+  },
+  "expected_output": {
+    "type": "feat",
+    "scope": "auth",
+    "has_body": true,
+    "has_enhanced_markers": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_executed_by",
+      "description": "Must have Executed-By marker with robot emoji",
+      "check": "commit_message.includes('Executed-By:') && commit_message.includes('backend-architect subagent')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "has_context",
+      "description": "Must have Context marker with phase/cycle",
+      "check": "commit_message.includes('Context:') && commit_message.includes('Phase3-Cycle7')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "has_module",
+      "description": "Must have Module marker",
+      "check": "commit_message.includes('Module:') && commit_message.includes('backend')",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "markers_order",
+      "description": "Enhanced markers must be in order: Executed-By -> Context -> Module",
+      "check": "commit_message.indexOf('Executed-By:') < commit_message.indexOf('Context:') && commit_message.indexOf('Context:') < commit_message.indexOf('Module:')",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "correct_emoji_executed_by",
+      "description": "Executed-By must use robot emoji",
+      "check": "commit_message.includes('Executed-By:')",
+      "severity": "high"
+    },
+    {
+      "id": "A6",
+      "name": "subagent_suffix",
+      "description": "Executed-By must end with 'subagent' suffix",
+      "check": "commit_message.match(/Executed-By:\\s*\\S+\\s+subagent/)",
+      "severity": "critical"
+    }
+  ]
+}

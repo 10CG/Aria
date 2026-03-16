@@ -1,0 +1,41 @@
+{
+  "eval_id": 1,
+  "eval_name": "backend-task-routing",
+  "category": "routing",
+  "prompt": "Route this task to the correct agent: 'Implement a new REST API endpoint POST /api/v1/orders that validates request body, writes to PostgreSQL, and returns 201 on success.'",
+  "setup": {
+    "task_type": "api_implementation",
+    "file_paths": ["backend/src/routes/orders.py", "backend/src/models/order.py"],
+    "keywords": ["REST API", "endpoint", "PostgreSQL"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "selects_backend_architect",
+      "description": "Should select backend-architect agent for API/database task",
+      "check": "output.includes('backend-architect')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "confidence_above_threshold",
+      "description": "Confidence score should be >= 0.85 for clear backend task",
+      "check": "confidence >= 0.85",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "provides_routing_rationale",
+      "description": "Should explain why backend-architect was selected",
+      "check": "output.match(/API|endpoint|database|PostgreSQL|backend/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "no_ambiguous_multi_match",
+      "description": "Should not suggest multiple agents for a clearly backend task",
+      "check": "!output.match(/mobile-developer|frontend/i)",
+      "severity": "medium"
+    }
+  ]
+}

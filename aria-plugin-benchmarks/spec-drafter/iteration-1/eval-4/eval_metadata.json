@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "template-compliance",
+  "category": "format-validation",
+  "prompt": "验证模板合规性: 检查生成的 proposal.md 是否遵循 OpenSpec Level 2 模板格式",
+  "setup": {
+    "level": "Level 2",
+    "required_sections": ["Background", "Scope", "Goals", "Non-Goals", "Implementation Plan"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_all_required_sections",
+      "description": "Should have all Level 2 required sections",
+      "check": "output.includes('Background') && output.includes('Non-Goal') && output.includes('Implementation')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "correct_heading_hierarchy",
+      "description": "Should use correct H2 headings for major sections",
+      "check": "output.includes('## Background') || output.includes('## Scope') || output.includes('## Goal')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "has_metadata_header",
+      "description": "Should include proposal metadata (version, date, status)",
+      "check": "output.includes('version') || output.includes('date') || output.includes('status') || output.includes('Status')",
+      "severity": "medium"
+    }
+  ]
+}

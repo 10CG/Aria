@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "error-recovery",
+  "category": "error-handling",
+  "prompt": "Execute Phase A. State-scanner reports: uncommitted changes in 3 files, working tree dirty. Feature: Add payment gateway integration.",
+  "setup": {
+    "state_scanner_result": "unclean",
+    "dirty_files": 3,
+    "feature": "payment-gateway"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_unclean_state",
+      "description": "Should detect and report unclean working tree state",
+      "check": "output.includes('unclean') || output.includes('dirty') || output.includes('uncommitted') || output.includes('working tree')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "blocks_or_warns",
+      "description": "Should block execution or issue a clear warning",
+      "check": "output.includes('WARNING') || output.includes('BLOCKED') || output.includes('cannot proceed') || output.includes('stash') || output.includes('警告')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "provides_resolution_steps",
+      "description": "Should provide steps to resolve the unclean state",
+      "check": "output.includes('git stash') || output.includes('commit') || output.includes('resolve') || output.includes('clean') || output.includes('action')",
+      "severity": "high"
+    }
+  ]
+}

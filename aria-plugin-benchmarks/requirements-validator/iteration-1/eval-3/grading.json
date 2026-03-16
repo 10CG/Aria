@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "chain-completeness",
+  "timestamp": "2026-03-16T14:04:30Z",
+  "assertions": [
+    {
+      "text": "detects_chain_gap",
+      "passed": true,
+      "evidence": "Output states 'chain is broken at 2 points' and shows chain visualization with [GAP] markers"
+    },
+    {
+      "text": "identifies_missing_architecture",
+      "passed": true,
+      "evidence": "Output identifies 'Missing System Architecture Section' as CRITICAL Gap 1 with action to create architecture section"
+    },
+    {
+      "text": "identifies_missing_story",
+      "passed": true,
+      "evidence": "Output identifies 'Missing User Story US-001' as CRITICAL Gap 2, explicitly naming US-001"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

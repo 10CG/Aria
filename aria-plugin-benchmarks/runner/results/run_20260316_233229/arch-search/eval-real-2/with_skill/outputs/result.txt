@@ -1,0 +1,117 @@
+以下是该项目的数据库设计与数据模型架构总览：
+
+---
+
+## 数据库概览
+
+**数据库引擎**: SQLite3，启用 WAL 模式（支持并发读取）
+**路径**: `backend/data/todos.db`
+**单例模式**: `Database` 类通过 `getInstance()` 全局共享连接
+
+---
+
+## ER 关系图
+
+```
+users 1──N todos 1──N notes
+  │                │
+  │                ├──N subtasks (自引用 parentId/childId)
+  │                │
+  │                └──N todo_tags N──1 tags
+  │
+  ├──1 user_settings
+  └──N social_accounts
+```
+
+---
+
+## 核心数据表
+
+### `users` — 用户表 (`database.js:150`)
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER PK | 自增主键 |
+| name | VARCHAR(100) | 姓名 |
+| email | VARCHAR(100) UNIQUE | 邮箱（登录凭据） |
+| password | VARCHAR(255) | bcrypt 哈希密码 |
+| avatar_url | VARCHAR(255) | 头像 URL |
+| role | TEXT | 角色，默认 `"user"` |
+| created_at | INTEGER | 北京时间时间戳（ms） |
+| last_login | INTEGER | 最后登录时间 |
+| reset_password_token | VARCHAR(255) | SHA-256 哈希重置 token |
+| reset_password_expire | INTEGER | token 1小时过期 |
+
+### `todos` — 待办事项表 (`database.js:179`)
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER PK | 自增主键 |
+| text | VARCHAR(1000) | 内容 |
+| tag | VARCHAR(50) | 标签分类 |
+| timestamp | INTEGER | 创建时间 |
+| plannedStart | INTEGER | 计划开始时间 |
+| estimatedTimeValue | DECIMAL(10,2) | 预估工时值 |
+| estimatedTimeUnit | VARCHAR(10) | 预估工时单位 |
+| completed | BOOLEAN | 是否完成，默认 0 |
+| parentId | INTEGER FK | 父任务 ID（子任务） |
+| priority | INTEGER | 优先级，默认 0 |
+| completed_at | INTEGER | 完成时间戳 |
+| user_id | INTEGER FK | 所属用户（数据隔离） |
+
+### `notes` — 备注表 (`database.js:201`)
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER PK | 自增主键 |
+| todoId | INTEGER FK | 关联的 Todo |
+| content | VARCHAR(2000) | 备注内容 |
+| timestamp | INTEGER | 创建时间 |
+| editedAt | INTEGER | 最后编辑时间 |
+| user_id | TEXT FK | 所属用户 |
+
+### `tags` + `todo_tags` — 标签多对多 (`database.js:214`)
+- `tags`: id, name, color（默认 `#cccccc`）
+- `todo_tags`: todoId FK + tagId FK（多对多关联表）
+
+### `subtasks` — 子任务关系表 (`database.js:234`)
+| 字段 | 说明 |
+|------|------|
+| parentId, childId | 复合主键，双向 FK 指向 todos |
+| user_id | 所属用户 |
+
+> 注意：todos.parentId 与 subtasks 表存在双重子任务表达，两者并存。
+
+### `user_settings` — 用户设置表 (`database.js:257`)
+| 字段 | 说明 |
+|------|------|
+| theme | 主题，默认 `light` |
+| language | 语言，默认 `zh-CN` |
+| display_mode | 显示模式，默认 `list` |
+| items_per_page | 每页条数，默认 10 |
+| default_view | 默认视图，默认 `today` |
+
+### `cache_table` — 服务端缓存 (`database.js:248`)
+- key / value / expires_at（TTL 5分钟，单位毫秒）
+
+### `social_accounts` — 第三方登录绑定 (`database.js:165`)
+- provider: `google/facebook/twitter/github`
+- UNIQUE(provider, provider_user_id)
+
+---
+
+## 索引设计 (`database.js:276`)
+
+```sql
+idx_todos_user_parent    ON todos(user_id, parentId)   -- 查子任务
+idx_todos_user_completed ON todos(user_id, completed)  -- 筛选完成状态
+idx_todos_completed_at   ON todos(completed_at)        -- 统计分析
+idx_todos_timestamp      ON todos(timestamp)            -- 时间排序
+idx_notes_todoId         ON notes(todoId)               -- 加载备注
+```
+
+---
+
+## 架构特点
+
+- **数据隔离**: 所有 Todo 查询携带 `user_id = ?`，多用户完全隔离
+- **外键约束**: 启用 `PRAGMA foreign_keys = ON`，级联删除
+- **备份系统**: 启动延迟触发完全备份 → 每 24h 完全 + 每 1h 增量，AES 加密存储
+- **注意**: `userModel.js` 是遗留的 Mongoose 模型文件（MongoDB 风格），**实际运行时不使用**，项目真正使用的是 SQLite + `authRepository.js`

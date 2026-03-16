@@ -1,0 +1,84 @@
+# Strategic Commit Orchestrator - Dependency Ordering
+
+## 依赖关系图
+
+```
+shared/types/api.ts                    (Level 0 - 无依赖)
+    ├── backend/src/api/handler.py     (Level 1 - 依赖 api.ts)
+    │       └── backend/tests/test_handler.py  (Level 2 - 依赖 handler.py)
+    └── frontend/src/api/client.ts     (Level 1 - 依赖 api.ts)
+```
+
+## 拓扑排序结果
+
+基于依赖关系执行拓扑排序:
+
+| 顺序 | 文件 | Level | 原因 |
+|------|------|-------|------|
+| 第一 | `shared/types/api.ts` | 0 | 无依赖，是其他文件的基础 |
+| 第二 | `backend/src/api/handler.py` | 1 | 依赖 api.ts，需在其之后提交 |
+| 第三 | `frontend/src/api/client.ts` | 1 | 依赖 api.ts，与 handler.py 同级 |
+| 第四 | `backend/tests/test_handler.py` | 2 | 依赖 handler.py，必须最后提交 |
+
+## AI-DDD 提交计划 (依赖顺序)
+
+### Commit 1 - Shared API Types (第一优先)
+
+```
+feat(shared): define API type contracts
+
+- Define request/response type interfaces (shared/types/api.ts)
+```
+
+**顺序**: 第一提交
+**理由**: shared/types/api.ts 是 backend 和 frontend 的共同依赖，必须最先入库，确保后续提交可以正确引用类型定义。
+
+---
+
+### Commit 2 - Backend API Handler
+
+```
+feat(backend): implement API request handler
+
+- Implement API handler using shared types (backend/src/api/handler.py)
+```
+
+**顺序**: 第二提交
+**理由**: 依赖 shared/types/api.ts 中的类型定义，必须在 Commit 1 后提交。
+
+---
+
+### Commit 3 - Frontend API Client
+
+```
+feat(frontend): implement API client integration
+
+- Implement frontend API client using shared types (frontend/src/api/client.ts)
+```
+
+**顺序**: 第三提交
+**理由**: 依赖 shared/types/api.ts，与 backend handler 同级别，可并行但建议按模块顺序。
+
+---
+
+### Commit 4 - Backend Tests (最后提交)
+
+```
+test(backend): add API handler unit tests
+
+- Add comprehensive handler tests (backend/tests/test_handler.py)
+```
+
+**顺序**: 第四提交 (最后)
+**理由**: 测试依赖 backend/src/api/handler.py 实现，必须在实现代码提交后才能进行测试。
+
+## 依赖验证
+
+```
+顺序:   1              2                  3                    4
+       shared  →  backend/handler  →  frontend/client  →  backend/tests
+       (base)     (depends on 1)     (depends on 1)      (depends on 2)
+```
+
+**总提交数**: 4
+**顺序合规**: ✅ 拓扑排序正确，无循环依赖

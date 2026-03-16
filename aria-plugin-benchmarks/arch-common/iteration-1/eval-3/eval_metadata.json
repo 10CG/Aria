@@ -1,0 +1,42 @@
+{
+  "eval_id": 3,
+  "eval_name": "doc-location-rules",
+  "category": "location",
+  "prompt": "Where should architecture documentation be placed for a project with modules at src/auth/, src/payment/, and src/notifications/? Apply arch-common placement rules.",
+  "setup": {
+    "project_structure": {
+      "modules": ["src/auth/", "src/payment/", "src/notifications/"],
+      "root": "/"
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "places_l0_at_root",
+      "description": "L0 ARCHITECTURE.md should be placed at the project root",
+      "check": "output.match(/\\/ARCHITECTURE\\.md|root.*ARCHITECTURE|ARCHITECTURE.*root/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "places_l1_inside_module",
+      "description": "L1 arch docs should be placed inside their respective module directories",
+      "check": "output.match(/src\\/auth\\/auth\\.arch\\.md|src\\/payment\\/payment\\.arch\\.md/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "covers_all_modules",
+      "description": "Should specify doc location for all three modules",
+      "check": "output.match(/auth.*arch|payment.*arch|notification.*arch/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "explains_colocation_principle",
+      "description": "Should explain that docs live alongside the code they describe",
+      "check": "output.match(/coloc|alongside|next to.*code|same.*directory|near.*source/i)",
+      "severity": "high"
+    }
+  ]
+}

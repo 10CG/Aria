@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "spec-compliance-check",
+  "timestamp": "2026-03-16T14:10:10Z",
+  "assertions": [
+    {
+      "text": "checks_spec_compliance",
+      "passed": true,
+      "evidence": "Output performs 'Phase 1: Specification Compliance Review' with table showing 5/6 spec requirements met, references 'openspec/changes/user-auth.md'"
+    },
+    {
+      "text": "validates_interface_contract",
+      "passed": true,
+      "evidence": "Output contains 'Interface Contract Validation' section with table checking all API fields against spec-defined contract"
+    },
+    {
+      "text": "reports_deviations",
+      "passed": true,
+      "evidence": "Output identifies 'Deviation 1: Missing expires_at field in response' with specific line numbers and before/after code comparison"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

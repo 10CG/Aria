@@ -1,0 +1,22 @@
+## Agent Router Result
+
+**Task**: Build a Flutter product listing screen with infinite scroll, skeleton loading states, and pull-to-refresh using Riverpod for state management.
+
+**Routing Decision**: mobile-developer
+**Confidence**: 0.95
+
+**Rationale**:
+- Flutter is a mobile UI framework — strong mobile domain signal
+- Riverpod state management is specific to Flutter/Dart ecosystem
+- Task involves UI components: screens, scroll behavior, loading states
+- File paths confirm mobile module: mobile/lib/screens/, mobile/lib/providers/
+
+**Matched Signals**:
+| Signal | Weight | Domain |
+|--------|--------|--------|
+| Flutter | 0.45 | mobile |
+| Riverpod | 0.30 | mobile |
+| screen / UI components | 0.20 | mobile |
+
+**Selected Agent**: mobile-developer
+**Suggested Workflow**: B.1 → B.2 (branch + implement + review)

@@ -1,0 +1,19 @@
+{
+  "eval_id": 6,
+  "eval_name": "forced-branch-mode",
+  "timestamp": "2026-03-16T13:34:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Should use Branch mode when explicitly specified",
+      "check": "output.includes('Branch') && !output.includes('Worktree')",
+      "severity": "critical",
+      "passed": true,
+      "evidence": "Output contains 'Branch' mode references throughout. No 'Worktree' mentions found - forced Branch mode correctly overrides auto-decision",
+      "text": "respects_mode_override"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Forced branch mode correctly overrides auto-decision algorithm, no Worktree references in output"
+}

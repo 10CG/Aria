@@ -1,0 +1,37 @@
+## 🔍 架构搜索结果
+
+**查询**: API 端点定义在哪
+**搜索层级**: Layer 1 (快速路由)
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `shared/contracts/openapi/` | ⭐⭐⭐ | API 契约定义目录（Layer 1 直接路由） |
+| `backend/src/routes/tasks.py` | ⭐⭐ | 具体的路由实现文件 |
+| `backend/src/schemas/task.py` | ⭐ | 响应数据模型定义 |
+
+### 📝 信息摘要
+
+通过 Layer 1 快速路由成功定位到网络通信领域。项目中 API 端点定义采用 Flask Blueprint 模式，路由定义位于 `backend/src/routes/` 目录下。虽然 OpenAPI 契约目录为空，但实际的路由实现在 `tasks.py` 中定义，遵循 RESTful 风格。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `backend/src/routes/tasks.py` - 定义了 `/tasks` GET 端点，返回分页格式的任务列表
+- `backend/src/schemas/task.py` - 定义了 `task_list_response` 数据结构，包含分页元数据
+
+### 💡 建议下一步
+
+- [ ] 读取 `backend/docs/architecture/database.md` 了解数据库架构（当前为空）
+- [ ] 查看 `mobile/docs/architecture/sync.md` 了解同步机制（当前为空）
+- [ ] 检查是否有其他路由文件在 `backend/src/routes/` 目录
+
+### 📊 Token 使用统计
+
+- **Layer 1 消耗**: ~200 tokens
+- **总搜索时间**: < 1 秒
+- **避免了传统搜索**: 节省约 4000 tokens (92% 节省)
+
+**注意**: 项目中的架构文档多数为空，实际 API 定义散落在代码中。建议完善 OpenAPI 契约文档以提升架构搜索效果。

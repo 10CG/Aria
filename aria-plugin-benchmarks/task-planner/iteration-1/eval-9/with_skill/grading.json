@@ -1,0 +1,15 @@
+{
+  "eval_id": 9,
+  "eval_name": "test-task-inclusion",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains multiple test references: 'RegisterForm.spec.js', 'validators.spec.js', 'password.spec.js', 'user-registration-flow.spec.js', '测试任务已自动添加', '测试覆盖：单元测试、集成测试、端到端测试'",
+      "text": "includes_test_tasks"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

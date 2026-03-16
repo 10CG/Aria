@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "new-file-detection",
+  "timestamp": "2026-03-16T08:01:00Z",
+  "assertions": [
+    {
+      "text": "detects_new_source_files",
+      "passed": true,
+      "evidence": "Output lists PaymentService.ts, PaymentGateway.ts, and Payment.ts as detected new files"
+    },
+    {
+      "text": "identifies_undocumented_files",
+      "passed": true,
+      "evidence": "Output marks all 3 files as [UNDOCUMENTED] and states 'have no corresponding architecture documentation'"
+    },
+    {
+      "text": "suggests_doc_location",
+      "passed": true,
+      "evidence": "Output recommends creating 'src/services/payment/payment.arch.md'"
+    },
+    {
+      "text": "lists_affected_layers",
+      "passed": true,
+      "evidence": "Output identifies files as 'Layer L1 (module level)' based on directory location"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

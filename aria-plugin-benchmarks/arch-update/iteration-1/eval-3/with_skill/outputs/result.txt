@@ -1,0 +1,57 @@
+arch-update: Architecture Document Generated
+=============================================
+
+Generating L1 architecture document for src/services/payment/...
+
+Output file: src/services/payment/payment.arch.md
+
+--- BEGIN GENERATED DOCUMENT ---
+
+# Payment Service Architecture
+
+> Layer: L1 (Module Level)
+> Path: src/services/payment/payment.arch.md
+> Updated: 2026-03-16
+
+## Overview
+
+The payment service module handles all payment processing operations including
+transaction initiation, gateway integration, and input validation. It provides
+a clean abstraction over third-party payment providers.
+
+## Purpose
+
+- Process customer payment transactions
+- Abstract payment gateway provider details
+- Validate payment data before processing
+- Handle payment lifecycle (pending, completed, failed)
+
+## Components
+
+### PaymentService
+- File: src/services/payment/PaymentService.ts
+- Role: Orchestrates payment workflows; coordinates between gateway and validator
+- Key methods: `processPayment()`, `refundPayment()`, `getTransactionStatus()`
+
+### PaymentGateway
+- File: src/services/payment/PaymentGateway.ts
+- Role: Wraps external payment provider API calls
+- Key methods: `charge()`, `refund()`, `verify()`
+
+### PaymentValidator
+- File: src/services/payment/PaymentValidator.ts
+- Role: Validates payment request data before processing
+- Key methods: `validate()`, `sanitize()`
+
+## Dependencies
+
+- External: Payment provider SDK
+- Internal: src/models/Payment.ts, src/services/auth/AuthService.ts
+
+## Data Flow
+
+  Client Request -> PaymentValidator -> PaymentService -> PaymentGateway -> Provider
+
+--- END GENERATED DOCUMENT ---
+
+Documentation successfully written to: src/services/payment/payment.arch.md

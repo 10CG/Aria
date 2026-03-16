@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "segmented-qa-flow",
+  "category": "discussion-flow",
+  "prompt": "开始一个关于「添加通知系统」功能的头脑风暴。使用分段问答模式，每次只提问一个关键问题，等待回答后继续。",
+  "setup": {
+    "topic": "通知系统功能设计",
+    "mode": "segmented-qa",
+    "max_questions_per_round": 1
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "asks_one_question_per_round",
+      "description": "Should ask exactly one focused question per round",
+      "check": "output.includes('？') || output.includes('?') || output.includes('问题')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "uses_segmented_sections",
+      "description": "Should use clearly segmented sections in the output",
+      "check": "output.includes('---') || output.includes('##') || output.includes('Section') || output.includes('阶段')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "maintains_discussion_context",
+      "description": "Should reference previous answers in subsequent questions",
+      "check": "output.includes('基于') || output.includes('based on') || output.includes('您提到') || output.includes('mentioned')",
+      "severity": "medium"
+    }
+  ]
+}

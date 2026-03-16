@@ -1,0 +1,4 @@
+docs(readme): 更新安装说明和API文档
+
+- 更新 README.md 安装步骤
+- 添加 API 端点文档

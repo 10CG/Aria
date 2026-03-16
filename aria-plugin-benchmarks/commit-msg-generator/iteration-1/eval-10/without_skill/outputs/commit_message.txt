@@ -1,0 +1,3 @@
+feat(unit): add date formatting unit tests
+
+Added unit tests for date formatting functionality including timezone conversion and edge cases.

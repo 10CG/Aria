@@ -1,0 +1,19 @@
+{
+  "eval_id": 7,
+  "eval_name": "forced-worktree-mode",
+  "timestamp": "2026-03-16T13:36:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Should use Worktree mode when explicitly specified",
+      "check": "output.includes('Worktree') && output.includes('.git/worktrees')",
+      "severity": "critical",
+      "passed": true,
+      "evidence": "Output contains 'Worktree' mode references and '.git/worktrees/TASK-004-simple' worktree path",
+      "text": "respects_worktree_override"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Forced worktree mode correctly creates isolated working directory under .git/worktrees/"
+}

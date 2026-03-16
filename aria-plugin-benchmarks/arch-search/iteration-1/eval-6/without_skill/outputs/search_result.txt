@@ -1,0 +1,57 @@
+# 基线测试搜索结果 (不使用 arch-search skill)
+
+## 搜索方法
+- 使用传统 Grep/Glob 工具
+- 搜索关键词: cache, 缓存, Cache, 缓存策略, Cache Strategy
+- 扩展搜索: Redis, redis, 内存, memory, 存储, storage, 策略, strategy
+
+## 搜索到的缓存相关文档
+
+### 1. network.md (F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project/mobile/docs/architecture/network.md)
+缓存策略作为拦截器的一部分:
+```
+┌─────────────────────────────────────────────┐
+│              API Service                    │
+│         (Retrofit Interface)                │
+├─────────────────────────────────────────────┤
+│            Interceptors                     │
+│   (Auth, Logging, Retry, Cache)             │
+├─────────────────────────────────────────────┤
+│               Dio Client                    │
+│         (HTTP Connection)                   │
+└─────────────────────────────────────────────┘
+```
+
+### 2. ARCHITECTURE.md (backend) (F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project/backend/docs/ARCHITECTURE.md)
+技术栈中提到:
+- **缓存**: Redis 7
+
+### 3. database.md (F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project/backend/docs/architecture/database.md)
+数据库架构中提到:
+- **缓存层**: Redis 7
+
+### 4. DOMAINS.md (F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project/DOMAINS.md)
+专门定义了"缓存策略"领域:
+```
+## 缓存策略 (cache)
+
+**Primary**: `mobile/docs/architecture/cache.md`
+**Secondary**:
+- `mobile/src/services/cache/README.md`
+
+**Keywords**: cache, 缓存, memo, store, persist, 持久化
+```
+
+## 发现的问题
+虽然 DOMAINS.md 中定义了缓存策略领域的文档路径 `mobile/docs/architecture/cache.md`，但在实际文件系统中找不到这个文件。这说明项目结构不完整。
+
+## Token 使用估算
+- 搜索文件数量: 9个文件
+- 实际读取文件数量: 4个文件
+- 估算 token 消耗: ~1500 tokens (主要用于文件读取和内容分析)
+
+## 总结
+使用传统方法找到了一些与缓存相关的文档片段，但没有找到完整的缓存策略文档。主要发现:
+1. 网络层中有缓存拦截器的设计
+2. 后端使用 Redis 作为缓存
+3. 项目中定义了缓存策略领域，但文档缺失

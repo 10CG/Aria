@@ -1,0 +1,17 @@
+{
+  "eval_id": 9,
+  "eval_name": "refs-document",
+  "result": "FAIL",
+  "score": 0.0,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "refs_footer",
+      "description": "Should include 'Refs:' with document path",
+      "expected": "commit_message.includes('Refs:') && commit_message.includes('docs/designs/auth-system.md')",
+      "status": "FAIL",
+      "reason": "Commit message does not include 'Refs:' or the document path 'docs/designs/auth-system.md'"
+    }
+  ],
+  "commit_message": "feat(auth): Add JWT authentication implementation\n\nImplemented JWT token service and authentication middleware for the backend.\nAdded comprehensive unit tests for the authentication module.\n\nChanges include:\n- JWTService class with token generation and validation\n- AuthMiddleware for FastAPI request authentication\n- Unit tests covering token generation, validation, and edge cases"
+}

@@ -1,0 +1,19 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "generate-from-staged-changes",
+  "timestamp": "2026-03-16T21:01:15.281510+00:00",
+  "assertions": [
+    {
+      "text": "conventional_format",
+      "passed": true,
+      "evidence": "Matched: 'chore'"
+    },
+    {
+      "text": "has_description",
+      "passed": true,
+      "evidence": "Matched: ': add benchmark comment to app.js'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

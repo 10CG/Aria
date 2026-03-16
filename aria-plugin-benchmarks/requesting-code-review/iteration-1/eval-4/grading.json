@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "review-dispatch",
+  "timestamp": "2026-03-16T14:11:40Z",
+  "assertions": [
+    {
+      "text": "dispatches_to_code_reviewer",
+      "passed": true,
+      "evidence": "Output specifies 'target_agent: code-reviewer' in dispatch YAML and states 'Dispatched to code-reviewer agent' in the header"
+    },
+    {
+      "text": "initiates_phase_1",
+      "passed": true,
+      "evidence": "Output contains 'Phase 1: Spec Compliance Review (ACTIVE)' section with status 'Phase 1 IN PROGRESS' and scope for spec compliance checks"
+    },
+    {
+      "text": "schedules_phase_2",
+      "passed": true,
+      "evidence": "Output contains 'Phase 2: Code Quality Review (SCHEDULED)' section with status 'Phase 2 SCHEDULED - awaiting Phase 1 completion' and quality review scope defined"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

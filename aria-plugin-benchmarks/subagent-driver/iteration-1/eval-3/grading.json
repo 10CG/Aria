@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "inter-task-review",
+  "timestamp": "2026-03-16T14:06:10Z",
+  "assertions": [
+    {
+      "text": "triggers_code_review",
+      "passed": true,
+      "evidence": "Output states 'Dependency Review Gate Triggered' and 'Code Review Dispatched' for TASK-002 before TASK-003 can proceed"
+    },
+    {
+      "text": "invokes_reviewer_agent",
+      "passed": true,
+      "evidence": "Output specifies 'reviewer_agent: code-reviewer' in YAML config and 'Invoking code-reviewer agent for inter-task review'"
+    },
+    {
+      "text": "blocks_next_task_pending_review",
+      "passed": true,
+      "evidence": "Output states 'TASK-003 Status: WAITING' and 'TASK-003 subagent launch is on hold pending review completion' with BLOCKED label"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

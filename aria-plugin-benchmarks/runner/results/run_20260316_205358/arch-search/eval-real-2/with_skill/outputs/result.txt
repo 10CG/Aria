@@ -1,0 +1,86 @@
+## Database Design & Data Model Architecture
+
+### Database System
+- **Type:** SQLite3
+- **Location:** `backend/data/todos.db`
+- **Config:** `PRAGMA foreign_keys = ON`, timestamps stored as INTEGER (ms epoch)
+
+---
+
+### Tables
+
+#### `users`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER PK | AUTOINCREMENT |
+| name | VARCHAR(100) | NOT NULL |
+| email | VARCHAR(100) | UNIQUE NOT NULL |
+| password | VARCHAR(255) | bcrypt hashed |
+| avatar_url | VARCHAR(255) | default avatar |
+| role | TEXT | default 'user' |
+| created_at, last_login | INTEGER | ms timestamps |
+| reset_password_token/expire | VARCHAR/INTEGER | password reset flow |
+
+#### `todos`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER PK | |
+| text | VARCHAR(1000) | NOT NULL |
+| tag | VARCHAR(50) | legacy category string |
+| user_id | INTEGER | FK → users(id) CASCADE |
+| parentId | INTEGER | FK → todos(id) CASCADE (subtask nesting) |
+| completed | BOOLEAN | default 0 |
+| completed_at, timestamp, updated_at | INTEGER | ms timestamps |
+| plannedStart | INTEGER | scheduled start |
+| estimatedTimeValue / Unit | DECIMAL / VARCHAR | time estimates |
+| partition_date | TEXT | date-based grouping |
+| priority | INTEGER | default 0 |
+
+#### `notes`
+Attached to a todo: `todoId` FK → todos(id) CASCADE. Fields: `content`, `timestamp`, `editedAt`, `user_id`.
+
+#### `tags` + `todo_tags` (many-to-many)
+- `tags`: id, name, color (hex, default `#cccccc`)
+- `todo_tags`: todoId + tagId, both cascading FKs
+
+#### `subtasks`
+Composite PK `(parentId, childId)` — both FK → todos(id). Enables multi-level task hierarchy alongside the `parentId` field in todos.
+
+#### `social_accounts`
+OAuth providers linked to users. UNIQUE `(provider, provider_user_id)`.
+
+#### `user_settings`
+One-to-one with users (UNIQUE user_id). Stores theme, language, display_mode, items_per_page, default_view, notification preferences.
+
+#### `cache_table`
+Key-value store with `expires_at` TTL (default 5 min). Used for caching like `all_todos_{userId}`.
+
+#### `db_stats`
+Internal metrics (total todos, completed count, DB size).
+
+---
+
+### Indexes
+```sql
+idx_todos_user_parent    (user_id, parentId)
+idx_todos_user_completed (user_id, completed)
+idx_todos_completed_at   (completed_at)
+idx_todos_timestamp      (timestamp)
+idx_notes_todoId         (todoId)
+```
+
+---
+
+### Entity Relationships
+```
+users ──< todos ──< notes
+      ──< user_settings (1:1)
+      ──< social_accounts
+todos ──< subtasks (self-referential)
+      ><─ tags (via todo_tags)
+```
+
+---
+
+### Modular Database Layer (`backend/src/database/`)
+12 specialized modules: `backupManager`, `backupScheduler`, `cacheManager`, `dataValidator`, `databaseMonitor`, `exportManager`, `queryAnalyzer`, `statsManager`, `timerManager`, `transactionManager`, `backupError`, plus `index.js` as the export interface.

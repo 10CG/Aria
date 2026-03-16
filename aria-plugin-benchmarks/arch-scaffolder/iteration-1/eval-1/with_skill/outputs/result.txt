@@ -1,0 +1,38 @@
+arch-scaffolder: PRD Extraction Report
+========================================
+
+Parsing PRD: "SaaS task management platform..."
+
+EXTRACTED ARCHITECTURAL INFORMATION:
+
+CORE FEATURES:
+  - Project management: Users can create and manage projects
+  - Task assignment: Tasks can be assigned to team members
+  - Progress tracking: Real-time progress visibility across projects
+
+NON-FUNCTIONAL REQUIREMENTS (NFR):
+  - Scalability: Must support 10,000 concurrent users
+  - Persistence: Full data durability with relational database
+  - Auditability: Complete audit logging of all changes
+
+INTEGRATIONS:
+  - Slack: Notification and workflow integration
+  - GitHub: Issue/PR linking and development workflow integration
+  - Third-party REST API: Public API for external integrations
+
+DATA REQUIREMENTS:
+  - Storage: Relational database (SQL)
+  - Audit logging: Full audit trail for all mutations
+  - Data consistency: ACID transactions required
+
+CONSTRAINTS:
+  - Must expose REST API (not GraphQL-only)
+  - Database must be relational (not NoSQL)
+  - SaaS deployment model
+
+EXTRACTION SUMMARY:
+  - Core features extracted: 3
+  - NFRs extracted: 3 (scalability: 10,000 concurrent users, persistence, auditability)
+  - Integrations extracted: 3 (Slack, GitHub, REST API)
+  - Data requirements extracted: 3
+  Ready to proceed to architecture document generation.

@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "branch-finisher-integration",
+  "timestamp": "2026-03-16T14:22:29Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Calling skill: branch-finisher' and 'Branch Finisher — Cleanup Sequence' section heading",
+      "text": "invokes_branch_finisher"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output shows 'git branch -d feature/oauth2-social-login' with 'Deleted branch' confirmation; 3 local + 1 remote branch deleted",
+      "text": "deletes_feature_branch"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output shows 'git worktree remove ../project-backend-task003', 'git worktree remove ../project-frontend-task004', and 'git worktree prune' executed",
+      "text": "removes_worktrees"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

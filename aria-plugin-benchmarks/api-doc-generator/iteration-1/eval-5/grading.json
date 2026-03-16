@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "markdown-doc-output",
+  "timestamp": "2026-03-16T10:35:30Z",
+  "assertions": [
+    {
+      "text": "markdown_headers",
+      "passed": true,
+      "evidence": "Output uses '# Payments API' (H1) and '## POST /payments', '## GET /payments/{id}', '## DELETE /payments/{id}' (H2 headers)"
+    },
+    {
+      "text": "documents_all_endpoints",
+      "passed": true,
+      "evidence": "Three H2 sections: POST /payments, GET /payments/{id}, DELETE /payments/{id}"
+    },
+    {
+      "text": "includes_code_examples",
+      "passed": true,
+      "evidence": "Output contains multiple '```json' and '```bash' code blocks with request/response examples and curl commands"
+    },
+    {
+      "text": "includes_response_format",
+      "passed": true,
+      "evidence": "Each endpoint section describes response format: 201 Created (POST), 200 OK (GET), 204 No Content (DELETE)"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

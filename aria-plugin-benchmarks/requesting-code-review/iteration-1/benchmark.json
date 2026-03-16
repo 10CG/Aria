@@ -1,0 +1,101 @@
+{
+  "benchmark_name": "requesting-code-review",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:10:00Z",
+  "total_evals": 4,
+  "evals_completed": 4,
+  "summary": {
+    "with_skill": {
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "spec_compliance_detection": "100%",
+        "code_quality_analysis": "100%",
+        "issue_categorization_accuracy": "100%",
+        "review_dispatch_correctness": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "phase-1": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "phase-2": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "output-format": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "dispatch": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "spec-compliance-check",
+      "category": "phase-1",
+      "with_skill": "PASS",
+      "key_finding": "Phase 1 review correctly checked spec compliance, identified interface contract deviations in login.py"
+    },
+    {
+      "eval_id": 2,
+      "name": "code-quality-check",
+      "category": "phase-2",
+      "with_skill": "PASS",
+      "key_finding": "Phase 2 detected SQL injection risk, hardcoded secret, and missing error handling; architecture assessed"
+    },
+    {
+      "eval_id": 3,
+      "name": "issue-categorization",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "SQL injection correctly categorized as Critical, poor naming as Minor, missing comments as Minor"
+    },
+    {
+      "eval_id": 4,
+      "name": "review-dispatch",
+      "category": "dispatch",
+      "with_skill": "PASS",
+      "key_finding": "code-reviewer agent dispatched correctly, Phase 1 initiated first, Phase 2 scheduled after Phase 1 completion"
+    }
+  ],
+  "review_phases": {
+    "phase_1": {
+      "name": "Spec Compliance",
+      "checks": ["interface_contract", "functional_requirements", "acceptance_criteria"]
+    },
+    "phase_2": {
+      "name": "Code Quality",
+      "checks": ["security", "style", "architecture", "error_handling", "test_coverage"]
+    }
+  },
+  "issue_categories": {
+    "Critical": {"description": "Security vulnerabilities, data loss risks, breaking spec"},
+    "Important": {"description": "Performance issues, missing error handling, architectural problems"},
+    "Minor": {"description": "Style issues, naming conventions, missing comments"}
+  },
+  "strengths": [
+    "Accurate spec compliance detection in Phase 1",
+    "Comprehensive security vulnerability detection in Phase 2 (SQL injection, hardcoded secrets)",
+    "Correct Critical/Important/Minor issue categorization",
+    "Proper sequential phase dispatch (Phase 1 before Phase 2)"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test review with large codebases (>50 files) in iteration 2",
+    "Add edge cases for conflicting spec versions",
+    "Test review dispatch with multiple concurrent tasks"
+  ],
+  "status": "completed"
+}

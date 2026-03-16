@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "dependency-ordering",
+  "timestamp": "2026-03-16T14:02:00Z",
+  "assertions": [
+    {
+      "text": "shared_types_committed_first",
+      "passed": true,
+      "evidence": "Output places 'shared/types/api.ts' as '第一' (first) commit, identified as Level 0 with no dependencies"
+    },
+    {
+      "text": "tests_committed_last",
+      "passed": true,
+      "evidence": "Output places 'backend/tests/test_handler.py' as '第四提交 (最后)' - tests committed last"
+    },
+    {
+      "text": "explains_ordering_rationale",
+      "passed": true,
+      "evidence": "Output contains '依赖' in multiple places explaining the dependency-based ordering rationale"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Dependency ordering via topological sort: shared types first (Level 0), implementation second (Level 1), tests last (Level 2)"
+}

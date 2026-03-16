@@ -1,0 +1,73 @@
+# Task Breakdown: OTP 登录功能
+
+> **Spec**: F:/work2025/cursor/Aria/aria-plugin-benchmarks/commit-msg-generator/test-env
+> **Total Tasks**: 7
+> **Estimated**: 28h
+
+## Task List
+
+### TASK-001: 设计数据库迁移
+- **Complexity**: M
+- **Dependencies**: None
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/migrations/001_add_otp_users.sql
+
+### TASK-002: 实现短信发送服务
+- **Complexity**: L
+- **Dependencies**: TASK-001
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/services/sms_service.py
+  - backend/config/sms_settings.py
+
+### TASK-003: 实现 OTP 生成和验证逻辑
+- **Complexity**: M
+- **Dependencies**: TASK-001
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/services/otp_service.py
+  - backend/utils/otp_generator.py
+
+### TASK-004: 更新用户模型
+- **Complexity**: S
+- **Dependencies**: TASK-001
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/models/user.py
+  - backend/migrations/002_update_user_with_otp.py
+
+### TASK-005: 修改登录 API
+- **Complexity**: M
+- **Dependencies**: TASK-003, TASK-004
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/auth/login.py
+  - backend/api/auth/verify_otp.py
+
+### TASK-006: 编写测试
+- **Complexity**: M
+- **Dependencies**: TASK-002, TASK-003, TASK-005
+- **Agent**: tester
+- **Deliverables**:
+  - backend/tests/test_sms_service.py
+  - backend/tests/test_otp_service.py
+  - backend/tests/test_auth_flow.py
+
+### TASK-007: 更新文档
+- **Complexity**: S
+- **Dependencies**: TASK-005
+- **Agent**: knowledge-manager
+- **Deliverables**:
+  - docs/otp-authentication.md
+  - README.md
+
+## Execution Order
+TASK-001 → TASK-002 → TASK-004 → TASK-003 → TASK-005 → TASK-006 → TASK-007
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 2 | 4h |
+| M | 4 | 16h |
+| L | 1 | 8h |

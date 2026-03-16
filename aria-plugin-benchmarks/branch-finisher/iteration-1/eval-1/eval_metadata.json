@@ -1,0 +1,33 @@
+{
+  "eval_id": 1,
+  "eval_name": "test-verification",
+  "category": "testing",
+  "prompt": "验证分支 feature/backend/TASK-101-user-auth 的所有测试是否通过，branch_type=feature, module=backend",
+  "setup": {
+    "branch": "feature/backend/TASK-101-user-auth",
+    "expected_test_result": "pass"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "runs_test_suite",
+      "description": "Should indicate running the test suite",
+      "check": "output.includes('test') || output.includes('测试') || output.includes('Test')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reports_pass_status",
+      "description": "Should report test pass/fail status clearly",
+      "check": "output.includes('pass') || output.includes('通过') || output.includes('Pass') || output.includes('PASS')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_branch",
+      "description": "Should reference the branch being tested",
+      "check": "output.includes('TASK-101') || output.includes('user-auth') || output.includes('feature/backend')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "bilingual-support",
+  "timestamp": "2026-03-16T14:32:30Z",
+  "assertions": [
+    {
+      "text": "handles_mixed_input",
+      "passed": true,
+      "evidence": "Output shows Input Parsing table identifying both 'Add a dark mode feature' (EN) and '添加深色模式功能' (ZH), and generates proposal for 'Dark Mode Feature'"
+    },
+    {
+      "text": "generates_english_output",
+      "passed": true,
+      "evidence": "Output generates a complete English proposal with '## Background', '## Scope', and '## Goals' sections as required"
+    },
+    {
+      "text": "preserves_intent",
+      "passed": true,
+      "evidence": "Proposal covers 'dark mode color theme', 'UI appearance', 'mode' toggle, and 'theme' throughout, preserving the full feature intent from both inputs"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

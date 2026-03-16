@@ -1,0 +1,38 @@
+{
+  "eval_id": 4,
+  "eval_name": "context-handoff",
+  "category": "context-management",
+  "prompt": "将 TASK-004 的上下文传递给新的 subagent。上下文应该最小化，只包含任务执行所必需的信息。",
+  "setup": {
+    "task_id": "TASK-004",
+    "available_context": {
+      "full_codebase": true,
+      "spec_document": true,
+      "previous_tasks": ["TASK-001", "TASK-002", "TASK-003"],
+      "task_details": true
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "includes_task_spec",
+      "description": "Should include the task specification in handoff",
+      "check": "output.includes('spec') || output.includes('规范') || output.includes('任务说明') || output.includes('TASK-004')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "minimizes_context_size",
+      "description": "Should only pass minimal required context, not full conversation history",
+      "check": "output.includes('minimal') || output.includes('最小') || output.includes('必要') || output.includes('relevant')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "includes_dependency_outputs",
+      "description": "Should include outputs from dependency tasks",
+      "check": "output.includes('TASK-001') || output.includes('TASK-002') || output.includes('依赖') || output.includes('depend')",
+      "severity": "medium"
+    }
+  ]
+}

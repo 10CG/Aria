@@ -1,0 +1,52 @@
+diff --git a/backend/src/routes/tasks.py b/backend/src/routes/tasks.py
+index a2fd12d..f256d18 100644
+--- a/backend/src/routes/tasks.py
++++ b/backend/src/routes/tasks.py
+@@ -5,8 +5,9 @@ tasks_bp = Blueprint('tasks', __name__)
+ 
+ @tasks_bp.route('/tasks', methods=['GET'])
+ def get_tasks():
+-    """Get all tasks with old response format"""
+-    return jsonify({"tasks": [
++    """Get all tasks with new paginated response format"""
++    tasks = [
+         {"id": 1, "name": "Task 1", "status": "pending"},
+         {"id": 2, "name": "Task 2", "status": "completed"}
+-    ]})
++    ]
++    return jsonify(task_list_response(tasks, total=2, page=1, page_size=10))
+diff --git a/backend/src/schemas/task.py b/backend/src/schemas/task.py
+index d825a43..6932ec6 100644
+--- a/backend/src/schemas/task.py
++++ b/backend/src/schemas/task.py
+@@ -1,5 +1,27 @@
+ from typing import List, Dict, Any
++from dataclasses import dataclass
+ 
+-def task_list_response(tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
+-    """Old response schema: {tasks: [...]}"""
+-    return {"tasks": tasks}
++@dataclass
++class ResponseMeta:
++    """Pagination metadata"""
++    total: int
++    page: int
++    page_size: int
++    has_next: bool
++
++def task_list_response(tasks: List[Dict[str, Any]], total: int, page: int, page_size: int) -> Dict[str, Any]:
++    """New response schema: {data: [...], meta: {...}}
++    
++    BREAKING CHANGE: Response format changed from {tasks: [...]} to {data: [...], meta: {...}}
++    This requires all API consumers to update their response parsing logic.
++    """
++    has_next = page * page_size < total
++    return {
++        "data": tasks,
++        "meta": {
++            "total": total,
++            "page": page,
++            "page_size": page_size,
++            "has_next": has_next
++        }
++    }

@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "status-change-propagation",
+  "timestamp": "2026-03-16T14:18:30Z",
+  "assertions": [
+    {
+      "text": "propagates_to_upm",
+      "passed": true,
+      "evidence": "Output shows UPM requirements diff updating REQ-020 status from 'In Progress' to 'Done' as Target 1"
+    },
+    {
+      "text": "updates_epic_progress",
+      "passed": true,
+      "evidence": "Output shows Epic EPIC-003 progress updated from 60% to 75% in the Target 2 section"
+    },
+    {
+      "text": "reports_propagation_scope",
+      "passed": true,
+      "evidence": "Propagation Summary table shows 2 targets updated and output states 'Total propagated: 2 targets updated'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

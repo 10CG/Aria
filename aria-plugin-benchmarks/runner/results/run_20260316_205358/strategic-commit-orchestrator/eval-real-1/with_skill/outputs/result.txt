@@ -1,0 +1,85 @@
+Here's the strategic commit plan based on the project structure and conventions:
+
+---
+
+## Strategic Commit Plan: Auth Logic + Login UI
+
+### Current State
+
+Only `frontend/src/js/app.js` has staged changes (4 benchmark test comment lines). The hypothetical auth + login UI changes would span these key files:
+
+```
+backend/src/auth/
+  authController.js     ← auth logic
+  authRepository.js     ← DB queries
+  authRoutes.js         ← route wiring
+
+frontend/src/js/
+  authApp.js            ← login UI logic
+  app.js                ← app init (currently staged)
+frontend/src/
+  todos.html            ← script version bump (required per CLAUDE.md)
+```
+
+---
+
+### Recommended 3-Commit Strategy
+
+**Commit 1 — Backend: Auth logic**
+```
+fix: <describe the auth fix>
+
+Files:
+  backend/src/auth/authController.js
+  backend/src/auth/authRepository.js
+  backend/src/auth/authRoutes.js
+```
+Rationale: Self-contained server-side change. Isolates backend from frontend for bisecting and rollback.
+
+---
+
+**Commit 2 — Frontend: Login UI**
+```
+feat/fix/style: <describe the UI change>
+
+Files:
+  frontend/src/js/authApp.js
+  frontend/src/todos.html   ← version bump required (CLAUDE.md mandate)
+```
+Rationale: Frontend-only change. Version bump on `todos.html` is **mandatory** per CLAUDE.md — `authApp.js` maps to `todos.html`, format `?v=202603161900`.
+
+---
+
+**Commit 3 — Frontend: App.js (currently staged)**
+```
+chore: remove benchmark test markers from app.js
+
+Files:
+  frontend/src/js/app.js
+  frontend/src/todos.html   ← version bump for app.js change
+```
+Rationale: The 4 benchmark comment lines in `app.js` should be cleaned before shipping. `app.js` also maps to `todos.html`, so the version bump applies here too.
+
+---
+
+### Key Constraint: Version Bumps
+
+Per `CLAUDE.md`, any change to these files **requires** updating `todos.html` with a new `?v=` timestamp (format `YYYYMMDDHHmm`):
+
+| Modified file | HTML to update |
+|---|---|
+| `authApp.js` | `frontend/src/todos.html` |
+| `app.js` | `frontend/src/todos.html` |
+
+If commits 2 and 3 land in the same session, they can share one version bump — just use the timestamp of the later commit.
+
+---
+
+### Commit Message Style (matching repo history)
+
+```
+fix: share database connection in AuthRepository    ← existing style
+style: use same color for checkmark as circle icon  ← existing style
+```
+
+Follow `type: short imperative description` — no scope prefix, no ticket numbers.

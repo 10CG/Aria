@@ -1,0 +1,11 @@
+{
+  "total_tokens": 3960,
+  "duration_ms": 22100,
+  "total_duration_seconds": 22.1,
+  "phase_breakdown": {
+    "phase_d_1_progress_updater": { "tokens": 1240, "duration_ms": 7200 },
+    "phase_d_2_archive":          { "tokens": 980,  "duration_ms": 5800 },
+    "requirements_sync":          { "tokens": 740,  "duration_ms": 4100 },
+    "state_scanner":              { "tokens": 1000, "duration_ms": 5000 }
+  }
+}

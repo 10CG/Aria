@@ -1,0 +1,144 @@
+# Task Breakdown: 用户认证功能
+
+> **Spec**: Direct feature request
+> **Total Tasks**: 8
+> **Estimated**: 32h
+
+## Task List
+
+### TASK-001: 设计用户认证数据库结构
+- **Complexity**: M
+- **Dependencies**: None
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/migrations/create_users_table.sql
+  - backend/models/user.py
+  - backend/database/schema.md
+- **Verification**:
+  - 数据表创建成功
+  - 用户模型定义完整
+
+### TASK-002: 实现用户注册 API
+- **Complexity**: M
+- **Dependencies**: TASK-001
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/auth/register.py
+  - backend/services/user_service.py
+  - backend/tests/test_register.py
+- **Verification**:
+  - POST /api/auth/register 接口可用
+  - 密码加密存储
+  - 邮箱/用户名验证
+
+### TASK-003: 实现用户登录 API
+- **Complexity**: M
+- **Dependencies**: TASK-001, TASK-002
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/auth/login.py
+  - backend/utils/jwt_handler.py
+  - backend/tests/test_login.py
+- **Verification**:
+  - POST /api/auth/login 接口可用
+  - JWT token 生成和验证
+  - 密码正确性验证
+
+### TASK-004: 实现密码重置功能
+- **Complexity**: L
+- **Dependencies**: TASK-001, TASK-003
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/auth/forgot_password.py
+  - backend/api/auth/reset_password.py
+  - backend/services/email_service.py
+  - backend/tests/test_password_reset.py
+- **Verification**:
+  - 忘记密码邮件发送
+  - 重置密码链接有效
+  - 密码更新成功
+
+### TASK-005: 开发前端登录页面
+- **Complexity**: M
+- **Dependencies**: TASK-003
+- **Agent**: frontend-developer
+- **Deliverables**:
+  - frontend/src/components/LoginForm.jsx
+  - frontend/src/pages/LoginPage.jsx
+  - frontend/styles/auth.css
+  - frontend/tests/Login.test.js
+- **Verification**:
+  - 登录表单显示正确
+  - 表单验证功能
+  - 登录成功跳转
+
+### TASK-006: 开发前端注册页面
+- **Complexity**: M
+- **Dependencies**: TASK-002, TASK-005
+- **Agent**: frontend-developer
+- **Deliverables**:
+  - frontend/src/components/RegisterForm.jsx
+  - frontend/src/pages/RegisterPage.jsx
+  - frontend/styles/auth.css
+  - frontend/tests/Register.test.js
+- **Verification**:
+  - 注册表单显示正确
+  - 实时表单验证
+  - 注册成功提示
+
+### TASK-007: 实现认证中间件
+- **Complexity**: L
+- **Dependencies**: TASK-003
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/middleware/auth.py
+  - backend/decorators/require_auth.py
+  - backend/utils/token_validator.py
+- **Verification**:
+  - JWT 验证中间件工作正常
+  - 受保护路由访问控制
+  - Token 失效处理
+
+### TASK-008: 集成认证系统到现有应用
+- **Complexity**: M
+- **Dependencies**: TASK-005, TASK-006, TASK-007
+- **Agent**: fullstack-developer
+- **Deliverables**:
+  - frontend/src/App.jsx 更新
+  - frontend/src/context/AuthContext.jsx
+  - backend/config/auth.py
+  - integration tests/auth_flow_test.py
+- **Verification**:
+  - 认证状态管理
+  - 登录/注册流程完整
+  - 安全退出功能
+
+## Execution Order
+TASK-001 → TASK-002 → TASK-003 → TASK-005 → TASK-006 → TASK-007 → TASK-004 → TASK-008
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 0 | 0h |
+| M | 5 | 20h |
+| L | 3 | 12h |
+| XL | 0 | 0h |
+| **Total** | **8** | **32h** |
+
+## Dependencies Analysis
+- **Database-first approach**: TASK-001 作为基础
+- **API parallel development**: TASK-002,003,004 可并行
+- **Frontend depends on API**: TASK-005,006 需要 TASK-003
+- **Security layer**: TASK-007 保护所有 API
+- **Final integration**: TASK-008 整合所有组件
+
+## Agent Allocation
+- **backend-architect** (4 tasks): 数据库、API、中间件
+- **frontend-developer** (2 tasks): 登录/注册页面
+- **fullstack-developer** (1 task): 系统集成
+
+## Notes
+- 所有任务均遵循 4-8 小时粒度
+- 密码重置(TASK-004)为 L 复杂度，涉及邮件服务
+- 认证中间件(TASK-007)为 L 复杂度，涉及安全实现
+- 最终集成(TASK-008)需要协调前后端

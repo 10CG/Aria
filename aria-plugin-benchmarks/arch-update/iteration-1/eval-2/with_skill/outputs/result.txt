@@ -1,0 +1,37 @@
+arch-update: Layer Classification Report
+=========================================
+
+Classifying architecture documents into L0/L1/L2 hierarchy...
+
+CLASSIFICATION RESULTS:
+
+  ARCHITECTURE.md
+    Location: project root (/)
+    Layer: L0 (project level)
+    Scope: Entire project overview, cross-module relationships
+    Role: Top-level entry point for all architecture documentation
+
+  src/auth/auth.arch.md
+    Location: src/auth/ module directory
+    Layer: L1 (module level)
+    Scope: Auth module internals, components, and interfaces
+    Role: Describes the auth module's architecture and design decisions
+
+  src/auth/UserRepository.arch.md
+    Location: src/auth/ alongside component source
+    Layer: L2 (component level)
+    Scope: Single component - UserRepository data access patterns
+    Role: Deep-dive documentation for a specific component
+
+LAYER HIERARCHY:
+  L0 (Project) -> L1 (Module) -> L2 (Component)
+
+  L0: One per project. Covers system-wide architecture and module map.
+  L1: One per module. Covers module design, dependencies, and public API.
+  L2: One per component. Covers implementation details and data flow.
+
+SUMMARY:
+  - 1 file classified as L0: ARCHITECTURE.md
+  - 1 file classified as L1: auth.arch.md
+  - 1 file classified as L2: UserRepository.arch.md
+  All 3 files correctly placed within the L0/L1/L2 hierarchy.

@@ -1,0 +1,13 @@
+diff --git a/lib/utils.py b/lib/utils.py
+index abc1234..def5678 100644
+--- a/lib/utils.py
++++ b/lib/utils.py
+@@ -42,7 +42,7 @@ class AuthManager:
+         self.token = None
+
+     def validate_credentials(self):
+-        """Check if user authenicaton credentials are valid."""
++        """Check if user authentication credentials are valid."""
+         return self.token and len(self.token) > 0
+
+     def refresh_token(self):

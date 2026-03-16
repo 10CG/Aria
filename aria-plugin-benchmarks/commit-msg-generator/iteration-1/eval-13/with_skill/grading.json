@@ -1,0 +1,14 @@
+{
+  "eval_id": 13,
+  "eval_name": "enhanced-marker-format-validation",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "assertions": [
+    {
+      "text": "overall_pass",
+      "passed": true,
+      "evidence": "Overall evaluation passed"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

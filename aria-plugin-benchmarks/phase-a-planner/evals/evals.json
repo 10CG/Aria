@@ -1,0 +1,199 @@
+{
+  "skill_name": "phase-a-planner",
+  "skill_path": "aria/skills/phase-a-planner",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for phase-a-planner skill - Ten-Step Cycle Phase A orchestration (A.1 Spec, A.2 Tasks, A.3 Agent allocation)",
+  "metrics": [
+    "orchestration_completeness",
+    "skip_condition_accuracy",
+    "state_detection_correctness",
+    "output_format_compliance",
+    "error_recovery_robustness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-cycle-execution",
+      "category": "orchestration",
+      "prompt": "Execute Phase A for new feature: Add OAuth2 social login support (GitHub + Google). No existing spec. Run A.1 → A.2 → A.3 in sequence.",
+      "setup": {
+        "feature": "oauth2-social-login",
+        "existing_spec": false,
+        "complexity": "L"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "executes_a1_spec_creation",
+          "description": "Should invoke A.1 spec-drafter to create proposal.md",
+          "check": "output.includes('A.1') || output.includes('spec-drafter') || output.includes('proposal.md')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "executes_a2_task_planning",
+          "description": "Should invoke A.2 task-planner after spec creation",
+          "check": "output.includes('A.2') || output.includes('task-planner') || output.includes('tasks.md')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "executes_a3_agent_allocation",
+          "description": "Should invoke A.3 agent allocation as final step",
+          "check": "output.includes('A.3') || output.includes('agent') || output.includes('allocation')",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "sequential_step_order",
+          "description": "Steps must execute in A.1 → A.2 → A.3 order",
+          "check": "output.indexOf('A.1') < output.indexOf('A.2') && output.indexOf('A.2') < output.indexOf('A.3')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "skip-condition-detection",
+      "category": "skip-logic",
+      "prompt": "Evaluate Phase A for: Fix typo in README.md, single file change, no logic impact. Should detect Level 1 skip condition.",
+      "setup": {
+        "change_type": "typo-fix",
+        "files_affected": 1,
+        "expected_level": "skip"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_skip_condition",
+          "description": "Should detect Level 1 skip - no spec needed for trivial change",
+          "check": "output.includes('skip') || output.includes('Skip') || output.includes('Level 1') || output.includes('跳过')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "does_not_create_spec",
+          "description": "Should NOT invoke spec-drafter for trivial changes",
+          "check": "!output.includes('spec-drafter') || output.includes('not required') || output.includes('skipping A.1')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "explains_skip_reason",
+          "description": "Should explain why spec is not needed",
+          "check": "output.includes('typo') || output.includes('trivial') || output.includes('simple') || output.includes('single file')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "existing-spec-detection",
+      "category": "state-detection",
+      "prompt": "Execute Phase A for feature: Add user profile avatar upload. Existing file found: openspec/changes/add-avatar-upload/proposal.md",
+      "setup": {
+        "feature": "avatar-upload",
+        "existing_spec": true,
+        "spec_path": "openspec/changes/add-avatar-upload/proposal.md",
+        "tasks_exist": false
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_existing_proposal",
+          "description": "Should detect existing proposal.md and skip A.1",
+          "check": "output.includes('existing') || output.includes('found') || output.includes('already exists') || output.includes('跳过 A.1')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "skips_a1_step",
+          "description": "Should skip A.1 spec creation since proposal already exists",
+          "check": "output.includes('skip A.1') || output.includes('A.1: skip') || output.includes('A.1 已完成') || output.includes('proposal.md exists')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "proceeds_to_a2",
+          "description": "Should proceed directly to A.2 task planning",
+          "check": "output.includes('A.2') || output.includes('task-planner') || output.includes('proceeding')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "yaml-output-format",
+      "category": "output-format",
+      "prompt": "Execute Phase A for: Implement real-time notifications via WebSocket. Generate execution plan with step status.",
+      "setup": {
+        "feature": "realtime-notifications",
+        "expected_format": "execution-plan"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_execution_plan",
+          "description": "Should output an execution plan structure",
+          "check": "output.includes('execution_plan') || output.includes('phase_a') || output.includes('Phase A Plan')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_step_status",
+          "description": "Each step should show its status (pending/completed/skipped)",
+          "check": "output.includes('status') || output.includes('completed') || output.includes('pending') || output.includes('skipped')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "lists_all_three_steps",
+          "description": "Output must reference all three phase steps A.1, A.2, A.3",
+          "check": "output.includes('A.1') && output.includes('A.2') && output.includes('A.3')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "includes_outputs_reference",
+          "description": "Should reference generated artifacts (proposal.md, tasks.md)",
+          "check": "output.includes('proposal') || output.includes('tasks') || output.includes('artifacts')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "error-recovery",
+      "category": "error-handling",
+      "prompt": "Execute Phase A. State-scanner reports: uncommitted changes in 3 files, working tree dirty. Feature: Add payment gateway integration.",
+      "setup": {
+        "state_scanner_result": "unclean",
+        "dirty_files": 3,
+        "feature": "payment-gateway"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_unclean_state",
+          "description": "Should detect and report unclean working tree state",
+          "check": "output.includes('unclean') || output.includes('dirty') || output.includes('uncommitted') || output.includes('working tree')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "blocks_or_warns",
+          "description": "Should block execution or issue a clear warning",
+          "check": "output.includes('WARNING') || output.includes('BLOCKED') || output.includes('cannot proceed') || output.includes('stash') || output.includes('警告')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "provides_resolution_steps",
+          "description": "Should provide steps to resolve the unclean state",
+          "check": "output.includes('git stash') || output.includes('commit') || output.includes('resolve') || output.includes('clean') || output.includes('action')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+# Branch Finisher - Four-Option Completion Flow
+
+## 分支完成状态确认
+
+- **Branch**: `feature/backend/TASK-101-user-auth`
+- **Tests**: PASSED (12/12)
+- **Uncommitted Changes**: None
+- **Upstream Sync**: Up to date
+
+所有预检查通过。请选择完成方式:
+
+---
+
+## 完成选项
+
+### 选项 1: Merge (直接合并)
+
+**操作**: 直接将分支合并到 develop
+
+```
+merge feature/backend/TASK-101-user-auth -> develop
+```
+
+**适用场景**:
+- 小型变更，无需代码审查
+- 团队内部快速迭代
+- 已通过所有自动化检查
+
+**执行命令预览**:
+```bash
+git checkout develop
+git merge --no-ff feature/backend/TASK-101-user-auth
+git push origin develop
+```
+
+---
+
+### 选项 2: PR (创建 Pull Request)
+
+**操作**: 在 Forgejo 上创建 Pull Request
+
+```
+Create PR: feature/backend/TASK-101-user-auth -> develop
+```
+
+**适用场景**:
+- 需要代码审查
+- 团队协作项目
+- 遵循 GitFlow 规范
+
+**PR 预览**:
+```
+Title: feat(auth): 添加用户认证功能 [TASK-101]
+Base: develop
+Reviewers: @tech-lead
+Labels: feature, backend
+```
+
+---
+
+### 选项 3: Keep (保留分支)
+
+**操作**: 保留分支，稍后处理
+
+```
+Keep branch: feature/backend/TASK-101-user-auth
+```
+
+**适用场景**:
+- 需要进一步修改
+- 等待依赖项完成
+- 暂时搁置
+
+**说明**: 分支将保留在远端，不做任何操作。
+
+---
+
+### 选项 4: Abort (取消/中止)
+
+**操作**: 取消完成流程，返回开发状态
+
+```
+Abort completion flow
+cancel all pending operations
+```
+
+**适用场景**:
+- 发现需要额外修改
+- 决策有误，需要重新评估
+- 紧急中止
+
+---
+
+## 请选择 (1-4):
+
+> 等待用户输入...
+
+所有 4 个选项均已呈现: merge / PR / keep / abort

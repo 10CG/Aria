@@ -1,0 +1,37 @@
+{
+  "eval_id": 2,
+  "eval_name": "task-status-update",
+  "category": "status-update",
+  "prompt": "Update task T2 status from 'in_progress' to 'completed' in the existing UPM document. The state block currently shows: T1=completed, T2=in_progress, T3=pending.",
+  "setup": {
+    "current_state": {
+      "T1": "completed",
+      "T2": "in_progress",
+      "T3": "pending"
+    },
+    "update": {"task_id": "T2", "new_status": "completed"}
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "t2_updated_to_completed",
+      "description": "T2 status must be updated to 'completed'",
+      "check": "output.match(/T2.*completed/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "other_tasks_unchanged",
+      "description": "T1 and T3 statuses must remain unchanged",
+      "check": "output.match(/T1.*completed/i) && output.match(/T3.*pending/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "percentage_recalculated",
+      "description": "Completion percentage must be recalculated (2/3 = 66.7%)",
+      "check": "output.match(/66\\.?7?%|67%/)",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "eval_id": 9,
+  "eval_name": "risk-level-detection",
+  "timestamp": "2026-03-16T13:40:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Should detect high risk from breaking/api keywords",
+      "check": "output.includes('high') || output.includes('高风险') || output.includes('High')",
+      "severity": "high",
+      "passed": true,
+      "evidence": "Output contains 'high' risk level detection with keyword matching for 'api' and 'breaking', and '高风险' label in conclusion",
+      "text": "detects_high_risk"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Risk level auto-detection correctly identifies 'api' and 'breaking' as high-risk keywords"
+}

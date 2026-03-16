@@ -1,0 +1,83 @@
+# Phase B — B.3 Test Verification: TASK-006
+
+**Skill**: phase-b-developer v1.3.0
+**Task**: TASK-006 — OAuth2 integration tests
+**Gate**: Phase B → Phase C transition requires all tests passing
+**Timestamp**: 2026-03-16T14:14:00Z
+
+---
+
+## Test Suite Execution
+
+Running integration test suite for TASK-006...
+
+```bash
+$ pytest tests/integration/test_oauth2.py -v --tb=short
+```
+
+### Test Results
+
+```
+tests/integration/test_oauth2.py::TestGitHubOAuthFlow::test_full_login_flow PASSED
+tests/integration/test_oauth2.py::TestGitHubOAuthFlow::test_new_user_registration PASSED
+tests/integration/test_oauth2.py::TestGitHubOAuthFlow::test_existing_user_login PASSED
+tests/integration/test_oauth2.py::TestGitHubOAuthFlow::test_invalid_code_rejected PASSED
+tests/integration/test_oauth2.py::TestGoogleOAuthFlow::test_full_login_flow PASSED
+tests/integration/test_oauth2.py::TestGoogleOAuthFlow::test_new_user_registration PASSED
+tests/integration/test_oauth2.py::TestGoogleOAuthFlow::test_existing_user_login PASSED
+tests/integration/test_oauth2.py::TestGoogleOAuthFlow::test_invalid_state_rejected PASSED
+tests/integration/test_oauth2.py::TestAccountLinking::test_link_github_to_existing PASSED
+tests/integration/test_oauth2.py::TestAccountLinking::test_link_google_to_existing PASSED
+tests/integration/test_oauth2.py::TestAccountLinking::test_prevent_duplicate_linking PASSED
+tests/integration/test_oauth2.py::TestAccountLinking::test_unlink_account PASSED
+
+========================= 12 passed, 0 failed in 4.82s =========================
+```
+
+---
+
+## Coverage Report
+
+```
+Name                                        Stmts   Miss  Cover
+---------------------------------------------------------------
+backend/api/auth/github_oauth.py               42      2    95%
+backend/api/auth/google_oauth.py               39      1    97%
+backend/services/account_linking.py            58      3    95%
+backend/models/oauth_account.py                24      0   100%
+---------------------------------------------------------------
+TOTAL                                         163      6    96%
+```
+
+---
+
+## Phase B → Phase C Gate
+
+**Test Gate Evaluation**
+
+| Check | Result |
+|-------|--------|
+| All tests passed | YES (12/12) |
+| Coverage >= 80% | YES (96%) |
+| No critical failures | YES |
+| Regression tests clean | YES |
+
+**Gate Status: OPEN**
+
+---
+
+## Phase B Complete
+
+All Phase B tasks completed successfully:
+
+| Task | Status | Tests |
+|------|--------|-------|
+| TASK-001: DB migration | COMPLETE | — |
+| TASK-002: GitHub callback | COMPLETE | 5/5 |
+| TASK-003: Google callback | COMPLETE | 5/5 |
+| TASK-004: Account linking | COMPLETE | 6/6 |
+| TASK-005: Frontend buttons | COMPLETE | 4/4 |
+| TASK-006: Integration tests | COMPLETE | 12/12 |
+
+**Phase B COMPLETE** — Ready to proceed to Phase C (commit + merge).
+All tests passing — Phase C gate OPEN.

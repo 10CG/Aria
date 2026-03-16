@@ -1,0 +1,82 @@
+Here's the task breakdown from the Phase 3 UX Optimization spec:
+
+---
+
+## Phase 3 Task Decomposition
+
+### FR-FE-003: 暗色模式支持 (P1)
+
+**1.1** — Rebuild `design-tokens.css` with CSS custom properties for both light and dark color schemes
+- Define all color tokens as CSS variables under `:root`
+- Add `[data-theme="dark"]` overrides
+
+**1.2** — Implement theme toggle component
+- JS module: detect `prefers-color-scheme` on load
+- Apply/toggle `data-theme` attribute on `<html>`
+- Persist choice to `localStorage`
+- Add toggle switch UI in header
+
+**1.3** — Audit and adapt all page CSS for dark mode
+- Files: `todos.css`, `statistics.css`, `auth.css`, `base.css`
+- Replace any hardcoded colors with CSS variable references
+- Verify each page visually in both themes
+
+---
+
+### FR-FE-004: 响应式布局优化 (P1)
+
+**2.1** — Add mobile responsive breakpoints and bottom navigation bar
+- Files: `base.css`, `todos.css`
+- Breakpoint at ≤768px
+- Bottom nav for primary actions on mobile
+
+**2.2** — Optimize touch targets and small-screen list display
+- Ensure all interactive elements ≥44px touch target
+- Reflow tables/lists for narrow viewports
+- Add swipe-to-delete gesture on todo items (JS)
+
+---
+
+### FR-FE-005: 加载状态与骨架屏 (P2)
+
+**3.1** — Build skeleton screen component and global loading indicator
+- New file: `skeleton.css`
+- Skeleton placeholders for todo list and stats page on initial load
+- Top progress bar for in-flight requests
+
+**3.2** — Add button loading states and network error feedback
+- Disable buttons during API calls, show spinner
+- Display toast/banner on network failure
+- Wire into API service layer
+
+---
+
+### FR-FE-006: 可访问性改进 (P2)
+
+**4.1** — Semantic HTML and ARIA attributes across all pages
+- Replace generic `<div>`/`<span>` with `<nav>`, `<main>`, `<section>`, `<article>`
+- Add `aria-label`, `aria-live` regions, `role` attributes
+- All form inputs must have associated `<label>`
+
+**4.2** — Keyboard navigation and focus management
+- Full Tab/Enter/Escape flow for core paths (login → add/edit/delete todo)
+- Focus trap in modals; restore focus on close
+- High-contrast mode compatibility (respect `prefers-contrast`)
+
+---
+
+### Suggested Execution Order
+
+| Priority | Task | Dependency |
+|----------|------|------------|
+| P1 | 1.1 CSS variable foundation | none — do first |
+| P1 | 1.2 Theme toggle component | after 1.1 |
+| P1 | 1.3 Dark mode style audit | after 1.2 |
+| P1 | 2.1 Mobile breakpoints + nav | parallel with 1.x |
+| P1 | 2.2 Touch targets + swipe | after 2.1 |
+| P2 | 3.1 Skeleton + progress bar | after 1.x stable |
+| P2 | 3.2 Button states + errors | after 3.1 |
+| P2 | 4.1 Semantic HTML + ARIA | parallel with 3.x |
+| P2 | 4.2 Keyboard nav + focus | after 4.1 |
+
+All tasks are purely frontend — no backend API changes required.

@@ -1,0 +1,25 @@
+{
+  "eval_id": 2,
+  "eval_name": "cli-bug-fix",
+  "timestamp": "2026-03-16T14:16:00Z",
+  "assertions": [
+    {
+      "text": "detects_cli_bug",
+      "passed": true,
+      "evidence": "Output contains 'CLI 路径 Bug 已检测', 'bug detected', and '错误' markers indicating bug detection"
+    },
+    {
+      "text": "corrects_path_automatically",
+      "passed": true,
+      "evidence": "Output uses 'openspec/archive/payment-gateway' as corrected path and never uses 'standards/openspec/archive' as destination"
+    },
+    {
+      "text": "documents_fix_applied",
+      "passed": true,
+      "evidence": "Output contains '[AUTO-FIX]', 'auto-fix 已应用', 'corrected', and 'fixed' documenting the bug fix"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "CLI path bug detected (standards/ prefix), auto-corrected to openspec/archive/payment-gateway, fix documented in output"
+}

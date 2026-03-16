@@ -1,0 +1,24 @@
+{
+  "benchmark_name": "commit-msg-generator",
+  "test_type": "real_execution",
+  "test_project": "todo-web",
+  "timestamp": "2026-03-16T20:29:33.591532+00:00",
+  "total_evals": 1,
+  "passed": 1,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "total_tokens": 21,
+  "total_duration_ms": 2849,
+  "total_cost_usd": 0.0912,
+  "eval_results": [
+    {
+      "eval_id": "real-1",
+      "eval_name": "generate-from-staged-changes",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "tokens": 21,
+      "duration_ms": 2849,
+      "failed_assertions": []
+    }
+  ]
+}

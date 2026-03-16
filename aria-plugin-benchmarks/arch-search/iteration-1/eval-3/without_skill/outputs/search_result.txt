@@ -1,0 +1,131 @@
+# API 端点定义搜索结果 (BASELINE 测试 - 不使用 arch-search skill)
+
+## 搜索方法
+- 使用传统的 Grep 和 Glob 工具
+- 在整个 mock-project 目录中搜索
+- 主要搜索了 API 相关的关键词和文件
+
+## 搜索查询
+- 查询: "API 端点定义在哪"
+- 搜索时间: 2026-03-13
+- 测试类型: BASELINE (不使用 arch-search skill)
+
+## 找到的相关文档
+
+### 1. OpenAPI 契约文件
+**路径**: `shared/contracts/openapi/api.yaml`
+**描述**: 定义了完整的 API 端点契约，包括所有 HTTP 方法和路径
+
+**主要 API 端点**:
+- `/auth/login` (POST) - 用户登录
+- `/auth/register` (POST) - 用户注册
+- `/tasks` (GET, POST) - 获取任务列表 / 创建任务
+- `/tasks/{id}` (GET, PUT, DELETE) - 获取/更新/删除特定任务
+
+**代码段**:
+```yaml
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+  /tasks:
+    get:
+      summary: List all tasks
+      tags:
+        - Tasks
+    post:
+      summary: Create a new task
+      tags:
+        - Tasks
+  /tasks/{id}:
+    get:
+      summary: Get task by ID
+      tags:
+        - Tasks
+    put:
+      summary: Update task
+      tags:
+        - Tasks
+    delete:
+      summary: Delete task
+      tags:
+        - Tasks
+```
+
+### 2. 移动端网络架构文档
+**路径**: `mobile/docs/architecture/network.md`
+**描述**: 包含了 Retrofit API 服务实现示例
+
+**代码段**:
+```dart
+@RestApi(baseUrl: '/api/v1')
+abstract class TaskApiService {
+  @GET('/tasks')
+  Future<List<Task>> getTasks();
+
+  @POST('/tasks')
+  Future<Task> createTask(@Body() CreateTaskRequest request);
+
+  @GET('/tasks/{id}')
+  Future<Task> getTask(@Path('id') String id);
+}
+```
+
+### 3. 领域路由映射
+**路径**: `DOMAINS.md`
+**描述**: 提供了 API 契约的快速定位指南
+
+**相关内容**:
+- **API契约领域**: `shared/contracts/openapi/`
+- **关键词**: API, endpoint, 端点, network, 网络, HTTP, REST
+
+### 4. 后端架构文档
+**路径**: `backend/docs/ARCHITECTURE.md`
+**描述**: 描述了使用 FastAPI 框架的分层架构
+
+**技术栈**:
+- 框架: FastAPI (Python 3.11+)
+- API Layer: Routes, Controllers
+
+## 关键发现
+
+1. **主要 API 定义位置**:
+   - OpenAPI YAML 文件是最完整的 API 契约定义
+   - 文件位置: `shared/contracts/openapi/api.yaml`
+
+2. **API 实现位置**:
+   - 移动端: 使用 Retrofit 实现客户端 API
+   - 后端: 使用 FastAPI 框架（但实际代码未在 mock-project 中）
+
+3. **代码指针**:
+   - API 服务实现示例: `mobile/docs/architecture/network.md` (第 32-46 行)
+   - API 契约定义: `shared/contracts/openapi/api.yaml` (第 6-51 行)
+
+## 搜索限制
+
+由于这是一个 mock 项目，实际的 API 实现代码文件不存在。我们只找到了：
+- OpenAPI 规范定义
+- 文档中的示例代码
+- 架构描述文档
+
+## Token 使用估计
+
+- 搜索的文件总数: ~7 个文档文件
+- 总字符数: ~5000 字符
+- 估算 token 消耗: ~1500 tokens（包括搜索和读取内容）
+
+## 总结
+
+通过传统搜索方法，成功找到了 API 端点定义的主要位置：
+1. OpenAPI 契约文件（最权威）
+2. 移动端网络架构文档（实现示例）
+3. 领域路由映射（快速查找指南）
+
+这种方法虽然找到了相关信息，但需要：
+- 手动搜索多个文件
+- 理解文档之间的关系
+- 整合不同来源的信息
+
+相比使用 arch-search skill，传统方法更耗时且需要更多的手动分析。

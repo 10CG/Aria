@@ -1,0 +1,35 @@
+{
+  "eval_id": 3,
+  "eval_name": "bidirectional-status-sync",
+  "category": "bidirectional",
+  "prompt": "双向同步状态: story_id=US-001, forgejo_issue=42, story_status=in-progress, issue_status=open, direction=bidirectional, repo=10cg/my-project",
+  "setup": {
+    "story_id": "US-001",
+    "issue_number": 42,
+    "story_status": "in-progress",
+    "issue_status": "open"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "syncs_status_to_issue",
+      "description": "Should update Forgejo Issue status to match Story status",
+      "check": "output.includes('in-progress') || output.includes('进行中') || output.includes('status') || output.includes('状态')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reflects_issue_back_to_story",
+      "description": "Should reflect Forgejo Issue changes back to User Story",
+      "check": "output.includes('bidirectional') || output.includes('双向') || output.includes('sync') || output.includes('同步')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_both_entities",
+      "description": "Should identify both the story and issue being synced",
+      "check": "output.includes('US-001') || (output.includes('42') && output.includes('Issue'))",
+      "severity": "high"
+    }
+  ]
+}

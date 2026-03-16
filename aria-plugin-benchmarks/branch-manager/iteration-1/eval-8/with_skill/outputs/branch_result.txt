@@ -1,0 +1,91 @@
+# Branch Manager 模拟结果 - PR 格式合规性测试
+
+## 输入参数
+- action: 创建 PR
+- branch: feature/backend/TASK-001-user-auth
+- base: develop
+- spec_path: openspec/changes/user-auth/proposal.md
+
+## PR 创建流程 (C.2)
+
+### C.2.1 - 同步检查
+- git fetch origin develop
+- git rebase origin/develop
+- 无冲突，同步成功
+
+### C.2.2 - 推送分支
+- git push --force-with-lease origin feature/backend/TASK-001-user-auth
+- 推送成功
+
+### C.2.3 - 创建 PR
+
+#### PR 标题
+根据分支名和 Spec 路径生成标题：
+
+```
+feat(backend): 用户认证功能 / User authentication feature
+```
+
+标题格式遵循: `{type}({scope}): {中文描述} / {English description}`
+- type: feat (从 feature 分支类型推导)
+- scope: backend (从模块标识符提取)
+
+#### PR 正文
+
+```markdown
+## Summary
+
+实现用户认证功能，包含登录、注册和会话管理。
+
+Implements: `openspec/changes/user-auth/proposal.md`
+
+## Changes
+
+- 添加用户认证 API 端点
+- 实现 JWT token 生成和验证
+- 添加用户模型和数据库迁移
+
+## Spec Reference
+
+本 PR 实现了以下 Spec 中定义的需求：
+- Spec 路径: `openspec/changes/user-auth/proposal.md`
+- 验收标准: 参见 proposal.md 中的 acceptance criteria
+
+## Test Plan
+
+- [ ] Unit tests pass
+- [ ] Integration tests pass (if applicable)
+- [ ] Manual testing completed
+
+## Checklist
+
+- [ ] Spec acceptance criteria satisfied
+- [ ] Tests passing
+- [ ] Documentation updated
+- [ ] No security vulnerabilities
+```
+
+### C.2.4 - 等待审批
+- PR URL: https://forgejo.10cg.pub/10CG/project/pulls/42 (模拟)
+- 状态: open
+
+## 输出结果
+
+```yaml
+pr_url: "https://forgejo.10cg.pub/10CG/project/pulls/42"
+pr_number: 42
+pr_title: "feat(backend): 用户认证功能 / User authentication feature"
+status: "open"
+branch_cleanup: "pending"
+spec_reference: "openspec/changes/user-auth/proposal.md"
+next_step: "等待审批"
+```
+
+## 断言验证
+
+- **PR 标题格式**: 包含 'feat' 类型前缀 (从 feature 分支推导)
+- **Spec 引用**: 包含 'Spec' 引用和 'proposal' 路径
+
+## 结论
+
+成功验证 PR 格式合规性。PR 标题遵循 `{type}({scope}): {description}` 格式，正文中包含 Spec 引用 (proposal.md)、变更列表、测试计划和检查清单。所有格式要求均满足 branch-manager C.2 阶段的规范。

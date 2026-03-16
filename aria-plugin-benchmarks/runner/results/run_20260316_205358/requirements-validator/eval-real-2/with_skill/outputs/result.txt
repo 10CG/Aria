@@ -1,0 +1,70 @@
+Based on my analysis, here is the validation report:
+
+---
+
+# Validation Report: `docs/architecture/system-architecture.md`
+
+## Summary
+- **Status**: WARN
+- **Issues Found**: 0 critical, 4 warnings, 3 info
+
+---
+
+## Warnings (should fix)
+
+**W-1: Undocumented backend module `aiService.js`**
+`backend/src/aiService.js` exists in the codebase but is not mentioned anywhere in the architecture doc (Section 3.4 key files). If AI features are in production, this is a meaningful omission.
+
+**W-2: Auth layer missing `authRepository.js`**
+The architecture doc (Section 3.1 diagram) shows `Controller → Service → Database`. The actual `routes.js` constructs `AuthController` with an injected `AuthRepository` — a separate repository layer that the doc doesn't acknowledge. `backend/src/auth/authRepository.js` is a real abstraction layer missing from the docs.
+
+**W-3: Undocumented profile management routes**
+`backend/src/auth/profileController.js` and `profileRoutes.js` exist but are not listed in Section 3.3 (API endpoints) or Section 3.4 (key files). Profile-related endpoints are missing from the API surface.
+
+**W-4: Architecture doc is stale (updated_at: 2026-02-25)**
+The document has not been updated since Phase 3 completion. Development has continued through March 2026 (benchmark markers, auth fixes). Version should be bumped to reflect current state.
+
+---
+
+## Info (optional improvements)
+
+**I-1: Component count says "8个" but lists 7 in tree**
+Section 4.1 names 7 components; the 8th is `components/index.js` (barrel re-export). Either add it to the tree or adjust the count.
+
+**I-2: Undocumented frontend files**
+Not mentioned in Section 4.1: `frontend/src/js/logger.js`, `frontend/src/js/utils/validate.js`, `frontend/src/js/utils/configChecker.js`, `frontend/src/404.html`, `frontend/src/50x.html`.
+
+**I-3: Undocumented backend utility**
+`backend/src/utils/field-mapper.js` exists but is not documented.
+
+---
+
+## Cross-Reference Check
+
+| Reference | Status |
+|---|---|
+| `docs/requirements/prd-todo-optimization-v1.md` | ✅ OK |
+| `backend/src/server.js` | ✅ EXISTS |
+| `backend/src/routes.js` | ✅ EXISTS |
+| `backend/src/database.js` | ✅ EXISTS |
+| `frontend/src/js/app.js` | ✅ EXISTS |
+| `docker-compose.prod.yml` | ✅ EXISTS |
+
+---
+
+## Codebase Consistency
+
+| Component/Path | Status |
+|---|---|
+| All middleware files (auth.js, rateLimiter.js, validate.js, etc.) | ✅ MATCH |
+| All frontend CSS files (7 files) | ✅ MATCH |
+| Frontend component structure | ✅ MATCH |
+| `backend/src/auth/authController.js` | ✅ EXISTS |
+| `backend/src/database/backupScheduler.js` | ✅ EXISTS |
+| `backend/src/aiService.js` | ⚠️ MISSING from doc |
+| `backend/src/auth/authRepository.js` | ⚠️ MISSING from doc |
+| `backend/src/auth/profileController.js` | ⚠️ MISSING from doc |
+
+---
+
+**Verdict**: Core architecture is accurately documented. The three warnings above represent real codebase evolution (AI service, auth repository pattern, profile routes) that postdate the doc's creation. The doc needs a targeted update to these areas.

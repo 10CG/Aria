@@ -1,0 +1,17 @@
+{
+  "eval_id": 10,
+  "eval_name": "bilingual-keyword-chinese",
+  "category": "i18n",
+  "prompt": "How is user registration implemented?",
+  "expected_layer": 1,
+  "expected_domain": "auth_security",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "handles_registration_query",
+      "description": "Should find registration/auth related docs",
+      "check": "output.match(/security|auth|register|注册|认证/i)",
+      "severity": "critical"
+    }
+  ]
+}

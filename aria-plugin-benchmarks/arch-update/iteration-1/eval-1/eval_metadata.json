@@ -1,0 +1,44 @@
+{
+  "eval_id": 1,
+  "eval_name": "new-file-detection",
+  "category": "change-detection",
+  "prompt": "Detect which new source files have been added to the project that require architecture documentation updates",
+  "setup": {
+    "new_files": [
+      "src/services/payment/PaymentService.ts",
+      "src/services/payment/PaymentGateway.ts",
+      "src/models/Payment.ts"
+    ],
+    "existing_docs": ["docs/ARCHITECTURE.md", "src/services/auth/auth.arch.md"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_new_source_files",
+      "description": "Should detect all newly added source files",
+      "check": "output.match(/PaymentService\\.ts|PaymentGateway\\.ts|Payment\\.ts/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_undocumented_files",
+      "description": "Should identify files lacking architecture documentation",
+      "check": "output.match(/undocumented|missing.*doc|no.*arch|needs.*doc/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "suggests_doc_location",
+      "description": "Should suggest appropriate documentation location",
+      "check": "output.match(/payment.*arch\\.md|arch.*payment|docs\\/.*payment/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "lists_affected_layers",
+      "description": "Should identify which architecture layer the new files belong to",
+      "check": "output.match(/L[012]|layer|module|component/i)",
+      "severity": "high"
+    }
+  ]
+}

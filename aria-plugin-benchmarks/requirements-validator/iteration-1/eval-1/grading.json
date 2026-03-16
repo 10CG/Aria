@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "prd-format-validation",
+  "timestamp": "2026-03-16T14:00:30Z",
+  "assertions": [
+    {
+      "text": "detects_missing_sections",
+      "passed": true,
+      "evidence": "Output contains '3 violations found' and 'Missing required section' for all three absent sections"
+    },
+    {
+      "text": "names_specific_sections",
+      "passed": true,
+      "evidence": "Output explicitly names 'Background', 'Scope', and 'Acceptance Criteria' as missing sections"
+    },
+    {
+      "text": "provides_violation_count",
+      "passed": true,
+      "evidence": "Output reports 'Total violations: 3' in the summary table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

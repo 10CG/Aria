@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "new-story-addition",
+  "timestamp": "2026-03-16T14:16:30Z",
+  "assertions": [
+    {
+      "text": "adds_story_to_upm",
+      "passed": true,
+      "evidence": "Output shows UPM diff with US-099 added as REQ-099 and confirms 'US-099 added to UPM' in the result header"
+    },
+    {
+      "text": "sets_initial_status",
+      "passed": true,
+      "evidence": "Output sets 'status: To Do' and 'initial_status: To Do' in the new YAML entry"
+    },
+    {
+      "text": "preserves_existing_entries",
+      "passed": true,
+      "evidence": "Impact Report states 'Modified: 0 existing entries (preserved unchanged)' and explicitly notes REQ-097 and REQ-098 are unchanged"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

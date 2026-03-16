@@ -1,0 +1,157 @@
+{
+  "skill_name": "spec-drafter",
+  "skill_path": "aria/skills/spec-drafter",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for spec-drafter skill - assists in creating OpenSpec proposal.md documents for Phase A.1",
+  "metrics": [
+    "level_judgment_accuracy",
+    "proposal_section_completeness",
+    "scope_extraction_precision",
+    "template_compliance_rate",
+    "bilingual_handling_quality"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "level-judgment",
+      "category": "level-detection",
+      "prompt": "判断规范等级: 用户请求 '修复登录页面一个 typo'",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "judges_level_1",
+          "description": "Should judge as Level 1 (Skip) for trivial fix",
+          "check": "output.includes('Level 1') || output.includes('Skip') || output.includes('L1')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "explains_reasoning",
+          "description": "Should explain why Level 1 was chosen",
+          "check": "output.includes('trivial') || output.includes('simple') || output.includes('简单') || output.includes('typo')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "proposal-generation",
+      "category": "doc-creation",
+      "prompt": "生成 proposal.md: 为用户认证功能 (登录/注册/密码重置) 创建 OpenSpec proposal",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "generates_proposal_file",
+          "description": "Should generate a proposal.md document",
+          "check": "output.includes('proposal') || output.includes('# ') || output.includes('## ')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_required_sections",
+          "description": "Should include Background, Scope, and Goals sections",
+          "check": "output.includes('Background') && output.includes('Scope') && (output.includes('Goal') || output.includes('目标'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "covers_all_features",
+          "description": "Should cover login, register, and password reset in the proposal",
+          "check": "(output.includes('login') || output.includes('登录')) && (output.includes('register') || output.includes('注册'))",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "scope-extraction",
+      "category": "input-parsing",
+      "prompt": "提取范围: '我们需要给用户添加一个通知系统，支持邮件和短信，但不包括推送通知'",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "extracts_in_scope",
+          "description": "Should extract email and SMS as in-scope",
+          "check": "(output.includes('email') || output.includes('邮件')) && (output.includes('SMS') || output.includes('短信'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "extracts_out_of_scope",
+          "description": "Should extract push notifications as out-of-scope",
+          "check": "output.includes('push') || output.includes('推送')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "uses_scope_format",
+          "description": "Should use in-scope/out-of-scope format structure",
+          "check": "output.includes('In-Scope') || output.includes('Out-of-Scope') || output.includes('范围内') || output.includes('范围外')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "template-compliance",
+      "category": "format-validation",
+      "prompt": "验证模板合规性: 检查生成的 proposal.md 是否遵循 OpenSpec Level 2 模板格式",
+      "setup": {
+        "level": "Level 2",
+        "required_sections": ["Background", "Scope", "Goals", "Non-Goals", "Implementation Plan"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_all_required_sections",
+          "description": "Should have all Level 2 required sections",
+          "check": "output.includes('Background') && output.includes('Non-Goal') && output.includes('Implementation')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "correct_heading_hierarchy",
+          "description": "Should use correct H2 headings for major sections",
+          "check": "output.includes('## Background') || output.includes('## Scope') || output.includes('## Goal')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "has_metadata_header",
+          "description": "Should include proposal metadata (version, date, status)",
+          "check": "output.includes('version') || output.includes('date') || output.includes('status') || output.includes('Status')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "bilingual-support",
+      "category": "i18n",
+      "prompt": "双语输入处理: 'Add a dark mode feature / 添加深色模式功能' — 请生成英文 proposal",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "handles_mixed_input",
+          "description": "Should correctly parse mixed Chinese/English input",
+          "check": "output.includes('dark mode') || output.includes('Dark Mode') || output.includes('深色模式')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "generates_english_output",
+          "description": "Should generate proposal content in English as requested",
+          "check": "output.includes('Background') && output.includes('Scope') && output.includes('Goal')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "preserves_intent",
+          "description": "Should preserve the feature intent from both language inputs",
+          "check": "output.includes('theme') || output.includes('mode') || output.includes('UI') || output.includes('appearance')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

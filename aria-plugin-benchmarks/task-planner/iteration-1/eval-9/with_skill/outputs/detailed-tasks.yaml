@@ -1,0 +1,238 @@
+metadata:
+  feature: user-registration
+  datasource: "proposal.md"
+  total_tasks: 15
+  include_tests: true
+
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    title: 设计注册页面 UI/UX
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables:
+      - frontend/src/components/auth/RegisterForm.vue
+      - frontend/src/styles/auth.css
+    agent: frontend-architect
+    verification:
+      - "UI 设计稿完成"
+      - "组件样式符合设计规范"
+
+  - id: TASK-002
+    parent: "1.1"
+    title: 实现注册表单前端组件
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-001
+    deliverables:
+      - frontend/src/components/auth/RegisterForm.vue
+      - frontend/tests/unit/RegisterForm.spec.js
+    agent: frontend-developer
+    verification:
+      - "表单组件正常渲染"
+      - "表单验证功能正常"
+      - "测试用例通过"
+
+  - id: TASK-003
+    parent: "1.2"
+    title: 创建注册 API 端点
+    status: pending
+    complexity: L
+    dependencies: []
+    deliverables:
+      - backend/src/controllers/AuthController.js
+      - backend/src/routes/auth.js
+      - backend/src/models/User.js
+    agent: backend-architect
+    verification:
+      - "API 端点可访问"
+      - "返回正确的 HTTP 状态码"
+
+  - id: TASK-004
+    parent: "1.3"
+    title: 实现邮箱格式验证
+    status: pending
+    complexity: S
+    dependencies:
+      - TASK-003
+    deliverables:
+      - backend/src/utils/validators.js
+      - backend/tests/unit/validators.spec.js
+    agent: backend-developer
+    verification:
+      - "验证正确的邮箱格式"
+      - "拒绝无效的邮箱格式"
+      - "测试用例通过"
+
+  - id: TASK-005
+    parent: "1.3"
+    title: 实现密码强度检查
+    status: pending
+    complexity: S
+    dependencies:
+      - TASK-003
+    deliverables:
+      - backend/src/utils/password.js
+      - backend/tests/unit/password.spec.js
+    agent: backend-developer
+    verification:
+      - "检查密码长度"
+      - "检查字符复杂度"
+      - "测试用例通过"
+
+  - id: TASK-006
+    parent: "1.1"
+    title: 处理注册表单提交
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-002
+      - TASK-004
+      - TASK-005
+    deliverables:
+      - frontend/src/services/auth.js
+      - backend/src/middlewares/validation.js
+    agent: fullstack-developer
+    verification:
+      - "表单提交成功"
+      - "数据验证通过"
+      - "错误处理正常"
+
+  - id: TASK-007
+    parent: "1.1"
+    title: 显示注册成功/错误消息
+    status: pending
+    complexity: S
+    dependencies:
+      - TASK-006
+    deliverables:
+      - frontend/src/components/ui/Message.vue
+    agent: frontend-developer
+    verification:
+      - "成功消息显示"
+      - "错误消息显示"
+      - "消息样式正确"
+
+  - id: TASK-008
+    parent: "2.1"
+    title: 生成邮箱验证令牌
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-003
+    deliverables:
+      - backend/src/utils/token.js
+      - backend/src/services/EmailVerificationService.js
+    agent: backend-developer
+    verification:
+      - "令牌生成成功"
+      - "令牌有效期正确"
+
+  - id: TASK-009
+    parent: "2.2"
+    title: 发送验证邮件
+    status: pending
+    complexity: L
+    dependencies:
+      - TASK-008
+    deliverables:
+      - backend/src/services/EmailService.js
+      - backend/config/email.config.js
+    agent: backend-developer
+    verification:
+      - "邮件发送成功"
+      - "邮件模板正确"
+
+  - id: TASK-010
+    parent: "2.3"
+    title: 实现验证链接处理
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-008
+      - TASK-009
+    deliverables:
+      - backend/src/controllers/VerificationController.js
+    agent: backend-developer
+    verification:
+      - "验证链接有效"
+      - "验证状态更新"
+
+  - id: TASK-011
+    parent: "2.3"
+    title: 验证邮箱状态显示
+    status: pending
+    complexity: S
+    dependencies:
+      - TASK-010
+    deliverables:
+      - frontend/src/components/auth/EmailVerificationStatus.vue
+    agent: frontend-developer
+    verification:
+      - "状态显示正确"
+      - "状态更新实时"
+
+  - id: TASK-012
+    parent: "3.1"
+    title: 创建用户数据模型
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-003
+    deliverables:
+      - backend/src/models/User.js
+      - backend/tests/unit/UserModel.spec.js
+    agent: backend-architect
+    verification:
+      - "模型定义正确"
+      - "数据库迁移成功"
+
+  - id: TASK-013
+    parent: "3.2"
+    title: 实现用户信息 CRUD
+    status: pending
+    complexity: L
+    dependencies:
+      - TASK-012
+    deliverables:
+      - backend/src/controllers/UserController.js
+      - backend/tests/integration/user-api.spec.js
+    agent: backend-developer
+    verification:
+      - "CRUD 操作正常"
+      - "API 测试通过"
+
+  - id: TASK-014
+    parent: "4.1"
+    title: 实现密码哈希存储
+    status: pending
+    complexity: M
+    dependencies:
+      - TASK-012
+    deliverables:
+      - backend/src/utils/hash.js
+      - backend/tests/unit/hash.spec.js
+    agent: backend-developer
+    verification:
+      - "哈希生成正确"
+      - "密码验证正常"
+
+  - id: TASK-015
+    parent: "5.1"
+    title: 编写端到端测试
+    status: pending
+    complexity: L
+    dependencies:
+      - TASK-002
+      - TASK-006
+      - TASK-011
+      - TASK-013
+    deliverables:
+      - tests/e2e/user-registration-flow.spec.js
+      - tests/e2e/email-verification.spec.js
+    agent: qa-engineer
+    verification:
+      - "注册流程测试通过"
+      - "验证流程测试通过"

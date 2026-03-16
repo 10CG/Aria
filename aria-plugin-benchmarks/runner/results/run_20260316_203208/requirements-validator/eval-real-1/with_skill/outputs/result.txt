@@ -1,0 +1,47 @@
+Here is the validation report for `docs/requirements/prd-todo-optimization-v1.md`:
+
+---
+
+## PRD Validation Report
+
+### Critical Issues
+
+**1. Phase 4 status incorrect** (line 38)
+The PRD shows Phase 4 as `🔄 进行中` with path `openspec/changes/phase4-acceptance-release/proposal.md`, but the OpenSpec is **archived** at `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md` with status `Complete ✅`. Phase 4 is done.
+
+**2. Phase 4 OpenSpec path broken** (line 38)
+References `openspec/changes/phase4-acceptance-release/proposal.md` — this path **does not exist**. Correct path: `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`.
+
+**3. Missing referenced contract files** (lines 831–833)
+Three files referenced in Section 10.2 do not exist:
+- `docs/contracts/api/todo-api-contract.md`
+- `docs/contracts/data/todo-data-contract.md`
+- `docs/contracts/ui/todo-list-page-contract.md`
+
+### Consistency Issues
+
+**4. Version mismatch** (lines 7 vs 24)
+Frontmatter: `version: 1.5.0` | Document header: `v1.3.0`. These must match.
+
+**5. `updated_at` mismatch** (lines 6 vs 27)
+Frontmatter: `updated_at: 2026-02-26` | Document header: `最后更新: 2026-02-15`.
+
+**6. Change history incomplete** (lines 839–840)
+Change log only shows v1.0.0 and v1.1.0, with no entries for v1.2–1.5 changes. The frontmatter says `version: 1.5.0` with `updated_at: 2026-02-26`, suggesting multiple undocumented updates.
+
+**7. Stale functional requirement statuses** (lines 319, 331, 362)
+Phase 2 is marked ✅ 已完成 in the progress table, but three requirements still show `🔄 进行中 (Phase 2)`:
+- FR-BE-003: 请求验证中间件
+- FR-BE-004: API 限流
+- FR-FE-002: JavaScript 模块化重构
+
+---
+
+### Summary
+
+| Severity | Count | Issues |
+|----------|-------|--------|
+| Critical | 3 | Phase 4 wrong status, broken path, missing contracts |
+| Consistency | 4 | Version mismatch, date mismatch, missing changelog entries, stale FR statuses |
+
+The most important fix is updating Phase 4 to ✅ 已完成 and correcting its OpenSpec path. Would you like me to apply these corrections?

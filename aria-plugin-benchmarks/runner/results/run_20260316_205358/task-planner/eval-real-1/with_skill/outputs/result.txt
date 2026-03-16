@@ -1,0 +1,40 @@
+Here's the task breakdown for Phase 3: 前端体验优化:
+
+---
+
+## Phase 3 Task Decomposition
+
+### FR-FE-003: 暗色模式支持 (P1)
+
+| # | Task | Files |
+|---|------|-------|
+| 1.1 | 建立暗色模式 CSS 变量体系，重构 `design-tokens.css`，定义亮/暗双套颜色方案 | `design-tokens.css` |
+| 1.2 | 实现主题切换组件：header 开关 UI + `prefers-color-scheme` 检测 + localStorage 持久化 | JS 组件文件 |
+| 1.3 | 适配所有页面的暗色模式样式，逐页验证 | `todos.css`, `statistics.css`, `auth.css`, `base.css`, 所有 HTML |
+
+### FR-FE-004: 响应式布局优化 (P1)
+
+| # | Task | Files |
+|---|------|-------|
+| 2.1 | 实现移动端响应式断点（≤768px）和底部导航栏 | `todos.css`, `base.css`, `statistics.css` |
+| 2.2 | 优化触摸目标区域（≥44px）、小屏列表显示、滑动删除手势 | CSS + 相关 JS 组件 |
+
+### FR-FE-005: 加载状态与骨架屏 (P2)
+
+| # | Task | Files |
+|---|------|-------|
+| 3.1 | 实现骨架屏组件（页面初始加载占位）和顶部进度条全局加载指示器 | 新增 `skeleton.css` + JS 组件 |
+| 3.2 | 添加按钮操作加载态（disabled + spinner）和网络异常状态提示 | API 服务层 + 按钮组件 |
+
+### FR-FE-006: 可访问性改进 (P2)
+
+| # | Task | Files |
+|---|------|-------|
+| 4.1 | 添加语义化 HTML 标签（nav/main/section/article）和完整 ARIA 属性 | 所有 HTML + JS 组件 |
+| 4.2 | 实现键盘导航（Tab/Enter/Escape）、焦点管理（模态框/动态内容）、高对比度兼容 | JS 组件 + CSS |
+
+---
+
+**总计 9 个任务**，建议执行顺序：P1 先行（1.1→1.2→1.3→2.1→2.2），P2 其次（3.1→3.2→4.1→4.2）。
+
+要开始执行某个任务吗？

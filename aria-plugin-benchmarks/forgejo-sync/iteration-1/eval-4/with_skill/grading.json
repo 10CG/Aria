@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "label-mapping",
+  "timestamp": "2026-03-16T14:12:00Z",
+  "assertions": [
+    {
+      "text": "maps_priority_label",
+      "passed": true,
+      "evidence": "Output maps priority 'high' to label 'priority:high' (#5) and lists it in mapping table"
+    },
+    {
+      "text": "maps_module_label",
+      "passed": true,
+      "evidence": "Output maps module 'backend' to label 'module:backend' (#8) and confirms it in result table"
+    },
+    {
+      "text": "maps_type_label",
+      "passed": true,
+      "evidence": "Output maps type 'feature' to label 'type:feature' (#3) and includes it in the label API request"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "All 4 metadata fields mapped to Forgejo labels: priority:high, module:backend, type:feature, sprint:Sprint-3"
+}

@@ -1,0 +1,155 @@
+现在我对项目结构和 OpenSpec 格式有了清晰认识。以下是 Tag/Label 功能的 OpenSpec Proposal：
+
+---
+
+# Todo 标签/标记功能
+
+> **Level**: Standard (Level 3 Spec)
+> **Status**: Draft
+> **Module**: frontend, backend
+> **PRD Reference**: docs/requirements/prd-todo-optimization-v1.md
+> **Created**: 2026-03-17
+
+## Why
+
+当前 Todo 应用的 `todos` 表中存在一个 `tag` 字段（`VARCHAR(50)`），但这是一个单值的分类字符串，不支持多标签分配。数据库中已存在完整的多对多基础设施（`tags` 表 + `todo_tags` 关联表），但从未被激活使用。
+
+用户痛点：
+- Todo 条目无法同时归属多个维度（如"工作"+"紧急"+"需评审"）
+- 没有可视化的颜色标签，任务优先级和类型难以快速识别
+- 无法通过标签维度过滤任务，管理大量 Todo 时效率低
+- 现有的单字段 `tag` 分类能力十分有限，且与 tags 基础设施重复
+
+## What
+
+激活并扩展已有的 `tags` / `todo_tags` 数据库基础设施，实现完整的标签生命周期管理：创建、编辑、删除、为 Todo 分配/取消标签，以及按标签过滤 Todo 列表。
+
+### 功能模块 1：标签管理（CRUD）
+
+用户可在设置或标签管理面板中：
+- 创建标签（名称 + 颜色选择器）
+- 编辑标签名称和颜色
+- 删除标签（同步解除该标签与所有 Todo 的关联）
+- 查看所有已创建的标签列表
+
+**数据约束：**
+- 标签名称：最长 30 字符，同一用户下唯一
+- 颜色：HEX 格式，默认 `#cccccc`
+- `tags` 表需增加 `user_id` 字段（当前缺少用户隔离）
+
+### 功能模块 2：Todo 标签分配
+
+在 Todo 创建/编辑界面中：
+- 显示用户所有标签，支持多选
+- 可快速创建新标签并立即分配
+- Todo 卡片上以彩色 Pill/Badge 形式展示已分配标签
+- 每个 Todo 最多支持 10 个标签
+
+### 功能模块 3：标签过滤
+
+在 Todo 列表页面中：
+- 侧边栏或顶部展示所有标签，显示各标签下的 Todo 数量
+- 点击标签进行过滤，支持多标签 AND/OR 逻辑（默认 OR）
+- 过滤状态与 URL 参数同步（`?tags=work,urgent`），支持分享和刷新保持
+- 与现有的"今日/全部/已完成"视图过滤器联动
+
+## Key Deliverables
+
+| 交付物 | 类型 | 文件路径 |
+|--------|------|---------|
+| 数据库 schema 迁移（tags 添加 user_id） | 修改 | `backend/src/database.js` |
+| 标签 CRUD API | 新增 | `backend/src/routes/tags.js` |
+| Todo API 扩展（附带标签字段） | 修改 | `backend/src/todoService.js` |
+| 前端标签管理组件 | 新增 | `frontend/src/js/components/TagManager.js` |
+| 前端标签选择器组件（Todo 编辑） | 新增 | `frontend/src/js/components/TagSelector.js` |
+| 前端标签过滤器组件 | 新增 | `frontend/src/js/components/TagFilter.js` |
+| 标签样式 | 新增 | `frontend/src/css/tags.css` |
+| 前端 App 集成 | 修改 | `frontend/src/js/app.js` |
+| HTML 模板更新（版本号同步） | 修改 | `frontend/src/todos.html` |
+
+## Data Model
+
+**现有表（已存在，可直接使用）：**
+
+```sql
+-- tags 表（需增加 user_id 列）
+CREATE TABLE IF NOT EXISTS tags (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name  TEXT NOT NULL,
+    color TEXT DEFAULT '#cccccc',
+    user_id INTEGER,  -- ← 新增，用于用户数据隔离
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(name, user_id)  -- ← 同用户下名称唯一
+);
+
+-- todo_tags 关联表（已存在，无需修改）
+CREATE TABLE IF NOT EXISTS todo_tags (
+    id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    todoId INTEGER NOT NULL,
+    tagId  INTEGER NOT NULL,
+    FOREIGN KEY (todoId) REFERENCES todos(id) ON DELETE CASCADE,
+    FOREIGN KEY (tagId)  REFERENCES tags(id)  ON DELETE CASCADE,
+    UNIQUE(todoId, tagId)  -- ← 新增唯一约束防重复
+);
+```
+
+**迁移策略：** 使用 `ALTER TABLE` 为已有 `tags` 表添加 `user_id` 列（SQLite `ALTER TABLE ADD COLUMN` 支持），无需重建表。
+
+## API Design
+
+```
+GET    /api/tags              → 获取当前用户所有标签（含各标签 todo 数量）
+POST   /api/tags              → 创建标签 { name, color }
+PUT    /api/tags/:id          → 更新标签 { name?, color? }
+DELETE /api/tags/:id          → 删除标签（级联清除 todo_tags）
+
+GET    /api/todos             → 扩展支持 ?tags=1,2,3 查询参数（OR 逻辑）
+POST   /api/todos/:id/tags    → 为 Todo 分配标签 { tagIds: [1,2,3] }（全量替换）
+GET    /api/todos/:id/tags    → 获取某 Todo 的所有标签
+
+```
+
+所有标签 API 需经过现有 `authMiddleware` 身份验证，且按 `user_id` 进行数据隔离。
+
+## Impact
+
+- **影响范围**: 全栈（后端 API + 前端 UI），不影响现有 Todo 核心流程
+- **数据库变更**: `tags` 表需要 schema 迁移（ADD COLUMN），需要兼容处理已有 `tag` 字符串字段（暂保留，不删除）
+- **风险**: 低 — 新功能独立扩展，现有 Todo CRUD 流程不受影响；schema 迁移使用 `IF NOT EXISTS`/`ADD COLUMN` 安全方式
+- **前端缓存**: 修改 `app.js` 后须同步更新 `todos.html` 中 `?v=` 版本号（格式 `?v=YYYYMMDDHHmm`）
+
+## Tasks
+
+**后端：**
+- [ ] B1. 执行 tags 表 schema 迁移：添加 `user_id` 列，添加 `UNIQUE(name, user_id)` 约束
+- [ ] B2. 实现 `backend/src/routes/tags.js`：GET/POST/PUT/DELETE /api/tags
+- [ ] B3. 实现 `backend/src/routes/todoTags.js`：POST/GET /api/todos/:id/tags
+- [ ] B4. 扩展 `backend/src/todoService.js`：getTodos() 支持 `tags` 查询参数过滤
+- [ ] B5. 在 `backend/app.js` 中注册新路由
+
+**前端：**
+- [ ] F1. 新增 `frontend/src/css/tags.css`：Pill/Badge 样式、颜色选择器样式
+- [ ] F2. 实现 `TagManager.js`：标签 CRUD 管理面板
+- [ ] F3. 实现 `TagSelector.js`：Todo 编辑器中的多选标签选择器
+- [ ] F4. 实现 `TagFilter.js`：标签过滤器（含 todo 计数徽章）
+- [ ] F5. 修改 `app.js`：集成三个新组件，URL 参数同步过滤状态
+- [ ] F6. 更新 `todos.html`：引入 `tags.css`，同步更新 `app.js?v=` 版本号
+
+## Success Criteria
+
+- [ ] 用户可创建、编辑、删除标签，标签数据在用户间完全隔离
+- [ ] Todo 编辑界面可分配 1-10 个标签，标签以彩色 Pill 显示在 Todo 卡片上
+- [ ] 标签过滤器显示各标签 Todo 数量，点击标签可过滤列表
+- [ ] 多标签过滤（OR 逻辑）正常工作，过滤状态通过 URL 参数保持
+- [ ] 删除标签后，已关联该标签的 Todo 自动解除关联，现有数据不受损
+- [ ] 所有标签 API 通过身份验证，未登录用户无法访问
+- [ ] 现有 Todo 核心流程（增删改查、完成状态、子任务）不受影响
+
+---
+
+这份 Proposal 的关键设计决策摘要：
+
+1. **复用已有基础设施** — `tags` 表和 `todo_tags` 表已存在于 `database.js:214-231`，无需从零建表，只需迁移添加 `user_id` 字段
+2. **保留现有 `tag` 字段** — `todos.tag VARCHAR(50)` 字段暂时保留，避免破坏现有数据；两套系统并行，后续可单独立项迁移
+3. **全量替换 tags 分配策略** — `POST /api/todos/:id/tags` 接受完整 tagIds 数组做全量替换，逻辑简单且幂等
+4. **前端缓存规范** — 修改 `app.js` 后必须按 `CLAUDE.md` 要求更新 `todos.html` 中的版本号

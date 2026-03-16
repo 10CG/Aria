@@ -1,0 +1,88 @@
+# Branch-Manager 模式决策结果
+## 测试参数
+- module: cross
+- task_id: TASK-002
+- description: api-refactor
+- files: [backend/api.py, frontend/api.ts, shared/types.ts]
+- task_count: 5
+- risk_level: high
+- mode: auto
+
+---
+
+## 复杂度评分计算 (5维度)
+
+### 1. file_count (文件数量) - 权重: 低
+- 输入: 3 个文件 (backend/api.py, frontend/api.ts, shared/types.ts)
+- 规则: 1-3 个文件 → 0 分
+- **得分: 0**
+
+### 2. cross_directory (跨目录) - 权重: 中
+- 输入: backend/ + frontend/ + shared/
+- 规则: 跨目录 → +2 分
+- **得分: 2**
+
+### 3. task_count (任务数量) - 权重: 低
+- 输入: 5 个任务
+- 规则: 4-8 个任务 → +1 分
+- **得分: 1**
+
+### 4. risk_level (风险等级) - 权重: 中
+- 输入: high
+- 规则: 高 (重构, API 变更) → +3 分
+- **得分: 3**
+
+### 5. parallel_needed (并行需求) - 权重: 高
+- 输入: 未显式指定，根据 "api-refactor" 描述推断
+- 分析: API 重构通常需要前后端并行调整，需要隔离开发环境
+- **得分: 0** (未显式指定)
+
+---
+
+## 总分计算
+```
+file_count    (0) +
+cross_directory (2) +
+task_count    (1) +
+risk_level    (3) +
+parallel_needed (0) =
+---------------
+总分: 6
+```
+
+---
+
+## 模式决策
+
+### 决策结果: **Worktree 模式**
+
+**决策理由**:
+- 总分 (6) >= 3，满足 Worktree 模式的阈值
+- 跨模块修改 (backend + frontend + shared) 需要隔离开发环境
+- 高风险操作 (API 重构) 需要独立空间避免污染主分支
+- 多任务开发 (5个任务) 增加了复杂度
+
+### 预期分支名:
+```
+feature/cross/TASK-002-api-refactor
+```
+
+### 输出路径:
+```
+.git/worktrees/TASK-002-api-refactor
+```
+
+---
+
+## 决策验证
+
+**符合的 Red Flags 规则**:
+- ✅ 复杂跨模块修改 → Worktree 模式正确
+- ✅ 高风险操作 → Worktree 提供隔离环境
+- ✅ 多任务并行 → 避免频繁切换分支
+
+**推荐的后续步骤**:
+1. 进入 worktree 目录: `cd .git/worktrees/TASK-002-api-refactor`
+2. 开始 API 重构开发
+3. 保持主分支 develop 不受影响
+4. 完成后推送并创建 PR

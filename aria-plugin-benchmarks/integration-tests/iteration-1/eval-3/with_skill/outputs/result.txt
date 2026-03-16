@@ -1,0 +1,217 @@
+================================================================================
+INTEGRATION TEST: cross-module-worktree-coordination
+Prompt: Implement API versioning across backend (Python) and mobile (Flutter) with database migration
+Skills: branch-manager, subagent-driver, strategic-commit-orchestrator,
+        commit-msg-generator, agent-router
+================================================================================
+
+[INIT] agent-router: Analyzing cross-module change request...
+
+--- agent-router output ---
+Request: "Implement API versioning across backend (Python) and mobile (Flutter) with database migration"
+Module detection:
+  backend (Python):     API versioning routes, version negotiation middleware
+  mobile (Flutter):     API client version headers, response model updates
+  database:             Migration: add api_version column to requests table
+
+Agent assignment:
+  backend-architect  -> backend API versioning (Python FastAPI)
+  mobile-developer   -> Flutter client versioning (Dart)
+  [db-migration handled by backend-architect as co-responsibility]
+
+Parallelism: backend-architect and mobile-developer can execute concurrently
+Dependency: mobile-developer depends on backend-architect's API contract (openapi.yaml)
+---
+
+[INIT] agent-router: backend-architect assigned to API, mobile-developer assigned to Flutter [OK]
+
+================================================================================
+=== Branch Strategy Evaluation ===
+================================================================================
+
+[B.1] branch-manager: Evaluating branch strategy for cross-module change...
+
+--- branch-manager scoring ---
+Indicator assessment:
+  modules affected:    3 (backend, mobile, db)   -> +2
+  estimated files:    >5 (16 estimated)           -> +1
+  parallel agents:     2                          -> +0
+  breaking change:     YES (API contract change)  -> +1
+  Risk level:          HIGH                       -> +1
+  Total score:         5   -> Worktree mode SELECTED (threshold: 3)
+
+Mode: Worktree mode selected (score=5, threshold=3)
+Worktree layout:
+  .worktrees/
+    backend-api-versioning/   (worktree for backend-architect)
+    mobile-api-versioning/    (worktree for mobile-developer)
+
+Creating worktrees:
+  git worktree add .worktrees/backend-api-versioning feature/api-versioning/TASK-325-backend
+  git worktree add .worktrees/mobile-api-versioning  feature/api-versioning/TASK-326-mobile
+
+  feature/api-versioning/TASK-325-backend  [worktree: .worktrees/backend-api-versioning] [OK]
+  feature/api-versioning/TASK-326-mobile   [worktree: .worktrees/mobile-api-versioning]  [OK]
+
+Shared coordination branch: feature/api-versioning/integration (for final merge)
+---
+
+[B.1] branch-manager: Worktree mode active (score=5). 2 worktrees created. [OK]
+
+================================================================================
+=== Parallel Agent Execution ===
+================================================================================
+
+--- subagent-driver -> backend-architect (worktree: .worktrees/backend-api-versioning) ---
+Task: TASK-325 - API versioning for FastAPI backend
+
+[RED]    test_api_version_negotiation.py - 3 failing tests (v1/v2 routing)
+[GREEN]  Implementing API versioning:
+  backend/src/api/v1/__init__.py                          [CREATED]
+  backend/src/api/v2/__init__.py                          [CREATED]
+  backend/src/api/v2/routes/users.py                      [CREATED]
+  backend/src/api/v2/routes/payments.py                   [CREATED]
+  backend/src/middleware/api_version_negotiator.py         [CREATED]
+  backend/src/api/versioning.py                           [CREATED]
+  backend/openapi.yaml                                    [MODIFIED: added v2 schema]
+  backend/tests/unit/test_api_version_negotiation.py      [CREATED]
+
+[GREEN]  Database migration:
+  db/migrations/0047_add_api_version_to_requests.py       [CREATED]
+  db/migrations/0047_add_api_version_to_requests.sql      [CREATED]
+  Changes: ALTER TABLE requests ADD COLUMN api_version VARCHAR(10) DEFAULT 'v1'
+
+[REFACTOR] Extracted version registry to backend/src/api/version_registry.py
+[PASS]   18/18 unit tests, 6/6 migration tests
+
+TASK-325: COMPLETE (16 files created/modified)
+---
+
+--- subagent-driver -> mobile-developer (worktree: .worktrees/mobile-api-versioning) ---
+Task: TASK-326 - Flutter client API versioning
+
+Waiting for backend openapi.yaml (contract) from TASK-325...
+  Dependency resolved: openapi.yaml available from backend-architect [OK]
+  Proceeding with mobile implementation...
+
+[RED]    test/api_version_client_test.dart - 2 failing tests
+[GREEN]  Implementing Flutter client versioning:
+  lib/data/network/api_version_interceptor.dart           [CREATED]
+  lib/data/network/api_client.dart                        [MODIFIED: add version header]
+  lib/data/models/api_response_v2.dart                    [CREATED]
+  lib/data/models/user_response_v2.dart                   [CREATED]
+  lib/data/models/payment_response_v2.dart                [CREATED]
+  test/api_version_client_test.dart                       [CREATED]
+
+[REFACTOR] Extracted version constant to lib/core/constants/api_constants.dart
+[PASS]   9/9 widget tests, 2/2 integration tests
+
+TASK-326: COMPLETE (7 files created/modified)
+---
+
+[B.2] subagent-driver: Both agents complete. Merging worktrees to integration branch... [OK]
+
+================================================================================
+=== Strategic Commit Orchestration ===
+================================================================================
+
+[C.1] strategic-commit-orchestrator: Analyzing changes for optimal commit grouping...
+
+--- strategic-commit-orchestrator output ---
+Files analyzed: 23 total (backend: 16, mobile: 7)
+Grouping strategy: by-module + semantic-cohesion
+
+Commit Group 1 (backend API):
+  backend/src/api/v1/__init__.py
+  backend/src/api/v2/__init__.py
+  backend/src/api/v2/routes/users.py
+  backend/src/api/v2/routes/payments.py
+  backend/src/middleware/api_version_negotiator.py
+  backend/src/api/versioning.py
+  backend/src/api/version_registry.py
+  backend/openapi.yaml
+  Files: 8
+
+Commit Group 2 (mobile):
+  lib/data/network/api_version_interceptor.dart
+  lib/data/network/api_client.dart
+  lib/data/models/api_response_v2.dart
+  lib/data/models/user_response_v2.dart
+  lib/data/models/payment_response_v2.dart
+  lib/core/constants/api_constants.dart
+  Files: 6
+
+Commit Group 3 (db migration):
+  db/migrations/0047_add_api_version_to_requests.py
+  db/migrations/0047_add_api_version_to_requests.sql
+  Files: 2
+
+Test files: distributed to their respective groups
+
+Total groups: 3 (backend commit + mobile commit + migration commit)
+---
+
+[C.1] strategic-commit-orchestrator: 3 commit groups created (Group 1: backend, Group 2: mobile, Group 3: migration) [OK]
+
+[C.2] commit-msg-generator: Generating messages for each commit group...
+
+--- commit-msg-generator output ---
+Group 1 (backend API versioning, 8 files):
+  feat(api): implement v2 API versioning with version negotiation middleware
+
+  Introduces /v1/ and /v2/ route namespaces with ApiVersionNegotiator
+  middleware. v2 adds extended user and payment schemas. Version registry
+  tracks supported versions and deprecation timelines.
+
+  BREAKING CHANGE: All clients must include X-API-Version header.
+  Refs: TASK-325
+  Executed-By: 🤖 backend-architect
+  Context: 📋 TASK-325
+  Module: 🔗 api
+
+Group 2 (mobile Flutter versioning, 6 files):
+  feat(mobile): add API version header interceptor for v2 compatibility
+
+  ApiVersionInterceptor automatically injects X-API-Version: v2 header.
+  Added v2 response model variants for User and Payment with new fields.
+  Backward compatible: falls back to v1 if version header rejected.
+
+  Refs: TASK-326
+  Executed-By: 🤖 mobile-developer
+  Context: 📋 TASK-326
+  Module: 🔗 mobile
+
+Group 3 (db migration, 2 files):
+  feat(db): add api_version column to requests table
+
+  Migration 0047: adds api_version VARCHAR(10) DEFAULT 'v1' to requests.
+  Enables per-request API version tracking for analytics and debugging.
+
+  Refs: TASK-325
+  Executed-By: 🤖 backend-architect
+  Context: 📋 TASK-325
+  Module: 🔗 db
+
+Commit SHAs:
+  Group 1 (feat(api)):    3a7f2b1c
+  Group 2 (feat(mobile)): 4b8a3c2d
+  Group 3 (feat(db)):     5c9b4d3e
+---
+
+[C.2] commit-msg-generator: 3 commits with scopes feat(api), feat(mobile), feat(db) [OK]
+
+[C.3] phase-c-integrator: Opening multi-module PR...
+
+--- phase-c-integrator output ---
+PR created:
+  Title:  feat(api-versioning): implement v2 API versioning across backend and mobile [TASK-325, TASK-326]
+  URL:    https://forgejo.10cg.pub/project/aria-web-app/pulls/PR-1854
+  Commits: 3 (feat(api), feat(mobile), feat(db))
+  Files:  23 changed
+
+PR merged: PR-1854 -> main [OK]
+---
+
+================================================================================
+RESULT: PASS
+================================================================================

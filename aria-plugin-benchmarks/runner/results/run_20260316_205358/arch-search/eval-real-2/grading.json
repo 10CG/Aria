@@ -1,0 +1,19 @@
+{
+  "eval_id": "real-2",
+  "eval_name": "search-database-design",
+  "timestamp": "2026-03-16T20:59:56.558606+00:00",
+  "assertions": [
+    {
+      "text": "finds_db_docs",
+      "passed": true,
+      "evidence": "Matched: 'Database'"
+    },
+    {
+      "text": "provides_pointers",
+      "passed": true,
+      "evidence": "Matched: 'backend/'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,30 @@
+{
+  "eval_id": 3,
+  "eval_name": "metadata-preservation",
+  "timestamp": "2026-03-16T14:16:30Z",
+  "assertions": [
+    {
+      "text": "preserves_title",
+      "passed": true,
+      "evidence": "Output shows '用户认证' in both before and after metadata, marked as '已保留 (preserved)'"
+    },
+    {
+      "text": "preserves_version",
+      "passed": true,
+      "evidence": "Output shows version '1.0' preserved in comparison table with '版本' label"
+    },
+    {
+      "text": "preserves_author",
+      "passed": true,
+      "evidence": "Output shows 'tech-lead' as author (作者) preserved in before/after comparison"
+    },
+    {
+      "text": "confirms_integrity",
+      "passed": true,
+      "evidence": "Output contains 'integrity 验证通过', 'preserved', '完整保留', and 'success' confirming data integrity"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "All 5 metadata fields preserved: title (用户认证), version (1.0), status, created, author (tech-lead). Integrity verified."
+}

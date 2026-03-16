@@ -1,0 +1,25 @@
+{
+  "eval_id": 1,
+  "eval_name": "correct-archive-path",
+  "timestamp": "2026-03-16T14:15:30Z",
+  "assertions": [
+    {
+      "text": "uses_project_archive_path",
+      "passed": true,
+      "evidence": "Output uses 'openspec/archive/user-auth' and explicitly states 'standards/openspec/archive' is NOT used"
+    },
+    {
+      "text": "resolves_project_root",
+      "passed": true,
+      "evidence": "Output references '/workspace/my-project' as project_root and uses it in full archive path"
+    },
+    {
+      "text": "confirms_archive_destination",
+      "passed": true,
+      "evidence": "Output confirms 'archive' destination 'openspec/archive/user-auth' in result table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Correct archive path used: /workspace/my-project/openspec/archive/user-auth. standards/ path explicitly avoided per Aria rule #5."
+}

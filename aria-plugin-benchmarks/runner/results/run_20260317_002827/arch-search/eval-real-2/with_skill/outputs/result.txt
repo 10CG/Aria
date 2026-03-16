@@ -1,0 +1,77 @@
+以下是本项目的数据库设计与数据模型架构总结：
+
+---
+
+## 数据库设计概览
+
+**技术选型**: SQLite3 (WAL 模式)，单文件 `backend/data/todos.db`，单例模式访问
+
+---
+
+### ER 关系图
+
+```
+users 1──N todos 1──N notes
+  │                │
+  │                ├──N subtasks (自引用 parentId)
+  │                │
+  │                └──N todo_tags N──1 tags
+  │
+  └──1 user_settings
+  └──N social_accounts
+```
+
+---
+
+### 核心表结构 (`database.js:147-286`)
+
+| 表名 | 关键字段 | 说明 |
+|------|---------|------|
+| `users` | id, name, email, password, avatar_url, role, reset_password_token | 用户主表 |
+| `todos` | id, text, tag, timestamp, plannedStart, estimatedTimeValue/Unit, completed, parentId, priority, completed_at, user_id | 待办事项，支持子任务嵌套 |
+| `notes` | id, todoId, content, timestamp, editedAt, user_id | 任务附加备注 |
+| `tags` | id, name, color | 标签定义表 |
+| `todo_tags` | todoId, tagId | 多对多关联表 |
+| `subtasks` | parentId, childId, user_id | 子任务关联（与 todos.parentId 双机制） |
+| `user_settings` | user_id, theme, language, display_mode, items_per_page, default_view | 用户偏好设置 |
+| `social_accounts` | user_id, provider, provider_user_id | 第三方登录账号 |
+| `cache_table` | key, value, expires_at | 服务端缓存（TTL 5分钟） |
+
+---
+
+### 索引设计
+
+```sql
+idx_todos_user_parent    ON todos(user_id, parentId)   -- 查询子任务
+idx_todos_user_completed ON todos(user_id, completed)  -- 完成状态筛选
+idx_todos_completed_at   ON todos(completed_at)        -- 按完成时间排序
+idx_todos_timestamp      ON todos(timestamp)           -- 按创建时间排序
+idx_notes_todoId         ON notes(todoId)              -- 查询任务备注
+```
+
+---
+
+### 数据库层模块化架构 (`database.js:10-20`)
+
+主 `Database` 类通过委托模式拆分为多个子模块：
+
+| 模块 | 职责 |
+|------|------|
+| `CacheManager` | 读写 `cache_table`，TTL 管理 |
+| `StatsManager` | 统计信息聚合 |
+| `TransactionManager` | BEGIN/COMMIT/ROLLBACK 封装 |
+| `DataValidator` | 数据完整性校验与清理 |
+| `QueryAnalyzer` | EXPLAIN、索引分析、WAL 状态 |
+| `ExportManager` | JSON/Gzip 导出、快照管理 |
+| `BackupManager` | 全量/增量备份、恢复、一致性校验 |
+| `BackupScheduler` | 定时备份（24h全量 + 1h增量） |
+| `DatabaseMonitor` | 慢查询监控、性能统计 |
+
+---
+
+### 关键设计特点
+
+1. **单例模式**: `Database.getInstance()` 确保全应用共享同一连接
+2. **外键约束**: `PRAGMA foreign_keys = ON`，所有关联表使用 `ON DELETE CASCADE`
+3. **时区处理**: 时间戳统一使用北京时间（Asia/Shanghai）
+4. **用户隔离**: 所有业务查询携带 `user_id = ?` 防止数据越权

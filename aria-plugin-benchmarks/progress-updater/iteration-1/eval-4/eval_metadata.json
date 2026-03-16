@@ -1,0 +1,36 @@
+{
+  "eval_id": 4,
+  "eval_name": "percentage-calculation",
+  "category": "calculation",
+  "prompt": "Calculate the overall completion percentage for a project with: 5 completed tasks, 2 in_progress tasks, 3 pending tasks. Partial credit: in_progress counts as 0.5.",
+  "setup": {
+    "completed": 5,
+    "in_progress": 2,
+    "pending": 3,
+    "total": 10,
+    "partial_credit_in_progress": 0.5
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "correct_percentage_with_partial",
+      "description": "Percentage = (5 + 2*0.5) / 10 = 60%",
+      "check": "output.match(/60%|60\\.0%/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "shows_calculation_breakdown",
+      "description": "Should show task count breakdown (completed/in_progress/pending)",
+      "check": "output.match(/completed.*5|5.*completed/i) && output.match(/in.progress.*2|2.*in.progress/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "handles_partial_credit",
+      "description": "Should acknowledge in_progress tasks contribute 0.5 weight",
+      "check": "output.match(/partial|0\\.5|half|weight/i)",
+      "severity": "high"
+    }
+  ]
+}

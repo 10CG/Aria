@@ -1,0 +1,40 @@
+## 🔍 架构搜索结果
+
+**查询**: Where is the login implementation?
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/security.md` | ⭐⭐⭐ | 移动应用认证与安全架构、JWT Token认证、安全措施 |
+| `shared/contracts/api/auth.yaml` | ⭐⭐⭐ | 认证 API 端点定义、登录/注册接口规范、安全要求 |
+
+### 📝 信息摘要
+
+查询定位到两个相关架构文档：1) 移动端安全架构文档详细描述了 JWT 认证流程、Token 存储方式和安全措施；2) 共享 API 契约定义了认证接口的具体规范，包括登录/注册请求/响应格式和速率限制要求。这些文档提供了登录功能的完整架构视角，从实现到契约层面都有覆盖。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/services/auth/auth_service.dart` - 认证服务核心实现
+- `mobile/src/services/auth/token_manager.dart` - Token 管理逻辑
+- `mobile/src/middleware/auth_middleware.dart` - 认证中间件
+- `mobile/src/screens/auth/login_screen.dart` - 登录 UI 实现
+- `shared/contracts/api/auth.yaml` - API 契约定义
+
+### 💡 建议下一步
+
+- [ ] 阅读 `mobile/docs/architecture/security.md` 了解完整的认证安全设计
+- [ ] 查看 `mobile/src/services/auth/auth_service.dart` 实现代码
+- [ ] 参考 `shared/contracts/api/auth.yaml` 了解 API 契约要求
+
+---
+
+**执行统计**:
+- Token 消耗估算: ~250 (Layer 1 快速路由)
+- 读取文档数: 2
+- 关键词命中: "login" 和 "auth" 均命中 auth_security 领域
+- 文档覆盖: 架构文档 + API 契约
+- 节省效果: 83% (相比传统搜索 ~3000 Token)

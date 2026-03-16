@@ -1,0 +1,76 @@
+# Phase B — Mode Selection Decision
+
+**Skill**: phase-b-developer v1.3.0
+**Analysis**: TASK-003 (backend) + TASK-004 (frontend) parallel development
+**Timestamp**: 2026-03-16T14:12:00Z
+
+---
+
+## Mode Evaluation Matrix
+
+| Factor | TASK-003 (Backend) | TASK-004 (Frontend) | Impact |
+|--------|-------------------|--------------------|----|
+| Domain | backend | frontend | Independent |
+| File overlap | backend/api/auth/ | frontend/src/pages/ | None |
+| Shared state | None expected | None expected | Low risk |
+| Duration | ~6h | ~4h | Parallel viable |
+| Dependencies | None between tasks | None between tasks | Independent |
+
+---
+
+## Mode Decision
+
+**Selected Mode: WORKTREE**
+
+### Rationale
+
+Tasks TASK-003 and TASK-004 are:
+1. **Fully independent** — no shared files or logic dependencies
+2. **Different domains** — backend and frontend have no overlap
+3. **Parallel execution viable** — both can proceed simultaneously
+4. **Isolated work areas** — git worktree provides clean isolation per agent
+
+Using `git worktree` allows backend-architect and frontend-developer to work **concurrently** without interfering with each other's changes or requiring branch context switching.
+
+### Alternative Considered: Branch mode
+Branch mode would require sequential execution (TASK-003 then TASK-004) — 10h sequential vs ~6h parallel. Worktree is more efficient for this case.
+
+---
+
+## Worktree Setup
+
+```bash
+# Worktree for backend task (TASK-003)
+$ git worktree add ../project-backend-task003 feature/oauth2-social-login-backend
+Preparing worktree (new branch 'feature/oauth2-social-login-backend')
+HEAD is now at a3f9c12 feat: initial oauth2 spec
+
+# Worktree for frontend task (TASK-004)
+$ git worktree add ../project-frontend-task004 feature/oauth2-social-login-frontend
+Preparing worktree (new branch 'feature/oauth2-social-login-frontend')
+HEAD is now at a3f9c12 feat: initial oauth2 spec
+```
+
+### Active Worktrees
+```
+$ git worktree list
+/project                              a3f9c12 [feature/oauth2-social-login]
+/project-backend-task003              a3f9c12 [feature/oauth2-social-login-backend]
+/project-frontend-task004             a3f9c12 [feature/oauth2-social-login-frontend]
+```
+
+---
+
+## Parallel Execution Plan
+
+| Worktree | Task | Agent | Estimated |
+|----------|------|-------|-----------|
+| project-backend-task003 | TASK-003: Google OAuth callback | backend-architect | 6h |
+| project-frontend-task004 | TASK-004: Social login buttons | frontend-developer | 4h |
+
+**Parallel execution** — both start simultaneously.
+**Merge point**: After both complete, merge both branches into `feature/oauth2-social-login`.
+
+---
+
+## Mode Selection: WORKTREE (parallel execution, isolated worktrees)

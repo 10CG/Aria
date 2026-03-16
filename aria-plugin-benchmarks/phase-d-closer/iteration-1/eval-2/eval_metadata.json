@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "spec-archival",
+  "category": "archive-flow",
+  "prompt": "Execute Phase D D.2: Archive completed OpenSpec for oauth2-social-login. Move from openspec/changes/ to openspec/archive/ with completion metadata.",
+  "setup": {
+    "spec_name": "oauth2-social-login",
+    "source_path": "openspec/changes/oauth2-social-login/",
+    "archive_path": "openspec/archive/oauth2-social-login/",
+    "completion_date": "2026-03-16"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "moves_to_archive_directory",
+      "description": "Should move spec files to openspec/archive/ directory",
+      "check": "output.includes('openspec/archive') || output.includes('archive/') || output.includes('archived')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "preserves_spec_files",
+      "description": "Should preserve proposal.md and tasks.md in archive",
+      "check": "output.includes('proposal.md') || output.includes('tasks.md') || output.includes('preserved')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "adds_completion_metadata",
+      "description": "Should add completion date and PR reference to archived spec",
+      "check": "output.includes('completed_at') || output.includes('completion') || output.includes('2026-03') || output.includes('metadata')",
+      "severity": "high"
+    }
+  ]
+}

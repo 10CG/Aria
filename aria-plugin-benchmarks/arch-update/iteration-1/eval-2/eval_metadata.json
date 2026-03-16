@@ -1,0 +1,43 @@
+{
+  "eval_id": 2,
+  "eval_name": "layer-classification",
+  "category": "layer-system",
+  "prompt": "Classify the following files into the correct architecture layer: project root ARCHITECTURE.md, module-level auth.arch.md, and component-level UserRepository.arch.md",
+  "setup": {
+    "files_to_classify": [
+      {"path": "ARCHITECTURE.md", "expected_layer": "L0"},
+      {"path": "src/auth/auth.arch.md", "expected_layer": "L1"},
+      {"path": "src/auth/UserRepository.arch.md", "expected_layer": "L2"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "classifies_l0_correctly",
+      "description": "ARCHITECTURE.md at root should be classified as L0 (project level)",
+      "check": "output.match(/ARCHITECTURE\\.md.*L0|L0.*ARCHITECTURE\\.md|project.*level/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "classifies_l1_correctly",
+      "description": "Module-level arch.md should be classified as L1",
+      "check": "output.match(/auth\\.arch\\.md.*L1|L1.*auth|module.*level/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "classifies_l2_correctly",
+      "description": "Component-level arch.md should be classified as L2",
+      "check": "output.match(/UserRepository.*L2|L2.*UserRepository|component.*level/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "explains_layer_hierarchy",
+      "description": "Should explain the L0/L1/L2 hierarchy relationship",
+      "check": "output.match(/L0.*L1.*L2|project.*module.*component|hierarchy/i)",
+      "severity": "high"
+    }
+  ]
+}

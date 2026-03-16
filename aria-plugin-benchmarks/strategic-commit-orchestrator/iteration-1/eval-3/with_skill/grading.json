@@ -1,0 +1,30 @@
+{
+  "eval_id": 3,
+  "eval_name": "commit-message-format",
+  "timestamp": "2026-03-16T14:01:30Z",
+  "assertions": [
+    {
+      "text": "conventional_commits_header",
+      "passed": true,
+      "evidence": "Output starts with 'feat(auth): add JWT token validation with expiry check'"
+    },
+    {
+      "text": "subject_length_limit",
+      "passed": true,
+      "evidence": "Subject line is 46 characters, well within the 50-character limit"
+    },
+    {
+      "text": "has_body_content",
+      "passed": true,
+      "evidence": "Body contains 'token', 'expiry', and 'refresh' as required keywords"
+    },
+    {
+      "text": "no_period_at_end",
+      "passed": true,
+      "evidence": "Subject line ends with 'check', not a period"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Conventional Commits format fully compliant: feat(auth) header, 46-char subject, descriptive body with token/expiry/refresh"
+}

@@ -1,0 +1,18 @@
+{
+  "eval_id": 4,
+  "eval_name": "layer1-state-management-routing",
+  "category": "layer-1-routing",
+  "prompt": "状态管理是怎么实现的",
+  "expected_layer": 1,
+  "expected_domain": "state_management",
+  "expected_document_path": "mobile/docs/architecture/state.md",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_state_doc",
+      "description": "Should find state management architecture doc",
+      "check": "output.match(/state.*\\.md|状态.*\\.md|provider|riverpod/i)",
+      "severity": "critical"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "decompose-archived-spec",
+  "timestamp": "2026-03-16T16:41:34.738976+00:00",
+  "assertions": [
+    {
+      "text": "creates_task_list",
+      "passed": true,
+      "evidence": "Matched: '任务'"
+    },
+    {
+      "text": "has_complexity",
+      "passed": true,
+      "evidence": "Matched: 'P1'"
+    },
+    {
+      "text": "has_dependencies",
+      "passed": true,
+      "evidence": "Matched: '顺序'"
+    },
+    {
+      "text": "assigns_agents",
+      "passed": true,
+      "evidence": "Matched: '涉及'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

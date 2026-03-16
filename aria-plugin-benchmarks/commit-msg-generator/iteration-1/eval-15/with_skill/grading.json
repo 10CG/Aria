@@ -1,0 +1,29 @@
+{
+  "eval_id": 15,
+  "eval_name": "eval-15",
+  "timestamp": "2026-03-16T22:30:00Z",
+  "assertions": [
+    {
+      "text": "standard_format",
+      "passed": true,
+      "evidence": "Message follows 'feat(export): ...' format exactly"
+    },
+    {
+      "text": "lowercase_type",
+      "passed": true,
+      "evidence": "Type 'feat' is lowercase"
+    },
+    {
+      "text": "colon_after_scope",
+      "passed": true,
+      "evidence": "Colon present after scope 'export)'"
+    },
+    {
+      "text": "space_after_colon",
+      "passed": true,
+      "evidence": "Space present after colon before subject"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

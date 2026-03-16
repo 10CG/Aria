@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "cli-bug-fix",
+  "category": "bug-workaround",
+  "prompt": "自动修复 CLI 路径 Bug 并归档: spec_path=openspec/changes/payment-gateway, cli_reported_path=standards/openspec/archive/payment-gateway (错误路径), auto_fix=true",
+  "setup": {
+    "spec_path": "openspec/changes/payment-gateway",
+    "cli_wrong_path": "standards/openspec/archive/payment-gateway",
+    "correct_path": "openspec/archive/payment-gateway",
+    "auto_fix": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_cli_bug",
+      "description": "Should detect the CLI path bug (standards/ prefix)",
+      "check": "output.includes('bug') || output.includes('fix') || output.includes('修复') || output.includes('incorrect') || output.includes('错误')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "corrects_path_automatically",
+      "description": "Should auto-correct to project-local openspec/archive/ path",
+      "check": "output.includes('openspec/archive') && !output.includes('standards/openspec/archive')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "documents_fix_applied",
+      "description": "Should document that the bug fix was applied",
+      "check": "output.includes('auto-fix') || output.includes('auto_fix') || output.includes('corrected') || output.includes('已修复') || output.includes('fixed')",
+      "severity": "high"
+    }
+  ]
+}

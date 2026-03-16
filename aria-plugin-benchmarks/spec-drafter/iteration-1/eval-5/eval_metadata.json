@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "bilingual-support",
+  "category": "i18n",
+  "prompt": "双语输入处理: 'Add a dark mode feature / 添加深色模式功能' — 请生成英文 proposal",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "handles_mixed_input",
+      "description": "Should correctly parse mixed Chinese/English input",
+      "check": "output.includes('dark mode') || output.includes('Dark Mode') || output.includes('深色模式')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "generates_english_output",
+      "description": "Should generate proposal content in English as requested",
+      "check": "output.includes('Background') && output.includes('Scope') && output.includes('Goal')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "preserves_intent",
+      "description": "Should preserve the feature intent from both language inputs",
+      "check": "output.includes('theme') || output.includes('mode') || output.includes('UI') || output.includes('appearance')",
+      "severity": "medium"
+    }
+  ]
+}

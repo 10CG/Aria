@@ -1,0 +1,40 @@
+{
+  "eval_id": 4,
+  "eval_name": "cross-skill-compatibility",
+  "category": "integration",
+  "prompt": "How does arch-common integrate with arch-search and arch-update skills? Explain the shared configuration points.",
+  "setup": {
+    "skills_to_check": ["arch-search", "arch-update"],
+    "query_type": "integration"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "mentions_arch_search_integration",
+      "description": "Should explain how arch-common config is used by arch-search",
+      "check": "output.match(/arch-search|arch_search/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "mentions_arch_update_integration",
+      "description": "Should explain how arch-common config is used by arch-update",
+      "check": "output.match(/arch-update|arch_update/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_shared_config",
+      "description": "Should identify the shared configuration elements (layer definitions, naming rules)",
+      "check": "output.match(/shared.*config|common.*config|layer.*definition|naming.*convention/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "explains_consistency_benefit",
+      "description": "Should explain why shared config ensures consistent behavior across skills",
+      "check": "output.match(/consistent|unified|single.*source|shared.*standard/i)",
+      "severity": "high"
+    }
+  ]
+}

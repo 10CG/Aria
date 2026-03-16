@@ -1,0 +1,155 @@
+{
+  "skill_name": "forgejo-sync",
+  "skill_path": "aria/skills/forgejo-sync",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for forgejo-sync skill - User Story to Forgejo Issue sync and PRD Wiki publishing",
+  "metrics": [
+    "sync_accuracy",
+    "publish_correctness",
+    "bidirectional_fidelity",
+    "metadata_mapping_accuracy"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "story-to-issue-sync",
+      "category": "sync-flow",
+      "prompt": "同步 User Story 到 Forgejo Issue: story_id=US-001, title=用户登录功能, description=实现JWT登录, acceptance_criteria=[登录成功返回token, 失败返回401], repo=10cg/my-project",
+      "setup": {
+        "story_id": "US-001",
+        "repo": "10cg/my-project",
+        "expected_action": "create_or_update"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "creates_forgejo_issue",
+          "description": "Should create or update a Forgejo Issue from the User Story",
+          "check": "output.includes('Issue') || output.includes('issue') || output.includes('创建')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "maps_story_title",
+          "description": "Should map User Story title to Issue title",
+          "check": "output.includes('用户登录') || output.includes('US-001') || output.includes('title')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "includes_acceptance_criteria",
+          "description": "Should include acceptance criteria in Issue body",
+          "check": "output.includes('acceptance') || output.includes('验收') || output.includes('criteria') || output.includes('token') || output.includes('401')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "prd-to-wiki-publish",
+      "category": "publish-flow",
+      "prompt": "将 PRD 文档发布到 Forgejo Wiki: prd_path=openspec/changes/user-auth/proposal.md, wiki_page=User-Auth-PRD, repo=10cg/my-project, version=1.0",
+      "setup": {
+        "prd_path": "openspec/changes/user-auth/proposal.md",
+        "wiki_page": "User-Auth-PRD",
+        "repo": "10cg/my-project"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "publishes_to_wiki",
+          "description": "Should publish PRD content to Forgejo Wiki",
+          "check": "output.includes('Wiki') || output.includes('wiki') || output.includes('发布')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "references_prd_path",
+          "description": "Should reference the source PRD document path",
+          "check": "output.includes('proposal.md') || output.includes('openspec') || output.includes('user-auth')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "sets_wiki_page_name",
+          "description": "Should use correct wiki page name",
+          "check": "output.includes('User-Auth-PRD') || output.includes('wiki_page') || output.includes('页面')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "bidirectional-status-sync",
+      "category": "bidirectional",
+      "prompt": "双向同步状态: story_id=US-001, forgejo_issue=42, story_status=in-progress, issue_status=open, direction=bidirectional, repo=10cg/my-project",
+      "setup": {
+        "story_id": "US-001",
+        "issue_number": 42,
+        "story_status": "in-progress",
+        "issue_status": "open"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "syncs_status_to_issue",
+          "description": "Should update Forgejo Issue status to match Story status",
+          "check": "output.includes('in-progress') || output.includes('进行中') || output.includes('status') || output.includes('状态')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "reflects_issue_back_to_story",
+          "description": "Should reflect Forgejo Issue changes back to User Story",
+          "check": "output.includes('bidirectional') || output.includes('双向') || output.includes('sync') || output.includes('同步')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_both_entities",
+          "description": "Should identify both the story and issue being synced",
+          "check": "output.includes('US-001') || (output.includes('42') && output.includes('Issue'))",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "label-mapping",
+      "category": "metadata",
+      "prompt": "映射 Story 元数据到 Forgejo Labels: story_id=US-001, priority=high, module=backend, type=feature, sprint=Sprint-3, repo=10cg/my-project",
+      "setup": {
+        "story_id": "US-001",
+        "metadata": {
+          "priority": "high",
+          "module": "backend",
+          "type": "feature",
+          "sprint": "Sprint-3"
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "maps_priority_label",
+          "description": "Should map priority to a Forgejo label",
+          "check": "output.includes('high') || output.includes('priority') || output.includes('优先级') || output.includes('label')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "maps_module_label",
+          "description": "Should map module identifier to a label",
+          "check": "output.includes('backend') || output.includes('module') || output.includes('模块')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "maps_type_label",
+          "description": "Should map story type to a label",
+          "check": "output.includes('feature') || output.includes('type') || output.includes('类型')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

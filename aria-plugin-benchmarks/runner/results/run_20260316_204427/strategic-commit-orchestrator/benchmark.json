@@ -1,0 +1,24 @@
+{
+  "benchmark_name": "strategic-commit-orchestrator",
+  "test_type": "real_execution",
+  "test_project": "todo-web",
+  "timestamp": "2026-03-16T20:53:28.807571+00:00",
+  "total_evals": 1,
+  "passed": 1,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "total_tokens": 1521,
+  "total_duration_ms": 34032,
+  "total_cost_usd": 0.1033,
+  "eval_results": [
+    {
+      "eval_id": "real-1",
+      "eval_name": "analyze-multi-file-changes",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "tokens": 1521,
+      "duration_ms": 34032,
+      "failed_assertions": []
+    }
+  ]
+}

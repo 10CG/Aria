@@ -1,0 +1,48 @@
+{
+  "eval_id": 5,
+  "eval_name": "phase-boundary-error-recovery",
+  "category": "error-handling",
+  "description": "Test failure at B->C boundary: branch-finisher detects failing tests, user retries, then proceeds to C",
+  "prompt": "Complete development but tests are failing - handle the failure and retry",
+  "skills_involved": [
+    "phase-b-developer", "branch-finisher", "phase-c-integrator",
+    "commit-msg-generator"
+  ],
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_test_failure",
+      "description": "branch-finisher must detect and report test failures",
+      "check": "output.match(/test.*fail|FAIL|failure.*detected/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "offers_retry_option",
+      "description": "branch-finisher should offer option to continue modifying (not just abort)",
+      "check": "output.match(/continue.*modif|option.*2|retry|keep.*working/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "revalidation_after_fix",
+      "description": "After fix, branch-finisher should re-run validation",
+      "check": "output.match(/re-?run|re-?validat|test.*again|verification.*pass/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "proceeds_to_phase_c",
+      "description": "After successful retry, should proceed to Phase C commit",
+      "check": "output.match(/Phase C|commit.*generat|proceed.*integrat/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "no_context_loss",
+      "description": "Branch name and task context must be preserved across retry",
+      "check": "output.match(/feature\\/|TASK-/) && !output.includes('context lost')",
+      "severity": "high"
+    }
+  ]
+}

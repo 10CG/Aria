@@ -1,0 +1,165 @@
+# 认证功能搜索结果 - BASELINE 测试（传统方法）
+
+**查询**: "搜索认证功能在哪里实现的"
+**方法**: Grep/Glob 传统搜索方法
+**工作目录**: F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project
+
+---
+
+## 搜索方法
+
+1. **文件查找**: 使用 Glob 遍历整个项目结构，找到所有文档和代码文件
+2. **关键词搜索**:
+   - 第一轮：认证相关关键词 (auth, Auth, 认证, 登陆, 登录, login, Login, authenticate, Authenticate, token, Token, jwt, JWT, password, Password)
+   - 第二轮：会话和用户相关关键词 (session, Session, user, User, account, Account, api, API, endpoint, Endpoint, middleware, Middleware, guard, Guard)
+   - 第三轮：在特定文件中搜索更详细的信息
+
+---
+
+## 发现的文档
+
+### 1. 主要架构文档
+
+- **mobile/docs/architecture/security.md**
+  - 移动应用的认证与安全架构
+  - 详细描述了 JWT Token 认证流程
+  - 包含安全措施和最佳实践
+
+- **mobile/docs/architecture/network.md**
+  - 网络通信架构
+  - 包含认证拦截器实现
+  - API 服务示例
+
+- **DOMAINS.md**
+  - 域路由映射表
+  - 指明了认证功能的主要入口文档
+
+- **backend/docs/ARCHITECTURE.md**
+  - 后端整体架构
+  - 展示了分层架构设计
+
+- **backend/docs/architecture/database.md**
+  - 数据库设计文档
+  - 包含用户表结构
+
+- **shared/contracts/openapi/api.yaml**
+  - API 契约定义
+  - 包含认证相关端点
+
+### 2. 次要参考文档
+
+- mobile/docs/ARCHITECTURE.md（主架构文档，引用了安全文档）
+- mobile/docs/architecture/state.md（状态管理）
+- mobile/docs/architecture/sync.md（数据同步）
+
+---
+
+## 关键发现
+
+### 认证架构概览
+
+认证功能采用 JWT Token 认证机制：
+
+1. **认证服务** (`mobile/src/services/auth/auth_service.dart`)
+   - 用户登录 (login)
+   - 用户登出 (logout)
+   - Token 刷新 (refreshToken)
+
+2. **Token 管理**
+   - AccessToken: 存储在内存中
+   - RefreshToken: 使用 flutter_secure_storage 安全存储
+
+3. **安全措施**
+   - TLS 1.3 强制加密
+   - SSL Pinning 证书锁定
+   - ProGuard/R8 代码混淆
+   - Root/越狱设备检测
+
+### 网络层集成
+
+认证通过拦截器机制集成到网络层：
+
+1. **认证拦截器** (`AuthInterceptor`)
+   - 自动添加 Authorization Bearer Token
+   - 在请求前检查并添加 Token
+
+2. **错误处理策略**
+   - 401 错误: Token 刷新后重试
+   - 其他网络错误: 自动重试机制
+
+### 数据存储
+
+后端数据库设计包含：
+
+1. **用户表 (users)**
+   - id (UUID)
+   - email (唯一)
+   - password_hash (加密存储)
+   - 其他用户信息
+
+2. **任务表 (tasks)**
+   - user_id 外键关联用户
+   - 任务基本信息
+
+### API 端点
+
+从 OpenAPI 契约中发现认证相关端点：
+
+- `POST /auth/login` - 用户登录
+- `POST /auth/register` - 用户注册
+
+---
+
+## 代码指针
+
+### 核心文件
+
+| 功能 | 文件路径 |
+|------|----------|
+| 认证服务 | `mobile/src/services/auth/auth_service.dart` |
+| Token 管理 | `mobile/src/services/auth/token_manager.dart` |
+| 认证拦截器 | `mobile/src/middleware/auth_middleware.dart` |
+| 登录页面 | `mobile/src/screens/auth/login_screen.dart` |
+| 注册页面 | `mobile/src/screens/auth/register_screen.dart` |
+| API 服务接口 | `mobile/src/services/api/` (Retrofit) |
+| 用户模型 | `backend/src/models/user.py` |
+| 数据库配置 | `backend/src/config/database.py` |
+| API 契约 | `shared/contracts/openapi/api.yaml` |
+
+### 架构文档
+
+| 领域 | 文档路径 | 关键内容 |
+|------|----------|----------|
+| 认证安全 | `mobile/docs/architecture/security.md` | JWT认证流程、安全措施 |
+| 网络通信 | `mobile/docs/architecture/network.md` | 拦截器、API调用策略 |
+| 域路由 | `DOMAINS.md` | 快速定位认证相关文档 |
+| 数据库设计 | `backend/docs/architecture/database.md` | 用户表结构、关联关系 |
+
+---
+
+## Token 使用估计
+
+**估计 Token 消耗**: ~2000-3000 tokens
+
+**详细构成**:
+- 扫描了 11 个文档文件
+- 多次使用 Grep 搜索（每个搜索约 100-200 tokens）
+- 阅读了主要架构文档（security.md ~300 tokens, network.md ~300 tokens）
+- 搜索了 API 契约文件（约 500 tokens）
+- 查看了数据库文档（约 200 tokens）
+
+---
+
+## 与技能搜索的对比优势
+
+**传统方法的优势**:
+1. **全面覆盖**: 自动搜索所有相关文件，不会遗漏
+2. **灵活调整**: 可以随时修改搜索关键词和策略
+3. **深度控制**: 可以精确控制搜索范围和上下文
+
+**传统方法的劣势**:
+1. **需要更多指导**: 需要明确知道要搜索哪些关键词
+2. **耗时更长**: 需要多次迭代和调整
+3. **需要专业知识**: 需要理解项目结构和术语
+
+**观察**: 基线测试展示了传统搜索方法的系统性，但依赖明确的搜索词。而 arch-search 技能可能通过理解语义更快速定位核心信息。

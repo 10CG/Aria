@@ -1,0 +1,22 @@
+## Agent Router Result
+
+**Task**: Implement a new REST API endpoint POST /api/v1/orders that validates request body, writes to PostgreSQL, and returns 201 on success.
+
+**Routing Decision**: backend-architect
+**Confidence**: 0.92
+
+**Rationale**:
+- Task involves REST API endpoint implementation (backend domain)
+- PostgreSQL database write operations indicate server-side data layer work
+- File paths backend/src/routes/orders.py and backend/src/models/order.py confirm backend scope
+- No frontend/mobile signals detected in task description
+
+**Matched Signals**:
+| Signal | Weight | Domain |
+|--------|--------|--------|
+| REST API endpoint | 0.40 | backend |
+| PostgreSQL | 0.35 | backend |
+| request validation | 0.17 | backend |
+
+**Selected Agent**: backend-architect
+**Suggested Workflow**: B.1 → B.2 (branch + implement + review)

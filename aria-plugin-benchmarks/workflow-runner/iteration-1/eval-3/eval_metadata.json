@@ -1,0 +1,41 @@
+{
+  "eval_id": 3,
+  "eval_name": "preset-workflow-feature",
+  "category": "preset",
+  "prompt": "Use the 'new-feature' preset workflow to set up for developing a new push notification feature.",
+  "setup": {
+    "workflow_type": "preset",
+    "preset_name": "new-feature",
+    "task": "Add push notification feature"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "recognizes_preset",
+      "description": "Should recognize and load the 'new-feature' preset",
+      "check": "output.match(/new-feature|new_feature/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_spec_phase",
+      "description": "new-feature preset must include spec creation (A.1)",
+      "check": "output.match(/A\\.1|spec-drafter|OpenSpec/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "includes_branch_creation",
+      "description": "new-feature preset must include branch creation (B.1)",
+      "check": "output.match(/B\\.1|branch|feature\\//i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "includes_merge_step",
+      "description": "new-feature preset must include merge to main (C.2)",
+      "check": "output.match(/C\\.2|merge|main/i)",
+      "severity": "high"
+    }
+  ]
+}

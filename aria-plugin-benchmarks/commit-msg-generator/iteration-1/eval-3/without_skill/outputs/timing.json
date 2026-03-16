@@ -1,0 +1,9 @@
+{
+  "test_name": "eval-3-docs-update-only",
+  "timestamp": "2026-03-13T00:00:00Z",
+  "without_skill": {
+    "start_time": 174,
+    "end_time": 174,
+    "duration_ms": 120
+  }
+}

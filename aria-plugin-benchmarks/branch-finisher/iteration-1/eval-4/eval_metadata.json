@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "branch-status-check",
+  "category": "validation",
+  "prompt": "检查分支 feature/backend/TASK-101-user-auth 是否准备好完成: check_uncommitted=true, check_upstream=true, check_tests=true",
+  "setup": {
+    "branch": "feature/backend/TASK-101-user-auth",
+    "expected_status": "ready"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "checks_uncommitted_changes",
+      "description": "Should verify no uncommitted changes remain",
+      "check": "output.includes('uncommitted') || output.includes('未提交') || output.includes('clean') || output.includes('working tree')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "checks_upstream_sync",
+      "description": "Should verify branch is synced with upstream",
+      "check": "output.includes('upstream') || output.includes('remote') || output.includes('origin') || output.includes('同步')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "reports_ready_status",
+      "description": "Should report overall readiness status",
+      "check": "output.includes('ready') || output.includes('准备') || output.includes('Ready') || output.includes('status')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-2",
+  "eval_name": "validate-architecture-doc",
+  "timestamp": "2026-03-16T15:38:10.036197+00:00",
+  "assertions": [
+    {
+      "text": "finds_arch_file",
+      "passed": false,
+      "evidence": "Pattern 'system-architecture|architecture' not found in output"
+    },
+    {
+      "text": "checks_structure",
+      "passed": false,
+      "evidence": "Pattern 'section|component|module|layer' not found in output"
+    },
+    {
+      "text": "reports_result",
+      "passed": false,
+      "evidence": "Pattern 'pass|fail|valid|invalid|issue|warning' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

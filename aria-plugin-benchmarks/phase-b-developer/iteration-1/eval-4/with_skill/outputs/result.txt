@@ -1,0 +1,93 @@
+# Phase B — B.2 Subagent Delegation: TASK-004
+
+**Skill**: phase-b-developer v1.3.0
+**Task**: TASK-004 — Account linking service
+**Delegating to**: backend-architect
+**Timestamp**: 2026-03-16T14:13:00Z
+
+---
+
+## Delegation Package
+
+Delegating TASK-004 to backend-architect with full context...
+
+### Task Brief for backend-architect
+
+```yaml
+task:
+  id: TASK-004
+  title: Account linking service
+  complexity: L
+  estimated_hours: 8
+  branch: feature/oauth2-social-login
+  worktree: /project-backend-task004
+
+spec_reference:
+  path: openspec/changes/oauth2-social-login/proposal.md
+  relevant_sections:
+    - "Account Linking"
+    - "OAuth2 User Flow"
+    - "Database Schema"
+
+context:
+  description: >
+    Implement the service layer that links a GitHub/Google social identity
+    to an existing user account (or creates a new user on first login).
+    This service is called by the OAuth2 callback handlers (TASK-002, TASK-003).
+
+  dependencies_complete:
+    - TASK-001  # oauth_accounts table exists
+    - TASK-002  # github_callback handler calls this service
+    - TASK-003  # google_callback handler calls this service (in progress)
+
+  deliverables:
+    - backend/services/account_linking.py
+    - backend/models/oauth_account.py
+    - backend/tests/test_account_linking.py
+
+verification_criteria:
+  - "create_or_link_user(provider, profile) creates new user when no match found"
+  - "create_or_link_user() links to existing user when email matches"
+  - "Prevents duplicate oauth_accounts entries for same provider+social_id"
+  - "Returns (user, created: bool) tuple in all cases"
+  - "Unit tests: coverage >= 90%"
+  - "No plaintext tokens stored in oauth_accounts table"
+
+done_when:
+  - All deliverable files created and committed
+  - Unit tests pass: pytest backend/tests/test_account_linking.py
+  - No regression in TASK-002 tests: pytest backend/tests/test_github_oauth.py
+```
+
+---
+
+## Delegation Status
+
+> Delegating to backend-architect...
+> backend-architect acknowledged task assignment.
+> Awaiting completion signal from backend-architect subagent.
+
+**Waiting** for backend-architect to complete TASK-004...
+
+[... 7h 42m elapsed ...]
+
+> backend-architect: TASK-004 COMPLETE
+> Handback received: all deliverables created, tests passing
+
+---
+
+## Completion Verification
+
+```
+$ pytest backend/tests/test_account_linking.py -v
+PASSED test_creates_new_user_on_first_login
+PASSED test_links_existing_user_by_email
+PASSED test_prevents_duplicate_oauth_account
+PASSED test_returns_user_and_created_flag
+PASSED test_rejects_plaintext_token_storage
+PASSED test_handles_provider_email_not_available
+
+6 passed, 0 failed — TASK-004 complete
+```
+
+**TASK-004 COMPLETE** — backend-architect handback accepted.

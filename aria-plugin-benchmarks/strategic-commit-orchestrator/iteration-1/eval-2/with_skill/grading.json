@@ -1,0 +1,25 @@
+{
+  "eval_id": 2,
+  "eval_name": "cross-module-grouping",
+  "timestamp": "2026-03-16T14:01:00Z",
+  "assertions": [
+    {
+      "text": "separates_modules",
+      "passed": true,
+      "evidence": "Output explicitly contains 'backend', 'frontend', 'shared', and 'mobile' as separate module groups"
+    },
+    {
+      "text": "identifies_shared_types_first",
+      "passed": true,
+      "evidence": "Group 1 is 'Shared Types (依赖基础)' - shared/types/user.ts identified as dependency foundation"
+    },
+    {
+      "text": "produces_multiple_groups",
+      "passed": true,
+      "evidence": "Output contains 'Group 2' and 'Group 3', confirming 3 commit groups produced"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Cross-module grouping correctly identified 4 modules, shared types dependency, and produced 3 ordered commit groups"
+}

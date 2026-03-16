@@ -1,0 +1,44 @@
+arch-common: Layer Hierarchy Definition
+=========================================
+
+The arch-common skill defines a three-tier layer system for architecture documentation.
+
+LAYER DEFINITIONS:
+
+  L0 - Project Level
+    Scope: Entire project / system overview
+    Purpose: Top-level entry point describing cross-module architecture, system
+             boundaries, technology stack, and module map.
+    Example: /ARCHITECTURE.md
+    Who reads it: New team members, architects, stakeholders
+
+  L1 - Module Level
+    Scope: A single module or bounded context
+    Purpose: Describes the internal design of a module, its components, public
+             interfaces, and design decisions.
+    Example: src/auth/auth.arch.md
+    Who reads it: Developers working within or integrating with a module
+
+  L2 - Component Level
+    Scope: A single component, class, or service
+    Purpose: Deep-dive documentation for a specific component's implementation
+             details, data flow, and invariants.
+    Example: src/auth/UserRepository.arch.md
+    Who reads it: Developers maintaining or extending a specific component
+
+LAYER HIERARCHY:
+
+  L0 (Project)
+    contains L1 (Module A)
+      contains L2 (Component 1)
+      contains L2 (Component 2)
+    contains L1 (Module B)
+      contains L2 (Component 3)
+
+  Each L0 document references all L1 modules.
+  Each L1 document references its L2 components.
+  The hierarchy is a parent-child tree: L0 -> L1 -> L2.
+
+SUMMARY:
+  L0 = project,  L1 = module,  L2 = component
+  Docs flow from high-level overview (L0) down to implementation detail (L2).

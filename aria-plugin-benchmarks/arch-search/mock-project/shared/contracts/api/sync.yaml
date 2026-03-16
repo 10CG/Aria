@@ -1,0 +1,108 @@
+# Sync API Contract
+
+openapi: 3.0.0
+info:
+  title: Data Sync API
+  version: 1.0.0
+  description: API 契约 - 离线数据同步接口
+
+paths:
+  /api/sync/sync:
+    post:
+      summary: 增量同步
+      description: 获取本地变更的远程数据，并上传本地变更
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                last_sync:
+                  type: string
+                  format: date-time
+                device_id:
+                  type: string
+                changes:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/DataChange"
+      responses:
+        "200":
+          description: 同步成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  synced_at:
+                    type: string
+                    format: date-time
+                  conflicts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Conflict"
+                  has_more:
+                    type: boolean
+
+  /api/sync/status:
+    get:
+      summary: 获取同步状态
+      description: 获取当前设备的同步状态
+      responses:
+        "200":
+          description: 成功获取状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncStatus"
+
+components:
+  schemas:
+    DataChange:
+      type: object
+      properties:
+        entity:
+          type: string
+        id:
+          type: string
+        action:
+          type: string
+          enum: [create, update, delete]
+        data:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+    
+    Conflict:
+      type: object
+      properties:
+        entity:
+          type: string
+        id:
+          type: string
+        local_version:
+          type: object
+        remote_version:
+          type: object
+        conflict_type:
+          type: string
+          enum: ["timestamp_conflict", "value_conflict"]
+    
+    SyncStatus:
+      type: object
+      properties:
+        last_sync:
+          type: string
+          format: date-time
+        pending_count:
+          type: integer
+        conflict_count:
+          type: integer
+        device_id:
+          type: string
+        status:
+          type: string
+          enum: ["synced", "pending", "conflict", "error"]
+

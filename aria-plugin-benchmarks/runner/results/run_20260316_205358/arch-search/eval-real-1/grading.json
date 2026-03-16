@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "search-auth-implementation",
+  "timestamp": "2026-03-16T20:58:12.942013+00:00",
+  "assertions": [
+    {
+      "text": "finds_relevant_docs",
+      "passed": true,
+      "evidence": "Matched: 'auth'"
+    },
+    {
+      "text": "provides_file_pointers",
+      "passed": true,
+      "evidence": "Matched: '.js'"
+    },
+    {
+      "text": "structured_output",
+      "passed": true,
+      "evidence": "Matched: 'architecture'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,103 @@
+# 传统方法搜索结果报告
+## 搜索任务：查找数据库设计文档
+
+**搜索方法**：使用 Grep 和 Glob 传统搜索工具
+**工作目录**：F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project
+**搜索查询**：数据库、database、db、schema、设计、design
+
+---
+
+## 搜索步骤
+
+### 1. 列出项目中的文档文件
+使用 `find` 命令查找所有 markdown 文档文件：
+- 发现 10 个文档文件，主要集中在 mobile/docs/architecture/ 和 backend/docs/architecture/ 目录
+
+### 2. 使用 Grep 搜索数据库相关内容
+使用 `grep -i` 在整个项目中搜索：
+- 匹配 7 个文件包含数据库相关关键词
+- 主要匹配文件：database.md、DOMAINS.md、network.md 等
+
+### 3. 检查其他文件类型
+- 查找 Python 文件：未找到
+- 查找 Dart 文件：未找到
+- 查找 YAML 文件：找到 api.yaml（API 契约文件）
+
+---
+
+## 找到的相关文档
+
+### 主要数据库设计文档
+**文件路径**：`backend/docs/architecture/database.md`
+
+这是最直接相关的数据库设计文档，包含：
+- 数据库选型：PostgreSQL 15 + Redis 7
+- Schema 设计原则：3NF 规范化、索引策略、软删除
+- 核心表结构：用户表 (users)、任务表 (tasks)
+- 相关代码文件引用：配置、模型、迁移脚本等
+- 性能优化策略：连接池、读写分离、分区
+
+### 领域路由映射文档
+**文件路径**：`DOMAINS.md`
+
+记录了数据存储模块的路由信息：
+- Primary：`backend/docs/architecture/database.md`
+- Keywords：database, 数据库, DB, storage, 存储, schema, 表, table, model, 模型
+- Secondary：`shared/contracts/db/schema.sql`、`backend/src/models/README.md`
+
+### API 契约文档
+**文件路径**：`shared/contracts/openapi/api.yaml`
+
+包含与数据库相关的 API 定义：
+- 用户认证相关端点：/auth/login, /auth/register
+- 任务管理端点：/tasks, /tasks/{id}
+- 但不包含具体的数据库 schema 定义
+
+---
+
+## 相关代码指针
+
+虽然项目中没有实际的代码文件（可能是文档项目），但 database.md 中提到了以下代码文件路径：
+
+| 功能 | 文件路径 |
+|------|----------|
+| 数据库配置 | `backend/src/config/database.py` |
+| 用户模型 | `backend/src/models/user.py` |
+| 任务模型 | `backend/src/models/task.py` |
+| 迁移脚本 | `backend/migrations/` |
+| Repository | `backend/src/repositories/` |
+
+---
+
+## 搜索总结
+
+### 优势
+1. **直接命中**：找到了专门的数据库设计文档
+2. **内容完整**：文档包含了架构设计、实现细节和代码引用
+3. **辅助信息**：DOMAINS.md 提供了模块间的关联信息
+
+### 限制
+1. **无法理解上下文**：无法判断这些文档的相关性优先级
+2. **依赖人工判断**：需要人工阅读文档内容才能找到相关信息
+3. **搜索范围受限**：只能通过关键词匹配，无法理解语义关系
+4. **重复工作**：需要多次搜索才能找到完整的架构信息
+
+### Token 使用估计
+- Grep 搜索：约 500 tokens
+- 文档读取：约 2000 tokens
+- 总计：约 2500 tokens
+
+---
+
+## 与 Arch-Skill 的对比
+
+传统方法能够找到文档，但：
+- ❌ 无法自动关联相关文档
+- ❌ 无法理解模块间关系
+- ❌ 无法提供完整的架构视图
+- ❌ 需要人工整合信息
+
+相比 arch-skill 的智能搜索，传统方法缺乏：
+- 语义理解能力
+- 自动关联推荐
+- 架构上下文意识

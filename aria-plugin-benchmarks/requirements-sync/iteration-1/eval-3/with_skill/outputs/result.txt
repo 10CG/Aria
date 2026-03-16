@@ -1,0 +1,62 @@
+# Requirements Sync — New Story Addition Report
+
+> **Operation**: Add New Story to UPM
+> **Skill**: requirements-sync v1.1.0
+> **Timestamp**: 2026-03-16T14:16:00Z
+
+## Sync Result: SUCCESS — US-099 added to UPM
+
+---
+
+## New Entry Added
+
+```yaml
+# Added to UPM requirements section
+- id: REQ-099
+  story_ref: US-099
+  title: "Support multi-language notifications"
+  status: To Do
+  initial_status: To Do
+  created: 2026-03-16T14:16:00Z
+  source: requirements-sync
+```
+
+---
+
+## UPM Diff (requirements section)
+
+```diff
+ requirements:
+   - id: REQ-097
+     story_ref: US-097
+     status: Done
+   - id: REQ-098
+     story_ref: US-098
+     status: In Progress
++  - id: REQ-099
++    story_ref: US-099
++    title: "Support multi-language notifications"
++    status: To Do
++    created: 2026-03-16T14:16:00Z
+```
+
+---
+
+## Impact Report
+
+- **Added**: 1 new entry (REQ-099 / US-099)
+- **Modified**: 0 existing entries (preserved unchanged)
+- **Deleted**: 0 entries
+- **UPM section integrity**: maintained
+
+Existing entries REQ-097 and REQ-098 are **unchanged** and unaffected by this operation.
+
+---
+
+## Summary
+
+| Operation | Count |
+|-----------|-------|
+| New entries added | 1 |
+| Existing entries unchanged | 2 |
+| Initial status assigned | To Do |

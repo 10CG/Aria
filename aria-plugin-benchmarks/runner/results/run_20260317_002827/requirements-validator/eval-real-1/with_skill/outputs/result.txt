@@ -1,0 +1,70 @@
+已完整读取 PRD 及 UPM 文档，现在进行交叉验证分析。
+
+---
+
+## PRD 验证报告
+
+**文件**: `docs/requirements/prd-todo-optimization-v1.md`
+
+---
+
+### 🔴 严重问题（数据不一致）
+
+**1. Phase 4 状态错误**
+- PRD 第 38 行: `Phase 4: 验收发布 | 🔄 进行中`
+- UPM 实际状态: `✅ 已完成`，完成日期 `2026-02-26`
+- **需修正为已完成**
+
+**2. Phase 4 OpenSpec 路径错误**
+- PRD 第 38 行指向: `openspec/changes/phase4-acceptance-release/proposal.md`
+- 实际归档路径: `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`
+- **路径不存在，链接失效**
+
+**3. 功能需求状态过期（Phase 2 已完成但仍标"进行中"）**
+| 需求 ID | 当前状态 | 应为 |
+|---------|---------|------|
+| FR-BE-003 (请求验证中间件) | 🔄 进行中 (Phase 2) | ✅ 已完成 |
+| FR-BE-004 (API 限流) | 🔄 进行中 (Phase 2) | ✅ 已完成 |
+| FR-FE-002 (JS 模块化重构) | 🔄 进行中 (Phase 2) | ✅ 已完成 |
+
+**4. 版本号前后矛盾**
+- Frontmatter `version: 1.5.0`（第 7 行）
+- 文档标题 `# Todo App 优化 PRD v1.3`（第 20 行）
+- 文档元信息 `**版本**: 1.3.0`（第 24 行）
+- **三处不一致，应统一为 1.5.0**
+
+**5. 最后更新日期矛盾**
+- Frontmatter `updated_at: 2026-02-26`（第 6 行）
+- 文档元信息 `**最后更新**: 2026-02-15`（第 27 行）
+- **应统一为 2026-02-26**
+
+---
+
+### 🟡 轻微问题
+
+**6. 变更历史（第 10.3 节）不完整**
+- 仅记录到 v1.1.0，缺少 v1.2.0 ~ v1.5.0 的条目
+
+**7. Frontmatter `relationships` 缺少 Phase 4 归档链接**
+- 第 14-17 行的 `related_to` 列表缺少 `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`
+
+---
+
+### ✅ 通过项
+
+- Phase 1 / 2 / 3 状态与 UPM 一致（均为已完成）
+- 测试覆盖 T1 / T2 归档路径正确
+- 功能需求 FR-BE-001、FR-BE-002、FR-FE-001、FR-FE-003 ~ FR-FE-006 状态正确
+- 验收标准（第 8 节）与 UPM 量化指标吻合（覆盖率 88.48%、Lighthouse 96分、API P95 <160ms）
+
+---
+
+### 总结
+
+| 类型 | 数量 |
+|------|------|
+| 严重问题 | 5 |
+| 轻微问题 | 2 |
+| 通过 | 全部其他项 |
+
+是否要我自动修复以上所有问题？

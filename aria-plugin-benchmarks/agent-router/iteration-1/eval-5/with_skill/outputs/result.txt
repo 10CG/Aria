@@ -1,0 +1,25 @@
+## Agent Router Result
+
+**Task**: Review the overall project architecture, assess technical debt across all modules, and create a refactoring roadmap.
+
+**Routing Decision**: tech-lead (fallback — no specific domain match)
+**Confidence**: 0.78
+
+**Rationale**:
+- Task involves overall/broad architectural review spanning all modules
+- No specific domain signals (no Flutter, no database, no API path)
+- "Technical debt across all modules" is a cross-cutting concern
+- Refactoring roadmap creation is a strategic, leadership-level task
+- Fallback to tech-lead is appropriate for broad, cross-cutting decisions
+
+**Domain Signal Analysis**:
+| Domain | Signals | Match |
+|--------|---------|-------|
+| backend | none detected | no |
+| mobile | none detected | no |
+| cross-cutting | "overall", "all modules", "roadmap" | yes |
+
+**No file path signals provided** — unable to narrow scope to a specific agent.
+
+**Selected Agent**: tech-lead
+**Suggested Workflow**: A.0 → A.1 (state scan → spec creation before implementing)

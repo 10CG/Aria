@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "branch-status-check",
+  "timestamp": "2026-03-16T14:07:00Z",
+  "assertions": [
+    {
+      "text": "checks_uncommitted_changes",
+      "passed": true,
+      "evidence": "Output contains 'working tree clean' and 'uncommitted' check result showing 0 files"
+    },
+    {
+      "text": "checks_upstream_sync",
+      "passed": true,
+      "evidence": "Output contains 'origin' upstream sync check, 'remote commits behind: 0', and '同步状态: Up to date'"
+    },
+    {
+      "text": "reports_ready_status",
+      "passed": true,
+      "evidence": "Output summary table shows 'Overall Status: Ready' and '分支准备好完成'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Branch status check performed all 3 validations: clean working tree, upstream synced, tests passing. Overall status: Ready."
+}

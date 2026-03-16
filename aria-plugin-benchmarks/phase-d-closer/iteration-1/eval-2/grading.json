@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "spec-archival",
+  "timestamp": "2026-03-16T14:31:35Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output shows 'git mv' commands moving files to 'openspec/archive/oauth2-social-login/' and 'Spec successfully archived to openspec/archive/'",
+      "text": "moves_to_archive_directory"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Archive contents listing shows 'proposal.md — preserved' and 'tasks.md — preserved' with file sizes intact",
+      "text": "preserves_spec_files"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output creates 'archive-meta.yaml' with 'completed_at: 2026-03-16T14:31:00Z', PR reference, and metadata fields",
+      "text": "adds_completion_metadata"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

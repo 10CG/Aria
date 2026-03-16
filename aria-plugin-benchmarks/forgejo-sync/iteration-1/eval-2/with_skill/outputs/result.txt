@@ -1,0 +1,65 @@
+# Forgejo Sync - PRD to Wiki Publish
+
+## 发布任务
+
+- **PRD Source**: `openspec/changes/user-auth/proposal.md`
+- **Wiki Page**: `User-Auth-PRD`
+- **Repository**: 10cg/my-project
+- **Version**: 1.0
+
+## Step 1: 读取 PRD 文档
+
+```bash
+$ cat openspec/changes/user-auth/proposal.md
+```
+
+文件读取成功: `openspec/changes/user-auth/proposal.md`
+文档大小: 2.4 KB
+标题: # 用户认证 PRD - OpenSpec Level 2
+
+## Step 2: 检查 Wiki 页面是否存在
+
+```
+GET https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/wiki/page/User-Auth-PRD
+Response: 404 (Page not found)
+```
+
+**结论**: Wiki 页面不存在，执行创建操作
+
+## Step 3: 发布到 Wiki
+
+### Wiki 发布请求
+
+```json
+POST https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/wiki/new
+{
+  "title": "User-Auth-PRD",
+  "content": "# 用户认证 PRD\n\n> Source: openspec/changes/user-auth/proposal.md\n> Version: 1.0\n> Published: 2026-03-16\n\n[PRD 内容...]",
+  "message": "Publish PRD: User-Auth-PRD (v1.0) from openspec/changes/user-auth/proposal.md"
+}
+```
+
+### Wiki 发布响应
+
+```json
+{
+  "title": "User-Auth-PRD",
+  "html_url": "https://forgejo.10cg.pub/10cg/my-project/wiki/User-Auth-PRD",
+  "last_commit": {
+    "message": "Publish PRD: User-Auth-PRD (v1.0) from openspec/changes/user-auth/proposal.md"
+  }
+}
+```
+
+## 发布结果
+
+| 项目 | 值 |
+|------|-----|
+| Wiki 页面 | User-Auth-PRD |
+| 源文件 | openspec/changes/user-auth/proposal.md |
+| 版本 | v1.0 |
+| 发布时间 | 2026-03-16 |
+| Wiki URL | https://forgejo.10cg.pub/10cg/my-project/wiki/User-Auth-PRD |
+| **状态** | **✅ 发布成功** |
+
+PRD 已成功发布到 Forgejo Wiki 页面 `User-Auth-PRD`。

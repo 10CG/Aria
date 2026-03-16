@@ -1,0 +1,42 @@
+{
+  "eval_id": 3,
+  "eval_name": "full-closure-sequence",
+  "category": "orchestration",
+  "prompt": "Execute full Phase D for completed feature: realtime-notifications. Run D.1 progress update then D.2 spec archival in sequence.",
+  "setup": {
+    "spec_name": "realtime-notifications",
+    "pr_number": 156,
+    "tasks_total": 7,
+    "tasks_completed": 7
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "executes_d1_then_d2",
+      "description": "Should execute D.1 before D.2 in the correct sequence",
+      "check": "output.indexOf('D.1') < output.indexOf('D.2') || output.includes('D.1 → D.2')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "d1_progress_completed",
+      "description": "D.1 should complete with progress status update",
+      "check": "output.includes('D.1') && (output.includes('progress') || output.includes('status') || output.includes('update'))",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "d2_archival_completed",
+      "description": "D.2 should complete with spec archived",
+      "check": "output.includes('D.2') && (output.includes('archive') || output.includes('archived') || output.includes('moved'))",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "phase_d_marked_complete",
+      "description": "Phase D should be marked complete after both steps",
+      "check": "output.includes('Phase D') && (output.includes('complete') || output.includes('COMPLETE') || output.includes('done'))",
+      "severity": "medium"
+    }
+  ]
+}

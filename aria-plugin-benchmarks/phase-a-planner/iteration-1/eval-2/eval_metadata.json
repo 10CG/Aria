@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "skip-condition-detection",
+  "category": "skip-logic",
+  "prompt": "Evaluate Phase A for: Fix typo in README.md, single file change, no logic impact. Should detect Level 1 skip condition.",
+  "setup": {
+    "change_type": "typo-fix",
+    "files_affected": 1,
+    "expected_level": "skip"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_skip_condition",
+      "description": "Should detect Level 1 skip - no spec needed for trivial change",
+      "check": "output.includes('skip') || output.includes('Skip') || output.includes('Level 1') || output.includes('跳过')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "does_not_create_spec",
+      "description": "Should NOT invoke spec-drafter for trivial changes",
+      "check": "!output.includes('spec-drafter') || output.includes('not required') || output.includes('skipping A.1')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "explains_skip_reason",
+      "description": "Should explain why spec is not needed",
+      "check": "output.includes('typo') || output.includes('trivial') || output.includes('simple') || output.includes('single file')",
+      "severity": "medium"
+    }
+  ]
+}

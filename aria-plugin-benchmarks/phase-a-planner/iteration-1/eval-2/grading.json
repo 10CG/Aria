@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "skip-condition-detection",
+  "timestamp": "2026-03-16T14:02:18Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Level 1 — Skip' and 'Phase A Decision: SKIP' with explicit skip labels for all three steps",
+      "text": "detects_skip_condition"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output states 'Spec-drafter: not invoked (not required for Level 1)' — spec-drafter explicitly not called",
+      "text": "does_not_create_spec"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output explains: 'Typo correction in documentation only', 'Single file change with no logic impact', 'trivial' effort rating",
+      "text": "explains_skip_reason"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

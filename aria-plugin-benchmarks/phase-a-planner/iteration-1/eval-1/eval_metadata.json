@@ -1,0 +1,41 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-cycle-execution",
+  "category": "orchestration",
+  "prompt": "Execute Phase A for new feature: Add OAuth2 social login support (GitHub + Google). No existing spec. Run A.1 → A.2 → A.3 in sequence.",
+  "setup": {
+    "feature": "oauth2-social-login",
+    "existing_spec": false,
+    "complexity": "L"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "executes_a1_spec_creation",
+      "description": "Should invoke A.1 spec-drafter to create proposal.md",
+      "check": "output.includes('A.1') || output.includes('spec-drafter') || output.includes('proposal.md')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "executes_a2_task_planning",
+      "description": "Should invoke A.2 task-planner after spec creation",
+      "check": "output.includes('A.2') || output.includes('task-planner') || output.includes('tasks.md')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "executes_a3_agent_allocation",
+      "description": "Should invoke A.3 agent allocation as final step",
+      "check": "output.includes('A.3') || output.includes('agent') || output.includes('allocation')",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "sequential_step_order",
+      "description": "Steps must execute in A.1 → A.2 → A.3 order",
+      "check": "output.indexOf('A.1') < output.indexOf('A.2') && output.indexOf('A.2') < output.indexOf('A.3')",
+      "severity": "high"
+    }
+  ]
+}

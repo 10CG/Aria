@@ -1,0 +1,148 @@
+diff --git a/lib/screens/login_screen.dart b/lib/screens/login_screen.dart
+new file mode 100644
+index 0000000..a1b2c3d
+--- /dev/null
++++ b/lib/screens/login_screen.dart
+@@ -0,0 +1,45 @@
++import 'package:flutter/material.dart';
++import '../widgets/login_form.dart';
++
++class LoginScreen extends StatefulWidget {
++  const LoginScreen({Key? key}) : super(key: key);
++
++  @override
++  State<LoginScreen> createState() => _LoginScreenState();
++}
++
++class _LoginScreenState extends State<LoginScreen> {
++  @override
++  Widget build(BuildContext context) {
++    return Scaffold(
++      appBar: AppBar(
++        title: const Text('Login'),
++        backgroundColor: Colors.blue,
++      ),
++      body: Center(
++        child: Padding(
++          padding: const EdgeInsets.all(24.0),
++          child: Card(
++            elevation: 8,
++            child: Padding(
++              padding: const EdgeInsets.all(16.0),
++              child: Column(
++                mainAxisSize: MainAxisSize.min,
++                children: const [
++                  Icon(Icons.person, size: 80, color: Colors.blue),
++                  SizedBox(height: 24),
++                  LoginForm(),
++                ],
++              ),
++            ),
++          ),
++        ),
++      ),
++    );
++  }
++}
+diff --git a/lib/widgets/login_form.dart b/lib/widgets/login_form.dart
+new file mode 100644
+index 0000000..b2c3d4e
+--- /dev/null
++++ b/lib/widgets/login_form.dart
+@@ -0,0 +1,68 @@
++import 'package:flutter/material.dart';
++
++class LoginForm extends StatefulWidget {
++  const LoginForm({Key? key}) : super(key: key);
++
++  @override
++  State<LoginForm> createState() => _LoginFormState();
++}
++
++class _LoginFormState extends State<LoginForm> {
++  final _formKey = GlobalKey<FormState>();
++  final _emailController = TextEditingController();
++  final _passwordController = TextEditingController();
++  bool _obscurePassword = true;
++
++  @override
++  void dispose() {
++    _emailController.dispose();
++    _passwordController.dispose();
++    super.dispose();
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return Form(
++      key: _formKey,
++      child: Column(
++        children: [
++          TextFormField(
++            controller: _emailController,
++            decoration: const InputDecoration(
++              labelText: 'Email',
++              prefixIcon: Icon(Icons.email),
++              border: OutlineInputBorder(),
++            ),
++            validator: (value) {
++              if (value == null || value.isEmpty) {
++                return 'Please enter your email';
++              }
++              return null;
++            },
++          ),
++          const SizedBox(height: 16),
++          TextFormField(
++            controller: _passwordController,
++            obscureText: _obscurePassword,
++            decoration: InputDecoration(
++              labelText: 'Password',
++              prefixIcon: const Icon(Icons.lock),
++              border: const OutlineInputBorder(),
++              suffixIcon: IconButton(
++                icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
++                onPressed: () {
++                  setState(() => _obscurePassword = !_obscurePassword);
++                },
++              ),
++            ),
++          ),
++        ],
++      ),
++    );
++  }
++}
+diff --git a/lib/main.dart b/lib/main.dart
+index 1234567..abcdef8 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -1,8 +1,13 @@
+ import 'package:flutter/material.dart';
++import 'screens/login_screen.dart';
+
+ void main() {
+   runApp(const MyApp());
+ }
+
+ class MyApp extends StatelessWidget {
++  static const String title = 'My App';
++
+   const MyApp({Key? key}) : super(key: key);
+
+   @override
+   Widget build(BuildContext context) {
+     return MaterialApp(
+-      title: 'Flutter Demo',
++      title: title,
+       theme: ThemeData(
+         primarySwatch: Colors.blue,
+       ),
+-      home: const MyHomePage(),
++      home: const LoginScreen(),
++      debugShowCheckedModeBanner: false,
+     );
+   }
+-}
++}
+\ No newline at end of file

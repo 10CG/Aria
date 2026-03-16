@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "missing-reference-detection",
+  "category": "reference-check",
+  "prompt": "检测缺失引用: User Story US-003 引用了不存在的 PRD-007 和架构章节 ARCH-004",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_broken_prd_ref",
+      "description": "Should detect the broken reference to PRD-007",
+      "check": "output.includes('PRD-007') || output.includes('broken') || output.includes('断链') || output.includes('not found')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "detects_broken_arch_ref",
+      "description": "Should detect the broken reference to ARCH-004",
+      "check": "output.includes('ARCH-004') || output.includes('reference') || output.includes('引用')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "reports_all_broken_refs",
+      "description": "Should report all broken references in a summary",
+      "check": "output.includes('2') || output.includes('summary') || output.includes('汇总')",
+      "severity": "medium"
+    }
+  ]
+}

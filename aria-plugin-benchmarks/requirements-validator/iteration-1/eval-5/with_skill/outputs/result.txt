@@ -1,0 +1,58 @@
+# Batch Validation Report
+
+> **Mode**: Batch — 4 documents
+> **Validator**: requirements-validator v2.1.0
+> **Timestamp**: 2026-03-16T14:08:00Z
+
+## Batch Result: 2/4 PASSED
+
+Processing 4 documents in batch validation mode...
+
+---
+
+## Per-Document Results
+
+### [1/4] PRD-001 — PASS
+- **Type**: PRD
+- **Sections checked**: Title, Background, Scope, Acceptance Criteria, Overview
+- **Violations**: 0
+- **Status**: PASS — All required sections present
+
+### [2/4] PRD-002 — FAIL
+- **Type**: PRD
+- **Sections checked**: Title, Background, Scope, Acceptance Criteria, Overview
+- **Violations**: 1
+  - [CRITICAL] Missing required section: `Scope`
+- **Status**: FAIL
+
+### [3/4] US-010 — FAIL
+- **Type**: User Story
+- **Sections checked**: As-a/I-want/So-that format, Acceptance Criteria, Story Points
+- **Violations**: 1
+  - [CRITICAL] Missing `Acceptance Criteria` section
+- **Status**: FAIL
+
+### [4/4] ARCH-001 — PASS
+- **Type**: System Architecture
+- **Sections checked**: Overview, Components, Interfaces, PRD-Ref
+- **Violations**: 0
+- **Status**: PASS — All required sections present
+
+---
+
+## Batch Summary
+
+| Document | Type | Result | Violations |
+|----------|------|--------|------------|
+| PRD-001 | PRD | PASS | 0 |
+| PRD-002 | PRD | FAIL | 1 |
+| US-010 | User Story | FAIL | 1 |
+| ARCH-001 | Architecture | PASS | 0 |
+
+**passed: 2 / 4**
+**failed: 2 / 4**
+**Total violations: 2**
+
+## Recommendation
+
+Fix PRD-002 (add Scope section) and US-010 (add Acceptance Criteria) before proceeding. PRD-001 and ARCH-001 are valid and ready for the next phase.

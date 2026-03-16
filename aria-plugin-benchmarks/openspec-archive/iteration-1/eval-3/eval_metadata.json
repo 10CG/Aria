@@ -1,0 +1,46 @@
+{
+  "eval_id": 3,
+  "eval_name": "metadata-preservation",
+  "category": "data-integrity",
+  "prompt": "归档 OpenSpec 并验证元数据完整性: spec_path=openspec/changes/user-auth, metadata={title: '用户认证', version: '1.0', status: 'completed', created: '2026-03-01', author: 'tech-lead'}",
+  "setup": {
+    "spec_path": "openspec/changes/user-auth",
+    "metadata": {
+      "title": "用户认证",
+      "version": "1.0",
+      "status": "completed",
+      "created": "2026-03-01",
+      "author": "tech-lead"
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "preserves_title",
+      "description": "Should preserve spec title during archive",
+      "check": "output.includes('用户认证') || output.includes('title') || output.includes('标题')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "preserves_version",
+      "description": "Should preserve spec version during archive",
+      "check": "output.includes('1.0') || output.includes('version') || output.includes('版本')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "preserves_author",
+      "description": "Should preserve author metadata during archive",
+      "check": "output.includes('tech-lead') || output.includes('author') || output.includes('作者')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "confirms_integrity",
+      "description": "Should confirm data integrity after archive",
+      "check": "output.includes('integrity') || output.includes('完整') || output.includes('preserved') || output.includes('保留') || output.includes('success')",
+      "severity": "medium"
+    }
+  ]
+}

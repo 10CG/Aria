@@ -1,0 +1,38 @@
+## 🔍 架构搜索结果
+
+**查询**: 状态管理是怎么实现的
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/state.md` | ⭐⭐⭐ | 状态管理架构文档，包含技术选型和实现细节 |
+| `DOMAINS.md` | ⭐⭐ | 状态管理的领域映射和路由信息 |
+
+### 📝 信息摘要
+
+应用使用 Riverpod 2.0 作为状态管理解决方案，采用响应式状态管理。状态分为四层：UI Layer、ViewModel Layer、Repository Layer 和 Data Source Layer。全局状态通过 StateNotifierProvider 管理，局部状态按功能模块组织。每个 Provider 只管理一类状态，使用 freezed 生成不可变类，并通过 AsyncValue 处理异步加载状态。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/providers/global_providers.dart` - 全局 Providers 定义
+- `mobile/src/providers/auth/auth_notifier.dart` - 认证状态管理
+- `mobile/src/features/task/providers/` - 任务状态管理模块
+- `mobile/src/providers/settings/` - 设置状态管理模块
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/state.md` 了解详细设计
+- [ ] 查看 `mobile/src/providers/global_providers.dart` 实现代码
+
+### Token 使用估计
+
+- Layer 1 搜索: ~200 tokens
+- DOMAINS.md 读取: ~300 tokens
+- state.md 读取: ~400 tokens
+- **总计**: ~900 tokens
+
+相比传统搜索 (~2900 tokens)，节省了约 69% 的 Token。

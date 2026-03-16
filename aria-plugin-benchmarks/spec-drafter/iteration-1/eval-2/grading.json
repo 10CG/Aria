@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "proposal-generation",
+  "timestamp": "2026-03-16T14:26:30Z",
+  "assertions": [
+    {
+      "text": "generates_proposal_file",
+      "passed": true,
+      "evidence": "Output generates a complete proposal.md document with proper markdown headings (# User Authentication System, ## Background, etc.)"
+    },
+    {
+      "text": "has_required_sections",
+      "passed": true,
+      "evidence": "Output contains '## Background', '## Scope', and '## Goals' sections as required by OpenSpec Level 2 template"
+    },
+    {
+      "text": "covers_all_features",
+      "passed": true,
+      "evidence": "Output covers 'login' (login endpoint), 'register' (registration endpoint), and password reset in both the Scope and Implementation Plan sections"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

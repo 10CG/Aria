@@ -1,0 +1,108 @@
+{
+  "benchmark_name": "agent-router",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T10:00:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 520,
+      "key_metrics": {
+        "routing_accuracy": "100%",
+        "avg_confidence_score": "0.87",
+        "fallback_detection": "100%",
+        "multi_agent_detection": "100%",
+        "rationale_quality": "high"
+      }
+    }
+  },
+  "by_category": {
+    "routing": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "avg_tokens": 480
+    },
+    "confidence": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 550
+    },
+    "multi-match": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 620
+    },
+    "fallback": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 450
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "backend-task-routing",
+      "category": "routing",
+      "with_skill": "PASS",
+      "key_finding": "Correctly selected backend-architect with 0.92 confidence for REST API + PostgreSQL task",
+      "tokens_used": 490
+    },
+    {
+      "eval_id": 2,
+      "name": "frontend-task-routing",
+      "category": "routing",
+      "with_skill": "PASS",
+      "key_finding": "Correctly selected mobile-developer with 0.95 confidence for Flutter/Riverpod task",
+      "tokens_used": 470
+    },
+    {
+      "eval_id": 3,
+      "name": "ambiguous-task-routing",
+      "category": "confidence",
+      "with_skill": "PASS",
+      "key_finding": "Correctly flagged cross-domain ambiguity (confidence: 0.55), suggested task decomposition",
+      "tokens_used": 550
+    },
+    {
+      "eval_id": 4,
+      "name": "multi-agent-suggestion",
+      "category": "multi-match",
+      "with_skill": "PASS",
+      "key_finding": "Correctly identified mobile-developer + backend-architect split with parallel execution plan",
+      "tokens_used": 620
+    },
+    {
+      "eval_id": 5,
+      "name": "fallback-routing",
+      "category": "fallback",
+      "with_skill": "PASS",
+      "key_finding": "Correctly fell back to tech-lead for broad architectural review with clear rationale",
+      "tokens_used": 450
+    }
+  ],
+  "strengths": [
+    "Accurate single-agent routing for domain-specific tasks (Flutter, Python/FastAPI)",
+    "Proper confidence scoring with low scores on cross-domain tasks",
+    "Clear routing rationale citing task keywords and file paths",
+    "Correct multi-agent split for tasks spanning mobile and backend domains",
+    "Reliable tech-lead fallback for cross-cutting concerns"
+  ],
+  "weaknesses": [
+    "No agent registry versioning — routing depends on hardcoded agent list",
+    "Confidence calibration not yet validated on edge cases"
+  ],
+  "recommendations": [
+    "Add agent registry file to decouple routing logic from skill code",
+    "Test with domain-adjacent tasks (e.g. mobile backend-for-frontend)",
+    "Add support for routing to custom user-defined agents"
+  ],
+  "status": "completed"
+}

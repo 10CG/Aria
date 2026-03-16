@@ -1,0 +1,53 @@
+# Brainstorm - Context Accumulation
+
+> **Mode**: Segmented Q&A
+> **Round**: 4 of 6
+> **Context Status**: 3 decisions accumulated
+
+---
+
+## 讨论上下文摘要
+
+在继续 Round 4 之前，让我们回顾之前已确认的决策：
+
+**已确认决策**:
+- ✅ Round 1: **PostgreSQL** 作为主数据库（强一致性需求）
+- ✅ Round 2: **RESTful** API 风格（标准化接口，便于前后端分离）
+- ✅ Round 3: **React** 作为前端框架（组件化，团队熟悉度高）
+
+---
+
+## Round 4: 状态管理方案
+
+基于我们已确认的技术栈（PostgreSQL + RESTful API + React），现在需要讨论前端的状态管理。
+
+**核心问题**:
+
+基于您选择了 **React** 作为前端框架，您倾向于使用哪种**状态管理方案**？
+
+```
+选项（与 React 生态一致）:
+A) React Context + useReducer（轻量级，适合中小型项目）
+B) Redux Toolkit（功能强大，适合复杂状态）
+C) Zustand（简洁现代，性能优秀）
+D) React Query（服务端状态管理，与 RESTful API 天然契合）
+E) 结合使用（例如 React Query + Zustand）
+```
+
+---
+
+## 决策一致性检查
+
+您的新选择需要与已有决策保持一致（consistent）：
+
+| 已有决策 | 对状态管理的影响 |
+|----------|-----------------|
+| PostgreSQL (关系型) | 数据结构清晰，适合 normalized state |
+| RESTful API | React Query 与 RESTful 天然符合（aligned），可自动处理缓存 |
+| React | 所有选项均与 React 兼容 |
+
+> 基于（given）RESTful API 的选型，**React Query** 可以减少大量重复的 fetch/cache 逻辑，与现有架构高度一致。
+
+---
+
+**请选择状态管理方案后，我们将讨论 Round 5: 部署与基础设施。**

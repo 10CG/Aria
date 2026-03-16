@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "missing-reference-detection",
+  "timestamp": "2026-03-16T14:06:30Z",
+  "assertions": [
+    {
+      "text": "detects_broken_prd_ref",
+      "passed": true,
+      "evidence": "Output explicitly identifies 'PRD-007 (not found)' as Broken Reference #1 with CRITICAL severity"
+    },
+    {
+      "text": "detects_broken_arch_ref",
+      "passed": true,
+      "evidence": "Output explicitly identifies 'ARCH-004 (not found)' as Broken Reference #2, listing it in the reference scan summary"
+    },
+    {
+      "text": "reports_all_broken_refs",
+      "passed": true,
+      "evidence": "Output reports 'Total broken references: 2' in the Reference Scan Summary table"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

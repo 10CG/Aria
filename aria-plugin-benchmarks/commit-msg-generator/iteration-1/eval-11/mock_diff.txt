@@ -1,0 +1,87 @@
+diff --git a/shared/contracts/openapi/tasks.yaml b/shared/contracts/openapi/tasks.yaml
+index abc1234..def5678 100644
+--- a/shared/contracts/openapi/tasks.yaml
++++ b/shared/contracts/openapi/tasks.yaml
+@@ -45,6 +45,7 @@ components:
+           type: integer
+           format: int64
+         title:
++        priority:
++          type: integer
++          enum: [1, 2, 3]
++          description: Task priority level (1=low, 2=medium, 3=high)
+         status:
+           type: string
+           enum: [pending, in_progress, completed]
+
+diff --git a/backend/src/routes/tasks.py b/backend/src/routes/tasks.py
+index 1234567..890abcd 100644
+--- a/backend/src/routes/tasks.py
++++ b/backend/src/routes/tasks.py
+@@ -28,12 +28,14 @@ class TaskUpdate(BaseModel):
+     title: Optional[str] = None
+     description: Optional[str] = None
+     status: Optional[TaskStatus] = None
++    priority: Optional[int] = None
+
+ @router.post("/tasks", response_model=Task)
+ async def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+     """Create a new task."""
+-    db_task = Task(**task.model_dump(), status=TaskStatus.pending)
++    db_task = Task(**task.model_dump(), status=TaskStatus.pending, priority=task.priority or 2)
+     db.add(db_task)
+     db.commit()
+     db.refresh(db_task)
+     return db_task
+
+diff --git a/mobile/lib/models/task.dart b/mobile/lib/models/task.dart
+index fedcba9..8765432 100644
+--- a/mobile/lib/models/task.dart
++++ b/mobile/lib/models/task.dart
+@@ -8,6 +8,7 @@ class Task {
+   final String id;
+   final String title;
+   final String description;
++  final int priority;
+   final TaskStatus status;
+
+   Task({
+@@ -15,6 +16,7 @@ class Task {
+     required this.id,
+     required this.title,
+     required this.description,
++    required this.priority,
+     required this.status,
+   });
+
+@@ -37,6 +39,7 @@ class Task {
+       id: json['id'] as String,
+       title: json['title'] as String,
+       description: json['description'] as String,
++      priority: json['priority'] as int? ?? 2,
+       status: TaskStatus.values.firstWhere(
+         (e) => e.toString() == 'TaskStatus.${json['status']}',
+       ),
+diff --git a/mobile/lib/screens/task_list.dart b/mobile/lib/screens/task_list.dart
+index 1357924..2468013 100644
+--- a/mobile/lib/screens/task_list.dart
++++ b/mobile/lib/screens/task_list.dart
+@@ -15,6 +15,7 @@ class TaskListScreen extends StatelessWidget {
+             title: Text(task.title),
+             subtitle: Text(task.description),
+             trailing: Icon(
++              _getPriorityIcon(task.priority),
+               _getStatusIcon(task.status),
+             ),
+             onTap: () => _navigateToTaskDetail(task),
+@@ -45,6 +46,10 @@ class TaskListScreen extends StatelessWidget {
+     }
+   }
+
++  IconData _getPriorityIcon(int priority) {
++    return priority == 3 ? Icons.flag : priority == 2 ? Icons.outlined_flag : Icons.flag_outlined;
++  }
++
+   IconData _getStatusIcon(TaskStatus status) {
+     switch (status) {
+       case TaskStatus.pending:

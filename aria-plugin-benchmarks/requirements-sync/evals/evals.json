@@ -1,0 +1,164 @@
+{
+  "skill_name": "requirements-sync",
+  "skill_path": "aria/skills/requirements-sync",
+  "skill_version": "1.1.0",
+  "description": "Benchmark tests for requirements-sync skill - syncs User Story status to UPM requirements and detects drift",
+  "metrics": [
+    "sync_accuracy",
+    "drift_detection_precision",
+    "propagation_completeness",
+    "conflict_resolution_correctness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "status-sync",
+      "category": "sync-flow",
+      "prompt": "同步状态: US-005 状态已更新为 Done，将此状态同步到 UPM requirements 章节对应条目",
+      "setup": {
+        "story_id": "US-005",
+        "new_status": "Done",
+        "upm_current_status": "In Progress"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "updates_upm_status",
+          "description": "Should update UPM requirements entry status to Done",
+          "check": "output.includes('Done') || output.includes('完成') || output.includes('synced')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_changed_entry",
+          "description": "Should identify the specific UPM entry that was changed",
+          "check": "output.includes('US-005') || output.includes('REQ-005')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "records_previous_status",
+          "description": "Should record the previous status (In Progress) for audit trail",
+          "check": "output.includes('In Progress') || output.includes('previous') || output.includes('before')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "drift-detection",
+      "category": "drift-analysis",
+      "prompt": "检测漂移: US-012 在 Jira 中状态为 Done，但 UPM 中对应需求条目仍显示 In Progress",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_drift",
+          "description": "Should detect the status inconsistency between story and UPM",
+          "check": "output.includes('drift') || output.includes('漂移') || output.includes('inconsisten') || output.includes('mismatch')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "shows_delta",
+          "description": "Should show the delta between story status and UPM status",
+          "check": "output.includes('Done') && output.includes('In Progress')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "recommends_action",
+          "description": "Should recommend a sync action to resolve the drift",
+          "check": "output.includes('sync') || output.includes('同步') || output.includes('update') || output.includes('fix')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "new-story-addition",
+      "category": "sync-flow",
+      "prompt": "添加新故事: US-099 是新创建的故事 (To Do)，将其添加到 UPM requirements 章节",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "adds_story_to_upm",
+          "description": "Should add US-099 as a new entry in UPM requirements",
+          "check": "output.includes('US-099') || output.includes('added') || output.includes('新增')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "sets_initial_status",
+          "description": "Should set the initial status to To Do in UPM",
+          "check": "output.includes('To Do') || output.includes('待办') || output.includes('initial')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "preserves_existing_entries",
+          "description": "Should not modify existing UPM entries during addition",
+          "check": "output.includes('existing') || output.includes('preserved') || output.includes('unchanged') || output.includes('不影响')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "status-change-propagation",
+      "category": "propagation",
+      "prompt": "状态传播: US-020 从 In Progress 变为 Done，需要同步到 UPM requirements 和相关 Epic 进度",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "propagates_to_upm",
+          "description": "Should propagate Done status to UPM requirements entry",
+          "check": "output.includes('UPM') || output.includes('requirements') || output.includes('需求')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "updates_epic_progress",
+          "description": "Should update the parent Epic progress percentage",
+          "check": "output.includes('Epic') || output.includes('epic') || output.includes('%') || output.includes('progress')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "reports_propagation_scope",
+          "description": "Should report how many documents were updated",
+          "check": "output.includes('updated') || output.includes('propagated') || output.includes('传播') || output.includes('2')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "conflict-resolution",
+      "category": "conflict-handling",
+      "prompt": "冲突解决: US-030 在 Git commit 中标记为 Done，但 UPM 中为 In Review，Jira 中为 In Progress — 三方冲突",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_three_way_conflict",
+          "description": "Should detect the three-way conflict across sources",
+          "check": "output.includes('conflict') || output.includes('冲突') || output.includes('3') || output.includes('three')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "shows_all_conflicting_values",
+          "description": "Should display all three conflicting status values",
+          "check": "output.includes('Done') && output.includes('In Review') && output.includes('In Progress')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "proposes_resolution",
+          "description": "Should propose a resolution strategy (e.g., latest-wins or manual review)",
+          "check": "output.includes('resolution') || output.includes('解决') || output.includes('recommend') || output.includes('manual')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

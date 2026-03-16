@@ -1,0 +1,169 @@
+# Task Breakdown: 后端 API 开发任务
+
+> **Spec**: Direct feature request
+> **Total Tasks**: 8
+> **Estimated**: 36h
+
+## Task List
+
+### TASK-001: 数据库模型设计
+- **Complexity**: L
+- **Dependencies**: None
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/models/user.py
+  - backend/models/order.py
+  - backend/database/migrations/create_tables.sql
+  - backend/database/schema.md
+- **Verification**:
+  - 数据表创建脚本执行成功
+  - 模型关系定义正确
+  - 支持所有业务查询
+
+### TASK-002: 用户认证系统实现
+- **Complexity**: L
+- **Dependencies**: TASK-001
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/services/auth_service.py
+  - backend/utils/jwt_handler.py
+  - backend/middleware/auth.py
+  - backend/config/auth.py
+- **Verification**:
+  - JWT token 生成和验证功能正常
+  - 认证中间件保护 API 端点
+  - 密码加密存储安全
+
+### TASK-003: 用户管理 API 实现
+- **Complexity**: M
+- **Dependencies**: TASK-001, TASK-002
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/v1/users.py
+  - backend/services/user_service.py
+  - backend/tests/test_users.py
+- **Verification**:
+  - RESTful API 端点响应正确
+  - 单元测试覆盖率 >85%
+  - API 文档自动生成
+
+### TASK-004: 订单管理 API 实现
+- **Complexity**: M
+- **Dependencies**: TASK-001, TASK-002
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/v1/orders.py
+  - backend/services/order_service.py
+  - backend/tests/test_orders.py
+- **Verification**:
+  - 订单 CRUD 操作完整
+  - 业务逻辑验证通过
+  - API 响应格式标准化
+
+### TASK-005: API 认证和授权集成
+- **Complexity**: M
+- **Dependencies**: TASK-002, TASK-003, TASK-004
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/v1/protected/
+  - backend/decorators/require_auth.py
+  - backend/config/security.py
+- **Verification**:
+  - 受保护端点访问控制正常
+  - Token 失效处理完善
+  - 权限验证机制可靠
+
+### TASK-006: API 集成测试
+- **Complexity**: M
+- **Dependencies**: TASK-003, TASK-004, TASK-005
+- **Agent**: qa-engineer
+- **Deliverables**:
+  - backend/tests/integration/
+  - backend/tests/test_api_endpoints.py
+  - backend/tests/test_auth_flow.py
+  - backend/tests/coverage_report/
+- **Verification**:
+  - 集成测试通过率 100%
+  - API 契约测试通过
+  - 性能测试报告生成
+
+### TASK-007: API 文档生成
+- **Complexity**: S
+- **Dependencies**: TASK-003, TASK-004
+- **Agent**: api-documenter
+- **Deliverables**:
+  - backend/api/docs/openapi.yaml
+  - backend/api/docs/swagger.yaml
+  - backend/README-API.md
+- **Verification**:
+  - OpenAPI 规范符合标准
+  - Swagger UI 可访问
+  - 文档内容与实现一致
+
+### TASK-008: API 性能监控
+- **Complexity**: M
+- **Dependencies**: TASK-003, TASK-004, TASK-006
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/utils/monitoring.py
+  - backend/config/metrics.yaml
+  - backend/logs/api_metrics.log
+- **Verification**:
+  - 响应时间监控正常
+  - 错误率统计准确
+  - 性能告警机制启用
+
+## Execution Order
+TASK-001 → TASK-002 → TASK-003 → TASK-004 → TASK-005 → TASK-006 → TASK-007 → TASK-008
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 1 | 2h |
+| M | 5 | 20h |
+| L | 2 | 14h |
+| XL | 0 | 0h |
+| **Total** | **8** | **36h** |
+
+## Dependencies Analysis
+- **Database-first**: TASK-001 作为基础
+- **Security layer**: TASK-002 保护所有 API
+- **API parallel development**: TASK-003,004 可并行
+- **Integration**: TASK-005 整合认证到所有 API
+- **Quality assurance**: TASK-006 确保质量
+- **Documentation**: TASK-007 生成 API 文档
+- **Monitoring**: TASK-008 添加可观测性
+
+## Agent Allocation
+- **backend-architect** (6 tasks): 数据库、API 实现、认证、监控
+  - 所有后端核心任务分配给后端架构师
+  - 包括 API 设计、实现和安全控制
+- **qa-engineer** (1 task): 集成测试
+  - 专门负责质量保证和测试覆盖
+- **api-documenter** (1 task): API 文档
+  - 专门负责 API 规范和文档生成
+
+## Evaluation Results
+
+### ✅ 测试通过
+Task-planner 成功为后端 API 开发任务分配了合适的 Agent：
+1. **backend-architect** - 分配了 6 个任务，全部与后端核心功能相关
+2. **qa-engineer** - 分配了集成测试任务，符合专业领域
+3. **api-documenter** - 分配了文档任务，符合专业领域
+
+### Agent 分配逻辑验证
+- 路径匹配：backend/**/*.py → backend-architect ✓
+- 关键词匹配：API, database, service → backend-architect ✓
+- 复杂度处理：XL 任务不存在，没有错误分配 ✓
+- 专业分工：测试和文档分别分配给专门 Agent ✓
+
+### 符合预期
+输出结果显示 task-planner 能正确：
+- 识别后端 API 开发任务的性质
+- 根据技术栈和任务类型分配 backend-architect
+- 将相关任务分配给专业 Agent（qa-engineer、api-documenter）
+- 遵循 4-8 小时的任务粒度
+- 正确分析任务依赖关系
+
+## Conclusion
+Task-planner 在处理"后端 API 开发任务"时表现优秀，成功分配了 backend-architect 作为主要 Agent，并合理分配了相关辅助 Agent。结果符合预期，验证了 Agent 分配规则的有效性。

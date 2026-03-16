@@ -1,0 +1,34 @@
+{
+  "eval_id": 3,
+  "eval_name": "branch-finisher-integration",
+  "category": "integration",
+  "prompt": "Phase C post-merge: Invoke branch-finisher skill to clean up feature/oauth2-social-login branch after PR merged to main.",
+  "setup": {
+    "merged_branch": "feature/oauth2-social-login",
+    "target_branch": "main",
+    "worktrees_created": 2
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "invokes_branch_finisher",
+      "description": "Should call branch-finisher skill after merge",
+      "check": "output.includes('branch-finisher') || output.includes('branch finisher') || output.includes('cleanup') || output.includes('clean up')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "deletes_feature_branch",
+      "description": "Should delete the merged feature branch",
+      "check": "output.includes('delete') || output.includes('branch -d') || output.includes('branch deleted') || output.includes('removed')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "removes_worktrees",
+      "description": "Should remove any git worktrees created during Phase B",
+      "check": "output.includes('worktree remove') || output.includes('worktree') || output.includes('prune')",
+      "severity": "medium"
+    }
+  ]
+}

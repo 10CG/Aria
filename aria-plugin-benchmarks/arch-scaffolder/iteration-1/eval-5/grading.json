@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "output-format-compliance",
+  "timestamp": "2026-03-16T09:05:00Z",
+  "assertions": [
+    {
+      "text": "is_valid_markdown",
+      "passed": true,
+      "evidence": "Output has H1 heading '# Task Management Platform - System Architecture' and multiple H2 sections"
+    },
+    {
+      "text": "has_document_title",
+      "passed": true,
+      "evidence": "Output starts with '# Task Management Platform - System Architecture' matching Architecture pattern"
+    },
+    {
+      "text": "sections_in_logical_order",
+      "passed": true,
+      "evidence": "'## Overview' appears at position 180, '## Modules' appears at position 490; Overview precedes Modules"
+    },
+    {
+      "text": "uses_consistent_heading_levels",
+      "passed": true,
+      "evidence": "All main sections use ## (H2), subsections under Integration Points use ### (H3); no #### found"
+    },
+    {
+      "text": "includes_metadata_header",
+      "passed": true,
+      "evidence": "Document header contains 'Version: 1.0.0' and 'Date: 2026-03-16' metadata"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

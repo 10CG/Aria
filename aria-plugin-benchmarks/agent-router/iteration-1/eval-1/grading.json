@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "backend-task-routing",
+  "timestamp": "2026-03-16T10:01:00Z",
+  "assertions": [
+    {
+      "text": "selects_backend_architect",
+      "passed": true,
+      "evidence": "Output contains 'backend-architect' as the routing decision with confidence 0.92"
+    },
+    {
+      "text": "confidence_above_threshold",
+      "passed": true,
+      "evidence": "Confidence score is 0.92, exceeds minimum threshold of 0.85"
+    },
+    {
+      "text": "provides_routing_rationale",
+      "passed": true,
+      "evidence": "Rationale explicitly mentions 'REST API endpoint implementation', 'PostgreSQL', and 'backend scope'"
+    },
+    {
+      "text": "no_ambiguous_multi_match",
+      "passed": true,
+      "evidence": "No 'mobile-developer' or 'frontend' references found in output"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

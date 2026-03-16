@@ -1,0 +1,76 @@
+# Subagent Driver - Isolation Level Selection
+
+> **Operation**: Isolation Level Analysis
+> **Tasks Evaluated**: 3
+> **Status**: All isolation levels correctly selected
+
+---
+
+## Isolation Level Decision Matrix
+
+| Task | Type | Scope | Isolation Level | Rationale |
+|------|------|-------|-----------------|-----------|
+| T1 | typo_fix | 1 file, doc-only | **none** | Trivial change, no risk to codebase state |
+| T2 | new_feature | 3-5 files, new code | **branch** | New feature requires isolated development environment |
+| T3 | large_refactor | >10 files, cross-module | **worktree** | Large refactor needs separate working tree to prevent conflicts |
+
+---
+
+## T1: Typo Fix - Isolation: NONE
+
+**Reasoning**: A documentation typo fix has no code impact. Running the subagent directly on the current branch is safe.
+
+```yaml
+task: T1
+type: typo_fix
+isolation: none
+execution: direct_on_current_branch
+risk: minimal
+```
+
+No branch or worktree creation required. Execute directly.
+
+---
+
+## T2: New Feature - Isolation: BRANCH
+
+**Reasoning**: Adding a new feature introduces new code that should be isolated from the main branch until reviewed and tested.
+
+```yaml
+task: T2
+type: new_feature
+isolation: branch
+branch_name: "feature/t2-new-feature"
+base_branch: "master"
+merge_strategy: "PR after completion"
+risk: medium
+```
+
+A new Git branch will be created for isolation. The subagent will work entirely within this branch.
+
+---
+
+## T3: Large Refactor - Isolation: WORKTREE
+
+**Reasoning**: A large refactor spanning >10 files and multiple modules requires a worktree to allow parallel development on other tasks without filesystem conflicts.
+
+```yaml
+task: T3
+type: large_refactor
+isolation: worktree
+worktree_path: "../project-t3-refactor"
+base_branch: "master"
+new_branch: "refactor/t3-large-refactor"
+parallel_safe: true
+risk: high
+```
+
+A Git worktree will be created at a separate directory. This allows other tasks to continue on the main working tree simultaneously.
+
+---
+
+## Summary
+
+- **T1** (typo): `none` - Direct execution, no isolation overhead
+- **T2** (feature): `branch` - Standard Git branch isolation
+- **T3** (refactor): `worktree` - Full worktree isolation for parallel safety

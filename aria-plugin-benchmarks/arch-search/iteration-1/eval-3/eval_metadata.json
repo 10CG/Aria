@@ -1,0 +1,25 @@
+{
+  "eval_id": 3,
+  "eval_name": "layer1-api-contract-routing",
+  "category": "layer-1-routing",
+  "prompt": "API 端点定义在哪",
+  "expected_layer": 1,
+  "expected_domain": "network",
+  "expected_document_path": "shared/contracts/openapi/",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_api_contract",
+      "description": "Should find API contracts or network architecture",
+      "check": "output.match(/contracts|openapi|api.*\\.yaml|network.*\\.md/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "no_layer3_fallback",
+      "description": "Should NOT fall back to Layer 3 for common queries",
+      "check": "!output.includes('Layer 3') && !output.includes('传统搜索')",
+      "severity": "high"
+    }
+  ]
+}

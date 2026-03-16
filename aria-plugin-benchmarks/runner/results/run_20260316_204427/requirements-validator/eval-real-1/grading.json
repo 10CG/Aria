@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "validate-prd-format",
+  "timestamp": "2026-03-16T20:46:08.818930+00:00",
+  "assertions": [
+    {
+      "text": "finds_prd_file",
+      "passed": true,
+      "evidence": "Matched: 'PRD'"
+    },
+    {
+      "text": "checks_format",
+      "passed": true,
+      "evidence": "Matched: 'Section'"
+    },
+    {
+      "text": "reports_result",
+      "passed": true,
+      "evidence": "Matched: 'valid'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

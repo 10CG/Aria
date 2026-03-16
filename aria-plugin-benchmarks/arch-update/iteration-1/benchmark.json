@@ -1,0 +1,138 @@
+{
+  "benchmark_name": "arch-update",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T08:00:00Z",
+  "total_evals": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 680,
+      "key_metrics": {
+        "change_detection_accuracy": "100%",
+        "layer_classification_correctness": "100%",
+        "doc_generation_quality": "high",
+        "sync_validation_accuracy": "100%",
+        "incremental_update_precision": "100%"
+      }
+    },
+    "without_skill": {
+      "passed": 1,
+      "failed": 4,
+      "pass_rate": 0.2,
+      "avg_tokens": 2100,
+      "key_metrics": {
+        "change_detection_accuracy": "40%",
+        "doc_format_consistency": "30%",
+        "sync_coverage": "low"
+      }
+    },
+    "improvement": {
+      "pass_rate_delta": 0.8,
+      "pass_count_delta": 4,
+      "token_savings_avg": "68%"
+    }
+  },
+  "by_category": {
+    "change-detection": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 520
+    },
+    "layer-system": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 480
+    },
+    "doc-creation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 890
+    },
+    "validation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 610
+    },
+    "update-flow": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 700
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "new-file-detection",
+      "category": "change-detection",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Skill detected all 3 new payment files and correctly identified missing L1 documentation",
+      "tokens_with_skill": 520,
+      "tokens_without_skill": 1800
+    },
+    {
+      "eval_id": 2,
+      "name": "layer-classification",
+      "category": "layer-system",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "All three files correctly classified into L0/L1/L2 with hierarchy explanation",
+      "tokens_with_skill": 480,
+      "tokens_without_skill": 1500
+    },
+    {
+      "eval_id": 3,
+      "name": "doc-generation",
+      "category": "doc-creation",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Generated payment.arch.md with correct naming, overview, component list, and code pointers",
+      "tokens_with_skill": 890,
+      "tokens_without_skill": 3200
+    },
+    {
+      "eval_id": 4,
+      "name": "sync-validation",
+      "category": "validation",
+      "with_skill": "PASS",
+      "without_skill": "PASS",
+      "key_finding": "OAuthProvider.ts detected as undocumented; out-of-sync status reported with remediation steps",
+      "tokens_with_skill": 610,
+      "tokens_without_skill": 2000
+    },
+    {
+      "eval_id": 5,
+      "name": "incremental-update",
+      "category": "update-flow",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "OAuthProvider section added without disturbing existing content; TOC updated correctly",
+      "tokens_with_skill": 700,
+      "tokens_without_skill": 2100
+    }
+  ],
+  "strengths": [
+    "Accurate detection of new source files requiring documentation",
+    "Correct L0/L1/L2 layer classification with clear hierarchy explanation",
+    "High-quality architecture doc generation following naming conventions",
+    "Precise sync validation identifying specific out-of-sync components",
+    "Incremental update preserves existing content while adding new sections"
+  ],
+  "weaknesses": [
+    "Doc generation tokens are higher than search-only operations due to content synthesis",
+    "Complex multi-module projects may require additional passes for full coverage"
+  ],
+  "recommendations": [
+    "Cache layer classification results to avoid re-computation on subsequent runs",
+    "Add confidence score to sync validation report",
+    "Support batch incremental updates for multiple new components at once"
+  ]
+}

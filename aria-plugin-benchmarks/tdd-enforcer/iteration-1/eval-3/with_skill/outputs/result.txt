@@ -1,0 +1,88 @@
+# TDD Enforcer - REFACTOR Phase Guidance
+
+> **Mode**: Strict
+> **Phase**: REFACTOR (Clean Up While Keeping Tests GREEN)
+> **Status**: 3 Code Smells Identified - Safe to Refactor
+
+---
+
+## REFACTOR Phase Active
+
+All tests are GREEN. You can safely refactor. TDD Enforcer will monitor that tests stay passing throughout the refactoring process.
+
+**Current Test Status**: 12 tests passing (0 failures)
+
+---
+
+## Code Smells Identified
+
+### Smell 1: Duplicate Logic (HIGH Priority)
+**Location**: `services/user_service.py` lines 23-31 and 67-75
+**Issue**: Email validation logic is duplicated in `create()` and `update()` methods
+
+**Refactoring Strategy**: Extract to separate method
+```python
+# Before (duplicated in create and update):
+if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+    raise ValueError("Invalid email format")
+
+# After (extract to private method):
+def _validate_email(self, email: str) -> None:
+    if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+        raise ValueError("Invalid email format")
+```
+
+### Smell 2: Complex Conditions (MEDIUM Priority)
+**Location**: `services/user_service.py` line 45
+**Issue**: Nested condition with 4 levels of depth reduces readability
+
+**Refactoring Strategy**: Simplify with early returns
+```python
+# Before (complex nested):
+if user:
+    if user.is_active:
+        if not user.is_locked:
+            if user.email_verified:
+                return user
+
+# After (simplified with guard clauses):
+if not user:
+    return None
+if not user.is_active:
+    raise UserInactiveError()
+if user.is_locked:
+    raise UserLockedError()
+if not user.email_verified:
+    raise EmailNotVerifiedError()
+return user
+```
+
+### Smell 3: Long Method (MEDIUM Priority)
+**Location**: `services/user_service.py` `create()` method (87 lines)
+**Issue**: Method exceeds 20-line guideline, handling too many responsibilities
+
+**Refactoring Strategy**: Extract sub-methods
+- Extract `_validate_user_data(data)` - lines 10-25
+- Extract `_hash_password(password)` - lines 26-35
+- Extract `_persist_user(user)` - lines 36-55
+
+---
+
+## Refactoring Order
+
+1. **Extract `_validate_email()`** - Low risk, fully covered by existing tests
+2. **Simplify conditions** - Medium risk, run tests after each guard clause added
+3. **Extract sub-methods from `create()`** - Higher risk, run tests after each extraction
+
+---
+
+## Safety Protocol
+
+Run tests after each refactoring step:
+```bash
+pytest tests/test_user_service.py -v
+```
+
+**Rule**: If any test turns RED during refactoring, revert immediately and use smaller steps.
+
+All tests must stay GREEN. No new functionality should be added during REFACTOR phase.

@@ -1,0 +1,23 @@
+{
+  "test_id": "state-scanner-eval3",
+  "test_name": "检查 OpenSpec 状态",
+  "skill_path": "F:/work2025/cursor/Aria/aria/skills/state-scanner",
+  "description": "验证 state-scanner 报告 OpenSpec 状态的能力",
+  "status": "completed",
+  "completed_at": "2026-03-13",
+  "expected_output": "应该报告 OpenSpec 状态部分，显示活跃的变更（如果有的话）",
+  "actual_output": "成功输出了完整的 OpenSpec 状态报告",
+  "validation_results": {
+    "openspec_status_reported": true,
+    "openedpec_status_displayed": true,
+    "configuration_status_checked": true,
+    "suggestions_provided": true,
+    "no_active_changes_detected": true
+  },
+  "notes": [
+    "state-scanner 正确检测到项目未配置 OpenSpec",
+    "显示了对齐的路径建议 (openspec/changes/, openspec/)",
+    "提供了具体的操作建议",
+    "虽然当前没有活跃变更，但框架完整支持该功能"
+  ]
+}

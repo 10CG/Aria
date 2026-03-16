@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "naming-convention",
+  "timestamp": "2026-03-16T08:32:00Z",
+  "assertions": [
+    {
+      "text": "specifies_architecture_md_for_l0",
+      "passed": true,
+      "evidence": "Output states 'L0 - PROJECT LEVEL: Name: ARCHITECTURE.md (uppercase, fixed name)'"
+    },
+    {
+      "text": "specifies_arch_md_extension_for_l1_l2",
+      "passed": true,
+      "evidence": "Output states 'Pattern: {module-name}.arch.md' and '*.arch.md extension' for L1/L2"
+    },
+    {
+      "text": "gives_naming_examples",
+      "passed": true,
+      "evidence": "Output lists 'auth.arch.md', 'payment.arch.md', 'notification-service.arch.md' as examples"
+    },
+    {
+      "text": "explains_case_convention",
+      "passed": true,
+      "evidence": "Output shows naming table with 'UPPERCASE' for ARCHITECTURE.md and 'lowercase' for *.arch.md"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

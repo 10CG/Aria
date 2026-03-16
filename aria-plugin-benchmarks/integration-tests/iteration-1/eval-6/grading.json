@@ -1,0 +1,34 @@
+{
+  "eval_id": 6,
+  "eval_name": "closure-state-consistency",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "progress_updater_writes_state_block",
+      "passed": true,
+      "evidence": "progress-updater wrote updated UPMv2-STATE block with stateToken=ST-2026-031602, completion=79%, activeSpecs=[]. Output explicitly shows the UPMv2-STATE comment block with 'stateToken', 'completion: 79%', and 'activeSpecs: []'."
+    },
+    {
+      "text": "archive_moves_spec_correctly",
+      "passed": true,
+      "evidence": "openspec-archive moved 'openspec/changes/SPEC-2024-047-user-notifications/ -> openspec/archive/2026/SPEC-2024-047-user-notifications/' with metadata including merge_sha, pr_url, state_token, and archived_at appended to proposal.md."
+    },
+    {
+      "text": "state_scanner_shows_clean",
+      "passed": true,
+      "evidence": "state-scanner post-closure scan shows 'Files found: 0 specs' in openspec/changes/ and reports 'No active specs in changes/ directory -> clean state'. Summary: 'State assessment: CLEAN STATE'."
+    },
+    {
+      "text": "requirements_sync_updated",
+      "passed": true,
+      "evidence": "requirements-sync skill updated the requirements tracking table with 'Feature: User Notification System -> status: completed', 'UPM updated: requirements-sync cross-reference table refreshed', and 'status: completed'."
+    },
+    {
+      "text": "atomic_state_update",
+      "passed": true,
+      "evidence": "phase-d-closer executed D.1 and D.2 as 'atomic unit (rollback on any failure)'. Final output: 'D.1 complete + D.2 complete. Atomic unit SUCCESS. Both phases completed: state written AND spec archived without partial state.' Both D.1 and D.2 appear in the verification section."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

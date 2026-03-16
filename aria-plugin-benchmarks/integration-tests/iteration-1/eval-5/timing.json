@@ -1,0 +1,12 @@
+{
+  "total_tokens": 4420,
+  "duration_ms": 29600,
+  "total_duration_seconds": 29.6,
+  "phase_breakdown": {
+    "phase_b_initial":      { "tokens": 1340, "duration_ms": 9200 },
+    "branch_finisher_fail": { "tokens": 680,  "duration_ms": 3800 },
+    "phase_b_retry":        { "tokens": 1060, "duration_ms": 7400 },
+    "branch_finisher_pass": { "tokens": 640,  "duration_ms": 3600 },
+    "phase_c":              { "tokens": 700,  "duration_ms": 5600 }
+  }
+}

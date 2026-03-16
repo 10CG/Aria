@@ -1,0 +1,77 @@
+# Brainstorm - Discussion Summary
+
+> **Mode**: Summary Generation
+> **Rounds Completed**: 5
+> **Status**: Discussion complete - actionable summary generated
+
+---
+
+## 头脑风暴总结报告
+
+**讨论主题**: 用户认证系统技术选型
+**讨论时间**: 2026-03-16
+**参与轮次**: 5 轮
+
+---
+
+## 已确认决策 (4 项)
+
+以下决策已在讨论中明确确认（confirmed）：
+
+### 决策 1: 主数据库选型
+- **决定**: 使用 PostgreSQL
+- **理由**: 业务数据需要强一致性，团队有丰富 PostgreSQL 经验
+- **确认于**: Round 1
+
+### 决策 2: API 设计风格
+- **决定**: 采用 RESTful 风格
+- **理由**: 标准化接口，便于前后端分离和第三方集成
+- **确认于**: Round 2
+
+### 决策 3: 前端框架
+- **决定**: 使用 React
+- **理由**: 团队熟悉度高，生态成熟，与 RESTful API 配合良好
+- **确认于**: Round 3
+
+### 决策 4: 前端状态管理
+- **决定**: 使用 React Query + Zustand 组合
+- **理由**: React Query 处理服务端状态，Zustand 处理客户端状态，职责分离
+- **确认于**: Round 4
+
+---
+
+## 下一步行动 (Action Items)
+
+| # | 行动项 | 负责人 | 截止日期 |
+|---|--------|--------|----------|
+| 1 | 创建 PostgreSQL 数据库 Schema 设计文档 | backend-architect | Sprint 1 |
+| 2 | 搭建 React + React Query + Zustand 项目脚手架 | frontend-developer | Sprint 1 |
+| 3 | 设计 RESTful API 接口规范文档 | tech-lead | Sprint 1 |
+| 4 | 配置开发、测试、生产环境 | devops | Sprint 1 |
+| 5 | 编写用户认证模块 OpenSpec 规范 | tech-lead | Sprint 1 Week 1 |
+
+---
+
+## 待定问题 (TBD / Open)
+
+以下问题在讨论中**未解决**，需要进一步研究或决策：
+
+### TBD 1: 部署平台选择
+- **问题**: 使用 AWS、GCP、还是自托管？
+- **阻塞**: 等待运维成本评估报告
+- **负责人**: devops
+- **预计解决**: Sprint 1 结束前
+
+### TBD 2: 认证方案（JWT vs Session）
+- **问题**: 使用无状态 JWT 还是服务端 Session？
+- **阻塞**: 需要确认安全需求和多端支持要求
+- **负责人**: backend-architect + security-team
+- **预计解决**: Sprint 1 结束前
+
+---
+
+## 总结
+
+本次头脑风暴完成 5 轮讨论，形成 4 项确认决策和 5 个具体行动项。2 个开放问题（TBD）将在 Sprint 1 期间解决。
+
+下一步建议：使用上述决策创建正式的 OpenSpec 规范文档，进入开发阶段。

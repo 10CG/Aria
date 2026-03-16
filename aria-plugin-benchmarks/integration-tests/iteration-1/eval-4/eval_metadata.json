@@ -1,0 +1,40 @@
+{
+  "eval_id": 4,
+  "eval_name": "brainstorm-to-spec-pipeline",
+  "category": "planning-chain",
+  "description": "Brainstorm session producing decisions that flow into spec-drafter and task-planner",
+  "prompt": "We need a caching layer but unsure about Redis vs Memcached vs in-memory - explore options and create spec",
+  "skills_involved": [
+    "brainstorm", "spec-drafter", "task-planner", "agent-router"
+  ],
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "brainstorm_produces_decision_matrix",
+      "description": "Brainstorm should generate comparison matrix for Redis/Memcached/in-memory",
+      "check": "output.match(/Redis|Memcached/) && (output.includes('matrix') || output.includes('comparison'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "spec_references_decision",
+      "description": "spec-drafter output should reference the brainstorm decision",
+      "check": "output.match(/decision.*record|brainstorm.*reference|docs\\/decisions\\//i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "spec_level_at_least_2",
+      "description": "Caching feature with exploration should be Level 2 or 3",
+      "check": "output.match(/Level [23]|level.*[23]/)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "tasks_include_implementation_and_test",
+      "description": "task-planner should include both implementation and test tasks",
+      "check": "output.match(/TASK-.*impl|TASK-.*test/i) || (output.includes('implementation') && output.includes('test'))",
+      "severity": "high"
+    }
+  ]
+}

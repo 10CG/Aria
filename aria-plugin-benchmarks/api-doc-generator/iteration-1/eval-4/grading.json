@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-framework-support",
+  "timestamp": "2026-03-16T10:34:30Z",
+  "assertions": [
+    {
+      "text": "detects_fastapi",
+      "passed": true,
+      "evidence": "Snippet 1 section header 'Framework: FastAPI (Python)' with detection signal explanation"
+    },
+    {
+      "text": "detects_express",
+      "passed": true,
+      "evidence": "Snippet 2 section header 'Framework: Express.js (Node.js)' with detection signal explanation"
+    },
+    {
+      "text": "detects_flask",
+      "passed": true,
+      "evidence": "Snippet 3 section header 'Framework: Flask (Python)' with detection signal explanation"
+    },
+    {
+      "text": "documents_all_three_endpoints",
+      "passed": true,
+      "evidence": "Three separate tables each containing GET /health — /health appears 3 times in output"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

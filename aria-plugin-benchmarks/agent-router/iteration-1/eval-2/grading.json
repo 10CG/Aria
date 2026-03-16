@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "frontend-task-routing",
+  "timestamp": "2026-03-16T10:02:00Z",
+  "assertions": [
+    {
+      "text": "selects_mobile_developer",
+      "passed": true,
+      "evidence": "Output contains 'mobile-developer' as the routing decision"
+    },
+    {
+      "text": "high_confidence_flutter",
+      "passed": true,
+      "evidence": "Confidence score is 0.95, exceeds minimum threshold of 0.90"
+    },
+    {
+      "text": "mentions_flutter_rationale",
+      "passed": true,
+      "evidence": "Rationale explicitly mentions 'Flutter', 'Riverpod', 'mobile module' and 'mobile/lib/screens/'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,69 @@
+# OpenSpec Archive - CLI Bug Fix
+
+## 归档任务
+
+- **Spec**: `openspec/changes/payment-gateway`
+- **CLI 报告路径**: `standards/openspec/archive/payment-gateway` (错误)
+- **Auto Fix**: true
+
+## CLI 路径 Bug 检测
+
+### 已知 Bug 说明
+
+```
+Bug: CLI 在解析归档路径时，错误地将 `standards/` 作为前缀
+原因: CLI 从 aria-standards 子模块路径推断归档目标，但变更应属于项目自身
+影响版本: aria-cli < 1.3.0
+```
+
+### 路径检测
+
+```
+CLI 报告路径: standards/openspec/archive/payment-gateway
+```
+
+**检测结果**: 路径以 `standards/` 开头 → **CLI 路径 Bug 已检测** ⚠️
+
+### 自动修复逻辑 (auto_fix=true)
+
+```python
+# Bug 检测规则
+if reported_path.startswith('standards/openspec/archive/'):
+    # 提取 spec 名称
+    spec_name = reported_path.replace('standards/openspec/archive/', '')
+    # 修正为项目本地路径
+    corrected_path = f'openspec/archive/{spec_name}'
+    print(f"[AUTO-FIX] Bug detected: '{reported_path}' → corrected to '{corrected_path}'")
+```
+
+### 修复应用
+
+```
+[AUTO-FIX] Bug detected: 'standards/openspec/archive/payment-gateway'
+           corrected  → 'openspec/archive/payment-gateway'
+```
+
+**已修复 (fixed)**: `standards/openspec/archive/payment-gateway` → `openspec/archive/payment-gateway`
+
+## 使用修正路径执行归档
+
+```bash
+$ mkdir -p openspec/archive/payment-gateway
+$ cp -r openspec/changes/payment-gateway/* openspec/archive/payment-gateway/
+```
+
+归档文件复制完成:
+- `proposal.md` → `openspec/archive/payment-gateway/proposal.md` ✅
+- `tasks.md` → `openspec/archive/payment-gateway/tasks.md` ✅
+
+## 归档结果
+
+| 项目 | 值 |
+|------|-----|
+| CLI 报告路径 (错误) | `standards/openspec/archive/payment-gateway` |
+| Auto-Fix 应用 | ✅ 已修复 (corrected) |
+| 实际使用路径 | `openspec/archive/payment-gateway` |
+| Bug 文档 | CLI path bug auto-fix applied |
+| **状态** | **✅ 归档成功** |
+
+注意: CLI 路径 bug auto-fix 已应用。建议升级 aria-cli 到 >= 1.3.0 以永久解决此问题。

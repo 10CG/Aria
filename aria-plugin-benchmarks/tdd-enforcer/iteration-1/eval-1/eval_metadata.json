@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "red-phase-enforcement",
+  "category": "tdd-cycle",
+  "prompt": "开发者想直接实现 UserService.create() 方法，还没有写任何测试。TDD Enforcer 应如何处理？",
+  "setup": {
+    "current_phase": "RED",
+    "has_tests": false,
+    "has_implementation": false
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_missing_test",
+      "description": "Should detect that no test exists before implementation",
+      "check": "output.includes('test') || output.includes('测试') || output.includes('RED')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "requires_test_first",
+      "description": "Should require writing test before implementation",
+      "check": "output.includes('先写') || output.includes('test first') || output.includes('写测试')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "provides_test_template",
+      "description": "Should provide guidance or template for writing the test",
+      "check": "output.includes('def test_') || output.includes('test_create') || output.includes('assert') || output.includes('断言')",
+      "severity": "high"
+    }
+  ]
+}

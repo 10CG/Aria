@@ -1,0 +1,214 @@
+================================================================================
+INTEGRATION TEST: phase-boundary-error-recovery
+Prompt: Complete development but tests are failing - handle the failure and retry
+Skills: phase-b-developer, branch-finisher, phase-c-integrator, commit-msg-generator
+================================================================================
+
+[CONTEXT] Resuming from in-progress Phase B
+  Active task:   TASK-342
+  Branch:        feature/backend/TASK-342-order-status-webhook
+  Description:   Add webhook notifications for order status changes
+  Developer:     subagent-driver -> backend-architect
+
+================================================================================
+=== Phase B: Development (in progress) ===
+================================================================================
+
+[B.2] subagent-driver: Development complete. Signaling branch-finisher...
+
+--- subagent-driver handoff ---
+Branch: feature/backend/TASK-342-order-status-webhook
+Files modified:
+  backend/src/webhooks/order_status_handler.py   [CREATED]
+  backend/src/webhooks/webhook_dispatcher.py      [MODIFIED]
+  backend/src/api/routes/webhooks.py              [MODIFIED]
+  backend/tests/unit/test_order_status_webhook.py [CREATED]
+  backend/tests/integration/test_webhook_flow.py  [CREATED]
+Development status: Implementation complete, ready for validation
+---
+
+[B.3] branch-finisher: Running pre-integration validation...
+
+--- branch-finisher output (ATTEMPT 1) ---
+Branch: feature/backend/TASK-342-order-status-webhook
+Task:   TASK-342
+
+Running test suite:
+  backend/tests/unit/test_order_status_webhook.py:
+    test_dispatch_on_status_change          ... PASS
+    test_dispatch_retries_on_5xx            ... PASS
+    test_dispatch_no_retry_on_4xx           ... PASS
+    test_hmac_signature_validation          ... PASS
+    test_payload_schema_v2                  ... PASS
+
+  backend/tests/integration/test_webhook_flow.py:
+    test_webhook_end_to_end_delivery        ... PASS
+    test_webhook_timeout_handling           ... FAIL
+    test_webhook_concurrent_dispatch        ... FAIL
+
+  backend/tests/unit/test_webhook_dispatcher.py (existing):
+    test_dispatcher_queue_ordering          ... FAIL
+
+FAILURE DETECTED:
+  3 tests FAILING:
+    - test_webhook_timeout_handling    [FAIL] AssertionError: timeout=30s expected, got timeout=None
+    - test_webhook_concurrent_dispatch [FAIL] RuntimeError: event loop closed during teardown
+    - test_dispatcher_queue_ordering   [FAIL] AssertionError: queue size 1 != 2 (regression)
+
+Linting (flake8): PASS
+Type checking (mypy): PASS (2 warnings, non-blocking)
+
+Validation: FAILED (3 test failures)
+
+---
+
+[B.3] branch-finisher: Test failure detected. Presenting options to developer...
+
+--- branch-finisher: USER OPTIONS ---
+Tests are failing on branch feature/backend/TASK-342-order-status-webhook.
+
+Failure summary:
+  [1] test_webhook_timeout_handling:    timeout attribute not set on WebhookDispatcher
+  [2] test_webhook_concurrent_dispatch: asyncio teardown race condition
+  [3] test_dispatcher_queue_ordering:   regression - queue not persisting second item
+
+Options:
+  Option 1: Abort - discard changes and return to main
+  Option 2: Continue modifying - keep working on the branch to fix the failures (retry)
+  Option 3: Force proceed - skip tests (NOT recommended, will be flagged in PR)
+
+User selected: Option 2 - Continue modifying (retry)
+---
+
+[B.3] branch-finisher: User chose to retry. Returning context to developer. Context preserved.
+  Branch:  feature/backend/TASK-342-order-status-webhook  [PRESERVED]
+  Task ID: TASK-342                                        [PRESERVED]
+  Failures handed back to subagent for targeted fixes.
+
+================================================================================
+=== Phase B: Retry (Targeted Fixes) ===
+================================================================================
+
+[B.2] subagent-driver: Received failure report. Applying targeted fixes...
+
+--- subagent-driver -> backend-architect (retry) ---
+Retry context:
+  branch:   feature/backend/TASK-342-order-status-webhook  (SAME BRANCH, no re-checkout)
+  task_id:  TASK-342
+  failures: [timeout_handling, concurrent_dispatch, queue_ordering]
+
+Fix 1: test_webhook_timeout_handling
+  Problem:  WebhookDispatcher.__init__ missing timeout parameter
+  Fix:      backend/src/webhooks/webhook_dispatcher.py:
+              Added: self.timeout = timeout or settings.WEBHOOK_TIMEOUT_SECONDS (default=30)
+  Verify:   test_webhook_timeout_handling now expects timeout=30 -> PASS
+
+Fix 2: test_webhook_concurrent_dispatch
+  Problem:  asyncio.get_event_loop() called after loop closed in teardown
+  Fix:      backend/src/webhooks/order_status_handler.py:
+              Replaced get_event_loop() with asyncio.get_running_loop() + explicit teardown guard
+  Verify:   test_webhook_concurrent_dispatch -> PASS
+
+Fix 3: test_dispatcher_queue_ordering (regression)
+  Problem:  webhook_dispatcher.py refactor accidentally dropped second enqueue call
+  Fix:      backend/src/webhooks/webhook_dispatcher.py:
+              Restored: await self._queue.put(payload) in dispatch_all() loop (missing after refactor)
+  Verify:   test_dispatcher_queue_ordering -> PASS
+
+Files modified in retry:
+  backend/src/webhooks/webhook_dispatcher.py      [MODIFIED: +8 lines]
+  backend/src/webhooks/order_status_handler.py    [MODIFIED: +3 lines]
+---
+
+[B.2] subagent-driver: 3 targeted fixes applied. Re-signaling branch-finisher.
+
+--- branch-finisher output (ATTEMPT 2 - Re-run Validation) ---
+Branch: feature/backend/TASK-342-order-status-webhook
+Task:   TASK-342
+
+Re-running full test suite after fixes:
+  backend/tests/unit/test_order_status_webhook.py:
+    test_dispatch_on_status_change          ... PASS
+    test_dispatch_retries_on_5xx            ... PASS
+    test_dispatch_no_retry_on_4xx           ... PASS
+    test_hmac_signature_validation          ... PASS
+    test_payload_schema_v2                  ... PASS
+
+  backend/tests/integration/test_webhook_flow.py:
+    test_webhook_end_to_end_delivery        ... PASS
+    test_webhook_timeout_handling           ... PASS  [WAS: FAIL]
+    test_webhook_concurrent_dispatch        ... PASS  [WAS: FAIL]
+
+  backend/tests/unit/test_webhook_dispatcher.py (existing):
+    test_dispatcher_queue_ordering          ... PASS  [WAS: FAIL]
+
+Results: 11/11 PASS (all previously failing tests now pass)
+Linting: PASS
+Type checking: PASS (0 warnings)
+Coverage: 88% (threshold: 80%)
+
+Verification: PASSED
+Re-validation complete. Branch is clean and ready for integration.
+---
+
+[B.3] branch-finisher: Re-validation PASSED after fix. Proceeding to Phase C. [OK]
+
+================================================================================
+=== Phase C: Integration ===
+================================================================================
+
+[C.1] commit-msg-generator: Generating commit message for TASK-342...
+
+--- commit-msg-generator output ---
+Branch: feature/backend/TASK-342-order-status-webhook
+Context: TASK-342 (preserved through retry, no context loss)
+Files: 5 changed (+127/-8)
+
+Generated commit message:
+  feat(webhooks): add order status change webhook notifications
+
+  Implements WebhookDispatcher with HMAC-signed payloads, retry logic
+  (3 attempts on 5xx), and configurable timeout (default 30s). Supports
+  concurrent dispatch via asyncio with proper event loop lifecycle.
+
+  Tests: 11 unit + integration tests passing, 88% coverage.
+  Refs: TASK-342
+  Executed-By: 🤖 backend-architect
+  Context: 📋 TASK-342
+  Module: 🔗 webhooks
+---
+
+[C.1] commit-msg-generator: Commit generated. Proceeding to integration. [OK]
+
+[C.2] phase-c-integrator: Opening PR...
+
+--- phase-c-integrator output ---
+PR created:
+  Title:  feat(webhooks): add order status change webhook notifications [TASK-342]
+  URL:    https://forgejo.10cg.pub/project/aria-web-app/pulls/PR-1862
+  Base:   main
+  Head:   feature/backend/TASK-342-order-status-webhook
+  Files:  5 changed
+
+PR merged: PR-1862 -> main [OK]
+---
+
+[C]   Phase C complete. Proceed to integration successful after retry.
+
+================================================================================
+=== ERROR RECOVERY VERIFICATION ===
+================================================================================
+
+Failure detection:       3 tests FAIL detected in attempt 1               [OK]
+Retry option offered:    "Option 2: Continue modifying (retry)"            [OK]
+Context preserved:       feature/backend/TASK-342-order-status-webhook     [OK]
+                         TASK-342 preserved through retry                  [OK]
+Re-validation run:       Full test suite re-run after fix (attempt 2)      [OK]
+Verification passed:     11/11 tests passing in re-validation              [OK]
+Phase C reached:         PR-1862 merged after successful retry             [OK]
+
+No context loss: branch=feature/backend/TASK-342-order-status-webhook, task=TASK-342 throughout
+
+================================================================================
+RESULT: PASS
+================================================================================

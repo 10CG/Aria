@@ -1,0 +1,64 @@
+╔══════════════════════════════════════════════════════════════╗
+║                    PROJECT STATE ANALYSIS                     ║
+╚══════════════════════════════════════════════════════════════╝
+
+📍 当前状态
+───────────────────────────────────────────────────────────────
+  分支: master
+  模块: 未检测到模块化结构
+  Phase/Cycle: 未配置进度管理
+  变更: 4 文件
+  OpenSpec: 未配置
+
+📊 变更分析
+───────────────────────────────────────────────────────────────
+  暂存文件:
+    - backend/src/routes/tasks.py
+    - backend/src/schemas/task.py
+  未暂存文件:
+    - backend/docs/
+    - mobile/
+    - shared/
+  类型: Python 代码 + 目录
+  复杂度: Level 1
+  架构影响: 无
+  测试覆盖: ❌ 未检测到测试文件
+
+📄 需求状态
+───────────────────────────────────────────────────────────────
+  配置状态: ❌ 未配置需求追踪
+  期望路径: docs/requirements/
+  建议操作:
+    - 如需启用需求追踪，参考 standards/templates/prd-template.md
+    - 或使用 OpenSpec 作为轻量替代方案
+
+🏗️ 架构状态
+───────────────────────────────────────────────────────────────
+  System Architecture: ❌ 不存在
+  期望路径: docs/architecture/system-architecture.md
+  建议操作:
+    - 如需启用架构追踪，创建 System Architecture 文档
+    - 参考 standards/core/documentation/system-architecture-spec.md
+
+📋 OpenSpec 状态
+───────────────────────────────────────────────────────────────
+  配置状态: ❌ 未配置 OpenSpec
+  期望路径: openspec/changes/, openspec/archive/
+  建议操作:
+    - 如需使用 OpenSpec，参考 standards/openspec/templates/
+    - 或使用 /spec-drafter 创建新的 proposal
+
+🎯 推荐工作流
+───────────────────────────────────────────────────────────────
+  ➤ [1] commit_only (推荐)
+      执行: C.1
+      理由: 已有暂存变更，仅需提交代码
+
+  ○ [2] quick-fix
+      执行: B.2 → C.1
+      理由: 如果只是简单的修复
+
+  ○ [3] 自定义组合
+      输入格式: "B.2 + C.1" 或 "Phase B"
+
+🤔 选择 [1-3] 或输入自定义:

@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "tdd-integration",
+  "timestamp": "2026-03-16T14:11:58Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'TDD enforcement active. Writing tests BEFORE implementation' and shows test file creation prior to any implementation file",
+      "text": "writes_tests_first"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output explicitly labels 'Phase 1 — Red', 'Phase 2 — Green', 'Phase 3 — Refactor' with Red→Green→Refactor cycle table",
+      "text": "red_green_refactor_cycle"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output shows '5 passed, 0 failed — Green phase complete' and 'All tests pass — TASK-002 marked complete via TDD dual-insurance'",
+      "text": "tests_pass_before_proceeding"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

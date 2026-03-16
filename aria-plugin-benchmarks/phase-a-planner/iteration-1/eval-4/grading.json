@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "yaml-output-format",
+  "timestamp": "2026-03-16T14:04:48Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'phase_a:' and 'Phase A Plan' heading and structured YAML execution_plan block",
+      "text": "has_execution_plan"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Each step in YAML has 'status: completed' field; summary table shows 'completed' for all three steps",
+      "text": "includes_step_status"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'A.1', 'A.2', and 'A.3' as YAML step IDs and as section headers",
+      "text": "lists_all_three_steps"
+    },
+    {
+      "id": "A4",
+      "passed": true,
+      "evidence": "Output references 'proposal.md', 'tasks.md', and 'artifacts:' array in YAML for each step",
+      "text": "includes_outputs_reference"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

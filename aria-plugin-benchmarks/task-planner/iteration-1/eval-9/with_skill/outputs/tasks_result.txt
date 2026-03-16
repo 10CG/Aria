@@ -1,0 +1,140 @@
+# Task Breakdown: 用户注册功能
+
+> **Spec**: /f/work2025/cursor/Aria/aria-plugin-benchmarks/task-planner/iteration-1/eval-9/user-registration-proposal.md
+> **Total Tasks**: 15
+> **Estimated**: 48h
+
+## Task List
+
+### TASK-001: 设计注册页面 UI/UX
+- **Complexity**: M
+- **Dependencies**: None
+- **Agent**: frontend-architect
+- **Deliverables**:
+  - frontend/src/components/auth/RegisterForm.vue
+  - frontend/src/styles/auth.css
+
+### TASK-002: 实现注册表单前端组件
+- **Complexity**: M
+- **Dependencies**: TASK-001
+- **Agent**: frontend-developer
+- **Deliverables**:
+  - frontend/src/components/auth/RegisterForm.vue
+  - frontend/tests/unit/RegisterForm.spec.js
+
+### TASK-003: 创建注册 API 端点
+- **Complexity**: L
+- **Dependencies**: None
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/src/controllers/AuthController.js
+  - backend/src/routes/auth.js
+  - backend/src/models/User.js
+
+### TASK-004: 实现邮箱格式验证
+- **Complexity**: S
+- **Dependencies**: TASK-003
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/utils/validators.js
+  - backend/tests/unit/validators.spec.js
+
+### TASK-005: 实现密码强度检查
+- **Complexity**: S
+- **Dependencies**: TASK-003
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/utils/password.js
+  - backend/tests/unit/password.spec.js
+
+### TASK-006: 处理注册表单提交
+- **Complexity**: M
+- **Dependencies**: TASK-002, TASK-004, TASK-005
+- **Agent**: fullstack-developer
+- **Deliverables**:
+  - frontend/src/services/auth.js
+  - backend/src/middlewares/validation.js
+
+### TASK-007: 显示注册成功/错误消息
+- **Complexity**: S
+- **Dependencies**: TASK-006
+- **Agent**: frontend-developer
+- **Deliverables**:
+  - frontend/src/components/ui/Message.vue
+
+### TASK-008: 生成邮箱验证令牌
+- **Complexity**: M
+- **Dependencies**: TASK-003
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/utils/token.js
+  - backend/src/services/EmailVerificationService.js
+
+### TASK-009: 发送验证邮件
+- **Complexity**: L
+- **Dependencies**: TASK-008
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/services/EmailService.js
+  - backend/config/email.config.js
+
+### TASK-010: 实现验证链接处理
+- **Complexity**: M
+- **Dependencies**: TASK-008, TASK-009
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/controllers/VerificationController.js
+
+### TASK-011: 验证邮箱状态显示
+- **Complexity**: S
+- **Dependencies**: TASK-010
+- **Agent**: frontend-developer
+- **Deliverables**:
+  - frontend/src/components/auth/EmailVerificationStatus.vue
+
+### TASK-012: 创建用户数据模型
+- **Complexity**: M
+- **Dependencies**: TASK-003
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/src/models/User.js
+  - backend/tests/unit/UserModel.spec.js
+
+### TASK-013: 实现用户信息 CRUD
+- **Complexity**: L
+- **Dependencies**: TASK-012
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/controllers/UserController.js
+  - backend/tests/integration/user-api.spec.js
+
+### TASK-014: 实现密码哈希存储
+- **Complexity**: M
+- **Dependencies**: TASK-012
+- **Agent**: backend-developer
+- **Deliverables**:
+  - backend/src/utils/hash.js
+  - backend/tests/unit/hash.spec.js
+
+### TASK-015: 编写端到端测试
+- **Complexity**: L
+- **Dependencies**: TASK-002, TASK-006, TASK-011, TASK-013
+- **Agent**: qa-engineer
+- **Deliverables**:
+  - tests/e2e/user-registration-flow.spec.js
+  - tests/e2e/email-verification.spec.js
+
+## Execution Order
+TASK-001 → TASK-002 → TASK-003 → TASK-004 → TASK-005 → TASK-006 → TASK-007 → TASK-008 → TASK-009 → TASK-010 → TASK-011 → TASK-012 → TASK-013 → TASK-014 → TASK-015
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 5 | 5h |
+| M | 6 | 18h |
+| L | 4 | 25h |
+
+## Test Tasks Included
+✅ 测试任务已自动添加：5个测试任务
+✅ 测试覆盖：单元测试、集成测试、端到端测试
+✅ 验证标准：每个测试任务都有明确的验收标准

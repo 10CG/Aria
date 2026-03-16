@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "new-story-addition",
+  "category": "sync-flow",
+  "prompt": "添加新故事: US-099 是新创建的故事 (To Do)，将其添加到 UPM requirements 章节",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "adds_story_to_upm",
+      "description": "Should add US-099 as a new entry in UPM requirements",
+      "check": "output.includes('US-099') || output.includes('added') || output.includes('新增')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "sets_initial_status",
+      "description": "Should set the initial status to To Do in UPM",
+      "check": "output.includes('To Do') || output.includes('待办') || output.includes('initial')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "preserves_existing_entries",
+      "description": "Should not modify existing UPM entries during addition",
+      "check": "output.includes('existing') || output.includes('preserved') || output.includes('unchanged') || output.includes('不影响')",
+      "severity": "medium"
+    }
+  ]
+}

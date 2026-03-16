@@ -1,0 +1,192 @@
+{
+  "skill_name": "subagent-driver",
+  "skill_path": "aria/skills/subagent-driver",
+  "skill_version": "1.3.0",
+  "description": "Benchmark tests for subagent-driver skill - Core SDD executor managing Fresh Subagent startup, isolation levels, and inter-task code review",
+  "metrics": [
+    "fresh_subagent_launch_correctness",
+    "isolation_level_selection_accuracy",
+    "inter_task_review_triggering",
+    "context_handoff_minimalism",
+    "task_completion_verification"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "fresh-subagent-launch",
+      "category": "agent-lifecycle",
+      "prompt": "启动一个新的 Fresh Subagent 来执行 TASK-003: 实现用户登录 API。确保 subagent 以干净的上下文启动。",
+      "setup": {
+        "task_id": "TASK-003",
+        "task_type": "backend-implementation",
+        "requires_clean_context": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "launches_fresh_context",
+          "description": "Should launch subagent with fresh/clean context",
+          "check": "output.includes('Fresh') || output.includes('clean') || output.includes('新') || output.includes('独立')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "assigns_correct_task",
+          "description": "Should assign TASK-003 to the new subagent",
+          "check": "output.includes('TASK-003') || output.includes('登录') || output.includes('login')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "isolates_from_parent_context",
+          "description": "Should ensure subagent does not inherit parent conversation context",
+          "check": "output.includes('isolat') || output.includes('隔离') || output.includes('context') || output.includes('上下文')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "isolation-level-selection",
+      "category": "isolation",
+      "prompt": "为以下三个任务选择正确的隔离级别: 1) 修复 typo（无代码变更）; 2) 添加新功能（新分支）; 3) 大型重构（需要 worktree）",
+      "setup": {
+        "tasks": [
+          {"id": "T1", "type": "typo_fix", "expected_isolation": "none"},
+          {"id": "T2", "type": "new_feature", "expected_isolation": "branch"},
+          {"id": "T3", "type": "large_refactor", "expected_isolation": "worktree"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "selects_none_for_trivial",
+          "description": "Should select no isolation for trivial typo fixes",
+          "check": "output.includes('none') || output.includes('无隔离') || output.includes('直接') || output.includes('trivial')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "selects_branch_for_feature",
+          "description": "Should select branch isolation for new features",
+          "check": "output.includes('branch') || output.includes('分支') || output.includes('Branch')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "selects_worktree_for_refactor",
+          "description": "Should select worktree isolation for large refactors",
+          "check": "output.includes('worktree') || output.includes('工作树') || output.includes('Worktree')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "inter-task-review",
+      "category": "code-review",
+      "prompt": "TASK-002 已完成，TASK-003 依赖于 TASK-002 的输出。在 TASK-003 开始前，subagent-driver 应触发任务间代码评审。",
+      "setup": {
+        "completed_task": "TASK-002",
+        "next_task": "TASK-003",
+        "dependency": "TASK-003 depends on TASK-002"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "triggers_code_review",
+          "description": "Should trigger code review before starting dependent task",
+          "check": "output.includes('review') || output.includes('评审') || output.includes('code-review') || output.includes('检查')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "invokes_reviewer_agent",
+          "description": "Should invoke code-reviewer agent for the review",
+          "check": "output.includes('code-reviewer') || output.includes('reviewer') || output.includes('评审员') || output.includes('agent')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "blocks_next_task_pending_review",
+          "description": "Should block TASK-003 until review is complete",
+          "check": "output.includes('block') || output.includes('wait') || output.includes('等待') || output.includes('完成后')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "context-handoff",
+      "category": "context-management",
+      "prompt": "将 TASK-004 的上下文传递给新的 subagent。上下文应该最小化，只包含任务执行所必需的信息。",
+      "setup": {
+        "task_id": "TASK-004",
+        "available_context": {
+          "full_codebase": true,
+          "spec_document": true,
+          "previous_tasks": ["TASK-001", "TASK-002", "TASK-003"],
+          "task_details": true
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "includes_task_spec",
+          "description": "Should include the task specification in handoff",
+          "check": "output.includes('spec') || output.includes('规范') || output.includes('任务说明') || output.includes('TASK-004')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "minimizes_context_size",
+          "description": "Should only pass minimal required context, not full conversation history",
+          "check": "output.includes('minimal') || output.includes('最小') || output.includes('必要') || output.includes('relevant')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "includes_dependency_outputs",
+          "description": "Should include outputs from dependency tasks",
+          "check": "output.includes('TASK-001') || output.includes('TASK-002') || output.includes('依赖') || output.includes('depend')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "task-completion-verification",
+      "category": "verification",
+      "prompt": "Subagent 声称已完成 TASK-005: 开发前端登录页面。验证任务是否真正完成（包括所有交付物和验收标准）。",
+      "setup": {
+        "task_id": "TASK-005",
+        "claimed_completion": true,
+        "deliverables_expected": ["LoginForm.jsx", "LoginPage.jsx", "Login.test.js"],
+        "acceptance_criteria": ["form renders", "validation works", "success redirect"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "checks_deliverables",
+          "description": "Should verify all expected deliverables exist",
+          "check": "output.includes('deliver') || output.includes('交付') || output.includes('LoginForm') || output.includes('文件')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "validates_acceptance_criteria",
+          "description": "Should validate against acceptance criteria",
+          "check": "output.includes('验收') || output.includes('acceptance') || output.includes('criteria') || output.includes('标准')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "reports_completion_status",
+          "description": "Should report a clear pass/fail completion status",
+          "check": "output.includes('完成') || output.includes('complete') || output.includes('PASS') || output.includes('通过')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

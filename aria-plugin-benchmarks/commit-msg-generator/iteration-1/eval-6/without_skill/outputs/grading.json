@@ -1,0 +1,41 @@
+{
+  "evaluation_id": "eval-6",
+  "test_name": "orchestrated-mobile-developer",
+  "mode": "without_skill",
+  "timestamp": "2026-03-13T00:00:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "mobile_developer_agent",
+      "description": "Executed-By must specify 'mobile-developer subagent'",
+      "expected": "🤖 Executed-By: mobile-developer subagent",
+      "actual": null,
+      "passed": false,
+      "reason": "Baseline output does not include enhanced markers"
+    },
+    {
+      "id": "A2",
+      "name": "phase_cycle_format",
+      "description": "Phase/Cycle must follow 'PhaseN-CycleM' format",
+      "expected": "Phase4-Cycle2",
+      "actual": null,
+      "passed": false,
+      "reason": "Baseline output does not include enhanced markers"
+    },
+    {
+      "id": "A3",
+      "name": "module_is_mobile",
+      "description": "Module marker must be 'mobile'",
+      "expected": "🔗 Module: mobile",
+      "actual": null,
+      "passed": false,
+      "reason": "Baseline output does not include enhanced markers"
+    }
+  ],
+  "summary": {
+    "total_assertions": 3,
+    "passed": 0,
+    "failed": 3,
+    "status": "FAIL"
+  }
+}

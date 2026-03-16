@@ -1,0 +1,61 @@
+# Forgejo Sync - Label Mapping
+
+## 映射任务
+
+- **Story**: US-001
+- **Repository**: 10cg/my-project
+- **Metadata Fields**: priority, module, type, sprint
+
+## 元数据到 Label 映射规则
+
+| Story 字段 | 值 | Forgejo Label | Label ID |
+|-----------|-----|--------------|---------|
+| priority | high | `priority:high` | #5 |
+| module | backend | `module:backend` | #8 |
+| type | feature | `type:feature` | #3 |
+| sprint | Sprint-3 | `sprint:Sprint-3` | #15 |
+
+## 检查现有 Labels
+
+```
+GET https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/labels
+```
+
+**现有 Labels**:
+- #3: `type:feature` (color: #0075ca) ✅ 已存在
+- #5: `priority:high` (color: #e4e669) ✅ 已存在
+- #8: `module:backend` (color: #d93f0b) ✅ 已存在
+- #15: `sprint:Sprint-3` (color: #0052cc) ✅ 已存在
+
+所有 4 个 labels 已存在，无需创建。
+
+## 应用 Labels 到 Issue #47
+
+```json
+POST https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues/47/labels
+{
+  "labels": [5, 8, 3, 15]
+}
+```
+
+**响应**:
+```json
+[
+  {"id": 5,  "name": "priority:high",   "color": "#e4e669"},
+  {"id": 8,  "name": "module:backend",  "color": "#d93f0b"},
+  {"id": 3,  "name": "type:feature",    "color": "#0075ca"},
+  {"id": 15, "name": "sprint:Sprint-3", "color": "#0052cc"}
+]
+```
+
+## 映射结果
+
+| 元数据字段 | Story 值 | Forgejo Label | 状态 |
+|-----------|---------|--------------|------|
+| priority | high | `priority:high` | ✅ 已映射 |
+| module | backend | `module:backend` | ✅ 已映射 |
+| type | feature | `type:feature` | ✅ 已映射 |
+| sprint | Sprint-3 | `sprint:Sprint-3` | ✅ 已映射 |
+
+**总计**: 4/4 元数据字段成功映射为 Forgejo Labels
+Issue #47 现在有 4 个 labels，元数据完整反映。

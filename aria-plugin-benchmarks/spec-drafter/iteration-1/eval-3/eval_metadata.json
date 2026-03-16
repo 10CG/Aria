@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "scope-extraction",
+  "category": "input-parsing",
+  "prompt": "提取范围: '我们需要给用户添加一个通知系统，支持邮件和短信，但不包括推送通知'",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "extracts_in_scope",
+      "description": "Should extract email and SMS as in-scope",
+      "check": "(output.includes('email') || output.includes('邮件')) && (output.includes('SMS') || output.includes('短信'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "extracts_out_of_scope",
+      "description": "Should extract push notifications as out-of-scope",
+      "check": "output.includes('push') || output.includes('推送')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "uses_scope_format",
+      "description": "Should use in-scope/out-of-scope format structure",
+      "check": "output.includes('In-Scope') || output.includes('Out-of-Scope') || output.includes('范围内') || output.includes('范围外')",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "quickfix-with-tdd-double-insurance",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "skips_phase_a",
+      "passed": true,
+      "evidence": "workflow-runner classified request as Level 1 and output shows 'Phase A: SKIP (Level 1 change - no OpenSpec required)'"
+    },
+    {
+      "text": "tdd_method_b_session_hook",
+      "passed": true,
+      "evidence": "workflow-runner registered pre-hook 'pre_code_write -> require_failing_test_first' and output shows 'Method B active: session-level TDD enforcement: ACTIVE'"
+    },
+    {
+      "text": "tdd_method_a_subagent",
+      "passed": true,
+      "evidence": "subagent-driver injected TDD Method A constraint with explicit 'RED -> GREEN -> REFACTOR' discipline text into subagent context. Full RED->GREEN->REFACTOR cycle executed and verified."
+    },
+    {
+      "text": "commit_type_is_fix",
+      "passed": true,
+      "evidence": "commit-msg-generator produced 'fix(payment): guard against null order in processRefund' - type is 'fix' matching bugfix convention"
+    },
+    {
+      "text": "branch_mode_is_branch",
+      "passed": true,
+      "evidence": "branch-manager scored 0 (single module, 3 files, 1 agent) and selected Branch mode. Output explicitly states 'Mode selected: Branch mode' and 'Worktree mode NOT triggered.'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "status-sync",
+  "timestamp": "2026-03-16T14:12:30Z",
+  "assertions": [
+    {
+      "text": "updates_upm_status",
+      "passed": true,
+      "evidence": "Output shows UPM diff updating status from 'In Progress' to 'Done' and reports 'synced' in the result header"
+    },
+    {
+      "text": "identifies_changed_entry",
+      "passed": true,
+      "evidence": "Output explicitly identifies 'US-005' and 'REQ-005' as the changed entry in both the Change Applied table and audit trail"
+    },
+    {
+      "text": "records_previous_status",
+      "passed": true,
+      "evidence": "Audit trail records 'previous: In Progress' and the diff shows the before state explicitly"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

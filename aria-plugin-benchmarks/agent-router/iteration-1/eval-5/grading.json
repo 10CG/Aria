@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "fallback-routing",
+  "timestamp": "2026-03-16T10:05:00Z",
+  "assertions": [
+    {
+      "text": "falls_back_to_tech_lead",
+      "passed": true,
+      "evidence": "Output selects 'tech-lead' as fallback with clear decision label"
+    },
+    {
+      "text": "explains_fallback_reason",
+      "passed": true,
+      "evidence": "Rationale cites 'overall/broad architectural review', 'cross-cutting concern', and 'no specific domain signals'"
+    },
+    {
+      "text": "does_not_hallucinate_agent",
+      "passed": true,
+      "evidence": "No invented agents (data-engineer, devops-engineer, qa-engineer) found in output"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,52 @@
+{
+  "eval_id": 5,
+  "eval_name": "orchestrated-mode-full-params",
+  "category": "orchestrated-mode",
+  "timestamp": "2026-03-13T03:15:30Z",
+  "commit_message": "Added authentication backend\n\nThis commit adds JWT authentication service and middleware.\n\n- Added AuthService for token handling\n- Added AuthMiddleware for request authentication\n- Added tests for auth service",
+  "expectations": [
+    {
+      "id": "A1",
+      "text": "has_executed_by",
+      "passed": false,
+      "evidence": "Missing 'Executed-By' marker"
+    },
+    {
+      "id": "A2",
+      "text": "has_context",
+      "passed": false,
+      "evidence": "Missing 'Context' marker with phase/cycle"
+    },
+    {
+      "id": "A3",
+      "text": "has_module",
+      "passed": false,
+      "evidence": "Missing 'Module' marker"
+    },
+    {
+      "id": "A4",
+      "text": "markers_order",
+      "passed": false,
+      "evidence": "No enhanced markers present to verify order"
+    },
+    {
+      "id": "A5",
+      "text": "correct_emoji_executed_by",
+      "passed": false,
+      "evidence": "No emoji marker found"
+    },
+    {
+      "id": "A6",
+      "text": "subagent_suffix",
+      "passed": false,
+      "evidence": "No 'Executed-By' with subagent suffix"
+    }
+  ],
+  "verdict": "fail",
+  "pass_rate": 0.0,
+  "critical_passed": 0,
+  "critical_total": 4,
+  "high_passed": 0,
+  "high_total": 2,
+  "notes": "Baseline without skill produces simple commit message without any enhanced markers or structured format"
+}

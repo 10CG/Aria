@@ -1,0 +1,27 @@
+{
+  "eval_id": "eval-7",
+  "eval_name": "breaking-change-api",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "assertions": {
+    "A1": {
+      "name": "breaking_change_marker",
+      "description": "Must include 'BREAKING CHANGE' in footer OR '!' in type",
+      "expected": "feat(api)!: or BREAKING CHANGE: in footer",
+      "actual": "feat(tasks): - no breaking change marker",
+      "passed": false
+    },
+    "A2": {
+      "name": "explains_impact",
+      "description": "Should explain the breaking change (response format, API, etc.)",
+      "expected": "Clear explanation of response format change from {tasks: [...]} to {data: [...], meta: {...}}",
+      "actual": "mentions 'changed data and meta fields instead of just tasks array' but does not clearly state this is a breaking change or the exact format change",
+      "passed": false
+    }
+  },
+  "overall": {
+    "total_assertions": 2,
+    "passed_assertions": 0,
+    "failed_assertions": 2,
+    "status": "FAIL"
+  }
+}

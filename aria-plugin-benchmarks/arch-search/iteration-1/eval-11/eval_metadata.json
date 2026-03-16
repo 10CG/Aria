@@ -1,0 +1,17 @@
+{
+  "eval_id": 11,
+  "eval_name": "token-savings-auth",
+  "category": "token-efficiency",
+  "prompt": "搜索认证功能的实现",
+  "expected_layer": 1,
+  "baseline_tokens": 3000,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "significant_token_savings",
+      "description": "Should save at least 60% tokens vs baseline",
+      "check": "tokens_used < 1200",
+      "severity": "critical"
+    }
+  ]
+}

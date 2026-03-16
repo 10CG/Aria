@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "multi-document-batch",
+  "category": "batch-validation",
+  "prompt": "批量验证: PRD-001 (valid), PRD-002 (missing Scope), US-010 (missing AC), ARCH-001 (valid)",
+  "setup": {
+    "document_count": 4,
+    "expected_valid": 2,
+    "expected_invalid": 2
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "processes_all_documents",
+      "description": "Should process all 4 documents",
+      "check": "output.includes('4') || output.includes('batch') || output.includes('批量')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reports_pass_fail_per_doc",
+      "description": "Should report pass/fail status for each document",
+      "check": "output.includes('PASS') || output.includes('FAIL') || output.includes('通过') || output.includes('失败')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "correct_valid_count",
+      "description": "Should correctly identify 2 valid and 2 invalid documents",
+      "check": "output.includes('2/4') || (output.includes('valid: 2') || output.includes('passed: 2'))",
+      "severity": "high"
+    }
+  ]
+}

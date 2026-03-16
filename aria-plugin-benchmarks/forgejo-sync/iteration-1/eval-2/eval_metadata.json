@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "prd-to-wiki-publish",
+  "category": "publish-flow",
+  "prompt": "将 PRD 文档发布到 Forgejo Wiki: prd_path=openspec/changes/user-auth/proposal.md, wiki_page=User-Auth-PRD, repo=10cg/my-project, version=1.0",
+  "setup": {
+    "prd_path": "openspec/changes/user-auth/proposal.md",
+    "wiki_page": "User-Auth-PRD",
+    "repo": "10cg/my-project"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "publishes_to_wiki",
+      "description": "Should publish PRD content to Forgejo Wiki",
+      "check": "output.includes('Wiki') || output.includes('wiki') || output.includes('发布')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "references_prd_path",
+      "description": "Should reference the source PRD document path",
+      "check": "output.includes('proposal.md') || output.includes('openspec') || output.includes('user-auth')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "sets_wiki_page_name",
+      "description": "Should use correct wiki page name",
+      "check": "output.includes('User-Auth-PRD') || output.includes('wiki_page') || output.includes('页面')",
+      "severity": "high"
+    }
+  ]
+}

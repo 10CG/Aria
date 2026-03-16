@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "analyze-multi-file-changes",
+  "timestamp": "2026-03-16T15:46:07.009268+00:00",
+  "assertions": [
+    {
+      "text": "groups_by_module",
+      "passed": false,
+      "evidence": "Pattern 'group|Group|backend|frontend' not found in output"
+    },
+    {
+      "text": "conventional_commits",
+      "passed": false,
+      "evidence": "Pattern '(feat|fix|refactor)\\(' not found in output"
+    },
+    {
+      "text": "suggests_order",
+      "passed": true,
+      "evidence": "Matched: 'after'"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.3333333333333333
+}

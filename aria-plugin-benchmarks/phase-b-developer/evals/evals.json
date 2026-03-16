@@ -1,0 +1,194 @@
+{
+  "skill_name": "phase-b-developer",
+  "skill_path": "aria/skills/phase-b-developer",
+  "skill_version": "1.3.0",
+  "description": "Benchmark tests for phase-b-developer skill - Ten-Step Cycle Phase B orchestration (B.1 Branch, B.2 Development, B.3 Testing)",
+  "metrics": [
+    "branch_naming_correctness",
+    "tdd_enforcement_rate",
+    "mode_selection_accuracy",
+    "subagent_delegation_quality",
+    "test_verification_completeness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "branch-creation-flow",
+      "category": "orchestration",
+      "prompt": "Execute Phase B step B.1: Create feature branch for task TASK-001 from spec oauth2-social-login. Branch naming convention: feature/{spec-name}",
+      "setup": {
+        "task_id": "TASK-001",
+        "spec_name": "oauth2-social-login",
+        "base_branch": "main",
+        "expected_branch": "feature/oauth2-social-login"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "creates_feature_branch",
+          "description": "Should create a branch following feature/{spec-name} convention",
+          "check": "output.includes('feature/oauth2-social-login') || output.includes('feature/') || output.includes('branch created')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "branches_from_correct_base",
+          "description": "Should branch from main or master",
+          "check": "output.includes('main') || output.includes('master') || output.includes('base branch')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "confirms_branch_checkout",
+          "description": "Should confirm active branch after creation",
+          "check": "output.includes('checkout') || output.includes('switched') || output.includes('Switched to') || output.includes('now on')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "tdd-integration",
+      "category": "tdd-dual-insurance",
+      "prompt": "Execute Phase B development with TDD enforcement for TASK-002: Implement GitHub OAuth2 callback handler. Enforce test-first approach.",
+      "setup": {
+        "task_id": "TASK-002",
+        "tdd_mode": true,
+        "feature": "github-oauth2-callback"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "writes_tests_first",
+          "description": "Should write failing tests before implementation",
+          "check": "output.includes('test first') || output.includes('TDD') || output.includes('failing test') || output.includes('Red phase')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "red_green_refactor_cycle",
+          "description": "Should follow Red → Green → Refactor cycle",
+          "check": "output.includes('Red') || output.includes('Green') || output.includes('Refactor') || output.includes('cycle')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "tests_pass_before_proceeding",
+          "description": "Should verify all tests pass before marking task complete",
+          "check": "output.includes('tests pass') || output.includes('passing') || output.includes('PASSED') || output.includes('all tests')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "worktree-mode-selection",
+      "category": "mode-decision",
+      "prompt": "Phase B mode selection: Task involves parallel development of backend and frontend components for TASK-003 and TASK-004. Determine optimal mode: worktree vs branch.",
+      "setup": {
+        "parallel_tasks": 2,
+        "task_ids": ["TASK-003", "TASK-004"],
+        "domains": ["backend", "frontend"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "evaluates_parallelism",
+          "description": "Should evaluate whether parallel worktrees are beneficial",
+          "check": "output.includes('parallel') || output.includes('worktree') || output.includes('concurrent') || output.includes('simultaneous')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "selects_appropriate_mode",
+          "description": "Should select worktree mode for parallel independent tasks",
+          "check": "output.includes('worktree') || output.includes('git worktree') || output.includes('mode: worktree') || output.includes('isolated')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "explains_decision_rationale",
+          "description": "Should explain why the selected mode is appropriate",
+          "check": "output.includes('independent') || output.includes('isolat') || output.includes('parallel execution') || output.includes('rationale')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "subagent-delegation",
+      "category": "agent-management",
+      "prompt": "Phase B B.2: Delegate TASK-004 (Account linking service) to backend-architect subagent. Provide task context, spec, and verification criteria.",
+      "setup": {
+        "task_id": "TASK-004",
+        "task_title": "Account linking service",
+        "assigned_agent": "backend-architect",
+        "spec_path": "openspec/changes/oauth2-social-login/proposal.md"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "delegates_to_correct_agent",
+          "description": "Should delegate to backend-architect agent",
+          "check": "output.includes('backend-architect') || output.includes('Backend Architect') || output.includes('delegating to')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "provides_task_context",
+          "description": "Should provide spec reference and task details to subagent",
+          "check": "output.includes('proposal.md') || output.includes('spec') || output.includes('TASK-004') || output.includes('context')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "includes_verification_criteria",
+          "description": "Should include acceptance criteria or verification steps",
+          "check": "output.includes('verification') || output.includes('acceptance') || output.includes('criteria') || output.includes('done when')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "awaits_completion_signal",
+          "description": "Should wait for subagent completion before proceeding",
+          "check": "output.includes('await') || output.includes('waiting') || output.includes('complete') || output.includes('handback')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "test-verification",
+      "category": "testing",
+      "prompt": "Phase B B.3: Verify test results for completed TASK-006 (OAuth2 integration tests). Run test suite and validate all tests pass before proceeding to Phase C.",
+      "setup": {
+        "task_id": "TASK-006",
+        "test_command": "pytest tests/integration/test_oauth2.py",
+        "expected_result": "all_pass"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "runs_test_suite",
+          "description": "Should execute the test suite for the completed task",
+          "check": "output.includes('pytest') || output.includes('running tests') || output.includes('test suite') || output.includes('npm test')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "reports_test_results",
+          "description": "Should report test counts and pass/fail status",
+          "check": "output.includes('passed') || output.includes('failed') || output.includes('PASSED') || output.includes('test results')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "gates_phase_c_on_passing",
+          "description": "Should gate Phase C entry on all tests passing",
+          "check": "output.includes('Phase C') || output.includes('proceed') || output.includes('ready') || output.includes('gate')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

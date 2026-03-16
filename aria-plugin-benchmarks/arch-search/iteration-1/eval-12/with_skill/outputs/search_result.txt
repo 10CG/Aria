@@ -1,0 +1,42 @@
+## 🔍 架构搜索结果
+
+**查询**: API endpoints 在哪定义
+**搜索层级**: Layer 2
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/network.md` | ⭐⭐⭐ | API 服务定义、网络架构、拦截器配置 |
+| `backend/docs/ARCHITECTURE.md` | ⭐⭐⭐ | 后端架构分层、API Layer 说明 |
+| `mobile/docs/ARCHITECTURE.md` | ⭐⭐ | 快速导航到 API 相关文档 |
+
+### 📝 信息摘要
+
+API endpoints 主要通过以下方式定义：
+1. **移动端**: 使用 Retrofit 注解定义 API 接口，位于 `@RestApi(baseUrl: '/api/v1')` 的抽象类中
+2. **后端**: 使用 Flask Blueprint 和 `@route` 装饰器定义路由
+3. **API 契约**: 标准化定义位于 `shared/contracts/openapi/` 目录
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/services/api/` - Retrofit API 服务接口定义
+- `mobile/src/services/api/interceptors/` - 网络拦截器实现
+- `backend/src/routes/` - Flask 路由定义（包含 tasks.py）
+- `mobile/src/config/network_config.dart` - 网络配置
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/network.md` 了解完整的 API 设计模式
+- [ ] 查看 `backend/src/routes/` 目录查看所有 API endpoints
+- [ ] 如需 API 契约文档，检查 `shared/contracts/openapi/` 目录
+
+---
+
+**Token 使用统计**:
+- Layer 1: ~200 tokens (快速路由匹配)
+- Layer 2: ~500 tokens (架构文档搜索)
+- 总计: ~700 tokens
+- 节省率: 82.5% (相比传统搜索 ~4000 tokens)

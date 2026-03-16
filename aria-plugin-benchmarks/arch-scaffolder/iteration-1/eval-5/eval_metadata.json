@@ -1,0 +1,48 @@
+{
+  "eval_id": 5,
+  "eval_name": "output-format-compliance",
+  "category": "format-validation",
+  "prompt": "Generate a complete architecture document skeleton for the task management SaaS platform. The output must follow the standard architecture document template format.",
+  "setup": {
+    "expected_format": "markdown",
+    "required_sections": ["title", "overview", "modules", "tech-stack", "nfr"],
+    "naming": "ARCHITECTURE.md"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "is_valid_markdown",
+      "description": "Output must be valid markdown with H1/H2 headings",
+      "check": "output.match(/^# .+/m) && output.match(/^## .+/m)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "has_document_title",
+      "description": "Document must have a clear H1 title related to the system",
+      "check": "output.match(/^# .*(Architecture|System|Platform)/im)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "sections_in_logical_order",
+      "description": "Overview section should appear before Modules section",
+      "check": "output.indexOf('Overview') < output.indexOf('Module')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "uses_consistent_heading_levels",
+      "description": "Main sections should be H2, sub-sections should be H3",
+      "check": "output.match(/^## /m) && !output.match(/^#### /m)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "includes_metadata_header",
+      "description": "Document should include version/date metadata at the top",
+      "check": "output.match(/version|date|updated|v[0-9]/i)",
+      "severity": "medium"
+    }
+  ]
+}

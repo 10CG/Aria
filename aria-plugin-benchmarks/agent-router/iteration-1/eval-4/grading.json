@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-agent-suggestion",
+  "timestamp": "2026-03-16T10:04:00Z",
+  "assertions": [
+    {
+      "text": "suggests_mobile_developer",
+      "passed": true,
+      "evidence": "Output lists 'Agent 1: mobile-developer' with Flutter push notification scope"
+    },
+    {
+      "text": "suggests_backend_architect",
+      "passed": true,
+      "evidence": "Output lists 'Agent 2: backend-architect' with WebSocket/FastAPI scope"
+    },
+    {
+      "text": "identifies_parallel_work",
+      "passed": true,
+      "evidence": "Output explicitly states 'Both agents can work concurrently' and 'parallel execution'"
+    },
+    {
+      "text": "provides_task_split",
+      "passed": true,
+      "evidence": "Output provides a 'Task Split / Breakdown' section assigning mobile and backend sub-tasks"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "phase-boundary-error-recovery",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "detects_test_failure",
+      "passed": true,
+      "evidence": "branch-finisher attempt 1 detected 3 failing tests: test_webhook_timeout_handling, test_webhook_concurrent_dispatch, test_dispatcher_queue_ordering. Output explicitly shows 'FAILURE DETECTED: 3 tests FAILING' and 'Validation: FAILED'."
+    },
+    {
+      "text": "offers_retry_option",
+      "passed": true,
+      "evidence": "branch-finisher presented 'Option 2: Continue modifying - keep working on the branch to fix the failures (retry)' and user selected it. Output contains both 'retry' and 'continue modifying'."
+    },
+    {
+      "text": "revalidation_after_fix",
+      "passed": true,
+      "evidence": "branch-finisher ran a full second attempt labeled 'ATTEMPT 2 - Re-run Validation' with message 'Re-running full test suite after fixes'. All 3 previously failing tests now show 'PASS [WAS: FAIL]'. Output contains 're-validation' and 'Verification: PASSED'."
+    },
+    {
+      "text": "proceeds_to_phase_c",
+      "passed": true,
+      "evidence": "After re-validation PASSED, output shows 'Proceeding to Phase C' and commit-msg-generator and phase-c-integrator both execute. PR-1862 merged successfully."
+    },
+    {
+      "text": "no_context_loss",
+      "passed": true,
+      "evidence": "Branch 'feature/backend/TASK-342-order-status-webhook' and task 'TASK-342' appear in both the retry section and the Phase C section. Final verification confirms 'No context loss: branch=feature/backend/TASK-342-order-status-webhook, task=TASK-342 throughout'. String 'context lost' does not appear."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

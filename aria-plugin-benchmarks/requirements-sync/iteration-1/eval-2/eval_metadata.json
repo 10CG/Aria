@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "drift-detection",
+  "category": "drift-analysis",
+  "prompt": "检测漂移: US-012 在 Jira 中状态为 Done，但 UPM 中对应需求条目仍显示 In Progress",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_drift",
+      "description": "Should detect the status inconsistency between story and UPM",
+      "check": "output.includes('drift') || output.includes('漂移') || output.includes('inconsisten') || output.includes('mismatch')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "shows_delta",
+      "description": "Should show the delta between story status and UPM status",
+      "check": "output.includes('Done') && output.includes('In Progress')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "recommends_action",
+      "description": "Should recommend a sync action to resolve the drift",
+      "check": "output.includes('sync') || output.includes('同步') || output.includes('update') || output.includes('fix')",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "eval_id": 4,
+  "eval_name": "preset-workflow-bugfix",
+  "category": "preset",
+  "prompt": "Use the 'bugfix' preset workflow for: 'Fix null pointer exception in order processing service'.",
+  "setup": {
+    "workflow_type": "preset",
+    "preset_name": "bugfix",
+    "task": "Fix null pointer exception in order processing service"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "recognizes_bugfix_preset",
+      "description": "Should recognize and load the 'bugfix' preset",
+      "check": "output.match(/bugfix|bug-fix|bug_fix/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "skips_phase_a",
+      "description": "bugfix preset should skip Phase A (no spec needed for bug fixes)",
+      "check": "!output.match(/A\\.1.*spec|spec-drafter/i) || output.match(/skip.*A|A.*skipped/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "executes_phase_b",
+      "description": "Should execute Phase B (branch + implement + fix)",
+      "check": "output.match(/B\\.1|B\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "executes_phase_c",
+      "description": "Should execute Phase C (commit + merge)",
+      "check": "output.match(/C\\.1|C\\.2/)",
+      "severity": "high"
+    }
+  ]
+}

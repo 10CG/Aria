@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "dependency-ordering",
+  "category": "ordering",
+  "prompt": "分析以下有依赖关系的变更并确定正确的提交顺序: shared/types/api.ts (基础类型), backend/src/api/handler.py (依赖 api.ts), frontend/src/api/client.ts (依赖 api.ts), backend/tests/test_handler.py (依赖 handler.py)",
+  "setup": {
+    "has_dependencies": true,
+    "dependency_chain": ["shared/types/api.ts", "backend/src/api/handler.py", "frontend/src/api/client.ts", "backend/tests/test_handler.py"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "shared_types_committed_first",
+      "description": "Shared types must be committed before dependent modules",
+      "check": "output.includes('shared') || output.includes('types') || output.includes('1st') || output.includes('第一')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "tests_committed_last",
+      "description": "Tests should be committed after implementation",
+      "check": "output.includes('test') || output.includes('测试')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "explains_ordering_rationale",
+      "description": "Should explain why this order is required",
+      "check": "output.includes('依赖') || output.includes('depend') || output.includes('order') || output.includes('顺序')",
+      "severity": "high"
+    }
+  ]
+}

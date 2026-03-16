@@ -1,0 +1,34 @@
+{
+  "eval_id": 3,
+  "eval_name": "refactor-phase-guidance",
+  "category": "tdd-cycle",
+  "prompt": "所有测试通过（GREEN）。代码中存在重复逻辑和复杂条件。TDD Enforcer 应指导 REFACTOR 阶段的安全重构。",
+  "setup": {
+    "current_phase": "REFACTOR",
+    "all_tests_passing": true,
+    "code_smells": ["duplicate_logic", "complex_conditions", "long_method"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "identifies_refactor_targets",
+      "description": "Should identify code smells to refactor",
+      "check": "output.includes('重构') || output.includes('refactor') || output.includes('smell') || output.includes('重复')",
+      "severity": "high"
+    },
+    {
+      "id": "A2",
+      "name": "ensures_tests_stay_green",
+      "description": "Should emphasize keeping tests green during refactor",
+      "check": "output.includes('测试') || output.includes('test') || output.includes('不破坏') || output.includes('保持')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "provides_refactor_strategy",
+      "description": "Should provide specific refactoring strategy",
+      "check": "output.includes('extract') || output.includes('提取') || output.includes('简化') || output.includes('consolidate')",
+      "severity": "medium"
+    }
+  ]
+}

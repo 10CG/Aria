@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "worktree-mode-selection",
+  "timestamp": "2026-03-16T14:12:31Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Parallel execution viable' in evaluation matrix and 'both can proceed simultaneously' in rationale",
+      "text": "evaluates_parallelism"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output states 'Selected Mode: WORKTREE' and shows 'git worktree add' commands for both tasks with isolated worktree paths",
+      "text": "selects_appropriate_mode"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output explains 'Fully independent', 'Different domains — backend and frontend have no overlap', 'parallel execution viable' as rationale",
+      "text": "explains_decision_rationale"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

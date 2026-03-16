@@ -1,0 +1,35 @@
+{
+  "eval_id": 5,
+  "eval_name": "summary-generation",
+  "category": "output-format",
+  "prompt": "头脑风暴讨论结束后，生成一份可执行的总结，包含所有确认的决策、待办事项和下一步行动。",
+  "setup": {
+    "discussion_rounds": 5,
+    "decisions_made": 4,
+    "open_questions": 2,
+    "action_items_expected": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "includes_decision_summary",
+      "description": "Should summarize all decisions made during the discussion",
+      "check": "output.includes('决策') || output.includes('decision') || output.includes('确认') || output.includes('confirmed')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_action_items",
+      "description": "Should include concrete actionable next steps",
+      "check": "output.includes('行动') || output.includes('action') || output.includes('下一步') || output.includes('TODO')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "flags_open_questions",
+      "description": "Should flag unresolved questions for future discussion",
+      "check": "output.includes('待定') || output.includes('open') || output.includes('未解决') || output.includes('TBD')",
+      "severity": "high"
+    }
+  ]
+}

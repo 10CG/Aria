@@ -1,0 +1,193 @@
+{
+  "benchmark_name": "commit-msg-generator",
+  "skill_version": "2.0.1",
+  "iteration": 1,
+  "timestamp": "2026-03-13T04:30:00Z",
+  "total_evals": 15,
+  "summary": {
+    "with_skill": {
+      "passed": 15,
+      "failed": 0,
+      "pass_rate": 1.0
+    },
+    "without_skill": {
+      "passed": 2,
+      "failed": 13,
+      "pass_rate": 0.13
+    },
+    "improvement": {
+      "pass_rate_delta": 0.87,
+      "pass_count_delta": 13
+    }
+  },
+  "by_category": {
+    "independent-mode": {
+      "total": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    "orchestrated-mode": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "special-cases": {
+      "total": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    "format-validation": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "complex-scenarios": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "scope-detection": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "simple-feat-add-files",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Proper feat type + auth scope"
+    },
+    {
+      "eval_id": 2,
+      "name": "bugfix-typo-fix",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "fix type + utils scope detected"
+    },
+    {
+      "eval_id": 3,
+      "name": "docs-update-only",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "PASS",
+      "key_finding": "docs type correctly identified"
+    },
+    {
+      "eval_id": 4,
+      "name": "refactor-code-restructure",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "PARTIAL",
+      "key_finding": "refactor type + utils scope"
+    },
+    {
+      "eval_id": 5,
+      "name": "orchestrated-mode-full-params",
+      "category": "orchestrated-mode",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "All enhanced markers correct"
+    },
+    {
+      "eval_id": 6,
+      "name": "orchestrated-mobile-developer",
+      "category": "orchestrated-mode",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "mobile-developer subagent + Phase4-Cycle2"
+    },
+    {
+      "eval_id": 7,
+      "name": "breaking-change-api",
+      "category": "special-cases",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "! marker + BREAKING CHANGE footer"
+    },
+    {
+      "eval_id": 8,
+      "name": "closes-issue",
+      "category": "special-cases",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Closes #123 footer"
+    },
+    {
+      "eval_id": 9,
+      "name": "refs-document",
+      "category": "special-cases",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Refs: design.md footer"
+    },
+    {
+      "eval_id": 10,
+      "name": "test-addition",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "test type (not feat!)"
+    },
+    {
+      "eval_id": 11,
+      "name": "multi-file-cross-module",
+      "category": "complex-scenarios",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Cross-module scope + detailed body"
+    },
+    {
+      "eval_id": 12,
+      "name": "chore-config",
+      "category": "independent-mode",
+      "with_skill": "PASS",
+      "without_skill": "N/A",
+      "key_finding": "chore type for config"
+    },
+    {
+      "eval_id": 13,
+      "name": "enhanced-marker-format-validation",
+      "category": "format-validation",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "All 5 marker assertions pass"
+    },
+    {
+      "eval_id": 14,
+      "name": "scope-extraction-path-based",
+      "category": "scope-detection",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "api/users scope from path"
+    },
+    {
+      "eval_id": 15,
+      "name": "conventional-commits-compliance",
+      "category": "format-validation",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Full format compliance"
+    }
+  ],
+  "strengths": [
+    "100% Conventional Commits format compliance",
+    "Correct type detection (feat/fix/docs/refactor/test/chore)",
+    "Intelligent scope extraction from file paths",
+    "Proper BREAKING CHANGE handling (! marker + footer)",
+    "Correct issue reference footers (Closes/Refs)",
+    "Enhanced markers format (Executed-By/Context/Module)",
+    "Cross-module change awareness",
+    "Consistent imperative mood subjects"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Consider testing bilingual (CN/EN) output quality",
+    "Add edge cases for very large diffs",
+    "Test interaction with pre-commit hooks"
+  ]
+}

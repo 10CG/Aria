@@ -1,0 +1,19 @@
+{
+  "eval_id": 7,
+  "eval_name": "breaking-change-api",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "assertions": [
+    {
+      "text": "breaking_change_marker",
+      "passed": true,
+      "evidence": "feat(api)!: in subject AND BREAKING CHANGE: in footer"
+    },
+    {
+      "text": "explains_impact",
+      "passed": true,
+      "evidence": "BREAKING CHANGE: Tasks API response format changed from { \"tasks\": [...] } to { \"data\": [...], \"meta\": {...} }. All API consumers must update their response parsing logic to handle the new structure."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

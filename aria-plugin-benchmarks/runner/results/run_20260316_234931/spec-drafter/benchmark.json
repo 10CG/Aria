@@ -1,0 +1,29 @@
+{
+  "benchmark_name": "spec-drafter",
+  "test_type": "real_execution",
+  "test_project": "todo-web",
+  "timestamp": "2026-03-16T16:13:31.760230+00:00",
+  "total_evals": 1,
+  "passed": 0,
+  "failed": 1,
+  "pass_rate": 0.0,
+  "total_tokens": 0,
+  "total_duration_ms": 240000,
+  "total_cost_usd": 0,
+  "eval_results": [
+    {
+      "eval_id": "real-1",
+      "eval_name": "draft-tag-feature-spec",
+      "verdict": "FAIL",
+      "pass_rate": 0.0,
+      "tokens": 0,
+      "duration_ms": 240000,
+      "failed_assertions": [
+        "creates_proposal_structure",
+        "assesses_level",
+        "defines_scope",
+        "includes_requirements"
+      ]
+    }
+  ]
+}

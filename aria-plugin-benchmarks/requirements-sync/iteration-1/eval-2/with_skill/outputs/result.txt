@@ -1,0 +1,51 @@
+# Requirements Sync — Drift Detection Report
+
+> **Operation**: Drift Analysis
+> **Skill**: requirements-sync v1.1.0
+> **Timestamp**: 2026-03-16T14:14:00Z
+
+## Drift Detected: 1 inconsistency found
+
+---
+
+## Drift Details
+
+### US-012 — Status Mismatch (drift)
+
+| Source | Status | Last Updated |
+|--------|--------|--------------|
+| Jira (authoritative) | **Done** | 2026-03-15T10:30:00Z |
+| UPM requirements | **In Progress** | 2026-03-10T09:00:00Z |
+
+**Delta**: Jira shows `Done` but UPM shows `In Progress`
+**Drift age**: ~5 days (since 2026-03-10)
+**Severity**: HIGH — UPM is 1 status state behind
+
+---
+
+## Root Cause Analysis
+
+The UPM requirements section was last updated on 2026-03-10, but US-012 was completed in Jira on 2026-03-15. The sync was not triggered after story completion.
+
+---
+
+## Recommended Action
+
+```
+sync US-012 → UPM requirements
+  update:  REQ-012.status  In Progress → Done
+  source:  Jira (US-012)
+  reason:  drift resolution
+```
+
+Run `requirements-sync --fix US-012` to apply the sync automatically, or manually update the UPM requirements entry for US-012.
+
+---
+
+## Drift Scan Summary
+
+| Story | Source A | Source B | Status |
+|-------|----------|----------|--------|
+| US-012 | Jira: Done | UPM: In Progress | DRIFT |
+
+**Total drift detected: 1**

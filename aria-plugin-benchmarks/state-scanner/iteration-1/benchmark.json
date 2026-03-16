@@ -1,0 +1,150 @@
+{
+  "benchmark_name": "state-scanner",
+  "skill_version": "2.4.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T13:33:00Z",
+  "total_evals": 8,
+  "evals_completed": 8,
+  "summary": {
+    "with_skill": {
+      "passed": 8,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 1450,
+      "key_metrics": {
+        "git_status_collection": "100%",
+        "openspec_detection": "100%",
+        "architecture_status_detection": "100%",
+        "requirements_status_detection": "100%",
+        "workflow_recommendation": "100%",
+        "user_interaction_format": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "state-collection": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "change-analysis": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "openspec-integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "architecture-integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "recommendation": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "requirements-integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "user-interaction": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "basic-state-collection",
+      "category": "state-collection",
+      "with_skill": "PASS",
+      "key_finding": "Correctly collected git status, branch info, staged/unstaged files",
+      "tokens_used": 1500
+    },
+    {
+      "eval_id": 2,
+      "name": "staged-changes-detection",
+      "category": "change-analysis",
+      "with_skill": "PASS",
+      "key_finding": "Correctly recommended quick-fix workflow for <=3 files change",
+      "tokens_used": 1500
+    },
+    {
+      "eval_id": 3,
+      "name": "openspec-status-check",
+      "category": "openspec-integration",
+      "with_skill": "PASS",
+      "key_finding": "Complete OpenSpec status with active changes count and archive summary",
+      "tokens_used": 1400
+    },
+    {
+      "eval_id": 4,
+      "name": "architecture-status-check",
+      "category": "architecture-integration",
+      "with_skill": "PASS",
+      "key_finding": "Architecture status with file path, component count, PRD chain validation",
+      "tokens_used": 1300
+    },
+    {
+      "eval_id": 5,
+      "name": "quick-fix-recommendation",
+      "category": "recommendation",
+      "with_skill": "PASS",
+      "key_finding": "Correctly recommended quick-fix (Level 1) for typo change",
+      "tokens_used": 1200
+    },
+    {
+      "eval_id": 6,
+      "name": "feature-development-recommendation",
+      "category": "recommendation",
+      "with_skill": "PASS",
+      "key_finding": "Recommended full-cycle with complete Phase steps (A.0 -> D.2)",
+      "tokens_used": 1600
+    },
+    {
+      "eval_id": 7,
+      "name": "requirements-status-check",
+      "category": "requirements-integration",
+      "with_skill": "PASS",
+      "key_finding": "Complete requirements status with PRD, User Stories, OpenSpec coverage",
+      "tokens_used": 1500
+    },
+    {
+      "eval_id": 8,
+      "name": "user-options-display",
+      "category": "user-interaction",
+      "with_skill": "PASS",
+      "key_finding": "Numbered options [1]-[4] with custom input option displayed",
+      "tokens_used": 1600
+    }
+  ],
+  "output_structure": {
+    "location_section": "present",
+    "change_analysis_section": "present",
+    "requirements_status_section": "present",
+    "architecture_status_section": "present",
+    "openspec_status_section": "present",
+    "workflow_recommendations_section": "present"
+  },
+  "strengths": [
+    "Structured ASCII-box output format for clarity",
+    "Comprehensive status collection (Git, OpenSpec, Architecture, Requirements)",
+    "Intelligent workflow recommendations based on change complexity",
+    "Clear actionable options with numbered selections",
+    "Correct Level 1/2/3 complexity assessment",
+    "Complete Phase step references in recommendations"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with real multi-module projects for cross-module detection",
+    "Add edge case tests for conflicting recommendations",
+    "Test Forgejo drift detection scenarios"
+  ],
+  "status": "completed"
+}

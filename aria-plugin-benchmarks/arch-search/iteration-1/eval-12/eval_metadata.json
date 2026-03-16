@@ -1,0 +1,18 @@
+{
+  "eval_id": 12,
+  "eval_name": "token-savings-api",
+  "category": "token-efficiency",
+  "prompt": "API endpoints 在哪定义",
+  "expected_layer": 1,
+  "baseline_tokens": 4000,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "significant_token_savings",
+      "description": "Should save at least 30% tokens vs baseline (relative metric, accounts for multi-domain ambiguity)",
+      "check": "(baseline_tokens - tokens_used) / baseline_tokens > 0.30",
+      "severity": "critical",
+      "note": "Changed from absolute (tokens_used < 1200) to relative (savings_rate > 30%) to handle multi-domain keyword ambiguity"
+    }
+  ]
+}

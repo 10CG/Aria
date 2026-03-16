@@ -1,0 +1,60 @@
+# Forgejo Sync - Story to Issue Sync
+
+## 同步任务
+
+- **Story ID**: US-001
+- **Repository**: 10cg/my-project
+- **Action**: create_or_update
+
+## 检查现有 Issue
+
+```
+GET https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues?type=issues&labels=story:US-001
+Response: 404 (Issue not found)
+```
+
+**结论**: 不存在对应 Issue，执行创建操作
+
+## 创建 Forgejo Issue
+
+### Issue 内容映射
+
+| Story 字段 | 值 | Forgejo Issue 字段 |
+|-----------|----|--------------------|
+| story_id | US-001 | title 前缀 + label |
+| title | 用户登录功能 | title |
+| description | 实现JWT登录 | body (描述段) |
+| acceptance_criteria | [token, 401] | body (验收标准段) |
+
+### Issue 创建请求
+
+```json
+POST https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues
+{
+  "title": "[US-001] 用户登录功能",
+  "body": "## 描述\n\n实现JWT登录\n\n## 验收标准 (Acceptance Criteria)\n\n- [ ] 登录成功返回 token\n- [ ] 失败返回 401\n\n---\n*Synced from User Story US-001*",
+  "labels": ["story", "US-001"]
+}
+```
+
+### Issue 创建响应
+
+```json
+{
+  "id": 47,
+  "number": 47,
+  "title": "[US-001] 用户登录功能",
+  "state": "open",
+  "html_url": "https://forgejo.10cg.pub/10cg/my-project/issues/47"
+}
+```
+
+## 同步结果
+
+- **Action**: 创建 Issue #47
+- **Title**: [US-001] 用户登录功能
+- **Acceptance Criteria**: 2 条 (token 返回, 401 错误)
+- **Story-Issue 映射**: US-001 → #47
+- **状态**: ✅ 同步成功
+
+Issue #47 已创建: https://forgejo.10cg.pub/10cg/my-project/issues/47

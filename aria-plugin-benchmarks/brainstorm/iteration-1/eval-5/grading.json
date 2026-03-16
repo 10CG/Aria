@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "summary-generation",
+  "timestamp": "2026-03-16T14:17:20Z",
+  "assertions": [
+    {
+      "text": "includes_decision_summary",
+      "passed": true,
+      "evidence": "Output contains '已确认决策 (4 项)' section with all 4 confirmed decisions listed with rationale and the round they were decided in"
+    },
+    {
+      "text": "includes_action_items",
+      "passed": true,
+      "evidence": "Output contains '下一步行动 (Action Items)' table with 5 specific action items, each with owner and deadline"
+    },
+    {
+      "text": "flags_open_questions",
+      "passed": true,
+      "evidence": "Output contains '待定问题 (TBD / Open)' section with 2 unresolved questions labeled 'TBD 1' and 'TBD 2' with blockers and expected resolution dates"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

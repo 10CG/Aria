@@ -1,0 +1,197 @@
+{
+  "skill_name": "strategic-commit-orchestrator",
+  "skill_path": "aria/skills/strategic-commit-orchestrator",
+  "skill_version": "2.3.0",
+  "description": "Benchmark tests for strategic-commit-orchestrator skill - AI-DDD intelligent commit grouping and planning",
+  "metrics": [
+    "grouping_accuracy",
+    "format_compliance",
+    "dependency_ordering",
+    "scalability"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "single-module-grouping",
+      "category": "grouping-logic",
+      "prompt": "分析以下单模块变更并生成提交分组计划: files=[backend/src/auth/login.py, backend/src/auth/register.py, backend/tests/test_auth.py], module=backend, task_id=TASK-101",
+      "setup": {
+        "file_count": 3,
+        "module_count": 1,
+        "expected_groups": 2
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "groups_by_concern",
+          "description": "Should group auth implementation separately from tests",
+          "check": "output.includes('auth') && (output.includes('group') || output.includes('分组') || output.includes('Group'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_module",
+          "description": "Should correctly identify the backend module",
+          "check": "output.includes('backend')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "suggests_commit_types",
+          "description": "Should suggest appropriate commit types (feat, test)",
+          "check": "output.includes('feat') || output.includes('test')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "cross-module-grouping",
+      "category": "grouping-logic",
+      "prompt": "分析跨模块变更并生成提交分组计划: files=[backend/src/api/users.py, frontend/src/pages/UserList.tsx, shared/types/user.ts, mobile/lib/screens/user_screen.dart], task_id=TASK-202, description=user-management-feature",
+      "setup": {
+        "file_count": 4,
+        "module_count": 4,
+        "expected_groups": 3
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "separates_modules",
+          "description": "Should create separate commit groups per module",
+          "check": "output.includes('backend') && output.includes('frontend') && (output.includes('shared') || output.includes('mobile'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_shared_types_first",
+          "description": "Should recognize shared types as a dependency group",
+          "check": "output.includes('shared') || output.includes('types') || output.includes('依赖')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "produces_multiple_groups",
+          "description": "Should produce 2 or more commit groups",
+          "check": "output.match(/group\\s*[2-9]|Group\\s*[2-9]|分组\\s*[2-9]|第[二三四五]组/) || output.includes('Commit 2') || output.includes('提交 2')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "commit-message-format",
+      "category": "format-validation",
+      "prompt": "为以下变更生成符合 Conventional Commits 格式的提交信息: type=feat, scope=auth, description=JWT token validation, body=Added token expiry check and refresh logic",
+      "setup": {
+        "expected_type": "feat",
+        "expected_scope": "auth",
+        "max_subject_length": 50
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "conventional_commits_header",
+          "description": "Should produce type(scope): description header",
+          "check": "output.match(/^feat\\(auth\\):|feat\\(auth\\):/m)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "subject_length_limit",
+          "description": "Subject line must not exceed 50 characters",
+          "check": "output.split('\\n')[0].length <= 72",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "has_body_content",
+          "description": "Should include body describing the changes",
+          "check": "output.includes('token') || output.includes('expiry') || output.includes('refresh')",
+          "severity": "medium"
+        },
+        {
+          "id": "A4",
+          "name": "no_period_at_end",
+          "description": "Subject line should not end with a period",
+          "check": "!output.split('\\n')[0].endsWith('.')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "dependency-ordering",
+      "category": "ordering",
+      "prompt": "分析以下有依赖关系的变更并确定正确的提交顺序: shared/types/api.ts (基础类型), backend/src/api/handler.py (依赖 api.ts), frontend/src/api/client.ts (依赖 api.ts), backend/tests/test_handler.py (依赖 handler.py)",
+      "setup": {
+        "has_dependencies": true,
+        "dependency_chain": ["shared/types/api.ts", "backend/src/api/handler.py", "frontend/src/api/client.ts", "backend/tests/test_handler.py"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "shared_types_committed_first",
+          "description": "Shared types must be committed before dependent modules",
+          "check": "output.includes('shared') || output.includes('types') || output.includes('1st') || output.includes('第一')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "tests_committed_last",
+          "description": "Tests should be committed after implementation",
+          "check": "output.includes('test') || output.includes('测试')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "explains_ordering_rationale",
+          "description": "Should explain why this order is required",
+          "check": "output.includes('依赖') || output.includes('depend') || output.includes('order') || output.includes('顺序')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "large-changeset-analysis",
+      "category": "scalability",
+      "prompt": "分析大型变更集 (22个文件) 并生成高效提交计划: files包含 backend(8), frontend(7), shared(3), tests(4), task_id=TASK-500, description=v2-api-migration",
+      "setup": {
+        "file_count": 22,
+        "module_count": 4,
+        "expected_max_groups": 6
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "handles_large_changeset",
+          "description": "Should successfully analyze 20+ file changes without errors",
+          "check": "output.includes('backend') && output.includes('frontend') && !output.includes('error') && !output.includes('错误')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "produces_structured_plan",
+          "description": "Should produce a structured grouping plan",
+          "check": "output.includes('plan') || output.includes('计划') || output.includes('Plan') || output.includes('Group') || output.includes('分组')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "groups_not_excessive",
+          "description": "Should not create excessive groups (keep manageable)",
+          "check": "output.match(/group\\s*[1-6]|Group\\s*[1-6]|分组\\s*[1-6]/i) || output.includes('migration')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "summarizes_total_commits",
+          "description": "Should provide total commit count summary",
+          "check": "output.match(/\\d+\\s*(commits|提交|commit)/) || output.includes('total') || output.includes('总计')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

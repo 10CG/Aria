@@ -1,0 +1,21 @@
+{
+  "eval_id": 8,
+  "eval_name": "user-options-display",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains numbered options: '[1] feature-dev (推荐)', '[2] quick-fix', '[3] full-cycle', '[4] 自定义组合' and '选择 [1-4] 或输入自定义'",
+      "text": "shows_numbered_options"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output contains '[4] 自定义组合' with '输入格式: \"B.2 + C.1\" 或 \"Phase B\"' and '支持任意步骤组合，灵活定制工作流' plus '输入自定义' prompt",
+      "text": "allows_custom_input"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

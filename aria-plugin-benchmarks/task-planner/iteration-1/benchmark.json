@@ -1,0 +1,161 @@
+{
+  "benchmark_name": "task-planner",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T13:35:00Z",
+  "total_evals": 10,
+  "evals_completed": 10,
+  "summary": {
+    "with_skill": {
+      "passed": 10,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "task_decomposition_quality": "100%",
+        "complexity_assessment_accuracy": "100%",
+        "dependency_analysis_accuracy": "100%",
+        "agent_allocation_rationality": "100%",
+        "yaml_output_compliance": "100%",
+        "test_task_inclusion": "100%",
+        "deliverables_identification": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "task-decomposition": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "complexity-assessment": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "dependency-analysis": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "agent-mapping": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "output-format": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "ordering": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "test-integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "deliverables": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "basic-task-decomposition",
+      "category": "task-decomposition",
+      "with_skill": "PASS",
+      "key_finding": "8 tasks generated with correct complexity labels (M/L), 32h total estimate"
+    },
+    {
+      "eval_id": 2,
+      "name": "complexity-assessment-small",
+      "category": "complexity-assessment",
+      "with_skill": "PASS",
+      "key_finding": "S complexity correctly assessed for typo fix (1 file, no dependencies)"
+    },
+    {
+      "eval_id": 3,
+      "name": "complexity-assessment-large",
+      "category": "complexity-assessment",
+      "with_skill": "PASS",
+      "key_finding": "XL complexity correctly assessed for API refactor (>10 files, cross-module)"
+    },
+    {
+      "eval_id": 4,
+      "name": "dependency-analysis",
+      "category": "dependency-analysis",
+      "with_skill": "PASS",
+      "key_finding": "Implicit dependencies correctly identified (test->impl, docs->impl)"
+    },
+    {
+      "eval_id": 5,
+      "name": "agent-allocation",
+      "category": "agent-mapping",
+      "with_skill": "PASS",
+      "key_finding": "backend-architect correctly allocated for API development tasks"
+    },
+    {
+      "eval_id": 6,
+      "name": "agent-allocation-frontend",
+      "category": "agent-mapping",
+      "with_skill": "PASS",
+      "key_finding": "mobile-developer correctly allocated for Flutter UI tasks (75%)"
+    },
+    {
+      "eval_id": 7,
+      "name": "yaml-output-format",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "YAML output with metadata:, tasks:, id:, title:, complexity: fields"
+    },
+    {
+      "eval_id": 8,
+      "name": "execution-order-generation",
+      "category": "ordering",
+      "with_skill": "PASS",
+      "key_finding": "Correct dependency order: API Design -> DB Migration -> Service Impl -> Integration Test"
+    },
+    {
+      "eval_id": 9,
+      "name": "test-task-inclusion",
+      "category": "test-integration",
+      "with_skill": "PASS",
+      "key_finding": "Test tasks correctly included with include_tests=true"
+    },
+    {
+      "eval_id": 10,
+      "name": "deliverables-identification",
+      "category": "deliverables",
+      "with_skill": "PASS",
+      "key_finding": "Deliverable files listed including .py, .dart, .sql migration files"
+    }
+  ],
+  "complexity_granularity": {
+    "S": {"hours": "1-2", "files": "1-2", "description": "Trivial changes, no logic"},
+    "M": {"hours": "4-8", "files": "3-5", "description": "Standard feature, moderate complexity"},
+    "L": {"hours": "8-16", "files": "6-10", "description": "Complex feature, multiple components"},
+    "XL": {"hours": "16+", "files": ">10", "description": "Epic-level, should be split"}
+  },
+  "strengths": [
+    "Accurate complexity assessment (S/M/L/XL granularity)",
+    "Correct implicit dependency inference (test->impl, docs->feature)",
+    "Rational agent pre-allocation based on task type",
+    "Clear execution order with critical path identification",
+    "Reasonable task sizing (4-8h per task)",
+    "Compliant YAML output format (detailed-tasks.yaml)",
+    "Automatic test task inclusion",
+    "Complete deliverables identification with migration files"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with real OpenSpec documents for end-to-end validation",
+    "Add edge cases for circular dependency detection",
+    "Test dual-layer architecture (tasks.md + detailed-tasks.yaml) integration"
+  ],
+  "status": "completed"
+}

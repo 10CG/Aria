@@ -1,0 +1,59 @@
+Based on the actual repo state and the hypothetical auth changes you described, here's the strategic commit plan:
+
+---
+
+## Strategic Commit Plan
+
+### Context
+
+- **Only staged change**: `frontend/src/js/app.js` — two benchmark test comments appended at EOF
+- **Hypothetical changes**: authentication logic in `backend/src/auth/` + login UI in `frontend/src/js/authApp.js`
+
+---
+
+### Recommended Commit Sequence
+
+**Commit 1 — Backend auth logic (commit first, it's the source of truth)**
+```
+fix: <describe the auth behavior change>
+
+Affects: backend/src/auth/authController.js, authRepository.js, etc.
+```
+Stage with: `git add backend/src/auth/`
+
+**Commit 2 — Frontend login UI (depends on the backend contract above)**
+```
+feat: update login UI to reflect new auth flow
+
+Affects: frontend/src/js/authApp.js, any related HTML
+```
+Stage with: `git add frontend/src/js/authApp.js frontend/src/todos.html`
+
+> Per `CLAUDE.md`: if `authApp.js` was modified, `frontend/src/todos.html` version param must be bumped to `?v=202603161843` (today, current time).
+
+**Commit 3 — Unrelated benchmark markers (already staged)**
+```
+chore: add benchmark test markers to app.js
+```
+Stage with: already staged (`frontend/src/js/app.js`)
+
+---
+
+### Ordering Rationale
+
+| Order | Why |
+|-------|-----|
+| Backend first | Auth contract defines what the frontend adapts to |
+| Frontend second | Logically depends on backend; reviewers see the full story |
+| Chore last | Unrelated to auth; isolating it keeps auth commits clean for `git bisect` |
+
+---
+
+### Key Reminders
+
+1. **Version bump required** — if `authApp.js` is touched, update `todos.html`:
+   ```html
+   <script src="js/authApp.js?v=202603161843" type="module"></script>
+   ```
+2. **Don't bundle backend + frontend in one commit** — auth controller and login UI serve different reviewers/rollback scenarios.
+3. **Commit 3 is ready to go** — the benchmark markers are already staged.

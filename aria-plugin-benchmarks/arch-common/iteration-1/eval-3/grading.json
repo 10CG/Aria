@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "doc-location-rules",
+  "timestamp": "2026-03-16T08:33:00Z",
+  "assertions": [
+    {
+      "text": "places_l0_at_root",
+      "passed": true,
+      "evidence": "Output specifies '/ARCHITECTURE.md' at project root with annotation '(Lives at project root)'"
+    },
+    {
+      "text": "places_l1_inside_module",
+      "passed": true,
+      "evidence": "Output lists 'src/auth/auth.arch.md' and 'src/payment/payment.arch.md' as L1 doc locations"
+    },
+    {
+      "text": "covers_all_modules",
+      "passed": true,
+      "evidence": "Output covers auth.arch.md, payment.arch.md, and notifications.arch.md for all three modules"
+    },
+    {
+      "text": "explains_colocation_principle",
+      "passed": true,
+      "evidence": "Output states 'COLOCATION PRINCIPLE: Architecture documentation lives alongside the code it describes'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

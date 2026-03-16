@@ -1,0 +1,57 @@
+# Requirements Sync — Status Sync Report
+
+> **Operation**: Status Sync
+> **Skill**: requirements-sync v1.1.0
+> **Timestamp**: 2026-03-16T14:12:00Z
+
+## Sync Result: SUCCESS
+
+US-005 status has been **synced** to UPM requirements section.
+
+---
+
+## Change Applied
+
+| Field | Before | After |
+|-------|--------|-------|
+| **Document** | UPM / requirements / US-005 | — |
+| **Status** | In Progress | **Done** |
+| **Updated by** | requirements-sync | — |
+| **Sync source** | User Story US-005 | — |
+
+---
+
+## Audit Trail
+
+```
+[2026-03-16T14:12:00Z] SYNC US-005
+  source:   User Story US-005 → status: Done
+  target:   UPM requirements entry REQ-005
+  previous: In Progress
+  new:      Done
+  result:   OK
+```
+
+---
+
+## UPM Diff (requirements section)
+
+```diff
+ requirements:
+   - id: REQ-005
+     story_ref: US-005
+     title: "User login with OTP"
+-    status: In Progress
++    status: Done
+     updated: 2026-03-16T14:12:00Z
+```
+
+---
+
+## Summary
+
+- **Entries synced**: 1
+- **UPM section**: requirements
+- **Story**: US-005
+- **Status change**: In Progress → Done
+- **Audit log**: recorded

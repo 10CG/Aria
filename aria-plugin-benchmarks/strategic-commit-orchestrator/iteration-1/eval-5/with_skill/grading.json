@@ -1,0 +1,30 @@
+{
+  "eval_id": 5,
+  "eval_name": "large-changeset-analysis",
+  "timestamp": "2026-03-16T14:02:30Z",
+  "assertions": [
+    {
+      "text": "handles_large_changeset",
+      "passed": true,
+      "evidence": "Output successfully analyzes all 22 files across 'backend' and 'frontend' with no error mentions"
+    },
+    {
+      "text": "produces_structured_plan",
+      "passed": true,
+      "evidence": "Output contains 'Group 1' through 'Group 5' with structured commit plan"
+    },
+    {
+      "text": "groups_not_excessive",
+      "passed": true,
+      "evidence": "Output contains 'Group 1' through 'Group 5' (5 groups, within 6-group limit) and 'migration' keyword"
+    },
+    {
+      "text": "summarizes_total_commits",
+      "passed": true,
+      "evidence": "Output contains '总计提交数: 5 commits' in summary section"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Large changeset (22 files, 4 modules) handled efficiently with 5-group plan, total commit summary provided, no errors"
+}

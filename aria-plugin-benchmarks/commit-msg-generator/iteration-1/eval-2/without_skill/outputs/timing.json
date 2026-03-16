@@ -1,0 +1,11 @@
+{
+  "test_name": "bugfix-typo-fix",
+  "test_id": "eval-2",
+  "mode": "without_skill",
+  "skill_used": null,
+  "timing": {
+    "start_time": "2026-03-13T00:00:00Z",
+    "end_time": "2026-03-13T00:00:01Z",
+    "duration_ms": 1000
+  }
+}

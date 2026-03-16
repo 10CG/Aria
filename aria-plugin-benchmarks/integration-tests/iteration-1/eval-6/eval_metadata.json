@@ -1,0 +1,48 @@
+{
+  "eval_id": 6,
+  "eval_name": "closure-state-consistency",
+  "category": "state-management",
+  "description": "After C->D transition, verify state-scanner reflects completed state and UPM is consistent",
+  "prompt": "PR merged successfully - execute closure phase and verify project state",
+  "skills_involved": [
+    "phase-d-closer", "progress-updater", "openspec-archive",
+    "state-scanner", "requirements-sync"
+  ],
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "progress_updater_writes_state_block",
+      "description": "D.1 must write UPMv2-STATE block with updated completion percentage",
+      "check": "output.match(/UPMv2-STATE|stateToken|completion.*\\d+%/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "archive_moves_spec_correctly",
+      "description": "D.2 must move spec from changes/ to archive/ with preserved metadata",
+      "check": "output.match(/changes\\/.*->.*archive\\//i) || (output.includes('archive') && output.includes('metadata'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "state_scanner_shows_clean",
+      "description": "After closure, state-scanner should show no active specs in changes/",
+      "check": "output.match(/no active.*spec|changes\\/.*empty|clean.*state/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "requirements_sync_updated",
+      "description": "requirements-sync should reflect completed status in UPM",
+      "check": "output.match(/requirements.*sync|UPM.*updated|status.*completed/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "atomic_state_update",
+      "description": "D.1 and D.2 should complete atomically (both succeed or neither)",
+      "check": "output.match(/D\\.1.*complete.*D\\.2.*complete|both.*phases.*success/i) || (output.includes('D.1') && output.includes('D.2'))",
+      "severity": "high"
+    }
+  ]
+}

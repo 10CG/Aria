@@ -1,0 +1,187 @@
+{
+  "skill_name": "brainstorm",
+  "skill_path": "aria/skills/brainstorm",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for brainstorm skill - AI-DDD collaborative thinking core for multi-round discussion, requirements clarification, and decision-making",
+  "metrics": [
+    "discussion_flow_quality",
+    "requirements_clarification_depth",
+    "decision_support_effectiveness",
+    "context_accumulation_accuracy",
+    "summary_actionability"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "segmented-qa-flow",
+      "category": "discussion-flow",
+      "prompt": "开始一个关于「添加通知系统」功能的头脑风暴。使用分段问答模式，每次只提问一个关键问题，等待回答后继续。",
+      "setup": {
+        "topic": "通知系统功能设计",
+        "mode": "segmented-qa",
+        "max_questions_per_round": 1
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "asks_one_question_per_round",
+          "description": "Should ask exactly one focused question per round",
+          "check": "output.includes('？') || output.includes('?') || output.includes('问题')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "uses_segmented_sections",
+          "description": "Should use clearly segmented sections in the output",
+          "check": "output.includes('---') || output.includes('##') || output.includes('Section') || output.includes('阶段')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "maintains_discussion_context",
+          "description": "Should reference previous answers in subsequent questions",
+          "check": "output.includes('基于') || output.includes('based on') || output.includes('您提到') || output.includes('mentioned')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "requirements-clarification",
+      "category": "clarification",
+      "prompt": "需求「优化系统性能」非常模糊。通过提问提取出可操作的具体需求，识别出不清晰的部分。",
+      "setup": {
+        "vague_requirement": "优化系统性能",
+        "clarification_target": ["specific_metric", "scope", "baseline", "target_value"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "identifies_ambiguity",
+          "description": "Should identify the vague/ambiguous aspects of the requirement",
+          "check": "output.includes('模糊') || output.includes('unclear') || output.includes('ambiguous') || output.includes('不明确')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "asks_clarifying_questions",
+          "description": "Should ask targeted questions to extract specific requirements",
+          "check": "output.includes('性能指标') || output.includes('metric') || output.includes('具体') || output.includes('specific')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "extracts_measurable_criteria",
+          "description": "Should help extract measurable acceptance criteria",
+          "check": "output.includes('ms') || output.includes('秒') || output.includes('%') || output.includes('可测量')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "decision-matrix-generation",
+      "category": "decision-support",
+      "prompt": "团队需要在三种数据库方案间做选择: PostgreSQL、MongoDB、Redis。生成决策对比矩阵，帮助做出有依据的选择。",
+      "setup": {
+        "options": ["PostgreSQL", "MongoDB", "Redis"],
+        "criteria": ["性能", "扩展性", "一致性", "开发成本", "运维复杂度"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "generates_comparison_matrix",
+          "description": "Should generate a comparison matrix for all options",
+          "check": "output.includes('|') || output.includes('matrix') || output.includes('对比') || output.includes('比较')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "covers_all_options",
+          "description": "Should cover all three database options",
+          "check": "output.includes('PostgreSQL') && output.includes('MongoDB') && output.includes('Redis')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "includes_recommendation",
+          "description": "Should provide a final recommendation with reasoning",
+          "check": "output.includes('推荐') || output.includes('recommend') || output.includes('建议') || output.includes('结论')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "context-accumulation",
+      "category": "context-management",
+      "prompt": "经过3轮讨论后，brainstorm 应该能够引用并整合之前轮次中确认的决策点，展示上下文的积累和延续。",
+      "setup": {
+        "round_number": 4,
+        "previous_decisions": [
+          "Round 1: 选择 PostgreSQL 作为主数据库",
+          "Round 2: API 使用 RESTful 风格",
+          "Round 3: 前端框架选择 React"
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "references_previous_decisions",
+          "description": "Should reference decisions made in previous rounds",
+          "check": "output.includes('PostgreSQL') || output.includes('RESTful') || output.includes('React') || output.includes('之前')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "builds_on_context",
+          "description": "Should build new questions/content on accumulated context",
+          "check": "output.includes('基于') || output.includes('given') || output.includes('已确认') || output.includes('confirmed')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "shows_decision_coherence",
+          "description": "Should show that new suggestions are coherent with existing decisions",
+          "check": "output.includes('一致') || output.includes('consistent') || output.includes('符合') || output.includes('aligned')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "summary-generation",
+      "category": "output-format",
+      "prompt": "头脑风暴讨论结束后，生成一份可执行的总结，包含所有确认的决策、待办事项和下一步行动。",
+      "setup": {
+        "discussion_rounds": 5,
+        "decisions_made": 4,
+        "open_questions": 2,
+        "action_items_expected": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "includes_decision_summary",
+          "description": "Should summarize all decisions made during the discussion",
+          "check": "output.includes('决策') || output.includes('decision') || output.includes('确认') || output.includes('confirmed')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_action_items",
+          "description": "Should include concrete actionable next steps",
+          "check": "output.includes('行动') || output.includes('action') || output.includes('下一步') || output.includes('TODO')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "flags_open_questions",
+          "description": "Should flag unresolved questions for future discussion",
+          "check": "output.includes('待定') || output.includes('open') || output.includes('未解决') || output.includes('TBD')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

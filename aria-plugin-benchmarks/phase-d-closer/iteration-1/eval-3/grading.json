@@ -1,0 +1,33 @@
+{
+  "eval_id": 3,
+  "eval_name": "full-closure-sequence",
+  "timestamp": "2026-03-16T14:32:38Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Sequence: D.1 → D.2' in header and D.1 section appears before D.2 section in document order",
+      "text": "executes_d1_then_d2"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "D.1 section shows 'Progress Status Update' with YAML update and 'D.1 COMPLETE — Progress status updated to completed'",
+      "text": "d1_progress_completed"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "D.2 section shows 'Spec Archival' with 'git mv' to openspec/archive/ and 'D.2 COMPLETE — Spec moved to openspec/archive/realtime-notifications/'",
+      "text": "d2_archival_completed"
+    },
+    {
+      "id": "A4",
+      "passed": true,
+      "evidence": "Output contains 'Phase D COMPLETE — realtime-notifications feature fully closed' in summary section",
+      "text": "phase_d_marked_complete"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

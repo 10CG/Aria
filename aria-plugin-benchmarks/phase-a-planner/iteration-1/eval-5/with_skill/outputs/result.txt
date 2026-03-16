@@ -1,0 +1,84 @@
+# Phase A Execution: payment-gateway
+
+**Skill**: phase-a-planner v1.0.0
+**Feature**: Add payment gateway integration
+**Timestamp**: 2026-03-16T14:05:00Z
+
+---
+
+## Pre-flight State Scan
+
+Running state-scanner...
+
+```
+State Scanner Report
+====================
+Working tree: DIRTY
+Uncommitted changes: 3 files
+
+Modified files:
+  M  backend/services/billing.py
+  M  backend/config/settings.py
+  M  frontend/src/pages/checkout.tsx
+
+Staged files: 0
+Untracked files: 0
+```
+
+---
+
+## WARNING: Unclean Working Tree Detected
+
+**Phase A BLOCKED — Cannot proceed with dirty working tree.**
+
+Reason: Phase A orchestrates spec creation and task planning that require a clean baseline. Starting new feature work on top of uncommitted changes can lead to:
+- Spec artifacts mixed with in-progress changes
+- Incorrect branch baseline for Phase B
+- Merge conflicts during Phase C integration
+
+---
+
+## Uncommitted Changes Summary
+
+| File | Status | Risk |
+|------|--------|------|
+| backend/services/billing.py | Modified | HIGH — may conflict with payment feature |
+| backend/config/settings.py | Modified | MEDIUM — config overlap possible |
+| frontend/src/pages/checkout.tsx | Modified | HIGH — UI overlap with payment feature |
+
+---
+
+## Resolution Actions Required
+
+Choose one of the following actions before retrying Phase A:
+
+### Option 1 (Recommended): Stash existing changes
+```bash
+git stash push -m "wip: pre-payment-gateway uncommitted changes"
+# Run Phase A
+# Then restore: git stash pop
+```
+
+### Option 2: Commit existing changes
+```bash
+git add backend/services/billing.py backend/config/settings.py frontend/src/pages/checkout.tsx
+git commit -m "wip: save in-progress billing changes before new feature"
+```
+
+### Option 3: Discard changes (use with caution)
+```bash
+git checkout -- backend/services/billing.py backend/config/settings.py frontend/src/pages/checkout.tsx
+```
+
+---
+
+## Phase A Status
+
+| Step | Status |
+|------|--------|
+| A.1 Spec Creation | BLOCKED |
+| A.2 Task Planning | BLOCKED |
+| A.3 Agent Allocation | BLOCKED |
+
+**Resolution**: Clean working tree, then re-run phase-a-planner.
+**Recommended action**: `git stash` → retry Phase A → `git stash pop` after Phase B branch creation.

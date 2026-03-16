@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "user-story-validation",
+  "category": "format-check",
+  "prompt": "验证 User Story 格式: 'As a user, I want to login' - 缺少 Acceptance Criteria 和 Story Points",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_missing_ac",
+      "description": "Should detect missing Acceptance Criteria",
+      "check": "output.includes('Acceptance Criteria') || output.includes('验收标准') || output.includes('AC')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "detects_missing_points",
+      "description": "Should detect missing Story Points",
+      "check": "output.includes('Story Point') || output.includes('点数') || output.includes('SP')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "format_is_valid",
+      "description": "Should confirm the As-a/I-want/So-that format structure is present",
+      "check": "output.includes('As a') || output.includes('format') || output.includes('格式')",
+      "severity": "medium"
+    }
+  ]
+}

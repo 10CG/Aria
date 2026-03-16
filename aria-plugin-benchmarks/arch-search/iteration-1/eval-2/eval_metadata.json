@@ -1,0 +1,25 @@
+{
+  "eval_id": 2,
+  "eval_name": "layer1-database-keyword-routing",
+  "category": "layer-1-routing",
+  "prompt": "查找数据库设计文档",
+  "expected_layer": 1,
+  "expected_domain": "data_storage",
+  "expected_document_path": "backend/docs/architecture/database.md",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_database_doc",
+      "description": "Should find database architecture document",
+      "check": "output.match(/database.*\\.md|数据库.*架构|data.*storage/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "layer1_efficiency",
+      "description": "Should complete in Layer 1",
+      "check": "tokens_used < 500",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "total_tokens": 4870,
+  "duration_ms": 26400,
+  "total_duration_seconds": 26.4,
+  "phase_breakdown": {
+    "brainstorm":     { "tokens": 2140, "duration_ms": 11800 },
+    "spec_drafter":   { "tokens": 1580, "duration_ms": 8300 },
+    "task_planner":   { "tokens": 830,  "duration_ms": 4600 },
+    "agent_routing":  { "tokens": 320,  "duration_ms": 1700 }
+  }
+}

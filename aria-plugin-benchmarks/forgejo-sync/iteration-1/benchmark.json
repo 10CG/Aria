@@ -1,0 +1,99 @@
+{
+  "benchmark_name": "forgejo-sync",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:10:00Z",
+  "total_evals": 4,
+  "evals_completed": 4,
+  "summary": {
+    "with_skill": {
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "sync_accuracy": "100%",
+        "publish_correctness": "100%",
+        "bidirectional_fidelity": "100%",
+        "metadata_mapping_accuracy": "100%",
+        "labels_mapped": "4 metadata fields",
+        "wiki_publish_support": "full",
+        "issue_sync_support": "create and update"
+      }
+    }
+  },
+  "by_category": {
+    "sync-flow": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "publish-flow": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "bidirectional": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "metadata": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "story-to-issue-sync",
+      "category": "sync-flow",
+      "with_skill": "PASS",
+      "key_finding": "Forgejo Issue created with correct title mapping and acceptance criteria included"
+    },
+    {
+      "eval_id": 2,
+      "name": "prd-to-wiki-publish",
+      "category": "publish-flow",
+      "with_skill": "PASS",
+      "key_finding": "PRD published to Wiki with correct page name, source path referenced"
+    },
+    {
+      "eval_id": 3,
+      "name": "bidirectional-status-sync",
+      "category": "bidirectional",
+      "with_skill": "PASS",
+      "key_finding": "Bidirectional sync confirmed: story in-progress -> issue open, changes reflected back"
+    },
+    {
+      "eval_id": 4,
+      "name": "label-mapping",
+      "category": "metadata",
+      "with_skill": "PASS",
+      "key_finding": "4 metadata fields mapped to Forgejo labels: priority=high, module=backend, type=feature, sprint=Sprint-3"
+    }
+  ],
+  "sync_architecture": {
+    "description": "User Story <-> Forgejo Issue bidirectional sync with Wiki PRD publishing",
+    "supported_operations": [
+      "Create Forgejo Issue from User Story",
+      "Update existing Issue from Story changes",
+      "Publish PRD to Forgejo Wiki",
+      "Bidirectional status synchronization",
+      "Story metadata to label mapping"
+    ]
+  },
+  "strengths": [
+    "Full bidirectional status synchronization",
+    "Accurate metadata-to-label mapping",
+    "PRD Wiki publish with source reference",
+    "Acceptance criteria preserved in Issue body"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with Forgejo API authentication failure scenarios",
+    "Add conflict resolution for simultaneous edits",
+    "Test with repositories requiring Cloudflare Access"
+  ],
+  "status": "completed"
+}

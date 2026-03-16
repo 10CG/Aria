@@ -1,0 +1,69 @@
+# OpenSpec Archive - Metadata Preservation
+
+## 归档任务
+
+- **Spec**: `openspec/changes/user-auth`
+- **验证模式**: 元数据完整性检查
+
+## 原始元数据
+
+```yaml
+title: 用户认证
+version: "1.0"
+status: completed
+created: 2026-03-01
+author: tech-lead
+```
+
+## 归档前元数据快照
+
+从 `openspec/changes/user-auth/proposal.md` 读取元数据:
+
+```
+title:   用户认证         ✅ 读取成功
+version: 1.0              ✅ 读取成功
+status:  completed        ✅ 读取成功
+created: 2026-03-01       ✅ 读取成功
+author:  tech-lead        ✅ 读取成功
+```
+
+## 执行归档 (保留元数据模式)
+
+```bash
+$ cp -r openspec/changes/user-auth/ openspec/archive/user-auth/
+```
+
+归档完成。开始元数据完整性验证...
+
+## 归档后元数据验证
+
+从 `openspec/archive/user-auth/proposal.md` 读取元数据:
+
+```
+title:   用户认证         ✅ 已保留 (preserved)
+version: 1.0              ✅ 已保留 (preserved)
+status:  completed        ✅ 已保留 (preserved)
+created: 2026-03-01       ✅ 已保留 (preserved)
+author:  tech-lead        ✅ 已保留 (preserved)
+```
+
+## 完整性对比报告
+
+| 字段 | 原始值 | 归档后值 | 一致 |
+|------|--------|---------|------|
+| title (标题) | 用户认证 | 用户认证 | ✅ |
+| version (版本) | 1.0 | 1.0 | ✅ |
+| status | completed | completed | ✅ |
+| created | 2026-03-01 | 2026-03-01 | ✅ |
+| author (作者) | tech-lead | tech-lead | ✅ |
+
+**额外添加** (仅归档版):
+```yaml
+archived_at: 2026-03-16
+archive_source: openspec/changes/user-auth
+```
+
+## 完整性结论
+
+所有 5 个元数据字段完整保留 (5/5 preserved)。
+数据 integrity 验证通过。归档操作 success。

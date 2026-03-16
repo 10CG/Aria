@@ -1,0 +1,22 @@
+{
+  "eval_id": 4,
+  "eval_name": "refactor-code-restructure",
+  "passed": true,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "id": "A1",
+      "name": "type_is_refactor",
+      "description": "Commit type must be refactor for code restructuring",
+      "passed": true,
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "scope_not_empty",
+      "description": "Scope must be present for refactor commits",
+      "passed": true,
+      "severity": "high"
+    }
+  ]
+}

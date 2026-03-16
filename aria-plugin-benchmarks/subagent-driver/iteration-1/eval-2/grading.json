@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "isolation-level-selection",
+  "timestamp": "2026-03-16T14:05:40Z",
+  "assertions": [
+    {
+      "text": "selects_none_for_trivial",
+      "passed": true,
+      "evidence": "Output selects 'none' for T1 (typo_fix) with reasoning 'Trivial change, no risk to codebase state' and 'isolation: none' in YAML"
+    },
+    {
+      "text": "selects_branch_for_feature",
+      "passed": true,
+      "evidence": "Output selects 'branch' for T2 (new_feature) with reasoning 'new code should be isolated from the main branch' and branch_name provided"
+    },
+    {
+      "text": "selects_worktree_for_refactor",
+      "passed": true,
+      "evidence": "Output selects 'worktree' for T3 (large_refactor) with reasoning about cross-module changes requiring separate working tree, worktree_path specified"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

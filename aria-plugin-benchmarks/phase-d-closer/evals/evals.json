@@ -1,0 +1,196 @@
+{
+  "skill_name": "phase-d-closer",
+  "skill_path": "aria/skills/phase-d-closer",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for phase-d-closer skill - Ten-Step Cycle Phase D orchestration (D.1 Progress update, D.2 Spec archival)",
+  "metrics": [
+    "progress_update_accuracy",
+    "archival_path_correctness",
+    "closure_sequence_completeness",
+    "skip_condition_detection",
+    "summary_report_quality"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "progress-update-execution",
+      "category": "progress-flow",
+      "prompt": "Execute Phase D D.1: Update progress status for completed spec oauth2-social-login. PR #143 merged to main. All 6 tasks complete.",
+      "setup": {
+        "spec_name": "oauth2-social-login",
+        "pr_number": 143,
+        "tasks_total": 6,
+        "tasks_completed": 6,
+        "pr_merged": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "updates_progress_status",
+          "description": "Should update the spec progress to 'completed' or 'merged' status",
+          "check": "output.includes('completed') || output.includes('merged') || output.includes('done') || output.includes('status: complete')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "records_pr_reference",
+          "description": "Should record the PR number in progress tracking",
+          "check": "output.includes('PR #143') || output.includes('#143') || output.includes('pull request')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "marks_all_tasks_complete",
+          "description": "Should mark all 6 tasks as completed in the progress record",
+          "check": "output.includes('6/6') || output.includes('all tasks') || output.includes('6 tasks') || output.includes('TASK-006')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "spec-archival",
+      "category": "archive-flow",
+      "prompt": "Execute Phase D D.2: Archive completed OpenSpec for oauth2-social-login. Move from openspec/changes/ to openspec/archive/ with completion metadata.",
+      "setup": {
+        "spec_name": "oauth2-social-login",
+        "source_path": "openspec/changes/oauth2-social-login/",
+        "archive_path": "openspec/archive/oauth2-social-login/",
+        "completion_date": "2026-03-16"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "moves_to_archive_directory",
+          "description": "Should move spec files to openspec/archive/ directory",
+          "check": "output.includes('openspec/archive') || output.includes('archive/') || output.includes('archived')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "preserves_spec_files",
+          "description": "Should preserve proposal.md and tasks.md in archive",
+          "check": "output.includes('proposal.md') || output.includes('tasks.md') || output.includes('preserved')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "adds_completion_metadata",
+          "description": "Should add completion date and PR reference to archived spec",
+          "check": "output.includes('completed_at') || output.includes('completion') || output.includes('2026-03') || output.includes('metadata')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "full-closure-sequence",
+      "category": "orchestration",
+      "prompt": "Execute full Phase D for completed feature: realtime-notifications. Run D.1 progress update then D.2 spec archival in sequence.",
+      "setup": {
+        "spec_name": "realtime-notifications",
+        "pr_number": 156,
+        "tasks_total": 7,
+        "tasks_completed": 7
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "executes_d1_then_d2",
+          "description": "Should execute D.1 before D.2 in the correct sequence",
+          "check": "output.indexOf('D.1') < output.indexOf('D.2') || output.includes('D.1 → D.2')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "d1_progress_completed",
+          "description": "D.1 should complete with progress status update",
+          "check": "output.includes('D.1') && (output.includes('progress') || output.includes('status') || output.includes('update'))",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "d2_archival_completed",
+          "description": "D.2 should complete with spec archived",
+          "check": "output.includes('D.2') && (output.includes('archive') || output.includes('archived') || output.includes('moved'))",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "phase_d_marked_complete",
+          "description": "Phase D should be marked complete after both steps",
+          "check": "output.includes('Phase D') && (output.includes('complete') || output.includes('COMPLETE') || output.includes('done'))",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "partial-completion",
+      "category": "skip-logic",
+      "prompt": "Execute Phase D for: fix typo in README (Level 1 skip). No spec was created, so D.2 archival should be skipped. Only D.1 minimal progress note needed.",
+      "setup": {
+        "change_type": "typo-fix",
+        "spec_created": false,
+        "level": 1
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_no_spec_to_archive",
+          "description": "Should detect that no OpenSpec exists and skip D.2",
+          "check": "output.includes('no spec') || output.includes('skip D.2') || output.includes('D.2: skip') || output.includes('not applicable')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "skips_d2_archival",
+          "description": "D.2 archival should be explicitly skipped",
+          "check": "output.includes('skip') || output.includes('SKIP') || output.includes('skipped') || output.includes('N/A')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "records_minimal_progress",
+          "description": "Should still record D.1 minimal progress note",
+          "check": "output.includes('D.1') || output.includes('progress') || output.includes('note') || output.includes('completed')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "status-summary-output",
+      "category": "output-format",
+      "prompt": "Execute Phase D and generate closure summary report for spec: add-payment-gateway. Include all D.1 and D.2 outcomes, timeline, and next steps.",
+      "setup": {
+        "spec_name": "add-payment-gateway",
+        "report_format": "closure-summary",
+        "include_timeline": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_closure_summary_header",
+          "description": "Output should have a clear closure summary heading",
+          "check": "output.includes('Closure') || output.includes('closure') || output.includes('Summary') || output.includes('Phase D Report')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_d1_d2_outcomes",
+          "description": "Report should cover both D.1 and D.2 outcomes",
+          "check": "output.includes('D.1') && output.includes('D.2')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "includes_next_steps_or_handoff",
+          "description": "Report should indicate what happens after Phase D",
+          "check": "output.includes('next') || output.includes('handoff') || output.includes('complete') || output.includes('closed')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "commit-generation",
+  "timestamp": "2026-03-16T14:20:22Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Commit message starts with 'feat(oauth2):' — 'feat' is a valid conventional commit type",
+      "text": "uses_conventional_commit_type"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Commit message contains '(oauth2)' scope in the header line: 'feat(oauth2)'",
+      "text": "includes_scope"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Commit footer contains 'Spec: openspec/changes/oauth2-social-login/proposal.md' and 'Refs: oauth2-social-login'",
+      "text": "references_spec"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

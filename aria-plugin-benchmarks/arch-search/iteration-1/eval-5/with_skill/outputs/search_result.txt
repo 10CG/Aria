@@ -1,0 +1,47 @@
+## 🔍 架构搜索结果
+
+**查询**: 搜索数据同步机制的设计文档
+**搜索层级**: Layer 1 (快速路由)
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/sync.md` | ⭐⭐⭐ | Mobile App 离线数据同步架构，包含同步流程、冲突解决策略 |
+| `backend/ARCHITECTURE.md` | ⭐⭐ | 后端架构中提到事件驱动同步，作为数据一致性策略 |
+| `mobile/docs/ARCHITECTURE.md` | ⭐⭐ | 在模块映射表中引用了 sync.md |
+
+### 📝 信息摘要
+
+系统采用离线优先的数据同步架构，核心特性包括：
+1. 离线优先：所有操作优先本地存储
+2. 自动同步：网络恢复后自动同步
+3. 冲突解决：基于时间戳的自动合并和三向合并策略
+4. 后端采用事件驱动同步机制确保最终一致性
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/services/sync/sync_engine.dart` - 同步引擎实现
+- `mobile/src/services/sync/conflict_resolver.dart` - 冲突解决逻辑
+- `mobile/src/services/sync/offline_queue.dart` - 离线队列管理
+- `mobile/src/services/network_detector.dart` - 网络状态检测
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/sync.md` 了解详细的同步流程设计
+- [ ] 查看 `mobile/src/services/sync/` 目录中的实际实现代码
+- [ ] 研究冲突解决策略的具体实现
+
+---
+
+## Token 使用统计
+
+- Layer 1 快速路由：~200 tokens
+- 读取 DOMAINS.md：~400 tokens
+- 读取主文档 sync.md：~600 tokens
+- Grep 验证其他文档：~200 tokens
+- **总计约 1400 tokens**
+
+对比传统搜索（约 3000+ tokens），节省了约 53% 的 tokens。

@@ -1,0 +1,12 @@
+docs(skills): 优化commit-msg-generator文档结构
+
+执行P0和P1优化。
+
+- 标准化YAML frontmatter
+- 添加快速导航章节
+
+🤖 Executed-By: tech-lead subagent
+
+📋 Context: Phase1-Cycle2 Skills optimization P0+P1
+
+🔗 Module: skills

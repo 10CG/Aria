@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "multi-document-batch",
+  "timestamp": "2026-03-16T14:08:30Z",
+  "assertions": [
+    {
+      "text": "processes_all_documents",
+      "passed": true,
+      "evidence": "Output processes all 4 documents labeled [1/4] through [4/4] and states 'Batch — 4 documents'"
+    },
+    {
+      "text": "reports_pass_fail_per_doc",
+      "passed": true,
+      "evidence": "Output reports PASS/FAIL status for each individual document in the Per-Document Results section"
+    },
+    {
+      "text": "correct_valid_count",
+      "passed": true,
+      "evidence": "Output reports 'passed: 2 / 4' in Batch Summary, correctly identifying PRD-001 and ARCH-001 as valid"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,35 @@
+{
+  "eval_id": 3,
+  "eval_name": "existing-spec-detection",
+  "category": "state-detection",
+  "prompt": "Execute Phase A for feature: Add user profile avatar upload. Existing file found: openspec/changes/add-avatar-upload/proposal.md",
+  "setup": {
+    "feature": "avatar-upload",
+    "existing_spec": true,
+    "spec_path": "openspec/changes/add-avatar-upload/proposal.md",
+    "tasks_exist": false
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_existing_proposal",
+      "description": "Should detect existing proposal.md and skip A.1",
+      "check": "output.includes('existing') || output.includes('found') || output.includes('already exists') || output.includes('跳过 A.1')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "skips_a1_step",
+      "description": "Should skip A.1 spec creation since proposal already exists",
+      "check": "output.includes('skip A.1') || output.includes('A.1: skip') || output.includes('A.1 已完成') || output.includes('proposal.md exists')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "proceeds_to_a2",
+      "description": "Should proceed directly to A.2 task planning",
+      "check": "output.includes('A.2') || output.includes('task-planner') || output.includes('proceeding')",
+      "severity": "high"
+    }
+  ]
+}

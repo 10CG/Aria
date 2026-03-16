@@ -1,0 +1,48 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-cycle-execution",
+  "category": "orchestration",
+  "prompt": "Run a full Ten-Step Cycle for a new feature task: 'Add user profile editing functionality'. Execute all phases A through D.",
+  "setup": {
+    "workflow_type": "full-cycle",
+    "task": "Add user profile editing functionality",
+    "skip_phases": []
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "executes_phase_a",
+      "description": "Should execute all Phase A steps (A.0, A.1, A.2, A.3)",
+      "check": "output.match(/A\\.0|A\\.1|A\\.2|A\\.3/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "executes_phase_b",
+      "description": "Should execute Phase B steps (B.1, B.2)",
+      "check": "output.match(/B\\.1|B\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "executes_phase_c",
+      "description": "Should execute Phase C steps (C.1, C.2)",
+      "check": "output.match(/C\\.1|C\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "executes_phase_d",
+      "description": "Should execute Phase D steps (D.1, D.2)",
+      "check": "output.match(/D\\.1|D\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A5",
+      "name": "correct_order",
+      "description": "Phases must execute in A→B→C→D order",
+      "check": "output.indexOf('A.0') < output.indexOf('B.1') && output.indexOf('B.1') < output.indexOf('C.1') && output.indexOf('C.1') < output.indexOf('D.1')",
+      "severity": "critical"
+    }
+  ]
+}

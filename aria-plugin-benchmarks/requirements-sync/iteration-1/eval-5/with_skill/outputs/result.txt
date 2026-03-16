@@ -1,0 +1,67 @@
+# Requirements Sync — Conflict Resolution Report
+
+> **Operation**: Conflict Detection and Resolution
+> **Skill**: requirements-sync v1.1.0
+> **Story**: US-030
+> **Timestamp**: 2026-03-16T14:20:00Z
+
+## Result: CONFLICT DETECTED — Manual review recommended
+
+A **3-way conflict** was detected for US-030. Automatic resolution is not safe; manual review is required.
+
+---
+
+## Conflict Details
+
+| Source | Status | Timestamp | Authority |
+|--------|--------|-----------|-----------|
+| Git commit (latest) | **Done** | 2026-03-16T11:00:00Z | High |
+| UPM requirements | **In Review** | 2026-03-16T09:00:00Z | Medium |
+| Jira | **In Progress** | 2026-03-15T15:00:00Z | Medium |
+
+All 3 sources disagree: `Done` vs `In Review` vs `In Progress`
+
+---
+
+## Conflict Analysis
+
+The conflict involves 3 sources with different status values for US-030:
+
+1. **Git commit** (most recent, 2026-03-16 11:00) — marks story as `Done`
+2. **UPM requirements** (2026-03-16 09:00) — shows `In Review`
+3. **Jira** (oldest, 2026-03-15 15:00) — shows `In Progress`
+
+The Git commit is the most recent signal, suggesting the story may genuinely be complete. However, the discrepancy with Jira (still In Progress) suggests Jira was not updated after code completion.
+
+---
+
+## Resolution Options
+
+### Option A: Latest-wins (Git as authoritative source)
+```
+Set all sources to: Done
+Source of truth: Git commit (2026-03-16T11:00:00Z)
+Risk: LOW if code review is already merged
+```
+
+### Option B: Manual review (recommended)
+```
+Review US-030 with the team to confirm current status.
+Update Jira and UPM to reflect the agreed state.
+Risk: NONE — safe and accurate
+```
+
+---
+
+## Recommendation
+
+**Manual review is recommended** before applying any sync. Confirm with the story owner whether the Git commit represents final completion or an intermediate commit. Once confirmed, run `requirements-sync --resolve US-030 --status <agreed-status>` to apply the resolution.
+
+---
+
+## Conflict Summary
+
+- **Sources in conflict**: 3 (Git, UPM, Jira)
+- **Conflicting values**: Done, In Review, In Progress
+- **Auto-resolved**: No
+- **Action required**: Manual resolution

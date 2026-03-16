@@ -1,0 +1,52 @@
+{
+  "eval_id": 3,
+  "eval_name": "doc-generation",
+  "category": "doc-creation",
+  "prompt": "Generate an architecture document for the newly added payment service module based on code analysis of src/services/payment/",
+  "setup": {
+    "source_directory": "src/services/payment/",
+    "files": [
+      "src/services/payment/PaymentService.ts",
+      "src/services/payment/PaymentGateway.ts",
+      "src/services/payment/PaymentValidator.ts"
+    ],
+    "layer": "L1"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "generates_valid_markdown",
+      "description": "Generated doc should be valid markdown with proper headings",
+      "check": "output.match(/^#.*Architecture|## Overview|## Components/im)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_module_overview",
+      "description": "Should include an overview section describing the payment module",
+      "check": "output.match(/overview|purpose|description|payment.*service/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "lists_components",
+      "description": "Should list the key components found in the module",
+      "check": "output.match(/PaymentService|PaymentGateway|PaymentValidator/)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "includes_code_pointers",
+      "description": "Should include code file references/pointers",
+      "check": "output.match(/\\.ts|src\\/services\\/payment/)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "correct_naming_convention",
+      "description": "Generated file should follow naming convention (*.arch.md)",
+      "check": "output.match(/payment\\.arch\\.md|ARCHITECTURE\\.md/i)",
+      "severity": "high"
+    }
+  ]
+}

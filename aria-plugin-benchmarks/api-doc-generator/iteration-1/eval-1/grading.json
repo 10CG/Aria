@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "openapi-generation",
+  "timestamp": "2026-03-16T10:31:30Z",
+  "assertions": [
+    {
+      "text": "has_openapi_version",
+      "passed": true,
+      "evidence": "Output contains 'openapi: 3.0.3' as the spec version declaration"
+    },
+    {
+      "text": "includes_post_users",
+      "passed": true,
+      "evidence": "Output contains '/users:' path with 'post:' operation defined"
+    },
+    {
+      "text": "includes_get_user_by_id",
+      "passed": true,
+      "evidence": "Output contains '/users/{user_id}:' path with 'get:' operation defined"
+    },
+    {
+      "text": "correct_status_codes",
+      "passed": true,
+      "evidence": "POST /users response shows '201: User created successfully'"
+    },
+    {
+      "text": "valid_yaml_or_json_structure",
+      "passed": true,
+      "evidence": "Output contains 'paths:' key at the top level of the YAML structure"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}
