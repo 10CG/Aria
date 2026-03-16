@@ -1,0 +1,101 @@
+# Strategic Commit Orchestrator - Cross-Module Grouping
+
+## 输入分析
+
+- **Task ID**: TASK-202
+- **Description**: user-management-feature
+- **Files**: 4 files across 4 modules
+
+| # | File | Module | Type |
+|---|------|--------|------|
+| 1 | shared/types/user.ts | shared | Type Definition |
+| 2 | backend/src/api/users.py | backend | API Implementation |
+| 3 | frontend/src/pages/UserList.tsx | frontend | UI Component |
+| 4 | mobile/lib/screens/user_screen.dart | mobile | Mobile Screen |
+
+## 依赖关系分析
+
+```
+shared/types/user.ts
+    ├── backend/src/api/users.py (依赖 User type)
+    ├── frontend/src/pages/UserList.tsx (依赖 User type)
+    └── mobile/lib/screens/user_screen.dart (依赖 User type)
+```
+
+**关键发现**: `shared/types/user.ts` 是所有模块的共同依赖，必须最先提交
+
+## AI-DDD 提交分组计划
+
+**推荐分组**: 3 个 commit groups
+
+---
+
+### Group 1: Shared Types (依赖基础)
+
+**提交信息**:
+```
+feat(shared): 定义用户管理共享类型
+
+- 新增 User 类型定义 (shared/types/user.ts)
+- 覆盖 backend/frontend/mobile 模块使用
+```
+
+**包含文件**:
+- `shared/types/user.ts` (A - 新增)
+
+**提交类型**: `feat`
+**Scope**: `shared`
+**顺序**: 第一提交 (其他模块依赖此类型)
+
+---
+
+### Group 2: Backend + Frontend Implementation
+
+**提交信息**:
+```
+feat(user-management): 实现用户管理 API 和前端页面
+
+- 新增用户列表 API 接口 (backend/src/api/users.py)
+- 新增用户列表前端页面 (frontend/src/pages/UserList.tsx)
+```
+
+**包含文件**:
+- `backend/src/api/users.py` (A - 新增)
+- `frontend/src/pages/UserList.tsx` (A - 新增)
+
+**提交类型**: `feat`
+**Scope**: `user-management`
+**顺序**: 第二提交 (依赖 shared types)
+
+---
+
+### Group 3: Mobile Implementation
+
+**提交信息**:
+```
+feat(mobile): 实现用户管理移动端页面
+
+- 新增用户屏幕 (mobile/lib/screens/user_screen.dart)
+```
+
+**包含文件**:
+- `mobile/lib/screens/user_screen.dart` (A - 新增)
+
+**提交类型**: `feat`
+**Scope**: `mobile`
+**顺序**: 第三提交
+
+---
+
+## 执行顺序
+
+1. **Group 1** → `feat(shared): 定义用户管理共享类型`
+2. **Group 2** → `feat(user-management): 实现用户管理 API 和前端页面`
+3. **Group 3** → `feat(mobile): 实现用户管理移动端页面`
+
+## 总结
+
+- 总提交数: 3
+- 跨模块: backend, frontend, shared, mobile (4 modules)
+- 依赖链: shared → backend/frontend → mobile
+- 格式合规: ✅ (Conventional Commits)

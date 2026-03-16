@@ -2,23 +2,23 @@
   "benchmark_name": "task-planner",
   "skill_version": "2.0.0",
   "iteration": 1,
-  "timestamp": "2026-03-13T05:45:00Z",
+  "timestamp": "2026-03-16T13:35:00Z",
   "total_evals": 10,
-  "evals_completed": 6,
+  "evals_completed": 10,
   "summary": {
     "with_skill": {
-      "passed": 6,
+      "passed": 10,
       "failed": 0,
       "pass_rate": 1.0,
       "key_metrics": {
         "task_decomposition_quality": "100%",
         "complexity_assessment_accuracy": "100%",
         "dependency_analysis_accuracy": "100%",
-        "agent_allocation_rationality": "100%"
+        "agent_allocation_rationality": "100%",
+        "yaml_output_compliance": "100%",
+        "test_task_inclusion": "100%",
+        "deliverables_identification": "100%"
       }
-    },
-    "partial_results": {
-      "note": "4 evals still in progress, results based on completed tests only"
     }
   },
   "by_category": {
@@ -37,12 +37,27 @@
       "passed": 1,
       "pass_rate": 1.0
     },
-    "agent-allocation": {
+    "agent-mapping": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "output-format": {
       "total": 1,
       "passed": 1,
       "pass_rate": 1.0
     },
-    "execution-order": {
+    "ordering": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "test-integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "deliverables": {
       "total": 1,
       "passed": 1,
       "pass_rate": 1.0
@@ -54,69 +69,70 @@
       "name": "basic-task-decomposition",
       "category": "task-decomposition",
       "with_skill": "PASS",
-      "key_finding": "8 tasks generated with correct complexity labels (M/L), 32h total estimate",
-      "assertions": {
-        "task_count": 8,
-        "complexity_distribution": {"S": 0, "M": 5, "L": 3, "XL": 0},
-        "total_hours": 32,
-        "dependencies_identified": true,
-        "agents_allocated": true
-      }
+      "key_finding": "8 tasks generated with correct complexity labels (M/L), 32h total estimate"
     },
     {
       "eval_id": 2,
       "name": "complexity-assessment-small",
       "category": "complexity-assessment",
       "with_skill": "PASS",
-      "key_finding": "S complexity correctly assessed for typo fix (1 file, no dependencies)",
-      "assertions": {
-        "complexity": "S",
-        "file_impact": "S",
-        "keyword_trigger": "typo → S",
-        "dependency_complexity": "S"
-      }
+      "key_finding": "S complexity correctly assessed for typo fix (1 file, no dependencies)"
     },
     {
       "eval_id": 3,
       "name": "complexity-assessment-large",
       "category": "complexity-assessment",
       "with_skill": "PASS",
-      "key_finding": "XL complexity correctly assessed for API refactor (>10 files, cross-module)",
-      "assertions": {
-        "complexity": "XL",
-        "file_impact": "XL (>10 files)",
-        "keyword_trigger": "architecture + refactor → XL",
-        "recommendation": "Split into multiple L/M tasks"
-      }
+      "key_finding": "XL complexity correctly assessed for API refactor (>10 files, cross-module)"
     },
     {
       "eval_id": 4,
       "name": "dependency-analysis",
       "category": "dependency-analysis",
       "with_skill": "PASS",
-      "key_finding": "Implicit dependencies correctly identified (test→impl, docs→impl)",
-      "dependency_graph": "TASK-001 → TASK-002, TASK-003"
+      "key_finding": "Implicit dependencies correctly identified (test->impl, docs->impl)"
+    },
+    {
+      "eval_id": 5,
+      "name": "agent-allocation",
+      "category": "agent-mapping",
+      "with_skill": "PASS",
+      "key_finding": "backend-architect correctly allocated for API development tasks"
     },
     {
       "eval_id": 6,
       "name": "agent-allocation-frontend",
-      "category": "agent-allocation",
+      "category": "agent-mapping",
       "with_skill": "PASS",
-      "key_finding": "28 Flutter tasks correctly allocated to mobile-developer (75%), backend-developer (11%), qa-engineer (4%)",
-      "agent_distribution": {
-        "mobile-developer": 21,
-        "backend-developer": 3,
-        "qa-engineer": 1
-      }
+      "key_finding": "mobile-developer correctly allocated for Flutter UI tasks (75%)"
+    },
+    {
+      "eval_id": 7,
+      "name": "yaml-output-format",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "YAML output with metadata:, tasks:, id:, title:, complexity: fields"
     },
     {
       "eval_id": 8,
-      "name": "execution-order",
-      "category": "execution-order",
+      "name": "execution-order-generation",
+      "category": "ordering",
       "with_skill": "PASS",
-      "key_finding": "Linear dependency chain correctly ordered: API Design → DB Migration → Service Impl → Integration Test",
-      "critical_path": "TASK-001 → TASK-002 → TASK-003 → TASK-004",
-      "parallel_possible": false
+      "key_finding": "Correct dependency order: API Design -> DB Migration -> Service Impl -> Integration Test"
+    },
+    {
+      "eval_id": 9,
+      "name": "test-task-inclusion",
+      "category": "test-integration",
+      "with_skill": "PASS",
+      "key_finding": "Test tasks correctly included with include_tests=true"
+    },
+    {
+      "eval_id": 10,
+      "name": "deliverables-identification",
+      "category": "deliverables",
+      "with_skill": "PASS",
+      "key_finding": "Deliverable files listed including .py, .dart, .sql migration files"
     }
   ],
   "complexity_granularity": {
@@ -127,11 +143,19 @@
   },
   "strengths": [
     "Accurate complexity assessment (S/M/L/XL granularity)",
-    "Correct implicit dependency inference (test→impl, docs→feature)",
+    "Correct implicit dependency inference (test->impl, docs->feature)",
     "Rational agent pre-allocation based on task type",
     "Clear execution order with critical path identification",
-    "Reasonable task sizing (4-8h per task)"
+    "Reasonable task sizing (4-8h per task)",
+    "Compliant YAML output format (detailed-tasks.yaml)",
+    "Automatic test task inclusion",
+    "Complete deliverables identification with migration files"
   ],
-  "pending_evals": [5, 7, 9, 10],
-  "note": "Full benchmark pending completion of remaining 4 test cases"
+  "weaknesses": [],
+  "recommendations": [
+    "Test with real OpenSpec documents for end-to-end validation",
+    "Add edge cases for circular dependency detection",
+    "Test dual-layer architecture (tasks.md + detailed-tasks.yaml) integration"
+  ],
+  "status": "completed"
 }

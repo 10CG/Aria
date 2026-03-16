@@ -1,0 +1,298 @@
+{
+  "skill_name": "integration-tests",
+  "description": "Cross-skill integration tests verifying multi-skill workflows and context passing in the Aria Ten-Step Cycle",
+  "test_type": "integration",
+  "metrics": [
+    "context_passing_integrity",
+    "phase_transition_correctness",
+    "skill_orchestration_order",
+    "error_recovery",
+    "state_consistency"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-feature-cycle-a-to-d",
+      "category": "end-to-end",
+      "description": "Complete A->B->C->D cycle for a new feature, verifying context flows from spec to PR to archive",
+      "prompt": "Execute full ten-step cycle for implementing a user notification feature",
+      "skills_involved": [
+        "state-scanner", "workflow-runner", "phase-a-planner", "spec-drafter",
+        "task-planner", "phase-b-developer", "branch-manager", "subagent-driver",
+        "phase-c-integrator", "commit-msg-generator", "phase-d-closer",
+        "progress-updater", "openspec-archive"
+      ],
+      "context_chain": "spec_id -> task_list -> branch_name -> commit_sha -> pr_url -> archive_path",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "phase_a_produces_spec",
+          "description": "Phase A must produce proposal.md with valid spec_id",
+          "check": "output.includes('proposal.md') && output.match(/SPEC-\\d+/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "phase_a_produces_tasks",
+          "description": "Phase A must produce detailed-tasks.yaml with task IDs referencing spec_id",
+          "check": "output.includes('detailed-tasks.yaml') && output.includes('TASK-')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "phase_b_creates_branch",
+          "description": "Phase B must create branch named feature/{module}/{task-id}-{desc}",
+          "check": "output.match(/feature\\/\\w+\\/TASK-\\d+-/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "phase_c_references_spec",
+          "description": "Phase C commit/PR must reference the original spec_id",
+          "check": "output.match(/SPEC-\\d+/) && (output.includes('PR') || output.includes('pull request'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A5",
+          "name": "phase_d_archives_spec",
+          "description": "Phase D must archive spec to openspec/archive/ (not standards/)",
+          "check": "output.includes('openspec/archive/') && !output.includes('standards/openspec/archive/')",
+          "severity": "critical"
+        },
+        {
+          "id": "A6",
+          "name": "context_chain_unbroken",
+          "description": "Each phase output must contain reference to previous phase artifact",
+          "check": "phases_all_reference_predecessor",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "quickfix-with-tdd-double-insurance",
+      "category": "partial-cycle",
+      "description": "Quick bugfix using Phase B->C only, verifying TDD double-insurance (Method A + Method B)",
+      "prompt": "Fix a null pointer exception in the payment service - simple 3-file change",
+      "skills_involved": [
+        "state-scanner", "workflow-runner", "phase-b-developer", "branch-manager",
+        "tdd-enforcer", "subagent-driver", "branch-finisher",
+        "phase-c-integrator", "commit-msg-generator"
+      ],
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "skips_phase_a",
+          "description": "Level 1 change should skip Phase A (no spec needed)",
+          "check": "!output.includes('Phase A') || output.includes('Phase A: SKIP')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "tdd_method_b_session_hook",
+          "description": "workflow-runner pre-hook should activate TDD enforcer at session level",
+          "check": "output.match(/tdd-enforcer.*session|Method B.*active|pre-hook.*TDD/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "tdd_method_a_subagent",
+          "description": "subagent-driver should pass TDD constraints to Fresh Subagent",
+          "check": "output.match(/tdd.*subagent|Method A.*constraint|RED.*GREEN.*REFACTOR/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "commit_type_is_fix",
+          "description": "Commit message must use 'fix' type for bugfix",
+          "check": "output.match(/fix\\(.*\\):/)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "branch_mode_is_branch",
+          "description": "Simple 3-file fix should use Branch mode (not Worktree)",
+          "check": "output.match(/Branch.*mode|mode.*branch/i) && !output.includes('Worktree mode')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "cross-module-worktree-coordination",
+      "category": "parallel-execution",
+      "description": "Cross-module change requiring Worktree mode, strategic commit grouping, and multi-module PR",
+      "prompt": "Implement API versioning across backend (Python) and mobile (Flutter) with database migration",
+      "skills_involved": [
+        "branch-manager", "subagent-driver", "strategic-commit-orchestrator",
+        "commit-msg-generator", "agent-router"
+      ],
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "selects_worktree_mode",
+          "description": "Cross-module (>5 files, 2+ modules) should trigger Worktree auto-selection (score >= 3)",
+          "check": "output.match(/Worktree.*mode|score.*[3-5]|worktree.*selected/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "agent_router_assigns_correctly",
+          "description": "agent-router should assign backend-architect for API and mobile-developer for Flutter",
+          "check": "output.includes('backend-architect') && output.includes('mobile-developer')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "strategic_commit_groups_by_module",
+          "description": "Commits should be grouped by module (backend group + mobile group + migration group)",
+          "check": "output.match(/[Gg]roup.*[23]/) || output.match(/backend.*commit.*mobile.*commit/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "commit_messages_have_correct_scopes",
+          "description": "Each commit group should have appropriate scope (api, mobile, db)",
+          "check": "output.match(/feat\\(api\\)|feat\\(mobile\\)|feat\\(db\\)|chore\\(migration\\)/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "brainstorm-to-spec-pipeline",
+      "category": "planning-chain",
+      "description": "Brainstorm session producing decisions that flow into spec-drafter and task-planner",
+      "prompt": "We need a caching layer but unsure about Redis vs Memcached vs in-memory - explore options and create spec",
+      "skills_involved": [
+        "brainstorm", "spec-drafter", "task-planner", "agent-router"
+      ],
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "brainstorm_produces_decision_matrix",
+          "description": "Brainstorm should generate comparison matrix for Redis/Memcached/in-memory",
+          "check": "output.match(/Redis|Memcached/) && (output.includes('matrix') || output.includes('comparison'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "spec_references_decision",
+          "description": "spec-drafter output should reference the brainstorm decision",
+          "check": "output.match(/decision.*record|brainstorm.*reference|docs\\/decisions\\//i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "spec_level_at_least_2",
+          "description": "Caching feature with exploration should be Level 2 or 3",
+          "check": "output.match(/Level [23]|level.*[23]/)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "tasks_include_implementation_and_test",
+          "description": "task-planner should include both implementation and test tasks",
+          "check": "output.match(/TASK-.*impl|TASK-.*test/i) || (output.includes('implementation') && output.includes('test'))",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "phase-boundary-error-recovery",
+      "category": "error-handling",
+      "description": "Test failure at B->C boundary: branch-finisher detects failing tests, user retries, then proceeds to C",
+      "prompt": "Complete development but tests are failing - handle the failure and retry",
+      "skills_involved": [
+        "phase-b-developer", "branch-finisher", "phase-c-integrator",
+        "commit-msg-generator"
+      ],
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_test_failure",
+          "description": "branch-finisher must detect and report test failures",
+          "check": "output.match(/test.*fail|FAIL|failure.*detected/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "offers_retry_option",
+          "description": "branch-finisher should offer option to continue modifying (not just abort)",
+          "check": "output.match(/continue.*modif|option.*2|retry|keep.*working/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "revalidation_after_fix",
+          "description": "After fix, branch-finisher should re-run validation",
+          "check": "output.match(/re-?run|re-?validat|test.*again|verification.*pass/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "proceeds_to_phase_c",
+          "description": "After successful retry, should proceed to Phase C commit",
+          "check": "output.match(/Phase C|commit.*generat|proceed.*integrat/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "no_context_loss",
+          "description": "Branch name and task context must be preserved across retry",
+          "check": "output.match(/feature\\/|TASK-/) && !output.includes('context lost')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "closure-state-consistency",
+      "category": "state-management",
+      "description": "After C->D transition, verify state-scanner reflects completed state and UPM is consistent",
+      "prompt": "PR merged successfully - execute closure phase and verify project state",
+      "skills_involved": [
+        "phase-d-closer", "progress-updater", "openspec-archive",
+        "state-scanner", "requirements-sync"
+      ],
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "progress_updater_writes_state_block",
+          "description": "D.1 must write UPMv2-STATE block with updated completion percentage",
+          "check": "output.match(/UPMv2-STATE|stateToken|completion.*\\d+%/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "archive_moves_spec_correctly",
+          "description": "D.2 must move spec from changes/ to archive/ with preserved metadata",
+          "check": "output.match(/changes\\/.*->.*archive\\//i) || (output.includes('archive') && output.includes('metadata'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "state_scanner_shows_clean",
+          "description": "After closure, state-scanner should show no active specs in changes/",
+          "check": "output.match(/no active.*spec|changes\\/.*empty|clean.*state/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "requirements_sync_updated",
+          "description": "requirements-sync should reflect completed status in UPM",
+          "check": "output.match(/requirements.*sync|UPM.*updated|status.*completed/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "atomic_state_update",
+          "description": "D.1 and D.2 should complete atomically (both succeed or neither)",
+          "check": "output.match(/D\\.1.*complete.*D\\.2.*complete|both.*phases.*success/i) || (output.includes('D.1') && output.includes('D.2'))",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

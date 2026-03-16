@@ -1,0 +1,34 @@
+{
+  "eval_id": 4,
+  "eval_name": "already-archived-detection",
+  "category": "validation",
+  "prompt": "检测已归档的 OpenSpec: spec_path=openspec/changes/user-auth, check_archive=openspec/archive/user-auth, detect_duplicates=true",
+  "setup": {
+    "spec_path": "openspec/changes/user-auth",
+    "archive_exists": true,
+    "expected_action": "skip_or_warn"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_already_archived",
+      "description": "Should detect that spec is already archived",
+      "check": "output.includes('already') || output.includes('已归档') || output.includes('exists') || output.includes('存在') || output.includes('duplicate')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "prevents_duplicate_archive",
+      "description": "Should prevent creating a duplicate archive",
+      "check": "output.includes('skip') || output.includes('跳过') || output.includes('warn') || output.includes('警告') || output.includes('abort')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "reports_archive_location",
+      "description": "Should report where the existing archive is located",
+      "check": "output.includes('openspec/archive') || output.includes('archive/user-auth') || output.includes('location') || output.includes('位置')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+# Spec Drafter — Template Compliance Validation
+
+> **Skill**: spec-drafter v2.0.0
+> **Check**: OpenSpec Level 2 template compliance
+> **Timestamp**: 2026-03-16T14:30:00Z
+
+## Compliance Result: PASS — All Level 2 requirements met
+
+The generated proposal.md is **fully compliant** with the OpenSpec Level 2 template format.
+
+---
+
+## Section Checklist
+
+| Section | Required | Status | Heading Level |
+|---------|----------|--------|---------------|
+| Metadata header (version, date, status) | Yes | PRESENT | frontmatter |
+| `## Background` | Yes | PRESENT | H2 |
+| `## Scope` | Yes | PRESENT | H2 |
+| `## Goals` | Yes | PRESENT | H2 |
+| `## Non-Goals` | Yes | PRESENT | H2 |
+| `## Implementation Plan` | Yes | PRESENT | H2 |
+| `## Open Questions` | Optional | PRESENT | H2 |
+
+**Required sections present**: 6/6 (100%)
+**Optional sections present**: 1/1
+
+---
+
+## Heading Hierarchy Check
+
+```
+# [Title]            ← H1 (document title)
+  ## Background      ← H2 (major section)
+  ## Scope           ← H2 (major section)
+    ### In-Scope     ← H3 (subsection)
+    ### Out-of-Scope ← H3 (subsection)
+  ## Goals           ← H2 (major section)
+  ## Non-Goals       ← H2 (major section)
+  ## Implementation Plan ← H2 (major section)
+  ## Open Questions  ← H2 (optional section)
+```
+
+Heading hierarchy is **correct and consistent**.
+
+---
+
+## Metadata Check
+
+```
+Version: 1.0.0     ✓ present
+Status:  Draft     ✓ present
+Date:    2026-...  ✓ present
+Author:  ...       ✓ present
+```
+
+---
+
+## Template Compliance Summary
+
+- **Level**: OpenSpec Level 2 (Minimal)
+- **Required sections**: 6/6 PASS
+- **Heading hierarchy**: PASS
+- **Metadata header**: PASS
+- **Overall**: COMPLIANT

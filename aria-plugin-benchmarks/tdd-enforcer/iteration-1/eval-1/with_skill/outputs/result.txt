@@ -1,0 +1,81 @@
+# TDD Enforcer - RED Phase Enforcement
+
+> **Mode**: Strict
+> **Phase**: RED (Test First Required)
+> **Status**: BLOCKED - No test found before implementation
+
+---
+
+## Violation Detected
+
+TDD Enforcer has detected an attempt to implement `UserService.create()` without a prior failing test.
+
+**Rule**: In TDD, you must write a failing test FIRST (RED phase) before writing any implementation.
+
+---
+
+## Action Required: Write Your Test First
+
+Before implementing `UserService.create()`, create the following test:
+
+```python
+# tests/test_user_service.py
+
+import pytest
+from services.user_service import UserService
+from models.user import User
+
+class TestUserServiceCreate:
+    def test_create_user_success(self):
+        """Test that UserService.create() successfully creates a user."""
+        service = UserService()
+        user_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "securepassword123"
+        }
+
+        result = service.create(user_data)
+
+        assert result is not None
+        assert isinstance(result, User)
+        assert result.username == "testuser"
+        assert result.email == "test@example.com"
+
+    def test_create_user_duplicate_email_raises(self):
+        """Test that creating user with duplicate email raises ValueError."""
+        service = UserService()
+        user_data = {"username": "user1", "email": "dup@example.com", "password": "pass123"}
+        service.create(user_data)
+
+        with pytest.raises(ValueError, match="Email already exists"):
+            service.create({"username": "user2", "email": "dup@example.com", "password": "pass456"})
+
+    def test_create_user_invalid_email_raises(self):
+        """Test that creating user with invalid email raises ValueError."""
+        service = UserService()
+        user_data = {"username": "user1", "email": "not-an-email", "password": "pass123"}
+
+        with pytest.raises(ValueError, match="Invalid email format"):
+            service.create(user_data)
+```
+
+---
+
+## TDD Cycle Status
+
+```
+[RED]   ← You are here: Write failing test
+GREEN   - Implement minimal code to pass
+REFACTOR - Clean up while keeping tests green
+```
+
+---
+
+## Next Steps
+
+1. Create `tests/test_user_service.py` with the tests above
+2. Run `pytest tests/test_user_service.py` - all tests should FAIL (RED confirmed)
+3. Only then proceed to implement `UserService.create()`
+
+**Implementation is blocked until tests are written.**

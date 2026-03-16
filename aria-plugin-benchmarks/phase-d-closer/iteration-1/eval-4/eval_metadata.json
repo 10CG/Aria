@@ -1,0 +1,34 @@
+{
+  "eval_id": 4,
+  "eval_name": "partial-completion",
+  "category": "skip-logic",
+  "prompt": "Execute Phase D for: fix typo in README (Level 1 skip). No spec was created, so D.2 archival should be skipped. Only D.1 minimal progress note needed.",
+  "setup": {
+    "change_type": "typo-fix",
+    "spec_created": false,
+    "level": 1
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_no_spec_to_archive",
+      "description": "Should detect that no OpenSpec exists and skip D.2",
+      "check": "output.includes('no spec') || output.includes('skip D.2') || output.includes('D.2: skip') || output.includes('not applicable')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "skips_d2_archival",
+      "description": "D.2 archival should be explicitly skipped",
+      "check": "output.includes('skip') || output.includes('SKIP') || output.includes('skipped') || output.includes('N/A')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "records_minimal_progress",
+      "description": "Should still record D.1 minimal progress note",
+      "check": "output.includes('D.1') || output.includes('progress') || output.includes('note') || output.includes('completed')",
+      "severity": "medium"
+    }
+  ]
+}

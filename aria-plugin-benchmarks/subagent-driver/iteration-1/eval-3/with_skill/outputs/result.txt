@@ -1,0 +1,65 @@
+# Subagent Driver - Inter-Task Code Review
+
+> **Operation**: Inter-task Review Gate
+> **Completed Task**: TASK-002
+> **Pending Task**: TASK-003
+> **Status**: TASK-003 BLOCKED - Awaiting inter-task code review
+
+---
+
+## Dependency Review Gate Triggered
+
+TASK-003 depends on the output of TASK-002. Before launching the TASK-003 subagent, Subagent Driver requires a code review of TASK-002's deliverables.
+
+**Review Trigger**: TASK-003 dependency on TASK-002 detected in task dependency graph.
+
+---
+
+## Code Review Dispatched
+
+Invoking code-reviewer agent for inter-task review of TASK-002...
+
+```yaml
+review_request:
+  type: "inter-task"
+  trigger: "dependency-gate"
+  subject_task: "TASK-002"
+  dependent_task: "TASK-003"
+  reviewer_agent: "code-reviewer"
+  review_phases:
+    - phase: 1
+      name: "Spec Compliance"
+      scope: ["backend/api/auth/register.py", "backend/services/user_service.py"]
+    - phase: 2
+      name: "Code Quality"
+      scope: ["backend/api/auth/register.py", "backend/services/user_service.py", "backend/tests/test_register.py"]
+  blocking: true
+  status: "review_in_progress"
+```
+
+---
+
+## TASK-003 Status: WAITING
+
+TASK-003 subagent launch is on hold pending review completion.
+
+```
+TASK-002  [COMPLETED] ──→ [CODE REVIEW IN PROGRESS]
+                                    │
+                                    ▼ (wait for approval)
+TASK-003  [BLOCKED] ─────────────── depends on TASK-002 approval
+```
+
+**TASK-003 will be launched automatically once the code-reviewer agent completes the review and approves TASK-002.**
+
+---
+
+## Review Outcome Paths
+
+| Review Result | Action |
+|---------------|--------|
+| APPROVED | Launch TASK-003 subagent with TASK-002 outputs |
+| APPROVED_WITH_NOTES | Launch TASK-003, attach notes to handoff context |
+| REJECTED | Return TASK-002 to original subagent for fixes |
+
+Current status: **Waiting for code-reviewer agent response...**

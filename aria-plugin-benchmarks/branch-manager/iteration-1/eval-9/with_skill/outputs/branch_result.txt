@@ -1,0 +1,104 @@
+# Branch Manager 模拟结果 - 风险等级检测测试
+
+## 输入参数
+- module: backend
+- task_id: TASK-005
+- description: api-breaking-change
+- mode: auto
+- 预期风险等级: high
+
+## 模式决策分析
+
+### 风险等级自动检测
+
+根据 SKILL.md 中定义的关键词匹配规则：
+
+| 关键词 | 风险等级 | 匹配结果 |
+|--------|---------|---------|
+| typo, format, lint, config, doc | low | 未匹配 |
+| refactor, architecture, api, breaking | high | **匹配: api, breaking** |
+| 其他 | medium | - |
+
+描述 "api-breaking-change" 包含以下高风险关键词：
+- **api** - API 接口变更
+- **breaking** - 破坏性变更
+
+**检测结果**: 风险等级为 **high** (高风险)
+
+### 自动决策算法执行
+
+根据 mode=auto，执行五维度评分：
+
+| 评分因素 | 权重 | 评分规则 | 得分 |
+|---------|------|---------|------|
+| `file_count` | 低 | 1-3 个文件 | 0 (默认值，未指定) |
+| `cross_directory` | 中 | 跨目录 | 0 (backend 模块，单目录) |
+| `task_count` | 低 | 1-3 个任务 | 0 (默认值，未指定) |
+| `risk_level` | 中 | 根据描述自动检测 | **high** (api + breaking 关键词) → **+3** |
+| `parallel_needed` | 高 | 不需要并行 | 0 (默认值，未指定) |
+
+**总分**: 0 + 0 + 0 + 3 + 0 = 3
+
+### 决策结果
+- **阈值**: score >= 3 → Worktree, score < 3 → Branch
+- **实际得分**: 3 (>= 3)
+- **风险等级**: **high** (高风险)
+- **决策**: **Worktree 模式**
+- **理由**: 包含 API 破坏性变更关键词，自动检测为高风险 (high)，评分达到阈值，使用隔离环境
+
+## 高风险任务特征
+
+检测到的高风险信号：
+1. 描述中包含 "api" - 涉及 API 接口变更
+2. 描述中包含 "breaking" - 存在破坏性变更风险
+3. 综合风险等级: **high** (高风险)
+
+高风险任务的影响：
+- 评分直接 +3，达到 Worktree 阈值
+- 建议使用隔离开发环境
+- 需要更严格的测试验证
+- 建议进行代码审查
+
+## 生成分支名
+
+根据命名规范：`{branch_type}/{module}/{task_id}-{description}`
+
+- branch_type: feature (默认)
+- module: backend
+- task_id: TASK-005
+- description: api-breaking-change
+
+**分支名**: `feature/backend/TASK-005-api-breaking-change`
+
+## 预期执行流程 (Worktree 模式)
+
+1. **环境验证**:
+   - 检查 Git 状态
+   - 验证 .gitignore 规则
+   - 检查开发环境
+
+2. **Worktree 创建**:
+   - git checkout develop
+   - git pull origin develop
+   - git worktree add .git/worktrees/TASK-005-api-breaking-change feature/backend/TASK-005-api-breaking-change
+   - git push -u origin feature/backend/TASK-005-api-breaking-change
+
+3. **输出结果**:
+   ```
+   mode: "worktree"
+   branch_name: "feature/backend/TASK-005-api-breaking-change"
+   worktree_path: ".git/worktrees/TASK-005-api-breaking-change"
+   location: "worktree"
+   remote_push: "success"
+   risk_level: "high"
+   decision_reason: "API 破坏性变更，高风险任务，使用隔离环境"
+   next_step: "cd 到 worktree 路径开始开发"
+   ```
+
+## 断言验证
+
+- **高风险检测**: 成功检测到 high 风险等级 (api + breaking 关键词匹配)
+
+## 结论
+
+成功验证风险等级自动检测功能。系统正确识别描述 "api-breaking-change" 中的高风险关键词 (api, breaking)，将风险等级标记为 high (高风险)，并因此将评分提升至阈值 (3)，自动选择 Worktree 模式提供隔离开发环境。

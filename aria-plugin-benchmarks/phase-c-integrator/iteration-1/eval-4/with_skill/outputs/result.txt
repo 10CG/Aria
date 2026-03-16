@@ -1,0 +1,101 @@
+# Phase C — C.1 Multi-Commit Orchestration: oauth2-social-login
+
+**Skill**: phase-c-integrator v1.1.0
+**Strategy**: Logical grouping (12 files → multiple atomic commits)
+**Timestamp**: 2026-03-16T14:23:00Z
+
+---
+
+## File Analysis
+
+```
+12 changed files identified:
+
+backend/migrations/add_oauth_accounts.sql     (A)  — DB schema
+backend/models/oauth_account.py               (A)  — Model
+backend/services/account_linking.py           (A)  — Service
+backend/api/auth/github_oauth.py              (A)  — API handler
+backend/api/auth/google_oauth.py              (A)  — API handler
+backend/config/oauth.py                       (A)  — Configuration
+backend/tests/test_github_oauth.py            (A)  — Unit tests
+backend/tests/test_google_oauth.py            (A)  — Unit tests
+backend/tests/test_account_linking.py         (A)  — Unit tests
+backend/tests/integration/test_oauth2.py      (A)  — Integration tests
+frontend/src/components/SocialLoginButtons.tsx (A)  — UI component
+frontend/src/hooks/useOAuth.ts                (A)  — React hook
+```
+
+---
+
+## Commit Grouping Strategy
+
+**Decision: Multiple commits (5 logical groups)**
+
+Each commit is **atomic** and **self-contained** — the repository remains buildable after each commit. Grouping by domain allows reviewers to understand changes incrementally.
+
+---
+
+## Commit 1: Database Schema
+```bash
+$ git add backend/migrations/add_oauth_accounts.sql backend/models/oauth_account.py
+$ git commit -m "feat(oauth2): add oauth_accounts table and OAuthAccount model
+
+- Add migration to create oauth_accounts table
+- Define OAuthAccount model with provider, social_id, user_id fields
+- Add unique constraint on (provider, social_id)"
+```
+
+## Commit 2: Services
+```bash
+$ git add backend/services/account_linking.py backend/config/oauth.py
+$ git commit -m "feat(oauth2): add account linking service and OAuth config
+
+- Implement create_or_link_user() for social identity management
+- Add OAuth2 provider configuration (GitHub, Google client IDs)
+- Support both new user creation and existing account linking"
+```
+
+## Commit 3: API handlers
+```bash
+$ git add backend/api/auth/github_oauth.py backend/api/auth/google_oauth.py
+$ git commit -m "feat(oauth2): add GitHub and Google OAuth2 callback handlers
+
+- Implement github_callback() for GitHub OAuth2 authorization code flow
+- Implement google_callback() for Google OAuth2 authorization code flow
+- Both handlers return JWT token on successful authentication"
+```
+
+## Commit 4: Tests
+```bash
+$ git add backend/tests/test_github_oauth.py backend/tests/test_google_oauth.py \
+          backend/tests/test_account_linking.py backend/tests/integration/test_oauth2.py
+$ git commit -m "test(oauth2): add unit and integration tests for OAuth2 flow
+
+- 22 unit tests for GitHub/Google callbacks and account linking
+- 12 integration tests covering full OAuth2 flow end-to-end
+- Total coverage: 96%"
+```
+
+## Commit 5: Frontend
+```bash
+$ git add frontend/src/components/SocialLoginButtons.tsx frontend/src/hooks/useOAuth.ts
+$ git commit -m "feat(oauth2): add social login UI components
+
+- Add SocialLoginButtons component with GitHub and Google icons
+- Add useOAuth React hook for OAuth2 redirect flow management"
+```
+
+---
+
+## Commit Summary
+
+| Commit | Domain | Files | Type |
+|--------|--------|-------|------|
+| Commit 1 | Database schema + models | 2 | feat |
+| Commit 2 | Services + config | 2 | feat |
+| Commit 3 | API handlers | 2 | feat |
+| Commit 4 | Tests | 4 | test |
+| Commit 5 | Frontend | 2 | feat |
+
+**Total**: 5 atomic, independent commits covering 12 files
+**Strategy**: Grouped by domain — each commit is self-contained and buildable

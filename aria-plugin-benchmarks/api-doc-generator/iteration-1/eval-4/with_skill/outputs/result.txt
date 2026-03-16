@@ -1,0 +1,47 @@
+## API Doc Generator — Multi-Framework Support
+
+Frameworks detected: FastAPI, Express, Flask
+Generated: 2026-03-16T10:34:00Z
+
+---
+
+### Snippet 1 — FastAPI
+
+**Framework**: FastAPI (Python)
+**Detection signal**: `@app.get` decorator + `async def` + Python type hints
+
+| Method | Path | Description | Response |
+|--------|------|-------------|----------|
+| GET | /health | Health check endpoint | `{"status": "ok"}` |
+
+**Notes**: FastAPI auto-generates OpenAPI docs at `/docs`. No auth required.
+
+---
+
+### Snippet 2 — Express
+
+**Framework**: Express.js (Node.js)
+**Detection signal**: `app.get(...)` with `(req, res) =>` arrow function + `res.json()`
+
+| Method | Path | Description | Response |
+|--------|------|-------------|----------|
+| GET | /health | Health check endpoint | `{"status": "ok"}` |
+
+**Notes**: Express route without middleware — publicly accessible.
+
+---
+
+### Snippet 3 — Flask
+
+**Framework**: Flask (Python)
+**Detection signal**: `@app.route(...)` decorator + `methods=['GET']` + `jsonify()`
+
+| Method | Path | Description | Response |
+|--------|------|-------------|----------|
+| GET | /health | Health check endpoint | `{"status": "ok"}` |
+
+**Notes**: Flask route, no authentication. Returns JSON via `jsonify()`.
+
+---
+
+**Summary**: 3 frameworks detected (FastAPI, Express, Flask). All document the same GET /health endpoint pattern with framework-specific syntax.

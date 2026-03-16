@@ -1,0 +1,49 @@
+{
+  "eval_id": 3,
+  "eval_name": "schema-generation",
+  "category": "schema",
+  "prompt": "Generate request and response schemas for a user registration endpoint based on this Pydantic model:\n\n```python\nclass UserCreate(BaseModel):\n    email: EmailStr\n    password: str = Field(min_length=8, max_length=64)\n    full_name: str = Field(max_length=100)\n    role: Optional[str] = 'user'\n\nclass UserResponse(BaseModel):\n    id: int\n    email: EmailStr\n    full_name: str\n    role: str\n    created_at: datetime\n```",
+  "setup": {
+    "framework": "fastapi",
+    "model_file": "backend/src/schemas/user.py",
+    "request_model": "UserCreate",
+    "response_model": "UserResponse"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "generates_request_schema",
+      "description": "Should generate a schema for UserCreate (request body)",
+      "check": "output.match(/UserCreate|request.*schema|requestBody/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "generates_response_schema",
+      "description": "Should generate a schema for UserResponse",
+      "check": "output.match(/UserResponse|response.*schema/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "includes_field_constraints",
+      "description": "Should include field constraints (min/max length, required/optional)",
+      "check": "output.match(/minLength|min_length|maxLength|max_length|required/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "includes_field_types",
+      "description": "Should include correct field types (string, integer, datetime)",
+      "check": "output.match(/string|integer|datetime/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "marks_optional_fields",
+      "description": "Optional fields (role) should be marked as not required",
+      "check": "output.match(/optional|not required|role.*default|default.*user/i)",
+      "severity": "medium"
+    }
+  ]
+}

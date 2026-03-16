@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "subagent-delegation",
+  "timestamp": "2026-03-16T14:13:52Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Delegating to backend-architect' and 'Delegating TASK-004 to backend-architect with full context'",
+      "text": "delegates_to_correct_agent"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output provides YAML delegation package with 'spec_reference: path: openspec/changes/oauth2-social-login/proposal.md', 'TASK-004' details, and 'context' section",
+      "text": "provides_task_context"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'verification_criteria' array with 6 specific acceptance criteria and 'done_when' conditions",
+      "text": "includes_verification_criteria"
+    },
+    {
+      "id": "A4",
+      "passed": true,
+      "evidence": "Output shows 'Awaiting completion signal from backend-architect subagent' and 'Handback received: all deliverables created, tests passing'",
+      "text": "awaits_completion_signal"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

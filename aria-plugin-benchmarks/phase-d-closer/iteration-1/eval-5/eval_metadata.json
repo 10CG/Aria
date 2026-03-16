@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "status-summary-output",
+  "category": "output-format",
+  "prompt": "Execute Phase D and generate closure summary report for spec: add-payment-gateway. Include all D.1 and D.2 outcomes, timeline, and next steps.",
+  "setup": {
+    "spec_name": "add-payment-gateway",
+    "report_format": "closure-summary",
+    "include_timeline": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_closure_summary_header",
+      "description": "Output should have a clear closure summary heading",
+      "check": "output.includes('Closure') || output.includes('closure') || output.includes('Summary') || output.includes('Phase D Report')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_d1_d2_outcomes",
+      "description": "Report should cover both D.1 and D.2 outcomes",
+      "check": "output.includes('D.1') && output.includes('D.2')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "includes_next_steps_or_handoff",
+      "description": "Report should indicate what happens after Phase D",
+      "check": "output.includes('next') || output.includes('handoff') || output.includes('complete') || output.includes('closed')",
+      "severity": "medium"
+    }
+  ]
+}

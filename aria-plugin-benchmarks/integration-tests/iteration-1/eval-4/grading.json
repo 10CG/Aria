@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "brainstorm-to-spec-pipeline",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "brainstorm_produces_decision_matrix",
+      "passed": true,
+      "evidence": "brainstorm skill generated a comparison matrix table comparing Redis, Memcached, In-Memory, and Hybrid across 9 criteria. Output contains 'Redis', 'Memcached', and the word 'matrix' in section header."
+    },
+    {
+      "text": "spec_references_decision",
+      "passed": true,
+      "evidence": "spec-drafter explicitly reads brainstorm output and writes into proposal.md: 'Technology selection based on structured evaluation in BRAINSTORM-2026-0316-042. Decision record: docs/decisions/DR-2026-047-caching-layer-redis.md'. Output shows 'decision_ref: docs/decisions/DR-2026-047-caching-layer-redis.md' and 'brainstorm_reference: BRAINSTORM-2026-0316-042'."
+    },
+    {
+      "text": "spec_level_at_least_2",
+      "passed": true,
+      "evidence": "spec-drafter assessed complexity as Level 3 (Full spec with proposal.md + tasks.md). Output shows 'level: 3' in spec metadata."
+    },
+    {
+      "text": "tasks_include_implementation_and_test",
+      "passed": true,
+      "evidence": "task-planner generated TASK-332..335 (4 implementation tasks) and TASK-336..337 (2 test tasks). Summary section shows 'implementation tasks: TASK-332, TASK-333, TASK-334, TASK-335' and 'test tasks: TASK-336, TASK-337'."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,28 @@
+{
+  "eval_id": 8,
+  "eval_name": "pr-format-compliance",
+  "timestamp": "2026-03-16T13:38:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "PR title should follow format: type(scope): description",
+      "check": "output.includes('feat') || output.includes('feature')",
+      "severity": "high",
+      "passed": true,
+      "evidence": "Output contains 'feat(backend): 用户认证功能' as PR title following the type(scope): description format",
+      "text": "has_pr_title_format"
+    },
+    {
+      "id": "A2",
+      "description": "Should reference the Spec path",
+      "check": "output.includes('Spec') || output.includes('spec') || output.includes('proposal')",
+      "severity": "medium",
+      "passed": true,
+      "evidence": "Output contains Spec reference section with 'openspec/changes/user-auth/proposal.md' path and 'Implements' link",
+      "text": "mentions_spec_reference"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "PR format follows Conventional Commits title format and includes Spec/proposal reference in body"
+}

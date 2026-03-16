@@ -1,0 +1,117 @@
+# Task Breakdown: 用户认证功能 (YAML Format)
+
+> **Spec**: Direct feature request
+> **Output Format**: YAML
+> **Total Tasks**: 6
+
+## YAML 任务列表
+
+```yaml
+metadata:
+  feature: user-authentication
+  datasource: "proposal.md"
+  total_tasks: 6
+  estimated_hours: 28
+  generated_at: "2026-03-16T13:30:00Z"
+
+tasks:
+  - id: TASK-001
+    title: 设计用户认证数据模型
+    status: pending
+    complexity: M
+    estimated_hours: 4
+    dependencies: []
+    deliverables:
+      - backend/models/user.py
+      - backend/migrations/create_users.sql
+    agent: backend-architect
+    verification:
+      - "用户表创建成功"
+      - "字段定义完整 (username, email, password_hash)"
+
+  - id: TASK-002
+    title: 实现用户注册接口
+    status: pending
+    complexity: M
+    estimated_hours: 6
+    dependencies:
+      - TASK-001
+    deliverables:
+      - backend/api/auth/register.py
+      - backend/services/user_service.py
+    agent: backend-architect
+    verification:
+      - "POST /api/auth/register 可用"
+      - "密码加密存储"
+
+  - id: TASK-003
+    title: 实现用户登录接口
+    status: pending
+    complexity: M
+    estimated_hours: 6
+    dependencies:
+      - TASK-001
+    deliverables:
+      - backend/api/auth/login.py
+      - backend/utils/jwt_handler.py
+    agent: backend-architect
+    verification:
+      - "POST /api/auth/login 可用"
+      - "JWT token 生成正确"
+
+  - id: TASK-004
+    title: 实现密码重置功能
+    status: pending
+    complexity: L
+    estimated_hours: 8
+    dependencies:
+      - TASK-002
+      - TASK-003
+    deliverables:
+      - backend/api/auth/reset_password.py
+      - backend/services/email_service.py
+    agent: backend-architect
+    verification:
+      - "重置邮件发送成功"
+      - "密码更新生效"
+
+  - id: TASK-005
+    title: 实现认证中间件
+    status: pending
+    complexity: M
+    estimated_hours: 4
+    dependencies:
+      - TASK-003
+    deliverables:
+      - backend/middleware/auth.py
+      - backend/decorators/require_auth.py
+    agent: backend-architect
+    verification:
+      - "JWT 验证中间件正常工作"
+      - "受保护路由访问控制"
+
+  - id: TASK-006
+    title: 编写认证模块测试
+    status: pending
+    complexity: S
+    estimated_hours: 4
+    dependencies:
+      - TASK-002
+      - TASK-003
+      - TASK-004
+    deliverables:
+      - backend/tests/test_auth.py
+      - backend/tests/test_user_service.py
+    agent: backend-architect
+    verification:
+      - "单元测试覆盖率 > 80%"
+      - "集成测试通过"
+```
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 1 | 4h |
+| M | 4 | 20h |
+| L | 1 | 8h |
+| **Total** | **6** | **28h** |

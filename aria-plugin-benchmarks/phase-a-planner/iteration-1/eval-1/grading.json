@@ -1,0 +1,33 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-cycle-execution",
+  "timestamp": "2026-03-16T14:01:45Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'A.1 — Spec Creation (spec-drafter)' and references 'proposal.md' creation",
+      "text": "executes_a1_spec_creation"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output contains 'A.2 — Task Planning (task-planner)' and references 'tasks.md' generation",
+      "text": "executes_a2_task_planning"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'A.3 — Agent Allocation' with explicit agent assignments for backend-architect, frontend-developer, qa-engineer",
+      "text": "executes_a3_agent_allocation"
+    },
+    {
+      "id": "A4",
+      "passed": true,
+      "evidence": "Steps appear in strict order: 'A.1' at position 312, 'A.2' at position 1087, 'A.3' at position 1842",
+      "text": "sequential_step_order"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

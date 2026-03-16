@@ -1,0 +1,33 @@
+{
+  "eval_id": 4,
+  "eval_name": "strictness-level-advisory",
+  "category": "strictness",
+  "prompt": "TDD Enforcer 以 Advisory 模式运行。开发者跳过了测试直接写实现代码。应该只发出警告，不阻断工作流。",
+  "setup": {
+    "strictness_level": "advisory",
+    "violation": "implementation_without_test"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "issues_warning_not_block",
+      "description": "Should issue a warning but not block the workflow",
+      "check": "output.includes('警告') || output.includes('warning') || output.includes('建议') || output.includes('Advisory')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "does_not_stop_execution",
+      "description": "Should allow work to continue despite violation",
+      "check": "output.includes('继续') || output.includes('continue') || output.includes('allowed') || output.includes('可以继续')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "logs_violation",
+      "description": "Should log or report the TDD violation for tracking",
+      "check": "output.includes('记录') || output.includes('log') || output.includes('violation') || output.includes('违反')",
+      "severity": "medium"
+    }
+  ]
+}

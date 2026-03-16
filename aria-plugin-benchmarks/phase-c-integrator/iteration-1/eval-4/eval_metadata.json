@@ -1,0 +1,34 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-commit-orchestration",
+  "category": "strategic-commit",
+  "prompt": "Phase C C.1 strategic commit: Group 12 changed files into logical commits for oauth2-social-login feature. Files span: models, services, API handlers, tests, frontend.",
+  "setup": {
+    "total_files": 12,
+    "file_groups": ["models", "services", "api", "tests", "frontend"],
+    "strategy": "logical-grouping"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "groups_into_multiple_commits",
+      "description": "Should create multiple logical commits rather than one large commit",
+      "check": "output.includes('commit 1') || output.includes('commit 2') || output.includes('multiple commits') || output.includes('grouped')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "groups_by_domain",
+      "description": "Each commit should correspond to a logical domain (models, services, etc.)",
+      "check": "output.includes('models') || output.includes('services') || output.includes('API') || output.includes('tests')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "uses_atomic_commits",
+      "description": "Each commit should be self-contained and buildable",
+      "check": "output.includes('atomic') || output.includes('self-contained') || output.includes('buildable') || output.includes('independent')",
+      "severity": "medium"
+    }
+  ]
+}

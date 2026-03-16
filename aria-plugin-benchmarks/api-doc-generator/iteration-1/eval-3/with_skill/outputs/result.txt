@@ -1,0 +1,72 @@
+## API Doc Generator — Schema Generation
+
+Framework detected: FastAPI (Pydantic)
+Source: backend/src/schemas/user.py
+Generated: 2026-03-16T10:33:00Z
+
+### Request Schema: UserCreate
+
+```yaml
+UserCreate:
+  type: object
+  required:
+    - email
+    - password
+    - full_name
+  properties:
+    email:
+      type: string
+      format: email
+      description: User's email address (must be valid email format)
+    password:
+      type: string
+      minLength: 8
+      maxLength: 64
+      description: User password (8-64 characters)
+    full_name:
+      type: string
+      maxLength: 100
+      description: User's full display name
+    role:
+      type: string
+      default: "user"
+      description: User role (optional, defaults to 'user')
+      # optional: not required — has default value
+```
+
+### Response Schema: UserResponse
+
+```yaml
+UserResponse:
+  type: object
+  required:
+    - id
+    - email
+    - full_name
+    - role
+    - created_at
+  properties:
+    id:
+      type: integer
+      description: Unique user identifier
+    email:
+      type: string
+      format: email
+      description: User's email address
+    full_name:
+      type: string
+      description: User's full name
+    role:
+      type: string
+      description: User role
+    created_at:
+      type: string
+      format: datetime
+      description: Account creation timestamp (ISO 8601)
+```
+
+**Field Constraints Summary**:
+- `password`: minLength=8, maxLength=64 (required)
+- `full_name`: maxLength=100 (required)
+- `role`: optional, not required, default='user'
+- `email`: format=email validation applied

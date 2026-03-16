@@ -1,0 +1,191 @@
+{
+  "skill_name": "phase-c-integrator",
+  "skill_path": "aria/skills/phase-c-integrator",
+  "skill_version": "1.1.0",
+  "description": "Benchmark tests for phase-c-integrator skill - Ten-Step Cycle Phase C orchestration (C.1 Commit, C.2 Merge/PR)",
+  "metrics": [
+    "commit_message_quality",
+    "pr_reference_accuracy",
+    "branch_cleanup_correctness",
+    "strategic_commit_grouping",
+    "conflict_handling_robustness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "commit-generation",
+      "category": "commit-flow",
+      "prompt": "Execute Phase C C.1: Generate conventional commits from staged changes. Files changed: backend/api/auth/github_oauth.py (new), backend/tests/test_github_oauth.py (new), backend/models/oauth_account.py (new). Feature: oauth2-social-login.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "backend/api/auth/github_oauth.py"},
+          {"status": "A", "path": "backend/tests/test_github_oauth.py"},
+          {"status": "A", "path": "backend/models/oauth_account.py"}
+        ],
+        "spec_name": "oauth2-social-login",
+        "expected_type": "feat"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "uses_conventional_commit_type",
+          "description": "Commit message must start with conventional type (feat/fix/refactor/test)",
+          "check": "output.includes('feat') || output.includes('fix') || output.includes('refactor') || output.includes('test')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_scope",
+          "description": "Commit should include a scope in parentheses",
+          "check": "output.includes('(auth)') || output.includes('(oauth') || output.includes('(oauth2)')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "references_spec",
+          "description": "Commit body or footer should reference the OpenSpec",
+          "check": "output.includes('oauth2-social-login') || output.includes('Spec:') || output.includes('Refs:')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "pr-creation",
+      "category": "pr-flow",
+      "prompt": "Execute Phase C C.2: Create pull request for feature/oauth2-social-login → main. Include spec reference and task completion summary.",
+      "setup": {
+        "source_branch": "feature/oauth2-social-login",
+        "target_branch": "main",
+        "spec_path": "openspec/changes/oauth2-social-login/proposal.md",
+        "tasks_completed": 6
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "creates_pr_with_title",
+          "description": "Should create PR with descriptive title",
+          "check": "output.includes('PR') || output.includes('Pull Request') || output.includes('pull request') || output.includes('title:')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "references_openspec",
+          "description": "PR description should reference the OpenSpec proposal",
+          "check": "output.includes('proposal.md') || output.includes('OpenSpec') || output.includes('Spec:') || output.includes('Closes')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "lists_completed_tasks",
+          "description": "PR description should list completed tasks",
+          "check": "output.includes('TASK-') || output.includes('tasks completed') || output.includes('checklist') || output.includes('- [')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "branch-finisher-integration",
+      "category": "integration",
+      "prompt": "Phase C post-merge: Invoke branch-finisher skill to clean up feature/oauth2-social-login branch after PR merged to main.",
+      "setup": {
+        "merged_branch": "feature/oauth2-social-login",
+        "target_branch": "main",
+        "worktrees_created": 2
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "invokes_branch_finisher",
+          "description": "Should call branch-finisher skill after merge",
+          "check": "output.includes('branch-finisher') || output.includes('branch finisher') || output.includes('cleanup') || output.includes('clean up')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "deletes_feature_branch",
+          "description": "Should delete the merged feature branch",
+          "check": "output.includes('delete') || output.includes('branch -d') || output.includes('branch deleted') || output.includes('removed')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "removes_worktrees",
+          "description": "Should remove any git worktrees created during Phase B",
+          "check": "output.includes('worktree remove') || output.includes('worktree') || output.includes('prune')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "multi-commit-orchestration",
+      "category": "strategic-commit",
+      "prompt": "Phase C C.1 strategic commit: Group 12 changed files into logical commits for oauth2-social-login feature. Files span: models, services, API handlers, tests, frontend.",
+      "setup": {
+        "total_files": 12,
+        "file_groups": ["models", "services", "api", "tests", "frontend"],
+        "strategy": "logical-grouping"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "groups_into_multiple_commits",
+          "description": "Should create multiple logical commits rather than one large commit",
+          "check": "output.includes('commit 1') || output.includes('commit 2') || output.includes('multiple commits') || output.includes('grouped')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "groups_by_domain",
+          "description": "Each commit should correspond to a logical domain (models, services, etc.)",
+          "check": "output.includes('models') || output.includes('services') || output.includes('API') || output.includes('tests')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "uses_atomic_commits",
+          "description": "Each commit should be self-contained and buildable",
+          "check": "output.includes('atomic') || output.includes('self-contained') || output.includes('buildable') || output.includes('independent')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "merge-conflict-handling",
+      "category": "error-handling",
+      "prompt": "Phase C C.2 merge: Attempting to merge feature/oauth2-social-login into main. Conflict detected in backend/config/settings.py. Handle gracefully.",
+      "setup": {
+        "source_branch": "feature/oauth2-social-login",
+        "target_branch": "main",
+        "conflict_files": ["backend/config/settings.py"],
+        "conflict_type": "content-conflict"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_merge_conflict",
+          "description": "Should detect and report the merge conflict",
+          "check": "output.includes('conflict') || output.includes('CONFLICT') || output.includes('merge conflict') || output.includes('<<<')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_conflict_files",
+          "description": "Should identify which files have conflicts",
+          "check": "output.includes('settings.py') || output.includes('conflict file') || output.includes('Unmerged paths')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "provides_resolution_guidance",
+          "description": "Should guide the developer through conflict resolution",
+          "check": "output.includes('resolve') || output.includes('resolution') || output.includes('manual') || output.includes('git add')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

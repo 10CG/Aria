@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "context-accumulation",
+  "timestamp": "2026-03-16T14:16:45Z",
+  "assertions": [
+    {
+      "text": "references_previous_decisions",
+      "passed": true,
+      "evidence": "Output explicitly lists all 3 previous decisions: 'PostgreSQL 作为主数据库', 'RESTful API 风格', 'React 作为前端框架' in the context summary section"
+    },
+    {
+      "text": "builds_on_context",
+      "passed": true,
+      "evidence": "Output states '基于我们已确认的技术栈（PostgreSQL + RESTful API + React）' and '基于（given）RESTful API 的选型' as foundation for new question"
+    },
+    {
+      "text": "shows_decision_coherence",
+      "passed": true,
+      "evidence": "Output has '决策一致性检查' table showing how each previous decision is consistent/aligned with state management options, uses 'aligned' and 'consistent'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

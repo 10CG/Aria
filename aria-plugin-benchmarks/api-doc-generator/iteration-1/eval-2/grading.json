@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "endpoint-extraction",
+  "timestamp": "2026-03-16T10:32:30Z",
+  "assertions": [
+    {
+      "text": "extracts_all_5_endpoints",
+      "passed": true,
+      "evidence": "Table shows 5 rows: GET /products, GET /products/{id}, POST /products, PUT /products/{id}, DELETE /products/{id}"
+    },
+    {
+      "text": "identifies_http_methods",
+      "passed": true,
+      "evidence": "Table columns include GET (x2), POST, PUT, DELETE — all 4 HTTP methods present"
+    },
+    {
+      "text": "identifies_path_params",
+      "passed": true,
+      "evidence": "Path params section: '/products/:id → path param {id} (integer, product identifier)'"
+    },
+    {
+      "text": "notes_auth_requirements",
+      "passed": true,
+      "evidence": "Authentication Notes section describes authenticate middleware and authorize('admin') for restricted endpoints"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

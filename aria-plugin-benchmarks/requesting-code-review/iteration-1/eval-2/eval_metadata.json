@@ -1,0 +1,38 @@
+{
+  "eval_id": 2,
+  "eval_name": "code-quality-check",
+  "category": "phase-2",
+  "prompt": "对提交的代码进行第二阶段评审：分析代码质量，包括代码风格、安全漏洞、架构合理性。",
+  "setup": {
+    "review_phase": 2,
+    "code_samples": {
+      "has_sql_injection_risk": true,
+      "has_hardcoded_secret": true,
+      "has_long_method": true,
+      "has_missing_error_handling": true
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_security_issues",
+      "description": "Should detect security vulnerabilities in the code",
+      "check": "output.includes('security') || output.includes('安全') || output.includes('injection') || output.includes('secret')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reviews_code_style",
+      "description": "Should review code style and naming conventions",
+      "check": "output.includes('style') || output.includes('风格') || output.includes('naming') || output.includes('命名')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "assesses_architecture",
+      "description": "Should assess architectural quality and patterns",
+      "check": "output.includes('architecture') || output.includes('架构') || output.includes('pattern') || output.includes('设计')",
+      "severity": "medium"
+    }
+  ]
+}

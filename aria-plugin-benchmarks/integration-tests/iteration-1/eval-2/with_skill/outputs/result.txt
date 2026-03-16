@@ -1,0 +1,183 @@
+================================================================================
+INTEGRATION TEST: quickfix-with-tdd-double-insurance
+Prompt: Fix a null pointer exception in the payment service - simple 3-file change
+Skills: state-scanner, workflow-runner, phase-b-developer, branch-manager,
+        tdd-enforcer, subagent-driver, branch-finisher, phase-c-integrator,
+        commit-msg-generator
+================================================================================
+
+[INIT] workflow-runner: Analyzing request complexity...
+
+--- workflow-runner analysis ---
+Request: "Fix a null pointer exception in the payment service - simple 3-file change"
+Change classification:
+  Type:           bugfix
+  Scope:          payment-service
+  Files affected: ~3 (stated by user)
+  Risk:           LOW
+  Level:          1 (simple fix, no spec required)
+
+Route decision: Level 1 -> Skip Phase A, enter at Phase B directly
+
+Phase A: SKIP (Level 1 change - no OpenSpec required)
+
+Pre-hook activation: tdd-enforcer [Method B]
+  Session-level TDD enforcement: ACTIVE
+  Hook registered: pre_code_write -> require_failing_test_first
+  Method B active: enforcing RED phase before any implementation file is written
+---
+
+[INIT] workflow-runner: Phase A: SKIP confirmed. Method B pre-hook: ACTIVE [OK]
+
+================================================================================
+=== Phase B: Development ===
+================================================================================
+
+[B.1] branch-manager: Evaluating branch strategy for null pointer fix...
+
+--- branch-manager output ---
+Scoring cross-module indicators:
+  modules affected:    1 (payment-service only)  -> +0
+  estimated files:     3                          -> +0
+  parallel agents:     1                          -> +0
+  Risk level:          LOW                        -> +0
+  Total score:         0   -> Branch mode (well below Worktree threshold of 3)
+
+Mode selected: Branch mode
+Base branch: main (SHA: f3c7d8e9)
+Creating: fix/payment/TASK-318-null-pointer-payment-service (from main)
+  git checkout -b fix/payment/TASK-318-null-pointer-payment-service
+  Branch created: fix/payment/TASK-318-null-pointer-payment-service [OK]
+---
+
+[B.1] branch-manager: Branch created in Branch mode (score=0). Worktree mode NOT triggered. [OK]
+
+[B.2] subagent-driver: Dispatching fix agent with TDD double-insurance...
+
+--- subagent-driver context injection ---
+Passing to Fresh Subagent:
+  task_id:      TASK-318
+  branch:       fix/payment/TASK-318-null-pointer-payment-service
+  description:  Fix NPE in PaymentService.processRefund() when order is null
+
+  TDD Method A constraint (injected into subagent context):
+    "You MUST follow RED -> GREEN -> REFACTOR discipline.
+     Write a failing test first. Do NOT write implementation before the test fails.
+     Constraint: tdd-subagent enforcement active."
+
+  Method A active: constraint injected
+  Method B active: session pre-hook enforcing test-first at OS level
+---
+
+--- subagent execution (fix/payment/TASK-318) ---
+Reproducing issue:
+  Observed: PaymentService.processRefund(orderId=None) raises AttributeError: 'NoneType' object
+  Root cause: payment/service.py:142 - no null guard before order.status access
+
+TDD RED -> GREEN -> REFACTOR:
+
+  [RED] Writing failing test first (Method B hook: test file write ALLOWED):
+    File: backend/tests/unit/test_payment_service.py
+    Adding: test_process_refund_null_order_raises_value_error()
+    Run:    pytest test_payment_service.py::test_process_refund_null_order_raises_value_error
+    Result: FAIL (AttributeError instead of ValueError) -> RED phase confirmed
+
+  [GREEN] Fixing null guard (Method A constraint satisfied: test written first):
+    File: backend/src/payment/service.py (line 138-145)
+    Change: Added `if order is None: raise ValueError("Order not found")` guard
+    File: backend/src/payment/exceptions.py
+    Change: Added OrderNotFoundException for semantic clarity
+    Run:    pytest test_payment_service.py::test_process_refund_null_order_raises_value_error
+    Result: PASS -> GREEN phase achieved
+
+  [REFACTOR] Cleaning up:
+    File: backend/src/payment/service.py
+    Change: Unified null checks with _validate_order() helper; no behavior change
+    Run:    pytest backend/tests/unit/test_payment_service.py
+    Result: 22/22 PASS (all existing + new test)
+
+Files modified:
+  backend/src/payment/service.py         (+8 lines, -2 lines)
+  backend/src/payment/exceptions.py      (+12 lines)
+  backend/tests/unit/test_payment_service.py (+19 lines)
+
+Total: 3 files changed (as estimated)
+---
+
+[B.2] subagent-driver: Fix complete. RED -> GREEN -> REFACTOR cycle verified. [OK]
+
+[B.3] branch-finisher: Running validation on fix/payment/TASK-318-null-pointer-payment-service...
+
+--- branch-finisher output ---
+Running test suite:
+  backend/tests/unit/test_payment_service.py:  22/22 PASS
+  backend/tests/integration/test_payment_flow.py: 11/11 PASS
+  Linting (flake8):  PASS
+  Type checking (mypy): PASS
+
+Validation: PASSED
+Branch ready for integration.
+---
+
+[B]   Phase B complete. Context: task_id=TASK-318, branch=fix/payment/TASK-318-null-pointer-payment-service
+
+================================================================================
+=== Phase C: Integration ===
+================================================================================
+
+[C.1] commit-msg-generator: Generating commit message for TASK-318 fix...
+
+--- commit-msg-generator output ---
+Analyzing diff (3 files, +39/-2):
+  Changed files: payment/service.py, payment/exceptions.py, tests/test_payment_service.py
+  Nature:        bug fix (null guard added)
+  Type:          fix
+  Scope:         payment
+  Breaking:      NO
+
+Generated commit message:
+  fix(payment): guard against null order in processRefund
+
+  PaymentService.processRefund() raised AttributeError when orderId
+  resolved to None. Added null guard with ValueError at entry point
+  and extracted _validate_order() helper for reuse.
+
+  Fixes: NPE-2026-0312 (reported by QA)
+  Tests: 22 unit + 11 integration tests passing
+  Executed-By: 🤖 fix-agent
+  Context: 📋 TASK-318
+  Module: 🔗 payment
+
+Commit type: fix(payment): [CORRECT for bugfix]
+---
+
+[C.1] commit-msg-generator: Commit type is fix(payment): [OK]
+
+[C.2] phase-c-integrator: Creating PR for bugfix...
+
+--- phase-c-integrator output ---
+PR created:
+  Title:  fix(payment): guard against null order in processRefund [TASK-318]
+  URL:    https://forgejo.10cg.pub/project/aria-web-app/pulls/PR-1851
+  Base:   main
+  Head:   fix/payment/TASK-318-null-pointer-payment-service
+  Files:  3 changed
+
+PR merged: PR-1851 -> main [OK]
+---
+
+[C]   Phase C complete. PR-1851 merged.
+
+================================================================================
+=== TDD DOUBLE-INSURANCE VERIFICATION ===
+================================================================================
+
+Method B (session hook):   pre-hook activated by workflow-runner BEFORE any code write [OK]
+Method A (subagent):       RED->GREEN->REFACTOR constraint injected into subagent context [OK]
+TDD cycle executed:        RED (test fail) -> GREEN (impl pass) -> REFACTOR (clean) [OK]
+Test count before fix:     21 unit tests
+Test count after fix:      22 unit tests (+1 regression test for NPE scenario)
+
+================================================================================
+RESULT: PASS
+================================================================================

@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "frontend-task-routing",
+  "category": "routing",
+  "prompt": "Route this task: 'Build a Flutter product listing screen with infinite scroll, skeleton loading states, and pull-to-refresh using Riverpod for state management.'",
+  "setup": {
+    "task_type": "ui_implementation",
+    "file_paths": ["mobile/lib/screens/product_list_screen.dart", "mobile/lib/providers/product_provider.dart"],
+    "keywords": ["Flutter", "Riverpod", "screen", "UI"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "selects_mobile_developer",
+      "description": "Should select mobile-developer agent for Flutter UI task",
+      "check": "output.includes('mobile-developer')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "high_confidence_flutter",
+      "description": "Flutter/Riverpod keywords should yield high confidence >= 0.90",
+      "check": "confidence >= 0.90",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "mentions_flutter_rationale",
+      "description": "Routing rationale should reference Flutter or mobile",
+      "check": "output.match(/Flutter|mobile|Dart|Riverpod/i)",
+      "severity": "high"
+    }
+  ]
+}

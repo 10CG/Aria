@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "single-module-grouping",
+  "category": "grouping-logic",
+  "prompt": "分析以下单模块变更并生成提交分组计划: files=[backend/src/auth/login.py, backend/src/auth/register.py, backend/tests/test_auth.py], module=backend, task_id=TASK-101",
+  "setup": {
+    "file_count": 3,
+    "module_count": 1,
+    "expected_groups": 2
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "groups_by_concern",
+      "description": "Should group auth implementation separately from tests",
+      "check": "output.includes('auth') && (output.includes('group') || output.includes('分组') || output.includes('Group'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_module",
+      "description": "Should correctly identify the backend module",
+      "check": "output.includes('backend')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "suggests_commit_types",
+      "description": "Should suggest appropriate commit types (feat, test)",
+      "check": "output.includes('feat') || output.includes('test')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+# TDD Enforcer - Advisory Mode
+
+> **Mode**: Advisory
+> **Violation Detected**: Implementation without prior test
+> **Action**: Warning issued (workflow continues)
+
+---
+
+## [WARNING] TDD Advisory Notice
+
+**TDD Violation Detected** - Implementation written before test
+
+You have written implementation code in `services/notification_service.py` without a corresponding test file. In TDD best practice, tests should be written first (RED phase).
+
+**This is a WARNING only. Your workflow is not blocked.**
+
+---
+
+## Advisory Details
+
+| Field | Value |
+|-------|-------|
+| Severity | Advisory |
+| Violation | Implementation before test |
+| File | `services/notification_service.py` |
+| TDD Phase Skipped | RED (test-first) |
+| Workflow Impact | None - you may continue |
+
+---
+
+## Recommendation
+
+While you can continue working, TDD Enforcer recommends:
+
+1. Write tests for `notification_service.py` retroactively
+2. Ensure test coverage >= 80% before merging
+3. In future work sessions, write tests first to maintain RED-GREEN-REFACTOR discipline
+
+---
+
+## Violation Log
+
+This violation has been recorded for sprint retrospective review:
+
+```
+[2026-03-16T14:01:30Z] ADVISORY violation logged
+  Type: implementation_without_test
+  File: services/notification_service.py
+  Developer: current_session
+  Strictness: Advisory (warning only)
+  Resolution: Pending (retroactive tests recommended)
+```
+
+---
+
+You may continue your current implementation. No action is required immediately.

@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "strictness-level-advisory",
+  "timestamp": "2026-03-16T14:01:30Z",
+  "assertions": [
+    {
+      "text": "issues_warning_not_block",
+      "passed": true,
+      "evidence": "Output explicitly states 'Mode: Advisory' and '[WARNING] TDD Advisory Notice', uses warning language without blocking"
+    },
+    {
+      "text": "does_not_stop_execution",
+      "passed": true,
+      "evidence": "Output states 'This is a WARNING only. Your workflow is not blocked.' and 'You may continue your current implementation. No action is required immediately.'"
+    },
+    {
+      "text": "logs_violation",
+      "passed": true,
+      "evidence": "Output contains 'Violation Log' section with timestamped entry recording the violation for sprint retrospective review"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

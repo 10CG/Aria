@@ -1,0 +1,36 @@
+## Workflow Runner — State-Aware Skip Logic
+
+Task: Continue feature development (state-aware resume)
+Workflow: skip-aware
+Started: 2026-03-16T10:25:00Z
+
+═══════════════════════════════════════════════
+  State Check
+═══════════════════════════════════════════════
+
+Detected current state: A.3 completed
+  ✓ state-scanner confirmed: project state is current
+  ✓ OpenSpec exists: openspec/changes/user-profile-edit/proposal.md
+  ✓ Agent assignment already completed (A.3 completed)
+
+Skip reason: Phase A already completed in previous session. OpenSpec exists and A.3 is done.
+Re-running Phase A would be redundant and wasteful.
+
+═══════════════════════════════════════════════
+  Phase A: SKIPPED (A.3 already completed)
+═══════════════════════════════════════════════
+
+═══════════════════════════════════════════════
+  Resuming from Phase B (B.1 first)
+═══════════════════════════════════════════════
+
+[B.1] Branch Manager → feature/user-profile-edit created (or resumed if branch exists)
+[B.2] Implementation → tasks in progress
+
+[C.1] Commit → changes recorded
+[C.2] Merge → feature/user-profile-edit → main
+
+[D.1] Progress Updater → state updated
+[D.2] Archive → cycle closed
+
+State-aware execution complete. Phase A skipped; resumed from B.1.

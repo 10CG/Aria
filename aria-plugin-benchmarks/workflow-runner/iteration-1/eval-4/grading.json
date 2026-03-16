@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "preset-workflow-bugfix",
+  "timestamp": "2026-03-16T10:24:30Z",
+  "assertions": [
+    {
+      "text": "recognizes_bugfix_preset",
+      "passed": true,
+      "evidence": "Output header shows 'Preset: bugfix' and 'Loaded preset configuration: Preset name: bugfix'"
+    },
+    {
+      "text": "skips_phase_a",
+      "passed": true,
+      "evidence": "Output states 'Phase A: SKIPPED — bugfix preset does not require spec-drafter or planning steps'"
+    },
+    {
+      "text": "executes_phase_b",
+      "passed": true,
+      "evidence": "B.1 and B.2 both executed with branch creation and implementation results shown"
+    },
+    {
+      "text": "executes_phase_c",
+      "passed": true,
+      "evidence": "C.1 (commit) and C.2 (merge to main) both executed"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

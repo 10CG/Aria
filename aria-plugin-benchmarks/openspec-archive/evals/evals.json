@@ -1,0 +1,164 @@
+{
+  "skill_name": "openspec-archive",
+  "skill_path": "aria/skills/openspec-archive",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for openspec-archive skill - Archives completed OpenSpec changes to correct project archive/ directory with CLI bug auto-fix",
+  "metrics": [
+    "path_resolution_accuracy",
+    "bug_workaround_reliability",
+    "data_integrity",
+    "duplicate_detection_accuracy"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "correct-archive-path",
+      "category": "path-resolution",
+      "prompt": "归档已完成的 OpenSpec: spec_path=openspec/changes/user-auth, project_root=/workspace/my-project, expected_archive=openspec/archive/user-auth",
+      "setup": {
+        "spec_path": "openspec/changes/user-auth",
+        "project_root": "/workspace/my-project",
+        "correct_archive": "openspec/archive/user-auth",
+        "incorrect_archive": "standards/openspec/archive/user-auth"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "uses_project_archive_path",
+          "description": "Should archive to project/openspec/archive/ not standards/",
+          "check": "output.includes('openspec/archive') && !output.includes('standards/openspec/archive')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "resolves_project_root",
+          "description": "Should correctly resolve project root for archive path",
+          "check": "output.includes('my-project') || output.includes('project_root') || output.includes('/workspace')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "confirms_archive_destination",
+          "description": "Should confirm the archive destination path",
+          "check": "output.includes('archive') && (output.includes('user-auth') || output.includes('destination') || output.includes('目标'))",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "cli-bug-fix",
+      "category": "bug-workaround",
+      "prompt": "自动修复 CLI 路径 Bug 并归档: spec_path=openspec/changes/payment-gateway, cli_reported_path=standards/openspec/archive/payment-gateway (错误路径), auto_fix=true",
+      "setup": {
+        "spec_path": "openspec/changes/payment-gateway",
+        "cli_wrong_path": "standards/openspec/archive/payment-gateway",
+        "correct_path": "openspec/archive/payment-gateway",
+        "auto_fix": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_cli_bug",
+          "description": "Should detect the CLI path bug (standards/ prefix)",
+          "check": "output.includes('bug') || output.includes('fix') || output.includes('修复') || output.includes('incorrect') || output.includes('错误')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "corrects_path_automatically",
+          "description": "Should auto-correct to project-local openspec/archive/ path",
+          "check": "output.includes('openspec/archive') && !output.includes('standards/openspec/archive')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "documents_fix_applied",
+          "description": "Should document that the bug fix was applied",
+          "check": "output.includes('auto-fix') || output.includes('auto_fix') || output.includes('corrected') || output.includes('已修复') || output.includes('fixed')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "metadata-preservation",
+      "category": "data-integrity",
+      "prompt": "归档 OpenSpec 并验证元数据完整性: spec_path=openspec/changes/user-auth, metadata={title: '用户认证', version: '1.0', status: 'completed', created: '2026-03-01', author: 'tech-lead'}",
+      "setup": {
+        "spec_path": "openspec/changes/user-auth",
+        "metadata": {
+          "title": "用户认证",
+          "version": "1.0",
+          "status": "completed",
+          "created": "2026-03-01",
+          "author": "tech-lead"
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "preserves_title",
+          "description": "Should preserve spec title during archive",
+          "check": "output.includes('用户认证') || output.includes('title') || output.includes('标题')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "preserves_version",
+          "description": "Should preserve spec version during archive",
+          "check": "output.includes('1.0') || output.includes('version') || output.includes('版本')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "preserves_author",
+          "description": "Should preserve author metadata during archive",
+          "check": "output.includes('tech-lead') || output.includes('author') || output.includes('作者')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "confirms_integrity",
+          "description": "Should confirm data integrity after archive",
+          "check": "output.includes('integrity') || output.includes('完整') || output.includes('preserved') || output.includes('保留') || output.includes('success')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "already-archived-detection",
+      "category": "validation",
+      "prompt": "检测已归档的 OpenSpec: spec_path=openspec/changes/user-auth, check_archive=openspec/archive/user-auth, detect_duplicates=true",
+      "setup": {
+        "spec_path": "openspec/changes/user-auth",
+        "archive_exists": true,
+        "expected_action": "skip_or_warn"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_already_archived",
+          "description": "Should detect that spec is already archived",
+          "check": "output.includes('already') || output.includes('已归档') || output.includes('exists') || output.includes('存在') || output.includes('duplicate')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "prevents_duplicate_archive",
+          "description": "Should prevent creating a duplicate archive",
+          "check": "output.includes('skip') || output.includes('跳过') || output.includes('warn') || output.includes('警告') || output.includes('abort')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "reports_archive_location",
+          "description": "Should report where the existing archive is located",
+          "check": "output.includes('openspec/archive') || output.includes('archive/user-auth') || output.includes('location') || output.includes('位置')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

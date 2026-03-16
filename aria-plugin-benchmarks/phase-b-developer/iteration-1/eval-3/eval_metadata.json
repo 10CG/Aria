@@ -1,0 +1,34 @@
+{
+  "eval_id": 3,
+  "eval_name": "worktree-mode-selection",
+  "category": "mode-decision",
+  "prompt": "Phase B mode selection: Task involves parallel development of backend and frontend components for TASK-003 and TASK-004. Determine optimal mode: worktree vs branch.",
+  "setup": {
+    "parallel_tasks": 2,
+    "task_ids": ["TASK-003", "TASK-004"],
+    "domains": ["backend", "frontend"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "evaluates_parallelism",
+      "description": "Should evaluate whether parallel worktrees are beneficial",
+      "check": "output.includes('parallel') || output.includes('worktree') || output.includes('concurrent') || output.includes('simultaneous')",
+      "severity": "high"
+    },
+    {
+      "id": "A2",
+      "name": "selects_appropriate_mode",
+      "description": "Should select worktree mode for parallel independent tasks",
+      "check": "output.includes('worktree') || output.includes('git worktree') || output.includes('mode: worktree') || output.includes('isolated')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "explains_decision_rationale",
+      "description": "Should explain why the selected mode is appropriate",
+      "check": "output.includes('independent') || output.includes('isolat') || output.includes('parallel execution') || output.includes('rationale')",
+      "severity": "medium"
+    }
+  ]
+}

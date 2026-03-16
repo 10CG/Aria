@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "spec-compliance-check",
+  "category": "phase-1",
+  "prompt": "对 TASK-003 的实现进行第一阶段评审：验证代码是否符合 OpenSpec 规范中定义的接口契约和功能需求。",
+  "setup": {
+    "review_phase": 1,
+    "task_id": "TASK-003",
+    "spec_file": "openspec/changes/user-auth.md",
+    "implementation_files": ["backend/api/auth/login.py", "backend/services/user_service.py"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "checks_spec_compliance",
+      "description": "Should verify implementation matches spec requirements",
+      "check": "output.includes('spec') || output.includes('规范') || output.includes('compliance') || output.includes('符合')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "validates_interface_contract",
+      "description": "Should validate API interface matches spec contract",
+      "check": "output.includes('interface') || output.includes('接口') || output.includes('API') || output.includes('contract')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "reports_deviations",
+      "description": "Should report any deviations from the spec",
+      "check": "output.includes('deviation') || output.includes('偏差') || output.includes('missing') || output.includes('缺少')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "code-quality-check",
+  "timestamp": "2026-03-16T14:10:45Z",
+  "assertions": [
+    {
+      "text": "detects_security_issues",
+      "passed": true,
+      "evidence": "Output detects SQL injection vulnerability in user_service.py line 52 and hardcoded secret key in jwt_handler.py line 8, both labeled [CRITICAL]"
+    },
+    {
+      "text": "reviews_code_style",
+      "passed": true,
+      "evidence": "Output contains 'Code Style Review' section identifying naming convention inconsistency ('Mixed naming styles detected', camelCase vs snake_case)"
+    },
+    {
+      "text": "assesses_architecture",
+      "passed": true,
+      "evidence": "Output contains 'Architecture Assessment' section identifying missing error handling layer and recommending centralized exception handler design pattern"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

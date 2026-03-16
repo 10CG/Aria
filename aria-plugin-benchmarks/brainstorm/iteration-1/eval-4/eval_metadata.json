@@ -1,0 +1,37 @@
+{
+  "eval_id": 4,
+  "eval_name": "context-accumulation",
+  "category": "context-management",
+  "prompt": "经过3轮讨论后，brainstorm 应该能够引用并整合之前轮次中确认的决策点，展示上下文的积累和延续。",
+  "setup": {
+    "round_number": 4,
+    "previous_decisions": [
+      "Round 1: 选择 PostgreSQL 作为主数据库",
+      "Round 2: API 使用 RESTful 风格",
+      "Round 3: 前端框架选择 React"
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "references_previous_decisions",
+      "description": "Should reference decisions made in previous rounds",
+      "check": "output.includes('PostgreSQL') || output.includes('RESTful') || output.includes('React') || output.includes('之前')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "builds_on_context",
+      "description": "Should build new questions/content on accumulated context",
+      "check": "output.includes('基于') || output.includes('given') || output.includes('已确认') || output.includes('confirmed')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "shows_decision_coherence",
+      "description": "Should show that new suggestions are coherent with existing decisions",
+      "check": "output.includes('一致') || output.includes('consistent') || output.includes('符合') || output.includes('aligned')",
+      "severity": "medium"
+    }
+  ]
+}

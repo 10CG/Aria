@@ -1,0 +1,42 @@
+{
+  "eval_id": 4,
+  "eval_name": "subagent-delegation",
+  "category": "agent-management",
+  "prompt": "Phase B B.2: Delegate TASK-004 (Account linking service) to backend-architect subagent. Provide task context, spec, and verification criteria.",
+  "setup": {
+    "task_id": "TASK-004",
+    "task_title": "Account linking service",
+    "assigned_agent": "backend-architect",
+    "spec_path": "openspec/changes/oauth2-social-login/proposal.md"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "delegates_to_correct_agent",
+      "description": "Should delegate to backend-architect agent",
+      "check": "output.includes('backend-architect') || output.includes('Backend Architect') || output.includes('delegating to')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "provides_task_context",
+      "description": "Should provide spec reference and task details to subagent",
+      "check": "output.includes('proposal.md') || output.includes('spec') || output.includes('TASK-004') || output.includes('context')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "includes_verification_criteria",
+      "description": "Should include acceptance criteria or verification steps",
+      "check": "output.includes('verification') || output.includes('acceptance') || output.includes('criteria') || output.includes('done when')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "awaits_completion_signal",
+      "description": "Should wait for subagent completion before proceeding",
+      "check": "output.includes('await') || output.includes('waiting') || output.includes('complete') || output.includes('handback')",
+      "severity": "medium"
+    }
+  ]
+}

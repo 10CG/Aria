@@ -1,0 +1,51 @@
+{
+  "eval_id": 1,
+  "eval_name": "openapi-generation",
+  "category": "spec-generation",
+  "prompt": "Generate an OpenAPI 3.0 specification from the following FastAPI route code:\n\n```python\n@router.post('/users', response_model=UserResponse, status_code=201)\nasync def create_user(user: UserCreate, db: Session = Depends(get_db)):\n    '''Create a new user account'''\n    return await user_service.create(user, db)\n\n@router.get('/users/{user_id}', response_model=UserResponse)\nasync def get_user(user_id: int, db: Session = Depends(get_db)):\n    '''Get user by ID'''\n    return await user_service.get_by_id(user_id, db)\n```",
+  "setup": {
+    "framework": "fastapi",
+    "source_file": "backend/src/routes/users.py",
+    "endpoints": [
+      {"method": "POST", "path": "/users", "status": 201},
+      {"method": "GET", "path": "/users/{user_id}"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_openapi_version",
+      "description": "Output must declare OpenAPI version 3.0.x",
+      "check": "output.match(/openapi.*3\\.0|OpenAPI.*3\\.0/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_post_users",
+      "description": "Spec must include POST /users endpoint",
+      "check": "output.match(/post.*\\/users|\\/users.*post/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "includes_get_user_by_id",
+      "description": "Spec must include GET /users/{user_id} endpoint",
+      "check": "output.match(/get.*\\/users\\/\\{user_id\\}|\\/users\\/\\{user_id\\}.*get/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "correct_status_codes",
+      "description": "POST /users must show 201 status code",
+      "check": "output.includes('201')",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "valid_yaml_or_json_structure",
+      "description": "Output must be in valid YAML or JSON structure",
+      "check": "output.includes('paths:') || output.includes('\"paths\":')",
+      "severity": "high"
+    }
+  ]
+}

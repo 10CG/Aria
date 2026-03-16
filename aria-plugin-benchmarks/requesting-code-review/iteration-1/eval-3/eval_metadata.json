@@ -1,0 +1,36 @@
+{
+  "eval_id": 3,
+  "eval_name": "issue-categorization",
+  "category": "output-format",
+  "prompt": "代码评审发现了多个问题：SQL注入漏洞、变量命名不规范、缺少注释。将这些问题分类为 Critical/Important/Minor。",
+  "setup": {
+    "issues_found": [
+      {"type": "sql_injection", "expected_category": "Critical"},
+      {"type": "poor_naming", "expected_category": "Minor"},
+      {"type": "missing_comments", "expected_category": "Minor"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "uses_critical_category",
+      "description": "Should categorize security issues as Critical",
+      "check": "output.includes('Critical') || output.includes('严重') || output.includes('critical')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "uses_minor_category",
+      "description": "Should categorize style issues as Minor",
+      "check": "output.includes('Minor') || output.includes('minor') || output.includes('次要')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "uses_important_category",
+      "description": "Should use Important category for medium-severity issues",
+      "check": "output.includes('Important') || output.includes('important') || output.includes('重要')",
+      "severity": "high"
+    }
+  ]
+}

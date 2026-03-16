@@ -1,0 +1,54 @@
+# User Story Format Validation Report
+
+> **Story**: US-042 — "As a user, I want to login"
+> **Validator**: requirements-validator v2.1.0
+> **Timestamp**: 2026-03-16T14:02:00Z
+
+## Validation Result: FAIL
+
+**2 violations found** in US-042.
+
+---
+
+## Format Structure Check
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| `As a [role]` | PASS | "As a user" — role defined |
+| `I want to [action]` | PASS | "I want to login" — action defined |
+| `So that [benefit]` | WARN | Missing benefit clause (optional but recommended) |
+
+The basic `As a / I want to` format structure is **present and valid**.
+
+---
+
+## Violations
+
+### [CRITICAL] Missing: Acceptance Criteria (AC)
+- **Rule**: US_FORMAT_001 — Every User Story must have at least one testable Acceptance Criteria
+- **Expected format**:
+  ```
+  ## Acceptance Criteria
+  - Given [context], When [action], Then [outcome]
+  ```
+- **Action**: Add AC section with Given/When/Then scenarios for the login flow
+
+### [HIGH] Missing: Story Points (SP)
+- **Rule**: US_FORMAT_002 — Every User Story must have a Story Points estimate
+- **Expected field**: `Story Points: <number>` (Fibonacci: 1, 2, 3, 5, 8, 13)
+- **Action**: Add `Story Points:` field with an estimated value
+
+---
+
+## Summary
+
+| Severity | Count |
+|----------|-------|
+| CRITICAL | 1     |
+| HIGH     | 1     |
+| WARN     | 1     |
+| **Total violations** | **2** |
+
+## Recommendation
+
+Add Acceptance Criteria with at least one Given/When/Then scenario covering the happy path (successful login) and at least one error scenario (invalid credentials). Assign Story Points before sprint planning.

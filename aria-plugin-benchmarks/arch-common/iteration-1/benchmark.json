@@ -1,0 +1,120 @@
+{
+  "benchmark_name": "arch-common",
+  "skill_version": "1.1.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T08:30:00Z",
+  "total_evals": 4,
+  "summary": {
+    "with_skill": {
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 410,
+      "key_metrics": {
+        "layer_definition_accuracy": "100%",
+        "naming_convention_compliance": "100%",
+        "doc_location_correctness": "100%",
+        "cross_skill_compatibility": "100%"
+      }
+    },
+    "without_skill": {
+      "passed": 1,
+      "failed": 3,
+      "pass_rate": 0.25,
+      "avg_tokens": 1350,
+      "key_metrics": {
+        "definition_consistency": "30%",
+        "naming_correctness": "50%",
+        "integration_awareness": "low"
+      }
+    },
+    "improvement": {
+      "pass_rate_delta": 0.75,
+      "pass_count_delta": 3,
+      "token_savings_avg": "70%"
+    }
+  },
+  "by_category": {
+    "layer-system": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 380
+    },
+    "naming": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 320
+    },
+    "location": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 420
+    },
+    "integration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 520
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "layer-hierarchy-definition",
+      "category": "layer-system",
+      "with_skill": "PASS",
+      "without_skill": "PARTIAL",
+      "key_finding": "All three layers L0/L1/L2 correctly defined with hierarchy relationship and concrete examples",
+      "tokens_with_skill": 380,
+      "tokens_without_skill": 1200
+    },
+    {
+      "eval_id": 2,
+      "name": "naming-convention",
+      "category": "naming",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "ARCHITECTURE.md for L0 and *.arch.md for L1/L2 correctly specified with case convention explanation",
+      "tokens_with_skill": 320,
+      "tokens_without_skill": 980
+    },
+    {
+      "eval_id": 3,
+      "name": "doc-location-rules",
+      "category": "location",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Correct doc paths generated for all 3 modules with colocation principle explained",
+      "tokens_with_skill": 420,
+      "tokens_without_skill": 1500
+    },
+    {
+      "eval_id": 4,
+      "name": "cross-skill-compatibility",
+      "category": "integration",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "Integration with arch-search and arch-update explained; shared config points identified",
+      "tokens_with_skill": 520,
+      "tokens_without_skill": 1700
+    }
+  ],
+  "strengths": [
+    "Precise and consistent L0/L1/L2 layer definitions with clear scope boundaries",
+    "Unambiguous naming conventions (ARCHITECTURE.md vs *.arch.md)",
+    "Correct colocation placement rules applied to multi-module projects",
+    "Clear articulation of how shared config ensures cross-skill consistency"
+  ],
+  "weaknesses": [
+    "As a configuration skill, it provides definitions but does not execute actions directly",
+    "Some edge cases (monorepo with nested modules) may need additional placement guidance"
+  ],
+  "recommendations": [
+    "Add explicit guidance for monorepo and nested module structures",
+    "Provide a validation command to check if existing docs follow arch-common conventions",
+    "Document upgrade path when arch-common conventions change between versions"
+  ]
+}

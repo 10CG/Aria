@@ -1,0 +1,185 @@
+{
+  "skill_name": "tdd-enforcer",
+  "skill_path": "aria/skills/tdd-enforcer",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for tdd-enforcer skill - Enforces TDD workflow using RED-GREEN-REFACTOR cycle",
+  "metrics": [
+    "red_phase_enforcement",
+    "green_phase_validation",
+    "refactor_phase_guidance",
+    "strictness_level_compliance",
+    "test_first_discipline"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "red-phase-enforcement",
+      "category": "tdd-cycle",
+      "prompt": "开发者想直接实现 UserService.create() 方法，还没有写任何测试。TDD Enforcer 应如何处理？",
+      "setup": {
+        "current_phase": "RED",
+        "has_tests": false,
+        "has_implementation": false
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_missing_test",
+          "description": "Should detect that no test exists before implementation",
+          "check": "output.includes('test') || output.includes('测试') || output.includes('RED')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "requires_test_first",
+          "description": "Should require writing test before implementation",
+          "check": "output.includes('先写') || output.includes('test first') || output.includes('写测试')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "provides_test_template",
+          "description": "Should provide guidance or template for writing the test",
+          "check": "output.includes('def test_') || output.includes('test_create') || output.includes('assert') || output.includes('断言')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "green-phase-validation",
+      "category": "tdd-cycle",
+      "prompt": "测试 test_create_user_success 已经写好并且失败了（RED）。开发者实现了 UserService.create() 方法。TDD Enforcer 应验证 GREEN 阶段。",
+      "setup": {
+        "current_phase": "GREEN",
+        "test_file": "tests/test_user_service.py",
+        "test_status": "was_red_now_implemented",
+        "implementation_file": "services/user_service.py"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "confirms_green_phase",
+          "description": "Should confirm that tests are now passing (GREEN)",
+          "check": "output.includes('GREEN') || output.includes('passing') || output.includes('通过')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "validates_minimal_implementation",
+          "description": "Should validate that implementation is minimal to pass tests",
+          "check": "output.includes('minimal') || output.includes('最小') || output.includes('只做') || output.includes('YAGNI')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "suggests_next_step",
+          "description": "Should suggest moving to REFACTOR phase",
+          "check": "output.includes('REFACTOR') || output.includes('重构') || output.includes('refactor') || output.includes('下一步')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "refactor-phase-guidance",
+      "category": "tdd-cycle",
+      "prompt": "所有测试通过（GREEN）。代码中存在重复逻辑和复杂条件。TDD Enforcer 应指导 REFACTOR 阶段的安全重构。",
+      "setup": {
+        "current_phase": "REFACTOR",
+        "all_tests_passing": true,
+        "code_smells": ["duplicate_logic", "complex_conditions", "long_method"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "identifies_refactor_targets",
+          "description": "Should identify code smells to refactor",
+          "check": "output.includes('重构') || output.includes('refactor') || output.includes('smell') || output.includes('重复')",
+          "severity": "high"
+        },
+        {
+          "id": "A2",
+          "name": "ensures_tests_stay_green",
+          "description": "Should emphasize keeping tests green during refactor",
+          "check": "output.includes('测试') || output.includes('test') || output.includes('不破坏') || output.includes('保持')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "provides_refactor_strategy",
+          "description": "Should provide specific refactoring strategy",
+          "check": "output.includes('extract') || output.includes('提取') || output.includes('简化') || output.includes('consolidate')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "strictness-level-advisory",
+      "category": "strictness",
+      "prompt": "TDD Enforcer 以 Advisory 模式运行。开发者跳过了测试直接写实现代码。应该只发出警告，不阻断工作流。",
+      "setup": {
+        "strictness_level": "advisory",
+        "violation": "implementation_without_test"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "issues_warning_not_block",
+          "description": "Should issue a warning but not block the workflow",
+          "check": "output.includes('警告') || output.includes('warning') || output.includes('建议') || output.includes('Advisory')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "does_not_stop_execution",
+          "description": "Should allow work to continue despite violation",
+          "check": "output.includes('继续') || output.includes('continue') || output.includes('allowed') || output.includes('可以继续')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "logs_violation",
+          "description": "Should log or report the TDD violation for tracking",
+          "check": "output.includes('记录') || output.includes('log') || output.includes('violation') || output.includes('违反')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "strictness-level-strict",
+      "category": "strictness",
+      "prompt": "TDD Enforcer 以 Strict 模式运行。开发者试图提交没有测试覆盖的实现代码。应该阻止提交。",
+      "setup": {
+        "strictness_level": "strict",
+        "violation": "commit_without_test_coverage",
+        "files_staged": ["services/payment_service.py"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "blocks_non_tdd_code",
+          "description": "Should block the commit due to missing test coverage",
+          "check": "output.includes('block') || output.includes('阻止') || output.includes('Strict') || output.includes('拒绝')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "explains_violation",
+          "description": "Should clearly explain what the TDD violation is",
+          "check": "output.includes('coverage') || output.includes('覆盖') || output.includes('测试') || output.includes('test')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "provides_remediation",
+          "description": "Should provide clear steps to remediate the violation",
+          "check": "output.includes('步骤') || output.includes('step') || output.includes('先写') || output.includes('需要')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

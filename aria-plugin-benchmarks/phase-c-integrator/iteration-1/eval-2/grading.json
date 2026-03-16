@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "pr-creation",
+  "timestamp": "2026-03-16T14:21:38Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output shows 'Pull Request created: https://github.com/org/project/pull/143' and 'PR Title' section with descriptive title",
+      "text": "creates_pr_with_title"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "PR description contains 'OpenSpec Reference' section linking to 'openspec/changes/oauth2-social-login/proposal.md'",
+      "text": "references_openspec"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "PR description contains '- [x] TASK-001' through '- [x] TASK-006' checklist with '6/6 tasks completed'",
+      "text": "lists_completed_tasks"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

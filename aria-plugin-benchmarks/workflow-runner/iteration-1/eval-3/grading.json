@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "preset-workflow-feature",
+  "timestamp": "2026-03-16T10:23:30Z",
+  "assertions": [
+    {
+      "text": "recognizes_preset",
+      "passed": true,
+      "evidence": "Output header shows 'Preset: new-feature' and 'Loaded preset configuration: Preset name: new-feature'"
+    },
+    {
+      "text": "includes_spec_phase",
+      "passed": true,
+      "evidence": "A.1 step shown as 'Spec Drafter → OpenSpec created' with file path"
+    },
+    {
+      "text": "includes_branch_creation",
+      "passed": true,
+      "evidence": "B.1 step shows 'feature/push-notifications created'; branch naming pattern 'feature/{spec-name}' defined in preset config"
+    },
+    {
+      "text": "includes_merge_step",
+      "passed": true,
+      "evidence": "C.2 step shows 'feature/push-notifications → main' merge"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

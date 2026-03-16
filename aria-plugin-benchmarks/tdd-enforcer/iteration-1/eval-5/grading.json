@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "strictness-level-strict",
+  "timestamp": "2026-03-16T14:02:00Z",
+  "assertions": [
+    {
+      "text": "blocks_non_tdd_code",
+      "passed": true,
+      "evidence": "Output states 'COMMIT BLOCKED', 'Strict Mode has rejected your commit', 'BLOCKED - Commit rejected' in the header status"
+    },
+    {
+      "text": "explains_violation",
+      "passed": true,
+      "evidence": "Output explains 'Coverage: 0% (no tests found)' and 'Required: 100% TDD compliance' with specific test file missing"
+    },
+    {
+      "text": "provides_remediation",
+      "passed": true,
+      "evidence": "Output provides 4-step remediation process: 'Step 1: Write failing tests', 'Step 2: Verify tests fail', 'Step 3: Confirm implementation passes', 'Step 4: Stage test file and retry commit'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

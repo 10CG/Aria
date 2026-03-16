@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "chain-completeness",
+  "category": "chain-validation",
+  "prompt": "检查需求链完整性: PRD-001 存在，但缺少对应的 System Architecture 章节和 User Story US-001",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_chain_gap",
+      "description": "Should detect the broken PRD→Architecture→Story chain",
+      "check": "output.includes('chain') || output.includes('链') || output.includes('gap') || output.includes('断裂')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_missing_architecture",
+      "description": "Should identify missing architecture section",
+      "check": "output.includes('Architecture') || output.includes('架构') || output.includes('System')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_missing_story",
+      "description": "Should identify missing User Story US-001",
+      "check": "output.includes('US-001') || output.includes('User Story') || output.includes('用户故事')",
+      "severity": "high"
+    }
+  ]
+}

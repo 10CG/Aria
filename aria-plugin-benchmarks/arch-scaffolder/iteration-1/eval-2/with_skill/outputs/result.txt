@@ -1,0 +1,81 @@
+arch-scaffolder: Architecture Template Populated
+=================================================
+
+Generating architecture document skeleton from PRD...
+Output: ARCHITECTURE.md
+
+--- BEGIN GENERATED DOCUMENT ---
+
+# Task Management Platform - System Architecture
+
+> Version: 1.0.0
+> Date: 2026-03-16
+> Status: Draft
+
+## Overview
+
+The Task Management Platform is a SaaS application that enables teams to create
+projects, assign tasks, and track progress collaboratively. The system is designed
+to support enterprise-scale usage while maintaining simplicity for individual teams.
+
+## System Context
+
+The platform operates as a multi-tenant SaaS service accessible via web browser
+and REST API. It integrates with external services (Slack, GitHub) and supports
+third-party integrations through a public API.
+
+External actors:
+  - End users (web UI)
+  - Third-party applications (REST API)
+  - Slack workspace (integration)
+  - GitHub repositories (integration)
+
+## Modules
+
+| Module            | Responsibility                              |
+|-------------------|---------------------------------------------|
+| auth              | User registration, login, session management|
+| projects          | Project lifecycle management                |
+| tasks             | Task creation, assignment, tracking         |
+| integrations      | Slack and GitHub connector services         |
+| api-gateway       | Public REST API routing and auth            |
+| audit             | Audit log capture and storage               |
+| notifications     | Event-driven notification dispatch          |
+
+## Technology Stack
+
+| Layer      | Technology        | Rationale                                  |
+|------------|-------------------|--------------------------------------------|
+| API        | Node.js / NestJS  | Async I/O, REST support, ecosystem maturity|
+| Database   | PostgreSQL        | Relational, ACID, audit log support        |
+| Cache      | Redis             | Session cache, rate limiting               |
+| Queue      | RabbitMQ          | Async notification delivery                |
+| Hosting    | AWS / GCP         | SaaS scalability, managed services         |
+
+## Non-Functional Requirements
+
+| NFR           | Target                    | Strategy                         |
+|---------------|---------------------------|----------------------------------|
+| Scalability   | 10,000 concurrent users   | Horizontal scaling + load balancer|
+| Availability  | 99.9% uptime              | Multi-AZ deployment              |
+| Auditability  | Full audit trail          | Immutable audit log table         |
+| Security      | OWASP compliance          | JWT auth, input validation        |
+
+## Integration Points
+
+### Slack Integration
+  - Method: Incoming webhooks + Slack Events API
+  - Purpose: Send task notifications to Slack channels
+
+### GitHub Integration
+  - Method: GitHub OAuth App + Webhooks
+  - Purpose: Link tasks to GitHub issues and PRs
+
+### Public REST API
+  - Method: REST over HTTPS with API key authentication
+  - Purpose: Third-party tool integrations
+
+--- END GENERATED DOCUMENT ---
+
+Template sections populated: 6/6
+Unfilled placeholders: 0

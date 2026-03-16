@@ -1,0 +1,36 @@
+{
+  "eval_id": 2,
+  "eval_name": "isolation-level-selection",
+  "category": "isolation",
+  "prompt": "为以下三个任务选择正确的隔离级别: 1) 修复 typo（无代码变更）; 2) 添加新功能（新分支）; 3) 大型重构（需要 worktree）",
+  "setup": {
+    "tasks": [
+      {"id": "T1", "type": "typo_fix", "expected_isolation": "none"},
+      {"id": "T2", "type": "new_feature", "expected_isolation": "branch"},
+      {"id": "T3", "type": "large_refactor", "expected_isolation": "worktree"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "selects_none_for_trivial",
+      "description": "Should select no isolation for trivial typo fixes",
+      "check": "output.includes('none') || output.includes('无隔离') || output.includes('直接') || output.includes('trivial')",
+      "severity": "high"
+    },
+    {
+      "id": "A2",
+      "name": "selects_branch_for_feature",
+      "description": "Should select branch isolation for new features",
+      "check": "output.includes('branch') || output.includes('分支') || output.includes('Branch')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "selects_worktree_for_refactor",
+      "description": "Should select worktree isolation for large refactors",
+      "check": "output.includes('worktree') || output.includes('工作树') || output.includes('Worktree')",
+      "severity": "critical"
+    }
+  ]
+}

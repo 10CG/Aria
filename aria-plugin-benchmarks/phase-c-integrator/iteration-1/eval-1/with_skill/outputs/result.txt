@@ -1,0 +1,81 @@
+# Phase C — C.1 Commit Generation: oauth2-social-login
+
+**Skill**: phase-c-integrator v1.1.0
+**Feature**: oauth2-social-login
+**Timestamp**: 2026-03-16T14:20:00Z
+
+---
+
+## Staged Changes Analysis
+
+```
+$ git diff --cached --stat
+ backend/api/auth/github_oauth.py    | 89 ++++++++++++++++++
+ backend/models/oauth_account.py     | 34 +++++++
+ backend/tests/test_github_oauth.py  | 67 +++++++++++++
+ 3 files changed, 190 insertions(+)
+```
+
+### File Classification
+
+| File | Type | Domain | Change |
+|------|------|--------|--------|
+| backend/api/auth/github_oauth.py | implementation | auth/oauth2 | Added (A) |
+| backend/models/oauth_account.py | model | auth/oauth2 | Added (A) |
+| backend/tests/test_github_oauth.py | test | auth/oauth2 | Added (A) |
+
+**Assessment**: All files are new additions in the oauth2 authentication domain.
+**Commit type**: `feat` (new functionality)
+**Scope**: `oauth2` (oauth2 authentication subsystem)
+
+---
+
+## Generated Commit Message
+
+```
+feat(oauth2): add GitHub OAuth2 callback handler and account model
+
+- Implement github_callback() for OAuth2 authorization code exchange
+- Add OAuthAccount model for linking social identities to users
+- Add unit tests with 5 test cases (100% coverage on happy path)
+
+Spec: openspec/changes/oauth2-social-login/proposal.md
+Task: TASK-002 (GitHub OAuth2 callback handler)
+Refs: oauth2-social-login
+```
+
+---
+
+## Commit Execution
+
+```bash
+$ git commit -m "feat(oauth2): add GitHub OAuth2 callback handler and account model
+
+- Implement github_callback() for OAuth2 authorization code exchange
+- Add OAuthAccount model for linking social identities to users
+- Add unit tests with 5 test cases (100% coverage on happy path)
+
+Spec: openspec/changes/oauth2-social-login/proposal.md
+Task: TASK-002 (GitHub OAuth2 callback handler)
+Refs: oauth2-social-login"
+
+[feature/oauth2-social-login b7e4a31] feat(oauth2): add GitHub OAuth2 callback handler and account model
+ 3 files changed, 190 insertions(+)
+ create mode 100644 backend/api/auth/github_oauth.py
+ create mode 100644 backend/models/oauth_account.py
+ create mode 100644 backend/tests/test_github_oauth.py
+```
+
+---
+
+## C.1 Status
+
+| Check | Result |
+|-------|--------|
+| Commit type | feat (new feature) |
+| Scope | (oauth2) |
+| Subject length | 52 chars (within limit) |
+| Body present | YES (3 bullet points) |
+| Spec reference | YES (Spec: + Refs: footer) |
+
+**C.1 COMPLETE** — Commit b7e4a31 created successfully.

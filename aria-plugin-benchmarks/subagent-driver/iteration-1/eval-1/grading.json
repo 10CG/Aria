@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "fresh-subagent-launch",
+  "timestamp": "2026-03-16T14:05:10Z",
+  "assertions": [
+    {
+      "text": "launches_fresh_context",
+      "passed": true,
+      "evidence": "Output states 'launch_type: fresh', 'Fresh Subagent Initialized', and 'context_inheritance: false'"
+    },
+    {
+      "text": "assigns_correct_task",
+      "passed": true,
+      "evidence": "Output contains 'TASK-003' in subagent ID, task_id, and handoff package with correct task name '实现用户登录 API'"
+    },
+    {
+      "text": "isolates_from_parent_context",
+      "passed": true,
+      "evidence": "Output explicitly states 'Context Isolation Confirmed', parent conversation history EXCLUDED, and only curated handoff package provided"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

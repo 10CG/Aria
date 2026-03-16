@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "layer-classification",
+  "timestamp": "2026-03-16T08:02:00Z",
+  "assertions": [
+    {
+      "text": "classifies_l0_correctly",
+      "passed": true,
+      "evidence": "Output states 'ARCHITECTURE.md - Layer: L0 (project level)'"
+    },
+    {
+      "text": "classifies_l1_correctly",
+      "passed": true,
+      "evidence": "Output states 'auth.arch.md - Layer: L1 (module level)'"
+    },
+    {
+      "text": "classifies_l2_correctly",
+      "passed": true,
+      "evidence": "Output states 'UserRepository.arch.md - Layer: L2 (component level)'"
+    },
+    {
+      "text": "explains_layer_hierarchy",
+      "passed": true,
+      "evidence": "Output includes section 'LAYER HIERARCHY: L0 (Project) -> L1 (Module) -> L2 (Component)'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

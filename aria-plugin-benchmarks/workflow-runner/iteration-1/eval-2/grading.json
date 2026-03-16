@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "partial-cycle-ab",
+  "timestamp": "2026-03-16T10:22:30Z",
+  "assertions": [
+    {
+      "text": "executes_phase_a",
+      "passed": true,
+      "evidence": "Output shows A.0, A.2, A.3 executed under PHASE A section"
+    },
+    {
+      "text": "executes_phase_b",
+      "passed": true,
+      "evidence": "Output shows B.1 and B.2 executed under PHASE B section"
+    },
+    {
+      "text": "skips_phase_c_and_d",
+      "passed": true,
+      "evidence": "No C.1, C.2, D.1, D.2 execution entries in output; only listed in 'Phases skipped' note"
+    },
+    {
+      "text": "acknowledges_partial_run",
+      "passed": true,
+      "evidence": "Output header shows 'Workflow: partial (A+B only)' and footer shows 'PARTIAL CYCLE COMPLETE (A+B)'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

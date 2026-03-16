@@ -1,0 +1,215 @@
+{
+  "skill_name": "agent-router",
+  "skill_path": "aria/skills/agent-router",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for agent-router skill - Intelligent task-to-Agent router",
+  "baseline_comparison": {
+    "method": "manual_agent_selection",
+    "description": "Human manually reads task description and picks an agent"
+  },
+  "metrics": [
+    "routing_accuracy",
+    "confidence_score",
+    "agent_selected",
+    "fallback_behavior",
+    "multi_agent_detection"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "backend-task-routing",
+      "category": "routing",
+      "prompt": "Route this task to the correct agent: 'Implement a new REST API endpoint POST /api/v1/orders that validates request body, writes to PostgreSQL, and returns 201 on success.'",
+      "expected_agent": "backend-architect",
+      "expected_confidence_min": 0.85,
+      "setup": {
+        "task_type": "api_implementation",
+        "file_paths": ["backend/src/routes/orders.py", "backend/src/models/order.py"],
+        "keywords": ["REST API", "endpoint", "PostgreSQL"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "selects_backend_architect",
+          "description": "Should select backend-architect agent for API/database task",
+          "check": "output.includes('backend-architect')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "confidence_above_threshold",
+          "description": "Confidence score should be >= 0.85 for clear backend task",
+          "check": "confidence >= 0.85",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "provides_routing_rationale",
+          "description": "Should explain why backend-architect was selected",
+          "check": "output.match(/API|endpoint|database|PostgreSQL|backend/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "no_ambiguous_multi_match",
+          "description": "Should not suggest multiple agents for a clearly backend task",
+          "check": "!output.match(/mobile-developer|frontend/i)",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "frontend-task-routing",
+      "category": "routing",
+      "prompt": "Route this task: 'Build a Flutter product listing screen with infinite scroll, skeleton loading states, and pull-to-refresh using Riverpod for state management.'",
+      "expected_agent": "mobile-developer",
+      "expected_confidence_min": 0.90,
+      "setup": {
+        "task_type": "ui_implementation",
+        "file_paths": ["mobile/lib/screens/product_list_screen.dart", "mobile/lib/providers/product_provider.dart"],
+        "keywords": ["Flutter", "Riverpod", "screen", "UI"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "selects_mobile_developer",
+          "description": "Should select mobile-developer agent for Flutter UI task",
+          "check": "output.includes('mobile-developer')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "high_confidence_flutter",
+          "description": "Flutter/Riverpod keywords should yield high confidence >= 0.90",
+          "check": "confidence >= 0.90",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "mentions_flutter_rationale",
+          "description": "Routing rationale should reference Flutter or mobile",
+          "check": "output.match(/Flutter|mobile|Dart|Riverpod/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ambiguous-task-routing",
+      "category": "confidence",
+      "prompt": "Route this task: 'Update the user profile feature to sync data between the mobile app and backend API.'",
+      "expected_agent": "tech-lead",
+      "expected_confidence_max": 0.70,
+      "setup": {
+        "task_type": "cross_domain",
+        "file_paths": ["mobile/lib/features/profile/", "backend/src/routes/profile.py"],
+        "keywords": ["sync", "mobile", "backend", "API"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "low_confidence_detected",
+          "description": "Ambiguous task should produce confidence <= 0.70",
+          "check": "confidence <= 0.70",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "flags_ambiguity",
+          "description": "Should flag that task spans multiple domains",
+          "check": "output.match(/ambiguous|multiple|cross|span|unclear/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "suggests_decomposition",
+          "description": "Should suggest breaking task into sub-tasks or escalating",
+          "check": "output.match(/decompose|split|break|sub-task|tech-lead/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "multi-agent-suggestion",
+      "category": "multi-match",
+      "prompt": "Route this task: 'Design and implement a real-time notification system: push notifications on mobile (Flutter) and a WebSocket server on the backend (FastAPI), plus update the shared API contract.'",
+      "expected_agents": ["mobile-developer", "backend-architect"],
+      "setup": {
+        "task_type": "multi_domain",
+        "file_paths": [
+          "mobile/lib/services/notification_service.dart",
+          "backend/src/websocket/notification_hub.py",
+          "shared/contracts/openapi/notifications.yaml"
+        ],
+        "keywords": ["push notifications", "Flutter", "WebSocket", "FastAPI", "API contract"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "suggests_mobile_developer",
+          "description": "Should suggest mobile-developer for Flutter push notification work",
+          "check": "output.includes('mobile-developer')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "suggests_backend_architect",
+          "description": "Should suggest backend-architect for WebSocket/FastAPI work",
+          "check": "output.includes('backend-architect')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_parallel_work",
+          "description": "Should identify that work can proceed in parallel",
+          "check": "output.match(/parallel|concurrent|simultaneously|both|two agents/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "provides_task_split",
+          "description": "Should provide a task breakdown per agent",
+          "check": "output.match(/mobile|backend/i) && output.match(/split|breakdown|assign/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "fallback-routing",
+      "category": "fallback",
+      "prompt": "Route this task: 'Review the overall project architecture, assess technical debt across all modules, and create a refactoring roadmap.'",
+      "expected_agent": "tech-lead",
+      "setup": {
+        "task_type": "architecture_review",
+        "file_paths": [],
+        "keywords": ["architecture", "technical debt", "roadmap", "refactoring"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "falls_back_to_tech_lead",
+          "description": "Should fallback to tech-lead for cross-cutting architectural concerns",
+          "check": "output.includes('tech-lead')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "explains_fallback_reason",
+          "description": "Should explain why tech-lead is the fallback choice",
+          "check": "output.match(/cross-cutting|overall|architecture|no specific|broad/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "does_not_hallucinate_agent",
+          "description": "Should not invent agent names not in the registry",
+          "check": "!output.match(/data-engineer|devops-engineer|qa-engineer/i)",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

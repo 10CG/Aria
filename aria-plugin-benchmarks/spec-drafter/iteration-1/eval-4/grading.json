@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "template-compliance",
+  "timestamp": "2026-03-16T14:30:30Z",
+  "assertions": [
+    {
+      "text": "has_all_required_sections",
+      "passed": true,
+      "evidence": "Output Section Checklist shows Background, Non-Goals, and Implementation Plan all marked PRESENT with 6/6 required sections passing"
+    },
+    {
+      "text": "correct_heading_hierarchy",
+      "passed": true,
+      "evidence": "Output shows '## Background', '## Scope', '## Goals' in the heading hierarchy diagram and confirms 'correct and consistent'"
+    },
+    {
+      "text": "has_metadata_header",
+      "passed": true,
+      "evidence": "Output shows Metadata Check with Version, Status, Date, and Author all marked as present"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

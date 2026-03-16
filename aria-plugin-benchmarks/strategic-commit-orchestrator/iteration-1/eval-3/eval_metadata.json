@@ -1,0 +1,41 @@
+{
+  "eval_id": 3,
+  "eval_name": "commit-message-format",
+  "category": "format-validation",
+  "prompt": "为以下变更生成符合 Conventional Commits 格式的提交信息: type=feat, scope=auth, description=JWT token validation, body=Added token expiry check and refresh logic",
+  "setup": {
+    "expected_type": "feat",
+    "expected_scope": "auth",
+    "max_subject_length": 50
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "conventional_commits_header",
+      "description": "Should produce type(scope): description header",
+      "check": "output.match(/^feat\\(auth\\):|feat\\(auth\\):/m)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "subject_length_limit",
+      "description": "Subject line must not exceed 50 characters",
+      "check": "output.split('\\n')[0].length <= 72",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "has_body_content",
+      "description": "Should include body describing the changes",
+      "check": "output.includes('token') || output.includes('expiry') || output.includes('refresh')",
+      "severity": "medium"
+    },
+    {
+      "id": "A4",
+      "name": "no_period_at_end",
+      "description": "Subject line should not end with a period",
+      "check": "!output.split('\\n')[0].endsWith('.')",
+      "severity": "medium"
+    }
+  ]
+}

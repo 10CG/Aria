@@ -1,0 +1,88 @@
+# Phase D — Full Closure Sequence: realtime-notifications
+
+**Skill**: phase-d-closer v1.0.0
+**Spec**: realtime-notifications
+**PR**: #156 merged to main
+**Sequence**: D.1 → D.2
+**Timestamp**: 2026-03-16T14:32:00Z
+
+---
+
+## Closure Sequence: D.1 → D.2
+
+### Pre-flight Verification
+
+- Spec path: openspec/changes/realtime-notifications/ — FOUND
+- PR #156: merged to main — CONFIRMED
+- Tasks: 7/7 complete — VERIFIED
+
+---
+
+## D.1 — Progress Status Update
+
+**Status**: IN PROGRESS
+
+Updating progress record for realtime-notifications...
+
+```yaml
+# openspec/changes/realtime-notifications/progress.yaml (updated)
+spec: realtime-notifications
+status: completed
+pr: 156
+tasks_completed: 7
+tasks_total: 7
+completion_rate: "7/7 (100%)"
+completed_at: "2026-03-16T14:32:00Z"
+merged_to: main
+```
+
+**D.1 COMPLETE** — Progress status updated to 'completed', PR #156 recorded, 7/7 tasks confirmed.
+
+---
+
+## D.2 — Spec Archival
+
+**Status**: IN PROGRESS
+
+Archiving spec from openspec/changes/ to openspec/archive/...
+
+```bash
+$ git mv openspec/changes/realtime-notifications/ openspec/archive/realtime-notifications/
+```
+
+Archive metadata created: openspec/archive/realtime-notifications/archive-meta.yaml
+
+```yaml
+spec: realtime-notifications
+archived_at: "2026-03-16T14:32:30Z"
+completed_at: "2026-03-16T14:32:00Z"
+pr: 156
+merged_to: main
+tasks_total: 7
+tasks_completed: 7
+outcome: success
+```
+
+**D.2 COMPLETE** — Spec moved to openspec/archive/realtime-notifications/
+
+---
+
+## Phase D Summary
+
+| Step | Status | Duration | Output |
+|------|--------|----------|--------|
+| D.1 Progress Update | COMPLETED | 8.4s | progress.yaml updated (status: completed) |
+| D.2 Spec Archival | COMPLETED | 5.7s | Archived to openspec/archive/realtime-notifications/ |
+
+**Phase D COMPLETE** — realtime-notifications feature fully closed.
+
+### Ten-Step Cycle: All Phases Complete
+
+```
+Phase A (Plan)    → DONE (specs and tasks created)
+Phase B (Develop) → DONE (feature implemented and tested)
+Phase C (Integrate) → DONE (PR #156 merged to main)
+Phase D (Close)   → DONE (progress updated, spec archived)
+```
+
+**Feature realtime-notifications: CLOSED** — Ten-step cycle complete.

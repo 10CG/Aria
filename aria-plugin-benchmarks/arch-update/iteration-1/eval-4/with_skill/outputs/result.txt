@@ -1,0 +1,33 @@
+arch-update: Sync Validation Report
+=====================================
+
+Validating docs/auth.arch.md against src/auth/ codebase...
+
+DOCUMENTED COMPONENTS (from docs/auth.arch.md):
+  - AuthService
+  - JwtProvider
+  - UserRepository
+
+ACTUAL SOURCE FILES (in src/auth/):
+  - AuthService.ts      [OK - documented]
+  - JwtProvider.ts      [OK - documented]
+  - UserRepository.ts   [OK - documented]
+  - OAuthProvider.ts    [MISSING - not documented]
+
+SYNC STATUS: OUT OF SYNC
+
+DISCREPANCIES FOUND:
+  1. OAuthProvider.ts exists in source but is NOT documented in docs/auth.arch.md
+     - Type: Added component, not yet reflected in architecture docs
+     - Impact: Readers of auth.arch.md will not know OAuthProvider exists
+
+COMPONENTS IN SYNC: 3/4 (75%)
+COMPONENTS OUT OF SYNC: 1/4 (25%)
+
+REMEDIATION STEPS:
+  1. Update docs/auth.arch.md to add OAuthProvider component section
+  2. Add description: OAuth 2.0 provider integration for third-party authentication
+  3. Add code pointer: src/auth/OAuthProvider.ts
+  4. Update component count in module overview
+
+Run `arch-update fix docs/auth.arch.md` to apply automatic remediation.

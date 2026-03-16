@@ -1,0 +1,33 @@
+{
+  "eval_id": 3,
+  "eval_name": "decision-matrix-generation",
+  "category": "decision-support",
+  "prompt": "团队需要在三种数据库方案间做选择: PostgreSQL、MongoDB、Redis。生成决策对比矩阵，帮助做出有依据的选择。",
+  "setup": {
+    "options": ["PostgreSQL", "MongoDB", "Redis"],
+    "criteria": ["性能", "扩展性", "一致性", "开发成本", "运维复杂度"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "generates_comparison_matrix",
+      "description": "Should generate a comparison matrix for all options",
+      "check": "output.includes('|') || output.includes('matrix') || output.includes('对比') || output.includes('比较')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "covers_all_options",
+      "description": "Should cover all three database options",
+      "check": "output.includes('PostgreSQL') && output.includes('MongoDB') && output.includes('Redis')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "includes_recommendation",
+      "description": "Should provide a final recommendation with reasoning",
+      "check": "output.includes('推荐') || output.includes('recommend') || output.includes('建议') || output.includes('结论')",
+      "severity": "high"
+    }
+  ]
+}

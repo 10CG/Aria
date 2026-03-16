@@ -1,0 +1,41 @@
+{
+  "eval_id": 5,
+  "eval_name": "large-changeset-analysis",
+  "category": "scalability",
+  "prompt": "分析大型变更集 (22个文件) 并生成高效提交计划: files包含 backend(8), frontend(7), shared(3), tests(4), task_id=TASK-500, description=v2-api-migration",
+  "setup": {
+    "file_count": 22,
+    "module_count": 4,
+    "expected_max_groups": 6
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "handles_large_changeset",
+      "description": "Should successfully analyze 20+ file changes without errors",
+      "check": "output.includes('backend') && output.includes('frontend') && !output.includes('error') && !output.includes('错误')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "produces_structured_plan",
+      "description": "Should produce a structured grouping plan",
+      "check": "output.includes('plan') || output.includes('计划') || output.includes('Plan') || output.includes('Group') || output.includes('分组')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "groups_not_excessive",
+      "description": "Should not create excessive groups (keep manageable)",
+      "check": "output.match(/group\\s*[1-6]|Group\\s*[1-6]|分组\\s*[1-6]/i) || output.includes('migration')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "summarizes_total_commits",
+      "description": "Should provide total commit count summary",
+      "check": "output.match(/\\d+\\s*(commits|提交|commit)/) || output.includes('total') || output.includes('总计')",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-agent-suggestion",
+  "category": "multi-match",
+  "prompt": "Route this task: 'Design and implement a real-time notification system: push notifications on mobile (Flutter) and a WebSocket server on the backend (FastAPI), plus update the shared API contract.'",
+  "setup": {
+    "task_type": "multi_domain",
+    "file_paths": [
+      "mobile/lib/services/notification_service.dart",
+      "backend/src/websocket/notification_hub.py",
+      "shared/contracts/openapi/notifications.yaml"
+    ],
+    "keywords": ["push notifications", "Flutter", "WebSocket", "FastAPI", "API contract"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "suggests_mobile_developer",
+      "description": "Should suggest mobile-developer for Flutter push notification work",
+      "check": "output.includes('mobile-developer')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "suggests_backend_architect",
+      "description": "Should suggest backend-architect for WebSocket/FastAPI work",
+      "check": "output.includes('backend-architect')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_parallel_work",
+      "description": "Should identify that work can proceed in parallel",
+      "check": "output.match(/parallel|concurrent|simultaneously|both|two agents/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "provides_task_split",
+      "description": "Should provide a task breakdown per agent",
+      "check": "output.match(/mobile|backend/i) && output.match(/split|breakdown|assign/i)",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+# Subagent Driver - Context Handoff
+
+> **Operation**: Minimal Context Handoff for TASK-004
+> **Principle**: Pass only what is necessary, nothing more
+> **Status**: Context package compiled (minimal)
+
+---
+
+## Context Minimization Analysis
+
+Subagent Driver evaluated all available context and selected only what is relevant to TASK-004.
+
+**TASK-004**: 实现密码重置功能 (Password Reset Feature)
+**Direct Dependencies**: TASK-001 (user model), TASK-003 (login API)
+
+---
+
+## Context Included / Excluded
+
+| Context Item | Included | Reason |
+|--------------|----------|--------|
+| TASK-004 spec | YES | Required - primary task definition |
+| TASK-001 output (user model) | YES | Required - dependency, defines user schema |
+| TASK-003 output (login API) | YES | Required - dependency, defines auth patterns |
+| TASK-002 output (register API) | NO | Not a direct dependency of TASK-004 |
+| Full conversation history | NO | Not necessary for task execution |
+| Unrelated project files | NO | Not necessary for task execution |
+| TASK-005/006/007 specs | NO | Future tasks, not yet relevant |
+
+**Context reduction**: From ~12,000 tokens (full context) to ~2,400 tokens (minimal context). 80% reduction.
+
+---
+
+## Handoff Package for TASK-004
+
+```yaml
+handoff:
+  task_id: "TASK-004"
+  task_name: "实现密码重置功能"
+  spec:
+    description: "实现忘记密码邮件发送和密码重置链接功能"
+    complexity: "L"
+    estimated_hours: "8-12h"
+    agent_type: "backend-architect"
+  deliverables:
+    - "backend/api/auth/forgot_password.py"
+    - "backend/api/auth/reset_password.py"
+    - "backend/services/email_service.py"
+    - "backend/tests/test_password_reset.py"
+  dependency_outputs:
+    - task: "TASK-001"
+      relevant_files:
+        - path: "backend/models/user.py"
+          key_info: "User model fields: id, email, password_hash, reset_token, reset_token_expires"
+    - task: "TASK-003"
+      relevant_files:
+        - path: "backend/utils/jwt_handler.py"
+          key_info: "JWT utilities - reusable for reset token generation"
+  acceptance_criteria:
+    - "忘记密码邮件发送成功"
+    - "重置密码链接有效（24h 过期）"
+    - "密码更新成功并使旧 token 失效"
+```
+
+---
+
+## Minimal Context Principles Applied
+
+1. Only **direct dependencies** included (TASK-001, TASK-003)
+2. Only **relevant fields** from dependency outputs, not full files
+3. Spec limited to **TASK-004 scope** only
+4. No conversation history or parent context passed

@@ -1,0 +1,15 @@
+{
+  "eval_id": 7,
+  "eval_name": "requirements-status-check",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains '📄 需求状态' section with '✅ 已配置需求追踪', 'PRD: prd-user-management-v1.md (Active)', 'User Stories: 10 个', and detailed story breakdown (ready: 4, in_progress: 2, done: 4)",
+      "text": "reports_requirements_status"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,49 @@
+{
+  "eval_id": 2,
+  "eval_name": "quickfix-with-tdd-double-insurance",
+  "category": "partial-cycle",
+  "description": "Quick bugfix using Phase B->C only, verifying TDD double-insurance (Method A + Method B)",
+  "prompt": "Fix a null pointer exception in the payment service - simple 3-file change",
+  "skills_involved": [
+    "state-scanner", "workflow-runner", "phase-b-developer", "branch-manager",
+    "tdd-enforcer", "subagent-driver", "branch-finisher",
+    "phase-c-integrator", "commit-msg-generator"
+  ],
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "skips_phase_a",
+      "description": "Level 1 change should skip Phase A (no spec needed)",
+      "check": "!output.includes('Phase A') || output.includes('Phase A: SKIP')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "tdd_method_b_session_hook",
+      "description": "workflow-runner pre-hook should activate TDD enforcer at session level",
+      "check": "output.match(/tdd-enforcer.*session|Method B.*active|pre-hook.*TDD/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "tdd_method_a_subagent",
+      "description": "subagent-driver should pass TDD constraints to Fresh Subagent",
+      "check": "output.match(/tdd.*subagent|Method A.*constraint|RED.*GREEN.*REFACTOR/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "commit_type_is_fix",
+      "description": "Commit message must use 'fix' type for bugfix",
+      "check": "output.match(/fix\\(.*\\):/)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "branch_mode_is_branch",
+      "description": "Simple 3-file fix should use Branch mode (not Worktree)",
+      "check": "output.match(/Branch.*mode|mode.*branch/i) && !output.includes('Worktree mode')",
+      "severity": "high"
+    }
+  ]
+}

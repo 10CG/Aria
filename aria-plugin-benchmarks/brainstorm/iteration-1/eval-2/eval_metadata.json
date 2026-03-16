@@ -1,0 +1,33 @@
+{
+  "eval_id": 2,
+  "eval_name": "requirements-clarification",
+  "category": "clarification",
+  "prompt": "需求「优化系统性能」非常模糊。通过提问提取出可操作的具体需求，识别出不清晰的部分。",
+  "setup": {
+    "vague_requirement": "优化系统性能",
+    "clarification_target": ["specific_metric", "scope", "baseline", "target_value"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "identifies_ambiguity",
+      "description": "Should identify the vague/ambiguous aspects of the requirement",
+      "check": "output.includes('模糊') || output.includes('unclear') || output.includes('ambiguous') || output.includes('不明确')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "asks_clarifying_questions",
+      "description": "Should ask targeted questions to extract specific requirements",
+      "check": "output.includes('性能指标') || output.includes('metric') || output.includes('具体') || output.includes('specific')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "extracts_measurable_criteria",
+      "description": "Should help extract measurable acceptance criteria",
+      "check": "output.includes('ms') || output.includes('秒') || output.includes('%') || output.includes('可测量')",
+      "severity": "high"
+    }
+  ]
+}

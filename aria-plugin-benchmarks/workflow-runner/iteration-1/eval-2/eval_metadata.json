@@ -1,0 +1,41 @@
+{
+  "eval_id": 2,
+  "eval_name": "partial-cycle-ab",
+  "category": "partial-cycle",
+  "prompt": "Run only Phase A + Phase B for task: 'Fix pagination bug on product list'. Skip Phase C and D as this is a small fix that will be committed manually.",
+  "setup": {
+    "workflow_type": "partial",
+    "phases": ["A", "B"],
+    "task": "Fix pagination bug on product list"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "executes_phase_a",
+      "description": "Should execute Phase A steps",
+      "check": "output.match(/A\\.0|A\\.1|A\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "executes_phase_b",
+      "description": "Should execute Phase B steps",
+      "check": "output.match(/B\\.1|B\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "skips_phase_c_and_d",
+      "description": "Should NOT execute Phase C or D steps",
+      "check": "!output.match(/C\\.1|C\\.2/) && !output.match(/D\\.1|D\\.2/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "acknowledges_partial_run",
+      "description": "Should indicate this is a partial cycle run",
+      "check": "output.match(/partial|A\\+B|Phase A.*Phase B|skipped/i)",
+      "severity": "high"
+    }
+  ]
+}

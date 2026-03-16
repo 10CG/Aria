@@ -1,0 +1,40 @@
+{
+  "eval_id": 3,
+  "eval_name": "state-token-generation",
+  "category": "state-token",
+  "prompt": "Generate a stateToken for quick state recovery. Project: 'api-refactor-v2'. Tasks: T1=completed, T2=completed, T3=in_progress, T4=pending, T5=pending. Iteration: 2.",
+  "setup": {
+    "project": "api-refactor-v2",
+    "iteration": 2,
+    "tasks": {
+      "T1": "completed",
+      "T2": "completed",
+      "T3": "in_progress",
+      "T4": "pending",
+      "T5": "pending"
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "state_token_present",
+      "description": "Output must include a stateToken field",
+      "check": "output.match(/stateToken|state_token|STATE_TOKEN/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "token_encodes_progress",
+      "description": "Token or accompanying metadata must encode progress (2/5 = 40%)",
+      "check": "output.match(/40%|2\\/5|2 of 5/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "token_is_compact",
+      "description": "stateToken should be a compact string suitable for machine parsing",
+      "check": "output.match(/[A-Za-z0-9+/=_-]{8,}/)",
+      "severity": "medium"
+    }
+  ]
+}

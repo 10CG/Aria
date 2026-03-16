@@ -1,0 +1,101 @@
+# Phase D — D.2 Spec Archival: oauth2-social-login
+
+**Skill**: phase-d-closer v1.0.0
+**Spec**: oauth2-social-login
+**Source**: openspec/changes/oauth2-social-login/
+**Archive**: openspec/archive/oauth2-social-login/
+**Timestamp**: 2026-03-16T14:31:00Z
+
+---
+
+## D.2 — Spec Archival
+
+### Source Contents (before archival)
+
+```
+openspec/changes/oauth2-social-login/
+├── proposal.md          (87 lines)
+├── tasks.md             (142 lines)
+├── detailed-tasks.yaml  (198 lines)
+└── progress.yaml        (completed status)
+```
+
+### Archival Action
+
+Moving completed OpenSpec to archive directory...
+
+```bash
+# Create archive directory
+$ mkdir -p openspec/archive/oauth2-social-login
+
+# Move all spec files to archive
+$ git mv openspec/changes/oauth2-social-login/proposal.md \
+         openspec/archive/oauth2-social-login/proposal.md
+
+$ git mv openspec/changes/oauth2-social-login/tasks.md \
+         openspec/archive/oauth2-social-login/tasks.md
+
+$ git mv openspec/changes/oauth2-social-login/detailed-tasks.yaml \
+         openspec/archive/oauth2-social-login/detailed-tasks.yaml
+
+$ git mv openspec/changes/oauth2-social-login/progress.yaml \
+         openspec/archive/oauth2-social-login/progress.yaml
+```
+
+### Adding Completion Metadata
+
+Writing archive metadata file...
+
+```yaml
+# openspec/archive/oauth2-social-login/archive-meta.yaml
+spec: oauth2-social-login
+archived_at: "2026-03-16T14:31:00Z"
+completed_at: "2026-03-16T14:30:00Z"
+pr: 143
+pr_url: "https://github.com/org/project/pull/143"
+merged_to: main
+merged_commit: d4e8b09
+tasks_total: 6
+tasks_completed: 6
+level: 3
+outcome: success
+notes: "Full OAuth2 social login implemented for GitHub and Google providers"
+```
+
+### Archive Contents (after archival)
+
+```
+openspec/archive/oauth2-social-login/
+├── proposal.md          (87 lines) — preserved
+├── tasks.md             (142 lines) — preserved
+├── detailed-tasks.yaml  (198 lines) — preserved
+├── progress.yaml        (completed) — preserved
+└── archive-meta.yaml    (NEW — completion metadata)
+```
+
+### Cleanup Source Directory
+
+```bash
+$ rmdir openspec/changes/oauth2-social-login
+$ git add -A
+$ git commit -m "chore(archive): archive completed spec oauth2-social-login
+
+Spec archived to openspec/archive/oauth2-social-login/
+Completion: PR #143 merged 2026-03-16, 6/6 tasks done"
+```
+
+---
+
+## D.2 Status
+
+| Action | Result |
+|--------|--------|
+| Source files found | 4 files |
+| Files moved to archive | 4/4 |
+| proposal.md preserved | YES |
+| tasks.md preserved | YES |
+| Completion metadata added | YES (archive-meta.yaml) |
+| Source directory cleaned | YES |
+| Archived with git commit | YES |
+
+**D.2 COMPLETE** — Spec successfully archived to openspec/archive/oauth2-social-login/

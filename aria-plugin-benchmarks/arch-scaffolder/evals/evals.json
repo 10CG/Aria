@@ -1,0 +1,275 @@
+{
+  "skill_name": "arch-scaffolder",
+  "skill_path": "aria/skills/arch-scaffolder",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for arch-scaffolder skill - Generates System Architecture document skeleton from PRD",
+  "baseline_comparison": {
+    "method": "manual_arch_doc_creation",
+    "description": "Manually reading the PRD and writing an architecture document from scratch"
+  },
+  "metrics": [
+    "prd_extraction_completeness",
+    "template_population_accuracy",
+    "module_identification_correctness",
+    "tech_stack_detection_accuracy",
+    "output_format_compliance"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "prd-extraction",
+      "category": "input-parsing",
+      "prompt": "Extract the key architectural information from the following PRD: 'We are building a SaaS task management platform. Users can create projects, assign tasks, and track progress. The system must support 10,000 concurrent users, integrate with Slack and GitHub, and provide a REST API for third-party integrations. Data must be persisted in a relational database with full audit logging.'",
+      "setup": {
+        "prd_content": "SaaS task management platform with user projects, task assignment, progress tracking, 10k concurrent users, Slack/GitHub integration, REST API, relational DB, audit logging",
+        "extraction_targets": ["core_features", "non_functional_requirements", "integrations", "constraints"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "extracts_core_features",
+          "description": "Should extract core features: projects, tasks, progress tracking",
+          "check": "output.match(/project|task.*assign|progress.*track/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "extracts_nfr_scalability",
+          "description": "Should extract the scalability NFR (10,000 concurrent users)",
+          "check": "output.match(/10[,.]?000|concurrent.*user|scalab/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "extracts_integrations",
+          "description": "Should extract Slack and GitHub integrations",
+          "check": "output.match(/Slack|GitHub/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "extracts_api_requirement",
+          "description": "Should extract REST API requirement",
+          "check": "output.match(/REST.*API|API.*REST|third.*party.*integrat/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "extracts_data_requirements",
+          "description": "Should extract relational DB and audit logging requirements",
+          "check": "output.match(/relational.*database|audit.*log|DB/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "template-population",
+      "category": "template",
+      "prompt": "Given the PRD for the task management SaaS platform, populate the standard architecture template with sections: Overview, System Context, Modules, Technology Stack, Non-Functional Requirements, and Integration Points.",
+      "setup": {
+        "template_sections": [
+          "Overview",
+          "System Context",
+          "Modules",
+          "Technology Stack",
+          "Non-Functional Requirements",
+          "Integration Points"
+        ],
+        "prd_summary": "SaaS task management platform"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_overview_section",
+          "description": "Should have a populated Overview section",
+          "check": "output.match(/## Overview|# Overview/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_modules_section",
+          "description": "Should have a populated Modules section",
+          "check": "output.match(/## Modules|## Module|# Modules/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "has_tech_stack_section",
+          "description": "Should have a populated Technology Stack section",
+          "check": "output.match(/## Technology|## Tech Stack|## Stack/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "has_nfr_section",
+          "description": "Should have a Non-Functional Requirements section",
+          "check": "output.match(/Non-Functional|NFR|non.*functional/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "has_integration_section",
+          "description": "Should have an Integration Points section",
+          "check": "output.match(/## Integration|Integration.*Points/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A6",
+          "name": "no_unfilled_placeholders",
+          "description": "Should not have any unfilled template placeholders like [TBD] or {{placeholder}}",
+          "check": "!output.match(/\\[TBD\\]|\\{\\{.*\\}\\}|\\[PLACEHOLDER\\]/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "module-identification",
+      "category": "analysis",
+      "prompt": "Analyze the task management SaaS PRD and identify the key system modules that should be represented in the architecture document.",
+      "setup": {
+        "prd_features": [
+          "user registration and login",
+          "project creation and management",
+          "task assignment and tracking",
+          "Slack and GitHub integrations",
+          "REST API for third parties",
+          "audit logging",
+          "notifications"
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "identifies_auth_module",
+          "description": "Should identify an authentication/user management module",
+          "check": "output.match(/auth|user.*management|identity|login/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_core_domain_module",
+          "description": "Should identify core domain modules (projects and tasks)",
+          "check": "output.match(/project.*module|task.*module|core.*domain|project.*management/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_integration_module",
+          "description": "Should identify an integration module for Slack/GitHub",
+          "check": "output.match(/integration.*module|external.*integrat|connector|webhook/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "identifies_api_module",
+          "description": "Should identify an API module or gateway for REST endpoints",
+          "check": "output.match(/api.*module|api.*gateway|REST.*module|endpoint/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "provides_module_count",
+          "description": "Should identify at least 4 distinct modules",
+          "check": "output.match(/module.*[4-9]|[4-9].*module|4 module|5 module|6 module|7 module/i)",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "tech-stack-detection",
+      "category": "analysis",
+      "prompt": "From the task management SaaS PRD, detect or infer the appropriate technology stack. The PRD mentions: REST API, relational database, 10k concurrent users, Slack integration, GitHub integration, and SaaS deployment.",
+      "setup": {
+        "prd_hints": [
+          "REST API",
+          "relational database",
+          "10,000 concurrent users",
+          "Slack integration via webhooks",
+          "GitHub integration",
+          "SaaS deployment"
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "identifies_api_framework",
+          "description": "Should detect or suggest an appropriate API framework",
+          "check": "output.match(/Express|FastAPI|Django|Rails|Spring|NestJS|Fastify|framework/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_database",
+          "description": "Should identify a relational database technology",
+          "check": "output.match(/PostgreSQL|MySQL|SQLite|SQL Server|relational|RDBMS/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "addresses_scalability_tech",
+          "description": "Should address technology choices for the 10k concurrent users requirement",
+          "check": "output.match(/load.*balanc|horizontal.*scal|Redis|cache|queue|async/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "mentions_integration_tech",
+          "description": "Should mention integration technology (webhooks, OAuth, SDK)",
+          "check": "output.match(/webhook|OAuth|SDK|API.*key|integration.*technolog/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "output-format-compliance",
+      "category": "format-validation",
+      "prompt": "Generate a complete architecture document skeleton for the task management SaaS platform. The output must follow the standard architecture document template format.",
+      "setup": {
+        "expected_format": "markdown",
+        "required_sections": ["title", "overview", "modules", "tech-stack", "nfr"],
+        "naming": "ARCHITECTURE.md"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "is_valid_markdown",
+          "description": "Output must be valid markdown with H1/H2 headings",
+          "check": "output.match(/^# .+/m) && output.match(/^## .+/m)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_document_title",
+          "description": "Document must have a clear H1 title related to the system",
+          "check": "output.match(/^# .*(Architecture|System|Platform)/im)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "sections_in_logical_order",
+          "description": "Overview section should appear before Modules section",
+          "check": "output.indexOf('Overview') < output.indexOf('Module')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "uses_consistent_heading_levels",
+          "description": "Main sections should be H2, sub-sections should be H3",
+          "check": "output.match(/^## /m) && !output.match(/^#### /m)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "includes_metadata_header",
+          "description": "Document should include version/date metadata at the top",
+          "check": "output.match(/version|date|updated|v[0-9]/i)",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

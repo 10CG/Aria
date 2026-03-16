@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "incremental-update",
+  "timestamp": "2026-03-16T08:05:00Z",
+  "assertions": [
+    {
+      "text": "adds_new_component_only",
+      "passed": true,
+      "evidence": "Output shows new '### OAuthProvider' section added with full component description"
+    },
+    {
+      "text": "preserves_existing_content",
+      "passed": true,
+      "evidence": "Output lists 'AuthService section: [preserved]', 'JwtProvider section: [preserved]', 'UserRepository section: [preserved]'"
+    },
+    {
+      "text": "indicates_incremental_mode",
+      "passed": true,
+      "evidence": "Output states 'Mode: INCREMENTAL (appending new section only, not regenerating)' and 'mode: incremental (partial update)'"
+    },
+    {
+      "text": "updates_table_of_contents",
+      "passed": true,
+      "evidence": "Output shows updated TABLE OF CONTENTS with 'OAuthProvider [newly added]' entry"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

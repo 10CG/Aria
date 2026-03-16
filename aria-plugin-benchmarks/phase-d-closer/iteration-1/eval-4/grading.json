@@ -1,0 +1,27 @@
+{
+  "eval_id": 4,
+  "eval_name": "partial-completion",
+  "timestamp": "2026-03-16T14:33:19Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output shows scan result 'NOT FOUND' for spec directory and states 'D.2: skip — no spec to archive'",
+      "text": "detects_no_spec_to_archive"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "D.2 section shows 'Status: SKIP' and 'D.2 SKIPPED (N/A — Level 1, no spec exists)'",
+      "text": "skips_d2_archival"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "D.1 section records minimal progress note in YAML changelog with 'D.1 COMPLETE — Minimal progress note recorded'",
+      "text": "records_minimal_progress"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

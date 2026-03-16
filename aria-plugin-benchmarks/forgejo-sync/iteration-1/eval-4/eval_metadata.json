@@ -1,0 +1,38 @@
+{
+  "eval_id": 4,
+  "eval_name": "label-mapping",
+  "category": "metadata",
+  "prompt": "映射 Story 元数据到 Forgejo Labels: story_id=US-001, priority=high, module=backend, type=feature, sprint=Sprint-3, repo=10cg/my-project",
+  "setup": {
+    "story_id": "US-001",
+    "metadata": {
+      "priority": "high",
+      "module": "backend",
+      "type": "feature",
+      "sprint": "Sprint-3"
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "maps_priority_label",
+      "description": "Should map priority to a Forgejo label",
+      "check": "output.includes('high') || output.includes('priority') || output.includes('优先级') || output.includes('label')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "maps_module_label",
+      "description": "Should map module identifier to a label",
+      "check": "output.includes('backend') || output.includes('module') || output.includes('模块')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "maps_type_label",
+      "description": "Should map story type to a label",
+      "check": "output.includes('feature') || output.includes('type') || output.includes('类型')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+arch-common: Document Placement Rules
+======================================
+
+Applying arch-common placement rules to project with modules:
+  src/auth/, src/payment/, src/notifications/
+
+PLACEMENT MAP:
+
+  L0 - Project Root:
+    /ARCHITECTURE.md
+    (Lives at project root, covers entire system)
+
+  L1 - Module Level (colocated with module source):
+    src/auth/auth.arch.md
+    src/payment/payment.arch.md
+    src/notifications/notifications.arch.md
+
+  L2 - Component Level (colocated with component, as needed):
+    src/auth/{component-name}.arch.md
+    src/payment/{component-name}.arch.md
+    src/notifications/{component-name}.arch.md
+
+COLOCATION PRINCIPLE:
+  Architecture documentation lives alongside the code it describes.
+  This ensures:
+    1. Docs are easy to find when reading code in an IDE
+    2. Docs are updated alongside code in the same commit/PR
+    3. The relationship between code and docs is unambiguous
+
+DIRECTORY STRUCTURE EXAMPLE:
+  /
+  ├── ARCHITECTURE.md          (L0 - project overview)
+  ├── src/
+  │   ├── auth/
+  │   │   ├── auth.arch.md     (L1 - auth module doc)
+  │   │   ├── AuthService.ts
+  │   │   └── JwtProvider.ts
+  │   ├── payment/
+  │   │   ├── payment.arch.md  (L1 - payment module doc)
+  │   │   └── PaymentService.ts
+  │   └── notifications/
+  │       ├── notifications.arch.md  (L1 - notifications module doc)
+  │       └── NotificationService.ts
+
+RULE: Never put L1/L2 docs in a separate /docs/ folder away from the source code.
+      Keep them next to the code they document (colocation).

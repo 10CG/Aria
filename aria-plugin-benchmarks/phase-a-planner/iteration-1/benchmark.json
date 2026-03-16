@@ -1,0 +1,100 @@
+{
+  "benchmark_name": "phase-a-planner",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:00:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "orchestration_completeness": "100%",
+        "skip_condition_accuracy": "100%",
+        "state_detection_correctness": "100%",
+        "output_format_compliance": "100%",
+        "error_recovery_robustness": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "orchestration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "skip-logic": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "state-detection": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "output-format": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "error-handling": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "full-cycle-execution",
+      "category": "orchestration",
+      "with_skill": "PASS",
+      "key_finding": "Full A.1→A.2→A.3 sequence executed correctly; proposal.md created, tasks.md generated, agents allocated"
+    },
+    {
+      "eval_id": 2,
+      "name": "skip-condition-detection",
+      "category": "skip-logic",
+      "with_skill": "PASS",
+      "key_finding": "Level 1 skip correctly detected for typo fix; no spec created, reason explained"
+    },
+    {
+      "eval_id": 3,
+      "name": "existing-spec-detection",
+      "category": "state-detection",
+      "with_skill": "PASS",
+      "key_finding": "Existing proposal.md detected; A.1 skipped, proceeded directly to A.2 task planning"
+    },
+    {
+      "eval_id": 4,
+      "name": "yaml-output-format",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "Execution plan output includes all A.1/A.2/A.3 steps with status fields and artifact references"
+    },
+    {
+      "eval_id": 5,
+      "name": "error-recovery",
+      "category": "error-handling",
+      "with_skill": "PASS",
+      "key_finding": "Unclean state detected and reported; execution blocked with git stash resolution steps provided"
+    }
+  ],
+  "strengths": [
+    "Correct sequential orchestration of A.1→A.2→A.3 steps",
+    "Accurate Level 1 skip detection for trivial changes",
+    "Reliable detection of existing spec artifacts",
+    "Well-structured execution plan output with step status",
+    "Robust unclean-state detection with actionable recovery steps"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with real OpenSpec documents for end-to-end Phase A validation",
+    "Add edge cases for partially completed Phase A (e.g., proposal exists but tasks.md is missing)",
+    "Test cross-agent handoff behavior when A.3 assigns multiple agents"
+  ],
+  "status": "completed"
+}

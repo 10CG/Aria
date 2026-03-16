@@ -1,0 +1,46 @@
+# Spec Drafter — Level Judgment
+
+> **Skill**: spec-drafter v2.0.0
+> **Input**: "修复登录页面一个 typo"
+> **Timestamp**: 2026-03-16T14:24:00Z
+
+## Level Judgment: Level 1 (Skip)
+
+**No proposal.md required for this change.**
+
+---
+
+## Reasoning
+
+The request is to fix a **typo** on the login page. This is a trivial, cosmetic text correction:
+
+- **Scope**: 1 file, 1 character/word change
+- **Business impact**: None (no logic change)
+- **Risk**: Minimal (text-only modification)
+- **Reversible**: Yes, in a single commit
+
+This qualifies as **Level 1 — Skip** under the OpenSpec level classification:
+
+| Criterion | Assessment |
+|-----------|------------|
+| Complexity | Trivial |
+| Files affected | 1 |
+| Logic change | None |
+| Spec required | No |
+| Recommended level | **Level 1 (Skip)** |
+
+---
+
+## OpenSpec Level Reference
+
+| Level | Name | When to Use | Requires |
+|-------|------|-------------|----------|
+| **L1** | **Skip** | Simple fixes, typos, cosmetic changes | Nothing |
+| L2 | Minimal | New features, API changes | proposal.md |
+| L3 | Full | Architectural changes, epics | proposal.md + tasks.md |
+
+---
+
+## Recommendation
+
+Proceed directly to implementation. Create a branch, fix the typo, commit with `fix(login): correct typo on login page label`, and merge. No spec document needed.

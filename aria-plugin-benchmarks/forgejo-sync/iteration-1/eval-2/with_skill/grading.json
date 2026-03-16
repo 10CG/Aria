@@ -1,0 +1,25 @@
+{
+  "eval_id": 2,
+  "eval_name": "prd-to-wiki-publish",
+  "timestamp": "2026-03-16T14:11:00Z",
+  "assertions": [
+    {
+      "text": "publishes_to_wiki",
+      "passed": true,
+      "evidence": "Output shows Wiki API POST request and '发布成功' in result summary, 'Wiki' mentioned throughout"
+    },
+    {
+      "text": "references_prd_path",
+      "passed": true,
+      "evidence": "Output references 'openspec/changes/user-auth/proposal.md' as source file in multiple places"
+    },
+    {
+      "text": "sets_wiki_page_name",
+      "passed": true,
+      "evidence": "Output uses 'User-Auth-PRD' as wiki_page name in API request and result summary"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "PRD successfully published to Forgejo Wiki page 'User-Auth-PRD' with source path reference and version tracking"
+}

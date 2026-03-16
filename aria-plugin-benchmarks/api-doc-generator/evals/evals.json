@@ -1,0 +1,253 @@
+{
+  "skill_name": "api-doc-generator",
+  "skill_path": "aria/skills/api-doc-generator",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for api-doc-generator skill - Generates API documentation and OpenAPI specs from code",
+  "baseline_comparison": {
+    "method": "manual_doc_writing",
+    "description": "Developer manually reads source code and writes API documentation"
+  },
+  "metrics": [
+    "openapi_spec_validity",
+    "endpoint_extraction_accuracy",
+    "schema_generation_correctness",
+    "framework_detection_accuracy",
+    "output_format_compliance"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "openapi-generation",
+      "category": "spec-generation",
+      "prompt": "Generate an OpenAPI 3.0 specification from the following FastAPI route code:\n\n```python\n@router.post('/users', response_model=UserResponse, status_code=201)\nasync def create_user(user: UserCreate, db: Session = Depends(get_db)):\n    '''Create a new user account'''\n    return await user_service.create(user, db)\n\n@router.get('/users/{user_id}', response_model=UserResponse)\nasync def get_user(user_id: int, db: Session = Depends(get_db)):\n    '''Get user by ID'''\n    return await user_service.get_by_id(user_id, db)\n```",
+      "expected_openapi_version": "3.0.x",
+      "setup": {
+        "framework": "fastapi",
+        "source_file": "backend/src/routes/users.py",
+        "endpoints": [
+          {"method": "POST", "path": "/users", "status": 201},
+          {"method": "GET", "path": "/users/{user_id}"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_openapi_version",
+          "description": "Output must declare OpenAPI version 3.0.x",
+          "check": "output.match(/openapi.*3\\.0|OpenAPI.*3\\.0/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_post_users",
+          "description": "Spec must include POST /users endpoint",
+          "check": "output.match(/post.*\\/users|\\/users.*post/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "includes_get_user_by_id",
+          "description": "Spec must include GET /users/{user_id} endpoint",
+          "check": "output.match(/get.*\\/users\\/\\{user_id\\}|\\/users\\/\\{user_id\\}.*get/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "correct_status_codes",
+          "description": "POST /users must show 201 status code",
+          "check": "output.includes('201')",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "valid_yaml_or_json_structure",
+          "description": "Output must be in valid YAML or JSON structure",
+          "check": "output.includes('paths:') || output.includes('\"paths\":')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "endpoint-extraction",
+      "category": "code-analysis",
+      "prompt": "Extract all API endpoints from this Express.js router file:\n\n```javascript\nrouter.get('/products', authenticate, productController.list);\nrouter.get('/products/:id', authenticate, productController.getById);\nrouter.post('/products', authenticate, authorize('admin'), productController.create);\nrouter.put('/products/:id', authenticate, authorize('admin'), productController.update);\nrouter.delete('/products/:id', authenticate, authorize('admin'), productController.delete);\n```",
+      "expected_endpoints": 5,
+      "setup": {
+        "framework": "express",
+        "source_file": "backend/src/routes/products.js",
+        "auth_middleware": "authenticate",
+        "admin_middleware": "authorize('admin')"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "extracts_all_5_endpoints",
+          "description": "Should extract all 5 endpoints from the router",
+          "check": "output.match(/GET.*\\/products|POST.*\\/products|PUT.*\\/products|DELETE.*\\/products/g)?.length >= 4",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_http_methods",
+          "description": "Should correctly identify GET, POST, PUT, DELETE methods",
+          "check": "output.match(/GET/i) && output.match(/POST/i) && output.match(/PUT/i) && output.match(/DELETE/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_path_params",
+          "description": "Should identify :id or {id} path parameters",
+          "check": "output.match(/\\{id\\}|:id|path.*param/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "notes_auth_requirements",
+          "description": "Should note authentication/authorization requirements",
+          "check": "output.match(/auth|authenticate|authorize|admin/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "schema-generation",
+      "category": "schema",
+      "prompt": "Generate request and response schemas for a user registration endpoint based on this Pydantic model:\n\n```python\nclass UserCreate(BaseModel):\n    email: EmailStr\n    password: str = Field(min_length=8, max_length=64)\n    full_name: str = Field(max_length=100)\n    role: Optional[str] = 'user'\n\nclass UserResponse(BaseModel):\n    id: int\n    email: EmailStr\n    full_name: str\n    role: str\n    created_at: datetime\n```",
+      "setup": {
+        "framework": "fastapi",
+        "model_file": "backend/src/schemas/user.py",
+        "request_model": "UserCreate",
+        "response_model": "UserResponse"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "generates_request_schema",
+          "description": "Should generate a schema for UserCreate (request body)",
+          "check": "output.match(/UserCreate|request.*schema|requestBody/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "generates_response_schema",
+          "description": "Should generate a schema for UserResponse",
+          "check": "output.match(/UserResponse|response.*schema/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "includes_field_constraints",
+          "description": "Should include field constraints (min/max length, required/optional)",
+          "check": "output.match(/minLength|min_length|maxLength|max_length|required/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "includes_field_types",
+          "description": "Should include correct field types (string, integer, datetime)",
+          "check": "output.match(/string|integer|datetime/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "marks_optional_fields",
+          "description": "Optional fields (role) should be marked as not required",
+          "check": "output.match(/optional|not required|role.*default|default.*user/i)",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "multi-framework-support",
+      "category": "framework",
+      "prompt": "Detect the framework and generate endpoint documentation for each of these three code snippets:\n\n1. FastAPI: `@app.get('/health') async def health_check(): return {'status': 'ok'}`\n2. Express: `app.get('/health', (req, res) => res.json({ status: 'ok' }))`\n3. Flask: `@app.route('/health', methods=['GET']) def health_check(): return jsonify({'status': 'ok'})`",
+      "expected_frameworks": ["fastapi", "express", "flask"],
+      "setup": {
+        "multi_framework": true,
+        "endpoints": [
+          {"framework": "fastapi", "method": "GET", "path": "/health"},
+          {"framework": "express", "method": "GET", "path": "/health"},
+          {"framework": "flask", "method": "GET", "path": "/health"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_fastapi",
+          "description": "Should detect and label FastAPI framework",
+          "check": "output.match(/FastAPI|fastapi/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "detects_express",
+          "description": "Should detect and label Express.js framework",
+          "check": "output.match(/Express|express/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "detects_flask",
+          "description": "Should detect and label Flask framework",
+          "check": "output.match(/Flask|flask/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "documents_all_three_endpoints",
+          "description": "Should document all three /health endpoints",
+          "check": "output.match(/\\/health/g)?.length >= 3",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "markdown-doc-output",
+      "category": "output-format",
+      "prompt": "Generate human-readable Markdown API documentation for a payments API with: POST /payments (create payment), GET /payments/{id} (get payment status), DELETE /payments/{id} (cancel payment). Include examples.",
+      "setup": {
+        "output_format": "markdown",
+        "api_name": "Payments API",
+        "endpoints": [
+          {"method": "POST", "path": "/payments"},
+          {"method": "GET", "path": "/payments/{id}"},
+          {"method": "DELETE", "path": "/payments/{id}"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "markdown_headers",
+          "description": "Output must use Markdown headers (# or ##)",
+          "check": "output.match(/^#{1,3} /m)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "documents_all_endpoints",
+          "description": "Should document POST /payments, GET /payments/{id}, DELETE /payments/{id}",
+          "check": "output.match(/POST.*\\/payments/i) && output.match(/GET.*\\/payments/i) && output.match(/DELETE.*\\/payments/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "includes_code_examples",
+          "description": "Should include request/response code examples",
+          "check": "output.includes('```') || output.includes('curl') || output.includes('example')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "includes_response_format",
+          "description": "Should describe response format for each endpoint",
+          "check": "output.match(/response|Response|200|201|204/i)",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

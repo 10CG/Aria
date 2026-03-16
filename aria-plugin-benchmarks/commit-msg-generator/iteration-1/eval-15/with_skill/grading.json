@@ -1,35 +1,29 @@
 {
-  "eval_id": "eval-15",
-  "assertions": {
-    "A1": {
-      "name": "standard_format",
-      "description": "Must follow '<type>(<scope>): <subject>' format",
+  "eval_id": 15,
+  "eval_name": "eval-15",
+  "timestamp": "2026-03-16T22:30:00Z",
+  "assertions": [
+    {
+      "text": "standard_format",
       "passed": true,
-      "reason": "Message follows 'feat(export): ...' format exactly"
+      "evidence": "Message follows 'feat(export): ...' format exactly"
     },
-    "A2": {
-      "name": "lowercase_type",
-      "description": "Type must be lowercase",
+    {
+      "text": "lowercase_type",
       "passed": true,
-      "reason": "Type 'feat' is lowercase"
+      "evidence": "Type 'feat' is lowercase"
     },
-    "A3": {
-      "name": "colon_after_scope",
-      "description": "Must have colon after scope",
+    {
+      "text": "colon_after_scope",
       "passed": true,
-      "reason": "Colon present after scope 'export)'"
+      "evidence": "Colon present after scope 'export)'"
     },
-    "A4": {
-      "name": "space_after_colon",
-      "description": "Must have space after colon before subject",
+    {
+      "text": "space_after_colon",
       "passed": true,
-      "reason": "Space present after colon before subject"
+      "evidence": "Space present after colon before subject"
     }
-  },
-  "overall": {
-    "passed": true,
-    "total_assertions": 4,
-    "passed_assertions": 4,
-    "score": 1.0
-  }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
 }

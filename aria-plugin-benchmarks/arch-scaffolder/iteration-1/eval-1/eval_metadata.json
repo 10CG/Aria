@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "eval_name": "prd-extraction",
+  "category": "input-parsing",
+  "prompt": "Extract the key architectural information from the following PRD: 'We are building a SaaS task management platform. Users can create projects, assign tasks, and track progress. The system must support 10,000 concurrent users, integrate with Slack and GitHub, and provide a REST API for third-party integrations. Data must be persisted in a relational database with full audit logging.'",
+  "setup": {
+    "prd_content": "SaaS task management platform with user projects, task assignment, progress tracking, 10k concurrent users, Slack/GitHub integration, REST API, relational DB, audit logging",
+    "extraction_targets": ["core_features", "non_functional_requirements", "integrations", "constraints"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "extracts_core_features",
+      "description": "Should extract core features: projects, tasks, progress tracking",
+      "check": "output.match(/project|task.*assign|progress.*track/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "extracts_nfr_scalability",
+      "description": "Should extract the scalability NFR (10,000 concurrent users)",
+      "check": "output.match(/10[,.]?000|concurrent.*user|scalab/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "extracts_integrations",
+      "description": "Should extract Slack and GitHub integrations",
+      "check": "output.match(/Slack|GitHub/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "extracts_api_requirement",
+      "description": "Should extract REST API requirement",
+      "check": "output.match(/REST.*API|API.*REST|third.*party.*integrat/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "extracts_data_requirements",
+      "description": "Should extract relational DB and audit logging requirements",
+      "check": "output.match(/relational.*database|audit.*log|DB/i)",
+      "severity": "high"
+    }
+  ]
+}

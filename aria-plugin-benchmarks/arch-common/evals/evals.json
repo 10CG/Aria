@@ -1,0 +1,187 @@
+{
+  "skill_name": "arch-common",
+  "skill_path": "aria/skills/arch-common",
+  "skill_version": "1.1.0",
+  "description": "Benchmark tests for arch-common skill - Shared configuration for architecture Skills defining L0/L1/L2 layer system and naming conventions",
+  "baseline_comparison": {
+    "method": "ad_hoc_convention",
+    "description": "Teams independently deciding on architecture doc naming and placement without shared standards"
+  },
+  "metrics": [
+    "layer_definition_accuracy",
+    "naming_convention_compliance",
+    "doc_location_correctness",
+    "cross_skill_compatibility"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "layer-hierarchy-definition",
+      "category": "layer-system",
+      "prompt": "Explain the L0/L1/L2 layer system defined in arch-common. What does each layer represent and what kind of documentation belongs at each level?",
+      "setup": {
+        "query_type": "definition",
+        "expected_layers": ["L0", "L1", "L2"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "defines_l0_as_project",
+          "description": "L0 should be defined as project-level documentation",
+          "check": "output.match(/L0.*project|project.*L0/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "defines_l1_as_module",
+          "description": "L1 should be defined as module-level documentation",
+          "check": "output.match(/L1.*module|module.*L1/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "defines_l2_as_component",
+          "description": "L2 should be defined as component-level documentation",
+          "check": "output.match(/L2.*component|component.*L2/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "explains_hierarchy_relationship",
+          "description": "Should explain the parent-child relationship between layers",
+          "check": "output.match(/L0.*contains.*L1|L1.*under.*L0|hierarchy|parent.*child/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "provides_concrete_examples",
+          "description": "Should provide concrete file path examples for each layer",
+          "check": "output.match(/ARCHITECTURE\\.md|\\*\\.arch\\.md|\\/docs\\//i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "naming-convention",
+      "category": "naming",
+      "prompt": "What are the architecture document naming conventions defined by arch-common? How should I name a project-level doc vs a module-level doc vs a component-level doc?",
+      "setup": {
+        "query_type": "naming_rules",
+        "context": "user wants to create new architecture docs"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "specifies_architecture_md_for_l0",
+          "description": "L0 project-level doc should be named ARCHITECTURE.md",
+          "check": "output.match(/ARCHITECTURE\\.md/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "specifies_arch_md_extension_for_l1_l2",
+          "description": "L1/L2 docs should use *.arch.md naming pattern",
+          "check": "output.match(/\\*\\.arch\\.md|\\.arch\\.md/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "gives_naming_examples",
+          "description": "Should give concrete naming examples (e.g. auth.arch.md, payment.arch.md)",
+          "check": "output.match(/[a-z]+\\.arch\\.md/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "explains_case_convention",
+          "description": "Should clarify case convention (uppercase ARCHITECTURE.md vs lowercase *.arch.md)",
+          "check": "output.match(/uppercase|ARCHITECTURE|lowercase|kebab/i)",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "doc-location-rules",
+      "category": "location",
+      "prompt": "Where should architecture documentation be placed for a project with modules at src/auth/, src/payment/, and src/notifications/? Apply arch-common placement rules.",
+      "setup": {
+        "project_structure": {
+          "modules": ["src/auth/", "src/payment/", "src/notifications/"],
+          "root": "/"
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "places_l0_at_root",
+          "description": "L0 ARCHITECTURE.md should be placed at the project root",
+          "check": "output.match(/\\/ARCHITECTURE\\.md|root.*ARCHITECTURE|ARCHITECTURE.*root/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "places_l1_inside_module",
+          "description": "L1 arch docs should be placed inside their respective module directories",
+          "check": "output.match(/src\\/auth\\/auth\\.arch\\.md|src\\/payment\\/payment\\.arch\\.md/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "covers_all_modules",
+          "description": "Should specify doc location for all three modules",
+          "check": "output.match(/auth.*arch|payment.*arch|notification.*arch/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "explains_colocation_principle",
+          "description": "Should explain that docs live alongside the code they describe",
+          "check": "output.match(/coloc|alongside|next to.*code|same.*directory|near.*source/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "cross-skill-compatibility",
+      "category": "integration",
+      "prompt": "How does arch-common integrate with arch-search and arch-update skills? Explain the shared configuration points.",
+      "setup": {
+        "skills_to_check": ["arch-search", "arch-update"],
+        "query_type": "integration"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "mentions_arch_search_integration",
+          "description": "Should explain how arch-common config is used by arch-search",
+          "check": "output.match(/arch-search|arch_search/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "mentions_arch_update_integration",
+          "description": "Should explain how arch-common config is used by arch-update",
+          "check": "output.match(/arch-update|arch_update/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_shared_config",
+          "description": "Should identify the shared configuration elements (layer definitions, naming rules)",
+          "check": "output.match(/shared.*config|common.*config|layer.*definition|naming.*convention/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "explains_consistency_benefit",
+          "description": "Should explain why shared config ensures consistent behavior across skills",
+          "check": "output.match(/consistent|unified|single.*source|shared.*standard/i)",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

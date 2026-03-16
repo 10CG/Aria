@@ -1,0 +1,41 @@
+{
+  "eval_id": 3,
+  "eval_name": "four-option-completion",
+  "category": "completion-flow",
+  "prompt": "分支开发完成，提供完成选项: branch=feature/backend/TASK-101-user-auth, tests=passed, show_options=true",
+  "setup": {
+    "branch": "feature/backend/TASK-101-user-auth",
+    "tests_passed": true,
+    "expected_options": ["merge", "PR", "keep", "abort"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "presents_merge_option",
+      "description": "Should present merge as a completion option",
+      "check": "output.includes('merge') || output.includes('合并') || output.includes('Merge')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "presents_pr_option",
+      "description": "Should present PR creation as a completion option",
+      "check": "output.includes('PR') || output.includes('Pull Request') || output.includes('pull request')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "presents_keep_option",
+      "description": "Should present keep branch option",
+      "check": "output.includes('keep') || output.includes('保留') || output.includes('Keep')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "presents_abort_option",
+      "description": "Should present abort/cancel option",
+      "check": "output.includes('abort') || output.includes('取消') || output.includes('Abort') || output.includes('cancel')",
+      "severity": "high"
+    }
+  ]
+}

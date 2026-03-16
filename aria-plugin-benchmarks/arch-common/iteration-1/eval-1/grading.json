@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "layer-hierarchy-definition",
+  "timestamp": "2026-03-16T08:31:00Z",
+  "assertions": [
+    {
+      "text": "defines_l0_as_project",
+      "passed": true,
+      "evidence": "Output states 'L0 - Project Level' with scope 'Entire project / system overview'"
+    },
+    {
+      "text": "defines_l1_as_module",
+      "passed": true,
+      "evidence": "Output states 'L1 - Module Level' with scope 'A single module or bounded context'"
+    },
+    {
+      "text": "defines_l2_as_component",
+      "passed": true,
+      "evidence": "Output states 'L2 - Component Level' with scope 'A single component, class, or service'"
+    },
+    {
+      "text": "explains_hierarchy_relationship",
+      "passed": true,
+      "evidence": "Output shows hierarchy tree 'L0 (Project) contains L1 (Module) contains L2 (Component)' with parent-child explanation"
+    },
+    {
+      "text": "provides_concrete_examples",
+      "passed": true,
+      "evidence": "Output provides examples: '/ARCHITECTURE.md', 'src/auth/auth.arch.md', 'src/auth/UserRepository.arch.md'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

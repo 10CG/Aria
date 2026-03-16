@@ -1,0 +1,45 @@
+{
+  "eval_id": 5,
+  "eval_name": "markdown-doc-output",
+  "category": "output-format",
+  "prompt": "Generate human-readable Markdown API documentation for a payments API with: POST /payments (create payment), GET /payments/{id} (get payment status), DELETE /payments/{id} (cancel payment). Include examples.",
+  "setup": {
+    "output_format": "markdown",
+    "api_name": "Payments API",
+    "endpoints": [
+      {"method": "POST", "path": "/payments"},
+      {"method": "GET", "path": "/payments/{id}"},
+      {"method": "DELETE", "path": "/payments/{id}"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "markdown_headers",
+      "description": "Output must use Markdown headers (# or ##)",
+      "check": "output.match(/^#{1,3} /m)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "documents_all_endpoints",
+      "description": "Should document POST /payments, GET /payments/{id}, DELETE /payments/{id}",
+      "check": "output.match(/POST.*\\/payments/i) && output.match(/GET.*\\/payments/i) && output.match(/DELETE.*\\/payments/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "includes_code_examples",
+      "description": "Should include request/response code examples",
+      "check": "output.includes('```') || output.includes('curl') || output.includes('example')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "includes_response_format",
+      "description": "Should describe response format for each endpoint",
+      "check": "output.match(/response|Response|200|201|204/i)",
+      "severity": "high"
+    }
+  ]
+}

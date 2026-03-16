@@ -1,0 +1,40 @@
+{
+  "eval_id": 4,
+  "eval_name": "yaml-output-format",
+  "category": "output-format",
+  "prompt": "Execute Phase A for: Implement real-time notifications via WebSocket. Generate execution plan with step status.",
+  "setup": {
+    "feature": "realtime-notifications",
+    "expected_format": "execution-plan"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_execution_plan",
+      "description": "Should output an execution plan structure",
+      "check": "output.includes('execution_plan') || output.includes('phase_a') || output.includes('Phase A Plan')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "includes_step_status",
+      "description": "Each step should show its status (pending/completed/skipped)",
+      "check": "output.includes('status') || output.includes('completed') || output.includes('pending') || output.includes('skipped')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "lists_all_three_steps",
+      "description": "Output must reference all three phase steps A.1, A.2, A.3",
+      "check": "output.includes('A.1') && output.includes('A.2') && output.includes('A.3')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "includes_outputs_reference",
+      "description": "Should reference generated artifacts (proposal.md, tasks.md)",
+      "check": "output.includes('proposal') || output.includes('tasks') || output.includes('artifacts')",
+      "severity": "medium"
+    }
+  ]
+}

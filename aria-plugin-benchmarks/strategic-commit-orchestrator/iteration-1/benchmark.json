@@ -1,0 +1,106 @@
+{
+  "benchmark_name": "strategic-commit-orchestrator",
+  "skill_version": "2.3.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:00:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "grouping_accuracy": "100%",
+        "format_compliance": "100%",
+        "dependency_ordering": "100%",
+        "scalability": "100%",
+        "cross_module_detection": "4 modules identified",
+        "max_files_handled": "22 files",
+        "conventional_commits_adherence": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "grouping-logic": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "format-validation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "ordering": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "scalability": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "single-module-grouping",
+      "category": "grouping-logic",
+      "with_skill": "PASS",
+      "key_finding": "Correctly grouped 3 files into 2 groups: auth implementation and tests"
+    },
+    {
+      "eval_id": 2,
+      "name": "cross-module-grouping",
+      "category": "grouping-logic",
+      "with_skill": "PASS",
+      "key_finding": "Identified 4 modules, created 3 commit groups with shared types as dependency group"
+    },
+    {
+      "eval_id": 3,
+      "name": "commit-message-format",
+      "category": "format-validation",
+      "with_skill": "PASS",
+      "key_finding": "Generated feat(auth): header with body, subject length within 50 chars, no trailing period"
+    },
+    {
+      "eval_id": 4,
+      "name": "dependency-ordering",
+      "category": "ordering",
+      "with_skill": "PASS",
+      "key_finding": "Shared types committed first, implementation before tests, dependency rationale explained"
+    },
+    {
+      "eval_id": 5,
+      "name": "large-changeset-analysis",
+      "category": "scalability",
+      "with_skill": "PASS",
+      "key_finding": "Successfully analyzed 22-file changeset, produced 5-group structured plan with total commit summary"
+    }
+  ],
+  "grouping_algorithm": {
+    "description": "AI-DDD commit grouping based on module boundaries and dependency analysis",
+    "principles": [
+      "Group by module boundary (backend, frontend, shared, mobile)",
+      "Separate implementation from tests",
+      "Shared/types changes always in first commit group",
+      "Maximum 6 groups for changesets up to 50 files"
+    ]
+  },
+  "strengths": [
+    "Accurate module boundary detection",
+    "Correct conventional commits format generation",
+    "Dependency-aware ordering algorithm",
+    "Handles large changesets (20+ files) without degradation",
+    "Clear rationale for grouping decisions"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with actual git diff output from real repositories",
+    "Add edge cases for circular dependency detection",
+    "Test with monorepo structures"
+  ],
+  "status": "completed"
+}

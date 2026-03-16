@@ -1,0 +1,78 @@
+# Agent Allocation: 后端 API 开发任务
+
+> **Spec**: Agent allocation request
+> **Task Type**: Backend API Development
+> **Recommended Agent**: backend-architect
+
+## Task Analysis
+
+### 任务特征识别
+
+| 维度 | 分析 |
+|------|------|
+| **技术领域** | Backend API 开发 |
+| **主要语言** | Python / Go / Java |
+| **涉及层级** | API 路由、服务层、数据层 |
+| **关键交付物** | API endpoints, services, models |
+
+## Agent 分配建议
+
+### 推荐 Agent: backend-architect
+
+**匹配理由**:
+- 后端 API 开发是 backend-architect 的核心能力领域
+- 涉及 API 设计、数据模型、服务架构等 Backend 专业技能
+- backend-architect 熟悉 RESTful 设计规范和后端最佳实践
+
+### Agent 能力匹配矩阵
+
+| Agent | 匹配度 | 理由 |
+|-------|--------|------|
+| **backend-architect** | **95%** | API 设计、服务实现、数据库交互 |
+| fullstack-developer | 60% | 可执行但非专精 |
+| frontend-developer | 10% | 不匹配后端任务 |
+
+## 任务分解与 Agent 映射
+
+### TASK-001: API 接口设计
+- **Complexity**: M
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/api/routes.py
+  - backend/api/schemas.py
+  - docs/api-spec.yaml
+
+### TASK-002: 服务层实现
+- **Complexity**: M
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/services/main_service.py
+  - backend/utils/validators.py
+
+### TASK-003: 数据模型与迁移
+- **Complexity**: M
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/models/data_model.py
+  - backend/migrations/001_initial.sql
+
+### TASK-004: API 测试编写
+- **Complexity**: S
+- **Agent**: backend-architect
+- **Deliverables**:
+  - backend/tests/test_api.py
+  - backend/tests/test_services.py
+
+## Execution Order
+TASK-003 → TASK-002 → TASK-001 → TASK-004
+
+## Summary
+| Complexity | Count | Hours |
+|------------|-------|-------|
+| S | 1 | 4h |
+| M | 3 | 12h |
+| **Total** | **4** | **16h** |
+
+## Agent Allocation Summary
+- **backend-architect** (4 tasks): 全部后端 API 开发任务
+- 后端 API 开发任务天然适合 backend-architect，无需跨 Agent 协作

@@ -1,0 +1,81 @@
+# Forgejo Sync - Bidirectional Status Sync
+
+## 同步任务
+
+- **Story**: US-001 (status: in-progress)
+- **Forgejo Issue**: #42 (status: open)
+- **Direction**: bidirectional
+- **Repository**: 10cg/my-project
+
+## 双向同步分析
+
+### 状态映射表
+
+| Story Status | Forgejo Issue Status | Label |
+|-------------|---------------------|-------|
+| `backlog` | `open` | status:backlog |
+| `in-progress` | `open` | status:in-progress |
+| `review` | `open` | status:review |
+| `completed` | `closed` | - |
+| `blocked` | `open` | status:blocked |
+
+**当前**: Story `in-progress` ↔ Issue `open` (一致)
+
+---
+
+## Step 1: Story → Issue 同步 (方向 A)
+
+### 更新 Issue #42 状态标签
+
+```json
+POST https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues/42/labels
+{
+  "labels": [12]
+}
+```
+
+Label #12 = `status:in-progress`
+
+**响应**:
+```json
+{"number": 42, "state": "open", "labels": [{"name": "status:in-progress"}]}
+```
+
+### 更新 Issue 内容 (进度同步)
+
+```json
+PATCH https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues/42
+{
+  "body": "[上次内容...]\n\n---\n*Status synced: in-progress (2026-03-16)*"
+}
+```
+
+---
+
+## Step 2: Issue → Story 双向反映 (方向 B)
+
+读取 Issue #42 的最新评论和状态:
+
+```
+GET https://forgejo.10cg.pub/api/v1/repos/10cg/my-project/issues/42/comments
+```
+
+**Issue 最新评论**: 无新评论 (状态已一致)
+
+双向同步 (bidirectional) 检查:
+- Issue #42 状态: `open` → 对应 Story `in-progress` ✅
+- Story US-001 状态: `in-progress` → 已反映至 Issue ✅
+- 同步方向: Story ↔ Issue (bidirectional) ✅
+
+---
+
+## 同步结果
+
+| 操作 | 详情 | 状态 |
+|------|------|------|
+| Story US-001 状态 | in-progress | ✅ |
+| Issue #42 label 更新 | status:in-progress 已添加 | ✅ |
+| 双向同步验证 | Story ↔ Issue 状态一致 | ✅ |
+| **整体同步** | **完成** | **✅** |
+
+双向同步 (bidirectional) 完成: US-001 ↔ Issue #42 状态已同步。

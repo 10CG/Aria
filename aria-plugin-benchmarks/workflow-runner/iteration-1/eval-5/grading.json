@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "phase-skip-logic",
+  "timestamp": "2026-03-16T10:25:30Z",
+  "assertions": [
+    {
+      "text": "detects_phase_a_completed",
+      "passed": true,
+      "evidence": "Output shows 'Detected current state: A.3 completed' in the state check section"
+    },
+    {
+      "text": "skips_phase_a",
+      "passed": true,
+      "evidence": "No 'running A.0' or 'executing A.1' entries; Phase A section shows 'SKIPPED (A.3 already completed)'"
+    },
+    {
+      "text": "starts_from_phase_b",
+      "passed": true,
+      "evidence": "Output section 'Resuming from Phase B (B.1 first)' and B.1 is the first executed step"
+    },
+    {
+      "text": "explains_skip_reason",
+      "passed": true,
+      "evidence": "Output states 'OpenSpec exists' and 'A.3 is done' as skip reasons, with explicit 'Skip reason:' label"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

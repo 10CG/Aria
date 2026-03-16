@@ -1,0 +1,98 @@
+# Deliverables Identification: 添加 OTP 登录功能
+
+> **Spec**: OTP (One-Time Password) 登录功能
+> **Total Deliverables**: 15 files
+> **Affected Modules**: auth, sms, database
+
+## 交付物清单
+
+### 1. 数据库迁移文件
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `backend/migrations/add_otp_table.sql` | 创建 OTP 记录表 | P0 |
+| `backend/migrations/alter_users_add_phone.sql` | 用户表添加手机号字段 | P0 |
+
+**迁移说明**:
+- OTP 表需要存储: otp_code, user_id, phone_number, expires_at, is_used
+- 用户表需要新增 phone_number 字段 (支持 OTP 登录绑定)
+
+### 2. 后端 API 交付物
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `backend/api/auth/otp_login.py` | OTP 登录接口 | P0 |
+| `backend/api/auth/otp_request.py` | 请求发送 OTP 接口 | P0 |
+| `backend/api/auth/otp_verify.py` | 验证 OTP 接口 | P0 |
+
+### 3. 服务层交付物
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `backend/services/otp_service.py` | OTP 生成与验证逻辑 | P0 |
+| `backend/services/sms_service.py` | 短信发送服务 | P0 |
+| `backend/models/otp.py` | OTP 数据模型 | P0 |
+
+### 4. 配置文件交付物
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `backend/config/sms_config.py` | 短信服务商配置 | P1 |
+| `backend/config/otp_config.py` | OTP 策略配置 (有效期、长度、重试限制) | P1 |
+
+### 5. 前端交付物
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `frontend/src/pages/OTPLoginPage.dart` | OTP 登录页面 | P1 |
+| `frontend/src/components/OTPInput.dart` | OTP 输入组件 | P1 |
+
+### 6. 测试交付物
+
+| 文件路径 | 说明 | 优先级 |
+|----------|------|--------|
+| `backend/tests/test_otp_service.py` | OTP 服务单元测试 | P1 |
+| `backend/tests/test_otp_api.py` | OTP API 集成测试 | P1 |
+
+## 交付物分类汇总
+
+| 类别 | 文件数 | 关键文件 |
+|------|--------|----------|
+| 数据库迁移 | 2 | add_otp_table.sql, alter_users_add_phone.sql |
+| API 接口 | 3 | otp_login.py, otp_request.py, otp_verify.py |
+| 服务层 | 3 | otp_service.py, sms_service.py, otp.py |
+| 配置 | 2 | sms_config.py, otp_config.py |
+| 前端 | 2 | OTPLoginPage.dart, OTPInput.dart |
+| 测试 | 2 | test_otp_service.py, test_otp_api.py |
+| **总计** | **14** | - |
+
+## 依赖关系
+
+```
+数据库迁移 (migration)
+  ├── add_otp_table.sql
+  └── alter_users_add_phone.sql
+         │
+         ▼
+服务层 (backend)
+  ├── otp.py (model)
+  ├── otp_service.py
+  └── sms_service.py
+         │
+         ▼
+API 层 (backend)
+  ├── otp_request.py
+  ├── otp_verify.py
+  └── otp_login.py
+         │
+         ▼
+前端 (frontend)
+  ├── OTPLoginPage.dart
+  └── OTPInput.dart
+```
+
+## Notes
+- 数据库迁移是最基础的交付物，必须首先完成
+- sms_service.py 需要对接第三方短信服务商 (如 Twilio, 阿里云短信)
+- OTP 配置建议: 6 位数字, 5 分钟有效期, 每日最多 10 次请求
+- 前端使用 .dart 文件 (Flutter 项目)

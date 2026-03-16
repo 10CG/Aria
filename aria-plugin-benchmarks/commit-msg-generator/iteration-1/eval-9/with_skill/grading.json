@@ -1,17 +1,22 @@
 {
   "eval_id": 9,
   "eval_name": "refs-document",
-  "result": "PASS",
-  "score": 1.0,
+  "timestamp": "2026-03-16T22:30:00Z",
   "assertions": [
     {
       "id": "A1",
-      "name": "refs_footer",
       "description": "Should include 'Refs:' with document path",
       "expected": "commit_message.includes('Refs:') && commit_message.includes('docs/designs/auth-system.md')",
       "status": "PASS",
-      "reason": "Commit message includes 'Refs: docs/designs/auth-system.md'"
+      "reason": "Commit message includes 'Refs: docs/designs/auth-system.md'",
+      "text": "refs_footer",
+      "passed": true,
+      "evidence": "No evidence recorded"
     }
   ],
-  "commit_message": "feat(auth): 实现JWT认证功能\n\n基于 auth-system.md 设计文档实现认证系统。\n\n- 创建 JWT token 生成服务\n- 添加认证中间件\n- 添加单元测试\n\nRefs: docs/designs/auth-system.md"
+  "verdict": "PASS",
+  "pass_rate": 1.0,
+  "notes": {
+    "commit_message": "feat(auth): 实现JWT认证功能\n\n基于 auth-system.md 设计文档实现认证系统。\n\n- 创建 JWT token 生成服务\n- 添加认证中间件\n- 添加单元测试\n\nRefs: docs/designs/auth-system.md"
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "eval_id": 3,
+  "eval_name": "bugfix-branch-naming",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "description": "Should use bugfix prefix in branch name",
+      "check": "output.includes('bugfix/mobile/ISSUE-42-login-crash')",
+      "severity": "critical",
+      "passed": true,
+      "evidence": "Output contains 'bugfix/mobile/ISSUE-42-login-crash' in branch name generation section",
+      "text": "correct_bugfix_format"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Bugfix branch naming follows the correct format: bugfix/{module}/{issue}-{description}"
+}

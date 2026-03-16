@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "tech-stack-detection",
+  "timestamp": "2026-03-16T09:04:00Z",
+  "assertions": [
+    {
+      "text": "identifies_api_framework",
+      "passed": true,
+      "evidence": "Output states 'Framework: NestJS (Node.js)' under API LAYER with rationale"
+    },
+    {
+      "text": "identifies_database",
+      "passed": true,
+      "evidence": "Output states 'Primary: PostgreSQL' with 'Relational database requirement; strong ACID guarantees for audit logging'"
+    },
+    {
+      "text": "addresses_scalability_tech",
+      "passed": true,
+      "evidence": "Output identifies Redis for caching and load balancer as scalability technology for 10,000 concurrent users"
+    },
+    {
+      "text": "mentions_integration_tech",
+      "passed": true,
+      "evidence": "Output specifies 'OAuth 2.0 App credentials' for Slack and 'OAuth App (GitHub OAuth flow)' for GitHub integration technology"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

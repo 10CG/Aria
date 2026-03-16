@@ -1,0 +1,36 @@
+{
+  "eval_id": 1,
+  "eval_name": "progress-update-execution",
+  "category": "progress-flow",
+  "prompt": "Execute Phase D D.1: Update progress status for completed spec oauth2-social-login. PR #143 merged to main. All 6 tasks complete.",
+  "setup": {
+    "spec_name": "oauth2-social-login",
+    "pr_number": 143,
+    "tasks_total": 6,
+    "tasks_completed": 6,
+    "pr_merged": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "updates_progress_status",
+      "description": "Should update the spec progress to 'completed' or 'merged' status",
+      "check": "output.includes('completed') || output.includes('merged') || output.includes('done') || output.includes('status: complete')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "records_pr_reference",
+      "description": "Should record the PR number in progress tracking",
+      "check": "output.includes('PR #143') || output.includes('#143') || output.includes('pull request')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "marks_all_tasks_complete",
+      "description": "Should mark all 6 tasks as completed in the progress record",
+      "check": "output.includes('6/6') || output.includes('all tasks') || output.includes('6 tasks') || output.includes('TASK-006')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "state-block-generation",
+  "timestamp": "2026-03-16T10:11:30Z",
+  "assertions": [
+    {
+      "text": "has_upmv2_header",
+      "passed": true,
+      "evidence": "Output contains '<!-- UPMv2-STATE: refactor-api -->' as the block header"
+    },
+    {
+      "text": "lists_all_tasks",
+      "passed": true,
+      "evidence": "Output contains T1, T2, and T3 in the tasks section"
+    },
+    {
+      "text": "correct_statuses",
+      "passed": true,
+      "evidence": "T1: completed, T2: in_progress, T3: pending — all match input specification"
+    },
+    {
+      "text": "machine_readable_format",
+      "passed": true,
+      "evidence": "Block enclosed in '```' code fence and HTML comment markers for machine parsing"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,69 @@
+# Phase D — D.1 Progress Update: oauth2-social-login
+
+**Skill**: phase-d-closer v1.0.0
+**Spec**: oauth2-social-login
+**Trigger**: PR #143 merged to main
+**Timestamp**: 2026-03-16T14:30:00Z
+
+---
+
+## D.1 — Progress Status Update
+
+### Current State (before update)
+
+```yaml
+# openspec/changes/oauth2-social-login/progress.yaml (reading...)
+spec: oauth2-social-login
+status: in-progress
+pr: null
+tasks_completed: 5
+tasks_total: 6
+last_updated: "2026-03-15T18:00:00Z"
+```
+
+### Update Action
+
+PR #143 confirmed merged to main. Updating progress record...
+
+```yaml
+# openspec/changes/oauth2-social-login/progress.yaml (updated)
+spec: oauth2-social-login
+status: completed
+pr: 143
+pr_url: "https://github.com/org/project/pull/143"
+tasks_completed: 6
+tasks_total: 6
+completion_rate: "6/6 (100%)"
+completed_at: "2026-03-16T14:30:00Z"
+last_updated: "2026-03-16T14:30:00Z"
+merged_to: main
+merged_commit: d4e8b09
+```
+
+### Task Completion Record
+
+| Task | Title | Status | Completed |
+|------|-------|--------|-----------|
+| TASK-001 | OAuth2 DB schema migration | DONE | 2026-03-15 |
+| TASK-002 | GitHub OAuth2 callback | DONE | 2026-03-15 |
+| TASK-003 | Google OAuth2 callback | DONE | 2026-03-16 |
+| TASK-004 | Account linking service | DONE | 2026-03-16 |
+| TASK-005 | Frontend social login buttons | DONE | 2026-03-16 |
+| TASK-006 | Integration tests | DONE | 2026-03-16 |
+
+**6/6 tasks completed** — all tasks marked done.
+
+---
+
+## D.1 Status
+
+| Field | Value |
+|-------|-------|
+| Progress status | completed |
+| PR reference | PR #143 |
+| Tasks | 6/6 complete |
+| Merged to | main (d4e8b09) |
+| Completion timestamp | 2026-03-16T14:30:00Z |
+
+**D.1 COMPLETE** — Progress updated successfully.
+Proceeding to D.2 spec archival.

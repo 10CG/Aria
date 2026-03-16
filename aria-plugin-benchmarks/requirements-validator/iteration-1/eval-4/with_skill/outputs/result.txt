@@ -1,0 +1,44 @@
+# Missing Reference Detection Report
+
+> **Source Document**: US-003
+> **Validator**: requirements-validator v2.1.0
+> **Timestamp**: 2026-03-16T14:06:00Z
+
+## Validation Result: FAIL — 2 Broken References Found
+
+US-003 contains **2 broken cross-references** to documents that do not exist.
+
+---
+
+## Broken Reference Details
+
+### [CRITICAL] Broken Reference #1: PRD-007 (not found)
+- **Reference in**: US-003, field `PRD-Ref: PRD-007`
+- **Expected**: A PRD document with ID PRD-007
+- **Status**: PRD-007 does not exist in the document registry
+- **Impact**: US-003 cannot be traced to a valid product requirement
+- **Action**: Either create PRD-007 or correct the reference to an existing PRD ID
+
+### [HIGH] Broken Reference #2: ARCH-004 (not found)
+- **Reference in**: US-003, field `Arch-Ref: ARCH-004`
+- **Expected**: An architecture section or document with ID ARCH-004
+- **Status**: ARCH-004 does not exist in the architecture registry
+- **Impact**: US-003 lacks a valid technical architecture anchor
+- **Action**: Either create ARCH-004 or correct the reference to an existing architecture section
+
+---
+
+## Reference Scan Summary
+
+| Reference | Type | Status |
+|-----------|------|--------|
+| PRD-007 | PRD | NOT FOUND |
+| ARCH-004 | Architecture | NOT FOUND |
+
+**Total broken references: 2**
+**Total references scanned: 2**
+**Reference integrity: 0% (0/2 valid)**
+
+## Recommendation
+
+Resolve all broken references before US-003 can be marked as ready for development. Verify document IDs against the current registry and update references accordingly.

@@ -1,0 +1,15 @@
+{
+  "eval_id": 5,
+  "eval_name": "quick-fix-recommendation",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains '[1] quick-fix (推荐) — Level 1 快速修复' and '仅 1 文件 typo 修复，适用快速流程'",
+      "text": "recommends_quick_fix"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

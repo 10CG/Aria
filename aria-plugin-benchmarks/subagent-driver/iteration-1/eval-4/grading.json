@@ -1,0 +1,24 @@
+{
+  "eval_id": 4,
+  "eval_name": "context-handoff",
+  "timestamp": "2026-03-16T14:06:45Z",
+  "assertions": [
+    {
+      "text": "includes_task_spec",
+      "passed": true,
+      "evidence": "Output includes 'TASK-004' spec with description, complexity, deliverables and acceptance_criteria in handoff package"
+    },
+    {
+      "text": "minimizes_context_size",
+      "passed": true,
+      "evidence": "Output explicitly shows '80% reduction' in context and table of excluded items including 'Full conversation history: NO' and 'Unrelated project files: NO'"
+    },
+    {
+      "text": "includes_dependency_outputs",
+      "passed": true,
+      "evidence": "Output includes dependency_outputs section with TASK-001 (user model) and TASK-003 (jwt_handler) relevant files, while TASK-002 is explicitly excluded as not a direct dependency"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

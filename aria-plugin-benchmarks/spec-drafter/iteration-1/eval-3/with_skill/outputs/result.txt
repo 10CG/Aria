@@ -1,0 +1,58 @@
+# Spec Drafter — Scope Extraction
+
+> **Skill**: spec-drafter v2.0.0
+> **Input**: "我们需要给用户添加一个通知系统，支持邮件和短信，但不包括推送通知"
+> **Timestamp**: 2026-03-16T14:28:00Z
+
+## Extracted Scope
+
+### In-Scope
+
+| # | Feature | Source Text |
+|---|---------|-------------|
+| 1 | Email notifications | "支持邮件" |
+| 2 | SMS notifications | "支持短信" |
+| 3 | Notification system core | "通知系统" |
+
+### Out-of-Scope
+
+| # | Feature | Source Text | Reason |
+|---|---------|-------------|--------|
+| 1 | Push notifications | "不包括推送通知" | Explicitly excluded by user |
+
+---
+
+## Scope Section for proposal.md
+
+```markdown
+## Scope
+
+### In-Scope
+- Email notification delivery to users
+- SMS notification delivery to users
+- Notification template management
+- Notification trigger integration
+
+### Out-of-Scope
+- Push notifications (mobile/browser) — explicitly excluded
+- In-app notification center (future consideration)
+```
+
+---
+
+## Parsing Notes
+
+- Input language: Chinese
+- Explicit exclusions found: 1 ("不包括推送通知" = "push notifications not included")
+- Implicit in-scope items inferred: notification system core infrastructure
+- Ambiguities: delivery preferences / user opt-out not mentioned — recommend clarifying
+
+---
+
+## Confidence
+
+| Item | Confidence | Notes |
+|------|------------|-------|
+| email in-scope | HIGH | Explicit: "支持邮件" |
+| SMS in-scope | HIGH | Explicit: "支持短信" |
+| push out-of-scope | HIGH | Explicit: "不包括推送通知" |

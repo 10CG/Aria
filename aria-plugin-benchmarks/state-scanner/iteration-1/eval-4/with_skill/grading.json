@@ -1,0 +1,15 @@
+{
+  "eval_id": 4,
+  "eval_name": "architecture-status-check",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains '🏗️ 架构状态' section with detailed architecture information including path, status, last_updated, and chain validity",
+      "text": "reports_architecture_status"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

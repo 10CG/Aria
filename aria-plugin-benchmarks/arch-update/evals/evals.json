@@ -1,0 +1,242 @@
+{
+  "skill_name": "arch-update",
+  "skill_path": "aria/skills/arch-update",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for arch-update skill - Architecture document creation, update, and validation",
+  "baseline_comparison": {
+    "method": "manual_doc_update",
+    "description": "Manually checking code changes and updating architecture docs by hand"
+  },
+  "metrics": [
+    "change_detection_accuracy",
+    "layer_classification_correctness",
+    "doc_generation_quality",
+    "sync_validation_accuracy",
+    "incremental_update_precision"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-file-detection",
+      "category": "change-detection",
+      "prompt": "Detect which new source files have been added to the project that require architecture documentation updates",
+      "setup": {
+        "new_files": [
+          "src/services/payment/PaymentService.ts",
+          "src/services/payment/PaymentGateway.ts",
+          "src/models/Payment.ts"
+        ],
+        "existing_docs": ["docs/ARCHITECTURE.md", "src/services/auth/auth.arch.md"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_new_source_files",
+          "description": "Should detect all newly added source files",
+          "check": "output.match(/PaymentService\\.ts|PaymentGateway\\.ts|Payment\\.ts/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_undocumented_files",
+          "description": "Should identify files lacking architecture documentation",
+          "check": "output.match(/undocumented|missing.*doc|no.*arch|needs.*doc/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "suggests_doc_location",
+          "description": "Should suggest appropriate documentation location",
+          "check": "output.match(/payment.*arch\\.md|arch.*payment|docs\\/.*payment/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "lists_affected_layers",
+          "description": "Should identify which architecture layer the new files belong to",
+          "check": "output.match(/L[012]|layer|module|component/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "layer-classification",
+      "category": "layer-system",
+      "prompt": "Classify the following files into the correct architecture layer: project root ARCHITECTURE.md, module-level auth.arch.md, and component-level UserRepository.arch.md",
+      "setup": {
+        "files_to_classify": [
+          {"path": "ARCHITECTURE.md", "expected_layer": "L0"},
+          {"path": "src/auth/auth.arch.md", "expected_layer": "L1"},
+          {"path": "src/auth/UserRepository.arch.md", "expected_layer": "L2"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "classifies_l0_correctly",
+          "description": "ARCHITECTURE.md at root should be classified as L0 (project level)",
+          "check": "output.match(/ARCHITECTURE\\.md.*L0|L0.*ARCHITECTURE\\.md|project.*level/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "classifies_l1_correctly",
+          "description": "Module-level arch.md should be classified as L1",
+          "check": "output.match(/auth\\.arch\\.md.*L1|L1.*auth|module.*level/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "classifies_l2_correctly",
+          "description": "Component-level arch.md should be classified as L2",
+          "check": "output.match(/UserRepository.*L2|L2.*UserRepository|component.*level/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "explains_layer_hierarchy",
+          "description": "Should explain the L0/L1/L2 hierarchy relationship",
+          "check": "output.match(/L0.*L1.*L2|project.*module.*component|hierarchy/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "doc-generation",
+      "category": "doc-creation",
+      "prompt": "Generate an architecture document for the newly added payment service module based on code analysis of src/services/payment/",
+      "setup": {
+        "source_directory": "src/services/payment/",
+        "files": [
+          "src/services/payment/PaymentService.ts",
+          "src/services/payment/PaymentGateway.ts",
+          "src/services/payment/PaymentValidator.ts"
+        ],
+        "layer": "L1"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "generates_valid_markdown",
+          "description": "Generated doc should be valid markdown with proper headings",
+          "check": "output.match(/^#.*Architecture|## Overview|## Components/im)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "includes_module_overview",
+          "description": "Should include an overview section describing the payment module",
+          "check": "output.match(/overview|purpose|description|payment.*service/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "lists_components",
+          "description": "Should list the key components found in the module",
+          "check": "output.match(/PaymentService|PaymentGateway|PaymentValidator/)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "includes_code_pointers",
+          "description": "Should include code file references/pointers",
+          "check": "output.match(/\\.ts|src\\/services\\/payment/)",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "correct_naming_convention",
+          "description": "Generated file should follow naming convention (*.arch.md)",
+          "check": "output.match(/payment\\.arch\\.md|ARCHITECTURE\\.md/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "sync-validation",
+      "category": "validation",
+      "prompt": "Validate that the existing architecture documentation is in sync with the current codebase. Check src/auth/ against docs/auth.arch.md",
+      "setup": {
+        "doc_path": "docs/auth.arch.md",
+        "source_path": "src/auth/",
+        "doc_references": ["AuthService", "JwtProvider", "UserRepository"],
+        "actual_files": ["AuthService.ts", "JwtProvider.ts", "UserRepository.ts", "OAuthProvider.ts"]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_undocumented_component",
+          "description": "Should detect OAuthProvider.ts is not documented in arch doc",
+          "check": "output.match(/OAuthProvider|undocumented|missing|not.*documented/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "reports_sync_status",
+          "description": "Should report overall sync status (in-sync / out-of-sync)",
+          "check": "output.match(/out.*sync|sync.*status|inconsistent|up.*to.*date/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "lists_discrepancies",
+          "description": "Should list specific discrepancies found",
+          "check": "output.match(/discrepanc|mismatch|missing|added|removed/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "suggests_remediation",
+          "description": "Should suggest how to fix the sync issues",
+          "check": "output.match(/update.*doc|add.*OAuthProvider|fix.*arch|remediat/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "incremental-update",
+      "category": "update-flow",
+      "prompt": "Update the existing src/auth/auth.arch.md to include the newly added OAuthProvider component without regenerating the entire document",
+      "setup": {
+        "existing_doc": "src/auth/auth.arch.md",
+        "new_component": "OAuthProvider.ts",
+        "existing_components": ["AuthService", "JwtProvider", "UserRepository"],
+        "update_type": "incremental"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "adds_new_component_only",
+          "description": "Should add OAuthProvider section without rewriting existing content",
+          "check": "output.match(/OAuthProvider|OAuth.*Provider/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "preserves_existing_content",
+          "description": "Should preserve existing AuthService, JwtProvider, UserRepository sections",
+          "check": "output.match(/AuthService|JwtProvider|UserRepository/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "indicates_incremental_mode",
+          "description": "Should indicate this is an incremental update, not a full regeneration",
+          "check": "output.match(/incremental|partial.*update|added.*section|append/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "updates_table_of_contents",
+          "description": "Should update any table of contents or component list",
+          "check": "output.match(/table.*contents|TOC|component.*list|updated.*index/i)",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

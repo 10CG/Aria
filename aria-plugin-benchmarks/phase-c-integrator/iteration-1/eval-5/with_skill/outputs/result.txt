@@ -1,0 +1,113 @@
+# Phase C — C.2 Merge Conflict Handling
+
+**Skill**: phase-c-integrator v1.1.0
+**Operation**: Merge feature/oauth2-social-login → main
+**Timestamp**: 2026-03-16T14:24:00Z
+
+---
+
+## Merge Attempt
+
+```bash
+$ git checkout main
+$ git merge feature/oauth2-social-login
+Auto-merging backend/api/auth/github_oauth.py
+Auto-merging backend/api/auth/google_oauth.py
+Auto-merging backend/services/account_linking.py
+CONFLICT (content): Merge conflict in backend/config/settings.py
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+---
+
+## Merge Conflict Detected
+
+**Phase C C.2 PAUSED — Manual intervention required.**
+
+### Conflict Summary
+
+| File | Type | Status |
+|------|------|--------|
+| backend/config/settings.py | Content conflict | UNRESOLVED |
+
+```bash
+$ git status
+On branch main
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   backend/config/settings.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### Conflict Content (backend/config/settings.py)
+
+```python
+<<<<<<< HEAD (main)
+OAUTH_PROVIDERS = {}
+DATABASE_URL = "postgresql://prod-server/app"
+=======
+OAUTH_PROVIDERS = {
+    'github': {'client_id': os.environ['GITHUB_CLIENT_ID']},
+    'google': {'client_id': os.environ['GOOGLE_CLIENT_ID']},
+}
+DATABASE_URL = "postgresql://prod-server/app"
+>>>>>>> feature/oauth2-social-login
+```
+
+**Conflict explanation**: `main` has `OAUTH_PROVIDERS = {}` (empty), while the feature branch adds GitHub and Google configuration. The `DATABASE_URL` is identical in both branches (not conflicting).
+
+---
+
+## Resolution Guidance
+
+### Recommended Resolution
+
+The feature branch change is correct — it adds the required OAuth configuration.
+Accept the feature branch version:
+
+**Step 1**: Open `backend/config/settings.py` in your editor and resolve the conflict markers:
+
+```python
+# RESOLVED: Keep the feature branch version
+OAUTH_PROVIDERS = {
+    'github': {'client_id': os.environ['GITHUB_CLIENT_ID']},
+    'google': {'client_id': os.environ['GOOGLE_CLIENT_ID']},
+}
+DATABASE_URL = "postgresql://prod-server/app"
+```
+
+**Step 2**: Mark the conflict as resolved and complete the merge:
+```bash
+$ git add backend/config/settings.py
+$ git commit -m "chore(merge): resolve conflict in settings.py — keep oauth provider config"
+```
+
+**Step 3**: Retry Phase C C.2 (PR creation):
+```bash
+# Resume phase-c-integrator after conflict is resolved
+```
+
+### Alternative: Abort merge
+```bash
+$ git merge --abort
+# Returns to pre-merge state on main
+```
+
+---
+
+## Conflict Status
+
+| Check | Result |
+|-------|--------|
+| Conflict detected | YES — 1 file |
+| Conflict file | backend/config/settings.py |
+| Other files auto-merged | YES (3 files clean) |
+| Resolution guidance | PROVIDED |
+
+**Merge paused** — Awaiting manual conflict resolution in `backend/config/settings.py`.
+After resolving, re-run Phase C to continue with PR creation.

@@ -1,0 +1,14 @@
+{
+  "total_tokens": 5630,
+  "duration_ms": 31200,
+  "total_duration_seconds": 31.2,
+  "phase_breakdown": {
+    "agent_routing":         { "tokens": 620,  "duration_ms": 2800 },
+    "branch_strategy":       { "tokens": 740,  "duration_ms": 3100 },
+    "parallel_execution": {
+      "backend_architect":   { "tokens": 1980, "duration_ms": 11600 },
+      "mobile_developer":    { "tokens": 1240, "duration_ms": 8400 }
+    },
+    "commit_orchestration":  { "tokens": 1050, "duration_ms": 5300 }
+  }
+}

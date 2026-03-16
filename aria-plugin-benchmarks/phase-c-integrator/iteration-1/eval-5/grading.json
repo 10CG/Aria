@@ -1,0 +1,27 @@
+{
+  "eval_id": 5,
+  "eval_name": "merge-conflict-handling",
+  "timestamp": "2026-03-16T14:24:26Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'CONFLICT (content): Merge conflict in backend/config/settings.py' and '<<<<<<< HEAD' merge conflict markers",
+      "text": "detects_merge_conflict"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output shows 'both modified: backend/config/settings.py' under 'Unmerged paths' and explicit conflict file table listing settings.py",
+      "text": "identifies_conflict_files"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'Resolution Guidance' section with 3 steps including 'git add backend/config/settings.py' and 'git commit' commands",
+      "text": "provides_resolution_guidance"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

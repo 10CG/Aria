@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "green-phase-validation",
+  "category": "tdd-cycle",
+  "prompt": "测试 test_create_user_success 已经写好并且失败了（RED）。开发者实现了 UserService.create() 方法。TDD Enforcer 应验证 GREEN 阶段。",
+  "setup": {
+    "current_phase": "GREEN",
+    "test_file": "tests/test_user_service.py",
+    "test_status": "was_red_now_implemented",
+    "implementation_file": "services/user_service.py"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "confirms_green_phase",
+      "description": "Should confirm that tests are now passing (GREEN)",
+      "check": "output.includes('GREEN') || output.includes('passing') || output.includes('通过')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "validates_minimal_implementation",
+      "description": "Should validate that implementation is minimal to pass tests",
+      "check": "output.includes('minimal') || output.includes('最小') || output.includes('只做') || output.includes('YAGNI')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "suggests_next_step",
+      "description": "Should suggest moving to REFACTOR phase",
+      "check": "output.includes('REFACTOR') || output.includes('重构') || output.includes('refactor') || output.includes('下一步')",
+      "severity": "medium"
+    }
+  ]
+}

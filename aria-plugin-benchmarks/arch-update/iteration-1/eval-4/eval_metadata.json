@@ -1,0 +1,42 @@
+{
+  "eval_id": 4,
+  "eval_name": "sync-validation",
+  "category": "validation",
+  "prompt": "Validate that the existing architecture documentation is in sync with the current codebase. Check src/auth/ against docs/auth.arch.md",
+  "setup": {
+    "doc_path": "docs/auth.arch.md",
+    "source_path": "src/auth/",
+    "doc_references": ["AuthService", "JwtProvider", "UserRepository"],
+    "actual_files": ["AuthService.ts", "JwtProvider.ts", "UserRepository.ts", "OAuthProvider.ts"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_undocumented_component",
+      "description": "Should detect OAuthProvider.ts is not documented in arch doc",
+      "check": "output.match(/OAuthProvider|undocumented|missing|not.*documented/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reports_sync_status",
+      "description": "Should report overall sync status (in-sync / out-of-sync)",
+      "check": "output.match(/out.*sync|sync.*status|inconsistent|up.*to.*date/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "lists_discrepancies",
+      "description": "Should list specific discrepancies found",
+      "check": "output.match(/discrepanc|mismatch|missing|added|removed/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "suggests_remediation",
+      "description": "Should suggest how to fix the sync issues",
+      "check": "output.match(/update.*doc|add.*OAuthProvider|fix.*arch|remediat/i)",
+      "severity": "high"
+    }
+  ]
+}

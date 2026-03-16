@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "worktree-cleanup",
+  "category": "cleanup",
+  "prompt": "清理 worktree: path=.git/worktrees/feature-backend-TASK-101, branch=feature/backend/TASK-101-user-auth, cleanup_mode=full",
+  "setup": {
+    "worktree_path": ".git/worktrees/feature-backend-TASK-101",
+    "branch": "feature/backend/TASK-101-user-auth",
+    "cleanup_mode": "full"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "removes_worktree",
+      "description": "Should execute git worktree remove command",
+      "check": "output.includes('worktree') && (output.includes('remove') || output.includes('删除') || output.includes('cleanup') || output.includes('清理'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "confirms_cleanup",
+      "description": "Should confirm worktree has been cleaned up",
+      "check": "output.includes('success') || output.includes('成功') || output.includes('done') || output.includes('完成') || output.includes('removed')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "references_worktree_path",
+      "description": "Should reference the worktree path being removed",
+      "check": "output.includes('.git/worktrees') || output.includes('worktrees') || output.includes('TASK-101')",
+      "severity": "high"
+    }
+  ]
+}

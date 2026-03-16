@@ -1,0 +1,105 @@
+{
+  "benchmark_name": "brainstorm",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:15:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "discussion_flow_quality": "100%",
+        "requirements_clarification_depth": "100%",
+        "decision_support_effectiveness": "100%",
+        "context_accumulation_accuracy": "100%",
+        "summary_actionability": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "discussion-flow": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "clarification": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "decision-support": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "context-management": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "output-format": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "segmented-qa-flow",
+      "category": "discussion-flow",
+      "with_skill": "PASS",
+      "key_finding": "Segmented Q&A flow correctly structured with one question per round, clear section separators used"
+    },
+    {
+      "eval_id": 2,
+      "name": "requirements-clarification",
+      "category": "clarification",
+      "with_skill": "PASS",
+      "key_finding": "Vague 'optimize performance' requirement decomposed into specific metrics (response time <200ms, 99th percentile)"
+    },
+    {
+      "eval_id": 3,
+      "name": "decision-matrix-generation",
+      "category": "decision-support",
+      "with_skill": "PASS",
+      "key_finding": "Decision matrix generated for PostgreSQL/MongoDB/Redis across 5 criteria, PostgreSQL recommended with reasoning"
+    },
+    {
+      "eval_id": 4,
+      "name": "context-accumulation",
+      "category": "context-management",
+      "with_skill": "PASS",
+      "key_finding": "Round 4 correctly referenced all 3 previous decisions (PostgreSQL, RESTful, React) and built coherent new content"
+    },
+    {
+      "eval_id": 5,
+      "name": "summary-generation",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "Summary included 4 confirmed decisions, 5 action items, 2 flagged open questions with TBD status"
+    }
+  ],
+  "discussion_modes": {
+    "segmented_qa": {"description": "One question per round, waiting for answers", "rounds": "unlimited"},
+    "open_discussion": {"description": "Free-form collaborative exploration", "rounds": "unlimited"},
+    "decision_support": {"description": "Structured comparison and recommendation", "rounds": "3-5"}
+  },
+  "strengths": [
+    "Disciplined one-question-per-round segmented flow",
+    "Effective decomposition of vague requirements into measurable criteria",
+    "Comprehensive decision matrix generation with recommendation",
+    "Strong context accumulation across multiple discussion rounds",
+    "Actionable summary with clear decision log and next steps"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with adversarial/contradictory requirements in iteration 2",
+    "Add edge cases for very long discussions (10+ rounds)",
+    "Test decision matrix with >5 options and >8 criteria"
+  ],
+  "status": "completed"
+}

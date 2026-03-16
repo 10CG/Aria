@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "status-change-propagation",
+  "category": "propagation",
+  "prompt": "状态传播: US-020 从 In Progress 变为 Done，需要同步到 UPM requirements 和相关 Epic 进度",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "propagates_to_upm",
+      "description": "Should propagate Done status to UPM requirements entry",
+      "check": "output.includes('UPM') || output.includes('requirements') || output.includes('需求')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "updates_epic_progress",
+      "description": "Should update the parent Epic progress percentage",
+      "check": "output.includes('Epic') || output.includes('epic') || output.includes('%') || output.includes('progress')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "reports_propagation_scope",
+      "description": "Should report how many documents were updated",
+      "check": "output.includes('updated') || output.includes('propagated') || output.includes('传播') || output.includes('2')",
+      "severity": "medium"
+    }
+  ]
+}

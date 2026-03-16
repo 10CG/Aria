@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "scope-extraction",
+  "timestamp": "2026-03-16T14:28:30Z",
+  "assertions": [
+    {
+      "text": "extracts_in_scope",
+      "passed": true,
+      "evidence": "Output lists both 'Email notifications' and 'SMS notifications' as In-Scope items with source text '支持邮件' and '支持短信'"
+    },
+    {
+      "text": "extracts_out_of_scope",
+      "passed": true,
+      "evidence": "Output lists 'Push notifications' in the Out-of-Scope table with source text '不包括推送通知' and reason 'Explicitly excluded by user'"
+    },
+    {
+      "text": "uses_scope_format",
+      "passed": true,
+      "evidence": "Output uses '### In-Scope' and '### Out-of-Scope' heading structure and generates a complete Scope section for proposal.md"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

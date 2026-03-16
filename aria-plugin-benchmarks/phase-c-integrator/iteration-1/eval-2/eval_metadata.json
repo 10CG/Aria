@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "pr-creation",
+  "category": "pr-flow",
+  "prompt": "Execute Phase C C.2: Create pull request for feature/oauth2-social-login → main. Include spec reference and task completion summary.",
+  "setup": {
+    "source_branch": "feature/oauth2-social-login",
+    "target_branch": "main",
+    "spec_path": "openspec/changes/oauth2-social-login/proposal.md",
+    "tasks_completed": 6
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "creates_pr_with_title",
+      "description": "Should create PR with descriptive title",
+      "check": "output.includes('PR') || output.includes('Pull Request') || output.includes('pull request') || output.includes('title:')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "references_openspec",
+      "description": "PR description should reference the OpenSpec proposal",
+      "check": "output.includes('proposal.md') || output.includes('OpenSpec') || output.includes('Spec:') || output.includes('Closes')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "lists_completed_tasks",
+      "description": "PR description should list completed tasks",
+      "check": "output.includes('TASK-') || output.includes('tasks completed') || output.includes('checklist') || output.includes('- [')",
+      "severity": "high"
+    }
+  ]
+}

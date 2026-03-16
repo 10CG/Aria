@@ -1,0 +1,42 @@
+{
+  "eval_id": 5,
+  "eval_name": "incremental-update",
+  "category": "update-flow",
+  "prompt": "Update the existing src/auth/auth.arch.md to include the newly added OAuthProvider component without regenerating the entire document",
+  "setup": {
+    "existing_doc": "src/auth/auth.arch.md",
+    "new_component": "OAuthProvider.ts",
+    "existing_components": ["AuthService", "JwtProvider", "UserRepository"],
+    "update_type": "incremental"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "adds_new_component_only",
+      "description": "Should add OAuthProvider section without rewriting existing content",
+      "check": "output.match(/OAuthProvider|OAuth.*Provider/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "preserves_existing_content",
+      "description": "Should preserve existing AuthService, JwtProvider, UserRepository sections",
+      "check": "output.match(/AuthService|JwtProvider|UserRepository/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "indicates_incremental_mode",
+      "description": "Should indicate this is an incremental update, not a full regeneration",
+      "check": "output.match(/incremental|partial.*update|added.*section|append/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "updates_table_of_contents",
+      "description": "Should update any table of contents or component list",
+      "check": "output.match(/table.*contents|TOC|component.*list|updated.*index/i)",
+      "severity": "medium"
+    }
+  ]
+}

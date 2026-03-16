@@ -1,0 +1,168 @@
+{
+  "skill_name": "requirements-validator",
+  "skill_path": "aria/skills/requirements-validator",
+  "skill_version": "2.1.0",
+  "description": "Benchmark tests for requirements-validator skill - validates product documents and checks associative completeness",
+  "metrics": [
+    "format_compliance_detection",
+    "chain_completeness_accuracy",
+    "reference_integrity_check",
+    "batch_validation_throughput"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "prd-format-validation",
+      "category": "format-check",
+      "prompt": "验证以下 PRD 文档格式是否符合规范: 文档缺少 Background、Scope 和 Acceptance Criteria 章节",
+      "setup": {
+        "document_type": "PRD",
+        "expected_violations": "3+"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_missing_sections",
+          "description": "Should detect missing required PRD sections",
+          "check": "output.includes('missing') || output.includes('缺少') || output.includes('required')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "names_specific_sections",
+          "description": "Should name the specific missing sections",
+          "check": "output.includes('Background') || output.includes('Scope') || output.includes('Acceptance')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "provides_violation_count",
+          "description": "Should report the number of violations found",
+          "check": "output.includes('violation') || output.includes('error') || output.includes('问题') || output.includes('3')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "user-story-validation",
+      "category": "format-check",
+      "prompt": "验证 User Story 格式: 'As a user, I want to login' - 缺少 Acceptance Criteria 和 Story Points",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_missing_ac",
+          "description": "Should detect missing Acceptance Criteria",
+          "check": "output.includes('Acceptance Criteria') || output.includes('验收标准') || output.includes('AC')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "detects_missing_points",
+          "description": "Should detect missing Story Points",
+          "check": "output.includes('Story Point') || output.includes('点数') || output.includes('SP')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "format_is_valid",
+          "description": "Should confirm the As-a/I-want/So-that format structure is present",
+          "check": "output.includes('As a') || output.includes('format') || output.includes('格式')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "chain-completeness",
+      "category": "chain-validation",
+      "prompt": "检查需求链完整性: PRD-001 存在，但缺少对应的 System Architecture 章节和 User Story US-001",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_chain_gap",
+          "description": "Should detect the broken PRD→Architecture→Story chain",
+          "check": "output.includes('chain') || output.includes('链') || output.includes('gap') || output.includes('断裂')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "identifies_missing_architecture",
+          "description": "Should identify missing architecture section",
+          "check": "output.includes('Architecture') || output.includes('架构') || output.includes('System')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "identifies_missing_story",
+          "description": "Should identify missing User Story US-001",
+          "check": "output.includes('US-001') || output.includes('User Story') || output.includes('用户故事')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "missing-reference-detection",
+      "category": "reference-check",
+      "prompt": "检测缺失引用: User Story US-003 引用了不存在的 PRD-007 和架构章节 ARCH-004",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_broken_prd_ref",
+          "description": "Should detect the broken reference to PRD-007",
+          "check": "output.includes('PRD-007') || output.includes('broken') || output.includes('断链') || output.includes('not found')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "detects_broken_arch_ref",
+          "description": "Should detect the broken reference to ARCH-004",
+          "check": "output.includes('ARCH-004') || output.includes('reference') || output.includes('引用')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "reports_all_broken_refs",
+          "description": "Should report all broken references in a summary",
+          "check": "output.includes('2') || output.includes('summary') || output.includes('汇总')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "multi-document-batch",
+      "category": "batch-validation",
+      "prompt": "批量验证: PRD-001 (valid), PRD-002 (missing Scope), US-010 (missing AC), ARCH-001 (valid)",
+      "setup": {
+        "document_count": 4,
+        "expected_valid": 2,
+        "expected_invalid": 2
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "processes_all_documents",
+          "description": "Should process all 4 documents",
+          "check": "output.includes('4') || output.includes('batch') || output.includes('批量')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "reports_pass_fail_per_doc",
+          "description": "Should report pass/fail status for each document",
+          "check": "output.includes('PASS') || output.includes('FAIL') || output.includes('通过') || output.includes('失败')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "correct_valid_count",
+          "description": "Should correctly identify 2 valid and 2 invalid documents",
+          "check": "output.includes('2/4') || (output.includes('valid: 2') || output.includes('passed: 2'))",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "eval_id": 4,
+  "eval_name": "multi-framework-support",
+  "category": "framework",
+  "prompt": "Detect the framework and generate endpoint documentation for each of these three code snippets:\n\n1. FastAPI: `@app.get('/health') async def health_check(): return {'status': 'ok'}`\n2. Express: `app.get('/health', (req, res) => res.json({ status: 'ok' }))`\n3. Flask: `@app.route('/health', methods=['GET']) def health_check(): return jsonify({'status': 'ok'})`",
+  "setup": {
+    "multi_framework": true,
+    "endpoints": [
+      {"framework": "fastapi", "method": "GET", "path": "/health"},
+      {"framework": "express", "method": "GET", "path": "/health"},
+      {"framework": "flask", "method": "GET", "path": "/health"}
+    ]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_fastapi",
+      "description": "Should detect and label FastAPI framework",
+      "check": "output.match(/FastAPI|fastapi/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "detects_express",
+      "description": "Should detect and label Express.js framework",
+      "check": "output.match(/Express|express/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "detects_flask",
+      "description": "Should detect and label Flask framework",
+      "check": "output.match(/Flask|flask/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "documents_all_three_endpoints",
+      "description": "Should document all three /health endpoints",
+      "check": "output.match(/\\/health/g)?.length >= 3",
+      "severity": "high"
+    }
+  ]
+}

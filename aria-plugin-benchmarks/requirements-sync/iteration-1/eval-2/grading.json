@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "drift-detection",
+  "timestamp": "2026-03-16T14:14:30Z",
+  "assertions": [
+    {
+      "text": "detects_drift",
+      "passed": true,
+      "evidence": "Output header states 'Drift Detected: 1 inconsistency found' and labels the issue as 'Status Mismatch (drift)'"
+    },
+    {
+      "text": "shows_delta",
+      "passed": true,
+      "evidence": "Output shows side-by-side table with 'Done' (Jira) vs 'In Progress' (UPM) and explicitly states the delta"
+    },
+    {
+      "text": "recommends_action",
+      "passed": true,
+      "evidence": "Output provides 'Recommended Action' section with explicit sync command and update instruction"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

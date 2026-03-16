@@ -1,0 +1,87 @@
+# Requesting Code Review - Review Dispatch
+
+> **Operation**: Code Review Dispatch for TASK-006
+> **Review Type**: Two-Phase Review
+> **Status**: Dispatched to code-reviewer agent
+
+---
+
+## Code Review Initiated
+
+Requesting Code Review skill has received the completion signal for TASK-006: 开发前端注册页面.
+
+**Dispatch Protocol**: Two-phase sequential review process activated.
+
+---
+
+## Dispatching to code-reviewer Agent
+
+```yaml
+dispatch:
+  skill: "requesting-code-review"
+  target_agent: "code-reviewer"
+  task_id: "TASK-006"
+  task_name: "开发前端注册页面"
+  review_type: "two-phase"
+  dispatch_timestamp: "2026-03-16T14:11:40Z"
+
+  files_for_review:
+    - "frontend/src/components/RegisterForm.jsx"
+    - "frontend/src/pages/RegisterPage.jsx"
+    - "frontend/styles/auth.css"
+    - "frontend/tests/Register.test.js"
+
+  spec_reference:
+    - "openspec/changes/user-auth.md"
+    - "tasks.md (TASK-006 acceptance criteria)"
+```
+
+---
+
+## Phase 1: Spec Compliance Review (ACTIVE)
+
+Phase 1 has been initiated with the code-reviewer agent.
+
+**Scope**: Verify that `RegisterForm.jsx` and `RegisterPage.jsx` implement all spec-defined requirements:
+- Registration form fields match spec (username, email, password, confirm_password)
+- Error states match spec-defined error messages
+- Success state navigates to spec-defined route (`/login`)
+- Form validation rules comply with spec constraints
+
+**Status**: Phase 1 IN PROGRESS - code-reviewer agent working...
+
+---
+
+## Phase 2: Code Quality Review (SCHEDULED)
+
+Phase 2 will be initiated automatically after Phase 1 completes.
+
+**Scheduled Scope**:
+- Code style and React best practices
+- Security considerations (XSS, CSRF for forms)
+- Component architecture (single responsibility principle)
+- Test coverage and test quality
+
+**Status**: Phase 2 SCHEDULED - awaiting Phase 1 completion
+
+---
+
+## Review Flow
+
+```
+TASK-006 Complete
+     │
+     ▼
+[requesting-code-review] dispatches to [code-reviewer]
+     │
+     ▼
+Phase 1: Spec Compliance ← IN PROGRESS
+     │ (on approval)
+     ▼
+Phase 2: Code Quality ← SCHEDULED
+     │ (on approval)
+     ▼
+Review Complete → TASK-006 APPROVED
+```
+
+Awaiting code-reviewer agent response for Phase 1.

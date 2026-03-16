@@ -1,0 +1,27 @@
+{
+  "eval_id": 5,
+  "eval_name": "error-recovery",
+  "timestamp": "2026-03-16T14:05:14Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Working tree: DIRTY', 'Uncommitted changes: 3 files', and 'Unclean Working Tree Detected' heading",
+      "text": "detects_unclean_state"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output contains 'WARNING: Unclean Working Tree Detected', 'Phase A BLOCKED' and 'Cannot proceed with dirty working tree'",
+      "text": "blocks_or_warns"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output provides three resolution options including 'git stash push', 'git commit', and 'git checkout --' with exact commands",
+      "text": "provides_resolution_steps"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

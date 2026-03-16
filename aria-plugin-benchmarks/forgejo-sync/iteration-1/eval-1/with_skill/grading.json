@@ -1,0 +1,25 @@
+{
+  "eval_id": 1,
+  "eval_name": "story-to-issue-sync",
+  "timestamp": "2026-03-16T14:10:30Z",
+  "assertions": [
+    {
+      "text": "creates_forgejo_issue",
+      "passed": true,
+      "evidence": "Output shows 'Issue 创建' and 'Issue #47 已创建' with Forgejo API POST request"
+    },
+    {
+      "text": "maps_story_title",
+      "passed": true,
+      "evidence": "Output maps 'US-001' story_id and '用户登录功能' title to Issue title '[US-001] 用户登录功能'"
+    },
+    {
+      "text": "includes_acceptance_criteria",
+      "passed": true,
+      "evidence": "Output includes '验收标准' section with 'token' and '401' acceptance criteria items"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Story US-001 successfully synced to Forgejo Issue #47 with title mapping and acceptance criteria preserved"
+}

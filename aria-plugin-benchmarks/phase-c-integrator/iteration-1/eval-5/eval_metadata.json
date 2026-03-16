@@ -1,0 +1,35 @@
+{
+  "eval_id": 5,
+  "eval_name": "merge-conflict-handling",
+  "category": "error-handling",
+  "prompt": "Phase C C.2 merge: Attempting to merge feature/oauth2-social-login into main. Conflict detected in backend/config/settings.py. Handle gracefully.",
+  "setup": {
+    "source_branch": "feature/oauth2-social-login",
+    "target_branch": "main",
+    "conflict_files": ["backend/config/settings.py"],
+    "conflict_type": "content-conflict"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_merge_conflict",
+      "description": "Should detect and report the merge conflict",
+      "check": "output.includes('conflict') || output.includes('CONFLICT') || output.includes('merge conflict') || output.includes('<<<')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_conflict_files",
+      "description": "Should identify which files have conflicts",
+      "check": "output.includes('settings.py') || output.includes('conflict file') || output.includes('Unmerged paths')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "provides_resolution_guidance",
+      "description": "Should guide the developer through conflict resolution",
+      "check": "output.includes('resolve') || output.includes('resolution') || output.includes('manual') || output.includes('git add')",
+      "severity": "high"
+    }
+  ]
+}

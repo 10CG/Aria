@@ -1,0 +1,226 @@
+{
+  "skill_name": "progress-updater",
+  "skill_path": "aria/skills/progress-updater",
+  "skill_version": "2.0.0",
+  "description": "Benchmark tests for progress-updater skill - Updates project progress status with UPMv2-STATE machine-readable blocks",
+  "baseline_comparison": {
+    "method": "manual_document_edit",
+    "description": "Human manually edits UPM progress document to update task statuses"
+  },
+  "metrics": [
+    "state_block_format_compliance",
+    "status_update_accuracy",
+    "state_token_validity",
+    "percentage_calculation_accuracy",
+    "incremental_update_safety"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "state-block-generation",
+      "category": "state-format",
+      "prompt": "Generate a UPMv2-STATE block for a project with 3 tasks: T1 (completed), T2 (in_progress), T3 (pending). Project: 'refactor-api'. Overall completion: 33%.",
+      "expected_state_version": "UPMv2",
+      "setup": {
+        "tasks": [
+          {"id": "T1", "status": "completed"},
+          {"id": "T2", "status": "in_progress"},
+          {"id": "T3", "status": "pending"}
+        ],
+        "project_name": "refactor-api"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_upmv2_header",
+          "description": "State block must start with UPMv2-STATE marker",
+          "check": "output.includes('UPMv2-STATE')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "lists_all_tasks",
+          "description": "State block must include all 3 task IDs",
+          "check": "output.includes('T1') && output.includes('T2') && output.includes('T3')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "correct_statuses",
+          "description": "Task statuses must match input",
+          "check": "output.match(/T1.*completed/i) && output.match(/T2.*in_progress/i) && output.match(/T3.*pending/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "machine_readable_format",
+          "description": "Block must be enclosed in code fence or structured block for machine parsing",
+          "check": "output.includes('```') || output.includes('<!-- UPMv2') || output.includes('---')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "task-status-update",
+      "category": "status-update",
+      "prompt": "Update task T2 status from 'in_progress' to 'completed' in the existing UPM document. The state block currently shows: T1=completed, T2=in_progress, T3=pending.",
+      "setup": {
+        "current_state": {
+          "T1": "completed",
+          "T2": "in_progress",
+          "T3": "pending"
+        },
+        "update": {"task_id": "T2", "new_status": "completed"}
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "t2_updated_to_completed",
+          "description": "T2 status must be updated to 'completed'",
+          "check": "output.match(/T2.*completed/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "other_tasks_unchanged",
+          "description": "T1 and T3 statuses must remain unchanged",
+          "check": "output.match(/T1.*completed/i) && output.match(/T3.*pending/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "percentage_recalculated",
+          "description": "Completion percentage must be recalculated (2/3 = 66.7%)",
+          "check": "output.match(/66\\.?7?%|67%/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "state-token-generation",
+      "category": "state-token",
+      "prompt": "Generate a stateToken for quick state recovery. Project: 'api-refactor-v2'. Tasks: T1=completed, T2=completed, T3=in_progress, T4=pending, T5=pending. Iteration: 2.",
+      "setup": {
+        "project": "api-refactor-v2",
+        "iteration": 2,
+        "tasks": {
+          "T1": "completed",
+          "T2": "completed",
+          "T3": "in_progress",
+          "T4": "pending",
+          "T5": "pending"
+        }
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "state_token_present",
+          "description": "Output must include a stateToken field",
+          "check": "output.match(/stateToken|state_token|STATE_TOKEN/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "token_encodes_progress",
+          "description": "Token or accompanying metadata must encode progress (2/5 = 40%)",
+          "check": "output.match(/40%|2\\/5|2 of 5/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "token_is_compact",
+          "description": "stateToken should be a compact string suitable for machine parsing",
+          "check": "output.match(/[A-Za-z0-9+/=_-]{8,}/)",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "percentage-calculation",
+      "category": "calculation",
+      "prompt": "Calculate the overall completion percentage for a project with: 5 completed tasks, 2 in_progress tasks, 3 pending tasks. Partial credit: in_progress counts as 0.5.",
+      "setup": {
+        "completed": 5,
+        "in_progress": 2,
+        "pending": 3,
+        "total": 10,
+        "partial_credit_in_progress": 0.5
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "correct_percentage_with_partial",
+          "description": "Percentage = (5 + 2*0.5) / 10 = 60%",
+          "check": "output.match(/60%|60\\.0%/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "shows_calculation_breakdown",
+          "description": "Should show task count breakdown (completed/in_progress/pending)",
+          "check": "output.match(/completed.*5|5.*completed/i) && output.match(/in.progress.*2|2.*in.progress/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "handles_partial_credit",
+          "description": "Should acknowledge in_progress tasks contribute 0.5 weight",
+          "check": "output.match(/partial|0\\.5|half|weight/i)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "incremental-update",
+      "category": "update-flow",
+      "prompt": "Incrementally update the existing UPMv2-STATE block: mark T3 as completed, add new task T6 as pending. Do NOT overwrite the entire block — only update changed fields.",
+      "setup": {
+        "existing_state": {
+          "T1": "completed",
+          "T2": "completed",
+          "T3": "in_progress",
+          "T4": "pending",
+          "T5": "pending"
+        },
+        "updates": [
+          {"task_id": "T3", "new_status": "completed"},
+          {"task_id": "T6", "action": "add", "status": "pending"}
+        ]
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "t3_updated_not_overwritten",
+          "description": "T3 should be updated to completed; existing T1, T2 must be preserved",
+          "check": "output.match(/T3.*completed/i) && output.match(/T1.*completed/i) && output.match(/T2.*completed/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "t6_added",
+          "description": "New task T6 must appear in the updated state block",
+          "check": "output.match(/T6.*pending/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "incremental_not_full_rewrite",
+          "description": "Output should indicate incremental update, not full rewrite",
+          "check": "output.match(/incremental|updated|patched|delta|diff/i)",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "updated_percentage",
+          "description": "Percentage should reflect 3 completed out of 6 total = 50%",
+          "check": "output.match(/50%|3\\/6|3 of 6/i)",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

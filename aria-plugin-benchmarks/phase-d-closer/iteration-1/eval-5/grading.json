@@ -1,0 +1,27 @@
+{
+  "eval_id": 5,
+  "eval_name": "status-summary-output",
+  "timestamp": "2026-03-16T14:34:22Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'Phase D Closure Summary Report' as the main heading and 'Closure Summary' section header",
+      "text": "has_closure_summary_header"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Report contains 'D.1 — Progress Status Update' section with 'Outcome: COMPLETED' and 'D.2 — Spec Archival' section with 'Outcome: COMPLETED'",
+      "text": "includes_d1_d2_outcomes"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'Next Steps' section stating 'Feature add-payment-gateway is closed. Ready for next iteration.'",
+      "text": "includes_next_steps_or_handoff"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

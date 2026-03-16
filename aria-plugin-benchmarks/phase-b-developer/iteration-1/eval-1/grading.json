@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "branch-creation-flow",
+  "timestamp": "2026-03-16T14:10:12Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'git checkout -b feature/oauth2-social-login' and 'Branch: feature/oauth2-social-login' confirmation",
+      "text": "creates_feature_branch"
+    },
+    {
+      "id": "A2",
+      "passed": true,
+      "evidence": "Output shows 'git checkout main' and 'Base: main (commit: a3f9c12)' confirming correct base branch",
+      "text": "branches_from_correct_base"
+    },
+    {
+      "id": "A3",
+      "passed": true,
+      "evidence": "Output contains 'Switched to a new branch' and 'Now on branch feature/oauth2-social-login'",
+      "text": "confirms_branch_checkout"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

@@ -1,0 +1,34 @@
+{
+  "eval_id": 4,
+  "eval_name": "review-dispatch",
+  "category": "dispatch",
+  "prompt": "任务 TASK-006 已完成。触发代码评审流程，正确委派给 code-reviewer agent 进行两阶段评审。",
+  "setup": {
+    "task_id": "TASK-006",
+    "review_type": "two-phase",
+    "phases": ["spec-compliance", "code-quality"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "dispatches_to_code_reviewer",
+      "description": "Should dispatch review to code-reviewer agent",
+      "check": "output.includes('code-reviewer') || output.includes('reviewer') || output.includes('评审') || output.includes('dispatch')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "initiates_phase_1",
+      "description": "Should initiate Phase 1 spec compliance review first",
+      "check": "output.includes('Phase 1') || output.includes('第一阶段') || output.includes('spec') || output.includes('规范')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "schedules_phase_2",
+      "description": "Should schedule Phase 2 code quality review after Phase 1",
+      "check": "output.includes('Phase 2') || output.includes('第二阶段') || output.includes('quality') || output.includes('质量')",
+      "severity": "high"
+    }
+  ]
+}

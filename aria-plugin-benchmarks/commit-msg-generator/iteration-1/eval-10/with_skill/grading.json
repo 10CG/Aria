@@ -2,8 +2,7 @@
   "eval_id": 10,
   "eval_name": "test-addition",
   "timestamp": "2026-03-13T03:30:00Z",
-  "commit_message": "test(unit): 添加日期格式化单元测试\n\n- 测试日期格式化功能\n- 测试时区转换\n- 测试边界情况",
-  "expectations": [
+  "assertions": [
     {
       "text": "type_is_test",
       "passed": true,
@@ -16,5 +15,8 @@
     }
   ],
   "verdict": "pass",
-  "pass_rate": 1.0
+  "pass_rate": 1.0,
+  "notes": {
+    "commit_message": "test(unit): 添加日期格式化单元测试\n\n- 测试日期格式化功能\n- 测试时区转换\n- 测试边界情况"
+  }
 }

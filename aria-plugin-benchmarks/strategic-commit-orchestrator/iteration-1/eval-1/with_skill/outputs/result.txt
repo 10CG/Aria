@@ -1,0 +1,74 @@
+# Strategic Commit Orchestrator - Single Module Grouping
+
+## 输入分析
+
+- **Task ID**: TASK-101
+- **Module**: backend
+- **Files**: 3 files in single module
+
+| # | File | Type | Concern |
+|---|------|------|---------|
+| 1 | backend/src/auth/login.py | Implementation | Auth login logic |
+| 2 | backend/src/auth/register.py | Implementation | Auth register logic |
+| 3 | backend/tests/test_auth.py | Test | Auth test coverage |
+
+## AI-DDD 提交分组计划
+
+### 分析结果
+
+模块边界: `backend` (单模块)
+关注点分离: 实现 (2 files) vs 测试 (1 file)
+
+**推荐分组**: 2 个 commit groups
+
+---
+
+### Group 1: Auth 功能实现
+
+**提交信息**:
+```
+feat(auth): 添加用户认证登录和注册功能
+
+- 实现 JWT 登录接口 (backend/src/auth/login.py)
+- 实现用户注册接口 (backend/src/auth/register.py)
+```
+
+**包含文件**:
+- `backend/src/auth/login.py` (A - 新增)
+- `backend/src/auth/register.py` (A - 新增)
+
+**提交类型**: `feat`
+**Scope**: `auth`
+
+---
+
+### Group 2: Auth 测试覆盖
+
+**提交信息**:
+```
+test(auth): 添加用户认证功能测试
+
+- 新增登录/注册功能单元测试 (backend/tests/test_auth.py)
+```
+
+**包含文件**:
+- `backend/tests/test_auth.py` (A - 新增)
+
+**提交类型**: `test`
+**Scope**: `auth`
+
+---
+
+## 执行顺序
+
+1. **Group 1** → `feat(auth): 添加用户认证登录和注册功能`
+2. **Group 2** → `test(auth): 添加用户认证功能测试`
+
+**理由**: 实现先于测试提交，确保 CI 流水线按逻辑顺序验证
+
+## 总结
+
+- 总提交数: 2
+- 模块: backend
+- 关注点分离: ✅ (实现 + 测试分离)
+- 格式合规: ✅ (Conventional Commits)

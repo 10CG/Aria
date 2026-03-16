@@ -1,0 +1,35 @@
+{
+  "eval_id": 5,
+  "eval_name": "task-completion-verification",
+  "category": "verification",
+  "prompt": "Subagent 声称已完成 TASK-005: 开发前端登录页面。验证任务是否真正完成（包括所有交付物和验收标准）。",
+  "setup": {
+    "task_id": "TASK-005",
+    "claimed_completion": true,
+    "deliverables_expected": ["LoginForm.jsx", "LoginPage.jsx", "Login.test.js"],
+    "acceptance_criteria": ["form renders", "validation works", "success redirect"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "checks_deliverables",
+      "description": "Should verify all expected deliverables exist",
+      "check": "output.includes('deliver') || output.includes('交付') || output.includes('LoginForm') || output.includes('文件')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "validates_acceptance_criteria",
+      "description": "Should validate against acceptance criteria",
+      "check": "output.includes('验收') || output.includes('acceptance') || output.includes('criteria') || output.includes('标准')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "reports_completion_status",
+      "description": "Should report a clear pass/fail completion status",
+      "check": "output.includes('完成') || output.includes('complete') || output.includes('PASS') || output.includes('通过')",
+      "severity": "high"
+    }
+  ]
+}

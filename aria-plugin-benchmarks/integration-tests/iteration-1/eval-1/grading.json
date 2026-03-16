@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-feature-cycle-a-to-d",
+  "timestamp": "2026-03-16T23:00:00Z",
+  "assertions": [
+    {
+      "text": "phase_a_produces_spec",
+      "passed": true,
+      "evidence": "spec-drafter created openspec/changes/SPEC-2024-047-user-notifications/proposal.md with spec_id=SPEC-2024-047"
+    },
+    {
+      "text": "phase_a_produces_tasks",
+      "passed": true,
+      "evidence": "task-planner generated detailed-tasks.yaml with 6 tasks TASK-301 through TASK-306, all referencing SPEC-2024-047"
+    },
+    {
+      "text": "phase_b_creates_branch",
+      "passed": true,
+      "evidence": "branch-manager created feature/backend/TASK-301-notification-service matching pattern feature/{module}/TASK-{N}-{desc}"
+    },
+    {
+      "text": "phase_c_references_spec",
+      "passed": true,
+      "evidence": "PR-1847 title includes SPEC-2024-047 and all 6 commit messages contain 'Refs: SPEC-2024-047'"
+    },
+    {
+      "text": "phase_d_archives_spec",
+      "passed": true,
+      "evidence": "openspec-archive moved spec to openspec/archive/2026/SPEC-2024-047-user-notifications/ (not standards/openspec/archive/)"
+    },
+    {
+      "text": "context_chain_unbroken",
+      "passed": true,
+      "evidence": "Full chain verified: SPEC-2024-047 -> TASK-301..306 -> feature/backend/TASK-301-notification-service -> e7f1a2b3 -> PR-1847 -> openspec/archive/2026/. Each phase references its predecessor artifact."
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

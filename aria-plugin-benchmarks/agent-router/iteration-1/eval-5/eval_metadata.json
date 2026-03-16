@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "fallback-routing",
+  "category": "fallback",
+  "prompt": "Route this task: 'Review the overall project architecture, assess technical debt across all modules, and create a refactoring roadmap.'",
+  "setup": {
+    "task_type": "architecture_review",
+    "file_paths": [],
+    "keywords": ["architecture", "technical debt", "roadmap", "refactoring"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "falls_back_to_tech_lead",
+      "description": "Should fallback to tech-lead for cross-cutting architectural concerns",
+      "check": "output.includes('tech-lead')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "explains_fallback_reason",
+      "description": "Should explain why tech-lead is the fallback choice",
+      "check": "output.match(/cross-cutting|overall|architecture|no specific|broad/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "does_not_hallucinate_agent",
+      "description": "Should not invent agent names not in the registry",
+      "check": "!output.match(/data-engineer|devops-engineer|qa-engineer/i)",
+      "severity": "medium"
+    }
+  ]
+}

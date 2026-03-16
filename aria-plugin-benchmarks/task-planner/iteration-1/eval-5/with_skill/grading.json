@@ -1,0 +1,15 @@
+{
+  "eval_id": 5,
+  "eval_name": "agent-allocation",
+  "timestamp": "2026-03-16T13:30:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "passed": true,
+      "evidence": "Output contains 'backend-architect' multiple times and 'Backend API' in task analysis",
+      "text": "allocates_backend_agent"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

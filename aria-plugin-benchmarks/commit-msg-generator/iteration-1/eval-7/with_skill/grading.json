@@ -1,27 +1,19 @@
 {
-  "eval_id": "eval-7",
+  "eval_id": 7,
   "eval_name": "breaking-change-api",
   "timestamp": "2026-03-13T03:30:00Z",
-  "assertions": {
-    "A1": {
-      "name": "breaking_change_marker",
-      "description": "Must include 'BREAKING CHANGE' in footer OR '!' in type",
-      "expected": "feat(api)!: or BREAKING CHANGE: in footer",
-      "actual": "feat(api)!: in subject AND BREAKING CHANGE: in footer",
-      "passed": true
+  "assertions": [
+    {
+      "text": "breaking_change_marker",
+      "passed": true,
+      "evidence": "feat(api)!: in subject AND BREAKING CHANGE: in footer"
     },
-    "A2": {
-      "name": "explains_impact",
-      "description": "Should explain the breaking change (response format, API, etc.)",
-      "expected": "Clear explanation of response format change from {tasks: [...]} to {data: [...], meta: {...}}",
-      "actual": "BREAKING CHANGE: Tasks API response format changed from { \"tasks\": [...] } to { \"data\": [...], \"meta\": {...} }. All API consumers must update their response parsing logic to handle the new structure.",
-      "passed": true
+    {
+      "text": "explains_impact",
+      "passed": true,
+      "evidence": "BREAKING CHANGE: Tasks API response format changed from { \"tasks\": [...] } to { \"data\": [...], \"meta\": {...} }. All API consumers must update their response parsing logic to handle the new structure."
     }
-  },
-  "overall": {
-    "total_assertions": 2,
-    "passed_assertions": 2,
-    "failed_assertions": 0,
-    "status": "PASS"
-  }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
 }

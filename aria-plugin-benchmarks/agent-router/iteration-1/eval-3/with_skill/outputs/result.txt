@@ -1,0 +1,23 @@
+## Agent Router Result
+
+**Task**: Update the user profile feature to sync data between the mobile app and backend API.
+
+**Routing Decision**: AMBIGUOUS — requires decomposition
+**Confidence**: 0.55
+
+**Warning**: This task spans multiple domains. Confidence is below the 0.75 single-agent threshold.
+
+**Domain Signals Detected**:
+| Domain | Signals | Weight |
+|--------|---------|--------|
+| mobile | "mobile app", "mobile/lib/features/profile/" | 0.45 |
+| backend | "backend API", "backend/src/routes/profile.py" | 0.45 |
+| cross-cutting | "sync data" | 0.10 |
+
+**Recommendation**: Split this task into sub-tasks:
+1. Sub-task A (mobile-developer): Update mobile profile screen to send/receive sync payloads
+2. Sub-task B (backend-architect): Update backend profile API to support sync endpoint
+
+Alternatively, escalate to tech-lead for cross-domain coordination.
+
+**Selected Agent**: tech-lead (escalation due to ambiguity)

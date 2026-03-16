@@ -1,0 +1,24 @@
+{
+  "eval_id": 3,
+  "eval_name": "issue-categorization",
+  "timestamp": "2026-03-16T14:11:15Z",
+  "assertions": [
+    {
+      "text": "uses_critical_category",
+      "passed": true,
+      "evidence": "Output categorizes SQL injection as 'CRITICAL' with reasoning that security vulnerabilities causing data exposure are automatically Critical"
+    },
+    {
+      "text": "uses_minor_category",
+      "passed": true,
+      "evidence": "Output categorizes poor naming as 'MINOR' and missing comments as 'MINOR', with correct reasoning that style/docs don't affect functionality"
+    },
+    {
+      "text": "uses_important_category",
+      "passed": true,
+      "evidence": "Output includes 'Important' in the categorization framework definition table, explicitly acknowledging the three-tier system exists even noting 'No issues in this review qualified as Important severity'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

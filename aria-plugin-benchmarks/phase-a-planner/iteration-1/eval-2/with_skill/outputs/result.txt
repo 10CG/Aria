@@ -1,0 +1,60 @@
+# Phase A Evaluation: typo-fix-readme
+
+**Skill**: phase-a-planner v1.0.0
+**Request**: Fix typo in README.md
+**Timestamp**: 2026-03-16T14:02:00Z
+
+---
+
+## Change Analysis
+
+Analyzing requested change to determine OpenSpec level...
+
+| Factor | Value | Weight |
+|--------|-------|--------|
+| Files affected | 1 (README.md) | low |
+| Logic changes | None | none |
+| Tests required | No | none |
+| API changes | No | none |
+| Dependencies | None | none |
+| Estimated effort | < 30 minutes | trivial |
+
+---
+
+## OpenSpec Level Assessment
+
+**Result: Level 1 — Skip**
+
+This change qualifies as Level 1 (Skip) based on:
+- Single file change with no logic impact
+- Typo correction in documentation only
+- No new behavior introduced
+- No tests required
+- Effort is below 1h threshold
+
+Per Aria methodology: *Level 1 changes do not require an OpenSpec proposal. Proceed directly to implementation.*
+
+---
+
+## Phase A Decision
+
+```
+A.1 (Spec Creation)  → SKIP — Level 1 change, spec not required
+A.2 (Task Planning)  → SKIP — No spec to plan from
+A.3 (Agent Allocation) → SKIP — Direct implementation, no subagent needed
+```
+
+**Spec-drafter**: not invoked (not required for Level 1)
+**task-planner**: not invoked (not required for Level 1)
+
+---
+
+## Recommended Action
+
+Proceed directly to implementation without Phase A overhead:
+
+1. Edit `README.md` to fix the typo
+2. Stage the change: `git add README.md`
+3. Commit: `git commit -m "docs(readme): fix typo in installation section"`
+
+**Phase A Result**: SKIPPED (Level 1 — trivial single-file doc change)

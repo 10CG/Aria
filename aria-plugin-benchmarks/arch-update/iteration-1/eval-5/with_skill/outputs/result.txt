@@ -1,0 +1,32 @@
+arch-update: Incremental Update Applied
+=========================================
+
+Performing incremental update on src/auth/auth.arch.md...
+Mode: INCREMENTAL (appending new section only, not regenerating)
+
+EXISTING CONTENT PRESERVED:
+  - AuthService section: [preserved]
+  - JwtProvider section: [preserved]
+  - UserRepository section: [preserved]
+
+NEW SECTION ADDED:
+  ### OAuthProvider
+  - File: src/auth/OAuthProvider.ts
+  - Role: Handles OAuth 2.0 authentication flows for third-party identity providers
+  - Key methods: `initiateOAuth()`, `handleCallback()`, `exchangeToken()`
+  - Providers supported: Google, GitHub, Microsoft
+
+TABLE OF CONTENTS (updated index):
+  1. AuthService
+  2. JwtProvider
+  3. UserRepository
+  4. OAuthProvider  [newly added]
+
+INCREMENTAL UPDATE SUMMARY:
+  - Mode: incremental (partial update)
+  - Lines added: 8
+  - Lines modified: 2 (TOC entries)
+  - Lines removed: 0
+  - Existing content: 100% preserved
+
+Update successfully applied to: src/auth/auth.arch.md

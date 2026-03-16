@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "tdd-integration",
+  "category": "tdd-dual-insurance",
+  "prompt": "Execute Phase B development with TDD enforcement for TASK-002: Implement GitHub OAuth2 callback handler. Enforce test-first approach.",
+  "setup": {
+    "task_id": "TASK-002",
+    "tdd_mode": true,
+    "feature": "github-oauth2-callback"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "writes_tests_first",
+      "description": "Should write failing tests before implementation",
+      "check": "output.includes('test first') || output.includes('TDD') || output.includes('failing test') || output.includes('Red phase')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "red_green_refactor_cycle",
+      "description": "Should follow Red → Green → Refactor cycle",
+      "check": "output.includes('Red') || output.includes('Green') || output.includes('Refactor') || output.includes('cycle')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "tests_pass_before_proceeding",
+      "description": "Should verify all tests pass before marking task complete",
+      "check": "output.includes('tests pass') || output.includes('passing') || output.includes('PASSED') || output.includes('all tests')",
+      "severity": "critical"
+    }
+  ]
+}

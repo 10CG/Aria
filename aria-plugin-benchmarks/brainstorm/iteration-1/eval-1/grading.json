@@ -1,0 +1,24 @@
+{
+  "eval_id": 1,
+  "eval_name": "segmented-qa-flow",
+  "timestamp": "2026-03-16T14:15:10Z",
+  "assertions": [
+    {
+      "text": "asks_one_question_per_round",
+      "passed": true,
+      "evidence": "Output contains exactly one question in 'Round 1: 通知类型定义' section asking about notification channels, ending with '？'"
+    },
+    {
+      "text": "uses_segmented_sections",
+      "passed": true,
+      "evidence": "Output uses '---' horizontal rules to separate sections and '##' markdown headers for 'Round 1: 通知类型定义' and '欢迎开始头脑风暴'"
+    },
+    {
+      "text": "maintains_discussion_context",
+      "passed": true,
+      "evidence": "Output references future rounds with '请回答上面的问题后，我们将继续探讨通知的触发时机' showing continuity planning"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

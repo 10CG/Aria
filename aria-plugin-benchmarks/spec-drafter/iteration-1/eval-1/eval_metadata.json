@@ -1,0 +1,22 @@
+{
+  "eval_id": 1,
+  "eval_name": "level-judgment",
+  "category": "level-detection",
+  "prompt": "判断规范等级: 用户请求 '修复登录页面一个 typo'",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "judges_level_1",
+      "description": "Should judge as Level 1 (Skip) for trivial fix",
+      "check": "output.includes('Level 1') || output.includes('Skip') || output.includes('L1')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "explains_reasoning",
+      "description": "Should explain why Level 1 was chosen",
+      "check": "output.includes('trivial') || output.includes('simple') || output.includes('简单') || output.includes('typo')",
+      "severity": "high"
+    }
+  ]
+}

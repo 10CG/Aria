@@ -1,0 +1,24 @@
+{
+  "eval_id": 2,
+  "eval_name": "requirements-clarification",
+  "timestamp": "2026-03-16T14:15:40Z",
+  "assertions": [
+    {
+      "text": "identifies_ambiguity",
+      "passed": true,
+      "evidence": "Output states '「优化系统性能」是一个非常模糊（ambiguous）的需求' and lists multiple unclear dimensions explicitly"
+    },
+    {
+      "text": "asks_clarifying_questions",
+      "passed": true,
+      "evidence": "Output provides 'Round 1: 性能指标澄清' asking about specific performance metrics with labeled options (A-E) including 'API response time', 'throughput', 'memory'"
+    },
+    {
+      "text": "extracts_measurable_criteria",
+      "passed": true,
+      "evidence": "Output shows measurable criteria example with 'P99 响应时间从当前 850ms 优化到 200ms 以内' with '%', 'ms', 'RPS' units specified"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

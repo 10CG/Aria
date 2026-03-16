@@ -1,0 +1,199 @@
+================================================================================
+INTEGRATION TEST: closure-state-consistency
+Prompt: PR merged successfully - execute closure phase and verify project state
+Skills: phase-d-closer, progress-updater, openspec-archive, state-scanner, requirements-sync
+================================================================================
+
+[CONTEXT] Incoming closure trigger
+  Event:      PR merged
+  PR:         PR-1847 (feat(notifications): implement user notification feature)
+  Merge SHA:  e9d7c5a3
+  Spec:       SPEC-2024-047
+  Tasks:      TASK-301, TASK-302, TASK-303, TASK-304, TASK-305, TASK-306 (all done)
+  Branch:     integration/SPEC-2024-047-notifications (merged, ready to delete)
+
+================================================================================
+=== Phase D: Closure ===
+================================================================================
+
+[D] phase-d-closer: Initiating atomic closure sequence for SPEC-2024-047...
+
+--- phase-d-closer: Pre-closure state snapshot ---
+Reading: openspec/project.md
+  Current stateToken:    ST-2026-031501
+  Current completion:    67%
+  Active specs:          [SPEC-2024-047]
+  Pending tasks:         6 (TASK-301..TASK-306, all in IN_PROGRESS)
+  Completed specs:       [SPEC-2024-039, SPEC-2024-041, SPEC-2024-043, SPEC-2024-044]
+
+Pre-flight check:
+  [x] PR-1847 merged (SHA: e9d7c5a3 verified in git log)
+  [x] SPEC-2024-047 exists in openspec/changes/
+  [x] All TASK-301..306 marked complete by subagent-driver
+  [x] No conflicting in-progress specs
+
+Executing D.1 and D.2 as atomic unit (rollback on any failure)...
+---
+
+--- D.1: progress-updater ---
+Task: Update UPM state after SPEC-2024-047 completion
+
+Reading current state:
+  openspec/project.md stateToken: ST-2026-031501
+  completion before: 67%
+
+Computing delta:
+  Tasks completing: 6 (TASK-301, TASK-302, TASK-303, TASK-304, TASK-305, TASK-306)
+  Total project tasks: 47
+  Tasks completed before: 31/47 (67%)
+  Tasks completed after:  37/47 (79%)
+
+Updating UPMv2-STATE block in openspec/project.md:
+  Previous:
+    <!-- UPMv2-STATE
+    stateToken: ST-2026-031501
+    lastUpdated: 2026-03-15T18:00:00Z
+    completion: 67%
+    activeSpecs: ["SPEC-2024-047"]
+    completedSpecs: ["SPEC-2024-039","SPEC-2024-041","SPEC-2024-043","SPEC-2024-044"]
+    -->
+
+  Updated:
+    <!-- UPMv2-STATE
+    stateToken: ST-2026-031602
+    lastUpdated: 2026-03-16T23:00:00Z
+    completion: 79%
+    activeSpecs: []
+    completedSpecs: ["SPEC-2024-039","SPEC-2024-041","SPEC-2024-043","SPEC-2024-044","SPEC-2024-047"]
+    -->
+
+  stateToken: ST-2026-031501 -> ST-2026-031602
+  completion:  67% -> 79%
+  activeSpecs: ["SPEC-2024-047"] -> []
+
+Marking tasks as DONE in openspec/project.md task table:
+  TASK-301: IN_PROGRESS -> DONE
+  TASK-302: IN_PROGRESS -> DONE
+  TASK-303: IN_PROGRESS -> DONE
+  TASK-304: IN_PROGRESS -> DONE
+  TASK-305: IN_PROGRESS -> DONE
+  TASK-306: IN_PROGRESS -> DONE
+
+openspec/project.md: WRITTEN
+  stateToken: ST-2026-031602
+  completion: 79%
+  UPMv2-STATE block: UPDATED
+
+D.1 complete: UPMv2-STATE written, completion=79%, stateToken=ST-2026-031602
+---
+
+--- D.2: openspec-archive ---
+Task: Archive SPEC-2024-047 from changes/ to archive/
+
+Source:  openspec/changes/SPEC-2024-047-user-notifications/
+Target:  openspec/archive/2026/SPEC-2024-047-user-notifications/
+
+Moving artifacts:
+  openspec/changes/SPEC-2024-047-user-notifications/proposal.md
+    -> openspec/archive/2026/SPEC-2024-047-user-notifications/proposal.md    [MOVED]
+
+  openspec/changes/SPEC-2024-047-user-notifications/detailed-tasks.yaml
+    -> openspec/archive/2026/SPEC-2024-047-user-notifications/detailed-tasks.yaml  [MOVED]
+
+Appending closure metadata to proposal.md:
+  ---
+  archived_at:   2026-03-16T23:00:00Z
+  archived_by:   openspec-archive
+  merge_sha:     e9d7c5a3
+  pr_url:        https://forgejo.10cg.pub/project/aria-web-app/pulls/PR-1847
+  state_token:   ST-2026-031602
+  final_status:  COMPLETED
+  ---
+
+Removing source directory:
+  openspec/changes/SPEC-2024-047-user-notifications/ [DELETED]
+
+Archive path: openspec/archive/2026/SPEC-2024-047-user-notifications/
+Metadata: preserved (merge_sha, pr_url, state_token, archived_at)
+
+D.2 complete: openspec/changes/SPEC-2024-047-user-notifications/ -> openspec/archive/2026/SPEC-2024-047-user-notifications/
+---
+
+[D] phase-d-closer: D.1 complete + D.2 complete. Atomic unit SUCCESS.
+    Both phases completed: state written AND spec archived without partial state.
+
+--- requirements-sync: Syncing completed status to UPM ---
+Reading updated openspec/project.md (stateToken: ST-2026-031602)
+  SPEC-2024-047 status: COMPLETED
+  Tasks TASK-301..306: all DONE
+
+Requirements sync:
+  Updating requirements tracking table:
+    Feature: User Notification System -> status: completed
+    Linked spec: SPEC-2024-047 -> status: archived (openspec/archive/2026/)
+    Completion tracker: 79% (37/47 tasks done)
+
+  UPM updated: requirements-sync cross-reference table refreshed
+  Status: completed
+  UPM is consistent with archived spec and git state.
+
+requirements-sync: UPM updated, status=completed [OK]
+---
+
+================================================================================
+=== Post-Closure State Verification ===
+================================================================================
+
+[D.3] state-scanner: Scanning project state after closure...
+
+--- state-scanner output ---
+Project: aria-web-app
+Scan timestamp: 2026-03-16T23:01:00Z
+Reading: openspec/project.md (stateToken: ST-2026-031602)
+
+Active specs in openspec/changes/:
+  Scanning openspec/changes/...
+  Files found: 0 specs
+  No active specs in changes/ directory -> clean state
+
+Active branches:
+  feature/auth/TASK-287-oauth2   (pre-existing, unrelated)
+  [integration/SPEC-2024-047-notifications: DELETED after merge]
+
+UPM state:
+  stateToken:    ST-2026-031602
+  completion:    79% (up from 67%)
+  activeSpecs:   [] (empty - clean)
+  completedSpecs: 5 (SPEC-2024-039, SPEC-2024-041, SPEC-2024-043, SPEC-2024-044, SPEC-2024-047)
+
+State assessment: CLEAN STATE
+  - No active specs pending in changes/
+  - All TASK-301..306 marked DONE
+  - UPM consistent with git state (merge SHA e9d7c5a3 verified)
+  - Archive present at openspec/archive/2026/SPEC-2024-047-user-notifications/
+
+Recommendation: Project state is consistent. Safe to start new spec.
+---
+
+[D.3] state-scanner: Clean state confirmed. No active specs in changes/. [OK]
+
+================================================================================
+=== CLOSURE CONSISTENCY VERIFICATION ===
+================================================================================
+
+D.1 complete (UPMv2-STATE written):
+  stateToken:  ST-2026-031601 -> ST-2026-031602                           [OK]
+  completion:  67% -> 79%                                                 [OK]
+  activeSpecs: ["SPEC-2024-047"] -> []                                    [OK]
+
+D.2 complete (spec archived):
+  changes/SPEC-2024-047-user-notifications/ -> archive/2026/SPEC-2024-047-user-notifications/ [OK]
+  metadata preserved: merge_sha=e9d7c5a3, pr_url=PR-1847                 [OK]
+
+requirements-sync: UPM updated, status=completed                         [OK]
+state-scanner: no active specs in changes/ (clean state)                 [OK]
+Atomic guarantee: D.1 and D.2 both completed (no partial state)          [OK]
+
+================================================================================
+RESULT: PASS
+================================================================================

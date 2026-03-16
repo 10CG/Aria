@@ -1,0 +1,42 @@
+{
+  "eval_id": 5,
+  "eval_name": "phase-skip-logic",
+  "category": "skip-logic",
+  "prompt": "Run the workflow for a feature task but skip Phase A because state-scanner already confirmed project state is current and an OpenSpec already exists (state: A.3 completed).",
+  "setup": {
+    "workflow_type": "skip-aware",
+    "current_state": "A.3_completed",
+    "existing_openspec": true,
+    "skip_phases": ["A"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_phase_a_completed",
+      "description": "Should detect that Phase A is already completed",
+      "check": "output.match(/A\\.3.*completed|Phase A.*done|already.*completed|state.*current/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "skips_phase_a",
+      "description": "Should skip Phase A and start from Phase B",
+      "check": "!output.match(/running.*A\\.0|executing.*A\\.1/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "starts_from_phase_b",
+      "description": "Should start execution from Phase B.1",
+      "check": "output.match(/start.*B\\.1|begin.*B\\.1|B\\.1.*first/i) || (output.match(/B\\.1/) && !output.match(/A\\.0/))",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "explains_skip_reason",
+      "description": "Should explain why Phase A was skipped",
+      "check": "output.match(/OpenSpec.*exists|already.*A\\.3|state.*current|skip.*reason/i)",
+      "severity": "high"
+    }
+  ]
+}

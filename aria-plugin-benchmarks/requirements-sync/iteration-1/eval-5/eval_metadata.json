@@ -1,0 +1,29 @@
+{
+  "eval_id": 5,
+  "eval_name": "conflict-resolution",
+  "category": "conflict-handling",
+  "prompt": "冲突解决: US-030 在 Git commit 中标记为 Done，但 UPM 中为 In Review，Jira 中为 In Progress — 三方冲突",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "detects_three_way_conflict",
+      "description": "Should detect the three-way conflict across sources",
+      "check": "output.includes('conflict') || output.includes('冲突') || output.includes('3') || output.includes('three')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "shows_all_conflicting_values",
+      "description": "Should display all three conflicting status values",
+      "check": "output.includes('Done') && output.includes('In Review') && output.includes('In Progress')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "proposes_resolution",
+      "description": "Should propose a resolution strategy (e.g., latest-wins or manual review)",
+      "check": "output.includes('resolution') || output.includes('解决') || output.includes('recommend') || output.includes('manual')",
+      "severity": "high"
+    }
+  ]
+}

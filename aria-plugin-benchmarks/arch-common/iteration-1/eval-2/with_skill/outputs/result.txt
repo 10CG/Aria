@@ -1,0 +1,39 @@
+arch-common: Naming Conventions
+=================================
+
+Architecture document naming rules defined by arch-common:
+
+L0 - PROJECT LEVEL:
+  Name: ARCHITECTURE.md  (uppercase, fixed name)
+  Location: project root or module root
+  Example: /ARCHITECTURE.md
+
+L1 - MODULE LEVEL:
+  Pattern: {module-name}.arch.md  (lowercase kebab-case + .arch.md extension)
+  Location: inside the module directory
+  Examples:
+    - auth.arch.md
+    - payment.arch.md
+    - notification-service.arch.md
+
+L2 - COMPONENT LEVEL:
+  Pattern: {component-name}.arch.md  (lowercase kebab-case + .arch.md extension)
+  Location: inside the module directory alongside the component
+  Examples:
+    - user-repository.arch.md
+    - jwt-provider.arch.md
+    - payment-gateway.arch.md
+
+NAMING RULES SUMMARY:
+
+  | Layer | Name Pattern        | Case       | Example                    |
+  |-------|---------------------|------------|----------------------------|
+  | L0    | ARCHITECTURE.md     | UPPERCASE  | /ARCHITECTURE.md           |
+  | L1    | {module}.arch.md    | lowercase  | src/auth/auth.arch.md      |
+  | L2    | {component}.arch.md | lowercase  | src/auth/user-repo.arch.md |
+
+KEY POINTS:
+  - ARCHITECTURE.md is always uppercase (L0 only)
+  - All other architecture docs use the *.arch.md extension
+  - Module/component names use lowercase kebab-case
+  - The .arch.md extension makes architecture docs easy to find with glob patterns

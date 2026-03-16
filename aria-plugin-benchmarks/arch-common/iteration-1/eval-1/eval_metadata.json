@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "eval_name": "layer-hierarchy-definition",
+  "category": "layer-system",
+  "prompt": "Explain the L0/L1/L2 layer system defined in arch-common. What does each layer represent and what kind of documentation belongs at each level?",
+  "setup": {
+    "query_type": "definition",
+    "expected_layers": ["L0", "L1", "L2"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "defines_l0_as_project",
+      "description": "L0 should be defined as project-level documentation",
+      "check": "output.match(/L0.*project|project.*L0/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "defines_l1_as_module",
+      "description": "L1 should be defined as module-level documentation",
+      "check": "output.match(/L1.*module|module.*L1/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "defines_l2_as_component",
+      "description": "L2 should be defined as component-level documentation",
+      "check": "output.match(/L2.*component|component.*L2/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "explains_hierarchy_relationship",
+      "description": "Should explain the parent-child relationship between layers",
+      "check": "output.match(/L0.*contains.*L1|L1.*under.*L0|hierarchy|parent.*child/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "provides_concrete_examples",
+      "description": "Should provide concrete file path examples for each layer",
+      "check": "output.match(/ARCHITECTURE\\.md|\\*\\.arch\\.md|\\/docs\\//i)",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+# OpenSpec Archive - Already-Archived Detection
+
+## 归档任务
+
+- **Spec**: `openspec/changes/user-auth`
+- **检查归档**: `openspec/archive/user-auth`
+- **重复检测**: enabled
+
+## Step 1: 检查归档目标是否已存在
+
+```bash
+$ test -d openspec/archive/user-auth && echo "EXISTS" || echo "NOT_FOUND"
+EXISTS
+```
+
+**结果**: 归档目标已存在 (exists)
+
+## 重复归档检测
+
+```
+检测到已归档 (duplicate detected):
+  路径 (location): openspec/archive/user-auth
+  状态: 已归档 (already archived)
+```
+
+### 现有归档内容
+
+```bash
+$ ls openspec/archive/user-auth/
+proposal.md  tasks.md
+
+$ cat openspec/archive/user-auth/proposal.md | head -5
+---
+title: 用户认证
+version: "1.0"
+status: completed
+archived_at: 2026-03-01
+```
+
+**归档已存在**: `openspec/archive/user-auth` 包含完整归档文件
+
+## 防止重复归档
+
+```
+[WARNING] 已归档检测 (already archived):
+  Spec:     openspec/changes/user-auth
+  Archive:  openspec/archive/user-auth (exists)
+  Action:   skip (跳过归档操作)
+
+原因: 重复归档会覆盖现有归档中的 archived_at 时间戳，
+      可能破坏归档历史记录。
+```
+
+**操作**: 跳过 (skip) - 不执行重复归档
+
+## 检测结果
+
+| 检查项 | 结果 |
+|--------|------|
+| 归档目标存在 | ✅ 已存在 (exists) |
+| 重复检测 | ✅ duplicate 已检测 |
+| 位置 (location) | `openspec/archive/user-auth` |
+| 警告 (warn) | ⚠️ 已归档，跳过操作 |
+| 最终动作 | **skip** (跳过) |
+
+## 结论
+
+`openspec/changes/user-auth` 已归档 (already archived)。
+归档位置 (location): `openspec/archive/user-auth`
+操作: 跳过 (skip) - 防止 duplicate 归档，归档历史完整保留。

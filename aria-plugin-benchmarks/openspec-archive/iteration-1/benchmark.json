@@ -1,0 +1,96 @@
+{
+  "benchmark_name": "openspec-archive",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:15:00Z",
+  "total_evals": 4,
+  "evals_completed": 4,
+  "summary": {
+    "with_skill": {
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "path_resolution_accuracy": "100%",
+        "bug_workaround_reliability": "100%",
+        "data_integrity": "100%",
+        "duplicate_detection_accuracy": "100%",
+        "cli_bug_auto_fix": "enabled",
+        "metadata_fields_preserved": "5 fields (title, version, status, created, author)",
+        "correct_archive_path": "project/openspec/archive/ (not standards/)"
+      }
+    }
+  },
+  "by_category": {
+    "path-resolution": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "bug-workaround": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "data-integrity": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "validation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "correct-archive-path",
+      "category": "path-resolution",
+      "with_skill": "PASS",
+      "key_finding": "Archived to project/openspec/archive/ (not standards/openspec/archive/), project root resolved correctly"
+    },
+    {
+      "eval_id": 2,
+      "name": "cli-bug-fix",
+      "category": "bug-workaround",
+      "with_skill": "PASS",
+      "key_finding": "CLI path bug detected (standards/ prefix), auto-corrected to openspec/archive/, fix documented"
+    },
+    {
+      "eval_id": 3,
+      "name": "metadata-preservation",
+      "category": "data-integrity",
+      "with_skill": "PASS",
+      "key_finding": "All 5 metadata fields preserved: title, version, status, created, author. Integrity confirmed."
+    },
+    {
+      "eval_id": 4,
+      "name": "already-archived-detection",
+      "category": "validation",
+      "with_skill": "PASS",
+      "key_finding": "Existing archive detected, duplicate prevented with warning, archive location reported"
+    }
+  ],
+  "archive_rules": {
+    "description": "OpenSpec archive path rules per Aria methodology",
+    "correct_path": "project/openspec/archive/{spec-name}",
+    "incorrect_path": "standards/openspec/archive/{spec-name}",
+    "cli_known_bug": "CLI may report standards/ path - skill auto-corrects to project-local path",
+    "duplicate_handling": "Skip and warn if archive already exists"
+  },
+  "strengths": [
+    "Correct project-local archive path enforcement",
+    "Automatic CLI path bug detection and correction",
+    "Complete metadata preservation during archive",
+    "Reliable duplicate archive detection"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with nested project structures",
+    "Add support for archiving multiple specs in batch",
+    "Test CLI bug fix across different OS path separators"
+  ],
+  "status": "completed"
+}

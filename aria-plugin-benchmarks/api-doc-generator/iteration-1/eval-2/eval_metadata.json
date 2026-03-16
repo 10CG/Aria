@@ -1,0 +1,42 @@
+{
+  "eval_id": 2,
+  "eval_name": "endpoint-extraction",
+  "category": "code-analysis",
+  "prompt": "Extract all API endpoints from this Express.js router file:\n\n```javascript\nrouter.get('/products', authenticate, productController.list);\nrouter.get('/products/:id', authenticate, productController.getById);\nrouter.post('/products', authenticate, authorize('admin'), productController.create);\nrouter.put('/products/:id', authenticate, authorize('admin'), productController.update);\nrouter.delete('/products/:id', authenticate, authorize('admin'), productController.delete);\n```",
+  "setup": {
+    "framework": "express",
+    "source_file": "backend/src/routes/products.js",
+    "auth_middleware": "authenticate",
+    "admin_middleware": "authorize('admin')"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "extracts_all_5_endpoints",
+      "description": "Should extract all 5 endpoints from the router",
+      "check": "output.match(/GET.*\\/products|POST.*\\/products|PUT.*\\/products|DELETE.*\\/products/g)?.length >= 4",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_http_methods",
+      "description": "Should correctly identify GET, POST, PUT, DELETE methods",
+      "check": "output.match(/GET/i) && output.match(/POST/i) && output.match(/PUT/i) && output.match(/DELETE/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "identifies_path_params",
+      "description": "Should identify :id or {id} path parameters",
+      "check": "output.match(/\\{id\\}|:id|path.*param/i)",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "notes_auth_requirements",
+      "description": "Should note authentication/authorization requirements",
+      "check": "output.match(/auth|authenticate|authorize|admin/i)",
+      "severity": "high"
+    }
+  ]
+}

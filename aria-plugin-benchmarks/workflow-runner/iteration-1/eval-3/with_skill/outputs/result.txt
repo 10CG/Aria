@@ -1,0 +1,29 @@
+## Workflow Runner — Preset: new-feature
+
+Task: Add push notification feature
+Preset: new-feature
+Description: Full Ten-Step Cycle with emphasis on spec creation and structured delivery
+Started: 2026-03-16T10:23:00Z
+
+Loaded preset configuration:
+  Preset name: new-feature
+  Phases: A.0 → A.1 → A.2 → A.3 → B.1 → B.2 → C.1 → C.2 → D.1 → D.2
+  OpenSpec level: Level 2 (Minimal) minimum
+  Branch naming: feature/{spec-name}
+
+═══════════════════════════════════════════════
+  Executing new-feature preset workflow...
+═══════════════════════════════════════════════
+
+[A.0] State Scanner → current state collected
+[A.1] Spec Drafter → OpenSpec created (openspec/changes/push-notifications/proposal.md)
+[A.2] Task Planner → tasks planned (3 tasks across mobile + backend)
+[A.3] Agent Router → agents assigned (mobile-developer, backend-architect)
+[B.1] Branch Manager → feature/push-notifications created
+[B.2] Implementation → tasks executed + reviewed
+[C.1] Commit → feat(notifications): add push notification system
+[C.2] Merge → feature/push-notifications → main
+[D.1] Progress Updater → UPMv2-STATE updated
+[D.2] Archive → OpenSpec archived, cycle closed
+
+Preset new-feature workflow completed. All 10 steps executed.

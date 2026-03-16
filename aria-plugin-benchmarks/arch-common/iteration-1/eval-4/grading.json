@@ -1,0 +1,29 @@
+{
+  "eval_id": 4,
+  "eval_name": "cross-skill-compatibility",
+  "timestamp": "2026-03-16T08:34:00Z",
+  "assertions": [
+    {
+      "text": "mentions_arch_search_integration",
+      "passed": true,
+      "evidence": "Output contains dedicated section 'INTEGRATION WITH arch-search' explaining usage"
+    },
+    {
+      "text": "mentions_arch_update_integration",
+      "passed": true,
+      "evidence": "Output contains dedicated section 'INTEGRATION WITH arch-update' explaining usage"
+    },
+    {
+      "text": "identifies_shared_config",
+      "passed": true,
+      "evidence": "Output shows 'SHARED CONFIGURATION ELEMENTS' table listing layer definitions, naming conventions, and placement rules"
+    },
+    {
+      "text": "explains_consistency_benefit",
+      "passed": true,
+      "evidence": "Output states 'arch-common acts as a single source of truth' ensuring 'consistent behavior across the entire architecture toolchain'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

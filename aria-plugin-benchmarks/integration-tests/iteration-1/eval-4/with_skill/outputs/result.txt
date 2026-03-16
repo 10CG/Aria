@@ -1,0 +1,175 @@
+================================================================================
+INTEGRATION TEST: brainstorm-to-spec-pipeline
+Prompt: We need a caching layer but unsure about Redis vs Memcached vs in-memory - explore options and create spec
+Skills: brainstorm, spec-drafter, task-planner, agent-router
+================================================================================
+
+[INIT] workflow-runner: Detected exploratory request with open decision. Routing to brainstorm first.
+
+================================================================================
+=== Brainstorm Session ===
+================================================================================
+
+[A.0] brainstorm: Starting structured exploration for caching layer decision...
+
+--- brainstorm output ---
+Topic: Caching layer technology selection
+Participants: AI (structured analysis) + Human (context provider)
+Session ID: BRAINSTORM-2026-0316-042
+
+PHASE 1: Option Enumeration
+  Identified options:
+    1. Redis           (distributed, feature-rich, persistence support)
+    2. Memcached       (simple, high-throughput, distributed)
+    3. In-memory cache (local, zero-latency, no infrastructure)
+    4. Hybrid          (in-memory L1 + Redis L2)
+
+PHASE 2: Constraint Gathering
+  Current system context:
+    - Scale: ~50k req/min peak
+    - Deployment: Kubernetes, 3-5 replicas
+    - Data: User sessions (TTL 30m), API response cache (TTL 5m), rate-limit counters
+    - Team: Familiar with Redis, no Memcached experience
+    - Budget: $80/month cache infrastructure limit
+
+PHASE 3: Comparison Matrix
+
+| Criterion              | Redis      | Memcached  | In-Memory  | Hybrid      |
+|------------------------|------------|------------|------------|-------------|
+| Multi-replica support  | YES        | YES        | NO         | YES         |
+| Data structure support | Rich       | String only| Language   | Rich        |
+| Persistence            | Optional   | NO         | NO         | Optional    |
+| Latency (p50)          | ~0.5ms     | ~0.3ms     | ~0.01ms    | ~0.01ms L1  |
+| Operational complexity | MEDIUM     | LOW        | LOW        | HIGH        |
+| TTL support            | YES        | YES        | Depends    | YES         |
+| Rate limiting support  | YES (INCR) | Limited    | NO         | YES         |
+| Monthly cost           | ~$45       | ~$30       | $0         | ~$45        |
+| Team familiarity       | HIGH       | LOW        | HIGH       | HIGH        |
+
+PHASE 4: Decision Analysis
+  Critical requirements:
+    - Multi-replica (Kubernetes): eliminates In-Memory as primary
+    - Rate limiting counters: eliminates Memcached (no atomic INCR)
+    - Budget: Redis ($45) within limit
+    - Team familiarity: Redis (HIGH) vs Memcached (LOW) -> reduces ramp-up risk
+
+DECISION: Redis
+  Rationale:
+    - Only option satisfying all critical requirements (multi-replica + rate-limiting)
+    - Team familiarity reduces implementation risk
+    - Rich data structures enable future use cases (pub/sub, sorted sets for leaderboards)
+    - Cost within budget
+  Rejected: Memcached (no rate limit counters), In-Memory (no multi-replica)
+  Conditional: Hybrid L1+L2 deferred to v2 if latency becomes bottleneck
+
+Writing decision record:
+  docs/decisions/DR-2026-047-caching-layer-redis.md [CREATED]
+  Content: ADR (Architecture Decision Record) with comparison matrix, rationale, consequences
+
+Brainstorm output: DECISION=Redis, decision_ref=docs/decisions/DR-2026-047-caching-layer-redis.md
+---
+
+[A.0] brainstorm: Decision reached - Redis selected. Decision record at docs/decisions/DR-2026-047-caching-layer-redis.md [OK]
+
+================================================================================
+=== Phase A: Spec Creation ===
+================================================================================
+
+[A.1] spec-drafter: Creating spec based on brainstorm decision...
+
+--- spec-drafter output ---
+Reading brainstorm decision: docs/decisions/DR-2026-047-caching-layer-redis.md
+  decision: Redis
+  decision_ref: docs/decisions/DR-2026-047-caching-layer-redis.md
+  brainstorm_reference: BRAINSTORM-2026-0316-042
+
+Complexity assessment:
+  - New infrastructure component (Redis)
+  - 3 use cases (sessions, API cache, rate limits)
+  - Cross-module impact (auth-service, api-gateway, user-service)
+  - Recommended level: Level 3 (Full: proposal.md + tasks.md)
+
+Creating: openspec/changes/SPEC-2024-051-redis-caching-layer/proposal.md
+  spec_id:     SPEC-2024-051
+  title:       Redis Caching Layer Implementation
+  level:       3
+  status:      draft
+  decision_ref: docs/decisions/DR-2026-047-caching-layer-redis.md
+
+  Sections written:
+    [x] Background (references DR-2026-047-caching-layer-redis.md and brainstorm session)
+    [x] Technology Decision (Redis - see docs/decisions/DR-2026-047-caching-layer-redis.md)
+    [x] Architecture Overview (Redis Sentinel for HA, connection pooling)
+    [x] Use Case 1: Session Cache (TTL=30m, keyspace: session:{user_id})
+    [x] Use Case 2: API Response Cache (TTL=5m, keyspace: cache:{endpoint}:{params_hash})
+    [x] Use Case 3: Rate Limit Counters (INCR + EXPIRE pattern)
+    [x] Migration Strategy (feature flag rollout)
+    [x] Observability (cache hit rate metrics, eviction alerts)
+
+  spec_id: SPEC-2024-051
+  proposal.md: openspec/changes/SPEC-2024-051-redis-caching-layer/proposal.md [CREATED]
+
+Spec includes brainstorm reference:
+  > "Technology selection based on structured evaluation in BRAINSTORM-2026-0316-042.
+  >  Decision record: docs/decisions/DR-2026-047-caching-layer-redis.md"
+---
+
+[A.1] spec-drafter: proposal.md created at Level 3, references brainstorm decision [OK]
+
+[A.2] task-planner: Decomposing SPEC-2024-051 into tasks...
+
+--- task-planner output ---
+Reading: openspec/changes/SPEC-2024-051-redis-caching-layer/proposal.md
+Decomposing (target: 4-8h each)...
+
+Task list:
+  TASK-331  infra: Provision Redis Sentinel cluster (Kubernetes)            [infra]  4h  HIGH
+  TASK-332  impl:  Implement RedisClient wrapper with connection pooling    [backend] 6h  HIGH
+  TASK-333  impl:  Migrate session storage to Redis cache                   [backend] 5h  HIGH
+  TASK-334  impl:  Implement API response cache middleware                  [backend] 6h  HIGH
+  TASK-335  impl:  Implement rate limit counter using Redis INCR            [backend] 4h  MEDIUM
+  TASK-336  test:  Integration tests for all three Redis use cases          [qa]      6h  HIGH
+  TASK-337  test:  Load test cache layer under 50k req/min                  [qa]      4h  MEDIUM
+  TASK-338  docs:  Update architecture diagrams and runbook                 [docs]    3h  LOW
+
+Task categories:
+  implementation tasks: TASK-332, TASK-333, TASK-334, TASK-335  (4 tasks)
+  test tasks:           TASK-336, TASK-337                       (2 tasks)
+  infrastructure:       TASK-331                                 (1 task)
+  documentation:        TASK-338                                 (1 task)
+
+Writing: openspec/changes/SPEC-2024-051-redis-caching-layer/detailed-tasks.yaml [CREATED]
+---
+
+[A.2] task-planner: 8 tasks (4 implementation + 2 test + 1 infra + 1 docs) [OK]
+
+[A.3] agent-router: Assigning tasks...
+
+--- agent-router output ---
+Assignments:
+  backend-architect  -> TASK-332, TASK-333, TASK-334, TASK-335
+  qa-engineer        -> TASK-336, TASK-337
+  infra-engineer     -> TASK-331
+  tech-writer        -> TASK-338
+---
+
+[A.3] agent-router: 4 agents assigned [OK]
+
+================================================================================
+=== PIPELINE VERIFICATION ===
+================================================================================
+
+Brainstorm -> Spec -> Tasks chain:
+  brainstorm:   BRAINSTORM-2026-0316-042 -> decision: Redis              [OK]
+  decision:     docs/decisions/DR-2026-047-caching-layer-redis.md        [OK]
+  spec:         SPEC-2024-051 Level 3 references decision record         [OK]
+  tasks:        TASK-331..TASK-338 (8 tasks: impl + test both present)   [OK]
+
+Spec level: Level 3 (meets minimum Level 2 requirement)
+Implementation tasks: TASK-332, TASK-333, TASK-334, TASK-335 (present)
+Test tasks: TASK-336, TASK-337 (present)
+Decision referenced in spec: docs/decisions/DR-2026-047-caching-layer-redis.md [OK]
+
+================================================================================
+RESULT: PASS
+================================================================================

@@ -1,0 +1,26 @@
+## Progress Updater — State Token Generation
+
+Project: api-refactor-v2
+Iteration: 2
+Generated: 2026-03-16T10:13:00Z
+
+**stateToken**: YXBpLXJlZmFjdG9yLXYyOml0ZXI9MjpUMT1jLFQyPWMsVDM9aXAsVDQ9cCxUNT1w
+
+**Token Metadata**:
+```
+stateToken: YXBpLXJlZmFjdG9yLXYyOml0ZXI9MjpUMT1jLFQyPWMsVDM9aXAsVDQ9cCxUNT1w
+project: api-refactor-v2
+iteration: 2
+completion: 40%
+tasks_completed: 2
+tasks_total: 5
+tasks_summary: T1=c,T2=c,T3=ip,T4=p,T5=p
+generated_at: 2026-03-16T10:13:00Z
+```
+
+**Progress**: 2 of 5 tasks completed (40%)
+- Completed: T1, T2
+- In Progress: T3
+- Pending: T4, T5
+
+Token can be passed to `/state-scanner` or `/workflow-runner` for quick state recovery without re-reading the full UPM document.

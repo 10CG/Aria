@@ -1,0 +1,58 @@
+{
+  "eval_id": 1,
+  "eval_name": "full-feature-cycle-a-to-d",
+  "category": "end-to-end",
+  "description": "Complete A->B->C->D cycle for a new feature, verifying context flows from spec to PR to archive",
+  "prompt": "Execute full ten-step cycle for implementing a user notification feature",
+  "skills_involved": [
+    "state-scanner", "workflow-runner", "phase-a-planner", "spec-drafter",
+    "task-planner", "phase-b-developer", "branch-manager", "subagent-driver",
+    "phase-c-integrator", "commit-msg-generator", "phase-d-closer",
+    "progress-updater", "openspec-archive"
+  ],
+  "context_chain": "spec_id -> task_list -> branch_name -> commit_sha -> pr_url -> archive_path",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "phase_a_produces_spec",
+      "description": "Phase A must produce proposal.md with valid spec_id",
+      "check": "output.includes('proposal.md') && output.match(/SPEC-\\d+/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "phase_a_produces_tasks",
+      "description": "Phase A must produce detailed-tasks.yaml with task IDs referencing spec_id",
+      "check": "output.includes('detailed-tasks.yaml') && output.includes('TASK-')",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "phase_b_creates_branch",
+      "description": "Phase B must create branch named feature/{module}/{task-id}-{desc}",
+      "check": "output.match(/feature\\/\\w+\\/TASK-\\d+-/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "phase_c_references_spec",
+      "description": "Phase C commit/PR must reference the original spec_id",
+      "check": "output.match(/SPEC-\\d+/) && (output.includes('PR') || output.includes('pull request'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A5",
+      "name": "phase_d_archives_spec",
+      "description": "Phase D must archive spec to openspec/archive/ (not standards/)",
+      "check": "output.includes('openspec/archive/') && !output.includes('standards/openspec/archive/')",
+      "severity": "critical"
+    },
+    {
+      "id": "A6",
+      "name": "context_chain_unbroken",
+      "description": "Each phase output must contain reference to previous phase artifact",
+      "check": "phases_all_reference_predecessor",
+      "severity": "critical"
+    }
+  ]
+}

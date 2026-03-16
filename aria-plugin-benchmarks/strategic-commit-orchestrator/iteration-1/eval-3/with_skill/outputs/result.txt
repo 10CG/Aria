@@ -1,0 +1,43 @@
+# Strategic Commit Orchestrator - Commit Message Format
+
+## 生成的提交信息
+
+```
+feat(auth): add JWT token validation with expiry check
+
+- Implement token expiry verification on each request
+- Add refresh token logic for seamless session renewal
+- Return 401 on expired tokens with refresh hint
+```
+
+## 格式验证报告
+
+### Conventional Commits 规范检查
+
+| 检查项 | 规范要求 | 实际值 | 状态 |
+|--------|---------|--------|------|
+| Header 格式 | `type(scope): description` | `feat(auth): add JWT token validation with expiry check` | ✅ |
+| Type | 小写 feat/fix/docs 等 | `feat` | ✅ |
+| Scope | 小写括号包裹 | `(auth)` | ✅ |
+| Subject 长度 | <= 50 字符 | 46 字符 | ✅ |
+| 末尾无句点 | Subject 不以 `.` 结尾 | `...check` | ✅ |
+| Body 分隔 | 空行分隔 Header 和 Body | 有空行 | ✅ |
+| Body 内容 | 描述变更详情 | token, expiry, refresh 均提及 | ✅ |
+
+### 详细分析
+
+**Header**: `feat(auth): add JWT token validation with expiry check`
+- Type: `feat` (新功能)
+- Scope: `auth` (认证模块)
+- Subject: `add JWT token validation with expiry check` (46 chars)
+
+**Body**:
+```
+- Implement token expiry verification on each request
+- Add refresh token logic for seamless session renewal
+- Return 401 on expired tokens with refresh hint
+```
+
+## 结论
+
+提交信息完全符合 Conventional Commits 规范要求，可直接使用。

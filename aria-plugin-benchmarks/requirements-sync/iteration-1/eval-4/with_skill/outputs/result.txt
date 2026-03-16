@@ -1,0 +1,59 @@
+# Requirements Sync — Status Change Propagation Report
+
+> **Operation**: Status Change Propagation
+> **Skill**: requirements-sync v1.1.0
+> **Trigger**: US-020 status changed from In Progress → Done
+> **Timestamp**: 2026-03-16T14:18:00Z
+
+## Propagation Result: SUCCESS — 2 documents updated
+
+---
+
+## Propagation Chain
+
+```
+US-020 (Done)
+    │
+    ├── [1] UPM requirements / REQ-020  ──── UPDATED
+    │        In Progress → Done
+    │
+    └── [2] Epic EPIC-003 progress      ──── UPDATED
+             60% → 75% (US-020 completion added)
+```
+
+---
+
+## Target 1: UPM Requirements
+
+```diff
+ requirements:
+   - id: REQ-020
+     story_ref: US-020
+     title: "Password reset via email"
+-    status: In Progress
++    status: Done
+     updated: 2026-03-16T14:18:00Z
+```
+
+---
+
+## Target 2: Epic Progress (EPIC-003)
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Stories total | 8 | 8 |
+| Stories done | 4 | **5** |
+| Epic progress | 60% | **75%** |
+
+Epic EPIC-003 progress recalculated: 5/8 stories done = **75%**
+
+---
+
+## Propagation Summary
+
+| Target | Type | Change | Status |
+|--------|------|--------|--------|
+| REQ-020 (UPM) | requirements | In Progress → Done | updated |
+| EPIC-003 | Epic | 60% → 75% | propagated |
+
+**Total propagated: 2 targets updated**

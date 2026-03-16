@@ -1,0 +1,28 @@
+## Progress Updater — Percentage Calculation
+
+**Overall Completion: 60%**
+
+**Calculation Breakdown**:
+```
+Formula: (completed + in_progress * 0.5) / total * 100
+
+Inputs:
+  completed:   5 tasks  × 1.0 weight = 5.0
+  in_progress: 2 tasks  × 0.5 weight = 1.0 (partial credit)
+  pending:     3 tasks  × 0.0 weight = 0.0
+
+Calculation:
+  Effective completed = 5.0 + 1.0 = 6.0
+  Total tasks = 10
+  Completion = 6.0 / 10 = 60.0%
+```
+
+**Task Summary**:
+| Status | Count | Weight | Contribution |
+|--------|-------|--------|--------------|
+| completed | 5 | 1.0 | 5.0 |
+| in_progress | 2 | 0.5 (partial credit) | 1.0 |
+| pending | 3 | 0.0 | 0.0 |
+| **Total** | **10** | | **6.0 / 10 = 60%** |
+
+Note: in_progress tasks receive 0.5 partial credit weight as they represent work underway but not yet delivered.

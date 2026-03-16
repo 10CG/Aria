@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "cross-module-grouping",
+  "category": "grouping-logic",
+  "prompt": "分析跨模块变更并生成提交分组计划: files=[backend/src/api/users.py, frontend/src/pages/UserList.tsx, shared/types/user.ts, mobile/lib/screens/user_screen.dart], task_id=TASK-202, description=user-management-feature",
+  "setup": {
+    "file_count": 4,
+    "module_count": 4,
+    "expected_groups": 3
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "separates_modules",
+      "description": "Should create separate commit groups per module",
+      "check": "output.includes('backend') && output.includes('frontend') && (output.includes('shared') || output.includes('mobile'))",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "identifies_shared_types_first",
+      "description": "Should recognize shared types as a dependency group",
+      "check": "output.includes('shared') || output.includes('types') || output.includes('依赖')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "produces_multiple_groups",
+      "description": "Should produce 2 or more commit groups",
+      "check": "output.match(/group\\s*[2-9]|Group\\s*[2-9]|分组\\s*[2-9]|第[二三四五]组/) || output.includes('Commit 2') || output.includes('提交 2')",
+      "severity": "high"
+    }
+  ]
+}

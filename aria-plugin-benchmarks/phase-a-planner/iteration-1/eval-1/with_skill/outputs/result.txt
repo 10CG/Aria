@@ -1,0 +1,123 @@
+# Phase A Execution Plan: oauth2-social-login
+
+**Skill**: phase-a-planner v1.0.0
+**Feature**: Add OAuth2 social login support (GitHub + Google)
+**Timestamp**: 2026-03-16T14:01:00Z
+**Mode**: Full cycle (no existing spec detected)
+
+---
+
+## Pre-flight Check
+
+- State scanner: CLEAN (working tree has no uncommitted changes)
+- Existing spec: NOT FOUND at openspec/changes/oauth2-social-login/
+- Decision: Execute full A.1 → A.2 → A.3 sequence
+
+---
+
+## A.1 — Spec Creation (spec-drafter)
+
+**Status**: COMPLETED
+**Action**: Invoked spec-drafter to generate OpenSpec proposal
+
+> Calling skill: spec-drafter
+> Input: feature=oauth2-social-login, providers=[github, google]
+> Output: openspec/changes/oauth2-social-login/proposal.md
+
+### Generated: openspec/changes/oauth2-social-login/proposal.md
+
+```markdown
+# OpenSpec: OAuth2 Social Login
+
+## Summary
+Add OAuth2 authentication support for GitHub and Google providers,
+allowing users to sign in without a password.
+
+## Motivation
+- Reduce signup friction (no password required)
+- Leverage trusted identity providers
+- Industry-standard OAuth2 / PKCE flow
+
+## Scope
+- Backend: OAuth2 callback handlers, token exchange, user linking
+- Frontend: Social login buttons, redirect flow
+- Database: oauth_accounts table linking social IDs to users
+
+## Out of Scope
+- Apple Sign In (future iteration)
+- Enterprise SSO (separate spec)
+
+## Acceptance Criteria
+- [ ] Users can sign in with GitHub OAuth2
+- [ ] Users can sign in with Google OAuth2
+- [ ] Existing accounts can be linked to social providers
+- [ ] OAuth tokens stored securely (not in plaintext)
+```
+
+A.1 completed in 12.3s — proposal.md written to disk.
+
+---
+
+## A.2 — Task Planning (task-planner)
+
+**Status**: COMPLETED
+**Action**: Invoked task-planner with proposal.md as input
+
+> Calling skill: task-planner
+> Input: openspec/changes/oauth2-social-login/proposal.md
+> Output: openspec/changes/oauth2-social-login/tasks.md
+
+### Generated tasks.md (summary):
+
+| Task | Title | Complexity | Hours | Agent |
+|------|-------|-----------|-------|-------|
+| TASK-001 | OAuth2 database schema migration | M | 4h | backend-architect |
+| TASK-002 | GitHub OAuth2 callback handler | M | 6h | backend-architect |
+| TASK-003 | Google OAuth2 callback handler | M | 6h | backend-architect |
+| TASK-004 | Account linking service | L | 8h | backend-architect |
+| TASK-005 | Frontend social login buttons | M | 4h | frontend-developer |
+| TASK-006 | OAuth2 integration tests | M | 6h | qa-engineer |
+
+Total: 6 tasks, 34h estimated
+
+A.2 completed in 18.7s — tasks.md written to disk.
+
+---
+
+## A.3 — Agent Allocation
+
+**Status**: COMPLETED
+**Action**: Allocated tasks to available agents
+
+### Agent Assignments:
+
+- **backend-architect** (4 tasks): TASK-001, TASK-002, TASK-003, TASK-004
+  - Rationale: Database schema, OAuth2 backend logic, account linking
+- **frontend-developer** (1 task): TASK-005
+  - Rationale: UI components, social login button integration
+- **qa-engineer** (1 task): TASK-006
+  - Rationale: Integration testing across both providers
+
+### Execution Order:
+TASK-001 → TASK-002 → TASK-003 → TASK-004 → TASK-005 → TASK-006
+
+A.3 completed in 6.1s — agent allocations recorded.
+
+---
+
+## Phase A Summary
+
+| Step | Status | Duration | Output |
+|------|--------|----------|--------|
+| A.1 Spec Creation | COMPLETED | 12.3s | proposal.md |
+| A.2 Task Planning | COMPLETED | 18.7s | tasks.md |
+| A.3 Agent Allocation | COMPLETED | 6.1s | agent assignments |
+
+**Total Duration**: 37.1s
+**Phase A**: COMPLETE — Ready for Phase B (branch creation)
+
+### Next Action
+Hand off to phase-b-developer with:
+- Spec: openspec/changes/oauth2-social-login/proposal.md
+- Tasks: openspec/changes/oauth2-social-login/tasks.md
+- Primary agent: backend-architect

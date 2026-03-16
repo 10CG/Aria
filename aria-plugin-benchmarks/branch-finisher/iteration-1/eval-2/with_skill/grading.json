@@ -1,0 +1,25 @@
+{
+  "eval_id": 2,
+  "eval_name": "worktree-cleanup",
+  "timestamp": "2026-03-16T14:06:00Z",
+  "assertions": [
+    {
+      "text": "removes_worktree",
+      "passed": true,
+      "evidence": "Output contains 'git worktree remove' command and 'worktree' + 'remove' keywords"
+    },
+    {
+      "text": "confirms_cleanup",
+      "passed": true,
+      "evidence": "Output contains 'removed successfully', 'success', 'done', and 'complete' in cleanup result table"
+    },
+    {
+      "text": "references_worktree_path",
+      "passed": true,
+      "evidence": "Output references '.git/worktrees/feature-backend-TASK-101' and 'TASK-101' throughout"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "notes": "Worktree cleanup completed: git worktree remove executed, .git/worktrees/feature-backend-TASK-101 removed, workspace restored"
+}

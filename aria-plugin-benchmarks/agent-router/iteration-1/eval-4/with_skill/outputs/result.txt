@@ -1,0 +1,28 @@
+## Agent Router Result
+
+**Task**: Design and implement a real-time notification system: push notifications on mobile (Flutter) and a WebSocket server on the backend (FastAPI), plus update the shared API contract.
+
+**Routing Decision**: MULTI-AGENT — task breakdown recommended
+**Agents**: mobile-developer + backend-architect (parallel execution)
+
+**Task Split / Breakdown**:
+
+**Agent 1: mobile-developer**
+- Scope: Flutter push notification integration
+- Files: mobile/lib/services/notification_service.dart
+- Deliverable: FCM/APNS integration, notification permission handling, foreground/background handlers
+
+**Agent 2: backend-architect**
+- Scope: WebSocket server + FastAPI notification hub
+- Files: backend/src/websocket/notification_hub.py
+- Deliverable: WebSocket endpoint, message broadcast logic, connection lifecycle management
+
+**Shared Dependency** (coordinate after both agents complete):
+- Update shared/contracts/openapi/notifications.yaml
+- Recommend: backend-architect leads API contract update; mobile-developer reviews
+
+**Parallel Execution**: Both agents can work concurrently. No blocking dependency until shared contract update.
+
+**Confidence per sub-task**:
+- mobile-developer: 0.93
+- backend-architect: 0.91

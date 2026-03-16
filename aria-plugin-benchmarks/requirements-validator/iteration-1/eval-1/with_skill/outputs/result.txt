@@ -1,0 +1,51 @@
+# PRD Format Validation Report
+
+> **Document**: PRD-001 (draft)
+> **Validator**: requirements-validator v2.1.0
+> **Timestamp**: 2026-03-16T14:00:00Z
+
+## Validation Result: FAIL
+
+**3 violations found** in PRD-001.
+
+---
+
+## Violations
+
+### [CRITICAL] Missing required section: Background
+- **Rule**: PRD_FORMAT_001 — All PRDs must contain a Background section explaining the business context
+- **Action**: Add a `## Background` section describing the problem and business motivation
+
+### [CRITICAL] Missing required section: Scope
+- **Rule**: PRD_FORMAT_002 — All PRDs must contain a Scope section defining in-scope and out-of-scope items
+- **Action**: Add a `## Scope` section with explicit in-scope and out-of-scope lists
+
+### [HIGH] Missing required section: Acceptance Criteria
+- **Rule**: PRD_FORMAT_003 — All PRDs must define measurable Acceptance Criteria
+- **Action**: Add a `## Acceptance Criteria` section with testable conditions
+
+---
+
+## Summary
+
+| Severity | Count |
+|----------|-------|
+| CRITICAL | 2     |
+| HIGH     | 1     |
+| MEDIUM   | 0     |
+| LOW      | 0     |
+| **Total violations** | **3** |
+
+## Present Sections (Passed)
+
+- [x] Title
+- [x] Overview
+- [x] User Requirements
+- [x] Technical Requirements
+- [ ] Background — **MISSING**
+- [ ] Scope — **MISSING**
+- [ ] Acceptance Criteria — **MISSING**
+
+## Recommendation
+
+Fix all CRITICAL violations before advancing to Architecture design phase. PRD must pass format validation before the PRD→Architecture chain can be established.

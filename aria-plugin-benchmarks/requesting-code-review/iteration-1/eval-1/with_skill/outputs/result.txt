@@ -1,0 +1,73 @@
+# Requesting Code Review - Phase 1: Spec Compliance
+
+> **Review Phase**: Phase 1 - Spec Compliance
+> **Task**: TASK-003 - 实现用户登录 API
+> **Spec Reference**: openspec/changes/user-auth.md
+> **Status**: Phase 1 Review Complete - 1 Deviation Found
+
+---
+
+## Phase 1: Specification Compliance Review
+
+Code Reviewer Agent activated for Phase 1 spec compliance check.
+
+**Files Under Review**:
+- `backend/api/auth/login.py`
+- `backend/services/user_service.py`
+
+**Spec Reference**: `openspec/changes/user-auth.md`
+
+---
+
+## Interface Contract Validation
+
+Checking implementation against spec-defined API interface...
+
+### Endpoint: POST /api/auth/login
+
+| Spec Requirement | Implementation | Status |
+|------------------|----------------|--------|
+| HTTP Method: POST | `@app.route('/api/auth/login', methods=['POST'])` | PASS |
+| Request body: `{email, password}` | `request.json.get('email')`, `request.json.get('password')` | PASS |
+| Success response: `{token, user_id, expires_at}` | Returns `{token, user_id}` | DEVIATION |
+| Error 401: invalid credentials | `return jsonify({'error': ...}), 401` | PASS |
+| Error 422: missing fields | Field validation present | PASS |
+| JWT expiry: 24h | `timedelta(hours=24)` in jwt_handler | PASS |
+
+---
+
+## Deviations from Spec
+
+### Deviation 1: Missing `expires_at` field in response
+
+**Spec requires** (`openspec/changes/user-auth.md`, line 47):
+```json
+{
+  "token": "eyJ...",
+  "user_id": 123,
+  "expires_at": "2026-03-17T14:00:00Z"
+}
+```
+
+**Implementation returns** (`backend/api/auth/login.py`, line 38):
+```python
+return jsonify({"token": token, "user_id": user.id}), 200
+```
+
+**Missing**: `expires_at` timestamp field in the response body.
+
+**Severity**: Important - Frontend clients need `expires_at` to schedule token refresh.
+
+---
+
+## Phase 1 Summary
+
+| Category | Result |
+|----------|--------|
+| Spec compliance | 5/6 requirements met |
+| Interface contract | 1 deviation found |
+| Functional requirements | All covered |
+
+**Phase 1 Result**: APPROVED WITH NOTES
+
+Proceeding to Phase 2 code quality review. The `expires_at` deviation should be fixed before final approval.

@@ -1,0 +1,34 @@
+{
+  "eval_id": 5,
+  "eval_name": "strictness-level-strict",
+  "category": "strictness",
+  "prompt": "TDD Enforcer 以 Strict 模式运行。开发者试图提交没有测试覆盖的实现代码。应该阻止提交。",
+  "setup": {
+    "strictness_level": "strict",
+    "violation": "commit_without_test_coverage",
+    "files_staged": ["services/payment_service.py"]
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "blocks_non_tdd_code",
+      "description": "Should block the commit due to missing test coverage",
+      "check": "output.includes('block') || output.includes('阻止') || output.includes('Strict') || output.includes('拒绝')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "explains_violation",
+      "description": "Should clearly explain what the TDD violation is",
+      "check": "output.includes('coverage') || output.includes('覆盖') || output.includes('测试') || output.includes('test')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "provides_remediation",
+      "description": "Should provide clear steps to remediate the violation",
+      "check": "output.includes('步骤') || output.includes('step') || output.includes('先写') || output.includes('需要')",
+      "severity": "high"
+    }
+  ]
+}

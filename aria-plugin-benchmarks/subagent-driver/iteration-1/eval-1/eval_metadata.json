@@ -1,0 +1,34 @@
+{
+  "eval_id": 1,
+  "eval_name": "fresh-subagent-launch",
+  "category": "agent-lifecycle",
+  "prompt": "启动一个新的 Fresh Subagent 来执行 TASK-003: 实现用户登录 API。确保 subagent 以干净的上下文启动。",
+  "setup": {
+    "task_id": "TASK-003",
+    "task_type": "backend-implementation",
+    "requires_clean_context": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "launches_fresh_context",
+      "description": "Should launch subagent with fresh/clean context",
+      "check": "output.includes('Fresh') || output.includes('clean') || output.includes('新') || output.includes('独立')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "assigns_correct_task",
+      "description": "Should assign TASK-003 to the new subagent",
+      "check": "output.includes('TASK-003') || output.includes('登录') || output.includes('login')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "isolates_from_parent_context",
+      "description": "Should ensure subagent does not inherit parent conversation context",
+      "check": "output.includes('isolat') || output.includes('隔离') || output.includes('context') || output.includes('上下文')",
+      "severity": "high"
+    }
+  ]
+}
