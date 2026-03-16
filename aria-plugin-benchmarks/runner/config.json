@@ -1,0 +1,140 @@
+{
+  "test_project": "F:/work2025/cursor/todo-web",
+  "aria_plugin": "F:/work2025/cursor/Aria/aria",
+  "benchmarks_dir": "F:/work2025/cursor/Aria/aria-plugin-benchmarks",
+  "output_dir": "F:/work2025/cursor/Aria/aria-plugin-benchmarks/runner/results",
+  "model": "sonnet",
+  "max_parallel": 2,
+  "timeout_seconds": 240,
+  "skills": {
+    "state-scanner": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "scan-todo-web-status",
+          "prompt": "/state-scanner",
+          "assertions": [
+            {"text": "detects_git_repo", "check": "git|branch|commit|分支|提交"},
+            {"text": "detects_openspec_archive", "check": "openspec|archive|spec|归档|OpenSpec"},
+            {"text": "detects_architecture_docs", "check": "architecture|system-architecture|架构|Architecture"},
+            {"text": "recommends_workflow", "check": "推荐|工作流|workflow|recommend|\\[\\d\\]|选择"},
+            {"text": "structured_output", "check": "═|─|╔|╗|║|┌|┐|│|\\+[-=]+\\+"}
+          ]
+        }
+      ]
+    },
+    "requirements-validator": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "validate-prd-format",
+          "prompt": "Validate the PRD document at docs/requirements/prd-todo-optimization-v1.md",
+          "assertions": [
+            {"text": "finds_prd_file", "check": "prd-todo-optimization|PRD"},
+            {"text": "checks_format", "check": "format|section|heading|template|格式|章节|模板|验证"},
+            {"text": "reports_result", "check": "pass|fail|valid|invalid|issue|warning|error|问题|修复|报告|严重"}
+          ]
+        },
+        {
+          "id": "real-2",
+          "name": "validate-architecture-doc",
+          "prompt": "Validate the system architecture document at docs/architecture/system-architecture.md",
+          "assertions": [
+            {"text": "finds_arch_file", "check": "system-architecture|architecture|架构"},
+            {"text": "checks_structure", "check": "section|component|module|layer|模块|组件|层"},
+            {"text": "reports_result", "check": "pass|fail|valid|invalid|issue|warning|问题|验证|报告"}
+          ]
+        }
+      ]
+    },
+    "arch-search": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "search-auth-implementation",
+          "prompt": "Search for authentication implementation architecture",
+          "assertions": [
+            {"text": "finds_relevant_docs", "check": "auth|jwt|token|login|security|认证|登录"},
+            {"text": "provides_file_pointers", "check": "\\.(js|ts|md)"},
+            {"text": "structured_output", "check": "Layer|layer|document|doc|架构|总览|分层"}
+          ]
+        },
+        {
+          "id": "real-2",
+          "name": "search-database-design",
+          "prompt": "Search for database design and data model architecture",
+          "assertions": [
+            {"text": "finds_db_docs", "check": "mongo|database|model|schema|collection|SQLite|数据库"},
+            {"text": "provides_pointers", "check": "\\.(js|ts|md)"}
+          ]
+        }
+      ]
+    },
+    "spec-drafter": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "draft-tag-feature-spec",
+          "prompt": "Create an OpenSpec proposal for adding a tag/label feature to todo items. Users should be able to create, assign, and filter by tags. Output the proposal content directly in your response, do not create any files.",
+          "assertions": [
+            {"text": "creates_proposal_structure", "check": "proposal|Proposal|## |提案|规范"},
+            {"text": "assesses_level", "check": "Level [123]|level.*[123]|[Ll]evel|复杂度|等级"},
+            {"text": "defines_scope", "check": "scope|Scope|feature|tag|label|标签|范围|功能"},
+            {"text": "includes_requirements", "check": "requirement|功能|feature|user story|需求|用户"}
+          ]
+        }
+      ]
+    },
+    "commit-msg-generator": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "generate-from-staged-changes",
+          "prompt": "I have staged a small change to frontend/src/js/app.js adding a benchmark comment. Generate a conventional commit message for this change. Do not run any tools, just generate the message based on this description.",
+          "setup": "echo '/* todo-web benchmark test */' >> frontend/src/js/app.js && git add frontend/src/js/app.js",
+          "cleanup": "git checkout -- frontend/src/js/app.js",
+          "assertions": [
+            {"text": "conventional_format", "check": "(feat|fix|docs|style|refactor|test|chore)"},
+            {"text": "has_description", "check": ": .{5,}|comment|benchmark|app\\.js"}
+          ]
+        }
+      ]
+    },
+    "task-planner": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "decompose-archived-spec",
+          "prompt": "Read the archived spec at openspec/archive/2026-02-24-phase3-ux-optimization/proposal.md and decompose it into tasks",
+          "assertions": [
+            {"text": "creates_task_list", "check": "task|TASK|Task|任务|#|\\d\\.\\d"},
+            {"text": "has_complexity", "check": "[SMLX]|small|medium|large|complex|复杂|优先|P[012]"},
+            {"text": "has_dependencies", "check": "depend|block|after|before|order|顺序|优先|先|后"},
+            {"text": "assigns_agents", "check": "agent|developer|architect|engineer|开发|前端|后端|涉及"}
+          ]
+        }
+      ]
+    },
+    "strategic-commit-orchestrator": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "analyze-multi-file-changes",
+          "prompt": "Analyze the project and suggest a strategic commit plan for changes across both backend/src/ and frontend/src/ directories. Assume we modified authentication logic in backend and the login UI in frontend.",
+          "assertions": [
+            {"text": "groups_by_module", "check": "group|Group|backend|frontend|分组|模块|后端|前端"},
+            {"text": "conventional_commits", "check": "(feat|fix|refactor)\\(|feat|fix|refactor|commit|提交"},
+            {"text": "suggests_order", "check": "order|first|then|before|after|sequence|顺序|先|后|步骤"}
+          ]
+        }
+      ]
+    }
+  }
+}
