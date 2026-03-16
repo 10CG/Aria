@@ -1,7 +1,7 @@
 # OpenSpec Proposal: Aria Plugin Skills Benchmark
 
 - **Level**: 2 (Minimal)
-- **Status**: In Progress
+- **Status**: Complete
 - **Created**: 2026-03-13
 - **Author**: 10CG Lab
 
