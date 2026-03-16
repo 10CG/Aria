@@ -1,10 +1,11 @@
 # Aria System Architecture
 
-> **Version**: 1.5.0
+> **Version**: 1.5.1
 > **Status**: Active
 > **Created**: 2026-01-18
 > **Last Updated**: 2026-03-16
 > **Project Type**: Methodology Research
+> **Parent PRD**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
 
 ---
 
@@ -775,6 +776,7 @@ Review Early, Review Often:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 1.5.1 | 2026-03-16 | 文档链路：新增 Parent PRD 引用，完善 L0→L1 需求链路 |
 | 1.5.0 | 2026-03-16 | 基准测试体系：新增 aria-plugin-benchmarks/ (27 Skill 评估套件 + 自动化 runner)；可测试性增强 |
 | 1.4.0 | 2026-02-07 | 两阶段代码审查：新增 aria:code-reviewer Agent 和 requesting-code-review Skill；subagent-driver v1.3.0 集成两阶段审查 |
 | 1.3.2 | 2026-02-06 | brainstorm v2.0.0: 基于 Superpowers 最佳实践重构对话流程; 新增"不可协商规则"强制对话控制; 修复 AI 跳过对话直接生成 User Stories 的问题 |
