@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "simple-feat-add-files",
+  "timestamp": "2026-03-13T03:00:00Z",
+  "commit_message": "Added authentication files\n\nThis commit adds new authentication routes and integrates them into the main app.",
+  "expectations": [
+    {
+      "text": "type_is_feat",
+      "passed": false,
+      "evidence": "Message does not follow Conventional Commits format - no type prefix"
+    },
+    {
+      "text": "scope_is_auth",
+      "passed": false,
+      "evidence": "No scope notation found"
+    },
+    {
+      "text": "subject_length",
+      "passed": true,
+      "evidence": "First line is 26 characters (<= 50)"
+    },
+    {
+      "text": "imperative_mood",
+      "passed": false,
+      "evidence": "Subject uses past tense 'Added' instead of imperative"
+    },
+    {
+      "text": "no_enhanced_markers",
+      "passed": true,
+      "evidence": "No enhanced markers found"
+    }
+  ],
+  "verdict": "fail",
+  "pass_rate": 0.4
+}

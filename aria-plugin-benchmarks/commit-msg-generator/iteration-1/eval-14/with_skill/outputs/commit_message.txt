@@ -1,0 +1,4 @@
+feat(api/users): 添加用户资料端点
+
+- 添加 GET /users/profile 端点
+- 支持用户信息查询

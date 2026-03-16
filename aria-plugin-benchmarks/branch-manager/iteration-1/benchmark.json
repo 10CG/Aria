@@ -1,0 +1,112 @@
+{
+  "benchmark_name": "branch-manager",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-13T05:45:00Z",
+  "total_evals": 10,
+  "evals_completed": 4,
+  "summary": {
+    "with_skill": {
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "mode_decision_accuracy": "100%",
+        "branch_naming_compliance": "100%",
+        "module_identifier_support": "6 modules",
+        "worktree_threshold_algorithm": "Correct (score >= 3)"
+      }
+    },
+    "partial_results": {
+      "note": "6 evals still in progress, results based on completed tests only"
+    }
+  },
+  "by_category": {
+    "branch-creation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "mode-decision": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "module-listing": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "hotfix-naming": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "simple-feature-branch",
+      "category": "branch-creation",
+      "with_skill": "PASS",
+      "key_finding": "Branch mode selected correctly (score=1 < 3), naming convention followed",
+      "assertions": {
+        "mode": "branch",
+        "branch_name": "feature/backend/TASK-001-user-auth",
+        "decision_reason": "Simple modification, use regular branch"
+      }
+    },
+    {
+      "eval_id": 2,
+      "name": "complex-worktree-decision",
+      "category": "mode-decision",
+      "with_skill": "PASS",
+      "key_finding": "Worktree mode selected (score=6 >= 3), cross-module + high-risk triggers",
+      "assertions": {
+        "mode": "worktree",
+        "total_score": 6,
+        "factors": {
+          "file_count": 0,
+          "cross_directory": 2,
+          "task_count": 1,
+          "risk_level": 3,
+          "parallel_needed": 0
+        }
+      }
+    },
+    {
+      "eval_id": 4,
+      "name": "hotfix-naming",
+      "category": "hotfix-naming",
+      "with_skill": "PASS",
+      "key_finding": "Hotfix branch naming followed convention: hotfix/backend/BUG-001-api-crash"
+    },
+    {
+      "eval_id": 10,
+      "name": "module-identifier-listing",
+      "category": "module-listing",
+      "with_skill": "PASS",
+      "key_finding": "All 6 supported modules listed with correct identifiers",
+      "modules": ["backend", "mobile", "shared", "cross", "docs", "standards"]
+    }
+  ],
+  "mode_decision_algorithm": {
+    "description": "5-dimension scoring system",
+    "threshold": "score >= 3 → Worktree, score < 3 → Branch",
+    "dimensions": [
+      {"name": "file_count", "weight": "low", "rules": "1-3 files → 0, 4-8 files → 1, >8 files → 2"},
+      {"name": "cross_directory", "weight": "medium", "rules": "cross-directory → +2"},
+      {"name": "task_count", "weight": "low", "rules": "4-8 tasks → +1"},
+      {"name": "risk_level", "weight": "medium", "rules": "high → +3, medium → +1"},
+      {"name": "parallel_needed", "weight": "high", "rules": "needed → +2"}
+    ]
+  },
+  "strengths": [
+    "Accurate auto-mode decision algorithm (5 dimensions)",
+    "Consistent branch naming convention: {type}/{module}/{task_id}-{description}",
+    "Clear decision reasoning output",
+    "Comprehensive module identifier support"
+  ],
+  "pending_evals": [3, 5, 6, 7, 8, 9],
+  "note": "Full benchmark pending completion of remaining 6 test cases"
+}

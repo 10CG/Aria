@@ -1,0 +1,7 @@
+{
+  "module": "mobile",
+  "issue": "ISSUE-42",
+  "description": "login-crash",
+  "branch_type": "bugfix",
+  "mode": "auto"
+}

@@ -1,0 +1,24 @@
+{
+  "eval_id": 15,
+  "eval_name": "complex-multi-keyword",
+  "category": "complex-query",
+  "prompt": "搜索离线数据同步和冲突解决的实现",
+  "expected_layer": 1,
+  "expected_domain": "sync",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "handles_complex_query",
+      "description": "Should handle multiple related keywords",
+      "check": "output.match(/sync|同步|offline|离线|conflict|冲突/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "provides_comprehensive_info",
+      "description": "Should provide comprehensive info summary",
+      "check": "output.includes('摘要') || output.includes('Summary') || output.includes('信息')",
+      "severity": "high"
+    }
+  ]
+}

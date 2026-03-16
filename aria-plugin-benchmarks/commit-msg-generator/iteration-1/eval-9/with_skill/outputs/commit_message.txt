@@ -1,0 +1,9 @@
+feat(auth): 实现JWT认证功能
+
+基于 auth-system.md 设计文档实现认证系统。
+
+- 创建 JWT token 生成服务
+- 添加认证中间件
+- 添加单元测试
+
+Refs: docs/designs/auth-system.md

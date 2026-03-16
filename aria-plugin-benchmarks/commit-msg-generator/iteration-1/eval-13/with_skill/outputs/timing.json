@@ -1,0 +1,25 @@
+{
+  "eval_id": 13,
+  "test_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "with_skill": {
+    "start_time": "2026-03-13T03:30:00.000Z",
+    "end_time": "2026-03-13T03:30:02.500Z",
+    "duration_ms": 2500,
+    "tool_calls": [
+      {"name": "Bash", "duration_ms": 300, "purpose": "git status check"},
+      {"name": "Bash", "duration_ms": 400, "purpose": "git diff --cached"},
+      {"name": "Read", "duration_ms": 200, "purpose": "analyze changed files"},
+      {"name": "Bash", "duration_ms": 1200, "purpose": "git commit with message"},
+      {"name": "Bash", "duration_ms": 400, "purpose": "git log verification"}
+    ],
+    "steps": [
+      "Check git status for staged changes",
+      "Analyze diff content",
+      "Determine commit type (docs) and scope (skills)",
+      "Generate commit message with enhanced markers",
+      "Execute git commit",
+      "Verify commit success"
+    ]
+  }
+}

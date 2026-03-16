@@ -1,0 +1,76 @@
+# 搜索结果：状态管理是怎么实现的
+
+## 搜索方法
+- 使用 Grep 进行关键词搜索（状态管理、state management、状态机等）
+- 搜索关键词：provider、notifier、riverpod
+- 使用 Glob 查找相关文件
+- 阅读相关架构文档
+
+## 文档发现
+1. **mobile/docs/architecture/state.md** - 详细的状态管理架构文档
+2. **mobile/docs/ARCHITECTURE.md** - 主架构文档，包含状态管理概述
+3. **DOMAINS.md** - 领域概览文档
+
+## 状态管理架构摘要
+
+### 技术选型
+- **Riverpod 2.0** - 响应式状态管理框架
+- 不依赖 BuildContext，编译时安全
+- 易于测试，支持依赖注入
+
+### 架构分层
+```
+┌─────────────────────────────────┐
+│         UI Layer                │
+│  (Widgets, Screens)             │
+├─────────────────────────────────┤
+│         ViewModel Layer         │
+│  (StateNotifierProviders)       │
+├─────────────────────────────────┤
+│         Repository Layer        │
+│  (Data Providers)               │
+├─────────────────────────────────┤
+│         Data Source Layer       │
+│  (API, Local Storage)           │
+└─────────────────────────────────┘
+```
+
+### Provider 组织
+- **全局状态**: 如认证状态
+  - `mobile/src/providers/global_providers.dart`
+  - 使用 StateNotifierProvider<AuthNotifier, AuthState>
+  - 通过依赖注入连接到 Repository
+
+- **局部状态**: 按功能模块组织
+  - 如任务状态：`mobile/src/features/task/providers/`
+  - 每个模块有自己的 provider 文件
+
+### 代码示例
+```dart
+// 认证状态管理
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier(ref.read(authRepositoryProvider));
+});
+
+// 用户信息（衍生状态）
+final userProvider = Provider<User?>((ref) {
+  return ref.watch(authProvider).user;
+});
+```
+
+## 相关代码指针
+- 全局 Providers: `mobile/src/providers/global_providers.dart`
+- 认证状态: `mobile/src/providers/auth/auth_notifier.dart`
+- 任务状态: `mobile/src/features/task/providers/`
+- 设置状态: `mobile/src/providers/settings/`
+
+## 最佳实践
+1. **单一职责**: 每个 Provider 只管理一类状态
+2. **不可变数据**: 使用 freezed 生成不可变类
+3. **异步处理**: 使用 AsyncValue 处理加载状态
+
+## Token 使用估算
+- 搜索操作约 100 tokens
+- 文档阅读约 2000 tokens
+- 输出生成约 500 tokens
+- **总计**: 约 2600 tokens

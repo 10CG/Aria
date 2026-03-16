@@ -1,0 +1,35 @@
+{
+  "eval_id": "eval-15",
+  "assertions": {
+    "A1": {
+      "name": "standard_format",
+      "description": "Must follow '<type>(<scope>): <subject>' format",
+      "passed": false,
+      "reason": "Message does not follow Conventional Commits format - missing type, scope, and colon separator"
+    },
+    "A2": {
+      "name": "lowercase_type",
+      "description": "Type must be lowercase",
+      "passed": false,
+      "reason": "No type present in message"
+    },
+    "A3": {
+      "name": "colon_after_scope",
+      "description": "Must have colon after scope",
+      "passed": false,
+      "reason": "No colon separator present"
+    },
+    "A4": {
+      "name": "space_after_colon",
+      "description": "Must have space after colon before subject",
+      "passed": false,
+      "reason": "No colon present to check spacing"
+    }
+  },
+  "overall": {
+    "passed": false,
+    "total_assertions": 4,
+    "passed_assertions": 0,
+    "score": 0.0
+  }
+}

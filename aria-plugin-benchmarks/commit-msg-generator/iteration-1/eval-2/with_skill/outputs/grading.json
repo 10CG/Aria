@@ -1,0 +1,31 @@
+{
+  "assertions": {
+    "A1": {
+      "name": "type_is_fix",
+      "description": "Message must start with 'fix('",
+      "expected": "Message starts with 'fix('",
+      "actual": "Message starts with 'fix('",
+      "passed": true
+    },
+    "A2": {
+      "name": "scope_is_utils",
+      "description": "Scope should be 'utils'",
+      "expected": "Scope is 'utils'",
+      "actual": "Scope is 'utils'",
+      "passed": true
+    },
+    "A3": {
+      "name": "subject_concise",
+      "description": "Subject mentions 'typo' or 'fix'",
+      "expected": "Subject contains 'typo' or 'fix'",
+      "actual": "Subject contains 'typo'",
+      "passed": true
+    }
+  },
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "overall_passed": true
+  }
+}

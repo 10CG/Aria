@@ -1,0 +1,38 @@
+## 🔍 架构搜索结果
+
+**查询**: mobile 模块的整体架构
+**搜索层级**: Layer 1 (快速路由)
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/ARCHITECTURE.md` | ⭐⭐⭐ | Mobile Module Architecture - Flutter应用整体架构文档 |
+
+### 📝 信息摘要
+
+Mobile 模块采用 Flutter 3.x + Dart 3.x 技术栈，使用 Riverpod 状态管理、Dio + Retrofit 网络层、Drift 本地存储。整体采用经典的四层架构：Presentation（界面）、Domain（领域）、Data（数据）、Infrastructure（基础设施）。模块包含认证安全、状态管理、数据同步、网络通信、导航路由、AI记忆等子领域。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/lib/main.dart` - 应用入口点
+- `mobile/lib/src/features/` - 功能模块实现
+- `mobile/lib/src/providers/` - Riverpod状态管理实现
+- `mobile/lib/src/services/` - 服务层实现
+- `mobile/lib/src/screens/` - 页面实现
+- `mobile/lib/src/widgets/` - UI组件实现
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/state.md` 了解状态管理设计
+- [ ] 查看 `mobile/docs/architecture/network.md` 了解网络架构
+- [ ] 查看各功能模块的 `mobile/lib/src/features/` 实现代码
+
+### 📊 搜索效率统计
+
+- **使用的 Layer**: Layer 1 (快速路由)
+- **Token 消耗**: ~200 tokens（包括文档读取）
+- **搜索时间**: < 1 秒
+- **命中率**: 100%

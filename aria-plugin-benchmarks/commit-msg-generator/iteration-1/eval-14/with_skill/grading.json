@@ -1,0 +1,15 @@
+{
+  "eval_id": 14,
+  "eval_name": "scope-extraction-path-based",
+  "timestamp": "2026-03-13T10:30:00Z",
+  "commit_message": "feat(api/users): 添加用户资料端点\n\n- 添加 GET /users/profile 端点\n- 支持用户信息查询",
+  "expectations": [
+    {
+      "text": "scope_from_path",
+      "passed": true,
+      "evidence": "Scope 'api/users' derived from file path 'backend/src/api/users.py'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

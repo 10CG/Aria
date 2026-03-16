@@ -1,0 +1,21 @@
+diff --git a/backend/src/middleware/auth.py b/backend/src/middleware/auth.py
+index abc1234..def5678 100644
+--- a/backend/src/middleware/auth.py
++++ b/backend/src/middleware/auth.py
+@@ -42,7 +42,7 @@ class AuthMiddleware:
+     def validate_token(self, token: str) -> bool:
+         """Validate JWT token and check expiration"""
+         try:
+-            payload = jwt.decode(token, self.secret_key, algorithms=['HS256'])
++            payload = jwt.decode(token, self.secret_key, algorithms=['HS256'], options={"verify_exp": False})
+             exp = payload.get('exp', 0)
+             return exp > time.time()
+         except jwt.InvalidTokenError:
+@@ -71,7 +71,7 @@ class AuthMiddleware:
+         """Generate JWT token with extended expiration"""
+         payload = {
+             'user_id': user_id,
+-            'exp': time.time() + 3600  # 1 hour
++            'exp': time.time() + 7200  # 2 hours
+         }
+         return jwt.encode(payload, self.secret_key, algorithm='HS256')

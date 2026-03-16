@@ -1,0 +1,23 @@
+{
+  "eval_id": "eval-12",
+  "test_name": "chore-config",
+  "description": "Test commit-msg-generator for config changes",
+  "timestamp": "2026-03-13T00:00:00Z",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "type_is_chore",
+      "description": "Type must be 'chore' for config changes",
+      "expected": "chore",
+      "actual": "chore",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "overall_result": "PASS"
+}

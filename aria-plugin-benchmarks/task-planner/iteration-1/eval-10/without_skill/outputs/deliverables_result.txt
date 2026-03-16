@@ -1,0 +1,27 @@
+# 手动任务分解: OTP 登录功能
+
+基于人工分析的任务分解：
+
+1. **设计数据库迁移**
+   - 添加 otp_verified 和 otp_expires 字段
+
+2. **实现短信发送功能**
+   - 集成短信 API
+   - 配置发送模板
+
+3. **OTP 生成和验证**
+   - 生成 6 位随机码
+   - 设置有效期
+
+4. **修改登录流程**
+   - 先验证密码
+   - 再验证 OTP
+
+5. **编写测试用例**
+   - 单元测试
+   - 集成测试
+
+交付文件：
+- backend/migrations/add_otp.sql
+- backend/services/sms.py
+- backend/utils/otp.py

@@ -1,0 +1,5 @@
+feat(auth): 添加JWT用户认证功能
+
+- 新增认证路由模块 (backend/src/routes/auth.py)
+- 实现用户登录和注册接口
+- 集成到主应用路由 (backend/src/app.py)

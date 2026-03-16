@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "eval_name": "layer1-auth-keyword-routing",
+  "category": "layer-1-routing",
+  "prompt": "搜索认证功能在哪里实现的",
+  "expected_layer": 1,
+  "expected_domain": "auth_security",
+  "expected_document_path": "mobile/docs/architecture/security.md",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "uses_layer_1",
+      "description": "Should use Layer 1 (domain routing) for auth keywords",
+      "check": "output.includes('Layer 1') || output.includes('layer 1') || output.includes('快速路由')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "finds_security_doc",
+      "description": "Should find security.md or auth-related architecture doc",
+      "check": "output.match(/security\\.md|auth.*\\.md|认证.*\\.md/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "provides_code_pointer",
+      "description": "Should provide code file pointer in output",
+      "check": "output.includes('.dart') || output.includes('.py') || output.includes('.ts')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "token_under_500",
+      "description": "Layer 1 should consume < 500 tokens",
+      "check": "tokens_used < 500",
+      "severity": "high"
+    }
+  ]
+}

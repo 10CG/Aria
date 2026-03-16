@@ -1,0 +1,399 @@
+{
+  "skill_name": "arch-search",
+  "skill_path": "aria/skills/arch-search",
+  "skill_version": "1.1.0",
+  "description": "Benchmark tests for arch-search skill - Token-efficient architecture document search",
+  "baseline_comparison": {
+    "method": "direct_code_search",
+    "description": "Traditional Grep/Glob search across entire codebase"
+  },
+  "metrics": [
+    "token_savings",
+    "layer_used",
+    "correct_document_found",
+    "output_format_compliance",
+    "code_pointer_accuracy"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "layer1-auth-keyword-routing",
+      "category": "layer-1-routing",
+      "prompt": "搜索认证功能在哪里实现的",
+      "expected_layer": 1,
+      "expected_domain": "auth_security",
+      "expected_document_path": "mobile/docs/architecture/security.md",
+      "setup": {
+        "keywords_in_query": ["认证", "auth"],
+        "should_match_domains": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "uses_layer_1",
+          "description": "Should use Layer 1 (domain routing) for auth keywords",
+          "check": "output.includes('Layer 1') || output.includes('layer 1') || output.includes('快速路由')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "finds_security_doc",
+          "description": "Should find security.md or auth-related architecture doc",
+          "check": "output.match(/security\\.md|auth.*\\.md|认证.*\\.md/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "provides_code_pointer",
+          "description": "Should provide code file pointer in output",
+          "check": "output.includes('.dart') || output.includes('.py') || output.includes('.ts')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "token_under_500",
+          "description": "Layer 1 should consume < 500 tokens",
+          "check": "tokens_used < 500",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "layer1-database-keyword-routing",
+      "category": "layer-1-routing",
+      "prompt": "查找数据库设计文档",
+      "expected_layer": 1,
+      "expected_domain": "data_storage",
+      "expected_document_path": "backend/docs/architecture/database.md",
+      "setup": {
+        "keywords_in_query": ["数据库", "database"],
+        "should_match_domains": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_database_doc",
+          "description": "Should find database architecture document",
+          "check": "output.match(/database.*\\.md|数据库.*架构|data.*storage/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "layer1_efficiency",
+          "description": "Should complete in Layer 1",
+          "check": "tokens_used < 500",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "layer1-api-contract-routing",
+      "category": "layer-1-routing",
+      "prompt": "API 端点定义在哪",
+      "expected_layer": 1,
+      "expected_domain": "network",
+      "expected_document_path": "shared/contracts/openapi/",
+      "setup": {
+        "keywords_in_query": ["API", "端点", "endpoint"],
+        "should_match_domains": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_api_contract",
+          "description": "Should find API contracts or network architecture",
+          "check": "output.match(/contracts|openapi|api.*\\.yaml|network.*\\.md/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "no_layer3_fallback",
+          "description": "Should NOT fall back to Layer 3 for common queries",
+          "check": "!output.includes('Layer 3') && !output.includes('传统搜索')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "layer1-state-management-routing",
+      "category": "layer-1-routing",
+      "prompt": "状态管理是怎么实现的",
+      "expected_layer": 1,
+      "expected_domain": "state_management",
+      "expected_document_path": "mobile/docs/architecture/state.md",
+      "setup": {
+        "keywords_in_query": ["状态管理", "state", "provider"],
+        "should_match_domains": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_state_doc",
+          "description": "Should find state management architecture doc",
+          "check": "output.match(/state.*\\.md|状态.*\\.md|provider|riverpod/i)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "layer2-architecture-search",
+      "category": "layer-2-search",
+      "prompt": "搜索数据同步机制的设计文档",
+      "expected_layer": 2,
+      "expected_domain": "sync",
+      "setup": {
+        "keywords_in_query": ["同步", "sync", "离线"],
+        "layer1_may_match": true,
+        "layer2_fallback": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_sync_doc",
+          "description": "Should find sync-related architecture document",
+          "check": "output.match(/sync.*\\.md|同步.*\\.md|offline/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "uses_grep_arch_docs",
+          "description": "Layer 2 should use Grep on architecture docs",
+          "check": "tokens_used < 1000",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "layer2-unknown-keyword",
+      "category": "layer-2-search",
+      "prompt": "查找缓存策略文档",
+      "expected_layer": 2,
+      "setup": {
+        "keywords_in_query": ["缓存", "cache"],
+        "layer1_may_match": false,
+        "needs_layer2_grep": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "searches_arch_docs",
+          "description": "Should search architecture docs even if no domain match",
+          "check": "output.includes('架构') || output.includes('ARCHITECTURE')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "reasonable_token_use",
+          "description": "Layer 2 should use < 1000 tokens",
+          "check": "tokens_used < 1000",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "layer3-fallback-rare-keyword",
+      "category": "layer-3-fallback",
+      "prompt": "搜索 foo-bar-baz 这个功能在哪",
+      "expected_layer": 3,
+      "setup": {
+        "keywords_in_query": ["foo-bar-baz"],
+        "should_not_match_domains": true,
+        "should_fallback_to_layer3": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "indicates_layer3",
+          "description": "Should indicate Layer 3 fallback",
+          "check": "output.includes('Layer 3') || output.includes('传统搜索') || output.includes('未找到')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "still_provides_results",
+          "description": "Should still attempt to provide useful results",
+          "check": "output.length > 100",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "output-format-compliance",
+      "category": "format-validation",
+      "prompt": "搜索导航路由的实现",
+      "expected_layer": 1,
+      "expected_domain": "navigation",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_emoji_header",
+          "description": "Output should have 🔍 emoji header",
+          "check": "output.includes('🔍')",
+          "severity": "medium"
+        },
+        {
+          "id": "A2",
+          "name": "has_query_section",
+          "description": "Should show the query term",
+          "check": "output.includes('查询') || output.includes('Query')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "has_layer_info",
+          "description": "Should indicate search layer used",
+          "check": "output.includes('Layer') || output.includes('层级')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "has_document_table",
+          "description": "Should have related documents section",
+          "check": "output.includes('文档') || output.includes('Document')",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "has_code_pointers",
+          "description": "Should provide code file pointers",
+          "check": "output.includes('.dart') || output.includes('.py')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "bilingual-keyword-support",
+      "category": "i18n",
+      "prompt": "Where is the login implementation?",
+      "expected_layer": 1,
+      "expected_domain": "auth_security",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "handles_english_keywords",
+          "description": "Should handle English keywords (login, auth)",
+          "check": "output.match(/security|auth|login|认证|登录/i)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "bilingual-keyword-chinese",
+      "category": "i18n",
+      "prompt": "How is user registration implemented?",
+      "expected_layer": 1,
+      "expected_domain": "auth_security",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "handles_registration_query",
+          "description": "Should find registration/auth related docs",
+          "check": "output.match(/security|auth|register|注册|认证/i)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "token-savings-auth",
+      "category": "token-efficiency",
+      "prompt": "搜索认证功能的实现",
+      "expected_layer": 1,
+      "baseline_tokens": 3000,
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "significant_token_savings",
+          "description": "Should save at least 60% tokens vs baseline",
+          "check": "tokens_used < 1200",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "token-savings-api",
+      "category": "token-efficiency",
+      "prompt": "API endpoints 在哪定义",
+      "expected_layer": 1,
+      "baseline_tokens": 4000,
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "significant_token_savings",
+          "description": "Should save at least 70% tokens vs baseline",
+          "check": "tokens_used < 1200",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "module-entry-routing",
+      "category": "module-entry",
+      "prompt": "mobile 模块的整体架构",
+      "expected_layer": 1,
+      "expected_document_path": "mobile/docs/ARCHITECTURE.md",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_module_entry",
+          "description": "Should find module ARCHITECTURE.md entry point",
+          "check": "output.match(/mobile.*ARCHITECTURE|ARCHITECTURE.*mobile/i)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "ai-system-search",
+      "category": "domain-specific",
+      "prompt": "AI 记忆系统是怎么设计的",
+      "expected_layer": 1,
+      "expected_domain": "ai_system",
+      "expected_document_path": "mobile/docs/architecture/ai-memory.md",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "finds_ai_memory_doc",
+          "description": "Should find AI memory architecture document",
+          "check": "output.match(/ai.*memory|记忆|智能/i)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "complex-multi-keyword",
+      "category": "complex-query",
+      "prompt": "搜索离线数据同步和冲突解决的实现",
+      "expected_layer": 1,
+      "expected_domain": "sync",
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "handles_complex_query",
+          "description": "Should handle multiple related keywords",
+          "check": "output.match(/sync|同步|offline|离线|conflict|冲突/i)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "provides_comprehensive_info",
+          "description": "Should provide comprehensive info summary",
+          "check": "output.includes('摘要') || output.includes('Summary') || output.includes('信息')",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

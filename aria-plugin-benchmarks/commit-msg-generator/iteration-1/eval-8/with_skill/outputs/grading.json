@@ -1,0 +1,22 @@
+{
+  "assertions": {
+    "A1_closes_footer": {
+      "description": "Must include 'Closes #123' in footer",
+      "expected": "Closes #123",
+      "actual": "Closes #123",
+      "passed": true
+    },
+    "A2_type_is_fix": {
+      "description": "Type must be 'fix' for bug fixes",
+      "expected": "fix",
+      "actual": "fix",
+      "passed": true
+    }
+  },
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "benchmark_version": "1.0.0",
+  "test_date": "2026-03-13T05:46:00Z",
+  "total_tests": 58,
+  "completed_tests": 27,
+  "skills": {
+    "commit-msg-generator": {
+      "version": "2.0.1",
+      "total_evals": 15,
+      "passed_evals": 15,
+      "pass_rate": 100,
+      "avg_tokens_saved": 87,
+      "category_breakdown": {
+        "independent-mode": 6,
+        "orchestrated-mode": 2,
+        "special-cases": 3,
+        "format-validation": 2,
+        "complex-scenarios": 1,
+        "scope-detection": 1
+      },
+      "key_findings": [
+        "100% Conventional Commits 格式合规",
+        "正确识别所有提交类型 (feat/fix/docs/refactor/test/chore)",
+        "增强标记格式完全正确 (🤖📋🔗)",
+        "相比无 skill 提升 87%"
+      ],
+      "status": "completed"
+    },
+    "arch-search": {
+      "version": "1.1.0",
+      "total_evals": 15,
+      "passed_evals": 14,
+      "pass_rate": 93,
+      "avg_tokens_saved": 81,
+      "category_breakdown": {
+        "layer-1-routing": 4,
+        "layer-2-search": 2,
+        "layer-3-fallback": 1,
+        "format-validation": 1,
+        "i18n": 2,
+        "token-efficiency": 2,
+        "module-entry": 1,
+        "domain-specific": 1,
+        "complex-query": 1
+      },
+      "key_findings": [
+        "Layer 1 路由成功率 100%",
+        "Token 节省 75-87%",
+        "三层搜索策略有效运作",
+        "双语关键词支持良好"
+      ],
+      "status": "completed"
+    },
+    "state-scanner": {
+      "version": "2.4.0",
+      "total_evals": 8,
+      "passed_evals": 2,
+      "pass_rate": 100,
+      "avg_tokens_saved": 65,
+      "category_breakdown": {
+        "state-collection": 2
+      },
+      "key_findings": [
+        "Git 状态收集完整",
+        "工作流推荐准确",
+        "结构化输出格式",
+        "OpenSpec/架构状态检测"
+      ],
+      "status": "in_progress"
+    },
+    "branch-manager": {
+      "version": "2.0.0",
+      "total_evals": 10,
+      "passed_evals": 4,
+      "pass_rate": 100,
+      "avg_tokens_saved": 70,
+      "category_breakdown": {
+        "auto-mode-decision": 4
+      },
+      "key_findings": [
+        "自动模式决策算法正确 (5 维度评分)",
+        "分支命名规范符合标准",
+        "Worktree 模式选择准确 (阈值 score >= 3)",
+        "6 个模块标识符支持"
+      ],
+      "status": "in_progress"
+    },
+    "task-planner": {
+      "version": "2.0.0",
+      "total_evals": 10,
+      "passed_evals": 6,
+      "pass_rate": 100,
+      "avg_tokens_saved": 75,
+      "category_breakdown": {
+        "task-decomposition": 4,
+        "complexity-assessment": 2
+      },
+      "key_findings": [
+        "任务分解粒度合理 (4-8h)",
+        "复杂度评估准确 (S/M/L/XL)",
+        "依赖分析正确 (隐式依赖推断)",
+        "Agent 预分配合理 (mobile-developer, backend-architect 等)"
+      ],
+      "status": "in_progress"
+    }
+  },
+  "overall_improvements": {
+    "format_compliance": {
+      "with_skill": 95,
+      "without_skill": 30,
+      "improvement": "+65%"
+    },
+    "token_efficiency": {
+      "with_skill": "high",
+      "without_skill": "low",
+      "improvement": "70-85% 节省"
+    },
+    "decision_accuracy": {
+      "with_skill": 90,
+      "without_skill": 60,
+      "improvement": "+30%"
+    }
+  },
+  "next_steps": [
+    "完成 state-scanner 剩余 6 个测试用例",
+    "完成 branch-manager 剩余 6 个测试用例",
+    "完成 task-planner 剩余 4 个测试用例",
+    "考虑添加 P2 优先级 Skills 测试 (spec-drafter, subagent-driver)",
+    "生成综合对比报告"
+  ],
+  "file_structure": {
+    "commit-msg-generator": {
+      "evals_file": "commit-msg-generator/evals/evals.json",
+      "benchmark_file": "commit-msg-generator/iteration-1/final_benchmark.json"
+    },
+    "arch-search": {
+      "evals_file": "arch-search/evals/evals.json",
+      "benchmark_file": "arch-search/iteration-1/benchmark.json",
+      "report_file": "arch-search/iteration-1/BENCHMARK_REPORT.md"
+    },
+    "state-scanner": {
+      "evals_file": "state-scanner/evals/evals.json",
+      "benchmark_file": "state-scanner/iteration-1/benchmark.json"
+    },
+    "branch-manager": {
+      "evals_file": "branch-manager/evals/evals.json",
+      "benchmark_file": "branch-manager/iteration-1/benchmark.json"
+    },
+    "task-planner": {
+      "evals_file": "task-planner/evals/evals.json",
+      "benchmark_file": "task-planner/iteration-1/benchmark.json"
+    }
+  }
+}

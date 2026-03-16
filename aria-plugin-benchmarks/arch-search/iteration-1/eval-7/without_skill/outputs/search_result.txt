@@ -1,0 +1,68 @@
+# ARCH-SEARCH BASELINE TEST - EVAL-7 WITHOUT SKILL
+
+## Test Configuration
+- **Query**: "搜索 foo-bar-baz 这个功能在哪"
+- **Method**: Traditional search (Grep/Glob)
+- **Project**: F:/work2025/cursor/Aria/aria-plugin-benchmarks/arch-search/mock-project
+- **Test**: BASELINE (without arch-search skill)
+
+## Search Methods Used
+
+### 1. Exact Match Search
+- Used: `grep "foo-bar-baz"` in entire project
+- Result: No files found
+
+### 2. Partial Match Searches
+- Used: `grep "foo"`, `grep "bar"`, `grep "baz"`
+- Result: No files found for any partial match
+
+### 3. File Pattern Search
+- Used: `glob **/*foo-bar-baz*`
+- Result: No files found
+
+### 4. Comprehensive File Scan
+- Total files scanned: 11 (all documentation and code files)
+- File types: .md (11 files)
+- Searched all content using grep -r
+
+## Documents in the Project
+
+The mock project contains the following documents:
+
+### Backend Architecture
+- `backend/docs/architecture/database.md`
+- `backend/docs/ARCHITECTURE.md`
+
+### Mobile Architecture
+- `mobile/docs/architecture/ai-memory.md`
+- `mobile/docs/architecture/navigation.md`
+- `mobile/docs/architecture/network.md`
+- `mobile/docs/architecture/security.md`
+- `mobile/docs/architecture/state.md`
+- `mobile/docs/architecture/sync.md`
+- `mobile/docs/architecture/cache.md`
+
+### Project-Level
+- `DOMAINS.md`
+- `mobile/docs/ARCHITECTURE.md`
+
+## Search Result
+
+**Nothing was found** related to "foo-bar-baz" functionality.
+
+### Why Nothing Was Found
+1. The query "foo-bar-baz" does not exist in the mock project
+2. No related terms (foo, bar, baz) found in any document
+3. This appears to be a test to validate that the traditional search method cannot find non-existent information
+
+## Token Usage Estimate
+- Input tokens: ~500 (11 files, ~200 words each)
+- Output tokens: ~200 (this summary)
+- Total: ~700 tokens
+
+## Comparison Note
+This represents the traditional search baseline. The arch-search skill might provide different results by:
+- Understanding semantic meaning of the query
+- Finding related concepts even with exact matches
+- Using knowledge about the architecture to infer location
+- Following architectural documentation patterns

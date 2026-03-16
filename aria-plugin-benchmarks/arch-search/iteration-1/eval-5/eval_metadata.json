@@ -1,0 +1,24 @@
+{
+  "eval_id": 5,
+  "eval_name": "layer2-architecture-search",
+  "category": "layer-2-search",
+  "prompt": "搜索数据同步机制的设计文档",
+  "expected_layer": 2,
+  "expected_domain": "sync",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_sync_doc",
+      "description": "Should find sync-related architecture document",
+      "check": "output.match(/sync.*\\.md|同步.*\\.md|offline/i)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "uses_grep_arch_docs",
+      "description": "Layer 2 should use Grep on architecture docs",
+      "check": "tokens_used < 1000",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "eval_id": 12,
+  "eval_name": "token-savings-api",
+  "category": "token-efficiency",
+  "prompt": "API endpoints 在哪定义",
+  "expected_layer": 1,
+  "baseline_tokens": 4000,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "significant_token_savings",
+      "description": "Should save at least 70% tokens vs baseline",
+      "check": "tokens_used < 1200",
+      "severity": "critical"
+    }
+  ]
+}

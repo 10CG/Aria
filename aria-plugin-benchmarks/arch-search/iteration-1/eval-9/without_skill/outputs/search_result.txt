@@ -1,0 +1,86 @@
+# BASELINE 测试结果：传统方法搜索登录实现
+
+## 查询信息
+- **项目**: Mock Project
+- **查询**: "Where is the login implementation?"
+- **测试类型**: BASELINE（不使用 arch-search skill）
+- **搜索方法**: 传统 Grep/Glob 方法
+
+## 搜索方法
+1. 使用 `grep -i` 搜索关键词：login, auth, signin, authentication
+2. 使用 `glob` 搜索文件名包含关键词
+3. 查看相关文档内容
+
+## 发现的文档
+
+### 1. API 契约文档
+**文件**: `shared/contracts/openapi/api.yaml`
+- **位置**: 第7行定义了 `/auth/login` API 端点
+- **内容**:
+  - POST `/auth/login` - 用户登录接口
+  - 包含 LoginRequest schema（email, password）
+  - 返回 200 状态码表示登录成功
+
+### 2. 移动端安全架构文档
+**文件**: `mobile/docs/architecture/security.md`
+- **登录相关内容**:
+  - 第16行：定义了 AuthService.login 方法
+  - 第41行：登录页面位于 `mobile/src/screens/auth/login_screen.dart`
+  - 认证服务位于 `mobile/src/services/auth/auth_service.dart`
+  - Token管理位于 `mobile/src/services/auth/token_manager.dart`
+
+### 3. 导航配置文档
+**文件**: `mobile/docs/architecture/navigation.md`
+- **登录路由配置**:
+  - 第24-25行：`/login` 路由指向 LoginScreen
+  - 第52行：未认证时重定向到 `/login`
+
+### 4. 领域文档
+**文件**: `DOMAINS.md`
+- **关键词**: 包含 auth, 认证, 登录, login 等相关词汇
+
+## 代码指针识别
+
+### 实际登录实现位置
+基于文档描述，登录实现在以下位置：
+
+1. **后端 API**:
+   - `shared/contracts/openapi/api.yaml` - 定义了 API 契约
+   - 实际实现可能在 `backend/src/controllers/auth/` 目录（但当前项目未提供）
+
+2. **移动端**:
+   - 认证服务: `mobile/src/services/auth/auth_service.dart`
+   - 登录页面: `mobile/src/screens/auth/login_screen.dart`
+   - Token管理: `mobile/src/services/auth/token_manager.dart`
+
+### 实际文件检查结果
+经过实际文件系统搜索发现：
+- 项目中只找到了一个实际代码文件：`mobile/src/services/cache/cache_manager.dart`
+- **未找到**任何 auth、login 相关的实际实现文件
+- 文档中描述的路径可能只是示例或占位符
+
+## 限制分析
+
+1. **无法找到具体实现文件**:
+   - 项目中只有文档，没有实际的源代码文件
+   - 文档中的路径可能是示例路径
+
+2. **搜索范围有限**:
+   - 传统方法只能找到包含关键词的文件
+   - 无法理解上下文关系和系统架构
+
+3. **需要更多猜测**:
+   - 需要手动阅读多个文档来拼凑信息
+   - 无法直接定位到具体实现
+
+4. **文档与代码分离**:
+   - 文档描述了完整的架构，但实际代码不存在
+   - 传统方法无法识别这种不一致性
+
+## Token 使用估算
+- 搜索文件名: ~50 tokens
+- 搜索内容: ~500 tokens (4个文件内容)
+- 总计: ~550 tokens
+
+## 结论
+使用传统方法能够找到登录相关的文档和API契约，但无法直接定位到具体的代码实现位置。需要阅读多个文档并手动拼凑信息，效率较低且容易遗漏重要细节。

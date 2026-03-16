@@ -1,0 +1,36 @@
+## 🔍 架构搜索结果
+
+**查询**: 搜索导航路由的实现
+**搜索层级**: Layer 1（快速路由）
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/navigation.md` | ⭐⭐⭐ | 使用 go_router 实现声明式路由，包含配置示例、深层链接和路由守卫 |
+
+### 📝 信息摘要
+
+项目使用 go_router 作为核心导航解决方案，实现了声明式路由配置。主要功能包括基础路由定义、参数传递（如 `/tasks/:id`）、URL Scheme 和 Universal Links 支持、以及认证路由守卫。路由配置集中在 `app_router.dart` 文件中，支持错误页面处理。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/routes/app_router.dart` - 路由配置主文件（包含 GoRouter 定义）
+- `mobile/src/routes/guards/` - 路由守卫实现目录
+- `mobile/src/services/deep_link_service.dart` - 深层链接处理服务
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/navigation.md` 了解详细的导航设计
+- [ ] 查看 `mobile/src/routes/app_router.dart` 实现代码
+
+---
+
+### Token 使用估计
+
+- Layer 1 快速路由: ~200 tokens
+- DOMAINS.md 读取: ~150 tokens
+- Primary 文档读取: ~300 tokens
+- Total: ~650 tokens（相比传统搜索节省约 80%）

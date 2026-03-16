@@ -1,0 +1,56 @@
+{
+  "eval_id": 13,
+  "eval_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "orchestrator_params": {
+    "subagent_type": "tech-lead",
+    "phase_cycle": "Phase1-Cycle2",
+    "module": "skills",
+    "context": "Skills optimization P0+P1"
+  },
+  "commit_message": "docs(skills): 优化commit-msg-generator文档结构\n\n执行P0和P1优化。\n\n- 标准化YAML frontmatter\n- 添加快速导航章节\n\n🤖 Executed-By: tech-lead subagent\n\n📋 Context: Phase1-Cycle2 Skills optimization P0+P1\n\n🔗 Module: skills",
+  "expectations": [
+    {
+      "id": "A1",
+      "text": "executed_by_format",
+      "passed": true,
+      "evidence": "Pattern matched: 'Executed-By: tech-lead subagent' (correct format with subagent suffix)"
+    },
+    {
+      "id": "A2",
+      "text": "context_format",
+      "passed": true,
+      "evidence": "Pattern matched: 'Context: Phase1-Cycle2 Skills optimization P0+P1' (correct PhaseN-CycleM format)"
+    },
+    {
+      "id": "A3",
+      "text": "module_format",
+      "passed": true,
+      "evidence": "Pattern matched: 'Module: skills' (correct lowercase module name)"
+    },
+    {
+      "id": "A4",
+      "text": "marker_spacing",
+      "passed": true,
+      "evidence": "Empty lines found between all enhanced markers (Executed-By -> Context -> Module)"
+    },
+    {
+      "id": "A5",
+      "text": "markers_after_body",
+      "passed": true,
+      "evidence": "Markers appear after body content and before footer section"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "critical_passed": 3,
+  "critical_total": 3,
+  "high_passed": 2,
+  "high_total": 2,
+  "notes": [
+    "All enhanced markers follow the exact format specified in ENHANCED_MARKERS_SPEC.md",
+    "Empty line spacing between markers improves readability (v1.3.0 requirement)",
+    "Markers correctly positioned after body, before any footer"
+  ]
+}

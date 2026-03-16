@@ -1,0 +1,57 @@
+{
+  "eval_id": 5,
+  "eval_name": "orchestrated-mode-full-params",
+  "category": "orchestrated-mode",
+  "timestamp": "2026-03-13T03:15:00Z",
+  "orchestrator_params": {
+    "subagent_type": "backend-architect",
+    "phase_cycle": "Phase3-Cycle7",
+    "module": "backend",
+    "context": "Backend API authentication implementation"
+  },
+  "commit_message": "feat(auth): 实现JWT认证服务\n\n- 创建AuthService处理token生成和验证逻辑\n- 添加AuthMiddleware中间件进行请求认证\n- 添加单元测试覆盖核心认证流程\n\n🤖 Executed-By: backend-architect subagent\n\n📋 Context: Phase3-Cycle7 Backend API authentication implementation\n\n🔗 Module: backend",
+  "expectations": [
+    {
+      "id": "A1",
+      "text": "has_executed_by",
+      "passed": true,
+      "evidence": "Found 'Executed-By: backend-architect subagent'"
+    },
+    {
+      "id": "A2",
+      "text": "has_context",
+      "passed": true,
+      "evidence": "Found 'Context: Phase3-Cycle7'"
+    },
+    {
+      "id": "A3",
+      "text": "has_module",
+      "passed": true,
+      "evidence": "Found 'Module: backend'"
+    },
+    {
+      "id": "A4",
+      "text": "markers_order",
+      "passed": true,
+      "evidence": "Order verified: Executed-By(idx:5) < Context(idx:7) < Module(idx:9)"
+    },
+    {
+      "id": "A5",
+      "text": "correct_emoji_executed_by",
+      "passed": true,
+      "evidence": "Contains emoji marker"
+    },
+    {
+      "id": "A6",
+      "text": "subagent_suffix",
+      "passed": true,
+      "evidence": "Pattern matched: 'Executed-By: backend-architect subagent'"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0,
+  "critical_passed": 4,
+  "critical_total": 4,
+  "high_passed": 2,
+  "high_total": 2
+}

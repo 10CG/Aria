@@ -1,0 +1,50 @@
+{
+  "eval_id": 13,
+  "eval_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "commit_message": "docs: update commit-msg-generator skill documentation\n\nOptimized documentation structure with standardized YAML frontmatter and quick navigation sections.",
+  "expectations": [
+    {
+      "id": "A1",
+      "text": "executed_by_format",
+      "passed": false,
+      "evidence": "No Executed-By marker found (manual commit without skill)"
+    },
+    {
+      "id": "A2",
+      "text": "context_format",
+      "passed": false,
+      "evidence": "No Context marker found (manual commit without skill)"
+    },
+    {
+      "id": "A3",
+      "text": "module_format",
+      "passed": false,
+      "evidence": "No Module marker found (manual commit without skill)"
+    },
+    {
+      "id": "A4",
+      "text": "marker_spacing",
+      "passed": false,
+      "evidence": "No enhanced markers present to verify spacing"
+    },
+    {
+      "id": "A5",
+      "text": "markers_after_body",
+      "passed": false,
+      "evidence": "No enhanced markers present in commit message"
+    }
+  ],
+  "verdict": "fail",
+  "pass_rate": 0.0,
+  "critical_passed": 0,
+  "critical_total": 3,
+  "high_passed": 0,
+  "high_total": 2,
+  "notes": [
+    "Manual commit message lacks enhanced markers entirely",
+    "This demonstrates the value of using commit-msg-generator skill with orchestrator parameters",
+    "Without the skill, critical metadata for traceability is missing"
+  ]
+}

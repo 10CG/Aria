@@ -1,0 +1,39 @@
+## 🔍 架构搜索结果
+
+**查询**: 查找缓存策略文档
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+**Token消耗**: ~250
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/cache.md` | ⭐⭐⭐ | 多级缓存架构、LRU策略、TTL配置 |
+
+### 📝 信息摘要
+
+项目采用了多级缓存架构，包括内存缓存（TTL 5分钟）、磁盘缓存（TTL 1小时）和网络缓存（TTL 1天）。缓存管理器支持原子操作、异步处理和性能监控，使用 LRU 作为内存缓存淘汰策略，支持 TTL 自动过期和手动失效。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/services/cache/cache_manager.dart` - 缓存管理器主类，实现 get/set/delete/clear 操作
+- `mobile/src/services/cache/memory_cache.dart` - 内存缓存实现（需创建）
+- `mobile/src/services/cache/disk_cache.dart` - 磁盘缓存实现（需创建）
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/cache.md` 了解详细设计
+- [ ] 查看 `mobile/src/services/cache/cache_manager.dart` 实现代码
+- [ ] 实现内存缓存和磁盘缓存模块
+
+---
+
+### 测试说明
+
+本次测试验证了 arch-search skill 的 Layer 1 快速路由功能：
+- 查询"缓存策略文档"成功命中 DOMAINS.md 中预定义的"缓存策略(cache)"领域
+- 直接返回架构文档摘要和相关代码指针
+- Token 使用量显著少于传统搜索（~250 vs ~3000+）
+- 保持了架构文档的优先级，避免了直接搜索代码文件

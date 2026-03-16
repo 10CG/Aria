@@ -1,0 +1,45 @@
+## 🔍 架构搜索结果
+
+**查询**: 搜索离线数据同步和冲突解决的实现
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `mobile/docs/architecture/sync.md` | ⭐⭐⭐ | Mobile App 离线数据同步架构，包含 Last-Write-Wins 和三向合并策略 |
+| `shared/contracts/api/sync.yaml` | ⭐⭐⭐ | API 契约 - 离线数据同步接口，定义同步和状态查询接口 |
+
+### 📝 信息摘要
+
+离线数据同步采用离线优先的设计理念，支持自动同步功能。系统使用基于时间戳的 Last-Write-Wins (LWW) 策决解决数据冲突，对于复杂对象还支持三向合并（3-Way Merge）能力。同步引擎通过本地存储与远程 API 之间的队列管理确保数据一致性，支持增量同步和后台自动同步功能。API 层提供了 `/api/sync/sync` 和 `/api/sync/status` 两个核心接口，支持设备间的数据变更同步和状态查询。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `mobile/src/services/sync/sync_engine.dart` - 同步引擎实现
+- `mobile/src/services/sync/conflict_resolver.dart` - 冲突解决器
+- `mobile/src/services/sync/offline_queue.dart` - 离线队列管理
+- `mobile/src/services/network_detector.dart` - 网络检测服务
+
+### 💡 建议下一步
+
+- [ ] 读取 `mobile/docs/architecture/sync.md` 了解详细的同步架构设计
+- [ ] 查看 `mobile/src/services/sync/sync_engine.dart` 实现代码
+- [ ] 查看 `shared/contracts/api/sync.yaml` 了解 API 契约详情
+- [ ] 检查 `mobile/src/services/sync/conflict_resolver.dart` 的冲突解决逻辑
+
+### 🔍 Token 使用估计
+
+- Layer 1 快速路由：约 200 Token
+- 读取架构文档：约 400 Token
+- 生成摘要：约 150 Token
+- **总计**：约 750 Token
+
+相比传统搜索（约 3000 Token），节省了约 75% 的 Token 消耗。
+
+---
+
+**执行时间**: 2026-03-13 03:33 UTC
+**搜索工具**: arch-search skill v1.1.0

@@ -1,0 +1,15 @@
+{
+  "eval_id": 14,
+  "eval_name": "scope-extraction-path-based",
+  "timestamp": "2026-03-13T10:30:10Z",
+  "commit_message": "update: 添加用户资料端点\n\n- 添加 GET /users/profile 端点\n- 支持用户信息查询",
+  "expectations": [
+    {
+      "text": "scope_from_path",
+      "passed": false,
+      "evidence": "No scope parentheses found; message does not follow conventional commits format with scope"
+    }
+  ],
+  "verdict": "fail",
+  "pass_rate": 0.0
+}

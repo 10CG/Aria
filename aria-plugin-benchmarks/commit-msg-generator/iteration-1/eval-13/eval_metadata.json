@@ -1,0 +1,63 @@
+{
+  "eval_id": 13,
+  "eval_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "description": "Test commit-msg-generator enhanced marker format compliance with strict spacing requirements",
+  "prompt": "Generate a commit message with enhanced markers. Parameters: subagent_type='tech-lead', phase_cycle='Phase1-Cycle2', module='skills', context='Skills optimization P0+P1'. The staged changes optimize the commit-msg-generator SKILL.md documentation.",
+  "setup": {
+    "staged_files": [
+      {"status": "M", "path": "aria/skills/commit-msg-generator/SKILL.md"}
+    ],
+    "diff_summary": "Skills documentation optimization - standardized YAML frontmatter and added quick navigation",
+    "orchestrator_params": {
+      "subagent_type": "tech-lead",
+      "phase_cycle": "Phase1-Cycle2",
+      "module": "skills",
+      "context": "Skills optimization P0+P1"
+    }
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "executed_by_format",
+      "description": "Format must be 'Executed-By: <type> subagent'",
+      "check": "commit_message.match(/Executed-By:\\s*[a-z-]+\\s+subagent/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "context_format",
+      "description": "Format must be 'Context: PhaseN-CycleM <description>'",
+      "check": "commit_message.match(/Context:\\s*Phase\\d+-Cycle\\d+\\s+.+/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "name": "module_format",
+      "description": "Format must be 'Module: <module-name>'",
+      "check": "commit_message.match(/Module:\\s+[a-z]+/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A4",
+      "name": "marker_spacing",
+      "description": "Enhanced markers should have empty line between them",
+      "check": "commit_message.includes('Executed-By:') && commit_message.match(/Executed-By:.*\\n\\n📋/)",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "markers_after_body",
+      "description": "Enhanced markers must appear after body, before footer",
+      "check": "commit_message.includes('Executed-By:') && !commit_message.startsWith('Executed-By:')",
+      "severity": "high"
+    }
+  ],
+  "expected_output": {
+    "type": "docs",
+    "scope": "skills",
+    "has_body": true,
+    "has_enhanced_markers": true,
+    "marker_format_compliant": true
+  }
+}

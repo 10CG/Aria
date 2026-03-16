@@ -1,0 +1,606 @@
+{
+  "skill_name": "commit-msg-generator",
+  "skill_path": "aria/skills/commit-msg-generator",
+  "skill_version": "2.0.1",
+  "description": "Benchmark tests for commit-msg-generator skill",
+  "evals": [
+    {
+      "id": 1,
+      "name": "simple-feat-add-files",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message for the staged changes. New authentication files have been added: backend/src/routes/auth.py and backend/src/app.py were modified to integrate authentication.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "backend/src/routes/auth.py"},
+          {"status": "M", "path": "backend/src/app.py"}
+        ],
+        "diff_summary": "Added JWT authentication with login and register endpoints"
+      },
+      "expected_output": {
+        "type": "feat",
+        "scope": "auth",
+        "has_body": true,
+        "format": "conventional-commits"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_feat",
+          "description": "Commit type must be 'feat' for new features",
+          "check": "commit_message.matches(/^feat\\s*\\(/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "scope_is_auth",
+          "description": "Scope should be 'auth' for authentication changes",
+          "check": "commit_message.includes('(auth)') || commit_message.includes('(auth/')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "subject_length",
+          "description": "Subject must be <= 50 characters",
+          "check": "first_line_length <= 50",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "imperative_mood",
+          "description": "Subject should use imperative mood (e.g., 'add' not 'added')",
+          "check": "!subject.match(/(added|updated|changed|fixed|removed)\\s/i) || subject.match(/^fix|^feat|^docs|^refactor|^test|^style|^perf|^build|^ci|^chore|^revert/i)",
+          "severity": "medium"
+        },
+        {
+          "id": "A5",
+          "name": "no_enhanced_markers",
+          "description": "Independent mode should NOT have enhanced markers",
+          "check": "!commit_message.includes('Executed-By:') && !commit_message.includes('Context:') && !commit_message.includes('Module:')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "bugfix-typo-fix",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message. Fixed a typo in the error message - changed 'authenicaton' to 'authentication' in lib/utils.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "lib/utils.py"}
+        ],
+        "diff_summary": "Fixed typo in error message"
+      },
+      "expected_output": {
+        "type": "fix",
+        "scope": "utils",
+        "has_body": false
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_fix",
+          "description": "Commit type must be 'fix' for bug fixes",
+          "check": "commit_message.matches(/^fix\\s*\\(/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "scope_is_utils",
+          "description": "Scope should be 'utils' for utils.py changes",
+          "check": "commit_message.includes('(utils)')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "subject_concise",
+          "description": "Subject should concisely describe the fix",
+          "check": "subject.toLowerCase().includes('typo') || subject.toLowerCase().includes('fix')",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "docs-update-only",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message. Updated README.md with new installation instructions and API documentation.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "README.md"},
+          {"status": "M", "path": "docs/API.md"}
+        ],
+        "diff_summary": "Documentation updates only"
+      },
+      "expected_output": {
+        "type": "docs",
+        "scope": "readme",
+        "has_body": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_docs",
+          "description": "Commit type must be 'docs' for documentation changes",
+          "check": "commit_message.matches(/^docs\\s*\\(/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "no_code_type",
+          "description": "Should not use feat/fix for docs-only changes",
+          "check": "!commit_message.match(/^(feat|fix)\\s*\\(/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "refactor-code-restructure",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message. Refactored the date handling utilities to use a common helper function. Changed files: lib/date_utils.py, lib/timezone.py, lib/format.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "lib/date_utils.py"},
+          {"status": "M", "path": "lib/timezone.py"},
+          {"status": "M", "path": "lib/format.py"}
+        ],
+        "diff_summary": "Code refactoring without functionality changes"
+      },
+      "expected_output": {
+        "type": "refactor",
+        "scope": "utils",
+        "has_body": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_refactor",
+          "description": "Commit type must be 'refactor' for code restructuring",
+          "check": "commit_message.matches(/^refactor\\s*\\(/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "scope_not_empty",
+          "description": "Scope should be present for refactor commits",
+          "check": "commit_message.match(/^refactor\\([^)]+\\)/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "orchestrated-mode-full-params",
+      "category": "orchestrated-mode",
+      "prompt": "Generate a commit message with enhanced markers. Parameters: subagent_type='backend-architect', phase_cycle='Phase3-Cycle7', module='backend', context='Backend API authentication implementation'. The staged changes add JWT token generation and validation.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "backend/src/services/auth_service.py"},
+          {"status": "M", "path": "backend/src/middleware/auth.py"},
+          {"status": "A", "path": "backend/tests/test_auth.py"}
+        ],
+        "diff_summary": "JWT authentication implementation",
+        "orchestrator_params": {
+          "subagent_type": "backend-architect",
+          "phase_cycle": "Phase3-Cycle7",
+          "module": "backend",
+          "context": "Backend API authentication implementation"
+        }
+      },
+      "expected_output": {
+        "type": "feat",
+        "scope": "auth",
+        "has_body": true,
+        "has_enhanced_markers": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "has_executed_by",
+          "description": "Must have Executed-By marker with robot emoji",
+          "check": "commit_message.includes('Executed-By:') && commit_message.includes('backend-architect subagent')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "has_context",
+          "description": "Must have Context marker with clipboard emoji",
+          "check": "commit_message.includes('Context:') && commit_message.includes('Phase3-Cycle7')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "has_module",
+          "description": "Must have Module marker with link emoji",
+          "check": "commit_message.includes('Module:') && commit_message.includes('backend')",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "markers_order",
+          "description": "Enhanced markers must be in order: Executed-By -> Context -> Module",
+          "check": "commit_message.indexOf('Executed-By:') < commit_message.indexOf('Context:') && commit_message.indexOf('Context:') < commit_message.indexOf('Module:')",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "correct_emoji_executed_by",
+          "description": "Executed-By must use robot emoji",
+          "check": "commit_message.includes('Executed-By:')",
+          "severity": "high"
+        },
+        {
+          "id": "A6",
+          "name": "subagent_suffix",
+          "description": "Executed-By must end with 'subagent' suffix",
+          "check": "commit_message.match(/Executed-By:\\s*\\S+\\s+subagent/)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "orchestrated-mobile-developer",
+      "category": "orchestrated-mode",
+      "prompt": "Generate commit with enhanced markers: subagent_type='mobile-developer', phase_cycle='Phase4-Cycle2', module='mobile', context='Mobile UI login screen'. Changes: Added login form widget and validation.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "lib/screens/login_screen.dart"},
+          {"status": "A", "path": "lib/widgets/login_form.dart"},
+          {"status": "M", "path": "lib/main.dart"}
+        ],
+        "diff_summary": "Login screen UI implementation",
+        "orchestrator_params": {
+          "subagent_type": "mobile-developer",
+          "phase_cycle": "Phase4-Cycle2",
+          "module": "mobile",
+          "context": "Mobile UI login screen"
+        }
+      },
+      "expected_output": {
+        "type": "feat",
+        "scope": "ui",
+        "has_enhanced_markers": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "mobile_developer_agent",
+          "description": "Executed-By must specify mobile-developer",
+          "check": "commit_message.includes('mobile-developer subagent')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "phase_cycle_format",
+          "description": "Phase/Cycle must follow 'PhaseN-CycleM' format",
+          "check": "commit_message.match(/Phase\\d+-Cycle\\d+/)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "module_is_mobile",
+          "description": "Module marker must be 'mobile'",
+          "check": "commit_message.includes('Module: mobile')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "breaking-change-api",
+      "category": "special-cases",
+      "prompt": "Generate a commit message. Changed the task API response format from {tasks: [...]} to {data: [...], meta: {...}}. This is a breaking change. Files: backend/src/routes/tasks.py, backend/src/schemas/task.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "backend/src/routes/tasks.py"},
+          {"status": "M", "path": "backend/src/schemas/task.py"}
+        ],
+        "diff_summary": "API response format change - breaking change"
+      },
+      "expected_output": {
+        "type": "feat",
+        "has_breaking_change": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "breaking_change_marker",
+          "description": "Must include BREAKING CHANGE in footer or ! in type",
+          "check": "commit_message.includes('BREAKING CHANGE') || commit_message.match(/^\\w+\\([^)]*\\)!:/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "explains_impact",
+          "description": "Should explain the breaking change impact",
+          "check": "commit_message.includes('response format') || commit_message.includes('format change') || commit_message.includes('API')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "closes-issue",
+      "category": "special-cases",
+      "prompt": "Generate a commit message that closes Issue #123. Fixed the login timeout issue by adjusting token expiration. Files: backend/src/middleware/auth.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "backend/src/middleware/auth.py"}
+        ],
+        "diff_summary": "Fix login timeout bug",
+        "issue_reference": "#123"
+      },
+      "expected_output": {
+        "type": "fix",
+        "has_closes": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "closes_footer",
+          "description": "Must include 'Closes #123' in footer",
+          "check": "commit_message.includes('Closes #123')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "type_is_fix",
+          "description": "Type must be 'fix' for bug fixes",
+          "check": "commit_message.match(/^fix\\s*\\(/)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "refs-document",
+      "category": "special-cases",
+      "prompt": "Generate a commit message. Implemented the authentication feature based on the design doc at docs/designs/auth-system.md. Files: backend/src/auth/, backend/tests/test_auth.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "backend/src/auth/jwt.py"},
+          {"status": "A", "path": "backend/src/auth/middleware.py"},
+          {"status": "A", "path": "backend/tests/test_auth.py"}
+        ],
+        "diff_summary": "Auth implementation based on design doc",
+        "doc_reference": "docs/designs/auth-system.md"
+      },
+      "expected_output": {
+        "type": "feat",
+        "has_refs": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "refs_footer",
+          "description": "Should include 'Refs:' with document path",
+          "check": "commit_message.includes('Refs:') && commit_message.includes('auth-system.md')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "test-addition",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message. Added unit tests for the date formatting utilities. Files: tests/unit/test_date_utils.py.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "tests/unit/test_date_utils.py"}
+        ],
+        "diff_summary": "Unit tests for date utils"
+      },
+      "expected_output": {
+        "type": "test",
+        "scope": "unit"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_test",
+          "description": "Type must be 'test' for test additions",
+          "check": "commit_message.match(/^test\\s*\\(/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "not_feat",
+          "description": "Test additions should NOT use 'feat' type",
+          "check": "!commit_message.match(/^feat\\s*\\(/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "multi-file-cross-module",
+      "category": "complex-scenarios",
+      "prompt": "Generate a commit message. Updated shared API contracts and both backend and mobile implementations for the task priority feature. Files: shared/contracts/openapi/tasks.yaml, backend/src/routes/tasks.py, mobile/lib/models/task.dart, mobile/lib/screens/task_list.dart.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "shared/contracts/openapi/tasks.yaml"},
+          {"status": "M", "path": "backend/src/routes/tasks.py"},
+          {"status": "M", "path": "mobile/lib/models/task.dart"},
+          {"status": "M", "path": "mobile/lib/screens/task_list.dart"}
+        ],
+        "diff_summary": "Cross-module task priority feature"
+      },
+      "expected_output": {
+        "type": "feat",
+        "has_body": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "cross_module_scope",
+          "description": "Scope should reflect cross-module nature or api",
+          "check": "commit_message.match(/^(feat|fix)\\((api|cross|tasks)\\)/)",
+          "severity": "medium"
+        },
+        {
+          "id": "A2",
+          "name": "has_body",
+          "description": "Complex changes should have body explaining modules affected",
+          "check": "commit_message.split('\\n\\n').length >= 2",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "chore-config",
+      "category": "independent-mode",
+      "prompt": "Generate a commit message. Updated .gitignore to exclude .env.local and updated eslint config.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": ".gitignore"},
+          {"status": "M", "path": ".eslintrc.json"}
+        ],
+        "diff_summary": "Configuration updates"
+      },
+      "expected_output": {
+        "type": "chore"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "type_is_chore",
+          "description": "Type must be 'chore' for config changes",
+          "check": "commit_message.match(/^chore\\s*\\(/)",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "enhanced-marker-format-validation",
+      "category": "format-validation",
+      "prompt": "Generate commit with enhanced markers: subagent_type='tech-lead', phase_cycle='Phase1-Cycle2', module='skills', context='Skills optimization P0+P1'. The staged changes optimize the commit-msg-generator skill documentation.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "aria/skills/commit-msg-generator/SKILL.md"}
+        ],
+        "diff_summary": "Skills documentation optimization",
+        "orchestrator_params": {
+          "subagent_type": "tech-lead",
+          "phase_cycle": "Phase1-Cycle2",
+          "module": "skills",
+          "context": "Skills optimization P0+P1"
+        }
+      },
+      "expected_output": {
+        "has_enhanced_markers": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "executed_by_format",
+          "description": "Executed-By format: 'Executed-By: <type> subagent'",
+          "check": "commit_message.match(/Executed-By:\\s*[a-z-]+\\s+subagent/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "context_format",
+          "description": "Context format: 'Context: PhaseN-CycleM <description>'",
+          "check": "commit_message.match(/Context:\\s*Phase\\d+-Cycle\\d+\\s+\\S+/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "module_format",
+          "description": "Module format: 'Module: <module-name>'",
+          "check": "commit_message.match(/Module:\\s*[a-z-]+/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "marker_spacing",
+          "description": "Enhanced markers should have empty line between them",
+          "check": "commit_message.includes('\\n\\nModule:') || commit_message.includes('\\n\\nContext:')",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "markers_after_body",
+          "description": "Enhanced markers must appear after body, before footer",
+          "check": "true",
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "scope-extraction-path-based",
+      "category": "scope-detection",
+      "prompt": "Generate a commit message. Modified backend/src/api/users.py to add user profile endpoint.",
+      "setup": {
+        "staged_files": [
+          {"status": "M", "path": "backend/src/api/users.py"}
+        ],
+        "diff_summary": "Add user profile endpoint"
+      },
+      "expected_output": {
+        "type": "feat",
+        "scope": "api/users or users"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "scope_from_path",
+          "description": "Scope should be derived from file path (api, users, or backend)",
+          "check": "commit_message.match(/\\((api|users|backend|api\\/users)\\)/)",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "conventional-commits-compliance",
+      "category": "format-validation",
+      "prompt": "Generate a commit message. Added new feature for exporting reports to PDF format. Files: src/services/report_exporter.py, src/templates/pdf_template.html.",
+      "setup": {
+        "staged_files": [
+          {"status": "A", "path": "src/services/report_exporter.py"},
+          {"status": "A", "path": "src/templates/pdf_template.html"}
+        ],
+        "diff_summary": "PDF export feature"
+      },
+      "expected_output": {
+        "format": "conventional-commits"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "standard_format",
+          "description": "Must follow '<type>(<scope>): <subject>' format",
+          "check": "commit_message.match(/^(feat|fix|docs|style|refactor|test|perf|build|ci|chore|revert)\\([^)]+\\):\\s+.+/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "lowercase_type",
+          "description": "Type must be lowercase",
+          "check": "commit_message.match(/^[a-z]+\\(/)",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "colon_after_scope",
+          "description": "Must have colon after scope",
+          "check": "commit_message.match(/^\\w+\\([^)]+\\):/)",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "space_after_colon",
+          "description": "Must have space after colon before subject",
+          "check": "commit_message.match(/^\\w+\\([^)]+\\):\\s+\\S/)",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}

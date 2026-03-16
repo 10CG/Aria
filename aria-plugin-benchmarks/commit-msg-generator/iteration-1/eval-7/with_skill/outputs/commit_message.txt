@@ -1,0 +1,9 @@
+feat(api)!: add pagination support to tasks API response
+
+Introduce paginated response format with metadata for better scalability.
+
+- Add ResponseMeta dataclass for pagination metadata
+- Update task_list_response to include data and meta fields
+- Add total, page, page_size, and has_next information
+
+BREAKING CHANGE: Tasks API response format changed from { "tasks": [...] } to { "data": [...], "meta": {...} }. All API consumers must update their response parsing logic to handle the new structure.

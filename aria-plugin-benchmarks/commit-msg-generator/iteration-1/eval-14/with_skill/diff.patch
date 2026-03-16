@@ -1,0 +1,17 @@
+diff --git a/backend/src/api/users.py b/backend/src/api/users.py
+index abc123..def456 100644
+--- a/backend/src/api/users.py
++++ b/backend/src/api/users.py
+@@ -5,6 +5,11 @@ from backend.models import User
+ 
+ 
+ @app.route('/users', methods=['GET'])
+ def list_users():
+     return jsonify({'users': []})
++
++
++@app.route('/users/profile', methods=['GET'])
++def get_user_profile():
++    """获取用户资料信息"""
++    user_id = request.args.get('id')
++    return jsonify({'id': user_id, 'name': 'Test User'})

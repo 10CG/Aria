@@ -1,0 +1,20 @@
+{
+  "eval_id": 13,
+  "test_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "without_skill": {
+    "start_time": "2026-03-13T03:30:00.000Z",
+    "end_time": "2026-03-13T03:30:00.800Z",
+    "duration_ms": 800,
+    "steps": [
+      "Review staged changes manually",
+      "Compose commit message from memory",
+      "Execute git commit"
+    ],
+    "notes": [
+      "Manual commit is faster but lacks consistency",
+      "No automated format validation",
+      "Missing enhanced markers for traceability"
+    ]
+  }
+}

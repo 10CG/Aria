@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "simple-feat-add-files",
+  "timestamp": "2026-03-13T03:00:00Z",
+  "commit_message": "feat(auth): 添加JWT用户认证功能\n\n- 新增认证路由模块 (backend/src/routes/auth.py)\n- 实现用户登录和注册接口\n- 集成到主应用路由 (backend/src/app.py)",
+  "expectations": [
+    {
+      "text": "type_is_feat",
+      "passed": true,
+      "evidence": "Message starts with 'feat('"
+    },
+    {
+      "text": "scope_is_auth",
+      "passed": true,
+      "evidence": "Message contains '(auth)'"
+    },
+    {
+      "text": "subject_length",
+      "passed": true,
+      "evidence": "First line is 29 characters (<= 50)"
+    },
+    {
+      "text": "imperative_mood",
+      "passed": true,
+      "evidence": "Subject uses imperative mood: '添加'"
+    },
+    {
+      "text": "no_enhanced_markers",
+      "passed": true,
+      "evidence": "No Executed-By/Context/Module markers found"
+    }
+  ],
+  "verdict": "pass",
+  "pass_rate": 1.0
+}

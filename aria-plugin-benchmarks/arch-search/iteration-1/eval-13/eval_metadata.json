@@ -1,0 +1,17 @@
+{
+  "eval_id": 13,
+  "eval_name": "module-entry-routing",
+  "category": "module-entry",
+  "prompt": "mobile 模块的整体架构",
+  "expected_layer": 1,
+  "expected_document_path": "mobile/docs/ARCHITECTURE.md",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_module_entry",
+      "description": "Should find module ARCHITECTURE.md entry point",
+      "check": "output.match(/mobile.*ARCHITECTURE|ARCHITECTURE.*mobile/i)",
+      "severity": "critical"
+    }
+  ]
+}

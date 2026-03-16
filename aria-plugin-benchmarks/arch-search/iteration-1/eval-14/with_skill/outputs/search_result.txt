@@ -1,0 +1,43 @@
+## 🔍 架构搜索结果
+
+**查询**: AI 记忆系统是怎么设计的
+**搜索层级**: Layer 1
+**匹配置信度**: 高
+
+### 📄 相关文档
+
+| 文档 | 相关度 | 关键内容 |
+|------|--------|----------|
+| `backend/docs/architecture/ai-memory.md` | ⭐⭐⭐ | AI 记忆系统完整架构设计，包含三层架构、关键技术选型和性能指标 |
+
+### 📝 信息摘要
+
+AI 记忆系统采用分层存储架构，分为数据层、业务层和接口层。数据层使用 Redis（短期记忆）和 SQLite（长期记忆）实现存储，结合 ChromaDB 进行语义搜索。业务层包含记忆管理器（负责增删改查和生命周期管理）和策略引擎（实现记忆压缩和重要性计算）。系统支持智能检索（基于向量相似度、时间衰减和相关性过滤），具备数据加密、访问控制和隐私保护功能。
+
+### 📁 代码文件指针
+
+如需查看具体实现：
+- `src/data/memory/memory_store.dart` - 主存储实现
+- `src/services/memory/memory_manager.dart` - 核心管理器
+- `src/policies/memory/` - 策略引擎
+- `src/clients/memory_client.dart` - SDK 客户端
+
+### 💡 建议下一步
+
+- [ ] 阅读 `backend/docs/architecture/ai-memory.md` 了解详细设计
+- [ ] 查看 `src/data/memory/` 目录下的存储实现
+- [ ] 研究 `src/services/memory/memory_manager.dart` 了解核心逻辑
+- [ ] 查看性能指标和数据加密实现
+
+---
+
+**技术栈**:
+- 短期存储: In-Memory Cache (Redis)
+- 长期存储: SQLite
+- 向量索引: ChromaDB + Sentence-BERT
+- 加密: AES-256
+
+**性能指标**:
+- 读取记忆: <50ms, QPS 1000+
+- 写入记忆: <100ms, QPS 500+
+- 语义搜索: <200ms, QPS 100+

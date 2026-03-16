@@ -1,0 +1,24 @@
+{
+  "eval_id": 9,
+  "eval_name": "refs-document",
+  "category": "footer-refs",
+  "description": "Test commit-msg-generator with document reference",
+  "setup": {
+    "staged_files": [
+      {"status": "A", "path": "backend/src/auth/jwt.py"},
+      {"status": "A", "path": "backend/src/auth/middleware.py"},
+      {"status": "A", "path": "backend/tests/test_auth.py"},
+      {"status": "A", "path": "docs/designs/auth-system.md"}
+    ],
+    "diff_summary": "Auth implementation based on design doc"
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "refs_footer",
+      "description": "Should include 'Refs:' with document path",
+      "check": "commit_message.includes('Refs:') && commit_message.includes('docs/designs/auth-system.md')",
+      "severity": "critical"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "eval_id": 13,
+  "eval_name": "enhanced-marker-format-validation",
+  "category": "orchestrated-mode",
+  "description": "Test commit-msg-generator enhanced marker format compliance",
+  "timestamp": "2026-03-13T03:30:00Z",
+  "assertions": {
+    "A1": {
+      "name": "executed_by_format",
+      "description": "Format: 'Executed-By: <type> subagent'",
+      "expected": "Executed-By: tech-lead subagent",
+      "with_skill": "PASS",
+      "without_skill": "FAIL"
+    },
+    "A2": {
+      "name": "context_format",
+      "description": "Format: 'Context: PhaseN-CycleM <description>'",
+      "expected": "Context: Phase1-Cycle2 Skills optimization P0+P1",
+      "with_skill": "PASS",
+      "without_skill": "FAIL"
+    },
+    "A3": {
+      "name": "module_format",
+      "description": "Format: 'Module: <module-name>'",
+      "expected": "Module: skills",
+      "with_skill": "PASS",
+      "without_skill": "FAIL"
+    },
+    "A4": {
+      "name": "marker_spacing",
+      "description": "Enhanced markers should have empty line between them",
+      "expected": "Empty lines between all markers",
+      "with_skill": "PASS",
+      "without_skill": "FAIL"
+    },
+    "A5": {
+      "name": "markers_after_body",
+      "description": "Enhanced markers must appear after body, before footer",
+      "expected": "Markers positioned after body content",
+      "with_skill": "PASS",
+      "without_skill": "FAIL"
+    }
+  },
+  "results": {
+    "with_skill": {
+      "total_assertions": 5,
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "verdict": "PASS"
+    },
+    "without_skill": {
+      "total_assertions": 5,
+      "passed": 0,
+      "failed": 5,
+      "pass_rate": 0.0,
+      "verdict": "FAIL"
+    }
+  },
+  "orchestrator_params": {
+    "subagent_type": "tech-lead",
+    "phase_cycle": "Phase1-Cycle2",
+    "module": "skills",
+    "context": "Skills optimization P0+P1"
+  },
+  "key_findings": [
+    "The commit-msg-generator skill correctly generates enhanced markers with proper formatting",
+    "Empty line spacing between markers (v1.3.0 requirement) is correctly implemented",
+    "All marker formats match the ENHANCED_MARKERS_SPEC.md specification",
+    "Manual commits without the skill lack all enhanced markers, demonstrating value of automated generation"
+  ],
+  "recommendation": "PASS - The skill correctly implements enhanced marker format validation"
+}

@@ -1,0 +1,36 @@
+{
+  "eval_id": 4,
+  "eval_name": "refactor-code-restructure",
+  "category": "independent-mode",
+  "prompt": "Generate a commit message. Refactored the date handling utilities to use a common helper function. Changed files: lib/date_utils.py, lib/timezone.py, lib/format.py.",
+  "setup": {
+    "staged_files": [
+      {"status": "D", "path": "lib/date_utils.py"},
+      {"status": "D", "path": "lib/timezone.py"},
+      {"status": "D", "path": "lib/format.py"},
+      {"status": "A", "path": "lib/date_handler.py"}
+    ],
+    "diff_summary": "Code refactoring without functionality changes"
+  },
+  "expected_output": {
+    "type": "refactor",
+    "scope": "utils",
+    "has_body": true
+  },
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "type_is_refactor",
+      "description": "Commit type must be 'refactor' for code restructuring",
+      "check": "commit_message.matches(/^refactor\\s*\\(/)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "scope_not_empty",
+      "description": "Scope should be present for refactor commits",
+      "check": "commit_message.match(/^refactor\\([^)]+\\)/)",
+      "severity": "high"
+    }
+  ]
+}

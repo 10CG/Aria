@@ -1,0 +1,45 @@
+{
+  "eval_id": 8,
+  "eval_name": "output-format-compliance",
+  "category": "format-validation",
+  "prompt": "搜索导航路由的实现",
+  "expected_layer": 1,
+  "expected_domain": "navigation",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "has_emoji_header",
+      "description": "Output should have 🔍 emoji header",
+      "check": "output.includes('🔍')",
+      "severity": "medium"
+    },
+    {
+      "id": "A2",
+      "name": "has_query_section",
+      "description": "Should show the query term",
+      "check": "output.includes('查询') || output.includes('Query')",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "name": "has_layer_info",
+      "description": "Should indicate search layer used",
+      "check": "output.includes('Layer') || output.includes('层级')",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "name": "has_document_table",
+      "description": "Should have related documents section",
+      "check": "output.includes('文档') || output.includes('Document')",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "name": "has_code_pointers",
+      "description": "Should provide code file pointers",
+      "check": "output.includes('.dart') || output.includes('.py')",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "eval_id": 14,
+  "eval_name": "ai-system-search",
+  "category": "domain-specific",
+  "prompt": "AI 记忆系统是怎么设计的",
+  "expected_layer": 1,
+  "expected_domain": "ai_system",
+  "expected_document_path": "mobile/docs/architecture/ai-memory.md",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "finds_ai_memory_doc",
+      "description": "Should find AI memory architecture document",
+      "check": "output.match(/ai.*memory|记忆|智能/i)",
+      "severity": "critical"
+    }
+  ]
+}

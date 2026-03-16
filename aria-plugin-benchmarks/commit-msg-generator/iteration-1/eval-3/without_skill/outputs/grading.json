@@ -1,0 +1,26 @@
+{
+  "test_name": "eval-3-docs-update-only",
+  "timestamp": "2026-03-13T00:00:00Z",
+  "input": {
+    "description": "Documentation-only changes",
+    "files": ["README.md", "docs/API.md"],
+    "mock_diff": "Documentation updates (installation instructions, API docs)"
+  },
+  "assertions": {
+    "A1_type_is_docs": {
+      "description": "Type must be 'docs' for documentation changes",
+      "expected": "docs",
+      "actual": "docs",
+      "passed": true
+    },
+    "A2_no_code_type": {
+      "description": "Should NOT use feat/fix for docs-only changes",
+      "expected": "not(feat|fix)",
+      "actual": "docs",
+      "passed": true
+    }
+  },
+  "overall_result": "PASS",
+  "pass_count": 2,
+  "total_count": 2
+}

@@ -1,0 +1,17 @@
+{
+  "eval_id": 9,
+  "eval_name": "bilingual-keyword-support",
+  "category": "i18n",
+  "prompt": "Where is the login implementation?",
+  "expected_layer": 1,
+  "expected_domain": "auth_security",
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "handles_english_keywords",
+      "description": "Should handle English keywords (login, auth)",
+      "check": "output.match(/security|auth|login|认证|登录/i)",
+      "severity": "critical"
+    }
+  ]
+}

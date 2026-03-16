@@ -1,0 +1,23 @@
+{
+  "eval_id": 6,
+  "eval_name": "layer2-unknown-keyword",
+  "category": "layer-2-search",
+  "prompt": "查找缓存策略文档",
+  "expected_layer": 2,
+  "assertions": [
+    {
+      "id": "A1",
+      "name": "searches_arch_docs",
+      "description": "Should search architecture docs even if no domain match",
+      "check": "output.includes('架构') || output.includes('ARCHITECTURE')",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "name": "reasonable_token_use",
+      "description": "Layer 2 should use < 1000 tokens",
+      "check": "tokens_used < 1000",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+# Authentication API Contract
+
+## 认证 API 端点定义
+
+### 登录接口 (POST /api/auth/login)
+
+```yaml
+request:
+  type: object
+  properties:
+    email:
+      type: string
+      format: email
+      example: "user@example.com"
+    password:
+      type: string
+      format: password
+      example: "P@ssw0rd123"
+      minLength: 8
+      maxLength: 64
+    remember_me:
+      type: boolean
+      default: false
+```
+
+```yaml
+response:
+  type: object
+  properties:
+    access_token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIs..."
+    refresh_token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIs..."
+    expires_in:
+      type: integer
+      example: 3600
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, user, guest]
+```
+
+### 注册接口 (POST /api/auth/register)
+
+```yaml
+request:
+  type: object
+  required: [email, password, name]
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+    name:
+      type: string
+    phone:
+      type: string
+      pattern: "^\\+?[0-9]{10,15}$"
+```
+
+### 刷新接口 (POST /api/auth/refresh)
+
+```yaml
+request:
+  type: object
+  properties:
+    refresh_token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIs..."
+```
+
+### 安全要求
+
+1. **速率限制**: 每分钟最多 5 次登录尝试
+2. **密码策略**:
+   - 最小长度: 8 字符
+   - 必须包含: 大写字母、小写字母、数字
+   - 不允许常见密码
+3. **会话管理**:
+   - Access Token 有效期: 1小时
+   - Refresh Token 有效期: 7天
+   - 连续失败3次锁定账户15分钟
+
+## 错误响应
+
+```yaml
+error:
+  type: object
+  properties:
+    code:
+      type: string
+      example: "INVALID_CREDENTIALS"
+    message:
+      type: string
+      example: "邮箱或密码错误"
+    details:
+      type: object
+```

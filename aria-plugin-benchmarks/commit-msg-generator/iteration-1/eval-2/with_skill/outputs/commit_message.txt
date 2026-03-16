@@ -1,0 +1,3 @@
+fix(utils): correct typo in authentication spelling
+
+Fixed misspelling of "authentication" in docstring.
