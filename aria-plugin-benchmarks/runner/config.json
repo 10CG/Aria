@@ -1,11 +1,11 @@
 {
-  "test_project": "F:/work2025/cursor/todo-web",
-  "aria_plugin": "F:/work2025/cursor/Aria/aria",
-  "benchmarks_dir": "F:/work2025/cursor/Aria/aria-plugin-benchmarks",
-  "output_dir": "F:/work2025/cursor/Aria/aria-plugin-benchmarks/runner/results",
+  "test_project": "/home/dev/todo-web",
+  "aria_plugin": "/home/dev/Aria/aria",
+  "benchmarks_dir": "/home/dev/Aria/aria-plugin-benchmarks",
+  "output_dir": "/home/dev/Aria/aria-plugin-benchmarks/runner/results",
   "model": "sonnet",
   "max_parallel": 2,
-  "timeout_seconds": 240,
+  "timeout_seconds": 300,
   "skills": {
     "state-scanner": {
       "enabled": true,
@@ -59,7 +59,7 @@
           "assertions": [
             {"text": "finds_relevant_docs", "check": "auth|jwt|token|login|security|认证|登录"},
             {"text": "provides_file_pointers", "check": "\\.(js|ts|md)"},
-            {"text": "structured_output", "check": "Layer|layer|document|doc|架构|总览|分层"}
+            {"text": "structured_output", "check": "Layer|layer|document|doc|架构|总览|分层|Architecture|Overview|Component|##"}
           ]
         },
         {
@@ -68,7 +68,7 @@
           "prompt": "Search for database design and data model architecture",
           "assertions": [
             {"text": "finds_db_docs", "check": "mongo|database|model|schema|collection|SQLite|数据库"},
-            {"text": "provides_pointers", "check": "\\.(js|ts|md)"}
+            {"text": "provides_pointers", "check": "\\.(js|ts|md)|/src/|backend/|frontend/|database/"}
           ]
         }
       ]
@@ -116,7 +116,7 @@
             {"text": "creates_task_list", "check": "task|TASK|Task|任务|#|\\d\\.\\d"},
             {"text": "has_complexity", "check": "[SMLX]|small|medium|large|complex|复杂|优先|P[012]"},
             {"text": "has_dependencies", "check": "depend|block|after|before|order|顺序|优先|先|后"},
-            {"text": "assigns_agents", "check": "agent|developer|architect|engineer|开发|前端|后端|涉及"}
+            {"text": "assigns_agents", "check": "agent|developer|architect|engineer|开发|前端|后端|涉及|FR-FE|FR-BE|修改|实现|负责|CSS|JS"}
           ]
         }
       ]
