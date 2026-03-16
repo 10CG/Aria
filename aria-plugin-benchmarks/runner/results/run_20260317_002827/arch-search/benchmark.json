@@ -1,0 +1,33 @@
+{
+  "benchmark_name": "arch-search",
+  "test_type": "real_execution",
+  "test_project": "todo-web",
+  "timestamp": "2026-03-16T16:37:24.033296+00:00",
+  "total_evals": 2,
+  "passed": 2,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "total_tokens": 17370,
+  "total_duration_ms": 133040,
+  "total_cost_usd": 0.3428,
+  "eval_results": [
+    {
+      "eval_id": "real-1",
+      "eval_name": "search-auth-implementation",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "tokens": 15637,
+      "duration_ms": 78280,
+      "failed_assertions": []
+    },
+    {
+      "eval_id": "real-2",
+      "eval_name": "search-database-design",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "tokens": 1733,
+      "duration_ms": 54760,
+      "failed_assertions": []
+    }
+  ]
+}

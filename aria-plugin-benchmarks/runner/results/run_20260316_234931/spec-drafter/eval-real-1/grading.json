@@ -1,0 +1,29 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "draft-tag-feature-spec",
+  "timestamp": "2026-03-16T16:13:31.757218+00:00",
+  "assertions": [
+    {
+      "text": "creates_proposal_structure",
+      "passed": false,
+      "evidence": "Pattern 'proposal|Proposal|## |提案|规范' not found in output"
+    },
+    {
+      "text": "assesses_level",
+      "passed": false,
+      "evidence": "Pattern 'Level [123]|level.*[123]|[Ll]evel|复杂度|等级' not found in output"
+    },
+    {
+      "text": "defines_scope",
+      "passed": false,
+      "evidence": "Pattern 'scope|Scope|feature|tag|label|标签|范围|功能' not found in output"
+    },
+    {
+      "text": "includes_requirements",
+      "passed": false,
+      "evidence": "Pattern 'requirement|功能|feature|user story|需求|用户' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

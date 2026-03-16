@@ -1,0 +1,84 @@
+现在我对项目结构有了清晰的认知，下面是基于实际代码架构的战略提交方案。
+
+---
+
+## 战略提交方案
+
+### 当前状态分析
+
+| 项目 | 状态 |
+|---|---|
+| 已暂存 | `frontend/src/js/app.js`（benchmark 标记，待处理） |
+| 假设变更 | 后端认证逻辑 + 前端登录 UI |
+| 提交风格 | `fix:`/`feat:`/`style:` 前缀，小写简洁 |
+
+---
+
+### 推荐提交顺序（3 个原子提交）
+
+#### Commit 1 — 后端认证逻辑
+```
+fix: validate JWT expiry and refresh token rotation in auth middleware
+```
+**涉及文件：**
+- `backend/middleware/auth.js` — JWT 验证逻辑
+- `backend/src/auth/authController.js` — 控制器业务逻辑
+- `backend/src/auth/authRepository.js` — 数据层（如有改动）
+
+**原则：** 后端独立成一个提交，便于回滚时不影响前端。
+
+---
+
+#### Commit 2 — 前端登录 UI + **必须同步版本号**
+```
+feat: redesign login form with error feedback and loading states
+```
+**涉及文件：**
+- `frontend/src/js/authApp.js` — 登录/注册逻辑
+- `frontend/src/todos.html` — **⚠️ 必须更新 `?v=` 版本号**（CLAUDE.md 规定）
+
+**版本号格式：** `?v=202603171030`（精确到分钟）
+
+```html
+<!-- todos.html 中需更新 -->
+<script src="js/authApp.js?v=202603171030" type="module"></script>
+```
+
+---
+
+#### Commit 3 — 清理临时标记（当前已暂存）
+```
+chore: remove benchmark test markers from app.js
+```
+**涉及文件：**
+- `frontend/src/js/app.js` — 移除末尾 3 行 benchmark 注释
+
+> 此文件当前已暂存，但内容是无意义的注释标记，建议先清理再提交，或单独作为一个 `chore:` 提交，**不要与功能变更混入同一个 commit**。
+
+---
+
+### 为什么这样分组？
+
+```
+Commit 1 (backend)    ← 独立可测试、可单独回滚
+    ↓
+Commit 2 (frontend)   ← 依赖 Commit 1 的 API 契约
+    ↓
+Commit 3 (cleanup)    ← 与功能无关，单独隔离
+```
+
+**核心原则：**
+- 每个 commit 对应一个**独立关注点**（backend / frontend UI / cleanup）
+- 后端先提交 → 前端提交时可引用已稳定的 API 行为
+- 清理提交永远不与功能提交混合，方便 `git bisect` 和 code review
+
+---
+
+### 执行前检查清单
+
+- [ ] `frontend/src/todos.html` 中 `authApp.js` 的 `?v=` 已更新为当前时间
+- [ ] `backend/src/auth/authRepository.js` 共享同一数据库连接（参考最近 fix commit）
+- [ ] `frontend/src/js/app.js` 末尾的 3 行 benchmark 标记已确认可移除
+- [ ] 运行本地测试确认登录流程端到端正常
+
+确认要执行哪个提交时告诉我，我来帮你暂存正确的文件并生成规范的 commit message。

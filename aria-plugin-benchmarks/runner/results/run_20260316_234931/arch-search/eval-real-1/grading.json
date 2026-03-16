@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "search-auth-implementation",
+  "timestamp": "2026-03-16T16:05:31.602293+00:00",
+  "assertions": [
+    {
+      "text": "finds_relevant_docs",
+      "passed": false,
+      "evidence": "Pattern 'auth|jwt|token|login|security|认证|登录' not found in output"
+    },
+    {
+      "text": "provides_file_pointers",
+      "passed": false,
+      "evidence": "Pattern '\\.(js|ts|md)' not found in output"
+    },
+    {
+      "text": "structured_output",
+      "passed": false,
+      "evidence": "Pattern 'Layer|layer|document|doc|架构|总览|分层' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

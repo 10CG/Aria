@@ -1,0 +1,19 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "generate-from-staged-changes",
+  "timestamp": "2026-03-16T15:43:05.660440+00:00",
+  "assertions": [
+    {
+      "text": "conventional_format",
+      "passed": false,
+      "evidence": "Pattern '(feat|fix|docs|style|refactor|test|chore)\\(' not found in output"
+    },
+    {
+      "text": "has_description",
+      "passed": false,
+      "evidence": "Pattern ': .{10,}' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

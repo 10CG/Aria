@@ -1,0 +1,63 @@
+以下是认证实现架构的完整概述：
+
+---
+
+## 认证架构总览
+
+### 分层结构
+
+```
+前端 (authApp.js)
+    ↓ HTTP 请求 (Bearer Token)
+后端路由 (authRoutes.js)
+    ↓
+中间件 (auth.js - protect/authorize)
+    ↓
+控制器 (authController.js)
+    ↓
+数据层 (authRepository.js)
+    ↓
+SQLite 数据库 (todos.db)
+```
+
+---
+
+### 后端层次
+
+| 层 | 文件 | 职责 |
+|----|------|------|
+| **路由** | `backend/src/auth/authRoutes.js` | 定义 API 端点，区分公开/受保护路由 |
+| **中间件** | `backend/middleware/auth.js` | JWT 验证 (`protect`)、角色授权 (`authorize`) |
+| **控制器** | `backend/src/auth/authController.js` | 业务逻辑，支持依赖注入 |
+| **数据层** | `backend/src/auth/authRepository.js` | SQLite 数据库操作封装 |
+
+### API 端点
+
+| 方法 | 路径 | 是否受保护 |
+|------|------|-----------|
+| POST | `/register` | 否 |
+| POST | `/login` | 否 |
+| POST | `/logout` | 否 |
+| POST | `/forgot-password` | 否 |
+| PUT | `/reset-password/:token` | 否 |
+| POST | `/social-login` | 否 |
+| GET | `/verify-token` | **是** |
+| GET | `/me` | **是** |
+
+---
+
+### 关键设计决策
+
+1. **JWT Token** — 有效期 30 天，通过 `Authorization: Bearer <token>` 或 Cookie 传递
+2. **依赖注入** — `AuthController` 接受 `repository`、`getSecretKey`、`sendEmailFn`，提高可测试性
+3. **数据库连接** — `AuthRepository` 支持外部共享连接（`fromDbInstance()`），防止登录失败问题（见最近 commit `0f68e9d`）
+4. **密码重置** — 使用 `crypto.randomBytes(20)` + SHA256 哈希，1小时过期
+5. **社交登录** — 通过 `social_accounts` 表关联第三方账号与用户
+
+---
+
+### 前端认证流 (`frontend/src/js/authApp.js`)
+
+- Token 同时存储在 `sessionStorage` 和 `localStorage`（跨标签页持久化）
+- 每 **30 分钟** 静默验证 Token；页面重新可见时也验证
+- 登录/注册成功后触发 `userAuthenticated` 自定义事件通知 `TodoApp`

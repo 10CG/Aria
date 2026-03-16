@@ -1,0 +1,41 @@
+{
+  "runner_version": "1.0.0",
+  "timestamp": "2026-03-16T15:31:43.429795+00:00",
+  "test_project": "F:/work2025/cursor/todo-web",
+  "model": "sonnet",
+  "total_skills": 1,
+  "total_evals": 1,
+  "total_passed": 0,
+  "total_failed": 1,
+  "overall_pass_rate": 0.0,
+  "total_cost_usd": 0.1507,
+  "skills": {
+    "state-scanner": {
+      "benchmark_name": "state-scanner",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T15:31:43.429258+00:00",
+      "total_evals": 1,
+      "passed": 0,
+      "failed": 1,
+      "pass_rate": 0.0,
+      "total_tokens": 5525,
+      "total_duration_ms": 86591,
+      "total_cost_usd": 0.1507,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "scan-todo-web-status",
+          "verdict": "FAIL",
+          "pass_rate": 0.6,
+          "tokens": 5525,
+          "duration_ms": 86591,
+          "failed_assertions": [
+            "recommends_workflow",
+            "structured_output"
+          ]
+        }
+      ]
+    }
+  }
+}

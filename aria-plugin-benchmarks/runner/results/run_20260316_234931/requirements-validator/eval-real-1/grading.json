@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "validate-prd-format",
+  "timestamp": "2026-03-16T15:57:31.424096+00:00",
+  "assertions": [
+    {
+      "text": "finds_prd_file",
+      "passed": false,
+      "evidence": "Pattern 'prd-todo-optimization|PRD' not found in output"
+    },
+    {
+      "text": "checks_format",
+      "passed": false,
+      "evidence": "Pattern 'format|section|heading|template|格式|章节|模板|验证' not found in output"
+    },
+    {
+      "text": "reports_result",
+      "passed": false,
+      "evidence": "Pattern 'pass|fail|valid|invalid|issue|warning|error|问题|修复|报告|严重' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

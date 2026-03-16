@@ -1,0 +1,34 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "scan-todo-web-status",
+  "timestamp": "2026-03-16T15:34:29.989672+00:00",
+  "assertions": [
+    {
+      "text": "detects_git_repo",
+      "passed": false,
+      "evidence": "Pattern 'git|branch|commit' not found in output"
+    },
+    {
+      "text": "detects_openspec_archive",
+      "passed": false,
+      "evidence": "Pattern 'openspec|archive|spec' not found in output"
+    },
+    {
+      "text": "detects_architecture_docs",
+      "passed": false,
+      "evidence": "Pattern 'architecture|system-architecture' not found in output"
+    },
+    {
+      "text": "recommends_workflow",
+      "passed": false,
+      "evidence": "Pattern '推荐|工作流|workflow|recommend|\\[\\d\\]|选择' not found in output"
+    },
+    {
+      "text": "structured_output",
+      "passed": false,
+      "evidence": "Pattern '═|─|╔|╗|║|┌|┐|│|\\+[-=]+\\+' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.0
+}

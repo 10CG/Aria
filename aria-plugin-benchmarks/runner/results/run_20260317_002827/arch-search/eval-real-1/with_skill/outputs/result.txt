@@ -1,0 +1,71 @@
+以下是认证实现架构的完整分析：
+
+---
+
+## 认证系统架构
+
+### 整体分层
+
+```
+前端 (authApp.js)
+    ↓ HTTP + Bearer Token
+后端路由 (authRoutes.js)
+    ↓
+认证中间件 (middleware/auth.js)  ← 受保护路由才经过
+    ↓
+控制器 (auth/authController.js)
+    ↓
+数据仓库 (auth/authRepository.js)
+    ↓
+SQLite 数据库 (data/todos.db)
+```
+
+---
+
+### 后端层
+
+#### 1. 路由 — `backend/src/auth/authRoutes.js`
+
+| 路径 | 方法 | 保护 | 功能 |
+|------|------|------|------|
+| `/register` | POST | 否 | 注册 |
+| `/login` | POST | 否 | 登录 |
+| `/logout` | POST | 否 | 登出 |
+| `/forgot-password` | POST | 否 | 忘记密码 |
+| `/reset-password/:token` | PUT | 否 | 重置密码 |
+| `/social-login` | POST | 否 | 社交登录 |
+| `/verify-token` | GET | **是** | 验证 Token |
+| `/me` | GET | **是** | 获取用户信息 |
+
+#### 2. 中间件 — `backend/middleware/auth.js`
+
+- 从 `Authorization: Bearer <token>` 头或 Cookie 获取 JWT
+- 用 `jwt.verify()` 验证签名（读取 `JWT_SECRET` 环境变量）
+- 通过 `Database.getInstance()` 单例查询用户，挂载到 `req.user`
+- `authorize(...roles)` 做角色级权限控制
+
+#### 3. 控制器 — `backend/src/auth/authController.js`
+
+使用**依赖注入**模式，支持注入：
+- `repository` — 数据仓库
+- `getSecretKey` — JWT 密钥函数
+- `sendEmailFn` — 邮件发送函数（便于测试）
+
+主要方法：`register` / `login` / `logout` / `getMe` / `forgotPassword` / `resetPassword` / `socialLogin` / `verifyToken`
+
+密码用 `bcrypt`（salt=10）哈希，JWT 有效期 **30天**。
+
+#### 4. 数据仓库 — `backend/src/auth/authRepository.js`
+
+- 直接操作 SQLite，封装所有用户 CRUD
+- 支持**外部 DB 实例注入**（`fromDbInstance()`，避免登录时连接冲突，这是上个 session 修复的 bug）
+- 使用外部实例时 `close()` 不会真正关闭连接
+
+---
+
+### 前端层 — `frontend/src/js/authApp.js`
+
+- Token 存储在 `sessionStorage` + `localStorage`（双写，跨 Tab 持久化）
+- 启动时调用 `todoService.verifyToken()` 验证有效性
+- 每 **30 分钟** + **页面重新可见**时静默验证
+- 登录/注册成功后派发 `userAuthenticated` 自定义事件通知 `TodoApp`
