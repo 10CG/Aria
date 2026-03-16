@@ -1,0 +1,29 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "draft-tag-feature-spec",
+  "timestamp": "2026-03-16T20:29:25.202583+00:00",
+  "assertions": [
+    {
+      "text": "creates_proposal_structure",
+      "passed": true,
+      "evidence": "Matched: 'proposal'"
+    },
+    {
+      "text": "assesses_level",
+      "passed": true,
+      "evidence": "Matched: 'Level**: Standard (Level 3'"
+    },
+    {
+      "text": "defines_scope",
+      "passed": true,
+      "evidence": "Matched: 'Tag'"
+    },
+    {
+      "text": "includes_requirements",
+      "passed": true,
+      "evidence": "Matched: 'Feature'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

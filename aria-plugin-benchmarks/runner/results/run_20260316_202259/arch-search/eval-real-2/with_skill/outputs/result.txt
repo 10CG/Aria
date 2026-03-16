@@ -1,0 +1,41 @@
+## Database Design & Data Model Architecture
+
+The app uses **SQLite3 with WAL mode** and 9 tables:
+
+### Schema Overview
+
+```
+users (1)─────(N) todos ──(N)── todo_tags ──(N)── tags
+  │                 │
+  │(1)              └─(N)── notes
+  │                 │
+  ├─(1) user_settings    └─(N)── subtasks (self-ref)
+  └─(N) social_accounts
+
++ cache_table (server-side TTL cache, 5min)
+```
+
+### Tables
+
+| Table | Purpose | Notable Columns |
+|-------|---------|-----------------|
+| `users` | Accounts | `role`, `avatar_url`, `reset_password_token` |
+| `todos` | Tasks | `text`, `tag`, `priority`, `parentId`, `estimatedTimeValue/Unit`, `partition_date` |
+| `notes` | Task comments | `todoId`, `content`, `editedAt` |
+| `tags` | Tag definitions | `name`, `color` |
+| `todo_tags` | Task↔Tag junction | `todoId`, `tagId` |
+| `subtasks` | Task hierarchy | `parentId`, `childId` (both FK to `todos`) |
+| `user_settings` | Preferences | `theme`, `language`, `display_mode`, `items_per_page` |
+| `social_accounts` | OAuth | `provider`, `provider_user_id` |
+| `cache_table` | Server cache | `key`, `value`, `expires_at` |
+
+### Key Design Decisions
+
+- **Dual tagging**: `todos.tag` is a legacy string field; `tags`+`todo_tags` is the newer M2M system
+- **Dual hierarchy**: `todos.parentId` (direct FK) and `subtasks` table (junction) — both exist
+- **All timestamps** are Unix milliseconds
+- **Cascading deletes** on all FK relationships
+- **5 indexes** on `todos` for user-isolation + filter queries
+
+**Schema file**: `backend/src/database.js:147-287`  
+**Architecture docs**: `docs/architecture/system-architecture.md`

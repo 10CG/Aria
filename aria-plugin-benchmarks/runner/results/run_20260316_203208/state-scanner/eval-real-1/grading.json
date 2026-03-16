@@ -1,0 +1,34 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "scan-todo-web-status",
+  "timestamp": "2026-03-16T20:33:01.149996+00:00",
+  "assertions": [
+    {
+      "text": "detects_git_repo",
+      "passed": true,
+      "evidence": "Matched: '分支'"
+    },
+    {
+      "text": "detects_openspec_archive",
+      "passed": true,
+      "evidence": "Matched: 'OpenSpec'"
+    },
+    {
+      "text": "detects_architecture_docs",
+      "passed": true,
+      "evidence": "Matched: '架构'"
+    },
+    {
+      "text": "recommends_workflow",
+      "passed": true,
+      "evidence": "Matched: '推荐'"
+    },
+    {
+      "text": "structured_output",
+      "passed": true,
+      "evidence": "Matched: '╔'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

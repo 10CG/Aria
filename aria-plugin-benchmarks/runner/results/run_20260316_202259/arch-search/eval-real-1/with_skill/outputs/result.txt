@@ -1,0 +1,44 @@
+Here's the authentication implementation architecture:
+
+## Authentication Architecture Overview
+
+### Layers
+
+```
+Request → protect middleware → AuthController → AuthRepository → SQLite DB
+```
+
+### 1. Middleware (`backend/middleware/auth.js`)
+- `protect` — JWT verification middleware used on protected routes
+  - Reads token from `Authorization: Bearer <token>` header or `token` cookie
+  - Verifies with `JWT_SECRET` env var (falls back to default in dev)
+  - Fetches user from DB via `Database.getInstance()` (singleton)
+  - Attaches `req.user` for downstream handlers
+- `authorize(...roles)` — role-based access control guard
+
+### 2. Routes (`backend/src/auth/authRoutes.js`)
+| Endpoint | Auth | Handler |
+|---|---|---|
+| `POST /register` | public | `authController.register` |
+| `POST /login` | public | `authController.login` |
+| `POST /logout` | public | `authController.logout` |
+| `POST /forgot-password` | public | `authController.forgotPassword` |
+| `PUT /reset-password/:resettoken` | public | `authController.resetPassword` |
+| `POST /social-login` | public | `authController.socialLogin` |
+| `GET /verify-token` | `protect` | `authController.verifyToken` |
+| `GET /me` | `protect` | `authController.getMe` |
+
+### 3. Controller (`backend/src/auth/authController.js`)
+- Class-based with **dependency injection** (repository, getSecretKey, sendEmailFn)
+- JWT tokens expire in **30 days**; password hashed with bcrypt (salt=10)
+- Password reset: random token → SHA-256 hashed → stored in DB, expires in 1 hour
+- Social login: finds/creates user by provider+providerId, links to email account if found
+
+### 4. Repository (`backend/src/auth/authRepository.js`)
+- Pure data-access layer over SQLite
+- Supports both owned connections (opens/closes its own) and **shared external connections** (via `fromDbInstance()` factory — won't close them)
+- Key tables: `users`, `social_accounts`
+
+### 5. Legacy / Unused
+- `userModel.js` — old Mongoose schema (MongoDB), no longer in use (project is SQLite)
+- `authControllerLegacy.js` — superseded by the refactored class-based controller

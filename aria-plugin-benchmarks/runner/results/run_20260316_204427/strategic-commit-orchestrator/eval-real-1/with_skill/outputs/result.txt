@@ -1,0 +1,59 @@
+Here's the strategic commit plan based on the project's actual structure and recent history:
+
+---
+
+## Strategic Commit Plan
+
+### Context
+
+The project follows `conventional commits` (as seen in history: `fix:`, `style:`, `feat:`). Authentication spans two layers:
+
+- **Backend**: `backend/middleware/auth.js`, `backend/src/database.js` (AuthRepository), `backend/src/routes.js`
+- **Frontend**: `frontend/src/js/authApp.js`, `frontend/src/index.html` (login UI), `frontend/src/todos.html`
+
+---
+
+### Recommended Commit Sequence
+
+**Commit 1 — Backend logic (isolated, testable independently)**
+```
+fix(auth): <describe the change>
+
+Files:
+  backend/middleware/auth.js
+  backend/src/database.js        # if AuthRepository changed
+  backend/src/routes.js          # if auth routes changed
+```
+
+**Commit 2 — Frontend UI (depends on backend contract, but deployable separately)**
+```
+fix(frontend): <describe the login UI change>
+
+Files:
+  frontend/src/js/authApp.js
+  frontend/src/index.html        # login page markup
+  frontend/src/todos.html        # update ?v= cache-bust param if app.js/authApp.js changed
+```
+
+> Per `CLAUDE.md`: if `authApp.js` was modified, `todos.html` **must** have its `<script>` version updated to `?v=202603161852` (today's date + current time).
+
+---
+
+### Why split them?
+
+| Reason | Detail |
+|--------|--------|
+| **Rollback granularity** | Backend auth bug can be reverted without touching UI |
+| **Review clarity** | Reviewers see server-side vs. client-side concerns separately |
+| **History** | Matches existing pattern: `0f68e9d` (backend fix) vs. `ba9363a` (frontend fix) were separate commits |
+| **Bisect-friendliness** | If login breaks, `git bisect` can isolate which layer introduced it |
+
+---
+
+### Current staged change
+
+There's one staged file right now: `frontend/src/js/app.js` (benchmark test markers). That should either be:
+- **Squashed** into the frontend commit if it's related
+- **Committed separately** as `chore: remove benchmark test markers` if it's cleanup
+
+Want me to execute any of these commits, or do you have actual auth changes to stage first?

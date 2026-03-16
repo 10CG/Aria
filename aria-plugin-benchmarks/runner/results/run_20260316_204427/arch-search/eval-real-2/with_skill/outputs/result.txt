@@ -1,0 +1,49 @@
+## Database Design & Data Model Architecture
+
+### Core Tables (SQLite)
+
+**Entity Relationships:**
+```
+users 1──N todos 1──N notes
+  │                ├──N subtasks (self-ref parentId)
+  │                └──N todo_tags N──1 tags
+  └──1 user_settings
+  └──N social_accounts
+```
+
+### Table Schemas
+
+| Table | Key Fields |
+|-------|-----------|
+| `users` | id, name, email, password, avatar_url, role, created_at |
+| `todos` | id, text, tag, timestamp, plannedStart, estimatedTimeValue/Unit, completed, parentId, partition_date, priority, completed_at, user_id |
+| `notes` | id, todoId, content, timestamp, editedAt, user_id |
+| `tags` | id, name, color (#cccccc default) |
+| `todo_tags` | id, todoId, tagId (junction table) |
+| `subtasks` | parentId, childId, user_id (denormalized M2M) |
+| `user_settings` | user_id, theme, language, notification_enabled, display_mode, default_view |
+| `social_accounts` | user_id, provider, provider_user_id |
+| `cache_table` | key, value, expires_at (300s TTL) |
+
+### Key Design Decisions
+
+- **Multi-tenancy**: All tables have `user_id` for user isolation within a single SQLite instance
+- **Timestamps**: Millisecond epoch integers (JS-compatible); Beijing timezone support via `toBeiJingTimestamp()`
+- **Hierarchical todos**: `parentId` in todos + `subtasks` junction table for parent-child relationships
+- **Tags**: Full M2M via `todo_tags`; `tags` table also supports color customization
+- **WAL mode** + `PRAGMA foreign_keys = ON` + `ON DELETE CASCADE` on all FKs
+- **Indexes**: `idx_todos_user_parent`, `idx_todos_user_completed`, `idx_todos_completed_at`, `idx_todos_timestamp`, `idx_notes_todoId`
+
+### Modular Database Layer (`backend/src/database/`)
+
+Specialized managers: `backupManager`, `cacheManager`, `dataValidator`, `queryAnalyzer`, `statsManager`, `transactionManager`, `databaseMonitor`, `timerManager`
+
+### Backup Strategy
+- Full backup every 24h, incremental every 1h
+- After 23 consecutive incrementals → force full
+- AES-256-GCM encryption + gzip compression
+
+**Key files:**
+- `backend/src/database.js` — main Database class (980 lines)
+- `backend/tests/database-schema.js` — schema export for tests
+- `docs/architecture/system-architecture.md` — ER diagram & design principles

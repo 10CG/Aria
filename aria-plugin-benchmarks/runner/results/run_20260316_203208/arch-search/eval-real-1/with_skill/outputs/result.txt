@@ -1,0 +1,39 @@
+Here's the complete authentication architecture:
+
+## Authentication System Overview
+
+**Type:** JWT-based stateless auth with SQLite multi-tenant isolation
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `backend/middleware/auth.js` | JWT verification (`protect`) & role authorization (`authorize`) |
+| `backend/src/auth/authRoutes.js` | Route definitions for all `/auth/*` endpoints |
+| `backend/src/auth/authController.js` | Business logic (refactored, DI-based) |
+| `backend/src/auth/authRepository.js` | Data access layer (user CRUD, social accounts) |
+| `backend/middleware/validators/user.js` | Zod schemas for input validation |
+| `frontend/src/js/authApp.js` | Auth UI, session management, periodic token validation |
+| `frontend/src/js/todoService.js` | Frontend API client with Bearer token injection |
+| `frontend/src/js/services/api.js` | HTTP client with 401 auto-logout interceptor |
+
+### Auth Flow
+
+```
+Login: POST /auth/login → authLimiter → validate → authController.login()
+  → bcrypt.compare() → JWT(30d) → sessionStorage/localStorage
+
+Protected request: GET /api/todos
+  → protect() middleware → jwt.verify() → req.user → controller → DB filtered by user_id
+
+Page load: checkAuthStatus() → GET /api/auth/me → show app or login screen
+```
+
+### Security Patterns
+
+- **Passwords:** bcryptjs, salt=10
+- **Tokens:** JWT HS256, 30-day expiry, from `JWT_SECRET`
+- **Reset tokens:** SHA256-hashed, 1-hour TTL, single-use
+- **Rate limiting:** Stricter `authLimiter` on auth endpoints
+- **Data isolation:** All tables have `user_id` FK, queries filtered per user
+- **Social login:** Supports google/github/wechat/qq via `social_accounts` table

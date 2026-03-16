@@ -1,0 +1,29 @@
+{
+  "eval_id": "real-1",
+  "eval_name": "decompose-archived-spec",
+  "timestamp": "2026-03-16T20:29:57.798717+00:00",
+  "assertions": [
+    {
+      "text": "creates_task_list",
+      "passed": true,
+      "evidence": "Matched: 'task'"
+    },
+    {
+      "text": "has_complexity",
+      "passed": true,
+      "evidence": "Matched: 's'"
+    },
+    {
+      "text": "has_dependencies",
+      "passed": true,
+      "evidence": "Matched: '顺序'"
+    },
+    {
+      "text": "assigns_agents",
+      "passed": false,
+      "evidence": "Pattern 'agent|developer|architect|engineer|开发|前端|后端|涉及' not found in output"
+    }
+  ],
+  "verdict": "FAIL",
+  "pass_rate": 0.75
+}

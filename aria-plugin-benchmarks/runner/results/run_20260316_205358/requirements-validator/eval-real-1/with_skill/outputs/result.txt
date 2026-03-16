@@ -1,0 +1,58 @@
+Here is the validation report for `docs/requirements/prd-todo-optimization-v1.md`:
+
+---
+
+## PRD Validation Report
+
+### Critical Issues
+
+**1. Version inconsistency (3-way mismatch)**
+- Frontmatter: `version: 1.5.0`
+- H1 title: `v1.3`
+- Info block: `**版本**: 1.3.0`
+- Changelog only records up to `1.1.0` — entries for 1.2.0–1.5.0 are missing
+
+**2. Date inconsistency**
+- Frontmatter: `updated_at: 2026-02-26`
+- Info block: `**最后更新**: 2026-02-15`
+
+**3. Phase 4 status stale**
+- PRD table shows Phase 4 as `🔄 进行中`
+- But the Phase 4 spec is archived at `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md` — archived = completed
+- Should be `✅ 已完成` with completion date `2026-02-26`
+
+**4. Phase 4 OpenSpec link broken**
+- PRD links to: `openspec/changes/phase4-acceptance-release/proposal.md`
+- Actual path: `openspec/archive/2026-02-26-phase4-acceptance-release/proposal.md`
+
+---
+
+### Moderate Issues
+
+**5. FR statuses stale for Phase 2 items**
+- `FR-BE-003`, `FR-BE-004`, `FR-FE-002` all show `🔄 进行中 (Phase 2)`
+- Phase 2 is marked ✅ completed in the implementation table — these should be updated
+
+**6. Five broken doc references in §10.2 and frontmatter**
+
+| Reference | Status |
+|-----------|--------|
+| `docs/index.md` | ❌ does not exist |
+| `docs/standards/do-tech-template.md` | ❌ does not exist |
+| `docs/contracts/api/todo-api-contract.md` | ❌ does not exist |
+| `docs/contracts/data/todo-data-contract.md` | ❌ does not exist |
+| `docs/contracts/ui/todo-list-page-contract.md` | ❌ does not exist |
+
+---
+
+### Summary
+
+| Category | Count |
+|----------|-------|
+| Critical | 4 |
+| Moderate | 2 |
+| Total issues | 6 |
+
+The most impactful fixes are: align the version field across frontmatter/header/info-block, mark Phase 4 as completed with the correct archive link, update FR statuses for Phase 2 items, and either create or remove the broken contract document references.
+
+Would you like me to fix these issues in the document?

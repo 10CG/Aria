@@ -1,0 +1,83 @@
+Here's a strategic commit plan based on the project architecture:
+
+---
+
+## Strategic Commit Plan: Auth Changes
+
+### Context
+- Only actually staged: `frontend/src/js/app.js` (benchmark comment, unrelated to auth)
+- Hypothetical auth changes span: `backend/src/auth/` + `frontend/src/js/authApp.js` + `frontend/src/css/auth.css`
+
+---
+
+### Recommended Commit Sequence
+
+**Commit 1 — Backend: Auth data layer**
+```
+fix(auth): update authentication repository query logic
+
+Files:
+  backend/src/auth/authRepository.js
+  backend/src/auth/userModel.js
+```
+Rationale: isolates DB-layer changes; independently revertable if query regression is found.
+
+---
+
+**Commit 2 — Backend: Auth controller & routes**
+```
+feat(auth): revise login/register controller logic
+
+Files:
+  backend/src/auth/authController.js
+  backend/src/auth/authRoutes.js
+```
+Rationale: depends on Commit 1 (repository interface), but separating controller from data layer keeps each commit reviewable.
+
+---
+
+**Commit 3 — Frontend: Auth UI styles**
+```
+style(auth): update login UI layout and visual design
+
+Files:
+  frontend/src/css/auth.css
+```
+Rationale: pure style change — zero JS risk, easy to bisect independently.
+
+---
+
+**Commit 4 — Frontend: Auth app logic + version bump**
+```
+feat(auth): update login UI with revised auth flow
+
+Files:
+  frontend/src/js/authApp.js
+  frontend/src/todos.html   ← version bump required per CLAUDE.md
+```
+> **Important:** Per project convention, `todos.html` must have its `authApp.js` script tag version updated to `?v=202603161830` (or current time). Skipping this causes browsers to serve stale JS.
+
+---
+
+**Commit 5 — Unrelated: Benchmark marker (already staged)**
+```
+chore(benchmark): add test marker to app.js
+
+Files:
+  frontend/src/js/app.js
+```
+This should be committed separately since it's unrelated to auth changes.
+
+---
+
+### Why this order?
+
+| # | Layer | Dependency | Rollback risk |
+|---|-------|------------|---------------|
+| 1 | DB/Repository | none | Low |
+| 2 | Controller | needs #1 | Medium |
+| 3 | CSS | independent | Low |
+| 4 | Frontend JS | needs #2 API contract | Medium |
+| 5 | Chore | independent | None |
+
+This ordering ensures `git bisect` can isolate regressions to a specific layer, and each commit passes independently in CI.

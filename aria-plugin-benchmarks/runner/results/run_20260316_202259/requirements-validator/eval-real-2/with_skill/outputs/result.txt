@@ -1,0 +1,67 @@
+Now I have enough to report. Here's the validation summary:
+
+---
+
+## System Architecture Validation Report
+
+### Accuracy: ~85% — Several gaps found
+
+---
+
+### Issues Found
+
+**1. Missing API Endpoints (Section 3.3)**
+
+The following routes exist in `routes.js` but are not documented:
+
+| Method | Endpoint | Status |
+|--------|----------|--------|
+| POST | `/api/backups/incremental` | Missing |
+| GET | `/api/backup/status` | Missing (doc lists `/api/scheduler/status` only) |
+| POST | `/api/backup/force-full` | Missing |
+| POST | `/api/backup/force-incremental` | Missing |
+| POST | `/api/todos/:todoId/tags/:tagId` | Missing |
+| DELETE | `/api/todos/:todoId/tags/:tagId` | Missing |
+| GET | `/api/backup/history` | Missing (in `server.js:107`) |
+| GET | `/api/health` | Missing (doc only lists `/health` — but there's also one at `routes.js:39` accessible as `/api/health`) |
+
+**2. `errorHandler` Registration Order (Section 3.2)**
+
+`server.js:120` registers `errorHandler` **before** the API router (added at line 144 inside the async IIFE). This means errors from `/api/*` routes technically bypass the global error handler in Express's middleware stack. The doc implies it's at the end of the chain (position #11).
+
+**3. Undocumented Backend Files (Section 3.4)**
+
+The following files exist but aren't mentioned:
+- `backend/src/aiService.js`
+- `backend/src/auth/authRepository.js` (used in `routes.js`)
+- `backend/src/auth/profileController.js`, `profileRoutes.js`, `authControllerLegacy.js`
+- `backend/src/logger.js`
+- `backend/src/database/` subdirectory has 10+ modules: `cacheManager.js`, `transactionManager.js`, `queryAnalyzer.js`, `databaseMonitor.js`, `exportManager.js`, `dataValidator.js`, `statsManager.js`, `timerManager.js`, etc.
+
+**4. Undocumented Frontend Files (Section 4.1)**
+
+- `frontend/src/js/logger.js`
+- `frontend/src/js/utils/validate.js`
+- `frontend/src/js/utils/configChecker.js`
+
+---
+
+### What's Accurate
+
+- Technology stack, versions, and middleware chain order (functionally)
+- Database schema (ER diagram, table columns, indexes)
+- Core backend layers: server → router → controller → service → database
+- Frontend module dependency graph
+- Deployment and CI/CD descriptions
+- Security measures
+- Backup scheduling logic
+
+---
+
+### Recommendation
+
+The doc needs updates in:
+1. **Section 3.3** — add the 8 missing endpoints
+2. **Section 3.4** — add `aiService.js`, `authRepository.js`, `logger.js`, and note the `database/` submodule directory
+3. **Section 3.2** — note that `errorHandler` is registered before API routes (or flag as a code issue to fix)
+4. **Section 4.1** — add `logger.js` and the missing utils files

@@ -1,0 +1,38 @@
+{
+  "runner_version": "1.0.0",
+  "timestamp": "2026-03-16T20:32:02.864565+00:00",
+  "test_project": "/home/dev/todo-web",
+  "model": "sonnet",
+  "total_skills": 1,
+  "total_evals": 1,
+  "total_passed": 1,
+  "total_failed": 0,
+  "overall_pass_rate": 1.0,
+  "total_cost_usd": 0.1202,
+  "skills": {
+    "task-planner": {
+      "benchmark_name": "task-planner",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T20:32:02.864429+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 1369,
+      "total_duration_ms": 36709,
+      "total_cost_usd": 0.1202,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "decompose-archived-spec",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 1369,
+          "duration_ms": 36709,
+          "failed_assertions": []
+        }
+      ]
+    }
+  }
+}

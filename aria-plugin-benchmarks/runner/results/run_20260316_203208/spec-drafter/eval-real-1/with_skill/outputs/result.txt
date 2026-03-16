@@ -1,0 +1,82 @@
+Now I have a clear picture of the current state. Here's the OpenSpec proposal:
+
+---
+
+# Phase 5: Todo Item Tag/Label Feature
+
+> **Level**: Standard (Level 2 Spec)
+> **Status**: Proposed
+> **Module**: frontend, backend
+> **PRD Reference**: docs/requirements/prd-todo-optimization-v1.md
+> **Created**: 2026-03-16
+
+## Why
+
+The app already supports a single `tag` field per todo (used as a category selector, e.g. "工作", "学习"). This is a coarse grouping mechanism — users can't apply multiple cross-cutting labels to a task. The database already has a complete multi-label infrastructure (`tags` table, `todo_tags` junction table) and backend API routes (`GET /tags`, `POST /tags`, `POST /todos/:todoId/tags/:tagId`, `DELETE /todos/:todoId/tags/:tagId`), but **no frontend UI exposes it**. This feature closes that gap.
+
+## What
+
+Expose the existing tag infrastructure through a UI that lets users create color-coded labels, assign multiple labels to todo items, and filter the todo list by one or more labels.
+
+### FR-TAG-001: Tag Management (P1)
+
+- Tag creation form: name input + color picker (predefined palette of ~10 colors)
+- Tag list view in a settings panel or sidebar section
+- Delete tag (with confirmation; cascade removes assignments via existing FK)
+- Tag names: max 20 chars, unique per user
+-涉及文件: new `frontend/src/js/components/tagManager.js`, `frontend/src/css/tags.css`
+
+### FR-TAG-002: Assign Tags to Todos (P1)
+
+- Tag picker in the todo edit modal — multi-select dropdown showing all available tags as colored chips
+- Inline tag display on each todo row: chips rendered next to the existing category tag
+- Add/remove tag assignment calls `POST /todos/:id/tags/:tagId` and `DELETE /todos/:id/tags/:tagId`
+- Tags load with todo list via a joined query or a parallel `/tags` fetch on page init
+- 涉及文件: `frontend/src/js/app.js`, `frontend/src/js/components/tagPicker.js`
+
+### FR-TAG-003: Filter by Tags (P2)
+
+- Multi-tag filter bar above the todo list (similar to existing category filter but for labels)
+- Selecting a tag narrows the list to todos that have **all** selected tags (AND logic)
+- Tag filters compose with the existing category filter and search
+- Active filter chips are dismissible
+- 涉及文件: `frontend/src/js/app.js`, `frontend/src/css/tags.css`
+
+### FR-TAG-004: Backend — User Scope for Tags (P1)
+
+- Current `tags` table has no `user_id` column — tags are global. Add `user_id` to scope tags per user (migration required).
+- `GET /tags` should return only the authenticated user's tags.
+- `POST /tags` should associate the new tag with `req.user.id`.
+- 涉及文件: `backend/src/database.js` (migration), `backend/src/todoController.js`, `backend/src/routes.js`
+
+## Key Deliverables
+
+| 交付物 | 类型 | 说明 |
+|--------|------|------|
+| `tags.user_id` migration | 修改 | Add user_id column + index to tags table |
+| `GET /tags` user scoping | 修改 | Filter by authenticated user |
+| `tagManager.js` component | 新增 | CRUD UI for label management |
+| `tagPicker.js` component | 新增 | Multi-select chip picker for todo edit modal |
+| Tag chips in todo row | 修改 | Render assigned tags in `app.js` todo template |
+| Multi-tag filter bar | 新增 | Filter UI + client-side filter logic in `app.js` |
+| `tags.css` | 新增 | Tag chip styles, color variants, filter bar styles |
+| Cache-bust version bumps | 修改 | `todos.html` `?v=` params for all modified JS files |
+
+## Impact
+
+- **影响范围**: Backend migration (additive, non-breaking) + frontend UI additions
+- **风险**: Low — database schema change is additive (new column, existing rows get NULL user_id which need a backfill); all existing API routes continue to work
+- **依赖**: Existing `tags` + `todo_tags` tables and the 4 backend routes are already in place — no new endpoints needed for core functionality
+- **兼容性**: The existing `todos.tag` category field is unaffected; the new label system is independent
+
+## Tasks
+
+- [ ] 1.1 Add `user_id` column to `tags` table via migration; update `getAllTags` and `createTag` to scope by user
+- [ ] 1.2 Backfill `tags.user_id` for any existing rows; add DB index on `(user_id)`
+- [ ] 2.1 Build `tagManager.js`: tag list, create form with color picker, delete with confirmation
+- [ ] 2.2 Build `tagPicker.js`: multi-select chip dropdown, emits add/remove events
+- [ ] 2.3 Integrate `tagPicker` into todo edit modal in `app.js`; render assigned tag chips in todo row template
+- [ ] 2.4 Load tags on page init; attach to todo objects client-side
+- [ ] 3.1 Build multi-tag filter bar UI in `app.js`; implement AND-filter logic composing with existing filters
+- [ ] 4.1 Write unit tests for `getAllTags` and `createTag` with user scoping
+- [ ] 4.2 Update `todos.html` `?v=` cache-bust params for all modified JS files

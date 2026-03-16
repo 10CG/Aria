@@ -1,0 +1,24 @@
+{
+  "eval_id": "real-2",
+  "eval_name": "validate-architecture-doc",
+  "timestamp": "2026-03-16T20:26:34.360715+00:00",
+  "assertions": [
+    {
+      "text": "finds_arch_file",
+      "passed": true,
+      "evidence": "Matched: 'Architecture'"
+    },
+    {
+      "text": "checks_structure",
+      "passed": true,
+      "evidence": "Matched: 'Section'"
+    },
+    {
+      "text": "reports_result",
+      "passed": true,
+      "evidence": "Matched: 'valid'"
+    }
+  ],
+  "verdict": "PASS",
+  "pass_rate": 1.0
+}

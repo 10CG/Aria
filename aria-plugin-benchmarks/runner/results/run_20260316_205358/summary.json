@@ -1,0 +1,200 @@
+{
+  "runner_version": "1.0.0",
+  "timestamp": "2026-03-16T21:02:24.525096+00:00",
+  "test_project": "/home/dev/todo-web",
+  "model": "sonnet",
+  "total_skills": 7,
+  "total_evals": 9,
+  "total_passed": 9,
+  "total_failed": 0,
+  "overall_pass_rate": 1.0,
+  "total_cost_usd": 1.3853,
+  "skills": {
+    "state-scanner": {
+      "benchmark_name": "state-scanner",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T20:54:57.446626+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 2606,
+      "total_duration_ms": 53469,
+      "total_cost_usd": 0.2119,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "scan-todo-web-status",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 2606,
+          "duration_ms": 53469,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "requirements-validator": {
+      "benchmark_name": "requirements-validator",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T20:57:34.707928+00:00",
+      "total_evals": 2,
+      "passed": 2,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 6613,
+      "total_duration_ms": 146977,
+      "total_cost_usd": 0.4542,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "validate-prd-format",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 2486,
+          "duration_ms": 44023,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": "real-2",
+          "eval_name": "validate-architecture-doc",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 4127,
+          "duration_ms": 102954,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "arch-search": {
+      "benchmark_name": "arch-search",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T20:59:56.559030+00:00",
+      "total_evals": 2,
+      "passed": 2,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 2051,
+      "total_duration_ms": 131925,
+      "total_cost_usd": 0.3323,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "search-auth-implementation",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 895,
+          "duration_ms": 33016,
+          "failed_assertions": []
+        },
+        {
+          "eval_id": "real-2",
+          "eval_name": "search-database-design",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 1156,
+          "duration_ms": 98909,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "spec-drafter": {
+      "benchmark_name": "spec-drafter",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T21:01:07.030610+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 3125,
+      "total_duration_ms": 65328,
+      "total_cost_usd": 0.128,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "draft-tag-feature-spec",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 3125,
+          "duration_ms": 65328,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "commit-msg-generator": {
+      "benchmark_name": "commit-msg-generator",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T21:01:15.281935+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 20,
+      "total_duration_ms": 2965,
+      "total_cost_usd": 0.0953,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "generate-from-staged-changes",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 20,
+          "duration_ms": 2965,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "task-planner": {
+      "benchmark_name": "task-planner",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T21:01:37.687584+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 885,
+      "total_duration_ms": 17421,
+      "total_cost_usd": 0.0656,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "decompose-archived-spec",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 885,
+          "duration_ms": 17421,
+          "failed_assertions": []
+        }
+      ]
+    },
+    "strategic-commit-orchestrator": {
+      "benchmark_name": "strategic-commit-orchestrator",
+      "test_type": "real_execution",
+      "test_project": "todo-web",
+      "timestamp": "2026-03-16T21:02:24.524978+00:00",
+      "total_evals": 1,
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "total_tokens": 1295,
+      "total_duration_ms": 41731,
+      "total_cost_usd": 0.098,
+      "eval_results": [
+        {
+          "eval_id": "real-1",
+          "eval_name": "analyze-multi-file-changes",
+          "verdict": "PASS",
+          "pass_rate": 1.0,
+          "tokens": 1295,
+          "duration_ms": 41731,
+          "failed_assertions": []
+        }
+      ]
+    }
+  }
+}
