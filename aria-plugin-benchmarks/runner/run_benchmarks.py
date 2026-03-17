@@ -42,6 +42,10 @@ def run_claude(prompt, cwd, skill_name=None, timeout=120, model="sonnet"):
 
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
+    # Ensure npm-global bin is in PATH for claude CLI
+    npm_global_bin = os.path.expanduser("~/.npm-global/bin")
+    if npm_global_bin not in env.get("PATH", ""):
+        env["PATH"] = npm_global_bin + os.pathsep + env.get("PATH", "")
 
     start = time.time()
     try:
