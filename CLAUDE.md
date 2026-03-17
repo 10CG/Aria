@@ -54,7 +54,7 @@ A. 规划 (Spec & Planning)
 
 B. 开发 (Development)
 ├── B.1 分支创建    → 隔离工作空间
-├── B.2 执行验证    → 开发+评审
+├── B.2 执行验证    → 开发+评审 (Skill 变更时含 /skill-creator benchmark)
 
 C. 集成 (Integration)
 ├── C.1 提交        → 记录变更
@@ -233,6 +233,11 @@ aria/
   - [ ] aria/VERSION (创建或更新)
   - [ ] aria/CHANGELOG.md (添加新版本条目)
   - [ ] aria/README.md (更新版本号和 Skills 数量)
+
+Skill 基准测试 (新增或修改 Skill 时):
+  - [ ] /skill-creator benchmark 已执行
+  - [ ] benchmark.json 中 delta.pass_rate 为正值 (Skill 确实提升了质量)
+  - [ ] 人类已审阅 HTML 报告并提交 feedback
 
 主项目:
   - [ ] 更新子模块指针 (git add aria)
