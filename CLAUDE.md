@@ -309,6 +309,43 @@ aria/
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### Skill 基准测试操作指南
+
+**何时触发基准测试:**
+
+| 触发场景 | 测试类型 | 命令 |
+|----------|---------|------|
+| 新增 Skill | with/without 对比 | `/skill-creator` → 创建流程含 benchmark |
+| 修改 Skill 逻辑 | with/without 对比 | `/skill-creator` → 改进流程含 benchmark |
+| 修改 Skill description | 触发准确率测试 | `/skill-creator` → description 优化 |
+| 定期质量审计 | 全量 benchmark | 逐 Skill 执行 `/skill-creator` benchmark |
+
+**标准流程 (逐 Skill 执行):**
+
+```
+1. /skill-creator benchmark <skill-name>
+   ├── 编写 evals.json (prompt + expected_output)
+   ├── 并行执行 with_skill + without_skill (subagent)
+   ├── grader agent 逐项评分 (语义级, 非 regex)
+   ├── aggregate_benchmark.py → benchmark.json + benchmark.md
+   ├── generate_review.py → HTML 可视化
+   └── 人类审阅 + 提交 feedback
+
+2. 关键输出文件:
+   ├── {skill}-workspace/iteration-N/benchmark.json  # 统计数据
+   ├── {skill}-workspace/iteration-N/benchmark.md    # 可读报告
+   └── {skill}-workspace/iteration-N/feedback.json   # 人类反馈
+
+3. 核心指标:
+   ├── delta.pass_rate  → Skill 带来的通过率提升
+   ├── delta.tokens     → Token 消耗变化
+   └── delta.time       → 耗时变化
+```
+
+**不需要 OpenSpec 的场景:**
+- 使用 `/skill-creator` 运行测试 → 这是验证活动，不是变更活动
+- 测试发现 Skill 需要改进 → **改进时**才需要 OpenSpec
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  规则 #5: 变更位置边界 (OpenSpec 兼容)                           │
