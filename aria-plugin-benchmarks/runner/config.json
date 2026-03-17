@@ -135,6 +135,324 @@
           ]
         }
       ]
+    },
+    "phase-a-planner": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-todo-feature",
+          "prompt": "Run Phase A planning for adding a notification feature to this project. Analyze current state and suggest a planning approach. Do not create any files, just output your analysis.",
+          "assertions": [
+            {"text": "scans_state", "check": "status|state|scan|git|branch|状态|扫描"},
+            {"text": "suggests_spec", "check": "spec|proposal|OpenSpec|Level|规范|提案"},
+            {"text": "plans_tasks", "check": "task|plan|decompose|分解|任务|规划"}
+          ]
+        }
+      ]
+    },
+    "phase-b-developer": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "analyze-dev-workflow",
+          "prompt": "Analyze how Phase B development workflow should proceed for this project. What branch strategy and development steps would you recommend? Do not create branches or modify files.",
+          "assertions": [
+            {"text": "suggests_branch", "check": "branch|分支|feature/|bugfix/"},
+            {"text": "mentions_development", "check": "develop|implement|code|开发|实现|编码"},
+            {"text": "mentions_testing", "check": "test|verify|validate|测试|验证|TDD"}
+          ]
+        }
+      ]
+    },
+    "phase-c-integrator": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "analyze-integration-workflow",
+          "prompt": "Analyze the current git state and suggest an integration strategy. What commit conventions and merge approach should be used? Do not create commits or merge anything.",
+          "assertions": [
+            {"text": "mentions_commit", "check": "commit|提交|conventional|Conventional"},
+            {"text": "mentions_merge", "check": "merge|PR|pull request|合并|集成"},
+            {"text": "follows_convention", "check": "feat|fix|docs|chore|refactor|convention|规范"}
+          ]
+        }
+      ]
+    },
+    "phase-d-closer": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "analyze-closure-workflow",
+          "prompt": "Analyze what closure steps are needed for this project. Check if there are any completed specs that need archiving or progress that needs updating. Do not modify any files.",
+          "assertions": [
+            {"text": "checks_progress", "check": "progress|update|status|进度|更新|状态"},
+            {"text": "checks_archive", "check": "archive|complete|归档|完成|收尾"}
+          ]
+        }
+      ]
+    },
+    "branch-manager": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "suggest-branch-name",
+          "prompt": "I need to implement a user notification feature. What branch name should I create? Analyze the task and suggest a branch name following conventions. Do not create the branch.",
+          "assertions": [
+            {"text": "suggests_branch_name", "check": "feature/|bugfix/|hotfix/"},
+            {"text": "follows_naming", "check": "notification|notify|通知"}
+          ]
+        },
+        {
+          "id": "real-2",
+          "name": "decide-isolation-mode",
+          "prompt": "I need to refactor the authentication module which touches 8 files across backend and frontend. Should I use a regular branch or a worktree? Analyze the factors and recommend. Do not create anything.",
+          "assertions": [
+            {"text": "analyzes_factors", "check": "file|factor|risk|score|complex|文件|因子|风险|复杂"},
+            {"text": "recommends_mode", "check": "branch|worktree|Mode [AB]|隔离|模式"}
+          ]
+        }
+      ]
+    },
+    "branch-finisher": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "analyze-branch-completion",
+          "prompt": "Analyze the current branch state and suggest completion options. What checks should be done before finishing this branch? Do not modify any branches.",
+          "assertions": [
+            {"text": "checks_tests", "check": "test|verify|check|测试|验证|检查"},
+            {"text": "offers_options", "check": "PR|merge|commit|continue|abort|提交|合并|继续|放弃|\\[\\d\\]"}
+          ]
+        }
+      ]
+    },
+    "arch-common": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "identify-architecture-layers",
+          "prompt": "Analyze the architecture documentation structure of this project. Identify the documentation layers (L0/L1/L2) and their relationships.",
+          "assertions": [
+            {"text": "identifies_layers", "check": "L0|L1|L2|layer|层|PRD|Architecture|OpenSpec"},
+            {"text": "finds_docs", "check": "docs/|architecture|ARCHITECTURE|system-architecture|\\.(md)"}
+          ]
+        }
+      ]
+    },
+    "arch-scaffolder": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "scaffold-from-prd",
+          "prompt": "Based on the PRD at docs/requirements/prd-todo-optimization-v1.md, suggest an architecture document skeleton. What sections and components should be included? Output the skeleton directly, do not create files.",
+          "assertions": [
+            {"text": "extracts_prd", "check": "PRD|requirement|需求|product"},
+            {"text": "generates_skeleton", "check": "##|section|component|module|overview|架构|组件|模块"},
+            {"text": "includes_tech_stack", "check": "technology|tech|stack|Node|Express|frontend|backend|技术"}
+          ]
+        }
+      ]
+    },
+    "arch-update": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "suggest-arch-updates",
+          "prompt": "Review the current system architecture doc at docs/architecture/system-architecture.md and check if it needs updates based on recent code changes. What sections are outdated? Do not modify the file.",
+          "assertions": [
+            {"text": "reads_arch_doc", "check": "system-architecture|architecture|架构"},
+            {"text": "identifies_changes", "check": "update|change|outdated|add|section|更新|变更|过时|新增"}
+          ]
+        }
+      ]
+    },
+    "agent-router": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "route-backend-task",
+          "prompt": "I need to design a REST API for user management with CRUD operations and JWT authentication. Which agent should handle this task? Analyze and recommend.",
+          "assertions": [
+            {"text": "identifies_agent", "check": "backend-architect|backend|API|architect|后端"},
+            {"text": "provides_reasoning", "check": "reason|because|suitable|match|原因|适合|匹配"}
+          ]
+        },
+        {
+          "id": "real-2",
+          "name": "detect-multi-agent",
+          "prompt": "I need to build a feature that requires a new database schema, a REST API, and a React frontend component. Which agents are needed? Analyze the task complexity.",
+          "assertions": [
+            {"text": "detects_multiple_agents", "check": "backend|frontend|mobile|architect|developer|多个|协作"},
+            {"text": "assigns_responsibilities", "check": "database|API|UI|component|schema|数据库|接口|组件"}
+          ]
+        }
+      ]
+    },
+    "workflow-runner": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-workflow-execution",
+          "prompt": "I want to run a new-feature workflow for this project. Analyze what steps would be needed and in what order. Do not execute any steps, just plan the workflow.",
+          "assertions": [
+            {"text": "identifies_phases", "check": "Phase [ABCD]|phase|A\\.|B\\.|C\\.|D\\.|阶段|步骤"},
+            {"text": "defines_order", "check": "order|sequence|first|then|next|顺序|先|然后|接下来|→"}
+          ]
+        }
+      ]
+    },
+    "progress-updater": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "generate-progress-update",
+          "prompt": "Generate a progress update for this project. Summarize the current state, what has been completed, and what remains. Output in a structured format.",
+          "assertions": [
+            {"text": "shows_status", "check": "status|progress|complete|pending|进度|状态|完成|待办"},
+            {"text": "structured_format", "check": "##|\\||─|━|完成|进行中|%"}
+          ]
+        }
+      ]
+    },
+    "api-doc-generator": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "generate-api-docs",
+          "prompt": "Analyze the backend API routes in this project and generate API documentation. List the endpoints, methods, and expected parameters. Output directly, do not create files.",
+          "assertions": [
+            {"text": "lists_endpoints", "check": "GET|POST|PUT|DELETE|endpoint|route|/api|路由"},
+            {"text": "describes_params", "check": "param|body|query|header|request|response|参数|请求|响应"}
+          ]
+        }
+      ]
+    },
+    "requesting-code-review": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-code-review",
+          "prompt": "Plan a code review for the most recent changes in this project. What should be checked in Phase 1 (spec compliance) and Phase 2 (code quality)? Do not actually perform the review.",
+          "assertions": [
+            {"text": "mentions_phase1", "check": "Phase 1|spec|compliance|规范|合规|phase.1"},
+            {"text": "mentions_phase2", "check": "Phase 2|quality|code review|质量|审查|phase.2"},
+            {"text": "categorizes_issues", "check": "Critical|Important|Minor|critical|important|minor|严重|重要"}
+          ]
+        }
+      ]
+    },
+    "tdd-enforcer": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "verify-tdd-awareness",
+          "prompt": "Analyze the testing practices in this project. What TDD phases (RED-GREEN-REFACTOR) would apply to adding a new feature? What strictness level would you recommend?",
+          "assertions": [
+            {"text": "mentions_tdd_phases", "check": "RED|GREEN|REFACTOR|red|green|refactor|TDD"},
+            {"text": "mentions_strictness", "check": "strict|advisory|superpowers|strictness|级别|严格"}
+          ]
+        }
+      ]
+    },
+    "openspec-archive": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-spec-archival",
+          "prompt": "Check the openspec/changes/ directory and identify any specs that should be archived. What is the correct archive path format? Do not move any files.",
+          "assertions": [
+            {"text": "checks_changes", "check": "changes/|openspec/changes|变更"},
+            {"text": "knows_archive_format", "check": "archive/|YYYY-MM-DD|\\d{4}-\\d{2}-\\d{2}|归档|日期"}
+          ]
+        }
+      ]
+    },
+    "brainstorm": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "brainstorm-first-round",
+          "prompt": "Start a brainstorm about adding a real-time collaboration feature to this todo app. Ask focused questions to clarify the problem space. Output your first round of analysis and questions.",
+          "assertions": [
+            {"text": "asks_questions", "check": "\\?|？|问题|question"},
+            {"text": "explores_problem", "check": "problem|challenge|考虑|问题空间|需求|场景|用户"},
+            {"text": "structured_discussion", "check": "##|─|阶段|方面|维度|aspect"}
+          ]
+        }
+      ]
+    },
+    "subagent-driver": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-subagent-delegation",
+          "prompt": "I have 3 tasks: 1) Add user model, 2) Create REST API routes, 3) Write unit tests. How would you delegate these to subagents? What isolation level is needed? Do not launch any subagents, just plan.",
+          "assertions": [
+            {"text": "plans_delegation", "check": "subagent|agent|delegate|task|委派|代理|任务"},
+            {"text": "considers_isolation", "check": "isolat|worktree|branch|context|隔离|上下文"}
+          ]
+        }
+      ]
+    },
+    "forgejo-sync": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "plan-issue-sync",
+          "prompt": "Analyze the user stories in docs/requirements/user-stories/ and plan how they would be synced to Forgejo issues. What labels and milestones should be created? Do not make any API calls.",
+          "assertions": [
+            {"text": "reads_stories", "check": "US-|user.story|story|Story|需求"},
+            {"text": "plans_sync", "check": "sync|issue|label|milestone|同步|标签|里程碑"}
+          ]
+        }
+      ]
+    },
+    "requirements-sync": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "detect-requirements-drift",
+          "prompt": "Check the requirements documents in docs/requirements/ and analyze if there is any drift between PRD goals and current implementation status. Are there inconsistencies?",
+          "assertions": [
+            {"text": "reads_requirements", "check": "PRD|requirement|story|US-|需求|prd"},
+            {"text": "detects_drift", "check": "drift|inconsisten|gap|mismatch|漂移|不一致|差距|偏差|status|状态"}
+          ]
+        }
+      ]
+    },
+    "integration-tests": {
+      "enabled": true,
+      "evals": [
+        {
+          "id": "real-1",
+          "name": "verify-phase-handoff",
+          "prompt": "Verify the handoff between Phase A (planning) and Phase B (development) for this project. What artifacts from Phase A are needed to start Phase B? Check if the current state supports a smooth transition.",
+          "assertions": [
+            {"text": "identifies_artifacts", "check": "spec|proposal|task|artifact|规范|提案|任务|产出物"},
+            {"text": "checks_readiness", "check": "ready|complete|missing|need|就绪|完成|缺少|需要"}
+          ]
+        }
+      ]
     }
   }
 }
