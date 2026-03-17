@@ -285,6 +285,29 @@ aria/
 3. **文档与代码必须同步更新** - 架构文档与代码一致
 4. **每个提交必须遵循规范** - Conventional Commits 格式
 5. **项目变更必须在项目的 openspec/changes/ 目录** - 不得放在 `standards/openspec/changes/`
+6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  规则 #6: Skill 基准测试工具边界                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  /skill-creator benchmark           ← 唯一正确方式              │
+│  ├── with/without 对比              → 证明 Skill 价值           │
+│  ├── AI 评分 (grader agent)         → 语义级验证                │
+│  ├── 盲测对比 (comparator agent)    → 消除偏见                  │
+│  ├── 统计分析 (mean ± stddev)       → 量化可靠性               │
+│  └── HTML 可视化 + 反馈循环         → 迭代改进                  │
+│                                                                 │
+│  aria-plugin-benchmarks/runner/     → 已废弃 (deprecated)       │
+│  ├── 仅支持 regex 断言              → 无法验证 Skill 价值       │
+│  ├── 无 with/without 对比           → 不回答核心问题            │
+│  └── 保留历史数据，不再投入新 eval   → 冻结状态                 │
+│                                                                 │
+│  原因: 基准测试的核心问题是 "Skill 是否提升了质量？"             │
+│  只有 /skill-creator 的 with/without 对比能回答这个问题          │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -319,3 +342,53 @@ aria/
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
 **规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards
+
+## Forgejo API (PR Operations)
+
+This repo is hosted on Forgejo behind Cloudflare Access. Use the `forgejo` CLI wrapper (not `gh` or `tea`) for all API operations. It automatically handles CF Access authentication.
+
+Path: `/home/dev/.npm-global/bin/forgejo`
+
+### Usage
+
+```bash
+forgejo <METHOD> <ENDPOINT> [curl options]
+```
+
+### Common Operations
+
+```bash
+# List PRs
+forgejo GET /repos/10CG/Aria/pulls
+
+# Get specific PR
+forgejo GET /repos/10CG/Aria/pulls/1
+
+# Create PR
+forgejo POST /repos/10CG/Aria/pulls -d '{
+  "title": "feat: description",
+  "body": "## Summary
+
+- changes",
+  "head": "feature-branch",
+  "base": "main"
+}'
+
+# Add comment to PR
+forgejo POST /repos/10CG/Aria/pulls/1/comments -d '{
+  "body": "LGTM"
+}'
+
+# Merge PR
+forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{
+  "Do": "merge"
+}'
+
+# List branches
+forgejo GET /repos/10CG/Aria/branches
+```
+
+### Notes
+- Repo: `10CG/Aria`
+- Default branch: check with `git remote show origin`
+- API docs: https://forgejo.10cg.pub/api/swagger (requires CF Access)
