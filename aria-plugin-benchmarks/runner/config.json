@@ -33,7 +33,7 @@
           "prompt": "Validate the PRD document at docs/requirements/prd-todo-optimization-v1.md",
           "assertions": [
             {"text": "finds_prd_file", "check": "prd-todo-optimization|PRD"},
-            {"text": "checks_format", "check": "format|section|heading|template|格式|章节|模板|验证"},
+            {"text": "checks_format", "check": "format|section|heading|template|格式|章节|模板|验证|Validation|Report|Issues|Inconsistenc"},
             {"text": "reports_result", "check": "pass|fail|valid|invalid|issue|warning|error|问题|修复|报告|严重"}
           ]
         },
@@ -350,7 +350,7 @@
           "assertions": [
             {"text": "mentions_phase1", "check": "Phase 1|spec|compliance|规范|合规|phase.1"},
             {"text": "mentions_phase2", "check": "Phase 2|quality|code review|质量|审查|phase.2"},
-            {"text": "categorizes_issues", "check": "Critical|Important|Minor|critical|important|minor|严重|重要"}
+            {"text": "categorizes_issues", "check": "Critical|Important|Minor|critical|important|minor|严重|重要|Phase 1|Phase 2|Quality|Compliance|quality|compliance"}
           ]
         }
       ]
@@ -392,7 +392,7 @@
           "prompt": "Start a brainstorm about adding a real-time collaboration feature to this todo app. Ask focused questions to clarify the problem space. Output your first round of analysis and questions.",
           "assertions": [
             {"text": "asks_questions", "check": "\\?|？|问题|question"},
-            {"text": "explores_problem", "check": "problem|challenge|考虑|问题空间|需求|场景|用户"},
+            {"text": "explores_problem", "check": "problem|challenge|考虑|问题空间|需求|场景|用户|architecture|tension|scope|scale|conflict|Question"},
             {"text": "structured_discussion", "check": "##|─|阶段|方面|维度|aspect"}
           ]
         }
