@@ -47,11 +47,11 @@ aria-plugin-benchmarks/
 ├── OVERALL_BENCHMARK_SUMMARY.md # 综合报告 (人类可读)
 ├── benchmark.json               # 全局基准数据
 │
-├── ab-suite/                    # 固定测试集 (版本化) [待建]
+├── ab-suite/                    # 固定测试集 (版本化) [已建立]
 │   ├── version.yaml             # 测试集版本号
 │   └── {skill-name}.json       # 每个 Skill 的 eval cases
 │
-├── ab-results/                  # 历史测试结果 [待建]
+├── ab-results/                  # 历史测试结果 [已建立]
 │   ├── YYYY-MM-DD/             # 每次完整运行
 │   │   ├── summary.yaml        # 总览报告
 │   │   └── {skill-name}/       # 每个 Skill 的详细结果
@@ -82,7 +82,7 @@ aria-plugin-benchmarks/
 
 | 类型 | 存储位置 | 用途 | 规则 |
 |------|---------|------|------|
-| 固定测试集 | `ab-suite/` (待建) | 常态化比对 | 修改需升版本号，旧数据不可比 |
+| 固定测试集 | `ab-suite/` | 常态化比对 | 修改需升版本号，旧数据不可比 |
 | 现有 evals | `{skill}/evals/evals.json` | 首轮基线 | 可迁移到 ab-suite |
 | 临时测试 | `{skill}/{skill}-workspace/` | 开发中验证 | 随时可改，不计入基线 |
 
@@ -472,10 +472,10 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 
 | Aether 实践 | Aria 对应 | 状态 |
 |-------------|----------|------|
-| `evals/ab-suite/` 固定测试集 | `ab-suite/` | 待建 (从现有 evals 迁移) |
-| `evals/ab-results/YYYY-MM-DD/` | `ab-results/` | 待建 |
-| `summary.yaml` 标准格式 | 同格式 | 待建 |
-| `version.yaml` 测试集版本 | 同机制 | 待建 |
+| `evals/ab-suite/` 固定测试集 | `ab-suite/` | ✅ 已建立 (28 skills, 56 cases) |
+| `evals/ab-results/YYYY-MM-DD/` | `ab-results/` | ✅ 已建立 (2026-03-13 基线) |
+| `summary.yaml` 标准格式 | 同格式 | ✅ 已建立 |
+| `version.yaml` 测试集版本 | 同机制 | ✅ 已建立 (v1.0.0) |
 | `/skill-benchmark` 编排 Skill | 使用 `/skill-creator` | ✅ 已确定 |
 | 4 轮实验验证 (评分→grep→触发→AB) | 1 轮教训 (regex runner → 废弃) | ✅ 已完成 |
 

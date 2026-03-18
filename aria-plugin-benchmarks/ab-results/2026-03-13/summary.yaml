@@ -1,6 +1,6 @@
 date: "2026-03-13"
 eval_suite_version: "1.0.0"
-note: "First complete AB baseline. 5 skills have original with/without data, 23 completed via agent team 2026-03-18."
+note: "Complete AB baseline. 5 from iteration-1 original data, 23 from agent team 2026-03-18."
 skills_tested: 28
 
 results:
@@ -16,24 +16,28 @@ results:
     verdict: "EQUAL"
   arch-common:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: null
-    delta_pass_rate: null
-    verdict: "PENDING"
+    without_skill_pass_rate: 0.25
+    delta_pass_rate: 0.75
+    verdict: "WITH_BETTER"
+    data_source: "iteration-1/benchmark.json"
   arch-scaffolder:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: null
-    delta_pass_rate: null
-    verdict: "PENDING"
+    without_skill_pass_rate: 0.2
+    delta_pass_rate: 0.8
+    verdict: "WITH_BETTER"
+    data_source: "iteration-1/benchmark.json"
   arch-search:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: null
-    delta_pass_rate: null
-    verdict: "PENDING"
+    without_skill_pass_rate: 0.53
+    delta_pass_rate: 0.47
+    verdict: "WITH_BETTER"
+    data_source: "iteration-1/benchmark.json"
   arch-update:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: null
-    delta_pass_rate: null
-    verdict: "PENDING"
+    without_skill_pass_rate: 0.2
+    delta_pass_rate: 0.8
+    verdict: "WITH_BETTER"
+    data_source: "iteration-1/benchmark.json"
   brainstorm:
     with_skill_pass_rate: 1.0
     without_skill_pass_rate: 0.33
@@ -51,9 +55,10 @@ results:
     verdict: "WITH_BETTER"
   commit-msg-generator:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: null
-    delta_pass_rate: null
-    verdict: "PENDING"
+    without_skill_pass_rate: 0.2
+    delta_pass_rate: 0.8
+    verdict: "WITH_BETTER"
+    data_source: "iteration-1/benchmark.json"
   forgejo-sync:
     with_skill_pass_rate: 1.0
     without_skill_pass_rate: 0.83
@@ -147,15 +152,15 @@ results:
 
 overall:
   total_skills: 28
-  with_better: 19
+  with_better: 24
   mixed: 1
   equal: 3
   without_better: 0
-  avg_delta: 0.53
-  with_skill_win_rate: 0.83
+  avg_delta: 0.56
+  with_skill_win_rate: 0.86
   key_findings:
-    - "19/23 skills show WITH_BETTER (Skill 确实提升质量)"
-    - "3/23 skills show EQUAL (需审查 Skill 价值)"
+    - "24/28 skills show WITH_BETTER (Skill 确实提升质量)"
+    - "3/28 skills show EQUAL (需审查 Skill 价值)"
     - "方法论特定 Skills (openspec-archive, phase-d-closer, workflow-runner) delta 最高"
     - "通用型 Skills (api-doc-generator, spec-drafter) 无明显优势"
     - "平均 delta: +0.53"

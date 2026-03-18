@@ -331,17 +331,6 @@ Skill 基准测试 (新增或修改 Skill 时):
 3. **文档与代码必须同步更新** - 架构文档与代码一致
 4. **每个提交必须遵循规范** - Conventional Commits 格式
 5. **项目变更必须在项目的 openspec/changes/ 目录** - 不得放在 `standards/openspec/changes/`
-6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
-
-**规则 #6 要点:** 只有 with/without AB 对比能回答"Skill 是否提升了质量"。自研 runner (`aria-plugin-benchmarks/runner/`) 已废弃。
-
-**触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
-
-**操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
-
-**详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`
-
-**不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -358,6 +347,18 @@ Skill 基准测试 (新增或修改 Skill 时):
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
+
+**规则 #6 要点:** 只有 with/without AB 对比能回答"Skill 是否提升了质量"。自研 runner (`aria-plugin-benchmarks/runner/`) 已废弃。
+
+**触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
+
+**操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
+
+**详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`
+
+**不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
+
 ---
 
 ## 项目状态
@@ -365,7 +366,7 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
-插件版本: v1.5.1 (aria-plugin)
+插件版本: v1.6.0 (aria-plugin)
 主项目版本: v1.0.2
 ```
 
