@@ -140,6 +140,8 @@ D. 收尾 (Closure)
 ├── 研究文档       → docs/
 ├── 需求文档       → docs/requirements/ (PRD + User Stories)
 ├── 架构文档       → docs/architecture/system-architecture.md
+├── 项目配置       → .aria/config.json (从 config.template.json 复制)
+├── 配置加载       → aria/skills/config-loader/ (内部基础设施)
 ├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
 ├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
 └── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
@@ -366,13 +368,13 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
-插件版本: v1.6.0 (aria-plugin)
+插件版本: v1.7.0 (aria-plugin)
 主项目版本: v1.0.2
 ```
 
 ---
 
-**更新**: 2026-03-18
+**更新**: 2026-03-19
 **维护**: 10CG Lab
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
