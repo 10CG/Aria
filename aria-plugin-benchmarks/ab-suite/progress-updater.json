@@ -1,0 +1,32 @@
+{
+  "skill_name": "progress-updater",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "state-block-generation",
+      "prompt": "Generate a UPMv2-STATE block for a project with 3 tasks: T1 (completed), T2 (in_progress), T3 (pending). Project: 'refactor-api'. Overall completion: 33%.",
+      "expected_output": "",
+      "expectations": [
+        "State block must start with UPMv2-STATE marker",
+        "State block must include all 3 task IDs",
+        "Task statuses must match input",
+        "Block must be enclosed in code fence or structured block for machine parsing"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "incremental-update",
+      "prompt": "Incrementally update the existing UPMv2-STATE block: mark T3 as completed, add new task T6 as pending. Do NOT overwrite the entire block — only update changed fields.",
+      "expected_output": "",
+      "expectations": [
+        "T3 should be updated to completed; existing T1, T2 must be preserved",
+        "New task T6 must appear in the updated state block",
+        "Output should indicate incremental update, not full rewrite",
+        "Percentage should reflect 3 completed out of 6 total = 50%"
+      ]
+    }
+  ]
+}

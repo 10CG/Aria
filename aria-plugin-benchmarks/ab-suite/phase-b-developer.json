@@ -1,0 +1,30 @@
+{
+  "skill_name": "phase-b-developer",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "branch-creation-flow",
+      "prompt": "Execute Phase B step B.1: Create feature branch for task TASK-001 from spec oauth2-social-login. Branch naming convention: feature/{spec-name}",
+      "expected_output": "",
+      "expectations": [
+        "Should create a branch following feature/{spec-name} convention",
+        "Should branch from main or master",
+        "Should confirm active branch after creation"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "test-verification",
+      "prompt": "Phase B B.3: Verify test results for completed TASK-006 (OAuth2 integration tests). Run test suite and validate all tests pass before proceeding to Phase C.",
+      "expected_output": "",
+      "expectations": [
+        "Should execute the test suite for the completed task",
+        "Should report test counts and pass/fail status",
+        "Should gate Phase C entry on all tests passing"
+      ]
+    }
+  ]
+}

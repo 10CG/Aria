@@ -1,0 +1,36 @@
+{
+  "skill": "openspec-archive",
+  "timestamp": "2026-03-18T11:10:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "correct-archive-path",
+      "without_skill_output": "There is no `openspec/changes/user-auth` in this project (`/home/dev/todo-web`), and `/workspace/my-project` is outside my allowed working directory.\n\n**The issue:** The `project_root=/workspace/my-project` path is not accessible in this session. My working directory is `/home/dev/todo-web`.\n\nCould you clarify:\n- Was this meant for the current project (`/home/dev/todo-web`)? If so, what is the cor",
+      "expectations_grading": [
+        {"text": "Should archive to project/openspec/archive/ not standards/", "passed": false, "evidence": "Did not perform any archival. Reported paths don't exist and asked clarifying questions about the project root"},
+        {"text": "Should correctly resolve project root for archive path", "passed": false, "evidence": "Could not resolve project_root=/workspace/my-project, reported it as outside allowed working directory"},
+        {"text": "Should confirm the archive destination path", "passed": false, "evidence": "Did not confirm any archive destination path, instead asked clarifying questions"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 852,
+      "duration_ms": 40232
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "already-archived-detection",
+      "without_skill_output": "**检测结果：**\n\n- `openspec/changes/user-auth` — **不存在**\n- `openspec/archive/user-auth` — **不存在**\n- 重复检测 — **无重复**\n\n当前归档中无任何 `user-auth` 相关的 OpenSpec，现有归档均为 phase1~phase4 的优化和测试覆盖相关内容。",
+      "expectations_grading": [
+        {"text": "Should detect that spec is already archived", "passed": false, "evidence": "Reported both paths as non-existent, but did not properly reason about the archive detection scenario"},
+        {"text": "Should prevent creating a duplicate archive", "passed": true, "evidence": "Reported no duplicates found, which prevents accidental duplication"},
+        {"text": "Should report where the existing archive is located", "passed": false, "evidence": "No existing archive location was reported since paths were not found"}
+      ],
+      "pass_rate": 0.33,
+      "tokens": 335,
+      "duration_ms": 11156
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.17
+  }
+}

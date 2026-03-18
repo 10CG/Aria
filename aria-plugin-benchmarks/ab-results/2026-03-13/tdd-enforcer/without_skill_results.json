@@ -1,0 +1,36 @@
+{
+  "skill": "tdd-enforcer",
+  "timestamp": "2026-03-18T13:11:22Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "red-phase-enforcement",
+      "without_skill_output": "TDD Enforcer 会**拦截**这个行为，按以下流程处理：\\n\\n## TDD Enforcer 的响应\\n\\n**1. 检测违规**\\n发现开发者试图直接写实现代码而没有对应的测试文件/测试用例 → 触发 RED 阶段缺失警告。\\n\\n**2. 根据严格度级别采取不同行动**\\n\\n| 级别 | 行为 |\\n|------|------|\\n| **Advisor",
+      "expectations_grading": [
+        {"text": "Should detect that no test exists before implementation", "passed": true, "evidence": "Detects RED phase missing and explicitly states developer is trying to write implementation without corresponding tests"},
+        {"text": "Should require writing test before implementation", "passed": true, "evidence": "In Strict mode, requires writing failing test first before continuing. Shows RED->GREEN->REFACTOR cycle."},
+        {"text": "Should provide guidance or template for writing the test", "passed": true, "evidence": "Provides a concrete test template: describe('UserService.create()') with a specific test case skeleton"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 579,
+      "duration_ms": 21704
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "strictness-level-strict",
+      "without_skill_output": "**TDD Enforcer — Strict Mode**\\n\\nStaged 변경사항을 분석했습니다.\\n\\n---\\n\\n**검사 결과: 통과 (PASS)**\\n\\n```\\nfrontend/src/js/app.js | +9 lines\\n```\\n\\nstaged 변경 내용:\\n```js\\n/* todo-web benchmark test */\\n/* todo-web benchmark test */\\n/* todo-web benchmark test */\\n/* todo-web benchmark",
+      "expectations_grading": [
+        {"text": "Should block the commit due to missing test coverage", "passed": false, "evidence": "Did NOT block the commit. Analyzed actual staged changes (benchmark comments) and determined they don't need test coverage, which is contextually reasonable but doesn't match the eval expectation of blocking"},
+        {"text": "Should clearly explain what the TDD violation is", "passed": false, "evidence": "Did not identify a TDD violation; instead concluded there is no violation since the staged changes are comments, not implementation code"},
+        {"text": "Should provide clear steps to remediate the violation", "passed": false, "evidence": "No remediation steps provided since no violation was detected; only suggested cleaning up benchmark markers"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1159,
+      "duration_ms": 48798
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

@@ -1,7 +1,7 @@
 # Aria 项目版本信息
 
 > **版本**: 1.0.2
-> **最后更新**: 2026-03-16
+> **最后更新**: 2026-03-18
 
 ## 版本号
 
@@ -25,14 +25,14 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.5.1 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-02-08 |
+| aria (子模块) | v1.6.0 | https://forgejo.10cg.pub/10CG/aria-plugin | 2026-03-18 |
 
-### aria v1.5.1 变更摘要
+### aria v1.6.0 变更摘要
 
-- **state-scanner 修复** - OpenSpec 检测逻辑新增 archive 目录扫描支持
-  - 明确区分 `standards/openspec/` (格式定义库) 和项目 `openspec/` (工作区)
-  - 新增待归档 Spec 检测 (Status=Complete 但仍在 changes/)
-  - 新增 OpenSpec 状态输出格式（活跃变更、已归档、待归档）
+- **workflow-runner auto-proceed** - Phase 间自动推进 + 状态持久化 + Gate 强制
+- **state-scanner 置信度评分** - 三维评分模型 + 高置信度自动执行
+- **SessionStart 中断恢复** - 检测未完成工作流并提示恢复
+- **AB 测试验证**: state-scanner delta +0.165, workflow-runner delta +0.33
 - **Skills 总数**: 27
 - **Agents 总数**: 11
 

@@ -1,0 +1,39 @@
+{
+  "skill": "api-doc-generator",
+  "timestamp": "2026-03-18T10:10:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "openapi-generation",
+      "without_skill_output": "```yaml\nopenapi: 3.0.0\ninfo:\n  title: User API\n  version: 1.0.0\n\npaths:\n  /users:\n    post:\n      summary: Create a new user account\n      operationId: create_user\n      requestBody:\n        required: true\n        content:\n          application/json:\n            schema:\n              $ref: '#/components/schemas/UserCreate'\n      responses:\n        '201':\n          description: User created successfully\n          content:\n            application/json:\n              schema:\n         ",
+      "expectations_grading": [
+        {"text": "Output must declare OpenAPI version 3.0.x", "passed": true, "evidence": "Output starts with 'openapi: 3.0.0'"},
+        {"text": "Spec must include POST /users endpoint", "passed": true, "evidence": "Spec includes '/users:' with 'post:' method"},
+        {"text": "Spec must include GET /users/{user_id} endpoint", "passed": true, "evidence": "Spec includes '/users/{user_id}:' with 'get:' method"},
+        {"text": "POST /users must show 201 status code", "passed": true, "evidence": "POST /users responses include '201' with description 'User created successfully'"},
+        {"text": "Output must be in valid YAML or JSON structure", "passed": true, "evidence": "Output is valid YAML wrapped in a code block"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 898,
+      "duration_ms": 13070
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "markdown-doc-output",
+      "without_skill_output": "# Payments API\n\nBase URL: `https://api.example.com/v1`\n\nAll requests must include the `Authorization: Bearer <token>` header. Responses are JSON.\n\n---\n\n## Endpoints\n\n### POST /payments\n\nCreate a new payment.\n\n**Request Body**\n\n| Field | Type | Required | Description |\n|-------|------|----------|-------------|\n| `amount` | integer | Yes | Amount in cents (e.g. `1999` = $19.99) |\n| `currency` | string | Yes | ISO",
+      "expectations_grading": [
+        {"text": "Output must use Markdown headers (# or ##)", "passed": true, "evidence": "Output uses # Payments API, ## Endpoints, ### POST /payments etc."},
+        {"text": "Should document POST /payments, GET /payments/{id}, DELETE /payments/{id}", "passed": true, "evidence": "All three endpoints are documented with dedicated sections"},
+        {"text": "Should include request/response code examples", "passed": true, "evidence": "Each endpoint has curl request examples and JSON response examples"},
+        {"text": "Should describe response format for each endpoint", "passed": true, "evidence": "Each endpoint shows example JSON responses with fields and status codes"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1235,
+      "duration_ms": 17274
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 1.0
+  }
+}

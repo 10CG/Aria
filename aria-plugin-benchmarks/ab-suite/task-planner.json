@@ -1,0 +1,29 @@
+{
+  "skill_name": "task-planner",
+  "version": "1.0.0",
+  "source_evals_count": 10,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "basic-task-decomposition",
+      "prompt": "将以下功能分解为任务: 添加用户认证功能，包括登录、注册、密码重置",
+      "expected_output": "",
+      "expectations": [
+        "Should generate a list of tasks",
+        "Should include complexity labels (S/M/L/XL)",
+        "Tasks should be 4-8 hour granularity"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "deliverables-identification",
+      "prompt": "识别交付物: 添加 OTP 登录功能",
+      "expected_output": "",
+      "expectations": [
+        "Should list deliverable files",
+        "Should include database migration for OTP"
+      ]
+    }
+  ]
+}

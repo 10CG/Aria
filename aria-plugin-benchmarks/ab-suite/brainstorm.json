@@ -1,0 +1,30 @@
+{
+  "skill_name": "brainstorm",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "segmented-qa-flow",
+      "prompt": "开始一个关于「添加通知系统」功能的头脑风暴。使用分段问答模式，每次只提问一个关键问题，等待回答后继续。",
+      "expected_output": "",
+      "expectations": [
+        "Should ask exactly one focused question per round",
+        "Should use clearly segmented sections in the output",
+        "Should reference previous answers in subsequent questions"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "summary-generation",
+      "prompt": "头脑风暴讨论结束后，生成一份可执行的总结，包含所有确认的决策、待办事项和下一步行动。",
+      "expected_output": "",
+      "expectations": [
+        "Should summarize all decisions made during the discussion",
+        "Should include concrete actionable next steps",
+        "Should flag unresolved questions for future discussion"
+      ]
+    }
+  ]
+}

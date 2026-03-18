@@ -1,0 +1,40 @@
+{
+  "skill_name": "commit-msg-generator",
+  "version": "1.0.0",
+  "source_evals_count": 15,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "simple-feat-add-files",
+      "prompt": "Generate a commit message for the staged changes. New authentication files have been added: backend/src/routes/auth.py and backend/src/app.py were modified to integrate authentication.",
+      "expected_output": {
+        "type": "feat",
+        "scope": "auth",
+        "has_body": true,
+        "format": "conventional-commits"
+      },
+      "expectations": [
+        "Commit type must be 'feat' for new features",
+        "Scope should be 'auth' for authentication changes",
+        "Subject must be <= 50 characters",
+        "Subject should use imperative mood (e.g., 'add' not 'added')",
+        "Independent mode should NOT have enhanced markers"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "conventional-commits-compliance",
+      "prompt": "Generate a commit message. Added new feature for exporting reports to PDF format. Files: src/services/report_exporter.py, src/templates/pdf_template.html.",
+      "expected_output": {
+        "format": "conventional-commits"
+      },
+      "expectations": [
+        "Must follow '<type>(<scope>): <subject>' format",
+        "Type must be lowercase",
+        "Must have colon after scope",
+        "Must have space after colon before subject"
+      ]
+    }
+  ]
+}

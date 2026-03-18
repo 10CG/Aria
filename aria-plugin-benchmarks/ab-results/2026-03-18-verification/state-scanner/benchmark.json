@@ -1,0 +1,103 @@
+{
+  "skill": "state-scanner",
+  "test_type": "post-modification-verification",
+  "timestamp": "2026-03-18T09:15:00Z",
+  "modification": "confidence scoring + auto-execute (commits 99bde37..cce9e74)",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "basic-state-collection",
+      "with_skill": {
+        "pass_rate": 1.0,
+        "expectations": [
+          {
+            "text": "Output should include Git status information",
+            "passed": true,
+            "evidence": "Includes branch (main), staged file (frontend/src/js/app.js), unstaged/untracked status, and recent commit log"
+          },
+          {
+            "text": "Should provide workflow recommendation",
+            "passed": true,
+            "evidence": "Provides actionable recommendation about committing staged changes and mentions CLAUDE.md version sync convention"
+          },
+          {
+            "text": "Output should use structured format with sections",
+            "passed": true,
+            "evidence": "Uses ## headings for 'Git 状態', '最近提交', 'OpenSpec 状態', 'UPM 文档', '待処理事項' with clear section separation"
+          }
+        ],
+        "tokens": 27516,
+        "duration_ms": 50649
+      },
+      "without_skill": {
+        "pass_rate": 0.67,
+        "expectations": [
+          {
+            "text": "Output should include Git status information",
+            "passed": true,
+            "evidence": "Includes branch (main), staged file (app.js +9 lines), sync status with origin"
+          },
+          {
+            "text": "Should provide workflow recommendation",
+            "passed": false,
+            "evidence": "Ends with '需要提交这些变更，还是有其他任务？' — a generic question, not a workflow recommendation. No mention of workflow levels, phases, or structured next steps"
+          },
+          {
+            "text": "Output should use structured format with sections",
+            "passed": true,
+            "evidence": "Uses bold headers and table format for commits, with clear section separation via horizontal rules"
+          }
+        ],
+        "tokens": 29068,
+        "duration_ms": 44850
+      },
+      "delta": 0.33
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "user-options-display",
+      "with_skill": {
+        "pass_rate": 0.5,
+        "expectations": [
+          {
+            "text": "Should show numbered options for user selection",
+            "passed": false,
+            "evidence": "Shows 3 workflow options using bullet points with conditional format ('若...→...') but not numbered [1], [2], [3] format. Options are actionable but not numbered for selection."
+          },
+          {
+            "text": "Should mention custom input option",
+            "passed": true,
+            "evidence": "Ends with '你接下来想做什么？' which is an open-ended prompt that explicitly invites custom/free-form input from the user"
+          }
+        ],
+        "tokens": 14528,
+        "duration_ms": 37705
+      },
+      "without_skill": {
+        "pass_rate": 0.5,
+        "expectations": [
+          {
+            "text": "Should show numbered options for user selection",
+            "passed": true,
+            "evidence": "Shows clearly numbered options: '1. 提交这些 benchmark 注释', '2. 删除这些无用注释后再提交', '3. 开始新功能开发'"
+          },
+          {
+            "text": "Should mention custom input option",
+            "passed": false,
+            "evidence": "Lists 3 specific numbered options but no explicit custom/other/自定义 option for user to specify something different"
+          }
+        ],
+        "tokens": 11136,
+        "duration_ms": 55157
+      },
+      "delta": 0.0
+    }
+  ],
+  "summary": {
+    "with_skill_avg_pass_rate": 0.75,
+    "without_skill_avg_pass_rate": 0.585,
+    "delta": 0.165,
+    "verdict": "WITH_BETTER",
+    "baseline_comparison": "vs ab-results/2026-03-13: with_skill was 1.0 (8/8 evals), current with_skill is 0.75 on AB-suite subset. Eval 2 (user-options-display) regressed on numbered format — skill uses bullet-point conditional format instead of numbered [1]-[4] options."
+  }
+}

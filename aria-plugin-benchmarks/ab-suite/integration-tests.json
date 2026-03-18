@@ -1,0 +1,35 @@
+{
+  "skill_name": "integration-tests",
+  "version": "1.0.0",
+  "source_evals_count": 6,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-feature-cycle-a-to-d",
+      "prompt": "Execute full ten-step cycle for implementing a user notification feature",
+      "expected_output": "",
+      "expectations": [
+        "Phase A must produce proposal.md with valid spec_id",
+        "Phase A must produce detailed-tasks.yaml with task IDs referencing spec_id",
+        "Phase B must create branch named feature/{module}/{task-id}-{desc}",
+        "Phase C commit/PR must reference the original spec_id",
+        "Phase D must archive spec to openspec/archive/ (not standards/)",
+        "Each phase output must contain reference to previous phase artifact"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "closure-state-consistency",
+      "prompt": "PR merged successfully - execute closure phase and verify project state",
+      "expected_output": "",
+      "expectations": [
+        "D.1 must write UPMv2-STATE block with updated completion percentage",
+        "D.2 must move spec from changes/ to archive/ with preserved metadata",
+        "After closure, state-scanner should show no active specs in changes/",
+        "requirements-sync should reflect completed status in UPM",
+        "D.1 and D.2 should complete atomically (both succeed or neither)"
+      ]
+    }
+  ]
+}

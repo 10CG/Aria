@@ -1,0 +1,132 @@
+{
+  "benchmark_name": "arch-scaffolder",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T09:00:00Z",
+  "total_evals": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 920,
+      "key_metrics": {
+        "prd_extraction_completeness": "100%",
+        "template_population_accuracy": "100%",
+        "module_identification_correctness": "100%",
+        "tech_stack_detection_accuracy": "100%",
+        "output_format_compliance": "100%"
+      }
+    },
+    "without_skill": {
+      "passed": 1,
+      "failed": 4,
+      "pass_rate": 0.2,
+      "avg_tokens": 2800,
+      "key_metrics": {
+        "extraction_completeness": "55%",
+        "template_compliance": "20%",
+        "format_consistency": "low"
+      }
+    },
+    "improvement": {
+      "pass_rate_delta": 0.8,
+      "pass_count_delta": 4,
+      "token_savings_avg": "67%"
+    }
+  },
+  "by_category": {
+    "input-parsing": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 680
+    },
+    "template": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1250
+    },
+    "analysis": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "avg_tokens": 820
+    },
+    "format-validation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1100
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "prd-extraction",
+      "category": "input-parsing",
+      "with_skill": "PASS",
+      "without_skill": "PARTIAL",
+      "key_finding": "All 5 extraction targets found: core features, 10k concurrent users NFR, Slack/GitHub integrations, REST API, and relational DB with audit logging",
+      "tokens_with_skill": 680,
+      "tokens_without_skill": 2100
+    },
+    {
+      "eval_id": 2,
+      "name": "template-population",
+      "category": "template",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "All 6 template sections populated with no unfilled placeholders; structured markdown output",
+      "tokens_with_skill": 1250,
+      "tokens_without_skill": 3500
+    },
+    {
+      "eval_id": 3,
+      "name": "module-identification",
+      "category": "analysis",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "5 modules identified: auth, project/task core domain, integration, API gateway, and notifications",
+      "tokens_with_skill": 750,
+      "tokens_without_skill": 2200
+    },
+    {
+      "eval_id": 4,
+      "name": "tech-stack-detection",
+      "category": "analysis",
+      "with_skill": "PASS",
+      "without_skill": "FAIL",
+      "key_finding": "PostgreSQL, Node.js/FastAPI, Redis for caching, OAuth/webhooks for integrations all detected from PRD hints",
+      "tokens_with_skill": 890,
+      "tokens_without_skill": 2500
+    },
+    {
+      "eval_id": 5,
+      "name": "output-format-compliance",
+      "category": "format-validation",
+      "with_skill": "PASS",
+      "without_skill": "PASS",
+      "key_finding": "Valid markdown with H1 title, H2 sections in logical order, consistent heading levels, and metadata header",
+      "tokens_with_skill": 1100,
+      "tokens_without_skill": 3800
+    }
+  ],
+  "strengths": [
+    "Comprehensive PRD extraction covering features, NFRs, integrations, and constraints",
+    "All architecture template sections populated without leaving placeholders",
+    "Accurate module identification from feature descriptions",
+    "Reasonable tech stack inference from requirement hints",
+    "Clean markdown output with consistent heading structure and metadata"
+  ],
+  "weaknesses": [
+    "Tech stack suggestions are inferences; explicit PRD tech choices would be more accurate",
+    "Complex PRDs with conflicting requirements may need human review of generated skeleton"
+  ],
+  "recommendations": [
+    "Support PRD input in multiple formats (markdown, plain text, structured JSON)",
+    "Add confidence annotations to inferred tech stack choices",
+    "Provide a review checklist alongside the generated architecture document skeleton"
+  ]
+}

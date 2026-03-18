@@ -1,0 +1,37 @@
+{
+  "skill": "agent-router",
+  "timestamp": "2026-03-18T10:00:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "backend-task-routing",
+      "without_skill_output": "The `aria:backend-architect` agent analyzed the codebase and designed the full implementation. Here's what it found and produced:\n\n---\n\n## Task Routed: `aria:backend-architect`\n\nThe agent analyzed the existing project structure and produced a complete, pattern-consistent design. Here's the summary:\n\n### Files to create (5)\n| File | Purpose |\n|------|---------|\n| `backend/middleware/validators/order.js` | Zod validation schema for order request body |\n| `backend/src/orders/",
+      "expectations_grading": [
+        {"text": "Should select backend-architect agent for API/database task", "passed": true, "evidence": "Output explicitly selects aria:backend-architect agent for the API/database task"},
+        {"text": "Confidence score should be >= 0.85 for clear backend task", "passed": false, "evidence": "No confidence score was provided in the output - the model just proceeded to route and execute rather than providing a structured routing decision with confidence"},
+        {"text": "Should explain why backend-architect was selected", "passed": false, "evidence": "While the output shows backend-architect was selected and shows design output, it does not explicitly explain *why* backend-architect was the right choice over other agents"},
+        {"text": "Should not suggest multiple agents for a clearly backend task", "passed": true, "evidence": "Only backend-architect agent was mentioned and used"}
+      ],
+      "pass_rate": 0.5,
+      "tokens": 14806,
+      "duration_ms": 250770
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "fallback-routing",
+      "without_skill_output": "Here's the complete architectural review. Key findings:\n\n---\n\n## Architecture Review Summary\n\n### Critical Issues (Fix First)\n1. **TD-01**: `mongoose` dependency + `userModel.js` are dead code (never imported, ~30MB overhead)\n2. **TD-02**: `authControllerLegacy.js` still ships to production, creates its own DB connections\n3. **TD-03**: `req.user?.id || 4` appears 18 times in `todoController.js` — auth bypass falls through ",
+      "expectations_grading": [
+        {"text": "Should fallback to tech-lead for cross-cutting architectural concerns", "passed": false, "evidence": "No agent routing was performed. The model directly executed the architecture review without routing to any agent, let alone tech-lead"},
+        {"text": "Should explain why tech-lead is the fallback choice", "passed": false, "evidence": "No routing decision or agent selection explanation was provided"},
+        {"text": "Should not invent agent names not in the registry", "passed": true, "evidence": "No agent names were mentioned at all, so none were invented"}
+      ],
+      "pass_rate": 0.33,
+      "tokens": 9831,
+      "duration_ms": 195312
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.42
+  }
+}

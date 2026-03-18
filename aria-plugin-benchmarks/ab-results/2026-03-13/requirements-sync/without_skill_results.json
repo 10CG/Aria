@@ -1,0 +1,36 @@
+{
+  "skill": "requirements-sync",
+  "timestamp": "2026-03-18T12:43:09Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "status-sync",
+      "without_skill_output": "项目中找不到 US-005 的任何记录。当前 UPM 文档 (`docs/upm-todo-optimization.md`) 是以 Phase 组织的，没有 User Story 条目，PRD 文档中也没有 US-005 的引用。请确认以下信息：1. US-005 存放在哪里？是否在 Forgejo Issues、另一个文档、或者需要新建？2. UPM requirements 章节 — 当前 UPM 文档没有 requiremen",
+      "expectations_grading": [
+        {"text": "Should update UPM requirements entry status to Done", "passed": false, "evidence": "Did not update any entry; could not find US-005 in the project and asked for clarification instead"},
+        {"text": "Should identify the specific UPM entry that was changed", "passed": false, "evidence": "Could not identify any UPM entry for US-005; reported that the UPM has no requirements section"},
+        {"text": "Should record the previous status (In Progress) for audit trail", "passed": false, "evidence": "No previous status was recorded since no entry was found or updated"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1770,
+      "duration_ms": 47961
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "conflict-resolution",
+      "without_skill_output": "この project に US-030 が見つかりません。いくつか確認させてください：1. このプロジェクト (todo-web) には User Story 形式 (US-XXX) のトラッキングが存在しません。UPM は Phase ベース (Phase 1-4) で管理されています。2. Jira の参照も CLAUDE.md には記載なく、このプロジェクトは Forgejo を使用しています。",
+      "expectations_grading": [
+        {"text": "Should detect the three-way conflict across sources", "passed": true, "evidence": "Output acknowledges the three sources (Git commit, UPM, Jira) with conflicting statuses and offers a resolution approach"},
+        {"text": "Should display all three conflicting status values", "passed": false, "evidence": "Does not explicitly list all three status values (Done, In Review, In Progress) side by side; focuses on asking for clarification"},
+        {"text": "Should propose a resolution strategy (e.g., latest-wins or manual review)", "passed": true, "evidence": "Proposes Git commit as single source of truth with priority: Git commit (Done) > UPM/Jira updated to Done"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 2069,
+      "duration_ms": 51047
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.335
+  }
+}

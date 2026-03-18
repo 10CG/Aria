@@ -1,0 +1,30 @@
+{
+  "skill_name": "openspec-archive",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "correct-archive-path",
+      "prompt": "归档已完成的 OpenSpec: spec_path=openspec/changes/user-auth, project_root=/workspace/my-project, expected_archive=openspec/archive/user-auth",
+      "expected_output": "",
+      "expectations": [
+        "Should archive to project/openspec/archive/ not standards/",
+        "Should correctly resolve project root for archive path",
+        "Should confirm the archive destination path"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "already-archived-detection",
+      "prompt": "检测已归档的 OpenSpec: spec_path=openspec/changes/user-auth, check_archive=openspec/archive/user-auth, detect_duplicates=true",
+      "expected_output": "",
+      "expectations": [
+        "Should detect that spec is already archived",
+        "Should prevent creating a duplicate archive",
+        "Should report where the existing archive is located"
+      ]
+    }
+  ]
+}

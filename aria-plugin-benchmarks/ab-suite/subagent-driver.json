@@ -1,0 +1,30 @@
+{
+  "skill_name": "subagent-driver",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "fresh-subagent-launch",
+      "prompt": "启动一个新的 Fresh Subagent 来执行 TASK-003: 实现用户登录 API。确保 subagent 以干净的上下文启动。",
+      "expected_output": "",
+      "expectations": [
+        "Should launch subagent with fresh/clean context",
+        "Should assign TASK-003 to the new subagent",
+        "Should ensure subagent does not inherit parent conversation context"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "task-completion-verification",
+      "prompt": "Subagent 声称已完成 TASK-005: 开发前端登录页面。验证任务是否真正完成（包括所有交付物和验收标准）。",
+      "expected_output": "",
+      "expectations": [
+        "Should verify all expected deliverables exist",
+        "Should validate against acceptance criteria",
+        "Should report a clear pass/fail completion status"
+      ]
+    }
+  ]
+}

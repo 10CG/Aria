@@ -1,0 +1,30 @@
+{
+  "skill_name": "requirements-sync",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "status-sync",
+      "prompt": "同步状态: US-005 状态已更新为 Done，将此状态同步到 UPM requirements 章节对应条目",
+      "expected_output": "",
+      "expectations": [
+        "Should update UPM requirements entry status to Done",
+        "Should identify the specific UPM entry that was changed",
+        "Should record the previous status (In Progress) for audit trail"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "conflict-resolution",
+      "prompt": "冲突解决: US-030 在 Git commit 中标记为 Done，但 UPM 中为 In Review，Jira 中为 In Progress — 三方冲突",
+      "expected_output": "",
+      "expectations": [
+        "Should detect the three-way conflict across sources",
+        "Should display all three conflicting status values",
+        "Should propose a resolution strategy (e.g., latest-wins or manual review)"
+      ]
+    }
+  ]
+}

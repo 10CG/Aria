@@ -1,0 +1,100 @@
+{
+  "benchmark_name": "spec-drafter",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:33:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "level_judgment_accuracy": "100%",
+        "proposal_section_completeness": "100%",
+        "scope_extraction_precision": "100%",
+        "template_compliance_rate": "100%",
+        "bilingual_handling_quality": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "level-detection": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "doc-creation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "input-parsing": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "format-validation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "i18n": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "level-judgment",
+      "category": "level-detection",
+      "with_skill": "PASS",
+      "key_finding": "Level 1 (Skip) correctly identified for typo fix; reasoning includes 'trivial', single file, no logic change"
+    },
+    {
+      "eval_id": 2,
+      "name": "proposal-generation",
+      "category": "doc-creation",
+      "with_skill": "PASS",
+      "key_finding": "Complete proposal.md generated with Background, Scope, Goals, Non-Goals, Implementation Plan; all 3 features (login, register, password reset) covered"
+    },
+    {
+      "eval_id": 3,
+      "name": "scope-extraction",
+      "category": "input-parsing",
+      "with_skill": "PASS",
+      "key_finding": "Email and SMS correctly extracted as In-Scope; push notifications correctly extracted as Out-of-Scope with explicit source text citation"
+    },
+    {
+      "eval_id": 4,
+      "name": "template-compliance",
+      "category": "format-validation",
+      "with_skill": "PASS",
+      "key_finding": "6/6 required Level 2 sections present; H2 heading hierarchy correct; metadata (version, status, date) all present"
+    },
+    {
+      "eval_id": 5,
+      "name": "bilingual-support",
+      "category": "i18n",
+      "with_skill": "PASS",
+      "key_finding": "Mixed EN+ZH input correctly parsed; English proposal generated with correct sections; dark mode feature intent fully preserved"
+    }
+  ],
+  "strengths": [
+    "Accurate OpenSpec level classification (L1/L2/L3) with clear reasoning",
+    "Complete proposal.md generation covering all required Level 2 sections",
+    "Precise scope extraction including explicit exclusions from natural language",
+    "Strict template compliance with correct heading hierarchy and metadata",
+    "Robust bilingual (ZH/EN) input handling with consistent English output generation"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test Level 3 (Full) generation including tasks.md alongside proposal.md",
+    "Add edge cases for ambiguous level classification (borderline L1/L2 scenarios)",
+    "Test scope extraction with implicit exclusions not explicitly stated by the user"
+  ],
+  "status": "completed"
+}

@@ -1,0 +1,30 @@
+{
+  "skill_name": "arch-search",
+  "version": "1.0.0",
+  "source_evals_count": 15,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "layer1-auth-keyword-routing",
+      "prompt": "搜索认证功能在哪里实现的",
+      "expected_output": "",
+      "expectations": [
+        "Should use Layer 1 (domain routing) for auth keywords",
+        "Should find security.md or auth-related architecture doc",
+        "Should provide code file pointer in output",
+        "Layer 1 should consume < 500 tokens"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "complex-multi-keyword",
+      "prompt": "搜索离线数据同步和冲突解决的实现",
+      "expected_output": "",
+      "expectations": [
+        "Should handle multiple related keywords",
+        "Should provide comprehensive info summary"
+      ]
+    }
+  ]
+}

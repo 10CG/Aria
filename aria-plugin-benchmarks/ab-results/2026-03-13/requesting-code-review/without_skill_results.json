@@ -1,0 +1,36 @@
+{
+  "skill": "requesting-code-review",
+  "timestamp": "2026-03-18T12:33:54Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "spec-compliance-check",
+      "without_skill_output": "## Phase 1 审查结果：**FAIL**\\n\\n---\\n\\n### 结论\\n\\n审查发现 `todos.css` 中存在 5 处本次变更**新引入**的硬编码颜色值，违反 TASK-003 的验收标准「无硬编码颜色值残留」。\\n\\n---\\n\\n### 阻塞问题\\n\\n**文件**: `frontend/src/css/todos.css`\\n\\n| 行号 | 当前值 | 应替换为 |\\n|------|--------|---------",
+      "expectations_grading": [
+        {"text": "Should verify implementation matches spec requirements", "passed": true, "evidence": "Output verifies implementation against acceptance criteria and identifies deviations from spec requirements"},
+        {"text": "Should validate API interface matches spec contract", "passed": false, "evidence": "Output focuses on CSS hardcoded color values, does not explicitly validate API interface contracts"},
+        {"text": "Should report any deviations from the spec", "passed": true, "evidence": "Reports 5 specific deviations (hardcoded color values) with line numbers and suggested fixes"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 3933,
+      "duration_ms": 276156
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "review-dispatch",
+      "without_skill_output": "## Code Review Result: Phase 1 FAIL\\n\\n审查发现 3 个阻塞问题，Phase 2 未执行：\\n\\n---\\n\\n### 阻塞问题 1 — 需求来源不明\\n\\n9 个完全相同的 `/* todo-web benchmark test */` 注释没有有效规范支撑：\\n- 没有说明为什么需要 9 个（而不是 1 个或其他数量）",
+      "expectations_grading": [
+        {"text": "Should dispatch review to code-reviewer agent", "passed": false, "evidence": "Did not dispatch to a code-reviewer agent; performed the review directly itself rather than delegating"},
+        {"text": "Should initiate Phase 1 spec compliance review first", "passed": true, "evidence": "Output shows Phase 1 was executed first and found blocking issues"},
+        {"text": "Should schedule Phase 2 code quality review after Phase 1", "passed": false, "evidence": "Phase 2 was not scheduled; it was skipped because Phase 1 failed, but no scheduling mechanism was demonstrated"}
+      ],
+      "pass_rate": 0.33,
+      "tokens": 4055,
+      "duration_ms": 176535
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

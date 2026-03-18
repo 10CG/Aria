@@ -1,0 +1,114 @@
+{
+  "benchmark_name": "api-doc-generator",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T10:30:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 1120,
+      "key_metrics": {
+        "openapi_spec_validity": "100%",
+        "endpoint_extraction_accuracy": "100%",
+        "schema_generation_correctness": "100%",
+        "framework_detection_accuracy": "100%",
+        "output_format_compliance": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "spec-generation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1250
+    },
+    "code-analysis": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 980
+    },
+    "schema": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1100
+    },
+    "framework": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1050
+    },
+    "output-format": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1220
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "openapi-generation",
+      "category": "spec-generation",
+      "with_skill": "PASS",
+      "key_finding": "Generated valid OpenAPI 3.0 spec with correct endpoints, status codes, and YAML structure",
+      "tokens_used": 1250
+    },
+    {
+      "eval_id": 2,
+      "name": "endpoint-extraction",
+      "category": "code-analysis",
+      "with_skill": "PASS",
+      "key_finding": "Extracted all 5 Express.js endpoints with correct methods, paths, and auth annotations",
+      "tokens_used": 980
+    },
+    {
+      "eval_id": 3,
+      "name": "schema-generation",
+      "category": "schema",
+      "with_skill": "PASS",
+      "key_finding": "Generated UserCreate and UserResponse schemas with field types, constraints, and optional markers",
+      "tokens_used": 1100
+    },
+    {
+      "eval_id": 4,
+      "name": "multi-framework-support",
+      "category": "framework",
+      "with_skill": "PASS",
+      "key_finding": "Correctly detected FastAPI, Express, and Flask from syntax patterns; documented all 3 /health endpoints",
+      "tokens_used": 1050
+    },
+    {
+      "eval_id": 5,
+      "name": "markdown-doc-output",
+      "category": "output-format",
+      "with_skill": "PASS",
+      "key_finding": "Generated well-structured Markdown docs with headers, endpoint sections, examples, and response descriptions",
+      "tokens_used": 1220
+    }
+  ],
+  "strengths": [
+    "Valid OpenAPI 3.0 YAML generation from Python decorator syntax",
+    "Accurate endpoint extraction including HTTP method, path, and middleware notes",
+    "Pydantic model → JSON Schema conversion with constraint preservation",
+    "Multi-framework detection from syntax patterns (decorators vs middleware chains)",
+    "Clean Markdown output with consistent structure and code examples"
+  ],
+  "weaknesses": [
+    "Cannot resolve cross-file model references without full codebase context",
+    "Middleware-inferred auth requirements may miss custom auth patterns"
+  ],
+  "recommendations": [
+    "Add support for reading Pydantic models from imported files (cross-file resolution)",
+    "Add OpenAPI spec validation step using openapi-spec-validator",
+    "Support TypeScript interface → JSON Schema conversion for Express/NestJS projects"
+  ],
+  "status": "completed"
+}

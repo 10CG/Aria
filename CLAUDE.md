@@ -2,7 +2,7 @@
 
 > **项目本质**: AI 辅助的领域驱动设计方法论研究
 > **核心假设**: AI 不是工具，而是理解项目意图的协作者
-> **版本**: 1.0.0
+> **版本**: 1.0.2
 
 ---
 
@@ -54,7 +54,7 @@ A. 规划 (Spec & Planning)
 
 B. 开发 (Development)
 ├── B.1 分支创建    → 隔离工作空间
-├── B.2 执行验证    → 开发+评审
+├── B.2 执行验证    → 开发+评审 (Skill 变更时含 /skill-creator benchmark)
 
 C. 集成 (Integration)
 ├── C.1 提交        → 记录变更
@@ -121,10 +121,11 @@ D. 收尾 (Closure)
 
 ### 子模块职责
 
-| 子模块 | 职责 | 关键内容 |
-|--------|------|----------|
+| 子模块/目录 | 职责 | 关键内容 |
+|-------------|------|----------|
 | `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 |
 | `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
+| `aria-plugin-benchmarks/` | Skill 基准测试 | AB 测试套件、结果存档、运维手册 |
 
 ### 目录导航
 
@@ -136,7 +137,12 @@ D. 收尾 (Closure)
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
 ├── 进度管理       → standards/core/progress-management/
-└── 研究文档       → docs/
+├── 研究文档       → docs/
+├── 需求文档       → docs/requirements/ (PRD + User Stories)
+├── 架构文档       → docs/architecture/system-architecture.md
+├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
+├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
+└── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
 ```
 
 ### Plugin 调用方式 (Aria 项目内部)
@@ -156,6 +162,40 @@ Agents:
 ```
 
 其他项目通过 Plugin 安装后使用 `/aria:` 前缀。
+
+### Git 子模块操作
+
+```bash
+# 更新所有子模块到远程最新
+git submodule update --remote
+
+# 更新单个子模块
+git submodule update --remote aria
+git submodule update --remote standards
+
+# 初始化 (首次 clone 后)
+git submodule update --init --recursive
+
+# 查看子模块状态
+git submodule status
+```
+
+### Forgejo API (PR Operations)
+
+Forgejo 位于 Cloudflare Access 后，使用 `forgejo` CLI wrapper：
+
+```bash
+# 路径: /home/dev/.npm-global/bin/forgejo
+# 用法: forgejo <METHOD> <ENDPOINT> [curl options]
+
+forgejo GET /repos/10CG/Aria/pulls                    # 列出 PR
+forgejo GET /repos/10CG/Aria/pulls/1                   # 查看 PR
+forgejo POST /repos/10CG/Aria/pulls -d '{              # 创建 PR
+  "title": "feat: description",
+  "head": "feature-branch", "base": "master"
+}'
+forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{"Do": "merge"}'  # 合并
+```
 
 ---
 
@@ -234,6 +274,12 @@ aria/
   - [ ] aria/CHANGELOG.md (添加新版本条目)
   - [ ] aria/README.md (更新版本号和 Skills 数量)
 
+Skill 基准测试 (新增或修改 Skill 时):
+  - [ ] /skill-creator benchmark 已执行 (with/without AB 对比)
+  - [ ] with_skill 通过率高于 without_skill (delta 为正值)
+  - [ ] 人类已审阅结果并确认 Skill 有正向价值
+  - [ ] 结果已存入 aria-plugin-benchmarks/ab-results/ (常态化积累)
+
 主项目:
   - [ ] 更新子模块指针 (git add aria)
   - [ ] 主项目/VERSION 更新插件版本记录
@@ -301,6 +347,18 @@ aria/
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
+
+**规则 #6 要点:** 只有 with/without AB 对比能回答"Skill 是否提升了质量"。自研 runner (`aria-plugin-benchmarks/runner/`) 已废弃。
+
+**触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
+
+**操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
+
+**详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`
+
+**不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
+
 ---
 
 ## 项目状态
@@ -308,13 +366,13 @@ aria/
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
-插件版本: v1.3.0 (aria-plugin)
-主项目版本: v1.0.0
+插件版本: v1.6.0 (aria-plugin)
+主项目版本: v1.0.2
 ```
 
 ---
 
-**更新**: 2026-02-06
+**更新**: 2026-03-18
 **维护**: 10CG Lab
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin

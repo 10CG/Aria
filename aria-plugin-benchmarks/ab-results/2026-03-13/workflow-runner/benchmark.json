@@ -1,0 +1,108 @@
+{
+  "benchmark_name": "workflow-runner",
+  "skill_version": "2.2.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T10:20:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 890,
+      "key_metrics": {
+        "phase_execution_order_accuracy": "100%",
+        "preset_selection_accuracy": "100%",
+        "skip_logic_correctness": "100%",
+        "partial_cycle_support": "100%",
+        "orchestration_completeness": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "orchestration": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 1050
+    },
+    "partial-cycle": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 820
+    },
+    "preset": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0,
+      "avg_tokens": 880
+    },
+    "skip-logic": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "avg_tokens": 810
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "full-cycle-execution",
+      "category": "orchestration",
+      "with_skill": "PASS",
+      "key_finding": "All 10 phase steps executed in correct A→B→C→D order",
+      "tokens_used": 1050
+    },
+    {
+      "eval_id": 2,
+      "name": "partial-cycle-ab",
+      "category": "partial-cycle",
+      "with_skill": "PASS",
+      "key_finding": "Phase A+B executed correctly; Phase C and D skipped as requested",
+      "tokens_used": 820
+    },
+    {
+      "eval_id": 3,
+      "name": "preset-workflow-feature",
+      "category": "preset",
+      "with_skill": "PASS",
+      "key_finding": "'new-feature' preset loaded correctly: full cycle with spec creation and branch management",
+      "tokens_used": 910
+    },
+    {
+      "eval_id": 4,
+      "name": "preset-workflow-bugfix",
+      "category": "preset",
+      "with_skill": "PASS",
+      "key_finding": "'bugfix' preset correctly skips Phase A spec creation, executes B+C",
+      "tokens_used": 850
+    },
+    {
+      "eval_id": 5,
+      "name": "phase-skip-logic",
+      "category": "skip-logic",
+      "with_skill": "PASS",
+      "key_finding": "State-aware skip: Phase A bypassed because A.3 already completed and OpenSpec exists",
+      "tokens_used": 810
+    }
+  ],
+  "strengths": [
+    "Correct Ten-Step Cycle phase ordering (A→B→C→D invariant maintained)",
+    "Flexible partial cycle execution without breaking phase invariants",
+    "Preset support reduces configuration overhead for common workflows",
+    "State-aware skip logic avoids redundant phase re-execution",
+    "Clear phase execution log with timestamps for auditability"
+  ],
+  "weaknesses": [
+    "Preset registry is hardcoded — no user-defined preset support yet",
+    "Phase skip logic requires accurate state input; stale state causes incorrect skips"
+  ],
+  "recommendations": [
+    "Add user-defined preset support via .aria/presets.yaml configuration",
+    "Integrate with state-scanner for automatic phase skip detection",
+    "Add dry-run mode to preview phase execution plan before running"
+  ],
+  "status": "completed"
+}

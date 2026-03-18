@@ -1,0 +1,27 @@
+{
+  "skill_name": "branch-manager",
+  "version": "1.0.0",
+  "source_evals_count": 10,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "simple-feature-branch-creation",
+      "prompt": "创建 feature 分支: module=backend, task_id=TASK-001, description=user-auth",
+      "expected_output": "",
+      "expectations": [
+        "Should generate correct branch name format",
+        "Should indicate Branch mode was selected"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "module-identifier-validation",
+      "prompt": "列出支持的模块标识符",
+      "expected_output": "",
+      "expectations": [
+        "Should list valid module identifiers"
+      ]
+    }
+  ]
+}

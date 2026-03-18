@@ -1,0 +1,33 @@
+{
+  "skill_name": "workflow-runner",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-cycle-execution",
+      "prompt": "Run a full Ten-Step Cycle for a new feature task: 'Add user profile editing functionality'. Execute all phases A through D.",
+      "expected_output": "",
+      "expectations": [
+        "Should execute all Phase A steps (A.0, A.1, A.2, A.3)",
+        "Should execute Phase B steps (B.1, B.2)",
+        "Should execute Phase C steps (C.1, C.2)",
+        "Should execute Phase D steps (D.1, D.2)",
+        "Phases must execute in A→B→C→D order"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "phase-skip-logic",
+      "prompt": "Run the workflow for a feature task but skip Phase A because state-scanner already confirmed project state is current and an OpenSpec already exists (state: A.3 completed).",
+      "expected_output": "",
+      "expectations": [
+        "Should detect that Phase A is already completed",
+        "Should skip Phase A and start from Phase B",
+        "Should start execution from Phase B.1",
+        "Should explain why Phase A was skipped"
+      ]
+    }
+  ]
+}

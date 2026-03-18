@@ -1,0 +1,30 @@
+{
+  "skill_name": "branch-finisher",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "test-verification",
+      "prompt": "验证分支 feature/backend/TASK-101-user-auth 的所有测试是否通过，branch_type=feature, module=backend",
+      "expected_output": "",
+      "expectations": [
+        "Should indicate running the test suite",
+        "Should report test pass/fail status clearly",
+        "Should reference the branch being tested"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "branch-status-check",
+      "prompt": "检查分支 feature/backend/TASK-101-user-auth 是否准备好完成: check_uncommitted=true, check_upstream=true, check_tests=true",
+      "expected_output": "",
+      "expectations": [
+        "Should verify no uncommitted changes remain",
+        "Should verify branch is synced with upstream",
+        "Should report overall readiness status"
+      ]
+    }
+  ]
+}

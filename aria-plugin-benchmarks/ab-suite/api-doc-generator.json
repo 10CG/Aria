@@ -1,0 +1,33 @@
+{
+  "skill_name": "api-doc-generator",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "openapi-generation",
+      "prompt": "Generate an OpenAPI 3.0 specification from the following FastAPI route code:\n\n```python\n@router.post('/users', response_model=UserResponse, status_code=201)\nasync def create_user(user: UserCreate, db: Session = Depends(get_db)):\n    '''Create a new user account'''\n    return await user_service.create(user, db)\n\n@router.get('/users/{user_id}', response_model=UserResponse)\nasync def get_user(user_id: int, db: Session = Depends(get_db)):\n    '''Get user by ID'''\n    return await user_service.get_by_id(user_id, db)\n```",
+      "expected_output": "",
+      "expectations": [
+        "Output must declare OpenAPI version 3.0.x",
+        "Spec must include POST /users endpoint",
+        "Spec must include GET /users/{user_id} endpoint",
+        "POST /users must show 201 status code",
+        "Output must be in valid YAML or JSON structure"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "markdown-doc-output",
+      "prompt": "Generate human-readable Markdown API documentation for a payments API with: POST /payments (create payment), GET /payments/{id} (get payment status), DELETE /payments/{id} (cancel payment). Include examples.",
+      "expected_output": "",
+      "expectations": [
+        "Output must use Markdown headers (# or ##)",
+        "Should document POST /payments, GET /payments/{id}, DELETE /payments/{id}",
+        "Should include request/response code examples",
+        "Should describe response format for each endpoint"
+      ]
+    }
+  ]
+}

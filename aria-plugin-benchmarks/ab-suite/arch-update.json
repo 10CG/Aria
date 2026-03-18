@@ -1,0 +1,32 @@
+{
+  "skill_name": "arch-update",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-file-detection",
+      "prompt": "Detect which new source files have been added to the project that require architecture documentation updates",
+      "expected_output": "",
+      "expectations": [
+        "Should detect all newly added source files",
+        "Should identify files lacking architecture documentation",
+        "Should suggest appropriate documentation location",
+        "Should identify which architecture layer the new files belong to"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "incremental-update",
+      "prompt": "Update the existing src/auth/auth.arch.md to include the newly added OAuthProvider component without regenerating the entire document",
+      "expected_output": "",
+      "expectations": [
+        "Should add OAuthProvider section without rewriting existing content",
+        "Should preserve existing AuthService, JwtProvider, UserRepository sections",
+        "Should indicate this is an incremental update, not a full regeneration",
+        "Should update any table of contents or component list"
+      ]
+    }
+  ]
+}

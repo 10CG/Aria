@@ -1,0 +1,30 @@
+{
+  "skill_name": "requesting-code-review",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "spec-compliance-check",
+      "prompt": "对 TASK-003 的实现进行第一阶段评审：验证代码是否符合 OpenSpec 规范中定义的接口契约和功能需求。",
+      "expected_output": "",
+      "expectations": [
+        "Should verify implementation matches spec requirements",
+        "Should validate API interface matches spec contract",
+        "Should report any deviations from the spec"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "review-dispatch",
+      "prompt": "任务 TASK-006 已完成。触发代码评审流程，正确委派给 code-reviewer agent 进行两阶段评审。",
+      "expected_output": "",
+      "expectations": [
+        "Should dispatch review to code-reviewer agent",
+        "Should initiate Phase 1 spec compliance review first",
+        "Should schedule Phase 2 code quality review after Phase 1"
+      ]
+    }
+  ]
+}

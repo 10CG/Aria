@@ -1,0 +1,35 @@
+{
+  "skill": "state-scanner",
+  "timestamp": "2026-03-18T12:53:09Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "basic-state-collection",
+      "without_skill_output": "## 项目当前状态\\n\\n### Git 状态\\n- **分支**: `main`（与 origin 同步）\\n- **暂存区**: `frontend/src/js/app.js` 有 1 个修改\\n\\n### 暂存区内容\\n`app.js` 末尾添加了 9 行 benchmark 测试注释：\\n```js\\n/* todo-web benchmark test */\\n/* todo-web benchmark test */\\n// ... (9 行重复)\\n```\\n这些看起来是测试标记，**尚未提",
+      "expectations_grading": [
+        {"text": "Output should include Git status information", "passed": true, "evidence": "Includes branch name, sync status with origin, and staged file information"},
+        {"text": "Should provide workflow recommendation", "passed": true, "evidence": "Provides '待处理事项' section with two actionable questions about next steps"},
+        {"text": "Output should use structured format with sections", "passed": true, "evidence": "Uses structured format with sections: Git 状态, 暂存区内容, OpenSpec 状态, 最近提交, PRD 进度, 待处理事项"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1509,
+      "duration_ms": 42971
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "user-options-display",
+      "without_skill_output": "**项目状态概览**\\n\\n**Branch:** `main` (与 origin 同步)\\n\\n**暂存区变更:**\\n- `frontend/src/js/app.js` — 末尾追加了 9 行 `/* todo-web benchmark test */` 注释\\n\\n**最近提交:**\\n- `c0b273e` Merge branch 'develop'\\n- `0f68e9d` fix: share database connection in AuthRepository (防止登录失败)\\n- `5d8ccab` / `a177c7f",
+      "expectations_grading": [
+        {"text": "Should show numbered options for user selection", "passed": false, "evidence": "Does not show numbered options; presents status overview but no selectable numbered options for next steps"},
+        {"text": "Should mention custom input option", "passed": false, "evidence": "Does not mention a custom input option; only asks open-ended questions about what to do next"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 677,
+      "duration_ms": 30482
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

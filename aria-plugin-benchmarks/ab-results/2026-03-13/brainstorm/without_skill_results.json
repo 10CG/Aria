@@ -1,0 +1,36 @@
+{
+  "skill": "brainstorm",
+  "timestamp": "2026-03-18T10:20:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "segmented-qa-flow",
+      "without_skill_output": "好的，我们开始头脑风暴。\n\n**问题 1/？**\n\n通知系统的**主要触发场景**是什么？\n\n例如：\n- A. 任务截止日期提醒（到期前 X 小时）\n- B. 任务状态变更（完成、删除）\n- C. 系统事件（登录异地、密码修改）\n- D. 以上全部，或者其他场景？",
+      "expectations_grading": [
+        {"text": "Should ask exactly one focused question per round", "passed": true, "evidence": "Output asks exactly one question about main trigger scenarios for the notification system"},
+        {"text": "Should use clearly segmented sections in the output", "passed": true, "evidence": "Uses '**问题 1/？**' header with bold formatting, clearly segmented"},
+        {"text": "Should reference previous answers in subsequent questions", "passed": false, "evidence": "Single-turn interaction with no prior context. This expectation requires multi-turn flow which cannot be evaluated in a single prompt call"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 205,
+      "duration_ms": 6134
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "summary-generation",
+      "without_skill_output": "本次对话中没有进行过头脑风暴讨论。请问：\n\n1. **你想总结哪次讨论？** 是最近几个 session 中关于 Tags 功能的规划讨论，还是其他内容？\n2. **还是你想设置一条规则？** 即\"每次头脑风暴结束后自动生成总结\"这样的自动化行为？\n\n如果是前者，我可以从记忆系统中提取相关内容；如果是后者，可以通过 `/update-config` 配置钩子来实现。",
+      "expectations_grading": [
+        {"text": "Should summarize all decisions made during the discussion", "passed": false, "evidence": "No summary generated. Model correctly identified no brainstorm occurred but could not produce a summary without context"},
+        {"text": "Should include concrete actionable next steps", "passed": false, "evidence": "No actionable next steps provided, only clarifying questions about what to summarize"},
+        {"text": "Should flag unresolved questions for future discussion", "passed": false, "evidence": "No unresolved questions flagged since no summary was generated"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1451,
+      "duration_ms": 30533
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.33
+  }
+}
