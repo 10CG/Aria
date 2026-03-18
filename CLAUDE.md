@@ -121,10 +121,11 @@ D. 收尾 (Closure)
 
 ### 子模块职责
 
-| 子模块 | 职责 | 关键内容 |
-|--------|------|----------|
+| 子模块/目录 | 职责 | 关键内容 |
+|-------------|------|----------|
 | `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 |
 | `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
+| `aria-plugin-benchmarks/` | Skill 基准测试 | AB 测试套件、结果存档、运维手册 |
 
 ### 目录导航
 
@@ -136,7 +137,12 @@ D. 收尾 (Closure)
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
 ├── 进度管理       → standards/core/progress-management/
-└── 研究文档       → docs/
+├── 研究文档       → docs/
+├── 需求文档       → docs/requirements/ (PRD + User Stories)
+├── 架构文档       → docs/architecture/system-architecture.md
+├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
+├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
+└── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
 ```
 
 ### Plugin 调用方式 (Aria 项目内部)
@@ -235,9 +241,10 @@ aria/
   - [ ] aria/README.md (更新版本号和 Skills 数量)
 
 Skill 基准测试 (新增或修改 Skill 时):
-  - [ ] /skill-creator benchmark 已执行
-  - [ ] benchmark.json 中 delta.pass_rate 为正值 (Skill 确实提升了质量)
-  - [ ] 人类已审阅 HTML 报告并提交 feedback
+  - [ ] /skill-creator benchmark 已执行 (with/without AB 对比)
+  - [ ] with_skill 通过率高于 without_skill (delta 为正值)
+  - [ ] 人类已审阅结果并确认 Skill 有正向价值
+  - [ ] 结果已存入 aria-plugin-benchmarks/ab-results/ (常态化积累)
 
 主项目:
   - [ ] 更新子模块指针 (git add aria)
@@ -337,14 +344,22 @@ Skill 基准测试 (新增或修改 Skill 时):
    └── 人类审阅 + 提交 feedback
 
 2. 关键输出文件:
-   ├── {skill}-workspace/iteration-N/benchmark.json  # 统计数据
-   ├── {skill}-workspace/iteration-N/benchmark.md    # 可读报告
-   └── {skill}-workspace/iteration-N/feedback.json   # 人类反馈
+   ├── {skill}-workspace/iteration-N/benchmark.json  # 统计数据 (临时)
+   ├── {skill}-workspace/iteration-N/benchmark.md    # 可读报告 (临时)
+   └── {skill}-workspace/iteration-N/feedback.json   # 人类反馈 (临时)
 
-3. 核心指标:
+3. 常态化存档 (结果必须沉淀):
+   ├── aria-plugin-benchmarks/ab-suite/              # 固定测试集 (版本化)
+   ├── aria-plugin-benchmarks/ab-results/YYYY-MM-DD/ # 历史结果存档
+   └── aria-plugin-benchmarks/ab-results/latest/     # 最新基线 (symlink)
+
+4. 核心指标:
    ├── delta.pass_rate  → Skill 带来的通过率提升
    ├── delta.tokens     → Token 消耗变化
    └── delta.time       → 耗时变化
+
+5. 详细运维流程:
+   └── aria-plugin-benchmarks/AB_TEST_OPERATIONS.md  # 完整操作手册
 ```
 
 **不需要 OpenSpec 的场景:**
@@ -379,7 +394,7 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 ---
 
-**更新**: 2026-02-06
+**更新**: 2026-03-18
 **维护**: 10CG Lab
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
