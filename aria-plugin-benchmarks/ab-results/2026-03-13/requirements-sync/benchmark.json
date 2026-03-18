@@ -1,0 +1,95 @@
+{
+  "benchmark_name": "requirements-sync",
+  "skill_version": "1.1.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T14:21:00Z",
+  "total_evals": 5,
+  "evals_completed": 5,
+  "summary": {
+    "with_skill": {
+      "passed": 5,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "sync_accuracy": "100%",
+        "drift_detection_precision": "100%",
+        "new_story_addition_correctness": "100%",
+        "propagation_completeness": "100%",
+        "conflict_resolution_correctness": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "sync-flow": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "drift-analysis": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "propagation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "conflict-handling": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "status-sync",
+      "category": "sync-flow",
+      "with_skill": "PASS",
+      "key_finding": "UPM entry REQ-005 status correctly synced from 'In Progress' to 'Done' with full audit trail including previous state"
+    },
+    {
+      "eval_id": 2,
+      "name": "drift-detection",
+      "category": "drift-analysis",
+      "with_skill": "PASS",
+      "key_finding": "Drift detected: Jira Done vs UPM In Progress for US-012; 5-day drift age calculated; sync recommendation provided"
+    },
+    {
+      "eval_id": 3,
+      "name": "new-story-addition",
+      "category": "sync-flow",
+      "with_skill": "PASS",
+      "key_finding": "US-099 added as REQ-099 with To Do status; 2 existing entries confirmed unchanged"
+    },
+    {
+      "eval_id": 4,
+      "name": "status-change-propagation",
+      "category": "propagation",
+      "with_skill": "PASS",
+      "key_finding": "Status propagated to 2 targets: UPM requirements (REQ-020) and Epic EPIC-003 (60% → 75%)"
+    },
+    {
+      "eval_id": 5,
+      "name": "conflict-resolution",
+      "category": "conflict-handling",
+      "with_skill": "PASS",
+      "key_finding": "3-way conflict detected across Git/UPM/Jira; all three values shown; manual review recommended with latest-wins option described"
+    }
+  ],
+  "strengths": [
+    "Accurate status sync with diff output showing before/after state",
+    "Drift detection with age calculation and actionable remediation",
+    "Safe new story addition without touching existing entries",
+    "Multi-target propagation including Epic progress recalculation",
+    "Prudent conflict handling: recommends manual review for 3-way conflicts"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with real UPM documents in a live project for end-to-end validation",
+    "Add benchmark for bulk drift scan across all stories in a sprint",
+    "Test auto-resolution for 2-way conflicts where one source is clearly authoritative"
+  ],
+  "status": "completed"
+}

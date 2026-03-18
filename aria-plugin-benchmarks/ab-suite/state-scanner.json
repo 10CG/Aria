@@ -1,0 +1,29 @@
+{
+  "skill_name": "state-scanner",
+  "version": "1.0.0",
+  "source_evals_count": 8,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "basic-state-collection",
+      "prompt": "查看项目当前状态",
+      "expected_output": "",
+      "expectations": [
+        "Output should include Git status information",
+        "Should provide workflow recommendation",
+        "Output should use structured format with sections"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "user-options-display",
+      "prompt": "查看项目状态",
+      "expected_output": "",
+      "expectations": [
+        "Should show numbered options for user selection",
+        "Should mention custom input option"
+      ]
+    }
+  ]
+}

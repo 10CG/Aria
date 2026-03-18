@@ -1,0 +1,31 @@
+{
+  "skill_name": "strategic-commit-orchestrator",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "single-module-grouping",
+      "prompt": "分析以下单模块变更并生成提交分组计划: files=[backend/src/auth/login.py, backend/src/auth/register.py, backend/tests/test_auth.py], module=backend, task_id=TASK-101",
+      "expected_output": "",
+      "expectations": [
+        "Should group auth implementation separately from tests",
+        "Should correctly identify the backend module",
+        "Should suggest appropriate commit types (feat, test)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "large-changeset-analysis",
+      "prompt": "分析大型变更集 (22个文件) 并生成高效提交计划: files包含 backend(8), frontend(7), shared(3), tests(4), task_id=TASK-500, description=v2-api-migration",
+      "expected_output": "",
+      "expectations": [
+        "Should successfully analyze 20+ file changes without errors",
+        "Should produce a structured grouping plan",
+        "Should not create excessive groups (keep manageable)",
+        "Should provide total commit count summary"
+      ]
+    }
+  ]
+}

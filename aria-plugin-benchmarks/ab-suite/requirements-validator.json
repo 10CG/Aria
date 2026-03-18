@@ -1,0 +1,30 @@
+{
+  "skill_name": "requirements-validator",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "prd-format-validation",
+      "prompt": "验证以下 PRD 文档格式是否符合规范: 文档缺少 Background、Scope 和 Acceptance Criteria 章节",
+      "expected_output": "",
+      "expectations": [
+        "Should detect missing required PRD sections",
+        "Should name the specific missing sections",
+        "Should report the number of violations found"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "multi-document-batch",
+      "prompt": "批量验证: PRD-001 (valid), PRD-002 (missing Scope), US-010 (missing AC), ARCH-001 (valid)",
+      "expected_output": "",
+      "expectations": [
+        "Should process all 4 documents",
+        "Should report pass/fail status for each document",
+        "Should correctly identify 2 valid and 2 invalid documents"
+      ]
+    }
+  ]
+}

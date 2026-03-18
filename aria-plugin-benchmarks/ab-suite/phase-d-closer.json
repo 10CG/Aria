@@ -1,0 +1,30 @@
+{
+  "skill_name": "phase-d-closer",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "progress-update-execution",
+      "prompt": "Execute Phase D D.1: Update progress status for completed spec oauth2-social-login. PR #143 merged to main. All 6 tasks complete.",
+      "expected_output": "",
+      "expectations": [
+        "Should update the spec progress to 'completed' or 'merged' status",
+        "Should record the PR number in progress tracking",
+        "Should mark all 6 tasks as completed in the progress record"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "status-summary-output",
+      "prompt": "Execute Phase D and generate closure summary report for spec: add-payment-gateway. Include all D.1 and D.2 outcomes, timeline, and next steps.",
+      "expected_output": "",
+      "expectations": [
+        "Output should have a clear closure summary heading",
+        "Report should cover both D.1 and D.2 outcomes",
+        "Report should indicate what happens after Phase D"
+      ]
+    }
+  ]
+}

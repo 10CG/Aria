@@ -1,0 +1,31 @@
+{
+  "skill_name": "agent-router",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "backend-task-routing",
+      "prompt": "Route this task to the correct agent: 'Implement a new REST API endpoint POST /api/v1/orders that validates request body, writes to PostgreSQL, and returns 201 on success.'",
+      "expected_output": "",
+      "expectations": [
+        "Should select backend-architect agent for API/database task",
+        "Confidence score should be >= 0.85 for clear backend task",
+        "Should explain why backend-architect was selected",
+        "Should not suggest multiple agents for a clearly backend task"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "fallback-routing",
+      "prompt": "Route this task: 'Review the overall project architecture, assess technical debt across all modules, and create a refactoring roadmap.'",
+      "expected_output": "",
+      "expectations": [
+        "Should fallback to tech-lead for cross-cutting architectural concerns",
+        "Should explain why tech-lead is the fallback choice",
+        "Should not invent agent names not in the registry"
+      ]
+    }
+  ]
+}

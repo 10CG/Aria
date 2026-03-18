@@ -1,0 +1,30 @@
+{
+  "skill_name": "tdd-enforcer",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "red-phase-enforcement",
+      "prompt": "开发者想直接实现 UserService.create() 方法，还没有写任何测试。TDD Enforcer 应如何处理？",
+      "expected_output": "",
+      "expectations": [
+        "Should detect that no test exists before implementation",
+        "Should require writing test before implementation",
+        "Should provide guidance or template for writing the test"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "strictness-level-strict",
+      "prompt": "TDD Enforcer 以 Strict 模式运行。开发者试图提交没有测试覆盖的实现代码。应该阻止提交。",
+      "expected_output": "",
+      "expectations": [
+        "Should block the commit due to missing test coverage",
+        "Should clearly explain what the TDD violation is",
+        "Should provide clear steps to remediate the violation"
+      ]
+    }
+  ]
+}

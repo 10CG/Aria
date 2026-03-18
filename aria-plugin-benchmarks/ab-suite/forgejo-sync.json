@@ -1,0 +1,30 @@
+{
+  "skill_name": "forgejo-sync",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "story-to-issue-sync",
+      "prompt": "同步 User Story 到 Forgejo Issue: story_id=US-001, title=用户登录功能, description=实现JWT登录, acceptance_criteria=[登录成功返回token, 失败返回401], repo=10cg/my-project",
+      "expected_output": "",
+      "expectations": [
+        "Should create or update a Forgejo Issue from the User Story",
+        "Should map User Story title to Issue title",
+        "Should include acceptance criteria in Issue body"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "label-mapping",
+      "prompt": "映射 Story 元数据到 Forgejo Labels: story_id=US-001, priority=high, module=backend, type=feature, sprint=Sprint-3, repo=10cg/my-project",
+      "expected_output": "",
+      "expectations": [
+        "Should map priority to a Forgejo label",
+        "Should map module identifier to a label",
+        "Should map story type to a label"
+      ]
+    }
+  ]
+}

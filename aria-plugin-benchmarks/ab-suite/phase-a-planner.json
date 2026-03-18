@@ -1,0 +1,31 @@
+{
+  "skill_name": "phase-a-planner",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-cycle-execution",
+      "prompt": "Execute Phase A for new feature: Add OAuth2 social login support (GitHub + Google). No existing spec. Run A.1 → A.2 → A.3 in sequence.",
+      "expected_output": "",
+      "expectations": [
+        "Should invoke A.1 spec-drafter to create proposal.md",
+        "Should invoke A.2 task-planner after spec creation",
+        "Should invoke A.3 agent allocation as final step",
+        "Steps must execute in A.1 → A.2 → A.3 order"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "error-recovery",
+      "prompt": "Execute Phase A. State-scanner reports: uncommitted changes in 3 files, working tree dirty. Feature: Add payment gateway integration.",
+      "expected_output": "",
+      "expectations": [
+        "Should detect and report unclean working tree state",
+        "Should block execution or issue a clear warning",
+        "Should provide steps to resolve the unclean state"
+      ]
+    }
+  ]
+}

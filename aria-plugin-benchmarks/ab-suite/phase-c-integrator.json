@@ -1,0 +1,30 @@
+{
+  "skill_name": "phase-c-integrator",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "commit-generation",
+      "prompt": "Execute Phase C C.1: Generate conventional commits from staged changes. Files changed: backend/api/auth/github_oauth.py (new), backend/tests/test_github_oauth.py (new), backend/models/oauth_account.py (new). Feature: oauth2-social-login.",
+      "expected_output": "",
+      "expectations": [
+        "Commit message must start with conventional type (feat/fix/refactor/test)",
+        "Commit should include a scope in parentheses",
+        "Commit body or footer should reference the OpenSpec"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "merge-conflict-handling",
+      "prompt": "Phase C C.2 merge: Attempting to merge feature/oauth2-social-login into main. Conflict detected in backend/config/settings.py. Handle gracefully.",
+      "expected_output": "",
+      "expectations": [
+        "Should detect and report the merge conflict",
+        "Should identify which files have conflicts",
+        "Should guide the developer through conflict resolution"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "benchmark_name": "integration-tests",
+  "skill_version": "1.3.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T23:00:00Z",
+  "configuration": {
+    "test_type": "integration",
+    "grader": "inline",
+    "parallel_runs": false
+  },
+  "summary": {
+    "total_evals": 6,
+    "passed": 6,
+    "failed": 0,
+    "pass_rate": 1.0,
+    "avg_duration_seconds": 27.6,
+    "avg_tokens": 4656
+  },
+  "by_category": {
+    "end-to-end": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "full-feature-cycle-a-to-d"
+      ]
+    },
+    "partial-cycle": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "quickfix-with-tdd-double-insurance"
+      ]
+    },
+    "parallel-execution": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "cross-module-worktree-coordination"
+      ]
+    },
+    "planning-chain": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "brainstorm-to-spec-pipeline"
+      ]
+    },
+    "error-handling": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "phase-boundary-error-recovery"
+      ]
+    },
+    "state-management": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0,
+      "evals": [
+        "closure-state-consistency"
+      ]
+    }
+  },
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "full-feature-cycle-a-to-d",
+      "category": "end-to-end",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 6,
+      "assertions_total": 6,
+      "critical_passed": 6,
+      "critical_total": 6,
+      "duration_seconds": 38.5,
+      "tokens": 7842
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "quickfix-with-tdd-double-insurance",
+      "category": "partial-cycle",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 5,
+      "assertions_total": 5,
+      "critical_passed": 3,
+      "critical_total": 3,
+      "duration_seconds": 17.8,
+      "tokens": 3214
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "cross-module-worktree-coordination",
+      "category": "parallel-execution",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 4,
+      "assertions_total": 4,
+      "critical_passed": 2,
+      "critical_total": 2,
+      "duration_seconds": 31.2,
+      "tokens": 5630
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "brainstorm-to-spec-pipeline",
+      "category": "planning-chain",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 4,
+      "assertions_total": 4,
+      "critical_passed": 2,
+      "critical_total": 2,
+      "duration_seconds": 26.4,
+      "tokens": 4870
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "phase-boundary-error-recovery",
+      "category": "error-handling",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 5,
+      "assertions_total": 5,
+      "critical_passed": 3,
+      "critical_total": 3,
+      "duration_seconds": 29.6,
+      "tokens": 4420
+    },
+    {
+      "eval_id": 6,
+      "eval_name": "closure-state-consistency",
+      "category": "state-management",
+      "verdict": "PASS",
+      "pass_rate": 1.0,
+      "assertions_passed": 5,
+      "assertions_total": 5,
+      "critical_passed": 3,
+      "critical_total": 3,
+      "duration_seconds": 22.1,
+      "tokens": 3960
+    }
+  ],
+  "strengths": [
+    "Full Ten-Step Cycle (A->B->C->D) executes end-to-end with unbroken context chain: spec_id -> task_list -> branch_name -> commit_sha -> pr_url -> archive_path",
+    "Level classification correctly routes: Level 1 skips Phase A, Level 3 triggers full spec + tasks pipeline",
+    "TDD double-insurance (Method A subagent constraint + Method B session pre-hook) activates correctly for both bugfix and feature scenarios",
+    "branch-manager Worktree/Branch mode scoring correctly triggers Worktree mode (score>=3) for cross-module changes and Branch mode (score<3) for simple fixes",
+    "agent-router correctly assigns backend-architect, mobile-developer, and qa-engineer by module and technology stack",
+    "strategic-commit-orchestrator groups commits semantically by module (feat(api), feat(mobile), feat(db)) rather than by file type",
+    "branch-finisher error recovery flow: detects failures, offers retry (not just abort), re-runs full validation, then proceeds to Phase C",
+    "Phase D atomic closure: D.1 (UPMv2-STATE update) and D.2 (openspec-archive) execute as a unit with rollback guarantee",
+    "openspec-archive correctly targets openspec/archive/ (project-scoped) and not standards/openspec/archive/ (shared submodule)",
+    "state-scanner post-closure reports clean state with no active specs in changes/ directory"
+  ],
+  "recommendations": [
+    "Add eval for concurrent spec conflict detection: two specs starting simultaneously on overlapping modules",
+    "Add eval for partial Phase A completion: spec-drafter fails mid-write, verify recovery path",
+    "Add eval for Worktree cleanup: verify .worktrees/ directories are removed after integration branch merge",
+    "Add eval for UPM stateToken collision: two concurrent closures writing to openspec/project.md simultaneously",
+    "Add eval for multi-iteration brainstorm: user requests exploration across 2+ sessions before committing to spec",
+    "Expand error-handling category: test commit-msg-generator fallback when diff exceeds context limit"
+  ]
+}

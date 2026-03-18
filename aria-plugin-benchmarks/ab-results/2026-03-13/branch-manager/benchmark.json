@@ -1,0 +1,177 @@
+{
+  "benchmark_name": "branch-manager",
+  "skill_version": "2.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-16T13:34:00Z",
+  "total_evals": 10,
+  "evals_completed": 10,
+  "summary": {
+    "with_skill": {
+      "passed": 10,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "key_metrics": {
+        "mode_decision_accuracy": "100%",
+        "branch_naming_compliance": "100%",
+        "module_identifier_support": "6 modules",
+        "worktree_threshold_algorithm": "Correct (score >= 3)",
+        "environment_validation": "100%",
+        "mode_override_support": "100%",
+        "pr_format_compliance": "100%",
+        "risk_detection_accuracy": "100%"
+      }
+    }
+  },
+  "by_category": {
+    "branch-creation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    "mode-decision": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "branch-naming": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "validation": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "mode-override": {
+      "total": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    "pr-creation": {
+      "total": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  },
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "name": "simple-feature-branch",
+      "category": "branch-creation",
+      "with_skill": "PASS",
+      "key_finding": "Branch mode selected correctly (score=1 < 3), naming convention followed"
+    },
+    {
+      "eval_id": 2,
+      "name": "complex-worktree-decision",
+      "category": "mode-decision",
+      "with_skill": "PASS",
+      "key_finding": "Worktree mode selected (score=6 >= 3), cross-module + high-risk triggers"
+    },
+    {
+      "eval_id": 3,
+      "name": "bugfix-branch-naming",
+      "category": "branch-naming",
+      "with_skill": "PASS",
+      "key_finding": "Correct bugfix naming: bugfix/mobile/ISSUE-42-login-crash"
+    },
+    {
+      "eval_id": 4,
+      "name": "hotfix-branch-naming",
+      "category": "branch-naming",
+      "with_skill": "PASS",
+      "key_finding": "Hotfix branch naming followed convention: hotfix/backend/BUG-001-api-crash"
+    },
+    {
+      "eval_id": 5,
+      "name": "environment-validation",
+      "category": "validation",
+      "with_skill": "PASS",
+      "key_finding": "Complete environment validation with .gitignore check and package manager detection"
+    },
+    {
+      "eval_id": 6,
+      "name": "forced-branch-mode",
+      "category": "mode-override",
+      "with_skill": "PASS",
+      "key_finding": "Correctly respected mode=branch override, no Worktree references"
+    },
+    {
+      "eval_id": 7,
+      "name": "forced-worktree-mode",
+      "category": "mode-override",
+      "with_skill": "PASS",
+      "key_finding": "Correctly used Worktree mode with .git/worktrees/ path"
+    },
+    {
+      "eval_id": 8,
+      "name": "pr-format-compliance",
+      "category": "pr-creation",
+      "with_skill": "PASS",
+      "key_finding": "PR title follows feat(scope) format with Spec reference"
+    },
+    {
+      "eval_id": 9,
+      "name": "risk-level-detection",
+      "category": "mode-decision",
+      "with_skill": "PASS",
+      "key_finding": "Correctly detected high risk from 'api-breaking-change' keywords"
+    },
+    {
+      "eval_id": 10,
+      "name": "module-identifier-listing",
+      "category": "validation",
+      "with_skill": "PASS",
+      "key_finding": "All 6 supported modules listed with correct identifiers"
+    }
+  ],
+  "mode_decision_algorithm": {
+    "description": "5-dimension scoring system",
+    "threshold": "score >= 3 -> Worktree, score < 3 -> Branch",
+    "dimensions": [
+      {
+        "name": "file_count",
+        "weight": "low",
+        "rules": "1-3 files -> 0, 4-8 files -> 1, >8 files -> 2"
+      },
+      {
+        "name": "cross_directory",
+        "weight": "medium",
+        "rules": "cross-directory -> +2"
+      },
+      {
+        "name": "task_count",
+        "weight": "low",
+        "rules": "4-8 tasks -> +1"
+      },
+      {
+        "name": "risk_level",
+        "weight": "medium",
+        "rules": "high -> +3, medium -> +1"
+      },
+      {
+        "name": "parallel_needed",
+        "weight": "high",
+        "rules": "needed -> +2"
+      }
+    ]
+  },
+  "strengths": [
+    "Accurate auto-mode decision algorithm (5 dimensions)",
+    "Consistent branch naming convention: {type}/{module}/{task_id}-{description}",
+    "Clear decision reasoning output",
+    "Comprehensive module identifier support",
+    "Correct mode override behavior (branch and worktree)",
+    "Complete environment validation (gitignore + package manager)",
+    "PR format with Spec reference support",
+    "Accurate risk-level keyword detection"
+  ],
+  "weaknesses": [],
+  "recommendations": [
+    "Test with actual Git operations in real repositories",
+    "Add edge cases for conflicting risk keywords",
+    "Test PR creation with Cloudflare Access mode"
+  ],
+  "status": "completed"
+}

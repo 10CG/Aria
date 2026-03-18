@@ -1,0 +1,33 @@
+{
+  "skill_name": "arch-common",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "layer-hierarchy-definition",
+      "prompt": "Explain the L0/L1/L2 layer system defined in arch-common. What does each layer represent and what kind of documentation belongs at each level?",
+      "expected_output": "",
+      "expectations": [
+        "L0 should be defined as project-level documentation",
+        "L1 should be defined as module-level documentation",
+        "L2 should be defined as component-level documentation",
+        "Should explain the parent-child relationship between layers",
+        "Should provide concrete file path examples for each layer"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "cross-skill-compatibility",
+      "prompt": "How does arch-common integrate with arch-search and arch-update skills? Explain the shared configuration points.",
+      "expected_output": "",
+      "expectations": [
+        "Should explain how arch-common config is used by arch-search",
+        "Should explain how arch-common config is used by arch-update",
+        "Should identify the shared configuration elements (layer definitions, naming rules)",
+        "Should explain why shared config ensures consistent behavior across skills"
+      ]
+    }
+  ]
+}

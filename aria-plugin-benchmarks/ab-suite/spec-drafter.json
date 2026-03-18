@@ -1,0 +1,29 @@
+{
+  "skill_name": "spec-drafter",
+  "version": "1.0.0",
+  "source_evals_count": 5,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "level-judgment",
+      "prompt": "判断规范等级: 用户请求 '修复登录页面一个 typo'",
+      "expected_output": "",
+      "expectations": [
+        "Should judge as Level 1 (Skip) for trivial fix",
+        "Should explain why Level 1 was chosen"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "bilingual-support",
+      "prompt": "双语输入处理: 'Add a dark mode feature / 添加深色模式功能' — 请生成英文 proposal",
+      "expected_output": "",
+      "expectations": [
+        "Should correctly parse mixed Chinese/English input",
+        "Should generate proposal content in English as requested",
+        "Should preserve the feature intent from both language inputs"
+      ]
+    }
+  ]
+}
