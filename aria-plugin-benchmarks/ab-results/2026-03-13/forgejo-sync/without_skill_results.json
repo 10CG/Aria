@@ -1,0 +1,36 @@
+{
+  "skill": "forgejo-sync",
+  "timestamp": "2026-03-18T10:50:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "story-to-issue-sync",
+      "without_skill_output": "没有找到可用的 Forgejo CLI 工具，也无法获取 API Token。以下是根据你提供的参数生成的 **Issue 内容**，可手动在 `10cg/my-project` 仓库中创建：\n\n---\n\n**Issue 标题：**\n```\n[US-001] 用户登录功能\n```\n\n**Issue 正文（Markdown）：**\n\n```markdown\n## User Story\n\n**ID:** US-001  \n**Title:** 用户登录功能\n\n## Description\n\n实现JWT登录\n\n## Acceptance Criter",
+      "expectations_grading": [
+        {"text": "Should create or update a Forgejo Issue from the User Story", "passed": false, "evidence": "Could not create the issue via API - generated content template for manual creation instead. No actual Forgejo API call was made."},
+        {"text": "Should map User Story title to Issue title", "passed": true, "evidence": "Mapped story title to '[US-001] 用户登录功能' as the Issue title"},
+        {"text": "Should include acceptance criteria in Issue body", "passed": true, "evidence": "Included acceptance criteria as markdown checklist: '- [ ] 登录成功返回token' and '- [ ] 失败返回401'"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 2123,
+      "duration_ms": 71577
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "label-mapping",
+      "without_skill_output": "No Forgejo CLI (`tea`) or GitHub CLI is available, and the `aria:forgejo-sync` skill failed to load. Here's what I can provide manually:\n\n## Forgejo Label Mapping for US-001\n\n| Metadata Field | Value | Label |\n|---|---|---|\n| story_id | US-001 | `story:US-001` |\n| priority | high | `priority:high` |\n| module | backend | `module:backend` |\n| type | feature | `type:feature` |\n| sprint | Sprint-3 | `spr",
+      "expectations_grading": [
+        {"text": "Should map priority to a Forgejo label", "passed": true, "evidence": "Mapped priority=high to label 'priority:high'"},
+        {"text": "Should map module identifier to a label", "passed": true, "evidence": "Mapped module=backend to label 'module:backend'"},
+        {"text": "Should map story type to a label", "passed": true, "evidence": "Mapped type=feature to label 'type:feature'"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1989,
+      "duration_ms": 41921
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.83
+  }
+}

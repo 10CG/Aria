@@ -1,0 +1,39 @@
+{
+  "skill": "workflow-runner",
+  "timestamp": "2026-03-18T13:14:23Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "full-cycle-execution",
+      "without_skill_output": "It looks like **write permissions haven't been approved** in your Claude Code session. You likely need to approve each file write in the permission prompt that appears in the UI, or switch to a higher permission mode. Here's what I need to do to implement the full feature — all the code is ready to write, but every file operation is being",
+      "expectations_grading": [
+        {"text": "Should execute all Phase A steps (A.0, A.1, A.2, A.3)", "passed": false, "evidence": "Attempted Phase A (scanned state, created OpenSpec proposal, identified tasks) but could not write files due to permission denials. No explicit A.0-A.3 step labeling."},
+        {"text": "Should execute Phase B steps (B.1, B.2)", "passed": false, "evidence": "Attempted to create branch and edit files but was blocked by permissions. Did not complete any B-phase deliverables."},
+        {"text": "Should execute Phase C steps (C.1, C.2)", "passed": false, "evidence": "Never reached Phase C (commit/merge) since Phase B was blocked by permissions"},
+        {"text": "Should execute Phase D steps (D.1, D.2)", "passed": false, "evidence": "Never reached Phase D (progress update/archive) since earlier phases were blocked"},
+        {"text": "Phases must execute in A->B->C->D order", "passed": true, "evidence": "The attempted execution followed A->B order before being blocked. The model understood the correct phase sequence."}
+      ],
+      "pass_rate": 0.2,
+      "tokens": 15788,
+      "duration_ms": 470660
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "phase-skip-logic",
+      "without_skill_output": "Your permission mode requires manual approval for backend file edits, and the request keeps timing out without a response. Please either: 1. Click Allow on the pending permission prompt in your Claude Code UI, or 2. Run /permissions to allow edits to the backend directory, or 3. Let me know if you want to proceed differently. Gap analysis: Bac",
+      "expectations_grading": [
+        {"text": "Should detect that Phase A is already completed", "passed": false, "evidence": "Did not explicitly detect or acknowledge that Phase A is already completed based on the A.3 completion state"},
+        {"text": "Should skip Phase A and start from Phase B", "passed": false, "evidence": "Jumped into implementation directly but did not explicitly state it was skipping Phase A; started attempting code changes without phase labeling"},
+        {"text": "Should start execution from Phase B.1", "passed": false, "evidence": "Did not label execution as B.1 (branch creation). Went straight to gap analysis and code editing attempts."},
+        {"text": "Should explain why Phase A was skipped", "passed": false, "evidence": "No explanation provided for skipping Phase A; the model focused on implementation without referencing the Ten-Step Cycle phases"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 14874,
+      "duration_ms": 304094
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.1
+  }
+}

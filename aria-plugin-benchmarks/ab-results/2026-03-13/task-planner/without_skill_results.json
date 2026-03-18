@@ -1,0 +1,35 @@
+{
+  "skill": "task-planner",
+  "timestamp": "2026-03-18T13:05:02Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "basic-task-decomposition",
+      "without_skill_output": "根据代码库探索，项目**已有完整的认证系统**。以下是该功能的标准任务分解（供参考或扩展使用）：\\n\\n---\\n\\n## 用户认证功能任务分解\\n\\n### T1 - 数据库层\\n- [ ] 设计 `users` 表（id, name, email, password, role, avatar_url, created_at, last_login）\\n- [ ] 设计 `reset_password_token`",
+      "expectations_grading": [
+        {"text": "Should generate a list of tasks", "passed": true, "evidence": "Generated 7 tasks (T1-T7) covering database, repository, controller, middleware, frontend UI, frontend logic, and testing"},
+        {"text": "Should include complexity labels (S/M/L/XL)", "passed": false, "evidence": "No complexity labels (S/M/L/XL) were assigned to any of the tasks"},
+        {"text": "Tasks should be 4-8 hour granularity", "passed": false, "evidence": "Tasks have subtasks but no time estimates; some tasks like T3 (6 endpoints) and T5 (6 UI elements) may exceed 8 hours without decomposition"}
+      ],
+      "pass_rate": 0.33,
+      "tokens": 1644,
+      "duration_ms": 134119
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "deliverables-identification",
+      "without_skill_output": "基于现有认证架构，以下是添加 OTP 登录功能的交付物清单：\\n\\n---\\n\\n## 交付物清单：OTP 登录功能\\n\\n### 数据库层\\n\\n| 交付物 | 说明 |\\n|--------|------|\\n| `users` 表新增字段 | `otp_code VARCHAR(6)`, `otp_expire INTEGER`, `otp_attempts INTEGER` |\\n\\n### 后端\\n\\n| 交付物 | 文件 | 说明 |",
+      "expectations_grading": [
+        {"text": "Should list deliverable files", "passed": true, "evidence": "Lists 12 deliverables with specific file paths: otpService.js (new), authController.js, authRoutes.js, authRepository.js, validators/, sendEmail.js, todos.html, authApp.js, todoService.js"},
+        {"text": "Should include database migration for OTP", "passed": true, "evidence": "Includes database layer deliverable with specific fields: otp_code VARCHAR(6), otp_expire INTEGER, otp_attempts INTEGER"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1685,
+      "duration_ms": 143476
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.665
+  }
+}

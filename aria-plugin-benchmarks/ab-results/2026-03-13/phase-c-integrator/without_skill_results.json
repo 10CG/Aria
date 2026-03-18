@@ -1,0 +1,36 @@
+{
+  "skill": "phase-c-integrator",
+  "timestamp": "2026-03-18T11:40:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "commit-generation",
+      "without_skill_output": "Those files don't exist in the repo yet — only `frontend/src/js/app.js` is currently staged. I'll generate the conventional commit messages based on the described changes for the `oauth2-social-login` feature.\n\n---\n\n## Phase C.1 — Conventional Commit Messages\n\nHere are the proposed commits, logically grouped:\n\n### Commit 1 — Data model\n```\nfeat(auth): add OAuthAccount model for social login persist",
+      "expectations_grading": [
+        {"text": "Commit message must start with conventional type (feat/fix/refactor/test)", "passed": true, "evidence": "All three commits use conventional types: feat(auth) for commits 1 and 2, test(auth) for commit 3"},
+        {"text": "Commit should include a scope in parentheses", "passed": true, "evidence": "All commits use (auth) scope in parentheses"},
+        {"text": "Commit body or footer should reference the OpenSpec", "passed": false, "evidence": "Mentions 'oauth2-social-login feature' informally but does not reference a formal OpenSpec ID or spec document path"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 1291,
+      "duration_ms": 36776
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "merge-conflict-handling",
+      "without_skill_output": "The branch `feature/oauth2-social-login` doesn't exist in this repository (local or remote), and there's no active merge conflict — the repo is clean on `main` with only a staged frontend change.\n\nA few possibilities:\n\n1. **Wrong repo** — this project is a todo web app; there's no OAuth2/social login feature branch here.\n2. **Branch not yet created** — if you're planning this merge, the branch need",
+      "expectations_grading": [
+        {"text": "Should detect and report the merge conflict", "passed": false, "evidence": "No merge was attempted since the branch doesn't exist. Model correctly identified the missing branch but did not handle the conflict scenario"},
+        {"text": "Should identify which files have conflicts", "passed": false, "evidence": "No files with conflicts were identified since no merge occurred"},
+        {"text": "Should guide the developer through conflict resolution", "passed": false, "evidence": "Offered to walk through a simulated scenario but did not provide actual conflict resolution guidance"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 545,
+      "duration_ms": 21268
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.33
+  }
+}

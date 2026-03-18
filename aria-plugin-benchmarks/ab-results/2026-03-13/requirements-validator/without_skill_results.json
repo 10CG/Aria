@@ -1,0 +1,36 @@
+{
+  "skill": "requirements-validator",
+  "timestamp": "2026-03-18T12:46:43Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "prd-format-validation",
+      "without_skill_output": "验证结果如下：\\n\\n## PRD 文档格式验证报告\\n\\n**文档**: `docs/requirements/prd-todo-optimization-v1.md`\\n\\n| 章节 | 声明状态 | 实际状态 | 位置 |\\n|------|----------|----------|------|\\n| Background (背景) | 缺失 | **存在** | §1 `项目背景` (第57行) |\\n| Scope (范围) | 缺失 | **确实缺失** | — |\\n| A",
+      "expectations_grading": [
+        {"text": "Should detect missing required PRD sections", "passed": true, "evidence": "Detected that Scope section is missing from the PRD document"},
+        {"text": "Should name the specific missing sections", "passed": true, "evidence": "Explicitly names Scope as the missing section; also correctly notes Background and AC exist under Chinese names"},
+        {"text": "Should report the number of violations found", "passed": true, "evidence": "Reports 1 out of 3 claimed missing sections is actually missing, with table-format breakdown of each"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1146,
+      "duration_ms": 31063
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "multi-document-batch",
+      "without_skill_output": "这些文档 ID 在项目中不存在。当前项目的文档结构：\\n\\n```\\ndocs/\\n├── requirements/prd-todo-optimization-v1.md   # 唯一 PRD\\n├── architecture/system-architecture.md        # 唯一架构文档\\n└── upm-todo-optimization.md\\n```\\n\\n项目中没有 `PRD-001`、`PRD-002`、`US-010`、`ARCH-001` 等 ID 编号的文档",
+      "expectations_grading": [
+        {"text": "Should process all 4 documents", "passed": false, "evidence": "Did not process any documents; reported all 4 IDs as not found in the project"},
+        {"text": "Should report pass/fail status for each document", "passed": false, "evidence": "Reported 'not found' for all 4 instead of validating the stated attributes"},
+        {"text": "Should correctly identify 2 valid and 2 invalid documents", "passed": false, "evidence": "Failed to handle hypothetical/synthetic document validation; treated all as non-existent"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 2272,
+      "duration_ms": 52714
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "skill": "integration-tests",
+  "timestamp": "2026-03-18T11:00:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "full-feature-cycle-a-to-d",
+      "without_skill_output": "## Codebase Summary\n\nHere's what I found that's directly relevant to a \"user notification feature\":\n\n**What already exists:**\n- `NetworkToast` - a polished slide-up toast for network events (offline/online/API errors), with ARIA support and slide animation\n- `user_settings` DB table - has `notification_enabled` (BOOLEAN) and `email_notification` (BOOLEAN) columns already\n- CSS for toasts, skeleton ",
+      "expectations_grading": [
+        {"text": "Phase A must produce proposal.md with valid spec_id", "passed": false, "evidence": "No proposal.md was created. The model analyzed the codebase and asked clarifying questions instead of executing the ten-step cycle"},
+        {"text": "Phase A must produce detailed-tasks.yaml with task IDs referencing spec_id", "passed": false, "evidence": "No tasks.yaml was created"},
+        {"text": "Phase B must create branch named feature/{module}/{task-id}-{desc}", "passed": false, "evidence": "No branch was created - model never progressed past analysis phase"},
+        {"text": "Phase C commit/PR must reference the original spec_id", "passed": false, "evidence": "No commit or PR was made"},
+        {"text": "Phase D must archive spec to openspec/archive/ (not standards/)", "passed": false, "evidence": "Never reached Phase D"},
+        {"text": "Each phase output must contain reference to previous phase artifact", "passed": false, "evidence": "No phases were executed in sequence"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 3971,
+      "duration_ms": 294045
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "closure-state-consistency",
+      "without_skill_output": "The git restore and file write commands need your approval. To clean up the leftover benchmark markers in `frontend/src/js/app.js`, I need to either:\n\n1. **Unstage + discard**: `git restore --staged frontend/src/js/app.js && git checkout frontend/src/js/app.js`\n2. **Or edit the file** to remove the 9 benchmark comment lines at the end\n\nThese are clearly test artifacts (9 identical `/* todo-web benc",
+      "expectations_grading": [
+        {"text": "D.1 must write UPMv2-STATE block with updated completion percentage", "passed": false, "evidence": "No UPM state block was written. Model focused on cleaning up benchmark artifacts instead of executing closure phase"},
+        {"text": "D.2 must move spec from changes/ to archive/ with preserved metadata", "passed": false, "evidence": "No spec archival was attempted"},
+        {"text": "After closure, state-scanner should show no active specs in changes/", "passed": false, "evidence": "No state scanning was performed as part of closure verification"},
+        {"text": "requirements-sync should reflect completed status in UPM", "passed": false, "evidence": "No requirements sync was executed"},
+        {"text": "D.1 and D.2 should complete atomically (both succeed or neither)", "passed": false, "evidence": "Neither D.1 nor D.2 were executed - model did not understand the closure phase workflow"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1921,
+      "duration_ms": 53953
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.0
+  }
+}

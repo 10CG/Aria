@@ -1,0 +1,36 @@
+{
+  "skill": "branch-finisher",
+  "timestamp": "2026-03-18T10:30:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "test-verification",
+      "without_skill_output": "分支 `feature/backend/TASK-101-user-auth` 在本地和远程仓库中均不存在。\n\n当前可用分支：\n- `main` (当前)\n- `remotes/origin/develop`\n- `remotes/origin/fix/dark-mode-colors`\n\n无法验证不存在的分支。请确认：\n1. 分支名称是否正确？\n2. 是否需要先创建该分支？\n3. 或者是否要在当前 `main` 分支上运行后端测试？",
+      "expectations_grading": [
+        {"text": "Should indicate running the test suite", "passed": false, "evidence": "Did not run the test suite. Correctly identified the branch doesn't exist but did not attempt to run tests"},
+        {"text": "Should report test pass/fail status clearly", "passed": false, "evidence": "No test results reported since branch was not found"},
+        {"text": "Should reference the branch being tested", "passed": true, "evidence": "Explicitly references 'feature/backend/TASK-101-user-auth' throughout the output"}
+      ],
+      "pass_rate": 0.33,
+      "tokens": 557,
+      "duration_ms": 16298
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "branch-status-check",
+      "without_skill_output": "**Branch `feature/backend/TASK-101-user-auth` does not exist** — neither locally nor on the remote.\n\nCurrent state:\n- **Current branch:** `main`\n- **Available branches:** `main`, `origin/develop`, `origin/fix/dark-mode-colors`\n- **Uncommitted changes:** `frontend/src/js/app.js` is staged but not committed\n\nThe branch you're asking about (`feature/backend/TASK-101-user-auth`) cannot be foun",
+      "expectations_grading": [
+        {"text": "Should verify no uncommitted changes remain", "passed": true, "evidence": "Detected and reported 'frontend/src/js/app.js is staged but not committed' - checked uncommitted changes status"},
+        {"text": "Should verify branch is synced with upstream", "passed": false, "evidence": "Could not verify upstream sync since the branch doesn't exist"},
+        {"text": "Should report overall readiness status", "passed": true, "evidence": "Clearly reported the branch does not exist, which effectively communicates not-ready status"}
+      ],
+      "pass_rate": 0.67,
+      "tokens": 595,
+      "duration_ms": 13607
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

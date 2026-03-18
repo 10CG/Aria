@@ -1,0 +1,38 @@
+{
+  "skill": "progress-updater",
+  "timestamp": "2026-03-18T12:31:22Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "state-block-generation",
+      "without_skill_output": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":3964,\"result\":\"```\\n<!--UPMv2-STATE:BEGIN-->\\nproject: refactor-api\\nupdated: 2026-03-18\\ncompletion: 33%\\ntasks:\\n  - id: T1\\n    status: completed\\n  - id: T2\\n    status: in_progress\\n  - id: T3\\n    status: pending\\n<!--UPMv2-STATE:END-->\\n```\"}",
+      "expectations_grading": [
+        {"text": "State block must start with UPMv2-STATE marker", "passed": true, "evidence": "Output contains <!--UPMv2-STATE:BEGIN--> marker"},
+        {"text": "State block must include all 3 task IDs", "passed": true, "evidence": "Output includes T1, T2, T3 task IDs"},
+        {"text": "Task statuses must match input", "passed": true, "evidence": "T1=completed, T2=in_progress, T3=pending all match"},
+        {"text": "Block must be enclosed in code fence or structured block for machine parsing", "passed": true, "evidence": "Output uses code fence (```) wrapping the structured YAML block"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 137,
+      "duration_ms": 9414
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "incremental-update",
+      "without_skill_output": "{\"type\":\"result\",\"subtype\":\"success\",\"result\":\"The edit was blocked by permissions. Please approve the write to `docs/upm-todo-optimization.md` so I can apply the incremental update — adding `t3: complete` (2026-03-18) and `t6: pending` inside the existing `<!-- UPMv2-STATE:BEGIN … END -->` block without touching anything else.\"}",
+      "expectations_grading": [
+        {"text": "T3 should be updated to completed; existing T1, T2 must be preserved", "passed": false, "evidence": "Output was blocked by permissions; no actual state block update was produced. It tried to edit a file but was denied."},
+        {"text": "New task T6 must appear in the updated state block", "passed": false, "evidence": "No updated state block in output, only a permission denial message"},
+        {"text": "Output should indicate incremental update, not full rewrite", "passed": true, "evidence": "The response mentions applying incremental update without touching anything else, indicating awareness of incremental approach"},
+        {"text": "Percentage should reflect 3 completed out of 6 total = 50%", "passed": false, "evidence": "No percentage calculation in output"}
+      ],
+      "pass_rate": 0.25,
+      "tokens": 2026,
+      "duration_ms": 48005
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.625
+  }
+}

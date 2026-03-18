@@ -1,0 +1,37 @@
+{
+  "skill": "strategic-commit-orchestrator",
+  "timestamp": "2026-03-18T12:55:34Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "single-module-grouping",
+      "without_skill_output": "指定的文件不存在于此项目中。这是一个 **JavaScript 项目**，而非 Python 项目，且指定的路径都不存在：\\n\\n- `backend/src/auth/login.py` — 不存在\\n- `backend/src/auth/register.py` — 不存在\\n- `backend/tests/test_auth.py` — 不存在\\n\\n实际的认证模块文件是：\\n```\\nbackend/src/auth/\\n  authController.js\\n",
+      "expectations_grading": [
+        {"text": "Should group auth implementation separately from tests", "passed": false, "evidence": "Did not generate any grouping plan; rejected the input because files don't exist in the project"},
+        {"text": "Should correctly identify the backend module", "passed": false, "evidence": "Did not identify/acknowledge the backend module for the hypothetical files; focused on file non-existence"},
+        {"text": "Should suggest appropriate commit types (feat, test)", "passed": false, "evidence": "No commit types suggested; asked for clarification instead of proceeding with the analysis"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 563,
+      "duration_ms": 24092
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "large-changeset-analysis",
+      "without_skill_output": "The repo only has 1 staged file. The 22-file changeset you described isn't present in the working tree yet. I'll generate a strategic commit plan based on your described structure.\\n\\n---\\n\\n## Commit Plan: TASK-500 v2-api-migration (22 files)\\n\\n### Guiding Principles\\n- Shared contracts first (downstream deps depend on them)\\n- Backend before front",
+      "expectations_grading": [
+        {"text": "Should successfully analyze 20+ file changes without errors", "passed": true, "evidence": "Successfully analyzed the 22-file changeset description and produced a detailed commit plan with 7 commits"},
+        {"text": "Should produce a structured grouping plan", "passed": true, "evidence": "Produced a well-structured 7-commit plan organized by layer: shared -> backend routes -> backend services -> backend tests -> frontend API -> frontend UI -> frontend tests"},
+        {"text": "Should not create excessive groups (keep manageable)", "passed": true, "evidence": "Created 7 commits for 22 files, which is a reasonable ratio of ~3 files per commit"},
+        {"text": "Should provide total commit count summary", "passed": true, "evidence": "Provides a Summary Table showing all 7 commits with scope, layer, file counts, and commit types"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 1741,
+      "duration_ms": 40065
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.5
+  }
+}

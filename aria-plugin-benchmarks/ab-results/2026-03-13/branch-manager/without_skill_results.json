@@ -1,0 +1,33 @@
+{
+  "skill": "branch-manager",
+  "timestamp": "2026-03-18T10:40:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "simple-feature-branch-creation",
+      "without_skill_output": "Branch `feature/backend/TASK-001-user-auth` needs to be created from `main`. Please approve the `git checkout -b` command to proceed.",
+      "expectations_grading": [
+        {"text": "Should generate correct branch name format", "passed": true, "evidence": "Generated branch name 'feature/backend/TASK-001-user-auth' follows the correct format: type/module/taskid-description"},
+        {"text": "Should indicate Branch mode was selected", "passed": false, "evidence": "No mention of 'Branch mode' selection. The model just directly attempted to create the branch without indicating a mode selection step"}
+      ],
+      "pass_rate": 0.5,
+      "tokens": 324,
+      "duration_ms": 13501
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "module-identifier-validation",
+      "without_skill_output": "以下是前端支持的模块标识符（Vite 别名 + 各 index 导出）：\n\n## Vite 路径别名\n\n| 别名 | 实际路径 |\n|------|----------|\n| `@` | `src/` |\n| `@utils` | `src/js/utils/` |\n| `@components` | `src/js/components/` |\n| `@services` | `src/js/services/` |\n| `@state` | `src/js/state/` |\n\n## 各模块 index 导出\n\n**`@components`**\n- `Component`\n- `Modal`\n- `FilterBar`\n- `Tod",
+      "expectations_grading": [
+        {"text": "Should list valid module identifiers", "passed": false, "evidence": "Listed Vite path aliases and JS module exports from the project instead of branch management module identifiers (backend, frontend, infra, docs, etc.). Misunderstood the context entirely"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1814,
+      "duration_ms": 42452
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.25
+  }
+}

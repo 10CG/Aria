@@ -1,0 +1,35 @@
+{
+  "skill": "spec-drafter",
+  "timestamp": "2026-03-18T12:49:23Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "level-judgment",
+      "without_skill_output": "这是一个**极简任务**，无需规范流程。\\n\\n**判断依据：**\\n- 范围极小：单个文字修正\\n- 零风险：不涉及逻辑、API、数据库\\n- 无歧义：typo 修复结果明确\\n\\n**建议操作：** 直接定位并修复，无需 OpenSpec、任务分解或审查流程。\\n\\n要我现在去找并修复这个 typo 吗？请告诉我具体是哪个错误（如果你知道的话），或者我可以直接去登录页面查找。",
+      "expectations_grading": [
+        {"text": "Should judge as Level 1 (Skip) for trivial fix", "passed": true, "evidence": "Judges it as a trivial task requiring no spec/process, equivalent to Level 1 Skip. Though does not explicitly use 'Level 1' terminology, the judgment is correct."},
+        {"text": "Should explain why Level 1 was chosen", "passed": true, "evidence": "Explains three reasons: small scope (single text fix), zero risk (no logic/API/DB), no ambiguity (clear fix)"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 384,
+      "duration_ms": 14651
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "bilingual-support",
+      "without_skill_output": "The proposal is ready to write. Here it is for your review:\\n\\n---\\n\\n**`openspec/2026-03-18-dark-mode/proposal.md`**\\n\\n```markdown\\n# Dark Mode: Full-Coverage Completion\\n\\n> **Level**: Minimal (Level 2 Spec)\\n> **Status**: Draft\\n> **Module**: frontend\\n> **PRD Reference**: docs/requirements/prd-todo-optimization-v1.md (FR-FE-003)\\n>",
+      "expectations_grading": [
+        {"text": "Should correctly parse mixed Chinese/English input", "passed": true, "evidence": "Successfully parsed the bilingual input 'Add a dark mode feature / 添加深色模式功能' and understood the feature request from both languages"},
+        {"text": "Should generate proposal content in English as requested", "passed": true, "evidence": "Generated a complete English proposal with sections: Why, What, Key Deliverables, Impact, Tasks, Success Criteria"},
+        {"text": "Should preserve the feature intent from both language inputs", "passed": true, "evidence": "The proposal covers dark mode feature comprehensively, preserving the intent from both the English and Chinese descriptions"}
+      ],
+      "pass_rate": 1.0,
+      "tokens": 6390,
+      "duration_ms": 127682
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 1.0
+  }
+}

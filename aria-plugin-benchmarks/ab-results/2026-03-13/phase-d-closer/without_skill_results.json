@@ -1,0 +1,36 @@
+{
+  "skill": "phase-d-closer",
+  "timestamp": "2026-03-18T11:50:00Z",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "progress-update-execution",
+      "without_skill_output": "No `oauth2-social-login` spec or UPM entry exists in this project. The only UPM is `docs/upm-todo-optimization.md` which tracks the completed todo-optimization phases. There's also no evidence of PR #143 in the git history.\n\nA few possibilities:\n1. This spec was tracked in a different project/UPM\n2. A new UPM entry needs to be created for this feature\n\nCould you clarify:\n- Is there a separate UP",
+      "expectations_grading": [
+        {"text": "Should update the spec progress to 'completed' or 'merged' status", "passed": false, "evidence": "No progress update performed. Model reported that the oauth2-social-login spec doesn't exist and asked for clarification"},
+        {"text": "Should record the PR number in progress tracking", "passed": false, "evidence": "No PR number recorded in any tracking document"},
+        {"text": "Should mark all 6 tasks as completed in the progress record", "passed": false, "evidence": "No tasks were marked as completed since no spec exists to track"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 1781,
+      "duration_ms": 42472
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "status-summary-output",
+      "without_skill_output": "No spec named `add-payment-gateway` exists in this project. The openspec directory contains only these specs:\n\n```\nopenspec/archive/\n├── 2026-02-13-phase1-basic-optimization/\n├── 2026-02-15-phase2-arch-optimization/\n├── 2026-02-15-test-coverage-enhancement/\n├── 2026-02-15-test-coverage-phase2/\n├── 2026-02-24-phase3-ux-optimization/\n└── 2026-02-26-phase4-acceptance-release/\n```\n\nThere is no acti",
+      "expectations_grading": [
+        {"text": "Output should have a clear closure summary heading", "passed": false, "evidence": "No closure summary heading generated. Output is an error report about missing spec, not a closure summary"},
+        {"text": "Report should cover both D.1 and D.2 outcomes", "passed": false, "evidence": "No D.1 or D.2 outcomes reported since Phase D could not be executed"},
+        {"text": "Report should indicate what happens after Phase D", "passed": false, "evidence": "No post-Phase-D next steps mentioned"}
+      ],
+      "pass_rate": 0.0,
+      "tokens": 748,
+      "duration_ms": 29438
+    }
+  ],
+  "summary": {
+    "total_evals": 2,
+    "avg_pass_rate": 0.0
+  }
+}
