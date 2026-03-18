@@ -2,7 +2,7 @@
 
 > **项目本质**: AI 辅助的领域驱动设计方法论研究
 > **核心假设**: AI 不是工具，而是理解项目意图的协作者
-> **版本**: 1.0.0
+> **版本**: 1.0.2
 
 ---
 
@@ -163,6 +163,40 @@ Agents:
 
 其他项目通过 Plugin 安装后使用 `/aria:` 前缀。
 
+### Git 子模块操作
+
+```bash
+# 更新所有子模块到远程最新
+git submodule update --remote
+
+# 更新单个子模块
+git submodule update --remote aria
+git submodule update --remote standards
+
+# 初始化 (首次 clone 后)
+git submodule update --init --recursive
+
+# 查看子模块状态
+git submodule status
+```
+
+### Forgejo API (PR Operations)
+
+Forgejo 位于 Cloudflare Access 后，使用 `forgejo` CLI wrapper：
+
+```bash
+# 路径: /home/dev/.npm-global/bin/forgejo
+# 用法: forgejo <METHOD> <ENDPOINT> [curl options]
+
+forgejo GET /repos/10CG/Aria/pulls                    # 列出 PR
+forgejo GET /repos/10CG/Aria/pulls/1                   # 查看 PR
+forgejo POST /repos/10CG/Aria/pulls -d '{              # 创建 PR
+  "title": "feat: description",
+  "head": "feature-branch", "base": "master"
+}'
+forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{"Do": "merge"}'  # 合并
+```
+
 ---
 
 ## 技术约束
@@ -299,72 +333,15 @@ Skill 基准测试 (新增或修改 Skill 时):
 5. **项目变更必须在项目的 openspec/changes/ 目录** - 不得放在 `standards/openspec/changes/`
 6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  规则 #6: Skill 基准测试工具边界                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  /skill-creator benchmark           ← 唯一正确方式              │
-│  ├── with/without 对比              → 证明 Skill 价值           │
-│  ├── AI 评分 (grader agent)         → 语义级验证                │
-│  ├── 盲测对比 (comparator agent)    → 消除偏见                  │
-│  ├── 统计分析 (mean ± stddev)       → 量化可靠性               │
-│  └── HTML 可视化 + 反馈循环         → 迭代改进                  │
-│                                                                 │
-│  aria-plugin-benchmarks/runner/     → 已废弃 (deprecated)       │
-│  ├── 仅支持 regex 断言              → 无法验证 Skill 价值       │
-│  ├── 无 with/without 对比           → 不回答核心问题            │
-│  └── 保留历史数据，不再投入新 eval   → 冻结状态                 │
-│                                                                 │
-│  原因: 基准测试的核心问题是 "Skill 是否提升了质量？"             │
-│  只有 /skill-creator 的 with/without 对比能回答这个问题          │
-└─────────────────────────────────────────────────────────────────┘
-```
+**规则 #6 要点:** 只有 with/without AB 对比能回答"Skill 是否提升了质量"。自研 runner (`aria-plugin-benchmarks/runner/`) 已废弃。
 
-### Skill 基准测试操作指南
+**触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
 
-**何时触发基准测试:**
+**操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
 
-| 触发场景 | 测试类型 | 命令 |
-|----------|---------|------|
-| 新增 Skill | with/without 对比 | `/skill-creator` → 创建流程含 benchmark |
-| 修改 Skill 逻辑 | with/without 对比 | `/skill-creator` → 改进流程含 benchmark |
-| 修改 Skill description | 触发准确率测试 | `/skill-creator` → description 优化 |
-| 定期质量审计 | 全量 benchmark | 逐 Skill 执行 `/skill-creator` benchmark |
+**详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`
 
-**标准流程 (逐 Skill 执行):**
-
-```
-1. /skill-creator benchmark <skill-name>
-   ├── 编写 evals.json (prompt + expected_output)
-   ├── 并行执行 with_skill + without_skill (subagent)
-   ├── grader agent 逐项评分 (语义级, 非 regex)
-   ├── aggregate_benchmark.py → benchmark.json + benchmark.md
-   ├── generate_review.py → HTML 可视化
-   └── 人类审阅 + 提交 feedback
-
-2. 关键输出文件:
-   ├── {skill}-workspace/iteration-N/benchmark.json  # 统计数据 (临时)
-   ├── {skill}-workspace/iteration-N/benchmark.md    # 可读报告 (临时)
-   └── {skill}-workspace/iteration-N/feedback.json   # 人类反馈 (临时)
-
-3. 常态化存档 (结果必须沉淀):
-   ├── aria-plugin-benchmarks/ab-suite/              # 固定测试集 (版本化)
-   ├── aria-plugin-benchmarks/ab-results/YYYY-MM-DD/ # 历史结果存档
-   └── aria-plugin-benchmarks/ab-results/latest/     # 最新基线 (symlink)
-
-4. 核心指标:
-   ├── delta.pass_rate  → Skill 带来的通过率提升
-   ├── delta.tokens     → Token 消耗变化
-   └── delta.time       → 耗时变化
-
-5. 详细运维流程:
-   └── aria-plugin-benchmarks/AB_TEST_OPERATIONS.md  # 完整操作手册
-```
-
-**不需要 OpenSpec 的场景:**
-- 使用 `/skill-creator` 运行测试 → 这是验证活动，不是变更活动
-- 测试发现 Skill 需要改进 → **改进时**才需要 OpenSpec
+**不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -399,53 +376,3 @@ Skill 基准测试 (新增或修改 Skill 时):
 **主仓库**: https://forgejo.10cg.pub/10CG/Aria
 **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
 **规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards
-
-## Forgejo API (PR Operations)
-
-This repo is hosted on Forgejo behind Cloudflare Access. Use the `forgejo` CLI wrapper (not `gh` or `tea`) for all API operations. It automatically handles CF Access authentication.
-
-Path: `/home/dev/.npm-global/bin/forgejo`
-
-### Usage
-
-```bash
-forgejo <METHOD> <ENDPOINT> [curl options]
-```
-
-### Common Operations
-
-```bash
-# List PRs
-forgejo GET /repos/10CG/Aria/pulls
-
-# Get specific PR
-forgejo GET /repos/10CG/Aria/pulls/1
-
-# Create PR
-forgejo POST /repos/10CG/Aria/pulls -d '{
-  "title": "feat: description",
-  "body": "## Summary
-
-- changes",
-  "head": "feature-branch",
-  "base": "main"
-}'
-
-# Add comment to PR
-forgejo POST /repos/10CG/Aria/pulls/1/comments -d '{
-  "body": "LGTM"
-}'
-
-# Merge PR
-forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{
-  "Do": "merge"
-}'
-
-# List branches
-forgejo GET /repos/10CG/Aria/branches
-```
-
-### Notes
-- Repo: `10CG/Aria`
-- Default branch: check with `git remote show origin`
-- API docs: https://forgejo.10cg.pub/api/swagger (requires CF Access)
