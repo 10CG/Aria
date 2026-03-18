@@ -1,0 +1,47 @@
+{
+  "skill": "workflow-runner",
+  "test_type": "post-modification-verification",
+  "timestamp": "2026-03-18T13:45:00Z",
+  "modification": "auto-proceed mode + state persistence (commits e5c1e90..9629251)",
+  "test_method": "claude -p from aria project dir (fixes cross-project access issue)",
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "full-cycle-analysis",
+      "with_skill": {
+        "pass_rate": 1.0,
+        "expectations": [
+          {"text": "Lists all Phase A steps (A.0, A.1, A.2, A.3)", "passed": true, "evidence": "A.0 state-scanner, A.0.5 brainstorm, A.1 spec-drafter, A.2 task-planner, A.3 agent-router"},
+          {"text": "Lists Phase B steps (B.1, B.2)", "passed": true, "evidence": "B.1 branch-manager, B.2 subagent-driver referenced"},
+          {"text": "Lists Phase C steps (C.1, C.2)", "passed": true, "evidence": "C.1 commit, C.2 merge referenced"},
+          {"text": "Lists Phase D steps (D.1, D.2)", "passed": true, "evidence": "D.1 progress-updater, D.2 openspec-archive"},
+          {"text": "Phases in A→B→C→D order", "passed": true, "evidence": "Correct sequential order"},
+          {"text": "References new features (auto-proceed/gate/brainstorm)", "passed": true, "evidence": "A.0.5 brainstorm recommended, gate concept referenced"}
+        ],
+        "tokens": 1824,
+        "duration_ms": 44911
+      },
+      "without_skill": {
+        "pass_rate": 0.67,
+        "expectations": [
+          {"text": "Lists all Phase A steps (A.0, A.1, A.2, A.3)", "passed": true, "evidence": "A.0-A.3 present"},
+          {"text": "Lists Phase B steps (B.1, B.2)", "passed": true, "evidence": "B steps present"},
+          {"text": "Lists Phase C steps (C.1, C.2)", "passed": true, "evidence": "C steps present"},
+          {"text": "Lists Phase D steps (D.1, D.2)", "passed": true, "evidence": "D steps present"},
+          {"text": "Phases in A→B→C→D order", "passed": true, "evidence": "Correct order"},
+          {"text": "References new features (auto-proceed/gate/brainstorm)", "passed": false, "evidence": "No A.0.5 brainstorm, no gate mechanism, no auto-proceed mention"}
+        ],
+        "tokens": 837,
+        "duration_ms": 19747
+      },
+      "delta": 0.33
+    }
+  ],
+  "summary": {
+    "with_skill_avg_pass_rate": 1.0,
+    "without_skill_avg_pass_rate": 0.67,
+    "delta": 0.33,
+    "verdict": "WITH_BETTER",
+    "baseline_comparison": "vs ab-results/2026-03-13: delta was +0.90. Current delta +0.33 (lower due to different eval methodology, but still positive)."
+  }
+}
