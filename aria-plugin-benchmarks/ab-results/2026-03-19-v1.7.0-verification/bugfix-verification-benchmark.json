@@ -1,0 +1,43 @@
+{
+  "skill_name": "state-scanner",
+  "skill_version": "2.6.0-bugfix",
+  "test_type": "bugfix-verification",
+  "issue_ref": "aria-plugin#1",
+  "date": "2026-03-19",
+  "eval_count": 2,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "results": [
+        {"eval_id": 5, "eval_name": "status-multiformat-extraction", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0},
+        {"eval_id": 6, "eval_name": "openspec-empty-changes-detection", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0}
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "total_assertions": 6,
+        "total_passed": 6
+      }
+    },
+    {
+      "name": "without_skill",
+      "results": [
+        {"eval_id": 5, "eval_name": "status-multiformat-extraction", "assertions_total": 3, "assertions_passed": 2, "pass_rate": 0.67},
+        {"eval_id": 6, "eval_name": "openspec-empty-changes-detection", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0}
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.835,
+        "total_assertions": 6,
+        "total_passed": 5
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.165,
+    "verdict": "WITH_BETTER"
+  },
+  "analysis": {
+    "discriminating_assertion": "multi-pattern Status extraction awareness — with_skill explicitly references pattern priority, without_skill handles it ad-hoc",
+    "non_discriminating": "eval-6 (openspec empty dir) — both configurations answered correctly, likely because the prompt itself contained the answer hint",
+    "conclusion": "Bugfix verification passed. with_skill delta positive (+0.165). The multi-format Status extraction pattern is the key differentiator."
+  }
+}

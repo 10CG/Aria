@@ -1,3 +1,9 @@
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Aria 运行时文件 (不提交)
+.aria/workflow-state.json
+.aria/workflow-state.json.tmp
+.aria/audit.log
+.aria/audit.log.*

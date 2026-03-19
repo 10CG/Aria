@@ -1,0 +1,29 @@
+{
+  "_comment": "Aria 项目级配置 — 所有字段可选，未设置使用默认值。复制为 config.json 后修改。",
+  "version": "1.0",
+
+  "workflow": {
+    "auto_proceed": false
+  },
+
+  "state_scanner": {
+    "confidence_threshold": 90,
+    "auto_execute_enabled": false,
+    "auto_execute_rules": ["commit_only", "quick_fix", "doc_only"],
+    "audit_log_path": ".aria/audit.log"
+  },
+
+  "tdd": {
+    "strictness": "advisory"
+  },
+
+  "benchmarks": {
+    "require_before_merge": true,
+    "skill_change_block_mode": "warn"
+  },
+
+  "experiments": {
+    "agent_team_audit": false,
+    "agent_team_audit_points": ["pre_merge"]
+  }
+}
