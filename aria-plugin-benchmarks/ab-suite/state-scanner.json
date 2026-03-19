@@ -1,8 +1,8 @@
 {
   "skill_name": "state-scanner",
-  "version": "1.0.0",
-  "source_evals_count": 8,
-  "selected_count": 2,
+  "version": "1.1.0",
+  "source_evals_count": 4,
+  "selected_count": 4,
   "evals": [
     {
       "id": 1,
@@ -18,11 +18,33 @@
     {
       "id": 2,
       "name": "user-options-display",
-      "prompt": "查看项目状态",
+      "prompt": "查看项目状态，给我可选操作",
       "expected_output": "",
       "expectations": [
         "Should show numbered options for user selection",
         "Should mention custom input option"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "readme-sync-detection",
+      "prompt": "检查项目状态，特别注意文档版本是否一致",
+      "expected_output": "",
+      "expectations": [
+        "Should check README.md version against VERSION file or plugin.json",
+        "Should mention CHANGELOG date as reference source for date sync",
+        "Should output readme_status section"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "config-awareness",
+      "prompt": "扫描项目状态，这个项目有 .aria/config.json 配置吗？",
+      "expected_output": "",
+      "expectations": [
+        "Should mention .aria/config.json or config-loader",
+        "Should describe config fields like auto_proceed or confidence_threshold",
+        "Should mention default values when config is absent"
       ]
     }
   ]

@@ -1,0 +1,47 @@
+{
+  "skill_name": "state-scanner",
+  "skill_version": "2.6.0",
+  "suite_version": "1.1.0",
+  "date": "2026-03-19",
+  "eval_count": 4,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "results": [
+        {"eval_id": 1, "eval_name": "basic-state-collection", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0},
+        {"eval_id": 2, "eval_name": "user-options-display", "assertions_total": 2, "assertions_passed": 2, "pass_rate": 1.0},
+        {"eval_id": 3, "eval_name": "readme-sync-detection", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0},
+        {"eval_id": 4, "eval_name": "config-awareness", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0}
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev": 0.0,
+        "total_assertions": 11,
+        "total_passed": 11,
+        "mean_tokens": 40017,
+        "mean_duration_ms": 143021
+      }
+    },
+    {
+      "name": "without_skill",
+      "results": [
+        {"eval_id": 1, "eval_name": "basic-state-collection", "assertions_total": 3, "assertions_passed": 3, "pass_rate": 1.0},
+        {"eval_id": 2, "eval_name": "user-options-display", "assertions_total": 2, "assertions_passed": 1, "pass_rate": 0.5},
+        {"eval_id": 3, "eval_name": "readme-sync-detection", "assertions_total": 3, "assertions_passed": 1, "pass_rate": 0.33},
+        {"eval_id": 4, "eval_name": "config-awareness", "assertions_total": 3, "assertions_passed": 2, "pass_rate": 0.67}
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.625,
+        "stddev": 0.28,
+        "total_assertions": 11,
+        "total_passed": 7,
+        "mean_tokens": 24886,
+        "mean_duration_ms": 97921
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate": 0.375,
+    "verdict": "WITH_BETTER"
+  }
+}
