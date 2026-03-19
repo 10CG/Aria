@@ -1,0 +1,54 @@
+{
+  "date": "2026-03-19",
+  "test_type": "rule6-enforcement-verification",
+  "skills_tested": ["state-scanner", "branch-finisher"],
+
+  "state-scanner": {
+    "eval_count": 2,
+    "with_skill": {
+      "eval-7": {"assertions": 3, "passed": 3, "pass_rate": 1.0},
+      "eval-8": {"assertions": 3, "passed": 3, "pass_rate": 1.0},
+      "mean_pass_rate": 1.0
+    },
+    "without_skill": {
+      "eval-7": {"assertions": 3, "passed": 2, "pass_rate": 0.67},
+      "eval-8": {"assertions": 3, "passed": 1, "pass_rate": 0.33},
+      "mean_pass_rate": 0.50
+    },
+    "delta": 0.50,
+    "verdict": "WITH_BETTER",
+    "discriminating_assertions": [
+      "skill_changes field reference (with=structured, without=ad-hoc)",
+      "exempt vs needs_benchmark distinction (with=clear criteria, without=missing)",
+      "/skill-creator actionable recommendation (with=explicit, without=absent)"
+    ]
+  },
+
+  "branch-finisher": {
+    "eval_count": 2,
+    "with_skill": {
+      "eval-1": {"assertions": 3, "passed": 3, "pass_rate": 1.0},
+      "eval-2": {"assertions": 3, "passed": 3, "pass_rate": 1.0},
+      "mean_pass_rate": 1.0
+    },
+    "without_skill": {
+      "eval-1": {"assertions": 3, "passed": 1, "pass_rate": 0.33},
+      "eval-2": {"assertions": 3, "passed": 2, "pass_rate": 0.67},
+      "mean_pass_rate": 0.50
+    },
+    "delta": 0.50,
+    "verdict": "WITH_BETTER",
+    "discriminating_assertions": [
+      "Step 2.5 zone classification methodology (with=explicit, without=absent)",
+      "ab-benchmark-gate.md + config reference (with=cited, without=absent)",
+      "internal skill exemption criteria (with=applied, without=missed)"
+    ]
+  },
+
+  "overall": {
+    "mean_with_skill": 1.0,
+    "mean_without_skill": 0.50,
+    "mean_delta": 0.50,
+    "verdict": "WITH_BETTER"
+  }
+}
