@@ -1,7 +1,7 @@
 # OpenSpec Proposal: Aria Plugin v1.7.0 Enhancements
 
 - **Level**: 3 (Full)
-- **Status**: Approved
+- **Status**: Complete
 - **Created**: 2026-03-18
 - **Author**: 10CG Lab
 - **Target Version**: v1.7.0
