@@ -275,7 +275,7 @@ subagent_driver:
 
 ### 报告问题
 
-- **Forgejo Issues**: https://forgejo.10cg.pub/10CG/aria-plugin/issues
+- **GitHub Issues**: https://github.com/10CG/aria-plugin/issues
 - **GitHub Issues**: https://github.com/10CG/aria-plugin/issues
 
 ### 功能建议

@@ -126,4 +126,4 @@ git worktree add .git/worktrees/TASK-XXX
 ---
 
 **维护**: 10CG Lab
-**仓库**: https://forgejo.10cg.pub/10CG/Aria
+**仓库**: https://github.com/10CG/Aria

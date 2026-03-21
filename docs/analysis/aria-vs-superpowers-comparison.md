@@ -420,8 +420,8 @@ Aria 和 Superpowers 代表了两种不同的插件框架设计哲学：
 
 ## 附录：资源链接
 
-- **Aria**: https://forgejo.10cg.pub/10CG/Aria
-- **Aria Plugin**: https://forgejo.10cg.pub/10CG/aria-plugin
+- **Aria**: https://github.com/10CG/Aria
+- **Aria Plugin**: https://github.com/10CG/aria-plugin
 - **Superpowers**: https://github.com/obra/superpowers
 - **Superpowers Skills**: https://github.com/obra/superpowers-skills (archived)
 

@@ -345,7 +345,7 @@ ls aria/hooks/
 
 ### 反馈渠道
 
-- GitHub Issues: `https://forgejo.10cg.pub/10CG/Aria/issues`
+- GitHub Issues: `https://github.com/10CG/Aria/issues`
 - 文档讨论: `standards/openspec/changes/aria-workflow-enhancement/`
 
 ---

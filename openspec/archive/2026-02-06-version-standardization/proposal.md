@@ -100,7 +100,7 @@ PATCH: Bug 修复 / 小改进
 
 > **版本**: 1.3.0
 > **发布日期**: 2026-02-06
-> **仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
+> **仓库**: https://github.com/10CG/aria-plugin
 
 ## 版本号
 
