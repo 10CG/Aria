@@ -27,13 +27,12 @@
 |------|------|------|----------|
 | aria (子模块) | v1.7.2 | https://github.com/10CG/aria-plugin | 2026-03-21 |
 
-### aria v1.6.0 变更摘要
+### aria v1.7.2 变更摘要
 
-- **workflow-runner auto-proceed** - Phase 间自动推进 + 状态持久化 + Gate 强制
-- **state-scanner 置信度评分** - 三维评分模型 + 高置信度自动执行
-- **SessionStart 中断恢复** - 检测未完成工作流并提示恢复
-- **AB 测试验证**: state-scanner delta +0.165, workflow-runner delta +0.33
-- **Skills 总数**: 27
+- **项目配置基础设施** - config-loader + `.aria/config.json` 体系
+- **Agent Team 审计实验** - agent-team-audit (默认关闭)
+- **文档国际化** - GitHub URL 统一，多语言 README 支持
+- **Skills 总数**: 29 (28 面向用户 + 1 内部)
 - **Agents 总数**: 11
 
 ## 对应 Tag
