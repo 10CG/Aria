@@ -126,7 +126,7 @@ Each phase has a dedicated Skill that ensures consistent, repeatable workflows:
 
 ## What You Get
 
-### Skills (28 user-facing + 1 internal)
+### Skills (27 user-facing + 2 internal)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -180,7 +180,7 @@ A standardized format for describing requirements so AI and humans agree on "wha
 | 2 (Minimal) | Medium features | `proposal.md` |
 | 3 (Full) | Architecture changes | `proposal.md` + `tasks.md` |
 
-Aria plugin reads specs from `standards/openspec/changes/` in your project. If you don't add the standards submodule, spec-related features won't work.
+Aria plugin reads specs from `openspec/changes/` in your project root directory (not inside `standards/`). The `standards` submodule provides the methodology definitions that the plugin references.
 
 ---
 
@@ -192,9 +192,9 @@ Aria plugin reads specs from `standards/openspec/changes/` in your project. If y
 your-project/
 ├── .aria/
 │   └── config.json            # Project configuration
+├── openspec/
+│   └── changes/                # Your requirement specs go here
 ├── standards/                  # (Optional) Methodology specs submodule
-│   └── openspec/
-│       └── changes/            # Your requirement specs go here
 ├── docs/                       # (Recommended) Architecture docs
 │   └── architecture/           # Kept in sync with code
 └── [your code...]
@@ -213,7 +213,7 @@ Aria/
 │   ├── openspec/               # Requirement spec format
 │   └── conventions/            # Conventions (git commit, etc.)
 ├── aria/                       # Aria Plugin (submodule, v1.7.2)
-│   ├── skills/                 # 29 Skills (28 user-facing + 1 internal)
+│   ├── skills/                 # 29 Skills (27 user-facing + 2 internal)
 │   ├── agents/                 # 11 Agents
 │   └── .claude-plugin/         # Plugin configuration
 ├── aria-plugin-benchmarks/     # Skill benchmark suite

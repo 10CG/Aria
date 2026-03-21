@@ -132,7 +132,7 @@ D. 收尾 (Closure)
 ```
 需要理解 X? 找这里:
 
-├── 项目定位       → standards/openspec/changes/aria-proposal.md
+├── 项目定位       → standards/methodology/aria-brand-guide.md
 ├── 工作流程       → standards/core/ten-step-cycle/
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
@@ -254,8 +254,9 @@ PATCH: Bug 修复 / 小改进
 aria/
 ├── .claude-plugin/
 │   ├── plugin.json       # 主版本文件 (真理来源 Source of Truth)
-│   ├── marketplace.json   # 市场发布配置
-│   └── hooks.json        # Hooks 配置
+│   └── marketplace.json   # 市场发布配置
+├── hooks/
+│   └── hooks.json        # Hooks 配置 (SessionStart 中断恢复检测)
 ├── VERSION               # 人类可读版本快照
 ├── CHANGELOG.md          # 版本变更记录
 └── README.md             # 包含版本号
@@ -271,7 +272,7 @@ aria/
 
 派生文件 (必须同步):
   - [ ] aria/.claude-plugin/marketplace.json (version, plugins[].version)
-  - [ ] aria/.claude-plugin/hooks.json (version 字段)
+  - [ ] aria/hooks/hooks.json (确保 hooks 配置正确)
   - [ ] aria/VERSION (创建或更新)
   - [ ] aria/CHANGELOG.md (添加新版本条目)
   - [ ] aria/README.md (更新版本号和 Skills 数量)
@@ -295,7 +296,6 @@ Skill 基准测试 (新增或修改 Skill 时):
 |------|------|------|
 | plugin.json | `version` | `"1.3.0"` |
 | marketplace.json | `version`, `plugins[].version` | `"1.3.0"` |
-| hooks.json | `version` | `"1.3.0"` |
 | VERSION | `版本` | `1.3.0` |
 | CHANGELOG.md | `## [X.Y.Z]` | `## [1.3.0]` |
 | README.md | `**Version**: X.Y.Z` | `**Version**: 1.3.0` |
@@ -368,14 +368,14 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中
 成熟度:   0.7 (核心流程已验证)
-插件版本: v1.7.0 (aria-plugin)
+插件版本: v1.7.2 (aria-plugin)
 主项目版本: v1.0.2
 ```
 
 ---
 
-**更新**: 2026-03-19
+**更新**: 2026-03-21
 **维护**: 10CG Lab
-**主仓库**: https://forgejo.10cg.pub/10CG/Aria
-**插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
-**规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards
+**主仓库**: https://github.com/10CG/Aria
+**插件仓库**: https://github.com/10CG/aria-plugin
+**规范仓库**: https://github.com/10CG/aria-standards
