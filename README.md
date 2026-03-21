@@ -3,7 +3,7 @@
 > 让 AI 真正理解你的软件项目
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Forgejo](https://img.shields.io/badge/Forgejo-Aria-blue)](https://forgejo.10cg.pub/10CG/Aria)
+[![GitHub](https://img.shields.io/badge/GitHub-Aria-blue)](https://github.com/10CG/Aria)
 
 ---
 
@@ -35,10 +35,12 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 
 | 特性 | 说明 |
 |------|------|
-| **🎯 状态感知** | AI 自动扫描项目，理解当前进度 |
-| **📋 规范先行** | OpenSpec 标准化需求描述 |
-| **🔄 十步循环** | 结构化的 AI 协作工作流 |
-| **📄 文档同步** | 架构文档与代码共同演进 |
+| **状态感知** | AI 自动扫描项目，理解当前进度 |
+| **规范先行** | OpenSpec 标准化需求描述 |
+| **十步循环** | 结构化的 AI 协作工作流 |
+| **文档同步** | 架构文档与代码共同演进 |
+| **TDD 驱动** | 测试先行，质量可控 |
+| **协作思考** | 结构化头脑风暴，AI 参与决策 |
 
 ---
 
@@ -81,11 +83,11 @@ Aria 是一套 **AI-DDD (AI 辅助领域驱动设计) 方法论**，通过结构
 ### 安装 Standards (可选，用于需求规范)
 
 ```bash
-# 添加到项目根目录
-git submodule add ssh://forgejo@forgejo.10cg.pub/10CG/aria-standards.git standards
+# 使用 HTTPS
+git submodule add https://github.com/10CG/aria-standards.git standards
 
-# 或使用 HTTPS
-git submodule add https://forgejo.10cg.pub/10CG/aria-standards.git standards
+# 或使用 SSH
+git submodule add git@github.com:10CG/aria-standards.git standards
 ```
 
 **说明**：`aria` 插件依赖 `standards/openspec` 目录来存放需求规范。如果不需要规范功能，可以跳过此步骤。
@@ -113,6 +115,9 @@ git submodule add https://forgejo.10cg.pub/10CG/aria-standards.git standards
 # 创建需求规范
 /aria:spec-drafter
 
+# 结构化头脑风暴
+/aria:brainstorm
+
 # 调用专业 Agent
 /aria:tech-lead 请规划这个功能的架构
 ```
@@ -125,15 +130,24 @@ git submodule add https://forgejo.10cg.pub/10CG/aria-standards.git standards
 Aria/                          # Aria 主项目 (方法论研究)
 ├── CLAUDE.md                  # AI 项目上下文
 ├── README.md                  # 本文档
+├── VERSION                    # 版本信息
 ├── standards/                 # 方法论规范 (子模块)
-│   ├── core/                  # 核心定义
+│   ├── core/                  # 核心定义 (十步循环、进度管理)
 │   ├── openspec/              # 需求规范
-│   └── conventions/           # 约定规范
-├── aria/                      # Aria 插件 (子模块)
-│   ├── skills/                # 23 个 Skills
-│   ├── agents/                # 9 个 Agents
-│   └── .claude-plugin/        # Plugin 配置
-└── docs/                      # 研究文档
+│   └── conventions/           # 约定规范 (Git Commit 等)
+├── aria/                      # Aria 插件 (子模块, v1.7.2)
+│   ├── skills/                # 28 个 Skills
+│   ├── agents/                # 11 个 Agents
+│   ├── .claude-plugin/        # Plugin 配置
+│   └── CHANGELOG.md           # 插件变更记录
+├── aria-plugin-benchmarks/    # Skill 基准测试套件
+│   ├── ab-suite/              # AB 测试固定测试集
+│   └── ab-results/            # AB 测试结果存档
+├── docs/                      # 研究文档
+│   ├── architecture/          # 系统架构文档
+│   └── requirements/          # PRD + User Stories
+└── openspec/                  # 项目自身的 OpenSpec 变更
+    └── archive/               # 已完成的变更归档
 ```
 
 **你的项目结构** (使用 Aria 后)：
@@ -166,17 +180,33 @@ your-project/
 
 **依赖关系**：Aria 插件依赖 `standards/openspec` 目录来存放和读取需求规范。如果不添加 `standards` 子模块，规范相关功能将无法正常工作。
 
-### Skills 工作流
+### Skills (28 个)
 
-每个 Phase 对应一个 Skill，确保流程标准化：
+| 类别 | Skills | 说明 |
+|------|--------|------|
+| **十步循环核心** | state-scanner, phase-a-planner, phase-b-developer, phase-c-integrator, phase-d-closer, spec-drafter, task-planner, progress-updater | 结构化工作流 |
+| **协作思考** | brainstorm | 结构化头脑风暴 |
+| **Git 工作流** | commit-msg-generator, strategic-commit-orchestrator, branch-manager, branch-finisher | 提交与分支管理 |
+| **开发工具** | subagent-driver, agent-router, tdd-enforcer, requesting-code-review | TDD、代码审查 |
+| **架构文档** | arch-common, arch-search, arch-update, arch-scaffolder, api-doc-generator | 架构文档同步 |
+| **需求管理** | requirements-validator, requirements-sync, forgejo-sync, openspec-archive | 需求追踪 |
+| **基础设施** | config-loader (内部) | 配置加载 |
 
-- `state-scanner` - 项目状态扫描
-- `spec-drafter` - 需求规范生成
-- `task-planner` - 任务分解
-- `branch-manager` - 分支管理
-- `phase-b-developer` - 开发执行
-- `commit-msg-generator` - 提交消息
-- `progress-updater` - 进度更新
+### Agents (11 个)
+
+| Agent | 职责 |
+|-------|------|
+| tech-lead | 技术决策与架构规划 |
+| context-manager | 跨 Agent 上下文管理 |
+| knowledge-manager | 知识库管理 |
+| code-reviewer | 代码审查 |
+| backend-architect | 后端架构设计 |
+| mobile-developer | 移动端开发 |
+| qa-engineer | 质量保证 |
+| ai-engineer | AI/LLM 应用开发 |
+| api-documenter | API 文档生成 |
+| ui-ux-designer | 界面设计 |
+| legal-advisor | 法律合规文档 |
 
 ---
 
@@ -189,15 +219,17 @@ your-project/
 | 重构 | 架构文档同步的代码演进 |
 | 代码审查 | 规范合规性自动检查 |
 | 知识传递 | 新人快速理解项目 |
+| 技术决策 | 结构化头脑风暴与方案讨论 |
 
 ---
 
 ## 项目状态
 
 ```
-当前版本: 1.0.0
-成熟度:   核心流程已验证
-研究方向: AI 协作模式的可重现性
+主项目版本: 1.0.2
+插件版本:   1.7.2 (aria-plugin)
+成熟度:     核心流程已验证
+研究方向:   AI 协作模式的可重现性
 ```
 
 ---
@@ -221,11 +253,12 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ## 联系方式
 
-- **主仓库**: https://forgejo.10cg.pub/10CG/Aria
-- **插件仓库**: https://forgejo.10cg.pub/10CG/aria-plugin
-- **规范仓库**: https://forgejo.10cg.pub/10CG/aria-standards
+- **主项目**: https://github.com/10CG/Aria
+- **插件仓库**: https://github.com/10CG/aria-plugin
+- **规范仓库**: https://github.com/10CG/aria-standards
+- **联系邮箱**: help@10cg.pub
 - **维护**: 10CG Lab
 
 ---
 
-**让 AI 成为你的软件开发伙伴 🚀**
+**让 AI 成为你的软件开发伙伴**
