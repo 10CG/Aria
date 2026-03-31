@@ -1,0 +1,39 @@
+{
+  "skill_name": "aria-report",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "bug-report-with-error-output",
+      "prompt": "aria 的 state-scanner 在我项目上跑到一半报错了：'Cannot read property phases of undefined'，然后直接退出。我的 .aria/config.json 配置文件是有的，macOS 系统。帮我把这个 bug 报给 Aria 维护团队。",
+      "expected_output": {
+        "issue_type": "bug",
+        "has_environment_section": true,
+        "has_privacy_review": true
+      },
+      "expectations": [
+        "Should classify as Bug Report and use structured template with reproduction steps and expected/actual behavior",
+        "Should collect environment information (plugin version, skills count, OS, config status)",
+        "Should show complete issue content for user confirmation before submission",
+        "Should route to correct repository (Forgejo 10CG/Aria or GitHub 10CG/aria-plugin)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "feature-request-english",
+      "prompt": "I think Aria should support YAML config files in addition to JSON. The .aria/config.json works but YAML would be more readable for complex configurations with inline comments. Please submit this as a feature request to the Aria maintainers.",
+      "expected_output": {
+        "issue_type": "feature",
+        "captures_use_case": true
+      },
+      "expectations": [
+        "Should classify as Feature Request with enhancement label, not bug report",
+        "Should capture the user's use case (YAML readability, comment support) in the issue body",
+        "Should use structured template with use case and proposed solution sections",
+        "Should present composed issue for user privacy review before submission"
+      ]
+    }
+  ]
+}

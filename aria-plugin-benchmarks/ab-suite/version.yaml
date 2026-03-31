@@ -1,10 +1,13 @@
-version: "1.0.0"
+version: "1.1.0"
 created: "2026-03-18"
-last_modified: "2026-03-18"
-skills_covered: 28
-total_eval_cases: 56
+last_modified: "2026-03-27"
+skills_covered: 29
+total_eval_cases: 58
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.1.0"
+    date: "2026-03-27"
+    changes: "Added aria-report skill (2 eval cases), total skills 28→29"
   - version: "1.0.0"
     date: "2026-03-18"
     changes: "Initial eval suite migrated from existing 178 eval cases, selected 56 core cases (2 per skill)"

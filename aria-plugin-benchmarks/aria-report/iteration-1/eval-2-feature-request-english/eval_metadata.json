@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "feature-request-english",
+  "prompt": "I think Aria should support YAML config files in addition to JSON. The .aria/config.json works but YAML would be more readable for complex configurations with inline comments. Please submit this as a feature request to the Aria maintainers.",
+  "assertions": [
+    "Should classify as Feature Request with enhancement label, not bug report",
+    "Should capture the user's use case (YAML readability, comment support) in the issue body",
+    "Should use structured template with use case and proposed solution sections",
+    "Should present composed issue for user privacy review before submission"
+  ]
+}

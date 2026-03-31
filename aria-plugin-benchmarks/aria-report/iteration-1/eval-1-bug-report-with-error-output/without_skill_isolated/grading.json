@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "bug-report-with-error-output",
+  "config": "without_skill_isolated",
+  "expectations": [
+    {
+      "text": "Should classify as Bug Report and use structured template with reproduction steps and expected/actual behavior",
+      "passed": true,
+      "evidence": "Correctly classified as Bug Report with 'bug' label. Structured template with 'Steps to Reproduce', 'Expected Behavior', 'Actual Behavior', 'Environment' sections."
+    },
+    {
+      "text": "Should collect environment information (plugin version, skills count, OS, config status)",
+      "passed": false,
+      "evidence": "Includes plugin version (v1.8.0), OS (macOS), config status (yes) — but MISSING skills count entirely. Also has '(fill in)' placeholders for Claude Code version and project type, meaning not fully auto-collected. The skill auto-collects all 4 fields; vanilla Claude gets 3/4 with manual gaps."
+    },
+    {
+      "text": "Should show complete issue content for user confirmation before submission",
+      "passed": false,
+      "evidence": "NO privacy review. Output presents content then jumps to 'How to Submit' with 3 submission options (GitHub/Forgejo/aria-report). Never shows content for user confirmation or asks for approval. Includes a 'Before Submitting -- Checklist' but this is about data completeness, not content privacy review."
+    },
+    {
+      "text": "Should route to correct repository (Forgejo 10CG/Aria or GitHub 10CG/aria-plugin)",
+      "passed": true,
+      "evidence": "Mentions both GitHub (10CG/aria-plugin) and Forgejo (10CG/Aria) with correct URLs. Also mentions the aria-report skill as Option C."
+    }
+  ],
+  "pass_rate": 0.5,
+  "notes": "CLEAN BASELINE (no contamination). Strong content quality with excellent root cause analysis and helpful pre-submit checklist. But critically missing: (1) complete auto-collected environment info (no skills count), (2) mandatory privacy review before submission. These are the skill's core unique value points."
+}

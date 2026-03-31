@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "feature-request-english",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "Should classify as Feature Request with enhancement label, not bug report",
+      "passed": true,
+      "evidence": "Step 1 classifies as 'Feature Request' with label 'enhancement'. Clear rationale: user explicitly said 'feature request'."
+    },
+    {
+      "text": "Should capture the user's use case (YAML readability, comment support) in the issue body",
+      "passed": true,
+      "evidence": "Step 4 '使用场景' section details YAML benefits: inline comments, human-friendly syntax, documentation of config choices, complex nested structures."
+    },
+    {
+      "text": "Should use structured template with use case and proposed solution sections",
+      "passed": true,
+      "evidence": "Issue body has '描述', '使用场景', '建议方案' sections matching the Feature Request template from SKILL.md. Includes environment info footer."
+    },
+    {
+      "text": "Should present composed issue for user privacy review before submission",
+      "passed": true,
+      "evidence": "Step 5 '隐私审查（必须）' shows full issue content with target repo, title, body, label, and 3-option confirmation prompt."
+    }
+  ],
+  "pass_rate": 1.0,
+  "notes": "Clean 7-step execution. Good expansion of user's brief request into detailed use case with specific examples. Proper 'enhancement' label."
+}

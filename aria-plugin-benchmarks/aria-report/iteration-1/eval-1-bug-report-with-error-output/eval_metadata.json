@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "bug-report-with-error-output",
+  "prompt": "aria 的 state-scanner 在我项目上跑到一半报错了：'Cannot read property phases of undefined'，然后直接退出。我的 .aria/config.json 配置文件是有的，macOS 系统。帮我把这个 bug 报给 Aria 维护团队。",
+  "assertions": [
+    "Should classify as Bug Report and use structured template with reproduction steps and expected/actual behavior",
+    "Should collect environment information (plugin version, skills count, OS, config status)",
+    "Should show complete issue content for user confirmation before submission",
+    "Should route to correct repository (Forgejo 10CG/Aria or GitHub 10CG/aria-plugin)"
+  ]
+}

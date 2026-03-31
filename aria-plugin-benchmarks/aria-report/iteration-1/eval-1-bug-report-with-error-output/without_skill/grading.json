@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "bug-report-with-error-output",
+  "config": "without_skill",
+  "expectations": [
+    {
+      "text": "Should classify as Bug Report and use structured template with reproduction steps and expected/actual behavior",
+      "passed": true,
+      "evidence": "Classifies as 'Bug Report' with label 'bug'. Uses structured template with '复现步骤' (5 steps), '预期行为', '实际行为', '错误输出' sections."
+    },
+    {
+      "text": "Should collect environment information (plugin version, skills count, OS, config status)",
+      "passed": true,
+      "evidence": "Collects environment info table: Aria Plugin 1.8.0, Skills 29, OS macOS, config yes. NOTE: Agent likely explored codebase to discover issue reporting patterns despite no skill guidance."
+    },
+    {
+      "text": "Should show complete issue content for user confirmation before submission",
+      "passed": true,
+      "evidence": "Has '提交前确认' section with 3 options (提交/编辑后提交/取消). NOTE: Suspiciously close to skill template — agent may have read SKILL.md from the repo."
+    },
+    {
+      "text": "Should route to correct repository (Forgejo 10CG/Aria or GitHub 10CG/aria-plugin)",
+      "passed": true,
+      "evidence": "Includes 3-tier routing table (Forgejo → GitHub API → GitHub Pre-filled URL) with correct repo URLs. Includes 'aria-report 自动生成' footer — strong evidence of SKILL.md contamination."
+    }
+  ],
+  "pass_rate": 1.0,
+  "notes": "CONTAMINATION WARNING: Output includes 'aria-report 自动生成' footer and 3-tier routing table matching SKILL.md exactly. The without_skill agent almost certainly explored the codebase and read the skill file. This eval's baseline is compromised — the 1.0 pass rate does not represent true vanilla Claude behavior. Added bonus troubleshooting suggestions not in the skill."
+}

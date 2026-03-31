@@ -1,0 +1,121 @@
+{
+  "skill_name": "aria-report",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-03-27T21:55:00Z",
+  "eval_suite_version": "1.1.0",
+
+  "summary": {
+    "total_evals": 2,
+    "with_skill": {
+      "passed": 2,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_duration_ms": 89967,
+      "avg_tokens": 25725
+    },
+    "without_skill": {
+      "passed": 0,
+      "failed": 2,
+      "pass_rate": 0.625,
+      "avg_duration_ms": 67578,
+      "avg_tokens": 24431
+    },
+    "delta": {
+      "pass_rate": 0.375,
+      "verdict": "WITH_BETTER"
+    }
+  },
+
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "bug-report-with-error-output",
+      "with_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "duration_ms": 90768,
+        "tokens": 25942
+      },
+      "without_skill_contaminated": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "duration_ms": 122930,
+        "tokens": 68973,
+        "note": "DISCARDED — agent read SKILL.md from codebase. See without_skill/ directory for raw data."
+      },
+      "without_skill_isolated": {
+        "verdict": "fail",
+        "pass_rate": 0.5,
+        "expectations_passed": 2,
+        "expectations_total": 4,
+        "duration_ms": 61893,
+        "tokens": 24404,
+        "failures": [
+          "Missing skills count in environment collection (3/4 fields, no auto-collection)",
+          "No privacy review — jumps from content to submission options without user confirmation"
+        ]
+      },
+      "delta": {
+        "pass_rate_improvement": 0.5,
+        "baseline": "without_skill_isolated (clean)"
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "feature-request-english",
+      "with_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "duration_ms": 89165,
+        "tokens": 25508
+      },
+      "without_skill": {
+        "verdict": "fail",
+        "pass_rate": 0.75,
+        "expectations_passed": 3,
+        "expectations_total": 4,
+        "duration_ms": 73262,
+        "tokens": 24457,
+        "failures": [
+          "No privacy review — presents content then jumps to submission instructions without user confirmation"
+        ]
+      },
+      "delta": {
+        "pass_rate_improvement": 0.25
+      }
+    }
+  ],
+
+  "analysis": {
+    "contamination_resolved": "Eval 1 re-run with explicit isolation (forbidden from reading aria/skills/aria-report/). Clean baseline confirms the original contamination — delta jumps from 0.0 to +0.5.",
+    "unique_value": "Two consistent differentiators across both evals: (1) MANDATORY privacy review before submission — vanilla Claude never does this; (2) Complete auto-collected environment info including skills count — vanilla Claude misses fields or leaves placeholders.",
+    "token_efficiency": "with_skill uses comparable tokens (25K avg) to isolated without_skill (24K avg) but achieves 100% pass rate vs 62.5%. The contaminated run used 69K tokens (exploring codebase), confirming structured guidance prevents wasteful exploration.",
+    "content_quality": "Vanilla Claude produces excellent content quality (detailed root cause analysis, alternatives considered). The skill's value is NOT content quality but process guarantees: privacy review, complete environment collection, and consistent submission routing."
+  },
+
+  "strengths": [
+    "Consistent 7-step structured execution across both evals (pass_rate: 1.0)",
+    "Mandatory privacy review prevents unreviewed public submissions (0% without_skill compliance)",
+    "Complete auto-collected environment info (4/4 fields vs 3/4 or fewer without skill)",
+    "Correct routing logic with actual command generation",
+    "Token-efficient: structured plan avoids codebase exploration overhead"
+  ],
+
+  "weaknesses": [
+    "Only 2 eval cases — limited statistical confidence",
+    "Content quality is comparable (vanilla Claude writes excellent issue content)",
+    "Initial without_skill baseline was contaminated, requiring re-run"
+  ],
+
+  "recommendations": [
+    "Consider adding eval cases for no-token routing scenario and question type",
+    "For future AB tests in this repo, use worktree isolation to prevent codebase contamination"
+  ]
+}

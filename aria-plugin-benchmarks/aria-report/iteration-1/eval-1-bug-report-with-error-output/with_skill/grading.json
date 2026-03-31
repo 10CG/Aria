@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "bug-report-with-error-output",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "Should classify as Bug Report and use structured template with reproduction steps and expected/actual behavior",
+      "passed": true,
+      "evidence": "Step 1 classifies as 'Bug Report' with label 'bug'. Step 4 uses structured template with '复现步骤', '预期行为', '实际行为', '错误输出' sections."
+    },
+    {
+      "text": "Should collect environment information (plugin version, skills count, OS, config status)",
+      "passed": true,
+      "evidence": "Step 2 collects PLUGIN_VERSION=1.8.0, SKILLS_COUNT=30, OS_INFO=Linux x86_64, HAS_CONFIG=no. Also notes user-reported macOS environment and reconciles discrepancy."
+    },
+    {
+      "text": "Should show complete issue content for user confirmation before submission",
+      "passed": true,
+      "evidence": "Step 5 '隐私审查（必须）' displays full issue title+body+label+target and presents 3 options: 提交/编辑后提交/取消."
+    },
+    {
+      "text": "Should route to correct repository (Forgejo 10CG/Aria or GitHub 10CG/aria-plugin)",
+      "passed": true,
+      "evidence": "Step 6 detects forgejo CLI + FORGEJO_TOKEN, routes to Forgejo Priority 1 at https://forgejo.10cg.pub/10CG/Aria. Shows exact forgejo POST command."
+    }
+  ],
+  "pass_rate": 1.0,
+  "notes": "Clean 7-step execution following skill template exactly. Good handling of environment discrepancy (execution env vs user-reported env)."
+}

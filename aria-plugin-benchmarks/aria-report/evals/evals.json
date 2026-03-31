@@ -1,0 +1,170 @@
+{
+  "skill_name": "aria-report",
+  "skill_path": "aria/skills/aria-report",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for aria-report skill - structured Issue reporting with environment collection, privacy review, and multi-route submission",
+  "metrics": [
+    "issue_classification_accuracy",
+    "environment_collection_completeness",
+    "template_structure_quality",
+    "privacy_review_enforcement",
+    "routing_logic_correctness"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "bug-report-with-error-output",
+      "category": "issue-classification",
+      "prompt": "aria 的 state-scanner 在我项目上跑到一半报错了：'Cannot read property phases of undefined'，然后直接退出。我的 .aria/config.json 配置文件是有的，macOS 系统。帮我把这个 bug 报给 Aria 维护团队。",
+      "setup": {
+        "issue_type": "bug",
+        "has_error_output": true,
+        "has_config": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "classifies_as_bug",
+          "description": "Should correctly classify this as a Bug Report, not a feature request or question",
+          "check": "output.includes('Bug') || output.includes('bug') || output.includes('缺陷') || output.includes('报告')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "collects_environment_info",
+          "description": "Should attempt to collect environment information (plugin version, OS, config status) before composing the issue",
+          "check": "output.includes('版本') || output.includes('version') || output.includes('Plugin') || output.includes('环境')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "uses_structured_template",
+          "description": "Should use a structured Bug Report template with sections (description, reproduction steps, expected/actual behavior)",
+          "check": "output.includes('复现') || output.includes('步骤') || output.includes('预期') || output.includes('实际') || output.includes('reproduction') || output.includes('expected')",
+          "severity": "critical"
+        },
+        {
+          "id": "A4",
+          "name": "includes_privacy_review",
+          "description": "Should show the full issue content to user for confirmation before attempting submission",
+          "check": "output.includes('确认') || output.includes('confirm') || output.includes('审查') || output.includes('review') || output.includes('提交前')",
+          "severity": "high"
+        },
+        {
+          "id": "A5",
+          "name": "targets_correct_repo",
+          "description": "Should mention the target repository (10CG/Aria or 10CG/aria-plugin) for issue submission",
+          "check": "output.includes('10CG') || output.includes('aria-plugin') || output.includes('Aria') || output.includes('GitHub') || output.includes('Forgejo')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "feature-request-english",
+      "category": "issue-classification",
+      "prompt": "I think Aria should support YAML config files in addition to JSON. The .aria/config.json works but YAML would be more readable for complex configurations with inline comments. Please submit this as a feature request to the Aria maintainers.",
+      "setup": {
+        "issue_type": "feature",
+        "language": "english"
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "classifies_as_feature",
+          "description": "Should correctly classify this as a Feature Request, not a bug report",
+          "check": "output.includes('Feature') || output.includes('feature') || output.includes('enhancement') || output.includes('功能建议')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "captures_use_case",
+          "description": "Should include the user's use case (YAML readability, comment support) in the issue body",
+          "check": "output.includes('YAML') && (output.includes('readable') || output.includes('comment') || output.includes('可读'))",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "structured_feature_template",
+          "description": "Should use a structured template with use case and proposed solution sections",
+          "check": "output.includes('使用场景') || output.includes('Use Case') || output.includes('use case') || output.includes('建议方案') || output.includes('Proposed') || output.includes('Solution')",
+          "severity": "high"
+        },
+        {
+          "id": "A4",
+          "name": "includes_privacy_review",
+          "description": "Should present the composed issue content to user for review before submission",
+          "check": "output.includes('confirm') || output.includes('review') || output.includes('确认') || output.includes('submit')",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "question-with-prior-research",
+      "category": "issue-classification",
+      "prompt": "tdd-enforcer 的三个 strictness 级别（advisory/strict/superpowers）我看了文档还是搞不太清楚区别在哪。能帮我提个 question 给 Aria 团队问问吗？",
+      "setup": {
+        "issue_type": "question",
+        "user_has_tried_docs": true
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "classifies_as_question",
+          "description": "Should correctly classify this as a Question, not a bug or feature",
+          "check": "output.includes('Question') || output.includes('question') || output.includes('提问') || output.includes('问题')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "preserves_user_context",
+          "description": "Should mention in the issue that the user already tried reading the docs",
+          "check": "output.includes('文档') || output.includes('doc') || output.includes('看了') || output.includes('read') || output.includes('tried')",
+          "severity": "high"
+        },
+        {
+          "id": "A3",
+          "name": "includes_specific_subject",
+          "description": "Should reference the specific topic (tdd-enforcer strictness levels) in the issue title or body",
+          "check": "output.includes('tdd-enforcer') || output.includes('strictness') || output.includes('advisory') || output.includes('strict')",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "routing-logic-no-token",
+      "category": "submission-routing",
+      "prompt": "我发现 workflow-runner 在 auto-proceed 模式下跳过了 Gate 1 的审批步骤，这应该是个 bug。帮我提交 issue。我没有配置 GITHUB_TOKEN。",
+      "setup": {
+        "issue_type": "bug",
+        "has_github_token": false,
+        "has_forgejo": false
+      },
+      "assertions": [
+        {
+          "id": "A1",
+          "name": "detects_no_token_fallback",
+          "description": "Should detect the absence of tokens and fall back to GitHub Pre-filled URL method",
+          "check": "output.includes('URL') || output.includes('url') || output.includes('浏览器') || output.includes('browser') || output.includes('链接') || output.includes('link')",
+          "severity": "critical"
+        },
+        {
+          "id": "A2",
+          "name": "provides_github_url",
+          "description": "Should provide a GitHub issues URL for manual submission",
+          "check": "output.includes('github.com') || output.includes('GitHub') || output.includes('issues/new')",
+          "severity": "critical"
+        },
+        {
+          "id": "A3",
+          "name": "suggests_token_setup",
+          "description": "Should suggest configuring GITHUB_TOKEN for future direct submissions",
+          "check": "output.includes('GITHUB_TOKEN') || output.includes('GH_TOKEN') || output.includes('token')",
+          "severity": "medium"
+        }
+      ]
+    }
+  ]
+}

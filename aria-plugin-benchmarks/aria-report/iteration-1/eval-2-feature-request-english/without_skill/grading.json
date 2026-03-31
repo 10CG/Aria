@@ -1,0 +1,29 @@
+{
+  "eval_id": 2,
+  "eval_name": "feature-request-english",
+  "config": "without_skill",
+  "expectations": [
+    {
+      "text": "Should classify as Feature Request with enhancement label, not bug report",
+      "passed": true,
+      "evidence": "Correctly identified as Feature Request with 'enhancement' label."
+    },
+    {
+      "text": "Should capture the user's use case (YAML readability, comment support) in the issue body",
+      "passed": true,
+      "evidence": "Extensive coverage: no inline comments in JSON, readability of nested structures, alignment with YAML conventions in CI/CD tooling. Even includes concrete config.template.yaml example."
+    },
+    {
+      "text": "Should use structured template with use case and proposed solution sections",
+      "passed": true,
+      "evidence": "Uses GitHub's standard feature request template: 'Is your feature request related to a problem?', 'Describe the solution you'd like', 'Describe alternatives you've considered'. Well-structured with affected components table."
+    },
+    {
+      "text": "Should present composed issue for user privacy review before submission",
+      "passed": false,
+      "evidence": "NO privacy review. Output ends with 'How to Submit' section providing gh issue create command and manual URL — but never shows content for user confirmation or asks for approval before submission."
+    }
+  ],
+  "pass_rate": 0.75,
+  "notes": "Very thorough feature request with excellent detail (alternatives, affected components, effort estimate). However, critically missing the mandatory privacy review step — would submit content without user confirmation. The without_skill output shows strong general capability but misses the skill's safety guarantee."
+}
