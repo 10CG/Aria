@@ -25,14 +25,13 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.7.2 | https://github.com/10CG/aria-plugin | 2026-03-21 |
+| aria (子模块) | v1.8.0 | https://github.com/10CG/aria-plugin | 2026-03-27 |
 
-### aria v1.7.2 变更摘要
+### aria v1.8.0 变更摘要
 
-- **项目配置基础设施** - config-loader + `.aria/config.json` 体系
-- **Agent Team 审计实验** - agent-team-audit (默认关闭)
-- **文档国际化** - GitHub URL 统一，多语言 README 支持
-- **Skills 总数**: 29 (28 面向用户 + 1 内部)
+- **新增 aria-report Skill** - Issue 报告与反馈 (Bug/Feature/Question)
+- AB benchmark: delta +0.375 (WITH_BETTER)
+- **Skills 总数**: 30 (28 面向用户 + 2 内部)
 - **Agents 总数**: 11
 
 ## 对应 Tag
