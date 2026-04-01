@@ -556,6 +556,7 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 | CLAUDE.md 操作指南 | AI 助手的操作参考 |
 | CLAUDE.md 版本发布检查清单 | 发版门卡 (benchmark 项必须勾选) |
 | OVERALL_BENCHMARK_SUMMARY.md | 综合报告 (人类可读, 含历史数据) |
+| CROSS_PROJECT_BENCHMARKING.md | 跨项目 benchmark 指南 (外部项目适配) |
 
 ---
 
