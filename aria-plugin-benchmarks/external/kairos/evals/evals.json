@@ -1,0 +1,68 @@
+{
+  "project": "kairos",
+  "project_context": {
+    "tech_stack": "TypeScript / Node.js / Vitest",
+    "description": "AI-driven private domain sales automation — WeChat/WeCom messaging, LLM gateway, agent pipeline with A/B evolution",
+    "conventions": "Conventional Commits (Chinese descriptions), develop branch, Forgejo PRs"
+  },
+  "skills": [
+    {
+      "skill_name": "commit-msg-generator",
+      "evals": [
+        {
+          "id": 1,
+          "name": "kairos-llm-provider-bugfix",
+          "prompt": "修复了 Kimi Provider 的 stream 问题。在 src/core/llm/providers/kimi.ts 中给 chat() 方法添加了 stream: false 参数，因为 Kimi API 在 stream 模式下会返回不完整的 JSON。同时在 src/core/llm/providers/doubao.ts 做了同样的修改。还修复了 src/core/llm/config.ts 中 4 个 Provider 的默认 priority 冲突问题（GLM=1, Qwen=2, Kimi=3, Doubao=4）。为这些暂存变更生成 commit message。",
+          "expectations": [
+            "Commit type must be 'fix' — this is a bug fix, not a feature",
+            "Scope should reference 'llm' or 'provider' — not generic 'core'",
+            "Subject should describe the actual fix (stream/priority), not just 'fix bugs'",
+            "Body should mention both the stream fix and priority conflict as separate concerns"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "kairos-console-feat",
+          "prompt": "新增了 Console Provider 健康监控页面。src/api/routes/provider-health.ts 新增了 /api/providers/health 端点，返回所有 Provider 的延迟、错误率、可用状态。console/ 目录下新增了 ProviderHealthDashboard 组件，展示实时状态表格和 30 分钟延迟趋势图。同时在 src/core/llm/gateway.ts 中增加了 getProviderStats() 方法用于收集统计数据。请生成 commit message。",
+          "expectations": [
+            "Commit type must be 'feat' — new monitoring feature",
+            "Scope should reference 'console' or 'provider' — the main user-facing change",
+            "Subject should mention health monitoring or dashboard, not list individual files"
+          ]
+        }
+      ]
+    },
+    {
+      "skill_name": "state-scanner",
+      "evals": [
+        {
+          "id": 1,
+          "name": "kairos-mid-feature-state",
+          "prompt": "我在 Kairos 项目中，当前在 feat/multi-provider-failover 分支上。有 5 个文件已修改未暂存（src/core/llm/providers/kimi.ts, doubao.ts, config.ts, 和 2 个测试文件）。openspec/changes/multi-provider-failover/proposal.md 状态是 Proposed。帮我扫描项目状态并推荐下一步。",
+          "expectations": [
+            "Should detect the feature branch and recommend a development workflow",
+            "Should identify the OpenSpec and its Proposed status",
+            "Should recommend reviewing/approving the spec before continuing development, or proceeding with implementation",
+            "Should present numbered options for user selection, not auto-execute"
+          ]
+        }
+      ]
+    },
+    {
+      "skill_name": "spec-drafter",
+      "evals": [
+        {
+          "id": 1,
+          "name": "kairos-new-feature-spec",
+          "prompt": "Kairos 需要一个新功能：用户偏好提取。当 Agent 与客户对话时，自动从聊天记录中提取用户的产品偏好（价格范围、品类偏好、购买意向等），存入 CRM 的用户画像。这会涉及 src/pipeline/（Agent Pipeline）和 src/core/（CRM 模块）。帮我创建一个 OpenSpec proposal。",
+          "expectations": [
+            "Should create a structured proposal.md with Level assessment (likely Level 2 or 3)",
+            "Should include motivation, change scope, and impact analysis",
+            "Should reference Kairos-specific modules (pipeline, CRM) not generic components",
+            "Should include tasks breakdown and success criteria"
+          ]
+        }
+      ]
+    }
+  ]
+}

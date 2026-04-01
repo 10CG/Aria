@@ -1,0 +1,96 @@
+{
+  "skill_name": "commit-msg-generator",
+  "project": "kairos",
+  "project_context": "TypeScript/Node.js AI sales automation",
+  "iteration": 1,
+  "timestamp": "2026-04-01T22:30:00Z",
+
+  "summary": {
+    "total_evals": 2,
+    "with_skill": {
+      "passed": 2,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_duration_ms": 36340,
+      "avg_tokens": 23366
+    },
+    "without_skill": {
+      "passed": 2,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_duration_ms": 31643,
+      "avg_tokens": 19187
+    },
+    "delta": {
+      "pass_rate": 0.0,
+      "verdict": "EQUAL"
+    }
+  },
+
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "kairos-llm-provider-bugfix",
+      "with_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "duration_ms": 32433,
+        "tokens": 23457
+      },
+      "without_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "duration_ms": 30087,
+        "tokens": 19175
+      },
+      "delta": {
+        "pass_rate_improvement": 0.0
+      },
+      "qualitative_notes": "Both produce near-identical commit messages. with_skill adds structured Analysis section with decision rationale; without_skill is more concise."
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "kairos-console-feat",
+      "with_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 3,
+        "expectations_total": 3,
+        "duration_ms": 40247,
+        "tokens": 23274
+      },
+      "without_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 3,
+        "expectations_total": 3,
+        "duration_ms": 33199,
+        "tokens": 19199
+      },
+      "delta": {
+        "pass_rate_improvement": 0.0
+      },
+      "qualitative_notes": "with_skill uses functional domain scope (provider-health) and Chinese body matching Kairos conventions. without_skill uses layer scope (console) and English body. Both valid, with_skill shows better convention awareness."
+    }
+  ],
+
+  "analysis": {
+    "cross_project_finding": "commit-msg-generator shows EQUAL verdict on Kairos — vanilla Claude already produces good Conventional Commits for clear, well-described changes. The Skill's internal Aria delta (+0.80) was measured on more nuanced scenarios (scope detection, mode selection). For straightforward external projects, the Skill adds convention awareness but not pass-rate improvement.",
+    "qualitative_advantages": [
+      "with_skill produces Analysis section explaining decisions (useful for team review)",
+      "with_skill chose more precise functional domain scopes (provider-health vs console)",
+      "with_skill matched Kairos's Chinese description convention in eval 2",
+      "with_skill uses ~22% more tokens but provides richer context"
+    ],
+    "recommendation": "commit-msg-generator has qualitative value (decision rationale, convention matching) but not quantitative delta on simple Kairos scenarios. Test with more complex/ambiguous scenarios for stronger differentiation.",
+    "comparison_to_internal": {
+      "aria_internal_delta": 0.80,
+      "kairos_cross_project_delta": 0.0,
+      "explanation": "Aria internal evals test edge cases (scope ambiguity, multi-module commits). Kairos evals use clear descriptions where vanilla Claude performs equally well."
+    }
+  }
+}
