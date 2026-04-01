@@ -15,6 +15,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.5] - 2026-04-01
+
+### Changed
+- **aria 子模块** — 更新至 v1.8.0
+  - 新增 aria-report Skill (Issue 报告与反馈)
+  - AB benchmark: delta +0.375 (WITH_BETTER)
+  - Skills 数量: 28 面向用户 + 2 内部 = 30
+- **架构文档** — system-architecture.md v1.5.1→v1.5.2, Skills 29→30
+- **版本文件** — VERSION 内部版本号不一致修复 (1.0.2→1.0.5)
+- **OpenSpec 归档** — aria-report-skill, readme-i18n-upgrade
+
+---
+
 ## [1.0.4] - 2026-03-21
 
 ### Added
