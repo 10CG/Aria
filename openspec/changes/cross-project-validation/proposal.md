@@ -36,7 +36,7 @@ Aria 方法论目前仅在自身项目中验证，缺乏外部项目的适用性
 - [ ] 编写 aria-plugin 快速上手指南 (从安装到首次十步循环)
 - [ ] 编写 standards 子模块独立复用文档
 - [ ] 适配 benchmark runner 支持外部项目评估
-- [ ] 选择并执行试点项目 (需与 Aria 不同技术栈/领域)
+- [ ] 选择并执行试点项目 → **Kairos** (TypeScript/Node.js, AI 销售自动化, 已部分采用 OpenSpec/UPM)
 - [ ] 编写适配过程记录 (Adaptation Log)，汇总所有调整、问题及解决方案
 - [ ] 通过 Issue Template 提交试点适用性报告
 
