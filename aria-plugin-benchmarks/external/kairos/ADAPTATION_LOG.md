@@ -40,6 +40,8 @@ This log records all adaptations, issues, and observations during the Aria pilot
 | Skill | Delta | Verdict | Notes |
 |-------|-------|---------|-------|
 | commit-msg-generator | 0.0 | EQUAL | Qualitative advantages (scope precision, convention matching) but no pass-rate difference |
+| state-scanner | +0.25 | WITH_BETTER | Interactive numbered workflow selection + confidence scoring; without_skill gives advice but no interactive format |
+| spec-drafter | 0.0 | EQUAL | Both produce comprehensive Level 3 specs; with_skill correctly separates proposal.md + tasks.md |
 
 ---
 
@@ -51,13 +53,25 @@ This log records all adaptations, issues, and observations during the Aria pilot
 - .aria/config.json setup was zero-friction
 - Kairos's existing OpenSpec + UPM structure is fully compatible
 - Benchmark framework works seamlessly with external project context
+- state-scanner's interactive workflow selection is genuinely useful cross-project
+- spec-drafter correctly identifies Level 3 and generates separate tasks.md
 
 ### What Didn't Work
 - commit-msg-generator didn't show quantitative improvement on simple scenarios
+- spec-drafter content quality is matched by vanilla Claude (both excellent)
 
 ### Adaptations Required
-- None so far — Aria tooling is compatible with Kairos out of the box
+- None — Aria tooling is compatible with Kairos out of the box
+
+### Key Insight
+**Process-oriented Skills transfer better than Content-oriented Skills.**
+- state-scanner (+0.25): unique interactive workflow selection
+- aria-report (+0.375 on Aria): mandatory privacy review
+- commit-msg-generator (0.0): vanilla Claude already writes good commits
+- spec-drafter (0.0): vanilla Claude already writes good specs
 
 ### Metrics
-- commit-msg-generator: delta 0.0 (EQUAL) — qualitative improvement only
-- (more Skills to be tested)
+- commit-msg-generator: delta 0.0 (EQUAL)
+- state-scanner: delta +0.25 (WITH_BETTER)
+- spec-drafter: delta 0.0 (EQUAL)
+- Overall: delta +0.0625 (MIXED)

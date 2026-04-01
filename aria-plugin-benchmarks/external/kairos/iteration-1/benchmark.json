@@ -1,29 +1,52 @@
 {
-  "skill_name": "commit-msg-generator",
   "project": "kairos",
   "project_context": "TypeScript/Node.js AI sales automation",
   "iteration": 1,
-  "timestamp": "2026-04-01T22:30:00Z",
+  "timestamp": "2026-04-01T23:00:00Z",
 
   "summary": {
-    "total_evals": 2,
+    "total_evals": 4,
+    "total_skills": 3,
     "with_skill": {
-      "passed": 2,
+      "passed": 4,
       "failed": 0,
-      "pass_rate": 1.0,
-      "avg_duration_ms": 36340,
-      "avg_tokens": 23366
+      "pass_rate": 1.0
     },
     "without_skill": {
-      "passed": 2,
-      "failed": 0,
-      "pass_rate": 1.0,
-      "avg_duration_ms": 31643,
-      "avg_tokens": 19187
+      "passed": 3,
+      "failed": 1,
+      "pass_rate": 0.9375
     },
     "delta": {
-      "pass_rate": 0.0,
-      "verdict": "EQUAL"
+      "pass_rate": 0.0625,
+      "verdict": "MIXED"
+    }
+  },
+
+  "by_skill": {
+    "commit-msg-generator": {
+      "evals": 2,
+      "with_skill_pass_rate": 1.0,
+      "without_skill_pass_rate": 1.0,
+      "delta": 0.0,
+      "verdict": "EQUAL",
+      "notes": "Both produce correct Conventional Commits for clear descriptions. with_skill adds decision rationale and better convention matching."
+    },
+    "state-scanner": {
+      "evals": 1,
+      "with_skill_pass_rate": 1.0,
+      "without_skill_pass_rate": 0.75,
+      "delta": 0.25,
+      "verdict": "WITH_BETTER",
+      "notes": "Key differentiator: with_skill produces interactive numbered workflow selection [1]-[4] with confidence scoring. without_skill gives prioritized advice (P0/P1/P2) but no interactive selection format."
+    },
+    "spec-drafter": {
+      "evals": 1,
+      "with_skill_pass_rate": 1.0,
+      "without_skill_pass_rate": 1.0,
+      "delta": 0.0,
+      "verdict": "EQUAL",
+      "notes": "Both produce comprehensive Level 3 specs. with_skill generates separate proposal.md + tasks.md (correct Level 3 convention) with level judgment visualization. without_skill produces single combined doc with excellent content (scope boundary, detailed risks)."
     }
   },
 
@@ -31,66 +54,49 @@
     {
       "eval_id": 1,
       "eval_name": "kairos-llm-provider-bugfix",
-      "with_skill": {
-        "verdict": "pass",
-        "pass_rate": 1.0,
-        "expectations_passed": 4,
-        "expectations_total": 4,
-        "duration_ms": 32433,
-        "tokens": 23457
-      },
-      "without_skill": {
-        "verdict": "pass",
-        "pass_rate": 1.0,
-        "expectations_passed": 4,
-        "expectations_total": 4,
-        "duration_ms": 30087,
-        "tokens": 19175
-      },
-      "delta": {
-        "pass_rate_improvement": 0.0
-      },
-      "qualitative_notes": "Both produce near-identical commit messages. with_skill adds structured Analysis section with decision rationale; without_skill is more concise."
+      "skill": "commit-msg-generator",
+      "with_skill": { "pass_rate": 1.0, "expectations_passed": 4, "expectations_total": 4, "tokens": 23457, "duration_ms": 32433 },
+      "without_skill": { "pass_rate": 1.0, "expectations_passed": 4, "expectations_total": 4, "tokens": 19175, "duration_ms": 30087 },
+      "delta": 0.0
     },
     {
       "eval_id": 2,
       "eval_name": "kairos-console-feat",
-      "with_skill": {
-        "verdict": "pass",
-        "pass_rate": 1.0,
-        "expectations_passed": 3,
-        "expectations_total": 3,
-        "duration_ms": 40247,
-        "tokens": 23274
-      },
-      "without_skill": {
-        "verdict": "pass",
-        "pass_rate": 1.0,
-        "expectations_passed": 3,
-        "expectations_total": 3,
-        "duration_ms": 33199,
-        "tokens": 19199
-      },
-      "delta": {
-        "pass_rate_improvement": 0.0
-      },
-      "qualitative_notes": "with_skill uses functional domain scope (provider-health) and Chinese body matching Kairos conventions. without_skill uses layer scope (console) and English body. Both valid, with_skill shows better convention awareness."
+      "skill": "commit-msg-generator",
+      "with_skill": { "pass_rate": 1.0, "expectations_passed": 3, "expectations_total": 3, "tokens": 23274, "duration_ms": 40247 },
+      "without_skill": { "pass_rate": 1.0, "expectations_passed": 3, "expectations_total": 3, "tokens": 19199, "duration_ms": 33199 },
+      "delta": 0.0
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "kairos-mid-feature-state",
+      "skill": "state-scanner",
+      "with_skill": { "pass_rate": 1.0, "expectations_passed": 4, "expectations_total": 4, "tokens": 44858, "duration_ms": 84043 },
+      "without_skill": { "pass_rate": 0.75, "expectations_passed": 3, "expectations_total": 4, "tokens": 21225, "duration_ms": 65259 },
+      "delta": 0.25,
+      "failure_detail": "without_skill did not present interactive numbered options for workflow selection — gave prioritized advice instead"
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "kairos-new-feature-spec",
+      "skill": "spec-drafter",
+      "with_skill": { "pass_rate": 1.0, "expectations_passed": 4, "expectations_total": 4, "tokens": 35357, "duration_ms": 92248 },
+      "without_skill": { "pass_rate": 1.0, "expectations_passed": 4, "expectations_total": 4, "tokens": 34140, "duration_ms": 120225 },
+      "delta": 0.0
     }
   ],
 
   "analysis": {
-    "cross_project_finding": "commit-msg-generator shows EQUAL verdict on Kairos — vanilla Claude already produces good Conventional Commits for clear, well-described changes. The Skill's internal Aria delta (+0.80) was measured on more nuanced scenarios (scope detection, mode selection). For straightforward external projects, the Skill adds convention awareness but not pass-rate improvement.",
-    "qualitative_advantages": [
-      "with_skill produces Analysis section explaining decisions (useful for team review)",
-      "with_skill chose more precise functional domain scopes (provider-health vs console)",
-      "with_skill matched Kairos's Chinese description convention in eval 2",
-      "with_skill uses ~22% more tokens but provides richer context"
+    "cross_project_findings": [
+      "state-scanner shows the clearest cross-project value (+0.25): its structured interactive workflow (numbered options + confidence scores) is a unique capability vanilla Claude doesn't replicate",
+      "commit-msg-generator and spec-drafter show EQUAL verdicts on Kairos: vanilla Claude handles clear descriptions and spec writing well without guidance",
+      "Skills with strong PROCESS value (state-scanner's interactive selection, aria-report's privacy review) transfer better cross-project than CONTENT skills (commit-msg, spec-drafter) where Claude's base capability is already strong",
+      "Token usage: with_skill uses more tokens for state-scanner (45K vs 21K) but delivers richer output (confidence scoring, multi-phase diagnostics, architecture assessment)"
     ],
-    "recommendation": "commit-msg-generator has qualitative value (decision rationale, convention matching) but not quantitative delta on simple Kairos scenarios. Test with more complex/ambiguous scenarios for stronger differentiation.",
-    "comparison_to_internal": {
-      "aria_internal_delta": 0.80,
-      "kairos_cross_project_delta": 0.0,
-      "explanation": "Aria internal evals test edge cases (scope ambiguity, multi-module commits). Kairos evals use clear descriptions where vanilla Claude performs equally well."
+    "portability_ranking": {
+      "high_value_cross_project": ["state-scanner", "aria-report"],
+      "qualitative_value_only": ["commit-msg-generator", "spec-drafter"],
+      "pattern": "Process-oriented Skills (workflow selection, safety checks) > Content-oriented Skills (message generation, doc writing)"
     }
   }
 }
