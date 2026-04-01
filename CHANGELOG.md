@@ -10,8 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- 跨项目验证方法论适用性 (US-002)
 - 多 AI 平台兼容性 (US-003)
+
+---
+
+## [1.1.0] - 2026-04-01
+
+### Added
+- **aria-report Skill** (aria-plugin v1.8.0) — Issue 报告与反馈 (Bug/Feature/Question)
+  - AB benchmark: delta +0.375 (WITH_BETTER)
+  - 自动环境收集、隐私审查、三级提交路由
+- **跨项目 Benchmark 框架** — `CROSS_PROJECT_BENCHMARKING.md` + `external/` 目录
+- **GitHub Issue Templates** — Adoption Report + Adaptation Issue (aria-plugin)
+- **Quick Start 指南** — 10 分钟零到工作流 (EN + ZH, aria-plugin)
+- **Standards 独立使用指南** — 不依赖 aria-plugin 的使用文档 (EN + ZH)
+
+### Changed
+- **US-001 增强工作流自动化** — 标记 done (4/4 验收标准达成, auto-proceed ~80% 步骤减少)
+- **US-002 跨项目方法论验证** — 标记 done (Kairos 试点完成, Adoption Report 已提交)
+
+### Research Findings
+- **Process vs Content Skills 可移植性模型**: Process Skills (state-scanner +0.25, aria-report +0.375) 跨项目价值高于 Content Skills (commit-msg 0.0, spec-drafter 0.0)
+- Kairos 试点零适配需求 — Aria 工具链开箱即用
 
 ---
 
