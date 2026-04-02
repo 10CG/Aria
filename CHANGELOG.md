@@ -14,6 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-04-02
+
+### Added
+- **自动审计系统** (US-004, aria-plugin v1.9.0)
+  - audit-engine Skill: convergence/challenge 双模式多轮收敛审计
+  - 7 个审计检查点覆盖十步循环全流程
+  - config-loader 旧配置兼容映射
+  - state-scanner v2.7.0 审计状态扫描 + adaptive 路由
+  - AB benchmark: delta +0.5 (WITH_BETTER)
+  - 3 轮循环审计验证 OpenSpec (4 agents x 3 rounds, 25+ issues 修正)
+- **架构文档** v1.6.0 — 审计子系统章节, Skills 30→32
+
+### Changed
+- **US-004 自动审计系统** — 标记 done
+- **aria 子模块** — 更新至 v1.9.0 (29 user-facing + 3 internal Skills)
+
+---
+
 ## [1.1.0] - 2026-04-01
 
 ### Added
