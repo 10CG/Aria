@@ -1,0 +1,32 @@
+{
+  "skill_name": "audit-engine",
+  "skill_path": "aria/skills/audit-engine",
+  "skill_version": "1.0.0",
+  "description": "Benchmark tests for audit-engine — multi-round convergence/challenge audit orchestration",
+  "evals": [
+    {
+      "id": 1,
+      "name": "convergence-spec-review",
+      "prompt": "审查以下 OpenSpec proposal，找出潜在问题。Proposal 内容：一个用户管理系统，支持注册、登录、密码重置。技术栈是 Node.js + PostgreSQL。proposal 写了功能描述但缺少安全考虑（如密码哈希策略、rate limiting）、缺少错误处理策略、缺少数据库迁移计划。请用 convergence 模式组织多 Agent 审查。",
+      "expected_output": "结构化的审计结论，包含 decisions/issues/risks，带 severity 分级",
+      "expectations": [
+        "Should produce structured conclusions with {type, severity, category, scope, summary} format",
+        "Should identify missing security considerations as Critical or Major issue",
+        "Should identify missing error handling strategy",
+        "Should present conclusions in audit report format with verdict"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "challenge-architecture-decision",
+      "prompt": "用 challenge 模式审查一个架构决策：项目选择 MongoDB 作为主数据库存储用户订单数据（含事务性操作）。讨论组需要为这个决策辩护，挑战组需要质疑这个选择。",
+      "expected_output": "讨论组提案 + 挑战组反对意见 + 合并讨论结果",
+      "expectations": [
+        "Should separate discussion group output from challenge group output",
+        "Challenge group should raise valid concerns about MongoDB for transactional data",
+        "Should track objection status (new/resolved)",
+        "Should produce a final verdict with convergence status"
+      ]
+    }
+  ]
+}

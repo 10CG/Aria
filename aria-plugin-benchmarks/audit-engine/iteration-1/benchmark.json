@@ -1,0 +1,70 @@
+{
+  "skill_name": "audit-engine",
+  "skill_version": "1.0.0",
+  "iteration": 1,
+  "timestamp": "2026-04-02T01:00:00Z",
+
+  "summary": {
+    "total_evals": 1,
+    "with_skill": {
+      "passed": 1,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "avg_tokens": 35698,
+      "avg_duration_ms": 91782
+    },
+    "without_skill": {
+      "passed": 0,
+      "failed": 1,
+      "pass_rate": 0.5,
+      "avg_tokens": 20669,
+      "avg_duration_ms": 64772
+    },
+    "delta": {
+      "pass_rate": 0.5,
+      "verdict": "WITH_BETTER"
+    }
+  },
+
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "convergence-spec-review",
+      "with_skill": {
+        "verdict": "pass",
+        "pass_rate": 1.0,
+        "expectations_passed": 4,
+        "expectations_total": 4,
+        "tokens": 35698,
+        "duration_ms": 91782
+      },
+      "without_skill": {
+        "verdict": "fail",
+        "pass_rate": 0.5,
+        "expectations_passed": 2,
+        "expectations_total": 4,
+        "tokens": 20669,
+        "duration_ms": 64772,
+        "failures": [
+          "No structured {type, severity, category, scope, summary} format — used prose + table instead",
+          "No audit report format — no frontmatter, no verdict field, no convergence tracking, no round records"
+        ]
+      },
+      "delta": {
+        "pass_rate_improvement": 0.5
+      }
+    }
+  ],
+
+  "regression_check": {
+    "method": "code_review",
+    "result": "7 PASS / 1 CONDITIONAL PASS",
+    "details": "All 8 modified Skills verified: audit.enabled=false guard present, existing workflow unmodified, output format additive-only. See regression-check.md."
+  },
+
+  "analysis": {
+    "unique_value": "audit-engine's primary value is PROCESS structure: multi-round convergence tracking, structured conclusion format, verdict calculation, and audit report generation. Vanilla Claude identifies the same issues but cannot produce the structured audit workflow.",
+    "content_parity": "Both with_skill and without_skill correctly identify Critical security gaps. Content quality is comparable.",
+    "process_advantage": "with_skill produces: frontmatter metadata, round-by-round records, four-tuple convergence proof, PASS/FAIL verdict calculation, agent attribution. None of these appear in without_skill output."
+  }
+}
