@@ -1,7 +1,7 @@
 # state-scanner 项目级自定义健康检查
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: In Progress
+> **Status**: Complete
 > **Created**: 2026-04-03
 > **Parent Story**: [US-006](../../docs/requirements/user-stories/US-006.md)
 > **Target Version**: v1.4.0
