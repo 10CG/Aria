@@ -1,10 +1,10 @@
 # Aria Dashboard — 项目进度看板与自动开发闭环
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: In Progress (Phase 1 Complete, Phase 2-3 Pending)
+> **Status**: In Progress (Phase 1-2 Complete, Phase 3a Pending)
 > **Created**: 2026-04-02
 > **Parent Story**: [US-005](../../docs/requirements/user-stories/US-005.md)
-> **Target Version**: v1.3.0
+> **Target Version**: v1.4.0
 > **Reference Implementation**: SilkNode `/progress-dashboard/`
 
 ## Why
@@ -141,57 +141,45 @@ API 模式 (可选配置):
   → 调用 GitHub/Forgejo Issues API 创建
 ```
 
-### Phase 3: 心跳 Agent (12-16h)
+### Phase 3a: 心跳扫描 Skill (8-12h)
 
-**交付物**: `aria-heartbeat` Skill + Schedule 配置
+> **注意**: 原 Phase 3 经 Agent Team 三轮讨论后拆分。Phase 3b (定时心跳) 和
+> Phase 3c (半自动开发闭环) 需要外部编排器 (aria-orchestrator)，已独立为
+> [US-007](../../docs/requirements/user-stories/US-007.md)。
 
-**触发**: Claude Code `/schedule` — 每 N 分钟执行一次 (可配置)
+**交付物**: `aria-heartbeat` Skill (手动触发, 只读)
 
-**心跳流程**:
+**触发**: `/aria:heartbeat scan` (人类手动执行)
+
+**扫描流程**:
 
 ```
-每次心跳:
+每次扫描:
   1. 扫描数据源:
      - Git 模式: ls .aria/issues/*.md → 筛选 status: open
      - API 模式: GET /repos/{owner}/{repo}/issues?state=open
 
-  2. 对每个新 issue:
+  2. 对每个 open issue:
      a. 分析复杂度:
         - 关键词 + 描述长度 + 影响范围 → Level 1/2/3
-     b. 创建 OpenSpec:
-        - Level 1: 跳过 (直接开发)
-        - Level 2+: 调用 spec-drafter
-     c. 执行十步循环:
-        - workflow-runner (全自动, auto_proceed=true)
-        - A: spec + plan
-        - B: branch + develop + test
-        - C: commit + PR
-        - D: progress + archive
-     d. 更新 issue 状态:
-        - Git: status: open → resolved, 添加 resolution 字段
-        - API: close issue + comment with PR link
+     b. 生成分析报告 (不自动开发):
+        - Issue 标题、优先级、复杂度评估
+        - 推荐的处理方式 (手动修复 / 创建 OpenSpec / 需讨论)
+     c. 更新 issue frontmatter:
+        - 添加 analyzed_at, complexity_level 字段
 
-  3. 重新生成看板:
-     - 调用 /aria:dashboard 刷新 HTML
-     - 如果是部署模式, 触发 CI 重新部署
+  3. 输出待处理 issue 报告:
+     - 按优先级排序
+     - 附复杂度评估和推荐行动
 ```
 
 **配置** (.aria/config.json):
 
 ```json
 {
-  "dashboard": {
-    "enabled": true,
-    "output_path": ".aria/dashboard/index.html",
+  "heartbeat": {
     "issue_backend": "git",
     "issue_repo": ""
-  },
-  "heartbeat": {
-    "enabled": false,
-    "interval_minutes": 30,
-    "auto_develop": true,
-    "max_concurrent_issues": 1,
-    "require_approval_above": "none"
   }
 }
 ```
@@ -205,7 +193,7 @@ API 模式 (可选配置):
 | **Positive** | 进度度量和审计可视化提供数据驱动的改进依据 |
 | **Risk** | 心跳 Agent 全自动开发需要可靠的测试覆盖防止错误代码合并 |
 | **Risk** | Issue 存储双模式增加系统复杂度，需要适配器抽象 |
-| **Limitation** | Phase 3 依赖 Claude Code `/schedule` 功能的成熟度 |
+| **Limitation** | Phase 3b/3c 已拆分到 US-007 (aria-orchestrator) |
 
 ## Constraints
 
@@ -213,15 +201,14 @@ API 模式 (可选配置):
 |------|------|
 | Phase 1 零外部依赖 | 单文件 HTML，不需要 npm/Node.js |
 | Git 原生模式优先 | 默认不依赖 GitHub/Forgejo API |
-| 心跳默认关闭 | 全自动开发是 opt-in，防止意外执行 |
+| Phase 3a 只读 | 手动扫描 + 分析报告，不自动开发 |
 | 单文件 HTML 上限 | Phase 1 的 HTML 需控制在合理体积内 |
 
 ## Dependencies
 
 - SilkNode progress-dashboard 代码提炼 (解析逻辑参考)
-- Claude Code `/schedule` (Phase 3 心跳触发)
 - aria-report (Issue 提交可复用 routing 逻辑)
-- workflow-runner (Phase 3 全自动十步循环)
+- Phase 3b/3c 依赖 → US-007 (aria-orchestrator)
 
 ## Success Criteria
 
@@ -236,7 +223,9 @@ API 模式 (可选配置):
 - [ ] API 模式可通过配置切换到 GitHub Issues
 - [ ] 看板可部署为长期运行的 Web 服务
 
-### Phase 3
-- [ ] 心跳 Agent 定时扫描并自动处理 Level 1 issue
-- [ ] 全自动十步循环端到端完成 (从 issue 到 PR)
-- [ ] Issue 状态自动更新，看板自动刷新
+### Phase 3a
+- [ ] `/aria:heartbeat scan` 扫描 open issue 并分析复杂度
+- [ ] 生成待处理 issue 报告 (只读, 不自动开发)
+- [ ] Issue frontmatter 更新 analyzed_at + complexity_level
+
+> Phase 3b/3c → [US-007 aria-orchestrator](../../docs/requirements/user-stories/US-007.md)
