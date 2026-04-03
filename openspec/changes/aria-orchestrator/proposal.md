@@ -96,20 +96,25 @@ aria-orchestrator/
 - 纯 shell + forgejo CLI，零 AI token 消耗
 - 输出格式与未来 AI 增强层 (claude -p) 对齐
 
-### Phase 3b-M1.5: Hermes 技术验证 (spike, 4-6h)
+### Phase 3b-M1.5: Hermes 技术验证 (spike) ✅ PASS (2026-04-03)
 
 > 验证 Hermes Agent 是否满足 aria-orchestrator 的基础设施需求。
-> 验证失败则回退到 FastAPI+SQLite 自建方案 (~400 行 Python)。
+> **结果: GO — 全部 5 项验证通过，无阻塞性问题。**
 
-**验证项**:
+**验证结果**:
 
-| 项目 | 验证内容 | 通过标准 |
-|------|---------|---------|
-| cron scheduler | tick()/60s, 隔离 session | 能定时执行 scan.sh 并捕获 JSON 输出 |
-| terminal tool | 执行 `claude -p` | 能传入 prompt, 捕获 stdout, 设超时 |
-| 消息网关 | Telegram/Slack | 能发送审批请求, 接收用户回复 |
-| 工具裁剪 | 禁用不需要的工具 | 仅保留 terminal + shell, 攻击面可控 |
-| 扩展点 | 自定义 Tool/Skill 注入 | 能注入 Aria 十步循环调度逻辑 |
+| 项目 | 通过标准 | 结果 | 关键代码 |
+|------|---------|------|---------|
+| cron scheduler | 定时执行 + 隔离 session | ✅ PASS | `cron/scheduler.py:540-626` — 文件锁隔离, cron/interval/一次性, 超时 600s |
+| terminal tool | 执行 `claude -p` + 捕获输出 | ✅ PASS | `tools/terminal_tool.py:900+` — 任意命令, stdout/stderr, 6 种后端 |
+| 消息网关 | 发送审批 + 接收回复 | ✅ PASS* | `gateway/config.py:48-65` — 16+ 平台, *cron 不能同步等待回复 (轮询解决) |
+| 工具裁剪 | 最小权限 | ✅ PASS | `toolsets.py` — `disabled_toolsets` + `create_custom_toolset()` |
+| 扩展点 | 自定义 Tool/Skill | ✅ PASS | `tools/registry.py` + `skills.external_dirs` 外部 SKILL.md 加载 |
+
+**关键发现**:
+- Hermes `skills.external_dirs` 支持加载外部 SKILL.md → Aria Skills 可能直接映射
+- cron job 一次性执行模型 → 人类审批需轮询模式 (发通知 → 下次 tick 检查回复)
+- 回退条件未触发，FastAPI+SQLite 方案作为备用保留
 
 ### Phase 3b-M2: Hermes 集成 + 定时心跳 (v1.5.0, 12-16h)
 
@@ -226,6 +231,6 @@ git worktree remove /tmp/aria-work-{issue-id}
 | Phase | 工作量 | 风险 |
 |-------|--------|------|
 | Phase 3b-M1 (scan-only) | 4-6h | 低 (确定性脚本) ✅ 已完成 |
-| Phase 3b-M1.5 (Hermes spike) | 4-6h | 中 (外部依赖验证) |
+| Phase 3b-M1.5 (Hermes spike) | 4-6h | ✅ PASS (2026-04-03) |
 | Phase 3b-M2 (Hermes 集成) | 12-16h | 中 (Hermes 集成) |
 | Phase 3c (闭环) | 20h+ | 高 (全自动开发安全性) |
