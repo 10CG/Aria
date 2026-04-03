@@ -10,64 +10,68 @@
 
 Aria 方法论的十步循环目前完全依赖人类在 Claude Code 内交互式执行。US-005 Phase 2 实现了 Issue 提交能力 (.aria/issues/)，但 Issue 创建后仍需人类手动启动开发流程。
 
-经 Agent Team 三轮讨论 (2026-04-03)，确认核心矛盾:
+经 Agent Team 六轮讨论 (2026-04-03)，确认核心矛盾和技术路径:
 
 ```
-心跳/编排需要的:              Claude Code 提供的:
-─────────────────              ─────────────────
-持久化状态机                    无状态单次会话
-长时间运行 (daemon)             交互式 session
-队列 + 重试 + 熔断              无内置容错
-外部事件触发 (webhook)          人类输入触发
+心跳/编排需要的:              Claude Code 提供的:       Hermes Agent 提供的:
+─────────────────              ─────────────────         ─────────────────
+持久化状态机                    无状态单次会话            ✅ FTS5 memory
+长时间运行 (daemon)             交互式 session           ✅ 持久进程
+队列 + 重试 + 熔断              无内置容错               ✅ run_agent 内置
+外部事件触发 (webhook)          人类输入触发             ✅ 消息网关
+定时调度                        /schedule (受限)         ✅ cron scheduler
+人类审批通道                    无                       ✅ Telegram/Slack
+隔离执行                        无                       ✅ Docker/SSH backend
 ```
 
-**结论**: 编排逻辑应在 Claude Code 外的独立进程中，通过 `claude -p` 调用 Claude Code 作为执行器。
+**结论**: 基于 Hermes Agent (NousResearch) 作为运行时底座，通过 `claude -p` 调用 Claude Code 执行 Aria Skills。Aria 扩展 Hermes，方法论独立于具体运行时。
 
 ## What
 
 ### 系统架构
 
 ```
-┌─────────────────────────────────────────────┐
-│            Forgejo                           │
-│  issue.created webhook ──────┐              │
-│  PR review / merge ◀────────┤              │
-└──────────────────────────────┼──────────────┘
-                               │
-                               ▼
-┌──────────────────────────────────────────────┐
-│  aria-orchestrator (Aether Nomad service)    │
-│                                              │
-│  ┌──────────┐  ┌─────────────────────────┐  │
-│  │ Webhook  │→ │ State Machine (SQLite)   │  │
-│  │ Receiver │  │ queued → analyzing       │  │
-│  │ (HMAC)   │  │ → developing → pr_created│  │
-│  └──────────┘  │ → resolved / failed      │  │
-│                └────────────┬────────────┘  │
-│  ┌──────────┐               │               │
-│  │ Cron     │→──────────────┘               │
-│  │ Fallback │                               │
-│  └──────────┘  ┌────────────────────────┐   │
-│                │ Safety Layer            │   │
-│                │ - 白名单标签 (aria:auto)│   │
-│                │ - token 预算            │   │
-│                │ - 熔断 (3x fail → stop) │   │
-│                │ - 执行超时 (10min)      │   │
-│                │ - 并发锁 (max=1)        │   │
-│                └────────────────────────┘   │
-│                         │                    │
-│                         ▼                    │
-│               ┌──────────────────┐           │
-│               │ claude -p "..."  │           │
-│               │ (git worktree)   │           │
-│               │                  │           │
-│               │ 自动加载:        │           │
-│               │ - CLAUDE.md      │           │
-│               │ - 33 Skills      │           │
-│               │ - 11 Agents      │           │
-│               │ - Hooks          │           │
-│               └──────────────────┘           │
-└──────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│              Forgejo                             │
+│  issue.created ──────┐  PR merge ◀──────────┐  │
+└──────────────────────┼───────────────────────┼──┘
+                       │                       │
+                       ▼                       │
+┌──────────────────────────────────────────────────┐
+│  aria-orchestrator (基于 Hermes Agent)            │
+│  部署: Aether Nomad service job (Docker)          │
+│                                                   │
+│  ┌─ Hermes cron layer (确定性, LLM 禁用) ─────┐  │
+│  │  scan_job:   terminal → scan.sh --json      │  │
+│  │  triage_job: 规则引擎 → Level 判定          │  │
+│  │  notify_job: gateway → Telegram/Slack 审批  │  │
+│  └──────────────────┬──────────────────────────┘  │
+│                     │ human approves               │
+│                     ▼                              │
+│  ┌─ Hermes AIAgent (LLM 启用, 按需) ──────────┐  │
+│  │  model: Haiku/Sonnet (调度决策, 低成本)     │  │
+│  │  terminal tool → claude -p (Opus)            │  │
+│  │  backend: Docker / local (git worktree)      │  │
+│  └──────────────────┬──────────────────────────┘  │
+│                     │                              │
+│  ┌─ Safety Layer ───┼──────────────────────────┐  │
+│  │  白名单 (aria:auto) │ token 预算            │  │
+│  │  熔断 (3x fail)     │ 执行超时 (10min)      │  │
+│  │  并发锁 (max=1)     │ 接口适配层 (退出策略) │  │
+│  └──────────────────────────────────────────────┘  │
+└──────────────────────┬─────────────────────────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │ claude -p "..."  │
+              │ (git worktree)   │
+              │                  │
+              │ 自动加载:        │
+              │ - CLAUDE.md      │
+              │ - 33 Aria Skills │
+              │ - 11 Agents      │
+              │ - Hooks          │
+              └──────────────────┘
 ```
 
 ### Phase 3b-M1: scan-only 模式 (v1.4.0, 4-6h)
@@ -92,15 +96,33 @@ aria-orchestrator/
 - 纯 shell + forgejo CLI，零 AI token 消耗
 - 输出格式与未来 AI 增强层 (claude -p) 对齐
 
-### Phase 3b-M2: 定时心跳 + 基础设施 (v1.5.0, 12-16h)
+### Phase 3b-M1.5: Hermes 技术验证 (spike, 4-6h)
 
-**在 M1 基础上增量添加**:
+> 验证 Hermes Agent 是否满足 aria-orchestrator 的基础设施需求。
+> 验证失败则回退到 FastAPI+SQLite 自建方案 (~400 行 Python)。
 
-| 组件 | 职责 |
-|------|------|
-| Webhook Receiver | 接收 Forgejo issue 事件, HMAC-SHA256 签名验证, 幂等去重 |
-| State Machine | Issue 生命周期管理, SQLite 持久化 |
-| Step Scheduler | cron 兜底扫描 + webhook 实时触发 |
+**验证项**:
+
+| 项目 | 验证内容 | 通过标准 |
+|------|---------|---------|
+| cron scheduler | tick()/60s, 隔离 session | 能定时执行 scan.sh 并捕获 JSON 输出 |
+| terminal tool | 执行 `claude -p` | 能传入 prompt, 捕获 stdout, 设超时 |
+| 消息网关 | Telegram/Slack | 能发送审批请求, 接收用户回复 |
+| 工具裁剪 | 禁用不需要的工具 | 仅保留 terminal + shell, 攻击面可控 |
+| 扩展点 | 自定义 Tool/Skill 注入 | 能注入 Aria 十步循环调度逻辑 |
+
+### Phase 3b-M2: Hermes 集成 + 定时心跳 (v1.5.0, 12-16h)
+
+**基于 Hermes Agent 重构 aria-orchestrator**:
+
+| 组件 | 实现方式 |
+|------|---------|
+| 定时扫描 | Hermes cron job → terminal tool → scan.sh --json |
+| Triage | Hermes cron job → 规则引擎 (确定性, LLM 禁用) |
+| 人类审批 | Hermes gateway → Telegram/Slack 通知 |
+| 开发执行 | Hermes AIAgent (Haiku) → terminal → claude -p (Opus) |
+| 状态持久化 | Hermes FTS5 memory |
+| Webhook | Hermes gateway 或独立端点 |
 | Executor | `claude -p` subprocess, worktree 隔离, 超时控制 |
 | Safety Layer | 白名单/熔断/预算/并发锁 |
 | Log Writer | .aria/heartbeat-log/{date}.md 审计日志 |
@@ -166,7 +188,11 @@ git worktree remove /tmp/aria-work-{issue-id}
 | D1 | 外部编排器 (非 Claude Code 内) | daemon 需求 vs 会话模型不匹配 |
 | D2 | `claude -p` 复用 Skill 生态 | 33 Skills 零重写，Agent SDK 需全部重写 |
 | D3 | 独立项目 aria-orchestrator | 不污染方法论层，submodule 接入 |
-| D4 | SQLite 状态存储 | 轻量、单文件、进程重启可恢复 |
+| D4 | 基于 Hermes Agent 构建 (4:1) | 覆盖 80% 基础设施 (cron/gateway/memory/隔离), 省 60% 自研 |
+| D4a | 模式 A: Hermes 调度 + claude -p 执行 | 双层各司其职, Haiku 调度 + Opus 开发, Skill 零重写 |
+| D4b | 生态关系: Aria 扩展 Hermes | 方法论独立于运行时 = 研究成果, 可替换底座 |
+| D4c | 接口适配层隔离 Hermes API | 退出策略: Hermes 停维时可迁移 |
+| D4d | 回退方案: FastAPI+SQLite | 若 Hermes spike 失败, ~400 行 Python 自建 |
 | D5 | git worktree 隔离执行 | 不接触主工作目录，最低安全要求 |
 | D6 | C.2 合并永远人类审批 | PR 是安全最后防线，不自动合并 |
 | D7 | Forgejo webhook + cron 双触发 | webhook 实时，cron 兜底 |
@@ -199,6 +225,7 @@ git worktree remove /tmp/aria-work-{issue-id}
 
 | Phase | 工作量 | 风险 |
 |-------|--------|------|
-| Phase 3b-M1 (scan-only) | 4-6h | 低 (确定性脚本) |
-| Phase 3b-M2 (定时+基础设施) | 12-16h | 中 (新项目架构) |
+| Phase 3b-M1 (scan-only) | 4-6h | 低 (确定性脚本) ✅ 已完成 |
+| Phase 3b-M1.5 (Hermes spike) | 4-6h | 中 (外部依赖验证) |
+| Phase 3b-M2 (Hermes 集成) | 12-16h | 中 (Hermes 集成) |
 | Phase 3c (闭环) | 20h+ | 高 (全自动开发安全性) |
