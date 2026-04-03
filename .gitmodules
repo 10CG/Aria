@@ -4,3 +4,6 @@
 [submodule "aria"]
 	path = aria
 	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-plugin.git
+[submodule "aria-orchestrator"]
+	path = aria-orchestrator
+	url = ssh://forgejo@forgejo.10cg.pub/10CG/aria-orchestrator.git
