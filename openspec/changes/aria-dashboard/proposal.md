@@ -1,7 +1,7 @@
 # Aria Dashboard — 项目进度看板与自动开发闭环
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Approved
 > **Created**: 2026-04-02
 > **Parent Story**: [US-005](../../docs/requirements/user-stories/US-005.md)
 > **Target Version**: v1.3.0
