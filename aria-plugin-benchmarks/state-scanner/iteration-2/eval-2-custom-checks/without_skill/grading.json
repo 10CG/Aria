@@ -1,0 +1,10 @@
+{
+  "expectations": [
+    {"text": "Output includes a dedicated custom checks section", "passed": true, "evidence": "Lines 104-127: '10. Custom Health Checks' as a separate numbered section"},
+    {"text": "Output shows individual check results with pass/fail status", "passed": true, "evidence": "Lines 110-113: Table with check name, severity, result columns"},
+    {"text": "Output shows fix suggestions for failed checks", "passed": true, "evidence": "Lines 118,125: Fix commands shown for each check"},
+    {"text": "Output shows severity level for each check", "passed": true, "evidence": "Table includes 'Severity' column with warning/error values"},
+    {"text": "Custom checks section is separate from other status sections", "passed": true, "evidence": "Section 10 is clearly separate from other numbered sections"},
+    {"text": "Failed checks do not block the rest of the status report", "passed": true, "evidence": "Full report with summary generated after custom checks section"}
+  ]
+}

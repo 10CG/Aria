@@ -14,7 +14,7 @@
 | 指标 | 值 |
 |------|-----|
 | Skills 测试 | 28/28 (100% 覆盖) |
-| 平均 delta | **+0.53** (Skills 平均提升质量 53%) |
+| 平均 delta | **+0.55** (Skills 平均提升质量 55%) |
 | WITH_BETTER | 19 (68%) |
 | MIXED | 1 (4%) |
 | EQUAL | 3 (11%) |
@@ -44,12 +44,12 @@
 | branch-finisher | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | requesting-code-review | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | requirements-validator | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
-| state-scanner | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | strategic-commit-orch | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | subagent-driver | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | tdd-enforcer | 1.0 | 0.5 | **+0.50** | WITH_BETTER |
 | progress-updater | 1.0 | 0.63 | **+0.38** | WITH_BETTER |
 | task-planner | 1.0 | 0.67 | **+0.33** | WITH_BETTER |
+| state-scanner | 1.0 | 0.765 | **+0.235** | WITH_BETTER |
 | forgejo-sync | 1.0 | 0.83 | +0.17 | MIXED |
 | api-doc-generator | 1.0 | 1.0 | 0.00 | EQUAL |
 | phase-a-planner | 1.0 | 1.0 | 0.00 | EQUAL |
@@ -60,8 +60,9 @@
 | 分级 | 条件 | Skills | 行动 |
 |------|------|--------|------|
 | **高价值** | delta >= 0.6 | 13 个 (phase-d, integration, workflow-runner, openspec-archive, commit-msg, arch-*, branch-manager, brainstorm, phase-b/c, requirements-sync) | 重点维护，优先测试 |
-| **中价值** | delta 0.3-0.6 | 11 个 (agent-router, arch-search, branch-finisher, requesting-code-review, requirements-validator, state-scanner, strategic-commit-orch, subagent-driver, tdd-enforcer, progress-updater, task-planner) | 正常维护 |
-| **低价值** | delta < 0.2 | 1 个 (forgejo-sync) | 审查是否需要增强 |
+| **中价值** | delta 0.3-0.6 | 10 个 (agent-router, arch-search, branch-finisher, requesting-code-review, requirements-validator, strategic-commit-orch, subagent-driver, tdd-enforcer, progress-updater, task-planner) | 正常维护 |
+| **低价值** | delta 0.2-0.3 | 1 个 (state-scanner) | 正常维护，custom checks 功能性 EQUAL 拉低 delta |
+| **待改进** | delta < 0.2 | 1 个 (forgejo-sync) | 审查是否需要增强 |
 | **待审查** | delta = 0 | 3 个 (api-doc-generator, phase-a-planner, spec-drafter) | 评估是否冗余或 eval case 区分度不足 |
 
 ---
@@ -130,5 +131,5 @@ aria-plugin-benchmarks/
 
 ---
 
-**最后更新**: 2026-03-18
+**最后更新**: 2026-04-03
 **跨项目对齐**: Aether AB_TEST_OPERATIONS.md v1.0.0

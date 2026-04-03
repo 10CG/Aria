@@ -1,0 +1,71 @@
+{
+  "benchmark_name": "state-scanner",
+  "skill_version": "2.8.0",
+  "previous_version": "2.4.0",
+  "iteration": 2,
+  "timestamp": "2026-04-03T13:55:00Z",
+  "total_evals": 3,
+  "evals_completed": 3,
+  "summary": {
+    "with_skill": {
+      "total_assertions": 17,
+      "passed": 17,
+      "failed": 0,
+      "pass_rate": 1.0
+    },
+    "without_skill": {
+      "total_assertions": 17,
+      "passed": 13,
+      "failed": 4,
+      "pass_rate": 0.765
+    },
+    "delta": 0.235,
+    "verdict": "WITH_BETTER"
+  },
+  "by_eval": [
+    {
+      "eval_id": 1,
+      "eval_name": "basic-state-collection",
+      "with_skill": {"passed": 6, "total": 6, "pass_rate": 1.0},
+      "without_skill": {"passed": 3, "total": 6, "pass_rate": 0.5},
+      "delta": 0.5,
+      "key_differences": [
+        "with_skill uses structured emoji/box format; without uses plain markdown",
+        "with_skill provides [1]-[4] numbered options; without has no selection mechanism",
+        "with_skill reports architecture chain validation; without only lists file path"
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "custom-health-checks",
+      "with_skill": {"passed": 6, "total": 6, "pass_rate": 1.0},
+      "without_skill": {"passed": 6, "total": 6, "pass_rate": 1.0},
+      "delta": 0.0,
+      "key_differences": [
+        "Both correctly read .aria/state-checks.yaml and executed checks",
+        "with_skill uses emoji status indicators (✅/⚠️/🔴); without uses table format",
+        "with_skill follows exact SKILL.md output spec; without invents own format",
+        "Qualitative: with_skill output is more consistent with Aria design system"
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "recommendation-with-custom-checks",
+      "with_skill": {"passed": 5, "total": 5, "pass_rate": 1.0},
+      "without_skill": {"passed": 3, "total": 5, "pass_rate": 0.6},
+      "delta": 0.4,
+      "key_differences": [
+        "with_skill uses [1]-[4] numbered options; without uses lettered A/B/C/D format",
+        "with_skill references RECOMMENDATION_RULES priority numbers; without uses ad-hoc ordering",
+        "with_skill includes confidence percentages; without estimates effort in hours",
+        "Both provide actionable recommendations with specific commands"
+      ]
+    }
+  ],
+  "analyst_observations": [
+    "Eval 2 (custom-health-checks) shows EQUAL pass rate — both agents successfully read and executed .aria/state-checks.yaml. The Skill adds format consistency but not functional advantage here. This is expected: the YAML config is self-describing, so agents can interpret it without guidance.",
+    "The strongest signal is eval 1 and 3 where the Skill enforces the [1]-[4] numbered options pattern and priority-based ordering — without the Skill, agents default to their own format choices, breaking UX consistency.",
+    "No assertions were non-discriminating (always pass regardless of skill). The custom checks assertions in eval 2 are closest to non-discriminating since both agents passed, but the qualitative difference in format consistency still justifies the Skill."
+  ],
+  "status": "completed"
+}

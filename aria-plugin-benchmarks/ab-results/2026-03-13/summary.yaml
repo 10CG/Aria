@@ -121,11 +121,12 @@ results:
     verdict: "EQUAL"
   state-scanner:
     with_skill_pass_rate: 1.0
-    without_skill_pass_rate: 0.625
-    delta_pass_rate: 0.375
+    without_skill_pass_rate: 0.765
+    delta_pass_rate: 0.235
     verdict: "WITH_BETTER"
-    data_source: "2026-03-19-v1.7.0-verification/state-scanner-benchmark.json"
-    note: "v2.6.0 with 4 evals (incl. readme-sync + config-awareness). Delta positive."
+    skill_version: "2.8.0"
+    data_source: "2026-04-03/state-scanner/benchmark.json"
+    note: "v2.8.0 with Phase 1.11 custom health checks. 3 evals, 17 assertions. Delta positive."
   strategic-commit-orchestrator:
     with_skill_pass_rate: 1.0
     without_skill_pass_rate: 0.5
