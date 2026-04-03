@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - 多 AI 平台兼容性 (US-003)
+- US-005 Phase 2: Issue 提交 + 存储
+- US-005 Phase 3: 心跳 Agent 全自动开发闭环
+
+---
+
+## [1.3.0] - 2026-04-03
+
+### Added
+- **aria-dashboard Skill** (aria-plugin v1.10.0) — 项目进度看板生成器
+  - 5 数据解析器: UPM, Stories, OpenSpec, Audit Reports, AB Benchmark
+  - 单文件自包含 HTML 模板 (深色主题, 响应式, 零 CDN)
+  - 跨项目兼容: UPM 双格式, Story 中英文字段, 任意 ID 前缀
+  - Issue 存储适配器设计 (Phase 2 提前准备)
+- **架构文档** v1.7.0 — Dashboard 可视化子系统, Skills 32→33
+
+### Changed
+- **US-005 Phase 1 完成** — 看板 Skill 已交付, Phase 2-3 待实施
+- **aria 子模块** — 更新至 v1.10.0 (30 user-facing + 3 internal Skills)
 
 ---
 
