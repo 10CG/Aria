@@ -5,7 +5,7 @@
 > 让 AI 真正理解你的软件项目
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.8.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.10.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -213,8 +213,8 @@ Aria/
 │   ├── core/                   # 核心定义（十步循环、进度管理）
 │   ├── openspec/               # 需求规范格式
 │   └── conventions/            # 约定规范（Git Commit 等）
-├── aria/                       # Aria 插件（子模块, v1.8.0）
-│   ├── skills/                 # 29 个 Skills（27 个面向用户 + 2 个内部）
+├── aria/                       # Aria 插件（子模块, v1.10.0）
+│   ├── skills/                 # 33 个 Skills（30 个面向用户 + 3 个内部）
 │   ├── agents/                 # 11 个 Agents
 │   └── .claude-plugin/         # Plugin 配置
 ├── aria-plugin-benchmarks/     # Skill 基准测试套件
@@ -233,8 +233,8 @@ Aria/
 ## 项目状态
 
 ```
-主项目版本:  1.0.2
-插件版本:    1.8.0 (aria-plugin)
+主项目版本:  1.3.0
+插件版本:    1.10.0 (aria-plugin)
 成熟度:      核心流程已验证
 研究方向:    AI 协作模式的可重现性
 ```

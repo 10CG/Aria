@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.8.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.10.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -126,7 +126,7 @@ Each phase has a dedicated Skill that ensures consistent, repeatable workflows:
 
 ## What You Get
 
-### Skills (27 user-facing + 2 internal)
+### Skills (30 user-facing + 3 internal)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -136,8 +136,9 @@ Each phase has a dedicated Skill that ensures consistent, repeatable workflows:
 | **Dev Tools** | subagent-driver, agent-router, tdd-enforcer, requesting-code-review | TDD enforcement, code review |
 | **Architecture Docs** | arch-common, arch-search, arch-update, arch-scaffolder, api-doc-generator | Keep docs in sync with code |
 | **Requirements** | requirements-validator, requirements-sync, forgejo-sync, openspec-archive | Requirement tracking |
-| **Infrastructure** | config-loader *(internal)* | Configuration loading |
-| **Experimental** | agent-team-audit *(disabled by default)* | Multi-agent team audit |
+| **Feedback** | aria-report | Bug reports and feature requests |
+| **Dashboard** | aria-dashboard | Project progress visualization |
+| **Infrastructure** | config-loader, audit-engine, agent-team-audit *(internal)* | Configuration, audit orchestration |
 
 ### Agents (11)
 
@@ -212,8 +213,8 @@ Aria/
 │   ├── core/                   # Core definitions (ten-step cycle)
 │   ├── openspec/               # Requirement spec format
 │   └── conventions/            # Conventions (git commit, etc.)
-├── aria/                       # Aria Plugin (submodule, v1.8.0)
-│   ├── skills/                 # 29 Skills (27 user-facing + 2 internal)
+├── aria/                       # Aria Plugin (submodule, v1.10.0)
+│   ├── skills/                 # 33 Skills (30 user-facing + 3 internal)
 │   ├── agents/                 # 11 Agents
 │   └── .claude-plugin/         # Plugin configuration
 ├── aria-plugin-benchmarks/     # Skill benchmark suite
@@ -232,8 +233,8 @@ Aria/
 ## Project Status
 
 ```
-Project Version:  1.0.2
-Plugin Version:   1.8.0 (aria-plugin)
+Project Version:  1.3.0
+Plugin Version:   1.10.0 (aria-plugin)
 Maturity:         Core workflows verified
 Research Focus:   Reproducibility of AI collaboration patterns
 ```
