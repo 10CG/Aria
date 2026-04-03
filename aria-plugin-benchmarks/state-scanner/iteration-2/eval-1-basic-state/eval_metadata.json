@@ -1,0 +1,37 @@
+{
+  "eval_id": 1,
+  "eval_name": "basic-state-collection",
+  "prompt": "查看项目当前状态",
+  "assertions": [
+    {
+      "id": "A1",
+      "text": "Output includes Git branch/status information",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "text": "Output includes OpenSpec status section",
+      "severity": "high"
+    },
+    {
+      "id": "A3",
+      "text": "Output includes requirements/User Story status",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "text": "Output includes architecture status",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "text": "Output uses structured format with visual section separators",
+      "severity": "medium"
+    },
+    {
+      "id": "A6",
+      "text": "Output includes workflow recommendation options",
+      "severity": "high"
+    }
+  ]
+}

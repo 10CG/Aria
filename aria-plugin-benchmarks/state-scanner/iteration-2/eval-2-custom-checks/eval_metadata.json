@@ -1,0 +1,37 @@
+{
+  "eval_id": 2,
+  "eval_name": "custom-health-checks",
+  "prompt": "扫描项目状态，我有自定义健康检查配置",
+  "assertions": [
+    {
+      "id": "A1",
+      "text": "Output includes a dedicated custom checks section (🔧 or equivalent)",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "text": "Output shows individual check results with pass/fail status",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "text": "Output shows fix suggestions for failed checks",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "text": "Output shows severity level for each check",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "text": "Custom checks section is separate from other status sections",
+      "severity": "medium"
+    },
+    {
+      "id": "A6",
+      "text": "Failed checks do not block the rest of the status report",
+      "severity": "high"
+    }
+  ]
+}

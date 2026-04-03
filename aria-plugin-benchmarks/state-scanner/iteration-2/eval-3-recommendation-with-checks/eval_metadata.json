@@ -1,0 +1,32 @@
+{
+  "eval_id": 3,
+  "eval_name": "recommendation-with-custom-checks",
+  "prompt": "项目状态有问题吗？给我推荐下一步",
+  "assertions": [
+    {
+      "id": "A1",
+      "text": "Output includes numbered recommendation options [1]-[4]",
+      "severity": "critical"
+    },
+    {
+      "id": "A2",
+      "text": "Recommendations account for custom check failures (mention fix or warning)",
+      "severity": "critical"
+    },
+    {
+      "id": "A3",
+      "text": "Custom check results are integrated into the overall status report",
+      "severity": "high"
+    },
+    {
+      "id": "A4",
+      "text": "Severity levels influence recommendation priority/ordering",
+      "severity": "high"
+    },
+    {
+      "id": "A5",
+      "text": "Output provides actionable next steps, not just status",
+      "severity": "medium"
+    }
+  ]
+}

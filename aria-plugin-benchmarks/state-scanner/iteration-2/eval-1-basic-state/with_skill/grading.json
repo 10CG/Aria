@@ -1,0 +1,10 @@
+{
+  "expectations": [
+    {"text": "Output includes Git branch/status information", "passed": true, "evidence": "Line 7: '分支: feature/us-006-custom-health-checks' with full commit history"},
+    {"text": "Output includes OpenSpec status section", "passed": true, "evidence": "Lines 53-61: '📋 OpenSpec 状态' with active/archived/pending counts"},
+    {"text": "Output includes requirements/User Story status", "passed": true, "evidence": "Lines 26-41: '📄 需求状态' with all 6 stories individually listed"},
+    {"text": "Output includes architecture status", "passed": true, "evidence": "Lines 43-51: '🏗️ 架构状态' with version, status, chain validation"},
+    {"text": "Output uses structured format with visual section separators", "passed": true, "evidence": "Uses emoji headers (📍📊📄🏗️📋🛡️🔧📖📦📌🎯), box art, and separator lines throughout"},
+    {"text": "Output includes workflow recommendation options", "passed": true, "evidence": "Lines 119-127: [1]-[4] numbered options with reasons"}
+  ]
+}

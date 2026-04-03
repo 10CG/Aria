@@ -1,0 +1,10 @@
+{
+  "expectations": [
+    {"text": "Output includes Git branch/status information", "passed": true, "evidence": "Line 4: 'Branch: feature/us-006-custom-health-checks' with commit table"},
+    {"text": "Output includes OpenSpec status section", "passed": true, "evidence": "Lines 72-79: 'Active OpenSpec Changes' table"},
+    {"text": "Output includes requirements/User Story status", "passed": true, "evidence": "Lines 57-68: 'User Stories Status' table"},
+    {"text": "Output includes architecture status", "passed": false, "evidence": "Line 125: 'Architecture Documentation' mentioned but only file path listed - no status, version, or chain validation"},
+    {"text": "Output uses structured format with visual section separators", "passed": false, "evidence": "Uses plain markdown headers and tables - no emoji indicators, no visual separator lines, no box art"},
+    {"text": "Output includes workflow recommendation options", "passed": false, "evidence": "Line 162-164: Only a summary paragraph with no numbered options for user selection"}
+  ]
+}

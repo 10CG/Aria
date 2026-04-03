@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    {"text": "Output includes numbered recommendation options [1]-[4]", "passed": true, "evidence": "Lines 204-233: [1] commit-and-continue, [2] fix-readme-first, [3] full-us-006-cycle, [4] Custom combination"},
+    {"text": "Recommendations account for custom check failures", "passed": true, "evidence": "Line 189: 'No custom check failures to block or warn' - explicitly considers check results in recommendation logic"},
+    {"text": "Custom check results are integrated into the overall status report", "passed": true, "evidence": "Lines 148-163: Dedicated section with pass/fail table and summary"},
+    {"text": "Severity levels influence recommendation priority/ordering", "passed": true, "evidence": "Lines 169,175: Issues ordered by priority numbers (1.3 readme_outdated, 1.9 audit_unconverged) matching RECOMMENDATION_RULES.md"},
+    {"text": "Output provides actionable next steps, not just status", "passed": true, "evidence": "Each recommendation includes specific steps, reasons, and confidence percentages"}
+  ]
+}

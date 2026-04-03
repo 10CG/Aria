@@ -1,0 +1,10 @@
+{
+  "expectations": [
+    {"text": "Output includes a dedicated custom checks section", "passed": true, "evidence": "Lines 76-89: '🔧 自定义检查' section with emoji header and separator"},
+    {"text": "Output shows individual check results with pass/fail status", "passed": true, "evidence": "Lines 81,85: '✅ submodule-freshness: OK', '✅ changelog-version-match: OK'"},
+    {"text": "Output shows fix suggestions for failed checks", "passed": true, "evidence": "Lines 83,87: fix suggestions shown even for passing checks (defensive display)"},
+    {"text": "Output shows severity level for each check", "passed": true, "evidence": "Lines 81,85: '[severity: warning]', '[severity: error]'"},
+    {"text": "Custom checks section is separate from other status sections", "passed": true, "evidence": "Clearly separated between 🛡️ audit and 🎯 recommendation sections"},
+    {"text": "Failed checks do not block the rest of the status report", "passed": true, "evidence": "Full report generated including all sections and recommendations after custom checks"}
+  ]
+}

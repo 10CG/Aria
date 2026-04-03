@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    {"text": "Output includes numbered recommendation options [1]-[4]", "passed": false, "evidence": "Uses '推荐 A/B/C/D' lettered format instead of [1]-[4] numbered options. No user selection prompt at the end."},
+    {"text": "Recommendations account for custom check failures", "passed": true, "evidence": "Line 75: '两项自定义检查均通过' - mentions checks passed, factored into recommendations"},
+    {"text": "Custom check results are integrated into the overall status report", "passed": true, "evidence": "Section 3: Dedicated table with check name, result, severity"},
+    {"text": "Severity levels influence recommendation priority/ordering", "passed": false, "evidence": "Recommendations ordered by subjective importance (A/B/C/D) not by severity-based priority rules. No reference to RECOMMENDATION_RULES priority numbers."},
+    {"text": "Output provides actionable next steps, not just status", "passed": true, "evidence": "Each recommendation includes specific actions with git commands and estimated effort"}
+  ]
+}
