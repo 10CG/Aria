@@ -233,7 +233,7 @@ Aria/
 ## Project Status
 
 ```
-Project Version:  1.3.0
+Project Version:  1.4.0
 Plugin Version:   1.10.0 (aria-plugin)
 Maturity:         Core workflows verified
 Research Focus:   Reproducibility of AI collaboration patterns

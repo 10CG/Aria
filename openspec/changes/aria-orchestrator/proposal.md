@@ -1,10 +1,10 @@
 # aria-orchestrator — 外部编排器与自动开发闭环
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: In Progress
 > **Created**: 2026-04-03
 > **Parent Story**: [US-007](../../docs/requirements/user-stories/US-007.md)
-> **Target Version**: v1.5.0 (Phase 3b), v2.0.0 (Phase 3c)
+> **Target Version**: v1.4.0 (Phase 3b ✅), v2.0.0 (Phase 3c)
 
 ## Why
 

@@ -11,8 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - 多 AI 平台兼容性 (US-003)
-- US-005 Phase 2: Issue 提交 + 存储
-- US-005 Phase 3: 心跳 Agent 全自动开发闭环
+- US-007 Phase 3c: 半自动开发闭环 (v2.0.0)
+
+---
+
+## [1.4.0] - 2026-04-08
+
+### Added
+- **aria-orchestrator 子模块** — 外部编排器 Phase 3b 完成 (US-007)
+  - Hermes Agent 心跳扫描 (60m 间隔, GLM-4.5-Air, 零成本)
+  - 飞书 (Feishu) 通知集成 — WebSocket gateway E2E 验证
+  - Aether Nomad 部署 (raw_exec driver, light-1 节点)
+  - heartbeat-scan Skill + scan.sh 确定性扫描器
+- **US-006 自定义健康检查** — state-scanner v2.8.0 完成
+
+### Changed
+- **US-007 Phase 3b-M1~M3 全部完成** — 从 scan-only 到飞书心跳通知
+- **OpenSpec aria-orchestrator** — Status: Draft → In Progress
+- **Hermes 运行时验证**: cron 调度 + 消息网关 + FTS5 memory
+
+### Fixed
+- GLM-4.7-Flash 429 限流 → 切换 GLM-4.5-Air (中文输出优化)
+- Feishu 集成 6 项必要配置 (D17-D22 gotchas 文档化)
+- heartbeat SILENT 模式 + 60m 间隔调整
 
 ---
 
@@ -212,7 +233,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/10CG/Aria/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/10CG/Aria/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/10CG/Aria/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/10CG/Aria/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/10CG/Aria/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/10CG/Aria/compare/v1.0.5...v1.1.0
+[1.0.5]: https://github.com/10CG/Aria/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/10CG/Aria/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/10CG/Aria/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/10CG/Aria/compare/v1.0.1...v1.0.2
