@@ -240,6 +240,12 @@ git worktree remove /tmp/aria-work-{issue-id}
 | D14 | 轻节点 (1C/1G) 足够运行 Hermes | 实测 140MB venv, ~100MB 运行时 |
 | D15 | config.yaml (非 cli-config.yaml) 为 cron 配置源 | 部署经验, scheduler.py:349 |
 | D16 | Skills 放 ~/.hermes/skills/ (非 external_dirs) | cron 中 external_dirs 不生效 |
+| D17 | 飞书必须配 ENCRYPT_KEY + VERIFICATION_TOKEN | 无此配置时事件不推送 (2026-04-08 踩坑) |
+| D18 | 飞书必须配 FEISHU_HOME_CHANNEL | cron deliver 需要目标 chat_id |
+| D19 | GATEWAY_ALLOW_ALL_USERS=true | Hermes 默认拒绝所有用户 |
+| D20 | 所有 env 必须在 Nomad env 块 | dotenv 不被子进程继承 (Hermes 限制) |
+| D21 | 飞书应用可用范围不能为空 | 可见范围为空 → WebSocket 连接成功但零事件 |
+| D22 | 避免频繁重连飞书 WebSocket | 短时间大量重连会被飞书临时限流 |
 | D5 | git worktree 隔离执行 | 不接触主工作目录，最低安全要求 |
 | D6 | C.2 合并永远人类审批 | PR 是安全最后防线，不自动合并 |
 | D7 | Forgejo webhook + cron 双触发 | webhook 实时，cron 兜底 |
