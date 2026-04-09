@@ -1,7 +1,8 @@
 # aria-orchestrator 剥离: 身份澄清 + 子模块移除
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Approved
+> **Status**: Rejected (by product owner, 2026-04-09)
+> **Rejection Reason**: 方向错误 — 产品负责人希望 Aria 作为整体项目升级 (v2.0), 不是剥离。参考 GSD 2 (gsd-build/gsd-2) 一体化模型。新讨论见 aria-2.0-integration OpenSpec。
 > **Created**: 2026-04-09
 > **Parent Story**: [US-007](../../docs/requirements/user-stories/US-007.md)
 > **Target Version**: v1.5.0
