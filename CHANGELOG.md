@@ -15,6 +15,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.2] - 2026-04-09
+
+### Security
+- **scan.sh 复杂度分析器安全加固** — 扩展安全关键词, 强制高危 issue tier=3
+  - 原列表只有 `security` 一个安全词, 漏判 SQL injection/XSS/CVE/RCE 等
+  - 新增 10+ 安全关键词: `vulnerabilit/cve/exploit/injection/xss/csrf/rce/sqli/auth bypass/privilege escalation/credential/secret leak/password leak/token leak/data leak`
+  - 安全匹配现在是硬性规则, 任何命中强制 tier=3
+  - 防止 Aria 2.0 自主 dispatch 模式下高危 issue 绕过人类审批
+
+### Changed
+- **scan.sh / heartbeat.sh 重命名 level → complexity_tier** — 消除与 OpenSpec Level 的语义冲突
+  - JSON 字段: `complexity_level` → `complexity_tier`, `by_level` → `by_complexity_tier`, `level_N` → `tier_N`
+  - 人类输出: `[Level N]` → `[Tier N]`
+  - 新增注释明确 "Complexity Tier" 与 "OpenSpec Level" 是不同概念
+  - 影响文件: `scan.sh`, `heartbeat.sh`, `schema/scan-result.json`, `skills/heartbeat-scan/SKILL.md`
+
+### Docs
+- **Aria 2.0 PRD** 初稿 (`docs/requirements/prd-aria-v2.md`)
+  - 基于 5 轮 Agent Team 收敛讨论
+  - 两层 AI 分工架构 (Hermes Layer 1 + 容器 Layer 2)
+  - 12 项关键架构决策记录
+  - 路线图 M0-M6 (~750h / 9 月 50% 投入)
+
+---
+
 ## [1.4.1] - 2026-04-09
 
 ### Added
@@ -250,7 +275,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/10CG/Aria/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/10CG/Aria/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/10CG/Aria/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/10CG/Aria/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/10CG/Aria/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/10CG/Aria/compare/v1.2.0...v1.3.0

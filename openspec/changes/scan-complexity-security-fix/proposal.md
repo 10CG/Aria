@@ -1,7 +1,7 @@
 # scan.sh 复杂度分析器安全 gap 修复 + Level 语义澄清
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Approved
+> **Status**: Complete
 > **Created**: 2026-04-09
 > **Parent Story**: [US-007](../../docs/requirements/user-stories/US-007.md)
 > **Target Version**: v1.4.2
