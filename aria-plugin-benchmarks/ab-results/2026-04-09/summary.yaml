@@ -8,7 +8,7 @@ results:
     with_skill_pass_rate: 1.0
     without_skill_pass_rate: 0.182
     delta_pass_rate: 0.818
-    verdict: "STRONG_WITH_BETTER"
+    verdict: "STRONG_POSITIVE_DELTA"
     skill_version: "2.9.0"
     previous_version: "2.8.0"
     evals: 3

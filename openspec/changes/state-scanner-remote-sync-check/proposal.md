@@ -210,7 +210,7 @@ fi
 | D5 | 不做 Issue 扫描 | 独立 Level 3 OpenSpec 处理 (`state-scanner-issue-awareness`) |
 | D6 | 文档抽到 references/sync-detection.md | 避免 SKILL.md 膨胀 (knowledge-manager 建议) |
 | D7 | warn_after_hours=24 默认值 | 日常开发节奏的自然分界点 |
-| D8 | **子阶段数量上限 15** (修复 M6) | 当前 11 → 本 Spec 后 12；超过 15 必须重构为分组 (如 Git/Context/Quality) 或合并语义相近阶段。阻止无界膨胀 |
+| D8 | **子阶段数量上限 15 + 顺序追加规约** (修复 M6 + Round 1 pre_merge tl_m2) | 当前 11 → 本 Spec 后 12；超过 15 必须重构为分组 (如 Git/Context/Quality) 或合并语义相近阶段。**阶段编号分配策略: append-only** — 新阶段一律追加到最大现存编号 + 1 (如当前最大 1.11，下一个必须是 1.12，不允许"插入 1.1.5"或填补空位)。理由: 可预测性 + 外部引用稳定性 |
 | D9 | **fail-soft 定义** (修复 m10) | 本 Spec 权威定义：任一命令失败 → 对应字段 null + `reason` 标注 + warning，绝不 exit ≠ 0，绝不阻塞后续阶段。`state-scanner-issue-awareness` 交叉引用此定义 |
 | D10 | **remote_commit 四级 fallback** (修复 M4) | Aria 多数子仓库无 `origin/HEAD`；必须通过 ls-remote (5s 超时) → config default → null 的降级链保证可用性 |
 | D11 | **upstream 显式探测** (修复 M3) | 先 `rev-parse @{u}` 判断 upstream 存在，再计算 ahead/behind，避免 `rev-list --count` 的 exit ≠ 0 |
@@ -268,3 +268,6 @@ fi
 - [ ] AC8: `aria-plugin-benchmarks/ab-results/latest/summary.yaml` 包含本次 state-scanner v2.9.0 记录
 - [ ] AC9: 所有 **12 个** 影响文件已按 Scope 表修改 (其中 **5 个版本号文件** 一致为 2.9.0: `plugin.json` / `marketplace.json` / `VERSION` / `CHANGELOG.md` / `README.md`；`docs/architecture/system-architecture.md` 不含版本号字段，仅 PATCH 级内容更新)
 - [ ] AC10: 本地 git 版本 < 2.15 时 fallback 到 `.git/shallow` 检测，不报 "unknown option"
+- [ ] AC11 (pre_merge Round 1 M1 fix): 本地领先远程场景 (`behind_count == 0 AND ahead_count > 0`) 输出 `hint_type: "push"` 且 **不触发** `submodule_drift` 规则, 改为 info 级 "push" 建议, 避免发出破坏性 "update --remote" 提示
+- [ ] AC12 (pre_merge Round 1 M1 fix): `tree_vs_remote == true` 但双方计数均为 0 (shallow clone 异常场景) 输出 `hint_type: "manual_check"`, 提示人工检查
+- [ ] AC13 (pre_merge Round 2 cr_r2_m2 fix): `rev-list --count` 返回空字符串时, 方向判定函数 `is_positive_int` 正确处理, 不报 "integer expression expected"

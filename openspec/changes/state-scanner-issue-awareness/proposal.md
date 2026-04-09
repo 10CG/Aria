@@ -251,7 +251,7 @@ SKILL.md 主文档只保留阶段摘要 (~25 行)。
 | D1 | Phase 1.13 追加，位于 1.12 之后 | 顺序依赖 (sync 早于 issue 便于上下文理解)；无代码依赖 |
 | D2 | 默认 `enabled: false` | 需网络 + token；opt-in 保证离线场景零影响 |
 | D3 | 15 分钟 TTL 缓存 | 单会话零打扰 + 跨会话新鲜度平衡 |
-| D4 | 仅复用 CLI wrapper (forgejo/gh) | 不在 skill 内管理 token，遵循既有信任模型 |
+| D4 | 仅复用 CLI wrapper (forgejo/gh) + 版本锚定 (Round 1 pre_merge tl_m3 fix) | 不在 skill 内管理 token；遵循既有信任模型。**依赖契约**: 本 Spec 锚定 `forgejo` CLI wrapper 的 `GET /repos/{owner}/{repo}/issues` 响应 JSON shape 必须含 `number` / `title` / `labels[].name` / `html_url` / `body` 字段 (对应 Gitea API v1 schema)。wrapper 升级改变 shape 必须在本 Spec addendum 声明兼容层，否则 `normalize` 映射会静默破坏。首版测试基于 `forgejo` wrapper 当前行为（2026-04-09 快照）。 |
 | D5 | 首版仅 Forgejo + GitHub | Aria 主场景；GitLab 作为 v2 扩展 |
 | D6 | 不递归子模块 issues | 噪音控制；独立 config 开关作为扩展点 |
 | D7 | 启发式关联 (非断言) | 避免误判；明确标注为启发式 |
