@@ -1,7 +1,7 @@
 # aria-orchestrator 心跳可观测性: 执行日志 + 扫描级熔断
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Approved
+> **Status**: Complete
 > **Created**: 2026-04-08
 > **Parent Story**: [US-007](../../docs/requirements/user-stories/US-007.md)
 > **Target Version**: v1.4.1

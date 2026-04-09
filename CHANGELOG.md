@@ -15,6 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - 2026-04-09
+
+### Added
+- **心跳执行日志** — 每次心跳追加到 `.aria/heartbeat-log/{date}.log`
+  - 记录: 时间戳, 扫描模式, issue 数量, 分级统计, 通知结果
+  - silent 模式 (0 issues) 也记录，确保完整审计轨迹
+  - notify 失败时附带 `err=` 错误详情
+- **扫描级熔断机制** — 连续 3 次心跳失败自动暂停
+  - 创建 `.aria/heartbeat-breaker` + 飞书告警
+  - 手动恢复: 删除 breaker + fail-count 文件
+  - 计数文件健壮性: 非数字内容自动重置
+
+### Fixed
+- heartbeat.sh python3 消息构建增加异常防护 (set -e 下不再静默中断)
+
+---
+
 ## [1.4.0] - 2026-04-08
 
 ### Added
@@ -233,7 +250,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/10CG/Aria/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/10CG/Aria/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/10CG/Aria/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/10CG/Aria/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/10CG/Aria/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/10CG/Aria/compare/v1.1.0...v1.2.0
