@@ -1,8 +1,12 @@
 {
   "skill_name": "state-scanner",
-  "version": "1.1.0",
-  "source_evals_count": 4,
-  "selected_count": 4,
+  "version": "1.2.0",
+  "source_evals_count": 7,
+  "selected_count": 7,
+  "changelog": [
+    {"version": "1.2.0", "date": "2026-04-09", "changes": "新增 Phase 1.12 (sync detection) + Phase 1.13 (issue awareness) 测试用例 3 个, 对应 state-scanner v2.9.0"},
+    {"version": "1.1.0", "date": "2026-03-18", "changes": "建立首版固定测试集"}
+  ],
   "evals": [
     {
       "id": 1,
@@ -45,6 +49,50 @@
         "Should mention .aria/config.json or config-loader",
         "Should describe config fields like auto_proceed or confidence_threshold",
         "Should mention default values when config is absent"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "submodule-sync-detection-new",
+      "prompt": "我在一个有 3 个 git 子模块的项目中工作 (aria, standards, aria-orchestrator)。最近其他协作者推送了 submodule 更新到远程。我想运行状态扫描了解当前本地代码是否和远程同步，特别是子模块是否落后远程。请扫描并告诉我是否需要 git submodule update。",
+      "expected_output": "",
+      "expectations": [
+        "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+        "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+        "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+        "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+        "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+        "Should fail-soft on any git error, never blocking the rest of the scan"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "upstream-behind-detection-new",
+      "prompt": "我的 feature 分支已经开发几天了，怀疑主分支已经有新的改动我没拉下来。请扫描状态告诉我当前分支是否落后 upstream，并提示我是否需要 git pull。注意项目可能有 detached HEAD 或 shallow clone 场景需要处理。",
+      "expected_output": "",
+      "expectations": [
+        "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+        "Should report current_branch.ahead and current_branch.behind when upstream exists",
+        "Should handle missing upstream with reason: no_upstream, not exit with error",
+        "Should handle detached HEAD with reason: detached_head",
+        "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+        "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "issue-awareness-opt-in-new",
+      "prompt": "我用 Aria 管理一个 Forgejo 上的项目，最近积累了一些 open issues 不知道哪些是阻塞性的。我想在开发新 feature 前先扫描项目状态同时了解 open issues。我的 .aria/config.json 中 state_scanner.issue_scan.enabled 设置为 true，platform 是 forgejo。请扫描并展示 issues。",
+      "expected_output": "",
+      "expectations": [
+        "Should show an Open Issues section only when issue_scan.enabled is true",
+        "Should detect platform using 4-tier priority (config.platform -> hostname map -> URL inference -> fallback)",
+        "Should call forgejo CLI wrapper (not raw curl) and handle 10 fetch_error enum values (network_unavailable, cli_missing, auth_missing, auth_failed, rate_limited, not_found_or_no_access, timeout, platform_unknown, parse_error, unknown)",
+        "Should use cache with 15-minute TTL at .aria/cache/issues.json",
+        "Should NOT manage API tokens inside the skill (rely on existing CLI wrapper auth)",
+        "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
+        "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
+        "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing"
       ]
     }
   ]

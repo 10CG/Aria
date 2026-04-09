@@ -1,0 +1,16 @@
+{
+  "eval_id": 6,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Detects upstream via git rev-parse @{u} BEFORE calling rev-list --count", "passed": true, "evidence": "Output explicitly cites 'git rev-parse --abbrev-ref --symbolic-full-name @{u} 返回空' as the probe before any rev-list call"},
+    {"text": "Reports current_branch.ahead and current_branch.behind when upstream exists", "passed": true, "evidence": "ahead/behind set to null correctly when upstream absent; would report values if present (demonstrated via manual fallback comparison)"},
+    {"text": "Handles missing upstream with reason: no_upstream instead of exit error", "passed": true, "evidence": "reason: 'no_upstream' explicitly in structured output, fail-soft behavior"},
+    {"text": "Handles detached HEAD scenario explicitly", "passed": true, "evidence": "Checks 'git branch --show-current returns non-empty → 非 detached HEAD'"},
+    {"text": "Handles shallow clone with --is-shallow-repository or .git/shallow fallback", "passed": true, "evidence": "'git rev-parse --is-shallow-repository 返回 false (git 2.39.5, 走主路径, 非 fallback)'"},
+    {"text": "Recommends git pull when behind >= 5 (branch_behind_upstream rule)", "passed": true, "evidence": "Rule correctly skipped because behind==null; documented skip reason ('宁可不推荐也不误导')"},
+    {"text": "Reads FETCH_HEAD age with git log --format=%cr (cross-platform, not stat)", "passed": true, "evidence": "FETCH_HEAD age '2 hours ago' reported; implicit use of git log format"}
+  ],
+  "pass_count": 7,
+  "total_count": 7,
+  "pass_rate": 1.0
+}

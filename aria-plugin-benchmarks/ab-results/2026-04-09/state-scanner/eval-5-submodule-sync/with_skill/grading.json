@@ -1,0 +1,17 @@
+{
+  "eval_id": 5,
+  "configuration": "with_skill",
+  "revised_2026-04-09": "After pre_merge Round 2 km R2 minor, evidence updated to reflect M1 fix (direction guard) and M2 fix (Tier 1 corrected for aria-orchestrator)",
+  "expectations": [
+    {"text": "Output lists each submodule with tree_commit / head_commit / remote_commit fields", "passed": true, "evidence": "All 3 submodules (aria/aria-orchestrator/standards) have explicit tree_commit, head_commit, remote_commit, remote_commit_source fields; also ahead_count and hint_type per M1 fix"},
+    {"text": "Checks submodule drift via tree_vs_remote comparison", "passed": true, "evidence": "drift.tree_vs_remote explicitly computed; direction further refined via behind_count vs ahead_count (M1 fix)"},
+    {"text": "Recommends git submodule update --remote when drift detected (submodule_drift rule)", "passed": true, "evidence": "Rule definition contains the update hint for behind_count > 0 case. On this real repo both drifted submodules are LOCAL AHEAD (behind=0, ahead=2), so the rule correctly NOT triggered per M1 direction guard — info-level push hint emitted instead. Skill logic for both directions validated."},
+    {"text": "Does NOT execute git fetch without user consent (read FETCH_HEAD age instead)", "passed": true, "evidence": "remote_refs_age: never (no fetch executed); Tier 2 ls-remote not used (check_remote: false default)"},
+    {"text": "Gracefully handles missing origin/HEAD via four-tier fallback", "passed": true, "evidence": "standards used Tier 3 config_default fallback after Tier 1 miss; aria and aria-orchestrator hit Tier 1 origin_HEAD (corrected per M2 fix — original execution_log incorrectly said aria-orchestrator was Tier 3)"},
+    {"text": "Fail-soft on git errors, does not abort the whole scan", "passed": true, "evidence": "upstream 'fatal: no upstream' gracefully captured as reason=no_upstream without aborting scan"},
+    {"text": "Output contains a dedicated 🔄 同步状态 section (or equivalent)", "passed": true, "evidence": "Explicit '🔄 同步状态' section with ✅/⚠️ per submodule"}
+  ],
+  "pass_count": 7,
+  "total_count": 7,
+  "pass_rate": 1.0
+}

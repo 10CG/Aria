@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.10.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.11.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -213,7 +213,7 @@ Aria/
 │   ├── core/                   # Core definitions (ten-step cycle)
 │   ├── openspec/               # Requirement spec format
 │   └── conventions/            # Conventions (git commit, etc.)
-├── aria/                       # Aria Plugin (submodule, v1.10.0)
+├── aria/                       # Aria Plugin (submodule, v1.11.0)
 │   ├── skills/                 # 33 Skills (30 user-facing + 3 internal)
 │   ├── agents/                 # 11 Agents
 │   └── .claude-plugin/         # Plugin configuration
@@ -234,7 +234,7 @@ Aria/
 
 ```
 Project Version:  1.4.2
-Plugin Version:   1.10.0 (aria-plugin)
+Plugin Version:   1.11.0 (aria-plugin)
 Maturity:         Core workflows verified
 Research Focus:   Reproducibility of AI collaboration patterns
 ```

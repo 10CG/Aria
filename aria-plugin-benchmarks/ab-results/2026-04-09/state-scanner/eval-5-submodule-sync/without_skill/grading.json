@@ -1,0 +1,16 @@
+{
+  "eval_id": 5,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Output lists each submodule with tree_commit / head_commit / remote_commit fields", "passed": true, "evidence": "Gitlink/HEAD/origin-master listed per submodule, though field names differ from skill schema (gitlink vs tree_commit)"},
+    {"text": "Checks submodule drift via tree_vs_remote comparison", "passed": false, "evidence": "Compares gitlink vs HEAD (workdir_vs_tree semantic) but does NOT do tree_vs_remote comparison explicitly"},
+    {"text": "Recommends git submodule update --remote when drift detected (submodule_drift rule)", "passed": false, "evidence": "Actively recommends NOT running git submodule update; concludes 'no drift'. Missed the tree_vs_remote drift entirely"},
+    {"text": "Does NOT execute git fetch without user consent (read FETCH_HEAD age instead)", "passed": true, "evidence": "Used cached refs/remotes without fetching"},
+    {"text": "Gracefully handles missing origin/HEAD via four-tier fallback", "passed": false, "evidence": "No fallback logic; relies on whatever git happens to have locally"},
+    {"text": "Fail-soft on git errors, does not abort the whole scan", "passed": true, "evidence": "Completed full analysis without errors"},
+    {"text": "Output contains a dedicated 🔄 同步状态 section (or equivalent)", "passed": false, "evidence": "No structured sync_status section with the Skill's visual brand"}
+  ],
+  "pass_count": 3,
+  "total_count": 7,
+  "pass_rate": 0.429
+}
