@@ -1,0 +1,15 @@
+{
+  "eval_id": 7,
+  "eval_name": "issue-awareness-opt-in-new",
+  "prompt": "我用 Aria 管理一个 Forgejo 上的项目，最近积累了一些 open issues 不知道哪些是阻塞性的。我想在开发新 feature 前先扫描项目状态同时了解 open issues。我的 .aria/config.json 中 state_scanner.issue_scan.enabled 设置为 true，platform 是 forgejo。请扫描并展示 issues。",
+  "assertions": [
+    {"text": "Shows 🎫 Open Issues section with open issues list when enabled=true", "weight": 1.0},
+    {"text": "Detects Forgejo platform via 4-tier priority (config -> hostname -> URL -> fallback)", "weight": 1.0},
+    {"text": "Calls forgejo CLI wrapper, not raw curl", "weight": 1.0},
+    {"text": "Handles 10 fetch_error enum values with proper fail-soft degradation", "weight": 1.0},
+    {"text": "Uses cache with 15-minute TTL at .aria/cache/issues.json", "weight": 1.0},
+    {"text": "Does NOT manage API tokens inside the skill", "weight": 1.0},
+    {"text": "Attempts heuristic linking to US-NNN or OpenSpec change names with word boundary protection", "weight": 1.0},
+    {"text": "Recommends triage for blocker/critical labeled issues (open_blocker_issues rule)", "weight": 1.0}
+  ]
+}

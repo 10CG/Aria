@@ -1,0 +1,17 @@
+{
+  "eval_id": 7,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Shows 🎫 Open Issues section with open issues list when enabled=true", "passed": false, "evidence": "No structured Open Issues section; refers user to browse the web UI manually"},
+    {"text": "Detects Forgejo platform via 4-tier priority (config -> hostname -> URL -> fallback)", "passed": false, "evidence": "Manually reads git remote -v but no 4-tier detection logic"},
+    {"text": "Calls forgejo CLI wrapper, not raw curl", "passed": false, "evidence": "Suggests raw curl first, mentions forgejo CLI as uncertain possibility"},
+    {"text": "Handles 10 fetch_error enum values with proper fail-soft degradation", "passed": false, "evidence": "No error classification; falls back to 'open browser'"},
+    {"text": "Uses cache with 15-minute TTL at .aria/cache/issues.json", "passed": false, "evidence": "No caching concept"},
+    {"text": "Does NOT manage API tokens inside the skill", "passed": true, "evidence": "Does not attempt to manage tokens (trivially satisfied because no API call made)"},
+    {"text": "Attempts heuristic linking to US-NNN or OpenSpec change names with word boundary protection", "passed": false, "evidence": "No heuristic linking logic at all"},
+    {"text": "Recommends triage for blocker/critical labeled issues (open_blocker_issues rule)", "passed": false, "evidence": "No recommendation rule framework"}
+  ],
+  "pass_count": 1,
+  "total_count": 8,
+  "pass_rate": 0.125
+}

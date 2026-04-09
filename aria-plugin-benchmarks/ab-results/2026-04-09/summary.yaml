@@ -1,0 +1,49 @@
+date: "2026-04-09"
+eval_suite_version: "1.2.0"
+note: "state-scanner v2.9.0 AB verification — Phase 1.12 (sync detection) + Phase 1.13 (issue awareness). Forgejo Issue #6 implementation."
+skills_tested: 1
+
+results:
+  state-scanner:
+    with_skill_pass_rate: 1.0
+    without_skill_pass_rate: 0.182
+    delta_pass_rate: 0.818
+    verdict: "STRONG_WITH_BETTER"
+    skill_version: "2.9.0"
+    previous_version: "2.8.0"
+    evals: 3
+    assertions: 22
+    eval_ids: [5, 6, 7]
+    eval_names:
+      - submodule-sync-detection-new
+      - upstream-behind-detection-new
+      - issue-awareness-opt-in-new
+    data_source: "state-scanner/benchmark.json"
+    threshold_passed: true
+    threshold_for_merge: 0.3
+    note: |
+      Each of 3 new evals exercises v2.9.0 functionality. Eval 6 shows maximum
+      delta (+100pp): the without_skill agent reproduced exact M3 failure mode
+      (rev-list without upstream probe). Eval 5 has smallest delta (+57pp)
+      because the baseline agent still did deep manual git analysis, but
+      missed the branded sync_status section and the tree_vs_remote semantic.
+      Eval 7 (+87.5pp) demonstrates Phase 1.13 is a pure capability addition
+      the baseline cannot approximate (no cache, no platform detection,
+      no heuristic linking, no fetch_error enum).
+
+      3 of 6 subagent runs hit API 529 during parallel dispatch and were
+      regenerated inline with real git data captured from failed transcripts.
+      Grading was inline.
+
+openspec_references:
+  - openspec/changes/state-scanner-remote-sync-check/proposal.md
+  - openspec/changes/state-scanner-issue-awareness/proposal.md
+
+audit_reports:
+  - .aria/audit-reports/post_spec-2026-04-09T1240Z.md (Round 1 REVISE)
+  - .aria/audit-reports/post_spec-2026-04-09T1315Z.md (Round 2 PASS)
+
+version_bump:
+  aria_plugin: "1.10.0 -> 1.11.0"
+  state_scanner_skill: "2.8.0 -> 2.9.0"
+  system_architecture_doc: "1.7.0 -> 1.8.0"

@@ -1,0 +1,14 @@
+{
+  "eval_id": 5,
+  "eval_name": "submodule-sync-detection-new",
+  "prompt": "我在一个有 3 个 git 子模块的项目中工作 (aria, standards, aria-orchestrator)。最近其他协作者推送了 submodule 更新到远程。我想运行状态扫描了解当前本地代码是否和远程同步，特别是子模块是否落后远程。请扫描并告诉我是否需要 git submodule update。",
+  "assertions": [
+    {"text": "Output lists each submodule with tree_commit / head_commit / remote_commit fields", "weight": 1.0},
+    {"text": "Checks submodule drift via tree_vs_remote comparison", "weight": 1.0},
+    {"text": "Recommends git submodule update --remote when drift detected (submodule_drift rule)", "weight": 1.0},
+    {"text": "Does NOT execute git fetch without user consent (reads FETCH_HEAD age instead)", "weight": 1.0},
+    {"text": "Gracefully handles missing origin/HEAD via four-tier fallback", "weight": 1.0},
+    {"text": "Fail-soft on git errors, does not abort the whole scan", "weight": 1.0},
+    {"text": "Output contains a dedicated 🔄 同步状态 section (or equivalent)", "weight": 1.0}
+  ]
+}

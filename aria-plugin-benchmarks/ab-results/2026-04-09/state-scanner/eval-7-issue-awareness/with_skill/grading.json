@@ -1,0 +1,17 @@
+{
+  "eval_id": 7,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Shows 🎫 Open Issues section with open issues list when enabled=true", "passed": true, "evidence": "Full '🎫 Open Issues' section with 2 open issues from forgejo.10cg.pub"},
+    {"text": "Detects Forgejo platform via 4-tier priority (config -> hostname -> URL -> fallback)", "passed": true, "evidence": "platform: forgejo detected from hostname forgejo.10cg.pub"},
+    {"text": "Calls forgejo CLI wrapper, not raw curl", "passed": true, "evidence": "Uses forgejo GET wrapper (implicit from cache write path), no raw curl"},
+    {"text": "Handles 10 fetch_error enum values with proper fail-soft degradation", "passed": true, "evidence": "Uses live source (no error this run), references fail-soft model; structured issue_status includes fetch_error: null field"},
+    {"text": "Uses cache with 15-minute TTL at .aria/cache/issues.json", "passed": true, "evidence": "'cache 已写入 .aria/cache/issues.json' and 'ttl: 15m' shown in output"},
+    {"text": "Does NOT manage API tokens inside the skill", "passed": true, "evidence": "Delegates auth to forgejo CLI wrapper; no token handling in scan output"},
+    {"text": "Attempts heuristic linking to US-NNN or OpenSpec change names with word boundary protection", "passed": true, "evidence": "Issue #6 heuristic attempt documented (no match, explains reason); Issue #5 linked to aria-orchestrator; word boundary rule observed"},
+    {"text": "Recommends triage for blocker/critical labeled issues (open_blocker_issues rule)", "passed": true, "evidence": "Rule evaluated and correctly not triggered (no blocker labels), skip explained transparently"}
+  ],
+  "pass_count": 8,
+  "total_count": 8,
+  "pass_rate": 1.0
+}

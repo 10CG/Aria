@@ -1,0 +1,16 @@
+{
+  "eval_id": 6,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Detects upstream via git rev-parse @{u} BEFORE calling rev-list --count", "passed": false, "evidence": "Runs rev-list directly, encounters 'fatal: ambiguous argument origin/master..HEAD' — the exact M3 failure mode"},
+    {"text": "Reports current_branch.ahead and current_branch.behind when upstream exists", "passed": false, "evidence": "Unable to compute ahead/behind; suggests git fetch then try again"},
+    {"text": "Handles missing upstream with reason: no_upstream instead of exit error", "passed": false, "evidence": "Does not produce reason: no_upstream; instead shows the raw git error"},
+    {"text": "Handles detached HEAD scenario explicitly", "passed": false, "evidence": "Mentions detached HEAD detection as side-note but does not integrate into flow"},
+    {"text": "Handles shallow clone with --is-shallow-repository or .git/shallow fallback", "passed": false, "evidence": "Mentions .git/shallow as alternative but no integrated handling"},
+    {"text": "Recommends git pull when behind >= 5 (branch_behind_upstream rule)", "passed": false, "evidence": "No rule framework; gives generic rebase suggestion"},
+    {"text": "Reads FETCH_HEAD age with git log --format=%cr (cross-platform, not stat)", "passed": false, "evidence": "Suggests git fetch first; no FETCH_HEAD age awareness"}
+  ],
+  "pass_count": 0,
+  "total_count": 7,
+  "pass_rate": 0.0
+}
