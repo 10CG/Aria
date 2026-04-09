@@ -1,9 +1,9 @@
 # Aria System Architecture
 
-> **Version**: 1.7.0
+> **Version**: 1.8.0
 > **Status**: Active
 > **Created**: 2026-01-18
-> **Last Updated**: 2026-04-03
+> **Last Updated**: 2026-04-09
 > **Project Type**: Methodology Research
 > **Parent PRD**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
 
@@ -776,6 +776,7 @@ Review Early, Review Often:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 1.8.0 | 2026-04-09 | state-scanner v2.9.0 状态感知扩展：Phase 1.12 本地/远程同步检测 (submodule 四级 fallback + upstream 探测 + 浅克隆兼容) 和 Phase 1.13 Issue 感知扫描 (Forgejo/GitHub 适配 + 15min 缓存 + 启发式关联)。子阶段数量 11→13 (上限 15 规约 D8)。aria-plugin v1.10.0→1.11.0。双 OpenSpec 并行 (Level 2 + Level 3)，post_spec 审计 2 轮收敛通过 |
 | 1.7.0 | 2026-04-03 | 可视化子系统：aria-dashboard (5 数据解析器 + 单文件 HTML + 跨项目兼容)。Skills 32→33 |
 | 1.6.0 | 2026-04-02 | 自动审计子系统：audit-engine (convergence/challenge 双模式)、7 检查点集成、config-loader 兼容层、state-scanner v2.7.0 adaptive 路由。Skills 30→32 |
 | 1.5.2 | 2026-04-01 | Skills 数量更新 (29→30)：新增 aria-report Skill (Issue 报告与反馈) |
