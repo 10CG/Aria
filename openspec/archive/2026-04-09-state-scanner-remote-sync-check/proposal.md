@@ -1,12 +1,15 @@
 # state-scanner 本地/远程同步检测
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Draft (Revised after post_spec audit Round 1)
+> **Status**: **Complete** (archived 2026-04-09)
 > **Created**: 2026-04-09
-> **Revised**: 2026-04-09 (audit findings M3/M4/M6/M7/m4/m5/m8/m11/m12)
-> **Target Version**: aria-plugin **v1.11.0** / state-scanner skill internal v2.9.0 (corrected 2026-04-09: aria-plugin 主版本遵循 1.x 序列，state-scanner Skill 内部版本号独立为 2.x)
+> **Revised**: 2026-04-09 (post_spec audit R1/R2 + pre_merge audit R1-R4)
+> **Archived**: 2026-04-09
+> **Target Version**: aria-plugin **v1.11.0** / state-scanner skill internal v2.9.0
 > **Source**: Forgejo Issue #6 (需求 2/2)
-> **Related To**: `state-scanner-issue-awareness` (Issue #6 需求 1/2, 并行开发, 同版本 v2.9.0 发布)
+> **Related To**: `state-scanner-issue-awareness` (Issue #6 需求 1/2, 并行发布)
+> **Merged**: aria-plugin#4 (b052a3e), Aria#7 (5ac335a)
+> **US**: US-008
 
 ## Why
 

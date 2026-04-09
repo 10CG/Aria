@@ -1,12 +1,15 @@
 # state-scanner Issue 感知能力
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft (Revised after post_spec audit Round 1)
+> **Status**: **Complete** (archived 2026-04-09)
 > **Created**: 2026-04-09
-> **Revised**: 2026-04-09 (audit findings M1/M2/M5/M8/M9/M10/m3/m6/m7/m8/m9/m10)
-> **Target Version**: aria-plugin **v1.11.0** / state-scanner skill internal v2.9.0 (与 sync-check 同版本并行发布, 修复 M2; 版本号层级修正见 2026-04-09 code-review)
+> **Revised**: 2026-04-09 (post_spec audit R1/R2 + pre_merge audit R1-R4)
+> **Archived**: 2026-04-09
+> **Target Version**: aria-plugin **v1.11.0** / state-scanner skill internal v2.9.0
 > **Source**: Forgejo Issue #6 (需求 1/2)
-> **Related To**: `state-scanner-remote-sync-check` (v2.9.0, 并行开发, 同版本发布; fail-soft 定义见其 D9, 修复 M1)
+> **Related To**: `state-scanner-remote-sync-check` (同版本并行发布)
+> **Merged**: aria-plugin#4 (b052a3e), Aria#7 (5ac335a)
+> **US**: US-008
 > **Tasks**: [tasks.md](./tasks.md)
 
 ## Why
