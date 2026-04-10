@@ -47,8 +47,7 @@ def test_normal_dual_delta_computation():
         )
         cat_map = {"generic_a": "generic_capability", "generic_b": "generic_capability", "aria_x": "aria_convention"}
         result = cdd.compute_eval_delta(tmp_path / "eval-1", cat_map)
-        assert result["internal"]["delta"] == 0.333  # (3/3 - 1/3) = 0.667... → wait
-        # Actually: with=3/3=1.0, without=1/3=0.333, delta=0.667
+        # with=3/3=1.0, without=1/3=0.333, delta=0.667
         assert result["internal"]["delta"] == 0.667
         # Cross-project (excluding aria): with=2/2=1.0, without=1/2=0.5, delta=0.5
         assert result["cross_project"]["delta"] == 0.5
@@ -86,14 +85,17 @@ def test_missing_category_defaults_to_aria_convention_with_warning(capsys):
             [("unknown_key", True)],
             [("unknown_key", False)],
         )
-        # Reset warning state to ensure capture
-        cdd._unmapped_warned.clear()
-        result = cdd.compute_eval_delta(tmp_path / "eval-1", {})
+        # Round 1 cr_m3 fix: pass an explicit per-call warned set to avoid
+        # module-level state pollution between tests.
+        local_warned: set = set()
+        result = cdd.compute_eval_delta(tmp_path / "eval-1", {}, warned=local_warned)
         captured = capsys.readouterr()
         assert "WARNING" in captured.err
         assert "unknown_key" in captured.err
         # Default to aria_convention → cross-project gets nothing
         assert result["cross_project"]["assertion_count"] == 0
+        # The local set should have captured the warning state, not module-level
+        assert "unknown_key" in local_warned
 
 
 def test_grading_with_extra_items_uses_grading_as_source_of_truth():
@@ -153,24 +155,108 @@ def test_aggregate_across_multiple_evals():
         assert agg["inflation_ratio"] == 0.25
 
 
-def test_help_flag_exits_zero(capsys):
+def test_help_flag_exits_zero(capsys, monkeypatch):
     """--help prints docstring and exits 0."""
-    sys.argv = ["calc_dual_delta.py", "--help"]
+    monkeypatch.setattr(sys, "argv", ["calc_dual_delta.py", "--help"])
     try:
         cdd.main()
     except SystemExit as e:
         assert e.code == 0
     captured = capsys.readouterr()
     assert "calc_dual_delta.py" in captured.out
-    assert "Spike prototype" in captured.out
+    # Round 1 qa_m9 fix: docstring no longer says "Spike prototype"
+    # (graduated to official reporting tool per Spec AC1)
+    assert "Dual Delta Reporting" in captured.out
 
 
-def test_no_args_exits_one(capsys):
+def test_no_args_exits_one(capsys, monkeypatch):
     """Missing positional args prints usage and exits 1."""
-    sys.argv = ["calc_dual_delta.py"]
+    monkeypatch.setattr(sys, "argv", ["calc_dual_delta.py"])
     try:
         cdd.main()
     except SystemExit as e:
         assert e.code == 1
     captured = capsys.readouterr()
     assert "Usage" in captured.err
+
+
+def test_inflation_ratio_capped_when_cross_delta_negative(capsys):
+    """Round 1 qa_M1 + Round 2 nf_01 fix: cross_delta<0 with internal_delta>0 →
+    inflation raw > 1.0 → capped at INFLATION_CAP_UPPER=1.0 + warning + uncapped preserved.
+
+    Fixture design (Round 2 nf_01 fix): need internal_delta > 0 AND cross_delta < 0
+    simultaneously across the aggregate. Use UNEQUAL assertion counts to prevent
+    internal cancellation:
+      - eval-1: 3 aria assertions (all pass with_skill, all fail without) → internal=+1.0, count=3
+      - eval-2: 1 generic assertion (fails with_skill, passes without)     → internal=-1.0, count=1, cross=-1.0, count=1
+    Weighted internal = (1.0*3 + (-1.0)*1) / 4 = 0.5
+    Weighted cross    = (-1.0*1) / 1 = -1.0
+    Raw inflation = 1 - (-1.0 / 0.5) = 3.0 → CAPPED to 1.0, uncapped = 3.0
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        # eval-1: 3 aria assertions, positive internal, no cross
+        make_eval_dir(
+            tmp_path,
+            "eval-1",
+            [{"text": f"aria_{i}", "weight": 1.0} for i in range(3)],
+            [(f"aria_{i}", True) for i in range(3)],
+            [(f"aria_{i}", False) for i in range(3)],
+        )
+        # eval-2: 1 generic assertion, NEGATIVE cross
+        make_eval_dir(
+            tmp_path,
+            "eval-2",
+            [{"text": "gen_x", "weight": 1.0}],
+            [("gen_x", False)],  # with_skill fails
+            [("gen_x", True)],   # without_skill passes
+        )
+        cat_map = {
+            "aria_0": "aria_convention", "aria_1": "aria_convention", "aria_2": "aria_convention",
+            "gen_x": "generic_capability",
+        }
+        results = [
+            cdd.compute_eval_delta(tmp_path / "eval-1", cat_map),
+            cdd.compute_eval_delta(tmp_path / "eval-2", cat_map),
+        ]
+        agg = cdd.aggregate(results)
+
+        # Verify the fixture really produces the conditions we need
+        assert agg["internal_delta"] == 0.5, f"expected 0.5, got {agg['internal_delta']}"
+        assert agg["cross_project_delta"] == -1.0
+
+        # ---- The core assertions for qa_M1 cap logic ----
+        # Raw inflation = 1 - (-1.0 / 0.5) = 3.0 → capped at 1.0
+        assert agg["inflation_ratio"] == 1.0, f"expected cap at 1.0, got {agg['inflation_ratio']}"
+        # Uncapped raw value preserved for diagnostics
+        assert agg["inflation_ratio_uncapped"] == 3.0, f"expected 3.0, got {agg['inflation_ratio_uncapped']}"
+        # stderr warning was emitted
+        captured = capsys.readouterr()
+        assert "WARNING" in captured.err
+        assert "inflation capped" in captured.err or "negative" in captured.err
+        # The warning field is present in the output
+        assert "inflation_warning" in agg
+
+
+def test_inflation_ratio_none_when_internal_delta_zero():
+    """Round 2 nf_02 fix: when internal_delta is 0 or None, inflation_ratio is None
+    (division-by-zero guard), and inflation_ratio_uncapped is also None."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        # Two assertions that cancel internally: 1 pass both, 1 fail both → delta=0
+        make_eval_dir(
+            tmp_path,
+            "eval-1",
+            [{"text": "gen_x", "weight": 1.0}, {"text": "aria_y", "weight": 1.0}],
+            [("gen_x", False), ("aria_y", True)],  # with: 1/2
+            [("gen_x", True), ("aria_y", False)],  # without: 1/2
+        )
+        cat_map = {"gen_x": "generic_capability", "aria_y": "aria_convention"}
+        results = [cdd.compute_eval_delta(tmp_path / "eval-1", cat_map)]
+        agg = cdd.aggregate(results)
+        # internal: 1/2 - 1/2 = 0 → inflation is None (undefined, division guard)
+        assert agg["internal_delta"] == 0.0
+        assert agg["inflation_ratio"] is None
+        assert agg["inflation_ratio_uncapped"] is None
+        # No warning should be emitted (this is a normal undefined case, not pathological)
+        assert "inflation_warning" not in agg

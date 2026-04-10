@@ -547,6 +547,73 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 
 ---
 
+## Dual Delta Reporting (Optional, v1.11.1+)
+
+> **Status**: Optional reporting layer. **Not a merge gate.**
+> **Added**: 2026-04-10 per `benchmark-transparency-enhancement` Spec.
+
+### 用途
+
+`calc_dual_delta.py` 是一个**报告工具**, 用于从已有的 `/skill-creator benchmark` 产物中计算两种 delta:
+
+- **internal_delta**: 所有 assertions (= `/skill-creator` 原生报告值)
+- **cross_project_delta**: 仅 `generic_capability` + `behavior_contract` assertions (近似跨项目测试会看到的值)
+
+两者差距 (inflation ratio) 用于透明度提示.
+
+### ⚠️ 本工具不是 gate
+
+- **Rule #6 不变**: 合并决策仍基于 `/skill-creator benchmark` 原流程
+- **不影响发版**: inflation ratio 仅是 informational, 不阻断任何 PR
+- **非 regression 触发器**: 高 inflation 不等于 Skill 质量问题, 可能仅是 eval scenario calibration 差异
+
+**为什么不升级为 gate?** Aria#8 spike (2026-04-10) 实测证明 state-scanner v2.9.0 inflation 仅 4.9%, commit-msg-generator v2.0.1 仅 11.3% — 远低于原估算的 50% / 100% 虚高. 数据证伪了"需要新 gate"的假说.
+
+### 两步运行
+
+```bash
+# Step 1: 正常跑 /skill-creator benchmark (产生 iteration-N/)
+/skill-creator benchmark state-scanner
+
+# Step 2: 用 calc_dual_delta.py 加 transparency 报告
+python3 aria-plugin-benchmarks/tools/calc_dual_delta.py \
+  aria-plugin-benchmarks/state-scanner/state-scanner-workspace/iteration-2 \
+  aria-plugin-benchmarks/tools/category_map_state_scanner.json
+```
+
+输出是 JSON 到 stdout.
+
+### Inflation 解读指南
+
+| inflation_ratio | 含义 | 建议 |
+|----------------|------|------|
+| `None` | internal_delta 为 0 | Skill 在 eval 上无效果, 检查 eval 本身 |
+| `~0.0` | 几乎相等 | **理想** — 跨项目成立 |
+| `0.0 - 0.2` | 20% 以内 | **可信** (state-scanner v2.9.0: 4.9%) |
+| `0.2 - 0.5` | 20-50% | **关注** — 考虑增加 generic scenarios |
+| `0.5 - 1.0` | 50-100% | **警示** — 可改进方向, 不阻塞发版 |
+| `1.0` (capped) | cross_delta < 0 | **病理性** — 查看 `inflation_ratio_uncapped` |
+
+### Category 字段 (可选)
+
+在 `eval_metadata.json` 的 `assertions[]` 可添加 `"category"` 字段:
+
+```json
+{
+  "text": "Output contains 🔄 同步状态 section",
+  "weight": 1.0,
+  "category": "aria_convention"
+}
+```
+
+3 个枚举值: `aria_convention` / `generic_capability` / `behavior_contract`. 缺失时默认 `aria_convention` + stderr warning. 详见 `ASSERTION_CATEGORY_GUIDE.md`.
+
+### 历史数据
+
+实测 Skills 的 dual delta 数据存档在 `HISTORICAL_CAVEATS.md` (透明度补充, 非警告).
+
+---
+
 ## 与其他文档的关系
 
 | 文档 | 职责 |
@@ -557,6 +624,8 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 | CLAUDE.md 版本发布检查清单 | 发版门卡 (benchmark 项必须勾选) |
 | OVERALL_BENCHMARK_SUMMARY.md | 综合报告 (人类可读, 含历史数据) |
 | CROSS_PROJECT_BENCHMARKING.md | 跨项目 benchmark 指南 (外部项目适配) |
+| **ASSERTION_CATEGORY_GUIDE.md** | Category 字段标注指南 (v1.11.1+) |
+| **HISTORICAL_CAVEATS.md** | 历史 Skills 的 dual delta 实测数据 (v1.11.1+) |
 
 ---
 
