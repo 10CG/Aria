@@ -286,7 +286,16 @@ Skill 基准测试 (新增或修改 Skill 时):
 主项目:
   - [ ] 更新子模块指针 (git add aria)
   - [ ] 主项目/VERSION 更新插件版本记录
+
+多远程推送 (Forgejo + GitHub):
+  - [ ] aria 子模块: git -C aria push origin master && git -C aria push github master
+  - [ ] standards 子模块 (如有变更): git -C standards push origin master && git -C standards push github master
+  - [ ] 主项目: git push origin master && git push github master
 ```
+
+> **为什么需要多远程推送**: Claude Code 插件市场从 GitHub 拉取,Forgejo 是主开发仓库。
+> 仅推送 Forgejo 会导致市场版本滞后。2026-04-10 事故: aria v1.11.1 发版后未推送 GitHub,
+> 市场停留在 v1.11.0。
 
 ### 版本信息一致性
 
