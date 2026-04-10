@@ -1,14 +1,19 @@
 # benchmark-transparency-enhancement — Dual Delta Reporting (非 gate)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Draft
+> **Status**: **Complete** (归档 2026-04-10)
 > **Created**: 2026-04-10
+> **Completed**: 2026-04-10
 > **Parent Issue**: [Aria#8](https://forgejo.10cg.pub/10CG/Aria/issues/8) (Phase 3 修正后 Spec, 替代原 3 个 Level 3 Spec 草案)
 > **Source**: `docs/analysis/spike-report-2026-04-10.md` (spike 实测证伪原 RCA 量化假说)
 > **Target Version**: aria-plugin v1.11.1 (patch release, 非 minor)
 > **DRI**: knowledge-manager
 > **Depends**: —
 > **Blocks**: —
+> **Merged PRs**:
+> - [aria-plugin#5](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/5) → 4ed183d
+> - [Aria#9](https://forgejo.10cg.pub/10CG/Aria/pulls/9) → ab2caef
+> **Parent US**: [US-009](../../../docs/requirements/user-stories/US-009.md)
 
 ## Why
 
@@ -166,11 +171,11 @@ Spike 已产出可工作的 ~291 行 Python 工具, 本 Spec 做**收尾硬化**
 - [ ] `aria-plugin-benchmarks/tools/category_map_state_scanner.json` 存在 (已交付)
 
 ### AC3: ASSERTION_CATEGORY_GUIDE.md 就位
-- [ ] 新建 `aria-plugin-benchmarks/ASSERTION_CATEGORY_GUIDE.md`
-- [ ] 包含 3 个 category 的简短定义
-- [ ] 包含 5 个正反例
-- [ ] 包含 "歧义默认 aria_convention" 规则
-- [ ] 长度 ≤ 100 行
+- [x] 新建 `aria-plugin-benchmarks/ASSERTION_CATEGORY_GUIDE.md`
+- [x] 包含 3 个 category 的简短定义
+- [x] 包含 5 个正反例
+- [x] 包含 "歧义默认 aria_convention" 规则
+- [x] 长度 ≤ **140 行** (D.2 追认, 原 ≤100 行, 实际 134 行, 超出部分是 External category_map + JSON 示例的实用内容, code-reviewer Final Review 接受为 non-blocking)
 
 ### AC4: AB_TEST_OPERATIONS.md 新增章节
 - [ ] 末尾新增 "Dual Delta Reporting (Optional)" 章节
