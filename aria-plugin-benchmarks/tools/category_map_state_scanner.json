@@ -1,0 +1,27 @@
+{
+  "_comment": "Category map for state-scanner v2.9.0 eval-5/6/7 (ab-results/2026-04-09). Based on RCA.",
+  "Output lists each submodule with tree_commit / head_commit / remote_commit fields": "aria_convention",
+  "Checks submodule drift via tree_vs_remote comparison": "aria_convention",
+  "Recommends git submodule update --remote when drift detected (submodule_drift rule)": "aria_convention",
+  "Does NOT execute git fetch without user consent (reads FETCH_HEAD age instead)": "behavior_contract",
+  "Gracefully handles missing origin/HEAD via four-tier fallback": "generic_capability",
+  "Fail-soft on git errors, does not abort the whole scan": "behavior_contract",
+  "Output contains a dedicated 🔄 同步状态 section (or equivalent)": "aria_convention",
+
+  "Detects upstream via git rev-parse @{u} BEFORE calling rev-list --count": "generic_capability",
+  "Reports current_branch.ahead and current_branch.behind when upstream exists": "aria_convention",
+  "Handles missing upstream with reason: no_upstream instead of exit error": "generic_capability",
+  "Handles detached HEAD scenario explicitly": "generic_capability",
+  "Handles shallow clone with --is-shallow-repository or .git/shallow fallback": "generic_capability",
+  "Recommends git pull when behind >= 5 (branch_behind_upstream rule)": "aria_convention",
+  "Reads FETCH_HEAD age with git log --format=%cr (cross-platform, not stat)": "generic_capability",
+
+  "Shows 🎫 Open Issues section with open issues list when enabled=true": "aria_convention",
+  "Detects Forgejo platform via 4-tier priority (config -> hostname -> URL -> fallback)": "aria_convention",
+  "Calls forgejo CLI wrapper, not raw curl": "behavior_contract",
+  "Handles 10 fetch_error enum values with proper fail-soft degradation": "aria_convention",
+  "Uses cache with 15-minute TTL at .aria/cache/issues.json": "aria_convention",
+  "Does NOT manage API tokens inside the skill": "behavior_contract",
+  "Attempts heuristic linking to US-NNN or OpenSpec change names with word boundary protection": "aria_convention",
+  "Recommends triage for blocker/critical labeled issues (open_blocker_issues rule)": "aria_convention"
+}

@@ -1,0 +1,26 @@
+{
+  "_comment": "Category map for commit-msg-generator v2.0.1 (15 evals). Based on spike analysis 2026-04-09.",
+  "_notes": {
+    "aria_convention": "Tests Aria-specific markers (Executed-By/Context/Module) or 'no_enhanced_markers' reverse-checks",
+    "generic_capability": "Standard Conventional Commits checks (type/scope/subject/imperative)",
+    "behavior_contract": "Negative constraints on output safety"
+  },
+  "type_is_feat": "generic_capability",
+  "type_is_fix": "generic_capability",
+  "type_is_docs": "generic_capability",
+  "type_is_refactor": "generic_capability",
+  "scope_is_auth": "generic_capability",
+  "scope_is_utils": "generic_capability",
+  "scope_is_docs": "generic_capability",
+  "scope_is_core": "generic_capability",
+  "subject_length": "generic_capability",
+  "subject_concise": "generic_capability",
+  "imperative_mood": "generic_capability",
+  "no_enhanced_markers": "aria_convention",
+  "has_executed_by": "aria_convention",
+  "has_context": "aria_convention",
+  "has_module": "aria_convention",
+  "markers_order": "aria_convention",
+  "correct_emoji_executed_by": "aria_convention",
+  "subagent_suffix": "aria_convention"
+}
