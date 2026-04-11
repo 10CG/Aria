@@ -1,0 +1,104 @@
+{
+  "benchmark_version": "1",
+  "date": "2026-04-11",
+  "target": "v1.13.0 (project-analyzer + agent-gap-analyzer + agent-creator)",
+  "evals": [
+    {
+      "id": 1,
+      "name": "project-analyzer (Node.js/Kairos)",
+      "with_skill": {
+        "assertions": [
+          {"text": "输出包含 project-profile.yaml 文件或等效结构化分析", "passed": true, "evidence": "输出 schema_version:1 的 YAML,含 tech_stack/packages/patterns"},
+          {"text": "正确识别 TypeScript/Node.js 技术栈", "passed": true, "evidence": "primary_language: TypeScript, runtime: Node.js 18"},
+          {"text": "识别了框架/ORM/测试工具等具体依赖", "passed": true, "evidence": "Express 5, Vitest 3, better-sqlite3, Zod, React 19"},
+          {"text": "输出格式为结构化 YAML 而非纯文本叙述", "passed": true, "evidence": "schema_version:1 标准 YAML 格式"}
+        ],
+        "pass_rate": 1.0,
+        "tokens": 38391,
+        "duration_ms": 124293
+      },
+      "without_skill": {
+        "assertions": [
+          {"text": "输出包含 project-profile.yaml 文件或等效结构化分析", "passed": true, "evidence": "输出 YAML 格式分析,但无 schema_version"},
+          {"text": "正确识别 TypeScript/Node.js 技术栈", "passed": true, "evidence": "TypeScript 5.7, Node.js 18"},
+          {"text": "识别了框架/ORM/测试工具等具体依赖", "passed": true, "evidence": "Express 5, Fastify 5, Vitest, better-sqlite3"},
+          {"text": "输出格式为结构化 YAML 而非纯文本叙述", "passed": true, "evidence": "YAML 格式但结构不同于 skill 定义的 schema"}
+        ],
+        "pass_rate": 1.0,
+        "tokens": 35435,
+        "duration_ms": 136365
+      },
+      "delta": 0.0
+    },
+    {
+      "id": 3,
+      "name": "agent-gap-analyzer (Kairos 覆盖度)",
+      "with_skill": {
+        "assertions": [
+          {"text": "输出包含覆盖和缺口的分类", "passed": true, "evidence": "covered 14 scenarios + gaps 6 scenarios,结构化分类"},
+          {"text": "识别了至少一个具体缺口", "passed": true, "evidence": "ORM Migration, CI/CD Pipeline, Observability, Voice/Media, WeCom, Messaging"},
+          {"text": "给出了缺口对应的建议 Agent 名称和职责", "passed": true, "evidence": "devops-engineer, database-specialist, media-engineer, channel-integration-specialist"},
+          {"text": "分析基于 Agent capabilities 而非猜测", "passed": true, "evidence": "使用 capabilities 标签匹配 (match_rate 0.33/0.5),引用了 taxonomy"}
+        ],
+        "pass_rate": 1.0,
+        "tokens": 36514,
+        "duration_ms": 170123
+      },
+      "without_skill": {
+        "assertions": [
+          {"text": "输出包含覆盖和缺口的分类", "passed": true, "evidence": "Agent 覆盖评级表 + 7 Gap 列表"},
+          {"text": "识别了至少一个具体缺口", "passed": true, "evidence": "企微集成, 国内 LLM, Nomad DevOps, 中国合规, 前端, 消息队列, 语音"},
+          {"text": "给出了缺口对应的建议 Agent 名称和职责", "passed": true, "evidence": "wecom-specialist, cn-llm-specialist, devops-engineer 等 7 个"},
+          {"text": "分析基于 Agent capabilities 而非猜测", "passed": false, "evidence": "使用主观评分 (9/10, 8/10) 而非 capabilities 标签匹配,无 taxonomy 引用"}
+        ],
+        "pass_rate": 0.75,
+        "tokens": 50253,
+        "duration_ms": 206002
+      },
+      "delta": 0.25
+    },
+    {
+      "id": 5,
+      "name": "agent-creator (Prisma 专家)",
+      "with_skill": {
+        "assertions": [
+          {"text": "输出包含 Agent frontmatter", "passed": true, "evidence": "name: prisma-database-specialist, description, capabilities, model, color"},
+          {"text": "description 遵循 STCO 模式", "passed": true, "evidence": "Scope + Use when + NOT for + Expects + Produces 全部存在"},
+          {"text": "capabilities 字段包含 kebab-case 标签列表", "passed": true, "evidence": "prisma-schema-design, database-migration, query-optimization, orm-best-practices, index-strategy"},
+          {"text": "body 包含 Focus Areas / Approach / Output 章节", "passed": true, "evidence": "5 Focus Areas, 5-step Approach, 4 Output types"},
+          {"text": "dry-run 模式: 仅预览不实际写入文件", "passed": true, "evidence": "明确标注 --dry-run 仅预览,未写入 .aria/agents/"}
+        ],
+        "pass_rate": 1.0,
+        "tokens": 32704,
+        "duration_ms": 110858
+      },
+      "without_skill": {
+        "assertions": [
+          {"text": "输出包含 Agent frontmatter", "passed": true, "evidence": "name: prisma-db-expert, description, capabilities, model, color"},
+          {"text": "description 遵循 STCO 模式", "passed": true, "evidence": "Use when + NOT for + Expects + Produces 存在 (借助了 Aria 已有 Agent 格式)"},
+          {"text": "capabilities 字段包含 kebab-case 标签列表", "passed": true, "evidence": "prisma-schema, database-migration, query-optimization, data-modeling, typescript-orm"},
+          {"text": "body 包含 Focus Areas / Approach / Output 章节", "passed": true, "evidence": "专业能力范围 + 迁移管理 + 查询优化 等章节存在"},
+          {"text": "dry-run 模式: 仅预览不实际写入文件", "passed": false, "evidence": "直接写入了 result.md,无 dry-run 概念"}
+        ],
+        "pass_rate": 0.8,
+        "tokens": 30644,
+        "duration_ms": 106465
+      },
+      "delta": 0.2
+    }
+  ],
+  "summary": {
+    "with_skill": {
+      "avg_pass_rate": 1.0,
+      "avg_tokens": 35870,
+      "avg_duration_ms": 135091
+    },
+    "without_skill": {
+      "avg_pass_rate": 0.85,
+      "avg_tokens": 38777,
+      "avg_duration_ms": 149611
+    },
+    "avg_delta": 0.15,
+    "verdict": "POSITIVE — with_skill 在所有 eval 中 pass_rate >= without_skill"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "skill_name": "project-adapter-suite",
+  "description": "AB benchmark for v1.13.0 three new Skills: project-analyzer, agent-gap-analyzer, agent-creator",
+  "evals": [
+    {
+      "id": 1,
+      "skill": "project-analyzer",
+      "prompt": "我刚接入了一个新的 Node.js 项目 (Kairos),项目在 /home/dev/Kairos 目录。帮我分析这个项目的技术栈、框架、测试工具和部署方式,输出一个结构化的项目画像到 .aria/project-profile.yaml",
+      "expected_output": "输出包含 tech_stack (TypeScript/Node.js), framework, testing, ci_cd, deployment 等字段的 YAML 文件",
+      "assertions": [
+        {"text": "输出包含 project-profile.yaml 文件或等效结构化分析", "category": "generic_capability"},
+        {"text": "正确识别 TypeScript/Node.js 技术栈", "category": "generic_capability"},
+        {"text": "识别了框架/ORM/测试工具等具体依赖", "category": "generic_capability"},
+        {"text": "输出格式为结构化 YAML 而非纯文本叙述", "category": "behavior_contract"}
+      ]
+    },
+    {
+      "id": 2,
+      "skill": "project-analyzer",
+      "prompt": "分析当前 Aria 项目 (/home/dev/Aria) 的技术栈。这个项目主要是方法论文档和 shell 脚本,没有标准的 package.json 或 go.mod",
+      "expected_output": "能降级处理,输出 unknown 或识别为文档/shell 项目,不报错",
+      "assertions": [
+        {"text": "不因缺少标准清单文件而报错或拒绝分析", "category": "behavior_contract"},
+        {"text": "输出包含项目特征描述 (子模块结构/shell 脚本/文档)", "category": "generic_capability"}
+      ]
+    },
+    {
+      "id": 3,
+      "skill": "agent-gap-analyzer",
+      "prompt": "基于 Kairos 项目 (TypeScript/Node.js/Express/Prisma/Jest),分析现有 Aria 的 11 个 Agent 对这个项目的覆盖度。哪些场景没有专业 Agent 覆盖?输出覆盖度报告",
+      "expected_output": "输出覆盖度分析,识别 ORM/数据库迁移、Jest 测试专家等缺口",
+      "assertions": [
+        {"text": "输出包含覆盖和缺口的分类", "category": "generic_capability"},
+        {"text": "识别了至少一个具体缺口 (如数据库/ORM 或测试专家)", "category": "generic_capability"},
+        {"text": "给出了缺口对应的建议 Agent 名称和职责", "category": "generic_capability"},
+        {"text": "分析基于 Agent capabilities 而非猜测", "category": "behavior_contract"}
+      ]
+    },
+    {
+      "id": 4,
+      "skill": "agent-gap-analyzer",
+      "prompt": "评估现有 Agent 对一个 Python ML 项目的覆盖度。项目使用 PyTorch + FastAPI + PostgreSQL + Docker,主要做图像识别模型训练和 API 服务",
+      "expected_output": "识别 ML ops / 数据工程 / 模型部署等缺口",
+      "assertions": [
+        {"text": "识别了 ML/数据相关的 Agent 缺口", "category": "generic_capability"},
+        {"text": "没有错误地将 ai-engineer 标记为完全覆盖 ML ops", "category": "behavior_contract"}
+      ]
+    },
+    {
+      "id": 5,
+      "skill": "agent-creator",
+      "prompt": "根据覆盖度分析,Kairos 项目缺少一个 Prisma 数据库专家 Agent。帮我生成这个 Agent 的配置,包含 STCO 格式的 description、capabilities 标签和完整的 body。用 --dry-run 模式预览不写入",
+      "expected_output": "生成符合 STCO 格式的 Agent 定义,含 name/description/capabilities/body",
+      "assertions": [
+        {"text": "输出包含 Agent frontmatter (name, description, capabilities)", "category": "behavior_contract"},
+        {"text": "description 遵循 STCO 模式 (Scope + Use when + Expects + Produces)", "category": "aria_convention"},
+        {"text": "capabilities 字段包含 kebab-case 标签列表", "category": "aria_convention"},
+        {"text": "body 包含 Focus Areas / Approach / Output 章节", "category": "behavior_contract"},
+        {"text": "dry-run 模式: 仅预览不实际写入文件", "category": "behavior_contract"}
+      ]
+    },
+    {
+      "id": 6,
+      "skill": "agent-creator",
+      "prompt": "为一个 Go 微服务项目创建一个 infrastructure-engineer Agent,负责 CI/CD pipeline 设计、Docker 容器化和 Nomad 部署。给我看预览",
+      "expected_output": "生成 Go/基础设施相关的 Agent 配置",
+      "assertions": [
+        {"text": "生成的 Agent 与基础设施/DevOps 领域相关", "category": "generic_capability"},
+        {"text": "capabilities 包含 infrastructure 或 ci-cd 相关标签", "category": "behavior_contract"},
+        {"text": "description 包含 NOT for 消歧 (与其他 Agent 区分)", "category": "aria_convention"}
+      ]
+    }
+  ]
+}

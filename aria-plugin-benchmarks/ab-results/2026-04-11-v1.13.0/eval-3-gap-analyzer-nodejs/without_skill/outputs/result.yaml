@@ -1,0 +1,438 @@
+---
+# Aria Agent Coverage Analysis for Kairos Project
+# Generated: 2026-04-11
+# Target Project: Kairos (TypeScript/Node.js/Express/Better-SQLite3/Vitest)
+# Analysis Method: without_skill (manual analysis, no gap-analyzer skill)
+
+metadata:
+  project: kairos
+  project_version: "0.9.5"
+  project_description: "AI 驱动的私域销售自动化系统，企微/微信客服 + 进化引擎 + TTS/ASR 语音层"
+  tech_stack:
+    runtime: "Node.js + TypeScript"
+    framework: "Express 5.0"
+    database: "better-sqlite3 (SQLite)"
+    test_framework: "Vitest"
+    frontend: "React 19 + Vite + Tailwind CSS (运营中台 console)"
+    llm_providers:
+      - "Qwen3.5 (执行层)"
+      - "Kimi K2.5 (执行层)"
+      - "Doubao 2.0 (执行层)"
+      - "Gemini 3.1 Pro (策略层)"
+      - "Claude Opus 4.6 (策略层交叉验证)"
+    infra: "Nomad + Consul + Traefik + Forgejo Actions (Aether 集群)"
+    channels: "企微内部应用 API + 微信客服 API (KF)"
+  aria_agents_count: 11
+  analysis_date: "2026-04-11"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Part 1: 各 Agent 对 Kairos 的覆盖度评估
+# ─────────────────────────────────────────────────────────────────────────────
+agent_coverage:
+
+  - agent: tech-lead
+    capabilities: [system-architecture, task-decomposition, engineering-process, cross-system-coordination, architecture-decision]
+    relevance: HIGH
+    coverage_score: 9
+    applicable_scenarios:
+      - "双层架构（执行层 vs 策略层）设计决策"
+      - "执行层 → 策略层服务拆分规划（Phase 2 Python 服务独立化）"
+      - "多 LLM Provider 降级链设计"
+      - "跨通道（企微 + 微信客服 + 抖音）统一适配器架构决策"
+      - "进化引擎触发策略（数据驱动 vs 时间兜底）"
+      - "SQLite → PostgreSQL/Redis 迁移路线图"
+      - "CI/CD 流程（Forgejo Actions → Aether Nomad）优化"
+    gaps_in_agent: []
+    notes: "覆盖度最高的 Agent，适用于 Kairos 几乎所有架构决策场景"
+
+  - agent: backend-architect
+    capabilities: [api-design, database-schema, microservice-architecture, performance-optimization, service-boundary]
+    relevance: HIGH
+    coverage_score: 8
+    applicable_scenarios:
+      - "运营中台 REST API 设计（/api/crm, /api/evolution, /api/pipelines, /api/conversations）"
+      - "CRM Canvas 数据模型设计（SQLite schema）"
+      - "Pipeline 路由器服务边界定义"
+      - "Session Lock 并发控制设计"
+      - "Message Queue 异步重试机制"
+      - "TTS/ASR Provider 抽象层设计"
+      - "Media Cache (pHash + SHA256) 性能优化"
+    gaps_in_agent:
+      - "不了解国内 LLM API 特性（企业合规、数据出境约束）"
+      - "缺乏企微/微信客服 Webhook 签名验证知识"
+    notes: "对标准 REST API 和数据库设计场景覆盖良好，但缺乏中国特定生态知识"
+
+  - agent: ai-engineer
+    capabilities: [llm-integration, rag-system, prompt-engineering, vector-search, agent-orchestration]
+    relevance: HIGH
+    coverage_score: 8
+    applicable_scenarios:
+      - "多 LLM Provider 统一网关（llm-gateway.ts）设计与实现"
+      - "Agent Runtime 递归循环架构（context → LLM → tool_calls → execute）"
+      - "进化引擎 Prompt 优化与 A/B 测试框架"
+      - "Context 管线动态组装（system prompt + CRM 画像 + Nexus 认知 + Skill 片段）"
+      - "Context Pruning/Compaction 策略"
+      - "Skill 白名单 + Zod schema 校验 tool_calls"
+      - "PII 脱敏后数据送海外 API 的合规设计"
+      - "多模型交叉验证（Gemini + Claude 协作评估）"
+    gaps_in_agent:
+      - "RAG/向量搜索技能偏西方生态（Qdrant/Pinecone），而 Kairos 使用 Nexus SDK"
+      - "不了解国内模型（Qwen/Kimi/Doubao）的 API 特性和限速策略"
+    notes: "AI 核心能力覆盖良好，但国产模型生态知识不足"
+
+  - agent: code-reviewer
+    capabilities: [code-review, spec-compliance, security-audit, test-coverage-review, pre-merge-verification]
+    relevance: HIGH
+    coverage_score: 9
+    applicable_scenarios:
+      - "TypeScript 类型安全审查"
+      - "Vitest 测试覆盖率审查（1434 测试，86 文件）"
+      - "企微 Webhook 签名验证安全审查"
+      - "PII 脱敏逻辑正确性审查"
+      - "Session Lock 并发安全审查"
+      - "Provider 降级链错误处理审查"
+      - "pre-merge 规范合规性验证"
+    gaps_in_agent: []
+    notes: "通用代码审查能力强，对 TypeScript 项目覆盖充分"
+
+  - agent: qa-engineer
+    capabilities: [test-strategy, defect-analysis, quality-assessment, risk-analysis, release-readiness]
+    relevance: HIGH
+    coverage_score: 8
+    applicable_scenarios:
+      - "Vitest 测试策略设计（单元 + 集成 + 覆盖率）"
+      - "进化引擎 A/B 测试结果验证"
+      - "消息队列异步重试的边界情况测试"
+      - "多 Provider 降级链故障注入测试"
+      - "企微/微信客服 Webhook 集成测试"
+      - "发版就绪评估（v0.9.x → v1.0 升级路线）"
+      - "并发安全（Session Lock）竞争条件分析"
+    gaps_in_agent:
+      - "缺乏消息平台（企微/微信）端到端测试环境搭建经验"
+      - "不了解国内 LLM API 的稳定性特性和测试策略"
+    notes: "质量保证能力强，但中国特定平台集成测试知识有限"
+
+  - agent: knowledge-manager
+    capabilities: [documentation-audit, knowledge-architecture, doc-codebase-alignment, ai-ddd-methodology]
+    relevance: MEDIUM
+    coverage_score: 7
+    applicable_scenarios:
+      - "docs/ 目录架构审计（ARCHITECTURE.md, PRD.md, user-stories）"
+      - "OpenSpec 变更管理一致性检查"
+      - "UPM.md 进度文档与代码对齐验证"
+      - "docs/arch/ L1/L2 模块架构文档维护"
+      - "API 文档与 routes 实现对齐"
+    gaps_in_agent: []
+    notes: "对 Aria 方法论文档管理场景覆盖良好"
+
+  - agent: context-manager
+    capabilities: [multi-agent-context, session-synthesis, context-optimization, decision-distillation]
+    relevance: MEDIUM
+    coverage_score: 6
+    applicable_scenarios:
+      - "跨 Agent 协作时的上下文压缩（进化引擎分析 + 架构决策协同）"
+      - "长会话中 Kairos 架构状态的传递"
+      - "多轮审计（audit-engine）时的上下文管理"
+    gaps_in_agent: []
+    notes: "属于工作流辅助角色，对 Kairos 特定业务覆盖有限，但在 Aria 工作流编排中有用"
+
+  - agent: ui-ux-designer
+    capabilities: [interface-design, wireframing, design-system, user-research, accessibility-audit]
+    relevance: MEDIUM
+    coverage_score: 5
+    applicable_scenarios:
+      - "运营中台 console（React + Tailwind）界面设计"
+      - "Dashboard / CRMOverview / Evolution / Pipelines / Conversations 页面交互设计"
+      - "CRM 画像可视化 UI 设计"
+      - "进化引擎结果展示图表设计（Recharts）"
+    gaps_in_agent:
+      - "不了解中国 B2B 运营后台的 UX 规范和习惯"
+      - "不了解企微/微信生态的 UI 约束"
+    notes: "仅适用于 console 子项目，对核心后端系统无直接贡献"
+
+  - agent: mobile-developer
+    capabilities: [react-native, flutter, native-integration, offline-sync, push-notification, app-deployment]
+    relevance: LOW
+    coverage_score: 2
+    applicable_scenarios:
+      - "未来可能的移动端管理 App（非当前路线图）"
+    gaps_in_agent:
+      - "Kairos 当前无移动端，Agent 能力完全不匹配"
+      - "不了解企微移动 SDK 集成"
+    notes: "当前版本 Kairos 无移动端需求，此 Agent 基本无用"
+
+  - agent: api-documenter
+    capabilities: [openapi-spec, sdk-generation, developer-documentation, api-versioning, interactive-docs]
+    relevance: MEDIUM
+    coverage_score: 6
+    applicable_scenarios:
+      - "运营中台 REST API OpenAPI/Swagger 规范生成（/api/crm, /api/evolution 等）"
+      - "Webhook 接口文档（企微回调格式说明）"
+      - "LLM Gateway 内部接口文档"
+      - "对外 API 版本管理策略"
+    gaps_in_agent:
+      - "不了解国内平台（企微/微信）的 API 特性文档格式惯例"
+    notes: "对 REST API 文档化有用，但 Kairos 主要是内部系统，外部 API 文档需求有限"
+
+  - agent: legal-advisor
+    capabilities: [privacy-policy, terms-of-service, gdpr-compliance, data-processing-agreement, regulatory-notice]
+    relevance: MEDIUM
+    coverage_score: 5
+    applicable_scenarios:
+      - "PII 脱敏合规文档（个人信息保护法 PIPL）"
+      - "数据跨境传输协议（国内数据 → Gemini/Claude 海外 API）"
+      - "用户数据收集与处理声明"
+    gaps_in_agent:
+      - "Agent 主要覆盖 GDPR/CCPA 等西方法规，缺乏中国《个人信息保护法》(PIPL) 专业知识"
+      - "不了解《数据安全法》《网络安全法》等中国特定法规"
+      - "不了解企微/微信平台数据使用协议的合规要求"
+      - "缺乏跨境数据传输（国内数据送海外模型）的中国合规评估能力"
+    notes: "覆盖西方法规场景，但 Kairos 的核心合规风险在中国法规，覆盖度严重不足"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Part 2: 场景未覆盖分析 (Gap Analysis)
+# ─────────────────────────────────────────────────────────────────────────────
+coverage_gaps:
+
+  - gap_id: GAP-001
+    title: "中国消息平台集成专家"
+    priority: CRITICAL
+    description: |
+      Kairos 的核心通道是企微（WeCom）内部应用 API 和微信客服（KF）API。
+      没有任何现有 Agent 具备这些平台的专业知识：
+      - 企微 Webhook 签名验证（SHA1 + Token + AES 解密）
+      - 企微消息类型（文本/图片/语音/视频/文件/事件）处理
+      - 微信客服 API 认证流程与接口规范
+      - 企微 AccessToken 刷新与缓存策略
+      - Cloudflare Access 绕过配置（/webhook/wecom 路径放行）
+      - 企微媒体文件上传/下载 API
+      - 消息回调验证（xml2js 解析 + 签名验证）
+    affected_modules:
+      - "src/channels/wecom/"
+      - "src/channels/ (kf-adapter, kf-api-client)"
+      - "relay/ (企微消息中继)"
+    suggested_agent: "wecom-integration-specialist"
+    suggested_capabilities:
+      - wecom-webhook-integration
+      - wechat-kf-api
+      - message-platform-auth
+      - media-file-handling
+      - cloudflare-access-bypass
+
+  - gap_id: GAP-002
+    title: "国内 LLM 生态专家"
+    priority: HIGH
+    description: |
+      Kairos 执行层使用 Qwen3.5、Kimi K2.5、Doubao 2.0 三个国产模型。
+      现有 ai-engineer Agent 专注于 OpenAI/Anthropic 等西方生态，缺乏：
+      - 国产模型 API 特性（请求格式、限速策略、错误码）
+      - 国产模型多模态能力差异（图片理解、语音转文本）
+      - Provider 自动降级链优化（指数退避 + jitter 参数调优）
+      - 国内模型成本估算与选型
+      - Consul KV 动态 Provider 注册与热加载
+      - GLM 全家桶（GLM-4 + CogVideoX + GLM-4-Voice）集成
+    affected_modules:
+      - "src/core/llm/providers/ (qwen.ts, kimi.ts, doubao.ts, glm.ts)"
+      - "src/core/llm/consul-provider-loader.ts"
+      - "src/core/asr-providers/ (glm-asr)"
+      - "src/core/tts-providers/ (glm-tts)"
+    suggested_agent: "cn-llm-specialist"
+    suggested_capabilities:
+      - domestic-llm-integration
+      - provider-failover-chain
+      - consul-dynamic-config
+      - glm-voice-pipeline
+      - cost-optimization-cn
+
+  - gap_id: GAP-003
+    title: "DevOps/基础设施工程师 (Nomad/Consul)"
+    priority: HIGH
+    description: |
+      Kairos 部署在 Aether 集群（Nomad + Consul + Traefik），
+      没有任何 Agent 具备这套基础设施的专业知识：
+      - Nomad job 定义与调度（nomad-dev.hcl, nomad-prod.hcl）
+      - Consul KV 配置管理与 Nomad template 注入
+      - Traefik 反向代理路由规则
+      - Forgejo Actions CI/CD 管线设计
+      - Docker 多阶段构建优化
+      - Host Volume 配置与管理
+      - 零停机部署策略（health check + 滚动更新）
+      - Nomad Allocation 故障排查
+    affected_modules:
+      - "deploy/ (nomad-dev.hcl, nomad-prod.hcl, nomad-relay.hcl)"
+      - ".forgejo/workflows/ (ci.yml, deploy.yaml)"
+      - "Dockerfile"
+      - "docker-compose.yml"
+    suggested_agent: "devops-engineer"
+    suggested_capabilities:
+      - nomad-deployment
+      - consul-service-mesh
+      - ci-cd-pipeline
+      - docker-optimization
+      - infrastructure-as-code
+
+  - gap_id: GAP-004
+    title: "中国数据合规专家"
+    priority: HIGH
+    description: |
+      Kairos 处理真实用户对话数据，将脱敏后数据发送至海外 LLM API（Gemini/Claude）。
+      现有 legal-advisor Agent 主要覆盖 GDPR/CCPA 等西方法规，缺乏：
+      - 《个人信息保护法》(PIPL) 合规评估
+      - 《数据安全法》分级分类要求
+      - 《网络安全法》等保合规
+      - 跨境数据传输合规（数据出境安全评估）
+      - 企微/微信平台数据使用协议合规
+      - 销售自动化场景的特定合规风险（广告法、消费者权益保护）
+    affected_modules:
+      - "src/evaluator/pii-anonymizer.ts"
+      - "src/evaluator/pii-patterns.ts"
+      - "src/evaluator/pii-ner.ts"
+    suggested_agent: "cn-compliance-advisor"
+    suggested_capabilities:
+      - pipl-compliance
+      - data-security-law
+      - cross-border-data-transfer
+      - sales-automation-compliance
+      - wechat-data-policy
+
+  - gap_id: GAP-005
+    title: "前端工程师 (React/Vite/Tailwind)"
+    priority: MEDIUM
+    description: |
+      Kairos 包含运营中台 console（React 19 + Vite + Tailwind CSS），
+      现有 ui-ux-designer 专注设计层，缺乏前端工程实现能力：
+      - React 19 新特性（Actions, use() hook）
+      - Vite 8.0 构建优化
+      - TanStack Query v5 数据获取与缓存
+      - Recharts 图表组件实现
+      - React Router v7 路由设计
+      - TypeScript 严格模式前端类型
+      - Tailwind CSS v4 样式系统
+      - i18n 国际化（console/src/i18n/）
+    affected_modules:
+      - "console/src/ (全部)"
+    suggested_agent: "frontend-engineer"
+    suggested_capabilities:
+      - react-development
+      - vite-build-system
+      - tanstack-query
+      - typescript-frontend
+      - tailwind-css
+
+  - gap_id: GAP-006
+    title: "消息队列/异步系统专家"
+    priority: MEDIUM
+    description: |
+      Kairos 核心有复杂的消息处理管道（message-bus → message-queue → message-buffer），
+      包含异步重试、优先级队列、消息去重等机制，没有专门 Agent 覆盖：
+      - 消息队列设计模式（优先级、死信、重试策略）
+      - Event-driven 架构（MessageBus 发布-订阅）
+      - 背压（Backpressure）控制
+      - 消息幂等性保证
+      - 高并发消息处理优化
+      - SQLite WAL 模式下的并发写入优化
+    affected_modules:
+      - "src/core/message-bus.ts"
+      - "src/core/message-queue.ts"
+      - "src/core/message-buffer.ts"
+      - "src/pipeline/session-lock.ts"
+    suggested_agent: "messaging-systems-engineer"
+    suggested_capabilities:
+      - message-queue-design
+      - event-driven-architecture
+      - concurrency-control
+      - async-retry-patterns
+      - sqlite-optimization
+
+  - gap_id: GAP-007
+    title: "语音/多媒体处理专家"
+    priority: MEDIUM
+    description: |
+      Kairos 有完整的 TTS/ASR 语音处理层（GLM 全家桶），以及媒体文件缓存系统。
+      没有 Agent 覆盖：
+      - ASR（自动语音识别）集成与优化
+      - TTS（文本转语音）声音克隆配置
+      - 语音消息格式转换（fluent-ffmpeg）
+      - 媒体文件哈希缓存（pHash + SHA256）
+      - 语音风格管理与个性化配置
+      - 多媒体消息（图片/视频/语音）在企微 API 中的处理
+    affected_modules:
+      - "src/core/asr-gateway.ts"
+      - "src/core/tts-gateway.ts"
+      - "src/core/media-cache.ts"
+      - "src/core/voice-* (多个文件)"
+      - "config/voices/ + config/asr.yaml + config/tts.yaml"
+    suggested_agent: "media-processing-engineer"
+    suggested_capabilities:
+      - asr-tts-integration
+      - audio-format-conversion
+      - voice-cloning
+      - media-file-caching
+      - multimedia-messaging
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Part 3: 覆盖度汇总
+# ─────────────────────────────────────────────────────────────────────────────
+coverage_summary:
+  total_agents: 11
+  high_relevance_agents: 5  # tech-lead, backend-architect, ai-engineer, code-reviewer, qa-engineer
+  medium_relevance_agents: 4  # knowledge-manager, context-manager, ui-ux-designer, api-documenter, legal-advisor
+  low_relevance_agents: 1   # mobile-developer
+
+  well_covered_scenarios:
+    - "系统架构决策与任务分解 (tech-lead)"
+    - "REST API 设计与数据库 Schema (backend-architect)"
+    - "LLM 集成与 Agent 编排基础 (ai-engineer)"
+    - "TypeScript 代码审查与测试 (code-reviewer)"
+    - "测试策略与发版就绪评估 (qa-engineer)"
+    - "文档管理与 AI-DDD 方法论 (knowledge-manager)"
+    - "运营中台 UI 设计 (ui-ux-designer)"
+    - "REST API 文档化 (api-documenter)"
+
+  uncovered_scenarios:
+    - "企微/微信客服平台集成 (GAP-001) [CRITICAL]"
+    - "国内 LLM 生态 (Qwen/Kimi/Doubao/GLM) (GAP-002) [HIGH]"
+    - "Nomad/Consul 基础设施 DevOps (GAP-003) [HIGH]"
+    - "中国数据合规 (PIPL/数据安全法) (GAP-004) [HIGH]"
+    - "React/Vite 前端工程实现 (GAP-005) [MEDIUM]"
+    - "消息队列与异步系统 (GAP-006) [MEDIUM]"
+    - "TTS/ASR 语音处理 (GAP-007) [MEDIUM]"
+
+  coverage_score:
+    value: 58
+    max: 100
+    formula: "high_relevance(5*9/11) + medium_relevance(4*6/11) + low_relevance(1*2/11) = ~58%"
+    interpretation: |
+      约 58% 的 Kairos 工程场景有对应 Agent 覆盖。
+      核心通用工程能力（架构、代码、测试、文档）覆盖良好。
+      Kairos 特有的中国生态（企微、国产 LLM、中国合规）和
+      专项技术（Nomad 运维、语音处理、前端工程）存在明显空白。
+
+  recommended_new_agents:
+    - name: "wecom-integration-specialist"
+      priority: CRITICAL
+      rationale: "企微/微信客服是 Kairos 最核心的通道，无任何现有 Agent 能覆盖"
+
+    - name: "cn-llm-specialist"
+      priority: HIGH
+      rationale: "执行层完全依赖国产模型，ai-engineer 的知识库不覆盖这些模型"
+
+    - name: "devops-engineer"
+      priority: HIGH
+      rationale: "Nomad/Consul/Forgejo Actions 部署是 Kairos 运维的核心场景，完全空白"
+
+    - name: "cn-compliance-advisor"
+      priority: HIGH
+      rationale: "legal-advisor 主要覆盖 GDPR 等西方法规，PIPL/数据安全法空白"
+
+    - name: "frontend-engineer"
+      priority: MEDIUM
+      rationale: "ui-ux-designer 只管设计，无法帮助实现 React/Vite/Tailwind 前端工程"
+
+    - name: "messaging-systems-engineer"
+      priority: MEDIUM
+      rationale: "消息队列/事件驱动是 Kairos 核心基础设施，无专业 Agent 覆盖"
+
+    - name: "media-processing-engineer"
+      priority: MEDIUM
+      rationale: "语音克隆/TTS/ASR 是 Kairos 差异化功能，无任何 Agent 覆盖"

@@ -1,0 +1,245 @@
+project:
+  name: kairos
+  version: "0.9.5"
+  description: AI-powered private domain sales automation system
+  license: MIT
+  type: monorepo (main app + relay sub-project)
+
+language:
+  primary: TypeScript 5.7
+  module_system: ESNext (type: "module")
+  target: ES2022
+  strict_mode: true
+  notable_flags:
+    - noUnusedLocals
+    - noUnusedParameters
+    - exactOptionalPropertyTypes
+    - noUncheckedIndexedAccess
+
+runtime:
+  engine: Node.js 18 (alpine, Docker base image)
+  entry_point: dist/index.js (compiled from src/index.ts)
+  dev_runner: tsx watch src/index.ts
+
+frameworks:
+  http_server:
+    - name: Express
+      version: "^5.0.0"
+      role: Main application HTTP server (webhooks, REST API, console static files)
+  relay_service:
+    - name: Fastify
+      version: "^5.2.0"
+      role: WeCom Sender Relay sub-project (fixed egress IP proxy)
+
+core_libraries:
+  database:
+    - name: better-sqlite3
+      version: "^12.6.2"
+      role: Embedded SQLite for local persistence (CRM, conversation history, evolution data)
+  validation:
+    - name: zod
+      version: "^4.3.6"
+      role: Runtime schema validation
+  configuration:
+    - name: dotenv
+      version: "^16.0.0"
+      role: Environment variable loading
+  file_processing:
+    - name: sharp
+      version: "^0.34.5"
+      role: Image processing
+    - name: fluent-ffmpeg
+      version: "^2.1.3"
+      role: Audio/video processing
+    - name: pdf-parse
+      version: "^2.4.5"
+      role: PDF content extraction
+    - name: multer
+      version: "^2.1.1"
+      role: Multipart file uploads
+  data_formats:
+    - name: xml2js
+      version: "^0.6.0"
+      role: WeCom XML message parsing
+    - name: yaml
+      version: "^2.8.2"
+      role: Config file parsing (pipelines, voices, products)
+    - name: gray-matter
+      version: "^4.0.3"
+      role: Frontmatter parsing
+  internal_sdk:
+    - name: "@nexus/sdk"
+      version: file:vendor/nexus-sdk-1.2.2.tgz
+      role: Nexus AI Cognitive Services Platform client (vendored)
+  utilities:
+    - name: uuid
+      version: "^13.0.0"
+
+testing:
+  framework: Vitest 3.x
+  coverage_provider: "@vitest/coverage-v8"
+  coverage_thresholds:
+    lines: 80%
+    functions: 80%
+    branches: 80%
+    statements: 80%
+  test_file_pattern: "src/**/*.test.ts"
+  test_count: 87 test files
+  special_config:
+    - "content-extractor.test.ts and audio-integration.test.ts run in fork pool (process isolation) to prevent mock leakage"
+  integration_testing:
+    - name: supertest
+      version: "^7.0.0"
+      role: HTTP integration tests for Express routes
+
+code_quality:
+  linter: ESLint 9 with typescript-eslint (type-checked rules)
+  formatter: Prettier 3
+  scripts:
+    lint: "eslint src/"
+    format: "prettier --write src/**/*.ts"
+    typecheck: "tsc --noEmit"
+
+architecture:
+  pattern: Layered / Event-driven
+  key_modules:
+    channels:
+      description: External messaging integrations
+      implementations:
+        - WeCom (Enterprise WeChat) internal app webhook
+        - WeCom KF (WeChat Customer Service) channel
+    core:
+      description: Business logic and infrastructure
+      sub_modules:
+        - llm: LLM Gateway with multi-provider failover
+        - agent: Agent Runtime for AI-driven responses
+        - pipeline: Pipeline Router + State Machine (sales funnel)
+        - memory: Nexus-backed long-term memory client
+        - product: Product knowledge base loader
+        - personality: Configurable AI personality profiles
+        - evaluator: Evolution Engine (automated persona improvement)
+        - scheduler: Heartbeat / outreach scheduling
+        - message-bus: Internal pub/sub event system
+        - file-manager: File storage, ASR/TTS gateways
+    api:
+      description: REST API exposed to admin console
+      routes:
+        - /conversations
+        - /crm
+        - /evolution
+        - /memories
+        - /pipelines
+        - /providers
+        - /voice-styles
+        - /voice-clones
+    relay:
+      description: Standalone WeCom Sender Relay (sub-project in relay/)
+      framework: Fastify 5
+      purpose: Fixed egress IP proxy for WeCom API calls + access_token lifecycle
+
+llm_providers:
+  gateway_pattern: Priority-based failover across multiple providers
+  providers:
+    - name: GLM (Zhipu AI)
+      priority: 1 (default/primary)
+      models: glm-4.6v (default)
+    - name: Qwen (Alibaba)
+      priority: 2
+      models: qwen-plus (default)
+    - name: Kimi (Moonshot)
+      priority: 3
+      models: moonshot-v1-8k (default)
+    - name: Doubao (ByteDance)
+      priority: 4
+      models: doubao-pro-32k (default)
+    - name: GenericOpenAI
+      role: Fallback for any OpenAI-compatible endpoint
+  dynamic_providers: Consul KV-based runtime provider loading (consul-provider-loader.ts)
+  strategic_layer: Anthropic Claude (via ANTHROPIC_AUTH_TOKEN in Nomad secrets)
+
+external_services:
+  - name: Nexus
+    role: AI Cognitive Services Platform (embeddings, memory, RAG)
+    tech_stack: Python + PostgreSQL (pgvector) + Redis
+    connection: HTTP REST via NEXUS_BASE_URL
+  - name: WeCom (Enterprise WeChat)
+    role: Primary messaging channel (internal app + customer service)
+  - name: GLM ASR
+    role: Automatic Speech Recognition
+  - name: GLM TTS
+    role: Text-to-Speech synthesis
+  - name: Ollama
+    role: Local LLM inference (referenced in docker-compose Nexus config)
+  - name: Consul
+    role: Service discovery + secret management (KV store for prod credentials)
+
+deployment:
+  containerization:
+    tool: Docker
+    build_strategy: Multi-stage build (builder → production)
+    base_image: node:18-alpine (via docker.1ms.run mirror)
+    health_check: GET /health (HTTP 200)
+    exposed_port: 3000
+    data_volume: /app/data (SQLite DB persistence)
+  orchestration:
+    tool: Nomad (HashiCorp)
+    environments:
+      - name: dev
+        job: kairos-dev
+        domain: kairos-dev.10cg.pub
+        resources: "500 MHz CPU, 512 MB RAM"
+      - name: prod
+        job: kairos-prod
+        domain: kairos.10cg.pub
+        resources: "1000 MHz CPU, 1024 MB RAM"
+        node_class: heavy_workload
+    service_discovery: Consul
+    reverse_proxy: Traefik (tag-based routing rules)
+    secrets_management: Consul KV (WECOM tokens, API keys, LLM credentials)
+    update_strategy:
+      max_parallel: 1
+      health_check: checks
+      auto_revert: true
+  local_compose:
+    tool: docker-compose
+    services: [kairos, nexus, nexus-postgres (pgvector:pg16), nexus-redis]
+  relay_service:
+    deployment: Separate Nomad job (nomad-relay.hcl)
+    purpose: Fixed egress IP for WeCom API whitelist compliance
+
+console:
+  description: Web admin console (pre-built frontend)
+  location: console/dist (static files served by Express)
+  note: Built separately in CI with Node 20+ before Docker image assembly
+
+ci_cd:
+  evidence: "References to CI in Dockerfile comments (console/dist built in CI step)"
+  registry: forgejo.10cg.pub/10cg (private Forgejo registry)
+  image_placeholder: "__IMAGE__" in Nomad HCL (substituted at deploy time)
+
+config_management:
+  format: YAML + JSON
+  locations:
+    - config/pipelines/ — sales pipeline definitions
+    - config/products/ — product knowledge base
+    - config/personalities/ — AI personality profiles
+    - config/asr.yaml — ASR provider config
+    - config/tts.yaml — TTS provider config
+    - config/voices/ — voice style definitions
+
+notable_patterns:
+  - Multi-LLM provider failover gateway (priority-based)
+  - Agent evolution / persona hot-reload system
+  - PII anonymizer module (pii-anonymizer, pii-ner)
+  - Message buffer + deduplication (MessageBuffer, MessageQueue)
+  - Typing simulator (human-like response delays)
+  - Voice style management + TTS integration
+  - Sales pipeline state machine (escalation, CRM, outreach)
+  - Consul-based dynamic provider loading at runtime
+  - Vendored SDK (nexus-sdk-1.2.2.tgz) committed in vendor/
+
+analysis_metadata:
+  analyzed_at: "2026-04-11"
+  analyzer: claude-sonnet-4-6 (without skill)
+  eval_id: eval-1-project-analyzer-nodejs
+  skill_used: false

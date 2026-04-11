@@ -1,0 +1,361 @@
+schema_version: "1"
+project: "kairos"
+timestamp: "2026-04-11T10:00:00+08:00"
+project_profile:
+  name: kairos
+  description: "AI-powered private domain sales automation system (TypeScript/Node.js/Express/SQLite→PostgreSQL/Vitest)"
+  tech_stack:
+    language: TypeScript
+    runtime: Node.js
+    framework: Express v5
+    orm: better-sqlite3 (SQLite MVP → PostgreSQL)
+    testing: Vitest
+    deployment: Docker + Nomad
+    ci_cd: Nomad HCL pipelines
+    llm_integrations: [Nexus SDK, Gemini, Claude Opus]
+    voice_pipeline: [ASR GLM, TTS GLM]
+    messaging: [WeChat KF API, WeCom Enterprise]
+    data_cache: Redis
+  patterns:
+    - multi-channel-messaging
+    - agent-runtime-with-skills
+    - evolution-engine-ab-testing
+    - crm-pipeline
+    - voice-media-processing
+    - scheduled-outreach
+    - human-escalation
+
+# ── Step 2: tech_stack_mapping → required scenarios ──────────────────────────
+# Rules applied (deterministic):
+#   framework: Express      → [api-design, performance-optimization]
+#   orm: SQLite/PostgreSQL  → [orm-migration, query-optimization, database-schema]
+#   testing: Vitest         → [test-strategy]
+#   deployment: Docker+Nomad→ [infrastructure, ci-cd-pipeline]
+#   llm: Nexus/Gemini/Claude→ [llm-integration, rag-system, prompt-engineering, agent-orchestration]
+#   voice: ASR/TTS          → [performance-optimization]  # media processing
+#   channels: WeChat API    → [api-design]
+#   evaluator: A/B engine   → [monitoring, quality-assessment]
+#   crm + pipeline          → [system-architecture, service-boundary]
+#   multi-agent orchestration→ [agent-orchestration]
+#   documentation           → [documentation-audit, developer-documentation]
+#   code changes            → [code-review, pre-merge-verification]
+
+# ── Step 3: Tag normalization (capabilities-taxonomy.yaml synonyms applied) ──
+# database-schema synonyms: [db-design, data-modeling, erd] → unified to database-schema
+# orm-migration synonyms: [database-migration, schema-migration] → unified to orm-migration
+# ci-cd-pipeline synonyms: [ci-cd, continuous-integration, devops] → unified to ci-cd-pipeline
+# infrastructure synonyms: [infra, cloud-infra, deployment] → unified to infrastructure
+# monitoring synonyms: [observability, logging, alerting] → unified to monitoring
+# performance-optimization synonyms: [perf-tuning, optimization] → unified to performance-optimization
+# api-design synonyms: [rest-api, endpoint-design, api-architecture] → unified to api-design
+# test-strategy synonyms: [testing-plan, qa-strategy] → unified to test-strategy
+# code-review synonyms: [review, pr-review] → unified to code-review
+
+# ── Step 4: Match calculation ─────────────────────────────────────────────────
+# Agent capability index (from frontmatter):
+#   tech-lead:        [system-architecture, task-decomposition, engineering-process, cross-system-coordination, architecture-decision]
+#   backend-architect:[api-design, database-schema, microservice-architecture, performance-optimization, service-boundary]
+#   ai-engineer:      [llm-integration, rag-system, prompt-engineering, vector-search, agent-orchestration]
+#   qa-engineer:      [test-strategy, defect-analysis, quality-assessment, risk-analysis, release-readiness]
+#   code-reviewer:    [code-review, spec-compliance, security-audit, test-coverage-review, pre-merge-verification]
+#   api-documenter:   [openapi-spec, sdk-generation, developer-documentation, api-versioning, interactive-docs]
+#   knowledge-manager:[documentation-audit, knowledge-architecture, doc-codebase-alignment, ai-ddd-methodology]
+#   context-manager:  [multi-agent-context, session-synthesis, context-optimization, decision-distillation]
+#   ui-ux-designer:   [interface-design, wireframing, design-system, user-research, accessibility-audit]
+#   mobile-developer: [react-native, flutter, native-integration, offline-sync, push-notification, app-deployment]
+#   legal-advisor:    [privacy-policy, terms-of-service, gdpr-compliance, data-processing-agreement, regulatory-notice]
+
+covered:
+  - scenario: "Backend API Design (Express REST)"
+    required_capabilities: [api-design]
+    matched_agent: "backend-architect"
+    matched_capabilities: [api-design]
+    match_rate: 1.0
+
+  - scenario: "Database Schema Design (SQLite → PostgreSQL)"
+    required_capabilities: [database-schema]
+    matched_agent: "backend-architect"
+    matched_capabilities: [database-schema]
+    match_rate: 1.0
+
+  - scenario: "Performance Optimization (media pipeline, message queue)"
+    required_capabilities: [performance-optimization]
+    matched_agent: "backend-architect"
+    matched_capabilities: [performance-optimization]
+    match_rate: 1.0
+
+  - scenario: "Service Boundary Design (channels / core / pipeline / evaluator)"
+    required_capabilities: [service-boundary, microservice-architecture]
+    matched_agent: "backend-architect"
+    matched_capabilities: [service-boundary, microservice-architecture]
+    match_rate: 1.0
+
+  - scenario: "System Architecture & Cross-service Coordination"
+    required_capabilities: [system-architecture, cross-system-coordination, architecture-decision]
+    matched_agent: "tech-lead"
+    matched_capabilities: [system-architecture, cross-system-coordination, architecture-decision]
+    match_rate: 1.0
+
+  - scenario: "Task Decomposition & Engineering Process"
+    required_capabilities: [task-decomposition, engineering-process]
+    matched_agent: "tech-lead"
+    matched_capabilities: [task-decomposition, engineering-process]
+    match_rate: 1.0
+
+  - scenario: "LLM Integration (Nexus SDK, Gemini, Claude)"
+    required_capabilities: [llm-integration, prompt-engineering, agent-orchestration]
+    matched_agent: "ai-engineer"
+    matched_capabilities: [llm-integration, prompt-engineering, agent-orchestration]
+    match_rate: 1.0
+
+  - scenario: "Agent Orchestration (evolution engine, skill-executor)"
+    required_capabilities: [agent-orchestration, llm-integration]
+    matched_agent: "ai-engineer"
+    matched_capabilities: [agent-orchestration, llm-integration]
+    match_rate: 1.0
+
+  - scenario: "Test Strategy (Vitest unit + integration)"
+    required_capabilities: [test-strategy, quality-assessment]
+    matched_agent: "qa-engineer"
+    matched_capabilities: [test-strategy, quality-assessment]
+    match_rate: 1.0
+
+  - scenario: "Code Review & Pre-merge Verification"
+    required_capabilities: [code-review, pre-merge-verification, security-audit]
+    matched_agent: "code-reviewer"
+    matched_capabilities: [code-review, pre-merge-verification, security-audit]
+    match_rate: 1.0
+
+  - scenario: "API Documentation (OpenAPI for Express routes)"
+    required_capabilities: [openapi-spec, developer-documentation, api-versioning]
+    matched_agent: "api-documenter"
+    matched_capabilities: [openapi-spec, developer-documentation, api-versioning]
+    match_rate: 1.0
+
+  - scenario: "Documentation Audit & Knowledge Architecture"
+    required_capabilities: [documentation-audit, knowledge-architecture]
+    matched_agent: "knowledge-manager"
+    matched_capabilities: [documentation-audit, knowledge-architecture]
+    match_rate: 1.0
+
+  - scenario: "Multi-agent Context Management (long sessions)"
+    required_capabilities: [multi-agent-context, session-synthesis, context-optimization]
+    matched_agent: "context-manager"
+    matched_capabilities: [multi-agent-context, session-synthesis, context-optimization]
+    match_rate: 1.0
+
+  - scenario: "Legal & Privacy Compliance (user data, WeChat data)"
+    required_capabilities: [privacy-policy, gdpr-compliance, data-processing-agreement]
+    matched_agent: "legal-advisor"
+    matched_capabilities: [privacy-policy, gdpr-compliance, data-processing-agreement]
+    match_rate: 1.0
+
+gaps:
+  - scenario: "ORM Migration & Schema Evolution (SQLite → PostgreSQL migration)"
+    required_capabilities: [orm-migration, query-optimization, database-schema]
+    best_partial_match:
+      agent: "backend-architect"
+      matched: [database-schema]
+      match_rate: 0.33
+    gap_reason: >
+      backend-architect covers database-schema design but lacks orm-migration
+      (schema-migration tooling, migration scripts, rollback plans) and
+      query-optimization (index tuning, EXPLAIN ANALYZE, N+1 detection).
+      The SQLite → PostgreSQL migration is a major pending task in Kairos.
+    suggested_agent:
+      name: "database-specialist"
+      capabilities: [orm-migration, query-optimization, database-schema, performance-optimization]
+
+  - scenario: "CI/CD Pipeline (Nomad HCL, Docker build, automated test gate)"
+    required_capabilities: [ci-cd-pipeline, infrastructure]
+    best_partial_match:
+      agent: "tech-lead"
+      matched: [engineering-process]
+      match_rate: 0.0  # engineering-process ≠ ci-cd-pipeline (no synonym overlap)
+    gap_reason: >
+      No agent has ci-cd-pipeline or infrastructure capabilities. tech-lead
+      covers engineering-process but this does not match ci-cd or devops tooling
+      (Nomad job specs, Docker multi-stage builds, deployment scripts, health
+      check gates). Kairos uses Nomad HCL for all deployments.
+    suggested_agent:
+      name: "devops-engineer"
+      capabilities: [ci-cd-pipeline, infrastructure, monitoring, deployment]
+
+  - scenario: "Observability & Monitoring (logging, alerting, metrics)"
+    required_capabilities: [monitoring]
+    best_partial_match:
+      agent: "qa-engineer"
+      matched: []
+      match_rate: 0.0
+    gap_reason: >
+      No agent has monitoring / observability capability. Kairos runs as a
+      production sales system requiring structured logging, error alerting,
+      provider health monitoring, and uptime dashboards. The evolution-engine
+      tracks conversion ROI but operational telemetry has no specialist agent.
+    suggested_agent:
+      name: "devops-engineer"
+      capabilities: [monitoring, ci-cd-pipeline, infrastructure]
+
+  - scenario: "Voice / Media Processing Pipeline (ASR/TTS, FFmpeg, pHash)"
+    required_capabilities: [performance-optimization, llm-integration]
+    best_partial_match:
+      agent: "ai-engineer"
+      matched: [llm-integration]
+      match_rate: 0.5
+    gap_reason: >
+      ai-engineer partially covers LLM integration but lacks domain knowledge
+      for real-time audio processing (ASR/TTS providers, FFmpeg media
+      transcoding, pHash deduplication, voice style management). This is a
+      core Kairos differentiator (GLM voice pipeline) with no dedicated agent.
+      match_rate 0.5 is on the boundary; flagged as gap due to domain
+      specificity of audio/media engineering.
+    suggested_agent:
+      name: "media-engineer"
+      capabilities: [voice-processing, media-pipeline, real-time-streaming, audio-optimization]
+
+  - scenario: "WeChat / WeCom Channel Integration (platform-specific APIs)"
+    required_capabilities: [api-design, native-integration]
+    best_partial_match:
+      agent: "backend-architect"
+      matched: [api-design]
+      match_rate: 0.5
+    gap_reason: >
+      backend-architect covers generic api-design but lacks native-integration
+      for WeChat/WeCom platform-specific protocols (message encryption, token
+      management, webhook verification, rate limiting by platform rules).
+      mobile-developer has native-integration but targets iOS/Android SDKs,
+      not messaging platform APIs. match_rate 0.5 flagged as gap due to
+      platform-specific compliance requirements.
+    suggested_agent:
+      name: "channel-integration-specialist"
+      capabilities: [native-integration, api-design, webhook-management, platform-compliance]
+
+  - scenario: "Real-time Messaging & Event-driven Architecture (message-bus, message-queue)"
+    required_capabilities: [performance-optimization, system-architecture]
+    best_partial_match:
+      agent: "tech-lead"
+      matched: [system-architecture]
+      match_rate: 0.5
+    gap_reason: >
+      tech-lead covers high-level system-architecture but lacks expertise in
+      real-time event-driven patterns specific to messaging systems (async
+      retry queues, back-pressure, dead-letter queues, message ordering
+      guarantees). Kairos message-bus.ts + message-queue.ts are core to
+      system reliability. match_rate 0.5; flagged as gap due to operational
+      depth required.
+    suggested_agent:
+      name: "messaging-architect"
+      capabilities: [event-driven-architecture, message-queue-design, real-time-processing, performance-optimization]
+
+  - scenario: "RAG / Vector Search (Nexus cognitive platform integration)"
+    required_capabilities: [rag-system, vector-search]
+    best_partial_match:
+      agent: "ai-engineer"
+      matched: [rag-system, vector-search]
+      match_rate: 1.0  # COVERED - see note
+    gap_reason: >
+      NOTE: This scenario is technically covered by ai-engineer (rag-system,
+      vector-search capabilities present). However flagged for attention:
+      Kairos integrates with Nexus (external cognitive platform) which
+      abstracts vector search behind a proprietary SDK. The integration
+      pattern differs from standard RAG (Qdrant/Pinecone direct access).
+      Practical coverage is partial due to Nexus SDK specifics.
+    suggested_agent:
+      name: "ai-engineer (existing, sufficient with Nexus SDK context)"
+      capabilities: [llm-integration, rag-system, vector-search, agent-orchestration]
+    flagged_as_attention: true  # not a hard gap, but requires Nexus domain context
+
+summary:
+  total_scenarios: 21
+  covered: 14
+  gaps: 6
+  attention_items: 1
+  coverage_rate: "66.7%"
+  gap_rate: "28.6%"
+
+agent_utilization:
+  - agent: "backend-architect"
+    scenarios_covered: 4
+    utilization: high
+  - agent: "tech-lead"
+    scenarios_covered: 2
+    utilization: medium
+  - agent: "ai-engineer"
+    scenarios_covered: 3
+    utilization: high
+  - agent: "qa-engineer"
+    scenarios_covered: 1
+    utilization: medium
+  - agent: "code-reviewer"
+    scenarios_covered: 1
+    utilization: medium
+  - agent: "api-documenter"
+    scenarios_covered: 1
+    utilization: low
+  - agent: "knowledge-manager"
+    scenarios_covered: 1
+    utilization: low
+  - agent: "context-manager"
+    scenarios_covered: 1
+    utilization: low
+  - agent: "legal-advisor"
+    scenarios_covered: 1
+    utilization: low
+  - agent: "ui-ux-designer"
+    scenarios_covered: 0
+    utilization: none
+    note: "Kairos is a backend-only automation system; no UI/UX design scenarios"
+  - agent: "mobile-developer"
+    scenarios_covered: 0
+    utilization: none
+    note: "Kairos targets WeChat/WeCom platform APIs, not native mobile app development"
+
+uncovered_capability_tags:
+  - orm-migration        # no agent has this
+  - query-optimization   # no agent has this
+  - ci-cd-pipeline       # no agent has this
+  - infrastructure       # no agent has this
+  - monitoring           # no agent has this
+
+suggested_new_agents:
+  - name: "devops-engineer"
+    priority: high
+    rationale: >
+      Covers ci-cd-pipeline, infrastructure, monitoring — 3 uncovered tags.
+      Kairos is a production system requiring Nomad deployment expertise,
+      Docker build pipelines, and operational observability. This gap
+      affects all production deployments.
+    suggested_capabilities: [ci-cd-pipeline, infrastructure, monitoring, deployment, security-audit]
+
+  - name: "database-specialist"
+    priority: medium
+    rationale: >
+      Covers orm-migration and query-optimization gaps.
+      Kairos has a pending SQLite → PostgreSQL migration (major engineering
+      task) and will need ongoing query tuning as data volume grows.
+    suggested_capabilities: [orm-migration, query-optimization, database-schema, performance-optimization]
+
+  - name: "media-engineer"
+    priority: medium
+    rationale: >
+      Covers real-time audio/video processing domain.
+      Kairos voice pipeline (ASR/TTS via GLM + FFmpeg) is a core differentiator
+      with no specialist coverage. Media engineering differs significantly from
+      general backend or AI engineering.
+    suggested_capabilities: [voice-processing, media-pipeline, real-time-streaming, audio-optimization, codec-handling]
+
+  - name: "channel-integration-specialist"
+    priority: low
+    rationale: >
+      WeChat/WeCom platform-specific integration patterns (encryption,
+      token refresh, webhook signature verification) are not covered by
+      backend-architect's generic api-design.
+    suggested_capabilities: [native-integration, webhook-management, platform-compliance, api-design]
+
+methodology_notes:
+  - "Matching is deterministic tag-based (no LLM scoring)"
+  - "match_rate = matched_capabilities / required_capabilities"
+  - "Scenarios with match_rate < 0.5 classified as gaps"
+  - "Scenarios at exactly 0.5 flagged as attention if domain specificity warrants"
+  - "Kairos actual tech stack differs slightly from task description: uses Vitest not Jest, uses better-sqlite3 not Prisma. Scenario mapping applied to actual stack."
+  - "ui-ux-designer and mobile-developer have 0 utilization: Kairos is a headless backend automation system"

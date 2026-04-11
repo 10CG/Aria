@@ -1,0 +1,104 @@
+schema_version: "1"
+name: "kairos"
+version: "0.9.5"
+description: "AI-powered private domain sales automation system"
+tech_stack:
+  primary_language: "TypeScript"
+  runtime: "Node.js 18 (Docker) / Node.js 22 (local dev)"
+  framework: "Express 5 (backend API)"
+  frontend: "React 19 + Vite 8 + Tailwind CSS 4 (console package)"
+  mobile: null
+  orm: null
+  database: "better-sqlite3 (embedded SQLite)"
+  validation: "Zod"
+  ai_services: "@nexus/sdk (vendor, local AI cognitive services platform)"
+packages:
+  - name: "kairos"
+    path: "."
+    role: "Main backend application — Express API + AI pipeline + WeCom channel"
+    framework: "Express 5"
+    test_runner: "Vitest 3"
+  - name: "wecom-relay"
+    path: "relay/"
+    role: "Fixed-egress IP proxy for WeCom API calls"
+    framework: "Fastify 5 + @fastify/multipart"
+    test_runner: "Vitest 2"
+  - name: "kairos-console"
+    path: "console/"
+    role: "Admin/management web UI"
+    framework: "React 19 + React Router 7 + TanStack Query 5 + Recharts"
+    test_runner: null
+patterns:
+  architecture: "multi-package monorepo (backend + relay + frontend in same repo, no workspace manager)"
+  testing: "Vitest (backend coverage threshold: 80% lines/functions/branches/statements)"
+  ci_cd: "Forgejo Actions (.forgejo/workflows/)"
+  orm: null
+  deployment: "Docker + Nomad (HashiCorp) + Traefik + Consul"
+  package_manager: "npm (package-lock.json)"
+  module_system: "ESM (type: module)"
+  linting: "ESLint 9 + Prettier 3 + TypeScript ESLint 8"
+work_modes:
+  - "Webhook-driven AI sales automation (WeCom)"
+  - "LLM pipeline execution (GLM, Anthropic)"
+  - "ASR/TTS voice processing (fluent-ffmpeg, sharp, pdf-parse)"
+  - "Product knowledge base management"
+  - "Admin console UI development"
+  - "Relay service as separate deployable unit"
+ci_cd_details:
+  platform: "Forgejo Actions"
+  workflows:
+    - file: ".forgejo/workflows/ci.yml"
+      trigger: "Pull Request to develop / main"
+      jobs: ["lint & typecheck (Node 18+20)", "test & coverage (Node 18+20)", "build (Node 18+20)", "docker build (on tag v*)"]
+    - file: ".forgejo/workflows/deploy.yaml"
+      trigger: "Push to develop branch"
+      jobs: ["build console frontend (Node 22)", "build & push Docker image", "deploy to Nomad dev", "verify deployment"]
+    - file: ".forgejo/workflows/deploy-relay.yaml"
+      trigger: "Push to develop (relay/** paths)"
+      jobs: ["build & push wecom-relay Docker image", "deploy relay to Nomad dev"]
+deployment_details:
+  container_registry: "forgejo.10cg.pub/10cg/"
+  orchestrator: "Nomad (HashiCorp)"
+  service_mesh: "Consul (service discovery + KV secrets)"
+  ingress: "Traefik (kairos.10cg.pub)"
+  environments:
+    - dev
+    - prod
+  nomad_job_files:
+    - "deploy/nomad-dev.hcl"
+    - "deploy/nomad-prod.hcl"
+    - "deploy/nomad-relay.hcl"
+  infrastructure_services:
+    - "Nexus (internal AI cognitive services, port 8001)"
+    - "PostgreSQL + pgvector (for Nexus)"
+    - "Redis 7 (for Nexus)"
+external_dependencies:
+  - name: "@nexus/sdk"
+    source: "vendor/nexus-sdk-1.2.2.tgz (local vendor tarball)"
+    role: "AI cognitive services SDK"
+  - name: "better-sqlite3"
+    role: "Embedded SQLite database"
+  - name: "fluent-ffmpeg"
+    role: "Audio/video processing (ASR pipeline)"
+  - name: "sharp"
+    role: "Image processing"
+  - name: "pdf-parse + pdfkit"
+    role: "PDF ingestion and generation"
+  - name: "multer"
+    role: "File upload handling"
+  - name: "xml2js"
+    role: "WeCom XML webhook parsing"
+  - name: "gray-matter + yaml"
+    role: "Configuration and markdown frontmatter parsing"
+detected_from:
+  - { file: "package.json", fields: ["dependencies", "devDependencies", "scripts"] }
+  - { file: "tsconfig.json", fields: ["compilerOptions.target", "compilerOptions.module", "paths"] }
+  - { file: "relay/package.json", fields: ["dependencies", "devDependencies"] }
+  - { file: "console/package.json", fields: ["dependencies", "devDependencies"] }
+  - { file: "vitest.config.ts", fields: ["test.include", "test.coverage.threshold", "test.poolMatchGlobs"] }
+  - { file: "Dockerfile", fields: ["FROM", "COPY", "CMD"] }
+  - { file: "docker-compose.yml", fields: ["services"] }
+  - { file: "deploy/nomad-prod.hcl", fields: ["job", "service.tags", "template"] }
+  - { file: ".forgejo/workflows/ci.yml", fields: ["jobs"] }
+  - { file: ".forgejo/workflows/deploy.yaml", fields: ["jobs"] }
+  - { file: ".forgejo/workflows/deploy-relay.yaml", fields: ["jobs"] }
