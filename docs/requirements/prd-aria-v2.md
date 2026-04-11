@@ -1,7 +1,7 @@
 # Aria 2.0 - 产品需求文档 (PRD)
 
-> **Version**: 2.0.0-draft
-> **Status**: Draft (Agent Team 5 轮收敛讨论输出)
+> **Version**: 2.0.0
+> **Status**: Approved (Draft → Approved 2026-04-11, 讨论组+挑战组 4 轮收敛)
 > **Created**: 2026-04-09
 > **Owner**: 10CG Lab
 > **Supersedes**: [prd-aria-v1.md](./prd-aria-v1.md) (v1.x 保持维护, v2.0 是并行升级)
@@ -353,7 +353,9 @@ Crash recovery:
 | **可观测** | 结构化 JSON 日志, trace_id 贯穿, 支持按 issue 查询 | P1 |
 | **文档同步** | 架构变更时 arch-update skill 能检测 | P1 |
 | **向后兼容** | v1.x 交互模式 (aria-plugin in CC) 完全保留 | P0 |
-| **隔离** | Layer 2 容器间通过 worktree + docker 隔离, 不做更强 sandbox | P2 |
+| **容器安全** | Layer 2 容器 drop ALL capabilities + no-new-privileges + read-only rootfs; Forgejo token 最小权限 (仅 PR 创建); 网络出口白名单 (仅 Forgejo + Anthropic API) | P0 |
+| **输入 sanitization** | Layer 1→2 拟人命令须经白名单校验 + 长度截断 (200 char/指令); 非白名单指令 reject + 审计日志; 防止 issue body prompt injection | P0 |
+| **隔离** | Layer 2 容器间通过 worktree + docker 隔离; server-side pre-receive hook 硬拦截越界 (不依赖客户端 hook) | P1 |
 
 ---
 
@@ -363,7 +365,7 @@ Crash recovery:
 
 | ID | 假设 | 验证方式 | 失败影响 |
 |----|------|---------|---------|
-| **A1** | headless `claude -p` 能加载 `/root/.claude/plugins/aria` 的 plugin | M1 实测 Dockerfile 构建 + 手动 dispatch | 中 - 需回退到 system prompt 注入 |
+| **A1** | headless `claude -p` 能加载 `/root/.claude/plugins/aria` 的 plugin | **M0** Dockerfile 初版阶段同步验证 (提前自 M1) | **高** - 回退到 system prompt 注入将废弃 v2.0 核心前提 |
 | **A2** | GLM 5.1 能生成高质量拟人命令 | M1-M2 benchmark (人工评分 10 个 sample) | 高 - 可能需升级 GLM model 或 fallback Sonnet |
 | **A3** | Aether heavy 节点 NFS 存储可挂载到 Nomad docker 容器 | M0 实测 `nomad alloc exec` + bind mount | 高 - 若失败需 constraint pin 单节点或重设计 |
 | **A4** | aria-plugin 的 Skills 在 headless 模式下通过 tool use 正常触发 | M1 实测 `claude -p` stream-json 输出 | 高 - 可能需 prompt 工程引导 |
@@ -382,6 +384,7 @@ Crash recovery:
 | **R5** Nomad eval 队列阻塞 (Aether 其他 workload 竞争) | 低 | 限制并发 N=3, 优先级调度 |
 | **R6** 跨节点 worktree bind mount 失败 | 高 | M0 实证 NFS 方案, 或 constraint pin heavy-1 |
 | **R7** Meta 参数超 64KB 限制 (prompt 大时) | 中 | Prompt 写 bind mount 文件, meta 只传 ISSUE_ID |
+| **R8** Hermes fork + 自研均失败 | 低 | 退出策略: 降级为 CLI-only 模式 (cron poll + `claude -p` 脚本调用, 无状态机/无 gateway, 手动 dispatch + 脚本辅助) |
 
 ---
 
@@ -392,7 +395,7 @@ Crash recovery:
 ```
 M0 (Week 1-2)     前置验证 + 架构定稿
 M1 (Week 3-6)     MVP: 手动 dispatch → 1 issue → PR (100h)
-M2 (Week 7-12)    Layer 1 状态机 + Hermes cron 集成 (140h)
+M2 (Week 7-12)    Layer 1 状态机 + Hermes cron 集成 + 输入 sanitization (140h)
 M3 (Week 13-16)   双 provider + Nomad integration (90h)
 M4 (Week 17-21)   Crash recovery + Replay + Reconciler (80h)
 M5 (Week 22-27)   Human gate + Review loop + Drift defense (100h)
@@ -412,15 +415,21 @@ M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
 - [ ] Nomad parameterized dispatch + meta 参数实测 (最大允许 payload)
 - [ ] `hermes-agent` upstream 源码分析 + fork 骨架建立
 - [ ] GLM 5.1 API 访问测试
-- [ ] Anthropic claude-code CLI 捆绑分发政策确认 (Legal 建议)
-- [ ] `aria-runner:claude-latest` Dockerfile 初版 (单机 docker run 验证)
+- [ ] **R1 法律确认 (M1 硬性前置)**: Anthropic claude-code CLI 捆绑分发政策确认 — R1 结论未出前不启动 M1
+- [ ] **A1 headless plugin 验证 (提前自 M1)**: `aria-runner:claude-latest` Dockerfile 初版 + `claude -p` plugin 加载实测
 - [ ] PRD 审阅 + 落地为 User Stories (US-010+)
-- [ ] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, 2026-04-11 Agent Team 讨论追加):
+- [ ] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, **timeboxed 1 sprint**):
   - 实现 gateway stub (飞书 API 最小调用) + SQLite state 最小原型
   - 实测 LoC + 开发工时
   - 对比 fork 路线: 痛点修复难度 + 月度 rebase 预估
   - 交付: Spike Report + AD3 修订建议 (保留 fork / 切换自研 / 混合)
+  - **Spike 结论若与 AD3 矛盾, 须提交产品负责人二次裁决, 不得自行变更方向**
   - 若选自研: gateway.py 接口需预留 Matrix 扩展点 (Aria#5 Pulse 长期规划)
+
+**M0 Exit Criteria** (三项可检查物):
+1. AD 文档覆盖 AD1-AD12 且含 alternatives considered (含 Spike 对比数据)
+2. Spike 代码可运行并产出量化数据 (LoC + 工时 + rebase 成本)
+3. 产品负责人签字确认 Go/No-Go
 
 **交付**: M0 Report (架构决策 + 风险确认 + M1 精确路径 + AD3 Spike 结论)
 
@@ -530,15 +539,15 @@ v2.0 新增:
 ### M6 验证 (发版前)
 
 **定量指标**:
-- 7 天连续运行无 crash
+- 7 天连续运行无 unplanned restart (排除计划维护窗口)
 - ≥ 10 个真实 issue 成功 dispatch + merge
 - Layer 1 cost < $10/月
 - Layer 2 cost < $70/月 (假设每天 10 dispatch, 80% 走 GLM)
 - 状态机单元测试 100% 覆盖
 - Crash recovery 在 3 种故障模式验证通过:
-  - Hermes 进程 crash mid-transition
-  - Nomad alloc unexpected termination
-  - SQLite 数据库损坏
+  - Hermes 进程 SIGKILL mid-transition → 恢复至 last-committed state
+  - Nomad alloc unexpected termination (OOM kill / container restart)
+  - SQLite 故障注入: (a) WAL 文件截断至 0 字节后启动,系统检测并恢复; (b) `PRAGMA integrity_check` 返回非 ok 时,系统拒绝启动并报错
 
 **定性指标**:
 - 人类审批时间中位数 < 10 分钟 (Feishu 卡片)
@@ -559,6 +568,7 @@ v2.0 新增:
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 2.0.0-draft | 2026-04-09 | 初稿, 基于 5 轮 Agent Team 收敛讨论 | 10CG Lab + Agent Team |
+| 2.0.0 | 2026-04-11 | Draft → Approved: 讨论组+挑战组 4 轮收敛审阅. 修订: A1 提前/升高, 容器安全 P0, M0 Exit Criteria, Spike timeboxed + 裁决权, sanitization US (M2), SQLite 测试具体化, R8 退出策略 | Agent Team Review |
 
 ---
 
