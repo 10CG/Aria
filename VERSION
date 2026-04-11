@@ -26,14 +26,13 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.12.0 | https://github.com/10CG/aria-plugin | 2026-04-11 |
+| aria (子模块) | v1.11.2 | https://github.com/10CG/aria-plugin | 2026-04-11 |
 
-### aria v1.12.0 变更摘要
+### aria v1.11.2 变更摘要
 
-- **US-010 Agent Team STCO 质量强化** — 11 Agent description 重写为 STCO 模式 (Scope-Trigger-Contract-Output)
-  - 6 消歧对 (tech-lead↔backend-architect, code-reviewer↔qa-engineer, knowledge-manager↔context-manager)
-  - Handoff contract v1.0 (Agent 间结构化上下文传递)
-  - PromptX 三段式启发,自然语言投射 (非 Gherkin)
+- **US-010 STCO Agent description 质量强化** (PR #6) — 11 Agent description 重写
+- **Handoff contract v1.0** — Agent 间结构化上下文传递协议
+- **Aria#10 legal-advisor 修复** (PR #7) — Multi-Round Protocol + Output Format + Critical Constraints
 - **Skills 总数**: 33 (30 面向用户 + 3 内部)
 - **Agents 总数**: 11
 
