@@ -1,7 +1,7 @@
 # agent-team-quality — Agent Team Description 精确化 + 协作契约
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Implementing
+> **Status**: Implemented
 > **Created**: 2026-04-11
 > **Parent Story**: [US-010](../../../docs/requirements/user-stories/US-010.md)
 > **Target Version**: v1.12.0

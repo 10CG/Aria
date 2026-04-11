@@ -26,12 +26,14 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.11.1 | https://github.com/10CG/aria-plugin | 2026-04-10 |
+| aria (子模块) | v1.12.0 | https://github.com/10CG/aria-plugin | 2026-04-11 |
 
-### aria v1.11.1 变更摘要
+### aria v1.12.0 变更摘要
 
-- **benchmark-transparency-enhancement** - dual delta reporting layer (Aria#8 Phase 3 修正方案)
-- **state-scanner v2.9.0** (v1.11.0) - Phase 1.12 同步检测 + Phase 1.13 Issue 感知
+- **US-010 Agent Team STCO 质量强化** — 11 Agent description 重写为 STCO 模式 (Scope-Trigger-Contract-Output)
+  - 6 消歧对 (tech-lead↔backend-architect, code-reviewer↔qa-engineer, knowledge-manager↔context-manager)
+  - Handoff contract v1.0 (Agent 间结构化上下文传递)
+  - PromptX 三段式启发,自然语言投射 (非 Gherkin)
 - **Skills 总数**: 33 (30 面向用户 + 3 内部)
 - **Agents 总数**: 11
 
