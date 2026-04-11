@@ -417,7 +417,7 @@ M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
 - [ ] GLM 5.1 API 访问测试
 - [ ] **R1 法律确认 (M1 硬性前置)**: Anthropic claude-code CLI 捆绑分发政策确认 — R1 结论未出前不启动 M1
 - [ ] **A1 headless plugin 验证 (提前自 M1)**: `aria-runner:claude-latest` Dockerfile 初版 + `claude -p` plugin 加载实测
-- [ ] PRD 审阅 + 落地为 User Stories (US-010+)
+- [ ] PRD 审阅 + 落地为 User Stories (US-020+)
 - [ ] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, **timeboxed 1 sprint**):
   - 实现 gateway stub (飞书 API 最小调用) + SQLite state 最小原型
   - 实测 LoC + 开发工时
@@ -494,18 +494,18 @@ Out of scope:
 
 | ID | 标题 | 优先级 |
 |----|------|--------|
-| US-010 | Aria 2.0 两层架构基础设施 | HIGH |
-| US-011 | Layer 1 状态机 + Hermes fork | HIGH |
-| US-012 | Layer 2 容器镜像 + 拟人命令协议 | HIGH |
-| US-013 | 跨 tick 长任务 + Crash recovery | HIGH |
-| US-014 | Human gate + Feishu 审批 | MEDIUM |
-| US-015 | 防漂移 + 审计日志 | MEDIUM |
-| US-016 | v2.0 文档体系 + CLAUDE.md 修订 | MEDIUM |
-| US-017 | Cost routing + 预算控制 | MEDIUM |
+| US-020 | Aria 2.0 两层架构基础设施 | HIGH |
+| US-021 | Layer 1 状态机 + Hermes fork | HIGH |
+| US-022 | Layer 2 容器镜像 + 拟人命令协议 | HIGH |
+| US-023 | 跨 tick 长任务 + Crash recovery | HIGH |
+| US-024 | Human gate + Feishu 审批 | MEDIUM |
+| US-025 | 防漂移 + 审计日志 | MEDIUM |
+| US-026 | v2.0 文档体系 + CLAUDE.md 修订 | MEDIUM |
+| US-027 | Cost routing + 预算控制 | MEDIUM |
 
 ### OpenSpec Changes (待起草)
 
-v2.0 的每个 milestone 将产出 1-N 个 OpenSpec Level 2/3 变更, 对应 US-010~US-017 的实施。首个:
+v2.0 的每个 milestone 将产出 1-N 个 OpenSpec Level 2/3 变更, 对应 US-020~US-027 的实施。首个:
 - `openspec/changes/aria-2.0-m0-prerequisite/` (M0 前置验证)
 - `openspec/changes/aria-2.0-m1-mvp/` (M1 MVP)
 - ...
@@ -600,5 +600,5 @@ v2.0 新增:
 ## 下一步
 
 1. **PRD 审阅** (人类): 确认本文档准确反映产品愿景
-2. **Phase A.1** (Aria 十步循环): 本 PRD 发布 → User Stories 起草 (US-010~US-017) → 首个 OpenSpec 起草 (aria-2.0-m0-prerequisite)
+2. **Phase A.1** (Aria 十步循环): 本 PRD 发布 → User Stories 起草 (US-020~US-027) → 首个 OpenSpec 起草 (aria-2.0-m0-prerequisite)
 3. **M0 启动**: 前置验证工作 (2 周)
