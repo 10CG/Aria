@@ -1,19 +1,19 @@
 # Aria 项目版本信息
 
-> **版本**: 1.4.2
-> **最后更新**: 2026-04-10
+> **版本**: 1.5.0
+> **最后更新**: 2026-04-11
 
 ## 版本号
 
 ```
-1.4.2
+1.5.0
 ```
 
 ## 说明
 
 - **Major (1)**: 方法论核心框架稳定
-- **Minor (4)**: US-007 Phase 3b aria-orchestrator 心跳 + 飞书通知 E2E 验证
-- **Patch (2)**: scan.sh 安全关键词扩展 + complexity_tier rename (P0 security)
+- **Minor (5)**: US-007 Phase 3b-M3-slim — 智能分诊 + 分级通知 (aria-orchestrator)
+- **Patch (0)**: 新 minor,patch 归零
 
 ## 子模块版本
 
@@ -31,10 +31,6 @@
 ### aria v1.11.1 变更摘要
 
 - **benchmark-transparency-enhancement** - dual delta reporting layer (Aria#8 Phase 3 修正方案)
-  - `calc_dual_delta.py` 定型 — 区分 internal / cross-project delta
-  - 新增 `ASSERTION_CATEGORY_GUIDE.md` + `HISTORICAL_CAVEATS.md`
-  - AB_TEST_OPERATIONS.md 新增 dual-delta 章节
-  - **非 gate change**: 不改变发版决策,仅透明度增强 (Level 2 patch)
 - **state-scanner v2.9.0** (v1.11.0) - Phase 1.12 同步检测 + Phase 1.13 Issue 感知
 - **Skills 总数**: 33 (30 面向用户 + 3 内部)
 - **Agents 总数**: 11
@@ -53,19 +49,21 @@ v1.2.0
 v1.3.0
 v1.4.0
 v1.4.1
-v1.4.2 (当前)
+v1.4.2
+v1.5.0 (当前)
 ```
 
 ## 发布说明
 
-v1.4.0 核心成果 — aria-orchestrator 外部编排器 Phase 3b 完成：
+v1.5.0 核心成果 — aria-orchestrator M3-slim 智能分诊:
 
-- ✅ Hermes Agent 心跳扫描 (60m 间隔, GLM-4.5-Air 零成本)
-- ✅ 飞书 (Feishu) 通知集成 E2E 验证
-- ✅ Aether Nomad 部署 (light-1 节点, raw_exec driver)
-- ✅ US-006 自定义健康检查完成
+- ✅ triage.sh 路由决策引擎 (scan → triage-result.json, configurable dispatch_policy)
+- ✅ 飞书分级通知 (🟢 Tier 1 / 🟡 Tier 2 / 🔴 Tier 3)
+- ✅ heartbeat.sh triage 集成 (fallback 降级, 不触发 circuit breaker)
+- ✅ notify-feishu.sh JSON 转义修复 (python3 payload 构造)
+- ✅ Agent Team 4 轮规划审计 + 2 轮 pre-merge 审计收敛
+- ✅ D23: M3 拆分 — dispatch/状态机/审批 → v2.0
 
 ## 下一步
 
-- [ ] v1.5.0 - US-007 Phase 3c 半自动开发闭环
-- [ ] v2.0.0 - 企业级功能支持
+- [ ] v2.0.0 - PRD v2.0 两层 AI 分工架构 (US-010~017, ~750h)
