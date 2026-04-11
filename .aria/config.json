@@ -47,5 +47,14 @@
   "experiments": {
     "agent_team_audit": false,
     "agent_team_audit_points": ["pre_merge"]
+  },
+
+  "orchestrator": {
+    "dispatch_policy": {
+      "tier1_action": "dispatch_ready",
+      "tier2_action": "approval_required",
+      "tier3_action": "human_only",
+      "dry_run": false
+    }
   }
 }
