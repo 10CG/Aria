@@ -254,6 +254,7 @@ git worktree remove /tmp/aria-work-{issue-id}
 | D10 | Dashboard 不迁移 | 生成是工具层职责，调度是运行时层职责 |
 | D11 | heartbeat scan 直接做编排器，跳过 Skill | 扫描是确定性逻辑，双重实现浪费 |
 | D12 | Phase 3a+3b 合并，编排器第一个 PR = scan-only | 代码从第一天在正确仓库，增量演进 |
+| D23 | M3 拆分为 M3-slim (v1.5.0) + 剩余留 v2.0 | M3 中 dispatch/状态机/审批 60% 会被 v2.0 容器架构替代,仅 triage+通知 (40%) 可复用。Agent Team 4 轮审计收敛 (2026-04-11) |
 
 ## Impact
 
@@ -281,5 +282,6 @@ git worktree remove /tmp/aria-work-{issue-id}
 | Phase 3b-M1 (scan-only) | 4-6h | ✅ 已完成 (2026-04-03) |
 | Phase 3b-M1.5 (Hermes spike) | 4-6h | ✅ PASS (2026-04-03) |
 | Phase 3b-M2 (轻节点 E2E) | 4-6h | ✅ PASS (2026-04-07) |
-| Phase 3b-M3 (完整集成) | 8-12h | 中 (gateway + 持久化) |
-| Phase 3c (闭环) | 20h+ | 高 (全自动开发安全性) |
+| Phase 3b-M3-slim (triage+通知) | ~4h | ✅ v1.5.0 交付 (D23: dispatch/状态机/审批 → v2.0) |
+| Phase 3b-M3 剩余 (状态机+dispatch+审批) | — | → v2.0 (PRD v2.0 US-010~017) |
+| Phase 3c (闭环) | 20h+ | → v2.0 |
