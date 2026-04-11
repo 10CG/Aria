@@ -367,7 +367,7 @@ Crash recovery:
 | **A2** | GLM 5.1 能生成高质量拟人命令 | M1-M2 benchmark (人工评分 10 个 sample) | 高 - 可能需升级 GLM model 或 fallback Sonnet |
 | **A3** | Aether heavy 节点 NFS 存储可挂载到 Nomad docker 容器 | M0 实测 `nomad alloc exec` + bind mount | 高 - 若失败需 constraint pin 单节点或重设计 |
 | **A4** | aria-plugin 的 Skills 在 headless 模式下通过 tool use 正常触发 | M1 实测 `claude -p` stream-json 输出 | 高 - 可能需 prompt 工程引导 |
-| **A5** | Hermes fork 月度 rebase 可控 (< 20h/月) | M0-M3 实际跟踪 | 中 - 若失败考虑 pin upstream 版本 |
+| **A5** | Hermes fork 月度 rebase 可控 (< 20h/月) | M0 Spike: fork vs 自研对比 (2026-04-11 Agent Team 2:2 分歧, 需数据) | 高 - 若 Spike 证伪, 切换自研路线 (~800-1200 行 Python) |
 | **A6** | GLM 5.1 公开可用 (via API) | M0 API 访问测试 | 中 - fallback 到 GLM-4.5-Air (已验证可用) |
 | **A7** | luxeno cron fallback 问题不阻塞 (Layer 1 cron 不调 LLM for routing) | M1 验证 cron 路径无 LLM fallback 依赖 | 低 - 已知规避: cron 全走规则, LLM 仅容器内 |
 
@@ -415,8 +415,14 @@ M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
 - [ ] Anthropic claude-code CLI 捆绑分发政策确认 (Legal 建议)
 - [ ] `aria-runner:claude-latest` Dockerfile 初版 (单机 docker run 验证)
 - [ ] PRD 审阅 + 落地为 User Stories (US-010+)
+- [ ] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, 2026-04-11 Agent Team 讨论追加):
+  - 实现 gateway stub (飞书 API 最小调用) + SQLite state 最小原型
+  - 实测 LoC + 开发工时
+  - 对比 fork 路线: 痛点修复难度 + 月度 rebase 预估
+  - 交付: Spike Report + AD3 修订建议 (保留 fork / 切换自研 / 混合)
+  - 若选自研: gateway.py 接口需预留 Matrix 扩展点 (Aria#5 Pulse 长期规划)
 
-**交付**: M0 Report (架构决策 + 风险确认 + M1 精确路径)
+**交付**: M0 Report (架构决策 + 风险确认 + M1 精确路径 + AD3 Spike 结论)
 
 ### M1: MVP 手动 E2E (Week 3-6)
 
