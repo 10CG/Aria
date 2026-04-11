@@ -26,13 +26,16 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.11.2 | https://github.com/10CG/aria-plugin | 2026-04-11 |
+| aria (子模块) | v1.13.0 | https://github.com/10CG/aria-plugin | 2026-04-11 |
 
-### aria v1.11.2 变更摘要
+### aria v1.13.0 变更摘要
 
-- **US-010 STCO Agent description 质量强化** (PR #6) — 11 Agent description 重写
-- **Handoff contract v1.0** — Agent 间结构化上下文传递协议
-- **Aria#10 legal-advisor 修复** (PR #7) — Multi-Round Protocol + Output Format + Critical Constraints
+- **US-011 项目适配能力** (PR #8) — 3 新 Skill: project-analyzer + agent-gap-analyzer + agent-creator
+- **11 Agent capabilities 机读字段** + capabilities-taxonomy.yaml (54 标签)
+- **agent-router v1.1.0** — 项目级 Agent 运行时发现
+- **5 技术栈模板** (Node.js/Python/Go/Flutter/generic)
+- **AB Benchmark**: avg delta +0.15 (POSITIVE)
+- **Skills 总数**: 36 (33 面向用户 + 3 内部) | **Agents**: 11
 - **Skills 总数**: 33 (30 面向用户 + 3 内部)
 - **Agents 总数**: 11
 
