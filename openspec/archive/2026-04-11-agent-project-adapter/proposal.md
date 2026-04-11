@@ -1,7 +1,7 @@
 # agent-project-adapter — 项目适配能力: 分析 + 覆盖度评估 + Agent 生成
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Approved
+> **Status**: Implemented
 > **Created**: 2026-04-11
 > **Parent Story**: [US-011](../../../docs/requirements/user-stories/US-011.md)
 > **Target Version**: v1.13.0
