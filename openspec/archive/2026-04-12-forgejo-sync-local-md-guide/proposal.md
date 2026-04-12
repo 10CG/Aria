@@ -1,7 +1,7 @@
 # forgejo-sync 主动引导创建 CLAUDE.local.md
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Approved (4-agent team, 4 rounds converged, 2026-04-12)
+> **Status**: Complete (merged aria-plugin PR #11, 2026-04-12)
 > **Created**: 2026-04-12
 > **Parent Story**: N/A (Source Issue 直接驱动。无现有 US 覆盖 forgejo-sync DX 改进)
 > **Source**: [aria-plugin#10](https://forgejo.10cg.pub/10CG/aria-plugin/issues/10)

@@ -1,7 +1,7 @@
 # state-scanner 阶段 1.8 README 检查增强
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Approved (4-agent team, 4 rounds converged, 2026-04-12)
+> **Status**: Complete (merged aria-plugin PR #11, 2026-04-12)
 > **Created**: 2026-04-12
 > **Parent Story**: N/A (Source Issue 直接驱动。US-008 已完成且聚焦于同步检测/Issue 感知，本 Spec 属于 state-scanner 增量改进)
 > **Source**: [aria-plugin#9](https://forgejo.10cg.pub/10CG/aria-plugin/issues/9)
