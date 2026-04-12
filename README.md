@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.13.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.14.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 

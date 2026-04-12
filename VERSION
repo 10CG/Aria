@@ -26,17 +26,16 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.13.0 | https://github.com/10CG/aria-plugin | 2026-04-11 |
+| aria (子模块) | v1.14.0 | https://github.com/10CG/aria-plugin | 2026-04-12 |
 
-### aria v1.13.0 变更摘要
+### aria v1.14.0 变更摘要
 
-- **US-011 项目适配能力** (PR #8) — 3 新 Skill: project-analyzer + agent-gap-analyzer + agent-creator
-- **11 Agent capabilities 机读字段** + capabilities-taxonomy.yaml (54 标签)
-- **agent-router v1.1.0** — 项目级 Agent 运行时发现
-- **5 技术栈模板** (Node.js/Python/Go/Flutter/generic)
-- **AB Benchmark**: avg delta +0.15 (POSITIVE)
-- **Skills 总数**: 36 (33 面向用户 + 3 内部) | **Agents**: 11
-- **Skills 总数**: 33 (30 面向用户 + 3 内部)
+- **state-scanner Phase 1.8 扩展** (aria-plugin#9) — README 检查增强 (子模块版本、Skill 数量、列表、badge)
+- **state-scanner Phase 1.14** (aria-plugin#10) — Forgejo 配置检测 (missing/incomplete/configured)
+- **forgejo-sync PRE_CHECK Step 0** — 主动引导创建 CLAUDE.local.md
+- **Skill 数量修正**: 30 面向用户 + 5 内部 = 35 (修正原 33+3=36 错误)
+- **AB Benchmark**: delta +46.7% (POSITIVE)
+- **Skills 总数**: 35 (30 面向用户 + 5 内部)
 - **Agents 总数**: 11
 
 ## 对应 Tag
