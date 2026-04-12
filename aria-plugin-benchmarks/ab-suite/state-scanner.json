@@ -1,9 +1,10 @@
 {
   "skill_name": "state-scanner",
-  "version": "1.2.0",
-  "source_evals_count": 7,
-  "selected_count": 7,
+  "version": "1.3.0",
+  "source_evals_count": 9,
+  "selected_count": 9,
   "changelog": [
+    {"version": "1.3.0", "date": "2026-04-12", "changes": "新增 Phase 1.8 扩展 (README skill count/badge) + Phase 1.14 (Forgejo config) 测试用例 2 个, 对应 v1.14.0"},
     {"version": "1.2.0", "date": "2026-04-09", "changes": "新增 Phase 1.12 (sync detection) + Phase 1.13 (issue awareness) 测试用例 3 个, 对应 state-scanner v2.9.0"},
     {"version": "1.1.0", "date": "2026-03-18", "changes": "建立首版固定测试集"}
   ],
@@ -93,6 +94,37 @@
         "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
         "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
         "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "readme-skill-count-badge-check",
+      "prompt": "我刚发布了 aria-plugin v1.14.0，新增了 3 个 Skill。我怀疑 aria/README.md 中的 Skill 数量和列表没更新，主项目 README 的 badge 版本也可能还是旧的。请扫描项目状态，特别检查 README 中的 Skill 数量是否与实际目录一致、Skill 列表是否完整、plugin badge 版本是否与 plugin.json 一致。",
+      "expected_output": "",
+      "expectations": [
+        "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+        "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+        "Should compare Skill count with the number stated in README",
+        "Should check Skill list completeness by comparing directory names with README Skills listing",
+        "Should output skill_list_missing items at info severity level (not warning)",
+        "Should check Plugin badge version in root README against plugin.json version",
+        "Should report badge mismatch as warning severity",
+        "Should gracefully handle missing aria submodule (skip, not error)"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "forgejo-config-detection",
+      "prompt": "我在一个使用 Forgejo (forgejo.10cg.pub) 作为 Git 平台的项目中工作。我还没有创建 CLAUDE.local.md 来配置 Forgejo API 访问。请扫描项目状态，告诉我是否有遗漏的配置，以及如何设置 Forgejo 集成。",
+      "expected_output": "",
+      "expectations": [
+        "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+        "Should check for existence of CLAUDE.local.md file",
+        "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+        "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+        "Should suggest running /forgejo-sync to create configuration when missing",
+        "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+        "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)"
       ]
     }
   ]

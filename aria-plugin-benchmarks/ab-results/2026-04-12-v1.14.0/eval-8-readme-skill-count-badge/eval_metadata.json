@@ -1,0 +1,15 @@
+{
+  "eval_id": 8,
+  "eval_name": "readme-skill-count-badge-check",
+  "prompt": "我刚发布了 aria-plugin v1.14.0，新增了 3 个 Skill。我怀疑 aria/README.md 中的 Skill 数量和列表没更新，主项目 README 的 badge 版本也可能还是旧的。请扫描项目状态，特别检查 README 中的 Skill 数量是否与实际目录一致、Skill 列表是否完整、plugin badge 版本是否与 plugin.json 一致。",
+  "assertions": [
+    {"text": "Checks aria/README.md version against plugin.json", "weight": 1.0},
+    {"text": "Counts Skills excluding user-invocable: false internal Skills", "weight": 1.0},
+    {"text": "Compares Skill count with README stated number", "weight": 1.0},
+    {"text": "Checks Skill list completeness against directory names", "weight": 1.0},
+    {"text": "Reports skill_list_missing at info severity (not warning)", "weight": 1.0},
+    {"text": "Checks Plugin badge version in root README", "weight": 1.0},
+    {"text": "Reports badge mismatch as warning severity", "weight": 1.0},
+    {"text": "Gracefully handles missing aria submodule", "weight": 0.5}
+  ]
+}

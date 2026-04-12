@@ -1,0 +1,37 @@
+{
+  "skill_name": "state-scanner",
+  "version": "v1.14.0-rc",
+  "date": "2026-04-12",
+  "source": "ab-suite/state-scanner.json v1.3.0 (evals 8-9 only, new feature coverage)",
+  "evals": [
+    {
+      "id": 8,
+      "name": "readme-skill-count-badge-check",
+      "prompt": "我刚发布了 aria-plugin v1.14.0，新增了 3 个 Skill。我怀疑 aria/README.md 中的 Skill 数量和列表没更新，主项目 README 的 badge 版本也可能还是旧的。请扫描项目状态，特别检查 README 中的 Skill 数量是否与实际目录一致、Skill 列表是否完整、plugin badge 版本是否与 plugin.json 一致。",
+      "assertions": [
+        {"text": "Checks aria/README.md version against plugin.json", "weight": 1.0},
+        {"text": "Counts Skills excluding user-invocable: false internal Skills", "weight": 1.0},
+        {"text": "Compares Skill count with README stated number", "weight": 1.0},
+        {"text": "Checks Skill list completeness against directory names", "weight": 1.0},
+        {"text": "Reports skill_list_missing at info severity (not warning)", "weight": 1.0},
+        {"text": "Checks Plugin badge version in root README", "weight": 1.0},
+        {"text": "Reports badge mismatch as warning severity", "weight": 1.0},
+        {"text": "Gracefully handles missing aria submodule", "weight": 0.5}
+      ]
+    },
+    {
+      "id": 9,
+      "name": "forgejo-config-detection",
+      "prompt": "我在一个使用 Forgejo (forgejo.10cg.pub) 作为 Git 平台的项目中工��。我还没有创建 CLAUDE.local.md 来配置 Forgejo API 访问。请扫描项目状态，告诉我是否有遗漏的配置，以及如何设置 Forgejo 集成。",
+      "assertions": [
+        {"text": "Detects Forgejo remote by checking git remote URLs", "weight": 1.0},
+        {"text": "Checks for CLAUDE.local.md existence", "weight": 1.0},
+        {"text": "Checks if CLAUDE.local.md contains forgejo: config block", "weight": 1.0},
+        {"text": "Outputs forgejo_config section with config_status", "weight": 1.0},
+        {"text": "Suggests running /forgejo-sync to create configuration", "weight": 1.0},
+        {"text": "Does NOT auto-create files during scan (read-only)", "weight": 1.0},
+        {"text": "Skips detection for non-Forgejo projects", "weight": 0.5}
+      ]
+    }
+  ]
+}

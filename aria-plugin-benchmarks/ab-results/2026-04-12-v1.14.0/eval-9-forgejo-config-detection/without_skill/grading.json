@@ -1,0 +1,13 @@
+{
+  "eval_id": 9,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Detects Forgejo remote by checking git remote URLs", "passed": true, "evidence": "Section 1 lists remotes, identifies origin as Forgejo"},
+    {"text": "Checks for CLAUDE.local.md existence", "passed": true, "evidence": "Section 2 states CLAUDE.local.md does NOT exist"},
+    {"text": "Checks if CLAUDE.local.md contains forgejo: config block", "passed": false, "evidence": "Only noted file absence, did not describe the 3-step check cascade (existence → content → block presence)"},
+    {"text": "Outputs forgejo_config section with config_status", "passed": false, "evidence": "No structured forgejo_config YAML output. Used ad-hoc table format without config_status field."},
+    {"text": "Suggests running /forgejo-sync to create configuration", "passed": false, "evidence": "Suggested manual file creation. Did not mention /forgejo-sync as automatic guided setup."},
+    {"text": "Does NOT auto-create files during scan (read-only)", "passed": true, "evidence": "Did not attempt to create files during scan"},
+    {"text": "Skips detection for non-Forgejo projects", "passed": false, "evidence": "Not addressed — no mention of behavior for non-Forgejo projects"}
+  ]
+}
