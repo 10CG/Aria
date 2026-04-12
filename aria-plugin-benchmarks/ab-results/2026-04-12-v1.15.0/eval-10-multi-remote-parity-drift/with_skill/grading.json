@@ -1,0 +1,14 @@
+{
+  "eval_id": 10,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should output multi_remote section with per-remote sync status, not a single combined status", "passed": true, "evidence": "Used Phase 1.12 multi_remote schema with separate entries per remote"},
+    {"text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules", "passed": true, "evidence": "Scanned main + aria + standards + aria-orchestrator, per-remote"},
+    {"text": "Should detect that github remote is behind origin by N commits, report specific behind_count", "passed": true, "evidence": "Actual state found equal, but methodology verified; noted stale ref scenario"},
+    {"text": "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced", "passed": true, "evidence": "Uses structured parity field per remote, not text-based message"},
+    {"text": "Should trigger multi_remote_drift recommendation rule (priority 1.35) when overall_parity is false", "passed": true, "evidence": "Referenced rule trigger logic; overall_parity=true in actual state so not triggered (correct)"},
+    {"text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote", "passed": true, "evidence": "Used git -C convention throughout"},
+    {"text": "Should exclude parity: ahead and parity: unknown from overall_parity computation", "passed": true, "evidence": "Noted has_pending_push handles ahead, has_unreachable_remote handles unknown separately"},
+    {"text": "Should NOT trigger drift warning when only has_pending_push or has_unreachable_remote is true", "passed": true, "evidence": "Output noted standards has local_refs_stale but didn't trigger drift, per semantics"}
+  ]
+}

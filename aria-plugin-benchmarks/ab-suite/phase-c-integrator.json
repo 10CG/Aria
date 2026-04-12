@@ -1,8 +1,12 @@
 {
   "skill_name": "phase-c-integrator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "source_evals_count": 5,
-  "selected_count": 2,
+  "selected_count": 3,
+  "changelog": [
+    {"version": "1.1.0", "date": "2026-04-12", "changes": "新增 eval-int-1 multi-remote-merge-push, 对应 v1.15.0 C.2.5 Multi-Remote Push Enforcement"},
+    {"version": "1.0.0", "date": "2026-03-18", "changes": "首版测试集"}
+  ],
   "evals": [
     {
       "id": 1,
@@ -24,6 +28,23 @@
         "Should detect and report the merge conflict",
         "Should identify which files have conflicts",
         "Should guide the developer through conflict resolution"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "multi-remote-merge-push",
+      "prompt": "Phase C C.2.5: PR 刚合并到 master (aria 子模块)。项目配置了 origin (Forgejo) + github (GitHub mirror) 双 remote, 还有 1 个子模块。请执行 Multi-Remote Push Enforcement: 主动推送所有 enforced remote 并做 post-push SHA 验证。描述执行流程和任何失败处理。",
+      "expected_output": "",
+      "expectations": [
+        "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+        "Should snapshot expected_sha = local HEAD before any push",
+        "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+        "Should call verify_parity_post_push with expected_sha after main repo push",
+        "Should NOT rely on 'Everything up-to-date' as success signal — require SHA comparison",
+        "Should block when any remote fails (fail_on_partial_push: true default)",
+        "Should handle read_only_remotes exception: push failure → warning downgrade, not block",
+        "Should output per-remote status report for all enforced remotes",
+        "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X"
       ]
     }
   ]

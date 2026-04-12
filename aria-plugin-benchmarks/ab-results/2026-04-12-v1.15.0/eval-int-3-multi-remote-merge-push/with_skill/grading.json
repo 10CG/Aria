@@ -1,0 +1,15 @@
+{
+  "eval_id": "int-3",
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]", "passed": true, "evidence": "Explicit helper invocation described"},
+    {"text": "Should snapshot expected_sha = local HEAD before any push", "passed": true, "evidence": "Stage 0 snapshot for main + aria"},
+    {"text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main", "passed": true, "evidence": "Outer loop per remote, inner submodule-first"},
+    {"text": "Should call verify_parity_post_push with expected_sha after main repo push", "passed": true, "evidence": "Verify call with expected_sha parameter"},
+    {"text": "Should NOT rely on 'Everything up-to-date' as success signal — require SHA comparison", "passed": true, "evidence": "Strict success judgment from helper"},
+    {"text": "Should block when any remote fails (fail_on_partial_push: true default)", "passed": true, "evidence": "P3 default: block"},
+    {"text": "Should handle read_only_remotes exception: push failure → warning downgrade, not block", "passed": true, "evidence": "P1 priority in decision table"},
+    {"text": "Should output per-remote status report for all enforced remotes", "passed": true, "evidence": "Per-remote reporting noted"},
+    {"text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X", "passed": true, "evidence": "Matrix gating dangling-pointer prevention"}
+  ]
+}

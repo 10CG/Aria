@@ -1,0 +1,13 @@
+{
+  "eval_id": 11,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should NOT report all remotes as synced when only origin was pushed", "passed": true, "evidence": "Detected aria github drift specifically"},
+    {"text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind", "passed": false, "evidence": "No structured schema; used rev-list --left-right --count output"},
+    {"text": "Should output hint_type: 'push' (not 'update') for github remote", "passed": true, "evidence": "Correctly suggested push direction"},
+    {"text": "Should report the exact missing remote name and behind_count in the fix suggestion", "passed": true, "evidence": "Identified github, 2 commits, specific SHAs"},
+    {"text": "Should preserve backwards-compatible submodules[].remote_commit field", "passed": false, "evidence": "No awareness of canonical schema backward compat"},
+    {"text": "Should show has_unreachable_remote: false when both remotes reachable", "passed": false, "evidence": "No reachability structured field"},
+    {"text": "Should include git-remote-helper reference when helper is available", "passed": false, "evidence": "No helper reference"}
+  ]
+}

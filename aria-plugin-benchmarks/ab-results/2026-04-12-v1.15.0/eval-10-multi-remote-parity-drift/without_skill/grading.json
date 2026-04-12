@@ -1,0 +1,14 @@
+{
+  "eval_id": 10,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should output multi_remote section with per-remote sync status, not a single combined status", "passed": false, "evidence": "Did not use structured multi_remote JSON schema; reported text-based per-remote status"},
+    {"text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules", "passed": true, "evidence": "Enumerated both remotes across main, aria, standards"},
+    {"text": "Should detect that github remote is behind origin by N commits, report specific behind_count", "passed": true, "evidence": "Detected aria github behind 2 commits with specific SHA"},
+    {"text": "Should NOT output 'Everything up-to-date' ambiguously", "passed": true, "evidence": "Used rev-list --left-right --count approach, bypasses text ambiguity"},
+    {"text": "Should trigger multi_remote_drift recommendation rule (priority 1.35) when overall_parity is false", "passed": false, "evidence": "No recommendation rule mechanism (skill-specific)"},
+    {"text": "Should provide per-remote fix hint", "passed": true, "evidence": "Provided git -C <path> push github master"},
+    {"text": "Should exclude parity: ahead and parity: unknown from overall_parity computation", "passed": false, "evidence": "No overall_parity concept in raw git approach"},
+    {"text": "Should NOT trigger drift warning when only has_pending_push or has_unreachable_remote is true", "passed": false, "evidence": "No semantic distinction between ahead/unknown/behind in output"}
+  ]
+}

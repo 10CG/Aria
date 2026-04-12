@@ -287,10 +287,13 @@ Skill 基准测试 (新增或修改 Skill 时):
   - [ ] 更新子模块指针 (git add aria)
   - [ ] 主项目/VERSION 更新插件版本记录
 
-多远程推送 (Forgejo + GitHub):
-  - [ ] aria 子模块: git -C aria push origin master && git -C aria push github master
-  - [ ] standards 子模块 (如有变更): git -C standards push origin master && git -C standards push github master
-  - [ ] 主项目: git push origin master && git push github master
+多远程推送 (v1.15.0+ 自动化):
+  - [x] Phase C.2.5 自动推送所有 enforced remote + post-push SHA 验证 (见 aria/skills/phase-c-integrator/SKILL.md)
+  - [ ] 若 C.2.5 报错 → 按错误提示手动修复后继续
+  - [ ] 灾备 (C.2.5 完全不可用时, 保留作为人工 fallback):
+    - aria 子模块: git -C aria push origin master && git -C aria push github master
+    - standards 子模块 (如有变更): git -C standards push origin master && git -C standards push github master
+    - 主项目: git push origin master && git push github master
 ```
 
 > **为什么需要多远程推送**: Claude Code 插件市场从 GitHub 拉取,Forgejo 是主开发仓库。
@@ -377,7 +380,7 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中 → v2.0 规划已批准
 成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
-插件版本: v1.13.0 (aria-plugin, 36 Skills + 11 Agents)
+插件版本: v1.15.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents)
 主项目版本: v1.5.0
 PRD v2.0: Approved (2026-04-11, 待 M0 启动)
 ```

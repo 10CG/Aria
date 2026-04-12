@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-4",
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should describe exponential backoff schedule: [0, 2, 4, 8] seconds (4 attempts total)", "passed": true, "evidence": "Exact schedule identified with formula"},
+    {"text": "Should specify per-remote upper bound = 4 * 5s timeout + 14s sleep = 34 seconds", "passed": true, "evidence": "34s upper bound with math breakdown"},
+    {"text": "Should implement in Python (not Bash) for reliable subprocess.run(timeout=...) and JSON handling", "passed": true, "evidence": "6 reasons listed for Python choice"},
+    {"text": "Should early-exit when match=true, not wait full schedule", "passed": true, "evidence": "Early exit control flow noted"},
+    {"text": "Should return match=false after all attempts exhausted without throwing exception", "passed": true, "evidence": "Noted decision returned, not exception"},
+    {"text": "Should classify errors: TimeoutExpired → network_timeout, exit 128 → auth_failed, OSError → error", "passed": true, "evidence": "All 4 error types classified correctly"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "eval_id": "hlp-1",
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should call git-remote-helper's check_parity.sh with --repo and --branch=master", "passed": true, "evidence": "Invoked bash check_parity.sh --repo=... --branch=master --verify-mode=local_refs"},
+    {"text": "Should output canonical JSON with remotes array containing one entry", "passed": true, "evidence": "JSON output conforms to canonical schema; aria has 2 remotes (not 1 as prompt stated), but correctly reported all"},
+    {"text": "remotes[0].parity should be 'equal'", "passed": true, "evidence": "Both origin and github reported parity=equal"},
+    {"text": "remotes[0].behind_count = 0 AND ahead_count = 0", "passed": true, "evidence": "behind=0, ahead=0 for both"},
+    {"text": "overall_parity should be true", "passed": true, "evidence": "overall_parity=true"},
+    {"text": "has_pending_push should be false", "passed": true, "evidence": "has_pending_push=false"},
+    {"text": "has_unreachable_remote should be false", "passed": true, "evidence": "has_unreachable_remote=false"}
+  ]
+}

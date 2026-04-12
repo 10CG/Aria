@@ -1,0 +1,68 @@
+{
+  "skill_name": "git-remote-helper",
+  "version": "1.0.0",
+  "source_evals_count": 4,
+  "selected_count": 4,
+  "changelog": [
+    {"version": "1.0.0", "date": "2026-04-12", "changes": "首版 — Layer 3 helper (US-012, v1.15.0): check_parity / push_all_remotes / verify_parity_post_push"}
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "parity-check-equal",
+      "prompt": "我的项目只有 origin 一个 remote, 本地 master HEAD 和 origin master 已完全同步。请用 git-remote-helper 的 check_parity 指令检测 parity 状态并输出 JSON。",
+      "expected_output": "",
+      "expectations": [
+        "Should call git-remote-helper's check_parity.sh with --repo and --branch=master",
+        "Should output canonical JSON with remotes array containing one entry",
+        "remotes[0].parity should be 'equal'",
+        "remotes[0].behind_count = 0 AND ahead_count = 0",
+        "overall_parity should be true",
+        "has_pending_push should be false",
+        "has_unreachable_remote should be false"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "parity-check-multi-remote-drift",
+      "prompt": "我的项目配置了双 remote (origin + github), github 落后 origin 2 个 commits。请用 git-remote-helper 检测并输出每个 remote 的独立状态。重点: 不要因为 'Everything up-to-date' 错误合并状态, 必须 per-remote 独立报告。",
+      "expected_output": "",
+      "expectations": [
+        "Should output remotes array with 2 entries (origin + github)",
+        "remotes[origin].parity = 'equal', behind_count = 0",
+        "remotes[github].parity = 'behind', behind_count = 2",
+        "overall_parity = false (github is behind)",
+        "Should NOT collapse to single status; per-remote entries must be independent",
+        "Should provide fix command: git -C <path> push github master"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "push-with-post-push-verify",
+      "prompt": "我需要推送 master 到 origin 和 github 两个 remote, 推送后必须验证所有 remote 的 HEAD 实际等于本地 HEAD (不能依赖 'Everything up-to-date' 文本)。请描述完整的 push + verify 流程并给出正确的调用方式。",
+      "expected_output": "",
+      "expectations": [
+        "Should describe 2-stage flow: push_all_remotes then verify_parity_post_push",
+        "Should emphasize success = (exit_code == 0) AND (post_remote_head == pre_local_head), NOT message text",
+        "Should capture pre_local_head SHA before push as expected_sha parameter",
+        "Should pass expected_sha to verify_parity_post_push to avoid race conditions",
+        "Should clarify that 'Everything up-to-date' is only success if post SHA matches pre local SHA",
+        "Should NOT recommend relying on exit code alone for multi-remote scenarios"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "post-push-retry-on-delay",
+      "prompt": "我推送到 GitHub 后立即验证, 但 GitHub 有 10-30s 的复制延迟。请解释 verify_parity_post_push 的重试策略, 包括 schedule 和上界时间。",
+      "expected_output": "",
+      "expectations": [
+        "Should describe exponential backoff schedule: [0, 2, 4, 8] seconds (4 attempts total)",
+        "Should specify per-remote upper bound = 4 * 5s timeout + 14s sleep = 34 seconds",
+        "Should implement in Python (not Bash) for reliable subprocess.run(timeout=...) and JSON handling",
+        "Should early-exit when match=true, not wait full schedule",
+        "Should return match=false after all attempts exhausted without throwing exception",
+        "Should classify errors: TimeoutExpired → network_timeout, exit 128 → auth_failed, OSError → error"
+      ]
+    }
+  ]
+}

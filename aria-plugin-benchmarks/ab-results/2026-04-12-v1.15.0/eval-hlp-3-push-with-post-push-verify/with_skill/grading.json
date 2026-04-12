@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-3",
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should describe 2-stage flow: push_all_remotes then verify_parity_post_push", "passed": true, "evidence": "3-stage flow (stage 0 snapshot + push + verify) described precisely"},
+    {"text": "Should emphasize success = (exit_code == 0) AND (post_remote_head == pre_local_head), NOT message text", "passed": true, "evidence": "Explicit rule stated, refs helper api.md"},
+    {"text": "Should capture pre_local_head SHA before push as expected_sha parameter", "passed": true, "evidence": "Stage 0 snapshot EXPECTED_SHA=$(git rev-parse HEAD)"},
+    {"text": "Should pass expected_sha to verify_parity_post_push to avoid race conditions", "passed": true, "evidence": "--expected-sha=$EXPECTED_SHA parameter shown"},
+    {"text": "Should clarify that 'Everything up-to-date' is only success if post SHA matches pre local SHA", "passed": true, "evidence": "Explicitly noted in Stage 1 success criteria"},
+    {"text": "Should NOT recommend relying on exit code alone for multi-remote scenarios", "passed": true, "evidence": "Strict SHA-level judgment required"}
+  ]
+}
