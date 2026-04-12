@@ -26,7 +26,13 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.15.0 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+| aria (子模块) | v1.15.1 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+
+### aria v1.15.1 变更摘要 (patch)
+
+- **git-remote-helper timeout 默认值**: 5s → 15s (dogfood 发现 Forgejo SSH over CF Access 实测 ~8s)
+- max_per_remote_seconds: 34 → 74
+- 快速网络可设 --timeout=5 回到 34s 上界
 
 ### aria v1.15.0 变更摘要
 
