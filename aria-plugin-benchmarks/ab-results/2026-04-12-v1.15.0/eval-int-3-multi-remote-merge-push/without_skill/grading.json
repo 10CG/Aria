@@ -1,0 +1,15 @@
+{
+  "eval_id": "int-3",
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]", "passed": false, "evidence": "Skill not available; used raw git commands"},
+    {"text": "Should snapshot expected_sha = local HEAD before any push", "passed": true, "evidence": "Captured main 5b7a5f7, aria 19f2861, standards af300d5"},
+    {"text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main", "passed": true, "evidence": "Bottom-up: standards → aria → main (correct order)"},
+    {"text": "Should call verify_parity_post_push with expected_sha after main repo push", "passed": true, "evidence": "ls-remote comparison to captured SHAs"},
+    {"text": "Should NOT rely on 'Everything up-to-date' as success signal", "passed": true, "evidence": "Explicitly noted 'Everything up-to-date' insufficient"},
+    {"text": "Should block when any remote fails", "passed": true, "evidence": "Failure handling table with abort"},
+    {"text": "Should handle read_only_remotes exception", "passed": false, "evidence": "No read_only concept in raw approach"},
+    {"text": "Should output per-remote status report", "passed": true, "evidence": "6 OK lines required checklist"},
+    {"text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X", "passed": true, "evidence": "Bottom-up order with gitlink parity check via ls-tree — actually very insightful"}
+  ]
+}

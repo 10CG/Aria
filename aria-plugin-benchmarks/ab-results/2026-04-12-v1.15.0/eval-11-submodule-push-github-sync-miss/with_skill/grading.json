@@ -1,0 +1,13 @@
+{
+  "eval_id": 11,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should NOT report all remotes as synced when only origin was pushed", "passed": true, "evidence": "Identified aria github ahead_count=2 + local_refs_stale=true"},
+    {"text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind", "passed": true, "evidence": "Used structured schema with per-remote parity; noted direction is 'ahead' from local perspective (local leads stale ref)"},
+    {"text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote", "passed": true, "evidence": "Explicitly noted direction: ahead from local, fix is push not update"},
+    {"text": "Should report the exact missing remote name and behind_count in the fix suggestion", "passed": true, "evidence": "Identified specific commits 06a0edf + 19f2861, remote name github"},
+    {"text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head", "passed": true, "evidence": "Acknowledged backward compatibility semantic in schema reference"},
+    {"text": "Should show has_unreachable_remote: false when both remotes reachable but github behind", "passed": true, "evidence": "Showed reachable:true for all remotes, distinguishing reachability from parity"},
+    {"text": "Should include git-remote-helper reference in the scan output when helper is available", "passed": true, "evidence": "Explicitly referenced git-remote-helper schema and verify_mode behaviors"}
+  ]
+}

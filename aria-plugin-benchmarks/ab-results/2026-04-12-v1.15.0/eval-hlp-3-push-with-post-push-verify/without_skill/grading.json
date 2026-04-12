@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-3",
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should describe 2-stage flow: push_all_remotes then verify_parity_post_push", "passed": true, "evidence": "4-stage flow described (pre-flight, push, verify, decision matrix) — richer than skill version"},
+    {"text": "Should emphasize success = (exit_code == 0) AND (post_remote_head == pre_local_head), NOT message text", "passed": true, "evidence": "Noted 'Everything up-to-date' is misleading; SHA byte-for-byte comparison required"},
+    {"text": "Should capture pre_local_head SHA before push as expected_sha parameter", "passed": true, "evidence": "LOCAL_SHA captured in pre-flight"},
+    {"text": "Should pass expected_sha to verify_parity_post_push to avoid race conditions", "passed": true, "evidence": "Compared to captured LOCAL_SHA in all verify methods"},
+    {"text": "Should clarify that 'Everything up-to-date' is only success if post SHA matches pre local SHA", "passed": true, "evidence": "Multiple pitfalls documented"},
+    {"text": "Should NOT recommend relying on exit code alone", "passed": true, "evidence": "Explicitly addressed in pitfalls section"}
+  ]
+}

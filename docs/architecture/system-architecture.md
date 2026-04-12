@@ -1,9 +1,9 @@
 # Aria System Architecture
 
-> **Version**: 1.8.0
+> **Version**: 1.9.0
 > **Status**: Active
 > **Created**: 2026-01-18
-> **Last Updated**: 2026-04-09
+> **Last Updated**: 2026-04-12
 > **Project Type**: Methodology Research
 > **Parent PRD**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
 
@@ -576,9 +576,10 @@ phase-b-developer v1.3.0:
   B.2: subagent-driver (SDD 执行 + 两阶段审查)
   B.3: branch-finisher (完成流程)
 
-phase-c-integrator v1.1.0:
+phase-c-integrator v1.2.0:
   入口检查: completion_option == 1
   Worktree 清理: PR 创建后
+  C.2.5: 合并后多远程推送 + post-push SHA 验证
 
 strategic-commit-orchestrator v2.3.0:
   模式感知: 获取 worktree_path
@@ -733,6 +734,78 @@ Review Early, Review Often:
 
 ---
 
+## 8.7 Phase C.2 Integration Quality Gate (v1.15.0+)
+
+> **新增于 v1.15.0** - phase-c-integrator-push-enforcement (US-012) 实施
+
+### 概述
+
+C.2 Phase 包含两级完整性保证:
+
+1. **C.2.1-C.2.4 (branch-manager)**: 推送 feature 分支 + 创建 PR + 合并, 仅 origin
+2. **C.2.5 Multi-Remote Push Enforcement (phase-c-integrator)**: 合并完成后主动推送所有 enforced remote, 通过 post-push SHA 验证确保跨远程一致性
+
+此设计防止"单远程 push 成功 → 误认为全局同步"的静默失败模式 (参见 2026-04-12 US-012 事件根因)。共享 `git-remote-helper` internal skill 提供 canonical JSON schema 和指令实现。
+
+### 三层架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              C.2 Multi-Remote Push Enforcement              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Layer 1: state-scanner (检测)                              │
+│  ├── sync_status.multi_remote.* 新字段                      │
+│  ├── overall_parity: in_sync / drift / ahead / unknown      │
+│  └── multi_remote_drift 推荐规则 (priority 1.35, warning)   │
+│                                                             │
+│  Layer 2: phase-c-integrator C.2.5 (执行)                   │
+│  ├── 合并 PR 后触发多远程推送                                │
+│  ├── Per-Remote Matrix Gating                               │
+│  └── post-push SHA 验证 (不依赖 "Everything up-to-date")    │
+│                                                             │
+│  Layer 3: git-remote-helper (共享基础设施)                  │
+│  ├── check_parity: per-remote SHA 对比                       │
+│  ├── push_all_remotes: 严格推送验证                          │
+│  └── verify_parity_post_push: 指数退避重试 [0,2,4,8]s       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Per-Remote Matrix Gating
+
+```yaml
+失败隔离原则:
+  子模块推 remote-X 失败: 仅阻断主仓库推 remote-X
+  其他 remote: 不受影响，继续执行
+
+失败优先级:
+  1. read_only_remotes: 跳过，不视为失败
+  2. fail_on_partial_push: 任一失败即全局阻断
+  3. 默认: 矩阵隔离，逐 remote 独立处理
+```
+
+### 配置
+
+```json
+// .aria/config.json
+{
+  "multi_remote": {
+    "enforced_remotes": ["origin", "github"],
+    "read_only_remotes": [],
+    "fail_on_partial_push": false
+  }
+}
+```
+
+### 相关文档
+
+- [phase-c-integrator-push-enforcement](../../openspec/changes/phase-c-integrator-push-enforcement/) - 提案文档 (US-012)
+- [state-scanner-multi-remote-parity](../../openspec/changes/state-scanner-multi-remote-parity/) - Layer 1 扩展提案
+- [aria/skills/phase-c-integrator/SKILL.md](../../aria/skills/phase-c-integrator/SKILL.md) - Skill 实现定义
+
+---
+
 ## 9. Evolution Roadmap
 
 ### 9.1 当前阶段 (v1.0)
@@ -776,6 +849,7 @@ Review Early, Review Often:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 1.9.0 | 2026-04-12 | Phase C.2 Integration Quality Gate (US-012)：三层多远程 Push Enforcement 架构 (Layer 1 state-scanner 多远程扩展 + Layer 2 phase-c-integrator C.2.5 + Layer 3 git-remote-helper internal skill)。aria-plugin v1.14.0→1.15.0。2026-04-12 发版事故根因修复 |
 | 1.8.0 | 2026-04-09 | state-scanner v2.9.0 状态感知扩展：Phase 1.12 本地/远程同步检测 (submodule 四级 fallback + upstream 探测 + 浅克隆兼容) 和 Phase 1.13 Issue 感知扫描 (Forgejo/GitHub 适配 + 15min 缓存 + 启发式关联)。子阶段数量 11→13 (上限 15 规约 D8)。aria-plugin v1.10.0→1.11.0。双 OpenSpec 并行 (Level 2 + Level 3)，post_spec 审计 2 轮收敛通过 |
 | 1.7.0 | 2026-04-03 | 可视化子系统：aria-dashboard (5 数据解析器 + 单文件 HTML + 跨项目兼容)。Skills 32→33 |
 | 1.6.0 | 2026-04-02 | 自动审计子系统：audit-engine (convergence/challenge 双模式)、7 检查点集成、config-loader 兼容层、state-scanner v2.7.0 adaptive 路由。Skills 30→32 |

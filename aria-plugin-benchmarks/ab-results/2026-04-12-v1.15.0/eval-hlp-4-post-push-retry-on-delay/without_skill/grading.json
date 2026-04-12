@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-4",
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should describe exponential backoff schedule: [0, 2, 4, 8] seconds (4 attempts total)", "passed": false, "evidence": "Proposed different schedule [0,3,5,8,13,21,30,40] — valid but not aligned with spec"},
+    {"text": "Should specify per-remote upper bound = 4 * 5s timeout + 14s sleep = 34 seconds", "passed": false, "evidence": "Proposed 120s deadline, different bound"},
+    {"text": "Should implement in Python (not Bash) for reliable subprocess.run(timeout=...)", "passed": false, "evidence": "Provided bash pseudocode; language not specified as Python"},
+    {"text": "Should early-exit when match=true, not wait full schedule", "passed": true, "evidence": "Standard early-exit pattern"},
+    {"text": "Should return match=false after all attempts exhausted", "passed": true, "evidence": "Standard retry completion pattern"},
+    {"text": "Should classify errors: TimeoutExpired → network_timeout, exit 128 → auth_failed, OSError → error", "passed": false, "evidence": "Used HTTP status classification (404/5xx/429) — different domain, not aligned with spec enum"}
+  ]
+}

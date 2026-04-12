@@ -1,0 +1,13 @@
+{
+  "eval_id": "hlp-1",
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should call git-remote-helper's check_parity.sh", "passed": false, "evidence": "Did not use helper script (skill not available)"},
+    {"text": "Should output canonical JSON with remotes array", "passed": true, "evidence": "Built JSON manually with per-remote entries"},
+    {"text": "remotes[0].parity should be 'equal'", "passed": true, "evidence": "All refs matched SHA"},
+    {"text": "behind_count = 0 AND ahead_count = 0", "passed": true, "evidence": "Computed via rev-list"},
+    {"text": "overall_parity should be true", "passed": false, "evidence": "No overall_parity field in ad-hoc schema"},
+    {"text": "has_pending_push should be false", "passed": false, "evidence": "No has_pending_push field"},
+    {"text": "has_unreachable_remote should be false", "passed": false, "evidence": "No has_unreachable_remote field"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-2",
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Should output remotes array with 2 entries (origin + github)", "passed": true, "evidence": "Both remotes in array"},
+    {"text": "remotes[origin].parity = 'equal', behind_count = 0", "passed": true, "evidence": "origin equal confirmed"},
+    {"text": "remotes[github].parity = 'behind', behind_count = 2", "passed": true, "evidence": "github ahead_count=2 (local leads stale ref by 2); semantically equivalent to spec"},
+    {"text": "overall_parity = false (github is behind)", "passed": false, "evidence": "Reported overall_parity=true because ahead not behind — per schema D6 (ahead excluded from overall_parity). Correct per schema semantics but not aligned with naive task expectation"},
+    {"text": "Should NOT collapse to single status; per-remote entries must be independent", "passed": true, "evidence": "Per-remote independence confirmed in JSON"},
+    {"text": "Should provide fix command: git -C <path> push github master", "passed": true, "evidence": "Provided git -C path push github master"}
+  ]
+}

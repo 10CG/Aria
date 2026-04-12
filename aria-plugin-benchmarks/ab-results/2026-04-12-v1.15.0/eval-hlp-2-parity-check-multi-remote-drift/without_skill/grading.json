@@ -1,0 +1,12 @@
+{
+  "eval_id": "hlp-2",
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Should output remotes array with 2 entries (origin + github)", "passed": true, "evidence": "Two remotes identified"},
+    {"text": "remotes[origin].parity = 'equal', behind_count = 0", "passed": true, "evidence": "Actual state: all equal (real state, not drift scenario)"},
+    {"text": "remotes[github].parity = 'behind', behind_count = 2", "passed": false, "evidence": "Could not synthesize drift scenario; reported actual state only"},
+    {"text": "overall_parity = false (github is behind)", "passed": false, "evidence": "No overall_parity concept"},
+    {"text": "Should NOT collapse to single status; per-remote entries must be independent", "passed": true, "evidence": "Per-remote left-right counts independent"},
+    {"text": "Should provide fix command: git -C <path> push github master", "passed": true, "evidence": "Recommended git -C form"}
+  ]
+}

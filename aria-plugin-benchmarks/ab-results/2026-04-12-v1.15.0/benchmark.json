@@ -1,0 +1,57 @@
+{
+  "skill_set": "US-012 Multi-Remote Parity (state-scanner + git-remote-helper + phase-c-integrator)",
+  "version": "v1.15.0-rc",
+  "date": "2026-04-12",
+  "eval_count": 7,
+  "configurations": {
+    "with_skill": {
+      "pass_rate": 0.9796,
+      "total_assertions": 49,
+      "passed_assertions": 48,
+      "mean_tokens": 43158,
+      "mean_duration_seconds": 124.3,
+      "evals": [
+        {"id": 10, "name": "multi-remote-parity-drift", "skill": "state-scanner", "pass_rate": 1.0, "passed": 8, "total": 8, "tokens": 46132, "duration_seconds": 151.3},
+        {"id": 11, "name": "submodule-push-github-sync-miss", "skill": "state-scanner", "pass_rate": 1.0, "passed": 7, "total": 7, "tokens": 46020, "duration_seconds": 189.6},
+        {"id": "hlp-1", "name": "parity-check-equal", "skill": "git-remote-helper", "pass_rate": 1.0, "passed": 7, "total": 7, "tokens": 41278, "duration_seconds": 62.6},
+        {"id": "hlp-2", "name": "parity-check-multi-remote-drift", "skill": "git-remote-helper", "pass_rate": 0.833, "passed": 5, "total": 6, "tokens": 47496, "duration_seconds": 158.3},
+        {"id": "hlp-3", "name": "push-with-post-push-verify", "skill": "git-remote-helper", "pass_rate": 1.0, "passed": 6, "total": 6, "tokens": 37482, "duration_seconds": 89.7},
+        {"id": "hlp-4", "name": "post-push-retry-on-delay", "skill": "git-remote-helper", "pass_rate": 1.0, "passed": 6, "total": 6, "tokens": 41586, "duration_seconds": 107.5},
+        {"id": "int-3", "name": "multi-remote-merge-push", "skill": "phase-c-integrator", "pass_rate": 1.0, "passed": 9, "total": 9, "tokens": 42111, "duration_seconds": 114.0}
+      ]
+    },
+    "without_skill": {
+      "pass_rate": 0.5714,
+      "total_assertions": 49,
+      "passed_assertions": 28,
+      "mean_tokens": 31790,
+      "mean_duration_seconds": 93.0,
+      "evals": [
+        {"id": 10, "name": "multi-remote-parity-drift", "skill": "state-scanner", "pass_rate": 0.375, "passed": 3, "total": 8, "tokens": 39463, "duration_seconds": 140.8},
+        {"id": 11, "name": "submodule-push-github-sync-miss", "skill": "state-scanner", "pass_rate": 0.429, "passed": 3, "total": 7, "tokens": 34843, "duration_seconds": 136.0},
+        {"id": "hlp-1", "name": "parity-check-equal", "skill": "git-remote-helper", "pass_rate": 0.429, "passed": 3, "total": 7, "tokens": 27658, "duration_seconds": 42.9},
+        {"id": "hlp-2", "name": "parity-check-multi-remote-drift", "skill": "git-remote-helper", "pass_rate": 0.667, "passed": 4, "total": 6, "tokens": 31426, "duration_seconds": 118.6},
+        {"id": "hlp-3", "name": "push-with-post-push-verify", "skill": "git-remote-helper", "pass_rate": 1.0, "passed": 6, "total": 6, "tokens": 29288, "duration_seconds": 75.5},
+        {"id": "hlp-4", "name": "post-push-retry-on-delay", "skill": "git-remote-helper", "pass_rate": 0.333, "passed": 2, "total": 6, "tokens": 27960, "duration_seconds": 58.2},
+        {"id": "int-3", "name": "multi-remote-merge-push", "skill": "phase-c-integrator", "pass_rate": 0.778, "passed": 7, "total": 9, "tokens": 31890, "duration_seconds": 83.6}
+      ]
+    }
+  },
+  "delta": {
+    "pass_rate": 0.4082,
+    "direction": "WITH_BETTER",
+    "significance": "POSITIVE"
+  },
+  "per_skill_delta": {
+    "state-scanner": 0.598,
+    "git-remote-helper": 0.355,
+    "phase-c-integrator": 0.222
+  },
+  "analyst_notes": [
+    "eval-hlp-3 (push/verify flow) tied at 100% — both with_skill and without_skill descriptions were thorough; skill value here is consistency/canonicality, not discovery",
+    "eval-hlp-4 largest delta (+66.7%) — without_skill invented valid-but-different retry schedule (AWS-style), showing skill provides specific parameter alignment",
+    "eval-int-3 without_skill achieved 77.8% — Claude's baseline git knowledge is strong; skill value is primarily in read_only_remotes abstraction and helper integration",
+    "All 7 with_skill runs achieved ≥83.3%, demonstrating skill structural consistency",
+    "Skill cost: +36% tokens on average (43158 vs 31790); +34% duration (124s vs 93s) — tradeoff for canonical JSON schema + structured failure handling"
+  ]
+}
