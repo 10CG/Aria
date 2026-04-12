@@ -26,16 +26,18 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.14.0 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+| aria (子模块) | v1.15.0 | https://github.com/10CG/aria-plugin | 2026-04-12 |
 
-### aria v1.14.0 变更摘要
+### aria v1.15.0 变更摘要
 
-- **state-scanner Phase 1.8 扩展** (aria-plugin#9) — README 检查增强 (子模块版本、Skill 数量、列表、badge)
-- **state-scanner Phase 1.14** (aria-plugin#10) — Forgejo 配置检测 (missing/incomplete/configured)
-- **forgejo-sync PRE_CHECK Step 0** — 主动引导创建 CLAUDE.local.md
-- **Skill 数量修正**: 30 面向用户 + 5 内部 = 35 (修正原 33+3=36 错误)
-- **AB Benchmark**: delta +46.7% (POSITIVE)
-- **Skills 总数**: 35 (30 面向用户 + 5 内部)
+- **US-012 多远程一致性保障** (aria-plugin#13) — 3 层加固防止发版遗漏推送
+  - Layer 3: `git-remote-helper` internal skill (canonical JSON schema + 3 脚本)
+  - Layer 1: state-scanner Phase 1.12 原地扩展多远程 parity (保持 D8 配额 14/15)
+  - Layer 2: phase-c-integrator C.2.5 Multi-Remote Push Enforcement + Per-Remote Matrix Gating
+- **根因修复**: 2026-04-12 v1.14.0 事件 (Aria#13) — "Everything up-to-date" 歧义 + 缺 post-push SHA 验证
+- **AB Benchmark**: delta +40.82% POSITIVE (49 assertions, 7 evals × with/without)
+- **Dogfooding**: 本次 v1.15.0 发版用新 helper 做 post-push SHA 验证, 双仓库双远程零差异
+- **Skills 总数**: 36 (30 面向用户 + 6 内部, +1 git-remote-helper)
 - **Agents 总数**: 11
 
 ## 对应 Tag
