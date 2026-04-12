@@ -26,7 +26,14 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.15.1 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+| aria (子模块) | v1.15.2 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+
+### aria v1.15.2 变更摘要 (patch, cleanup)
+
+- **check_parity.sh shell injection 防护** (MEDIUM) — Python heredoc 变量注入 → 环境变量传参 + 单引号 heredoc
+- check_parity.sh 死代码清理 (TIMEOUT_CMD 未使用的 19 行)
+- verify_post_push.py `--max-retries` 命名注释增强 (明确 4 attempts = 1 initial + 3 retries)
+- fallback 路径可移植性 (`ARIA_PLUGIN_ROOT` 环境变量支持)
 
 ### aria v1.15.1 变更摘要 (patch)
 
