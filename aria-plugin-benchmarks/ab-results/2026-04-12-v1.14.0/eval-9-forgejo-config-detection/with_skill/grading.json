@@ -1,0 +1,13 @@
+{
+  "eval_id": 9,
+  "configuration": "with_skill",
+  "expectations": [
+    {"text": "Detects Forgejo remote by checking git remote URLs", "passed": true, "evidence": "Phase 1.14 Detection Step 1 explicitly checks origin URL hostname against forgejo.10cg.pub. Shows forgejo_remote_detected:true."},
+    {"text": "Checks for CLAUDE.local.md existence", "passed": true, "evidence": "Detection Step 2 explicitly checks /home/dev/Aria/CLAUDE.local.md — result: FILE DOES NOT EXIST"},
+    {"text": "Checks if CLAUDE.local.md contains forgejo: config block", "passed": true, "evidence": "Detection Step 3 described (skipped because file missing) — shows the 3-step detection cascade"},
+    {"text": "Outputs forgejo_config section with config_status", "passed": true, "evidence": "Structured YAML: forgejo_config.config_status: missing with instance, remotes, and suggestion fields"},
+    {"text": "Suggests running /forgejo-sync to create configuration", "passed": true, "evidence": "suggestion field says '运行 /forgejo-sync 可引导创建配置 (需确认)' + Option A recommendation"},
+    {"text": "Does NOT auto-create files during scan (read-only)", "passed": true, "evidence": "Scan only reads state and outputs recommendations. No files created."},
+    {"text": "Skips detection for non-Forgejo projects", "passed": true, "evidence": "Detection Step 1 specifies: 无 Forgejo remote → 静默跳过. Output schema includes forgejo_remote_detected:false variant."}
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "skill_name": "state-scanner",
+  "version": "v1.14.0-rc (Phase 1.8 expansion + Phase 1.14 new)",
+  "date": "2026-04-12",
+  "eval_count": 2,
+  "configurations": {
+    "with_skill": {
+      "pass_rate": 1.0,
+      "total_assertions": 15,
+      "passed_assertions": 15,
+      "mean_tokens": 49428,
+      "mean_duration_seconds": 238.9,
+      "evals": [
+        {"id": 8, "name": "readme-skill-count-badge-check", "pass_rate": 1.0, "passed": 8, "total": 8, "tokens": 47894, "duration_seconds": 211.4},
+        {"id": 9, "name": "forgejo-config-detection", "pass_rate": 1.0, "passed": 7, "total": 7, "tokens": 50963, "duration_seconds": 266.3}
+      ]
+    },
+    "without_skill": {
+      "pass_rate": 0.533,
+      "total_assertions": 15,
+      "passed_assertions": 8,
+      "mean_tokens": 39424,
+      "mean_duration_seconds": 150.4,
+      "evals": [
+        {"id": 8, "name": "readme-skill-count-badge-check", "pass_rate": 0.5, "passed": 4, "total": 8, "tokens": 44248, "duration_seconds": 171.6},
+        {"id": 9, "name": "forgejo-config-detection", "pass_rate": 0.571, "passed": 4, "total": 7, "tokens": 34600, "duration_seconds": 129.2}
+      ]
+    }
+  },
+  "delta": {
+    "pass_rate": 0.467,
+    "direction": "WITH_BETTER",
+    "significance": "POSITIVE"
+  }
+}

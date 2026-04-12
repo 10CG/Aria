@@ -1,0 +1,14 @@
+{
+  "eval_id": 8,
+  "configuration": "without_skill",
+  "expectations": [
+    {"text": "Checks aria/README.md version against plugin.json", "passed": true, "evidence": "Section 3.1 checks README version 1.13.0 against plugin.json 1.13.0"},
+    {"text": "Counts Skills excluding user-invocable: false internal Skills", "passed": false, "evidence": "Only identified 3 internal skills (arch-common, config-loader, audit-engine). Missed agent-router and agent-team-audit as user-invocable:false. Counted 32 user-facing instead of correct 30."},
+    {"text": "Compares Skill count with README stated number", "passed": true, "evidence": "Compared counts across files, identified mismatches"},
+    {"text": "Checks Skill list completeness against directory names", "passed": true, "evidence": "Counted skills per README section, compared with directories"},
+    {"text": "Reports skill_list_missing at info severity (not warning)", "passed": false, "evidence": "No structured severity classification system used. All issues reported as generic severity levels (CRITICAL/HIGH/etc) without matching the skill's info/warning framework."},
+    {"text": "Checks Plugin badge version in root README", "passed": true, "evidence": "Section 3.3 checks badge v1.13.0"},
+    {"text": "Reports badge mismatch as warning severity", "passed": false, "evidence": "Used generic STALE label, not the skill's warning severity classification"},
+    {"text": "Gracefully handles missing aria submodule", "passed": false, "evidence": "Not addressed — no degradation strategy discussed"}
+  ]
+}
