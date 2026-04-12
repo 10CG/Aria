@@ -375,15 +375,24 @@ Skill 基准测试 (新增或修改 Skill 时):
 ## 项目状态
 
 ```
-当前阶段: 研究中
-成熟度:   0.7 (核心流程已验证)
-插件版本: v1.11.1 (aria-plugin)
-主项目版本: v1.4.2
+当前阶段: 研究中 → v2.0 规划已批准
+成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
+插件版本: v1.13.0 (aria-plugin, 36 Skills + 11 Agents)
+主项目版本: v1.5.0
+PRD v2.0: Approved (2026-04-11, 待 M0 启动)
+```
+
+### User Story 编号分区
+
+```
+US-001~009: v1.x 已有 (done/in_progress/pending)
+US-010~019: v1.x 新增 (Agent Team 质量 + 项目适配)
+US-020~027: v2.0 (待起草)
 ```
 
 ---
 
-**更新**: 2026-04-08
+**更新**: 2026-04-12
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
