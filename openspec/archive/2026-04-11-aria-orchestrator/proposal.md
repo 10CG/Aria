@@ -1,10 +1,12 @@
 # aria-orchestrator — 外部编排器与自动开发闭环
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: In Progress
+> **Status**: Complete (v1.5.0 scope delivered 2026-04-11)
 > **Created**: 2026-04-03
+> **Completed**: 2026-04-11 (v1.5.0 release, commit e8b29cb)
 > **Parent Story**: [US-007](../../docs/requirements/user-stories/US-007.md)
-> **Target Version**: v1.4.0 (Phase 3b ✅), v2.0.0 (Phase 3c)
+> **Target Version**: v1.4.0 (Phase 3b ✅), v1.5.0 (Phase 3b-M3-slim ✅)
+> **Scope Transfer Note**: Phase 3c (闭环) 和 Phase 3b-M3 剩余 (dispatch / 状态机 / 人类审批) 范围已由 **PRD v2.0** 全面接管, 由新 User Story 系列 **US-020~027** 承接 (两层 AI 分工架构: Layer 1 Hermes fork + Layer 2 容器)。本 Spec 到 v1.5.0 为止, 不再追加任务。见 [US-020](../../../docs/requirements/user-stories/US-020.md) 与 [aria-2.0-m0-prerequisite](../aria-2.0-m0-prerequisite/proposal.md) / [aria-2.0-m0-spike-hermes](../aria-2.0-m0-spike-hermes/proposal.md)。
 
 ## Why
 
