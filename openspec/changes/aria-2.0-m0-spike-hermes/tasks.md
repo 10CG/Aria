@@ -6,18 +6,21 @@
 
 ## Task 分解
 
-| ID | Task | 工时 | 依赖 |
-|---|---|---|---|
-| ST1 | Hermes upstream 源码分析 + fork 骨架 | 6h | T1.pass (父 Spec) |
-| ST2 | fork 路径: 1 次 rebase 实操 + license 扫描 | 10h | ST1 |
-| ST3 | 自研路径: gateway + SQLite 状态机原型 | 20h | — |
-| ST4 | 5 状态 4 转换演示 (双路径各实现 1 次) | 6h | ST1, ST3 |
-| ST5 | 元知识 prompt v0.1 起草 + 实跑 | 3h | ST3 |
-| ST6 | 量化数据收集 + Spike Report 撰写 | 5h | ST2, ST3, ST4, ST5 |
-| ST7 | 缓冲 | 2h | — |
-| **Total Core** | | **50h** | |
-| **+ Buffer** | | **2h** | |
-| **Grand Total** | | **52h** | |
+> **ST1 更新 (2026-04-14)**: ST1 纸面部分已完成 (实际 ~2h, 原估 6h), 节省 4h 拨给新增的 ST3.5 Option C POC (8h) 减去节省 = 净 +4h 工时, 总 Core 工时从 50h → 54h, 进而 Grand Total 52h → 56h。T4 在父 Spec 的总工时仍为 52h 基线 + 4h 从 M0 全局 buffer 10h 拨付。
+
+| ID | Task | 工时 | 依赖 | ST1 更新 |
+|---|---|---|---|---|
+| ST1 | Hermes upstream 源码分析 (ST1.1/1.3 推迟到 ST2) | ~~6h~~ **2h** | — | **完成 (纸面部分, 节省 4h)** |
+| ST2 | fork 路径: 1 次 rebase 实操 + license 扫描 + clone + fork push | 10h | ST1 + 本地环境 | (含 ST1.1 / ST1.4 推迟项) |
+| ST3 | 自研路径: gateway + SQLite 状态机原型 | 20h | — | 不变 |
+| **ST3.5** | **Option C POC: 外部 tool pack 注册 hermes-agent (新增)** | **8h** | — | **新增** |
+| ST4 | 5 状态 4 转换演示 (双路径各实现 1 次) | 6h | ST1, ST3 | 不变 |
+| ST5 | 元知识 prompt v0.1 起草 + 实跑 | 3h | ST3 | 不变 |
+| ST6 | 量化数据收集 + Spike Report 撰写 | 5h | ST2, ST3, ST3.5, ST4, ST5 | + ST3.5 依赖 |
+| ST7 | 缓冲 | 2h | — | 不变 |
+| **Total Core** | | **54h** (原 50h) | | +4h (ST3.5 新增 8h - ST1 节省 4h) |
+| **+ Buffer** | | **2h** | | 不变 |
+| **Grand Total** | | **56h** (原 52h) | | **+4h 从父 Spec M0 全局 buffer 拨付** |
 
 ---
 
@@ -99,6 +102,72 @@
   - 每个子任务开始/结束打卡
   - 汇总到 `spikes/hermes-route/self-built-hours.md`
 - [ ] **ST3.8** 缓冲 (2h)
+
+---
+
+## ST3.5 — Option C POC: Extension-only tool pack (8h, ST1 新发现)
+
+> **背景**: ST1 纸面结构分析发现 hermes-agent v0.9.0 有公开的 `ToolRegistry` 扩展 API (`tools/registry.py` 的 `register()` 方法, 支持外部 Python 包独立注册 tool 而无需 fork core)。本 POC 验证该路径的可行性。
+
+### 前置
+
+- ST2 已完成 (本地 clone hermes-agent) **或** 独立 clone (不依赖 ST2 完成状态)
+- Python 3.11+ 环境
+
+### 任务
+
+- [ ] **ST3.5.1** (2h) 搭建 `aria-hermes-tools` Python 包骨架
+  - `pyproject.toml` 定义最小包 (name / version / dependencies: hermes-agent>=0.9)
+  - 项目结构:
+    ```
+    aria-hermes-tools/
+    ├── pyproject.toml
+    ├── aria_hermes_tools/
+    │   ├── __init__.py
+    │   └── tools/
+    │       ├── __init__.py       # import 副作用注册
+    │       └── aria_hello_world.py
+    └── tests/
+        └── test_registration.py
+    ```
+
+- [ ] **ST3.5.2** (3h) 实现 `aria_hello_world` tool 并验证注册
+  - 编写最小 tool, 调用 `hermes_agent.tools.registry.register()` 在模块 import 时注册
+  - 本地 `pip install -e .` 到 hermes-agent 虚拟环境
+  - 启动 hermes-agent, 验证 `aria_hello_world` 出现在 `/tools` CLI 命令列表中
+  - 通过 AIAgent 发送 "call aria hello world" 指令, 验证 tool 被调用
+  - **pass 条件**: hermes-agent 日志中看到 `aria_hello_world` 被调用的 trace
+
+- [ ] **ST3.5.3** (2h) 实现 `aria_state_transition` tool + SQLite 集成
+  - 定义 SQLite schema: `dispatches(trace_id, state, timestamp, metadata_json)`
+  - tool `aria_state_transition(trace_id, from_state, to_state)` 原子写 SQLite
+  - 状态合法性校验 (只允许 proposal.md §3 定义的 5 states 4 transitions)
+  - 单元测试: 3 次成功转换 + 1 次非法转换 reject
+  - **pass 条件**: pytest 通过 + SQLite 文件含正确历史记录
+
+- [ ] **ST3.5.4** (1h) 端到端验证: AIAgent 通过 tool 完成 1 个状态转换序列
+  - 场景: AIAgent 接收 "dispatch issue 123" 指令
+  - 预期行为: AIAgent 调用 `aria_state_transition(trace_id=123, idle → dispatched)`
+  - 验证: SQLite 记录 state=dispatched, AIAgent 返回成功消息
+  - **pass 条件**: 1 次完整的 AIAgent → tool → SQLite → 响应 闭环
+
+### ST3.5 验收标准
+
+- [ ] Option C POC 的 4 个子任务全部完成且 pass
+- [ ] aria-hermes-tools 包代码量记录 (cloc), 纳入 ST6 量化指标
+- [ ] 产出 `spikes/hermes-route/option-c-poc-report.md`, 含:
+  - 实现代码路径
+  - hermes-agent ToolRegistry API 的使用体验 (有无限制 / 有无坑)
+  - AIAgent 调用 external tool 的稳定性观察 (是否触发 prompt caching 问题)
+  - 建议: Option C 是否应该成为首选路径
+
+### ST3.5 失败判定
+
+若以下任一发生 → Option C POC 失败, 退回 Option A (fork) 裁决流程:
+- ToolRegistry 的 `register()` 抛出异常或需要修改 core 代码
+- hermes-agent 启动时无法发现外部注册的 tool
+- AIAgent 调用时触发 prompt caching 破坏
+- 跨 session 持久化 (SQLite) 与 hermes-agent 的 session 模型冲突
 
 ---
 
