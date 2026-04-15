@@ -1,8 +1,8 @@
 {
   "summary": {
-    "pass_rate": 0.5,
-    "passed": 3,
-    "failed": 3,
+    "pass_rate": 0.3333,
+    "passed": 2,
+    "failed": 4,
     "total": 6
   },
   "expectations": [
@@ -32,9 +32,9 @@
       "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '轻量化 Hermes', 'lightweight Hermes']; found: none"
     },
     {
-      "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
-      "passed": true,
-      "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+      "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)",
+      "passed": false,
+      "evidence": "Must not contain any of ['NOT scanned', '未扫描', 'not scanning submodules', '子模块 NOT', 'submodules NOT', '(N/A in this version)', 'pre-change 版本限制']; found: ['未扫描', '(N/A in this version)', 'pre-change 版本限制']"
     }
   ]
 }

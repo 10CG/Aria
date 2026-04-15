@@ -59,6 +59,12 @@ def grade_blob(blob: str, assertions: list) -> list:
             m = a.get("min", 1)
             passed, hits = check_contains_count(blob, vs, m)
             evidence = f"Need {m}+ of {vs}; found {len(hits)}: {hits}"
+        elif ct == "not_contains_any":
+            # Passes iff NONE of the values appear (strict discriminator).
+            vs = a["values"]
+            hits = [v for v in vs if v.lower() in blob.lower()]
+            passed = len(hits) == 0
+            evidence = f"Must not contain any of {vs}; found: {hits or 'none (pass)'}"
         else:
             passed = False
             evidence = f"Unknown check_type: {ct}"

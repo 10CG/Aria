@@ -1,11 +1,12 @@
 # state-scanner-submodule-issue-scan — Phase 1.13 Submodule Issue 扫描
 
 > **Level**: Minimal (Level 2)
-> **Status**: Draft
+> **Status**: Draft (Round 1 Audit FAIL → Round 2 修正中)
 > **Created**: 2026-04-15
-> **Target Version**: aria-plugin v1.15.x (patch) 或 v1.16.0 (取决于 SemVer 裁决, 见 §Impact)
+> **Target Version**: aria-plugin v1.16.0 (MINOR, 新功能 + 向后兼容, 见 §Impact §SemVer 裁决)
 > **Source**: 2026-04-15 Aria 主项目 session 中用户指出 "aria-plugin 应该也有 issue, 为什么没查看到?", 追查到 Phase 1.13 显式不递归 submodule (D6 决策)
-> **Parent Spec (相关, 不合并)**: [state-scanner-mechanical-enforcement](../state-scanner-mechanical-enforcement/proposal.md) (姐妹 Spec, 单一焦点分离)
+> **Parent Spec (扩展其决策)**: `state-scanner-issue-awareness` (2026-04-09 归档, 位于 `openspec/archive/2026-04-09-state-scanner-issue-awareness/`) — 本 Spec 扩展其 D6 "不递归 submodule" 决策为 opt-in, 不否定原决策本体
+> **Sister Spec (相关, 不合并)**: [state-scanner-mechanical-enforcement](../state-scanner-mechanical-enforcement/proposal.md) (姐妹 Spec, 主题不同 — 执行纪律 vs 设计假设, 单一焦点分离)
 
 ---
 
@@ -103,12 +104,17 @@ D6 的"噪音控制"论点**基于一个隐性假设**: submodule = 第三方依
 - ❌ **修改原 D6 决策本体** — 本 Spec 作为 D6 的**补充扩展点**, 不否定 D6, 只说明 D6 在 vendored 模式下仍然合理
 - ❌ **Phase 1.14 Forgejo 配置检测的 submodule 扩展** — 独立 Spec
 
-### 向后兼容保证
+### 向后兼容保证 (Round 2 强化 — 回应 R1 I3 tech-lead 反馈)
 
-1. **默认行为不变**: `scan_submodules` 缺省或 `false` 时, Phase 1.13 行为与 v2.9.0 完全一致 (仅扫主 repo)
-2. **缓存文件向后兼容**: v2.9.0 的缓存文件 schema 已含 `repos` map, 新版读取时 `repos` 多 key 无兼容问题; 新版写入时若 `scan_submodules=false` 则仅写单 key (与 v2.9.0 行为一致)
-3. **配置文件向后兼容**: 不改 `.aria/config.json` 已有字段语义, 仅新增可选字段
-4. **输出 schema 向后兼容**: `issue_status.items` 字段在 `scan_submodules=false` 下保持 flat 列表 (只有主 repo 的 items); 开启后改为聚合各 repo items 的 flat 视图, **新增** `issue_status.repos[]` 字段作为按 repo 分组的视图。两个视图并存, 消费者可选。
+1. **默认行为字节级不变**: `scan_submodules` 缺省或 `false` 时, Phase 1.13 行为与 v2.9.0 **完全一致**:
+   - 同一扫描路径 (仅主 repo, 不解析 `.gitmodules`)
+   - 同一超时预算 (`stage_timeout_seconds=12`, 不升到 20s — 见 D14)
+   - 同一输出 schema (无 `repos` 字段, `schema_version=null` 等价于 v1.0)
+   - 同一推荐规则行为 (`open_blocker_issues` 在单 repo items[] 上评估, 与 v2.9.0 一致)
+2. **缓存文件向后兼容 (v1.1 schema_version 守卫)**: v2.9.0 缓存文件**没有** `schema_version` 字段; v1.16.0 reader 识别此情况为 pre-v1.1, 视为 cold cache, **一次性** re-fetch 重建缓存。此后写入的缓存含 `schema_version="1.1"`, 此后读取正常命中。详见 references/issue-scanning.md §步骤 4 cache schema 守卫。
+3. **配置文件向后兼容**: 不改 `.aria/config.json` 已有字段语义, 仅新增可选字段 `scan_submodules`。`stage_timeout_seconds` 无变化 (自适应默认值, 用户显式设置被尊重)。
+4. **输出 schema 向后兼容 (v1.1 双写别名)**: `issue_status.items[]` 与 `issue_status.open_issues[]` 由 writer 同步双写, v1.0 消费者读 `open_issues` 仍可用, v1.1+ 消费者优先 `items`. `open_issues` 别名将在 v2.x (至少跨 2 个 MINOR) 后移除, 正式弃用通告随 v1.16.0 CHANGELOG 发出。
+5. **推荐规则向后兼容**: `open_blocker_issues` v2.10.0 语义为跨 repo 聚合, 但当 `scan_submodules=false` 时 `items[]` 只含主 repo items, 聚合逻辑**退化为单 repo 评估**, 行为与 v2.9.0 等价。
 
 ### 依赖
 
@@ -124,16 +130,19 @@ D6 的"噪音控制"论点**基于一个隐性假设**: submodule = 第三方依
 |----|------|------|
 | **D1** | `scan_submodules` 默认 `false`, opt-in | 向后兼容 (CLAUDE.md 规则 #4), 不破坏 vendored submodule 场景 |
 | **D2** | **串行**扫描 submodule (非并行) | 首版最小化复杂度, 避免 rate limit 复杂化; 实测 Aria 3 submodule × 平均 2s API ≈ 6s, 在总超时预算内 |
-| **D3** | 总阶段超时从 12s 提升到 **20s** | 串行扫描 N=4 (主 repo + 3 submodule) × 5s 最坏情况 = 20s, 给 cache 命中/ratelimit 留出缓冲; 与原 D9 "TLS 握手 + API + 缓冲" 逻辑同构, 仅线性扩展 |
+| **D3** | ~~总阶段超时从 12s 提升到 20s~~ → **总阶段超时自适应分档** (Round 2 修复 R1 I2 + I3) | `scan_submodules=false` → 12s (不变, 向后兼容); `scan_submodules=true` → `max(20, (N+1)×api_timeout_seconds)` 按 submodule 数自动扩展; 用户显式设置覆盖自适应. 既消除了 tech-lead 指出的"非 opt-in 副作用", 又消除了 backend-architect 指出的"hardcoded 20s not scaling with N"双重问题 |
 | **D4** | submodule 列表从 `.gitmodules` 提取, 不从 `git submodule status` | 前者是 source of truth 且可用无网络; 后者需要实际 checkout 状态, 在 shallow clone / CI 场景下可能失败 |
 | **D5** | 每个 submodule 独立 platform 检测 | 支持未来跨平台场景 (如主 repo 在 Forgejo, submodule 在 GitHub); 首版 Aria 全部 Forgejo, 仅为扩展点预留 |
-| **D6** | 缓存文件 **单文件多 repo 结构** (复用已预留 schema) | v2.9.0 `issues.json` 已是 `{fetched_at, repos: {...}}` 结构, 零破坏性改动; 缓存 age 以写入时间计算, 所有 repo 共享同一 `fetched_at` |
+| **D6** | 缓存文件 **单文件多 repo 结构** + **schema_version 字段** (Round 2 修复 R1 C1) | 新增 `schema_version: "1.1"` 字段作为 cache migration 守卫; reader 识别缺失或低版本 schema → cold re-fetch. 原 v2.9.0 `issues.json` 实际是 `{fetched_at, platform, open_issues:[]}` 单 repo 扁平结构 (本 Spec 发现前的 Round 1 认知错误), **不是** 已预留的多 repo 结构; v1.16.0 新增 `schema_version` 字段显式管理迁移 |
 | **D7** | 推荐规则 `open_blocker_issues` **聚合所有 repo** | 任一 repo 的 blocker 都应触发降级; 不按主 repo / submodule 区分 severity |
 | **D8** | **不** 修改原 D6 决策本体, 作为补充扩展点 | D6 的 "vendored 场景下噪音控制" 论点仍然成立, 本 Spec 只扩展"meta-repo 场景"的开关, 两个场景解耦 |
 | **D9** | 启发式关联 (`linked_us` / `linked_openspec`) **使用主 repo 的** `openspec/changes/` 目录扫描 | submodule 通常没有自己的 openspec 目录; Aria 模式下 OpenSpec 始终在主 repo; 若未来需要 per-submodule openspec 扫描, 再立独立 Spec |
 | **D10** | 每个 submodule 的 API 调用失败**独立 fail-soft** | 一个 submodule 失败不影响其他 submodule 的结果; 失败的 submodule 在 `repos[owner/repo]` 下记录 `fetch_error`, `items: []` |
 | **D11** | submodule URL 解析失败时**跳过该 submodule**, 不阻断整个 Phase 1.13 | 兼容 D10 fail-soft 原则 |
-| **D12** | 本 Spec 不引入新 `fetch_error` 枚举值, 复用现有 10 个 | submodule 扫描的错误语义与主 repo 扫描完全一致, 无需新类别 |
+| **D12** | 本 Spec 不引入新 `fetch_error` 枚举值, 复用现有 10 个 + 新增 3 个 submodule-专属: `submodule_not_initialized` / `no_origin_remote` / `parse_error` (path 层) | submodule 扫描的错误语义大部分与主 repo 一致, 3 个新枚举是 submodule-only 的 path-level 错误, 不污染主 repo 错误空间 |
+| **D13** | `limit: 20` 应用于**每 repo**, 非全局上限 (Round 2 新增, 回应 R1 tech-lead M5) | 每 repo 独立 limit 避免大 repo 抢占小 repo 的配额; Aria 场景: 4 repo × 20 = 80 items 上限, 实际 5 items (远低于上限). 未来如 items 膨胀到影响 UI, 可在聚合视图追加 truncate/paginate 逻辑 (本 Spec 不含) |
+| **D14** | `stage_timeout_seconds` 分档行为 (Round 2 新增, 回应 R1 tech-lead I3) | `scan_submodules=false` 保留 v1.0 的 12s (不变), `scan_submodules=true` 用自适应公式 `max(20, (N+1)×5)`. 用户显式设置优先级最高. 两条路径各自的 SLA 清晰: 向后兼容用户享受相同预算, 新功能用户享受按需扩展 |
+| **D15** | v1.0/v1.1 输出 schema **双写别名** `open_issues` == `items` (Round 2 新增, 回应 R1 backend-architect I1) | v1.0 消费者读 `open_issues` 仍然工作, v1.1+ 消费者读 `items` 享受 `repo` 字段。writer 双写代价可忽略 (内存引用). 别名将在 v2.x deprecate, 至少跨 2 个 MINOR 版本的 deprecation window |
 
 ---
 
@@ -224,19 +233,27 @@ D6 的"噪音控制"论点**基于一个隐性假设**: submodule = 第三方依
 - [ ] 缓存文件 schema 可容纳多 repo (已预留, 仅验证)
 - [ ] 缓存失效后同步 refresh 并覆写
 
-### AC-5: Aria 项目实测
+### AC-5: Aria 项目实测 ⚠️ **LIVE-DATA DEPENDENT** (Round 2 修复 R1 qa-engineer M8)
+
+**声明**: 本 AC 依赖 2026-04-15 当日 Aria 项目的 live issue 快照, 是**烟雾测试级别**验收 (smoke test), 非**长期回归门槛** (regression gate). 一旦 aria-plugin#17/#18 或 aria-orchestrator#1 被关闭, 本 AC 将无法自动通过。长期回归应通过 benchmark eval suite 的 fixture 化数据覆盖 (见 §未完成的工作)。
 
 - [ ] 本地运行 `/state-scanner` 后, `issue_status.repos` 应含 4 个 key (`10CG/Aria`, `10CG/aria-plugin`, `10CG/aria-standards`, `10CG/aria-orchestrator`)
-- [ ] `10CG/aria-plugin` 的 items 应含 #17 / #18
-- [ ] `10CG/aria-orchestrator` 的 items 应含 #1
+- [ ] `10CG/aria-plugin` 的 items 应含 #17 / #18 (2026-04-15 快照, 若被关闭则重新评估)
+- [ ] `10CG/aria-orchestrator` 的 items 应含 #1 (同上)
 - [ ] `10CG/aria-standards` 的 `open_count` 为 0
 - [ ] 推荐决策能看到所有 repo 的 items
 
-### AC-6: 推荐规则聚合
+### AC-6: 推荐规则聚合 ⚠️ **LIVE-DATA DEPENDENT** (Round 2 修复 R1 qa-engineer M8)
 
-- [ ] `open_blocker_issues` 规则评估时聚合所有 repos 的 items
-- [ ] 任一 repo 的 blocker label 触发降级推荐
+**声明**: 本 AC 的 "任一 repo blocker 触发降级" 验证要求有一个实际带 blocker/critical label 的 open issue。当前 Aria 项目的所有 open issue 均无 label (`labels: []`), 本 AC 无法以 live-data 形式验证。长期应通过 fixture-based eval 测试本规则的聚合逻辑。
+
+- [ ] `open_blocker_issues` 规则评估时聚合所有 repos 的 items (代码路径存在性)
+- [ ] 任一 repo 的 blocker label 触发降级推荐 (**需要 fixture 测试, live 场景下 untested**)
 - [ ] 推荐输出显示 "来自 submodule 的 blocker" 的来源信息
+
+### AC-9: Round 2 新增 — Backward compat regression (修复 R1 qa-engineer I9)
+
+- [ ] `scan_submodules=false` 默认路径在 benchmark eval-backward-compat 中通过 (输出 schema 无 `repos` 字段, `items[]` 只含主 repo, 行为与 v2.9.0 一致)
 
 ### AC-7: 文档完整性
 
@@ -255,13 +272,16 @@ D6 的"噪音控制"论点**基于一个隐性假设**: submodule = 第三方依
 
 ## Rollback Plan
 
-**Level 1 (最快回滚)**: 用户/CI 设置 `scan_submodules: false`
+**Level 1 (最快回滚, 运行时降级)**: 用户/CI 设置 `scan_submodules: false`
 - 零发布, 运行时降级
 - 回到 v2.9.0 行为
+- ⚠️ **限制 (Round 2 修复 R1 qa-engineer M7)**: Level 1 **仅在缺陷限于 `scan_submodules=true` 执行分支**时有效。若缺陷位于共享代码路径 (例如 cache writer 无条件写入 `schema_version` 字段导致 v1.0 reader 困惑), Level 1 不生效, 必须 Level 2 代码回滚。
+- **判定方法**: 出现 bug 后, 先执行 `jq 'del(.state_scanner.issue_scan.scan_submodules)' .aria/config.json` 并重跑 state-scanner, 若 bug 消失 → Level 1 有效; 若 bug 仍在 → Level 2 或 Level 3
 
-**Level 2 (代码回滚)**: 如果发现 `scan_submodules=true` 下有严重 bug
-- 回滚 SKILL.md / issue-scanning.md / RECOMMENDATION_RULES.md 到 v1.15.2 版本
-- 缓存文件不需清理 (schema 向后兼容)
+**Level 2 (代码回滚)**: 如果发现 `scan_submodules=true` 下或共享路径上有严重 bug
+- 回滚 aria-plugin 的 SKILL.md / issue-scanning.md / RECOMMENDATION_RULES.md / CHANGELOG.md 到 v1.15.2 版本 (git revert aria-plugin commit 488e736+)
+- 回滚 Aria 主仓库的 openspec/changes/state-scanner-submodule-issue-scan/ (git revert 主 repo commit)
+- 删除 `.aria/cache/issues.json` (schema 不兼容, 重建)
 - `.aria/config.json` 的 `scan_submodules` 字段保留但无效果
 
 **Level 3 (完全撤回)**: 如果 meta-repo 模式在实测中被证明是伪需求

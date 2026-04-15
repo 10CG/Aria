@@ -1,0 +1,30 @@
+round: 1
+agent: knowledge-manager
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: IMPORTANT
+    type: version-drift
+    area: aria/skills/state-scanner/RECOMMENDATION_RULES.md:1124
+    description: "RECOMMENDATION_RULES.md 的页脚 '最后更新: 2026-04-09' 仍停留在 v2.9.0 时间点, 变更历史末尾也只有 'v2.9.0 (2026-04-09)' 条目, 缺少对应 v2.10.0 / v1.16.0 的变更历史条目。open_blocker_issues 规则 description 已更新为 '(v1.1.0+ 聚合所有 repo)', 但文件级元数据未同步。"
+    recommendation: "在 RECOMMENDATION_RULES.md 变更历史末尾追加 '### v2.10.0 (2026-04-15)' 条目, 说明 open_blocker_issues 规则语义升级, 并将'最后更新'更新为 2026-04-15。"
+  - category: IMPORTANT
+    type: schema-mismatch
+    area: references/issue-scanning.md:25-46 vs SKILL.md:709-740
+    description: "issue-scanning.md 顶部的 v1.0.0 基础输出 Schema (第 25-46 行) 仍使用 v1.0 单 repo 扁平格式, 缺少 repo 字段标注和 repos 分组视图。SKILL.md 已展示 v1.16.0 完整格式, 但 issue-scanning.md 的概览节未同步, 两者存在可见差异。"
+    recommendation: "更新 issue-scanning.md 第 25-46 行的输出 Schema 示例, 添加 repo 字段 (标注 v1.16.0+) 和 repos 分组块, 与 SKILL.md 及 Spec 的双视图描述保持三方一致。"
+  - category: MINOR
+    type: broken-link
+    area: openspec/changes/state-scanner-submodule-issue-scan/proposal.md:8
+    description: "Spec 在 'Parent Spec' 字段标注的是姐妹 Spec state-scanner-mechanical-enforcement, 但该字段名称为 'Parent Spec (相关, 不合并)', 命名语义混乱——父 Spec 应为已归档的 state-scanner-issue-awareness (2026-04-09), 姐妹 Spec 是 mechanical-enforcement。"
+    recommendation: "将字段拆为两行: Parent Spec: state-scanner-issue-awareness (2026-04-09 归档) 和 Sister Spec: state-scanner-mechanical-enforcement。"
+  - category: MINOR
+    type: changelog-gap
+    area: aria/CHANGELOG.md
+    description: "CHANGELOG.md 目前最新条目为 [1.15.2], 无 v1.16.0 预留条目或 Draft 标注。Spec §SemVer 裁决已明确目标版本为 v1.16.0, 但 CHANGELOG 尚未有任何记录。"
+    recommendation: "在 PR 合并前于 CHANGELOG.md 追加 '## [1.16.0] - TBD' 条目, 记录 Phase 1.13 submodule 扫描功能。"
+  - category: MINOR
+    type: memory-alignment
+    area: CLAUDE.md + memory/feedback_state_scanner_run_all_phases.md
+    description: "变更与用户 memory feedback_state_scanner_run_all_phases 完全对齐——该 memory 正是此次实测发现漏报的根因, 本 PR 是对该 memory 记录问题的直接修复。CLAUDE.md 6 条不可协商规则均未受影响, AD11 hard constraint 在所有文档中一致执行。"
+    recommendation: "无需操作, 记录为正向对齐确认。"
+summary: "版本号本身在 SKILL.md 头尾 (2.10.0)、issue-scanning.md (v1.1.0) 与 Spec (v2.10.0 target) 三处一致, 无跨文件版本漂移。主要风险: RECOMMENDATION_RULES.md 变更历史未追加 v2.10.0 条目, issue-scanning.md 概览节的输出 Schema 示例仍为 v1.0 单 repo 格式。修复上述两项后, PR 文档质量可达 PASS 标准。"

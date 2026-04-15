@@ -8,6 +8,6 @@
     {"id": "finds_aria_plugin_17", "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "check_type": "contains_any", "values": ["aria-plugin#17", "aria-plugin #17", "Drift Guard", "audit-engine"]},
     {"id": "finds_aria_plugin_18", "text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "check_type": "contains_any", "values": ["aria-plugin#18", "aria-plugin #18", "Token", "estimator"]},
     {"id": "finds_aria_orch_1", "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)", "check_type": "contains_any", "values": ["aria-orchestrator#1", "aria-orchestrator #1", "轻量化 Hermes", "lightweight Hermes"]},
-    {"id": "mentions_4_or_more_repos", "text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "check_type": "contains_count", "values": ["10CG/Aria", "10CG/aria-plugin", "10CG/aria-standards", "10CG/aria-orchestrator"], "min": 3}
+    {"id": "does_not_disclaim_no_submodule_scan", "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)", "check_type": "not_contains_any", "values": ["NOT scanned", "未扫描", "not scanning submodules", "子模块 NOT", "submodules NOT", "(N/A in this version)", "pre-change 版本限制"]}
   ]
 }

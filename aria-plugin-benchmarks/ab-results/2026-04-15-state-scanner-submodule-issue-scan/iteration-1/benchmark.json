@@ -4,12 +4,13 @@
     "skill_path": "<path/to/skill>",
     "executor_model": "<model-name>",
     "analyzer_model": "<model-name>",
-    "timestamp": "2026-04-15T10:46:18Z",
+    "timestamp": "2026-04-15T11:19:33Z",
     "evals_run": [
       0,
       1
     ],
-    "runs_per_configuration": 3
+    "runs_per_configuration": 1,
+    "note": "n=1 per config — deterministic code-path delta, not LLM variance test. See README.md §方法论说明."
   },
   "runs": [
     {
@@ -17,9 +18,9 @@
       "configuration": "old_skill",
       "run_number": 1,
       "result": {
-        "pass_rate": 0.5,
-        "passed": 3,
-        "failed": 3,
+        "pass_rate": 0.3333,
+        "passed": 2,
+        "failed": 4,
         "total": 6,
         "time_seconds": 365.0,
         "tokens": 81156,
@@ -48,14 +49,14 @@
           "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: none"
         },
         {
-          "text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)",
+          "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)",
           "passed": false,
-          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: none"
+          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '轻量化 Hermes', 'lightweight Hermes']; found: none"
         },
         {
-          "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
-          "passed": true,
-          "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+          "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)",
+          "passed": false,
+          "evidence": "Must not contain any of ['NOT scanned', '未扫描', 'not scanning submodules', '子模块 NOT', 'submodules NOT', '(N/A in this version)', 'pre-change 版本限制']; found: ['未扫描', '(N/A in this version)', 'pre-change 版本限制']"
         }
       ],
       "notes": []
@@ -144,14 +145,14 @@
           "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: ['Token', 'estimator']"
         },
         {
-          "text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)",
+          "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)",
           "passed": true,
-          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: ['\u8f7b\u91cf\u5316 Hermes']"
+          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '轻量化 Hermes', 'lightweight Hermes']; found: ['轻量化 Hermes']"
         },
         {
-          "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
+          "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)",
           "passed": true,
-          "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+          "evidence": "Must not contain any of ['NOT scanned', '未扫描', 'not scanning submodules', '子模块 NOT', 'submodules NOT', '(N/A in this version)', 'pre-change 版本限制']; found: none (pass)"
         }
       ],
       "notes": []
@@ -208,9 +209,9 @@
   "run_summary": {
     "old_skill": {
       "pass_rate": {
-        "mean": 0.5834,
-        "stddev": 0.1179,
-        "min": 0.5,
+        "mean": 0.5,
+        "stddev": 0.2357,
+        "min": 0.3333,
         "max": 0.6667
       },
       "time_seconds": {
@@ -247,7 +248,7 @@
       }
     },
     "delta": {
-      "pass_rate": "-0.42",
+      "pass_rate": "-0.50",
       "time_seconds": "+75.7",
       "tokens": "+256"
     }
