@@ -180,8 +180,12 @@
   - 基于 AD1-AD12 起草 8 处 diff 草案
   - 不提交, 待 US-026 执行
   - 随 M0 Report 一并交产品负责人审阅
-- [ ] **T5.4** AD3 回填 (0.5h, T4.done 后)
+- [x] **T5.4** AD3 回填 (0.5h, T4.done 后) — 2026-04-15 完成
   - Spike Report 结论直接写入 AD3 段落, 含: 选型 / 量化数据 / 回滚路径
+  - 产出: `aria-orchestrator/docs/architecture-decisions.md` (新建, AD3 完整填充 + 其余 AD 留 stub 待 T5.2 撰写)
+  - AD3 决议: `option-c-extension-only` (Extension-only tool pack via hermes entry-point plugin API)
+  - 含: 决策 / 背景 (3 条 PRD 原假设反证) / 3 alternatives (A fork / B 自研 / R8) / 选型理由 (8 维度对比表) / 5 风险项 + 缓解 / 3 级回滚路径 / PRD v2.0 反转建议 / 合规性 flag (需产品负责人接受 2 项缩减)
+  - 主引用: `openspec/changes/aria-2.0-m0-spike-hermes/spike-report.md`
 
 ---
 
