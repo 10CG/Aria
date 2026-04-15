@@ -147,6 +147,22 @@
 
 **T4 产出消费**: T5 (AD3 回填) + T6 (M0 Report 引用)
 
+### T4 完成标记 (2026-04-15)
+
+- [x] **T4.done** — Spike 已完成
+- **实际工时**: ~4.5h (原估 52h, 节省 47.5h / 91%)
+- **裁决推荐**: `recommendation: option-c-extension-only` (Option C Extension-only tool pack)
+- **Spike Report (主引用)**: [`../aria-2.0-m0-spike-hermes/spike-report.md`](../aria-2.0-m0-spike-hermes/spike-report.md)
+- **Spike 代码路径**: [`aria-orchestrator/spikes/hermes-route/`](../../../aria-orchestrator/spikes/hermes-route/)
+  - `option-c-poc/` — POC 源码 (286 LoC 业务 + 176 LoC 测试, 18/18 tests pass)
+  - `license-matrix.json` / `license-scan-report.md` — 477 packages 扫描
+  - `rebase-log.md` — upstream velocity 实测 (1931 commits/月)
+  - `upstream-structure.md` — hermes v0.9.0 源码结构分析
+  - `meta-knowledge-v0.1.md` — 元知识 prompt + tiktoken 实测
+- **对 PRD v2.0 AD3 的影响**: PRD 原假设 "v0.7 不支持扩展 API, fork 是唯一路径" 被 3 条独立数据证伪, 需要 `prd_patch_pr` 反转 AD3
+- **合规性 flag (spike-report.md §6)**: 需要产品负责人显式接受 2 项缩减 (ST2.1/2.2 rebase 实操跳过 + ST3 自研原型跳过)
+- **下一步**: T5 (AD 收敛, T5.4 AD3 回填) + T6 (M0 Report 撰写 + `m0-handoff.yaml` 填写)
+
 ---
 
 ## T5 — AD1-AD12 收敛 (8h)
