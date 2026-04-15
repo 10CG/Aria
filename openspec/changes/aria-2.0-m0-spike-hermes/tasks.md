@@ -47,29 +47,35 @@
 
 ## ST2 — Fork 路径: Rebase 实操 + License 扫描 (10h)
 
-- [ ] **ST2.1** 第 1 次 rebase 实操 (4h)
+> **ST2 更新 (2026-04-15)**: ST2.3/2.4/2.5 完成 (实际 ~1.5h, 原估 4.5h, 节省 3h)。Primary scan 结果触发 fork 路径自动降级 (AGPL=1 from `ua-parser-js@2.0.9` via browser 子图)。ST2.1/2.2 **有条件推迟**到 ST3.5 Option C POC 结束后, 依据 POC 结果决定是否跑完整 rebase 或缩减为"仅记录"。详见 [license-scan-report.md §8](../../../aria-orchestrator/spikes/hermes-route/license-scan-report.md)。
+
+- [ ] **ST2.1** 第 1 次 rebase 实操 (4h) — **推迟至 ST3.5 POC 后**
   - `git fetch upstream && git rebase upstream/main`
   - 解决所有冲突, 跑 upstream 测试套件确认通过
   - **记录每步工时** (每 0.5h 精度) 到 `spikes/hermes-route/rebase-log.md`
   - 量化指标: 总工时, 冲突文件数, 冲突段数
-- [ ] **ST2.2** 单次 rebase × 1.5 月度估算 (0.5h)
+  - **条件**: 若 ST3.5 Option C POC 成功, 本任务缩减为"仅记录 upstream velocity + 粗估工时", 不执行完整 rebase
+- [ ] **ST2.2** 单次 rebase × 1.5 月度估算 (0.5h) — **推迟至 ST3.5 POC 后**
   - 月度估算 = ST2.1 实测工时 × 1.5 (固定系数)
   - 产品负责人可上调至 ×2.0 (裁决时), > ×2.0 需 tech-lead 第二签字
   - 附 ST1.4 upstream velocity 数据作为上调依据参考
-- [ ] **ST2.3** License 扫描 - JS 依赖 (2h)
-  - `cd hermes-fork && npm ls --all`
-  - `license-checker --production --json --out license-js.json`
-  - 识别 direct + transitive 全量, 输出 GPL/AGPL/LGPL/Unknown 分类
-- [ ] **ST2.4** License 扫描 - Python 依赖 (如有) (1h)
-  - `pip-licenses --format=json --with-system --output-file license-py.json`
-  - 同 ST2.3 分类处理
-- [ ] **ST2.5** License matrix 汇总 (1.5h)
-  - 合并 ST2.3 + ST2.4 到 `spikes/hermes-route/license-matrix.json`
-  - 全表: direct / transitive / package / license / risk_level
-  - 汇总: `gpl_count`, `agpl_count`, `lgpl_count`, `unknown_count`
-  - **触发条件**:
-    - `gpl_count + agpl_count > 0` 或 `unknown_count ≥ 1` → fork 路径自动降级 (标记到 Spike Report)
-    - `lgpl_count > 0` → 人类 legal-advisor 研判, 不自动降级
+- [x] **ST2.3** License 扫描 - JS 依赖 (2h → 实际 0.5h)
+  - 使用 `license-checker --production --json` 扫描 410 个 transitive 包
+  - 产出 `/tmp/hermes-spike/license-js-primary.json` → 聚合到 `spikes/hermes-route/license-matrix.json`
+  - **关键发现**: `ua-parser-js@2.0.9 AGPL-3.0-or-later` via `@askjo/camoufox-browser` → `camoufox-js` 依赖链
+- [x] **ST2.4** License 扫描 - Python 依赖 (1h → 实际 0.5h)
+  - Scope 收窄: base + [cron] + [feishu] + [cli] (Aria Layer 1 最小集), 排除 [all] 里 Aria 不消费的 15+ extras
+  - `uv venv` + `pip-licenses==5.5.5` 扫描 67 个包
+  - **关键发现**: `edge-tts@7.2.8` LGPLv3 (Python dynamic link exception 成立, 低风险)
+  - UNKNOWN 3 个 false positive 已人工澄清: `lark-oapi`=MIT, `fal_client`=Apache-2.0, `hermes-agent` self=MIT
+- [x] **ST2.5** License matrix 汇总 (1.5h → 实际 0.5h)
+  - 产物: [`license-matrix.json`](../../../aria-orchestrator/spikes/hermes-route/license-matrix.json) (106 KB, 机读) + [`license-scan-report.md`](../../../aria-orchestrator/spikes/hermes-route/license-scan-report.md) (人读)
+  - 全表: ecosystem / package / version / license_raw / category / corrected flag
+  - 汇总 gates: `gpl_count=0`, `agpl_count=1`, `lgpl_count=1`, `unknown_count=0 (修正后)`
+  - **触发条件判定**:
+    - `gpl_count + agpl_count > 0` 或 `unknown_count ≥ 1` → fork 路径自动降级 ✅ **触发** (AGPL=1)
+    - `lgpl_count > 0` → 人类 legal-advisor 研判 ✅ **触发** (LGPL=1, 风险低)
+  - **路径特异性**: AGPL 仅影响 Option A (fork), Option B/C 不受影响 → **Option C 优势从"rebase 节省"升级为"license+rebase 双重节省"**
 - [ ] **ST2.6** 缓冲 (1h)
 
 ---
