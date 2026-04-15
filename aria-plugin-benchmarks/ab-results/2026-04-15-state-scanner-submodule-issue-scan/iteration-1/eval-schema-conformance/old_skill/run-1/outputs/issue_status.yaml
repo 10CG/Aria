@@ -1,0 +1,23 @@
+issue_status:
+  fetched_at: "2026-04-15T10:40:15Z"
+  source: live
+  fetch_error: null
+  warning: null
+  platform: forgejo
+  open_count: 2
+  items:
+    - number: 16
+      title: "[US-020] Aria 2.0 M0 — 前置验证与架构定稿"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/Aria/issues/16"
+      linked_openspec: null
+      linked_us: "US-020"
+      heuristic: true
+    - number: 5
+      title: "[Feature] Pulse 项目集成 — AI-native 通讯层 (Matrix + Conduit + Element)"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/Aria/issues/5"
+      linked_openspec: null
+      linked_us: null
+      heuristic: true
+  label_summary: {}

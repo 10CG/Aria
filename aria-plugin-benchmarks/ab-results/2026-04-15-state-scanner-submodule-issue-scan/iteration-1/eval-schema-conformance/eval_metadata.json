@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "schema-conformance",
+  "prompt": "I'm working in the Aria project at /home/dev/Aria. Please execute the state-scanner skill's Phase 1.13 (Issue 感知扫描) and output ONLY the resulting issue_status YAML structure (as the skill specification defines). Do not output recommendations or other phases — just the raw issue_status block. The forgejo CLI is available. The .aria/config.json file has Phase 1.13 enabled.",
+  "assertions": [
+    {"id": "output_is_yaml_structure", "text": "Output contains issue_status: YAML key", "check_type": "contains", "value": "issue_status"},
+    {"id": "has_fetched_at", "text": "Output contains fetched_at field", "check_type": "contains", "value": "fetched_at"},
+    {"id": "has_platform_forgejo", "text": "Output identifies platform as forgejo", "check_type": "contains", "value": "forgejo"},
+    {"id": "has_open_count", "text": "Output contains open_count field", "check_type": "contains", "value": "open_count"},
+    {"id": "has_repos_field", "text": "Output contains repos: field (v1.1.0+ schema)", "check_type": "contains", "value": "repos"},
+    {"id": "has_aria_plugin_entry", "text": "repos map contains 10CG/aria-plugin entry", "check_type": "contains", "value": "aria-plugin"}
+  ]
+}

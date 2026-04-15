@@ -1,0 +1,256 @@
+{
+  "metadata": {
+    "skill_name": "state-scanner",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-15T10:46:18Z",
+    "evals_run": [
+      0,
+      1
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 365.0,
+        "tokens": 81156,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output mentions Aria #16 (US-020 M0)",
+          "passed": true,
+          "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"
+        },
+        {
+          "text": "Output mentions Aria #5 (Pulse)",
+          "passed": true,
+          "evidence": "Looking for: '#5'; found"
+        },
+        {
+          "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)",
+          "passed": false,
+          "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: none"
+        },
+        {
+          "text": "Output mentions aria-plugin #18 (Token Attention / estimator)",
+          "passed": false,
+          "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: none"
+        },
+        {
+          "text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)",
+          "passed": false,
+          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: none"
+        },
+        {
+          "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
+          "passed": true,
+          "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 123.8,
+        "tokens": 53174,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output contains issue_status: YAML key",
+          "passed": true,
+          "evidence": "Looking for: 'issue_status'; found"
+        },
+        {
+          "text": "Output contains fetched_at field",
+          "passed": true,
+          "evidence": "Looking for: 'fetched_at'; found"
+        },
+        {
+          "text": "Output identifies platform as forgejo",
+          "passed": true,
+          "evidence": "Looking for: 'forgejo'; found"
+        },
+        {
+          "text": "Output contains open_count field",
+          "passed": true,
+          "evidence": "Looking for: 'open_count'; found"
+        },
+        {
+          "text": "Output contains repos: field (v1.1.0+ schema)",
+          "passed": false,
+          "evidence": "Looking for: 'repos'; not found"
+        },
+        {
+          "text": "repos map contains 10CG/aria-plugin entry",
+          "passed": false,
+          "evidence": "Looking for: 'aria-plugin'; not found"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 206.6,
+        "tokens": 77748,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output mentions Aria #16 (US-020 M0)",
+          "passed": true,
+          "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"
+        },
+        {
+          "text": "Output mentions Aria #5 (Pulse)",
+          "passed": true,
+          "evidence": "Looking for: '#5'; found"
+        },
+        {
+          "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)",
+          "passed": true,
+          "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: ['Drift Guard', 'audit-engine']"
+        },
+        {
+          "text": "Output mentions aria-plugin #18 (Token Attention / estimator)",
+          "passed": true,
+          "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: ['Token', 'estimator']"
+        },
+        {
+          "text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)",
+          "passed": true,
+          "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: ['\u8f7b\u91cf\u5316 Hermes']"
+        },
+        {
+          "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
+          "passed": true,
+          "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 130.9,
+        "tokens": 56071,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output contains issue_status: YAML key",
+          "passed": true,
+          "evidence": "Looking for: 'issue_status'; found"
+        },
+        {
+          "text": "Output contains fetched_at field",
+          "passed": true,
+          "evidence": "Looking for: 'fetched_at'; found"
+        },
+        {
+          "text": "Output identifies platform as forgejo",
+          "passed": true,
+          "evidence": "Looking for: 'forgejo'; found"
+        },
+        {
+          "text": "Output contains open_count field",
+          "passed": true,
+          "evidence": "Looking for: 'open_count'; found"
+        },
+        {
+          "text": "Output contains repos: field (v1.1.0+ schema)",
+          "passed": true,
+          "evidence": "Looking for: 'repos'; found"
+        },
+        {
+          "text": "repos map contains 10CG/aria-plugin entry",
+          "passed": true,
+          "evidence": "Looking for: 'aria-plugin'; found"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.5834,
+        "stddev": 0.1179,
+        "min": 0.5,
+        "max": 0.6667
+      },
+      "time_seconds": {
+        "mean": 244.4,
+        "stddev": 170.5542,
+        "min": 123.8,
+        "max": 365.0
+      },
+      "tokens": {
+        "mean": 67165.0,
+        "stddev": 19786.262,
+        "min": 53174,
+        "max": 81156
+      }
+    },
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 168.75,
+        "stddev": 53.528,
+        "min": 130.9,
+        "max": 206.6
+      },
+      "tokens": {
+        "mean": 66909.5,
+        "stddev": 15327.9537,
+        "min": 56071,
+        "max": 77748
+      }
+    },
+    "delta": {
+      "pass_rate": "-0.42",
+      "time_seconds": "+75.7",
+      "tokens": "+256"
+    }
+  },
+  "notes": []
+}

@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "meta-repo-issue-discovery",
+  "prompt": "I'm working in the Aria project at /home/dev/Aria which is a meta-repo with three submodules: aria (→ 10CG/aria-plugin), standards (→ 10CG/aria-standards), and aria-orchestrator (→ 10CG/aria-orchestrator). Please execute the state-scanner skill and report ALL open GitHub/Forgejo issues across all repos (main repo + submodules) that I should triage. For each issue, include the issue number, title, and which repo it belongs to. Use the forgejo CLI which is available in the environment.",
+  "assertions": [
+    {"id": "finds_main_repo_16", "text": "Output mentions Aria #16 (US-020 M0)", "check_type": "contains_any", "values": ["#16", "US-020"]},
+    {"id": "finds_main_repo_5", "text": "Output mentions Aria #5 (Pulse)", "check_type": "contains", "value": "#5"},
+    {"id": "finds_aria_plugin_17", "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "check_type": "contains_any", "values": ["aria-plugin#17", "aria-plugin #17", "Drift Guard", "audit-engine"]},
+    {"id": "finds_aria_plugin_18", "text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "check_type": "contains_any", "values": ["aria-plugin#18", "aria-plugin #18", "Token", "estimator"]},
+    {"id": "finds_aria_orch_1", "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)", "check_type": "contains_any", "values": ["aria-orchestrator#1", "aria-orchestrator #1", "轻量化 Hermes", "lightweight Hermes"]},
+    {"id": "mentions_4_or_more_repos", "text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "check_type": "contains_count", "values": ["10CG/Aria", "10CG/aria-plugin", "10CG/aria-standards", "10CG/aria-orchestrator"], "min": 3}
+  ]
+}

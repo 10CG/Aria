@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "pass_rate": 0.5,
+    "passed": 3,
+    "failed": 3,
+    "total": 6
+  },
+  "expectations": [
+    {
+      "text": "Output mentions Aria #16 (US-020 M0)",
+      "passed": true,
+      "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"
+    },
+    {
+      "text": "Output mentions Aria #5 (Pulse)",
+      "passed": true,
+      "evidence": "Looking for: '#5'; found"
+    },
+    {
+      "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)",
+      "passed": false,
+      "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: none"
+    },
+    {
+      "text": "Output mentions aria-plugin #18 (Token Attention / estimator)",
+      "passed": false,
+      "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: none"
+    },
+    {
+      "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)",
+      "passed": false,
+      "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '轻量化 Hermes', 'lightweight Hermes']; found: none"
+    },
+    {
+      "text": "Output acknowledges 4 repos scanned (main + 3 submodules)",
+      "passed": true,
+      "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"
+    }
+  ]
+}

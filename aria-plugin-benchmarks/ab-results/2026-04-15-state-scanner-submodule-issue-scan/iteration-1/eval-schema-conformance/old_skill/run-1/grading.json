@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "pass_rate": 0.6667,
+    "passed": 4,
+    "failed": 2,
+    "total": 6
+  },
+  "expectations": [
+    {
+      "text": "Output contains issue_status: YAML key",
+      "passed": true,
+      "evidence": "Looking for: 'issue_status'; found"
+    },
+    {
+      "text": "Output contains fetched_at field",
+      "passed": true,
+      "evidence": "Looking for: 'fetched_at'; found"
+    },
+    {
+      "text": "Output identifies platform as forgejo",
+      "passed": true,
+      "evidence": "Looking for: 'forgejo'; found"
+    },
+    {
+      "text": "Output contains open_count field",
+      "passed": true,
+      "evidence": "Looking for: 'open_count'; found"
+    },
+    {
+      "text": "Output contains repos: field (v1.1.0+ schema)",
+      "passed": false,
+      "evidence": "Looking for: 'repos'; not found"
+    },
+    {
+      "text": "repos map contains 10CG/aria-plugin entry",
+      "passed": false,
+      "evidence": "Looking for: 'aria-plugin'; not found"
+    }
+  ]
+}
