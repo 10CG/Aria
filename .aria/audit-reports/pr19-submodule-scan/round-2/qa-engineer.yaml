@@ -1,0 +1,5 @@
+round: 2
+agent: qa-engineer
+verdict: PASS
+findings: []
+summary: "All five Round 1 findings fully resolved. I7 (metadata): benchmark.json runs_per_configuration=1 with note field — verified. I8 (false-positive): assertion does_not_disclaim_no_submodule_scan uses not_contains_any; grading.json confirms old_skill scores 2/6 (33.3%) on eval-0, down from prior 3/6 — assertion now discriminates correctly. I9 (coverage gap): AC-9 present in proposal.md tracking eval-backward-compat as future work. M7 (rollback Level 1 caveat): explicit shared-path defect warning + diagnostic command. M8 (AC-5/AC-6 verifiability): both carry LIVE-DATA DEPENDENT flag with decay conditions. Math cross-checks: eval-0 old 2/6, eval-1 old 4/6, both with_skill 6/6, aggregate 50% vs 100%, +50pp delta correct; JSON sign inversion -0.50 documented in benchmark.md §签名惯例澄清."
