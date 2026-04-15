@@ -1,0 +1,5 @@
+round: 4
+agent: tech-lead
+verdict: PASS
+findings: []
+summary: "R3 annotation at line 27 correctly identifies the v1.0 block as pre-v1.16.0 historical format, points readers to §步骤 4 schema_version 语义, and preserves the overall narrative (opt-in default, backward-compat via alias + cold cache guard, fail-soft). No architectural regression; stability reconfirmed."
