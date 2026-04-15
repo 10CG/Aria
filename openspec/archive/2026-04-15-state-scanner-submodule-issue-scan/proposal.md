@@ -1,12 +1,16 @@
 # state-scanner-submodule-issue-scan — Phase 1.13 Submodule Issue 扫描
 
 > **Level**: Minimal (Level 2)
-> **Status**: Draft (Round 1 Audit FAIL → Round 2 修正中)
+> **Status**: **Complete** ✅ (归档 2026-04-15, PR #19 已合并, v1.16.0 已发版)
 > **Created**: 2026-04-15
-> **Target Version**: aria-plugin v1.16.0 (MINOR, 新功能 + 向后兼容, 见 §Impact §SemVer 裁决)
+> **Archived**: 2026-04-15
+> **Delivered Version**: aria-plugin v1.16.0
+> **PR**: [aria-plugin#19](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/19) (merged 8ec898a @ 2026-04-15T11:35:04Z)
+> **Audit**: 5-round multi-agent pre_merge convergence (R4=R5=empty), 22 findings resolved. 详见 `.aria/audit-reports/pr19-submodule-scan/round-{1..5}/`
+> **Benchmark**: `aria-plugin-benchmarks/ab-results/2026-04-15-state-scanner-submodule-issue-scan/` (+50pp pass rate delta)
 > **Source**: 2026-04-15 Aria 主项目 session 中用户指出 "aria-plugin 应该也有 issue, 为什么没查看到?", 追查到 Phase 1.13 显式不递归 submodule (D6 决策)
-> **Parent Spec (扩展其决策)**: `state-scanner-issue-awareness` (2026-04-09 归档, 位于 `openspec/archive/2026-04-09-state-scanner-issue-awareness/`) — 本 Spec 扩展其 D6 "不递归 submodule" 决策为 opt-in, 不否定原决策本体
-> **Sister Spec (相关, 不合并)**: [state-scanner-mechanical-enforcement](../state-scanner-mechanical-enforcement/proposal.md) (姐妹 Spec, 主题不同 — 执行纪律 vs 设计假设, 单一焦点分离)
+> **Parent Spec (扩展其决策)**: `state-scanner-issue-awareness` (2026-04-09 归档) — 本 Spec 扩展其 D6 "不递归 submodule" 决策为 opt-in, 不否定原决策本体
+> **Sister Spec (相关, 不合并)**: `state-scanner-mechanical-enforcement` (Draft) — 姐妹 Spec, 主题不同 (执行纪律 vs 设计假设), 单一焦点分离
 
 ---
 
