@@ -70,23 +70,33 @@
 
 ## T2 — A3 NFS + Nomad Bind Mount 实测 (4.5h)
 
-- [ ] **T2.1** Aether NFS 挂载现状调查 (1h)
-  - 查证 heavy-80/81/82 节点是否挂载 `nfs-fastpool-aether`
-  - 产出 `nfs-status.md` (节点 × 挂载点矩阵)
-- [ ] **T2.2** Nomad parameterized dispatch 实测 (2h)
-  - 写一个最小 parameterized job `aria-nfs-smoke.hcl`
-  - `nomad alloc exec` 确认容器内 NFS 挂载点可见
-  - 容器内写入 `/opt/aria-outputs/smoke-<timestamp>.txt`, 内容为 UUID
-- [ ] **T2.3** 宿主侧 md5 双向校验 (1h)
-  - 以 **Nomad agent user** (UID 推断自 `nomad node status`) 执行 `md5sum /opt/aria-outputs/smoke-<timestamp>.txt`
-  - 对比容器内 md5, 必须完全一致, 否则 fail
-  - 记录权限模式 (0644 / 0664 / ...)
+> **R8 决策**: Spec 原假设 NFS 栈被 T2.1 实测推翻, 改用 virtiofs + Nomad docker driver `config.volumes` (W 方案, 零 client.hcl 侵入)。详见 [`artifacts/t2/decision-r8-virtiofs-vs-nfs.md`](./artifacts/t2/decision-r8-virtiofs-vs-nfs.md)。
+
+- [x] **T2.1** Aether 存储挂载现状调查 (1h) — 2026-04-15
+  - ~~查证 heavy-80/81/82 是否挂载 `nfs-fastpool-aether`~~ → 无 NFS, 实际是 virtiofs `aether-share` 透传
+  - 产出 [`artifacts/t2/nfs-status.md`](./artifacts/t2/nfs-status.md) (节点 × 挂载点矩阵 + Nomad agent user 结论)
+  - 原始 probe: [`artifacts/t2/raw/heavy-{80,81,82}-probe.txt`](./artifacts/t2/raw/)
+- [x] **T2.2** Nomad parameterized dispatch 实测 (2h) — 2026-04-15
+  - [`aria-storage-smoke.hcl`](./artifacts/t2/aria-storage-smoke.hcl) (W 方案, 用 `config.volumes` 替代 host_volume)
+  - 通过 Nomad HTTP API 验证 (本地无 Nomad CLI, 替代 `nomad alloc exec`)
+  - 3 次 dispatch 覆盖 heavy-1/2/3 各一次, 容器内写 UUID + alloc_id + md5 到 `/opt/aria-outputs/smoke-<smoke_id>.txt`, 全部 exit 0
+  - 证据: [`artifacts/t2/t2.2-dispatch-log.txt`](./artifacts/t2/t2.2-dispatch-log.txt)
+- [x] **T2.3** 宿主侧 md5 双向校验 (1h, 核心部分) — 2026-04-15
+  - Nomad agent 以 **root (UID 0)** 运行 (systemd 无 `User=`, `ps -o user,comm` 显示 root), UID 推断步骤简化
+  - 容器内 md5 `c681d046...` ↔ 宿主 md5 `c681d046...` 字节级一致 (bind mount 无漂移)
+  - 跨 3 节点 md5 交叉校验: 9 个值全一致 (3 节点 × 3 文件)
+  - 权限: bind mount 目录 0777 root:root, 容器写入文件 0644 root:root
+  - **延后到 M1 US-022**: 非 root 容器 UID (如 1000) 写入 + virtiofs 并发 locking + 三节点同写 last-writer-wins (M0 探针已证通路)
 - [ ] **T2.4** Nomad meta 64KB 边界测试 (0.5h)
   - 发送一个 60KB 的 meta 参数 dispatch
   - 确认边界行为, 产出 R7 缓解方案文档 (prompt 走文件, meta 传 ISSUE_ID)
-- [ ] **T2 交付物**:
-  - `nfs-status.md` + `aria-nfs-smoke.hcl` + `nfs-validation-report.md`
-  - 任何失败 → fallback 方案: 单节点 `constraint` pin heavy-80
+- [x] **T2 交付物** (含 R8 override):
+  - [x] [`nfs-status.md`](./artifacts/t2/nfs-status.md)
+  - [x] [`aria-storage-smoke.hcl`](./artifacts/t2/aria-storage-smoke.hcl) (原 `aria-nfs-smoke.hcl`, R8 改名)
+  - [x] [`storage-validation-report.md`](./artifacts/t2/storage-validation-report.md) (原 `nfs-validation-report.md`, R8 改名, 结论: **A3 假设 PASS**)
+  - [x] [`decision-r8-virtiofs-vs-nfs.md`](./artifacts/t2/decision-r8-virtiofs-vs-nfs.md)
+  - [ ] T2.4 `t2.4-meta-boundary.md` (待)
+  - 原 fallback "单节点 constraint pin heavy-80" 不再适用: W 方案已零侵入全节点验证
 
 **T1 No-Go 下的处置**: T2 产出部分有效 (基础设施事实), knowledge-manager 在 M0 Report 对涉及 GLM/luxeno 的段落做 strikethrough 标注, phase-c-integrator 在 pre_merge 检查点验证。
 

@@ -1,0 +1,46 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+# Node: heavy-2 (ip: 192.168.69.81)
+# Date: 2026-04-15T15:32:32+00:00
+
+## mount | grep aether-volumes
+aether-share on /opt/aether-volumes type virtiofs (rw,relatime)
+
+## findmnt /opt/aether-volumes
+TARGET              SOURCE       FSTYPE   OPTIONS
+/opt/aether-volumes aether-share virtiofs rw,relatime
+
+## stat /opt/aether-volumes
+  File: /opt/aether-volumes
+  Size: 13        	Blocks: 24         IO Block: 1048576 directory
+Device: 0,45	Inode: 519         Links: 13
+Access: (0777/drwxrwxrwx)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-02-20 16:15:12.540291788 +0000
+Modify: 2026-03-26 00:31:04.944618354 +0000
+Change: 2026-03-26 00:31:04.944618354 +0000
+ Birth: -
+
+## df -hT /opt/aether-volumes
+Filesystem     Type      Size  Used Avail Use% Mounted on
+aether-share   virtiofs  2.0T  141G  1.9T   7% /opt/aether-volumes
+
+## id nomad (user)
+id: 'nomad': no such user
+
+## systemctl is-active nomad
+active
+
+## ls /opt/aether-volumes
+total 33
+drwxrwxrwx 13 root root   13 Mar 26 00:31 .
+drwxr-xr-x 10 root root 4096 Mar 31 01:41 ..
+drwxr-xr-x  2 root root    2 Mar 18 17:30 data
+drwxr-xr-x  4 root root    4 Mar 26 00:31 dev-db
+drwxr-xr-x  3 root root    3 Mar  7 03:52 kairos
+drwxr-xr-x  3 root root    3 Mar 15 01:32 kairos-prod
+drwxr-xr-x  5 root root    5 Mar 19 17:05 my-api
+drwxr-xr-x  4 root root    4 Mar 18 17:38 myapp
+drwxr-xr-x  4 root root    4 Mar 10 08:19 nexus
+drwxr-xr-x  5 root root    5 Mar 10 18:10 runners
+drwxr-xr-x  2 root root    2 Mar  6 17:02 test-cli
+drwxr-xr-x  4 root root    4 Mar  6 16:53 test-volume-cli
+drwxrwxrwx  8 root root    8 Feb 24 15:38 todo-web

@@ -1,0 +1,155 @@
+# T2.2 Dispatch Log — aria-storage-smoke
+# Date: 2026-04-15
+# Nomad server: http://192.168.69.70:4646
+
+=== aria-storage-smoke/dispatch-1776294759-6457bb09 ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294759459505005
+  alloc_id:        35aff3e5-3986-c300-53b9-17aba4f44f79
+  node_name:       heavy-3
+  client_status:   failed
+  task_state:      dead
+  task_failed:     True
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Failed Validation: 2 errors occurred:
+	* failed to parse config: 
+	* Extra characters after interpolation expression: Template interpolatio
+    - Not Restarting: Policy allows no restarts
+  stdout_fetch_error: HTTP Error 404: Not Found
+
+=== aria-storage-smoke/dispatch-1776294826-58d578a9 ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294826018952493
+  alloc_id:        a17a3a9f-82f4-a7a7-5a81-59c52b96748c
+  node_name:       heavy-2
+  client_status:   complete
+  task_state:      dead
+  task_failed:     False
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Driver: Downloading image
+    - Started: Task started by client
+    - Terminated: Exit Code: 0
+  stdout:
+    --- wrote /opt/aria-outputs/smoke-001.txt ---
+    smoke_id=001
+    uuid=10e66369-389f-4d9b-957e-1a225c5220a0
+    container_hostname=e1a12c44017e
+    container_uid=0
+    container_gid=0
+    ts=2026-04-15T23:13:53+00:00
+    nomad_alloc_id=a17a3a9f-82f4-a7a7-5a81-59c52b96748c
+    nomad_node_name=heavy-2
+    md5_in_container=c681d046b29492ccf816651f6acc1a7a
+
+=== aria-storage-smoke/dispatch-1776294880-122ad67c ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294880827923461
+  alloc_id:        2c5c2680-b642-a827-612d-eee8be5afc9c
+  node_name:       heavy-2
+  client_status:   complete
+  task_state:      dead
+  task_failed:     False
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Started: Task started by client
+    - Terminated: Exit Code: 0
+  stdout:
+    --- wrote /opt/aria-outputs/smoke-002.txt ---
+    smoke_id=002
+    uuid=1ae7a239-dd47-4740-b738-b72f75f7b6aa
+    container_hostname=16503f7292bf
+    container_uid=0
+    container_gid=0
+    ts=2026-04-15T23:14:41+00:00
+    nomad_alloc_id=2c5c2680-b642-a827-612d-eee8be5afc9c
+    nomad_node_name=heavy-2
+    md5_in_container=83afcfd94178fd6819505fadd9c7466a
+
+=== aria-storage-smoke/dispatch-1776294880-a9df7ae8 ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294880832605076
+  alloc_id:        8b93ea82-d269-7f3d-0594-9d1bb63febdb
+  node_name:       heavy-2
+  client_status:   complete
+  task_state:      dead
+  task_failed:     False
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Started: Task started by client
+    - Terminated: Exit Code: 0
+  stdout:
+    --- wrote /opt/aria-outputs/smoke-003.txt ---
+    smoke_id=003
+    uuid=bdda3387-f999-4502-8a56-870b75671d2b
+    container_hostname=4db785940256
+    container_uid=0
+    container_gid=0
+    ts=2026-04-15T23:14:41+00:00
+    nomad_alloc_id=8b93ea82-d269-7f3d-0594-9d1bb63febdb
+    nomad_node_name=heavy-2
+    md5_in_container=993b9cec13aaef98e326d53b8fca66e2
+
+=== aria-storage-smoke/dispatch-1776294909-c1668a7f ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294909169911450
+  alloc_id:        df2f3ad6-0272-32dd-6b1d-65b0e0e1b216
+  node_name:       heavy-1
+  client_status:   complete
+  task_state:      dead
+  task_failed:     False
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Driver: Downloading image
+    - Started: Task started by client
+    - Terminated: Exit Code: 0
+  stdout:
+    --- wrote /opt/aria-outputs/smoke-002.txt ---
+    smoke_id=002
+    uuid=4522c733-2059-4f84-a757-0a4fd6bbf03e
+    container_hostname=b01474f6de92
+    container_uid=0
+    container_gid=0
+    ts=2026-04-15T23:15:13+00:00
+    nomad_alloc_id=df2f3ad6-0272-32dd-6b1d-65b0e0e1b216
+    nomad_node_name=heavy-1
+    md5_in_container=1ba209fead451a6d18c709597fc5aa5f
+
+=== aria-storage-smoke/dispatch-1776294914-cad52779 ===
+  Job.Status:      dead
+  ParentID:        aria-storage-smoke
+  SubmitTime:      1776294914188788974
+  alloc_id:        7f251f53-4e35-6322-83d7-95955e92446d
+  node_name:       heavy-3
+  client_status:   complete
+  task_state:      dead
+  task_failed:     False
+  events:
+    - Received: Task received by client
+    - Task Setup: Building Task Directory
+    - Driver: Downloading image
+    - Started: Task started by client
+    - Terminated: Exit Code: 0
+  stdout:
+    --- wrote /opt/aria-outputs/smoke-003.txt ---
+    smoke_id=003
+    uuid=e0440eea-ef42-44cb-9a5e-6bdc7b6ae1b5
+    container_hostname=bda788bae43b
+    container_uid=0
+    container_gid=0
+    ts=2026-04-15T23:15:17+00:00
+    nomad_alloc_id=7f251f53-4e35-6322-83d7-95955e92446d
+    nomad_node_name=heavy-3
+    md5_in_container=60586021ad5633d1060dfbe922d2db8a
+
