@@ -31,37 +31,35 @@
 
 > **重要**: T1 是 Day 0-1 前置闸门, T3/T4 启动条件 = `T1.status == done && T1.new_concerns == ∅`; T1 `awaiting_external` 时 T2 可启动, T3/T4 hold。
 
-- [ ] **T1.1** License 兼容性查证 (1.5h)
-  - 执行 `license-checker --production --json` (JS 依赖)
-  - 执行 `pip-licenses --format=json --with-system` (Python 依赖)
-  - 对 Hermes fork 规划的 upstream 依赖链做 direct + transitive 全扫描
-  - 产出 `license-matrix.json` (direct/transitive 分列, GPL/AGPL/LGPL/Unknown 单列高亮)
-  - **触发**: GPL/AGPL 或 unknown count ≥ 1 → fork 路径自动降级, 倾向自研; LGPL count ≥ 1 → 人类 legal 研判不自动降级
-- [ ] **T1.2** GLM 5.1 ToS 自动化条款查证 (0.5h)
-  - 定位智谱清言官方 API ToS 页面
-  - 识别对"自动化 Agent 调用 / 代理转发"的明确条款
-  - 结论: confirmed / pending / declined → 写入 M0 Report R9 章节
-  - **风险**: 若 declined 或不明 → R9 升级, M1 启动前须产品负责人 pending 态签字
-- [ ] **T1.3** Luxeno 代理授权 + 数据流合规 (0.5h)
-  - 查证 luxeno 官方是否获 GLM 授权作为 API 代理
-  - 确认 luxeno 数据处理条款 (是否落地存储 / DPA 状态)
-  - **约束**: Spike 阶段禁止上传真实代码/issue, 仅用合成 fixture
-- [ ] **T1.4** 跨境合规 (1h, 仅风险提示深度)
-  - 识别 Layer 1 Hermes 通过 luxeno 转发代码到 GLM 的跨境数据流
-  - 不做深度审, 仅出风险提示
-  - 若涉及敏感 IP → 升级为 ad-hoc 法律咨询 (体外预算)
-- [ ] **T1.5** Docker pull 事实分发审计 (0.5h)
-  - 确认 M0 所有文档无 `docker pull aria-runner` 示例
-  - 仅允许 `docker build` 本地构建
-  - Dockerfile 构建时门控 + README WARNING block (T3 实施)
-- [ ] **T1.6** Aether 节点物理归属查证 (0.5h)
-  - 确认 Aether heavy-80/81/82 节点归属 (10CG 自有 / 第三方托管)
-  - 若非自有且无 DPA → 升级为 R10 风险项, 同款签字流程
-- [ ] **T1 交付物**:
-  - `aria-orchestrator/docs/r1-legal-memo.md` (使用 `standards/legal/scoped-memo-template.md`)
-  - Memo 必含: 评估覆盖的司法辖区 / 未覆盖区域 / 风险提示 vs 合规结论的边界 / 失效条件
-  - `license-matrix.json` (T1.1 产出)
-  - 更新 M0 Report R9 三态章节
+**状态 (2026-04-15 回填)**: T1 substantive work 已于 2026-04-14 完成 (Memo v1.1), T3/T4 解锁。产品负责人 final signoff 仍为 `awaiting_external`, 不阻塞 T5/T6, 由 T6 M0 Report 交付时一并完成。
+
+- [x] **T1.1** License 兼容性查证 (1.5h) — 2026-04-14 完成
+  - Spike 第 5 维度执行 `license-checker` + `pip-licenses` 全量扫描, 产出 `aria-orchestrator/spikes/hermes-route/license-matrix.json` (477 packages direct+transitive)
+  - 结果: GPL/AGPL 直接依赖 **0**; LGPL direct **0**; Unknown direct **0** — fork 路径未自动降级 (但最终由 Spike 量化结论 → Option C Extension-only, 非 fork)
+  - 详见 Legal Memo IS-1 + `aria-orchestrator/spikes/hermes-route/license-scan-report.md`
+- [x] **T1.2** GLM 5.1 ToS 自动化条款查证 (0.5h) — 2026-04-14 完成
+  - WebSearch + WebFetch 未定位官方 ToS 自动化条款级文本 ("信息不可得")
+  - 产品负责人锁定策略 = **路径 B (被动 pending + 自承诺签字)**, 写入 M0 Report R9 章节
+  - 详见 Legal Memo IS-2 + §5 结论性质汇总
+- [x] **T1.3** Luxeno 代理授权 + 数据流合规 (0.5h) — 2026-04-14 完成 (v1.1 澄清)
+  - 产品负责人澄清: **Luxeno = silknode (10CG 自有品牌, 不落地存储)**, 不构成第三方代理合规风险, 无需 DPA
+  - 详见 Legal Memo IS-3
+- [x] **T1.4** 跨境合规 (1h, 仅风险提示深度) — 2026-04-14 完成
+  - 基于 IS-3 澄清 (10CG→silknode→GLM 为内部系统 API 透传, 无数据出境存储), **不触发**中国数据出境合规义务
+  - 详见 Legal Memo IS-4
+- [x] **T1.5** Docker pull 事实分发审计 (0.5h) — 2026-04-14 完成
+  - 主仓库 grep 确认: M0 文档无 `docker pull aria-runner` 示例, 仅含本地 `docker build` + 构建时 `DEPLOY_ENV` 门控
+  - 详见 Legal Memo IS-5
+- [x] **T1.6** Aether 节点物理归属查证 (0.5h) — 2026-04-14 完成 (v1.1 澄清)
+  - 产品负责人澄清: **Aether heavy-80/81/82 为 10CG 自有集群**, R10 风险项 **不触发**, 无需第三方 DPA
+  - 失效触发: 未来若引入第三方托管节点 (burst / 混合部署) → Memo 失效, 须重新评估并触发 R10 流程
+  - 详见 Legal Memo IS-6
+- [x] **T1 交付物**:
+  - `aria-orchestrator/docs/r1-legal-memo.md` v1.1 (使用 `standards/legal/scoped-memo-template.md`, 含司法辖区 / Out of Scope / 风险提示 vs 合规结论边界 / 失效条件 §6 / 免责声明 §7)
+  - `aria-orchestrator/spikes/hermes-route/license-matrix.json` (T1.1 产出)
+  - R9 三态章节写入: T6.1 M0 Report 起草时合并
+- [ ] **T1 final signoff** (awaiting_external, 不阻塞 T5/T6)
+  - Memo §8 `Final approver signature` pending, 由 T6 M0 Report 交付时一并完成
 
 **时序约束**:
 - T1 ≤ 4.5h (硬边界)
@@ -167,19 +165,21 @@
 
 ## T5 — AD1-AD12 收敛 (8h)
 
-- [ ] **T5.1** AD 索引草表 (0.5h, Day 1 前置)
-  - 产出 AD1-AD12 的标号 + 标题 + 一行概述
-  - 交产品负责人锁定命名, 避免后期扯皮
-- [ ] **T5.2** 每项 AD 完整撰写 (6h)
-  - `aria-orchestrator/docs/architecture-decisions.md`
-  - 每项含: 决策 / alternatives considered / 选型理由 / 风险 / 回滚路径
-  - **AD3 (Hermes fork 路径)** 留空待 T4 Spike 结论回填
-  - R7 (Nomad meta 64KB) 作为 M1 Layer 1→2 协议硬约定写入
-  - 新增 AD-M0-1 ~ AD-M0-7 (本 Spec proposal 列出的 M0 治理决策)
-- [ ] **T5.3** CLAUDE.md 修订草案 (1h, 不提交)
-  - 基于 AD1-AD12 起草 8 处 diff 草案
-  - 不提交, 待 US-026 执行
-  - 随 M0 Report 一并交产品负责人审阅
+- [x] **T5.1** AD 索引草表 (0.5h, Day 1 前置) — 2026-04-15 完成
+  - `aria-orchestrator/docs/architecture-decisions.md` 已含 AD1-12 + AD-M0-1~7 完整标号 + 标题 + 一行决策
+  - 命名与 PRD v2.0 §架构决策 table 完全一致, 无需产品负责人二次锁定
+- [x] **T5.2** 每项 AD 完整撰写 (6h) — 2026-04-15 完成
+  - `aria-orchestrator/docs/architecture-decisions.md` v0.2
+  - AD1/AD2/AD4-AD12 全量填充 (每项含: 决策 / 背景 / Alternatives Considered / 选型理由 / 风险 / 回滚路径)
+  - AD3 由 T5.4 先行回填 (2026-04-15), 主引用 `spike-report.md`
+  - R7 (Nomad meta 64KB) 已写入 AD4 §风险 #2, 作为 M1 Layer 1→2 协议硬约定 (meta 只传 ISSUE_ID, prompt 走 bind mount 文件)
+  - AD-M0-1 ~ AD-M0-7 (7 项治理决策) 完整撰写, 主引用 2026-04-14 Agent Team review log
+  - 文档版本历史已更新到 v0.2
+- [x] **T5.3** CLAUDE.md 修订草案 (1h, 不提交) — 2026-04-15 完成
+  - `aria-orchestrator/docs/claude-md-revision-draft.md` 已创建
+  - 8 处 diff 完整起草 (Diff 1-8), 严格遵守 AD11 硬约束 (不修改 6 条不可协商规则本体)
+  - Diff 7 新增 "Aria 2.0 运行时" 章节草案 ≤ 50 行
+  - 含 US-026 执行检查清单, 推迟到 US-026 正式提交
 - [x] **T5.4** AD3 回填 (0.5h, T4.done 后) — 2026-04-15 完成
   - Spike Report 结论直接写入 AD3 段落, 含: 选型 / 量化数据 / 回滚路径
   - 产出: `aria-orchestrator/docs/architecture-decisions.md` (新建, AD3 完整填充 + 其余 AD 留 stub 待 T5.2 撰写)
