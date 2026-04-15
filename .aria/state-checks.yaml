@@ -1,0 +1,34 @@
+version: "1"
+
+# 项目级自定义健康检查 — 由 state-scanner Phase 1.11 串行执行
+# 设计目的: 对 state-scanner 各可选/opt-in 阶段做"是否真的跑了"的反向验证,
+# 防止 AI 在执行时跳过某个阶段 (如 Phase 1.13 Issue 感知) 却没人发现。
+#
+# 关键不变量: Phase 1.11 是硬编码执行的 (不像 Phase 1.13 需读 config 判断),
+# 所以在这里放探针 = 利用可靠阶段监视不可靠阶段。
+
+checks:
+  # --- Issue 扫描新鲜度 (防止 Phase 1.13 被跳过) ---
+  - name: "issue-cache-freshness"
+    description: |
+      若 issue_scan.enabled=true, 则 .aria/cache/issues.json 必须存在且
+      在 2×TTL (默认 30min) 内。陈旧或缺失意味着 Phase 1.13 未执行
+      (或被 AI 跳过)。此检查是 Phase 1.13 是否真的跑了的反向证据。
+    command: |
+      if ! grep -q '"issue_scan"' .aria/config.json 2>/dev/null; then
+        echo "OK (disabled)"; exit 0
+      fi
+      if ! grep -A2 '"issue_scan"' .aria/config.json | grep -q '"enabled": true'; then
+        echo "OK (disabled)"; exit 0
+      fi
+      if [ ! -f .aria/cache/issues.json ]; then
+        echo "MISSING — Phase 1.13 never ran"; exit 1
+      fi
+      if [ -z "$(find .aria/cache/issues.json -mmin -30 2>/dev/null)" ]; then
+        echo "STALE — cache > 30min, Phase 1.13 likely skipped"; exit 1
+      fi
+      echo "OK"
+    severity: warning
+    fix: "rm .aria/cache/issues.json && 重跑 /state-scanner 触发 Phase 1.13 live fetch"
+    timeout_seconds: 5
+    enabled: true
