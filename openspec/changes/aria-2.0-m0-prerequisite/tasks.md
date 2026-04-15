@@ -87,15 +87,17 @@
   - 跨 3 节点 md5 交叉校验: 9 个值全一致 (3 节点 × 3 文件)
   - 权限: bind mount 目录 0777 root:root, 容器写入文件 0644 root:root
   - **延后到 M1 US-022**: 非 root 容器 UID (如 1000) 写入 + virtiofs 并发 locking + 三节点同写 last-writer-wins (M0 探针已证通路)
-- [ ] **T2.4** Nomad meta 64KB 边界测试 (0.5h)
-  - 发送一个 60KB 的 meta 参数 dispatch
-  - 确认边界行为, 产出 R7 缓解方案文档 (prompt 走文件, meta 传 ISSUE_ID)
+- [x] **T2.4** Nomad meta 边界测试 (0.5h) — 2026-04-15
+  - 宽扫 1K→1M + 二分 120K→150K, 定位边界 **131048 bytes (max) / 131049 bytes (first fail)** per meta key
+  - 根因: **Linux kernel `MAX_ARG_STRLEN = 131072` (128 KiB)**, 不是 Nomad 限制
+  - PRD R7 "64KB" 假设偏保守, 实际约 128 KiB — 缓解方案 (prompt 走文件) 保持不变, 修订后约束 `len(v) < 100KB` per key
+  - 证据: [`artifacts/t2/t2.4-meta-boundary.md`](./artifacts/t2/t2.4-meta-boundary.md)
 - [x] **T2 交付物** (含 R8 override):
   - [x] [`nfs-status.md`](./artifacts/t2/nfs-status.md)
   - [x] [`aria-storage-smoke.hcl`](./artifacts/t2/aria-storage-smoke.hcl) (原 `aria-nfs-smoke.hcl`, R8 改名)
   - [x] [`storage-validation-report.md`](./artifacts/t2/storage-validation-report.md) (原 `nfs-validation-report.md`, R8 改名, 结论: **A3 假设 PASS**)
   - [x] [`decision-r8-virtiofs-vs-nfs.md`](./artifacts/t2/decision-r8-virtiofs-vs-nfs.md)
-  - [ ] T2.4 `t2.4-meta-boundary.md` (待)
+  - [x] [`t2.4-meta-boundary.md`](./artifacts/t2/t2.4-meta-boundary.md)
   - 原 fallback "单节点 constraint pin heavy-80" 不再适用: W 方案已零侵入全节点验证
 
 **T1 No-Go 下的处置**: T2 产出部分有效 (基础设施事实), knowledge-manager 在 M0 Report 对涉及 GLM/luxeno 的段落做 strikethrough 标注, phase-c-integrator 在 pre_merge 检查点验证。
