@@ -115,12 +115,12 @@
   - aria-plugin 加载: build-time `COPY aria/ /opt/aria-plugin/` + runtime `--plugin-dir` flag (AD2)
   - DEPLOY_ENV 构建时门控 (Dockerfile RUN 层 + CI workflow 双重验证)
   - CI: `.forgejo/workflows/build-aria-runner.yaml` (Aether CI 规范, Forgejo Registry push)
-- [ ] **T3.2** Headless plugin 加载验证 (2h)
+- [x] **T3.2** Headless plugin 加载验证 (2h) — 2026-04-16
   - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.2
   - 容器内 `claude -p --plugin-dir /opt/aria-plugin "列出可用 aria skills"` 期望触发 plugin
   - 判定: stdout 包含 ≥3 个已知 skill 名称 (state-scanner / spec-drafter / brainstorm 等)
   - 证据归档到 `/opt/aether-volumes/aria-runner/outputs/t3-evidence/`
-- [ ] **T3.3** Read-only rootfs + bind mount 共存验证 (1.5h)
+- [x] **T3.3** Read-only rootfs + bind mount 共存验证 (1.5h) — 2026-04-16
   - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.3a-T3.3d
   - T3.3a: `--read-only --tmpfs /tmp -v ...outputs:/opt/aria-outputs` 下 bind mount 可写
   - T3.3b: `/tmp` tmpfs 可写
@@ -140,7 +140,7 @@
   - ai-engineer 审核 5 个模板占位符 (禁含业务纹理)
   - **legal-advisor (人类) 最终签字** 写入 `templates/REVIEW.md`
   - AI agent 意见仅 audit trail, 不构成放行依据
-- [ ] **T3.6** `image_sha256` 记录 (0.5h)
+- [x] **T3.6** `image_sha256` 记录 (0.5h) — 2026-04-16
   - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.6
   - `docker inspect --format='{{.Id}}'` → `t3-evidence/t3.6-image-sha256.txt`
   - CI workflow 也在 step summary 中记录 SHA256
