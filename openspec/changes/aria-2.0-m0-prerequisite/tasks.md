@@ -224,7 +224,11 @@
 - [ ] **T6.5** T1 No-Go 处置 (条件性, 0.5h)
   - 若 T1 最终 No-Go → knowledge-manager 在 M0 Report 对 T2 涉及 GLM/luxeno 段落做 strikethrough
   - phase-c-integrator 在 pre_merge 检查点验证 strikethrough 已完成
-- [ ] **T6.6** Handoff schema 校验 (0.5h)
+- [x] **T6.6** Handoff schema 校验 (0.5h) — 2026-04-16
+  - 产出 `aria-orchestrator/docs/validate-m0-handoff.py` (stdlib only, 无 PyYAML 依赖)
+  - 12 字段 + 类型 + enum + 条件性必填 + final 态完整性检查
+  - 对当前 draft 跑通: ✅ PASS (6 warnings, 全部 pending T1 placeholders)
+  - 三场景测试 (draft / final / pending-forgot-signoff) 全部符合预期
   - audit-engine pre_merge 检查 `m0-handoff.yaml` schema 完整性
   - `prd_patch_pr` 缺失或空 → block US-020 关闭
   - `r9_status == pending` 且无 `r9_signoff` → block
