@@ -36,8 +36,10 @@ jobs:
           fetch-depth: 0
 
       - name: Init submodules via internal HTTP
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
         run: |
-          git config --global url."http://192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
+          git config --global url."http://forge:${FORGEJO_TOKEN}@192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
           git submodule update --init --recursive
 
       - name: Verify DEPLOY_ENV gate
