@@ -1,0 +1,114 @@
+# aria-runner Docker 镜像构建 — M0 探针 + M1 生产基线
+#
+# 遵循 Aether CI 规范 (参考 kairos deploy.yaml)
+# 触发: 手动 dispatch (M0) 或 aria-orchestrator/docker/ 路径变更 (M1+)
+#
+# Spec: aria-2.0-m0-prerequisite §T3.1
+
+name: Build aria-runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'DEPLOY_ENV gate (must be "internal")'
+        required: true
+        default: 'internal'
+      image_tag:
+        description: 'Image tag (default: claude-m0)'
+        required: false
+        default: 'claude-m0'
+
+  push:
+    branches: [feature/aria-2.0-m0-prerequisite]
+    paths:
+      - 'aria-orchestrator/docker/aria-runner/**'
+
+jobs:
+  build:
+    name: Build & Push aria-runner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Verify DEPLOY_ENV gate
+        run: |
+          DEPLOY_ENV="${{ github.event.inputs.deploy_env || 'internal' }}"
+          if [ "$DEPLOY_ENV" != "internal" ]; then
+            echo "::error::DEPLOY_ENV must be 'internal', got '$DEPLOY_ENV'"
+            exit 1
+          fi
+
+      - name: Verify aria-plugin submodule
+        run: |
+          if [ ! -f aria/.claude-plugin/plugin.json ]; then
+            echo "::error::aria-plugin submodule not initialized"
+            exit 1
+          fi
+          echo "aria-plugin version: $(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")"
+
+      - name: Set image tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.image_tag || 'claude-m0' }}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "full=forgejo.10cg.pub/10cg/aria-runner:$TAG" >> $GITHUB_OUTPUT
+          echo "sha=forgejo.10cg.pub/10cg/aria-runner:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
+      - name: Login to Forgejo Registry
+        uses: docker/login-action@v3
+        with:
+          registry: forgejo.10cg.pub
+          username: ${{ secrets.FORGEJO_USER }}
+          password: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: aria-orchestrator/docker/aria-runner/Dockerfile
+          push: false
+          load: true
+          build-args: |
+            DEPLOY_ENV=internal
+          tags: |
+            ${{ steps.tag.outputs.full }}
+            ${{ steps.tag.outputs.sha }}
+
+      - name: Verify image
+        run: |
+          docker image inspect ${{ steps.tag.outputs.full }}
+          echo "--- image size ---"
+          docker image ls ${{ steps.tag.outputs.full }} --format "{{.Size}}"
+          echo "--- entrypoint check ---"
+          docker run --rm --entrypoint sh ${{ steps.tag.outputs.full }} -c \
+            "claude --version && test -f /opt/aria-plugin/.claude-plugin/plugin.json && echo 'plugin OK'"
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.tag.outputs.full }}
+          docker push ${{ steps.tag.outputs.sha }}
+          echo "✅ Pushed: ${{ steps.tag.outputs.full }}"
+          echo "✅ Pushed: ${{ steps.tag.outputs.sha }}"
+
+      - name: Record image SHA256
+        run: |
+          SHA=$(docker inspect --format='{{.Id}}' ${{ steps.tag.outputs.full }})
+          echo "image_sha256=$SHA"
+          echo "## aria-runner Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | \`${{ steps.tag.outputs.full }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| SHA | \`$SHA\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plugin | aria v$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])") |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
