@@ -106,25 +106,26 @@
 
 ## T3 — A1 Dockerfile + headless plugin + GLM smoke (10h)
 
-> **前置**: T1.done (T3 依赖合规结论), T2.pass (需要 NFS 路径确认)
+> **前置**: T1.done (T3.4/T3.5 依赖合规结论), T2.pass ✅ (bind mount 路径已确认)
+> **T3.1-T3.3 + T3.6 合规中性**: 不触碰 GLM/luxeno, 不依赖 T1, 可并行推进
 
-- [ ] **T3.1** Dockerfile 初版 (3h)
-  - 基于 `node:20-bookworm-slim`
-  - 预装 `@anthropic-ai/claude-code` + aria-plugin (软链到 `/root/.claude/plugins/aria`)
-  - **构建时门控**:
-    ```dockerfile
-    ARG DEPLOY_ENV=internal
-    RUN [ "$DEPLOY_ENV" = "internal" ] || { echo "ERROR: aria-runner must not be deployed outside 10CG Lab private cluster"; exit 1; }
-    ```
-  - README.md WARNING block (版本日期 + Dockerfile commit SHA), 并行维护
+- [x] **T3.1** Dockerfile 初版 (3h) — 2026-04-16
+  - `aria-orchestrator/docker/aria-runner/Dockerfile` + `entrypoint.sh`
+  - 基于 `node:20-bookworm-slim` + `@anthropic-ai/claude-code@latest` (npm global)
+  - aria-plugin 加载: build-time `COPY aria/ /opt/aria-plugin/` + runtime `--plugin-dir` flag (AD2)
+  - DEPLOY_ENV 构建时门控 (Dockerfile RUN 层 + CI workflow 双重验证)
+  - CI: `.forgejo/workflows/build-aria-runner.yaml` (Aether CI 规范, Forgejo Registry push)
 - [ ] **T3.2** Headless plugin 加载验证 (2h)
-  - `docker build -t aria-runner:claude-m0 --build-arg DEPLOY_ENV=internal .`
-  - 容器内运行 `claude -p "查看 Aria 项目状态"` 期望触发 state-scanner
-  - stdout 证据归档到 `t3-headless-plugin-evidence.log`
+  - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.2
+  - 容器内 `claude -p --plugin-dir /opt/aria-plugin "列出可用 aria skills"` 期望触发 plugin
+  - 判定: stdout 包含 ≥3 个已知 skill 名称 (state-scanner / spec-drafter / brainstorm 等)
+  - 证据归档到 `/opt/aether-volumes/aria-runner/outputs/t3-evidence/`
 - [ ] **T3.3** Read-only rootfs + bind mount 共存验证 (1.5h)
-  - `docker run --read-only --tmpfs /tmp -v $(pwd)/aria-outputs:/opt/aria-outputs ...`
-  - 确认 `/opt/aria-outputs/` 可写 (read-only rootfs 不影响 bind mount)
-  - 确认 headless plugin 加载在 read-only 模式下不报错 (任何隐性写路径问题暴露)
+  - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.3a-T3.3d
+  - T3.3a: `--read-only --tmpfs /tmp -v ...outputs:/opt/aria-outputs` 下 bind mount 可写
+  - T3.3b: `/tmp` tmpfs 可写
+  - T3.3c: rootfs 写入被正确拒绝
+  - T3.3d: `claude -p` 在 read-only 模式下运行 (需 tmpfs 覆盖 `~/.claude` / `~/.npm` / `~/.config`)
 - [ ] **T3.4** GLM smoke test (1.5h)
   - 从 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` 模板生成 5 条合成 prompt (禁止真实采样)
   - 用 GLM 5.1 API 生成拟人任务描述
@@ -140,7 +141,9 @@
   - **legal-advisor (人类) 最终签字** 写入 `templates/REVIEW.md`
   - AI agent 意见仅 audit trail, 不构成放行依据
 - [ ] **T3.6** `image_sha256` 记录 (0.5h)
-  - `docker inspect aria-runner:claude-m0 --format '{{.Id}}'` 写入 `m0-handoff.yaml.image_sha256`
+  - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.6
+  - `docker inspect --format='{{.Id}}'` → `t3-evidence/t3.6-image-sha256.txt`
+  - CI workflow 也在 step summary 中记录 SHA256
 - [ ] **T3.7** 缓冲 (0.5h)
 
 **T3 触发阈值**: 实测 > 16h → A1 失败评估, 可能触发 R8
