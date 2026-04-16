@@ -152,7 +152,7 @@
 
 ## T4 — Hermes Spike (52h, 详见 Spike Spec)
 
-详见 [aria-2.0-m0-spike-hermes/tasks.md](../aria-2.0-m0-spike-hermes/tasks.md).
+详见 [aria-2.0-m0-spike-hermes/tasks.md](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/tasks.md).
 
 本任务在本 Spec 中仅作为占位 + 工时预算登记, 具体步骤与验收在 Spike Spec 内定义。
 
@@ -165,7 +165,7 @@
 - [x] **T4.done** — Spike 已完成
 - **实际工时**: ~4.5h (原估 52h, 节省 47.5h / 91%)
 - **裁决推荐**: `recommendation: option-c-extension-only` (Option C Extension-only tool pack)
-- **Spike Report (主引用)**: [`../aria-2.0-m0-spike-hermes/spike-report.md`](../aria-2.0-m0-spike-hermes/spike-report.md)
+- **Spike Report (主引用)**: [`../../archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md`](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md)
 - **Spike 代码路径**: [`aria-orchestrator/spikes/hermes-route/`](../../../aria-orchestrator/spikes/hermes-route/)
   - `option-c-poc/` — POC 源码 (286 LoC 业务 + 176 LoC 测试, 18/18 tests pass)
   - `license-matrix.json` / `license-scan-report.md` — 477 packages 扫描
@@ -200,21 +200,20 @@
   - 产出: `aria-orchestrator/docs/architecture-decisions.md` (新建, AD3 完整填充 + 其余 AD 留 stub 待 T5.2 撰写)
   - AD3 决议: `option-c-extension-only` (Extension-only tool pack via hermes entry-point plugin API)
   - 含: 决策 / 背景 (3 条 PRD 原假设反证) / 3 alternatives (A fork / B 自研 / R8) / 选型理由 (8 维度对比表) / 5 风险项 + 缓解 / 3 级回滚路径 / PRD v2.0 反转建议 / 合规性 flag (需产品负责人接受 2 项缩减)
-  - 主引用: `openspec/changes/aria-2.0-m0-spike-hermes/spike-report.md`
+  - 主引用: `openspec/archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md`
 
 ---
 
 ## T6 — M0 Report + Handoff + PRD Patch (7.5h)
 
-- [ ] **T6.1** M0 Report 撰写 (3h)
-  - `aria-orchestrator/docs/m0-report.md`
-  - 含: 架构决策摘要 / Spike 结论 / 5 项假设验证结果 / 风险确认 / M1 精确路径
-  - **R9 三态章节** (`received / pending / declined`)
-  - 签字位 footer 统一表述
-- [ ] **T6.2** `m0-handoff.yaml` 生成 (1h)
-  - Schema v1.1 12 字段完整填写
-  - 作为 M0 Report 机读附件
-  - `image_sha256` 来自 T3.6, `glm_smoke_passed` 来自 T3.4, `spike_code_path` 来自 T4, `ad3_conclusion` 来自 T5.4
+- [x] **T6.1** M0 Report 撰写 (3h) — 2026-04-16 v0.1 draft 完成
+  - `aria-orchestrator/docs/m0-report.md` 9 节 (Executive Summary / ADR 摘要 / Spike 结论 / 5 项假设 / 风险 / R9 三态 / M1 路径 / 签字位 / 索引)
+  - 待 T1 Legal final signoff 后升级 v1.0
+- [x] **T6.2** `m0-handoff.yaml` 生成 (1h) — 2026-04-16
+  - `aria-orchestrator/docs/m0-handoff.yaml` schema v1.1 12 字段 + extended metadata
+  - 已填: spike_code_path / nfs_path / image_tag / image_sha256 / ad3_conclusion / report_version
+  - Pending T1: go_decision / prd_patch_pr / r9_status / r9_signoff / pd_signoff / glm_smoke_passed
+  - hermes spike 两项回填已完成 (Spec 归档 2026-04-16)
 - [ ] **T6.3** PRD patch PR 起草 (1.5h, 仅在产品负责人 Go-with-revision 时触发)
   - 若产品负责人裁决含局部 PRD 修订 → 起草 `prd_patch_pr`
   - 记录 PR 号到 `m0-handoff.yaml.prd_patch_pr`
@@ -253,5 +252,5 @@
 
 - [proposal.md](./proposal.md)
 - [US-020](../../../docs/requirements/user-stories/US-020.md)
-- [Spike Spec](../aria-2.0-m0-spike-hermes/)
+- [Spike Spec](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/)
 - [Agent Team review log](../../../.aria/decisions/2026-04-14-us020-agent-team-review.md)

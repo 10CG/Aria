@@ -1,13 +1,18 @@
 # aria-2.0-m0-spike-hermes — Hermes fork vs 自研路线 Spike
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Complete — 2026-04-16 (verdict: Option C Extension-only, 节省 51.5h)
 > **Created**: 2026-04-14
+> **Completed**: 2026-04-15 (spike-report.md) + 2026-04-16 (m0-handoff 回填)
 > **Parent Story**: [US-020](../../../docs/requirements/user-stories/US-020.md)
 > **Parent Spec**: [aria-2.0-m0-prerequisite](../aria-2.0-m0-prerequisite/proposal.md) (本 Spec 是 T4 的独立化)
 > **Target Version**: v2.0.0-m0
 > **Timebox**: 1 sprint (~52h, 硬边界 > 60h 评估, > 72h 强制终止)
 > **Source**: PRD v2.0 §AD3 + Agent Team R3 投票 2:2 分歧
+>
+> **归档说明**: ST1 (fork 路径深挖) 和 ST3 (自研路径实现) 的子任务在 ST3.5 Option C POC
+> 证明新路径可行后**显式跳过**, 详见 `spike-report.md` §6.2 合规性声明。这是 Spike
+> 的正当提前终止 (alternatives pruned by POC winner), 非任务遗漏。
 
 ## Why
 

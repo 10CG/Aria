@@ -26,22 +26,22 @@
 
 ## ST1 — Hermes Upstream 源码分析 + Fork 骨架 (6h)
 
-- [ ] **ST1.1** 克隆 NousResearch/hermes-agent v0.7+ upstream (0.5h)
+- [x] **ST1.1** (skipped: Option C 取代, 见 spike-report.md §6.2) 克隆 NousResearch/hermes-agent v0.7+ upstream (0.5h)
   - 推到 `forgejo.10cg.pub/10CG/hermes-agent` (fork)
   - 添加 `github` remote 指向 upstream (tracking)
-- [ ] **ST1.2** 源码结构分析 (2h)
+- [x] **ST1.2** (skipped: Option C 取代, 见 spike-report.md §6.2) 源码结构分析 (2h)
   - 识别 core/extension/plugin 边界
   - 确认 fork 安全扩展路径 (预期 `internal/aria/` 独立目录)
   - 产出 `spikes/hermes-route/upstream-structure.md`
-- [ ] **ST1.3** Fork 骨架建立 (2h)
+- [x] **ST1.3** (skipped: Option C 取代, 见 spike-report.md §6.2) Fork 骨架建立 (2h)
   - 在 `internal/aria/` 创建 Layer 1 状态机骨架
   - 最小文件: `state_machine.py`, `gateway.py`, `dispatcher.py`, `tests/test_transitions.py`
   - 确保 fork build + upstream test pass 不受影响
-- [ ] **ST1.4** Upstream changelog 采集 (1h)
+- [x] **ST1.4** (skipped: Option C 取代, 见 spike-report.md §6.2) Upstream changelog 采集 (1h)
   - `git log --since="6 months ago" --oneline upstream/main | wc -l`
   - 记录到 `spikes/hermes-route/upstream-velocity.txt`
   - 月度中位数: `<count> / 6`
-- [ ] **ST1.5** 缓冲 (0.5h)
+- [x] **ST1.5** (skipped: Option C 取代, 见 spike-report.md §6.2) 缓冲 (0.5h)
 
 ---
 
@@ -49,13 +49,13 @@
 
 > **ST2 更新 (2026-04-15)**: ST2.3/2.4/2.5 完成 (实际 ~1.5h, 原估 4.5h, 节省 3h)。Primary scan 结果触发 fork 路径自动降级 (AGPL=1 from `ua-parser-js@2.0.9` via browser 子图)。ST2.1/2.2 **有条件推迟**到 ST3.5 Option C POC 结束后, 依据 POC 结果决定是否跑完整 rebase 或缩减为"仅记录"。详见 [license-scan-report.md §8](../../../aria-orchestrator/spikes/hermes-route/license-scan-report.md)。
 
-- [ ] **ST2.1** 第 1 次 rebase 实操 (4h) — **推迟至 ST3.5 POC 后**
+- [x] **ST2.1** (skipped: Option C 取代, 见 spike-report.md §6.2) 第 1 次 rebase 实操 (4h) — **推迟至 ST3.5 POC 后**
   - `git fetch upstream && git rebase upstream/main`
   - 解决所有冲突, 跑 upstream 测试套件确认通过
   - **记录每步工时** (每 0.5h 精度) 到 `spikes/hermes-route/rebase-log.md`
   - 量化指标: 总工时, 冲突文件数, 冲突段数
   - **条件**: 若 ST3.5 Option C POC 成功, 本任务缩减为"仅记录 upstream velocity + 粗估工时", 不执行完整 rebase
-- [ ] **ST2.2** 单次 rebase × 1.5 月度估算 (0.5h) — **推迟至 ST3.5 POC 后**
+- [x] **ST2.2** (skipped: Option C 取代, 见 spike-report.md §6.2) 单次 rebase × 1.5 月度估算 (0.5h) — **推迟至 ST3.5 POC 后**
   - 月度估算 = ST2.1 实测工时 × 1.5 (固定系数)
   - 产品负责人可上调至 ×2.0 (裁决时), > ×2.0 需 tech-lead 第二签字
   - 附 ST1.4 upstream velocity 数据作为上调依据参考
@@ -76,38 +76,38 @@
     - `gpl_count + agpl_count > 0` 或 `unknown_count ≥ 1` → fork 路径自动降级 ✅ **触发** (AGPL=1)
     - `lgpl_count > 0` → 人类 legal-advisor 研判 ✅ **触发** (LGPL=1, 风险低)
   - **路径特异性**: AGPL 仅影响 Option A (fork), Option B/C 不受影响 → **Option C 优势从"rebase 节省"升级为"license+rebase 双重节省"**
-- [ ] **ST2.6** 缓冲 (1h)
+- [x] **ST2.6** (skipped: Option C 取代, 见 spike-report.md §6.2) 缓冲 (1h)
 
 ---
 
 ## ST3 — 自研路径: Gateway + SQLite 状态机原型 (20h)
 
-- [ ] **ST3.1** 项目骨架 (1h)
+- [x] **ST3.1** (skipped: Option C 取代, 见 spike-report.md §6.2) 项目骨架 (1h)
   - `spikes/hermes-route/self-built/` 目录
   - Python 3.11+, pyproject.toml, pytest 配置
   - SQLite schema v0 (dispatches 表, WAL mode)
-- [ ] **ST3.2** Gateway stub (飞书 API 最小调用) (4h)
+- [x] **ST3.2** (skipped: Option C 取代, 见 spike-report.md §6.2) Gateway stub (飞书 API 最小调用) (4h)
   - 最小飞书 webhook 调用封装
   - Human gate 卡片发送 + approve/reject callback
   - 最小配置: token / chat_id / secret
-- [ ] **ST3.3** SQLite 状态持久化 (3h)
+- [x] **ST3.3** (skipped: Option C 取代, 见 spike-report.md §6.2) SQLite 状态持久化 (3h)
   - Active dispatches 表
   - State transition 原子写 (temp file + rename)
   - Crash recovery 扫描逻辑
-- [ ] **ST3.4** 9 状态 (简化为 5 状态) 基础实现 (6h)
+- [x] **ST3.4** (skipped: Option C 取代, 见 spike-report.md §6.2) 9 状态 (简化为 5 状态) 基础实现 (6h)
   - S0_IDLE / S_DISPATCHED / S_RUNNING / S_AWAITING_HUMAN / S_RESUMED / S_FAIL
   - 状态定义 + 合法 transition 表 + 异常处理
-- [ ] **ST3.5** 单元测试 (3h)
+- [x] **ST3.5** (skipped: Option C 取代, 见 spike-report.md §6.2) 单元测试 (3h)
   - 100% transition 覆盖 (PRD NFR: 状态机单元测试 100%)
   - 跑 `pytest --cov` 确认覆盖率
-- [ ] **ST3.6** LoC 统计 (0.5h)
+- [x] **ST3.6** (skipped: Option C 取代, 见 spike-report.md §6.2) LoC 统计 (0.5h)
   - `cloc --include-lang=Python --exclude-dir=.venv,__pycache__,migrations .`
   - 业务 LoC vs 测试 LoC 分列
   - 记录到 `spikes/hermes-route/self-built-loc.json`
-- [ ] **ST3.7** 实测开发工时记录 (持续, 0.5h 记录)
+- [x] **ST3.7** (skipped: Option C 取代, 见 spike-report.md §6.2) 实测开发工时记录 (持续, 0.5h 记录)
   - 每个子任务开始/结束打卡
   - 汇总到 `spikes/hermes-route/self-built-hours.md`
-- [ ] **ST3.8** 缓冲 (2h)
+- [x] **ST3.8** (skipped: Option C 取代, 见 spike-report.md §6.2) 缓冲 (2h)
 
 ---
 
@@ -269,9 +269,9 @@ idle → dispatched → running → awaiting_human → resumed
 - [x] 所有 ST1-ST6 任务完成且有证据归档 (ST3 自研原型跳过, 见 spike-report.md §6.2 显式合规性声明)
 - [x] ~~`metrics.json` 完整~~ → 替代为 `spike-report.md §2` 量化数据表 + `license-matrix.json` 机读数据
 - [x] `spike-report.md` 产出, 含裁决矩阵 + 推荐 (Option C Extension-only)
-- [ ] 裁决结论 `option-c-extension-only` 回填到父 Spec `m0-handoff.yaml.ad3_conclusion` — **待 M0 T5 执行**
+- [x] 裁决结论 `option-c-extension-only` 回填到父 Spec `m0-handoff.yaml.ad3_conclusion` — 2026-04-16 完成 (T6.2)
 - [x] 触发 PRD AD3 修订 → patch 文本起草完成 (见 spike-report.md §0.3 + §5.2)
-- [ ] Spike Report 路径在 `m0-handoff.yaml.spike_code_path` 记录 — **待 M0 T5 执行**
+- [x] Spike Report 路径在 `m0-handoff.yaml.spike_code_path` 记录 — 2026-04-16 完成 (T6.2, 值: `aria-orchestrator/spikes/hermes-route/`)
 
 ## 关联文档
 

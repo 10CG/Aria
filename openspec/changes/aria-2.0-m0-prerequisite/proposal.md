@@ -5,7 +5,7 @@
 > **Created**: 2026-04-14
 > **Parent Story**: [US-020](../../../docs/requirements/user-stories/US-020.md)
 > **Target Version**: v2.0.0-m0
-> **Related Spec**: [aria-2.0-m0-spike-hermes](../aria-2.0-m0-spike-hermes/proposal.md) (Spike 专项 Spec, 本 Spec 产出依赖其结论回填 AD3)
+> **Related Spec**: [aria-2.0-m0-spike-hermes](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md) (Spike 专项 Spec, 本 Spec 产出依赖其结论回填 AD3)
 > **Source**: PRD v2.0 §M0 + Agent Team 4 轮收敛 ([review log](../../../.aria/decisions/2026-04-14-us020-agent-team-review.md))
 
 ## Why
@@ -95,4 +95,4 @@ M0 的存在 = 把假设验证压到 2 周可控窗口内, 让产品负责人基
 - US-020: [docs/requirements/user-stories/US-020.md](../../../docs/requirements/user-stories/US-020.md)
 - Brainstorm 决策: [.aria/decisions/2026-04-14-aria-2.0-us020-scope.md](../../../.aria/decisions/2026-04-14-aria-2.0-us020-scope.md)
 - Agent Team 收敛: [.aria/decisions/2026-04-14-us020-agent-team-review.md](../../../.aria/decisions/2026-04-14-us020-agent-team-review.md)
-- Spike Spec: [../aria-2.0-m0-spike-hermes/proposal.md](../aria-2.0-m0-spike-hermes/proposal.md)
+- Spike Spec: [../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md)
