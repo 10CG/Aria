@@ -30,15 +30,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Rewrite submodule URLs to internal HTTP
-        run: |
-          git config --global url."http://192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
-
-      - name: Checkout with submodules
+      - name: Checkout (without submodules)
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
+
+      - name: Init submodules via internal HTTP
+        run: |
+          git config --global url."http://192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
+          git submodule update --init --recursive
 
       - name: Verify DEPLOY_ENV gate
         run: |
