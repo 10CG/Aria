@@ -215,10 +215,13 @@
   - 已填: spike_code_path / nfs_path / image_tag / image_sha256 / ad3_conclusion / report_version
   - Pending T1: go_decision / prd_patch_pr / r9_status / r9_signoff / pd_signoff / glm_smoke_passed
   - hermes spike 两项回填已完成 (Spec 归档 2026-04-16)
-- [ ] **T6.3** PRD patch PR 起草 (1.5h) — 已触发 (T6.4 Go-with-revision 2026-04-16)
-  - **scope**: AD3 反转 (fork-default → option-c-extension-only); 引用 spike-report.md
-  - 起草 `prd_patch_pr` → 记录 PR 号到 `m0-handoff.yaml.prd_patch_pr`
-  - PR 必须 3 工作日内合并 (2026-04-19 前), 否则冻结 US-021 启动
+- [x] **T6.3** PRD patch PR 起草 (1.5h) — 2026-04-16
+  - **scope**: AD3 反转 (fork-default → option-c-extension-only); 12 处文档同步修改
+  - **PR**: [10CG/Aria#19](https://forgejo.10cg.pub/10CG/Aria/pulls/19)
+  - 分支: `feature/prd-v2-ad3-option-c-patch` (从 master 分出, 独立合并)
+  - PRD 版本: 2.0.0 → **2.1.0** (§版本历史 新增 entry)
+  - 合并截止: **2026-04-19** (3 工作日 per R3-D1.2), 否则冻结 US-021 启动
+  - handoff.yaml.prd_patch_pr 已回填 `"10CG/Aria#19"`
 - [~] **T6.4** 产品负责人评审 (0.5h) — Phase 1 完成 2026-04-16, Phase 2 待 T6.3/T3.4
   - **Phase 1** (已完成): owner (simonfish, per AD-M0-9) 审阅 M0 Report v0.9, 裁决 **Go-with-revision**
     - M0 Report §7.2 velocity_cosign 已签 (×3.76 加速, 超 ×2.0 阈值)
