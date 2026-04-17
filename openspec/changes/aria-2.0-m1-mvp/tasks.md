@@ -2,7 +2,7 @@
 
 > **Parent**: [proposal.md](./proposal.md)
 > **US**: [US-021](../../../docs/requirements/user-stories/US-021.md)
-> **Total**: ~100h (Core ~80h + Buffer ~20h, per PRD v2.1 §M1 baseline)
+> **Total**: ~107h (Core 87h + Buffer 20h, PRD 100h baseline ±7%)
 > **Status**: Draft (Phase A.2 post_spec convergence done 2026-04-17 Round 6)
 
 ## Task 工时基线
@@ -10,15 +10,15 @@
 | ID | Task | 估算 | 依赖 | 验收 | Agent 主责 |
 |----|------|------|------|------|-----------|
 | **T0** | M1 kickoff + synthetic fixture 初始化 | 2h | — | T0.done | knowledge-manager |
-| **T1** | Legal carryover + Registry auth + 镜像生产化 | 12h | T0 | T1.done + `anthropic_api_terms_verified=true` | legal-advisor (T1.a) + backend-architect (T1.b/c) |
-| **T2** | Nomad job template + host volume (outputs + inputs 三节点) | 16h | T1.c (镜像 available) | T2.done + inputs volume 三节点 smoke PASS | backend-architect |
-| **T3** | Issue schema v0.1 + dispatch 脚本 + DEMO fixture | 14h | T2 | T3.done + schema validator PASS | backend-architect + ai-engineer (prompt 模板) |
-| **T4** | Runner entrypoint (prompt 模板 + stream-json + 幂等三态 + trap) | 20h | T3 | T4.done + 单次 DEMO dispatch smoke PASS | ai-engineer + backend-architect |
-| **T5** | DEMO E2E 5 轮 × 2 + profiling | 16h | T4 | T5.done + `e2e_demo_passed=true` | qa-engineer + ai-engineer |
-| **T6** | M1 Report + handoff v1.0 + AD-M1-* 回写 | 6h | T1-T5 | T6.done + handoff validator PASS (final) | knowledge-manager + tech-lead |
-| Buffer | 预留 | 20h | — | Week 2 checkpoint 触发分配 | — |
+| **T1** | Legal carryover + Registry auth + 镜像 scaffold | 12h | T0 | T1.done + `anthropic_api_terms_verified=true` | legal-advisor (T1.a) + backend-architect (T1.b/c) |
+| **T2** | Nomad job template + host volume (outputs + inputs 三节点) | 16h | T1.c (scaffold 镜像 available) | T2.done + inputs volume 三节点 smoke PASS | backend-architect |
+| **T3** | Issue schema v0.1 + dispatch 脚本 + DEMO fixture + **prompt 模板 + 引擎选型** | 15h | T2 | T3.done + schema validator PASS + T3.4.0 引擎决议 | backend-architect + ai-engineer (T3.4) |
+| **T4** | Runner entrypoint (prompt 渲染 + stream-json + 幂等三态 + trap + 真实 API smoke) | 20h | T3 | T4.done + T4.5 真实 Anthropic API smoke PASS | backend-architect (T4.1/4.4) + ai-engineer (T4.2/4.3) |
+| **T5** | T1.c final rebuild + DEMO E2E 5 轮 × 2 + profiling + performance_baseline 聚合 | 16h | T4 | T5.done + `e2e_demo_passed=true` | qa-engineer + ai-engineer + tech-lead (failed triage) |
+| **T6** | M1 Report + handoff v1.0 (+tech-lead co-sign) + AD-M1-* 回写 | 6h | T1-T5 | T6.done + handoff validator PASS (final) + tech-lead co-sign | knowledge-manager + tech-lead |
+| Buffer | 预留 (soft 14h + hard 6h) | 20h | — | soft cap 按 T 分类 / hard reserve 需 owner 签字 | — |
 
-**Total Core**: 86h; **Buffer**: 20h (含 R-M1-7 Week 2 checkpoint reforecast 机制)
+**Total Core**: 87h; **Buffer**: 20h (soft 14h + hard 6h, 含 R-M1-7 Week 2 checkpoint reforecast 机制). **Total**: 107h (PRD 100h baseline ± 7%, 合理范围内)
 
 ---
 
@@ -32,7 +32,10 @@
   - 内容: README.md + `src/` 空 Python/Node/Go 模块 × 3 (供 DEMO-002 非语言绑定)
   - commit 基线 (供 DEMO-002 验证 diff 命中)
 - [ ] **T0.3** 架构决策位约定 (0.5h)
-  - `aria-orchestrator/docs/architecture-decisions.md` 预开 AD-M1-1 ~ AD-M1-9 占位 (T6 统一回填)
+  - `aria-orchestrator/docs/architecture-decisions.md` 预开 **AD-M1-1 ~ AD-M1-11** 占位 (T6 统一回填, per TL-P2-M1 扩位)
+    - AD-M1-1~9 见 proposal §架构决策
+    - AD-M1-10 prompt 引擎选型 (T3.4.0 决议)
+    - AD-M1-11 ANTHROPIC_API_KEY 注入方案 (T2.2.1 决议)
   - `.aria/decisions/` 文件夹无需新建 (已有 M1 scope reorg 决议)
 - [ ] **T0.4** 缓冲 (0.2h)
 
@@ -57,7 +60,7 @@
   - 输出 `m0-m1-transition-audit.md` 附在 memo 尾部
 - [ ] **T1.a.3** Owner signoff (0.3h, per AD-M0-9 solo-lab)
   - Memo 最后一行 `Signed-by: human:simonfish @ 2026-MM-DD` (机械 gate 检测)
-- [ ] **T1.a.4** 缓冲 (0.2h)
+- [ ] **T1.a.4** 缓冲 (0.5h, 原 0.2h → 0.5h 纠正 T1 加总 per CR-R1-M1; T1.a 总 = 3.8h ≈ 4h 报表)
 
 **T1.a.DoD**: memo 文件存在 + 最后一行签字 + `handoff.legal_assumptions.anthropic_api_terms_verified=true` 可回填。
 
@@ -80,21 +83,29 @@
 
 **T1.b.DoD**: `docker push` 成功 + token lifecycle design 文档存在 + access audit 报告存在。
 
+**T1.b 回退联动 (per BA-R1-T1b-GAP)**: 若 T1.b.1 Spike 回退触发 (`docker push` 不可行 → nomad artifact + docker load) → T2.2.1 HCL template 必须切换 `artifact` stanza 替代 `volume + registry pull`, 估算 +8h 落入 Hard reserve (非 Soft cap)。T1.b.3 access audit 范围也相应调整 (无 registry access 则仅审 artifact HTTP 源)。
+
 ### T1.c — 镜像生产化 (4h)
 
-- [ ] **T1.c.1** Dockerfile 微调 (1h) — 继承 M0 `aria-runner/Dockerfile`, 调整:
-  - `ENV ARIA_MODEL=claude-opus-4-5-20250929` (per AD-M1-6 snapshot id)
-  - 无 `ANTHROPIC_BASE_URL` (officially unset, per AD-M1-6)
-  - `ENTRYPOINT` 升级为 T4 新版本 (接 T4 交付)
+- [ ] **T1.c.1** Dockerfile scaffold 版 (1h, per TL-P1-I1 两阶段方案)
+  - 继承 M0 `aria-runner/Dockerfile`, 调整:
+    - `ENV ARIA_MODEL=claude-opus-4-5-20250929` (per AD-M1-6 snapshot id)
+    - 无 `ANTHROPIC_BASE_URL` (officially unset, per AD-M1-6)
+    - `ENTRYPOINT` 用 **M0 stub entrypoint** (skill load only, 解锁 T2 启动)
+  - 根据 T3.4.0 引擎选型决议: 若 Jinja2 → 加 `RUN pip install jinja2`
 - [ ] **T1.c.2** Build + tag 策略 (1h, per AD-M1-2)
-  - `docker build -t forgejo.10cg.pub/10CG/aria-runner:claude-<sha>` (immutable)
+  - `docker build -t forgejo.10cg.pub/10CG/aria-runner:claude-<sha1>` (scaffold, immutable)
   - `docker tag ... forgejo.10cg.pub/10CG/aria-runner:claude-latest` (mutable)
-  - 记录 `image_sha256`
+  - 记录 `image_sha256_scaffold`
 - [ ] **T1.c.3** Push 两 tag 到 registry (0.5h)
-- [ ] **T1.c.4** 镜像 pull 验证 (从三个 heavy 节点, 各 auth + pull 成功) (1h)
-- [ ] **T1.c.5** 缓冲 (0.5h)
+- [ ] **T1.c.4** 镜像 pull 验证 (从三个 heavy 节点, 各 auth + pull 成功) (0.5h)
+- [ ] **T1.c.5** Registry push 流程文档 (0.5h, per KM-PL-02 proposal §What 交付物 1 对齐)
+  - 产出: `nomad/registry-push-guide.md` (含 `.env.local` 模式, auth 步骤, 失败排错)
+- [ ] **T1.c.6** 缓冲 (0.5h)
 
-**T1.c.DoD**: registry 有 `claude-<sha>` + `claude-latest` 两 tag; 三 heavy 节点均可 pull; `image_sha256` 记入 T6.
+**T1.c (scaffold) DoD**: registry 有 `claude-<sha1>` + `claude-latest` 两 tag; 三 heavy 节点均可 pull; `image_sha256_scaffold` 记入 T6 临时字段; registry push 流程文档化。
+
+> **T1.c (final) 在 T4.5 之后**: T4 entrypoint 完成后 rebuild → tag `claude-<sha2>` final → retag `claude-latest`; `image_sha256_final` 记入 T6 正式 handoff 字段。此动作归入 T5.1.0 新子任务 (从 T5 Buffer 分配 0.5h)。
 
 ---
 
@@ -108,9 +119,10 @@
   - `aria-runner-outputs` → `/opt/aether-volumes/aria-runner/outputs` (M0 已验证)
   - **`aria-runner-inputs` → `/opt/aether-volumes/aria-runner/inputs`** (新增, per BA-C1)
   - 三节点分别 reload nomad agent
-- [ ] **T2.1.2** 三节点 smoke dispatch 验证 inputs mount (1.5h, per BA-C1 门控)
+- [ ] **T2.1.2** 三节点 smoke dispatch 验证 inputs mount (1.5h, per BA-C1 门控 + BA-R2-T2.1.2-RECOVERY)
   - 最简测试 alloc: 挂载 inputs volume, `ls /opt/aria-inputs` 非空 → PASS
-  - 任一节点失败 → 回退重配置, 修复后再测
+  - **门控条件**: 三节点**全部**通过 (not 2/3); 任一节点失败 → 回退
+  - 回退步骤 (递进): (1) `nomad agent reload` → 若失败 (2) `systemctl restart nomad` → 仍失败则 block T3 启动直至修复
 - [ ] **T2.1.3** 缓冲 (0.5h)
 
 ### T2.2 — Nomad Job Template (8h)
@@ -119,7 +131,10 @@
   - 路径: `nomad/jobs/aria-runner-template.hcl`
   - `parameterized` block (meta=ISSUE_ID)
   - `volume` stanza 挂 outputs + inputs
-  - `env` stanza: `ARIA_SETTINGS_JSON` 从 Nomad meta 或硬编码 (非继承 M0 草稿)
+  - `env` stanza:
+    - `ARIA_SETTINGS_JSON` 从 Nomad meta 或硬编码 (非继承 M0 草稿)
+    - **`ANTHROPIC_API_KEY` 注入 (per BA-R2-T4.5-AUTH-INJECT-MISSING)**: 方案 A = Nomad `template` block + Vault; 方案 B = Nomad `vault` stanza 直接; 方案 C = inputs volume 中 `.env` 文件挂载 (最简, 不依赖 Vault); T2.2.1 Spike 决选 A/B/C, 记入 AD-M1-11 (编号继续扩位, per TL-P2-M1 模式)
+    - **`GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL`**: bot 账户身份, 供 entrypoint `git config` 使用
   - `resources`: CPU 2000 MHz / memory 2048 MiB / disk 4096 MiB (per BA-I1)
   - `tmpfs`: `/tmp:size=1024m` + `/root:size=512m` (per BA-R2-C2)
   - `readonly_rootfs = true` (M0 继承)
@@ -141,7 +156,7 @@
 
 ---
 
-## T3 — Issue Schema v0.1 + Dispatch Script + DEMO Fixture (14h)
+## T3 — Issue Schema v0.1 + Dispatch Script + DEMO Fixture + Prompt 模板 (15h)
 
 ### T3.1 — Issue Schema v0.1 Artifact (3h)
 
@@ -153,7 +168,10 @@
   - 注明: v0.1 breaking change 可接受 escape hatch (per proposal §3)
 - [ ] **T3.1.2** schema validator (Python stdlib, 仿 M0 handoff validator) (1h)
   - 路径: `openspec/changes/aria-2.0-m1-mvp/artifacts/validate-issue-schema.py`
-  - 检查: 必填字段 / enum 值 / 类型
+  - 检查:
+    - 必填字段 / enum 值 / 类型
+    - **Action verb 检查 (per AD-M1-3 + QA F4 + QA N2)**: `description` 含 "新增" / "修改" / "删除" 之一 + 具体文件/函数名
+    - `ip_classification` ∈ {synthetic}  (M1 仅允许 synthetic, 其他值 validator 报错; M2+ 解禁需 per AD-M1-9 治理流程)
 
 **T3.1.DoD**: issue-schema-v0.1.md 存在 + validator 对 DEMO-001/002 验证 PASS。
 
@@ -184,15 +202,24 @@
   - 拷 inputs: `.aria/issues/{ID}.yaml` + 其引用的 files → `/opt/aria-inputs/{ID}/`
   - `nomad job dispatch -meta ISSUE_ID={ID}` + alloc id 记录
   - Poll alloc 状态 + tail logs (`nomad alloc logs -stderr <alloc_id>`)
+  - **Poll 竞态处理 (per BA-R3-T3.3-HOUR)**: alloc 刚 dispatch 处于 `pending` 时 `nomad alloc logs` 会报错; 实现 `sleep 5; retry` 循环直到 alloc 进入 `running` (最长等待 120s 超时视为 dispatch 失败)
 - [ ] **T3.3.2** 脚本幂等性测试 (1h) — 连续两次同 ISSUE_ID dispatch, 第二次应报错拒绝
 - [ ] **T3.3.3** README + 使用说明 (0.5h)
 - [ ] **T3.3.4** 缓冲 (0.5h)
 
-### T3.4 — Prompt 模板 (1h)
+### T3.4 — Prompt 模板 + 渲染契约 (2h, per TL-P1-C1 / AI-R1-1/2)
 
-- [ ] **T3.4.1** `docker/aria-runner/prompts/issue-dispatch.md` 起草 (1h, per AI-I1)
+- [ ] **T3.4.0** 引擎选型决议 (0.5h, 必须先于 T4.1 启动)
+  - 候选: bash `envsubst` (Dockerfile 已装) vs Python Jinja2 (需 `pip install jinja2`)
+  - 权衡: envsubst 轻量但无控制流; Jinja2 强但增依赖 + 安全边界 (render untrusted YAML)
+  - Decision 记入 AD-M1-x 回写占位; T1.c.1 Dockerfile 根据结果决定是否加依赖
+- [ ] **T3.4.1** `docker/aria-runner/prompts/issue-dispatch.md` 起草 (1h)
   - 变量: `{{ issue_title }}`, `{{ issue_description }}`, `{{ files_listing }}`, `{{ expected_changes }}`
-  - 引擎: bash `envsubst` 或 Python Jinja2 (T4 定)
+  - 按 T3.4.0 决议的引擎语法 (envsubst `${VAR}` 或 Jinja2 `{{ var }}`)
+- [ ] **T3.4.2** 变量渲染契约 + golden sample (0.5h, per AI-R1-1)
+  - `files_listing` = markdown bulleted list (换行 + `- filename`)
+  - `expected_changes` = 两子项展开 `expected_file_touched[]` (list) + `expected_diff_contains[]` (list)
+  - 产出 DEMO-001 / DEMO-002 各一份 golden 渲染文本 (字面量, 作为 T4.1.1 step 5 单测 fixture)
 
 **T3.DoD**: schema validator PASS on DEMO-001/002; dispatch script 幂等; prompt template 存在。
 
@@ -204,9 +231,9 @@
 
 - [ ] **T4.1.1** `docker/aria-runner/entrypoint.sh` 重写 (M0 只做 skill load) (3h)
   - 11 步流程 (proposal §What §4 锁定):
-    1. 读 `NOMAD_META_ISSUE_ID`
+    1. 读 `NOMAD_META_ISSUE_ID`; **设 `handoff.t4_started=true` signal** (per QA F3)
     2. 加载 `/opt/aria-inputs/{ID}/` (volume read-only)
-    3. `git clone --depth 1` 目标 repo → `/tmp/workspace`
+    3. `git clone --depth 1` 目标 repo → `/tmp/workspace`; **`git config --global user.name / user.email`** (从 Dockerfile ENV `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` 注入, 预置 bot 账户身份, per BA-R2-GIT-IDENTITY-GAP)
     4. 创建分支 `aria/{ID}`
     5. 渲染 prompt (Jinja2 或 envsubst)
     6. Bash array `CLAUDE_ARGS=(claude -p "$RENDERED" ...)` + `timeout -k 10s 600s "${CLAUDE_ARGS[@]}"`
@@ -224,16 +251,23 @@
   - 提取 `.total_cost_usd`, `.usage.{input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens}`, `.is_error`
   - **Fallback** (per AI-R3-C1): 若无 result 帧 (timeout SIGKILL) → `claude_usage` null, `outcome=CLAUDE_TIMEOUT`
 - [ ] **T4.2.2** 原始 stdout 归档到 `/opt/aria-outputs/{ID}/claude.stream.jsonl` (1h)
-- [ ] **T4.2.3** 单元测试 (模拟 stream-json 输出) (1.5h)
-- [ ] **T4.2.4** 缓冲 (0.5h)
+- [ ] **T4.2.3** 单元测试 — 5 种 fixture 覆盖 (2h, per AI-R1-3)
+  1. 正常 result 帧 (SUCCESS path, 提取 cost + usage)
+  2. 无 result 帧 (timeout SIGKILL 路径, fallback 到 null + CLAUDE_TIMEOUT)
+  3. `is_error=true` (claude 报错但 stream 完整)
+  4. 格式损坏 / 截断 JSON line (error handling)
+  5. 多 result 帧取最后 (edge case)
+
+**T4.2.DoD**: parser 处理 5 fixtures 全部 PASS; fallback path 显式测试通过。
 
 ### T4.3 — result.json 生成 + assertion 计算 (5h)
 
 - [ ] **T4.3.1** schema v1.0 序列化 (2h, per proposal §What §4 result.json schema)
-- [ ] **T4.3.2** assertion_results 计算 (2h, per TL-I5)
+- [ ] **T4.3.2** assertion_results 计算 (2h, per TL-I5 + AI-R1-4)
   - `file_touched_hit`: `git diff HEAD --name-only` 与 `expected_file_touched[]` 对比
-  - `diff_contains_hit`: `git diff HEAD` 的 `+` 行与 `expected_diff_contains[]` 字面量子串匹配
+  - `diff_contains_hit`: `git diff HEAD` 的 `+` 行 (**过滤 diff header** `^\+\+\+` 避免文件路径字面量误命中, per AI-R1-4) 与 `expected_diff_contains[]` 字面量子串匹配
   - `unmatched_files[]` / `unmatched_patterns[]` 记录
+  - **单测必含** 1 fixture: "`+++  b/path/README.md` + expected_diff_contains=['README'] → 预期 false (header 被过滤)"
 - [ ] **T4.3.3** SUCCESS 严格判定 (5 AND, per AD-M1-4) (0.5h)
 - [ ] **T4.3.4** 缓冲 (0.5h)
 
@@ -244,24 +278,34 @@
   - `NEW`: branch 不存在 → 正常路径
   - `PARTIAL_PUSH_RECOVERY`: branch 存在 + PR 不存在 → force-push + 创建 PR
   - `FULL_RECOVERY`: branch + PR 都存在 → force-push + `.bak` 归档旧 result.json + 覆写 + 不创建 PR
+  - **Force-push 策略 (per BA-R4-T4.4.2-HOUR)**: 使用 `git push --force-with-lease` (而非 `--force`) 防意外覆盖 concurrent push
+  - **409 conflict 处理 (per BA-R2-T4.4.2-409-IMPL-GAP)**: force-with-lease 遇 409 → `outcome=IDEMPOTENCY_CONFLICT`, 写 result.json 后 exit 1 (**不重试**, 避免死循环); T4.4.3 单测 fixture 必含此路径; outcome enum 同步扩展 (见下)
 - [ ] **T4.4.3** 缓冲 (1h)
 
 ### T4.5 — 单次 DEMO Dispatch Smoke (2h)
 
-- [ ] **T4.5.1** DEMO-001 单次 dispatch 验证端到端 (1.5h) — 验证链路无断点
-- [ ] **T4.5.2** 缓冲 (0.5h)
+- [ ] **T4.5.1** DEMO-001 单次 dispatch 验证端到端 (2h, per AI-R1-5)
+  - **真实 Anthropic API 调用, 非 mock** (首次验证 official API endpoint + token + model id 可跑通)
+  - 若 API 层失败 (auth/配额/ToS block) → 回退到 T1.a legal 审视 或 T1.c 镜像 ENV 检查
+  - 链路无断点覆盖: dispatch 脚本 → Nomad alloc → runner entrypoint 11 步 → PR 创建
 
-**T4.DoD**: entrypoint 11 步执行成功; stream-json 解析正确; result.json schema 合规; 幂等三态测试通过; 单次 DEMO-001 dispatch PASS。
+**T4.5 FAIL 处置 (per KM-PM-02)**: 由 ai-engineer + backend-architect 联合 triage, 不升级到 T5 (smoke 阶段失败 = T4 未完成)。
+
+**T4.DoD**: entrypoint 11 步执行成功; stream-json 解析正确; result.json schema 合规; 幂等三态测试通过; T4.5 真实 Anthropic API smoke PASS。
 
 ---
 
 ## T5 — DEMO E2E Execution + Profiling (16h)
 
-### T5.1 — DEMO-001 5 轮执行 (4h)
+### T5.1 — DEMO-001 5 轮执行 (4.5h, +0.5h per TL-P1-I1 final image rebuild)
 
+- [ ] **T5.1.0** T1.c (final) — entrypoint 完成后 rebuild (0.5h, per TL-P1-I1 从 Buffer 支出)
+  - `docker build -t forgejo.10cg.pub/10CG/aria-runner:claude-<sha2>`
+  - Retag `claude-latest`; 推送两 tag
+  - `image_sha256_final` 记入 T6 正式 handoff 字段 (替换 scaffold 临时值)
 - [ ] **T5.1.1** 5 轮执行 + 每轮 result.json 归档 (2h)
   - 串行执行 (非并发, 避免 race condition; per QA-R1 并发可能性 = 否, 简化 M1 MVP)
-  - 每轮 triage 上限 10 min (含 dispatch + alloc + claude + PR), 超时 → `outcome=CLAUDE_TIMEOUT`
+  - **每轮端到端上限 10 min** (含 dispatch + alloc + claude + PR, 非仅 triage 窗口, per QA-F1 措辞澄清), 超时 → `outcome=CLAUDE_TIMEOUT`
 - [ ] **T5.1.2** outcome distribution 统计 (1h)
   - 分母 = 5, 分子 = `outcome=SUCCESS` 计数
   - ≥ 4 (即 ≥80%) 才 passed
@@ -270,22 +314,35 @@
 
 ### T5.2 — DEMO-002 5 轮执行 (6h)
 
-- [ ] **T5.2.1** 5 轮执行 (3h, DEMO-002 更复杂, 每轮预估 10-15 min)
+- [ ] **T5.2.1** 5 轮执行 (3h, per QA N1 端到端上限对齐)
+  - **每轮端到端上限 = `CLAUDE_TIMEOUT_S` = 600s (10min)** — 与 T5.1.1 / proposal §4 step 6 统一, 不区别 DEMO-001/002
+  - 若 T4.5 smoke 或 T5.1 DEMO-001 实测 DEMO-002 class task 逼近 600s → T4 实施期按 `p95 × 1.5` 原则 reforecast `CLAUDE_TIMEOUT_S` (Dockerfile ENV 更新 + image rebuild), 同步修订本 task 预估
+  - 工时 3h = 5 轮 × ≤10min 纯等待 + ~0.5h 间隙处理 + 0.2h 记录
 - [ ] **T5.2.2** outcome + stats 同 T5.1.2/1.3 (1h)
-- [ ] **T5.2.3** PR diff 质量人工 review + owner 签字 (1h, per AD-M0-9 solo-lab, 非独立角色)
+- [ ] **T5.2.3** PR diff 质量评审 (1h, 拆为 AI advisory + human signoff, per TL-P1-I3)
+  - **T5.2.3.a** code-reviewer advisory 预审 (0.5h) — AI agent 按 rubric 审阅 5 个 PR:
+    - (a) 功能完整性: `expected_diff_contains` 全部命中
+    - (b) 无不相关文件修改 (仅 `expected_file_touched` 列出文件有 diff)
+    - (c) 无明显错误逻辑 / syntax error
+    - (d) test 含至少 1 个 `assert`
+    - 输出 `DEMO-002-review.yaml` (per PR: pass/fail + rationale)
+  - **T5.2.3.b** Owner signoff (0.5h, per AD-M0-9) — simonfish 基于 advisory 决议 (AI 意见 audit trail 不构成放行)
 - [ ] **T5.2.4** 缓冲 (1h)
 
-### T5.3 — E2E 统计汇总 + 失败 triage (4h)
+### T5.3 — E2E 统计汇总 + 失败 triage + performance_baseline (4h)
 
-- [ ] **T5.3.1** 汇总 handoff.demo_executions 字段 (1.5h)
+- [ ] **T5.3.1** 汇总 handoff.demo_executions 字段 (1h)
   - `e2e_demo_passed = DEMO-001.passed AND DEMO-002.passed`
-- [ ] **T5.3.2** Failed runs triage (1.5h) — 按 outcome enum 分类, 记录原因 + 是否可重试
-- [ ] **T5.3.3** 缓冲 (1h)
+- [ ] **T5.3.2** Failed runs triage (1.5h) — 按 outcome enum 分类, 记录原因 + 是否可重试 (tech-lead 参与决策, per KM-PM-01 / STCO tech-lead 主责)
+- [ ] **T5.3.3** performance_baseline 聚合 (0.5h, per TL-P1-M1)
+  - 聚合 T2.3 resource baseline + T5.1/5.2 duration p50/p95 + token usage
+  - 写入 `handoff.performance_baseline.{cpu_p95, memory_p95, demo_002_p50_duration_s, token_usage_p50}`
+- [ ] **T5.3.4** 缓冲 (1h)
 
 ### T5.4 — Week 2 Checkpoint (2h)
 
-- [ ] **T5.4.1** 累计工时核算 (0.5h) — 若 ≥ 60h 且 T4 未开始 → 触发 scope 重估
-- [ ] **T5.4.2** 若触发: DEMO-002 降级为 optional (per AD-M1-5 + R-M1-7)
+- [ ] **T5.4.1** 累计工时核算 (0.5h) — 若 ≥ 60h 且 `handoff.t4_started == false` → 触发 scope 重估 (per QA F3 机械可检; handoff schema v1.0 需加 `t4_started: bool` 字段, 执行 T4.1.1 第一个 checkbox 时 runner 置 true)
+- [ ] **T5.4.2** 若触发: DEMO-002 降级为 optional (**0h if not triggered, 1-2h if triggered, 从 Buffer 支出**, per CR-R1-M2)
   - deferred-with-approval 走 No-Go-with-revision (非 Go)
   - 写入 `handoff.open_issues`
 - [ ] **T5.4.3** 缓冲 (1.5h, 通常 M1 正常进度不触发)
@@ -309,36 +366,64 @@
     - §6 签字位
 - [ ] **T6.1.2** 缓冲 (0.5h)
 
-### T6.2 — Handoff schema v1.0 生成 (1.5h, per AD-M1-7)
+### T6.2 — Handoff schema v1.0 生成 (1.5h, per AD-M1-7; tech-lead co-sign, per KM-PM-01)
 
 - [ ] **T6.2.1** `aria-orchestrator/docs/m1-handoff.yaml` 填充 (1h)
-  - go_decision / image_refs / nomad 配置 / demo_executions / legal_assumptions / performance_baseline / demo_token_usage
+  - go_decision / image_refs (含 `image_sha256_final` 替换 scaffold) / nomad 配置 / `t4_started` / demo_executions / legal_assumptions / performance_baseline / demo_token_usage
 - [ ] **T6.2.2** Handoff validator 创建 + 验证 (0.5h)
   - `aria-orchestrator/docs/validate-m1-handoff.py` (仿 M0 validator)
-  - 验证: schema v1.0 字段必填 + enum + outcome_distribution SUM == runs + e2e_demo_passed 逻辑 AND
+  - **验证清单 (per LA + QA)**:
+    - schema v1.0 字段必填 + enum
+    - `outcome_distribution` SUM == runs (per DEMO)
+    - `e2e_demo_passed = DEMO-001.passed AND DEMO-002.passed` 逻辑 AND
+    - `legal_assumptions.anthropic_api_terms_verified == true` (orphan 检测: true 值必须有对应 m1-legal-carryover.md + 末行 `Signed-by:` 签字)
+    - `legal_assumptions.luxeno_data_cleared` (backfill from T1.a.2)
+    - `legal_assumptions.m1_memo_signed` (mechanical file-existence check)
+    - `image_refs.immutable_sha` 非空 (不是 scaffold 占位)
+- [ ] **T6.2.3** tech-lead co-sign (0.3h, 附 T6.2.2 之后, per KM-PM-01 + KM2-PM-03/04)
+  - 对 handoff schema M2 接口契约做最终裁决 (schema amendments 窗口策略 per AD-M1-7 是否激活)
+  - **机械 artifact**: `m1-handoff.yaml` 末部新增字段:
+    ```yaml
+    tech_lead_cosign:
+      signed_by: "human:simonfish"    # per AD-M0-9 solo-lab
+      date: "YYYY-MM-DD"
+      statement: "M2 接口契约审阅通过 / schema additive-only 窗口 ... (自定义说明)"
+    ```
+  - Validator (T6.2.2) 追加检查: `tech_lead_cosign.signed_by != null AND tech_lead_cosign.date != null`
+  - 工时 0.3h 从 T6.4 缓冲吸收 (T6.4.1 0.5h → 0.2h, T6.4.2 0.5h 不变)
+  - **T6.DoD 补加**: "tech-lead co-sign artifact 存在" 为独立 gate 条件
 
 ### T6.3 — AD-M1-* 决议回写 (1h, per KM-M2 / CR-M3)
 
 - [ ] **T6.3.1** 在 `aria-orchestrator/docs/architecture-decisions.md` 填充 AD-M1-1 ~ AD-M1-9 最终决议 (1h)
 
-### T6.4 — Owner Signoff (1h, per AD-M0-9)
+### T6.4 — Owner Signoff (0.7h, per AD-M0-9; 0.3h 已转入 T6.2.3 tech-lead co-sign)
 
-- [ ] **T6.4.1** Owner 审阅 M1 Report + handoff + legal carryover (0.5h)
+- [ ] **T6.4.1** Owner 审阅 M1 Report + handoff + legal carryover (0.2h, per KM2-PM-04 减配)
 - [ ] **T6.4.2** 签字 + go_decision 填充 (0.5h)
   - `Go` | `Go-with-revision` | `No-Go` | `No-Go-with-revision`
   - Deferred-with-approval (DEMO-002 降级) → 走 `No-Go-with-revision` (per AD-M1-5)
 
-**T6.DoD**: Report 完整; handoff validator PASS (final); ADRs 回写; owner signoff 完成。
+**T6.DoD**: Report 完整; handoff validator PASS (final); ADRs 回写; owner signoff 完成; **tech-lead co-sign artifact 存在** (`m1-handoff.yaml.tech_lead_cosign.signed_by != null` AND `.date != null`, per KM3-PM-02)。
 
 ---
 
-## Buffer (20h)
+## Buffer (20h, 分 soft + hard 两档, per TL-P1-I2)
 
-全局备用, 分配规则:
-- T1+T4 Spike 超工时 → 最多 +10h
-- T5 DEMO 重跑 triage → 最多 +5h
-- T6 handoff 迭代 → 最多 +5h
-- R-M1-7 Week 2 checkpoint 触发: 不消耗 buffer, 走 AD-M1-5 降级规则
+**Soft cap (总 14h, 按 T 分类)**:
+- T1+T4 Spike 超工时 → 最多 +8h (原 10h, 让出 2h 到 hard reserve)
+- T5 DEMO 重跑 triage → 最多 +3h (原 5h, 让 2h)
+- T6 handoff 迭代 → 最多 +3h (原 5h, 让 2h)
+
+**T5.1.0 final image rebuild 0.5h 归档 (per TL-P2-M2)**: 已内嵌到 T5.1 summary (16h → 16.5h), **不计入 Buffer soft cap** (即非 "T5 DEMO 重跑 triage" 类别). 若 T5.1.0 rebuild 失败需 debug → 从 T5 DEMO 重跑 triage 3h 支出。
+
+**Hard reserve (6h, 真正 global)**:
+- 任一 T 桶超 soft cap 上限后, 额外申请 hard reserve 需 owner 签字 + 写 `handoff.open_issues`
+- Hard reserve 完全耗尽 → 触发 No-Go-with-revision (超支 = 产品负责人决议)
+
+**Week 2 checkpoint (R-M1-7)**:
+- 累计工时 ≥ 60h 且 `handoff.t4_started == false` → 触发 scope 重估 (DEMO-002 降级为 optional)
+- 不消耗 buffer, 走 AD-M1-5 降级规则 (`No-Go-with-revision` 分支)
 
 ## 收敛后状态
 
@@ -370,8 +455,11 @@
 ### 协同任务 (多 Agent 共同)
 
 - **T3.2 DEMO fixture 设计**: backend-architect (repo 结构) + qa-engineer (测试设计) + legal-advisor (IP classification 审查)
-- **T4 Runner entrypoint**: ai-engineer (claude CLI 层) + backend-architect (git / PR / 幂等守卫) 紧密配合
-- **T6.2 Handoff validator**: backend-architect (schema 实现) + knowledge-manager (字段 traceability 审查)
+- **T4 Runner entrypoint**: ai-engineer (claude CLI 层 T4.2/4.3) + backend-architect (git / PR / 幂等守卫 T4.1/4.4) 紧密配合; **entrypoint.sh 最终集成归属: backend-architect 主导, ai-engineer 以 patch/PR 形式提交 T4.2/4.3 代码段供 review** (per BA-R5-T4-BOUNDARY)
+- **T4.5 smoke FAIL 处置**: ai-engineer + backend-architect 联合 triage, 不升级到 T5 (per KM-PM-02)
+- **T5.3.2 Failed runs triage**: qa-engineer (枚举分类) + tech-lead (决策: 是否回退 / 重跑 / 升级) (per KM-PM-01)
+- **T6.2 Handoff validator**: backend-architect (schema 实现) + knowledge-manager (字段 traceability 审查) + **tech-lead co-sign (M2 接口契约裁决, per KM-PM-01)**
+- **T5.2.3 PR diff 评审**: code-reviewer advisory (T5.2.3.a) + owner signoff (T5.2.3.b, per TL-P1-I3)
 
 ### Solo-lab 签字主体 (per AD-M0-9)
 
@@ -393,6 +481,7 @@
 - [US-022.md](../../../docs/requirements/user-stories/US-022.md) — M1 后继 (M2 硬门控 handoff.e2e_demo_passed=true)
 - [M0 Report](../../../aria-orchestrator/docs/m0-report.md) — M1 精确路径基线
 - [M0 handoff](../../../aria-orchestrator/docs/m0-handoff.yaml) — M1 输入契约只读
+- [M0 tasks (archived)](../../archive/2026-04-17-aria-2.0-m0-prerequisite/tasks.md) — M1 tasks 分解 pattern 参考 (per CR-R2-L3)
 - [PRD v2.1 §M1](../../../docs/requirements/prd-aria-v2.md)
 
 ---

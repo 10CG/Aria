@@ -57,6 +57,7 @@ M1 的定位 = **把 blueprint 从 "spike 可跑" 升级到 "production-ish, 手
    - `openspec/changes/aria-2.0-m1-mvp/artifacts/issue-schema-v0.1.md` — YAML schema 定义
      - 字段: `id`, `title`, `description`, `files[]`, `expected_changes`
      - **早锁字段 (per BA-R2-I1 + AD-M1-3 提前锁定)**: `expected_file_touched[]` + `expected_diff_contains[]` (字面量子串匹配, 不是正则, per QA-C1-PARTIAL); **匹配范围 (per QA-N1)**: v0.1 **仅验证增量 `+` 行** (不覆盖删除语义); 若 DEMO 需验证删除操作, 延后到 schema v1.0 (M2 扩展); 本 v0.1 的 DEMO-001 (README 修改一行 = 改) / DEMO-002 (新增 function+test = 纯增量) 均纯增量, 不受此限制影响
+     - **Action verb validator (per QA F4 post_planning R1)**: issue schema v0.1 validator 必须检查 `description` 含 "新增" / "修改" / "删除" 动词 + 具体文件/函数名 (降低 claude `CLAUDE_NO_OP` 概率, 与 §What §4 step 8 git diff 检测形成 defense in depth)
      - **`ip_classification`** (必填, enum: `synthetic` | `trivial-real` | `real`): DEMO-001/002 必须为 `synthetic`, 继承 M0 T3.5 合成 fixture 模式 (per LA-I1); M1 仅允许 `synthetic`, 其他值在 M2+ 解禁前需显式治理流程 (见 AD-M1-9)
    - `.aria/issues/DEMO-001.yaml` — reference DEMO (synthetic)
    - `aria-orchestrator/scripts/dispatch-issue.sh` — 手动 dispatch 脚本 (幂等, bash)
@@ -124,7 +125,7 @@ M1 的定位 = **把 blueprint 从 "spike 可跑" 升级到 "production-ish, 手
        diff_contains_hit: bool
        unmatched_files: [...]          # 未命中的 expected_file_touched 列表 (对称 unmatched_patterns, per TL-R3-2)
        unmatched_patterns: [...]       # 未命中的 expected_diff_contains 列表
-     outcome: SUCCESS | INFRA_FAILURE | CLAUDE_TIMEOUT | CLAUDE_REFUSAL | CLAUDE_NO_OP | GIT_STAGE_FAILURE | PR_CREATE_FAILURE | ASSERTION_MISMATCH
+     outcome: SUCCESS | INFRA_FAILURE | CLAUDE_TIMEOUT | CLAUDE_REFUSAL | CLAUDE_NO_OP | GIT_STAGE_FAILURE | PR_CREATE_FAILURE | ASSERTION_MISMATCH | IDEMPOTENCY_CONFLICT
      error:
        type: string | null             # 对应 outcome 的细分类
        detail: string | null
@@ -174,6 +175,9 @@ M1 的定位 = **把 blueprint 从 "spike 可跑" 升级到 "production-ish, 手
      outputs: "/opt/aether-volumes/aria-runner/outputs"
      inputs:  "/opt/aether-volumes/aria-runner/inputs"
 
+   # —— T4 启动信号 (per QA F3 + post_planning R1) ——
+   t4_started: bool                    # runner 执行 T4.1.1 第一个 checkbox 时置 true, 供 Week 2 checkpoint 机械检测
+
    # —— E2E 验收 ——
    e2e_demo_passed: true | false      # = DEMO-001.passed AND DEMO-002.passed (严格 AND, per QA-C2)
                                       # US-022 启动硬门控
@@ -194,6 +198,7 @@ M1 的定位 = **把 blueprint 从 "spike 可跑" 升级到 "production-ish, 手
          GIT_STAGE_FAILURE: int
          PR_CREATE_FAILURE: int
          ASSERTION_MISMATCH: int       # per TL-I5 / QA-N3
+         IDEMPOTENCY_CONFLICT: int     # per BA-R2-T4.4.2-409 (force-with-lease 409)
        # 约束: SUM(outcome_distribution 所有 enum 计数) == runs
        pr_urls: [...]
      DEMO-002: { ... 同结构 ... }
