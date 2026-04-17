@@ -126,16 +126,25 @@
   - T3.3b: `/tmp` tmpfs 可写
   - T3.3c: rootfs 写入被正确拒绝
   - T3.3d: `claude -p` 在 read-only 模式下运行 (需 tmpfs 覆盖 `~/.claude` / `~/.npm` / `~/.config`)
-- [ ] **T3.4** GLM smoke test (1.5h)
+- [~] **T3.4** GLM smoke test (2.5h actual vs 1.5h baseline) — Path C 拆分执行 (2026-04-17)
   - 从 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` 模板生成 5 条合成 prompt (禁止真实采样)
-  - 用 GLM 5.1 API (经 Luxeno 路由, `LUXENO_API_KEY` / base_url=`https://api.luxeno.ai/v1` / model=`glm-4.7-flashx`; 参见 `aria-orchestrator/config/hermes-config.yaml` fallback_model) 生成拟人任务描述
-  - 每条 prompt 跑 `claude -p` 触发 state-scanner (同 Luxeno key)
-  - 二值化判定: ≥4 条触发且返回非空 YAML (grep `-E "Phase/Cycle:|phase_cycle:"`, 双格式容忍) = pass
-  - 失败 → 升级 R8 评估
-  - **所有 5 条样本** 归档到 `ab-suite/glm-smoke/failed-samples/<timestamp>-<seq>.yaml`
-  - Schema: `{prompt, failure_mode, raw_output, expected_grep, glm_model_version, status: pass|fail}` (expected_grep = `Phase/Cycle:|phase_cycle:`)
-  - `failure_mode` 枚举: `not_triggered | triggered_empty_yaml | triggered_invalid_yaml | partial_response | timeout`
-  - 产出 `summary.yaml` 含 5 条索引
+  - 用 GLM 5.1 API (经 Luxeno 路由, `LUXENO_API_KEY` / base_url=`https://api.luxeno.ai/v1`) 生成拟人任务描述
+  - 每条 prompt 跑 `claude -p --permission-mode bypassPermissions` 触发 state-scanner (同 Luxeno key)
+  - **v1.1 修正** — 二值化判定 grep: `PROJECT STATE ANALYSIS|📍 当前状态|🎯 推荐工作流` (canonical 标记, 项目无关). 原 `Phase/Cycle:|phase_cycle:` 仅适用 UPM 项目, Aria meta-project 不走 UPM, T3.5 AI 预审未识别此假设
+  - ≥4/5 = pass; 失败 → 升级 R8 评估 (本轮评估不触发, 详见 findings §6)
+  - **所有样本** 归档到 `ab-suite/glm-smoke/failed-samples/<timestamp>-<test-id>/*.yaml`
+  - Schema: `{prompt, failure_mode, raw_output, raw_stderr, return_code, expected_grep, glm_model_openai, glm_model_anthropic, mode, status: pass|fail, template, seed, ran_at}`
+  - `failure_mode` 枚举: `not_triggered | triggered_empty_yaml | triggered_invalid_yaml | partial_response | timeout | glm_generation_failed`
+  - 产出 `summary.yaml` 含 sub-test + samples 索引
+  - **Routing 偏差 (2026-04-17 实测)**: Luxeno `glm-4.7-flashx` OpenAI endpoint 对 ≥800 字节 prompt 返回 408 upstream / Anthropic endpoint 返回 "not available" → 实际 `glm-4.5` (OpenAI) + `glm-4.7` (Anthropic)
+  - **Path C 拆分** (per owner decision 2026-04-17): 用一个严格判定遮蔽多个信号不利于 Go/No-Go 决议
+    - **T3.4.a** auto mode: 自然语言 → Skill 自触发 → 测 A1.c 假设
+    - **T3.4.b** slash mode: 显式 `/state-scanner` → Skill 执行 → 测 Option C 显式契约
+  - **结果**:
+    - T3.4.a: **0/5 FAIL** — GLM-4.7 不自触发 Skills (material finding, 非 M0 阻断)
+    - T3.4.b: **3/5** (corrected grep) — 3 produce canonical output, 2 timeout (Luxeno 可靠性)
+    - 整体未过 spec threshold, 但 material conclusion = A1 部分成立 + **强化 AD3 Option C 决议**
+  - **详细发现**: [`aria-plugin-benchmarks/ab-suite/glm-smoke/T3.4-findings.md`](../../../aria-plugin-benchmarks/ab-suite/glm-smoke/T3.4-findings.md) (9 章节 + 5 教训)
 - [x] **T3.5** Fixture 模板二审 (1h) — 2026-04-16
   - ai-engineer Round 1 预审: 9 findings (1 critical + 3 important + 5 minor), 全部应用于 `f70f1dc`
   - owner (simonfish) Round 2 签字: **approved** (per AD-M0-9: 1 人 + AI 场景下, 原 "legal-advisor (人类)" 角色由 owner 承担; audit trail 性质保留见 AD-M0-6)
