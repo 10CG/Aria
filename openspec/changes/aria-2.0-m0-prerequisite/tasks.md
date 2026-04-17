@@ -128,8 +128,8 @@
   - T3.3d: `claude -p` 在 read-only 模式下运行 (需 tmpfs 覆盖 `~/.claude` / `~/.npm` / `~/.config`)
 - [ ] **T3.4** GLM smoke test (1.5h)
   - 从 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` 模板生成 5 条合成 prompt (禁止真实采样)
-  - 用 GLM 5.1 API 生成拟人任务描述
-  - 每条 prompt 跑 `claude -p` 触发 state-scanner
+  - 用 GLM 5.1 API (经 Luxeno 路由, `LUXENO_API_KEY` / base_url=`https://api.luxeno.ai/v1` / model=`glm-4.7-flashx`; 参见 `aria-orchestrator/config/hermes-config.yaml` fallback_model) 生成拟人任务描述
+  - 每条 prompt 跑 `claude -p` 触发 state-scanner (同 Luxeno key)
   - 二值化判定: ≥4 条触发且返回非空 YAML (grep `current_phase:`) = pass
   - 失败 → 升级 R8 评估
   - **所有 5 条样本** 归档到 `ab-suite/glm-smoke/failed-samples/<timestamp>-<seq>.yaml`
