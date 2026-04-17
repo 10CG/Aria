@@ -1,0 +1,15 @@
+prompt: /state-scanner
+failure_mode: timeout
+raw_output: ''
+raw_stderr: '
+
+  [TIMEOUT]'
+return_code: -1
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 04-ambiguous-request
+seed: d4
+mode: slash
+ran_at: '2026-04-17T09:12:00.573052+00:00'

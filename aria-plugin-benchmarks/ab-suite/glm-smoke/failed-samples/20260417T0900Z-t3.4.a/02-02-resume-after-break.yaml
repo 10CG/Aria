@@ -1,0 +1,106 @@
+prompt: 嘿，我几天没碰这个项目了，回来有点懵，不记得上次改到哪一步了，能帮我回顾下进度和接下来该做什么吗？
+failure_mode: triggered_invalid_yaml
+raw_output: '根据状态扫描，给你生成项目进度报告：
+
+
+  ---
+
+
+  ## 📊 Aria 项目进度概览
+
+
+  **当前分支**: `feature/aria-2.0-m0-prerequisite`
+
+  **插件版本**: v1.16.0
+
+  **主项目版本**: v1.5.0
+
+
+  ---
+
+
+  ## 🎯 M0 (US-020) 进度: **84%** 完成
+
+
+  ### 已完成任务 (T0-T2, T4-T5)
+
+  | 任务 | 状态 | 说明 |
+
+  |------|------|------|
+
+  | **T0** | ✅ | US-020 头部同步 |
+
+  | **T1** | ✅ | Legal 前置闸门 (final signoff pending) |
+
+  | **T2** | ✅ | A3 NFS + Nomad bind mount 实测 (改用 virtiofs) |
+
+  | **T4** | ✅ | Hermes Spike 完成 (节省 47.5h, 推荐 Option C) |
+
+  | **T5** | ✅ | AD1-AD12 收敛完成 |
+
+
+  ### 进行中
+
+  | 任务 | 状态 | 说明 |
+
+  |------|------|------|
+
+  | **T3** | 🟡 90% | GLM smoke test (T3.4) 待做 |
+
+  | **T6** | 🟡 80% | PR#19 已创建, Phase 2 待完成 |
+
+
+  ### 待办核心任务
+
+  1. **T3.4** - GLM smoke test (1.5h) — 当前在 `glm-smoke/` 目录
+
+  2. **T6.4 Phase 2** - 产品负责人评审 + handoff.yaml 回填
+
+  3. **T6.7** - 缓冲时间 (0.5h)
+
+
+  ---
+
+
+  ## 📁 当前目录状态
+
+
+  你在 `aria-plugin-benchmarks/ab-suite/glm-smoke/`，有 2 个未跟踪目录:
+
+  - `failed-samples/` — T3.4 失败样本归档
+
+  - `scripts/` — T3.4 执行脚本
+
+
+  ---
+
+
+  ## 🚀 接下来建议
+
+
+  根据状态扫描推荐：
+
+
+  **[1] 继续 T3.4 GLM smoke test** — 你在正确目录，这是 M0 最后待办任务
+
+  **[2] 检查 PR #19 状态** — 合并截止 2026-04-19
+
+  **[3] 完成 T6.4 Phase 2** — 产品负责人评审签字
+
+
+  ---
+
+
+  需要我帮你继续执行 T3.4 GLM smoke test 吗？
+
+  '
+raw_stderr: ''
+return_code: 0
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 02-resume-after-break
+seed: b2
+mode: auto
+ran_at: '2026-04-17T09:00:31.261948+00:00'

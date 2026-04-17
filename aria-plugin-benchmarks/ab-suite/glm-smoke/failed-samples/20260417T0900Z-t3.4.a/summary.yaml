@@ -1,0 +1,36 @@
+timestamp: 20260417T0900Z-t3.4.a
+mode: auto
+sub_test: T3.4.a
+total: 5
+passed: 0
+failed: 5
+threshold: 4
+overall_pass: false
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+samples:
+- index: 1
+  template: 01-initial-scan
+  status: fail
+  failure_mode: triggered_invalid_yaml
+  path: 20260417T0900Z-t3.4.a/01-01-initial-scan.yaml
+- index: 2
+  template: 02-resume-after-break
+  status: fail
+  failure_mode: triggered_invalid_yaml
+  path: 20260417T0900Z-t3.4.a/02-02-resume-after-break.yaml
+- index: 3
+  template: 03-pre-action-guidance
+  status: fail
+  failure_mode: partial_response
+  path: 20260417T0900Z-t3.4.a/03-03-pre-action-guidance.yaml
+- index: 4
+  template: 04-ambiguous-request
+  status: fail
+  failure_mode: glm_generation_failed
+  path: 20260417T0900Z-t3.4.a/04-04-ambiguous-request.yaml
+- index: 5
+  template: 05-anomaly-triage
+  status: fail
+  failure_mode: timeout
+  path: 20260417T0900Z-t3.4.a/05-05-anomaly-triage.yaml

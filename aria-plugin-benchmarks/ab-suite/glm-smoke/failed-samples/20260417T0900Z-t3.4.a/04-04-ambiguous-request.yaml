@@ -1,0 +1,13 @@
+prompt: ''
+failure_mode: glm_generation_failed
+raw_output: ''
+raw_stderr: ''
+return_code: null
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 04-ambiguous-request
+seed: d4
+mode: auto
+ran_at: '2026-04-17T09:02:14.194384+00:00'
