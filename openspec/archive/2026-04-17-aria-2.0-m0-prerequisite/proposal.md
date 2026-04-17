@@ -1,8 +1,9 @@
 # aria-2.0-m0-prerequisite — Aria 2.0 M0 前置验证与架构定稿
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Complete
 > **Created**: 2026-04-14
+> **Completed**: 2026-04-17 (T6.4 Phase 2 final signoff, handoff validator PASS final)
 > **Parent Story**: [US-020](../../../docs/requirements/user-stories/US-020.md)
 > **Target Version**: v2.0.0-m0
 > **Related Spec**: [aria-2.0-m0-spike-hermes](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md) (Spike 专项 Spec, 本 Spec 产出依赖其结论回填 AD3)
