@@ -26,7 +26,17 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.15.2 | https://github.com/10CG/aria-plugin | 2026-04-12 |
+| aria (子模块) | v1.16.0 | https://github.com/10CG/aria-plugin | 2026-04-15 |
+
+### aria v1.16.0 变更摘要 (minor, meta-repo 支持)
+
+- **state-scanner Phase 1.13 `scan_submodules` opt-in** — 递归扫描 `.gitmodules` 中所有 submodule 的 Forgejo/GitHub issues, 每个 submodule 独立 fail-soft; 支持 meta-repo 模式 (Aria 主 repo + aria-plugin / aria-orchestrator / aria-standards)
+- **`stage_timeout_seconds` 自适应**: 关闭时保持 12s 向后兼容, 开启时 `max(20, (N+1)×api_timeout_seconds)` 按 submodule 数线性扩展
+- **cache schema_version 守卫**: 识别 pre-v1.1 旧缓存 → 一次性 cold re-fetch, 避免 silent corruption
+- **open_blocker_issues 推荐规则跨 repo 聚合**: 任一 repo (主 + submodule) 的 blocker/critical label 触发降级推荐
+- **SKILL.md**: 2.9.0 → 2.10.0 | **issue-scanning.md**: 1.0.0 → 1.1.0
+- **Benchmark**: +41.7pp pass rate (ab-results/2026-04-15-state-scanner-submodule-issue-scan/)
+- **向后兼容**: `scan_submodules=false` (默认) 场景与 v1.15.2 字节级一致
 
 ### aria v1.15.2 变更摘要 (patch, cleanup)
 
