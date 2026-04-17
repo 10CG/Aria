@@ -255,7 +255,7 @@ output_format: result.json
 
 **回滚路径** (3 级降级):
 - Option C (当前默认) → Option B 自研 (~800-1200 LoC Python) → Option A fork hermes-agent (M5+ 最终备选)
-- 触发降级: Option C extension API 在 M1+ 使用中暴露阻断性缺陷
+- 触发降级: Option C Extension API 在 M1+ 使用中暴露阻断性缺陷
 
 **元知识** (~1K token, 注入到 Hermes system prompt):
 
@@ -400,7 +400,7 @@ Crash recovery:
 ```
 M0 (Week 1-2)     前置验证 + 架构定稿
 M1 (Week 3-6)     MVP: 手动 dispatch → 1 issue → PR (100h)
-M2 (Week 7-12)    Layer 1 状态机 + Hermes cron 集成 + 输入 sanitization (140h)
+M2 (Week 7-12)    Layer 1 状态机 + Hermes Option C Extension + 输入 sanitization (140h)
 M3 (Week 13-16)   双 provider + Nomad integration (90h)
 M4 (Week 17-21)   Crash recovery + Replay + Reconciler (80h)
 M5 (Week 22-27)   Human gate + Review loop + Drift defense (100h)
@@ -487,7 +487,7 @@ Out of scope:
 | state-machine.md | Layer 1 状态机设计 | `aria-orchestrator/docs/` |
 | layer2-container.md | 容器镜像设计 + entrypoint | `aria-orchestrator/docs/` |
 | container-launcher.md | ContainerLauncher 抽象 (预留 K8s/云) | `aria-orchestrator/docs/` |
-| hermes-extension-ops.md | Hermes Option C extension 维护策略 (纯 tool pack, 无 fork) | `aria-orchestrator/docs/` |
+| hermes-extension-ops.md | Hermes Option C Extension 维护策略 (纯 tool pack, 无 fork) | `aria-orchestrator/docs/` |
 | prompt-templates.md | 拟人命令模板库 | `aria-orchestrator/docs/` |
 
 ### CLAUDE.md 修订 (8 处 diff)
@@ -500,16 +500,18 @@ Out of scope:
 
 ### User Stories (待起草)
 
-| ID | 标题 | 优先级 |
-|----|------|--------|
-| US-020 | Aria 2.0 两层架构基础设施 | HIGH |
-| US-021 | Layer 1 状态机 + Hermes Option C Extension | HIGH |
-| US-022 | Layer 2 容器镜像 + 拟人命令协议 | HIGH |
-| US-023 | 跨 tick 长任务 + Crash recovery | HIGH |
-| US-024 | Human gate + Feishu 审批 | MEDIUM |
-| US-025 | 防漂移 + 审计日志 | MEDIUM |
-| US-026 | v2.0 文档体系 + CLAUDE.md 修订 | MEDIUM |
-| US-027 | Cost routing + 预算控制 | MEDIUM |
+> **范围重排 per M0 Go-with-revision (2026-04-17)**: 原 US-020~022 命名按 "架构层/功能域" 分组, M0 Go 决议后重排为 "milestone 时间序" 分组, 使 Story 与 M1-M6 一一对应。
+
+| ID | 标题 | 对应 Milestone | 优先级 |
+|----|------|----------------|--------|
+| US-020 | Aria 2.0 M0 前置验证与架构定稿 (done 2026-04-17) | M0 | HIGH |
+| US-021 | Aria 2.0 M1 — MVP 手动 E2E dispatch (Layer 2 容器 + Nomad) | M1 | HIGH |
+| US-022 | Aria 2.0 M2 — Layer 1 状态机 + Hermes Option C Extension | M2 | HIGH |
+| US-023 | Aria 2.0 M3 — 双 provider + Nomad integration + Crash recovery | M3 | HIGH |
+| US-024 | Aria 2.0 M4 — Human gate + Feishu 审批 | M4 | MEDIUM |
+| US-025 | Aria 2.0 M5 — 防漂移 + 审计日志 + Review loop | M5 | MEDIUM |
+| US-026 | Aria 2.0 M6 — v2.0 文档体系 + CLAUDE.md 修订 | M6 | MEDIUM |
+| US-027 | Aria 2.0 — Cost routing + 预算控制 (跨 milestone) | M3-M6 | MEDIUM |
 
 ### OpenSpec Changes (待起草)
 
