@@ -11,7 +11,7 @@
 4. 必须暗示**存在未提交/未处理的变更** (如 "刚写完一些", "改了几个文件", "手上这堆东西")
 5. 必须暗示**不确定下一步** (如 "不知道直接提交还是...", "不确定该先干啥")
 6. 语气**犹豫, 寻求外部判断**, 口语化
-7. 长度 {{ length_hint | default("40-90 字") }}
+7. 长度 {{ length_min | default(40) }}-{{ length_max | default(90) }} 字
 8. 语言: {{ language | default("中文") }}
 
 ## 输出格式 (关键)
@@ -20,14 +20,25 @@
 - **禁止前缀**如 "好的, 这是..."
 - **禁止后缀**如 "谢谢"
 - **禁止 markdown 代码块包裹**
-- 不要加引号
+- **禁止引号包裹**
+- **禁止内心独白 / 思考过程**, 如 "让我想想...", "先分析一下..."
 
-## 示例 (仅示范风格, 不要复用具体措辞)
+## 风格示例
+
+✅ **正确风格** (仅示范语气, 不要复用具体措辞):
 
 {%- if language == "en" %}
 > just finished a bunch of changes, not sure if I should commit directly or if something else needs to happen first — you tell me
 {%- else %}
 > 手上改了一堆东西还没提交, 不知道是直接 commit 还是得先走点啥流程, 你帮看看下一步咋办
+{%- endif %}
+
+❌ **错误示例** (展示要避免的业务纹理):
+
+{%- if language == "en" %}
+> wrote the checkout flow, ready to push to the e-commerce app?
+{%- else %}
+> 博客的评论功能改完了, 是不是可以直接提交了
 {%- endif %}
 
 ## 变量种子

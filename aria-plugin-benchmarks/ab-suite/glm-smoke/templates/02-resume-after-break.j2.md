@@ -10,7 +10,7 @@
 3. 允许通用占位: "这个项目", "之前那个分支", "那个改动", "上次那个问题"
 4. 必须暗示**时间间隔** (如 "上周", "几天前", "放假回来") 但不必给出精确日期
 5. 语气**有点茫然, 需要系统帮忙唤起上下文**, 口语化
-6. 长度 {{ length_hint | default("40-100 字") }}
+6. 长度 {{ length_min | default(40) }}-{{ length_max | default(100) }} 字
 7. 语言: {{ language | default("中文") }}
 
 ## 输出格式 (关键)
@@ -19,14 +19,25 @@
 - **禁止前缀**如 "好的, 这是...", "以下是..."
 - **禁止后缀**如 "希望帮到你"
 - **禁止 markdown 代码块包裹**
-- 不要加引号
+- **禁止引号包裹**
+- **禁止内心独白 / 思考过程**, 如 "让我想想...", "先分析一下..."
 
-## 示例 (仅示范风格, 不要复用具体措辞)
+## 风格示例
+
+✅ **正确风格** (仅示范语气, 不要复用具体措辞):
 
 {%- if language == "en" %}
 > came back after a week off, totally lost where I was — can you remind me what's pending on this branch
 {%- else %}
 > 放假回来有点懵, 上周好像在这个分支上改了些东西但不记得进到哪一步了, 帮我理一下
+{%- endif %}
+
+❌ **错误示例** (展示要避免的业务纹理):
+
+{%- if language == "en" %}
+> back from vacation, where am I on the payment gateway integration?
+{%- else %}
+> 休假回来了, 之前那个待办应用的用户中心接口改到哪步了?
 {%- endif %}
 
 ## 变量种子

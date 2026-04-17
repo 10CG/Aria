@@ -11,7 +11,7 @@
 4. 允许状态类描述: "分支状态奇怪", "改动比我记得的多", "子模块看起来不太对", "提交历史有点乱"
 5. 语气**疑虑、求诊断、不急**, 口语化
 6. **禁止明确指派修复方案** (如 "帮我 rebase", "重置 HEAD") — 本模板的要点是"我不知道咋了, 你看看"
-7. 长度 {{ length_hint | default("40-100 字") }}
+7. 长度 {{ length_min | default(40) }}-{{ length_max | default(100) }} 字
 8. 语言: {{ language | default("中文") }}
 
 ## 输出格式 (关键)
@@ -20,14 +20,25 @@
 - **禁止前缀**如 "好的, 这是..."
 - **禁止后缀**如 "帮个忙"
 - **禁止 markdown 代码块包裹**
-- 不要加引号
+- **禁止引号包裹**
+- **禁止内心独白 / 思考过程**, 如 "让我想想...", "先分析一下..."
 
-## 示例 (仅示范风格, 不要复用具体措辞)
+## 风格示例
+
+✅ **正确风格** (仅示范语气, 不要复用具体措辞):
 
 {%- if language == "en" %}
 > something feels off with this branch, not sure if I messed up the submodules or what — can you just diagnose it and tell me what's weird
 {%- else %}
 > 这个分支看着有点不对劲, 也说不清哪里怪, 子模块看起来也乱糟糟的, 你先看一圈告诉我啥情况吧
+{%- endif %}
+
+❌ **错误示例** (违反"感觉不对劲"而非"明确故障"的精神):
+
+{%- if language == "en" %}
+> docker build is failing on the payment service, help me debug
+{%- else %}
+> 待办应用的登录接口 500 了, 帮我排查下
 {%- endif %}
 
 ## 变量种子
