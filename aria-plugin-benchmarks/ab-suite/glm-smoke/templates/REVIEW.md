@@ -51,34 +51,38 @@
 
 ---
 
-## Round 2 — Legal-Advisor 人类审核 (待进行)
+## Round 2 — Owner 签字 (per AD-M0-9, 待进行)
 
-### 审核要点 (人类 legal-advisor 必签)
+> **AD-M0-9 说明**: 原 T3.5 规范要求 "legal-advisor (人类) 最终签字"。AD-M0-9 确定在 10CG Lab = 1 人 + AI 场景下, 该"人类角色"由 **owner** 承担 (详见 `aria-orchestrator/docs/architecture-decisions.md` AD-M0-9)。签字 = **audit trail** 非法律豁免 (AD-M0-6)。底层风险 mitigation (fixture 模板法 / 禁业务纹理 / AI 预审) 全部保留。
 
-根据 T3.5 任务定义 (`tasks.md:139-142`):
-- [ ] **legal-advisor (人类)** 最终签字 — **写入本文件下方 §签字段**
+### 签字流程
+
+- [ ] **owner** 最终签字 — 写入本文件下方 §签字段
 - AI agent 意见 (Round 1) 仅为 audit trail, 不构成放行依据
-- 人类签字后产品负责人才能授权 T3.4 真跑
+- owner 签字后产品负责人才能授权 T3.4 真跑 (1 人 Lab 下 owner 通常同时是产品负责人)
 
 ### 建议审核 scope
 
-根据 ai-engineer Round 1 结论, legal-advisor 的重点应是:
+根据 ai-engineer Round 1 结论, owner 签字前应确认:
 
 1. 确认 Finding #1 的 Spec 修正 (`tasks.md:133` grep pattern) 语义正确
-2. 快速抽查 5 模板负向示例 (Finding #4 新增部分) 是否本身含业务纹理 — AI 已扫描但人类应复核
+2. 快速抽查 5 模板负向示例 (Finding #4 新增部分) 是否本身含业务纹理 — AI 已扫描但 owner 应复核
 3. 确认执行协议标注 🔶 ILLUSTRATIVE 足够清晰, 不会被误跑
 4. 对 Finding #7 (seed namespacing) 决定: 强制 T3.4 脚手架实现 vs. 接受当前现状
 
-### 签字段 (待人类填写)
+### 签字段 (待 owner 填写)
 
 ```yaml
-legal_advisor_signoff:
-  signed_by: null           # human:<姓名>, 由 10CG Lab 内指定的 legal-advisor 角色
+owner_signoff:
+  signed_by: null           # human:<owner 姓名>, per AD-M0-9 合并原 legal-advisor 角色
   date: null                # YYYY-MM-DD
   verdict: null             # approved | approved_with_conditions | rejected
   conditions: []            # 如 approved_with_conditions, 列出条件
   notes: null               # 审核意见 / 保留意见
+  referenced_ai_review: "Round 1 ai-engineer advisory, 9/9 findings applied in commit f70f1dc"
 ```
+
+**注**: `referenced_ai_review` 字段是 AD-M0-9 风险 #3 缓解要求 — owner 签字必须 reference AI 预审结论, 避免 owner 同时为作者 + 签字人时失去独立视角。
 
 ---
 
@@ -88,8 +92,9 @@ legal_advisor_signoff:
 |------|------|------|--------|
 | 2026-04-16 | Aria (初稿) | 起草 5 模板 + README | `f879ce8` |
 | 2026-04-16 | ai-engineer (AI Advisory) | Round 1 审核 9 findings | (本文件) |
-| 2026-04-16 | Aria (修复应用) | 全部 9 findings 修复 | (待 commit) |
-| TBD | legal-advisor (人类) | Round 2 最终签字 | TBD |
+| 2026-04-16 | Aria (修复应用) | 全部 9 findings 修复 | `f70f1dc` |
+| 2026-04-16 | AD-M0-9 (角色合并) | 确定 owner 签字替代 legal-advisor | (待 commit) |
+| TBD | owner (per AD-M0-9) | Round 2 最终签字 | TBD |
 
 ---
 

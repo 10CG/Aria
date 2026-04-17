@@ -38,7 +38,7 @@ M0 的存在 = 把假设验证压到 2 周可控窗口内, 让产品负责人基
 4. **治理产物**
    - `standards/legal/scoped-memo-template.md` (新增, Legal Memo 通用模板)
    - Dockerfile 构建时门控 + README WARNING block (R4-D8)
-   - fixture 合成模板 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` + `REVIEW.md` 人类 legal 签字
+   - fixture 合成模板 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` + `REVIEW.md` owner 签字 (per AD-M0-9, 1 人 + AI 场景下角色合并)
 
 ### 架构决策
 

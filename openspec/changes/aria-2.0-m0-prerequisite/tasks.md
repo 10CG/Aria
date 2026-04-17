@@ -138,7 +138,7 @@
   - 产出 `summary.yaml` 含 5 条索引
 - [ ] **T3.5** Fixture 模板二审 (1h)
   - ai-engineer 审核 5 个模板占位符 (禁含业务纹理)
-  - **legal-advisor (人类) 最终签字** 写入 `templates/REVIEW.md`
+  - **owner 最终签字** 写入 `templates/REVIEW.md` (per AD-M0-9: 1 人 + AI 场景下, "legal-advisor (人类)" 等角色由 owner 承担; audit trail 性质保留, 见 AD-M0-6)
   - AI agent 意见仅 audit trail, 不构成放行依据
 - [x] **T3.6** `image_sha256` 记录 (0.5h) — 2026-04-16
   - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.6
