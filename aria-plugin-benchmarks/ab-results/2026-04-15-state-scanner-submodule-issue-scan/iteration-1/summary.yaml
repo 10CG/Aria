@@ -1,0 +1,66 @@
+date: "2026-04-15"
+eval_suite_version: "1.3.0"
+note: "state-scanner v2.10.0 (aria-plugin v1.16.0) scan_submodules opt-in AB verification. Meta-repo pattern support. 5-round multi-agent pre_merge audit converged (R4=R5=empty). 22 findings resolved across rounds."
+skills_tested: 1
+
+results:
+  state-scanner:
+    with_skill_pass_rate: 1.0
+    without_skill_pass_rate: 0.5
+    delta_pass_rate: 0.5
+    verdict: "STRONG_POSITIVE_DELTA"
+    skill_version: "2.10.0"
+    previous_version: "2.9.0"
+    aria_plugin_version: "1.16.0"
+    evals: 2
+    assertions: 12
+    eval_ids: [0, 1]
+    eval_names:
+      - meta-repo-issue-discovery
+      - schema-conformance
+    data_source: "benchmark.json"
+    threshold_passed: true
+    threshold_for_merge: 0.3
+    runs_per_configuration: 1
+    methodology_note: "n=1 per config justified by deterministic code-path delta (scan 1 vs 4 repo), not LLM variance. Assertion design is binary (mentions issue or not). See README.md §方法论说明."
+    note: |
+      Phase 1.13 extension to scan .gitmodules submodules (opt-in via
+      state_scanner.issue_scan.scan_submodules). Dogfooding in Aria meta-repo:
+      old (v2.9.0) baseline missed aria-plugin#17, #18, aria-orchestrator#1
+      (60% under-reporting). New (v2.10.0) discovers all 5 open issues
+      across 4 repos (0% under-reporting).
+
+      Round 1 audit found 2 CRITICAL schema bugs (cache migration gap + per-repo
+      fetched_at writer/reader mismatch), 11 IMPORTANT, and 11 MINOR issues.
+      Rounds 2-3 applied fixes. Round 4 achieved first clean state. Round 5
+      confirmed stability (R5 == R4 == empty findings).
+
+      I8 false-positive assertion fix (mentions_4_or_more_repos replaced with
+      does_not_disclaim_no_submodule_scan) improved delta from +41.7pp to
+      +50.0pp — the false positive was diluting the real signal.
+
+openspec_references:
+  - openspec/archive/2026-04-15-state-scanner-submodule-issue-scan/proposal.md
+
+audit_reports:
+  - .aria/audit-reports/pr19-submodule-scan/round-1/AGGREGATE.md (FAIL, 24 findings)
+  - .aria/audit-reports/pr19-submodule-scan/round-2/AGGREGATE.md (PASS_WITH_WARNINGS, 2 MIN NEW)
+  - .aria/audit-reports/pr19-submodule-scan/round-3/AGGREGATE.md (PASS_WITH_WARNINGS, 1 MIN NEW)
+  - .aria/audit-reports/pr19-submodule-scan/round-4/AGGREGATE.md (PASS, first clean)
+  - .aria/audit-reports/pr19-submodule-scan/round-5/AGGREGATE.md (PASS, stability confirmed — CONVERGED)
+
+decision_record: .aria/decisions/2026-04-15-pr19-state-scanner-submodule-scan.md
+
+version_bump:
+  aria_plugin: "1.15.2 -> 1.16.0"
+  state_scanner_skill: "2.9.0 -> 2.10.0"
+  issue_scanning_reference: "1.0.0 -> 1.1.0"
+
+previous_baseline:
+  date: "2026-04-09"
+  note: "v2.9.0 AB (Phase 1.12 sync detection + Phase 1.13 issue awareness initial). Data preserved at aria-plugin-benchmarks/ab-results/2026-04-09/."
+  with_skill_pass_rate: 1.0
+  without_skill_pass_rate: 0.182
+  delta_pass_rate: 0.818
+  evals: 3
+  eval_ids: [5, 6, 7]

@@ -1,0 +1,35 @@
+round: 1
+agent: code-reviewer
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: IMPORTANT
+    type: spec-gap
+    area: references/issue-scanning.md:步骤3 submodule path 含空格
+    description: "Phase 1: AC-2 要求兼容路径含空格。步骤 2 的首选方案输出每行一路径后, 步骤 3 用 `for submodule_path in $submodule_paths` 迭代 — 裸变量展开在路径含空格时会分词错误。AC-2 checkbox 明确要求此兼容性。"
+    recommendation: "改用 `while IFS= read -r submodule_path` 或将路径写入数组 (`mapfile -t`) 再迭代; 或改用 `git config --file .gitmodules --get-all submodule.*.path` 配合 null-delimited 读取。"
+  - category: IMPORTANT
+    type: bash-syntax
+    area: references/issue-scanning.md:步骤6 缓存命中检查
+    description: "Phase 2: `date -d` 是 GNU date 扩展, macOS/BSD/WSL 某些发行版使用 `date -j -f` 语法; 脚本静默返回空 cached_ts, 导致每次 TTL 检查都 miss, 缓存永不命中。"
+    recommendation: "用 POSIX 兼容方式: python3 -c 或 node -e; 或在注释中明确标注 'GNU date only, Linux/WSL' 记录为已知限制。"
+  - category: IMPORTANT
+    type: spec-gap
+    area: references/issue-scanning.md:步骤3 #3.7 github 分支
+    description: "Phase 1/2: GitHub 分支用 `cd \"$submodule_path\" && gh issue list` — 在整阶段 timeout wrapper 内执行 cd 改变工作目录; sub_exit 捕获的是 cd 的退出码而非 gh 的。"
+    recommendation: "改用 `gh -C \"$submodule_path\" issue list` 或子 shell 执行 `(cd ...; gh ...)` 避免改变外层 shell 状态。"
+  - category: MINOR
+    type: ambiguity
+    area: references/issue-scanning.md:步骤3 #3.6 cached_ts 计算
+    description: "Phase 2: `now_ts` 变量在 submodule 循环中使用, 但未在此章节定义。若实现者忘记设置, TTL 比较会因空变量算术错误全部 miss。"
+    recommendation: "在 §步骤 3 开头或显式 `now_ts=$(date +%s)` 初始化。"
+  - category: MINOR
+    type: spec-gap
+    area: SKILL.md:配置项表格 + issue-scanning.md:fail-soft 矩阵
+    description: "Phase 1: AC-3 要求失败 submodule 记录 fetch_error。Fail-soft 矩阵'submodule 未初始化'为'repos 不包含该条目' — 与 D10 的'记录 fetch_error, items: []'语义不一致。"
+    recommendation: "统一行为: 未初始化 submodule 写入 repos[owner/repo], 设 fetch_error: 'submodule_not_initialized', items: []。"
+  - category: MINOR
+    type: ambiguity
+    area: references/issue-scanning.md:步骤3 变量 all_repos_json
+    description: "Phase 2: 步骤 4 的 jq 聚合使用 $repos 引用 all_repos_json, 但步骤 3 伪代码中从未构造或赋值该变量; record_repo_success/record_repo_error 等辅助函数未定义。"
+    recommendation: "在步骤 3 末尾或步骤 4 前补充 all_repos_json 的构造方式, 或明确注释这些是逻辑占位符。"
+summary: "Phase 1 总体 PASS — D1/D2/D3/D6/D9/D10/D11 均已体现; AC-1/AC-3/AC-4/AC-6/AC-7 有文字覆盖; AC-2 空格兼容性和 D10/D11 fail-soft 一致性存在 2 个 Important 缺口。Phase 2 发现 3 个 bash 级别缺陷 (空格分词、GNU-date 跨平台、cd vs gh -C), 均属可修复的 bash-prose 质量问题, 不阻塞核心逻辑。建议 Round 2 修复 3 个 IMPORTANT 后重新审查。"

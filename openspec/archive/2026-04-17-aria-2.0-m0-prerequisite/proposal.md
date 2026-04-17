@@ -1,11 +1,12 @@
 # aria-2.0-m0-prerequisite — Aria 2.0 M0 前置验证与架构定稿
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Complete
 > **Created**: 2026-04-14
+> **Completed**: 2026-04-17 (T6.4 Phase 2 final signoff, handoff validator PASS final)
 > **Parent Story**: [US-020](../../../docs/requirements/user-stories/US-020.md)
 > **Target Version**: v2.0.0-m0
-> **Related Spec**: [aria-2.0-m0-spike-hermes](../aria-2.0-m0-spike-hermes/proposal.md) (Spike 专项 Spec, 本 Spec 产出依赖其结论回填 AD3)
+> **Related Spec**: [aria-2.0-m0-spike-hermes](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md) (Spike 专项 Spec, 本 Spec 产出依赖其结论回填 AD3)
 > **Source**: PRD v2.0 §M0 + Agent Team 4 轮收敛 ([review log](../../../.aria/decisions/2026-04-14-us020-agent-team-review.md))
 
 ## Why
@@ -38,7 +39,7 @@ M0 的存在 = 把假设验证压到 2 周可控窗口内, 让产品负责人基
 4. **治理产物**
    - `standards/legal/scoped-memo-template.md` (新增, Legal Memo 通用模板)
    - Dockerfile 构建时门控 + README WARNING block (R4-D8)
-   - fixture 合成模板 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` + `REVIEW.md` 人类 legal 签字
+   - fixture 合成模板 `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/*.j2.md` + `REVIEW.md` owner 签字 (per AD-M0-9, 1 人 + AI 场景下角色合并)
 
 ### 架构决策
 
@@ -95,4 +96,4 @@ M0 的存在 = 把假设验证压到 2 周可控窗口内, 让产品负责人基
 - US-020: [docs/requirements/user-stories/US-020.md](../../../docs/requirements/user-stories/US-020.md)
 - Brainstorm 决策: [.aria/decisions/2026-04-14-aria-2.0-us020-scope.md](../../../.aria/decisions/2026-04-14-aria-2.0-us020-scope.md)
 - Agent Team 收敛: [.aria/decisions/2026-04-14-us020-agent-team-review.md](../../../.aria/decisions/2026-04-14-us020-agent-team-review.md)
-- Spike Spec: [../aria-2.0-m0-spike-hermes/proposal.md](../aria-2.0-m0-spike-hermes/proposal.md)
+- Spike Spec: [../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md](../../archive/2026-04-16-aria-2.0-m0-spike-hermes/proposal.md)

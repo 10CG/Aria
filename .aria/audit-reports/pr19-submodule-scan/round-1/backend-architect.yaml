@@ -1,0 +1,30 @@
+round: 1
+agent: backend-architect
+verdict: FAIL
+findings:
+  - category: CRITICAL
+    type: cache_schema_migration_gap
+    area: .aria/cache/issues.json vs references/issue-scanning.md §Step 5
+    description: The live on-disk cache uses the pre-v2.9.0 schema {fetched_at, platform, open_issues:[]} — there is no repos:{} map. The spec claims v2.9.0 already pre-reserves this structure, but the actual file disproves that. No migration path or cache-invalidation logic is documented for users upgrading from the old schema.
+    recommendation: Add a cache schema version guard (e.g., check for presence of repos key on read; if absent, treat as cold cache and re-fetch). Document the one-time cold-cache on first v1.16.0 run.
+  - category: CRITICAL
+    type: per_repo_fetched_at_field_missing_in_write
+    area: references/issue-scanning.md §Step 5 cache JSON vs §Step 3.6 cache-read logic
+    description: Step 3.6 reads repos[$key].fetched_at to evaluate per-repo TTL, but the Step 5 cache write schema omits fetched_at at the repo level — only the top-level fetched_at exists. On a partial refresh run (some repos hit, some miss), the per-repo TTL check will always treat cached repos as expired because their fetched_at is null/empty.
+    recommendation: Add fetched_at to each repo-level cache entry in the write schema, or document that per-repo TTL uses the top-level fetched_at exclusively and remove the per-repo fetched_at read in Step 3.6.
+  - category: IMPORTANT
+    type: output_schema_key_rename_is_breaking
+    area: SKILL.md Phase 1.13 output schema, issue_status.items vs open_issues
+    description: The pre-change cache and output schema uses open_issues[] as the flat list key; v1.16.0 renames it to items[] and adds a repo field. Consumers on v1.15.x reading the cached file after a v1.16.0 write will find open_issues absent. This is a breaking rename, not an additive change.
+    recommendation: Either retain open_issues as an alias (write both keys) or add a schema_version field so downstream consumers can branch on it. The SemVer MINOR claim holds only if no consumer depends on the open_issues key name.
+  - category: IMPORTANT
+    type: timeout_not_scaling_with_n
+    area: D3, SKILL.md stage_timeout_seconds=20
+    description: The 20s default is calibrated for N=4 (Aria's specific topology). A project with 6 submodules needs 35s at worst case, but the config default remains 20s with only a prose note to manually adjust.
+    recommendation: Either make stage_timeout_seconds auto-computed as (N+1)*api_timeout_seconds at runtime, or emit an explicit warning when the submodule count exceeds floor(stage_timeout_seconds/api_timeout_seconds)-1.
+  - category: MINOR
+    type: label_summary_cross_repo_opacity
+    area: SKILL.md issue_status.label_summary
+    description: label_summary is aggregated cross-repo with no per-repo breakdown. A consumer cannot determine which repo is driving a high bug count without traversing repos{} manually.
+    recommendation: Low priority — the repos{} grouped view already provides the per-repo signal. No change needed unless a consumer for per-repo label_summary emerges.
+summary: Two critical schema inconsistencies exist — the live cache file does not match the v2.9.0 schema assumed by the spec, and per-repo cache TTL reads a fetched_at field that is never written. These will cause silent full-cache misses on every submodule after the first run. The output key rename (open_issues→items) is a behavioral breaking change that contradicts the backward-compatibility claim. These must be resolved before merge.

@@ -1,0 +1,45 @@
+prompt: /state-scanner
+failure_mode: triggered_invalid_yaml
+raw_output: "Now I have a comprehensive view of the project state. Let me present\
+  \ the analysis:\n\n```\n╔══════════════════════════════════════════════════════════════╗\n\
+  ║                    PROJECT STATE ANALYSIS                     ║\n╚══════════════════════════════════════════════════════════════╝\n\
+  \n\U0001F4CD 当前状态\n───────────────────────────────────────────────────────────────\n\
+  \  分支: feature/aria-2.0-m0-prerequisite\n  模块: glm-smoke (ab-suite 子目录)\n  项目版本:\
+  \ v1.5.0 | 插件版本: v1.16.0\n  同步状态: 领先 origin/master 2 commits / 落后 49 commits\n\n\
+  \U0001F4CA 变更分析\n───────────────────────────────────────────────────────────────\n\
+  \  未提交文件: 2 个\n    - aria-plugin-benchmarks/ab-suite/glm-smoke/failed-samples/\n\
+  \    - aria-plugin-benchmarks/ab-suite/glm-smoke/scripts/run-glm-smoke.py\n  变更类型:\
+  \ 测试产物 + 脚本 (glm-smoke suite)\n  复杂度: Level 1\n\n\U0001F4C4 需求状态\n───────────────────────────────────────────────────────────────\n\
+  \  配置状态: ✅ 已配置\n  PRD: prd-aria-v1.md, prd-aria-v2.md\n  User Stories: 9 个 (US-001,\
+  \ US-002, US-006~011, US-020)\n  PRD v2.0 Status: Approved (2026-04-11)\n\n\U0001F4CB\
+  \ OpenSpec 状态\n───────────────────────────────────────────────────────────────\n\
+  \  活跃变更: 3 个\n    ✏️  aria-2.0-m0-prerequisite (Draft) ← 当前分支关联\n    ✏️  aria-2.0-silknode-integration-contract\n\
+  \    ✏️  state-scanner-mechanical-enforcement\n  已归档: 23 个\n\n\U0001F6E1️ 审计状态\n\
+  ───────────────────────────────────────────────────────────────\n  审计系统: ❌ 未启用 (experiments.agent_team_audit:\
+  \ false)\n\n\U0001F527 自定义检查\n───────────────────────────────────────────────────────────────\n\
+  \  ⚠️  issue-cache-freshness: STALE\n     缓存时间: 2026-04-17 01:47:07Z (约 7 小时前)\n\
+  \     修复建议: rm .aria/cache/issues.json && 重跑 /state-scanner\n\n\U0001F504 同步状态\n\
+  ───────────────────────────────────────────────────────────────\n  当前分支: feature/aria-2.0-m0-prerequisite\n\
+  \  与 origin/master: 领先 2 / 落后 49\n  远程状态: ✅ 与 origin 同步\n  子模块:\n    ✅ standards:\
+  \ master (791f05a)\n    \U0001F500 aria-orchestrator: feature/m0-t4-st1-hermes-analysis\
+  \ (cf136dc)\n    \U0001F500 aria: v1.6.0+66 (07dda35) — 非 release tag\n\n\U0001F3AB\
+  \ Open Issues\n───────────────────────────────────────────────────────────────\n\
+  \  平台: Forgejo — 6 open (跨 2 repos)\n  10CG/Aria (4):\n    \U0001F4CC #18  bug(state-scanner):\
+  \ Phase 1.5 未检测 PRD Status\n    \U0001F4CC #17  bug(state-scanner): Phase 1.5 Status\
+  \ 提取漏掉 ## heading\n    \U0001F4CC #16  [US-020] Aria 2.0 M0 — 前置验证与架构定稿\n    \U0001F4CC\
+  \ #5   [Feature] Pulse 项目集成\n  10CG/aria-plugin (2):\n    \U0001F4CC #18  feat(estimator):\
+  \ Token × Attention 双主轴工作量估算\n    \U0001F4CC #17  feat(audit-engine): 多轮挑战循环加固\n\
+  \  数据来源: cache (stale) | ttl: 15m\n\n\U0001F3AF 推荐工作流\n───────────────────────────────────────────────────────────────\n\
+  \  ➤ [1] quick-fix (推荐)\n      理由: 测试产物文件未提交，Level 1 变更，快速提交即可\n  ○ [2] feature-dev\
+  \ — 需要 OpenSpec 先从 Draft → Approved\n  ○ [3] branch-finisher — 完成当前分支收尾工作\n  ○ [4]\
+  \ 自定义组合\n\n\U0001F914 选择 [1-4] 或输入自定义:\n```\n"
+raw_stderr: ''
+return_code: 0
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 05-anomaly-triage
+seed: e5
+mode: slash
+ran_at: '2026-04-17T09:13:10.609596+00:00'

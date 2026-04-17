@@ -1,0 +1,15 @@
+prompt: 我感觉这个仓库状态有点飘，提交历史乱七八糟的，改动比我记得的多好多，子模块也看着不对劲，你能帮我看看咋回事吗
+failure_mode: timeout
+raw_output: ''
+raw_stderr: '
+
+  [TIMEOUT]'
+return_code: -1
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 05-anomaly-triage
+seed: e5
+mode: auto
+ran_at: '2026-04-17T09:04:26.828594+00:00'

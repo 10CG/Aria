@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 6,
+    "failed": 0,
+    "total": 6
+  },
+  "expectations": [
+    {
+      "text": "Output mentions Aria #16 (US-020 M0)",
+      "passed": true,
+      "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"
+    },
+    {
+      "text": "Output mentions Aria #5 (Pulse)",
+      "passed": true,
+      "evidence": "Looking for: '#5'; found"
+    },
+    {
+      "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)",
+      "passed": true,
+      "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: ['Drift Guard', 'audit-engine']"
+    },
+    {
+      "text": "Output mentions aria-plugin #18 (Token Attention / estimator)",
+      "passed": true,
+      "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: ['Token', 'estimator']"
+    },
+    {
+      "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)",
+      "passed": true,
+      "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '轻量化 Hermes', 'lightweight Hermes']; found: ['轻量化 Hermes']"
+    },
+    {
+      "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)",
+      "passed": true,
+      "evidence": "Must not contain any of ['NOT scanned', '未扫描', 'not scanning submodules', '子模块 NOT', 'submodules NOT', '(N/A in this version)', 'pre-change 版本限制']; found: none (pass)"
+    }
+  ]
+}

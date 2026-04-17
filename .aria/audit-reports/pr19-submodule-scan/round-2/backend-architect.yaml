@@ -1,0 +1,11 @@
+round: 2
+agent: backend-architect
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: MINOR
+    type: schema_version_claim_inconsistency
+    area: SKILL.md Phase 1.13 output schema example vs references/issue-scanning.md §步骤 5 writer
+    description: "SKILL.md states 'scan_submodules=false outputs schema_version=1.0' (in §向后兼容保证 comment) but the step 5 writer unconditionally emits schema_version=1.1 regardless of scan_submodules value. The writer does not branch on scan_submodules. The reader accepts both 1.0 and 1.1 as compatible so there's no functional regression, but the stated invariant is false."
+    recommendation: "Either branch the writer to emit 1.0 when scan_submodules=false (matching the stated invariant), or update SKILL.md to state the writer always emits 1.1 (documentation fix). Preferred: update SKILL.md since writer consistency is simpler."
+    status: NEW
+summary: "All four Round 1 findings (C1, C2, I1, I2) are properly resolved. The schema_version guard correctly cold-caches pre-v1.1 entries; per-repo fetched_at is written in step 3.11 and read in step 3.6; dual-write is a single jq reference making out-of-sync impossible; the D14 formula max(20,(N+1)*5) computes 55s for N=10 as required. One new minor inconsistency exists between SKILL.md stated schema_version value for scan_submodules=false path and what the writer actually emits, requiring either a writer branch or a doc correction before merge."

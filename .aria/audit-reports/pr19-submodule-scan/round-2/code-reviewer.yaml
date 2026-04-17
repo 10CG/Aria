@@ -1,0 +1,11 @@
+round: 2
+agent: code-reviewer
+verdict: PASS
+findings:
+  - category: MINOR
+    type: open_count_field_mismatch_doc_gap
+    area: issue-scanning.md §步骤 3.11 vs §Fail-soft 矩阵
+    description: "The success path writes open_count via jq template; error-path entries use open_count: 0 literal — consistent at pseudocode level. The Fail-soft matrix table header says 'repos 条目行为' without explicitly stating the schema field name, creating minor documentation ambiguity between open_count (pseudocode) and open_issues (v1.0 alias). No runtime defect, purely doc clarity gap."
+    recommendation: "Add a one-line note in §Fail-soft 矩阵 confirming that error-path entries use open_count: 0 (not the v1.0 open_issues alias) to remove consumer ambiguity."
+    status: NEW
+summary: "All six Round 1 findings (I4 submodule_path_with_spaces, I5 date_d_GNU_only, I6 cd_vs_gh_C, M2 now_ts_undefined, M3 failsoft_inconsistency, M4 all_repos_json_undefined) are correctly and fully resolved. The only new finding is a Minor documentation gap in the Fail-soft matrix. The implementation is production-ready."

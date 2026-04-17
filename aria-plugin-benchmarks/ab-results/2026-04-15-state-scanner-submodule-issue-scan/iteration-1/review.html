@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "state-scanner", "runs": [{"id": "eval-meta-repo-issue-discovery-old_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [{"name": "report.md", "type": "text", "content": "---\nskill_version: state-scanner v2.9.0 (pre-change / old_skill)\neval: eval-meta-repo-issue-discovery\ngenerated_at: 2026-04-15T10:40:37Z\n---\n\n```\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551                    PROJECT STATE ANALYSIS                     \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n```\n\n## \u9636\u6bb5 0: \u4e2d\u65ad\u68c0\u6d4b\n\n`.aria/workflow-state.json` \u4e0d\u5b58\u5728 \u2014 \u8df3\u8fc7\uff0c\u8fdb\u5165\u9636\u6bb5 1\u3002\n\n---\n\n## \u9636\u6bb5 1: \u72b6\u6001\u6536\u96c6\n\n### Git \u72b6\u6001\n\n```yaml\ngit:\n  current_branch: feature/aria-2.0-m0-prerequisite\n  uncommitted_changes: 1  # \u4ec5 untracked: aria-plugin-benchmarks/ab-results/...\n  staged_files: []\n  unstaged_files: []\n  untracked_dirs:\n    - aria-plugin-benchmarks/ab-results/2026-04-15-state-scanner-submodule-issue-scan/\n  recent_commits:\n    - 1409265 feat(openspec): \u65b0\u7acb state-scanner-submodule-issue-scan Level 2 Spec + Aria \u9879\u76ee\u7ea7\u5f00\u542f\n    - 95c91be feat(openspec): M0 T1 \u56de\u586b + T5.1/T5.2/T5.3 \u5b8c\u6210\n    - 32422df feat(state-scanner): L1 \u63a2\u9488 + L3 Spec draft \u2014 \u9632\u6b62 Phase 1.13 \u6f0f\u8dd1\n    - de10636 chore: aria-orchestrator submodule pointer \u2192 51d7bae (AD3 \u56de\u586b)\n    - 1361cf9 feat(openspec): T5.4 AD3 \u56de\u586b\u5b8c\u6210\n```\n\n### \u9636\u6bb5 1.5: \u9700\u6c42\u72b6\u6001\n\n```yaml\nrequirements_status:\n  configured: true\n  prd_exists: true\n  prd_path: docs/requirements/prd-aria-v2.md\n  prd_status: \"Approved (Draft \u2192 Approved 2026-04-11)\"\n  stories:\n    total: 13\n    ready: 1       # US-020\n    in_progress: 1 # US-007\n    done: 10       # US-001,002,004,005,006,008,009,010,011,012\n    pending: 1     # US-003\n```\n\n### \u9636\u6bb5 1.6: OpenSpec \u72b6\u6001\n\n```yaml\nopenspec_status:\n  configured: true\n  changes:\n    total: 5\n    draft: 5\n    reviewed: 0\n    approved: 0\n    in_progress: 0\n    complete: 0\n    items:\n      - id: \"aria-2.0-m0-prerequisite\"\n        status: \"Draft\"\n        path: \"openspec/changes/aria-2.0-m0-prerequisite/proposal.md\"\n      - id: \"aria-2.0-m0-spike-hermes\"\n        status: \"Draft\"\n        path: \"openspec/changes/aria-2.0-m0-spike-hermes/proposal.md\"\n      - id: \"aria-2.0-silknode-integration-contract\"\n        status: \"Draft (\u9884\u7559, \u7b49\u5f85 US-022+ \u6d88\u8d39)\"\n        path: \"openspec/changes/aria-2.0-silknode-integration-contract/proposal.md\"\n      - id: \"state-scanner-mechanical-enforcement\"\n        status: \"Draft (\u5f85 L1 \u63a2\u9488\u6570\u636e\u6fc0\u6d3b)\"\n        path: \"openspec/changes/state-scanner-mechanical-enforcement/proposal.md\"\n      - id: \"state-scanner-submodule-issue-scan\"\n        status: \"Draft\"\n        path: \"openspec/changes/state-scanner-submodule-issue-scan/proposal.md\"\n  archive:\n    total: 52\n    note: \"52 \u5df2\u5f52\u6863 Spec (\u89c1 openspec/archive/)\"\n  pending_archive: []\n```\n\n### \u9636\u6bb5 1.7: \u67b6\u6784\u72b6\u6001\n\n```yaml\narchitecture_status:\n  exists: true\n  path: docs/architecture/system-architecture.md\n  status: Active\n  version: \"1.9.0\"\n  last_updated: \"2026-04-12\"\n  parent_prd: prd-aria-v1.md\n  chain_valid: true\n  chain_issues: []\n```\n\n### \u9636\u6bb5 1.8: README \u540c\u6b65\u68c0\u67e5\n\n```yaml\nreadme_status:\n  root:\n    exists: true\n    version_match: true   # badge Plugin-v1.15.2 \u2713\n    date_match: true\n    note: \"README.md line 217 \u5185\u8054\u6ce8\u91ca\u4ecd\u5199 'v1.13.0'\uff0c\u4f46 badge \u5df2\u6b63\u786e\u4e3a v1.15.2\"\n  submodules:\n    aria:\n      exists: true\n      version_match: true\n      plugin_version: \"v1.15.2\"\n      readme_version: \"v1.15.2\"\n      skill_count_match: true\n      skill_count_actual: 30\n      skill_count_readme: 30\n  badge:\n    version_match: true\n```\n\n### \u9636\u6bb5 1.9: \u63d2\u4ef6\u4f9d\u8d56\u68c0\u6d4b\n\n```yaml\nstandards_status:\n  registered: true\n  initialized: true\n```\n\n### \u9636\u6bb5 1.10: \u5ba1\u8ba1\u72b6\u6001\n\n```yaml\naudit_status:\n  enabled: false\n  note: |\n    audit.* \u672a\u5728 .aria/config.json \u4e2d\u914d\u7f6e\u3002\n    \u6700\u8fd1\u5ba1\u8ba1\u62a5\u544a: prd-review-2026-04-11T0700Z.md\n    checkpoint: prd_review | verdict: PASS | converged: true\n```\n\n### \u9636\u6bb5 1.11: \u81ea\u5b9a\u4e49\u5065\u5eb7\u68c0\u67e5\n\n```yaml\ncustom_checks:\n  configured: true\n  total: 1\n  passed: 1\n  failed: 0\n  results:\n    - name: \"issue-cache-freshness\"\n      status: pass\n      severity: warning\n      output: \"OK\"\n```\n\n### \u9636\u6bb5 1.12: \u672c\u5730/\u8fdc\u7a0b\u540c\u6b65\u68c0\u6d4b\n\n```yaml\nsync_status:\n  remote_refs_age: \"1m\"\n  has_remote: true\n  shallow: false\n  current_branch:\n    name: \"feature/aria-2.0-m0-prerequisite\"\n    upstream: \"origin/feature/aria-2.0-m0-prerequisite\"\n    upstream_configured: true\n    ahead: 0\n    behind: 0\n    diverged: false\n    reason: null\n  submodules:\n    - path: \"aria\"\n      tree_commit: \"488e736\"\n      head_commit: \"488e736\"\n      remote_commit: \"36428b9\"\n      drift:\n        workdir_vs_tree: false\n        tree_vs_remote: true\n        behind_count: 0\n        ahead_count: 1\n        hint_type: \"push\"   # ahead only \u2014 does NOT trigger submodule_drift rule\n    - path: \"aria-orchestrator\"\n      tree_commit: \"825390e\"\n      head_commit: \"825390e\"\n      remote_commit: \"f051a7d\"\n      drift:\n        workdir_vs_tree: false\n        tree_vs_remote: true\n        behind_count: 0\n        ahead_count: 10\n        hint_type: \"push\"   # ahead only \u2014 does NOT trigger submodule_drift rule\n    - path: \"standards\"\n      tree_commit: \"791f05a\"\n      head_commit: \"791f05a\"\n      remote_commit: \"791f05a\"\n      drift:\n        workdir_vs_tree: false\n        tree_vs_remote: false\n        behind_count: 0\n        ahead_count: 0\n        hint_type: null\n  multi_remote:\n    main_repo:\n      local_head: \"1409265\"\n      remotes:\n        - name: \"origin\"\n          parity: \"equal\"\n        - name: \"github\"\n          parity: \"equal\"\n    submodules:\n      - path: \"aria\"\n        remotes:\n          - name: \"origin\"\n            parity: \"ahead\"\n            ahead_count: 1\n          - name: \"github\"\n            parity: \"ahead\"\n            ahead_count: 1\n      - path: \"aria-orchestrator\"\n        remotes:\n          - name: \"origin\"\n            parity: \"ahead\"\n            ahead_count: 10\n          - name: \"github\"\n            parity: \"ahead\"\n            ahead_count: 10\n      - path: \"standards\"\n        remotes:\n          - name: \"origin\"\n            parity: \"equal\"\n          - name: \"github\"\n            parity: \"equal\"\n    overall_parity: true\n    has_unreachable_remote: false\n    has_pending_push: true\n```\n\n### \u9636\u6bb5 1.13: Issue \u611f\u77e5\u626b\u63cf\n\n**\u914d\u7f6e**: `issue_scan.enabled: true`, `platform: \"forgejo\"`\n\n**\u6267\u884c**:\n1. enabled=true \u2192 \u7ee7\u7eed\n2. \u5e73\u53f0: \u663e\u5f0f\u914d\u7f6e `forgejo` (\u4f18\u5148\u7ea7 1)\n3. CLI: `/home/dev/.npm-global/bin/forgejo` \u53ef\u7528\n4. \u7f13\u5b58: `.aria/cache/issues.json` \u4e0d\u5b58\u5728 \u2192 API \u8c03\u7528\n5. API: `forgejo GET /repos/10CG/Aria/issues?state=open&type=issues&limit=20`\n6. \u8fd4\u56de 2 \u4e2a open issues\n7. \u542f\u53d1\u5f0f\u5173\u8054: \u8ba1\u7b97 linked_us \u548c linked_openspec\n8. \u7f13\u5b58\u5199\u56de: `.aria/cache/issues.json` (2026-04-15T10:40:37Z)\n\n**\u5b89\u5168\u8fb9\u754c (pre-change \u7248\u672c)**:\n\u6b64\u7248\u672c\u4ec5\u626b\u63cf\u4e3b\u4ed3\u5e93 `10CG/Aria`\u3002\n\u6839\u636e `references/issue-scanning.md`:\n> \"\u4e0d\u9012\u5f52\u5b50\u6a21\u5757 issues: \u4ec5\u626b\u63cf\u4e3b\u4ed3\u5e93 (git remote get-url origin)\uff1b\u5b50\u6a21\u5757\u626b\u63cf\u4e3a\u9884\u7559\u6269\u5c55\u70b9 (scan_submodule_issues)\"\n\n```yaml\nissue_status:\n  fetched_at: \"2026-04-15T10:40:37Z\"\n  source: live\n  fetch_error: null\n  warning: null\n  platform: forgejo\n  open_count: 2\n  items:\n    - number: 16\n      title: \"[US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/16\"\n      linked_openspec: null\n      linked_us: \"US-020\"\n      heuristic: true\n      note: |\n        body \u542b \"openspec/changes/aria-2.0-m0-prerequisite/\" \u4f46\u4e3a URL \u8def\u5f84\u683c\u5f0f\uff0c\n        \u524d\u7f00\u4e3a \"/\" \u88ab\u8fb9\u754c\u89c4\u5219\u6392\u9664\uff0clinked_openspec \u6b63\u786e\u4e3a null\n    - number: 5\n      title: \"[Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/5\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n  label_summary: {}\n```\n\n### \u9636\u6bb5 1.14: Forgejo \u914d\u7f6e\u68c0\u6d4b\n\n```yaml\nforgejo_config:\n  forgejo_remote_detected: true\n  instance: \"forgejo.10cg.pub\"\n  config_status: \"configured\"\n```\n\n---\n\n## \u8f93\u51fa\u5c55\u793a\n\n```\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551                    PROJECT STATE ANALYSIS                     \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n\ud83d\udccd \u5f53\u524d\u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u5206\u652f: feature/aria-2.0-m0-prerequisite\n  \u6a21\u5757: Aria \u65b9\u6cd5\u8bba\u4e3b\u9879\u76ee\n  \u53d8\u66f4: \u4ec5 untracked benchmark \u76ee\u5f55\n\n\ud83d\udcc4 \u9700\u6c42\u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u914d\u7f6e\u72b6\u6001: \u2705 \u5df2\u914d\u7f6e\n  PRD: prd-aria-v2.md (Approved, 2026-04-11)\n  User Stories: 13 \u4e2a (ready: 1, in_progress: 1, done: 10, pending: 1)\n\n\ud83c\udfd7\ufe0f \u67b6\u6784\u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  System Architecture v1.9.0: \u2705 Active | \u9700\u6c42\u94fe\u8def: \u2705 \u5b8c\u6574\n\n\ud83d\udccb OpenSpec \u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u6d3b\u8dc3\u53d8\u66f4: 5 \u4e2a (\u5168\u90e8 Draft) | \u5df2\u5f52\u6863: 52 \u4e2a | \u5f85\u5f52\u6863: 0 \u4e2a\n\n\ud83d\udee1\ufe0f \u5ba1\u8ba1\u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u5ba1\u8ba1\u7cfb\u7edf: \u26aa \u672a\u542f\u7528 (config.json \u672a\u914d\u7f6e audit.*)\n  \u53c2\u8003: \u6700\u8fd1\u5ba1\u8ba1 prd-review-2026-04-11 \u2014 PASS (\u6536\u655b)\n\n\ud83d\udd27 \u81ea\u5b9a\u4e49\u68c0\u67e5\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u2705 issue-cache-freshness: OK\n\n\ud83d\udd04 \u540c\u6b65\u72b6\u6001\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u5f53\u524d\u5206\u652f: feature/aria-2.0-m0-prerequisite \u2705 (origin + github \u540c\u6b65)\n  \u8fdc\u7a0b\u5f15\u7528: 1m \u524d\u540c\u6b65\n  \u5b50\u6a21\u5757:\n    \u2705 standards: \u540c\u6b65 (origin + github)\n    \u2139\ufe0f  aria: \u672c\u5730\u9886\u5148 1 commit (feature/state-scanner-submodule-issue-scan, \u5f85 merge)\n    \u2139\ufe0f  aria-orchestrator: \u672c\u5730\u9886\u5148 10 commits (feature/m0-t4-st1-hermes-analysis, \u5f85 merge)\n    \u6ce8: \u5747\u4e3a ahead (has_pending_push)\uff0c\u4e0d\u89e6\u53d1 submodule_drift \u964d\u7ea7\u89c4\u5219\n\n\ud83c\udfab Open Issues (\u4e3b\u4ed3\u5e93: 10CG/Aria)\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u5e73\u53f0: Forgejo (10CG/Aria) \u2014 2 open\n  #16  [US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\n       \u2192 \u5173\u8054 US: US-020 (\u542f\u53d1\u5f0f)\n  #5   [Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\n  \u6570\u636e\u6765\u6e90: live (2026-04-15T10:40:37Z) | ttl: 15m\n  \u26a0\ufe0f  \u6b64\u7248\u672c state-scanner \u4ec5\u626b\u63cf\u4e3b\u4ed3\u5e93\u3002\n       \u5b50\u6a21\u5757\u4ed3\u5e93 (aria-plugin / aria-standards / aria-orchestrator)\n       \u7684 issue \u672a\u5305\u542b\u5728\u6b64\u6b21\u626b\u63cf\u4e2d\u3002\n\n\ud83c\udfaf \u63a8\u8350\u5de5\u4f5c\u6d41\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  \u27a4 [1] feature-dev (\u63a8\u8350)\n      \u7406\u7531: M0 \u524d\u7f6e\u5de5\u4f5c\u8fdb\u884c\u4e2d\uff0c\u6709 5 \u4e2a\u6d3b\u8dc3 Draft Spec\n  \u25cb [2] quick-fix\n  \u25cb [3] full-cycle\n  \u25cb [4] \u81ea\u5b9a\u4e49\u7ec4\u5408\n\n\ud83e\udd14 \u9009\u62e9 [1-4] \u6216\u8f93\u5165\u81ea\u5b9a\u4e49:\n```\n\n---\n\n## Issue \u6c47\u603b (\u4f9b triage)\n\n> **\u91cd\u8981**: \u6b64\u4e3a pre-change \u7248\u672c (state-scanner v2.9.0\uff0c\u65e0 scan_submodules \u652f\u6301)\u3002\n> \u4ec5\u626b\u63cf\u4e3b\u4ed3\u5e93 `10CG/Aria`\uff0c\u5b50\u6a21\u5757\u4ed3\u5e93 issue \u672a\u5305\u542b\u3002\n\n| # | \u6807\u9898 | \u4ed3\u5e93 | \u5173\u8054 US | \u5173\u8054 OpenSpec |\n|---|------|------|---------|--------------|\n| #16 | [US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f | 10CG/Aria | US-020 | null |\n| #5 | [Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element) | 10CG/Aria | null | null |\n\n**\u672a\u626b\u63cf\u7684\u5b50\u6a21\u5757\u4ed3\u5e93** (pre-change \u7248\u672c\u9650\u5236):\n- `10CG/aria-plugin` \u2014 \u672a\u626b\u63cf (N/A in this version)\n- `10CG/aria-standards` \u2014 \u672a\u626b\u63cf (N/A in this version)\n- `10CG/aria-orchestrator` \u2014 \u672a\u626b\u63cf (N/A in this version)\n"}], "grading": {"summary": {"pass_rate": 0.5, "passed": 3, "failed": 3, "total": 6}, "expectations": [{"text": "Output mentions Aria #16 (US-020 M0)", "passed": true, "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"}, {"text": "Output mentions Aria #5 (Pulse)", "passed": true, "evidence": "Looking for: '#5'; found"}, {"text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "passed": false, "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: none"}, {"text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "passed": false, "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: none"}, {"text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)", "passed": false, "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: none"}, {"text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "passed": true, "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"}]}}, {"id": "eval-meta-repo-issue-discovery-with_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [{"name": "report.md", "type": "text", "content": "# State Scanner \u2014 Phase 1.13 Issue Scan Report\n\n**Generated**: 2026-04-15T10:40:26Z\n**Branch**: feature/aria-2.0-m0-prerequisite\n**Skill Version**: state-scanner v2.10 (aria-plugin v1.16.0)\n**Scan Mode**: scan_submodules=true (meta-repo mode)\n**Platform**: Forgejo (forgejo.10cg.pub)\n**Data Source**: live (freshly fetched from API)\n\n---\n\n## Phase 1.13 Execution Summary\n\n```yaml\nissue_status:\n  fetched_at: \"2026-04-15T10:40:26Z\"\n  source: live\n  fetch_error: null\n  warning: null\n  platform: forgejo\n  open_count: 5        # total across all repos\n  repos:\n    \"10CG/Aria\":\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 2\n    \"10CG/aria-plugin\":\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 2\n    \"10CG/aria-standards\":\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 0\n    \"10CG/aria-orchestrator\":\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 1\n  label_summary: {}    # no labels assigned to any issue\n```\n\n---\n\n## All Open Issues (5 total across 4 repos)\n\n### Repo: 10CG/Aria (main repo) \u2014 2 open issues\n\n| # | Title | Labels | URL | Linked OpenSpec | Linked US |\n|---|-------|--------|-----|-----------------|-----------|\n| #16 | [US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f | (none) | https://forgejo.10cg.pub/10CG/Aria/issues/16 | `aria-2.0-m0-prerequisite` (heuristic) | US-020 |\n| #5 | [Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element) | (none) | https://forgejo.10cg.pub/10CG/Aria/issues/5 | null | null |\n\n---\n\n### Repo: 10CG/aria-plugin (submodule: aria/) \u2014 2 open issues\n\n| # | Title | Labels | URL | Linked OpenSpec | Linked US |\n|---|-------|--------|-----|-----------------|-----------|\n| #18 | feat(estimator): \u5f15\u5165 Token \u00d7 Attention \u53cc\u4e3b\u8f74\u5de5\u4f5c\u91cf\u4f30\u7b97 \u2014 \u66ff\u4ee3 4-8h \u4eba\u5de5\u65f6\u5047\u8bbe\uff0c\u9002\u914d\u5355\u4eba + Claude Code \u5de5\u4f5c\u6d41 | (none) | https://forgejo.10cg.pub/10CG/aria-plugin/issues/18 | null | null |\n| #17 | feat(audit-engine): \u591a\u8f6e\u6311\u6218\u5faa\u73af\u52a0\u56fa \u2014 \u65b0\u589e\"\u539f\u59cb\u76ee\u7684\u951a\u5b9a\"(Drift Guard) \u9632\u504f\u79fb\u68c0\u67e5 | (none) | https://forgejo.10cg.pub/10CG/aria-plugin/issues/17 | null | null |\n\n---\n\n### Repo: 10CG/aria-standards (submodule: standards/) \u2014 0 open issues\n\nNo open issues found.\n\n---\n\n### Repo: 10CG/aria-orchestrator (submodule: aria-orchestrator/) \u2014 1 open issue\n\n| # | Title | Labels | URL | Linked OpenSpec | Linked US |\n|---|-------|--------|-----|-----------------|-----------|\n| #1 | [Idea] \u8f7b\u91cf\u5316 Hermes \u2014 \u81ea\u7814\u7cbe\u7b80\u7248\u66ff\u4ee3\u5b8c\u6574 Hermes Agent | (none) | https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1 | null | null |\n\n---\n\n## Flat Aggregated View (all 5 items)\n\n```yaml\nitems:\n  - number: 16\n    title: \"[US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\"\n    labels: []\n    url: \"https://forgejo.10cg.pub/10CG/Aria/issues/16\"\n    repo: \"10CG/Aria\"\n    linked_openspec: \"aria-2.0-m0-prerequisite\"\n    linked_us: \"US-020\"\n    heuristic: true\n\n  - number: 5\n    title: \"[Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\"\n    labels: []\n    url: \"https://forgejo.10cg.pub/10CG/Aria/issues/5\"\n    repo: \"10CG/Aria\"\n    linked_openspec: null\n    linked_us: null\n    heuristic: true\n\n  - number: 18\n    title: \"feat(estimator): \u5f15\u5165 Token x Attention \u53cc\u4e3b\u8f74\u5de5\u4f5c\u91cf\u4f30\u7b97\"\n    labels: []\n    url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/18\"\n    repo: \"10CG/aria-plugin\"\n    linked_openspec: null\n    linked_us: null\n    heuristic: true\n\n  - number: 17\n    title: \"feat(audit-engine): \u591a\u8f6e\u6311\u6218\u5faa\u73af\u52a0\u56fa \u2014 \u65b0\u589e\u539f\u59cb\u76ee\u7684\u951a\u5b9a(Drift Guard)\"\n    labels: []\n    url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/17\"\n    repo: \"10CG/aria-plugin\"\n    linked_openspec: null\n    linked_us: null\n    heuristic: true\n\n  - number: 1\n    title: \"[Idea] \u8f7b\u91cf\u5316 Hermes \u2014 \u81ea\u7814\u7cbe\u7b80\u7248\u66ff\u4ee3\u5b8c\u6574 Hermes Agent\"\n    labels: []\n    url: \"https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1\"\n    repo: \"10CG/aria-orchestrator\"\n    linked_openspec: null\n    linked_us: null\n    heuristic: true\n```\n\n---\n\n## Phase 1.11 Custom Check Result\n\nThe issue-cache-freshness check in .aria/state-checks.yaml now passes:\n\n```\ncustom_checks:\n  configured: true\n  total: 1\n  passed: 1\n  failed: 0\n  results:\n    - name: \"issue-cache-freshness\"\n      status: pass\n      severity: warning\n      output: \"OK\"\n```\n\nCache written to .aria/cache/issues.json at 2026-04-15T10:40:26Z.\n\n---\n\n## Triage Summary\n\nTotal open issues: 5 across 4 repos.\nNo blocker/critical labels detected \u2014 open_blocker_issues rule does NOT trigger.\n\n| Priority | Repo | Issue # | Title | Action |\n|----------|------|---------|-------|--------|\n| Active | 10CG/Aria | #16 | [US-020] Aria 2.0 M0 | In-progress \u2014 linked to current branch and OpenSpec |\n| Backlog | 10CG/Aria | #5 | Pulse \u96c6\u6210 | Feature idea, no active Spec |\n| Backlog | 10CG/aria-plugin | #18 | Token x Attention Estimator | New feature idea, no active Spec |\n| Backlog | 10CG/aria-plugin | #17 | Drift Guard for audit-engine | Enhancement proposal, no active Spec |\n| Deferred | 10CG/aria-orchestrator | #1 | \u8f7b\u91cf\u5316 Hermes | Decision record, \"\u6682\u4e0d\u884c\u52a8\" per issue body |\n"}], "grading": {"summary": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6}, "expectations": [{"text": "Output mentions Aria #16 (US-020 M0)", "passed": true, "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"}, {"text": "Output mentions Aria #5 (Pulse)", "passed": true, "evidence": "Looking for: '#5'; found"}, {"text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "passed": true, "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: ['Drift Guard', 'audit-engine']"}, {"text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "passed": true, "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: ['Token', 'estimator']"}, {"text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)", "passed": true, "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: ['\u8f7b\u91cf\u5316 Hermes']"}, {"text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "passed": true, "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"}]}}, {"id": "eval-schema-conformance-old_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [{"name": "issue_status.yaml", "type": "text", "content": "issue_status:\n  fetched_at: \"2026-04-15T10:40:15Z\"\n  source: live\n  fetch_error: null\n  warning: null\n  platform: forgejo\n  open_count: 2\n  items:\n    - number: 16\n      title: \"[US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/16\"\n      linked_openspec: null\n      linked_us: \"US-020\"\n      heuristic: true\n    - number: 5\n      title: \"[Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/5\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n  label_summary: {}\n"}], "grading": {"summary": {"pass_rate": 0.6667, "passed": 4, "failed": 2, "total": 6}, "expectations": [{"text": "Output contains issue_status: YAML key", "passed": true, "evidence": "Looking for: 'issue_status'; found"}, {"text": "Output contains fetched_at field", "passed": true, "evidence": "Looking for: 'fetched_at'; found"}, {"text": "Output identifies platform as forgejo", "passed": true, "evidence": "Looking for: 'forgejo'; found"}, {"text": "Output contains open_count field", "passed": true, "evidence": "Looking for: 'open_count'; found"}, {"text": "Output contains repos: field (v1.1.0+ schema)", "passed": false, "evidence": "Looking for: 'repos'; not found"}, {"text": "repos map contains 10CG/aria-plugin entry", "passed": false, "evidence": "Looking for: 'aria-plugin'; not found"}]}}, {"id": "eval-schema-conformance-with_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [{"name": "issue_status.yaml", "type": "text", "content": "issue_status:\n  fetched_at: \"2026-04-15T10:40:16Z\"\n  source: live\n  fetch_error: null\n  warning: null\n  platform: forgejo\n  open_count: 5\n  items:\n    - number: 16\n      title: \"[US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/16\"\n      repo: \"10CG/Aria\"\n      linked_openspec: null\n      linked_us: \"US-020\"\n      heuristic: true\n    - number: 5\n      title: \"[Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/Aria/issues/5\"\n      repo: \"10CG/Aria\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n    - number: 18\n      title: \"feat(estimator): \u5f15\u5165 Token \u00d7 Attention \u53cc\u4e3b\u8f74\u5de5\u4f5c\u91cf\u4f30\u7b97 \u2014 \u66ff\u4ee3 4-8h \u4eba\u5de5\u65f6\u5047\u8bbe\uff0c\u9002\u914d\u5355\u4eba + Claude Code \u5de5\u4f5c\u6d41\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/18\"\n      repo: \"10CG/aria-plugin\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n    - number: 17\n      title: \"feat(audit-engine): \u591a\u8f6e\u6311\u6218\u5faa\u73af\u52a0\u56fa \u2014 \u65b0\u589e\\\"\u539f\u59cb\u76ee\u7684\u951a\u5b9a\\\"(Drift Guard) \u9632\u504f\u79fb\u68c0\u67e5\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/17\"\n      repo: \"10CG/aria-plugin\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n    - number: 1\n      title: \"[Idea] \u8f7b\u91cf\u5316 Hermes \u2014 \u81ea\u7814\u7cbe\u7b80\u7248\u66ff\u4ee3\u5b8c\u6574 Hermes Agent\"\n      labels: []\n      url: \"https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1\"\n      repo: \"10CG/aria-orchestrator\"\n      linked_openspec: null\n      linked_us: null\n      heuristic: true\n  label_summary: {}\n  repos:\n    10CG/Aria:\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 2\n      items:\n        - number: 16\n          title: \"[US-020] Aria 2.0 M0 \u2014 \u524d\u7f6e\u9a8c\u8bc1\u4e0e\u67b6\u6784\u5b9a\u7a3f\"\n          labels: []\n          url: \"https://forgejo.10cg.pub/10CG/Aria/issues/16\"\n          linked_openspec: null\n          linked_us: \"US-020\"\n          heuristic: true\n        - number: 5\n          title: \"[Feature] Pulse \u9879\u76ee\u96c6\u6210 \u2014 AI-native \u901a\u8baf\u5c42 (Matrix + Conduit + Element)\"\n          labels: []\n          url: \"https://forgejo.10cg.pub/10CG/Aria/issues/5\"\n          linked_openspec: null\n          linked_us: null\n          heuristic: true\n    10CG/aria-plugin:\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 2\n      items:\n        - number: 18\n          title: \"feat(estimator): \u5f15\u5165 Token \u00d7 Attention \u53cc\u4e3b\u8f74\u5de5\u4f5c\u91cf\u4f30\u7b97 \u2014 \u66ff\u4ee3 4-8h \u4eba\u5de5\u65f6\u5047\u8bbe\uff0c\u9002\u914d\u5355\u4eba + Claude Code \u5de5\u4f5c\u6d41\"\n          labels: []\n          url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/18\"\n          linked_openspec: null\n          linked_us: null\n          heuristic: true\n        - number: 17\n          title: \"feat(audit-engine): \u591a\u8f6e\u6311\u6218\u5faa\u73af\u52a0\u56fa \u2014 \u65b0\u589e\\\"\u539f\u59cb\u76ee\u7684\u951a\u5b9a\\\"(Drift Guard) \u9632\u504f\u79fb\u68c0\u67e5\"\n          labels: []\n          url: \"https://forgejo.10cg.pub/10CG/aria-plugin/issues/17\"\n          linked_openspec: null\n          linked_us: null\n          heuristic: true\n    10CG/aria-standards:\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 0\n      items: []\n    10CG/aria-orchestrator:\n      platform: forgejo\n      source: live\n      fetch_error: null\n      open_count: 1\n      items:\n        - number: 1\n          title: \"[Idea] \u8f7b\u91cf\u5316 Hermes \u2014 \u81ea\u7814\u7cbe\u7b80\u7248\u66ff\u4ee3\u5b8c\u6574 Hermes Agent\"\n          labels: []\n          url: \"https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1\"\n          linked_openspec: null\n          linked_us: null\n          heuristic: true\n"}], "grading": {"summary": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6}, "expectations": [{"text": "Output contains issue_status: YAML key", "passed": true, "evidence": "Looking for: 'issue_status'; found"}, {"text": "Output contains fetched_at field", "passed": true, "evidence": "Looking for: 'fetched_at'; found"}, {"text": "Output identifies platform as forgejo", "passed": true, "evidence": "Looking for: 'forgejo'; found"}, {"text": "Output contains open_count field", "passed": true, "evidence": "Looking for: 'open_count'; found"}, {"text": "Output contains repos: field (v1.1.0+ schema)", "passed": true, "evidence": "Looking for: 'repos'; found"}, {"text": "repos map contains 10CG/aria-plugin entry", "passed": true, "evidence": "Looking for: 'aria-plugin'; found"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "state-scanner", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-04-15T10:46:18Z", "evals_run": [0, 1], "runs_per_configuration": 3}, "runs": [{"eval_id": 0, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 3, "failed": 3, "total": 6, "time_seconds": 365.0, "tokens": 81156, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Output mentions Aria #16 (US-020 M0)", "passed": true, "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"}, {"text": "Output mentions Aria #5 (Pulse)", "passed": true, "evidence": "Looking for: '#5'; found"}, {"text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "passed": false, "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: none"}, {"text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "passed": false, "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: none"}, {"text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)", "passed": false, "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: none"}, {"text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "passed": true, "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"}], "notes": []}, {"eval_id": 1, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 0.6667, "passed": 4, "failed": 2, "total": 6, "time_seconds": 123.8, "tokens": 53174, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Output contains issue_status: YAML key", "passed": true, "evidence": "Looking for: 'issue_status'; found"}, {"text": "Output contains fetched_at field", "passed": true, "evidence": "Looking for: 'fetched_at'; found"}, {"text": "Output identifies platform as forgejo", "passed": true, "evidence": "Looking for: 'forgejo'; found"}, {"text": "Output contains open_count field", "passed": true, "evidence": "Looking for: 'open_count'; found"}, {"text": "Output contains repos: field (v1.1.0+ schema)", "passed": false, "evidence": "Looking for: 'repos'; not found"}, {"text": "repos map contains 10CG/aria-plugin entry", "passed": false, "evidence": "Looking for: 'aria-plugin'; not found"}], "notes": []}, {"eval_id": 0, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 206.6, "tokens": 77748, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Output mentions Aria #16 (US-020 M0)", "passed": true, "evidence": "Any of ['#16', 'US-020']; found: ['#16', 'US-020']"}, {"text": "Output mentions Aria #5 (Pulse)", "passed": true, "evidence": "Looking for: '#5'; found"}, {"text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "passed": true, "evidence": "Any of ['aria-plugin#17', 'aria-plugin #17', 'Drift Guard', 'audit-engine']; found: ['Drift Guard', 'audit-engine']"}, {"text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "passed": true, "evidence": "Any of ['aria-plugin#18', 'aria-plugin #18', 'Token', 'estimator']; found: ['Token', 'estimator']"}, {"text": "Output mentions aria-orchestrator #1 (\u8f7b\u91cf\u5316 Hermes)", "passed": true, "evidence": "Any of ['aria-orchestrator#1', 'aria-orchestrator #1', '\u8f7b\u91cf\u5316 Hermes', 'lightweight Hermes']; found: ['\u8f7b\u91cf\u5316 Hermes']"}, {"text": "Output acknowledges 4 repos scanned (main + 3 submodules)", "passed": true, "evidence": "Need 3+ of ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']; found 4: ['10CG/Aria', '10CG/aria-plugin', '10CG/aria-standards', '10CG/aria-orchestrator']"}], "notes": []}, {"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 130.9, "tokens": 56071, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Output contains issue_status: YAML key", "passed": true, "evidence": "Looking for: 'issue_status'; found"}, {"text": "Output contains fetched_at field", "passed": true, "evidence": "Looking for: 'fetched_at'; found"}, {"text": "Output identifies platform as forgejo", "passed": true, "evidence": "Looking for: 'forgejo'; found"}, {"text": "Output contains open_count field", "passed": true, "evidence": "Looking for: 'open_count'; found"}, {"text": "Output contains repos: field (v1.1.0+ schema)", "passed": true, "evidence": "Looking for: 'repos'; found"}, {"text": "repos map contains 10CG/aria-plugin entry", "passed": true, "evidence": "Looking for: 'aria-plugin'; found"}], "notes": []}], "run_summary": {"old_skill": {"pass_rate": {"mean": 0.5834, "stddev": 0.1179, "min": 0.5, "max": 0.6667}, "time_seconds": {"mean": 244.4, "stddev": 170.5542, "min": 123.8, "max": 365.0}, "tokens": {"mean": 67165.0, "stddev": 19786.262, "min": 53174, "max": 81156}}, "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 168.75, "stddev": 53.528, "min": 130.9, "max": 206.6}, "tokens": {"mean": 66909.5, "stddev": 15327.9537, "min": 56071, "max": 77748}}, "delta": {"pass_rate": "-0.42", "time_seconds": "+75.7", "tokens": "+256"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

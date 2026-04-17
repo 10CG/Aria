@@ -1,0 +1,11 @@
+round: 3
+agent: backend-architect
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: MINOR
+    type: schema_version_example_stale_in_output_schema
+    area: references/issue-scanning.md §Output Schema v1.0.0 block (top, around line 29)
+    description: "The v1.0.0 single-repo example still shows schema_version: 1.0, but the writer (步骤 5 / 缓存写回) always emits 1.1 in all scenarios per the R2 fix. A reader following the example could incorrectly expect 1.0 on disk after a fresh write when scan_submodules=false."
+    recommendation: "Update the v1.0.0 example block comment to clarify that this represents a pre-v1.16.0 cache file on disk, not what the v1.16.0 writer emits; or annotate with 'historical format only — v1.16.0 writer always emits 1.1'. No behavioral change needed; reader already accepts both."
+    status: NEW
+summary: "The R2 fix is correctly applied — SKILL.md §向后兼容保证 now accurately states writer always emits 1.1 with sound rationale, and the reader in §步骤 4 explicitly accepts both 1.0 and 1.1. One minor documentation inconsistency remains in the output schema example block which still shows schema_version 1.0 for the single-repo format, potentially misleading but harmless at runtime."

@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "meta-repo-issue-discovery",
+  "prompt": "I'm working in the Aria project at /home/dev/Aria which is a meta-repo with three submodules: aria (→ 10CG/aria-plugin), standards (→ 10CG/aria-standards), and aria-orchestrator (→ 10CG/aria-orchestrator). Please execute the state-scanner skill and report ALL open GitHub/Forgejo issues across all repos (main repo + submodules) that I should triage. For each issue, include the issue number, title, and which repo it belongs to. Use the forgejo CLI which is available in the environment.",
+  "assertions": [
+    {"id": "finds_main_repo_16", "text": "Output mentions Aria #16 (US-020 M0)", "check_type": "contains_any", "values": ["#16", "US-020"]},
+    {"id": "finds_main_repo_5", "text": "Output mentions Aria #5 (Pulse)", "check_type": "contains", "value": "#5"},
+    {"id": "finds_aria_plugin_17", "text": "Output mentions aria-plugin #17 (Drift Guard / audit-engine)", "check_type": "contains_any", "values": ["aria-plugin#17", "aria-plugin #17", "Drift Guard", "audit-engine"]},
+    {"id": "finds_aria_plugin_18", "text": "Output mentions aria-plugin #18 (Token Attention / estimator)", "check_type": "contains_any", "values": ["aria-plugin#18", "aria-plugin #18", "Token", "estimator"]},
+    {"id": "finds_aria_orch_1", "text": "Output mentions aria-orchestrator #1 (轻量化 Hermes)", "check_type": "contains_any", "values": ["aria-orchestrator#1", "aria-orchestrator #1", "轻量化 Hermes", "lightweight Hermes"]},
+    {"id": "does_not_disclaim_no_submodule_scan", "text": "Output does NOT contain the 'submodules NOT scanned' disclaimer (positive discriminator, replaces R1-I8 false-positive assertion)", "check_type": "not_contains_any", "values": ["NOT scanned", "未扫描", "not scanning submodules", "子模块 NOT", "submodules NOT", "(N/A in this version)", "pre-change 版本限制"]}
+  ]
+}

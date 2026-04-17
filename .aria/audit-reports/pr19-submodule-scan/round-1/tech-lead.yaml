@@ -1,0 +1,20 @@
+round: 1
+agent: tech-lead
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: IMPORTANT
+    type: non-opt-in-side-effect
+    area: proposal.md §What item 5 + §Decision Records D3 (stage_timeout 12→20s)
+    description: "D3 raises stage_timeout_seconds default from 12s to 20s unconditionally, not gated on scan_submodules=true. This contradicts the §向后兼容保证 'default behavior unchanged' claim — a non-meta-repo user who hits network issues now waits 8s longer before fail-soft, which is a user-visible default change independent of the opt-in."
+    recommendation: "Either (a) gate the 20s budget on scan_submodules=true (keep 12s when false), or (b) explicitly document in §向后兼容 that the timeout ceiling increased for all users and justify why 8s extra tail latency is acceptable for non-meta-repo users."
+  - category: MINOR
+    type: decision-gap
+    area: proposal.md §Decision Records (missing D for limit aggregation)
+    description: "D-records do not address the per-repo `limit: 20` interaction. With 4 repos, max items becomes 80 (4x budget), which could shift the 'top-N triage' UX or inflate the aggregated view unexpectedly. No decision recorded on whether limit is per-repo or global."
+    recommendation: "Add a D13 recording 'limit applies per-repo (not global cap)' with rationale, and note in AC whether aggregate display should truncate/paginate when len(items) > threshold."
+  - category: MINOR
+    type: benchmark-report-format
+    area: aria-plugin-benchmarks/.../iteration-1/benchmark.md (Delta column)
+    description: "benchmark.md reports Pass Rate delta as `-0.42` while old=58% and new=100%, which is sign-inverted or at least confusing (improvement shown as negative). The file is also only 12 lines, missing per-eval breakdown and conclusion narrative required by CLAUDE.md rule #6."
+    recommendation: "Regenerate benchmark.md with the correct sign convention (new - old = +0.42) and include per-eval results so a reviewer can confirm the improvement is real and not eval-calibration noise."
+summary: "Spec is architecturally sound — opt-in design, D1-D12 cover the main trade-offs, sister-spec separation is correct (what-to-scan vs how-to-enforce are orthogonal), and cross-plugin impact on Aether/Kairos is genuinely zero for the scan_submodules=false path. Two real gaps: the 12→20s timeout raise is mislabeled as zero-impact when it is actually a global default change, and the benchmark.md artifact is too thin to defend rule #6 compliance. Neither is a blocker for Level 2 scope; both can be fixed in Round 2."

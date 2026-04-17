@@ -1,0 +1,109 @@
+issue_status:
+  fetched_at: "2026-04-15T10:40:16Z"
+  source: live
+  fetch_error: null
+  warning: null
+  platform: forgejo
+  open_count: 5
+  items:
+    - number: 16
+      title: "[US-020] Aria 2.0 M0 — 前置验证与架构定稿"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/Aria/issues/16"
+      repo: "10CG/Aria"
+      linked_openspec: null
+      linked_us: "US-020"
+      heuristic: true
+    - number: 5
+      title: "[Feature] Pulse 项目集成 — AI-native 通讯层 (Matrix + Conduit + Element)"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/Aria/issues/5"
+      repo: "10CG/Aria"
+      linked_openspec: null
+      linked_us: null
+      heuristic: true
+    - number: 18
+      title: "feat(estimator): 引入 Token × Attention 双主轴工作量估算 — 替代 4-8h 人工时假设，适配单人 + Claude Code 工作流"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/18"
+      repo: "10CG/aria-plugin"
+      linked_openspec: null
+      linked_us: null
+      heuristic: true
+    - number: 17
+      title: "feat(audit-engine): 多轮挑战循环加固 — 新增\"原始目的锚定\"(Drift Guard) 防偏移检查"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/17"
+      repo: "10CG/aria-plugin"
+      linked_openspec: null
+      linked_us: null
+      heuristic: true
+    - number: 1
+      title: "[Idea] 轻量化 Hermes — 自研精简版替代完整 Hermes Agent"
+      labels: []
+      url: "https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1"
+      repo: "10CG/aria-orchestrator"
+      linked_openspec: null
+      linked_us: null
+      heuristic: true
+  label_summary: {}
+  repos:
+    10CG/Aria:
+      platform: forgejo
+      source: live
+      fetch_error: null
+      open_count: 2
+      items:
+        - number: 16
+          title: "[US-020] Aria 2.0 M0 — 前置验证与架构定稿"
+          labels: []
+          url: "https://forgejo.10cg.pub/10CG/Aria/issues/16"
+          linked_openspec: null
+          linked_us: "US-020"
+          heuristic: true
+        - number: 5
+          title: "[Feature] Pulse 项目集成 — AI-native 通讯层 (Matrix + Conduit + Element)"
+          labels: []
+          url: "https://forgejo.10cg.pub/10CG/Aria/issues/5"
+          linked_openspec: null
+          linked_us: null
+          heuristic: true
+    10CG/aria-plugin:
+      platform: forgejo
+      source: live
+      fetch_error: null
+      open_count: 2
+      items:
+        - number: 18
+          title: "feat(estimator): 引入 Token × Attention 双主轴工作量估算 — 替代 4-8h 人工时假设，适配单人 + Claude Code 工作流"
+          labels: []
+          url: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/18"
+          linked_openspec: null
+          linked_us: null
+          heuristic: true
+        - number: 17
+          title: "feat(audit-engine): 多轮挑战循环加固 — 新增\"原始目的锚定\"(Drift Guard) 防偏移检查"
+          labels: []
+          url: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/17"
+          linked_openspec: null
+          linked_us: null
+          heuristic: true
+    10CG/aria-standards:
+      platform: forgejo
+      source: live
+      fetch_error: null
+      open_count: 0
+      items: []
+    10CG/aria-orchestrator:
+      platform: forgejo
+      source: live
+      fetch_error: null
+      open_count: 1
+      items:
+        - number: 1
+          title: "[Idea] 轻量化 Hermes — 自研精简版替代完整 Hermes Agent"
+          labels: []
+          url: "https://forgejo.10cg.pub/10CG/aria-orchestrator/issues/1"
+          linked_openspec: null
+          linked_us: null
+          heuristic: true

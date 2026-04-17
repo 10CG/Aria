@@ -20,6 +20,7 @@
     },
 
     "issue_scan": {
+      "_comment_submodules": "2026-04-15 启用 scan_submodules + stage_timeout 12→20 作为 state-scanner-submodule-issue-scan Spec 的 dogfooding — 防止 Aria meta-repo 模式下 aria-plugin / aria-orchestrator / aria-standards 的 issue 被漏扫",
       "enabled": true,
       "platform": "forgejo",
       "platform_hostnames": {
@@ -28,10 +29,11 @@
       },
       "cache_ttl_seconds": 900,
       "cache_path": ".aria/cache/issues.json",
-      "stage_timeout_seconds": 12,
+      "stage_timeout_seconds": 20,
       "api_timeout_seconds": 5,
       "limit": 20,
-      "label_filter": []
+      "label_filter": [],
+      "scan_submodules": true
     }
   },
 

@@ -1,0 +1,59 @@
+prompt: 刚切换到这个分支，完全忘了上次在哪了，给个当前状态概况吧
+failure_mode: triggered_invalid_yaml
+raw_output: '**当前分支**: `feature/aria-2.0-m0-prerequisite`
+
+
+  ## 进度概况
+
+
+  **M0 (US-020) — Aria 2.0 前置验证阶段**
+
+
+  | 任务 | 状态 |
+
+  |------|------|
+
+  | T1 Legal Memo | ✅ 完成 |
+
+  | T2 Aether NFS | ✅ 完成 |
+
+  | T3 Headless Plugin | ✅ 完成 |
+
+  | T4 GLM Smoke Test | ✅ 完成 |
+
+  | T5 Hermes Spike | ✅ 完成 |
+
+  | T6 Handoff 文档 | 🔄 84% (Phase 2 待完成) |
+
+
+  **最近工作**: T6.3 PR #19 合并完成，T6.4 Phase 1 完成
+
+
+  **未提交**: `scripts/` 目录有未跟踪文件
+
+
+  **Submodule 状态**:
+
+  - `aria/` → v1.6.0-66-g07dda35 (ahead)
+
+  - `aria-orchestrator/` → feature/m0-t4-st1-hermes-analysis
+
+  - `standards/` → master
+
+
+  **下一步**: T6.4 Phase 2 / T1 外部依赖 / T3.4 infra
+
+
+  需要查看 `scripts/` 内容或继续哪个任务？
+
+  '
+raw_stderr: ''
+return_code: 0
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 01-initial-scan
+seed: a1
+mode: auto
+ran_at: '2026-04-17T08:58:49.379746+00:00'

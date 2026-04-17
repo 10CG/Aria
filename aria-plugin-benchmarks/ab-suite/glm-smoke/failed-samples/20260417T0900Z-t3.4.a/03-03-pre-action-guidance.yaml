@@ -1,0 +1,54 @@
+prompt: 刚改了几个文件还没提交，不知道是直接提交还是得先修改一下，或者需要走评审流程，你帮我看看下一步该怎么做
+failure_mode: partial_response
+raw_output: '根据分析，情况如下：
+
+
+  ## 当前状态
+
+
+  | 文件/目录 | 性质 | 建议 |
+
+  |----------|------|------|
+
+  | `scripts/run-glm-smoke.py` | **测试代码** | ✅ 应该提交 |
+
+  | `failed-samples/` | **测试输出** | ❌ 应该 gitignore |
+
+
+  ## 建议操作
+
+
+  ```bash
+
+  # 1. 创建 .gitignore
+
+  echo "failed-samples/" > /home/dev/Aria/aria-plugin-benchmarks/ab-suite/glm-smoke/.gitignore
+
+
+  # 2. 提交测试脚本
+
+  git add aria-plugin-benchmarks/ab-suite/glm-smoke/scripts/
+
+  git add aria-plugin-benchmarks/ab-suite/glm-smoke/.gitignore
+
+  git commit -m "test(m0): add T3.4 GLM smoke test runner"
+
+  ```
+
+
+  **不需要 PR review**：这是测试工具代码，不是插件核心逻辑。直接提交即可。
+
+
+  需要我帮你执行这些操作吗？
+
+  '
+raw_stderr: ''
+return_code: 0
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 03-pre-action-guidance
+seed: c3
+mode: auto
+ran_at: '2026-04-17T09:01:18.742571+00:00'

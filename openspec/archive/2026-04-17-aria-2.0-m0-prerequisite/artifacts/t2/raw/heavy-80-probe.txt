@@ -1,0 +1,54 @@
+bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+# Node: heavy-1 (ip: 192.168.69.80)
+# Date: 2026-04-15T15:32:32+00:00
+
+## mount | grep aether-volumes
+aether-share on /opt/aether-volumes type virtiofs (rw,relatime)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/58451b4f148a3b3681f31f6dee78d25355559fc98f69cef09ce44941ddd6404c type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8499/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8498/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8497/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8496/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8495/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8494/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8500/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8500/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/c93762ec22b91c1819ab2d918346caca34b29179cc8f1c4e3dd1316601d53b4c type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8970/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8969/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8968/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8967/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8971/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8971/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/d6ff371e1c651395d951d04bc6e08136a616955252d736717ccf314087f836b2 type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11715/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3760/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3759/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3758/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3757/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3756/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3755/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3754/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3753/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11717/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11717/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/fad28c964d16740735ecb20aa7f1570251a9bb7e2c32905327e20317e6a06fb5 type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11714/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11713/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11712/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11711/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11710/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11709/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11708/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11707/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11706/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11705/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11704/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11703/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11702/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11701/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11700/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11699/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11698/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11716/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/11716/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/f896489445c20f9e4db663082dfebccadc9f72295bb7c4781bcfff4c8f6a38b4 type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12322/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3994/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3992/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3991/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3990/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3989/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3967/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3966/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3965/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3961/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12324/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12324/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/3e9e42dde11819da669fcff4fc5bf894f5012c6029147aa33d512aa332fb670d type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12321/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3760/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3759/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3758/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3757/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3756/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3755/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3754/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/3753/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12323/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12323/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/6b555382fd0aead5b7dc43ae856470abf1ad2333cfe67122abfd41b0d139766e type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12325/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10262/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10261/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10260/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10259/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10258/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10257/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10256/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12326/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12326/work)
+overlay on /opt/aether-volumes/runners/heavy-1/docker/rootfs/overlayfs/fea5989a39cb5e69388f013251e9828f81b5d64e9c34c5f54f66a9b2f3560898 type overlay (rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12473/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12472/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12471/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12470/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12469/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12468/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12467/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12466/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10066/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10065/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10064/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/10063/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12474/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/12474/work)
+
+## findmnt /opt/aether-volumes
+TARGET              SOURCE       FSTYPE   OPTIONS
+/opt/aether-volumes aether-share virtiofs rw,relatime
+
+## stat /opt/aether-volumes
+  File: /opt/aether-volumes
+  Size: 13        	Blocks: 24         IO Block: 1048576 directory
+Device: 0,46	Inode: 519         Links: 13
+Access: (0777/drwxrwxrwx)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-02-20 16:15:12.540291788 +0000
+Modify: 2026-03-26 00:31:04.944618354 +0000
+Change: 2026-03-26 00:31:04.944618354 +0000
+ Birth: -
+
+## df -hT /opt/aether-volumes
+Filesystem     Type      Size  Used Avail Use% Mounted on
+aether-share   virtiofs  2.0T  141G  1.9T   7% /opt/aether-volumes
+
+## id nomad (user)
+id: 'nomad': no such user
+
+## systemctl is-active nomad
+active
+
+## ls /opt/aether-volumes
+total 33
+drwxrwxrwx 13 root root   13 Mar 26 00:31 .
+drwxr-xr-x  8 root root 4096 Feb 21 11:15 ..
+drwxr-xr-x  2 root root    2 Mar 18 17:30 data
+drwxr-xr-x  4 root root    4 Mar 26 00:31 dev-db
+drwxr-xr-x  3 root root    3 Mar  7 03:52 kairos
+drwxr-xr-x  3 root root    3 Mar 15 01:32 kairos-prod
+drwxr-xr-x  5 root root    5 Mar 19 17:05 my-api
+drwxr-xr-x  4 root root    4 Mar 18 17:38 myapp
+drwxr-xr-x  4 root root    4 Mar 10 08:19 nexus
+drwxr-xr-x  5 root root    5 Mar 10 18:10 runners
+drwxr-xr-x  2 root root    2 Mar  6 17:02 test-cli
+drwxr-xr-x  4 root root    4 Mar  6 16:53 test-volume-cli
+drwxrwxrwx  8 root root    8 Feb 24 15:38 todo-web

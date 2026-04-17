@@ -1,0 +1,35 @@
+prompt: /state-scanner
+failure_mode: triggered_invalid_yaml
+raw_output: "现在生成状态报告和推荐：\n\n---\n\n```\n╔══════════════════════════════════════════════════════════════╗\n\
+  ║                    PROJECT STATE ANALYSIS                     ║\n╚══════════════════════════════════════════════════════════════╝\n\
+  \n\U0001F4CD 当前状态\n───────────────────────────────────────────────────────────────\n\
+  \  分支: feature/aria-2.0-m0-prerequisite\n  模块: aria-plugin-benchmarks/ab-suite/glm-smoke\n\
+  \  变更: 2 目录未跟踪\n  位置: glm-smoke 测试套件目录 (非独立 Git 仓库)\n\n\U0001F4CA 变更分析\n───────────────────────────────────────────────────────────────\n\
+  \  未跟踪目录:\n    - failed-samples/\n    - scripts/\n\n\U0001F4C4 需求状态 (主项目)\n───────────────────────────────────────────────────────────────\n\
+  \  配置状态: ✅ 已配置\n  PRD: prd-aria-v2.md (2026-04-17 更新)\n  User Stories: user-stories/\
+  \ 目录存在\n\n\U0001F3AB Open Issues (跨仓库聚合)\n───────────────────────────────────────────────────────────────\n\
+  \  平台: Forgejo — 6 open (Aria: 4, aria-plugin: 2)\n  \n  10CG/Aria:\n    \U0001F4CC\
+  \ #18  bug(state-scanner): Phase 1.5 未检测 PRD Status\n    \U0001F4CC #17  bug(state-scanner):\
+  \ Phase 1.5 Status 提取漏掉 ## heading\n    \U0001F4CC #16  [US-020] Aria 2.0 M0 — 前置验证与架构定稿\n\
+  \    \U0001F4CC #5   [Feature] Pulse 项目集成\n  \n  10CG/aria-plugin:\n    \U0001F4CC\
+  \ #18  feat(estimator): Token × Attention 双主轴工作量估算\n    \U0001F4CC #17  feat(audit-engine):\
+  \ 多轮挑战循环加固\n  \n  数据来源: cache (7h ago) | ttl: 15m\n\n\U0001F504 同步状态\n───────────────────────────────────────────────────────────────\n\
+  \  当前分支: feature/aria-2.0-m0-prerequisite\n  分支状态: 与 origin 同步\n  \n  子模块 (主项目):\n\
+  \    ✅ standards: 同步\n    ⚠️  aria: 领远主版本 66 commits\n    ⚠️  aria-orchestrator:\
+  \ 在 feature/m0-t4-st1-hermes-analysis 分支\n\n⚙️ 项目配置\n──────────────────────────────────────────────────────────────️\n\
+  \  state_scanner: ✅ 已配置\n  issue_scan: ✅ 已启用 (scan_submodules: true)\n  auto_execute:\
+  \ ❌ 已禁用\n\n\U0001F3AF 推荐工作流\n───────────────────────────────────────────────────────────────\n\
+  \  ➤ [1] quick-fix (推荐)\n      理由: 当前在测试套件子目录，未跟踪文件可能是测试数据或脚本\n  ○ [2] custom-workflow\n\
+  \      理由: 需要自定义执行步骤\n  ○ [3] skip\n      理由: 仅查看状态，不执行任何工作流\n  ○ [4] 自定义组合\n\n\U0001F914\
+  \ 选择 [1-4] 或输入自定义 (如 \"B.1 + C.1\"):\n```\n\n---\n\n**说明**: 当前工作目录是 `aria-plugin-benchmarks/ab-suite/glm-smoke`，这是\
+  \ Aria 主项目内的测试套件目录，不是独立的 Git 仓库。Git 操作实际作用于主项目根目录 `/home/dev/Aria`。\n"
+raw_stderr: ''
+return_code: 0
+expected_grep: 'Phase/Cycle:|phase_cycle:'
+glm_model_openai: glm-4.5
+glm_model_anthropic: glm-4.7
+status: fail
+template: 02-resume-after-break
+seed: b2
+mode: slash
+ran_at: '2026-04-17T09:08:01.138786+00:00'

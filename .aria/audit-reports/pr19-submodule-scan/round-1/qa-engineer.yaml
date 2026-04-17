@@ -1,0 +1,30 @@
+round: 1
+agent: qa-engineer
+verdict: PASS_WITH_WARNINGS
+findings:
+  - category: IMPORTANT
+    type: benchmark_metadata_inconsistency
+    area: iteration-1/benchmark.json metadata.runs_per_configuration
+    description: "benchmark.json declares runs_per_configuration=3, but only 1 run per config exists for each eval (run_number=1 only). The README correctly states n=1, but the JSON metadata is factually wrong."
+    recommendation: "Correct metadata.runs_per_configuration to 1 before merge, or add a clarifying note field."
+  - category: IMPORTANT
+    type: false_positive_assertion
+    area: eval-meta-repo-issue-discovery assertion id=mentions_4_or_more_repos
+    description: "The '4 repos scanned' assertion passed for old_skill because old_skill explicitly named the repos it was NOT scanning. Uses contains_count on repo name strings with min=3, making negative acknowledgement indistinguishable from positive coverage. Inflates old_skill pass score from 2/6 to 3/6."
+    recommendation: "Replace with paired assertion: one for 'repos scanned' (positive evidence of API calls) and one negating 'submodules NOT scanned' text."
+  - category: IMPORTANT
+    type: eval_coverage_gap_backward_compat
+    area: benchmark eval suite
+    description: "No eval covers the scan_submodules=false default path. The Spec's primary backward-compat guarantee has zero benchmark evidence — it relies solely on the additive code-path argument."
+    recommendation: "A minimal eval-backward-compat with scan_submodules absent/false should be added. The gap itself is a merge risk given production Aria dogfooding."
+  - category: MINOR
+    type: rollback_level1_gap
+    area: proposal.md §Rollback Plan Level 1
+    description: "Level 1 rollback (set scan_submodules=false) only recovers from bugs in the new opt-in branch. If a bug exists in shared infrastructure (e.g., the cache schema writer always emits repos), Level 1 is ineffective."
+    recommendation: "Add a caveat to Level 1 stating it is only effective if the defect is confined to the scan_submodules=true branch; shared-path regression requires Level 2."
+  - category: MINOR
+    type: ac_not_mechanically_verifiable
+    area: proposal.md AC-5 / AC-6
+    description: "AC-5 (specific issue numbers #17, #18, #1 present) and AC-6 (blocker label aggregation) are point-in-time assertions tied to current live issue state. They will silently become invalid once those issues are closed."
+    recommendation: "Flag AC-5 and AC-6 as 'live-data dependent'; these are smoke-test criteria, not durable regression gates."
+summary: "The benchmark demonstrates genuine functional value (+41.7pp) and core discrimination is real. n=1 per config is acceptable given the additive code-path nature. However: (1) the runs_per_configuration=3 metadata lie in benchmark.json creates false statistical impression; (2) the '4 repos scanned' assertion passes for old_skill via negative acknowledgement, inflating baseline score; (3) default-path backward-compat has zero eval coverage."
