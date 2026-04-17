@@ -215,13 +215,19 @@
   - 已填: spike_code_path / nfs_path / image_tag / image_sha256 / ad3_conclusion / report_version
   - Pending T1: go_decision / prd_patch_pr / r9_status / r9_signoff / pd_signoff / glm_smoke_passed
   - hermes spike 两项回填已完成 (Spec 归档 2026-04-16)
-- [ ] **T6.3** PRD patch PR 起草 (1.5h, 仅在产品负责人 Go-with-revision 时触发)
-  - 若产品负责人裁决含局部 PRD 修订 → 起草 `prd_patch_pr`
-  - 记录 PR 号到 `m0-handoff.yaml.prd_patch_pr`
-  - PR 必须 3 工作日内合并, 否则冻结 US-021 启动
-- [ ] **T6.4** 产品负责人评审 (0.5h)
-  - 提交 M0 Report 给 10CG Lab 产品负责人
-  - 等待 Go/No-Go 签字
+- [ ] **T6.3** PRD patch PR 起草 (1.5h) — 已触发 (T6.4 Go-with-revision 2026-04-16)
+  - **scope**: AD3 反转 (fork-default → option-c-extension-only); 引用 spike-report.md
+  - 起草 `prd_patch_pr` → 记录 PR 号到 `m0-handoff.yaml.prd_patch_pr`
+  - PR 必须 3 工作日内合并 (2026-04-19 前), 否则冻结 US-021 启动
+- [~] **T6.4** 产品负责人评审 (0.5h) — Phase 1 完成 2026-04-16, Phase 2 待 T6.3/T3.4
+  - **Phase 1** (已完成): owner (simonfish, per AD-M0-9) 审阅 M0 Report v0.9, 裁决 **Go-with-revision**
+    - M0 Report §7.2 velocity_cosign 已签 (×3.76 加速, 超 ×2.0 阈值)
+    - R9 状态: pending + §5.2 放行陈述已签 (基于 Luxeno=silknode 10CG 自有 + fixture 零业务纹理)
+    - handoff.yaml v0.9 记录 `owner_intent=Go-with-revision`
+    - 触发 T6.3 PRD patch PR 起草 (AD3 反转)
+  - **Phase 2** (待完成): T6.3 PR 号就位后回填 `pd_signoff` + `prd_patch_pr`, schema → final 态
+    - R3-D1.2 硬要求: "产品负责人签 Go 时须同步记录 prd_patch_pr" — 故 pd_signoff 必须等 PR 号到位
+    - 依赖: T6.3 完成 + T3.4 infra 完成 (glm_smoke_passed 回填)
 - [ ] **T6.5** T1 No-Go 处置 (条件性, 0.5h)
   - 若 T1 最终 No-Go → knowledge-manager 在 M0 Report 对 T2 涉及 GLM/luxeno 段落做 strikethrough
   - phase-c-integrator 在 pre_merge 检查点验证 strikethrough 已完成
