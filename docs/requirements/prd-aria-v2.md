@@ -88,7 +88,7 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
 方法论层  standards/          ← 思考/协作/决策规范 (v1.x 不变)
 工具层    aria-plugin (+ CC)  ← 交互式使用 (不变) + Layer 2 容器内嵌
 运行时层  aria-orchestrator:
-          ├── Layer 1: Hermes fork (GLM 5.1, 扮演 AI 主管)
+          ├── Layer 1: Hermes + aria-extension (Option C, GLM 5.1, 扮演 AI 主管)
           └── Layer 2: 容器镜像 (预装 CC + aria-plugin, 扮演 AI 工程师)
 ```
 
@@ -96,7 +96,7 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Layer 1: Hermes fork (AI 主管)                              │
+│  Layer 1: Hermes + aria-extension (Option C, AI 主管)        │
 │  ─────────────────────────────────────────────────────────── │
 │  位置:   Aether light 节点, raw_exec                          │
 │  LLM:    GLM 5.1 (fallback: GLM-4.5-Air)                     │
@@ -139,7 +139,7 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
 |----|------|------|
 | **AD1** | 两层 AI 分工 (Hermes 主管 + 容器工程师) | 继承 aria-plugin 已验证能力, 不重新实现方法论 |
 | **AD2** | Layer 2 容器预装 aria-plugin (build-time) | 解决 headless Plugin 加载 P0 问题 |
-| **AD3** | Hermes fork (非 Python extension) | hermes-agent 0.7 不支持 Python 扩展 API, fork 是唯一路径 |
+| **AD3** | Hermes **Option C Extension-only** (反转 fork 默认) | M0 T4 Spike (2026-04-16) 发现 hermes-agent entry-point plugin API 支持纯 tool pack, 0 hermes core 修改, 4.5h POC 13/13 pass, 0 GPL/AGPL/Unknown 依赖. fork 路径降级为 M5+ 备选 (AD3 Spike 回填) |
 | **AD4** | Nomad Parameterized Batch Job 启动容器 | 原生支持, 利用 Aether 现有基础设施, 不需新部署工具 |
 | **AD5** | 状态机 9 states + S_FAIL 兜底 | QA 建议 (R2→R3), 平衡精细与简单 |
 | **AD6** | 拟人命令协议 (非结构化 RPC) | 产品负责人明确表述, AI-AI 协作更自然, 符合 GSD 2 模式 |
@@ -243,14 +243,19 @@ output_format: result.json
 
 **关键**: prompt 字段是 **自然语言**, 不是结构化指令。Layer 1 用 GLM 5.1 基于 issue 生成, 风格要像"人类 PM 写的 Jira ticket"。
 
-#### 4. Hermes fork + 元知识
+#### 4. Hermes + aria-extension (Option C) + 元知识
 
-**Hermes fork 管理**:
-- 位置: `forgejo.10cg.pub/10CG/hermes-agent`
-- 基于: NousResearch/hermes-agent v0.7+
-- 扩展: fork 内新增 `internal/aria/` 目录 (Layer 1 状态机 + launcher + dispatcher)
-- 同步: 月度 rebase from upstream (估 12-20h/月, 前 3 月)
-- License: MIT (upstream), 10CG 修改保持 MIT
+**Hermes 集成方式** (M0 T4 Spike 反转, 见 AD3):
+- 位置: `aria-orchestrator/` 内的 entry-point plugin (Python tool pack)
+- 基于: upstream `hermes-agent` (无 fork, 无 10CG 分叉仓库)
+- 扩展方式: Python entry-point plugin API — 注册 tool pack, 0 hermes core 修改
+- 同步: 无月度 rebase (跟随 upstream pip 包版本升级即可)
+- License: MIT (upstream + 本扩展)
+- POC: 13/13 tests pass, 4.5h 验证完成 (vs 原估 52h), 见 `openspec/archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md`
+
+**回滚路径** (3 级降级):
+- Option C (当前默认) → Option B 自研 (~800-1200 LoC Python) → Option A fork hermes-agent (M5+ 最终备选)
+- 触发降级: Option C extension API 在 M1+ 使用中暴露阻断性缺陷
 
 **元知识** (~1K token, 注入到 Hermes system prompt):
 
@@ -369,7 +374,7 @@ Crash recovery:
 | **A2** | GLM 5.1 能生成高质量拟人命令 | M1-M2 benchmark (人工评分 10 个 sample) | 高 - 可能需升级 GLM model 或 fallback Sonnet |
 | **A3** | Aether heavy 节点 NFS 存储可挂载到 Nomad docker 容器 | M0 实测 `nomad alloc exec` + bind mount | 高 - 若失败需 constraint pin 单节点或重设计 |
 | **A4** | aria-plugin 的 Skills 在 headless 模式下通过 tool use 正常触发 | M1 实测 `claude -p` stream-json 输出 | 高 - 可能需 prompt 工程引导 |
-| **A5** | Hermes fork 月度 rebase 可控 (< 20h/月) | M0 Spike: fork vs 自研对比 (2026-04-11 Agent Team 2:2 分歧, 需数据) | 高 - 若 Spike 证伪, 切换自研路线 (~800-1200 行 Python) |
+| **A5** | ~~Hermes fork 月度 rebase 可控~~ → **Option C Extension-only 无 rebase 成本** (entry-point plugin API 解耦) | ✅ M0 T4 Spike (2026-04-16) 已验证: 13/13 POC pass, 0 hermes core 修改, 4.5h 完成 | 低 - Option C 降级路径 B (自研) → A (fork) 已在 AD3 锁定 |
 | **A6** | GLM 5.1 公开可用 (via API) | M0 API 访问测试 | 中 - fallback 到 GLM-4.5-Air (已验证可用) |
 | **A7** | luxeno cron fallback 问题不阻塞 (Layer 1 cron 不调 LLM for routing) | M1 验证 cron 路径无 LLM fallback 依赖 | 低 - 已知规避: cron 全走规则, LLM 仅容器内 |
 
@@ -384,7 +389,7 @@ Crash recovery:
 | **R5** Nomad eval 队列阻塞 (Aether 其他 workload 竞争) | 低 | 限制并发 N=3, 优先级调度 |
 | **R6** 跨节点 worktree bind mount 失败 | 高 | M0 实证 NFS 方案, 或 constraint pin heavy-1 |
 | **R7** Meta 参数超 64KB 限制 (prompt 大时) | 中 | Prompt 写 bind mount 文件, meta 只传 ISSUE_ID |
-| **R8** Hermes fork + 自研均失败 | 低 | 退出策略: 降级为 CLI-only 模式 (cron poll + `claude -p` 脚本调用, 无状态机/无 gateway, 手动 dispatch + 脚本辅助) |
+| **R8** Hermes Option C + 降级路径 (自研 / fork) 均失败 | 低 | 退出策略: 降级为 CLI-only 模式 (cron poll + `claude -p` 脚本调用, 无状态机/无 gateway, 手动 dispatch + 脚本辅助) |
 
 ---
 
@@ -413,18 +418,21 @@ M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
 必做:
 - [ ] Aether NFS 存储现状调查: heavy-80/81/82 是否挂载 `nfs-fastpool-aether`?
 - [ ] Nomad parameterized dispatch + meta 参数实测 (最大允许 payload)
-- [ ] `hermes-agent` upstream 源码分析 + fork 骨架建立
+- [x] `hermes-agent` upstream 源码分析 + **Option C Extension API 验证** (已完成 2026-04-16, Spike Report 13/13 pass, fork 骨架未建立 — Option C 反转)
 - [ ] GLM 5.1 API 访问测试
 - [ ] **R1 法律确认 (M1 硬性前置)**: Anthropic claude-code CLI 捆绑分发政策确认 — R1 结论未出前不启动 M1
 - [ ] **A1 headless plugin 验证 (提前自 M1)**: `aria-runner:claude-latest` Dockerfile 初版 + `claude -p` plugin 加载实测
 - [ ] PRD 审阅 + 落地为 User Stories (US-020+)
-- [ ] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, **timeboxed 1 sprint**):
-  - 实现 gateway stub (飞书 API 最小调用) + SQLite state 最小原型
-  - 实测 LoC + 开发工时
-  - 对比 fork 路线: 痛点修复难度 + 月度 rebase 预估
-  - 交付: Spike Report + AD3 修订建议 (保留 fork / 切换自研 / 混合)
-  - **Spike 结论若与 AD3 矛盾, 须提交产品负责人二次裁决, 不得自行变更方向**
-  - 若选自研: gateway.py 接口需预留 Matrix 扩展点 (Aria#5 Pulse 长期规划)
+- [x] **Hermes fork vs 自研 Spike** (orchestrator#1 评估, timeboxed) ✅ 已完成 2026-04-16
+  - 实测结果: 实际用时 4.5h (vs 估算 52h, -47.5h)
+  - **关键发现**: 新发现 **Option C Extension-only** 路径 (超越原 fork vs 自研二元选项)
+    - hermes-agent entry-point plugin API 支持纯 tool pack
+    - 0 hermes core 修改, 0 rebase 成本
+    - 13/13 POC tests pass, 0 GPL/AGPL/Unknown 依赖
+  - **AD3 反转**: fork-default → option-c-extension-only (见本 PR / AD3 更新)
+  - Spike Report: `openspec/archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md`
+  - 产品负责人二次裁决: Go-with-revision (2026-04-16, §签字位 §7.1)
+  - Matrix 扩展点 (Aria#5 Pulse): Option C 不阻断, 保留 M5+ 规划
 
 **M0 Exit Criteria** (三项可检查物):
 1. AD 文档覆盖 AD1-AD12 且含 alternatives considered (含 Spike 对比数据)
@@ -479,7 +487,7 @@ Out of scope:
 | state-machine.md | Layer 1 状态机设计 | `aria-orchestrator/docs/` |
 | layer2-container.md | 容器镜像设计 + entrypoint | `aria-orchestrator/docs/` |
 | container-launcher.md | ContainerLauncher 抽象 (预留 K8s/云) | `aria-orchestrator/docs/` |
-| hermes-fork-ops.md | Hermes fork 维护策略 | `aria-orchestrator/docs/` |
+| hermes-extension-ops.md | Hermes Option C extension 维护策略 (纯 tool pack, 无 fork) | `aria-orchestrator/docs/` |
 | prompt-templates.md | 拟人命令模板库 | `aria-orchestrator/docs/` |
 
 ### CLAUDE.md 修订 (8 处 diff)
@@ -495,7 +503,7 @@ Out of scope:
 | ID | 标题 | 优先级 |
 |----|------|--------|
 | US-020 | Aria 2.0 两层架构基础设施 | HIGH |
-| US-021 | Layer 1 状态机 + Hermes fork | HIGH |
+| US-021 | Layer 1 状态机 + Hermes Option C Extension | HIGH |
 | US-022 | Layer 2 容器镜像 + 拟人命令协议 | HIGH |
 | US-023 | 跨 tick 长任务 + Crash recovery | HIGH |
 | US-024 | Human gate + Feishu 审批 | MEDIUM |
@@ -521,7 +529,7 @@ v1.x 继续维护:
 
 v2.0 新增:
   - aria-orchestrator 从 "心跳扫描器" 升级为 "自主开发运行时"
-  - Layer 1 Hermes fork (新增)
+  - Layer 1 Hermes + aria-extension (Option C, 新增; M1 工时估 ~80h per Spike 量化)
   - Layer 2 容器镜像 (新增)
   - 所有 v1.x 能力在 Layer 2 容器内继承 (build-time 预装 aria-plugin)
 ```
@@ -569,6 +577,7 @@ v2.0 新增:
 |---------|------|---------|--------|
 | 2.0.0-draft | 2026-04-09 | 初稿, 基于 5 轮 Agent Team 收敛讨论 | 10CG Lab + Agent Team |
 | 2.0.0 | 2026-04-11 | Draft → Approved: 讨论组+挑战组 4 轮收敛审阅. 修订: A1 提前/升高, 容器安全 P0, M0 Exit Criteria, Spike timeboxed + 裁决权, sanitization US (M2), SQLite 测试具体化, R8 退出策略 | Agent Team Review |
+| **2.1.0** | **2026-04-16** | **AD3 反转: fork-default → option-c-extension-only** (M0 T4 Spike 发现 entry-point plugin API, 0 hermes core 修改, 4.5h 13/13 POC pass). 影响: 架构图 Layer 1 描述 / AD3 表 / §4 Hermes 集成方式 / A5 假设 / R8 退出条件 / M0 roadmap / US-021 scope / M1 milestone. 触发: T6.4 Go-with-revision (owner simonfish signoff 2026-04-16, per AD-M0-9). 引用: `openspec/archive/2026-04-16-aria-2.0-m0-spike-hermes/spike-report.md` + `aria-orchestrator/docs/architecture-decisions.md#ad3` | 10CG Lab (owner) |
 
 ---
 
@@ -587,7 +596,7 @@ v2.0 新增:
 - 挑战组 (3): qa-engineer, code-reviewer, legal-advisor
 
 **关键决策由产品负责人直接裁决**:
-- P0-1 (Hermes 扩展路径): **A** (Fork hermes-agent)
+- P0-1 (Hermes 扩展路径): ~~A (Fork hermes-agent)~~ → **C (Option C Extension-only)** (M0 T4 Spike 2026-04-16 反转, 见 v2.1.0 变更 + AD3)
 - P0-2 (Layer 2 aria-plugin 加载): **必须加载** (澄清为完整 CC 开发环境容器)
 - Q1 (LLM 接口/ToS): **C** (luxeno 代理合规, 不涉及 Anthropic key)
 - Q2 (P0 技术验证): **C** (挑战组并行验证)
