@@ -74,11 +74,11 @@
 
 ```yaml
 owner_signoff:
-  signed_by: null           # human:<owner 姓名>, per AD-M0-9 合并原 legal-advisor 角色
-  date: null                # YYYY-MM-DD
-  verdict: null             # approved | approved_with_conditions | rejected
-  conditions: []            # 如 approved_with_conditions, 列出条件
-  notes: null               # 审核意见 / 保留意见
+  signed_by: "human:simonfish"  # per AD-M0-9, owner = 10CG Lab 唯一 human 角色
+  date: "2026-04-16"
+  verdict: approved
+  conditions: []
+  notes: "Round 1 ai-engineer advisory 9/9 findings 已全部应用 (含 critical Finding #1 grep assertion 修正 + 3 important + 5 minor). 审核 scope 确认: (1) tasks.md:133 grep pattern 已改为 Phase/Cycle:|phase_cycle: 双格式容忍, 语义正确; (2) 5 模板负向示例无业务纹理; (3) 🔶 ILLUSTRATIVE 标注清晰; (4) Finding #7 seed namespacing 接受当前状态, 不强制 T3.4 脚手架实现."
   referenced_ai_review: "Round 1 ai-engineer advisory, 9/9 findings applied in commit f70f1dc"
 ```
 
@@ -93,8 +93,8 @@ owner_signoff:
 | 2026-04-16 | Aria (初稿) | 起草 5 模板 + README | `f879ce8` |
 | 2026-04-16 | ai-engineer (AI Advisory) | Round 1 审核 9 findings | (本文件) |
 | 2026-04-16 | Aria (修复应用) | 全部 9 findings 修复 | `f70f1dc` |
-| 2026-04-16 | AD-M0-9 (角色合并) | 确定 owner 签字替代 legal-advisor | (待 commit) |
-| TBD | owner (per AD-M0-9) | Round 2 最终签字 | TBD |
+| 2026-04-16 | AD-M0-9 (角色合并) | 确定 owner 签字替代 legal-advisor | `5b361c5` |
+| 2026-04-16 | owner (simonfish, per AD-M0-9) | Round 2 最终签字: **approved** | (本 commit) |
 
 ---
 

@@ -136,10 +136,11 @@
   - Schema: `{prompt, failure_mode, raw_output, expected_grep, glm_model_version, status: pass|fail}` (expected_grep = `Phase/Cycle:|phase_cycle:`)
   - `failure_mode` 枚举: `not_triggered | triggered_empty_yaml | triggered_invalid_yaml | partial_response | timeout`
   - 产出 `summary.yaml` 含 5 条索引
-- [ ] **T3.5** Fixture 模板二审 (1h)
-  - ai-engineer 审核 5 个模板占位符 (禁含业务纹理)
-  - **owner 最终签字** 写入 `templates/REVIEW.md` (per AD-M0-9: 1 人 + AI 场景下, "legal-advisor (人类)" 等角色由 owner 承担; audit trail 性质保留, 见 AD-M0-6)
-  - AI agent 意见仅 audit trail, 不构成放行依据
+- [x] **T3.5** Fixture 模板二审 (1h) — 2026-04-16
+  - ai-engineer Round 1 预审: 9 findings (1 critical + 3 important + 5 minor), 全部应用于 `f70f1dc`
+  - owner (simonfish) Round 2 签字: **approved** (per AD-M0-9: 1 人 + AI 场景下, 原 "legal-advisor (人类)" 角色由 owner 承担; audit trail 性质保留见 AD-M0-6)
+  - AI agent 意见仅 audit trail, 不构成放行依据 — 本次 owner 签字已 reference AI review 结论
+  - 审核结果归档: `aria-plugin-benchmarks/ab-suite/glm-smoke/templates/REVIEW.md`
 - [x] **T3.6** `image_sha256` 记录 (0.5h) — 2026-04-16
   - 验证脚本: `aria-orchestrator/docker/aria-runner/tests/t3-verify.sh` §T3.6
   - `docker inspect --format='{{.Id}}'` → `t3-evidence/t3.6-image-sha256.txt`
