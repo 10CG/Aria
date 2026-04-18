@@ -1,0 +1,27 @@
+id: DEMO-001
+title: "[M1 MVP DEMO-001] Update fixture README signed-by timestamp"
+description: |
+  修改 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md 末尾的
+  Signed-by 行, 将日期更新为今天 (UTC).
+
+  这是 M1 MVP 管道连通验证 (DEMO-001 trivial case), 目的: 证明 aria-runner
+  可完成 dispatch → claude execution → git commit → Forgejo PR 闭环.
+  claude 预期仅修改一行 (timestamp YYYY-MM-DD 部分), 不触碰其他内容.
+
+  具体操作:
+  1. 定位 README.md 末尾的 "Signed-by: human:simonfish @ YYYY-MM-DD" 行
+  2. 修改 timestamp 为 $(date -u +%Y-%m-%d)
+  3. 保存并 commit
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md
+  expected_diff_contains:
+    - "Signed-by: human:simonfish"
+ip_classification: synthetic
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-04-18T00:00:00Z"
