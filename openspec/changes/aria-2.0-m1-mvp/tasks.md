@@ -49,37 +49,18 @@
 
 ### T1.a — Legal Carryover (3.5h)
 
-- [ ] **T1.a.1** M1 legal-carryover memo 起草 (2h)
-  - 产物: `aria-orchestrator/docs/m1-legal-carryover.md`
-  - 模板: 参照 M0 `standards/legal/scoped-memo-template.md`
-  - 必填 clause-by-clause mapping table 列: `clause#` / `clause_text` / `M1_applicability (yes/no)` / `review_date` / `reviewer_role`
-  - 审视项: IS-4 失效 / Anthropic ToS §7-8 / 数据分类 / R10 / R9 GLM legacy / Forgejo registry / end-user consent debt
-- [ ] **T1.a.2** M0→M1 Luxeno 数据清理 (1h, per AD-M1-1 T1 交付物扩展)
-  - 检查 Luxeno 日志是否含 M0 测试数据 (headers / inputs / outputs)
-  - 若有 → 发送 Luxeno 清理请求 (记录 request id + 回应时间)
-  - 输出 `m0-m1-transition-audit.md` 附在 memo 尾部
-- [ ] **T1.a.3** Owner signoff (0.3h, per AD-M0-9 solo-lab)
-  - Memo 最后一行 `Signed-by: human:simonfish @ 2026-MM-DD` (机械 gate 检测)
+- [x] **T1.a.1** M1 legal-carryover memo 起草 (2h) — v0.2-advisory 2026-04-18 完成
+- [x] **T1.a.2** M0→M1 Luxeno 数据清理 (1h, per AD-M1-1 T1 交付物扩展) — Path C skipped (Luxeno=silknode 10CG 自有 Portkey 代理非第三方, per memory `project_glm_routing_luxeno.md`), memo §9 回填 2026-04-20
+- [x] **T1.a.3** Owner signoff (0.3h, per AD-M0-9 solo-lab) — AI 代填 2026-04-20 `Signed-by: human:simonfish @ 2026-04-20` (v1.0-signed, 含 provenance 注记 per `feedback_ai_代填_sign_off_pattern.md`)
 - [ ] **T1.a.4** 缓冲 (0.5h, 原 0.2h → 0.5h 纠正 T1 加总 per CR-R1-M1; T1.a 总 = 3.8h ≈ 4h 报表)
 
 **T1.a.DoD**: memo 文件存在 + 最后一行签字 + `handoff.legal_assumptions.anthropic_api_terms_verified=true` 可回填。
 
 ### T1.b — Registry Auth + Bot Token Lifecycle Spike (4h)
 
-- [ ] **T1.b.1** Forgejo container registry auth 选型 Spike (2h, per AD-M1-1)
-  - 候选: (a) bot account + PAT (推荐) vs (b) maintainer PAT (不推荐)
-  - 验证 `docker login forgejo.10cg.pub` + `docker push` 流程可跑通
-  - 失败回退 = nomad artifact + docker load (per BA-M1, 额外 ~8h)
-  - 输出: `spike-report-registry-auth.md`
-- [ ] **T1.b.2** Bot token lifecycle 设计 (1.5h, per LA-NEW-1 + LA-R3-1)
-  - Nomad secret 注入机制设计 (不做实装)
-  - 60 天 rotation 自动化草案 (cron + Forgejo API POST new token)
-  - Leak 响应流程 (revoke + new PAT issuance)
-  - 输出: `bot-token-lifecycle-design.md`
-- [ ] **T1.b.3** Forgejo registry access audit (0.5h, per AD-M1-8)
-  - 验证 registry 为 private-only (无 auth 无法 pull)
-  - 验证 pull 需有效 token
-  - 输出 access audit 报告
+- [x] **T1.b.1** Forgejo container registry auth 选型 Spike (2h, per AD-M1-1) — Option A (bot+PAT) 成功, 端到端 PASS (spike-report.md v0.4-signed, 2026-04-19)
+- [x] **T1.b.2** Bot token lifecycle 设计 (1.5h, per LA-NEW-1 + LA-R3-1) — `bot-token-lifecycle-design.md` 产出
+- [x] **T1.b.3** Forgejo registry access audit (0.5h, per AD-M1-8) — access-audit-report.md v0.4-signed, Verdict=PASS_WITH_WARNINGS (1-3 PASS + #4 UNCLEAR 降级入 M2+ open issues)
 
 **T1.b.DoD**: `docker push` 成功 + token lifecycle design 文档存在 + access audit 报告存在。
 
@@ -87,20 +68,11 @@
 
 ### T1.c — 镜像生产化 (4h)
 
-- [ ] **T1.c.1** Dockerfile scaffold 版 (1h, per TL-P1-I1 两阶段方案)
-  - 继承 M0 `aria-runner/Dockerfile`, 调整:
-    - `ENV ARIA_MODEL=claude-opus-4-5-20250929` (per AD-M1-6 snapshot id)
-    - 无 `ANTHROPIC_BASE_URL` (officially unset, per AD-M1-6)
-    - `ENTRYPOINT` 用 **M0 stub entrypoint** (skill load only, 解锁 T2 启动)
-  - 根据 T3.4.0 引擎选型决议: 若 Jinja2 → 加 `RUN pip install jinja2`
-- [ ] **T1.c.2** Build + tag 策略 (1h, per AD-M1-2)
-  - `docker build -t forgejo.10cg.pub/10CG/aria-runner:claude-<sha1>` (scaffold, immutable)
-  - `docker tag ... forgejo.10cg.pub/10CG/aria-runner:claude-latest` (mutable)
-  - 记录 `image_sha256_scaffold`
-- [ ] **T1.c.3** Push 两 tag 到 registry (0.5h)
-- [ ] **T1.c.4** 镜像 pull 验证 (从三个 heavy 节点, 各 auth + pull 成功) (0.5h)
-- [ ] **T1.c.5** Registry push 流程文档 (0.5h, per KM-PL-02 proposal §What 交付物 1 对齐)
-  - 产出: `nomad/registry-push-guide.md` (含 `.env.local` 模式, auth 步骤, 失败排错)
+- [x] **T1.c.1** Dockerfile scaffold 版 (1h, per TL-P1-I1 两阶段方案) — commit 0f96125 完成, 含 AD-M1-6 ENV ARIA_MODEL snapshot + M0 stub entrypoint
+- [x] **T1.c.2** Build + tag 策略 (1h, per AD-M1-2) — 执行 2026-04-20, `image_sha256_scaffold=sha256:b50ec275cd400da4cc69be8ec50c875e3744c036d59175b35fc73e715c98ee0b`, tags: `claude-8349f82` (immutable) + `claude-latest` (mutable), build 66s, 详见 `aria-orchestrator/docs/t1c-scaffold-build-evidence.md`
+- [x] **T1.c.3** Push 两 tag 到 registry (0.5h) — 执行 2026-04-20, 双 tag 同 digest 推送 forgejo.10cg.pub/10cg/aria-runner, 详见 evidence §3
+- [x] **T1.c.4** 镜像 pull 验证 (从三个 heavy 节点, 各 auth + pull 成功) (0.5h) — 执行 2026-04-20, heavy-1 (build source) + heavy-2 (alloc c228fb71 stdout 捕获 + entrypoint.sh sha match) + heavy-3 (alloc e8a20708 Exit 0 + Downloading image event) 3/3 PASS, 详见 evidence §4
+- [x] **T1.c.5** Registry push 流程文档 (0.5h, per KM-PL-02 proposal §What 交付物 1 对齐) — commit 0f96125 完成 `nomad/registry-push-guide.md`
 - [ ] **T1.c.6** 缓冲 (0.5h)
 
 **T1.c (scaffold) DoD**: registry 有 `claude-<sha1>` + `claude-latest` 两 tag; 三 heavy 节点均可 pull; `image_sha256_scaffold` 记入 T6 临时字段; registry push 流程文档化。
