@@ -26,12 +26,9 @@
 
 **先决**: `post_spec` 收敛审计 Round 6 PASS (本 Spec 进入 A.2 起点)。
 
-- [ ] **T0.1** 创建 Forgejo Issue 10CG/Aria (0.3h) — 标题 "[US-021] M1 MVP 手动 E2E dispatch", body 引用 US-021.md + proposal.md
-- [ ] **T0.2** 创建 synthetic fixture repo stub (1h)
-  - 路径: `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/`
-  - 内容: README.md + `src/` 空 Python/Node/Go 模块 × 3 (供 DEMO-002 非语言绑定)
-  - commit 基线 (供 DEMO-002 验证 diff 命中)
-- [ ] **T0.3** 架构决策位约定 (0.5h)
+- [x] **T0.1** 创建 Forgejo Issue 10CG/Aria (0.3h) — [Aria#21](https://forgejo.10cg.pub/10CG/Aria/issues/21) "[US-021] Aria 2.0 M1 — MVP 手动 E2E dispatch" created 2026-04-17 T0 kickoff; URL 已记入 `docs/requirements/user-stories/US-021.md` §Forgejo Issue (line 8)
+- [x] **T0.2** 创建 synthetic fixture repo stub (1h) — `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/` 已存在 (README.md + src/ + tests/)
+- [x] **T0.3** 架构决策位约定 (0.5h) — `aria-orchestrator/docs/architecture-decisions.md` v0.4 已开 AD-M1-1 ~ AD-M1-11 占位 (2026-04-17); v0.5 AD-M1-10 + AD-M1-11 Decided 实装回填
   - `aria-orchestrator/docs/architecture-decisions.md` 预开 **AD-M1-1 ~ AD-M1-11** 占位 (T6 统一回填, per TL-P2-M1 扩位)
     - AD-M1-1~9 见 proposal §架构决策
     - AD-M1-10 prompt 引擎选型 (T3.4.0 决议)
@@ -93,7 +90,7 @@
 
 ### T2.2 — Nomad Job Template (8h)
 
-- [ ] **T2.2.1** HCL template 起草 (4h)
+- [x] **T2.2.1** HCL template 起草 (4h) — `aria-runner-template.hcl` 完整实装 (pre-draft 原 commit 7fa981c 2026-04-18, 2026-04-21 T2.2.2 session 5 处 pre-fix 后 validate + register PASS); AD-M1-11 Spike 完成 (决议 Option D Nomad Variables, v0.5 Decided 2026-04-21, Spike 工时从 2h → 30min), 详见 AD-M1-11 章节 + `t2-2-job-register-dispatch-evidence.md` §1 pre-fix 清单
   - 路径: `nomad/jobs/aria-runner-template.hcl`
   - `parameterized` block (meta=ISSUE_ID)
   - `volume` stanza 挂 outputs + inputs
