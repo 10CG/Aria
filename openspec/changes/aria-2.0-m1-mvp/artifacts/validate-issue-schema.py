@@ -129,7 +129,7 @@ def _parse_block(lines: list, indent: int, idx: int):
 
 
 def _parse_scalar(s: str):
-    """Parse a scalar (string/int/bool/null)."""
+    """Parse a scalar (string/int/bool/null/empty-inline-collection)."""
     if not s:
         return None
     if s.lower() in ("null", "~"):
@@ -138,6 +138,10 @@ def _parse_scalar(s: str):
         return True
     if s.lower() == "false":
         return False
+    if s == "[]":
+        return []
+    if s == "{}":
+        return {}
     if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
         return s[1:-1]
     try:

@@ -120,20 +120,25 @@
 
 ### T3.1 — Issue Schema v0.1 Artifact (3h)
 
-- [ ] **T3.1.1** 起草 `openspec/changes/aria-2.0-m1-mvp/artifacts/issue-schema-v0.1.md` (2h, per AD-M1-3)
+- [x] **T3.1.1** 起草 `openspec/changes/aria-2.0-m1-mvp/artifacts/issue-schema-v0.1.md` (2h, per AD-M1-3) — pre-draft 2026-04-18 (137 行), 2026-04-21 T3.1 closeout patch v0.1.1: L79 canonical target_repo 修正为 `10CG/Aria` (原 `10CG/aria-plugin-benchmarks` 与 L115 example 偏差, `aria-plugin-benchmarks/` 是 Aria repo 内普通子目录非独立 repo, 验证通过 `.gitmodules` 仅含 standards/aria/aria-orchestrator 三 submodule)
   - 字段: `id`, `title`, `description`, `files[]`, `expected_changes`
     - `expected_changes.expected_file_touched[]` (必填, per QA-C1)
     - `expected_changes.expected_diff_contains[]` (必填, 字面量子串, 范围 `+` 行, per QA-N1)
   - `ip_classification` 必填, v0.1 仅允许 `synthetic`
   - 注明: v0.1 breaking change 可接受 escape hatch (per proposal §3)
-- [ ] **T3.1.2** schema validator (Python stdlib, 仿 M0 handoff validator) (1h)
+- [x] **T3.1.2** schema validator (Python stdlib, 仿 M0 handoff validator) (1h) — pre-draft 2026-04-18 (290 行), 2026-04-21 T3.1 closeout patch: `_parse_scalar` 扩展支持 `[]` / `{}` flow-style 空集合 (原 `files: []` 被误判字符串, spec/impl 偏差), 非 breaking 添加行为. Smoke 矩阵 PASS:
+  - 正: embedded DEMO-001 example (extracted 35 行 yaml) → 0 err 0 warn
+  - 负 1: id 小写 `demo-001` → regex + filename mismatch 双重报错 ✓
+  - 负 2: 缺 action verb → error fired ✓
+  - 负 3: empty expected_file_touched `[]` → error fired ✓
+  - 负 4: `ip_classification: real` → AD-M1-9 enforcement error fired ✓
   - 路径: `openspec/changes/aria-2.0-m1-mvp/artifacts/validate-issue-schema.py`
   - 检查:
     - 必填字段 / enum 值 / 类型
     - **Action verb 检查 (per AD-M1-3 + QA F4 + QA N2)**: `description` 含 "新增" / "修改" / "删除" 之一 + 具体文件/函数名
     - `ip_classification` ∈ {synthetic}  (M1 仅允许 synthetic, 其他值 validator 报错; M2+ 解禁需 per AD-M1-9 治理流程)
 
-**T3.1.DoD**: issue-schema-v0.1.md 存在 + validator 对 DEMO-001/002 验证 PASS。
+**T3.1.DoD**: issue-schema-v0.1.md 存在 ✓ + validator 对 embedded DEMO-001 example **PASS** (full DoD 含 DEMO-001/002 YAML fixture 由 T3.2 完成 — T3.2 起草 DEMO-001/002 时复用 schema doc embedded example 作模板, validator 必跑 PASS 作为 T3.2.DoD 前置)。
 
 ### T3.2 — DEMO Fixture Issue 设计 (5h)
 

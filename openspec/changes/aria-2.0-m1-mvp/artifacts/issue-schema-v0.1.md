@@ -76,7 +76,7 @@ metadata:
 ### `metadata.target_repo`
 - **必填**
 - 格式 `<org>/<repo>` (Forgejo slug)
-- DEMO-001/002 目标: `10CG/aria-plugin-benchmarks` (M1 fixture repo in M0-established path)
+- DEMO-001/002 目标: **`10CG/Aria`** — fixture 位于 Aria repo 内 `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/` 目录 (非独立 `10CG/aria-plugin-benchmarks` repo; `aria-plugin-benchmarks/` 不在 `.gitmodules` 内, 是 Aria repo 的普通子目录 per M0 T0.2)
 
 ### `metadata.base_branch`
 - **可选**
@@ -135,3 +135,4 @@ metadata:
 | Version | Date | Changes |
 |---------|------|---------|
 | v0.1 | 2026-04-18 | Initial draft for M1 MVP. DEMO-001/002 consumed fields. `expected_file_touched` + `expected_diff_contains` 早锁 (per AD-M1-3 + BA-R2-I1). `ip_classification=synthetic` 强制 (per AD-M1-9). Action verb required (per QA-F4). |
+| v0.1.1 | 2026-04-21 | T3.1 closeout patch: **L79 canonical target_repo `10CG/Aria`** (修正 v0.1 与 L115 example 偏差, `aria-plugin-benchmarks/` 是 Aria repo 内普通目录非独立 repo); **validator `_parse_scalar` 支持 `[]` / `{}` flow-style 空集合** (之前 `files: []` 被误判为字符串, spec/impl 偏差修复); 正 DEMO-001 + 4 negative cases smoke PASS (id regex / filename mismatch / ip_classification real / missing action verb). 非 breaking change (添加支持, 不移除/改变已有行为). |
