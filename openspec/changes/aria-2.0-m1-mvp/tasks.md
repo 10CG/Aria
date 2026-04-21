@@ -198,7 +198,12 @@
 
 ### T4.1 — Entrypoint 骨架 (4h)
 
-- [ ] **T4.1.1** `docker/aria-runner/entrypoint.sh` 重写 (M0 只做 skill load) (3h)
+- [x] **T4.1.1** `docker/aria-runner/entrypoint.sh` 重写 (M0 只做 skill load) (3h) — pre-draft 2026-04-18 已 538 行 `entrypoint-m1.sh` 全 11 步 + trap + atomic rename + Forgejo API. 2026-04-21 T4.1a closeout 补 3 个 real-fix:
+  * Step 1b secrets source 分支文档注明 AD-M1-11 方案 D (Nomad Variables) 为生产路径, .env file 仅 dev override fallback (原 pre-draft 留方案 C 遗留注, 易误导)
+  * Step 5 新增 `command -v envsubst` pre-flight (AD-M1-10 v0.2 closeout deferred 的 runtime verification, 若 scaffold v1 image 无 envsubst 则 fail fast 提示 Dockerfile +gettext-base + scaffold v2 rebuild)
+  * Step 5 新增 rendered prompt invariant check (`grep -qE '\$\{?ARIA_'` on rendered output → die if leftover sigils, per RENDERING_CONTRACT.md §Invariant check, T3.4.2 首轮 render 已暴露同类 frontmatter 自引用坑)
+  * 当前 `entrypoint.sh` 仍 M0 stub (58 行), 激活 (entrypoint-m1.sh → entrypoint.sh rename) 延迟到 T5.1.0 final image rebuild (per entrypoint-m1.sh L5-8 file header 锁定)
+  * bash -n 语法 PASS (entrypoint-m1.sh 559 行 + lib/parse-stream-json.sh 70 行 + lib/compute-assertions.sh 137 行 均 PASS)
   - 11 步流程 (proposal §What §4 锁定):
     1. 读 `NOMAD_META_ISSUE_ID`; **设 `handoff.t4_started=true` signal** (per QA F3)
     2. 加载 `/opt/aria-inputs/{ID}/` (volume read-only)
@@ -211,7 +216,7 @@
     9. 幂等三态 (NEW/PARTIAL/FULL + `.bak` 归档)
     10. git add/commit/push + Forgejo create PR
     11. 写 result.json (含 trap EXIT 保护)
-- [ ] **T4.1.2** `trap 'write_partial_result_json' EXIT` 实现 (1h, per BA-R3-C2)
+- [x] **T4.1.2** `trap 'write_partial_result_json' EXIT` 实现 (1h, per BA-R3-C2) — pre-draft 2026-04-18 `entrypoint-m1.sh` L65-96 已实装: trap 注册 L98, `write_partial_result_json` 函数在 `$RESULT_JSON` 未写时触发, atomic rename + 空字段 sed 修正为 null, outcome=INFRA_FAILURE error.type=crashed_before_result_write. 2026-04-21 静态语法 PASS, 功能验证延迟 T5 DEMO 5 轮中的 crash path (若 Step 10 push 失败 trap 应写 partial).
 
 ### T4.2 — Stream-json 解析器 (5h)
 
