@@ -169,7 +169,7 @@
 
 ### T3.4 — Prompt 模板 + 渲染契约 (2h, per TL-P1-C1 / AI-R1-1/2)
 
-- [ ] **T3.4.0** 引擎选型决议 (0.5h, 必须先于 T4.1 启动)
+- [x] **T3.4.0** 引擎选型决议 (0.5h, 必须先于 T4.1 启动) — AD-M1-10 **Decided 2026-04-18** (Option A = bash `envsubst`), 5 条选型理由 (简单性 + 依赖最小化 + 安全边界 + 调试成本 + M2 升级路径) + 3 条 risk mitigation 已记. 2026-04-21 T3.4.0 closeout 回填: scaffold v1 Dockerfile L47-51 仅装 `git jq curl`, `node:20-bookworm-slim` 按惯例不默认含 `gettext-base`, envsubst 运行时可用性验证**移交 T4.1.1 Step 5 起始检查**; 若缺则 Dockerfile 补 `gettext-base` + scaffold v2 rebuild (~1h, 计入 T1.c Buffer / soft buffer). 不预防性动 scaffold v1 的理由: T1.c 已 pass + 无代码路径触发需求, 避免污染 handoff.image_sha256_scaffold baseline. 详见 AD-M1-10 v0.2 bottom note.
   - 候选: bash `envsubst` (Dockerfile 已装) vs Python Jinja2 (需 `pip install jinja2`)
   - 权衡: envsubst 轻量但无控制流; Jinja2 强但增依赖 + 安全边界 (render untrusted YAML)
   - Decision 记入 AD-M1-x 回写占位; T1.c.1 Dockerfile 根据结果决定是否加依赖
