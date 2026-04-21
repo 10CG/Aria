@@ -102,7 +102,7 @@
   - `tmpfs`: `/tmp:size=1024m` + `/root:size=512m` (per BA-R2-C2)
   - `readonly_rootfs = true` (M0 继承)
 - [x] **T2.2.2** Job register + dispatch smoke 测试 (2h) — 执行 2026-04-21, 5 处 HCL pre-fix (constraint node.class / image lowercase / AD-M1-11 D secrets / tmpfs mount 语法 / env stanza 清理) 后 validate + register + dispatch smoke-002 全链路 PASS (alloc 1c1f944d 调度 heavy-2, image pull + volume mount + template 注入 + container 启动 + entrypoint exec claude 均 ✅; CLI arg mismatch 属 T4 scope). `nomad_job_version=0`, `JobModifyIndex=126502`. 详见 `aria-orchestrator/docs/t2-2-job-register-dispatch-evidence.md`
-- [ ] **T2.2.3** `nomad/README.md` deployment + 排错手册 (1.5h)
+- [x] **T2.2.3** `nomad/README.md` deployment + 排错手册 (1.5h) — 执行 2026-04-21, 全面重写匹配 T2.1 (aether volume create, 非 /etc/nomad/client.hcl 手动) + T2.2.2 实测 (AD-M1-11 方案 D Nomad Variables + 5 处 HCL pre-fix 完整列表 + smoke-002 PASS 链路). 覆盖 6 个排错章节 (HCL validation / host_volume / image pull / alloc crashes / readonly_rootfs / dispatch timeout). 引用 t2-1-volume-setup-evidence.md + t2-2-job-register-dispatch-evidence.md + Aether#31/#32.
 - [ ] **T2.2.4** 缓冲 (0.5h)
 
 ### T2.3 — Resource Profiling 基线 (4h)
