@@ -178,13 +178,17 @@
   - 候选: bash `envsubst` (Dockerfile 已装) vs Python Jinja2 (需 `pip install jinja2`)
   - 权衡: envsubst 轻量但无控制流; Jinja2 强但增依赖 + 安全边界 (render untrusted YAML)
   - Decision 记入 AD-M1-x 回写占位; T1.c.1 Dockerfile 根据结果决定是否加依赖
-- [ ] **T3.4.1** `docker/aria-runner/prompts/issue-dispatch.md` 起草 (1h)
-  - 变量: `{{ issue_title }}`, `{{ issue_description }}`, `{{ files_listing }}`, `{{ expected_changes }}`
-  - 按 T3.4.0 决议的引擎语法 (envsubst `${VAR}` 或 Jinja2 `{{ var }}`)
-- [ ] **T3.4.2** 变量渲染契约 + golden sample (0.5h, per AI-R1-1)
-  - `files_listing` = markdown bulleted list (换行 + `- filename`)
-  - `expected_changes` = 两子项展开 `expected_file_touched[]` (list) + `expected_diff_contains[]` (list)
-  - 产出 DEMO-001 / DEMO-002 各一份 golden 渲染文本 (字面量, 作为 T4.1.1 step 5 单测 fixture)
+- [x] **T3.4.1** `docker/aria-runner/prompts/issue-dispatch.md` 起草 (1h) — pre-draft 2026-04-18 已 50 行, 2026-04-21 T3.4 closeout **critical fix**: 移除 header frontmatter 里的自引用 `$ARIA_*` 文档块 (envsubst 无 markdown 感知, header doc 里的示意 `$ARIA_ISSUE_ID` 也被替换, 污染渲染输出). 模板改为纯 prompt body (38 行), 所有文档搬去 `RENDERING_CONTRACT.md`. sha256 baseline = `13498378...`
+  - 变量 (5 个 whitelist, 超 tasks 原规划 4 + ARIA_ISSUE_ID): `$ARIA_ISSUE_ID`, `$ARIA_ISSUE_TITLE`, `$ARIA_ISSUE_DESCRIPTION`, `$ARIA_FILES_LISTING`, `$ARIA_EXPECTED_CHANGES`
+  - envsubst 引擎 per AD-M1-10 (whitelist 调用模式抵御 Risk R1 `$` 字符误展开)
+- [x] **T3.4.2** 变量渲染契约 + golden sample (0.5h, per AI-R1-1) — 执行 2026-04-21, 三件产出:
+  - `prompts/RENDERING_CONTRACT.md` (新建, 151 行): 字段→变量映射规则 + 参考 renderer bash+Python 实现 + 模板设计约束教训 (envsubst 无 markdown 感知) + sha256 baseline 表
+  - `prompts/golden-samples/DEMO-001.rendered.txt` (51 行, sha256 `533f2329...`): envsubst 真渲染产出
+  - `prompts/golden-samples/DEMO-002.rendered.txt` (61 行, sha256 `812a0d88...`): envsubst 真渲染产出
+  - **Invariant check PASS**: `grep -Ec '\$\{?ARIA_'` 对两份 golden 均 = 0 (所有 whitelist vars 消耗, 无 leftover 文档 sigils)
+  - `files_listing` = markdown bulleted list ✓
+  - `expected_changes` = 两子项展开 (Files MUST be touched + Substrings in + 行) ✓
+  - T4.1.1 Step 5 可用本 golden 作 sha256 比对单测 fixture
 
 **T3.DoD**: schema validator PASS on DEMO-001/002; dispatch script 幂等; prompt template 存在。
 
