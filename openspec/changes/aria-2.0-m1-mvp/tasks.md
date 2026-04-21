@@ -162,14 +162,14 @@
 
 ### T3.3 — Dispatch 脚本 (5h)
 
-- [ ] **T3.3.1** `aria-orchestrator/scripts/dispatch-issue.sh` 起草 (3h)
+- [x] **T3.3.1** `aria-orchestrator/scripts/dispatch-issue.sh` 起草 (3h) — pre-draft 2026-04-18 已 229 行, 2026-04-21 closeout patch: (1) 新增 pre-flight check (nomad + python3 CLI availability) 避免 set -e 在 $(...) pipefail 下 silent die; (2) exit code doc 新增 65 (environment error); (3) awk regex 从 `{8}` 区间量词改 portable `length($1)==8` (mawk 不支持 interval, 导致 T3.3.2 Test 2 FAIL 定位到此 bug). Real-cluster read-only smoke PASS via `NOMAD_ADDR=http://192.168.69.70:4646`: Step 0 validator ✓ + Step 1 idempotency ✓ + Step 2 exit 2 (inputs copy on dev host 无 host volume, 符预期).
   - Pre-dispatch 检查: `nomad job status aria-runner-template | grep ISSUE_ID` 无 running alloc (per BA-M3)
   - 拷 inputs: `.aria/issues/{ID}.yaml` + 其引用的 files → `/opt/aria-inputs/{ID}/`
   - `nomad job dispatch -meta ISSUE_ID={ID}` + alloc id 记录
   - Poll alloc 状态 + tail logs (`nomad alloc logs -stderr <alloc_id>`)
   - **Poll 竞态处理 (per BA-R3-T3.3-HOUR)**: alloc 刚 dispatch 处于 `pending` 时 `nomad alloc logs` 会报错; 实现 `sleep 5; retry` 循环直到 alloc 进入 `running` (最长等待 120s 超时视为 dispatch 失败)
-- [ ] **T3.3.2** 脚本幂等性测试 (1h) — 连续两次同 ISSUE_ID dispatch, 第二次应报错拒绝
-- [ ] **T3.3.3** README + 使用说明 (0.5h)
+- [x] **T3.3.2** 脚本幂等性测试 (1h) — 执行 2026-04-21, 产出 `aria-orchestrator/scripts/tests/test-dispatch-idempotency.sh` (PATH-mock nomad CLI, 3 scenarios): (1) no conflicting alloc → 通过 Step 1; (2) 同 ISSUE_ID running alloc → exit 1 拒绝; (3) 不同 ISSUE_ID running alloc → 不拒绝继续. 首轮 3 运行 2 PASS 1 FAIL, 定位到 dispatch-issue.sh awk 区间量词 mawk 不兼容 bug, 修复后 **3/3 PASS**. 全 E2E 幂等 (真 Nomad dispatch × 2) 延迟到 T5 DEMO 5 轮 runs 天然 exercise.
+- [x] **T3.3.3** README + 使用说明 (0.5h) — 产出 `aria-orchestrator/scripts/README.md` (138 行): usage + prerequisites (7 项) + 执行流程 + 7 个 exit codes + 3 个 concrete examples (happy path / idempotency rejection / invalid ID) + non-heavy host 运行说明 + idempotency test 章节 + 2026-04-21 mawk bug 历史注记 + related files cross-ref
 - [ ] **T3.3.4** 缓冲 (0.5h)
 
 ### T3.4 — Prompt 模板 + 渲染契约 (2h, per TL-P1-C1 / AI-R1-1/2)
