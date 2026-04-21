@@ -107,9 +107,9 @@
 
 ### T2.3 — Resource Profiling 基线 (4h)
 
-- [ ] **T2.3.1** smoke alloc 跑 `stress-ng` 占用 → 验证 2048 MiB / 4096 MiB 上限有效 (1.5h)
-- [ ] **T2.3.2** tmpfs 1024m 容量测试 (1h, per BA-R2-C2): mock git clone (~200 MiB) + dummy stream-json buffer (~100 MiB), 观察 p95 使用率
-- [ ] **T2.3.3** 输出 `resource-baseline.md` 记入 T6 (1h)
+- [x] **T2.3.1** smoke alloc 跑 `stress` 占用 → 验证 2048 MiB / 4096 MiB 上限有效 (1.5h) — 执行 2026-04-21, 5 scenario matrix (mem-soft/hard/over + tmpfs-fill/over) PASS 全部符合预期。**关键发现**: Aether scheduler memory oversubscription **未启用**, `memory_max=4096` 被忽略, 实际硬限 = 2048 MiB (mem-hard 3500 MiB 请求 2s 内 OOM Killed)。polinux/stress (非 stress-ng) 足够 M1 smoke, `--verify` flag 不可用。HCL 迭代: 4 次 validate/dispatch converge, 最终用 `template{}` + `{{ env }}` 渲染 + `entrypoint=["/bin/sh"]` 覆盖。Alloc evidence: f73f2554 / d021cb4c / dd790898 / 2a099770 / 58b94aa9。全部详情 → [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) §2。Job HCL → [`aria-orchestrator/nomad/jobs/aria-smoke-resources.hcl`](../../../aria-orchestrator/nomad/jobs/aria-smoke-resources.hcl)。
+- [x] **T2.3.2** tmpfs 1024m 容量测试 (1h, per BA-R2-C2): mock git clone (~200 MiB) + dummy stream-json buffer (~100 MiB), 观察 p95 使用率 — 执行 2026-04-21 (与 T2.3.1 同 smoke job, scenario `tmpfs-fill` + `tmpfs-over`)。**实测**: 200 + 100 = 300 MiB / 1024 MiB tmpfs = **29 % 使用率, 71 % headroom** (BA-R2-C2 设计充分)。tmpfs `size` enforce 精确, 1200 MiB 写入在 1024 MiB 处 ENOSPC, 无 silent overflow。详情 → [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) §2.4-2.5。
+- [x] **T2.3.3** 输出 `resource-baseline.md` 记入 T6 (1h) — 2026-04-21 完成, 文件: [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) (285 行)。6 章节: TL;DR / 测试方法 / 实测结果 / 推导的 production baseline / Aether upstream 依赖 / 复现。新识别 M2 依赖锚点: Aether scheduler oversubscription 启用 (跟踪方式类比 Aether#27/#31/#32)。
 - [ ] **T2.3.4** 缓冲 (0.5h)
 
 **T2.DoD**: host volume 三节点 PASS; Nomad job registered + dispatch smoke PASS; resource baseline 记录。
