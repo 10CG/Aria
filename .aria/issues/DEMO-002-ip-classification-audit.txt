@@ -1,0 +1,76 @@
+DEMO-002 IP Classification Audit (per LA-I1 + AD-M1-9 + LA-R3-5)
+================================================================
+
+Issue: .aria/issues/DEMO-002.yaml
+Audit date: 2026-04-21
+Spec: aria-2.0-m1-mvp §T3.2.3
+
+CONTENT REVIEW
+--------------
+
+1. Target files (to be created by claude):
+   - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/utility.py (new)
+   - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/test_utility.py (new)
+
+   Content nature: Standard textbook algorithm (Fibonacci sequence) + unit
+   tests. No 10CG internal business logic, no production code, no PII, no
+   customer data, no trade secrets.
+
+2. Issue prompt content (description + metadata):
+   Natural language instructions for implementing fibonacci(n: int) -> int
+   with negative-input ValueError handling + pytest cases for n=0/1/5 and
+   negative input. Algorithm is publicly documented (Wikipedia, CLRS, etc.)
+   with no novel IP.
+
+3. Expected output content:
+   - Function definition: "def fibonacci" + docstring
+   - Test cases: "def test_", "assert" statements, ValueError coverage
+   - All substring assertions (def fibonacci / def test_ / assert /
+     ValueError) are standard Python idioms with no semantic coupling to
+     10CG intellectual property.
+
+CLASSIFICATION VERDICT
+----------------------
+
+ip_classification: synthetic (M1-permitted under AD-M1-9)
+
+Justification:
+- Algorithm is textbook / public domain (Fibonacci sequence + pytest idioms)
+- Fixture path within aria-plugin-benchmarks/ synthetic sandbox
+- Output files are new (no modification of existing 10CG IP)
+- Non-trivial scenario specifically designed to exercise claude code
+  generation quality WITHOUT requiring access to 10CG proprietary code
+
+COUNTERFACTUAL CHECK (per LA-R3-5)
+----------------------------------
+
+If claude generated code accidentally leaked 10CG-specific patterns:
+- Input context prevents this: fixture repo is empty (src/python/.gitkeep +
+  tests/.gitkeep only), no 10CG code in scope for claude to "borrow"
+- aria-plugin (loaded via --plugin-dir) contains methodology skills, not
+  business logic; skills guide workflow, not algorithm content
+- Fibonacci is globally public knowledge; no plausible leakage path
+
+CROSS-BORDER DATA FLOW ASSESSMENT (per M1 legal-carryover memo §3)
+------------------------------------------------------------------
+
+Per T1.a M1 legal-carryover v1.0-signed (2026-04-20), Anthropic official API
+call carries only synthetic prompt content. DEMO-002 content (prompt +
+fixture context) meets the "no personal info, no state-critical data"
+assumption. Cross-border transmission permissible without additional CBDT
+filing. Generated code is synthetic output of the API, not transmitted
+personal data.
+
+SIGN-OFF
+--------
+
+Reviewed-by: ai:aria-agent @ 2026-04-21 (content + counterfactual review +
+  assertion string literal match verification)
+Approved-by: human:simonfish (authority, via M0 AD-M0-9 solo-lab standing
+  delegation to AI for synthetic fixture IP classification + AI 代填 pattern
+  per feedback_ai_代填_sign_off_pattern.md; any future change from synthetic
+  to trivial-real/real requires explicit re-signing per AD-M1-9 governance
+  + external counsel review per AD-M1-9)
+
+Provenance: This audit file created 2026-04-21 T3.2.3 closeout. DEMO-002.yaml
+content stable since 2026-04-18 pre-draft, no changes 2026-04-21.

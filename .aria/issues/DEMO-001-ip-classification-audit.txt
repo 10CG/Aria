@@ -1,0 +1,61 @@
+DEMO-001 IP Classification Audit (per LA-I1 + AD-M1-9 + LA-R3-5)
+================================================================
+
+Issue: .aria/issues/DEMO-001.yaml
+Audit date: 2026-04-21
+Spec: aria-2.0-m1-mvp §T3.2.3
+
+CONTENT REVIEW
+--------------
+
+1. Target file:
+   aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md
+
+   Content nature: Synthetic fixture README describing M1 MVP DEMO scenarios.
+   No 10CG internal business logic, no production code, no PII, no customer data.
+   Pre-existing content signed 2026-04-17 by human:simonfish under AD-M1-9
+   synthetic fixture regime (inherits M0 T3.5 合成 fixture 模式).
+
+2. Issue prompt content (description + metadata):
+   Natural language instructions in Chinese/English mix, references only to
+   synthetic fixture paths. No real-world business vocabulary, no vendor /
+   customer / partner names, no production system identifiers.
+
+3. Expected output content:
+   - Modifying ONE pre-existing "Signed-by" line timestamp
+   - Format: "**Signed-by**: human:simonfish @ <YYYY-MM-DD>"
+   - No code generation, no new IP creation
+
+CLASSIFICATION VERDICT
+----------------------
+
+ip_classification: synthetic (M1-permitted under AD-M1-9)
+
+Justification:
+- Fixture README is synthetic (established 2026-04-17 T0.2, no real IP)
+- Modification is timestamp-only, produces no new IP
+- Target path within aria-plugin-benchmarks/ (Aria repo subdirectory, not vendored)
+- No out-of-scope classifications (trivial-real / real) triggered
+
+CROSS-BORDER DATA FLOW ASSESSMENT (per M1 legal-carryover memo §3)
+------------------------------------------------------------------
+
+Per T1.a M1 legal-carryover v1.0-signed (2026-04-20), Anthropic official API
+call carries only synthetic prompt content. DEMO-001 content meets the
+"no personal info, no state-critical data" assumption (PRD §合规). Cross-
+border transmission is permissible without additional CBDT filing.
+
+SIGN-OFF
+--------
+
+Reviewed-by: ai:aria-agent @ 2026-04-21 (content review + regex-free literal
+  substring match verification)
+Approved-by: human:simonfish (authority, via M0 AD-M0-9 solo-lab standing
+  delegation to AI for synthetic fixture IP classification + AI 代填 pattern
+  per feedback_ai_代填_sign_off_pattern.md; any future change from synthetic
+  to trivial-real/real requires explicit re-signing per AD-M1-9 governance)
+
+Provenance: This audit file created 2026-04-21 T3.2.3 closeout. DEMO-001.yaml
+content stable since 2026-04-18 pre-draft, only expected_diff_contains string
+patched 2026-04-21 to handle markdown bold asterisks in target line (no IP
+implication, pure assertion string refinement).

@@ -18,7 +18,7 @@ expected_changes:
   expected_file_touched:
     - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md
   expected_diff_contains:
-    - "Signed-by: human:simonfish"
+    - "human:simonfish @"
 ip_classification: synthetic
 metadata:
   target_repo: "10CG/Aria"

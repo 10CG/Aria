@@ -142,22 +142,22 @@
 
 ### T3.2 — DEMO Fixture Issue 设计 (5h)
 
-- [ ] **T3.2.1** DEMO-001.yaml 起草 (1.5h, synthetic trivial)
+- [x] **T3.2.1** DEMO-001.yaml 起草 (1.5h, synthetic trivial) — pre-draft 2026-04-18 已就位, 2026-04-21 closeout patch: `expected_diff_contains` 从 `"Signed-by: human:simonfish"` 改 `"human:simonfish @"` (修复 markdown bold `**Signed-by**:` 导致的 substring 无法命中 `+` 行 bug); validator PASS (0 err 0 warn)
   - 路径: `.aria/issues/DEMO-001.yaml`
   - scenario: 修改 `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md` 的一行 (synthetic)
-  - `expected_file_touched: ["README.md"]`
-  - `expected_diff_contains: ["<specific content>"]`
+  - `expected_file_touched: ["aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/README.md"]`
+  - `expected_diff_contains: ["human:simonfish @"]` (单 substring 足以判定 pipeline connectivity, DEMO-001 仅管道维度非质量维度 per proposal §143)
   - `ip_classification: synthetic`
-- [ ] **T3.2.2** DEMO-002.yaml 起草 (2.5h, synthetic non-trivial)
-  - scenario: 在 fixture repo 新增 `src/<lang>/utility.py` + `tests/test_utility.py`
-  - 期望 claude 产出完整 function + test
-  - `expected_file_touched: ["src/python/utility.py", "tests/test_utility.py"]`
-  - `expected_diff_contains: ["def utility_func", "def test_utility_func", "assert"]`
+- [x] **T3.2.2** DEMO-002.yaml 起草 (2.5h, synthetic non-trivial) — pre-draft 2026-04-18, 2026-04-21 validator PASS (0 err 0 warn), 无需修改
+  - scenario: 在 fixture repo 新增 `src/python/utility.py` (fibonacci(n) + ValueError handling + docstring) + `tests/test_utility.py` (≥3 pytest, 含边界 0/1 + 负数 ValueError)
+  - `expected_file_touched: ["src/python/utility.py", "tests/test_utility.py"]` (相对 fixture 路径, validator 不检查路径存在只检查非空)
+  - `expected_diff_contains: ["def fibonacci", "def test_", "assert", "ValueError"]` (4 substrings AND 语义 per QA-N1)
   - `ip_classification: synthetic`
-  - 注: 设计需避免 claude "no-op" 陷阱 (per QA-R2) — issue 描述必须含明确"新增"动词 + 具体文件/函数名
-- [ ] **T3.2.3** DEMO issue 合成 IP 审查 (0.5h, per LA-I1 + AD-M1-9)
-  - 确认 DEMO-001/002 inputs 无 10CG 真实业务 IP
-  - 记入 `DEMO-{001,002}-ip-classification-audit.txt` (per LA-R3-5)
+  - 注: 设计避免 claude "no-op" 陷阱 — description 含 "新增" 动词 + 2 个具体文件名 + 函数名 fibonacci + 3 个断言值
+- [x] **T3.2.3** DEMO issue 合成 IP 审查 (0.5h, per LA-I1 + AD-M1-9) — 执行 2026-04-21, 两份 audit 文件产出:
+  - `.aria/issues/DEMO-001-ip-classification-audit.txt` (content review + 跨境数据流评估 + AI 代填签字 per AD-M0-9 solo-lab delegation + feedback_ai_代填_sign_off_pattern.md)
+  - `.aria/issues/DEMO-002-ip-classification-audit.txt` (含 counterfactual leakage check per LA-R3-5: fixture sandbox 为空 + aria-plugin 仅方法论非业务逻辑 → 无泄漏路径; Fibonacci 为公共领域算法)
+  - 两份均 Verdict = `ip_classification: synthetic` (M1-permitted per AD-M1-9)
 - [ ] **T3.2.4** 缓冲 (0.5h)
 
 ### T3.3 — Dispatch 脚本 (5h)
