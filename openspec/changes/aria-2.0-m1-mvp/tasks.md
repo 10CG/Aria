@@ -104,10 +104,7 @@
   - `resources`: CPU 2000 MHz / memory 2048 MiB / disk 4096 MiB (per BA-I1)
   - `tmpfs`: `/tmp:size=1024m` + `/root:size=512m` (per BA-R2-C2)
   - `readonly_rootfs = true` (M0 继承)
-- [ ] **T2.2.2** Job register + dispatch smoke 测试 (2h)
-  - `nomad job run aria-runner-template.hcl` 注册
-  - `nomad job dispatch -meta ISSUE_ID=smoke-001 aria-runner-template` 验证可触发
-  - 记录 `nomad_job_version` 到 T6 handoff
+- [x] **T2.2.2** Job register + dispatch smoke 测试 (2h) — 执行 2026-04-21, 5 处 HCL pre-fix (constraint node.class / image lowercase / AD-M1-11 D secrets / tmpfs mount 语法 / env stanza 清理) 后 validate + register + dispatch smoke-002 全链路 PASS (alloc 1c1f944d 调度 heavy-2, image pull + volume mount + template 注入 + container 启动 + entrypoint exec claude 均 ✅; CLI arg mismatch 属 T4 scope). `nomad_job_version=0`, `JobModifyIndex=126502`. 详见 `aria-orchestrator/docs/t2-2-job-register-dispatch-evidence.md`
 - [ ] **T2.2.3** `nomad/README.md` deployment + 排错手册 (1.5h)
 - [ ] **T2.2.4** 缓冲 (0.5h)
 
