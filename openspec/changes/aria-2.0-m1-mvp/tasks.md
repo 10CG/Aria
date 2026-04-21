@@ -87,14 +87,8 @@
 
 ### T2.1 — Host Volume 声明 (4h)
 
-- [ ] **T2.1.1** 三 heavy 节点 `/etc/nomad/client.hcl` 配置 (2h)
-  - `aria-runner-outputs` → `/opt/aether-volumes/aria-runner/outputs` (M0 已验证)
-  - **`aria-runner-inputs` → `/opt/aether-volumes/aria-runner/inputs`** (新增, per BA-C1)
-  - 三节点分别 reload nomad agent
-- [ ] **T2.1.2** 三节点 smoke dispatch 验证 inputs mount (1.5h, per BA-C1 门控 + BA-R2-T2.1.2-RECOVERY)
-  - 最简测试 alloc: 挂载 inputs volume, `ls /opt/aria-inputs` 非空 → PASS
-  - **门控条件**: 三节点**全部**通过 (not 2/3); 任一节点失败 → 回退
-  - 回退步骤 (递进): (1) `nomad agent reload` → 若失败 (2) `systemctl restart nomad` → 仍失败则 block T3 启动直至修复
+- [x] **T2.1.1** 三 heavy 节点 `/etc/nomad/client.hcl` 配置 (2h) — 执行 2026-04-21 via `aether volume create` × 3 节点 (Aether convention 写入 `/opt/nomad/config/client.hcl` + `systemctl restart nomad`, 非 `/etc/nomad/client.hcl` + reload; Spec 路径不准但等价); 三节点 `HostVolumes` 均暴露 `aria-runner-outputs` + `aria-runner-inputs`. Spec-vs-Aether 偏差 (777 perms / client-RO false / restart vs reload) 由 [Aether#31](https://forgejo.10cg.pub/10CG/Aether/issues/31) 追踪, 详见 `aria-orchestrator/docs/t2-1-volume-setup-evidence.md` §1
+- [x] **T2.1.2** 三节点 smoke dispatch 验证 inputs mount (1.5h, per BA-C1 门控 + BA-R2-T2.1.2-RECOVERY) — 执行 2026-04-21, 3/3 PASS (outputs-rw-ok + inputs-mount-ok + inputs-ro-ok 三节点各自通过), job-level RO 强制有效 (touch 返回 `Read-only file system`). 详见 evidence §2
 - [ ] **T2.1.3** 缓冲 (0.5h)
 
 ### T2.2 — Nomad Job Template (8h)
@@ -105,7 +99,7 @@
   - `volume` stanza 挂 outputs + inputs
   - `env` stanza:
     - `ARIA_SETTINGS_JSON` 从 Nomad meta 或硬编码 (非继承 M0 草稿)
-    - **`ANTHROPIC_API_KEY` 注入 (per BA-R2-T4.5-AUTH-INJECT-MISSING)**: 方案 A = Nomad `template` block + Vault; 方案 B = Nomad `vault` stanza 直接; 方案 C = inputs volume 中 `.env` 文件挂载 (最简, 不依赖 Vault); T2.2.1 Spike 决选 A/B/C, 记入 AD-M1-11 (编号继续扩位, per TL-P2-M1 模式)
+    - **`ANTHROPIC_API_KEY` 注入 (per BA-R2-T4.5-AUTH-INJECT-MISSING)**: ✅ **决议 2026-04-21: 方案 D (Nomad Variables, 继承 aria-build FORGEJO_BOT_PAT 先例)**, 记入 AD-M1-11 v0.5. Aether Vault 实测未部署, A/B 不可行 (Aether#32 独立追踪); 评估 C 触发 Aether#31 偏差 + 路径复用冲突. 实装: `template { data = "{{ with nomadVar \"nomad/jobs/aria-runner-template\" }}ANTHROPIC_API_KEY={{ .ANTHROPIC_API_KEY }}{{ end }}"; env = true }` + owner 一次 `nomad var put`.
     - **`GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL`**: bot 账户身份, 供 entrypoint `git config` 使用
   - `resources`: CPU 2000 MHz / memory 2048 MiB / disk 4096 MiB (per BA-I1)
   - `tmpfs`: `/tmp:size=1024m` + `/root:size=512m` (per BA-R2-C2)
