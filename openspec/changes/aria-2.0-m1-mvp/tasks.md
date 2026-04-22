@@ -220,19 +220,20 @@
 
 ### T4.2 — Stream-json 解析器 (5h)
 
-- [ ] **T4.2.1** 读 stdout 最后 `type=result` JSON line (2h, per AI-C4)
-  - Python 或 bash + jq
-  - 提取 `.total_cost_usd`, `.usage.{input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens}`, `.is_error`
-  - **Fallback** (per AI-R3-C1): 若无 result 帧 (timeout SIGKILL) → `claude_usage` null, `outcome=CLAUDE_TIMEOUT`
-- [ ] **T4.2.2** 原始 stdout 归档到 `/opt/aria-outputs/{ID}/claude.stream.jsonl` (1h)
-- [ ] **T4.2.3** 单元测试 — 5 种 fixture 覆盖 (2h, per AI-R1-3)
-  1. 正常 result 帧 (SUCCESS path, 提取 cost + usage)
-  2. 无 result 帧 (timeout SIGKILL 路径, fallback 到 null + CLAUDE_TIMEOUT)
-  3. `is_error=true` (claude 报错但 stream 完整)
-  4. 格式损坏 / 截断 JSON line (error handling)
-  5. 多 result 帧取最后 (edge case)
+- [x] **T4.2.1** 读 stdout 最后 `type=result` JSON line (2h, per AI-C4) — pre-draft 2026-04-18 `docker/aria-runner/lib/parse-stream-json.sh` 70 行已实装 bash + jq; 2026-04-22 T4.2 session 覆盖 7-fixture 矩阵全 PASS 验证功能正确. 逻辑: `jq -R -s` slurp JSONL → `try fromjson catch null` 过滤损坏行 → `select(.type == "result")` 过滤 → `last // null` 取最后或 fallback null. 字段提取: `.total_cost_usd`, `.usage.{input,output,cache_creation,cache_read}_tokens`, `.is_error` (默认值 `// false` / `// 0` / `// null` 处理 missing 字段).
+- [x] **T4.2.2** 原始 stdout 归档到 `/opt/aria-outputs/{ID}/claude.stream.jsonl` (1h) — pre-draft 已在 `entrypoint-m1.sh` L297 实装 `CLAUDE_STREAM_FILE="${OUTPUT_DIR}/claude.stream.jsonl"` + L311-313 `timeout -k 10s ... > "$CLAUDE_STREAM_FILE" 2> >(tee...)` 捕获 stdout 到 archive + stderr 单独到 `claude.stderr.log`. T4.2 session 交叉读 entrypoint 确认实装位置.
+- [x] **T4.2.3** 单元测试 — **7** 种 fixture 覆盖 (原 Spec 5 种 + 2 对抗, per `feedback_pre_draft_bug_hunt_discipline`) (2h, per AI-R1-3) — 2026-04-22 全 PASS.
+  1. ✅ `fx-01-normal-result`: 正常 result 帧 (提取 cost + usage + duration + num_turns)
+  2. ✅ `fx-02-no-result`: 无 result 帧 (timeout SIGKILL 路径, fallback null)
+  3. ✅ `fx-03-is-error-true`: `is_error=true` (claude 报错但 stream 完整)
+  4. ✅ `fx-04-corrupted-lines`: 格式损坏/截断 JSON line + unterminated object (try/catch 过滤)
+  5. ✅ `fx-05-multi-result`: 多 result 帧取最后 (`last` 语义)
+  6. ✅ `fx-06-empty-stream` (对抗): 零字节输入 → null fallback
+  7. ✅ `fx-07-result-missing-usage` (对抗): result 帧缺 `.usage` 对象 → 默认值 `0` 填充
+  - Runner: `docker/aria-runner/tests/parse-stream-json/test.sh` (bash + jq, canonical-form 比较 `jq -S .`); 7/7 PASS 2026-04-22.
+  - 结论 (对 `feedback_pre_draft_bug_hunt_discipline`): 本文件少见地在 pre-draft 阶段即 zero bug (70 行 / 7 fixture 矩阵全 PASS). 归因: jq 声明式 pipeline 结构简单 + 字段级默认值全显式处理. 反证"每 pre-draft 必藏 1-3 bug"在小型 pure-function 组件上不成立, 规则精确化为"含 I/O 副作用或动态分支的 pre-draft 必查".
 
-**T4.2.DoD**: parser 处理 5 fixtures 全部 PASS; fallback path 显式测试通过。
+**T4.2.DoD**: parser 处理 7 fixtures 全部 PASS; fallback path 显式测试通过 — ✅ 2026-04-22 已达成.
 
 ### T4.3 — result.json 生成 + assertion 计算 (5h)
 
