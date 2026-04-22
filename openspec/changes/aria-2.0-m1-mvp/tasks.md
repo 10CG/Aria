@@ -237,14 +237,18 @@
 
 ### T4.3 — result.json 生成 + assertion 计算 (5h)
 
-- [ ] **T4.3.1** schema v1.0 序列化 (2h, per proposal §What §4 result.json schema)
-- [ ] **T4.3.2** assertion_results 计算 (2h, per TL-I5 + AI-R1-4)
-  - `file_touched_hit`: `git diff HEAD --name-only` 与 `expected_file_touched[]` 对比
-  - `diff_contains_hit`: `git diff HEAD` 的 `+` 行 (**过滤 diff header** `^\+\+\+` 避免文件路径字面量误命中, per AI-R1-4) 与 `expected_diff_contains[]` 字面量子串匹配
-  - `unmatched_files[]` / `unmatched_patterns[]` 记录
-  - **单测必含** 1 fixture: "`+++  b/path/README.md` + expected_diff_contains=['README'] → 预期 false (header 被过滤)"
-- [ ] **T4.3.3** SUCCESS 严格判定 (5 AND, per AD-M1-4) (0.5h)
-- [ ] **T4.3.4** 缓冲 (0.5h)
+- [x] **T4.3.1** schema v1.0 序列化 (2h, per proposal §What §4 result.json schema) — entrypoint-m1.sh Step 11 L515-550 已实装. 2026-04-22 T4.3 session **Spec 字段对照审计发现 1 bug**: 原 `claude_usage: $usage` 直接 passthrough parser 内部格式 (nested `.usage.{...}` + `total_cost_usd` + `raw_*`), 不符合 Spec L113-119 要求的 **flat 6 字段** (其中 `cost_usd_reported` 是 rename from `total_cost_usd` per AI-R3-I1). 修复: 在 Step 11 jq 模板中 reshape (见 L535-545 新增 if/then/else + 逐字段映射), 保持 parser 输出不变 (T4.2 fixture 矩阵无需回归). 验证: fx-01 parser 输出 → reshape 后得到 flat 6 字段 PASS; fx-02 null fallback → null PASS.
+- [x] **T4.3.2** assertion_results 计算 (2h, per TL-I5 + AI-R1-4) — `docker/aria-runner/lib/compute-assertions.sh` 138 行 pre-draft; 2026-04-22 T4.3 session 建 7-fixture 矩阵验证, **发现并修 1 bug**: 原 `DIFF_PLUS_LINES=$(git diff ... \| grep -E '^\+' \| ...)` 在空 diff 时首个 grep 无匹配 exit 1, `set -o pipefail` + `set -e` 杀脚本 (ca-06-empty-diff 复现). 修复: 改用 `awk '/^\+/ && !/^\+\+\+ / { sub(...); print }'` 单步过滤, 始终 exit 0. 矩阵覆盖 (全 PASS):
+  1. ✅ `ca-01-happy-path`: 单 file + 单 pattern
+  2. ✅ `ca-02-file-miss`: expected file 未触达
+  3. ✅ `ca-03-pattern-miss`: file 触达但 pattern 未命中
+  4. ✅ `ca-04-diff-header-false-match`: **Spec 强制 fixture** — 创建 `docs/README.md` 内容 `xyz only`, expected `["README"]`. 证明 `+++  b/docs/README.md` header 被过滤, diff_hit=false (若无过滤会误判 true).
+  5. ✅ `ca-05-multi-file-multi-pattern`: 2 file × 2 pattern 同时命中
+  6. ✅ `ca-06-empty-diff`: `git commit --allow-empty` no-op 路径, 触发 bugfix 的 bug
+  7. ✅ `ca-07-shallow-clone-base`: HEAD~1 不存在, fallback 到 empty tree sha (compute-assertions.sh L45-49)
+  - Runner: `docker/aria-runner/tests/compute-assertions/test.sh` (bash + jq + git + python3, 每 fixture 独立 mktemp 工作区)
+- [x] **T4.3.3** SUCCESS 严格判定 (5 AND, per AD-M1-4) (0.5h) — entrypoint-m1.sh L497-508 已实装. 5-AND: `CLAUDE_EXIT_CODE -eq 0 AND -n COMMIT_SHA AND -n PR_URL AND FILE_TOUCHED_HIT == true AND DIFF_CONTAINS_HIT == true`, 对应 proposal L134 原文 (注: proposal 文本 "三项都 true" 是口误, 实际列出 5 条件, impl 5-AND 正确). 任 1 false → `FINAL_OUTCOME="ASSERTION_MISMATCH"` (L506-508). 集成测试延 T5 DEMO 真实 dispatch 时自然验证, 不需独立单测.
+- [x] **T4.3.4** 缓冲 (0.5h) — T4.3 session 实际 consumed ~2h (bugfix + 7 fixture 工程比预估稍重), 缓冲保留未触发, 归入 proposal 缓冲池。
 
 ### T4.4 — PR 创建 + 幂等守卫 (4h)
 
