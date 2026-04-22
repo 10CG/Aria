@@ -252,14 +252,19 @@
 
 ### T4.4 — PR 创建 + 幂等守卫 (4h)
 
-- [ ] **T4.4.1** Forgejo API 调用封装 (1.5h) — 使用 bot PAT, Bash + curl 或 Python requests
-- [ ] **T4.4.2** 幂等三态实现 (1.5h, per BA-R2-C1)
-  - `NEW`: branch 不存在 → 正常路径
-  - `PARTIAL_PUSH_RECOVERY`: branch 存在 + PR 不存在 → force-push + 创建 PR
-  - `FULL_RECOVERY`: branch + PR 都存在 → force-push + `.bak` 归档旧 result.json + 覆写 + 不创建 PR
-  - **Force-push 策略 (per BA-R4-T4.4.2-HOUR)**: 使用 `git push --force-with-lease` (而非 `--force`) 防意外覆盖 concurrent push
-  - **409 conflict 处理 (per BA-R2-T4.4.2-409-IMPL-GAP)**: force-with-lease 遇 409 → `outcome=IDEMPOTENCY_CONFLICT`, 写 result.json 后 exit 1 (**不重试**, 避免死循环); T4.4.3 单测 fixture 必含此路径; outcome enum 同步扩展 (见下)
-- [ ] **T4.4.3** 缓冲 (1h)
+- [x] **T4.4.1** Forgejo API 调用封装 (1.5h) — 使用 bot PAT, Bash + curl 或 Python requests — entrypoint-m1.sh L381-384 (`GET /api/v1/repos/.../pulls`) + L459-463 (`POST /api/v1/repos/.../pulls`) 已实装 curl 直调 (bash + curl + jq, 无 Python). 2026-04-22 T4.4 session 对照 Spec §What §3 + Forgejo API v1 ref 审计, 无 critical bug; 集成级行为延 T4.5 真实 dispatch 验证.
+- [x] **T4.4.2** 幂等三态实现 (1.5h, per BA-R2-C1) — entrypoint-m1.sh Step 9 (L386-399) + Step 10 (L415-450) 已实装三态判定 + force-with-lease + 409 分类; 2026-04-22 T4.4.3 **提取纯函数分类器**以支持 fixture 测试:
+  - `lib/detect-idempotency-state.sh`: 2 布尔 → enum ({NEW,PARTIAL_PUSH_RECOVERY,FULL_RECOVERY})
+  - `lib/classify-push-result.sh`: (exit_code, push_log) → outcome enum ({SUCCESS,IDEMPOTENCY_CONFLICT,GIT_STAGE_FAILURE}), 识别模式: `non-fast-forward|rejected|stale info|409` → IDEMPOTENCY_CONFLICT
+  - entrypoint-m1.sh Step 9/10 重构调用 lib, `stale info` 模式新增 (原仅 `non-fast-forward|rejected|409`) 使 force-with-lease lease 违例更准确归类.
+  - **force-with-lease (BA-R4)**: 保留, Step 10 L418 `git push --force-with-lease`.
+  - **409 不重试**: classifier 分类出 IDEMPOTENCY_CONFLICT → `PROVISIONAL_OUTCOME` 记录 → Step 11 写 result.json → exit 1 (entrypoint 最后), 无 retry 循环.
+- [x] **T4.4.3** 缓冲 / fixture 矩阵 (1h) — 2026-04-22 用于 classifier 单测, **13/13 PASS**:
+  - **Part A** (classify-push-result.sh, 7 cases): pc-01 success → SUCCESS; **pc-02 rejected non-fast-forward** / **pc-03 lease stale info** / **pc-04 HTTP 409 literal** → all IDEMPOTENCY_CONFLICT (Spec 强制 409 覆盖通过 3 条 fixture 全路径) ; pc-05 network timeout / pc-06 auth failure / pc-07 empty log → all GIT_STAGE_FAILURE (fallback).
+  - **Part B** (detect-idempotency-state.sh, 4 cases): (false,false)→NEW / (true,false)→PARTIAL / (true,true)→FULL / (false,true)→NEW (orphan-PR 边缘态保守归 NEW, 加注释记录).
+  - **Part C** (arg validation, 2 cases): non-boolean + non-integer → exit 64 正确拒绝.
+  - Runner: `docker/aria-runner/tests/push-classifier/test.sh` (bash parallel arrays, ordered iteration).
+  - 全量回归验证 (T4.2/T4.3/T4.4 联动): 27/27 PASS 2026-04-22.
 
 ### T4.5 — 单次 DEMO Dispatch Smoke (2h)
 
