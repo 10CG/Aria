@@ -268,10 +268,15 @@
 
 ### T4.5 — 单次 DEMO Dispatch Smoke (2h)
 
-- [ ] **T4.5.1** DEMO-001 单次 dispatch 验证端到端 (2h, per AI-R1-5)
-  - **真实 Anthropic API 调用, 非 mock** (首次验证 official API endpoint + token + model id 可跑通)
-  - 若 API 层失败 (auth/配额/ToS block) → 回退到 T1.a legal 审视 或 T1.c 镜像 ENV 检查
-  - 链路无断点覆盖: dispatch 脚本 → Nomad alloc → runner entrypoint 11 步 → PR 创建
+- [x] **T4.5.1** DEMO-001 单次 dispatch 验证端到端 (2h 计划, 实耗 ~4h) — 执行 2026-04-23, **PASS**: alloc `70ee89aa`, outcome=SUCCESS, PR #29 创建 (1 file / +1 / -1 / aria/DEMO-001 → feature/aria-2.0-m1-mvp), claude 实际 LLM call (smart-sonnet → glm-4.7 via Luxeno per AD-M1-12) 26s / 11 turns / $0.495, 11 步全通。
+  - **真实 API call 证据**: stream-json `result` 帧 `total_cost_usd=0.495`, `model=glm-4.7` (Luxeno backend mapping AD-M1-12 生效), api_error_status=null
+  - **链路无断点覆盖 CONFIRMED**: seeder (inputs volume) → Nomad dispatch → runner entrypoint 11 步 → parse-stream-json → compute-assertions → Forgejo PR create
+  - **Spec T4.5 L273 "回退到 T1.c 镜像 ENV 检查" 实际触发**: T4.5 smoke 首轮暴露 scaffold v1 镜像缺 entrypoint-m1.sh/lib/prompts/python3, 执行 T5.1.0 pulled forward (Dockerfile 重构 + aria-build rebuild + 镜像 tag claude-m1-69e66a6-v6)
+  - **Pre-draft bug hunt 积累** (本 session 实际修): (1) Dockerfile L91 仅 COPY M0 stub (T5.1.0 延迟); (2) 缺 gettext-base; (3) 缺 python3 (YAML parser 依赖); (4) `unset ANTHROPIC_BASE_URL` 违反 AD-M1-12; (5) Forgejo URL 直连 `forgejo.10cg.pub` 被 CF Access 拦 302 → 改内网 `192.168.69.200:3000`; (6) claude `--permission-mode bypassPermissions` root 下被 claude-code 拒 → 移除 flag 依赖 settings allowlist; (7) DEMO-001 `base_branch: master` 但 fixture 只在 feature branch → 改 `base_branch: feature/aria-2.0-m1-mvp`; (8) 孤儿 aria/DEMO-001 + PR #28 需 API 清理 (IDEMPOTENCY_CONFLICT 分类器正确归类)
+  - **Spec 强制 409 classifier** 实战验证: 2nd dispatch 正确分类为 IDEMPOTENCY_CONFLICT (lease stale, shallow clone 无 aria/DEMO-001 ref → push rejected)
+  - **DEMO_002 未跑** — M1 Spec T4.5 只要求 DEMO-001 smoke, DEMO-002 在 T5 DEMO 矩阵
+  - **M1 image 生产 tag**: `forgejo.10cg.pub/10cg/aria-runner:claude-m1-69e66a6-v6` (aria-orchestrator sha 69e66a6); aria-runner-template.hcl pin 此 tag (AD-M1-2 immutable)
+  - Evidence files (heavy volume `/opt/aria-outputs/DEMO-001/`): result.json, claude-usage.json (reshape 新 schema), claude.stream.jsonl, assertion-results.json, .t4_started marker
 
 **T4.5 FAIL 处置 (per KM-PM-02)**: 由 ai-engineer + backend-architect 联合 triage, 不升级到 T5 (smoke 阶段失败 = T4 未完成)。
 
