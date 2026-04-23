@@ -1,0 +1,66 @@
+{
+  "skill": "state-scanner",
+  "baseline_version": "v1.16.2 (commit aria@415f11c)",
+  "target_version": "v1.16.3 (commit aria@b924696)",
+  "date": "2026-04-23",
+  "fix": "Forgejo #18 — Phase 1.5 PRD Status extraction + prd_draft_blocking rule",
+  "lines_added": 68,
+  "check_count": 10,
+  "baseline_coverage": 0.2,
+  "target_coverage": 1.0,
+  "delta_pp": 80.0,
+  "per_check": [
+    {
+      "name": "C1: Phase 1.5 prd_files[] schema 存在 (SKILL.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C2: PRD status 字段提取 (SKILL.md)",
+      "baseline_ok": true,
+      "target_ok": true
+    },
+    {
+      "name": "C3: linked_stories 字段 (SKILL.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C4: launch_date 字段 (SKILL.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C5: 输出格式 ⚠️ Draft PRD 标注 (SKILL.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C6: backward-compat prd_exists 保留 (SKILL.md)",
+      "baseline_ok": true,
+      "target_ok": true
+    },
+    {
+      "name": "C7: prd_draft_blocking 规则存在 (RECOMMENDATION_RULES.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C8: priority 5 定义正确 (RECOMMENDATION_RULES.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C9: recommendation review-prd (RECOMMENDATION_RULES.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    },
+    {
+      "name": "C10: condition Draft + linked_stories>=5 (RECOMMENDATION_RULES.md)",
+      "baseline_ok": false,
+      "target_ok": true
+    }
+  ],
+  "method": "structural smoke (inline Python, not full /skill-creator AB)",
+  "note": "Pattern 1-5 reused from v1.16.1 #17 fix (no re-test needed)."
+}
