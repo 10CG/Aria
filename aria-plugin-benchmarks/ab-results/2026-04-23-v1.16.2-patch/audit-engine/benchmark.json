@@ -1,0 +1,69 @@
+{
+  "skill": "audit-engine",
+  "baseline_version": "v1.16.0 (commit aria@07dda35, 394 lines)",
+  "target_version": "v1.16.2 (commit aria@415f11c, 513 lines)",
+  "date": "2026-04-23",
+  "fixes": [
+    "Forgejo #27 (v1.16.1) — Pre-write change_id validation",
+    "Forgejo #26 (v1.16.2) — Pre-merge checkpoint report completeness gate"
+  ],
+  "lines_added": 119,
+  "check_count": 10,
+  "baseline_coverage": 0.1,
+  "target_coverage": 0.9,
+  "delta_pp": 80.0,
+  "per_check": [
+    {
+      "name": "C1: #27 Pre-write Validation 章节存在",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C2: #27 openspec/changes 路径校验",
+      "v1160_ok": null,
+      "v1162_ok": true
+    },
+    {
+      "name": "C3: #27 openspec/archive 通配校验",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C4: #27 豁免 config audit.allow_dangling_change_ids",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C5: #26 Checkpoint Report Completeness Gate 章节存在",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C6: #26 audit-reports 目录扫描",
+      "v1160_ok": true,
+      "v1162_ok": true
+    },
+    {
+      "name": "C7: #26 post_closure 排除",
+      "v1160_ok": false,
+      "v1162_ok": false
+    },
+    {
+      "name": "C8: #26 豁免 config audit.allow_incomplete_checkpoints",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C9: #26 豁免时 WARN audit trail",
+      "v1160_ok": false,
+      "v1162_ok": true
+    },
+    {
+      "name": "C10: #26+#27 互补关系文档化",
+      "v1160_ok": false,
+      "v1162_ok": true
+    }
+  ],
+  "method": "structural grep smoke (inline Python, not full /skill-creator AB)",
+  "note": "audit-engine is a Markdown Skill (docs, not executable). Full AB via /skill-creator would need 3 fixture scenarios (normal / missing-checkpoint / dangling-change_id); deferred to dedicated session. Structural checks verify fix presence and doc coherence."
+}

@@ -1,0 +1,78 @@
+{
+  "skill": "state-scanner",
+  "baseline_version": "v1.16.0 (commit aria@07dda35)",
+  "target_version": "v1.16.1 (commit aria@9acb801)",
+  "date": "2026-04-23",
+  "fix": "Forgejo #17 — Phase 1.5 Status heading regex",
+  "test_count": 9,
+  "baseline_pass_rate": 0.5555555555555556,
+  "target_pass_rate": 1.0,
+  "delta_pp": 44.44444444444444,
+  "per_test": [
+    {
+      "name": "E1: Status: done (plain EN)",
+      "v1160_pass": true,
+      "v1161_pass": true,
+      "v1160_cap": "done",
+      "v1161_cap": "done"
+    },
+    {
+      "name": "E2: ## Status: COMPLETED (MD heading, #17 core)",
+      "v1160_pass": false,
+      "v1161_pass": true,
+      "v1160_cap": null,
+      "v1161_cap": "COMPLETED (Cycle 42)"
+    },
+    {
+      "name": "E3: ### Status: active",
+      "v1160_pass": false,
+      "v1161_pass": true,
+      "v1160_cap": null,
+      "v1161_cap": "active"
+    },
+    {
+      "name": "E4: **Status**: done (bold EN)",
+      "v1160_pass": true,
+      "v1161_pass": true,
+      "v1160_cap": "done",
+      "v1161_cap": "done"
+    },
+    {
+      "name": "E5: ### 状态: 完成 (CN heading)",
+      "v1160_pass": false,
+      "v1161_pass": true,
+      "v1160_cap": null,
+      "v1161_cap": "完成"
+    },
+    {
+      "name": "E6: **状态**: 进行中 (CN bold)",
+      "v1160_pass": true,
+      "v1161_pass": true,
+      "v1160_cap": "进行中",
+      "v1161_cap": "进行中"
+    },
+    {
+      "name": "E7: 状态: 待定 (CN plain)",
+      "v1160_pass": false,
+      "v1161_pass": true,
+      "v1160_cap": null,
+      "v1161_cap": "待定"
+    },
+    {
+      "name": "E8: > Status: draft (blockquote)",
+      "v1160_pass": true,
+      "v1161_pass": true,
+      "v1160_cap": "draft",
+      "v1161_cap": "draft"
+    },
+    {
+      "name": "E9: | Status | done | (table)",
+      "v1160_pass": true,
+      "v1161_pass": true,
+      "v1160_cap": "done",
+      "v1161_cap": "done"
+    }
+  ],
+  "method": "structural regex smoke (inline Python, not full /skill-creator AB)",
+  "note": "Full /skill-creator AB pending dedicated session; this smoke validates the core regex change against 9 canonical inputs."
+}
