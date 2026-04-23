@@ -1,0 +1,69 @@
+{
+  "skill": "aria-dashboard (SKILL.md + dashboard.html)",
+  "baseline": "v1.16.3 (aria@b924696)",
+  "target": "v1.16.4 (aria@17f6423)",
+  "date": "2026-04-23",
+  "fixes": [
+    "#23 Major 1 duration fallback",
+    "#23 Major 2 verdict CSS",
+    "#23 Major 3 Carry-forward section"
+  ],
+  "check_count": 10,
+  "baseline_coverage": 0.0,
+  "target_coverage": 1.0,
+  "delta_pp": 100.0,
+  "per_check": [
+    {
+      "name": "#23-M1 Created date fallback chain (≥3 sources)",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M1 archive dir prefix YYYY-MM-DD fallback",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M2 verdict-warning CSS class",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M2 verdict-neutral CSS class",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M2 PASS_WITH_* pattern recognition",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M2 frontmatter verdict: read-first",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M3 Carry-forward section in SKILL.md",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M3 {{CARRY_FORWARD_HTML}} placeholder in template",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M3 target_release grouping",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#23-M3 data source audit-reports + Out of Scope",
+      "baseline": false,
+      "target": true
+    }
+  ],
+  "method": "structural smoke",
+  "deferred": "Minor 4-9 → v1.17.x"
+}

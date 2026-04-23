@@ -1,0 +1,44 @@
+{
+  "skill": "phase-c-integrator (+ phase-d-closer)",
+  "baseline": "v1.16.3 (aria@b924696)",
+  "target": "v1.16.4 (aria@17f6423)",
+  "date": "2026-04-23",
+  "fix": "Forgejo #22 — C.2.6 UPM milestone-driven sub-progress",
+  "check_count": 6,
+  "baseline_coverage": 0.0,
+  "target_coverage": 0.8333333333333334,
+  "delta_pp": 83.33333333333333,
+  "per_check": [
+    {
+      "name": "#22-1 C.2.6 step defined in phase-c SKILL.md",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#22-2 upm.milestone_driven config flag",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#22-3 UPM sub-bullet format documented",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#22-4 [ ]→[~] status mark transition",
+      "baseline": false,
+      "target": false
+    },
+    {
+      "name": "#22-5 phase-d milestone-driven mode section",
+      "baseline": false,
+      "target": true
+    },
+    {
+      "name": "#22-6 phase-d D.1 finalize mode documented",
+      "baseline": false,
+      "target": true
+    }
+  ],
+  "method": "structural smoke"
+}
