@@ -331,7 +331,7 @@
 
 ### T6.1 — M1 Report 起草 (2.5h)
 
-- [ ] **T6.1.1** `aria-orchestrator/docs/m1-report.md` 起草 (2h)
+- [x] **T6.1.1** `aria-orchestrator/docs/m1-report.md` 起草 (2h)
   - 结构参照 M0 Report (简化版):
     - §0 Executive Summary + velocity 实测 vs PRD 100h
     - §1 镜像链路验证结果
@@ -340,13 +340,13 @@
     - §4 Legal carryover 摘要
     - §5 Open issues for M2
     - §6 签字位
-- [ ] **T6.1.2** 缓冲 (0.5h)
+- [x] **T6.1.2** 缓冲 (0.5h)
 
 ### T6.2 — Handoff schema v1.0 生成 (1.5h, per AD-M1-7; tech-lead co-sign, per KM-PM-01)
 
-- [ ] **T6.2.1** `aria-orchestrator/docs/m1-handoff.yaml` 填充 (1h)
+- [x] **T6.2.1** `aria-orchestrator/docs/m1-handoff.yaml` 填充 (1h)
   - go_decision / image_refs (含 `image_sha256_final` 替换 scaffold) / nomad 配置 / `t4_started` / demo_executions / legal_assumptions / performance_baseline / demo_token_usage
-- [ ] **T6.2.2** Handoff validator 创建 + 验证 (0.5h)
+- [x] **T6.2.2** Handoff validator 创建 + 验证 (0.5h)
   - `aria-orchestrator/docs/validate-m1-handoff.py` (仿 M0 validator)
   - **验证清单 (per LA + QA)**:
     - schema v1.0 字段必填 + enum
@@ -356,7 +356,7 @@
     - `legal_assumptions.luxeno_data_cleared` (backfill from T1.a.2)
     - `legal_assumptions.m1_memo_signed` (mechanical file-existence check)
     - `image_refs.immutable_sha` 非空 (不是 scaffold 占位)
-- [ ] **T6.2.3** tech-lead co-sign (0.3h, 附 T6.2.2 之后, per KM-PM-01 + KM2-PM-03/04)
+- [x] **T6.2.3** tech-lead co-sign (0.3h, 附 T6.2.2 之后, per KM-PM-01 + KM2-PM-03/04)
   - 对 handoff schema M2 接口契约做最终裁决 (schema amendments 窗口策略 per AD-M1-7 是否激活)
   - **机械 artifact**: `m1-handoff.yaml` 末部新增字段:
     ```yaml
@@ -371,12 +371,12 @@
 
 ### T6.3 — AD-M1-* 决议回写 (1h, per KM-M2 / CR-M3)
 
-- [ ] **T6.3.1** 在 `aria-orchestrator/docs/architecture-decisions.md` 填充 AD-M1-1 ~ AD-M1-9 最终决议 (1h)
+- [x] **T6.3.1** 在 `aria-orchestrator/docs/architecture-decisions.md` 填充 AD-M1-1 ~ AD-M1-9 最终决议 (1h)
 
 ### T6.4 — Owner Signoff (0.7h, per AD-M0-9; 0.3h 已转入 T6.2.3 tech-lead co-sign)
 
-- [ ] **T6.4.1** Owner 审阅 M1 Report + handoff + legal carryover (0.2h, per KM2-PM-04 减配)
-- [ ] **T6.4.2** 签字 + go_decision 填充 (0.5h)
+- [x] **T6.4.1** Owner 审阅 M1 Report + handoff + legal carryover (0.2h, per KM2-PM-04 减配)
+- [x] **T6.4.2** 签字 + go_decision 填充 (0.5h)
   - `Go` | `Go-with-revision` | `No-Go` | `No-Go-with-revision`
   - Deferred-with-approval (DEMO-002 降级) → 走 `No-Go-with-revision` (per AD-M1-5)
 

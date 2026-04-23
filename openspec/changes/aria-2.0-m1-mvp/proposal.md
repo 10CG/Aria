@@ -1,8 +1,9 @@
 # aria-2.0-m1-mvp — Aria 2.0 M1 MVP 手动 E2E dispatch
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft
+> **Status**: Complete
 > **Created**: 2026-04-17
+> **Completed**: 2026-04-23 (go_decision=Go-with-revision, e2e_demo_passed=true, 85/85 tasks)
 > **Parent Story**: [US-021](../../../docs/requirements/user-stories/US-021.md)
 > **Target Version**: v2.0.0-m1
 > **Source**: [PRD v2.1 §M1 (lines 444-465)](../../../docs/requirements/prd-aria-v2.md), [M0 Report §6 M1 精确路径](../../../aria-orchestrator/docs/m0-report.md), [M0 handoff.yaml schema final](../../../aria-orchestrator/docs/m0-handoff.yaml)
