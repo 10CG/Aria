@@ -1,0 +1,54 @@
+{
+  "m1_e2e_summary": {
+    "generated_at": "2026-04-23T04:35:30Z",
+    "image_tag": "forgejo.10cg.pub/10cg/aria-runner:claude-m1-5154c13-v9",
+    "provider": "Luxeno (AD-M1-12) smart-sonnet -> glm-4.7",
+    "demo_001": {
+      "rounds_counted": 5,
+      "success_count": 5,
+      "success_rate": 1,
+      "outcomes": [
+        {
+          "outcome": "SUCCESS",
+          "count": 5
+        }
+      ],
+      "avg_duration_s": 26.2,
+      "p50_duration_s": 25,
+      "p95_duration_s": 35,
+      "total_cost_usd": 1.038,
+      "p50_input_tokens": 30618,
+      "p50_output_tokens": 890,
+      "failed_allocs": []
+    },
+    "demo_002": {
+      "rounds_counted": 9,
+      "success_count": 8,
+      "success_rate": 0.8888888888888888,
+      "outcomes": [
+        {
+          "outcome": "ASSERTION_MISMATCH",
+          "count": 1
+        },
+        {
+          "outcome": "SUCCESS",
+          "count": 8
+        }
+      ],
+      "avg_duration_s": 32.7,
+      "p50_duration_s": 26,
+      "p95_duration_s": 56,
+      "total_cost_usd": 1.791,
+      "p50_input_tokens": 2329,
+      "p50_output_tokens": 1149,
+      "failed_allocs": [
+        {
+          "round": 3,
+          "alloc": "45ce61a6",
+          "outcome": "ASSERTION_MISMATCH"
+        }
+      ]
+    },
+    "e2e_demo_passed": true
+  }
+}
