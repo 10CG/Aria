@@ -34,7 +34,7 @@
     - AD-M1-10 prompt 引擎选型 (T3.4.0 决议)
     - AD-M1-11 ANTHROPIC_API_KEY 注入方案 (T2.2.1 决议)
   - `.aria/decisions/` 文件夹无需新建 (已有 M1 scope reorg 决议)
-- [ ] **T0.4** 缓冲 (0.2h)
+- [x] **T0.4** 缓冲 (0.2h)
 
 **T0.DoD**: Forgejo Issue URL 记入 US-021.md; fixture repo commit SHA 记入 T3 输入; AD-M1-* 占位行到位。
 
@@ -49,7 +49,7 @@
 - [x] **T1.a.1** M1 legal-carryover memo 起草 (2h) — v0.2-advisory 2026-04-18 完成
 - [x] **T1.a.2** M0→M1 Luxeno 数据清理 (1h, per AD-M1-1 T1 交付物扩展) — Path C skipped (Luxeno=silknode 10CG 自有 Portkey 代理非第三方, per memory `project_glm_routing_luxeno.md`), memo §9 回填 2026-04-20
 - [x] **T1.a.3** Owner signoff (0.3h, per AD-M0-9 solo-lab) — AI 代填 2026-04-20 `Signed-by: human:simonfish @ 2026-04-20` (v1.0-signed, 含 provenance 注记 per `feedback_ai_代填_sign_off_pattern.md`)
-- [ ] **T1.a.4** 缓冲 (0.5h, 原 0.2h → 0.5h 纠正 T1 加总 per CR-R1-M1; T1.a 总 = 3.8h ≈ 4h 报表)
+- [x] **T1.a.4** 缓冲 (0.5h, 原 0.2h → 0.5h 纠正 T1 加总 per CR-R1-M1; T1.a 总 = 3.8h ≈ 4h 报表)
 
 **T1.a.DoD**: memo 文件存在 + 最后一行签字 + `handoff.legal_assumptions.anthropic_api_terms_verified=true` 可回填。
 
@@ -70,7 +70,7 @@
 - [x] **T1.c.3** Push 两 tag 到 registry (0.5h) — 执行 2026-04-20, 双 tag 同 digest 推送 forgejo.10cg.pub/10cg/aria-runner, 详见 evidence §3
 - [x] **T1.c.4** 镜像 pull 验证 (从三个 heavy 节点, 各 auth + pull 成功) (0.5h) — 执行 2026-04-20, heavy-1 (build source) + heavy-2 (alloc c228fb71 stdout 捕获 + entrypoint.sh sha match) + heavy-3 (alloc e8a20708 Exit 0 + Downloading image event) 3/3 PASS, 详见 evidence §4
 - [x] **T1.c.5** Registry push 流程文档 (0.5h, per KM-PL-02 proposal §What 交付物 1 对齐) — commit 0f96125 完成 `nomad/registry-push-guide.md`
-- [ ] **T1.c.6** 缓冲 (0.5h)
+- [x] **T1.c.6** 缓冲 (0.5h)
 
 **T1.c (scaffold) DoD**: registry 有 `claude-<sha1>` + `claude-latest` 两 tag; 三 heavy 节点均可 pull; `image_sha256_scaffold` 记入 T6 临时字段; registry push 流程文档化。
 
@@ -86,7 +86,7 @@
 
 - [x] **T2.1.1** 三 heavy 节点 `/etc/nomad/client.hcl` 配置 (2h) — 执行 2026-04-21 via `aether volume create` × 3 节点 (Aether convention 写入 `/opt/nomad/config/client.hcl` + `systemctl restart nomad`, 非 `/etc/nomad/client.hcl` + reload; Spec 路径不准但等价); 三节点 `HostVolumes` 均暴露 `aria-runner-outputs` + `aria-runner-inputs`. Spec-vs-Aether 偏差 (777 perms / client-RO false / restart vs reload) 由 [Aether#31](https://forgejo.10cg.pub/10CG/Aether/issues/31) 追踪, 详见 `aria-orchestrator/docs/t2-1-volume-setup-evidence.md` §1
 - [x] **T2.1.2** 三节点 smoke dispatch 验证 inputs mount (1.5h, per BA-C1 门控 + BA-R2-T2.1.2-RECOVERY) — 执行 2026-04-21, 3/3 PASS (outputs-rw-ok + inputs-mount-ok + inputs-ro-ok 三节点各自通过), job-level RO 强制有效 (touch 返回 `Read-only file system`). 详见 evidence §2
-- [ ] **T2.1.3** 缓冲 (0.5h)
+- [x] **T2.1.3** 缓冲 (0.5h)
 
 ### T2.2 — Nomad Job Template (8h)
 
@@ -103,14 +103,14 @@
   - `readonly_rootfs = true` (M0 继承)
 - [x] **T2.2.2** Job register + dispatch smoke 测试 (2h) — 执行 2026-04-21, 5 处 HCL pre-fix (constraint node.class / image lowercase / AD-M1-11 D secrets / tmpfs mount 语法 / env stanza 清理) 后 validate + register + dispatch smoke-002 全链路 PASS (alloc 1c1f944d 调度 heavy-2, image pull + volume mount + template 注入 + container 启动 + entrypoint exec claude 均 ✅; CLI arg mismatch 属 T4 scope). `nomad_job_version=0`, `JobModifyIndex=126502`. 详见 `aria-orchestrator/docs/t2-2-job-register-dispatch-evidence.md`
 - [x] **T2.2.3** `nomad/README.md` deployment + 排错手册 (1.5h) — 执行 2026-04-21, 全面重写匹配 T2.1 (aether volume create, 非 /etc/nomad/client.hcl 手动) + T2.2.2 实测 (AD-M1-11 方案 D Nomad Variables + 5 处 HCL pre-fix 完整列表 + smoke-002 PASS 链路). 覆盖 6 个排错章节 (HCL validation / host_volume / image pull / alloc crashes / readonly_rootfs / dispatch timeout). 引用 t2-1-volume-setup-evidence.md + t2-2-job-register-dispatch-evidence.md + Aether#31/#32.
-- [ ] **T2.2.4** 缓冲 (0.5h)
+- [x] **T2.2.4** 缓冲 (0.5h)
 
 ### T2.3 — Resource Profiling 基线 (4h)
 
 - [x] **T2.3.1** smoke alloc 跑 `stress` 占用 → 验证 2048 MiB / 4096 MiB 上限有效 (1.5h) — 执行 2026-04-21, 5 scenario matrix (mem-soft/hard/over + tmpfs-fill/over) PASS 全部符合预期。**关键发现**: Aether scheduler memory oversubscription **未启用**, `memory_max=4096` 被忽略, 实际硬限 = 2048 MiB (mem-hard 3500 MiB 请求 2s 内 OOM Killed)。polinux/stress (非 stress-ng) 足够 M1 smoke, `--verify` flag 不可用。HCL 迭代: 4 次 validate/dispatch converge, 最终用 `template{}` + `{{ env }}` 渲染 + `entrypoint=["/bin/sh"]` 覆盖。Alloc evidence: f73f2554 / d021cb4c / dd790898 / 2a099770 / 58b94aa9。全部详情 → [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) §2。Job HCL → [`aria-orchestrator/nomad/jobs/aria-smoke-resources.hcl`](../../../aria-orchestrator/nomad/jobs/aria-smoke-resources.hcl)。
 - [x] **T2.3.2** tmpfs 1024m 容量测试 (1h, per BA-R2-C2): mock git clone (~200 MiB) + dummy stream-json buffer (~100 MiB), 观察 p95 使用率 — 执行 2026-04-21 (与 T2.3.1 同 smoke job, scenario `tmpfs-fill` + `tmpfs-over`)。**实测**: 200 + 100 = 300 MiB / 1024 MiB tmpfs = **29 % 使用率, 71 % headroom** (BA-R2-C2 设计充分)。tmpfs `size` enforce 精确, 1200 MiB 写入在 1024 MiB 处 ENOSPC, 无 silent overflow。详情 → [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) §2.4-2.5。
 - [x] **T2.3.3** 输出 `resource-baseline.md` 记入 T6 (1h) — 2026-04-21 完成, 文件: [`artifacts/resource-baseline.md`](artifacts/resource-baseline.md) (285 行)。6 章节: TL;DR / 测试方法 / 实测结果 / 推导的 production baseline / Aether upstream 依赖 / 复现。新识别 M2 依赖锚点: Aether scheduler oversubscription 启用 (跟踪方式类比 Aether#27/#31/#32)。
-- [ ] **T2.3.4** 缓冲 (0.5h)
+- [x] **T2.3.4** 缓冲 (0.5h)
 
 **T2.DoD**: host volume 三节点 PASS; Nomad job registered + dispatch smoke PASS; resource baseline 记录。
 
@@ -158,7 +158,7 @@
   - `.aria/issues/DEMO-001-ip-classification-audit.txt` (content review + 跨境数据流评估 + AI 代填签字 per AD-M0-9 solo-lab delegation + feedback_ai_代填_sign_off_pattern.md)
   - `.aria/issues/DEMO-002-ip-classification-audit.txt` (含 counterfactual leakage check per LA-R3-5: fixture sandbox 为空 + aria-plugin 仅方法论非业务逻辑 → 无泄漏路径; Fibonacci 为公共领域算法)
   - 两份均 Verdict = `ip_classification: synthetic` (M1-permitted per AD-M1-9)
-- [ ] **T3.2.4** 缓冲 (0.5h)
+- [x] **T3.2.4** 缓冲 (0.5h)
 
 ### T3.3 — Dispatch 脚本 (5h)
 
@@ -170,7 +170,7 @@
   - **Poll 竞态处理 (per BA-R3-T3.3-HOUR)**: alloc 刚 dispatch 处于 `pending` 时 `nomad alloc logs` 会报错; 实现 `sleep 5; retry` 循环直到 alloc 进入 `running` (最长等待 120s 超时视为 dispatch 失败)
 - [x] **T3.3.2** 脚本幂等性测试 (1h) — 执行 2026-04-21, 产出 `aria-orchestrator/scripts/tests/test-dispatch-idempotency.sh` (PATH-mock nomad CLI, 3 scenarios): (1) no conflicting alloc → 通过 Step 1; (2) 同 ISSUE_ID running alloc → exit 1 拒绝; (3) 不同 ISSUE_ID running alloc → 不拒绝继续. 首轮 3 运行 2 PASS 1 FAIL, 定位到 dispatch-issue.sh awk 区间量词 mawk 不兼容 bug, 修复后 **3/3 PASS**. 全 E2E 幂等 (真 Nomad dispatch × 2) 延迟到 T5 DEMO 5 轮 runs 天然 exercise.
 - [x] **T3.3.3** README + 使用说明 (0.5h) — 产出 `aria-orchestrator/scripts/README.md` (138 行): usage + prerequisites (7 项) + 执行流程 + 7 个 exit codes + 3 个 concrete examples (happy path / idempotency rejection / invalid ID) + non-heavy host 运行说明 + idempotency test 章节 + 2026-04-21 mawk bug 历史注记 + related files cross-ref
-- [ ] **T3.3.4** 缓冲 (0.5h)
+- [x] **T3.3.4** 缓冲 (0.5h)
 
 ### T3.4 — Prompt 模板 + 渲染契约 (2h, per TL-P1-C1 / AI-R1-1/2)
 
@@ -317,11 +317,11 @@
 
 ### T5.4 — Week 2 Checkpoint (2h)
 
-- [ ] **T5.4.1** 累计工时核算 (0.5h) — 若 ≥ 60h 且 `handoff.t4_started == false` → 触发 scope 重估 (per QA F3 机械可检; handoff schema v1.0 需加 `t4_started: bool` 字段, 执行 T4.1.1 第一个 checkbox 时 runner 置 true)
-- [ ] **T5.4.2** 若触发: DEMO-002 降级为 optional (**0h if not triggered, 1-2h if triggered, 从 Buffer 支出**, per CR-R1-M2)
+- [x] **T5.4.1** 累计工时核算 (0.5h) — 若 ≥ 60h 且 `handoff.t4_started == false` → 触发 scope 重估 (per QA F3 机械可检; handoff schema v1.0 需加 `t4_started: bool` 字段, 执行 T4.1.1 第一个 checkbox 时 runner 置 true)
+- [x] **T5.4.2** 若触发: DEMO-002 降级为 optional (**0h if not triggered, 1-2h if triggered, 从 Buffer 支出**, per CR-R1-M2)
   - deferred-with-approval 走 No-Go-with-revision (非 Go)
   - 写入 `handoff.open_issues`
-- [ ] **T5.4.3** 缓冲 (1.5h, 通常 M1 正常进度不触发)
+- [x] **T5.4.3** 缓冲 (1.5h, 通常 M1 正常进度不触发)
 
 **T5.DoD**: `e2e_demo_passed = true/false` 确定; outcome distribution 完整; PR URLs 列表记录。
 
