@@ -96,9 +96,14 @@ T6 audit (pre_merge R1 aria:code-reviewer) 确认此偏移文档化充分, MERGE
 
 ## T7. Aria 项目 dogfooding (2.5h, +0.5h per CF-2)
 
-- [ ] **T7.0** (CF-2 前置) 定义 JSON canonical normalizer: `jq -S --sort-keys`, float 精度 6 位, null/absent 字段统一归并, timestamp 字段白名单容忍差异, 输出到 `references/json-diff-normalizer.md` (0.5h)
-- [ ] **T7.1** 在 Aria 主项目跑新版 scan.py, 通过 T7.0 normalizer 对比 v2.9 输出字段 (1h)
-- [ ] **T7.2** 差异分析 + 修复 (字段命名 / 顺序 / 类型漂移), 机械断言 diff exit code 0 (1h)
+**Design reframe (2026-04-24)**: T7.1 literal 文本 "对比 v2.9 输出字段" 不可行 —
+v2.9 prose 路径无 JSON 产物可 diff. 实际实施为 **v3.0 vs v3.0 snapshot stability**
+(两次 scan.py 跑 + normalize + diff 断言零 drift). 详见 aria PR #26 commit message
++ `references/json-diff-normalizer.md` §"Why reframe" 章节.
+
+- [x] **T7.0** (CF-2 前置) 定义 JSON canonical normalizer + stdlib-only 实现 (0.5h) — aria PR #26 merged 2026-04-24 (1a875d5); `references/json-diff-normalizer.md` (10 rules 规范) + `scripts/normalize_snapshot.py` (stdlib ~170 行)
+- [x] **T7.1** 在 Aria 主项目跑新版 scan.py + normalize, 生成 golden baseline (1h) — aria PR #26; `tests/fixtures/reference-snapshot-aria.json` (722 行, Aria master 2026-04-24 归一化快照). **reframe from literal v2.9 compare**
+- [x] **T7.2** 机械断言 diff exit code 0 (1h) — aria PR #26 `tests/test_normalize_snapshot.py::TestStabilityIntegration` (两次 scan.py + normalize → 字节级一致断言); live dogfood 验证 DIFF_EXIT=0
 
 ## T8. Kairos 跨项目验证 (2h)
 
