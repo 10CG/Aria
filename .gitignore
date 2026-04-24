@@ -11,4 +11,7 @@
 # Aria Skill 运行时缓存 (v2.9.0+)
 .aria/cache/
 .aria/heartbeat-scan.json
+
+# state-scanner Step 0 output (v3.0.0+): 会话级 snapshot, 每次运行覆盖, 不提交
+.aria/state-snapshot.json
 __pycache__/
