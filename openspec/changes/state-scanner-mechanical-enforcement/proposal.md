@@ -86,7 +86,7 @@ state-scanner v2.9 的 Phase 1.x 有 14 个子阶段 (0 / 1 / 1.1 / 1.5-1.14)，
 | **AD-SSME-2** | 脚本**只采集**, 不做推荐匹配 | 规则表达力需要语言理解, 强行数据化会把 AI 推理能力从 Phase 2 剥夺; 但置信度**公式**可以数据化 (数值权重) |
 | **AD-SSME-3** | JSON schema 版本化 (`schema_version` 字段) | SKILL.md 和脚本解耦演化; 版本不匹配时 SKILL.md 硬 abort |
 | **AD-SSME-4** | Phase 2/3/4 保留 prose (AI 推理) | 推荐匹配 / 用户交互 / workflow-runner handoff 需要语言理解, 这三阶段的跳步用户**立刻可见** (没有推荐输出), 不需要额外防御 |
-| **AD-SSME-5** | 保留 `mechanical_mode=false` opt-out 1 个 minor 版本 | 不破坏现有用户工作流; v1.17.0 起移除 opt-out, prose 路径完全下线 |
+| **AD-SSME-5** | 保留 `mechanical_mode=false` opt-out 1 个 minor 版本 | 不破坏现有用户工作流; v1.18.0 起移除 opt-out (post-CF-1 revision, 此 release = v1.17.0, 移除 = v1.18.0), prose 路径完全下线 |
 | **AD-SSME-6** | (post-audit revision 2026-04-23, CF-4) Source-of-truth = 手维 `state-snapshot-schema.md`, scan.py 通过 `SNAPSHOT_SCHEMA_VERSION` 常量引用版本号; 一致性由 `scripts/validate_schema_doc.py` 在 CI 断言 | stdlib-only 约束下 docstring → markdown 工具链成本过高 (AST 解析 + 渲染 ≥2h), 手维 + validator 更稳定 |
 | **AD-SSME-7** | 不做 emit-handoff.sh (Phase 4 保留 AI) | 边际收益低, Phase 4 主要是结构化参数传递, AI prose 足够 |
 
@@ -163,7 +163,7 @@ state-scanner v2.9 的 Phase 1.x 有 14 个子阶段 (0 / 1 / 1.1 / 1.5-1.14)，
 - [ ] L1 探针 `issue-cache-freshness` 仍然保留且通过
 - [ ] `/skill-creator` benchmark delta 非负 (不破坏现有质量)
 - [ ] Aria v1.15.0 的 Phase 1.12 多远程 parity / Phase 1.13 Issue 感知字段在新版中完整保留
-- [ ] 迁移文档覆盖 opt-out 移除时间表 (v1.17.0)
+- [ ] 迁移文档覆盖 opt-out 移除时间表 (v1.18.0 — post-CF-1 revision, 此 release = v1.17.0)
 
 ---
 
