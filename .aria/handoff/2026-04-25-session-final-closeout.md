@@ -126,3 +126,27 @@ aria:state-scanner   # 自动识别 deferred 项目优先级
 4. **Spec archive** (5min) — 在所有 deferred 完成后
 
 或切换主题: aria-plugin #17 Drift Guard (Level 2, ~8-12h)
+
+---
+
+## 9. Session-end audit (本 session 自查)
+
+### 任务遗漏
+- ✅ 主线: state-scanner Spec 39 done / 5 deferred (post-release backlog), 全部 4-remote synced
+- ✅ Stale local branches `feature/state-scanner-mechanical-t3/t4` 清理 (本 session 创建未及时清, 已补)
+- 📋 Pre-session debt (不在本 session 责任):
+  - main repo stale local: `feature/aria-2.0-m0-prerequisite` / `benchmark-transparency-enhancement` / `prd-v2-ad3-option-c-patch`
+  - aria submodule stale local: `feature/agent-project-adapter` / `agent-team-stco` / `benchmark-transparency-enhancement` / `fix/legal-advisor-behavior`
+  - Open PR Aria #30 (docs/pre-aria-history) — 2026-04-23 创建, 与本 session 无关
+  - 不动这些, 留给 owner 在合适 session 处理
+
+### 经验固化补充 (本 session 末追加)
+- ✅ `feedback_smoke_benchmark_truthiness.md` — qa-engineer T9 发现的 anti-pattern (field-presence-only 让 None 误 PASS), 独立成 memory
+- ✅ `feedback_spec_reframe_in_session.md` — T7 reframe 模式 (commit/reference doc/tasks.md 3 处文档化) 模板化
+
+### Next-session 入口验证 (just ran)
+```bash
+cd /home/dev/Aria && git pull && python3 aria/skills/state-scanner/scripts/scan.py --output .aria/state-snapshot.json
+# Verified: schema=1.0, branch=master, uncommitted=0, parity=True, aria-version-match=True
+```
+入口路径无障碍, snapshot 准确无 drift.
