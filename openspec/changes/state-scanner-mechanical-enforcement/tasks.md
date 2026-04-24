@@ -1,9 +1,21 @@
 # state-scanner-mechanical-enforcement — Tasks
 
-> **Status**: Draft (待 Activation Gate 触发)
+> **Status**: Approved (2026-04-23, Activation Gate 条件 2 触发)
 > **Level**: Full (Level 3)
-> **预估工时**: 46h (含 20% buffer)
+> **预估工时 (原)**: 46h (含 20% buffer)
+> **预估工时 (post-audit revision)**: ~52h (CF-2 +0.5h, CF-4 +2.5h, IF-1 Target Version 对齐 +2h, Buffer 20%)
 > **触发条件**: L1 探针亮红 ≥ 2 次 / 用户显式要求 / Phase 1.x 新增第 15 个阶段
+
+---
+
+## T0. Pre-B.2 Revisions (audit 注入, 2026-04-23)
+
+来自 post_spec Agent Team 4/4 一致投票 `activate_with_revisions`, B.2 开工前必须完成:
+
+- [x] **T0.1** CF-1 Target Version 追齐 v1.17.0 + AD-SSME-5 v1.18.0 (proposal.md header 已更新)
+- [x] **T0.2** CF-3 snapshot_schema_version 命名决议 — scan.py SNAPSHOT_SCHEMA_VERSION="1.0" 常量 + 顶层字段已落地; references/state-snapshot-schema.md 已创建 stub 明示命名隔离 (R1-C5 修)
+- [x] **T0.3** CF-4 T4.3 revise 选型: **(b) 降级为手维 schema.md** — proposal AD-SSME-6 已更新, tasks.md T4 已重写, schema.md stub 已创建 (R1-C5 修)
+- [x] **T0.4** CF-2 新增 T7.0 JSON canonical normalizer (jq -S + float 精度 + null/absent 归并) 作为 T7.1 前置 — T7 章节已加入 T7.0 条目
 
 ---
 
@@ -32,7 +44,17 @@
 - [ ] **T2.4** 实现 Phase 1.8 README 同步检查 (版本 / 日期 / Skill 数量) (1h)
 - [ ] **T2.5** 实现 Phase 1.9 + 1.10 standards + audit 扫描 (audit-reports/ 最新报告解析) (1h)
 
-## T3. Phase 1.11-1.14 (6h)
+## T3. Phase 1.11-1.14 (6h, 含 mid_impl + pre_merge audit 遗留 IDs)
+
+**显式承接的 deferred findings** (R1-M1 code-reviewer audit 要求):
+- TL-1 (mid_impl): scan.py 1073 行单文件 → 拆 collectors/ 包 (~1h, T3 开工前先做)
+- TL-2 (mid_impl): Phase 1.5 `complexity` 阈值硬编码, 标注 `advisory_from_collector`
+- CR-I1 (mid_impl): docstring schema.md 死链 → T4.1 文档落地 (pre_merge R1 已补 stub)
+- CR-I2 (mid_impl): CLI --output 双写 → pre_merge R1-I3 已 in-session 修复
+- CR-I3 (mid_impl): --log-level 无 validation → T3 开工前用 argparse choices=[] 收紧
+- CR-I4 (mid_impl): T7.0 canonical normalizer → T7.0 独立任务已加入
+- R1-I1 (pre_merge): snapshot_schema_version additive-change 规则 → schema.md stub 已记录, T4.1 细化
+- R1-I2 (pre_merge): exit code 消费协议 → schema.md stub 已记录, T5.3 SKILL.md 吸收
 
 - [ ] **T3.1** 实现 Phase 1.11 自定义检查 (读 `.aria/state-checks.yaml` + 串行执行 + 超时守卫) (1.5h)
 - [ ] **T3.2** 实现 Phase 1.12 同步检测 (FETCH_HEAD age / submodule drift 方向性守卫) (1.5h)
@@ -40,11 +62,11 @@
 - [ ] **T3.4** 实现 Phase 1.13 Issue 感知 (Forgejo/GitHub 平台检测 + 缓存 + 10 种 fetch_error 枚举) (1h)
 - [ ] **T3.5** 实现 Phase 1.14 Forgejo 配置检测 (CLAUDE.local.md forgejo 块) (0.5h)
 
-## T4. Schema 文档与版本化 (2h)
+## T4. Schema 文档与版本化 (2h, AD-SSME-6 降级)
 
-- [ ] **T4.1** 创建 `aria/skills/state-scanner/references/state-snapshot-schema.md` (1h)
-- [ ] **T4.2** 加 `schema_version: "1.0"` 字段到 JSON 输出, 定义不匹配时 abort 协议 (0.5h)
-- [ ] **T4.3** 从 scan.py docstring 自动生成 schema 文档的 make target (0.5h)
+- [ ] **T4.1** 创建 `aria/skills/state-scanner/references/state-snapshot-schema.md` 作为 **source-of-truth** (手维), 明示 `snapshot_schema_version` (顶层) vs `issue_status.schema_version` (Phase 1.13 内嵌) 的作用域分离 (1h)
+- [ ] **T4.2** scan.py 定义 `SNAPSHOT_SCHEMA_VERSION = "1.0"` 常量 → JSON 输出顶层 `snapshot_schema_version` (CF-3 rename), 加载时 SKILL.md 硬断言 (0.5h)
+- [ ] **T4.3** schema.md 与 scan.py 一致性 validator: `scripts/validate_schema_doc.py` 读取 schema.md 字段表 + scan.py `SNAPSHOT_SCHEMA_VERSION` + 抽样输出 key 对齐, CI 可调用 (0.5h, 降级自"docstring 自动生成")
 
 ## T5. SKILL.md 重构 (3h)
 
@@ -64,10 +86,11 @@
 - [ ] **T6.5** Phase 1.11-1.14 (custom/sync/issue/forgejo) 单元测试, 含 mock Forgejo API (2h)
 - [ ] **T6.6** schema_version mismatch abort 路径测试 (0h, 归并 T5.3)
 
-## T7. Aria 项目 dogfooding (2h)
+## T7. Aria 项目 dogfooding (2.5h, +0.5h per CF-2)
 
-- [ ] **T7.1** 在 Aria 主项目跑新版 scan.py, 对比 v2.9 输出字段 (1h)
-- [ ] **T7.2** 差异分析 + 修复 (字段命名 / 顺序 / 类型漂移) (1h)
+- [ ] **T7.0** (CF-2 前置) 定义 JSON canonical normalizer: `jq -S --sort-keys`, float 精度 6 位, null/absent 字段统一归并, timestamp 字段白名单容忍差异, 输出到 `references/json-diff-normalizer.md` (0.5h)
+- [ ] **T7.1** 在 Aria 主项目跑新版 scan.py, 通过 T7.0 normalizer 对比 v2.9 输出字段 (1h)
+- [ ] **T7.2** 差异分析 + 修复 (字段命名 / 顺序 / 类型漂移), 机械断言 diff exit code 0 (1h)
 
 ## T8. Kairos 跨项目验证 (2h)
 

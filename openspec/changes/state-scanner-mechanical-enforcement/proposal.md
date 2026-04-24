@@ -1,12 +1,43 @@
 # state-scanner-mechanical-enforcement — state-scanner Phase 1.x 机械化执行
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft (待 L1 探针数据激活, 见 §Activation Gate)
+> **Status**: Approved (2026-04-23, Activation Gate 条件 2 用户显式请求触发, post_spec Agent Team 4/4 一致 PASS_WITH_WARNINGS + activate_with_revisions)
 > **Created**: 2026-04-15
+> **Activated**: 2026-04-23
 > **Parent Story**: (无直接父 Story, 属 Plugin 基础设施质量改进)
-> **Target Version**: aria-plugin v1.16.0 (或 v1.15.x patch, 取决于激活时机)
+> **Target Version**: aria-plugin v1.17.0 (activation 时从 v1.16.0 追齐至 v1.16.4+, minor bump 为 v1.17.0; AD-SSME-5 "1 minor 版本后移除 opt-out" 同步改为 v1.18.0)
 > **Source**: 2026-04-15 Aria 主项目 session 发现 Phase 1.13 Issue 感知自 2026-04-09 首次启用后连续多轮 session 漏跑 (issue cache 陈旧 6 天), 非工具缺陷而是 AI 执行纪律问题
 > **Related Feedback Memory**: `feedback_state_scanner_run_all_phases.md`
+> **post_spec Audit**: `.aria/audit-reports/post_spec-2026-04-23T2058Z-state-scanner-mechanical.md`
+
+---
+
+## Revisions Required Pre-B.2 (2026-04-23 audit 注入)
+
+post_spec Agent Team (tech-lead / backend-architect / qa-engineer / code-reviewer) 4/4 一致投票 `activate_with_revisions`. 本 Spec 激活为 Approved, 但以下 4 条 Critical Finding 必须在 Phase B.2 T1 开工前作为 T0 revision 消化:
+
+| CF | 拥有者 | 问题 | 必需 revision |
+|---|---|---|---|
+| CF-1 | tech-lead | Target Version v1.16.0 已过期 (实际 v1.16.4) | 追齐 v1.17.0, AD-SSME-5 移除时间表改 v1.18.0 (本 header 已更新) |
+| CF-2 | qa-engineer | T7.1 "diff 为空或仅时间戳差异" 无机械判定标准 | tasks.md 新增 T7.0 "JSON canonical normalizer 规范" (jq -S + float 精度 + null/absent 归并), 作为 T7.1 前置 |
+| CF-3 | backend-architect | state-snapshot.json 顶层 schema_version 与 issue_status.schema_version 命名冲突 | 顶层字段重命名 `snapshot_schema_version`, T4.1 schema 文档明示作用域边界 |
+| CF-4 | code-reviewer | T4.3 AD-SSME-6 "docstring 自动生成 schema.md" 0.5h 严重低估 | 二选一: (a) T4.3 扩至 3h 明确工具链, (b) 降级为手维 schema.md, AD-SSME-6 改 "source-of-truth = schema.md" |
+
+Important Findings (IF-1~IF-8) 见 `.aria/audit-reports/post_spec-2026-04-23T2058Z-state-scanner-mechanical.md`, 开工 1 周内评估处理。
+
+## Intentional Divergences from v2.9 prose (pre_merge R1-C6 audit 注入)
+
+proposal.md §非目标 声明 "不改变 Phase 1.x 数据采集语义". 以下 5 项属 scan.py 实现阶段发现的 **bug 修复**, 与 §非目标 字面冲突, 现显式记录为 intentional:
+
+| # | v2.9 prose 行为 | v3.0 scan.py 行为 | 来源 audit |
+|---|---|---|---|
+| D1 | `Approved` Status 塌缩为 `ready` | 保留独立 `approved` 状态 | mid_impl B1 (code-reviewer IMP-1) |
+| D2 | `Reviewed` Status 塌缩为 `pending` | 保留独立 `reviewed` 状态 | mid_impl B1 (code-reviewer IMP-1) |
+| D3 | `chain_valid` 对 `"(pending)"`/`TBD` 返回 True (false positive) | 占位符黑名单拒绝, 返回 False | mid_impl B2 (code-reviewer IMP-2) |
+| D4 | YAML `key: \|` block scalar 泄漏字面 `"\|"` | 识别块标量 marker, 返回 None | mid_impl B3 (code-reviewer IMP-3) |
+| D5 | `Active`/`Deprecated`/`Archived` Status 映射为 `unknown` | 保留独立 `active`/`deprecated`/`archived` 状态 | pre_merge R1-I5 (qa-engineer QA-R1-10) |
+
+T7.1 dogfooding diff 必须通过 T7.0 canonical normalizer 把上述 5 字段放入 tolerance whitelist, 否则会把 bug 修复误判为 regression。详见 `aria/skills/state-scanner/references/state-snapshot-schema.md` §Sister-bug divergence。
 
 ## Why
 
@@ -56,7 +87,7 @@ state-scanner v2.9 的 Phase 1.x 有 14 个子阶段 (0 / 1 / 1.1 / 1.5-1.14)，
 | **AD-SSME-3** | JSON schema 版本化 (`schema_version` 字段) | SKILL.md 和脚本解耦演化; 版本不匹配时 SKILL.md 硬 abort |
 | **AD-SSME-4** | Phase 2/3/4 保留 prose (AI 推理) | 推荐匹配 / 用户交互 / workflow-runner handoff 需要语言理解, 这三阶段的跳步用户**立刻可见** (没有推荐输出), 不需要额外防御 |
 | **AD-SSME-5** | 保留 `mechanical_mode=false` opt-out 1 个 minor 版本 | 不破坏现有用户工作流; v1.17.0 起移除 opt-out, prose 路径完全下线 |
-| **AD-SSME-6** | 新字段先加到脚本, 再改 SKILL.md schema 文档 | 避免双写 prose 和代码; schema 文档从脚本 docstring 自动生成 |
+| **AD-SSME-6** | (post-audit revision 2026-04-23, CF-4) Source-of-truth = 手维 `state-snapshot-schema.md`, scan.py 通过 `SNAPSHOT_SCHEMA_VERSION` 常量引用版本号; 一致性由 `scripts/validate_schema_doc.py` 在 CI 断言 | stdlib-only 约束下 docstring → markdown 工具链成本过高 (AST 解析 + 渲染 ≥2h), 手维 + validator 更稳定 |
 | **AD-SSME-7** | 不做 emit-handoff.sh (Phase 4 保留 AI) | 边际收益低, Phase 4 主要是结构化参数传递, AI prose 足够 |
 
 ### 非目标 (Out of Scope)
