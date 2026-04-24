@@ -65,9 +65,9 @@
 
 ## T4. Schema 文档与版本化 (2h, AD-SSME-6 降级)
 
-- [ ] **T4.1** 创建 `aria/skills/state-scanner/references/state-snapshot-schema.md` 作为 **source-of-truth** (手维), 明示 `snapshot_schema_version` (顶层) vs `issue_status.schema_version` (Phase 1.13 内嵌) 的作用域分离 (1h)
-- [ ] **T4.2** scan.py 定义 `SNAPSHOT_SCHEMA_VERSION = "1.0"` 常量 → JSON 输出顶层 `snapshot_schema_version` (CF-3 rename), 加载时 SKILL.md 硬断言 (0.5h)
-- [ ] **T4.3** schema.md 与 scan.py 一致性 validator: `scripts/validate_schema_doc.py` 读取 schema.md 字段表 + scan.py `SNAPSHOT_SCHEMA_VERSION` + 抽样输出 key 对齐, CI 可调用 (0.5h, 降级自"docstring 自动生成")
+- [x] **T4.1** 创建 `aria/skills/state-scanner/references/state-snapshot-schema.md` 作为 **source-of-truth** (手维) (1h) — Full Schema authored 2026-04-24: 18 top-level keys documented (含 4 个新 T3 顶层 key); BA-R*-I1 (main_repo.path / items[].heuristic) / BA-R*-M1 (ERR_AUTH_MISSING reserved) / BA-R*-M2 (single-remote ahead-only 10-scenario worked examples table) / QA-C2 PR filter 全部文档化
+- [x] **T4.2** scan.py 定义 `SNAPSHOT_SCHEMA_VERSION = "1.0"` 常量 → JSON 输出顶层 `snapshot_schema_version` (CF-3 rename) (0.5h) — 已在 b8db9a0 commit 实现 (scan.py:56 常量 + line 116 输出); SKILL.md 硬断言归 T5.3
+- [x] **T4.3** schema.md 与 scan.py 一致性 validator: `scripts/validate_schema_doc.py` (0.5h) — 3 check 新 validator: 版本常量对齐 / 文档 required keys 在 live 输出中存在 / live keys 都被文档化. 本项目实测 3/3 PASS (18 keys matched)
 
 ## T5. SKILL.md 重构 (3h)
 
