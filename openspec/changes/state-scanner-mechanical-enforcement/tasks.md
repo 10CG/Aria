@@ -107,9 +107,9 @@ T6 audit (pre_merge R1 aria:code-reviewer) 确认此偏移文档化充分, MERGE
 
 ## T9. 迁移与回退 (2h)
 
-- [ ] **T9.1** 创建 `references/migration-v2.9-to-v3.0.md` (1h)
-- [ ] **T9.2** 实现 `state_scanner.mechanical_mode` config flag (默认 true, 可 opt-out) (0.5h)
-- [ ] **T9.3** 在 CHANGELOG / plugin.json 明确 v1.17.0 起移除 opt-out (0.5h)
+- [x] **T9.1** 创建 `references/migration-v2.9-to-v3.0.md` (1h) — aria PR #25 merged 2026-04-24 (e6cb261); ~170 行, 含 Why / Step 0 / exit codes / D1-D5 / opt-out lifecycle / downstream callers / upgrade checklist / rollback
+- [x] **T9.2** `state_scanner.mechanical_mode` config flag (默认 true, 可 opt-out) (0.5h) — aria PR #25. **设计澄清**: flag 是 AI-prose contract (SKILL.md §Step 0 + §Opt-out 段), NOT scan.py runtime switch (grep 0 hit 全 collector/scan.py). scan.py 本身就是 mechanical path, 不需要 runtime 分支; flag 由 config-loader 读取供下游 skills 感知
+- [ ] **T9.3** 在 CHANGELOG / plugin.json 明确 **v1.18.0** 起移除 opt-out (0.5h) — **deferred to T10** (受 /skill-creator benchmark gate 约束, 非 Level 2 patch 豁免; 与 T10.3 plugin.json/marketplace/README/VERSION/CHANGELOG 批次绑定). R1-M1 v1.17→v1.18 drift 已于此批次在 proposal.md 修复
 
 ## T10. Benchmark 与发版 (2h)
 
@@ -135,6 +135,6 @@ T6 audit (pre_merge R1 aria:code-reviewer) 确认此偏移文档化充分, MERGE
 ## 后置动作 (merge 后)
 
 - [ ] 观察 L1 探针 (`issue-cache-freshness`) 4 周零告警
-- [ ] 观察 `mechanical_mode=false` 使用量 (若为零则 v1.17.0 安全移除)
+- [ ] 观察 `mechanical_mode=false` 使用量 (若为零则 v1.18.0 安全移除 — post-CF-1 revision)
 - [ ] 在 MEMORY.md 标记 `feedback_state_scanner_run_all_phases.md` 为 "partially obsolete (机械化已落地, 但作为历史原因记录保留)"
 - [ ] 评估其他 Skill 是否有类似 prose-only 执行的脆弱性, 决定是否推广本 Spec 模式
