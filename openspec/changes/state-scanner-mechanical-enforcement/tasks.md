@@ -61,6 +61,7 @@
 - [x] **T3.3** 实现 Phase 1.12 多远程 parity (v1.15.0+, local_refs / ls_remote 模式) (1.5h) — `collectors/multi_remote.py` 504 行; 5 种 parity + overall_parity 精确语义; R2 QA-C1 critical fix: overall_parity 要求至少一个 equal 证据; R2 QA-I1: ls-remote 空输出 → `remote_branch_missing, reachable=True`
 - [x] **T3.4** 实现 Phase 1.13 Issue 感知 (Forgejo/GitHub 平台检测 + 缓存 + 10 种 fetch_error 枚举) (1h) — `collectors/issue_scan.py` 801 行; v1.1 schema + submodule 聚合; R2 QA-C2 critical fix: Forgejo `/issues` endpoint 返 PR → 客户端过滤 `pull_request` key + URL 含 `/pulls/`; 已知 Forgejo 自带 `type=issues` 过滤不可靠
 - [x] **T3.5** 实现 Phase 1.14 Forgejo 配置检测 (CLAUDE.local.md forgejo 块) (0.5h) — `collectors/forgejo_config.py` 127 行; 4 状态; R2 QA-I3 fix: fenced code block `forgejo:` 不算 configured (mask ```...``` 后再匹配); R2 CR-M1: 补 collect_forgejo_config 函数级 docstring
+- [x] **T3.6** Helper consolidation (4-agent audit consensus) (~1h, audit-driven add-on) — `collectors/git.py` 扩展 `_current_branch(timeout)` / `_is_shallow(timeout)` / `_enumerate_submodule_paths()`; sync.py / multi_remote.py / issue_scan.py 改为 import, 净减 24 行重复代码; byte-parity 验证
 
 ## T4. Schema 文档与版本化 (2h, AD-SSME-6 降级)
 
