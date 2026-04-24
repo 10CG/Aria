@@ -1,0 +1,132 @@
+{
+  "exit_code": 0,
+  "schema_version": "1.0",
+  "total_passed": 35,
+  "total_assertions": 35,
+  "pct": 100.0,
+  "results": [
+    {
+      "id": 1,
+      "name": "basic-state-collection",
+      "passed": 4,
+      "total": 4,
+      "details": {
+        "exit_code_zero_or_soft": true,
+        "snapshot_has_git_block": true,
+        "snapshot_has_changes_block": true,
+        "structured_output": true
+      }
+    },
+    {
+      "id": 2,
+      "name": "user-options-display",
+      "passed": 2,
+      "total": 2,
+      "details": {
+        "snapshot_provides_recommendation_inputs": true,
+        "snapshot_complexity_present": true
+      }
+    },
+    {
+      "id": 3,
+      "name": "readme-sync-detection",
+      "passed": 4,
+      "total": 4,
+      "details": {
+        "readme_block_present": true,
+        "root_status_present": true,
+        "submodules_aria_present": true,
+        "version_match_field_present": true
+      }
+    },
+    {
+      "id": 4,
+      "name": "config-awareness",
+      "passed": 2,
+      "total": 2,
+      "details": {
+        "issue_status_block_present_when_enabled": true,
+        "custom_checks_configured": true
+      }
+    },
+    {
+      "id": 5,
+      "name": "submodule-sync-detection",
+      "passed": 5,
+      "total": 5,
+      "details": {
+        "sync_status_present": true,
+        "submodules_array_present": true,
+        "drift_field_per_sub": true,
+        "behind_count_explicit_int": true,
+        "tree_vs_remote_field": true
+      }
+    },
+    {
+      "id": 6,
+      "name": "upstream-behind-detection",
+      "passed": 3,
+      "total": 3,
+      "details": {
+        "current_branch_block": true,
+        "upstream_or_reason": true,
+        "shallow_field_present": true
+      }
+    },
+    {
+      "id": 7,
+      "name": "issue-awareness-opt-in",
+      "passed": 4,
+      "total": 4,
+      "details": {
+        "issue_status_present_when_enabled": true,
+        "schema_version_field": true,
+        "open_count_int": true,
+        "source_enum_valid": true
+      }
+    },
+    {
+      "id": 8,
+      "name": "readme-skill-count-badge",
+      "passed": 2,
+      "total": 2,
+      "details": {
+        "aria_readme_block_present": true,
+        "plugin_version_field": true
+      }
+    },
+    {
+      "id": 9,
+      "name": "forgejo-config-detection",
+      "passed": 3,
+      "total": 3,
+      "details": {
+        "forgejo_config_block_present": true,
+        "remote_detected_field": true,
+        "config_status_or_no_remote": true
+      }
+    },
+    {
+      "id": 10,
+      "name": "multi-remote-parity-drift",
+      "passed": 3,
+      "total": 3,
+      "details": {
+        "multi_remote_block_present": true,
+        "overall_parity_bool": true,
+        "submodules_per_remote_present": true
+      }
+    },
+    {
+      "id": 11,
+      "name": "submodule-push-github-sync-miss",
+      "passed": 3,
+      "total": 3,
+      "details": {
+        "per_submodule_remotes_present": true,
+        "github_remote_detected": true,
+        "parity_per_remote": true
+      }
+    }
+  ]
+}
