@@ -71,12 +71,12 @@
 
 ## T5. SKILL.md 重构 (3h)
 
-- [ ] **T5.1** 在 SKILL.md `## 执行流程` 章节开头插入 **Step 0 机械指令** 块 (0.5h)
-- [ ] **T5.2** 将 Phase 1.1-1.14 的 prose 描述精简为"字段由 scan.py 产出, 语义见 state-snapshot-schema.md" (1h)
-- [ ] **T5.3** Phase 2 入口断言: 读 `.aria/state-snapshot.json`, 验证 `schema_version == "1.0"`, 缺失或不匹配直接 abort (0.5h)
-- [ ] **T5.4** Phase 3/4 保持不变 (AI prose 路径) (0h)
-- [ ] **T5.5** 更新 SKILL.md 顶部 "版本" 为 v3.0.0 (0.5h)
-- [ ] **T5.6** 更新 `aria/skills/state-scanner/references/*.md` 中引用 SKILL.md prose 字段的地方 (0.5h)
+- [x] **T5.1** 在 SKILL.md `## 执行流程` 章节开头插入 **Step 0 机械指令** 块 (0.5h) — aria PR #23 merged 2026-04-24 (a02ddfe)
+- [x] **T5.2** 将 Phase 1.1-1.14 的 prose 描述精简为"字段由 scan.py 产出, 语义见 state-snapshot-schema.md" (1h) — aria PR #23 (-724 net lines, 1178→454)
+- [x] **T5.3** Phase 2 入口断言: 读 `.aria/state-snapshot.json`, 验证 `snapshot_schema_version == "1.0"` (post-CF-3 rename), 缺失或不匹配直接 abort (0.5h) — aria PR #23
+- [x] **T5.4** Phase 3/4 保持不变 (AI prose 路径) (0h) — aria PR #23 (no change confirmed)
+- [x] **T5.5** 更新 SKILL.md 顶部 "版本" 为 v3.0.0 + 底部版本行一致 (0.5h) — aria PR #23
+- [x] **T5.6** 更新 `aria/skills/state-scanner/references/*.md` 中引用 SKILL.md prose 字段的地方 (0.5h) — N/A, references 已在 T4 阶段对齐 scan.py 契约, 仅 schema.md 引用 scan.py/snapshot_schema_version 为 source-of-truth 设计意图 (aria:code-reviewer R1 确认)
 
 ## T6. 测试套件 (8h)
 
