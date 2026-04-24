@@ -80,12 +80,19 @@
 
 ## T6. 测试套件 (8h)
 
-- [ ] **T6.1** 创建 `tests/test_scan.py` + pytest 配置 (1h)
-- [ ] **T6.2** 创建 `tests/fixtures/` — minimal git repo / openspec / audit reports / config 变体 (2h)
-- [ ] **T6.3** Phase 0 + Phase 1 (git/project/changes) 单元测试 (1.5h)
-- [ ] **T6.4** Phase 1.5-1.10 (需求/openspec/arch/readme/standards/audit) 单元测试 (1.5h)
-- [ ] **T6.5** Phase 1.11-1.14 (custom/sync/issue/forgejo) 单元测试, 含 mock Forgejo API (2h)
-- [ ] **T6.6** schema_version mismatch abort 路径测试 (0h, 归并 T5.3)
+**Design deviation (2026-04-24)**: 使用 stdlib `unittest` 而非 pytest. 理由: scan.py
+是 stdlib-only (proposal.md §Constraints), 测试必须匹配部署目标 (Aether light 节点
+无 pip). `run_tests.py` 提供 pytest-like UX + stdlib `trace` 覆盖报告. AD-SSME-1 一致.
+T6 audit (pre_merge R1 aria:code-reviewer) 确认此偏移文档化充分, MERGE_WITH_FIXES.
+
+- [x] **T6.1** 创建 `tests/test_*.py` + stdlib unittest 配置 (run_tests.py) (1h) — aria PR #24 merged 2026-04-24 (b747a85). 原 "test_scan.py" 拆为每 collector 一个 test_*.py + `test_scan_integration.py` 承担 E2E
+- [x] **T6.2** 创建 `tests/_helpers.py` 工厂函数 (tmp_repo / tmp_project / make_openspec / make_audit_report / make_config / make_state_checks) (2h) — aria PR #24. **偏移**: 未创建 `tests/fixtures/` 目录, 改为 `_helpers.py` 工厂函数模式 (更灵活, 支持 tempfile 隔离). code-reviewer IF-1 确认功能等价, 仅目录命名不同
+- [x] **T6.3** Phase 0 + Phase 1 (git/changes/upm/interrupt) 单元测试 (1.5h) — aria PR #24 (45 tests: interrupt 9 / git 14 / changes 11 / upm 11)
+- [x] **T6.4** Phase 1.5-1.10 (需求/openspec/arch/readme/standards/audit) 单元测试 (1.5h) — aria PR #24 (57 tests: requirements 7 / openspec 23 / architecture 9 / readme 8 / standards 4 / audit 6)
+- [x] **T6.5** Phase 1.11-1.14 (custom/sync/multi_remote/issue_scan/forgejo) 单元测试 (2h) — aria PR #24 partial (68 tests, 純函数 + 负向路径). 见 T6.5-followup I/O 覆盖待提升
+- [x] **T6.6** schema_version mismatch abort 路径测试 (0h, 归并 T5.3) — aria PR #24 `test_scan_integration.py::test_schema_version_constant` writer 侧; reader 侧在 SKILL.md §阶段 2 入口断言 (AI prose, 非单元测试范围)
+
+- [ ] **T6.5-followup** 提升 I/O-heavy collector 覆盖至 ≥70% (~3h, pre_merge R1 IF-2) — sync (18→70) / multi_remote (33→70) / issue_scan (44→70) 需要 subprocess mocking 层. 不阻塞 T7-T10 推进, 可并行或后置
 
 ## T7. Aria 项目 dogfooding (2.5h, +0.5h per CF-2)
 
