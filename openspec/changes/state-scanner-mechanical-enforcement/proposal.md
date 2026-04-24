@@ -25,6 +25,20 @@ post_spec Agent Team (tech-lead / backend-architect / qa-engineer / code-reviewe
 
 Important Findings (IF-1~IF-8) 见 `.aria/audit-reports/post_spec-2026-04-23T2058Z-state-scanner-mechanical.md`, 开工 1 周内评估处理。
 
+## Intentional Divergences from v2.9 prose (pre_merge R1-C6 audit 注入)
+
+proposal.md §非目标 声明 "不改变 Phase 1.x 数据采集语义". 以下 5 项属 scan.py 实现阶段发现的 **bug 修复**, 与 §非目标 字面冲突, 现显式记录为 intentional:
+
+| # | v2.9 prose 行为 | v3.0 scan.py 行为 | 来源 audit |
+|---|---|---|---|
+| D1 | `Approved` Status 塌缩为 `ready` | 保留独立 `approved` 状态 | mid_impl B1 (code-reviewer IMP-1) |
+| D2 | `Reviewed` Status 塌缩为 `pending` | 保留独立 `reviewed` 状态 | mid_impl B1 (code-reviewer IMP-1) |
+| D3 | `chain_valid` 对 `"(pending)"`/`TBD` 返回 True (false positive) | 占位符黑名单拒绝, 返回 False | mid_impl B2 (code-reviewer IMP-2) |
+| D4 | YAML `key: \|` block scalar 泄漏字面 `"\|"` | 识别块标量 marker, 返回 None | mid_impl B3 (code-reviewer IMP-3) |
+| D5 | `Active`/`Deprecated`/`Archived` Status 映射为 `unknown` | 保留独立 `active`/`deprecated`/`archived` 状态 | pre_merge R1-I5 (qa-engineer QA-R1-10) |
+
+T7.1 dogfooding diff 必须通过 T7.0 canonical normalizer 把上述 5 字段放入 tolerance whitelist, 否则会把 bug 修复误判为 regression。详见 `aria/skills/state-scanner/references/state-snapshot-schema.md` §Sister-bug divergence。
+
 ## Why
 
 ### 问题陈述
