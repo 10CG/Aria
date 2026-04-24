@@ -21,28 +21,28 @@
 
 ## 激活前置 (Gate)
 
-- [ ] **G.1** L1 探针告警计数或用户显式启动信号已记录
-- [ ] **G.2** 确认 Activation Gate 触发原因 (告警 / 显式 / 演化压力)
-- [ ] **G.3** 确认 state-scanner 当前版本, 评估是否需要重估 §工时估算
-- [ ] **G.4** 确认 Spec Status 从 Draft → Approved
+- [x] **G.1** L1 探针告警计数或用户显式启动信号已记录 — Activation Gate 条件 2 (用户显式请求) 2026-04-23 触发, post_spec audit 4/4 PASS_WITH_WARNINGS + activate_with_revisions
+- [x] **G.2** 确认 Activation Gate 触发原因 (告警 / 显式 / 演化压力) — 用户显式触发; post_spec Agent Team 共识
+- [x] **G.3** 确认 state-scanner 当前版本, 评估是否需要重估 §工时估算 — Target Version 追齐 v1.17.0; §工时估算在 post_spec audit 内已 revised (CF-1/CF-4)
+- [x] **G.4** 确认 Spec Status 从 Draft → Approved — 2026-04-23 完成 (见 proposal.md header)
 
 ---
 
 ## T1. 脚本骨架与 Phase 1.1-1.5 (6h)
 
-- [ ] **T1.1** 创建 `aria/skills/state-scanner/scripts/scan.py` 骨架 (argparse / logger / exit codes) (1h)
-- [ ] **T1.2** 实现 Phase 0 中断检测 (读 `.aria/workflow-state.json`, git_anchor 验证) (1h)
-- [ ] **T1.3** 实现 Phase 1 Git 状态采集 (status / branch / recent_commits / staged/unstaged) (1.5h)
-- [ ] **T1.4** 实现 Phase 1 项目状态 (phase_cycle from UPM / active_module / openspec_status 摘要) (1h)
-- [ ] **T1.5** 实现 Phase 1 变更分析 (file_types / complexity Level 1-3 启发式 / skill_changes detection) (1.5h)
+- [x] **T1.1** 创建 `aria/skills/state-scanner/scripts/scan.py` 骨架 (argparse / logger / exit codes) (1h) — PR #33 merged 2026-04-24
+- [x] **T1.2** 实现 Phase 0 中断检测 (读 `.aria/workflow-state.json`, git_anchor 验证) (1h) — PR #33
+- [x] **T1.3** 实现 Phase 1 Git 状态采集 (status / branch / recent_commits / staged/unstaged) (1.5h) — PR #33
+- [x] **T1.4** 实现 Phase 1 项目状态 (phase_cycle from UPM / active_module / openspec_status 摘要) (1h) — PR #33
+- [x] **T1.5** 实现 Phase 1 变更分析 (file_types / complexity Level 1-3 启发式 / skill_changes detection) (1.5h) — PR #33
 
 ## T2. Phase 1.6-1.10 (5h)
 
-- [ ] **T2.1** 实现 Phase 1.5 需求状态扫描 (扫 `docs/requirements/`, 5 种 Status 正则) (1h)
-- [ ] **T2.2** 实现 Phase 1.6 OpenSpec 扫描 (changes/ + archive/, Status 字段提取) (1h)
-- [ ] **T2.3** 实现 Phase 1.7 架构状态 (system-architecture.md header + 链路完整性) (1h)
-- [ ] **T2.4** 实现 Phase 1.8 README 同步检查 (版本 / 日期 / Skill 数量) (1h)
-- [ ] **T2.5** 实现 Phase 1.9 + 1.10 standards + audit 扫描 (audit-reports/ 最新报告解析) (1h)
+- [x] **T2.1** 实现 Phase 1.5 需求状态扫描 (扫 `docs/requirements/`, 5 种 Status 正则) (1h) — PR #33 merged 2026-04-24
+- [x] **T2.2** 实现 Phase 1.6 OpenSpec 扫描 (changes/ + archive/, Status 字段提取) (1h) — PR #33
+- [x] **T2.3** 实现 Phase 1.7 架构状态 (system-architecture.md header + 链路完整性) (1h) — PR #33
+- [x] **T2.4** 实现 Phase 1.8 README 同步检查 (版本 / 日期 / Skill 数量) (1h) — PR #33
+- [x] **T2.5** 实现 Phase 1.9 + 1.10 standards + audit 扫描 (audit-reports/ 最新报告解析) (1h) — PR #33
 
 ## T3. Phase 1.11-1.14 (6h, 含 mid_impl + pre_merge audit 遗留 IDs)
 
