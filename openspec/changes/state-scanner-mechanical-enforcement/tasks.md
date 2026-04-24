@@ -56,7 +56,7 @@
 - R1-I1 (pre_merge): snapshot_schema_version additive-change 规则 → schema.md stub 已记录, T4.1 细化
 - R1-I2 (pre_merge): exit code 消费协议 → schema.md stub 已记录, T5.3 SKILL.md 吸收
 
-- [ ] **T3.1** 实现 Phase 1.11 自定义检查 (读 `.aria/state-checks.yaml` + 串行执行 + 超时守卫) (1.5h)
+- [x] **T3.1** 实现 Phase 1.11 自定义检查 (读 `.aria/state-checks.yaml` + 串行执行 + 超时守卫) (1.5h) — `collectors/custom_checks.py`, stdlib-only YAML subset parser, 4 negative-path cases pass (missing file / malformed YAML / version mismatch / timeout+rc127+disabled mix); aria 项目实测捕获 issue-cache-freshness MISSING
 - [ ] **T3.2** 实现 Phase 1.12 同步检测 (FETCH_HEAD age / submodule drift 方向性守卫) (1.5h)
 - [ ] **T3.3** 实现 Phase 1.12 多远程 parity (v1.15.0+, local_refs / ls_remote 模式) (1.5h)
 - [ ] **T3.4** 实现 Phase 1.13 Issue 感知 (Forgejo/GitHub 平台检测 + 缓存 + 10 种 fetch_error 枚举) (1h)
