@@ -1,8 +1,9 @@
 # round-2-latent-bug-audit-findings — 主动 audit 第 2 轮发现汇总
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 作为 backlog catalog 用)
-> **Status**: Draft
+> **Status**: Complete (2026-04-25, catalog finalized + archived per self-instruction "merge 后立即归档")
 > **Created**: 2026-04-25
+> **Completed**: 2026-04-25
 > **Type**: 调查报告 + backlog grouping (非单一实现 Spec)
 > **Source**: 2026-04-25 v1.17.3 发布后 user 选 [C] = "再来一轮主动 audit, 这次扫 aria-orchestrator / 其他 Skill". 4 个并行 Explore agent dispatch.
 > **Estimate**: 各子项 0.5-3h (后续每条择优立独立 Spec)
