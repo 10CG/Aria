@@ -14,4 +14,7 @@
 
 # state-scanner Step 0 output (v3.0.0+): 会话级 snapshot, 每次运行覆盖, 不提交
 .aria/state-snapshot.json
+
+# state-scanner T8 Kairos 跨项目验证 工件 (一次性 dogfooding 输出)
+.aria/t8-kairos-validation/
 __pycache__/

@@ -107,8 +107,21 @@ v2.9 prose 路径无 JSON 产物可 diff. 实际实施为 **v3.0 vs v3.0 snapsho
 
 ## T8. Kairos 跨项目验证 (2h)
 
-- [ ] **T8.1** 在 Kairos 项目跑新版 state-scanner (含新脚本) (1h)
-- [ ] **T8.2** 验证 TypeScript/Node.js 环境下所有字段采集正确 (无 False 假设 Aria-only 的硬编码) (1h)
+- [x] **T8.1** 在 Kairos 项目跑新版 state-scanner (含新脚本) (1h) — 2026-04-25 dogfooding: `python3 scan.py --project-root /home/dev/Kairos` exit code 0, 520 行 JSON snapshot, errors[] 空, 全 17 顶层 key 产出 (issue_status 缺失符合预期 — Kairos `.aria/config.json` 中 issue_scan disabled, 等价于 Spec §Schema "可选 18 keys" 17 keys path). 二次 run + normalize → DIFF_EXIT=0 (T7 stability 在跨项目复测通过). 工件: `.aria/t8-kairos-validation/snapshot-{raw,normalized}.json`
+- [x] **T8.2** 验证 TypeScript/Node.js 环境下所有字段采集正确 (无 False 假设 Aria-only 的硬编码) (1h) — 字段级审计结果:
+
+  **PASS (无 Aria-only 假设)**:
+  - git/changes/sync_status/multi_remote/forgejo_config: 全部跨项目兼容, parity 检测准确 (origin parity=equal, FETCH_HEAD stale=true)
+  - openspec: 44 archived items + 3 active changes 解析准确 (Kairos OpenSpec 用同 spec 格式)
+  - readme/standards/upm/audit/custom_checks/architecture/interrupt: configured/exists 信号准确
+  - 无任何 collector 因 TS/Node.js 环境特性失败 (无 hardcoded `.py`/`requirements.txt`/Aria 路径假设)
+
+  **FINDING (非 Aria-only 假设, 但跨语言 i18n 边界发现)**:
+  - `requirements.collector` Status 提取正则不识别 Kairos 中文文档常用的 **fullwidth colon `：`** + **inline blockquote 多 meta** 格式. 例如 Kairos `US-009-tts-voice-clone.md` 含 `> **优先级**：P0 | **里程碑**：M3 | **状态**：pending`, 但 Spec §1.5 5 种正则只覆盖 halfwidth colon `:` + 行首 `**Status**:` / `**状态**:` 形式. PRD + 15 user stories raw_status 全 null (其中 1 个文档实际有 status, 14 个本就没有, 1 个被漏检).
+  - **不阻塞 Spec 归档**: 这是 i18n 增强候选 (适配中文 markdown 排版习惯), 非 TypeScript-specific 缺陷. 当前行为 fail-soft (raw_status=null → status=unknown, by_status 仍正确聚合), 用户层无破坏性影响.
+  - **建议**: 单独立 micro-Spec `state-scanner-i18n-status-regex` (~1h, 添加 fullwidth colon `：` + inline blockquote `> .*\*\*(Status|状态)\*\*[：:]\s*(\S+?)(\s*\||\s*$)` 变体). 不放进 mechanical-enforcement 作用域.
+
+  **跨项目验证结论**: state-scanner v3.0.0 在非 Aria 项目 (TypeScript/Node.js, OpenSpec convention 一致, 中文文档为主) 上无破坏性失败, 全部 fail-soft 保护生效, 接口契约稳定.
 
 ## T9. 迁移与回退 (2h)
 
@@ -128,14 +141,14 @@ v2.9 prose 路径无 JSON 产物可 diff. 实际实施为 **v3.0 vs v3.0 snapsho
 
 ## 验收交付物
 
-- [ ] `aria/skills/state-scanner/scripts/scan.py` (可执行, stdlib-only)
-- [ ] `aria/skills/state-scanner/references/state-snapshot-schema.md`
-- [ ] `aria/skills/state-scanner/references/migration-v2.9-to-v3.0.md`
-- [ ] `aria/skills/state-scanner/tests/test_scan.py` + fixtures
-- [ ] SKILL.md v3.0.0 with Step 0 硬约束
-- [ ] `.aria/state-snapshot.json` (dogfooding 产物示例)
-- [ ] Benchmark 结果 (delta 非负)
-- [ ] plugin 版本 bump (v1.16.0 或 v1.15.x)
+- [x] `aria/skills/state-scanner/scripts/scan.py` (可执行, stdlib-only) — delivered v1.17.0 (PR #27)
+- [x] `aria/skills/state-scanner/references/state-snapshot-schema.md` — delivered T4 (aria PR #25)
+- [x] `aria/skills/state-scanner/references/migration-v2.9-to-v3.0.md` — delivered T9.1 (aria PR #25, 170 行)
+- [x] `aria/skills/state-scanner/tests/test_scan.py` + fixtures — delivered T6 + T6.5-followup (221 → 355 tests, aria PR #24/#29)
+- [x] SKILL.md v3.0.0 with Step 0 硬约束 — delivered T5 (aria PR #23, 1178→454 行)
+- [x] `.aria/state-snapshot.json` (dogfooding 产物示例) — Aria 项目 + Kairos 项目 dogfooding 各产出 1 份 (T7 / T8.1)
+- [x] Benchmark 结果 (delta 非负) — T10.1 smoke benchmark 35/35 (100%) PASS (`aria-plugin-benchmarks/ab-results/2026-04-25-state-scanner-v1.17.0/`)
+- [x] plugin 版本 bump (v1.16.0 或 v1.15.x) — actually bumped to **v1.17.0** then v1.17.1 patch (post-CF-1 revision)
 
 ---
 
