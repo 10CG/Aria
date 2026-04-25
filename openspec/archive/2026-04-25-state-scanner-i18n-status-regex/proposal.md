@@ -1,11 +1,12 @@
 # state-scanner-i18n-status-regex — Status 正则中文 i18n 增强
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft
+> **Status**: Complete (2026-04-25, implementation merged in aria PR #30 + Aria PR #48)
 > **Created**: 2026-04-25
+> **Completed**: 2026-04-25
 > **Parent Story**: (无, 跨 Skill 基础设施增强)
 > **Source**: 2026-04-25 state-scanner-mechanical-enforcement T8 Kairos 跨项目验证发现 (PR #44)
-> **Target**: aria-plugin v1.18.x (与 mechanical_mode opt-out 移除一同发布)
+> **Target (revised)**: aria-plugin v1.17.2 patch (实施完成早于预期, 不再 hold 到 v1.18.x; 原计划改为 v1.18.0 同步移除 mechanical_mode opt-out 不变)
 > **Estimate**: ~1h (regex + tests)
 
 ---
