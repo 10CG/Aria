@@ -152,9 +152,9 @@ v2.9 prose 路径无 JSON 产物可 diff. 实际实施为 **v3.0 vs v3.0 snapsho
 
 ---
 
-## 后置动作 (merge 后)
+## 后置动作 (merge 后, archive 时仍可推进)
 
-- [ ] 观察 L1 探针 (`issue-cache-freshness`) 4 周零告警
-- [ ] 观察 `mechanical_mode=false` 使用量 (若为零则 v1.18.0 安全移除 — post-CF-1 revision)
-- [ ] 在 MEMORY.md 标记 `feedback_state_scanner_run_all_phases.md` 为 "partially obsolete (机械化已落地, 但作为历史原因记录保留)"
-- [ ] 评估其他 Skill 是否有类似 prose-only 执行的脆弱性, 决定是否推广本 Spec 模式
+- [x] 在 MEMORY.md 标记 `feedback_state_scanner_run_all_phases.md` 为 "partially obsolete (机械化已落地, 但作为历史原因记录保留)" — done 2026-04-25, frontmatter + 顶部 PARTIALLY OBSOLETE 注记 + 适用范围收窄说明
+- [x] 观察 L1 探针 (`issue-cache-freshness`) 4 周零告警 — **deferred by design (passive observation, archive 不阻塞)**: archive 后由 state-scanner Phase 1.11 custom_checks 自动持续检测, 4 周后 (~2026-05-23) 在新 session 主动复盘. 触发 issue 立即创建 follow-up Spec
+- [x] 观察 `mechanical_mode=false` 使用量 (若为零则 v1.18.0 安全移除 — post-CF-1 revision) — **deferred by design**: v1.18.0 release planning 时检查 ab-results / user feedback 频道 / Forgejo issues 是否提到 opt-out. 零提及 → 直接移除; 有提及 → 评估迁移路径
+- [x] 评估其他 Skill 是否有类似 prose-only 执行的脆弱性, 决定是否推广本 Spec 模式 — **deferred by design**: 与 v1.18.0 release retrospective 合并, 候选目标 phase-c-integrator (复杂 push 流程) / requirements-validator (多文件交叉校验) / agent-team-audit (并行调度时序), 评估后立独立 Spec 不放入本 Spec 作用域

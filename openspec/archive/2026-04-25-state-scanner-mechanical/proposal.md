@@ -1,9 +1,10 @@
 # state-scanner-mechanical-enforcement — state-scanner Phase 1.x 机械化执行
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Approved (2026-04-23, Activation Gate 条件 2 用户显式请求触发, post_spec Agent Team 4/4 一致 PASS_WITH_WARNINGS + activate_with_revisions)
+> **Status**: Complete (2026-04-25, T1-T10 全部交付, 8/8 验收交付物 ticked, T8 Kairos 跨项目验证通过)
 > **Created**: 2026-04-15
 > **Activated**: 2026-04-23
+> **Completed**: 2026-04-25
 > **Parent Story**: (无直接父 Story, 属 Plugin 基础设施质量改进)
 > **Target Version**: aria-plugin v1.17.0 (activation 时从 v1.16.0 追齐至 v1.16.4+, minor bump 为 v1.17.0; AD-SSME-5 "1 minor 版本后移除 opt-out" 同步改为 v1.18.0)
 > **Source**: 2026-04-15 Aria 主项目 session 发现 Phase 1.13 Issue 感知自 2026-04-09 首次启用后连续多轮 session 漏跑 (issue cache 陈旧 6 天), 非工具缺陷而是 AI 执行纪律问题
