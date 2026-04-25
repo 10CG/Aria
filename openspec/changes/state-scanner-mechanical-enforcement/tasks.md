@@ -92,7 +92,7 @@ T6 audit (pre_merge R1 aria:code-reviewer) 确认此偏移文档化充分, MERGE
 - [x] **T6.5** Phase 1.11-1.14 (custom/sync/multi_remote/issue_scan/forgejo) 单元测试 (2h) — aria PR #24 partial (68 tests, 純函数 + 负向路径). 见 T6.5-followup I/O 覆盖待提升
 - [x] **T6.6** schema_version mismatch abort 路径测试 (0h, 归并 T5.3) — aria PR #24 `test_scan_integration.py::test_schema_version_constant` writer 侧; reader 侧在 SKILL.md §阶段 2 入口断言 (AI prose, 非单元测试范围)
 
-- [ ] **T6.5-followup** 提升 I/O-heavy collector 覆盖至 ≥70% (~3h, pre_merge R1 IF-2) — sync (18→70) / multi_remote (33→70) / issue_scan (44→70) 需要 subprocess mocking 层. 不阻塞 T7-T10 推进, 可并行或后置
+- [x] **T6.5-followup** 提升 I/O-heavy collector 覆盖 (pre_merge R1 IF-2) — 通过 `unittest.mock.patch("collectors.<m>._run", side_effect=fake)` subprocess mocking 层, 新增 130 tests (221→351). 实测 stdlib `trace`-based coverage: sync 18.2%→67.8% (+49.6pp) / multi_remote 33.1%→69.7% (+36.6pp, rounds to 70%) / issue_scan 43.8%→73.4% (+29.6pp ✅). sync 仍 ~2.2pp 低于名义 70% 阈值 — 缺口来自 `_collect_current_branch` 四状态结构化 dict 字面量的多行延续 (Phase 1.12 spec §4 强制), `trace` 工具按"unique line numbers in execution events" 计数, 多行语句仅计 1 line hit. 实际可执行分支已全覆盖 (directional guard / fail-soft / parse_failed 等). 见 aria 子模块 `tests/test_sync_mocked.py` / `test_multi_remote_mocked.py` / `test_issue_scan_mocked.py`
 
 ## T7. Aria 项目 dogfooding (2.5h, +0.5h per CF-2)
 
