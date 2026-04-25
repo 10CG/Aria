@@ -1,0 +1,120 @@
+{
+  "spec": "state-scanner-i18n-status-regex",
+  "plugin_version": "1.17.2",
+  "benchmark_type": "smoke (inline structural assertions)",
+  "rationale": "Per feedback_smoke_vs_full_ab_benchmark.md: doc-dominant Level 2 patch with strong unit-test evidence (362 stdlib unittest tests). Full /skill-creator AB delta would be drowned by LLM stochasticity vs deterministic regex assertions.",
+  "total_cases": 12,
+  "passes": 12,
+  "fails": 0,
+  "pass_rate": "100%",
+  "results": [
+    {
+      "case_id": "S1",
+      "label": "P1 halfwidth EN",
+      "expected_raw": "Active",
+      "got_raw": "Active",
+      "expected_normalized": "active",
+      "got_normalized": "active",
+      "pass": true
+    },
+    {
+      "case_id": "S2",
+      "label": "P1 fullwidth EN (i18n)",
+      "expected_raw": "Active",
+      "got_raw": "Active",
+      "expected_normalized": "active",
+      "got_normalized": "active",
+      "pass": true
+    },
+    {
+      "case_id": "S3",
+      "label": "P2 halfwidth CN",
+      "expected_raw": "pending",
+      "got_raw": "pending",
+      "expected_normalized": "pending",
+      "got_normalized": "pending",
+      "pass": true
+    },
+    {
+      "case_id": "S4",
+      "label": "P2 fullwidth CN (i18n primary)",
+      "expected_raw": "pending",
+      "got_raw": "pending",
+      "expected_normalized": "pending",
+      "got_normalized": "pending",
+      "pass": true
+    },
+    {
+      "case_id": "S5",
+      "label": "P3 blockquote EN halfwidth",
+      "expected_raw": "done",
+      "got_raw": "done",
+      "expected_normalized": "done",
+      "got_normalized": "done",
+      "pass": true
+    },
+    {
+      "case_id": "S6",
+      "label": "P3 blockquote EN fullwidth (i18n)",
+      "expected_raw": "done",
+      "got_raw": "done",
+      "expected_normalized": "done",
+      "got_normalized": "done",
+      "pass": true
+    },
+    {
+      "case_id": "S7",
+      "label": "P4 heading prefix",
+      "expected_raw": "Reviewed",
+      "got_raw": "Reviewed",
+      "expected_normalized": "reviewed",
+      "got_normalized": "reviewed",
+      "pass": true
+    },
+    {
+      "case_id": "S8",
+      "label": "P4 heading fullwidth (i18n)",
+      "expected_raw": "Reviewed",
+      "got_raw": "Reviewed",
+      "expected_normalized": "reviewed",
+      "got_normalized": "reviewed",
+      "pass": true
+    },
+    {
+      "case_id": "S9",
+      "label": "P5 table CN",
+      "expected_raw": "active",
+      "got_raw": "active",
+      "expected_normalized": "active",
+      "got_normalized": "active",
+      "pass": true
+    },
+    {
+      "case_id": "S10",
+      "label": "P6 NEW Kairos US-009",
+      "expected_raw": "pending",
+      "got_raw": "pending",
+      "expected_normalized": "pending",
+      "got_normalized": "pending",
+      "pass": true
+    },
+    {
+      "case_id": "S11",
+      "label": "P6 NEW status middle EN",
+      "expected_raw": "in progress",
+      "got_raw": "in progress",
+      "expected_normalized": "in_progress",
+      "got_normalized": "in_progress",
+      "pass": true
+    },
+    {
+      "case_id": "S12",
+      "label": "NEGATIVE prose mention",
+      "expected_raw": null,
+      "got_raw": null,
+      "expected_normalized": "unknown",
+      "got_normalized": "unknown",
+      "pass": true
+    }
+  ]
+}
