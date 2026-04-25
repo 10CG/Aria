@@ -1,0 +1,96 @@
+{
+  "spec": "state-scanner-collector-regex-hardening",
+  "plugin_version": "1.17.3",
+  "benchmark_type": "smoke (inline structural assertions)",
+  "rationale": "Per feedback_smoke_vs_full_ab_benchmark.md: doc-dominant Level 2 patch with 9 new unit tests + 371 total stdlib unittest passes. Full /skill-creator AB delta would be drowned by LLM stochasticity vs deterministic regex assertions.",
+  "total_cases": 12,
+  "passes": 12,
+  "fails": 0,
+  "pass_rate": "100%",
+  "results": [
+    {
+      "case_id": "S1",
+      "label": "arch Status baseline",
+      "expected": "Active",
+      "got": "Active",
+      "pass": true
+    },
+    {
+      "case_id": "S2",
+      "label": "arch Status fullwidth",
+      "expected": "Active",
+      "got": "Active",
+      "pass": true
+    },
+    {
+      "case_id": "S3",
+      "label": "arch Status heading",
+      "expected": "Draft",
+      "got": "Draft",
+      "pass": true
+    },
+    {
+      "case_id": "S4",
+      "label": "arch Status heading fullwidth",
+      "expected": "Draft",
+      "got": "Draft",
+      "pass": true
+    },
+    {
+      "case_id": "S5",
+      "label": "arch LastUpd heading fullwidth",
+      "expected": "2026-04-25",
+      "got": "2026-04-25",
+      "pass": true
+    },
+    {
+      "case_id": "S6",
+      "label": "arch ParentPRD heading + bold",
+      "expected": "prd-v3",
+      "got": "prd-v3",
+      "pass": true
+    },
+    {
+      "case_id": "S7",
+      "label": "forgejo halfwidth",
+      "expected": "MATCH",
+      "got": "MATCH",
+      "pass": true
+    },
+    {
+      "case_id": "S8",
+      "label": "forgejo fullwidth (i18n)",
+      "expected": "MATCH",
+      "got": "MATCH",
+      "pass": true
+    },
+    {
+      "case_id": "S9",
+      "label": "forgejo blockquote",
+      "expected": "MATCH",
+      "got": "MATCH",
+      "pass": true
+    },
+    {
+      "case_id": "S10",
+      "label": "readme Version heading",
+      "expected": "1.2.3",
+      "got": "1.2.3",
+      "pass": true
+    },
+    {
+      "case_id": "S11",
+      "label": "readme Version 版本 heading",
+      "expected": "1.2.3",
+      "got": "1.2.3",
+      "pass": true
+    },
+    {
+      "case_id": "S12",
+      "label": "NEG: forgejo no colon",
+      "expected": "NO_MATCH",
+      "got": "NO_MATCH",
+      "pass": true
+    }
+  ]
+}

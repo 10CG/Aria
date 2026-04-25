@@ -1,12 +1,13 @@
 # state-scanner-collector-regex-hardening — collector 字段提取正则鲁棒性补强
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft
+> **Status**: Complete (2026-04-25, implementation merged in aria PR #32 + Aria PR #51, released as v1.17.3)
 > **Created**: 2026-04-25
+> **Completed**: 2026-04-25
 > **Parent Story**: (无, 跨 collector 基础设施增强)
 > **Source**: 2026-04-25 主动 latent bug audit (PR #30 merge 后空闲扫描). 复合应用 v1.17.1 anchor narrowness + v1.17.2 i18n fullwidth colon 两条教训作为 lint 标准, 在 architecture.py / forgejo_config.py 命中匹配
-> **Target**: aria-plugin v1.17.3 patch (与 v1.17.1 / v1.17.2 同模式 quick patch)
-> **Estimate**: ~1.5h (3 文件 regex + 5-7 unit tests + smoke benchmark)
+> **Target**: aria-plugin v1.17.3 patch (与 v1.17.1 / v1.17.2 同模式 quick patch) — released
+> **Estimate**: ~1.5h (3 文件 regex + 5-7 unit tests + smoke benchmark) — actual ~1.5h (matched estimate)
 > **Related Feedback Memory**: `feedback_smoke_benchmark_truthiness.md`, `feedback_smoke_vs_full_ab_benchmark.md`
 
 ---
