@@ -2,10 +2,10 @@
 
 > **Parent**: [proposal.md](./proposal.md)
 > **US**: [US-022](../../../docs/requirements/user-stories/US-022.md)
-> **Total**: 146h (Core 17 items, OD-7=b 已裁 M2-15 partial-write 6h, partial-write 推 M3-2)
-> **PRD baseline**: 140h (±4.3%, 可接受)
-> **Status**: Draft (Phase A.1.2 起草, post_spec 审计待 owner 决策)
-> **Owner Decisions**: OD-1~OD-7 (per brainstorm conclusion 2026-04-27)
+> **Total (实测)**: **156h** (post_spec audit cm F3 实测累加; 与 OD-7=b 锁定 146h 偏离 +10h, 6.8% 超 PRD 140h 基线 = 11.4%)
+> **PRD baseline**: 140h
+> **Status**: Draft + post_spec audit findings open (待 OD-8 owner 决策预算 + 8 important issues 在 Phase B 早期修复)
+> **Owner Decisions**: OD-1~OD-7 已锁定; OD-8 (预算调整) 待决
 
 ## Task 工时基线
 
@@ -29,8 +29,15 @@
 | **T15** | M2 E2E demo (DEMO-001 + DEMO-002 ≥ 10 dispatches via cron) | 12h | T1-T14 | T15.done + 验收 A (≥10 issues) + 验收 D (perf ≤ M1 × 1.5) | qa-engineer + ai-engineer |
 | **T16** | M2 Report + m2-handoff.yaml v1.0 + 3 patches (AD5 / PRD §M2 / US-022) + tech-lead co-sign | 6h | T15 | T16.done + handoff validator PASS + 3 patches merged + owner sign-off | knowledge-manager + tech-lead |
 
-**Total Core**: 146h (per OD-7=b, M2-15 partial-write 6h 已裁 → 推 M3-2 reconciler)
-**PRD baseline**: 140h (overrun 4.3%, owner 接受)
+**Total (实测累加)**: **156h** (T0 3h + T1 30h + T2 8h + T3 16h + T4 8h + T5 4h + T6 12h + T7 10h + T8 8h + T9 5h + T10 10h + T11 2h + T12 6h + T13 6h + T14 10h + T15 12h + T16 6h)
+
+**vs OD-7=b 锁定 146h**: 实际 +10h 膨胀 (6.8%), 来源 = T0 kickoff 新增 3h + T8/T10/T13 抽出独立 task 边际开销 ~7h (brainstorm 原 M2-1 状态机骨架 16h 内含 silknode/LLM review/S8 merge 子内容, 重组时未削减原 task 工时)
+**vs PRD 140h baseline**: +16h (11.4% overrun)
+
+**OD-8 待决** (post_spec audit cm F3 暴露):
+- (a) 接受 156h 新基线 + owner 重批准 (替代 OD-7=b 146h)
+- (b) 削减 10h 落到 OD-7 锁定 146h (例 T1 30→25h + T16 6→1h, 但风险大)
+- (c) 重新做 mapping 让 brainstorm M2 scope 18 项 (146h post-cut) 与 tasks 17 项 (156h) 真正对齐 (不改总数)
 
 > **M2-15 (M3 deferred) 占位说明**: S6/S8 partial-write 原子性 (sub-step bitmask + 幂等 key) 在 M2 不实现; M2 实施期若发生 partial-write, 走 S_FAIL with `reason=infrastructure`, 监控触发后人工介入 reset。完整原子性 + 自动 reconciler 推 M3-2 (US-023 ~30h)。
 
@@ -470,7 +477,66 @@ T15      ─→ T16 (Report + handoff + patches)
 - [ ] **Phase A.1.3**: 3 patches 起草完成 (待用户 review 后启动)
 - [ ] **Phase A.2**: post_spec 审计 (待 owner 决策启动 / 跳过)
 - [ ] **Phase A.3**: Agent 分配 (本文件已含 Agent 主责字段, 后续可由 task-planner 微调)
-- [ ] **Phase B 准入**: owner Status: Draft → Approved
+- [ ] **Phase B 准入**: owner Status: Draft → Approved + OD-8 预算决策
+
+---
+
+## Post_spec Audit Known Issues (2026-04-28)
+
+来自 post_spec audit 3 agent challenge mode round 1 (qa / code-reviewer / context-manager), Critical 2 项已修, 8 important + 8 minor 标记 known issue 推 Phase B 早期发现期修复。
+
+### ✅ Critical Resolved (2 项)
+
+- **F1 (cm)**: m1-handoff.yaml 字段名校正 → proposal §What 六 6.4 已 patch (2026-04-28 verified against actual schema)
+- **F3 (cm)**: 工时累加 156h ≠ claim 146h → tasks 工时表已诚实标 156h, 待 OD-8 owner 决策 (a/b/c 三选一)
+
+### ⚠️ Important — Phase B 早期 Backlog (8 项)
+
+按 audit 严重度排序, B.1 启动前 spec-drafter 一次性处理或 B.2 实施期早期发现:
+
+1. **S7_HUMAN_GATE 行为内部矛盾** (qa F1)
+   - **位置**: proposal.md line 60 ("M2 = 发送即终") vs line 65 + T12.4 ("block-until-PR-merge")
+   - **修复**: B.1 启动前删 line 60 旧措辞, 统一为 "M2: cron tick 轮询 PR merge, block-until-merge"
+2. **S6_REVIEW → S8_MERGE collapse 无说明** (qa F2 + cr F1)
+   - brainstorm S6 三路出口 (含 approve→S8 直达), Spec/tasks 收成两路
+   - **修复**: B.1 owner 仲裁是否 collapse; 若 yes 在 proposal §What 一 注 "M2: 所有 PASS 路由 S7, S6→S8 直连推 M4"
+3. **notification_status 字段缺 SQL schema** (qa F3)
+   - tasks T12.3 写入但 proposal §What 二 SQL DDL 无此列
+   - **修复**: B.2 T2 实施期发现, ALTER TABLE 加列; 或 B.1 启动前补 proposal §What 二
+4. **S4_LAUNCH / S8_MERGE timeout 实现 gap** (qa F4)
+   - proposal §What 三 列 timeout 但 tasks T4/T13 无对应实现子任务
+   - **修复**: B.2 T4 + T13 期间补 1h 实现 (估算 +2h 工时, 加重 OD-8)
+5. **partial_write enum 缺口** (qa F5)
+   - brainstorm M2-15 mitigation 用 reason=partial_write, 9 enum 不含
+   - **修复**: B.1 启动前补 enum 第 10 值, 或 brainstorm mitigation 改用 reason=infrastructure (已锁 enum)
+6. **HERMES_ALLOC_TIMEOUT_MIN env_var 静默丢弃** (qa F6)
+   - brainstorm 标 configurable, Spec/tasks 全 hardcode 30min
+   - **修复**: B.2 T4.2 实施期补 env_var 读取 (DI 注入支持单测多阈值)
+7. **§核心交付清单未同步** (cr F3)
+   - tasks 17 项含 T8/T9/T10/T13 不在 US-022 line 28-33 字面列, Patch 3 未补
+   - **修复**: 扩展 Patch 3 加入 §核心交付补充段, 或 proposal 显式声明 "tasks 17 items = US-022 §核心交付 6 项 + OD-3 LLM review + OD-5 6 项 implementation breakdown"
+8. **silknode-contract §99 引用错误 + S5_REVIEWING 残留** (cm F2 + F4)
+   - silknode-contract 实际无 §99 编号, 应为 §契约 1 (line 31-40) 或 §Acceptance 第 1 项
+   - proposal line 210 残留旧 AD5 命名 S5_REVIEWING (现应为 S6_REVIEW)
+   - **修复**: B.1 启动前 grep 全文 replace (3 处 §99 + 1 处 S5_REVIEWING), 5 行编辑
+
+### 🟡 Minor — Phase B 中或忽略 (8 项)
+
+- T1 30h 关键路径无 risk 标注 (建议补 hermes Extension API stability 假设)
+- T10 ground truth 样本 2 个 (M1 fixtures) 不足以测准确率, T0.4 可扩展含 ground truth 标注
+- S9_CLOSE 描述含 OpenSpec archive 等人工步骤, 应限定为 "状态机层 = write final state record"
+- schema_version 字段未列 SQL DDL (tasks T2.1 声明), B.2 T2 实施期发现
+- silknode endpoint URL 半 placeholder (proposal line 207 已写 URL 但同句标"待 T0.5 确认"), B.1 末尾或 T0.5 触发 patch
+- human_timeout reason (proposal §What 三 line 170) 不在 9 enum 内, 标 M4 forward-only 字段
+- patches/01 实施清单 line 范围细化 (line 411-439 整段 vs line 415 单行 + cross-ref 注)
+- mapping 工时记账模糊 (M2-5 reason enum 6h 散落到 T4 8h + T13.3+T8.2 4h, 累计 -2h 不齐)
+
+### Audit Convergence Status
+
+- post_spec round 1 (challenge mode, 3 agents): PASS_WITH_WARNINGS × 3
+- 2 critical 已修, 8 important + 8 minor 标 known issue
+- ready_for_owner_signoff: **TRUE pending OD-8** (预算决策, 不阻塞其他维度)
+- 不需要 round 2 audit (brainstorm 已 4 轮, 边际收益低; B.1 启动前 spec-drafter 处理 important 即可)
 
 ---
 

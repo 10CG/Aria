@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS dispatches (
 
   -- 输入契约 (R7 / AD-M1-2)
   prompt_path           TEXT,             -- bind mount 路径, size ≤ 128 KiB (R7 hard cap)
-  image_sha             TEXT NOT NULL,    -- AD-M1-2 immutable_sha pin, 拒绝 mutable_tag
+  image_sha             TEXT NOT NULL,    -- 来自 m1-handoff.yaml.image_refs.image_sha_final (AD-M1-2 immutable pin, 拒绝 image_tag_mutable)
   alloc_id              TEXT,             -- Nomad alloc_id (S4 后填)
 
   -- 失败 forensic (OD-5c, M2 不重试但留字段为 M3 reconciler)
@@ -218,18 +218,40 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 
 #### 6.3 Image refs (AD-M1-2 / TL-R3-4)
 
-- `dispatches.image_sha` 字段必填且 = `sha256:[a-f0-9]{64}` 格式
-- M2 dispatch 时强制使用 `m1-handoff.yaml.image_refs.immutable_sha`, **禁** 引用 `mutable_tag` (claude-latest)
-- S4_LAUNCH guard: 启动前 `assert image_sha matches /^sha256:[a-f0-9]{64}$/ else S_FAIL(reason=infrastructure)`
+- `dispatches.image_sha` 字段必填且 = m1-handoff.yaml `image_refs.image_sha_final` 值 (M1 实际为短 SHA 如 `5154c13`, 非完整 sha256:[a-f0-9]{64} 格式)
+- M2 dispatch 时强制使用 `m1-handoff.yaml.image_refs.image_sha_final`, **禁** 引用 `image_refs.image_tag_mutable` (claude-latest)
+- S4_LAUNCH guard: 启动前 `assert image_sha == m1_handoff.image_refs.image_sha_final else S_FAIL(reason=infrastructure)`; image_sha 长度/格式校验 in T11.2 实施期 owner 决定 (full sha256 vs 短 SHA, M1 现状是短 SHA `5154c13`)
 
 #### 6.4 M1 handoff 输入契约 (additive-only, per AD-M1-7)
 
+> **Field name verified 2026-04-28** against `aria-orchestrator/docs/m1-handoff.yaml` v1.0 actual schema. 旧 brainstorm 引用 (`immutable_sha`/`mutable_tag`/`nomad_job_id`/`host_volumes`/`demo_002_p50_duration_s`) 已校正。
+
 M2 消费 m1-handoff.yaml v1.0 字段 (read-only, 不修改 schema):
-- `image_refs.{registry, immutable_sha, mutable_tag}` — 镜像选型
-- `nomad_job_id` + `nomad_job_version` — Nomad job template 复用
-- `host_volumes.{aria-runner-inputs, aria-runner-outputs}` — 三节点卷
-- `performance_baseline.demo_002_p50_duration_s` — non-regression 基线 (M2 验收 D)
-- `demo_token_usage` — cost 基线对比
+
+- **镜像选型** (per AD-M1-2 / TL-R3-4 immutable pin):
+  - `image_refs.registry` = `forgejo.10cg.pub/10CG/aria-runner`
+  - `image_refs.image_sha_final` ← **immutable SHA, M2 dispatch 时 pin 此字段**
+  - `image_refs.image_tag_immutable_pattern` (`aria-runner:claude-<sha>`) ← M2 解析 `<sha>` 占位符为 `image_sha_final`
+  - `image_refs.image_tag_mutable` (`aria-runner:claude-latest`) ← **禁** M2 dispatch 引用 (per AD-M1-2)
+
+- **Nomad 配置** (per M1 deployment infrastructure):
+  - `nomad_config.job_template_path` ← M2 Hermes Extension 复用此 HCL template
+  - `nomad_config.host_volume_config_path` ← host volume 挂载配置
+  - `nomad_config.volumes[]` ← 数组, 含 `aria-runner-inputs` + `aria-runner-outputs` 三节点卷
+
+- **Performance 基线** (M2 验收 D non-regression 数据源):
+  - `performance_baseline.dispatch_to_pr_p50_s` = 28 ← **M2 验收 D 基线**: m2 实测 p50 ≤ 28 × 1.5 = 42s
+  - `performance_baseline.dispatch_to_pr_p95_s` = 95 ← 辅助参考
+  - `performance_baseline.heavy_node_alloc_success_rate` = 1.0 ← 基础设施可用性
+
+- **Token cost 基线** (M2 cost 对比, US-027 数据源):
+  - `demo_token_usage.DEMO-001.{input_tokens_total, output_tokens_total}`
+  - `demo_token_usage.DEMO-002.{input_tokens_total, output_tokens_total}`
+  - M2 实测 token 数应在 ±2x 范围 (Anthropic vs GLM 对比, AD-M1-12 Luxeno pivot 影响)
+
+- **Legal 前提** (per M1 carryover):
+  - `legal_assumptions.luxeno_data_cleared` = true ← M2 silknode 路径合规依赖
+  - `legal_assumptions.m1_memo_signed` = true ← M2 启动前提
 
 M2 产出 m2-handoff.yaml v1.0 (additive-only, schema_version="1.0"), 新增段 `m2_dispatches/*` (state machine metrics + handoff 给 US-023 M3)。
 
