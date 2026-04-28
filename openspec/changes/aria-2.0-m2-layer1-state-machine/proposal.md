@@ -1,8 +1,9 @@
 # aria-2.0-m2-layer1-state-machine — Aria 2.0 M2 Layer 1 状态机 + Hermes Extension
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft (Phase A.1 起草, post_spec 审计 待 owner 决策)
+> **Status**: **Approved** (Phase A.1 起草 + post_spec audit PASS_WITH_WARNINGS + OD-8 锁定预算 156h, 2026-04-28)
 > **Created**: 2026-04-28
+> **Approved**: 2026-04-28 (owner sign-off, Status: Draft → Approved)
 > **Parent Story**: [US-022](../../../docs/requirements/user-stories/US-022.md)
 > **Target Version**: v2.0.0-m2
 > **Source**:
@@ -15,7 +16,7 @@
 > **Related**:
 >   - **前置 (硬门控)**: [US-021 / aria-2.0-m1-mvp](../../archive/2026-04-23-aria-2.0-m1-mvp/) — `e2e_demo_passed=true` (2026-04-23 已满足)
 >   - **后继**: US-023 (M3 双 provider + Crash recovery + Reconciler)
-> **Owner Decisions**: OD-1 (PRD 命名) / OD-2 (验收 B 弱形式) / OD-3 (silknode→GLM) / OD-4 (patch 推 A.1) / OD-5 (6 项 M2 必做) / OD-6 (单文件输出) / OD-7 (146h 裁 M2-15)
+> **Owner Decisions**: OD-1 (PRD 命名) / OD-2 (验收 B 弱形式) / OD-3 (silknode→GLM) / OD-4 (patch 推 A.1) / OD-5 (6 项 M2 必做) / OD-6 (单文件输出) / OD-7 (146h 裁 M2-15, **superseded by OD-8**) / **OD-8 = a (156h 新基线, 2026-04-28)**
 
 > **silknode contract 消费声明 (per silknode-integration-contract §99 acceptance)**: 本 Spec verbatim 引用 silknode-integration-contract 契约 1 全文 (见 §外部依赖契约), 满足该 Spec 第一项 acceptance checkmark。S2_DECIDE / S3_BUILD_CMD / S6_REVIEW 三个 LLM 调用状态依此契约保证 no-storage 透传。
 

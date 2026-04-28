@@ -943,10 +943,15 @@ owner_signoff_required:
     confirmed_in_brainstorm: true
 
   - item: "M2 scope 152h vs PRD 140h 超 12h (8.6%)"
-    owner_decision: "OD-7 = b (2026-04-27)"
+    owner_decision: "OD-7 = b (2026-04-27) — **SUPERSEDED by OD-8 (2026-04-28)**"
     decision_detail: "裁剪 M2-15 partial-write (6h), 落 146h, partial-write 推 M3 配套 reconciler"
     blocking_phase_a1: false
     resolved: true
+    superseded_note: |
+      Phase A.1 post_spec audit (2026-04-28, cm F3) 暴露 tasks 工时实测累加 = 156h ≠ claim 146h,
+      根因是 task 重组 (silknode/LLM review/S8 merge 抽出独立 task) 时 brainstorm M2 scope 18 项 (146h post-cut)
+      与 tasks 17 项 (156h) 工时未真正 reconcile。Owner OD-8 = a (2026-04-28) 接受 156h 新基线,
+      M2-15 partial-write 仍裁 (推 M3-2 reconciler), 净结果是 OD-7 文字 "146h" → "156h", 其他维度不变。
 
   - item: "M3 deferrals 8 项确认"
     owner_decision: "全部接受 (2026-04-27)"
@@ -992,6 +997,15 @@ owner_signoff_required:
     owner_decision: "Approved (2026-04-27)"
     blocking_phase_a1: false
     resolved: true
+
+  - item: "OD-8 (post_spec audit gap reconciliation): tasks 实测 156h vs OD-7=b 锁定 146h"
+    owner_decision: "OD-8 = a (2026-04-28)"
+    decision_detail: |
+      接受 156h 新基线 (替代 OD-7=b 146h)。M2-15 partial-write 仍裁 (推 M3-2)。
+      理由: task 重组真实成本 + M1 实战 +7% over 估算先例。PRD 140h baseline 偏离 +16h (11.4%) owner 接受。
+    blocking_phase_b: false
+    resolved: true
+    audit_trail: ".aria/audit-reports/post_spec-2026-04-28T1700Z-us022-m2-layer1.md"
 
 # ============================================================
 # SECTION 18: FINAL M2 SCOPE (POST OD-7, 146h)

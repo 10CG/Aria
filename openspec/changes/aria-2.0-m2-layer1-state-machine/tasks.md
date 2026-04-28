@@ -2,10 +2,10 @@
 
 > **Parent**: [proposal.md](./proposal.md)
 > **US**: [US-022](../../../docs/requirements/user-stories/US-022.md)
-> **Total (实测)**: **156h** (post_spec audit cm F3 实测累加; 与 OD-7=b 锁定 146h 偏离 +10h, 6.8% 超 PRD 140h 基线 = 11.4%)
-> **PRD baseline**: 140h
-> **Status**: Draft + post_spec audit findings open (待 OD-8 owner 决策预算 + 8 important issues 在 Phase B 早期修复)
-> **Owner Decisions**: OD-1~OD-7 已锁定; OD-8 (预算调整) 待决
+> **Total (locked)**: **156h** (per OD-8 = a, 2026-04-28 owner 仲裁; 替代 OD-7=b 146h; PRD 140h baseline 偏离 +16h / 11.4%, owner 接受)
+> **PRD baseline**: 140h (overrun 11.4%, owner OD-8 已接受)
+> **Status**: **Approved** (post_spec audit 2 critical 修复 + 8 important 推 Phase B 早期 + OD-8 锁定预算 → ready for Phase B)
+> **Owner Decisions**: OD-1~OD-7 + **OD-8 = a** (156h 新基线, 2026-04-28)
 
 ## Task 工时基线
 
@@ -34,10 +34,10 @@
 **vs OD-7=b 锁定 146h**: 实际 +10h 膨胀 (6.8%), 来源 = T0 kickoff 新增 3h + T8/T10/T13 抽出独立 task 边际开销 ~7h (brainstorm 原 M2-1 状态机骨架 16h 内含 silknode/LLM review/S8 merge 子内容, 重组时未削减原 task 工时)
 **vs PRD 140h baseline**: +16h (11.4% overrun)
 
-**OD-8 待决** (post_spec audit cm F3 暴露):
-- (a) 接受 156h 新基线 + owner 重批准 (替代 OD-7=b 146h)
-- (b) 削减 10h 落到 OD-7 锁定 146h (例 T1 30→25h + T16 6→1h, 但风险大)
-- (c) 重新做 mapping 让 brainstorm M2 scope 18 项 (146h post-cut) 与 tasks 17 项 (156h) 真正对齐 (不改总数)
+**OD-8 = a** (锁定 2026-04-28): 接受 156h 新基线, 替代 OD-7=b 锁定的 146h。
+- 理由: brainstorm 是早期估算, M1 实战显示真实工时 +7% over 估算 (PRD 100h → 实际 107h); 156h 是 task 重组后的诚实数, audit 暴露 reconciliation gap
+- 影响: PRD v2.1 §M2 line 156 可能引用 140h baseline, M2 Report (T16) 同步标 "实际 156h, +11.4% over PRD baseline, owner OD-8 接受 (2026-04-28 brainstorm-to-spec audit gap reconciliation)"
+- 与 OD-7 关系: OD-7=b (146h) 已 superseded; brainstorm conclusion 文件 §17 标记为"superseded by OD-8 (post_spec audit gap reconciliation)"
 
 > **M2-15 (M3 deferred) 占位说明**: S6/S8 partial-write 原子性 (sub-step bitmask + 幂等 key) 在 M2 不实现; M2 实施期若发生 partial-write, 走 S_FAIL with `reason=infrastructure`, 监控触发后人工介入 reset。完整原子性 + 自动 reconciler 推 M3-2 (US-023 ~30h)。
 
@@ -477,7 +477,7 @@ T15      ─→ T16 (Report + handoff + patches)
 - [ ] **Phase A.1.3**: 3 patches 起草完成 (待用户 review 后启动)
 - [ ] **Phase A.2**: post_spec 审计 (待 owner 决策启动 / 跳过)
 - [ ] **Phase A.3**: Agent 分配 (本文件已含 Agent 主责字段, 后续可由 task-planner 微调)
-- [ ] **Phase B 准入**: owner Status: Draft → Approved + OD-8 预算决策
+- [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
 
 ---
 
@@ -535,7 +535,7 @@ T15      ─→ T16 (Report + handoff + patches)
 
 - post_spec round 1 (challenge mode, 3 agents): PASS_WITH_WARNINGS × 3
 - 2 critical 已修, 8 important + 8 minor 标 known issue
-- ready_for_owner_signoff: **TRUE pending OD-8** (预算决策, 不阻塞其他维度)
+- ready_for_owner_signoff: **TRUE** (OD-8 = a 锁定 156h, 2026-04-28); Status: Draft → Approved
 - 不需要 round 2 audit (brainstorm 已 4 轮, 边际收益低; B.1 启动前 spec-drafter 处理 important 即可)
 
 ---
