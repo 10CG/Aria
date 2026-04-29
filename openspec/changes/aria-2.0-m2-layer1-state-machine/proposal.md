@@ -117,6 +117,12 @@ CREATE TABLE IF NOT EXISTS dispatches (
   token_cost_usd        REAL DEFAULT 0.0,
   model_used            TEXT,             -- 实际命中的 model (glm-4.7-air | glm-4.7-flashx)
 
+  -- S7 人类门控通知 (F3 fix: 原 SQL 缺失此字段; schema.sql 已含, 本文档补齐)
+  -- notification_status: Feishu webhook HTTP 响应码或错误字符串
+  -- 值域: NULL (未发送) | "200" | "5xx" | "network_error"
+  -- 非 2xx 仅 log warning, 不触发 S_FAIL (per qa R1 OBJ-6 / T12.3)
+  notification_status   TEXT,
+
   -- Fallback 跟踪 (OD-5e, AD-M0-8 主/fallback 非对称)
   fallback_triggered    INTEGER DEFAULT 0,  -- bool
   fallback_chain_json   TEXT,             -- JSON: [{model, trigger_reason, latency_ms, endpoint_from, endpoint_to}, ...]
@@ -137,7 +143,7 @@ CREATE INDEX idx_state ON dispatches(state);
 CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 ```
 
-**fail_reason enum (OD-5c, 9 值)**:
+**fail_reason enum (OD-5c, 10 值)**:
 - `quota_exhausted`: silknode 返回 429, GLM token 配额耗尽
 - `provider_5xx`: silknode/GLM 持续 5xx (单次请求 OpenAI SDK 内重试 3 次仍失败)
 - `timeout`: S3/S5/S6 LLM call > 120s 或 alloc heartbeat > 30min (M3-4 拆分细分)
@@ -146,6 +152,7 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 - `dispatch_lost`: Nomad alloc lost / OOM kill 等基础设施级失败
 - `review_rejected`: S6 LLM 评审给出 negative verdict
 - `infrastructure`: 其他基础设施错误 (网络 / 文件系统 / Forgejo API)
+- `partial_write`: M2 监控路径 — 状态 transition 中途写入中断 (M2-15 mitigation brainstorm 引用; M3-2 完整 crash recovery 实施)
 - `other`: 兜底未分类
 
 **fallback_chain_json 字段 schema (per Phase A.1 followup R3-OBJ-4)**:
@@ -169,7 +176,7 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 | S2_DECIDE | LLM call > 120s (含 OpenAI SDK 内 3 次重试) | S_FAIL | `timeout` |
 | S3_BUILD_CMD | LLM call > 120s | S_FAIL | `timeout` |
 | S4_LAUNCH | Nomad dispatch ack > 30s | S_FAIL | `dispatch_lost` |
-| S5_AWAIT | alloc last_heartbeat_at > 30min | S_FAIL | `timeout` |
+| S5_AWAIT | alloc last_heartbeat_at > 30min (env: HERMES_ALLOC_TIMEOUT_MIN, 默认 30, 可在 Hermes 部署时覆盖) | S_FAIL | `timeout` |
 | S6_REVIEW | LLM call > 120s | S_FAIL | `timeout` |
 | S7_HUMAN_GATE | (M2: 无超时, block-until-merge); M4: webhook ack > 7d | (M4 only) S_FAIL | `human_timeout` |
 | S8_MERGE | Forgejo API > 30s | S_FAIL | `infrastructure` |
@@ -286,7 +293,39 @@ M2 产出 m2-handoff.yaml v1.0 (additive-only, schema_version="1.0"), 新增段 
 **F. Owner sign-off**
 - 产品负责人 (10CG Lab solo per AD-M0-9) 签字确认 Go/No-Go (per M0 sign-off 模板)
 
-### 八、Patches (per OD-4, T6 阶段实施)
+### 八、核心交付一致性声明 (F3-cr: tasks ↔ US-022 §核心交付 + OD-5 mapping)
+
+本 Spec tasks.md 的 17 个任务组与 US-022 §核心交付 6 项 + OD-5 6 项 + OD-3 LLM review 的映射关系:
+
+| tasks.md 任务组 | 对应 §核心交付 / OD 条目 |
+|-----------------|--------------------------|
+| T0–T1 (Spec + scaffold) | 前置: US-022 §验收 F (owner sign-off) 准入条件 |
+| T2 (SQLite WAL schema) | US-022 §核心交付 2: 状态持久化 + OD-5b schema |
+| T3 (Transition logic) | US-022 §核心交付 1: 状态机 10 状态 + OD-5a/f 并发 + OD-5b timeout |
+| T4 (Timeout + forensic) | US-022 §核心交付 3: 失败处理 + OD-5b timeout + OD-5c forensic 字段 |
+| T5 (Idempotency) | US-022 §核心交付 4: cron 重入安全 + OD-5a idempotency |
+| T6 (Cron scheduler) | US-022 §核心交付 1: 自动 cron 60min tick 触发 |
+| T7 (Nomad dispatch) | US-022 §核心交付 1: S4_LAUNCH Nomad parameterized dispatch |
+| T8 (silknode LLM) | US-022 §核心交付 5: LLM 100% 走 silknode + OD-3 (silknode→GLM) |
+| T9 (m1-handoff 消费) | US-022 §核心交付 6: m1-handoff additive-only 消费 (AD-M1-7) |
+| T10 (S6 LLM review) | OD-3 LLM review (S6_REVIEW state) + US-022 §验收 E silknode contract |
+| T11 (image SHA guard) | US-022 §核心交付 6 + AD-M1-2 immutable pin enforcement |
+| T12 (S7 Feishu webhook) | US-022 §核心交付 1: S7_HUMAN_GATE notification stub |
+| T13 (S8 Forgejo merge) | US-022 §核心交付 1: S8_MERGE deterministic merge |
+| T14 (DI + unit tests) | US-022 §验收 A: cron dispatch ≥10 synthetic issues (test coverage) |
+| T15 (E2E validation) | US-022 §验收 A/B/C/D: end-to-end acceptance criteria |
+| T16 (m2-handoff + validator) | US-022 §验收 C: m2-handoff.yaml + validate-m2-handoff.py |
+| T17 (M2 Report + archive) | US-022 §验收 F: owner sign-off + Phase D closure |
+
+OD-5 6 项完整覆盖:
+- OD-5a (idempotency) → T3 guard + T5
+- OD-5b (timeout) → T3 S5_AWAIT + T4
+- OD-5c (forensic fields) → T4 + schema.sql
+- OD-5d (LLM cost tracking) → T8 + schema.sql
+- OD-5e (fallback tracking) → T8 + schema.sql
+- OD-5f (advisory lock) → T3.3 TickLock + T6
+
+### 九、Patches (per OD-4, T6 阶段实施)
 
 本 Spec 起草过程产出以下 3 个 patch (推到 T6 M2 Report 阶段, 与 m2-handoff.yaml 一同提交):
 
