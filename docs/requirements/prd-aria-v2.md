@@ -156,7 +156,7 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
 
 ### Must-have (v2.0 核心)
 
-#### 1. Layer 1 状态机 (9 states + S_FAIL)
+#### 1. Layer 1 状态机 (10 states + S_FAIL)
 
 ```yaml
 状态机:
