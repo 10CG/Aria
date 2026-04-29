@@ -472,12 +472,42 @@ T15      ─→ T16 (Report + handoff + patches)
 
 ## Status
 
-- [ ] **Phase A.1.1**: proposal.md 起草完成 (2026-04-28, 348 行)
-- [ ] **Phase A.1.2**: tasks.md 起草完成 (2026-04-28, 17 items 146h, 本文件)
-- [ ] **Phase A.1.3**: 3 patches 起草完成 (待用户 review 后启动)
-- [ ] **Phase A.2**: post_spec 审计 (待 owner 决策启动 / 跳过)
-- [ ] **Phase A.3**: Agent 分配 (本文件已含 Agent 主责字段, 后续可由 task-planner 微调)
+- [x] **Phase A.1.1**: proposal.md 起草完成 (2026-04-28, 348 行)
+- [x] **Phase A.1.2**: tasks.md 起草完成 (2026-04-28, 17 items 156h post-OD-8, 本文件)
+- [x] **Phase A.1.3**: 3 patches 起草完成 (patches/01-03)
+- [x] **Phase A.2**: post_spec 审计 完成 (2026-04-28, challenge mode 1 round, 3 agents PASS_WITH_WARNINGS, 2 critical fix + 13/14 important 闭合)
+- [x] **Phase A.3**: Agent 分配 (本文件含 Agent 主责字段, 实施期已用 backend-architect / ai-engineer / qa-engineer 3-agent team)
 - [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
+- [x] **Phase B.1**: feature 分支创建 (主仓 + aria-orchestrator submodule 同名)
+- [~] **Phase B.2**: 实施中 (13/17 tasks done, ~62.8% spec coverage, 163 tests passing 2026-04-29)
+- [ ] **Phase B.2 剩余**: T8.2-T8.3 silknode 真实集成 / T10.2-T10.4 LLM review 完整 / T15 E2E demo / T16 Report+handoff+Patch1 commit (~58h, 需 owner endpoint verify + dev 部署)
+- [ ] **Phase C**: 集成 (push 主仓 + submodule 到 origin + github / 创建 PR Forgejo + GitHub)
+- [ ] **Phase D**: 收尾 (UPM 更新 N/A for Aria, Spec 归档至 openspec/archive/)
+
+## Phase B.2 完成状态详细 (2026-04-29 closeout)
+
+| Task | 状态 | Commit |
+|------|------|--------|
+| T0 | ✅ Done (除 T0.1 owner) | fde643b |
+| T1.1-T1.7 | ✅ Done | fde643b + 6e9f2d7 |
+| T2.1 | ✅ Done | fde643b |
+| T2.2-T2.4 | ✅ Done | 2a8479e |
+| T3 | ✅ Done | a989da0 |
+| T4 | ✅ Done | e28491e |
+| T5 | ✅ Done | b92d54c |
+| T6 | ✅ Done | 257b9af |
+| T7 | ✅ Done | a142a30 |
+| T8.1 / T8.4 | ✅ Stub | 578f81e |
+| T8.2-T8.3 | ⏳ Pending | 需 silknode endpoint owner verify |
+| T9 | ✅ Schema | 578f81e |
+| T10.1 | ✅ Done | 578f81e |
+| T10.2-T10.4 | ⏳ Pending | 依赖 T8.2-T8.3 |
+| T11 | ✅ Done | 578f81e |
+| T12 | ✅ Done | 4d50d49 |
+| T13 | ✅ Done | 79081dd |
+| T14.1-T14.2 | ✅ Done | 578f81e |
+| T15 (含 T15.5) | ⏳ Pending (T15.5 占位 done) | 需 dev 部署 |
+| T16 | ⏳ Pending | 需 T15 完成数据填 handoff |
 
 ---
 
