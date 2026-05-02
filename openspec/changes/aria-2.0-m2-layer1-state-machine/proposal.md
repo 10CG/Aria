@@ -16,7 +16,9 @@
 > **Related**:
 >   - **前置 (硬门控)**: [US-021 / aria-2.0-m1-mvp](../../archive/2026-04-23-aria-2.0-m1-mvp/) — `e2e_demo_passed=true` (2026-04-23 已满足)
 >   - **后继**: US-023 (M3 双 provider + Crash recovery + Reconciler)
-> **Owner Decisions**: OD-1 (PRD 命名) / OD-2 (验收 B 弱形式) / OD-3 (silknode→GLM) / OD-4 (patch 推 A.1) / OD-5 (6 项 M2 必做) / OD-6 (单文件输出) / OD-7 (146h 裁 M2-15, **superseded by OD-8**) / **OD-8 = a (156h 新基线, 2026-04-28)**
+> **Owner Decisions**: OD-1 (PRD 命名) / OD-2 (验收 B 弱形式) / OD-3 (silknode→GLM) / OD-4 (patch 推 A.1) / OD-5 (6 项 M2 必做) / OD-6 (单文件输出) / OD-7 (146h 裁 M2-15, **superseded by OD-8**) / **OD-8 = a (156h 新基线, 2026-04-28)** / **OD-9 (silknode→Luxeno reframe, 2026-05-02)** / **OD-10 (T1 实施偏离 AD3 finding + 修复路径锁定 [A], 2026-05-02; AD-M2-7 回填)**
+
+> ⚠️ **OD-10 finding 2026-05-02**: T1 实施 (Phase B.2 startup) 的 aria-layer1 plugin 包结构偏离 AD3 Option C "pip entry-point" 路径 — 用了自创 `plugin.json` 格式而非 hermes 标准 `plugin.yaml` + `pyproject.toml` entry-point + `register(ctx)`。`_register_with_hermes_scheduler` 是 NotImplementedError dead code, T1.7 DEPLOYMENT.md 基于 docker / heavy-1 错误前提 (实际 hermes 以 raw_exec 跑在 light-1)。修复路径已锁定 Option A (严格修, 详见 [.aria/decisions/2026-05-02-od-10-...](../../../.aria/decisions/2026-05-02-od-10-t1-ad3-deviation-finding.md) + AD-M2-7 在 architecture-decisions.md)。214 unit tests pass 不能覆盖此偏移, 因为单元测试 mock 掉了 hermes 加载路径。T1.1 / T1.3 / T1.7 已 reopened; T1.2 / T1.4 / T1.5 / T1.6 (状态机内部逻辑) 保持 done。
 
 > **silknode contract 消费声明 (per silknode-integration-contract §Acceptance 第 1 项)**: 本 Spec verbatim 引用 silknode-integration-contract §契约 1 全文 (silknode-integration-contract proposal.md line 31-40, 见本 Spec §What 六 6.1), 满足该 Spec §Acceptance line 99 第一项 checkmark。S2_DECIDE / S3_BUILD_CMD / S6_REVIEW 三个 LLM 调用状态依此契约保证 no-storage 透传。
 
