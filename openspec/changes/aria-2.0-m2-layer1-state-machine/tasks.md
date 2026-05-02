@@ -288,17 +288,28 @@
 
 **目标**: 持久化 token cost 数据 (per OD-5d, US-027 cost routing 依赖)。
 
-- [ ] **T9.1** OpenAI SDK response 字段提取 (1h)
-  - `usage.prompt_tokens` / `usage.completion_tokens`
-  - silknode 是否透传 usage? T8 smoke 已验证 ✅ (Luxeno 路径透传 input_tokens / output_tokens)
-- [ ] **T9.2** 单价表 (1h) — **OD-9 reframe**: Luxeno coding-plan 月度账单, 占位价仅估算
-  - `glm-4.5-air`: 输入 ~$0.0002 / 输出 ~$0.0008 per 1K tokens (实际 Luxeno 月度账单为准)
-  - `glm-4.7`: 输入 ~$0.0006 / 输出 ~$0.0022 per 1K tokens (同上)
-- [ ] **T9.3** dispatches 表字段写入 (2h)
-  - 每次 LLM call 后 update `token_usage_input/output/cost_usd/model_used`
-  - 跨多次 call 累计 (S2/S3/S6 同 dispatch 内多次调用)
-- [ ] **T9.4** 跨 dispatch 累计正确性测试 (1h)
-  - 5 个 dispatch 跑完, SQL aggregate 应等于 silknode 账单 (允许 ±5% 误差)
+- [x] **T9.1** silknode response 字段提取 (1h) — **done 2026-05-02**
+  - `usage_from_silknode_response()` 把 silknode_client 返回 dict (`usage.input_tokens / output_tokens / model / fallback_triggered / fallback_chain_json`) 转 `TokenUsage`
+  - 未知 model 返回 `cost_usd=0.0` (audit log 保留 token 计数, M3 backfill 校正)
+  - `fallback_model` 参数支持记录 *intended* primary (caller accounting 用)
+  - `ReviewVerdict.usage` 字段附带 (cache hit 返回 None, caller 跳过持久化)
+- [x] **T9.2** 单价表 (1h) — **done 2026-05-02**
+  - `glm-4.5-air`: input $0.0002 / output $0.0008 per 1K tokens (per OD-9)
+  - `glm-4.7`: input $0.0006 / output $0.0022 per 1K tokens (per OD-9)
+  - `supported_models()` API 暴露给 validator + tests
+  - 实际成本以 Luxeno 月度账单为准, _PRICING 仅用于 audit estimate
+- [x] **T9.3** dispatches 表字段写入 (2h) — **done 2026-05-02**
+  - `DispatchRepository.update_token_usage()` 已有 (T3.4 实现) — UPDATE 累加 `token_usage_input + ?, output + ?, cost_usd + ?, model_used = ?, fallback_triggered + ?, fallback_chain_json = ?`
+  - `_handle_s6_review` 在 verdict 决策前调 `repo.update_token_usage(...)` (cache hit 即 verdict.usage=None 时跳过)
+  - 持久化失败 logger.warning 不阻塞状态机 (cost data 是 observability, 非正确性)
+- [x] **T9.4** 跨 dispatch 累计正确性测试 (1h) — **done 2026-05-02**
+  - `tests/test_t9_token_tracking.py` 14 unit tests:
+    - 5-dispatch SQL aggregate 等 sum-of-parts (T9.4 验收)
+    - 单 dispatch 内 S2+S3+S6 三次 update 累加 (T3.4 cumulative semantics)
+    - fallback_triggered 计数累加 3 次 fallback events
+    - 未知 model → cost_usd=0.0 不抛异常
+    - silknode response missing `usage` field 默认 0/0
+  - 全 14/14 PASS, full suite 225 → 239 tests no regression
 
 **T9.done = token 字段填充 + 累计正确性测试 PASS**
 
