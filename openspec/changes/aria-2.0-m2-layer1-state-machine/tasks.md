@@ -54,8 +54,17 @@
 - [ ] **T0.2** AD-M2-* 决议位 frontmatter 预留 (0.5h)
   - 在 `aria-orchestrator/docs/architecture-decisions.md` 新增 `## AD-M2-*` 占位段
   - 预留 6 个常见决议位 (provider 切换 / heartbeat 阈值 / cron 间隔 / fail_reason 演进 / S7 ack 触发 / handoff schema 演化)
-- [ ] **T0.3** brainstorm conclusion phase_a1_followup 7 项 cross-ref 验证 (0.5h)
+- [x] **T0.3** brainstorm conclusion phase_a1_followup 7 项 cross-ref 验证 (0.5h) — **done 2026-05-02**
   - grep 本 Spec proposal.md, 确认 R3-OBJ-3/4/5 + R3-OBJ-cm-1/2/3/4 全部可定位
+  - 验证结果 (e11b1c8 + 历史 commits 累积):
+    - R3-OBJ-3 (SCREAMING_SNAKE 约定偏离): 2 hit ✓ (line 已含 PRD §M2 状态命名约定偏离声明)
+    - R3-OBJ-4 (fallback log schema): 4 hit ✓ (fallback_triggered + trigger_reason + endpoint_from/to)
+    - R3-OBJ-5 (S7 block-until-PR-merge): 6 hit ✓ (S7_HUMAN_GATE 默认无 auto-pass)
+    - R3-OBJ-cm-1 (POC mapping + LoC +25%): 4 hit ✓ (§What 一 状态映射表)
+    - R3-OBJ-cm-2 (human = owner per AD-M0-9): 4 hit ✓
+    - R3-OBJ-cm-3 (prompt_path ≤ 128 KiB): 4 hit ✓ (line 105/229 hard cap)
+    - R3-OBJ-cm-4 (escalation matrix): 2 hit ✓ (line 187 §实施期 escalation matrix)
+  - 全部 7 项可 grep 定位; "Phase A.1 followup 7 项落地" checklist (proposal.md line 377) 全部可勾
 - [x] **T0.4** synthetic fixture 复用确认 (1h) — **done 2026-05-02**
   - 复用 M1 `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/`, 扩展 8 个 issue variants (DEMO-003~010) 用于 T15 ≥10 dispatches 验收
   - 起草于 `.aria/issues/DEMO-00{3..10}.yaml` + `README.md`
