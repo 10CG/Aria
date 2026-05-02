@@ -401,21 +401,19 @@
 
 **目标**: DI clock + alloc_status mock, fast-forward 60min cron 至毫秒级 (per qa R1 OBJ-7)。
 
-- [ ] **T14.1** DI 接口设计 (3h)
-  - `Clock` 接口: `now() -> datetime` (生产 = `datetime.utcnow()`, test = mock)
-  - `AllocStatusProvider` 接口: `get_status(alloc_id) -> str` (生产 = Nomad API, test = dict lookup)
-- [ ] **T14.2** 100+ unit tests (5h)
-  - 覆盖全部 transition (S0→S1, S1→S2, ..., S8→S9_CLOSE) 合法 + 非法
-  - 覆盖全部 timeout (S2/S3/S5/S6/S4/S8)
-  - 覆盖全部 9 fail_reason
-  - 覆盖 idempotency (S0/S4)
-  - 覆盖 advisory lock skip
-  - stdlib unittest (per M1 风格, 192 tests baseline)
-- [ ] **T14.3** fast-forward cron 测试 (2h)
-  - 测试内 60min cron 在 < 1s 内 simulate 多个 tick
-  - 验证 S5_AWAIT 跨 ≥3 tick 行为
+- [x] **T14.1** DI 接口设计 (3h) — **done 2026-04-29**
+  - `Clock` Protocol (`interfaces.py:112`) + `MockClock` / `AdvancingClock` test impls
+  - `AllocStatusProvider` Protocol (`interfaces.py:128`) + `FakeAllocStatusProvider` (dict lookup)
+  - `ProductionClock` (`interfaces.py:532`) for runtime use
+- [x] **T14.2** 100+ unit tests (5h) — **done 2026-05-02 (target exceeded by 2.4x)**
+  - **239 tests passing** (target was 100+) covering: full transition matrix (legal + illegal), 9 fail_reason values, S2/S3/S4/S5/S6/S8 timeouts, S0/S4 idempotency, advisory lock skip, T9 cumulative token tracking, T1 plugin loading integration
+  - stdlib `unittest` per M1 192 tests baseline; 6 skipped (4 pre-existing + 2 PyYAML-gated)
+- [x] **T14.3** fast-forward cron 测试 (2h) — **done 2026-04-29**
+  - `test_state_machine_skeleton.py:test_09_cron_tick_fast_forward_60min_in_under_1s`
+  - MockClock 推进 3 × 60min in `< 1s` real wall time (assertion enforced)
+  - S5_AWAIT 跨 ≥3 tick polling 验证 (test_t6_*)
 
-**T14.done = ≥ 100 unit tests + DI 接口完整 + fast-forward < 1s/cycle**
+**T14.done = ≥ 100 unit tests (239 actual) + DI 接口完整 + fast-forward < 1s/cycle ✅**
 
 ---
 
