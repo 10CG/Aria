@@ -535,8 +535,8 @@ T15      ─→ T16 (Report + handoff + patches)
 - [x] **Phase A.3**: Agent 分配 (本文件含 Agent 主责字段, 实施期已用 backend-architect / ai-engineer / qa-engineer 3-agent team)
 - [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
 - [x] **Phase B.1**: feature 分支创建 (主仓 + aria-orchestrator submodule 同名)
-- [~] **Phase B.2**: 实施中 (13/17 tasks done, ~62.8% spec coverage, 163 tests passing 2026-04-29)
-- [ ] **Phase B.2 剩余**: T8.2-T8.3 silknode 真实集成 / T10.2-T10.4 LLM review 完整 / T15 E2E demo / T16 Report+handoff+Patch1 commit (~58h, 需 owner endpoint verify + dev 部署)
+- [~] **Phase B.2**: AI-runnable scope **100% commit done** (T0~T14 + T16.1~T16.3 + AD-M2-1..7 backfill + README v0.2.0); 239 tests passing 2026-05-02
+- [ ] **Phase B.2 剩余 (owner-blocking only)**: T1.7 cluster deploy 5 步 (~1.5h owner) → T15 E2E demo (~12h, depends on T1.7) → T16.4 M2 Report + sign-off (~1h, depends on T15 metrics)
 - [ ] **Phase C**: 集成 (push 主仓 + submodule 到 origin + github / 创建 PR Forgejo + GitHub)
 - [ ] **Phase D**: 收尾 (UPM 更新 N/A for Aria, Spec 归档至 openspec/archive/)
 
