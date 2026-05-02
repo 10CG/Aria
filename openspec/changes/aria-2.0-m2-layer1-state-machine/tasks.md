@@ -83,18 +83,22 @@
 
 **目标**: 按 AD3 Option C "Extension-only, 0 hermes core 修改", 实现 Hermes Extension plugin 骨架, 复用 M0 Spike POC (286 LoC, 13/13 tests pass) 作为起点。
 
-- [~] **T1.1** Hermes Extension 工程 scaffold (4h) — **REOPENED 2026-05-02 per OD-10 / AD-M2-7**
+- [x] **T1.1** Hermes Extension 工程 scaffold (4h → +3h fix = 7h) — **REOPENED 2026-05-02 → DONE 2026-05-02 per OD-10 / AD-M2-7**
   - 按 hermes plugin 标准目录布局 (`hermes-extensions/aria-layer1/`)
-  - ~~`plugin.json`~~ → **`plugin.yaml`** + `__init__.py` (含 `register(ctx)`) + `pyproject.toml` (entry-point group `hermes_agent.plugins`) + `extension.py` + `requirements.txt`
-  - manifest 声明 lifecycle hooks: `on_session_start` (per R-AD3-2 缓解 MCP 动态刷新 race)
-  - **OD-10 finding**: T1.1 实施偏离 AD3 Option C (pip entry-point), 用了自创 plugin.json 格式; 必须重做为 hermes 标准 pip package
+  - ~~`plugin.json`~~ → **`plugin.yaml`** + `pyproject.toml` (entry-point group `hermes_agent.plugins` → `aria_layer1:register`)
+  - 源码移入 `aria_layer1/` Python 包 (15 modules, sibling imports → relative imports)
+  - `__init__.py` 重写为 `register(ctx)` 调 `ctx.register_hook("on_session_start", ...)`
+  - `plugin.yaml` 含 `hooks: [on_session_start]` (hermes_cli VALID_HOOKS 之一, 唯一可用 cron 注册路径)
+  - 225 tests (含 9 个 test_t1_plugin_loading_integration.py 真实 plugin 契约 test) PASS
 - [ ] **T1.2** 复用 M0 Spike POC 5 状态代码 (3h)
   - 从 `openspec/archive/2026-04-16-aria-2.0-m0-spike-hermes/poc-code/` 拉 286 LoC 起点
   - 重命名状态: PENDING → S0_IDLE, RUNNING → S4_LAUNCH+S5_AWAIT (拆分占位), SUCCESS → S9_CLOSE, FAILED → S_FAIL, TIMEOUT → S_FAIL with reason
-- [~] **T1.3** 60min cron tick 注册 (3h) — **REOPENED 2026-05-02 per OD-10 / AD-M2-7**
-  - Hermes scheduler API 注册 `aria_layer1_tick`, 间隔 60min
-  - 启动时刻可配 (默认对齐 UTC 整点)
-  - **OD-10 finding**: 实施期写为 `_register_with_hermes_scheduler() = NotImplementedError` dead-code stub (vendor liaison 假设错误); 必须替换为 `on_session_start` hook 内调 hermes cron API (`hermes cron create --command ... --interval 60m`)
+- [x] **T1.3** 60min cron tick 注册 (3h → +1h fix = 4h) — **REOPENED 2026-05-02 → DONE 2026-05-02 per OD-10 / AD-M2-7**
+  - `_register_with_hermes_scheduler` 重写为 subprocess `hermes cron create --id aria_layer1_tick --command "python -m aria_layer1.tick_runner ..." --interval 60m`
+  - 幂等: 命中 "already exists" / "duplicate" stderr → 视为成功
+  - 新增 `tick_runner.py` CLI shim (hermes cron 派生 fresh subprocess 调用)
+  - 单元测试覆盖三种路径: CLI 缺失 → FileNotFoundError / CLI 存在 → subprocess 调用 / "already exists" → 静默成功
+  - `on_session_start` 改为接 `context=None` 默认参数 (hermes hook 调用约定); FileNotFoundError 时仅 warn 不 crash hermes
 - [ ] **T1.4** Forgejo API client (issue list + label filter) (4h)
   - 复用 `forgejo` CLI wrapper (路径已知 `/home/dev/.npm-global/bin/forgejo`, per CLAUDE.md)
   - 支持 label-based filter (默认 `aria-auto`)
@@ -104,16 +108,17 @@
 - [ ] **T1.6** Extension 集成测试 (8h)
   - 启动 hermes + load extension, 触发 1 次手动 tick
   - 验证: tick handler 被调用, Forgejo API 可读 issue 列表, schema validator 拒绝 malformed issue
-- [~] **T1.7** Extension 部署到 dev (~~Aether `aria-build` heavy-1 节点~~, light-1 raw_exec) (5h → 1h after OD-10) — **REOPENED 2026-05-02 per OD-10 / AD-M2-7**
-  - ~~Nomad job 定义 (long-running service) + host volume 挂载 SQLite db~~
-  - **OD-10 reframe**: hermes 实际以 raw_exec driver 跑在 light_exec class 节点 (light-1, `/opt/aria-orchestrator/venv/bin/hermes gateway run`), 不是 docker; aria-orchestrator nomad job 已 running since 2026-04-08
-  - 修正后部署: pip install aria-layer1 到 `/opt/aria-orchestrator/venv` + 修改 aria-orchestrator job HCL 加 host volume mount (light-1: `aria-layer1-data`) + Nomad Variable LUXENO_API_KEY env
-  - 启动验证: `hermes plugins list` 含 enabled aria-layer1 + `hermes cron list` 含 `aria_layer1_tick` + 第一次 cron tick 在 60min 内触发
+- [~] **T1.7** Extension 部署到 dev (light-1 raw_exec) (5h → 1h after OD-10) — **REOPENED 2026-05-02; AI-runnable parts DONE 2026-05-02; owner-action remains**
+  - **AI 段 done**: DEPLOYMENT.md 重写 (light-1 / raw_exec / pip install / Nomad Variables) + HCL fragment + verify/rollback/troubleshooting 章节
+  - **Owner 段 (blocking T1.7 done)**: 5 步顺序 — (1) `pip install -e` 到 `/opt/aria-orchestrator/venv` (2) `nomad var put aria-orchestrator/secrets LUXENO_API_KEY=... ARIA_FEISHU_WEBHOOK_URL=...` (3) HCL 加 volume + template (4) `nomad job stop -purge && job run` (5) `hermes plugins list` + `hermes cron list` + 手动 `tick_runner` 验证
+  - 启动验证条件: `hermes plugins list` 含 enabled aria-layer1 + `hermes cron list` 含 `aria_layer1_tick` + 第一次 manual tick PASS
 
 **T1.done = Extension 在 dev 环境 long-running, 60min cron 自动触发, Forgejo issue 可读, schema validator 工作**
 
 > ⚠️ **2026-05-02 OD-10 / AD-M2-7 finding**: T1 子任务 T1.1 / T1.3 / T1.7 标 reopened — plugin 包结构偏离 AD3 Option C (pip entry-point), `_register_with_hermes_scheduler` 是 NotImplementedError dead code, DEPLOYMENT.md 基于 docker / heavy-1 错误前提。修复路径已锁定 Option A (严格修, +4-6h, T15.1 part 2 -4h, 净 0~+2h, OD-8 156h 容差内)。T1.done 重新声明条件: `hermes plugins list` 含 enabled aria-layer1 + `hermes cron list` 含 aria_layer1_tick + 单次手动 tick PASS。
 > T1.2 / T1.4 / T1.5 / T1.6 (状态机内部逻辑 + Forgejo / schema validator / payload guard) **保持 done**, 不受 plugin 包结构偏移影响。
+>
+> **2026-05-02 后续 fix progress**: T1.1 + T1.3 AI 段完成 (源码移 `aria_layer1/` 包, 7 sibling imports → relative, `register(ctx)` 重写, `_register_with_hermes_scheduler` 改 subprocess `hermes cron create`, `tick_runner.py` CLI shim, 9 个 plugin 加载 integration test 新增, 全 225 tests PASS); T1.7 AI 段完成 (DEPLOYMENT.md 重写 light-1 / raw_exec / pip install). T1.7 owner action 5 步 (pip install + Nomad Variable + HCL 改 + job restart + verify) 待执行才能 mark T1.done。
 
 ---
 
