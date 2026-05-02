@@ -229,21 +229,31 @@
 
 ## T8 — silknode 集成 (8h)
 
-**目标**: silknode OAI baseURL 调用 + AD-M0-8 主/fallback (air → flashx) + fallback log 字段。
+**目标**: LLM client + AD-M0-8 主/fallback + fallback log 字段。
 
-- [ ] **T8.1** OpenAI SDK 客户端配置 (2h)
-  - `base_url = "https://silknode.10cg.pub/v1"` (T0.5 确认 URL)
-  - `api_key` 来自 Hermes secret store (复用 M1 Nomad Variables 模式)
-- [ ] **T8.2** 主/fallback 切换逻辑 (3h)
-  - 主调用 `glm-4.7-air`; 5xx 持续 (SDK 内 3 次 expo backoff 后仍 fail) → 切 `glm-4.7-flashx`
+> **OD-9 reframe (2026-05-02 owner decision)**: T8 实施期发现 3 处 spec drift, 已对齐:
+> 1. **路由**: 不走 `silknode.10cg.pub` (CF Access 拦截 + gateway 内置 key 已过期). 改走 **`https://api.luxeno.ai/v1`** (Luxeno coding-plan 订阅, sk-silk-* key). 直配 `api.bigmodel.cn` 会触发 pay-per-token 计费 (owner 拒绝).
+> 2. **主模型**: `glm-4.7-air` **不存在** (智谱 4.7 系列只有 flash/flashx/旗舰). 改用 **`glm-4.5-air`** (M1 已实战, coding plan 内, thinking model 需 max_tokens ≥ 2000).
+> 3. **fallback 模型**: `glm-4.7-flashx` 改 **`glm-4.7`** (旗舰, coding plan 内, S6_REVIEW 高质量兜底; 4.7-flash RPM 限制风险高被排除).
+>
+> 文件名 `silknode_client.py` 保留 (Protocol naming + 历史兼容). 实施 commit + interfaces.py + DEPLOYMENT.md 已同步本 reframe.
+
+- [x] **T8.1** LLM 客户端配置 (2h)
+  - `base_url = "https://api.luxeno.ai/v1"` (env: `LUXENO_BASE_URL`)
+  - `api_key` from `LUXENO_API_KEY` env (本地 .env / 生产 Nomad Variables)
+- [x] **T8.2** 主/fallback 切换逻辑 (3h)
+  - 主调用 `glm-4.5-air`; 5xx/429/网络错误持续 (3 次 expo backoff 后仍 fail) → 切 `glm-4.7`
   - fallback 切换记录 `fallback_chain_json` 字段 (per OD-5e schema 完整)
-- [ ] **T8.3** silknode 真实调用 smoke (2h)
-  - dev 环境跑 1 次完整 dispatch, 验证 silknode 收到调用 (silknode 日志可见 metric-level meta, 不见 payload — 验证契约 1 no-storage)
+  - User-Agent header 必填 (Cloudflare 1010 防御 — Python-urllib UA 被 block)
+- [x] **T8.3** 真实调用 smoke (2h)
+  - dev 环境真实调用 PASS: `glm-4.5-air` HTTP 200 / latency ~5s / output 'PASS' / fallback_chain `["glm-4.5-air:ok"]`
+  - fallback 路径验证: bogus model → 400 → fallback to glm-4.5-air → `["glm-bogus:fail:http_400", "glm-4.5-air:ok"]`
+  - Luxeno 透传 usage 字段 (input_tokens / output_tokens), 无需 tiktoken 估算
 - [ ] **T8.4** Aria 客户端 secrets/PII lint rule (1h)
   - 静态 lint: prompt 模板不含 `<secret>` / `<api_key>` / 已知 PII pattern
   - 命中 → CI fail
 
-**T8.done = silknode 真实调用 PASS + fallback 切换 unit test + lint rule 生效 + 契约 1 metric-level 日志验证**
+**T8.done = LLM 真实调用 PASS + fallback 切换 unit test (15/15) + lint rule 生效 + Luxeno 路由 doc 化**
 
 ---
 
@@ -253,10 +263,10 @@
 
 - [ ] **T9.1** OpenAI SDK response 字段提取 (1h)
   - `usage.prompt_tokens` / `usage.completion_tokens`
-  - silknode 是否透传 usage? T8 smoke 时验证, 不透传则 fallback 估算 (token count + 单价)
-- [ ] **T9.2** 单价表 (1h)
-  - `glm-4.7-air`: 输入 / 输出 USD per 1K tokens (实际 silknode 账单价, T0.5 owner 提供)
-  - `glm-4.7-flashx`: 同上
+  - silknode 是否透传 usage? T8 smoke 已验证 ✅ (Luxeno 路径透传 input_tokens / output_tokens)
+- [ ] **T9.2** 单价表 (1h) — **OD-9 reframe**: Luxeno coding-plan 月度账单, 占位价仅估算
+  - `glm-4.5-air`: 输入 ~$0.0002 / 输出 ~$0.0008 per 1K tokens (实际 Luxeno 月度账单为准)
+  - `glm-4.7`: 输入 ~$0.0006 / 输出 ~$0.0022 per 1K tokens (同上)
 - [ ] **T9.3** dispatches 表字段写入 (2h)
   - 每次 LLM call 后 update `token_usage_input/output/cost_usd/model_used`
   - 跨多次 call 累计 (S2/S3/S6 同 dispatch 内多次调用)
@@ -497,8 +507,8 @@ T15      ─→ T16 (Report + handoff + patches)
 | T5 | ✅ Done | b92d54c |
 | T6 | ✅ Done | 257b9af |
 | T7 | ✅ Done | a142a30 |
-| T8.1 / T8.4 | ✅ Stub | 578f81e |
-| T8.2-T8.3 | ⏳ Pending | 需 silknode endpoint owner verify |
+| T8.1 / T8.2 / T8.3 | ✅ Done (OD-9 reframe to Luxeno + glm-4.5-air/glm-4.7) | 578f81e + (this commit) |
+| T8.4 | ✅ Stub | 578f81e (lint rule pending) |
 | T9 | ✅ Schema | 578f81e |
 | T10.1 | ✅ Done | 578f81e |
 | T10.2-T10.4 | ⏳ Pending | 依赖 T8.2-T8.3 |

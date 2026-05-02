@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS dispatches (
   token_usage_input     INTEGER DEFAULT 0,
   token_usage_output    INTEGER DEFAULT 0,
   token_cost_usd        REAL DEFAULT 0.0,
-  model_used            TEXT,             -- 实际命中的 model (glm-4.7-air | glm-4.7-flashx)
+  model_used            TEXT,             -- 实际命中的 model (glm-4.5-air | glm-4.7) — OD-9 reframe 2026-05-02
 
   -- S7 人类门控通知 (F3 fix: 原 SQL 缺失此字段; schema.sql 已含, 本文档补齐)
   -- notification_status: Feishu webhook HTTP 响应码或错误字符串
@@ -155,16 +155,19 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 - `partial_write`: M2 监控路径 — 状态 transition 中途写入中断 (M2-15 mitigation brainstorm 引用; M3-2 完整 crash recovery 实施)
 - `other`: 兜底未分类
 
-**fallback_chain_json 字段 schema (per Phase A.1 followup R3-OBJ-4)**:
+**fallback_chain_json 字段 schema (per Phase A.1 followup R3-OBJ-4; OD-9 reframe 2026-05-02 model names)**:
+
+注: T8 实施时简化为 `["{model}:ok"|"{model}:fail:{reason}", ...]` 字符串数组 (compact form, audit log 友好). 完整对象形式保留为可选扩展, 当前实现取 compact form。
+
 ```json
 [
   {
-    "model": "glm-4.7-air",
+    "model": "glm-4.5-air",
     "trigger_reason": "primary_fail_429",
     "latency_ms": 1234,
-    "endpoint_from": "silknode-oai/v1/chat/completions",
-    "endpoint_to": "silknode-oai/v1/chat/completions",
-    "model_switched_to": "glm-4.7-flashx"
+    "endpoint_from": "luxeno-oai/v1/chat/completions",
+    "endpoint_to": "luxeno-oai/v1/chat/completions",
+    "model_switched_to": "glm-4.7"
   }
 ]
 ```
@@ -214,11 +217,12 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 > - **允许**: 指标级 meta 日志 (请求次数 / 延迟 / 错误码), 前提是不含 request/response payload 内容
 > - **可追溯**: 若 silknode 新增任何落地行为, **必须**触发 r1-legal-memo v1.1 失效条件, 重新评估 IS-3/IS-4 并更新 Memo 至 v2.0+
 
-**消费规则 (M2 实施期)**:
-- M2 LLM 调用 (S2/S3/S6) 100% 经 silknode OAI baseURL `https://silknode.10cg.pub/v1/chat/completions` (**T0.5 状态**: 假设 baseURL = `https://silknode.10cg.pub/v1`, 与 M1 Luxeno 实战配置一致; owner 后续验证, 若不符以 Nomad Variable `SILKNODE_BASE_URL` 覆盖, 不改代码), 不直连 Anthropic API / 智谱 API
-- 主 model: `glm-4.7-air`; fallback model: `glm-4.7-flashx` (continues AD-M0-8)
+**消费规则 (M2 实施期, OD-9 reframe 2026-05-02)**:
+- M2 LLM 调用 (S2/S3/S6) 100% 经 **Luxeno OAI baseURL** `https://api.luxeno.ai/v1/chat/completions` (env: `LUXENO_BASE_URL`, key: `LUXENO_API_KEY`). **不**走 silknode-gateway (Portkey, 内置 key 已过期 + caller 仍需自带 key), **不**直连 `api.bigmodel.cn` (会触发 pay-per-token 计费). Luxeno 是 silknode 项目的运营品牌 (10CG 自有, R1 Legal Memo IS-3 cover), 走 coding-plan 订阅。
+- 主 model: **`glm-4.5-air`** (M1 已实战, thinking model, 需 max_tokens ≥ 2000); fallback model: **`glm-4.7`** (旗舰, S6_REVIEW 高质量兜底). 排除 `glm-4.7-flash` (RPM 限制风险) 与 `glm-4.7-air` (不存在). 与 AD-M0-8 主/fallback 非对称设计意图一致 (主便宜稳定 / fallback 高质量).
 - Aria 客户端 SHOULD NOT 在 prompt 内 inline secrets/PII (T2 静态 lint rule 检查)
-- S6_REVIEW 同一 dispatch_id 内 review prompt hash 命中可复用 cache (Aria 侧, 非 silknode 侧), 跨 dispatch 不复用
+- HTTP client 必带 `User-Agent: aria-orchestrator/...` header (Cloudflare 1010 防御 — 默认 Python-urllib UA 被 block)
+- S6_REVIEW 同一 dispatch_id 内 review prompt hash 命中可复用 cache (Aria 侧), 跨 dispatch 不复用
 
 #### 6.2 Nomad meta 边界 (R7 / T2.4 hard cap)
 
