@@ -249,9 +249,11 @@
   - dev 环境真实调用 PASS: `glm-4.5-air` HTTP 200 / latency ~5s / output 'PASS' / fallback_chain `["glm-4.5-air:ok"]`
   - fallback 路径验证: bogus model → 400 → fallback to glm-4.5-air → `["glm-bogus:fail:http_400", "glm-4.5-air:ok"]`
   - Luxeno 透传 usage 字段 (input_tokens / output_tokens), 无需 tiktoken 估算
-- [ ] **T8.4** Aria 客户端 secrets/PII lint rule (1h)
-  - 静态 lint: prompt 模板不含 `<secret>` / `<api_key>` / 已知 PII pattern
-  - 命中 → CI fail
+- [x] **T8.4** Aria 客户端 secrets/PII lint rule (1h) — `lint_prompt.py` + CLI + 15 tests
+  - 静态 lint: prompt 模板不含 `<secret>` / `<api_key>` / Bearer token / password= / CN 身份证 / 邮箱 / CN 手机号
+  - CI gate: `python -m lint_prompt prompts/` exit 1 on violations (GitHub/Forgejo Actions annotation 格式)
+  - Runtime warn-only: review_caller 调用前 lint, 命中 → log warning (defensive, 不阻塞)
+  - 实测 prompts/s6_review.md clean (CLI exit 0)
 
 **T8.done = LLM 真实调用 PASS + fallback 切换 unit test (15/15) + lint rule 生效 + Luxeno 路由 doc 化**
 
@@ -513,7 +515,7 @@ T15      ─→ T16 (Report + handoff + patches)
 | T6 | ✅ Done | 257b9af |
 | T7 | ✅ Done | a142a30 |
 | T8.1 / T8.2 / T8.3 | ✅ Done (OD-9 reframe to Luxeno + glm-4.5-air/glm-4.7) | e78a259 |
-| T8.4 | ✅ Stub | 578f81e (lint rule pending) |
+| T8.4 | ✅ Done (CLI gate + runtime warn + 15 tests) | (this commit) |
 | T10.1 / T10.2 / T10.3 / T10.4 | ✅ Done (live accuracy 83.3% ≥ 80%) | (this commit) |
 | T9 | ✅ Schema | 578f81e |
 | T10.1 | ✅ Done | 578f81e |
