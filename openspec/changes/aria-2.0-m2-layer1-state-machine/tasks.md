@@ -438,12 +438,17 @@
 
 **目标**: 收尾产物, 准入 US-023 (M3) 起草。
 
-- [ ] **T16.1** m2-handoff.yaml v1.0 起草 (2h)
-  - additive-only on m1-handoff.yaml v1.0
-  - 新增段 `m2_dispatches/*` (state machine metrics 聚合, 含 ≥10 dispatch 全部数据)
-  - 字段: `total_dispatches / success_count / fail_count / fail_reason_breakdown / avg_p50_duration / token_cost_total / fallback_trigger_count`
-- [ ] **T16.2** validate-m2-handoff.py 脚本 (1h)
-  - 复用 M1 validator 模式 (`validate-m1-handoff.py`)
+- [x] **T16.1** m2-handoff.yaml v1.0 起草 (2h) — **schema done 2026-05-02; T15 metrics + signoffs pending**
+  - additive-only on m1-handoff.yaml v1.0 (per AD-M1-7)
+  - 17 段 schema: m2 timestamps / state_machine / hermes_extension / llm_provider / persistence / m2_dispatches / performance_vs_m1 / m2_acceptance / ad_m2_decisions / owner_decisions / test_baseline / open_issues_for_m3 / m1_carryover_status / legal_assumptions / signoffs / decisions / patches_applied
+  - T15 metrics 字段全部留 `<pending T15>` 占位 (validator 接受占位 in draft mode)
+  - signoffs 留 `<pending signoff>` 占位 (validator 强制: go_decision 非 placeholder 时必须填)
+  - 文件: `aria-orchestrator/docs/m2-handoff.yaml`
+- [x] **T16.2** validate-m2-handoff.py 脚本 (1h) — **done 2026-05-02**
+  - 复用 M1 validator 模式 (`validate-m1-handoff.py`); stdlib only, no PyYAML 依赖
+  - 9 项 schema 检查: required fields / schema_version=1.0 / go_decision enum / state_machine.total_states=10 / fail_reason_enum 9 values exhaustive / hermes_extension.manifest_format='plugin.yaml' (per AD-M2-7) / llm_provider.base_url=Luxeno (per OD-9) / acceptance_a >=10 / ratio_threshold=1.5 / final-state signoffs required
+  - 12 unit tests in `test_validate_m2_handoff.py` (含 actual repo handoff PASS test 防 schema 漂移)
+  - 文件: `aria-orchestrator/docs/validate-m2-handoff.py`
 - [x] **T16.3** 3 patches commit + merge + tech-lead 复核 (2h) — **done 2026-05-02**
   - **Patch 1**: AD5 (`aria-orchestrator/docs/architecture-decisions.md` line 399 + 451-453) — applied in aria-orchestrator commit `4302fcc` (2026-05-02, 5 spots: 标题/决策/背景/Option A cross-ref/风险+回滚)
   - **Patch 2**: PRD (`docs/requirements/prd-aria-v2.md` §M2 line 159 标题) — applied in `fde643b` (Phase B.1+B.2 startup, 2026-04-28)
