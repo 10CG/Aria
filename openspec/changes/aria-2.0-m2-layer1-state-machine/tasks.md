@@ -419,11 +419,11 @@
   - 字段: `total_dispatches / success_count / fail_count / fail_reason_breakdown / avg_p50_duration / token_cost_total / fallback_trigger_count`
 - [ ] **T16.2** validate-m2-handoff.py 脚本 (1h)
   - 复用 M1 validator 模式 (`validate-m1-handoff.py`)
-- [ ] **T16.3** 3 patches commit + merge + tech-lead 复核 (2h)
-  - **Patch 1**: AD5 (`aria-orchestrator/docs/architecture-decisions.md` line 399 + 451-453)
-  - **Patch 2**: PRD (`docs/requirements/prd-aria-v2.md` §M2 line 159 标题)
-  - **Patch 3**: US-022 (`docs/requirements/user-stories/US-022.md` line 78 验收 B + line 87 §不在范围)
-  - **注**: patch 内容已在 Phase A.1.3 起草完成 (per OD-4), T16.3 仅做最终 commit + merge + tech-lead 复核
+- [x] **T16.3** 3 patches commit + merge + tech-lead 复核 (2h) — **done 2026-05-02**
+  - **Patch 1**: AD5 (`aria-orchestrator/docs/architecture-decisions.md` line 399 + 451-453) — applied in aria-orchestrator commit `4302fcc` (2026-05-02, 5 spots: 标题/决策/背景/Option A cross-ref/风险+回滚)
+  - **Patch 2**: PRD (`docs/requirements/prd-aria-v2.md` §M2 line 159 标题) — applied in `fde643b` (Phase B.1+B.2 startup, 2026-04-28)
+  - **Patch 3**: US-022 (`docs/requirements/user-stories/US-022.md` line 78 验收 B + line 87 §不在范围) — applied in `fde643b` (Phase B.1+B.2 startup, 2026-04-28)
+  - **注**: patch 内容已在 Phase A.1.3 起草完成 (per OD-4); Patches 2/3 已在 B.1+B.2 startup 一并 commit, Patch 1 在 T16.3 收尾 commit; tech-lead 复核与 T16.4 M2 Report 同期 co-sign
 - [ ] **T16.4** M2 Report (`docs/m2-report.md`) (1h)
   - 简洁报告 (M1 风格): go_decision / e2e_passed / metrics / lessons learned / handoff link
   - tech-lead co-sign 字段
