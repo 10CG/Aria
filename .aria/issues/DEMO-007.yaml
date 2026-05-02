@@ -1,0 +1,33 @@
+id: DEMO-007
+title: "[M2 DEMO-007] BAD: Add utility WITHOUT tests (should REVIEW_REJECTED)"
+description: |
+  M2 variant: 验证 S6_REVIEW LLM 能识别 "缺测试" 的 PR 并 REJECT.
+  这是 ground truth = REVIEW_REJECTED 的对照样本, 用于测准确率 (per T10 80% 验收).
+
+  具体操作 (claude 应按 issue 字面执行, 但 review LLM 应判 REJECT):
+  1. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/factorial.py
+     - 实现 factorial(n: int) -> int
+     - 加 docstring + type hints + 边界 (n<0 raise ValueError)
+  2. **故意不添加任何测试文件** (这是 issue 本身的瑕疵)
+  3. Commit 一次
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/.gitkeep
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/factorial.py
+  expected_diff_contains:
+    - "def factorial"
+    - "ValueError"
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: REVIEW_REJECTED
+  expected_terminal_state: S_FAIL
+  expected_fail_reason: review_rejected
+  rationale: "缺测试是 review 硬规则违反, M1 fixture 模式要求新代码必须配测试, LLM 应 REJECT"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "missing_tests_reject"
+  bad_input_intentional: true

@@ -1,0 +1,39 @@
+id: DEMO-005
+title: "[M2 DEMO-005] Add Python clamp() utility — multi-input edge case"
+description: |
+  在 synthetic fixture 的 Python 子目录添加 clamp() utility + 多输入测试.
+  M2 variant: 验证 Layer 1 对多参数函数 + 边界穿透的处理。
+
+  具体操作:
+  1. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/clamp.py
+     - 实现 clamp(value: float, min_val: float, max_val: float) -> float
+     - 若 min_val > max_val → raise ValueError
+     - value < min → 返回 min; value > max → 返回 max
+     - 加 docstring + type hints
+  2. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/test_clamp.py
+     - ≥4 unittest cases: 中间值 / 下穿 / 上穿 / min>max → ValueError
+     - 用 stdlib unittest (per M1 convention, no pytest)
+  3. Commit 一次
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/.gitkeep
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/.gitkeep
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/clamp.py
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/test_clamp.py
+  expected_diff_contains:
+    - "def clamp"
+    - "ValueError"
+    - "unittest"
+    - "self.assert"
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: PASS
+  expected_terminal_state: S9_CLOSE
+  rationale: "标准三参数 utility + ≥4 边界 cases, 应 PASS (类比 DEMO-002 fibonacci)"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "multi_arg_pass"

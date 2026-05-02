@@ -56,8 +56,12 @@
   - 预留 6 个常见决议位 (provider 切换 / heartbeat 阈值 / cron 间隔 / fail_reason 演进 / S7 ack 触发 / handoff schema 演化)
 - [ ] **T0.3** brainstorm conclusion phase_a1_followup 7 项 cross-ref 验证 (0.5h)
   - grep 本 Spec proposal.md, 确认 R3-OBJ-3/4/5 + R3-OBJ-cm-1/2/3/4 全部可定位
-- [ ] **T0.4** synthetic fixture 复用确认 (1h)
+- [x] **T0.4** synthetic fixture 复用确认 (1h) — **done 2026-05-02**
   - 复用 M1 `aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/`, 扩展 8 个 issue variants (DEMO-003~010) 用于 T15 ≥10 dispatches 验收
+  - 起草于 `.aria/issues/DEMO-00{3..10}.yaml` + `README.md`
+  - 7/8 PASS-variant 通过 M1 validator; DEMO-009 故意 schema-invalid (ground truth NOT_REACHED, S1_SCAN 测)
+  - Coverage: 6 PASS / 2 REVIEW_REJECTED / 1 SCHEMA_FAIL / 1 idempotency replica
+  - T10 准确率验收用 9 issues (DEMO-009 除外不到 review)
 - [ ] **T0.5** silknode endpoint 确认 (0.5h)
   - 与 silknode owner (= 本 owner per AD-M0-9) 确认 OAI baseURL: `https://silknode.10cg.pub/v1` 还是其他
   - 确认 GLM-air / flashx 配置在该 endpoint 已就绪 (M1 实战已用过, 大概率 yes)
