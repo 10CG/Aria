@@ -108,10 +108,17 @@
 - [ ] **T1.6** Extension 集成测试 (8h)
   - 启动 hermes + load extension, 触发 1 次手动 tick
   - 验证: tick handler 被调用, Forgejo API 可读 issue 列表, schema validator 拒绝 malformed issue
-- [~] **T1.7** Extension 部署到 dev (light-1 raw_exec) (5h → 1h after OD-10) — **REOPENED 2026-05-02; AI-runnable parts DONE 2026-05-02; owner-action remains**
-  - **AI 段 done**: DEPLOYMENT.md 重写 (light-1 / raw_exec / pip install / Nomad Variables) + HCL fragment + verify/rollback/troubleshooting 章节
-  - **Owner 段 (blocking T1.7 done)**: 5 步顺序 — (1) `pip install -e` 到 `/opt/aria-orchestrator/venv` (2) `nomad var put aria-orchestrator/secrets LUXENO_API_KEY=... ARIA_FEISHU_WEBHOOK_URL=...` (3) HCL 加 volume + template (4) `nomad job stop -purge && job run` (5) `hermes plugins list` + `hermes cron list` + 手动 `tick_runner` 验证
-  - 启动验证条件: `hermes plugins list` 含 enabled aria-layer1 + `hermes cron list` 含 `aria_layer1_tick` + 第一次 manual tick PASS
+- [x] **T1.7** Extension 部署到 dev (light-1 raw_exec) — **DONE 2026-05-03 (started 2026-05-02 evening)**
+  - 部署形态修订 (per AD-M2-8 2026-05-03): cron 调度从 hermes cron 迁到 Nomad periodic job (`aria-orchestrator/deploy/aria-layer1-cron.nomad.hcl`); hermes 仍 host plugin 但不调度 cron
+  - **5 个 latent bugs caught + fixed during deploy**:
+    1. plugin.yaml `requires_env` 4/6 名错配 runtime source (commit 88dc975c)
+    2. HCL nomadVar path `aria-orchestrator/secrets` 撞 workload identity ACL → `nomad/jobs/aria-orchestrator` (cdfb7d4)
+    3. raw_exec driver 不支持 nomad host_volume 声明 → 删 mount, env 直接绝对路径 (4fbee9b)
+    4. `_get_repo()` 缺 schema bootstrap → fresh DB 拒 SELECT → executescript schema.sql 自动 init (e8bb95f, +3 regression tests)
+    5. hermes cron CLI 契约 (LLM-prompt + skill, 不接 `python -m`) + on_session_start 仅 first-chat 触发 → AD-M2-8 pivot Nomad periodic (7545c87)
+  - **验证**: `aether dev run aria-layer1-cron` PASS + `POST /periodic/force` PASS + child alloc Exit Code 0 + stdout `{"processed": 0, "skipped": 0, "failed": 0}` + dispatches.db (49KB) + hermes-tick.lock 持久化
+  - **资产产出**: 2 HCL 文件 (light + cron) + 1 decision file (.aria/decisions/2026-05-02-ad-m2-8-nomad-periodic-cron-pivot.md)
+  - **Tests**: 242 PASS (was 239 before T1.7 fixes; +3 schema regression guards)
 
 **T1.done = Extension 在 dev 环境 long-running, 60min cron 自动触发, Forgejo issue 可读, schema validator 工作**
 
@@ -421,16 +428,22 @@
 
 **目标**: 验收 A (≥10 自动 dispatch) + 验收 D (perf ≤ M1 × 1.5)。
 
-- [ ] **T15.1** dev 环境完整部署 (2h)
-  - hermes + extension up, SQLite db 初始化, silknode 配置就位
-- [ ] **T15.2** 10 个 synthetic issue 注入 Forgejo (2h)
-  - DEMO-001/002 (M1 复用) + DEMO-003~010 (T0.4 新增 8 个 variants)
-  - label `aria-auto` 触发 cron tick filter
-- [ ] **T15.3** 实测 ≥3 个 cron tick 全程 (3h)
-  - 第一 tick scan + dispatch 部分 issue
-  - 第二 tick poll S5_AWAIT, 处理 S6/S7/S8
-  - 第三 tick close 剩余
-  - 全程不需 owner 介入 (除 S7 PR merge)
+- [x] **T15.1** dev 环境完整部署 (2h) — **DONE 2026-05-03 (with T1.7)**
+  - hermes (aria-orchestrator service) + aria-layer1 plugin loaded ✓
+  - aria-layer1-cron periodic job deployed via `aether dev run` ✓
+  - SQLite dispatches.db auto-init verified at host volume `/opt/aether-volumes/aria-layer1/data/` ✓
+  - silknode/Luxeno endpoint reachable (LUXENO_API_KEY in nomad/jobs/aria-orchestrator) ✓
+  - One forced periodic tick PASS (child alloc periodic-1777750379 exit 0)
+- [~] **T15.2** 10 个 synthetic issue 注入 Forgejo (2h) — **PARTIAL 2026-05-03**
+  - inject-demo-issues.py 脚本就位 (10 fixtures dry-run PASS)
+  - DEMO-001 single-injection smoke ✓ (Forgejo issue #62, internal id 705)
+  - **5 latent bugs caught + fixed during smoke** (commits 6eb2a83 / 271a999 / 8647315 + 2 owner-side: PAT scope expansion + Nomad var copy)
+  - 剩余 9 issues 注入 deferred 到 T7 production wiring 完成后 (S4_LAUNCH stub 阻塞)
+- [~] **T15.3** 实测 ≥3 个 cron tick 全程 (3h) — **PARTIAL 2026-05-03 (4 ticks recorded)**
+  - **State machine 实证推进 4 步**: S0_IDLE (Phase 1 seed) → S1_SCAN (eligible) → S2_DECIDE (LLM, ~12s wall) → S3_BUILD_CMD → (S4 阻塞)
+  - issue 705 (Forgejo #62) live trajectory 在 dispatches.db 可观测
+  - **S4_LAUNCH 撞 NomadDispatchClientStub.dispatch NotImplementedError** (T7 production wiring deferred 不在 T15.3 scope)
+  - ≥10 dispatch 全 cycle 待 T7 production HTTP dispatch 实现后才能验收
 - [ ] **T15.4** Performance metrics 收集 (3h)
   - 单 issue dispatch 总时长 (S0 → S9_CLOSE 或 S_FAIL)
   - LLM call cumulative latency
@@ -535,8 +548,9 @@ T15      ─→ T16 (Report + handoff + patches)
 - [x] **Phase A.3**: Agent 分配 (本文件含 Agent 主责字段, 实施期已用 backend-architect / ai-engineer / qa-engineer 3-agent team)
 - [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
 - [x] **Phase B.1**: feature 分支创建 (主仓 + aria-orchestrator submodule 同名)
-- [~] **Phase B.2**: AI-runnable scope **100% commit done** (T0~T14 + T16.1~T16.3 + AD-M2-1..7 backfill + README v0.2.0); 239 tests passing 2026-05-02
-- [ ] **Phase B.2 剩余 (owner-blocking only)**: T1.7 cluster deploy 5 步 (~1.5h owner) → T15 E2E demo (~12h, depends on T1.7) → T16.4 M2 Report + sign-off (~1h, depends on T15 metrics)
+- [~] **Phase B.2**: AI-runnable scope **100% commit done** (T0~T14 + T16.1~T16.3 + T1.7 + T15.1 + T15.2/T15.3 partial + AD-M2-1..8 + README v0.2.0); **247 tests passing 2026-05-03** (+8 regression guards: 3 schema + 5 Phase 1 scan-and-seed)
+- [ ] **Phase B.2 剩余**: T7 production wiring (NomadDispatchClient HTTP, ~2-4h, owner decision) → T15.3 完整 + T15.4-T15.5 (~7h after T7) → T16.4 M2 Report + sign-off (~1h)
+- [~] **2026-05-03 session 10 latent bugs caught & fixed**: see `.aria/decisions/2026-05-03-t1-7-t15-2-deploy-debugging.md` for full catalog
 - [ ] **Phase C**: 集成 (push 主仓 + submodule 到 origin + github / 创建 PR Forgejo + GitHub)
 - [ ] **Phase D**: 收尾 (UPM 更新 N/A for Aria, Spec 归档至 openspec/archive/)
 
