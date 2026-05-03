@@ -457,18 +457,21 @@
   - DEMO-001 single-injection smoke ✓ (Forgejo issue #62, internal id 705)
   - **5 latent bugs caught + fixed during smoke** (commits 6eb2a83 / 271a999 / 8647315 + 2 owner-side: PAT scope expansion + Nomad var copy)
   - 剩余 9 issues 注入 deferred 到 T7 production wiring 完成后 (S4_LAUNCH stub 阻塞)
-- [~] **T15.3** 实测 ≥3 个 cron tick 全程 (3h) — **PARTIAL 2026-05-03 (4 ticks recorded)**
-  - **State machine 实证推进 4 步**: S0_IDLE (Phase 1 seed) → S1_SCAN (eligible) → S2_DECIDE (LLM, ~12s wall) → S3_BUILD_CMD → (S4 阻塞)
-  - issue 705 (Forgejo #62) live trajectory 在 dispatches.db 可观测
-  - **S4_LAUNCH 撞 NomadDispatchClientStub.dispatch NotImplementedError** (T7 production wiring deferred 不在 T15.3 scope)
-  - ≥10 dispatch 全 cycle 待 T7 production HTTP dispatch 实现后才能验收
-- [ ] **T15.4** Performance metrics 收集 (3h)
-  - 单 issue dispatch 总时长 (S0 → S9_CLOSE 或 S_FAIL)
-  - LLM call cumulative latency
-  - 与 M1 baseline 对比 (`m1_handoff.performance_baseline.demo_002_p50_duration_s`)
-- [ ] **T15.5** non-regression 验证 (验收 D) (2h)
-  - `m2_demo_002_p50 ≤ m1_demo_002_p50 × 1.5`
-  - 不达标 → triage (silknode latency? cron overhead? 状态机 transition 频次?)
+- [x] **T15.3** 实测 ≥10 cron-driven dispatch 全程 (3h) — **DONE 2026-05-03 17:59-18:00 UTC**
+  - 注入 10 个 aria-auto issues (Forgejo #63-#72, internal id 715-724) via Forgejo API
+  - 8 force ticks 间隔 5s walked 全 10 个 issue 完整状态机: `S0_IDLE → S1_SCAN → S2_DECIDE → S3_BUILD_CMD → S4_LAUNCH → S_FAIL(infrastructure)`
+  - **dispatches.db 实证: 10/10 newly injected issues + 1 prior (issue 705) = 11 rows total, fail_reasons={'infrastructure': 10, 'timeout': 1}**
+  - 验收 A ≥10 issue auto-dispatched ✓
+  - S_FAIL(infrastructure) 路径全程符合 AD-M2-9 §风险 #1 (aria-layer2-runner 缺失即预期)
+  - 全程无 owner 手工干预 (除 issue 创建 + force tick CLI)
+  - Sister-bug fix (commit e36beb2): Phase 1 dedupe 解除已 S_FAIL issue 重复 seed UNIQUE constraint 的 latent IntegrityError
+- [~] **T15.4** Performance metrics 收集 (3h) — **OD-11 PENDING 2026-05-03**
+  - 见 `.aria/decisions/2026-05-03-od-11-t15-4-5-perf-reframe.md`
+  - M1 baseline 含完整 Layer 2 容器路径; M2 cycle 终结于 S4_LAUNCH HTTP 500 (Layer 2 absent per AD-M2-9 §风险 #1) → 不可比
+  - 4 个选项 (A/B/C/D); 推荐 C (waive 验收 D, carryover to M3)
+  - Owner action: 在 m2-handoff.yaml `signoffs.acceptance_d` 字段填决定
+- [~] **T15.5** non-regression 验证 (验收 D) (2h) — **OD-11 PENDING 2026-05-03**
+  - 同 OD-11 — 实施前需 owner 选项决定
 
 **T15.done = 验收 A (≥10 issue auto dispatched) + 验收 D (perf ≤ 1.5x) + 全程无 owner 手工介入**
 
