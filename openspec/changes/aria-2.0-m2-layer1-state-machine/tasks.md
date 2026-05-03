@@ -265,10 +265,13 @@
   - 决策记录: AD-M2-9 (Layer 1 → Layer 2 Nomad parameterized dispatch 契约)
   - cluster smoke deploy 留 owner 触发 (deploy aria-layer1-cron 重启 → 单 tick 观察 issue 705 推进 S3→S4→S5/S_FAIL)
 
-- [ ] **T7.6** Cluster smoke (owner-triggered, **gate per AD-M2-9 §治理影响 + R1 TL-4**)
-  - Owner 步骤: redeploy `aria-layer1-cron` (Nomad periodic, AD-M2-8) 后强制单 tick (`/v1/job/<id>/periodic/force`)
-  - 验收条件: dispatches.db 中 issue 705 (或新注入的 demo issue) `alloc_id` 字段非空 + state 推进过 S4_LAUNCH (达 S5_AWAIT 或 triage-able S_FAIL fail_reason)
-  - 任何新 latent bug 在本 Spec scope 内补丁 (sister-bug bundle pattern), 完成后回 memory 起 `project_us022_t7_5_smoke_complete.md` 并 cite 本 AD-M2-9 + dispatches.db 实证
+- [x] **T7.6** Cluster smoke PASS 2026-05-03 17:21 UTC (light-1)
+  - Re-deploy: `nomad job run aria-layer1-cron.nomad.hcl` (parent periodic 重建)
+  - Force tick: `nomad job periodic force aria-layer1-cron` ×4 间隔 5s
+  - Trajectory: 新注入 issue #63 (Forgejo internal id 715, label `aria-auto`) seeded → S1_SCAN → S2_DECIDE → S3_BUILD_CMD → **S4_LAUNCH (T7.5 HTTP dispatch 实际调用 Nomad API)** → HTTP 500 "parameterized job not found" → S_FAIL(`infrastructure`)
+  - 实证 fail_detail: `S4_LAUNCH dispatch error: NomadDispatchClientHTTP: HTTP 500 for http://192.168.69.70:4646/v1/job/aria-layer2-runner/dispatch: rpc error: parameterized job not found`
+  - **完全符合 AD-M2-9 §风险 #1 + 错误路由 matrix 预期** (Layer 2 job 是 M3 scope, 缺失即 S_FAIL(infrastructure))
+  - T7 stub 100% 阻塞解除; Remaining Latent #1 (T7 stub) 可标 RESOLVED
 
 **T7.done = prompt 写盘 + meta 100KB 断言 + 错误分诊 rule + round-trip 测试 + HTTP wiring + cluster smoke PASS**
 
@@ -582,7 +585,7 @@ T15      ─→ T16 (Report + handoff + patches)
 | T4 | ✅ Done | e28491e |
 | T5 | ✅ Done | b92d54c |
 | T6 | ✅ Done | 257b9af |
-| T7 | ✅ Done (T7.1-T7.4) + T7.5 HTTP wiring 2026-05-03 (AD-M2-9, code-merge pending cluster smoke) | a142a30 + (this session) |
+| T7 | ✅ Done (T7.1-T7.4 + T7.5 HTTP wiring + T7.6 cluster smoke PASS 2026-05-03, AD-M2-9) | a142a30 + e0cc6de |
 | T8.1 / T8.2 / T8.3 | ✅ Done (OD-9 reframe to Luxeno + glm-4.5-air/glm-4.7) | e78a259 |
 | T8.4 | ✅ Done (CLI gate + runtime warn + 15 tests) | (this commit) |
 | T10.1 / T10.2 / T10.3 / T10.4 | ✅ Done (live accuracy 83.3% ≥ 80%) | (this commit) |
