@@ -181,10 +181,19 @@ CREATE INDEX idx_state_entered ON dispatches(state_entered_at);
 | S2_DECIDE | LLM call > 120s (含 OpenAI SDK 内 3 次重试) | S_FAIL | `timeout` |
 | S3_BUILD_CMD | LLM call > 120s | S_FAIL | `timeout` |
 | S4_LAUNCH | Nomad dispatch ack > 30s | S_FAIL | `dispatch_lost` |
+| S4_LAUNCH | Nomad meta size violation (200 OK 含 sentinel 或 4xx 含 sentinel) | S_FAIL | `infrastructure` |
+| S4_LAUNCH | Nomad HTTP 4xx/5xx / JSON decode / DispatchedJobID 缺失 | S_FAIL | `infrastructure` |
 | S5_AWAIT | alloc last_heartbeat_at > 30min (env: HERMES_ALLOC_TIMEOUT_MIN, 默认 30, 可在 Hermes 部署时覆盖) | S_FAIL | `timeout` |
 | S6_REVIEW | LLM call > 120s | S_FAIL | `timeout` |
 | S7_HUMAN_GATE | (M2: 无超时, block-until-merge); M4: webhook ack > 7d | (M4 only) S_FAIL | `human_timeout` |
 | S8_MERGE | Forgejo API > 30s | S_FAIL | `infrastructure` |
+
+**S4_LAUNCH wall-clock 拆解 (per AD-M2-9, 2026-05-03 T7.5)**:
+- Phase 1 — POST `/v1/job/{id}/dispatch` (post_timeout=30s)
+- Phase 2 — sync alloc resolve via `/v1/job/{quote(DispatchedJobID)}/allocations` (alloc_resolve_timeout=25s; per-GET cap = `min(http_timeout=10, remaining_budget)`)
+- Phase 3 — alloc-state polling (M3 alloc_provider 注入后): `_NOMAD_ACK_TIMEOUT_SECONDS=30s`
+- Worst-case S4 wall (M3 完整路径): 30+25+30 = 85s; M2 demo (alloc_provider=None) 短路在 Phase 2 后转 S5_AWAIT
+- DispatchedJobID 必须 `quote(safe='')` 编码 — Nomad parameterized dispatch ID 含 `/`, 否则 router 404 → 100% S_FAIL(DISPATCH_LOST)
 
 **实施期 escalation matrix (per Phase A.1 followup R3-OBJ-cm-4)**:
 - S_FAIL retry 次数上限: 0 (M2 不重试, 进入 S_FAIL = 终态)
@@ -311,7 +320,7 @@ M2 产出 m2-handoff.yaml v1.0 (additive-only, schema_version="1.0"), 新增段 
 | T4 (Timeout + forensic) | US-022 §核心交付 3: 失败处理 + OD-5b timeout + OD-5c forensic 字段 |
 | T5 (Idempotency) | US-022 §核心交付 4: cron 重入安全 + OD-5a idempotency |
 | T6 (Cron scheduler) | US-022 §核心交付 1: 自动 cron 60min tick 触发 |
-| T7 (Nomad dispatch) | US-022 §核心交付 1: S4_LAUNCH Nomad parameterized dispatch |
+| T7 (Nomad dispatch) | US-022 §核心交付 1: S4_LAUNCH Nomad parameterized dispatch (T7.5 HTTP wiring added 2026-05-03 per AD-M2-9) |
 | T8 (silknode LLM) | US-022 §核心交付 5: LLM 100% 走 silknode + OD-3 (silknode→GLM) |
 | T9 (m1-handoff 消费) | US-022 §核心交付 6: m1-handoff additive-only 消费 (AD-M1-7) |
 | T10 (S6 LLM review) | OD-3 LLM review (S6_REVIEW state) + US-022 §验收 E silknode contract |

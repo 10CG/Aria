@@ -254,8 +254,23 @@
 - [ ] **T7.4** bind mount round-trip 测试 (3h)
   - 写 prompt.txt → dispatch alloc → alloc 内读 prompt.txt 验证内容一致
   - 复用 M1 inputs volume (`aria-runner-inputs`, 三节点已就绪)
+- [x] **T7.5** NomadDispatchClient HTTP 生产化 wiring (~3h, **added 2026-05-03**)
+  - 新增 `NomadDispatchClientHTTP` (stdlib urllib, mirror ForgejoCliClient T15.2 pattern)
+  - `_handle_s4_launch` 在 `alloc_id=""` 路径调 `dispatch()` 写入 row.alloc_id
+  - 错误映射: MetaSizeExceeded/RuntimeError → S_FAIL(INFRASTRUCTURE); TimeoutError/AllocID="" → S_FAIL(DISPATCH_LOST)
+  - URL 安全: `_build_alloc_url` 用 `quote(dispatched_job_id, safe='')` 编码 Nomad parameterized DispatchedJobID 的 `/`
+  - alloc filter: 跳过 `failed`/`lost`/`complete` ClientStatus, 取首个 eligible
+  - 每 GET 超时上限 = `min(http_timeout, remaining_budget)` (避免单 hung 请求 overshoot)
+  - 20 unit tests (含 8 behavioral on `_resolve_alloc` deadline loop + ClientStatus filter incl. missing/None + URL encode + slash %2F integration + 4xx triage + alloc_id E2E persistence via `_advance_dispatch`)
+  - 决策记录: AD-M2-9 (Layer 1 → Layer 2 Nomad parameterized dispatch 契约)
+  - cluster smoke deploy 留 owner 触发 (deploy aria-layer1-cron 重启 → 单 tick 观察 issue 705 推进 S3→S4→S5/S_FAIL)
 
-**T7.done = prompt 写盘 + meta 100KB 断言 + 错误分诊 rule + round-trip 测试 PASS**
+- [ ] **T7.6** Cluster smoke (owner-triggered, **gate per AD-M2-9 §治理影响 + R1 TL-4**)
+  - Owner 步骤: redeploy `aria-layer1-cron` (Nomad periodic, AD-M2-8) 后强制单 tick (`/v1/job/<id>/periodic/force`)
+  - 验收条件: dispatches.db 中 issue 705 (或新注入的 demo issue) `alloc_id` 字段非空 + state 推进过 S4_LAUNCH (达 S5_AWAIT 或 triage-able S_FAIL fail_reason)
+  - 任何新 latent bug 在本 Spec scope 内补丁 (sister-bug bundle pattern), 完成后回 memory 起 `project_us022_t7_5_smoke_complete.md` 并 cite 本 AD-M2-9 + dispatches.db 实证
+
+**T7.done = prompt 写盘 + meta 100KB 断言 + 错误分诊 rule + round-trip 测试 + HTTP wiring + cluster smoke PASS**
 
 ---
 
@@ -549,8 +564,9 @@ T15      ─→ T16 (Report + handoff + patches)
 - [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
 - [x] **Phase B.1**: feature 分支创建 (主仓 + aria-orchestrator submodule 同名)
 - [~] **Phase B.2**: AI-runnable scope **100% commit done** (T0~T14 + T16.1~T16.3 + T1.7 + T15.1 + T15.2/T15.3 partial + AD-M2-1..8 + README v0.2.0); **247 tests passing 2026-05-03** (+8 regression guards: 3 schema + 5 Phase 1 scan-and-seed)
-- [ ] **Phase B.2 剩余**: T7 production wiring (NomadDispatchClient HTTP, ~2-4h, owner decision) → T15.3 完整 + T15.4-T15.5 (~7h after T7) → T16.4 M2 Report + sign-off (~1h)
+- [ ] **Phase B.2 剩余**: ~~T7 production wiring~~ done 2026-05-03 (T7.5 + AD-M2-9 + 19 tests, code-merge pending cluster smoke) → T15.3 完整 + T15.4-T15.5 (~7h) → T16.4 M2 Report + sign-off (~1h)
 - [~] **2026-05-03 session 10 latent bugs caught & fixed**: see `.aria/decisions/2026-05-03-t1-7-t15-2-deploy-debugging.md` for full catalog
+- [~] **2026-05-03 evening T7.5 HTTP wiring**: 4-agent R1 (3 BLOCK + 1 SCOPE_OK) → R2 (3 SCOPE_BOUNDED_OK + 1 MERGE_OK, all R1 critical/important closed) → R3 single-agent stability verify (verified=true, SCOPE_BOUNDED_OK, 2 doc-minor only); 6 R1 code defects fixed (URL %2F encode / budget cap / ClientStatus filter incl. None/missing / triage full-body / E2E persistence test / behavioral deadline loop coverage); 1 R2 governance fix (T7.6 cluster smoke unchecked task); **267 tests collected (261 PASS + 6 SKIP)**
 - [ ] **Phase C**: 集成 (push 主仓 + submodule 到 origin + github / 创建 PR Forgejo + GitHub)
 - [ ] **Phase D**: 收尾 (UPM 更新 N/A for Aria, Spec 归档至 openspec/archive/)
 
@@ -566,7 +582,7 @@ T15      ─→ T16 (Report + handoff + patches)
 | T4 | ✅ Done | e28491e |
 | T5 | ✅ Done | b92d54c |
 | T6 | ✅ Done | 257b9af |
-| T7 | ✅ Done | a142a30 |
+| T7 | ✅ Done (T7.1-T7.4) + T7.5 HTTP wiring 2026-05-03 (AD-M2-9, code-merge pending cluster smoke) | a142a30 + (this session) |
 | T8.1 / T8.2 / T8.3 | ✅ Done (OD-9 reframe to Luxeno + glm-4.5-air/glm-4.7) | e78a259 |
 | T8.4 | ✅ Done (CLI gate + runtime warn + 15 tests) | (this commit) |
 | T10.1 / T10.2 / T10.3 / T10.4 | ✅ Done (live accuracy 83.3% ≥ 80%) | (this commit) |
