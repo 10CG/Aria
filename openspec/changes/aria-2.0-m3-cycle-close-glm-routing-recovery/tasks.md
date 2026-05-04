@@ -74,14 +74,18 @@
 
 **T2.done = NomadAllocHTTPProvider class 实施 + Protocol assert + ARIA_LAZY_WIRE=1 注入测试 + Nomad mock integration test PASS + AD-M3-2 回填**
 
-#### T3 — Schema migration v2 (~3h, AD-M3-3 触发, R2 I4 + R2 M3 + R2 M5)
+#### T3 — Schema migration v2 (~3h, AD-M3-3 触发, R2 I4 + R2 M3 + R2 M5 + R1-C1/M2/M3)
 
 - [ ] **T3.1** Migration script `aria-orchestrator/migrations/002_schema_v2_additive.sql`:
+  - **Pre-condition (R1-C1)**: 验 v1 fixture 已含 `fallback_triggered INTEGER NOT NULL DEFAULT 0` (M2 schema.sql:85 实证); fail-fast if missing
   - `ALTER TABLE dispatches ADD COLUMN cycle_start_ts TEXT`
   - `ALTER TABLE dispatches ADD COLUMN cycle_end_ts TEXT`
   - `ALTER TABLE dispatches ADD COLUMN dispatched_job_id TEXT`
   - `ALTER TABLE dispatches ADD COLUMN eval_id TEXT`
   - `ALTER TABLE dispatches ADD COLUMN provider_cost_model TEXT`
+  - `ALTER TABLE dispatches ADD COLUMN attempt_history_json TEXT` (per R1-M2, T6.6 reconciler stuck event log)
+  - `CREATE TABLE IF NOT EXISTS migration_notes (key TEXT PRIMARY KEY, note TEXT, applied_at TEXT)` (per R1-M3, backfill placeholder audit trail)
+  - `INSERT INTO schema_meta VALUES ('fallback_chain_outcome_enum', '["ok","http_5xx","http_429","http_4xx","timeout","network_error","quality_degrade"]')` (per R1-C2 self-doc, future audit drift detect)
 - [ ] **T3.2** `fallback_chain_json` write-time exhaustive transform (per R2 I4): UPDATE all v1 字符串数组 → v2 dict array, 同 ALTER 同 transaction
 - [ ] **T3.3** `INSERT INTO schema_meta VALUES ('schema_version', '2.0')`
 - [ ] **T3.4** Backfill rules:
@@ -89,7 +93,7 @@
   - 历史 S9_CLOSE / S_FAIL row `cycle_start_ts = state_entered_at` (per R2 M5, 显式 placeholder 注 in `migration_notes` table)
 - [ ] **T3.5** Migration runner: 启动时自动检查 schema_version 升级 (与 M2 SchemaInitializer 集成); ALTER 失败 SQLite 自动回滚
 - [ ] **T3.6** Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 CanonicalDispatchesDB pattern)
-- [ ] **T3.7** Unit + integration tests: migration apply on fixture → 0 数据丢失 + 5 新 col present + dict fallback round-trip + backfill rules applied (≥10 tests)
+- [ ] **T3.7** Unit + integration tests: migration apply on fixture → 0 数据丢失 + 6 新 col present + migration_notes table created + schema_meta outcome_enum entry + dict fallback round-trip + backfill rules applied + R1-C1 fallback_triggered pre-condition assertion (≥12 tests)
 - [ ] **T3.8** **inline UNIQUE constraint (`schema.sql:98`) 保留** (drop 推 schema v3 / M4) — 应用层 dedupe 续用
 - [ ] **T3.9** Drift guard test (per `feedback_validator_repo_drift_guard_test`): committed schema.sql 通过 migration 等价 production
 - [ ] **T3.10** AD-M3-3 回填 (schema v2 additive 决策 + fallback_chain transform 时机)
@@ -117,7 +121,7 @@
 - [ ] **T5.4** 路由策略: 混合 — Attempt 1-2: `attempt_count++` (let next cron tick retry) / Attempt 3: S_FAIL(stuck) terminal
 - [ ] **T5.5** CAS 锁 (per OD-12 §Q4 + R2 I5): `UPDATE ... WHERE rowid=X AND state='S5_AWAIT' AND last_heartbeat_at=? AND attempt_count=?` (compound 版本字段)
 - [ ] **T5.6** SQLite WAL + `PRAGMA busy_timeout=5000` (per R2 M4); CAS 失败 retry 1 次 (lost = let cron win)
-- [ ] **T5.7** Strategy interface (M5 LLM-decided 升级预留): env `ARIA_RECONCILER_STRATEGY=mechanical|llm` 切换 1 行
+- [ ] **T5.7** Strategy interface (M5 LLM-decided 升级预留): env `ARIA_RECONCILER_STRATEGY=mechanical|llm` 切换 1 行 + **`ReconcilerStrategy` Protocol stub** (per R1-M8): `decide(stuck_row: DispatchRow) -> Decision` 返回 enum `{RETRY, FAIL, LEAVE}`
 - [ ] **T5.8** `nomad job validate` HCL pre-deploy
 - [ ] **T5.9** AD-M3-5 回填 (reconciler design 决策)
 
@@ -127,7 +131,7 @@
 
 - [ ] **T6.1** `aria_layer1/reconciler.py` MechanicalReconciler class
 - [ ] **T6.2** Detect stuck S5_AWAIT row (per 三阈值)
-- [ ] **T6.3** Route: attempt_count<3 → CAS UPDATE attempt_count++ / attempt_count=3 → CAS UPDATE state='S_FAIL', fail_reason='stuck'
+- [ ] **T6.3** Route: attempt_count<3 → CAS UPDATE attempt_count++ / attempt_count=3 → CAS UPDATE state='S_FAIL'; **stuck reason routing matrix (per R1-M10)**: S2/S3 → fail_reason='timeout' / S4/S5 → fail_reason='stuck' / S1/S6/S7/S8 → fail_reason='infrastructure'
 - [ ] **T6.4** Feishu 告警 (per R2 M2): `FEISHU_OPS_ALERT_WEBHOOK` env 可选, fallback `FEISHU_NOTIFY_WEBHOOK` + warning log
 - [ ] **T6.5** Unit tests: 三阈值 boundary + CAS lost-update + Feishu webhook send mock (≥10 tests)
 - [ ] **T6.6** Audit log: stuck detection event 写 `dispatches.attempt_history_json` (per AD-M2-9 §forensic)
@@ -139,7 +143,7 @@
 - [ ] **T7.1** `_handle_s5_await` 重写 — 不依赖 in-memory state (M2 已设计无 in-memory)
 - [ ] **T7.2** 从 dispatches table 读 `alloc_id` + `dispatched_at`
 - [ ] **T7.3** alloc_provider re-query (HTTP) 获取 alloc 状态
-- [ ] **T7.4** 状态分支: pending/queued → leave (next tick) / running/complete → S6_REVIEW / failed/lost → S_FAIL
+- [ ] **T7.4** 状态分支: pending/queued → leave (next tick) / running/complete → S6_REVIEW / failed/lost → S_FAIL / **404 Not Found → S_FAIL(alloc_lost)** (per R1-M9, alloc 已 GC)
 - [ ] **T7.5** 1 unit test: `test_handle_s5_await_resumes_from_db_only` (verify 不读 self._memory)
 - [ ] **T7.6** AD-M3-6 回填 (crash recovery scope 决策, OD-3b 锁后)
 
@@ -151,8 +155,9 @@
 - [ ] **T8.2** Base URL: `open.bigmodel.cn/api/paas/v4/chat/completions`
 - [ ] **T8.3** Auth: `ZHIPU_API_KEY` (post-rotation 才 wired, T13)
 - [ ] **T8.4** Per-token billing model field (vs Luxeno flat)
-- [ ] **T8.5** silknode-integration-contract 契约 1 no-storage 透传 (verbatim consume)
-- [ ] **T8.6** Unit tests: success / 5xx / 429 / timeout / token usage parse (≥7 tests)
+- [ ] **T8.5** silknode-integration-contract 契约 1 no-storage 透传 — **OD-3d generalize**: 契约 1 §禁止条款 适用所有上游 LLM provider, 含 ZhipuClient 直连 (in-memory buffer only, 无 disk log payload); 等 owner Phase A.2 advisory 确认 yes/no
+- [ ] **T8.6** **Timeout policy (per R1-I1, OD-3g default 等 owner)**: `connect_timeout=5s` + `read_timeout=60s` per call (硬 ceiling)
+- [ ] **T8.7** Unit tests: success / 5xx / 429 / timeout / token usage parse / connect_timeout / read_timeout (≥7 tests)
 
 **T8.done = ZhipuClient 实施 + 契约 1 no-storage + ≥7 tests**
 
@@ -165,14 +170,18 @@
   - S3_BUILD_CMD → `glm-5-turbo`
   - S6_REVIEW → `glm-5.1`
 - [ ] **T9.4** Per-state fallback ladder (model degrade): `5.1 → 5-turbo → 4.5-air` if quality model 5xx
-- [ ] **T9.5** fallback_chain_json dict-array 写入 (write-time, schema v2): `[{provider, model, outcome, reason, latency_ms, ts}]`
+- [ ] **T9.5** fallback_chain_json dict-array 写入 (write-time, schema v2): `[{provider, model, outcome, reason, latency_ms, ts}]` — **dict 字段类型/枚举锁定 (per R1-C2)**: `provider ∈ {luxeno, zhipu}`; `outcome ∈ {ok, http_5xx, http_429, http_4xx, timeout, network_error, quality_degrade}`; `ts` ISO-8601 UTC; `latency_ms` int; `reason` str|null; intra-provider retry (per R1-M6) 也写 entry, outcome 反映该次结果
+- [ ] **T9.5b** **fallback_triggered 写入点 (per R1-M4)**: ProviderRouter 落 fallback 时同步 UPDATE `dispatches.fallback_triggered=1` (任何 fallback_chain_json 含 outcome != 'ok' 即 trigger); 1 unit test asserting field after fallback path
 - [ ] **T9.6** Wire to `_handle_s2_decide` / `_handle_s3_build_cmd` / `_handle_s6_review` (M2 单一 SilknodeClient 替换为 ProviderRouter)
 - [ ] **T9.7** Test matrix (per R2 I8): parameterized (3 state × 5 fallback path × 6 dict field assertion) ≥ 12 cases
   - States: S2_DECIDE, S3_BUILD_CMD, S6_REVIEW
-  - Paths: Luxeno-only-success / Luxeno-success-after-1-retry / Luxeno→Zhipu-fallback / Luxeno→Zhipu-both-5xx → S_FAIL / Luxeno→Zhipu-quality-degrade-5.1→5-turbo
-  - Assertions: provider/model/outcome/reason/latency_ms/ts in fallback_chain_json
+  - Paths: Luxeno-only-success (1 entry chain) / Luxeno-success-after-1-retry (2 entries: fail + ok) / Luxeno→Zhipu-fallback (2 entries: luxeno fail + zhipu ok) / Luxeno→Zhipu-both-5xx → S_FAIL (≥2 entries all non-ok) / Luxeno→Zhipu-quality-degrade-5.1→5-turbo (≥2 entries quality_degrade outcome)
+  - Assertions: provider/model/outcome/reason/latency_ms/ts in fallback_chain_json (R1-C2 enum 严格)
 - [ ] **T9.8** Multi-model benchmark (~8h subset of T9): 3 模型 × 同 prompt 重复 3 次 = 9 次/state, 验证 quality
-- [ ] **T9.9** Benchmark 结果写入 m3-handoff.yaml `multi_model_routing_benchmark` field
+  - **Quality threshold (per R1-I8, OD-3e default 等 owner)**: S2 ≥80% 状态决策正确率 / S3 ≥90% bash command shellcheck-equivalent 通过 / S6 ≥66% 三轮 review 多数票一致
+  - **Gate vs exploratory (per OD-3e)**: AI 推荐 default = **exploratory only** (Luxeno 已实战稳定; 硬 gate budget cap 不够), owner 确认后改 m3-handoff `multi_model_benchmark_gate=true|false`
+  - **Budget cap (per R1-I9)**: `BUDGET_CAP_USD=5.00` hard ceiling, abort if exceeded; m3-handoff `t9_8_benchmark_actual_cost_usd` field
+- [ ] **T9.9** Benchmark 结果写入 m3-handoff.yaml `multi_model_routing_benchmark` field (含 quality metrics + actual_cost_usd + threshold pass/fail)
 - [ ] **T9.10** AD-M3-4 回填 (ProviderRouter 决策)
 
 **T9.done = ProviderRouter 实施 + multi-model state-aware + dict fallback + ≥12 test matrix + benchmark + AD-M3-4 回填**
@@ -183,7 +192,8 @@
 - [ ] **T10.2** S2/S3 token tracking wiring (per R2 I3, 复用 M2 T9 pattern): `_handle_s2_decide` + `_handle_s3_build_cmd` 末尾加 `repo.update_token_usage(...)` 调用 + `usage_from_silknode_response` helper extend (Zhipu compat)
 - [ ] **T10.3** compute_cost provider-aware branch:
   - Luxeno: cost_usd = 0 (flat sub baseline 单独跟踪 m3-handoff)
-  - Zhipu: cost_usd = metered per pricing table (T10 含 Zhipu pricing constants module)
+  - Zhipu: cost_usd = metered per pricing table (T10 含 `aria_layer1/llm/zhipu_pricing.py` constants module **per R1-I7 + OD-3f default**: `_PRICING_VERSION='1.0'` + `_PRICING_FETCHED_AT='<T10 实施日>'` + source URL comment + 6-month review trigger; AI 推荐 default = snapshot at T10 day, 等 owner OD-3f 确认 vs runtime API)
+  - **Zhipu response.usage compat (per ai R1)**: 验 Zhipu /v4/chat/completions response.usage `{prompt_tokens, completion_tokens, total_tokens}` shape 与 silknode 透传一致 → 同 helper + provider param; 不一致 → 加 `ZhipuTokenAdapter`
 - [ ] **T10.4** m3-handoff.yaml 加 fields: `luxeno_subscription_baseline_usd_monthly` + `zhipu_metered_usd_total` (per R2 C1)
 - [ ] **T10.5** Unit test: cumulative S2 + S3 + S6 tokens (per R2 I3) + provider-aware cost (≥4 tests)
 - [ ] **T10.6** AD-M3-7 回填 (provider-aware cost model 决策)
@@ -210,7 +220,11 @@
   - Step 5: assert state advances (running mock alloc → S6_REVIEW prep)
 - [ ] **T12.2** Reconciler concurrent test (per R2 I9): cron tick + reconciler 同 row 同 ts; verify CAS lost-update detected (BEGIN IMMEDIATE 序列化, 一方 win + 另一方 retry once → lost)
 - [ ] **T12.3** Reconciler 三阈值 boundary tests (各阈值 ±1 内/外, ≥6 tests)
-- [ ] **T12.4** Hermes kill -9 lock test (process kill mid-S5_AWAIT, restart, verify _handle_s5_await DB-only resume)
+- [ ] **T12.4** Hermes kill -9 lock test (per R1-I3 harness 设计明示 + Q-NEW-1 owner 确认 unit vs integration):
+  - **AI 推荐 default = unit (subprocess+SIGKILL)** (Tier-1 sufficient per Q6=A; Tier-2 live Hermes 推 T15 stretch)
+  - 实施 (default unit path): `subprocess.Popen(['python', '-m', 'aria_layer1.tick_runner'])` 启动 fresh hermes-extension 子进程 → mid-S5_AWAIT 时 `os.kill(pid, signal.SIGKILL)` → 重启相同 cmd → 5-step pattern (per T12.1) verify _handle_s5_await DB-only resume
+  - Fixture: FakeAllocStatusProvider injection via env var (subprocess 继承)
+  - 若 owner 选 integration: 推 T15 stretch, 加 ~6h Tier-2 cluster smoke
 - [ ] **T12.5** MockClock fast-forward 验 60min boundary 不需真等
 
 **T12.done = crash recovery named test (5 步) PASS + reconciler concurrent CAS test PASS + 三阈值 boundary tests + kill -9 lock test PASS**
@@ -249,16 +263,29 @@
 - [ ] **T15.5** 验收 E: 11-row dispatches.db 真实 fixture (T15.3 M2 实际数据) migration test → 0 数据丢失
 - [ ] **T15.6** m3-handoff.yaml `acceptance_a_actual_dispatches=10` + `acceptance_d_fallback_observed=true` + `acceptance_e_migration_zero_loss=true`
 - [ ] **T15.7** Tier-2 cluster verification (embedded in T1 implementation per Q6=A, 不强制单独 gate)
+  - **Falsifiable evidence (per R1-I4)**: `acceptance_a_tier2_carryover_verified=true` 必须有可验证 metric — **≥1 dispatches.db row WHERE `dispatched_job_id IS NOT NULL AND eval_id IS NOT NULL`** (T1.OWNER sample dispatch 后)
+  - 不强制 multi-row, 但 0-row 则 validator FAIL_FAST (防 boolean true 无下层证据)
 
 **T15.done = ≥10 issue full cycle PASS + 验收 A+D+E 全 documented + handoff fields filled**
 
 #### T16 — Closeout: m3-handoff.yaml + AD backfill + Report + Spec archive (~6h)
 
 - [ ] **T16.1** `aria-orchestrator/docs/m3-handoff.yaml` schema v1.0 (additive-only on m2-handoff schema, per AD-M2-7 plugin.yaml + OD-9 + OD-5c fail_reason 不重写)
-- [ ] **T16.2** `validate-m3-handoff.py` (stdlib, ≥10 checks, fail-fast on AD-M3-* placeholder)
+  - **Acceptance fields enumerate (per R1-I2)**: 6 验收必备 fields:
+    - `acceptance_a_actual_dispatches: int` (≥10)
+    - `acceptance_a_tier2_carryover_verified: bool` (per R1-I4 falsifiable evidence)
+    - `acceptance_b_p50_passed: bool` + `acceptance_b_p50_actual_s: float` + `acceptance_b_methodology: str` + `acceptance_b_measured_post_rotation: bool`
+    - `acceptance_c_crash_recovery_test_passed: bool` (per R1-I2 missing field)
+    - `acceptance_d_fallback_observed: bool` + `acceptance_d_test_matrix_count: int`
+    - `acceptance_e_migration_zero_loss: bool` + `acceptance_e_fixture_rows: int`
+    - `acceptance_f_rotation_completed: bool` + `acceptance_f_rotation_date: str`
+- [ ] **T16.2** `validate-m3-handoff.py` (stdlib, ≥15 checks per R1-I2, fail-fast on AD-M3-1..7 `_待回填_` per R1-M5 spillover sentinel exception):
+  - **6 acceptance truthy assertions** (per `feedback_smoke_benchmark_truthiness`): `acceptance_*.passed is True` (boolean, 不仅 key-present)
+  - **AD slot fail-fast** (per R1-M5): grep `_待回填_` only in AD-M3-1..7 范围, AD-M3-8/9/10 `_spillover_` 字面值跳过 (实际未用则 status 改 `_unused_`)
+  - validator 自身 drift guard test (per `feedback_validator_repo_drift_guard_test`): committed canonical instance 通过 validator
 - [ ] **T16.3** AD-M3-1..7 回填 (per `feedback_ad_slot_backfill_checkpoint`); validator fails if any `_待回填_`
-- [ ] **T16.4** 5 PRD patches commit (per Phase A.1.4 起草, OD-4 模式: patches 内容已就位, T16 actual commit):
-  - Patch 01: PRD §M3 工时 90→185h (OD-13)
+- [ ] **T16.4** 4 PRD patches commit at T16.4 (Patch 01 已在 A.3.2 OD-13 立 commit per R1-I5 reword; T16.4 仅 commit Patches 02-05):
+  - ~~Patch 01: PRD §M3 工时 90→185h (OD-13)~~ — **已在 A.3.2 commit, T16.4 不重复**
   - Patch 02: 'dual provider' → 'multi-model GLM routing + cross-provider HA fallback' (Q1=D')
   - Patch 03: 验收 A → Tier-1 + carryover #1 cluster verification embedded (Q6=A)
   - Patch 04: 验收 B → 47.25s + S1_SCAN→S9_CLOSE wall + fallback filter (Q7=C)
@@ -315,14 +342,16 @@ T13 (secret rotation) ─→ T14 (perf bench) ─→ T15 (≥10 cycle) ─→ T1
 |---|---|---|---|
 | A.0 | 状态扫描 + brainstorm R1+R2 | (DONE 2026-05-03) | ✅ |
 | A.1 | proposal.md + tasks.md + 5 patches | 12h | ✅ A.1.1-4 done (2026-05-04); A.1.5 Forgejo Issue 推 A.3 |
-| A.2 | post_spec audit (4-round) | 4h | ⏳ |
+| A.2 | post_spec audit (4-round) | 4h | 🔄 R1 done (2026-05-04T103702Z, 2 critical / 9 important / 9 minor / 7 OD candidates); R2 等 owner advisory |
 | A.3 | OD-12 lock + OD-13 + Approved | 1h | ⏳ |
 | B.1 | feature 分支 + dual push | 0.5h | ⏳ |
-| B.2.0 | M2 carryover (T1-T4) | 21h | ⏳ |
+| B.2.0 | M2 carryover (T1-T4 + T13 pull-forward per OD-14) | 24h | ⏳ |
 | B.2.1 | M3 new scope (T5-T12) | 90h | ⏳ |
-| B.2.Z | E2E + handoff (T13-T16) | 30h | ⏳ |
+| B.2.Z | E2E + handoff (T14-T16, T13 已拉前) | 27h | ⏳ |
 | C+D | 集成 + 归档 | (含 buffer 17h) | ⏳ |
 | **Total** | | **185h** | |
+
+> **Status table 数学 reconcile (per R1-I6)**: A.1+A.2+A.3+B.1+B.2.0+B.2.1+B.2.Z = 12+4+1+0.5+24+90+27 = **158.5h** 显式; OD-12 §Q2 baseline 168h subtotal **含 25h audit overhead** (Phase A.2 4h 显式 + Phase B.2 scope-bounded ~16h 隐含在 B.2.0/B.2.1/B.2.Z hours + Phase D 4-round ~5h 在 C+D 17h buffer 内); 17h buffer 在 C+D 行隐含 → 158.5+17+9.5 audit absorbed = 185h. R2 audit reconcile gap 0.
 
 ## 引用
 
