@@ -1,9 +1,9 @@
 # aria-2.0-m3-cycle-close-glm-routing-recovery — Aria 2.0 M3 Layer 2 Cycle Close + GLM Multi-Model Routing + Crash Recovery
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: **Draft** (Phase A.1 起草中, 2026-05-04; OD-12 RESOLVED 7 主决策 + 25 细节 + R2 4/4 READY_FOR_R3 input)
+> **Status**: **Approved** (Phase A.3 lock 2026-05-04; AI-drafted per AD-M0-9 with provenance; owner final sign-off pending implicit per `feedback_ai_代填_sign_off_pattern`, audit trail in `.aria/decisions/2026-05-04-us-023-phase-a2-r1-owner-advisory.md` + `.aria/decisions/2026-05-04-od-13-prd-m3-effort-90-to-185h.md`)
 > **Created**: 2026-05-04
-> **Approved**: _Pending Phase A.3 (post-audit OD-13 PRD patch + baseline final lock)_
+> **Approved**: 2026-05-04 (Phase A.3 OD-12 baseline final lock + OD-13 PRD patch applied + R2 SCOPE_OK_R2 4/4 + R3+R4 collapsed per OD-15)
 > **Parent Story**: [US-023](../../../docs/requirements/user-stories/US-023.md)
 > **Target Version**: v2.0.0-m3
 > **Source**:
@@ -22,7 +22,7 @@
 >   - **前置 (硬门控)**: [US-022 / aria-2.0-m2-layer1-state-machine](../../archive/2026-05-03-aria-2.0-m2-layer1-state-machine/) — `m2_e2e_passed=true` + Go-with-revision 2026-05-03 已满足
 >   - **后继**: US-024 (M4 Human gate + Feishu approve + 7d ack timeout)
 >   - **跨 milestone**: US-027 (Cost routing + 预算控制 跨 M3-M6, M3 起 per-provider token breakdown 铺路)
-> **Owner Decisions**: OD-12 (7 主决策 + 25 细节, 2026-05-03) / **OD-13 PENDING** (PRD §M3 工时 90→185h, Phase A.3 锁) / **OD-3a/b/c PENDING** (Phase A.2 advisory: HCL pinning / crash recovery scope / NomadAllocHTTPProvider 注入路径)
+> **Owner Decisions**: OD-12 RESOLVED 2026-05-03 (7 主决策 + 25 细节) / **OD-13 RESOLVED 2026-05-04** (PRD §M3 工时 90→185h, Phase A.3 lock; PRD patches applied) / OD-3a/b/c RESOLVED Phase A.2 R1 (HCL sha digest pin / crash recovery scope=仅 S5_AWAIT / lazy-wire ARIA_LAZY_WIRE=1) / **OD-14 RESOLVED 2026-05-04** (T13 secret rotation 拉到 B.2.0 startup per advisory Q1=YES) / **OD-15 RESOLVED 2026-05-04** (Phase A.2 R3+R4 collapse per R2 SCOPE_OK_R2 4/4) / OD-3d/3e/3f/3g RESOLVED 2026-05-04 (silknode contract generalize / multi-model benchmark exploratory / Zhipu pricing snapshot / ZhipuClient timeout default)
 
 > **Q1=D' divergence 声明 (per OD-12)**: 本 Spec 的 "双 provider" 解读 supersedes PRD §M3 字面 — 实际为 **Luxeno (primary, flat sub) + Zhipu 官方 (HA fallback, per-token billing) + GLM 多模型 routing** (S2=4.5-air / S3=5-turbo / S6=5.1, fallback ladder 5.1→5-turbo→4.5-air)。Anthropic provider 保留 deprecated (per AD-M1-12 supersedes AD-M1-6, owner subscription-only no API key)。Patch 02 在 Phase A.1.4 落地。
 
@@ -256,15 +256,15 @@ Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 Canonica
 
 ## Architecture Decisions (AD-M3-* placeholders, 7 主 + 3 spillover)
 
-| ID | 主题 | 状态 | 触发 |
-|---|---|---|---|
-| AD-M3-1 | Layer 2 parameterized job HCL (image sha pin + meta keys + idempotency) | _待回填_ Phase B.2.0 T1 | OD-3a 锁定后 |
-| AD-M3-2 | NomadAllocHTTPProvider 注入路径 (ARIA_LAZY_WIRE) + Protocol contract | _待回填_ Phase B.2.0 T2 | OD-3c 锁定后 |
-| AD-M3-3 | Schema v2 migration (additive-first + write-time fallback transform + backfill rules) | _待回填_ Phase B.2.0 T3 | OD-12 §Q5 实施期 |
-| AD-M3-4 | ProviderRouter abstraction + Luxeno→Zhipu HA + GLM multi-model state-aware | _待回填_ Phase B.2.1 T9 | OD-12 §Q1=D' 实施期 |
-| AD-M3-5 | Reconciler periodic job + CAS lock + 三阈值 + Strategy interface | _待回填_ Phase B.2.1 T5-T6 | OD-12 §Q3+Q4 实施期 |
-| AD-M3-6 | Crash recovery scope (仅 S5_AWAIT + alloc_provider re-query) | _待回填_ Phase B.2.1 T7 | OD-3b 锁定后 |
-| AD-M3-7 | Provider-aware token cost model (Luxeno=0 flat / Zhipu metered) | _待回填_ Phase B.2.1 T10 | R2 C1 实施期 |
+| ID | 主题 | 状态 | 触发 | 主责 agent (Phase A.3.4) |
+|---|---|---|---|---|
+| AD-M3-1 | Layer 2 parameterized job HCL (image sha pin + meta keys + idempotency) | _待回填_ Phase B.2.0 T1 | OD-3a sha digest 锁 | backend-architect (HCL design) + qa-engineer (validate) |
+| AD-M3-2 | NomadAllocHTTPProvider 注入路径 (ARIA_LAZY_WIRE) + Protocol contract | _待回填_ Phase B.2.0 T2 | OD-3c lazy-wire 锁 | backend-architect (Protocol) + ai-engineer (lazy-wire pattern) |
+| AD-M3-3 | Schema v2 migration (additive-first + write-time fallback transform + backfill rules) | _待回填_ Phase B.2.0 T3 | OD-12 §Q5 实施期 | backend-architect (SQL) + qa-engineer (fixture) |
+| AD-M3-4 | ProviderRouter abstraction + Luxeno→Zhipu HA + GLM multi-model state-aware | _待回填_ Phase B.2.1 T9 | OD-12 §Q1=D' + OD-3d/3e/3f/3g | ai-engineer (router design) + backend-architect (concurrency) |
+| AD-M3-5 | Reconciler periodic job + CAS lock + 三阈值 + Strategy interface | _待回填_ Phase B.2.1 T5-T6 | OD-12 §Q3+Q4 + R1-M8 | backend-architect (CAS + HCL) + ai-engineer (Strategy interface) |
+| AD-M3-6 | Crash recovery scope (仅 S5_AWAIT + alloc_provider re-query + 404 case) | _待回填_ Phase B.2.1 T7 | OD-3b 锁 + R1-M9 | qa-engineer (test harness) + ai-engineer (semantic) |
+| AD-M3-7 | Provider-aware token cost model (Luxeno=0 flat / Zhipu metered + Zhipu pricing snapshot) | _待回填_ Phase B.2.1 T10 | R2 C1 + OD-3f snapshot | ai-engineer (pricing + cost) + qa-engineer (cumulative test) |
 | AD-M3-8 | _spillover_ | _spillover_ | _on demand_ |
 | AD-M3-9 | _spillover_ | _spillover_ | _on demand_ |
 | AD-M3-10 | _spillover_ | _spillover_ | _on demand_ |
@@ -302,9 +302,9 @@ Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 Canonica
 
 ```
 Phase A.0 (DONE)  状态扫描 + brainstorm R1 + R2 (4-agent parallel)
-Phase A.1 (NOW)   proposal.md + tasks.md + 5 patches (~12h, 含 sub-phase A.1.0 PRD 第一步 patch / A.1.1 dir / A.1.2 proposal / A.1.3 tasks / A.1.4 patches)
-Phase A.2         post_spec audit (4-round multi-agent, ~4h) — 验证 R2 critical/important 全在 Spec 内 + OD-3a/b/c advisory
-Phase A.3         OD-12 baseline final lock + OD-13 PRD patch + Spec Status: Draft → Approved (~1h)
+Phase A.1 (DONE)  proposal.md + tasks.md + 5 patches (~12h, 2026-05-04)
+Phase A.2 (DONE)  post_spec audit R1+R2 (R3+R4 collapsed per OD-15) — 4-agent fix-verify SCOPE_OK_R2 4/4 (~4h, 2026-05-04)
+Phase A.3 (DONE)  OD-13 立 + PRD Patch 01-05 commit + Status: Draft → Approved + Agent assign (~1h, 2026-05-04)
 Phase B.1         feature 分支 (`feature/aria-2.0-m3-cycle-close-glm-routing-recovery`) (<0.5h)
 Phase B.2.0       M2 carryover (T1-T4, ~21h):
                     T1: aria-layer2-runner HCL fork (~6h)

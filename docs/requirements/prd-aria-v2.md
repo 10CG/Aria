@@ -401,15 +401,17 @@ Crash recovery:
 M0 (Week 1-2)     前置验证 + 架构定稿
 M1 (Week 3-6)     MVP: 手动 dispatch → 1 issue → PR (100h)
 M2 (Week 7-12)    Layer 1 状态机 + Hermes Option C Extension + 输入 sanitization (140h)
-M3 (Week 13-16)   双 provider + Nomad integration (90h)
+M3 (Week 13-16+)  Layer 2 cycle close + GLM 多模型 routing + Crash recovery (185h, OD-13 lock 2026-05-04 per US-023 §OD-12 §Q2)
 M4 (Week 17-21)   Crash recovery + Replay + Reconciler (80h)
 M5 (Week 22-27)   Human gate + Review loop + Drift defense (100h)
 M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
 ─────────────────────────────────────────────────────
-合计:             ~750h ≈ 30 周单人 / 9 月 50% 投入
+合计:             ~845h ≈ 33 周单人 / 10 月 50% 投入 (M3 90→185h per OD-13 2026-05-04)
 ```
 
 **注**: 工时估算基于 R3 挑战组实测重估 (R3 讨论组估 380h, Code Reviewer 实测 750h)。选取实测值作为 PRD 工时。
+
+**M3 OD-13 update (Phase A.3, 2026-05-04)**: M3 工时由 90h → 185h, 因 US-023 brainstorm OD-12 §Q2 揭露 scope discovery 后真实 inflation (×2.06, 与 M2 ×1.48 同模式)。新基线 185h hard, 5-6 周 50% 投入, 详见 [US-023.md §估算](../requirements/user-stories/US-023.md) 与 [aria-2.0-m3-cycle-close-glm-routing-recovery proposal.md](../../openspec/changes/aria-2.0-m3-cycle-close-glm-routing-recovery/proposal.md) Phase 路线图; 决议 [`.aria/decisions/2026-05-04-od-13-prd-m3-effort-90-to-185h.md`](../../.aria/decisions/2026-05-04-od-13-prd-m3-effort-90-to-185h.md)。
 
 ### M0: 前置验证 (Week 1-2)
 
@@ -464,9 +466,62 @@ Out of scope:
   - 自动触发
 ```
 
+### M3: Layer 2 cycle close + GLM 多模型 routing + Crash recovery (Week 13-16+)
+
+> **基线**: 185h hard (OD-12 §Q2 lock 2026-05-03; OD-13 Phase A.3 立 2026-05-04)
+> **Spec**: [aria-2.0-m3-cycle-close-glm-routing-recovery](../../openspec/changes/aria-2.0-m3-cycle-close-glm-routing-recovery/proposal.md)
+> **Status**: Approved Pending owner final sign-off (Phase A.3 AI-drafted 2026-05-04)
+
+**目的**: 将 M2 Layer 1 状态机驱动 dispatch (S0→S4_LAUNCH 真发) 升级为 **Layer 1+Layer 2 完整闭环 (S0→S9_CLOSE)** + 重启可恢复 + 双 provider HA + 多模型 quality routing。
+
+**Provider 架构 (Q1=D')**:
+- **Primary**: Luxeno (api.luxeno.ai/v1, flat subscription)
+- **HA Fallback**: Zhipu 官方 (open.bigmodel.cn/api/paas/v4, per-token billing, 已充值)
+- **Anthropic**: deprecated (per AD-M1-12 supersedes AD-M1-6, owner subscription-only no API key)
+
+**模型路由 (state-aware quality routing)**:
+- S2_DECIDE → `glm-4.5-air` (cheap)
+- S3_BUILD_CMD → `glm-5-turbo` (mid-tier, 对标 Sonnet)
+- S6_REVIEW → `glm-5.1` (top-tier, 对标 Opus)
+- Per-state fallback ladder (model degrade): `5.1 → 5-turbo → 4.5-air`
+
+**核心交付**:
+- ≥10 个 synthetic issue 走完整 Layer 1+Layer 2 cycle (S0→S9_CLOSE) 含 ≥1 真实 PR merged
+- Cycle p50 ≤ M1 baseline × 1.5 = 47.25s (S1_SCAN→S9_CLOSE wall, fallback_triggered=false 过滤)
+- Hermes kill -9 重启实测: pre-restart S5_AWAIT 自动 resume polling
+- Luxeno 5xx 模拟 → Zhipu 接管 (fallback_chain_json dict-array 含两类 entry)
+- 独立 Reconciler periodic job (30min) 检测 stuck S5_AWAIT > 60min → S_FAIL(stuck) routing + Feishu 告警
+- Schema migration v2 (additive-first): 6 新 col + dict fallback_chain_json transform + migration_notes table
+- Secret rotation T13 一次性 5 keys (含 ZHIPU_API_KEY, **拉到 B.2.0 startup per OD-14**, 90-day cap 2026-08-02 安全)
+
+**6 验收标准**:
+
+| ID | 验收 | 量化 metric |
+|---|---|---|
+| A | ≥10 issue 走完整 Layer 1+Layer 2 cycle (S0→S9_CLOSE) | `count(state=S9_CLOSE) ≥ 10` Tier-1 fake-cycle test (Q6=A); Tier-2 evidence: ≥1 row WHERE dispatched_job_id IS NOT NULL AND eval_id IS NOT NULL |
+| B | M3 cycle p50 ≤ 47.25s | `median(cycle_end_ts - cycle_start_ts) WHERE state='S9_CLOSE' AND fallback_triggered=false ≤ 47.25s` (post-rotation per Q8d) |
+| C | Crash recovery: Hermes 重启 → S5_AWAIT auto-resume polling | 5-step named test `test_t12_crash_recovery_s5_await_auto_resume` PASS + T12.4 unit test (subprocess + SIGKILL) PASS |
+| D | GLM 多 provider HA fallback (Q1=D'): Luxeno 5xx → Zhipu 接管 | `fallback_chain_json` 含 luxeno + zhipu 两类 entry; parameterized test matrix 3 state × 5 path × 6 dict field assertion ≥12 cases PASS |
+| E | Schema migration v2 backward-compat (Q5=A additive) | 11-row dispatches.db fixture migration test PASS, 0 数据丢失; 6 新 col present; outcome enum self-doc entry; backfill rules applied |
+| F | Secret rotation 完成 (5 keys: 4 旧 + ZHIPU_API_KEY) | rotation_completed=true + date 在 m3-handoff.yaml + post-rotation 验收 B PASS |
+
+**M2 input 契约**: 见 [Spec proposal.md §M2 Input 契约](../../openspec/changes/aria-2.0-m3-cycle-close-glm-routing-recovery/proposal.md), 复用 m2-handoff.yaml schema v1.0 (additive-only)。
+
+**Out of Scope**: M4 完整 human gate / M5 防漂移 / inline UNIQUE drop (推 v3) / LLM-decided reconciler / 其他 5 状态 crash recovery (M3 仅 S5_AWAIT)。
+
+**Phase 路线图**:
+- A.1 (~12h): proposal + tasks + 5 patches drafting (DONE 2026-05-04)
+- A.2 (~4h): post_spec audit R1+R2 collapse per OD-15 (DONE 2026-05-04)
+- A.3 (~1h): OD-13 PRD patch + baseline lock + Approved (本)
+- B.1 (<0.5h): feature 分支
+- B.2.0 (~24h): M2 carryover (T1-T4) + T13 secret rotation (per OD-14 pull forward)
+- B.2.1 (~90h): M3 new scope (T5-T12)
+- B.2.Z (~27h): E2E + handoff (T14-T16)
+- C+D: 集成 + 归档 (含 buffer 17h)
+
 ### M2-M6
 
-详见 tasks.md (将在 PRD 确认后起草)。
+详见 tasks.md (将在 PRD 确认后起草)。M3 已 expanded 见上; M4-M6 后续 milestone Spec 起草时同模式 expand。
 
 ---
 

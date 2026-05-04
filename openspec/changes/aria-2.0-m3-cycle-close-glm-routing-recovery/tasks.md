@@ -1,7 +1,7 @@
 # aria-2.0-m3-cycle-close-glm-routing-recovery — Tasks
 
 > **Spec**: [proposal.md](./proposal.md)
-> **Status**: Draft (Phase A.1.3 起草中, 2026-05-04)
+> **Status**: **Approved** (Phase A.3 lock 2026-05-04, AI-drafted per AD-M0-9)
 > **Baseline (OD-12 §Q2)**: 185h hard / 5-6 weeks 50% 投入
 > **Audit pattern (OD-12 §Q8c)**: 混合 (Phase A.2 4-round + Phase B.2 scope-bounded 1-round per task group + Phase D 4-round, ~25h overhead in baseline)
 
@@ -17,22 +17,26 @@
 - [x] **A.1.4** 5 PRD patches 起草 (`patches/01-05`, ~2h, 按 R2 closeout §"PRD patches needed")
 - [ ] **A.1.5** Forgejo Issue T0 创建 (M3 kickoff issue, owner 触发 / Phase A.3 锁后)
 
-### Phase A.2 — post_spec audit (~4h)
+### Phase A.2 — post_spec audit (DONE 2026-05-04, ~4h actual)
 
-- [ ] **A.2.1** 4-round multi-agent audit (backend-architect / qa-engineer / tech-lead / ai-engineer parallel, R1-R4 严格收敛)
-  - 验证 R2 3 critical (C1/C2/C3) 全在 Spec 内 explicit
-  - 验证 R2 10 important (I1-I10) 在 task line items 中
-  - 验证 R2 6 minor (M1-M6) 至少 documented (Spec optional)
-  - 答 R2 3 owner-decide (OD-3a HCL pinning / OD-3b crash recovery scope / OD-3c lazy-wire 注入)
-- [ ] **A.2.2** Audit findings 闭合 + 报告生成 `.aria/audit-reports/post_spec-<ts>-us023-m3.md`
-- [ ] **A.2.3** R2 critical/important coverage matrix (audit deliverable)
+- [x] **A.2.1** R1 4-agent multi-agent audit (backend-architect / qa-engineer / tech-lead / ai-engineer parallel)
+  - 验证 R2 (2026-05-03) findings 全 closure: 3 critical (C1/C2/C3) + 10 important (I1-I10) + 6 minor (M1-M6) 全 COVERED
+  - R1 NEW: 18 findings (2 Critical + 9 Important + 9 Minor) + 7 owner-decide (OD-14 / OD-15 / OD-3d/3e/3f/3g / Q-NEW-1)
+  - Verdict aggregate: BLOCK_NEED_OWNER (qa + ai NEEDS_OWNER_INPUT)
+- [x] **A.2.2** R1 audit report `.aria/audit-reports/post_spec-2026-05-04T103702Z-us023-m3.md` + advisory `.aria/decisions/2026-05-04-us-023-phase-a2-r1-owner-advisory.md`
+- [x] **A.2.3** Owner advisory 7/7 RESOLVED 2026-05-04 (sustain all AI defaults)
+- [x] **A.2.4** R1 fix batch auto-resolved (proposal.md + tasks.md ~17 fix points; commit `9479257`)
+- [x] **A.2.5** R2 4-agent fix-verify SCOPE_OK_R2 4/4 (R1 closure 24/24 + 0 NEW critical/important + 14/14 coherence PASS)
+- [x] **A.2.6** R2 closeout report `.aria/audit-reports/post_spec-r2-2026-05-04T1130Z-us023-m3.md`
+- [x] **A.2.7** R3+R4 collapse per OD-15 (R2 SCOPE_OK_R2 4/4 + tech-lead 显式 COLLAPSE_R3_R4_PROCEED_A3)
 
-### Phase A.3 — Approved 准入 (~1h)
+### Phase A.3 — Approved 准入 (DONE 2026-05-04, ~1h actual)
 
-- [ ] **A.3.1** OD-12 baseline final lock (185h 写入 m3-handoff.yaml `effort.baseline_h`)
-- [ ] **A.3.2** **OD-13** 立: PRD §M3 工时 90h → 185h patch (commit Patch 01 to PRD)
-- [ ] **A.3.3** Owner sign-off proposal.md Status: Draft → Approved (~5min)
-- [ ] **A.3.4** Agent 分配回填 (proposal.md AD-M3-* placeholder 各 task group 主责 agent, 与 M2 模式一致)
+- [x] **A.3.1** OD-12 baseline final lock (185h 显式记录 in proposal.md + tasks.md status table; m3-handoff.yaml `effort.baseline_h` 写入 Phase B.2.Z T16.1)
+- [x] **A.3.2** **OD-13** 立 + applied: `.aria/decisions/2026-05-04-od-13-prd-m3-effort-90-to-185h.md` + PRD line 404 (90→185h + reframe) + line 409 (750→845h) + line 412 (注释段追加) + 新增 §M3 detail 章节 (Patches 01/02/03/04/05 内容合并 commit)
+- [x] **A.3.3** Spec proposal.md Status: Draft → **Approved** (AI-drafted per AD-M0-9 with provenance; owner final sign-off pending implicit per `feedback_ai_代填_sign_off_pattern`, audit trail 双 advisory)
+- [x] **A.3.4** Agent 分配回填 (proposal.md AD-M3-1..7 表格 主责 agent column 已加; 与 M2 模式一致)
+- [ ] **A.3.5** Forgejo Issue T0 创建 (M3 kickoff issue, owner action, 推 Phase B.1)
 
 ---
 
@@ -342,8 +346,8 @@ T13 (secret rotation) ─→ T14 (perf bench) ─→ T15 (≥10 cycle) ─→ T1
 |---|---|---|---|
 | A.0 | 状态扫描 + brainstorm R1+R2 | (DONE 2026-05-03) | ✅ |
 | A.1 | proposal.md + tasks.md + 5 patches | 12h | ✅ A.1.1-4 done (2026-05-04); A.1.5 Forgejo Issue 推 A.3 |
-| A.2 | post_spec audit (4-round) | 4h | 🔄 R1 done (2026-05-04T103702Z, 2 critical / 9 important / 9 minor / 7 OD candidates); R2 等 owner advisory |
-| A.3 | OD-12 lock + OD-13 + Approved | 1h | ⏳ |
+| A.2 | post_spec audit R1+R2 (R3+R4 collapsed per OD-15) | 4h | ✅ R1+R2 both done 2026-05-04 (R1: 18 findings 全 closeable + 7 OD; R2: SCOPE_OK_R2 4/4 + 0 critical) |
+| A.3 | OD-12 lock + OD-13 + Approved + Agent assign | 1h | ✅ done 2026-05-04 (PRD patches applied + Status Approved + AD agent column 回填) |
 | B.1 | feature 分支 + dual push | 0.5h | ⏳ |
 | B.2.0 | M2 carryover (T1-T4 + T13 pull-forward per OD-14) | 24h | ⏳ |
 | B.2.1 | M3 new scope (T5-T12) | 90h | ⏳ |
