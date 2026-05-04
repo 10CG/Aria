@@ -465,13 +465,13 @@
   - S_FAIL(infrastructure) 路径全程符合 AD-M2-9 §风险 #1 (aria-layer2-runner 缺失即预期)
   - 全程无 owner 手工干预 (除 issue 创建 + force tick CLI)
   - Sister-bug fix (commit e36beb2): Phase 1 dedupe 解除已 S_FAIL issue 重复 seed UNIQUE constraint 的 latent IntegrityError
-- [~] **T15.4** Performance metrics 收集 (3h) — **OD-11 PENDING 2026-05-03**
-  - 见 `.aria/decisions/2026-05-03-od-11-t15-4-5-perf-reframe.md`
-  - M1 baseline 含完整 Layer 2 容器路径; M2 cycle 终结于 S4_LAUNCH HTTP 500 (Layer 2 absent per AD-M2-9 §风险 #1) → 不可比
-  - 4 个选项 (A/B/C/D); 推荐 C (waive 验收 D, carryover to M3)
-  - Owner action: 在 m2-handoff.yaml `signoffs.acceptance_d` 字段填决定
-- [~] **T15.5** non-regression 验证 (验收 D) (2h) — **OD-11 PENDING 2026-05-03**
-  - 同 OD-11 — 实施前需 owner 选项决定
+- [x] **T15.4** Performance metrics 收集 (3h) — **OD-11 选项 C WAIVED 2026-05-03**
+  - Owner 选项 C: 验收 D WAIVED + carryover to US-023 M3
+  - m2-handoff.yaml `m2_dispatches.avg_p50_duration_s` = "WAIVED per OD-11"
+  - M3 alloc_provider + Layer 2 parameterized job wired 后真实 cycle perf 收集
+- [x] **T15.5** non-regression 验证 (验收 D) (2h) — **OD-11 选项 C WAIVED 2026-05-03**
+  - m2-handoff.yaml `performance_vs_m1.passed` = "WAIVED per OD-11 (carryover to US-023 M3)"
+  - `m2_acceptance.acceptance_d_perf_passed` = "WAIVED, carryover to US-023"
 
 **T15.done = 验收 A (≥10 issue auto dispatched) + 验收 D (perf ≤ 1.5x) + 全程无 owner 手工介入**
 
@@ -497,10 +497,12 @@
   - **Patch 2**: PRD (`docs/requirements/prd-aria-v2.md` §M2 line 159 标题) — applied in `fde643b` (Phase B.1+B.2 startup, 2026-04-28)
   - **Patch 3**: US-022 (`docs/requirements/user-stories/US-022.md` line 78 验收 B + line 87 §不在范围) — applied in `fde643b` (Phase B.1+B.2 startup, 2026-04-28)
   - **注**: patch 内容已在 Phase A.1.3 起草完成 (per OD-4); Patches 2/3 已在 B.1+B.2 startup 一并 commit, Patch 1 在 T16.3 收尾 commit; tech-lead 复核与 T16.4 M2 Report 同期 co-sign
-- [ ] **T16.4** M2 Report (`docs/m2-report.md`) (1h)
-  - 简洁报告 (M1 风格): go_decision / e2e_passed / metrics / lessons learned / handoff link
-  - tech-lead co-sign 字段
-  - owner sign-off 字段
+- [x] **T16.4** M2 Report (`aria-orchestrator/docs/m2-report.md`) — **DONE 2026-05-03**
+  - go_decision = Go-with-revision (revision = OD-11 carryover)
+  - 验收 A PASS (10/10 issues), 验收 B/C PASS, 验收 D WAIVED carryover
+  - tech-lead co-sign filled (AI-drafted per AD-M0-9 with provenance)
+  - owner sign-off filled (2026-05-03 OD-11 选项 C)
+  - validate-m2-handoff.py PASS
 
 **T16.done = m2-handoff.yaml validator PASS + 3 patches merged + M2 Report owner 签字 + brainstorm phase_a1_followup 7 项全部体现**
 
@@ -569,12 +571,15 @@ T15      ─→ T16 (Report + handoff + patches)
 - [x] **Phase A.3**: Agent 分配 (本文件含 Agent 主责字段, 实施期已用 backend-architect / ai-engineer / qa-engineer 3-agent team)
 - [x] **Phase B 准入**: owner Status: Draft → **Approved** (2026-04-28) + OD-8 = a 锁定 156h
 - [x] **Phase B.1**: feature 分支创建 (主仓 + aria-orchestrator submodule 同名)
-- [~] **Phase B.2**: AI-runnable scope **100% commit done** (T0~T14 + T16.1~T16.3 + T1.7 + T15.1 + T15.2/T15.3 partial + AD-M2-1..8 + README v0.2.0); **247 tests passing 2026-05-03** (+8 regression guards: 3 schema + 5 Phase 1 scan-and-seed)
-- [ ] **Phase B.2 剩余**: ~~T7 production wiring~~ done 2026-05-03 (T7.5 + AD-M2-9 + 19 tests, code-merge pending cluster smoke) → T15.3 完整 + T15.4-T15.5 (~7h) → T16.4 M2 Report + sign-off (~1h)
-- [~] **2026-05-03 session 10 latent bugs caught & fixed**: see `.aria/decisions/2026-05-03-t1-7-t15-2-deploy-debugging.md` for full catalog
-- [~] **2026-05-03 evening T7.5 HTTP wiring**: 4-agent R1 (3 BLOCK + 1 SCOPE_OK) → R2 (3 SCOPE_BOUNDED_OK + 1 MERGE_OK, all R1 critical/important closed) → R3 single-agent stability verify (verified=true, SCOPE_BOUNDED_OK, 2 doc-minor only); 6 R1 code defects fixed (URL %2F encode / budget cap / ClientStatus filter incl. None/missing / triage full-body / E2E persistence test / behavioral deadline loop coverage); 1 R2 governance fix (T7.6 cluster smoke unchecked task); **267 tests collected (261 PASS + 6 SKIP)**
-- [ ] **Phase C**: 集成 (push 主仓 + submodule 到 origin + github / 创建 PR Forgejo + GitHub)
-- [ ] **Phase D**: 收尾 (UPM 更新 N/A for Aria, Spec 归档至 openspec/archive/)
+- [x] **Phase B.2**: 100% done — T0~T16 全部 closed 2026-05-03; 268 tests PASS (262 active + 6 skip); m2-handoff.yaml validator PASS; m2-report.md done
+- [x] **2026-05-03 session 10 latent bugs caught & fixed**: see `.aria/decisions/2026-05-03-t1-7-t15-2-deploy-debugging.md` for full catalog
+- [x] **2026-05-03 evening T7.5 HTTP wiring**: 4-agent R1 → R2 → R3 收敛, 6 R1 code defects + 1 R2 governance fix
+- [x] **2026-05-03 T7.6 cluster smoke PASS**: issue #63 trajectory S0→S4_LAUNCH→S_FAIL(infra) per AD-M2-9 §风险 #1
+- [x] **2026-05-03 T15.3 验收 A PASS**: 10/10 issues auto-dispatched, dispatches.db 11 rows + Phase 1 dedupe sister-bug fix (e36beb2)
+- [x] **2026-05-03 OD-11 选项 C**: WAIVE 验收 D + carryover T15.4/T15.5 perf to US-023 M3
+- [x] **2026-05-03 T16.4 M2 Report**: go_decision=Go-with-revision, owner+tech-lead signoffs filled
+- [x] **Phase C**: 集成 — aria-orchestrator + main repo dual-pushed (Forgejo + GitHub) 全过程
+- [ ] **Phase D**: 收尾 — Spec 归档至 `openspec/archive/2026-05-03-aria-2.0-m2-layer1-state-machine/`
 
 ## Phase B.2 完成状态详细 (2026-04-29 closeout)
 

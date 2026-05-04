@@ -1,8 +1,9 @@
 # aria-2.0-m2-layer1-state-machine — Aria 2.0 M2 Layer 1 状态机 + Hermes Extension
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: **Approved** (Phase A.1 起草 + post_spec audit PASS_WITH_WARNINGS + OD-8 锁定预算 156h, 2026-04-28)
+> **Status**: **Done — Archived** (Closeout 2026-05-03, Go-with-revision per OD-11 carryover; 268 tests PASS)
 > **Created**: 2026-04-28
+> **Archived**: 2026-05-03 (`openspec/archive/2026-05-03-aria-2.0-m2-layer1-state-machine/`)
 > **Approved**: 2026-04-28 (owner sign-off, Status: Draft → Approved)
 > **Parent Story**: [US-022](../../../docs/requirements/user-stories/US-022.md)
 > **Target Version**: v2.0.0-m2
