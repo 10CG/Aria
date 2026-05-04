@@ -2,9 +2,26 @@
 id: US-023-PHASE-A2-R1-OWNER-ADVISORY
 title: US-023 / aria-2.0-m3 Phase A.2 R1 — owner advisory 7 问
 date: 2026-05-04
-status: pending_owner_input
+status: resolved
+resolved_at: 2026-05-04
+owner_decision: 同意全部 7 AI 推荐 default
 relates_to: US-023, OD-12 RESOLVED, R1 audit (.aria/audit-reports/post_spec-2026-05-04T103702Z-us023-m3.md), Phase A.2 R2 next
 ---
+
+## Owner 决议汇总 (2026-05-04 RESOLVED)
+
+| # | OD-ID | 答案 | 锁定 default | impact |
+|---|-------|------|--------------|--------|
+| Q1 | OD-14 | YES | T13 拉到 B.2.0 startup (week 1) | tasks.md status table 已含 default; B.2.0=24h, B.2.Z=27h |
+| Q2 | OD-15 | defer | R2 closure 后再决 | 当下 R2 必跑 |
+| Q3 | OD-3d | YES | silknode 契约 1 generalize 到 ZhipuClient | T8.5 Spec 已含 default |
+| Q4 | OD-3e | exploratory | T9.8 multi-model benchmark exploratory only, `multi_model_benchmark_gate=false` | T9.8 Spec 已含 default; budget cap $5 sustain |
+| Q5 | OD-3f | snapshot | Zhipu pricing snapshot at T10 day + 6-month review | T10.3 Spec 已含 default |
+| Q6 | OD-3g | accept | ZhipuClient connect_timeout=5s + read_timeout=60s | T8.6 Spec 已含 default |
+| Q7 | Q-NEW-1 | unit | T12.4 unit (subprocess + SIGKILL + FakeAllocStatusProvider env var) | T12.4 Spec 已含 default |
+
+**Sustain default**: Spec 当前已 reflect 全部 default, 无 deviation, 直接进 R2 fix-verify。
+
 
 # US-023 / M3 Phase A.2 R1 — Owner Advisory (7 问)
 
