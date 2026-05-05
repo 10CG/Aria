@@ -355,7 +355,7 @@ T13 (secret rotation) ─→ T14 (perf bench) ─→ T15 (≥10 cycle) ─→ T1
 | A.2 | post_spec audit R1+R2 (R3+R4 collapsed per OD-15) | 4h | ✅ R1+R2 both done 2026-05-04 (R1: 18 findings 全 closeable + 7 OD; R2: SCOPE_OK_R2 4/4 + 0 critical) |
 | A.3 | OD-12 lock + OD-13 + Approved + Agent assign | 1h | ✅ done 2026-05-04 (PRD patches applied + Status Approved + AD agent column 回填) |
 | B.1 | feature 分支 + dual push | 0.5h | ✅ done 2026-05-05 (state-snapshot `overall_parity=true`) |
-| B.2.0 | M2 carryover (T1-T4 + T13 pull-forward per OD-14) | 24h | ⏳ |
+| B.2.0 | M2 carryover (T1-T4 + T13 pull-forward per OD-14) | 24h | ⏳ T1+T2+T3 done 2026-05-05 (实际 ~5.5h vs ~13h baseline = 7.5h 节省); T4 blocked by T1.OWNER + T13 (异步 owner action) |
 | B.2.1 | M3 new scope (T5-T12) | 90h | ⏳ |
 | B.2.Z | E2E + handoff (T14-T16, T13 已拉前) | 27h | ⏳ |
 | C+D | 集成 + 归档 | (含 buffer 17h) | ⏳ |
