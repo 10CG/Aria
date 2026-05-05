@@ -258,7 +258,7 @@ Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 Canonica
 
 | ID | 主题 | 状态 | 触发 | 主责 agent (Phase A.3.4) |
 |---|---|---|---|---|
-| AD-M3-1 | Layer 2 parameterized job HCL (image sha pin + meta keys + idempotency) | _待回填_ Phase B.2.0 T1 | OD-3a sha digest 锁 | backend-architect (HCL design) + qa-engineer (validate) |
+| AD-M3-1 | Layer 2 parameterized job HCL (image sha pin + meta keys + idempotency) | **Decided 2026-05-05 (T1)** — see [architecture-decisions.md §AD-M3-1](../../../aria-orchestrator/docs/architecture-decisions.md) | OD-3a sha digest 锁 | backend-architect (HCL design) + qa-engineer (validate) |
 | AD-M3-2 | NomadAllocHTTPProvider 注入路径 (ARIA_LAZY_WIRE) + Protocol contract | _待回填_ Phase B.2.0 T2 | OD-3c lazy-wire 锁 | backend-architect (Protocol) + ai-engineer (lazy-wire pattern) |
 | AD-M3-3 | Schema v2 migration (additive-first + write-time fallback transform + backfill rules) | _待回填_ Phase B.2.0 T3 | OD-12 §Q5 实施期 | backend-architect (SQL) + qa-engineer (fixture) |
 | AD-M3-4 | ProviderRouter abstraction + Luxeno→Zhipu HA + GLM multi-model state-aware | _待回填_ Phase B.2.1 T9 | OD-12 §Q1=D' + OD-3d/3e/3f/3g | ai-engineer (router design) + backend-architect (concurrency) |

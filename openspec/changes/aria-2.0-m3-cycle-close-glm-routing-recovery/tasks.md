@@ -60,7 +60,7 @@
 - [x] **T1.6** Resources / Constraints: M1 baseline (cpu=2000 MHz, mem=2048 MiB), heavy nodes only (`node.class = heavy_workload`, M1 实证 ground truth) — 注: proposal §一 字面 "CPU 1000" 是 paraphrase, 此处遵从 M1 BA-I1 实证值 (HCL header note 标 deviation)
 - [x] **T1.7** Idempotency: DISPATCH_ID + IDEMPOTENCY_KEY 双重 dedupe — HCL 层完成 meta key enumeration (T1.2) + restart `attempts=0 mode=fail` (跨 alloc retry 由 Layer 1 reconciler + entrypoint dedupe 处理); entrypoint 层 dedupe 在 image 内, 非 HCL scope
 - [x] **T1.8** `nomad job validate aria-layer2-runner.hcl` pre-deploy (per `feedback_nomad_hcl_validate_early`) — PASS (Nomad v1.7.7, "Job validation successful"; driver-level checks 待 Aether agent 连接验证, per `feedback_hcl_driver_feature_matrix`)
-- [ ] **T1.9** AD-M3-1 回填 (HCL meta keys + image pin 决策 + registry domain owner-decision)
+- [x] **T1.9** AD-M3-1 回填 (HCL meta keys + image pin 决策 + registry domain owner-decision) — 2026-05-05 done: aria-orchestrator/docs/architecture-decisions.md §AD-M3-* 占位段 (10 槽) + AD-M3-1 完整 6 段 (决策/背景/Alternatives/选型理由/风险/回滚路径) + version history 0.7 + proposal.md AD-M3-1 行 cross-reference
 - [ ] **T1.OWNER** Owner action: (a) 确认 image registry domain (registry.10cg.pub 新建 vs 沿用 forgejo.10cg.pub); (b) `nomad var put nomad/jobs/aria-layer2-runner ...` 8 secrets (T13 rotation 后); (c) `nomad job run aria-layer2-runner.hcl` on Aether (~30min, verify alloc launch)
 
 **T1.done = HCL validate PASS + Aether 部署成功 + sample dispatch 实测 alloc state 推进 + AD-M3-1 回填**
