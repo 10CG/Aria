@@ -51,16 +51,17 @@
 
 #### T1 — `aria-layer2-runner` HCL parameterized job (~6h, AD-M3-1 触发)
 
-- [ ] **T1.1** Fork from US-021 M1 HCL (`aria-orchestrator/jobs/aria-layer2-runner.nomad.hcl`); diff 标注 M1→M3 变化点
-- [ ] **T1.2** `meta_required` 字段 enumerate (per R2 I1 + OD-3a): `ISSUE_ID, ISSUE_URL, DISPATCH_ID, IMAGE_SHA, IDEMPOTENCY_KEY`
-- [ ] **T1.3** `meta_optional` 字段: `BUDGET_CAP_USD, TRIAGE_BODY_JSON`
-- [ ] **T1.4** Image pin sha digest (per OD-3a default, AD-M1-7 reproducibility): HCL `image = "registry.10cg.pub/aria-runner@sha256:${IMAGE_SHA}"`
-- [ ] **T1.5** Driver = docker (M1 一致, 不切 raw_exec); host_volume `aria-runner-cache` (if applicable from M1)
-- [ ] **T1.6** Resources / Constraints: M1 baseline (heavy nodes only)
-- [ ] **T1.7** Idempotency: DISPATCH_ID + IDEMPOTENCY_KEY 双重 dedupe verify (per OD-5a + AD-M1-7)
-- [ ] **T1.8** `nomad job validate` HCL pre-deploy (per `feedback_nomad_hcl_validate_early`)
-- [ ] **T1.9** AD-M3-1 回填 (HCL meta keys + image pin 决策)
-- [ ] **T1.OWNER** Owner action: 部署 HCL on Aether (`nomad job run aria-layer2-runner.nomad.hcl`, ~30min, verify alloc launch)
+- [x] **T1.1** Fork from US-021 M1 HCL → `aria-orchestrator/nomad/jobs/aria-layer2-runner.hcl`; diff 标注 M1→M3 变化点 (header 表格 7 维度)
+  - **Path reframe** (per `feedback_spec_reframe_in_session`): tasks.md 字面 `aria-orchestrator/jobs/aria-layer2-runner.nomad.hcl` 与 sister files 路径不一致; 实际 path 取 `aria-orchestrator/nomad/jobs/aria-layer2-runner.hcl` (与 `aria-runner-template.hcl` / `aria-build.hcl` / `aria-layer1.hcl` 对齐, 无 `.nomad.` infix)。Reframe 三处: HCL header note + commit message + 本 tasks.md 此处。
+- [x] **T1.2** `meta_required` 字段 enumerate (per R2 I1 + OD-3a): `ISSUE_ID, ISSUE_URL, DISPATCH_ID, IMAGE_SHA, IDEMPOTENCY_KEY` ✓ HCL `parameterized.meta_required` 5 keys
+- [x] **T1.3** `meta_optional` 字段: `BUDGET_CAP_USD, TRIAGE_BODY_JSON` ✓ HCL `parameterized.meta_optional` 2 keys
+- [x] **T1.4** Image pin sha digest (per OD-3a default, AD-M1-7 reproducibility): HCL `image = "registry.10cg.pub/aria-runner@sha256:${NOMAD_META_IMAGE_SHA}"` ✓ — 注: registry domain `registry.10cg.pub` (proposal 字面) 与 M1 实际 `forgejo.10cg.pub/10cg/aria-runner` 不一致, T1.OWNER 部署前 owner 确认 (HCL header note + AD-M3-1 待回填)
+- [x] **T1.5** Driver = docker (M1 一致, 不切 raw_exec); host_volume `aria-runner-outputs` + `aria-runner-inputs` (M1 一致, 无 `aria-runner-cache` per M1 baseline 实证)
+- [x] **T1.6** Resources / Constraints: M1 baseline (cpu=2000 MHz, mem=2048 MiB), heavy nodes only (`node.class = heavy_workload`, M1 实证 ground truth) — 注: proposal §一 字面 "CPU 1000" 是 paraphrase, 此处遵从 M1 BA-I1 实证值 (HCL header note 标 deviation)
+- [x] **T1.7** Idempotency: DISPATCH_ID + IDEMPOTENCY_KEY 双重 dedupe — HCL 层完成 meta key enumeration (T1.2) + restart `attempts=0 mode=fail` (跨 alloc retry 由 Layer 1 reconciler + entrypoint dedupe 处理); entrypoint 层 dedupe 在 image 内, 非 HCL scope
+- [x] **T1.8** `nomad job validate aria-layer2-runner.hcl` pre-deploy (per `feedback_nomad_hcl_validate_early`) — PASS (Nomad v1.7.7, "Job validation successful"; driver-level checks 待 Aether agent 连接验证, per `feedback_hcl_driver_feature_matrix`)
+- [ ] **T1.9** AD-M3-1 回填 (HCL meta keys + image pin 决策 + registry domain owner-decision)
+- [ ] **T1.OWNER** Owner action: (a) 确认 image registry domain (registry.10cg.pub 新建 vs 沿用 forgejo.10cg.pub); (b) `nomad var put nomad/jobs/aria-layer2-runner ...` 8 secrets (T13 rotation 后); (c) `nomad job run aria-layer2-runner.hcl` on Aether (~30min, verify alloc launch)
 
 **T1.done = HCL validate PASS + Aether 部署成功 + sample dispatch 实测 alloc state 推进 + AD-M3-1 回填**
 
