@@ -88,26 +88,24 @@
 
 #### T3 — Schema migration v2 (~3h, AD-M3-3 触发, R2 I4 + R2 M3 + R2 M5 + R1-C1/M2/M3)
 
-- [ ] **T3.1** Migration script `aria-orchestrator/migrations/002_schema_v2_additive.sql`:
-  - **Pre-condition (R1-C1)**: 验 v1 fixture 已含 `fallback_triggered INTEGER NOT NULL DEFAULT 0` (M2 schema.sql:85 实证); fail-fast if missing
-  - `ALTER TABLE dispatches ADD COLUMN cycle_start_ts TEXT`
-  - `ALTER TABLE dispatches ADD COLUMN cycle_end_ts TEXT`
-  - `ALTER TABLE dispatches ADD COLUMN dispatched_job_id TEXT`
-  - `ALTER TABLE dispatches ADD COLUMN eval_id TEXT`
-  - `ALTER TABLE dispatches ADD COLUMN provider_cost_model TEXT`
-  - `ALTER TABLE dispatches ADD COLUMN attempt_history_json TEXT` (per R1-M2, T6.6 reconciler stuck event log)
-  - `CREATE TABLE IF NOT EXISTS migration_notes (key TEXT PRIMARY KEY, note TEXT, applied_at TEXT)` (per R1-M3, backfill placeholder audit trail)
-  - `INSERT INTO schema_meta VALUES ('fallback_chain_outcome_enum', '["ok","http_5xx","http_429","http_4xx","timeout","network_error","quality_degrade"]')` (per R1-C2 self-doc, future audit drift detect)
-- [ ] **T3.2** `fallback_chain_json` write-time exhaustive transform (per R2 I4): UPDATE all v1 字符串数组 → v2 dict array, 同 ALTER 同 transaction
-- [ ] **T3.3** `INSERT INTO schema_meta VALUES ('schema_version', '2.0')`
-- [ ] **T3.4** Backfill rules:
-  - 历史 row `provider_cost_model = 'subscription_flat'` (per AD-M1-12 Luxeno-only, R2 M3)
-  - 历史 S9_CLOSE / S_FAIL row `cycle_start_ts = state_entered_at` (per R2 M5, 显式 placeholder 注 in `migration_notes` table)
-- [ ] **T3.5** Migration runner: 启动时自动检查 schema_version 升级 (与 M2 SchemaInitializer 集成); ALTER 失败 SQLite 自动回滚
-- [ ] **T3.6** Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 CanonicalDispatchesDB pattern)
-- [ ] **T3.7** Unit + integration tests: migration apply on fixture → 0 数据丢失 + 6 新 col present + migration_notes table created + schema_meta outcome_enum entry + dict fallback round-trip + backfill rules applied + R1-C1 fallback_triggered pre-condition assertion (≥12 tests)
-- [ ] **T3.8** **inline UNIQUE constraint (`schema.sql:98`) 保留** (drop 推 schema v3 / M4) — 应用层 dedupe 续用
-- [ ] **T3.9** Drift guard test (per `feedback_validator_repo_drift_guard_test`): committed schema.sql 通过 migration 等价 production
+- [x] **T3.1** Migration script `aria_layer1/migrations/002_schema_v2_additive.sql` (44 行):
+  - **Path reframe** (per `feedback_spec_reframe_in_session`): 字面 `aria-orchestrator/migrations/...` 改为 in-package `aria_layer1/migrations/...` (importlib.resources 可加载, raw_exec/docker/pip install 通用); reframe 三处: SQL header note + schema_migrate.py header + 本 tasks.md 此处
+  - **Pre-condition (R1-C1)**: 由 schema_migrate.py `_assert_fallback_triggered_column_exists` 实施 (PRAGMA table_info), fail-fast if missing
+  - 6 ALTER TABLE ADD COLUMN: cycle_start_ts / cycle_end_ts / dispatched_job_id / eval_id / provider_cost_model / attempt_history_json (全 TEXT nullable additive per AD-M1-7)
+  - CREATE TABLE IF NOT EXISTS migration_notes (key/note/applied_at, per R1-M3)
+  - INSERT OR IGNORE schema_meta fallback_chain_outcome_enum (per R1-C2)
+  - UPDATE schema_meta SET value='2.0' WHERE key='schema_version'
+- [x] **T3.2** `fallback_chain_json` 写时 transform (per R2 I4): `_transform_fallback_chain_v1_to_v2` Python 实施 (Python SQL 联动, 同 BEGIN IMMEDIATE 事务内); v1 string-array → v2 dict-array (7 keys: model/trigger_reason='legacy_v1_migrated'/latency_ms/endpoint_from/endpoint_to/model_switched_to/outcome='ok'); 已是 v2 dict-array round-trip safe; null/malformed 跳过
+- [x] **T3.3** schema_version 写入 — 通过 SQL `UPDATE schema_meta SET value='2.0'` (existing key) + schema.sql `INSERT OR IGNORE schema_version='2.0'` (fresh DB)
+- [x] **T3.4** Backfill rules — `_apply_backfill_rules` 实施 (Python, 同 BEGIN IMMEDIATE 事务):
+  - Rule 1: provider_cost_model NULL → 'subscription_flat' (M1+M2 Luxeno-only per AD-M1-12 + R2 M3)
+  - Rule 2: cycle_start_ts NULL on (S9_CLOSE / S_FAIL) → state_entered_at (per R2 M5, 显式 placeholder)
+  - 每 rule 写 migration_notes audit row (per R1-M3)
+- [x] **T3.5** Migration runner — `aria_layer1/schema_migrate.py:apply_migrations(conn)` (305 行); BEGIN IMMEDIATE 事务包裹, ALTER 失败 ROLLBACK; idempotent re-runs via schema_version 检测; wired in `extension.py:_get_repo` (schema.sql executescript → apply_migrations)
+- [x] **T3.6** Test fixture — `_create_v1_baseline_db()` + `_insert_v1_dispatch()` 在 test_t3 内合成 11-row M2 T15.3 trajectory (DEMO-001/002 S9_CLOSE + ISS-705..713 S_FAIL); 不依赖外部 .db 文件 (per testability + reproducibility, 无 binary fixture)
+- [x] **T3.7** Tests — `tests/test_t3_schema_migration.py` 16 tests: 5 apply_migrations behavior + 1 R1-C1 pre-condition + 4 fallback_chain transform + 3 backfill rules/audit + 3 integration (11-row fixture / drift guard / extension._get_repo 触发); 全 PASS, 0 regression on 283 baseline (now 299 total)
+- [x] **T3.8** inline UNIQUE 保留 — `schema.sql:98` `CONSTRAINT uq_issue_active UNIQUE (issue_id)` 不动 (drop 推 schema v3 / M4); 应用层 dedupe (M2 T15.2 e36beb2 dedupe sister-bug fix) 续用
+- [x] **T3.9** Drift guard test — `test_drift_guard_committed_schema_matches_migrated_v1` (per `feedback_validator_repo_drift_guard_test`): 两 path (fresh schema.sql 直建 v2 vs v1+migration) 必须 column set + table set + schema_version 完全相等; 实测 PASS
 - [ ] **T3.10** AD-M3-3 回填 (schema v2 additive 决策 + fallback_chain transform 时机)
 
 **T3.done = migration apply 11-row fixture 0 loss + 5 col additive + dict fallback transform + backfill rules + AD-M3-3 回填**
