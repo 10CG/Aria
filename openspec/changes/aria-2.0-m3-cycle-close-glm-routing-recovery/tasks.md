@@ -106,7 +106,7 @@
 - [x] **T3.7** Tests — `tests/test_t3_schema_migration.py` 16 tests: 5 apply_migrations behavior + 1 R1-C1 pre-condition + 4 fallback_chain transform + 3 backfill rules/audit + 3 integration (11-row fixture / drift guard / extension._get_repo 触发); 全 PASS, 0 regression on 283 baseline (now 299 total)
 - [x] **T3.8** inline UNIQUE 保留 — `schema.sql:98` `CONSTRAINT uq_issue_active UNIQUE (issue_id)` 不动 (drop 推 schema v3 / M4); 应用层 dedupe (M2 T15.2 e36beb2 dedupe sister-bug fix) 续用
 - [x] **T3.9** Drift guard test — `test_drift_guard_committed_schema_matches_migrated_v1` (per `feedback_validator_repo_drift_guard_test`): 两 path (fresh schema.sql 直建 v2 vs v1+migration) 必须 column set + table set + schema_version 完全相等; 实测 PASS
-- [ ] **T3.10** AD-M3-3 回填 (schema v2 additive 决策 + fallback_chain transform 时机)
+- [x] **T3.10** AD-M3-3 回填 — 2026-05-05 done: aria-orchestrator/docs/architecture-decisions.md §AD-M3-3 完整 6 段 (决策 7 维度 / 背景 / 7 alternatives / 7 选型理由 / 8 风险 / 4-level 回滚 / 治理影响) + version history 0.9 + proposal.md AD-M3-3 行 cross-reference
 
 **T3.done = migration apply 11-row fixture 0 loss + 5 col additive + dict fallback transform + backfill rules + AD-M3-3 回填**
 
