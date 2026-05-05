@@ -67,14 +67,21 @@
 
 #### T2 — `NomadAllocHTTPProvider` 生产化 (~4h, AD-M3-2 触发, R2 C3)
 
-- [ ] **T2.1** 实施 `aria_layer1/clients/alloc_status_provider.py` `NomadAllocHTTPProvider` class
-- [ ] **T2.2** `AllocStatusProvider` Protocol 实施 (M2 同 contract per AD-M2-9)
-- [ ] **T2.3** HTTP GET `/v1/allocation/{alloc_id}` (Nomad API, base_url 走 `NOMAD_ADDR` Nomad Variable)
-- [ ] **T2.4** 30s ack-poll budget (M2 fake-only → M3 真实化, 30s 超时则留状态 reconciler 处理)
-- [ ] **T2.5** alloc states 映射 Layer 1 transition (per OD-12 §Q3): `pending|queued` → 不动 / `running` → S6 prep / `complete` → S6_REVIEW / `failed` → S_FAIL(layer2_runner_failed) / `lost` → S_FAIL(alloc_lost)
-- [ ] **T2.6** **Lazy-wire 注入** (per R2 C3 + OD-3c): `tick_runner.py` 内 `if os.environ.get("ARIA_LAZY_WIRE") == "1": self._alloc_provider = NomadAllocHTTPProvider()` (ForgejoCliClient + NomadDispatchClientHTTP pattern 一致)
-- [ ] **T2.7** Unit tests: 5 alloc state mapping + lazy-wire 注入 + Protocol contract assert (≥8 tests)
-- [ ] **T2.8** Integration test: testing-mock Nomad HTTP (httpx mock or local nomad agent dev mode), 3 状态 round-trip
+- [x] **T2.1** 实施 `aria_layer1/alloc_status_provider.py` `NomadAllocHTTPProvider` class (276 行)
+  - **Path reframe** (per `feedback_spec_reframe_in_session`): proposal §二 字面 `aria_layer1/clients/alloc_status_provider.py` 与 sister files 路径不一致 (实际无 `clients/` 子目录, nomad_client.py / forgejo_client.py / silknode_client.py 均 flat); 实际 path 取 `aria_layer1/alloc_status_provider.py`。Reframe 三处: 文件 header note + 本 tasks.md 此处 + commit message。
+- [x] **T2.2** `AllocStatusProvider` Protocol 实施 — M2 frozen Protocol (interfaces.py L128) 直接复用, additive 即可 (per AD-M2-9 §contract); M3 实施类 duck-type satisfies, 无需修改 Protocol 自身
+- [x] **T2.3** HTTP GET `/v1/allocation/{alloc_id}` — `_fetch_allocation` 实施 (urllib stdlib, percent-quote alloc_id, NOMAD_TOKEN forward-compat); 默认 base_url=`$NOMAD_ADDR` env 或 Aether `http://192.168.69.70:4646`
+- [x] **T2.4** 30s ack-poll budget — provider 自身 per-call timeout 5s (≥6 retries fit 在 30s budget); 30s budget 由 caller (M2 `_handle_s4_launch` ack-poll loop + `_handle_s5_await` 跨 tick re-entry) 强制, provider 保持简单 (单 GET, 无内部 retry)
+- [x] **T2.5** alloc states 映射 (5 → M2 frozen 3-state vocabulary, additive-only per AD-M2-9):
+  - Nomad `pending|queued` → Protocol `running` + exit_code=None (M2 _handle_s5 heartbeat & 不动)
+  - Nomad `running` → `running` + None
+  - Nomad `complete` → `terminated` + exit_code=0 (从 TaskStates Terminated event 取, defensive 验非零)
+  - Nomad `failed` → `terminated` + exit_code (从 Terminated event ExitCode 取, default 1)
+  - Nomad `lost` → `lost` + None
+  - Unknown → `running` + None (defensive, 防 Nomad 新版本 ClientStatus enum 演进)
+- [x] **T2.6** Lazy-wire 注入 — `extension.py` 两处加 (per OD-3c default + R2 C3): `_handle_s4_launch` ack-poll path (ARIA_LAZY_WIRE=1 → NomadAllocHTTPProvider) + `_handle_s5_await` 进入时 (alloc_id 已设, lazy-wire opt-in); 与 ForgejoCliClient + NomadDispatchClientHTTP pattern 一致
+- [x] **T2.7** Unit tests — `tests/test_t2_alloc_status_provider.py` 12 unit tests: 5 ClientStatus mapping + 4 defensive fallback (unknown/empty alloc_id/fetch error/complete with task non-zero) + Protocol conformance + 2 exit_code extraction (with/without Terminated event); 全 PASS
+- [x] **T2.8** Integration tests — 3 integration via `unittest.mock.patch` urlopen (URL %2F-encoding / 404 GC fallback / real Nomad-shaped JSON 解析); 全 PASS。无 httpx 第三方依赖 (stdlib mock 与 test_phase1/test_t8 precedent 一致)
 - [ ] **T2.9** AD-M3-2 回填 (lazy-wire + Protocol contract 决策)
 
 **T2.done = NomadAllocHTTPProvider class 实施 + Protocol assert + ARIA_LAZY_WIRE=1 注入测试 + Nomad mock integration test PASS + AD-M3-2 回填**
