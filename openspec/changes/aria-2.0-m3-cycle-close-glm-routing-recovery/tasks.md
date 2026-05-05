@@ -82,7 +82,7 @@
 - [x] **T2.6** Lazy-wire 注入 — `extension.py` 两处加 (per OD-3c default + R2 C3): `_handle_s4_launch` ack-poll path (ARIA_LAZY_WIRE=1 → NomadAllocHTTPProvider) + `_handle_s5_await` 进入时 (alloc_id 已设, lazy-wire opt-in); 与 ForgejoCliClient + NomadDispatchClientHTTP pattern 一致
 - [x] **T2.7** Unit tests — `tests/test_t2_alloc_status_provider.py` 12 unit tests: 5 ClientStatus mapping + 4 defensive fallback (unknown/empty alloc_id/fetch error/complete with task non-zero) + Protocol conformance + 2 exit_code extraction (with/without Terminated event); 全 PASS
 - [x] **T2.8** Integration tests — 3 integration via `unittest.mock.patch` urlopen (URL %2F-encoding / 404 GC fallback / real Nomad-shaped JSON 解析); 全 PASS。无 httpx 第三方依赖 (stdlib mock 与 test_phase1/test_t8 precedent 一致)
-- [ ] **T2.9** AD-M3-2 回填 (lazy-wire + Protocol contract 决策)
+- [x] **T2.9** AD-M3-2 回填 (lazy-wire + Protocol contract 决策) — 2026-05-05 done: aria-orchestrator/docs/architecture-decisions.md §AD-M3-2 完整 6 段 (决策/背景/6 alternatives/选型理由/7 风险/3-level 回滚) + version history 0.8 + proposal.md AD-M3-2 行 cross-reference
 
 **T2.done = NomadAllocHTTPProvider class 实施 + Protocol assert + ARIA_LAZY_WIRE=1 注入测试 + Nomad mock integration test PASS + AD-M3-2 回填**
 
