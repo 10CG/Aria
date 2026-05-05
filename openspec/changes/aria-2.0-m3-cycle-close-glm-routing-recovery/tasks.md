@@ -125,15 +125,15 @@
 
 #### T5 — Reconciler design + `aria-layer1-reconcile.nomad.hcl` (~6h, AD-M3-5 触发, OD-12 §Q3+Q4)
 
-- [ ] **T5.1** HCL `aria-orchestrator/jobs/aria-layer1-reconcile.nomad.hcl`: Nomad periodic job, cadence 30min (cron 60min 中点跑)
-- [ ] **T5.2** 同 docker image 不同 entry-point: `aria-layer1-reconcile` CLI
-- [ ] **T5.3** 三阈值 default (per OD-12 §Q3): `max_age_at_S5_AWAIT_minutes=60` / `max_total_attempts=3` / `stuck_alloc_states=('pending', 'queued')`
-- [ ] **T5.4** 路由策略: 混合 — Attempt 1-2: `attempt_count++` (let next cron tick retry) / Attempt 3: S_FAIL(stuck) terminal
-- [ ] **T5.5** CAS 锁 (per OD-12 §Q4 + R2 I5): `UPDATE ... WHERE rowid=X AND state='S5_AWAIT' AND last_heartbeat_at=? AND attempt_count=?` (compound 版本字段)
-- [ ] **T5.6** SQLite WAL + `PRAGMA busy_timeout=5000` (per R2 M4); CAS 失败 retry 1 次 (lost = let cron win)
-- [ ] **T5.7** Strategy interface (M5 LLM-decided 升级预留): env `ARIA_RECONCILER_STRATEGY=mechanical|llm` 切换 1 行 + **`ReconcilerStrategy` Protocol stub** (per R1-M8): `decide(stuck_row: DispatchRow) -> Decision` 返回 enum `{RETRY, FAIL, LEAVE}`
-- [ ] **T5.8** `nomad job validate` HCL pre-deploy
-- [ ] **T5.9** AD-M3-5 回填 (reconciler design 决策)
+- [x] **T5.1** HCL `aria-orchestrator/deploy/aria-layer1-reconcile.nomad.hcl` (path reframe: `deploy/` not `jobs/` 与 sister `aria-layer1-cron.nomad.hcl` 对齐, per `feedback_spec_reframe_in_session`): Nomad periodic job, 30min cadence, half-offset cron expression `15,45 * * * *` (avoids :00 collision with cron tick at `0 * * * *`)
+- [x] **T5.2** Entry-point reframe (per `feedback_spec_reframe_in_session`): tasks.md 字面 "同 docker image 不同 entry-point" 描述 Layer 2 image; 实际 Layer 1 reconciler 运行 Layer 1 代码路径 (查 dispatches.db + Forgejo + Feishu, 不跑 user prompt) → raw_exec on light-1 venv mirroring `aria-layer1-cron.nomad.hcl`. CLI module `aria_layer1.reconcile_runner` (sister to `tick_runner.py`).
+- [x] **T5.3** 三阈值 mixed env+const (per OD-12 §Q3): `ARIA_RECONCILER_S5_MAX_AGE_MIN=60` env (HCL) / `ARIA_RECONCILER_MAX_ATTEMPTS=3` env (HCL) / `STUCK_ALLOC_STATES=('pending','queued')` 代码常量 (`reconciler.py:ReconcilerThresholds`, 不开放 env 防 misclassify 'running' 为 stuck → 风险 #2)
+- [x] **T5.4** 混合路由 `MechanicalReconciler.decide()`: `attempt_count < MAX_ATTEMPTS` → `Decision.RETRY` (T6 CAS UPDATE attempt_count++) / `attempt_count >= MAX_ATTEMPTS` → `Decision.FAIL` (T6 CAS UPDATE state='S_FAIL' + fail_reason 路由矩阵 per T6.3)
+- [x] **T5.5** CAS 复合版本字段契约 documented in `reconciler.py` module docstring (per OD-12 §Q4 + R2 I5): `UPDATE dispatches SET ... WHERE rowid=? AND state='S5_AWAIT' AND last_heartbeat_at=? AND attempt_count=?`; rowcount==0 一次重试 (re-SELECT + re-decide + re-UPDATE) 失败推下一 reconciler tick. T6 实施 SQL.
+- [x] **T5.6** SQLite WAL + `PRAGMA busy_timeout=5000` 复用 `db.open_repo` 中央 PRAGMA (per R2 M4); 半偏移 cron `15,45 * * * *` 是 primary guard, busy_timeout 是 secondary (manual force trigger 兜底)
+- [x] **T5.7** Strategy interface 完整: `Decision` enum {RETRY, FAIL, LEAVE} + `ReconcilerStrategy` Protocol (`reconciler.py`, runtime_checkable, decide(stuck_row) -> Decision) + `select_strategy()` env-driven (`ARIA_RECONCILER_STRATEGY=mechanical(default)|llm`); 'llm' 选项 fail-fast NotImplementedError (M5 forward); unknown 值降级 mechanical + warning. MechanicalReconciler self-bound default (`__init__` 检测 None / sentinel 自绑 self.decide)
+- [x] **T5.8** `nomad job validate aria-orchestrator/deploy/aria-layer1-reconcile.nomad.hcl` PASS (Nomad v1.7.7, "Job validation successful"; 唯一 warning `cron is deprecated and may be removed` 与 sister `aria-layer1-cron.nomad.hcl` 同 pattern, hygiene cron→crons sweep 推单独 Spec per AD-M3-5 §风险 #6)
+- [x] **T5.9** AD-M3-5 回填 — 2026-05-05 done: `aria-orchestrator/docs/architecture-decisions.md` §AD-M3-5 完整 6 段决议 (决策 7 维度 / 背景 / 11 alternatives / 10 选型理由 / 10 风险 / 4-level 回滚 / 治理影响) + version history 0.9 → 1.0 + proposal.md AD-M3-5 行 cross-reference + 299 tests 0 regression 实测
 
 **T5.done = HCL validate PASS + 三阈值/CAS/Strategy interface 实施 + AD-M3-5 回填**
 
