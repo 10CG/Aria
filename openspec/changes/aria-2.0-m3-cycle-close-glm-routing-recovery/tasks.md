@@ -139,14 +139,15 @@
 
 #### T6 — Reconciler stuck-detection + S_FAIL routing + Feishu (~8h)
 
-- [ ] **T6.1** `aria_layer1/reconciler.py` MechanicalReconciler class
-- [ ] **T6.2** Detect stuck S5_AWAIT row (per 三阈值)
-- [ ] **T6.3** Route: attempt_count<3 → CAS UPDATE attempt_count++ / attempt_count=3 → CAS UPDATE state='S_FAIL'; **stuck reason routing matrix (per R1-M10)**: S2/S3 → fail_reason='timeout' / S4/S5 → fail_reason='stuck' / S1/S6/S7/S8 → fail_reason='infrastructure'
-- [ ] **T6.4** Feishu 告警 (per R2 M2): `FEISHU_OPS_ALERT_WEBHOOK` env 可选, fallback `FEISHU_NOTIFY_WEBHOOK` + warning log
-- [ ] **T6.5** Unit tests: 三阈值 boundary + CAS lost-update + Feishu webhook send mock (≥10 tests)
-- [ ] **T6.6** Audit log: stuck detection event 写 `dispatches.attempt_history_json` (per AD-M2-9 §forensic)
+- [x] **T6.1** `aria_layer1/reconciler.py` MechanicalReconciler.run() — pipeline (1) `repo.list_stuck_s5_await(cutoff_iso)` (2) `strategy.decide(row)` (3) CAS UPDATE per Decision (`_handle_retry` / `_handle_fail`) (4) Feishu alert on FAIL (5) result aggregation. Result dict: `{stuck_rows_found, retried, failed, left, cas_lost, alerts_sent, alerts_skipped}`.
+- [x] **T6.2** `db.list_stuck_s5_await(cutoff_iso)`: SELECT WHERE state='S5_AWAIT' AND (last_heartbeat_at IS NULL OR last_heartbeat_at < cutoff). NULL heartbeat 视作 stuck (alloc never ack'd).
+- [x] **T6.3** CAS via `db.cas_increment_attempt` + `db.cas_mark_failed_stuck` (复合版本字段: state + last_heartbeat_at + attempt_count, NULL-safe). Routing matrix `_FAIL_REASON_BY_STATE` in reconciler.py — S2/S3 → TIMEOUT / S4_LAUNCH → DISPATCH_LOST / S5_AWAIT → TIMEOUT / S1/S6/S7/S8 → INFRASTRUCTURE. M2 frozen FailReason enum 无 'stuck' value (per AD-M2-9 frozen enum), 文档化语义对齐: S5_AWAIT → TIMEOUT (elapsed-budget 语义) / S4_LAUNCH → DISPATCH_LOST. Inline comment 三处锚定 reframe (reconciler.py + tasks.md 此条 + AD-M3-5 §决策 #3 footnote).
+- [x] **T6.4** `reconcile_runner._build_feishu_client()` — URL resolution per T6.4: (1) `ARIA_FEISHU_OPS_ALERT_WEBHOOK` 优先 → FeishuWebhookClient(ops_url) (2) fallback `ARIA_FEISHU_WEBHOOK_URL` + warning log → FeishuWebhookClient(general_url) (3) 都 unset → None (skip alerts, info log, reconciler 不 block). MechanicalReconciler.feishu Protocol DI; tests inject FakeFeishuWebhook.
+- [x] **T6.5** `tests/test_t6_reconciler.py` 18 tests (≥10 target 满足): 4 decide boundary (1/2/3/4 attempt_count) + 4 thresholds/strategy plumbing + 2 stuck scan (S5_AWAIT only, NULL=stuck) + 4 run() body (RETRY CAS / FAIL CAS / fail_reason matrix contract / CAS lost-update rebound) + 2 Feishu (alert sent / skipped when unconfigured) + 2 attempt_history (append / malformed replace). 全 PASS, 0 regression on T5 baseline (299 → 317 total).
+- [x] **T6.6** `attempt_history_json` audit log via `MechanicalReconciler._build_history()` — JSON array append, schema `{detected_at, stuck_state, elapsed_min, attempt_count, action_taken}` per AD-M2-9 §forensic + R1-M2. Malformed existing JSON → replaced with single-event array + warning log. CAS UPDATE 同 statement 写入 (atomic, 无 TOCTOU)。
+- [x] **T6.7** Dispatch dataclass v2 column coverage — 新增 6 字段 (cycle_start_ts / cycle_end_ts / dispatched_job_id / eval_id / provider_cost_model / attempt_history_json) + `from_row()` 解析. T3 ALTER 已加列, dataclass 同步对齐 (per `feedback_validator_repo_drift_guard_test` schema-code consistency)。
 
-**T6.done = reconciler 三阈值实施 + stuck → S_FAIL 路由 + Feishu 通知 + ≥10 tests**
+**T6.done = reconciler 三阈值 + 混合路由 CAS + Feishu DI + 18 tests + attempt_history audit + Dispatch dataclass v2 sync**
 
 #### T7 — Crash recovery (~10h, AD-M3-6 触发, OD-3b scope=仅 S5_AWAIT)
 
