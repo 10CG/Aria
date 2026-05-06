@@ -1,7 +1,7 @@
 # aria-2.0-m3-cycle-close-glm-routing-recovery — Aria 2.0 M3 Layer 2 Cycle Close + GLM Multi-Model Routing + Crash Recovery
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: **Approved** (Phase A.3 lock 2026-05-04; AI-drafted per AD-M0-9 with provenance; owner final sign-off pending implicit per `feedback_ai_代填_sign_off_pattern`, audit trail in `.aria/decisions/2026-05-04-us-023-phase-a2-r1-owner-advisory.md` + `.aria/decisions/2026-05-04-od-13-prd-m3-effort-90-to-185h.md`)
+> **Status**: **Archived** 2026-05-06 (AI-runnable scope T1-T3 + T5-T12 merged via PR #6 + #74 with strict 3-round pre_merge convergence audit, 5-agent × 3 rounds R1→R2→R3 5/5 PASS converged; AD-M3-1..7 全 Decided; T4 + T9.8/T9.9 + T13-T16 owner-action carryover tracked in `m3-handoff.yaml §10 t16_backlog_issues` + Forgejo Issues #75/#76/#77; audit trail `.aria/audit-reports/pre_merge-R1/R2/R3-2026-05-06T*-us023-m3.md`)
 > **Created**: 2026-05-04
 > **Approved**: 2026-05-04 (Phase A.3 OD-12 baseline final lock + OD-13 PRD patch applied + R2 SCOPE_OK_R2 4/4 + R3+R4 collapsed per OD-15)
 > **Parent Story**: [US-023](../../../docs/requirements/user-stories/US-023.md)
