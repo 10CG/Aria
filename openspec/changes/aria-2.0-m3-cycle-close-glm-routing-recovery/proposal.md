@@ -264,7 +264,7 @@ Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 Canonica
 | AD-M3-4 | ProviderRouter abstraction + Luxeno→Zhipu HA + GLM multi-model state-aware | **Decided 2026-05-06 (T9; T9.8/T9.9 owner-blocked)** — see [architecture-decisions.md §AD-M3-4](../../../aria-orchestrator/docs/architecture-decisions.md) | OD-12 §Q1=D' + OD-3d/3e/3f/3g | ai-engineer (router design) + backend-architect (concurrency) |
 | AD-M3-5 | Reconciler periodic job + CAS lock + 三阈值 + Strategy interface | **Decided 2026-05-05 (T5 design lock; T6 implements stuck-detection)** — see [architecture-decisions.md §AD-M3-5](../../../aria-orchestrator/docs/architecture-decisions.md) | OD-12 §Q3+Q4 + R1-M8 | backend-architect (CAS + HCL) + ai-engineer (Strategy interface) |
 | AD-M3-6 | Crash recovery scope (仅 S5_AWAIT + alloc_provider re-query + 404 case) | **Decided 2026-05-06 (T7)** — see [architecture-decisions.md §AD-M3-6](../../../aria-orchestrator/docs/architecture-decisions.md) | OD-3b 锁 + R1-M9 | qa-engineer (test harness) + ai-engineer (semantic) |
-| AD-M3-7 | Provider-aware token cost model (Luxeno=0 flat / Zhipu metered + Zhipu pricing snapshot) | _待回填_ Phase B.2.1 T10 | R2 C1 + OD-3f snapshot | ai-engineer (pricing + cost) + qa-engineer (cumulative test) |
+| AD-M3-7 | Provider-aware token cost model (Luxeno=0 flat / Zhipu metered + Zhipu pricing snapshot) | **Decided 2026-05-06 (T10)** — see [architecture-decisions.md §AD-M3-7](../../../aria-orchestrator/docs/architecture-decisions.md) | R2 C1 + OD-3f snapshot | ai-engineer (pricing + cost) + qa-engineer (cumulative test) |
 | AD-M3-8 | _spillover_ | _spillover_ | _on demand_ |
 | AD-M3-9 | _spillover_ | _spillover_ | _on demand_ |
 | AD-M3-10 | _spillover_ | _spillover_ | _on demand_ |
