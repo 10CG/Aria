@@ -1,0 +1,36 @@
+id: DEMO-006
+title: "[M2 DEMO-006] Add docstring to existing fixture function"
+description: |
+  修改 synthetic fixture 已有 utility, 添加 docstring (无逻辑变更).
+  M2 variant: 验证 Layer 1 处理纯文档 PR (small surface diff) 的能力。
+
+  前置: DEMO-002 已落地 src/python/utility.py 中的 fibonacci 函数。
+  本任务: 仅修改该函数, 添加 PEP-257 docstring, 不改逻辑。
+
+  具体操作:
+  1. 修改 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/utility.py
+     - 在 fibonacci 函数定义下方添加 triple-quoted docstring
+     - 必须包含: 函数说明 / Args / Returns / Raises 四节
+     - 保持函数体不变
+  2. Commit 一次
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/utility.py
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/utility.py
+  expected_diff_contains:
+    - "Args:"
+    - "Returns:"
+    - "Raises:"
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: PASS
+  expected_terminal_state: S9_CLOSE
+  rationale: "纯 docstring 添加 + PEP-257 格式标准, LLM 应 PASS (small but valid)"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "doc_only_pass"
+  depends_on_prior_demo: DEMO-002

@@ -1,0 +1,37 @@
+id: DEMO-003
+title: "[M2 DEMO-003] Add Node.js string-reverse utility + jest test"
+description: |
+  在 synthetic fixture 的 Node.js 子目录添加纯计算 utility + jest 测试.
+  M2 variant: 验证 Layer 1 状态机对非 Python (Node.js) workload 的处理能力.
+
+  具体操作:
+  1. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/node/string_utils.js
+     - 实现函数 reverseString(s: string): string
+     - 必须处理 null/undefined → throw new TypeError('input must be a string')
+     - 加 JSDoc 注释
+  2. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/test_string_utils.js
+     - 至少 3 个 jest test: 基本字符串 / 空字符串 / 非字符串输入 (throw)
+     - 每个测试 expect(...).toBe(...) 或 toThrow(...)
+  3. Commit 一次
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/node/.gitkeep
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/.gitkeep
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/node/string_utils.js
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/test_string_utils.js
+  expected_diff_contains:
+    - "function reverseString"
+    - "TypeError"
+    - "expect("
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: PASS
+  expected_terminal_state: S9_CLOSE
+  rationale: "标准 utility + 完整测试 + 边界处理, S6_REVIEW LLM 应判 PASS"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "lang_node_pass"

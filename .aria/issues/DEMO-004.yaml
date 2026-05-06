@@ -1,0 +1,40 @@
+id: DEMO-004
+title: "[M2 DEMO-004] Add Go is-prime utility + table-driven test"
+description: |
+  在 synthetic fixture 的 Go 子目录添加纯计算 utility + table-driven 测试.
+  M2 variant: 验证 Layer 1 状态机对 Go workload 的处理能力 (无 cgo, 纯 stdlib).
+
+  具体操作:
+  1. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/go/primes.go
+     - package primes
+     - 实现 IsPrime(n int) bool
+     - n < 2 返回 false; 用 trial division up to sqrt(n)
+     - 加 godoc 注释
+  2. 新增 aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/primes_test.go
+     - package primes
+     - TestIsPrime 用 table-driven pattern: ≥5 cases 覆盖 0/1/2/质数/合数
+     - 每个 case 用 t.Errorf 报告
+  3. Commit 一次
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/go/.gitkeep
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/.gitkeep
+expected_changes:
+  expected_file_touched:
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/go/primes.go
+    - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/tests/primes_test.go
+  expected_diff_contains:
+    - "package primes"
+    - "func IsPrime"
+    - "func TestIsPrime"
+    - "t.Errorf"
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: PASS
+  expected_terminal_state: S9_CLOSE
+  rationale: "Go table-driven test 是行业标准, 完整 + idiomatic, LLM 应 PASS"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "lang_go_pass"

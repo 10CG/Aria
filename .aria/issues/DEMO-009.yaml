@@ -1,0 +1,25 @@
+id: DEMO-009
+title: "[M2 DEMO-009] BAD: Schema-malformed issue (should S_FAIL@S1_SCAN)"
+description: |
+  M2 variant: 验证 Layer 1 schema validator 拒绝 malformed issue.
+  这是 S_FAIL @ S1_SCAN with reason=schema_invalid 的对照样本。
+
+  本 issue 故意缺少必填字段 expected_changes, 应在 S1_SCAN 阶段被拒。
+  (注: claude 永不会执行此 issue — 状态机在 dispatch 前就 S_FAIL)
+files:
+  - aria-plugin-benchmarks/ab-suite/m1-mvp/fixtures/src/python/.gitkeep
+expected_changes: null  # 故意 null — schema validator 应拒
+ip_classification: synthetic
+ground_truth:
+  expected_review_verdict: NOT_REACHED
+  expected_terminal_state: S_FAIL
+  expected_fail_reason: schema_invalid
+  expected_fail_state: S1_SCAN
+  rationale: "expected_changes=null 违反 M1 schema v0.1 (required field), S1_SCAN payload guard 应拒"
+metadata:
+  target_repo: "10CG/Aria"
+  base_branch: master
+  created_by: "ai:aria-agent"
+  created_at: "2026-05-02T00:00:00Z"
+  m2_variant: "schema_invalid_fail"
+  bad_input_intentional: true
