@@ -16,7 +16,7 @@
 >   - [m2-report.md §4.2](../../../aria-orchestrator/docs/m2-report.md) (carryover scope)
 >   - [AD-M2-9](../../../aria-orchestrator/docs/architecture-decisions.md) §风险 #1 (Layer 2 job 缺失即 M3 scope)
 >   - [OD-11](../../../.aria/decisions/2026-05-03-od-11-t15-4-5-perf-reframe.md) (T15.4/T15.5 perf carryover)
->   - [secret_rotation_deferred SOP](../../../.aria/decisions/2026-05-02-secret-rotation-deferred.md) (T13 mid Phase B.2 trigger)
+>   - [secret_rotation_deferred SOP](../../../.aria/decisions/2026-05-02-secret-rotation-deferred.md) (T13 pulled to Phase B.2.0 startup week 1 per OD-14 RESOLVED 2026-05-04; supersedes original "mid Phase B.2 trigger" wording — R1-TL-001 reframe 2026-05-06)
 > **Forgejo Issue**: _Pending creation T0_
 > **Related**:
 >   - **前置 (硬门控)**: [US-022 / aria-2.0-m2-layer1-state-machine](../../archive/2026-05-03-aria-2.0-m2-layer1-state-machine/) — `m2_e2e_passed=true` + Go-with-revision 2026-05-03 已满足
@@ -246,7 +246,7 @@ Test fixture: T15.3 真实 11-row dispatches.db 快照 (per qa R1 OBJ-5 Canonica
 | 2 | Anthropic deprecated 但 PRD 字面仍要求双 provider | 低 | OD-12 §Q1=D' + Patch 02 (PRD §M3 字面 reframe), AD-M1-12 supersedes |
 | 3 | Schema migration v2 在 production dispatches.db zero-downtime | 中 | additive-first (新 schema_version=2 + 双 read 策略, drop UNIQUE 推 v3); ALTER 失败 SQLite 自动回滚; T15 11-row fixture migration test PASS gate |
 | 4 | Reconciler 与 cron tick 锁竞争 | 中 | CAS (compound 版本字段 last_heartbeat_at + attempt_count) + busy_timeout=5000ms + retry 1; 故障隔离 (cron 挂 reconciler 仍工作) |
-| 5 | Secret rotation 2026-08-02 hard cap 与 M3 schedule 接近 | 中 | T13 mid Phase B.2 trigger (~Week 14-15), 不晚于 cap; M3 不超 6 周硬约束 |
+| 5 | Secret rotation 2026-08-02 hard cap 与 M3 schedule 接近 | 中 | **T13 拉到 Phase B.2.0 startup (week 1) per OD-14 RESOLVED** (R1-TL-001 reframe 2026-05-06: 原文 "T13 mid Phase B.2 trigger (~Week 14-15)" 与 OD-14 决策冲突, 已修正); 不晚于 90-day cap 2026-08-02; M3 不超 6 周硬约束 |
 | 6 | Crash recovery test 需重现 stuck dispatch | 中 | T12 named test (5-step) + integration test kill -9 lock; MockClock fast-forward 不需真等 60min |
 | 7 | 双 provider 切换 token cost 不确定性 | 中 | T9 token_tracking 已就位; T10 加 per-provider breakdown |
 | 8 | OD-12 baseline 185h × 6 周硬约束被超 | 高 | OD-13 立 Phase A.3; B.2 mid-sprint scope-cut review 触发; 候选裁切: T9 multi-model benchmark / T11 加固 / T15 Tier-2 stretch |
@@ -306,11 +306,15 @@ Phase A.1 (DONE)  proposal.md + tasks.md + 5 patches (~12h, 2026-05-04)
 Phase A.2 (DONE)  post_spec audit R1+R2 (R3+R4 collapsed per OD-15) — 4-agent fix-verify SCOPE_OK_R2 4/4 (~4h, 2026-05-04)
 Phase A.3 (DONE)  OD-13 立 + PRD Patch 01-05 commit + Status: Draft → Approved + Agent assign (~1h, 2026-05-04)
 Phase B.1         feature 分支 (`feature/aria-2.0-m3-cycle-close-glm-routing-recovery`) (<0.5h)
-Phase B.2.0       M2 carryover (T1-T4, ~21h):
+Phase B.2.0       M2 carryover + T13 pulled forward per OD-14 (T1-T4 + T13, ~24h):
                     T1: aria-layer2-runner HCL fork (~6h)
                     T2: alloc_provider 生产化 (~4h)
                     T3: schema migration v2 (~3h)
                     T4: single-issue Layer 2 cycle smoke (~3h)
+                    T13: secret rotation execution 5 keys (~3h, week 1
+                         per OD-14 — see R1-TL-001 reframe; tasks.md
+                         keeps T13 in Phase B.2.Z section for tracking
+                         continuity but execution timing is week 1)
 Phase B.2.1       M3 新 scope (T5-T12, ~90h):
                     T5: reconciler design + HCL (~6h)
                     T6: reconciler stuck-detection + S_FAIL + Feishu (~8h)
@@ -320,8 +324,9 @@ Phase B.2.1       M3 新 scope (T5-T12, ~90h):
                     T10: per-provider token breakdown (~4h)
                     T11: Nomad integration 加固 (~8h)
                     T12: reconciler + crash recovery integration tests (~8h)
-Phase B.2.Z       E2E + handoff (T13-T16, ~30h):
-                    T13: secret rotation execution 5 keys (~3h)
+Phase B.2.Z       E2E + handoff (T14-T16, ~27h; T13 pulled to B.2.0):
+                    (T13 listed here for tracking continuity but
+                     executes in B.2.0 week 1 per OD-14 + R1-TL-001)
                     T14: perf benchmark vs M1 (post-rotation, ~6h)
                     T15: ≥10 cycle Tier-1 集成 (验收 A+B+D+E) (~10h)
                     T16: m3-handoff.yaml + AD-M3 backfill + Report + Spec archive (~6h)
