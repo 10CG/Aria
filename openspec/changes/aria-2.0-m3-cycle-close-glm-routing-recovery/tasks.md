@@ -162,13 +162,13 @@
 
 #### T8 — `ZhipuClient` (~4h)
 
-- [ ] **T8.1** `aria_layer1/clients/zhipu_client.py` mirror SilknodeClient (stdlib urllib, per `feedback_secrets_never_in_conversation` os.environ)
-- [ ] **T8.2** Base URL: `open.bigmodel.cn/api/paas/v4/chat/completions`
-- [ ] **T8.3** Auth: `ZHIPU_API_KEY` (post-rotation 才 wired, T13)
-- [ ] **T8.4** Per-token billing model field (vs Luxeno flat)
-- [ ] **T8.5** silknode-integration-contract 契约 1 no-storage 透传 — **OD-3d generalize**: 契约 1 §禁止条款 适用所有上游 LLM provider, 含 ZhipuClient 直连 (in-memory buffer only, 无 disk log payload); 等 owner Phase A.2 advisory 确认 yes/no
-- [ ] **T8.6** **Timeout policy (per R1-I1, OD-3g default 等 owner)**: `connect_timeout=5s` + `read_timeout=60s` per call (硬 ceiling)
-- [ ] **T8.7** Unit tests: success / 5xx / 429 / timeout / token usage parse / connect_timeout / read_timeout (≥7 tests)
+- [x] **T8.1** Path reframe (per `feedback_spec_reframe_in_session` + AD-M3-2 §选型 #6): tasks.md 字面 `aria_layer1/clients/zhipu_client.py` → 实际 `aria_layer1/zhipu_client.py` (flat 与 sister forgejo_client / silknode_client / nomad_client 对齐, 无 clients/ 子目录, 与 alloc_status_provider.py / schema_migrate.py 同模式)。stdlib http.client (用于 connect/read timeout 切分; urllib 单一 timeout 不支持) + json + urllib.parse + ssl. ZHIPU_API_KEY / ZHIPU_BASE_URL via os.environ (per `feedback_secrets_never_in_conversation`).
+- [x] **T8.2** Base URL: `https://open.bigmodel.cn/api/paas/v4` (POST `/chat/completions`); ZHIPU_BASE_URL env override 支持。
+- [x] **T8.3** Auth: `ZHIPU_API_KEY` env (T13 rotation 后 wired); 缺失时 RuntimeError + 错误信息显式指向 .env / Nomad Variables; 测试 `test_missing_api_key_raises_runtime_error` 实证。
+- [x] **T8.4** Per-token billing field: result dict 加 `provider="zhipu"` + `provider_cost_model="metered"` (vs Luxeno `subscription_flat`); ProviderRouter T9 + token tracking T10 读这 2 字段做 attribution。
+- [x] **T8.5** No-storage contract (OD-3d generalize 适用所有上游 LLM provider, 等 owner Phase A.2 advisory): 模块 docstring 锚定 + logger.warning 仅记 metadata (model + status + body_len + retryable), 不入 prompt content; 测试 `test_logger_does_not_record_prompt_content` 实证 capture 整个 zhipu logger output 不含 prompt 字面。
+- [x] **T8.6** Timeout policy (per R1-I1 hard ceiling, OD-3g default): `CONNECT_TIMEOUT_SECONDS=5` + `READ_TIMEOUT_SECONDS=60` 模块常量; `http.client.HTTPSConnection(timeout=connect_timeout)` 后 `conn.sock.settimeout(read_timeout)` 切分 connect 与 read budget; `ZhipuTimeout(phase, seconds)` 区分 connect vs read 触发点 (caller can route差异化 retry 策略); 单层 — ProviderRouter T9 自有 retry/fallback。两测试 `test_call_llm_connect_timeout_raises_zhipu_timeout` + `..._read_timeout_...` 实证。
+- [x] **T8.7** Unit tests `tests/test_t8_zhipu_client.py` 11 tests (T8.7 ≥7 target 满足): 3 success/parsing (zhipu metadata / token usage / provider_cost_model='metered') + 3 HTTP errors (500 retryable / 429 retryable / 400 non-retryable) + 2 timeout (connect / read) + 3 config/Protocol/no-storage (missing key / Protocol conformance / logger no-prompt). 0 regression on T7 baseline (323 → 334 total)。
 
 **T8.done = ZhipuClient 实施 + 契约 1 no-storage + ≥7 tests**
 
