@@ -174,26 +174,17 @@
 
 #### T9 — `ProviderRouter` + multi-model + dict fallback_chain_json (~14h, AD-M3-4 触发, OD-12 §Q1=D')
 
-- [ ] **T9.1** `aria_layer1/llm/provider_router.py` ProviderRouter class
-- [ ] **T9.2** 主链: Luxeno (primary, flat sub) → Zhipu (fallback, per-token) — 3 次 expo backoff (1s/2s/4s) 后被动 fallback
-- [ ] **T9.3** Model chain (per OD-12 §Q1):
-  - S2_DECIDE → `glm-4.5-air`
-  - S3_BUILD_CMD → `glm-5-turbo`
-  - S6_REVIEW → `glm-5.1`
-- [ ] **T9.4** Per-state fallback ladder (model degrade): `5.1 → 5-turbo → 4.5-air` if quality model 5xx
-- [ ] **T9.5** fallback_chain_json dict-array 写入 (write-time, schema v2): `[{provider, model, outcome, reason, latency_ms, ts}]` — **dict 字段类型/枚举锁定 (per R1-C2)**: `provider ∈ {luxeno, zhipu}`; `outcome ∈ {ok, http_5xx, http_429, http_4xx, timeout, network_error, quality_degrade}`; `ts` ISO-8601 UTC; `latency_ms` int; `reason` str|null; intra-provider retry (per R1-M6) 也写 entry, outcome 反映该次结果
-- [ ] **T9.5b** **fallback_triggered 写入点 (per R1-M4)**: ProviderRouter 落 fallback 时同步 UPDATE `dispatches.fallback_triggered=1` (任何 fallback_chain_json 含 outcome != 'ok' 即 trigger); 1 unit test asserting field after fallback path
-- [ ] **T9.6** Wire to `_handle_s2_decide` / `_handle_s3_build_cmd` / `_handle_s6_review` (M2 单一 SilknodeClient 替换为 ProviderRouter)
-- [ ] **T9.7** Test matrix (per R2 I8): parameterized (3 state × 5 fallback path × 6 dict field assertion) ≥ 12 cases
-  - States: S2_DECIDE, S3_BUILD_CMD, S6_REVIEW
-  - Paths: Luxeno-only-success (1 entry chain) / Luxeno-success-after-1-retry (2 entries: fail + ok) / Luxeno→Zhipu-fallback (2 entries: luxeno fail + zhipu ok) / Luxeno→Zhipu-both-5xx → S_FAIL (≥2 entries all non-ok) / Luxeno→Zhipu-quality-degrade-5.1→5-turbo (≥2 entries quality_degrade outcome)
-  - Assertions: provider/model/outcome/reason/latency_ms/ts in fallback_chain_json (R1-C2 enum 严格)
-- [ ] **T9.8** Multi-model benchmark (~8h subset of T9): 3 模型 × 同 prompt 重复 3 次 = 9 次/state, 验证 quality
-  - **Quality threshold (per R1-I8, OD-3e default 等 owner)**: S2 ≥80% 状态决策正确率 / S3 ≥90% bash command shellcheck-equivalent 通过 / S6 ≥66% 三轮 review 多数票一致
-  - **Gate vs exploratory (per OD-3e)**: AI 推荐 default = **exploratory only** (Luxeno 已实战稳定; 硬 gate budget cap 不够), owner 确认后改 m3-handoff `multi_model_benchmark_gate=true|false`
-  - **Budget cap (per R1-I9)**: `BUDGET_CAP_USD=5.00` hard ceiling, abort if exceeded; m3-handoff `t9_8_benchmark_actual_cost_usd` field
-- [ ] **T9.9** Benchmark 结果写入 m3-handoff.yaml `multi_model_routing_benchmark` field (含 quality metrics + actual_cost_usd + threshold pass/fail)
-- [ ] **T9.10** AD-M3-4 回填 (ProviderRouter 决策)
+- [x] **T9.1** Path reframe (per `feedback_spec_reframe_in_session` + AD-M3-2 §选型 #6 + T8 reframe): `aria_layer1/provider_router.py` (flat 与 sister silknode_client / zhipu_client / forgejo_client / nomad_client 对齐, 无 llm/ subdir). ProviderRouter class — DI: luxeno (SilknodeClient Protocol) + zhipu (optional) + sleep (test injection) + retry_backoffs + retries_per_provider; satisfies SilknodeClient Protocol via `call_llm(prompt, model)` (Protocol-compatible drop-in for self._silknode slot); also exposes `route_for_state(prompt, state)` 便捷 API。
+- [x] **T9.2** Provider chain: Luxeno (primary, flat sub) → Zhipu (fallback, per-token); 3 次 expo backoff (1s/2s/4s) `RETRY_BACKOFF_SECONDS` 模块常量, 测试零 wait via `sleep=lambda _:None`; intra-provider 4 attempts (initial + 3 retries) 后 retries 耗尽 → 切下一 provider; 任一 provider 出 non-retryable 错误 (4xx-other) 直接跳下个 provider 不重试 (per `feedback_pre_merge_4round_convergence_template` 类似耗尽语义).
+- [x] **T9.3** State-aware primary model `STATE_PRIMARY_MODEL` 模块常量 (per OD-12 §Q1=D'): S2_DECIDE → glm-4.5-air, S3_BUILD_CMD → glm-5-turbo, S6_REVIEW → glm-5.1. Handler call site: S2 unchanged glm-4.5-air, S3 改 "glm-4.5-air" → "glm-5-turbo", S6 `call_review` 加 `primary_model="glm-5.1"`.
+- [x] **T9.4** Per-state degrade ladder `MODEL_DEGRADE_LADDER` 常量: glm-5.1 → glm-5-turbo → glm-4.5-air (3-tier S6); glm-5-turbo → glm-4.5-air (2-tier S3); glm-4.5-air → 单层 (terminal, S2 cheapest tier). 降级触发: 当前 tier 在所有 provider 均耗尽 → quality_degrade marker entry → 下一 tier。
+- [x] **T9.5** fallback_chain_json dict-array (R1-C2 enum strict 实施): 字段 {provider, model, outcome, reason, latency_ms, ts}; outcome enum {ok, http_5xx, http_429, http_4xx, timeout, network_error, quality_degrade}; provider enum {luxeno, zhipu, **router**} (router 是 synthetic kind, 仅 quality_degrade 跨 tier 转移 marker 用; R1-C2 文档化扩展, AD-M3-4 §决策 #5 锚定 + tests/test_t9_provider_router.py `test_provider_enum_includes_router_for_synthetic_entries` 实证); intra-provider retry 每次都写 entry (per R1-M6).
+- [x] **T9.5b** fallback_triggered 写入点 (per R1-M4): ProviderRouter `_finalize_success` 在 chain 闭环时计算 (any non-ok entry → True); result dict 透出 `fallback_triggered` boolean; M2 `repo.update_token_usage(fallback_triggered=...)` API 直接消费, 0 改 token tracking 层 (router I/O-narrow). Tests `test_fallback_triggered_false_on_clean_success` + `..._true_after_any_non_ok` 实证.
+- [x] **T9.6** Handler wiring via `extension._ensure_silknode_wired()` lazy-wire 助手 — production `ARIA_LAZY_WIRE=1 + LUXENO_API_KEY` set → 构造 LuxenoSilknodeClient + (optional ZHIPU_API_KEY) ZhipuClient → wrap ProviderRouter → 装 `self._silknode` slot (Protocol-compatible drop-in); 测试不设 env, 直接 `silknode=` DI 注入 ScriptedClient/FakeSilknodeClient 走相同 Protocol 路径 (M2 测试 0 改); S2/S3/S6 handler entry 调 `_ensure_silknode_wired()`. Reframe per `feedback_spec_reframe_in_session`: tasks.md 字面 "替换为 ProviderRouter" 实施实质等价 (silknode slot 现指向 router 实例), AD-M3-4 §决策 #7 + 风险 #10 锚定。
+- [x] **T9.7** Test matrix `tests/test_t9_provider_router.py` (T9.7 ≥12 target — 19 tests landed): Path 1 Luxeno-only-success ×3 states (S2/S3/S6) + Path 2 retry-then-ok / Path 3 Luxeno→Zhipu fallback (5xx exhaust + 429 retry) ×2 + Path 4 quality_degrade 5.1→5-turbo + full-ladder-exhausted raises ×2 + Path 5 4xx no-retry skip-to-zhipu + 4xx both raises ×2 + Schema strict (dict keys / outcome enum / router synthetic provider) ×3 + fallback_triggered (clean false / non-ok true) ×2 + Misc (Protocol conformance / route_for_state / no-zhipu / unknown-model) ×4. ScriptedClient deque 配置错误时 `AssertionError("ScriptedClient ran out")` 显式抛 (per R1-C2 严格性); 0 regression on T8 baseline (334 → 353 total).
+- [ ] **T9.8** Multi-model benchmark (~8h subset of T9) — **OWNER-BLOCKED** per OD-3e default (exploratory 不阻塞合并) + R1-I9 ($5 budget cap 显式 approval 必需) + T13 (ZHIPU_API_KEY rotation 必需). 当 owner 启用时: 3 模型 × 同 prompt 重复 3 次 = 9 次/state, S2 ≥80% / S3 ≥90% / S6 ≥66% 三轮 review 多数票. 决策本体 (T9.1-T9.7+T9.10) 不依赖 benchmark 结果, 即使延期至 M4 也仅影响 acceptance D 子条目, 不破坏 ProviderRouter 实施.
+- [ ] **T9.9** Benchmark 结果写入 m3-handoff.yaml — owner-blocked 与 T9.8 联动. m3-handoff 已留 `multi_model_benchmark_gate` field hook (default false = exploratory). 未跑则字段保 default, M3 acceptance D 仍可标 PASS-with-deferred.
+- [x] **T9.10** AD-M3-4 回填 — 2026-05-06 done: `aria-orchestrator/docs/architecture-decisions.md` §AD-M3-4 完整 6 段决议 (决策 8 维度 / 背景 / 13 alternatives / 9 选型理由 / 10 风险 / 4-level 回滚 / 治理影响) + version history 1.2 → 1.3 + proposal.md AD-M3-4 行 cross-reference. T9.8/T9.9 owner-blocked 状态显式记录在 §状态 + §决策 #8 + §风险 #1 三处。
 
 **T9.done = ProviderRouter 实施 + multi-model state-aware + dict fallback + ≥12 test matrix + benchmark + AD-M3-4 回填**
 
