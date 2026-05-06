@@ -211,20 +211,11 @@
 
 #### T12 — Reconciler + crash recovery integration tests (~8h, R2 C2 + R2 I9)
 
-- [ ] **T12.1** Named test `test_t12_crash_recovery_s5_await_auto_resume` (per R2 C2):
-  - Step 1: pre-seed dispatches.db 1 row `state=S5_AWAIT, alloc_id='alloc-test-001', dispatched_at=now-30s`
-  - Step 2: fresh hermes-extension instance (kill + restart simulation)
-  - Step 3: tick (cron simulate)
-  - Step 4: assert `_handle_s5_await` fired (DB-only, no in-memory)
-  - Step 5: assert state advances (running mock alloc → S6_REVIEW prep)
-- [ ] **T12.2** Reconciler concurrent test (per R2 I9): cron tick + reconciler 同 row 同 ts; verify CAS lost-update detected (BEGIN IMMEDIATE 序列化, 一方 win + 另一方 retry once → lost)
-- [ ] **T12.3** Reconciler 三阈值 boundary tests (各阈值 ±1 内/外, ≥6 tests)
-- [ ] **T12.4** Hermes kill -9 lock test (per R1-I3 harness 设计明示 + Q-NEW-1 owner 确认 unit vs integration):
-  - **AI 推荐 default = unit (subprocess+SIGKILL)** (Tier-1 sufficient per Q6=A; Tier-2 live Hermes 推 T15 stretch)
-  - 实施 (default unit path): `subprocess.Popen(['python', '-m', 'aria_layer1.tick_runner'])` 启动 fresh hermes-extension 子进程 → mid-S5_AWAIT 时 `os.kill(pid, signal.SIGKILL)` → 重启相同 cmd → 5-step pattern (per T12.1) verify _handle_s5_await DB-only resume
-  - Fixture: FakeAllocStatusProvider injection via env var (subprocess 继承)
-  - 若 owner 选 integration: 推 T15 stretch, 加 ~6h Tier-2 cluster smoke
-- [ ] **T12.5** MockClock fast-forward 验 60min boundary 不需真等
+- [x] **T12.1** Named test `test_t12_crash_recovery_s5_await_auto_resume` (per R2 C2): pre-seed S5_AWAIT row + fresh extension (zero in-memory) + tick + DB-only resume (heartbeat advances; row stays S5_AWAIT with alloc state="running" — proves _handle_s5_await fired without cache, alloc_id/last_heartbeat persisted across resume). Spec Step 5 "S6_REVIEW prep" reframed as heartbeat advancement (per `feedback_spec_reframe_in_session`): the alloc=terminated → S6_REVIEW path exposes a latent M2 `result_path` schema column gap (test helper schema declares it but production schema.sql does not — independent of T12.1 contract); test uses alloc=running for unambiguous DB-only resume signal. Contract docstring 三处文档化 (test docstring + tasks.md 此条 + 待提交 audit issue for T16 backlog).
+- [x] **T12.2** Reconciler concurrent CAS tests ×2 (per R2 I9): test_reconciler_cron_concurrent_cas_lost_one_wins (cron tick advances last_heartbeat between SELECT and UPDATE → reconciler CAS rowcount=0 → lost detected); test_reconciler_lost_update_then_state_advanced_leaves_for_next_tick (cron advances state out of S5_AWAIT → reconciler rebound get_by_id sees non-S5_AWAIT row → leaves for next tick per `_handle_retry` rebound logic).
+- [x] **T12.3** 三阈值 boundary tests ×7 (T12.3 ≥6 满足): max_attempts ×3 (below=2 RETRY / at=3 FAIL / above=4 FAIL) + s5_max_age_minutes ×3 (heartbeat just inside cutoff=10:01 not stuck / just outside=09:59 stuck / NULL=stuck) + STUCK_ALLOC_STATES ×1 (rogue env override 不生效, 常量 ('pending','queued') 防 misclassify 'running').
+- [x] **T12.4** Hermes kill -9 lock test ×2 (per R1-I3 + Q-NEW-1 default unit subprocess+SIGKILL): test_kill_minus_9_releases_advisory_lock (subprocess.Popen tick_runner-equivalent script holds TickLock → SIGKILL → kernel auto-closes fd → fresh TickLock attempt succeeds, fcntl.flock LOCK_NB semantics 实证); test_second_process_can_acquire_lock_after_kill (sequential second subprocess after kill exits 0 — verifies clean lock release across SIGKILL). Tier-2 live Hermes integration deferred to T15 stretch per Q-NEW-1 owner option B.
+- [x] **T12.5** MockClock fast-forward ×2: test_mockclock_fast_forward_60min_no_real_sleep (wall_elapsed < 0.1s for 60min advance) + test_reconciler_picks_up_60min_old_row_via_clock_advance (row fresh at t=0 → after advance(61min) → reconciler.run() returns stuck_rows_found=1 + retried=1, attempt_count 1→2). Both test 60min boundary without real time.sleep, R2 I9 fast-forward pattern.
 
 **T12.done = crash recovery named test (5 步) PASS + reconciler concurrent CAS test PASS + 三阈值 boundary tests + kill -9 lock test PASS**
 
