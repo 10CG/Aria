@@ -151,12 +151,12 @@
 
 #### T7 — Crash recovery (~10h, AD-M3-6 触发, OD-3b scope=仅 S5_AWAIT)
 
-- [ ] **T7.1** `_handle_s5_await` 重写 — 不依赖 in-memory state (M2 已设计无 in-memory)
-- [ ] **T7.2** 从 dispatches table 读 `alloc_id` + `dispatched_at`
-- [ ] **T7.3** alloc_provider re-query (HTTP) 获取 alloc 状态
-- [ ] **T7.4** 状态分支: pending/queued → leave (next tick) / running/complete → S6_REVIEW / failed/lost → S_FAIL / **404 Not Found → S_FAIL(alloc_lost)** (per R1-M9, alloc 已 GC)
-- [ ] **T7.5** 1 unit test: `test_handle_s5_await_resumes_from_db_only` (verify 不读 self._memory)
-- [ ] **T7.6** AD-M3-6 回填 (crash recovery scope 决策, OD-3b 锁后)
+- [x] **T7.1** `_handle_s5_await` audit confirm DB-only (M2 已设计无 in-memory): handler 完全读 `ctx.dispatch_row` (DB SELECT 结果) + `repo` (DispatchRepository) + DI clients (alloc_provider / clock); `AriaLayer1Extension` 实例零 in-flight 缓存/dict/set tracking。T7 不改 handler 逻辑, 仅 audit confirm + AD-M3-6 §决策 #2 显式 contract 锚定。
+- [x] **T7.2** `alloc_id` + `last_heartbeat_at` 从 `dispatches` 表读 — 通过 `ctx.dispatch_row.get("alloc_id")` + `dispatch_row.get("last_heartbeat_at")`, M2 已实施。T7 audit confirm: alloc_id 在 S4_LAUNCH 期间持久化, S5_AWAIT 进入时已 readable; T7.5 fixture `_insert_s5_await_row` 实证 DB-only 输入路径足够。
+- [x] **T7.3** `alloc_provider.get_status(alloc_id)` HTTP re-query — M2 lazy-wire 模式 (per AD-M3-2 §决策 #2): cron runner 设 `ARIA_LAZY_WIRE=1` → `_handle_s5_await` 进入时构造 `NomadAllocHTTPProvider`; 失败异常 catch + log + fall-through 到 stub path。T7 不改 wire 路径。
+- [x] **T7.4** 状态分支 — running → leave + heartbeat update / terminated+exit_code==0 → S6_REVIEW / terminated+exit_code!=0 → S_FAIL(CONTAINER_CRASH) / lost → S_FAIL(DISPATCH_LOST) / 未知 ClientStatus → 保守 fallback running + warning. **404 → state='lost' (R1-M9)**: `NomadAllocHTTPProvider._fetch_allocation` raise `_AllocFetchError(http_code=exc.code)`; `get_status` catch 时 `if exc.http_code == 404` → return `{"state":"lost"}` (alloc 已 GC, permanent), 其他 HTTP 错误 → conservative running fallback (transient, per AD-M2-9)。下游 `_handle_s5_await` "lost" 分支已存在 → S_FAIL(DISPATCH_LOST), 0 路由改动。
+- [x] **T7.5** Unit tests — `tests/test_t7_crash_recovery.py` 6 tests: 3 NomadAllocHTTPProvider (404 → lost / 500 → running / 无 http_code → running) + 3 _handle_s5_await (DB-only resume → S6_REVIEW / 404-derived lost → S_FAIL(DISPATCH_LOST) / 无 alloc_id → 留态 + heartbeat update)。M2 test `test_integration_http_404_falls_back_to_running` 翻转为 `test_integration_http_404_maps_to_lost` + docstring 显式说明 M2→M3 contract change。0 regression on T6 baseline (317 → 323 total)。
+- [x] **T7.6** AD-M3-6 回填 — 2026-05-06 done: `aria-orchestrator/docs/architecture-decisions.md` §AD-M3-6 完整 6 段决议 (决策 7 维度 / 背景 / 8 alternatives / 7 选型理由 / 8 风险 / 4-level 回滚 / 治理影响) + version history 1.1 → 1.2 + proposal.md AD-M3-6 行 cross-reference。
 
 **T7.done = _handle_s5_await DB-only 实施 + unit test + AD-M3-6 回填 (T12 集成 test 收尾)**
 
