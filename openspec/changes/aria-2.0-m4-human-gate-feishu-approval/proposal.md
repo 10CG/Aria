@@ -349,7 +349,7 @@ R2 fix QA-6/QA-11/AI-6: 加 Tier 标签 (Tier-1=自动化 fake-cycle / Tier-2=re
 ## Owner action items (前置 / 阻塞)
 
 - [ ] T-deploy: Aether Nomad Variables 配置 `ARIA_FEISHU_WEBHOOK_URL` + `ARIA_FEISHU_SIGNING_SECRET` (前置 acceptance 实测)
-- [ ] config: 提供 owner Forgejo username 字面值 (T-deploy.3 写入 `authorized_approvers: ["<owner-username>"]`,推 T-deploy 阶段) — *R3-trivial fix per TL-R2-3*
+- [x] config: 提供 owner Forgejo username 字面值 = **`simonfish`** (owner 2026-05-07 确认) → T-deploy.3 写入 `authorized_approvers: ["simonfish"]`
 - [ ] (可选) bot PAT 账户 (e.g. `aria-bot`) 创建并配置 PAT (per AD-M4-2 bot username 区分;若与 owner PAT 共享则 polling 必须 filter 自身评论)
 - [ ] T0.1: Forgejo M4 kickoff issue 创建 (推 Phase B.1)
 - [ ] (post-merge) Feishu 6 mandatory configs 复检 (memory burned record 防御)

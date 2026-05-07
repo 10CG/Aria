@@ -85,7 +85,7 @@
 
 #### T-comment-poll — Forgejo PR 评论 polling + magic-string parser (~7-11h post-R2)
 
-- [ ] **T-comment-poll.1** *(R2 expanded per AI-7)* owner_username config schema 设计 + 加载: `.aria/orchestrator-config.yaml` 新字段 `authorized_approvers: list[str]` (M4 单元素 [owner],M5 加 reviewer 非 ABI break);加载顺序 file-first env-override (ARIA_AUTHORIZED_APPROVERS 逗号分隔 override file)
+- [ ] **T-comment-poll.1** *(R2 expanded per AI-7;owner 2026-05-07 lock username)* owner_username config schema 设计 + 加载: `.aria/orchestrator-config.yaml` 新字段 `authorized_approvers: list[str]`,**M4 lock value = `["simonfish"]`** (owner Forgejo username 已确认),M5 加 reviewer 非 ABI break;加载顺序 file-first env-override (ARIA_AUTHORIZED_APPROVERS 逗号分隔 override file)
 - [ ] **T-comment-poll.2** `comment_poll.py` 新模块: `scan_pending_s7_dispatches() -> list[Dispatch]`
 - [ ] **T-comment-poll.3** `comment_poll.py`: `fetch_new_comments(forgejo, pr_id, since_comment_id) -> list[Comment]` (复用 ForgejoCliClient + **pagination 内部循环 page 直至无新评论** per R2 AI-1)
 - [ ] **T-comment-poll.4** `comment_poll.py`: `parse_magic_string(comment) -> Decision | None` (strict regex,R2 fix QA-1/AI-8)
@@ -178,7 +178,7 @@
 
 - [ ] **T-deploy.1** Aether Nomad Variables 配置 `ARIA_FEISHU_WEBHOOK_URL` (`nomad var put ... >/dev/null 2>&1` 同 secret-hygiene 规范 #7)
 - [ ] **T-deploy.2** Aether Nomad Variables 配置 `ARIA_FEISHU_SIGNING_SECRET` (同上)
-- [ ] **T-deploy.3** *(R2 expanded per AI-7)* `authorized_approvers` 配置项写入 (`.aria/orchestrator-config.yaml` `authorized_approvers: ["owner-username"]`,Aether config map 或 Nomad Variables file-based)
+- [ ] **T-deploy.3** *(R2 expanded per AI-7;owner 2026-05-07 lock value)* `authorized_approvers` 配置项写入 (`.aria/orchestrator-config.yaml` `authorized_approvers: ["simonfish"]`,Aether config map 或 Nomad Variables file-based)
 - [ ] **T-deploy.4** aria-layer1 nomad job 重启 + Consul service health check pass
 - [ ] **T-deploy.4b** *(R2 NEW per AD-M4-9)* 部署独立 `aria-layer1-comment-poll.nomad.hcl` (30s cron) + Consul service health check
 - [ ] **T-deploy.5** 6 mandatory feishu+hermes configs 复检 (memory `feedback_feishu_hermes_gotchas` 引用)
