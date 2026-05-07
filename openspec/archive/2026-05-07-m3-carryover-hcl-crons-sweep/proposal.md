@@ -1,10 +1,13 @@
 # m3-carryover-hcl-crons-sweep
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft (R1 + R2 audit applied 2026-05-07; awaiting R3 stability + owner Aether dev verify)
+> **Status**: Complete (2026-05-07, archived after 3-round multi-agent pre_merge audit STABLE convergence)
 > **Created**: 2026-05-07
+> **Completed**: 2026-05-07 (aria-orchestrator PR #7 merged at `5d0e70b`; Aria main PR #80 merged at `a21b619`; 3-round 4-agent pre_merge audit converged R1→R2→R3 STABLE 4/4; Forgejo Issue #76 close pending owner Aether dev verify)
 > **R1 audit**: 4-agent multi-agent (backend-architect / qa-engineer / tech-lead / code-reviewer); ALIGNED 4/4 direction; tech-lead BLOCK on submodule regression (resolved R1→R2 fix: rebased onto master c0d8c46 + submod pointer → 5d0e70b post-#7-merge HEAD)
-> **R2 audit**: same 4-agent team; ALL R1 CRITICAL CLOSED; ALIGNED 4/4; R2 NEW (this commit closes): (a) main commit `068e497` body says "bumped to 0fe3ce5" — actual diff is `dea9d8d → 5d0e70b` (#7 merge containing 0fe3ce5; 5d0e70b is correct landing point per R2-backend-architect/code-reviewer flag); (b) `.Specs[0]` API path fallback to `.Spec` (per R2-qa-engineer); (c) §风险 binary-vs-runtime bridge language (per R2-code-reviewer)
+> **R2 audit**: same 4-agent team; ALL R1 CRITICAL CLOSED; ALIGNED 4/4; 3 R2 NEW MINOR closed in d4c66a3
+> **R3 audit (stability)**: same 4-agent team; STABLE 4/4 (0 NEW findings, R2 closed); finding-set-equality convergence per `feedback_audit_convergence_pattern.md`
+> **Owner action remaining**: Aether dev cluster verify (acceptance #7 — `aether dev run` + `nomad job inspect | jq .Periodic.Specs[0]` + `.NextLaunch`); pre-merge audit converged so verify becomes post-merge owner smoke test (HCL change is reversible via revert if verify fails)
 > **Type**: 单子系统 hygiene 改动 (aria-orchestrator/deploy/ HCL × 2)
 > **Source**: M3 closeout backlog Issue [#76](https://forgejo.10cg.pub/10CG/Aria/issues/76); m3-handoff.yaml §10 t16_backlog_issues #76; AD-M3-5 §风险 #6 (deferred to separate hygiene Spec)
 > **Sister-bug bundle**: 否 (与 #75 result_path / #77 validator 分属不同子系统, owner 决策为 3 独立 Level 2)
