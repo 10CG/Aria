@@ -373,6 +373,16 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
 
+7. **Secret 写入/读取命令必须 redirect output** - 详见 `standards/conventions/secret-hygiene.md`
+
+**规则 #7 要点:** Secret 命令的 stdout/stderr 不得流入 chat-visible 通道。Bash 强制 `>/dev/null 2>&1`; Python `subprocess` 强制 `capture_output=True` (且不 print) 或 `stdout=DEVNULL`。验证用 metadata (status code / 字段长度 / `nomad var get -out=keys` 仅取 key 名), 不读 secret value 字面。Exception 必须 `# secret-leak-ok-explicit` 注释 + 理由 + 隔离环境证据 + owner sign-off。
+
+**触发场景:** `nomad var put/get` / `kubectl create secret` / `vault kv put` / `gh secret set` / `forgejo POST /tokens` / cloud secret manager / DB password commands / `cat <key-file>` / `echo $SECRET` / `nomad job inspect` (含 runtime env)。完整清单见规范 §2。
+
+**Source incidents:** 2026-05-02 Aria 自身 (4 keys via `nomad inspect`) + 2026-05-06 truffle-hound (4 keys via Python subprocess inherit stdio); Forgejo Issue [#78](https://forgejo.10cg.pub/10CG/Aria/issues/78).
+
+**详细规范 + 正向 pattern + exception 模板:** `standards/conventions/secret-hygiene.md`
+
 ---
 
 ## 项目状态
