@@ -1,0 +1,105 @@
+{
+  "spec": "state-scanner-t5-ai-fallback",
+  "plugin_version_target": "1.17.8",
+  "benchmark_type": "smoke (structural assertions, doc-only Level 1) — Round 2 post-review",
+  "rationale": "T5 17 行 SKILL.md AI 行为指引 + Important #2 fix (移除 branch check)。完整 /skill-creator AB 在 LLM 随机性下 delta 不可靠 (沿用 v1.17.3 doc-dominant smoke + defer 立例)。Round 2 在 aria:code-reviewer review 后修 branch check 过严问题。",
+  "review_round": 2,
+  "review_changes": "removed git.branch == 'master' check from condition 1 per aria:code-reviewer Important #2 — feature 分支上 cycle 闭合的 inter-cycle resume 也是合理 case, 且 condition 3 已隐式排除 mid-feature 状态",
+  "total_cases": 13,
+  "passes": 13,
+  "fails": 0,
+  "pass_rate": "100%",
+  "results": [
+    {
+      "case_id": "S1",
+      "label": "section_anchor",
+      "desc": "T5 子节锚点存在",
+      "pass": true,
+      "evidence": "**完整性兜底 (inter-cycle resume)**"
+    },
+    {
+      "case_id": "S2",
+      "label": "trigger_cond_1",
+      "desc": "触发条件 1 (status_clean only, 删 branch check)",
+      "pass": true,
+      "evidence": "git.status_clean == true` (工作树干净"
+    },
+    {
+      "case_id": "S3",
+      "label": "trigger_cond_2",
+      "desc": "触发条件 2 (上次 audit 收敛)",
+      "pass": true,
+      "evidence": "audit.has_unconverged == false"
+    },
+    {
+      "case_id": "S4",
+      "label": "trigger_cond_3",
+      "desc": "触发条件 3 (无高置信度规则)",
+      "pass": true,
+      "evidence": "commit_only` / `quick_fix` 类高置信度"
+    },
+    {
+      "case_id": "S5",
+      "label": "trigger_cond_4",
+      "desc": "触发条件 4 (UPM configured)",
+      "pass": true,
+      "evidence": "requirements.upm.configured == true"
+    },
+    {
+      "case_id": "S6",
+      "label": "action_read_upm",
+      "desc": "AI 行动 1: Read UPM Pending Followups",
+      "pass": true,
+      "evidence": "**Read** `requirements.upm.source_file` 全文, 重点抓 `## Pending Followups"
+    },
+    {
+      "case_id": "S7",
+      "label": "action_grep_handoff",
+      "desc": "AI 行动 2: Grep handoff doc 指针",
+      "pass": true,
+      "evidence": "**Grep** UPM 顶部 `> .*Next session 入口.*\\((.+\\.md"
+    },
+    {
+      "case_id": "S8",
+      "label": "action_override_rec",
+      "desc": "AI 行动 3: 覆盖 snapshot 推荐",
+      "pass": true,
+      "evidence": "feature_new"
+    },
+    {
+      "case_id": "S9",
+      "label": "transition_note",
+      "desc": "过渡指引说明",
+      "pass": true,
+      "evidence": "过渡指引"
+    },
+    {
+      "case_id": "S10",
+      "label": "placement_after_audit",
+      "desc": "插入位置 (audit 后)",
+      "pass": true,
+      "evidence": "audit.has_unconverged == true`, 提示用户处理 (查看报告 / 重新审计 / 接受当前结论)\n\n**完整性兜底"
+    },
+    {
+      "case_id": "S11",
+      "label": "placement_before_phase3",
+      "desc": "插入位置 (阶段 3 前)",
+      "pass": true,
+      "evidence": "完整性兜底 (inter-cycle resume)**:\n\n> snapshot 字段全 OK 不代表推荐充分。当所有以下条件**同时**成立时, AI 必须"
+    },
+    {
+      "case_id": "S12",
+      "label": "negative_no_must_caps",
+      "desc": "未使用大写 MUST",
+      "pass": true,
+      "evidence": "no MUST(caps), 必须(zh)=ok"
+    },
+    {
+      "case_id": "S13",
+      "label": "branch_check_removed",
+      "desc": "[NEW] Important #2 fix: branch check 已移除",
+      "pass": true,
+      "evidence": "branch check 已删除"
+    }
+  ]
+}
