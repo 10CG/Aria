@@ -1,9 +1,10 @@
 # m3-carryover-hcl-crons-sweep
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft (R1 audit applied 2026-05-07; awaiting R2 + owner Aether dev verify)
+> **Status**: Draft (R1 + R2 audit applied 2026-05-07; awaiting R3 stability + owner Aether dev verify)
 > **Created**: 2026-05-07
-> **R1 audit**: 4-agent multi-agent (backend-architect / qa-engineer / tech-lead / code-reviewer); ALIGNED 4/4 direction; tech-lead BLOCK on submodule regression (resolved this revision: rebased onto master c0d8c46 + submod pointer → 5d0e70b post-#7-merge HEAD)
+> **R1 audit**: 4-agent multi-agent (backend-architect / qa-engineer / tech-lead / code-reviewer); ALIGNED 4/4 direction; tech-lead BLOCK on submodule regression (resolved R1→R2 fix: rebased onto master c0d8c46 + submod pointer → 5d0e70b post-#7-merge HEAD)
+> **R2 audit**: same 4-agent team; ALL R1 CRITICAL CLOSED; ALIGNED 4/4; R2 NEW (this commit closes): (a) main commit `068e497` body says "bumped to 0fe3ce5" — actual diff is `dea9d8d → 5d0e70b` (#7 merge containing 0fe3ce5; 5d0e70b is correct landing point per R2-backend-architect/code-reviewer flag); (b) `.Specs[0]` API path fallback to `.Spec` (per R2-qa-engineer); (c) §风险 binary-vs-runtime bridge language (per R2-code-reviewer)
 > **Type**: 单子系统 hygiene 改动 (aria-orchestrator/deploy/ HCL × 2)
 > **Source**: M3 closeout backlog Issue [#76](https://forgejo.10cg.pub/10CG/Aria/issues/76); m3-handoff.yaml §10 t16_backlog_issues #76; AD-M3-5 §风险 #6 (deferred to separate hygiene Spec)
 > **Sister-bug bundle**: 否 (与 #75 result_path / #77 validator 分属不同子系统, owner 决策为 3 独立 Level 2)
@@ -101,7 +102,7 @@ aria-orchestrator/deploy/aria-layer1-reconcile.nomad.hcl:66:    cron            
 - [ ] `nomad job validate aria-orchestrator/deploy/aria-layer1-reconcile.nomad.hcl 2>&1 | grep -c "cron is deprecated"` returns `0`
 - [ ] `aria-orchestrator/docs/architecture-decisions.md` §AD-M3-5 §风险 #6 标注闭环引用
 - [ ] m3-handoff.yaml §10 #76 entry `triage_t16` 字段从 `<pending>` 改为 `fix-now: closed by openspec/archive/<date>-m3-carryover-hcl-crons-sweep`
-- [ ] **owner cluster verify** (concrete metric per R1-qa-engineer): `aether dev run` 两 job, 后跑 `nomad job inspect <job> | jq -r '.Job.Periodic.Specs[0]'` 验证 spec 字符串匹配 (`"0 * * * *"` / `"15,45 * * * *"`); 下个 periodic 触发时间通过 `nomad job inspect <job> | jq -r '.Job.Periodic.NextLaunch'` 检查 (应是下个 :00 或 :15/:45 时点)
+- [ ] **owner cluster verify** (concrete metric per R1-qa-engineer + R2-qa-engineer fallback): `aether dev run` 两 job, 后跑 `nomad job inspect <job> | jq -r '.Job.Periodic.Specs[0] // .Job.Periodic.Spec'` 验证 spec 字符串匹配 (`"0 * * * *"` / `"15,45 * * * *"`)。Nomad `crons` array 在 inspect 响应中应在 `Specs` (plural array); 若返回 `null` 则 fallback 至 `.Spec` (singular, legacy)。下个 periodic 触发时间通过 `nomad job inspect <job> | jq -r '.Job.Periodic.NextLaunch'` 检查 (应是下个 :00 或 :15/:45 时点)。
 - [ ] Forgejo Issue #76 关闭, comment 引用 archive 路径
 - [ ] PR + 多远程推送 (origin + github) per CLAUDE.md §版本发布检查清单
 
@@ -132,6 +133,6 @@ aria-orchestrator/deploy/aria-layer1-reconcile.nomad.hcl:66:    cron            
 - stdout 含 `Job validation successful`
 - stderr/stdout 不再含 `cron is deprecated` warning (实证 grep -c = 0)
 
-证据链: `nomad job validate` 不仅做 schema lint, 也校验字段 ID — 若 `crons` 在 1.7.7 是 unknown field 会被 silently ignore (Nomad HCL parser 对未知 stanza 字段非 error), 但配套 deprecation 提示 (`cron is deprecated... Use crons instead`) 在 v1.7.7 binary 中被实测移除 = 字段已被识别为 valid replacement。然而 *parser 接受* ≠ *runtime scheduler 行为等价*; 后者由 owner cluster verify 兜底 (per R1-backend-architect)。
+证据链: `nomad job validate` 不仅做 schema lint, 也校验字段 ID — 若 `crons` 在 1.7.7 是 unknown field 会被 silently ignore (Nomad HCL parser 对未知 stanza 字段非 error), 但配套 deprecation 提示 (`cron is deprecated... Use crons instead`) 在 v1.7.7 binary 中被实测移除 = 字段已被识别为 valid replacement。然而 *parser 接受* ≠ *runtime scheduler 行为等价*; **本地 binary lint clean ≠ Aether scheduler runtime 等价**, 后者 (next-launch 时间精确触发 + cadence 不漂移) 由验收 #7 owner cluster verify 兜底 (per R1-backend-architect + R2-code-reviewer language clarity request)。
 
 > **决策**: 本 Spec 假设 Nomad 1.7.7 已支持 `crons` array (本地 v1.7.7 binary 实证 + changelog 推断双重证据)。若 owner cluster verify 失败 (next-launch 时间不符 / job 注册成功但永不触发), 本 Spec 失败回滚, 额外起草"等待 Nomad 升级"跟踪 Issue。
