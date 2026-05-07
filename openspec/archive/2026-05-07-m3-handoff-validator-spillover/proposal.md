@@ -1,8 +1,9 @@
 # m3-handoff-validator-spillover
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft
+> **Status**: Complete (2026-05-07, archived per Level 2 micro-Spec "merge 后立即归档" convention)
 > **Created**: 2026-05-07
+> **Completed**: 2026-05-07 (aria-orchestrator PR #9 merged at dea9d8d; Aria main PR #82 merged at e152acc; 35 validator tests + 393 aria-layer1 baseline preserved)
 > **Type**: New tool (validate-m3-handoff.py + tests) + sentinel logic for AD slot fail-fast guard
 > **Source**: M3 closeout backlog Forgejo Issue [#77](https://forgejo.10cg.pub/10CG/Aria/issues/77); m3-handoff.yaml §10 t16_backlog_issues #77 (`<required for T16.2 implementation; not optional>`); AD-M3-* §治理影响 fail-fast 守卫 line (architecture-decisions.md:2357)
 > **Owner decision**: 一并实施 T16.2 validator 主体 (per session 2026-05-07: "A, B, 一并做"; not just sentinel logic)
