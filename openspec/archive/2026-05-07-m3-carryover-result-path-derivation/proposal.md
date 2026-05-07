@@ -1,8 +1,9 @@
 # m3-carryover-result-path-derivation
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft
+> **Status**: Complete (2026-05-07, archived per Level 2 micro-Spec "merge 后立即归档" convention)
 > **Created**: 2026-05-07
+> **Completed**: 2026-05-07 (aria-orchestrator PR #8 merged at 499d4c4; Aria main PR #81 merged at 6ae57f6; Forgejo Issue #75 close pending owner; 393 tests PASS)
 > **Type**: Schema-code drift 收敛 (1 prod 文件 + 6-8 test 文件 + 1 新 drift-guard test)
 > **Source**: M3 closeout backlog Forgejo Issue [#75](https://forgejo.10cg.pub/10CG/Aria/issues/75); m3-handoff.yaml §10 t16_backlog_issues #75; T12.1 5-step crash-recovery integration test 触发
 > **Owner decision**: **Option B** (drop persistence, do not migrate schema) per session 2026-05-07
