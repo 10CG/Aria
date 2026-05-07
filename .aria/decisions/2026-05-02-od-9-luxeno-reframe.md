@@ -80,3 +80,17 @@
 ## Supersedes
 
 无 — OD-9 是新增决策, 不撤销 OD-1~OD-8。但 OD-3 ("S5/S6 review 走 silknode→GLM") 的 "silknode" 字面词在 OD-9 后等价于 "Luxeno coding-plan baseURL", 不改 OD-3 文本。
+
+---
+
+## Retroactive Owner Acknowledgment (appended 2026-05-07)
+
+> **Source**: 3-round Spec discussion loop convergence on `aria-2.0-silknode-integration-contract`; resolves Acceptance criterion (b) "Phase A.2 owner conditional" raised by R1/R2/R3 challenge group (qa-engineer); per R3 unified discussion group recommendation.
+> **Sign-off**: solo-lab (uni.concept.wzfq@gmail.com) via archive commit per AD-M0-9 (1-人 lab pr_approval = sign-off mechanism)
+> **Context file**: `.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md`
+
+**Acknowledgment**: silknode-integration-contract §契约 1 (no-storage) constraints applied throughout M2 development per OD-9 Luxeno reframe. The original Spec text at line 31-40 ("silknode 代理 (Luxeno 品牌) 在 Aria 2.0 架构中必须保持 'API 调用透传, 不落地存储' 的行为") binds Luxeno baseURL operationally identical to silknode-gateway baseURL.
+
+OD-3d (in M3 archive) further generalized this constraint to **all upstream LLM providers** (Luxeno + Zhipu direct + future), including ZhipuClient direct-connect path. The "等 owner Phase A.2 确认" annotation in the M3 archive (line 132 of `openspec/archive/2026-05-06-aria-2.0-m3-cycle-close-glm-routing-recovery/proposal.md`) is hereby **confirmed retroactively** as accepted: Contract 1 generalization is applied unconditionally to ZhipuClient direct-connect.
+
+**No silent gap**: Contract 1 enforcement is documented + waived-for-mechanical-detection-via**`.aria/state-checks.yaml::silknode-contract-deferral-expiry` probe (warns at 2026-08-05); Contract 2 (business data classification) carries explicit deferred waiver per the 2026-05-07 decision file.

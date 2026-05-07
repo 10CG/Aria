@@ -32,3 +32,43 @@ checks:
     fix: "rm .aria/cache/issues.json && 重跑 /state-scanner 触发 Phase 1.13 live fetch"
     timeout_seconds: 5
     enabled: true
+
+  # --- silknode-integration-contract deferred-acceptance expiry ---
+  - name: "silknode-contract-deferral-expiry"
+    description: |
+      Watches the silknode-integration-contract Spec waiver decision file.
+      Per 2026-05-07 3-round Spec discussion loop convergence:
+      - Spec archived 2026-05-07 with explicit waiver until 2026-08-05
+      - Contract 2 (业务数据分类约束) was never mechanically enforced in M2
+      - This probe is the "detection stub" deliverable from R3 convergence
+        (closes qa-engineer R2 objection #c "scaffold-helpers-drift risk")
+      WARN (not BLOCK) if expires_at past now() — waiver renewal / Spec
+      re-evaluation required per .aria/decisions/2026-05-07-silknode-contract-*.
+    command: |
+      WAIVER='.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md'
+      if [ ! -f "$WAIVER" ]; then
+        echo "OK (waiver file absent — likely pre-2026-05-07 state)"; exit 0
+      fi
+      EXPIRES=$(grep -E '^expires_at:' "$WAIVER" | head -1 | sed -E 's/^expires_at:[[:space:]]*//; s/T.*$//; s/[[:space:]]*$//')
+      if [ -z "$EXPIRES" ]; then
+        echo "MALFORMED — expires_at not found in $WAIVER"; exit 1
+      fi
+      EPOCH_EXPIRES=$(date -d "$EXPIRES" +%s 2>/dev/null)
+      EPOCH_NOW=$(date +%s)
+      if [ -z "$EPOCH_EXPIRES" ]; then
+        echo "MALFORMED — expires_at '$EXPIRES' not parseable"; exit 1
+      fi
+      if [ "$EPOCH_NOW" -gt "$EPOCH_EXPIRES" ]; then
+        DAYS_OVER=$(( (EPOCH_NOW - EPOCH_EXPIRES) / 86400 ))
+        echo "EXPIRED — silknode-contract waiver past $EXPIRES (${DAYS_OVER}d over)"
+        exit 1
+      fi
+      DAYS_LEFT=$(( (EPOCH_EXPIRES - EPOCH_NOW) / 86400 ))
+      echo "OK (${DAYS_LEFT}d until waiver expiry $EXPIRES)"
+    severity: warning
+    fix: |
+      1. Read .aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md §重新评估时 SOP
+      2. Check deferred acceptance items (c) US-025 status + (d) US-026/PRD anchor status
+      3. Decide: close waiver (all MET) / renew waiver (new file, new expires_at) / upgrade to standards/governance/silknode-no-storage.md
+    timeout_seconds: 5
+    enabled: true

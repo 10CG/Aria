@@ -1,8 +1,12 @@
 # aria-2.0-silknode-integration-contract — silknode 集成契约 (预留 Spec)
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft (预留, 等待 US-022+ 消费)
+> **Status**: Complete (Archived-with-Waiver, 2026-05-07; per 3-round multi-agent Spec discussion loop convergence)
 > **Created**: 2026-04-14
+> **Closed**: 2026-05-07 — Acceptance (a)+(b) MET via US-022/023 archives; (c)+(d) deferred-with-explicit-waiver until 2026-08-05 (90-day hard cap matching secret-rotation precedent)
+> **Waiver decision**: `.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md`
+> **Detection stub**: `.aria/state-checks.yaml::silknode-contract-deferral-expiry` (WARN-on-expiry probe, 同 commit 落地)
+> **Audit trajectory**: R1 (4 challenge objections) → R2 (compromise pattern) → R3 (90d + verbatim + sign-off + retroactive OD-9 ack + stub + machine-readable expires_at + audit trail) → CONVERGED 0 challenge objections
 > **Parent Story**: (待定, 预期 [US-022](../../../docs/requirements/user-stories/US-022.md) Layer 1 Hermes fork + Layer 2 容器, M0 Spike 结论后起草)
 > **Source**: [r1-legal-memo.md v1.1](../../../aria-orchestrator/docs/r1-legal-memo.md) 第 5 段"v1.1 后续人工动作" 第 2-3 项
 > **Upstream Decisions**: 产品负责人 2026-04-14 澄清 (记录于 Aria 主项目 feature/aria-2.0-m0-prerequisite 分支)
