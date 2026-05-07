@@ -202,6 +202,7 @@ Spec 路径: `openspec/changes/aria-2.0-m4-human-gate-feishu-approval/`
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | v0.1 | 2026-05-07 | brainstorm 收敛初稿,Q1-Q14 全部锁定 | AI (per owner explicit authorization) |
+| v0.2 | 2026-05-07 | Phase A.2 R1 audit (4-agent parallel post_spec, challenge mode) 收敛 PASS_WITH_WARNINGS — 6 critical + 21 important + 16 minor。R2 fix 应用至 proposal.md / tasks.md (30 新子任务 + 4 新 AD-M4 slots: AD-M4-8 cross-cutting idempotency / AD-M4-9 polling 30s 独立 cron / AD-M4-10 m4-handoff additive + abi_compat_promises forward-binding / AD-M4-11 owner_username config list 预埋 M5)。Audit 报告: `.aria/audit-reports/post_spec-R1-2026-05-07T1811Z-us024-m4.md`。Q1-Q14 决议本身未变,R2 仅细化实施细节 (e.g. 7 列含 last_polled_comment_id, UNIQUE INDEX, ALLOWED_TRANSITIONS dict, polling cadence 30s, first-decision-wins, comment.type filter, SQLite version probe, Aria dogfooding 边界声明)。 | AI (per owner explicit authorization, R2 fix-verify pending) |
 
 ---
 
