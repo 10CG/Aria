@@ -1,8 +1,9 @@
 # aria-secret-hygiene-rule
 
 > **Level**: Minimal (Level 2 Spec — 仅 proposal.md, 无 tasks.md)
-> **Status**: Draft
+> **Status**: Complete (2026-05-07, archived per Level 2 micro-Spec "merge 后立即归档" convention)
 > **Created**: 2026-05-07
+> **Completed**: 2026-05-07 (standards PR #2 merged at 2cd34d3; Aria main PR #83 merged at f894c53; Forgejo Issue #78 closed Path 1; Path 3 hook deferred to follow-up)
 > **Type**: Aria methodology rule addition (standards/ 新文件 + 主 CLAUDE.md 规则 #7)
 > **Source**: Forgejo Issue [#78](https://forgejo.10cg.pub/10CG/Aria/issues/78) (filed by truffle-hound team after 2026-05-06 secret leak incident); memory `feedback_secrets_never_in_conversation.md` (2026-05-02 教训, 4 keys leaked via `nomad inspect` 全量 dump)
 > **Scope decision**: **Path (1) Documentation only** for this Spec; Path (3) PreToolUse hook defer 至独立后续 Spec (false-positive 调优 + 多 shell 兼容是其独立设计议题)
