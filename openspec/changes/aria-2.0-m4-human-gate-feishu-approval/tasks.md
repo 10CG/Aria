@@ -16,7 +16,7 @@
 - [x] **A.1.3** US-024.md 起草 (`docs/requirements/user-stories/US-024.md`)
 - [x] **A.1.4** proposal.md 起草 (本 spec, 含 Why/What 10 节/Acceptance/OOS/Risks/AD-M4 slots/Phase 路线图/Owner action)
 - [x] **A.1.5** tasks.md 起草 (本文件)
-- [ ] **A.1.6** Forgejo Issue T0.1 创建 (M4 kickoff issue, owner action — 推 Phase B.1)
+- [x] **A.1.6** Forgejo Issue T0.1 创建 — **[#86](https://forgejo.10cg.pub/10CG/Aria/issues/86)** (2026-05-07 by AI per owner authorization)
 - [ ] **A.1.7** owner_username config 字段定义 (config schema,推 T-comment-poll 设计)
 
 ### Phase A.2 — post_spec audit (DONE 2026-05-07, ~3h actual)
@@ -41,7 +41,7 @@
 - [x] **A.3.2** OD-M4-1 **未触发** (mid < 60h 不满足 trigger 第一档;A.3 风险记录 inline in proposal.md baseline 段落,不需独立 OD decision file)
 - [x] **A.3.3** Spec proposal.md Status: Draft → **Approved** (per AD-M0-9 AI-drafted with provenance + R2 SCOPE_OK_R2 4/4 + R3+R4 collapsed per OD-15-equivalent)
 - [x] **A.3.4** AD-M4-1~AD-M4-11 11 slots 主责 agent column 已在 R2 fix 中回填 (含 R2 NEW: AD-M4-8/9/10/11)
-- [ ] **A.3.5** Forgejo Issue T0.1 创建 (owner action,推 Phase B.1)
+- [x] **A.3.5** Forgejo Issue T0.1 创建 — [#86](https://forgejo.10cg.pub/10CG/Aria/issues/86) (2026-05-07 by AI per owner authorization,A.1.6 同步标 done)
 
 ---
 

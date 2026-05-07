@@ -14,7 +14,7 @@
 >   - [feedback_feishu_hermes_gotchas](../../../.claude/projects/-home-dev-Aria/memory/feedback_feishu_hermes_gotchas.md)
 >   - [reference_10cg_cluster_internal_routing](../../../.claude/projects/-home-dev-Aria/memory/reference_10cg_cluster_internal_routing.md) (Aether 192.168.69.x 私网)
 >   - [aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/](../../../aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/) (M2/M3 已实现 S7/Feishu/transitions/tests)
-> **Forgejo Issue**: _Pending T0.1 (M4 kickoff issue 创建)_
+> **Forgejo Issue**: [#86](https://forgejo.10cg.pub/10CG/Aria/issues/86) (created 2026-05-07 by AI per owner authorization)
 > **Related**:
 >   - **前置 (硬门控)**: [US-023](../../../docs/requirements/user-stories/US-023.md) M3 carryover trio CLOSED 2026-05-07
 >   - **后继**: US-025 (M5 Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable)
