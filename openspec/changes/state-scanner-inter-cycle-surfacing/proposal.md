@@ -89,8 +89,14 @@ followups:
 **新规则**: `pending_followups_p1`
 
 ```yaml
-priority: 1.85   # 优先级介于 multi_remote_drift (1.35) 与 readme_outdated (1.3) 之间
-condition: snapshot.requirements.upm.followups[*] | filter priority="P1" | count > 0
+priority: 1.85   # 位于 architecture_chain_broken (1.8) 之后、audit_unconverged (1.9) 之前
+                 # rationale: inter-cycle P1 followup 优先级高于审计状态感知 (1.9),
+                 # 但低于架构链路完整性 (1.8) — 架构断链是更严重的项目健康信号
+condition: |
+  # 伪代码 (RECOMMENDATION_RULES.md 现有 condition 是自由文本描述, 实现时
+  # 等价于 Python: any(f.get("priority") == "P1" for f in
+  # snapshot.get("requirements", {}).get("upm", {}).get("followups", []))
+  followups 中存在 priority == "P1" 的 row (≥1)
 trigger: 推荐输出展示前 5 条 P1 followups + "建议优先处理 cross-cycle backlog"
 ```
 
@@ -111,9 +117,20 @@ handoff_doc:
 r"^>\s*[^\n]*?(?:Next session 入口|下次 session 入口|🚪 Next session)[^\n]*?\(([^)]+\.md)\)"
 ```
 
-放宽备选(可配 `state_scanner.handoff_aliases` future):
-- `> .*入口.*\(([^)]+\.md)\)`
-- `> .*handoff.*\(([^)]+\.md)\)`
+主 regex 有三处安全锚点:`^>` 行首 blockquote、关键词枚举、`.md` 扩展名。
+
+**备选 regex**(收紧版,本 Spec 启用):
+
+```python
+r"^>\s*.*?(?:入口|handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)"
+```
+
+收紧设计:行首 `^>` 锚点 + 关键词与括号间 ≤80 字符 + 不跨行(`[^()\n]`)。这是为了避免中文 "入口" 在技术文档中泛化命中(e.g. "函数入口"、"调试入口"、"程序入口"、"记录入口" 后跟意外 markdown link 时误报)。
+
+**T3.3 强制负例**:必须包含
+- `> 函数入口在 (xxx.md)` — 不应命中(无 "Next session" / "handoff" / "session" 之一,且 "入口" 前直接接非空格)。说明:实际收紧 regex 中 "入口" 仍在 alternation 中,需 T3.1 在实现时进一步确认负例覆盖,或将备选缩到只含 "handoff / session" 不含独立的 "入口"。本 Spec 留出实现选择空间
+- `> 调试入口: 见 [debug.md](debug.md)` — 边界 case,需明确 spec 是否允许"调试入口"形式(若不允许,则负例;若允许,则正例并标注限制)
+- `> Next session 入口: ...\n(下一行)... (handoff.md)` — 跨行不应命中(`\n` 截断)
 
 只取**首条匹配**(UPM 约定 handoff 指针单条)。
 
@@ -138,23 +155,56 @@ priority_items:
 ```
 
 **取值策略**:
+- **数据源**:`priority_items[]` 是 `stories.items[]` 的**派生视图**(过滤 + 排序 + 切片),**不重新 glob 文件系统**。`requirements.py` 在已有 `story_items` 收集结束后做一次 filter/sort
 - 优先级筛选:`in_progress` > `ready` > `pending` (其他 status 不进 priority_items)
 - N 默认 5(可配 `state_scanner.priority_items_limit`)
-- 排序:status_normalized 优先级 → file mtime DESC(同优先级新近优先)
+- **排序(三级 stable tie-break,跨 OS 确定)**:
+  1. `_STATUS_ORDER` ASC: `in_progress=0 < ready=1 < pending=2`
+  2. file mtime DESC(同 status 内新近优先)
+  3. file path LEX ASC(同 status + 同 mtime 时字母序;防 `git clone` 平铺 mtime 退化)
+- **mtime 读取**:仅对入选项调用 `Path.stat().st_mtime` 一次(N≤5 通常)
+- `priority_hint` 字段为 future 扩展占位,本 Spec 不实现 US frontmatter Priority 解析
 
 **新规则**: `resume_in_progress_us`
 
 ```yaml
-priority: 1.88   # 紧邻 pending_followups_p1 (1.85) 之后,在 multi_remote_drift (1.35) 之前
-condition: snapshot.requirements.stories.priority_items[*] | filter status_normalized="in_progress" | count >= 1
+priority: 1.88   # 紧邻 pending_followups_p1 (1.85) 之后、audit_unconverged (1.9) 之前
+                 # rationale: in-progress US 是当前 cycle 进行中的工作,
+                 # 优先级与 P1 followup 同级但稍后, 让 cross-cycle backlog 先浮出
+condition: |
+  # 伪代码 (同 pending_followups_p1 注释): 实现等价于 Python:
+  # any(i.get("status_normalized") == "in_progress" for i in
+  # snapshot.get("requirements", {}).get("stories", {}).get("priority_items", []))
+  priority_items 中存在 status_normalized == "in_progress" 的项 (≥1)
 trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继续 US-X (Phase B/C/D)"
 ```
 
 #### Cross-cutting
 
-- **Schema 文档**: `aria/skills/state-scanner/references/state-snapshot-schema.md` 加 §upm.followups, §upm.handoff_doc, §requirements.stories.priority_items 三节及 backward-compat 声明
-- **T5 兜底降级**: `aria/skills/state-scanner/SKILL.md` 阶段 2 "完整性兜底" 段从"AI 必须 Read UPM/handoff"改为"如 `upm.followups[]` 缺失或为空且 UPM 文件确含 `## Pending Followups` 表 → snapshot 字段构造异常 → soft warn"
-- **完整 `/skill-creator` AB benchmark**: 此时 schema 引入可断言结构信号(snapshot 三新字段是否非空、推荐规则是否触发),AB delta 不再被 LLM 噪声淹没。固定 inter-cycle-resume fixture(SilkNode 简化版)+ 4 evals × 2 configs × subagents = 标准 AB 流程。结果存 `aria-plugin-benchmarks/ab-results/{date}-state-scanner-inter-cycle-surfacing/`
+- **Prerequisite — `git.status_clean` derived 字段**: `collectors/git.py` 现仅产 `staged_files[] / unstaged_files[] / uncommitted_count`,**无 `status_clean` 字段**,而 T5 SKILL.md 触发条件 1 引用此字段。新增 `status_clean: bool = (staged_files == [] and unstaged_files == [])` derived 字段,同步 `state-snapshot-schema.md §git`。否则 TX.2 降级后触发条件永远 false → silent failure
+- **Schema 文档**: `aria/skills/state-scanner/references/state-snapshot-schema.md` 加 §git.status_clean, §upm.followups, §upm.handoff_doc, §requirements.stories.priority_items 四节及 backward-compat 声明。**字段缺失行为统一**:`upm.followups` 字段不存在(无 `## Pending Followups` section)/ `upm.handoff_doc: null`(无匹配)/ `priority_items: []`(无候选)
+- **normalize_snapshot 同步**: `normalize_snapshot.py` 加规则 — `followups[*].raw_row` 进 `DROP_KEYS` 防大文本 drift 加剧已知 flake `test_two_consecutive_runs_diff_zero`。`priority_items[]` 排序结果若不进 DROP_KEYS,需保证三级 stable tie-break(见 G4 取值策略)。`handoff_doc.raw_match` 同 raw_row 处理
+- **T5 兜底降级 (mock 段落)**: `aria/skills/state-scanner/SKILL.md` 阶段 2 第 172-187 行 17 行替换为约 7 行 sanity check:
+  ```markdown
+  **完整性兜底 (inter-cycle resume — sanity check)**:
+
+  > 若 `requirements.upm.followups[]` 字段不存在 / 为空 (`[]`),
+  > 但 UPM `source_file` 文本中确实含有 `## Pending Followups` 标题
+  > (mechanical grep 验证) → snapshot 字段构造异常 → soft warn:
+  > "followups 字段缺失,inter-cycle 优先级可能不完整。检查 collectors/upm.py 版本"
+  > 同理校验 `upm.handoff_doc` 与 `requirements.stories.priority_items[]`
+  ```
+  原 4 项触发条件 + 3 个 AI 主动 Read/Grep 行动**全部删除**(由 collector 字段替代)
+- **完整 `/skill-creator` AB benchmark (三 arm 拆分,delta 归因)**:
+  - **arm A**: baseline `without_skill` (无 state-scanner)
+  - **arm B**: `with_skill v1.17.7 + T5` (T5 兜底保留,无新 collector 字段)
+  - **arm C**: `with_skill v1.18.0` (新 collector + 新规则 + T5 降级)
+  - 期望 `delta(C - B)` 为正(收益主要来自 collector 而非 T5),`delta(B - A)` 验证 T5 价值。固定 inter-cycle-resume fixture (规格见下),结果存 `aria-plugin-benchmarks/ab-results/{date}-state-scanner-inter-cycle-surfacing/`
+  - **fixture 最小规格** (避免与 SilkNode 真实数据耦合):
+    - followups: 6 行 (P1×2 / P2×2 / P3×2)
+    - handoff_doc: `> 🚪 Next session 入口: 见 [docs/handoff/stub.md](docs/handoff/stub.md)` + 空 stub.md (exists=true)
+    - 1 个 in_progress US + 1 个 pending US
+    - 额外 negative fixture × 2: (a) UPM 无 Pending Followups 表 (b) handoff 路径不存在
 - **版本 bump**: aria-plugin v1.17.7 → **v1.18.0**(新 collector 字段 + 新规则 = MINOR per CLAUDE.md 项目惯例)
 
 ---
@@ -164,60 +214,110 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 | Type | Description |
 |------|-------------|
 | **Positive** | inter-cycle resume surfacing 从 LLM 兜底升级为机械化 snapshot;AI 跨 session 优先级追踪能力质变;UPM Pending Followups 表与 collector 契约一致;为 SilkNode + Aria + Aether + Kairos 等多项目复用 |
-| **Positive** | 完整 `/skill-creator` AB benchmark 数据进入常态化积累,T5 sanity check 降级后 SKILL.md 阶段 2 段瘦身 |
-| **Risk** | snapshot schema 加 3 字段 — backward-compat 必须保证(consumer 不假定字段存在)。Mitigation:Aria + Kairos + Aether 三项目跑 dogfooding,任一 collector 退化必阻塞 |
-| **Risk** | markdown table parser 的容错可能误命中非 Pending Followups 表(项目 UPM 内可能有多张表)。Mitigation:严格锚定 `## Pending Followups` 标题文本,只取标题后第一张表;新增否定测试覆盖"UPM 内含其他表但 Pending Followups 缺失" |
-| **Risk** | handoff regex 写死中文/Emoji,跨语言项目可能漏匹配。Mitigation:G3 规范多 alias regex + 配置项预留 future i18n 扩展 |
+| **Positive** | 完整 `/skill-creator` AB benchmark 数据进入常态化积累(三 arm 拆分让 delta 归因可分),T5 sanity check 降级后 SKILL.md 阶段 2 段瘦身 17→7 行 |
+| **Risk** | snapshot schema 加 4 字段(`git.status_clean` + 3 inter-cycle 字段)— backward-compat 必须保证(consumer 不假定字段存在)。Mitigation:Aria + Kairos + Aether 三项目跑 dogfooding,任一 collector 退化必阻塞;TX.6 加 ≥2 个 unit test 验证 `.get()` 防御性访问 |
+| **Risk** | markdown table parser 的容错可能误命中非 Pending Followups 表(项目 UPM 内可能有多张表)。Mitigation:严格锚定 `## Pending Followups` 标题文本(大小写敏感、允许 0-3 前导空格),只取标题后第一张 `\|` 起始表;T2.3 多表 negative case 覆盖 |
+| **Risk** | handoff regex 写死中文/Emoji,跨语言项目可能漏匹配,**且备选 regex 中 "入口" 可能误命中技术文档**("函数入口" / "调试入口" 等)。Mitigation:G3 备选 regex 收紧到 `^>` + ≤80 字符 + 不跨行;T3.3 加 "函数入口" / "调试入口" / 跨行 三个负例 |
+| **Risk** | `priority_items[]` mtime 排序在 `git clone` 平铺 mtime 时退化为 glob 顺序,加剧 issue #61 cross-platform flake 风险。Mitigation:三级 stable tie-break (`status_order ASC → mtime DESC → path LEX ASC`),path LEX 在 mtime 平局时确保确定性 |
 
 ---
 
 ## Tasks
 
+> **执行顺序**: TX.0 (git.status_clean) + TX.1 (schema doc) **必须先于** G2/G3/G4 实现任务 (per CLAUDE.md "规范先行" 认知框架);G2 / G3 / G4 三组无文件冲突可**并行实施** (G2 改 upm.py table parser、G3 改 upm.py regex、G4 改 requirements.py priority_items);Cross-cutting TX.2-TX.7 必须等 G2/G3/G4 全部 merge 后串行。
+
+### G0 — Prerequisite (新增)
+
+- [ ] **TX.0** `collectors/git.py` 加 derived 字段 `status_clean: bool`(`staged_files == [] and unstaged_files == []`)+ schema 文档同步 + 1 个 unit test
+
 ### G2 — UPM Pending Followups 表解析
 
 - [ ] **T2.1** schema 设计:`snapshot.requirements.upm.followups[]` 字段格式定稿(含 row_index / priority / item / source / tracking / next_action / raw_row)
-- [ ] **T2.2** `collectors/upm.py` 加 markdown table parser:锚点匹配 `## Pending Followups` heading + 提取后续首张表 + 列规范化 + i18n 全角分隔/中文表头别名
-- [ ] **T2.3** 单元测试:正常表 / 空表(只有 header+separator) / 错列序 / 缺列 / embedded inline code / 多表 negative / heading 缺失 fail-soft / 表内 pipe escape
+- [ ] **T2.2** `collectors/upm.py` 加 markdown table parser:
+  - heading regex: `r"^[ \t]{0,3}#{2,3}\s+Pending Followups\s*$"` (大小写敏感、允许 0-3 前导空格、显式排除全角空格 　)
+  - heading 与表格间允许任意非表格行,逐行扫描直到 `\|` 起始行
+  - pipe escape 处理: `row.replace('\\|', '\x00').split('\|')` 后还原
+  - 列规范化: 表头列名映射 (`Priority` / `优先级` / `Pri`)
+  - 实现者可自决是否拆 `_upm_followups.py` sub-module (无需另起 Spec)
+- [ ] **T2.3** 单元测试 **(≥ 8 cases,T2.3.a-h 一一对应)**:
+  - T2.3.a 正常表 (4-6 行,含 P1/P2/P3)
+  - T2.3.b 空表 (只有 header+separator)
+  - T2.3.c 错列序 (列名映射验证)
+  - T2.3.d 缺列 (Tracking 列不存在 → null 填充)
+  - T2.3.e embedded inline code in cell
+  - T2.3.f pipe escape `\|` in cell (正确还原为字面 `|`)
+  - T2.3.g 多表 negative (UPM 含其他表但 `## Pending Followups` 缺失 → followups 字段不存在)
+  - T2.3.h heading 前导空格 / heading 与表间含说明段落
 - [ ] **T2.4** `RECOMMENDATION_RULES.md` 加 `pending_followups_p1`(priority 1.85),含 condition + trigger + 输出展示模板(前 5 条 P1)
 - [ ] **T2.5** Aria + Kairos + SilkNode (mock fixture) dogfooding:验证 followups[] 字段非空且 priority 列规范化正确
 
 ### G3 — Handoff doc 指针识别
 
-- [ ] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(`Next session 入口` 主 + `入口` / `handoff` 备选),取首条匹配
-- [ ] **T3.2** 路径规范化:相对 project root + `os.path.exists` 验证 → `handoff_doc.exists` 字段
-- [ ] **T3.3** 单元测试:中文/英文/Emoji 三种 entry 形式 / 多 link 取首 / 路径不存在 fail-soft / regex 模糊匹配负例
+- [ ] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(主 `Next session 入口` + 收紧版备选 `^>\s*.*?(?:入口|handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)`),取首条匹配
+- [ ] **T3.2** 路径格式三态:
+  - 相对路径 → `(project_root / raw).resolve()` + `relative_to(project_root)`
+  - 绝对路径 → `Path(raw).resolve()` + 不做 `relative_to`,exists() 检查
+  - URL (`http://` / `https://`) → `path=raw`, `exists=false` + `soft_error("unsupported_path_format")`
+- [ ] **T3.3** 单元测试 **(≥ 5 cases,T3.3.a-e)**:
+  - T3.3.a 中文 / 英文 / Emoji 三种 entry 形式 (3 子测试)
+  - T3.3.b 多 link 取首条
+  - T3.3.c 路径不存在 → `exists=false` fail-soft
+  - T3.3.d 误命中负例: `> 函数入口在 (xxx.md)` / `> 调试入口: 见 [debug.md](debug.md)` 不命中
+  - T3.3.e 跨行不命中: `> Next session ...\n>(下一行) (handoff.md)`
 - [ ] **T3.4** schema 文档更新 §upm.handoff_doc
 
 ### G4 — in-progress US priority_items
 
-- [ ] **T4.1** schema 设计:`snapshot.requirements.stories.priority_items[]`(id + status_normalized + raw_status + priority_hint + file)
-- [ ] **T4.2** `collectors/requirements.py` 增量提取 in_progress + ready + pending 头部 N(默认 5)项,带文件路径,按 status_normalized 优先级 + mtime 排序
+- [ ] **T4.1** schema 设计:`snapshot.requirements.stories.priority_items[]`(id + status_normalized + raw_status + priority_hint=null + file)
+- [ ] **T4.2** `collectors/requirements.py` **基于已有 `story_items[]` 派生** (不重新 glob):
+  - 过滤 `status_normalized ∈ {in_progress, ready, pending}`
+  - 三级 stable 排序: `_STATUS_ORDER ASC → mtime DESC → path LEX ASC`
+  - mtime 仅对入选项调用 `Path.stat().st_mtime` 一次 (N≤5)
+  - 切片头部 N (默认 5,可配)
+  - 确认 `_normalize_status('ready')` 与 `**Status**: Ready` 链路在 `_status.py` 中正确归一为 `ready`(若不正确,补 normalize 修复)
 - [ ] **T4.3** `RECOMMENDATION_RULES.md` 加 `resume_in_progress_us`(priority 1.88)
-- [ ] **T4.4** 单元测试 + schema 文档 §requirements.stories.priority_items
+- [ ] **T4.4** 单元测试 **(≥ 4 cases,T4.4.a-d)**:
+  - T4.4.a in_progress + ready + pending 排序顺序正确
+  - T4.4.b 同 status 同 mtime 时 path LEX 字母序 (验证 git clone 平铺 mtime 场景)
+  - T4.4.c N=0 / 全部空状态 → `priority_items: []`
+  - T4.4.d `_normalize_status('ready')` / `**Status**: Ready` / `**状态**: 就绪` 正确归一为 `ready`
 - [ ] **T4.5** 配置项 `state_scanner.priority_items_limit`(默认 5)纳入 config-loader
 
 ### Cross-cutting
 
-- [ ] **TX.1** `aria/skills/state-scanner/references/state-snapshot-schema.md` 三节扩充 + 显式声明 backward-compat(consumer 不假定字段存在)
-- [ ] **TX.2** `aria/skills/state-scanner/SKILL.md` 阶段 2 "完整性兜底" 段降级为 sanity check 措辞 + 引用新字段名
-- [ ] **TX.3** 完整 `/skill-creator` AB benchmark 跑一次:
-  - 固定 fixture:`aria-plugin-benchmarks/state-scanner/fixtures/inter-cycle-resume/`(UPM 含 22 行 Pending Followups 表 + handoff doc + git 干净 + audit 收敛 mock)
-  - 2-3 evals × (with_skill v1.18.0 vs without_skill / vs old_skill v1.17.7) × subagents
+- [ ] **TX.1** `aria/skills/state-scanner/references/state-snapshot-schema.md` 四节扩充 (§git.status_clean + §upm.followups + §upm.handoff_doc + §requirements.stories.priority_items) + 显式声明 backward-compat (字段缺失行为统一,见 What §Cross-cutting Schema 文档)
+  - 子任务 TX.1.a: `normalize_snapshot.py` 加规则 — `followups[*].raw_row` 进 `DROP_KEYS` 防大文本 drift 加剧已知 flake (类似 recent_commits 处理);`handoff_doc.raw_match` 同处理
+  - 子任务 TX.1.b: `test_normalize_snapshot.py` 加 followups/handoff_doc/priority_items normalize 规则覆盖 case (已含确定性排序的 priority_items 不必 DROP,只需稳定性测试)
+- [ ] **TX.2** `aria/skills/state-scanner/SKILL.md` 阶段 2 "完整性兜底" 段降级为约 7 行 sanity check (mock 段落见 What §Cross-cutting T5 兜底降级);删除原 4 触发条件 + 3 AI 主动 Read/Grep 行动
+- [ ] **TX.3** 完整 `/skill-creator` AB benchmark 跑一次 **(三 arm 拆分,delta 归因)**:
+  - **arm A**: baseline `without_skill`
+  - **arm B**: `with_skill v1.17.7 + T5` (T5 兜底保留,无新 collector)
+  - **arm C**: `with_skill v1.18.0` (新 collector + 新规则 + T5 降级)
+  - **fixture 最小规格** (避免与 SilkNode 真实数据耦合): 见 What §Cross-cutting fixture 规格 (followups 6 行 P1×2/P2×2/P3×2 + handoff stub + 1 in_progress US + 1 pending US + 2 negative)
   - 结果存 `aria-plugin-benchmarks/ab-results/{YYYY-MM-DD}-state-scanner-inter-cycle-surfacing/` + `latest` symlink 切换
-  - delta 必须为正(with_skill 通过率 ≥ baseline)
+  - PASS gate: `delta(C - A) ≥ 0` 阻塞 merge;Quality target: `delta(C - A) ≥ +5pp` 不阻塞但记录 benchmark.md;`delta(C - B)` 应为正(收益主要来自 collector)
 - [ ] **TX.4** Aria 子模块版本 bump v1.17.7 → v1.18.0:plugin.json + marketplace.json + VERSION + CHANGELOG.md + README.md
 - [ ] **TX.5** 主项目 submodule 指针 bump + 主项目 VERSION + CHANGELOG 同步
+- [ ] **TX.6** Backward-compat verify (新增):`test_upm.py` + `test_requirements.py` 加 ≥ 2 个 unit test,验证 consumer 用 `result.data.get('followups', [])` / `data['stories'].get('priority_items', [])` 等防御性访问方式在字段缺失时不抛 KeyError + 行为合理
+- [ ] **TX.7** PR merge 前在 Aria + Kairos + Aether 三项目本地分别跑 scan.py,exit=0 + errors=[] 截图或日志附 PR 描述 (CI 接入留 future Spec)
 
 ---
 
 ## Success Criteria
 
 - [ ] `state-scanner --output snapshot.json` 在 SilkNode 真实项目上产出含 `upm.followups[]` (≥1 P1 row), `upm.handoff_doc.path` (handoff doc), `requirements.stories.priority_items[]` (≥1 in_progress US) 的 snapshot
+- [ ] `git.status_clean` 字段在所有 dogfooding 项目 snapshot 中正确产出(干净 = true,有暂存/未暂存 = false)
 - [ ] Aria + Kairos + Aether 三项目 dogfooding scan.py 0 退化:`exit=0`,`errors=[]` 或仅 fail-soft 软错误
-- [ ] state-scanner 单元测试套件 ≥ 380 pass(371 baseline + ≥9 新增覆盖 G2/G3/G4)
-- [ ] 完整 `/skill-creator` AB benchmark with_skill 通过率 ≥ without_skill (delta ≥ 0,理想 +5pp 以上)
-- [ ] T5 兜底降级生效:SKILL.md 阶段 2 "完整性兜底" 段从"AI 必须 Read"改为"如新字段缺失则 sanity check warn"
-- [ ] 反向 backward-compat 验证:旧版 consumer(模拟"假定 followups 字段不存在")仍能正常运行,不抛 KeyError
+- [ ] **state-scanner 单元测试套件 ≥ 389 pass** (372 baseline,实测 grep 计数,**非** Spec 旧文 371) **+ ≥17 新增分项覆盖**:
+  - G2 ≥ 8 cases (T2.3.a-h 一一对应)
+  - G3 ≥ 5 cases (T3.3.a-e 一一对应)
+  - G4 ≥ 4 cases (T4.4.a-d 一一对应)
+- [ ] **AB benchmark 双层标准**:
+  - **PASS gate (阻塞 merge)**: `delta(arm C − arm A) ≥ 0`(with new collectors 不劣于 baseline)
+  - **Quality target (不阻塞,记录 benchmark.md)**: `delta(arm C − arm A) ≥ +5pp`
+  - 归因证据: `delta(C − B)` ≥ 0(收益主要来自 collector 而非 T5)
+- [ ] T5 兜底降级生效:SKILL.md 阶段 2 "完整性兜底" 段从 17 行 (4 触发条件 + 3 AI 主动 Read/Grep + 过渡说明) 缩减为 7 行 sanity check,逻辑替换为 "snapshot 字段缺失但 UPM 含 `## Pending Followups` 表 → soft warn"
+- [ ] **Backward-compat verify (TX.6)**:`test_upm.py` + `test_requirements.py` ≥ 2 个 case 验证 `data.get('followups', [])` / `data['stories'].get('priority_items', [])` 等防御性访问在字段缺失时不抛 KeyError 且 fallback 行为合理
 - [ ] `pending_followups_p1` 规则触发时推荐输出含 P1 items 简表 + handoff doc 路径(若 G3 命中)
 - [ ] `resume_in_progress_us` 规则触发时推荐输出含 in_progress US id + raw_status 摘要
 
@@ -226,9 +326,12 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 ## Out of Scope (本 Spec 不做)
 
 - **G1** PRD `**Status**:` markdown 解析失败诊断 — Issue #85 中已确认 `_status.py` 已含 6 个 pattern,SilkNode 5/5 全 null 是异常,需先要诊断数据(`state-snapshot.json` 摘录 + PRD 头部 raw bytes)。本 Spec **不**盲改 parser,等数据回贴后单独处理(可能是 fixture / 路径 mismatch / 格式变体,处理路径不同)
+  - **追踪策略**:保留 Issue #85 open 状态;若 **2026-05-22** 前 SilkNode 未回贴诊断数据,由 Tech Lead 决策关闭 G1 / 转 backlog / 降优;G1 独立 Spec(若需)在 `openspec/changes/` 下另起,**不**修改本 Spec
+- **`docs/architecture/system-architecture.md` 同步** — 该文档描述高层 state-scanner 架构(Phase 1.x mechanical 路径 + collector 调用关系),**不**枚举 snapshot 字段集。本次新增 4 字段(`git.status_clean` + 3 inter-cycle)无需修改该文档,仅 `state-snapshot-schema.md` 更新(per CLAUDE.md Rule #3 同步原则,文档/代码同步范围限于 schema 文档)
 - handoff doc 内容深度解析(TL;DR / priority sections 抽取)— 当前只识别指针 + 路径,内容由 AI Read 处理。如未来证明需要,起 follow-up Spec
 - UPM `## Pending Followups` 表跨多张拼接 / 多语言混合 — 单一项目通常单表,如需要起 follow-up
 - Forgejo Issue ↔ followup 双向同步 — 已是 forgejo-sync skill 范畴
+- `state_scanner.handoff_aliases` 配置项扩展(运行时可注入更多 alias regex)— 本 Spec 在 G3 备选 regex 内置中英文 alias,运行时配置留 future
 
 ---
 
