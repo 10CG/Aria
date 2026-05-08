@@ -122,15 +122,22 @@ r"^>\s*[^\n]*?(?:Next session 入口|下次 session 入口|🚪 Next session)[^\
 **备选 regex**(收紧版,本 Spec 启用):
 
 ```python
-r"^>\s*.*?(?:入口|handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)"
+r"^>\s*.*?(?:handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)"
 ```
 
-收紧设计:行首 `^>` 锚点 + 关键词与括号间 ≤80 字符 + 不跨行(`[^()\n]`)。这是为了避免中文 "入口" 在技术文档中泛化命中(e.g. "函数入口"、"调试入口"、"程序入口"、"记录入口" 后跟意外 markdown link 时误报)。
+**默认决策(R2 收敛后定稿,移除 "入口" 独立 alternation)**:中文 "入口" 在技术文档中泛化命中风险高("函数入口"、"调试入口"、"程序入口"、"记录入口" 后跟意外 markdown link 即会误报)。备选 regex 仅匹配 `handoff` / `session` 关键词,中文 "入口" 命中依赖**主 regex** 的复合短语枚举(`Next session 入口` / `下次 session 入口` / `🚪 Next session`)。
 
-**T3.3 强制负例**:必须包含
-- `> 函数入口在 (xxx.md)` — 不应命中(无 "Next session" / "handoff" / "session" 之一,且 "入口" 前直接接非空格)。说明:实际收紧 regex 中 "入口" 仍在 alternation 中,需 T3.1 在实现时进一步确认负例覆盖,或将备选缩到只含 "handoff / session" 不含独立的 "入口"。本 Spec 留出实现选择空间
-- `> 调试入口: 见 [debug.md](debug.md)` — 边界 case,需明确 spec 是否允许"调试入口"形式(若不允许,则负例;若允许,则正例并标注限制)
-- `> Next session 入口: ...\n(下一行)... (handoff.md)` — 跨行不应命中(`\n` 截断)
+实现者**不得**单方面在备选 regex 加回独立 "入口" alternation;若有强需求,必须在 PR 描述中说明并补充覆盖性负例测试。
+
+**T3.3 强制负例**(R2 收敛版):
+- `> 函数入口在 (xxx.md)` — **不命中**(备选 regex 不含独立 "入口")
+- `> 调试入口: 见 [debug.md](debug.md)` — **不命中**(同上)
+- `> Next session 入口: ...\n>(下一行)... (handoff.md)` — **不命中**(`[^()\n]` 跨行截断)
+
+**T3.3 强制正例**:
+- `> 🚪 Next session 入口: 见 [docs/handoff/x.md](docs/handoff/x.md)` — 主 regex 匹配
+- `> handoff: see [handoff.md](handoff.md)` — 备选 regex 匹配
+- `> session 入口 (handoff.md)` — 备选 regex 匹配("入口" 仅作为 80 字符内 free-form 文本,不参与关键词匹配)
 
 只取**首条匹配**(UPM 约定 handoff 指针单条)。
 
@@ -217,7 +224,7 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 | **Positive** | 完整 `/skill-creator` AB benchmark 数据进入常态化积累(三 arm 拆分让 delta 归因可分),T5 sanity check 降级后 SKILL.md 阶段 2 段瘦身 17→7 行 |
 | **Risk** | snapshot schema 加 4 字段(`git.status_clean` + 3 inter-cycle 字段)— backward-compat 必须保证(consumer 不假定字段存在)。Mitigation:Aria + Kairos + Aether 三项目跑 dogfooding,任一 collector 退化必阻塞;TX.6 加 ≥2 个 unit test 验证 `.get()` 防御性访问 |
 | **Risk** | markdown table parser 的容错可能误命中非 Pending Followups 表(项目 UPM 内可能有多张表)。Mitigation:严格锚定 `## Pending Followups` 标题文本(大小写敏感、允许 0-3 前导空格),只取标题后第一张 `\|` 起始表;T2.3 多表 negative case 覆盖 |
-| **Risk** | handoff regex 写死中文/Emoji,跨语言项目可能漏匹配,**且备选 regex 中 "入口" 可能误命中技术文档**("函数入口" / "调试入口" 等)。Mitigation:G3 备选 regex 收紧到 `^>` + ≤80 字符 + 不跨行;T3.3 加 "函数入口" / "调试入口" / 跨行 三个负例 |
+| **Risk** | handoff regex 写死中文/Emoji,跨语言项目可能漏匹配。Mitigation:R2 收敛版备选 regex 移除独立 "入口" alternation,仅 `handoff` / `session` 关键词;主 regex 保留复合短语 `Next session 入口` / `下次 session 入口` / `🚪 Next session` 覆盖中文场景;T3.3 三负例(函数入口 / 调试入口 / 跨行)+ 三正例覆盖 |
 | **Risk** | `priority_items[]` mtime 排序在 `git clone` 平铺 mtime 时退化为 glob 顺序,加剧 issue #61 cross-platform flake 风险。Mitigation:三级 stable tie-break (`status_order ASC → mtime DESC → path LEX ASC`),path LEX 在 mtime 平局时确保确定性 |
 
 ---
