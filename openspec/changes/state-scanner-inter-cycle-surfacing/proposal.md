@@ -2,7 +2,10 @@
 
 > **Level**: Minimal (Level 2 Spec — proposal.md 含任务,无独立 tasks.md)
 > **Status**: Approved (post_spec R2 PASS_WITH_WARNINGS, 4/4 vote, 2026-05-08; PR #88 merged)
-> **Implementation**: Sub-PR (a) merged 2026-05-09 (TX.0 + TX.1 prerequisite, 4 rounds pre_merge audit converged R3==R4); Sub-PR (b) G2/G3/G4 + Sub-PR (c) TX.2-TX.7 cleanup still pending.
+> **Implementation**:
+> - Sub-PR (a) TX.0 + TX.1 prerequisite — merged 2026-05-09 (aria-plugin#37, 4 rounds pre_merge audit converged R3==R4)
+> - Sub-PR (b) G2 + G3 + G4 collectors + 2 recommendation rules — merged 2026-05-09 (aria-plugin#38, 5 rounds pre_merge audit converged R4==R5)
+> - Sub-PR (c) TX.2-TX.7 cleanup (SKILL.md T5 降级 + AB benchmark v1.18.0 + Kairos/Aether dogfooding) still pending
 > **Created**: 2026-05-08
 > **Type**: Collector enhancement (G2/G3/G4 from Forgejo Issue #85)
 > **Source**: Forgejo Issue [10CG/Aria#85](https://forgejo.10cg.pub/10CG/Aria/issues/85) — SilkNode 实战反馈
@@ -240,56 +243,26 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 
 ### G2 — UPM Pending Followups 表解析
 
-- [ ] **T2.1** schema 设计:`snapshot.requirements.upm.followups[]` 字段格式定稿(含 row_index / priority / item / source / tracking / next_action / raw_row)
-- [ ] **T2.2** `collectors/upm.py` 加 markdown table parser:
-  - heading regex: `r"^[ \t]{0,3}#{2,3}\s+Pending Followups\s*$"` (大小写敏感、允许 0-3 前导空格、显式排除全角空格 　)
-  - heading 与表格间允许任意非表格行,逐行扫描直到 `\|` 起始行
-  - pipe escape 处理: `row.replace('\\|', '\x00').split('\|')` 后还原
-  - 列规范化: 表头列名映射 (`Priority` / `优先级` / `Pri`)
-  - 实现者可自决是否拆 `_upm_followups.py` sub-module (无需另起 Spec)
-- [ ] **T2.3** 单元测试 **(≥ 8 cases,T2.3.a-h 一一对应)**:
-  - T2.3.a 正常表 (4-6 行,含 P1/P2/P3)
-  - T2.3.b 空表 (只有 header+separator)
-  - T2.3.c 错列序 (列名映射验证)
-  - T2.3.d 缺列 (Tracking 列不存在 → null 填充)
-  - T2.3.e embedded inline code in cell
-  - T2.3.f pipe escape `\|` in cell (正确还原为字面 `|`)
-  - T2.3.g 多表 negative (UPM 含其他表但 `## Pending Followups` 缺失 → followups 字段不存在)
-  - T2.3.h heading 前导空格 / heading 与表间含说明段落
-- [ ] **T2.4** `RECOMMENDATION_RULES.md` 加 `pending_followups_p1`(priority 1.85),含 condition + trigger + 输出展示模板(前 5 条 P1)
-- [ ] **T2.5** Aria + Kairos + SilkNode (mock fixture) dogfooding:验证 followups[] 字段非空且 priority 列规范化正确
+- [x] **T2.1** schema 设计:`snapshot.requirements.upm.followups[]` 字段格式定稿(含 row_index / priority / item / source / tracking / next_action / raw_row)  *(sub-PR (a) merged 2026-05-09 as part of TX.1 schema doc)*
+- [x] **T2.2** `collectors/upm.py` 加 markdown table parser  *(sub-PR (b) merged 2026-05-09, aria-plugin#38)*
+- [x] **T2.3** 单元测试 **(≥ 8 cases,T2.3.a-h 一一对应)**  *(sub-PR (b): 10 tests including T2.3.a-h + BA-10 fullwidth space negative + unknown priority + P0 normalization added in R2 corrections)*
+- [x] **T2.4** `RECOMMENDATION_RULES.md` 加 `pending_followups_p1`(priority 1.85)  *(sub-PR (b) merged 2026-05-09)*
+- [ ] **T2.5** Aria + Kairos + SilkNode (mock fixture) dogfooding  *(Aria self-scan dogfooded in sub-PR (b); Kairos + SilkNode dogfooding deferred to sub-PR (c) TX.7)*
 
 ### G3 — Handoff doc 指针识别
 
-- [ ] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(主 `Next session 入口` + R2 收敛版备选 `^>\s*.*?(?:handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)`,移除独立 "入口" alternation 见 §What L128-130 + schema.md §upm.handoff_doc),取首条匹配
-- [ ] **T3.2** 路径格式三态:
-  - 相对路径 → `(project_root / raw).resolve()` + `relative_to(project_root)`
-  - 绝对路径 → `Path(raw).resolve()` + 不做 `relative_to`,exists() 检查
-  - URL (`http://` / `https://`) → `path=raw`, `exists=false` + `soft_error("unsupported_path_format")`
-- [ ] **T3.3** 单元测试 **(≥ 5 cases,T3.3.a-e)**:
-  - T3.3.a 中文 / 英文 / Emoji 三种 entry 形式 (3 子测试)
-  - T3.3.b 多 link 取首条
-  - T3.3.c 路径不存在 → `exists=false` fail-soft
-  - T3.3.d 误命中负例: `> 函数入口在 (xxx.md)` / `> 调试入口: 见 [debug.md](debug.md)` 不命中
-  - T3.3.e 跨行不命中: `> Next session ...\n>(下一行) (handoff.md)`
-- [ ] **T3.4** schema 文档更新 §upm.handoff_doc
+- [x] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(主 `Next session 入口` + R2 收敛版备选)  *(sub-PR (b) merged 2026-05-09, aria-plugin#38; primary regex Chinese/English/Emoji enumeration + fallback BA-02 form removed standalone "入口")*
+- [x] **T3.2** 路径格式三态  *(sub-PR (b): all 3 branches landed; absolute path + relative_to escape branches added as tests in R2 corrections)*
+- [x] **T3.3** 单元测试 **(≥ 5 cases,T3.3.a-e)**  *(sub-PR (b): 7 tests including T3.3.a-e + URL unsupported + absent-when-no-match + R2 absolute path branch + relative_to escape with handoff_path_escapes_project soft_error)*
+- [x] **T3.4** schema 文档更新 §upm.handoff_doc  *(sub-PR (a) shipped initial schema; sub-PR (b) R2 corrections updated to "shipped" + added errors[] enum subsection)*
 
 ### G4 — in-progress US priority_items
 
-- [ ] **T4.1** schema 设计:`snapshot.requirements.stories.priority_items[]`(id + status_normalized + raw_status + priority_hint=null + file)
-- [ ] **T4.2** `collectors/requirements.py` **基于已有 `story_items[]` 派生** (不重新 glob):
-  - 过滤 `status_normalized ∈ {in_progress, ready, pending}`
-  - 三级 stable 排序: `_STATUS_ORDER ASC → mtime DESC → path LEX ASC`
-  - mtime 仅对入选项调用 `Path.stat().st_mtime` 一次 (N≤5)
-  - 切片头部 N (默认 5,可配)
-  - 确认 `_normalize_status('ready')` 与 `**Status**: Ready` 链路在 `_status.py` 中正确归一为 `ready`(若不正确,补 normalize 修复)
-- [ ] **T4.3** `RECOMMENDATION_RULES.md` 加 `resume_in_progress_us`(priority 1.88)
-- [ ] **T4.4** 单元测试 **(≥ 4 cases,T4.4.a-d)**:
-  - T4.4.a in_progress + ready + pending 排序顺序正确
-  - T4.4.b 同 status 同 mtime 时 path LEX 字母序 (验证 git clone 平铺 mtime 场景)
-  - T4.4.c N=0 / 全部空状态 → `priority_items: []`
-  - T4.4.d `_normalize_status('ready')` / `**Status**: Ready` / `**状态**: 就绪` 正确归一为 `ready`
-- [ ] **T4.5** 配置项 `state_scanner.priority_items_limit`(默认 5)纳入 config-loader
+- [x] **T4.1** schema 设计:`snapshot.requirements.stories.priority_items[]`(id + status_normalized + raw_status + priority_hint=null + file)  *(sub-PR (a) merged 2026-05-09 as part of TX.1 schema doc)*
+- [x] **T4.2** `collectors/requirements.py` **基于已有 `story_items[]` 派生**  *(sub-PR (b) merged 2026-05-09, aria-plugin#38; 3-level stable sort with mtime OSError fail-soft; non-dict JSON guards added in R2 corrections)*
+- [x] **T4.3** `RECOMMENDATION_RULES.md` 加 `resume_in_progress_us`(priority 1.88)  *(sub-PR (b) merged 2026-05-09)*
+- [x] **T4.4** 单元测试 **(≥ 4 cases,T4.4.a-d)**  *(sub-PR (b): 7 tests including T4.4.a-d + limit default/configurable + shape + R2 mtime OSError fallback)*
+- [x] **T4.5** 配置项 `state_scanner.priority_items_limit`(默认 5)纳入 config-loader  *(sub-PR (b): `_load_priority_items_limit` with non-dict guards from R2)*
 
 ### Cross-cutting
 
