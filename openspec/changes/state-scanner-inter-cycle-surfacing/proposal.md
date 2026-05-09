@@ -2,6 +2,7 @@
 
 > **Level**: Minimal (Level 2 Spec — proposal.md 含任务,无独立 tasks.md)
 > **Status**: Approved (post_spec R2 PASS_WITH_WARNINGS, 4/4 vote, 2026-05-08; PR #88 merged)
+> **Implementation**: Sub-PR (a) merged 2026-05-09 (TX.0 + TX.1 prerequisite, 4 rounds pre_merge audit converged R3==R4); Sub-PR (b) G2/G3/G4 + Sub-PR (c) TX.2-TX.7 cleanup still pending.
 > **Created**: 2026-05-08
 > **Type**: Collector enhancement (G2/G3/G4 from Forgejo Issue #85)
 > **Source**: Forgejo Issue [10CG/Aria#85](https://forgejo.10cg.pub/10CG/Aria/issues/85) — SilkNode 实战反馈
@@ -235,7 +236,7 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 
 ### G0 — Prerequisite (新增)
 
-- [ ] **TX.0** `collectors/git.py` 加 derived 字段 `status_clean: bool`(`staged_files == [] and unstaged_files == []`)+ schema 文档同步 + 1 个 unit test
+- [x] **TX.0** `collectors/git.py` 加 derived 字段 `status_clean: bool`(`staged_files == [] and unstaged_files == []`)+ schema 文档同步 + 1 个 unit test  *(sub-PR (a) merged 2026-05-09, aria-plugin#37 + Aria#93)*
 
 ### G2 — UPM Pending Followups 表解析
 
@@ -292,9 +293,9 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 
 ### Cross-cutting
 
-- [ ] **TX.1** `aria/skills/state-scanner/references/state-snapshot-schema.md` 四节扩充 (§git.status_clean + §upm.followups + §upm.handoff_doc + §requirements.stories.priority_items) + 显式声明 backward-compat (字段缺失行为统一,见 What §Cross-cutting Schema 文档)
-  - 子任务 TX.1.a: `normalize_snapshot.py` 加规则 — `followups[*].raw_row` 进 `DROP_KEYS` 防大文本 drift 加剧已知 flake (类似 recent_commits 处理);`handoff_doc.raw_match` 同处理
-  - 子任务 TX.1.b: `test_normalize_snapshot.py` 加 followups/handoff_doc/priority_items normalize 规则覆盖 case (已含确定性排序的 priority_items 不必 DROP,只需稳定性测试)
+- [x] **TX.1** `aria/skills/state-scanner/references/state-snapshot-schema.md` 四节扩充 (§git.status_clean + §upm.followups + §upm.handoff_doc + §requirements.stories.priority_items) + 显式声明 backward-compat (字段缺失行为统一,见 What §Cross-cutting Schema 文档)  *(sub-PR (a) merged 2026-05-09, includes KM-08 prerequisite blockquotes per R2 pre_merge audit)*
+  - [x] 子任务 TX.1.a: `normalize_snapshot.py` 加规则 — `followups[*].raw_row` 进 `DROP_KEYS` 防大文本 drift 加剧已知 flake (类似 recent_commits 处理);`handoff_doc.raw_match` 同处理  *(sub-PR (a) merged 2026-05-09)*
+  - [x] 子任务 TX.1.b: `test_normalize_snapshot.py` 加 followups/handoff_doc/priority_items normalize 规则覆盖 case (已含确定性排序的 priority_items 不必 DROP,只需稳定性测试)  *(sub-PR (a) merged 2026-05-09 — 4 new tests + 1 fail-soft branch test added per R2 audit follow-up)*
 - [ ] **TX.2** `aria/skills/state-scanner/SKILL.md` 阶段 2 "完整性兜底" 段降级为约 7 行 sanity check (mock 段落见 What §Cross-cutting T5 兜底降级);删除原 4 触发条件 + 3 AI 主动 Read/Grep 行动
 - [ ] **TX.3** 完整 `/skill-creator` AB benchmark 跑一次 **(三 arm 拆分,delta 归因)**:
   - **arm A**: baseline `without_skill`
