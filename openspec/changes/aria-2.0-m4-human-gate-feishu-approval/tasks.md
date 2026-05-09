@@ -3,7 +3,8 @@
 > **Spec**: [proposal.md](./proposal.md)
 > **Status**: **Approved** (Phase A.3 lock 2026-05-07, R2 SCOPE_OK_R2 4/4 + R3+R4 collapsed per OD-15-equivalent)
 > **Baseline**: 60h hard (per brainstorm Q8' β' + A.3 reconciliation);**OD-M4-1 reframe trigger 三档**: >72h 立即 / 60-72h 风险记录 (本 Spec 即此情况) / <60h 隐式锁
-> **Audit pattern**: 同 M3 OD-15 collapse (Phase A.2 R1+R2 + R3+R4 collapse,Phase B.3 pre_merge 3-4 round 严格收敛,Phase D 1 round);post_spec audit 完成 (R1+R2 audit reports 已落盘)
+> **Audit pattern**: post_spec (Phase A.2): R1+R2 SCOPE_OK_R2 4/4 → R3+R4 collapsed per OD-15 (M3 同模式) — DONE 2026-05-07.
+> Phase B.3 pre_merge: R1 NEEDS_FIX → R2 SCOPE_OK_R2 4/4 → owner 2026-05-09 触发真实 R3 收敛循环 (per "循环执行直到某次审核内容完全和上一轮一致" 指令, NOT collapsed); R3 4-agent NEW_FINDINGS → R3-trivial inline → R4 stability confirm — IN PROGRESS 2026-05-09.
 
 ---
 
@@ -47,10 +48,10 @@
 
 ## Phase B: 开发
 
-### Phase B.1 — feature 分支 (~0.5h)
+### Phase B.1 — feature 分支 (DONE 2026-05-07, ~0.2h actual)
 
-- [ ] **B.1.1** 主仓 + aria-orchestrator submodule 同名 feature 分支创建: `feature/aria-2.0-m4-human-gate-feishu-approval`
-- [ ] **B.1.2** 双远程 push (origin + github) — state-snapshot 验证 4 repos 双 remote `parity=equal`
+- [x] **B.1.1** 主仓 + aria-orchestrator submodule 同名 feature 分支创建: `feature/aria-2.0-m4-human-gate-feishu-approval` (主仓 from 77dbb41 / aria-orchestrator from 3e559a7)
+- [x] **B.1.2** 双远程 push (origin + github) — 4 repo branches parity ✓: 主仓 origin/github + aria-orchestrator origin/github 全部 SHA equal (1 unique SHA per repo)
 
 ### Phase B.2 — 实施 (~50h component-sum)
 

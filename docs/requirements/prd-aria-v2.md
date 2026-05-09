@@ -167,7 +167,14 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
   S4_LAUNCH:       Nomad parameterized dispatch, 记录 alloc_id 到 SQLite
   S5_AWAIT:        跨 tick polling (可持续多个 cron tick)
   S6_REVIEW:       [LLM] 评审 Layer 2 结果 (代码质量 + 越界检查 + acceptance)
-  S7_HUMAN_GATE:   Feishu 审批卡片 (唯一人类介入点)
+  S7_HUMAN_GATE:   双语义入口 — Feishu 卡片 (通知 + 入口) + Forgejo PR 评论 (决策真理来源)
+                   • Feishu 卡片: outbound 通知 (含 PR link + diff 摘要 + magic-string 提示)
+                   • Forgejo PR 评论: `/aria approve` / `/aria reject: <reason>` 提交决策
+                   • owner-username 验证 (case-sensitive exact match against authorized_approvers)
+                   • first-decision-wins (R2 AI-3): 首决策后忽略后续 edit/delete
+                   • 7d ack 超时 → reconciler auto-reject (M4 AD-M4-4)
+                   • M4 reframe per AD-M4-1 (Q10=B brainstorm 2026-05-07): Aether 私网 + 复用
+                     M2 T15.x Forgejo polling 优于引入 Cloudflare Tunnel callback
   S8_MERGE:        确定性 git merge + Forgejo API
   S9_CLOSE:        归档 (OpenSpec archive + CHANGELOG + 清理)
   S_FAIL:          兜底错误状态 (任何 state 抛异常进入)
@@ -402,11 +409,23 @@ M0 (Week 1-2)     前置验证 + 架构定稿
 M1 (Week 3-6)     MVP: 手动 dispatch → 1 issue → PR (100h)
 M2 (Week 7-12)    Layer 1 状态机 + Hermes Option C Extension + 输入 sanitization (140h)
 M3 (Week 13-16+)  Layer 2 cycle close + GLM 多模型 routing + Crash recovery (185h, OD-13 lock 2026-05-04 per US-023 §OD-12 §Q2)
-M4 (Week 17-21)   Crash recovery + Replay + Reconciler (80h)
-M5 (Week 22-27)   Human gate + Review loop + Drift defense (100h)
-M6 (Week 28-30)   E2E testing + docs + v2.0.0 release (120h)
+M4 (Week 17-19)   Human gate + Feishu 审批 (60h, US-024 brainstorm Q8' β' lock 2026-05-07)
+M5 (Week 20-25)   Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable (~120h, M3+M4 carryover scope 重估)
+M6 (Week 26-28)   E2E testing + docs + v2.0.0 release (120h)
 ─────────────────────────────────────────────────────
-合计:             ~845h ≈ 33 周单人 / 10 月 50% 投入 (M3 90→185h per OD-13 2026-05-04)
+合计:             ~845h ≈ 33 周单人 / 10 月 50% 投入
+
+**M4 reframe (2026-05-07, US-024 brainstorm Q1=A + Q8' β')**:
+  - 旧: M4 (Week 17-21) Crash recovery + Replay + Reconciler (80h);
+        M5 (Week 22-27) Human gate + Review loop + Drift defense (100h)
+  - 新: M4 (Week 17-19) Human gate + Feishu 审批 (60h);
+        M5 (Week 20-25) Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 (120h)
+  - 理由: M3 (US-023) 已包含 Crash recovery 验收 C (S5_AWAIT auto-resume);
+          原 M4 Replay/Reconciler 内容向 M5 迁移与 review-loop / drift defense 同质聚合;
+          M4 trust-but-verify 发现 M2/M3 已实现 S7_HUMAN_GATE 大部分基础 → baseline 90→60h reframe
+  - 总预算 reconciliation: M4 80h→60h (-20h) + M5 100h→120h (+20h) = 净增 0,合计 ~845h 不变
+  - 治理: 见 [AD-M4-1](../../aria-orchestrator/docs/architecture-decisions.md#ad-m4-1) /
+          [brainstorm 决策记录](../../.aria/decisions/2026-05-07-us024-m4-brainstorm.md) Q1+Q8'
 ```
 
 **注**: 工时估算基于 R3 挑战组实测重估 (R3 讨论组估 380h, Code Reviewer 实测 750h)。选取实测值作为 PRD 工时。
@@ -564,7 +583,7 @@ Out of scope:
 | US-022 | Aria 2.0 M2 — Layer 1 状态机 + Hermes Option C Extension | M2 | HIGH |
 | US-023 | Aria 2.0 M3 — 双 provider + Nomad integration + Crash recovery | M3 | HIGH |
 | US-024 | Aria 2.0 M4 — Human gate + Feishu 审批 | M4 | MEDIUM |
-| US-025 | Aria 2.0 M5 — 防漂移 + 审计日志 + Review loop | M5 | MEDIUM |
+| US-025 | Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable | M5 | MEDIUM |
 | US-026 | Aria 2.0 M6 — v2.0 文档体系 + CLAUDE.md 修订 | M6 | MEDIUM |
 | US-027 | Aria 2.0 — Cost routing + 预算控制 (跨 milestone) | M3-M6 | MEDIUM |
 
