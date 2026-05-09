@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Track A — US-024 M4 T-deploy + smoke (2026-05-09 EOD)
+
+production deploy + E2E smoke for Aria 2.0 M4 (US-024). Submodule bumps
+(aria-orchestrator) capture 3 deploy-time production fixes; no Aria main
+version bump (M4 logic ships via submodule).
+
+#### Deploy artifacts
+- aria-layer1-comment-poll deployed on Aether light-1 (5-field cron + `--continuous --interval 30 --max-iterations 2`, 30s effective cadence)
+- aria-layer1-reconcile deployed (M3 carryover gap closed in Track A B2 scope)
+- light-1 venv refresh: M2 v0.2.0 → M4 master + dispatches.db schema v1.1 → v3.0 (14 dispatches preserved, integrity ok)
+
+#### Production fixes (aria-orchestrator submodule)
+- `ec264f0` HCL cron 6-field → 5-field + `--continuous` fallback (Aether Nomad v1.7.7 6-field validate-passes-but-degrades-to-30min discovery; AD-M4-9 §风险 #2 path activated)
+- `5467991` `_compute_feishu_signature` HMAC key/msg swap fix (Feishu code:19021 silent reject bug; +1 swap_regression test; existing test was reproducing the bug with same wrong formula)
+- `834c313` m4-handoff.yaml Tier-2 partial writeback + t_deploy_status section + go_decision/rationale
+
+#### Closeout
+- m4-handoff.yaml validator OK ✅
+- OD-M4-2 underbaseline retrospective signed off (28h actual / 60h baseline = 0.47, T-deploy added ~6h)
+- Forgejo housekeeping: Issue #86 closed, PR #10 + #94 description amended (R3+R4 collapsed → R1-R5 owner-invoked CONVERGED), smoke PR #97 + branch deleted
+- 6 incident memory entries (3 from Track A discovery: feishu_hmac_swap / nomad_cron_silent_degrade / handoff_doc_venv_ready_smell + 3 closeout patterns: smoke_dispatch_sql_inject / secret_env_inject_via_go_template / schema_migration_3_safeguard)
+
+#### Pending (deferred, not blocking)
+- Phase D.2 final go_decision: awaiting Tier-2 N≥3 real owner workload accumulation
+- Task #42 secret rotation: 4 keys re-exposed in conversation 2026-05-02 + 2026-05-09, hard cap 2026-08-02
+- M5 inputs filed: aria-layer1-cron 1h cadence vs SLO + aria-layer2-runner job missing (M2/M3 era infra gap)
+
 ### Planned
 - 多 AI 平台兼容性 (US-003)
 - US-007 Phase 3c: 半自动开发闭环 (v2.0.0)
