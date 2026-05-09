@@ -260,7 +260,7 @@ trigger: 推荐输出展示 in_progress US id + raw_status 第一行,推荐 "继
 
 ### G3 — Handoff doc 指针识别
 
-- [ ] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(主 `Next session 入口` + 收紧版备选 `^>\s*.*?(?:入口|handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)`),取首条匹配
+- [ ] **T3.1** `collectors/upm.py` 加 raw_block 顶部 grep regex(主 `Next session 入口` + R2 收敛版备选 `^>\s*.*?(?:handoff|session)[^()\n]{0,80}\(([^)]+\.md)\)`,移除独立 "入口" alternation 见 §What L128-130 + schema.md §upm.handoff_doc),取首条匹配
 - [ ] **T3.2** 路径格式三态:
   - 相对路径 → `(project_root / raw).resolve()` + `relative_to(project_root)`
   - 绝对路径 → `Path(raw).resolve()` + 不做 `relative_to`,exists() 检查
