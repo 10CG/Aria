@@ -3,7 +3,8 @@
 > **Level**: Full (Level 3 Spec)
 > **Status**: **Approved** (Phase A.3 lock 2026-05-07, AI-drafted per AD-M0-9 with provenance; owner final sign-off implicit per `feedback_ai_代填_sign_off_pattern` 若无 owner objection within session;R3+R4 collapsed per OD-15-equivalent after R2 4/4 SCOPE_OK_R2 SCOPE_OK_R2)
 > **Created**: 2026-05-07
-> **Approved**: 2026-05-07 (Phase A.2 R2 SCOPE_OK_R2 4/4 + R3+R4 collapse per M3 OD-15 模式; audit trail `.aria/audit-reports/post_spec-R1-2026-05-07T1811Z-us024-m4.md` + `.aria/audit-reports/post_spec-R2-2026-05-07T1845Z-us024-m4.md`)
+> **Approved**: 2026-05-07 (Phase A.2 post_spec audit R2 SCOPE_OK_R2 4/4 + R3+R4 collapse per M3 OD-15 模式; audit trail `.aria/audit-reports/post_spec-R1-2026-05-07T1811Z-us024-m4.md` + `.aria/audit-reports/post_spec-R2-2026-05-07T1845Z-us024-m4.md`)
+> **Phase B.3 pre_merge audit (2026-05-09)**: R1 4-agent NEEDS_FIX → R2 SCOPE_OK_R2 4/4 → **R3 owner-invoked convergence loop** (per owner instruction "循环执行直到某次审核内容完全和上一轮一致"; NOT collapsed); R3 + R4 audit trail in `.aria/audit-reports/pre_merge-R3+R4-2026-05-09-us024-m4.md`. R3 surfaces 3 inline fixes (TL-R3-1 spec frontmatter reframe / AI-R3-1 runner --continuous flag / TL-R3-2 AD-M4-8 dual-path) + Tier-3 deferred items.
 > **Parent Story**: [US-024](../../../docs/requirements/user-stories/US-024.md)
 > **Target Version**: v2.0.0-m4
 > **Source**:
