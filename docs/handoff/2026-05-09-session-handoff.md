@@ -204,7 +204,11 @@ Forgejo comment (id 5633) summarizes all 18 tasks shipped + benchmark results + 
 
 > 🚪 Next session 入口: 见 [docs/handoff/2026-05-09-session-handoff.md](docs/handoff/2026-05-09-session-handoff.md)
 
-(此格式与 G3 collector 的 primary regex 兼容, `/aria:state-scanner` 会自动识别此 handoff 指针并展示在 inter-cycle resume recommendation 中 — v1.18.0 dogfood)
+**G3 detection scope 澄清** (本 cycle 经验沉淀):
+- G3 collector (`_detect_handoff_doc` in `collectors/upm.py`) 仅扫描 UPM `raw_block` 内的 marker, 不扫描任意 markdown 文档
+- Aria 是 methodology 项目, **没有 UPM 文件** (per memory `project_aria_no_runtime_upm`), 因此本 handoff doc 中的 marker 不会被 Aria self-scan 自动识别
+- 跨项目使用 (SilkNode / Kairos / 任何有 UPM 的项目): 在该项目 UPM 文件 UPMv2-STATE block 内放 `> 🚪 Next session 入口: 见 [docs/handoff/X.md](docs/handoff/X.md)` → G3 自动识别
+- Aria 内部约定: next session 读 `docs/handoff/latest.md` 找 Latest 指针 → handoff doc 全文 (marker 是 reference convention, not collector dogfood)
 
 ---
 
