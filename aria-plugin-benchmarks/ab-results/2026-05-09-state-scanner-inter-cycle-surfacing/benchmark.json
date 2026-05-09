@@ -222,5 +222,85 @@
     "efficiency_C_wins_on_tokens": false,
     "decision": "PASS",
     "rationale": "Findability tied at ceiling (no delta possible — fixture small + assertions binary). Efficiency delta CLEARLY POSITIVE for arm_C (-70% tools, -25% duration vs A; -50% tools, -22% duration vs B). Per Spec L324, efficiency wins satisfy quality criterion when findability hits ceiling. Same pattern as v1.17.3 doc-dominant smoke + defer precedent."
-  }
+  },
+  "negative_fixtures": {
+    "neg1_no_pending_followups": {
+      "fixture": "/tmp/state-scanner-bench-fixture-neg1",
+      "purpose": "Spec L218(a) — UPM has UPMv2-STATE + handoff but NO `## Pending Followups`. Tests rule suppression: pending_followups_p1 should NOT fire.",
+      "results": {
+        "arm_A_without_skill": {
+          "n1_no_fabricated_p1": true,
+          "n1_acknowledges_no_followups": true,
+          "n1_handoff_path_correct": true,
+          "n1_us100_inprogress": true
+        },
+        "arm_B_v1.17.7_T5": {
+          "n1_no_fabricated_p1": true,
+          "n1_acknowledges_no_followups": true,
+          "n1_handoff_path_correct": true,
+          "n1_us100_inprogress": true
+        },
+        "arm_C_v1.18.0": {
+          "n1_no_fabricated_p1": true,
+          "n1_acknowledges_no_followups": true,
+          "n1_handoff_path_correct": true,
+          "n1_us100_inprogress": true
+        }
+      }
+    },
+    "neg2_broken_handoff_path": {
+      "fixture": "/tmp/state-scanner-bench-fixture-neg2",
+      "purpose": "Spec L218(b) — Pending Followups exists + handoff pointer references `docs/handoff/MISSING.md` which doesn't exist on filesystem. Tests broken-pointer handling.",
+      "results": {
+        "arm_A_without_skill": {
+          "n2_detects_broken_handoff": true,
+          "n2_does_not_pretend_read": true,
+          "n2_p1_followup_surfaced": true,
+          "n2_us200_pending": true
+        },
+        "arm_B_v1.17.7_T5": {
+          "n2_detects_broken_handoff": true,
+          "n2_does_not_pretend_read": true,
+          "n2_p1_followup_surfaced": true,
+          "n2_us200_pending": true
+        },
+        "arm_C_v1.18.0": {
+          "n2_detects_broken_handoff": true,
+          "n2_does_not_pretend_read": true,
+          "n2_p1_followup_surfaced": true,
+          "n2_us200_pending": true
+        }
+      }
+    }
+  },
+  "combined_arm_pass_rates": {
+    "arm_A_without_skill": {
+      "happy_path_passed": 14,
+      "happy_path_total": 14,
+      "negative_passed": 8,
+      "negative_total": 8,
+      "total_passed": 22,
+      "total_total": 22,
+      "rate_pct": 100.0
+    },
+    "arm_B_v1.17.7_T5": {
+      "happy_path_passed": 14,
+      "happy_path_total": 14,
+      "negative_passed": 8,
+      "negative_total": 8,
+      "total_passed": 22,
+      "total_total": 22,
+      "rate_pct": 100.0
+    },
+    "arm_C_v1.18.0": {
+      "happy_path_passed": 14,
+      "happy_path_total": 14,
+      "negative_passed": 8,
+      "negative_total": 8,
+      "total_passed": 22,
+      "total_total": 22,
+      "rate_pct": 100.0
+    }
+  },
+  "variance_disclaimer": "N=2 trials per arm × happy-path fixture + N=1 per arm × 2 negative fixtures = 8 runs per arm. Within-arm variance is not estimable from N=2 (e.g., arm_B happy-path tools spread 6 vs 4 = 33% relative). Directional conclusions (arm_C wins efficiency) are robust given the absolute gap (3 vs 10 tools). Inter-arm precision (B vs A) is weakly grounded by point estimates. Per audit-engine R1 qa-engineer Major: this limitation is acknowledged; benchmark is exploratory not statistical. Future iterations could increase N to 5+ for variance estimates."
 }

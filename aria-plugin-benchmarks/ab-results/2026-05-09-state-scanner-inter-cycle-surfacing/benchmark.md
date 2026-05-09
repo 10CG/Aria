@@ -1,10 +1,12 @@
 # state-scanner-inter-cycle-surfacing — TX.3 three-arm AB benchmark
 
-> **Date**: 2026-05-09
+> **Date**: 2026-05-09 (R1 audit corrections appended same-day)
 > **Spec**: `openspec/changes/state-scanner-inter-cycle-surfacing/proposal.md`
 > **Sub-PR**: aria-plugin (c) — TX.2-TX.7 cleanup
-> **Methodology**: 3 arms × 2 trials each (N=6 subagent runs), single canonical fixture
-> **Decision**: **PASS** (efficiency wins, findability tied at ceiling per memory `feedback_smoke_defer_extends_to_inline_ai_guidance`)
+> **Methodology**: 3 arms × 2 trials happy-path fixture + 3 arms × 1 trial × 2 negative fixtures (N=12 subagent runs total per Spec L213-218)
+> **Decision**: **PASS** (efficiency wins on happy path; rule-suppression verified on both negative fixtures; findability tied at ceiling per memory `feedback_smoke_defer_extends_to_inline_ai_guidance`)
+>
+> **Variance disclaimer**: N=2 trials per cell on happy path (insufficient for statistical variance estimates — see §Variance limitations). Directional conclusions robust; precise inter-arm B-vs-A characterization is exploratory not statistical.
 
 ## Fixture
 
@@ -112,10 +114,61 @@ The findability ceiling is not a defect of the test — it is the predicted beha
 
 This benchmark satisfies the Spec mandate (TX.3) for sub-PR (c) merge gate.
 
+## Negative fixtures (Spec L218 mandate — added per R1 audit qa-engineer Major)
+
+Per Spec L218: "额外 negative fixture × 2: (a) UPM 无 Pending Followups 表 (b) handoff 路径不存在".
+
+### NEG1 — UPM with handoff pointer but NO `## Pending Followups` heading
+
+Tests rule suppression: `pending_followups_p1` should NOT fire when `upm.followups` field is absent.
+
+| Assertion | arm_A | arm_B | arm_C |
+|-----------|-------|-------|-------|
+| Does NOT fabricate P1 items | ✓ | ✓ | ✓ |
+| Acknowledges no Pending Followups (suppression note OR no P1 claims) | ✓ | ✓ | ✓ |
+| Surfaces handoff stub.md path | ✓ | ✓ | ✓ |
+| Identifies US-100 as in_progress | ✓ | ✓ | ✓ |
+
+All 3 arms correctly suppress P1 followup recommendations. arm_C explicitly notes rule suppression via `pending_followups_p1` predicate (`upm.followups[].priority == "P1"`) failing on absent field. arm_A + arm_B refrain from fabricating P1 items because UPM grep finds none.
+
+### NEG2 — Handoff pointer references nonexistent file (`docs/handoff/MISSING.md`)
+
+Tests broken-pointer handling: arms should detect missing path and not pretend to Read content.
+
+| Assertion | arm_A | arm_B | arm_C |
+|-----------|-------|-------|-------|
+| Detects broken handoff path | ✓ | ✓ | ✓ |
+| Does NOT pretend to Read content from MISSING.md | ✓ | ✓ | ✓ |
+| Surfaces P1 followup that exists | ✓ | ✓ | ✓ |
+| Identifies US-200 (pending) | ✓ | ✓ | ✓ |
+
+**arm_C advantage**: collector pre-validates `handoff_doc.exists: false` in snapshot — AI immediately knows pointer is broken without filesystem call. arm_A + arm_B must do their own `test -f` / Read and catch ENOENT.
+
+### Combined arm pass rates (positive + negative fixtures)
+
+| Arm | Happy passes | Negative passes | Total | Rate |
+|-----|--------------|-----------------|-------|------|
+| arm_A | 14/14 | 8/8 | 22/22 | 100.0% |
+| arm_B | 14/14 | 8/8 | 22/22 | 100.0% |
+| arm_C | 14/14 | 8/8 | 22/22 | 100.0% |
+
+**All 3 arms pass all 22 assertions.** Findability + suppression both work across all configurations. Differentiation is in efficiency (above) + qualitative (collector pre-validation).
+
+## Variance limitations (R1 audit qa-engineer Major)
+
+| Limitation | Detail | Mitigation |
+|------------|--------|------------|
+| N=2 happy-path trials per arm | arm_B happy-path tools spread 6 vs 4 (33% relative) | Directional conclusion (arm_C ≪ arm_A) robust given absolute gap (3 vs 10); B-vs-A precision is exploratory |
+| N=1 negative-fixture trials per arm | No within-cell variance estimate | Suppression behavior is binary (rule fires or doesn't); N=1 sufficient to verify presence/absence |
+| Findability ceiling | All assertions hit 100% — no quantitative differentiation | Per memory precedent, fall back to efficiency metrics (tool count + duration) for delta comparison |
+| Single subagent variant | All trials use general-purpose subagent — different agent types may behave differently | Sub-PR (a)/(b) used aria:* agents for audit; benchmark uses general-purpose for skill-version isolation |
+
+**Future iterations**: For statistical variance estimates, increase N to 5+ per cell. For more rigorous arm_B fidelity, snapshot-strip is a reasonable observable-equivalent simulation; literal v1.17.7 collector checkout would give identical consumer-side behavior.
+
 ## Files
 
-- `arm_A_without_skill/trial_{1,2}.md` — arm A subagent outputs
-- `arm_B_v1.17.7_T5/trial_{1,2}.md` — arm B subagent outputs
-- `arm_C_v1.18.0/trial_{1,2}.md` — arm C subagent outputs
-- `benchmark.json` — structured aggregate (assertions + efficiency + deltas + gate decision)
+- `arm_A_without_skill/trial_{1,2}.md` + `neg{1,2}_trial_1.md` — arm A subagent outputs (4 files)
+- `arm_B_v1.17.7_T5/trial_{1,2}.md` + `neg{1,2}_trial_1.md` — arm B subagent outputs (4 files)
+- `arm_C_v1.18.0/trial_{1,2}.md` + `neg{1,2}_trial_1.md` — arm C subagent outputs (4 files)
+- `benchmark.json` — structured aggregate (assertions + efficiency + deltas + negative fixtures + gate decision)
 - `benchmark.md` — this file (human-readable analysis)
