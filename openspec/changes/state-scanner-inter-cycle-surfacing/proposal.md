@@ -1,7 +1,7 @@
 # state-scanner-inter-cycle-surfacing
 
 > **Level**: Minimal (Level 2 Spec — proposal.md 含任务,无独立 tasks.md)
-> **Status**: Draft
+> **Status**: Approved (post_spec R2 PASS_WITH_WARNINGS, 4/4 vote, 2026-05-08; PR #88 merged)
 > **Created**: 2026-05-08
 > **Type**: Collector enhancement (G2/G3/G4 from Forgejo Issue #85)
 > **Source**: Forgejo Issue [10CG/Aria#85](https://forgejo.10cg.pub/10CG/Aria/issues/85) — SilkNode 实战反馈
