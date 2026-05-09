@@ -15,6 +15,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - 2026-05-09
+
+### Added — state-scanner-inter-cycle-surfacing (Spec 18 任务全实装)
+
+aria-plugin v1.17.7 → v1.18.0 ship。Spec `state-scanner-inter-cycle-surfacing`
+全部 18 任务通过 3 个 sub-PR 串行交付,每个 sub-PR 经 4-5 轮 multi-agent
+pre_merge audit 收敛(详见各 sub-PR audit reports)。
+
+#### Sub-PR (a) — TX.0 + TX.1 prerequisite (aria-plugin#37, merged 8ecee44)
+- TX.0 `git.status_clean` derived field
+- TX.1 `state-snapshot-schema.md` 4 nested-field sections + backward-compat contract
+- TX.1.a `normalize_snapshot.py` DROP_KEYS for `raw_row` + `raw_match`
+- TX.1.b 4 normalize tests
+- 4 rounds R1-R4, R3==R4 converged, 4/4 PASS
+
+#### Sub-PR (b) — G2 + G3 + G4 collectors (aria-plugin#38, merged 9242d8d)
+- G2: `_parse_followups_table` (heading regex + column normalization +
+  pipe-escape + BA-10 fullwidth space rejection)
+- G3: `_detect_handoff_doc` (primary regex Chinese/English/Emoji + R2-converged
+  fallback BA-02 form + 3-state path resolution)
+- G4: `_derive_priority_items` (3-level stable sort + configurable limit +
+  non-dict JSON guards)
+- 2 new RECOMMENDATION_RULES: `pending_followups_p1` (1.85) +
+  `resume_in_progress_us` (1.88)
+- 32 new tests (24 initial + 8 R2 corrections)
+- 5 rounds R1-R5, R4==R5 converged after 8 R2 corrections (2 Majors closed:
+  schema doc-sync + handoff_doc absence contract)
+
+#### Sub-PR (c) — TX.2 + TX.3 + TX.4 + TX.6 + TX.7 cleanup (aria-plugin#39, merged 5767fe3)
+- TX.2 SKILL.md T5 兜底降级 (17 → ~9 lines sanity check)
+- TX.3 three-arm AB benchmark (PASS — efficiency wins -70% tools / -24%
+  duration vs A; findability tied at ceiling per memory precedent;
+  Spec L218 negative fixtures × 2 added per R1 audit Major)
+- TX.4 aria-plugin v1.17.7 → v1.18.0 + marketplace.json drift fix
+- TX.6 4 backward-compat verify tests (defensive `.get()` patterns)
+- TX.7 Aria + Kairos + Aether dogfooding (3 projects exit=0 errors=[])
+- 4 rounds R1-R4, R3==R4 converged after R1 corrections (2 Majors closed:
+  variance disclaimer + negative fixtures)
+
+### Changed
+- **aria submodule pointer**: 8ecee44 → 9242d8d → 5767fe3 (3 PR merges)
+- **VERSION**: 1.5.0 → 1.6.0 + aria plugin reference 1.16.0 → 1.18.0
+- **aria-plugin-benchmarks/ab-results/2026-05-09-state-scanner-inter-cycle-surfacing/**:
+  full benchmark artifacts (12 trial outputs + benchmark.{json,md} +
+  variance disclaimer)
+
+### Aria methodology dogfooding outcomes
+- 3 sub-PR 串行交付模式验证 (handoff doc 推荐的拆分方式)
+- multi-agent convergence audit 模式累计 13 轮 audit-engine 调用
+- 4-agent team (code-reviewer + backend-architect + qa-engineer +
+  knowledge-manager) 共识机制有效 (R2 escalation + R3-R5 stability)
+- 智能 PR scope 拆分 (sub-PR (a) 4 任务 / sub-PR (b) 9 任务 / sub-PR (c) 5 任务)
+  避免单 PR review 压力
+
+### Refs
+- Spec: `openspec/changes/state-scanner-inter-cycle-surfacing/proposal.md`
+  (Approved 2026-05-08 post_spec R2 PASS_WITH_WARNINGS, 4/4 vote)
+- Issue: 10CG/Aria#85 (SilkNode inter-cycle surfacing forcing function)
+- Audit reports: `.aria/audit-reports/pre_merge-R1-R{4,5,4}-2026-05-09-state-scanner-inter-cycle-surfacing-sub-pr-{a,b,c}.md`
+- Benchmark: `aria-plugin-benchmarks/ab-results/2026-05-09-state-scanner-inter-cycle-surfacing/benchmark.md`
+
+---
+
 ## [1.4.2] - 2026-04-09
 
 ### Security

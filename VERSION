@@ -1,18 +1,18 @@
 # Aria 项目版本信息
 
-> **版本**: 1.5.0
-> **最后更新**: 2026-04-11
+> **版本**: 1.6.0
+> **最后更新**: 2026-05-09
 
 ## 版本号
 
 ```
-1.5.0
+1.6.0
 ```
 
 ## 说明
 
 - **Major (1)**: 方法论核心框架稳定
-- **Minor (5)**: US-007 Phase 3b-M3-slim — 智能分诊 + 分级通知 (aria-orchestrator)
+- **Minor (6)**: state-scanner-inter-cycle-surfacing — aria-plugin v1.17.7 → v1.18.0 ship 全 18 任务实装 (G2 UPM Pending Followups parser + G3 handoff_doc pointer detection + G4 in_progress US priority_items + 2 新推荐规则 + git.status_clean derived field + 4 schema 字段 backward-compat contract + SKILL.md T5 兜底降级 + TX.6 backward-compat verify tests + TX.3 三-arm AB benchmark)。3 sub-PR 串行交付,每个 sub-PR 经 4-5 轮 multi-agent pre_merge audit 收敛。
 - **Patch (0)**: 新 minor,patch 归零
 
 ## 子模块版本
@@ -26,7 +26,7 @@
 
 | 插件 | 版本 | 仓库 | 更新日期 |
 |------|------|------|----------|
-| aria (子模块) | v1.16.0 | https://github.com/10CG/aria-plugin | 2026-04-15 |
+| aria (子模块) | v1.18.0 | https://github.com/10CG/aria-plugin | 2026-05-09 |
 
 ### aria v1.16.0 变更摘要 (minor, meta-repo 支持)
 

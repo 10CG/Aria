@@ -1,11 +1,14 @@
 # state-scanner-inter-cycle-surfacing
 
 > **Level**: Minimal (Level 2 Spec — proposal.md 含任务,无独立 tasks.md)
-> **Status**: Approved (post_spec R2 PASS_WITH_WARNINGS, 4/4 vote, 2026-05-08; PR #88 merged)
-> **Implementation**:
-> - Sub-PR (a) TX.0 + TX.1 prerequisite — merged 2026-05-09 (aria-plugin#37, 4 rounds pre_merge audit converged R3==R4)
-> - Sub-PR (b) G2 + G3 + G4 collectors + 2 recommendation rules — merged 2026-05-09 (aria-plugin#38, 5 rounds pre_merge audit converged R4==R5)
-> - Sub-PR (c) TX.2-TX.7 cleanup (SKILL.md T5 降级 + AB benchmark v1.18.0 + Kairos/Aether dogfooding) still pending
+> **Status**: **Archived** (2026-05-09 — all 18 tasks shipped via 3 sub-PRs)
+> **Approved**: 2026-05-08 post_spec R2 PASS_WITH_WARNINGS, 4/4 vote (PR #88 merged)
+> **Implementation history** (all merged 2026-05-09):
+> - Sub-PR (a) TX.0+TX.1+TX.1.a+TX.1.b prerequisite — aria-plugin#37, SHA 8ecee44, 4 rounds R3==R4 converged
+> - Sub-PR (b) G2+G3+G4 collectors + 2 rec rules — aria-plugin#38, SHA 9242d8d, 5 rounds R4==R5 converged after 2 R2 Major fixes (schema doc-sync + handoff_doc absence)
+> - Sub-PR (c) TX.2+TX.3+TX.4+TX.6+TX.7 cleanup — aria-plugin#39, SHA 5767fe3, 4 rounds R3==R4 converged after 2 R1 Major fixes (variance disclaimer + negative fixtures)
+> **Audit reports**: `.aria/audit-reports/pre_merge-R1-R{4,5,4}-2026-05-09-state-scanner-inter-cycle-surfacing-sub-pr-{a,b,c}.md`
+> **TX.3 benchmark**: `aria-plugin-benchmarks/ab-results/2026-05-09-state-scanner-inter-cycle-surfacing/` (3 arms × 6+6 trials, PASS gate)
 > **Created**: 2026-05-08
 > **Type**: Collector enhancement (G2/G3/G4 from Forgejo Issue #85)
 > **Source**: Forgejo Issue [10CG/Aria#85](https://forgejo.10cg.pub/10CG/Aria/issues/85) — SilkNode 实战反馈
