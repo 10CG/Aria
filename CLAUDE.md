@@ -383,6 +383,22 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **详细规范 + 正向 pattern + exception 模板:** `standards/conventions/secret-hygiene.md`
 
+8. **PR merge 前必跑 pre-merge gate** - 详见 `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (v1.3.0+)
+
+**规则 #8 要点:** Phase C.2 PR merge 前必须通过 phase-c-integrator C.2.4 pre-merge precondition gate (内部调用 `aether ci status --branch main --in-flight --json` + PR CI status query) 验证 (a) 本 PR CI 已 passing; (b) main 分支无 in-flight CI run。`wait` 状态由 workflow-runner `wait_recoverable` 错误类型处理 (指数退避 + Ctrl-C escape hatch),**不**视为 workflow failure。
+
+**触发场景:** Phase C.2 action 流程中 (auto_merge 或 user-triggered merge) 必须经过 C.2.4 gate。`auto_merge=true` workflow 自动调用; `auto_merge=false` user 触发 merge 前由 phase-c-integrator 强制 invoke。
+
+**Source incidents:** 2026-05-02 SilkNode PR-321 cancel PR-322 main CI Run #3161 (459s 部署观测丢失);Forgejo Issue [#60](https://forgejo.10cg.pub/10CG/Aria/issues/60)。
+
+**Exception:** 项目无 aether plugin (`aether` CLI 不可用) 时按配置 `phase_c_integrator.pre_merge_gate.no_aether_fallback` 降级:`skip_with_warning` (默认,记录到 workflow report) / `abort` (严格模式)。Exception 必须在项目 `.aria/config.json` 显式声明 `phase_c_integrator.pre_merge_gate.no_aether_fallback` 字段。
+
+**Primitive responsibility split:**
+- aether 提供 (`aether ci status --branch X --in-flight --json` query primitive,P0-A): aether-cli #116 SHA `f29abee` (2026-05-06)
+- aria 消费 + verdict 计算 (P0-B `aether-pre-merge-check` skill 从未实施): phase-c-integrator C.2.4 + workflow-runner `wait_recoverable` + 本规则 #8 强制约束
+
+**详细实施规范:** `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (与 Rule #7 引用 `standards/conventions/secret-hygiene.md` 同结构)
+
 ---
 
 ## 项目状态
@@ -390,8 +406,8 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中 → v2.0 规划已批准
 成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
-插件版本: v1.15.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents)
-主项目版本: v1.5.0
+插件版本: v1.18.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents) — sub-PR (c) release 后 → v1.19.0
+主项目版本: v1.6.0 — sub-PR (c) release 后 → v1.7.0
 PRD v2.0: Approved (2026-04-11, 待 M0 启动)
 ```
 
