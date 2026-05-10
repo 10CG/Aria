@@ -3,7 +3,7 @@
 > **Level**: Minimal (Level 2 — proposal.md 含任务,无独立 tasks.md;跨 skill + workflow-runner + CLAUDE.md 不可协商规则集 — 沿用 state-scanner-inter-cycle-surfacing precedent 的"Level 2 含任务"形式,与 Aria 项目惯例一致)
 > **Status**: **Approved** (post_spec R2 unanimous PASS_WITH_WARNINGS, 2026-05-09; pragmatic convergence per Aria memory `feedback_post_spec_audit_pragmatic_convergence`; R2 new Majors inline-patched)
 > **Created**: 2026-05-09
-> **Approved**: 2026-05-09 (audit report: `.aria/audit-reports/post_spec-R1-R2-2026-05-09T...Z-phase-c-integrator-pre-merge-gate.md`)
+> **Approved**: 2026-05-09 (audit report: `.aria/audit-reports/post_spec-R1-R2-2026-05-09T1816Z-phase-c-integrator-pre-merge-gate.md`)
 > **Type**: Workflow safety gate (consume aether primitive)
 > **Source**: Forgejo Issue [10CG/Aria#60](https://forgejo.10cg.pub/10CG/Aria/issues/60) — SilkNode 实战反馈
 > **Upstream blocker resolved**: aether#89 closed 2026-05-06,`aether ci status --in-flight` flag + `aether-ci-cli (was: aether-pre-merge-check, R3 修订 — skill 不存在)` skill 就绪
