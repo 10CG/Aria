@@ -1,7 +1,8 @@
 {
   "_fixture_id": "wait_then_green",
-  "_description": "Sequence: 2 polling cycles return wait, 3rd returns green. Tests workflow-runner wait_recoverable polling loop.",
-  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var; helper reads `_sequence` array index from `_call_count` env var",
+  "_status": "ASPIRATIONAL — integration test pending (R2 audit QA-2)",
+  "_description": "Aspirational fixture for a future integration test exercising the workflow-runner wait_recoverable polling loop (2 cycles wait → 1 cycle green). Requires a mock-injection mechanism in pre_merge_gate.py (e.g., ARIA_AETHER_MOCK_RESPONSE_FILE env var with sequence stepping) that does NOT yet exist in the v1.19.0 helper. Polling-loop correctness in v1.19.0 is verified at the gate_state_helper level (see test_gate_state_helper.GateStateLifecycleTests.test_subsequent_wait_increments_retry_count + test_wait_to_green_preserves_retry_count) — fixture remains for future end-to-end integration coverage.",
+  "_consumed_by": "Currently no consumer. When the mock-injection mechanism ships, this fixture is suitable for an integration test invoking pre_merge_gate.py via subprocess with the env var set.",
   "_mock_latency_ms": 200,
   "_sequence_strategy": "indexed_by_call_count",
   "_sequence": [

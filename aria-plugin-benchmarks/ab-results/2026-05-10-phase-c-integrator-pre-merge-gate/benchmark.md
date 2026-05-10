@@ -50,14 +50,24 @@ This deviates from the state-scanner-inter-cycle-surfacing T5.1 precedent (which
 
 | ID | File | Expected verdict | Purpose |
 |----|------|------------------|---------|
-| green | green.json | green | happy path — main quiet + PR passing |
-| wait | wait.json | wait | **PRIMARY PASS GATE** — main has in-flight, suspend merge |
-| wait_then_green | wait_then_green.json | wait → wait → green (sequence) | verify workflow-runner wait_recoverable polling loop |
-| fail | fail.json | fail | PR CI red → block merge |
-| NEG-1-malformed | NEG-1-malformed.json | fail (not crash) | Spec QA-2 R2 patch: helper handles unknown enum |
-| NEG-2-timeout | NEG-2-timeout.json | fail (after retry) | Spec QA-2 R2 patch: subprocess timeout + 3-retry |
+| ID | File | Expected verdict | Status | Purpose |
+|----|------|------------------|--------|---------|
+| green | green.json | green | active | happy path — main quiet + PR passing (mapped to test_case_a_green) |
+| wait | wait.json | wait | active | **PRIMARY PASS GATE** — main has in-flight, suspend merge (mapped to test_case_b) |
+| wait_then_green | wait_then_green.json | wait → wait → green (sequence) | **aspirational (R2 QA-2)** | future integration test for workflow-runner wait_recoverable polling loop; requires mock-injection mechanism not yet shipped in v1.19.0. Polling-loop correctness verified at gate_state_helper unit-test level instead. |
+| fail | fail.json | fail | active | PR CI red → block merge (mapped to test_case_c) |
+| NEG-1-malformed | NEG-1-malformed.json | fail (not crash) | active | Spec QA-2 R2 patch: helper handles upstream error (mapped to test_case_e_main_leg + e2_pr_leg) |
+| NEG-2-timeout | NEG-2-timeout.json | fail (after retry) | **aspirational (R2 QA-3)** | future integration test for subprocess timeout retry exhaustion. v1.19.0 helper enforces timeout (`subprocess.run(timeout=N)` + 3-attempt retry verified by source inspection), but no test currently patches subprocess.run to raise TimeoutExpired. |
 
-Each fixture is consumed via env var `ARIA_AETHER_MOCK_RESPONSE_FILE=<path>` by the helper subprocess wrapper (test path only; production uses real `aether ci status` CLI calls).
+**R2 audit transparency** (QA-2 + QA-3 corrections):
+
+- **Active fixtures** (4) map to passing unit tests where `_query_aether` is patched at the function boundary. They exercise the gate's verdict-routing logic comprehensively.
+- **Aspirational fixtures** (2: `wait_then_green` + `NEG-2-timeout`) require a mock-injection mechanism (`ARIA_AETHER_MOCK_RESPONSE_FILE` env var that pre_merge_gate.py would read instead of calling `aether ci status`) that does NOT yet exist in v1.19.0. They are preserved as documentation for future integration test scope.
+- **What v1.19.0 actually verifies for the aspirational paths**:
+  - `wait_then_green` polling: gate_state_helper `test_subsequent_wait_increments_retry_count` + `test_wait_to_green_preserves_retry_count` cover the state-machine transitions; the integration of pre_merge_gate.py's verdict output → workflow-runner's polling loop is currently AI-driven (caller orchestrates per SKILL.md) and not exercised end-to-end in a single Python test.
+  - `NEG-2-timeout`: source inspection of `_run_aether_with_retry` confirms `subprocess.run(timeout=N)` + max 3 retries with backoff `(5,15,45)`. A `mock.patch('subprocess.run', side_effect=TimeoutExpired)` test would close this gap and is recommended as a follow-up patch.
+
+**Earlier wording correction** (R2 QA-2): the prior version of this section claimed "each fixture is consumed via env var `ARIA_AETHER_MOCK_RESPONSE_FILE`" — that mechanism does not exist in v1.19.0. Corrected to the per-fixture status above.
 
 ---
 

@@ -1,10 +1,10 @@
 {
   "_fixture_id": "NEG-1-malformed",
-  "_description": "Negative fixture per Spec QA-2 R2 patch: malformed verdict / unknown enum value. Expected: pre_merge_gate.py routes to verdict=fail (not unhandled exception, not silent skip).",
-  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var",
-  "_expected_helper_behavior": "compute_verdict() routes unknown pr_ci_status via _normalize_pr_ci_status() default → pending → wait verdict (not crash). Or if verdict field is malformed/missing, helper falls back to fail with raw_message error.",
+  "_description": "Negative fixture per Spec QA-2 R2 patch: simulates aether returning structurally invalid JSON. The corresponding test (test_case_e_malformed_aether_main_leg_routes_fail) patches _query_aether to return (False, None, '<error msg>') directly — fixture-as-data is illustrative, not consumed by helper subprocess. Expected: gate_check routes to verdict=fail with raw_message containing the parser error string.",
+  "_consumed_by": "Documentation only. Real verification happens via test mock at the _query_aether boundary, not via subprocess. R2 patch (QA-1): reconciled prior contradiction — there is one canonical routing path (_query_aether returns ok=False → gate_check routes to fail).",
+  "_expected_helper_behavior": "When _query_aether returns ok=False (whether due to malformed JSON, unexpected schema, or non-zero exit code), gate_check short-circuits to verdict=fail and surfaces the error in raw_message. The fixture's verdict/pr_ci_status fields below are NOT parsed — _query_aether returns False before any parsing occurs.",
   "_mock_latency_ms": 200,
   "verdict": "unknown_state_completely_invalid",
   "pr_ci_status": "totally_unrecognized_status",
-  "raw_message": "malformed JSON simulation: verdict + pr_ci_status outside enum"
+  "raw_message": "malformed JSON simulation: verdict + pr_ci_status outside enum (illustrative only — not parsed by helper)"
 }
