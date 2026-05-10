@@ -1,0 +1,69 @@
+{
+  "skill_name": "phase-c-integrator-pre-merge-gate",
+  "version": "1.0.0",
+  "type": "workflow_skill_subextension",
+  "parent_skill": "phase-c-integrator",
+  "spec": "openspec/changes/phase-c-integrator-pre-merge-gate/proposal.md",
+  "issue": "10CG/Aria#60",
+  "release_pr": "10CG/aria-plugin#42 (v1.19.0)",
+  "fixtures_dir": "phase-c-integrator-pre-merge-gate-fixtures/",
+  "changelog": [
+    {"version": "1.0.0", "date": "2026-05-10", "changes": "Initial fixture suite for v1.19.0 ship: 4 happy + 2 negative fixtures matching Spec D1 §Contract Source schema"}
+  ],
+  "fixtures": [
+    {
+      "id": "green",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/green.json",
+      "expected_verdict": "green",
+      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_a_green",
+      "purpose": "happy path — main quiet + PR passing → continue merge"
+    },
+    {
+      "id": "wait",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/wait.json",
+      "expected_verdict": "wait",
+      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_b_wait_with_translated_runs",
+      "purpose": "main has in-flight → suspend merge (PRIMARY PASS GATE METRIC)"
+    },
+    {
+      "id": "wait_then_green",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/wait_then_green.json",
+      "expected_verdict": "wait then green (sequence)",
+      "test_case_in_unit_tests": "test_gate_state_helper polling tests + integration",
+      "purpose": "verify workflow-runner wait_recoverable polling loop convergence"
+    },
+    {
+      "id": "fail",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/fail.json",
+      "expected_verdict": "fail",
+      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_c_failing_routes_fail_regardless_of_main",
+      "purpose": "PR CI red → block merge"
+    },
+    {
+      "id": "NEG-1-malformed",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-1-malformed.json",
+      "expected_verdict": "fail (not crash)",
+      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_routes_fail",
+      "purpose": "Spec QA-2 R2 patch — verify helper does not crash on unknown enum"
+    },
+    {
+      "id": "NEG-2-timeout",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-2-timeout.json",
+      "expected_verdict": "fail (after retry exhaustion)",
+      "test_case_in_unit_tests": "test_pre_merge_gate (timeout path; integration scenario)",
+      "purpose": "Spec QA-2 R2 patch — verify subprocess timeout + 3-retry behavior"
+    }
+  ],
+  "primary_pass_gate_metric": {
+    "name": "wait_triggered_when_in_flight_mock_present",
+    "target": "100%",
+    "rationale": "Per Spec QA-6 R2 inline patch: cancel-other-in-flight-run cannot be measured in mock environment (no real concurrent CI). Use wait-trigger-rate as the structural PASS gate signal.",
+    "verified_by": "test_pre_merge_gate.GateCheckTests.test_case_b_wait_with_translated_runs (currently passing)"
+  },
+  "quality_target_deferred_to_dogfood": {
+    "name": "cancel-other-in-flight-run count",
+    "target": 0,
+    "deferred_to": "T5.4 dogfood Layer 2 (forced wait mock injection across Aria + Kairos + Aether projects)",
+    "rationale": "Real cancel-prevention measurement requires multi-PR concurrent CI scenario; not feasible in unit-test mock environment."
+  }
+}

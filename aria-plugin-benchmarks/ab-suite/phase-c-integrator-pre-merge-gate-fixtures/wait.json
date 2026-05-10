@@ -1,0 +1,18 @@
+{
+  "_fixture_id": "wait",
+  "_description": "main 有 in-flight + PR CI passing → expected verdict=wait + in_flight_runs[] populated",
+  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var",
+  "_mock_latency_ms": 200,
+  "verdict": "wait",
+  "pr_ci_status": "passing",
+  "in_flight_runs": [
+    {
+      "run_id": 3161,
+      "branch": "main",
+      "started_at": "2026-05-10T12:45:00Z",
+      "elapsed_seconds": 300
+    }
+  ],
+  "primitive_used": "mock",
+  "raw_message": "main has in-flight CI run #3161; gate suspends merge"
+}

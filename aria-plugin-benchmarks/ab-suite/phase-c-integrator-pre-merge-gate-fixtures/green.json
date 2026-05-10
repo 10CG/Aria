@@ -1,0 +1,11 @@
+{
+  "_fixture_id": "green",
+  "_description": "main 无 in-flight + PR CI passing → expected verdict=green",
+  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var",
+  "_mock_latency_ms": 200,
+  "verdict": "green",
+  "pr_ci_status": "passing",
+  "in_flight_runs": [],
+  "primitive_used": "mock",
+  "raw_message": "happy path: PR CI green + main quiet"
+}

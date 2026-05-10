@@ -1,0 +1,11 @@
+{
+  "_fixture_id": "fail",
+  "_description": "PR CI failing → expected verdict=fail (regardless of main in-flight state)",
+  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var",
+  "_mock_latency_ms": 200,
+  "verdict": "fail",
+  "pr_ci_status": "failing",
+  "in_flight_runs": [],
+  "primitive_used": "mock",
+  "raw_message": "PR CI red; merge blocked"
+}

@@ -1,0 +1,34 @@
+{
+  "_fixture_id": "wait_then_green",
+  "_description": "Sequence: 2 polling cycles return wait, 3rd returns green. Tests workflow-runner wait_recoverable polling loop.",
+  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var; helper reads `_sequence` array index from `_call_count` env var",
+  "_mock_latency_ms": 200,
+  "_sequence_strategy": "indexed_by_call_count",
+  "_sequence": [
+    {
+      "verdict": "wait",
+      "pr_ci_status": "passing",
+      "in_flight_runs": [
+        {"run_id": 3161, "branch": "main", "started_at": "2026-05-10T12:45:00Z", "elapsed_seconds": 60}
+      ],
+      "primitive_used": "mock",
+      "raw_message": "polling cycle 1: still in-flight"
+    },
+    {
+      "verdict": "wait",
+      "pr_ci_status": "passing",
+      "in_flight_runs": [
+        {"run_id": 3161, "branch": "main", "started_at": "2026-05-10T12:45:00Z", "elapsed_seconds": 90}
+      ],
+      "primitive_used": "mock",
+      "raw_message": "polling cycle 2: still in-flight (extended)"
+    },
+    {
+      "verdict": "green",
+      "pr_ci_status": "passing",
+      "in_flight_runs": [],
+      "primitive_used": "mock",
+      "raw_message": "polling cycle 3: main CI completed; safe to merge"
+    }
+  ]
+}

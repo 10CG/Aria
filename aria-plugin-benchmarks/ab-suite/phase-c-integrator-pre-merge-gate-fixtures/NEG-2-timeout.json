@@ -1,0 +1,10 @@
+{
+  "_fixture_id": "NEG-2-timeout",
+  "_description": "Negative fixture per Spec QA-2 R2 patch: simulated subprocess timeout. helper subprocess.run() should hit primitive_call_timeout_seconds (default 30s), retry max 3 attempts (5s/15s/45s backoff), then route to verdict=fail with timeout raw_message.",
+  "_consumed_by": "pre_merge_gate.py via ARIA_AETHER_MOCK_RESPONSE_FILE env var; helper detects `_mock_latency_ms` and sleeps before returning",
+  "_mock_latency_ms": 999999,
+  "_expected_helper_behavior": "subprocess.run timeout fires after primitive_call_timeout_seconds; max 3 retry attempts; final exit_code=-SIGTERM mapped to fail verdict; raw_message contains 'timeout after N attempts'",
+  "verdict": "would-have-been-green-if-not-for-timeout",
+  "pr_ci_status": "passing",
+  "raw_message": "this fixture should never be parsed because subprocess times out first"
+}
