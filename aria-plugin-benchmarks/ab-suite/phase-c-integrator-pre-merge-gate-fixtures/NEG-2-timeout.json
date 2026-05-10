@@ -1,0 +1,11 @@
+{
+  "_fixture_id": "NEG-2-timeout",
+  "_status": "ASPIRATIONAL — integration test pending (R2 audit QA-3)",
+  "_description": "Aspirational fixture for a future integration test exercising subprocess timeout behavior. The v1.19.0 helper subprocess.run() correctly enforces primitive_call_timeout_seconds (verified by source inspection of _run_aether_with_retry), but no test currently patches subprocess.run to raise TimeoutExpired across all 3 attempts. The fixture's _mock_latency_ms field requires the same mock-injection mechanism as wait_then_green (does NOT exist in v1.19.0). Fix: add a mock.patch test that raises subprocess.TimeoutExpired and asserts verdict=fail + raw_message contains 'timeout after N attempts'. Fixture preserved for future test.",
+  "_consumed_by": "Currently no consumer. When ARIA_AETHER_MOCK_RESPONSE_FILE injection mechanism ships, this fixture exercises the timeout retry exhaustion path end-to-end via subprocess.",
+  "_mock_latency_ms": 999999,
+  "_expected_helper_behavior": "subprocess.run timeout fires after primitive_call_timeout_seconds; max 3 retry attempts; final exit_code=-SIGTERM mapped to fail verdict; raw_message contains 'timeout after N attempts'",
+  "verdict": "would-have-been-green-if-not-for-timeout",
+  "pr_ci_status": "passing",
+  "raw_message": "this fixture should never be parsed because subprocess times out first"
+}

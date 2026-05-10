@@ -1,0 +1,49 @@
+{
+  "spec": "openspec/changes/phase-c-integrator-pre-merge-gate/proposal.md",
+  "issue": "10CG/Aria#60",
+  "release_pr": "10CG/aria-plugin#42 (v1.19.0)",
+  "date": "2026-05-10",
+  "type": "structural_verification",
+  "rationale": "Workflow orchestration sub-step; cancel-prevention metric requires production CI; per QA-6 R2 inline patch use wait-trigger-rate proxy + unit-test fixture coverage",
+  "decision": "PASS",
+  "primary_pass_gate": {
+    "metric": "wait_triggered_when_in_flight_mock_present",
+    "target": "100%",
+    "measured": "100%",
+    "verified_by": "test_pre_merge_gate.GateCheckTests.test_case_b_wait_with_translated_runs"
+  },
+  "structural_metrics": {
+    "wait_triggered_when_in_flight_mock_present": {"target": 100, "measured": 100, "unit": "percent"},
+    "green_routed_when_main_quiet_and_pr_passing": {"target": 100, "measured": 100, "unit": "percent"},
+    "fail_routed_when_pr_failing": {"target": 100, "measured": 100, "unit": "percent"},
+    "fail_routed_on_malformed_response": {"target": 100, "measured": 100, "unit": "percent"},
+    "binary_pre_flight_check_fails_on_outdated": {"target": 100, "measured": 100, "unit": "percent"},
+    "enabled_false_skips_to_green_no_detection": {"target": 100, "measured": 100, "unit": "percent"},
+    "no_aether_skip_with_warning_default": {"target": 100, "measured": 100, "unit": "percent"},
+    "state_v10_migrates_to_v11_no_keyerror": {"target": 100, "measured": 100, "unit": "percent"}
+  },
+  "test_counts": {
+    "D1_pre_merge_gate_py": {"total": 21, "passed": 21, "failed": 0},
+    "D2_gate_state_helper_py": {"total": 22, "passed": 22, "failed": 0},
+    "combined": {"total": 43, "passed": 43, "failed": 0}
+  },
+  "fixtures": {
+    "directory": "ab-suite/phase-c-integrator-pre-merge-gate-fixtures/",
+    "count_happy": 4,
+    "count_negative": 2,
+    "total": 6
+  },
+  "deferred_to_dogfood_T54": [
+    "cancel-other-in-flight-run count (target 0)",
+    "wait → green polling latency under real CI duration",
+    "aether CLI version compatibility audit across deployed environments",
+    "Cross-PR resume after Ctrl-C → suspended → resume in production"
+  ],
+  "variance_disclaimer": "N/A — measurement is structural verification via deterministic unit tests, not exploratory LLM trials. Variance disclaimer applies to state-scanner-style benchmarks; here helper code is deterministic and mocks are exact.",
+  "methodology_precedent": {
+    "differs_from": "state-scanner-inter-cycle-surfacing (2026-05-09)",
+    "why": "Workflow orchestration sub-step (helper script + LLM-driven SKILL.md) vs knowledge skill (collector enrichment); AB measurement of LLM workflow behavior under multi-PR concurrent CI not feasible in mock; deferred to production dogfood",
+    "recorded_for_future_workflow_skill_specs": true
+  },
+  "audit_report_reference": ".aria/audit-reports/post_spec-R1-R2-2026-05-09T1816Z-phase-c-integrator-pre-merge-gate.md"
+}
