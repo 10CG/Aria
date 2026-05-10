@@ -96,11 +96,12 @@ Verification of arm B's structural behavior is performed by the unit test suites
 | `GateCheckTests.test_case_b_wait_with_translated_runs` | 1 | **`wait.json` — PRIMARY PASS GATE** |
 | `GateCheckTests.test_case_c_failing_routes_fail_regardless_of_main` | 1 | `fail.json` |
 | `GateCheckTests.test_case_d_pending_routes_wait` | 1 | (PR pending status) |
-| `GateCheckTests.test_case_e_malformed_aether_routes_fail` | 1 | `NEG-1-malformed.json` |
+| `GateCheckTests.test_case_e_malformed_aether_main_leg_routes_fail` | 1 | `NEG-1-malformed.json` (main-leg path) |
+| `GateCheckTests.test_case_e2_malformed_aether_pr_leg_routes_fail` | 1 | `NEG-1-malformed.json` (PR-leg path, R2 CR-M2 patch) |
 | `GateCheckTests.test_case_f_outdated_binary_fails_fast` | 1 | (binary version pre-flight) |
 | `FallbackTests` | 3 (enabled=false / no_aether skip / no_aether abort) | Backward-compat / fallback paths |
 | `NormalizePrCiStatusTests` | 4 | PR status enum normalization |
-| **Total D1** | **20** | |
+| **Total D1** | **21** | (R2 added test_case_e2 per CR-M2) |
 
 ### D2 — `gate_state_helper.py` (22 tests in `aria-plugin#41`)
 
@@ -121,12 +122,12 @@ Verification of arm B's structural behavior is performed by the unit test suites
 
 ```
 $ cd aria/skills/phase-c-integrator && python3 -m unittest tests.test_pre_merge_gate
-Ran 20 tests in 0.054s — OK
+Ran 21 tests in 0.054s — OK   (R2 added test_case_e2 per CR-M2)
 
 $ cd aria/skills/workflow-runner && python3 -m unittest tests.test_gate_state_helper
 Ran 22 tests in 0.038s — OK
 
-Total: 42/42 PASS
+Total: 43/43 PASS
 ```
 
 ---
@@ -138,7 +139,8 @@ Total: 42/42 PASS
 | `wait_triggered_when_in_flight_mock_present` | 100% | **100%** ✓ | `test_case_b_wait_with_translated_runs` (verdict == "wait" when main_runs non-empty + pr_passing) |
 | `green_routed_when_main_quiet_and_pr_passing` | 100% | **100%** ✓ | `test_case_a_green` |
 | `fail_routed_when_pr_failing` | 100% | **100%** ✓ | `test_case_c_failing_routes_fail_regardless_of_main` |
-| `fail_routed_on_malformed_response` | 100% | **100%** ✓ | `test_case_e_malformed_aether_routes_fail` |
+| `fail_routed_on_malformed_response_main_leg` | 100% | **100%** ✓ | `test_case_e_malformed_aether_main_leg_routes_fail` |
+| `fail_routed_on_malformed_response_pr_leg` | 100% | **100%** ✓ | `test_case_e2_malformed_aether_pr_leg_routes_fail` (R2 CR-M2 patch) |
 | `binary_pre_flight_check_fails_on_outdated` | 100% | **100%** ✓ | `test_case_f_outdated_binary_fails_fast` |
 | `enabled_false_skips_to_green_no_detection` | 100% | **100%** ✓ | `FallbackTests.test_disabled_skips_to_green` |
 | `no_aether_skip_with_warning_default` | 100% | **100%** ✓ | `FallbackTests.test_no_aether_skip_with_warning` |

@@ -23,9 +23,9 @@
     "state_v10_migrates_to_v11_no_keyerror": {"target": 100, "measured": 100, "unit": "percent"}
   },
   "test_counts": {
-    "D1_pre_merge_gate_py": {"total": 20, "passed": 20, "failed": 0},
+    "D1_pre_merge_gate_py": {"total": 21, "passed": 21, "failed": 0},
     "D2_gate_state_helper_py": {"total": 22, "passed": 22, "failed": 0},
-    "combined": {"total": 42, "passed": 42, "failed": 0}
+    "combined": {"total": 43, "passed": 43, "failed": 0}
   },
   "fixtures": {
     "directory": "ab-suite/phase-c-integrator-pre-merge-gate-fixtures/",
