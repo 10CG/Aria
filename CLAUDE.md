@@ -406,8 +406,8 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中 → v2.0 规划已批准
 成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
-插件版本: v1.18.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents) — sub-PR (c) release 后 → v1.19.0
-主项目版本: v1.6.0 — sub-PR (c) release 后 → v1.7.0
+插件版本: v1.19.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents)
+主项目版本: v1.7.0
 PRD v2.0: Approved (2026-04-11, 待 M0 启动)
 ```
 

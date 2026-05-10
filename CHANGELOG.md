@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2026-05-10
+
+### Added — phase-c-integrator pre-merge gate cycle ship (Spec: phase-c-integrator-pre-merge-gate, Forgejo Issue #60)
+
+- **CLAUDE.md non-negotiable rule #8** ("PR merge 前必跑 pre-merge gate") with same depth structure as Rules #6/#7.
+- **CLAUDE.md 项目状态** version bumped: plugin v1.18.0 → v1.19.0; main project v1.6.0 → v1.7.0.
+- **aria submodule** bumped to v1.19.0 (commit `ab1c873`):
+  - D1 phase-c-integrator C.2.4 pre-merge precondition gate + helper script + 21 unit tests (PR aria-plugin#40)
+  - D2 workflow-runner `wait_recoverable` error type + workflow-state-schema 1.0→1.1 (additive) + helper + 22 unit tests (PR aria-plugin#41)
+  - Release v1.19.0 (PR aria-plugin#42)
+- **AB benchmark** (`aria-plugin-benchmarks/ab-results/2026-05-10-phase-c-integrator-pre-merge-gate/`):
+  - Structural verification approach (per QA-6 R2 inline patch): 8 metrics @ 100% across 43 unit tests
+  - 6 fixtures (4 active + 2 aspirational with explicit follow-up scope)
+  - Methodology comparison vs state-scanner-inter-cycle-surfacing precedent recorded for future workflow-skill specs
+
+### Audit history
+
+- post_spec audit R1+R2 (2026-05-09): 4 Critical → 0, unanimous PASS_WITH_WARNINGS
+- T1.0 spike (2026-05-10): R3 Spec revision — `aether-pre-merge-check` skill never shipped, verdict computation moved to aria; consume `aether ci status --in-flight` (aether-cli #116, SHA `f29abee`)
+- pre_merge audit R1+R2+R3 (2026-05-10): converged to unanimous PASS at R3 (4/4 agents)
+
+### Background
+
+2026-05-02 SilkNode incident: PR-321 merge cancelled PR-322 main CI Run #3161 (459s deployment observability lost). Root cause: Forgejo Actions concurrency rule + Nomad single-job topology + missing pre-merge in-flight CI check in aria workflow.
+
 ## [Unreleased]
 
 ### Track A — US-024 M4 T-deploy + smoke (2026-05-09 EOD)
