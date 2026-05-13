@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "skill_name": "state-scanner",
+    "skill_path": "aria/skills/state-scanner/",
+    "skill_modification": "scripts/collectors/_status.py::_normalize_status — word-boundary regex + reorder + add implemented token",
+    "executor_model": "deterministic (unit test framework)",
+    "timestamp": "2026-05-13T17:00Z",
+    "iteration": 1,
+    "rule_6_framing": "Deterministic bug fix — AB is pre-fix vs post-fix unit test pass rate (capability-correctness measure). The /skill-creator with-vs-without-skill framing is not the right metric for a single-file deterministic logic fix; pre/post unit-test pass rate is the rigorous AB. See aria-issue-triage-sop precedent (acknowledged structural vs capability framing differs by skill type)."
+  },
+  "configurations": ["pre-fix", "post-fix"],
+  "test_suite": "aria/skills/state-scanner/tests/test_openspec.py::TestStatusNormalizationIssue101Fix",
+  "runs": [
+    {
+      "config": "pre-fix",
+      "test_pass_count": 3,
+      "test_total": 13,
+      "pass_rate": 0.231,
+      "failures": [
+        "test_issue101_docs_marketplace_adaptation (Bug 1: Approved Phase A done → done not approved)",
+        "test_issue101_existing_data_migration (Bug 2: Implemented → unknown not implemented)",
+        "test_issue101_pricing_status_marketplace_redo (Bug 2)",
+        "test_issue101_terms_of_service_and_attribution (Bug 1)",
+        "test_positive_regression_in_progress_with_done_shadow",
+        "test_positive_regression_ready_with_done_shadow",
+        "test_positive_regression_single_token_states (Implemented → unknown)",
+        "test_shadow_inactive_not_active",
+        "test_shadow_incomplete_not_complete",
+        "test_shadow_unimplemented_not_implemented (would also fail post-fix without word-boundary)"
+      ]
+    },
+    {
+      "config": "post-fix",
+      "test_pass_count": 13,
+      "test_total": 13,
+      "pass_rate": 1.0,
+      "failures": []
+    }
+  ],
+  "delta": {
+    "pass_rate": "+0.769",
+    "cases_recovered": 10,
+    "cases_total": 13
+  },
+  "live_verify": {
+    "pre_fix": "Live scan of Aria (openspec/changes/) returned pending_archive count = 4 (false positives on docs-marketplace / existing-data-migration / pricing-status-redo / terms-of-service)",
+    "post_fix": "Live scan returned pending_archive count = 0 (all 4 specs correctly classified: approved / implemented / implemented / pending)"
+  },
+  "regression": {
+    "full_state_scanner_test_suite": {
+      "pre_fix_total": 414,
+      "post_fix_total": 427,
+      "all_pass_post_fix": true,
+      "regression_count": 0
+    }
+  },
+  "notes": [
+    "Rule #6 verdict: PASS — pre/post delta +77pp on test pass rate + 0 regression in 414 pre-existing tests.",
+    "The 3 pre-fix passing tests were edge cases that passed by happenstance (empty string returns unknown regardless of fix; Approved-Implemented ordering matches `approved` first even with missing `implemented` token).",
+    "Word-boundary regex (`\\b<token>\\b`) is the structural fix — root-causes entire substring-shadow class including pre-existing `inactive`/`incomplete` shadows.",
+    "Skill description (state-scanner SKILL.md) NOT modified except adding 'Status 字段最佳实践' section (Rule #6 applies but no description text change).",
+    "Live verify completes the Rule #6 evidence: pending_archive went from 4 false positives → 0 (actual Aria spec set).",
+    "Precedent: aria-issue-triage-sop iteration-1 (2026-05-13) established that deterministic Skills measure AB via correctness (unit test or live scan), not capability-vs-baseline framing."
+  ]
+}
