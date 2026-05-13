@@ -1,7 +1,7 @@
 # Aria Issue #101 — fix `_normalize_status` substring + `Implemented` token gap
 
 > **Level**: 2 (Minimal — 单文件 bug fix + unit test + 1 doc note)
-> **Status**: **Approved (Phase A.2 R1 SCOPE_OK_R1)** — 2 agent unanimous PASS_WITH_WARNINGS, 4 Major inline-fixed (word-boundary + order + shadow tests)
+> **Status**: **Complete** (Phase A+B+C+D shipped 2026-05-13; merged via PR Aria#103 + aria-plugin#44; closes #101)
 > **Change ID**: `aria-issue-101-status-normalize`
 > **Trigger**: Forgejo Aria [#101](https://forgejo.10cg.pub/10CG/Aria/issues/101) — state-scanner v3.0 `_normalize_status` 子串匹配 "done" → `pending_archive` 假阳性
 > **Triage evidence**: [issuecomment-5972](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-5972) (manual) + [issuecomment-6019](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-6019) (AI dogfood)
