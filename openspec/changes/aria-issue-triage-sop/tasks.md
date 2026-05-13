@@ -1,7 +1,34 @@
 # Tasks — Aria Issue Triage SOP
 
-> Parent: [proposal.md](./proposal.md) | **Status**: Phase A.2 (R1 fixes applied 2026-05-13, ready for R2 audit)
+> Parent: [proposal.md](./proposal.md) | **Status**: **Phase A.3 准入** (Spec Approved 2026-05-13 R1+R2 SCOPE_OK_R2)
 > **Truth-source**: convention doc (`standards/conventions/issue-triage.md`); SKILL.md 引用而非复制
+
+---
+
+## Phase A.3 Agent Assignment
+
+| Task | Primary agent | Co-agent (review/secondary) | Rationale |
+|------|---------------|---------------------------|-----------|
+| **T1** triage.py collector | `aria:backend-architect` | `aria:code-reviewer` (mid-implementation) | stdlib-only Python, 类比 state-scanner scan.py 机械化 pattern, 系统架构 + schema 设计为主 |
+| **T2** SKILL.md | `aria:knowledge-manager` | `aria:tech-lead` (Skill 调用契约) | 文档架构 + 引用 SOT pattern (与 secret-hygiene 同模式) |
+| **T3** convention SOT | `aria:knowledge-manager` | — | 单 doc, 与 `standards/conventions/` 既有文档 (git-commit / secret-hygiene) 同结构 |
+| **T4** unit test + CI 集成 | `aria:qa-engineer` | `aria:backend-architect` (T1 接口边界) | 测试策略 + fixture 设计 + CI workflow 文件定位 |
+| **T5** dogfooding | `aria:qa-engineer` | owner (人工 review verdict 一致性) | acceptance rubric 执行 + 与 issuecomment-5972 diff 评估 |
+| **T6** Rule #9 decision memo | `aria:tech-lead` | `aria:knowledge-manager` (文档存档) | 流程/规范决策, incident-driven 入册路径设计 |
+| **T7** Phase C ship | (orchestrated by) `phase-c-integrator` skill | `audit-engine` (pre_merge checkpoint) | Aria 标准 phase 流程, 走 Rule #8 pre-merge gate |
+| **T8** skill-creator AB benchmark | owner (manual `/skill-creator` invocation) | — | Rule #6 不可协商, 必须人工触发, 不分配 Agent |
+
+**协作节奏** (per Aria 十步循环 B.2 含评审):
+- Phase B.1 branch 创建后,T1+T2+T3 可并行 (无相互依赖, 不同文件)
+- Phase B.2 实施阶段中, mid-implementation `aria:code-reviewer` 跑 1 次 (T1 完成后,T4 写测试前) — 早期介入捕 schema/collection_status 边界问题
+- Phase B.2 完成后, post-implementation audit (`audit-engine` checkpoint=`post_implementation`) 跑 1 轮 (Level 2 → convergence mode), team = T1/T2/T3 primary agents
+- Phase C.2.4 pre-merge gate 必跑 (Rule #8) + audit-engine `pre_merge` checkpoint 完整性 gate (#26 + #27 双重校验)
+
+**Phase B 入口条件** (已满足):
+- ✅ Spec Approved (post_spec R2 SCOPE_OK_R2)
+- ✅ tasks.md well-formed (T1-T8 effort baseline 12-16h)
+- ✅ Open Questions Q1-Q4 全 CLOSED (无遗留决策)
+- ✅ branch-manager 可直接起 `feature/aria-issue-triage-sop`
 
 ## Phase B Tasks (按依赖顺序)
 
