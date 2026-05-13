@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### US-025 M5 Phase A done (2026-05-13)
+
+Phase A 全部完成 (brainstorm + spec-drafter + R1+R2 audit + 准入 + B.1 分支)。
+Phase B.2 ~138h baseline 待新 session 启动。
+
+#### Phase A trajectory
+- 2026-05-10 brainstorm Q0-Q9 锁 (10 个决策, .aria/decisions/2026-05-10-us025-m5-brainstorm.md)
+- 2026-05-10 spec-drafter proposal + tasks (572 行 draft)
+- 2026-05-10 R1 audit 4-agent NEEDS_FIX (65 findings: 11C + 34I + 14m + 6o)
+- 2026-05-10..12 R2 fix-verify SCOPE_OK_R2 4/4 (92.3% reduction; R1 critical 100% closed)
+- 2026-05-13 R2-cleanup 14 polish applied (effort 130h→138h, OD trigger 156h→165h, etc)
+- 2026-05-13 Phase A.3 准入 Spec Status: Draft → Approved (.aria/decisions/2026-05-13-us025-m5-spec-approved.md)
+- 2026-05-13 Phase B.1 feature/aria-2.0-m5 branches dual-pushed (Aria 主仓 + aria-orchestrator)
+
+#### Spec scope (7 in M5 + 5 推 M6)
+- A Replay state-only (10h) / B Failure analysis + smart retry (15h) / C Drift defense commit lint + spec diff (12h) / D Review loop hybrid changes+redo (52h, max wp) / E Audit log SQLite immutable (15h) / F Risk-tier dual-write only (5h) / G cron direct transition (6h) / Phase 6 acceptance+docs (18h)
+- 推 M6: H aria-layer2-runner deploy + F.algorithm + A.advanced + B.advanced + C.advanced
+
+#### Baseline
+- Effort: 138h AI portion (T-deploy owner-runnable separately)
+- OD-M5-1 trigger: 165h (= 138 × 1.20)
+- PERT: optimistic 117h / likely 138h / pessimistic 165h
+
+#### abi_compat hard constraints (validate-m5-handoff.py 6 checks enforce)
+- #1 risk_tier_stub_to_risk_tier (M5 写 'always' literal not NULL per R2 TL-2)
+- #2 forgejo_approval_comment_id_unique_index
+- #3 comment_poll_cadence_independent
+- #4 human_decision_first_decision_wins
+- AD-M5-1..AD-M5-11 reserved (Phase B 回填)
+
+#### Memory entries (4 new feedback)
+- feedback_live_llm_gate_in_tier1 (Tier-1 必含 *.live, M4 paper-fix 防御)
+- feedback_audit_r2_collapse_default_vs_owner_invoked (R2 默认 collapse 条件)
+- feedback_abi_compat_schema_dual_write_literal (literal not NULL)
+- project_us025_m5_phase_a_b1_done_2026-05-13 (next session entry)
+
+---
+
 ## [1.7.0] - 2026-05-10
 
 ### Added — phase-c-integrator pre-merge gate cycle ship (Spec: phase-c-integrator-pre-merge-gate, Forgejo Issue #60)
