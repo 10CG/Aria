@@ -1,7 +1,7 @@
 # Aria Issue Triage SOP — 6-step standard process
 
 > **Level**: 2 (Minimal — 单 Skill 新增 + convention doc + 标准化已有手工流程)
-> **Status**: **Approved (post_dogfood)** (Phase B.2 T1-T6 完成; T5 dogfood PASS 2026-05-13, 94.9% cumulative ≥85% threshold; T5 dogfood comment at [issuecomment-6019](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-6019); ready for T8 benchmark + T7 Phase C ship)
+> **Status**: **Complete** (Phase A+B+C+D shipped 2026-05-13; merged via PR Aria#102 + aria-plugin#43 + aria-standards#3; ready for archive)
 > **Change ID**: `aria-issue-triage-sop` (`-sop` 后缀仅区分本次变更范围;Skill 目录名为 `issue-triage`)
 > **Trigger context**: 2026-05-13 处理 Forgejo [#101](https://forgejo.10cg.pub/10CG/Aria/issues/101) 时识别 — issue triage 流程缺位,容易跳到方案推荐而忽略版本/代码/in-flight 核对
 > **Triage canonical example**: [issuecomment-5972](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-5972)
