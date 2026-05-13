@@ -1,14 +1,19 @@
 # Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable
 
 > **Level**: 3 (Full — 跨多 module + 架构变更 + schema migration + abi_compat 约束)
-> **Status**: Draft (Phase A.1, ready for Phase A.2 post_spec audit)
+> **Status**: **Approved** (Phase A.2 post_spec audit R1+R2 SCOPE_OK_R2 4/4, R2 92.3% reduction; R3+ collapsed per Aria-default convergence — non-owner-invoked, R2 critical 11/11 closed + 0 new critical)
 > **Change ID**: `aria-2.0-m5-replay-reconciler-drift-review-loop-audit`
 > **Parent US**: [US-025](../../../docs/requirements/user-stories/US-025.md)
 > **Parent PRD**: [prd-aria-v2.md §M5](../../../docs/requirements/prd-aria-v2.md) (Week 20-25, 120h baseline)
 > **Predecessor Spec**: [aria-2.0-m4-human-gate-feishu-approval](../../archive/2026-05-09-aria-2.0-m4-human-gate-feishu-approval/proposal.md) (M4 archived 2026-05-09)
 > **Brainstorm Source**: [.aria/decisions/2026-05-10-us025-m5-brainstorm.md](../../../.aria/decisions/2026-05-10-us025-m5-brainstorm.md) (10 个 Q 全部锁定)
-> **Effort baseline**: 113-118h (vs 120h PRD lock); OD-M5-1 trigger at 144h
+> **Effort baseline**: 138h (R2-cleanup reconcile per TL-R2-1/4: feature 113-118h + Phase 6 实际 18h subtask sum); OD-M5-1 trigger raised to 165h (= 138 × 1.20, R2-cleanup TL-R2-2 raise from 156h for 6.5% pessimistic cushion)
 > **abi_compat hard constraints**: 4 forward-binding promises from m4-handoff.yaml (validate-m5-handoff.py enforced)
+> **Audit trajectory**:
+>   - Phase A.2 R1 (2026-05-10): NEEDS_FIX (65 findings: 11C + 34I + 14m + 6o); R1 report `.aria/audit-reports/post_spec-R1-2026-05-10T1506Z-aria-2.0-m5.md`
+>   - Phase A.2 R2 (2026-05-12): SCOPE_OK_R2 4/4 (92.3% reduction; 0 new critical, 1 new important closed inline as polish); R2 report `.aria/audit-reports/post_spec-R2-2026-05-12T2351Z-aria-2.0-m5.md`
+>   - R2-cleanup (2026-05-13): 14 minor/observation polish 应用 (TL-R2-1/2/3/4 + BA-R2-1/2/3/4 + QA-R2-1/2/3 + AI-R2-1/2/3 + QA-R2-2 important security)
+>   - R3+ collapsed: per Aria-default convergence (owner 未显式 invoke deep R3 stability per `feedback_owner_invoked_convergence_loop`); R1 critical 100% closed + R2 vote unanimity sufficient for Phase A.3 entry
 
 ---
 
@@ -93,78 +98,113 @@ M4 (US-024) 完成后, Aria 2.0 在 production 已能跑通 "AI dispatch → Lay
 
 ## How
 
-### 总体策略 (Phase Decomposition)
+### 总体策略 (Phase Decomposition, R2 reconcile)
 
 ```
-Phase 1 — Schema + Foundation (~30h)
-  ├── Schema migration v3 → v4 (含 F + E)
+Phase 1 — Schema + Foundation (~25h)
+  ├── Schema migration v3 → v4 (含 F dual-write + E + D 新列 + retry_count)
+  │     • 1.1-1.9 schema/db (12h)
+  │     • 1.10-1.13 instrumentation via AuditLogger middleware (10h)
+  │     • 1.14-1.15 risk-stub validate + AD-M5-8 (3h)
   ├── db.py helpers (append_audit_event, query_audit_log, get_risk_tier)
-  └── Audit log instrumentation (state_transition + llm_call + human_decision)
+  └── Audit log instrumentation (state_transition + llm_call via ProviderRouter middleware + human_decision)
 
 Phase 2 — G + B (~21h)
-  ├── comment-poll direct transition (G, 6h)
-  └── Failure analysis + smart retry (B, 15h)
+  ├── comment-poll direct transition (G, 6h) + partial failure recovery (AD-M5-9)
+  └── Failure analysis + smart retry (B, 15h) + JSON parse fallback + calibration spike
 
 Phase 3 — D Review loop (~50-55h, 最大 workpackage)
-  ├── Schema 加 rework_round / rework_of / rework_mode columns
-  ├── Comment-poll 协议扩展 (4 commands)
-  ├── /aria changes 改稿模式 Layer 2 二次进入 + force-push
-  ├── /aria redo 重做模式 新 dispatch + 旧 PR close
-  └── rework cap=3 enforcement + Feishu round 显示
+  ├── Schema 加 rework_round / rework_of / rework_mode / rework_feedback / retry_count (Phase 1 已含)
+  ├── Comment-poll 协议扩展 (4 commands) + AD-M5-2 rework_round semantics
+  ├── /aria changes 改稿模式 Layer 2 二次进入 + force-push (AD-M5-3/AD-M5-4)
+  ├── /aria redo 重做模式 新 dispatch + 旧 PR close (timing per AD-M5-3 §redo)
+  └── rework cap=3 enforcement + Feishu round 显示 + boundary tests
 
 Phase 4 — A Replay (~10h)
-  ├── aria_layer1/replay.py
+  ├── aria_layer1/replay.py (含 NULL-rework_mode handling + pre-M5 graceful degrade)
   ├── query audit log + dispatches 主表 join
   └── markdown report 生成
 
 Phase 5 — C Drift defense (~12h)
-  ├── Commit lint validator + Layer 2 hook (5h)
-  └── Spec diff LLM call + Feishu drift 卡片 (7h)
+  ├── Commit lint validator + Layer 2 hook (5h) + 12 enumerated fixtures + retry cap
+  └── Spec diff LLM call (S8_MERGE only) + Feishu drift 卡片 (7h) + input slicing + cost spike
 
-Phase 6 — T-acceptance + T-docs + T-prd-reframe + T-deploy
-  ├── Tier-1 synthetic 验收 (各项单元 + 集成测试)
-  ├── m5-handoff.yaml schema (additive on m4-handoff)
-  ├── AD-M5-1..M5-N 全部 backfill
-  ├── PRD 同步 (US-025 done + AD-M5 references)
+Phase 6 — T-acceptance + T-docs + T-prd-reframe + T-deploy (~12-15h, R2 扩展)
+  ├── Tier-1 synthetic 验收 (12 explicit subtasks per 12 criteria, ~10h, QA-1 fix)
+  ├── m5-handoff.yaml schema (additive on m4-handoff) + validate-m5-handoff.py 4 checks (~3h)
+  ├── AD-M5-1..AD-M5-11 全部 backfill (TL-9 mechanical assert)
+  ├── PRD 同步 (US-025 done + AD-M5 references) (~2h)
   └── T-deploy (owner-runnable, post-merge)
 ```
 
-### 关键技术决策 (AD-M5 slots, Phase B 实施期回填)
+**Effort sum reconcile (R2 fix TL-1 + R2-cleanup TL-R2-1/4)**:
+| Phase | Estimate | Range | Notes |
+|-------|----------|-------|-------|
+| Phase 1 | 25h | 22-28 | Schema + audit log instrumentation + risk-stub |
+| Phase 2 | 21h | 19-24 | G cron direct + B failure analysis |
+| Phase 3 | 52h | 50-55 | D Review loop hybrid (largest workpackage) |
+| Phase 4 | 10h | 9-12 | A Replay deterministic state |
+| Phase 5 | 12h | 11-14 | C Drift defense (commit lint + spec diff) |
+| Phase 6 | 18h | 16-20 | T-acceptance ~12 + T-docs ~3 + T-prd ~2 + verify ~1 (T-deploy owner-only excluded; R2-cleanup TL-R2-1 reconcile from 13h after subtask sum 检测) |
+| **Total (AI portion)** | **138h** | **127-153h** | T-deploy owner-runnable not counted in B.2 |
 
-| AD-M5-N | 主题 | Phase | Status |
-|---------|------|-------|--------|
-| AD-M5-1 | comment-poll direct transition reframe (supersedes AD-M4-9 § 决策 #4) | Phase 2 | _slot_ |
-| AD-M5-2 | rework_round 存储设计 (新 dispatch row vs 同 row counter) | Phase 3 | _slot_ |
-| AD-M5-3 | Layer 2 二次进入 mechanism (改稿 vs 重做的容器路径区分) | Phase 3 | _slot_ |
-| AD-M5-4 | force-push vs append-commit (改稿模式的 PR history shape) | Phase 3 | _slot_ |
-| AD-M5-5 | spec_drift_detected 阈值 (默认 70, 阈值可调机制) | Phase 5 | _slot_ |
-| AD-M5-6 | Failure analysis LLM prompt template 设计 + 版本管理 | Phase 2 | _slot_ |
-| AD-M5-7 | Audit log retention 策略 (M5 不做 archival, 推 M6) | Phase 1 | _slot_ |
-| AD-M5-8 | risk_tier dual-write 接口边界 (read-side hot-swap mechanism) | Phase 1 | _slot_ |
-| AD-M5-9 | comment-poll 进程崩溃后的 reconciler 兜底契约 | Phase 2 | _slot_ |
-| AD-M5-10 | abi_compat_promises forward-binding M5→M6 (新增 promises) | Phase 6 | _slot_ |
-| AD-M5-11 | T-deploy schema migration v3→v4 3-safeguard 实施 | Phase 6 | _slot_ |
+**Baseline lock**: 138h central (R2-cleanup TL-R2-4 reconcile from 130h; Phase 6 真实 subtask sum 18h 推高 total)
+**OD-M5-1 trigger**: 165h (= 138 × 1.20, R2-cleanup TL-R2-2 raise from 156h to give pessimistic 155h + 10h safety cushion ≈ 6.5%)
 
-### Schema migration v3 → v4 (additive only)
+### 关键技术决策 (AD-M5-1..AD-M5-11, Phase B 实施期回填; TL-9 mechanical assert)
+
+| ID | 主题 | Phase | Framing (R2 fix TL-10) | Status |
+|---|------|-------|------------------------|--------|
+| AD-M5-1 | comment-poll direct transition reframe (supersedes AD-M4-9 § 决策 #4) | Phase 2 | open decision | _slot_ |
+| AD-M5-2 | rework chain 机制文档 (per-row counter + rework_of FK, 锁定 R2 BA-1/BA-2 后) | Phase 3 | documentation (已 lock in §SQL) | _slot_ |
+| AD-M5-3 | Layer 2 二次进入 mechanism (改稿 vs 重做的容器路径 + redo PR close timing) | Phase 3 | open decision | _slot_ |
+| AD-M5-4 | force-push rationale lock (备选 append-commit 已考虑 rejected) | Phase 3 | documentation | _slot_ |
+| AD-M5-5 | spec_drift_detected 阈值 + nomadVar ARIA_SPEC_DRIFT_THRESHOLD 调机制 + input slicing | Phase 5 | open decision | _slot_ |
+| AD-M5-6 | Failure analysis LLM prompt + nomadVar ARIA_FAIL_RETRY_CONFIDENCE_MIN + calibration data | Phase 2 | open decision | _slot_ |
+| AD-M5-7 | Audit log retention 策略 (M5 不 archival, M6 trigger condition 显式) | Phase 1 | open decision | _slot_ |
+| AD-M5-8 | risk_tier dual-write 接口边界 + M5 stub write ('always' literal, not NULL, per R2 fix TL-2) | Phase 1 | open decision | _slot_ |
+| AD-M5-9 | comment-poll partial failure recovery + reconciler 兜底契约 (per R2 fix BA-3) | Phase 2 | open decision | _slot_ |
+| AD-M5-10 | abi_compat_promises M5→M6 forward-binding (新增 5 candidate promises 预 enumerate, R2 fix TL-14) | Phase 6 | open decision | _slot_ |
+| AD-M5-11 | T-deploy schema migration v3→v4 3-safeguard inline (per R2 fix QA-4) | Phase 6 | open decision | _slot_ |
+
+**AD-M5-10 forward-binding candidates** (预 enumerate per TL-14, finalized in Phase 6):
+1. dispatch_audit_log_immutable_promise (M5 INSERT-only enforced via DB triggers; M6 不得 DROP triggers)
+2. rework_round_cap_default_3_promise (M5 ARIA_REWORK_MAX_ROUND default=3; M6 不得改默认行为, 仅 nomadVar override)
+3. spec_drift_threshold_default_70_promise (同上)
+4. comment_poll_direct_transition_promise (M5 锁定 comment-poll 写 human_decision 后直接调 _handle_s7_human_gate; M6 不得回退到 cron-only transition)
+5. risk_tier_dual_write_literal_always_promise (M5 写 'always' literal not NULL; M6 算法上线时 dual-write real value 同时仍写 risk_tier_stub)
+
+### Schema migration v3 → v4 (additive only, R2 fixes BA-1/BA-2/BA-4/BA-5/BA-6/BA-13/QA-2)
 
 ```sql
 -- F Risk-tier dual-write column
 ALTER TABLE dispatches ADD COLUMN risk_tier TEXT;
--- (不 DROP risk_tier_stub, 不 RENAME)
+-- M5 写 'always' literal (per R2 fix TL-2 + AD-M5-8, satisfy abi_compat #1 真正 dual-write)
+-- 不 DROP risk_tier_stub, 不 RENAME
 
--- D Review loop columns
-ALTER TABLE dispatches ADD COLUMN rework_of INTEGER REFERENCES dispatches(rowid);
+-- D Review loop columns (R2 fix BA-1: FK 用 dispatch_id TEXT 而非 rowid; BA-5: rework_mode NULL OK for parent rows)
+ALTER TABLE dispatches ADD COLUMN rework_of TEXT REFERENCES dispatches(dispatch_id);
 ALTER TABLE dispatches ADD COLUMN rework_round INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE dispatches ADD COLUMN rework_mode TEXT CHECK(rework_mode IN ('changes', 'redo'));
+ALTER TABLE dispatches ADD COLUMN rework_mode TEXT CHECK(rework_mode IS NULL OR rework_mode IN ('changes', 'redo', 'retry'));
+-- BA-6 fix: 分离 fail_reason (enum) 与 rework_feedback (user prose)
+ALTER TABLE dispatches ADD COLUMN rework_feedback TEXT;
+-- QA-2 fix: retry_count 列 for B 项 Failure analysis system retry guard
+ALTER TABLE dispatches ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0;
 
--- E Audit log immutable table
+-- E Audit log immutable table (R2 fix BA-4: event_type CHECK; BA-13: FOREIGN KEY)
 CREATE TABLE dispatch_audit_log (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   dispatch_id  TEXT    NOT NULL,
   ts           TEXT    NOT NULL,
   event_type   TEXT    NOT NULL,
   payload_json TEXT    NOT NULL,
-  CHECK (json_valid(payload_json))
+  CHECK (json_valid(payload_json)),
+  CHECK (event_type IN (
+    'state_transition', 'llm_call', 'human_decision',
+    'rework_cycle', 'failure_analysis', 'risk_tier_classified',
+    'spec_drift_detected', 'commit_lint_result'
+  )),
+  FOREIGN KEY (dispatch_id) REFERENCES dispatches(dispatch_id)
 );
 CREATE INDEX idx_audit_dispatch_ts ON dispatch_audit_log(dispatch_id, ts);
 
@@ -173,11 +213,23 @@ CREATE TRIGGER audit_no_update BEFORE UPDATE ON dispatch_audit_log
 CREATE TRIGGER audit_no_delete BEFORE DELETE ON dispatch_audit_log
   BEGIN SELECT RAISE(ABORT, 'audit log immutable'); END;
 
--- 2 new fail_reason values
--- (CHECK constraint update via migration script per `feedback_schema_migration_3_safeguard_pattern`)
--- 'rework_exceeded'  (rework_round >= ARIA_REWORK_MAX_ROUND)
--- 'changes_requested' (existing M4 reject_reason now used as fail_reason for /aria changes /redo)
+-- 2 new fail_reason values (via migration script per 3-safeguard pattern inline in T-deploy 6.18)
+-- 'rework_exceeded'  (rework_round > ARIA_REWORK_MAX_ROUND, see semantics below)
+-- 'changes_requested' (current dispatch row 进入此终态 when /aria changes 或 /aria redo 触发, 新 dispatch row 接力)
 ```
+
+**Comment-poll protocol field mapping (R2-cleanup BA-R2-4)**:
+- `/aria approve` → `human_decision='approve'`; no rework_feedback
+- `/aria reject: <reason>` → `human_decision='reject'`; `reject_reason=<reason>` (M4 字段保留, enum-like categorical)
+- `/aria changes: <feedback>` → `human_decision='changes_requested'`; **`rework_feedback=<feedback>`** (M5 新增专用列, free-form text); 新 dispatch row `rework_mode='changes'`
+- `/aria redo: <feedback>` → 同 changes, `rework_mode='redo'`
+
+**rework_round semantics lock (R2 fix BA-2 + AD-M5-2 documentation)**:
+- 原始 dispatch (无 rework): `rework_round=0, rework_of=NULL, rework_mode=NULL`
+- /aria changes round 1: 新 row `rework_round=1, rework_of=<original_id>, rework_mode='changes'`
+- /aria redo round 2: 新 row `rework_round=2, rework_of=<round1_id>, rework_mode='redo'`
+- cap=3 含义: ARIA_REWORK_MAX_ROUND=3 → **允许最多 3 个 rework rows (round=1,2,3)**; round=4 创建拒绝, 当前 row → S_FAIL(rework_exceeded)
+- System retry (B Failure analysis, R2 fix BA-7): 新 row `rework_round=0, rework_of=<parent>, rework_mode='retry'`, 不消耗 owner-facing rework cap; retry_count 单独追踪 (max 1 per dispatch)
 
 ### 4 commands comment-poll protocol
 
@@ -199,48 +251,58 @@ cap 触发:
 
 ---
 
-## Constraints (abi_compat hard 约束, M5 不可违反)
+## Constraints (abi_compat hard 约束, M5 不可违反; R2 fix TL-3 完整 4 enforcement)
 
-| Promise | M5 必须遵守 | Enforcement |
-|---------|------------|-------------|
-| #1 risk_tier_stub_to_risk_tier | ADD COLUMN risk_tier 不 RENAME 不 DROP stub; dual-write; read hot-swap | validate-m5-handoff.py::check_risk_tier_migration_acknowledged |
-| #2 forgejo_approval_comment_id_unique_index | 不 DROP uq_approval_comment; rebuild 时保持 partial WHERE NOT NULL 语义 | validate-m5-handoff.py::check_unique_index_preserved |
-| #3 comment_poll_cadence_independent | comment-poll 仍独立 Nomad job (不合并到其他 job, 即使 G 项扩展责任) | M5 deploy review (T-deploy.6 carryforward) |
-| #4 human_decision_first_decision_wins | rework 用 NEW dispatch row, 同 row human_decision 一次性写入 | validate-m5-handoff.py::check_first_decision_wins_preserved |
+| Promise | M5 必须遵守 | Enforcement | Tasks Ref |
+|---------|------------|-------------|-----------|
+| #1 risk_tier_stub_to_risk_tier | ADD COLUMN risk_tier 不 RENAME 不 DROP stub; dual-write 写 'always' literal (per AD-M5-8); read hot-swap | validate-m5-handoff.py::check_risk_tier_migration_acknowledged | T6.6.1 |
+| #2 forgejo_approval_comment_id_unique_index | 不 DROP uq_approval_comment; rebuild 时保持 partial WHERE NOT NULL 语义 | validate-m5-handoff.py::check_unique_index_preserved | T6.6.2 |
+| #3 comment_poll_cadence_independent | comment-poll 仍独立 Nomad job (G 项扩展责任 OK, 但不合并到 reconciler/cron job) | validate-m5-handoff.py::check_comment_poll_job_independent (扫 deploy/*.nomad.hcl 验证 aria-layer1-comment-poll job 存在且 type=batch) | T6.6.3 |
+| #4 human_decision_first_decision_wins | rework 用 NEW dispatch row, 同 row human_decision 一次性写入 (per AD-M5-2 lock); CAS 守卫 | validate-m5-handoff.py::check_first_decision_wins_preserved | T6.6.4 |
 
 ---
 
 ## Acceptance criteria
 
-### Tier-1 (synthetic, AI-implementable, 必过)
+### Tier-1 (synthetic, AI-implementable, 必过, R2 fix AI-1 + QA-1 增 live LLM + 完整 mapping)
 
-- [ ] **A.1** Replay output 含完整 state 时间线 + LLM metadata + rework chain (单元测试 + 集成测试)
-- [ ] **B.1** Failure analysis LLM 调用 + retry/abort/notify_owner 路径 + audit log 写入 (单元测试 + mock LLM 集成测试)
-- [ ] **C.1** Commit lint 拒绝不规范 commit (regex 单元测试 12+ fixtures)
-- [ ] **C.2** Spec diff LLM 调用 + score 计算 + Feishu 警告卡片 (单元测试 + mock LLM)
-- [ ] **D.1** /aria changes + /aria redo 创建新 dispatch row (集成测试: 4 commands × 3 rounds)
-- [ ] **D.2** rework_round cap=3 enforcement (单元测试: round 3 后 fail_reason='rework_exceeded')
-- [ ] **D.3** abi_compat #4 first-decision-wins 保持 (集成测试: 同一 row 多次写 human_decision 应被 CAS 拒绝)
-- [ ] **E.1** Schema migration v3→v4 backward-compat (per `feedback_schema_migration_3_safeguard_pattern`)
-- [ ] **E.2** Audit log immutable (UPDATE/DELETE 都 RAISE)
-- [ ] **F.1** risk_tier 列加但 M5 行为不变 (validate-m5-handoff.py::check_risk_tier_migration_acknowledged)
-- [ ] **G.1** comment-poll direct transition 集成测试 (mock approve → 60s 内 state=S8_MERGE)
-- [ ] **All** 单元测试 + 集成测试合计 ≥ 600 PASS (vs M4 final 537)
+- [ ] **A.1** Replay output 含完整 state 时间线 + LLM input_prompt+output_text + rework chain (单元 + 集成测试 + pre-M5 dispatch graceful degrade test)
+- [ ] **B.1** Failure analysis mock LLM: retry/abort/notify_owner 路径 + confidence 0.7 boundary + JSON parse fallback + audit log 写入
+- [ ] **B.1.live** Failure analysis live LLM gate (per R2 fix AI-1): 至少 1 次真 ProviderRouter call to glm-4.5-air,验证 (a) JSON schema 合规率 (b) confidence 字段 ∈ [0,1] (c) action 字段 ∈ enum (d) fallback chain 行为正确
+- [ ] **C.1** Commit lint regex 12 enumerated fixtures (per R2 fix QA-5,见 tasks 5.5)
+- [ ] **C.2** Spec diff mock LLM + score 计算 + Feishu 警告卡片 + S_FAIL skip + input slicing (proposal What/Acceptance only)
+- [ ] **C.2.live** Spec diff live LLM gate (per R2 fix AI-1): 至少 1 次真 LLM call 在 1 个 mock PR diff,验证 JSON 合规 + score 字段 ∈ [0,100]
+- [ ] **D.1** /aria changes + /aria redo 创建新 dispatch row (集成测试: 4 commands × 3 rounds × mixed mode)
+- [ ] **D.2** rework_round cap=3 enforcement (单元测试: round=3 创建 OK, round=4 创建 reject + 当前 row → S_FAIL(rework_exceeded))
+- [ ] **D.3** abi_compat #4 first-decision-wins 保持 (集成测试: 同一 row 多次写 human_decision 被 CAS 拒绝;新 row 接力一次性写入)
+- [ ] **D.4** redo 模式 PR close 时序: 新 PR 创建后 (S5_PR_CREATED handler) 才写 "Superseded by #<new>" comment + close 旧 PR (per R2 fix BA-9)
+- [ ] **D.5** Forgejo PR close failure handling (mock Forgejo 5xx, 系统状态不 orphaned, 失败写 audit log) (per R2 fix QA-9)
+- [ ] **E.1** Schema migration v3→v4 3-safeguard inline (atomic backup + dry-run on copy + integrity_check + row_count assert per R2 fix QA-4)
+- [ ] **E.2** Audit log immutable (UPDATE/DELETE 都 RAISE; event_type CHECK 拒绝非法 enum; FK 拒绝 orphan)
+- [ ] **F.1** risk_tier 列加 + M5 dispatcher 写 'always' literal (not NULL, per R2 fix TL-2); validate-m5-handoff.py 4 checks PASS
+- [ ] **G.1** comment-poll direct transition 集成测试 (mock approve → 60s 内 state=S8_MERGE) + partial failure recovery via reconciler 兜底 (per R2 fix BA-3)
+- [ ] **HMAC.1** Feishu HMAC computation oracle test (independent fixture, per R2 fix TL-8: 防止 M4 paper-fix 复发)
+- [ ] **All** 单元测试 + 集成测试合计 ≥ 600 PASS from ≥30 new test functions (≥15 为 behavioral integration tests, per R2 fix QA-14)
 
-### Tier-2 (real-dispatch, post-deploy 累积, 不阻塞 Phase D.2)
+### Tier-2 (real-dispatch, post-deploy 累积, 不阻塞 Phase D.2; R2 fix QA-10 加 minimum partial acceptance)
 
+**Minimum partial Tier-2 acceptance** (Phase D.2 owner sign-off 前必过, per R2 fix QA-10):
+- [ ] **G.2.real** real comment → S8_MERGE max latency < 60s (R2 fix QA-20: max over ≥3 dispatches, p99 留到 ≥20 累积)
+- [ ] **TIER-2-min-fallback** 若 2 周内无真 dispatch, owner 可强制 test dispatch (SQL inject S_FAIL + 验证 failure analysis 触发) 替代 B.2.real, 文档化 owner override
+
+**Full Tier-2 (累积型, 不阻塞 production launch)**:
 - [ ] **D.2.real** ≥3 real dispatches 含 ≥1 changes + ≥1 redo + ≥1 reject + ≥1 successful approve
 - [ ] **D.2.cap** 至少 1 个 dispatch 测到 rework_round=2 (非边界测试)
 - [ ] **B.2.real** ≥1 real failure 触发 Failure analysis LLM 给出建议 (owner 验证建议合理)
 - [ ] **C.2.real** ≥1 real spec drift detected (score < 70 触发卡片) — owner 验证 drift 真实
-- [ ] **G.2.real** real comment → S8_MERGE p99 latency < 60s (M4 实测 17min 含中断, M5 必须 < 60s)
+- [ ] **H.dep.note** aria-layer2-runner deploy (M6 推迟,Track A-4) 阻塞 D.2.real 真 dispatch; Phase D.2 owner 显式 sign-off accept partial Tier-2 (per R2 fix TL-7)
 
 ### Phase D.2 final go_decision
 
 - [ ] m5-handoff.yaml validator OK ✅
-- [ ] m5-handoff.yaml::abi_compat_promises 全 4 条遵守 + 新增 M5→M6 forward-binding 文档化
-- [ ] AD-M5-1..M5-N 全部 Decided
-- [ ] Tier-2 N≥3 累积或 owner 显式 sign-off accept partial Tier-2
+- [ ] m5-handoff.yaml::abi_compat_promises 全 4 条遵守 + 新增 5 M5→M6 forward-binding 文档化 (per AD-M5-10)
+- [ ] **AD-M5-1..AD-M5-11 全部 Decided** (R2 fix TL-9: mechanical assert, 不用 'N')
+- [ ] Tier-2 minimum partial 达成 (G.2.real + TIER-2-min-fallback per QA-10) OR Tier-2 N≥3 累积 OR owner 显式 sign-off accept partial
 
 ---
 
@@ -248,7 +310,7 @@ cap 触发:
 
 | ID | Risk | Severity | Mitigation |
 |----|------|----------|------------|
-| R-M5-1 | D Review loop 是 M5 最大 workpackage (~50-55h, 41% M5), 估计偏差风险大 | High | Phase A.1 早期 break down 到 ≤8h sub-tasks; 每周 progress review; AD-M5-2/3/4 早期 lock |
+| R-M5-1 | D Review loop 是 M5 最大 workpackage (~50-55h, 41% M5), 估计偏差风险大 | High | Phase A.1 早期 break down 到 ≤8h sub-tasks; 每周 progress review; AD-M5-2/3/4 早期 lock; **R2 fix TL-11: Phase 3 mid-checkpoint 加 (after schema+protocol ~15h)** |
 | R-M5-2 | Failure analysis LLM 不稳定 (B 项) → 误 retry / 误 abort | Medium | confidence 阈值 0.7 + retry_count < 1 + 仅可恢复 fail_reason; LLM 错也最多多 1 次 dispatch (cost 可控) |
 | R-M5-3 | Spec diff LLM 可能误判 drift (C 项) | Medium | score < 70 仅 Feishu 警告 (不阻塞); owner judge 是否真 drift; 阈值 nomadVar 可调 |
 | R-M5-4 | Schema migration v3 → v4 风险 (含新表 + 多列 + INSERT-only triggers) | High | per `feedback_schema_migration_3_safeguard_pattern` 三重保险 (atomic backup + dry-run on copy + apply on prod with integrity check + row count assert) |
@@ -265,18 +327,23 @@ cap 触发:
 M2: 156h baseline → ~150h actual, ratio 0.96 (≈ baseline)
 M3: 60h baseline → 72h actual, ratio 1.20 (over, OD-13)
 M4: 60h baseline → 22-26h actual, ratio 0.47 (under, OD-M4-2 retrospective)
-M5: 120h baseline → ~? (本 Spec)
+M5: 138h baseline (R2-cleanup reconcile per TL-R2-1/4) → ~? (本 Spec)
    ─ σ 大 (M2-M4 0.42-1.20), 单点估算 unreliable
-   ─ 建议 PERT 三点估算 (per OD-M4-2 §M5 application guidance):
-     • optimistic   ~95h  (Trust-but-verify 红利同 M4 模式)
-     • likely      ~115h  (本 Spec 估算)
-     • pessimistic ~140h  (D Review loop 偏差 + LLM 调试反复)
-   ─ OD-M5-1 trigger: 144h (= 120 × 1.2)
+   ─ PERT 三点估算 (per OD-M4-2 §M5 application guidance + R2-cleanup):
+     • optimistic   ~117h  (Trust-but-verify 红利同 M4 模式 ratio 0.85)
+     • likely      ~138h  (本 Spec R2-cleanup 估算)
+     • pessimistic ~165h  (D Review loop 偏差 + LLM 调试反复 ratio 1.20)
+   ─ OD-M5-1 trigger: 165h (= 138 × 1.20, R2-cleanup TL-R2-2 raise to match pessimistic + 0h margin: exact pessimistic 触发即合理 retrospective signal)
 ```
 
-**M5 中期监控 (Phase B 实施)**:
-- Phase 1+2 完成后 (~51h预算): 实测 actual_h_phase_1_plus_2 vs 51 estimate, 偏差 > 30% → 触发 mid-impl reforecast (per `feedback_audit_convergence_pattern` mid-implementation 模式)
-- Phase 3 (D Review loop) 是高风险段, 加 R3 audit checkpoint
+**M5 中期监控 (Phase B 实施, R2 fix TL-11 加 Phase 3 mid-checkpoint + QA-19 加 reforecast 响应协议)**:
+- **Checkpoint 1 — Phase 1+2 完成后 (~46h 预算 R2 reconcile)**: 实测 vs 46h, 偏差 > 30% (> 60h) → 触发 mid-impl reforecast (响应协议见下)
+- **Checkpoint 2 — Phase 3 中期 (schema+protocol ~15h 完成后)**: 跑 R3 audit on rework-loop 设计, 验证 AD-M5-2/3/4 实施前真锁
+- **Reforecast 响应协议 (per QA-19, 类比 OD-M4-1 三层)**:
+  1. 实测 actual_h_phase_1_plus_2 > 60h → 重算 M5 total projection
+  2. 识别 Phase 3 sub-tasks eligible for M6 deferral (优先级: redo mode full cycle > changes mode > 共用 schema)
+  3. Owner decision required within 1 session before Phase 3 start
+  4. M5 total > 156h → 触发 OD-M5-1 underbaseline-or-overbaseline retrospective decision
 
 ---
 
