@@ -1,6 +1,6 @@
 # Tasks — Aria Issue #101 status normalize fix
 
-> Parent: [proposal.md](./proposal.md) | **Status**: Phase A.2 draft, ready for post_spec audit
+> Parent: [proposal.md](./proposal.md) | **Status**: Phase A.2 R1 SCOPE_OK_R1 (2 agent PASS_WITH_WARNINGS unanimous, 4 Major inline-fixed), ready for Phase B
 
 ## Phase B Tasks (按依赖顺序)
 
@@ -15,15 +15,24 @@
 ### T2 — Unit tests (~1h)
 
 - [ ] **T2.1** Add `aria/skills/state-scanner/tests/test_status_normalize.py` (new file)
-- [ ] **T2.2** Test cases (regression + edge):
-  - 4 issue #101 真实 Status 字符串 (proposal Success Criteria 列出)
-  - "Active" 单 token → `active`
-  - "Implemented" 单 token → `implemented` (new state)
-  - "Done" 单 token → `done` (verify fallback still works)
-  - "Archived 2026-01-01" → `archived` (terminal precedence)
-  - `None` / 空字符串 → `unknown`
+- [ ] **T2.2** Test cases (R1 audit refined — 3 categories):
+  - **Bug 1+2 fix verification** (4 issue #101 strings, proposal §Success Criteria 列出)
+  - **Shadow guards** (R1 BA-M1 / BA-m2 / QA-M1):
+    - `"Inactive — superseded"` → `unknown` (NOT `active`)
+    - `"Unimplemented stubs"` → `unknown` (NOT `implemented`)
+    - `"Incomplete (missing sections)"` → `unknown` (NOT `done`)
+    - `"Approved (Implemented by PR-A)"` → `approved` (BA-M2: ordering: approved BEFORE implemented)
+  - **Positive regression** (R1 BA-m4 / QA-m5 — confirm reorder didn't break happy path):
+    - `"Active"` / `"Reviewed"` / `"Ready"` 单 token → respective states
+    - `"In Progress (50% done)"` → `in_progress` (multi-word phrase + shadow inside)
+    - `"ready (Phase A done)"` → `ready` (shadow inside narrative)
+  - **Existing happy path**:
+    - `"Done"` 单 token → `done` (fallback still works)
+    - `"Implemented"` 单 token → `implemented` (new state)
+    - `"Archived 2026-01-01"` → `archived` (terminal precedence)
+    - `None` / 空字符串 → `unknown`
 - [ ] **T2.3** Run state-scanner 整体 test suite, 确认无 regression (pre-fix all green, post-fix all green)
-- [ ] **T2.4** Live verify: `python3 aria/skills/state-scanner/scripts/scan.py --output /tmp/scan-after-fix.json` → 检查 `openspec.pending_archive` 在 Aria 4 spec 上为空
+- [ ] **T2.4** Live verify: `python3 aria/skills/state-scanner/scripts/scan.py --output /tmp/scan-after-fix.json` → 检查 `openspec.pending_archive` 在 Aria 当前所有 `openspec/changes/` 内 spec 上为空 (R1 QA-m1: 不写死 4 个,以当前内容为准)
 
 ### T3 — Doc update (~30min)
 

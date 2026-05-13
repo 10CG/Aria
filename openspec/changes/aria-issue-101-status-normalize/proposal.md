@@ -1,7 +1,7 @@
 # Aria Issue #101 — fix `_normalize_status` substring + `Implemented` token gap
 
-> **Level**: 2 (Minimal — 单文件 bug fix + 4 unit test + 1 doc note)
-> **Status**: Draft (Phase A.1+A.2)
+> **Level**: 2 (Minimal — 单文件 bug fix + unit test + 1 doc note)
+> **Status**: **Approved (Phase A.2 R1 SCOPE_OK_R1)** — 2 agent unanimous PASS_WITH_WARNINGS, 4 Major inline-fixed (word-boundary + order + shadow tests)
 > **Change ID**: `aria-issue-101-status-normalize`
 > **Trigger**: Forgejo Aria [#101](https://forgejo.10cg.pub/10CG/Aria/issues/101) — state-scanner v3.0 `_normalize_status` 子串匹配 "done" → `pending_archive` 假阳性
 > **Triage evidence**: [issuecomment-5972](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-5972) (manual) + [issuecomment-6019](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-6019) (AI dogfood)
@@ -64,41 +64,80 @@ if "approved" in low:                # ← L64, 永远到不了
 - 新增 lifecycle states 超出 `implemented` (如 `verifying`, `monitoring` 等推后续 cycle 评估)
 - 改 state-scanner snapshot schema (新 state `implemented` 仅出现在 collector 输出, scan-snapshot consumers 兼容)
 
-### Fix sketch
+### Fix sketch (R1 audit refined — word boundary + order)
+
+R1 audit (BA + QA) 发现 substring shadow 类问题: 单纯 `X in low` 会让 `inactive` 命中 `active` / `unimplemented` 命中 `implemented` / `incomplete` 命中 `complete`。修复办法: **word-boundary regex 匹配** 根治 shadow 类。
 
 ```python
+import re
+
+# Word-boundary token matcher: prevents substring shadowing
+# (e.g., "inactive" no longer matches "active", "unimplemented" no longer matches "implemented")
+def _has_token(text: str, token: str) -> bool:
+    """Match token as a whole word in text. Both args lower-case."""
+    return re.search(r"\b" + re.escape(token) + r"\b", text) is not None
+
+
 def _normalize_status(raw: str | None) -> str:
+    """Normalize Status string to OpenSpec-aligned lifecycle states.
+
+    Priority order (R1 audit refined):
+      1. Terminal (archived / deprecated) — irreversible
+      2. Pending family (draft / pending / placeholder)
+      3. In-progress family (containing space + i18n)
+      4. approved (moved BEFORE implemented/done — BA-M2; "Approved (Implemented)" should → approved)
+      5. implemented (Bug 2 fix — was missing from dict)
+      6. reviewed / active / ready
+      7. done / complete — LAST fallback (Bug 1 fix)
+
+    Uses word-boundary matching to prevent substring shadows (#101 root cause).
+    """
     if raw is None:
         return "unknown"
     low = raw.lower()
-    # Terminal states first (irreversible)
-    if "archived" in low:
+
+    # Terminal states first
+    if _has_token(low, "archived"):
         return "archived"
-    if "deprecated" in low:
+    if _has_token(low, "deprecated"):
         return "deprecated"
-    # Explicit lifecycle states (priority: most specific to least)
+
+    # Pending family
     for token in ("draft", "pending", "placeholder"):
-        if token in low:
+        if _has_token(low, token):
             return "pending"
-    for token in ("in progress", "in_progress", "in-progress", "进行中"):
-        if token in low:
+
+    # In-progress family (multi-word + i18n; literal substring is correct here
+    # because the exact phrases are unambiguous)
+    for phrase in ("in progress", "in_progress", "in-progress", "进行中"):
+        if phrase in low:
             return "in_progress"
-    if "implemented" in low:           # ← NEW (Bug 2 fix)
-        return "implemented"
-    if "approved" in low:               # ← moved BEFORE done (Bug 1 fix)
+
+    # approved BEFORE implemented (BA-M2): "Approved (Implemented by PR-A)" → approved
+    if _has_token(low, "approved"):
         return "approved"
-    if "reviewed" in low:
+    if _has_token(low, "implemented"):  # Bug 2 fix
+        return "implemented"
+    if _has_token(low, "reviewed"):
         return "reviewed"
-    if "active" in low:
+    if _has_token(low, "active"):
         return "active"
-    if "ready" in low:
+    if _has_token(low, "ready"):
         return "ready"
-    # Done/complete LAST as fallback (avoids substring shadowing)
+
+    # done/complete LAST as fallback (Bug 1 fix)
     for token in ("done", "complete"):
-        if token in low:
+        if _has_token(low, token):
             return "done"
+
     return "unknown"
 ```
+
+**Shadow guards now handled by `\b` word boundary** (no need for explicit `inactive`/`unimplemented`/`incomplete` exclusion):
+- `"Inactive — superseded"` → `unknown` (good, was `active` before fix)
+- `"Unimplemented stubs"` → `unknown` (good, would be `implemented` without `\b`)
+- `"Incomplete (missing sections)"` → `unknown` (good, was `done` before fix)
+- `"Approved (Implemented by PR-A)"` → `approved` (good, matches first in priority order)
 
 ---
 
@@ -133,9 +172,18 @@ def _normalize_status(raw: str | None) -> str:
   - `"Implemented (...) — post-deploy 验证后归档"` → `implemented`
   - `"Implemented (...) — UAT PASS; post-monitoring 后归档"` → `implemented`
   - `"⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09"` → `pending`
+- [ ] **Shadow guards** (R1 audit BA-M1 + QA-M1):
+  - `"Inactive — superseded"` → `unknown` (NOT `active`)
+  - `"Unimplemented stubs"` → `unknown` (NOT `implemented`)
+  - `"Incomplete (missing sections)"` → `unknown` (NOT `done`)
+  - `"Approved (Implemented by PR-A)"` → `approved` (BA-M2 ordering)
+- [ ] **Positive regression** (R1 BA-m4 + QA-m5):
+  - `"Active"` → `active` / `"Reviewed"` → `reviewed` / `"Ready"` → `ready` (single-token)
+  - `"In Progress (50% done)"` → `in_progress` (multi-word + shadow inside)
+  - `"ready (Phase A done)"` → `ready` (shadow inside narrative)
 - [ ] 现有 state-scanner 测试 (`aria/skills/state-scanner/tests/`) 全部通过 (无 regression)
 - [ ] 新 unit test (T2) 全部通过
-- [ ] `pending_archive` snapshot field 在 Aria 自身 4 个 active spec 上返回**空数组** (live 验证)
+- [ ] `pending_archive` snapshot field 在 Aria 当前所有 active spec 上返回**空数组** (live 验证;R1 QA-m1: 不写死 4 个,以当前 `openspec/changes/` 内容为准)
 - [ ] Rule #6 benchmark: with-fix vs without-fix delta > 0 on pending_archive accuracy
 
 ---
