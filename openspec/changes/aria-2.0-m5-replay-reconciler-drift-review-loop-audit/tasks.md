@@ -162,15 +162,15 @@
 
 ## Phase 4 — A Replay (~10h, R2 fixes BA-5/BA-18/QA-11/QA-18/AI-4)
 
-- [ ] 4.1 设计 replay output format = markdown only (per R2 fix BA-18 lock; JSON 推 M6); 文档化 AD-M5-10 forward-binding 'replay output 格式 M6 可加 JSON'
-- [ ] 4.2 aria_layer1/replay.py::replay(dispatch_id) 主入口 (返回 markdown 字符串)
-- [ ] 4.3 query audit log + dispatches 主表 join (用 db.py::query_audit_log)
-- [ ] 4.4 时间序输出: state 转换 + LLM 调用 (含 input_prompt 前 200 字符 + output_text 摘要 per R2 fix AI-4) + human decisions + rework cycles + failure analysis + drift detection 全部按 ts 排序
-- [ ] 4.5 rework chain 输出: 递归展开 rework_of 链 (round 1 → round 2 → round 3) + NULL rework_mode 处理 (per R2 fix BA-5: 根 dispatch rework_mode=NULL 显示 'origin')
-- [ ] 4.6 markdown 渲染: 表格 + 链接 + 代码块 + Forgejo PR 链接
-- [ ] 4.7 文件输出: 默认 stdout, `--output-file` 选项写入 `.aria/replay-reports/{dispatch_id}.md`; dispatch_id sanitize (per R2 fix QA-18: 替换非 alphanumeric/dash/underscore 为 underscore 防 path traversal)
-- [ ] 4.8 单元测试: replay 各种场景 (无 rework / 1 round changes / 2 round mixed / 含 failure analysis / 含 drift / NULL rework_mode 根 dispatch / dispatch_id 含特殊字符)
-- [ ] 4.9 集成测试 (per R2 fix QA-11): replay 合成 dispatch (manually seeded audit log entries, 不依赖 M4 production 数据) + pre-M5 dispatch graceful degrade ('audit log: no entries (pre-M5 dispatch)')
+- [x] 4.1 设计 replay output format = markdown only (per R2 fix BA-18 lock; JSON 推 M6); 文档化 AD-M5-10 forward-binding 'replay output 格式 M6 可加 JSON'
+- [x] 4.2 aria_layer1/replay.py::replay(dispatch_id) 主入口 (返回 markdown 字符串)
+- [x] 4.3 query audit log + dispatches 主表 join (用 db.py::query_audit_log)
+- [x] 4.4 时间序输出: state 转换 + LLM 调用 (含 input_prompt 前 200 字符 + output_text 摘要 per R2 fix AI-4) + human decisions + rework cycles + failure analysis + drift detection 全部按 ts 排序
+- [x] 4.5 rework chain 输出: 递归展开 rework_of 链 (round 1 → round 2 → round 3) + NULL rework_mode 处理 (per R2 fix BA-5: 根 dispatch rework_mode=NULL 显示 'origin')
+- [x] 4.6 markdown 渲染: 表格 + 链接 + 代码块 + Forgejo PR 链接
+- [x] 4.7 文件输出: 默认 stdout, `--output-file` 选项写入 `.aria/replay-reports/{dispatch_id}.md`; dispatch_id sanitize (per R2 fix QA-18: 替换非 alphanumeric/dash/underscore 为 underscore 防 path traversal)
+- [x] 4.8 单元测试: replay 各种场景 (无 rework / 1 round changes / 2 round mixed / 含 failure analysis / 含 drift / NULL rework_mode 根 dispatch / dispatch_id 含特殊字符)
+- [x] 4.9 集成测试 (per R2 fix QA-11): replay 合成 dispatch (manually seeded audit log entries, 不依赖 M4 production 数据) + pre-M5 dispatch graceful degrade ('audit log: no entries (pre-M5 dispatch)')
 
 ---
 
