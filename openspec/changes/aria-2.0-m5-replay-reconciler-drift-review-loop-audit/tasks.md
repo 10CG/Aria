@@ -108,22 +108,22 @@
 
 ### T-rework-loop schema (~5h, Phase 1 已含 schema, 此处验证 + AD-M5-2 documentation)
 
-- [ ] 3.1 schema migration 包含 rework_of TEXT FK / rework_round / rework_mode / rework_feedback / retry_count columns (Phase 1 task 1.1 已含)
-- [ ] 3.2 db.py::create_rework_dispatch / count_rework_chain helpers (Phase 1 task 1.6.5 / 1.6.6 已含, 此处验证)
-- [ ] 3.3 文档: AD-M5-2 slot (rework chain 机制 documentation per R2 fix TL-10; per-row counter + rework_of FK 已 lock in §SQL; cap=3 含义: ≤3 rework rows allowed, round=4 reject)
-- [ ] 3.4 单元测试: rework chain 创建 + cap boundary (round=3 创建 OK, round=4 创建 reject + 当前 row → S_FAIL(rework_exceeded)) + 含 mode='retry' 不消耗 owner cap (per R2 fix BA-7)
-- [ ] 3.4.5 单元测试: cyclic rework_of chain (合成 corrupt data) → count_rework_chain 不 hang (LIMIT 10 guard 起效, raise or sentinel)
+- [x] 3.1 schema migration 包含 rework_of TEXT FK / rework_round / rework_mode / rework_feedback / retry_count columns (Phase 1 task 1.1 已含)
+- [x] 3.2 db.py::create_rework_dispatch / count_rework_chain helpers (Phase 1 task 1.6.5 / 1.6.6 已含, 此处验证)
+- [x] 3.3 文档: AD-M5-2 slot (rework chain 机制 documentation per R2 fix TL-10; per-row counter + rework_of FK 已 lock in §SQL; cap=3 含义: ≤3 rework rows allowed, round=4 reject)
+- [x] 3.4 单元测试: rework chain 创建 + cap boundary (round=3 创建 OK, round=4 创建 reject + 当前 row → S_FAIL(rework_exceeded)) + 含 mode='retry' 不消耗 owner cap (per R2 fix BA-7)
+- [x] 3.4.5 单元测试: cyclic rework_of chain (合成 corrupt data) → count_rework_chain 不 hang (LIMIT 10 guard 起效, raise or sentinel)
 
 ### T-rework-loop comment-poll protocol (~10h, R2 fixes BA-9/QA-9/QA-17/AI-9)
 
-- [ ] 3.5 comment_poll.py::parse_magic_string 扩展 4 commands (approve / reject / changes / redo)
-- [ ] 3.6 process_dispatch 路由: changes → create_rework_dispatch(mode='changes', feedback=feedback) + 当前 row S_FAIL(changes_requested) + rework_feedback=feedback (per R2 fix BA-6: 分离 fail_reason enum 与 rework_feedback text)
-- [ ] 3.7 process_dispatch 路由: redo → create_rework_dispatch(mode='redo', feedback=feedback) + 当前 row S_FAIL(changes_requested) + 添加 placeholder comment "Superseded — new PR pending (dispatch_id=<new_id>)" 旧 PR (per R2 fix BA-9: 不立即 close, 因新 PR# 未知); 实际 close + 写 "Superseded by #<new>" 在 S5_PR_CREATED handler (见 task 3.22)
-- [ ] 3.7.5 Forgejo PR close failure handling (per R2 fix QA-9): 包 try/except; 失败时 audit log event_type='rework_cycle' payload 含 close_status='failed'; 后续 reconciler tick 重试; 单元测试 mock Forgejo 5xx → 验证新 dispatch row 状态 OK 不 orphaned
-- [ ] 3.8 cap enforcement: 创建前检查 count_rework_chain(parent_id) > ARIA_REWORK_MAX_ROUND → 拒绝并 S_FAIL(rework_exceeded); 注意是 > 不是 >= (per R2 fix BA-2 语义 lock)
-- [ ] 3.9 nomadVar `ARIA_REWORK_MAX_ROUND` 接入 (default=3, override 可调) + startup validation: < 1 raise ConfigurationError (per R2 fix QA-17 防 cap=0/负值)
-- [ ] 3.10 audit log 写入: event_type='rework_cycle', payload={rework_of, rework_round, rework_mode, rework_feedback (truncated to 4KB), parent_pr_url, parent_dispatch_id} (per R2 fix AI-9)
-- [ ] 3.11 单元测试: 4 commands 各路径 + cap 边界 (round=3 创建 OK, round=4 拒绝 per R2 fix BA-2) + mixed mode (changes+redo+approve chain) + retry mode 不消耗 cap
+- [x] 3.5 comment_poll.py::parse_magic_string 扩展 4 commands (approve / reject / changes / redo)
+- [x] 3.6 process_dispatch 路由: changes → create_rework_dispatch(mode='changes', feedback=feedback) + 当前 row S_FAIL(changes_requested) + rework_feedback=feedback (per R2 fix BA-6: 分离 fail_reason enum 与 rework_feedback text)
+- [x] 3.7 process_dispatch 路由: redo → create_rework_dispatch(mode='redo', feedback=feedback) + 当前 row S_FAIL(changes_requested) + 添加 placeholder comment "Superseded — new PR pending (dispatch_id=<new_id>)" 旧 PR (per R2 fix BA-9: 不立即 close, 因新 PR# 未知); 实际 close + 写 "Superseded by #<new>" 在 S5_PR_CREATED handler (见 task 3.22)
+- [x] 3.7.5 Forgejo PR close failure handling (per R2 fix QA-9): 包 try/except; 失败时 audit log event_type='rework_cycle' payload 含 close_status='failed'; 后续 reconciler tick 重试; 单元测试 mock Forgejo 5xx → 验证新 dispatch row 状态 OK 不 orphaned
+- [x] 3.8 cap enforcement: 创建前检查 count_rework_chain(parent_id) > ARIA_REWORK_MAX_ROUND → 拒绝并 S_FAIL(rework_exceeded); 注意是 > 不是 >= (per R2 fix BA-2 语义 lock)
+- [x] 3.9 nomadVar `ARIA_REWORK_MAX_ROUND` 接入 (default=3, override 可调) + startup validation: < 1 raise ConfigurationError (per R2 fix QA-17 防 cap=0/负值)
+- [x] 3.10 audit log 写入: event_type='rework_cycle', payload={rework_of, rework_round, rework_mode, rework_feedback (truncated to 4KB), parent_pr_url, parent_dispatch_id} (per R2 fix AI-9)
+- [x] 3.11 单元测试: 4 commands 各路径 + cap 边界 (round=3 创建 OK, round=4 拒绝 per R2 fix BA-2) + mixed mode (changes+redo+approve chain) + retry mode 不消耗 cap
 
 ### T-rework-loop changes mode (Layer 2 二次进入) (~20h)
 
@@ -131,14 +131,14 @@
 - [ ] 3.13 Layer 2 容器启动逻辑: rework-changes mode 时, fetch 原 PR branch + 接收 feedback prompt + AI 改稿
 - [ ] 3.14 git push 策略: force-push 同 branch (per AD-M5-4 锁定方向; 备选 append-commit considered+rejected per R2 fix TL-10)
 - [ ] 3.15 PR diff 演进: force-push 后 PR diff 自动更新, owner 看到 v1 → v2 演进
-- [ ] 3.15.5 changes mode state machine 入口 (per R2 fix BA-8): 新 row initial state S4_LAUNCH → fetch original branch + apply feedback → force-push → S5_PR_CREATED (PR 已存在 force-push updates) → S6_REVIEW; 若 S6 LLM 拒绝 changes-mode → S_FAIL(review_rejected) 不 auto-loop
+- [x] 3.15.5 changes mode state machine 入口 (per R2 fix BA-8): 新 row initial state S4_LAUNCH → fetch original branch + apply feedback → force-push → S5_PR_CREATED (PR 已存在 force-push updates) → S6_REVIEW; 若 S6 LLM 拒绝 changes-mode → S_FAIL(review_rejected) 不 auto-loop
 - [ ] 3.16 S6_REVIEW LLM review (changes 模式跳 S2/S3, 节省 ~50% LLM cost — 实测见 task 3.27.5)
-- [ ] 3.16.5 changes mode audit log completeness (per R2 fix QA-6): 验证新 row audit log 不含 spurious S2/S3 state_transition events; Replay 时显示 'rework entry at S4/S6'
+- [x] 3.16.5 changes mode audit log completeness (per R2 fix QA-6): 验证新 row audit log 不含 spurious S2/S3 state_transition events; Replay 时显示 'rework entry at S4/S6'
 - [ ] 3.16.6 prompt assemble (per R2 fix AI-6): (a) 必须项 feedback + 原 issue body (b) 可选 file-by-file diff 按 'feedback 提到的 file' 优先 + hard cap 60K tokens, 超出 fallback redo mode + audit log warn
-- [ ] 3.17 Feishu 卡片: round 显示 "rework round 2/3 — changes mode" + 原 PR 链接 + new PR diff 链接
+- [x] 3.17 Feishu 卡片: round 显示 "rework round 2/3 — changes mode" + 原 PR 链接 + new PR diff 链接
 - [ ] 3.18 集成测试: changes 模式完整 cycle (mock /aria changes → 新 row → Layer 2 容器 → PR diff 更新 → S6→S7→approve)
 - [ ] 3.18.5 集成测试 large-diff fixture (mock 80KB diff per R2 fix AI-6): 验证 truncation + fallback to redo mode 行为
-- [ ] 3.19 文档: AD-M5-3 slot (Layer 2 二次进入 mechanism + prompt 长度策略 + state machine 入口) + AD-M5-4 slot (force-push rationale)
+- [x] 3.19 文档: AD-M5-3 slot (Layer 2 二次进入 mechanism + prompt 长度策略 + state machine 入口) + AD-M5-4 slot (force-push rationale)
 
 ### T-rework-loop redo mode (新 dispatch 全周期) (~12h)
 
@@ -146,17 +146,17 @@
 - [ ] 3.21 Layer 2 容器启动: redo mode 时走完整 S0 → S2 → S3 → S4 → S5 → S6 → S7 (新 PR 创建)
 - [ ] 3.22 旧 PR close + 写 "Superseded by #<new>" comment 由 S5_PR_CREATED handler 执行 (per R2 fix BA-9: 解决 temporal ordering — 新 PR# 此时已生成); comment-poll 时仅写 placeholder "Superseded — new PR pending"
 - [ ] 3.23 新 PR 描述自动包含原 issue + redo feedback + rework chain 完整链 (原 PR + new PR 双向链接)
-- [ ] 3.24 LLM cost 计入 audit log (full 100% cost vs changes 50% cost, replay 时可见对比)
-- [ ] 3.25 Feishu 卡片: round 显示 "rework round 2/3 — redo mode" + new PR 链接 + per-round mode label correctness (per R2 fix QA-7: mixed-mode chain 卡片显示正确 mode)
+- [x] 3.24 LLM cost 计入 audit log (full 100% cost vs changes 50% cost, replay 时可见对比)
+- [x] 3.25 Feishu 卡片: round 显示 "rework round 2/3 — redo mode" + new PR 链接 + per-round mode label correctness (per R2 fix QA-7: mixed-mode chain 卡片显示正确 mode)
 - [ ] 3.26 集成测试: redo 模式完整 cycle (mock /aria redo → 新 row → 全 state machine → 新 PR → S7→approve)
 - [ ] 3.26.5 集成测试 redo timing (per R2 fix D.4): assert "Superseded by #<new>" comment 写入 in S5_PR_CREATED handler 不在 comment-poll 阶段
 
 ### T-rework-loop integration (~5h)
 
-- [ ] 3.27 mixed mode 测试 (per R2 fix QA-7): changes round 1 + redo round 2 + approve round 3; 验证 (a) cap 合并计数 (b) 每 round Feishu 卡片显示对应 mode (c) PR 链接正确
+- [x] 3.27 mixed mode 测试 (per R2 fix QA-7): changes round 1 + redo round 2 + approve round 3; 验证 (a) cap 合并计数 (b) 每 round Feishu 卡片显示对应 mode (c) PR 链接正确
 - [ ] 3.27.5 cost calibration spike (per R2 fix AI-5): mock 1 changes cycle + 1 redo cycle, 实测 LLM total cost 对比 vs M4 baseline; 写入 AD-M5-6 数据
-- [ ] 3.28 abi_compat #4 兼容性测试: 同一 row 多次写 human_decision 应被 CAS 拒绝 (first-decision-wins); 新 row 接力一次性写入
-- [ ] 3.29 AD-M5-2 Decided sign-off + cross-link to AD-M5-3 (Layer 2 二次进入) / AD-M5-4 (force-push rationale) (per R2 fix TL-R2-3 dedup: 3.3 is "slot 定义", 3.29 is "Decided sign-off after Phase 3 impl complete")
+- [x] 3.28 abi_compat #4 兼容性测试: 同一 row 多次写 human_decision 应被 CAS 拒绝 (first-decision-wins); 新 row 接力一次性写入
+- [x] 3.29 AD-M5-2 Decided sign-off + cross-link to AD-M5-3 (Layer 2 二次进入) / AD-M5-4 (force-push rationale) (per R2 fix TL-R2-3 dedup: 3.3 is "slot 定义", 3.29 is "Decided sign-off after Phase 3 impl complete")
 
 ---
 
