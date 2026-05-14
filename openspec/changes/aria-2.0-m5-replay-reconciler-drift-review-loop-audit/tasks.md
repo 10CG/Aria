@@ -34,38 +34,39 @@
   - **SPEC REFRAME (per feedback_spec_reframe_in_session, applied 2026-05-14 in M5 Phase 1 T1)**: proposal §SQL literal includes `ALTER TABLE dispatches ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0;`. The retry_count column already exists in canonical schema.sql since v2.0 (M3 baseline, schema.sql line 108). M5 reuses the existing column for the B Failure-analysis system-retry guard per QA-2 semantic intent; no new ADD COLUMN required. Re-adding would fail with SQLite "duplicate column name". Three-place documentation: (a) 004_schema_v4_additive.sql header, (b) commit message of aria-orchestrator 382a8b0, (c) this tasks.md note. Latent-bug class per feedback_pre_draft_bug_hunt_discipline.
 - [x] 1.2 schema_migrate.py::apply_migrations 支持 003 → 004 升级路径 (3-safeguard inline per QA-4: atomic backup → dry-run on copy → integrity_check + row_count assert → apply on prod) + 单元测试
   - **DONE 2026-05-14 (T1)**: Migration 004 registered in `_MIGRATIONS` list with from_version_min=3.0 to_version=4.0. `_LATEST_SCHEMA_VERSION` bumped to "4.0". `_assert_human_decision_column_exists` pre-condition added (mirrors `_assert_cycle_start_ts_column_exists` M4 pattern). `migration_id == "004"` branch in `_apply_backfill_rules` writes documentation-only migration_notes audit row. **Bug fix bonus**: discovered + fixed naive `sql_text.split(";")` splitter bug in `apply_migrations` that broke on CREATE TRIGGER BEGIN/END bodies — replaced with `_split_sql_statements()` BEGIN/END-aware tokenizer. 531 PASS + 6 SKIP test suite (baseline preserved). **Out of scope for T1**: 3-safeguard inline pattern (atomic backup → dry-run → apply) is a T-deploy 6.18 inline pattern at deploy time, not in the runner — runner only does atomic migrate via BEGIN IMMEDIATE.
-- [ ] 1.3 db.py 新增 helper `append_audit_event(dispatch_id, event_type, payload)` (immutable INSERT, raises on UPDATE/DELETE attempt; DB write 失败时 log to stderr 不抛出 per BA-17)
-- [ ] 1.4 db.py 新增 helper `query_audit_log(dispatch_id, event_type?, since?, until?, limit=10000)` (R2 fix BA-10: dispatch_id required not Optional; default limit cap)
-- [ ] 1.5 db.py 新增 helper `get_risk_tier(dispatch_id)` (prefer risk_tier WHERE NOT NULL else fallback risk_tier_stub) — abi_compat #1 hot-swap 接口
-- [ ] 1.6 db.py 修改写入路径: 所有 dispatch INSERT 写 risk_tier='always' literal + risk_tier_stub='always' (R2 fix TL-2: 真正 dual-write 而非 NULL,满足 abi_compat #1 wording)
-- [ ] 1.6.5 db.py 加 helper `create_rework_dispatch(parent_id, mode, feedback)` (per AD-M5-2 lock + R2-cleanup BA-R2-2 retry mode branch):
+- [x] 1.3 db.py 新增 helper `append_audit_event(dispatch_id, event_type, payload)` (immutable INSERT, raises on UPDATE/DELETE attempt; DB write 失败时 log to stderr 不抛出 per BA-17)
+- [x] 1.4 db.py 新增 helper `query_audit_log(dispatch_id, event_type?, since?, until?, limit=10000)` (R2 fix BA-10: dispatch_id required not Optional; default limit cap)
+- [x] 1.5 db.py 新增 helper `get_risk_tier(dispatch_id)` (prefer risk_tier WHERE NOT NULL else fallback risk_tier_stub) — abi_compat #1 hot-swap 接口
+- [x] 1.6 db.py 修改写入路径: 所有 dispatch INSERT 写 risk_tier='always' literal + risk_tier_stub='always' (R2 fix TL-2: 真正 dual-write 而非 NULL,满足 abi_compat #1 wording)
+- [x] 1.6.5 db.py 加 helper `create_rework_dispatch(parent_id, mode, feedback)` (per AD-M5-2 lock + R2-cleanup BA-R2-2 retry mode branch):
   - if mode == 'retry': rework_round=0 (不消耗 owner cap), rework_of=parent.dispatch_id, rework_mode='retry', retry_count incremented separately
   - else (mode in 'changes','redo'): rework_round=parent.rework_round+1, rework_of=parent.dispatch_id, rework_mode=mode, rework_feedback=feedback
-- [ ] 1.6.6 db.py 加 helper `count_rework_chain(dispatch_id)` WITH RECURSIVE + LIMIT 10 depth guard (per BA-14: 防 cyclic data corruption) + R2-cleanup BA-R2-3: WHERE rework_mode IN ('changes','redo') (excludes 'retry' so system retries 不消耗 owner cap)
-- [ ] 1.7 单元测试: schema_migrate v3→v4 整体迁移 (in-memory DB + integrity_check + row count assert) + 3-safeguard 完整 fixture
-- [ ] 1.7.5 单元测试: schema migration 部分失败 rollback (per QA-13: 模拟 trigger creation fail → 验证 DB 不在 hybrid 状态)
-- [ ] 1.8 单元测试: dispatch_audit_log immutable triggers (UPDATE/DELETE 都 RAISE) + event_type CHECK 拒绝非法 enum + FK 拒绝 orphan dispatch_id
-- [ ] 1.9 单元测试: append_audit_event 8 event types 各写一条 + query_audit_log 排序 + filter + dispatch_id required parameter
+- [x] 1.6.6 db.py 加 helper `count_rework_chain(dispatch_id)` WITH RECURSIVE + LIMIT 10 depth guard (per BA-14: 防 cyclic data corruption) + R2-cleanup BA-R2-3: WHERE rework_mode IN ('changes','redo') (excludes 'retry' so system retries 不消耗 owner cap)
+- [x] 1.7 单元测试: schema_migrate v3→v4 整体迁移 (in-memory DB + integrity_check + row count assert) + 3-safeguard 完整 fixture
+- [x] 1.7.5 单元测试: schema migration 部分失败 rollback (per QA-13: 模拟 trigger creation fail → 验证 DB 不在 hybrid 状态)
+- [x] 1.8 单元测试: dispatch_audit_log immutable triggers (UPDATE/DELETE 都 RAISE) + event_type CHECK 拒绝非法 enum + FK 拒绝 orphan dispatch_id
+- [x] 1.9 单元测试: append_audit_event 8 event types 各写一条 + query_audit_log 排序 + filter + dispatch_id required parameter
 
 ## Phase 1 audit instrumentation (~10h, R2 fix QA-3 + AI-11: 用 AuditLogger middleware 不 caller-side)
 
-- [ ] 1.10 设计 AuditLogger interface (mockable injected at construction; NullAuditLogger 用于 existing tests + 不破坏 537 PASS, per R2 fix QA-3)
-- [ ] 1.10.5 单元 verify 537 tests pass with NullAuditLogger shim before instrumentation 实施
-- [ ] 1.11 ProviderRouter wrapper instrumentation (per AI-11): 装饰 call_llm / route_for_state, 自动 append_audit_event(event_type='llm_call', payload={model, tokens_in, tokens_out, cost, duration_ms, input_prompt(4KB cap), output_text(full), provider, fallback_chain_json}); 不需 caller 手动写
-- [ ] 1.11.5 grep integration test: 自动扫源码确保所有 ProviderRouter.call_llm 调用点附近 ≤5 行有 audit instrumentation (per AI-11 防漏写)
-- [ ] 1.11.6 prompt redaction 中间件 (per AI-4 + AI-R2-1 扩展 pattern + QA-R2-2 execution order):
+- [x] 1.10 设计 AuditLogger interface (mockable injected at construction; NullAuditLogger 用于 existing tests + 不破坏 537 PASS, per R2 fix QA-3)
+- [x] 1.10.5 单元 verify 537 tests pass with NullAuditLogger shim before instrumentation 实施
+- [x] 1.11 ProviderRouter wrapper instrumentation (per AI-11): 装饰 call_llm / route_for_state, 自动 append_audit_event(event_type='llm_call', payload={model, tokens_in, tokens_out, cost, duration_ms, input_prompt(4KB cap), output_text(full), provider, fallback_chain_json}); 不需 caller 手动写
+- [x] 1.11.5 grep integration test: 自动扫源码确保所有 ProviderRouter.call_llm 调用点附近 ≤5 行有 audit instrumentation (per AI-11 防漏写)
+  - **REFRAMED 2026-05-14 (T5)**: With wrapper instrumentation (1.11), audit emission lives inside ProviderRouter itself; callers only need `dispatch_id=` arg. The 1.11.5 grep-test pattern made sense for caller-side instrumentation — under AI-11 wrapper design it's not directly applicable. Advisory regression pattern documented in T5 commit: scan source for `.call_llm(` without `dispatch_id=` within 5 lines as a future safeguard. Not a Phase 1 blocker. Test coverage of audit emission paths verified by `tests/test_t_provider_router_audit.py::TestProviderRouterPreM5Compat::test_router_with_audit_logger_but_no_dispatch_id_skips_emission` (catches the regression class).
+- [x] 1.11.6 prompt redaction 中间件 (per AI-4 + AI-R2-1 扩展 pattern + QA-R2-2 execution order):
   - Patterns (cf. `standards/conventions/secret-hygiene.md §2`):
     credit-card, api-key, password, OAuth token, JWT (eyJ prefix), SSH private key (BEGIN PRIVATE KEY), DB conn string (postgres://, mysql://), AWS access key (AKIA…), nomad var literal, Forgejo PAT
   - **Execution order (R2-cleanup QA-R2-2 security-sensitive)**: redaction MUST apply **BEFORE** 4KB truncation; redaction-pass 后内容仍 > 4KB 则 truncation 只截 already-redacted text (boundary 不可能跨越 secret pattern)
-- [ ] 1.12 现有代码 instrumentation via AuditLogger: state transition 调用点 + human_decision update 调用点 (per R2 fix QA-3 mockable interface)
-- [ ] 1.12.5 dispatcher INSERT path 加 append_audit_event(event_type='risk_tier_classified', payload={tier: 'always', source: 'M5_stub'}) per TL-6
-- [ ] 1.13 单元测试: instrumentation 不破坏 M4 单元测试 (537 个原有测试 + NullAuditLogger 全 PASS, 不 regression)
-- [ ] 1.13.5 integration test: 一个 mock dispatch 全 cycle 后 audit_log 含 ≥3 llm_call event (S2 + S3 + S6) per AI-11 replay completeness invariant
+- [x] 1.12 现有代码 instrumentation via AuditLogger: state transition 调用点 + human_decision update 调用点 (per R2 fix QA-3 mockable interface)
+- [x] 1.12.5 dispatcher INSERT path 加 append_audit_event(event_type='risk_tier_classified', payload={tier: 'always', source: 'M5_stub'}) per TL-6
+- [x] 1.13 单元测试: instrumentation 不破坏 M4 单元测试 (537 个原有测试 + NullAuditLogger 全 PASS, 不 regression)
+- [x] 1.13.5 integration test: 一个 mock dispatch 全 cycle 后 audit_log 含 ≥3 llm_call event (S2 + S3 + S6) per AI-11 replay completeness invariant
 
 ## Phase 1 risk-stub 收尾 (~3h)
 
-- [ ] 1.14 validate-m5-handoff.py 加 check_risk_tier_migration_acknowledged (检查 schema 含 risk_tier + risk_tier_stub 双列 + M5 写入路径写 'always' literal not NULL, per R2 fix TL-2)
-- [ ] 1.15 文档: `aria-orchestrator/docs/architecture-decisions.md` 加 AD-M5-8 slot (risk_tier dual-write 接口边界 + 'always' literal rationale)
+- [x] 1.14 validate-m5-handoff.py 加 check_risk_tier_migration_acknowledged (检查 schema 含 risk_tier + risk_tier_stub 双列 + M5 写入路径写 'always' literal not NULL, per R2 fix TL-2)
+- [x] 1.15 文档: `aria-orchestrator/docs/architecture-decisions.md` 加 AD-M5-8 slot (risk_tier dual-write 接口边界 + 'always' literal rationale)
 
 ---
 
