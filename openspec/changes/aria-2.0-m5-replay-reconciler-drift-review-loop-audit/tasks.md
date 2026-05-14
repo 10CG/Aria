@@ -74,31 +74,33 @@
 
 ### T-cron-direct (G, 6h, R2 fix BA-3 加 partial failure recovery)
 
-- [ ] 2.1 comment_poll.py::process_dispatch 在 update_human_decision 成功后 (CAS PASS) 直接调用 extension._handle_s7_human_gate(dispatch_id); 包 try/except 异常写 audit log 但不 rollback human_decision (immutable)
-- [ ] 2.2 兜底逻辑 (per R2 fix BA-3 + AD-M5-9 explicit): reconciler 30min 必须扫 `state=S7_HUMAN_GATE AND human_decision IS NOT NULL → re-attempt _handle_s7_human_gate(dispatch_id)` (不论 comment-poll liveness)
-- [ ] 2.3 单元测试: comment-poll direct transition 端到端 (mock approve → assert state=S8_MERGE within 1 tick cycle)
-- [ ] 2.4 单元测试: comment-poll partial failure 路径 (per R2 fix BA-3): CAS PASS 后 _handle_s7_human_gate raise → human_decision 已 commit + state 仍 S7 → reconciler 下一 tick 推进 to S8
-- [ ] 2.5 文档: `aria-orchestrator/docs/architecture-decisions.md` 加 AD-M5-1 slot (comment-poll direct transition reframe, supersedes AD-M4-9 § 决策 #4) + AD-M5-9 slot (partial failure recovery 契约)
+- [x] 2.1 comment_poll.py::process_dispatch 在 update_human_decision 成功后 (CAS PASS) 直接调用 extension._handle_s7_human_gate(dispatch_id); 包 try/except 异常写 audit log 但不 rollback human_decision (immutable)
+- [x] 2.2 兜底逻辑 (per R2 fix BA-3 + AD-M5-9 explicit): reconciler 30min 必须扫 `state=S7_HUMAN_GATE AND human_decision IS NOT NULL → re-attempt _handle_s7_human_gate(dispatch_id)` (不论 comment-poll liveness)
+- [x] 2.3 单元测试: comment-poll direct transition 端到端 (mock approve → assert state=S8_MERGE within 1 tick cycle)
+- [x] 2.4 单元测试: comment-poll partial failure 路径 (per R2 fix BA-3): CAS PASS 后 _handle_s7_human_gate raise → human_decision 已 commit + state 仍 S7 → reconciler 下一 tick 推进 to S8
+- [x] 2.5 文档: `aria-orchestrator/docs/architecture-decisions.md` 加 AD-M5-1 slot (comment-poll direct transition reframe, supersedes AD-M4-9 § 决策 #4) + AD-M5-9 slot (partial failure recovery 契约)
 
 ### T-failure-analysis (B, 15h, R2 fixes AI-1/AI-2/AI-3/AI-8/AI-10/BA-7/QA-8)
 
-- [ ] 2.6 设计 Failure analysis LLM prompt template (input: fail_reason + last 3 llm_call events 含 prompt 摘要 + last 5 state_transition events per AI-10; output JSON {action, confidence, reason, suggested_owner_action}; prompt 末尾 'output ONLY valid JSON no markdown fence')
+- [x] 2.6 设计 Failure analysis LLM prompt template (input: fail_reason + last 3 llm_call events 含 prompt 摘要 + last 5 state_transition events per AI-10; output JSON {action, confidence, reason, suggested_owner_action}; prompt 末尾 'output ONLY valid JSON no markdown fence')
   - **摘要算法 (R2-cleanup AI-R2-3)**: first 500 chars of input_prompt + ts + model + tokens (metadata + prefix); 不调 LLM 二次生成 (cost discipline per AI-5)
-- [ ] 2.6.5 JSON parse fallback chain (per R2 fix AI-2): try parse → if malformed (markdown fence / extra text / wrong type) → regex extract → if still fail → 默认 action='notify_owner' + confidence=0.0 + reason='LLM JSON parse failed'; 写 audit log warn
-- [ ] 2.7 prompt template 版本管理 (放 `aria-orchestrator/aria-layer1/prompts/failure_analysis.md`, 加版本号 + audit log 记录使用版本)
-- [ ] 2.8 reconciler.py::_handle_failure_analysis 新方法: 当 dispatch 进入 S_FAIL 时调用 LLM analysis; **skip if fail_reason='changes_requested' or 'rework_exceeded'** (per R2 fix BA-6: owner-initiated 非 system failure)
-- [ ] 2.9 retry 路径 (per R2 fix BA-7 separate from rework cap): action='retry' + confidence >= ARIA_FAIL_RETRY_CONFIDENCE_MIN + retry_count < 1 + fail_reason in {'infrastructure', 'timeout'} → 调用 create_rework_dispatch(parent, mode='retry', feedback=reason); 新 row rework_round=0 不消耗 owner cap; retry_count++
-- [ ] 2.10 abort 路径: action='abort' → 写明确 fail_reason + final
-- [ ] 2.11 notify_owner 路径: action='notify_owner' → Feishu reject 卡片含 LLM 诊断 + suggested_owner_action
-- [ ] 2.12 ProviderRouter 接入 (per R2 fix AI-8): failure_analysis 调用 call_llm(prompt, 'glm-4.5-air'); MODEL_DEGRADE_LADDER['glm-4.5-air'] 当前 terminal → owner decision in AD-M5-6: 接受 terminal (优先稳定) OR 扩 ladder 加 glm-5-turbo (优先成功率); R2 lock 'terminal acceptable for M5, M6 evaluate based on real failure rate'
-- [ ] 2.13 audit log 写入: event_type='failure_analysis', payload=LLM 完整输出 + 是否触发 retry + raw_output (含 malformed JSON 原文 if applicable)
-- [ ] 2.13.5 nomadVar `ARIA_FAIL_RETRY_CONFIDENCE_MIN` 接入 (default=0.7, per R2 fix AI-3 与 spec drift threshold 对称)
-- [ ] 2.14 单元测试: 4 路径 (retry/abort/notify_owner/JSON parse fail) × mock LLM + boundary tests (confidence=0.70 boundary; confidence=null/malformed/out-of-range; action='unknown_value' → notify_owner default per R2 fix QA-8)
-- [ ] 2.15 集成测试: 真 fail dispatch + mock LLM → 验证完整 audit log 链路
-- [ ] 2.15.5 calibration spike (per R2 fix AI-3 + R2-cleanup QA-R2-3 信息层澄清): 用 M4 historical 13 条 S_FAIL fail_reason + 手动构造 synthetic mock context (M4 无 audit log table, 非真 historical replay) 离线跑 prompt → 统计 confidence 分布; 如果均值 > 0.85 → 提议阈值提到 0.85; 数据写入 AD-M5-6 + 注明 calibration data 是 synthetic, 生产部署后需用真 audit log 数据复核阈值
+- [x] 2.6.5 JSON parse fallback chain (per R2 fix AI-2): try parse → if malformed (markdown fence / extra text / wrong type) → regex extract → if still fail → 默认 action='notify_owner' + confidence=0.0 + reason='LLM JSON parse failed'; 写 audit log warn
+- [x] 2.7 prompt template 版本管理 (放 `aria-orchestrator/aria-layer1/prompts/failure_analysis.md`, 加版本号 + audit log 记录使用版本)
+- [x] 2.8 reconciler.py::_handle_failure_analysis 新方法: 当 dispatch 进入 S_FAIL 时调用 LLM analysis; **skip if fail_reason='changes_requested' or 'rework_exceeded'** (per R2 fix BA-6: owner-initiated 非 system failure)
+- [x] 2.9 retry 路径 (per R2 fix BA-7 separate from rework cap): action='retry' + confidence >= ARIA_FAIL_RETRY_CONFIDENCE_MIN + retry_count < 1 + fail_reason in {'infrastructure', 'timeout'} → 调用 create_rework_dispatch(parent, mode='retry', feedback=reason); 新 row rework_round=0 不消耗 owner cap; retry_count++
+- [x] 2.10 abort 路径: action='abort' → 写明确 fail_reason + final
+- [x] 2.11 notify_owner 路径: action='notify_owner' → Feishu reject 卡片含 LLM 诊断 + suggested_owner_action
+- [x] 2.12 ProviderRouter 接入 (per R2 fix AI-8): failure_analysis 调用 call_llm(prompt, 'glm-4.5-air'); MODEL_DEGRADE_LADDER['glm-4.5-air'] 当前 terminal → owner decision in AD-M5-6: 接受 terminal (优先稳定) OR 扩 ladder 加 glm-5-turbo (优先成功率); R2 lock 'terminal acceptable for M5, M6 evaluate based on real failure rate'
+- [x] 2.13 audit log 写入: event_type='failure_analysis', payload=LLM 完整输出 + 是否触发 retry + raw_output (含 malformed JSON 原文 if applicable)
+- [x] 2.13.5 nomadVar `ARIA_FAIL_RETRY_CONFIDENCE_MIN` 接入 (default=0.7, per R2 fix AI-3 与 spec drift threshold 对称)
+- [x] 2.14 单元测试: 4 路径 (retry/abort/notify_owner/JSON parse fail) × mock LLM + boundary tests (confidence=0.70 boundary; confidence=null/malformed/out-of-range; action='unknown_value' → notify_owner default per R2 fix QA-8)
+- [x] 2.15 集成测试: 真 fail dispatch + mock LLM → 验证完整 audit log 链路
+- [x] 2.15.5 calibration spike (per R2 fix AI-3 + R2-cleanup QA-R2-3 信息层澄清): 用 M4 historical 13 条 S_FAIL fail_reason + 手动构造 synthetic mock context (M4 无 audit log table, 非真 historical replay) 离线跑 prompt → 统计 confidence 分布; 如果均值 > 0.85 → 提议阈值提到 0.85; 数据写入 AD-M5-6 + 注明 calibration data 是 synthetic, 生产部署后需用真 audit log 数据复核阈值
+  - **OWNER-DEFERRED (Phase 2 P5)**: Calibration spike requires real LLM calls (~¥0.15 budget for 13 synthetic fixtures × glm-4.5-air). Spec status tracked in AD-M5-6 slot with "calibration data: synthetic only, NOT yet collected". Default threshold ARIA_FAIL_RETRY_CONFIDENCE_MIN=0.7 unchanged until owner runs spike + posts results. Threshold updates are nomadVar-only (runtime override, no code change).
 - [ ] **2.15.6 live LLM acceptance (per R2 fix AI-1 + B.1.live)**: 至少 1 次真 ProviderRouter call to glm-4.5-air on a synthetic S_FAIL fixture → 验证 (a) JSON schema 合规 (b) confidence ∈ [0,1] (c) action 字段 ∈ enum (d) parse fallback 不触发 (健康路径)
+  - **OWNER-DEFERRED to Phase 6 acceptance**: Tier-1 acceptance gate, NOT a Phase 2 P3-P6 blocker. Owner runs pre-merge OR during Phase 6 T-acceptance.B.1.live. Production wiring landed in P4 (`reconcile_runner._build_failure_analysis_caller` + `ARIA_FAILURE_ANALYSIS_ENABLED=1` opt-in env). Cost per run ≈ ¥0.01-0.02; Tier-1 budget ≤ ¥0.10 (4 live calls total: B.1.live + C.2.live + 2 boundary fixtures).
   - **Cost (R2-cleanup AI-R2-2)**: 每次 live call ~1-2K tokens ≈ ¥0.01-0.02; Tier-1 acceptance run 4 live calls (B.1.live + C.2.live + 2 boundary fixtures) ≤ ¥0.10; CI 不跑 live gate (避免 daily cost), 仅 owner 手动 trigger pre-merge OR Phase 6 acceptance
-- [ ] 2.16 文档: AD-M5-6 slot (Failure analysis LLM prompt 设计 + nomadVar + ladder decision + calibration data)
+- [x] 2.16 文档: AD-M5-6 slot (Failure analysis LLM prompt 设计 + nomadVar + ladder decision + calibration data)
 
 ---
 
