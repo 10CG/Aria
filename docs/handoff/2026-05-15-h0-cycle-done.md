@@ -53,9 +53,10 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 
 | # | 项目 | scope | 估时 | 来源 |
 |---|------|-------|------|------|
-| H1 | aria-plugin #46 audit 3 Important follow-up | hook `set -e` 注释 / `handoff_drift` non_blocking 语义 / `latest.md` schema doc 标注 | ~1h | aria:code-reviewer #46 audit |
+| H1 | aria-plugin #46 audit 3 Important follow-up | hook `set -e` 注释 / `handoff_drift` non_blocking 语义 / `latest.md` schema doc 标注 + convention SOT `{archive-date}` placeholder 填实 (2026-05-15) | ~1.5h | aria:code-reviewer #46/#4 audit |
 | H2 | US-025 M5 Phase B.2 | Replay/Reconciler ~138h baseline | multi-session | 上个 cycle carry-forward (M5 是 v2.0 主线) |
 | H3 | issue-triage iteration-2 | SKILL.md "MUST run scripts/triage.py" | ~1h | #101 cycle handoff H1 |
+| H4 | (optional) Rule #6 H0 structural benchmark 补跑 | mtime sort accuracy + misplaced precision/recall fixture, 存 ab-results | ~1h low-pri | owner-directed T8.2 skip ([decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md)) |
 
 ### 中优先级
 
@@ -81,6 +82,7 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 | `handoff_drift` `non_blocking: false` 语义模糊 | 与 audit_unconverged 1.9 / custom_check_failed 1.95 对比 | H1 follow-up 澄清 (tri-state 或改 non_blocking: true + 显式 precedence note) |
 | hook `set -e` 在 `$(...)` 子壳失效 | python heredoc crash | fallthrough 到安全 PASS (已验证); H1 follow-up 加注释 |
 | 第三方已有 `.aria/handoff/` 升级后 | v1.21.0 升级 | L2 collector 检测 → L3 推荐 migrate-handoff-drift workflow |
+| **Rule #6 deviation (T8.2 skip)** | CLAUDE.md Rule #6 不可协商, owner-directed skip | [decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md) 记录: deterministic collector 的 LLM AB tautological, 442 unit + 10 smoke + live dogfood 替代。scoped to deterministic-only; capability-type Skill 变更 Rule #6 不可 waive。H4 可选补结构化 benchmark |
 
 ---
 
@@ -98,7 +100,7 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 | 维度 | 本 session 涉及? | 状态 | 备注 |
 |------|------------------|------|------|
 | UPM (进度) | N/A | — | Aria 自身无 UPM (方法论项目本质) |
-| User Stories | ❌ | OK | bug/issue-driven cycle, 非 US-driven (#92 linked US-095 但本 cycle 不改 US 状态) |
+| User Stories | ❌ | OK | issue-driven cycle, 非 US-driven。注: scan `#92 linked_us=US-095` 是 **heuristic 误判** (US-095 文件不存在; Aria US 仅 US-001~025 per CLAUDE.md 分区; #92 是 aria-auto 标签 issue, 标题字面含 "US-095" 被误匹配)。无真实 US 链接, 无需 US 状态更新 |
 | OpenSpec | ✅ | archived | `openspec/archive/2026-05-15-aria-ten-step-session-handoff-stage/` |
 | PRD | ❌ | OK | 不变 |
 | Standards/conventions | ✅ | shipped | 新增 `session-handoff.md` via aria-standards #4 → master `3d4c86a` |
@@ -144,21 +146,22 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 
 ---
 
-## §8 Memory entries this session (3 candidate, 待写)
+## §8 Memory entries this session (3 written + indexed)
 
 | File | Type | Theme |
 |------|------|-------|
-| `feedback_meta_cycle_dogfood_self_consistency.md` | feedback | 修方法论 bug 用方法论自身,ship 后受益方是本 cycle 自身的 closeout — 自洽闭环有效 |
-| `feedback_sequenced_multirepo_gitlink_bump.md` | feedback | 多 repo PR ship: submodule PR 先 merge → gitlink re-bump 到 post-merge HEAD (非 feature tip) → 再 merge main PR。aria:code-reviewer 能 catch 此 blocker |
-| `feedback_collector_exclude_navigation_pointer.md` | feedback | "找最新文件" collector 必须排除 latest.md / index 类 navigation pointer (mtime 永远最新会 shadow 真内容) |
+| [feedback_meta_cycle_dogfood_self_consistency.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_meta_cycle_dogfood_self_consistency.md) | feedback | 修方法论 bug 用方法论自身,ship 后受益方是本 cycle 自身 closeout — 自洽闭环有效 |
+| [feedback_sequenced_multirepo_gitlink_bump.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_sequenced_multirepo_gitlink_bump.md) | feedback | 多 repo ship: submodule PR 先 merge → gitlink re-bump 到 post-merge HEAD → 再 merge main PR |
+| [feedback_collector_exclude_navigation_pointer.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_collector_exclude_navigation_pointer.md) | feedback | "找最新文件" collector 必须排除 latest.md/index 类 pointer (mtime 恒最新会 shadow 真内容) |
 
-加上前期 session 已 indexed 的 entries — MEMORY.md 全部 indexed。
+✅ MEMORY.md index 已更新 (3 新条目 in ## Feedback section)。前期 session entries 不变。
 
 ---
 
 ## Cross-references
 
 - [Approval signoff](../../.aria/decisions/2026-05-14-h0-spec-approved.md)
+- [Rule #6 T8.2 skip decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md)
 - [post_spec R1+R2 audits](../../.aria/audit-reports/) (`post_spec-{R1,R2}-2026-05-14-*`)
 - [pre_merge R1 audits](../../.aria/audit-reports/) (`pre_merge-R1-2026-05-14T1500Z-*`)
 - [Archived spec](../../openspec/archive/2026-05-15-aria-ten-step-session-handoff-stage/)
