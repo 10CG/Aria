@@ -32,13 +32,19 @@
 | **D2** | M6a = 2 Specs: **Spec X = changes-mode (~22h)**, **Spec Y = redo+OS-3/4/5 aux (~19h)** | Q2 + Q6 correction | changes is highest-frequency owner usage; ship-first prioritization; risk-tier excluded per D6 |
 | **D3** | Layer 2 reads rework context via **Nomad meta_optional**: `REWORK_MODE` / `REWORK_FEEDBACK` / `PARENT_PR_ID` / `REWORK_OF` | Q3 | Consistent with existing `ISSUE_ID`/`DISPATCH_ID`/`PROMPT_PATH` pattern; replayable via `nomad alloc status`; no new boundary |
 | **D4** | M6a归 **US-025 carryover** (mirror M3 carryover trio pattern); no new US-028; PRD not patched | Q4 | PRD §588 US-020~US-027 boundary preserved; M3 silknode/result-path/hcl-crons-sweep precedent; cleaner traceability |
-| **D5** | Spec X uses **A2 skeleton-then-fill**: `MODE_HANDLERS` dispatcher with `initial`+`changes` impl, `redo` slot = `NotImplementedError` | Q5 | Dispatcher exercised by X (avoid `feedback_scaffold_helpers_drift`); Y zero-refactor drop-in; total ~42h |
+| **D5** | Spec X uses **A2 skeleton-then-fill**: dispatcher with `initial`+`changes` impl, `redo` slot = unimplemented-fail | Q5 | Dispatcher exercised by X (avoid `feedback_scaffold_helpers_drift`); Y zero-refactor drop-in; total ~42h |
+
+> **D5 v2 reality reframe** (2026-05-15 post Spec X R1 audit, per code-reviewer F1):
+> Original D5 wording described Python `MODE_HANDLERS` dict + `NotImplementedError`. Spec X R1 audit (`backend-architect` finding C1) verified Layer 2 actual runtime = bash (`entrypoint-m1.sh` 596 lines + Node base image). Implementation language reframed to **bash case-statement dispatcher** (`case "${MODE}" in initial) ... ;; changes) ... ;; redo) exit 1 ...`). **Semantic intent preserved**: A2 skeleton-then-fill pattern in bash (initial+changes implemented, redo branch returns exit 1 + result.json error). Brainstorm functional decision unchanged; only implementation language clarified. See Spec X proposal §"R1 → v2 fixes" C1 row.
 | **D6** | **risk-tier algorithm pushed to M7+** — v2.0 ships with `risk_tier_stub 'always'` literal (M5 ABI compat) | Q6 | Not in m5-handoff::open_issues_for_m6; not in PRD M6 definition; YAGNI for v2.0; classifier needs production calibration data |
 | **D7** | US-025 close gate **reframed**: T-deploy + Tier-1 live + Spec X+Y archived (2 owner gates + 2 AI Specs); Tier-2 path coverage **absorbed to US-026 M6b ≥10 dispatch verification** | Q7 | Eliminates duplicate path-coverage verification; US-025 closes in ~1-2 weeks instead of indefinite owner-workload wait |
 
 ---
 
-## 2. Spec X Design (changes-mode, ~22h)
+## 2. Spec X Design (changes-mode, ~22h baseline → ~25h after R1+R2 fixes)
+
+> **Note (v2 reframe 2026-05-15)**: Section below uses pre-R1 Python framing (`aria_layer2_runner/mode_dispatcher.py`, `mode_changes.py`, `claude -p --prompt-file`). Current Spec X implementation = **bash dispatcher** per `openspec/changes/aria-2.0-m5-carryover-layer2-changes-mode/proposal.md` §C+§D (verified Layer 2 reality during Phase A.2 R1 audit). Functional intent preserved; only language differs.
+
 
 **Path**: `openspec/changes/aria-2.0-m5-carryover-layer2-changes-mode/`
 
