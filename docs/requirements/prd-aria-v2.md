@@ -583,7 +583,7 @@ Out of scope:
 | US-022 | Aria 2.0 M2 — Layer 1 状态机 + Hermes Option C Extension | M2 | HIGH |
 | US-023 | Aria 2.0 M3 — 双 provider + Nomad integration + Crash recovery | M3 | HIGH |
 | US-024 | Aria 2.0 M4 — Human gate + Feishu 审批 | M4 | MEDIUM |
-| US-025 | Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable | M5 | MEDIUM |
+| US-025 | Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable | M5 | MEDIUM | (Layer 1 done 2026-05-15 Phase 1-6; T-deploy + Tier-1 live LLM gates + Tier-2 N≥3 owner-deferred to D.2 sign-off; Layer 2 review-loop container behavior 推 M6 H项) |
 | US-026 | Aria 2.0 M6 — v2.0 文档体系 + CLAUDE.md 修订 | M6 | MEDIUM |
 | US-027 | Aria 2.0 — Cost routing + 预算控制 (跨 milestone) | M3-M6 | MEDIUM |
 
