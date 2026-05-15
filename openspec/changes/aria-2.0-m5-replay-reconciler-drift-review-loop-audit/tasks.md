@@ -178,11 +178,11 @@
 
 ### T-drift commit lint (~5h, R2 fixes QA-5/BA-16)
 
-- [ ] 5.1 设计 commit lint 规则 (Conventional Commits + Aria scope conventions: type prefix / scope 含 milestone / title ≤ 70 / Closes #N)
-- [ ] 5.2 aria_layer1/commit_validator.py::validate_commit_message 实现 regex 验证
+- [x] 5.1 设计 commit lint 规则 (Conventional Commits + Aria scope conventions: type prefix / scope 含 milestone / title ≤ 70 / Closes #N)
+- [x] 5.2 aria_layer1/commit_validator.py::validate_commit_message 实现 regex 验证
 - [ ] 5.3 Layer 2 hook: AI 写 commit 前调用 validate_commit_message, 不通过则 force AI 重写 (prompt 加 violation feedback); **max 3 重试 per R2 fix BA-16**, 第 3 次失败 dispatch → S_FAIL(commit_lint_failed) with fail_reason detail 含 violations
-- [ ] 5.4 audit log 写入: event_type='commit_lint_result', payload={passed, violations, raw_message, retry_attempt}
-- [ ] 5.5 单元测试 12 enumerated fixtures (per R2 fix QA-5):
+- [x] 5.4 audit log 写入: event_type='commit_lint_result', payload={passed, violations, raw_message, retry_attempt}
+- [x] 5.5 单元测试 12 enumerated fixtures (per R2 fix QA-5):
   - (1) valid `feat(M5): title ≤70` + `Closes #N`
   - (2) missing type prefix
   - (3) unknown type (e.g. 'style' vs 'feat' for code)
@@ -198,20 +198,21 @@
 
 ### T-drift spec diff (~7h, R2 fixes BA-12/QA-15/AI-5/AI-7)
 
-- [ ] 5.6 设计 Spec diff LLM prompt template; input slicing (per R2 fix AI-7): 不传 raw proposal.md, 仅传 extracted '## What' + '## Acceptance criteria' 章节 (regex 抽); PR diff 排除 generated/lock/migration-script 文件
-- [ ] 5.6.5 cost spike (per R2 fix AI-5): 用 1 个真 M4 PR (3KB diff) 跑 prompt 实测 input tokens + cost; 写入 AD-M5-5 数据
-- [ ] 5.6.6 calibration spike (per R2 fix AI-7): 5-10 个真 M4 PR offline run, 校验 false-positive 率 < 30%
-- [ ] 5.7 prompt template 版本管理 (`aria-orchestrator/aria-layer1/prompts/spec_drift.md`)
-- [ ] 5.8 dispatcher.py::_check_spec_drift 新方法: dispatch **S8_MERGE only** 后调用 LLM 比较 (per R2 fix BA-12 + QA-15: S_FAIL 类 dispatches 不触发, 无 merged code to compare; per-rework-cycle drift 记录在每 round audit log 含 rework_round tag)
-- [ ] 5.9 ProviderRouter 接入: spec_drift 用 call_llm(prompt, 'glm-4.5-air'); ladder terminal (per AI-8 lock)
-- [ ] 5.10 阈值判断: score < ARIA_SPEC_DRIFT_THRESHOLD → 触发 Feishu drift 警告卡片 (build_drift_alert_card)
-- [ ] 5.11 nomadVar `ARIA_SPEC_DRIFT_THRESHOLD=70` 接入 (default 70, owner 可调)
-- [ ] 5.12 audit log 写入: event_type='spec_drift_detected', payload={score, deviations, extra_changes, input_prompt(4KB cap), raw_output, rework_round}
-- [ ] 5.12.5 JSON parse fallback (per R2 fix AI-2 spec drift 同模式): malformed JSON → 默认 score=NULL + 不触发 Feishu 卡片 + audit log warn
-- [ ] 5.13 单元测试: 多 score 阈值 + Feishu 卡片 mock + audit log + JSON parse fail fixtures (5+ malformed samples per R2 fix AI-2)
-- [ ] 5.14 集成测试: S8_MERGE dispatch + mock LLM → 完整 drift detection 链路; **negative test**: S_FAIL dispatch 不 trigger spec_drift_detected (per R2 fix BA-12)
-- [ ] **5.14.5 live LLM acceptance (per R2 fix AI-1 + C.2.live)**: 至少 1 次真 ProviderRouter call to glm-4.5-air on 1 mock PR diff → 验证 JSON 合规 + score ∈ [0,100]
-- [ ] 5.15 文档: AD-M5-5 slot (spec_drift 阈值 + nomadVar + input slicing + cost spike 数据)
+- [x] 5.6 设计 Spec diff LLM prompt template; input slicing (per R2 fix AI-7): 不传 raw proposal.md, 仅传 extracted '## What' + '## Acceptance criteria' 章节 (regex 抽); PR diff 排除 generated/lock/migration-script 文件
+- [x] 5.6.5 cost spike (per R2 fix AI-5): 用 1 个真 M4 PR (3KB diff) 跑 prompt 实测 input tokens + cost; 写入 AD-M5-5 数据
+- [x] 5.6.6 calibration spike (per R2 fix AI-7): 5-10 个真 M4 PR offline run, 校验 false-positive 率 < 30%
+- [x] 5.7 prompt template 版本管理 (`aria-orchestrator/aria-layer1/prompts/spec_drift.md`)
+- [x] 5.8 dispatcher.py::_check_spec_drift 新方法: dispatch **S8_MERGE only** 后调用 LLM 比较 (per R2 fix BA-12 + QA-15: S_FAIL 类 dispatches 不触发, 无 merged code to compare; per-rework-cycle drift 记录在每 round audit log 含 rework_round tag)
+- [x] 5.9 ProviderRouter 接入: spec_drift 用 call_llm(prompt, 'glm-4.5-air'); ladder terminal (per AI-8 lock)
+- [x] 5.10 阈值判断: score < ARIA_SPEC_DRIFT_THRESHOLD → 触发 Feishu drift 警告卡片 (build_drift_alert_card)
+- [x] 5.11 nomadVar `ARIA_SPEC_DRIFT_THRESHOLD=70` 接入 (default 70, owner 可调)
+- [x] 5.12 audit log 写入: event_type='spec_drift_detected', payload={score, deviations, extra_changes, input_prompt(4KB cap), raw_output, rework_round}
+- [x] 5.12.5 JSON parse fallback (per R2 fix AI-2 spec drift 同模式): malformed JSON → 默认 score=NULL + 不触发 Feishu 卡片 + audit log warn
+- [x] 5.13 单元测试: 多 score 阈值 + Feishu 卡片 mock + audit log + JSON parse fail fixtures (5+ malformed samples per R2 fix AI-2)
+- [x] 5.14 集成测试: S8_MERGE dispatch + mock LLM → 完整 drift detection 链路; **negative test**: S_FAIL dispatch 不 trigger spec_drift_detected (per R2 fix BA-12)
+- [x] **5.14.5 live LLM acceptance (per R2 fix AI-1 + C.2.live)**: 至少 1 次真 ProviderRouter call to glm-4.5-air on 1 mock PR diff → 验证 JSON 合规 + score ∈ [0,100]
+  - **OWNER-DEFERRED to Phase 6 acceptance** (per AD-M5-5 + B.1.live pattern from Phase 2). Production wiring landed in P3 (`reconcile_runner._build_spec_drift_caller` + `ARIA_SPEC_DRIFT_ENABLED=1` opt-in env). Cost per run ≈ ¥0.05; Tier-1 budget ≤ ¥0.10 shared with B.1.live failure_analysis gate.
+- [x] 5.15 文档: AD-M5-5 slot (spec_drift 阈值 + nomadVar + input slicing + cost spike 数据)
 
 ---
 
