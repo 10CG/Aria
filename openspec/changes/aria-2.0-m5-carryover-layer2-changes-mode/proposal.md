@@ -1,0 +1,235 @@
+# Aria 2.0 M5 Carryover — Layer 2 changes-mode container + MODE_HANDLERS skeleton
+
+> **Level**: 3 (Full — multi-module: aria-orchestrator Layer 1 + Layer 2 image + Nomad HCL + test fixtures + side-effect doc patches)
+> **Status**: Draft (Phase A.1, awaiting R1/R2 audit)
+> **Change ID**: `aria-2.0-m5-carryover-layer2-changes-mode`
+> **Parent US**: US-025 (M5 carryover; mirror M3 carryover trio pattern per `feedback_scope_bounded_merge_for_level3` + M3 silknode/result-path/hcl-crons-sweep precedent)
+> **Brainstorm source**: [`.aria/decisions/2026-05-15-m6-brainstorm.md`](../../../.aria/decisions/2026-05-15-m6-brainstorm.md) D1-D7
+> **Sibling Spec**: `aria-2.0-m5-carryover-layer2-redo-mode-aux/` (Spec Y, ships after this one drops 'redo' handler into the `NotImplementedError` slot)
+> **Estimate**: ~22h AI-runnable (per brainstorm D5 A2 skeleton-then-fill option)
+> **Created**: 2026-05-15
+
+---
+
+## Why
+
+M5 (US-025) Phase B 2026-05-15 ship 仅完成 **Layer 1 wiring** for review-loop 改稿/重做 (per AD-M5-3 Decided 2026-05-14): 当 owner 在 PR comment 发 `/aria changes: <feedback>` 时, Layer 1 创建新 dispatch row `rework_mode='changes'` + `pr_id=<inherited>` + `rework_feedback=<text>`, 新行进入 S4_LAUNCH。但 **Layer 2 容器侧的实际 changes mode 实施** (fetch 原 PR branch + apply feedback prompt + force-push) **被 AD-M5-3 显式标记 deferred to M6**。
+
+**M5 期间已知 limitation** (per AD-M5-3 §"M5 期间观察行为"):
+- owner /aria changes → 新行 S4 → 卡住 → reconciler 7d timeout → S_FAIL(human_timeout)
+- Acceptance test 期间 owner 仅使用 /aria approve / /aria reject
+- 这是 known gap, US-025 Phase D.2 final Go 需 Spec X+Y archive 后才能 close
+
+**Spec X 价值**:
+1. 解锁 owner 高频 review-loop 用法 (`/aria changes:` 改稿,M5 brainstorm Q5 owner-locked > 50% rework usage)
+2. 为 Spec Y 提供 `MODE_HANDLERS` dispatcher 基础设施 (D5 skeleton-then-fill: X+Y 总成本 ~42h vs 纯并行 ~45h)
+3. 解除 US-025 D.2 close gate 中的 Spec X archive 前置条件 (per D7)
+
+**为什么不与 Spec Y 合并为一个 Spec** (D2 选 2-Spec 而非 1 fat Spec 的理由,locked in brainstorm):
+- 1500+ 行 fat Spec 会让 R1/R2 audit 基数过大, R2 高风险
+- changes mode 是 high-frequency 用法,先 ship 立即解锁 owner 体验
+- redo mode 实施依赖 close-old-PR + Forgejo state PATCH API (Spec Y OS-3), 与 changes mode (force-push) 不共享代码路径
+- D5 skeleton-then-fill 让 Spec Y zero-refactor drop-in
+
+---
+
+## What
+
+### In scope (Spec X must deliver, ~22h)
+
+#### A. Layer 1 dispatcher 扩展 (~3h)
+- `aria_layer1/extension.py::_handle_s4_launch`:当 dispatch row `rework_mode IS NOT NULL` 时,从 row 读取 4 字段写入 Nomad dispatch meta_optional:
+  - `REWORK_MODE` ← `rework_mode` (`'initial'` (隐式 NULL→initial) / `'changes'` / `'redo'` / `'retry'`)
+  - `REWORK_FEEDBACK` ← `rework_feedback` (≤ 4KB,超出截断 + audit warn)
+  - `PARENT_PR_ID` ← `pr_id` (changes mode 用)
+  - `REWORK_OF` ← `rework_of` (replay chain 追溯用)
+- 对 `rework_mode IS NULL` 行 (原始 dispatch):不写新 meta keys (向后兼容,Layer 2 image v10 看不见这些 env 时默认 `initial` mode)
+
+#### B. Nomad HCL meta_optional 扩展 (~1h)
+- `aria-orchestrator/nomad/jobs/aria-layer2-runner.hcl`:`parameterized` 块 `meta_optional` 加 4 keys
+- 不动 `meta_required` (保持 M1 BC: ISSUE_ID / ISSUE_URL / DISPATCH_ID / IMAGE_SHA / IDEMPOTENCY_KEY)
+- HCL `nomad job validate` 通过 (per `feedback_nomad_hcl_validate_early`)
+
+#### C. Layer 2 entrypoint MODE_HANDLERS scaffolding (~3h)
+- 新建 `aria_layer2_runner/mode_dispatcher.py`:
+  ```python
+  MODE_HANDLERS: Dict[str, Callable[[dict], int]] = {
+      'initial': handle_initial,
+      'changes': handle_changes,
+      'redo':    _not_implemented_yet,  # Spec Y drop-in
+      'retry':   handle_initial,        # alias to initial per M5 failure_analysis path
+  }
+  def dispatch_mode(env: dict) -> int:
+      mode = env.get('REWORK_MODE') or 'initial'
+      return MODE_HANDLERS[mode](env)
+  ```
+- `_not_implemented_yet` raise + audit log event 后 sys.exit(1) (Layer 2 alloc 标 failed,Layer 1 reconciler 看到后 S_FAIL(redo_mode_unimplemented), owner-facing fail_reason 明确)
+- 重构: 现有 entrypoint script 主逻辑迁入 `mode_initial.py`,**零行为变更** (test parity required: 现有 M5 acceptance synthetic 必须仍 pass)
+
+#### D. mode_changes.py 实施 (~10h)
+- Forgejo API client (reuse `aria_layer1/forgejo_client.py` 或子集 inline):
+  - `GET /repos/<org>/<repo>/pulls/<PARENT_PR_ID>` → 拿 head branch name + clone URL
+  - `GET /repos/<org>/<repo>/pulls/<PARENT_PR_ID>/reviews/comments` → 拉所有 PR review comments (per AD-M5-3 §risk mitigation:防 force-push 后失 context)
+- Prompt assemble (per AD-M5-3 §"Prompt assemble strategy" locked):
+  - 必须项:`REWORK_FEEDBACK` + 原 issue body
+  - 可选项:file-by-file diff (按 feedback 提到的 file 优先级排序)
+  - 加 PR review comments 作为附加 context
+  - Hard cap: 60K tokens; 超出 → audit log event `prompt_cap_overflow` + fallback to redo mode (set `MODE='redo'` env + re-invoke dispatcher; Spec Y `mode_redo` ship 后才生效,Spec X 期间 fallback 报错明确)
+- Git ops:
+  - `git clone --depth 1 --branch <head_branch> <forgejo_url> work/`
+  - `cd work/ && git fetch origin <head_branch>` (建 FETCH_HEAD per `feedback_git_force_with_lease_shallow_clone`)
+  - `claude -p --prompt-file <assembled_prompt>`
+  - `git add -A && git commit -m "<auto-generated message>"`
+  - `git push --force-with-lease=<head_branch>:$(git rev-parse FETCH_HEAD) origin <head_branch>`
+- 完成后 alloc terminates code=0, Layer 1 reconciler 看到 → S5_AWAIT → S6_REVIEW
+
+#### E. Image build + digest pin (~2h)
+- Dockerfile bump (含 mode_dispatcher + mode_initial + mode_changes + mode_redo 占位)
+- Tag: `claude-m6a-<commit-sha>-v10`
+- Image push 到 `forgejo.10cg.pub/10cg/aria-runner`
+- sha256 digest 取回 + 写 HCL `image_sha` 默认 value (per AD-M1-7 reproducibility lock)
+- `aria-build-verify` job (existing) 验证 digest
+
+#### F. Synthetic acceptance (~2h)
+- Unit: `mode_dispatcher` routing (4 modes + unknown → error)
+- Unit: `mode_changes.py` prompt builder (empty feedback / 60K overflow / Forgejo 5xx / missing PARENT_PR_ID)
+- Integration: mock Forgejo + mock `claude -p` + verify force-push 调用 (git push --force-with-lease 命令 captured)
+- E2E synthetic: test dispatch row insert `rework_mode='changes'` → Layer 1 `_handle_s4_launch` invoke → Nomad meta verify (4 keys) → mock Layer 2 alloc terminate code=0 → S5_AWAIT advance verify
+- **Production verification deferred** to US-026 M6b ≥10 dispatch (per D7 absorption)
+
+#### G. Side-effect patches (Spec X Phase A.1 同步 — ~1h)
+- `docs/requirements/user-stories/US-025.md`: footer "M5 Carryover Sub-Specs" linking Spec X (+ placeholder for Spec Y)
+- `aria-orchestrator/docs/m5-handoff.yaml::open_issues_for_m6`:
+  - M5-OS-1: mark `absorbed_by: aria-2.0-m5-carryover-layer2-changes-mode`
+  - 新增 field `m6_carryover_to_us_026` containing absorbed Tier-2 path coverage (per D7)
+- `aria-orchestrator/docs/architecture-decisions.md::AD-M5-3`: 状态行 → "Decided 2026-05-14 — Layer 1 wiring DONE; Layer 2 IMPLEMENTATION **in progress via Spec X (aria-2.0-m5-carryover-layer2-changes-mode)**"
+- `prd-aria-v2.md` M6 row: **不动** (per D4)
+
+---
+
+### Out of Scope (deferred or rejected)
+
+- **Spec Y scope**: redo-mode, OS-3 close-old-PR, OS-4 spec_drift_fetcher, OS-5 commit-lint retry → `aria-2.0-m5-carryover-layer2-redo-mode-aux/`
+- **risk-tier algorithm**: 推 M7+ per D6 (v2.0 ships `risk_tier_stub 'always'` literal as M5 ABI compat)
+- **`claude -p` provider routing changes**: M3 ProviderRouter chain (S2=glm-4.5-air / S3=glm-5-turbo / S6=glm-5.1) 不动
+- **Schema migration v4 → v5**: 不引入 (Spec X 不动 schema; Spec Y 也不动)
+- **comment-poll cadence**: M5 已 < 60s per AD-M5-1, 不动
+- **Append-commit mode** (vs force-push): AD-M5-4 已 lock force-push, Spec X 不重开此决策
+- **changes mode 内部 LLM 第二次 audit pass**: 不引入 (changes mode 信任 owner feedback 的 directed intent; double-pass 是 M7+ idea per D6 邻接)
+
+---
+
+## Key Decisions (cross-ref brainstorm)
+
+| 决策 | 锁定项 | Source |
+|------|--------|--------|
+| D1 | M6 = M6a (US-025 carryover) + M6b (US-026 docs/release) | brainstorm Q1 |
+| D2 | M6a = 2 Specs, Spec X first ship | brainstorm Q2 (修正后) |
+| D3 | Layer 2 context via Nomad meta_optional (4 keys) | brainstorm Q3 |
+| D4 | M6a归 US-025 carryover, no new US-028 | brainstorm Q4 |
+| D5 | A2 skeleton-then-fill (MODE_HANDLERS w/ `_not_implemented_yet` redo slot) | brainstorm Q5 |
+| D6 | risk-tier algo 推 M7+ (out of scope) | brainstorm Q6 |
+| D7 | Tier-2 path coverage absorbed to US-026 M6b | brainstorm Q7 |
+| AD-M5-3 | Layer 1↔Layer 2 contract (rework_mode/feedback/pr_id/rework_of) | M5 Decided 2026-05-14 |
+| AD-M5-4 | force-push (not append-commit) | M5 Decided 2026-05-14 |
+| AD-M1-7 | image sha256 digest pin (reproducibility) | M1 Decided |
+
+---
+
+## 验收
+
+### A.1 Phase 完成验收
+- [ ] proposal.md (本文件) created + cross-ref to brainstorm
+- [ ] tasks.md created (8 task groups, ~22h breakdown)
+- [ ] `openspec validate aria-2.0-m5-carryover-layer2-changes-mode --strict` 通过
+
+### Phase A.2 audit 收敛
+- [ ] R1 audit (5 agents: backend-architect / ai-engineer / code-reviewer / qa-engineer / context-manager) generates findings
+- [ ] R2 audit fixes; findings reduction ≥ 80% (per `feedback_audit_convergence_pattern` 5-round trajectory baseline)
+- [ ] Spec Status → Approved
+
+### Phase B 实施完成验收
+- [ ] T1-T8 全部 `[x]` complete
+- [ ] All synthetic tests pass (~30 new behavioral tests expected per X scope)
+- [ ] M5 existing tests still pass (zero regression)
+- [ ] HCL `nomad job validate` 通过
+- [ ] Image build + sha digest pinned in HCL default
+
+### Phase C merge
+- [ ] aria-orchestrator PR merged
+- [ ] Aria 主 repo PR (submodule bump + side-effect patches) merged
+- [ ] Both repos master parity (Forgejo origin + GitHub) verified via SHA
+
+### Phase D archive (Spec X 独立 archive,不等 Spec Y)
+- [ ] m6-carryover-layer2-changes-mode 归档到 `openspec/archive/2026-XX-XX-aria-2.0-m5-carryover-layer2-changes-mode/`
+- [ ] US-025 status 仍 in_progress (等 Spec Y + T-deploy + Tier-1 live)
+
+---
+
+## 价值
+
+| 维度 | 解锁 |
+|------|------|
+| Owner UX | `/aria changes:` 高频用法立刻 live (vs M5 ship 时 `/aria changes:` 直接 S_FAIL human_timeout) |
+| Spec Y velocity | MODE_HANDLERS infra 已 in place,Y 仅 ~19h drop-in vs 纯 redo-from-scratch ~28h (refactor risk) |
+| US-025 close path | Spec X archive 是 D.2 close 2 个 AI 前置之一 (另一个 Spec Y) |
+| Aria methodology | M3 carryover trio pattern 第二次实证 (M3 silknode/result-path/hcl-crons-sweep → M5 Spec X/Y),Aria 规范层稳定 |
+
+---
+
+## 风险与回滚
+
+| 风险 | Severity | Mitigation |
+|------|----------|-----------|
+| MODE_HANDLERS 抽象被 R1/R2 audit 标 over-engineered | Low | Phase A.2 audit 时回退到 A4 "concrete + Y-friendly naming" (brainstorm Q5 alternative);Spec Y refactor 影响仅 ~5h 增量 |
+| force-push 后 PR review threads marked outdated | Medium (AD-M5-3 known) | Prompt 含 PR review comments history (mitigation locked in AD-M5-3); owner 仍可在 force-push 后 PR 看到 historical thread |
+| 60K token cap overflow in `mode_changes` | Low | Audit log warn + fallback to redo (Spec Y ship 前: 报错明确 + S_FAIL(prompt_overflow)); 真实 owner feedback rarely 60K |
+| Image v10 build breaks aria-build pipeline | Low | 5x prior bumps (M1-M5) successful;`aria-build-verify` validates digest before Layer 1 references it |
+| Forgejo API rate-limit on PR comments fetch | Low | Cache per dispatch (短时间内重试不再 hit API); 真实 Layer 2 alloc 1 次 fetch |
+| Layer 1 `_handle_s4_launch` regression breaks M5 initial mode | Medium | Test parity (zero-behavior change for `rework_mode IS NULL`); existing M5 537 tests must still pass |
+
+**回滚路径**:
+1. **Code only revert**: revert aria-orchestrator PR → Layer 1 不写 meta_optional 新 keys → Layer 2 image v10 仍部署但默认 'initial' mode → `/aria changes:` 仍 卡住 (与 M5 ship 时一致) → 无 regression
+2. **Image revert**: 改 HCL `image_sha` 默认 value 回 v9 (M5 ship 版本) → 新 dispatch 用回旧 image,无 mode_dispatcher → 与 M5 ship 一致
+3. **Spec X archived → Spec Y rollout 路径影响**: 若 Spec X 出生产事故,Spec Y 等 Spec X hotfix Spec ship 后再启动 (per `feedback_sister_bug_bundling`)
+
+---
+
+## 排序依赖
+
+```
+T1 (Layer 1 meta write)  ─┐
+T2 (HCL meta_optional)   ─┴─→ T3 (MODE_HANDLERS scaffolding)
+                                    │
+                                    ↓
+                            T4 (mode_changes.py)
+                                    │
+                                    ↓
+                            T5 (image build + digest)
+                                    │
+                                    ↓
+                            T6 (synthetic acceptance)
+                                    │
+                                    ↓
+                            T7 (side-effect patches)
+                                    │
+                                    ↓
+                            T8 (Phase C merge + Phase D archive)
+```
+
+T1 + T2 can run in parallel (different files); T3-T6 strict sequential (each builds on prior); T7 prep can start at T4; T8 awaits all merge.
+
+---
+
+## Cross-references
+
+- Brainstorm decision: [.aria/decisions/2026-05-15-m6-brainstorm.md](../../../.aria/decisions/2026-05-15-m6-brainstorm.md)
+- AD-M5-3 Layer 2 二次进入 contract: [architecture-decisions.md:3574-3629](../../../aria-orchestrator/docs/architecture-decisions.md)
+- AD-M5-4 force-push rationale: same file, §AD-M5-4
+- AD-M5-10 forward-binding promises: same file, §AD-M5-10
+- M5 deferred handoff: [m5-handoff.yaml::open_issues_for_m6](../../../aria-orchestrator/docs/m5-handoff.yaml)
+- M5 session closeout: [docs/handoff/2026-05-15-us025-m5-c2-d1-done.md](../../../docs/handoff/2026-05-15-us025-m5-c2-d1-done.md)
+- PRD v2.0 §410-414 M6 row: [prd-aria-v2.md](../../../docs/requirements/prd-aria-v2.md)
+- M3 carryover trio precedent: `openspec/archive/2026-05-07-m3-carryover-{hcl-crons-sweep,result-path-derivation,handoff-validator-spillover}/`
+- US-025: [docs/requirements/user-stories/US-025.md](../../../docs/requirements/user-stories/US-025.md)
+- Memory references: `feedback_phase_a_depth_drives_b_velocity` / `feedback_git_force_with_lease_shallow_clone` / `feedback_audit_convergence_pattern` / `feedback_scope_bounded_merge_for_level3` / `feedback_nomad_hcl_validate_early`
