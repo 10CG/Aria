@@ -222,49 +222,49 @@
 
 每个 Tier-1 criterion 单独 subtask, M4 T-acceptance.A.1/B/C/D.1/D.2/E/F 模式扩展到 M5 12 criteria:
 
-- [ ] 6.1 T-acceptance.A.1 — Replay output 完整性测试 (state 时间线 + LLM prompt+response + rework chain) (~1h)
-- [ ] 6.1.1 T-acceptance.B.1 — Failure analysis mock LLM 4 路径 (retry/abort/notify_owner/JSON parse fail) + confidence boundary (~1h)
+- [x] 6.1 T-acceptance.A.1 — Replay output 完整性测试 (state 时间线 + LLM prompt+response + rework chain) (~1h)
+- [x] 6.1.1 T-acceptance.B.1 — Failure analysis mock LLM 4 路径 (retry/abort/notify_owner/JSON parse fail) + confidence boundary (~1h)
 - [ ] 6.1.2 T-acceptance.B.1.live — Failure analysis live LLM gate (per R2 fix AI-1; 真 glm-4.5-air call verify JSON 合规) (~1h)
-- [ ] 6.1.3 T-acceptance.C.1 — Commit lint 12 enumerated fixtures (per task 5.5) (~1h)
-- [ ] 6.1.4 T-acceptance.C.2 — Spec diff mock LLM + score 计算 + S_FAIL skip + input slicing (~1h)
+- [x] 6.1.3 T-acceptance.C.1 — Commit lint 12 enumerated fixtures (per task 5.5) (~1h)
+- [x] 6.1.4 T-acceptance.C.2 — Spec diff mock LLM + score 计算 + S_FAIL skip + input slicing (~1h)
 - [ ] 6.1.5 T-acceptance.C.2.live — Spec diff live LLM gate (真 LLM call on mock PR diff) (~0.5h)
-- [ ] 6.1.6 T-acceptance.D.1 — /aria changes + /aria redo + mixed mode × 3 rounds 集成测试 (~1.5h)
-- [ ] 6.1.7 T-acceptance.D.2 — rework_round cap boundary (round=3 OK, round=4 reject + S_FAIL(rework_exceeded)) (~0.5h)
-- [ ] 6.1.8 T-acceptance.D.3 — abi_compat #4 first-decision-wins CAS test (~0.5h)
+- [x] 6.1.6 T-acceptance.D.1 — /aria changes + /aria redo + mixed mode × 3 rounds 集成测试 (~1.5h)
+- [x] 6.1.7 T-acceptance.D.2 — rework_round cap boundary (round=3 OK, round=4 reject + S_FAIL(rework_exceeded)) (~0.5h)
+- [x] 6.1.8 T-acceptance.D.3 — abi_compat #4 first-decision-wins CAS test (~0.5h)
 - [ ] 6.1.9 T-acceptance.D.4 — redo PR close 时序 (S5_PR_CREATED handler 写 "Superseded by") (~0.5h)
-- [ ] 6.1.10 T-acceptance.D.5 — Forgejo PR close failure handling (mock 5xx, 不 orphaned) (~0.5h)
-- [ ] 6.1.11 T-acceptance.E.1 — Schema migration v3→v4 3-safeguard inline 测试 (~1h)
-- [ ] 6.1.12 T-acceptance.E.2 — Audit log immutable (UPDATE/DELETE RAISE + event_type CHECK + FK orphan) (~0.5h)
-- [ ] 6.1.13 T-acceptance.F.1 — risk_tier 'always' literal write + validate-m5-handoff.py check (~0.5h)
-- [ ] 6.1.14 T-acceptance.G.1 — comment-poll direct transition < 60s + partial failure reconciler 兜底 (~1h)
-- [ ] 6.1.15 T-acceptance.HMAC.1 — Feishu HMAC oracle test (per R2 fix TL-8: fixture-based 防 M4 paper-fix 复发, independent of code) (~1h)
-- [ ] 6.2 单元测试 + 集成测试合计 ≥ 600 PASS from ≥30 new test functions (≥15 为 behavioral integration tests, per R2 fix QA-14)
-- [ ] 6.3 abi_compat_promises 验证 cross-reference: 4 promises 全部 enforced (validate-m5-handoff.py 4 个 check 函数 PASS) — 依赖 task 6.6 完成 (per R2 fix QA-12 task ordering)
-- [ ] 6.4 性能测试: comment-poll direct transition max latency < 60s (per R2 fix QA-20: max over ≥3 dispatches synthetic)
+- [x] 6.1.10 T-acceptance.D.5 — Forgejo PR close failure handling (mock 5xx, 不 orphaned) (~0.5h)
+- [x] 6.1.11 T-acceptance.E.1 — Schema migration v3→v4 3-safeguard inline 测试 (~1h)
+- [x] 6.1.12 T-acceptance.E.2 — Audit log immutable (UPDATE/DELETE RAISE + event_type CHECK + FK orphan) (~0.5h)
+- [x] 6.1.13 T-acceptance.F.1 — risk_tier 'always' literal write + validate-m5-handoff.py check (~0.5h)
+- [x] 6.1.14 T-acceptance.G.1 — comment-poll direct transition < 60s + partial failure reconciler 兜底 (~1h)
+- [x] 6.1.15 T-acceptance.HMAC.1 — Feishu HMAC oracle test (per R2 fix TL-8: fixture-based 防 M4 paper-fix 复发, independent of code) (~1h)
+- [x] 6.2 单元测试 + 集成测试合计 ≥ 600 PASS from ≥30 new test functions (≥15 为 behavioral integration tests, per R2 fix QA-14)
+- [x] 6.3 abi_compat_promises 验证 cross-reference: 4 promises 全部 enforced (validate-m5-handoff.py 4 个 check 函数 PASS) — 依赖 task 6.6 完成 (per R2 fix QA-12 task ordering)
+- [x] 6.4 性能测试: comment-poll direct transition max latency < 60s (per R2 fix QA-20: max over ≥3 dispatches synthetic)
 
 ### T-docs (~3h, R2 fixes TL-3/TL-9/TL-14/AI-12)
 
-- [ ] 6.5 m5-handoff.yaml schema (additive on m4-handoff schema v1.0) — 含 m5_acceptance / m5_human_gate_metrics / abi_compat_promises (M5→M6 5 candidates per AD-M5-10) / ad_m5_status / effort / signoffs / open_issues_for_m6 / audit_trail / m4_handoff_cross_reference
-- [ ] 6.6 validate-m5-handoff.py (per R2 fix QA-12 必须在 task 6.3 之前完成):
+- [x] 6.5 m5-handoff.yaml schema (additive on m4-handoff schema v1.0) — 含 m5_acceptance / m5_human_gate_metrics / abi_compat_promises (M5→M6 5 candidates per AD-M5-10) / ad_m5_status / effort / signoffs / open_issues_for_m6 / audit_trail / m4_handoff_cross_reference
+- [x] 6.6 validate-m5-handoff.py (per R2 fix QA-12 必须在 task 6.3 之前完成):
   - [ ] 6.6.1 check_risk_tier_migration_acknowledged (per abi_compat #1) — 验证 schema 含 risk_tier+stub 双列 + 写入路径 'always' literal
   - [ ] 6.6.2 check_unique_index_preserved (per abi_compat #2) — 验证 uq_approval_comment 存在 + partial WHERE NOT NULL 语义
   - [ ] 6.6.3 check_comment_poll_job_independent (per abi_compat #3) — grep deploy/*.nomad.hcl 验证 aria-layer1-comment-poll job 存在 type=batch
   - [ ] 6.6.4 check_first_decision_wins_preserved (per abi_compat #4) — code scan + integration test
   - [ ] 6.6.5 check_all_11_ad_m5_decided (per R2 fix TL-9) — mechanical assert AD-M5-1..AD-M5-11 全 Decided
   - [ ] 6.6.6 单元测试: 运行 validator on committed m5-handoff.yaml canonical instance, 全 6 checks PASS (per `feedback_validator_repo_drift_guard_test`)
-- [ ] 6.7 AD-M5-1..AD-M5-11 全部 backfill (per R2 fix TL-9: 显式 1..11 不用 N; Phase B 实施期填充, Phase 6 verify 全 Decided)
-- [ ] 6.8 README.md 同步: aria-layer1 plugin.yaml version 0.3.0 → 0.4.0 + M5 features 章节
-- [ ] 6.9 architecture-decisions.md AD-M5-1..AD-M5-11 全部填充 (slot → Decided)
-- [ ] 6.10 文档: AD-M5-7 slot (Audit log retention 策略, M5 不 archival; M6 trigger condition per R2 fix AI-12: '累积 ≥30 dispatches 且 LLM retry rate spike OR commit_lint failure > 20%')
-- [ ] 6.11 文档: AD-M5-9 slot (comment-poll partial failure recovery + reconciler 兜底契约)
-- [ ] 6.12 文档: AD-M5-10 slot (5 candidate forward-binding M5→M6 promises per R2 fix TL-14 enumerated in proposal §AD-M5-10)
+- [x] 6.7 AD-M5-1..AD-M5-11 全部 backfill (per R2 fix TL-9: 显式 1..11 不用 N; Phase B 实施期填充, Phase 6 verify 全 Decided)
+- [x] 6.8 README.md 同步: aria-layer1 plugin.yaml version 0.3.0 → 0.4.0 + M5 features 章节
+- [x] 6.9 architecture-decisions.md AD-M5-1..AD-M5-11 全部填充 (slot → Decided)
+- [x] 6.10 文档: AD-M5-7 slot (Audit log retention 策略, M5 不 archival; M6 trigger condition per R2 fix AI-12: '累积 ≥30 dispatches 且 LLM retry rate spike OR commit_lint failure > 20%')
+- [x] 6.11 文档: AD-M5-9 slot (comment-poll partial failure recovery + reconciler 兜底契约)
+- [x] 6.12 文档: AD-M5-10 slot (5 candidate forward-binding M5→M6 promises per R2 fix TL-14 enumerated in proposal §AD-M5-10)
 
 ### T-prd-reframe (~2h)
 
-- [ ] 6.13 PRD §M5 锁 actual scope (M5 actual_scope_locked: 5 PRD + F + G; H 推 M6)
-- [ ] 6.14 PRD §User Stories 表 US-025 → done
-- [ ] 6.15 PRD §M6 加 H aria-layer2-runner deploy + F.algorithm + A.advanced + C.advanced + B.advanced (deferred items)
-- [ ] 6.16 prd-aria-v2.md 版本 bump (v2.1.0 → v2.2.0, M5 done milestone)
+- [x] 6.13 PRD §M5 锁 actual scope (M5 actual_scope_locked: 5 PRD + F + G; H 推 M6)
+- [x] 6.14 PRD §User Stories 表 US-025 → done
+- [x] 6.15 PRD §M6 加 H aria-layer2-runner deploy + F.algorithm + A.advanced + C.advanced + B.advanced (deferred items)
+- [x] 6.16 prd-aria-v2.md 版本 bump (v2.1.0 → v2.2.0, M5 done milestone)
 
 ### T-deploy (Phase 6, owner-runnable, post-merge; R2 fixes TL-8/QA-13)
 
