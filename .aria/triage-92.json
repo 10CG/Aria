@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.20.0",
+  "issue_ref": "10CG/Aria#92",
+  "generated_at": "2026-05-13T20:20:42Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 92,
+      "title": "feat: 十步循环加 session-handoff 阶段 (开始读 + 结束写, 配合 state-scanner)",
+      "body": "## 背景 / 问题\n\naria 十步循环目前没有标准化 **session 切换** 这个事件。实战发现：\n\n1. **session 开始时**: `aria:state-scanner` v3.0 snapshot 里**没有** handoff 文件作为采集字段, AI 直接读 snapshot 给推荐就会错过用户在上 session 写的\"下一步建议\"。\n\n   实测案例 (SilkNode 2026-05-09):\n   - 用户 `/aria:state-scanner` → AI 拿 snapshot 看到 main 干净 + 44 ready stories → 推荐 \"随便挑一个 ready story\"\n   - 用户反问 \"你是不是没读交接文档？\" → AI 才去读 `docs/handoff/2026-05-09-session-handoff.md`\n   - handoff §6 明确写了优先级: \"**US-095 first**, US-097 是 dead path 直到 US-095 land\"\n   - 修正后推荐才对齐用户意图\n\n2. **session 结束时**: 没有标准化模板/触发点。本 SilkNode 项目自发演进出 `docs/handoff/{date}-session-handoff.md` 模式, 含 8 段 (TL;DR / 已完成 / 未完成 / 风险 / 教训 / 4 维度同步 / next-session 入口 / 提交清单), 但这是 ad-hoc, 不是 aria 规范一部分。\n\n## 影响范围\n\n跨 session 工作的所有 Level 2+ 项目 (持续多天的 feature, 多个 US 的 epic) 都吃这个亏:\n- 信息断层: AI 看不到上次 session 总结的 next-step\n- 用户体验: 必须人工提示 AI \"读 handoff 文件\", 否则 state-scanner 给的推荐基于不完整信息\n- 一致性: 不同项目自发演进出不同 handoff 格式, 经验无法跨项目复用\n\n## 建议方案 (3 个修法, 任选或组合)\n\n### T1: state-scanner 加 handoff awareness collector\n\n`scripts/scan.py` 加 `collectors/handoff.py`:\n- 扫 `docs/handoff/*.md` 找 latest (mtime 排序)\n- snapshot 顶层加 `handoff` 字段: `{exists, latest_path, last_modified, age_hours}`\n- AI 在 Phase 2 推荐前**必读** snapshot.handoff.latest_path (如果 exists 且 age_hours < 720, 即 30 天)\n- snapshot 阶段不读 handoff body (避免膨胀), 只暴露 path; AI 自己 Read\n\n### T2: phase-d-closer 加 D.3 session-handoff 步骤\n\nPhase D 收尾后 (D.1 progress-update + D.2 openspec-archive) 加 **D.3 session-handoff (可选触发)**:\n- 触发条件: session 跨度 > 4h 或本 session 完整 ship ≥ 2 个 US\n- 模板: 8 段 (TL;DR / 已完成 / 未完成 / 风险 / 教训 / 4 维度同步 / next-session 入口 / 提交清单), 参考 SilkNode `docs/handoff/2026-05-09-session-handoff.md`\n- 输出路径: `docs/handoff/{YYYY-MM-DD}-session-handoff.md`\n- 命名 deterministic: 同日多 session 用 `{YYYY-MM-DD}-{HHMM}-session-handoff.md`\n\n### T3: 独立 skill `aria:session-bridge`\n\n- `aria:session-bridge --read`: state-scanner 之后强制读 latest handoff, surface §next-session 优先级\n- `aria:session-bridge --write`: phase-d-closer 之后调, 引导写 handoff doc\n- 跟 T1 + T2 不冲突, 是更上层的封装\n\n## 推荐组合\n\n**T1 + T2**:\n- T1 解决 session 开始读取 (零成本, scan.py 加一个 collector)\n- T2 解决 session 结束写出 (在 Phase D 加可选步骤, 不破坏现有流程)\n- T3 可作为 v1 之后的封装升级\n\n## Acceptance Criteria\n\n- [ ] state-scanner snapshot.handoff 字段定义在 schema.md (additive, schema 1.0 → 1.1)\n- [ ] state-scanner SKILL.md 阶段 2 决策前 \"读 snapshot.handoff.latest_path 如果 exists\" 写入 RECOMMENDATION_RULES.md\n- [ ] phase-d-closer SKILL.md 加 D.3 步骤说明 + 模板引用\n- [ ] handoff 模板文件 (例: `aria/templates/session-handoff.md`) 含 8 段骨架\n- [ ] 实测: SilkNode 下次 session 不需要用户提示, AI 自动读 handoff\n\n## Reference (实战参考)\n\nSilkNode 2026-05-09 handoff 文件 (8 段实战模板, 含 audit trajectory 数据点 + 4 维度同步状态):\n\n`docs/handoff/2026-05-09-session-handoff.md`\n\n主要 section:\n- §0 入口 (强调下次 session 用 state-scanner 进入)\n- §1 已完成 (按时间顺序, 含 commit hash)\n- §2 未完成 (按 P1/P2/P3 优先级)\n- §3 关键风险点 / 已知陷阱\n- §4 实战教训 (memory 沉淀)\n- §5 4 维度 aria 同步状态 (PRD/User Story/OpenSpec/UPM)\n- §6 Next session 入口 + 优先级建议\n- §7 提交清单\n- §8 数学 + 进度 (W2 进度 2/4 等)\n\n## 关联\n\n延续 Issue #85 (state-scanner v3.0 surfacing gap) 同一主题 — 都是 \"AI 视野\" 问题:\n- #85: 4 个 surfacing gap (PRD frontmatter / UPM Pending Followups / handoff doc / in_progress US 内容)\n- 本 issue: 把 #85 G3 (handoff doc 指针未识别) 升级为完整方案 + 加上 session 结束侧的写入规范\n",
+      "state": "open",
+      "labels": [
+        "aria-auto"
+      ],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/92",
+      "created_at": "2026-05-09T00:16:57Z",
+      "updated_at": "2026-05-09T14:36:50Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": null,
+      "current": "1.20.0",
+      "gap": null
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "docs/handoff/2026-05-09-session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: # Aria — Session Handoff (2026-05-09)\n2: \n3: > **Status**: Active — Ready for next session\n4: > **Cycle period**: 2026-05-08 (sub-PR (a) Spec approved + a-prereq drafted) → 2026-05-09 (3 sub-PR ship + Spec archive + v1.18.0 release)\n5: > **Next session 入口建议**: 优先读本 doc, 然后按 [Recommended workflow](#recommended-workflow) 选轨道",
+          "warning": null,
+          "total_lines": 255
+        },
+        {
+          "file_path": "docs/handoff/{date}-session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "scripts/scan.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "collectors/handoff.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "docs/handoff/*.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "docs/handoff/{YYYY-MM-DD}-session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "{YYYY-MM-DD}-{HHMM}-session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "aria/templates/session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [
+        "chore/state-scanner-spec-status-fix",
+        "feature/aria-issue-101-status-normalize",
+        "feature/aria-issue-triage-sop",
+        "feature/phase-c-integrator-pre-merge-gate-d3-claude-md-rule",
+        "feature/phase-c-integrator-pre-merge-gate-prereq",
+        "feature/phase-c-integrator-pre-merge-gate-t5-benchmark",
+        "master",
+        "remotes/github/chore/state-scanner-spec-status-fix",
+        "remotes/github/feature/aria-2.0-m0-prerequisite",
+        "remotes/github/feature/aria-2.0-m2-layer1-state-machine",
+        "remotes/github/feature/aria-2.0-m4-human-gate-feishu-approval",
+        "remotes/github/feature/aria-issue-101-status-normalize",
+        "remotes/github/feature/aria-issue-triage-sop",
+        "remotes/github/feature/aria-secret-hygiene-rule",
+        "remotes/github/feature/benchmark-transparency-enhancement",
+        "remotes/github/feature/m3-carryover-hcl-crons-sweep",
+        "remotes/github/feature/m3-carryover-result-path-derivation",
+        "remotes/github/feature/m3-handoff-validator-spillover",
+        "remotes/github/feature/phase-c-integrator-pre-merge-gate-d3-claude-md-rule",
+        "remotes/github/feature/phase-c-integrator-pre-merge-gate-prereq",
+        "remotes/github/feature/phase-c-integrator-pre-merge-gate-t5-benchmark",
+        "remotes/github/feature/prd-v2-ad3-option-c-patch",
+        "remotes/github/feature/state-scanner-mechanical-t3",
+        "remotes/github/feature/state-scanner-mechanical-t4",
+        "remotes/github/feature/state-scanner-v2.9",
+        "remotes/github/feature/v1.17.4-bundled-archive",
+        "remotes/github/feature/v1.17.5-bundled-archive",
+        "remotes/github/feature/v1.17.6-archive",
+        "remotes/github/master",
+        "remotes/origin/aria/DEMO-001",
+        "remotes/origin/aria/DEMO-002",
+        "remotes/origin/chore/state-scanner-spec-status-fix",
+        "remotes/origin/feature/aria-2.0-m0-prerequisite",
+        "remotes/origin/feature/aria-2.0-m2-layer1-state-machine",
+        "remotes/origin/feature/aria-2.0-m4-human-gate-feishu-approval",
+        "remotes/origin/feature/aria-issue-101-status-normalize",
+        "remotes/origin/feature/aria-issue-triage-sop",
+        "remotes/origin/feature/aria-secret-hygiene-rule",
+        "remotes/origin/feature/benchmark-transparency-enhancement",
+        "remotes/origin/feature/m3-carryover-hcl-crons-sweep",
+        "remotes/origin/feature/m3-carryover-result-path-derivation",
+        "remotes/origin/feature/m3-handoff-validator-spillover",
+        "remotes/origin/feature/phase-c-integrator-pre-merge-gate-d3-claude-md-rule",
+        "remotes/origin/feature/phase-c-integrator-pre-merge-gate-prereq",
+        "remotes/origin/feature/phase-c-integrator-pre-merge-gate-t5-benchmark",
+        "remotes/origin/feature/prd-v2-ad3-option-c-patch",
+        "remotes/origin/feature/state-scanner-mechanical-t3",
+        "remotes/origin/feature/state-scanner-mechanical-t4",
+        "remotes/origin/feature/state-scanner-v2.9",
+        "remotes/origin/feature/v1.17.4-bundled-archive",
+        "remotes/origin/feature/v1.17.5-bundled-archive",
+        "remotes/origin/feature/v1.17.6-archive",
+        "remotes/origin/master"
+      ],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "2902787bca2e06bd92d3c0ed7fc4963aeeaaf9f5"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": null,
+    "cases": [],
+    "hit_count": 0,
+    "total_count": 0,
+    "hit_rate": "0/0"
+  },
+  "verdict": null,
+  "severity": null,
+  "recommended_action": null,
+  "deviation_note": null,
+  "errors": []
+}

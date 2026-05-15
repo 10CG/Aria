@@ -123,9 +123,10 @@ D. 收尾 (Closure)
 
 | 子模块/目录 | 职责 | 关键内容 |
 |-------------|------|----------|
-| `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 |
+| `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 (含 secret-hygiene / **session-handoff**) |
 | `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
 | `aria-plugin-benchmarks/` | Skill 基准测试 | AB 测试套件、结果存档、运维手册 |
+| `docs/handoff/` | Session handoff records | 跨 session 优先级 / carry-forward / 实战教训传递 (Rule #9) |
 
 ### 目录导航
 
@@ -136,10 +137,13 @@ D. 收尾 (Closure)
 ├── 工作流程       → standards/core/ten-step-cycle/
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
+├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
+├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+)
 ├── 进度管理       → standards/core/progress-management/
 ├── 研究文档       → docs/
 ├── 需求文档       → docs/requirements/ (PRD + User Stories)
 ├── 架构文档       → docs/architecture/system-architecture.md
+├── Session handoff → docs/handoff/{date}-{slug}.md (canonical, Rule #9)
 ├── 项目配置       → .aria/config.json (从 config.template.json 复制)
 ├── 配置加载       → aria/skills/config-loader/ (内部基础设施)
 ├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
@@ -399,6 +403,18 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **详细实施规范:** `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (与 Rule #7 引用 `standards/conventions/secret-hygiene.md` 同结构)
 
+9. **Session handoff docs 必须写在 `docs/handoff/`** - 详见 `standards/conventions/session-handoff.md` (aria-plugin v1.21.0+)
+
+**规则 #9 要点:** session handoff 文档 (`docs/handoff/{YYYY-MM-DD}-{slug}.md`) 必须写在 `docs/handoff/` (canonical), 禁止写 `.aria/handoff/*.md`。`.aria/` 是机器状态 namespace, `docs/` 是人类/AI 可读 prose namespace; handoff 是 prose 范畴。5 层 defense-in-depth: L1 PreToolUse hook 阻断写入 + L2 scan.py collector 检测 misplaced + L3 state-scanner 推荐迁移 + L4 本规范 (Convention SOT) + L5 phase-d-closer D.3 template 硬编码输出路径。
+
+**触发场景:** session 跨度 > 4h **或** 本 session 完整 ship ≥ 2 cycles/US **或** 本 session 跨 ≥ 2 phases。phase-d-closer D.2 archive 完成后, D.3 step 评估上述条件 (4-level fallback 信号), 满足则 prompt user 写 handoff (template `aria/templates/session-handoff.md`, 9-section skeleton 含 §0 入口 / §1-§7 标准段 / §8 memory entries)。
+
+**Source incidents:** 4 起 dogfood (SilkNode 2026-05-09 1 起 + Aria self 2026-05-13 3 起,含 H0 spec 起草本 session 自身);Forgejo Issue [#92](https://forgejo.10cg.pub/10CG/Aria/issues/92) (triage [#6170](https://forgejo.10cg.pub/10CG/Aria/issues/92#issuecomment-6170)).
+
+**Exception:** **零 exception** (与 Rule #7 不同, handoff 路径选择无 ambiguity 边缘场景)。任何 `.aria/handoff/*.md` 写入企图都应 redirect 到 `docs/handoff/`。
+
+**详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
+
 ---
 
 ## 项目状态
@@ -406,7 +422,7 @@ Skill 基准测试 (新增或修改 Skill 时):
 ```
 当前阶段: 研究中 → v2.0 规划已批准
 成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
-插件版本: v1.19.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents)
+插件版本: v1.21.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents + Rule #9 session-handoff)
 主项目版本: v1.7.0
 PRD v2.0: Approved (2026-04-11, 待 M0 启动)
 ```
