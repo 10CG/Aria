@@ -1,0 +1,62 @@
+# issue-triage unit tests — main repo CI integration
+#
+# Runs pytest for aria/skills/issue-triage/tests/ from the main repo context
+# (where the aria submodule is checked out as aria/).
+# Triggered on changes to the issue-triage skill or its tests.
+#
+# T4.5: CI integration per openspec/changes/aria-issue-triage-sop/tasks.md §T4.5
+# Run target: python3 -m pytest aria/skills/issue-triage/tests/ -v
+
+name: issue-triage tests
+
+on:
+  push:
+    branches: [master, 'feature/aria-issue-triage-sop']
+    paths:
+      - 'aria/skills/issue-triage/**'
+  pull_request:
+    paths:
+      - 'aria/skills/issue-triage/**'
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: pytest issue-triage (main repo)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Init aria submodule
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        run: |
+          git config --global url."http://forge:${FORGEJO_TOKEN}@192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
+          git submodule update --init aria
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest jsonschema
+
+      - name: Run issue-triage tests
+        run: |
+          python3 -m pytest aria/skills/issue-triage/tests/ -v --tb=short
+        env:
+          TRIAGE_LOG_LEVEL: WARNING
+
+      - name: Upload test results (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-triage-pytest-results
+          path: .pytest_cache/
+          retention-days: 7

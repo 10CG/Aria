@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "skill_name": "issue-triage",
+    "skill_path": "aria/skills/issue-triage/",
+    "executor_model": "claude-opus-4-7[1m]",
+    "analyzer_model": "claude-opus-4-7[1m]",
+    "timestamp": "2026-05-13T15:09:43Z",
+    "evals_run": ["eval-1-aria-101-direct-ref", "eval-2-silknode-207-url-only", "eval-3-ambiguous-recent-bug-ref"],
+    "runs_per_configuration": 3,
+    "iteration": 1,
+    "configurations": ["with_skill", "without_skill"]
+  },
+  "runs": [
+    {"eval_name": "eval-1-aria-101-direct-ref", "config": "with_skill", "passed": 12, "total": 13, "pass_rate": 0.923, "time_seconds": 155.0, "tokens": 64566, "lenient_passed": 8, "lenient_total": 8, "discriminating_passed": 4, "discriminating_total": 5},
+    {"eval_name": "eval-1-aria-101-direct-ref", "config": "without_skill", "passed": 10, "total": 13, "pass_rate": 0.769, "time_seconds": 100.4, "tokens": 45763, "lenient_passed": 8, "lenient_total": 8, "discriminating_passed": 2, "discriminating_total": 5},
+    {"eval_name": "eval-2-silknode-207-url-only", "config": "with_skill", "passed": 11, "total": 12, "pass_rate": 0.917, "time_seconds": 143.7, "tokens": 61146, "lenient_passed": 7, "lenient_total": 7, "discriminating_passed": 4, "discriminating_total": 5},
+    {"eval_name": "eval-2-silknode-207-url-only", "config": "without_skill", "passed": 8, "total": 12, "pass_rate": 0.667, "time_seconds": 60.9, "tokens": 40412, "lenient_passed": 7, "lenient_total": 7, "discriminating_passed": 1, "discriminating_total": 5},
+    {"eval_name": "eval-3-ambiguous-recent-bug-ref", "config": "with_skill", "passed": 11, "total": 12, "pass_rate": 0.917, "time_seconds": 122.0, "tokens": 66625, "lenient_passed": 7, "lenient_total": 7, "discriminating_passed": 4, "discriminating_total": 5},
+    {"eval_name": "eval-3-ambiguous-recent-bug-ref", "config": "without_skill", "passed": 8, "total": 12, "pass_rate": 0.667, "time_seconds": 69.4, "tokens": 35136, "lenient_passed": 7, "lenient_total": 7, "discriminating_passed": 1, "discriminating_total": 5}
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate_mean": 0.919,
+      "time_seconds_mean": 140.2,
+      "tokens_mean": 64112,
+      "lenient_pass_rate": 1.0,
+      "discriminating_pass_rate": 0.80
+    },
+    "without_skill": {
+      "pass_rate_mean": 0.701,
+      "time_seconds_mean": 76.9,
+      "tokens_mean": 40437,
+      "lenient_pass_rate": 1.0,
+      "discriminating_pass_rate": 0.267
+    },
+    "delta": {
+      "pass_rate": "+0.218",
+      "lenient_pass_rate": "+0.000",
+      "discriminating_pass_rate": "+0.533",
+      "time_seconds": "+63.3",
+      "tokens": "+23675"
+    }
+  },
+  "notes": [
+    "Lenient (capability) assertions show ZERO delta — Opus 4.7[1M] is strong enough that baseline naturally performs version check / git log / in-flight / verdict on well-contextualized issues. Issue #101 had prior triage comments (#5972 manual + #6019 dogfood) that provided strong context for baseline.",
+    "Discriminating (structure) assertions show +53.3pp delta — Skill ensures machine-readable JSON output, dedicated ready-to-post triage-comment.md, canonical enum verdicts (verdict + severity + recommended_action 3/3). Baseline produces ad-hoc markdown.",
+    "Time cost: with_skill +63.3s avg (+82%). Tokens: +23k avg (+59%). The Skill's value is structure + reusability + downstream automation potential, not single-shot answer speed.",
+    "Schema validation (D3) failed for all 3 with_skill runs — agents hand-wrote JSON instead of running scripts/triage.py. SKILL.md needs to be more emphatic that 'MUST invoke scripts/triage.py for Step 0, do not hand-author JSON'. This is iteration-2 carry-forward.",
+    "Verdict for Rule #6 (CLAUDE.md): delta > 0 across pass_rate (+21.8pp overall, +53.3pp on structural dimensions). PASS — with documented caveat that capability delta is 0 on Opus 4.7 with contextual evidence; structural value is the dominant signal.",
+    "Analyst note (non-discriminating assertions): A1-A8/A1-A7 (functional checks) show 100% pass on both configs. They confirm the Skill doesn't BREAK anything (no regression) but don't discriminate Skill value. For future iterations, replace lenient checks with structural / format-conformance / cross-repo-specific cases."
+  ]
+}
