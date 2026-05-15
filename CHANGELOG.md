@@ -9,6 +9,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### US-025 M5 Layer 1 SHIPPED + Phase C.2 + D.1 done (2026-05-15)
+
+M5 Phase 1-6 (Layer 1 portion) complete + Phase C.2 merged to master + Phase D.1 progress update done.
+Phase D.2 (Spec archive + final Go decision) owner-deferred pending T-deploy + Tier-1 live LLM gates + Tier-2 N≥3.
+
+#### Phase trajectory (single cycle 2026-05-13 → 2026-05-15)
+
+| Phase | Scope | Baseline | Actual | Ratio | Test Δ |
+|-------|-------|----------|--------|-------|--------|
+| 1 | Schema + audit log foundation | 25h | ~13h | ×0.52 | +87 |
+| 2 | G inline transition + B failure_analysis | 21h | ~8h | ×0.38 | +46 |
+| 3 | D Review-loop (Layer 1) | 22h | ~3.5h | ×0.16 | +25 |
+| 4 | A Replay framework | 10h | ~2h | ×0.20 | +19 |
+| 5 | C Drift defense | 12h | ~3h | ×0.25 | +56 |
+| 6 | Tier-1 acceptance + docs | 22h | ~5h | ×0.23 | +23 |
+| C.2+D.1 | Merge + progress | 1h | ~1h | ×1.0 | 0 |
+| **Total** | | **156h** | **~35.5h** | **×0.23** | **+256** |
+
+OD-M5-1 trigger (156h) never approached. 121h remaining of budget.
+
+#### Phase C.2 merge SHAs (2026-05-15)
+- Aria 主仓: master `0af9f75` (D.1) ← `3a04545` (PR #106 merge) ← `db5a8d0` (Phase 6 ship)
+- aria-orchestrator: master `b2cf057` (PR #11 merge) ← `c9ea33a` (Phase 6 ship)
+- 3-way parity verified (origin Forgejo + GitHub)
+
+#### Key deliverables (Layer 1)
+- Schema v3 → v4.1 (5 additive cols + dispatch_audit_log immutable + drop overstrict inline UQ per T1.5 latent-bug fix)
+- 8-event audit log + AuditLogger DI + 10-pattern secret redaction (redact-before-truncate per QA-R2-2)
+- G comment_poll inline S7→S8 transition (vs M4 30min cron); reconciler 30min fallback (AD-M5-9)
+- B Failure-analysis LLM (glm-4.5-air, 3-action routing per AD-M5-6)
+- D Review-loop Layer 1: /aria changes / /aria redo / /aria retry commands; rework cap=3 + nomadVar
+- A Replay framework (markdown-only, deterministic, no LLM)
+- C Drift defense: commit_validator + spec_drift LLM (S8_MERGE-triggered, threshold 70)
+- F risk_tier dual-write 'always' literal (abi_compat #1 hot-swap)
+- 11/11 AD-M5 slots Decided per TL-9
+- 5 forward-binding promises M5→M6 enumerated (AD-M5-10)
+- validate-m5-handoff.py 5-check suite + canonical drift-guard tests
+
+#### aria-layer1 plugin version: 0.2.0 → 0.4.0
+(coordinated bump across pyproject.toml + plugin.yaml + README.md — discovered pre-existing 0.2/0.3 drift; see [[feedback-plugin-version-drift-multiple-sources]])
+
+#### Owner-deferred to Phase D.2
+- T-deploy execution per `docs/handoff/2026-05-15-m5-deploy-playbook.md` (7 steps + rollback)
+- Tier-1 live LLM gates: B.1.live + C.2.live (~¥0.10 budget)
+- Tier-2 N≥3 real workload dispatches (≥1 changes + ≥1 redo + ≥1 reject)
+- After Go: archive `openspec/changes/aria-2.0-m5-...` → `openspec/archive/2026-05-XX-aria-2.0-m5-...`
+- US-025 status: in_progress → done
+
+#### M6 deferred (~40h Layer 2 in aria-layer2-runner H项)
+- M5-OS-1: changes-mode container fetch+force-push (~20h)
+- M5-OS-2: redo-mode entrypoint (~12h)
+- M5-OS-3: close-old-PR + "Superseded by" comment (~2h)
+- M5-OS-4: spec_drift_input_fetcher full implementation (~3h)
+- M5-OS-5: Commit lint Layer 2 retry hook (~2h)
+
+#### Latent-bug discovery (T1.5)
+M2-era inline `CONSTRAINT uq_issue_active UNIQUE (issue_id)` was always-enforced in modern SQLite (original comment claimed "fallback for <3.25" — incorrect). Blocked M5 review-loop new-row pattern. Migration 005 rebuilds dispatches table to drop constraint; partial index `uq_issue_active_partial` continues OD-5a guard. See [[feedback-inline-vs-partial-unique-overlap]].
+
+#### Methodology insights captured
+- [[feedback-phase-budget-compounding]]: Multi-phase Spec ratios compound; foundation phase carries infrastructure
+- [[feedback-submodule-pointer-post-merge-bump]]: Multi-repo Phase C.2 pointer hygiene pattern
+- [[feedback-plugin-version-drift-multiple-sources]]: 3+ version-file coordination at release
+- [[feedback-create-trigger-split-semicolon]]: SQL splitter must be BEGIN/END-aware
+- [[feedback-inline-vs-partial-unique-overlap]]: Inline `CONSTRAINT UNIQUE` + partial index both active in modern SQLite
+
+---
+
 ### US-025 M5 Phase A done (2026-05-13)
 
 Phase A 全部完成 (brainstorm + spec-drafter + R1+R2 audit + 准入 + B.1 分支)。
