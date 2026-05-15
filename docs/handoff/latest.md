@@ -5,7 +5,8 @@
 > 自 v1.21.0 起 (H0 spec ship), `/aria:state-scanner` Phase 1.15 collector
 > 会自动 surface 本 pointer + handoff doc 路径,AI 在阶段 2 推荐前必读。
 
-**Latest**: [2026-05-13-issue-101-cycle-closeout.md](./2026-05-13-issue-101-cycle-closeout.md) — Forgejo Aria #101 完整闭环 (2 cycles shipped + aria-plugin v1.20.0 release)
+**Latest**: [2026-05-15-h0-cycle-done.md](./2026-05-15-h0-cycle-done.md) — H0 aria-ten-step-session-handoff-stage 完整闭环 (Rule #9 + 5-layer enforcement + aria-plugin v1.21.0 release, Forgejo #92 closed)
+**Predecessor (#101)**: [2026-05-13-issue-101-cycle-closeout.md](./2026-05-13-issue-101-cycle-closeout.md) — Forgejo Aria #101 完整闭环 (2 cycles + v1.20.0)
 **Predecessor (M5)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md) — US-025 M5 Phase A done + B.1 feature branches ready
 **Predecessor (phase-c)**: [2026-05-10-phase-c-integrator-pre-merge-gate-cycle-done.md](./2026-05-10-phase-c-integrator-pre-merge-gate-cycle-done.md) — Aria v1.7.0 + aria-plugin v1.19.0 ship
 **Predecessor (M4 Track A)**: [2026-05-09-track-a-deploy-done.md](./2026-05-09-track-a-deploy-done.md) — M4 production live + 3 fixes
@@ -19,7 +20,8 @@
 
 | Date | Session | Status |
 |------|---------|--------|
-| [2026-05-13 #101 closeout](./2026-05-13-issue-101-cycle-closeout.md) | issue-triage-sop + issue-101-status-normalize + aria v1.20.0 release | **Active (Latest)** |
+| [2026-05-15 H0 done](./2026-05-15-h0-cycle-done.md) | aria-ten-step-session-handoff-stage full cycle + Rule #9 + v1.21.0 + #92 closed | **Active (Latest)** |
+| [2026-05-13 #101 closeout](./2026-05-13-issue-101-cycle-closeout.md) | issue-triage-sop + issue-101-status-normalize + aria v1.20.0 release | Active (predecessor) |
 | [2026-05-13 M5](./2026-05-13-us025-m5-phase-a-b1-done.md) | US-025 M5 Phase A done + B.1 ready + 4 memory entries | Active (parallel predecessor) |
 | [2026-05-10 phase-c](./2026-05-10-phase-c-integrator-pre-merge-gate-cycle-done.md) | phase-c-integrator pre-merge gate complete + Issue #60 closed | Active (parallel predecessor) |
 | [2026-05-09 Track A done](./2026-05-09-track-a-deploy-done.md) | US-024 M4 T-deploy + E2E smoke complete + 3 production fixes | Active (M4 predecessor) |

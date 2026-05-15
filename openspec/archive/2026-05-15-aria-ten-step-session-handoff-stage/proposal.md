@@ -1,7 +1,7 @@
 # Aria — Ten-step cycle: add session-handoff stage (read at start + write at end)
 
 > **Level**: 2 (Minimal — multi-file structural change, +/-doc-heavy, ~19h)
-> **Status**: **Approved** 2026-05-14 (Phase A.3) — R1+R2 SCOPE_OK_R2 收敛 (R1: 1C+8M inline-fixed F1-F10; R2: 0C+4M editorial inline-fixed G1-G4; knowledge-manager CONVERGED + backend/qa PASS_WITH_WARNINGS no R3), ready for Phase B
+> **Status**: **Complete** 2026-05-15 (Phase A+B+C+D shipped) — R1+R2 SCOPE_OK_R2 (A.2) + pre_merge R1 SCOPE_OK_R1 (B.3) + 3-PR sequenced merge (standards #4 / aria-plugin #46 / Aria #105) + aria-plugin v1.21.0 release. Closes Forgejo Aria #92.
 > **Change ID**: `aria-ten-step-session-handoff-stage`
 > **Trigger**: Forgejo Aria [#92](https://forgejo.10cg.pub/10CG/Aria/issues/92) — ten-step cycle 缺 session 切换标准化阶段
 > **Triage verdict**: `confirmed/minor/next-cycle` ([issuecomment-6170](https://forgejo.10cg.pub/10CG/Aria/issues/92#issuecomment-6170))

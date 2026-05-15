@@ -1,6 +1,6 @@
 # Tasks — H0 aria-ten-step-session-handoff-stage
 
-> Parent: [proposal.md](./proposal.md) | **Status**: **Approved** 2026-05-14 (Phase A.3) — A.2 SCOPE_OK_R2 收敛, ready for Phase B.1 branch
+> Parent: [proposal.md](./proposal.md) | **Status**: **Complete** 2026-05-15 — all T1-T8 shipped via 3-PR sequenced merge + v1.21.0 release
 
 ## Phase B Tasks (按依赖顺序)
 
