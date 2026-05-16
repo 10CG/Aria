@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Spec X (M5 carryover Layer 2 changes-mode) full cycle complete (2026-05-16)
+
+**Spec X** (`aria-2.0-m5-carryover-layer2-changes-mode`) full Aria 10-step cycle complete across 2 sessions (2026-05-15 + 2026-05-16). M5 carryover sub-Spec 1 of 2; M3 carryover trio pattern 2nd validation.
+
+#### Phase trajectory
+
+| Phase | Outcome | Commit |
+|-------|---------|--------|
+| A.0 brainstorm M6 | 7 decisions D1-D7 locked | `aae0fbc` |
+| A.1 spec-drafter | proposal v3 + tasks (Level 3) | `0c34227` → `0d2475e` (post R3) |
+| A.2 audit R1+R2+R3 | 73 → 20 → 6 findings (100% critical+high closure); STABILITY_CONFIRMED | `.aria/audit-reports/post_spec-{R1,R2,R3}-*.md` |
+| B.1 branches | dual-repo `feature/spec-x-layer2-changes-mode` | both remotes parity |
+| B.2 implementation | T1-T4+T7 done (7/8); T5 owner-deferred; T6 inline | aria-orch `25a3d77` → `5608419` → `efd51ef` |
+| C.2 merge | aria-orch PR #12 + Aria PR #108 | aria-orch `b197f26`; Aria `0d32ff5` |
+| D.2 archive | `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/` | `d7f96a5` master |
+
+**Tests**: 863 PASS (812 Python + 51 bash), 0 regression, nomad validate PASS, 4-way SHA parity
+
+**Key R1+R2+R3 fixes**: bash dispatcher (Python→bash reality drift) / AD-M5-3 append-not-replace / `claude -p` positional / bash curl+jq (no Python aria_layer1) / 60K cap sys.exit(2) / retry mode NOT writes REWORK_MODE / Conventional Commits `chore(rework-N)` valid type / case-counted tests / Rule #9 per-session trigger
+
+**Latent bug surfaced post-archive** (via Spec Y R1): REWORK_ROUND env var never propagated to Layer 2 → silent "round 1" display bug; retro-fix planned via Spec Y T-pre
+
+#### Spec Y (M5 carryover Layer 2 redo-mode + aux) kickoff
+
+Spec Y Phase A.1 + A.2 R1 + v2 fixes done on feature branch (R2 verify + Phase B+C+D pending next session).
+
+- R1 audit (4 agents): ~37 findings including 6 CRITICAL reality drift
+- v2 fixes applied: shell-port commit_validator / extend S5_AWAIT handler / 5-key meta_optional / migration 006 renumber / AD append guard / 3-tuple fetcher signature
+- Estimated remaining: ~20-22h Phase B + standard C.2/D.2
+
+#### Memory entries added (3)
+
+- `project_spec_x_complete_2026-05-16.md` — full Spec X cycle record
+- `feedback_sister_spec_r1_latent_catch.md` — sister Spec R1 retroactively catches latent bugs
+- `feedback_per_spec_assumption_recheck.md` — each new Spec re-verifies env/FS assumptions
+
+---
+
 ### US-025 M5 Layer 1 SHIPPED + Phase C.2 + D.1 done (2026-05-15)
 
 M5 Phase 1-6 (Layer 1 portion) complete + Phase C.2 merged to master + Phase D.1 progress update done.

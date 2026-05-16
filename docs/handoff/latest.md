@@ -5,14 +5,15 @@
 > 自 v1.21.0 起 (H0 spec ship), `/aria:state-scanner` Phase 1.15 collector
 > 会自动 surface 本 pointer + handoff doc 路径,AI 在阶段 2 推荐前必读。
 
-**Latest**: [2026-05-15-us025-m5-c2-d1-done.md](./2026-05-15-us025-m5-c2-d1-done.md) — US-025 M5 Layer 1 SHIPPED via Phase C.2 (Aria PR #106 master `0af9f75`, aria-orchestrator PR #11 master `b2cf057`) + Phase D.1 progress update done; Phase D.2 (Spec archive + final Go) owner-deferred pending T-deploy + Tier-1 live LLM + Tier-2 N≥3
-**Companion (deploy playbook)**: [2026-05-15-m5-deploy-playbook.md](./2026-05-15-m5-deploy-playbook.md) — 7-step owner-runnable playbook
-**Predecessor (Phase 6 pre-merge)**: [2026-05-15-us025-m5-phase-6-done.md](./2026-05-15-us025-m5-phase-6-done.md) — Phase 6 SHIP READY (before C.2 merge)
-**Predecessor (H0 same day)**: [2026-05-15-h0-cycle-done.md](./2026-05-15-h0-cycle-done.md) — H0 aria-ten-step-session-handoff-stage 完整闭环 (Rule #9 + v1.21.0)
-**Predecessor (M5 Phase 1)**: [2026-05-14-us025-m5-phase-1-done.md](./2026-05-14-us025-m5-phase-1-done.md) — Schema + audit log infra
-**Predecessor (M5 Phase A)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md) — Spec Approved + B.1 branches
+**Latest**: [2026-05-16-spec-x-shipped-spec-y-kickoff.md](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) — **Spec X (M5 carryover Layer 2 changes-mode) full Phase A→D cycle complete** (archived `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/`); **Spec Y (redo-mode + aux) A.1 + R1 + v2 fixes** on feature branch (R2 verify + Phase B+C+D pending); 3 new memory entries; M3 carryover trio pattern 2nd validation; 4-way SHA parity
+**Predecessor (M5 Layer 1 ship)**: [2026-05-15-us025-m5-c2-d1-done.md](./2026-05-15-us025-m5-c2-d1-done.md) — US-025 M5 Layer 1 SHIPPED (含 Spec X 2026-05-16 addendum)
+**Predecessor (deploy playbook)**: [2026-05-15-m5-deploy-playbook.md](./2026-05-15-m5-deploy-playbook.md) — owner T-deploy 7-step playbook (still pending owner action)
+**Predecessor (Phase 6 pre-merge)**: [2026-05-15-us025-m5-phase-6-done.md](./2026-05-15-us025-m5-phase-6-done.md) — Phase 6 SHIP READY
+**Predecessor (H0 same day)**: [2026-05-15-h0-cycle-done.md](./2026-05-15-h0-cycle-done.md) — H0 aria-ten-step-session-handoff-stage (Rule #9 + v1.21.0)
+**Predecessor (M5 Phase 1)**: [2026-05-14-us025-m5-phase-1-done.md](./2026-05-14-us025-m5-phase-1-done.md)
+**Predecessor (M5 Phase A)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md)
 
-**Created**: 2026-05-15 EOD (D.1 closeout)
+**Created**: 2026-05-16 EOD (Spec X complete + Spec Y kickoff closeout)
 **Cycle**: US-025 M5 Layer 1 SHIPPED — full Phase 1-6 + C.2 + D.1 in single coherent cycle (~35.5h actual vs 156h baseline ×0.23); 793 PASS + 6 SKIP; 11/11 AD-M5 Decided; D.2 owner-gated
 
 ---
@@ -21,7 +22,8 @@
 
 | Date | Session | Status |
 |------|---------|--------|
-| [2026-05-15 C.2+D.1](./2026-05-15-us025-m5-c2-d1-done.md) | US-025 M5 Layer 1 SHIPPED + Phase D.1 done + 3 new memory entries | **Active (Latest)** |
+| [2026-05-16 Spec X complete + Spec Y kickoff](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) | Spec X full A→D cycle + Spec Y A.1+R1+v2 fixes + 3 new memory entries | **Active (Latest)** |
+| [2026-05-15 C.2+D.1](./2026-05-15-us025-m5-c2-d1-done.md) | US-025 M5 Layer 1 SHIPPED + Phase D.1 done + 3 new memory entries | Active (predecessor; M5 Layer 1) |
 | [2026-05-15 deploy](./2026-05-15-m5-deploy-playbook.md) | Owner-runnable T-deploy playbook (7 steps + rollback) | Active (companion) |
 | [2026-05-15 Phase 6](./2026-05-15-us025-m5-phase-6-done.md) | M5 Phase 6 SHIP READY (pre-merge state) | superseded by C.2+D.1 |
 | [2026-05-15 H0 done](./2026-05-15-h0-cycle-done.md) | aria-ten-step-session-handoff-stage full cycle + Rule #9 + v1.21.0 + #92 closed | Active (parallel predecessor) |
