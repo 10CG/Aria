@@ -1,8 +1,8 @@
 # Aria — Session Handoff (2026-05-15) — H0 aria-ten-step-session-handoff-stage cycle done
 
-> **Status**: Active — H0 cycle complete, v1.21.0 shipped
-> **Cycle period**: 2026-05-13 (state-scanner entry, H0 surfaced) → 2026-05-15 (full cycle ship)
-> **Next session 入口**: 优先读本 doc → `/aria:state-scanner` (v1.21.0 Phase 1.15 会自动 surface 本 doc) → §6 选择下一步
+> **Status**: H0 cycle complete (v1.21.0) + H5 follow-up fix shipped (v1.21.1, 2026-05-16). Predecessor — latest.md 现指向 US-025 M5。
+> **Cycle period**: 2026-05-13 (state-scanner entry) → 2026-05-15 (H0 ship) → 2026-05-16 (H5 fix ship)
+> **Next session 入口**: `/aria:state-scanner` — v1.21.1 collector 以 latest.md pointer 为权威, surface 真正最新 handoff (US-025 M5)。本 doc 为 H0 predecessor 记录
 
 ---
 
@@ -58,6 +58,12 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 | H3 | issue-triage iteration-2 | SKILL.md "MUST run scripts/triage.py" | ~1h | #101 cycle handoff H1 |
 | H4 | (optional) Rule #6 H0 structural benchmark 补跑 | mtime sort accuracy + misplaced precision/recall fixture, 存 ab-results | ~1h low-pri | owner-directed T8.2 skip ([decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md)) |
 
+### ✅ 已解决 (本 session post-closeout)
+
+| # | 项目 | 解决 |
+|---|------|------|
+| **H5** | collector mtime-latest 与 latest.md pointer 分歧 (closeout 时发现: 编辑过的 H0 handoff 因 mtime 最新而 shadow 更新的 US-025 handoff) | **RESOLVED in aria-plugin v1.21.1** (2026-05-16): collector 改 pointer-priority (`_parse_latest_pointer`),mtime 仅 fallback;新增 `latest_source` 字段 + stale-pointer soft_error;+4 tests / 446 suite;3-PR sequenced merge (aria-standards#5 / aria-plugin#47 / Aria#109);doc-code synced。Memory `feedback_handoff_mtime_vs_pointer_divergence` 标注 RESOLVED。本 handoff 现可安全编辑 (collector 读 pointer 忽略 mtime) — fix 自验证。 |
+
 ### 中优先级
 
 | # | 项目 | 状态 |
@@ -83,6 +89,7 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 | hook `set -e` 在 `$(...)` 子壳失效 | python heredoc crash | fallthrough 到安全 PASS (已验证); H1 follow-up 加注释 |
 | 第三方已有 `.aria/handoff/` 升级后 | v1.21.0 升级 | L2 collector 检测 → L3 推荐 migrate-handoff-drift workflow |
 | **Rule #6 deviation (T8.2 skip)** | CLAUDE.md Rule #6 不可协商, owner-directed skip | [decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md) 记录: deterministic collector 的 LLM AB tautological, 442 unit + 10 smoke + live dogfood 替代。scoped to deterministic-only; capability-type Skill 变更 Rule #6 不可 waive。H4 可选补结构化 benchmark |
+| ~~collector mtime/pointer 分歧 (H5)~~ ✅ **RESOLVED** | (原: predecessor handoff post-hoc 编辑获最新 mtime) | aria-plugin v1.21.1 collector pointer-priority fix (见 §2 已解决 H5)。此风险已消除 |
 
 ---
 
@@ -90,7 +97,7 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 
 - **元论证 cycle 的 dogfood 自洽性**: H0 修的痛点 (AI 漏读 handoff) 在本 cycle 起草时第 4 次发生,ship 后本 handoff 是第 5 次 dogfood(受益方)。修方法论 bug 用方法论自身是有效的自洽闭环。
 - **PR 审计 catch 真 blocker**: aria:code-reviewer #105 audit 发现 submodule pointer bumps 漏 commit — 这是 sequenced multi-repo ship 的经典陷阱。教训: 创建 main PR 前必须确认 gitlink 已 staged + 等 submodule PR merge 后 re-bump 到 post-merge HEAD (非 feature tip)。
-- **collector latest.md 陷阱**: pointer file mtime 永远最新,会 shadow 真 handoff doc。任何 "找最新文件" 逻辑都要排除 navigation pointer。(QA-M2,我 dogfood 时已看到但初期忽略,audit 才正式 catch)
+- **collector latest.md 陷阱 (两层)**: (a) QA-M2 — pointer file 自身 mtime 永远最新会 shadow 真 doc → H0 已排除 latest.md;(b) H5 — 但排除还不够,*被编辑过的 predecessor* 也会因 mtime 最新而 shadow,真正解法是 **以 latest.md pointer 为语义权威, mtime 仅 fallback** (v1.21.1 修复)。教训: "找最新" 不能只靠 mtime,要有 human-maintained 语义锚 (pointer/index) 优先。
 - **Rule #6 framing**: handoff collector 是 deterministic Python,不适合 LLM with/without AB benchmark (tautological),改用 442 unit tests + live dogfood 验证 — 与 memory `feedback_rule6_framing_differs_by_skill_type` 一致。
 
 ---
@@ -135,26 +142,35 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 
 ## §7 提交清单 (commit hash + multi-remote parity)
 
+H0 ship (v1.21.0):
 ```
-[main Aria]  master = 513aec5 | origin = github ✅  (+本 D 收尾 commit pending)
-[aria]       master = 4b6a6b8 | origin = github ✅  (tag v1.21.0 = 43ff30a both)
-[standards]  master = 3d4c86a | origin = github ✅
+[main Aria]  513aec5 → 9afcd7b (D closeout) → 3d7730e (rebased on US-025)
+[aria]       master = 4b6a6b8 | tag v1.21.0 = 43ff30a both
+[standards]  master = 3d4c86a
 ```
 
-**Tags published**: aria v1.21.0 (annotated, origin + github = `43ff30a`)
-**PRs merged**: aria-standards#4 / aria-plugin#46 / Aria#105 (sequenced)
+H5 fix ship (v1.21.1, 2026-05-16, post-closeout):
+```
+[main Aria]  master = a8a2912 (#109) | origin = github ✅
+[aria]       master = 2438548 (#47)  | tag v1.21.1 both | origin = github ✅
+[standards]  master = 4e3e3a9 (#5)   | origin = github ✅
+```
+
+**Tags published**: aria v1.21.0 (`43ff30a`) + v1.21.1 (H5 fix), both origin + github
+**PRs merged**: H0 → aria-standards#4 / aria-plugin#46 / Aria#105 ; H5 → aria-standards#5 / aria-plugin#47 / Aria#109 (both sequenced)
 
 ---
 
-## §8 Memory entries this session (3 written + indexed)
+## §8 Memory entries this session (4 written + indexed)
 
 | File | Type | Theme |
 |------|------|-------|
 | [feedback_meta_cycle_dogfood_self_consistency.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_meta_cycle_dogfood_self_consistency.md) | feedback | 修方法论 bug 用方法论自身,ship 后受益方是本 cycle 自身 closeout — 自洽闭环有效 |
 | [feedback_sequenced_multirepo_gitlink_bump.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_sequenced_multirepo_gitlink_bump.md) | feedback | 多 repo ship: submodule PR 先 merge → gitlink re-bump 到 post-merge HEAD → 再 merge main PR |
 | [feedback_collector_exclude_navigation_pointer.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_collector_exclude_navigation_pointer.md) | feedback | "找最新文件" collector 必须排除 latest.md/index 类 pointer (mtime 恒最新会 shadow 真内容) |
+| [feedback_handoff_mtime_vs_pointer_divergence.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_handoff_mtime_vs_pointer_divergence.md) | feedback | (H5) collector 以 latest.md pointer 为语义权威, mtime 仅 fallback。**RESOLVED v1.21.1** |
 
-✅ MEMORY.md index 已更新 (3 新条目 in ## Feedback section)。前期 session entries 不变。
+✅ MEMORY.md index 已更新 (4 条目 in ## Feedback section)。前期 session entries 不变。
 
 ---
 
