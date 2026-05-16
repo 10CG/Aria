@@ -294,7 +294,14 @@
 - [x] T0 Phase A.2 R3 stability round (3 agents): qa=CONFIRMED, ai=CONFIRMED, code-reviewer=needs 4 surgical fixes
 - [x] T0 R3 surgical fixes applied (3627→3605 ×2, frontmatter v2→v3→Approved, ~22h→~25h ×2)
 - [x] T0 Spec Status → **Approved** (2026-05-15T18:50Z)
-- [ ] T1-T7 Phase B (~25h AI-runnable per R1+R2 reconciled)
-- [ ] T8 Phase C+D (standard 10-step bookkeeping + R1 I7/I8 fixes)
+- [x] **T1 done** 2026-05-16 (aria-orchestrator `25a3d77`) — Layer 1 _handle_s4_launch + 10 tests
+- [x] **T2 done** 2026-05-16 (aria-orchestrator `a6baeb1`) — HCL meta_optional + 3 inventory tests
+- [x] **T3 done** 2026-05-16 (aria-orchestrator `6af2c35`) — bash dispatcher + git mv + 6 tests
+- [x] **T4 done** 2026-05-16 (aria-orchestrator `5608419`) — modes/changes.sh + 18 tests
+- [ ] T5 Image build — **owner-deferred** (aria-build Nomad job trigger required; AD-M1-7 sha256 dispatch-time pin pattern; will happen at Phase C.2 owner T-deploy or M6b verification)
+- [x] **T6 inline-verified** (37 case-counted ≥32 target met inline via T1-T4 tests; openspec validate gracefully degraded per R1 fix)
+- [x] **T7 done** 2026-05-16 (aria-orchestrator `efd51ef` + Aria `e4c8430`) — m5-handoff/AD-M5-3/US-025/US-026/handoff doc patches
+- [ ] T8 Phase C+D (standard 10-step bookkeeping + R1 I7/I8 fixes) — pre_merge audit + dual-repo PR + merge + archive
+- [ ] T0 Phase B.3 mid_implementation/post_implementation audit (deferred to pre_merge gate per proportionality — 3-round post_spec convergence already covered architectural concerns)
 
 **当前 Phase**: A.1 v2 (R1 reality-drift fixes applied, awaiting R2)
