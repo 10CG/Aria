@@ -1,7 +1,7 @@
 # Aria 2.0 M5 Carryover — Layer 2 redo-mode + aux (close-old-PR + spec_drift + commit-lint)
 
 > **Level**: 3 (Full — Layer 2 image extension + Layer 1 PR-state-machine + Forgejo state PATCH + audit log + tests)
-> **Status**: Draft (Phase A.1, awaiting R1 audit)
+> **Status**: Draft v2 (R1 fixes applied 2026-05-16; addresses 6 CRITICAL + key HIGH reality-drift findings; R2 verification audit deferred to next session per context budget — see `.aria/audit-reports/post_spec-R1-2026-05-16T0530Z-*.md`)
 > **Change ID**: `aria-2.0-m5-carryover-layer2-redo-mode-aux`
 > **Parent US**: US-025 (M5 carryover; second of the carryover trio after Spec X, mirror M3 precedent per brainstorm D4)
 > **Sibling Spec**: `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/` (Spec X — shipped 2026-05-16, archived; established bash mode dispatcher + changes handler that Spec Y drops 'redo' handler into per D5 A2 skeleton-then-fill)
@@ -12,6 +12,33 @@
 >   - OS-4 spec_drift_input_fetcher full impl (~3h)
 >   - OS-5 commit-lint Layer 2 retry hook (~2h)
 > **Created**: 2026-05-16
+
+---
+
+## R1 → v2 fixes (architectural decisions locked + reality alignment)
+
+| R1 finding | Decision / Fix |
+|------------|---------------|
+| **CRIT-1** `_handle_s5_pr_created` doesn't exist | **Decision**: extend existing `_handle_s5_await` terminal path (alloc exit_code=0) to read result.json + extract new_pr_id when `rework_mode='redo'`. NEW Layer 1 task T1.5 reads result.json (location `${OUTPUTS_DIR}/result.json` mounted via host volume, same as M5 alloc result). NO new state machine state; minimal change. T3 OS-3 fires AFTER S5_AWAIT terminal handler stores new_pr_id on dispatch row. |
+| **CRIT-2** commit_validator Python not in Layer 2 image | **Decision**: **shell-port** validator regex (Aria precedent: Spec X R1 C4 chose bash + curl+jq over Python). New `lib/commit-lint-validate.sh` (~30 lines) implements Conv Commits regex per `standards/conventions/git-commit.md`. NO Python pkg added to Dockerfile. T5.1 invokes `bash /opt/aria-runner/lib/commit-lint-validate.sh "${COMMIT_MSG}"` instead of python3 -m. |
+| **CRIT-3** REWORK_ROUND env never propagated | **Decision**: extend Layer 1 `_handle_s4_launch` extra_meta dict + HCL meta_optional to **5 keys** (add `REWORK_ROUND` 5th key). NEW Spec Y task T-pre (0.5h): aria-orchestrator Layer 1 patch + HCL update. **Also retro-fixes Spec X latent bug** (changes mode round display always 1). Updates AD-M5-3 contract from 4-key to 5-key. |
+| **CRIT-4** spec_drift_input_fetcher signature wrong | **Fix**: T4.4 return `(spec_what, spec_acceptance, pr_diff)` 3-tuple matching `reconciler.py:1014` unpack. Fetcher internally calls `extract_spec_sections(proposal_text)` from existing `spec_drift.py:104-128`. spec_id/pr_id are internal lookup keys, NOT output. |
+| **CRIT-5** T7.2 AD-M5-3 append guard missing | **Fix**: T7.2 explicit literal guard: "**append BELOW existing 2026-05-16 line** preserving Spec X's previous update line; AD = immutable per Spec X R2 C2 convention". |
+| **CRIT-6** Migration 005 already occupied | **Fix**: renumber to **006_schema_v4.1_add_spec_id.sql** (T0.1). Update drift-guard test T0.5 to apply cumulative 003+004+005+006. |
+| **HIGH backend-H2** spec_id derivation undefined | **Decision**: spec_id sourced from **issue.yaml** `linked_spec_id` field if present (Layer 1 already parses issue.yaml during S1_SCAN). NEW: Layer 1 writes spec_id to dispatch row at S1_SCAN time (not S5). Removes T1.1 result.json dependency on Layer 2 for spec_id. |
+| **HIGH backend-H1** OS-3 partial state risk | **Fix**: T3 sequence reverses to PATCH-first then comment: (1) PATCH state=closed; (2) on success, POST Superseded comment; (3) on PATCH failure 5xx → 3 retries; (4) on PATCH success + comment fail → audit `comment_only` outcome (acceptable — old PR is closed which is the primary state goal). |
+| **HIGH ai-3** AD-M5-3 narrowing | **Fix**: T7.3 AD-M5-3 append also adds narrowing note: "Spec Y 2026-05-16 narrows: redo mode = 3 sections (no diff); changes mode = 4 sections per original lock". |
+| **HIGH ai-4** T5.1 LLM cost | **Decision**: commit-lint retry uses **same `${ARIA_MODEL}` (claude-opus-4-5)** as main code-gen for consistency. Add cost row to risk table: "3 retries × 2 modes × ~500 token input × ~50 token output × opus rate = ~$0.01 per failed dispatch — negligible". |
+| **HIGH ai-5** Redo prompt char budget | **Fix**: T2.5 explicit per-section caps: feedback ≤4KB (Layer 1 truncated, inherited), issue body ≤10K chars (head -c), supersedes ref ≤500 chars (literal). Total ≤15KB hard cap; overflow → `S_FAIL(prompt_overflow)` per Spec X precedent. |
+| **HIGH ai-7** commit_message extraction directive | **Fix**: T2.5 prompt template appendix: literal directive `IMPORTANT: After your code changes, output a single final line in plain text: 'commit_message: <type>(<scope>): <description>'` per Spec X T4.3 R2 F1 pattern. |
+| **HIGH qa-H4 → CRIT-6** | Migration renumber 005 → 006 (covered in CRIT-6 fix). |
+| **HIGH qa-H6** OS-4 archived spec path | **Fix**: T4.2 fetch logic: try `openspec/changes/<spec_id>/proposal.md` first; on 404 fall back to `openspec/archive/*-<spec_id>/proposal.md` (Forgejo content API supports directory listing via `/contents` endpoint). Audit log records which path used. |
+| **HIGH qa-H7** Regression count not enumerated | **Fix**: T6.9 explicit commands listed (mirror Spec X T6.3 pattern). |
+| **HIGH code-reviewer C1-C10** | Bundled fixes: D5 bash explicit / §What add T0+T1 preamble / AD line ranges added / T8.1 Conv Commits 9 examples enumerated / Level header layer placement clarified / image v11 task explicit / Out of Scope inheritance line / lib/forgejo-helpers.sh extraction confirmed (extract always). |
+
+**Remaining R1 findings deferred to R2 verification next session** (~10 MEDIUM + ~8 LOW): non-blocking refinements (race conditions / over-cap defensive sizing / end-to-end test gaps / etc).
+
+---
 
 ---
 
