@@ -1,7 +1,8 @@
 # Aria 2.0 M5 Carryover — Layer 2 changes-mode container (bash mode dispatcher)
 
 > **Level**: 3 (Full — Layer 1 + Layer 2 image + Nomad HCL + side-effect doc patches)
-> **Status**: **Approved** (Phase A.2 R1+R2+R3 convergence; R3 stability 2/3 STABILITY_CONFIRMED + 1 surgical residual fix applied; R4 unnecessary per code-reviewer proportionality recommendation `feedback_agent_team_for_level1`)
+> **Status**: **Complete (2026-05-16 archived; Phase B.2 T1-T4+T7 shipped, T5 owner-deferred, T6 inline-verified; Phase C.2 merged aria-orchestrator PR #12 + Aria PR #108)**
+> _Previous_: Approved (Phase A.2 R1+R2+R3 convergence; R3 stability 2/3 STABILITY_CONFIRMED + 1 surgical residual fix applied; R4 unnecessary per code-reviewer proportionality recommendation `feedback_agent_team_for_level1`)
 > **Change ID**: `aria-2.0-m5-carryover-layer2-changes-mode`
 > **Parent US**: US-025 (M5 carryover; M3 carryover trio pattern: see archived `2026-05-07-m3-carryover-hcl-crons-sweep/`, `2026-05-07-m3-carryover-result-path-derivation/`, `2026-05-07-m3-handoff-validator-spillover/`)
 > **Brainstorm source**: [`.aria/decisions/2026-05-15-m6-brainstorm.md`](../../../.aria/decisions/2026-05-15-m6-brainstorm.md) D1-D7 (D5 A2 skeleton-then-fill — implementation language clarified bash per R1 reality-drift fix C1)
