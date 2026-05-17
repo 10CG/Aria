@@ -1,7 +1,7 @@
 # Aria 2.0 M5 Carryover — Layer 2 redo-mode + aux (close-old-PR + spec_drift + commit-lint)
 
 > **Level**: 3 (Full — Layer 2 image extension + Layer 1 PR-state-machine + Forgejo state PATCH + audit log + tests)
-> **Status**: Draft v3 (R2 verification 2026-05-16T2242Z found 6/6 R1 CRIT decisions correct in fix table but body/tasks propagation incomplete + 1 new CRIT R2-NEW-1 schema version collision + ~10 HIGH — v3 applies surgical propagation pass; R3 stability audit pending — see `.aria/audit-reports/post_spec-R1-2026-05-16T0530Z-*.md` + `.aria/audit-reports/post_spec-R2-2026-05-16T2242Z-*.md`)
+> **Status**: **Approved** (R3 stability audit 2026-05-17T03Z 3-agent unanimous PASS — 7/7 R1+R2-NEW CRIT closed + 17/17 R2 HIGH closed + 4 minor doc-polish surgical-fixed; see audit chain `.aria/audit-reports/post_spec-{R1-2026-05-16T0530Z,R2-2026-05-16T2242Z,R3-2026-05-17T03Z}-aria-2.0-m5-carryover-layer2-redo-mode-aux-summary.md`)
 > **Change ID**: `aria-2.0-m5-carryover-layer2-redo-mode-aux`
 > **Parent US**: US-025 (M5 carryover; second of the carryover trio after Spec X, mirror M3 precedent per brainstorm D4)
 > **Sibling Spec**: `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/` (Spec X — shipped 2026-05-16, archived; established bash mode dispatcher + changes handler that Spec Y drops 'redo' handler into per D5 A2 skeleton-then-fill)
@@ -229,19 +229,22 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 - `test_t_close_old_pr.py` — Python Layer 1 S5_AWAIT handler (3 cases: redo dispatch detected + PATCH+comment sequence / 4xx fallback / parent PR already closed graceful)
 - `test_t_spec_drift_fetcher.py` — Python (5 cases: stub→full impl + missing spec_id graceful + proposal.md fetch + PR diff fetch + 3-tuple return)
 - `test_t_commit_lint_retry.py` — Python **retry-loop integration** (4 cases: valid first try / invalid then valid retry / 3-retry exhaust → S_FAIL / claude rewrite fixture); validator regex correctness covered by bash test above
-- `test_t_schema_v4_2_migration.py` — Python (2 cases: migration adds spec_id to v4.1 DB → v4.2 / idempotent re-run)
+- `test_t_schema_v4_2_migration.py` — Python (3 cases: migration adds spec_id to v4.1 DB → v4.2 / idempotent re-run / drift-guard cumulative 003+004+005+006 per T0.6)
 - `test_t_spec_id_write.py` — Python (2 cases: issue.yaml linked_spec_id present → UPDATE applied; absent → spec_id stays NULL graceful)
 
-**Total: ~32 new test cases** (~18 bash + ~14 Python; case-counted per Spec X R2 NEW-1 fix; enumerated and verifiable per qa-H7)
+**Total: ≥35 new test cases enumerated** (18 bash + 17 Python; enumeration in tasks T6.1-T6.10 sums to 3+5+4+2+4+3+5+4+3+2 = 35; case-counted per Spec X R2 NEW-1 fix; commands verifiable per qa-H7 + tasks T6.11)
 
 **Regression**: all Spec X tests must continue passing (modes/changes.sh + dispatcher.sh + Spec X Python tests).
 
 #### G. Side-effect patches (~1h)
 
-- T7.1: `docs/requirements/user-stories/US-025.md` footer — add Spec Y status row to M5 Carryover Sub-Specs table (mark Spec Y in_progress → done)
-- T7.2: `aria-orchestrator/docs/m5-handoff.yaml::open_issues_for_m6` — mark M5-OS-2/3/4/5 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux`
-- T7.3: `aria-orchestrator/docs/architecture-decisions.md::AD-M5-3` append "2026-05-XX Spec Y impl complete; redo + close-old-PR + spec_drift + commit-lint shipped"
-- T7.4: `aria-orchestrator/docs/validate-m5-handoff.py` — extend `check_m6_carryover_to_us_026_present` (which Spec X T7.4 deferred) to also verify Spec Y absorption fields if appropriate
+(Note: T7 sub-task numbering is canonical in tasks.md T7.1-T7.6; below is high-level body listing organized by purpose, not sub-task number)
+
+- US-025 footer Spec Y status row (M5 Carryover Sub-Specs table) → done
+- `aria-orchestrator/docs/m5-handoff.yaml::open_issues_for_m6` mark M5-OS-2/3/4/5 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux`
+- `aria-orchestrator/docs/architecture-decisions.md::AD-M5-3` **APPEND BELOW** existing 2026-05-16 Spec X line (immutable per Spec X R2 C2; literal guard in tasks T7.2): "Spec Y impl complete; redo + close-old-PR + spec_drift + commit-lint shipped; **5-key contract** (REWORK_ROUND added); **prompt narrowing** (redo=3 sections / changes=4 sections)"
+- `aria-orchestrator/docs/validate-m5-handoff.py` — extend `check_m6_carryover_to_us_026_present` (which Spec X T7.4 deferred) to also verify Spec Y absorption fields
+- `docs/handoff/2026-05-15-us025-m5-c2-d1-done.md` — add Addendum 3 noting Spec Y cycle complete
 
 ---
 
@@ -287,7 +290,7 @@ T-pre.4/.5/.6 modify Spec X archived test files (`tests/test_t_changes_mode_meta
 
 ### Phase B 验收 (R1+R2+R3 fixes refined)
 - [ ] T-pre + T0-T8 全部 `[x]` complete (T1.0 NEW for M1 schema extension per R2-NEW-2)
-- [ ] ~32 new test cases PASS (mirror Spec X §F structure; case-counted per Spec X R2 NEW-1 fix)
+- [ ] ≥35 new test cases PASS (mirror Spec X §F structure; case-counted per Spec X R2 NEW-1 fix; enumeration in tasks T6.1-T6.10)
 - [ ] Spec X regression: 51 bash + 812 Python all still PASS (T6.9 enumerates executable commands per qa-H7)
 - [ ] `nomad job validate aria-layer2-runner.hcl` PASS (HCL changed by T-pre adding REWORK_ROUND 5th key per `feedback_nomad_hcl_validate_early`)
 - [ ] `aria_layer1` migration 006_schema_v4.2_add_spec_id.sql adds spec_id column to v4.1 DB (target v4.2) + idempotent re-run
@@ -346,36 +349,33 @@ T-pre.4/.5/.6 modify Spec X archived test files (`tests/test_t_changes_mode_meta
 T-pre REWORK_ROUND 5-key contract ─┐
   (Layer 1 extra_meta + HCL + AD)  │
                                    ↓
-                          T2 modes/redo.sh impl
+                          T2 modes/redo.sh impl (writes new_pr_id to result.json)
                                    │
 T0 schema 006 v4.1→v4.2 ──┐        │
                           ↓        │
 T1.0 M1 issue schema +   T1 Layer 1│
 linked_spec_id field      spec_id  │
                           @S1_SCAN │
-                          (T1.0→T1)│
-                          │        │
-                          │   T1.5 _handle_s5_await terminal reads result.json (per CRIT-1)
-                          │        │
-                          │        ↓
-T4 OS-4 spec_drift       │   T3 OS-3 close-old-PR Layer 1 _handle_s5_await
-fetcher (independent)──→─┤      (PATCH-first then comment per backend-H1)
-                          │        │
-T5 OS-5 commit-lint       │        │
-shell-port lib/  ─────────┴────────┤
-(commit-lint-validate.sh             │
- + commit-lint-retry.sh)             │
-                                     ↓
-                          T6 Synthetic acceptance (~32 cases)
-                                     │
-                                     ↓
-                          T7 Side-effect patches
-                                     │
-                                     ↓
-                          T8 Phase C+D (dual-repo merge + archive)
+                                   │
+                                   ↓
+T4 OS-4 spec_drift           T3 OS-3 close-old-PR Layer 1
+fetcher (independent)──→─┐      `_handle_s5_await` terminal-path
+                          │      (T3.1 reads result.json for new_pr_id
+T5 OS-5 commit-lint       │       per CRIT-1, then PATCH-first per backend-H1)
+shell-port lib/  ─────────┤
+(commit-lint-validate.sh   │
+ + commit-lint-retry.sh)   │
+                           ↓
+                  T6 Synthetic acceptance (≥35 cases)
+                           │
+                           ↓
+                  T7 Side-effect patches (US-025 footer / m5-handoff / AD-M5-3 / validate-m5-handoff / handoff Addendum)
+                           │
+                           ↓
+                  T8 Phase C+D (dual-repo merge + archive)
 ```
 
-**Parallelism**: T-pre + T0 + T1.0 + T2 + T4 + T5 can run in parallel (different files). T1 depends on T0 + T1.0. T1.5 depends on T2. T3 depends on T2 + T1.5. T6 depends on T2-T5. T7 doc-only.
+**Parallelism**: T-pre + T0 + T1.0 + T2 + T4 + T5 can run in parallel (different files). T1 depends on T0 + T1.0. T3 depends on T2 (T1.5 merged into T3.1 per CRIT-1 — both fire in `_handle_s5_await` terminal-path). T6 depends on T2-T5. T7 doc-only.
 
 ---
 
