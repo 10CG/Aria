@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.21.2",
+  "issue_ref": "10CG/silknode#207",
+  "generated_at": "2026-05-17T21:05:28Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 207,
+      "title": "silknode-web: REDIS_URL 随 Consul template 重渲染偶发空值 → 部署期应用 fast-fail",
+      "body": "## 现象\n\nsilknode-web 部署后偶发重启循环（约 30–40s 恢复），错误日志：\n\n```\n╔══════════════════════════════════════════════════════╗\n║     FATAL: Missing required environment variables    ║\n║  ✗ REDIS_URL is not set                              ║\n╚══════════════════════════════════════════════════════╝\n```\n\n当前 alloc `208ded83` 的事件时间线（heavy-3 节点）：\n\n```\n19:22:33 [Restart Signaled] Template with change_mode restart re-rendered\n19:22:34 [Terminated] Exit Code: 0\n19:22:35 [Started]\n19:22:37 [Terminated] Exit Code: 1   ← nextjs 自杀，REDIS_URL 空\n19:22:38 [Restarting] Task restarting in 32.129s\n19:23:12 [Started]                   ← 32s 后自愈\n```\n\n## 不是 DB 问题（Postgres 全程正常）\n\n| 服务 | Consul | 节点 |\n|---|---|---|\n| `dev-db` (postgres 5432) | passing | heavy-3 |\n| `silknode-redis` (16379) | passing | heavy-3 |\n| Consul critical checks | 0 | — |\n\n## 根因\n\nsilknode-web HCL 的 template 块：\n\n```hcl\n{{ range service \"silknode-redis\" -}}\nREDIS_URL=redis://{{ .Address }}:{{ .Port }}\n{{ end -}}\n```\n\n当 `silknode-redis` **短暂 0 个 healthy 实例**时，此块不产生任何输出 → 渲染后的 `.env` 文件里**根本没有 REDIS_URL 这一行**（不是空字符串，是整行缺失）→ 应用 env-check 判定未设置 → 立即退出。\n\n**为什么会有空窗**：`silknode-redis` 是 `silknode-gateway` task group 里的 sidecar task，和 gateway 共享 lifecycle。gateway 任何健康检查翻转 / 重启 / 重调度 → redis sidecar 在 Consul 短暂 deregister → silknode-web 的 template 正好在那一刻 re-render 就会命中空窗。\n\n## 修复（推荐组合 [A] + [B]，~15 分钟）\n\n### [A] template 加抖动缓冲（止血）\n\n```hcl\ntemplate {\n  destination = \"secrets/app.env\"\n  env         = true\n  change_mode = \"restart\"\n  splay       = \"30s\"           # 新增\n  wait {                        # 新增\n    min = \"10s\"\n    max = \"30s\"\n  }\n  data = <<EOH\n... (现有内容不变)\nEOH\n}\n```\n\n效果：30s 内的 redis 闪失不会触发 silknode-web 重启，绝大多数情况下 sidecar 已经自愈再渲染。\n\n### [B] template 本体加守卫（兜底）\n\n```hcl\n{{- $redis := service \"silknode-redis\" }}\n{{- if gt (len $redis) 0 }}\nREDIS_URL=redis://{{ (index $redis 0).Address }}:{{ (index $redis 0).Port }}\n{{- else }}\n# redis momentarily unavailable — keep last known value\nREDIS_URL={{ env \"REDIS_URL\" }}\n{{- end }}\n```\n\n与 [A] 叠加后，即便真命中 0 实例空窗，环境变量保留上次值，避免 fast-fail。\n\n### [C] 下一轮（可选，架构级）\n\n把 `silknode-redis` 从 `silknode-gateway` task group **拆为独立 service job**，lifecycle 与 gateway 解耦。可复用 Aether #56 交付的 stateful-job + NFS/virtiofs host_volume 模式让 redis 数据持久化。会独立开一个 follow-up issue，不阻塞 [A]/[B]。\n\n## 验证方法\n\n应用 [A]+[B] 后：\n\n```bash\n# 观察 10 分钟，restarts 不再增长\nnomad alloc status <alloc-id> | grep Restarts\n# 手动触发 gateway 重启模拟 redis 闪失\nnomad alloc restart -task redis <gateway-alloc-id>\n# silknode-web 不应收到 Template re-render 导致的 exit 1\n```\n\n## Aether 侧跟进\n\n此 pattern 可能影响其他使用 `range service \"X\"` 引导必选环境变量的项目。考虑在 `aether init` 模板中默认包含 `splay` + 守卫写法 — 跟进 issue 待开（若需要协助请 @ Aether 维护团队）。\n",
+      "state": "open",
+      "labels": [
+        "area/deploy-ci",
+        "area/infra-config",
+        "priority/p2-high",
+        "type/bug"
+      ],
+      "comments": [
+        {
+          "id": 2667,
+          "body": "Aether 侧跟进已开: [10CG/Aether#61](https://forgejo.10cg.pub/10CG/Aether/issues/61) — 把 `splay`/`wait` + `range service` 守卫写进 aether-init 默认模板 + 新增 `aether doctor template_bare_range` 检测。下轮 sprint 处理。本 issue 的 [A]+[B] 本地修复不受阻塞，可先行。",
+          "user": "simonfish",
+          "created_at": "2026-04-24T20:02:53Z"
+        },
+        {
+          "id": 2689,
+          "body": "## ⚠️ 勘误 — 撤回之前的 `{{ env \"REDIS_URL\" }}` fallback 建议\n\n此前我在本 issue 建议的 template 守卫写法中包含 `{{ env \"REDIS_URL\" }}` 作为 else 分支兜底:\n\n```hcl\n{{- else }}\n# redis temporarily unavailable — keep last known value\nREDIS_URL={{ env \"REDIS_URL\" }}\n{{- end }}\n```\n\n**该建议技术上无效**, 请不要采用。\n\n### 为什么无效\n\nConsul Template 的 `{{ env \"X\" }}` 指令读取的是 **consul-template daemon 的进程环境**, **不是上次渲染的文件内容**。在 Nomad 任务里:\n\n- 冷启动或任务重启后, consul-template daemon 的进程 env 里**不会**有 `REDIS_URL` (它是**渲染产出**, 不是**渲染输入**)\n- `{{ env \"REDIS_URL\" }}` 返回空字符串\n- 文件写出 `REDIS_URL=` (空值), 与裸 range 完全缺失该行在 env-check 角度行为**等价失败**\n\n此 bug 在 Aether 侧 Spec 审计 (Round 1 + Round 2) 被 code-verify 抓出。\n\n### 正确方案 (已在 Aether Spec 中收敛)\n\n**三件套**: `wait { min max }` debounce + `change_mode = \"noop\"` + `{{ if gt (len $svc) 0 }}` 守卫。**不需要** else 分支, **不需要** `{{ env }}` fallback。\n\n```hcl\ntemplate {\n  destination = \"secrets/app.env\"\n  env         = true\n  change_mode = \"noop\"           # 文件被重写后不触发任务重启\n  splay       = \"5s\"\n  wait {\n    min = \"10s\"                  # <10s 的上游闪失会被吞掉, 渲染本身不触发\n    max = \"30s\"\n  }\n  data = <<EOH\n{{- $redis := service \"silknode-redis\" }}\n{{- if gt (len $redis) 0 }}\nREDIS_URL=redis://{{ (index $redis 0).Address }}:{{ (index $redis 0).Port }}\n{{- end }}\n# 注: 0 实例时 REDIS_URL 行**整行不写入**新文件;\n# change_mode=noop 确保任务不重启; 运行中进程继续用启动时读到的内存老值。\nEOH\n}\n```\n\n### 精确语义 (canonical)\n\n1. consul-template **仍然重写**目标文件 (`wait` 窗口到期后)\n2. `{{ if gt (len $svc) 0 }}` 守卫 → `REDIS_URL=...` **整行不出现**在新文件 (不是空值)\n3. `change_mode = \"noop\"` → 文件重写后**不触发**任务重启信号\n4. 运行中进程 `os.Environ()` 保留**启动时**的老值, 继续工作\n\n### 保护边界 (重要, 不要误解)\n\n| 场景 | 是否保护 |\n|---|---|\n| 上游 <10s 闪失 (wait 吸收) | ✅ 不重渲染 |\n| 上游 10-30s 闪失 (渲染但缺行 + noop) | ✅ 运行进程内存老值 |\n| 任务本身重启 (滚更/故障) 期间上游正好 0 实例 | ❌ 冷启动读新文件失败 — 应用端自身启动重试 |\n| 首次部署, 上游从未健康 | ❌ 等同裸 range — 用 Nomad 依赖排序先起 redis |\n\n**本方案保护运行中进程, 不保护冷启动** — 应用端仍应对必选 env 实现启动重试或健康检查 back-off。\n\n### 完整 Aether 侧跟进\n\n- Spec: `openspec/changes/harden-aether-init-consul-template/` (Level 3, 3 轮审计已 PASS)\n- Forgejo issue: [10CG/Aether#61](https://forgejo.10cg.pub/10CG/Aether/issues/61)\n- 计划发布: CLI v1.11.0 + Plugin v1.10.0, 届时 `aether init` 生成的模板默认带三件套\n- canonical 运维读物: `docs/guides/consul-template-render-flap-mitigation.md` (随 v1.11.0 发布)\n\n抱歉误导。",
+          "user": "simonfish",
+          "created_at": "2026-04-24T21:02:16Z"
+        },
+        {
+          "id": 2891,
+          "body": "## ✅ Aether 侧已发布 — 迁移指南\n\n随 Aether v1.10.0 发布 (2026-04-25), 三件套模板和检测工具已就绪。\n\n### 发布清单 (已落地)\n\n- [aether-cli v1.11.0](https://forgejo.10cg.pub/10CG/Aether/releases/tag/cli-v1.11.0) — 含 `aether doctor template_bare_range` WARN 级 check\n- [aether-plugin v1.10.0](https://forgejo.10cg.pub/10CG/aether-plugin/releases/tag/v1.10.0) — `/aether:init` 生成的 HCL 默认带三件套\n- [Aether 主仓库 v1.10.0](https://forgejo.10cg.pub/10CG/Aether/releases/tag/v1.10.0)\n- canonical 运维手册: [docs/guides/consul-template-render-flap-mitigation.md](https://forgejo.10cg.pub/10CG/Aether/src/branch/master/docs/guides/consul-template-render-flap-mitigation.md)\n- Spec 路径: `openspec/changes/harden-aether-init-consul-template/` (Phase 5 收尾完成后将归档到 `openspec/archive/2026-04-25-harden-aether-init-consul-template/`)\n\n### 实测证据 (Phase 3 GATE PASS)\n\n集群实测 (heavy-3 节点, 2026-04-25T14:33Z):\n\n| 指标 | ab-test-old (裸 range) | ab-test-new (三件套) | 期望 |\n|---|---|---|---|\n| 10x stop-purge flap 期间任务重启数 | **77** | **0** | old≥3, new==0 |\n| 前置自检 (1x flap) | delta=7 | (n/a) | ≥1 |\n\nverdict: `aether-plugin-benchmarks/ab-results/aether-init-hardened-template-2026-04-25/verdict.md` (主仓库)\n\n### silknode-web 迁移建议\n\n1. **更新 silknode-web 的 Nomad job HCL** 把 `template {}` 块换成三件套写法 (照搬上方 #2689 erratum 中的范例)\n2. **在 dev 集群验证** 用 `aether doctor template_bare_range --json` 跑一遍, 确认 silknode-web 不再被 flag (升级 CLI 到 v1.11.0)\n3. **可选 — 主动 flap 测试** 人为做一次 `nomad job stop -purge silknode-redis && sleep 35 && nomad job run silknode-redis`, 观察 silknode-web 重启数应为 0\n4. 部署到 prod 时同样升级模板 (template{} 块的修改是纯渲染逻辑, 无停机风险)\n\n### 边界提醒 (重要)\n\n三件套**仅保护运行中进程**, 不保护:\n- 任务本身重启期间上游正好 0 实例 → 冷启动失败 (应用端启动重试责任)\n- 首次部署上游从未健康 → 部署顺序应先起 redis\n\n详情见 [canonical guide §保护边界](https://forgejo.10cg.pub/10CG/Aether/src/branch/master/docs/guides/consul-template-render-flap-mitigation.md#保护边界)。\n\n---\n\n致歉再次确认: #2689 中已撤回的 `{{ env \"REDIS_URL\" }}` fallback 写法**确实无效**, 不要采用。",
+          "user": "simonfish",
+          "created_at": "2026-04-25T17:06:22Z"
+        },
+        {
+          "id": 3754,
+          "body": "## 状态更新 2026-04-30\n\n### 当前修复进度\n\n- [x] **[A] splay+wait 短期补丁** — `commit 11b594e` (2026-04-24), `splay = \"30s\"` + `wait { min=\"10s\", max=\"30s\"}` 已 land。\n- [ ] **[B] template if/else guard** — 未应用。考虑到 [A] 已抵御 sub-30s 闪失 + [C] 是真正长期解, [B] 作为中间态价值有限, 跳过。\n- [ ] **[C] silknode-redis 独立 Nomad job** — DEFERRED 至 UPM (P2 非 launch blocker, 见 UPM `DEFERRED 清单` 第 5 项)。\n\n### 运行验证\n\n现在 dev 部署 (alloc `748b0782`, image `6e5fe98`):\n- ClientStatus: `running`\n- Restarts: `0`\n- 自 [A] land 后 6 天无 REDIS_URL 重启循环复现\n\n### 处理建议\n\n本 issue 描述的现象 (`Restart Signaled` → `Exit Code 1` → 32s 自愈循环) 已被 [A] 抑制, 长期根治 [C] 在 UPM DEFERRED tracked。两条路径:\n\n1. **现在 close**: 把 [C] 视为独立 architecture work, 启动时另开 issue\n2. **保留 open**: 把 issue 转作 [C] 的 tracking 入口, 重写 title 为 \"redis 拆独立 Nomad job (long-term fix)\"\n\n等 user 决策。",
+          "user": "simonfish",
+          "created_at": "2026-04-30T16:06:21Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/SilkNode/issues/207",
+      "created_at": "2026-04-24T20:01:12Z",
+      "updated_at": "2026-04-30T16:06:21Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.10.0",
+      "current": "1.21.2",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "docs/guides/consul-template-render-flap-mitigation.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "aether-plugin-benchmarks/ab-results/aether-init-hardened-template-2026-04-25/verdict.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "forgejo.10cg.pub/10CG/Aether/src/branch/master/docs/guides/consul-template-render-flap-mitigation.md",
+          "line": null,
+          "format": "md_link",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [
+        {
+          "number": 469,
+          "title": "feat(security): Phase 2 — PostToolUse content-scan hook (secret-scan.sh)",
+          "state": "open",
+          "html_url": "https://forgejo.10cg.pub/10CG/SilkNode/pulls/469",
+          "head_branch": "feat/secret-scan-posttooluse-hook",
+          "match_reasons": [
+            "fix"
+          ]
+        },
+        {
+          "number": 419,
+          "title": "release: Dockerfile COPY public/ fix (issue #414 xlsx 404)",
+          "state": "open",
+          "html_url": "https://forgejo.10cg.pub/10CG/SilkNode/pulls/419",
+          "head_branch": "release/issue-414-dockerfile-public",
+          "match_reasons": [
+            "fix"
+          ]
+        }
+      ],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "91370db6331c52c8e2fc292b0f59d2f5e961a247"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "skip",
+    "cases": [
+      {
+        "input": "Trigger silknode-redis sidecar deregister window while silknode-web Consul template re-renders (live Nomad/Consul cluster)",
+        "expected": "REDIS_URL line missing from rendered .env -> silknode-web exit code 1 -> 32s restart loop -> self-heal",
+        "actual": null,
+        "match": null,
+        "notes": "skip: no SilkNode Nomad/Consul cluster, no alloc access, no HCL access from /home/dev/Aria (cross-repo production infra bug). Live reproduction not possible in triage environment. Resolution determined from issue tracker documentary evidence instead (see verdict rationale)."
+      }
+    ],
+    "hit_count": 0,
+    "total_count": 1,
+    "hit_rate": "0/1"
+  },
+  "verdict": "fixed-in-X",
+  "severity": "minor",
+  "recommended_action": "close",
+  "deviation_note": null,
+  "errors": []
+}

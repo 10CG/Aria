@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "D1 json output",
+      "passed": true,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    },
+    {
+      "text": "D2 comment md",
+      "passed": true,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    },
+    {
+      "text": "D3 schema conformance",
+      "passed": false,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    },
+    {
+      "text": "D4 canonical enums",
+      "passed": true,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    },
+    {
+      "text": "D5 multi artifact",
+      "passed": true,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    },
+    {
+      "text": "script produced",
+      "passed": true,
+      "evidence": "repro.cases.0: 'case_id' is a required property"
+    }
+  ]
+}

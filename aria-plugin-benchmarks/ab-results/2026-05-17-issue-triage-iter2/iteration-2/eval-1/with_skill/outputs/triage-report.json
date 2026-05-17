@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.21.2",
+  "issue_ref": "10CG/Aria#101",
+  "generated_at": "2026-05-17T21:20:21Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 101,
+      "title": "state-scanner v3.0: _normalize_status 子串匹配 \"done\" 导致 pending_archive 假阳性 (4/4 实测中招)",
+      "body": "## Bug Report\n\n**描述**: state-scanner v3.0 的 `_normalize_status` 用无词边界的子串匹配判定 Status=\"done\"，导致任何含 \"Phase X done\" / \"PR-A done\" / \"Phase B done\" 字样的 OpenSpec change 被错误归一化成 `done` 状态，进而误报为 `pending_archive`。**真实项目命中率 4/4**（即此项目当前活跃 spec 全部被误判）。\n\n如果用户照 state-scanner 推荐 [1] openspec-archive 执行，会把 WIP spec 移动到 `openspec/archive/`，破坏其他并行终端的工作上下文 — silent false-positive 推荐 → 数据移位。\n\n**根因 (代码位置)**: `skills/state-scanner/scripts/collectors/_status.py` `_normalize_status()`\n\n```python\nfor token in (\"done\", \"complete\"):\n    if token in low:          # ← 无词边界, 子串匹配\n        return \"done\"\n```\n\n`raw_status` 由 `_extract_status` pattern 4 (`^(?:#{1,6}\\s+)?Status[：:]\\s*(.+?)\\s*$`) 抓的是 Status 整行，含后续描述。十步循环鼓励用户在 Status 写 \"Phase A done, ready for Phase B\" 这种增量叙事 → \"done\" 子串必中。\n\n**复现步骤**:\n\n1. 写一个 OpenSpec proposal.md，Status 行如下任一形式：\n   - `## Status: ✅ Approved — Phase A done, ready for Phase B`\n   - `## Status: ✅ Implemented PR-A merged, post-deploy 验证后归档`\n   - `## Status: ⏸ DRAFT pending lawyer review — Phase B PR-A done`\n2. 跑 `python3 scripts/scan.py --output /tmp/snap.json`\n3. 看 `jq '.openspec.pending_archive' /tmp/snap.json`\n\n**预期行为**:\n- \"Approved Phase A done, ready for Phase B\" → status `approved` (Phase B 未开工不能归档)\n- \"Implemented PR-A merged, post-deploy 验证后归档\" → status `in_progress` 或新的 `verifying` 状态 (post-deploy 验证未完成)\n- \"⏸ DRAFT pending lawyer review\" → status `pending` 或 `draft` (被外部依赖阻塞)\n\n**实际行为**: 全部归一化为 `\"done\"` → 全部进 `pending_archive`, state-scanner 推荐 openspec-archive 工作流为 [1]。\n\n**错误输出** (本项目真实 snapshot):\n\n```json\n{\n  \"openspec\": {\n    \"pending_archive\": [\n      {\"id\": \"docs-marketplace-adaptation\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"existing-data-migration\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"pricing-status-marketplace-redo\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"terms-of-service-and-attribution\", \"reason\": \"Status=done still in changes/\"}\n    ]\n  }\n}\n```\n\n真实状态核对:\n\n| spec | proposal.md Status 原文 | tasks 完成度 | 真实进度 | 真该归档？ |\n|------|------------------------|-------------|---------|----------|\n| docs-marketplace-adaptation | \"Approved (Rev2 CONVERGED) — Phase A done, ready for Phase B\" | 4/30 | Phase A done / Phase B 未开工 | ❌ |\n| existing-data-migration | \"Implemented (Phase B PR-A merged 2026-05-10 main fce87bc) — post-deploy 验证后归档\" | 5/52 | PR 合并 / dev 验证中 | ⚠️ 等验证 |\n| pricing-status-marketplace-redo | \"Implemented (Phase B PR-A merged 2026-05-10 main 6160d18) — UAT PASS; post-monitoring 后归档\" | 4/38 | UAT PASS / 监控期 | ⚠️ 等监控 |\n| terms-of-service-and-attribution | \"⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09 commit eb49e77\" | 3/40 | 阻塞律师 review | ❌ |\n\n**修复建议** (优先级序):\n\n(a) **加词边界**: `re.search(r\"\\b\" + re.escape(token) + r\"\\b\", low)` — 最小改动，仍是子串但要求独立词。但仍救不了 \"Phase A done\" / \"PR-A done\" 因为 \"done\" 本身是独立词。\n\n(b) **首 token 抽取**: 抽 Status 第一行后用 `re.split(r\"[—\\-,(（]\", raw, maxsplit=1)[0].strip()` 取首段再匹配 — 推荐方案。\"Approved — Phase A done\" 首 token 是 \"Approved\" → status=approved。\n\n(c) **negative guard**: 含 \"draft\" / \"pending\" / \"approved\" / \"in progress\" / \"blocker\" 时跳过 done 短路 — 兜底防御。\n\n建议组合 **(b) 主修 + (c) 兜底**，并在 SKILL.md 加最佳实践示例 (`## Status: <single-token>`)。\n\n**影响面评估**:\n- 触发条件: 任何 aria 十步循环用户在 Status 写\"Phase X done\" 增量叙事 → **普遍**\n- 后果严重度: state-scanner 是推荐入口，照做会 silent 移走 WIP spec\n- 可复现度: 100% (4/4 项目内 spec 全中招)\n\n## 环境信息\n- Aria Plugin: 1.17.3\n- Skills: 36\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n- 项目: SilkNode (10CG/SilkNode, OpenSpec changes 4 个, archive 多个)\n\n---\n*由 aria-report 自动生成 — 修复建议含 patch sketch 在描述中*\n",
+      "state": "closed",
+      "labels": [
+        "bug"
+      ],
+      "comments": [
+        {
+          "id": 5972,
+          "body": "## Triage report — 2026-05-13\n\n按 issue triage 6 步流程执行:\n\n### 1. Version check\n- 报告版本: Aria Plugin **1.17.3**\n- 当前 release: **1.19.0** (aria submodule HEAD `ab1c873`)\n- 结论: bug 在两版本均存在 — 不是过时报告\n\n### 2. Code path verification\n位置确认 — `aria/skills/state-scanner/scripts/collectors/_status.py:58-60`:\n\n```python\nfor token in (\"done\", \"complete\"):\n    if token in low:\n        return \"done\"\n```\n\n`done` / `complete` 在 `approved` / `reviewed` / `active` (line 64-69) **之前**判定,任何 `low` 含 \"done\" 子串即短路返回 `done`,与 raw_status 真实语义无关。\n\n### 3. Git log\n`_status.py` 最近 2 commit:\n- `47c9a57` feat(state-scanner): i18n status regex — fullwidth colon + inline blockquote\n- `b8db9a0` refactor(state-scanner): T3 prep — split scan.py into collectors/ package\n\n**均未触及匹配顺序逻辑**,无修复。\n\n### 4. In-flight branch / PR\n检索 `10CG/Aria` + `10CG/aria-plugin` open PR,关键词 `101` / `normalize` / `status` — **零命中**。无 in-flight 修复。\n\n### 5. Reproduction (current v1.19.0)\n直接 import `_normalize_status` 跑 issue 列出的 4 个真实 Status 字符串:\n\n| spec | actual | expected | verdict |\n|---|---|---|---|\n| docs-marketplace-adaptation | **done** | approved | 🔴 命中 done 误判 |\n| existing-data-migration | **unknown** | approved/verifying | 🟡 不同 bug — \"Implemented\" 不在词典 |\n| pricing-status-marketplace-redo | **unknown** | approved/verifying | 🟡 同上 |\n| terms-of-service-and-attribution | **done** | pending (DRAFT) | 🔴 命中 done 误判 |\n\n### 6. Verdict\n\n**Confirmed — needs fix**。但报告与实测略有偏差,需在 fix scope 里覆盖:\n\n- **核心 bug (2/4)**: `done` token 优先级太高 + 无词边界 — 与 issue 描述一致\n- **次生 bug (2/4)**: `Implemented` (合法 OpenSpec lifecycle 状态) 不在任何 token 列表,返回 `unknown` — issue 未涵盖,但是同根域问题 (token 字典 + 优先级设计) 的另一面\n\n### 修复 scope 建议\n\nIssue 提出的 (b) 首 token 抽取 + (c) negative guard 仍是正确方向,但建议**额外包含**:\n\n- (d) `Implemented` → 映射到新增的 `implemented` lifecycle 状态(或先短期映到 `active`,新状态留 Spec 讨论)\n- (e) 加 unit test 覆盖本 issue 4 个真实字符串 + 至少 3 个 edge case (`done` 词边界、`Implemented` 别名、纯 token 单值如 `Active`)\n- (f) state-scanner SKILL.md 加 \"Status 行最佳实践\" 小节,引导用户用 single-token 或 `<token> — <narrative>` 格式\n\n### 后续动作\n\n- [ ] Phase A.1 — `aria-issue-101-status-normalize` OpenSpec proposal (Level 2 minimal)\n- [ ] Phase B — 修复 + unit test + SKILL.md 文档同步\n- [ ] Phase C — 走 pre-merge gate (Rule #8)\n- [ ] Issue close + 关联 PR\n\n---\n\n*Triage 完成时间: 2026-05-13 | 流程: 6-step SOP (拟以 `aria-issue-triage-sop` OpenSpec 沉淀为标准流程)*\n",
+          "user": "simonfish",
+          "created_at": "2026-05-13T00:24:47Z"
+        },
+        {
+          "id": 6019,
+          "body": "## Dogfood comment — automated triage via /issue-triage v1.0\n\n> **Purpose**: T5 dogfooding of `aria-issue-triage-sop` Phase B.2. Compare against the manual triage at [issuecomment-5972](https://forgejo.10cg.pub/10CG/Aria/issues/101#issuecomment-5972).\n> **Acceptance**: PASS (3/3 hard gates + 94.9% soft-field cumulative, ≥85% threshold).\n> **Repro hit rate**: 2/4 (matches manual exactly).\n> **Verdict**: `partial-repro` — the 7th verdict, created precisely because of this case.\n\n---\n\n## Triage Report\n\n**Verdict**: `partial-repro` | **Severity**: `minor` | **Recommended Action**: `next-cycle`\n\n---\n\n### Version\n\n| Field | Value |\n|-------|-------|\n| Reported | `1.17.3` |\n| Current | `1.19.0` |\n| Gap | `behind` (+2 minor versions) |\n\nIssue was filed against v1.17.3; current release is v1.19.0. The bug is present in both versions — this is not an outdated report. The `_normalize_status` logic has not changed between these versions (Step 4 git log confirms no relevant fix commits).\n\n### Code Path\n\n`aria/skills/state-scanner/scripts/collectors/_status.py` (prose citation, L58-60):\n\n- File exists at path `aria/skills/state-scanner/scripts/collectors/_status.py` — confirmed present\n- Line 58-60 snippet retrieved: `for token in (\"done\", \"complete\"): if token in low: return \"done\"` — matches issue description exactly\n- Note: the issue also uses bare `skills/state-scanner/scripts/collectors/_status.py` (without `aria/` prefix) — that path does not exist; the full path with `aria/` prefix is the correct citation\n\nThe code path verification confirms: `\"done\"` and `\"complete\"` substring checks execute at lines 58-60, **before** the `\"approved\"` check at line 64. Any Status string containing the substring `\"done\"` will short-circuit and return `\"done\"` regardless of other tokens in the string.\n\n### Git History\n\n`git log -n 20 --oneline -- aria/skills/state-scanner/scripts/collectors/_status.py` returned:\n\n- `47c9a57` feat(state-scanner): i18n status regex — fullwidth colon + inline blockquote\n- `b8db9a0` refactor(state-scanner): T3 prep — split scan.py into collectors/ package\n\n**No recent commits matched fix-related keywords** (`fix`, `resolve`, `normalize`, `bugfix`). `likely_fix_candidates: []`. The substring matching order logic has not been patched.\n\n### In-flight\n\n| Category | Matches |\n|----------|---------|\n| Remote PRs | none (0 open PRs keyword-matched on `101` / `normalize` / `_status`) |\n| Local branches | none |\n| Worktrees | `feature/aria-issue-triage-sop` (current worktree — unrelated to bug fix) |\n\nNo in-flight fix work found. Starting a new fix cycle will not create duplicate work.\n\n### Reproduction\n\n**Mode**: `auto` | **Hit rate**: `2/4`\n\nExecuted: `python3 -c \"from _status import _normalize_status; ...\"` against current `aria/skills/state-scanner/scripts/collectors/_status.py`.\n\n| case_id | Input (Status raw string) | Expected behavior | Actual behavior | Match | Notes |\n|---------|--------------------------|-------------------|-----------------|-------|-------|\n| case-1-docs-marketplace | `Approved (Rev2 CONVERGED) — Phase A done, ready for Phase B` | `approved` (Phase B not started) | `done` (substring hit) | false | PRIMARY BUG — \"done\" token at L58 evaluated before \"approved\" at L64; `done` substring wins |\n| case-2-existing-data-migration | `Implemented (Phase B PR-A merged 2026-05-10 main fce87bc) — post-deploy 验证后归档` | `done` (issue claims pending_archive hit) | `unknown` | false | SECONDARY BUG — `Implemented` not in any token list; returns `unknown` not `done`; different root cause than issue describes |\n| case-3-pricing-marketplace-redo | `Implemented (Phase B PR-A merged 2026-05-10 main 6160d18) — UAT PASS; post-monitoring 后归档` | `done` (issue claims pending_archive hit) | `unknown` | false | SECONDARY BUG — same as case-2; `Implemented` missing from token dict |\n| case-4-terms-of-service | `⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09 commit eb49e77` | `pending` or `draft` (lawyer-blocked, not done) | `done` (substring hit) | false | PRIMARY BUG — \"done\" token at L58 evaluated before \"pending\"/\"draft\" at L72; `done` substring wins |\n\n**Summary**: cases 1 and 4 reproduce the primary substring-ordering bug exactly as described. Cases 2 and 3 hit a *different* bug (`Implemented` not mapped in the token dictionary → `unknown`), which the issue does not describe and which is a secondary/adjacent defect.\n\n**Deviation from issue claim**: Issue reports all 4 cases as `pending_archive` hits via the `done` substring bug. Actual repro: 2/4 confirm the primary `done` substring ordering bug; 2/4 (`Implemented` cases) hit a secondary `unknown` mapping gap that the issue does not describe.\n\n### Verdict Rationale\n\nVerdict is **`partial-repro`** because:\n\n1. The core bug is real and reproducible (2/4 confirmed: `\"done\"` token checked before `\"approved\"` and `\"pending\"` — substring `done` in Status narrative overrides intended semantic). This is a genuine defect requiring a fix.\n2. However, the issue self-reports 4/4 hit rate for the `done` substring mechanism. The actual mechanism for cases 2 and 3 is different (`Implemented` not in token dictionary → `unknown`, not `done`). These cases end up in `pending_archive` for a *different* reason or may not appear there at all depending on scanner logic.\n3. The `partial-repro` verdict forces the fix scope to cover both the primary (substring ordering) and secondary (missing `Implemented` token) bugs, rather than narrowly patching only what was described.\n\n**deviation_note**: Issue self-reports 4/4 hit rate for the `done` substring ordering bug. Actual repro: 2/4 confirm primary bug (`done` token fires before `approved`/`pending` — cases 1 and 4). 2/4 (`existing-data-migration`, `pricing-status-marketplace-redo`) hit a secondary bug: `Implemented` is not in any token list and returns `unknown`, not `done`. Both are real defects in `_normalize_status` but they have different root causes. Fix scope must cover both (a) substring ordering/word-boundary for `done`, and (b) missing `Implemented` lifecycle token mapping.\n\n---\n\n*Generated by `/issue-triage` v1.19.0 — Ref: 10CG/Aria#101*\n*Step 6 performed by AI (auto mode) — 2026-05-13*\n\n\n---\n\n*Auto-generated by `/issue-triage` Skill (aria-plugin v1.19.0+, cycle `aria-issue-triage-sop`).*\n*Acceptance report: `.aria/dogfood-T5-report.md` (committed on branch `feature/aria-issue-triage-sop`).*\n",
+          "user": "simonfish",
+          "created_at": "2026-05-13T14:34:49Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/101",
+      "created_at": "2026-05-12T23:28:54Z",
+      "updated_at": "2026-05-15T08:20:10Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.17.3",
+      "current": "1.21.2",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "skills/state-scanner/scripts/collectors/_status.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "_status.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "aria/skills/state-scanner/scripts/collectors/_status.py",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: \"\"\"Shared Status extraction + normalization used by requirements + openspec collectors.\n2: \n3: 6 regex variants per SKILL.md Phase 1.5. R1-I7 fix: pattern 4 allows optional\n4: Markdown heading prefix `#{1,6} ` to catch `## Status: Active`.\n5: ",
+          "warning": null,
+          "total_lines": 113
+        },
+        {
+          "file_path": ".aria/dogfood-T5-report.md",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: # T5 Dogfood Report — aria-issue-triage-sop\n2: \n3: > Date: 2026-05-13\n4: > Target issue: Forgejo Aria #101\n5: > Manual baseline: issuecomment-5972 (simonfish, 2026-05-13T00:24:47Z)",
+          "warning": null,
+          "total_lines": 184
+        },
+        {
+          "file_path": "aria/skills/state-scanner/scripts/collectors/_status.py",
+          "line": 58,
+          "format": "prose_l",
+          "exists": true,
+          "line_in_range": true,
+          "snippet": "55: def _normalize_status(raw: str | None) -> str:\n56:     \"\"\"Normalize Status string to OpenSpec-aligned lifecycle states.\n57: \n58:     Priority order (refined per Forgejo Aria #101 fix, 2026-05-13):\n59:       1. Terminal (archived / deprecated) — irreversible\n60:       2. Pending family (draft / pending / placeholder)\n61:       3. In-progress family (multi-word + i18n; literal substring is unambiguous)",
+          "warning": null,
+          "total_lines": 113
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [
+        "feature/aria-issue-101-status-normalize",
+        "remotes/github/feature/aria-issue-101-status-normalize",
+        "remotes/origin/feature/aria-issue-101-status-normalize"
+      ],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "91370db6331c52c8e2fc292b0f59d2f5e961a247"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1-docs-marketplace",
+        "input": "_normalize_status('Approved (Rev2 CONVERGED) — Phase A done, ready for Phase B')",
+        "expected_behavior": "Returns 'approved' (Phase B not started, must NOT be normalized to done)",
+        "actual_behavior": "Returned 'approved' — word-boundary _has_token with 'approved' checked before 'done' fallback",
+        "match": false
+      },
+      {
+        "case_id": "case-2-existing-data-migration",
+        "input": "_normalize_status('Implemented (Phase B PR-A merged 2026-05-10 main fce87bc) — post-deploy 验证后归档')",
+        "expected_behavior": "Returns a non-done lifecycle state (issue's secondary bug: was 'unknown' pre-fix)",
+        "actual_behavior": "Returned 'implemented' — new lifecycle token added by #101 fix Bug 2",
+        "match": false
+      },
+      {
+        "case_id": "case-3-pricing-marketplace-redo",
+        "input": "_normalize_status('Implemented (Phase B PR-A merged 2026-05-10 main 6160d18) — UAT PASS; post-monitoring 后归档')",
+        "expected_behavior": "Returns a non-done lifecycle state (issue's secondary bug: was 'unknown' pre-fix)",
+        "actual_behavior": "Returned 'implemented' — new lifecycle token added by #101 fix Bug 2",
+        "match": false
+      },
+      {
+        "case_id": "case-4-terms-of-service",
+        "input": "_normalize_status('⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09 commit eb49e77')",
+        "expected_behavior": "Returns 'pending' (lawyer-blocked draft, must NOT be normalized to done)",
+        "actual_behavior": "Returned 'pending' — pending family checked before 'done' fallback",
+        "match": false
+      }
+    ],
+    "hit_count": 0,
+    "total_count": 4,
+    "hit_rate": "0/4"
+  },
+  "verdict": "fixed-in-X",
+  "severity": "major",
+  "recommended_action": "close",
+  "deviation_note": null,
+  "errors": []
+}
