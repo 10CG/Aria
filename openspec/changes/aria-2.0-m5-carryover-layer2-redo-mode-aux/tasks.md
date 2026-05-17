@@ -34,12 +34,12 @@
 
 ### T-pre — Add 5th meta_optional key REWORK_ROUND
 
-- [ ] pre.1 Extend `aria_layer1/extension.py::_handle_s4_launch` extra_meta when `rework_mode IN ('changes','redo')`: add `"REWORK_ROUND": str(dispatch.get("rework_round") or 1)`
-- [ ] pre.2 Update HCL `nomad/jobs/aria-layer2-runner.hcl` meta_optional list: add 5th key `"REWORK_ROUND"`. **Must run `nomad job validate aria-layer2-runner.hcl`** post-edit per `feedback_nomad_hcl_validate_early`
-- [ ] pre.3 Update existing audit `meta_optional_written` payload `rework_keys_written` list to include `REWORK_ROUND` (5 keys total; note: existing historical rows remain 4-key per AD-M5-10 #1 immutability — readers must use `len()` not equality)
-- [ ] pre.4 Update Spec X test `tests/test_t_changes_mode_meta.py` (modify existing assertions): add `REWORK_ROUND` to expected key list (5 keys total: REWORK_MODE / REWORK_FEEDBACK / PARENT_PR_ID / REWORK_OF / REWORK_ROUND); value matches dispatch.rework_round
-- [ ] pre.5 Update Spec X bash test `tests/changes-mode/mode_changes-prompt.sh` to add **new test case** verifying NOMAD_META_REWORK_ROUND env consumed (modes/changes.sh:174 fallback `${REWORK_ROUND:-1}` now correctly resolves to actual round when env present; test with REWORK_ROUND=2 → prompt section header says "round 2")
-- [ ] pre.6 Update AD-M5-3 contract section: 4-key → **5-key** Layer 1↔Layer 2 meta contract (architecture-decisions.md §AD-M5-3 contract sub-section ~L3585-3596; verify line range with grep before edit)
+- [x] pre.1 Extend `aria_layer1/extension.py::_handle_s4_launch` extra_meta when `rework_mode IN ('changes','redo')`: add `"REWORK_ROUND": str(dispatch.get("rework_round") or 1)`
+- [x] pre.2 Update HCL `nomad/jobs/aria-layer2-runner.hcl` meta_optional list: add 5th key `"REWORK_ROUND"`. **Must run `nomad job validate aria-layer2-runner.hcl`** post-edit per `feedback_nomad_hcl_validate_early`
+- [x] pre.3 Update existing audit `meta_optional_written` payload `rework_keys_written` list to include `REWORK_ROUND` (5 keys total; note: existing historical rows remain 4-key per AD-M5-10 #1 immutability — readers must use `len()` not equality)
+- [x] pre.4 Update Spec X test `tests/test_t_changes_mode_meta.py` (modify existing assertions): add `REWORK_ROUND` to expected key list (5 keys total: REWORK_MODE / REWORK_FEEDBACK / PARENT_PR_ID / REWORK_OF / REWORK_ROUND); value matches dispatch.rework_round
+- [x] pre.5 Update Spec X bash test `tests/changes-mode/mode_changes-prompt.sh` to add **new test case** verifying NOMAD_META_REWORK_ROUND env consumed (modes/changes.sh:174 fallback `${REWORK_ROUND:-1}` now correctly resolves to actual round when env present; test with REWORK_ROUND=2 → prompt section header says "round 2")
+- [x] pre.6 Update AD-M5-3 contract section: 4-key → **5-key** Layer 1↔Layer 2 meta contract (architecture-decisions.md §AD-M5-3 contract sub-section ~L3585-3596; verify line range with grep before edit)
 
 ---
 
@@ -47,35 +47,35 @@
 
 ### T1.0 — M1 issue schema extension (R2-NEW-2, ~0.3h)
 
-- [ ] 1.0.1 Locate M1 issue body validator (per `extension.py:1614` reference) — likely `aria_layer1/m1_issue_validator.py` or schema file
-- [ ] 1.0.2 Add optional field `linked_spec_id`: type `string`, regex `^[a-z0-9-]+$`, nullable, backward-compat (absent → ignored, no validation error)
-- [ ] 1.0.3 Unit test extending existing M1 validator tests: present + valid format → passes; absent → passes; present + invalid format (uppercase/special chars) → validation error
+- [x] 1.0.1 Locate M1 issue body validator (per `extension.py:1614` reference) — likely `aria_layer1/m1_issue_validator.py` or schema file
+- [x] 1.0.2 Add optional field `linked_spec_id`: type `string`, regex `^[a-z0-9-]+$`, nullable, backward-compat (absent → ignored, no validation error)
+- [x] 1.0.3 Unit test extending existing M1 validator tests: present + valid format → passes; absent → passes; present + invalid format (uppercase/special chars) → validation error
 
 ### T0 — Schema **v4.1 → v4.2** additive migration (~1h, R2-NEW-1)
 
-- [ ] 0.1 Create `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/migrations/006_schema_v4.2_add_spec_id.sql` (renumbered from 005 per CRIT-6 + version bumped v4.1→v4.2 per R2-NEW-1 — current state already at v4.1 per `_LATEST_SCHEMA_VERSION`):
+- [x] 0.1 Create `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/migrations/006_schema_v4.2_add_spec_id.sql` (renumbered from 005 per CRIT-6 + version bumped v4.1→v4.2 per R2-NEW-1 — current state already at v4.1 per `_LATEST_SCHEMA_VERSION`):
   - `ALTER TABLE dispatches ADD COLUMN spec_id TEXT;` (nullable, no default)
   - **NO** `ADD COLUMN IF NOT EXISTS` (per R2-NEW-7 — SQLite does NOT support this syntax); idempotency via migration-version guard pattern matching existing 004 precedent (runner skips applied migrations)
   - Update `schema_meta` row: insert/update v4.2 marker (NOT v4.1 — already there)
-- [ ] 0.2 Update `aria_layer1/schema.sql` (canonical):
+- [x] 0.2 Update `aria_layer1/schema.sql` (canonical):
   - Add `spec_id TEXT` to `CREATE TABLE dispatches` column list (between `pr_id` and `fail_reason` per existing ordering convention)
   - Update header version comment **v4.1 → v4.2** (NOT v4.0→v4.1 — current is v4.1)
-- [ ] 0.3 Update `aria_layer1/schema_migrate.py`:
+- [x] 0.3 Update `aria_layer1/schema_migrate.py`:
   - Add migration registry entry `("006", "006_schema_v4.2_add_spec_id.sql", "4.1", "4.2")` (from_version, to_version)
   - Bump `_LATEST_SCHEMA_VERSION = "4.2"` (was "4.1")
-- [ ] 0.4 Update `aria_layer1/db.py` `DispatchRepository.create_dispatch` + helpers to optionally accept/read `spec_id` (default None)
-- [ ] 0.5 Unit test `test_t_schema_v4_2_migration.py`:
+- [x] 0.4 Update `aria_layer1/db.py` `DispatchRepository.create_dispatch` + helpers to optionally accept/read `spec_id` (default None)
+- [x] 0.5 Unit test `test_t_schema_v4_2_migration.py`:
   - Migration adds spec_id column to **v4.1** DB (not v4.0 — current baseline is v4.1) → version becomes v4.2
   - Re-run idempotent (no error on existing v4.2 DB; migration-version guard skips)
   - Existing dispatches rows have spec_id=NULL after migration
-- [ ] 0.6 Drift-guard test (per `feedback_validator_repo_drift_guard_test`): committed `schema.sql` matches migrations **003 + 004 + 005 + 006** cumulative result
+- [x] 0.6 Drift-guard test (per `feedback_validator_repo_drift_guard_test`): committed `schema.sql` matches migrations **003 + 004 + 005 + 006** cumulative result
 
 ### T1 — Layer 1 spec_id write **at S1_SCAN** (per HIGH backend-H2 fix, ~1h; depends on T1.0)
 
-- [ ] 1.1 In `extension.py::_handle_s1_scan` (or equivalent S1_SCAN handler): when issue.yaml has `linked_spec_id` field (validated by T1.0 schema), `UPDATE dispatches SET spec_id=? WHERE dispatch_id=? AND spec_id IS NULL` (CAS guard)
-- [ ] 1.2 Audit event: emit `rework_cycle` with payload `outcome=spec_id_written`, `spec_id=<value>` at S1_SCAN time (not S5)
-- [ ] 1.3 Unit test in new `test_t_spec_id_write.py`: 2 cases — (a) seed dispatch + issue.yaml with linked_spec_id → verify UPDATE applied; (b) issue.yaml without linked_spec_id → spec_id stays NULL graceful skip
-- [ ] 1.4 Document: spec_id sourced from issue.yaml `linked_spec_id` field (e.g. user pre-fills when creating issue from Spec template). Layer 2 result.json does NOT carry spec_id (T2.9 has spec_id removed).
+- [x] 1.1 In `extension.py::_handle_s1_scan` (or equivalent S1_SCAN handler): when issue.yaml has `linked_spec_id` field (validated by T1.0 schema), `UPDATE dispatches SET spec_id=? WHERE dispatch_id=? AND spec_id IS NULL` (CAS guard)
+- [x] 1.2 Audit event: emit `rework_cycle` with payload `outcome=spec_id_written`, `spec_id=<value>` at S1_SCAN time (not S5)
+- [x] 1.3 Unit test in new `test_t_spec_id_write.py`: 2 cases — (a) seed dispatch + issue.yaml with linked_spec_id → verify UPDATE applied; (b) issue.yaml without linked_spec_id → spec_id stays NULL graceful skip
+- [x] 1.4 Document: spec_id sourced from issue.yaml `linked_spec_id` field (e.g. user pre-fills when creating issue from Spec template). Layer 2 result.json does NOT carry spec_id (T2.9 has spec_id removed).
 
 **Note**: T1.5 (Layer 1 S5_AWAIT result.json read for new_pr_id, CRIT-1 fix) merged into T3.1 since both fire in the same `_handle_s5_await` terminal-path branch. **T3.1 + T6.6** (`test_t_close_old_pr.py` — note T6.5 is the bash commit-lint-validate test, not the close-old-pr test) covers the unit test scenarios (redo dispatch alloc terminates with result.json → Layer 1 binds pr_id correctly + audit `state_transition` payload `new_pr_id_from_result_json=true`).
 
@@ -85,9 +85,9 @@
 
 ### T2 — modes/redo.sh + entrypoint.sh redo branch swap
 
-- [ ] 2.1 (~0.5h) entrypoint.sh: replace `redo) ... exit 1` branch with `redo) exec /opt/aria-runner/modes/redo.sh "$@" ;;`
-- [ ] 2.2 (~2h) modes/redo.sh skeleton + globals (mirror modes/changes.sh §"Globals" section; same defaults, same env var consumption including NOMAD_META_REWORK_ROUND per T-pre.2)
-- [ ] 2.3 (~1.5h) Forgejo PR fetch (curl + jq). **Always create `lib/forgejo-helpers.sh`** (per C10 v2 decision; drop "if duplication > 50 lines" guard) — by (a) **extracting** existing `forgejo_get_retry` from `modes/changes.sh`; (b) **writing new** `forgejo_post_retry` + `forgejo_patch_retry` using same retry pattern. Both modes/changes.sh + modes/redo.sh source this helper
+- [x] 2.1 (~0.5h) entrypoint.sh: replace `redo) ... exit 1` branch with `redo) exec /opt/aria-runner/modes/redo.sh "$@" ;;`
+- [x] 2.2 (~2h) modes/redo.sh skeleton + globals (mirror modes/changes.sh §"Globals" section; same defaults, same env var consumption including NOMAD_META_REWORK_ROUND per T-pre.2)
+- [x] 2.3 (~1.5h) Forgejo PR fetch (curl + jq). **Always create `lib/forgejo-helpers.sh`** (per C10 v2 decision; drop "if duplication > 50 lines" guard) — by (a) **extracting** existing `forgejo_get_retry` from `modes/changes.sh`; (b) **writing new** `forgejo_post_retry` + `forgejo_patch_retry` using same retry pattern. Both modes/changes.sh + modes/redo.sh source this helper
 - [ ] 2.4 (~2h) Fresh-checkout from `base.ref` (NOT head.ref): `git clone --depth 1 --branch ${BASE_BRANCH} ...` + create new branch via `git checkout -b aria/redo-${PARENT_PR_ID}-${REWORK_ROUND}-$(date +%Y%m%dT%H%M%S)` (REWORK_ROUND now real env var from T-pre, no `:-1` fallback in branch name)
 - [ ] 2.5 (~2h) Prompt assemble — redo-specific (3 sections only, NO diff section per AD-M5-3 narrowing). **Explicit char caps per HIGH ai-5**:
   - Section 1: feedback ≤4KB (Layer 1 truncated upstream, inherited from Spec X T4.4)
