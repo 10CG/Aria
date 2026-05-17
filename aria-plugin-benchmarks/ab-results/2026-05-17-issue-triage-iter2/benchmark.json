@@ -1,0 +1,59 @@
+{
+  "skill_name": "issue-triage",
+  "iteration": 2,
+  "date": "2026-05-17",
+  "configs": {
+    "with_skill_v1.1.0": {
+      "D1": 4,
+      "D2": 4,
+      "D3": 0,
+      "D4_lenient": 4,
+      "D5": 4,
+      "script_produced": 4,
+      "n": 4,
+      "mean_tokens": 48392,
+      "mean_duration_s": 135.4
+    },
+    "old_skill_v1.0.0": {
+      "D1": 4,
+      "D2": 4,
+      "D3": 0,
+      "D4_lenient": 3,
+      "D5": 4,
+      "script_produced": 4,
+      "n": 4,
+      "mean_tokens": 50204,
+      "mean_duration_s": 129.8
+    }
+  },
+  "primary_metric": "D3_schema_conformance",
+  "primary_result": "0/4 both configs — iteration-2 did NOT fix D3",
+  "headline": "2026-05-13 D3 root-cause diagnosis (hand-authoring) is WRONG for Opus 4.7. script_produced=8/8 (zero hand-authoring, incl v1.0.0). Real D3 root cause: AI-filled Stage 3 fields use non-canonical enum values (severity:medium, verdict:already-fixed/enhancement, missing repro case_id).",
+  "rule6_verdict": "iteration-2 anti-hand-author = valid defense-in-depth, 0 regression, but 0 effect on D3. iteration-3 required (Stage 3 enum drift).",
+  "d4_caveat": "D4 grader used lenient accepted-set, non-discriminating vs schema — discard, schema(D3) is authority",
+  "iteration_2": {
+    "with_skill_v1.2.0": {
+      "D1": 4,
+      "D2": 4,
+      "D3": 4,
+      "D4": 4,
+      "D5": 4,
+      "script_produced": 4,
+      "n": 4,
+      "mean_tokens": 52306,
+      "mean_duration_s": 127.4
+    },
+    "old_skill_v1.0.0": {
+      "D1": 4,
+      "D2": 4,
+      "D3": 1,
+      "D4": 1,
+      "D5": 4,
+      "script_produced": 4,
+      "n": 4,
+      "mean_tokens": 50985,
+      "mean_duration_s": 105.4
+    }
+  },
+  "final_verdict": "D3 0/4 → 4/4 with_skill (v1.2.0 iteration-3). Rule #6 PASS. Ship v1.21.3. Root-cause diagnosis from 2026-05-13 was wrong (hand-authoring); real cause = Stage 3 enum drift, fixed by inline enum table + self-check."
+}

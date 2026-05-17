@@ -1,0 +1,34 @@
+{
+  "skill_name": "issue-triage",
+  "iteration": 2,
+  "baseline": "v1.0.0 (pre-anti-hand-author, skill-snapshot-old/)",
+  "with_skill": "v1.1.0 (iteration-2 anti-hand-author strengthened)",
+  "primary_metric": "D3 schema conformance (was 0/3 with_skill in 2026-05-13 benchmark — agents hand-wrote JSON missing steps.step1_issue.body)",
+  "evals": [
+    {
+      "id": 1,
+      "name": "aria-101-direct-ref",
+      "prompt": "core-team 反馈 aria-plugin 有个 state-scanner 把活跃 spec 误归为 done 的 bug — Forgejo Aria #101。先帮我核对一下,看是不是已经修了或者有人在做。我们工作目录是 /home/dev/Aria,在 master 分支上。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "silknode-207-url-only",
+      "prompt": "用户在 SilkNode 提了个生产 bug,链接 https://forgejo.10cg.pub/10CG/silknode/issues/207 — 大概是 Consul template 重渲染 REDIS_URL 偶发空值。帮我看看这是不是已经修过、或者有人正在做。要不要立刻起 hotfix cycle?",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "ambiguous-recent-bug-ref",
+      "prompt": "我记得最近 Aria 仓库有个 state-scanner 不显示 in-flight 改动的 bug 反馈,好像是 #89 还是 #90?帮我查一下,核对完告诉我现在应该怎么做。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "fresh-noncontextualized-aria-95",
+      "prompt": "Forgejo Aria #95 是个 feature request,关于 R1/R2 audit 加 framework-convention checker。帮我 triage 一下这个 issue,看现在该不该排进开发。工作目录 /home/dev/Aria。",
+      "files": [],
+      "note": "Non-contextualized eval per 2026-05-13 benchmark carry-forward — #95 has no prior triage comments, isolates capability delta from baseline pattern-replication."
+    }
+  ]
+}

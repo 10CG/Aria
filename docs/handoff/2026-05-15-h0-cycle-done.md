@@ -55,7 +55,7 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 |---|------|-------|------|------|
 | ~~H1~~ ✅ | ~~aria-plugin #46 audit 3 Important + PR#4 m5~~ | **RESOLVED v1.21.2** (2026-05-17): hook set -e NOTE / handoff_drift tri-state semantics + degradation:true / latest.md never-candidate schema note / convention {archive-date}→2026-05-15. 3-PR sequenced (#6/#48/main). doc-only, 446/446. | done | aria:code-reviewer #46/#4 |
 | H2 | US-025 M5 Phase B.2 | **superseded** — 并行 session 已 ship M5 Layer 1 (latest.md → us025-m5-c2-d1-done.md); 此 H2 entry stale, 见 US-025 handoff | — | 并行轨, 非本轨 |
-| H3 | issue-triage iteration-2 | SKILL.md "MUST run scripts/triage.py" | ~1h | #101 cycle handoff H1 |
+| ~~H3~~ ✅ | ~~issue-triage iteration-2~~ | **RESOLVED v1.21.3** (2026-05-17): iter-2 anti-hand-author (benchmark-disproven as cause, kept defense-in-depth) + **iter-3 real fix** (Stage 3 inline schema enum + Step 6 case_id + Stage 3.5 self-check). D3 schema conformance **0/4 → 4/4** (Rule #6 capability full AB, causal delta). Misdiagnosis corrected: 2026-05-13 blamed hand-authoring; real cause = AI enum drift. SKILL v1.0.0→1.2.0. aria-plugin#49. | done | #101 handoff H1 |
 | H4 | (optional) Rule #6 H0 structural benchmark 补跑 | mtime sort accuracy + misplaced precision/recall fixture, 存 ab-results | ~1h low-pri | owner-directed T8.2 skip ([decision memo](../../.aria/decisions/2026-05-15-h0-rule6-benchmark-skip.md)) |
 
 ### ✅ 已解决 (本 session post-closeout)

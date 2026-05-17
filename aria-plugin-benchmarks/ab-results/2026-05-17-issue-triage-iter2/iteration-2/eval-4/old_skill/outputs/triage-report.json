@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.21.2",
+  "issue_ref": "10CG/Aria#95",
+  "generated_at": "2026-05-17T21:20:58Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 95,
+      "title": "feat: R1/R2 audit 加 framework-convention checker (+ Phase B 实施前本地 build 验证)",
+      "body": "## 背景 / 问题\n\npost_spec audit (R1 5-agent + R2 focused 2-agent) 跟 spec drafting 的 sister tools (tsc / lint / 单测) 都不查 **framework convention** — Next.js route handler export 限制 / Astro page exports / SvelteKit `+page.server.ts` / Vue Composition API 反模式 等. 这类 bug 只有 framework 自己的 build / dev server 才能抓.\n\n## 实战案例 (SilkNode US-096, 2026-05-09 单 session)\n\n**Phase B PR-A 部署链路**:\n\n```\nmain 554833b push → CI fail 5m53s   ← R1 5-agent + R2 2-agent + tsc + lint + 1427 vitest 全过\n↓ hotfix 1: 删 dead export\nmain 747f097 push → CI fail 6m2s    ← 删 export 后 import unused\n↓ hotfix 2: 删 unused import\nmain 15626ca push → CI success 8m5s\n```\n\n**Bug**: Wave 1 SDD agent 在 `src/app/api/admin/cron/supplier-health-aggregate/route.ts` 加:\n\n```typescript\nimport { Prisma, HealthWindow } from \"@/generated/prisma/client\";\n// ... 200 行 POST handler ...\nexport { Prisma };  // \"for tests / future use\"\n```\n\n实际 `Prisma` 文件内 0 reference. 单 export 是真 dead code.\n\n**Next.js 14 限制**: route handler 仅允许 export `GET/POST/PUT/DELETE/PATCH/HEAD/OPTIONS` + metadata (`runtime` / `dynamic` / `revalidate` / `fetchCache` 等). 任何 named export 触发 build 阶段:\n\n```\nFailed to compile.\nType error: Route does not match the required types of a Next.js Route.\n\"Prisma\" is not a valid Route export field.\n```\n\n## R1 + R2 audit 都没抓的根因\n\n| 层 | 行为 | 抓 dead export / unused import? |\n|---|---|---|\n| TypeScript 类型 | 合法 TS, 不报 unused (默认 `noUnusedLocals: false`) | ❌ |\n| tsc --noEmit | 不看 reference | ❌ |\n| ESLint local (`next lint`) | route.ts 路径默认宽松, no-unused-vars 是 warning | ⚠️ |\n| Vitest mock prisma | 不触发 Next.js build-time check | ❌ |\n| **R1 5-agent post_spec** (backend / silent-failure / qa / pr-test / code-reviewer) | agent prompt 范围: spec compliance / API design / privacy / SQL / test 覆盖 / silent failure — **不含 framework convention** | ❌ |\n| **R2 focused** | 同上 | ❌ |\n| CI **build phase** (`next build`) | Next.js 内部严 type-check + lint | ✅ 抓到 |\n\n## 跟之前同模式 audit blind\n\n跟我们 SilkNode 自己沉淀的 `feedback_nextjs_underscore_private_folder.md` (Next.js `_folder` private routing — Vitest 直接 import 模块绕过 routing 抓不到, e2e smoke 才暴露) **完全同模式**.\n\n跟 Issue #85 (state-scanner v3.0 surfacing gap) / #92 (handoff doc 集成) 是同 \"audit visibility\" 系列, 但**层级更低**: 已经写完 spec + 实施 + 单测 + lint, 仍漏抓 framework convention.\n\n## 影响范围\n\n不仅 Next.js: 任何 framework 都有 convention 类约束 — Astro page exports / SvelteKit `+page` / Vue/React 反模式 (e.g., 在 server component 用 client hooks) / Solid / Remix loaders / 等等. 本 issue 是 generic 问题用 SilkNode Next.js 案例说明.\n\n**未抓到的 cost**: SilkNode US-096 PR-A 多花 ~30min (2 次 hotfix CI redeploy ~14min + 我诊断/修 ~10min + verify ~6min).\n\n## 建议方案 (3 选 1 或组合)\n\n### T1: 加 framework-convention-checker agent 到 R1 default 5-agent\n\nR1 audit 现 5 agent (backend-arch / silent-failure / qa / pr-test / code-reviewer) 默认没人查 framework. 提议加第 6 个 **framework-convention-checker** agent (或合并到 code-reviewer):\n- 输入: spec + 项目 framework (Next.js / Astro / etc., 自动从 `package.json` 探测)\n- 检查 framework-specific anti-patterns (Next.js route handler exports / `_folder` routing / \"use client/server\" 误用 / metadata export 限制 / etc.)\n- 用 framework 文档 / 现有 codebase 同类文件作 baseline 对比\n\n### T2: aria phase-b-developer 加预 `next build` step\n\nPhase B 实施完成 → tsc + lint + vitest 通过后, **强制跑一次** `npm run build` (or 项目对应 framework build) 在 commit/push 前. 任何 framework convention bug 在本地 build 阶段就抓, 而非等 CI fail 后 hotfix.\n\n成本: build 1-3min 单 dev 机, 远低于 CI fail + redeploy ~14min × N hotfix iteration.\n\n### T3: spec drafting Phase A 加 framework constraints section\n\n模板加一段 \"Framework Constraints\" — 项目 framework 已知 conventions / anti-patterns 列表, R1 agent prompt 自动 include.\n\n例 SilkNode (Next.js):\n- route.ts 仅允许 GET/POST/etc + metadata exports, 禁止 named export\n- `_folder` 是 private routing, 不参与 URL\n- middleware regex 必须 anchored 防意外公开\n- Server Component 不能 import Client hooks\n\n## 推荐组合: T1 + T2\n\n- T1 解决 audit visibility (适合 spec drafting 时抓)\n- T2 解决 implementation 时立即抓 (build 是 framework convention 的 ground truth)\n- T3 是 nice-to-have 强化 spec 模板\n\n## Acceptance Criteria\n\n- [ ] aria audit-engine 默认 5-agent 加 framework-convention-checker 或 code-reviewer prompt 扩展\n- [ ] phase-b-developer skill 实施完成 → 强制本地 `npm run build` (或项目 framework build) 验证\n- [ ] aria 项目模板 spec drafting Phase A 加 \"Framework Constraints\" section\n- [ ] 实测: SilkNode 下次类似 framework convention bug 在 R1 audit 抓或本地 build 抓, 不再 CI fail 后 hotfix\n\n## Reference\n\n- SilkNode 实战 memory: `feedback_nextjs_route_export_audit_blind.md` (2026-05-09)\n- 同模式: `feedback_nextjs_underscore_private_folder.md` (2026-04-29)\n- 关联: Issue #85 (state-scanner gap) / Issue #92 (handoff integration)\n- 教训 cost: US-096 PR-A 30min 额外 (2 hotfix iteration)\n\n## 关联\n\n延续 #85 / #92 \"audit visibility\" 系列, 但本 issue 是**实施后 framework convention bug** 的 audit blind, 跟 #85 (spec 阶段 surfacing) / #92 (session 切换) 互补.\n",
+      "state": "open",
+      "labels": [
+        "aria-auto"
+      ],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/95",
+      "created_at": "2026-05-09T14:36:50Z",
+      "updated_at": "2026-05-09T14:36:51Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": null,
+      "current": "1.21.2",
+      "gap": null
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "+page.server.ts",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "src/app/api/admin/cron/supplier-health-aggregate/route.ts",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "feedback_nextjs_underscore_private_folder.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "package.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "feedback_nextjs_route_export_audit_blind.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "91370db6331c52c8e2fc292b0f59d2f5e961a247"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "C1-audit-engine-roster",
+        "input": "grep audit-engine SKILL.md for framework-convention agent in default roster",
+        "expected_behavior": "no framework-convention-checker present (gap claimed by issue)",
+        "actual_behavior": "audit-engine roster = qa-engineer / code-reviewer / backend-architect / tech-lead; no framework-convention-checker; no framework-aware prompt",
+        "match": true,
+        "notes": "Gap confirmed: T1 capability absent"
+      },
+      {
+        "case_id": "C2-phase-b-build-step",
+        "input": "grep phase-b-developer SKILL.md for pre-push local framework build step",
+        "expected_behavior": "no forced local `npm run build` / framework build before commit/push (gap claimed by issue)",
+        "actual_behavior": "no local build / framework build step found in phase-b-developer SKILL.md",
+        "match": true,
+        "notes": "Gap confirmed: T2 capability absent"
+      },
+      {
+        "case_id": "C3-cited-evidence-paths",
+        "input": "verify SilkNode cited paths (route.ts, feedback memos, package.json) in Aria repo",
+        "expected_behavior": "paths describe SilkNode incident, not present in Aria repo",
+        "actual_behavior": "all 5 cited paths not found in Aria repo (expected; they are SilkNode/external evidence, not Aria code paths)",
+        "match": null,
+        "notes": "Feature request evidence is external (SilkNode US-096); Aria-side gap verified via C1/C2 instead"
+      }
+    ],
+    "hit_count": 2,
+    "total_count": 3,
+    "hit_rate": "2/3"
+  },
+  "verdict": "confirmed",
+  "severity": "minor",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}
