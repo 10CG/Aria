@@ -1,7 +1,7 @@
 # Aria 2.0 M5 Carryover — Layer 2 redo-mode + aux (close-old-PR + spec_drift + commit-lint)
 
 > **Level**: 3 (Full — Layer 2 image extension + Layer 1 PR-state-machine + Forgejo state PATCH + audit log + tests)
-> **Status**: Draft v2 (R1 fixes applied 2026-05-16; addresses 6 CRITICAL + key HIGH reality-drift findings; R2 verification audit deferred to next session per context budget — see `.aria/audit-reports/post_spec-R1-2026-05-16T0530Z-*.md`)
+> **Status**: Draft v3 (R2 verification 2026-05-16T2242Z found 6/6 R1 CRIT decisions correct in fix table but body/tasks propagation incomplete + 1 new CRIT R2-NEW-1 schema version collision + ~10 HIGH — v3 applies surgical propagation pass; R3 stability audit pending — see `.aria/audit-reports/post_spec-R1-2026-05-16T0530Z-*.md` + `.aria/audit-reports/post_spec-R2-2026-05-16T2242Z-*.md`)
 > **Change ID**: `aria-2.0-m5-carryover-layer2-redo-mode-aux`
 > **Parent US**: US-025 (M5 carryover; second of the carryover trio after Spec X, mirror M3 precedent per brainstorm D4)
 > **Sibling Spec**: `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/` (Spec X — shipped 2026-05-16, archived; established bash mode dispatcher + changes handler that Spec Y drops 'redo' handler into per D5 A2 skeleton-then-fill)
@@ -40,6 +40,51 @@
 
 ---
 
+## R2 → v3 fixes (body+tasks propagation pass; 1 new CRIT)
+
+R2 verify (2026-05-16T2242Z, 3-agent consensus: tech-lead + qa-engineer + code-reviewer) found:
+- **1/6 R1 CRIT fully closed** (CRIT-3 REWORK_ROUND); 5/6 PARTIAL — decision table correct, body/tasks not propagated
+- **1 new CRIT R2-NEW-1**: schema version target collision (current state already at v4.1 per `schema_migrate.py:_LATEST_SCHEMA_VERSION="4.1"`; migration 006 must bump to **v4.2** else no-op silent skip)
+- **~10 new HIGH**: linked_spec_id field missing / T5 dup numbering / T3 order not reversed / T4.4 4-tuple still / test-type mismatch / SQLite syntax / cost row missing / dispatcher claim false / PR title template missing / T-pre scope undeclared
+
+| R2 finding | v3 fix |
+|------------|--------|
+| **R2-NEW-1** schema v4.1 collision | Migration **006_schema_v4.2_add_spec_id.sql** (renamed); from_version="4.1", to_version="4.2"; `schema_migrate.py` add entry + bump `_LATEST_SCHEMA_VERSION="4.2"`; all body/tasks references v4.1 → v4.2 |
+| **CRIT-1 propagation** | Body §A/§B + tasks T3.1 all `_handle_s5_pr_created` → `_handle_s5_await` terminal path |
+| **CRIT-2 propagation** | Body §D code block rewrite: `bash /opt/aria-runner/lib/commit-lint-validate.sh` (no Python); remove "Python module already shipped" caption |
+| **CRIT-4 propagation** | tasks T4.4 return `(spec_what, spec_acceptance, pr_diff)` 3-tuple matching `reconciler.py:1014` unpack |
+| **CRIT-5 propagation** | tasks T7.2 add literal guard "append BELOW existing 2026-05-16 line — DO NOT replace; immutable append-only per Spec X R2 C2" |
+| **CRIT-6 propagation** | Body §C + 验收 + 风险与回滚 all `005_schema_v4.1_additive.sql` → `006_schema_v4.2_add_spec_id.sql` |
+| **R2-NEW-2** linked_spec_id missing | NEW task T1.0 (~0.3h): extend M1 issue validator schema with optional `linked_spec_id: string` field, regex `^[a-z0-9-]+$`, backward-compat |
+| **R2-NEW-3** T5 dup numbering | Renumber T5.1/5.2/5.3/5.4/5.5 sequential |
+| **R2-NEW-4** T3 order | T3 sub-task order **reversed**: 3.1 detect → 3.2 read parent → 3.3 PATCH state=closed (with retries) → 3.4 POST Superseded comment → 3.5 audit; per backend-H1 v2 |
+| **R2-NEW-6** test-type mismatch | Add `tests/changes-mode/commit-lint-validate.sh` bash test (4 cases); Python test repurposed to retry-loop integration |
+| **R2-NEW-7** SQLite syntax | Drop `IF NOT EXISTS` mention; mandate migration-version guard per 004 precedent |
+| **R2-NEW-8** ai-4 cost row | Add risk-table row: "commit-lint retry × N dispatches × Opus rate → ~$0.01/failure; 3-retry hard cap" |
+| **R2-NEW-9** T2.9 dead field | Remove `spec_id` from T2.9 result.json field list (Layer 1 S1_SCAN writes per T1) |
+| **R2-NEW-10** dispatcher claim | Body §A L73 rewrite: "Spec Y replaces `redo) ... exit 1` branch in entrypoint.sh with `redo) exec /opt/aria-runner/modes/redo.sh \"$@\" ;;`" (matches T2.1) |
+| **R2-NEW-11** PR title template | tasks T2.8 literal title template per below |
+| **R2-NEW-12** T-pre scope | NEW proposal subsection §Out of Scope contrast: "Spec X retro-fix scope (T-pre.4/.5/.6 modify archived Spec X test files + AD-M5-3 contract section — legitimate per CRIT-3 retro-fix; not full Spec X re-archive)" |
+| **HIGH ai-3** AD-M5-3 narrowing | tasks T7.2 append narrowing literal: "Spec Y narrows: redo mode = 3 sections (no diff); changes mode = 4 sections per original lock" |
+| **HIGH ai-5** char caps | tasks T2.5 add explicit caps: feedback ≤4KB / issue ≤10K / supersedes ref ≤500 / total ≤15KB; overflow → S_FAIL(prompt_overflow) |
+| **HIGH ai-7** commit_message directive | tasks T2.5 prompt appendix literal `IMPORTANT` directive (per Spec X T4.3 R2 F1) |
+| **HIGH backend-H2 body** | Body §C rewrite: spec_id sourced at S1_SCAN via issue.yaml linked_spec_id (NOT Layer 2 result.json + _handle_s5_pr_created) |
+| **HIGH qa-H6 tasks** | tasks T4.2: try `openspec/changes/<id>/proposal.md` first; on 404 fall back to `openspec/archive/*-<id>/proposal.md` via Forgejo `/contents` directory listing |
+| **HIGH qa-H7 commands** | tasks T6.9 enumerate executable bash + Python commands per Spec X T6.3 pattern |
+| **HIGH C9 Conv Commits** | tasks T8.1 enumerate Spec Y commit examples (T-pre/T0/T1/T2/T3/T4/T5/T7 each) |
+| **HIGH C10 lib/forgejo** | tasks T2.3 "always extract `lib/forgejo-helpers.sh`" (drop "consider...>50 lines" guard) |
+| **MEDIUM count drift** | All test count refs → ≥28 (enumeration: 3+5+4+2+3+5+4+2 plus new bash commit-lint 4 = 32) |
+| **MEDIUM estimate** | Reconcile: ~20h AI-runnable (19h core OS + 1h T-pre retro-fix) + T1.0 (0.3h) + bookkeeping ~5h = **~25.3h gross** |
+| **MEDIUM HCL validate** | tasks T6.10 "HCL changed by T-pre (REWORK_ROUND 5th key); MUST run `nomad job validate aria-layer2-runner.hcl` per `feedback_nomad_hcl_validate_early`" |
+| **MEDIUM T6.4 rename** | `close-old-pr-layer2.sh` → `redo-result-pr.sh` (Layer 2 only writes new_pr_id; closure logic Layer 1) |
+| **LOW status line** | tasks "当前 Phase" → "A.2 (R2 verified, v3 applied, R3 stability pending)" |
+| **LOW T7 numbering** | tasks add T7.5: extend `validate-m5-handoff.py::check_m6_carryover_to_us_026_present` to verify Spec Y absorption (per proposal §G T7.4) |
+| **LOW memory refs** | proposal Cross-references add `feedback_agent_team_for_level1` + `feedback_submodule_pointer_post_merge_bump` |
+
+**R3 stability audit** (next, 3-agent, ~30min): verify v3 propagation complete; target 0 CRIT + ≤3 HIGH + ≤6 MEDIUM/LOW residual.
+
+---
+
 ---
 
 ## Why
@@ -54,9 +99,9 @@ Spec X (M5 carryover, archived 2026-05-16) shipped:
 
 **Spec Y delivers**:
 1. **OS-2 redo mode container**: `modes/redo.sh` — fresh checkout from base branch + feedback prompt context + new branch + new PR (no force-push, distinct from changes-mode)
-2. **OS-3 close-old-PR + Superseded-by comment**: Layer 1 S5_PR_CREATED handler — when `rework_of IS NOT NULL AND rework_mode='redo' AND parent_pr_id IS NOT NULL`, after new PR created → POST comment `_Superseded by #<new>_` on parent PR + PATCH parent PR state=closed (per Spec 3.22 + BA-9)
-4. **OS-4 spec_drift_input_fetcher full impl**: per AD-M5-5 — dispatch_id → spec_id mapping + read `openspec/changes/<spec_id>/proposal.md` + Forgejo PR diff API (Spec X T1 placeholder `spec_id` schema column needed; Spec Y adds via T0 schema migration sub-task)
-5. **OS-5 commit-lint Layer 2 retry hook**: max 3 retries + S_FAIL on 3rd failure (per Spec 5.3 + BA-16); leverages Spec X T4.3 commit_message extraction + fallback pattern
+2. **OS-3 close-old-PR + Superseded-by comment**: Layer 1 `_handle_s5_await` terminal-path extension (per CRIT-1 v2 — handler `_handle_s5_pr_created` does NOT exist) — when `rework_of IS NOT NULL AND rework_mode='redo' AND parent_pr_id IS NOT NULL`, after new PR created (Layer 2 wrote new_pr_id to result.json) → **PATCH parent PR state=closed FIRST, then POST Superseded comment** (per backend-H1 v2 reversed sequence)
+3. **OS-4 spec_drift_input_fetcher full impl**: per AD-M5-5 — dispatch_id → spec_id (from S1_SCAN write per backend-H2) + read `openspec/changes/<spec_id>/proposal.md` (with archive-path fallback per qa-H6) + Forgejo PR diff API; returns 3-tuple `(spec_what, spec_acceptance, pr_diff)` matching reconciler.py:1014 unpack (per CRIT-4)
+4. **OS-5 commit-lint Layer 2 retry hook**: max 3 retries + S_FAIL on 3rd failure (per Spec 5.3 + BA-16); shell-port via `lib/commit-lint-validate.sh` (per CRIT-2 — NO Python in Layer 2 image); leverages Spec X T4.3 commit_message extraction + fallback pattern
 
 **Scope rationale** (per brainstorm D2): bundling OS-2/3/4/5 into one Spec Y avoids 4 separate Phase A/B/C/D cycles for related Layer 2 follow-up work. OS-2 is the majority (~63% of effort); OS-3/4/5 are small auxiliary that share Layer 2 image + tests + audit overhead.
 
@@ -70,7 +115,7 @@ Spec X (M5 carryover, archived 2026-05-16) shipped:
 
 #### A. OS-2 modes/redo.sh (~12h)
 
-**Bash mode handler**, drop-in to `MODE_HANDLERS['redo']` slot (per Spec X T3.1 dispatcher already routes `redo` to `modes/redo.sh`). Spec X currently has the `redo` branch in `entrypoint.sh` exit 1 with `redo_mode_unimplemented`; Spec Y replaces that branch with `exec /opt/aria-runner/modes/redo.sh`.
+**Bash mode handler**. Spec X currently has `redo) ... exit 1` branch in `entrypoint.sh` (case statement, NOT an associative-array dispatcher) emitting `redo_mode_unimplemented`. Spec Y replaces that branch with `redo) exec /opt/aria-runner/modes/redo.sh "$@" ;;` (per T2.1).
 
 **modes/redo.sh logic** (~250 lines bash, similar shape to modes/changes.sh):
 - Read env: `NOMAD_META_REWORK_FEEDBACK`, `NOMAD_META_PARENT_PR_ID`, `NOMAD_META_REWORK_OF`, FORGEJO_BOT_PAT
@@ -88,62 +133,77 @@ Spec X (M5 carryover, archived 2026-05-16) shipped:
 - claude -p positional (per Spec X T4.3, `timeout -k 10s ${CLAUDE_TIMEOUT_S}`)
 - Extract commit_message OR fallback `chore(redo-${PARENT_PR_ID}): redo PR-${PARENT_PR_ID} round ${REWORK_ROUND:-1}` (per Spec X T4.3 conventional commits)
 - `git push origin <new_branch>` (regular push, not force-push)
-- Forgejo create new PR via API: `POST /repos/<org>/<repo>/pulls -d '{"title":..., "head":"<new_branch>", "base":"<base_branch>"}'`
-- result.json includes `new_pr_id` (Layer 1 reads this in S5_PR_CREATED handler for OS-3 close-old-PR)
+- Forgejo create new PR via API: `POST /repos/<org>/<repo>/pulls -d '{"title": "Aria redo: PR-${PARENT_PR_ID} round ${REWORK_ROUND}", "head":"<new_branch>", "base":"<base_branch>", "body": "Supersedes #${PARENT_PR_ID} (Aria redo mode)"}'` (literal template; T2.8 elaborates)
+- result.json includes `new_pr_id` (Layer 1 reads this in `_handle_s5_await` terminal path per CRIT-1 fix for OS-3 close-old-PR; see T1.5)
 
 #### B. OS-3 close-old-PR + Superseded-by comment (~2h)
 
-**Layer 1 `_handle_s5_pr_created`** extension (extension.py):
-- When dispatch_row `rework_mode='redo' AND rework_of IS NOT NULL`:
-  - Read NEW pr_id from this dispatch's result.json (after S5 alloc terminates code=0)
-  - Read PARENT pr_id from `rework_of` chain (parent dispatch row.pr_id)
-  - Forgejo API: POST comment on parent PR: `_Superseded by #<new>_ (Aria redo mode round <round>)`
-  - Forgejo API: PATCH `/repos/<org>/<repo>/issues/<parent_pr_id> {state: "closed"}`
-  - Emit audit event `rework_cycle` with payload outcome=`old_pr_closed`
-- Failure handling: Forgejo 4xx/5xx → audit warn + don't block new PR creation (best-effort)
+**Layer 1 `_handle_s5_await` terminal-path extension** (extension.py; reuses existing handler at terminal `exit_code=0` branch — see T1.5):
+- When dispatch_row `rework_mode='redo' AND rework_of IS NOT NULL AND new_pr_id from result.json`:
+  - Read NEW pr_id from this dispatch's result.json (after S5 alloc terminates code=0; per CRIT-1 fix)
+  - UPDATE dispatches SET pr_id=<new> WHERE dispatch_id=? (replaces find_or_create_pr path for redo dispatches)
+  - Read PARENT pr_id from `rework_of` chain (parent dispatch row.pr_id; guard NULL → audit warn + skip close)
+  - **Sequence (PATCH-first per backend-H1 v2)**:
+    1. Forgejo API: PATCH `/repos/<org>/<repo>/issues/<parent_pr_id> {state: "closed"}` (3 retries on 5xx; success outcome = primary state goal)
+    2. On PATCH success: Forgejo API POST comment on parent PR: `_Superseded by #<new>_ (Aria redo mode round <round>)` (round from dispatch.rework_round)
+    3. On PATCH success + comment fail → audit `comment_only_succeeded` (acceptable; old PR closed)
+    4. On PATCH fail after retries → audit `close_failed` + emit warn (don't block new PR; owner can manually close)
+  - Emit audit event `rework_cycle` with payload outcome=`old_pr_closed` | `comment_only_succeeded` | `close_failed`
+- Failure handling (enumerated per qa-H5): parent PR already closed (409/422) → treat as success + still post comment; null parent pr_id → audit warn + skip; network timeout vs 4xx/5xx distinct retry policy (network → retry; 4xx → no retry, audit; 5xx → 3 retries)
 
 #### C. OS-4 spec_drift_input_fetcher full impl (~3h)
 
 Per Spec X §Out of Scope cross-ref + AD-M5-5: M5 ships stub returning empty inputs. Spec Y full impl requires:
 
-**T0 schema migration** (Layer 1, v4 → v4.1 additive):
-- ALTER TABLE dispatches ADD COLUMN `spec_id TEXT` (nullable, no default)
-- Migration script `aria_layer1/migrations/005_schema_v4.1_additive.sql`
+**T0 schema migration** (Layer 1, **v4.1 → v4.2 additive** — current state already at v4.1 per `schema_migrate.py:_LATEST_SCHEMA_VERSION`; per R2-NEW-1 fix):
+- ALTER TABLE dispatches ADD COLUMN `spec_id TEXT` (nullable, no default; idempotency via migration-version guard pattern matching existing 004 migration — SQLite has no `ADD COLUMN IF NOT EXISTS`)
+- Migration script `aria_layer1/migrations/006_schema_v4.2_add_spec_id.sql`
+- `schema_migrate.py` add entry `("006", "006_schema_v4.2_add_spec_id.sql", "4.1", "4.2")` + bump `_LATEST_SCHEMA_VERSION="4.2"`
 - DB triggers untouched (audit log immutability preserved per AD-M5-10 #1)
 
-**Layer 1 write**: when Layer 2 dispatch creates new branch/PR with linked Spec, store `spec_id` on dispatch row (NEW T1: Layer 2 result.json includes `spec_id` if available; Layer 1 _handle_s5_pr_created reads + UPDATE dispatches SET spec_id=...).
+**Layer 1 write at S1_SCAN** (per backend-H2 v2 fix; NOT Layer 2 result.json):
+- New T1.0: extend M1 issue body validator schema with optional `linked_spec_id: string` field (regex `^[a-z0-9-]+$`, nullable, backward-compat)
+- T1.1: in `extension.py::_handle_s1_scan`, when issue.yaml `linked_spec_id` present → `UPDATE dispatches SET spec_id=? WHERE dispatch_id=? AND spec_id IS NULL` (CAS guard)
+- Layer 2 result.json does NOT carry spec_id (removed per T1.4)
 
 **Layer 1 spec_drift_input_fetcher** (replace M5 stub):
-- Input: dispatch_id → query dispatches row → spec_id + pr_id
-- Read `openspec/changes/<spec_id>/proposal.md` from Aria main repo (Forgejo raw content API or git fetch)
+- Input: dispatch_id → query dispatches row → spec_id + pr_id (internal lookup keys)
+- Read `openspec/changes/<spec_id>/proposal.md` from Aria main repo via Forgejo raw content API; **on 404 fall back to `openspec/archive/*-<spec_id>/proposal.md`** (per qa-H6 v2 fix; Forgejo `/contents` directory listing for prefix match)
 - Read PR diff via Forgejo API `/repos/<org>/<repo>/pulls/<pr_id>.diff`
-- Return both as input to spec_drift LLM analysis (existing M5 spec_drift.py logic, just replace empty-input stub)
+- Internally call `extract_spec_sections(proposal_text)` from existing `spec_drift.py:104-128` to slice §What + §验收
+- Return `(spec_what, spec_acceptance, pr_diff)` **3-tuple matching `reconciler.py:1014` unpack** (per CRIT-4 v2 fix; NOT a 4-field named tuple — spec_id/pr_id are internal lookup, NOT output)
 
 #### D. OS-5 Commit-lint Layer 2 retry hook (~2h)
 
-Per Spec 5.3 + BA-16 + Spec X T4.3 commit_validator interaction:
+Per Spec 5.3 + BA-16 + Spec X T4.3 commit_validator interaction. **Shell-port** per CRIT-2 v2 fix (Spec X R1 C1 reality drift precedent: Layer 2 is Node-base + bash, NO Python).
 
-**modes/changes.sh + modes/redo.sh** add post-commit pre-push hook:
+**lib/commit-lint-validate.sh** (~30 lines) — pure bash Conventional Commits validator:
+- Regex per `standards/conventions/git-commit.md:40-53` valid types `{feat|fix|chore|refactor|test|docs|style|perf|build|ci}` + subject ≤72 chars
+- Exit 0 if valid, exit 1 if invalid
+- NO Python dependency (no `python3 -m aria_layer1.commit_validator`)
+
+**lib/commit-lint-retry.sh** — shared retry loop helper invoked from both modes/changes.sh + modes/redo.sh:
+
 ```bash
 # After git commit, before git push:
 COMMIT_MSG=$(git log -1 --pretty=%s)
 RETRY=0
 MAX_RETRY=3
-while ! python3 -m aria_layer1.commit_validator validate "${COMMIT_MSG}" 2>/dev/null; do
+while ! bash /opt/aria-runner/lib/commit-lint-validate.sh "${COMMIT_MSG}" >/dev/null 2>&1; do
     RETRY=$((RETRY + 1))
     if [[ ${RETRY} -ge ${MAX_RETRY} ]]; then
         fail_with "commit_lint_exhausted" "3 invalid msgs"
     fi
-    # Re-invoke claude to fix commit msg
-    NEW_MSG=$(timeout -k 10s 60 claude -p "Rewrite this commit message to follow Conventional Commits format per standards/conventions/git-commit.md. Original: '${COMMIT_MSG}'. Output only the new message, single line.")
+    # Re-invoke claude (same ${ARIA_MODEL} as code-gen per HIGH ai-4 v2) to fix commit msg
+    NEW_MSG=$(timeout -k 10s "${CLAUDE_TIMEOUT_S:-60}" claude -p "Rewrite this commit message to follow Conventional Commits format per standards/conventions/git-commit.md. Original: '${COMMIT_MSG}'. Output only the new message, single line.")
     git commit --amend -m "${NEW_MSG}"
     COMMIT_MSG="${NEW_MSG}"
 done
 ```
 
-`commit_validator` Python module already shipped in M5 (Spec 5.3); Spec Y adds Layer 2 hook invocation.
+`aria_layer1/commit_validator.py` library remains in M5 for Layer 1 use; Spec Y bash hook independently re-implements the regex contract per same Conventional Commits spec (single SoT: `standards/conventions/git-commit.md`).
 
-**Note**: this hook applies to BOTH modes/changes.sh AND modes/redo.sh (shared infrastructure refactored into `lib/commit-lint-retry.sh` helper).
+**Note**: this hook applies to BOTH modes/changes.sh AND modes/redo.sh (shared via `lib/commit-lint-retry.sh` helper).
 
 #### E. Layer 2 entrypoint dispatcher update (~0.5h)
 
@@ -164,12 +224,15 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 - `tests/changes-mode/redo-dispatcher.sh` — verify dispatcher routes 'redo' to modes/redo.sh (3 cases: redo→exec / unknown still fails / initial still works)
 - `tests/changes-mode/mode_redo-prompt.sh` — prompt assembly (5 cases: feedback/issue body/no diff section/CJK/boundary)
 - `tests/changes-mode/mode_redo-git.sh` — git ops (4 cases: fresh checkout / new branch creation / regular push / new PR creation)
-- `tests/changes-mode/close-old-pr.sh` — bash tests for Layer 2-side; Python test for Layer 1 S5 handler in test_t_close_old_pr.py
-- `test_t_spec_drift_fetcher.py` — Python (5 cases: stub→full impl + missing spec_id + proposal.md fetch + PR diff fetch + integration)
-- `test_t_commit_lint_retry.py` — Python (4 cases: valid first try / invalid then valid retry / 3-retry exhaust → S_FAIL / claude rewrite fixture)
-- `test_t_schema_v4_1_migration.py` — Python (2 cases: migration adds spec_id column / idempotent re-run)
+- `tests/changes-mode/redo-result-pr.sh` — Layer 2 result.json writes new_pr_id (2 cases: success / fail-to-create-new-PR no close action) — renamed per R2 MEDIUM
+- `tests/changes-mode/commit-lint-validate.sh` — **NEW per R2-NEW-6** bash validator regex (4 cases: valid CC format / invalid format / 72-char boundary / type prefix CJK)
+- `test_t_close_old_pr.py` — Python Layer 1 S5_AWAIT handler (3 cases: redo dispatch detected + PATCH+comment sequence / 4xx fallback / parent PR already closed graceful)
+- `test_t_spec_drift_fetcher.py` — Python (5 cases: stub→full impl + missing spec_id graceful + proposal.md fetch + PR diff fetch + 3-tuple return)
+- `test_t_commit_lint_retry.py` — Python **retry-loop integration** (4 cases: valid first try / invalid then valid retry / 3-retry exhaust → S_FAIL / claude rewrite fixture); validator regex correctness covered by bash test above
+- `test_t_schema_v4_2_migration.py` — Python (2 cases: migration adds spec_id to v4.1 DB → v4.2 / idempotent re-run)
+- `test_t_spec_id_write.py` — Python (2 cases: issue.yaml linked_spec_id present → UPDATE applied; absent → spec_id stays NULL graceful)
 
-**Total: ~23 new test cases** (~12 bash + ~11 Python)
+**Total: ~32 new test cases** (~18 bash + ~14 Python; case-counted per Spec X R2 NEW-1 fix; enumerated and verifiable per qa-H7)
 
 **Regression**: all Spec X tests must continue passing (modes/changes.sh + dispatcher.sh + Spec X Python tests).
 
@@ -186,10 +249,14 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 
 - **T-deploy image build** (image bump `claude-m5-carry-<sha>-v11`): owner-deferred per AD-M1-7 dispatch-time pin pattern (same as Spec X T5)
 - **risk-tier algorithm** → M7+ per D6
-- **Schema v5 / non-additive migration**: Spec Y only adds spec_id column (v4.1 additive)
+- **Schema v5 / non-additive migration**: Spec Y only adds spec_id column (v4.1 → v4.2 additive per R2-NEW-1)
 - **Spec Y full Tier-2 path coverage** (≥10 dispatches): absorbed to US-026 M6b per D7
 - **claude -p invocation upgrades**: Layer 2 model + provider chain unchanged
 - **Multi-iteration redo** (`/aria redo` round 2/3/4): rework_round cap=3 already enforced in M5 Layer 1; Spec Y doesn't change cap semantics
+
+### Spec X retro-fix scope (in scope per R2-NEW-12, T-pre tasks 4-6)
+
+T-pre.4/.5/.6 modify Spec X archived test files (`tests/test_t_changes_mode_meta.py` assertion 4→5 keys + `tests/changes-mode/mode_changes-prompt.sh` add REWORK_ROUND env case) and AD-M5-3 contract section (4-key → 5-key bump). This is **legitimate retro-fix scope** per CRIT-3 fix (REWORK_ROUND silent bug latent in Spec X master; modes/changes.sh:174,256 fallback `${REWORK_ROUND:-1}` always renders round 1). NOT a Spec X re-archive — Spec Y commits include these Spec X file edits because the bug was discovered while drafting Spec Y. Audit-engine treats this as Spec Y deliverable (per `feedback_sister_spec_r1_latent_catch`).
 
 ---
 
@@ -200,7 +267,7 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 | D1-D7 | All 7 brainstorm decisions inherited from Spec X | brainstorm 2026-05-15 |
 | Bash mode handler | Same pattern as Spec X modes/changes.sh (per Spec X R1 C1 reality drift fix) | Spec X archived |
 | `chore(redo-N)` commit msg | Same valid Conventional Commits type as Spec X chore(rework-N) | git-commit.md:40-53 |
-| spec_id schema v4.1 | Additive ALTER TABLE only; preserves AD-M5-10 #1 audit immutability | AD-M5-10 |
+| spec_id schema v4.1 → v4.2 | Additive ALTER TABLE only (v4.2 is target; current state v4.1 per `_LATEST_SCHEMA_VERSION` — R2-NEW-1 fix); preserves AD-M5-10 #1 audit immutability | AD-M5-10 |
 | OS-3 close-old-PR via Forgejo API | Forgejo PATCH `/issues/<id>/state` (issues API covers PRs in Forgejo) | per Spec 3.22 |
 | Forgejo PAT secret-hygiene | Same Nomad Variables injection pattern as Spec X §I | standards/conventions/secret-hygiene.md Rule #7 |
 
@@ -218,13 +285,13 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 - [ ] R3 stability if needed
 - [ ] Spec Status → Approved
 
-### Phase B 验收 (R1+R2 fixes will refine)
-- [ ] T1-T8 全部 `[x]` complete
-- [ ] ~23 new test cases PASS (mirror Spec X §F structure)
-- [ ] Spec X regression: 51 bash + 812 Python all still PASS
-- [ ] `nomad job validate aria-layer2-runner.hcl` PASS (HCL unchanged but smoke verify)
-- [ ] `aria_layer1` migration 005 adds spec_id column + idempotent
-- [ ] Approximate test count ≥ 23 new (case-counted, not file-counted per Spec X R2 NEW-1 fix)
+### Phase B 验收 (R1+R2+R3 fixes refined)
+- [ ] T-pre + T0-T8 全部 `[x]` complete (T1.0 NEW for M1 schema extension per R2-NEW-2)
+- [ ] ~32 new test cases PASS (mirror Spec X §F structure; case-counted per Spec X R2 NEW-1 fix)
+- [ ] Spec X regression: 51 bash + 812 Python all still PASS (T6.9 enumerates executable commands per qa-H7)
+- [ ] `nomad job validate aria-layer2-runner.hcl` PASS (HCL changed by T-pre adding REWORK_ROUND 5th key per `feedback_nomad_hcl_validate_early`)
+- [ ] `aria_layer1` migration 006_schema_v4.2_add_spec_id.sql adds spec_id column to v4.1 DB (target v4.2) + idempotent re-run
+- [ ] `_LATEST_SCHEMA_VERSION` bumped 4.1→4.2 in `schema_migrate.py`
 - [ ] Rule #6 benchmark exemption explicit (no Skill changes)
 
 ### Phase C merge (dual-repo, Rule #8 per repo)
@@ -256,13 +323,15 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 
 | 风险 | Severity | Mitigation |
 |------|----------|-----------|
-| Schema v4 → v4.1 migration breaks existing dispatches | Medium | Additive-only (ALTER TABLE ADD COLUMN nullable); idempotent re-run; existing rows have spec_id=NULL (fetcher treats NULL as "no spec linked"); migration unit test |
-| Forgejo PATCH /issues/<id>/state has unintended effects | Medium | Best-effort fallback: if PATCH 5xx, log + don't block new PR; mark old PR as Superseded via comment regardless |
-| OS-3 timing — close-old-PR before new PR created → 漏更新 | Low | Sequence locked: new PR creation MUST succeed before close-old-PR fires (in S5_PR_CREATED handler reading new pr_id from result.json) |
-| OS-4 stale proposal.md content (Aria main repo branch lag) | Low | Fetch latest master via Forgejo raw API; document as "snapshot at S5 time" semantic; OS-4 audit log records sha |
+| Schema v4.1 → v4.2 migration breaks existing dispatches | Medium | Additive-only (ALTER TABLE ADD COLUMN nullable); idempotent via migration-version guard (existing 004 precedent — SQLite has no ADD COLUMN IF NOT EXISTS); existing rows have spec_id=NULL (fetcher treats NULL as "no spec linked"); migration unit test verifies v4.1→v4.2 transition |
+| Forgejo PATCH /issues/<id>/state has unintended effects | Medium | Best-effort fallback: if PATCH 5xx after 3 retries, audit warn + don't block new PR; if PATCH success + comment fails → audit `comment_only_succeeded` (old PR closed = primary goal achieved) |
+| OS-3 timing — close-old-PR before new PR created → 漏更新 | Low | Sequence locked: new PR creation in modes/redo.sh MUST succeed before close-old-PR fires (in `_handle_s5_await` terminal handler reading new pr_id from result.json per CRIT-1) |
+| OS-4 stale proposal.md content (Aria main repo branch lag) | Low | Fetch latest master via Forgejo raw API; archive-path fallback per qa-H6; document as "snapshot at S5 time" semantic; OS-4 audit log records sha |
 | OS-5 commit-lint retry loop infinite | Low | Hard cap 3 retries + S_FAIL(commit_lint_exhausted); each retry has 60s claude timeout |
-| Layer 2 image bump (v10 → v11) breaks Spec X (changes-mode) | Low | Same Dockerfile + chmod + modes/ structure; just adds redo.sh + lib/commit-lint-retry.sh; Spec X modes/initial.sh + modes/changes.sh unchanged |
-| spec_id write race condition (multiple Layer 2 allocs) | Low | Single-alloc-per-dispatch per Nomad parameterized job (same as M5 baseline); CAS UPDATE WHERE spec_id IS NULL guard |
+| OS-5 retry cost runaway | Low | Per HIGH ai-4: 3 retries × 2 modes × ~500 token input × ~50 token output × Opus rate = **~$0.01 per failed dispatch** (negligible); 3-retry hard cap prevents unbounded spend |
+| Layer 2 image bump (v10 → v11) breaks Spec X (changes-mode) | Low | Same Dockerfile + chmod + modes/ structure; adds redo.sh + lib/commit-lint-validate.sh + lib/commit-lint-retry.sh; Spec X modes/initial.sh + modes/changes.sh unchanged (modes/changes.sh receives T-pre REWORK_ROUND env now) |
+| spec_id write race condition (multiple Layer 2 allocs) | Low | Single-alloc-per-dispatch per Nomad parameterized job (same as M5 baseline); CAS UPDATE WHERE spec_id IS NULL guard at S1_SCAN (Layer 1 single-threaded write) |
+| `linked_spec_id` issue field NULL/missing | Low | T1.0 makes field optional + backward-compat; absent → spec_id stays NULL → spec_drift fetcher treats as "no spec linked" → returns empty 3-tuple (existing M5 stub behavior preserved) |
 
 **回滚路径**:
 1. **Code-only revert**: revert Spec Y commits → Layer 2 dispatcher 'redo' branch reverts to exit 1 + redo_mode_unimplemented (Spec X behavior)
@@ -274,26 +343,39 @@ Test files (under existing `docker/aria-runner/tests/` + `hermes-extensions/aria
 ## 排序依赖
 
 ```
-T0 schema migration (v4.1) ─┐
-                            ├─→ T1 Layer 1 spec_id write
-                            │
-T2 modes/redo.sh impl ──────┼─→ T3 OS-3 Layer 1 S5_PR_CREATED close-old-PR
-                            │
-T4 OS-4 spec_drift_input_fetcher full impl ─→ (independent)
-                            │
-T5 OS-5 commit-lint Layer 2 retry hook (shared lib) ──→ updates modes/changes.sh + modes/redo.sh
-                            │
-                            ↓
-                    T6 Synthetic acceptance (~23 cases)
-                            │
-                            ↓
-                    T7 Side-effect patches
-                            │
-                            ↓
-                    T8 Phase C+D (dual-repo merge + archive)
+T-pre REWORK_ROUND 5-key contract ─┐
+  (Layer 1 extra_meta + HCL + AD)  │
+                                   ↓
+                          T2 modes/redo.sh impl
+                                   │
+T0 schema 006 v4.1→v4.2 ──┐        │
+                          ↓        │
+T1.0 M1 issue schema +   T1 Layer 1│
+linked_spec_id field      spec_id  │
+                          @S1_SCAN │
+                          (T1.0→T1)│
+                          │        │
+                          │   T1.5 _handle_s5_await terminal reads result.json (per CRIT-1)
+                          │        │
+                          │        ↓
+T4 OS-4 spec_drift       │   T3 OS-3 close-old-PR Layer 1 _handle_s5_await
+fetcher (independent)──→─┤      (PATCH-first then comment per backend-H1)
+                          │        │
+T5 OS-5 commit-lint       │        │
+shell-port lib/  ─────────┴────────┤
+(commit-lint-validate.sh             │
+ + commit-lint-retry.sh)             │
+                                     ↓
+                          T6 Synthetic acceptance (~32 cases)
+                                     │
+                                     ↓
+                          T7 Side-effect patches
+                                     │
+                                     ↓
+                          T8 Phase C+D (dual-repo merge + archive)
 ```
 
-**Parallelism**: T0+T2+T4+T5 can run in parallel (different files). T1 depends on T0. T3 depends on T2. T6 depends on T2-T5. T7 doc-only.
+**Parallelism**: T-pre + T0 + T1.0 + T2 + T4 + T5 can run in parallel (different files). T1 depends on T0 + T1.0. T1.5 depends on T2. T3 depends on T2 + T1.5. T6 depends on T2-T5. T7 doc-only.
 
 ---
 
@@ -308,4 +390,4 @@ T5 OS-5 commit-lint Layer 2 retry hook (shared lib) ──→ updates modes/chan
 - US-025: `docs/requirements/user-stories/US-025.md` (close gate per D7)
 - PRD §588 US row: M6 stays `US-026` per D4
 - Spec X precedents (mirror these in Spec Y): bash dispatcher pattern + tests/changes-mode/ + R1+R2+R3 audit convergence + per-task-group commits
-- Memory references: same as Spec X (`feedback_phase_a_depth_drives_b_velocity` / `feedback_git_force_with_lease_shallow_clone` / `feedback_audit_convergence_pattern` / `feedback_nomad_hcl_validate_early` / `feedback_validator_repo_drift_guard_test` / `feedback_pre_draft_bug_hunt_discipline`)
+- Memory references: same as Spec X plus per R2 (`feedback_phase_a_depth_drives_b_velocity` / `feedback_git_force_with_lease_shallow_clone` / `feedback_audit_convergence_pattern` / `feedback_nomad_hcl_validate_early` / `feedback_validator_repo_drift_guard_test` / `feedback_pre_draft_bug_hunt_discipline` / `feedback_agent_team_for_level1` / `feedback_submodule_pointer_post_merge_bump` / `feedback_sister_spec_r1_latent_catch` / `feedback_per_spec_assumption_recheck`)
