@@ -95,9 +95,9 @@
   - Section 3: "supersedes PR #<id>" reference ≤500 chars (literal sentence; deliberately discards prior diff)
   - **Total hard cap ≤15KB**; overflow → `S_FAIL(prompt_overflow)` per Spec X T4.4 case 5 precedent
   - **Appendix literal directive per HIGH ai-7** (Spec X T4.3 R2 F1 pattern): append to prompt: `IMPORTANT: After your code changes, output a single final line in plain text: 'commit_message: <type>(<scope>): <description>'` — used by T2.6 extraction
-- [ ] 2.6 (~1.5h) claude -p positional + parse output + extract `commit_message: ...` line (per T2.5 directive) OR fallback `chore(redo-${PARENT_PR_ID}): redo PR-${PARENT_PR_ID} round ${REWORK_ROUND}`
-- [ ] 2.7 (~1h) `git push origin <new_branch>` (regular push, NOT force-push)
-- [ ] 2.8 (~1.5h) Forgejo create new PR with **literal title template per R2-NEW-11**:
+- [x] 2.6 (~1.5h) claude -p positional + parse output + extract `commit_message: ...` line (per T2.5 directive) OR fallback `chore(redo-${PARENT_PR_ID}): redo PR-${PARENT_PR_ID} round ${REWORK_ROUND}`
+- [x] 2.7 (~1h) `git push origin <new_branch>` (regular push, NOT force-push)
+- [x] 2.8 (~1.5h) Forgejo create new PR with **literal title template per R2-NEW-11**:
   ```bash
   forgejo_post_retry "/repos/${ORG}/${REPO}/pulls" \
     --data "$(jq -n \
@@ -108,7 +108,7 @@
       '{title: $title, head: $head, base: $base, body: $body}')"
   ```
   Parse response for new pr_id via `jq '.number'`
-- [ ] 2.9 (~0.5h) result.json write with **only** `new_pr_id` + `parent_pr_id` (spec_id REMOVED per R2-NEW-9 — Layer 1 S1_SCAN writes spec_id from issue.yaml linked_spec_id per T1.1, NOT Layer 2)
+- [x] 2.9 (~0.5h) result.json write with **only** `new_pr_id` + `parent_pr_id` (spec_id REMOVED per R2-NEW-9 — Layer 1 S1_SCAN writes spec_id from issue.yaml linked_spec_id per T1.1, NOT Layer 2)
 
 ---
 
