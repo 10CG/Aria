@@ -48,7 +48,7 @@
 ### T1.0 — M1 issue schema extension (R2-NEW-2, ~0.3h)
 
 - [x] 1.0.1 Locate M1 issue body validator (per `extension.py:1614` reference) — likely `aria_layer1/m1_issue_validator.py` or schema file
-- [x] 1.0.2 Add optional field `linked_spec_id`: type `string`, regex `^[a-z0-9-]+$`, nullable, backward-compat (absent → ignored, no validation error)
+- [x] 1.0.2 Add optional field `linked_spec_id`: type `string`, regex `^[a-z0-9.-]+$` (H2 amend 2026-05-18: original `^[a-z0-9-]+$` rejected real change IDs like `aria-2.0-m5-…`; owner OD → add `.` per pre-archive amendment), nullable, backward-compat (absent → ignored, no validation error)
 - [x] 1.0.3 Unit test extending existing M1 validator tests: present + valid format → passes; absent → passes; present + invalid format (uppercase/special chars) → validation error
 
 ### T0 — Schema **v4.1 → v4.2** additive migration (~1h, R2-NEW-1)

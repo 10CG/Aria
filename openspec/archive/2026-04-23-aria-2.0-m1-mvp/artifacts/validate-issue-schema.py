@@ -157,7 +157,7 @@ ID_RE = re.compile(r"^[A-Z][A-Z0-9-]+$")
 REPO_SLUG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$")
 CREATED_BY_RE = re.compile(r"^(human|ai):\S+")
 RFC3339_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$")
-LINKED_SPEC_ID_RE = re.compile(r"^[a-z0-9-]+$")  # Spec Y T1.0: optional Aria OpenSpec change ID
+LINKED_SPEC_ID_RE = re.compile(r"^[a-z0-9.-]+$")  # Spec Y T1.0 (H2 amend 2026-05-18): added '.' so real change IDs like "aria-2.0-m5-…" validate
 ACTION_VERBS = ("新增", "修改", "删除")
 IP_CLASSIFICATION_M1 = {"synthetic"}  # M1 only accepts synthetic
 
