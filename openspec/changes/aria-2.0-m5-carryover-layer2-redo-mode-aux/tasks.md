@@ -88,8 +88,8 @@
 - [x] 2.1 (~0.5h) entrypoint.sh: replace `redo) ... exit 1` branch with `redo) exec /opt/aria-runner/modes/redo.sh "$@" ;;`
 - [x] 2.2 (~2h) modes/redo.sh skeleton + globals (mirror modes/changes.sh §"Globals" section; same defaults, same env var consumption including NOMAD_META_REWORK_ROUND per T-pre.2)
 - [x] 2.3 (~1.5h) Forgejo PR fetch (curl + jq). **Always create `lib/forgejo-helpers.sh`** (per C10 v2 decision; drop "if duplication > 50 lines" guard) — by (a) **extracting** existing `forgejo_get_retry` from `modes/changes.sh`; (b) **writing new** `forgejo_post_retry` + `forgejo_patch_retry` using same retry pattern. Both modes/changes.sh + modes/redo.sh source this helper
-- [ ] 2.4 (~2h) Fresh-checkout from `base.ref` (NOT head.ref): `git clone --depth 1 --branch ${BASE_BRANCH} ...` + create new branch via `git checkout -b aria/redo-${PARENT_PR_ID}-${REWORK_ROUND}-$(date +%Y%m%dT%H%M%S)` (REWORK_ROUND now real env var from T-pre, no `:-1` fallback in branch name)
-- [ ] 2.5 (~2h) Prompt assemble — redo-specific (3 sections only, NO diff section per AD-M5-3 narrowing). **Explicit char caps per HIGH ai-5**:
+- [x] 2.4 (~2h) Fresh-checkout from `base.ref` (NOT head.ref): `git clone --depth 1 --branch ${BASE_BRANCH} ...` + create new branch via `git checkout -b aria/redo-${PARENT_PR_ID}-${REWORK_ROUND}-$(date +%Y%m%dT%H%M%S)` (REWORK_ROUND now real env var from T-pre, no `:-1` fallback in branch name)
+- [x] 2.5 (~2h) Prompt assemble — redo-specific (3 sections only, NO diff section per AD-M5-3 narrowing). **Explicit char caps per HIGH ai-5**:
   - Section 1: feedback ≤4KB (Layer 1 truncated upstream, inherited from Spec X T4.4)
   - Section 2: issue body ≤10K chars (`head -c 10240 ${INPUTS_DIR}/<dispatch_id>/issue.yaml`)
   - Section 3: "supersedes PR #<id>" reference ≤500 chars (literal sentence; deliberately discards prior diff)
