@@ -1,6 +1,6 @@
 # Aria — Session Handoff (2026-05-15) — H0 aria-ten-step-session-handoff-stage cycle done
 
-> **Status**: H0 cycle complete (v1.21.0) + ALL carry-forward closed — H1✅(v1.21.2) H3✅(v1.21.3) H4✅(structural benchmark) H5✅(v1.21.1);H2 superseded (并行 US-025 M5)。Predecessor doc — latest.md 现指向 US-025 M5。
+> **Status**: ✅ **FULLY CLOSED** (2026-05-18) — H0 cycle + 全部 carry-forward 终结,无任何 open 项。H0✅(v1.21.0) H1✅(v1.21.2) H3✅(v1.21.3) H4✅(structural Rule #6) H5✅(v1.21.1);H2 superseded (并行 US-025 M5 独立轨)。本 doc 为 **archived predecessor 历史记录**,非 active handoff — latest.md 权威指向 US-025 M5 轨。新 session 不应从本 doc 取 next-step。
 > **Cycle period**: 2026-05-13 (state-scanner entry) → 2026-05-15 (H0 ship) → 2026-05-16 (H5 fix ship)
 > **Next session 入口**: `/aria:state-scanner` — v1.21.1 collector 以 latest.md pointer 为权威, surface 真正最新 handoff (US-025 M5)。本 doc 为 H0 predecessor 记录
 
@@ -126,17 +126,19 @@ self-referential 注: 本 handoff 由 H0 cycle 的 phase-d-closer D.3 流程产�
 /aria:state-scanner
 ```
 
-**优先级建议** (按本 session 判断):
+> ⚠️ **本节已过时 — H0 轨全部 carry-forward 已闭合 (见 header)**。保留为历史记录。新 session **不要**从下方旧优先级取 next-step;走 `/aria:state-scanner` → latest.md 权威指向 US-025 M5 轨。
 
-1. ⭐ **H1 aria-plugin #46 follow-up** — 3 Important 澄清 (~1h, 快速 win, 巩固 H0 质量)
-2. **H2 US-025 M5 Phase B.2** — v2.0 主线,~138h multi-session (大块,需专注 session)
-3. **H3 issue-triage iteration-2** — ~1h quick win
-4. **M4 批量 triage** ~20 open issues — 用刚 ship 稳定的 `/issue-triage`
+~~原优先级建议 (已全部完成/superseded)~~:
 
-**不应该做的**:
-- 不要重复 triage Forgejo #92 (本 cycle 已 closes)
-- 不要再碰 `.aria/handoff/` (L1 hook 现在会拦,且已迁移)
-- 不要在 H1 follow-up 重开 H0 spec (已 archived;follow-up 是独立 micro-cycle)
+1. ~~H1 aria-plugin #46 follow-up~~ → ✅ v1.21.2
+2. ~~H2 US-025 M5 Phase B.2~~ → superseded (并行 session 已 ship M5 Layer 1)
+3. ~~H3 issue-triage iteration-2~~ → ✅ v1.21.3 (D3 0/4→4/4)
+4. M4 批量 triage ~20 open issues → 仍是有效的 standalone backlog,但属 US-025/通用轨,非 H0 carry-forward;由 latest.md US-025 handoff 或独立决定驱动
+
+**仍然不应该做的** (跨 session 长期有效):
+- 不要重复 triage Forgejo #92 (H0 已 closes)
+- 不要再碰 `.aria/handoff/` (L1 hook 拦 + 已迁移 docs/handoff/)
+- 不要重开已 archived 的 H0 spec
 
 ---
 
@@ -189,4 +191,4 @@ H5 fix ship (v1.21.1, 2026-05-16, post-closeout):
 
 **Created**: 2026-05-15 (Phase D.3, dogfood — 5th evidence, self-produced by the cycle that built D.3)
 **Session duration**: ~3 day span (intermittent), H0 cycle full A+B+C+D
-**Status**: Active — next session 选 H1 (quick win) / H2 (M5 主线) per §6
+**Status**: ✅ FULLY CLOSED 2026-05-18 — archived predecessor record, zero open items. H0 cycle 端到端完成 (spec→5层impl→3-PR ship v1.21.0 → H5 v1.21.1 → H1 v1.21.2 → H3 v1.21.3 → H4 structural Rule #6)。H2 superseded by 并行 US-025 M5。live 轨见 latest.md (US-025)。

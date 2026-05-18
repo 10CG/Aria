@@ -26,7 +26,7 @@
 | [2026-05-15 C.2+D.1](./2026-05-15-us025-m5-c2-d1-done.md) | US-025 M5 Layer 1 SHIPPED + Phase D.1 done + 3 new memory entries | Active (predecessor; M5 Layer 1) |
 | [2026-05-15 deploy](./2026-05-15-m5-deploy-playbook.md) | Owner-runnable T-deploy playbook (7 steps + rollback) | Active (companion) |
 | [2026-05-15 Phase 6](./2026-05-15-us025-m5-phase-6-done.md) | M5 Phase 6 SHIP READY (pre-merge state) | superseded by C.2+D.1 |
-| [2026-05-15 H0 done](./2026-05-15-h0-cycle-done.md) | aria-ten-step-session-handoff-stage full cycle + Rule #9 + v1.21.0 + #92 closed | Active (parallel predecessor) |
+| [2026-05-15 H0 done](./2026-05-15-h0-cycle-done.md) | aria-ten-step-session-handoff-stage full cycle + Rule #9 + v1.21.0 + #92 closed; H1/H3/H4/H5 全闭 (→v1.21.3) | ✅ FULLY CLOSED (archived predecessor) |
 | [2026-05-14](./2026-05-14-us025-m5-phase-1-done.md) | US-025 M5 Phase 1 done — schema v3→v4.1 + audit log foundation | superseded by 2026-05-15 |
 | [2026-05-13 #101 closeout](./2026-05-13-issue-101-cycle-closeout.md) | issue-triage-sop + issue-101-status-normalize + aria v1.20.0 release | Active (predecessor) |
 | [2026-05-13](./2026-05-13-us025-m5-phase-a-b1-done.md) | US-025 M5 Phase A done + B.1 ready | superseded by 2026-05-15 |
