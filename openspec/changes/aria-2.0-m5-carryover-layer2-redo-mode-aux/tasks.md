@@ -116,12 +116,12 @@
 
 ### T3 — Layer 1 `_handle_s5_await` terminal-path close-old-PR (per CRIT-1 fix — NOT `_handle_s5_pr_created` which doesn't exist)
 
-- [ ] 3.1 (~0.5h) In `extension.py::_handle_s5_await` terminal branch (exit_code=0): detect redo dispatch (`rework_mode='redo' AND rework_of IS NOT NULL AND new_pr_id in result.json`); UPDATE dispatches SET pr_id=<new> WHERE dispatch_id=? (replaces find_or_create_pr for redo); audit event `state_transition` payload `new_pr_id_from_result_json=true`
-- [ ] 3.2 (~0.3h) Read parent dispatch row via `rework_of` → parent.pr_id; **guard NULL parent pr_id** (audit warn `parent_no_pr` + skip close) per qa-H5
-- [ ] 3.3 (~0.5h) **PATCH-FIRST per backend-H1 v2**: Forgejo PATCH `/repos/<org>/<repo>/issues/<parent_pr_id> {state: "closed"}` with **3 retries on 5xx** (Forgejo PR is issue subtype); on 409/422 (already closed) → treat as success continue to T3.4; on 4xx (not 409/422) → audit `close_failed_4xx` + skip comment; on 5xx exhausted → audit `close_failed_5xx` + skip comment + don't block new PR
-- [ ] 3.4 (~0.3h) On PATCH success (incl. already-closed): Forgejo POST comment on parent PR: `_Superseded by #<new>_ (Aria redo round ${round})` — round from `dispatch.rework_round` query; on comment fail → audit `comment_only_succeeded` (acceptable; old PR is closed, primary goal achieved)
-- [ ] 3.5 (~0.2h) Audit event `rework_cycle` outcome ∈ `{old_pr_closed | comment_only_succeeded | close_failed_4xx | close_failed_5xx | parent_no_pr}`, payload=`{parent_pr_id, new_pr_id, superseded_comment_id?, round, http_status?, retries?}`
-- [ ] 3.6 Error handling matrix (enumerated per qa-H5):
+- [x] 3.1 (~0.5h) In `extension.py::_handle_s5_await` terminal branch (exit_code=0): detect redo dispatch (`rework_mode='redo' AND rework_of IS NOT NULL AND new_pr_id in result.json`); UPDATE dispatches SET pr_id=<new> WHERE dispatch_id=? (replaces find_or_create_pr for redo); audit event `state_transition` payload `new_pr_id_from_result_json=true` — **2026-05-19 implementation note**: result.json is on a Nomad host volume bind mount NOT reachable cross-node via `/v1/client/fs/cat`; we read `new_pr_id` from the alloc stderr `[redo.sh] PASS new_pr_id=<N>` marker (redo.sh T2.9 emits) via Nomad's `/v1/client/fs/logs` API. Audit payload uses `new_pr_id_source="alloc_logs"` + `new_pr_id_from_result_json=false` instead of the literal Spec key (see handoff Finding #5 for full rationale).
+- [x] 3.2 (~0.3h) Read parent dispatch row via `rework_of` → parent.pr_id; **guard NULL parent pr_id** (audit warn `parent_no_pr` + skip close) per qa-H5
+- [x] 3.3 (~0.5h) **PATCH-FIRST per backend-H1 v2**: Forgejo PATCH `/repos/<org>/<repo>/issues/<parent_pr_id> {state: "closed"}` with **3 retries on 5xx** (Forgejo PR is issue subtype); on 409/422 (already closed) → treat as success continue to T3.4; on 4xx (not 409/422) → audit `close_failed_4xx` + skip comment; on 5xx exhausted → audit `close_failed_5xx` + skip comment + don't block new PR
+- [x] 3.4 (~0.3h) On PATCH success (incl. already-closed): Forgejo POST comment on parent PR: `_Superseded by #<new>_ (Aria redo round ${round})` — round from `dispatch.rework_round` query; on comment fail → audit `comment_only_succeeded` (acceptable; old PR is closed, primary goal achieved)
+- [x] 3.5 (~0.2h) Audit event `rework_cycle` outcome ∈ `{old_pr_closed | already_closed | comment_only_succeeded | close_failed_4xx | close_failed_5xx | parent_no_pr | new_pr_id_unparsed}`, payload=`{parent_pr_id, new_pr_id, superseded_comment_id?, round, http_status?, retries?, new_pr_id_source}` (added `already_closed` for 409/422 + `new_pr_id_unparsed` defensive when alloc logs miss the marker; `new_pr_id_source` documents the alloc_logs channel per T3.1 note)
+- [x] 3.6 Error handling matrix (enumerated per qa-H5):
   - Network timeout (distinct from HTTP error) → retry as 5xx (3 retries)
   - Parent PR already closed (409/422) → continue to comment (still post supersede note)
   - rework_of resolves to dispatch with pr_id=NULL → audit warn `parent_no_pr` + skip both PATCH+comment (don't fail dispatch)
@@ -134,11 +134,11 @@
 
 ### T4 — spec_drift_input_fetcher production impl (per CRIT-4 + qa-H6 v2 fixes)
 
-- [ ] 4.1 (~0.5h) Replace M5 stub `spec_drift_input_fetcher` empty-return (`reconcile_runner.py:213-221`) with full impl
-- [ ] 4.2 (~1h) Read `openspec/changes/<spec_id>/proposal.md` from Aria main repo via Forgejo raw content API: `GET /repos/<aria_org>/<aria_repo>/raw/branch/<branch>/<path>`. **On 404 fall back per qa-H6**: try `openspec/archive/*-<spec_id>/proposal.md` — use Forgejo `GET /repos/<aria_org>/<aria_repo>/contents/openspec/archive` to list directory entries, find prefix-match `*-<spec_id>`, fetch from matched path. Audit log records which path used (`source: changes | archive | not_found`)
-- [ ] 4.3 (~1h) Read PR diff via `GET /repos/<org>/<repo>/pulls/<pr_id>.diff` (Forgejo diff endpoint)
-- [ ] 4.4 (~0.5h) Return **3-tuple `(spec_what, spec_acceptance, pr_diff)`** matching `reconciler.py:1014` unpack contract (per CRIT-4 v2 fix). Internally call `extract_spec_sections(proposal_text)` from existing `spec_drift.py:104-128` to slice §What + §验收 sections. spec_id and pr_id are **internal lookup keys**, NOT output fields. NOT a named tuple; plain 3-tuple
-- [ ] 4.5 Unit tests `test_t_spec_drift_fetcher.py` (5 cases):
+- [x] 4.1 (~0.5h) Replace M5 stub `spec_drift_input_fetcher` empty-return (`reconcile_runner.py:213-221`) with full impl
+- [x] 4.2 (~1h) Read `openspec/changes/<spec_id>/proposal.md` from Aria main repo via Forgejo raw content API: `GET /repos/<aria_org>/<aria_repo>/raw/branch/<branch>/<path>`. **On 404 fall back per qa-H6**: try `openspec/archive/*-<spec_id>/proposal.md` — use Forgejo `GET /repos/<aria_org>/<aria_repo>/contents/openspec/archive` to list directory entries, find prefix-match `*-<spec_id>`, fetch from matched path. Audit log records which path used (`source: changes | archive | not_found`)
+- [x] 4.3 (~1h) Read PR diff via `GET /repos/<org>/<repo>/pulls/<pr_id>.diff` (Forgejo diff endpoint)
+- [x] 4.4 (~0.5h) Return **3-tuple `(spec_what, spec_acceptance, pr_diff)`** matching `reconciler.py:1014` unpack contract (per CRIT-4 v2 fix). Internally call `extract_spec_sections(proposal_text)` from existing `spec_drift.py:104-128` to slice §What + §验收 sections. spec_id and pr_id are **internal lookup keys**, NOT output fields. NOT a named tuple; plain 3-tuple
+- [x] 4.5 Unit tests `test_t_spec_drift_fetcher.py` (5 cases):
   - (a) stub-replaced (existing reconciler test still passes with full impl)
   - (b) missing spec_id (NULL in dispatch row) → return empty 3-tuple `("", "", "")` graceful
   - (c) proposal.md fetch success from `openspec/changes/<id>/`
@@ -151,15 +151,15 @@
 
 ### T5 — Commit-lint Layer 2 retry hook (CRIT-2 fix: **shell-port**, not Python; renumbered per R2-NEW-3)
 
-- [ ] 5.1 (~0.7h) Create `docker/aria-runner/lib/commit-lint-validate.sh` (~30 lines): bash regex validator per `standards/conventions/git-commit.md:40-53` valid types `{feat|fix|chore|refactor|test|docs|style|perf|build|ci}` + subject line ≤72 chars. Exit 0 if valid, exit 1 if invalid. NO Python dependency.
-- [ ] 5.2 (~0.5h) Create `docker/aria-runner/lib/commit-lint-retry.sh` shared helper:
+- [x] 5.1 (~0.7h) Create `docker/aria-runner/lib/commit-lint-validate.sh` (~30 lines): bash regex validator per `standards/conventions/git-commit.md:40-53` valid types `{feat|fix|chore|refactor|test|docs|style|perf|build|ci}` + subject line ≤72 chars. Exit 0 if valid, exit 1 if invalid. NO Python dependency.
+- [x] 5.2 (~0.5h) Create `docker/aria-runner/lib/commit-lint-retry.sh` shared helper:
   - Function `commit_lint_retry_loop()` taking COMMIT_MSG + MAX_RETRY (default 3)
   - Calls `bash /opt/aria-runner/lib/commit-lint-validate.sh "$msg" >/dev/null 2>&1` (NOT Python)
   - Loop: validate → if fail, `timeout -k 10s ${CLAUDE_TIMEOUT_S:-60} claude -p` rewrite (using `${ARIA_MODEL}` opus per HIGH ai-4 decision) → git commit --amend → retry (max 3)
   - On 3rd fail: exit with S_FAIL(commit_lint_exhausted) — write result.json + exit 1
-- [ ] 5.3 (~0.5h) Update modes/changes.sh: source `lib/commit-lint-retry.sh` + call `commit_lint_retry_loop` after `git commit` before `git push`
-- [ ] 5.4 (~0.5h) Update modes/redo.sh: same source + call pattern
-- [ ] 5.5 (~0.5h) Unit test `test_t_commit_lint_retry.py` (Python retry-loop integration only — validator regex correctness covered by separate bash test `tests/changes-mode/commit-lint-validate.sh` per R2-NEW-6):
+- [x] 5.3 (~0.5h) Update modes/changes.sh: source `lib/commit-lint-retry.sh` + call `commit_lint_retry_loop` after `git commit` before `git push`
+- [x] 5.4 (~0.5h) Update modes/redo.sh: same source + call pattern
+- [x] 5.5 (~0.5h) Unit test `test_t_commit_lint_retry.py` (Python retry-loop integration only — validator regex correctness covered by separate bash test `tests/changes-mode/commit-lint-validate.sh` per R2-NEW-6):
   - 4 cases (valid first try / invalid then valid after retry / 3-retry exhaust → S_FAIL exit 1 + result.json written / claude rewrite fixture mocked)
 
 ---
