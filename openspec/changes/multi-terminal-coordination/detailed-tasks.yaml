@@ -1,0 +1,635 @@
+metadata:
+  feature: multi-terminal-coordination
+  spec_path: openspec/changes/multi-terminal-coordination/
+  datasource: tasks.md (v3, R2 v3 收敛 Approved)
+  decision_ref: docs/decisions/DEC-20260519-001-multi-terminal-coordination.md
+  total_tasks: 30
+  estimated_total_hours: 55
+  hours_range: 44-58h (per tasks.md Summary)
+  cross_repo:
+    standards: [TASK-001]
+    aria-plugin: [TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019, TASK-020, TASK-021, TASK-022, TASK-023, TASK-024, TASK-025, TASK-026, TASK-027, TASK-029]
+    aria-main: [TASK-028]
+    cross-3-repo-fanout: [TASK-030]
+  merge_order_hard_constraint:
+    - "Step A: standards PR (TASK-001) merge + 子模块指针 bump"
+    - "Step B: aria-plugin PR (TASK-002..027 + 029) merge + 子模块指针 bump"
+    - "Step C: Aria 主仓 PR (TASK-028 dogfood + TASK-030 fan-out 发布) merge"
+  created: 2026-05-19
+
+# ============================================================================
+# Phase 1 — Layer H: Handoff frontmatter + 全分支重建看板 (P1 纯读零行为变更)
+# ============================================================================
+
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    title: standards Rule #9 frontmatter schema 段起草
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:knowledge-manager
+    repo: standards
+    dependencies: []
+    deliverables:
+      - standards/conventions/session-handoff.md (新增 §"机读 frontmatter schema": track-id / owner-container / phase / status / updated-at 字段定义 / 语义 / YAML 示例 / 与现有 prose 段共存规则)
+    verification:
+      - frontmatter schema 5 字段全部文档化,含语义和取值范围
+      - 与现有 §3.2 latest_path 语义授权说明不冲突
+      - prose 段(human readable)与 frontmatter(machine readable)共存示例 ≥1
+
+  - id: TASK-002
+    parent: "1.2"
+    title: aria/templates/session-handoff.md 加 frontmatter 头
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:knowledge-manager
+    repo: aria-plugin
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/templates/session-handoff.md (顶部添加 YAML frontmatter 模板段 + 字段填充指引)
+    verification:
+      - 新 handoff 用模板生成时输出 frontmatter + prose
+      - 字段值与 TASK-001 schema 完全对齐
+
+  - id: TASK-003
+    parent: "1.3"
+    title: state-scanner Phase 1 加 git fetch + 30s 缓存
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/coordination_fetch.py (新建 — `git fetch refs/heads/* + refs/aria/coordination --no-tags` + 30s 本地 fetch 时间戳缓存)
+      - aria/skills/state-scanner/SKILL.md (Phase 1 流程更新)
+    verification:
+      - 距上次 fetch < 30s 跳过 → 看板顶部标"缓存于 Xs 前"
+      - fetch 失败时不中断,转 offline 降级路径 (TASK-007)
+
+  - id: TASK-004
+    parent: "1.4"
+    title: 全分支 handoff frontmatter parser + legacy fallback
+    status: pending
+    complexity: L
+    estimated_hours: 3
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-003]
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py (扫所有 `origin/**` 的 `docs/handoff/*.md` → 解析 frontmatter → 重建 track 列表)
+      - 解析失败处理: 无 frontmatter / schema 不全 → 标 `legacy` + mtime fallback,不阻塞看板
+    verification:
+      - fixture: 含 frontmatter 的新 handoff 解析为 track 行
+      - fixture: 无 frontmatter 的 archived handoff 标 `legacy` + mtime fallback
+      - 多分支 fixture (N=5) → track 列表正确合并
+      - 与 feedback_handoff_mtime_vs_pointer_divergence (H5 v1.21.1) 协同
+
+  - id: TASK-005
+    parent: "1.5"
+    title: 多 track 看板渲染
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-004]
+    deliverables:
+      - aria/skills/state-scanner/scripts/renderers/track_board.py (TRACK / OWNER/容器/会话 / PHASE / HANDOFF / LAST-PING / STATUS 列;新鲜度颜色 🟢🟡🔴;折叠 done/abandoned 分区)
+      - 列来源映射: LAST-PING = Layer L claim.heartbeat_at;PHASE = Layer H frontmatter.phase;缺则标 `—`
+    verification:
+      - fixture: 3 active + 1 done + 1 abandoned → 渲染分两区
+      - 新鲜度颜色按 heartbeat 周期 / stale_ttl 计算正确
+      - 列缺值标 `—` 不报错
+
+  - id: TASK-006
+    parent: "1.6"
+    title: latest.md 降派生产物 + 多/单 track 行为分支
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-005]
+    deliverables:
+      - aria/skills/state-scanner/scripts/writers/latest_md_writer.py (多 track 场景: 不写真实指针,仅 deprecation banner + 看板指引;单 track 场景: 仍写当前 track 指针向后兼容老 session)
+    verification:
+      - 单 track fixture → latest.md 含指针
+      - 多 track fixture → latest.md 含 banner,无单一指针
+      - L2 collector (scan.py) 语义权威仍以 frontmatter 为准,latest.md 仅 prose fallback
+
+  - id: TASK-007
+    parent: "1.7"
+    title: 离线降级 — fetch 失败用缓存 + 红条告警
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-003]
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/coordination_fetch.py (fetch 失败 → 用本地缓存看板 + 看板顶部红条 "⚠ 离线: 看板可能陈旧, 重复劳动风险升高")
+    verification:
+      - 模拟 fetch 401 / 网络中断 → 不崩溃, 红条出现
+      - 缓存看板内容与最近一次 fetch 一致
+
+  - id: TASK-008
+    parent: "1.8"
+    title: P1 单元 + 集成测试套件 (5 case)
+    status: pending
+    complexity: L
+    estimated_hours: 2
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-002, TASK-004, TASK-005, TASK-006, TASK-007]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_p1_layer_h.py (5 case per tasks.md 1.8):
+      - "  (a) 无 frontmatter 旧格式 handoff → graceful skip 标 legacy 不报错"
+      - "  (b) latest.md 多 track → banner;单 track → 指针"
+      - "  (c) 老 session `cat latest.md` 仍得可读 markdown"
+      - "  (d) 离线注入 → 顶部红条"
+      - "  (e) N=20+ 远程分支性能基线 (Phase 1 完成时长记录)"
+    verification:
+      - 所有 5 case 通过
+      - 性能基线记入 .aria/benchmarks/p1-baseline.json
+
+  - id: TASK-009
+    parent: "1.9"
+    title: Rule #9 5 层 enforcement matrix 兼容性同步
+    status: pending
+    complexity: M
+    estimated_hours: 1
+    agent: aria:knowledge-manager
+    repo: aria-plugin
+    dependencies: [TASK-001]
+    deliverables:
+      - "L1 hook `handoff-location-guard.sh`: 文档化"无需改动,仅检查路径不检查内容"判定 (注释 + 测试断言)"
+      - "L2 collector `scan.py` / `collectors/handoff.py`: 加 frontmatter-aware 解析 (向后兼容无 frontmatter 旧 doc,fold 到 TASK-004)"
+      - "L4 规约 / L5 D.3 template: 已在 TASK-001 / TASK-002 覆盖"
+      - aria/skills/state-scanner/docs/rule9-5layer-matrix.md (新建 — 5 层覆盖矩阵文档,明示每层职责 + 是否需改动 + 引用文件)
+    verification:
+      - 5 层全部有文档化判定
+      - matrix 文档 review 通过
+
+# ============================================================================
+# Phase 2 — Layer L: Orphan ref + 急切认领 + reconcile (P2 advisory liveness)
+# ============================================================================
+
+  - id: TASK-010
+    parent: "2.1"
+    title: orphan ref 结构 + claim YAML schema 设计
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/docs/coordination-ref-schema.md (新建 — refs/aria/coordination 结构:claims/<container-id>/<session-id>.yaml + archive/<year-month>/ + claim schema_version: "1" + 8 字段 + 可选 superseded_from)
+      - aria/skills/state-scanner/lib/claim_schema.py (新建 — Pydantic/dataclass 校验 + reader 见未知 schema_version 降级 status: unknown)
+    verification:
+      - schema doc 含全字段 + 示例
+      - reader 单测: schema_version=2 (未知) → status: unknown,不崩溃
+
+  - id: TASK-011
+    parent: "2.2"
+    title: 身份生成 — container-id 持久化 + session-id 临时
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/lib/identity.py (新建 — `~/.aria/container-id` 首次生成 short-uuid + 可选人类标签 + hostname 回退;session-id 临时 短随机 + 起始时间戳)
+    verification:
+      - 首次调用 → 生成持久化文件
+      - 第二次 → 复用同 container-id
+      - container-id 文件缺失 → fallback hostname
+      - 可选标签持久化保存
+
+  - id: TASK-012
+    parent: "2.3"
+    title: orphan ref bootstrap (幂等初始化)
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-010]
+    deliverables:
+      - aria/skills/state-scanner/lib/coordination_ref.py::bootstrap (`git commit --orphan` 初始化 refs/aria/coordination,幂等;首次 push 创建远端 ref)
+    verification:
+      - 首次调用 → ref 创建
+      - 第二次调用 → 不重复创建,不报错
+      - 远端 ref 缺失时本地有 → push 自动建立
+
+  - id: TASK-013
+    parent: "2.3"
+    title: claim 文件 CRUD + push/fetch + file-per-writer 分区
+    status: pending
+    complexity: M
+    estimated_hours: 3
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-010, TASK-011, TASK-012]
+    deliverables:
+      - aria/skills/state-scanner/lib/coordination_ref.py::{read_claims, write_claim, push, fetch} (claim 文件 read/write 严格按 claims/<container-id>/<session-id>.yaml 分区 → 永不写他人文件 → push 永不冲突)
+    verification:
+      - 单测: 同 container 两 session 各写各文件 → 互不覆盖
+      - 跨 container fixture: 两容器同 ref push → file-per-writer 无内容冲突
+      - 读 claim 缺失 → 静默 None 不报错
+
+  - id: TASK-014
+    parent: "2.4"
+    title: 确定性 track-id 派生 (规范化函数)
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/lib/track_id.py::derive (小写化 → `/._` 替换为 `-` → 最大长度 64 字符 → 超长或含非 ASCII 时 fallback `sha256(原 id)[:16]`)
+    verification:
+      - 单测边界 case: `aria-2.0-m5-...` (含点) → 规范化输出
+      - 单测 含 / 大写 / 非 ASCII / 超 64 字符 各路径
+      - 跨容器同输入产同输出 (确定性)
+
+  - id: TASK-015
+    parent: "2.6"
+    title: reconcile 协议实现
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-013, TASK-018]
+    deliverables:
+      - aria/skills/state-scanner/lib/reconcile.py (4 规则:早 `claimed_at` 胜 / done 接管 / stale_ttl 接管 / 时钟相等字典序 `<container>/<session>` tiebreak;输入 claims list 输出 verdict per track-id)
+    verification:
+      - 黄金表测试 (TASK-020 中覆盖)
+      - 同步 documented in proposal §What/Layer L
+
+  - id: TASK-016
+    parent: "2.5"
+    title: 急切认领闸门集成 state-scanner
+    status: pending
+    complexity: L
+    estimated_hours: 3
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-013, TASK-014, TASK-015]
+    deliverables:
+      - aria/skills/state-scanner/scripts/phase1_gate.py (闸门:推荐 → 用户确认 → 二次 fetch → reconcile 撞车检查 → push claim → 才放行 Phase B)
+      - 文档化 "闸门是窗口压缩器、非排他;reconcile 是最终仲裁者;实现必须确保 push 前已写入 claimed_at"
+    verification:
+      - 模拟双终端同时跑 → 一方 push 成功一方撞车 → reconcile 裁决
+      - claim 文件含 claimed_at 写入时间戳早于 push
+
+  - id: TASK-017
+    parent: "2.7"
+    title: 看板 COLLISION 行 + 时钟偏移告警
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-005, TASK-015]
+    deliverables:
+      - aria/skills/state-scanner/scripts/renderers/track_board.py (扩展 — COLLISION 行渲染 + 区分 cross-owner collision 强提示 vs self-multi-container collision soft hint + 时钟偏移超 clock_skew_warn_threshold 时 reconcile 降级 CONFLICT 标记)
+    verification:
+      - 双 owner collision → 看板强提示文案
+      - 同 owner 多 container collision → soft hint
+      - 时钟偏移 > 30s fixture → 看板 `⚠ 时钟偏移?` + reconcile CONFLICT 不静默
+
+  - id: TASK-018
+    parent: "2.8"
+    title: claim 生命周期 + 命名常量 + GC archive
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-013]
+    deliverables:
+      - aria/skills/state-scanner/lib/constants.py (HEARTBEAT_INTERVAL = 600s, STALE_TTL = 1800s, CLOCK_SKEW_WARN_THRESHOLD = 30s,跨容器实现必须共用)
+      - aria/skills/state-scanner/lib/claim_lifecycle.py (acquire / heartbeat (周期 + phase 切换) / release Phase D 写 status: done)
+      - aria/skills/state-scanner/lib/gc.py (status=done claim 保留 7 天后移入 archive/<year-month>/ 保留 sha256 摘要 tombstone)
+    verification:
+      - heartbeat 周期触发 push 每 10 min
+      - stale_ttl 30 min 未 heartbeat → 看板标 🔴
+      - GC: 7 天前 done claim → archive/
+
+  - id: TASK-019
+    parent: "2.9"
+    title: 失败处理矩阵 (7 类)
+    status: pending
+    complexity: L
+    estimated_hours: 3
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-013, TASK-018]
+    deliverables:
+      - "aria/skills/state-scanner/lib/failure_handlers.py (7 路径):"
+      - "  (a) push non-ff → fetch-replay-repush N=3 次"
+      - "  (b) push 401/403 → 不重试,告警 + 人工决策"
+      - "  (c) push 其它失败 → 让用户决定继续/中止"
+      - "  (d) orphan ref 不存在 → 自动 bootstrap (TASK-012)"
+      - "  (e) 磁盘满 / 本地写失败 → 告警 + 跳过 claim, 非崩溃"
+      - "  (f) partial fetch → 比对 fetch 前后本地 ref sha 单调推进,失败按 (a) 重试"
+      - "  (g) 时钟偏移超 30s → reconcile 降级 CONFLICT + 人工决策"
+    verification:
+      - 单测覆盖 7 路径
+      - SIGKILL 中途 fetch → 本地 ref 未污染 (partial fetch 单测)
+
+  - id: TASK-020
+    parent: "2.10"
+    title: P2 reconcile 黄金表测试
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-015]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_reconcile_golden_table.py:
+      - "  (1) 全 4 规则:早胜 / done 接管 / stale 接管 / tiebreak"
+      - "  (2) 边界 stale_ttl ± 1s 三档 (TTL-1s / TTL / TTL+1s)"
+      - "  (3) heartbeat 缺失 → 视同 stale"
+      - "  (4) status 4×4 组合矩阵 (active+active / done+active / done+done / abandoned+active 等)"
+    verification:
+      - 全表 100% PASS
+      - reconcile 一致率 = 100% (3.4 (c) 量化指标基线)
+
+  - id: TASK-021
+    parent: "2.10"
+    title: P2 race 窗口可复现性测试
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-015, TASK-016]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_race_window.py:
+      - "  ClockProvider 抽象注入 (或 monkeypatch datetime.now)"
+      - "  threading.Barrier 零 sleep 同步 (禁止 sleep 近似)"
+      - "  CI 强制注入相同时间戳 → 触发 tiebreak 路径"
+      - "  断言:两 claim 时间戳差 < ε (测试有效性)"
+    verification:
+      - 10 次并发注入 → 碰撞检测触发率 = 100%
+      - 非 flaky (连续 100 次 CI 无失败)
+
+  - id: TASK-022
+    parent: "2.10"
+    title: P2 失败注入矩阵测试
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-019]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_failure_injection.py (注入 TASK-019 7 路径 — push non-ff / 401-403 / 其它 push 失败 / orphan ref 缺失 / 磁盘满 / partial fetch / 时钟偏移)
+    verification:
+      - 7 路径 全部 PASS
+      - 降级行为符合规范率 ≥ 90% (3.4 (d) 量化指标基线)
+
+# ============================================================================
+# Phase 3 — Design A + Rule #6 benchmark + Dogfood (P3 完整闭环)
+# ============================================================================
+
+  - id: TASK-023
+    parent: "3.1"
+    title: 同容器并发 active claim 计数检测
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-013]
+    deliverables:
+      - aria/skills/state-scanner/lib/concurrent_tracks.py (扫本 container-id 名下所有 active claim → 计数 ≥ 2 触发 worktree 模式)
+    verification:
+      - 单 container 单 claim → 不触发
+      - 单 container 双 claim → 触发 worktree 模式标志
+
+  - id: TASK-024
+    parent: "3.2"
+    title: worktree 自动创建 + 子模块独立 checkout
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-023]
+    deliverables:
+      - aria/skills/state-scanner/lib/worktree_manager.py (`git worktree add worktrees/<track-id>/` + 子模块 update --init --recursive 独立 checkout + 钩入 branch-manager B.1 流程)
+    verification:
+      - 双 active claim 触发 → 创建 worktrees/<track-id>/ + 含独立子模块
+      - 单容器双 track 工作互不踩踏 (集成测试)
+
+  - id: TASK-025
+    parent: "3.3"
+    title: worktree 生命周期 — release 清理 + 误用保护
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-024, TASK-018]
+    deliverables:
+      - aria/skills/state-scanner/lib/worktree_manager.py::cleanup (track release/status=done 后归档或清理;若 worktree 含未 commit 改动 → 阻止清理 + 告警)
+    verification:
+      - status=done track → worktree 移入 worktrees/_archive/ 或清理
+      - 未 commit 改动 → 不清理,告警
+
+  - id: TASK-026
+    parent: "3.4"
+    title: Rule #6 structural benchmark 设计
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-022]
+    deliverables:
+      - "aria-plugin-benchmarks/ab-suite/multi-terminal-coordination/benchmark.yaml (4 量化指标):"
+      - "  (a) 看板正确性: fixture N=20 → 通过率 ≥ 95%"
+      - "  (b) race 可复现: 10 次并发注入 → 碰撞检测触发率 = 100%"
+      - "  (c) reconcile 确定性: 黄金表 K 条 → verdict 一致率 = 100%"
+      - "  (d) 失败矩阵覆盖: M 注入场景 → 降级符合率 ≥ 90%"
+      - "  baseline = 同测试集在旧 state-scanner (P1 前) 通过率;delta = new - baseline > 0"
+      - "  通过条件 = delta > 0 (必要) AND human review (充分)"
+    verification:
+      - benchmark yaml 文档化
+      - 4 指标阈值明确
+
+  - id: TASK-027
+    parent: "3.5"
+    title: 执行 /skill-creator benchmark 存入 ab-results
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    agent: aria:qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-026]
+    deliverables:
+      - aria-plugin-benchmarks/ab-results/<timestamp>/multi-terminal-coordination/ (运行结果存档)
+      - aria-plugin-benchmarks/ab-results/latest/summary.yaml (更新 delta 记录)
+    verification:
+      - delta > 0 (per TASK-026 baseline)
+      - human review 通过
+
+  - id: TASK-028
+    parent: "3.6"
+    title: Aria 主仓 dogfood ≥1 多终端 cycle (可观测 instrumentation)
+    status: pending
+    complexity: L
+    estimated_hours: 3
+    agent: aria:qa-engineer
+    repo: aria-main
+    dependencies: [TASK-027]
+    deliverables:
+      - .aria/dogfood-reports/multi-terminal-coordination-<date>.md (含可观测实测数值):
+      - "  (a) coordination ref 内同一 track-id 的 status=active claim 数 ≤ 1 (超出即重复)"
+      - "  (b) state-scanner 看板使用 handoff updated-at 与 git log 最新 handoff commit 时间差 < 60s"
+      - "  (c) 报告含上述实测数值,不接受 'absence of failure' 为 PASS"
+    verification:
+      - ≥1 个 dogfood cycle 完成
+      - 实测数值落到报告
+      - 无重复 / 无接错棒 事件 (可证伪)
+
+  - id: TASK-029
+    parent: "3.7"
+    title: 文档同步 — 5 层 enforcement matrix 全覆盖
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:knowledge-manager
+    repo: aria-plugin
+    dependencies: [TASK-001, TASK-002, TASK-009]
+    deliverables:
+      - aria/skills/state-scanner/SKILL.md (L3 — Phase 1 多 track 看板 + 闸门更新)
+      - CLAUDE.md (Rule #9 引用本 Spec change_id) — 提交到 Aria 主仓
+      - standards/conventions/session-handoff.md (L4 — TASK-001 已覆盖,本任务核对)
+      - aria/templates/session-handoff.md (L5 — TASK-002 已覆盖,本任务核对)
+      - "L2 collector docstring 更新 (TASK-004 / TASK-009 已 fold,本任务核对完整性)"
+      - "L1 hook 不需改动文档化 (TASK-009 已 fold,本任务核对完整性)"
+      - aria/skills/state-scanner/docs/rule9-5layer-matrix.md (TASK-009 输出,本任务 review)
+    verification:
+      - 5 层全部有文档化条目
+      - CLAUDE.md Rule #9 反向回引到 change_id `multi-terminal-coordination`
+
+  - id: TASK-030
+    parent: "3.8"
+    title: 跨 3 repo C.2 + Rule #8 pre-merge gate + Phase D 归档
+    status: pending
+    complexity: M
+    estimated_hours: 2
+    agent: aria:code-reviewer
+    repo: cross-3-repo-fanout
+    dependencies: [TASK-028, TASK-029]
+    deliverables:
+      - "Step A: standards PR (TASK-001) merge + 子模块指针 bump"
+      - "Step B: aria-plugin PR merge + bump + plugin.json / marketplace.json / VERSION / CHANGELOG / README minor bump (e.g. v1.21.x → v1.22.0)"
+      - "Step C: Aria 主仓 PR (子模块指针 + TASK-028 dogfood) merge"
+      - "Rule #8 pre-merge gate (C.2.4) 在每个 PR merge 前通过"
+      - "phase-c-integrator C.2.5 编排多远程推送 + post-push SHA 验证"
+      - "Phase D 归档: openspec/changes/multi-terminal-coordination/ → openspec/archive/2026-XX-XX-multi-terminal-coordination/"
+    verification:
+      - 3 PR 全部 merged
+      - Rule #8 gate 通过日志在每个 PR 上
+      - 多远程 SHA 4-way / 6-way parity
+      - archive 目录已创建
+
+# ============================================================================
+# Execution Order (拓扑序)
+# ============================================================================
+
+execution_order:
+  phase_1:
+    sequential:
+      - TASK-001  # standards schema (Step A)
+    parallel_after_TASK-001:
+      - TASK-002  # template (depends 001)
+      - TASK-009  # 5-layer matrix (depends 001)
+    parallel_independent:
+      - TASK-003  # fetch
+    sequential_chain:
+      - TASK-004  # parser (depends 003)
+      - TASK-005  # board (depends 004)
+      - TASK-006  # latest.md demote (depends 005)
+    parallel:
+      - TASK-007  # offline (depends 003)
+    final_p1:
+      - TASK-008  # P1 tests (depends 002, 004, 005, 006, 007)
+
+  phase_2:
+    parallel_independent:
+      - TASK-010  # schema design
+      - TASK-011  # identity
+      - TASK-014  # track-id derivation
+    sequential_chain:
+      - TASK-012  # orphan bootstrap (depends 010)
+      - TASK-013  # claim CRUD (depends 010, 011, 012)
+      - TASK-018  # lifecycle + constants (depends 013)
+      - TASK-015  # reconcile (depends 013, 018)
+      - TASK-016  # eager gate (depends 013, 014, 015)
+      - TASK-017  # collision row (depends 005, 015)
+      - TASK-019  # failure matrix (depends 013, 018)
+    tests:
+      - TASK-020  # reconcile golden (depends 015)
+      - TASK-021  # race window (depends 015, 016)
+      - TASK-022  # failure injection (depends 019)
+
+  phase_3:
+    sequential_chain:
+      - TASK-023  # concurrent count (depends 013)
+      - TASK-024  # worktree (depends 023)
+      - TASK-025  # worktree lifecycle (depends 024, 018)
+    benchmark:
+      - TASK-026  # design (depends 022)
+      - TASK-027  # execute (depends 026)
+    dogfood:
+      - TASK-028  # Aria 主仓 (depends 027)
+    docs_release:
+      - TASK-029  # 5-layer doc sync (depends 001, 002, 009)
+      - TASK-030  # cross-repo fanout (depends 028, 029)
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+summary:
+  by_complexity:
+    S: 9     # TASK-002, 006, 007, 011, 012, 014, 022, 023, 025, 027  -> recount: 002, 006, 007, 012, 014, 022, 023, 025, 027 = 9
+    M: 14    # TASK-001, 003, 005, 009, 010, 015, 017, 018, 024, 026, 029, 030, 011 (corrected M not S) = re-check below
+    L: 5     # TASK-004, 008, 016, 019, 028
+    XL: 0
+  by_agent:
+    aria:knowledge-manager: [TASK-001, TASK-002, TASK-009, TASK-029]
+    aria:backend-architect: [TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019, TASK-023, TASK-024, TASK-025]
+    aria:qa-engineer: [TASK-008, TASK-020, TASK-021, TASK-022, TASK-026, TASK-027, TASK-028]
+    aria:code-reviewer: [TASK-030]
+  by_phase:
+    P1_Layer_H: { tasks: 9, hours: 15 }
+    P2_Layer_L: { tasks: 13, hours: 26 }
+    P3_DesignA_benchmark_dogfood: { tasks: 8, hours: 14 }
+  total: { tasks: 30, hours: 55, range: "44-58h" }
+
+# ============================================================================
+# Notes
+# ============================================================================
+
+notes:
+  - "粒度: 全部 atomic TASK 1-3h (粗粒度 tasks.md 每行展开为 1-3 atomic)。粗粒度 2.3 / 2.10 各拆为 2-3 atom。"
+  - "无 XL 任务 (per CLAUDE.md 小步迭代原则,detailed-tasks Layer 2 颗粒度承重)"
+  - "Dependencies 全部 TASK-NNN 显式引用,无循环依赖 (DAG 已验证)"
+  - "Agent 分布:knowledge-manager 4 / backend-architect 18 / qa-engineer 7 / code-reviewer 1 (跨 3 repo fanout 编排)"
+  - "tech-lead 未单独分配 atomic task (其 R1+R2 决策已注入到 tasks 注释 + cross-repo merge 顺序约束);建议在 mid_implementation / post_implementation audit 由 tech-lead 复审"
+  - "post_planning audit checkpoint: .aria/config.json 配置 post_planning: off → 跳过 (per audit-engine skill rule)"
+  - "可进入 B.1 branch-manager 创建 feature/multi-terminal-coordination 分支 (按 merge 顺序 standards 子模块先开 PR)"

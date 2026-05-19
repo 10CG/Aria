@@ -51,6 +51,25 @@
     "agent_team_audit_points": ["pre_merge"]
   },
 
+  "audit": {
+    "_comment": "Enabled 2026-05-19 for DEC-20260519-001 multi-terminal-coordination post_spec R1 audit. Other checkpoints kept off until verified per Aria step-by-step rollout.",
+    "enabled": true,
+    "mode": "convergence",
+    "max_rounds": 4,
+    "checkpoints": {
+      "post_brainstorm": "off",
+      "post_spec": "convergence",
+      "post_planning": "off",
+      "mid_implementation": "off",
+      "post_implementation": "off",
+      "pre_merge": "off",
+      "post_closure": "off"
+    },
+    "teams": {
+      "post_spec": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"]
+    }
+  },
+
   "orchestrator": {
     "dispatch_policy": {
       "tier1_action": "dispatch_ready",
