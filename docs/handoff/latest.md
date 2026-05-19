@@ -5,7 +5,8 @@
 > 自 v1.21.0 起 (H0 spec ship), `/aria:state-scanner` Phase 1.15 collector
 > 会自动 surface 本 pointer + handoff doc 路径,AI 在阶段 2 推荐前必读。
 
-**Latest**: [2026-05-19-spec-y-h1-h2-t2-closed.md](./2026-05-19-spec-y-h1-h2-t2-closed.md) — **H1+H2 prod fixes RESOLVED + Spec Y T2 main flow CLOSED (T2.4+T2.5+T2.6+T2.7+T2.8+T2.9)**: extension.py tuple-vs-list bug fixed with real-validator regression test (pre-fix S0_IDLE → post-fix S2_DECIDE strong signal) + `linked_spec_id` regex pre-archive amend accepts `aria-2.0-*` real change IDs + redo.sh full main body (fresh-checkout from base.ref + 3-section prompt + claude -p + regular push + Forgejo POST new PR + result.json with `new_pr_id+parent_pr_id`); 826 Python + 26 bash / 0 regression; 6-way SHA parity (Aria main `a7042a2` + aria-orch `1d4a1a6`); 1 new memory entry; **🔴 1 NEW production blocker — Finding #4 git push auth** (changes.sh + redo.sh use bare clone_url with no creds; initial.sh uses URL rewrite pattern; must paired-fix before T-deploy or all pushes hard-fail); Spec Y Phase B 12/17 done = 71%, T3-T8 ~12h remain
+**Latest**: [2026-05-19-spec-y-t3-t8-shipped.md](./2026-05-19-spec-y-t3-t8-shipped.md) — **Spec Y full Phase A→D cycle COMPLETE 2026-05-19**: T3 (Layer 1 close-old-PR @ S5_AWAIT terminal via alloc_logs channel + 7-outcome rework_cycle audit) + T4 (spec_drift_input_fetcher prod impl) + T5 (commit-lint shell-port) + T6 (+31 bash cases) + T7 (5 doc patches) + Finding #4 paired URL-rewrite fix + Finding #5 alloc_logs accepted OD + T8 archive (`openspec/archive/2026-05-19-aria-2.0-m5-carryover-layer2-redo-mode-aux/`); Aria PR #113 + aria-orch PR #13 merged; 846 Python + 57 bash + 6/6 validate-m5-handoff.py / 0 regression; 3-way master SHA parity (Aria main `97c6c0d` + aria-orch `09ff364`); **all 5 findings closed**; US-025 close gate now only blocked by 2 owner-gated execution items (T-deploy + Tier-1 live LLM)
+**Predecessor (same day, T2 main flow closed)**: [2026-05-19-spec-y-h1-h2-t2-closed.md](./2026-05-19-spec-y-h1-h2-t2-closed.md) — H1+H2 prod fixes + Spec Y T2 main flow shipped + 1 NEW Finding #4 surfaced (resolved this session)
 **Predecessor (Spec Y T-pre + T0 + T1.0 + T1 + T2.1 + T2.2 + T2.3, evening of 2026-05-17)**: [2026-05-17-evening-spec-y-phase-b-core-5-tasks.md](./2026-05-17-evening-spec-y-phase-b-core-5-tasks.md) — Phase B core 5-task batch shipped + Aria #111 reply + 3 new memory entries + 3 surfaced findings 待 owner (now: #1 H1 RESOLVED this session, #2 stale marker folded to T7, #3 H2 RESOLVED this session)
 **Predecessor (Spec Y Approved + Phase B kickoff, 2026-05-17 morning)**: [2026-05-17-spec-y-approved-phase-b-kickoff.md](./2026-05-17-spec-y-approved-phase-b-kickoff.md) — Spec Y R2 verify → v3 propagation → R3 PASS → Status=Approved + T-pre + T0
 **Predecessor (Spec X complete + Spec Y kickoff)**: [2026-05-16-spec-x-shipped-spec-y-kickoff.md](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) — Spec X archived + Spec Y A.1 + R1 + v2 fixes
@@ -16,8 +17,8 @@
 **Predecessor (M5 Phase 1)**: [2026-05-14-us025-m5-phase-1-done.md](./2026-05-14-us025-m5-phase-1-done.md) — Schema + audit log infra
 **Predecessor (M5 Phase A)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md) — Spec Approved + B.1 branches
 
-**Created**: 2026-05-19 early UTC (Spec Y H1+H2 prod fixes + T2 main flow CLOSED)
-**Cycle**: Follow-up to 2026-05-17 evening session — shipped H1 (extension.py tuple-vs-list bug fix + real-validator regression) + H2 (linked_spec_id regex `^[a-z0-9.-]+$` pre-archive amend) + T2.4+T2.5 (fresh-checkout + 3-section prompt) + T2.6-T2.9 (claude / push / PR create / result.json); 7 commits across 2 repos; 826 Python + 26 bash / 0 regression; **1 NEW production blocker (Finding #4 git push auth) — must fix before T-deploy**; Spec Y Phase B 12/17 done = 71%, T3-T8 (~12h AI-runnable) + 5 owner-gated items pending
+**Created**: 2026-05-19 mid-UTC (Spec Y full Phase A→D cycle CLOSED via T3-T8 ship)
+**Cycle**: Continuation of cross-midnight 2026-05-18→05-19 session — shipped T3 (Layer 1 close-old-PR + alloc_logs channel + 7-outcome audit) + T4 (spec_drift fetcher prod) + T5 (commit-lint shell-port) + T6 (+31 bash cases) + T7 (5 doc patches incl. AD-M5-3 append + validate-m5-handoff.py new check) + Finding #4 paired URL-rewrite fix + Finding #5 alloc_logs accepted by owner OD + T8 D.2 archive; 13 commits across 2 repos + 2 PR merges + 1 D.2 archive direct-to-master; **all 5 findings closed**; US-025 close gate only blocked by 2 owner-gated items (T-deploy + Tier-1 live LLM)
 
 ---
 
@@ -25,7 +26,8 @@
 
 | Date | Session | Status |
 |------|---------|--------|
-| [2026-05-19 Spec Y H1+H2 + T2 CLOSED](./2026-05-19-spec-y-h1-h2-t2-closed.md) | H1+H2 prod fixes RESOLVED + T2 main flow CLOSED + 7 commits + 1 NEW Finding #4 git auth blocker | **Active (Latest)** |
+| [2026-05-19 Spec Y T3-T8 shipped (full cycle CLOSE)](./2026-05-19-spec-y-t3-t8-shipped.md) | T3+T4+T5+T6+T7 + Findings #4 paired fix + #5 OD accepted + T8 D.2 archive → Spec Y full Phase A→D cycle complete; 13 commits + 2 PR merges + 1 archive | **Active (Latest)** |
+| [2026-05-19 Spec Y H1+H2 + T2 CLOSED](./2026-05-19-spec-y-h1-h2-t2-closed.md) | H1+H2 prod fixes RESOLVED + T2 main flow CLOSED + 7 commits + 1 NEW Finding #4 git auth blocker (resolved by 2026-05-19 T3-T8 session) | Active (predecessor; same day) |
 | [2026-05-17 evening Spec Y Phase B 5-task batch](./2026-05-17-evening-spec-y-phase-b-core-5-tasks.md) | Spec Y Phase B T1.0+T1+T2.1+T2.2+T2.3 shipped + Aria #111 reply + 3 new memory entries + 3 surfaced findings (#1+#3 RESOLVED 2026-05-19, #2 folded to T7) | Active (predecessor) |
 | [2026-05-17 Spec Y Approved + Phase B kickoff](./2026-05-17-spec-y-approved-phase-b-kickoff.md) | Spec Y R2+R3 → Approved + Phase B T-pre+T0 shipped + 4 new memory entries + US-025 sync | Active (predecessor) |
 | [2026-05-16 Spec X complete + Spec Y kickoff](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) | Spec X full A→D cycle archived + Spec Y A.1+R1+v2 fixes + 3 new memory entries | Active (predecessor) |
