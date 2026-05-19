@@ -176,6 +176,7 @@
 - **Spec X archive(sibling)**: [`openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/`](../../openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/)
 - US-025: [`docs/requirements/user-stories/US-025.md`](../requirements/user-stories/US-025.md) — Status + footer 全 sync'd
 - M5 deploy playbook: [`2026-05-15-m5-deploy-playbook.md`](2026-05-15-m5-deploy-playbook.md) — owner T-deploy 7-step
+- **M5 v11 deploy addendum (Spec X+Y bundle)**: [`2026-05-19-m5-deploy-playbook-v11-addendum.md`](2026-05-19-m5-deploy-playbook-v11-addendum.md) — owner-runnable image build + schema v4.2 + real Layer 2 smoke (added 2026-05-19 post-closeout; 3 OD locked: registry=forgejo.10cg.pub, tag=claude-m5-carry-, Rule #8 gate=runs)
 - Rule #9 trigger eval: **STRONG** — (a) session > 8h cumulative ✓, (b) full A→D cycle ship for Spec Y ✓ (1 cycle), (c) crosses Phase A retrospective + B + C + D + closeout, (d) 5 findings triage + resolution. Handoff doc mandated.
 
 ---
