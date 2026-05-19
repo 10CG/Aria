@@ -157,6 +157,7 @@ ID_RE = re.compile(r"^[A-Z][A-Z0-9-]+$")
 REPO_SLUG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*$")
 CREATED_BY_RE = re.compile(r"^(human|ai):\S+")
 RFC3339_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$")
+LINKED_SPEC_ID_RE = re.compile(r"^[a-z0-9.-]+$")  # Spec Y T1.0 (H2 amend 2026-05-18): added '.' so real change IDs like "aria-2.0-m5-…" validate
 ACTION_VERBS = ("新增", "修改", "删除")
 IP_CLASSIFICATION_M1 = {"synthetic"}  # M1 only accepts synthetic
 
@@ -248,6 +249,17 @@ def validate(data: dict, filename_stem: str) -> list:
             err(f"metadata.created_by {meta['created_by']!r} not in 'human:<user>' or 'ai:<agent>' format")
         if "created_at" in meta and isinstance(meta["created_at"], str) and not RFC3339_RE.match(meta["created_at"]):
             err(f"metadata.created_at {meta['created_at']!r} not RFC 3339 format")
+
+    # --- linked_spec_id (Spec Y T1.0: optional, nullable, backward-compat) ---
+    # When present and non-null, must be a kebab-case Aria OpenSpec change ID.
+    # Absent or explicit null → no error (graceful for historical issues without
+    # the field; consumed by Layer 1 S1_SCAN to populate dispatches.spec_id —
+    # see aria_layer1/extension.py::_handle_s1_scan).
+    if "linked_spec_id" in data and data["linked_spec_id"] is not None:
+        if not isinstance(data["linked_spec_id"], str):
+            err(f"linked_spec_id must be string or null, got {type(data['linked_spec_id']).__name__}")
+        elif not LINKED_SPEC_ID_RE.match(data["linked_spec_id"]):
+            err(f"linked_spec_id {data['linked_spec_id']!r} does not match regex {LINKED_SPEC_ID_RE.pattern}")
 
     return errors, warnings
 

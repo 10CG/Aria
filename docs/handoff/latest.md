@@ -5,16 +5,19 @@
 > 自 v1.21.0 起 (H0 spec ship), `/aria:state-scanner` Phase 1.15 collector
 > 会自动 surface 本 pointer + handoff doc 路径,AI 在阶段 2 推荐前必读。
 
-**Latest**: [2026-05-16-spec-x-shipped-spec-y-kickoff.md](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) — **Spec X (M5 carryover Layer 2 changes-mode) full Phase A→D cycle complete** (archived `openspec/archive/2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode/`); **Spec Y (redo-mode + aux) A.1 + R1 + v2 fixes** on feature branch (R2 verify + Phase B+C+D pending); 3 new memory entries; M3 carryover trio pattern 2nd validation; 4-way SHA parity
-**Predecessor (M5 Layer 1 ship)**: [2026-05-15-us025-m5-c2-d1-done.md](./2026-05-15-us025-m5-c2-d1-done.md) — US-025 M5 Layer 1 SHIPPED (含 Spec X 2026-05-16 addendum)
-**Predecessor (deploy playbook)**: [2026-05-15-m5-deploy-playbook.md](./2026-05-15-m5-deploy-playbook.md) — owner T-deploy 7-step playbook (still pending owner action)
-**Predecessor (Phase 6 pre-merge)**: [2026-05-15-us025-m5-phase-6-done.md](./2026-05-15-us025-m5-phase-6-done.md) — Phase 6 SHIP READY
-**Predecessor (H0 same day)**: [2026-05-15-h0-cycle-done.md](./2026-05-15-h0-cycle-done.md) — H0 aria-ten-step-session-handoff-stage (Rule #9 + v1.21.0)
-**Predecessor (M5 Phase 1)**: [2026-05-14-us025-m5-phase-1-done.md](./2026-05-14-us025-m5-phase-1-done.md)
-**Predecessor (M5 Phase A)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md)
+**Latest**: [2026-05-19-spec-y-h1-h2-t2-closed.md](./2026-05-19-spec-y-h1-h2-t2-closed.md) — **H1+H2 prod fixes RESOLVED + Spec Y T2 main flow CLOSED (T2.4+T2.5+T2.6+T2.7+T2.8+T2.9)**: extension.py tuple-vs-list bug fixed with real-validator regression test (pre-fix S0_IDLE → post-fix S2_DECIDE strong signal) + `linked_spec_id` regex pre-archive amend accepts `aria-2.0-*` real change IDs + redo.sh full main body (fresh-checkout from base.ref + 3-section prompt + claude -p + regular push + Forgejo POST new PR + result.json with `new_pr_id+parent_pr_id`); 826 Python + 26 bash / 0 regression; 6-way SHA parity (Aria main `a7042a2` + aria-orch `1d4a1a6`); 1 new memory entry; **🔴 1 NEW production blocker — Finding #4 git push auth** (changes.sh + redo.sh use bare clone_url with no creds; initial.sh uses URL rewrite pattern; must paired-fix before T-deploy or all pushes hard-fail); Spec Y Phase B 12/17 done = 71%, T3-T8 ~12h remain
+**Predecessor (Spec Y T-pre + T0 + T1.0 + T1 + T2.1 + T2.2 + T2.3, evening of 2026-05-17)**: [2026-05-17-evening-spec-y-phase-b-core-5-tasks.md](./2026-05-17-evening-spec-y-phase-b-core-5-tasks.md) — Phase B core 5-task batch shipped + Aria #111 reply + 3 new memory entries + 3 surfaced findings 待 owner (now: #1 H1 RESOLVED this session, #2 stale marker folded to T7, #3 H2 RESOLVED this session)
+**Predecessor (Spec Y Approved + Phase B kickoff, 2026-05-17 morning)**: [2026-05-17-spec-y-approved-phase-b-kickoff.md](./2026-05-17-spec-y-approved-phase-b-kickoff.md) — Spec Y R2 verify → v3 propagation → R3 PASS → Status=Approved + T-pre + T0
+**Predecessor (Spec X complete + Spec Y kickoff)**: [2026-05-16-spec-x-shipped-spec-y-kickoff.md](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) — Spec X archived + Spec Y A.1 + R1 + v2 fixes
+**Predecessor (M5 Layer 1 ship)**: [2026-05-15-us025-m5-c2-d1-done.md](./2026-05-15-us025-m5-c2-d1-done.md) — US-025 M5 Layer 1 SHIPPED via Phase C.2 + Phase D.1
+**Predecessor (deploy playbook)**: [2026-05-15-m5-deploy-playbook.md](./2026-05-15-m5-deploy-playbook.md) — 7-step owner-runnable T-deploy playbook
+**Predecessor (Phase 6 pre-merge)**: [2026-05-15-us025-m5-phase-6-done.md](./2026-05-15-us025-m5-phase-6-done.md) — Phase 6 SHIP READY (before C.2 merge)
+**Predecessor (H0 same day)**: [2026-05-15-h0-cycle-done.md](./2026-05-15-h0-cycle-done.md) — H0 aria-ten-step-session-handoff-stage 完整闭环 (Rule #9 + v1.21.0) — ✅ FULLY CLOSED 2026-05-19 per master `9e66adb` (H1/H3/H4/H5 全闭, v1.21.3 ship)
+**Predecessor (M5 Phase 1)**: [2026-05-14-us025-m5-phase-1-done.md](./2026-05-14-us025-m5-phase-1-done.md) — Schema + audit log infra
+**Predecessor (M5 Phase A)**: [2026-05-13-us025-m5-phase-a-b1-done.md](./2026-05-13-us025-m5-phase-a-b1-done.md) — Spec Approved + B.1 branches
 
-**Created**: 2026-05-16 EOD (Spec X complete + Spec Y kickoff closeout)
-**Cycle**: US-025 M5 Layer 1 SHIPPED — full Phase 1-6 + C.2 + D.1 in single coherent cycle (~35.5h actual vs 156h baseline ×0.23); 793 PASS + 6 SKIP; 11/11 AD-M5 Decided; D.2 owner-gated
+**Created**: 2026-05-19 early UTC (Spec Y H1+H2 prod fixes + T2 main flow CLOSED)
+**Cycle**: Follow-up to 2026-05-17 evening session — shipped H1 (extension.py tuple-vs-list bug fix + real-validator regression) + H2 (linked_spec_id regex `^[a-z0-9.-]+$` pre-archive amend) + T2.4+T2.5 (fresh-checkout + 3-section prompt) + T2.6-T2.9 (claude / push / PR create / result.json); 7 commits across 2 repos; 826 Python + 26 bash / 0 regression; **1 NEW production blocker (Finding #4 git push auth) — must fix before T-deploy**; Spec Y Phase B 12/17 done = 71%, T3-T8 (~12h AI-runnable) + 5 owner-gated items pending
 
 ---
 
@@ -22,7 +25,10 @@
 
 | Date | Session | Status |
 |------|---------|--------|
-| [2026-05-16 Spec X complete + Spec Y kickoff](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) | Spec X full A→D cycle + Spec Y A.1+R1+v2 fixes + 3 new memory entries | **Active (Latest)** |
+| [2026-05-19 Spec Y H1+H2 + T2 CLOSED](./2026-05-19-spec-y-h1-h2-t2-closed.md) | H1+H2 prod fixes RESOLVED + T2 main flow CLOSED + 7 commits + 1 NEW Finding #4 git auth blocker | **Active (Latest)** |
+| [2026-05-17 evening Spec Y Phase B 5-task batch](./2026-05-17-evening-spec-y-phase-b-core-5-tasks.md) | Spec Y Phase B T1.0+T1+T2.1+T2.2+T2.3 shipped + Aria #111 reply + 3 new memory entries + 3 surfaced findings (#1+#3 RESOLVED 2026-05-19, #2 folded to T7) | Active (predecessor) |
+| [2026-05-17 Spec Y Approved + Phase B kickoff](./2026-05-17-spec-y-approved-phase-b-kickoff.md) | Spec Y R2+R3 → Approved + Phase B T-pre+T0 shipped + 4 new memory entries + US-025 sync | Active (predecessor) |
+| [2026-05-16 Spec X complete + Spec Y kickoff](./2026-05-16-spec-x-shipped-spec-y-kickoff.md) | Spec X full A→D cycle archived + Spec Y A.1+R1+v2 fixes + 3 new memory entries | Active (predecessor) |
 | [2026-05-15 C.2+D.1](./2026-05-15-us025-m5-c2-d1-done.md) | US-025 M5 Layer 1 SHIPPED + Phase D.1 done + 3 new memory entries | Active (predecessor; M5 Layer 1) |
 | [2026-05-15 deploy](./2026-05-15-m5-deploy-playbook.md) | Owner-runnable T-deploy playbook (7 steps + rollback) | Active (companion) |
 | [2026-05-15 Phase 6](./2026-05-15-us025-m5-phase-6-done.md) | M5 Phase 6 SHIP READY (pre-merge state) | superseded by C.2+D.1 |
