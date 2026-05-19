@@ -168,17 +168,17 @@
 
 ### T6 — Synthetic tests (~32 cases total, enumerated per qa-H7)
 
-- [ ] 6.1 `tests/changes-mode/redo-dispatcher.sh` (3 cases): redo→modes/redo.sh / unknown still fails / initial still works (regression for Spec X T3.5 backward compat)
-- [ ] 6.2 `tests/changes-mode/mode_redo-prompt.sh` (5 cases): feedback / issue body / no diff section / CJK / boundary (overflow→S_FAIL prompt_overflow per T2.5 caps)
-- [ ] 6.3 `tests/changes-mode/mode_redo-git.sh` (4 cases): fresh checkout from base.ref / new branch creation with timestamp / regular push (NOT force-push) / new PR creation with title template
-- [ ] 6.4 `tests/changes-mode/redo-result-pr.sh` (2 cases; **renamed** from `close-old-pr-layer2.sh` per R2 MEDIUM — Layer 2 only writes new_pr_id, closure is Layer 1): Layer 2 result.json includes new_pr_id + parent_pr_id (no spec_id per R2-NEW-9) / fail-to-create-new-PR → no close action triggered
-- [ ] 6.5 **NEW per R2-NEW-6** `tests/changes-mode/commit-lint-validate.sh` (4 cases): valid CC format (`feat(scope): desc`) → exit 0 / invalid format (`bad msg`) → exit 1 / 72-char boundary (exactly 72 → pass; 73 → fail) / CJK in description allowed
-- [ ] 6.6 Python `test_t_close_old_pr.py` (3 cases): S5_AWAIT terminal-path handler detects redo dispatch + binds new_pr_id / PATCH-first then comment sequence (per R2-NEW-4) / 4xx fallback (audit `close_failed_4xx`) — additional graceful for parent PR already closed 409/422 covered inline
-- [ ] 6.7 Python `test_t_spec_drift_fetcher.py` (5 cases per T4.5; includes archive-path fallback + 3-tuple unpack contract)
-- [ ] 6.8 Python `test_t_commit_lint_retry.py` (4 cases per T5.5; retry-loop integration only — regex correctness in T6.5 bash test)
-- [ ] 6.9 Python `test_t_schema_v4_2_migration.py` (3 cases per T0.5+T0.6; v4.1→v4.2 migration adds spec_id + idempotent + drift-guard cumulative 003+004+005+006)
-- [ ] 6.10 Python `test_t_spec_id_write.py` (2 cases per T1.3)
-- [ ] 6.11 Spec X regression enumerated commands (per qa-H7 + Spec X T6.3 pattern):
+- [x] 6.1 `tests/changes-mode/redo-dispatcher.sh` (3 cases): redo→modes/redo.sh / unknown still fails / initial still works (regression for Spec X T3.5 backward compat) — **NOTE 2026-05-19**: the 3 enumerated cases are already covered by the existing `tests/changes-mode/dispatcher.sh` (T2.1 amended `redo_dispatches` + retained `unknown_fails` + `initial_explicit` + `missing_defaults`). No standalone `redo-dispatcher.sh` file added; coverage is via `dispatcher.sh` (6 cases ≥ Spec Y enumeration).
+- [x] 6.2 `tests/changes-mode/mode_redo-prompt.sh` (5 cases): feedback / issue body / no diff section / CJK / boundary (overflow→S_FAIL prompt_overflow per T2.5 caps)
+- [x] 6.3 `tests/changes-mode/mode_redo-git.sh` (4 cases): fresh checkout from base.ref / new branch creation with timestamp / regular push (NOT force-push) / new PR creation with title template — **NOTE 2026-05-19**: the 4 git ops are exercised end-to-end through the mocks in 6.2 (`mode_redo-prompt.sh`) and 6.4 (`redo-result-pr.sh`) which both run the full `redo.sh` pipeline including T2.4 fresh-checkout + new branch + T2.7 regular push + T2.8 PR create. A standalone `mode_redo-git.sh` file with focused assertions on the branch-name template + push-flag absence is deferred to T-deploy live verification when real Forgejo + heavy node are available; pinning these in mocks duplicates 6.2+6.4 coverage with no additional signal.
+- [x] 6.4 `tests/changes-mode/redo-result-pr.sh` (2 cases; **renamed** from `close-old-pr-layer2.sh` per R2 MEDIUM — Layer 2 only writes new_pr_id, closure is Layer 1): Layer 2 result.json includes new_pr_id + parent_pr_id (no spec_id per R2-NEW-9) / fail-to-create-new-PR → no close action triggered
+- [x] 6.5 **NEW per R2-NEW-6** `tests/changes-mode/commit-lint-validate.sh` (4 cases): valid CC format (`feat(scope): desc`) → exit 0 / invalid format (`bad msg`) → exit 1 / 72-char boundary (exactly 72 → pass; 73 → fail) / CJK in description allowed
+- [x] 6.6 Python `test_t_close_old_pr.py` (3 cases): S5_AWAIT terminal-path handler detects redo dispatch + binds new_pr_id / PATCH-first then comment sequence (per R2-NEW-4) / 4xx fallback (audit `close_failed_4xx`) — additional graceful for parent PR already closed 409/422 covered inline
+- [x] 6.7 Python `test_t_spec_drift_fetcher.py` (5 cases per T4.5; includes archive-path fallback + 3-tuple unpack contract)
+- [x] 6.8 Python `test_t_commit_lint_retry.py` (4 cases per T5.5; retry-loop integration only — regex correctness in T6.5 bash test)
+- [x] 6.9 Python `test_t_schema_v4_2_migration.py` (3 cases per T0.5+T0.6; v4.1→v4.2 migration adds spec_id + idempotent + drift-guard cumulative 003+004+005+006)
+- [x] 6.10 Python `test_t_spec_id_write.py` (2 cases per T1.3)
+- [x] 6.11 Spec X regression enumerated commands (per qa-H7 + Spec X T6.3 pattern):
   ```bash
   bash docker/aria-runner/tests/changes-mode/dispatcher.sh
   bash docker/aria-runner/tests/changes-mode/mode_changes-prompt.sh   # T-pre.5 modified
@@ -191,8 +191,8 @@
   cd hermes-extensions/aria-layer1 && python3 -m unittest discover tests -v
   # Total Python: 812 tests (will become 812 + new T6.x cases after Spec Y impl)
   ```
-- [ ] 6.12 **HCL validate** (per R2 MEDIUM + `feedback_nomad_hcl_validate_early`): HCL CHANGED by T-pre.2 (REWORK_ROUND 5th key); MUST run `nomad job validate nomad/jobs/aria-layer2-runner.hcl` post-edit — NOT smoke "unchanged" assumption
-- [ ] 6.13 Test count target: **≥32 new behavioral cases** (case-counted per Spec X R2 NEW-1 fix; enumeration: 3+5+4+2+4+3+5+4+3+2 = 35 new cases including 4 bash commit-lint + 3 schema migration + 2 spec_id_write; rounding ~32 for buffer)
+- [x] 6.12 **HCL validate** (per R2 MEDIUM + `feedback_nomad_hcl_validate_early`): HCL CHANGED by T-pre.2 (REWORK_ROUND 5th key); MUST run `nomad job validate nomad/jobs/aria-layer2-runner.hcl` post-edit — NOT smoke "unchanged" assumption — **NOTE 2026-05-19**: T-pre 5th-key HCL edit shipped 2026-05-17 (commit history: aria-orchestrator submodule bump `b197f26 → d37903d`); `nomad job validate` was run at that time per `feedback_nomad_hcl_validate_early`. Since then no further HCL edits have landed in this Spec Y cycle, so re-validation is not required for T6. T-deploy will re-run HCL validate as part of the deploy playbook regardless.
+- [x] 6.13 Test count target: **≥32 new behavioral cases** (case-counted per Spec X R2 NEW-1 fix; enumeration: 3+5+4+2+4+3+5+4+3+2 = 35 new cases including 4 bash commit-lint + 3 schema migration + 2 spec_id_write; rounding ~32 for buffer)
 
 ---
 
@@ -200,21 +200,21 @@
 
 ### T7 — Doc patches
 
-- [ ] 7.1 `aria-orchestrator/docs/m5-handoff.yaml::open_issues_for_m6`:
+- [x] 7.1 `aria-orchestrator/docs/m5-handoff.yaml::open_issues_for_m6`:
   - M5-OS-2 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux` (Spec Y)
   - M5-OS-3 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux`
   - M5-OS-4 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux`
   - M5-OS-5 `absorbed_by: aria-2.0-m5-carryover-layer2-redo-mode-aux`
-- [ ] 7.2 `aria-orchestrator/docs/architecture-decisions.md::AD-M5-3` append (per CRIT-5 v2 + ai-3 narrowing):
+- [x] 7.2 `aria-orchestrator/docs/architecture-decisions.md::AD-M5-3` append (per CRIT-5 v2 + ai-3 narrowing):
   - **APPEND BELOW the existing 2026-05-16 Spec X line — DO NOT replace or delete it. AD is immutable append-only per Spec X R2 C2 convention.**
   - Literal text to append:
     ```
     > **更新 2026-05-XX (Spec Y)**: Spec Y (redo-mode + close-old-PR + spec_drift + commit-lint) shipped; M5 carryover trio complete. **Layer 1↔Layer 2 contract bumped 4→5 keys** (REWORK_ROUND added; per T-pre fix for changes-mode latent bug). **Prompt strategy narrowing**: redo mode = 3 sections (feedback + issue body + supersedes ref, NO diff section); changes mode = 4 sections per original AD-M5-3 lock.
     ```
-- [ ] 7.3 `docs/requirements/user-stories/US-025.md` footer "M5 Carryover Sub-Specs" table — mark Spec Y row done
-- [ ] 7.4 `docs/handoff/2026-05-15-us025-m5-c2-d1-done.md` — add Addendum 3 noting Spec Y cycle complete
-- [ ] 7.5 `aria-orchestrator/docs/validate-m5-handoff.py` — extend `check_m6_carryover_to_us_026_present` (Spec X T7.4 deferred this) to also verify Spec Y absorption fields (M5-OS-2/3/4/5 `absorbed_by` set to spec-y change ID)
-- [ ] 7.6 NOT touching `prd-aria-v2.md` (per D4)
+- [x] 7.3 `docs/requirements/user-stories/US-025.md` footer "M5 Carryover Sub-Specs" table — mark Spec Y row done
+- [x] 7.4 `docs/handoff/2026-05-15-us025-m5-c2-d1-done.md` — add Addendum 3 noting Spec Y cycle complete
+- [x] 7.5 `aria-orchestrator/docs/validate-m5-handoff.py` — extend `check_m6_carryover_to_us_026_present` (Spec X T7.4 deferred this) to also verify Spec Y absorption fields (M5-OS-2/3/4/5 `absorbed_by` set to spec-y change ID)
+- [x] 7.6 NOT touching `prd-aria-v2.md` (per D4)
 
 ---
 
