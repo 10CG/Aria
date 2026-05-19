@@ -1,0 +1,180 @@
+{
+  "with_skill": {
+    "n": 4,
+    "agg": {
+      "D1_json_output": 4,
+      "D2_comment_md": 4,
+      "D3_schema_conformance": 0,
+      "D4_canonical_enums": 4,
+      "D5_multi_artifact": 4,
+      "script_produced": 4
+    },
+    "details": {
+      "eval-1": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "verdict: 'already-fixed' is not one of ['confirmed', 'partial-repro', 'not-reproducible', 'fixed-in-X', 'duplicate-of-#N', 'needs",
+        "D4_values": {
+          "verdict": "already-fixed",
+          "severity": "minor",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-2": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "repro.cases.0: 'case_id' is a required property",
+        "D4_values": {
+          "verdict": "fixed-in-X",
+          "severity": "minor",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-3": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']",
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "medium",
+          "recommended_action": "open-spec"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-4": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "verdict: 'enhancement' is not one of ['confirmed', 'partial-repro', 'not-reproducible', 'fixed-in-X', 'duplicate-of-#N', 'needs-i",
+        "D4_values": {
+          "verdict": "enhancement",
+          "severity": "medium",
+          "recommended_action": "schedule"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      }
+    }
+  },
+  "old_skill": {
+    "n": 4,
+    "agg": {
+      "D1_json_output": 4,
+      "D2_comment_md": 4,
+      "D3_schema_conformance": 0,
+      "D4_canonical_enums": 3,
+      "D5_multi_artifact": 4,
+      "script_produced": 4
+    },
+    "details": {
+      "eval-1": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "verdict: 'fixed-in-1.20.0' is not one of ['confirmed', 'partial-repro', 'not-reproducible', 'fixed-in-X', 'duplicate-of-#N', 'nee",
+        "D4_values": {
+          "verdict": "fixed-in-1.20.0",
+          "severity": "n/a",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": false,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-2": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "verdict: 'fixed' is not one of ['confirmed', 'partial-repro', 'not-reproducible', 'fixed-in-X', 'duplicate-of-#N', 'needs-info', ",
+        "D4_values": {
+          "verdict": "fixed",
+          "severity": "medium",
+          "recommended_action": "no-new-cycle"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-3": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']",
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "medium",
+          "recommended_action": "open-cycle"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-4": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']",
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "medium",
+          "recommended_action": "schedule"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      }
+    }
+  }
+}

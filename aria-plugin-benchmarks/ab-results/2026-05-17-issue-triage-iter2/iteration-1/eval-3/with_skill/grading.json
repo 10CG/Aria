@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "D1 json output",
+      "passed": true,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    },
+    {
+      "text": "D2 comment md",
+      "passed": true,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    },
+    {
+      "text": "D3 schema conformance",
+      "passed": false,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    },
+    {
+      "text": "D4 canonical enums",
+      "passed": true,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    },
+    {
+      "text": "D5 multi artifact",
+      "passed": true,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    },
+    {
+      "text": "script produced",
+      "passed": true,
+      "evidence": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']"
+    }
+  ]
+}

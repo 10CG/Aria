@@ -1,0 +1,113 @@
+{
+  "benchmark": "H0 handoff collector — structural (Rule #6 deterministic)",
+  "date": "2026-05-17",
+  "collector_under_test": "aria/skills/state-scanner/scripts/collectors/handoff.py (post-H5, pointer-priority)",
+  "aria_plugin_version": "v1.21.3",
+  "total": 14,
+  "passed": 14,
+  "pass_rate": 1.0,
+  "metric_groups": {
+    "M1": {
+      "passed": 2,
+      "total": 2,
+      "label": "mtime-sort accuracy"
+    },
+    "M2": {
+      "passed": 2,
+      "total": 2,
+      "label": "pointer-priority"
+    },
+    "M3": {
+      "passed": 2,
+      "total": 2,
+      "label": "misplaced precision (no FP)"
+    },
+    "M4": {
+      "passed": 2,
+      "total": 2,
+      "label": "misplaced recall (no miss)"
+    },
+    "M5": {
+      "passed": 2,
+      "total": 2,
+      "label": "latest.md exclusion"
+    },
+    "M6": {
+      "passed": 4,
+      "total": 4,
+      "label": "fallback/edge robustness"
+    }
+  },
+  "cases": [
+    {
+      "case": "M1.a mtime-sort newest picked (no pointer, 5 files)",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M1.b mtime-sort single file",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M2.a pointer wins over newer-mtime predecessor",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M2.b pointer with bare filename (no ./)",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M3.a misplaced precision — clean docs/handoff only, no FP",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M3.b misplaced precision — non-.md in .aria/handoff not flagged",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M4.a misplaced recall — all 3 .aria/handoff/*.md detected, sorted",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M4.b misplaced recall — drift state (both dirs populated)",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M5.a latest.md never a candidate (only latest.md → exists false)",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M5.b latest.md in .aria/handoff NOT flagged misplaced",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M6.a stale pointer (target absent) → mtime fallback + soft_error",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M6.b no pointer file at all → mtime fallback, no error",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M6.c empty docs/handoff → exists false, all null, no crash",
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "M6.d docs/handoff absent entirely → graceful",
+      "passed": true,
+      "error": null
+    }
+  ]
+}

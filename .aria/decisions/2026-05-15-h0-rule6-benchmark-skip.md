@@ -47,11 +47,20 @@ T8.2 `/skill-creator` benchmark **skipped** per owner direction.
 - Surfaced in closeout handoff §3 (known deviation, next-session aware)
 - If future H-series cycle adds a **capability-type** Skill change (LLM-driven), Rule #6 `/skill-creator` benchmark is NOT waivable — this skip is scoped to deterministic collector/structural changes only
 
-## Follow-up (optional, non-blocking)
+## Follow-up — ✅ RESOLVED 2026-05-17 (H4)
 
-If methodology team wants strict Rule #6 closure for H0 retroactively:
-- Run structural metric benchmark (mtime sort accuracy on fixture set + misplaced detection precision/recall) per the redefined T8.2 in archived tasks.md, store in `aria-plugin-benchmarks/ab-results/2026-05-XX-h0-handoff-stage/`
-- Tracked as carry-forward H4 in handoff (low priority)
+Structural Rule #6 closure executed retroactively:
+- `aria-plugin-benchmarks/ab-results/2026-05-17-h0-handoff-structural/` —
+  14/14 PASS (pass_rate 1.0) across 6 metric groups: mtime-sort accuracy,
+  pointer-priority, misplaced precision (no FP), misplaced recall (no miss),
+  latest.md exclusion, fallback/edge robustness. Covers post-H5
+  pointer-priority + stale-pointer fallback.
+- No defect found → no code change / version bump (validation activity).
+- The owner-directed T8.2 skip is now **positively closed** with a
+  deterministic structural result, not just a deferral rationale. This
+  decision memo remains the record of the original skip + its scope
+  (deterministic-only; capability-type still non-waivable — proven in H3
+  iteration-3 which DID run a full capability AB).
 
 ## References
 

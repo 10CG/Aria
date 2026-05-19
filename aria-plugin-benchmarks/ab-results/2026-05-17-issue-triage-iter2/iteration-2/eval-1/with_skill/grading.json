@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "D1 json output",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    },
+    {
+      "text": "D2 comment md",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    },
+    {
+      "text": "D3 schema conformance",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    },
+    {
+      "text": "D4 canonical enums",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    },
+    {
+      "text": "D5 multi artifact",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    },
+    {
+      "text": "script produced",
+      "passed": true,
+      "evidence": "{'verdict': 'fixed-in-X', 'severity': 'major', 'recommended_action': 'close'}"
+    }
+  ]
+}

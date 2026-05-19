@@ -1,0 +1,179 @@
+{
+  "with_skill": {
+    "n": 4,
+    "agg": {
+      "D1_json_output": 4,
+      "D2_comment_md": 4,
+      "D3_schema_conformance": 4,
+      "D4_canonical_enums": 4,
+      "D5_multi_artifact": 4,
+      "script_produced": 4
+    },
+    "details": {
+      "eval-1": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": true,
+        "D3_error": null,
+        "D4_values": {
+          "verdict": "fixed-in-X",
+          "severity": "major",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-2": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": true,
+        "D3_error": null,
+        "D4_values": {
+          "verdict": "fixed-in-X",
+          "severity": "major",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-3": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": true,
+        "D3_error": null,
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "minor",
+          "recommended_action": "next-cycle"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-4": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": true,
+        "D3_error": null,
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "major",
+          "recommended_action": "next-cycle"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      }
+    }
+  },
+  "old_skill": {
+    "n": 4,
+    "agg": {
+      "D1_json_output": 4,
+      "D2_comment_md": 4,
+      "D3_schema_conformance": 1,
+      "D4_canonical_enums": 1,
+      "D5_multi_artifact": 4,
+      "script_produced": 4
+    },
+    "details": {
+      "eval-1": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "verdict: 'fixed-in-v1.20.0' is not one of ['confirmed', 'partial-repro', 'not-reproducible', 'fixed-in-X', 'duplicate-of-#N', 'ne",
+        "D4_values": {
+          "verdict": "fixed-in-v1.20.0",
+          "severity": "minor",
+          "recommended_action": "close"
+        },
+        "D4_canonical_enums": false,
+        "D5_multi_artifact": true,
+        "_files": [
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-2": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "severity: 'medium' is not one of ['critical', 'major', 'minor', 'trivial']",
+        "D4_values": {
+          "verdict": "needs-info",
+          "severity": "medium",
+          "recommended_action": "no-new-cycle-awaiting-user-decision"
+        },
+        "D4_canonical_enums": false,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-3": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": false,
+        "D3_error": "severity: 'moderate' is not one of ['critical', 'major', 'minor', 'trivial']",
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "moderate",
+          "recommended_action": "open-openspec-cycle"
+        },
+        "D4_canonical_enums": false,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      },
+      "eval-4": {
+        "D1_json_output": true,
+        "D2_comment_md": true,
+        "D3_schema_conformance": true,
+        "D3_error": null,
+        "D4_values": {
+          "verdict": "confirmed",
+          "severity": "minor",
+          "recommended_action": "next-cycle"
+        },
+        "D4_canonical_enums": true,
+        "D5_multi_artifact": true,
+        "_files": [
+          "run-notes.md",
+          "triage-comment.md",
+          "triage-report.json"
+        ],
+        "script_produced": true
+      }
+    }
+  }
+}

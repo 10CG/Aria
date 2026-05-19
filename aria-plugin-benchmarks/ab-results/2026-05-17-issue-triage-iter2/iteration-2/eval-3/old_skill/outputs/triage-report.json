@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.21.2",
+  "issue_ref": "10CG/Aria#89",
+  "generated_at": "2026-05-17T21:21:19Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 89,
+      "title": "state-scanner: surface in-flight (mid-implementation) carry-forward items, not just ship-time consolidation",
+      "body": "## 现象\n\n长周期 OpenSpec change (本提案场景: TH v0.3.2 chat MVP, 8 个 dev session 累积) 在实施过程中会累积 carry-forward 决策 (本批不修, 留下次), 主流程当前是把这些项**内联标注**进 `openspec/changes/<change>/tasks.md` 的 task 注释里 (e.g. `[code-ready: ... carry-forward: X]`)。\n\n这些项**只在 ship 时**汇总到 `project_v<X>_carry_forward.md` memory 文件 (历史 v0.2.1 / v0.2.2 / v0.3.0 / v0.3.1 都是此 pattern)。\n\n## 问题\n\n**implementation 期间 (mid-flight, 未 ship)**, state-scanner 不主动识别这些 carry-forward 注释:\n\n- `tasks.md` 内联 `carry-forward` 标记不在 state-scanner 任何 phase 输出里\n- session memory 文件虽然 MEMORY.md 索引能加载但 carry-forward 项目埋在长 markdown body 里, 不被 surface\n- 在多 session 接手场景 (e.g. 4 天后下个 dev session, 另一个 AI 实例 / 用户), 接手者看不到这些累积的\"待处理\"项, 除非主动 grep 或回忆\n\n实际后果: 真实 case (TH v0.3.2) 8 个 session 累积 ≥ 7 项 carry-forward (含 race condition / 用户体验 bug / 架构 gap), 全部内联 tasks.md, **state-scanner 报告里完全不可见**。直到用户主动问\"这些是不是会被遗忘?\"才暴露问题。\n\n## 预期\n\nstate-scanner 应该有机制 surface in-flight carry-forward, 不光在 ship 时聚合:\n\n- 选项 A: 新 Phase 1.X \"Active openspec carry-forward scan\" — grep active `openspec/changes/*/tasks.md` 内联 `carry-forward` 标记, 输出条数 + 前 N 项 brief\n- 选项 B: 通用化 — 检测任意 `TODO/FIXME/carry-forward` 标注 count from active spec dirs\n- 选项 C: 约定 — 维护 `openspec/changes/<change>/_carry_forward.md` running file, scanner 发现并 surface\n- 选项 D: 项目级 `.aria/state-checks.yaml` 推荐配置加 carry-forward grep check (本质把 surface 责任下放 user 自配)\n\n## 实例上下文 (供参考)\n\n- 项目: TH v0.3.2 chat MVP (Path C, FastAPI Feishu webhook)\n- session 数: 8 (持续 ~13 天 cycle)\n- carry-forward 累积 ≥ 7 项, 含 race condition (write_raw_file in git_lock 范围错位致 burst 期间同文件多 commit), users_cache scope 重批待办, channel_type 启发式 bug, events_received.jsonl 缺失, dispatch-layer workspace 持久化 gap (跨 /accept /judge /reflect), CF tunnel 临时 → stable URL 切换, 18:22 老 commit retroactive 缺 trailer\n- 全部内联 `openspec/changes/v0-3-2-chat-mvp/tasks.md`, 无 memory 集中索引\n- 第 8 session 末用户问\"是不是会被遗忘?\"才意识到 surface gap\n",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/89",
+      "created_at": "2026-05-08T23:27:37Z",
+      "updated_at": "2026-05-08T23:27:37Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "0.3.2",
+      "current": "1.21.2",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "openspec/changes/<change>/tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "project_v<X>_carry_forward.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "openspec/changes/*/tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "openspec/changes/<change>/_carry_forward.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".aria/state-checks.yaml",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: version: \"1\"\n2: \n3: # 项目级自定义健康检查 — 由 state-scanner Phase 1.11 串行执行\n4: # 设计目的: 对 state-scanner 各可选/opt-in 阶段做\"是否真的跑了\"的反向验证,\n5: # 防止 AI 在执行时跳过某个阶段 (如 Phase 1.13 Issue 感知) 却没人发现。",
+          "warning": null,
+          "total_lines": 74
+        },
+        {
+          "file_path": "openspec/changes/v0-3-2-chat-mvp/tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "91370db6331c52c8e2fc292b0f59d2f5e961a247"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "skip",
+    "cases": [
+      {
+        "input": "Run scan.py against a project with inline [carry-forward: ...] annotations in openspec/changes/*/tasks.md",
+        "expected": "state-scanner surfaces in-flight carry-forward count + brief in some phase",
+        "actual": "scan.py has zero carry-forward handling (grep confirms no carry-forward/carry_forward token in scripts/scan.py); only SKILL.md/schema mention it tangentially. Gap verified by static inspection, not runtime repro (feature request).",
+        "match": false,
+        "notes": "feature request / enhancement gap, not a runtime-reproducible defect; verified via source inspection"
+      }
+    ],
+    "hit_count": 0,
+    "total_count": 1,
+    "hit_rate": "0/1"
+  },
+  "verdict": "confirmed",
+  "severity": "moderate",
+  "recommended_action": "open-openspec-cycle",
+  "deviation_note": null,
+  "errors": [],
+  "triage_notes": "Issue #90 (state-scanner: surface in-progress openspec/changes/*/tasks.md inline carry-forward annotations) is a near-identical duplicate filed one issue later, same TH v0.3.2 case. Recommend deduping: keep #89 as canonical (earlier, broader framing), close #90 as duplicate or merge scope. reported version 0.3.2 is the TH example project context, NOT Aria; version gap field is not meaningful for this Aria-internal feature request."
+}
