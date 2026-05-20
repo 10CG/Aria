@@ -78,6 +78,8 @@ multi-terminal-coordination Spec 已 archive,30/30 atomic 全 ship,5 audits 全 
 | O3 | **P3 cleanup hygiene patch**(~9 minor items) | dead `timedelta` import / `_TERMINAL_STATUSES` 双定义 cross-ref / `verdict_reason` typed enum / `lib/__init__.py` 双上下文 import 提取 / docstring stale 句 / lazy imports promote / etc. | ~1h 一次性 | P2 closeout § "Cleanup follow-up" |
 | O4 | **`gc.archive_done_claims` 实际 git write 路径** | 当前 log WARNING + 返回 metadata;实际归档需 git mv plumbing(自然由 GC 调度器 owner 触发时实施) | ~2h | TASK-018 docstring + Round 8 code-reviewer Finding #1 |
 | O5 | **`heartbeat` 周期调度器集成** | API ship(`claim_lifecycle.heartbeat`);周期 push(10 min)需 phase-b-developer mid-cycle 或 cron 触发 — 由 caller / scheduler 集成 | ~1h | TASK-018 / Round 8 tech-lead Finding |
+| O6 | **aria/README.md 版本行不一致** | aria/README.md 显示 `Version: 1.21.4`,但 master 已是 v1.22.1。SoT bump 漏了 README 一行;v1.22.0 release commit + v1.22.1 hotfix 都未触碰它 | 5 min(一行 fix + 小 PR)| 本 session end-of-session check 实测发现 |
+| O7 | **skill 模板 `git worktree add .git/worktrees/{name}` gitdir-worktree collision** | aria-plugin branch-manager skill 模板默认建 worktree 在 `.git/worktrees/{name}` → gitdir 与 worktree-root 重合,HEAD/index/logs 等内部文件 leak 到工作树根 untracked。本 session 靠"显式 `git add <path>`" 避险;长期 fix 改用 repo-root-level `worktrees/{name}/`(per TASK-024 `WORKTREE_ROOT_DIRNAME` 已定义) | ~30min(改 skill 模板)| 本 session worktree 创建实测发现 |
 
 ### 与本 session 并行进行的**其它 track 状态**(per 另一终端 handoff)
 
@@ -223,20 +225,17 @@ git branch -d feature/multi-terminal-coordination  # 本地
 
 ## §8 Memory entries this session
 
-### Confirmed (本 session 实际写入):
+### Confirmed (本 session 实际写入 — 5 条全 indexed)
 
 | File | Type | Theme |
 |------|------|-------|
-| `feedback_concurrency_advisory_over_hardlock.md` | feedback | 并发协调既定哲学(advisory + 最终一致 + 可见可对账;"多终端"含跨容器;纯 git 不绑平台 - DEC-20260519-001) |
+| `feedback_concurrency_advisory_over_hardlock.md` | feedback | 并发协调既定哲学(advisory + 最终一致 + 可见可对账;"多终端"含跨容器;纯 git 不绑平台 — DEC-20260519-001) |
+| `feedback_meta_dogfood_solution_validates_self_mid_ship.md` | feedback | 反 race / coordination spec ship 中撞到自己要解决的问题 = 极致 dogfood,纳入交付物;multi-terminal-coordination 6 race events + 3 production bugs(v1.22.1 hotfix)零日实证 |
+| `feedback_git_stash_pop_race_recovery_hazard.md` | feedback | race recovery `stash + rebase + pop` 有 conflict marker 误 commit 风险;pop 后必须 grep verify;推荐 `pull --rebase --autostash`(race #5 撞 → race #6 立即得证) |
+| `feedback_pgrep_self_match_polling_deadlock.md` | feedback | `until ! pgrep -f 'PATTERN'` polling 时 PATTERN 在 shell 自身命令行 → 自匹配死循环;改用 `pgrep -x BINARY` 或 `pgrep -f \| grep -v "^$$"`(本 session 2 bg shell 实证) |
+| `feedback_yaml_auto_coerces_iso_dates_to_datetime.md` | feedback | PyYAML `safe_load` 把 ISO 8601 string 自动转 datetime;schema validator `isinstance(_, str)` 会误拒;coerce datetime→ISO string 再 type guard(v1.22.1 hotfix bug #1 实证) |
 
-### Candidate(本 handoff 写完后可选追加,基于本 session 教训):
-
-| Candidate slug | Type | Rationale |
-|---|------|-----------|
-| `feedback_meta_dogfood_solution_validates_self` | feedback | 本 session ship multi-terminal-coordination spec 期间撞到 3 次真实 race events — "the solution validates itself by being needed mid-ship";适用于将来设计反 race / coordination spec 的元 dogfood pattern |
-| `feedback_agent_team_22_round_orchestration` | feedback | 25+ agents in 22 orchestration rounds delivered 30 atomic tasks + 108 tests + 5 audits + 3 PRs — Aria methodology 可大规模 coherent execute;orchestration overhead vs direct work tradeoff |
-
-总计 indexed memory entries: ~133(P2 closeout 时报告)+ 本次 1 confirmed = **~134**;若追加 2 candidate 则 ~136。
+累计本 session 沉淀 **5 条 feedback**,均 indexed in `MEMORY.md`。所有候选条目都已确认转 confirmed,无未写候选。
 
 ---
 
