@@ -10,27 +10,27 @@
 
 ## 1. Layer H — Handoff frontmatter + 全分支重建看板 (P1 纯读零行为变更)
 
-- [ ] 1.1 在 `standards/conventions/session-handoff.md` 添加机读 frontmatter schema 段 (Rule #9 升级:字段定义 / 语义 / 示例 / 与现有 prose 段共存规则)
-- [ ] 1.2 升级 `aria/templates/session-handoff.md` 模板加 frontmatter 头
-- [ ] 1.3 state-scanner Phase 1 collector 扩展 `git fetch`(限定 refspec `refs/heads/*` + coordination ref,`--no-tags`,避免全量 tag 拖慢慢网络;**R1 v2**:本地 fetch 时间戳缓存,距上次 < 30s 跳过 → 看板标"缓存于 Xs 前")
-- [ ] 1.4 实现"扫所有 `origin/**` 的 `docs/handoff/` + 解析 frontmatter → 重建 track 列表"(**R1 v2**:解析失败时 — 无 frontmatter / schema 不全 — 标记为 `legacy` track 并按 mtime fallback,不阻塞看板;与 H5 v1.21.1 `feedback_handoff_mtime_vs_pointer_divergence` 协同)
-- [ ] 1.5 多 track 看板渲染(TRACK / OWNER/容器/会话 / PHASE / HANDOFF / LAST-PING / STATUS + 新鲜度颜色 + 折叠 done/abandoned 分区;**R1 v2**:LAST-PING 列源自 `Layer L claim.heartbeat_at`,PHASE 列源自 `Layer H frontmatter.phase`,缺则标 `—`)
-- [ ] 1.6 `docs/handoff/latest.md` 角色降级为派生产物(**R1 v2**:多 track 场景下 latest.md 不写真实指针,仅含 deprecation banner 指引读看板;单 track 场景仍写当前 track 指针以兼容老 session;L2 collector 读取语义权威**仍以 frontmatter 为准**,latest.md 仅 prose fallback)
-- [ ] 1.7 离线退化:fetch 失败时用缓存看板 + 顶部红条告警"看板可能陈旧"
-- [ ] 1.8 P1 单元 + 集成测试(**R1 v2** 具体 case:(a) 无 frontmatter 旧格式 handoff → graceful skip 不报错 / 标 legacy;(b) latest.md 多 track 时为 deprecation banner、单 track 时为指针;(c) 老 session `cat latest.md` 仍得可读 markdown;(d) 离线注入 → 顶部红条;(e) N=20+ 远程分支性能基线)
-- [ ] 1.9 **(R1 v2)** Rule #9 5 层 enforcement 兼容性同步:(a) **L1 hook** `handoff-location-guard.sh` 仅检查路径不检查内容 → 无需改动,文档化此判定;(b) **L2 collector** `scan.py` / `collectors/handoff.py` 增加 frontmatter-aware 解析能力(向后兼容无 frontmatter 旧 doc);(c) **L4 规约** 1.1 已覆盖;(d) **L5 D.3 template** 1.2 已覆盖 — 输出明确"5 层全覆盖" matrix 文档
+- [x] 1.1 在 `standards/conventions/session-handoff.md` 添加机读 frontmatter schema 段 (Rule #9 升级:字段定义 / 语义 / 示例 / 与现有 prose 段共存规则)
+- [x] 1.2 升级 `aria/templates/session-handoff.md` 模板加 frontmatter 头
+- [x] 1.3 state-scanner Phase 1 collector 扩展 `git fetch`(限定 refspec `refs/heads/*` + coordination ref,`--no-tags`,避免全量 tag 拖慢慢网络;**R1 v2**:本地 fetch 时间戳缓存,距上次 < 30s 跳过 → 看板标"缓存于 Xs 前")
+- [x] 1.4 实现"扫所有 `origin/**` 的 `docs/handoff/` + 解析 frontmatter → 重建 track 列表"(**R1 v2**:解析失败时 — 无 frontmatter / schema 不全 — 标记为 `legacy` track 并按 mtime fallback,不阻塞看板;与 H5 v1.21.1 `feedback_handoff_mtime_vs_pointer_divergence` 协同)
+- [x] 1.5 多 track 看板渲染(TRACK / OWNER/容器/会话 / PHASE / HANDOFF / LAST-PING / STATUS + 新鲜度颜色 + 折叠 done/abandoned 分区;**R1 v2**:LAST-PING 列源自 `Layer L claim.heartbeat_at`,PHASE 列源自 `Layer H frontmatter.phase`,缺则标 `—`)
+- [x] 1.6 `docs/handoff/latest.md` 角色降级为派生产物(**R1 v2**:多 track 场景下 latest.md 不写真实指针,仅含 deprecation banner 指引读看板;单 track 场景仍写当前 track 指针以兼容老 session;L2 collector 读取语义权威**仍以 frontmatter 为准**,latest.md 仅 prose fallback)
+- [x] 1.7 离线退化:fetch 失败时用缓存看板 + 顶部红条告警"看板可能陈旧"
+- [x] 1.8 P1 单元 + 集成测试(**R1 v2** 具体 case:(a) 无 frontmatter 旧格式 handoff → graceful skip 不报错 / 标 legacy;(b) latest.md 多 track 时为 deprecation banner、单 track 时为指针;(c) 老 session `cat latest.md` 仍得可读 markdown;(d) 离线注入 → 顶部红条;(e) N=20+ 远程分支性能基线)
+- [x] 1.9 **(R1 v2)** Rule #9 5 层 enforcement 兼容性同步:(a) **L1 hook** `handoff-location-guard.sh` 仅检查路径不检查内容 → 无需改动,文档化此判定;(b) **L2 collector** `scan.py` / `collectors/handoff.py` 增加 frontmatter-aware 解析能力(向后兼容无 frontmatter 旧 doc);(c) **L4 规约** 1.1 已覆盖;(d) **L5 D.3 template** 1.2 已覆盖 — 输出明确"5 层全覆盖" matrix 文档
 
 ## 2. Layer L — Orphan ref + 急切认领 + reconcile (P2 advisory liveness)
 
-- [ ] 2.1 设计并文档化 `refs/aria/coordination` orphan ref 结构 + claim 文件 schema(`claims/<container-id>/<session-id>.yaml`);**R1 v2** 字段:`schema_version: "1"`(必需,reader 见未知 version 降级 `status: unknown`)+ `track_id` / `owner` / `container` / `session` / `phase` / `status` / `claimed_at` / `heartbeat_at` + 可选 `superseded_from`
-- [ ] 2.2 实现身份生成 + 持久化(`~/.aria/container-id` 可选人类标签 + UUID 生成 + 回退 hostname;session-id 临时)
-- [ ] 2.3 实现 orphan ref bootstrap(幂等初始化)+ claim 读写 + push/fetch 操作
-- [ ] 2.4 实现确定性 track-id 派生(**R1 v2 规范化规则**:小写化 → `/` `.` `_` 替换为 `-` → 最大长度 64 字符 → 超长或含非 ASCII 时 fallback `sha256(原 id)[:16]`;跨容器实现必须共用此函数,单元测试枚举边界 case)
-- [ ] 2.5 急切认领闸门集成 state-scanner:推荐 → 用户确认 → 二次 fetch → 撞车检查 → push claim → 才放行 Phase B(**R1 v2 关键语义**:二次 fetch 通过**不是互斥锁获取**;push 后若他人同时 push,下次 fetch 触发 reconcile 确定性裁决;实现必须确保 push 前已写入 `claimed_at`,reconcile 是最终仲裁者,**闸门是窗口压缩器、非排他**)
-- [ ] 2.6 reconcile 协议实现(早 `claimed_at` 胜 / done 接管 / stale_ttl 接管 / 时钟相等字典序 `<container>/<session>` tiebreak)
-- [ ] 2.7 看板渲染加 COLLISION 行 + 时钟偏移检测告警;**R1 v2** 区分 **cross-owner collision**(强提示)vs **self-multi-container collision**(soft hint,可能容器迁移);时钟偏移超阈值时 reconcile **降级为 CONFLICT 标记 + 人工决策**,不静默用偏移时间戳判定
-- [ ] 2.8 claim 生命周期:acquire / heartbeat / release;**R1 v2 具体常量**(全部为命名常量,跨容器实现必须共用):heartbeat 周期 = **10 min**,`stale_ttl` = **30 min**(= 3× heartbeat),**`clock_skew_warn_threshold` = 30s**(R2 v3,同 track 两 claim 时间戳偏差 > 30s 触发 2.7 时钟偏移告警 + reconcile 降级 CONFLICT),orphan ref push 每 heartbeat 周期触发一次;每日 ~20+ push 在 git 单 ref 写压力可接受范围(无 pack GC 触发);**R1 v2 GC**:status=done claim 保留 7 天后移入 `archive/<year-month>/`(保留 sha256 摘要 tombstone),orphan ref 不参与 git GC 需手动维护
-- [ ] 2.9 失败处理(**R1 v2 失败矩阵完整覆盖**):
+- [x] 2.1 设计并文档化 `refs/aria/coordination` orphan ref 结构 + claim 文件 schema(`claims/<container-id>/<session-id>.yaml`);**R1 v2** 字段:`schema_version: "1"`(必需,reader 见未知 version 降级 `status: unknown`)+ `track_id` / `owner` / `container` / `session` / `phase` / `status` / `claimed_at` / `heartbeat_at` + 可选 `superseded_from`
+- [x] 2.2 实现身份生成 + 持久化(`~/.aria/container-id` 可选人类标签 + UUID 生成 + 回退 hostname;session-id 临时)
+- [x] 2.3 实现 orphan ref bootstrap(幂等初始化)+ claim 读写 + push/fetch 操作
+- [x] 2.4 实现确定性 track-id 派生(**R1 v2 规范化规则**:小写化 → `/` `.` `_` 替换为 `-` → 最大长度 64 字符 → 超长或含非 ASCII 时 fallback `sha256(原 id)[:16]`;跨容器实现必须共用此函数,单元测试枚举边界 case)
+- [x] 2.5 急切认领闸门集成 state-scanner:推荐 → 用户确认 → 二次 fetch → 撞车检查 → push claim → 才放行 Phase B(**R1 v2 关键语义**:二次 fetch 通过**不是互斥锁获取**;push 后若他人同时 push,下次 fetch 触发 reconcile 确定性裁决;实现必须确保 push 前已写入 `claimed_at`,reconcile 是最终仲裁者,**闸门是窗口压缩器、非排他**)
+- [x] 2.6 reconcile 协议实现(早 `claimed_at` 胜 / done 接管 / stale_ttl 接管 / 时钟相等字典序 `<container>/<session>` tiebreak)
+- [x] 2.7 看板渲染加 COLLISION 行 + 时钟偏移检测告警;**R1 v2** 区分 **cross-owner collision**(强提示)vs **self-multi-container collision**(soft hint,可能容器迁移);时钟偏移超阈值时 reconcile **降级为 CONFLICT 标记 + 人工决策**,不静默用偏移时间戳判定
+- [x] 2.8 claim 生命周期:acquire / heartbeat / release;**R1 v2 具体常量**(全部为命名常量,跨容器实现必须共用):heartbeat 周期 = **10 min**,`stale_ttl` = **30 min**(= 3× heartbeat),**`clock_skew_warn_threshold` = 30s**(R2 v3,同 track 两 claim 时间戳偏差 > 30s 触发 2.7 时钟偏移告警 + reconcile 降级 CONFLICT),orphan ref push 每 heartbeat 周期触发一次;每日 ~20+ push 在 git 单 ref 写压力可接受范围(无 pack GC 触发);**R1 v2 GC**:status=done claim 保留 7 天后移入 `archive/<year-month>/`(保留 sha256 摘要 tombstone),orphan ref 不参与 git GC 需手动维护
+- [x] 2.9 失败处理(**R1 v2 失败矩阵完整覆盖**):
   - (a) push non-ff(两容器同推)→ fetch-replay-repush N 次
   - (b) push 401/403(认证失败)→ **不重试**,直接告警 + 人工决策
   - (c) push 失败其它原因 → 让用户决定继续/中止
@@ -38,7 +38,7 @@
   - (e) **(R1 v2)** 磁盘满 / 本地写失败 → 告警 + 跳过 claim,**非崩溃**
   - (f) **(R1 v2)** partial fetch(网络中断,ref 更新不完整)→ **R2 v3 检测方式**:比对 fetch 前后本地 `refs/aria/coordination` 的 sha 是否**单调推进**(允许相等 = 远端未变;若回退或 fetch 报错 = partial fetch),失败按 (a) 重试;单元测试覆盖"fetch 中途 SIGKILL → 本地 ref 未污染"路径
   - (g) **(R1 v2)** 跨容器时钟偏移超阈值 → reconcile 降级 CONFLICT + 人工决策(per 2.7)
-- [ ] 2.10 P2 单元 + 集成测试(**R1 v2 强化**):
+- [x] 2.10 P2 单元 + 集成测试(**R1 v2 强化**):
   - (1) **reconcile 黄金表必须覆盖**:全 4 规则 + 边界 `stale_ttl ± 1s`(三档:TTL-1s / TTL / TTL+1s)+ `heartbeat` 缺失视同 stale + `status` 4×4 组合矩阵(`active+active` / `done+active` / `done+done` / `abandoned+active` 等)
   - (2) **race 窗口可复现性**:时间戳通过 `ClockProvider` 抽象注入(或 monkeypatch `datetime.now`),CI 强制注入相同时间戳触发 tiebreak 路径;并发由两线程/进程 **barrier** 同步(**R2 v3**:必须为零 sleep 同步原语,如 `threading.Barrier` / `multiprocessing.Barrier` / 等效 IPC,**禁止用 sleep 近似**),不依赖真实 sleep;CI 报告记录"两 claim 时间戳差 < ε" 作为测试有效性断言
   - (3) **failure 注入矩阵**对应 2.9 每条
