@@ -413,6 +413,15 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **Exception:** **零 exception** (与 Rule #7 不同, handoff 路径选择无 ambiguity 边缘场景)。任何 `.aria/handoff/*.md` 写入企图都应 redirect 到 `docs/handoff/`。
 
+**Extension** (multi-terminal-coordination, aria-plugin v1.22.x+):
+Rule #9 在 v1.22.x 引入机读 frontmatter schema (Layer H, §2.3, 5 字段:
+`track-id` / `owner-container` / `phase` / `status` / `updated-at`)。state-scanner
+Phase 1.16/1.17 从此跨分支 fetch + 重建多 track 看板,根除单写者 `latest.md` pointer
+branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/reconcile
+协调机制:急切认领闸门 (phase1_gate) + orphan ref claim YAML + 确定性 reconcile 6-rule。
+详见 `openspec/changes/multi-terminal-coordination/`
+(Approved 2026-05-19 per DEC-20260519-001) + `standards/conventions/session-handoff.md §2.3`。
+
 **详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
 
 ---

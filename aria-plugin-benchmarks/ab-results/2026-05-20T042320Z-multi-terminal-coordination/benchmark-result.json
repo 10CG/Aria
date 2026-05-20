@@ -1,0 +1,68 @@
+{
+  "benchmark_id": "multi-terminal-coordination",
+  "spec": "openspec/changes/multi-terminal-coordination/",
+  "run_timestamp": "2026-05-20T04:23:20Z",
+  "git_sha_aria_main": "ce1032a14cb7c2fff7d9bd9d8b472688df46f9f9",
+  "git_sha_aria_plugin": "2bc5712681ccc55678284d426198430799298a97",
+  "git_sha_standards": "03ddfd0f284dfc459183cd39cec5cf861c9de94c",
+  "skill_type": "structural",
+  "rule_6_framing": "structural (non-LLM with/without; delta>0 AUTO_GATE AND human_review SUFFICIENT)",
+  "runner_cmd": "python3 -m unittest tests.test_p1_layer_h tests.test_reconcile_golden_table tests.test_race_window tests.test_failure_injection",
+  "elapsed_seconds": 1.336,
+  "expected_total": 108,
+  "actual_total": 108,
+  "actual_pass": 108,
+  "actual_fail": 0,
+  "metrics": {
+    "board_correctness": {
+      "fixture": "tests.test_p1_layer_h",
+      "sample_size": 18,
+      "pass_count": 18,
+      "pass_rate_pct": 100.0,
+      "baseline_pct": 0,
+      "threshold_pct": 95,
+      "delta": 100.0,
+      "delta_positive": true,
+      "passed": true
+    },
+    "race_reproducibility": {
+      "fixture": "tests.test_race_window",
+      "sample_size": 12,
+      "pass_count": 12,
+      "pass_rate_pct": 100.0,
+      "baseline_pct": 0,
+      "threshold_pct": 100,
+      "delta": 100.0,
+      "delta_positive": true,
+      "passed": true
+    },
+    "reconcile_determinism": {
+      "fixture": "tests.test_reconcile_golden_table",
+      "sample_size": 55,
+      "pass_count": 55,
+      "pass_rate_pct": 100.0,
+      "baseline_pct": 0,
+      "threshold_pct": 100,
+      "delta": 100.0,
+      "delta_positive": true,
+      "passed": true
+    },
+    "failure_matrix_coverage": {
+      "fixture": "tests.test_failure_injection",
+      "sample_size": 23,
+      "pass_count": 23,
+      "pass_rate_pct": 100.0,
+      "baseline_pct": 0,
+      "threshold_pct": 90,
+      "delta": 100.0,
+      "delta_positive": true,
+      "passed": true
+    }
+  },
+  "auto_gate": true,
+  "auto_gate_reason": "All 4 delta > 0 AND all metrics meet threshold",
+  "human_review": "pending",
+  "human_review_note": "TASK-027 mechanical run complete. User must invoke /skill-creator (or equivalent) for human review to confirm: (a) test set is representative, not biased; (b) capability improvement is genuine, not measurement artifact; (c) baseline=0% claim (pre-P1 had no relevant modules) verified by code inspection.",
+  "verdict": "pending_human_review",
+  "notes": "Run mechanically by TASK-027 orchestration. P1 18 + P2 90 = 108 tests, all PASS in 1.336s. No regressions vs P1 baseline. structural framing per feedback_rule6_framing_differs_by_skill_type."
+}

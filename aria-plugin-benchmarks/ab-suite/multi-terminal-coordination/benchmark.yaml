@@ -1,0 +1,289 @@
+# aria-plugin-benchmarks/ab-suite/multi-terminal-coordination/benchmark.yaml
+#
+# Rule #6 structural benchmark design for the multi-terminal-coordination spec.
+# Covers state-scanner Phase 1 (Layer H multi-track board) + Phase 2 (Layer L
+# claim/reconcile) implementation quality gate.
+#
+# Framing: structural (NOT LLM with/without)
+#   Rationale: state-scanner additions are deterministic logic and schema-driven
+#   board rendering.  LLM with/without framing cannot measure correctness of a
+#   reconcile algorithm or a race-window collision detector — it only measures
+#   whether an LLM rephrases correctly.  Per feedback_rule6_framing_differs_by_skill_type,
+#   the correct framing for deterministic/structural skills is pre-implementation
+#   baseline (0%) vs post-implementation pass rate, with human review as the
+#   sufficiency gate.
+#
+# Reference incidents / precedents:
+#   2026-05-13-issue-triage (structural +53.3pp delta)
+#   2026-05-13-state-scanner-issue-101-fix (deterministic pre/post)
+#   2026-05-17-h0-handoff-structural (14/14 PASS, Rule #6 #14 carry-forward closed)
+#
+# Spec: openspec/changes/multi-terminal-coordination/proposal.md §Impact Rule #6 row
+# Tasks: openspec/changes/multi-terminal-coordination/tasks.md §3.4
+# TASK-026 (qa-engineer, P3 Round 1)
+
+benchmark_id: multi-terminal-coordination
+skill_type: structural
+# "structural" = deterministic logic + schema correctness; NOT LLM with/without.
+# See AB_TEST_OPERATIONS.md §Core Concepts and feedback_rule6_framing_differs_by_skill_type.
+
+spec: openspec/changes/multi-terminal-coordination/
+created: "2026-05-20"
+task: TASK-026
+
+purpose: |
+  Verify that the state-scanner Phase 1 (Layer H multi-track board) and Phase 2
+  (Layer L claim/reconcile) implementations introduced by the
+  multi-terminal-coordination spec deliver measurable quality improvements
+  over the pre-P1 baseline, per Rule #6 structural framing.
+
+  Four deterministic dimensions are measured:
+    (a) Board correctness       — rendered board fields match expected values
+    (b) Race reproducibility    — collision detector fires 100% of the time
+    (c) Reconcile determinism   — golden-table verdicts match spec 100%
+    (d) Failure matrix coverage — all 7 failure paths degrade gracefully
+
+  All four must pass (delta > 0 on each metric) before human review is invoked.
+
+# ---------------------------------------------------------------------------
+# Metric definitions
+# ---------------------------------------------------------------------------
+
+metrics:
+
+  board_correctness:
+    label: "M1 — Multi-track board field/order correctness"
+    description: >
+      state-scanner renders the multi-track coordination board.  Each fixture
+      drives a distinct board scenario (legacy track, offline degradation,
+      single vs multi active, latest.md action, etc.).  The assertion checks
+      field presence, values, and structural shape against expected output.
+    fixture_module: tests.test_p1_layer_h
+    fixture_count: 18
+    # 18 test methods in test_p1_layer_h.py (TASK-008 deliverable).
+    # The spec mandates N=20+ remote-branch performance baseline; the perf test
+    # (test_e_twenty_branch_performance + test_e_baseline_json_schema_structure)
+    # contributes 2 of the 18, satisfying the N=20 requirement.
+    sample_size: 18
+    pass_threshold_pct: 95
+    # 95% = 17/18 minimum.  The 5% slack accommodates a single flap in the
+    # timing-sensitive test_e_twenty_branch_performance on slow CI runners.
+    baseline_source: >
+      Pre-P1 state-scanner had no multi-track board, no frontmatter parser,
+      no offline red-bar, no latest.md banner logic.  Running this fixture set
+      against the pre-P1 codebase yields 0% pass rate (all 18 tests would fail
+      on missing symbols / wrong output shape).  Baseline = 0%.
+    baseline_pct: 0
+    measurement: passed_count / total_count * 100
+
+  race_reproducibility:
+    label: "M2 — Race-window collision detection rate"
+    description: >
+      reconcile() must behave deterministically under concurrent injection of
+      identical-timestamp claims.  The barrier-synced 100-iteration burst test
+      (TestRaceWindowEpsilonAssertion.test_100_bursts_all_identical) verifies
+      that every burst returns the same (winner, verdict_reason), proving
+      zero-flakiness.  The 10-thread concurrent reconcile (test_concurrent_reconcile_same_verdict)
+      verifies thread-safety.  Additional tiebreak and cross-owner scenarios
+      confirm that the collision detector fires on every eligible input.
+    fixture_module: tests.test_race_window
+    fixture_count: 12
+    sample_size: 12
+    # The spec says "10 concurrent injections → collision detection = 100%".
+    # test_race_window.py implements this as 100-iteration bursts (stricter than
+    # 10 injections) plus explicit tiebreak path assertions.  12 test methods total.
+    pass_threshold_pct: 100
+    # 100% is the only acceptable threshold: a race detector that misses even
+    # one trigger path is broken by definition.
+    baseline_source: >
+      Pre-P1/P2 state-scanner had no reconcile module, no ClockProvider
+      abstraction, no tiebreak path.  Running this fixture set against the
+      pre-P2 codebase yields 0% pass rate (all 12 tests would fail on missing
+      symbols).  Baseline = 0%.
+    baseline_pct: 0
+    measurement: passed_count / total_count * 100
+
+  reconcile_determinism:
+    label: "M3 — Reconcile golden-table verdict accuracy"
+    description: >
+      reconcile() must return the correct (winner, verdict_reason) for every
+      entry in the golden table, covering all 4 protocol rules plus boundary
+      cases: stale_ttl ± 1s three-tier, heartbeat-absent treated as stale,
+      status 4×4 combination matrix, clock-skew threshold boundary cases,
+      and frozen/deterministic-output invariants.
+    fixture_module: tests.test_reconcile_golden_table
+    fixture_count: 55
+    sample_size: 55
+    pass_threshold_pct: 100
+    # 100% is mandatory: reconcile is a deterministic algorithm.  Any miss
+    # means a correctness bug in the protocol implementation.
+    baseline_source: >
+      Pre-P2 state-scanner had no reconcile.py module.  All 55 golden-table
+      tests would fail (ImportError / AttributeError) against the pre-P2
+      codebase.  Baseline = 0%.
+    baseline_pct: 0
+    measurement: passed_count / total_count * 100
+
+  failure_matrix_coverage:
+    label: "M4 — Failure-injection degradation conformance"
+    description: >
+      failure_handlers.py must handle all 7 failure paths from tasks.md §2.9
+      without crashing and with the correct degradation behavior:
+        (a) push non-ff    → fetch-replay-repush cycle
+        (b) push 401/403   → no retry + warn
+        (c) push other     → user_decision callback
+        (d) orphan absent  → auto-bootstrap
+        (e) disk full      → warn + skip, non-crashing
+        (f) partial fetch  → SHA regression detection
+        (g) clock skew     → CLOCK_SKEW_WARN_THRESHOLD export + CONFLICT downgrade
+      23 test methods cover the 7 paths in test_failure_injection.py (TASK-022).
+    fixture_module: tests.test_failure_injection
+    fixture_count: 23
+    sample_size: 23
+    pass_threshold_pct: 90
+    # 90% = 21/23 minimum.  The 10% slack acknowledges that mock-boundary tests
+    # occasionally reflect library internals rather than behavior regressions.
+    # Any miss below 90% requires investigation before PASS can be granted.
+    baseline_source: >
+      Pre-P2 state-scanner had no failure_handlers.py, no coordination_ref
+      module, no orphan-ref bootstrap.  All 23 tests would fail on missing
+      imports.  Baseline = 0%.
+    baseline_pct: 0
+    measurement: passed_count / total_count * 100
+
+# ---------------------------------------------------------------------------
+# Aggregate totals
+# ---------------------------------------------------------------------------
+
+aggregate:
+  total_test_methods: 108
+  # Breakdown: test_p1_layer_h(18) + test_reconcile_golden_table(55)
+  #            + test_race_window(12) + test_failure_injection(23) = 108
+  note: >
+    108 matches the expected_total in the task brief (P1 18 + P2 90).
+    P2 total = reconcile_golden_table(55) + race_window(12) + failure_injection(23) = 90.
+
+# ---------------------------------------------------------------------------
+# Verdict rule
+# ---------------------------------------------------------------------------
+
+verdict_rule:
+  description: >
+    PASS requires BOTH conditions satisfied (AND semantics):
+
+    AUTO_GATE (necessary condition — automated):
+      For each metric M in {board_correctness, race_reproducibility,
+      reconcile_determinism, failure_matrix_coverage}:
+        delta_M = new_pass_rate_pct - baseline_pct
+        REQUIRE delta_M > 0
+
+      Since all four baselines are 0%, the AUTO_GATE simplifies to:
+        board_correctness     >= 95%  (17/18)
+        race_reproducibility  = 100% (12/12)
+        reconcile_determinism = 100% (55/55)
+        failure_matrix_coverage >= 90% (21/23)
+
+    HUMAN_REVIEW (sufficient condition — manual):
+      Reviewer confirms that each metric improvement reflects genuine capability
+      gain, not test-set drift, implementation-matching-test circular logic,
+      or flaky CI timer artifacts.  Specifically:
+        - board_correctness:       field assertions cover new board columns (TRACK,
+                                   OWNER, PHASE, LAST-PING, STATUS), not only
+                                   pre-existing output lines
+        - race_reproducibility:    100-burst test demonstrates zero-sleep barrier
+                                   synchronization; timestamps injected, not real
+        - reconcile_determinism:   golden table covers all 4 protocol rules + every
+                                   boundary case listed in tasks.md §2.10 (1)
+        - failure_matrix_coverage: all 7 failure paths from tasks.md §2.9 are
+                                   represented (not just the easiest 21)
+
+  formula: "PASS = (ALL delta_M > 0) AND human_review_passed"
+
+  auto_gate_fields:
+    board_correctness:      {threshold_pct: 95,  operator: ">="}
+    race_reproducibility:   {threshold_pct: 100, operator: ">="}
+    reconcile_determinism:  {threshold_pct: 100, operator: ">="}
+    failure_matrix_coverage:{threshold_pct: 90,  operator: ">="}
+
+# ---------------------------------------------------------------------------
+# Test runner
+# ---------------------------------------------------------------------------
+
+runner:
+  cmd: |
+    cd aria/skills/state-scanner
+    python3 -m unittest \
+      tests.test_p1_layer_h \
+      tests.test_reconcile_golden_table \
+      tests.test_race_window \
+      tests.test_failure_injection \
+      -v 2>&1
+  cwd: aria/skills/state-scanner
+  expected_total: 108
+  exit_code_success: 0
+  parse_hint: >
+    Parse `Ran N tests in Xs` for total count.  Parse `OK` vs `FAILED (failures=N, errors=N)`
+    for aggregate verdict.  For per-metric pass rates, count `... ok` lines per module prefix
+    (test_p1_layer_h / test_reconcile_golden_table / test_race_window / test_failure_injection).
+  note: >
+    Actual execution is TASK-027 scope (user-driven /skill-creator benchmark).
+    This benchmark.yaml only defines the design; do not run it here.
+
+# ---------------------------------------------------------------------------
+# Expected result schema (for TASK-027 ab-results/ output)
+# ---------------------------------------------------------------------------
+
+expected_result_schema:
+  benchmark_id: multi-terminal-coordination
+  run_timestamp: "<ISO 8601 UTC, e.g. 2026-05-21T10:00:00Z>"
+  git_sha: "<Aria main repo HEAD at time of run>"
+  aria_plugin_sha: "<aria-plugin feature/multi-terminal-coordination HEAD>"
+  rule_6_framing: structural
+  # Per feedback_rule6_framing_differs_by_skill_type: document framing explicitly.
+
+  metrics:
+    board_correctness:
+      passed: "<int>"
+      total: 18
+      pass_rate_pct: "<float>"
+      baseline_pct: 0
+      delta: "<pass_rate_pct - 0>"
+      threshold_pct: 95
+      gate_passed: "<bool>"
+
+    race_reproducibility:
+      passed: "<int>"
+      total: 12
+      pass_rate_pct: "<float>"
+      baseline_pct: 0
+      delta: "<pass_rate_pct - 0>"
+      threshold_pct: 100
+      gate_passed: "<bool>"
+
+    reconcile_determinism:
+      passed: "<int>"
+      total: 55
+      pass_rate_pct: "<float>"
+      baseline_pct: 0
+      delta: "<pass_rate_pct - 0>"
+      threshold_pct: 100
+      gate_passed: "<bool>"
+
+    failure_matrix_coverage:
+      passed: "<int>"
+      total: 23
+      pass_rate_pct: "<float>"
+      baseline_pct: 0
+      delta: "<pass_rate_pct - 0>"
+      threshold_pct: 90
+      gate_passed: "<bool>"
+
+  aggregate:
+    total: 108
+    passed: "<int>"
+    pass_rate_pct: "<float>"
+
+  auto_gate: "<bool — true if ALL 4 gate_passed=true>"
+  human_review: "pending | passed | failed"
+  verdict: "pending | PASS | FAIL"
+  notes: "<reviewer comments — must address the 4 HUMAN_REVIEW bullets in verdict_rule>"
