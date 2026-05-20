@@ -1,6 +1,19 @@
 # Aria 2.0 M5 — T-deploy playbook v11 ADDENDUM (Spec X + Spec Y bundle)
 
-> **Status**: Owner-runnable — AI does NOT auto-execute. Drafted 2026-05-19 by AI prep session (per US-025 close-gate C-path: "务实派 dry-run + 命令草稿").
+> ⛔ **SUPERSEDED 2026-05-20** by `docs/handoff/2026-05-20-m5-deploy-playbook-v2-accurate.md`.
+>
+> The v11 addendum below was drafted on **incorrect assumptions about prod layout** (specifically: assumed `/opt/aria-orchestrator` was a git checkout; assumed prod was at M4 ready-to-upgrade-to-M5 state; assumed `sqlite3` CLI available). Actual prod state per `docs/handoff/2026-05-20-prod-state-investigation.md` is significantly different:
+>   - Source actually at `/root/Aria/` (not `/opt/aria-orchestrator/`)
+>   - Branch on `feature/aria-2.0-m2-layer1-state-machine` (211/258 commits behind master)
+>   - DB schema v3.0 (not v4.1)
+>   - aria-layer1 v0.2.0 (not v0.3.0)
+>   - Layer 1 cron + reconcile NOT deployed (mixed Hermes-internal + Nomad architecture)
+>
+> **Use v2-accurate playbook instead** for the next deploy attempt. v11 is preserved here as historical artifact + for cross-reference of generally-correct schema migration / smoke patterns (which v2 incorporates after adjusting for actual prod state).
+
+---
+
+> **Status**: ~~Owner-runnable — AI does NOT auto-execute. Drafted 2026-05-19 by AI prep session (per US-025 close-gate C-path: "务实派 dry-run + 命令草稿").~~ **SUPERSEDED** per banner above.
 > **Supersedes**: `2026-05-15-m5-deploy-playbook.md` Step 1-2 (additive image build + schema bumps) + Step 5 (real Layer 2 smoke replaces SQL-inject smoke).
 > **Preserves**: `2026-05-15-m5-deploy-playbook.md` Step 3 (nomadVar config) + Step 4 (Nomad job redeploy) + Step 6 (Tier-1 live LLM gates) + Step 7 (Tier-2 accumulation) — those steps unchanged.
 > **Target image**: `forgejo.10cg.pub/10CG/aria-runner:claude-m5-carry-09ff364-v11` (per handoff §6 naming)
