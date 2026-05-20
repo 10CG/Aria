@@ -53,6 +53,9 @@ updated-at: 2026-05-20T04:50:34Z
 | 2026-05-20 04:42 | **Phase D.2 archive (Step D)**: `openspec/changes/multi-terminal-coordination/` → `openspec/archive/2026-05-20-multi-terminal-coordination/` | `c44b679` | per Rule #5 + Phase D.2 |
 | 2026-05-20 04:45 | **Step F**: dogfood metric script 跑完 → 诚实 PENDING (coordination_ref 未 bootstrap,等待第一个用 Layer L 的 session) | `.aria/dogfood-reports/multi-terminal-coordination-post-merge-2026-05-20.md` | infrastructure verified |
 | 2026-05-20 04:47 | **organic race event #3**: Step F push reject — 又一终端 push `d4c0b6b`(prod-state investigation + v2 playbook)| rebase 解决 → Aria 主仓 master `583ac930` | 第 3 次本 session 实证 |
+| 2026-05-20 04:55 | **organic race event #4 + #5 + production bug surfacing**: D.3 handoff push reject(另一终端 push session-final);`git stash pop` 引入 conflict markers 误 commit(b0c9c3a);立即 fix(1fc0359);**首次 dogfood `collect_handoff_multibranch` 实测发现 3 个 v1.22.0 production bugs**(datetime auto-coerce 误标 legacy / Python re-sort 撤销 git committerdate 排序 / stale 错误消息)| 多 file changes | 触发 v1.22.1 hotfix |
+| 2026-05-20 05:30 | **v1.22.1 hotfix shipped**:aria-plugin PR #53 → merged `62c3249`;Aria 主仓 submodule bump + CLAUDE.md 项目状态 v1.21.0 → v1.22.1 → master `a7c5565`(`pull --rebase --autostash` 干净处理 organic race event #6 — 又一终端 push US-025/026 更新)| aria-plugin `62c3249` / Aria 主仓 `a7c5565` | 实测:多 track 看板正确出 2 non-legacy tracks |
+| 2026-05-20 05:35 | session cleanup:worktree remove + feature branch delete + 2 new memory entries(meta-dogfood + stash pop hazard)+ CLAUDE.md 版本更新 + handoff 更新 | — | **真正闭环** |
 
 **Cycles shipped this session**: **1 full Spec cycle Phase A → D** (multi-terminal-coordination v1.22.0)。
 
