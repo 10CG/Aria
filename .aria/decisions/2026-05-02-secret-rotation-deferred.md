@@ -4,7 +4,13 @@
 > **Decider**: solo-lab (uni.concept.wzfq@gmail.com)
 > **Type**: Risk acceptance (security debt)
 > **Trigger**: T1.7 cluster deploy 前置评估 (M2 deploy session)
-> **Status**: Active deferral until production launch
+> **Status**: **Trigger #1 + #3 fired 2026-05-20** — partial rotation in progress; original 4-key set still deferred to Phase C / 2026-08-02 hard cap
+>
+> **2026-05-20 amendment**:
+> - **触发条件 #1** (Aria 2.0 production launch — M5 T-deploy) fired
+> - **触发条件 #3** (任一 key 被任何手段重新暴露) fired — 5 个 Nomad var keys 经 `nomad var get -out=json` 在 chat transcript 暴露 (本决议未列入这 5 个 key, 它们是 M4/M5 era 新增 secret, 不与本决议原 4-key set 重叠)
+> - **本决议原 4-key set (GLM_API_KEY + FEISHU_APP_SECRET + FEISHU_VERIFICATION_TOKEN + FEISHU_ENCRYPT_KEY) 仍未轮换**, 延后到 M5 Phase C 完成后 OR 2026-08-02 hard cap (whichever first); 详见 [`2026-05-20-secret-rotation-during-m5-deploy.md`](2026-05-20-secret-rotation-during-m5-deploy.md) §3.3
+> - 本决议 status 在原 4-key set 实际轮换后改为 `Resolved YYYY-MM-DD`
 
 ---
 
