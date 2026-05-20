@@ -25,9 +25,9 @@
 
 **Predecessor (same track)**: [2026-05-20-m5-phase-a-snapshot-done.md](./2026-05-20-m5-phase-a-snapshot-done.md) — Phase A + A.7 dry-run 完成(`simonfish/dev-claude`):5 OD locked + 4 reframes + DB snapshot + backup branch + A.7 dry-run 3 advisories;本 session(Phase B)已全 inline 处理
 
-### Track C (NEW, in-flight) — state-scanner inline carry-forward surfacing 🟡 A.1 done
+### Track C — state-scanner inline carry-forward surfacing (v1.23.0) ✅ DONE
 
-**Status**: Spec proposal + tasks drafted on `feature/state-scanner-inline-carry-forward-surfacing`(commit `54f6a56`,both remotes pushed)。Tier 2 state-scanner family fill cycle(addresses Forgejo #90 primary + #89 superset variant B)during M5 Phase B → C 24h observation 窗口。Phase A.1 done;A.2 pre_spec audit + B/C/D execution carry-forward to next dedicated session(~2-3h)。proposal.md / tasks.md 见 `openspec/changes/state-scanner-inline-carry-forward-surfacing/`。
+**Latest**: [2026-05-20-state-scanner-carry-forward-shipped.md](./2026-05-20-state-scanner-carry-forward-shipped.md) — ✅ **Full A→D cycle SHIPPED 单 session**(`simonfish/dev-claude2` 续 Track B Phase B 在同 session 内):A.1 Spec drafted → A.2 R1 REVISE → Rev1 → R2 PASS_WITH_WARNINGS unanimous(3 agents:tech-lead / backend-architect / qa-engineer) → Rev1.1 sync(1 cross-agent converged regex sync drift)→ B.1-B.8(collector `_extract_carry_forward_annotations` + new snapshot field `openspec.carry_forward_inventory` + 2-tier rules carry_forward_info/pile + 16 unit tests / **584/584 regression PASS** + live dogfood atomic 4→9→4 + Rule #6 structural deterministic AUTO_GATE substitute + 5+1 SOT v1.22.1→**v1.23.0**)→ C.2 aria-plugin PR #54 merged `964f5ad` → re-bump gitlink → Aria main PR #115 merged `1b1a3a4` → D.1 #90+#89 closed-by-PR(含 #89 选项 A/B/C/D selection table)→ D.2 spec archived;**4-repo 3-way SHA parity 全绿**;0 critical / 0 major / 5 advisory minors documented as future work;Track C **DONE 无 carry-forward**(Forgejo open 13 → **11**)
 
 ---
 
@@ -35,6 +35,7 @@
 
 | Date | Session | Track | Status |
 |------|---------|-------|--------|
+| [2026-05-20 Track C state-scanner carry-forward shipped (v1.23.0)](./2026-05-20-state-scanner-carry-forward-shipped.md) | Full A→D cycle 单 session (~7h 含 Track B Phase B): A.1 → R1 REVISE → Rev1 → R2 PASS_WITH_WARNINGS → Rev1.1 → B 16 tests + 584 regression + dogfood atomic + Rule #6 substitute + v1.23.0 → C 2 PR merged → D #90+#89 closed + spec archived; 4-repo parity 全绿 | C | ✅ DONE |
 | [2026-05-20 M5 Phase B SHIPPED (Layer 1 deploy + schema v4.2 + Smoke A/B/C PASS)](./2026-05-20-m5-phase-b-shipped.md) | B.1-B.9 全 (Reset → master leap → pip v0.4.0 → auto-migrate v4.2 → var inventory → Hermes restart → reconcile/cron HCL upgrade → Smoke A+B+C PASS);3 advisories (R6 m1-handoff missing / R7 auto-migrate meta-lesson / R8 pre-existing); cross-container handoff dev-claude→dev-claude2; Phase C ≥24h gated | B | **Active (Latest B)** |
 | [2026-05-20 M5 Phase A + A.7 dry-run done (10:15 amendment)](./2026-05-20-m5-phase-a-snapshot-done.md) | 5 OD locked + 4 reframes + DB snapshot + backup branch + A.7 dry-run (2 HCL validate + 3 advisories) + 2 memory entries + 2 races clean rebased + Q1-Q4 audit | B | superseded (Phase B 已推) |
 | [2026-05-20 multi-terminal-coordination v1.22.0 SHIPPED](./2026-05-20-multi-terminal-coordination-v1220-shipped.md) | Full A→D cycle (30 atomic + 108 tests + R8 audit + Rule #6 AUTO_GATE + 3 PR merged + Phase D.2 archive);**first handoff using v1.22.0 frontmatter** | A | **Active (Latest A)** |
