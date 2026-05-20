@@ -1,16 +1,17 @@
 ---
 track-id: aria-2-0-m5-replay-reconciler-drift-review-loop-audit
 owner-container: simonfish/dev-claude
-phase: A
+phase: A.7
 status: paused
-updated-at: 2026-05-20T07:32:01Z
+updated-at: 2026-05-20T10:15:00Z
 ---
 
-# Aria — Session Handoff (2026-05-20 ~07:30 UTC) — M5 T-deploy Phase A done, Phase B gated
+# Aria — Session Handoff (2026-05-20 ~10:15 UTC) — M5 T-deploy Phase A done + A.7 dry-run derisk, Phase B gated
 
-> **Status**: Paused — Phase A 5 OD resolved + 4 prod findings + zero prod mutation; Phase B (~2-3h prod-write) gated to next dedicated session
+> **Status**: Paused — Phase A 5 OD + Phase A.7 dry-run + 2 memory entries + 0 prod mutation; Phase B (~2-3h prod-write) gated to next dedicated session
 > **Predecessor handoff**: [`2026-05-20-session-final-o1-paused-with-v2-playbook.md`](2026-05-20-session-final-o1-paused-with-v2-playbook.md) — same track, the v2 playbook this session executed Phase A against
-> **Next session 入口**: 优先读本 doc → §6 → Phase B 直接走 v2 playbook §Phase B 步骤 1-8 (5 OD 已锁,4 prod findings 已 reframe)
+> **Next session 入口**: 优先读本 doc → §6 → Phase B 直接走 v2 playbook §Phase B 步骤 1-8 (5 OD 已锁 + 3 dry-run advisories applied per §3 R5)
+> **Revision history**: Initially written 07:32 (Phase A.5 sign-off); amended 10:15 to include Phase A.7 dry-run + 2 memory writes + 2 multi-terminal races + Q3 audit confirmation.
 
 ---
 
@@ -22,7 +23,8 @@ updated-at: 2026-05-20T07:32:01Z
 2. **`.aria/notes/m5-deploy-od-decisions-2026-05-20.md`** — 5 OD 决策正式记录 (AskUserQuestion-backed)
 3. **`.aria/notes/m5-deploy-phase-a-snapshot-2026-05-20.md`** — DB 快照 + 16 dispatch IDs + backup branch + sign-off checklist
 4. **`.aria/notes/prod-job-spec-live-2026-05-20.md`** — Live Nomad spec (Rule #7 scrubbed)
-5. Optional: `2026-05-20-prod-state-investigation.md` (Phase A reframes 2 of its §2 finding 顺序 — 见 §3 R1)
+5. **`.aria/notes/m5-deploy-phase-a7-dry-run-2026-05-20.md`** — **(A.7 amendment 10:15)** Phase B HCL validate + migrations + Nomad var + 3 advisories (HCL ambiguity / 005 row count assert / M1_VALIDATOR_PATH file)
+6. Optional: `2026-05-20-prod-state-investigation.md` (Phase A reframes 2 of its §2 finding 顺序 — 见 §3 R1)
 6. Optional: `2026-05-20-m5-deploy-playbook-v2-accurate.md` (§Phase B 1-8 仍可用, 但 §OD-3/§OD-4 假设需替换为本 doc 的 reframe)
 
 读完后:**Phase B 可直接进**, 5 OD 已锁, Phase A 所有前置完成。预计 ~2-3h dedicated session。
@@ -55,6 +57,17 @@ updated-at: 2026-05-20T07:32:01Z
 | ~06:05 | A.6 supplement: prod `/root/.hermes/cron/jobs.json` read | 1 active cron = `aria-heartbeat` 48ed7e826bc3 (995 runs) | **NOT aria-layer1** — orthogonal M0/M1 tooling |
 | ~06:10 | A.5 sign-off checklist 全勾 (10/11, 仅 owner go/no-go pending) | notes 三份齐 | zero prod mutation accumulated |
 | ~07:30 | AskUserQuestion 1: Phase B gate → (a) wrap clean | — | 本 doc + commit + push |
+| ~07:33 | **Aria main commit `34106d1`** docs(handoff): Phase A snapshot done | 5 文件 (3 notes + handoff + latest.md) | Phase A.5 sign-off |
+| ~07:35 | **Multi-terminal race #1**: push reject (origin advanced to `a2d06e7` v1.22.1 hotfix by `simonfish/dev-claude2`) → clean rebase | — | 第 N+1 次 race meta-dogfood |
+| ~07:38 | Push retry success → 3-way SHA parity `34106d1` | origin + github | per `feedback_concurrent_edit_clean_rebase_pattern` |
+| ~08:00 | **Phase A.7 dry-run validation** (opportunistic derisking, zero prod write) | `.aria/notes/m5-deploy-phase-a7-dry-run-2026-05-20.md` | nomad job validate (2 HCL) + migrations 004/005/006 inspect + Nomad var existence (Rule #7) + 3 advisories surfaced |
+| ~09:30 | Memory entries: `feedback_prod_state_must_ground_playbook` amend + `feedback_layered_od_resolution_with_live_probe` new + MEMORY.md index | harness `~/.claude/.../memory/` (non-repo) | 2 committed; `feedback_git_stash_skips_submodule_pointer` skipped (low value, general Git knowledge) |
+| ~09:35 | Issue cache cleared (`.aria/cache/issues.json`) | — | next-session ergonomics — Phase 1.13 will live-fetch |
+| ~10:00 | **Aria main commit `54c2488`** docs(handoff): Phase A.7 dry-run validation | 1 file (advisory note) | |
+| ~10:02 | **Multi-terminal race #2**: push reject (origin advanced to `34a1ce7` D.3 update by `simonfish/dev-claude2`) → clean rebase | — | 2nd race this session |
+| ~10:05 | Push retry success → 3-way SHA parity `54c2488` | origin + github | clean |
+| ~10:10 | Q1-Q4 closeout audit: 4-repo parity verify + US-025/US-026 status check + OpenSpec inventory (M5 Spec still active, T-deploy unchecked = correct) + UPM N/A + PRD unchanged | inline shell + reads | this amendment trail |
+| ~10:15 | **Handoff doc amendment**: frontmatter phase A→A.7, updated-at bumped, §1 timeline extended, §3 R5 added (3 advisories), §6 + §7 refreshed | 本 file | Phase B closure for handoff |
 
 **Cycles shipped this session**: **0 OpenSpec Spec full cycle**。Phase A 是 deploy-prep,非 Spec cycle 范畴。
 
@@ -132,11 +145,23 @@ updated-at: 2026-05-20T07:32:01Z
 
 **Lesson 候选** (low priority): `feedback_git_stash_skips_submodule_pointer` — pointer-only submodule M 不能用 default stash 保存,显式 `git diff aria-orchestrator > /tmp/...` patch 才稳。
 
-### R4 — Concurrent terminal awareness 仍 active (本 session 实测 0 race)
+### R4 — Concurrent terminal awareness 仍 active (本 session 实测 2 race — 10:15 amendment)
 
-**预期对照**: `simonfish/dev-claude2` 终端在 ~04:50 UTC ship 完 v1.22.0 + multi-terminal-coordination archive 后,本 session ~05:48 UTC 启动时已经 quiesce。本 session 全程未与另一终端发生 push reject。
+**Pre-A.5 (07:30 之前)**: `simonfish/dev-claude2` 终端在 ~04:50 UTC ship 完 v1.22.0 + multi-terminal-coordination archive 后已 quiesce。
 
-**Mitigation 持续**: 提交前 `git fetch` + Rule #8 gate + push 前 multi-remote parity verify (per `feedback_sequenced_multirepo_gitlink_bump`)。
+**Post-A.5 (07:35 + 10:02)**: 在 Phase A 收尾 push + Phase A.7 push 时连续 2 次撞上 `simonfish/dev-claude2` 的并发 push (`a2d06e7` v1.22.1 hotfix + `34a1ce7` D.3 update),均 clean rebase 解决,零 file conflict。这是 multi-terminal-coordination Spec 要解决的场景的第 7、8 次连续 dogfood (前 6 次记录在 Track A handoff)。
+
+**Mitigation 持续**: 提交前 `git fetch` + Rule #8 gate + push 前 multi-remote parity verify (per `feedback_sequenced_multirepo_gitlink_bump` + `feedback_concurrent_edit_clean_rebase_pattern`)。Future v1.22.x Layer L claim/reconcile 实施后, 这种 race 会更早被 awareness。
+
+### R5 — Phase A.7 dry-run 3 advisories (Phase B 必读 — 10:15 amendment)
+
+Phase A.7 dry-run validation (零 prod 写) surface 了 3 个 Phase B 需要 inline 处理的 advisory (详见 `.aria/notes/m5-deploy-phase-a7-dry-run-2026-05-20.md`):
+
+1. **HCL ambiguity trap** (CRITICAL): `aria-orchestrator.nomad.hcl` 是 docker 变体 (task name `hermes`), `aria-orchestrator-light.nomad.hcl` 才是 prod raw_exec 变体 (task `hermes-gateway`)。Phase B Step 5 `nomad job restart aria-orchestrator` 不 re-apply HCL → 安全;但若以后任何 `nomad job run` 必用 `-light` 后缀,否则会 flip prod driver。
+2. **005 migration row count assert** (MEDIUM): Migration 005 `_schema_v4_drop_inline_uq.sql` 用 SQLite 标准 DROP CONSTRAINT workaround (CREATE TABLE new + copy + RENAME),对 16 prod rows 全表 rebuild。Phase B Step 4 必须在 005 应用后 assert `SELECT COUNT(*) FROM dispatches = 16`,否则视为 copy 步骤数据丢失,立即 rollback 至 A.2 snapshot。
+3. **M1_VALIDATOR_PATH file** (LOW, non-blocker): 新 cron HCL 引用 `/opt/aether-volumes/aria-layer1/data/validate-issue-schema.py` (env block default)。Nomad var 若未设此 key 且 host 文件 missing,job start 不 block 但首 tick 触发 validator 调用会 fail。Phase B Step 7 smoke 加 validator 文件 existence 检查 OR Nomad var `M1_VALIDATOR_PATH=` 显式置空 skip。
+
+3 个 advisory 都 surface 在 Phase A.7 dry-run note 内 + 本 §3 R5。新 session 启 Phase B 前先读这两处。
 
 ---
 
@@ -181,14 +206,15 @@ updated-at: 2026-05-20T07:32:01Z
 ## §6 Next session 入口 + 优先级建议
 
 ```bash
-# Path A: 推 Phase B (full M5 deploy Layer 1) — Phase A 5 OD + 4 reframe 已就绪
-# 1. 读取顺序:
-cat docs/handoff/2026-05-20-m5-phase-a-snapshot-done.md       # 本 doc
+# Path A: 推 Phase B (full M5 deploy Layer 1) — Phase A 5 OD + 4 reframe + 3 advisory 已就绪
+# 1. 读取顺序 (本 doc + 4 notes, 10:15 amendment 完整):
+cat docs/handoff/2026-05-20-m5-phase-a-snapshot-done.md       # 本 doc (此 amendment)
 cat .aria/notes/m5-deploy-od-decisions-2026-05-20.md           # 5 OD
 cat .aria/notes/m5-deploy-phase-a-snapshot-2026-05-20.md       # DB + backup + checklist
 cat .aria/notes/prod-job-spec-live-2026-05-20.md               # Live Nomad spec
-# 2. 走 v2 playbook §Phase B Step 1-8 (5 OD 已锁, 不再 prompt)
-# 3. ~2-3h dedicated session, prod-write
+cat .aria/notes/m5-deploy-phase-a7-dry-run-2026-05-20.md       # 3 Phase B advisories (HCL trap / 005 assert / validator path)
+# 2. 走 v2 playbook §Phase B Step 1-8 + inline §3 R5 三 advisories
+# 3. ~2-3h dedicated session, prod-write (Phase B 是真正首次 prod 写 — 5 OD 锁定且 3 advisories 处理后风险已最小)
 # 4. 完成后 Phase D archive + handoff (Phase B done)
 
 # Path B: 不推 Phase B, 做别的 backlog
@@ -212,43 +238,40 @@ cat .aria/notes/prod-job-spec-live-2026-05-20.md               # Live Nomad spec
 
 ## §7 提交清单 (commit hash + multi-remote parity)
 
-**Pre-commit Rule #8 gate**: ✅ `aether ci status --branch master --in-flight --json` returned `runs: []` GREEN (07:30 UTC)
+**Pre-commit Rule #8 gates this session**: 3 invocations, all `runs: []` GREEN (pre-`34106d1` + pre-`54c2488` + pre-本-amendment)
 
-**This session's Aria main commit** (即将):
-- `docs(handoff): M5 Phase A snapshot done — 5 OD locked + 4 prod reframes + DB/backup ready for Phase B`
+**Aria main commits this session** (in order):
+- `34106d1` docs(handoff): M5 T-deploy Phase A snapshot done — 5 OD locked + 4 prod reframes + zero prod mutation
+- `54c2488` docs(handoff): Phase A.7 dry-run validation — 0 blockers + 3 advisories for Phase B
+- (本 amendment commit, 即将) docs(handoff): M5 Phase A handoff 10:15 amendment — A.7 + memory + races + Q3 audit
 
-**Pre-commit state** (about to commit):
-```
-?? .aria/notes/m5-deploy-od-decisions-2026-05-20.md
-?? .aria/notes/m5-deploy-phase-a-snapshot-2026-05-20.md
-?? .aria/notes/prod-job-spec-live-2026-05-20.md
-+  docs/handoff/2026-05-20-m5-phase-a-snapshot-done.md   (本 doc)
-+  docs/handoff/latest.md   (updated to add Track B Phase A entry)
-```
-
-**Pre-push state target** (3-way SHA parity, multi-remote):
+**3-way SHA parity (post-本-commit target)**:
 - Aria main: master push to `origin` + `github`
-- aria submodule: unchanged this session (still at `ce58d35` v1.22.0)
-- aria-orchestrator submodule: unchanged this session (still at `962cb56`)
-- standards submodule: unchanged this session (still at `16041f4`)
+- aria submodule: `62c324978333d1ffacde0a20436043e96f257f4c` (v1.22.1 hotfix, by `simonfish/dev-claude2`)
+- aria-orchestrator submodule: `962cb56c1bbec46ff20783bfa909beb312d5eb85` (HCL registry-lock)
+- standards submodule: `16041f4df2f9ff2f4a6a6cb8a1cd8c40b92048c1` (Layer H schema)
+
+**Q1 closeout audit** (10:10 UTC): ALL 4 repos 3-way SHA parity verified ✅ (`git ls-remote` + `git rev-parse HEAD` per repo)
 
 **No regression**:
-- 0 prod modifications (snapshot + backup + read-only inspect only)
-- 0 code/test/skill changes
-- aria-plugin tests: untouched (no submodule bump)
+- 0 prod modifications (snapshot + backup + read-only inspect + read-only HCL validate only)
+- 0 code/test/skill changes (only handoff doc + advisory notes)
+- aria-plugin tests: untouched (no source change)
+- aria submodule auto-bumped to v1.22.1 via rebase (orthogonal track A's commit, not our work)
 
 ---
 
-## §8 Memory entries this session (0 new committed; 3 candidates surfaced)
+## §8 Memory entries this session (2 committed harness, 1 skipped — 10:15 amendment)
 
-本 session committed 0 new MEMORY.md entries(沿用 predecessor pattern — 先 in handoff, owner review 后再决定文字)。
+本 session 10:00 决策 — auto-advance 阶段 commit 了 2/3 candidates 到 harness 持久化 memory store (`~/.claude/projects/-home-dev-Aria/memory/`,非 repo):
 
-**3 candidates** for owner decision (内容见 §4):
-1. `feedback_prod_state_must_ground_playbook` (re-激活, predecessor §4 同候选;本 session 第 2 次激活 — owner 是否本 session 写入,或继续 defer 到 Phase B 后再总成 1 条?)
-2. `feedback_layered_od_resolution_with_live_probe` (新, medium-high) — OD 不是 one-shot, prod-state-dependent OD 需 live probe 后细化 sub-prompt
-3. `feedback_git_stash_skips_submodule_pointer` (低, 通用 Git 知识) — backup branch 是更稳的 submodule pointer M 保留方式
+1. **`feedback_prod_state_must_ground_playbook.md`** ✅ — **amended** existing entry with second activation note (Phase A 中 investigation doc §2.2 + §2.4 自己也被 live probe 推翻 — meta-instance 强化 lesson "investigation doc 不 immutable")
+2. **`feedback_layered_od_resolution_with_live_probe.md`** ✅ — **new** entry + MEMORY.md index line。Universal lesson: Owner OD 不 one-shot, prod-state-dependent OD 需 Phase A live probe 后细化 sub-prompt;两轮 OD 比单轮稳。Source incident = 本 session OD-3 重定义 + OD-4 reclassify
+3. **`feedback_git_stash_skips_submodule_pointer`** ❌ **skipped** — 通用 Git 知识, 不属"项目特有教训", per CLAUDE.md memory rules "Don't save what repo already records"
 
-**Cumulative MEMORY.md count**: ~138 entries (unchanged this session).
+**Cumulative MEMORY.md count**: ~139 entries (+1 new this session)。
+
+**Q2 audit** (10:10 UTC): 无未沉淀的经验。HCL ambiguity / multi-terminal race / Rule #7 hygiene pattern 都已被现有 memory 覆盖 (`feedback_nomad_hcl_validate_early` / `feedback_concurrent_edit_clean_rebase_pattern` / `feedback_nomad_inspect_secret_leak`)。
 
 ---
 
@@ -264,7 +287,19 @@ cat .aria/notes/prod-job-spec-live-2026-05-20.md               # Live Nomad spec
 
 ---
 
-**Created**: 2026-05-20 ~07:32 UTC (post-A.5-sign-off, pre-本-commit)
-**Session duration**: ~2h (focused, no fatigue overlap with predecessor's 16h)
-**Status**: Paused — Phase A done, Phase B ready in next dedicated session
-**Next session entry**: Path A (Phase B 推 deploy) 或 Path B (do other backlog) — owner 决定
+**Created**: 2026-05-20 ~07:32 UTC (post-A.5-sign-off, pre-`34106d1`-commit)
+**Amended**: 2026-05-20 ~10:15 UTC (post-A.7-dry-run + post-Q1-Q4-audit, pre-amendment-commit)
+**Session duration**: ~4.5h cumulative (07:32 amendment trigger + 2h pre-amendment work)
+**Status**: Paused — Phase A.7 done (Phase A + dry-run derisking), Phase B ready in next dedicated session
+**Next session entry**: Path A (Phase B 推 deploy) 或 Path B (do other backlog) — owner 决定。**优先级 ⭐ Path A** — US-025 close gate 主线, Phase A + A.7 derisking 已让 Phase B 风险降到可接受。
+
+---
+
+## Q1-Q4 closeout audit summary (10:15 UTC)
+
+| Q | 问 | 答 |
+|---|---|---|
+| Q1 | 本地 vs 远程仓库同步? | ✅ ALL 4 repos 3-way SHA parity (Aria main `54c2488` + aria `62c3249` + standards `16041f4` + aria-orchestrator `962cb56`)。工作树 clean。 |
+| Q2 | 未完成 task / 讨论? | 无 in-scope incomplete。Phase B 是 deferred-by-design (owner Path A 选择 wrap clean),非本 session 任务。Q2 唯一 gap = handoff doc 本身 stale → 本 amendment 已 fix。 |
+| Q3 | UPM / US / Spec / PRD 维度? | UPM N/A (Aria 主仓 不用)。US-025 + US-026 status 已含 2026-05-20 update note 指向 v2 playbook + investigation (predecessor session 完成的)。M5 main Spec Approved + T-deploy tasks 6.17-6.30 全 unchecked (owner-runnable) — Phase A 是 pre-6.17 derisking,**不对应任何 sub-task**, tasks.md 不需更新 ✅。PRD unchanged。 |
+| Q4 | 收尾交接? | ✅ 本 amendment commit 后,新 session 走 `/aria:state-scanner` Phase 1.15 collector 会自动 surface `docs/handoff/latest.md` → 本 doc (Track B latest entry)。读完本 doc + 4 notes 即可推 Phase B 或转其他 backlog。 |
