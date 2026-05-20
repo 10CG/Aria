@@ -11,6 +11,8 @@
 | **Closed (stale)** | **12** (#96, #62, #63, #64-#72) |
 | **Re-labeled** | **3** (#61+#73 +bug; #95 -aria-auto) |
 | Open after triage | **15** |
+| **Tier 1 sister-bundle shipped (v1.21.4)** | **#61 + #73 closed** (2026-05-20, aria-plugin PR #51) |
+| **Open after v1.21.4** | **13** |
 
 All 12 closes posted a uniform "synthetic dispatch acceptance artifact, milestone archived" comment with handoff cross-reference. Reopenable if historical reference needed.
 
@@ -20,14 +22,14 @@ All 12 closes posted a uniform "synthetic dispatch acceptance artifact, mileston
 
 > Sorted by (a) scope clarity (b) AI-actionability (c) value cohesion within thematic family.
 
-### 🟢 Tier 1 — small/medium bugs ready to ship (sister-bundle candidates)
+### ~~🟢 Tier 1 — small/medium bugs ready to ship (sister-bundle candidates)~~ ✅ SHIPPED 2026-05-20
 
-| # | Label | Scope | Notes |
-|---|-------|-------|-------|
-| **#61** | bug | 1-line fix | `aria/skills/state-scanner/scripts/collectors/_common.py:_run` subprocess `text=True` → add `encoding="utf-8", errors="replace"`. Windows GBK locale crashes. Confirmed in `_common.py:36-44`. |
-| **#73** | bug | small fix | `_status.py::_normalize_status` doesn't recognize `Implementation-Complete-Pending-Obs` transitional token → wrongly returns `done` → false-positive `pending_archive` recommendation. Add transitional family or extend Pending family. |
+| # | Label | Status |
+|---|-------|--------|
+| **#61** | bug | ✅ Closed by v1.21.4 (`_common.py:_run` encoding=utf-8 + errors=replace + UnicodeDecodeError catch) |
+| **#73** | bug | ✅ Closed by v1.21.4 (`_status.py:_normalize_status` new transitional family → `implemented`; #101 incidental migration was insufficient — `pending` symptom broke `requirements.py:56` priority_items surface) |
 
-**Path**: Aria-plugin v1.21.4 patch sister-bug bundle. ~1.5-2h incl. plugin version bump (4 files + CHANGELOG), smoke benchmark per Rule #6.
+**Actual ship**: ~2h, 9-step Phase A→D, aria-plugin PR #51, +14 regression tests, 460/460 + 15/15 smoke PASS. **Forgejo open count**: 15 → 13.
 
 ### 🟡 Tier 2 — state-scanner thematic enhancement family
 
@@ -73,13 +75,15 @@ All 12 closes posted a uniform "synthetic dispatch acceptance artifact, mileston
 
 ---
 
-## Recommended next session sequence (post-O1+O2)
+## Recommended next session sequence
 
-1. **Ship Tier 1 patch v1.21.4** (#61 + #73 bundle) — fastest concrete win, validates aria-plugin patch pipeline post-US-025-close
-2. **Spec #84 + #107** (Tier 3 secret family) — directly carries forward this session's Rule #7/8 muscle
-3. **Spec #89/#90 absorption** (Tier 2 state-scanner family)
-4. **#79 / #95** (Tier 2-4 audit-side) — harder, defer
-5. Tier 5/6 proposals — leave until owner has bandwidth to OD
+> Updated 2026-05-20 post-v1.21.4 ship + multi-terminal-coordination Spec emergence (另一终端 active scope on aria submodule).
+
+1. ~~**Ship Tier 1 patch v1.21.4** (#61 + #73 bundle)~~ ✅ DONE 2026-05-20
+2. **Owner-gated: O1 (T-deploy v11) + O2 (Tier-1 live LLM)** — unblocks US-025 close
+3. **Tier 5 Forgejo discussion** (#59 / #104 / #111) — pure metadata, zero git mutation, safe regardless of multi-terminal Spec state
+4. **Tier 2/3/4 (state-scanner / secret-hygiene / audit-rubric)** — **defer until `multi-terminal-coordination` Spec ships**. All these touch aria submodule (state-scanner Skill / hooks / SKILL.md), high conflict-rebase risk with their Phase B implementation. Re-evaluate after MT-1 ships.
+5. **US-026 M6b kickoff** — still blocked by US-025 close gate (O1+O2)
 
 ---
 
