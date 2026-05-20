@@ -25,6 +25,10 @@
 
 **Predecessor (same track)**: [2026-05-20-m5-phase-a-snapshot-done.md](./2026-05-20-m5-phase-a-snapshot-done.md) — Phase A + A.7 dry-run 完成(`simonfish/dev-claude`):5 OD locked + 4 reframes + DB snapshot + backup branch + A.7 dry-run 3 advisories;本 session(Phase B)已全 inline 处理
 
+### Track C (NEW, in-flight) — state-scanner inline carry-forward surfacing 🟡 A.1 done
+
+**Status**: Spec proposal + tasks drafted on `feature/state-scanner-inline-carry-forward-surfacing`(commit `54f6a56`,both remotes pushed)。Tier 2 state-scanner family fill cycle(addresses Forgejo #90 primary + #89 superset variant B)during M5 Phase B → C 24h observation 窗口。Phase A.1 done;A.2 pre_spec audit + B/C/D execution carry-forward to next dedicated session(~2-3h)。proposal.md / tasks.md 见 `openspec/changes/state-scanner-inline-carry-forward-surfacing/`。
+
 ---
 
 ## 历史 handoff(按时间 desc)
