@@ -46,28 +46,28 @@
 
 ## 3. Design A 条件触发 + Rule #6 benchmark + Dogfood (P3 完整闭环)
 
-- [ ] 3.1 同容器并发 active claim 计数检测(本容器 ≥2 active 触发 worktree 模式)
-- [ ] 3.2 worktree 自动创建逻辑:`worktrees/<track-id>/` + 子模块独立 checkout + 钩入 B.1 分支创建流程
-- [ ] 3.3 worktree 生命周期:track release(`status: done`)后归档/清理策略 + 误用保护
-- [ ] 3.4 Rule #6 structural benchmark 设计(**R1 v2 量化指标**,非 LLM with/without,需 human review 替代 with/without delta 判定):
+- [x] 3.1 同容器并发 active claim 计数检测(本容器 ≥2 active 触发 worktree 模式)
+- [x] 3.2 worktree 自动创建逻辑:`worktrees/<track-id>/` + 子模块独立 checkout + 钩入 B.1 分支创建流程
+- [x] 3.3 worktree 生命周期:track release(`status: done`)后归档/清理策略 + 误用保护
+- [x] 3.4 Rule #6 structural benchmark 设计(**R1 v2 量化指标**,非 LLM with/without,需 human review 替代 with/without delta 判定):
   - (a) **看板正确性**:fixture 集 N=20 个,state-scanner 输出行数 / 字段值匹配期望,通过率 ≥ 95%
   - (b) **race 可复现**:10 次并发注入,碰撞检测触发率 = **100%**
   - (c) **reconcile 确定性**:黄金表 K 条(2.10 (1) 全覆盖),verdict 与期望一致率 = **100%**
   - (d) **失败矩阵覆盖**:M 个注入场景(2.10 (3) 全覆盖),降级行为符合规范率 ≥ 90%
   - baseline = 同测试集在旧 state-scanner(P1 上线前)通过率;`delta = new - baseline > 0` 即为通过
-- [ ] 3.5 执行 `/skill-creator benchmark` 并存入 `aria-plugin-benchmarks/ab-results/`,通过率达 3.4 标准
-- [ ] 3.6 Aria 主仓 dogfood:承载 ≥1 多终端 cycle,**R1 v2 可观测指标**(可证伪):
+- [x] 3.5 执行 `/skill-creator benchmark` 并存入 `aria-plugin-benchmarks/ab-results/`,通过率达 3.4 标准
+- [x] 3.6 Aria 主仓 dogfood:承载 ≥1 多终端 cycle,**R1 v2 可观测指标**(可证伪):
   - (a) **重复认领**:coordination ref 内同一 track-id 的 `status=active` claim 数 ≤ 1(超出即重复,记录到 dogfood 日志)
   - (b) **接错棒**:state-scanner 看板实际使用的 handoff `updated-at` 与该分支 git log 最新 handoff commit 时间差 **< 60s**
   - (c) dogfood 报告必须**包含上述实测数值**,不接受"未观测到问题"作为 PASS 依据
-- [ ] 3.7 文档同步(**R1 v2 5 层 enforcement matrix 全覆盖**):
+- [x] 3.7 文档同步(**R1 v2 5 层 enforcement matrix 全覆盖**):
   - (a) `aria/skills/state-scanner/SKILL.md` 更新(L3)
   - (b) `CLAUDE.md` Rule #9 引用本 Spec(L4 顶层链接)
   - (c) `standards/conventions/session-handoff.md` schema 段(L4 已在 1.1)
   - (d) `aria/templates/session-handoff.md` frontmatter 头(L5 已在 1.2)
   - (e) L2 collector `scan.py` / `collectors/handoff.py` docstring + error message 更新(已在 1.9 covered)
   - (f) L1 hook `handoff-location-guard.sh` 文档化"不需改动,仅检查路径不检查内容"(已在 1.9 covered)
-- [ ] 3.8 版本发布:aria-plugin minor bump + 跨 3 repo C.2 + **Rule #8 pre-merge gate (C.2.4)** 通过 + Phase D 归档(plugin.json / marketplace.json / VERSION / CHANGELOG / README + 子模块指针 + 多远程推送)
+- [x] 3.8 版本发布:aria-plugin minor bump + 跨 3 repo C.2 + **Rule #8 pre-merge gate (C.2.4)** 通过 + Phase D 归档(plugin.json / marketplace.json / VERSION / CHANGELOG / README + 子模块指针 + 多远程推送)
 
 ---
 
