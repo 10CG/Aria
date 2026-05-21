@@ -267,7 +267,31 @@ aria-heartbeat 09:00:28 UTC **仍 401** → resync 没修好它 → 重新诊断
 | B | aria-layer1 (M5 reconcile/cron/dispatch) | `silknode_client.ProviderRouter` | **Luxeno** `api.luxeno.ai/v1` | `LUXENO_API_KEY` | subscription flat |
 
 - 路径 B 有 `provider_router.py` 的 Luxeno→Zhipu HA fallback 能力 (`zhipu_client.py` 直连 `open.bigmodel.cn` + `ZHIPU_API_KEY`), 但 `extension.py:879` `if os.environ.get("ZHIPU_API_KEY")` gate — Nomad var **无 `ZHIPU_API_KEY`** → fallback 未激活 → 路径 B 实际 Luxeno-only。
-- **architecture 不一致** = 一个潜在 follow-up: 路径 A (Hermes) 走 metered 直连 Z.AI 与 owner 2026-05-02 "避免 per-token 计费, 用 Luxeno subscription" 决策矛盾。建议 owner 评估 §3.5(c) 把 Hermes 也重定向到 Luxeno, 统一两路径到 subscription-flat 计费 + 单一账户。**记入 Phase C / 后续 backlog。**
+
+### §3.7 Hermes → Luxeno 重定向 (owner 选 option c, 2026-05-21 11:26 UTC EXECUTED)
+
+Owner 选 §3.5(c) — 把 Hermes 也重定向到 Luxeno, 统一双路径。
+
+**执行** (2026-05-21 11:26 UTC, autonomous, Rule #7-safe):
+1. 验证 `hermes_cli` `zai` provider HermesOverlay: `transport="openai_chat"` + `base_url_env_var="GLM_BASE_URL"` → `zai` provider 用 OpenAI Chat Completions 协议 POST `{GLM_BASE_URL}/chat/completions`
+2. Backup `/root/.hermes/.env` → `.env.bak-pre-luxeno-redirect-20260521T112605`
+3. Python helper (scp): 在 `/root/.hermes/.env` —
+   - `GLM_API_KEY` 旧死 Z.AI key (sha `2d15bf433f57`) → 新 Luxeno key (sha `987201dd4773`)
+   - **新增** `GLM_BASE_URL=https://api.luxeno.ai/v1` (此前未设 → `zai` 用默认直连 Z.AI; 现显式指向 Luxeno OpenAI-compat endpoint)
+   - 13 → 14 行, perms 0600 保留
+4. `nomad alloc restart d43c2a7e` (Total Restarts 4→5, gateway running + feishu connected)
+5. **验证**: `hermes cron run 48ed7e826bc3` 手动触发 aria-heartbeat → 新 tick `2026-05-21_11-27-47.md` Response = **`[SILENT]`** (成功态; LLM 调用经 Luxeno 成功, 无 429/401)
+
+**结果 — 双路径现统一**:
+
+| 路径 | 调用方 | endpoint (现) | 凭证 | 计费 |
+|------|--------|---------------|------|------|
+| A | Hermes `provider: zai` | `https://api.luxeno.ai/v1/chat/completions` (GLM_BASE_URL) | `GLM_API_KEY` = Luxeno key | Luxeno subscription |
+| B | aria-layer1 `silknode_client` | `https://api.luxeno.ai/v1/chat/completions` | `LUXENO_API_KEY` = 同 Luxeno key | Luxeno subscription |
+
+两路径现走**同一 Luxeno subscription 账户**, 与 owner 2026-05-02 "用 Luxeno subscription 避免 per-token 计费" 决策一致。死的 Z.AI 直连账户 (旧 GLM_API_KEY) 不再被使用。aria-heartbeat (M0/M1-era 监控) 恢复正常。
+
+**残留**: 同一 Luxeno key 现存于 4 处 (Nomad var LUXENO_API_KEY + `/root/.hermes/.env` 的 GLM_API_KEY/ANTHROPIC_API_KEY/LUXENO_API_KEY) — 下次 Luxeno rotation 须 4 处全换 (per `feedback_rotation_enumerate_all_credential_stores`)。长期 fix 仍是把 `/root/.hermes/.env` 迁移到 Nomad-var-rendered。
 
 ---
 
