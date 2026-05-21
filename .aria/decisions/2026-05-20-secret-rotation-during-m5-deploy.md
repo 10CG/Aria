@@ -222,40 +222,52 @@ Result: **HTTP 200**，model 返回 `glm-4.5-air`，usage `prompt=6 + completion
 - Test 走 Rule #7 compliant 路径: Python subprocess 读 /tmp/<cred>.new, 调最小 API, **不 echo key value, 只 print HTTP status + metadata + usage**
 - 本次 dogfood 实证: AI 错误地假设余额仍为 0 → 推荐 owner 充值 → owner 反问 "不是先确认新 key 状态吗" → live test 立即驳回原假设 — owner 直觉是对的, AI 应主动建议这一步
 
-### §3.5 Phase B 回归 — Hermes dotenv Luxeno 凭证未同步 (2026-05-21 stability observation 发现)
+### §3.5 `/root/.hermes/.env` 的 stale Luxeno 凭证副本 resync (2026-05-21) + 误诊更正
 
-**事件**: Phase B 完成后 24h 稳定性观察 (2026-05-21 08:22 UTC) 发现 Hermes errors.log:
-- 2026-05-21 00:54~06:59 UTC: aria-heartbeat 持续 HTTP 429 (每 hourly tick)
-- **2026-05-21 07:59:53 UTC: HTTP 401 `Authentication Failed` (code 1000)** — 新信号, 比 429 更严重
+> **⚠ 更正记录 (2026-05-21 09:40 UTC)**: 本节初版 (08:30) 把 aria-heartbeat 429/401 误诊为"Phase B rotation 回归", 并称 resync 修复了它。**深入诊断后证伪** — 见下方"更正"。本节保留初版叙述 + 更正, 作为 faithful-reporting audit trail。
 
-**根因**: §3.3 的 gap。本决议 §3.3 列举 `/root/.hermes/.env` 未轮换 keys 时只写了 4 个 (GLM_API_KEY + 3 FEISHU_*), **漏了 `ANTHROPIC_API_KEY` + `LUXENO_API_KEY`** —— 这两个也在 `/root/.hermes/.env`, 且**都是 Luxeno 凭证** (Hermes gateway 通过 Anthropic SDK + `ANTHROPIC_BASE_URL=https://api.luxeno.ai` 认证, `x-api-key` 用的就是 Luxeno key)。
+**初版诊断 (08:30, 后被证伪)**: 24h 稳定性观察发现 aria-heartbeat 2026-05-21 00:54~06:59 UTC 持续 429 + 07:59:53 UTC HTTP 401。当时归因为 `/root/.hermes/.env` 的 Luxeno 凭证副本未随 R3 同步, 推测 resync + restart 可修复。
 
-诊断 (sha256 指纹比对, 无 value 打印):
-```
-Nomad var LUXENO_API_KEY (R3 rotated):    sha256[:12] 987201dd4773  ← 新 key
-Hermes .env ANTHROPIC_API_KEY:            sha256[:12] dbd9c7bc235e  ← 旧 key (已 revoke)
-Hermes .env LUXENO_API_KEY:               sha256[:12] dbd9c7bc235e  ← 同旧 key
-```
+**做了什么 (08:24-08:25 UTC, 仍有效的部分)**:
+- Backup `/root/.hermes/.env` → `.env.bak-pre-luxeno-resync-20260521T082453`
+- Python resync `ANTHROPIC_API_KEY` + `LUXENO_API_KEY` 两行 从旧 `dbd9c7bc235e` → 新 `987201dd4773`
+- `nomad alloc restart d43c2a7e`
+- Live verify: `api.luxeno.ai/v1/messages` + `/v1/chat/completions` 新 key 均 HTTP 200
 
-**两个 .env 文件架构** (本次才厘清):
-- `/root/.hermes/.env` (static, 605 bytes, Apr 8) — **Hermes gateway 进程**启动时 load (`run_agent: Loaded environment variables from /root/.hermes/.env`)
-- `secrets/aria-layer1.env` (Nomad-var-rendered via `DOTENV_PATH`) — **aria-layer1 reconcile/cron** 子进程 load
+**更正 (2026-05-21 09:40, 深入诊断后)**:
 
-R3 (`nomad var put`) 只更新了 Nomad var → 只 fix 了 `secrets/aria-layer1.env` 路径 (aria-layer1 OK)。`/root/.hermes/.env` 是独立 static 文件, R3 没碰 → Hermes 仍用旧 key。owner revoke 旧 key 后 Hermes 先 429 (旧 key 余额耗尽残留) 后 401 (revoke 生效)。
+aria-heartbeat 09:00:28 UTC **仍 401** → resync 没修好它 → 重新诊断 Hermes provider 路由:
 
-**修复** (2026-05-21 08:24-08:25 UTC, autonomous, Rule #7-safe):
-1. Backup `/root/.hermes/.env` → `.env.bak-pre-luxeno-resync-20260521T082453` (605 bytes, 13 行)
-2. Python helper (scp 到 light-1 跑, 非 transcript): 从 Nomad var 读新 key → 重写 `/root/.hermes/.env` 的 `ANTHROPIC_API_KEY` + `LUXENO_API_KEY` 两行 → 保留其余 11 行 + perms 0600
-3. sha256 指纹 verify: 两 key 现 = `987201dd4773` (匹配新 key)
-4. `nomad alloc restart d43c2a7e` → Hermes 重载 `.env` (Total Restarts 3→4, gateway running + feishu connected)
-5. Live verify 两端点新 key: `/v1/messages` (Hermes Anthropic-compat path) **HTTP 200** + `/v1/chat/completions` (aria-layer1 OpenAI-compat path) **HTTP 200**
+- Hermes `config.yaml` `model.provider: zai`。`hermes_cli` PROVIDER_REGISTRY 的 `zai` entry: `inference_base_url=https://api.z.ai/api/paas/v4`, `api_key_env_vars=(GLM_API_KEY, ZAI_API_KEY, Z_AI_API_KEY)`, `base_url_env_var=GLM_BASE_URL`。
+- `/root/.hermes/.env` 无 `GLM_BASE_URL` → Hermes `provider: zai` 用**默认直连 Z.AI** `api.z.ai/api/paas/v4` + `GLM_API_KEY` (sha `2d15bf433f57`, len 49)。
+- **Hermes 根本不读 `ANTHROPIC_API_KEY` / `LUXENO_API_KEY` / `ANTHROPIC_BASE_URL`** (那些是 `anthropic` provider 的 var, `provider: zai` 时全部 ignored)。
+- ∴ aria-heartbeat 429/401 的真实根因 = **`GLM_API_KEY` 绑定的 Z.AI 直连账户余额耗尽** (67h 持续 429 自 2026-05-17 11:00 UTC, **早于 M5 Phase B 整整 3 天**) → Z.AI 停用 key → 401。**与 Luxeno、与本次 rotation 完全无关。**
+- Twin #1 handoff `2026-05-20-m5-phase-b-shipped.md` 的 "R8 pre-existing zai 余额耗尽 + Lark timeout non-blocking" **早已正确标注为 pre-existing**。本节初版错误地把它重新归因为 Phase B 回归。
 
-**Lesson** (新 memory `feedback_rotation_enumerate_all_credential_stores`):
-- 轮换一个 secret 前必须**枚举该 secret 的所有 config store 副本**。同一个 Luxeno 凭证存在于至少 3 处: (a) Nomad var `nomad/jobs/aria-orchestrator` LUXENO_API_KEY; (b) `/root/.hermes/.env` ANTHROPIC_API_KEY; (c) `/root/.hermes/.env` LUXENO_API_KEY。只轮换 (a) → (b)(c) 变 stale → owner revoke 后 Hermes 401。
-- Rotation SOP 应加一步: `grep -rl <key-name-OR-fingerprint> <all config dirs>` 找全部副本, 一次性全换。
-- 长期 fix (decision §3.3 已提): `/root/.hermes/.env` 迁移到 Nomad-var-rendered 路径, 消除 static 文件 → 单一 source-of-truth, 自动 propagate。
+**§3.5 resync 的净值 (更正后)**:
+- ✅ 仍有效: `/root/.hermes/.env` 的 `LUXENO_API_KEY` 副本确实 stale (旧 `dbd9c7bc235e`)。若 Hermes 进程内有 aria-layer1 plugin 代码调 `silknode_client` (读 `os.environ` LUXENO_API_KEY), 需要新值 → resync 正确。`ANTHROPIC_API_KEY` resync 对 `provider: zai` 无影响 (unused), 但一致性无害。
+- ❌ 不成立: 这不是 "Phase B 回归", resync 也**不解决 aria-heartbeat 401**。
 
-**对 24h Phase C gate 的影响**: Layer 1 state machine (reconcile/cron, 走 Nomad var 新 key) 全程未受影响 — 24h 稳定 clock 不重置。但 Hermes gateway 此前 ~10h 处于 LLM-broken 状态 (401/429); 修复后 08:25 UTC 重启恢复。Phase C 启动前应确认 aria-heartbeat 下一 tick (~08:59 UTC) 成功。
+**真实的 aria-heartbeat 修复 = owner-action (Z.AI 直连账户, 非本 decision rotation 范围)**:
+- (a) 给 `GLM_API_KEY` 绑定的 Z.AI 账户 (api.z.ai / bigmodel.cn console) 充值, 并确认 key 未被停用 (若停用需重生)
+- (b) 或轮换 `GLM_API_KEY` 到一个有余额的 Z.AI key
+- (c) **或重定向 Hermes 到 Luxeno** (Luxeno 账户已验证有余额): `/root/.hermes/.env` 设 `GLM_BASE_URL=https://api.luxeno.ai/<对应 path>` + `GLM_API_KEY=<Luxeno key>` → 让 `provider: zai` 走 Luxeno。这同时**统一了两条 LLM 路径** (见 §3.6)。
+
+**Lesson (新 memory `feedback_rotation_enumerate_all_credential_stores`)**: 该 memory 的核心教训 (轮换前枚举所有 config store 副本) **仍成立** — `/root/.hermes/.env` 确实藏了 stale `LUXENO_API_KEY` 副本。但该 memory 的"实例"叙述需更正: stale 副本是真的, 但它不是 aria-heartbeat 401 的原因 (那是独立的 Z.AI 账户问题)。
+
+**对 24h Phase C gate 的影响**: Layer 1 state machine (reconcile/cron, 走 Nomad var Luxeno 新 key) 全程未受影响, 24h clock 不重置。aria-heartbeat (Hermes provider=zai, Z.AI 直连) 自 2026-05-17 就 broken — 这是 **pre-existing, 非 Phase B 引入**。Phase C 不被它 block (aria-heartbeat 是 M0/M1-era 监控, 与 M5 Layer 1 正交), 但 owner 应择期处理 Z.AI 账户。
+
+### §3.6 双 LLM 路径 architecture (2026-05-21 厘清)
+
+本次诊断厘清了 Aria 的 LLM API 路由**非统一**:
+
+| 路径 | 调用方 | provider | endpoint | 凭证 | 计费 |
+|------|--------|----------|----------|------|------|
+| A | Hermes gateway (aria-orchestrator 主进程 / aria-heartbeat / Hermes 内部 LLM) | `provider: zai` (config.yaml) | **直连 Z.AI** `api.z.ai/api/paas/v4` | `GLM_API_KEY` | per-token metered |
+| B | aria-layer1 (M5 reconcile/cron/dispatch) | `silknode_client.ProviderRouter` | **Luxeno** `api.luxeno.ai/v1` | `LUXENO_API_KEY` | subscription flat |
+
+- 路径 B 有 `provider_router.py` 的 Luxeno→Zhipu HA fallback 能力 (`zhipu_client.py` 直连 `open.bigmodel.cn` + `ZHIPU_API_KEY`), 但 `extension.py:879` `if os.environ.get("ZHIPU_API_KEY")` gate — Nomad var **无 `ZHIPU_API_KEY`** → fallback 未激活 → 路径 B 实际 Luxeno-only。
+- **architecture 不一致** = 一个潜在 follow-up: 路径 A (Hermes) 走 metered 直连 Z.AI 与 owner 2026-05-02 "避免 per-token 计费, 用 Luxeno subscription" 决策矛盾。建议 owner 评估 §3.5(c) 把 Hermes 也重定向到 Luxeno, 统一两路径到 subscription-flat 计费 + 单一账户。**记入 Phase C / 后续 backlog。**
 
 ---
 

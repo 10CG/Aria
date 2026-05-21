@@ -136,13 +136,19 @@ Smoke + B.7 alloc logs 显示 `AriaLayer1Extension initialized (version=0.1.0, d
 
 Smoke A/B/C 注入 3 个 issue_id (DEMO-M5-001/002/003 共 6 行 dispatch rows + 6 个 audit log entries). 没删除, 保留 audit trail. 不影响 reconciler 或 cron tick (parent rows 都 terminal S_FAIL, smoke A 唯一 active 子行 S4_LAUNCH 是 fake image_sha 不会真 dispatch). M6 cleanup session 可批量 delete `WHERE issue_id LIKE 'DEMO-M5-%'`.
 
-### R6 — Phase B regression: Hermes dotenv Luxeno key stale (2026-05-21 found + FIXED)
+### R6 — aria-heartbeat broken (Z.AI 直连账户耗尽 — PRE-EXISTING, 非 Phase B 回归)
 
-24h stability observation (2026-05-21 08:22 UTC) 发现 Hermes errors.log 自 owner revoke 旧 Luxeno key 后持续 429 (00:54-06:59 UTC) → 401 Authentication Failed (07:59:53 UTC)。根因: rotation §3.3 gap — `/root/.hermes/.env` 有 2 个 Luxeno 凭证副本 (ANTHROPIC_API_KEY + LUXENO_API_KEY) 未随 R3 Nomad var rotation 同步。
+> **更正 (2026-05-21 09:40)**: 本节初版误标 "Phase B regression ... FIXED"。深入诊断证伪 — 见下。
 
-**已修复** (autonomous, 2026-05-21 08:24-08:25 UTC): backup `.env` → Python resync 2 keys 到新值 (sha256 verify) → `nomad alloc restart d43c2a7e` → live verify `/v1/messages` + `/v1/chat/completions` 两端点 HTTP 200。Layer 1 state machine 全程未受影响。canonical 记录 decision §3.5; 新 memory `feedback_rotation_enumerate_all_credential_stores`。
+24h stability observation 发现 aria-heartbeat 自 2026-05-17 11:00 UTC 起持续 429 (67h) → 2026-05-21 07:59+09:00 UTC HTTP 401。
 
-**Phase C 前置**: 确认 aria-heartbeat 下一 hourly tick (~08:59 UTC May 21) 成功 (直接 endpoint test 已证 key 有效, in-situ cron 仅冗余确认)。
+**真实根因**: aria-heartbeat 跑在 Hermes `provider: zai` → **直连 Z.AI `api.z.ai/api/paas/v4` + `GLM_API_KEY`** (非 Luxeno, 非 ANTHROPIC_API_KEY)。`GLM_API_KEY` 绑定的 Z.AI 直连账户余额耗尽 → 429 → key 停用 → 401。**Pre-existing since 2026-05-17, 早于 M5 Phase B 3 天** — twin #1 handoff R8 "pre-existing zai 余额耗尽" 早已正确标注。与 Luxeno、与本次 rotation 无关。
+
+**08:24 做的 resync** (`/root/.hermes/.env` ANTHROPIC_API_KEY + LUXENO_API_KEY → 新 Luxeno key): 仍是有效 hygiene (stale 副本确实存在), 但 **不是 aria-heartbeat 的修复** (Hermes provider=zai 不读这俩)。decision §3.5 有完整更正 + §3.6 双路径 architecture。
+
+**aria-heartbeat 修复 = owner-action** (Z.AI 直连账户, M5 范围外): (a) Z.AI 账户充值 + 确认 GLM_API_KEY 未停用 (b) 或轮换 GLM_API_KEY (c) 或重定向 Hermes 到 Luxeno (设 GLM_BASE_URL + GLM_API_KEY=Luxeno key, 同时统一双路径)。
+
+**对 Phase C 的影响**: 不 block。aria-heartbeat 是 M0/M1-era 监控, 与 M5 Layer 1 (走 Luxeno, 健康) 正交。Layer 1 state machine 24h gate clock 不受影响。
 
 ---
 
