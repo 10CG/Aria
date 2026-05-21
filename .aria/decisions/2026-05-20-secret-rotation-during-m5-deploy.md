@@ -222,6 +222,41 @@ Result: **HTTP 200**，model 返回 `glm-4.5-air`，usage `prompt=6 + completion
 - Test 走 Rule #7 compliant 路径: Python subprocess 读 /tmp/<cred>.new, 调最小 API, **不 echo key value, 只 print HTTP status + metadata + usage**
 - 本次 dogfood 实证: AI 错误地假设余额仍为 0 → 推荐 owner 充值 → owner 反问 "不是先确认新 key 状态吗" → live test 立即驳回原假设 — owner 直觉是对的, AI 应主动建议这一步
 
+### §3.5 Phase B 回归 — Hermes dotenv Luxeno 凭证未同步 (2026-05-21 stability observation 发现)
+
+**事件**: Phase B 完成后 24h 稳定性观察 (2026-05-21 08:22 UTC) 发现 Hermes errors.log:
+- 2026-05-21 00:54~06:59 UTC: aria-heartbeat 持续 HTTP 429 (每 hourly tick)
+- **2026-05-21 07:59:53 UTC: HTTP 401 `Authentication Failed` (code 1000)** — 新信号, 比 429 更严重
+
+**根因**: §3.3 的 gap。本决议 §3.3 列举 `/root/.hermes/.env` 未轮换 keys 时只写了 4 个 (GLM_API_KEY + 3 FEISHU_*), **漏了 `ANTHROPIC_API_KEY` + `LUXENO_API_KEY`** —— 这两个也在 `/root/.hermes/.env`, 且**都是 Luxeno 凭证** (Hermes gateway 通过 Anthropic SDK + `ANTHROPIC_BASE_URL=https://api.luxeno.ai` 认证, `x-api-key` 用的就是 Luxeno key)。
+
+诊断 (sha256 指纹比对, 无 value 打印):
+```
+Nomad var LUXENO_API_KEY (R3 rotated):    sha256[:12] 987201dd4773  ← 新 key
+Hermes .env ANTHROPIC_API_KEY:            sha256[:12] dbd9c7bc235e  ← 旧 key (已 revoke)
+Hermes .env LUXENO_API_KEY:               sha256[:12] dbd9c7bc235e  ← 同旧 key
+```
+
+**两个 .env 文件架构** (本次才厘清):
+- `/root/.hermes/.env` (static, 605 bytes, Apr 8) — **Hermes gateway 进程**启动时 load (`run_agent: Loaded environment variables from /root/.hermes/.env`)
+- `secrets/aria-layer1.env` (Nomad-var-rendered via `DOTENV_PATH`) — **aria-layer1 reconcile/cron** 子进程 load
+
+R3 (`nomad var put`) 只更新了 Nomad var → 只 fix 了 `secrets/aria-layer1.env` 路径 (aria-layer1 OK)。`/root/.hermes/.env` 是独立 static 文件, R3 没碰 → Hermes 仍用旧 key。owner revoke 旧 key 后 Hermes 先 429 (旧 key 余额耗尽残留) 后 401 (revoke 生效)。
+
+**修复** (2026-05-21 08:24-08:25 UTC, autonomous, Rule #7-safe):
+1. Backup `/root/.hermes/.env` → `.env.bak-pre-luxeno-resync-20260521T082453` (605 bytes, 13 行)
+2. Python helper (scp 到 light-1 跑, 非 transcript): 从 Nomad var 读新 key → 重写 `/root/.hermes/.env` 的 `ANTHROPIC_API_KEY` + `LUXENO_API_KEY` 两行 → 保留其余 11 行 + perms 0600
+3. sha256 指纹 verify: 两 key 现 = `987201dd4773` (匹配新 key)
+4. `nomad alloc restart d43c2a7e` → Hermes 重载 `.env` (Total Restarts 3→4, gateway running + feishu connected)
+5. Live verify 两端点新 key: `/v1/messages` (Hermes Anthropic-compat path) **HTTP 200** + `/v1/chat/completions` (aria-layer1 OpenAI-compat path) **HTTP 200**
+
+**Lesson** (新 memory `feedback_rotation_enumerate_all_credential_stores`):
+- 轮换一个 secret 前必须**枚举该 secret 的所有 config store 副本**。同一个 Luxeno 凭证存在于至少 3 处: (a) Nomad var `nomad/jobs/aria-orchestrator` LUXENO_API_KEY; (b) `/root/.hermes/.env` ANTHROPIC_API_KEY; (c) `/root/.hermes/.env` LUXENO_API_KEY。只轮换 (a) → (b)(c) 变 stale → owner revoke 后 Hermes 401。
+- Rotation SOP 应加一步: `grep -rl <key-name-OR-fingerprint> <all config dirs>` 找全部副本, 一次性全换。
+- 长期 fix (decision §3.3 已提): `/root/.hermes/.env` 迁移到 Nomad-var-rendered 路径, 消除 static 文件 → 单一 source-of-truth, 自动 propagate。
+
+**对 24h Phase C gate 的影响**: Layer 1 state machine (reconcile/cron, 走 Nomad var 新 key) 全程未受影响 — 24h 稳定 clock 不重置。但 Hermes gateway 此前 ~10h 处于 LLM-broken 状态 (401/429); 修复后 08:25 UTC 重启恢复。Phase C 启动前应确认 aria-heartbeat 下一 tick (~08:59 UTC) 成功。
+
 ---
 
 ## §4 决策详细 — Layer 2 (Aria 本地 hook，已完成)
