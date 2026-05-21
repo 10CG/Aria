@@ -3,12 +3,14 @@ track-id: aria-2-0-m5-replay-reconciler-drift-review-loop-audit
 owner-container: simonfish/dev-claude
 phase: B.8-done
 status: ship_ready
-updated-at: 2026-05-20T16:00:00Z
+updated-at: 2026-05-21T08:30:00Z
 ---
 
-# Aria — Session Handoff (2026-05-20 ~16:00 UTC) — M5 T-deploy Phase B done + Smoke A/B/C verified + Layer 2 secret-guard hook installed
+# Aria — Session Handoff (2026-05-20 ~16:00 UTC, amended 2026-05-21 08:30 UTC) — M5 T-deploy Phase B done + Smoke A/B/C verified + Layer 2 secret-guard hook installed
 
-> **Status**: SHIP READY — Phase B (B.1-B.8) 全部完成, smoke A/B/C 通过 (B 含 1 finding); Layer 1 Nomad jobs (reconcile + cron) deployed + healthy; 5 leaked secrets rotated; secret-guard hook v1.2 cherry-picked + active. Phase C (Layer 2 image + real LLM gates) 推下个 dedicated session
+> **2026-05-21 08:30 UTC amendment**: 24h stability observation 发现并修复 1 个 Phase B 回归 — Hermes `/root/.hermes/.env` 的 Luxeno 凭证副本 (ANTHROPIC_API_KEY + LUXENO_API_KEY) 未随 rotation 同步, owner revoke 旧 key 后 Hermes 401。已 resync + restart + live verify 两端点 HTTP 200。详见 decision §3.5 + 新 memory `feedback_rotation_enumerate_all_credential_stores`。Layer 1 state machine 全程未受影响, 24h gate clock 不重置。
+>
+> **Status**: SHIP READY — Phase B (B.1-B.8) 全部完成, smoke A/B/C 通过 (B 含 1 finding); Layer 1 Nomad jobs (reconcile + cron) deployed + healthy; 5 leaked secrets rotated; secret-guard hook v1.2 cherry-picked + active; 2026-05-21 Hermes dotenv Luxeno regression fixed. Phase C (Layer 2 image + real LLM gates) 推下个 dedicated session
 > **Predecessor handoff**: [`2026-05-20-m5-phase-a-snapshot-done.md`](2026-05-20-m5-phase-a-snapshot-done.md) — Phase A.7 dry-run + 5 OD locked + DB snapshot + backup branch
 > **Next session 入口**: 优先读本 doc → §6 → 选 Phase C (Layer 2 image) 或 backlog
 > **Length**: ~3.5h cumulative session (start ~12:45 UTC + B.5 secret leak detour ~2h + Phase B continuation)
@@ -133,6 +135,14 @@ Smoke + B.7 alloc logs 显示 `AriaLayer1Extension initialized (version=0.1.0, d
 ### R5 — DEMO-M5-* dispatch rows 留 prod DB (4 行 audit 痕迹)
 
 Smoke A/B/C 注入 3 个 issue_id (DEMO-M5-001/002/003 共 6 行 dispatch rows + 6 个 audit log entries). 没删除, 保留 audit trail. 不影响 reconciler 或 cron tick (parent rows 都 terminal S_FAIL, smoke A 唯一 active 子行 S4_LAUNCH 是 fake image_sha 不会真 dispatch). M6 cleanup session 可批量 delete `WHERE issue_id LIKE 'DEMO-M5-%'`.
+
+### R6 — Phase B regression: Hermes dotenv Luxeno key stale (2026-05-21 found + FIXED)
+
+24h stability observation (2026-05-21 08:22 UTC) 发现 Hermes errors.log 自 owner revoke 旧 Luxeno key 后持续 429 (00:54-06:59 UTC) → 401 Authentication Failed (07:59:53 UTC)。根因: rotation §3.3 gap — `/root/.hermes/.env` 有 2 个 Luxeno 凭证副本 (ANTHROPIC_API_KEY + LUXENO_API_KEY) 未随 R3 Nomad var rotation 同步。
+
+**已修复** (autonomous, 2026-05-21 08:24-08:25 UTC): backup `.env` → Python resync 2 keys 到新值 (sha256 verify) → `nomad alloc restart d43c2a7e` → live verify `/v1/messages` + `/v1/chat/completions` 两端点 HTTP 200。Layer 1 state machine 全程未受影响。canonical 记录 decision §3.5; 新 memory `feedback_rotation_enumerate_all_credential_stores`。
+
+**Phase C 前置**: 确认 aria-heartbeat 下一 hourly tick (~08:59 UTC May 21) 成功 (直接 endpoint test 已证 key 有效, in-situ cron 仅冗余确认)。
 
 ---
 
