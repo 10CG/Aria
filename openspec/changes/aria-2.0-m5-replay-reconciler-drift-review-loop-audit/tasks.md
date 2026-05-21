@@ -268,23 +268,25 @@
 
 ### T-deploy (Phase 6, owner-runnable, post-merge; R2 fixes TL-8/QA-13)
 
-- [ ] 6.17 Pre-deploy: SSH light-1 + git pull + git checkout master + pip install -e refresh (per `feedback_handoff_doc_assumes_venv_ready_smell`)
-- [ ] 6.18 Schema migration: 3-safeguard pattern inline (per R2 fix QA-4):
-  - [ ] 6.18.1 atomic backup via Python sqlite3.backup() (WAL-safe) → /opt/aether-volumes/aria-layer1/data/backups/dispatches.db.pre-m5.<timestamp>
-  - [ ] 6.18.2 integrity_check on backup → assert OK
-  - [ ] 6.18.3 dry-run on copy: shutil.copy backup → /tmp/dispatches.dryrun.db → apply_migrations → assert integrity_check OK + row count unchanged
-  - [ ] 6.18.4 apply on prod: same apply_migrations → assert integrity_check OK + row count unchanged + new cols present
-  - [ ] 6.18.5 rollback verification (per R2 fix QA-13): backup DB 可 restore via schema_migrate.py + integrity_check PASS
-- [ ] 6.19 nomadVar 配置: `ARIA_REWORK_MAX_ROUND=3` + `ARIA_SPEC_DRIFT_THRESHOLD=70` + `ARIA_FAIL_RETRY_CONFIDENCE_MIN=0.7` (per R2 fix AI-3) + 其他新增 secrets (TBD per Phase 6)
-- [ ] 6.20 nomad job validate + aether dev run (aria-layer1-comment-poll + aria-layer1-reconcile redeploy with M5 code)
-- [ ] 6.20.1 HCL cron syntax pre-validate (per R2 fix TL-8 Track A discovery): grep effective-cadence in alloc 第 1 个 tick logs, 验证 Next Periodic Launch ≤ 60s (5-field 1-min + --continuous) 不退化到 30min
-- [ ] 6.21 Verify alloc + clean ticks (1 cron cycle + 1 comment-poll cycle + 1 reconcile cycle 都跑过, audit log 写入正常)
-- [ ] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在 (per R2 fix TL-8: aria-layer2-runner 缺失但 stub 仍 work for synthetic test); 文档化 Tier-2 D.2.real 阻塞 (推 M6)
-- [ ] 6.22 Smoke E2E (类比 M4 Track A): SQL inject S7 dispatch + send Feishu card + /aria changes → 验证改稿模式 cycle
-- [ ] 6.23 Smoke E2E redo: SQL inject + /aria redo → 验证重做模式 cycle
-- [ ] 6.24 Smoke E2E rework cap: 创建 round=3 dispatch + /aria changes round=4 → 验证 S_FAIL(rework_exceeded)
-- [ ] 6.25 m5-handoff.yaml writeback: Tier-1 acceptance 字段 + audit_trail.pre_merge 填充
-- [ ] 6.26 Forgejo housekeeping: M5 kickoff issue close + PR description amend (如有 audit trajectory 需校正)
+> **Phase B DONE 2026-05-20** (light-1, by parallel twin sessions `simonfish/dev-claude` + `simonfish/dev-claude2` — multi-terminal-coordination dogfood #5; prod state converged, idempotent ops). Detail: `docs/handoff/2026-05-20-m5-phase-b-deploy-done.md` + `2026-05-20-m5-phase-b-shipped.md` + `aria-orchestrator/docs/m5-handoff.yaml::t_deploy_status.phase_b_completion`.
+
+- [x] 6.17 Pre-deploy: SSH light-1 + git pull + git checkout master + pip install -e refresh — **DONE** (B.1-B.3: reset submodule → single big leap master `244151e` → pip -e v0.4.0)
+- [x] 6.18 Schema migration: 3-safeguard pattern inline (per R2 fix QA-4) — **DONE** (B.4; ⚠ 实际由 aria-layer1-comment-poll tick auto-applied `apply_migrations` 13:17:33 UTC — `AriaLayer1Extension.__init__` 设计内自动迁移; 3-safeguard 显式 dry-run 步骤被旁路, 但 outcome 验证齐全, 见子项)
+  - [x] 6.18.1 atomic backup via Python sqlite3.backup() → `/opt/aether-volumes/aria-layer1/data/backups/dispatches.db.pre-v4.2.<ts>` — **DONE**
+  - [x] 6.18.2 integrity_check on backup → assert OK — **DONE** (integrity=ok, 16 rows)
+  - [~] 6.18.3 dry-run on copy — **旁路** (auto-migration 先于显式 dry-run 触发; Phase A.2 snapshot `/tmp/aria-layer1-snapshot-20260520T055525/dispatches.db.pre-m5` 保留 v3.0 rollback 路径)
+  - [x] 6.18.4 apply on prod → integrity_check OK + row count unchanged + new cols present — **DONE** (schema v3.0→v4.2, 16 rows preserved, 40 cols + dispatch_audit_log + 2 triggers)
+  - [x] 6.18.5 rollback verification — **DONE** (A.2 snapshot + post-migration backup 双 rollback target)
+- [~] 6.19 nomadVar 配置 — **PARTIAL** (B.5: 7 keys rotated via `nomad var put -force`; ⚠ `ARIA_REWORK_MAX_ROUND`/`ARIA_SPEC_DRIFT_THRESHOLD`/`ARIA_FAIL_RETRY_CONFIDENCE_MIN` 未显式设 → 用 code 默认值 3/70/0.7 — 行为正确但 nomadVar 无显式条目; owner 若要显式锁定需 Phase C 补设)
+- [x] 6.20 nomad job validate + run (aria-layer1-comment-poll + aria-layer1-reconcile + aria-layer1-cron) — **DONE** (B.7: 2 new jobs deployed, HCL validate clean)
+- [x] 6.20.1 HCL cron syntax pre-validate — **DONE** (A.7 dry-run + B.7 force-spawn; Next Periodic Launch ≤ 60s 确认)
+- [x] 6.21 Verify alloc + clean ticks — **DONE** (B.7: reconcile + cron force-spawn alloc Exit 0, Extension init OK, audit log 写入正常)
+- [ ] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在; 文档化 Tier-2 D.2.real 阻塞 — **Phase C** (Layer 2 image)
+- [x] 6.22 Smoke E2E changes mode — **DONE** (Smoke A: PR #116 + /aria changes → parent S_FAIL(changes_requested) + child S4_LAUNCH rework_mode=changes; FULL PASS)
+- [x] 6.23 Smoke E2E redo — **DONE w/ finding** (Smoke B: PR #117 + /aria redo → child S0_IDLE rework_mode=redo; DB PASS; placeholder comment skipped — M5-OS-PB-1 ctx.forgejo lazy-wire bug, M6 follow-up)
+- [x] 6.24 Smoke E2E rework cap — **DONE** (Smoke C: 4-row chain + cap check → S_FAIL(rework_exceeded), audit outcome=rejected_cap_exceeded; code-path PASS)
+- [x] 6.25 m5-handoff.yaml writeback — **DONE** (B.9: `t_deploy_status.phase_b_completion` + `smoke_verification` + M5-OS-PB-1/2 findings)
+- [~] 6.26 Forgejo housekeeping — **PARTIAL** (smoke PR #116/#117 closed + branches deleted; M5 kickoff issue close 推 Phase D)
 
 ### T-deploy 验收 (Tier-2 累积型, 不阻塞 Phase D.2)
 
