@@ -281,7 +281,7 @@
 - [x] 6.20 nomad job validate + run (aria-layer1-comment-poll + aria-layer1-reconcile + aria-layer1-cron) — **DONE** (B.7: 2 new jobs deployed, HCL validate clean)
 - [x] 6.20.1 HCL cron syntax pre-validate — **DONE** (A.7 dry-run + B.7 force-spawn; Next Periodic Launch ≤ 60s 确认)
 - [x] 6.21 Verify alloc + clean ticks — **DONE** (B.7: reconcile + cron force-spawn alloc Exit 0, Extension init OK, audit log 写入正常)
-- [ ] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在; 文档化 Tier-2 D.2.real 阻塞 — **Phase C** (Layer 2 image)
+- [~] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在; 文档化 Tier-2 D.2.real 阻塞 — **Phase C** (Layer 2 image). **2026-05-22 PARTIAL (O2)**: Layer 2 镜像 build+push (`forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11`, digest `sha256:5b80ca6c…35148f5`) + `aria-layer2-runner` parameterized job 注册 + `m1-handoff.yaml` image_refs 更新。剩余:alloc-存在 verify → O3 real dispatch。详见 `docs/handoff/2026-05-22-m5-phase-c-playbook.md` §O3
 - [x] 6.22 Smoke E2E changes mode — **DONE** (Smoke A: PR #116 + /aria changes → parent S_FAIL(changes_requested) + child S4_LAUNCH rework_mode=changes; FULL PASS)
 - [x] 6.23 Smoke E2E redo — **DONE w/ finding** (Smoke B: PR #117 + /aria redo → child S0_IDLE rework_mode=redo; DB PASS; placeholder comment skipped — M5-OS-PB-1 ctx.forgejo lazy-wire bug, M6 follow-up)
 - [x] 6.24 Smoke E2E rework cap — **DONE** (Smoke C: 4-row chain + cap check → S_FAIL(rework_exceeded), audit outcome=rejected_cap_exceeded; code-path PASS)
