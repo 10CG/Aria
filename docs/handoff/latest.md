@@ -11,13 +11,16 @@
 
 ---
 
-## ★ 最新 session (2026-05-22) — M5 Phase C O1+O2 ✅ + aria-plugin #50 ✅
+## ★ 最新 session (2026-05-22 ~16:05 UTC) — **Track D NEW**: aria-secret-guard-plugin-default Phase A ✅
+
+**★ Track D 最新 (NEW, 本 session)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — **Phase A 完整 ship** by `dev-claude2` (~3h): state-scanner → brainstorm (Q1 hook merge 5-trial instrumented test 实证 + Q2/Q3 收敛) → DEC + 1 new memory `feedback_claude_code_hook_merge_all_fire` → A.1 spec-drafter (proposal 172 行 + tasks 124 行) → post_spec R1 (1 critical version conflict + 12 major + 17 minor across 5 agents) → Rev1 sweep (v1.23.0→v1.24.0 + 4 new sections incl §State Schema/Ship Gate Fallback/Rollback Plan) → R2 PASS_WITH_WARNINGS converged 2-round (5/5 agents R1 ADDRESSED + 0 new major + 2 inline-fix §2.3 frontmatter enum) → A.2 task-planner 18 TASK DAG (17 in-cycle + 1 out-of-cycle, agent pre-assigned) → commit 9d41b2e rebase atop M5 Phase C 10 commits (no path overlap) → 3-way SHA parity ✓ + 2 new memory (`feedback_dec_ship_target_staleness_verify` + `feedback_instrumented_hook_self_lockout_escape`). **Ship target: aria-plugin v1.24.0** (DEC §5 yaml v1.23.0 superseded by state-scanner Spec 2026-05-20). **Cycle active**: Phase B/C/D pending next session (~10h remaining, critical path TASK-001 → 004 → 006 → 007/008 → 009 → 010-014 → 017)。
 
 **★ M5 Track B 最新**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — M5 Phase C 推进:**O1 (Feishu secret 轮换) ✅ + O2 (Layer 2 aria-runner 镜像 build+注册) ✅**。镜像 `forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11` digest `sha256:5b80ca6c…35148f5`;`aria-layer2-runner` parameterized job 注册;`m1-handoff.yaml` 更新;2026-05-02 secret deferral set 整体 CLOSED。**carry-forward: O3 (Tier-1 live LLM real smoke,单独 session,~¥0.10) + Phase D.2**。执行细节见 [`2026-05-22-m5-phase-c-playbook.md`](./2026-05-22-m5-phase-c-playbook.md)。
 
-**独立 track (本 session 另完成,已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1,607 test OK,#50 closed)。本 track DONE 无 carry-forward。
+**独立 track (本日另完成,已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1,607 test OK,#50 closed)。本 track DONE 无 carry-forward。
 
 > ⚠️ M5 (US-025) 仍未完:O3 + Phase D.2 待续 —— 见 §Track B / 上方 M5 handoff。
+> ⚠️ Track D NEW (本 session 新开):Phase B/C/D 待续 —— 见上方 Track D handoff。
 
 ---
 
