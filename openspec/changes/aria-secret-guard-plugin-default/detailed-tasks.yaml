@@ -1,0 +1,456 @@
+metadata:
+  feature: aria-secret-guard-plugin-default
+  spec_level: 3
+  spec_path: openspec/changes/aria-secret-guard-plugin-default
+  datasource: tasks.md (8 phases, 45 subtasks)
+  ship_target: aria-plugin v1.24.0
+  total_tasks: 17
+  total_estimated_hours: "6-9h (single cycle, excluding post-ship §18)"
+  created: 2026-05-22
+  audit_status: "post_spec converged R2 PASS_WITH_WARNINGS (.aria/audit-reports/post_spec-R2-2026-05-22T141716-511Z-...)"
+  rev2_deferred_items:  # R2 audit minor items to absorb during implementation (not blockers)
+    - "BA N1: not_installed runtime contract — clarify assert-never in TASK-004 aria-doctor SKILL.md"
+    - "BA N2: single_local advisory text — include 'plugin version < v1.24.0' alternate cause in TASK-004"
+    - "QA NF2: banner regex spec + 8th unit test (banner-missing edge case) in TASK-004"
+    - "QA NF1: SilkNode P3 stand-in command inventory documented in TASK-008 if P3 triggered"
+    - "tech-lead N1: hooks.json matcher entries count consistency in TASK-003"
+
+# ============================================================================
+# Phase B.2 — Hook Source Migration + aria-doctor + Docs (parallel possible)
+# ============================================================================
+
+tasks:
+  - id: TASK-001
+    parent: ["1.1", "1.2", "1.3"]
+    title: "Cherry-pick secret-guard scripts + path classification"
+    status: pending
+    complexity: M
+    estimated_hours: 1.5
+    dependencies: []
+    deliverables:
+      - aria/hooks/secret-guard.sh
+      - aria/hooks/secret-scan.sh
+    agent: backend-architect
+    verification:
+      - "git log shows clean cherry-pick from SilkNode commit 8eef709"
+      - "$CLAUDE_PROJECT_DIR refs classified in commit message (project-scoped vs plugin-internal)"
+      - "~/.claude/logs/guard-bypass.log path unchanged (still user-home)"
+    notes: "Cherry-pick is mechanical; path classification is the brain work."
+
+  - id: TASK-002
+    parent: ["1.4", "1.5", "1.6"]
+    title: "Port 251 tests + add 1 env-var resolution test + local verify"
+    status: pending
+    complexity: S
+    estimated_hours: 1.0
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/hooks/tests/secret-guard.test.sh
+      - aria/hooks/tests/secret-scan.test.sh
+    agent: qa-engineer
+    verification:
+      - "bash aria/hooks/tests/secret-guard.test.sh → 207/207 PASS"
+      - "bash aria/hooks/tests/secret-scan.test.sh → 44/44 PASS"
+      - "+1 new ${CLAUDE_PLUGIN_ROOT} substitution runtime test PASS"
+      - "Total: 252/252"
+
+  - id: TASK-003
+    parent: ["1.7"]
+    title: "Register hooks.json PreToolUse + PostToolUse entries"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/hooks/hooks.json
+    agent: backend-architect
+    verification:
+      - "PreToolUse: 2 entries (Bash matcher + Read|Edit|Write|MultiEdit matcher), both → secret-guard.sh"
+      - "PostToolUse: 1 entry (Bash|Read|Edit|Write|MultiEdit matcher) → secret-scan.sh"
+      - "NotebookEdit not registered (per proposal §Tool Matcher decision)"
+      - "Total hook entries: 3 (matches proposal Key Deliverables count; Rev1 N1 reconciled)"
+    notes: "Rev1 R2 tech-lead N1 hooks count consistency closure point."
+
+  - id: TASK-004
+    parent: ["2.1", "2.2", "2.3", "2.4", "2.5"]
+    title: "aria-doctor check_secret_guard_install() — 5-state schema + 7+1 unit tests + Rule #6 substitute"
+    status: pending
+    complexity: L
+    estimated_hours: 2.5
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/aria-doctor/SKILL.md
+      - aria-plugin-benchmarks/ab-results/2026-05-XX-aria-secret-guard-plugin-default-structural/
+      - aria-plugin-benchmarks/ab-results/2026-05-XX-aria-secret-guard-plugin-default-structural/README.md
+      - aria-plugin-benchmarks/ab-results/2026-05-XX-aria-secret-guard-plugin-default-structural/atomicity-guard.md
+      - aria-plugin-benchmarks/ab-results/2026-05-XX-aria-secret-guard-plugin-default-structural/dogfood-evidence.md
+    agent: knowledge-manager
+    verification:
+      - "5 primary states implemented: not_installed / single_plugin / single_local / dual_install / corrupted_settings"
+      - "2 sub-flags implemented: stale_local_version / divergent_content"
+      - "8 unit tests PASS (7 from Rev1 + 1 new for banner-missing edge case per R2 QA NF2)"
+      - "SKILL.md documents: state semantics + advisory text per state + atomicity guard (Rule #6 substitute)"
+      - "single_local advisory text includes 'plugin 未加载? OR plugin version < v1.24.0' (R2 BA N2)"
+      - "not_installed runtime reachability declared 'assert-never under normal plugin-loaded execution' (R2 BA N1)"
+      - "Banner regex spec documented (e.g. '^# v(\\d+\\.\\d+)' or actual format) (R2 QA NF2)"
+      - "Structural substitute artifacts in ab-results/ (README + atomicity-guard.md + dogfood-evidence.md)"
+    notes: |
+      R2-deferred items absorbed here:
+      - BA N1: not_installed contract
+      - BA N2: single_local alternate-cause advisory
+      - QA NF2: banner regex + 8th test
+
+  - id: TASK-005
+    parent: ["3.1", "3.2", "3.3", "3.4"]
+    title: "standards/conventions/secret-hygiene.md Layer 2 update + Path↔Layer mapping"
+    status: pending
+    complexity: S
+    estimated_hours: 0.75
+    dependencies: []
+    deliverables:
+      - standards/conventions/secret-hygiene.md
+    agent: knowledge-manager
+    verification:
+      - "§Layer 2 enforcement 段 added, references aria/hooks/secret-guard.sh as plugin SOT"
+      - "Path↔Layer mapping table at top (Path 1↔Layer 0 / Path 2↔inline / Path 3↔Layer 2)"
+      - "Q1 evidence boundary note added (Write event proxy, Bash extrapolation by hook orchestrator parity)"
+      - "Local copy + plugin coexist 模式 documented with 5-state aria-doctor pointer"
+    notes: "Parallel-able with TASK-001/002/003/004."
+
+# ============================================================================
+# Phase B.2 — Version Bump (parallel possible)
+# ============================================================================
+
+  - id: TASK-006
+    parent: ["4.1", "4.2", "4.3", "4.4", "4.5", "4.6"]
+    title: "5+1 SOT bump v1.23.0 → v1.24.0 with known-limitation 全集"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-004]
+    deliverables:
+      - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+    agent: tech-lead
+    verification:
+      - "Pre-bump verify: aria/VERSION === '1.23.0' (sanity check before write)"
+      - "plugin.json version === '1.24.0'"
+      - "marketplace.json version + plugins[].version === '1.24.0'"
+      - "VERSION snapshot updated with release date + minor description"
+      - "CHANGELOG [1.24.0] section includes BOTH (a) cat && grep .env false-positive AND (b) log-file grep false-negative (parent DEC §2.6 Q4 deferred)"
+      - "README.md version + hooks count updated (3 plugin hook entries)"
+
+# ============================================================================
+# Phase B.3 — Dogfood + Smoke (sequential; ship gate)
+# ============================================================================
+
+  - id: TASK-007
+    parent: ["5.1"]
+    title: "Aria self dogfood — 10 daily commands + p95 timing capture"
+    status: pending
+    complexity: S
+    estimated_hours: 0.75
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-006]
+    deliverables:
+      - openspec/changes/aria-secret-guard-plugin-default/smoke-evidence.md  # partial, Aria section
+    agent: qa-engineer
+    verification:
+      - "10 daily commands recorded with command/tool/hook_path/outcome/classification"
+      - "Timing p50_ms + p95_ms captured per event"
+      - "p95 < 100ms (Performance Budget per proposal §Impact)"
+      - "0 unexpected_false_positive AND 0 unexpected_false_negative entries"
+
+  - id: TASK-008
+    parent: ["5.2", "5.2.fallback"]
+    title: "SilkNode cross-project smoke (P2) OR fallback P2.5/P3"
+    status: pending
+    complexity: M
+    estimated_hours: 1.5
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-006]
+    deliverables:
+      - openspec/changes/aria-secret-guard-plugin-default/smoke-evidence.md  # SilkNode section appended
+    agent: qa-engineer
+    verification:
+      - "If P2 (default): SilkNode owner-provided ~10 commands run + recorded with classification + timing"
+      - "If P2.5 (owner unavailable Day 0-7): 降级 post-ship 7-day dogfood, smoke-evidence mode=deferred_post_ship"
+      - "If P3 (Day 14+): Aria owner stand-in with documented general + SilkNode-specific commands (R2 QA NF1 — inventory documented inline here)"
+      - "0 unexpected_false_positive AND 0 unexpected_false_negative (if P2/P3 actually ran)"
+    notes: |
+      R2 QA NF1 closure point: if P3 triggers, document the stand-in inventory inline in smoke-evidence.md
+      "owner_stand_in_inventory" section.
+
+  - id: TASK-009
+    parent: ["5.3", "5.4"]
+    title: "Aggregate smoke-evidence.md + ship gate verdict"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-007, TASK-008]
+    deliverables:
+      - openspec/changes/aria-secret-guard-plugin-default/smoke-evidence.md  # finalized
+    agent: qa-engineer
+    verification:
+      - "smoke-evidence.md conforms to YAML schema (per tasks.md §5.3)"
+      - "Verdict computed per §5.4 rubric: PASS / REVIEW / BLOCK"
+      - "If REVIEW (1-2 unexpected): triaged, decision recorded"
+      - "If BLOCK: escalate to v1.24.0 OD (放弃 ship 或接受新发现)"
+      - "If PASS: proceed to TASK-010"
+
+# ============================================================================
+# Phase B.2 audit + C.2 merge (sequential)
+# ============================================================================
+
+  - id: TASK-010
+    parent: ["6.1"]
+    title: "post_implementation audit (5-agent convergence, locked)"
+    status: pending
+    complexity: M
+    estimated_hours: 1.0
+    dependencies: [TASK-009]
+    deliverables:
+      - .aria/audit-reports/post_implementation-RN-<timestamp>-aria-secret-guard-plugin-default-orchestrator.md
+    agent: tech-lead  # orchestrator; convergence dispatches 5 agents
+    verification:
+      - "5-agent team locked: tech-lead + backend-architect + qa-engineer + code-reviewer + knowledge-manager"
+      - "Convergence achieved (unanimous PASS or PASS_WITH_WARNINGS, no oscillation)"
+      - "Verdict computed + audit report written to .aria/audit-reports/"
+    notes: "Config currently has post_implementation=off; must temporarily enable for this Spec OR document why skipped."
+
+  - id: TASK-011
+    parent: ["6.2"]
+    title: "pre_merge audit + aether ci status verify (Rule #8)"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-010]
+    deliverables:
+      - .aria/audit-reports/pre_merge-RN-<timestamp>-aria-secret-guard-plugin-default-orchestrator.md
+    agent: tech-lead
+    verification:
+      - "pre_merge audit converged"
+      - "aether ci status --branch main --in-flight --json clean (or fallback per config no_aether_fallback)"
+      - "PR CI status passing"
+
+  - id: TASK-012
+    parent: ["6.3", "6.4"]
+    title: "Merge standards PR + pre-merge rollback gate"
+    status: pending
+    complexity: S
+    estimated_hours: 0.25
+    dependencies: [TASK-011]
+    deliverables:
+      - "git: standards PR merged"
+    agent: tech-lead
+    verification:
+      - "standards PR Rule #8 gate PASS"
+      - "Pre-merge rollback gate verified: aria-plugin PR Rule #8 ALL pass before proceeding to TASK-013"
+      - "If gate FAIL: execute Rollback Plan Row 1 (revert standards PR)"
+
+  - id: TASK-013
+    parent: ["6.5", "6.6"]
+    title: "Re-bump standards pointer in aria-plugin PR + merge"
+    status: pending
+    complexity: S
+    estimated_hours: 0.25
+    dependencies: [TASK-012]
+    deliverables:
+      - "git: aria-plugin PR merged with standards re-bump"
+    agent: tech-lead
+    verification:
+      - "aria-plugin PR head includes re-bumped standards pointer to post-merge HEAD"
+      - "aria-plugin PR merged"
+
+  - id: TASK-014
+    parent: ["6.7", "6.8"]
+    title: "Aria main submodule re-bump + multi-remote push + post-push rollback gate"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-013]
+    deliverables:
+      - "git: aria submodule pointer bumped to post-merge HEAD"
+      - "git: standards submodule pointer bumped to post-merge HEAD"
+      - "Aria main commit + push to origin + github"
+    agent: tech-lead
+    verification:
+      - "Submodule pointers reference post-merge HEAD (per memory feedback_sequenced_multirepo_gitlink_bump)"
+      - "Post-push SHA verify: origin === github === local (per memory feedback_release_phase_d_5_files_synchronization)"
+      - "If SHA mismatch persistent: execute Rollback Plan Row 2 (revert aria-plugin + standards)"
+
+# ============================================================================
+# Phase D — Closure
+# ============================================================================
+
+  - id: TASK-015
+    parent: ["7.1", "7.2"]
+    title: "D.1 progress no-op + D.2 archive spec"
+    status: pending
+    complexity: S
+    estimated_hours: 0.25
+    dependencies: [TASK-014]
+    deliverables:
+      - openspec/archive/<YYYY-MM-DD>-aria-secret-guard-plugin-default/  # moved from openspec/changes/
+    agent: tech-lead
+    verification:
+      - "D.1: no-op per memory project_aria_no_runtime_upm (Aria self has no UPM)"
+      - "D.2: openspec/changes/aria-secret-guard-plugin-default/ → openspec/archive/<YYYY-MM-DD>-aria-secret-guard-plugin-default/"
+      - "smoke-evidence.md included in archived directory"
+      - "Use /aria:openspec-archive skill (handles CLI bug correction)"
+
+  - id: TASK-016
+    parent: ["7.3", "7.4"]
+    title: "D.3 close Forgejo Aria #84 + #107 + SilkNode #429 reference comment"
+    status: pending
+    complexity: S
+    estimated_hours: 0.5
+    dependencies: [TASK-014]
+    deliverables:
+      - "Forgejo Aria #84 closing comment"
+      - "Forgejo Aria #107 closing comment"
+      - "Forgejo SilkNode PR #429 reference comment"
+    agent: tech-lead
+    verification:
+      - "Aria #84 + #107 closed with aria-plugin v1.24.0 commit hash + Q1 evidence link (DEC §4) + aria-doctor 5-state command example + §Rollback Plan reference"
+      - "SilkNode PR #429 reference comment posted: 'framework default complete in aria-plugin v1.24.0 (commit <SHA>); v1.2 仍可作历史 SOT, 迁移由 SilkNode owner 自决'"
+
+  - id: TASK-017
+    parent: ["7.5", "7.6"]
+    title: "D.3 handoff doc (Rule #9 §2.3 compliant) + memory verify"
+    status: pending
+    complexity: S
+    estimated_hours: 0.75
+    dependencies: [TASK-016]
+    deliverables:
+      - docs/handoff/<YYYY-MM-DD>-aria-secret-guard-plugin-default-shipped.md
+    agent: knowledge-manager
+    verification:
+      - "Handoff doc written to docs/handoff/ (per Rule #9)"
+      - "Frontmatter (Rule #9 §2.3) 5 fields: track-id=aria-secret-guard-plugin-default, owner-container=<container>, phase=D.3, status=done, updated-at=<ISO 8601 UTC>"
+      - "Template ref: aria/templates/session-handoff.md followed"
+      - "Memory feedback_claude_code_hook_merge_all_fire confirmed indexed in MEMORY.md"
+      - "1-2 new ship-lesson memory entries added if surfaced during cycle"
+
+# ============================================================================
+# Post-Ship (Out of Cycle) — separate tracking
+# ============================================================================
+
+  - id: TASK-018
+    parent: ["8.1", "8.2", "8.3", "8.4"]
+    title: "Post-ship tracking: Aether 14-day escalation + v1.24.1 SLA + v1.25.x scope"
+    status: deferred  # not in current cycle
+    complexity: S  # tracking only, not implementation
+    estimated_hours: "out-of-cycle"
+    dependencies: [TASK-014]  # ship complete
+    deliverables:
+      - "Forgejo issue or memory entry tracking Aether dogfood status"
+      - "v1.24.1 minor cycle ready-to-trigger if Aether finds unexpected false-positive (48h SLA)"
+      - "v1.25.x scope item: aria-doctor self-test 子命令"
+      - "v1.25.x scope item: PreToolUse Write content scan"
+    agent: tech-lead
+    verification:
+      - "Aether owner notified via Forgejo Issue #107 comment with 14-day escalation deadline"
+      - "v1.24.1 minor cycle triggered within 48h if Aether finds critical false-positive"
+      - "v1.25.x scope items logged in Aria backlog (Forgejo issue or roadmap memory)"
+    notes: "Out-of-cycle. Tracking responsibility, not active implementation."
+
+# ============================================================================
+# DAG / Execution order
+# ============================================================================
+
+execution_dag:
+  parallel_groups:
+    # All can start immediately (no dependencies)
+    group_1:
+      - TASK-001
+      - TASK-005  # standards prose update (no dep on hook source)
+    # After TASK-001 completes
+    group_2:
+      - TASK-002  # tests
+      - TASK-003  # hooks.json
+      - TASK-004  # aria-doctor
+    # After all B.2 source work
+    group_3:
+      - TASK-006  # version bump
+    # After version bump
+    group_4:
+      - TASK-007  # Aria self dogfood
+      - TASK-008  # SilkNode (or fallback)
+    # After both dogfood
+    group_5:
+      - TASK-009  # smoke evidence aggregation + ship gate verdict
+    # Sequential from here
+    sequential_tail:
+      - TASK-010  # post_implementation audit
+      - TASK-011  # pre_merge audit
+      - TASK-012  # standards PR merge
+      - TASK-013  # aria-plugin PR merge
+      - TASK-014  # Aria main + multi-remote push
+      - TASK-015  # archive
+      - TASK-016  # Forgejo comments
+      - TASK-017  # handoff doc + memory
+    out_of_cycle:
+      - TASK-018  # post-ship tracking
+
+  critical_path:
+    - TASK-001
+    - TASK-004
+    - TASK-006
+    - TASK-007  # or TASK-008 whichever is longer
+    - TASK-009
+    - TASK-010
+    - TASK-011
+    - TASK-012
+    - TASK-013
+    - TASK-014
+    - TASK-017
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+summary:
+  by_complexity:
+    S: 12
+    M: 4
+    L: 1
+    XL: 0
+  by_agent:
+    backend-architect: 2
+    qa-engineer: 4
+    knowledge-manager: 3
+    tech-lead: 8
+  total_estimated_in_cycle: "6.5-9h (TASK-001 to TASK-017)"
+  out_of_cycle: "TASK-018 (Aether 14-day + v1.24.1 SLA + v1.25.x scope tracking)"
+
+  parallelization_savings:
+    - "TASK-005 parallel with TASK-001/002/003/004 saves ~0.75h"
+    - "TASK-007 parallel with TASK-008 saves ~1.0h"
+    - "Net: ~1.75h savings if parallelized"
+    - "Wall-clock optimal: ~4.5-7h (vs strict sequential ~9h)"
+
+  critical_dependencies:
+    - "TASK-006 (version bump) gates TASK-007/008 dogfood (must run with correct version)"
+    - "TASK-009 ship gate PASS verdict gates TASK-010 audit"
+    - "TASK-012 standards merge MUST precede TASK-013 aria-plugin merge (sequenced multi-repo pattern)"
+    - "TASK-014 SHA parity gates TASK-015 archive"
+
+  audit_checkpoint_config_notes:
+    post_implementation: |
+      Currently config has post_implementation=off. For this Level 3 Spec
+      involving plugin SOT + cross-project blast radius, recommend enabling
+      post_implementation=convergence for this cycle (TASK-010). Decision
+      deferred to TASK-010 entry: either enable config or document skip
+      rationale in audit-reports/.
+    pre_merge: |
+      Currently config has pre_merge=off. Rule #8 mandates pre-merge gate
+      regardless of audit-engine config (aether ci status verify is independent).
+      TASK-011 covers Rule #8; pre_merge audit checkpoint is optional.
+
+  agent_assignment_rationale:
+    backend-architect: "TASK-001 (cherry-pick + path classification), TASK-003 (hooks.json schema) — system contract design"
+    qa-engineer: "TASK-002 (tests), TASK-007/008/009 (dogfood + smoke + verdict) — testing + verification"
+    knowledge-manager: "TASK-004 (aria-doctor SKILL.md), TASK-005 (standards prose), TASK-017 (handoff doc + memory) — documentation surface"
+    tech-lead: "TASK-006 (version bump), TASK-010-016 (audit + merge + archive + closure), TASK-018 (post-ship tracking) — orchestration + ship process"
