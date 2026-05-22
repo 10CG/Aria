@@ -1,10 +1,34 @@
 # Aria 2.0 M5 — Phase C playbook (Layer 2 image + Tier-1 live LLM + Feishu secret)
 
-> **Status**: Owner-runnable — 填补 `2026-05-20-m5-deploy-playbook-v2-accurate.md` §Phase C 缺失的 step-by-step
+> **Status**: **O1 ✅ + O2 ✅ 完成 (2026-05-22)** — O3 + Phase D.2 待续
 > **Authority**: 2026-05-22 light-1 实地 SSH 侦察 (read-only, Rule #7 compliant) + decision §2.5 + aria-build-README + aria-runner Dockerfile
 > **Predecessor**: `2026-05-20-m5-deploy-playbook-v2-accurate.md` (Phase A + B 已执行完毕)
 > **Scope**: 3 个 owner gate (O1 / O2 / O3) + Phase D.2 close
 > **Created**: 2026-05-22 by AI recon
+
+---
+
+## §执行记录 (2026-05-22)
+
+**O1 — FEISHU secret 轮换 ✅ 完成**
+- 飞书后台重置 App Secret + Verification Token + Encrypt Key (保留 app,APP_ID `cli_a95f50f09f7adcb5` 不变)
+- `/root/.hermes/.env` 3 key 更新 → Hermes restart → 验证 `✓ feishu connected` (WS 干净重连)
+- decision `2026-05-02-secret-rotation-deferred.md` → Resolved;原 4-key deferral set 整体 CLOSED
+- 提交: 主仓 `558b5f8`
+
+**O2 — Layer 2 aria-runner 镜像 ✅ 完成**
+- 镜像: `forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11` (+`claude-latest`)
+- digest: `sha256:5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5`
+- 烤入: aria-plugin v1.23.1 (8253b6e) + Layer 2 changes/redo (Spec X+Y) + claude-code CLI
+- bot PAT 加 `read:repository` scope (aria-build clone 用);Layer 2 var 另用 write-scoped PAT
+- `nomad/jobs/aria-layer2-runner` var 填全 8 key (ANTHROPIC_BASE_URL=`https://api.luxeno.ai` 实测核实;model alias glm-4.5-air/glm-5.1/glm-5-turbo;Luxeno+Zhipu HA)
+- `aria-layer2-runner.hcl` image ref `10CG`→`10cg` 修正 (docker lowercase)
+- `aria-layer2-runner` parameterized job 注册成功 (Status running)
+- 提交: aria-orch `9cfbce8` (m1-handoff) + `ebd5bdd` (HCL fix);主仓 `9b38a95` + `8668cac`
+- **踩坑记录**: ① `git config insteadOf` 多值需 `--add` (改用 `git -c`);② docker 镜像路径要小写 `10cg`;③ `.gitmodules` ssh URL 需 insteadOf 重写 (容器无 SSH key);④ mawk 不支持 `{n}` 区间
+
+**O3 — Tier-1 live LLM gate + Layer 2 real smoke** — 待续 (单独 session,~¥0.10)
+**Phase D.2 — close** — O3 后
 
 ---
 
