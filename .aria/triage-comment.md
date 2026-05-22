@@ -1,6 +1,6 @@
 ## Triage Report
 
-**Verdict**: `partial-repro` | **Severity**: `minor` | **Recommended Action**: `next-cycle`
+**Verdict**: `confirmed` | **Severity**: `major` | **Recommended Action**: `next-cycle`
 
 ---
 
@@ -8,69 +8,47 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | `1.17.3` |
-| Current | `1.19.0` |
-| Gap | `behind` (+2 minor versions) |
+| Reported | `1.20.0` |
+| Current | `1.23.0` |
+| Gap | behind (+3 minor) |
 
-Issue was filed against v1.17.3; current release is v1.19.0. The bug is present in both versions — this is not an outdated report. The `_normalize_status` logic has not changed between these versions (Step 4 git log confirms no relevant fix commits).
+报告版本 v1.20.0 落后当前 v1.23.0 三个 minor，但 bug 在 **v1.23.0 仍可复现**（见下方 Reproduction）。期间的 `state-scanner-bugfix-locale-and-transitional-status`（Aria #73, 2026-05-20）只补了 `implementation-complete/-done` 短语，未触及 `_extract_status` 的提取范围 —— 非 outdated report。
 
 ### Code Path
 
-`aria/skills/state-scanner/scripts/collectors/_status.py` (prose citation, L58-60):
-
-- File exists at path `aria/skills/state-scanner/scripts/collectors/_status.py` — confirmed present
-- Line 58-60 snippet retrieved: `for token in ("done", "complete"): if token in low: return "done"` — matches issue description exactly
-- Note: the issue also uses bare `skills/state-scanner/scripts/collectors/_status.py` (without `aria/` prefix) — that path does not exist; the full path with `aria/` prefix is the correct citation
-
-The code path verification confirms: `"done"` and `"complete"` substring checks execute at lines 58-60, **before** the `"approved"` check at line 64. Any Status string containing the substring `"done"` will short-circuit and return `"done"` regardless of other tokens in the string.
+- `skills/state-scanner/scripts/collectors/_status.py` — **存在**，与 issue 描述一致。`_extract_status` 用 `_STATUS_PATTERNS` 的 `re.MULTILINE` `^...(.+?)\s*$` 抓取，仅截单行但**对单行长度无任何上限**；`_normalize_status` 的 `done/complete` fallback 在**整个 raw 字符串**上做 word-boundary 搜索。
+- *(triage.py Step 3 因 issue 路径相对 aria-plugin repo root、而扫描发生在 Aria 主仓，误报三处 "file not found" —— 实际文件均存在，已人工核对。)*
 
 ### Git History
 
-`git log -n 20 --oneline -- aria/skills/state-scanner/scripts/collectors/_status.py` returned:
-
-- `47c9a57` feat(state-scanner): i18n status regex — fullwidth colon + inline blockquote
-- `b8db9a0` refactor(state-scanner): T3 prep — split scan.py into collectors/ package
-
-**No recent commits matched fix-related keywords** (`fix`, `resolve`, `normalize`, `bugfix`). `likely_fix_candidates: []`. The substring matching order logic has not been patched.
+No recent commits matched on cited files（Step 4 skipped — cited paths 在主仓不可直接 resolve）。Aria #101 修复 commit `154775a`（2026-05-13）引入 word-boundary `_has_token`，根治 substring-shadow，但**未改提取范围** —— 本 issue 是同类 bug 的另一面，非 #101 的重复。
 
 ### In-flight
 
 | Category | Matches |
 |----------|---------|
-| Remote PRs | none (0 open PRs keyword-matched on `101` / `normalize` / `_status`) |
+| Remote PRs | none |
 | Local branches | none |
-| Worktrees | `feature/aria-issue-triage-sop` (current worktree — unrelated to bug fix) |
+| Worktrees | none（仅 main `master` @ `90ec746`）|
 
-No in-flight fix work found. Starting a new fix cycle will not create duplicate work.
+无 in-flight 修复，可安全开新 cycle。
 
 ### Reproduction
 
-**Mode**: `auto` | **Hit rate**: `2/4`
+**Mode**: `auto` | **Hit rate**: `1/1`
 
-Executed: `python3 -c "from _status import _normalize_status; ..."` against current `aria/skills/state-scanner/scripts/collectors/_status.py`.
+- **case-1**: 合成单行 Status 字段 `> **Status**: 🟢 **Phase B Sprint 2 delivered** — archival blocked; ... docs sync 标 done; ...`（178 chars），经 v1.23.0 `_extract_status` + `_normalize_status`。
+  - **Expected**: normalize 结果 ≠ `done` —— 头部主语义 `delivered` 属 implemented-class / archival-blocked，子任务叙述里的 `done` token 不应 shadow lifecycle。
+  - **Actual**: `_extract_status` 返回完整 178-char 单行（无长度/句子/首行截断）；`_normalize_status` 经 word-boundary 命中埋在叙述里的 `标 done` → fallback 归 lifecycle `done`。
+  - **Match**: ✅ 复现。
 
-| case_id | Input (Status raw string) | Expected behavior | Actual behavior | Match | Notes |
-|---------|--------------------------|-------------------|-----------------|-------|-------|
-| case-1-docs-marketplace | `Approved (Rev2 CONVERGED) — Phase A done, ready for Phase B` | `approved` (Phase B not started) | `done` (substring hit) | false | PRIMARY BUG — "done" token at L58 evaluated before "approved" at L64; `done` substring wins |
-| case-2-existing-data-migration | `Implemented (Phase B PR-A merged 2026-05-10 main fce87bc) — post-deploy 验证后归档` | `done` (issue claims pending_archive hit) | `unknown` | false | SECONDARY BUG — `Implemented` not in any token list; returns `unknown` not `done`; different root cause than issue describes |
-| case-3-pricing-marketplace-redo | `Implemented (Phase B PR-A merged 2026-05-10 main 6160d18) — UAT PASS; post-monitoring 后归档` | `done` (issue claims pending_archive hit) | `unknown` | false | SECONDARY BUG — same as case-2; `Implemented` missing from token dict |
-| case-4-terms-of-service | `⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09 commit eb49e77` | `pending` or `draft` (lawyer-blocked, not done) | `done` (substring hit) | false | PRIMARY BUG — "done" token at L58 evaluated before "pending"/"draft" at L72; `done` substring wins |
-
-**Summary**: cases 1 and 4 reproduce the primary substring-ordering bug exactly as described. Cases 2 and 3 hit a *different* bug (`Implemented` not mapped in the token dictionary → `unknown`), which the issue does not describe and which is a secondary/adjacent defect.
-
-**Deviation from issue claim**: Issue reports all 4 cases as `pending_archive` hits via the `done` substring bug. Actual repro: 2/4 confirm the primary `done` substring ordering bug; 2/4 (`Implemented` cases) hit a secondary `unknown` mapping gap that the issue does not describe.
+附带观测：proposed-fix-1（首段截断）预览下，该 case normalize 变为 `unknown`（不再误归 `done`，也就不会进 `pending_archive[]`）—— 治本方向，但头部 `delivered` 仍非已识别 token，需配合 token 字典扩展才能精确归 `implemented`。
 
 ### Verdict Rationale
 
-Verdict is **`partial-repro`** because:
-
-1. The core bug is real and reproducible (2/4 confirmed: `"done"` token checked before `"approved"` and `"pending"` — substring `done` in Status narrative overrides intended semantic). This is a genuine defect requiring a fix.
-2. However, the issue self-reports 4/4 hit rate for the `done` substring mechanism. The actual mechanism for cases 2 and 3 is different (`Implemented` not in token dictionary → `unknown`, not `done`). These cases end up in `pending_archive` for a *different* reason or may not appear there at all depending on scanner logic.
-3. The `partial-repro` verdict forces the fix scope to cover both the primary (substring ordering) and secondary (missing `Implemented` token) bugs, rather than narrowly patching only what was described.
-
-**deviation_note**: Issue self-reports 4/4 hit rate for the `done` substring ordering bug. Actual repro: 2/4 confirm primary bug (`done` token fires before `approved`/`pending` — cases 1 and 4). 2/4 (`existing-data-migration`, `pricing-status-marketplace-redo`) hit a secondary bug: `Implemented` is not in any token list and returns `unknown`, not `done`. Both are real defects in `_normalize_status` but they have different root causes. Fix scope must cover both (a) substring ordering/word-boundary for `done`, and (b) missing `Implemented` lifecycle token mapping.
+Bug 在当前 v1.23.0 确认复现：`_extract_status` 对单行 Status 字段无长度上限，大型 spec 把 Status 当 mini-changelog 写时，`_normalize_status` 的 `done/complete` fallback 会命中子任务叙述里的 token，把仍 archival-blocked 的 spec 错归 `done` → 错放进 `openspec.pending_archive[]`，污染 state-scanner 的归档推荐。属 state-scanner 核心输出的正确性缺陷（`major`）—— 但有归档前人工 gate、且触发条件较具体（单行长 Status + 头部非关键词 + 埋藏 done token），无数据损坏、不阻断主流程，故非 `critical`。与 #101 同源不同面，建议下一 cycle 修复（`next-cycle`）。
 
 ---
 
-*Generated by `/issue-triage` v1.19.0 — Ref: 10CG/Aria#101*
-*Step 6 performed by AI (auto mode) — 2026-05-13*
+*Generated by `/issue-triage` v1.23.0 — Ref: 10CG/aria-plugin#50*
+*Step 6 performed by AI (auto mode) — 2026-05-21*
