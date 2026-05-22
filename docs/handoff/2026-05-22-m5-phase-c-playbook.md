@@ -73,39 +73,51 @@ ssh light-1 'export PATH=$PATH:/usr/local/bin; nomad job restart aria-orchestrat
 
 **Step 2 — exec 进 aria-build 容器**
 ```bash
-ssh light-1   # 或任一能到 Nomad 的节点
+ssh light-1
 export PATH=$PATH:/usr/local/bin
-ALLOC=$(nomad job status aria-build | awk '/running/{print $1; exit}')
-nomad alloc exec -task build -i -t "$ALLOC" /bin/sh
-# 容器内:确认已登录 — cat ~/.docker/config.json | jq '.auths|keys' → ["forgejo.10cg.pub"]
+# aria-build alloc 实测 = 7ae8ecff (18d 常驻 service)。若变更,从 Allocations 表取
+# running 那行的 ID (注意别用 awk '{8}' 区间 — light-1 是 mawk,不支持)
+nomad alloc exec -task build -i -t 7ae8ecff /bin/sh
+# 容器内确认已登录: cat ~/.docker/config.json | jq '.auths|keys' → ["forgejo.10cg.pub"]
 ```
 
-**Step 3 — 容器内 clone Aria 仓 (含 submodule) 并 build**
-> aria-runner Dockerfile **必须从 Aria 仓库根目录** build(`COPY aria/` 烤入 aria-plugin + `COPY aria-orchestrator/docker/aria-runner/`)。
-```sh
-# 容器内 shell — 用 FORGEJO_BOT_PAT clone (env 已注入)
-cd /tmp && rm -rf Aria-build && \
-  git clone --recurse-submodules https://forgejo.10cg.pub/10CG/Aria.git Aria-build   # ⚠️ VERIFY: clone 是否需 PAT 凭据 — 见 §4 待核实 #2
-cd Aria-build
-# checkout 目标 ref (Step 1 决定);默认 master 已是最新
-git submodule update --init --recursive
+**Step 3 — 取源 + build**
 
-# build (Dockerfile L13-16 钦定命令 — 从仓库根目录 + -f 指定 Dockerfile)
+> ⚠️ **§4 #2 实测**:aria-build 容器的 `FORGEJO_BOT_PAT` 是 registry-scoped(或已过期),**不能 git clone 仓库**;且 forgejo.10cg.pub 集群内是自签证书(`git` 需 `-c http.sslVerify=false`)。下面两条取源路线 **owner 选一**。
+> aria-runner Dockerfile **必须从 Aria 仓库根目录** build(`COPY aria/` + `COPY aria-orchestrator/docker/aria-runner/`)。
+
+**路线 A — 给 bot 一个 repo-read PAT(推荐,一劳永逸)**
+1. Forgejo:`aria-runner-bot` 账号 → PAT 加 `read:repository` scope(保留原 `write:package`)
+2. `aether env set --job aria-build FORGEJO_BOT_PAT <new-pat>` → `nomad job restart aria-build`
+3. 容器内 clone:
+```sh
+cd /tmp && rm -rf Aria-build
+git -c http.sslVerify=false clone --recurse-submodules \
+  "https://${FORGEJO_BOT_USER}:${FORGEJO_BOT_PAT}@forgejo.10cg.pub/10CG/Aria.git" Aria-build
+cd Aria-build && git -c http.sslVerify=false submodule update --init --recursive
+```
+
+**路线 B — light-1 host 取源 tar-pipe 进容器(不动 PAT)**
+> ⚠️ 别用 `/root/Aria` —— 它是 aria-layer1 的 editable install 源,改它会动到运行中的 Layer 1。在 host clone 独立 scratch:
+```sh
+# light-1 host (root 已有 forgejo git 凭据)
+git clone --recurse-submodules <forgejo-Aria-url> /tmp/Aria-build-src
+nomad alloc exec -task build 7ae8ecff mkdir -p /tmp/Aria-build
+tar -C /tmp/Aria-build-src -cf - . | nomad alloc exec -i -task build 7ae8ecff tar -C /tmp/Aria-build -xf -
+```
+
+**build(两条路线汇合 — 容器内,从仓库根目录)**
+```sh
+cd /tmp/Aria-build
+TAG=claude-m5-91b8975-v11   # Step 1 决定的 ref/tag
 docker build -f aria-orchestrator/docker/aria-runner/Dockerfile \
   --build-arg DEPLOY_ENV=internal \
-  -t forgejo.10cg.pub/10CG/aria-runner:claude-m5-carry-09ff364-v11 .
-
-# 双 tag (AD-M1-2: immutable + mutable)
-docker tag forgejo.10cg.pub/10CG/aria-runner:claude-m5-carry-09ff364-v11 \
-           forgejo.10cg.pub/10CG/aria-runner:claude-latest
-
-# push 两个 tag
-docker push forgejo.10cg.pub/10CG/aria-runner:claude-m5-carry-09ff364-v11
+  -t "forgejo.10cg.pub/10CG/aria-runner:$TAG" .
+docker tag "forgejo.10cg.pub/10CG/aria-runner:$TAG" forgejo.10cg.pub/10CG/aria-runner:claude-latest
+docker push "forgejo.10cg.pub/10CG/aria-runner:$TAG"
 docker push forgejo.10cg.pub/10CG/aria-runner:claude-latest
-
-# 记下 image digest (更新 m1-handoff.yaml 用)
-docker inspect --format='{{index .RepoDigests 0}}' \
-  forgejo.10cg.pub/10CG/aria-runner:claude-m5-carry-09ff364-v11
+# 记下 sha256 digest — Step 4 更新 m1-handoff.yaml + Layer 2 dispatch IMAGE_SHA 用
+docker inspect --format='{{index .RepoDigests 0}}' "forgejo.10cg.pub/10CG/aria-runner:$TAG"
 exit
 ```
 
@@ -116,13 +128,30 @@ exit
 - `image_history:` 追加 final_tag = `claude-m5-carry-09ff364-v11`
 > 这是一个 commit(aria-orchestrator 子模块 + 主仓 submodule bump),走正常 Phase C 提交流程。
 
+**Step 4.5 — 填 Nomad var `nomad/jobs/aria-layer2-runner`(注册前必须)**
+`aria-layer2-runner.hcl` 的 `template` stanza 从此 var 渲染 secrets,不填 → runner 启动无凭据。8 keys(HCL header L244-252 钦定):
+```bash
+# Rule #7: 用 -in stdin / @file 传值,别在命令行明文 echo 密钥
+nomad var put -in=json nomad/jobs/aria-layer2-runner <<'EOF'
+{ "Items": {
+  "FORGEJO_BOT_PAT": "...", "ANTHROPIC_API_KEY": "...",
+  "ANTHROPIC_BASE_URL": "...", "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
+  "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.1", "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5-turbo",
+  "ZHIPU_API_KEY": "...", "ZHIPU_BASE_URL": "https://open.bigmodel.cn/api/paas/v4" } }
+EOF
+nomad var get -out=keys nomad/jobs/aria-layer2-runner   # 验证 8 keys 在,不读值
+```
+> ⚠️ `ANTHROPIC_BASE_URL` + model alias **以 Luxeno 当前实际配置为准** —— HCL header 给的是 M3 草案值(`https://luxeno.ai/api`),与 aria-layer1 实际用的 `api.luxeno.ai/v1` 可能有出入,owner 核对。
+
 **Step 5 — 注册 `aria-layer2-runner` parameterized template**
 ```bash
-ssh light-1 'export PATH=$PATH:/usr/local/bin; cd /root/Aria/aria-orchestrator/nomad/jobs && \
+# HCL 源:用 Step 3 路线 B 的 /tmp/Aria-build-src (master 全量),或 scp 一份过来
+# —— 别用 prod /root/Aria (停在 244151e,且 editable-install 耦合勿动)
+ssh light-1 'export PATH=$PATH:/usr/local/bin; cd /tmp/Aria-build-src/aria-orchestrator/nomad/jobs && \
   nomad job validate aria-layer2-runner.hcl && nomad job run aria-layer2-runner.hcl && \
   nomad job status aria-layer2-runner | head -10'
 ```
-> ⚠️ 前提:prod `/root/Aria` 需先更新到含最新 HCL 的 ref(现停在 `244151e`)。`aria-runner-template.hcl` 与 `aria-layer2-runner.hcl` 的关系、HCL 里的 image tag 是否引用 `claude-latest` — 见 §4 待核实 #4。
+> aria-layer2-runner.hcl 经 §4 #4 review 确认:job 是 batch+parameterized,image 在 **dispatch 时**用 `IMAGE_SHA` meta 做 sha-digest pin(注册时不需要 image 存在;dispatch 时才拉)。注册成功 = `nomad job status aria-layer2-runner` 显示 parameterized job 就绪。
 
 ---
 
@@ -164,17 +193,17 @@ ssh light-1 'export PATH=$PATH:/usr/local/bin; nomad job dispatch -meta ISSUE_ID
 
 ---
 
-## §4 待核实项(执行前需 owner 或下一 recon session 确认)
+## §4 核实项 (2026-05-22 SSH recon 已核实 #2/#3/#4)
 
-| # | 项 | 为什么 |
-|---|----|--------|
-| 1 | Layer 1 `reconcile`/`cron` 是 Hermes-internal 还是漏部署 | recon 显示它们不在 Nomad job 列表,但 2026-05-21 handoff §5 称 "running"。若 OD-2 当初选 (a) Hermes-internal 则正常;否则 Phase B 不完整需补 |
-| 2 | aria-build 容器内 clone Aria 仓的凭据 | README 只证实容器有 docker push 的 FORGEJO_BOT_PAT;`git clone` 私仓是否复用同 PAT 需实测(`https://<user>:<pat>@forgejo...` 或 SSH key) |
-| 3 | `GLM_API_KEY` 现状 | Hermes 已重定向 Luxeno,旧 Z.AI GLM_API_KEY 是 orphan;O1 Step 5 更新 deferral 时确认是否一并标弃用 |
-| 4 | `aria-layer2-runner.hcl` / `aria-runner-template.hcl` 内容 | 注册前需 review:image tag 引用方式(`claude-latest` 还是 pinned sha)、parameterized meta 字段、prod `/root/Aria` 需先更新 |
-| 5 | O3 real smoke 的 test issue + dispatch 参数 + 预期产物 | v2-accurate playbook §Phase C 只给 scope,未给具体 dispatch 脚本;v11 addendum Step 5(real)有雏形但已 SUPERSEDED |
+| # | 项 | 状态 |
+|---|----|------|
+| 1 | Layer 1 `reconcile`/`cron` 是 Hermes-internal 还是漏部署 | ⏳ **未核实** — recon 显示不在 Nomad job 列表,2026-05-21 handoff §5 称 "running"。属 Phase B 完整性,不阻塞 O2 |
+| 2 | aria-build 容器 clone 仓库能力 | ✅ **RESOLVED** — git 2.52.0 ✓ / docker 29.4.1 ✓ / 67.9G 磁盘 ✓ / FORGEJO_BOT_* env ✓。**但 `FORGEJO_BOT_PAT` 不能 git clone**(实测 "Credentials are incorrect or have expired" — registry-scoped 或已过期);且 forgejo.10cg.pub 集群内自签证书需 `http.sslVerify=false`。→ O2 取源见 §O2 Step 3 路线 A/B |
+| 3 | `GLM_API_KEY` 现状 | ✅ **RESOLVED** — O1 Step 5 已处理:Z.AI 旧 key 经 Hermes→Luxeno 重定向架构性退役;`.env` 的 `GLM_API_KEY` var 现持 Luxeno key。旧 Z.AI 账户 owner 可自行注销(非紧急) |
+| 4 | `aria-layer2-runner.hcl` 内容 | ✅ **RESOLVED** — job `aria-layer2-runner` (batch+parameterized);image **dispatch 时 sha-digest pin** (`@sha256:${NOMAD_META_IMAGE_SHA}`,非硬编码 tag);constraint `node.class==heavy_workload`。注册前**必须先填 Nomad var** `nomad/jobs/aria-layer2-runner` 8 keys(见 §O2 Step 4.5)。`aria-runner-template.hcl` 是 M1 legacy,不用它 |
+| 5 | O3 real smoke 的 test issue + dispatch 参数 + 预期产物 | ⏳ **未核实** — v2-accurate playbook §Phase C 只给 scope;O3 单独 session 时再 ground |
 
-> 建议:O1 可立即独立执行。O2 执行前先 SSH 把 §4 #2 #4 核实掉(~15min recon)。O3 在 O2 完成后单独 session。
+> 建议:O1 已完成。O2 = Step 1→2→3(取源路线 A/B 选一)→4→4.5→5。O3 在 O2 完成 + Phase B 稳定 ≥24h 后单独 session。
 
 ---
 
