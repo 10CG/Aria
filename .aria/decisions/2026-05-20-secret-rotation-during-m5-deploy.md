@@ -189,6 +189,8 @@ INFO Lark: connected to wss://msg-frontier.feishu.cn/ws/v2?
 | FEISHU_VERIFICATION_TOKEN | Phase C / 2026-08-02 | 不变 |
 | FEISHU_ENCRYPT_KEY | Phase C / 2026-08-02 | 不变 |
 
+> **✅ Rotation 完成 (2026-05-22)**: 原 4-key set 处置完毕 — 3 个 FEISHU_* key 经 O1 轮换 (保留 app 仅重置密钥;Hermes WS 干净重连验证 ✅);`GLM_API_KEY` 经 Hermes→Luxeno 重定向架构性退役。详见 [`2026-05-02-secret-rotation-deferred.md`](2026-05-02-secret-rotation-deferred.md) §Resolution。2026-08-02 hard cap calendar reminder 可撤销。
+
 **理由**:
 - FEISHU_APP_SECRET 是 §2.5 Lark WS `access_key` + `ticket` 的派生源, 间接 leak 触发上游轮换义务
 - 其余 3 keys 在本 session **未被重新暴露**, 2026-05-02 hard cap 仍适用 (距今 75 天)

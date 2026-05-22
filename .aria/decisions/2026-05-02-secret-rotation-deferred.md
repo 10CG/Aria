@@ -4,7 +4,7 @@
 > **Decider**: solo-lab (uni.concept.wzfq@gmail.com)
 > **Type**: Risk acceptance (security debt)
 > **Trigger**: T1.7 cluster deploy 前置评估 (M2 deploy session)
-> **Status**: **Trigger #1 + #3 fired 2026-05-20** — partial rotation in progress; original 4-key set still deferred to Phase C / 2026-08-02 hard cap
+> **Status**: **Resolved 2026-05-22** — 原 4-key set 处置完毕:3 个 FEISHU_* key 轮换 (O1, 保留 app 仅重置密钥) + GLM_API_KEY 经 Hermes→Luxeno 重定向架构性退役。见 §Resolution。
 >
 > **2026-05-20 amendment**:
 > - **触发条件 #1** (Aria 2.0 production launch — M5 T-deploy) fired
@@ -72,3 +72,24 @@
 - M2 handoff `legal_assumptions` + `open_issues_for_m3` 段
 - AD-M1-11 Nomad Variables 注入路径 (本决议明确选择继续走 Variables, 不切 Vault — Vault Aether#32 仍 open)
 - Aether#32 (Vault + Workload Identity) — 长期 fix, 不是 M2 范围
+
+---
+
+## Resolution (2026-05-22)
+
+原 4-key deferral set 处置完毕,本决议 **CLOSED**:
+
+| Key | 处置 | 日期 |
+|-----|------|------|
+| `FEISHU_APP_SECRET` | **轮换** — Feishu 后台重置 App Secret (保留 app, APP_ID 不变);写入 `/root/.hermes/.env`;Hermes 重启验证 Feishu WS 干净重连 ✅ | 2026-05-22 |
+| `FEISHU_VERIFICATION_TOKEN` | **轮换** — Feishu 事件订阅重新生成;写入 `.env` | 2026-05-22 |
+| `FEISHU_ENCRYPT_KEY` | **轮换** — 同上 (注:Hermes 现为 websocket 连接模式,该 key 属 webhook 模式工件,已轮换但运行时不行使) | 2026-05-22 |
+| `GLM_API_KEY` | **superseded** — Hermes 2026-05-21 重定向 Luxeno,不再直连 Z.AI 智谱;`.env` 的 `GLM_API_KEY` var 现持 Luxeno key。原 Z.AI 账户 + 旧 key 成 orphan,owner 可在 Z.AI console 注销 (非紧急) | 2026-05-21 (架构性退役) |
+
+**执行偏离 SOP**: §轮换执行 SOP step 1 原写"删除 app 重建",实际选"保留 app 仅重置密钥" —— APP_ID 不变免重配 callback,安全目标等效 (App Secret 一重置即作废所有派生 access_key/ticket)。owner 决策 (solo-lab) 2026-05-22。
+
+**2026-08-02 hard cap**: 已可撤销对应 calendar reminder (4 key 均已处置)。
+
+**残留 hygiene** (非本决议范畴): `/root/.hermes/.env` 仍明文 dotenv 落盘 → 长期迁 Nomad-var-rendered (见 `docs/handoff/2026-05-21-m5-phase-b-stabilization-hermes-luxeno.md` §2 S7)。
+
+**触发链**: `2026-05-20-secret-rotation-during-m5-deploy.md` §2.5 (Lark WS access_key 间接 leak → FEISHU_APP_SECRET 轮换紧迫性升级) → O1 执行 (`docs/handoff/2026-05-22-m5-phase-c-playbook.md` §O1)。
