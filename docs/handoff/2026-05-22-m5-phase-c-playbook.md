@@ -179,25 +179,44 @@ ssh light-1 'export PATH=$PATH:/usr/local/bin; cd /tmp/Aria-build-src/aria-orche
 
 ---
 
-## §O3 — Tier-1 live LLM gate + Layer 2 real smoke (owner 触发,~¥0.10)
+## §O3 — Tier-1 live LLM gate + Layer 2 real smoke (建议单独 session)
 
-> 用**真实 Layer 2 dispatch** 替换 Phase B 的合成 SQL-inject Smoke A/B/C。
+> 用**真实 Layer 2 dispatch** 替换 Phase B 的合成 SQL-inject Smoke。**这是会真实花钱 (~¥0.10) + 创建真实 PR 的 live autonomous dispatch** —— 建议作为专门 session 谨慎执行。
 
-**Step 1 — Layer 2 real dispatch smoke**(B.1.live / C.2.live)
+### O3 dispatch 契约 (2026-05-22 grounding — 读 entrypoint.sh + modes/initial.sh)
+
+`aria-layer2-runner` initial 模式 11 步流程:
+1. 读 `NOMAD_META_ISSUE_ID` (须匹配 `^[A-Z][A-Z0-9-]+$`,如 `DEMO-M5-004`)
+2. 读 **`/opt/aria-inputs/${ISSUE_ID}/issue.yaml`** (host volume `aria-runner-inputs`,read-only 挂载) —— 含 `target_repo` / `base_branch` / 标题 / 描述 / expected_changes
+3. `git clone --depth 1` target_repo (经 `FORGEJO_INTERNAL_URL` 默认 `http://192.168.69.200:3000` + bot PAT)
+4. 建分支 `aria/${ISSUE_ID}` → 渲染 prompt → `claude -p` (真实 LLM) → commit/push → Forgejo PR create
+
+dispatch 命令:
 ```bash
-# Nomad dispatch 一个真实 issue 到 aria-layer2-runner
-ssh light-1 'export PATH=$PATH:/usr/local/bin; nomad job dispatch -meta ISSUE_ID=<test-issue> aria-layer2-runner'
+nomad job dispatch \
+  -meta ISSUE_ID=<DEMO-M5-NNN> -meta ISSUE_URL=<full-url> \
+  -meta DISPATCH_ID=<uuid> -meta IMAGE_SHA=sha256:5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5 \
+  -meta IDEMPOTENCY_KEY=<key> aria-layer2-runner
 ```
-- 验证三类 Layer 2 行为:force-push / close-old-PR / commit-lint retry
-- 这会触发真实 LLM 调用(claude-code in container)→ 实际花费 ~¥0.10
-> ⚠️ 具体 test issue 选择、dispatch meta 参数、预期产物验证 — 见 §4 待核实 #5。
 
-**Step 2 — 观测 + 验收**
-- `nomad alloc logs` 看 runner 执行
-- 确认 issue → PR 闭环成功;Layer 1 dispatch 记录正确写 `dispatches.db`
+### O3 执行前的真实前置 (均需先落实)
 
-**Step 3 — Tier-2 累积**(被动)
-- O4:Tier-2 需 N≥3 真实 dispatch 累积 — 随 owner 日常 workload 自然攒,不是单次动作
+| # | 前置 | 状态 |
+|---|------|------|
+| O3-a | **`aria-runner-inputs` + `aria-runner-outputs` host volume** 在 heavy 节点配置 | ⏳ **未核实** — `nomad volume status -type host` 未见 aria-runner-* (M1 era 配过,当前集群需重新确认/配置;否则 dispatch 无法 place) |
+| O3-b | **`issue.yaml` 起草** + 放到 inputs 卷的 `${ISSUE_ID}/issue.yaml` | ⏳ 需 author (schema 见 modes/initial.sh Step 2 `extract_yaml_field`) |
+| O3-c | **test repo + 一个 trivial throwaway issue** | ⏳ **owner 决策** — 需一个 sandbox repo + 无关痛痒的小 issue (runner 会真的建分支/开 PR) |
+| O3-d | 接受成本 ~¥0.10 + 真实 PR artifact | owner 确认 |
+
+### O3 步骤 (前置就绪后)
+
+1. 配/验证 host volume (O3-a) → author issue.yaml 放上 inputs 卷 (O3-b)
+2. `nomad job dispatch ...` (上方契约)
+3. `nomad alloc logs <alloc>` 观测 runner 11 步
+4. 验证:issue → PR 闭环;runner result.json `outcome=SUCCESS`
+5. **Tier-2 累积** (O4,被动):N≥3 真实 dispatch 随 owner 日常 workload 自然攒
+
+> §4 #5 原标"未核实"现已 grounding 为上方契约 + 4 前置;O3-a/b/c 是下一 session 起点。
 
 ---
 
