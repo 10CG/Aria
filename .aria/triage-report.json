@@ -1,41 +1,32 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.19.0",
-  "issue_ref": "10CG/Aria#101",
-  "generated_at": "2026-05-13T14:30:31Z",
+  "triage_tool_version": "1.23.0",
+  "issue_ref": "10CG/aria-plugin#50",
+  "generated_at": "2026-05-21T15:25:30Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 101,
-      "title": "state-scanner v3.0: _normalize_status 子串匹配 \"done\" 导致 pending_archive 假阳性 (4/4 实测中招)",
-      "body": "## Bug Report\n\n**描述**: state-scanner v3.0 的 `_normalize_status` 用无词边界的子串匹配判定 Status=\"done\"，导致任何含 \"Phase X done\" / \"PR-A done\" / \"Phase B done\" 字样的 OpenSpec change 被错误归一化成 `done` 状态，进而误报为 `pending_archive`。**真实项目命中率 4/4**（即此项目当前活跃 spec 全部被误判）。\n\n如果用户照 state-scanner 推荐 [1] openspec-archive 执行，会把 WIP spec 移动到 `openspec/archive/`，破坏其他并行终端的工作上下文 — silent false-positive 推荐 → 数据移位。\n\n**根因 (代码位置)**: `skills/state-scanner/scripts/collectors/_status.py` `_normalize_status()`\n\n```python\nfor token in (\"done\", \"complete\"):\n    if token in low:          # ← 无词边界, 子串匹配\n        return \"done\"\n```\n\n`raw_status` 由 `_extract_status` pattern 4 (`^(?:#{1,6}\\s+)?Status[：:]\\s*(.+?)\\s*$`) 抓的是 Status 整行，含后续描述。十步循环鼓励用户在 Status 写 \"Phase A done, ready for Phase B\" 这种增量叙事 → \"done\" 子串必中。\n\n**复现步骤**:\n\n1. 写一个 OpenSpec proposal.md，Status 行如下任一形式：\n   - `## Status: ✅ Approved — Phase A done, ready for Phase B`\n   - `## Status: ✅ Implemented PR-A merged, post-deploy 验证后归档`\n   - `## Status: ⏸ DRAFT pending lawyer review — Phase B PR-A done`\n2. 跑 `python3 scripts/scan.py --output /tmp/snap.json`\n3. 看 `jq '.openspec.pending_archive' /tmp/snap.json`\n\n**预期行为**:\n- \"Approved Phase A done, ready for Phase B\" → status `approved` (Phase B 未开工不能归档)\n- \"Implemented PR-A merged, post-deploy 验证后归档\" → status `in_progress` 或新的 `verifying` 状态 (post-deploy 验证未完成)\n- \"⏸ DRAFT pending lawyer review\" → status `pending` 或 `draft` (被外部依赖阻塞)\n\n**实际行为**: 全部归一化为 `\"done\"` → 全部进 `pending_archive`, state-scanner 推荐 openspec-archive 工作流为 [1]。\n\n**错误输出** (本项目真实 snapshot):\n\n```json\n{\n  \"openspec\": {\n    \"pending_archive\": [\n      {\"id\": \"docs-marketplace-adaptation\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"existing-data-migration\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"pricing-status-marketplace-redo\", \"reason\": \"Status=done still in changes/\"},\n      {\"id\": \"terms-of-service-and-attribution\", \"reason\": \"Status=done still in changes/\"}\n    ]\n  }\n}\n```\n\n真实状态核对:\n\n| spec | proposal.md Status 原文 | tasks 完成度 | 真实进度 | 真该归档？ |\n|------|------------------------|-------------|---------|----------|\n| docs-marketplace-adaptation | \"Approved (Rev2 CONVERGED) — Phase A done, ready for Phase B\" | 4/30 | Phase A done / Phase B 未开工 | ❌ |\n| existing-data-migration | \"Implemented (Phase B PR-A merged 2026-05-10 main fce87bc) — post-deploy 验证后归档\" | 5/52 | PR 合并 / dev 验证中 | ⚠️ 等验证 |\n| pricing-status-marketplace-redo | \"Implemented (Phase B PR-A merged 2026-05-10 main 6160d18) — UAT PASS; post-monitoring 后归档\" | 4/38 | UAT PASS / 监控期 | ⚠️ 等监控 |\n| terms-of-service-and-attribution | \"⏸ DRAFT pending lawyer review — Phase B PR-A done 2026-05-09 commit eb49e77\" | 3/40 | 阻塞律师 review | ❌ |\n\n**修复建议** (优先级序):\n\n(a) **加词边界**: `re.search(r\"\\b\" + re.escape(token) + r\"\\b\", low)` — 最小改动，仍是子串但要求独立词。但仍救不了 \"Phase A done\" / \"PR-A done\" 因为 \"done\" 本身是独立词。\n\n(b) **首 token 抽取**: 抽 Status 第一行后用 `re.split(r\"[—\\-,(（]\", raw, maxsplit=1)[0].strip()` 取首段再匹配 — 推荐方案。\"Approved — Phase A done\" 首 token 是 \"Approved\" → status=approved。\n\n(c) **negative guard**: 含 \"draft\" / \"pending\" / \"approved\" / \"in progress\" / \"blocker\" 时跳过 done 短路 — 兜底防御。\n\n建议组合 **(b) 主修 + (c) 兜底**，并在 SKILL.md 加最佳实践示例 (`## Status: <single-token>`)。\n\n**影响面评估**:\n- 触发条件: 任何 aria 十步循环用户在 Status 写\"Phase X done\" 增量叙事 → **普遍**\n- 后果严重度: state-scanner 是推荐入口，照做会 silent 移走 WIP spec\n- 可复现度: 100% (4/4 项目内 spec 全中招)\n\n## 环境信息\n- Aria Plugin: 1.17.3\n- Skills: 36\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n- 项目: SilkNode (10CG/SilkNode, OpenSpec changes 4 个, archive 多个)\n\n---\n*由 aria-report 自动生成 — 修复建议含 patch sketch 在描述中*\n",
+      "number": 50,
+      "title": "bug(state-scanner): _extract_status 提取过宽 → Status 长文本里 sub-task token 命中 fallback (us-036 reproduce)",
+      "body": "## Symptom\n\n`scripts/collectors/_status.py` 的 `_extract_status` 提取整个 Status 字段 (包括 sub-task 状态描述 / 历史路径 / Archival blockers / 进展更新等长文本)，`_normalize_status` 在 fallback `done/complete` 阶段命中文本里的 token，错误归 lifecycle `done`，把 still-blocked spec 错放进 `openspec.pending_archive[]`.\n\n## Reproduce\n\nProject: `10CG/nexus` (private Forgejo); proposal: `openspec/changes/us-036-memory-conflict-resolution/proposal.md`\n\n```python\nimport sys\nsys.path.insert(0, \".claude/plugins/marketplaces/10CG-aria-plugin/skills/state-scanner/scripts/collectors\")\nfrom _status import _extract_status, _normalize_status\n\nraw = _extract_status(open(\"openspec/changes/us-036-memory-conflict-resolution/proposal.md\").read())\nprint(f\"len(raw) = {len(raw)}\")           # 1529\nprint(f\"normalize = {_normalize_status(raw)}\")  # done (WRONG)\n```\n\nStatus 字段头部主语义 = `🟢 **Phase B Sprint 2 delivered**` (即 `implemented` lifecycle 且 archival_blocked), 但 1529 chars 里有 sub-task 描述 `\"(3) ~~TASK-101 multi-seed~~ ✅ closed 2026-05-09 (PR #53 实质完成, docs sync 标 **done**; ...)\"`. word-boundary `\\bdone\\b` 命中 → fallback `done`. \n\n## Root cause\n\n`_extract_status` 当前用 `_STATUS_PATTERNS` regex 在整 proposal text 上抓 `> **Status**: ...` 段, 没限制段内长度 / 行数 / sentence 边界. nexus 等大型 spec 习惯把 status field 当 mini-changelog 写 (sub-task 状态 + 归档历史 + 阻塞项), 导致 raw 长达 1500+ chars, fallback token shadow 必然发生.\n\nAria #101 fix (commit `154775a` 2026-05-13) 已经修了 substring shadow (word-boundary matching) 和加 `implemented` token, 但**提取范围**没改 — 同一类 bug 的另一面.\n\n## Proposed fix (任选一或组合)\n\n1. **首行/首句截断**: `_extract_status` 只返回 Status 字段第一个 sentence (`.split(/[.。]/)[0]`) 或第一行 (`.split(\"\\n\")[0]`). 主 lifecycle 语义通常在头部.\n2. **长度上限**: 截到前 N chars (N=200?), 截到则 log soft_error \"status_field_truncated\".\n3. **加权限制**: 多行 Status 字段时, fallback `done/complete` 仅在首行内有效; sub-line 命中触发 soft_error 而非归 done.\n4. **ignore 装饰文本**: skip strikethrough (`~~...~~`) / sub-bullet (`- ` / `* `) / 引用 (`> `) 在 Status 长文本里的内容.\n\n推荐 (1) — 治本 + 简单. nexus us-036 的 Status 长描述实际是 useful narrative (写给人读), 不应该被 truncate. 但 normalizer 只看 lifecycle keyword, 首行/首句覆盖即可.\n\n## Workaround (currently in place)\n\nnexus PR #70 已 land (10CG/nexus 5c85400): us-036 proposal Status 首段加 `**implemented**` lifecycle keyword, priority 5 命中, 不再走 fallback done. 单点 workaround, 不解决其他可能受影响的 spec.\n\n## Affected\n\nany OpenSpec proposal whose `> **Status**: ...` 字段是 multi-line / multi-sentence narrative 且头部主语义 phrase 不含 normalizer 识别的 lifecycle keyword (delivered / shipped / done 但属于 sub-task 时). \n\n## Related\n\n- Aria #101 (substring shadow 2026-05-13, commit `154775a`)\n- aria-plugin v1.20.0 (本次 reproduce 使用版本)\n- nexus PR #70 (us-036 workaround, 5c85400)\n\n## Version info\n\n- aria-plugin: v1.20.0 (manifest `marketplaces/10CG-aria-plugin/.claude-plugin/marketplace.json`)\n- nexus: `5c85400` (after us-036 workaround merge)\n- 复现日期: 2026-05-19",
       "state": "open",
-      "labels": [
-        "bug"
-      ],
-      "comments": [
-        {
-          "id": 5972,
-          "body": "## Triage report — 2026-05-13\n\n按 issue triage 6 步流程执行:\n\n### 1. Version check\n- 报告版本: Aria Plugin **1.17.3**\n- 当前 release: **1.19.0** (aria submodule HEAD `ab1c873`)\n- 结论: bug 在两版本均存在 — 不是过时报告\n\n### 2. Code path verification\n位置确认 — `aria/skills/state-scanner/scripts/collectors/_status.py:58-60`:\n\n```python\nfor token in (\"done\", \"complete\"):\n    if token in low:\n        return \"done\"\n```\n\n`done` / `complete` 在 `approved` / `reviewed` / `active` (line 64-69) **之前**判定,任何 `low` 含 \"done\" 子串即短路返回 `done`,与 raw_status 真实语义无关。\n\n### 3. Git log\n`_status.py` 最近 2 commit:\n- `47c9a57` feat(state-scanner): i18n status regex — fullwidth colon + inline blockquote\n- `b8db9a0` refactor(state-scanner): T3 prep — split scan.py into collectors/ package\n\n**均未触及匹配顺序逻辑**,无修复。\n\n### 4. In-flight branch / PR\n检索 `10CG/Aria` + `10CG/aria-plugin` open PR,关键词 `101` / `normalize` / `status` — **零命中**。无 in-flight 修复。\n\n### 5. Reproduction (current v1.19.0)\n直接 import `_normalize_status` 跑 issue 列出的 4 个真实 Status 字符串:\n\n| spec | actual | expected | verdict |\n|---|---|---|---|\n| docs-marketplace-adaptation | **done** | approved | 🔴 命中 done 误判 |\n| existing-data-migration | **unknown** | approved/verifying | 🟡 不同 bug — \"Implemented\" 不在词典 |\n| pricing-status-marketplace-redo | **unknown** | approved/verifying | 🟡 同上 |\n| terms-of-service-and-attribution | **done** | pending (DRAFT) | 🔴 命中 done 误判 |\n\n### 6. Verdict\n\n**Confirmed — needs fix**。但报告与实测略有偏差,需在 fix scope 里覆盖:\n\n- **核心 bug (2/4)**: `done` token 优先级太高 + 无词边界 — 与 issue 描述一致\n- **次生 bug (2/4)**: `Implemented` (合法 OpenSpec lifecycle 状态) 不在任何 token 列表,返回 `unknown` — issue 未涵盖,但是同根域问题 (token 字典 + 优先级设计) 的另一面\n\n### 修复 scope 建议\n\nIssue 提出的 (b) 首 token 抽取 + (c) negative guard 仍是正确方向,但建议**额外包含**:\n\n- (d) `Implemented` → 映射到新增的 `implemented` lifecycle 状态(或先短期映到 `active`,新状态留 Spec 讨论)\n- (e) 加 unit test 覆盖本 issue 4 个真实字符串 + 至少 3 个 edge case (`done` 词边界、`Implemented` 别名、纯 token 单值如 `Active`)\n- (f) state-scanner SKILL.md 加 \"Status 行最佳实践\" 小节,引导用户用 single-token 或 `<token> — <narrative>` 格式\n\n### 后续动作\n\n- [ ] Phase A.1 — `aria-issue-101-status-normalize` OpenSpec proposal (Level 2 minimal)\n- [ ] Phase B — 修复 + unit test + SKILL.md 文档同步\n- [ ] Phase C — 走 pre-merge gate (Rule #8)\n- [ ] Issue close + 关联 PR\n\n---\n\n*Triage 完成时间: 2026-05-13 | 流程: 6-step SOP (拟以 `aria-issue-triage-sop` OpenSpec 沉淀为标准流程)*\n",
-          "user": "simonfish",
-          "created_at": "2026-05-13T00:24:47Z"
-        }
-      ],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/101",
-      "created_at": "2026-05-12T23:28:54Z",
-      "updated_at": "2026-05-13T07:11:20Z"
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/50",
+      "created_at": "2026-05-19T10:49:22Z",
+      "updated_at": "2026-05-19T11:43:25Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.17.3",
-      "current": "1.19.0",
+      "reported": "1.20.0",
+      "current": "1.23.0",
       "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "skills/state-scanner/scripts/collectors/_status.py",
+          "file_path": "scripts/collectors/_status.py",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -44,7 +35,7 @@
           "warning": "file not found"
         },
         {
-          "file_path": "_status.py",
+          "file_path": "openspec/changes/us-036-memory-conflict-resolution/proposal.md",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -53,20 +44,19 @@
           "warning": "file not found"
         },
         {
-          "file_path": "aria/skills/state-scanner/scripts/collectors/_status.py",
-          "line": 58,
-          "format": "prose_l",
-          "exists": true,
-          "line_in_range": true,
-          "snippet": "55:     for token in (\"deprecated\",):\n56:         if token in low:\n57:             return \"deprecated\"\n58:     for token in (\"done\", \"complete\"):\n59:         if token in low:\n60:             return \"done\"\n61:     for token in (\"in progress\", \"in_progress\", \"in-progress\", \"进行中\"):",
-          "warning": null,
-          "total_lines": 75
+          "file_path": "marketplaces/10CG-aria-plugin/.claude-plugin/marketplace.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
         }
       ],
       "matches_description": false
     },
     "step4_history": {
-      "collection_status": "ok",
+      "collection_status": "skipped",
       "likely_fix_candidates": []
     },
     "step5_inflight": {
@@ -76,23 +66,31 @@
       "worktrees": [
         {
           "path": "/home/dev/Aria",
-          "branch": "feature/aria-issue-triage-sop",
+          "branch": "master",
           "is_main": true,
-          "head": "0b4b4a710a34039208978425b99ed3de34e46450"
+          "head": "90ec746bfca9f602996fa5b47b0840ac0d0fdb38"
         }
       ]
     }
   },
   "repro": {
-    "exit_mode": null,
-    "cases": [],
-    "hit_count": 0,
-    "total_count": 0,
-    "hit_rate": "0/0"
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "Synthetic single-line Status field `> **Status**: 🟢 **Phase B Sprint 2 delivered** — archival blocked; ... docs sync 标 done; blockers: live verify outstanding` (178 chars) passed through _extract_status + _normalize_status imported from plugin cache v1.23.0 collectors/_status.py",
+        "expected_behavior": "normalize result is NOT 'done' — header semantics 'delivered' indicates an implemented-class / archival-blocked spec; a 'done' token buried in sub-task narrative must not shadow the lifecycle classification",
+        "actual_behavior": "_extract_status returns the entire 178-char single line (no length / sentence / first-line cap); _normalize_status falls through to the 'done' fallback via a word-boundary hit on the buried '标 done', returning lifecycle 'done'",
+        "match": true
+      }
+    ],
+    "hit_count": 1,
+    "total_count": 1,
+    "hit_rate": "1/1"
   },
-  "verdict": null,
-  "severity": null,
-  "recommended_action": null,
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
   "deviation_note": null,
   "errors": []
 }
