@@ -1,7 +1,7 @@
 # state-scanner — fix `_status` lifecycle-head extraction range + extend token dict (aria-plugin #50)
 
 > **Level**: 2 (Minimal — collector 逻辑 fix + regression tests + doc note)
-> **Status**: Approved (post_spec audit R1→R2→R3 CONVERGED 2026-05-21,5-agent convergence,verdict PASS)
+> **Status**: Complete (Phase A+B+C+D shipped 2026-05-22 — aria-plugin PR #55 `8253b6e` + Aria PR #118 `737d9bf` merged + 多远程推送 verified;closes aria-plugin #50)
 > **Change ID**: `state-scanner-status-extraction-range`
 > **Trigger**: Forgejo aria-plugin [#50](https://forgejo.10cg.pub/10CG/aria-plugin/issues/50) — `_extract_status` 提取范围无上限 → 长单行 Status 里子任务 token shadow lifecycle 归类
 > **Triage evidence**: [issuecomment-7980](https://forgejo.10cg.pub/10CG/aria-plugin/issues/50#issuecomment-7980) (local: `.aria/triage-report.json` + `.aria/triage-comment.md`)

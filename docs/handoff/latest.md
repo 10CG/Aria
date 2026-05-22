@@ -11,6 +11,14 @@
 
 ---
 
+## ★ 最新 session (2026-05-22) — aria-plugin #50 `_status` extraction-range ✅ DONE
+
+[2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — ✅ **full A→D cycle SHIPPED 单 session** (`simonfish/dev-claude`,2026-05-21 15:08 → 2026-05-22 02:00 UTC):`/state-scanner` → backlog 梳理 → `/issue-triage` aria-plugin #50 (confirmed/major) → Phase A Spec `state-scanner-status-extraction-range` (Level 2) + post_spec 5-agent audit R1 (1 Critical) → R2 → R3 CONVERGED → Phase B T1-T6 (`_status_lifecycle_head` 首段截断 + `_status_field_overlong` soft_error + delivered/shipped token;607 test OK,0 regression) → Phase C aria-plugin PR #55 (`8253b6e`) + Aria PR #118 (`737d9bf`) merged + 两仓×两远程 SHA verified → Phase D #50 closed + spec archived。**本 track DONE,无 carry-forward**。
+
+> ⚠️ **M5 Track B 仍是 active carry-forward** — 见下方 Track B,Phase C owner-gated (24h gate 已到期,剩 owner O1/O2/O3)。本 #50 cycle 与 M5 正交,不代表 M5 完成。
+
+---
+
 ## ⚠ 当前并发 2 个 track(本日 master `b0c9c3a`)
 
 两条 track 同期在 master 上 ship,latest.md 单指针无法准确表达。**用 `/aria:state-scanner` 查多 track 看板**。下方列两 track 各自的 session-final handoff:
@@ -47,6 +55,7 @@
 
 | Date | Session | Track | Status |
 |------|---------|-------|--------|
+| [2026-05-22 aria-plugin #50 _status extraction-range shipped](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) | Full A→D cycle 单 session: state-scanner → triage #50 → Phase A Spec + post_spec R1→R2→R3 CONVERGED → Phase B T1-T6 (607 test OK, 0 regression) → Phase C 双 PR (#55 + #118) merged + 多远程 verified → Phase D #50 closed + spec archived; aria-plugin v1.23.1 | (#50) | ✅ DONE |
 | [2026-05-21 M5 Phase B 稳定化 + Hermes→Luxeno 重定向](./2026-05-21-m5-phase-b-stabilization-hermes-luxeno.md) | 24h 稳定观察 → aria-heartbeat 429/401 误诊→更正→owner option(c) Hermes 重定向 Luxeno (双 LLM 路径统一) + M5 Spec tasks.md T-deploy 6.17-6.26 同步 + 1 新 memory + 3 更正 + decision §3.5-3.7 | B | **★ Active (Latest B, SHIP READY)** |
 | [2026-05-20 Track C state-scanner carry-forward shipped (v1.23.0)](./2026-05-20-state-scanner-carry-forward-shipped.md) | Full A→D cycle 单 session (~7h 含 Track B Phase B twin #1): A.1 → R1 REVISE → Rev1 → R2 PASS_WITH_WARNINGS → Rev1.1 → B 16 tests + 584 regression + dogfood atomic + Rule #6 substitute + v1.23.0 → C 2 PR merged → D #90+#89 closed + spec archived; 4-repo parity 全绿 | C | ✅ DONE |
 | [2026-05-20 M5 Phase B twin #2 + Smoke A/B/C + Layer 2 secret-guard](./2026-05-20-m5-phase-b-deploy-done.md) | B.1-B.8 全 ship + 3 smoke (A full / B DB-pass with M5-OS-PB-1 finding ctx.forgejo lazy-wire bug / C code-path) + 🚨 Rule #7 leak detour: Layer 1 5-key rotation + Layer 2 SilkNode hook cherry-pick (251 self-tests + live block dogfood) + Layer 3 decision 408 行 (plugin v1.23.0 upgrade path + §2.5 Lark WS leak FEISHU_APP_SECRET promoted); 2026-05-21 稳定化见上方 Latest | B | predecessor (Phase B 主体 twin #2) |
