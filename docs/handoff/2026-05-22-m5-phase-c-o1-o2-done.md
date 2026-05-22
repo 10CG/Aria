@@ -97,7 +97,7 @@ updated-at: 2026-05-22T13:25:00Z
 |------|------|
 | **UPM** | N/A — Aria 主仓不使用 UPM |
 | **User Story** | US-025 `in_progress` — 正确 (Phase C O3 + D.2 未完) |
-| **OpenSpec** | M5 Spec `approved` 不变 (Phase C/D 未完不归档) |
+| **OpenSpec** | M5 Spec `approved` 不变 (Phase C/D 未完不归档);closeout Q3 audit 把 tasks.md `6.21.1` 标 `[~]` partial + O2 Layer 2 image 成果注记 (commit `6cf98b4`),消除轻微 spec↔reality drift。其余 `[ ]`/`[~]` (6.19/6.26/6.27-6.30) 留 Phase D.2 sweep |
 | **PRD / Architecture** | 不变 |
 | **Auto-memory** | 未新增 (MEMORY.md 超限) |
 | **Decision memos** | `2026-05-02-secret-rotation-deferred.md` → Resolved;`2026-05-20-secret-rotation-during-m5-deploy.md` §3.3 → ✅ 注记 |
