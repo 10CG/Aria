@@ -11,11 +11,13 @@
 
 ---
 
-## ★ 最新 session (2026-05-22) — aria-plugin #50 `_status` extraction-range ✅ DONE
+## ★ 最新 session (2026-05-22) — M5 Phase C O1+O2 ✅ + aria-plugin #50 ✅
 
-[2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — ✅ **full A→D cycle SHIPPED 单 session** (`simonfish/dev-claude`,2026-05-21 15:08 → 2026-05-22 02:00 UTC):`/state-scanner` → backlog 梳理 → `/issue-triage` aria-plugin #50 (confirmed/major) → Phase A Spec `state-scanner-status-extraction-range` (Level 2) + post_spec 5-agent audit R1 (1 Critical) → R2 → R3 CONVERGED → Phase B T1-T6 (`_status_lifecycle_head` 首段截断 + `_status_field_overlong` soft_error + delivered/shipped token;607 test OK,0 regression) → Phase C aria-plugin PR #55 (`8253b6e`) + Aria PR #118 (`737d9bf`) merged + 两仓×两远程 SHA verified → Phase D #50 closed + spec archived。**本 track DONE,无 carry-forward**。
+**★ M5 Track B 最新**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — M5 Phase C 推进:**O1 (Feishu secret 轮换) ✅ + O2 (Layer 2 aria-runner 镜像 build+注册) ✅**。镜像 `forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11` digest `sha256:5b80ca6c…35148f5`;`aria-layer2-runner` parameterized job 注册;`m1-handoff.yaml` 更新;2026-05-02 secret deferral set 整体 CLOSED。**carry-forward: O3 (Tier-1 live LLM real smoke,单独 session,~¥0.10) + Phase D.2**。执行细节见 [`2026-05-22-m5-phase-c-playbook.md`](./2026-05-22-m5-phase-c-playbook.md)。
 
-> ⚠️ **M5 Track B 仍是 active carry-forward** — 见下方 Track B,Phase C owner-gated (24h gate 已到期,剩 owner O1/O2/O3)。本 #50 cycle 与 M5 正交,不代表 M5 完成。
+**独立 track (本 session 另完成,已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1,607 test OK,#50 closed)。本 track DONE 无 carry-forward。
+
+> ⚠️ M5 (US-025) 仍未完:O3 + Phase D.2 待续 —— 见 §Track B / 上方 M5 handoff。
 
 ---
 
@@ -55,6 +57,7 @@
 
 | Date | Session | Track | Status |
 |------|---------|-------|--------|
+| [2026-05-22 M5 Phase C O1+O2 done](./2026-05-22-m5-phase-c-o1-o2-done.md) | M5 Phase C: O1 Feishu secret 轮换 + O2 Layer 2 aria-runner 镜像 build+注册 (claude-m5-91b8975-v11 digest 5b80ca6c) + m1-handoff 更新 + aria-layer2-runner 注册; O3 + Phase D.2 carry-forward | B (M5) | **★ Active (Latest, O3 待续)** |
 | [2026-05-22 aria-plugin #50 _status extraction-range shipped](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) | Full A→D cycle 单 session: state-scanner → triage #50 → Phase A Spec + post_spec R1→R2→R3 CONVERGED → Phase B T1-T6 (607 test OK, 0 regression) → Phase C 双 PR (#55 + #118) merged + 多远程 verified → Phase D #50 closed + spec archived; aria-plugin v1.23.1 | (#50) | ✅ DONE |
 | [2026-05-21 M5 Phase B 稳定化 + Hermes→Luxeno 重定向](./2026-05-21-m5-phase-b-stabilization-hermes-luxeno.md) | 24h 稳定观察 → aria-heartbeat 429/401 误诊→更正→owner option(c) Hermes 重定向 Luxeno (双 LLM 路径统一) + M5 Spec tasks.md T-deploy 6.17-6.26 同步 + 1 新 memory + 3 更正 + decision §3.5-3.7 | B | **★ Active (Latest B, SHIP READY)** |
 | [2026-05-20 Track C state-scanner carry-forward shipped (v1.23.0)](./2026-05-20-state-scanner-carry-forward-shipped.md) | Full A→D cycle 单 session (~7h 含 Track B Phase B twin #1): A.1 → R1 REVISE → Rev1 → R2 PASS_WITH_WARNINGS → Rev1.1 → B 16 tests + 584 regression + dogfood atomic + Rule #6 substitute + v1.23.0 → C 2 PR merged → D #90+#89 closed + spec archived; 4-repo parity 全绿 | C | ✅ DONE |
