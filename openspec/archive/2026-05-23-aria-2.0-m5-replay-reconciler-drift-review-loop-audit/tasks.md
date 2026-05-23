@@ -281,19 +281,21 @@
 - [x] 6.20 nomad job validate + run (aria-layer1-comment-poll + aria-layer1-reconcile + aria-layer1-cron) — **DONE** (B.7: 2 new jobs deployed, HCL validate clean)
 - [x] 6.20.1 HCL cron syntax pre-validate — **DONE** (A.7 dry-run + B.7 force-spawn; Next Periodic Launch ≤ 60s 确认)
 - [x] 6.21 Verify alloc + clean ticks — **DONE** (B.7: reconcile + cron force-spawn alloc Exit 0, Extension init OK, audit log 写入正常)
-- [~] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在; 文档化 Tier-2 D.2.real 阻塞 — **Phase C** (Layer 2 image). **2026-05-22 PARTIAL (O2)**: Layer 2 镜像 build+push (`forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11`, digest `sha256:5b80ca6c…35148f5`) + `aria-layer2-runner` parameterized job 注册 + `m1-handoff.yaml` image_refs 更新。剩余:alloc-存在 verify → O3 real dispatch。详见 `docs/handoff/2026-05-22-m5-phase-c-playbook.md` §O3
+- [x] 6.21.1 verify aria-runner-template (M2 era stub) alloc 存在; 文档化 Tier-2 D.2.real 阻塞 — **DONE 2026-05-23** (O2 Layer 2 镜像 `forgejo.10cg.pub/10cg/aria-runner@sha256:5b80ca6c…35148f5` + `aria-layer2-runner` parameterized job 注册 + O3 DEMO-M5-O3 real dispatch on heavy-3 alloc `6cf0d7ab` 11 步 18s 完成, PR #121 created+validated+cleaned, assertion file_touched_hit + diff_contains_hit 全 true). 详见 `docs/handoff/2026-05-23-m5-phase-c-o3-done-d2-close.md`
 - [x] 6.22 Smoke E2E changes mode — **DONE** (Smoke A: PR #116 + /aria changes → parent S_FAIL(changes_requested) + child S4_LAUNCH rework_mode=changes; FULL PASS)
 - [x] 6.23 Smoke E2E redo — **DONE w/ finding** (Smoke B: PR #117 + /aria redo → child S0_IDLE rework_mode=redo; DB PASS; placeholder comment skipped — M5-OS-PB-1 ctx.forgejo lazy-wire bug, M6 follow-up)
 - [x] 6.24 Smoke E2E rework cap — **DONE** (Smoke C: 4-row chain + cap check → S_FAIL(rework_exceeded), audit outcome=rejected_cap_exceeded; code-path PASS)
 - [x] 6.25 m5-handoff.yaml writeback — **DONE** (B.9: `t_deploy_status.phase_b_completion` + `smoke_verification` + M5-OS-PB-1/2 findings)
-- [~] 6.26 Forgejo housekeeping — **PARTIAL** (smoke PR #116/#117 closed + branches deleted; M5 kickoff issue close 推 Phase D)
+- [x] 6.26 Forgejo housekeeping — **DONE 2026-05-23** (smoke PR #116/#117 closed + branches deleted in Phase B; O3 throwaway PR #121 + branch + issue #119 cleaned post-validation)
 
 ### T-deploy 验收 (Tier-2 累积型, 不阻塞 Phase D.2)
 
-- [ ] 6.27 累积 ≥3 real dispatches 含 ≥1 changes + ≥1 redo + ≥1 reject (随 owner 日常 workload 自然累积)
-- [ ] 6.28 累积 ≥1 real failure 触发 Failure analysis LLM (owner 验证建议合理)
-- [ ] 6.29 累积 ≥1 real spec drift detected (owner 验证 drift 真实)
-- [ ] 6.30 m5-handoff.yaml writeback Tier-2 字段 + Phase D.2 final go_decision
+> **Note 2026-05-23**: Phase D.2 close gate (per brainstorm D7 + spec §一) **MET**: T-deploy ✅ (Phase B Layer 1 + Phase C O1+O2+O3 Layer 2) + Tier-1 live LLM ✅ (O3 real dispatch, claude_exit=0, assertions hit) + Spec X+Y archived ✅. Tier-2 6.27-6.29 by design **non-blocking** (cumulative owner workload validation continues post-close).
+
+- [ ] 6.27 累积 ≥3 real dispatches 含 ≥1 changes + ≥1 redo + ≥1 reject (随 owner 日常 workload 自然累积; **post-close**)
+- [ ] 6.28 累积 ≥1 real failure 触发 Failure analysis LLM (owner 验证建议合理; **post-close**)
+- [ ] 6.29 累积 ≥1 real spec drift detected (owner 验证 drift 真实; **post-close**)
+- [~] 6.30 m5-handoff.yaml writeback — **DONE for D.2 close 2026-05-23** (go_decision=Go + phase_c_completion + b1_live_llm_passed=true + c2_live_llm_passed=true + layer2_deployment_findings F1-F5); Tier-2 字段留 post-close owner workload writeback
 
 ---
 

@@ -1,7 +1,8 @@
 # Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable
 
 > **Level**: 3 (Full — 跨多 module + 架构变更 + schema migration + abi_compat 约束)
-> **Status**: **Approved** (Phase A.2 post_spec audit R1+R2 SCOPE_OK_R2 4/4, R2 92.3% reduction; R3+ collapsed per Aria-default convergence — non-owner-invoked, R2 critical 11/11 closed + 0 new critical)
+> **Status**: **Complete (2026-05-23 archived; Phase D.2 close gate MET per brainstorm D7: T-deploy ✅ Phase B Layer 1 + Phase C O1/O2/O3 Layer 2 + Tier-1 live LLM ✅ via O3 DEMO-M5-O3 + Spec X+Y archived ✅; Tier-2 6.27-6.29 non-blocking owner runtime accumulation continues post-close)**
+> _Previous_: Approved (Phase A.2 post_spec audit R1+R2 SCOPE_OK_R2 4/4, R2 92.3% reduction; R3+ collapsed per Aria-default convergence — non-owner-invoked, R2 critical 11/11 closed + 0 new critical)
 > **Change ID**: `aria-2.0-m5-replay-reconciler-drift-review-loop-audit`
 > **Parent US**: [US-025](../../../docs/requirements/user-stories/US-025.md)
 > **Parent PRD**: [prd-aria-v2.md §M5](../../../docs/requirements/prd-aria-v2.md) (Week 20-25, 120h baseline)

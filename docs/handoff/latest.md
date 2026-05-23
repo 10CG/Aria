@@ -11,16 +11,19 @@
 
 ---
 
-## ★ 最新 session (2026-05-22 ~16:05 UTC) — **Track D NEW**: aria-secret-guard-plugin-default Phase A ✅
+## ★ 最新 session (2026-05-23 ~00:30 UTC) — 🎉 **M5 CLOSED** (US-025 done, Spec archived)
 
-**★ Track D 最新 (NEW, 本 session)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — **Phase A 完整 ship** by `dev-claude2` (~3h): state-scanner → brainstorm (Q1 hook merge 5-trial instrumented test 实证 + Q2/Q3 收敛) → DEC + 1 new memory `feedback_claude_code_hook_merge_all_fire` → A.1 spec-drafter (proposal 172 行 + tasks 124 行) → post_spec R1 (1 critical version conflict + 12 major + 17 minor across 5 agents) → Rev1 sweep (v1.23.0→v1.24.0 + 4 new sections incl §State Schema/Ship Gate Fallback/Rollback Plan) → R2 PASS_WITH_WARNINGS converged 2-round (5/5 agents R1 ADDRESSED + 0 new major + 2 inline-fix §2.3 frontmatter enum) → A.2 task-planner 18 TASK DAG (17 in-cycle + 1 out-of-cycle, agent pre-assigned) → commit 9d41b2e rebase atop M5 Phase C 10 commits (no path overlap) → 3-way SHA parity ✓ + 2 new memory (`feedback_dec_ship_target_staleness_verify` + `feedback_instrumented_hook_self_lockout_escape`). **Ship target: aria-plugin v1.24.0** (DEC §5 yaml v1.23.0 superseded by state-scanner Spec 2026-05-20). **Cycle active**: Phase B/C/D pending next session (~10h remaining, critical path TASK-001 → 004 → 006 → 007/008 → 009 → 010-014 → 017)。
+**★ M5 Track B FINAL — DONE**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — **M5 Phase C O3 ✅ + Phase D.2 close ✅**. O3 Tier-1 live LLM real smoke: DEMO-M5-O3 dispatch on heavy-3 alloc `6cf0d7ab`, 11 步 18s, PR #121 created+validated+cleaned (assertion file_touched_hit + diff_contains_hit 全 true, claude_exit=0, $0.228 Anthropic-equivalent / Luxeno subscription 实际近零)。Phase D.2 close gate per brainstorm D7 **MET**: T-deploy ✅ + Tier-1 live LLM ✅ + Spec X+Y archived ✅. **US-025 → done 2026-05-23**, M5 Spec → `openspec/archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/`. m5-handoff.yaml::go_decision=Go + phase_c_completion + 5 个 layer2_deployment_findings F1-F5 (F1 已修 / F4+F5 已修 / F2+F3 carry-forward to post-M5 节点级 Nomad docker plugin `auth.config` 修复)。Tier-2 6.27-6.29 cumulative validation 由 design 非阻塞, 随 owner workload 自然累积。
 
-**★ M5 Track B 最新**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — M5 Phase C 推进:**O1 (Feishu secret 轮换) ✅ + O2 (Layer 2 aria-runner 镜像 build+注册) ✅**。镜像 `forgejo.10cg.pub/10cg/aria-runner:claude-m5-91b8975-v11` digest `sha256:5b80ca6c…35148f5`;`aria-layer2-runner` parameterized job 注册;`m1-handoff.yaml` 更新;2026-05-02 secret deferral set 整体 CLOSED。**carry-forward: O3 (Tier-1 live LLM real smoke,单独 session,~¥0.10) + Phase D.2**。执行细节见 [`2026-05-22-m5-phase-c-playbook.md`](./2026-05-22-m5-phase-c-playbook.md)。
+**★ Track D 最新 (inflight, 与本 M5 close 正交)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — Phase A ✅, Phase B/C/D pending; **Ship target: aria-plugin v1.24.0**. Cycle active 与 M5 互不影响, 下次 session 可继续。
 
-**独立 track (本日另完成,已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1,607 test OK,#50 closed)。本 track DONE 无 carry-forward。
+**M5 Phase C 中段 (predecessor, 历史)**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — O1 (Feishu secret 轮换) + O2 (Layer 2 镜像 build+注册) — 已被本日 close handoff 取代。
 
-> ⚠️ M5 (US-025) 仍未完:O3 + Phase D.2 待续 —— 见 §Track B / 上方 M5 handoff。
-> ⚠️ Track D NEW (本 session 新开):Phase B/C/D 待续 —— 见上方 Track D handoff。
+**独立 track (2026-05-22 完成, 已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1)。无 carry-forward。
+
+> ✅ **M5 整体完成** — Phase B (Layer 1 prod deploy 2026-05-20) + Phase C (Layer 2 image + Tier-1 live LLM smoke 2026-05-22~23) + Phase D.2 close (2026-05-23)
+> ⚠ **Track D inflight** — aria-secret-guard-plugin-default Phase B/C/D pending(~10h), 详见 Track D handoff
+> 🔶 **Post-M5 carry-forward** — F2/F3 Nomad HCL docker auth + image GC proper fix(~2-4h 节点级 plugin config), 可独立 hygiene cycle 处理
 
 ---
 
@@ -60,7 +63,8 @@
 
 | Date | Session | Track | Status |
 |------|---------|-------|--------|
-| [2026-05-22 M5 Phase C O1+O2 done](./2026-05-22-m5-phase-c-o1-o2-done.md) | M5 Phase C: O1 Feishu secret 轮换 + O2 Layer 2 aria-runner 镜像 build+注册 (claude-m5-91b8975-v11 digest 5b80ca6c) + m1-handoff 更新 + aria-layer2-runner 注册; O3 + Phase D.2 carry-forward | B (M5) | **★ Active (Latest, O3 待续)** |
+| [2026-05-23 M5 Phase C O3 + Phase D.2 close](./2026-05-23-m5-phase-c-o3-done-d2-close.md) | 🎉 **M5 CLOSED** — O3 live LLM smoke (alloc 6cf0d7ab, 18s, PR #121 cleaned, assertion 双 hit) + Phase D.2 close (US-025 done, M5 Spec archived, m5-handoff.yaml go_decision=Go, F1-F5 findings recorded; F2/F3 carry-forward to post-M5 节点级 docker auth.config 修复) | B (M5) | ✅ **DONE (M5 整体完成)** |
+| [2026-05-22 M5 Phase C O1+O2 done](./2026-05-22-m5-phase-c-o1-o2-done.md) | M5 Phase C 中段: O1 Feishu secret 轮换 + O2 Layer 2 aria-runner 镜像 build+注册 (claude-m5-91b8975-v11 digest 5b80ca6c) + m1-handoff 更新 + aria-layer2-runner 注册; O3 + Phase D.2 carry-forward | B (M5) | predecessor (中段, superseded by 2026-05-23 close) |
 | [2026-05-22 aria-plugin #50 _status extraction-range shipped](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) | Full A→D cycle 单 session: state-scanner → triage #50 → Phase A Spec + post_spec R1→R2→R3 CONVERGED → Phase B T1-T6 (607 test OK, 0 regression) → Phase C 双 PR (#55 + #118) merged + 多远程 verified → Phase D #50 closed + spec archived; aria-plugin v1.23.1 | (#50) | ✅ DONE |
 | [2026-05-21 M5 Phase B 稳定化 + Hermes→Luxeno 重定向](./2026-05-21-m5-phase-b-stabilization-hermes-luxeno.md) | 24h 稳定观察 → aria-heartbeat 429/401 误诊→更正→owner option(c) Hermes 重定向 Luxeno (双 LLM 路径统一) + M5 Spec tasks.md T-deploy 6.17-6.26 同步 + 1 新 memory + 3 更正 + decision §3.5-3.7 | B | **★ Active (Latest B, SHIP READY)** |
 | [2026-05-20 Track C state-scanner carry-forward shipped (v1.23.0)](./2026-05-20-state-scanner-carry-forward-shipped.md) | Full A→D cycle 单 session (~7h 含 Track B Phase B twin #1): A.1 → R1 REVISE → Rev1 → R2 PASS_WITH_WARNINGS → Rev1.1 → B 16 tests + 584 regression + dogfood atomic + Rule #6 substitute + v1.23.0 → C 2 PR merged → D #90+#89 closed + spec archived; 4-repo parity 全绿 | C | ✅ DONE |

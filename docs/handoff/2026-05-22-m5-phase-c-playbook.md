@@ -193,9 +193,10 @@ ssh light-1 'export PATH=$PATH:/usr/local/bin; cd /tmp/Aria-build-src/aria-orche
 
 dispatch 命令:
 ```bash
+# ⚠️ IMAGE_SHA is bare hex (NO sha256: prefix) — HCL line 166 已自带 @sha256:${IMAGE_SHA}, 加前缀会拼出 @sha256:sha256:... 报 "does not match registry specification" (Finding F1, fix 2026-05-23 per O3 smoke)
 nomad job dispatch \
   -meta ISSUE_ID=<DEMO-M5-NNN> -meta ISSUE_URL=<full-url> \
-  -meta DISPATCH_ID=<uuid> -meta IMAGE_SHA=sha256:5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5 \
+  -meta DISPATCH_ID=<uuid> -meta IMAGE_SHA=5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5 \
   -meta IDEMPOTENCY_KEY=<key> aria-layer2-runner
 ```
 
