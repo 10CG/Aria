@@ -54,8 +54,18 @@ nested object.
 ❌ **Re-purpose existing field** (semantic change of `details.plugin_version`
 from semver to commit SHA, etc.).
 
-❌ **Tighten banner regex** in a way that previously-matching versions now
-fail. (Loosening is allowed.)
+❌ **Change banner regex in either direction** (v1.24.2 audit followup —
+backend-architect M3 closure):
+- **Tightening**: previously-matching version banners now fail to detect
+  (silent `local_version: null` regression, loses `stale_local_version`
+  sub-flag accuracy)
+- **Loosening**: previously-non-matching strings now register as version
+  banners (false-positive version match on unrelated comments, may
+  trigger spurious `stale_local_version`)
+Either direction silently changes detection semantics without bumping
+the schema contract. Regex changes that demonstrably preserve all
+existing test fixtures' classification + add new positive cases via
+new fixtures are the only safe path.
 
 ❌ **Change exit code semantics**. (Currently: 0 = check succeeded; 2 = usage
 error.)
