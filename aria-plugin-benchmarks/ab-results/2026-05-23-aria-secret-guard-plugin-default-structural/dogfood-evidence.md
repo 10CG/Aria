@@ -60,20 +60,38 @@ event #2 of this Spec cycle** in the TASK-002 + TASK-005 commit messages.
 
 ---
 
-## Post-bump capture (deferred to TASK-007)
+## Post-bump capture (TASK-007 result, 2026-05-23T07:12:29Z)
 
-TASK-007 Aria self dogfood (~10 daily commands + p95 timing) will run **after**
-TASK-006 v1.24.0 SOT bump. Expected delta from this initial capture:
+After TASK-006 5+1 SOT bump 1.23.1 → 1.24.0 (commit f97bc32). Direct hook
+invocation timing via `bash aria/hooks/secret-guard.sh` (proxy for production
+`bash ${CLAUDE_PLUGIN_ROOT}/hooks/secret-guard.sh`).
 
-| Field | This capture (pre-bump) | After TASK-006 (post-bump) |
-|-------|-------------------------|----------------------------|
-| `details.plugin_version` | `"1.23.1"` | `"1.24.0"` |
-| State | `dual_install` (unchanged) | `dual_install` (unchanged) |
-| Sub-flags | `[]` (unchanged) | `[]` if no content change; `["divergent_content"]` if v1.24.0 SOT bump adds banner |
+**Aggregate (PreToolUse 10 daily commands, full breakdown in `openspec/changes/aria-secret-guard-plugin-default/smoke-evidence.md` §1)**:
 
-TASK-007 will append the post-bump check + ≥10 daily-use Bash/Read/Edit commands
-+ timing capture (p50_ms, p95_ms per event) directly to this file under a
-"Post-bump capture" section.
+| Metric | Bash matcher path | Read/Edit matcher path |
+|--------|-------------------|------------------------|
+| n | 7 (events 1-6, 10) | 3 (events 7-9) |
+| min ms | 295 | 101 |
+| max ms | 337 | 102 |
+| p50 ms | 316 | 102 |
+| p95 ms | 337 | 102 |
+
+**Findings**:
+- F1: p95 = 337 ms (Bash) > 100 ms original budget → owner triage Accept,
+  budget revised to `p95 < 400 ms (Bash)` / `p95 < 150 ms (Read/Edit)`
+- F2: NEW known-limit — Bash `cat <key-file>` not in regex; Read/Edit catches
+  same paths via independent file_path scan; owner triage Accept as known-limit
+
+**Block-validation events**: 2/3 blocked correctly (B1 nomad-var-get → exit 2;
+B2 Read .env → exit 2). B3 (Bash `cat id_rsa`) → exit 0 reclassified as F2.
+
+**PostToolUse scan events** (3 representative): 1 REDACT applied + 2 pass-through;
+n=3, range [174-222] ms.
+
+**Ship gate verdict (smoke-evidence.md §3)**: **REVIEW → PASS_TRIAGED**
+- 0 unexpected_false_positive
+- 0 unexpected_false_negative (post F2 reclassification)
+- 2 findings triaged 2026-05-23 (both Accept-with-doc) → TASK-010 audit unblocked
 
 ---
 
