@@ -11,9 +11,21 @@
 
 ---
 
-## ★ 最新 session (2026-05-23 ~22:52 UTC) — 🎉 **Roadmap burndown CLOSED** (4 quick-wins shipped as v1.24.1 → v1.26.0)
+## ★ 最新 session #1 (2026-05-23 ~22:52 UTC) — 🎉 **Roadmap burndown CLOSED** (4 quick-wins shipped as v1.24.1 → v1.26.0)
 
 **Latest**: [2026-05-23-aria-secret-guard-roadmap-burndown.md](./2026-05-23-aria-secret-guard-roadmap-burndown.md) — burndown of 4 v1.24.0 roadmap items (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+
+## ★ 最新 session #2 (2026-05-23 ~15:30 UTC) — 🎉 **Track E CLOSED** (aria-layer2-docker-auth-cold-pull-fix shipped)
+
+**Co-Latest**: [2026-05-23-aria-layer2-docker-auth-cold-pull-fix-done.md](./2026-05-23-aria-layer2-docker-auth-cold-pull-fix-done.md) — Track E full Phase A→D ship handoff (并行 dev-claude session, 与 burndown 同日 ship). Multi-track day: 4 concurrent tracks shipped same date (Track B/D/E/burndown)。
+
+**★ Track E FINAL — DONE (2026-05-23 ~06:30 → ~15:30 UTC, ~9h)**: M5 carry-forward F2/F3 (Nomad HCL docker auth + image GC cold-pull fix) 完整闭环。Probe-first reframe ~40% scope 收缩 (M5 §2 推荐 vs 实测;3 heavy 节点 plugin auth.config 已 wired, 真正 fix = 删 HCL task auth block fallback 到节点级 SOT)。Phase A R1+R2 4-agent audit 全 PASS_WITH_WARNINGS converged + Rev2-micro;Phase B 3 PR ship (standards #9 / aria-orch #14 / Aria main #123) + 3-way SHA parity + a8e0096 aria pointer regression patch (caught + fixed during PR #123 rebase from dev-claude2 并行 advance);Phase C post_impl 2-agent PASS_WITH_WARNINGS 0 Critical;Phase D archive + 1 updated + 3 new memory entries + 本 handoff + Forgejo issue batch (aria-orch #16 #17 / Aria main #124)。**Side effect benefits**: piggyback executed `FORGEJO_BOT_PAT` partial rotation (per `.aria/decisions/2026-05-20-secret-rotation-during-m5-deploy.md` §1 Layer 1); discovered + corrected DEC §3.1 R1.B partial scope spec (canonical 7-scope via codebase enum, AD-M1-8 + DEC 2026-05-20 both updated);Lab-wide convention `standards/conventions/nomad-docker-registry-auth.md` v1.0.0 shipped。**Self-multi-container coordination stress test 部分通过** (5 Spec files 零 conflict + submodule pointer regression caught,Layer L 6-rule rule 7 gap surfaced for P3 patch — issue Aria main #124)。本 track 已 DONE,无 carry-forward (3 follow-up issues 在 file,independent cycles)。
+
+---
+
+## ★ 前 session (2026-05-23 ~12:03 UTC) — 🎉 **Track D CLOSED** (aria-secret-guard-plugin-default v1.24.0 SHIPPED)
+
+**Predecessor latest**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — Track D Phase B→D full ship handoff(被 burndown #1 + Track E #2 在同日 succeed)
 
 **★ Roadmap burndown — DONE**: [2026-05-23-aria-secret-guard-roadmap-burndown.md](./2026-05-23-aria-secret-guard-roadmap-burndown.md) — **aria-secret-guard v1.24.0 roadmap quick-win burndown** (~10h session, 2026-05-23 12:30→22:52 UTC, immediately following Track D Phase D.3 close at 12:03). 4 micro-releases:
 - **v1.24.1** O6: `.github/secret_scanning.yml` allowlist (aria-plugin 076a8c3 / Aria main b452820)

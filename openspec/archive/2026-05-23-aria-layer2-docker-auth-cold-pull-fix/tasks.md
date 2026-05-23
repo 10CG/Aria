@@ -28,7 +28,7 @@
 
 ## 1. Phase B start — Probe & sister HCL decision
 
-- [ ] **T1.0 [AI]** probe `aria-runner-template` job 状态 + repo 引用扫描 + 决定处置分支
+- [x] **T1.0 [AI]** probe `aria-runner-template` job 状态 + repo 引用扫描 + 决定处置分支
   - 3 节点 SSH: `for h in heavy-1 heavy-2 heavy-3; do ssh $h "nomad job status aria-runner-template 2>/dev/null | head -3"; done`
   - repo grep: `grep -r 'aria-runner-template' aria-orchestrator/ docs/ --include='*.hcl' --include='*.md' --include='*.sh'`
   - 决分支:
@@ -41,19 +41,19 @@
 
 ## 2. Phase B — HCL diff (aria-orchestrator submodule)
 
-- [ ] **T2.1 [AI]** `aria-layer2-runner.hcl` 删 docker task auth block (L172-175) + 周围注释 reframe
+- [x] **T2.1 [AI]** `aria-layer2-runner.hcl` 删 docker task auth block (L172-175) + 周围注释 reframe
   - 删 5 行 `auth { username = "aria-runner-bot" password = "${FORGEJO_BOT_PAT}" }`
   - 改注释 L168 + L169 (原引用 AD-M1-8 + FORGEJO_BOT_PAT 来源) 为: `# Auth: 节点级 plugin auth.config (per standards/conventions/nomad-docker-registry-auth.md + DEC-20260523-001 supersedes AD-M1-8)`
   - 估时: 0.15h
   - 依赖: 无
 
-- [ ] **T2.2 [AI]** `aria-runner-template.hcl` 按 T1.0 分支处理
+- [x] **T2.2 [AI]** `aria-runner-template.hcl` 按 T1.0 分支处理
   - (a)/(b) 分支: 删 L78-81 auth block + 加 deprecation/parity 注释
   - (c) 分支: 文件 header 加 `# SUPERSEDED by aria-layer2-runner @ DEC-20260523-001 — do not run; kept as M1 archive reference` + 仍删 auth block 防 grep 回归
   - 估时: 0.2h
   - 依赖: T1.0
 
-- [ ] **T2.3 [AI]** verify or add `${NOMAD_META_TARGET_NODE}` constraint in HCL (R2 M-cross-N-I-2)
+- [x] **T2.3 [AI]** verify or add `${NOMAD_META_TARGET_NODE}` constraint in HCL (R2 M-cross-N-I-2)
   - grep 检查 `aria-layer2-runner.hcl` 是否有 `constraint { ... ${NOMAD_META_TARGET_NODE} ... }` 块
   - 若无,加:
     ```hcl
@@ -65,18 +65,19 @@
     ```
     并标 `meta_optional` 加 `TARGET_NODE`(空时退 regex 匹配 `.+` 任意节点 — 不破现有 dispatch)
   - 注意 alt: 若 HCL 设计上不该有 hard constraint (auto-placement),则改用 `affinity { ... weight = 100 }` 软性,owner T8 时用 `-detach` + `nomad alloc status` 验证落点
+  - **实际实施 (2026-05-23 post_impl M-qa-PI-X-5 reframe)**: 选 alt path 之改良 — `meta_optional` 加 `TARGET_NODE` (per HCL line 109-116), **不**加 hard constraint (会让 normal dispatch 撞 empty regex `^$` = 调度失败); owner C2 测试用 `nomad node drain` 推 alloc 到目标节点 或临时 HCL override `value = "heavy-N"`。Acceptance C2.5 (`nomad alloc status | grep 'Node Name'`) 是真正 catch silent-fail 的 gate。
   - 估时: 0.25h
   - 依赖: T2.1
 
 ## 3. Phase B — Doc updates (aria-orchestrator submodule)
 
-- [ ] **T3.1 [AI]** `aria-orchestrator/nomad/README.md` 行 170 排查表 update (R1 M-km-C-2)
+- [x] **T3.1 [AI]** `aria-orchestrator/nomad/README.md` 行 170 排查表 update (R1 M-km-C-2)
   - 原: `image auth 失败 (401/403) | 检查 HCL config.auth.password template 指向 Nomad Variable 正确`
   - 改: `image auth 失败 (401/403) | 检查节点级 /root/.docker/config.json cred (per standards/conventions/nomad-docker-registry-auth.md); task-level HCL auth block 已废弃 (DEC-20260523-001)`
   - 估时: 0.1h
   - 依赖: 无
 
-- [ ] **T3.2 [AI]** `aria-orchestrator/docs/architecture-decisions.md` §AD-M1-8 Revised note (R1 M-km-I-3)
+- [x] **T3.2 [AI]** `aria-orchestrator/docs/architecture-decisions.md` §AD-M1-8 Revised note (R1 M-km-I-3)
   - Status 行后追加 1 行:
     ```
     > **Revised by DEC-20260523-001 (2026-05-23)** — task-level docker auth block removed from aria-layer2-runner + aria-runner-template; node-level plugin auth.config (`/root/.docker/config.json` per heavy node) is now SOT. See `standards/conventions/nomad-docker-registry-auth.md`.
@@ -86,7 +87,7 @@
 
 ## 4. Phase B — Convention doc (standards submodule)
 
-- [ ] **T4.1 [AI]** 起草 `standards/conventions/nomad-docker-registry-auth.md` (新文件, 9 段 §0-§8, per DEC §4 D4)
+- [x] **T4.1 [AI]** 起草 `standards/conventions/nomad-docker-registry-auth.md` (新文件, 9 段 §0-§8, per DEC §4 D4)
   - §0 Rationale + Observed contradiction (Aether 2026-04-23 GO vs Aria 2026-05-23 FAIL, with table)
   - §1 Problem statement (M5 §3 R2 实证 + 不可复现根因候选)
   - §2 Mechanism (NOMAD_META_* vs template stanza env 解析时序 + docker driver invocation timing)
@@ -100,7 +101,7 @@
   - 估时: 1h
   - 依赖: 无 (与 T1-T3 并行可)
 
-- [ ] **T4.2 [AI]** verify convention doc 满足 R2 验收 D
+- [x] **T4.2 [AI]** verify convention doc 满足 R2 验收 D
   - `[ -f standards/conventions/nomad-docker-registry-auth.md ]`
   - `grep -cE 'heavy-[1-3]|aria-runner-bot' standards/conventions/nomad-docker-registry-auth.md == 0`
   - `grep -cE '^## §[0-8] ' standards/conventions/nomad-docker-registry-auth.md == 9`
@@ -109,18 +110,18 @@
 
 ## 5. Phase B — Standards index updates
 
-- [ ] **T5.1 [AI]** `standards/summaries/conventions-summary.md` 新增 nomad-docker-registry-auth 摘要条目
+- [x] **T5.1 [AI]** `standards/summaries/conventions-summary.md` 新增 nomad-docker-registry-auth 摘要条目
   - 估时: 0.1h
   - 依赖: T4.1
 
-- [ ] **T5.2 [AI]** `standards/README.md` Development Conventions 表新增条目
+- [x] **T5.2 [AI]** `standards/README.md` Development Conventions 表新增条目
   - **Deferred minor** (per R1 M-km-M-1): 顺带补 `secret-hygiene.md` + `session-handoff.md` 索引缺失? — owner 决,若 yes 一并加;若 no 仅加本 Spec
   - 估时: 0.1h
   - 依赖: T4.1
 
 ## 6. Phase B — Owner verify (cred validity, BEFORE HCL activation)
 
-- [ ] **T6 [OWNER]** 3 节点 cred verify per §Acceptance B (fingerprint + round-trip via stdin)
+- [x] **T6 [OWNER]** 3 节点 cred verify per §Acceptance B (fingerprint + round-trip via stdin)
   - B1 fingerprint per node (Python sha256[:12]) — 3 行输出必须全等
   - B2 round-trip per node via `--password-stdin` (PAT 走 stdin 不入 process args) — 期望返 `200`
   - **若 fingerprint drift OR HTTP non-200 → STOP, 进 R1 escalation path**:
@@ -132,7 +133,7 @@
 
 ## 7. Phase B — Owner deploy (HCL activation)
 
-- [ ] **T7 [OWNER]** Push HCL change + run on cluster
+- [x] **T7 [OWNER]** Push HCL change + run on cluster
   - 主仓 dev branch push + Forgejo PR 创建 (但不 merge — 等 post_implementation audit + cold-pull verify)
   - `nomad job run aria-orchestrator/nomad/jobs/aria-layer2-runner.hcl` (3 heavy 任一节点 nomad cli)
   - 若 T1.0 = (a) 分支, 同 run aria-runner-template.hcl
@@ -141,7 +142,7 @@
 
 ## 8. Phase B — Owner verify (cold-pull live, AFTER activation)
 
-- [ ] **T8 [OWNER]** 3 节点 cold-pull live verify per §Acceptance C
+- [x] **T8 [OWNER]** 3 节点 cold-pull live verify per §Acceptance C
   - 每节点 4 步 (C1 docker rmi -f / C2 dispatch / C2.5 alloc node verify / C3 grep log "Pulling from")
   - 3/3 节点 PASS ⇒ live verify done
   - 若任一节点 C3 缺 "Pulling from" 行 但 alloc 仍 SUCCESS → 检查是否走 cache (C1 清得不彻底) 或 alloc 落错节点 (C2.5 漏)
@@ -151,7 +152,7 @@
 
 ## 9. Phase C — post_implementation audit (Level 2 proportionality)
 
-- [ ] **T9 [AI+OWNER]** Single-round post_implementation audit (2-agent: tech-lead + qa-engineer)
+- [x] **T9 [AI+OWNER]** Single-round post_implementation audit (2-agent: tech-lead + qa-engineer)
   - 输入: HCL diff + convention doc + nomad/README update + AD note + standards index + T6/T7/T8 evidence
   - 输出: PASS / NEEDS_FIX verdict + 0-N findings
   - per `[[feedback_agent_team_for_level1]]` proportionality — Level 2 doc-dominant change 1 轮足够
@@ -161,7 +162,7 @@
 
 ## 10. Phase C — Commit + multi-remote push + PR merge
 
-- [ ] **T10.1 [AI]** Commit standards submodule (convention + index)
+- [x] **T10.1 [AI]** Commit standards submodule (convention + index)
   - 分支 `feature/layer2-docker-auth-fix` in standards/
   - commit message per DEC §4 D3 + sign reference to DEC-20260523-001
   - push origin + github (multi-remote per `[[feedback_state_scanner_run_all_phases]]`)
@@ -169,7 +170,7 @@
   - 估时: 0.15h
   - 依赖: T9 PASS
 
-- [ ] **T10.2 [AI]** Commit aria-orchestrator submodule (HCL + nomad/README + AD note)
+- [x] **T10.2 [AI]** Commit aria-orchestrator submodule (HCL + nomad/README + AD note)
   - 分支同名
   - commit message 按 T1.0 分支选 (a)/(b)/(c) template
   - push 双 remote
@@ -177,7 +178,7 @@
   - 估时: 0.15h
   - 依赖: T9 PASS
 
-- [ ] **T10.3 [AI+OWNER]** PR merge order — standards 先, aria-orchestrator 后, 主仓 last
+- [x] **T10.3 [AI+OWNER]** PR merge order — standards 先, aria-orchestrator 后, 主仓 last
   - per `[[feedback_coupled_pr_merge_discipline]]`:
     1. merge standards PR (`Do=merge`)
     2. aria-orchestrator submodule bump 到 standards master post-merge SHA, 验 `git -C standards merge-base --is-ancestor <PR_SHA> master` (per `[[feedback_submodule_pointer_post_merge_bump]]`)

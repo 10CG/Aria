@@ -144,7 +144,7 @@ INFO Lark: connected to wss://msg-frontier.feishu.cn/ws/v2?
 | 步骤 | 操作 | 注意事项 |
 |------|------|---------|
 | R1.A | Luxeno (silknode) 后台 → revoke 现 key (`sk-silk-bB8H555*` 前缀) → 生成新 key | 命名 `aria-orchestrator-prod-20260520-rotated` |
-| R1.B | Forgejo (`aria-runner-bot`) → revoke PAT → 生成新 PAT | 权限范围: read+write:repository / read+write:issue / read:user |
+| R1.B | Forgejo (`aria-runner-bot`) → revoke PAT → 生成新 PAT | 权限范围: read+write:repository / read+write:issue / read:user — **⚠ 2026-05-23 CORRECTION**: 此 scope spec **不完整**, 漏 `:package` 系列。canonical 7-scope 集 (验证经 Aria Spec `aria-layer2-docker-auth-cold-pull-fix` 2026-05-23 v1 PAT cold-pull FAIL 实证 + codebase enumeration): `read:package + write:package + read:repository + write:repository + read:issue + write:issue + read:user`。详 `.aria/decisions/2026-05-23-layer2-docker-auth-cold-pull-fix.md` §8.2。 |
 | R1.C | Feishu 群机器人 → 安全设置 → **重置签名**（不删机器人） | webhook URL 不变（详见 §3.2） |
 | R2 | 4 个新值写入 light-1 临时文件，0600 权限 | `/tmp/luxeno.new` / `/tmp/forgejo.new` / `/tmp/feishu_webhook.new`（旧 URL 不变）/ `/tmp/feishu_signing.new` |
 | R3 | `nomad var put -force` 全量替换（7 keys，删 OPS_ALERT），**必须 `>/dev/null 2>&1`** | 触发 ChangeMode=restart → aria-orchestrator + aria-layer1-comment-poll 自动重启 |
@@ -478,4 +478,19 @@ Plugin-level hook 一旦装 → 该 plugin 加载就 active → 几乎等同 use
 
 **Created**: 2026-05-20 by AI Phase B.5 rotation session
 **Author**: solo-lab (uni.concept.wzfq@gmail.com), drafted by Claude Opus 4.7 (1M context) with explicit owner sign-off
-**Status**: Layer 2 done; Layer 1 in-progress; Layer 3 decided (next-cycle Spec)
+**Status**: Layer 2 done; Layer 1 mostly done (FORGEJO_BOT_PAT image-pull side rotated 2026-05-23 via piggyback Spec; Nomad var FORGEJO_BOT_PAT (2026-05-03 PAT) kept per scope-discipline Option X); Layer 3 SHIPPED 2026-05-23 (aria-secret-guard-plugin-default v1.24.0 via dev-claude2 terminal)
+
+---
+
+## §4 Layer 1 partial completion via piggyback (appended 2026-05-23)
+
+`FORGEJO_BOT_PAT` rotation (R1.B + R3 partial) **partially completed** 2026-05-23 as piggyback of Spec `aria-layer2-docker-auth-cold-pull-fix`:
+
+- **Image-pull side** (3 heavy nodes `/root/.docker/config.json`): rotated to new PAT `aria-runner-bot-prod-20260523-v2-full-scope` with **canonical 7-scope set** (per CORRECTION above)。2 旧 PATs (`aria layer2 runner 2026 05 22` + `aria build clone 2026 05 22`) revoked。
+- **Nomad var side** (`nomad/jobs/aria-orchestrator::FORGEJO_BOT_PAT` for Layer 1 reconciler + aria-build + Layer 2 entrypoint git ops): **kept on 2026-05-03 PAT `aria-runner-bot`** (Option X scope discipline — image-pull and container-git-ops are independent cred paths, not coupling required by this rotation)。
+
+**Remaining Layer 1 work for full FORGEJO_BOT_PAT rotation closure** (post-2026-08-02 hard cap or independent cycle):
+- Rotate Nomad var `FORGEJO_BOT_PAT` to a new PAT also (or reuse the 2026-05-23 v2 PAT to consolidate, then revoke 2026-05-03 PAT)
+- This is a clean operation (Nomad var update + restart aria-orchestrator + aria-layer1-comment-poll)
+
+**Cross-ref**: `.aria/decisions/2026-05-23-layer2-docker-auth-cold-pull-fix.md` §8.1-§8.2 (piggyback execution trace + canonical scope correction)

@@ -240,7 +240,65 @@ Q4: 验收 C 节点覆盖 → 推荐 3/3
 
 ---
 
+## §8 Phase B implementation outcome (appended 2026-05-23 ~15:20 UTC, per qa-engineer M-qa-PI-X-2)
+
+### §8.1 R1 escalation Branch 2 (piggyback) actual execution
+
+Proposal §Risks R1 decision tree Branch 2 ("FORGEJO_BOT_PAT 在 in-flight rotation 子集 → piggyback") **triggered + executed**:
+
+1. T6 initial verify: B1 fingerprint drift detected (heavy-1/2 = `3654ff26d443`, heavy-3 = `21015768f512`) + B2 all 3 LOGIN_OK ⇒ 2 distinct valid PATs in active use
+2. Owner revoke 2 旧 PATs (`aria layer2 runner 2026 05 22` + `aria build clone 2026 05 22`)
+3. Detected 3rd existing PAT `aria-runner-bot` (2026-05-03), fingerprint `c957308a0e35`, used by Nomad var `FORGEJO_BOT_PAT` for Layer 1 + aria-build + Layer 2 entrypoint git ops → **kept (Option X, scope discipline)**
+4. Owner create v1 PAT `aria-runner-bot-prod-20260523-rotated` with scopes per **DEC-20260520 §3.1 R1.B** (incomplete spec: missing `:package`)
+5. Atomic 3-node sync (Path B tmp file) → fingerprint `0d6e152a82f1` 3-way, B2 LOGIN_OK 3-way
+6. T8 cold-pull FAIL — all 3 nodes 401 unauthorized (JWT payload reveals `Scope=write:issue,write:repository,read:user`, missing `read:package`)
+7. Owner create v2 PAT `aria-runner-bot-prod-20260523-v2-full-scope` with **canonical 7-scope set** (per codebase enumeration, see §8.2)
+8. Atomic 3-node sync (Path B retry) → fingerprint `46e20fea2f5e` 3-way, B2 LOGIN_OK 3-way
+9. T8 cold-pull PASS — 3/3 PULL_EXIT=0, "Pulling from 10cg/aria-runner" + "Pull complete"
+10. Owner revoke v1 PAT, retain v2 + 2026-05-03 (independent path)
+
+**Final active PATs for aria-runner-bot**:
+- `aria-runner-bot-prod-20260523-v2-full-scope` (fingerprint `46e20fea2f5e`, 7 scopes) — node config.json image pull
+- `aria-runner-bot` 2026-05-03 (fingerprint `c957308a0e35`) — Nomad var FORGEJO_BOT_PAT (Layer 1 + aria-build + container git ops)
+
+### §8.2 PAT scope canonical (per codebase enumeration)
+
+**DEC-20260520 §3.1 R1.B was incomplete** — lists only `write:repository / read:repository / write:issue / read:issue / read:user`, missing `:package` series。
+**AD-M1-8 §决定 Option A canonical** lists `read:package + write:package + write:repository + read:user`, missing `:issue` series。
+
+True canonical (via 2026-05-23 codebase grep of aria-runner-bot operations) = **7 scopes**:
+
+| Scope | Operation evidence |
+|-------|---------------------|
+| `read:package` | Nomad docker driver image pull (this Spec C verify) |
+| `write:package` | aria-build `docker push` (Dockerfile + registry-push-guide.md) |
+| `read:repository` | Layer 1 `GET /repos/.../pulls/{id}` + Layer 2 entrypoint `git clone` |
+| `write:repository` | Layer 1 `POST .../pulls/{id}/merge` + Layer 2 `git push` |
+| `read:issue` | Layer 1 `GET /repos/.../issues?state=open&label=...` |
+| `write:issue` | Layer 1 + Layer 2 `POST .../issues/{id}/comments` |
+| `read:user` | Self-identify `GET /user` |
+
+### §8.3 Phase B audit outcome summary
+
+| Stage | Verdict | Audit report |
+|-------|---------|--------------|
+| post_spec R1 (4-agent) | NEEDS_FIX → 4C/16I/12M | `.aria/audit-reports/post_spec-R1-2026-05-23T0900Z-...md` |
+| post_spec R2 (4-agent verify) | PASS_WITH_WARNINGS (4/4) | `.aria/audit-reports/post_spec-R2-2026-05-23T1100Z-...md` |
+| Rev2-micro sweep | (5 surgical edits applied) | proposal Rev1.1 |
+| Phase B AI segment | (T1.0 + T2.x + T3.x + T4.x + T5.x done, 3 PR merged) | commits 53c0f8a → edc1bdf (rebased) → 6fea5d7 (merge) → a8e0096 (aria pointer regression fix) |
+| post_implementation R1 (2-agent L2 proportionality) | PASS_WITH_WARNINGS (0C/5I/7M aggregate); Phase D CONDITIONAL on 3 items | (this DEC §8 + tasks.md sync + probe evidence file address the 3 conditions) |
+
+### §8.4 Latent issues surfaced (for Phase D Forgejo issue batch)
+
+1. **PAT scope canonical missing from AD-M1-8** (per §8.2) — file Forgejo issue to update AD-M1-8 §决定 with 7-scope
+2. **`a8e0096` aria pointer regression** caught + fixed but root cause prevention not codified — file Forgejo issue for branch-finisher / Phase C.2.5 mechanical regression gate (multi-terminal-coordination Layer L 6-rule patch)
+3. **dispatch-issue.sh + t5-run-demo.sh + test-dispatch-idempotency.sh** still reference `aria-runner-template` (per T1.0 probe report §4 draft) — file Forgejo issue for script drift cleanup
+4. **DEC-20260520 §3.1 R1.B incomplete scope spec** — update target via Forgejo issue (covered by #1 above, can bundle)
+
+---
+
 **Status changes**:
 - 2026-05-23 ~06:30 UTC: Draft v1 (probe + reframe + Spec draft 同 session)
 - 2026-05-23 ~10:00 UTC: Draft v2 / Rev1 (post R1 4-agent audit — 4C/16I/12M; Rev1 addressed 4 Critical + 8 cross-cutting Important + ~6 absorbed Minor)
 - 2026-05-23 ~11:30 UTC: **Approved (Rev1.1)** — R2 4-agent 4/4 PASS_WITH_WARNINGS converged + Rev2-micro sweep (B2 stdin / C2.5 alloc node verify / A2 regex unify / D responsibility label / DEC Status sync / M6 blocker note);post_spec audit closed,准入 Phase A.2 task-planner
+- 2026-05-23 ~15:20 UTC: **Phase B + Phase C closed (post_implementation 2-agent PASS_WITH_WARNINGS, 0 Critical)** — §8 outcome appended (R1 escalation actual + PAT scope canonical correction + latent issues for Phase D batch);准入 Phase D archive

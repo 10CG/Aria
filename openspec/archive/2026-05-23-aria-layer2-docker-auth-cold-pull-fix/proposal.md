@@ -1,7 +1,7 @@
 # aria-layer2-docker-auth-cold-pull-fix
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Approved (Rev1.1, post R2 — 4-agent 4/4 PASS_WITH_WARNINGS converged; Rev2-micro 修 2 cross-cutting NEW Important + ~6 顺带 Minor;详 R1+R2 audit reports)
+> **Status**: **Complete (2026-05-23 archived)** — Phase D.2 close gate MET: 3-way SHA parity verified (3 repos × 3 endpoints) post-merge + a8e0096 aria pointer regression patched + T6/T7/T8 owner-segment evidence PASS (per .aria/probes/2026-05-23-t6-t8-execution-evidence.md) + post_implementation 2-agent PASS_WITH_WARNINGS 0 Critical. Original Approved (Rev1.1, post R2 — 4-agent 4/4 PASS_WITH_WARNINGS converged + Rev2-micro). Spec archived to `openspec/archive/2026-05-23-aria-layer2-docker-auth-cold-pull-fix/`.
 > **Created**: 2026-05-23
 > **决策来源**: M5 Phase D.2 handoff `docs/handoff/2026-05-23-m5-phase-c-o3-done-d2-close.md` §2 F2/F3 + §3 R2
 > **Probe grounded**: 2026-05-23 SSH 实地侦察 heavy-1/2/3 (per `[[feedback_prod_state_must_ground_playbook]]`)
