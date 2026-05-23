@@ -3,14 +3,14 @@ track-id: aria-secret-guard-roadmap-burndown
 owner-container: dev-claude2
 phase: D.3
 status: done
-updated-at: 2026-05-23T22:52:29Z
+updated-at: 2026-05-23T23:39:16Z
 ---
 
-# Aria — Session Handoff (2026-05-23 ~22:52 UTC) — aria-secret-guard v1.24.0 roadmap burndown SHIPPED (O3 + O4 + O5 + O6 = 4 micro-cycles)
+# Aria — Session Handoff (2026-05-23 ~23:39 UTC) — aria-secret-guard v1.24.0 roadmap burndown SHIPPED + 3-repo branch hygiene (O3 + O4 + O5 + O6 + cleanup = 4 micro-cycles + repo hygiene)
 
-> **Status**: ✅ Track FULLY CLOSED — 4 quick-win v1.24.0 roadmap items shipped as 4 minor/patch releases (v1.24.1 → v1.24.2 → v1.25.0 → v1.26.0)
-> **Cycle period**: 2026-05-23 ~12:30 UTC (start) → ~22:52 UTC (~10h, immediately following Track D Phase D.3 close at ~12:03 UTC)
-> **Next session 入口**: 优先读本 doc → `/aria:state-scanner` → §6 选择下一步(本 burndown DONE,剩 4 owner-gated v1.27.x items)
+> **Status**: ✅ Track FULLY CLOSED — 4 quick-win v1.24.0 roadmap items shipped as 4 minor/patch releases (v1.24.1 → v1.24.2 → v1.25.0 → v1.26.0) + 3-repo branch hygiene cleanup (19 local + 19 origin merged-to-master branches deleted)
+> **Cycle period**: 2026-05-23 ~12:30 UTC (start) → ~23:39 UTC (~11h, immediately following Track D Phase D.3 close at ~12:03 UTC)
+> **Next session 入口**: 优先读本 doc → `/aria:state-scanner` → §6 选择下一步(本 burndown DONE + 3-repo 全 hygiene clean,剩 4 owner-gated v1.27.x items)
 
 ---
 
@@ -32,10 +32,12 @@ updated-at: 2026-05-23T22:52:29Z
 | ~13:30 | **v1.24.2** (O5 actionable subset, 4/5 minors) | (a) python3 dep guard in aria-doctor `json_escape()` / (b) 4 F2 labeled known-limit regression tests / (c) `<date>` placeholder → `2026-05-23` / (d) CHANGELOG "3 new" wording clarification | aria-plugin `0530db4` / standards `6e56f2e` / Aria main `c0535c0` |
 | ~14:30 | **v1.25.0** (O4) | Bash matcher regex extension for local `<reader> <key-file>` (id_rsa/id_ed25519/.pem/.key/.p12/.pfx/.jks/.gpg/.age/.tfstate/aws-credentials/aws-config/kube-config/kubeconfig) — closes v1.24.0 known-limit (c) F2 from TASK-007 dogfood;Bash↔Read parity 达成 | aria-plugin `d9b2e5e` / Aria main `b02fa26` |
 | ~22:30 | **v1.26.0** (O3) | Hook perf optimization — (1) consolidated entry jq call (1 readarray vs 3 printf\|jq subshells) + (2) bash builtin `=~` regex sweep vs `echo \| grep -qE` × 100 subprocess forks。**Bash p95 337ms → 76ms (-77%) / Read p95 102ms → 41ms (-60%) / cold-start 600-1400ms → 59-68ms (-90%)**。所有 path 重回原 100ms budget(v1.24.0 relaxed 到 400/150ms)。 | aria-plugin `8578609` / Aria main `63e6154` |
+| ~22:55 | **burndown handoff written** | this doc — 9-section Rule #9 §2.3 compliant + latest.md pointer updated | Aria main `52db2e5` (rebased over concurrent layer2-docker-auth-fix #123 push) |
+| ~23:30 | **3-repo branch hygiene cleanup** | 19 local merged-to-master branches deleted (Aria main 7 + aria-plugin 11 + standards 1) + 19 corresponding origin branches deleted。0 unmerged branches existed (all confirmed safe by `git branch --merged master`)。Origin-only branches without local counterpart preserved (conservative — could be other sessions' in-flight work)。 | branch deletes only, no master commits |
 
-**Cycles shipped this session**: **4 micro-releases**(v1.24.1 / v1.24.2 / v1.25.0 / v1.26.0),共 4 个 v1.24.0 roadmap items closed(O6 + O5 4/5 / O4 / O3)。
+**Cycles shipped this session**: **4 micro-releases**(v1.24.1 / v1.24.2 / v1.25.0 / v1.26.0),共 4 个 v1.24.0 roadmap items closed(O6 + O5 4/5 / O4 / O3),plus 3-repo branch hygiene cleanup。
 
-**累计**: 4 PRs merged + 4 Aria main commits + 1 standards commit + 4 SOT 5+1 bumps + 3-repo 3-way SHA parity 全程 verified at each step + 0 behavior regression + 271/271 tests PASS unchanged + 1 new memory entry sealed in v1.24.0 D.3 handoff(`feedback_github_secret_scanning_push_range_blocks_history`)被本 burndown 引用反复实证。
+**累计**: 4 PRs merged + 4 Aria main commits + 1 standards commit + 4 SOT 5+1 bumps + 3-repo 3-way SHA parity 全程 verified at each step + 0 behavior regression + 271/271 tests PASS unchanged + 1 new memory entry sealed in v1.24.0 D.3 handoff(`feedback_github_secret_scanning_push_range_blocks_history`)被本 burndown 引用反复实证 + **19 local + 19 origin merged branches cleaned across 3 repos (Aria main 0 / aria-plugin 0 / standards 0 local non-master branches remain)**。
 
 ---
 
@@ -150,6 +152,10 @@ updated-at: 2026-05-23T22:52:29Z
 - 不要忽略 §3 "stale `.git/index.lock`" 风险 — 多 session 并发时频繁清理是必要(本 session 撞 3 次)
 - 不要忽略 §3 "submodule detached HEAD" 风险 — worktree submodule operations 需 `git branch -f master HEAD` 手动同步
 
+**可选 follow-up hygiene**(non-blocking,留给后续 hygiene cycle):
+- **Origin-only branches cleanup**: 3 repos 共 29 origin-only 残留(无 local 对应),需 per-branch PR-status review(closed-without-merge → 可删 / unmerged-still-needed → 保留)。Forgejo UI 或 `forgejo GET /repos/X/pulls?state=closed` 批量查可加速。
+- **branch_cap 收敛到 ≤20**: state-scanner `handoff_multibranch_branch_cap` 仍 soft warn(22 remote branches > 20 cap)。清完 origin-only 残留即可消除。
+
 ---
 
 ## §7 提交清单 (commit hash + multi-remote parity, post-burndown)
@@ -189,6 +195,63 @@ standards: **1 direct master commit**:
 ### Forgejo issues
 
 - 无新 issues opened/closed(本 burndown 全部内部 cleanup;之前 Aria #84 + #107 在 v1.24.0 D.3 时已 closed)
+
+### Repo hygiene cleanup (post-burndown, ~23:30 UTC)
+
+19 local + 19 origin branches deleted across 3 repos (all confirmed merged-to-master by `git branch --merged master` — 0 unmerged):
+
+**Aria 主仓 (7 + 7)**:
+- `chore/state-scanner-spec-status-fix`
+- `feature/aria-issue-101-status-normalize`
+- `feature/aria-issue-triage-sop`
+- `feature/phase-c-integrator-pre-merge-gate-d3-claude-md-rule`
+- `feature/phase-c-integrator-pre-merge-gate-prereq`
+- `feature/phase-c-integrator-pre-merge-gate-t5-benchmark`
+- `feature/state-scanner-inline-carry-forward-surfacing`
+
+**aria-plugin (11 + 11)**:
+- `feature/aria-issue-101-status-normalize`
+- `feature/aria-issue-triage-sop`
+- `feature/inline-carry-forward-surfacing`
+- `feature/phase-c-integrator-pre-merge-gate-d2-workflow-runner`
+- `feature/phase-c-integrator-pre-merge-gate-prereq`
+- `feature/phase-c-integrator-pre-merge-gate-release-v1.19.0`
+- `feature/state-scanner-tx-g2-g3-g4-collectors`
+- `feature/state-scanner-tx0-tx1-prereq`
+- `feature/state-scanner-tx2-tx7-cleanup`
+- `hotfix/v1.22.1-handoff-frontmatter-collector-fixes`
+- `release/v1.20.0`
+
+**standards (1 + 1)**:
+- `feature/aria-issue-triage-sop`
+
+**Conservatively PRESERVED** (origin-only, no local counterpart — could be other session in-flight or shared historical state):
+- Aria 主仓 origin: 14 残留 (e.g. `feature/aria-2.0-m0-prerequisite`, `feature/m3-carryover-*`, `feature/aria-secret-hygiene-rule`, `feature/multi-terminal-coordination`, etc.)
+- aria-plugin origin: 11 残留 (e.g. `feature/agent-project-adapter`, `feature/state-scanner-v2.9`, `feature/v1.17.*-bundled`, etc.)
+- standards origin: 4 残留 (`feature/aria-secret-hygiene-rule`, `feature/layer2-docker-auth-fix`, `feature/multi-terminal-coordination`, `feature/standards/standards-docs-sync`)
+
+These need per-branch PR-status review to safely delete (closed-without-merge vs unmerged-still-needed) — outside auto-progress scope. Future cleanup cycle can address via Forgejo UI or `gh pr list --state closed --base master --json mergedAt,headRefName` style query.
+
+### Post-cleanup state verification (state-scanner snapshot)
+
+```
+=== GIT ===
+branch=master clean=True uncommitted=0 ahead=0 behind=0
+
+=== SYNC === overall_parity=True pending_push=False
+  main local=52db2e5  github: equal  origin: equal
+  [standards] local=96f72c9   github: equal  origin: equal
+  [aria]      local=8578609   github: equal  origin: equal
+  [aria-orchestrator] local=1c23407  origin: unknown (detached, 另一 session 管理)
+
+=== TRACKS === count=123 (was 181 pre-cleanup; -58 from local merged branch refs gone)
+=== CHANGES === Level 1, 0 files
+=== OPENSPEC === active=0, pending_archive=0
+```
+
+`handoff_multibranch_branch_cap` collector soft error: **29 → 22** remote-branch count(cleanup 直接减少 7 from Aria main、~10 from aria-plugin、1 from standards origin)。仍超 20 cap,需后续 cleanup cycle 处理 origin-only 残留。
+
+Local non-master branch count post-cleanup: **0 / 0 / 0** across all 3 repos。
 
 ---
 
@@ -231,5 +294,6 @@ standards: **1 direct master commit**:
 ---
 
 **Created**: 2026-05-23T22:52:29Z
-**Session duration**: ~10h cumulative (2026-05-23 ~12:30 UTC → ~22:52 UTC), immediately following Track D Phase D.3 close (~12:03 UTC)
-**Status**: ✅ Track FULLY CLOSED — 4 v1.24.0 roadmap quick-wins shipped as v1.24.1 / v1.24.2 / v1.25.0 / v1.26.0 (4 PR merged + 4 Aria main commits + 1 standards commit + 3-way SHA parity at each release + 271/271 tests PASS unchanged + 0 behavior regression vs v1.24.0). Hook perf reclaimed original 100ms budget (-77% Bash / -90% cold-start). Next session may pick from §6 SUGGESTED priorities or any backlog — no carry-forward from this burndown.
+**Updated**: 2026-05-23T23:39:16Z (added §7 Repo hygiene cleanup section + timeline ~23:30 event)
+**Session duration**: ~11h cumulative (2026-05-23 ~12:30 UTC → ~23:39 UTC), immediately following Track D Phase D.3 close (~12:03 UTC)
+**Status**: ✅ Track FULLY CLOSED — 4 v1.24.0 roadmap quick-wins shipped as v1.24.1 / v1.24.2 / v1.25.0 / v1.26.0 (4 PR merged + 4 Aria main commits + 1 standards commit + 3-way SHA parity at each release + 271/271 tests PASS unchanged + 0 behavior regression vs v1.24.0) + **3-repo branch hygiene cleanup (19 local + 19 origin merged-to-master deleted; 0 local non-master branches remain in any repo)**. Hook perf reclaimed original 100ms budget (-77% Bash / -90% cold-start). Next session may pick from §6 SUGGESTED priorities or any backlog — no carry-forward from this burndown.
