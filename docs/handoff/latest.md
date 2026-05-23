@@ -11,11 +11,19 @@
 
 ---
 
-## ★ 最新 session (2026-05-23 ~12:03 UTC) — 🎉 **Track D CLOSED** (aria-secret-guard-plugin-default v1.24.0 SHIPPED)
+## ★ 最新 session (2026-05-23 ~22:52 UTC) — 🎉 **Roadmap burndown CLOSED** (4 quick-wins shipped as v1.24.1 → v1.26.0)
 
-**Latest**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — Track D Phase B→D full ship handoff(state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+**Latest**: [2026-05-23-aria-secret-guard-roadmap-burndown.md](./2026-05-23-aria-secret-guard-roadmap-burndown.md) — burndown of 4 v1.24.0 roadmap items (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
 
-**★ Track D FINAL — DONE**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — **aria-secret-guard-plugin-default v1.24.0 SHIPPED**. 17 in-cycle TASKs Phase B→D ship 在 ~9h session(2026-05-23 03:00→12:03 UTC,Phase A 2026-05-22 已 ship)。262/262 tests PASS + 2 audits converged (post_spec R2 ✓ + post_implementation R1 5-agent informal ✓) + 3-PR ship (standards #8 / aria-plugin #58 / Aria main #122) + 3-way SHA parity(`b3cc647 / 3b688a9 / 8542a91`) + Phase D.2 archive + Forgejo Aria #84+#107 closed + SilkNode PR #429 reference + dogfood ship-gate REVIEW→PASS_TRIAGED (F1 perf budget revised + F2 Bash cat-key-file 新 known-limit, 双 owner triage Accept) + Rule #6 structural substitute artifacts (README + atomicity-guard + dogfood-evidence) + GitHub Secret Scanning hotfix (2 fixtures sanitize + 2 unblock URL owner click) + 1 new memory entry `feedback_github_secret_scanning_push_range_blocks_history`. **本 track 已 DONE, 无 carry-forward**(仅低优 v1.24.1+ roadmap O1-O9: SilkNode P2.5 deferred dogfood 7-day deadline / perf opt / regex extension / minor cleanup 12 项 / `.github/secret_scanning.yml` allowlist / Aether 14-day 通知 / aria-doctor self-test / PreToolUse Write content scan)。
+**★ Roadmap burndown — DONE**: [2026-05-23-aria-secret-guard-roadmap-burndown.md](./2026-05-23-aria-secret-guard-roadmap-burndown.md) — **aria-secret-guard v1.24.0 roadmap quick-win burndown** (~10h session, 2026-05-23 12:30→22:52 UTC, immediately following Track D Phase D.3 close at 12:03). 4 micro-releases:
+- **v1.24.1** O6: `.github/secret_scanning.yml` allowlist (aria-plugin 076a8c3 / Aria main b452820)
+- **v1.24.2** O5: python3 guard + F2 labeled tests + `<date>` placeholder + CHANGELOG wording (aria-plugin 0530db4 / standards 6e56f2e / Aria main c0535c0)
+- **v1.25.0** O4: Bash↔Read parity for `<reader> <key-file>` — closes v1.24.0 known-limit (c) F2 (aria-plugin d9b2e5e / Aria main b02fa26)
+- **v1.26.0** O3: hook perf optimization — **Bash p95 337→76ms (-77%), Read p95 102→41ms (-60%), cold-start 600-1400→59-68ms (-90%)**, reclaims original 100ms budget (aria-plugin 8578609 / Aria main 63e6154)
+
+271/271 tests PASS unchanged across all 4 releases; 0 behavior regression; 4 PR merged + 4 Aria main direct master commits + 1 standards direct master commit + 3-way SHA parity verified at each release. **本 burndown 已 DONE, 无 carry-forward**(剩余 4 owner-gated items: O1 SilkNode P2.5 deadline 2026-05-30 / O7 Aether 14-day 通知 / O8 aria-doctor self-test / O9 PreToolUse Write content scan; 见 burndown handoff §2)。
+
+**★ Track D 已闭环 (predecessor 同期完成)**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — Track D v1.24.0 full A→D ship (~9h session, 12:03 UTC close). 17 in-cycle TASKs / 262 tests / 2 audits converged / 3-PR ship / Phase D.2 archive / Forgejo Aria #84+#107 closed。本 burndown handoff 是其 §6 roadmap items 的 follow-up execution。
 
 **★ M5 Track B FINAL — DONE (predecessor 同期完成)**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — **M5 Phase C O3 ✅ + Phase D.2 close ✅**. O3 Tier-1 live LLM real smoke: DEMO-M5-O3 dispatch on heavy-3 alloc `6cf0d7ab`, 11 步 18s, PR #121 created+validated+cleaned。Phase D.2 close gate **MET**: T-deploy ✅ + Tier-1 live LLM ✅ + Spec X+Y archived ✅. **US-025 → done 2026-05-23**, M5 Spec → `openspec/archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/`。Tier-2 6.27-6.29 cumulative validation 由 design 非阻塞,随 owner workload 自然累积。
 
