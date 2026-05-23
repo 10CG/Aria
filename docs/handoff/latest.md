@@ -11,20 +11,23 @@
 
 ---
 
-## ★ 最新 session (2026-05-23 ~00:30 UTC) — 🎉 **M5 CLOSED** (US-025 done, Spec archived)
+## ★ 最新 session (2026-05-23 ~12:03 UTC) — 🎉 **Track D CLOSED** (aria-secret-guard-plugin-default v1.24.0 SHIPPED)
 
-**Latest**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — M5 整体 close handoff(state-scanner Phase 1.15 collector 解析此行作 canonical pointer; 详细多 track 描述见下)
+**Latest**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — Track D Phase B→D full ship handoff(state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
 
-**★ M5 Track B FINAL — DONE**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — **M5 Phase C O3 ✅ + Phase D.2 close ✅**. O3 Tier-1 live LLM real smoke: DEMO-M5-O3 dispatch on heavy-3 alloc `6cf0d7ab`, 11 步 18s, PR #121 created+validated+cleaned (assertion file_touched_hit + diff_contains_hit 全 true, claude_exit=0, $0.228 Anthropic-equivalent / Luxeno subscription 实际近零)。Phase D.2 close gate per brainstorm D7 **MET**: T-deploy ✅ + Tier-1 live LLM ✅ + Spec X+Y archived ✅. **US-025 → done 2026-05-23**, M5 Spec → `openspec/archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/`. m5-handoff.yaml::go_decision=Go + phase_c_completion + 5 个 layer2_deployment_findings F1-F5 (F1 已修 / F4+F5 已修 / F2+F3 carry-forward to post-M5 节点级 Nomad docker plugin `auth.config` 修复)。Tier-2 6.27-6.29 cumulative validation 由 design 非阻塞, 随 owner workload 自然累积。
+**★ Track D FINAL — DONE**: [2026-05-23-aria-secret-guard-plugin-default-shipped.md](./2026-05-23-aria-secret-guard-plugin-default-shipped.md) — **aria-secret-guard-plugin-default v1.24.0 SHIPPED**. 17 in-cycle TASKs Phase B→D ship 在 ~9h session(2026-05-23 03:00→12:03 UTC,Phase A 2026-05-22 已 ship)。262/262 tests PASS + 2 audits converged (post_spec R2 ✓ + post_implementation R1 5-agent informal ✓) + 3-PR ship (standards #8 / aria-plugin #58 / Aria main #122) + 3-way SHA parity(`b3cc647 / 3b688a9 / 8542a91`) + Phase D.2 archive + Forgejo Aria #84+#107 closed + SilkNode PR #429 reference + dogfood ship-gate REVIEW→PASS_TRIAGED (F1 perf budget revised + F2 Bash cat-key-file 新 known-limit, 双 owner triage Accept) + Rule #6 structural substitute artifacts (README + atomicity-guard + dogfood-evidence) + GitHub Secret Scanning hotfix (2 fixtures sanitize + 2 unblock URL owner click) + 1 new memory entry `feedback_github_secret_scanning_push_range_blocks_history`. **本 track 已 DONE, 无 carry-forward**(仅低优 v1.24.1+ roadmap O1-O9: SilkNode P2.5 deferred dogfood 7-day deadline / perf opt / regex extension / minor cleanup 12 项 / `.github/secret_scanning.yml` allowlist / Aether 14-day 通知 / aria-doctor self-test / PreToolUse Write content scan)。
 
-**★ Track D 最新 (inflight, 与本 M5 close 正交)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — Phase A ✅, Phase B/C/D pending; **Ship target: aria-plugin v1.24.0**. Cycle active 与 M5 互不影响, 下次 session 可继续。
+**★ M5 Track B FINAL — DONE (predecessor 同期完成)**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — **M5 Phase C O3 ✅ + Phase D.2 close ✅**. O3 Tier-1 live LLM real smoke: DEMO-M5-O3 dispatch on heavy-3 alloc `6cf0d7ab`, 11 步 18s, PR #121 created+validated+cleaned。Phase D.2 close gate **MET**: T-deploy ✅ + Tier-1 live LLM ✅ + Spec X+Y archived ✅. **US-025 → done 2026-05-23**, M5 Spec → `openspec/archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/`。Tier-2 6.27-6.29 cumulative validation 由 design 非阻塞,随 owner workload 自然累积。
 
-**M5 Phase C 中段 (predecessor, 历史)**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — O1 (Feishu secret 轮换) + O2 (Layer 2 镜像 build+注册) — 已被本日 close handoff 取代。
+**Track D Phase A predecessor (历史)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — Phase A complete (Spec + post_spec audit R2 converged + task plan), 已被本日 Phase B→D ship handoff 取代。
+
+**M5 Phase C 中段 (历史)**: [2026-05-22-m5-phase-c-o1-o2-done.md](./2026-05-22-m5-phase-c-o1-o2-done.md) — O1 (Feishu secret 轮换) + O2 (Layer 2 镜像 build+注册) — 已被 2026-05-23 close handoff 取代。
 
 **独立 track (2026-05-22 完成, 已闭环)**: [2026-05-22-aria-plugin-50-status-extraction-range-shipped.md](./2026-05-22-aria-plugin-50-status-extraction-range-shipped.md) — aria-plugin #50 `_status` 提取范围修复 full A→D cycle SHIPPED (v1.23.1)。无 carry-forward。
 
+> ✅ **Track D 整体完成** — aria-secret-guard-plugin-default Phase A (2026-05-22) + Phase B→D (2026-05-23 ~9h) — Layer 2 mechanical enforcement of Rule #7 shipped as aria-plugin default
 > ✅ **M5 整体完成** — Phase B (Layer 1 prod deploy 2026-05-20) + Phase C (Layer 2 image + Tier-1 live LLM smoke 2026-05-22~23) + Phase D.2 close (2026-05-23)
-> ⚠ **Track D inflight** — aria-secret-guard-plugin-default Phase B/C/D pending(~10h), 详见 Track D handoff
+> 🔶 **Post-Track-D v1.24.1+ roadmap** — SilkNode P2.5 dogfood deadline 2026-05-30 / 12 minor cleanup / hook perf opt / F2 regex extension / `.github/secret_scanning.yml` allowlist
 > 🔶 **Post-M5 carry-forward** — F2/F3 Nomad HCL docker auth + image GC proper fix(~2-4h 节点级 plugin config), 可独立 hygiene cycle 处理
 
 ---
