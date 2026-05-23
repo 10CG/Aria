@@ -204,20 +204,22 @@ aria-orchestrator 子仓变更:
 
 ## §8 Memory entries this session
 
-**未新增 memory 文件** (MEMORY.md 已超 size limit 41.4KB > 24.4KB; 等下个 session 瘦身后补)。
+**新增 3 个 memory entries (closeout 增量, 2026-05-23 ~01:00 UTC)**:
+- ✅ [`feedback_forgejo_pat_docker_vs_git_split.md`](../../.claude/projects/-home-dev-Aria/memory/feedback_forgejo_pat_docker_vs_git_split.md) — Forgejo PAT docker pull vs git-over-HTTP 分裂 = `must_change_password=true` (Forgejo #2809);诊断 SOP + 修复 + 生产前置
+- ✅ [`feedback_nomad_docker_auth_template_interp_gap.md`](../../.claude/projects/-home-dev-Aria/memory/feedback_nomad_docker_auth_template_interp_gap.md) — Nomad HCL docker `auth { password=${VAR} }` 从 template env 插值不可靠; build-node 缓存掩盖; cold-path 验证强制; 正解=节点级 plugin `auth.config`
+- ✅ [`feedback_service_account_drift_preflight.md`](../../.claude/projects/-home-dev-Aria/memory/feedback_service_account_drift_preflight.md) — 服务账户 collaborator / must_change_password / PAT scope 漂移; 3 维度 round-trip preflight; 长度匹配 ≠ 内容正确
 
-本 session 教训暂存于:
+MEMORY.md 已同步 3 行 one-line 索引(整体仍超 size limit, 不阻塞本次, 留待独立 hygiene cycle 整体瘦身)。
+
+本 session 其他教训留存于:
 - §3 R1-R5 (本 doc, 5 条本 session 新陷阱)
-- §4 实战教训 (本 doc, 4-5 条 meta lesson)
+- §4 实战教训 (本 doc, 5 条 meta lesson)
 - `m5-handoff.yaml::t_deploy_status.phase_c_completion.layer2_deployment_findings` (F1-F5 机读形式)
 - `2026-05-22-m5-phase-c-playbook.md` §O3 dispatch 命令(F1 fix + ⚠ 注释)
 
-后续 session 瘦身 MEMORY.md 时, **必须补**的 memory(候选):
-- `feedback_forgejo_pat_docker_vs_git_auth_path.md` — Forgejo #2809 诊断特征 + must_change_password 修复 SOP
-- `feedback_nomad_docker_auth_template_interpolation_gap.md` — HCL auth block 模板插值不可靠; node-level config 为正解
-- `feedback_service_account_collaborator_drift.md` — bot 账户的 repo collaborator 权限会因 housekeeping 漂移, M1 历史 PR 非证据
-- `feedback_nomad_image_gc_compounds_auth_gap.md` — Nomad default `gc.image_delay=3min` 加剧 docker auth gap
-- `feedback_owner_secret_swap_round_trip_verify.md` — Nomad var get-编辑-put 的 owner-side 替换易出位, 必须 round-trip 自验证 (`nomad var get` 拿值 + `git ls-remote` 测)
+后续 session 可选补 (低优):
+- `feedback_nomad_image_gc_compounds_auth_gap.md` — Nomad default `gc.image_delay=3min` 加剧 docker auth gap (已并入上方 #2 第 4 段, 单独 entry 非必需)
+- `feedback_owner_secret_swap_round_trip_verify.md` — get-编辑-put 易出位 (已并入上方 #3 末段, 单独 entry 非必需)
 
 **Q-audit (收尾)**:
 - **Q1 未完成 task?** Tier-2 6.27-6.29 deferred(by design, non-blocking) + F2/F3 proper fix(post-M5) + S6 hygiene(timed). 全部 §2 documented + scheduled。无遗漏。

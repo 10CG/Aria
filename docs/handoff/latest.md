@@ -13,6 +13,8 @@
 
 ## ★ 最新 session (2026-05-23 ~00:30 UTC) — 🎉 **M5 CLOSED** (US-025 done, Spec archived)
 
+**Latest**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — M5 整体 close handoff(state-scanner Phase 1.15 collector 解析此行作 canonical pointer; 详细多 track 描述见下)
+
 **★ M5 Track B FINAL — DONE**: [2026-05-23-m5-phase-c-o3-done-d2-close.md](./2026-05-23-m5-phase-c-o3-done-d2-close.md) — **M5 Phase C O3 ✅ + Phase D.2 close ✅**. O3 Tier-1 live LLM real smoke: DEMO-M5-O3 dispatch on heavy-3 alloc `6cf0d7ab`, 11 步 18s, PR #121 created+validated+cleaned (assertion file_touched_hit + diff_contains_hit 全 true, claude_exit=0, $0.228 Anthropic-equivalent / Luxeno subscription 实际近零)。Phase D.2 close gate per brainstorm D7 **MET**: T-deploy ✅ + Tier-1 live LLM ✅ + Spec X+Y archived ✅. **US-025 → done 2026-05-23**, M5 Spec → `openspec/archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/`. m5-handoff.yaml::go_decision=Go + phase_c_completion + 5 个 layer2_deployment_findings F1-F5 (F1 已修 / F4+F5 已修 / F2+F3 carry-forward to post-M5 节点级 Nomad docker plugin `auth.config` 修复)。Tier-2 6.27-6.29 cumulative validation 由 design 非阻塞, 随 owner workload 自然累积。
 
 **★ Track D 最新 (inflight, 与本 M5 close 正交)**: [2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md](./2026-05-22-aria-secret-guard-plugin-default-phase-a-shipped.md) — Phase A ✅, Phase B/C/D pending; **Ship target: aria-plugin v1.24.0**. Cycle active 与 M5 互不影响, 下次 session 可继续。
