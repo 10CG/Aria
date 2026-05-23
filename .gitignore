@@ -18,3 +18,6 @@
 # state-scanner T8 Kairos 跨项目验证 工件 (一次性 dogfooding 输出)
 .aria/t8-kairos-validation/
 __pycache__/
+
+# Per-cycle worktrees (B.1 worktree mode, repo-root level)
+worktrees/
