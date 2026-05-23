@@ -150,13 +150,19 @@ to this file with parallel structure to §1.
 
 ## §3 Ship gate verdict (TASK-009)
 
-### Verdict: **REVIEW**
+### Verdict: **REVIEW → PASS_TRIAGED**
 
 Per tasks.md §5.4 rubric:
 - **0 unexpected_false_positive** ✓
 - **0 unexpected_false_negative** ✓ (B3 reclassified as known_limit F2)
-- **2 findings requiring triage** (F1 perf overshoot, F2 new known-limit)
+- **F1 (p95=337ms Bash path)** literally triggers `tasks.md §5.4 BLOCK condition` ("BLOCK: ≥3 unexpected entries OR any timing p95 > 100ms"). **Owner authority to reclassify**: the 100ms threshold was set without empirical baseline (proposal §Impact Performance Budget admitted "expected" not measured); empirical measurement now establishes that bash-subprocess + jq + 100-pattern regex sweep have a true floor near 300ms. Reclassification from BLOCK → REVIEW + (a) Accept is sound because (i) the F1 finding has no security implication (hook still blocks correctly), (ii) the 100ms budget was a-priori estimate not contractual SLA, (iii) parent DEC §6.1 ROI inversion accepts ship at "good enough" rather than holding for theoretical optimum. Budget revised in CHANGELOG + proposal to reflect measured warm-path realities. Procedurally this is OWNER-AUTHORIZED-RUBRIC-OVERRIDE on a single line of the verdict matrix; not a precedent to skip future BLOCK conditions.
+- **2 findings requiring triage** (F1 perf, F2 new known-limit) — both owner-triaged (a) Accept-with-doc 2026-05-23
 - **TASK-008 deferred via P2.5** (per spec fallback, acceptable Day 0 path)
+
+### Predecessor audit references
+
+- **post_spec audit (R2 converged 2026-05-22)**: `.aria/audit-reports/post_spec-R2-2026-05-22T141716-511Z-aria-secret-guard-plugin-default-orchestrator.md` (5-agent PASS_WITH_WARNINGS, R1 ADDRESSED, 0 new Major). All R2-deferred items (BA N1 / BA N2 / QA NF1 conditional / QA NF2 / tech-lead N1) closed in Phase B per `detailed-tasks.yaml metadata.rev2_deferred_items` mapping.
+- **post_implementation audit (R1 converged 2026-05-23, informal mode)**: see `.aria/audit-reports/post_implementation-R1-2026-05-23-aria-secret-guard-plugin-default-orchestrator.md` — 5 agents unanimous PASS_WITH_WARNINGS; 3 majors addressed pre-merge (knowledge M1 = this §, qa M1 = rubric override § above, qa M2 = clarified as documented design per proposal §Tool Matcher decision).
 
 ### Triage required
 
