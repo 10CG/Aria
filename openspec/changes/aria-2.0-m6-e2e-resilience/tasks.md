@@ -2,9 +2,9 @@
 
 > **Spec**: [aria-2.0-m6-e2e-resilience](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: Draft
+> **Status**: R1 fixes applied (2026-05-24) — pending R2 verification
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2 Spec #2 + §4 P-4..P-9)
-> **Estimated total**: ~29h impl (~10h TG-A + ~13h TG-B + ~6h TG-C; +1h Q-NEW-1 hybrid mock layer)
+> **Estimated total**: ~30h impl (~10.5h TG-A + ~13h TG-B + ~6h TG-C; +1h Q-NEW-1 hybrid mock layer; +1h R1 fixes: T-validate-schema-1 + AD-M6-4b)
 > **Agents**: backend-architect (TG-A obs + overall) + qa-engineer (TG-B crash) + knowledge-manager (TG-C samples)
 
 ---
@@ -28,7 +28,7 @@ the 3-day history accumulates, then re-check.
 
 | Group | Topic | Scope ref | Est | Agent |
 |-------|-------|-----------|-----|-------|
-| TG-A-infra | Phase B precondition gate + is_synthetic migration | §What A.2, §Constraints | ~1h | backend-architect |
+| TG-A-infra | Phase B precondition gate + is_synthetic migration 006 + T-validate-schema-1 | §What A.2, §Constraints | ~1.5h | backend-architect |
 | TG-A-uptime | Nomad alloc uptime gate + probe structure | §What A.1, A.3, A.4 | ~3h | backend-architect |
 | TG-A-dispatch | Dispatch tracker SQL + stratification + pre-flight | §What A.2, A.5, A.6 | ~3.5h | backend-architect |
 | TG-A-validate | validate-m6-handoff.py paired test triple | §What A.7 | ~1h | backend-architect |
@@ -45,7 +45,37 @@ the 3-day history accumulates, then re-check.
 
 ---
 
-## TG-A-infra — Phase B gate + is_synthetic migration (~1h)
+## TG-A-infra — Phase B gate + is_synthetic migration + schema validation (~1.5h)
+
+<!-- R1-T2-4 fix: Mechanism B removed (title column doesn't exist); AD-M6-4 locked to Mechanism A.
+     Migration renamed from 005 to 006 (005 already exists in schema v4.2). Schema validation
+     task T-validate-schema-1 added per [[feedback_validator_repo_drift_guard_test]]. (R1 audit 2026-05-24) -->
+<!-- R1-T2-1 fix: T-validate-schema-1 added as first TG-A task to verify live dispatches
+     schema columns before any SQL implementation. (R1 audit 2026-05-24) -->
+
+- [ ] **T-validate-schema-1** (FIRST task — schema drift guard): Verify live `dispatches` schema
+  column-by-column before writing any SQL:
+  ```bash
+  sqlite3 aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/aria_layer1.db \
+    "PRAGMA table_info(dispatches);"
+  ```
+  Confirm: `state` column exists (NOT `final_state`); `state_entered_at` column exists (NOT
+  `created_at`); NO `title`, `issue_type`, or `project_name` columns; `is_synthetic` absent
+  (will be added by migration 006). Commit a schema validation test triple alongside migration 006
+  (per `[[feedback_validator_repo_drift_guard_test]]`):
+  ```python
+  # aria-orchestrator/hermes-extensions/aria-layer1/tests/test_schema_column_guard.py
+  def test_dispatches_has_state_not_final_state(db_conn):
+      cols = {row[1] for row in db_conn.execute("PRAGMA table_info(dispatches)").fetchall()}
+      assert 'state' in cols
+      assert 'final_state' not in cols
+      assert 'created_at' not in cols
+      assert 'issue_type' not in cols
+      assert 'project_name' not in cols
+      assert 'title' not in cols
+  ```
+  Run against the canonical `schema.sql` applied to a fresh in-memory DB. This test is
+  the schema drift regression guard and must pass before any TG-A SQL is written.
 
 - [ ] A-infra-1 Verify Spec #1 AC-7 gate passes before any TG-A code begins:
   ```bash
@@ -54,53 +84,65 @@ the 3-day history accumulates, then re-check.
   If exit non-zero: STOP. Record block reason in `.aria/probes/m6-gate-check.md`. Do not proceed
   until gate passes.
 
-- [ ] A-infra-2 Inspect current dispatches schema to determine `is_synthetic` tagging mechanism
-  (P-7, AD-M6-4). Check whether `is_synthetic` column already exists:
-  ```bash
-  sqlite3 aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/aria_layer1.db \
-    "PRAGMA table_info(dispatches);" | grep is_synthetic
+- [ ] A-infra-2 Add `is_synthetic` column via migration 006 (AD-M6-4 LOCKED to Mechanism A — no
+  Mechanism B; `title` column does not exist in live schema). Write:
+  `aria-orchestrator/hermes-extensions/aria-layer1/migrations/006_schema_v5_add_is_synthetic.sql`
+  ```sql
+  -- Migration 006: schema v4.2 → v5.0 (additive)
+  -- Adds is_synthetic column for M6 7d run stratification tracking
+  ALTER TABLE dispatches ADD COLUMN is_synthetic INTEGER DEFAULT 0;
+  UPDATE schema_meta SET value='5.0' WHERE key='schema_version';
   ```
-  - If column exists: skip migration, document Mechanism A choice in AD-M6-4.
-  - If column absent and migration acceptable: write
-    `aria-orchestrator/hermes-extensions/aria-layer1/migrations/005_m6_synthetic_tag.sql`
-    with `ALTER TABLE dispatches ADD COLUMN is_synthetic INTEGER NOT NULL DEFAULT 0;`
-    (additive, backward-compatible).
-  - If migration blocked: use Mechanism B (title prefix `[DEMO-M6-*]`); document in AD-M6-4.
-  Document chosen mechanism in `aria-orchestrator/docs/architecture-decisions.md` AD-M6-4 slot.
+  Verify column is absent before running: skip if already present.
+  Document in `aria-orchestrator/docs/architecture-decisions.md` AD-M6-4 slot: "Mechanism A
+  (schema column is_synthetic, migration 006) — locked at R1 audit 2026-05-24. Mechanism B
+  (title prefix) structurally invalid: no title column in dispatches schema."
 
-- [ ] A-infra-3 If migration 005 was written: verify abi_compat promises not violated:
+- [ ] A-infra-3 Verify abi_compat promises not violated after migration 006:
   ```bash
   python3 aria-orchestrator/docs/validate-m6-handoff.py --check-abi-compat
   ```
   Must exit 0 (audit trigger promises intact after migration). If exit non-zero: investigate
-  before proceeding — the migration must not contain `DROP TRIGGER`.
+  before proceeding — migration 006 must not contain `DROP TRIGGER`.
 
 ---
 
 ## TG-A-uptime — Nomad alloc uptime gate + probe structure (~3h)
 
-- [ ] A-uptime-1 Create probe directory and alloc ID file structure:
+<!-- R1-T2-5 fix: A-uptime-1 rewritten to use alloc.CreateTime (alloc-level, does not reset
+     on task restart) + persist Day-1 anchor file. TaskStates['aria-layer1']['StartedAt']
+     removed — resets on task restart, causes false-FAIL on legitimate 168h alloc.
+     (R1 audit 2026-05-24) -->
+- [ ] A-uptime-1 Create probe directory and alloc anchor file structure:
   ```bash
   mkdir -p .aria/probes/
-  # Owner action: record alloc ID at Day-1 start
-  echo "<ALLOC_ID>" > .aria/probes/m6-alloc-id.txt
+  ```
+  **Day-1 owner action**: record alloc anchor at Day-1 run start:
+  ```bash
+  nomad alloc status <ALLOC_ID> -json \
+    | jq -c '{alloc_id: .ID, create_time_ns: .CreateTime}' \
+    > .aria/probes/m6-7d-day-1-alloc-anchor.json
   ```
   Implement `check-m6-e2e-acceptance.py --tg-a --check-uptime` sub-check:
-  - Read alloc ID from `.aria/probes/m6-alloc-id.txt` (exit 2 if file absent).
-  - Query Nomad alloc API via `subprocess`:
+  - Read anchor from `.aria/probes/m6-7d-day-1-alloc-anchor.json` (exit 2 if file absent).
+  - Query current alloc state via `subprocess`:
     ```python
     result = subprocess.run(
-        ['nomad', 'alloc', 'status', alloc_id, '-json'],
+        ['nomad', 'alloc', 'status', anchored_alloc_id, '-json'],
         capture_output=True,   # per [[feedback_secrets_never_in_conversation]] pattern
         text=True, timeout=30
     )
     data = json.loads(result.stdout)
-    started_at = data['TaskStates']['aria-layer1']['StartedAt']
+    current_alloc_id = data['ID']
+    create_time_ns = data['CreateTime']   # nanoseconds since Unix epoch
     ```
-  - Compute uptime: `uptime_s = (datetime.now(timezone.utc) - datetime.fromisoformat(started_at)).total_seconds()`.
+  - Identity check: if `current_alloc_id != anchored_alloc_id` → `[FAIL] AC-1: alloc replaced`.
+    Exit 1.
+  - Compute uptime: `now_ns = time.time_ns(); uptime_s = (now_ns - create_time_ns) / 1e9`.
   - PASS condition: `uptime_s >= 604800` (168h × 3600s).
-  - Emit `[PASS] AC-1: alloc uptime >= 168h (actual: <N.N>h)` or `[FAIL] AC-1: uptime <N.N>h < 168h`.
-  - Exit code 1 on FAIL; exit code 2 if alloc ID file missing or Nomad CLI unavailable.
+  - Emit `[PASS] AC-1: alloc uptime >= 168h (actual: <N.N>h, alloc_id=<id>)` or
+    `[FAIL] AC-1: uptime <N.N>h < 168h`.
+  - Exit code 1 on FAIL; exit code 2 if anchor file missing or Nomad CLI unavailable.
 
   REPO_ROOT pattern:
   ```python
@@ -111,6 +153,7 @@ the 3-day history accumulates, then re-check.
 - [ ] A-uptime-2 Create daily probe snapshot template. Implement a probe helper function
   `write_probe_snapshot(day_n, alloc_data, dispatch_summary)` that writes
   `.aria/probes/m6-7d-day-{N}.md` with the structure defined in proposal §A.3.
+  - Day-1 probe must include the alloc anchor section (Alloc ID + CreateTime_ns + CreateTime human).
   - Day-3 probe must include the health gate section filled in.
   - Function is idempotent: if file exists with same day content, no-op.
 
@@ -134,16 +177,30 @@ the 3-day history accumulates, then re-check.
   Acceptance sub-check: read Day-3 probe file, assert line
   `Day-3 gate verdict: PASS` exists in content. Exit 1 if line contains `FAIL`.
 
-- [ ] A-uptime-4 Unit test: `check-uptime` sub-check with `uptime_s = 604800` (exactly 168h) →
-  PASS (boundary is >= not >). `uptime_s = 604799` (1s short) → FAIL.
+<!-- R1-T2-5 fix: Unit tests updated to use CreateTime-based uptime + alloc ID identity check.
+     (R1 audit 2026-05-24) -->
+- [ ] A-uptime-4 Unit test: `check-uptime` sub-check —
+  - Fixture with same alloc_id + `uptime_s = 604800` (exactly 168h) → PASS (boundary is >=).
+  - Fixture with same alloc_id + `uptime_s = 604799` (1s short) → FAIL with uptime message.
+  - Fixture with **different** current alloc_id vs anchored alloc_id → FAIL with "alloc replaced" message.
+  - Missing anchor file → exit 2.
 
 - [ ] A-uptime-5 Unit test: Day-3 health gate — fixture with `has_s9=True, s_fail_rate=0.40, stuck=0`
   → PASS. Fixture with `has_s9=False` → FAIL reason contains "S0→S9". Fixture with
   `s_fail_rate=0.51` → FAIL reason contains "S_FAIL rate". Fixture with `stuck=1` → FAIL.
+  Additionally: verify Day-3 acceptance check reads all 3 individual condition lines (not just
+  verdict) per proposal §A.4 (I2-1 fix).
 
 ---
 
 ## TG-A-dispatch — Dispatch tracker + stratification + pre-flight (~3.5h)
+
+<!-- R1-T2-1 fix: SQL queries rewritten — `final_state`/`created_at`/`issue_type` do not exist.
+     Use `state='S9_CLOSE'`, `state_entered_at`, and dispatch_audit_log json_extract.
+     (R1 audit 2026-05-24) -->
+<!-- R1-T2-4 fix: Mechanism B reference removed (title column doesn't exist). (R1 audit 2026-05-24) -->
+<!-- R1-T2-6 fix: Check order fixed — assert total >= 10 FIRST before any division.
+     Division guarded: `synth_count / total_s9 if total_s9 > 0 else 0.0`. (R1 audit 2026-05-24) -->
 
 - [ ] A-dispatch-1 Implement dispatch stratification SQL query in acceptance script
   (proposal §A.2, `--tg-a --check-dispatch`):
@@ -152,41 +209,53 @@ the 3-day history accumulates, then re-check.
   REPO_ROOT = HERE.parent                   # → aria-orchestrator/
   db_path = REPO_ROOT / "hermes-extensions/aria-layer1/aria_layer1/aria_layer1.db"
   ```
-  Query:
+  Query (uses live column names — `state='S9_CLOSE'`, `state_entered_at`):
   ```sql
-  -- Total S9 completed in 7d window
+  -- Total S9_CLOSE completed in 7d window (STEP 1 — run first before any division)
   SELECT COUNT(*) FROM dispatches
-  WHERE final_state = 'S9'
-  AND created_at BETWEEN :start AND :end;
+  WHERE state = 'S9_CLOSE'
+  AND state_entered_at BETWEEN :start AND :end;
   ```
-  Assert result >= 10. Emit `[FAIL] AC-2: total S9 dispatches N < 10` if not met.
+  Assert result >= 10 **FIRST** (before any synthetic cap calculation). Emit
+  `[FAIL] AC-2: total S9_CLOSE dispatches N < 10` and exit 1 if not met.
 
   NOTE: SQL uses `provider_cost_model` filter only when filtering by provider type, not `provider`
   (schema column SoT: no `provider` column on dispatches table).
 
-- [ ] A-dispatch-2 Implement synthetic cap check:
+- [ ] A-dispatch-2 Implement synthetic cap check (STEP 2 — after total >= 10 confirmed):
   ```sql
   SELECT
     SUM(CASE WHEN is_synthetic=1 THEN 1 ELSE 0 END) as synth_count,
     COUNT(*) as total
   FROM dispatches
-  WHERE final_state='S9'
-  AND created_at BETWEEN :start AND :end;
+  WHERE state='S9_CLOSE'
+  AND state_entered_at BETWEEN :start AND :end;
   ```
-  Assert `synth_count / total <= 0.70`. Emit `[FAIL] AC-2: synthetic ratio N/M > 70%` if exceeded.
-  If Mechanism B (title prefix): replace `is_synthetic=1` with `title LIKE '[DEMO-M6-%]'`.
+  Division guarded: `synth_ratio = synth_count / total_s9 if total_s9 > 0 else 0.0`.
+  Assert `synth_ratio <= 0.70`. Emit `[FAIL] AC-2: synthetic ratio N/M > 70%` if exceeded.
+  (Mechanism B title-prefix approach is NOT valid — `dispatches` has no `title` column.)
 
-- [ ] A-dispatch-3 Implement stratification check per required issue types:
-  For each type in `('bug', 'feature', 'stale')`:
+- [ ] A-dispatch-3 Implement stratification check per required issue types (STEP 3):
+  Issue type is stored in `dispatch_audit_log.payload_json`, NOT in `dispatches` columns.
+  At Phase B kickoff, verify the exact `json_extract` key against live data (see T-validate-schema-1).
+  For each type_hint in `('bug', 'feature', 'stale')`:
   ```sql
-  SELECT COUNT(*) FROM dispatches
-  WHERE final_state='S9' AND issue_type=? AND created_at BETWEEN ? AND ?;
+  SELECT COUNT(DISTINCT d.dispatch_id)
+  FROM dispatches d
+  JOIN dispatch_audit_log al ON al.dispatch_id = d.dispatch_id
+  WHERE d.state = 'S9_CLOSE'
+  AND d.state_entered_at BETWEEN :start AND :end
+  AND json_extract(al.payload_json, '$.issue_type_hint') = :type_hint;
   ```
   Assert result >= 1 per type. Emit `[FAIL] AC-2: no completed <type> dispatch in 7d window`.
 
-- [ ] A-dispatch-4 Unit test: in-memory SQLite with 10 completed dispatches (3 bug, 4 feature, 3 stale,
-  7 synthetic, 3 real) → AC-2 PASS. Fixture with 9 total → FAIL (< 10). Fixture with 8 synthetic
-  out of 10 (>70%) → FAIL. Fixture with 0 stale → FAIL.
+- [ ] A-dispatch-4 Unit test: in-memory SQLite with schema.sql applied + 10 S9_CLOSE dispatches
+  (verified via dispatch_audit_log with issue_type_hint payloads: 3 bug, 4 feature, 3 stale,
+  7 is_synthetic=1, 3 is_synthetic=0) → AC-2 PASS.
+  - Fixture with 9 total → FAIL (< 10). Exit 1 with total message.
+  - Fixture with 8 is_synthetic=1 out of 10 (>70%) → FAIL with ratio message.
+  - Fixture with 0 stale dispatch_audit_log entries → FAIL with stale message.
+  - Fixture with total=0 → FAIL with total message (NOT ZeroDivisionError).
 
 - [ ] A-dispatch-5 Implement pre-flight provenance script (proposal §A.5):
   Create `.aria/probes/m6-preflight-provenance.md` template (owner fills at Phase B kickoff):
@@ -204,15 +273,25 @@ the 3-day history accumulates, then re-check.
   - Parse 3 `cost_usd` entries: assert all <= 2.0.
   - Emit `[PASS] AC-6: preflight log committed, all 3 dispatches <= $2.00`.
 
+<!-- R1-T2-1 fix: A-dispatch-6 query rewritten — `project_name` and `final_state` do not exist
+     in dispatches schema. Cross-project evidence is detected via dispatch_audit_log payload_json
+     or issue_id prefix convention (Phase B implementer must verify via T-validate-schema-1 live
+     probe which payload field carries project context). (R1 audit 2026-05-24) -->
 - [ ] A-dispatch-6 Implement cross-project conditional acceptance (P-9):
-  In acceptance script, check dispatches for cross-project evidence:
+  In acceptance script, check dispatches for cross-project evidence via `dispatch_audit_log`:
   ```sql
-  SELECT dispatch_id, project_name FROM dispatches
-  WHERE final_state='S9'
-  AND project_name != 'Aria'
-  AND created_at BETWEEN :start AND :end
+  SELECT d.dispatch_id,
+         json_extract(al.payload_json, '$.project') as project
+  FROM dispatches d
+  JOIN dispatch_audit_log al ON al.dispatch_id = d.dispatch_id
+  WHERE d.state = 'S9_CLOSE'
+  AND d.state_entered_at BETWEEN :start AND :end
+  AND json_extract(al.payload_json, '$.project') IS NOT NULL
+  AND json_extract(al.payload_json, '$.project') != 'Aria'
   LIMIT 1;
   ```
+  NOTE: The exact payload key for project context must be verified at Phase B via live data
+  probe (T-validate-schema-1). The query above uses `$.project` as a placeholder.
   If row found: emit `[PASS+] AC-2: cross-project evidence present (project=<name>, dispatch_id=<id>)`.
   If no cross-project row: emit `[PASS] AC-2: Aria-only 7d window (cross-project conditional not met)`.
   Neither outcome is a FAIL — cross-project is conditional, not mandatory.
@@ -230,23 +309,23 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 - [ ] A-validate-1 Implement paired test triple in
   `aria-orchestrator/tests/test_validate_m6_handoff_tga_compat.py`:
 
-  - **Test 1** — schema.sql still contains triggers after migration 005:
+  <!-- R1-T2-4 fix: migration number updated to 006; Mechanism B removed. (R1 audit 2026-05-24) -->
+  - **Test 1** — schema.sql still contains triggers after migration 006:
     ```python
-    def test_audit_triggers_survive_migration_005():
+    def test_audit_triggers_survive_migration_006():
         schema = (REPO_ROOT / "hermes-extensions/aria-layer1/aria_layer1/schema.sql").read_text()
         assert "audit_no_update" in schema
         assert "audit_no_delete" in schema
     ```
-  - **Test 2** — migration 005 does NOT contain DROP TRIGGER (if file exists):
+  - **Test 2** — migration 006 does NOT contain DROP TRIGGER:
     ```python
-    def test_migration_005_no_drop_trigger():
-        m005 = REPO_ROOT / "hermes-extensions/aria-layer1/migrations/005_m6_synthetic_tag.sql"
-        if not m005.exists():
-            pytest.skip("Migration 005 not written (Mechanism B in use)")
-        content = m005.read_text()
-        assert "DROP TRIGGER" not in content, "Migration 005 must not drop audit triggers"
+    def test_migration_006_no_drop_trigger():
+        m006 = REPO_ROOT / "hermes-extensions/aria-layer1/migrations/006_schema_v5_add_is_synthetic.sql"
+        assert m006.exists(), "Migration 006 must exist (Mechanism A is locked)"
+        content = m006.read_text()
+        assert "DROP TRIGGER" not in content, "Migration 006 must not drop audit triggers"
     ```
-  - **Test 3** — validate-m6-handoff.py --check-abi-compat exits 0 after 005:
+  - **Test 3** — validate-m6-handoff.py --check-abi-compat exits 0 after 006:
     ```python
     def test_validate_m6_abi_compat_after_tga_migration(tmp_path):
         result = subprocess.run(
@@ -320,13 +399,18 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   each SDK-boundary mock must match production code. Any deviation in a test must use
   `# mock-layer-deviation-ok: <reason>` comment.
 
-- [ ] B-scaffold-2 Create test file scaffold (empty test functions with docstrings) for all 6 modes:
+<!-- R1-I2-3/I2-4 fix: LLM test files split by provider (Luxeno/Zhipu have different exception
+     classes and base URLs). (R1 audit 2026-05-24) -->
+- [ ] B-scaffold-2 Create test file scaffold (empty test functions with docstrings) for all modes:
   - `aria-orchestrator/tests/test_crash_infra1.py` (Hermes SIGKILL, SDK)
   - `aria-orchestrator/tests/test_crash_infra2.py` (Layer 2 alloc SIGKILL, SDK)
   - `aria-orchestrator/tests/test_crash_infra3_wal.py` (WAL × 4 scenarios, SDK)
-  - `aria-orchestrator/tests/test_crash_llm4.py` (429 rate-limit, SDK)
-  - `aria-orchestrator/tests/test_crash_llm5.py` (invalid JSON, httpx_mock)
-  - `aria-orchestrator/tests/test_crash_llm6.py` (provider 5xx, httpx_mock)
+  - `aria-orchestrator/tests/test_crash_llm4_luxeno_429.py` (429 rate-limit, Luxeno path, SDK)
+  - `aria-orchestrator/tests/test_crash_llm4_zhipu_429.py` (429 rate-limit, Zhipu path, SDK)
+  - `aria-orchestrator/tests/test_crash_llm5_luxeno.py` (invalid JSON, Luxeno URL, httpx_mock)
+  - `aria-orchestrator/tests/test_crash_llm5_zhipu.py` (invalid JSON, Zhipu URL, httpx_mock)
+  - `aria-orchestrator/tests/test_crash_llm6_luxeno.py` (provider 5xx, Luxeno URL, httpx_mock)
+  - `aria-orchestrator/tests/test_crash_llm6_zhipu.py` (provider 5xx, Zhipu URL, httpx_mock)
 
   Each file begins with:
   ```python
@@ -401,11 +485,21 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
     - Same mock pattern as WAL-A.
     - Same assertions.
 
+  <!-- R1-I2-2 fix: WAL-D assertion corrected — NO S_FAIL (SQLite auto-recreates WAL; recovery
+       succeeds; integrity preserved). S_FAIL is only for WAL-A/B/C where corruption detected.
+       (R1 audit 2026-05-24) -->
   - `test_wal_file_deleted` (WAL-D):
     - `tmpdir` fixture: create SQLite DB in WAL mode, delete WAL file entirely.
-    - Assert: SQLite reopens DB without WAL (no corruption visible); a subsequent clean
-      connection can read/write successfully (no data corruption).
+    - Do NOT mock sqlite3.connect — use real filesystem (WAL-D is a real-file scenario).
+    - Assert: NO S_FAIL — recovery succeeds; a subsequent clean connection can read/write
+      successfully (no data corruption visible).
     - Assert: structured log entry `{"event": "wal_fault", "scenario": "WAL-D", "recovery": "wal_auto_recreated"}`.
+    - Add comment:
+      ```python
+      # WAL-D: NOT a corruption scenario. SQLite auto-recreates WAL on reconnect.
+      # Recovery succeeds (no S_FAIL). Contrast with WAL-A/B/C which produce S_FAIL.
+      # See proposal §B.2 WAL-D row for expected outcome.
+      ```
 
 - [ ] B-infra-4 Write `aria-orchestrator/acceptance/m6-wal-fault.sh` (M-qa-R3-8, AC-3):
   ```bash
@@ -436,89 +530,138 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ## TG-B-llm — LLM-4/5/6 crash tests (~1.5h)
 
-- [ ] B-llm-1 Implement `test_crash_llm4.py` (429 rate-limit, SDK boundary):
-  - Mock `llm_client.complete()` to raise `RateLimitError(retry_after=30)` when called during
-    an S2/S3/S6 LLM call.
+<!-- R1-I2-3 fix: LLM-4 split into Luxeno and Zhipu provider test files — different HTTP error
+     classes (_LLMHTTPError vs ZhipuHTTPError). (R1 audit 2026-05-24) -->
+<!-- R1-I2-4 fix: LLM-5/LLM-6 use provider-specific httpx_mock URL patterns (Luxeno ≠ Zhipu
+     base URLs). Split into provider-specific test files. (R1 audit 2026-05-24) -->
+<!-- R1-I2-5 fix: Mock target updated — `llm_client.complete()` doesn't exist. Real call sites:
+     `provider_router.call_llm` / `provider_router.route_for_state` / `silknode_client.call_llm`
+     / `zhipu_client.call_llm`. (R1 audit 2026-05-24) -->
+<!-- R1-I2-6 fix: Exception class names corrected — no `RateLimitError`/`ProviderUnavailableError`.
+     Use `_LLMHTTPError(status=429)` (silknode) / `ZhipuHTTPError(status=429)` (zhipu) for 429.
+     Use `LLMRouteExhausted` for router-level exhaustion. (R1 audit 2026-05-24) -->
+
+- [ ] B-llm-1 Implement LLM-4 (429 rate-limit) split into 2 test files:
+
+  **`test_crash_llm4_luxeno_429.py`** (Luxeno path, SDK boundary):
+  - Mock `silknode_client.call_llm` to raise `_LLMHTTPError(status=429)` (from
+    `aria_layer1.silknode_client._LLMHTTPError`) — exact production exception class.
   - Use `FakeClock` to advance time past `retry_after` and verify retry attempt.
-  - Assert: (a) initial 429 → state machine pauses (not → S_FAIL immediately); (b) after
-    `retry_after` seconds elapsed (via `FakeClock.advance(31)`), retry is attempted; (c) if
-    retry succeeds, state continues normally; (d) if retry raises `RateLimitError` again
-    (2nd consecutive), state machine → S_FAIL with log entry
+  - Assert: (a) ProviderRouter classifies 429 → `HTTP_429` outcome; (b) after all retries
+    exhausted, `LLMRouteExhausted` is raised; (c) state machine → S_FAIL with log entry
     `{"event": "rate_limit_exhausted", "recovery": "s_fail_set"}`.
 
-- [ ] B-llm-2 Implement `test_crash_llm5.py` (invalid JSON, httpx_mock at HTTP layer):
-  - Use `pytest_httpx` (or equivalent httpx mock) to intercept the provider HTTP call:
+  **`test_crash_llm4_zhipu_429.py`** (Zhipu path, SDK boundary):
+  - Mock `zhipu_client.call_llm` to raise `ZhipuHTTPError(status=429)` (from
+    `aria_layer1.zhipu_client.ZhipuHTTPError`) — exact production exception class.
+  - Same assertions as Luxeno path.
+  - Add comment:
+    ```python
+    # Mock layer: SDK boundary. Luxeno and Zhipu have different HTTP error classes.
+    # See crash-recovery-mock-layer-rationale.md LLM-4.
+    ```
+
+- [ ] B-llm-2 Implement LLM-5 (invalid JSON) split by provider:
+
+  **`test_crash_llm5_luxeno.py`** (Luxeno base URL):
+  - Use `pytest_httpx` to intercept Luxeno provider HTTP call at its specific base URL:
     ```python
     httpx_mock.add_response(
         method="POST",
-        url=re.compile(r"https://.*api.*"),
+        url=re.compile(r"https://.*luxeno.*|https://.*silknode.*"),  # verify actual Luxeno URL
         status_code=200,
-        content=b"{ bad json ["     # malformed response body
+        content=b"{ bad json ["
     )
     ```
-  - Assert: (a) SDK adapter raises JSON parse error (not generic `Exception`); (b) state
-    machine → S_FAIL; (c) log entry `{"event": "llm_response_malformed", "recovery": "s_fail_set"}`.
-  - Mock at HTTP layer (not SDK): validates the SDK adapter's JSON parsing path is exercised
-    (per `[[feedback_mock_layer_per_failure_semantic]]`).
-  - Add comment:
-    ```python
-    # Mock layer: HTTP (httpx_mock). Invalid JSON arrives as valid HTTP 200.
-    # SDK adapter's response parsing is the code under test.
-    # See crash-recovery-mock-layer-rationale.md LLM-5.
-    ```
+  - Assert: (a) SDK adapter raises JSON parse error; (b) state machine → S_FAIL; (c) log entry
+    `{"event": "llm_response_malformed", "recovery": "s_fail_set"}`.
 
-- [ ] B-llm-3 Implement `test_crash_llm6.py` (provider 5xx, httpx_mock at HTTP layer):
-  - `httpx_mock.add_response(status_code=503, json={"error": "service_unavailable"})`.
-  - Assert: SDK converts 5xx to `ProviderUnavailableError`; state machine → S_FAIL; log entry
+  **`test_crash_llm5_zhipu.py`** (Zhipu base URL):
+  - Same pattern with Zhipu-specific URL (verify from `zhipu_client.py` base URL constant).
+
+  Both files add comment:
+  ```python
+  # Mock layer: HTTP (httpx_mock). Invalid JSON arrives as valid HTTP 200.
+  # Provider-specific URL patterns required (Luxeno ≠ Zhipu base URL).
+  # See crash-recovery-mock-layer-rationale.md LLM-5.
+  ```
+
+- [ ] B-llm-3 Implement LLM-6 (provider 5xx) split by provider:
+
+  **`test_crash_llm6_luxeno.py`** + **`test_crash_llm6_zhipu.py`**:
+  - `httpx_mock.add_response(status_code=503, json={"error": "service_unavailable"})` on
+    provider-specific URL.
+  - Assert: ProviderRouter classifies 503 → `HTTP_5XX` outcome (via `_classify_exception`);
+    after exhaustion `LLMRouteExhausted` raised; state machine → S_FAIL; log entry
     `{"event": "provider_unavailable", "status_code": 503, "recovery": "s_fail_set"}`.
+  - Do NOT assert `ProviderUnavailableError` — that class does not exist in production code.
+    The classification is done via `_classify_exception` outcome string `"http_5xx"`.
   - Add comment:
     ```python
-    # Mock layer: HTTP (httpx_mock). 5xx is an HTTP-level failure.
-    # SDK ProviderUnavailableError conversion is the code under test.
-    # See crash-recovery-mock-layer-rationale.md LLM-6.
+    # Mock layer: HTTP (httpx_mock). 5xx classified as HTTP_5XX by provider_router._classify_exception.
+    # Provider-specific URL patterns required. See crash-recovery-mock-layer-rationale.md LLM-6.
     ```
 
 ---
 
 ## TG-B-statemachine — State machine coverage + AdvancingClock DI (~4h)
 
-- [ ] B-sm-1 Audit `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/state_machine.py`
-  for all `datetime.now()` calls. Replace each with `self._clock.now()`.
-  Add `clock` parameter to `AriaStateMachine.__init__`:
+<!-- R1-T2-2 fix: `aria_layer1/state_machine.py` does NOT exist. State machine logic is in 4
+     modules: extension.py, comment_poll.py, reconciler.py, tick_runner.py. All B-sm tasks
+     updated to use correct module paths and 4-module cov target per Q1 lock (2026-05-24).
+     (R1 audit 2026-05-24) -->
+<!-- R1-I2-5 fix: Mock target updated from `llm_client.complete()` (non-existent) to
+     `provider_router.call_llm` / `silknode_client.call_llm` / `zhipu_client.call_llm`.
+     (R1 audit 2026-05-24) -->
+<!-- R1-I2-7 fix: pyproject.toml addopts declaration added in B-sm-4. (R1 audit 2026-05-24) -->
+
+- [ ] B-sm-1 Audit state machine datetime.now() calls across all 4 modules:
+  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/extension.py`
+  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/comment_poll.py`
+  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/reconciler.py`
+  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/tick_runner.py`
+
+  For each `datetime.now()` call found, replace with `self._clock.now()`. Add `clock` parameter
+  to each handler class constructor:
   ```python
   def __init__(self, ..., clock=None):
       self._clock = clock or RealClock()
   ```
   Per AD-M6-6: injection at constructor level (not per-method) minimizes API surface change.
-  Document all replaced call sites in a comment block at top of state_machine.py:
+  Document all replaced call sites in a comment block at top of each modified file:
   ```python
-  # AdvancingClock DI: all datetime.now() calls replaced with self._clock.now()
+  # AdvancingClock DI: datetime.now() calls replaced with self._clock.now()
   # to prevent wall-clock flakiness (per [[feedback_phase_b_velocity_patterns_2026-04-29]]).
   # Replaced sites: [list file:line references here]
   ```
+  Note: `aria_layer1/state_machine.py` does NOT exist and must NOT be created (Q1 lock 2026-05-24).
 
 - [ ] B-sm-2 Implement `test_state_machine_deterministic.py`:
-  For each deterministic state (S0, S1, S4, S5, S7, S8, S9, S_FAIL), write tests covering:
-  - Normal outbound transition: e.g., `test_s0_to_s1_on_claim` — state machine in S0, issue
-    claim succeeds → S1.
-  - Failure-injected outbound transition: e.g., `test_s0_to_sfail_on_infra2_kill` — state
-    machine in S0, `AllocTerminatedError` raised during claim → S_FAIL.
-  - Re-entry idempotency: e.g., `test_s1_reentry_is_noop` — state machine in S1, second
-    entry attempt → remains S1 (no double-claim side effect).
+  For each deterministic state (S0_IDLE, S1_SCAN, S4_LAUNCH, S5_AWAIT, S7_HUMAN_GATE, S8_MERGE,
+  S9_CLOSE, S_FAIL), write tests covering:
+  - Normal outbound transition: e.g., `test_s0_idle_to_s1_scan_on_claim` — state machine in
+    S0_IDLE, issue claim succeeds → S1_SCAN (handler in extension.py).
+  - Failure-injected outbound transition: e.g., `test_s0_idle_to_sfail_on_infra2_kill` — state
+    machine in S0_IDLE, `AllocTerminatedError` raised during claim → S_FAIL.
+  - Re-entry idempotency: e.g., `test_s1_scan_reentry_is_noop` — state machine in S1_SCAN,
+    second entry attempt → remains S1_SCAN (no double-claim side effect).
 
   Use `FakeClock` for all time-sensitive transitions. Zero live LLM calls.
-  Run with `--cov-fail-under=100` for `aria_layer1/state_machine.py` deterministic paths.
+  Run with `--cov=aria_layer1.extension,aria_layer1.comment_poll,aria_layer1.reconciler,aria_layer1.tick_runner --cov-fail-under=100`.
 
-- [ ] B-sm-3 Implement `test_state_machine_stochastic_replay.py` (S2/S3/S6 mocked replay):
+- [ ] B-sm-3 Implement `test_state_machine_stochastic_replay.py` (S2_DECIDE/S3_BUILD_CMD/S6_REVIEW
+  mocked replay):
   Commit fixture files to `aria-orchestrator/tests/fixtures/state_machine/`:
-  - `s2_plan_response.json` — captured LLM response for S2 (planning) transition.
-  - `s3_code_response.json` — captured LLM response for S3 (code generation) transition.
-  - `s6_review_response.json` — captured LLM response for S6 (review processing) transition.
+  - `s2_decide_response.json` — captured LLM response for S2_DECIDE transition.
+  - `s3_build_cmd_response.json` — captured LLM response for S3_BUILD_CMD transition.
+  - `s6_review_response.json` — captured LLM response for S6_REVIEW transition.
   (Source: DEMO-M5-O3 captures or pre-flight captures from TG-A §A.5. If pre-flight captures
   not yet available at test time, use placeholder fixtures and update in Phase B.2.)
 
-  Tests use `unittest.mock.patch` to return fixture JSON from `llm_client.complete()` without
-  any real HTTP call. Assert state transitions S2→S3, S3→S4, S6→S7 fire correctly.
+  Tests use `unittest.mock.patch` to mock `provider_router.call_llm` or `route_for_state`
+  (NOT `llm_client.complete()` — non-existent) to return fixture JSON without any real HTTP
+  call. Assert state transitions S2_DECIDE→S3_BUILD_CMD, S3_BUILD_CMD→S4_LAUNCH,
+  S6_REVIEW→S7_HUMAN_GATE fire correctly.
 
   Verify zero live calls: add `conftest.py` fixture that fails the test if any real HTTP call
   is made to provider URLs:
@@ -534,12 +677,19 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   ```bash
   pytest aria-orchestrator/tests/test_state_machine_deterministic.py \
          aria-orchestrator/tests/test_state_machine_stochastic_replay.py \
-    --cov=aria_layer1.state_machine \
+    --cov=aria_layer1.extension,aria_layer1.comment_poll,aria_layer1.reconciler,aria_layer1.tick_runner \
     --cov-report=term-missing \
     --cov-fail-under=100
   ```
-  Must exit 0. If coverage < 100%, identify uncovered lines and add targeted tests before
-  declaring TG-B complete.
+  Must exit 0. If coverage < 100%, identify uncovered lines and add targeted tests.
+
+  Additionally, declare `--cov-fail-under=100` in `aria-orchestrator/pyproject.toml` to enforce
+  in CI (per I2-7 requirement):
+  ```toml
+  [tool.pytest.ini_options]
+  addopts = "--cov-fail-under=100"
+  ```
+  This ensures CI fails if coverage drops even when pytest is run without explicit `--cov-fail-under`.
 
 ---
 
@@ -704,18 +854,30 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ## T-docs — AD-M6-* slots (~0.5h)
 
-- [ ] T-docs-1 Add AD-M6-4 decision stub to `aria-orchestrator/docs/architecture-decisions.md`:
-  "is_synthetic tagging mechanism: Deferred to Phase B. Mechanism A (schema column) preferred if
-  migration cost acceptable; Mechanism B (title prefix) fallback. Document actual choice in this
-  slot during Phase B kickoff."
+<!-- R1-T2-4 fix: AD-M6-4 no longer deferred — locked to Mechanism A at R1 audit. Mechanism B
+     removed. AD-M6-4b new slot for pre-flight routing strategy. (R1 audit 2026-05-24) -->
+- [ ] T-docs-1 Add AD-M6-4 decision to `aria-orchestrator/docs/architecture-decisions.md` (LOCKED):
+  "is_synthetic tagging mechanism: **Mechanism A — schema column** `is_synthetic INTEGER DEFAULT 0`
+  added via migration `006_schema_v5_add_is_synthetic.sql` (schema v5.0). Mechanism B (title prefix
+  `[DEMO-M6-*]`) was removed at R1 audit 2026-05-24 — `dispatches.title` column does not exist in
+  live schema. No Phase B decision required — implementation must use Mechanism A."
+
+- [ ] T-docs-1b Add AD-M6-4b decision stub to `aria-orchestrator/docs/architecture-decisions.md`:
+  "Pre-flight routing strategy: default = accept Luxeno subscription billing (cost_usd=0.0 per
+  dispatch, bounded zeros acceptable). If metered cost evidence required, override provider_router
+  to force Zhipu for 3 pre-flight dispatches. Document actual choice in this slot."
 
 - [ ] T-docs-2 Add AD-M6-5 decision stub: "Pre-flight dispatch fixture provenance: Deferred to
   Phase B. Option A (replay M5 O3 captures) preferred for regression continuity. Document actual
   provenance in `.aria/probes/m6-preflight-provenance.md` during Phase B kickoff."
 
-- [ ] T-docs-3 Add AD-M6-6 decision: "AdvancingClock DI injection point: clock injected at
-  `AriaStateMachine` constructor level. All `datetime.now()` calls in `state_machine.py` replaced
-  with `self._clock.now()`. `RealClock` is the default (no behavior change in production)."
+<!-- R1-T2-2 fix: AD-M6-6 updated to reference 4-module distribution (no state_machine.py).
+     (R1 audit 2026-05-24) -->
+- [ ] T-docs-3 Add AD-M6-6 decision: "AdvancingClock DI injection point: clock injected at handler
+  class constructor level across 4 modules (extension.py, comment_poll.py, reconciler.py,
+  tick_runner.py). `aria_layer1/state_machine.py` does NOT exist (Q1 lock 2026-05-24). All
+  `datetime.now()` calls in those 4 modules replaced with `self._clock.now()`. `RealClock` is the
+  default (no behavior change in production)."
 
 - [ ] T-docs-4 Verify US-026 `docs/requirements/user-stories/US-026.md` references
   `aria-2.0-m6-e2e-resilience` change ID; update if missing.
@@ -776,7 +938,7 @@ TG-C-corpus templates (C-corpus-1..3) may be written in advance; sample content 
 | P-4: Mock-layer-per-mode matrix (Q-NEW-1 hybrid 4 SDK + 2 HTTP) | DEC §4 + Q-NEW-1 | §What B.1 (full table) | B-scaffold-1, B-infra-1..3, B-llm-1..3 |
 | P-5: 4 WAL scenarios (WAL-A/B/C/D) vs 3 enumeration | DEC §4 P-5 + PRD §634 | §What B.2 (4-scenario table) | B-infra-3 |
 | P-6: TG-A → TG-B handoff checkpoint contract | DEC §4 P-6 | §What A.7 (checkpoint list) | A-validate-1, TG-B-scaffold start condition |
-| P-7: is_synthetic tagging mechanism (Mech A schema column vs Mech B title prefix) | DEC §4 P-7 | §What A.2 (P-7 block) | A-infra-2 + AD-M6-4 |
+| P-7: is_synthetic tagging mechanism (Mech A LOCKED — migration 006; Mech B removed R1 audit) | DEC §4 P-7 | §What A.2 (P-7 block) | T-validate-schema-1 + A-infra-2 + AD-M6-4 |
 | P-8: Pre-flight dispatch fixture provenance (Option A/B/C) | DEC §4 P-8 | §What A.5 (P-8 block) | A-dispatch-5 + AD-M6-5 |
 | P-9: Cross-project Kairos/silknode acceptance conditions | DEC §4 P-9 | §What A.6 (P-9 block) | A-dispatch-6 |
 | Q-NEW-1: Hybrid mock layer +1h scope | Owner Q-NEW-1 2026-05-24 | §What B.1 (hybrid table) + §Effort baseline | B-scaffold-1 + mock-layer-per-mode rationale doc |
@@ -786,6 +948,10 @@ TG-C-corpus templates (C-corpus-1..3) may be written in advance; sample content 
 
 ## Status
 
-**Draft** — Ready for Phase A.2 post_spec R1 audit (4-agent parallel: tech-lead-critic + qa + ai + code-reviewer).
+**R1 fixes applied 2026-05-24** — R1 NEEDS_FIX → fixes applied by backend-architect agent.
+Key changes: T2-1 SQL columns (state='S9_CLOSE', state_entered_at), T2-2 state_machine.py→4-module cov,
+T2-3 AC-6 Luxeno=0 paper-fix, T2-4 Mechanism B removed, T2-5 AC-1 CreateTime uptime, T2-6 check order,
+X-T3 mean→median, I2-1..I2-8 important fixes. Ready for R2 audit verification.
 
-**Approved 锁定后** → Phase A.3 agent allocation → Phase B.1 branch creation (after Phase B precondition gate PASS).
+**Pending** → Phase A.2 R2 audit (3-agent challenge: cr + ai + tl-critic) → R2 verdict
+→ if SCOPE_OK_R2: Phase A.3 agent allocation → Phase B.1 branch creation (after Phase B precondition gate PASS).

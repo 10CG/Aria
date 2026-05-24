@@ -565,7 +565,7 @@ Out of scope:
 | 文档 | 内容 | 位置 |
 |------|------|------|
 | decision-autonomy-matrix.md | 自主/审批/禁止决策矩阵 | `standards/autonomous/` |
-| layer-boundary-contract.md | Layer 1 / Layer 2 职责契约 | `standards/autonomous/` |
+| layer-boundary-contract.md | Layer 1 / Layer 2 职责契约 | `aria-orchestrator/docs/` (Aria-specific 内部契约,非 Lab-shareable;per km M-km-R2-005 brainstorm 决策 + Spec #3 R1-audit-Q3 lock 2026-05-24 — Lab 其他项目不复用 Aria 双层架构,放 standards/ 会污染 Lab 共享空间) |
 
 ### 架构文档 (新增)
 
@@ -653,7 +653,7 @@ v2.0 新增:
 **定性指标**:
 - 人类审批时间中位数 < 10 分钟 (Feishu 卡片)
 - 漂移检测误报率 < 20%
-- 拟人命令质量 (人工评分, 10 samples 平均 ≥ 7/10)
+- 拟人命令质量 (人工评分, 10 samples median ≥ 7/10; lock 2026-05-24 per Spec #2/#3 R1-audit-Q4 — median 替换原 "平均" 因 bimodal score 分布 robust + falsifiability 更强 + Lab industry convention)
 
 ### 方法论研究交付
 

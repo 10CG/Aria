@@ -1,15 +1,18 @@
 # Aria 2.0 M6 Spec #3 — Documentation Suite (CLAUDE.md v2.0 + Architecture + standards/autonomous)
 
-> **Level**: 3 (Full — cross-cuts CLAUDE.md / standards/autonomous / docs/architecture / aria-orch/docs / Aria README)
+> **Level**: 3 (Full — cross-cuts CLAUDE.md / standards/autonomous / docs/architecture / aria-orchestrator/docs / Aria README)
 > **Status**: Draft
 > **Change ID**: `aria-2.0-m6-docs`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
-> **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (post `a786444` PRD patch, §M6 4-5w timeline)
+> **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (post `a786444` + `e884e62` PRD patches, §M6 4-5w timeline)
 > **Predecessor Spec**: [aria-2.0-m5-replay-reconciler-drift-review-loop-audit](../../archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/proposal.md) (M5 archived 2026-05-23)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2 Spec #3 + §4 P-10..P-13, CONVERGED 2026-05-24)
-> **Effort baseline**: ~33h impl (TG-DOCS-A ~11h release-blocker + TG-DOCS-B ~22h architecture). Single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`.
+> **Effort baseline**: ~33h impl (TG-DOCS-A ~11h release-blocker + TG-DOCS-B ~22h architecture; T-B0.10 +0.1h v1.29.0 gate). Single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`.
 > **v2.0.1-deferrable**: TG-DOCS-B (~22h architecture) may ship as v2.0.1 if 5w calendar slips per Q-final-1 Menu C. TG-DOCS-A (~11h) is v2.0.0 release-blocker (ships with v2.0.0 unconditionally).
-> **AD allocation reservation**: **AD-M6-7** and **AD-M6-8** are reserved for this Spec #3 only. Spec #1 (`aria-2.0-m6-cost-acceptance`) holds AD-M6-1/2/3; Spec #2 (`aria-2.0-m6-e2e-resilience`) holds AD-M6-4/5/6. **AD-M5-11** (pre-existing M5 RESERVED slot in `aria-orchestrator/docs/architecture-decisions.md`) is claimed by this Spec for M6 docs architectural decisions. (per DEC-20260524-001 §2 AD-M6-* allocation lock 2026-05-24)
+> **AD allocation reservation**: **AD-M6-7**, **AD-M6-8**, and **AD-M6-9** are reserved for this Spec #3. AD-M6-7 = state-checks probe design. AD-M6-8 = reserved slot. **AD-M6-9** = `standards/autonomous/` namespace creation decision (claimed by this Spec per Q2 owner lock 2026-05-24 — AD-M5-11 collision with M5-spillover scope discovered in R1 audit; Spec #3 vacates AD-M5-11 claim). Spec #1 holds AD-M6-1/2/3; Spec #2 holds AD-M6-4/5/6. (per DEC-20260524-001 §2 AD-M6-* allocation lock 2026-05-24)
+> **Audit trajectory**:
+>   - Phase A.2 R1: NEEDS_FIX (4-agent combined sister-Specs, 2026-05-24) — aggregate `.aria/audit-reports/post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-sister-specs.md`
+>   <!-- R1 fix-pass in progress (knowledge-manager agent) -->
 > **Sibling Spec (Approved)**: [aria-2.0-m6-cost-acceptance](../aria-2.0-m6-cost-acceptance/proposal.md) (Spec #1, commit `c29a800`, AD-M6-1/2/3)
 > **Sibling Spec (parallel draft)**: [aria-2.0-m6-e2e-resilience](../aria-2.0-m6-e2e-resilience/proposal.md) (Spec #2, AD-M6-4/5/6)
 > **Successor**: [aria-2.0-m6-release-closeout](../aria-2.0-m6-release-closeout/proposal.md) (Spec #4, gates on this Spec's CLAUDE.md v2.0 + state-checks probes)
@@ -40,10 +43,22 @@ M5 shipped a production-grade autonomous dispatch loop that passed the "can-run 
 
 <!-- P-13: CLAUDE.md 8 diffs listed here verbatim, 2-pass per feedback_spec_v2_body_propagation_2pass -->
 
-##### A.1 — CLAUDE.md v1.0.4 → v2.0 (8+1 diffs) (~4h)
+##### A.1 — CLAUDE.md v1.0.4 → v2.0 (9 diffs) (~4h)
+
+<!-- R1-T3-1 fix: title was "8+1 diffs" conflicting with body count of "9"; unified to "9 diffs" per live CLAUDE.md read. Live file is 454 lines, 9 Rules (#1-#9) already present. Diffs enumerated below are anchored to live line ranges. -->
 
 Source draft: `aria-orchestrator/docs/claude-md-revision-draft.md` (M0 T5.3 deliverable).
-The 9 diffs to apply (Diff 1-8 from draft + Diff 9 incremental):
+The 9 diffs to apply (Diff 1-8 from draft + Diff 9 incremental).
+Live CLAUDE.md section map (v1.0.4, 454 lines):
+- Lines 1-5: Header block (项目本质 / 核心假设 / 版本)
+- Lines 9-18: 文档边界 (no change)
+- Lines 21-37: 项目定位 → 研究目标 (Diff 1 + Diff 2)
+- Lines 40-76: 核心概念 (Diff 3 adds §两层AI分工 after §十步循环, line ~66)
+- Lines 120-188: 信息地图 (Diff 4 adds aria-orchestrator/ row to table at line ~124)
+- Lines 208-228: 技术约束 / Aria 的边界 (Diff 5 adds v2.0 boundary line)
+- Lines 343-426: 不可协商规则 #1-#9 (Diff 6 = NO-OP verify; Rules #7/#8/#9 body already present)
+- Lines 429-453: 项目状态 (Diff 8 updates versions, Diff 9 bumps version field)
+- After line 426 (after §不可協商規則): Diff 7 adds new §Aria 2.0 运行时 chapter
 
 **Diff 1 — 文档顶部"项目本质"段落扩展** (draft §Diff 1):
 Replace the three-line header block. Change "AI 辅助的领域驱动设计方法论研究" → "AI-DDD 方法论的定义与端到端参考实现 (v1.x 方法论 + v2.0 自主运行时)". Change 核心假设 and version line per draft.
@@ -52,7 +67,8 @@ Replace the three-line header block. Change "AI 辅助的领域驱动设计方�
 Add "身份演进 (v1.x → v2.0)" subsection before §研究目标. Content: v1.x = 方法论研究 (人类交互式), v2.0 = 方法论定义 + 端到端参考实现 (AI 自主式). Cross-link to architecture-decisions.md.
 
 **Diff 3 — "核心概念"新增"两层 AI 分工"小节** (draft §Diff 3):
-After §十步循环, add §两层 AI 分工 (v2.0 新增). Layer 1 (Hermes + GLM) = PM role. Layer 2 (aria-runner + CC + aria-plugin) = engineering role. Cross-link AD1 + AD6.
+After §十步循环 (live CLAUDE.md ~line 66), add §两层 AI 分工 (v2.0 新增). Layer 1 (Hermes + Luxeno-routed GLM models) = PM role. Layer 2 (aria-runner + CC + aria-plugin) = engineering role. Cross-link AD1 + AD6.
+<!-- R1-I3-4 fix: "Hermes + GLM" → "Hermes + Luxeno-routed GLM models" per 2026-05-21 redirect recorded in memory feedback_diagnose_from_provider_config_not_symptom and project_glm_routing_luxeno -->
 
 **Diff 4 — "信息地图"子模块表格新增 aria-orchestrator 行** (draft §Diff 4):
 Add table row: `aria-orchestrator/` | v2.0 运行时 (Layer 1/2) | Hermes fork / Docker 镜像 / Nomad job / ADR. Add two §目录导航 entries: Aria 2.0 架构决策 → aria-orchestrator/docs/architecture-decisions.md; Layer 边界契约 → aria-orchestrator/docs/layer-boundary-contract.md.
@@ -60,8 +76,10 @@ Add table row: `aria-orchestrator/` | v2.0 运行时 (Layer 1/2) | Hermes fork /
 **Diff 5 — "技术约束"补充 v2.0 边界** (draft §Diff 5):
 Add "✅ 实现 (v2.0): 端到端参考实现 (aria-orchestrator, 仅限 10CG Lab 内部)" line. Add clarifying paragraph: v2.0 runtime ≠ general framework.
 
-**Diff 6 — "不可协商规则"章节不修改** (draft §Diff 6 — hard constraint per AD11):
-Rules #1-#6 text body is FROZEN. No deletions, no modifications. AD11 compliance.
+**Diff 6 — "不可协商规则"章节不修改 (Rules #1-#9 all FROZEN)** (draft §Diff 6 — hard constraint per AD11):
+<!-- R1-T3-1 fix: original Diff 6 said "Rules #1-#6 FROZEN" but live CLAUDE.md already has 9 rules (#1-#9 all present, lines 343-426). AD11 freeze scope applies to ALL rules present in the live file. Updated to: Rules #1-#9 text body is FROZEN. -->
+Rules #1-#9 text body is FROZEN. No deletions, no modifications to any existing rule body. AD11 compliance extended to all 9 rules.
+Verify after edits: `git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-9]"` must produce no output (Rules #1-#9 bodies unmodified per I3-1 AC addition).
 
 **Diff 7 — 新增"Aria 2.0 运行时"独立章节** (draft §Diff 7, ≤50 lines):
 New H2 section after §不可协商规则. Includes: 分层叙述 (standards / aria-plugin / aria-orchestrator), 与 6 条规则的关系 (how Layer 2 enforces each), 人类参与点 (AD10: S7_AWAITING_MERGE), 详细入口 (architecture-decisions.md / spikes / M0 Spec / PRD v2.0).
@@ -69,12 +87,16 @@ New H2 section after §不可协商规则. Includes: 分层叙述 (standards / a
 **Diff 8 — "项目状态"版本号更新** (draft §Diff 8, using M6-time actual values):
 Update stage: "研究中 → v2.0 规划已批准" → "v2.0 M6 执行中 (M1-M5 shipped)". Update 插件版本 from v1.22.0 to actual v1.27.0 (current per `c7e611f` submodule bump). Update 主项目版本 v1.7.0. Add 运行时版本 line. Update "更新" date at bottom.
 
-**Diff 9 — Rules #7/#8/#9 + §2.3 frontmatter schema catch-up** (incremental beyond original draft, ~0.5h):
-Rules #7/8/9 and the Rule #9 §2.3 frontmatter schema extension were added to CLAUDE.md AFTER the M0 draft was written (post-M1 through post-M5). The draft does not cover them. Diff 9 is therefore a no-op edit on Rule #7/8/9 body text (they are already in the live CLAUDE.md as of 2026-04-12 updates) — but requires:
-- Plugin version synchronization: CLAUDE.md §项目状态 must reference v1.27.0 (not v1.22.0) per commit `c7e611f`.
-- Rule #8 §exception clause must reference the actual `.aria/config.json` field name `phase_c_integrator.pre_merge_gate.no_aether_fallback` (already present; verify no drift from config.template.json).
-- Rule #9 §2.3 frontmatter extension must cite `aria-plugin v1.22.x+` (already present; verify not stale).
+**Diff 9 — Rules #7/#8/#9 + §2.3 frontmatter schema catch-up + plugin version sync** (incremental beyond original draft, ~0.5h):
+<!-- R1-T3-1 fix: clarified Diff 9 scope against live CLAUDE.md. Live §项目状态 shows 插件版本: v1.22.0 (stale — plugin.json SoT reads v1.27.0 per dynamic read). DEC-20260524-001 cited v1.26.0 which was draft-time snapshot from dev-claude2 burndown session. -->
+<!-- R1-T3-3 fix: plugin version SoT is aria/.claude-plugin/plugin.json. No hardcode — Phase B implementor MUST read dynamically: `python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])"` -->
+Rules #7/8/9 and the Rule #9 §2.3 frontmatter schema extension were added to CLAUDE.md AFTER the M0 draft was written (post-M1 through post-M5). The draft does not cover them. Diff 9 is therefore a no-op edit on Rule #7/8/9 body text (they are already in the live CLAUDE.md) — but requires:
+- **Plugin version synchronization** (non-trivial): Live CLAUDE.md §项目状态 (line ~434) shows `插件版本: v1.22.0` — this is stale. Plugin SoT `aria/.claude-plugin/plugin.json` reads `v1.27.0`. DEC-20260524-001 cited v1.26.0 as draft-time snapshot; dev-claude2 burndown session shipped v1.27.0 same session. Update to: read version dynamically via `python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])"` — do NOT hardcode.
+- Rule #8 §exception clause: verify `phase_c_integrator.pre_merge_gate.no_aether_fallback` field name in live CLAUDE.md §Rule #8 matches `config.template.json` (already present; no edit if correct).
+- Rule #9 §2.3 frontmatter extension: verify cites `aria-plugin v1.22.x+` (already present; no edit if correct).
 - Version field: bump `**版本**: 1.0.4` → `**版本**: 2.0.0`.
+
+Note: Plugin version SoT = `aria/.claude-plugin/plugin.json`. DEC-20260524-001 v1.26.0 was draft-time snapshot; dev-claude2 burndown shipped v1.27.0 in the same session. AC-3 and Diff 9 must read the version dynamically, not hardcode any snapshot value.
 
 Constraint (AD11): Diff 9 MUST NOT alter Rule #1-#6 text. It only updates §项目状态 version numbers and bumps the top-level version field.
 
@@ -141,20 +163,29 @@ Three new entries in `.aria/state-checks.yaml`. Each probe is a 1-line (or minim
 
 **Probe 1 — version-badge-match**: README.md plugin badge version matches aria/.claude-plugin/plugin.json version field.
 
+<!-- R1-T3-2 fix: original `head -1` ordering is fragile to README layout changes and extracts v1.15.2 (stale badge) rather than the plugin badge. Replaced with anchored regex on the badge token. Task dependency: Probe 1 verification must run AFTER T-A2.1 (README badge update) to get PASS result; before T-A2.1 it is expected to FAIL (stale badge). Explicit dependency note added. -->
+
 ```yaml
 - name: "m6-version-badge-match"
   description: |
     Verify README.md Plugin badge version matches aria/.claude-plugin/plugin.json.
     Drift = README badge stale after a plugin version bump.
+    Task dependency: this probe produces PASS only after T-A2.1 (README badge update to v1.27.0).
+    FAIL before T-A2.1 is expected and correct behavior.
   command: |
-    BADGE=$(grep -oP '(?<=Plugin-v)[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1)
+    BADGE=$(grep -m1 -oP 'badge[^\d]*v?\K[0-9]+\.[0-9]+\.[0-9]+' README.md)
     PLUGIN=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")
+    [ -z "$BADGE" ] && { echo "MISSING badge pattern in README.md"; exit 1; }
     [ "$BADGE" = "$PLUGIN" ] && echo "OK badge=$BADGE" || { echo "DRIFT badge=$BADGE plugin=$PLUGIN"; exit 1; }
   severity: warning
   fix: "Update README.md Plugin badge to match aria/.claude-plugin/plugin.json version"
   timeout_seconds: 5
   enabled: true
 ```
+
+Probe 1 PASS/FAIL fixture (T-A6 bug-hunt requirement per `[[feedback_pre_draft_bug_hunt_discipline]]`):
+- FAIL case: run probe BEFORE T-A2.1 (badge still v1.15.2, plugin.json = v1.27.0) → must exit 1 with "DRIFT badge=1.15.2 plugin=1.27.0".
+- PASS case: run probe AFTER T-A2.1 (badge updated to v1.27.0, plugin.json = v1.27.0) → must exit 0 with "OK badge=1.27.0".
 
 **Probe 2 — claude-md-version-match**: CLAUDE.md top-level `**版本**:` field matches the v2.0 milestone. Specifically, after TG-DOCS-A ships, CLAUDE.md version must be `2.0.0`.
 
@@ -176,6 +207,8 @@ Note: this probe is intentionally set to `enabled: true` but will exit 1 until T
 
 **Probe 3 — arch-doc-stale-warning**: `docs/architecture/system-architecture.md` last-updated header is not older than 90 days from today.
 
+<!-- R1-I3-3 fix: original `date -d` is GNU-only (fails on macOS/BSD). Replaced with python3 datetime arithmetic which is cross-platform. -->
+
 ```yaml
 - name: "m6-arch-doc-stale"
   description: |
@@ -184,11 +217,18 @@ Note: this probe is intentionally set to `enabled: true` but will exit 1 until T
   command: |
     LAST=$(grep -oP '(?<=\*\*Last Updated\*\*: )\d{4}-\d{2}-\d{2}' docs/architecture/system-architecture.md | head -1)
     [ -z "$LAST" ] && { echo "MISSING Last Updated header"; exit 1; }
-    EPOCH_DOC=$(date -d "$LAST" +%s 2>/dev/null)
-    [ -z "$EPOCH_DOC" ] && { echo "UNPARSEABLE Last Updated: $LAST"; exit 1; }
-    EPOCH_NOW=$(date +%s)
-    AGE_DAYS=$(( (EPOCH_NOW - EPOCH_DOC) / 86400 ))
-    [ $AGE_DAYS -lt 90 ] && echo "OK age=${AGE_DAYS}d" || { echo "STALE age=${AGE_DAYS}d (threshold=90d)"; exit 1; }
+    python3 -c "
+import sys, datetime
+last = datetime.date.fromisoformat('$LAST')
+today = datetime.date.today()
+age = (today - last).days
+if age < 90:
+    print(f'OK age={age}d')
+    sys.exit(0)
+else:
+    print(f'STALE age={age}d (threshold=90d)')
+    sys.exit(1)
+" || exit 1
   severity: warning
   fix: "Update docs/architecture/system-architecture.md **Last Updated** header and review content"
   timeout_seconds: 5
@@ -235,7 +275,8 @@ Post-check: `[ -f docs/architecture/version-scheme.md ] && grep -q "aria-plugin"
 ##### B.3 — standards/autonomous/ directory (Lab-shareable files) (~5h)
 
 <!-- P-10: standards submodule operation sequence — detailed runbook in tasks.md T-B3-0 -->
-<!-- P-11: content boundary between standards/autonomous/ and aria-orch/evals/ -->
+<!-- P-11: content boundary between standards/autonomous/ and aria-orchestrator/evals/ -->
+<!-- R1-X-T1 fix: aria-orch/evals/ → aria-orchestrator/evals/ in comment -->
 
 **Target submodule**: `/home/dev/Aria/standards/` (own git repo per `[[project_meta_repo_pattern]]`)
 
@@ -258,21 +299,41 @@ Minimum content: ≥100 lines. Must include cross-reference to `aria-orchestrato
 **B.3.2 — standards/autonomous/humanized-command-patterns.md** (Lab-shareable, ≥10 curated samples)
 
 <!-- P-11: BOTH-locations content boundary design -->
+<!-- R1-X-T1 fix: `aria-orch/` shorthand replaced with `aria-orchestrator/` full path throughout this section. Lab-shareable file in standards/ must reference the full path to avoid broken links on other Lab projects cloning standards. -->
+<!-- R1-X-T3 fix: "mean" → "median" per Q4 owner lock 2026-05-24 (PRD §656 patched e884e62). Median is more robust for bimodal score distributions. -->
+<!-- R1-X-T5 fix: rubric dimensions synced to 7 (D1-D7) per Spec #2 §C.2 SoT. Original had 5 dimensions (naturalness / actionability / context-completeness / brevity / tone-appropriateness); Spec #2 §C.2 defines D1-D7 which is the canonical 7-dimension set. Cross-ref note added. -->
 Content boundary clarification (P-11):
 - THIS file (`standards/autonomous/humanized-command-patterns.md`): Lab-shareable CURATED patterns. Contains ≥10 distilled examples demonstrating good vs bad command phrasing, the PRD §639 rubric explanation, and scoring guidance. Does NOT contain raw corpus files.
-- SPEC #2 TG-C (`aria-orch/evals/m6-prompt-quality/corpus/sample-{01..10}.md`): the actual M6 E2E run samples with per-sample scoring. Does NOT duplicate the pattern guide.
-- Cross-reference: this file references Spec #2 TG-C corpus with `See also: aria-orch/evals/m6-prompt-quality/ for M6 E2E corpus samples`. Spec #2 TG-C references this file with `See also: standards/autonomous/humanized-command-patterns.md for Lab-wide pattern guide`.
+- SPEC #2 TG-C (`aria-orchestrator/evals/m6-prompt-quality/corpus/sample-{01..10}.md`): the actual M6 E2E run samples with per-sample scoring. Does NOT duplicate the pattern guide.
+- Cross-reference: this file references Spec #2 TG-C corpus with `See also: aria-orchestrator/evals/m6-prompt-quality/ for M6 E2E corpus samples`. Spec #2 TG-C references this file with `See also: standards/autonomous/humanized-command-patterns.md for Lab-wide pattern guide`.
 - No content duplication between the two locations.
 
-Content requirements: ≥10 curated samples (pattern name + bad example + good example + rationale). PRD §639 rubric (scoring dimensions). Header: `<!-- Lab-shareable: this file is in standards/ and may be reused by other 10CG Lab projects. -->`. Cross-reference to Spec #2 TG-C corpus.
+Content requirements: ≥10 curated samples (pattern name + bad example + good example + rationale). PRD §639 rubric (7 dimensions D1-D7, median ≥ 7/10 threshold). Header: `<!-- Lab-shareable: this file is in standards/ and may be reused by other 10CG Lab projects. -->`. Cross-reference to Spec #2 TG-C corpus.
 
-Minimum content: ≥200 lines (rough proxy for ≥10 patterns at ~15-20 lines each + rubric section).
+**PRD §639 rubric — 7 dimensions (SoT = Spec #2 §C.2):**
+Rubric 7 dimensions D1-D7 SoT = Spec #2 §C.2; Spec #3 humanized-command-patterns.md re-uses identical dimension structure (no divergence allowed):
 
-Post-check: `wc -l < standards/autonomous/humanized-command-patterns.md` ≥ 200.
+| Dim | Name | Scoring guidance |
+|-----|------|-----------------|
+| D1 | Naturalness | 0=robotic/template; 10=indistinguishable from skilled human |
+| D2 | Specificity | 0=vague; 10=precise actionable steps with exact file/function refs |
+| D3 | Tone appropriateness | 0=wrong tone for context; 10=matches request severity and relationship |
+| D4 | Completeness | 0=missing required context; 10=all context a developer needs included |
+| D5 | Conciseness | 0=verbose padding; 10=minimal words to convey full intent |
+| D6 | Technical accuracy | 0=incorrect references; 10=all file/function/commit references correct |
+| D7 | Autonomy footprint | 0=over-delegates; 10=appropriately scoped with no unnecessary asks |
+
+Pass threshold: per-sample **median** of D1-D7 ≥ 7.0. Corpus pass: median(sample-01..10 medians) ≥ 7/10 (per PRD §656 patched 2026-05-24 e884e62, mean → median per Q4 lock).
+
+Minimum content: ≥200 lines (rough proxy for ≥10 patterns at ~15-20 lines each + 7-dimension rubric section).
+
+Post-check: `grep -c "^### Pattern" standards/autonomous/humanized-command-patterns.md` ≥ 10 (structural check; replaces fragile `wc -l ≥ 200` proxy per X-T5 fix).
 
 ##### B.4 — aria-orchestrator/docs/layer-boundary-contract.md (Aria-specific, NOT in standards/) (~3h)
 
 <!-- km M-km-R2-005: this file is Aria-specific, must NOT go into standards/ -->
+<!-- R1-T3-5 fix: PRD §568 patched 2026-05-24 (e884e62) per Q3 R1 audit lock to follow Spec #3 implementation insight (km M-km-R2-005 brainstorm decision). PRD §568 now reads: `aria-orchestrator/docs/` (Aria-specific 内部契约,非 Lab-shareable). Spec #3 §B.4 was already correct; PRD caught up to the Spec. -->
+Note: PRD §568 patched 2026-05-24 (e884e62) per Q3 R1 audit lock — location confirmed as `aria-orchestrator/docs/layer-boundary-contract.md`. This file is Aria-specific and must NOT enter `standards/`. PRD §568 post-patch text and Spec #3 §B.4 are now in alignment.
 
 **Target file**: `/home/dev/Aria/aria-orchestrator/docs/layer-boundary-contract.md`
 
@@ -293,11 +354,15 @@ Update/create to reflect current state: Layer 1/2 architecture, M1-M5 shipped ca
 
 Post-check: `[ -f aria-orchestrator/README.md ] && grep -q "Layer 1" aria-orchestrator/README.md && exit 0`.
 
-##### B.6 — architecture-decisions.md AD-M5-11 slot claim (~0.5h + AD-M6-7/8 stubs)
+##### B.6 — architecture-decisions.md AD-M6-9 claim + AD-M6-7/8 stubs (~0.5h)
+
+<!-- R1-X-T4 fix: AD-M5-11 collision with M5-spillover scope discovered in R1 audit. Live architecture-decisions.md:3460-3478 reserves AD-M5-11 for "M5-spillover topics" (originally reserved for M6 spec drafter to back-fill M5 retroactive decisions). Spec #3 vacates AD-M5-11 claim per Q2 owner lock 2026-05-24. AD-M6-9 reserved instead for standards/autonomous/ namespace creation decision. -->
 
 **Target file**: `/home/dev/Aria/aria-orchestrator/docs/architecture-decisions.md`
 
-1. Claim AD-M5-11 RESERVED slot with the M6 docs architectural decision: document the `standards/autonomous/` namespace creation decision (Lab-shareable vs Aria-specific content boundary — why `layer-boundary-contract.md` goes in `aria-orchestrator/docs/` rather than `standards/`, and why `humanized-command-patterns.md` goes in `standards/autonomous/` rather than `aria-orch/`).
+Note: AD-M5-11 collision with M5-spillover scope discovered in R1 audit; Spec #3 vacates claim per Q2 owner lock 2026-05-24; AD-M6-9 reserved instead.
+
+1. Add **AD-M6-9** entry for the `standards/autonomous/` namespace creation decision (Lab-shareable vs Aria-specific content boundary — why `layer-boundary-contract.md` goes in `aria-orchestrator/docs/` rather than `standards/`, and why `humanized-command-patterns.md` goes in `standards/autonomous/` rather than `aria-orchestrator/evals/`). Do NOT edit AD-M5-11 (that slot is reserved for M5-spillover topics per its existing text at lines 3460-3480).
 2. Add stubs for AD-M6-7 (this Spec's state-checks probe design decision) and AD-M6-8 (reserve slot).
 
 ### Out of scope (explicit drops per DEC §3 + R3)
@@ -362,7 +427,7 @@ TG-DOCS-B (architecture, v2.0.1-deferrable):
     humanized-command-patterns.md
   aria-orchestrator/docs/layer-boundary-contract.md  ← new file (Aria-specific)
   aria-orchestrator/README.md  ← v2.0 update
-  aria-orchestrator/docs/architecture-decisions.md  ← AD-M5-11 claim + AD-M6-7/8 stubs
+  aria-orchestrator/docs/architecture-decisions.md  ← AD-M6-9 claim + AD-M6-7/8 stubs <!-- R1-X-T4 fix: AD-M5-11 → AD-M6-9 -->
   submodule pointer bump:
     git add standards  ← after standards feature branch lands on master
 ```
@@ -371,7 +436,7 @@ TG-DOCS-B (architecture, v2.0.1-deferrable):
 
 | ID | Topic | Decision |
 |----|-------|----------|
-| AD-M5-11 | standards/autonomous/ namespace creation | `standards/autonomous/` is created as a new subdirectory for Lab-shareable autonomous AI operation patterns. Files here are published under the standards submodule and reusable by other 10CG Lab projects. Aria-specific implementation contracts (like `layer-boundary-contract.md`) go in `aria-orchestrator/docs/` instead. Rationale: Lab-shareable patterns benefit from being in the shared standards submodule; Aria-specific contracts would pollute standards/ with Aria internals and create dependency issues for other projects importing standards. |
+| AD-M6-9 | standards/autonomous/ namespace creation | `standards/autonomous/` is created as a new subdirectory for Lab-shareable autonomous AI operation patterns. Files here are published under the standards submodule and reusable by other 10CG Lab projects. Aria-specific implementation contracts (like `layer-boundary-contract.md`) go in `aria-orchestrator/docs/` instead. Rationale: Lab-shareable patterns benefit from being in the shared standards submodule; Aria-specific contracts would pollute standards/ with Aria internals and create dependency issues for other projects importing standards. AD-M5-11 was vacated (M5-spillover scope collision, Q2 owner lock 2026-05-24 R1 audit). <!-- R1-X-T4 fix: AD-M5-11 → AD-M6-9 per Q2 owner lock 2026-05-24 --> |
 | AD-M6-7 | state-checks.yaml probe design (3-probe set) | Three probes address version-badge-match, claude-md-version, and arch-doc-stale. Severity = `warning` (non-blocking) to allow gradual adoption. Commands use standard POSIX tools (grep, date, python3) with no external dependencies. `enabled: true` even during pre-v2.0 window so state-scanner surfaces status proactively. |
 | AD-M6-8 | (Reserved — no topic assigned at Phase A) | RESERVED for Phase B decisions discovered during implementation. Per `[[feedback_ad_slot_backfill_checkpoint]]`: AD-M6-8 must be filled or explicitly retired before this Spec archives. |
 
@@ -383,6 +448,8 @@ All criteria are binary-falsifiable per `[[feedback_falsifiable_evidence_for_bin
 
 ### AC-1 — CLAUDE.md v2.0 content verified (TG-DOCS-A)
 
+<!-- R1-I3-1 fix: added Rule #1-#6 body freeze check (git diff based). Count-based check (grep -c "Rule #") is necessary but not sufficient — a rename attack could pass the count while modifying rule bodies. -->
+
 **Evidence**:
 ```bash
 grep -c "Rule #" CLAUDE.md  # must return ≥ 9 (Rules #1-#9 all present)
@@ -390,8 +457,10 @@ grep -q "**版本**: 2.0.0" CLAUDE.md  # Diff 9 version bump applied
 grep -q "两层 AI 分工" CLAUDE.md  # Diff 3 applied
 grep -q "Aria 2.0 运行时" CLAUDE.md  # Diff 7 chapter present
 grep -q "aria-orchestrator" CLAUDE.md  # Diff 4 table row present
+# Rule #1-#6 body freeze check (AD11 + Rule #9 extension: all rules frozen):
+git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-6]"  # must produce no output (R1-I3-1)
 ```
-All five commands exit 0.
+All six commands pass (first five exit 0; sixth produces no output).
 
 ### AC-2 — Release notes file exists + Plugin Compatibility section present (TG-DOCS-A)
 
@@ -406,18 +475,27 @@ All five commands exit 0.
 
 ### AC-3 — README.md badge and Aria 2.0 cross-link updated (TG-DOCS-A)
 
+<!-- R1-T3-3 fix: replaced hardcoded v1.27.0 with dynamic plugin.json read. Hardcoding is brittle — next plugin bump will silently fail this AC. DEC-20260524-001 v1.26.0 was draft-time snapshot; plugin.json SoT is authoritative. -->
+
 **Evidence**:
 ```bash
-grep -q "v1.27.0" README.md && grep -q "Aria 2.0" README.md && exit 0
+PLUGIN_VER=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")
+grep -qF "$PLUGIN_VER" README.md && grep -q "Aria 2.0" README.md && exit 0
 ```
-Plugin version badge must show v1.27.0 (matches `aria/.claude-plugin/plugin.json`).
+Plugin version badge must match the version in `aria/.claude-plugin/plugin.json` (current: v1.27.0 per `c7e611f` — but read dynamically, no hardcode). Plugin version SoT = `aria/.claude-plugin/plugin.json`; DEC-20260524-001 v1.26.0 was draft-time snapshot, dev-claude2 burndown shipped v1.27.0 same session.
 
 ### AC-4 — .aria/state-checks.yaml contains 3 new M6 probes (TG-DOCS-A)
 
+<!-- R1-I3-2 fix: `grep -c` counts total lines matching the pattern, not distinct probe names. If a probe description contains the name string, the count doubles. Replaced with per-probe name existence check using `grep -qF "name: \"${probe}\""` loop. Python YAML check is the authoritative gate. -->
+
 **Evidence**:
 ```bash
-grep -c "m6-version-badge-match\|m6-claude-md-version\|m6-arch-doc-stale" .aria/state-checks.yaml
-# must return 3 (exactly one match per probe name)
+# Per-probe name existence check (replaces fragile grep -c count):
+for probe in "m6-version-badge-match" "m6-claude-md-version" "m6-arch-doc-stale"; do
+  grep -qF "name: \"${probe}\"" .aria/state-checks.yaml || { echo "MISSING probe: $probe"; exit 1; }
+done
+echo "All 3 probe names present"
+# Python YAML structural check (authoritative gate):
 python3 -c "
 import yaml, sys
 data = yaml.safe_load(open('.aria/state-checks.yaml'))
@@ -442,16 +520,19 @@ sys.exit(1 if missing else 0)
 
 ### AC-6 — standards/autonomous/ 2 files exist with Lab-shareable headers and required cross-refs (TG-DOCS-B)
 
+<!-- R1-X-T1 fix: `aria-orch/evals/m6-prompt-quality` → `aria-orchestrator/evals/m6-prompt-quality` in cross-ref check. -->
+<!-- R1-X-T5 fix: `wc -l >= 200` proxy replaced with `grep -c "^### Pattern" >= 10` structural check. The line count proxy passes repetitive content; pattern count directly verifies the ≥10 curated samples requirement. -->
+
 **Evidence**:
 ```bash
 [ -f standards/autonomous/decision-autonomy-matrix.md ] \
   && [ -f standards/autonomous/humanized-command-patterns.md ] \
   && grep -q "Lab-shareable" standards/autonomous/decision-autonomy-matrix.md \
   && grep -q "Lab-shareable" standards/autonomous/humanized-command-patterns.md \
-  && grep -q "aria-orch/evals/m6-prompt-quality" standards/autonomous/humanized-command-patterns.md \
+  && grep -q "aria-orchestrator/evals/m6-prompt-quality" standards/autonomous/humanized-command-patterns.md \
   && exit 0
-# Minimum line count for humanized-command-patterns.md:
-[ $(wc -l < standards/autonomous/humanized-command-patterns.md) -ge 200 ] && exit 0
+# Structural check for ≥10 curated pattern sections (replaces wc -l proxy per X-T5):
+[ $(grep -c "^### Pattern" standards/autonomous/humanized-command-patterns.md) -ge 10 ] && exit 0
 ```
 
 ### AC-7 — layer-boundary-contract.md exists with cost.json schema pin (TG-DOCS-B)
@@ -489,14 +570,20 @@ print(probe['command'])
 # must exit 0 and print "OK age=<N>d" where N < 90
 ```
 
-### AC-10 — AD-M5-11 slot claimed and AD-M6-7/8 documented (TG-DOCS-B)
+### AC-10 — AD-M6-9 claimed and AD-M6-7/8 documented (TG-DOCS-B)
+
+<!-- R1-X-T4 fix: AC-10 originally verified AD-M5-11 was "claimed". Per Q2 owner lock, Spec #3 vacates AD-M5-11 and uses AD-M6-9 instead. AC-10 now verifies AD-M6-9 presence (the new namespace creation decision) plus AD-M6-7/8 stubs. AD-M5-11 must remain as RESERVED/M5-spillover in architecture-decisions.md (Spec #3 does NOT overwrite it). -->
 
 **Evidence**:
 ```bash
-grep -q "AD-M5-11" aria-orchestrator/docs/architecture-decisions.md \
+grep -q "AD-M6-9" aria-orchestrator/docs/architecture-decisions.md \
   && grep -q "standards/autonomous" aria-orchestrator/docs/architecture-decisions.md \
   && grep -q "AD-M6-7" aria-orchestrator/docs/architecture-decisions.md \
   && grep -q "AD-M6-8" aria-orchestrator/docs/architecture-decisions.md \
+  && exit 0
+# Verify AD-M5-11 is still present and NOT overwritten (it belongs to M5-spillover):
+grep -q "AD-M5-11" aria-orchestrator/docs/architecture-decisions.md \
+  && grep -q "Reserved slot\|RESERVED" aria-orchestrator/docs/architecture-decisions.md \
   && exit 0
 ```
 
@@ -508,7 +595,7 @@ grep -q "AD-M5-11" aria-orchestrator/docs/architecture-decisions.md \
 |----|------|----------|------------|
 | R-M6D-1 | CLAUDE.md Diff 6 accidentally modifies Rule #1-#6 text (AD11 violation) | High | After writing CLAUDE.md v2.0, run `git diff HEAD -- CLAUDE.md` and verify Rules #1-#6 lines are unchanged. AC-1 `grep -c "Rule #"` count ≥ 9 is a necessary but not sufficient check — also verify line-for-line identity on the 6 rule bodies. |
 | R-M6D-2 | standards/ submodule pointer drift: feature branch merged in submodule but main Aria pointer not bumped | Medium | Per `[[feedback_submodule_regression_pitfall]]`: after standards branch lands on master, explicitly run `git -C standards pull && git add standards && git commit`. T-B3-0 runbook enforces this. |
-| R-M6D-3 | humanized-command-patterns.md content duplicated in Spec #2 TG-C corpus (BOTH-locations boundary violation) | Medium | P-11 content boundary is explicit: standards/ file = curated patterns + rubric guide; aria-orch/evals/ file = raw corpus samples. Cross-references point to each other. Enforced via header comment in both files. |
+| R-M6D-3 | humanized-command-patterns.md content duplicated in Spec #2 TG-C corpus (BOTH-locations boundary violation) | Medium | P-11 content boundary is explicit: standards/ file = curated patterns + rubric guide; `aria-orchestrator/evals/` file = raw corpus samples. Cross-references point to each other. Enforced via header comment in both files. <!-- R1-X-T1 fix: aria-orch/ → aria-orchestrator/ --> |
 | R-M6D-4 | state-checks.yaml Probe 1 (badge match) fails immediately after AC-3 (README badge update) if there is a version mismatch between badge and plugin.json | Low | Probe 1 is designed to expose real drift. If it fails after the update, it means the badge update itself is wrong. Bug-hunt requirement: test probe against PASS case (badge = plugin.json) and FAIL case (mismatch) before commit. |
 | R-M6D-5 | layer-boundary-contract.md accidentally placed in standards/ violating km M-km-R2-005 | Medium | File header enforcement + tasks.md T-B4 explicit path. AC-7 evidence checks for `aria-orchestrator/docs/` path (file existence at that path). |
 | R-M6D-6 | TG-DOCS-B v2.0.1 slip causes state-checks.yaml Probe 3 (arch-doc-stale) to fire continuously during v2.0.0 window | Low | Probe 3 severity=warning (non-blocking). If TG-DOCS-B slips, state-scanner reports the staleness as advisory only. AC-9 verification is deferred to TG-DOCS-B completion. |
@@ -539,7 +626,7 @@ TG-DOCS-B (architecture, v2.0.1-deferrable):
        incl. B.3.2 humanized-command-patterns.md ≥10 samples         (~2h)
   B.4  aria-orchestrator/docs/layer-boundary-contract.md (new)       ~3h
   B.5  aria-orchestrator/README v2.0                                  ~0.5h (collapsed into B.4 pass)
-  B.6  architecture-decisions.md AD-M5-11 claim + stubs              ~0.5h
+  B.6  architecture-decisions.md AD-M6-9 claim + AD-M6-7/8 stubs     ~0.5h <!-- R1-X-T4 fix: AD-M5-11 → AD-M6-9 -->
   ─────────────────────────────────────────────────────────────────────
   TG-DOCS-B subtotal                                                  ~22h
 
@@ -557,7 +644,7 @@ Owner manual action (post-ship, not in B.2):
 | Dependency | Direction | Notes |
 |------------|-----------|-------|
 | Spec #1 cost.json schema (`c29a800`) | Upstream (locked) | B.4 `layer-boundary-contract.md` documents this schema but does NOT modify it. Schema is frozen. |
-| Spec #2 TG-C corpus path `aria-orch/evals/m6-prompt-quality/` | Cross-reference | B.3.2 cross-refs this path. If Spec #2 changes the corpus path, B.3.2 must be updated. Coordinate with backend-architect. |
+| Spec #2 TG-C corpus path `aria-orchestrator/evals/m6-prompt-quality/` | Cross-reference | B.3.2 cross-refs this path. If Spec #2 changes the corpus path, B.3.2 must be updated. Coordinate with backend-architect. <!-- R1-X-T1 fix: aria-orch/ → aria-orchestrator/ --> |
 | `aria-orchestrator/docs/claude-md-revision-draft.md` | Upstream (existing draft) | A.1 consumes diffs 1-8 from this file. |
 | `aria/.claude-plugin/plugin.json` | Upstream (read-only) | A.3 and Probe 1 read the version field for badge verification. |
 | Spec #4 `aria-2.0-m6-release-closeout` | Downstream | Spec #4 gates on CLAUDE.md v2.0 (AC-1) + state-checks probes (AC-4) from this Spec. |
@@ -578,11 +665,13 @@ Owner manual action (post-ship, not in B.2):
 
 **Decisions**:
 - [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) — DEC-20260524-001 §2 Spec #3 scope + §4 P-10..P-13 (source-of-truth)
+- [.aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md](../../../.aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md) — DEC-20260524-002 Aria #124: v1.29.0 block-mode gate; T-B0.10 precondition source (X-T2 fix) <!-- R1-X-T2 fix: added DEC-20260524-002 cross-ref per Q5 owner pre-decision -->
 
 **PRD references**:
-- [docs/requirements/prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) — M6 scope (Week 26-30, ~82h total, post `a786444`)
-- PRD §553 — decision autonomy matrix rationale
-- PRD §639 — humanized command rubric
+- [docs/requirements/prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) — M6 scope (Week 26-30, ~82h total, post `a786444` + `e884e62` patches)
+- PRD §567-568 (post `e884e62`) — layer-boundary-contract.md location confirmed as `aria-orchestrator/docs/` (T3-5 Q3 lock)
+- PRD §639 (content ref) — humanized command rubric, 7 dimensions D1-D7
+- PRD §656 (post `e884e62`) — rubric scoring metric patched to median (Q4 lock 2026-05-24)
 
 **Memory entries**:
 - `[[feedback_pre_draft_bug_hunt_discipline]]` — P-12 probe scripts bug-hunted against PASS/FAIL before commit
@@ -593,3 +682,4 @@ Owner manual action (post-ship, not in B.2):
 - `[[feedback_clear_cache_before_code_change]]` — M6 release verification preflight: clear plugin cache before CLAUDE.md v2.0 testing
 - `[[feedback_submodule_regression_pitfall]]` — concurrent Spec landing + submodule pointer bump discipline
 - `[[feedback_ad_slot_backfill_checkpoint]]` — AD-M6-8 must be filled or retired before Spec archives
+- `[[feedback_audit_driven_fix_conventions]]` — R1 fix-trail: inline `<!-- R1-T3-X fix: ... -->` and `<!-- R1-X-TN fix: ... -->` trace applied throughout this file
