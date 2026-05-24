@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session — Track E follow-ups #16+#17 (2026-05-24 ~11:50 UTC) — ✅ **aria-orch PR #18 SHIPPED**
+## ★ 最新 session — Aria #124 Spec APPROVED + Track E follow-ups SHIPPED (2026-05-24 ~16:15 UTC, ~6h cumulative)
 
-**Latest**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E follow-up #16 (JOB_NAME `aria-runner-template` → `aria-layer2-runner` 7 refs in scripts/) + #17 (AD-M1-8 PAT scope 4 → canonical 7-scope set + per-scope evidence table) bundled in aria-orch PR #18 (merge SHA `0ce52b9`) + main Aria submodule pointer bump (`c8a5f03`) + 3-way SHA parity verified;1h micro-cycle;0 new memory;**M6 Phase A.1 仍 blocked on owner PRD 2 patches (Track F §2 inherit)** (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+**Latest**: [2026-05-24-aria-124-spec-approved-phase-b-ready.md](./2026-05-24-aria-124-spec-approved-phase-b-ready.md) — 2 cycles this session: (a) Track E follow-ups #16+#17 fully SHIPPED Phase A→D ~1h (aria-orch PR #18 `0ce52b9` + main Aria bump `c8a5f03`); (b) Aria #124 submodule pointer regression gate brainstorm CONVERGED + Phase A.1 Spec drafted + Phase A.2 R1 4-agent audit (4C+19I+20M PASS_WITH_WARNINGS 4/4) + Rev1 + R2 3-agent audit (**3/3 unanimous CONVERGED + 0 new Critical**) = **Spec APPROVED**。Brainstorm pattern: R2 双反转(tech-lead + code-reviewer mutual concession)+ ai-engineer R2 neutral 3rd path (B+) hardened + measured tripwire unified anchor + 4/4 R3 ACCEPT_R3。Carry-forward: Phase B+C+D ~12h to next session(s)。3 concurrent push races resolved cleanly via `pull --rebase`。6-way SHA parity 全 verified。0 new memory (4 candidates deferred to Phase D D.3 per discipline)。 **M6 仍 blocked on owner PRD 2 patches (Track F inherit)** (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+
+## ★ 前 session #1 — Track E follow-ups (2026-05-24 ~11:50 UTC, intra-session predecessor, ~1h)
+
+**Sister**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E follow-up #16 (JOB_NAME `aria-runner-template` → `aria-layer2-runner` 7 refs in scripts/) + #17 (AD-M1-8 PAT scope 4 → canonical 7-scope set + per-scope evidence table) bundled in aria-orch PR #18 (merge SHA `0ce52b9`) + main Aria submodule pointer bump (`c8a5f03`) + 3-way SHA parity verified;1h micro-cycle;0 new memory
 
 ## ★ 前 session (2026-05-24 ~00:45 UTC) — 🎉 **M6 (US-026) Brainstorm CONVERGED**
 
