@@ -1,0 +1,9 @@
+claimed_at: '2026-05-24T16:59:24Z'
+container: bfe8285d
+heartbeat_at: '2026-05-24T16:59:24Z'
+owner: simonfish
+phase: B.1
+schema_version: '1'
+session: s-468d@1659
+status: active
+track_id: aria-submodule-pointer-regression-gate
