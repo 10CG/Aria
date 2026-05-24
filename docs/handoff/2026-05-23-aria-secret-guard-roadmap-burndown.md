@@ -3,7 +3,7 @@ track-id: aria-secret-guard-roadmap-burndown
 owner-container: dev-claude2
 phase: D.3
 status: done
-updated-at: 2026-05-24T00:53:00Z
+updated-at: 2026-05-24T01:15:00Z
 ---
 
 # Aria — Session Handoff (2026-05-23 ~23:39 UTC) — aria-secret-guard v1.24.0 roadmap burndown SHIPPED + 3-repo branch hygiene (O3 + O4 + O5 + O6 + cleanup = 4 micro-cycles + repo hygiene)
@@ -259,17 +259,68 @@ Local non-master branch count post-cleanup: **0 / 0 / 0** across all 3 repos。
 
 ## §8 Memory entries this session
 
-### Confirmed: **0 new entries**
+### Confirmed: **1 new entry** (added during session-end audit 2026-05-24)
 
-本 session 4 个 cycles 都复用既有 memory patterns。Mid-iteration bugs 都 inline 文档化在 `aria/hooks/secret-guard.sh` 警示后人:
-- IFS=$'\t' empty-field collapse(注释 in v1.26.0 secret-guard.sh ~line 105 `readarray -t` 块上方)
-- jq `.tool_name | type, X, Y, Z` precedence bug(注释 in 同一处,加括号示例)
+| File | Type | Theme |
+|------|------|-------|
+| `feedback_bash_hook_perf_subprocess_fork_dominates.md` | feedback | Bash hook perf 真 hotspot = subprocess fork in tight loops (~3ms × ~100 patterns = ~300ms), 不是 interpreter/jq startup (warm cache);`echo \| grep -qE` × N → `[[ =~ $pat ]]` builtin (POSIX ERE 兼容, 0 fork) = 4-5× speedup;**永远 profile 再优化**(wrong-hypothesis cost compounds — 本 session O3 起初 hypothesis "28 jq calls 是 hotspot" 实测错,真实主体是 100-pattern echo\|grep loop);2026-05-24 v1.26.0 实证 p95 337→76ms (-77%)。Cross-cycle value: 任何未来 Aria/SilkNode/Aether 生态 bash hook 优化均适用。 |
 
-**不写 memory 的理由**: 两个 bug 都是 secret-guard.sh local idiom,非 cross-cycle / cross-project value。inline 注释足以警示直接修这个文件的人。Memory 写"jq operator precedence"或"bash IFS tab quirk"会过于泛化(任何人 jq/bash 用户都该知道,写在 memory 反而稀释 Aria-specific 价值)。
+Indexed in `MEMORY.md` Feedback section。
+
+### Not promoted to memory (deliberate)
+
+- **`IFS=$'\t' read @tsv` empty-field collapse**(v1.26.0 mid-iteration bug)— inline 文档化在 `aria/hooks/secret-guard.sh` ~line 105 `readarray -t` 块上方
+- **jq query precedence `.x | type, A, B, C`**(v1.26.0 mid-iteration bug)— 同位置 inline 警告
+- **Reason**: 两 bug 都是 secret-guard.sh local idiom,非 cross-cycle value;泛化版本(jq/bash 通用知识)会稀释 Aria-specific memory 价值;inline 注释足以警示直接修这个文件的人
 
 ### Reused / reinforced
 
-7 个 memory entries 见 §4。
+7 既有 memory entries 见 §4。
+
+---
+
+## §9 Session-end audit (2026-05-24T00:53Z+, user-initiated 4-question review)
+
+User-issued 4-question audit at session close:
+
+### Q1: Unfinished tasks/discussions?
+**Answer: NONE actionable in this session.**
+- 6/9 v1.24.0 roadmap items closed (O3+O4+O5(4/5)+O6+O7+O8)
+- Remaining (all **explicitly deferred** in §2 + §6,non-blocking):
+  - O1 SilkNode P2.5(owner-gated,deadline 2026-05-30 剩 6 天)
+  - O2 P3 escalation(conditional on O1 expire)
+  - O5 尾巴 7 cosmetic minors(low value,~15min)
+  - O9 PreToolUse Write content scan(v1.27.x scope ~3h)
+  - Polish 30 `echo|grep` → `=~` 转换(low marginal value,~1h)
+- TaskList: empty(0 active task)
+- Working tree: clean,0 uncommitted
+- Open Aria issues unrelated to this session(#5/#32/#54/#58/#59/#79/#95/#104/#120/#124)= prior backlog,not session work
+
+### Q2: Lessons worth memorializing not yet captured?
+**Answer: 1 — written + indexed in §8 above.**
+- `feedback_bash_hook_perf_subprocess_fork_dominates` (cross-cycle valuable: 主要 bash hook 优化 idiom)
+- Other findings (IFS empty-collapse / jq precedence) intentionally inline-only per cross-cycle value threshold
+- v1.X.0 roadmap burndown release cadence pattern — deemed process observation,not novel idiom worth memorizing (5+1 SOT bump + multi-remote push patterns already covered by existing memory entries `feedback_release_phase_d_5_files_synchronization` + `feedback_sequenced_multirepo_gitlink_bump`)
+
+### Q3: Aria 4-dimension update status (UPM / US / Spec / PRD)?
+**Answer: All 4 correctly NOT updated (N/A scope verified).**
+
+| Dimension | Status | Why N/A |
+|-----------|--------|---------|
+| **UPM** | N/A by design | Aria 自身无 UPM per memory `project_aria_no_runtime_upm` (methodology project) |
+| **User Stories** | N/A by scope | Plugin-internal hygiene + perf optimization; no user-facing feature to map to a US. No new US created, no existing US updated. |
+| **OpenSpec** | N/A correctly | Parent spec `aria-secret-guard-plugin-default` archived at v1.24.0 ship (Track D). 4 micro-releases v1.24.1/v1.24.2/v1.25.0/v1.26.0 + v1.27.0 all Level 1 hotfix scope per CLAUDE.md (无需 OpenSpec)。Active changes count = 0 ✓。 |
+| **PRD** | N/A by scope | PRD v2.0 Approved (per CLAUDE.md project status). This session's plugin-internal patches don't impact PRD scope. No PRD edits made. |
+
+**No accidental drift detected**:dimension updates that *should* have happened but didn't = none。
+
+### Q4: Session closeout
+- ✅ TaskList empty
+- ✅ Burndown handoff updated through O8 + this §9 audit
+- ✅ latest.md pointer correctly surfaces burndown(via Phase 1.15 collector pointer)
+- ✅ 1 new memory entry indexed in MEMORY.md
+- ✅ 3-way SHA parity verified at every release
+- 待: final state-scanner verification(本 §9 commit 后)
 
 ---
 
