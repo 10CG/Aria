@@ -1,7 +1,7 @@
 # aria-submodule-pointer-regression-gate — Phase C.2.4.5 (B+) hardened pre-merge gate
 
 > **Level**: 3 (Full — Skill behavior change + replay test fixtures + convention doc + 2-phase rollout + tripwire mechanism)
-> **Status**: **Draft (Rev1)** (Phase A.2 R1 audit complete → 4 Critical + 19 Important addressed in Rev1; awaiting R2)
+> **Status**: ✅ **Approved** (Phase A.2 CONVERGED 2026-05-24 via R2 unanimous 3/3 CONVERGED + 0 new Critical; ready for Phase A.3 → Phase B.1)
 > **Change ID**: `aria-submodule-pointer-regression-gate`
 > **Parent Forgejo issue**: [Aria #124](https://forgejo.10cg.pub/10CG/Aria/issues/124)
 > **Source incident**: 2026-05-23 PR #123 silent submodule pointer regression (commit `6fea5d7`) caught by post-merge audit + fast-forward fix `a8e0096`
@@ -18,8 +18,8 @@
 > **Audit trajectory** (R1 audit completed 2026-05-24T~14:59Z):
 >   - **Phase A.2 R1** (2026-05-24, 4-agent parallel: tech-lead + backend-architect + qa + knowledge-manager): **PASS_WITH_WARNINGS 4/4 unanimous** — 4 Critical + 19 Important + 20 Minor. Aggregate report: `.aria/audit-reports/post_spec-R1-2026-05-24T1459Z-aria-submodule-pointer-regression-gate.md`
 >   - **Phase A.2 Rev1 applied** (2026-05-24, this commit): 4 Critical (C-tl-1 numbering / C-tl-2 placement / C-tl-3 tripwire location / C-km-1 memory refs) + ~10 Important addressed inline
->   - **Phase A.2 R2** (pending): expected 3-4 agent validate Rev1 — convergence target per `feedback_post_spec_audit_pragmatic_convergence` = unanimous PASS_WITH_WARNINGS + 0 new Critical
->   - **CONVERGED** (pending R2)
+>   - **Phase A.2 R2** (2026-05-24T~15:15Z, 3-agent parallel: tech-lead + qa + code-reviewer-NEW): **CONVERGED 3/3 unanimous** — all 4 R1 Critical CLOSED + 11 new Minor (all cosmetic / spec polish / batch-fixable Phase B.1). Aggregate report: `.aria/audit-reports/post_spec-R2-2026-05-24T1515Z-aria-submodule-pointer-regression-gate.md`
+>   - ✅ **CONVERGED** 2026-05-24 — per `feedback_post_spec_audit_pragmatic_convergence` 收敛准则 (unanimous + verdict 改善 + 无振荡 + 0 new Critical) + Level 2/3 pragmatic baseline (R1→R2 unanimous, no R3 needed)
 
 ---
 
