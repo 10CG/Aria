@@ -7,7 +7,7 @@
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)
 > **Predecessor Spec**: [aria-2.0-m5-replay-reconciler-drift-review-loop-audit](../../archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/proposal.md) (M5 archived 2026-05-23)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2, CONVERGED 2026-05-24)
-> **Effort baseline**: ~13h (updated from ~10h after R1 adds T3.7/T3.8 + T4.5/T4.6 + T5.11; see §Effort baseline)
+> **Effort baseline**: ~12h impl (updated from ~10h after R1 adds T3.7/T3.8 + T4.5/T4.6 + T5.11; see §Effort baseline). R1/R2 audit cycle adds ~1h review overhead (not impl) — single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`; <!-- R2-cr-I1 fix: effort SoT unified to ~12h impl across frontmatter / §What / §Effort baseline / tasks.md -->.
 > **abi_compat hard constraints**: 5 forward-binding promises from m5-handoff.yaml (validate-m6-handoff.py must cross-check all 5; source: `aria-orchestrator/docs/m5-handoff.yaml` line 151-172)
 >   1. `dispatch_audit_log_immutable_promise` (line 152-155, AD-M5-8)
 >   2. `rework_round_cap_default_3_promise` (line 156-159, AD-M5-2)
@@ -60,7 +60,7 @@ owner must manually run the cron daily for ≥3 days before Spec #2 kickoff (per
 
 ## What
 
-### In scope (~13h)
+### In scope (~12h impl)
 
 #### A. Dual-row cost.json schema (2h)
 
@@ -229,8 +229,14 @@ A new `aria-orchestrator/docs/validate-m6-handoff.py` script (sibling to `valida
 that cross-checks all 5 m5-handoff.yaml abi_compat promises are still honoured in the codebase.
 
 <!-- R1-C3 fix: all grep targets use absolute repo-relative paths (REPO_ROOT resolution pattern) -->
-The script resolves paths using `REPO_ROOT = Path(__file__).parent.parent.parent` (mirrors
-`validate-m5-handoff.py::REPO_ROOT` resolution). All file targets use absolute paths:
+<!-- R2-C-tl-N1 fix: REPO_ROOT off-by-1 corrected — mirrors validate-m5-handoff.py:40-41 line-for-line (HERE.parent, NOT .parent.parent.parent) -->
+The script resolves paths using the canonical sibling pattern (line-for-line mirror of
+`aria-orchestrator/docs/validate-m5-handoff.py:40-41`):
+```python
+HERE = Path(__file__).resolve().parent      # → aria-orchestrator/docs/
+REPO_ROOT = HERE.parent                     # → aria-orchestrator/  (NOT main repo root /home/dev/Aria/)
+```
+All file targets use absolute paths anchored at `aria-orchestrator/`:
 - Python sources: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / "*.py"`
 - SQL migrations: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "migrations" / "*.sql"`
 - Schema: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / "schema.sql"`
@@ -456,6 +462,25 @@ print('PASS')
 ```
 Must print `PASS` without assertion errors.
 
+### AC-2b — No orphaned NULL `provider_cost_model` rows
+
+<!-- R2-ai-NI-1 fix: NULL provider_cost_model rows would be silently excluded from both metered + subscription_flat aggregates -->
+
+The dispatches table MUST NOT contain rows with `provider_cost_model IS NULL` (M2 migration 002
+backfilled historical rows to `subscription_flat`; new inserts always set provider_cost_model).
+Such rows would be invisible to AC-2's `WHERE provider_cost_model='metered'` and
+`WHERE provider_cost_model='subscription_flat'` aggregates, silently under-counting cost.
+
+Evidence (binary-falsifiable):
+```sql
+SELECT COUNT(*) AS orphan_rows
+FROM dispatches
+WHERE provider_cost_model IS NULL;
+-- Must return 0. Non-zero → exit 1 (data integrity violation, manual investigation required)
+```
+Acceptance script reports `[FAIL: AC-2b] orphaned rows=N` with the offending dispatch_ids surfaced
+for owner triage (per `[[feedback_falsifiable_evidence_for_binary_acceptance]]`).
+
 ### AC-3 — Luxeno=0 false-positive prevention
 
 <!-- R1-C2 fix: AC-3 now asserts the snapshot script's transformation (null guard in code), not the schema column -->
@@ -617,8 +642,11 @@ Total (AI-implementable)                                         ~11.5h ≈ 12h
 ```
 
 R1 delta: +~2h from original ~10h. Sources: D +1h (T3.7/T3.8 volume floor), E +0.5h (T4.5/T4.6),
-F +0.5h (T5.11 pricing freshness). Revised baseline: **~12h** (conservatively **~13h** with R1 review
-integration overhead). Documented per `[[feedback_phase_budget_compounding]]`.
+F +0.5h (T5.11 pricing freshness). **Implementation baseline: ~12h** (single SoT; cited identically
+in frontmatter line 10 + tasks.md line 7 + this section). R1/R2 audit review overhead ~1h is tracked
+separately (audit-engine cost, not Phase B implementation). Documented per
+`[[feedback_phase_budget_compounding]]` + `[[feedback_spec_v2_body_propagation_2pass]]`.
+<!-- R2-cr-I1 fix: effort SoT unified to ~12h impl; removed "~13h conservatively" weasel that drifted across surfaces -->.
 
 Owner manual action (post-ship, not in B.2):
   - Set .aria/config.json thresholds

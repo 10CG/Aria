@@ -29,8 +29,10 @@
 <!-- R1-I-6 fix: atomic write also for archive copy -->
 <!-- R1-C3 fix: absolute repo-relative paths specified; REPO_ROOT resolution pattern -->
 <!-- R1-C8 fix: script is .py throughout -->
+<!-- R2-C-tl-N1 fix: REPO_ROOT off-by-1 corrected — HERE.parent (2 levels), NOT .parent.parent.parent -->
 - [ ] 1.1 Design and implement snapshot script `aria-orchestrator/acceptance/m6-cost-snapshot.py`:
-  - Resolve `REPO_ROOT = Path(__file__).parent.parent.parent` (mirrors `validate-m5-handoff.py::REPO_ROOT`).
+  - Resolve `HERE = Path(__file__).resolve().parent; REPO_ROOT = HERE.parent` (anchors at `aria-orchestrator/`,
+    mirrors `validate-m5-handoff.py:40-41` line-for-line; `__file__` is at `aria-orchestrator/acceptance/`).
   - Query SQLite dispatches table at `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / "aria_layer1.db"`
     (or configured path): `SUM(token_cost_usd) WHERE provider_cost_model='metered' AND created_at > datetime('now', '-30 days')`.
   - Cast aggregate to float explicitly: `float(cursor.fetchone()[0] or 0.0)`.
@@ -179,6 +181,13 @@
   exit 2, `[ERROR] AC-0: JSON parse error: .aria/cost.json`.
   <!-- R1-I-2 fix: T4.6 corrupt JSON → exit 2 test -->
 
+<!-- R2-ai-NI-1 fix: AC-2b orphan provider_cost_model check + test -->
+- [ ] 4.7 Implement AC-2b orphan-rows check in `check-m6-cost-acceptance.py`:
+  `SELECT COUNT(*), GROUP_CONCAT(dispatch_id) FROM dispatches WHERE provider_cost_model IS NULL`.
+  If count > 0 → `[FAIL: AC-2b] orphaned rows=N (ids: ...)` + exit 1.
+- [ ] 4.8 Unit test (R2-NI-1): fixture DB with 1 NULL `provider_cost_model` row → exit 1 +
+  `[FAIL: AC-2b]` in stdout; fixture with 0 NULL rows → AC-2b PASS.
+
 ---
 
 ## T-validate — validate-m6-handoff.py (5 abi_compat + P-2 + P-3 + pricing freshness + 3-day history) (~3h)
@@ -187,7 +196,10 @@
 - [ ] 5.1 Create `aria-orchestrator/docs/validate-m6-handoff.py` (sibling to `validate-m5-handoff.py`)
   with CLI interface: `python3 validate-m6-handoff.py [-v]` runs all checks; individual check flags:
   `--check-abi-compat`, `--check-cost-method-enum`, `--check-3-day-history`, `--check-pricing-freshness`.
-  Resolve `REPO_ROOT = Path(__file__).parent.parent.parent`; all file access uses absolute paths:
+  <!-- R2-C-tl-N1 fix: REPO_ROOT off-by-1 corrected — HERE.parent (2 levels), NOT .parent.parent.parent -->
+  Resolve `HERE = Path(__file__).resolve().parent; REPO_ROOT = HERE.parent` (anchors at
+  `aria-orchestrator/`, mirrors `validate-m5-handoff.py:40-41` line-for-line; `__file__` is at
+  `aria-orchestrator/docs/`). All file access uses absolute paths:
   `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / <file>`
   and `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "migrations" / <file>`.
 
