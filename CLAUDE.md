@@ -16,6 +16,16 @@
 **README.md** = "用户如何使用 Aria"
 **CLAUDE.md** = "AI 如何理解 Aria 项目"
 
+## 工作语言
+
+**Aria 工作语言 = 中文**。AI 助手与 owner 对话默认中文叙述,不要大量中英混杂。
+
+**保留英文**(技术 token,翻译反而损害清晰度): 代码 / 命令 / 文件路径 / git SHA / branch / PR# / 版本号 / commit message / spec 术语 (Phase A.1 / Rule #7 / OpenSpec / Layer L / Q-NEW etc.) / 工具/Skill/Agent 名 / memory 引用。
+
+**用中文**: 叙述 / 解释 / 进度更新 / 建议 / 风险说明 / 询问 (含 AskUserQuestion options) / handoff prose 段落 / audit verdict 判定。
+
+详细 do/don't + 实证: memory `user_chinese_conversation_default`。
+
 ---
 
 ## 项目定位
