@@ -36,8 +36,8 @@
 - [ ] T-A1.3 Apply Diff 3: add §两层 AI 分工 subsection after §十步循环 (live CLAUDE.md ~line 66). Max 20 lines. Layer 1: Hermes + Luxeno-routed GLM models = PM role. Layer 2: aria-runner + CC + aria-plugin = engineering role. Cross-link AD1 + AD6. <!-- R1-I3-4 fix: "Hermes + GLM" → "Hermes + Luxeno-routed GLM models" per 2026-05-21 redirect -->
 - [ ] T-A1.4 Apply Diff 4: add `aria-orchestrator/` row to §子模块职责 table. Add two §目录导航 entries (architecture-decisions.md + layer-boundary-contract.md).
 - [ ] T-A1.5 Apply Diff 5: add `✅ 实现 (v2.0)` line to §技术约束. Add clarifying v2.0 exception paragraph.
-- [ ] T-A1.6 Apply Diff 6 (NO-OP): verify Rules #1-#6 text is UNCHANGED. Run `git diff HEAD -- CLAUDE.md | grep "^[-+]" | grep -E "规则 #[1-6]"` and confirm no deletions or modifications to rule bodies. If any diff appears on rule bodies, ABORT and investigate.
-- [ ] T-A1.7 Apply Diff 7: add §Aria 2.0 运行时 chapter after §不可协商规则. Strictly ≤50 lines. Include: 分层叙述 (3-line ASCII), 与 6 条规则的关系 (table or list), 人类参与点 (S7), 详细入口 (4 cross-links).
+- [ ] T-A1.6 Apply Diff 6 (NO-OP): verify Rules #1-#9 text is UNCHANGED. Run `git diff HEAD -- CLAUDE.md | grep "^[-+]" | grep -E "规则 #[1-9]"` and confirm no deletions or modifications to rule bodies. If any diff appears on rule bodies, ABORT and investigate.
+- [ ] T-A1.7 Apply Diff 7: add §Aria 2.0 运行时 chapter after §不可协商规则. Strictly ≤50 lines. Include: 分层叙述 (3-line ASCII), 与 9 条规则的关系 (table or list), 人类参与点 (S7), 详细入口 (4 cross-links).
 - [ ] T-A1.8 Apply Diff 8: update §项目状态. Set: 当前阶段 = "v2.0 M6 执行中 (M1-M5 shipped)". 成熟度 = 0.9. 插件版本 = actual value from `aria/.claude-plugin/plugin.json`. 主项目版本 = v1.7.0. Add 运行时版本 line. Update 更新 date at bottom.
 - [ ] T-A1.9 Apply Diff 9 (incremental): bump `**版本**: 1.0.4` → `**版本**: 2.0.0`. Update §项目状态 `插件版本:` field — live CLAUDE.md line ~434 shows `v1.22.0` (stale); read current value dynamically: `python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])"` and update to match (no hardcode). Verify Rule #7/#8/#9 body text is already present (no edit needed — they are already in live CLAUDE.md). Verify `phase_c_integrator.pre_merge_gate.no_aether_fallback` field name in Rule #8 matches `config.template.json`. Verify Rule #9 §2.3 cites `aria-plugin v1.22.x+` (already present; no edit if correct). <!-- R1-T3-3 fix: dynamic plugin.json read for §項目状態 version update; live CLAUDE.md shows v1.22.0 (stale vs v1.27.0 plugin.json SoT) -->
 
@@ -48,8 +48,8 @@ grep -q "**版本**: 2.0.0" CLAUDE.md  # → exit 0
 grep -q "两层 AI 分工" CLAUDE.md  # → exit 0
 grep -q "Aria 2.0 运行时" CLAUDE.md  # → exit 0
 grep -q "aria-orchestrator" CLAUDE.md  # → exit 0
-# Rule #1-#6 body freeze check (R1-I3-1 addition):
-git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-6]"  # → must produce NO output
+# Rule #1-#9 body freeze check (R1-I3-1 addition):
+git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-9]"  # → must produce NO output
 ```
 
 **AD11 compliance check (mandatory before next task)**:
@@ -194,13 +194,22 @@ sys.exit(1 if missing else 0)
   ```bash
   # Fetch to ensure origin/master ref is fresh (fail-loud — do not grep success patterns):
   git -C standards fetch origin master
-  # Verify standards feature branch is strict ancestor of master post-merge:
+  # <!-- R3-NC-tl-R2-2 fix: merge-base --is-ancestor args swapped to match DEC-20260524-002 SoT.
+  #                       Previous version had args inverted (FEATURE→MASTER exit 0 actually means REGRESSION per
+  #                       aria-submodule-pointer-regression-gate/tasks.md:86-87 canonical). Replaced single-call gate
+  #                       with 3-zone branching (PASS forward / REGRESSION / DIVERGENT) for unambiguous semantics. -->
+  # Verify master pointer is ancestor of feature pointer (forward bump = feature CONTAINS master's old point):
   MASTER_PTR=$(git -C standards rev-parse origin/master)
   FEATURE_PTR=$(git -C standards rev-parse HEAD)
-  git -C standards merge-base --is-ancestor "$FEATURE_PTR" "$MASTER_PTR"
-  # exit 0 = forward/ancestor relationship confirmed (safe to bump)
-  # exit 1 = regression or divergence → ABORT and investigate
-  echo "Gate PASS: standards branch is ancestor of master at $MASTER_PTR"
+  if git -C standards merge-base --is-ancestor "$MASTER_PTR" "$FEATURE_PTR"; then
+    echo "Gate PASS: master pointer $MASTER_PTR is ancestor of feature pointer $FEATURE_PTR (forward bump safe)"
+  elif git -C standards merge-base --is-ancestor "$FEATURE_PTR" "$MASTER_PTR"; then
+    echo "Gate FAIL: REGRESSION — feature pointer $FEATURE_PTR is ancestor of master $MASTER_PTR (would roll back)"
+    exit 1
+  else
+    echo "Gate FAIL: DIVERGENT — feature pointer $FEATURE_PTR and master $MASTER_PTR have no ancestor relation (history rewritten or sibling branches)"
+    exit 1
+  fi
   ```
   Cross-ref: DEC-20260524-002 `.aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md` §4 (B+) pre-merge gate design. This is the v1.29.0 block-mode precondition applied to standards submodule operations.
   Then stage:
@@ -500,6 +509,6 @@ grep -q "AD-M6-9" aria-orchestrator/docs/architecture-decisions.md \
 - [ ] AD-M6-8 is either filled with a real decision topic OR explicitly retired with justification. Not RESERVED.
 - [ ] standards/ submodule is on `master` branch: `git -C standards branch --show-current` → `master`.
 - [ ] Main Aria repo `git status` shows `standards` pointer updated (included in Phase C.1 commit).
-- [ ] CLAUDE.md AD11 compliance verified: Rules #1-#6 bodies are unchanged from pre-edit.
+- [ ] CLAUDE.md AD11 compliance verified: Rules #1-#9 bodies are unchanged from pre-edit.
 - [ ] AC-9 (state-checks arch-doc-stale probe): if TG-DOCS-B shipped, run probe manually and confirm exit 0.
 - [ ] If TG-DOCS-B deferred to v2.0.1 per owner decision: document the deferral decision in `docs/release-notes-v2.0.0.md §Known Limitations` (T-A3.5 already includes this placeholder).

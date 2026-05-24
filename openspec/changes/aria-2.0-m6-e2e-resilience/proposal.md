@@ -114,7 +114,7 @@ A SQL query verifies that ≥10 dispatches completed the full S0→S9 path with 
 - Date filter column: `state_entered_at` (ISO-8601 UTC TEXT; NOT `created_at`).
 - Per-dispatch issue metadata (title, labels, project): in `dispatch_audit_log.payload_json`
   via `json_extract` — NOT top-level columns on `dispatches`.
-- Synthetic flag: `is_synthetic` (added by migration 006; DEFAULT 0).
+- Synthetic flag: `is_synthetic` (added by migration 007; DEFAULT 0).
 
 **Stratification tracking approach**: Issue type (bug/feature/stale) is stored in the
 `dispatch_audit_log` `state_transition` payload at S0_IDLE entry, accessible as
@@ -158,7 +158,7 @@ ONLY** (Mechanism B is structurally invalid; see constraint below):
 
 - **Mechanism A — Schema column (LOCKED)**: `is_synthetic INTEGER DEFAULT 0` column on the
   `dispatches` table. Value `1` = synthetic fixture dispatch; value `0` = real issue dispatch.
-  A new additive migration `006_schema_v5_add_is_synthetic.sql` adds this column
+  A new additive migration `007_schema_v4.3_add_is_synthetic.sql` adds this column
   (`ALTER TABLE dispatches ADD COLUMN is_synthetic INTEGER DEFAULT 0`), targeting schema version
   5.0. This follows the M5 additive migration pattern (per `[[feedback_schema_migration_to_version_bump]]`).
   See task T-schema-1 below.
@@ -169,7 +169,7 @@ Mechanism B (title prefix `[DEMO-M6-*]`) was **removed at R1 audit (2026-05-24)*
 and producing `sqlite3.OperationalError: no such column: title` on day 1. AD-M6-4 is locked
 to Mechanism A (schema column) — no Phase B decision required.
 
-The Phase B implementer runs migration 006 and verifies abi_compat promises intact (see T-schema-1 + §A.7).
+The Phase B implementer runs migration 007 and verifies abi_compat promises intact (see T-schema-1 + §A.7).
 
 **Synthetic cap**: ≤70% of the ≥10 dispatches may be synthetic (i.e., at most 7 of 10 may be
 `is_synthetic=1`). The remaining ≥3 must be real issues. This cap is enforced in the acceptance
@@ -295,11 +295,11 @@ Spec #2 change.
 
 The validate-m6-handoff.py script (Spec #1, already shipped) must have a **paired test triple**
 (per backend M-ba-R3-1c): 3 unit tests that verify the abi_compat promises are still honoured
-after any TG-A schema migration (particularly the `is_synthetic` column addition via migration 006):
+after any TG-A schema migration (particularly the `is_synthetic` column addition via migration 007):
 
-- Test 1: schema.sql still contains `audit_no_update` and `audit_no_delete` after migration 006.
-- Test 2: migration 006 does NOT contain `DROP TRIGGER`.
-- Test 3: `validate-m6-handoff.py --check-abi-compat` still exits 0 after migration 006 applied
+- Test 1: schema.sql still contains `audit_no_update` and `audit_no_delete` after migration 007.
+- Test 2: migration 007 does NOT contain `DROP TRIGGER`.
+- Test 3: `validate-m6-handoff.py --check-abi-compat` still exits 0 after migration 007 applied
   to a test database.
 
 ---
@@ -605,9 +605,9 @@ This SoT was established in Spec #1 R1-C1 and applies to all TG-A SQL queries in
 
 <!-- R1-T2-4 fix: Migration renamed from 005 to 006 (migration 005 already exists in schema v4.2
      per Spec Y T0 — Spec X migration 005 drops inline UNIQUE constraint via table rebuild).
-     Migration 006 targets schema v5.0. (R1 audit 2026-05-24) -->
+     Migration 007 targets schema v5.0. (R1 audit 2026-05-24) -->
 The `is_synthetic` column addition (Mechanism A, §A.2, **locked** per R1 T2-4) must be implemented
-as additive migration `006_schema_v5_add_is_synthetic.sql`:
+as additive migration `007_schema_v4.3_add_is_synthetic.sql`:
 ```sql
 ALTER TABLE dispatches ADD COLUMN is_synthetic INTEGER DEFAULT 0;
 ```
@@ -680,7 +680,7 @@ TG-C Humanized Samples (sequential after TG-A 7d run):
 
 | ID | Topic | Decision |
 |----|-------|----------|
-| AD-M6-4 | is_synthetic tagging mechanism | **LOCKED to Mechanism A** (R1 audit 2026-05-24). Mechanism B (title prefix) was removed: `dispatches.title` column does not exist in live schema. Migration 006 adds `is_synthetic INTEGER DEFAULT 0` (additive, schema v5.0). See T-schema-1 in TG-A-infra. |
+| AD-M6-4 | is_synthetic tagging mechanism | **LOCKED to Mechanism A** (R1 audit 2026-05-24). Mechanism B (title prefix) was removed: `dispatches.title` column does not exist in live schema. Migration 007 adds `is_synthetic INTEGER DEFAULT 0` (additive, schema v5.0). See T-schema-1 in TG-A-infra. |
 | AD-M6-5 | Pre-flight fixture provenance (Option A replay vs Option B fresh synthetic vs Option C cross-project) | **Deferred to Phase B kickoff**. Check whether `aria-orchestrator/docs/demo-m5-o3-*.yaml` capture files exist from M5. If yes, prefer Option A (regression continuity). Document in `.aria/probes/m6-preflight-provenance.md`. |
 | AD-M6-6 | AdvancingClock DI injection point | Clock parameter injected at handler class constructor level (e.g., `AriaExtension(clock=FakeClock(...))`) rather than per-method. State machine logic is distributed across 4 modules (extension.py, comment_poll.py, reconciler.py, tick_runner.py — per Q1 lock 2026-05-24; no `state_machine.py`). All time-sensitive internal methods in those 4 modules read `self._clock.now()` instead of `datetime.now()`. |
 
@@ -984,7 +984,7 @@ TG-A: Runtime Observability
   A.5  Pre-flight dry-run script + provenance log                ~1.5h
   A.6  Cross-project conditional acceptance (acceptance only)    ~0.5h
   A.7  validate-m6-handoff.py paired test triple                 ~1h
-  A.docs AD-M6-4/5/4b slots + is_synthetic migration 006 (locked Mech A) ~0.5h
+  A.docs AD-M6-4/5/4b slots + is_synthetic migration 007 (locked Mech A) ~0.5h
   A.schema-validate T-validate-schema-1 (schema drift guard test)  ~0.5h
   A.tg-a-acceptance check-m6-e2e-acceptance.py --tg-a section   ~1h
 TG-A subtotal                                                    ~10-10.5h
@@ -1018,7 +1018,7 @@ Total (AI-implementable)                                         ~29-30h ≈ 30h
 Phase A audit overhead ~1h is tracked separately (not impl).
 
 Q-NEW-1 delta: +1h for hybrid mock layer rationale documentation and per-mode matrix in TG-B.
-R1-fix delta: +0.5h T-validate-schema-1 schema drift guard + migration 006 (T2-1/T2-4 fixes);
+R1-fix delta: +0.5h T-validate-schema-1 schema drift guard + migration 007 (T2-1/T2-4 fixes);
 +0.5h AC-6 AD-M6-4b pre-flight routing strategy AD slot (T2-3 fix). Total ~30h (vs 29h baseline).
 
 Owner manual actions (post-ship, not in B.2):
@@ -1035,8 +1035,8 @@ Owner manual actions (post-ship, not in B.2):
 | Spec #1 `aria-2.0-m6-cost-acceptance` AC-7 (3-day rolling history PASS) | Upstream (hard gate) | Spec #2 Phase B MUST NOT start until `validate-m6-handoff.py --check-3-day-history` exits 0; Spec #1 commit `c29a800` Approved |
 <!-- R1-T2-1 fix: Column list corrected — `final_state` and `issue_type` do not exist. Terminal
      state is `state='S9_CLOSE'`; issue metadata is in dispatch_audit_log.payload_json.
-     Migration 006 (not "optional") adds `is_synthetic` column. (R1 audit 2026-05-24) -->
-| M5 dispatches table (`token_cost_usd`, `provider_cost_model`, `state`, `state_entered_at`) | Upstream (already shipped M2+) | All SQL queries in TG-A read existing M5 columns; migration 006 adds `is_synthetic` (additive, schema v5.0, AD-M6-4 locked to Mechanism A) |
+     Migration 007 (not "optional") adds `is_synthetic` column. (R1 audit 2026-05-24) -->
+| M5 dispatches table (`token_cost_usd`, `provider_cost_model`, `state`, `state_entered_at`) | Upstream (already shipped M2+) | All SQL queries in TG-A read existing M5 columns; migration 007 adds `is_synthetic` (additive, schema v5.0, AD-M6-4 locked to Mechanism A) |
 | `aria-orchestrator/docs/validate-m6-handoff.py` | Upstream (Spec #1 deliverable) | TG-A paired test triple (§A.7) tests this script; must be shipped by Spec #1 before TG-A Phase B completes |
 | DEMO-M5-O3 capture files (optional) | Upstream (conditional) | `aria-orchestrator/docs/demo-m5-o3-*.yaml` used for pre-flight Option A (P-8); if absent, fall back to Option B |
 | `aria-runner-bot` PAT scopes | Upstream | Cross-project dispatch (P-9) requires existing PAT scopes sufficient; no new PAT creation in this Spec |

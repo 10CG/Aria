@@ -28,7 +28,7 @@ the 3-day history accumulates, then re-check.
 
 | Group | Topic | Scope ref | Est | Agent |
 |-------|-------|-----------|-----|-------|
-| TG-A-infra | Phase B precondition gate + is_synthetic migration 006 + T-validate-schema-1 | §What A.2, §Constraints | ~1.5h | backend-architect |
+| TG-A-infra | Phase B precondition gate + is_synthetic migration 007 + T-validate-schema-1 | §What A.2, §Constraints | ~1.5h | backend-architect |
 | TG-A-uptime | Nomad alloc uptime gate + probe structure | §What A.1, A.3, A.4 | ~3h | backend-architect |
 | TG-A-dispatch | Dispatch tracker SQL + stratification + pre-flight | §What A.2, A.5, A.6 | ~3.5h | backend-architect |
 | TG-A-validate | validate-m6-handoff.py paired test triple | §What A.7 | ~1h | backend-architect |
@@ -61,7 +61,7 @@ the 3-day history accumulates, then re-check.
   ```
   Confirm: `state` column exists (NOT `final_state`); `state_entered_at` column exists (NOT
   `created_at`); NO `title`, `issue_type`, or `project_name` columns; `is_synthetic` absent
-  (will be added by migration 006). Commit a schema validation test triple alongside migration 006
+  (will be added by migration 007). Commit a schema validation test triple alongside migration 007
   (per `[[feedback_validator_repo_drift_guard_test]]`):
   ```python
   # aria-orchestrator/hermes-extensions/aria-layer1/tests/test_schema_column_guard.py
@@ -84,26 +84,26 @@ the 3-day history accumulates, then re-check.
   If exit non-zero: STOP. Record block reason in `.aria/probes/m6-gate-check.md`. Do not proceed
   until gate passes.
 
-- [ ] A-infra-2 Add `is_synthetic` column via migration 006 (AD-M6-4 LOCKED to Mechanism A — no
+- [ ] A-infra-2 Add `is_synthetic` column via migration 007 (AD-M6-4 LOCKED to Mechanism A — no
   Mechanism B; `title` column does not exist in live schema). Write:
-  `aria-orchestrator/hermes-extensions/aria-layer1/migrations/006_schema_v5_add_is_synthetic.sql`
+  `aria-orchestrator/hermes-extensions/aria-layer1/migrations/007_schema_v4.3_add_is_synthetic.sql`
   ```sql
-  -- Migration 006: schema v4.2 → v5.0 (additive)
+  -- Migration 007: schema v4.2 → v5.0 (additive)
   -- Adds is_synthetic column for M6 7d run stratification tracking
   ALTER TABLE dispatches ADD COLUMN is_synthetic INTEGER DEFAULT 0;
   UPDATE schema_meta SET value='5.0' WHERE key='schema_version';
   ```
   Verify column is absent before running: skip if already present.
   Document in `aria-orchestrator/docs/architecture-decisions.md` AD-M6-4 slot: "Mechanism A
-  (schema column is_synthetic, migration 006) — locked at R1 audit 2026-05-24. Mechanism B
+  (schema column is_synthetic, migration 007) — locked at R1 audit 2026-05-24. Mechanism B
   (title prefix) structurally invalid: no title column in dispatches schema."
 
-- [ ] A-infra-3 Verify abi_compat promises not violated after migration 006:
+- [ ] A-infra-3 Verify abi_compat promises not violated after migration 007:
   ```bash
   python3 aria-orchestrator/docs/validate-m6-handoff.py --check-abi-compat
   ```
   Must exit 0 (audit trigger promises intact after migration). If exit non-zero: investigate
-  before proceeding — migration 006 must not contain `DROP TRIGGER`.
+  before proceeding — migration 007 must not contain `DROP TRIGGER`.
 
 ---
 
@@ -310,20 +310,20 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   `aria-orchestrator/tests/test_validate_m6_handoff_tga_compat.py`:
 
   <!-- R1-T2-4 fix: migration number updated to 006; Mechanism B removed. (R1 audit 2026-05-24) -->
-  - **Test 1** — schema.sql still contains triggers after migration 006:
+  - **Test 1** — schema.sql still contains triggers after migration 007:
     ```python
     def test_audit_triggers_survive_migration_006():
         schema = (REPO_ROOT / "hermes-extensions/aria-layer1/aria_layer1/schema.sql").read_text()
         assert "audit_no_update" in schema
         assert "audit_no_delete" in schema
     ```
-  - **Test 2** — migration 006 does NOT contain DROP TRIGGER:
+  - **Test 2** — migration 007 does NOT contain DROP TRIGGER:
     ```python
     def test_migration_006_no_drop_trigger():
-        m006 = REPO_ROOT / "hermes-extensions/aria-layer1/migrations/006_schema_v5_add_is_synthetic.sql"
-        assert m006.exists(), "Migration 006 must exist (Mechanism A is locked)"
-        content = m006.read_text()
-        assert "DROP TRIGGER" not in content, "Migration 006 must not drop audit triggers"
+        m007 = REPO_ROOT / "hermes-extensions/aria-layer1/migrations/007_schema_v4.3_add_is_synthetic.sql"
+        assert m007.exists(), "Migration 007 must exist (Mechanism A is locked)"
+        content = m007.read_text()
+        assert "DROP TRIGGER" not in content, "Migration 007 must not drop audit triggers"
     ```
   - **Test 3** — validate-m6-handoff.py --check-abi-compat exits 0 after 006:
     ```python
@@ -858,7 +858,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
      removed. AD-M6-4b new slot for pre-flight routing strategy. (R1 audit 2026-05-24) -->
 - [ ] T-docs-1 Add AD-M6-4 decision to `aria-orchestrator/docs/architecture-decisions.md` (LOCKED):
   "is_synthetic tagging mechanism: **Mechanism A — schema column** `is_synthetic INTEGER DEFAULT 0`
-  added via migration `006_schema_v5_add_is_synthetic.sql` (schema v5.0). Mechanism B (title prefix
+  added via migration `007_schema_v4.3_add_is_synthetic.sql` (schema v5.0). Mechanism B (title prefix
   `[DEMO-M6-*]`) was removed at R1 audit 2026-05-24 — `dispatches.title` column does not exist in
   live schema. No Phase B decision required — implementation must use Mechanism A."
 
@@ -938,7 +938,7 @@ TG-C-corpus templates (C-corpus-1..3) may be written in advance; sample content 
 | P-4: Mock-layer-per-mode matrix (Q-NEW-1 hybrid 4 SDK + 2 HTTP) | DEC §4 + Q-NEW-1 | §What B.1 (full table) | B-scaffold-1, B-infra-1..3, B-llm-1..3 |
 | P-5: 4 WAL scenarios (WAL-A/B/C/D) vs 3 enumeration | DEC §4 P-5 + PRD §634 | §What B.2 (4-scenario table) | B-infra-3 |
 | P-6: TG-A → TG-B handoff checkpoint contract | DEC §4 P-6 | §What A.7 (checkpoint list) | A-validate-1, TG-B-scaffold start condition |
-| P-7: is_synthetic tagging mechanism (Mech A LOCKED — migration 006; Mech B removed R1 audit) | DEC §4 P-7 | §What A.2 (P-7 block) | T-validate-schema-1 + A-infra-2 + AD-M6-4 |
+| P-7: is_synthetic tagging mechanism (Mech A LOCKED — migration 007; Mech B removed R1 audit) | DEC §4 P-7 | §What A.2 (P-7 block) | T-validate-schema-1 + A-infra-2 + AD-M6-4 |
 | P-8: Pre-flight dispatch fixture provenance (Option A/B/C) | DEC §4 P-8 | §What A.5 (P-8 block) | A-dispatch-5 + AD-M6-5 |
 | P-9: Cross-project Kairos/silknode acceptance conditions | DEC §4 P-9 | §What A.6 (P-9 block) | A-dispatch-6 |
 | Q-NEW-1: Hybrid mock layer +1h scope | Owner Q-NEW-1 2026-05-24 | §What B.1 (hybrid table) + §Effort baseline | B-scaffold-1 + mock-layer-per-mode rationale doc |

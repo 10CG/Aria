@@ -82,7 +82,7 @@ Rules #1-#9 text body is FROZEN. No deletions, no modifications to any existing 
 Verify after edits: `git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-9]"` must produce no output (Rules #1-#9 bodies unmodified per I3-1 AC addition).
 
 **Diff 7 — 新增"Aria 2.0 运行时"独立章节** (draft §Diff 7, ≤50 lines):
-New H2 section after §不可协商规则. Includes: 分层叙述 (standards / aria-plugin / aria-orchestrator), 与 6 条规则的关系 (how Layer 2 enforces each), 人类参与点 (AD10: S7_AWAITING_MERGE), 详细入口 (architecture-decisions.md / spikes / M0 Spec / PRD v2.0).
+New H2 section after §不可协商规则. Includes: 分层叙述 (standards / aria-plugin / aria-orchestrator), 与 9 条规则的关系 (how Layer 2 enforces each), 人类参与点 (AD10: S7_AWAITING_MERGE), 详细入口 (architecture-decisions.md / spikes / M0 Spec / PRD v2.0).
 
 **Diff 8 — "项目状态"版本号更新** (draft §Diff 8, using M6-time actual values):
 Update stage: "研究中 → v2.0 规划已批准" → "v2.0 M6 执行中 (M1-M5 shipped)". Update 插件版本 from v1.22.0 to actual v1.27.0 (current per `c7e611f` submodule bump). Update 主项目版本 v1.7.0. Add 运行时版本 line. Update "更新" date at bottom.
@@ -98,7 +98,7 @@ Rules #7/8/9 and the Rule #9 §2.3 frontmatter schema extension were added to CL
 
 Note: Plugin version SoT = `aria/.claude-plugin/plugin.json`. DEC-20260524-001 v1.26.0 was draft-time snapshot; dev-claude2 burndown shipped v1.27.0 in the same session. AC-3 and Diff 9 must read the version dynamically, not hardcode any snapshot value.
 
-Constraint (AD11): Diff 9 MUST NOT alter Rule #1-#6 text. It only updates §项目状态 version numbers and bumps the top-level version field.
+Constraint (AD11): Diff 9 MUST NOT alter Rule #1-#9 text. It only updates §项目状态 version numbers and bumps the top-level version field.
 
 ##### A.2 — 主 Aria README updates (~1.5h)
 
@@ -385,9 +385,9 @@ Note: AD-M5-11 collision with M5-spillover scope discovered in R1 audit; Spec #3
 
 Per `[[project_meta_repo_pattern]]`: `standards/` is NOT vendored. It is an independent git repository (`https://github.com/10CG/aria-standards`). Changes require: feature branch in the submodule → merge/push → submodule pointer bump in main Aria repo. The detailed runbook is in tasks.md T-B3-0.
 
-### CLAUDE.md Rule #1-#6 text is FROZEN (AD11 hard constraint)
+### CLAUDE.md Rule #1-#9 text is FROZEN (AD11 hard constraint)
 
-Diff 6 is explicitly a no-op. No diff to apply to Rules #1-#6 body text. AD11 "不修改现有 6 条不可协商规则, 只新增 Aria 2.0 运行时章节". Diff 7 and Diff 9 are additive or update-only.
+Diff 6 is explicitly a no-op. No diff to apply to Rules #1-#9 body text. AD11 "不修改现有 9 条不可协商规则, 只新增 Aria 2.0 运行时章节". Diff 7 and Diff 9 are additive or update-only.
 
 ### layer-boundary-contract.md must NOT enter standards/ (km M-km-R2-005)
 
@@ -448,7 +448,7 @@ All criteria are binary-falsifiable per `[[feedback_falsifiable_evidence_for_bin
 
 ### AC-1 — CLAUDE.md v2.0 content verified (TG-DOCS-A)
 
-<!-- R1-I3-1 fix: added Rule #1-#6 body freeze check (git diff based). Count-based check (grep -c "Rule #") is necessary but not sufficient — a rename attack could pass the count while modifying rule bodies. -->
+<!-- R1-I3-1 fix: added Rule #1-#9 body freeze check (git diff based). Count-based check (grep -c "Rule #") is necessary but not sufficient — a rename attack could pass the count while modifying rule bodies. -->
 
 **Evidence**:
 ```bash
@@ -457,8 +457,8 @@ grep -q "**版本**: 2.0.0" CLAUDE.md  # Diff 9 version bump applied
 grep -q "两层 AI 分工" CLAUDE.md  # Diff 3 applied
 grep -q "Aria 2.0 运行时" CLAUDE.md  # Diff 7 chapter present
 grep -q "aria-orchestrator" CLAUDE.md  # Diff 4 table row present
-# Rule #1-#6 body freeze check (AD11 + Rule #9 extension: all rules frozen):
-git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-6]"  # must produce no output (R1-I3-1)
+# Rule #1-#9 body freeze check (AD11 + Rule #9 extension: all rules frozen):
+git diff HEAD -- CLAUDE.md | grep "^[-]" | grep "Rule #[1-9]"  # must produce no output (R1-I3-1)
 ```
 All six commands pass (first five exit 0; sixth produces no output).
 
@@ -593,7 +593,7 @@ grep -q "AD-M5-11" aria-orchestrator/docs/architecture-decisions.md \
 
 | ID | Risk | Severity | Mitigation |
 |----|------|----------|------------|
-| R-M6D-1 | CLAUDE.md Diff 6 accidentally modifies Rule #1-#6 text (AD11 violation) | High | After writing CLAUDE.md v2.0, run `git diff HEAD -- CLAUDE.md` and verify Rules #1-#6 lines are unchanged. AC-1 `grep -c "Rule #"` count ≥ 9 is a necessary but not sufficient check — also verify line-for-line identity on the 6 rule bodies. |
+| R-M6D-1 | CLAUDE.md Diff 6 accidentally modifies Rule #1-#9 text (AD11 violation) | High | After writing CLAUDE.md v2.0, run `git diff HEAD -- CLAUDE.md` and verify Rules #1-#9 lines are unchanged. AC-1 `grep -c "Rule #"` count ≥ 9 is a necessary but not sufficient check — also verify line-for-line identity on the 9 rule bodies. |
 | R-M6D-2 | standards/ submodule pointer drift: feature branch merged in submodule but main Aria pointer not bumped | Medium | Per `[[feedback_submodule_regression_pitfall]]`: after standards branch lands on master, explicitly run `git -C standards pull && git add standards && git commit`. T-B3-0 runbook enforces this. |
 | R-M6D-3 | humanized-command-patterns.md content duplicated in Spec #2 TG-C corpus (BOTH-locations boundary violation) | Medium | P-11 content boundary is explicit: standards/ file = curated patterns + rubric guide; `aria-orchestrator/evals/` file = raw corpus samples. Cross-references point to each other. Enforced via header comment in both files. <!-- R1-X-T1 fix: aria-orch/ → aria-orchestrator/ --> |
 | R-M6D-4 | state-checks.yaml Probe 1 (badge match) fails immediately after AC-3 (README badge update) if there is a version mismatch between badge and plugin.json | Low | Probe 1 is designed to expose real drift. If it fails after the update, it means the badge update itself is wrong. Bug-hunt requirement: test probe against PASS case (badge = plugin.json) and FAIL case (mismatch) before commit. |
