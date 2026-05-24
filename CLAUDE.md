@@ -139,6 +139,7 @@ D. 收尾 (Closure)
 ├── 提交规范       → standards/conventions/git-commit.md
 ├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
 ├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+)
+├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.28.0+ §C.2.4.5 mechanical gate companion)
 ├── 进度管理       → standards/core/progress-management/
 ├── 研究文档       → docs/
 ├── 需求文档       → docs/requirements/ (PRD + User Stories)

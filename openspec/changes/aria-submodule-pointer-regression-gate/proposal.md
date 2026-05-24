@@ -191,7 +191,7 @@ Auto-promote **(A) post-merge backward-move detector** without re-brainstorm if 
 
 1. Any submodule pointer regression escapes (B+) within next **12 months** OR **100 merges** (whichever first)
 2. Any (B+) fetch-failure incident manifests in audit logs (degraded mode triggered)
-3. Any non-PR-flow regression observed (direct master push bypassing PR + C.2.5)
+3. Any non-PR-flow regression observed (direct master push bypassing PR + §C.2.4.5)
 
 **Counter mechanism** (per code-reviewer Q-NEW-1): tracked in `aria/metrics/submodule-gate-misses.json` (mechanical, append-only) with `{timestamp, miss_type, pr_id_if_known, master_sha, feature_sha, detected_by}`.
 
@@ -218,7 +218,7 @@ New file `standards/conventions/submodule-pointer-hygiene.md`. Content:
 - "Always `git fetch origin` before any rebase that may touch submodule pointers"
 - "Never resolve submodule pointer conflict via `git checkout origin/<branch> -- <sub>` without explicit `git fetch` immediately prior in the same shell session"
 - "If conflict resolution requires a stale ref (deliberate revert), abort the rebase and use the override mechanism (commit trailer or PR label) instead"
-- Cross-reference to phase-c-integrator §C.2.5 + this Spec
+- Cross-reference to phase-c-integrator §C.2.4.5 + this Spec
 
 **NOT added as numbered Rule** in `CLAUDE.md` (per code-reviewer R3 — Rules #1-#9 already heavy; convention SOT in `standards/conventions/` is sufficient).
 
@@ -248,14 +248,14 @@ This mirrors Rule #8 rollout cadence + addresses warn-only drift risk.
                          (B+) Hardened Pre-Merge Gate Architecture
                          ─────────────────────────────────────────
 
-phase-c-integrator C.2.5 (after Rule #8 CI gate, before merge)
+phase-c-integrator §C.2.4.5 (after §C.2.4 CI gate, before branch-manager merge API)
         │
         ▼
   ┌────────────────────────────────┐
   │  Step 1: fail-loud fetch       │
   │  git fetch origin master       │  ← exit-code-only abort
   └──────┬─────────────────────────┘     (no fragile grep)
-         │ (non-zero exit) → abort C.2.5 with diagnostic
+         │ (non-zero exit) → abort §C.2.4.5 with diagnostic
          ▼
   ┌────────────────────────────────┐
   │  Step 2: refspec assertion     │
@@ -309,7 +309,7 @@ AD-FOLLOWUP-5: Two-phase rollout uses hard date (v1.28.0 + 14d) default-on, not 
 Bash for the gate logic (consistency with existing phase-c-integrator + aria/hooks/ Bash) — NOT Python. Reasons:
 - Hooks ecosystem in aria-plugin is Bash (per `feedback_bash_hook_perf_subprocess_fork_dominates`)
 - Gate logic is git plumbing — Bash + git CLI is idiomatic
-- No dependency on Python runtime in C.2.5 critical path
+- No dependency on Python runtime in §C.2.4.5 critical path
 
 Performance budget (Rev1 R1-ba-5 fix — realistic CI cold-path estimate):
 - **Warm cache (local dev)**: per-submodule fetch ~200ms + ls-tree <10ms + ancestry ×2 ~100ms ≈ ~310ms per submodule. 3 submodules sequential ≈ ~930ms total.
@@ -326,7 +326,7 @@ Performance budget (Rev1 R1-ba-5 fix — realistic CI cold-path estimate):
 | A.2 | post_spec audit R1+R2 convergence | ~1.5h (4 agents × 2 rounds = 8 agent-calls, sequential pacing) |
 | A.3 | Agent allocation + branch creation | ~0.5h |
 | B.1 | branch creation + scaffolding | ~0.5h |
-| B.2.a | Bash gate implementation in phase-c-integrator §C.2.5 | ~2h |
+| B.2.a | Bash gate implementation in phase-c-integrator §C.2.4.5 | ~2h |
 | B.2.b | Override parser (commit trailer + PR label via forgejo CLI) | ~1h |
 | B.2.c | Telemetry + audit log writer | ~0.5h |
 | B.3.a | 9-scenario replay test fixture infrastructure (ephemeral fixture repos) | ~2h |
@@ -384,7 +384,7 @@ No remaining open Q for owner. Phase A.2 audit may surface additional questions;
 - standards source repo `/home/dev/Aria/standards/` — new file `conventions/submodule-pointer-hygiene.md`
 - main Aria repo `/home/dev/Aria/` — submodule pointer bump after aria-plugin PR merges; this Spec itself lives here
 - Forgejo `10CG/Aria/aria-plugin/aria-orchestrator/standards` — PR targets for ship
-- Existing Rule #8 (phase-c-integrator C.2.4 `aether ci status` gate) — this Spec adds C.2.5 below it; no conflict
+- Existing Rule #8 (phase-c-integrator §C.2.4 `aether ci status` gate) — this Spec adds NEW §C.2.4.5 sub-step between §C.2.4 and existing §C.2.5 (Multi-Remote Push); no conflict
 - Aria #124 issue — closed by aria-plugin PR merge in Phase C
 
 NOT a dependency: `aether` plugin (not invoked by this gate). The fail-loud fetch is local git, not Aether-mediated.
@@ -395,7 +395,7 @@ NOT a dependency: `aether` plugin (not invoked by this gate). The fail-loud fetc
 
 ### Mechanical (Phase B exit)
 
-- [ ] (B+) gate code in `aria/skills/phase-c-integrator/SKILL.md` §C.2.5 with exact bash commands per §What A
+- [ ] (B+) gate code in `aria/skills/phase-c-integrator/SKILL.md` §C.2.4.5 with exact bash commands per §What A
 - [ ] All 9 replay test scenarios PASS (per tasks.md T-replay-1 through T-replay-9)
 - [ ] Override mechanism (commit trailer + PR label) works per dogfood test
 - [ ] Telemetry writer creates `aria/metrics/submodule-gate-overrides.json` + `submodule-gate-misses.json`
@@ -444,7 +444,7 @@ NOT a dependency: `aether` plugin (not invoked by this gate). The fail-loud fetc
 
 - CLAUDE.md Rule #5 (project's own openspec/changes/) ✓
 - CLAUDE.md Rule #6 (Skill benchmark) — deterministic structural substitute per `feedback_deterministic_structural_skill_rule6_substitute`
-- CLAUDE.md Rule #8 (Phase C.2.4 pre-merge gate pattern) — this Spec extends to C.2.5 with parallel pattern
+- CLAUDE.md Rule #8 (Phase C.2.4 pre-merge gate pattern) — this Spec adds NEW §C.2.4.5 with parallel pattern (no rename of existing §C.2.5 Multi-Remote Push)
 - CLAUDE.md Rule #9 (session-handoff) — Phase D handoff per template
 - Version cadence: MINOR bump (new Skill behavior + new convention)
 - 向后兼容 principle: warn-only first, then block (mirrors Rule #8 rollout)

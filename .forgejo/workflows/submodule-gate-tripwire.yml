@@ -1,0 +1,145 @@
+# Submodule Pointer Regression Tripwire — weekly post-merge ancestry audit
+#
+# Spec: aria/openspec/changes/aria-submodule-pointer-regression-gate (v1.28.0+)
+# Convention: standards/conventions/submodule-pointer-hygiene.md
+# Forgejo: Aria #124
+# DEC: .aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md
+#
+# Purpose: detect submodule pointer regressions that escaped the pre-merge gate (B+),
+# auto-promote (A) post-merge detector if any tripwire condition fires.
+#
+# Activation policy (per Spec §What E + R2 N-cr-2):
+# - v1.28.0 ships this workflow as `workflow_dispatch` ONLY (manual trigger for verification)
+# - v1.29.0 commit switches to `on: schedule` weekly cron (Sundays 04:00 UTC)
+# - Current state: DRAFT (workflow_dispatch only); activation flip is a separate v1.29.0 commit
+#
+# Output:
+# - On regression escape detected: append entry to aria/metrics/submodule-gate-misses.jsonl
+#   + file a Forgejo issue with label `gate-tripwire-count` for owner review
+# - On every run (including clean): write last_run_timestamp to misses.jsonl for outage detection
+
+name: Submodule Gate Tripwire (v1.28.0 draft)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (no issue filing, no JSONL append)"
+        required: false
+        default: "false"
+  # v1.29.0 commit will add:
+  # schedule:
+  #   - cron: '0 4 * * 0'  # Sundays 04:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  tripwire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with submodules + full history needed for HEAD~1 comparison)
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Inspect submodule ancestry HEAD~1 vs HEAD
+        id: ancestry
+        shell: bash
+        run: |
+          set -uo pipefail
+          # Output file lines: "MISS:<sub>:<old_sha>:<new_sha>" for escapes; empty if all clean
+          MISSES=()
+          while IFS= read -r SUB; do
+            [[ -z "$SUB" ]] && continue
+            OLD=$(git ls-tree HEAD~1 "$SUB" 2>/dev/null | awk '{print $3}')
+            NEW=$(git ls-tree HEAD "$SUB" 2>/dev/null | awk '{print $3}')
+
+            # Skip first-time and no-change cases (consistent with §C.2.4.5)
+            [[ -z "$OLD" ]] && continue
+            [[ -z "$NEW" ]] && continue
+            [[ "$OLD" == "$NEW" ]] && continue
+
+            git -C "$SUB" fetch origin --quiet 2>/dev/null || true
+
+            # If OLD is NOT ancestor of NEW (and they're not equal), it's a regression or divergence
+            if ! git -C "$SUB" merge-base --is-ancestor "$OLD" "$NEW" 2>/dev/null; then
+              MISSES+=("MISS:$SUB:$OLD:$NEW")
+            fi
+          done < <(git config --file .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null | awk '{print $2}')
+
+          if [[ ${#MISSES[@]} -eq 0 ]]; then
+            echo "result=clean" >> "$GITHUB_OUTPUT"
+            echo "✓ no submodule pointer regressions in HEAD~1..HEAD"
+          else
+            echo "result=miss" >> "$GITHUB_OUTPUT"
+            for m in "${MISSES[@]}"; do echo "$m"; done
+            # Emit as multi-line output
+            {
+              echo "misses<<EOF"
+              for m in "${MISSES[@]}"; do echo "$m"; done
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Always write last_run_timestamp (outage detection per R1 qa M-qa-3)
+        if: ${{ inputs.dry_run != 'true' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p aria/metrics
+          ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          # Append last_run record (separate from miss records for query simplicity)
+          printf '{"timestamp":"%s","kind":"tripwire_run","result":"%s","commit":"%s"}\n' \
+            "$ts" "${{ steps.ancestry.outputs.result }}" "$GITHUB_SHA" \
+            >> aria/metrics/submodule-gate-misses.jsonl
+          echo "✓ last_run_timestamp recorded"
+
+      - name: File Forgejo issue on miss (auto-promote (A) trigger condition #1)
+        if: ${{ steps.ancestry.outputs.result == 'miss' && inputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TRIPWIRE_TOKEN }}
+        run: |
+          set -uo pipefail
+          # Use forgejo CLI if available, else curl with token
+          BODY="Submodule pointer regression escaped (B+) gate detected by tripwire weekly audit.
+
+          **Detected at**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          **Commit**: $GITHUB_SHA
+          **Misses**:
+          \`\`\`
+          ${{ steps.ancestry.outputs.misses }}
+          \`\`\`
+
+          **Per Spec [aria-submodule-pointer-regression-gate] tripwire condition #1**:
+          - Auto-promote (A) post-merge backward-move detector without re-brainstorm
+          - Update tripwire counter at \`aria/metrics/submodule-gate-misses.jsonl\`
+
+          **Owner action**:
+          1. Inspect each MISS entry; determine if it's a real regression or a legitimate rollback that bypassed (B+)
+          2. If real regression: fast-forward fix per a8e0096 pattern (2026-05-23 incident playbook)
+          3. If legitimate rollback that bypassed gate: investigate why no commit trailer / PR label was used
+          4. Promote (A) detector to next sprint if tripwire condition count >= 1 within 12mo / 100 merges
+
+          /label gate-tripwire-count
+          "
+
+          # Try forgejo CLI first
+          if command -v forgejo >/dev/null 2>&1; then
+            forgejo POST /repos/10CG/Aria/issues -d "$(jq -n --arg title "tripwire: submodule pointer regression escaped (B+) — $GITHUB_SHA" --arg body "$BODY" '{title:$title, body:$body, labels:["gate-tripwire-count"]}')" || true
+          else
+            echo "WARN: forgejo CLI not available; issue not filed. Tripwire counter still appended to JSONL."
+          fi
+
+      - name: Summary
+        shell: bash
+        run: |
+          if [[ "${{ steps.ancestry.outputs.result }}" == "clean" ]]; then
+            echo "✓ Tripwire clean — no submodule regressions detected this audit"
+          else
+            echo "✗ Tripwire MISS — see filed Forgejo issue + aria/metrics/submodule-gate-misses.jsonl"
+            exit 1
+          fi

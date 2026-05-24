@@ -235,7 +235,7 @@ per qa R1 I-qa-1 — uncovered scenario
   - Rule 1: Always `git fetch origin` before rebase touching submodules
   - Rule 2: Never `git checkout origin/<branch> -- <sub>` without fresh fetch in same shell
   - Rule 3: For deliberate rollback, use override mechanism (commit trailer or PR label)
-  - Cross-references to phase-c-integrator §C.2.5 + this Spec
+  - Cross-references to phase-c-integrator §C.2.4.5 + this Spec
   - Source incident (PR #123 / commits)
 - [ ] Match `standards/conventions/secret-hygiene.md` style + frontmatter
 
@@ -267,7 +267,7 @@ per qa R1 I-qa-1 — uncovered scenario
 
 ---
 
-## T-rule6 — Rule #6 deterministic structural substitute (~0.5h)
+## T-rule6 — Rule #6 deterministic structural substitute (~1h, Rev1 R1-tl M-tl-5 bump from 0.5h)
 
 per `feedback_deterministic_structural_skill_rule6_substitute` (non-LLM AB):
 
