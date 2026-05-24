@@ -11,15 +11,25 @@
 
 ---
 
-## ★ 最新 session — Aria #124 Spec APPROVED + Track E follow-ups SHIPPED (2026-05-24 ~16:15 UTC, ~6h cumulative)
+## ★ 最新 session #A — Track G: M6 Phase A Spec Batch 3/4 Approved (2026-05-24 ~16:30 UTC, dev-claude) — 🎉 **Spec #1+#2+#3 CONVERGED**
 
-**Latest**: [2026-05-24-aria-124-spec-approved-phase-b-ready.md](./2026-05-24-aria-124-spec-approved-phase-b-ready.md) — 2 cycles this session: (a) Track E follow-ups #16+#17 fully SHIPPED Phase A→D ~1h (aria-orch PR #18 `0ce52b9` + main Aria bump `c8a5f03`); (b) Aria #124 submodule pointer regression gate brainstorm CONVERGED + Phase A.1 Spec drafted + Phase A.2 R1 4-agent audit (4C+19I+20M PASS_WITH_WARNINGS 4/4) + Rev1 + R2 3-agent audit (**3/3 unanimous CONVERGED + 0 new Critical**) = **Spec APPROVED**。Brainstorm pattern: R2 双反转(tech-lead + code-reviewer mutual concession)+ ai-engineer R2 neutral 3rd path (B+) hardened + measured tripwire unified anchor + 4/4 R3 ACCEPT_R3。Carry-forward: Phase B+C+D ~12h to next session(s)。3 concurrent push races resolved cleanly via `pull --rebase`。6-way SHA parity 全 verified。0 new memory (4 candidates deferred to Phase D D.3 per discipline)。 **M6 仍 blocked on owner PRD 2 patches (Track F inherit)** (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+**Latest (T-G)**: [2026-05-24-m6-phase-a-spec-batch-approved.md](./2026-05-24-m6-phase-a-spec-batch-approved.md) — Track G = M6 (US-026) Phase A.1+A.2 closed for 3/4 sub-Specs: Spec #1 cost-acceptance (`c29a800`) + Spec #2 e2e-resilience + Spec #3 docs (both `413dd75`); 16 audit reports total (3× R1 4-agent + 3× R2 3-agent + 2× R3 1-agent stability); 4 PRD patches landed (a786444 + e884e62/8a5fdc4); 8 owner Q-locks; 3 new memory entries (combined-mode value / migration slot draft-time-verify / gate logic cross-Spec SoT validate); Spec #4 release-closeout deferred next session;~6.2h session;13 commits (7 dev-claude + 6 dev-claude2 interleave 零冲突)。**M6 Phase A Spec batch DONE** (3/4 sub-Specs); next session Spec #4 + Phase B.1 (state-scanner Phase 1.15 collector 解析此行作 canonical pointer for M6 work)
 
-## ★ 前 session #1 — Track E follow-ups (2026-05-24 ~11:50 UTC, intra-session predecessor, ~1h)
+## ★ 最新 session #B — Aria #124 Spec APPROVED + Track E follow-ups SHIPPED (2026-05-24 ~16:15 UTC, dev-claude2)
 
-**Sister**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E follow-up #16 (JOB_NAME `aria-runner-template` → `aria-layer2-runner` 7 refs in scripts/) + #17 (AD-M1-8 PAT scope 4 → canonical 7-scope set + per-scope evidence table) bundled in aria-orch PR #18 (merge SHA `0ce52b9`) + main Aria submodule pointer bump (`c8a5f03`) + 3-way SHA parity verified;1h micro-cycle;0 new memory
+**Latest (T-A124)**: [2026-05-24-aria-124-spec-approved-phase-b-ready.md](./2026-05-24-aria-124-spec-approved-phase-b-ready.md) — 2 cycles this session: (a) Track E follow-ups #16+#17 fully SHIPPED Phase A→D ~1h (aria-orch PR #18 `0ce52b9` + main Aria bump `c8a5f03`); (b) Aria #124 submodule pointer regression gate brainstorm CONVERGED + Phase A.1 Spec drafted + Phase A.2 R1 4-agent audit (4C+19I+20M PASS_WITH_WARNINGS 4/4) + Rev1 + R2 3-agent audit (**3/3 unanimous CONVERGED + 0 new Critical**) = **Spec APPROVED**。Brainstorm pattern: R2 双反转(tech-lead + code-reviewer mutual concession)+ ai-engineer R2 neutral 3rd path (B+) hardened + measured tripwire unified anchor + 4/4 R3 ACCEPT_R3。Carry-forward: Phase B+C+D ~12h to next session(s)。3 concurrent push races resolved cleanly via `pull --rebase`。6-way SHA parity 全 verified。0 new memory (4 candidates deferred to Phase D D.3 per discipline)。
 
-## ★ 前 session (2026-05-24 ~00:45 UTC) — 🎉 **M6 (US-026) Brainstorm CONVERGED**
+> **Multi-track note**: Track G (本 file) 和 Track A124 (parallel-container handoff) 同 session 周期 ship (~6h overlap)。state-scanner Phase 1.17 跨分支 frontmatter 看板是 multi-track 语义权威 (per v1.22.0+ design); 单 latest.md pointer 保留向后兼容,但应读两 pointers 都识别。
+
+## ★ 前 session — Track E follow-ups (2026-05-24 ~11:50 UTC, dev-claude2 intra-day predecessor)
+
+**Sister**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E #16 + #17 bundled aria-orch PR #18 (merge `0ce52b9`) + main submodule pointer bump (`c8a5f03`);1h micro-cycle dev-claude2 ship
+
+## ★ 前 session — Track E follow-ups (2026-05-24 ~11:50 UTC, dev-claude2 ship)
+
+**Predecessor**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E #16 + #17 bundled aria-orch PR #18 (merge `0ce52b9`) + main submodule pointer bump (`c8a5f03`);1h micro-cycle dev-claude2 ship
+
+## ★ 早前 session (2026-05-24 ~00:45 UTC) — 🎉 **M6 (US-026) Brainstorm CONVERGED**
 
 **Predecessor**: [2026-05-24-m6-brainstorm-converged-track-f.md](./2026-05-24-m6-brainstorm-converged-track-f.md) — Track F = M6 brainstorm CONVERGED (DEC-20260524-001, 11 owner decisions, 4 sub-Specs locked ~82h)
 
