@@ -9,36 +9,61 @@
 
 ---
 
-## Task Group Overview
+## Task Group Overview (Rev1 — added T-layerL / T-memory / T-telemetry-0)
 
 | Group | Topic | Scope ref | Est |
 |-------|-------|-----------|-----|
-| T-gate | (B+) gate implementation in phase-c-integrator §C.2.5 | §What A | ~2.5h |
-| T-override | Override mechanism (commit trailer + PR label parser) | §What B | ~1h |
-| T-telemetry | Telemetry writer + audit log + metrics files | §What B+C | ~0.5h |
-| T-replay | 9-scenario replay test fixture + assertions | §What A + §Acceptance | ~3.5h |
-| T-convention | (C) convention doc in standards/ | §What D | ~0.5h |
-| T-rollout | v1.28.0 5+1 SOT bump + CHANGELOG | §What E | ~0.5h |
-| T-rule6 | Rule #6 deterministic structural substitute | §Risks methodology | ~0.5h |
-| T-tripwire | Tripwire counter + observer cron config (defer enable to v1.29.0) | §What C | ~0.5h |
+| **T-layerL** (Rev1 NEW) | Phase B.1 prerequisite: Layer L claim for shared Skill file | §Risks R8 | ~0.2h |
+| T-gate | (B+) gate implementation in phase-c-integrator §C.2.4.5 | §What A | ~2.5h |
+| T-override | Override mechanism (commit trailer + PR label parser, ASCII `->` alt, SHA normalization) | §What B | ~1h |
+| **T-telemetry-0** (Rev1 NEW) | Create `aria/metrics/` directory + `.gitkeep` | §Risks R11 | ~0.1h |
+| T-telemetry | Telemetry writers + audit logs + `human_reviewed_as_fp` field | §What B+C | ~0.5h |
+| T-replay | 9-scenario replay test fixture + assertions (+ T-replay-10 detached HEAD) | §What A + §Acceptance | ~3.5h |
+| T-convention | (C) convention doc in `standards/conventions/submodule-pointer-hygiene.md` | §What D | ~0.5h |
+| T-rollout | v1.28.0 5+1 SOT bump + CHANGELOG (style anchor [1.27.0]) | §What E | ~0.5h |
+| T-rule6 | Rule #6 deterministic structural substitute | §Risks methodology | ~1h (Rev1 R1-tl M-tl-5: bumped from 0.5h) |
+| T-tripwire | Tripwire counter + Forgejo Actions workflow at `.forgejo/workflows/submodule-gate-tripwire.yml` (in 10CG/Aria main repo, NOT aria-plugin) | §What C | ~0.5h |
+| **T-memory** (Rev1 NEW) | Phase D: write 3-4 brainstorm pattern memory files cited in Spec but not yet present | §Risks R12 + §Cross-references | ~0.5h |
+
+**Total Phase B**: ~9.8h (Rev1 added ~0.8h for new tasks + T-rule6 bump)
+**Total end-to-end** (Phase A.2 + A.3 + B + C + D): ~15h unchanged (Rev1 absorbed within original buffer)
+
+---
+
+## T-layerL — Layer L claim for shared Skill file (Rev1 NEW, ~0.2h)
+
+per Risks R8 + Rev1 R1-tl-5 fix — `aria/skills/phase-c-integrator/SKILL.md` is shared resource.
+
+- [ ] Before any T-gate edit: write claim YAML to `refs/aria/coordination` per multi-terminal-coordination v1.22.0+ Layer L
+- [ ] track-id: `aria-submodule-pointer-regression-gate`
+- [ ] claimed-paths: `["aria/skills/phase-c-integrator/SKILL.md"]`
+- [ ] Heartbeat every 10min during Phase B (per Layer L claim_lifecycle)
+- [ ] Release claim in Phase D.2 after archive
 
 ---
 
 ## T-gate — (B+) gate implementation (~2.5h)
 
-### T-gate-1 — Sketch gate inline in phase-c-integrator §C.2.5 (Bash) (~0.5h)
+### T-gate-1 — Sketch gate inline in phase-c-integrator §C.2.4.5 (Bash) (~0.5h)
 
-- [ ] Read current `aria/skills/phase-c-integrator/SKILL.md` §C.2.4 (Rule #8 aether ci gate) for existing pattern
-- [ ] Add new §C.2.5 section header "Submodule Pointer Regression Gate (B+)"
-- [ ] Document mode toggle: `ARIA_SUBMODULE_GATE_MODE=warn|block` (env var; defaults set per version: v1.28.0=warn, v1.29.0=block)
-- [ ] Document order: §C.2.4 CI gate → §C.2.5 submodule gate → merge execution
+per Rev1 R1-tl-1 fix — NEW sub-step §C.2.4.5 (NOT §C.2.5 which is existing Multi-Remote Push)
+
+- [ ] Read current `aria/skills/phase-c-integrator/SKILL.md` §C.2.4 (Rule #8 aether ci gate) AND §C.2.5 (Multi-Remote Push) for context
+- [ ] Add NEW sub-step §C.2.4.5 between them: "Submodule Pointer Regression Gate (B+)"
+- [ ] Document mode toggle: `ARIA_SUBMODULE_GATE_MODE=warn|block` (env var; default via `.aria/config.json` `phase_c_integrator.submodule_gate.mode` set per version: v1.28.0=warn, v1.29.0=block) — per Rev1 R1-tl M-tl-4
+- [ ] Document order: §C.2.4 CI gate → **§C.2.4.5 submodule gate (NEW)** → branch-manager merge API call → §C.2.5 Multi-Remote Push (existing, untouched)
+- [ ] **Lock pre-merge invocation hook point** (Rev1 R1-tl-2 fix): explicit "called by phase-c-integrator BEFORE branch-manager merge API; not as post-merge hook"
 
 ### T-gate-2 — Implement fail-loud fetch (Step 1) (~0.3h)
 
-- [ ] `git fetch origin master` (exit-code-only abort, per AD-FOLLOWUP-1)
-- [ ] No `grep` of success patterns
-- [ ] On non-zero exit: classify as `wait_recoverable` (transient) vs terminal (auth/URL) via stderr pattern
-- [ ] Emit structured error to workflow-runner
+per Rev1 R1-ba-1/2 + R1-tl-3 fixes
+
+- [ ] `git fetch origin` (bare — NOT `git fetch origin master`; per R1-ba-1 latter doesn't update `origin/master` ref reliably)
+- [ ] Capture BEFORE_REMOTE = `git rev-parse origin/master 2>/dev/null || echo "FIRST_RUN"` **before** fetch (R1-ba-2 ordering fix)
+- [ ] **Bounded retries** (R1-tl-3 fix — drop stderr regex classifier): exponential backoff 1s/2s/4s × 3 attempts; if all fail → terminal block with explicit "fetch_exhausted_retries" telemetry entry + remediation hint (auth/network/URL drift)
+- [ ] No `grep` of success patterns (AD-FOLLOWUP-1 prohibition)
+- [ ] Capture AFTER_REMOTE = `git rev-parse origin/master` strictly after fetch
+- [ ] First-run handling (R1-ba-3): if BEFORE_REMOTE == "FIRST_RUN" → skip refspec assertion (no prior state to compare); proceed to Step 3 ancestry checks
 
 ### T-gate-3 — Implement refspec assertion (Step 2) (~0.4h)
 
@@ -73,8 +98,11 @@
 
 ### T-override-1 — Commit trailer parser (~0.4h)
 
+per Rev1 R1-ba-4 + R1-qa M-qa-5 fixes
+
 - [ ] Parse merge commit message via `git log -1 --format=%B HEAD`
-- [ ] Match trailer pattern: `^Submodule-Rollback: (\S+) (\S+)→(\S+) reason=(.+)$`
+- [ ] Match trailer pattern (BOTH Unicode and ASCII forms): `^Submodule-Rollback: (\S+) (\S+)(?:→|->)(\S+) reason=(.+)$` (Rev1 R1-ba-4 ASCII `->` alternative)
+- [ ] **SHA normalization** (R1-qa M-qa-5): resolve short SHAs (≥7 chars) via `git -C "$SUB" rev-parse "$short_sha"` before comparison
 - [ ] Verify trailer SHAs match the actual FEATURE/MASTER pointers (forbid mismatched override)
 - [ ] Return: allowed | not-allowed (mismatched) | absent
 
@@ -91,13 +119,28 @@
 
 ---
 
+## T-telemetry-0 — Create `aria/metrics/` directory (Rev1 NEW, ~0.1h)
+
+per Risks R11 + R1-km-4 fix
+
+- [ ] Idempotent `mkdir -p aria/metrics/` on first gate run (or as Phase B.1 scaffolding step)
+- [ ] Add `.gitkeep` file so empty dir is checked in
+- [ ] Add `aria/metrics/*.json` line to aria-plugin `.gitignore` (telemetry files are per-deployment, not committed)
+- [ ] Verify file system permissions (0755 dir / 0644 .gitkeep)
+
+---
+
 ## T-telemetry — Telemetry + audit (~0.5h)
 
 ### T-telemetry-1 — Warn-only telemetry writer (~0.3h)
 
+per Rev1 R1-qa-4 + R1-ba M-ba-3 fixes
+
 - [ ] Append to `aria/metrics/submodule-gate-warns.json` on every WOULD-BLOCK event
-- [ ] Fields: `timestamp, pr_id, submodule, master_sha, feature_sha, verdict, mode`
-- [ ] Used to compute FP rate for v1.29.0 flip decision
+- [ ] **JSONL format** (R1-ba M-ba-3: race-safe for concurrent appends; one JSON object per line; kernel write atomic for <PIPE_BUF=4096 bytes)
+- [ ] Fields: `timestamp, pr_id, submodule, master_sha, feature_sha, verdict, mode, human_reviewed_as_fp (initial: null)` — Rev1 R1-qa-4 adds FP-review field
+- [ ] Used to compute FP rate for v1.29.0 flip decision: FP = `count(human_reviewed_as_fp==true) / count(true+false)` excluding null pending entries
+- [ ] Monthly review owner (Rev1 M-qa-6): simonfishgit sets `human_reviewed_as_fp` field per WOULD-BLOCK event
 
 ### T-telemetry-2 — Block-mode audit logger (~0.2h)
 
@@ -165,10 +208,21 @@
 
 ### T-replay-9 — Concurrent force-push race (~0.4h)
 
-- [ ] Fixture: between `BEFORE=rev-parse` and `AFTER=rev-parse` in gate, simulate force-push to origin/master
-- [ ] If new origin/master is ancestry-forward → gate continues
-- [ ] If new origin/master is history-rewritten (non-ancestor) → gate aborts with operator confirm
-- [ ] Per backend-architect R3 missing scenario
+per backend-architect R3 missing scenario + Rev1 R1-ba M-ba-5 fix — use deterministic pre-staged fixture
+
+- [ ] Fixture: deterministic pre-stage — bare remote repo has commits A→B→C; create parent repo with origin/master at A; pre-stage bare remote at C (=force-pushed ahead)
+- [ ] Run gate; verify BEFORE rev-parse returns A, fetch advances to C, AFTER rev-parse returns C
+- [ ] If A is ancestor of C → gate continues (ancestry-forward)
+- [ ] **Variation**: bare remote rewrites to alternative branch A→D (non-ancestor of C) → gate aborts with operator confirm
+- [ ] Do NOT use real background concurrent processes (flaky)
+
+### T-replay-10 — Detached HEAD submodule (Rev1 NEW, ~0.2h)
+
+per qa R1 I-qa-1 — uncovered scenario
+
+- [ ] Fixture: submodule on detached HEAD at a commit that exists in origin but is not on any current branch
+- [ ] Verify: `fetch origin` succeeds, `ls-tree HEAD <sub>` returns valid SHA, `merge-base --is-ancestor` operates on raw SHAs correctly
+- [ ] Assert gate behavior matches expected verdict (PASS / REGRESSION / DIVERGENT based on relationship to master gitlink)
 
 ---
 
@@ -235,10 +289,27 @@ per `feedback_deterministic_structural_skill_rule6_substitute` (non-LLM AB):
 
 ### T-tripwire-2 — Observer cron drafting (DEFER enable to v1.29.0) (~0.3h)
 
-- [ ] Draft `aria/cron/submodule-gate-tripwire.sh` (Bash)
-- [ ] Weekly cron via Forgejo Actions OR Aether scheduled job
-- [ ] Logic: compare master HEAD~1 vs HEAD submodule gitlinks ancestry; on regression → append to misses.json + file Forgejo issue
-- [ ] Spec the cron schedule but do NOT activate it in v1.28.0; activate post-v1.29.0 ship
+per Rev1 R1-tl-3 fix — resolve proposal/tasks contradiction; location is **main 10CG/Aria repo**, NOT aria-plugin
+
+- [ ] Draft `.forgejo/workflows/submodule-gate-tripwire.yml` in `10CG/Aria` main repo (Forgejo Actions workflow)
+- [ ] Weekly cron schedule (e.g., `0 4 * * 0` = Sunday 04:00 UTC)
+- [ ] Logic in workflow step: compare master HEAD~1 vs HEAD submodule gitlinks ancestry; on regression → append to `aria/metrics/submodule-gate-misses.json` + file Forgejo issue with label `gate-tripwire-count`
+- [ ] **Cron always writes `last_run_timestamp` field** to misses.json (Rev1 R1-qa M-qa-3 fix) — monthly review owner detects cron skip via absence of recent timestamp
+- [ ] Spec the cron schedule but **DO NOT activate** workflow in v1.28.0 (`on: workflow_dispatch` only, manual trigger for testing); switch to `on: schedule` cron in v1.29.0 commit
+- [ ] Backup detection: workflow emits Aether alert OR Feishu webhook on failure (per qa M-qa-3)
+
+---
+
+## T-memory — Phase D: create 3-4 brainstorm pattern memory files (Rev1 NEW, ~0.5h)
+
+per Risks R12 + R1 C-km-1 fix — Spec cites these as cross-references but they don't yet exist
+
+- [ ] `feedback_brainstorm_forcing_function_unified_anchor.md` — R3 orchestrator forcing function (M6 origin + this brainstorm 2nd empirical)
+- [ ] `feedback_brainstorm_owner_escalation_discipline.md` — Q-escalation ≤2 per round healthy threshold; >2 = brainstorm cop-out signal
+- [ ] `feedback_paper_fix_antipattern.md` — substance-level vs surface-verdict-match distinction; M6 brainstorm R2 paper-fix caught, this brainstorm R2 substance-level reversal verified
+- [ ] **NEW candidate**: `feedback_r2_mutual_concession_third_path_synthesis.md` — when R1 fork's R2 challengers both concede to opposite positions, neutral 3rd party's synthesis path (strict superset of both concessions) is often the forcing-function unified anchor; this brainstorm = 1st empirical evidence post-M6
+- [ ] Index in MEMORY.md per Aria memory protocol
+- [ ] Decide at Phase D audit: ship all 4 OR drop NEW candidate if not deemed cross-cycle valuable (avoid memory inflation per `feedback_brainstorm_owner_escalation_discipline` lineage)
 
 ---
 

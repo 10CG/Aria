@@ -1,17 +1,25 @@
-# aria-submodule-pointer-regression-gate — Phase C.2.5 (B+) hardened pre-merge gate
+# aria-submodule-pointer-regression-gate — Phase C.2.4.5 (B+) hardened pre-merge gate
 
 > **Level**: 3 (Full — Skill behavior change + replay test fixtures + convention doc + 2-phase rollout + tripwire mechanism)
-> **Status**: **Draft** (Phase A.1 complete; awaiting Phase A.2 R1 post_spec audit)
+> **Status**: **Draft (Rev1)** (Phase A.2 R1 audit complete → 4 Critical + 19 Important addressed in Rev1; awaiting R2)
 > **Change ID**: `aria-submodule-pointer-regression-gate`
 > **Parent Forgejo issue**: [Aria #124](https://forgejo.10cg.pub/10CG/Aria/issues/124)
 > **Source incident**: 2026-05-23 PR #123 silent submodule pointer regression (commit `6fea5d7`) caught by post-merge audit + fast-forward fix `a8e0096`
-> **Brainstorm Source**: [DEC-20260524-002](../../../.aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md) — 4 R1 agents + 3 R2 reversals + 4 R3 unanimous ACCEPT_R3 + 3 Q-NEW MINOR (all resolved in this Spec)
+> **Brainstorm Source**: [DEC-20260524-002](../../../.aria/decisions/2026-05-24-aria-124-submodule-pointer-regression-gate.md) — 4 R1 agents + 3 R2 reversals (tech-lead + code-reviewer mutual concession) + ai-engineer R2 neutral 3rd path unified anchor + 4 R3 unanimous ACCEPT_R3 + 3 Q-NEW MINOR (all resolved in this Spec)
 > **Predecessor Spec (incident origin)**: [aria-layer2-docker-auth-cold-pull-fix](../../archive/2026-05-23-aria-layer2-docker-auth-cold-pull-fix/) (archived 2026-05-23, where PR #123 incident occurred)
-> **Effort baseline**: ~5h impl (gate + 9-scenario replay test fixtures + convention doc) + ~2h test infrastructure + ~1h docs + ~1h Rule #6 structural substitute = **~9h total Phase B effort**
-> **Target version**: aria-plugin **v1.28.0** (warn-only) → **v1.29.0** (block flip, 14d after v1.28.0 OR FP threshold <2% over 20+ merges)
-> **Modified Skill**: `aria/skills/phase-c-integrator/SKILL.md` §C.2.5 (extends Rule #8 gate location)
-> **NEW convention doc**: `standards/conventions/submodule-pointer-hygiene.md` (zero-code (C) doc, NOT Rule #10)
+> **Effort baseline**: ~9h Phase B impl (T-gate ~2.5h + T-override ~1h + T-telemetry ~0.5h + T-replay ~3.5h + T-convention ~0.5h + T-rollout ~0.5h + T-rule6 ~1h + T-tripwire ~0.5h) + ~3.5h Phase A.2-A.3 audit/allocation + ~2h Phase C+D = **~15h end-to-end** across 2-3 sessions
+> **Target version**: aria-plugin **v1.28.0** (warn-only) → **v1.29.0** (block flip, 14d hard date after v1.28.0 ship OR FP threshold <2% over 20+ WOULD-BLOCK events with ≥3 minimum-observation guard)
+> **Modified Skill**: `aria/skills/phase-c-integrator/SKILL.md` — **NEW sub-step §C.2.4.5 inserted between existing §C.2.4 (Rule #8 `aether ci status` gate) and existing §C.2.5 (Multi-Remote Push Enforcement, v1.15.0+)**. No existing section is renumbered; minimal-cascade insertion per Rev1 R1-tl-1 fix.
+> **NEW convention doc**: `standards/conventions/submodule-pointer-hygiene.md` (zero-code (C) doc, NOT Rule #10 — convention SOT only)
+> **NEW telemetry directory**: `aria/metrics/` (created on first run if absent — see T-telemetry-0)
+> **Tripwire observer location**: `.forgejo/workflows/submodule-gate-tripwire.yml` in `10CG/Aria` main repo (weekly cron — NOT `aria/cron/` in aria-plugin per Rev1 R1-tl-3 fix)
 > **Risk class**: Backward-compatible per `向后兼容` Aria principle — v1.28.0 ships in warn-only mode (logs WOULD-BLOCK, doesn't refuse merge); ecosystem has 14d to surface false positives before v1.29.0 flips to block.
+
+> **Audit trajectory** (R1 audit completed 2026-05-24T~14:59Z):
+>   - **Phase A.2 R1** (2026-05-24, 4-agent parallel: tech-lead + backend-architect + qa + knowledge-manager): **PASS_WITH_WARNINGS 4/4 unanimous** — 4 Critical + 19 Important + 20 Minor. Aggregate report: `.aria/audit-reports/post_spec-R1-2026-05-24T1459Z-aria-submodule-pointer-regression-gate.md`
+>   - **Phase A.2 Rev1 applied** (2026-05-24, this commit): 4 Critical (C-tl-1 numbering / C-tl-2 placement / C-tl-3 tripwire location / C-km-1 memory refs) + ~10 Important addressed inline
+>   - **Phase A.2 R2** (pending): expected 3-4 agent validate Rev1 — convergence target per `feedback_post_spec_audit_pragmatic_convergence` = unanimous PASS_WITH_WARNINGS + 0 new Critical
+>   - **CONVERGED** (pending R2)
 
 ---
 
@@ -56,18 +64,36 @@ This Spec ships **5 deliverables** in a single change unit, bundled because they
 
 ### A. (B+) hardened pre-merge gate
 
-New section in `aria/skills/phase-c-integrator/SKILL.md` §C.2.5 (after Rule #8 `aether ci status` check, before merge execution). Mechanism:
+**Hook point** (Rev1 R1-tl-2 fix): NEW sub-step **§C.2.4.5** in `aria/skills/phase-c-integrator/SKILL.md`, inserted between existing §C.2.4 (Rule #8 `aether ci status` gate) and existing §C.2.5 (Multi-Remote Push Enforcement, v1.15.0+). **Pre-merge** — invoked by phase-c-integrator BEFORE the branch-manager merge API call, AFTER §C.2.4 CI gate passes. If §C.2.4.5 blocks, merge never executes. (Existing §C.2.5 Multi-Remote Push runs POST-merge and is untouched by this Spec.)
+
+Mechanism (Bash):
 
 ```bash
-# Step 1 — fail-loud fetch (mandatory, exit-code-only abort per backend-architect Q-NEW-1)
-git fetch origin master
-# Non-zero exit → abort C.2.5 with explicit "fetch failed" error
-# Do NOT grep success patterns (git success signatures complex: "Already up to date", "up to date",
-# "new ref", fast-forward SHA range, etc. — too fragile to whitelist)
+# Step 1 — fail-loud fetch (mandatory, exit-code-only abort per AD-FOLLOWUP-1 / backend-architect R3 Q-NEW-1)
+# Rev1 R1-ba-1 fix: use bare `git fetch origin` (NOT `git fetch origin master`) — the bare form
+# updates origin/master remote-tracking ref reliably. `git fetch origin master` updates FETCH_HEAD
+# but does NOT advance origin/master in general, defeating Step 2 refspec assertion.
 
-# Step 2 — refspec assertion
-BEFORE_REMOTE=$(git rev-parse origin/master)
-# (already fetched in Step 1)
+# Capture BEFORE (Rev1 R1-ba-2 fix: BEFORE must be captured BEFORE fetch, not after)
+BEFORE_REMOTE=$(git rev-parse origin/master 2>/dev/null || echo "FIRST_RUN")
+
+# Wait_recoverable bounded retries (Rev1 R1-tl-3 fix: drop stderr regex classifier, use bounded retry)
+RETRY_DELAYS=(1 2 4)  # exponential backoff, 3 attempts total
+for delay in "${RETRY_DELAYS[@]}"; do
+    if git fetch origin 2>&1; then
+        FETCH_OK=1
+        break
+    fi
+    sleep "$delay"
+done
+if [[ "${FETCH_OK:-0}" != 1 ]]; then
+    echo "BLOCK: git fetch origin failed after 3 attempts (1s/2s/4s backoff). Submodule pointer ancestry cannot be verified safely." >&2
+    echo "       Manual remediation: investigate auth (PAT expiry?), network connectivity, or origin URL drift, then retry merge." >&2
+    log_gate_telemetry "FETCH_FAILURE" "$BEFORE_REMOTE" "(unknown)" "fetch_exhausted_retries"
+    exit 1
+fi
+
+# Step 2 — refspec assertion (Rev1 R1-ba-2 fix: AFTER captured strictly after fetch)
 AFTER_REMOTE=$(git rev-parse origin/master)
 # If expected-to-advance (e.g., upstream had new commits per `git log HEAD..origin/master`)
 # and BEFORE == AFTER → abort with operator confirm
@@ -144,6 +170,13 @@ Two ways to override gate when shipping legitimate revert:
 Submodule-Rollback: aria a8e0096→3b688a9 reason=v1.24.1 introduced critical regression in hook X
 ```
 
+ASCII alternative (per Rev1 R1-ba-4 fix — UTF-8 fragility in non-UTF-8 locales LANG=C/POSIX):
+```
+Submodule-Rollback: aria a8e0096->3b688a9 reason=v1.24.1 introduced critical regression
+```
+
+Both forms are accepted by the parser. Convention doc documents both. SHA can be short (≥7 chars) — parser resolves via `git rev-parse` before comparison (Rev1 R1-qa M-qa-5 fix).
+
 **Option 2 — PR label** `submodule-rollback-approved` (settable only by repo maintainers via Forgejo):
 - Lower granularity (PR-level not commit-level)
 - For multi-commit reverts where trailer would clutter
@@ -162,7 +195,7 @@ Auto-promote **(A) post-merge backward-move detector** without re-brainstorm if 
 
 **Counter mechanism** (per code-reviewer Q-NEW-1): tracked in `aria/metrics/submodule-gate-misses.json` (mechanical, append-only) with `{timestamp, miss_type, pr_id_if_known, master_sha, feature_sha, detected_by}`.
 
-**Monitoring observer** (per qa Q-NEW-1): weekly periodic GitHub Actions / Forgejo Actions cron in `10CG/Aria` that runs:
+**Monitoring observer** (per qa Q-NEW-1; Rev1 R1-tl-3 fix — proposal/tasks contradiction resolved): weekly Forgejo Actions workflow at **`.forgejo/workflows/submodule-gate-tripwire.yml` in `10CG/Aria` main repo** (NOT `aria/cron/` in aria-plugin). Bash logic in workflow runs:
 ```bash
 # Compare master HEAD~1 vs HEAD submodule gitlinks for ancestry
 for SUB in $(git config --file .gitmodules --get-regexp path | awk '{print $2}'); do
@@ -197,8 +230,11 @@ New file `standards/conventions/submodule-pointer-hygiene.md`. Content:
 | Block | aria-plugin **v1.29.0** | `ARIA_SUBMODULE_GATE_MODE=block` (default) | Refuses merge with exit 1 + remediation hint | Permanent |
 
 **Flip decision criteria** (per qa R3 + code-reviewer R3 concerns about indefinite warn-only):
-- FP rate < 2% sustained over 20+ merges in warn-only window OR
-- 14d hard date elapsed without explicit OpenSpec to defer (default-on policy — silence = ready to flip)
+- **FP rate < 2%** computed as `FP_count / total_WOULD-BLOCK_events` (Rev1 R1-qa-4 denominator fix — denominator is alerted cases, not all merges) sustained over **≥20 WOULD-BLOCK events** OR
+- **14d hard date** elapsed since v1.28.0 ship WITH **≥3 minimum gate executions observed in warn-only window** (Rev1 R1-qa-3 zero-activity guard); if <3 executions observed → document as "insufficient warm observation" in flip decision record + extend warn-only window to next 20 PR merges OR flip with explicit risk-acceptance note
+- Default-on policy: silence (no defer OpenSpec filed) = ready to flip at hard date IF minimum-observation guard met
+
+**FP labeling mechanism** (Rev1 R1-qa-4): warns schema includes `human_reviewed_as_fp: true|false|null` field. Monthly review (named owner: simonfishgit per Rev1 M-qa-6 fix) sets the field by examining each WOULD-BLOCK event against PR intent (legitimate rollback → true; actual regression → false; under investigation → null). FP rate = `count(true) / count(true+false)` excluding null pending entries.
 
 This mirrors Rule #8 rollout cadence + addresses warn-only drift risk.
 
@@ -275,7 +311,10 @@ Bash for the gate logic (consistency with existing phase-c-integrator + aria/hoo
 - Gate logic is git plumbing — Bash + git CLI is idiomatic
 - No dependency on Python runtime in C.2.5 critical path
 
-Performance budget: gate adds <500ms per submodule (3 submodules × ~150ms = <500ms total for fetch + ls-tree + 2 ancestry checks). Well under Rule #8 existing ~3-5s CI status check cost.
+Performance budget (Rev1 R1-ba-5 fix — realistic CI cold-path estimate):
+- **Warm cache (local dev)**: per-submodule fetch ~200ms + ls-tree <10ms + ancestry ×2 ~100ms ≈ ~310ms per submodule. 3 submodules sequential ≈ ~930ms total.
+- **CI cold-path (Forgejo Actions runner, fresh container, no warm git cache)**: per-submodule fetch ~500-2000ms + ls-tree <10ms + ancestry ~100ms ≈ ~610-2110ms per submodule. 3 submodules sequential ≈ ~1830-6330ms total.
+- **Worst case acceptable**: 3s warm / 6s cold. Comparable to or slightly higher than Rule #8 `aether ci status` (~3-5s). Phase B may add background-subshell parallelization for submodule loop if CI dogfood shows >5s sustained; defer optimization until measured.
 
 ---
 
@@ -320,7 +359,11 @@ OR ship across more sessions if owner pacing prefers smaller chunks.
 | R5 | First-time submodule false-block | HIGH if missed | nil-SHA explicit handling (qa R1 CRITICAL TEST GAP) — scenario 7 must verify gate exits 0 with INFO on empty ls-tree |
 | R6 | Concurrent force-push race during gate execution | LOW | Refspec assertion (Step 2) detects unexpected origin/master mid-flight; legitimate ancestry-forward continues, history-rewrite aborts with operator confirm (backend-architect R3 missing scenario #9) |
 | R7 | URL drift attack (submodule remote URL swapped to attacker server) | **Out of scope** | Supply-chain threat model — separate Spec; if manifests, tripwire condition #3 (non-PR-flow) catches + escalates |
-| R8 | Multi-terminal coordination — another session's `phase-c-integrator` changes conflict with this Spec | LOW | Spec lives in main Aria `openspec/changes/` (not aria-plugin) — parallel work on aria-plugin Skills happens but the OpenSpec for THIS change is unique per Spec ID |
+| R8 | Multi-terminal coordination — another session's `phase-c-integrator/SKILL.md` edits conflict with this Spec | MEDIUM (Rev1 R1-tl-5 upgrade) | Spec lives in main Aria `openspec/changes/` (unique per Spec ID), BUT the modified Skill file `aria/skills/phase-c-integrator/SKILL.md` is a shared resource. **Phase B.1 must claim** `aria/skills/phase-c-integrator/SKILL.md` via Layer L (multi-terminal-coordination v1.22.0+) before edits — write claim YAML with track-id `aria-submodule-pointer-regression-gate` to `refs/aria/coordination`. See T-layerL task. |
+| R9 (Rev1 NEW) | Tripwire dead-zone — observer cron skipped silently for weeks | MEDIUM | Cron itself writes `last_run_timestamp` to misses.json on every execution (Rev1 R1-qa M-qa-3); monthly review (owner: simonfishgit) checks for absence of recent timestamp = cron failure signal |
+| R10 (Rev1 NEW) | Telemetry retention unbounded | LOW | 4 JSONL files in `aria/metrics/` — append-only with no automated rotation. Monitor disk; manual rotation annually or when file >1MB. Estimated ~3-4 events/month → years before reaching 1MB. |
+| R11 (Rev1 NEW) | `aria/metrics/` directory does not exist on fresh clone | MEDIUM | T-telemetry-0 (NEW task) creates directory on first gate run (`mkdir -p aria/metrics`) with `.gitkeep` placeholder; idempotent |
+| R12 (Rev1 NEW) | 3 brainstorm pattern memory files referenced in Spec do not yet exist in user memory dir | LOW | **R1 C-km-1 finding**: `feedback_brainstorm_forcing_function_unified_anchor` + `feedback_brainstorm_owner_escalation_discipline` + `feedback_paper_fix_antipattern` are queued for write in Phase D D.3 of brainstorm cycle. Spec marks them as "(to be created Phase D)" in cross-refs. T-memory task added. |
 
 ---
 
@@ -408,10 +451,13 @@ NOT a dependency: `aether` plugin (not invoked by this gate). The fail-loud fetc
 
 ### Brainstorm pattern memory
 
-- `feedback_brainstorm_forcing_function_unified_anchor` — R3 orchestrator forcing function (this brainstorm replicated)
-- `feedback_brainstorm_owner_escalation_discipline` — Q-escalation count (this brainstorm: 3 Q-NEW total across R3, healthy)
-- `feedback_post_spec_audit_pragmatic_convergence` — pragmatic convergence (this brainstorm: 4/4 R3 ACCEPT_R3)
-- `feedback_paper_fix_antipattern` — R2 mutual concession (this brainstorm: substance-level reversals, non-paper)
+- `feedback_brainstorm_forcing_function_unified_anchor` **(to be created Phase D — Rev1 R1-km-1 fix)** — R3 orchestrator forcing function (this brainstorm replicated M6 pattern)
+- `feedback_brainstorm_owner_escalation_discipline` **(to be created Phase D — Rev1 R1-km-1 fix)** — Q-escalation count (this brainstorm: 3 Q-NEW total across R3, healthy threshold)
+- `feedback_post_spec_audit_pragmatic_convergence` ✓ exists — pragmatic convergence (this brainstorm: 4/4 R3 ACCEPT_R3)
+- `feedback_paper_fix_antipattern` **(to be created Phase D — Rev1 R1-km-1 fix)** — R2 mutual concession (this brainstorm: substance-level reversals, non-paper)
+- `feedback_r2_mutual_concession_third_path_synthesis` **(NEW candidate, to be created Phase D)** — R2 fork resolution via ai-engineer neutral 3rd path; current brainstorm 1st empirical evidence; cross-cycle valuable per `feedback_brainstorm_forcing_function_unified_anchor` lineage
+
+**T-memory task** added to tasks.md (Phase D scope) to create these memory entries before closeout.
 
 ### Related infrastructure
 
