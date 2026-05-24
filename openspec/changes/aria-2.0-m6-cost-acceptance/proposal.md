@@ -1,21 +1,23 @@
 # Aria 2.0 M6 Spec #1 — Cost Acceptance (dual-track schema + cron sentinel + alarm)
 
 > **Level**: 3 (Full — cross-cuts aria-orchestrator + .aria/config.json + validate-m6-handoff.py + Feishu webhook + audit-log immutability cross-check)
-> **Status**: **Draft** (Phase A.1; pending Phase A.2 post_spec audit)
+> **Status**: Draft
 > **Change ID**: `aria-2.0-m6-cost-acceptance`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)
 > **Predecessor Spec**: [aria-2.0-m5-replay-reconciler-drift-review-loop-audit](../../archive/2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit/proposal.md) (M5 archived 2026-05-23)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2, CONVERGED 2026-05-24)
-> **Effort baseline**: ~10h (DEC §2 Spec #1 central estimate)
+> **Effort baseline**: ~13h (updated from ~10h after R1 adds T3.7/T3.8 + T4.5/T4.6 + T5.11; see §Effort baseline)
 > **abi_compat hard constraints**: 5 forward-binding promises from m5-handoff.yaml (validate-m6-handoff.py must cross-check all 5; source: `aria-orchestrator/docs/m5-handoff.yaml` line 151-172)
 >   1. `dispatch_audit_log_immutable_promise` (line 152-155, AD-M5-8)
 >   2. `rework_round_cap_default_3_promise` (line 156-159, AD-M5-2)
 >   3. `spec_drift_threshold_default_70_promise` (line 160-163, AD-M5-5)
 >   4. `comment_poll_direct_transition_promise` (line 164-167, AD-M5-1)
 >   5. `risk_tier_dual_write_literal_always_promise` (line 168-171, AD-M5-8)
+> **AD allocation reservation**: AD-M6-1 / AD-M6-2 / AD-M6-3 are reserved for **this Spec #1** only.
+> Specs #2 / #3 / #4 must start from AD-M6-4 onwards. (per Q4, 2026-05-24)
 > **Audit trajectory**:
->   - Phase A.2 R1: pending
+>   - Phase A.2 R1: NEEDS_FIX (4/4, 2026-05-24) — 11 Critical + 8 Important; R1 fixes applied 2026-05-24 (backend-architect pass)
 >   - Phase A.2 R2: pending
 
 ---
@@ -58,11 +60,12 @@ owner must manually run the cron daily for ≥3 days before Spec #2 kickoff (per
 
 ## What
 
-### In scope (~10h)
+### In scope (~13h)
 
 #### A. Dual-row cost.json schema (2h)
 
-Write a cron script (`aria-orchestrator/acceptance/m6-cost-snapshot.sh` or Python equivalent) that
+<!-- R1-C8 fix: §What E and §How diagram changed from .sql to .py throughout -->
+Write a cron script (`aria-orchestrator/acceptance/m6-cost-snapshot.py`) that
 produces `.aria/cost.json` with exactly two top-level keys:
 
 ```jsonc
@@ -84,7 +87,7 @@ produces `.aria/cost.json` with exactly two top-level keys:
     "window_start_iso": "<ISO-8601>",
     "window_end_iso": "<ISO-8601>"
   },
-  "freshness_ts": "<ISO-8601-UTC>"
+  "freshness_ts": "<RFC-3339-UTC+00:00>"
 }
 ```
 
@@ -97,11 +100,25 @@ Field semantics (P-1, DEC §4 ai-R3CH-2 closure):
 - `subscription_usd.window_start_iso` / `window_end_iso` identify the billing cycle the snapshot
   corresponds to (e.g. current calendar month). Used to correlate trending data, not for cost math.
 - `metered_usd.cost_usd` is the SQLite aggregate `SUM(token_cost_usd)` for Zhipu-routed dispatches
-  within the rolling 30-day window queried from the dispatches table.
+  within the rolling 30-day window. The query filters by `provider_cost_model='metered'` (not by a
+  `provider` column — the dispatches table has no `provider` column; it has `provider_cost_model`).
+  The aggregate is cast to `float` explicitly: `float(cursor.fetchone()[0] or 0.0)`.
+- `freshness_ts` MUST be serialized as `datetime.now(timezone.utc).isoformat()`, which produces an
+  explicit `+00:00` suffix (e.g., `2026-05-24T12:00:00+00:00`). Never bare `Z`, never naive.
 
-The cost aggregation query reads from `aria-orchestrator` SQLite (dispatches table `token_cost_usd` column,
-already written per-dispatch by M2 `update_token_usage` path). No new schema migration needed — this Spec
-is additive (reads existing columns, writes a JSON artifact).
+<!-- R1-C3 fix: absolute repo-relative paths specified here for implementer clarity -->
+The cost aggregation query reads from `aria-orchestrator` SQLite (dispatches table `token_cost_usd`
+column at `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/schema.sql`, already written
+per-dispatch by M2 `update_token_usage` path). No new schema migration needed — this Spec is additive
+(reads existing columns, writes a JSON artifact).
+
+<!-- R1-I-1 fix: atomic write pattern required -->
+<!-- R1-I-6 fix: atomic write also for archive copy -->
+The snapshot script MUST use atomic write for both outputs:
+1. Write to `.aria/cost.json.tmp`, then `os.rename('.aria/cost.json.tmp', '.aria/cost.json')`.
+2. Write to `.aria/cost-snapshots/cost-YYYY-MM-DD.json.tmp`, then `os.rename()` to final path.
+This prevents a mid-write Nomad kill from producing corrupt JSON. Concurrent reader/writer safety
+is achieved via atomic rename (not file locking); document this in AD-M6-2.
 
 #### B. Owner-set thresholds in .aria/config.json (1h)
 
@@ -120,18 +137,23 @@ Document the threshold semantics: `zhipu_30d_usd` applies to the rolling 30-day 
 sum; `luxeno_monthly_usd` applies to the owner's actual monthly Luxeno invoice (NOT the derived null
 cost_usd — it is a manual reference threshold for owner awareness, not automated computation).
 
-#### C. freshness_ts gate (0.5h, threaded into snapshot script + acceptance SQL)
+#### C. freshness_ts gate (0.5h, threaded into snapshot script + acceptance check)
 
-The cron script writes `freshness_ts` as the UTC ISO-8601 timestamp at snapshot time.
+The cron script writes `freshness_ts` as described in §A (RFC-3339 UTC with `+00:00` suffix).
 
 Acceptance gate definition: `now - freshness_ts > 86400 seconds` → cost.json is stale; the entire
 Spec #1 acceptance check is rejected with a stale-data error. This prevents passing acceptance
 on a 48h-old snapshot.
 
-#### D. Cron sentinel + alarm path (2h)
+#### D. Cron sentinel + alarm path (3h)
 
+<!-- R1-C11 fix: added §D.iii dispatch volume floor per PRD §645 -->
 A Nomad periodic job (or extension to existing `aria-layer1-cron`) runs the cost snapshot script
-daily. On completion, if `metered_usd.cost_usd >= 0.8 * m6.cost_thresholds.zhipu_30d_usd`, send a
+daily.
+
+**D.i — Zhipu 80% cost threshold alarm**
+
+On completion, if `metered_usd.cost_usd >= 0.8 * m6.cost_thresholds.zhipu_30d_usd`, send a
 Feishu warning card via the existing `ARIA_FEISHU_WEBHOOK_URL` nomad var (no new var creation).
 
 Luxeno alarm: because `subscription_usd.cost_usd` is `null`, the 80% alarm for Luxeno is
@@ -140,44 +162,146 @@ script MUST NOT treat `null` as 0 when evaluating the Luxeno alarm path — doin
 alarms that should fire (Luxeno=0 false-positive). The script logs a reminder
 `"Luxeno subscription: manual invoice review required (cost_usd not per-dispatch attributable)"`.
 
-Feishu alarm card fields: `provider`, `cost_usd`, `threshold`, `pct_used`, `freshness_ts`, `action_url`.
+<!-- R1-I-3 fix: ARIA_FEISHU_WEBHOOK_URL absence caught around alarm send only, not snapshot write -->
+If `ARIA_FEISHU_WEBHOOK_URL` is absent at runtime, the cron script MUST:
+1. Write cost.json successfully (do NOT abort snapshot write due to missing alarm config).
+2. Log `[WARN] alarm-skipped: ARIA_FEISHU_WEBHOOK_URL not configured; Feishu alarm suppressed`.
+3. Exit 0 (cron must not fail due to missing alarm config).
+The `NotConfigured` exception from `feishu_webhook.py` MUST be caught around the `feishu_send`
+call only — not around the snapshot write path.
 
-#### E. Acceptance SQL script (1.5h, binary-falsifiable per `[[feedback_falsifiable_evidence_for_binary_acceptance]]`)
+Feishu alarm card fields: `provider`, `cost_usd`, `threshold`, `pct_used` (integer 0-100), `freshness_ts`, `action_url`.
 
-A standalone SQL + Python script `aria-orchestrator/acceptance/check-m6-cost-acceptance.sql` (or
-Python wrapper calling SQLite) that emits binary PASS/FAIL for each criterion. See §Acceptance
-criteria for the exact SQL queries.
+<!-- R1-C5 fix: pct_used defined as integer 0-100; decimal arithmetic required -->
+`pct_used` is an **integer 0-100** (e.g., 80, not 0.80). Computed as `int(round(cost_usd / threshold * 100))`.
+Use `decimal.Decimal` arithmetic in threshold comparisons to avoid IEEE-754 drift at non-round thresholds.
+
+**D.ii — Luxeno manual review reminder**
+
+The cron script always logs (regardless of alarm threshold):
+`"Luxeno subscription: manual invoice review required (cost_usd not per-dispatch attributable)"`
+
+**D.iii — Dispatch volume floor check**
+
+<!-- R1-C11 fix: new section per PRD §645 "≥10/day under flat-rate" requirement -->
+Per PRD §645 "(iii) Dispatch volume floor: ≥10/day under flat-rate (Luxeno subscription
+cost-effectiveness gate; below floor → reconsider subscription vs metered routing)":
+
+The cron script computes the 7-day rolling average of dispatches under `provider_cost_model=
+'subscription_flat'`:
+
+```sql
+SELECT COUNT(*) / 7.0
+FROM dispatches
+WHERE provider_cost_model = 'subscription_flat'
+  AND created_at > datetime('now', '-7 days')
+```
+
+<!-- R1-C1 fix: WHERE provider_cost_model='subscription_flat' not WHERE provider='luxeno' -->
+If this average is **strictly less than 10 dispatches/day**, emit a Feishu info card with
+severity=info (not warning), title `"Luxeno volume floor reminder"`, body:
+`"Luxeno dispatch volume below subscription-effectiveness floor (N=<avg_per_day>, floor=10); consider routing reconfiguration."`.
+
+Volume floor check is independent of the 80% cost alarm. Both may fire in the same cron run.
+
+#### E. Acceptance script (1.5h, binary-falsifiable per `[[feedback_falsifiable_evidence_for_binary_acceptance]]`)
+
+<!-- R1-C8 fix: script extension locked as .py everywhere -->
+A standalone Python script `aria-orchestrator/acceptance/check-m6-cost-acceptance.py` (calling
+SQLite) that emits binary PASS/FAIL for each criterion. See §Acceptance criteria for the exact
+checks.
+
+<!-- R1-C7 fix: exit code contract lifted from AD-M6-3 defer to Spec body per Q1 -->
+**Exit code contract** (owner decision Q1, 2026-05-24):
+- `exit 0` — all sub-checks (AC-1..AC-4) PASS.
+- `exit 1` — one or more AC sub-checks FAIL (data condition: stale data, wrong schema, null guard violation, missing or invalid threshold value).
+- `exit 2` — infrastructure error that prevents evaluation:
+  - `.aria/cost.json` absent (emit `[ERROR] AC-0: cost.json not found — cron has never run`)
+  - corrupt JSON in cost.json or config.json (emit `[ERROR] AC-0: JSON parse error: <filename>`)
+  - `.aria/config.json` absent or `m6.cost_thresholds` key missing
+  - `ARIA_FEISHU_WEBHOOK_URL` absent ONLY when the alarm send path is the specific sub-check under test
+
+Each sub-check emits `[PASS] AC-N: <name>` or `[FAIL] AC-N: <reason>` (or `[ERROR] AC-0: <reason>` for infra failures).
 
 #### F. validate-m6-handoff.py with 5 abi_compat promise checks (2h, P-3)
 
 A new `aria-orchestrator/docs/validate-m6-handoff.py` script (sibling to `validate-m5-handoff.py`)
 that cross-checks all 5 m5-handoff.yaml abi_compat promises are still honoured in the codebase.
+
+<!-- R1-C3 fix: all grep targets use absolute repo-relative paths (REPO_ROOT resolution pattern) -->
+The script resolves paths using `REPO_ROOT = Path(__file__).parent.parent.parent` (mirrors
+`validate-m5-handoff.py::REPO_ROOT` resolution). All file targets use absolute paths:
+- Python sources: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / "*.py"`
+- SQL migrations: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "migrations" / "*.sql"`
+- Schema: `REPO_ROOT / "hermes-extensions" / "aria-layer1" / "aria_layer1" / "schema.sql"`
+
 The 5 checks (per DEC §4 backend M-ba-R3-1c):
 
 1. `check_dispatch_audit_log_immutable` — assert `schema.sql` still contains `audit_no_update` and
-   `audit_no_delete` trigger definitions; assert `004_schema_v4_additive.sql` has not been modified
-   to DROP those triggers.
+   `audit_no_delete` trigger name strings (positive grep on schema.sql); assert `004_schema_v4_additive.sql`
+   does NOT contain `DROP TRIGGER` (negative grep — trigger names absent from migration file means
+   triggers are not dropped).
 2. `check_rework_round_cap_default_3` — grep `extension.py` for literal `3` as default in
    `_read_rework_max_round`; fail if default value is not `3`.
 3. `check_spec_drift_threshold_default_70` — grep `reconciler.py` for literal `70` as default in
    `_read_spec_drift_threshold`; fail if default value is not `70`.
-4. `check_comment_poll_direct_transition` — grep `comment_poll.py` for the `_handle_s7_human_gate`
-   direct call wiring; assert it is not removed or bypassed.
-5. `check_risk_tier_dual_write_literal_always` — grep dispatcher/db INSERT path for `'always'`
-   literal written to `risk_tier_stub`; fail if literal is absent.
+4. `check_comment_poll_direct_transition` — grep `comment_poll.py` using
+   `re.search(r'^\s*[^#]*_handle_s7_human_gate\s*\(', content, re.MULTILINE)` to exclude commented-out
+   or dead-code-wrapped calls; assert match exists (call is present and non-commented).
+5. `check_risk_tier_dual_write_literal_always` — grep dispatcher/db INSERT path using
+   `re.search(r"INSERT.*risk_tier_stub.*'always'", content, re.DOTALL)` (anchored to INSERT context,
+   not any occurrence of `'always'`); fail if pattern is absent.
 
 In addition: `validate-m6-handoff.py` must include `check_cost_measurement_method_enum` (P-2, DEC §4
-qa-M-qa-R3-3): validates that the cost snapshot output's `cost_measurement_method` field (if present
-in the schema) is one of the explicit enum values:
-`{provider_api_billing, local_token_count_x_unit_price, subscription_flat_no_attribution}`.
-If the field is absent from cost.json (current schema does not include it), this check verifies that
-the schema document explicitly lists which method applies to each provider row.
+qa-M-qa-R3-3).
+
+<!-- R1-C9 fix: provider_api_billing kept as RESERVED with explicit forward-compat note -->
+**Provider → cost_measurement_method mapping (locked, no enum drift)**:
+
+| Provider | Method | Source |
+|----------|--------|--------|
+| `zhipu` | `local_token_count_x_unit_price` | `zhipu_pricing._PRICING` table; Zhipu API response does NOT return `cost_usd` field — cost is computed locally from token counts |
+| `luxeno` | `subscription_flat_no_attribution` | flat subscription; per-call attribution structurally impossible |
+| *(reserved)* | `provider_api_billing` | RESERVED for future providers (e.g., AWS Bedrock billing export, OpenAI `/v1/usage`); **no current Aria provider** exposes per-call `cost_usd` in API response |
+
+`check_cost_measurement_method_enum`: validates that for each provider row in cost.json, the
+`cost_measurement_method` field (if present) is one of the three enum values above. If the field is
+absent from cost.json (current schema does not include it), this check emits
+`[WARN] cost_measurement_method field absent from cost.json; advisory in M6, promoted to FAIL in M7+`
+and exits 0 (warning-only in M6).
+
+Additionally: `check_cost_measurement_method_enum` asserts that `zhipu_client.py`'s `_post_chat`
+return dict does NOT contain a `cost_usd` key — confirming `local_token_count_x_unit_price` is the
+correct enum for Zhipu. This check fails if someone refactors `zhipu_client.py` to expose a
+`cost_usd` field without updating the enum mapping.
+
+<!-- R1-C10 + Q2 fix: check_zhipu_pricing_freshness added to validate-m6-handoff.py -->
+`validate-m6-handoff.py` must also include `check_zhipu_pricing_freshness` (Q2, 2026-05-24):
+
+- Parse `_PRICING_REVIEW_DUE` and `_PRICING_OWNER_VERIFIED` from
+  `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/zhipu_pricing.py`.
+- Exit 1 with `[WARN] zhipu_pricing: _PRICING_REVIEW_DUE ({date}) is in the past — pricing is stale; run owner pricing review ritual` if `_PRICING_REVIEW_DUE < datetime.now(timezone.utc).date()`.
+- Exit 1 with `[WARN] zhipu_pricing: _PRICING_OWNER_VERIFIED=False — cost attribution unconfirmed` if `_PRICING_OWNER_VERIFIED == False`.
+- This freshness check expands AC-8 (see §Acceptance criteria AC-8).
 
 #### G. 3-day rolling history precondition for Spec #2 (0.5h documentation + manual owner step)
 
 `validate-m6-handoff.py` includes `check_3_day_rolling_history_exists`: verifies that the directory
 `.aria/cost-snapshots/` contains ≥3 files matching `cost-YYYY-MM-DD.json` with consecutive dates
-ending no earlier than `today - 1 day` (i.e., at least the prior 3 calendar days have a snapshot).
+ending no earlier than `today - 1 day`.
+
+<!-- R1-C6 fix: algorithm specified precisely -->
+**Algorithm** (consecutive-day check):
+- "Today" is defined as `datetime.now(timezone.utc).date()`.
+- Extract all dates from `cost-YYYY-MM-DD.json` filenames in `.aria/cost-snapshots/`.
+- Sort descending; take the 3 most-recent dates.
+- Check passes if AND ONLY IF:
+  (a) ≥3 files exist matching the pattern.
+  (b) The 3 most-recent dates form a consecutive sequence with no gaps:
+      `date[i+1] == date[i] + timedelta(days=1)` for each adjacent pair.
+  (c) The most recent date is no earlier than `today - 1 day`.
+- A set of `[today-4, today-2, today-1]` files (gap at `today-3`) FAILS condition (b)
+  even though it has ≥3 files — the gap is detected.
 
 This file is a gate for Spec #2 startup: Spec #2 e2e-resilience MUST NOT start its 7-day run until
 this check passes. Owner manual action: after Spec #1 ships, run the cron manually daily for ≥3 days
@@ -196,53 +320,21 @@ to accumulate the required history (OR wait for natural cron cadence).
 | OOS-7 | Schema migration to dispatches table | Cost aggregation reads existing M2 columns (`token_cost_usd`); no migration needed |
 | OOS-8 | Luxeno per-dispatch attribution computation | Attribution is structurally null per subscription billing; computing it would be mathematically incorrect |
 | OOS-9 | M5-OS-PB-1 carry-forward (comment_poll lazy-wire forgejo UX fix) | Owner Q6 decision: "defer all carry-forward"; confirmed dropped 4/4 R3 |
+| OOS-10 | FX adapter (CNY → USD conversion at runtime) | USD only in Spec #1. CNY→USD conversion is part of the pricing review ritual: owner manually edits `zhipu_pricing.py` literals during `_PRICING_REVIEW_DUE` refresh. Not a Spec #1 runtime concern. (per Q3, 2026-05-24) |
 
 ---
 
-## How
+## Constraints
 
-### Technical approach
+<!-- R1-I-8 + Q3 fix: USD-only constraint clause added -->
+### Currency
 
-Cost data pipeline:
-```
-dispatches.token_cost_usd (per-dispatch, written by M2 ProviderRouter)
-    │ SQLite SUM WHERE provider='zhipu' AND created_at > now-30d
-    ▼
-metered_usd.cost_usd  (rolling 30d aggregate, written to .aria/cost.json)
+All `cost_usd` values in this Spec are **USD (ISO 4217)**. There is no FX conversion adapter at
+runtime. Zhipu's public prices are denominated in CNY; the owner manually converts to USD when
+updating `zhipu_pricing.py` literals during the `_PRICING_REVIEW_DUE` refresh cycle. FX adaptation
+is OOS-10 (see above).
 
-Luxeno API (or manual input)
-    │ tokens_used (informational) + window dates
-    ▼
-subscription_usd  (null cost_usd, written to .aria/cost.json)
-
-.aria/cost.json
-    │ daily cron writes
-    │ each run also archives to .aria/cost-snapshots/cost-YYYY-MM-DD.json
-    ▼
-check-m6-cost-acceptance.sql  →  PASS/FAIL per criterion
-validate-m6-handoff.py        →  5 abi_compat promise checks + 3-day history gate
-```
-
-Alarm path:
-```
-cron script reads .aria/config.json m6.cost_thresholds.zhipu_30d_usd
-    │ metered_usd.cost_usd >= 0.80 * threshold
-    ▼
-Feishu warning card via ARIA_FEISHU_WEBHOOK_URL (existing env var)
-    │ Luxeno alarm: null cost_usd → NO automated alarm; log manual-review reminder only
-```
-
-### Key design decisions (AD-M6-1..AD-M6-3, to be filled during Phase B)
-
-| ID | Topic | Phase | Status |
-|----|-------|-------|--------|
-| AD-M6-1 | cost.json snapshot script language (bash vs Python) + integration with existing cron job | Phase B | _slot_ |
-| AD-M6-2 | cost-snapshots/ archive naming + retention (how many days kept, cleanup policy) | Phase B | _slot_ |
-| AD-M6-3 | validate-m6-handoff.py: exit code semantics + stdout format (machine-readable vs human prose) | Phase B | _slot_ |
-
----
-
-## Constraints (abi_compat hard constraints, M6 must not violate)
+### abi_compat hard constraints (M6 must not violate)
 
 | Promise | Requirement | Source | Enforcement |
 |---------|------------|--------|-------------|
@@ -254,6 +346,68 @@ Feishu warning card via ARIA_FEISHU_WEBHOOK_URL (existing env var)
 
 This Spec introduces no new abi_compat promises (cost schema is additive; no new abi_compat forward-binding to M7 identified at this stage).
 
+### Platform
+
+Implementation target: Linux only (Nomad alloc running Python 3.9+ per aria-layer1 container image).
+macOS/Windows compatibility is not required. POSIX `os.rename()` atomicity assumed.
+
+---
+
+## How
+
+### Technical approach
+
+Cost data pipeline:
+```
+dispatches.token_cost_usd (per-dispatch, written by M2 ProviderRouter)
+    │ SQLite SUM WHERE provider_cost_model='metered' AND created_at > now-30d
+    ▼
+metered_usd.cost_usd  (rolling 30d aggregate, written to .aria/cost.json)
+
+Luxeno API (or manual input)
+    │ tokens_used (informational) + window dates
+    ▼
+subscription_usd  (null cost_usd, written to .aria/cost.json)
+
+.aria/cost.json  (atomic write via os.rename)
+    │ daily cron writes
+    │ each run also archives to .aria/cost-snapshots/cost-YYYY-MM-DD.json (atomic)
+    ▼
+check-m6-cost-acceptance.py  →  PASS/FAIL per criterion (exit 0/1/2)
+validate-m6-handoff.py       →  5 abi_compat promise checks + pricing freshness + 3-day history gate
+```
+
+<!-- R1-C1 fix: SQL query in diagram uses provider_cost_model='metered', not provider='zhipu' -->
+
+Alarm path:
+```
+cron script reads .aria/config.json m6.cost_thresholds.zhipu_30d_usd
+    │ metered_usd.cost_usd >= 0.80 * threshold  (Decimal arithmetic)
+    ▼
+Feishu warning card via ARIA_FEISHU_WEBHOOK_URL (existing env var)
+    │ Luxeno alarm: null cost_usd → NO automated alarm; log manual-review reminder only
+    │
+    │ ARIA_FEISHU_WEBHOOK_URL absent → log [WARN] + continue; exit 0
+    ▼
+Volume floor check:
+    │ 7-day avg dispatches WHERE provider_cost_model='subscription_flat' < 10/day
+    ▼
+Feishu info card "Luxeno volume floor reminder" (severity=info, not warning)
+```
+
+<!-- R1-C1 fix: SQL in alarm path diagram uses provider_cost_model='subscription_flat', not provider='luxeno' -->
+
+### Key design decisions (AD-M6-1..AD-M6-3)
+
+<!-- R1-C7 + Q1 fix: AD-M6-3 removed as defer slot; exit code contract lifted to Spec body -->
+<!-- R1-I-4 + Q4 fix: AD allocation reservation note added -->
+
+| ID | Topic | Decision |
+|----|-------|----------|
+| AD-M6-1 | cost.json snapshot script language + integration | Python (same as aria_layer1 runtime; enables unittest mocking). Integrates with existing `aria-layer1-cron` as a new sub-command rather than a new Nomad job. |
+| AD-M6-2 | cost-snapshots/ archive naming + retention | Files named `cost-YYYY-MM-DD.json`. Retention: keep last 30 files (30-day rolling); cleanup on each cron run. Atomic write via `os.rename()` for both cost.json and archive copy. Concurrent reader/writer safety via atomic rename (no file locking needed). |
+| AD-M6-3 | *(removed)* | Exit code contract lifted to §What E (Spec body) per owner Q1. No Phase B decision needed. |
+
 ---
 
 ## Acceptance criteria
@@ -263,23 +417,31 @@ No subjective language. Each criterion cites the concrete verifiable evidence.
 
 ### AC-1 — cost.json exists and is fresh
 
-**Evidence**: file `.aria/cost.json` exists AND:
-```bash
-python3 -c "
-import json, datetime, sys
+<!-- R1-C4 fix: timezone-aware datetime.now(timezone.utc); tzinfo assert; age<0 guard; boundary < 86400 -->
+**Evidence**: file `.aria/cost.json` exists AND the following check passes:
+```python
+import json, sys
+from datetime import datetime, timezone
 d = json.load(open('.aria/cost.json'))
-ts = datetime.datetime.fromisoformat(d['freshness_ts'].rstrip('Z'))
-age = (datetime.datetime.utcnow() - ts).total_seconds()
+ts = datetime.fromisoformat(d['freshness_ts'])
+if ts.tzinfo is None:
+    print('FAIL AC-1: freshness_ts is timezone-naive; snapshot script MUST write UTC+00:00', file=sys.stderr)
+    sys.exit(1)
+now = datetime.now(timezone.utc)
+age = (now - ts).total_seconds()
+if age < 0:
+    print(f'FAIL AC-1: freshness_ts is in the future (skew={abs(age):.1f}s); verify system clock', file=sys.stderr)
+    sys.exit(1)
 sys.exit(0 if age < 86400 else 1)
-"
 ```
-Exit code 0 = PASS; exit code 1 = stale (fail acceptance).
+The snapshot script MUST write `freshness_ts` as `datetime.now(timezone.utc).isoformat()` (produces
+`+00:00` suffix, e.g. `2026-05-24T12:00:00+00:00`). Never bare `Z`, never timezone-naive.
+Boundary: `age STRICTLY LESS THAN 86400` seconds (a snapshot exactly 86400 seconds old is STALE).
 
 ### AC-2 — dual-row schema correct
 
 **Evidence**:
-```bash
-python3 -c "
+```python
 import json, sys
 d = json.load(open('.aria/cost.json'))
 assert 'metered_usd' in d, 'missing metered_usd'
@@ -289,42 +451,75 @@ assert d['subscription_usd']['provider'] == 'luxeno', 'subscription provider mus
 assert d['subscription_usd']['cost_usd'] is None, 'Luxeno cost_usd must be null (not 0)'
 assert 'attribution_disclaimer' in d['subscription_usd'], 'missing attribution_disclaimer'
 assert isinstance(d['metered_usd']['cost_usd'], (int, float)), 'Zhipu cost_usd must be numeric'
+assert d['metered_usd']['cost_usd'] >= 0.0, 'Zhipu cost_usd must not be negative'
 print('PASS')
-"
 ```
 Must print `PASS` without assertion errors.
 
 ### AC-3 — Luxeno=0 false-positive prevention
 
-**Evidence**: the cron alarm script, when given a cost.json with `subscription_usd.cost_usd = null`,
-does NOT evaluate `null >= 0.8 * threshold` as truthy and does NOT send a Feishu alarm card for
-Luxeno. This is verified by unit test: mock `cost_usd=null` input → assert `feishu_send` was NOT
-called for the Luxeno row.
+<!-- R1-C2 fix: AC-3 now asserts the snapshot script's transformation (null guard in code), not the schema column -->
+**Evidence**: The snapshots script's null guard is verified at two layers:
 
-Additionally: `SELECT COUNT(*) FROM dispatches WHERE provider = 'luxeno' AND token_cost_usd IS NULL`
-produces a row count ≥ 0 without error (column existence + null semantics), confirming the existing
-schema does not store Luxeno per-dispatch cost as 0.
+**Layer 1 — Code path (primary)**: The cron alarm script, when given a cost.json with
+`subscription_usd.cost_usd = null`, does NOT evaluate `null >= 0.8 * threshold` as truthy and
+does NOT send a Feishu alarm card for Luxeno. Verified by unit test: mock `cost_usd=null` input
+→ assert `feishu_send` was NOT called for the Luxeno row (T3.5).
+
+**Layer 2 — Schema invariant note**: The dispatches table stores `token_cost_usd REAL NOT NULL
+DEFAULT 0.0` (schema.sql line 101). Luxeno callers write `cost_usd=0.0` per-dispatch (not NULL).
+The `subscription_usd.cost_usd=null` in cost.json is a **snapshot-script transformation**: the
+script deliberately sets this field to `null` when the `provider_cost_model='subscription_flat'`
+aggregate is computed, because `0.0` would be a false attribution (the schema stores 0.0 per
+dispatch as a sentinel, not as a real cost). The null in cost.json is distinct from the 0.0 in
+the schema. AC-3 validates the transformation, not the schema column value.
+
+<!-- R1-C1 fix: AC-3 SQL uses provider_cost_model='subscription_flat', not provider='luxeno' -->
+Verification query (schema layer): `SELECT COUNT(*) FROM dispatches
+WHERE provider_cost_model = 'subscription_flat' AND token_cost_usd IS NOT NULL`
+must return 0 after a schema-compliant backfill (or >= 0 for pre-M2 legacy rows where
+`provider_cost_model` is NULL, which is acceptable per backfill semantics).
 
 ### AC-4 — .aria/config.json thresholds set
 
 **Evidence**:
-```bash
-python3 -c "
+```python
 import json, sys
 cfg = json.load(open('.aria/config.json'))
 t = cfg['m6']['cost_thresholds']
 assert isinstance(t['zhipu_30d_usd'], (int, float)) and t['zhipu_30d_usd'] > 0
 assert isinstance(t['luxeno_monthly_usd'], (int, float)) and t['luxeno_monthly_usd'] > 0
 print('PASS')
-"
 ```
 Must print `PASS`.
 
 ### AC-5 — 80% Feishu alarm fires correctly
 
-**Evidence**: unit test where `metered_usd.cost_usd = 0.80 * zhipu_30d_usd` (boundary) → assert
-`feishu_send` IS called with `pct_used >= 80`. Complementary: `cost_usd = 0.79 * threshold` →
-`feishu_send` NOT called. Both assertions pass.
+<!-- R1-C5 fix: pct_used is integer 0-100; decimal arithmetic in fixture math; above-boundary test added -->
+**Evidence**: unit tests with exact IEEE-754-stable threshold arithmetic:
+
+- `test_alarm_at_boundary`: `metered_usd.cost_usd = threshold * Decimal('0.80')` → `feishu_send`
+  IS called; card field `pct_used == 80` (integer, range 0-100).
+- `test_alarm_below_boundary`: `metered_usd.cost_usd = threshold * Decimal('0.7999')` →
+  `feishu_send` NOT called.
+- `test_alarm_above_boundary` (T3.4-bis): `metered_usd.cost_usd = threshold * Decimal('0.801')` →
+  `feishu_send` IS called.
+
+Boundary semantics: alarm fires when `cost_usd >= 0.80 * threshold` (inclusive ≥).
+`pct_used` field unit: integer 0-100 (e.g., 80, NOT 0.80).
+Fixtures use `decimal.Decimal` to avoid IEEE-754 drift at non-round thresholds.
+
+### AC-5b — Dispatch volume floor alarm fires correctly
+
+<!-- R1-C11 fix: new AC-5b for volume floor boundary per §D.iii -->
+**Evidence**: unit test:
+- `test_volume_floor_below`: 7-day average < 10/day → Feishu info card IS emitted with title
+  `"Luxeno volume floor reminder"`.
+- `test_volume_floor_at_floor`: 7-day average == 10/day → info card NOT emitted (boundary:
+  alarm fires on strictly < 10).
+- `test_volume_floor_above`: 7-day average > 10/day → info card NOT emitted.
+
+Floor semantics: info card fires when 7-day rolling average is **strictly less than 10 dispatches/day**.
 
 ### AC-6 — validate-m6-handoff.py exits 0 with all 5 promise IDs
 
@@ -343,34 +538,54 @@ python3 aria-orchestrator/docs/validate-m6-handoff.py --check-abi-compat
 
 ### AC-7 — 3-day rolling history exists before Spec #2 kickoff
 
+<!-- R1-C6 fix: algorithm is precisely specified; consecutive-day semantics locked -->
 **Evidence**:
 ```bash
 python3 aria-orchestrator/docs/validate-m6-handoff.py --check-3-day-history
 ```
 - Exit code 0
 - stdout contains `"3-day rolling history: PASS (N files, latest YYYY-MM-DD)"` where N ≥ 3.
-- Files `.aria/cost-snapshots/cost-YYYY-MM-DD.json` for ≥3 consecutive days exist on disk.
+- The 3 most-recent snapshot dates form a consecutive sequence (no gaps).
+- The most recent date is no earlier than `datetime.now(timezone.utc).date() - timedelta(days=1)`.
+
+Gap case: `[today-4, today-2, today-1]` (gap at `today-3`) → exit non-zero, `[FAIL] 3-day history:
+consecutive gap detected`.
 
 This check MUST pass before Spec #2 `aria-2.0-m6-e2e-resilience` Phase B is permitted to start.
 
-### AC-8 — cost_measurement_method enum documented (P-2)
+### AC-8 — cost_measurement_method enum documented and pricing freshness validated (P-2)
 
-**Evidence**: `validate-m6-handoff.py --check-cost-method-enum` exits 0, verifying that for each
-provider row in cost.json, the method is one of
-`{provider_api_billing, local_token_count_x_unit_price, subscription_flat_no_attribution}`.
-Zhipu row maps to `local_token_count_x_unit_price` (SQLite aggregate of per-dispatch token_cost_usd).
-Luxeno row maps to `subscription_flat_no_attribution`.
+<!-- R1-C10 + Q2 fix: AC-8 expanded to cover pricing freshness check -->
+**Evidence**:
+```bash
+python3 aria-orchestrator/docs/validate-m6-handoff.py --check-cost-method-enum
+```
+- Exit code 0 if `cost_measurement_method` field is absent from cost.json (warning emitted, not
+  hard fail, in M6).
+- Exit code 1 if `cost_measurement_method` is present but contains an invalid enum value.
+- Asserts `zhipu_client.py` `_post_chat` return dict does NOT contain `cost_usd` key (confirms
+  `local_token_count_x_unit_price` correctness).
 
-### AC-9 — acceptance SQL script is binary-falsifiable
+```bash
+python3 aria-orchestrator/docs/validate-m6-handoff.py --check-pricing-freshness
+```
+- Exit code 0 if `_PRICING_REVIEW_DUE >= today` AND `_PRICING_OWNER_VERIFIED == True`.
+- Exit code 1 (warn) if `_PRICING_REVIEW_DUE < today` OR `_PRICING_OWNER_VERIFIED == False`,
+  with labelled `[WARN]` messages.
 
+### AC-9 — acceptance script is binary-falsifiable
+
+<!-- R1-C7 + Q1 fix: exit code contract fully specified; AD-M6-3 defer removed -->
 **Evidence**:
 ```bash
 cd aria-orchestrator/acceptance && python3 check-m6-cost-acceptance.py
 ```
 - Exit code 0 when all checks pass.
-- Exit code non-zero when any check fails (stale data, schema violation, or null-guard violation).
-- Script embeds at least the queries for AC-1 through AC-4 as named sub-checks with
-  `[PASS]` / `[FAIL: <reason>]` labelled output per check.
+- Exit code 1 when any AC sub-check fails (data condition).
+- Exit code 2 when infrastructure error prevents evaluation (cost.json missing, corrupt JSON,
+  config key missing, or env var absent when alarm path is the sub-check under test).
+- Script embeds checks for AC-1 through AC-4 as named sub-checks with
+  `[PASS] AC-N: <name>` / `[FAIL] AC-N: <reason>` / `[ERROR] AC-0: <reason>` labelled output per check.
 
 ---
 
@@ -390,19 +605,24 @@ cd aria-orchestrator/acceptance && python3 check-m6-cost-acceptance.py
 ## Effort baseline
 
 ```
-A. Dual-row cost.json schema + cron script       ~2h
-B. .aria/config.json threshold keys              ~1h
-C. freshness_ts gate (threaded into A + E)       ~0.5h
-D. Cron sentinel + alarm path                    ~2h
-E. Acceptance SQL script                         ~1.5h
-F. validate-m6-handoff.py (5 abi_compat + P-2)  ~2h
-G. 3-day history check (threaded into F)         ~0.5h
-─────────────────────────────────────────────────────
-Total (AI-implementable)                         ~9.5h ≈ 10h
+A. Dual-row cost.json schema + cron script (+ atomic write)      ~2h
+B. .aria/config.json threshold keys                              ~1h
+C. freshness_ts gate (threaded into A + E)                       ~0.5h
+D. Cron sentinel + alarm path (+ vol floor T3.7/T3.8)           ~3h  (+1h from ~2h)
+E. Acceptance script (+ T4.5/T4.6 infra failure tests)          ~2h  (+0.5h from ~1.5h)
+F. validate-m6-handoff.py (5 abi_compat + P-2 + pricing T5.11)  ~2.5h  (+0.5h from ~2h)
+G. 3-day history check (threaded into F)                         ~0.5h
+──────────────────────────────────────────────────────────────────────
+Total (AI-implementable)                                         ~11.5h ≈ 12h
+```
+
+R1 delta: +~2h from original ~10h. Sources: D +1h (T3.7/T3.8 volume floor), E +0.5h (T4.5/T4.6),
+F +0.5h (T5.11 pricing freshness). Revised baseline: **~12h** (conservatively **~13h** with R1 review
+integration overhead). Documented per `[[feedback_phase_budget_compounding]]`.
+
 Owner manual action (post-ship, not in B.2):
   - Set .aria/config.json thresholds
   - Run cron daily × ≥3 days to accumulate history
-```
 
 ---
 
@@ -410,7 +630,7 @@ Owner manual action (post-ship, not in B.2):
 
 | Dependency | Direction | Notes |
 |------------|-----------|-------|
-| M5 dispatches table `token_cost_usd` column | Upstream (already shipped M2+) | Cost aggregation reads this column; no migration needed |
+| M5 dispatches table `token_cost_usd` + `provider_cost_model` columns | Upstream (already shipped M2+) | Cost aggregation reads these columns; no migration needed |
 | `ARIA_FEISHU_WEBHOOK_URL` nomad var | Upstream (already set M4+) | Alarm path reuses; no new var creation |
 | `.aria/config.json` existing structure | Upstream | New `m6.cost_thresholds` key added additively |
 | `aria-orchestrator/docs/m5-handoff.yaml` | Upstream (archived M5) | validate-m6-handoff.py reads promises from lines 151-172 |
@@ -442,3 +662,5 @@ Owner manual action (post-ship, not in B.2):
 - `[[feedback_test_mock_pattern_hides_prod_bug]]` — Luxeno=0 false-positive: mock-shape must align with real null semantics; unit test must mock only transport, not alarm logic
 - `[[feedback_scaffold_helpers_drift_without_callers]]` — validate-m6-handoff.py grep targets must be verified against committed codebase, not hypothetical paths
 - `[[feedback_spec_v2_body_propagation_2pass]]` — P-1/P-2/P-3 precision items are propagated to both §What subsections and tasks.md task numbers (see tasks T1.2/T5.2/T6.1)
+- `[[feedback_audit_driven_fix_conventions]]` — inline R1-C*/R1-I-* traces applied throughout this document for R2 auditor traceability
+- `[[feedback_phase_budget_compounding]]` — effort baseline bumped ~10h → ~12h after R1 adds net 3 task groups (T3.7/T3.8, T4.5/T4.6, T5.11)

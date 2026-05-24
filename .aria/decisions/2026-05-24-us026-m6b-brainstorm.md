@@ -121,6 +121,12 @@ aria-2.0-m6-docs:
       - aria-orchestrator/README v2.0 update
       - .aria/state-checks.yaml 3 drift 探针 (version badge match / claude.md version match / arch doc stale warning ≥90d)
       - aria-orchestrator/docs/architecture-decisions.md §AD-M5-11 RESERVED slot 用于 M6 docs decisions
+
+> **AD-M6-* allocation reservation (post-R1, lock 2026-05-24, per Spec #1 R1 audit aggregate Q4):**
+> - **AD-M6-1 / AD-M6-2 / AD-M6-3**: reserved for **Spec #1 `aria-2.0-m6-cost-acceptance`** (snapshot script lang choice / cost-snapshots archive retention / [removed: was acceptance script exit code, lifted to Spec body per Q1])
+> - **AD-M6-4+**: Specs #2 / #3 / #4 drafter must start from AD-M6-4
+> - **AD-M5-11**: pre-existing M5 reserved slot for M6 docs (Spec #3 may use)
+> - Rationale: Spec #1 ships first (cost-acceptance gates Spec #2 trending data), claims earliest AD slots. Cross-Spec coordination enforced by this memo + state-scanner audit-engine R1+R2 cross-ref check.
   acceptance:
     - TG-DOCS-A release-blocker: 4 files exist + state-checks 3 探针 ship + CLAUDE.md v2.0 grep verify
     - TG-DOCS-B architecture: 4 standards/autonomous files + system-architecture v2.0 + version-scheme + state-checks 探针 + drift 探针 yaml grep verify
