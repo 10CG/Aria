@@ -3,7 +3,7 @@ track-id: aria-secret-guard-roadmap-burndown
 owner-container: dev-claude2
 phase: D.3
 status: done
-updated-at: 2026-05-24T00:00:00Z
+updated-at: 2026-05-24T00:53:00Z
 ---
 
 # Aria — Session Handoff (2026-05-23 ~23:39 UTC) — aria-secret-guard v1.24.0 roadmap burndown SHIPPED + 3-repo branch hygiene (O3 + O4 + O5 + O6 + cleanup = 4 micro-cycles + repo hygiene)
@@ -35,6 +35,7 @@ updated-at: 2026-05-24T00:00:00Z
 | ~22:55 | **burndown handoff written** | this doc — 9-section Rule #9 §2.3 compliant + latest.md pointer updated | Aria main `52db2e5` (rebased over concurrent layer2-docker-auth-fix #123 push) |
 | ~23:30 | **3-repo branch hygiene cleanup** | 19 local merged-to-master branches deleted (Aria main 7 + aria-plugin 11 + standards 1) + 19 corresponding origin branches deleted。0 unmerged branches existed (all confirmed safe by `git branch --merged master`)。Origin-only branches without local counterpart preserved (conservative — could be other sessions' in-flight work)。 | branch deletes only, no master commits |
 | 2026-05-24 ~00:00 | **O7 Aether 14-day post-ship 通知 SHIPPED** | [Aether #143](https://forgejo.10cg.pub/10CG/Aether/issues/143) tracking issue created on `10CG/Aether` main repo。Body 含 full context (v1.24.0→v1.26.0 timeline)+ dogfood scope (Aether-specific commands)+ workarounds + known limitations + perf budget + **deadline 2026-06-06** + 48h hotfix SLA + 3 报告 options + Aria-side artifact links。 | Aether tracker issue #143, no master commits |
+| 2026-05-24 ~00:50 | **v1.27.0 (O8) SHIPPED** | aria-doctor `--self-test` + `--help` user-facing flags (skill v1.0.0 → v1.1.0)。`--self-test` wraps 8 unit tests with env diagnostics + live env check + summary verdict (exit 0/1/2)。`--help` prints Usage block。Backward-compatible: positional single-check JSON mode unchanged。Unknown flag rejected with exit 2 + pointer。271/271 tests PASS unchanged (no new test, runner wrapper)。 | aria-plugin `1b8ec3f` / Aria main `c7e611f` |
 
 **Cycles shipped this session**: **4 micro-releases**(v1.24.1 / v1.24.2 / v1.25.0 / v1.26.0),共 4 个 v1.24.0 roadmap items closed(O6 + O5 4/5 / O4 / O3),plus 3-repo branch hygiene cleanup。
 
@@ -56,7 +57,7 @@ updated-at: 2026-05-24T00:00:00Z
 | O2 | **TASK-008 P3 escalation**(条件) | Day 0+14 (deadline **2026-06-06**) 若 O1 仍未跑 → Aria owner stand-in + 文档化 SilkNode-specific 命令 inventory(R2 QA NF1 闭环) | ~1h | smoke-evidence.md §2 |
 | O5(尾巴) | **7 cosmetic-only audit minors not addressed in v1.24.2** | tech-lead M1 VERSION line length / code-reviewer M2 internal accounting drift / qa M N1 timing variance investigation / backend-architect M1 hooks.json matcher overlap by-design / tech-lead M2 SilkNode deadlines (已 surface)/ knowledge M N3 14d deadline (已 surface)/ code-reviewer M1 already FIXED | ~15min(若需要) | post_implementation R1 audit report |
 | ~~O7~~ | ✅ **CLOSED 2026-05-24 ~00:00 UTC** | Aether tracking issue [#143](https://forgejo.10cg.pub/10CG/Aether/issues/143) created on `10CG/Aether` main repo with deadline 2026-06-06 + 48h hotfix SLA + 3 报告 options. Aether owner self-service from here; silence past deadline = assumed PASS. | — | issue Aether #143 |
-| O8 | **aria-doctor self-test 子命令** (v1.27.x scope) | 让 aria-doctor 独立可测自身 + 多种 fixture 自动验证 | ~1h | detailed-tasks.yaml TASK-018 v1.25.x list |
+| ~~O8~~ | ✅ **CLOSED 2026-05-24 ~00:50 UTC** as **v1.27.0** | aria-doctor v1.0.0 → v1.1.0: `--self-test` + `--help` flags。aria-plugin PR #63 merged (SHA `1b8ec3f`) + Aria main submodule bump (`c7e611f`). 3-way SHA parity ✓。 | — | aria-plugin PR #63 |
 | O9 | **PreToolUse Write content scan** (v1.27.x scope) | 实现 Write 事件主动 content 扫描(目前 stub 仅占位 + PostToolUse 配对触发) | ~3h | proposal §Tool Matcher + qa M2 closure context |
 | Polish | **~30 pre-loop `echo | grep -qE` → `=~` conversion**(v1.27.x perf polish) | 剩余 ~30 个 filter check / guard:ack check / redirect check 转 bash builtin,~90ms 额外节省。v1.26.0 已达 100ms budget,边际收益递减 | ~1h | v1.26.0 CHANGELOG "NOT addressed" 段 |
 
@@ -145,7 +146,7 @@ updated-at: 2026-05-24T00:00:00Z
 1. ⭐ **若 SilkNode owner 在场** → O1: 跑 SilkNode P2.5 deferred dogfood (~30min) → 转 P2 mode + smoke-evidence.md §2 update。Deadline **2026-05-30**(剩 ~7 天);过期则 O2 P3 escalation(deadline 2026-06-06)。
 2. ~~**若你想做 Aether dogfood 启动**~~ → ✅ **O7 已 closed 2026-05-24** (tracker issue Aether #143)。Aether owner self-service window 已 open;deadline **2026-06-06**;silence = PASS。
 3. **若你想结构性 polish hook perf 到极致** → polish item: 剩余 ~30 个 `echo | grep -qE` → `=~` 转换(~1h,~90ms 额外节省;v1.26.0 已达 budget,边际收益)
-4. **若你想做新功能(v1.27.x scope)** → O8 aria-doctor self-test 子命令(~1h)/ O9 PreToolUse Write content scan(~3h)
+4. **若你想做新功能(v1.27.x scope)** → ~~O8 aria-doctor self-test 子命令~~(✅ shipped v1.27.0 2026-05-24)/ O9 PreToolUse Write content scan(~3h)
 5. **若 v1.24.0 audit 7 cosmetic minors 想全清** → O5 尾巴:VERSION line length / accounting drift / by-design notes 等(~15min,极低价值)
 
 **不应该做的**:
