@@ -68,7 +68,7 @@ v2.0 新增:     人类只在关键节点审批 (Spec 创建, PR 合并)
 **M6 v2.0 发版**:
 - [ ] 连续 7 天 24/7 无人值守运行
 - [ ] 至少 10 个真实 issue 通过自主 dispatch 成功合并
-- [ ] Hermes Layer 1 成本 < $10/月, Layer 2 成本 < $70/月
+- [ ] Cost gate dual-track 达标 (Luxeno subscription + Zhipu metered + dispatch volume floor ≥10/day; 详见 §M6 验证 — 替换原单档 $10/$70, lock 2026-05-24 per DEC-20260524-001 Q-final-2 Path a)
 - [ ] 状态机 transition 100% 单元测试覆盖
 - [ ] Crash recovery 在 3 种故障模式下验证通过
 - [ ] 审计日志完整, 任一 dispatch 可回溯决策路径
@@ -411,9 +411,9 @@ M2 (Week 7-12)    Layer 1 状态机 + Hermes Option C Extension + 输入 sanitiz
 M3 (Week 13-16+)  Layer 2 cycle close + GLM 多模型 routing + Crash recovery (185h, OD-13 lock 2026-05-04 per US-023 §OD-12 §Q2)
 M4 (Week 17-19)   Human gate + Feishu 审批 (60h, US-024 brainstorm Q8' β' lock 2026-05-07)
 M5 (Week 20-25)   Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable (~120h, M3+M4 carryover scope 重估)
-M6 (Week 26-28)   E2E testing + docs + v2.0.0 release (120h)
+M6 (Week 26-30)   E2E testing + docs + v2.0.0 release (~82h, US-026 brainstorm Q-final-1 Menu C lock 2026-05-24)
 ─────────────────────────────────────────────────────
-合计:             ~845h ≈ 33 周单人 / 10 月 50% 投入
+合计:             ~807h ≈ 32 周单人 / 9.5 月 50% 投入  (845h - 38h M6 reframe)
 
 **M4 reframe (2026-05-07, US-024 brainstorm Q1=A + Q8' β')**:
   - 旧: M4 (Week 17-21) Crash recovery + Replay + Reconciler (80h);
@@ -426,6 +426,20 @@ M6 (Week 26-28)   E2E testing + docs + v2.0.0 release (120h)
   - 总预算 reconciliation: M4 80h→60h (-20h) + M5 100h→120h (+20h) = 净增 0,合计 ~845h 不变
   - 治理: 见 [AD-M4-1](../../aria-orchestrator/docs/architecture-decisions.md#ad-m4-1) /
           [brainstorm 决策记录](../../.aria/decisions/2026-05-07-us024-m4-brainstorm.md) Q1+Q8'
+
+**M6 reframe (2026-05-24, US-026 brainstorm Q-final-1 Menu C lock)**:
+  - 旧: M6 (Week 26-28) E2E testing + docs + v2.0.0 release (120h)
+  - 新: M6 (Week 26-30) 4 sub-Specs ship (~82h, 4-5 weeks wall-clock single owner):
+        Spec #1 `aria-2.0-m6-cost-acceptance` (~10h, Level 2-3 borderline, gates Spec #2 trending data)
+        Spec #2 `aria-2.0-m6-e2e-resilience` (~29h Level 3, TG-A obs / TG-B 6-mode crash hybrid mock / TG-C 拟人样本)
+        Spec #3 `aria-2.0-m6-docs` (~33h Level 3, TG-DOCS-A release-blocker + TG-DOCS-B architecture v2.0.1-deferrable)
+        Spec #4 `aria-2.0-m6-release-closeout` (~10h Level 2, RED/ABORT pre-release gates)
+  - 理由: M6 brainstorm 4-agent ×3-round CONVERGED 收敛 (R3 orchestrator forcing function 节省 ~2 round);
+          5 sub-Specs 降为 4 (proportionality, tl2-CH-001);
+          Spec #1 first → Spec #2 + Spec #3 parallel → Spec #4 last (Q8 sequencing)
+  - 总预算 reconciliation: M6 120h→82h (-38h),合计 ~845h → ~807h
+  - Risk: secret rotation 8-2 hard cap buffer 压缩 ~36 days at 5w (RED threshold; mitigated by Spec #4 pre-release RED/ABORT gates: <21d=RED warn, <14d=ABORT)
+  - 治理: 见 [DEC-20260524-001](../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) Q-final-1 Menu C
 ```
 
 **注**: 工时估算基于 R3 挑战组实测重估 (R3 讨论组估 380h, Code Reviewer 实测 750h)。选取实测值作为 PRD 工时。
@@ -625,8 +639,11 @@ v2.0 新增:
 **定量指标**:
 - 7 天连续运行无 unplanned restart (排除计划维护窗口)
 - ≥ 10 个真实 issue 成功 dispatch + merge
-- Layer 1 cost < $10/月
-- Layer 2 cost < $70/月 (假设每天 10 dispatch, 80% 走 GLM)
+- **Cost gate (dual-track, per [DEC-20260524-001](../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) Q-final-2 Path a, 替换原单档 $10/$70 lock 2026-05-24)**:
+  - (i) **Layer 1 (Luxeno flat subscription)**: 月度账单 ≤ `m6.cost_thresholds.luxeno_monthly_usd` (owner-set in `.aria/config.json`, attribution null per subscription billing)
+  - (ii) **Layer 2 (Zhipu / Z.AI metered)**: 月度账单 ≤ `m6.cost_thresholds.zhipu_30d_usd` (owner-set in `.aria/config.json`, per-dispatch cost additive)
+  - (iii) **Dispatch volume floor**: ≥ 10/day under flat-rate (Luxeno subscription cost-effectiveness gate; below floor → reconsider subscription vs metered routing)
+  - cost.json dual-row schema (Spec #1 `aria-2.0-m6-cost-acceptance` deliverable): `metered_usd{provider:zhipu, input_tokens, output_tokens, cost_usd}` + `subscription_usd{provider:luxeno, cost_usd:null, attribution_disclaimer:"subscription billing, no per-dispatch attribution"}` + `freshness_ts` (acceptance reject if now-freshness>24h)
 - 状态机单元测试 100% 覆盖
 - Crash recovery 在 3 种故障模式验证通过:
   - Hermes 进程 SIGKILL mid-transition → 恢复至 last-committed state
