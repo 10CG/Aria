@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session — Track F (2026-05-24 ~00:45 UTC) — 🎉 **M6 (US-026) Brainstorm CONVERGED**
+## ★ 最新 session — Track E follow-ups #16+#17 (2026-05-24 ~11:50 UTC) — ✅ **aria-orch PR #18 SHIPPED**
 
-**Latest**: [2026-05-24-m6-brainstorm-converged-track-f.md](./2026-05-24-m6-brainstorm-converged-track-f.md) — Track F = M6 brainstorm CONVERGED (DEC-20260524-001, 11 owner decisions, 4 sub-Specs locked ~82h) (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+**Latest**: [2026-05-24-track-e-followups-17-16-done.md](./2026-05-24-track-e-followups-17-16-done.md) — Track E follow-up #16 (JOB_NAME `aria-runner-template` → `aria-layer2-runner` 7 refs in scripts/) + #17 (AD-M1-8 PAT scope 4 → canonical 7-scope set + per-scope evidence table) bundled in aria-orch PR #18 (merge SHA `0ce52b9`) + main Aria submodule pointer bump (`c8a5f03`) + 3-way SHA parity verified;1h micro-cycle;0 new memory;**M6 Phase A.1 仍 blocked on owner PRD 2 patches (Track F §2 inherit)** (state-scanner Phase 1.15 collector 解析此行作 canonical pointer)
+
+## ★ 前 session (2026-05-24 ~00:45 UTC) — 🎉 **M6 (US-026) Brainstorm CONVERGED**
+
+**Predecessor**: [2026-05-24-m6-brainstorm-converged-track-f.md](./2026-05-24-m6-brainstorm-converged-track-f.md) — Track F = M6 brainstorm CONVERGED (DEC-20260524-001, 11 owner decisions, 4 sub-Specs locked ~82h)
 
 **★ Track F FINAL — DONE (2026-05-24 ~00:45 UTC, ~3h brainstorm + cross 跨午夜 UTC continuation of 2026-05-23 18h+ session containing Track E)**: M6 (US-026) brainstorm 完整闭环。Loop: Q1-Q8 initial owner Q&A → R1 Discussion (4 agents) → R1 Challenge (3 agents) → R2 Discussion → R2 Challenge (paper-fix antipattern 复现 caught) → R3 Discussion (orchestrator forcing-function unified anchor — agents validate not re-propose, 4/4 ACCEPT) → R3 Challenge (0 substantive blocking) → 3 final owner Qs (Q-final-1 timeline Menu C + Q-final-2 PRD §628-629 patch Path a + Q-NEW-1 Hybrid mock layer) → CONVERGED。**4 sub-Specs locked**: aria-2.0-m6-cost-acceptance (~10h) + aria-2.0-m6-e2e-resilience (~29h, TG-A obs + TG-B 6 crash modes Hybrid + TG-C 拟人 samples) + aria-2.0-m6-docs (~33h, internal A+B TG split) + aria-2.0-m6-release-closeout (~10h)。**Side effects**: DROPPED INFRA Spec / M5-OS-PB-1 / 5 sub-Specs / PRD vacuous reframe / m6-core / double DOCS Spec。**3 new memory entries 固化**: feedback_brainstorm_forcing_function_unified_anchor + feedback_brainstorm_owner_escalation_discipline + feedback_mock_layer_per_failure_semantic。**Owner-action pending Phase A.1 启动前**: PRD §M6 timeline 3w→5w patch + PRD §628-629 cost gate metered+subscription dual-track patch (Q-final-1 + Q-final-2)。本 track 已 DONE,carry-forward: M6 Phase A.1 × 4 parallel spec-drafter dispatch (next session)。
 
