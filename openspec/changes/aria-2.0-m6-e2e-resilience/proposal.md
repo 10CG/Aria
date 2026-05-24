@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #2 — E2E Resilience (runtime observability + crash recovery + humanized samples)
 
 > **Level**: 3 (Full — cross-cuts runtime observability + crash recovery + humanized command samples; three internal task groups)
-> **Status**: R1 fixes applied (2026-05-24) — pending R2 verification
+> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1)
 > **Change ID**: `aria-2.0-m6-e2e-resilience`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)
@@ -18,8 +18,12 @@
 > **AD allocation reservation**: AD-M6-4 / AD-M6-5 / AD-M6-6 reserved for **this Spec #2** only.
 > Spec #1 holds AD-M6-1/2/3 (per Q4 lock 2026-05-24). Spec #3 must start from AD-M6-7+.
 > **Audit trajectory**:
->   - Phase A.2 R1 NEEDS_FIX (post_spec 4-agent parallel, 2026-05-24): 6 Critical (T2-1..T2-6) + 1 Cross-Critical (X-T3) + 8 Important (I2-1..I2-8); R1 fixes applied same session (backend-architect agent). Aggregate: `.aria/audit-reports/post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-sister-specs.md`.
->   <!-- R1-fixes applied 2026-05-24: T2-1 SQL columns, T2-2 state_machine path, T2-3 AC-6 Luxeno=0, T2-4 is_synthetic Mech-B removed, T2-5 AC-1 uptime metric, T2-6 AC-2 check order, X-T3 mean→median, I2-1..I2-8 -->
+>   - Phase A.2 R1 (2026-05-24, 4-agent combined sister-Specs: tl-critic + qa + ai + cr): NEEDS_FIX 4/4 — 6C + 8I + X-T3 (combined-mode caught 5 X-Critical themes); aggregate `post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-sister-specs.md`
+>   - Phase A.2 R1-fix applied (commit `8a5fdc4` w/ PRD §568/§656 catch-up): backend-architect pass, T2-1..T2-6 + X-T3 + I2-1..I2-8 substantive closure
+>   - Phase A.2 R2 challenge (2026-05-24, 3-agent: cr + ai + tl-critic): SPLIT — cr SCOPE_OK_R2 23/23 / ai SCOPE_OK_R2 6/6 / tl-critic NEEDS_FIX (2 NEW Critical self-spotted via cross-Spec verify)
+>   - Phase A.2 R2-fix applied (commit `c0e9d79`): NC-tl-R2-1 migration 006→007 (slot collision avoid M5 v4.2) + paper-fix completion
+>   - Phase A.2 R3 stability (2026-05-24, tech-lead-critic 1-agent scope-limited): **R3_STABLE** — 0 new C + 0 new I; 3/3 R2 fixes CLOSED byte-for-byte
+>   - **CONVERGED** 2026-05-24 — ready for Phase A.3 (agent allocation per DEC §6: backend-architect lead + qa-engineer/knowledge-manager joint) → Phase B.1 (gated on Spec #1 AC-7 3-day cost trending data)
 
 ---
 

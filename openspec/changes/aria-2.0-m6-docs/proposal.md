@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #3 — Documentation Suite (CLAUDE.md v2.0 + Architecture + standards/autonomous)
 
 > **Level**: 3 (Full — cross-cuts CLAUDE.md / standards/autonomous / docs/architecture / aria-orchestrator/docs / Aria README)
-> **Status**: Draft
+> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1; TG-DOCS-B may slip to v2.0.1 per Q-final-1 Menu C)
 > **Change ID**: `aria-2.0-m6-docs`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (post `a786444` + `e884e62` PRD patches, §M6 4-5w timeline)
@@ -11,8 +11,12 @@
 > **v2.0.1-deferrable**: TG-DOCS-B (~22h architecture) may ship as v2.0.1 if 5w calendar slips per Q-final-1 Menu C. TG-DOCS-A (~11h) is v2.0.0 release-blocker (ships with v2.0.0 unconditionally).
 > **AD allocation reservation**: **AD-M6-7**, **AD-M6-8**, and **AD-M6-9** are reserved for this Spec #3. AD-M6-7 = state-checks probe design. AD-M6-8 = reserved slot. **AD-M6-9** = `standards/autonomous/` namespace creation decision (claimed by this Spec per Q2 owner lock 2026-05-24 — AD-M5-11 collision with M5-spillover scope discovered in R1 audit; Spec #3 vacates AD-M5-11 claim). Spec #1 holds AD-M6-1/2/3; Spec #2 holds AD-M6-4/5/6. (per DEC-20260524-001 §2 AD-M6-* allocation lock 2026-05-24)
 > **Audit trajectory**:
->   - Phase A.2 R1: NEEDS_FIX (4-agent combined sister-Specs, 2026-05-24) — aggregate `.aria/audit-reports/post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-sister-specs.md`
->   <!-- R1 fix-pass in progress (knowledge-manager agent) -->
+>   - Phase A.2 R1 (2026-05-24, 4-agent combined sister-Specs): NEEDS_FIX 4/4 — 5C (T3-1..T3-5) + 4 X-C (X-T1/T2/T4/T5) + 5I; aggregate `post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-sister-specs.md`
+>   - Phase A.2 R1-fix applied (commit `8a5fdc4` w/ PRD §568/§656 catch-up): knowledge-manager pass
+>   - Phase A.2 R2 challenge (3-agent): SPLIT — cr SCOPE_OK_R2 23/23 / ai SCOPE_OK_R2 / tl-critic NEEDS_FIX 2 NEW C self-spot (paper-fix completion + v1.29.0 gate args inversion)
+>   - Phase A.2 R2-fix applied (commit `c0e9d79`): NC-tl-R2-2 gate args inverted → 3-zone branching (match dev-claude2 SoT) + paper-fix Rule #1-#6 → #1-#9 propagation
+>   - Phase A.2 R3 stability (tech-lead-critic 1-agent scope-limited): **R3_STABLE** — 0 new C + 0 new I; 3/3 R2 fixes CLOSED byte-for-byte
+>   - **CONVERGED** 2026-05-24 — ready for Phase A.3 (knowledge-manager) → Phase B.1 (TG-DOCS-A v2.0.0-blocker first; TG-DOCS-B v2.0.1-deferrable per Q-final-1 Menu C)
 > **Sibling Spec (Approved)**: [aria-2.0-m6-cost-acceptance](../aria-2.0-m6-cost-acceptance/proposal.md) (Spec #1, commit `c29a800`, AD-M6-1/2/3)
 > **Sibling Spec (parallel draft)**: [aria-2.0-m6-e2e-resilience](../aria-2.0-m6-e2e-resilience/proposal.md) (Spec #2, AD-M6-4/5/6)
 > **Successor**: [aria-2.0-m6-release-closeout](../aria-2.0-m6-release-closeout/proposal.md) (Spec #4, gates on this Spec's CLAUDE.md v2.0 + state-checks probes)
