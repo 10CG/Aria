@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #1 — Cost Acceptance (dual-track schema + cron sentinel + alarm)
 
 > **Level**: 3 (Full — cross-cuts aria-orchestrator + .aria/config.json + validate-m6-handoff.py + Feishu webhook + audit-log immutability cross-check)
-> **Status**: Draft
+> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1)
 > **Change ID**: `aria-2.0-m6-cost-acceptance`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)
@@ -17,8 +17,12 @@
 > **AD allocation reservation**: AD-M6-1 / AD-M6-2 / AD-M6-3 are reserved for **this Spec #1** only.
 > Specs #2 / #3 / #4 must start from AD-M6-4 onwards. (per Q4, 2026-05-24)
 > **Audit trajectory**:
->   - Phase A.2 R1: NEEDS_FIX (4/4, 2026-05-24) — 11 Critical + 8 Important; R1 fixes applied 2026-05-24 (backend-architect pass)
->   - Phase A.2 R2: pending
+>   - Phase A.2 R1 (2026-05-24, 4-agent parallel: tech-lead-critic + qa + ai + code-reviewer): NEEDS_FIX 4/4 — 12 Critical + 20 Important (de-dup → 11 themes + 8 themes); aggregate at `post_spec-R1-aggregate-2026-05-24-aria-2.0-m6-cost-acceptance.md`
+>   - Phase A.2 R1-fix applied (commit `0d4a317`, backend-architect pass): 11C + 8I + Q1-Q4 owner decisions
+>   - Phase A.2 R2 challenge (2026-05-24, 3-agent: cr + ai + tl-critic): SCOPE_OK_R2 conditional 3/3 — 1 NEW Critical (self-spot REPO_ROOT off-by-1) + 2 Important; 90.6% R1 reduction
+>   - Phase A.2 R2-fix applied (commit `75a399d`): C-tl-N1 REPO_ROOT canonical 2-level + cr-I1 effort SoT unified ~12h impl + ai-NI-1 AC-2b orphan NULL check
+>   - Phase A.2 R3 stability (2026-05-24, tech-lead-critic 1-agent scope-limited): **R3_STABLE** — 0 new C + 0 new I; 3/3 R2 fixes CLOSED + 2 trivial observations (cosmetic, non-blocking)
+>   - **CONVERGED** 2026-05-24 — ready for Phase A.3 (agent allocation) → Phase B.1 (branch creation)
 
 ---
 
