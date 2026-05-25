@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #4 — Release Closeout (pre-release gates orchestrator + archive trigger)
 
 > **Level**: 2 (Minimal — single net-new orchestrator script + 5 net-new gate primitives + 4-directory archive runner; no schema changes, no submodule-internal changes, no cross-cutting refactor)
-> **Status**: Draft (Phase A.1 — 2026-05-25 起草 by tech-lead agent; 待 Phase A.2 audit)
+> **Status**: ✅ **Approved** (Phase A.2 CONVERGED 2026-05-25 via R3 stability check; ready for Phase A.3 → Phase B.1)
 > **Change ID**: `aria-2.0-m6-release-closeout`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, post `a786444` + `e884e62` patches, §637-660 量化/定性指标)
@@ -14,7 +14,7 @@
 > **Effort baseline**: ~10h impl baseline (T-A2 orchestrator ~3h + T-A3 tests ~3h + T-A4 archive runner ~1.5h + T-A5 docs ~1h + T-A1 scaffolding ~0.5h + T-A6 memory candidate ~0.5h + ~0.5h buffer). Single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`; cited identically in frontmatter + §Effort baseline + tasks.md.
 > **AD allocation reservation**: **AD-M6-10**, **AD-M6-11**, and **AD-M6-12** are reserved for this Spec #4. AD-M6-10 = orchestrator exit code aggregation contract. AD-M6-11 = atomic-archive 4-directory transactional pattern. AD-M6-12 = secret rotation buffer threshold (21d RED / 14d ABORT) calibration. Spec #1 holds AD-M6-1/2/3; Spec #2 holds AD-M6-4/5/6; Spec #3 holds AD-M6-7/8/9. (per DEC-20260524-001 §2 AD-M6-* allocation lock 2026-05-24)
 > **Authored by**: Claude Opus 4.7 via `aria:tech-lead` agent, 2026-05-25
-> **Audit trajectory**: Phase A.2 R1 (3-agent parallel: backend-architect + qa-engineer + code-reviewer) NEEDS_FIX 3/3 (2026-05-25); R1-fix `cdd2e5e` applies 7 Critical + 12 Important findings + 3 owner Q-locks (Q1=T-A1.4 reconcile, Q2=phase-d-closer delegation, Q3=invert primary path); Phase A.2 R2 (3-agent challenge) SPLIT verdict 2 SCOPE_OK_R2 + 1 NEEDS_FIX_R2 — R1 5C closed 5/5 + 77-92% reduction; R2-fix `<R2-FIX-COMMIT-PENDING>` applies 4 new Important + 4 new Minor (I-NEW-r2-1 self-trap propagation / I-NEW-r2-2 AD-M6-10 exit code gap / I-ba-R2-1 G-4 message format / I-qa-R2-1 phase-d-closer exit 3 escalation); Phase A.2 R3 stability (1-agent scope-limited) pending per `[[feedback_3round_early_convergence]]`
+> **Audit trajectory**: Phase A.2 R1 (3-agent parallel: backend-architect + qa-engineer + code-reviewer) NEEDS_FIX 3/3 (2026-05-25); R1-fix `cdd2e5e` applies 7 Critical + 12 Important findings + 3 owner Q-locks (Q1=T-A1.4 reconcile, Q2=phase-d-closer delegation, Q3=invert primary path). Phase A.2 R2 (3-agent challenge) SPLIT verdict 2 SCOPE_OK_R2 + 1 NEEDS_FIX_R2 — R1 5C closed 5/5 + 77-92% reduction; R2-fix `8252525` applies 4 new Important + 6 new Minor (I-NEW-r2-1 self-trap propagation / I-NEW-r2-2 AD-M6-10 exit code gap / I-ba-R2-1 G-4 message format / I-qa-R2-1 phase-d-closer exit 3 escalation) + R1 PARTIAL closures. Phase A.2 R3 stability (1-agent code-reviewer scope-limited 2026-05-25) **R3_STABLE** — 11/11 R2-fix CLOSED + 0 new Critical + 0 new Important + 1 cosmetic Minor (G-8 REQUIRED_SIBLINGS code block list extended to 4 entries in R3-fix this commit). **Phase A.2 CONVERGED → Approved.**
 
 ---
 
@@ -191,6 +191,7 @@ REQUIRED_SIBLINGS = [
     'aria-2.0-m6-cost-acceptance',
     'aria-2.0-m6-e2e-resilience',
     'aria-2.0-m6-docs',
+    'aria-2.0-m6-release-closeout',  # R3-fix N-cosmetic-R3-1: self-check (4 entries; per T-A2.9 + N-ba-2)
 ]
 for sibling in REQUIRED_SIBLINGS:
     if not (CHANGES / sibling).is_dir():
