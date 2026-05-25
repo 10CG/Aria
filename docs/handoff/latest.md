@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #A — Track G: M6 Phase A Spec Batch 3/4 Approved (2026-05-24 ~16:30 UTC, dev-claude) — 🎉 **Spec #1+#2+#3 CONVERGED**
+## ★ 最新 session #A — 🎉 **M6 Phase A 4/4 sub-Specs COMPLETE** — Spec #4 release-closeout Approved (2026-05-25 ~22:00 UTC, dev-claude) 
 
-**Latest (T-G)**: [2026-05-24-m6-phase-a-spec-batch-approved.md](./2026-05-24-m6-phase-a-spec-batch-approved.md) — Track G = M6 (US-026) Phase A.1+A.2 closed for 3/4 sub-Specs: Spec #1 cost-acceptance (`c29a800`) + Spec #2 e2e-resilience + Spec #3 docs (both `413dd75`); 16 audit reports total (3× R1 4-agent + 3× R2 3-agent + 2× R3 1-agent stability); 4 PRD patches landed (a786444 + e884e62/8a5fdc4); 8 owner Q-locks; 3 new memory entries (combined-mode value / migration slot draft-time-verify / gate logic cross-Spec SoT validate); Spec #4 release-closeout deferred next session;~6.2h session;13 commits (7 dev-claude + 6 dev-claude2 interleave 零冲突)。**M6 Phase A Spec batch DONE** (3/4 sub-Specs); next session Spec #4 + Phase B.1 (state-scanner Phase 1.15 collector 解析此行作 canonical pointer for M6 work)
+**Latest (T-Spec4)**: [2026-05-25-m6-spec4-release-closeout-approved.md](./2026-05-25-m6-spec4-release-closeout-approved.md) — Spec #4 `aria-2.0-m6-release-closeout` Phase A.1+A.2 CONVERGED via R3 stability check 2026-05-25 (`650b70a`)。M6 Phase A 4/4 sub-Specs Approved (Spec #1 `c29a800` + Spec #2/#3 `413dd75` + Spec #4 `650b70a`)。**~50min Level 2 cycle** (Phase A.1 + R1 + R1-fix + R2 + R2-fix + R3 stability + Approved); 8 audit reports (3 R1 raw + R1 aggregate + 3 R2 raw + R2 aggregate + R3 stability)。**3 owner Q-locks** via AskUserQuestion batch (T-A1.4 reconcile / phase-d-closer delegation / invert primary path)。**2 new memory entries** (audit_trajectory_placeholder_footgun + terminal_spec_orchestrator_pattern)。**Multi-terminal**: dev-claude2 同期 ship Aria #124 v1.28.0 (5 commits),1 push race rebase clean。US-026 Status `pending → in_progress`。**Next session**: Spec #1 Phase A.3 + Phase B.1 启动 cron 累积 3-day data (Spec #2 precondition);Spec #3 TG-DOCS-A 可并行。⚠️ MEMORY.md 99.4% utilization,next session 写 memory 前必 prune。
+
+## ★ 前 session #A_prev — Track G: M6 Phase A Spec Batch 3/4 Approved (2026-05-24 ~16:30 UTC, dev-claude) — 🎉 **Spec #1+#2+#3 CONVERGED**
+
+**Predecessor (T-G)**: [2026-05-24-m6-phase-a-spec-batch-approved.md](./2026-05-24-m6-phase-a-spec-batch-approved.md) — Track G = M6 (US-026) Phase A.1+A.2 closed for 3/4 sub-Specs: Spec #1 cost-acceptance (`c29a800`) + Spec #2 e2e-resilience + Spec #3 docs (both `413dd75`); 16 audit reports total (3× R1 4-agent + 3× R2 3-agent + 2× R3 1-agent stability); 4 PRD patches landed (a786444 + e884e62/8a5fdc4); 8 owner Q-locks; 3 new memory entries (combined-mode value / migration slot draft-time-verify / gate logic cross-Spec SoT validate); Spec #4 release-closeout deferred to next session (本 2026-05-25 已 ship — 见上 T-Spec4 pointer);~6.2h session;13 commits (7 dev-claude + 6 dev-claude2 interleave 零冲突)。**M6 Phase A Spec batch DONE** (3/4 sub-Specs)。
 
 ## ★ 最新 session #B — 🎉 **Aria #124 FULLY SHIPPED v1.28.0** + 5 memories + 工作语言双写 (2026-05-24 ~10:50 → 2026-05-25 ~00:10 UTC, dev-claude, ~13h 跨度)
 
