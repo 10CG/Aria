@@ -14,7 +14,7 @@
 > **Effort baseline**: ~10h impl baseline (T-A2 orchestrator ~3h + T-A3 tests ~3h + T-A4 archive runner ~1.5h + T-A5 docs ~1h + T-A1 scaffolding ~0.5h + T-A6 memory candidate ~0.5h + ~0.5h buffer). Single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`; cited identically in frontmatter + §Effort baseline + tasks.md.
 > **AD allocation reservation**: **AD-M6-10**, **AD-M6-11**, and **AD-M6-12** are reserved for this Spec #4. AD-M6-10 = orchestrator exit code aggregation contract. AD-M6-11 = atomic-archive 4-directory transactional pattern. AD-M6-12 = secret rotation buffer threshold (21d RED / 14d ABORT) calibration. Spec #1 holds AD-M6-1/2/3; Spec #2 holds AD-M6-4/5/6; Spec #3 holds AD-M6-7/8/9. (per DEC-20260524-001 §2 AD-M6-* allocation lock 2026-05-24)
 > **Authored by**: Claude Opus 4.7 via `aria:tech-lead` agent, 2026-05-25
-> **Audit trajectory**: Phase A.2 R1 (3-agent parallel: backend-architect + qa-engineer + code-reviewer) NEEDS_FIX 3/3 (2026-05-25); R1-fix `<R1-FIX-COMMIT-PENDING>` applies 7 Critical + 12 Important findings + 3 owner Q-locks (Q1=T-A1.4 reconcile, Q2=phase-d-closer delegation, Q3=invert primary path); Phase A.2 R2 (3-agent challenge) pending
+> **Audit trajectory**: Phase A.2 R1 (3-agent parallel: backend-architect + qa-engineer + code-reviewer) NEEDS_FIX 3/3 (2026-05-25); R1-fix `cdd2e5e` applies 7 Critical + 12 Important findings + 3 owner Q-locks (Q1=T-A1.4 reconcile, Q2=phase-d-closer delegation, Q3=invert primary path); Phase A.2 R2 (3-agent challenge) SPLIT verdict 2 SCOPE_OK_R2 + 1 NEEDS_FIX_R2 — R1 5C closed 5/5 + 77-92% reduction; R2-fix `<R2-FIX-COMMIT-PENDING>` applies 4 new Important + 4 new Minor (I-NEW-r2-1 self-trap propagation / I-NEW-r2-2 AD-M6-10 exit code gap / I-ba-R2-1 G-4 message format / I-qa-R2-1 phase-d-closer exit 3 escalation); Phase A.2 R3 stability (1-agent scope-limited) pending per `[[feedback_3round_early_convergence]]`
 
 ---
 
@@ -28,7 +28,7 @@ M6 ships three independently-Approved Specs (#1 cost-acceptance / #2 e2e-resilie
 
 2. **Secret rotation hard cap 2026-08-02 has no automated buffer warning**: per `[[project_secret_rotation_deferred_2026-05-02]]`, the partial rotation deadline is hard-capped at 2026-08-02 (9-key carry-forward debt). If M6 ships within `<14d` of that cap, owner has no slack to rotate secrets post-release — a foreseeable cliff. Spec #4 G-4 surfaces this as `<21d → RED` (informational warn) / `<14d → ABORT` (hard block).
 
-3. **5-files SemVer drift would silently break Plugin Compatibility**: CLAUDE.md "版本发布检查清单" lists 5 files (plugin.json SoT + 4 derived) that must all match. Per `[[feedback_plugin_version_drift_multiple_sources]]`, drift between these has been observed mid-session (v1.22.0 stale in CLAUDE.md while plugin.json = v1.27.0). Without an automated probe, manual bump errors silently propagate to market consumers. G-7 catches this pre-ship.
+3. **6-surfaces SemVer drift would silently break Plugin Compatibility**: CLAUDE.md "版本发布检查清单" lists 5 plugin-stream files (plugin.json SoT + 4 derived) plus the main repo `/VERSION` plugin-row entry — **6 surfaces total** — that must all match. Per `[[feedback_plugin_version_drift_multiple_sources]]`, drift between these has been observed mid-session (v1.22.0 stale in CLAUDE.md while plugin.json = v1.27.0). Without an automated probe, manual bump errors silently propagate to market consumers. G-7 catches this pre-ship.
 
 4. **Submodule pointer drift + Forgejo Discussion URL liveness + archive-trigger eligibility are orthogonal "loose ends"**: Each of these would either degrade release credibility (G-5 submodule misalignment → market consumers fetch broken pointers), break documented promises (G-6 FAQ URL 404 after Spec #3 ships release notes citing it), or cause out-of-order archives (G-8 sibling already archived → Spec #4 cannot orchestrate). They share orchestrator infrastructure but no single sibling owns them.
 
@@ -106,9 +106,15 @@ if buffer_days >= 21:
     print(f"[PASS] G-4: secret rotation buffer {buffer_days}d (cap {HARD_CAP.isoformat()})")
 elif buffer_days >= 14:
     print(f"[RED] G-4: secret rotation buffer {buffer_days}d < 21d (cap {HARD_CAP.isoformat()}); owner advisory")
-else:
+elif buffer_days >= 0:
+    # R2-fix I-ba-R2-1: cap-day (0d) AND positive-but-<14d ABORT share same template (with "< 14d" suffix for distinguishability)
     print(f"[ABORT] G-4: secret rotation buffer {buffer_days}d < 14d (cap {HARD_CAP.isoformat()}); rotate before release")
+else:
+    # R2-fix I-ba-R2-1: negative buffer (past cap) uses distinct "cap exceeded by Nd" template
+    print(f"[ABORT] G-4: secret rotation buffer {buffer_days}d (cap {HARD_CAP.isoformat()}); cap exceeded by {-buffer_days} days")
 ```
+
+**Note on cap-day-itself (buffer_days == 0)**: hits the `buffer_days >= 0` ABORT branch, emitting `[ABORT] G-4: secret rotation buffer 0d < 14d`. Test 5 (AC-3) asserts this message format (the `< 14d` suffix is informational; the binary verdict is correct).
 
 **Boundary semantics** (binary-falsifiable):
 - `buffer_days >= 21` → PASS (green)
@@ -197,7 +203,7 @@ for sibling in REQUIRED_SIBLINGS:
             print(f'[ABORT] G-8: {sibling} missing from openspec/changes/ and openspec/archive/')
 ```
 
-**PASS condition**: All 3 sibling directories present in `openspec/changes/` AND no pre-archive evidence in `openspec/archive/`. Spec #4 itself (`aria-2.0-m6-release-closeout`) is expected to be in `changes/` (running its own Phase B), which is checked separately (orchestrator script's own location).
+**PASS condition**: All 3 sibling directories present in `openspec/changes/` AND no pre-archive evidence in `openspec/archive/`. <!-- R2-fix N-ba-2: wire self-check explicitly --> Spec #4 itself (`aria-2.0-m6-release-closeout`) MUST also be present in `openspec/changes/`; if absent (e.g., owner accidentally pre-archived) → ABORT with `[ABORT] G-8: aria-2.0-m6-release-closeout (self) missing from openspec/changes/; out-of-order self-archive`. The self-check is a 4th iteration of the same `is_dir()` probe loop in T-A2.9 (REQUIRED_SIBLINGS list extended with self-name).
 
 #### H. Phase D archive runner (~1.5h, separate sub-script)
 
@@ -214,6 +220,20 @@ for sibling in REQUIRED_SIBLINGS:
 5. **Atomic execute** (`--execute` explicit): use Python `pathlib.Path.rename()` per directory. If any rename fails mid-sequence, attempt rollback (rename completed-moves back to `changes/`). Log per-move success/failure to summary report. If rollback ALSO fails mid-sequence, exit with `[ERROR] inconsistent state — N moves committed, K rollbacks failed; manual intervention required` and exit 3 (NEW exit code: inconsistent-state distinct from ABORT-refuse=2).
 6. Post-move: append archive record to most-recent summary report (skipped if dry-run since no report was written this invocation per N-qa-5). In `--execute` mode emit US-026 status diff RECOMMENDATION text only — does NOT execute mutation per OOS-5.
 7. **Symmetric recommendation** (NEW R1-fix I-cr-5): emit Forgejo Issue closure recommendation if open M6-tracking issue detected via `forgejo` wrapper enumeration (text-only, no API call per OOS-7).
+
+**Phase D.2 caller contract for exit codes** (R2-fix I-qa-R2-1 + I-NEW-r2-2 — explicit handling for all exit codes):
+
+When `aria:phase-d-closer` D.2 step invokes `m6-archive-runner.py --execute`, the Skill MUST handle each exit code distinctly:
+
+| Exit | Meaning | phase-d-closer D.2 action |
+|------|---------|---------------------------|
+| 0 | Archive succeeded | Proceed to D.3 (handoff per Rule #9) |
+| 1 | (reserved — not emitted by archive runner) | Treat as bug; halt + escalate |
+| 2 | Archive refused (readiness ABORT / RED-without-override / pre-archived destinations) | Halt D.2; surface error; do NOT retry; owner-action required |
+| **3** | **Inconsistent state** (mid-move OSError + rollback ALSO failed) | **MUST halt D.2 IMMEDIATELY; surface error verbatim to owner; do NOT proceed to D.3; do NOT retry; explicit owner intervention required (likely manual fs cleanup)** |
+| 20 | Hard pre-condition failure (git unavailable / MAIN_REPO_ROOT resolution) | Halt D.2; surface error; investigate environment |
+
+The exit-3 path is the **only** non-clean exit that leaves the filesystem in an inconsistent state. `phase-d-closer` D.2 implementations MUST NOT treat exit 3 as "generic non-zero failure" — the owner-facing message must surface the partial-state details from the summary report.
 
 **Atomicity guarantee** (AD-M6-11): on filesystem failure mid-sequence, rollback restores the pre-execute state for completed moves. The script CANNOT guarantee true POSIX atomicity across 4 separate `rename()` syscalls (kernel-level), but it guarantees "best-effort transactional rollback" which is the closest stdlib-only approximation. Documented as known limitation in AD-M6-11.
 
@@ -383,13 +403,13 @@ Per `[[feedback_per_spec_assumption_recheck]]`: Phase B kick (T-A2.1 start) requ
                   ┌───────────────────────────────────────────┐
                   │      G-1..G-8 sequential execution        │
                   │                                           │
-                  │  G-1: subprocess validate-m6-handoff.py   │  ← Spec #1
-                  │  G-2: subprocess check-m6-e2e-...py       │  ← Spec #2
+                  │  G-1: subprocess validate-m6-handoff.py   │  ← Spec #1 (per-flag ×4)
+                  │  G-2: subprocess check-m6-e2e-...py       │  ← Spec #2 (per-flag ×3)
                   │  G-3: grep CLAUDE.md + state-checks.yaml  │  ← Spec #3
                   │  G-4: date arith vs 2026-08-02 cap        │  ← project_secret_rotation_deferred
-                  │  G-5: git ls-tree HEAD vs git ls-remote   │  ← .gitmodules enum
+                  │  G-5: git ls-tree HEAD vs git ls-remote   │  ← .gitmodules enum (3 submodules)
                   │  G-6: forgejo GET <url-from-release-notes>│  ← Spec #3 §A.5 deferred
-                  │  G-7: 5-files SemVer string match         │  ← CLAUDE.md release checklist
+                  │  G-7: 6-surfaces SemVer string match      │  ← CLAUDE.md release checklist (5 plugin + 1 main)
                   │  G-8: ls openspec/{changes,archive}/      │  ← archive ordering
                   └───────────────┬───────────────────────────┘
                                   │ per-gate exit code aggregation
@@ -414,7 +434,7 @@ Per `[[feedback_per_spec_assumption_recheck]]`: Phase B kick (T-A2.1 start) requ
 
 | ID | Topic | Decision |
 |----|-------|----------|
-| AD-M6-10 | Orchestrator exit code aggregation contract | Three-state verdict (ALL_PASS 0 / RED 1 / ABORT 2). RED honors `--owner-override "<rationale>"` with non-empty rationale + audit-log entry. ABORT rejects override (hard block). Per-gate stdout `[PASS\|RED\|ABORT] G-N: <msg>` format. Summary report idempotent (timestamped filename, accumulates trail). |
+| AD-M6-10 | Orchestrator exit code aggregation contract | <!-- R2-fix I-NEW-r2-2 -->Three-state verdict (ALL_PASS 0 / RED 1 / ABORT 2) for the orchestrator; PLUS exit 3 (archive runner inconsistent-state, mid-move + rollback failure — emitted by `m6-archive-runner.py` only) + exit 20 (hard pre-condition failure: git unavailable / MAIN_REPO_ROOT resolution — emitted by either script). RED honors `--owner-override "<rationale>"` with non-empty rationale + audit-log entry (whitespace-only treated as empty). ABORT rejects override (hard block). Per-gate stdout `[PASS\|RED\|ABORT] G-N: <msg>` format. Summary report idempotent (timestamped filename, accumulates trail). `phase-d-closer` D.2 caller contract for exit 3 = MUST halt + surface verbatim + no auto-retry (per §H Phase D.2 caller contract table). |
 | AD-M6-11 | Atomic 4-directory archive transactional pattern | Use `pathlib.Path.rename()` per move. Track completed moves in an in-memory list; on any failure, attempt rollback by reverse-renaming completed moves back to `openspec/changes/`. Known limitation (documented): not POSIX-atomic across 4 syscalls; best-effort transactional. Dry-run mode (`--dry-run`) prints planned moves without filesystem mutation. |
 | AD-M6-12 | Secret rotation buffer threshold calibration | Thresholds locked at 21d RED / 14d ABORT based on owner-acknowledged rotation time-to-execute (~7-14d real-world delay between "decide to rotate" → "all 9 credentials rotated and tested" per 2026-05-20 rotation R3 evidence). 14d ABORT leaves owner exactly half the worst-case rotation lead-time. 21d RED is one full rotation cycle of advance warning. Re-calibration would require new Spec + DEC. |
 
@@ -430,10 +450,18 @@ All criteria are binary-falsifiable per `[[feedback_falsifiable_evidence_for_bin
 ```bash
 [ -f aria-orchestrator/acceptance/check-m6-release-readiness.py ] || exit 1
 python3 aria-orchestrator/acceptance/check-m6-release-readiness.py --help
-# must exit 0; stdout must contain "ALL_PASS", "RED", "ABORT", "--owner-override", "--dry-run" (help text mentions all CLI surface)
+# must exit 0; stdout must contain "ALL_PASS", "RED", "ABORT", "--owner-override", "--dry-run", "--gates" (help text mentions all CLI surface) <!-- R2-fix N-qa-3: --gates added -->
 ```
 
-Three-state verdict contract: exit 0 = ALL_PASS, exit 1 = RED, exit 2 = ABORT. No other exit codes. Verified by AC-2 / AC-9 boundary scenarios.
+<!-- R2-fix I-NEW-r2-2: exit code contract amended for exit 3 (archive runner inconsistent-state) + exit 20 (hard pre-condition failure) introduced by R1-fix -->
+Exit code contract:
+- 0 = ALL_PASS (or RED→0 with `--owner-override`)
+- 1 = RED (no override; hold)
+- 2 = ABORT (hard block) OR archive runner refusal (readiness ABORT / RED-without-override / pre-archived destinations)
+- 3 = archive runner inconsistent-state (rollback failure; manual intervention required) — emitted by `m6-archive-runner.py` only, NOT by `check-m6-release-readiness.py`
+- 20 = hard pre-condition failure (git unavailable / MAIN_REPO_ROOT resolution failure) — emitted by either script
+
+Verified by AC-2 / AC-9 / AC-10 boundary scenarios. The orchestrator (`check-m6-release-readiness.py`) emits 0/1/2/20 only; the archive runner (`m6-archive-runner.py`) emits 0/2/3/20 only. Exit 1 is exclusive to orchestrator. Exit 3 is exclusive to archive runner.
 
 ### AC-2 — G-1..G-3 sibling consumption gates wired correctly
 
@@ -500,7 +528,7 @@ Test fixtures use `tempfile.TemporaryDirectory()` + `subprocess.run(['git', 'ini
 - `test_G6_RED_no_url`: release-notes-v2.0.0.md missing FAQ URL → orchestrator reports `[RED] G-6: Forgejo Discussion URL not yet posted in release notes; owner action`.
 
 **Secret hygiene meta-test** per `[[feedback_secrets_never_in_conversation]]` (reframed per R1-fix I-qa-2):
-- Test fixtures MUST NOT reference env vars known to carry credentials. `assert all(env_ref not in fixture_text for env_ref in ['FORGEJO_TOKEN', 'ARIA_PAT', 'FORGEJO_PAT', 'GH_TOKEN', 'GITHUB_TOKEN'])`.
+- Test fixtures MUST NOT reference env vars known to carry credentials. Meta-test enumerates all `*.py` files in `aria-orchestrator/tests/acceptance/` directory (R2-fix I-qa-2 PARTIAL closure: `fixture_file` now explicitly scoped to `pathlib.Path(__file__).parent.glob('*.py')`); for each: `assert all(env_ref not in open(fixture_file).read() for env_ref in ['FORGEJO_TOKEN', 'ARIA_PAT', 'FORGEJO_PAT', 'GH_TOKEN', 'GITHUB_TOKEN'])`.
 - Test fixtures MUST NOT call `forgejo` subprocess live; ALL `subprocess.run` invocations for `forgejo` in test scope are monkey-patched (mocked at transport boundary). `assert isinstance(subprocess.run, unittest.mock.MagicMock)` during test execution.
 - Fixture mock return values use placeholder URLs (e.g., `https://forgejo.10cg.pub/10CG/Aria/issues/999`) NOT live URLs.
 - Summary report writer (T-A2.11) MUST capture G-6 **stderr only** (NOT stdout) — assertion: `assert 'auth_header_redacted' not in report_content AND forgejo_wrapper_stdout NOT in report_content`. Per `[[feedback_nomad_inspect_secret_leak]]` + `[[feedback_secret_guard_plugin_upstream_dogfood]]` — Forgejo wrapper stdout may contain auth headers; never persists to git-tracked report.
@@ -524,6 +552,8 @@ The SoT is `plugin.json`; all other surfaces are compared against it (NOT agains
 **Evidence**:
 - `test_G8_PASS_all_active`: fixture where `openspec/changes/` contains all 3 sibling directories AND `openspec/archive/` contains no `*-aria-2.0-m6-*` directories → orchestrator reports `[PASS] G-8`.
 - `test_G8_ABORT_prearchived`: fixture where `openspec/changes/aria-2.0-m6-cost-acceptance/` is absent BUT `openspec/archive/2026-05-30-aria-2.0-m6-cost-acceptance/` exists → orchestrator reports `[ABORT] G-8: aria-2.0-m6-cost-acceptance already archived; Spec #4 out-of-order`.
+- `test_G8_ABORT_totally_missing` (R2-fix N-qa-6): fixture where `aria-2.0-m6-cost-acceptance` is absent from BOTH `openspec/changes/` AND `openspec/archive/` (never existed / accidentally deleted) → orchestrator reports `[ABORT] G-8: aria-2.0-m6-cost-acceptance missing from openspec/changes/ and openspec/archive/`.
+- `test_G8_ABORT_self_missing` (R2-fix N-ba-2): fixture where `openspec/changes/aria-2.0-m6-release-closeout/` (self) is absent → orchestrator reports `[ABORT] G-8: aria-2.0-m6-release-closeout (self) missing from openspec/changes/; out-of-order self-archive`.
 
 ### AC-8 — Summary report writes correctly + idempotent on repeat run
 
@@ -541,7 +571,8 @@ ls .aria/m6-release-readiness/ | wc -l  # must return 2 (both files present)
 
 Filename format: `{YYYY-MM-DDTHHMMSSZ}-report.md` (e.g., `2026-05-25T143012Z-report.md`). UTC timestamp via `datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%SZ')` (no colons → filename-safe across all filesystems).
 
-### AC-9 — Owner override env var honored for RED but rejected for ABORT
+### AC-9 — Owner override CLI flag honored for RED but rejected for ABORT
+<!-- R2-fix N-NEW-r2-1: heading fixed from "env var" to "CLI flag" (mechanism is `--owner-override` argparse arg, not environment variable) -->
 
 **Evidence**:
 ```bash
@@ -588,7 +619,7 @@ Per `[[feedback_schema_migration_3_safeguard_pattern]]` adapted: dry-run is the 
 | R-M6CL-1 | Secret rotation buffer drift — if M6 ship slips past plan, G-4 fires `<14d ABORT` before owner can rotate the 9-key carry-forward (per `[[project_secret_rotation_deferred_2026-05-02]]`) | Medium | Owner pre-emptively rotates secrets if calendar projection shows ship date < 2026-07-12 (21d before cap). G-4 RED window at 14-20d gives 2-week advance warning. Hard cap 2026-08-02 is owner-set; re-calibration requires new Spec. |
 | R-M6CL-2 | Sibling script path drift — Spec #1 / #2 / #3 rename scripts during Phase B implementation, breaking G-1 / G-2 / G-3 subprocess invocations | Medium | Phase B kick verify probe (T-A2.0) tests all 3 script paths + CLI flag contracts BEFORE T-A2.2 implementation. Failed verify → owner escalation. Per `[[feedback_per_spec_assumption_recheck]]` + `[[feedback_scaffold_helpers_drift_without_callers]]`. |
 | R-M6CL-3 | Forgejo Discussion URL race — Spec #3 §A.5 only mandates FAQ TEXT in release notes; actual URL is owner-action post-Spec #3 ship. If Spec #4 runs before Spec #3 §A.5 owner-action complete, G-6 emits RED (which is correct, but may confuse "is M6 ready?" reading) | Low | G-6 emits RED (not ABORT) precisely because URL absence is expected mid-window. G-8 archive trigger eligibility ensures Spec #4 runs AFTER sibling Phase B; FAQ posting is OOS-4 explicit. RED→ship path with `--owner-override "FAQ URL pending owner post"` is the documented release path. |
-| R-M6CL-4 | 5-files SemVer string drift — manual bump error in any of 6 surfaces (plugin.json + 4 derived + 主项目 VERSION) → G-7 ABORT | Medium | Pre-bump owner uses CLAUDE.md release checklist as authoritative procedure. G-7 ABORT is the correct response (catch drift pre-ship). Mitigation is documentation, not script — Spec #4 is the catcher, not the preventer. |
+| R-M6CL-4 | 6-surfaces SemVer string drift — manual bump error in any of 6 surfaces (plugin.json SoT + 4 derived plugin-stream files + 主项目 /VERSION row) → G-7 ABORT | Medium | Pre-bump owner uses CLAUDE.md release checklist as authoritative procedure. G-7 ABORT is the correct response (catch drift pre-ship). Mitigation is documentation, not script — Spec #4 is the catcher, not the preventer. |
 | R-M6CL-5 | Atomic archive on filesystem failure — mid-rename crash leaves N archived + 4-N active, post-rollback (if rollback also fails) leaves inconsistent state | Medium | Dry-run mode (T-A4.3) lets owner inspect planned moves before execute. Rollback in `--execute` is best-effort transactional. AD-M6-11 documents known limitation (not POSIX-atomic across 4 syscalls). T-A4.4 pytest covers mock fs-failure mid-move. |
 | R-M6CL-6 | PyYAML not on host → G-3 YAML structural check unavailable | Low | Per §Constraints + AD-M6-10 fallback: G-3 primary path is grep-based name presence (stdlib-only); YAML structural is OPTIONAL second pass gated by `importlib.util.find_spec('yaml')`. No hard dependency on PyYAML. |
 | R-M6CL-7 | Spec #4 self-archives mid-orchestration — Spec #4 invokes itself archive while still running | Low | Archive runner is a SEPARATE script from orchestrator. Owner explicitly invokes archive runner after readiness PASS. Spec #4 orchestrator never invokes its own archive. Reduces footgun risk. |
@@ -626,8 +657,8 @@ Owner manual action (post-Phase B, not in B.2):
 
 | Dependency | Direction | Notes |
 |------------|-----------|-------|
-| Spec #1 `aria-2.0-m6-cost-acceptance` Phase B complete | Upstream (hard) | G-1 invokes `validate-m6-handoff.py --all`. Phase B kick verify (A-1). |
-| Spec #2 `aria-2.0-m6-e2e-resilience` Phase B complete | Upstream (hard) | G-2 invokes `check-m6-e2e-acceptance.py --all`. Phase B kick verify (A-2). |
+| Spec #1 `aria-2.0-m6-cost-acceptance` Phase B complete | Upstream (hard) | G-1 invokes `validate-m6-handoff.py` per-flag (4 calls: `--check-abi-compat` / `--check-3-day-history` / `--check-cost-method-enum` / `--check-pricing-freshness`). Per-flag canonical per owner Q3 lock 2026-05-25. Phase B kick verify (A-1). |
+| Spec #2 `aria-2.0-m6-e2e-resilience` Phase B complete | Upstream (hard) | G-2 invokes `check-m6-e2e-acceptance.py` per-flag (3 calls: `--tg-a` / `--tg-b` / `--tg-c`). Per-flag canonical per owner Q3 lock. Phase B kick verify (A-2). |
 | Spec #3 `aria-2.0-m6-docs` Phase C.2 complete (TG-DOCS-A only) | Upstream (hard) | G-3 reads CLAUDE.md v2.0 + state-checks.yaml. Phase B kick verify (A-3). |
 | `aria/.claude-plugin/plugin.json` `version` field | Upstream (read-only SoT) | G-7 derives expected SemVer from this. |
 | `forgejo` CLI wrapper at `/home/dev/.npm-global/bin/forgejo` | Infrastructure (host-managed) | G-6 invokes wrapper subprocess. A-5 verify. Falls back to RED on absence. |

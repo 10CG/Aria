@@ -155,10 +155,12 @@
   - Any parse failure (None return) → ABORT (cannot ship with unparseable version file).
 
 - [ ] 2.9 Implement `gate_8_archive_trigger_eligibility()`:
-  - For each of 3 sibling Specs (`aria-2.0-m6-cost-acceptance`, `aria-2.0-m6-e2e-resilience`, `aria-2.0-m6-docs`):
-    - Check `openspec/changes/<sibling>/` is directory → expected (still active).
-    - If absent: probe `openspec/archive/*-<sibling>/` glob → if pre-archive found, ABORT with `<sibling> already archived (<path>); Spec #4 out-of-order`. If absent both places, ABORT with `<sibling> missing from openspec/changes/ AND openspec/archive/`.
-  - All 3 present in `changes/` AND none in `archive/` → PASS.
+  - <!-- R2-fix N-ba-2: extended REQUIRED list to include self (4 entries total) -->
+    For each of 4 entries (3 siblings + self): `aria-2.0-m6-cost-acceptance`, `aria-2.0-m6-e2e-resilience`, `aria-2.0-m6-docs`, `aria-2.0-m6-release-closeout` (self):
+    - Check `openspec/changes/<name>/` is directory → expected (still active).
+    - If absent: probe `openspec/archive/*-<name>/` glob → if pre-archive found, ABORT with `<name> already archived (<path>); Spec #4 out-of-order`. If absent both places, ABORT with `<name> missing from openspec/changes/ AND openspec/archive/`.
+    - Self-absent special case: ABORT with `<name> (self) missing from openspec/changes/; out-of-order self-archive`.
+  - All 4 present in `changes/` AND none in `archive/` → PASS.
 
 - [ ] 2.10 Implement aggregator + exit code logic + owner-override:
   - Collect 8 `(verdict, message)` tuples.
@@ -188,7 +190,7 @@
   - `tmp_repo_fixture`: `tempfile.TemporaryDirectory()` + `subprocess.run(['git', 'init'])` + minimal `aria/.claude-plugin/plugin.json` + minimal `.aria/state-checks.yaml` + minimal `CLAUDE.md`. Used by all tests needing repo context.
   - `mock_sibling_scripts_fixture`: monkey-patch `subprocess.run` for `validate-m6-handoff.py` / `check-m6-e2e-acceptance.py` invocations to return configurable exit codes. Per `[[feedback_test_mock_pattern_hides_prod_bug]]`: mock at subprocess transport layer ONLY.
 
-- [ ] 3.2 AC-1 — `test_orchestrator_exists_and_help_works`: assert script exists; `--help` exits 0; help text contains all CLI surface keywords (ALL_PASS / RED / ABORT / --owner-override / --dry-run).
+- [ ] 3.2 AC-1 — `test_orchestrator_exists_and_help_works`: assert script exists; `--help` exits 0; help text contains all CLI surface keywords (ALL_PASS / RED / ABORT / --owner-override / --dry-run / **--gates** <!-- R2-fix N-qa-3: --gates added -->). Use case-insensitive substring assertions for robustness.
 
 - [ ] 3.3 AC-2 — G-1..G-3 sibling consumption (9 fixtures):
   - `test_G1_PASS` / `test_G1_RED` / `test_G1_ABORT`: mock validate-m6-handoff.py returns 0/1/2.
@@ -225,7 +227,14 @@
   - `test_G6_RED_url_404`: same URL + mock returns `CompletedProcess(returncode=22, stdout='', stderr='HTTP/1.1 404')` → RED.
   - `test_G6_RED_no_url`: release-notes missing FAQ URL → RED `not yet posted`.
   - **Secret-hygiene meta-tests** per `[[feedback_secrets_never_in_conversation]]` (R1-fix I-qa-2 reframed — Forgejo PATs have no unique prefix, so old regex was tautological):
-    - `test_G6_no_pat_env_var_refs`: scan all fixture test files; assert NONE reference env var names known to carry credentials: `for env_name in ['FORGEJO_TOKEN', 'FORGEJO_PAT', 'ARIA_PAT', 'GH_TOKEN', 'GITHUB_TOKEN']: assert env_name not in open(fixture_file).read()`.
+    - `test_G6_no_pat_env_var_refs`: scan all `*.py` test fixture files; assert NONE reference env var names known to carry credentials. <!-- R2-fix I-qa-2 PARTIAL closure: scoped fixture_file -->
+      ```python
+      import pathlib
+      for fixture_file in pathlib.Path(__file__).parent.glob('*.py'):
+          content = fixture_file.read_text()
+          for env_name in ['FORGEJO_TOKEN', 'FORGEJO_PAT', 'ARIA_PAT', 'GH_TOKEN', 'GITHUB_TOKEN']:
+              assert env_name not in content, f"{fixture_file}: credential env var name leaked"
+      ```
     - `test_G6_forgejo_subprocess_always_mocked`: assert `subprocess.run` is `unittest.mock.MagicMock` instance during ALL G-6 test executions (never live call to `forgejo` wrapper).
     - `test_G6_report_excludes_stdout`: invoke `test_G6_PASS_url_200` then assert generated summary report does NOT contain the mocked stdout string (e.g., `'{"id":999,...}'`); MUST contain stderr-redacted placeholder comment.
 
@@ -236,9 +245,11 @@
   - `test_G7_ABORT_plugin_json_missing`: fixture without `aria/.claude-plugin/plugin.json` (or with corrupt JSON) → ABORT with `SoT plugin.json missing OR unparseable`.
   - `test_G7_ABORT_multi_stale`: fixture where CHANGELOG.md + README.md + main `/VERSION` are ALL stale (3 surfaces drifted) → ABORT message must list ALL 3 stale files (NOT just the first found).
 
-- [ ] 3.8 AC-7 — G-8 archive trigger ordering (2 scenarios):
-  - `test_G8_PASS_all_active`: tmp_repo with all 3 sibling dirs in `openspec/changes/`, none in `openspec/archive/` → PASS.
-  - `test_G8_ABORT_prearchived`: tmp_repo with `cost-acceptance` only in `openspec/archive/2026-05-30-aria-2.0-m6-cost-acceptance/` → ABORT.
+- [ ] 3.8 AC-7 — G-8 archive trigger ordering (4 scenarios; R2-fix N-qa-6 + N-ba-2 added):
+  - `test_G8_PASS_all_active`: tmp_repo with all 4 dirs (3 siblings + self) in `openspec/changes/`, none in `openspec/archive/` → PASS.
+  - `test_G8_ABORT_prearchived`: tmp_repo with `cost-acceptance` only in `openspec/archive/2026-05-30-aria-2.0-m6-cost-acceptance/` → ABORT with `already archived; Spec #4 out-of-order`.
+  - `test_G8_ABORT_totally_missing` (R2-fix N-qa-6): tmp_repo where `aria-2.0-m6-cost-acceptance` is absent from BOTH `openspec/changes/` AND `openspec/archive/` → ABORT with `missing from openspec/changes/ AND openspec/archive/`.
+  - `test_G8_ABORT_self_missing` (R2-fix N-ba-2): tmp_repo where `aria-2.0-m6-release-closeout` (self) is absent from `openspec/changes/` → ABORT with `(self) missing from openspec/changes/; out-of-order self-archive`.
 
 - [ ] 3.9 AC-8 — Summary report write idempotency:
   - `test_report_written_on_first_run`: invoke orchestrator → assert 1 `.md` file appears in `.aria/m6-release-readiness/`.
@@ -339,7 +350,7 @@
     M6 ship 前必跑 `python3 aria-orchestrator/acceptance/check-m6-release-readiness.py` →
     exit 0 = ALL_PASS (可 ship) / exit 1 = RED (需 --owner-override) / exit 2 = ABORT (硬阻).
     自动化覆盖 8 个 gate (G-1..G-8): cost-acceptance / e2e-resilience / docs / secret-rotation-buffer /
-    submodule-pointer-pre-release / Forgejo-Discussion-URL-liveness / 5-files-version-sync /
+    submodule-pointer-pre-release / Forgejo-Discussion-URL-liveness / 6-surfaces-version-sync /
     archive-trigger-eligibility。详情见
     [openspec/changes/aria-2.0-m6-release-closeout/proposal.md](openspec/changes/aria-2.0-m6-release-closeout/proposal.md)。
     ```
@@ -396,8 +407,8 @@ M6 CLOSED
 ## Risk-mitigation checklist (Phase B kick)
 
 Before T-A2.1 implementation begins, owner verifies (per `[[feedback_per_spec_assumption_recheck]]`):
-- [ ] A-1: Spec #1 `validate-m6-handoff.py` exists + `--all` flag accepted (or fallback path documented)
-- [ ] A-2: Spec #2 `check-m6-e2e-acceptance.py` exists + `--all` flag accepted
+- [ ] A-1: Spec #1 `validate-m6-handoff.py` exists + ships 4 individual flags (`--check-abi-compat` / `--check-3-day-history` / `--check-cost-method-enum` / `--check-pricing-freshness`) per Spec #1 §AC-6/7/8 contract (per-flag canonical per owner Q3 lock 2026-05-25; `--all` NOT contracted) <!-- R2-fix I-NEW-r2-1 -->
+- [ ] A-2: Spec #2 `check-m6-e2e-acceptance.py` exists + ships 3 TG flags (`--tg-a` / `--tg-b` / `--tg-c`) per Spec #2 AC-1/3/5 contract (per-flag canonical) <!-- R2-fix I-NEW-r2-1 -->
 - [ ] A-3: Spec #3 TG-DOCS-A shipped to master (CLAUDE.md v2.0 + 3 state-checks probes)
 - [ ] A-4: `aria/.claude-plugin/plugin.json` `version` parseable
 - [ ] A-5: `forgejo` CLI wrapper on PATH
