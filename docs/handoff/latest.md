@@ -11,7 +11,13 @@
 
 ---
 
-## ★ 最新 session #A — 🎉 **M6 Phase A 4/4 sub-Specs COMPLETE** — Spec #4 release-closeout Approved (2026-05-25 ~22:00 UTC, dev-claude) 
+## ★ 最新 session #A — 🎉 **M6 Phase A 4/4 sub-Specs COMPLETE** — Spec #4 release-closeout Approved (2026-05-25 ~22:00 UTC, dev-claude)
+
+## ★ 同日 session #V129 — Track V129: v1.29.0 submodule-gate block-flip Phase A Approved (2026-05-25 ~14:35 UTC, dev-claude) — Spec drafted + R1+R2 CONVERGED, Phase B+C+D 留 2026-06-07 ship
+
+**Latest (T-V129)**: [2026-05-25-v1.29.0-flip-phase-a-approved.md](./2026-05-25-v1.29.0-flip-phase-a-approved.md) — Track V129 = aria-plugin v1.29.0 warn→block flip Phase A 完成。Spec `openspec/changes/aria-submodule-gate-block-flip/proposal.md` Level 2 Approved (R1 3-agent: tl PWW + qa **REVISE 2C/4I** + cr PWW → Rev1 (2 Critical + 13 Important + 8 Minor fixed) → R2 3-agent unanimous PASS_WITH_WARNINGS CONVERGED + 0 new Critical)。6 audit reports (R1+R2 × 3 agents)。Carry-forward: §观察期数据 ship 当天 (2026-06-07 D+14 hard date) 填入真实 14d FP 数据 + 6 deliverables (A1+A2+A3 default flip / B tripwire cron / C 5+1 SOT bump / D main repo 1.7.1 / E decision doc / F wording sync) + ~5-6h end-to-end ship。Inter-session gap ~13d, 本 handoff §3 含完整 D+14 ship checklist 防止 context 丢失。Parent Spec: `openspec/archive/2026-05-24-aria-submodule-pointer-regression-gate/`。
+
+> **Multi-track 2026-05-25 note**: 同日 dev-claude 两 track 并行: T-Spec4 (上, 22:00 UTC) + T-V129 (本, 14:35 UTC)。两者无文件碰撞 (T-Spec4 在 M6 Specs / T-V129 在 v1.29.0 flip Spec),latest.md merge rebase 1 次解决。
 
 **Latest (T-Spec4)**: [2026-05-25-m6-spec4-release-closeout-approved.md](./2026-05-25-m6-spec4-release-closeout-approved.md) — Spec #4 `aria-2.0-m6-release-closeout` Phase A.1+A.2 CONVERGED via R3 stability check 2026-05-25 (`650b70a`)。M6 Phase A 4/4 sub-Specs Approved (Spec #1 `c29a800` + Spec #2/#3 `413dd75` + Spec #4 `650b70a`)。**~50min Level 2 cycle** (Phase A.1 + R1 + R1-fix + R2 + R2-fix + R3 stability + Approved); 8 audit reports (3 R1 raw + R1 aggregate + 3 R2 raw + R2 aggregate + R3 stability)。**3 owner Q-locks** via AskUserQuestion batch (T-A1.4 reconcile / phase-d-closer delegation / invert primary path)。**2 new memory entries** (audit_trajectory_placeholder_footgun + terminal_spec_orchestrator_pattern)。**Multi-terminal**: dev-claude2 同期 ship Aria #124 v1.28.0 (5 commits),1 push race rebase clean。US-026 Status `pending → in_progress`。**Next session**: Spec #1 Phase A.3 + Phase B.1 启动 cron 累积 3-day data (Spec #2 precondition);Spec #3 TG-DOCS-A 可并行。⚠️ MEMORY.md 99.4% utilization,next session 写 memory 前必 prune。
 
