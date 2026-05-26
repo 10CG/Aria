@@ -2,10 +2,10 @@
 
 > **Spec**: [aria-2.0-m6-cost-acceptance](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: Draft
+> **Status**: Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability; Phase A.3 agent allocation locked 2026-05-26; ready for Phase B.1)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2)
 > **Estimated total**: ~12h (updated from ~10h; R1 adds T3.7/T3.8 + T4.5/T4.6 + T5.11 + T3.4-bis; see proposal §Effort baseline)
-> **Agent**: backend-architect
+> **Agent**: backend-architect (primary impl ~11h/12h: T-schema/T-config/T-alarm/T-acceptance/T-validate; qa-engineer for AC pytest design review + Phase B test-strategy audit; knowledge-manager for T-docs AD-M6-1/2 + T-prd cross-ref verify ~1h)
 
 ---
 
@@ -349,7 +349,17 @@ T-prd (7.1-7.2)             — parallel with all above (verify-only, no code ch
 
 ## Status
 
-**Draft (Phase A.1 → R1 fixes applied 2026-05-24)** — Ready for Phase A.2 post_spec R2 audit
-(3-agent challenge: code-reviewer + ai-engineer + tech-lead-critic per R1→R2 closure plan).
+**Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability; Phase A.3 agent allocation locked 2026-05-26)** — Ready for Phase B.1 branch creation → Phase B.2 implementation.
 
-**Approved 锁定后** → Phase A.3 → Phase B.1 branch creation → Phase B.2 implementation.
+**Phase A trajectory**:
+- A.1 Draft 2026-05-24 (commit `c29a800` predecessor batch)
+- A.2 R1 NEEDS_FIX 4/4 (4-agent: tl + qa + ai + cr); 12C + 20I → 11+8 themes
+- A.2 R1-fix `0d4a317`: 11C + 8I + Q1-Q4 owner decisions closed
+- A.2 R2 SCOPE_OK_R2 3/3 (3-agent: cr + ai + tl); 1 new C (REPO_ROOT off-by-1) + 2 I
+- A.2 R2-fix `75a399d`: C-tl-N1 + cr-I1 + ai-NI-1 closed
+- A.2 R3 stability (tl-critic 1-agent): R3_STABLE 0 new C + 0 new I → **CONVERGED Approved**
+- A.3 agent allocation lock 2026-05-26: backend-architect primary + qa-engineer review + knowledge-manager for docs/PRD groups
+
+**Phase B kickoff order (per Track G + Spec #4 closeout handoff)**: branch `feature/m6-cost-acceptance` in
+`aria-orchestrator` submodule; Phase B.1 priority = cron-daily kick to begin 3-day data accumulation
+(Spec #2 AC-7 precondition; ≥3 daily runs unblock Spec #2 Phase B start).
