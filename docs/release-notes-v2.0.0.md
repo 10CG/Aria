@@ -47,7 +47,7 @@ State machine S0-S9 + S_FAIL implemented in aria-orchestrator. Proven with 268 t
 
 ### Cost Tracking (Spec #1)
 
-Locked `cost.json` schema (`metered_usd`, `subscription_usd`, `freshness_ts`) for cross-layer cost tracking. See `aria-orchestrator/docs/layer-boundary-contract.md` (TG-DOCS-B).
+Locked `cost.json` schema (`metered_usd`, `subscription_usd`, `freshness_ts`) for cross-layer cost tracking. See `aria-orchestrator/docs/layer-boundary-contract.md` *(TG-DOCS-B, ships in v2.0.1)*.
 
 ### E2E Resilience (M5 + Spec #2)
 

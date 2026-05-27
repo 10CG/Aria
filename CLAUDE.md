@@ -186,7 +186,7 @@ v2.0 在"十步循环"之上建立了两层执行结构:
 ├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
 ├── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
 ├── Aria 2.0 架构决策  → aria-orchestrator/docs/architecture-decisions.md
-└── Layer 边界契约     → aria-orchestrator/docs/layer-boundary-contract.md
+└── Layer 边界契约     → aria-orchestrator/docs/layer-boundary-contract.md (TG-DOCS-B, v2.0.1)
 ```
 
 ### Plugin 调用方式 (Aria 项目内部)
@@ -498,9 +498,10 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ### 详细入口
 
 - 架构决策: [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md)
-- Layer 边界契约: [aria-orchestrator/docs/layer-boundary-contract.md](aria-orchestrator/docs/layer-boundary-contract.md)
+- Layer 边界契约: [aria-orchestrator/docs/layer-boundary-contract.md](aria-orchestrator/docs/layer-boundary-contract.md) *(TG-DOCS-B, v2.0.1)*
 - PRD v2.0: [docs/requirements/prd-aria-v2.md](docs/requirements/prd-aria-v2.md)
 - 系统架构: [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md)
+- M0 Spec (历史): [openspec/archive/2026-04-17-aria-2.0-m0-prerequisite/proposal.md](openspec/archive/2026-04-17-aria-2.0-m0-prerequisite/proposal.md)
 
 ---
 
