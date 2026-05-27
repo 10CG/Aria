@@ -254,6 +254,60 @@ Dogfood 价值: 验证 skill 可工作 + 暴露 3 个 cross-project usability is
 ---
 
 **Created**: 2026-05-27T07:50:00Z
+**Amendment**: 2026-05-27T~08:10Z (添加 §9 session-end 4-question audit)
 **Session cumulative duration**: ~5.5h working time across 3 calendar days
-**Status**: ✅ Session FULLY CLOSED — 4 arcs ship + D1-D6 Approved + audit P0 backlog + #127 closed + routine disabled + 0 actionable in-session carry-forward (all deferred to next session per §6)
+**Status**: ✅ Session FULLY CLOSED + amended — 4 arcs ship + D1-D6 Approved + audit P0 backlog + #127 closed + routine disabled + CLAUDE.md §项目状态 staleness fixed inline
 **Next entry**: `/aria:state-scanner` → 本 doc surface (mtime 最新) → next session 选 §6 carry-forward Path
+
+---
+
+## §9 Session-end 4-question audit (amendment, 2026-05-27T~08:10Z)
+
+> Per Rule #9 session-end protocol (引用 Aria #124 amendment 模式)。
+
+### Q1: 未完成任务/讨论?
+
+**Answer: 1 gap 已 inline fix, 其余 intentional defer。**
+
+- ⚠ **CLAUDE.md §项目状态 stale** (插件版本 v1.22.0 vs 实际 v1.28.0, last updated 2026-04-12) — 本 session inline fix at this amendment commit:
+  - 插件版本 v1.22.0 → v1.28.0 (含 secret-guard / aria-doctor / submodule gate)
+  - Skills count 30+6 → 32+6
+  - 成熟度 0.8 → 0.85
+  - 当前阶段 描述 → M6 4/4 sub-Specs Approved
+  - PRD 段加 aria-fleet cross-ref (M7+ scope)
+  - 更新日期 2026-04-12 → 2026-05-27
+- Other carry-forward items 均 intentional defer (见 §6 priority list)
+
+### Q2: 文档固化的经验?
+
+**Answer: 5 candidates captured in §4 (待 prune 后 add), 2 个 considered + deferred (cross-cycle value 弱)**
+
+- 5 captured (§4 list) — recommend add post-prune
+- 2 deferred (not strong enough for cross-cycle):
+  - "Owner 一句关键洞察 re-frame ROI" — universal collaboration but obvious
+  - "Multi-arc long session 模式" — obvious
+- 0 missed candidate (本 session 实证已穷举)
+
+### Q3: UPM / US / Spec / PRD 4 维度?
+
+| 维度 | 本 session 影响 | 状态 | Action |
+|------|----------------|------|--------|
+| **UPM** | N/A by design (Aria 无 UPM per `project_aria_no_runtime_upm`) | ✅ | none |
+| **User Stories** | aria-fleet 应是 US-027 (或 028) for M7 work | ⚠ **intentional defer** | M7 brainstorm 时 create (避免 vapor US) |
+| **OpenSpec** | v1.29.0 Spec Approved (`5d00826`) | ✅ | aria-fleet Spec deferred M7+ |
+| **PRD** | aria-fleet 战略未反映 | ⚠ **intentional defer** | M7 brainstorm 完成后 update PRD v2.1+ (或 v3.0) |
+
+**Defer 理由**: 按 Aria 规范, US/PRD 应在 brainstorm 完成 + design lock 之后 update。M7 aria-fleet 实施 timeline = M6 ship 后 (~M7+, 推测 v2.0.0 release 后), 现在 create US/update PRD 是 vapor (会随实施迭代变)。
+
+### Q4: 收尾 + 交接
+
+- ✅ Handoff `2026-05-27-aria-fleet-strategic-pivot-session.md` written + committed `877157a`
+- ✅ latest.md T-STRAT pointer 顶部 (per Rule #9 §2.3 frontmatter schema)
+- ✅ 9-section template (本 §9 amendment 把 8-section 升级到 9-section)
+- ✅ 双远程 push 3-way parity verified
+- ✅ CLAUDE.md staleness fix 本 commit 一并 ship
+- ✅ Next session entry: `/aria:state-scanner` 应解析本 doc (mtime 最新) → surface 至阶段 2 推荐
+
+### Audit verdict
+
+**Session FULLY CLOSED + amended**. 1 gap 已 inline fix (CLAUDE.md staleness),2 gap (US/PRD aria-fleet) intentional defer to M7 brainstorm (规范要求)。本 amendment commit 后 0 actionable in-session carry-forward。

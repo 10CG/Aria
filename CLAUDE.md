@@ -440,11 +440,15 @@ branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/re
 ## 项目状态
 
 ```
-当前阶段: 研究中 → v2.0 规划已批准
-成熟度:   0.8 (核心流程验证 + 项目适配能力 + PRD v2.0 Approved)
-插件版本: v1.22.0 (aria-plugin, 30 user-facing + 6 internal Skills + 11 Agents + Rule #9 + §2.3 frontmatter schema + Layer L claim/reconcile/急切认领 gate + Design A 条件触发 worktree)
+当前阶段: Aria 2.0 M6 Phase A 4/4 sub-Specs Approved (Phase B kickoff pending)
+成熟度:   0.85 (核心流程稳定 + 多终端协调实证 + 跨 30+ Spec 实证 + AB benchmark 累积)
+插件版本: v1.28.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
+                  default + aria-doctor v1.1.0 + §C.2.4.5 submodule pointer regression gate
+                  warn-only mode, v1.29.0 flip 2026-06-07 D+14)
 主项目版本: v1.7.0
-PRD v2.0: Approved (2026-04-11, 待 M0 启动)
+PRD v2.0: Approved (2026-04-11) — M0-M4 done; M5 active; M6 4 sub-Specs Approved 2026-05-24~25;
+          M6 ship 后 (M7+) aria-fleet 三层架构 (通用/workspace/instance) 待 brainstorm
+          → 详见 `.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md` (D1-D6 Approved)
 ```
 
 ### User Story 编号分区
@@ -457,7 +461,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-04-12
+**更新**: 2026-05-27 (项目状态 section 同步至 v1.28.0 + aria-fleet 战略 cross-ref)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
