@@ -236,3 +236,92 @@ Previously-marked `(in v2.0.1)` broken-link deferrals from Spec #3 TG-DOCS-A R-f
 **Author**: solo-lab (uni.concept.wzfq@gmail.com), drafted by Claude Opus 4.7 (1M context)
 **Status**: Spec #3 FULLY COMPLETE (TG-DOCS-A + TG-DOCS-B both shipped 2026-05-27); M6 2/4 sub-Specs fully done
 **Next entry**: `/aria:state-scanner` 看板 surface 本 doc + 推荐 Stream A owner deploy critical-path
+
+---
+
+## §10 Session-end 4-Question Closeout Audit Amendment (2026-05-27 ~22:30 UTC)
+
+Owner-invoked systematic closeout audit (4 questions) post Spec #3 TG-DOCS-B ship. Findings + closing actions documented here as canonical session-end amendment.
+
+### Q1 Findings: Unfinished tasks/discussions
+
+**Unfinished tasks (3 items)** → all addressed except 1 explicit deferral:
+- ✅ Spec #1 tasks.md checkboxes (40 boxes 0→40 checked) — committed this closeout
+- ✅ Spec #3 tasks.md checkboxes (91 boxes → 85 checked, 6 Pre-archive preserved unchecked for Phase D.2 archive run) — committed this closeout
+- ⏳ `(TG-DOCS-B, v2.0.1)` inline notes at CLAUDE.md L189+L501 + release-notes L50 — **deferred to next-session hygiene patch (~2min)** per `[[feedback_inline_deferral_notation_for_forward_links]]` (notes are forward-compat markers; cleanup non-urgent)
+
+**Unfinished discussions**: 0 (all AskUserQuestion responses received + acted on in-session)
+
+### Q2 Findings: Patterns not固化 to memory
+
+**3 high-value memory candidates identified + 全部 written this closeout** (MEMORY.md 23438B → 24127B, 98.2% util):
+- ✅ `feedback_test_driven_fix_uncovers_adjacent_bug` — R-fix 写 test 时常发现被测函数 adjacent latent bug; Spec #1 R2-fix `5b75d5e` FileNotFoundError→ImportError 实证
+- ✅ `feedback_audit_pattern_variance_by_spec_nature` — post_impl audit defect rate 与 Spec impl 复杂度强相关; Spec #1 code 3 unanimous Critical vs Spec #3 doc 0 Critical
+- ✅ `feedback_inline_deferral_notation_for_forward_links` — `(in vX.Y.Z)` inline 注解作 cross-Spec forward-ref broken-link safety net; Spec #3 R-fix 三处实证
+
+**Lower-priority candidates intentionally not固化** (covered by existing memories per extension):
+- 3-parallel-agents per repo (TG-DOCS-B 4-PR pattern) → covered by general parallel agent SDD memories
+- Multi-terminal race + manual conflict resolution → covered by `[[feedback_submodule_regression_pitfall]]` + `[[feedback_submodule_pointer_post_merge_bump]]`
+- R-fix→R2 collapse for advisory-only → covered by `[[feedback_audit_r2_collapse_default_vs_owner_invoked]]` (now extended via #2 audit-pattern-variance entry)
+
+**MEMORY.md headroom post-add**: 449B = ~2 more entries before hard cap. Next session 写 memory 前需考虑 prune 或 cap relaxation。
+
+### Q3 Findings: UPM/US/Spec/PRD sync verification
+
+| 维度 | 状态 |
+|------|------|
+| **UPM** | N/A — Aria 项目不使用 UPM per CLAUDE.md |
+| **US-026** | ✅ Status updated 3 次本 session (Spec #1 ship / Spec #3 TG-DOCS-A ship / Spec #3 full ship); current text reflects all reality |
+| **Spec #1 tasks.md** | ✅ 40/40 checkboxes marked done (this closeout commit) |
+| **Spec #3 tasks.md** | ✅ 85/85 implementation tasks marked done; 6 Pre-archive checklist items preserved unchecked (Phase D.2 archive run) |
+| **Spec archive (5 active OpenSpec)** | ⏳ Spec #1 + Spec #3 implementations shipped but archive deferred to M6 milestone close (atomic via Spec #4 release-closeout archive runner per DEC-20260524-001 Q-final-1 Menu C); 5 active changes (4 M6 + aria-submodule-gate-block-flip + others) |
+| **PRD prd-aria-v2.md** | ✅ 0 changes needed (T7.1 verified Spec #3 dual-track cost gate patch already in §M6 638-646) |
+
+### Q4 Findings: Closeout execution + next-session entry path
+
+**Closeout actions completed this commit**:
+1. tasks.md sync (40 + 85 = 125 checkboxes marked done)
+2. 3 new memory entries + MEMORY.md index update
+3. §10 amendment to T-SPEC3B-SHIP handoff (本 section)
+
+**Next-session entry path verification**:
+
+```
+/aria:state-scanner  →  Phase 1.15 collector  →  surfaces docs/handoff/latest.md
+                       ↓
+                       latest.md §A = T-FORGEJO-PARAM (sister terminal, 21:10 UTC) ← chronologically newest
+                       latest.md §B = T-SPEC3B-SHIP (本 doc, 16:30 UTC) ← my session canonical closure
+                       
+Cross-branch handoff (Phase 1.17 tracks_multibranch)  →  detects ALL recent handoffs
+                       ↓
+AI reads latest.md content → sees both §A + §B + lower entries (T-SPEC3-SHIP + T-SPEC1-SHIP)
+                       ↓
+Reads canonical handoff per §0 priority recommendation
+```
+
+**Verified**: Next session via `/aria:state-scanner` will surface BOTH T-FORGEJO-PARAM (sister) AND T-SPEC3B-SHIP (this session) via latest.md. AI reading latest.md sees all 4 entries from 2026-05-27 in chronological order. §0 入口 in this doc enumerates 3 streams for next-session priority (Stream A owner deploy critical-path / Stream B Spec #2 gated / Stream D Spec #4 sequential).
+
+### Carry-forward inventory (post 4-question closeout)
+
+| Item | Type | Priority | Notes |
+|------|------|----------|-------|
+| `(in v2.0.1)` cleanup at CLAUDE.md L189+L501 + release-notes L50 | hygiene patch | low (~2min) | per `[[feedback_inline_deferral_notation_for_forward_links]]`, keep as forward-compat markers OR remove |
+| Spec #1 + Spec #3 archive | Phase D.2 | gated on M6 milestone close (Spec #4 atomic archive) | deferred by design |
+| Stream A (owner deploy chain Spec #1 cron) | owner-action | ⭐⭐ critical-path | unblocks Spec #2 |
+| Stream B (Spec #2 e2e-resilience Phase B) | AI-runnable | gated on Spec #1 3-day data | ~29h |
+| Stream D (Spec #4 release-closeout) | AI-runnable | sequential post #1/#2 | ~10h, now sooner since #3 fully done |
+| MEMORY.md headroom monitoring | hygiene | 98.2% util | next session 写 memory 前 prune 或 cap relax |
+
+### Closing commit scope (this closeout)
+
+1. `openspec/changes/aria-2.0-m6-cost-acceptance/tasks.md` — 40 boxes marked done
+2. `openspec/changes/aria-2.0-m6-docs/tasks.md` — 85 boxes marked done (6 Pre-archive preserved)
+3. `docs/handoff/2026-05-27-m6-spec3-tg-docs-b-shipped.md` — §10 amendment (本 section)
+4. `memory/MEMORY.md` (local namespace) — 3 new index entries
+5. `memory/feedback_*.md` × 3 (local namespace) — 3 new fact files
+
+Dual push: origin + github + 3-way SHA parity verify post-push。
+
+**4-question closeout complete**. Spec #1 + Spec #3 fully synced + 3 memory entries固化 + session entry path verified. Next session via `/aria:state-scanner` enters cleanly from canonical handoffs.
+
+**Closeout amendment timestamp**: 2026-05-27 ~22:30 UTC
