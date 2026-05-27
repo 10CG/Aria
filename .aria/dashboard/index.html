@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aria — Aria Dashboard</title>
+<style>
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-card: #21242f;
+  --bg-card-hover: #282c3a;
+  --bg-input: #2a2e3b;
+  --border: #2e3241;
+  --border-light: #3a3f52;
+  --text-primary: #e4e6ed;
+  --text-secondary: #9298a8;
+  --text-muted: #6b7185;
+  --accent-blue: #5b8def;
+  --accent-blue-dim: rgba(91,141,239,0.15);
+  --accent-green: #3dd68c;
+  --accent-green-dim: rgba(61,214,140,0.15);
+  --accent-yellow: #f0c351;
+  --accent-yellow-dim: rgba(240,195,81,0.15);
+  --accent-red: #ef6b6b;
+  --accent-red-dim: rgba(239,107,107,0.15);
+  --accent-purple: #a78bfa;
+  --accent-purple-dim: rgba(167,139,250,0.15);
+  --accent-orange: #f59e42;
+  --accent-orange-dim: rgba(245,158,66,0.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.35);
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* === Layout === */
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* === Header === */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-left h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.header-left .subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.header-right {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.header-right .generated-at {
+  margin-top: 4px;
+}
+
+/* === Phase Banner === */
+.phase-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.phase-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.phase-name {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.in_progress, .status-badge.active, .status-badge.doing {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+  border: 1px solid rgba(91,141,239,0.3);
+}
+
+.status-badge.completed, .status-badge.done {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+  border: 1px solid rgba(61,214,140,0.3);
+}
+
+.status-badge.blocked {
+  background: var(--accent-red-dim);
+  color: var(--accent-red);
+  border: 1px solid rgba(239,107,107,0.3);
+}
+
+.status-badge.unknown {
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.cycle-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.cycle-bar {
+  width: 120px;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cycle-bar-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* === KPI Row === */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.kpi-card:hover {
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-hover);
+}
+
+.kpi-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kpi-target {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.kpi-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.kpi-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* === Section === */
+.section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.section-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+/* === Story Board (Three Columns) === */
+.story-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .story-board { grid-template-columns: 1fr; }
+}
+
+.story-column {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  min-height: 200px;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.column-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.column-title.todo { color: var(--accent-yellow); }
+.column-title.wip { color: var(--accent-blue); }
+.column-title.done { color: var(--accent-green); }
+
+.column-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+
+.story-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  cursor: default;
+}
+
+.story-card:hover {
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-card);
+}
+
+.story-card:last-child { margin-bottom: 0; }
+
+.story-id {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-bottom: 3px;
+}
+
+.story-title {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.story-priority {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.story-priority.high {
+  background: var(--accent-red-dim);
+  color: var(--accent-red);
+}
+
+.story-priority.medium {
+  background: var(--accent-yellow-dim);
+  color: var(--accent-yellow);
+}
+
+.story-priority.low {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+/* === Two-Column Layout (Specs + Audits) === */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* === Spec Table === */
+.spec-table, .audit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spec-table th, .audit-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.spec-table td, .audit-table td {
+  font-size: 13px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.spec-table tr:last-child td,
+.audit-table tr:last-child td {
+  border-bottom: none;
+}
+
+.spec-table tr:hover td,
+.audit-table tr:hover td {
+  background: var(--bg-card-hover);
+}
+
+.spec-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.spec-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.spec-status.approved {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+.spec-status.draft {
+  background: var(--accent-yellow-dim);
+  color: var(--accent-yellow);
+}
+
+.spec-status.archived {
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.spec-status.in-review {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+}
+
+.spec-duration {
+  font-variant-numeric: tabular-nums;
+}
+
+/* === Audit Table Specifics === */
+.verdict-pass {
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+.verdict-revise {
+  color: var(--accent-red);
+  font-weight: 600;
+}
+
+/* 2026-04-23 修复 #23 Major 2 — Minor 4-9 延期到 v1.17.x */
+.verdict-warning {
+  background: var(--accent-yellow-dim);
+  color: var(--accent-yellow);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.verdict-neutral {
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.audit-checkpoint {
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 12px;
+  color: var(--accent-purple);
+}
+
+/* === Stats Bar === */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stat-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* === Benchmark Section === */
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.benchmark-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.benchmark-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.benchmark-stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.benchmark-stat-value.positive { color: var(--accent-green); }
+.benchmark-stat-value.neutral { color: var(--text-secondary); }
+.benchmark-stat-value.negative { color: var(--accent-red); }
+
+.top-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.skill-chip .delta {
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.skill-chip .delta.zero {
+  color: var(--text-muted);
+}
+
+/* === Risks === */
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.risk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.risk-severity {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-severity.critical { background: var(--accent-red); }
+.risk-severity.high { background: var(--accent-orange); }
+.risk-severity.medium { background: var(--accent-yellow); }
+.risk-severity.low { background: var(--accent-green); }
+
+.risk-desc {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.risk-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.risk-status.open {
+  background: var(--accent-red-dim);
+  color: var(--accent-red);
+}
+
+.risk-status.mitigating {
+  background: var(--accent-yellow-dim);
+  color: var(--accent-yellow);
+}
+
+.risk-status.resolved {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+/* === Empty State === */
+.empty-state {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.empty-state .empty-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* === Card wrapper for sections === */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+/* === Issue Form === */
+.issue-form-section {
+  margin-bottom: 24px;
+}
+
+.issue-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .issue-form { grid-template-columns: 1fr; }
+}
+
+.issue-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.issue-form .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.issue-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.issue-form input[type="text"],
+.issue-form textarea,
+.issue-form select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.issue-form input[type="text"]:focus,
+.issue-form textarea:focus,
+.issue-form select:focus {
+  border-color: var(--accent-blue);
+}
+
+.issue-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.issue-form select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239298a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.issue-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-generate {
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.btn-generate:hover {
+  background: #4a7de0;
+}
+
+.btn-generate:active {
+  background: #3a6dd0;
+}
+
+.btn-copy {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+  display: none;
+}
+
+.btn-copy:hover {
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+.issue-output {
+  grid-column: 1 / -1;
+  display: none;
+  margin-top: 4px;
+}
+
+.issue-output textarea {
+  width: 100%;
+  min-height: 160px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  color: var(--accent-green);
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 12px;
+  resize: vertical;
+  outline: none;
+}
+
+.issue-output .output-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.issue-form-notice {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* === Carry-forward Section === */
+/* 2026-04-23 修复 #23 Major 3 — Minor 4-9 延期到 v1.17.x */
+.carry-forward {
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.carry-forward h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.cf-group {
+  margin-bottom: 16px;
+}
+
+.cf-group:last-child {
+  margin-bottom: 0;
+}
+
+.cf-group h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cf-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cf-group li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 5px 0 5px 12px;
+  border-left: 2px solid var(--accent-yellow-dim);
+  margin-bottom: 4px;
+  line-height: 1.45;
+}
+
+.cf-group li:last-child {
+  margin-bottom: 0;
+}
+
+.cf-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+/* === Footer === */
+.footer {
+  text-align: center;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* === Responsive === */
+@media (max-width: 600px) {
+  .dashboard { padding: 16px 12px 32px; }
+  .header { flex-direction: column; gap: 12px; }
+  .header-right { text-align: left; }
+  .phase-banner { flex-direction: column; align-items: flex-start; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .benchmark-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Aria</h1>
+      <div class="subtitle">Aria Dashboard — Project Progress Overview</div>
+    </div>
+    <div class="header-right">
+      <div>Aria Dashboard v1.1.0</div>
+      <div class="generated-at">Generated: 2026-05-27T02:08:24Z</div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- Section 1: Progress Overview (Phase + KPI + Cycle)               -->
+  <!-- ================================================================ -->
+  <div class="phase-banner">
+    <div class="phase-info">
+      <span class="phase-name">方法论研究 — Aria 2.0 M6 sub-Specs Approved</span>
+      <span class="status-badge in-progress">active</span>
+    </div>
+    <div class="cycle-info">
+      <span>Cycle #—</span>
+      <div class="cycle-bar">
+        <div class="cycle-bar-fill" style="width: 0%"></div>
+      </div>
+      <span>0%</span>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="empty-state"><div class="empty-icon">📊</div>
+        <div>No UPM document — Aria 是方法论项目, 无 runtime UPM (per memory <code>project_aria_no_runtime_upm</code>)</div></div>
+  </div>
+
+  <!-- Risks -->
+  
+
+  <!-- ================================================================ -->
+  <!-- Section 2: Story Board (Three Columns)                           -->
+  <!-- ================================================================ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">User Stories</span>
+      <span class="section-badge">19 stories</span>
+    </div>
+    <div class="story-board">
+      <!-- TODO Column -->
+      <div class="story-column">
+        <div class="column-header">
+          <span class="column-title todo">TODO</span>
+          <span class="column-count">1</span>
+        </div>
+        <div class="story-card">
+  <div class="story-id">US-003</div>
+  <div class="story-title">多 AI 平台兼容性</div>
+  <span class="story-priority low">LOW</span>
+</div>
+      </div>
+      <!-- In Progress Column -->
+      <div class="story-column">
+        <div class="column-header">
+          <span class="column-title wip">In Progress</span>
+          <span class="column-count">2</span>
+        </div>
+        <div class="story-card">
+  <div class="story-id">US-007</div>
+  <div class="story-title">aria-orchestrator — 外部编排器与自动开发闭环</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-026</div>
+  <div class="story-title">Aria 2.0 M6 — v2.0 文档体系 + CLAUDE.md 修订 + Release</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+      </div>
+      <!-- Done Column -->
+      <div class="story-column">
+        <div class="column-header">
+          <span class="column-title done">Done</span>
+          <span class="column-count">16</span>
+        </div>
+        <div class="story-card">
+  <div class="story-id">US-001</div>
+  <div class="story-title">增强工作流自动化</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-002</div>
+  <div class="story-title">跨项目方法论验证</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-004</div>
+  <div class="story-title">十步循环自动审计系统</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-005</div>
+  <div class="story-title">项目进度看板与自动开发闭环</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-006</div>
+  <div class="story-title">state-scanner 项目级自定义健康检查</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-008</div>
+  <div class="story-title">state-scanner v2.9 本地/远程同步检测 + Issue 感知扫描</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-009</div>
+  <div class="story-title">benchmark-transparency-enhancement — Dual Delta Reporting Layer</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-010</div>
+  <div class="story-title">Agent Team 质量强化 — Description 精确化 + 协作契约</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-011</div>
+  <div class="story-title">项目适配能力 — Agent 覆盖度分析 + 配置生成</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-012</div>
+  <div class="story-title">发版多远程一致性保障</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-020</div>
+  <div class="story-title">Aria 2.0 M0 — 前置验证与架构定稿</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-021</div>
+  <div class="story-title">Aria 2.0 M1 — MVP 手动 E2E dispatch</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-022</div>
+  <div class="story-title">Aria 2.0 M2 — Layer 1 状态机 + Hermes Option C Extension</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-023</div>
+  <div class="story-title">Aria 2.0 M3 — Cycle close + GLM 多模型 routing + Crash recovery</div>
+  <span class="story-priority high">HIGH</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-024</div>
+  <div class="story-title">Aria 2.0 M4 — Human gate + Feishu 审批</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+<div class="story-card">
+  <div class="story-id">US-025</div>
+  <div class="story-title">Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable</div>
+  <span class="story-priority medium">MEDIUM</span>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- Section 3 & 4: OpenSpec + Audit History (Two Columns)            -->
+  <!-- ================================================================ -->
+  <div class="two-col section">
+    <!-- OpenSpec List -->
+    <div class="card">
+      <div class="section-header">
+        <span class="section-title">OpenSpec</span>
+        <span class="section-badge">5 active / 87 archived</span>
+      </div>
+      <div class="stats-bar">
+        <span class="stat-item">Avg duration: <strong>1.4 days</strong></span>
+      </div>
+      <tr>
+  <td class="spec-name">aria-2.0-m6-cost-acceptance</td>
+  <td><span class="spec-status approved">Approved</span></td>
+  <td>3</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">aria-2.0-m6-docs</td>
+  <td><span class="spec-status approved">Approved</span></td>
+  <td>3</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">aria-2.0-m6-e2e-resilience</td>
+  <td><span class="spec-status approved">Approved</span></td>
+  <td>3</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">aria-2.0-m6-release-closeout</td>
+  <td><span class="spec-status approved">Approved</span></td>
+  <td>2</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">aria-submodule-gate-block-flip</td>
+  <td><span class="spec-status approved">Approved</span></td>
+  <td>2</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-24-aria-submodule-pointer-regression-gate</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>3</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-23-aria-2.0-m5-replay-reconciler-drift-review-loop-audit</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>3</td>
+  <td class="spec-duration">—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-23-aria-layer2-docker-auth-cold-pull-fix</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>Minimal</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-23-aria-secret-guard-plugin-default</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>Full</td>
+  <td class="spec-duration">1d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-22-state-scanner-status-extraction-range</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">1d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-20-multi-terminal-coordination</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>3</td>
+  <td class="spec-duration">1d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-20-state-scanner-bugfix-locale-and-transitional-status</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-20-state-scanner-inline-carry-forward-surfacing</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-19-aria-2.0-m5-carryover-layer2-redo-mode-aux</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>3</td>
+  <td class="spec-duration">3d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-16-aria-2.0-m5-carryover-layer2-changes-mode</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>3</td>
+  <td class="spec-duration">1d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-15-aria-ten-step-session-handoff-stage</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">2d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-13-aria-issue-101-status-normalize</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-13-aria-issue-triage-sop</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>2</td>
+  <td class="spec-duration">0d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-10-phase-c-integrator-pre-merge-gate</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>Minimal</td>
+  <td class="spec-duration">1d</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="spec-name">2026-05-09-aria-2.0-m4-human-gate-feishu-approval</td>
+  <td><span class="spec-status archived">Archived</span></td>
+  <td>Full</td>
+  <td class="spec-duration">2d</td>
+  <td>US-024</td>
+</tr>
+    </div>
+
+    <!-- Audit History -->
+    <div class="card">
+      <div class="section-header">
+        <span class="section-title">Audit History</span>
+        <span class="section-badge">63 reports</span>
+      </div>
+      <tr>
+  <td class="audit-checkpoint">post_spec</td>
+  <td class="verdict-warning">PASS_WITH_WARNINGS</td>
+  <td>—</td>
+  <td>challenge</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td class="audit-checkpoint">post_spec</td>
+  <td class="verdict-warning">PASS_WITH_WARNINGS</td>
+  <td>2</td>
+  <td>convergence</td>
+  <td>2026-05-22</td>
+</tr>
+<tr>
+  <td class="audit-checkpoint">post_spec</td>
+  <td class="verdict-warning">PASS_WITH_WARNINGS</td>
+  <td>2</td>
+  <td>convergence</td>
+  <td>2026-05-20</td>
+</tr>
+<tr>
+  <td class="audit-checkpoint">post_spec</td>
+  <td class="verdict-pass">PASS</td>
+  <td>2</td>
+  <td>convergence</td>
+  <td>2026-05-19</td>
+</tr>
+<tr>
+  <td class="audit-checkpoint">post_spec</td>
+  <td class="verdict-warning">PASS_WITH_WARNINGS</td>
+  <td>1</td>
+  <td>convergence</td>
+  <td>2026-05-19</td>
+</tr>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- Section 5: AB Benchmark Summary                                  -->
+  <!-- ================================================================ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">AB Benchmark Summary</span>
+      <span class="section-badge">2026-04-09</span>
+    </div>
+    <div class="benchmark-grid">
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value neutral">1</div>
+        <div class="benchmark-stat-label">Skills Tested</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value positive">++0.82</div>
+        <div class="benchmark-stat-label">Avg Delta</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value positive">100%</div>
+        <div class="benchmark-stat-label">Win Rate</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value positive">1</div>
+        <div class="benchmark-stat-label">WITH_BETTER</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value neutral">0</div>
+        <div class="benchmark-stat-label">EQUAL</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="benchmark-stat-value neutral">0</div>
+        <div class="benchmark-stat-label">MIXED</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <span class="section-title" style="font-size:13px;">Top Skills by Delta</span>
+      </div>
+      <div class="top-skills-list">
+        <span class="skill-chip">state-scanner <span class="delta">+0.82</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- Section 6: Carry-forward (2026-04-23 修复 #23 Major 3)         -->
+  <!-- Hidden when no data (backward-compat for non-polish projects)  -->
+  <!-- ================================================================ -->
+  
+
+  <!-- ================================================================ -->
+  <!-- Section 7: Issue Submission Form                                -->
+  <!-- ================================================================ -->
+  <div class="section issue-form-section">
+    <div class="section-header">
+      <span class="section-title">Submit Feedback</span>
+      <span class="section-badge">Issue Form</span>
+    </div>
+    <div class="card">
+      <div class="issue-form" id="issueForm">
+        <div class="form-group">
+          <label for="issue-title">Title *</label>
+          <input type="text" id="issue-title" maxlength="100" placeholder="Brief summary of the issue" required>
+        </div>
+        <div class="form-group">
+          <label for="issue-type">Type</label>
+          <select id="issue-type">
+            <option value="bug">Bug</option>
+            <option value="feature">Feature Request</option>
+            <option value="question">Question</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label for="issue-desc">Description *</label>
+          <textarea id="issue-desc" placeholder="Detailed description, steps to reproduce, expected behavior..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="issue-priority">Priority</label>
+          <select id="issue-priority">
+            <option value="P0">P0 — Production blocker</option>
+            <option value="P1">P1 — Major impact</option>
+            <option value="P2" selected>P2 — Normal (default)</option>
+            <option value="P3">P3 — Low priority</option>
+          </select>
+        </div>
+        <div class="issue-form-actions">
+          <button class="btn-generate" id="btnGenerate" type="button">Generate Issue Markdown</button>
+          <button class="btn-copy" id="btnCopy" type="button">Copy to Clipboard</button>
+        </div>
+        <div class="issue-output" id="issueOutput">
+          <textarea id="issueMarkdown" readonly></textarea>
+          <div class="output-hint">
+            Save this content as <code>.aria/issues/ISSUE-{timestamp}.md</code> then run
+            <code>git add</code> + <code>git commit</code>.
+            For direct submission, see the deploy guide.
+          </div>
+        </div>
+        <div class="issue-form-notice">
+          Static mode: This form generates Markdown for manual use. To submit issues directly,
+          deploy the dashboard as a web service.
+          See <a href="https://github.com/10CG/aria-plugin" style="color:var(--accent-blue)">deploy guide</a> for details.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Generated by <strong>aria-dashboard</strong> v1.1.0 — Aria AI-DDD Methodology
+  </div>
+
+</div>
+
+<script>
+/* === Minimal JS for interactivity === */
+(function() {
+  'use strict';
+
+  // Collapse/Expand sections on title click
+  document.querySelectorAll('.section-header').forEach(function(header) {
+    header.style.cursor = 'pointer';
+    header.addEventListener('click', function() {
+      var section = this.parentElement;
+      var content = section.querySelectorAll(':scope > *:not(.section-header)');
+      content.forEach(function(el) {
+        if (el.style.display === 'none') {
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Highlight active phase status
+  var badges = document.querySelectorAll('.status-badge');
+  badges.forEach(function(badge) {
+    var text = badge.textContent.trim().toLowerCase();
+    if (!badge.classList.contains(text)) {
+      badge.classList.add(text);
+    }
+  });
+
+  // === Issue Form: Generate Markdown ===
+  var btnGenerate = document.getElementById('btnGenerate');
+  var btnCopy = document.getElementById('btnCopy');
+  var issueOutput = document.getElementById('issueOutput');
+  var issueMarkdown = document.getElementById('issueMarkdown');
+
+  if (btnGenerate) {
+    btnGenerate.addEventListener('click', function() {
+      var title = document.getElementById('issue-title').value.trim();
+      var desc = document.getElementById('issue-desc').value.trim();
+      var type = document.getElementById('issue-type').value;
+      var priority = document.getElementById('issue-priority').value;
+
+      if (!title) {
+        document.getElementById('issue-title').focus();
+        return;
+      }
+      if (!desc) {
+        document.getElementById('issue-desc').focus();
+        return;
+      }
+
+      var now = new Date();
+      var ts = now.toISOString().replace(/:/g, '-').replace(/\.\d+Z$/, 'Z');
+      var id = 'ISSUE-' + ts;
+      var isoFull = now.toISOString();
+
+      var md = '---\n'
+        + 'id: ' + id + '\n'
+        + 'title: "' + title.replace(/"/g, '\\"') + '"\n'
+        + 'type: ' + type + '\n'
+        + 'priority: ' + priority + '\n'
+        + 'status: open\n'
+        + 'created: "' + isoFull + '"\n'
+        + 'updated: "' + isoFull + '"\n'
+        + 'reporter: ""\n'
+        + 'assignee: ""\n'
+        + 'labels: []\n'
+        + 'resolution: ""\n'
+        + 'pr_link: ""\n'
+        + '---\n\n'
+        + '## Description\n\n'
+        + desc + '\n';
+
+      issueMarkdown.value = md;
+      issueOutput.style.display = 'block';
+      btnCopy.style.display = 'inline-block';
+    });
+  }
+
+  if (btnCopy) {
+    btnCopy.addEventListener('click', function() {
+      issueMarkdown.select();
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(issueMarkdown.value);
+        } else {
+          document.execCommand('copy');
+        }
+        btnCopy.textContent = 'Copied!';
+        setTimeout(function() { btnCopy.textContent = 'Copy to Clipboard'; }, 2000);
+      } catch (e) {
+        btnCopy.textContent = 'Copy failed';
+        setTimeout(function() { btnCopy.textContent = 'Copy to Clipboard'; }, 2000);
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
