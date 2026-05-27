@@ -313,3 +313,54 @@ Dogfood 价值: 验证 skill 可工作 + 暴露 3 个 cross-project usability is
 ### Audit verdict
 
 **Session FULLY CLOSED + amended**. 1 gap 已 inline fix (CLAUDE.md staleness),2 gap (US/PRD aria-fleet) intentional defer to M7 brainstorm (规范要求)。本 amendment commit 后 0 actionable in-session carry-forward。
+
+---
+
+## §10 Session-end 4-question audit (Round 2 amendment, 2026-05-27T~08:40Z)
+
+> Per owner re-run of 4Q audit after `3410d60` (DEC stub + Forgejo #128 创建)。Round 2 验证 round 1 (§9 `b7f562d`) 后续行动是否完整 + 是否引入新 gap。
+
+### Q1: 未完成任务/讨论?
+
+**Round 2 finding**: 0 new actionable gaps。Round 1 (§9) → Round 2 (§10) 间触发的所有 action 已 commit:
+- ✅ DEC stub `.aria/decisions/2026-05-27-aria-fleet-brainstorm.md` created (`3410d60`)
+- ✅ Forgejo Aria #128 M7 tracker created (`3410d60`)
+- ✅ Handoff §0 入口列表 updated to 7 items (`3410d60`)
+- ⏸ 5 memory candidates 仍 defer to MEMORY.md prune (multiple-round intentional carry-forward,符合规范)
+
+唯一 round-2 gap = 本 §10 amendment 缺失,即将 inline fix。
+
+### Q2: 未固化经验?
+
+**Round 2 finding**: 0 new high-value candidates。
+
+Round 2 涌现的 operational patterns (cross-cycle value 边缘):
+- "Pre-A.0 brainstorm 内容 location-normalize via stub-with-reference pattern" — Aria-specific 操作模式
+- "Deferred long-term work 需 Forgejo placeholder tracker prevent fading" — universal 但 obvious
+
+5 已 add-recommended (§4 + §9) + 4 deferred (§9 + §10) = 9 candidates surface。
+
+### Q3: UPM/US/Spec/PRD?
+
+**Round 2 finding**: 状态同 round 1 §9, 0 change。
+
+aria-fleet 从 Pre-A.0 exploration → post-A.0 brainstorm DEC + Forgejo tracker (round 1→2 进展), 但 A.1+ (proposal / tasks / US / PRD update) 仍 intentional defer M7+。**4 维度无 status change**。
+
+| 维度 | Round 1 §9 状态 | Round 2 §10 状态 |
+|------|---------------|----------------|
+| UPM | N/A | N/A |
+| OpenSpec | v1.29.0 done / aria-fleet deferred | (same) |
+| US | aria-fleet deferred M7 | (same) |
+| PRD | aria-fleet deferred M7 | (same) |
+
+### Q4: Round 2 收尾
+
+- ✅ Round 1 handoff + §9 amendment committed `b7f562d`
+- ✅ Round 2 follow-ups (DEC + Forgejo #128 + §0 update) committed `3410d60`
+- ✅ 本 §10 amendment commit 即将 ship
+
+### Audit verdict (Round 2)
+
+**Session SECOND-ROUND CONFIRMED CLOSED**。Round 1 → Round 2 audit 是规范允许的递归清理模式 (类似 [[feedback_audit_convergence_4_round_baseline]] 的简化版 — owner-driven re-audit)。Round 2 0 new findings, 与 round 1 audit 结论 converged。
+
+**Convergence signal**: Round 1 + Round 2 unanimous (无新 Critical / 无 verdict 振荡 / 无 dimension change) → 进一步 round (3+) 预计 0 new findings 除非 context 变化 (新 commit / 新 task)。Owner 可视 round 2 为 session-end audit 的 final converged 状态。
