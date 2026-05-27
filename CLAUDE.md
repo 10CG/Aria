@@ -510,9 +510,10 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.28.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
+插件版本: v1.30.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.1.0 + §C.2.4.5 submodule pointer regression gate
-                  warn-only mode, v1.29.0 flip 2026-06-07 D+14)
+                  warn-only mode + Forgejo hosts parameterization via ARIA_FORGEJO_HOSTS env;
+                  v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
 PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 2026-05-24~25);
@@ -530,7 +531,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-27 (v2.0.0 — CLAUDE.md 升版, 9 diffs applied: Aria 2.0 两层架构 + aria-orchestrator 入口 + 运行时章节)
+**更新**: 2026-05-27 (v2.0.0 CLAUDE.md 升版 + 插件 v1.30.0 Forgejo hosts parameterization ship)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
