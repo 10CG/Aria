@@ -2,7 +2,7 @@
 
 > **Spec**: [aria-2.0-m6-e2e-resilience](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: R1 fixes applied (2026-05-24) — pending R2 verification
+> **Status**: Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability; ready for Phase A.3 → Phase B.1 — Phase B gated on Spec #1 AC-7 3-day rolling data precondition)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 §2 Spec #2 + §4 P-4..P-9)
 > **Estimated total**: ~30h impl (~10.5h TG-A + ~13h TG-B + ~6h TG-C; +1h Q-NEW-1 hybrid mock layer; +1h R1 fixes: T-validate-schema-1 + AD-M6-4b)
 > **Agents**: backend-architect (TG-A obs + overall) + qa-engineer (TG-B crash) + knowledge-manager (TG-C samples)
@@ -948,10 +948,14 @@ TG-C-corpus templates (C-corpus-1..3) may be written in advance; sample content 
 
 ## Status
 
-**R1 fixes applied 2026-05-24** — R1 NEEDS_FIX → fixes applied by backend-architect agent.
-Key changes: T2-1 SQL columns (state='S9_CLOSE', state_entered_at), T2-2 state_machine.py→4-module cov,
-T2-3 AC-6 Luxeno=0 paper-fix, T2-4 Mechanism B removed, T2-5 AC-1 CreateTime uptime, T2-6 check order,
-X-T3 mean→median, I2-1..I2-8 important fixes. Ready for R2 audit verification.
+**Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1)** — Phase B kickoff gated on Spec #1 AC-7 3-day rolling data precondition (wait until ≥3 daily cron snapshots exist post Spec #1 Phase C.2 merge + cron deploy).
 
-**Pending** → Phase A.2 R2 audit (3-agent challenge: cr + ai + tl-critic) → R2 verdict
-→ if SCOPE_OK_R2: Phase A.3 agent allocation → Phase B.1 branch creation (after Phase B precondition gate PASS).
+**Phase A trajectory** (synced from proposal.md, Status drift corrected 2026-05-26):
+- A.1 Draft 2026-05-24 (commit predecessor batch leading to `c29a800`/`413dd75`)
+- A.2 R1 NEEDS_FIX 4/4 (4-agent: tl + qa + ai + cr); 12C + 20I de-duped
+- R1-fix applied 2026-05-24 (backend-architect agent): T2-1 SQL columns + T2-2 state_machine→4-module + T2-3 AC-6 Luxeno=0 paper-fix + T2-4 Mech B removed + T2-5 AC-1 CreateTime uptime + T2-6 check order + X-T3 mean→median + I2-1..I2-8
+- A.2 R2 challenge (3-agent: cr + ai + tl-critic): SCOPE_OK_R2
+- A.2 R2-fix applied
+- A.2 R3 stability: R3_STABLE → **CONVERGED Approved** (commit `413dd75` 2026-05-24)
+- A.3 agent allocation: frontmatter line 8 declares per-task-group (backend-architect TG-A + qa-engineer TG-B + knowledge-manager TG-C) — A.3 lock implicit via frontmatter
+- B.1 branch creation: deferred until Spec #1 Phase B.2 implements + deploys snapshot cron (3-day data accumulation precondition)

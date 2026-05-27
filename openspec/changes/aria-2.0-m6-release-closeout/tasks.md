@@ -2,7 +2,7 @@
 
 > **Spec**: [aria-2.0-m6-release-closeout](./proposal.md)
 > **Level**: 2 (Minimal)
-> **Status**: Draft (Phase A.1)
+> **Status**: ✅ Approved (Phase A.2 CONVERGED 2026-05-25 via R3 stability check at `650b70a`; ready for Phase A.3 → Phase B — Phase B sequential post Spec #1+#2+#3 Phase C.2 merge per Q-final-1 Menu C)
 > **Brainstorm Source**: [.aria/decisions/2026-05-24-us026-m6b-brainstorm.md](../../../.aria/decisions/2026-05-24-us026-m6b-brainstorm.md) (DEC-20260524-001 Q-final-1 Menu C)
 > **Estimated total**: ~10h impl (single SoT per `[[feedback_spec_v2_body_propagation_2pass]]`; cited identically in proposal §Effort baseline + frontmatter)
 > **Agent**: backend-architect (primary; tech-lead-critic for Phase A.2; qa-engineer for AC pytest design review)

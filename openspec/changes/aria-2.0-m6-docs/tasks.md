@@ -1,7 +1,7 @@
 # Tasks — aria-2.0-m6-docs
 
 > **Spec**: [proposal.md](proposal.md)
-> **Status**: Draft
+> **Status**: Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability; TG-DOCS-A B.1 branch `feature/m6-docs-tg-a` created 2026-05-26 at SHA `94f5d0f`; ready for Phase B.2 implementation; TG-DOCS-B may slip to v2.0.1 per Q-final-1 Menu C owner gate)
 > **Effort baseline**: ~33h impl (TG-DOCS-A ~11h + TG-DOCS-B ~22h; T-B0.10 +0.1h v1.29.0 gate). Single SoT — matches proposal.md §Effort baseline and frontmatter.
 > **v2.0.1-deferrable**: TG-DOCS-B tasks (T-B*) may defer to v2.0.1 if 5w calendar slips (owner decision gate). TG-DOCS-A tasks (T-A*) ship with v2.0.0 unconditionally.
 > **Agent**: knowledge-manager
