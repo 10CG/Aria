@@ -44,7 +44,7 @@
 **AC verification (inline)**:
 ```bash
 grep -c "Rule #" CLAUDE.md  # → ≥ 9
-grep -q "**版本**: 2.0.0" CLAUDE.md  # → exit 0
+grep -qF "**版本**: 2.0.0" CLAUDE.md  # → exit 0  (R2-fix: -qF fixed-string to portably handle ** on grep/ugrep/BSD-grep)
 grep -q "两层 AI 分工" CLAUDE.md  # → exit 0
 grep -q "Aria 2.0 运行时" CLAUDE.md  # → exit 0
 grep -q "aria-orchestrator" CLAUDE.md  # → exit 0
@@ -75,7 +75,9 @@ git diff HEAD -- CLAUDE.md | grep "^[-+]" | grep "Rule #[1-9]"
 
 **AC verification**:
 ```bash
-grep -q "v1.27.0" README.md && grep -q "Aria 2.0" README.md && exit 0
+PLUGIN_VER=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")
+grep -qF "v${PLUGIN_VER}" README.md && grep -q "Aria 2.0" README.md && exit 0
+# R2-fix: dynamic plugin.json read (was hardcoded v1.27.0; current is v1.28.0)
 ```
 
 ---
@@ -445,7 +447,7 @@ Run all ACs in order. All must exit 0 (except TG-DOCS-B ACs if v2.0.1 deferred b
 ```bash
 # AC-1: CLAUDE.md v2.0 content
 grep -c "Rule #" CLAUDE.md  # ≥ 9
-grep -q "**版本**: 2.0.0" CLAUDE.md && echo "AC-1a PASS" || echo "AC-1a FAIL"
+grep -qF "**版本**: 2.0.0" CLAUDE.md && echo "AC-1a PASS" || echo "AC-1a FAIL"  # R2-fix: -qF for ** portability
 grep -q "两层 AI 分工" CLAUDE.md && echo "AC-1b PASS" || echo "AC-1b FAIL"
 grep -q "Aria 2.0 运行时" CLAUDE.md && echo "AC-1c PASS" || echo "AC-1c FAIL"
 grep -q "aria-orchestrator" CLAUDE.md && echo "AC-1d PASS" || echo "AC-1d FAIL"
@@ -457,7 +459,8 @@ grep -q "aria-orchestrator" CLAUDE.md && echo "AC-1d PASS" || echo "AC-1d FAIL"
   && echo "AC-2 PASS" || echo "AC-2 FAIL"
 
 # AC-3: README badge
-grep -q "v1.27.0" README.md && grep -q "Aria 2.0" README.md && echo "AC-3 PASS" || echo "AC-3 FAIL"
+PLUGIN_VER=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")
+grep -qF "v${PLUGIN_VER}" README.md && grep -q "Aria 2.0" README.md && echo "AC-3 PASS" || echo "AC-3 FAIL"  # R2-fix: dynamic read
 
 # AC-4: state-checks.yaml probes
 python3 -c "
