@@ -1,8 +1,8 @@
 # Aria - AI-DDD Methodology
 
-> **项目本质**: AI 辅助的领域驱动设计方法论研究
-> **核心假设**: AI 不是工具，而是理解项目意图的协作者
-> **版本**: 1.0.4
+> **项目本质**: AI-DDD 方法论的定义与端到端参考实现 (v1.x 方法论 + v2.0 自主运行时)
+> **核心假设**: AI 不仅是协作者 (v1.x), 更是 SDLC 的自主执行者 (v2.0)
+> **版本**: 2.0.0
 
 ---
 
@@ -39,6 +39,19 @@ Aria 是一个**方法论研究项目**，而非框架实现。它探索如何�
 Aria 模式: AI 理解 → 人类确认 → 协作交付
 ```
 
+### 身份演进 (v1.x → v2.0)
+
+```
+v1.x 定位: 方法论研究项目 (人类交互式)
+v2.0 定位: 方法论定义 + 端到端参考实现 (AI 自主式)
+```
+
+v1.x 的十步循环已被验证为可执行, v2.0 把同一套方法论放到**无人值守**场景下验证。两者共享方法论本体, 区分在于**执行主体**:
+- v1.x: 人类 + Claude Code (interactive)
+- v2.0: Hermes (Layer 1) + aria-runner 容器 (Layer 2)
+
+详细运行时架构见 [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md) (AD1-AD12)。
+
 ### 研究目标
 
 1. **可重现的 AI 协作流程** - 不同项目、不同 AI 都能获得一致结果
@@ -74,6 +87,17 @@ D. 收尾 (Closure)
 ├── D.1 进度更新    → 同步状态
 └── D.2 归档        → 完成闭环
 ```
+
+### 两层 AI 分工 (v2.0 新增)
+
+v2.0 在"十步循环"之上建立了两层执行结构:
+
+- **Layer 1 (主管)**: Hermes + Luxeno-routed GLM models, 做 PM 角色 (triage / 派发 / 审批)
+- **Layer 2 (工程师)**: aria-runner 容器 + Claude Code + aria-plugin, 做工程师角色 (执行十步循环)
+
+两层通过**拟人命令**(自然语言 YAML) 通信, 不用结构化 RPC。详见 AD1 + AD6。
+
+**重要**: Layer 1 **不加载** aria-plugin, 只加载 ~1K token 元知识 (AD7); Layer 2 **完整加载** aria-plugin, 执行完整十步循环。
 
 ### OpenSpec 需求规范
 
@@ -137,6 +161,7 @@ D. 收尾 (Closure)
 | `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
 | `aria-plugin-benchmarks/` | Skill 基准测试 | AB 测试套件、结果存档、运维手册 |
 | `docs/handoff/` | Session handoff records | 跨 session 优先级 / carry-forward / 实战教训传递 (Rule #9) |
+| `aria-orchestrator/` | v2.0 运行时 (Layer 1/2) | Hermes fork / Docker 镜像 / Nomad job / ADR |
 
 ### 目录导航
 
@@ -159,7 +184,9 @@ D. 收尾 (Closure)
 ├── 配置加载       → aria/skills/config-loader/ (内部基础设施)
 ├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
 ├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
-└── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
+├── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
+├── Aria 2.0 架构决策  → aria-orchestrator/docs/architecture-decisions.md
+└── Layer 边界契约     → aria-orchestrator/docs/layer-boundary-contract.md
 ```
 
 ### Plugin 调用方式 (Aria 项目内部)
@@ -234,8 +261,12 @@ forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{"Do": "merge"}'  # 合并
 │  ✅ 定义: 如何思考、如何协作、如何决策                 │
 │  ✅ 规范: 文档格式、工作流程、命名约定                 │
 │  ❌ 实现: 具体代码、工具配置、部署脚本                 │
+│  ✅ 实现 (v2.0): 端到端参考实现 (aria-orchestrator,    │
+│                  仅限 10CG Lab 内部)                    │
 └─────────────────────────────────────────────────────────┘
 ```
+
+**v2.0 的例外**: Aria 2.0 的运行时层 (`aria-orchestrator/`) 是**方法论的参考实现**, 不是通用框架。它仅供 10CG Lab 内部使用, 不对外发布, 不构成 Aria 对"实现"的背书。其他项目仍应把 Aria 方法论视为"如何思考", 而非"用什么工具"。
 
 ---
 
@@ -437,16 +468,53 @@ branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/re
 
 ---
 
+## Aria 2.0 运行时 (参考实现层, v2.0.0 in progress)
+
+Aria 2.0 引入"参考实现层", 把 v1.x 的十步循环方法论**端到端自动化**。这一层**不改变方法论本体**, 只改变执行主体。
+
+### 分层叙述
+
+```
+方法论层  standards/          ← 思考/协作/决策规范 (v1.x 不变)
+工具层    aria-plugin (+ CC)  ← 交互式使用 (不变) + Layer 2 容器内嵌
+运行时层  aria-orchestrator/  ← v2.0 新增, 仅 10CG Lab 内部
+          ├── Layer 1: Hermes + Luxeno-routed GLM models (AI 主管)
+          └── Layer 2: aria-runner 容器 (AI 工程师)
+```
+
+### 与 9 条不可协商规则的关系
+
+v2.0 运行时**严格遵守** 9 条规则, 规则由 Layer 2 容器内的 aria-plugin 负责执行:
+- Rule #1 OpenSpec: Layer 1 在 S1_TRIAGED 前确认 issue 是否有对应 Spec
+- Rule #2 十步循环不跳过 Phase A: Layer 2 执行完整十步循环
+- Rule #3 文档同步: Layer 2 在 S5_REVIEWING 前强制 arch-update
+- Rule #4-6: Layer 2 按 v1.x 语义执行
+- Rule #7-9: Layer 2 内 Claude Code 实例遵守相同 secret / pre-merge / handoff 规则
+
+### 人类参与点
+
+v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产品负责人通过 Feishu 签字 merge PR。其他阶段完全自主。
+
+### 详细入口
+
+- 架构决策: [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md)
+- Layer 边界契约: [aria-orchestrator/docs/layer-boundary-contract.md](aria-orchestrator/docs/layer-boundary-contract.md)
+- PRD v2.0: [docs/requirements/prd-aria-v2.md](docs/requirements/prd-aria-v2.md)
+- 系统架构: [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md)
+
+---
+
 ## 项目状态
 
 ```
-当前阶段: Aria 2.0 M6 Phase A 4/4 sub-Specs Approved (Phase B kickoff pending)
-成熟度:   0.85 (核心流程稳定 + 多终端协调实证 + 跨 30+ Spec 实证 + AB benchmark 累积)
+当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
+成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
 插件版本: v1.28.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.1.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode, v1.29.0 flip 2026-06-07 D+14)
 主项目版本: v1.7.0
-PRD v2.0: Approved (2026-04-11) — M0-M4 done; M5 active; M6 4 sub-Specs Approved 2026-05-24~25;
+运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
+PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 2026-05-24~25);
           M6 ship 后 (M7+) aria-fleet 三层架构 (通用/workspace/instance) 待 brainstorm
           → 详见 `.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md` (D1-D6 Approved)
 ```
@@ -461,7 +529,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-27 (项目状态 section 同步至 v1.28.0 + aria-fleet 战略 cross-ref)
+**更新**: 2026-05-27 (v2.0.0 — CLAUDE.md 升版, 9 diffs applied: Aria 2.0 两层架构 + aria-orchestrator 入口 + 运行时章节)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin

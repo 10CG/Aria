@@ -72,3 +72,57 @@ checks:
       3. Decide: close waiver (all MET) / renew waiver (new file, new expires_at) / upgrade to standards/governance/silknode-no-storage.md
     timeout_seconds: 5
     enabled: true
+
+  # --- M6 Documentation Drift Probes (aria-2.0-m6-docs TG-DOCS-A, AD-M6-7) ---
+
+  - name: "m6-version-badge-match"
+    description: |
+      Verify README.md Plugin badge version matches aria/.claude-plugin/plugin.json.
+      Drift = README badge stale after a plugin version bump.
+      Task dependency: this probe produces PASS only after T-A2.1 (README badge update).
+      FAIL before T-A2.1 is expected and correct behavior.
+    command: |
+      BADGE=$(grep -m1 -oP 'badge[^\d]*v?\K[0-9]+\.[0-9]+\.[0-9]+' README.md)
+      PLUGIN=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])")
+      [ -z "$BADGE" ] && { echo "MISSING badge pattern in README.md"; exit 1; }
+      [ "$BADGE" = "$PLUGIN" ] && echo "OK badge=$BADGE" || { echo "DRIFT badge=$BADGE plugin=$PLUGIN"; exit 1; }
+    severity: warning
+    fix: "Update README.md Plugin badge to match aria/.claude-plugin/plugin.json version"
+    timeout_seconds: 5
+    enabled: true
+
+  - name: "m6-claude-md-version"
+    description: |
+      Verify CLAUDE.md top-level version field is 2.0.0 after Aria 2.0 release.
+      Drift = CLAUDE.md not yet updated after v2.0.0 ships, or accidentally reverted.
+    command: |
+      VER=$(grep -oP '(?<=\*\*版本\*\*: )[0-9]+\.[0-9]+\.[0-9]+' CLAUDE.md | head -1)
+      [ "$VER" = "2.0.0" ] && echo "OK version=$VER" || { echo "DRIFT claude-md-version=$VER (expected 2.0.0)"; exit 1; }
+    severity: warning
+    fix: "Apply CLAUDE.md Diff 9 version bump: **版本**: 1.0.4 -> **版本**: 2.0.0"
+    timeout_seconds: 5
+    enabled: true
+
+  - name: "m6-arch-doc-stale"
+    description: |
+      Warn if docs/architecture/system-architecture.md **Last Updated** header is >=90 days old.
+      Architecture docs that age without review silently diverge from reality (post-M5 experience).
+    command: |
+      LAST=$(grep -oP '(?<=\*\*Last Updated\*\*: )\d{4}-\d{2}-\d{2}' docs/architecture/system-architecture.md | head -1)
+      [ -z "$LAST" ] && { echo "MISSING Last Updated header"; exit 1; }
+      python3 -c "
+      import sys, datetime
+      last = datetime.date.fromisoformat('$LAST')
+      today = datetime.date.today()
+      age = (today - last).days
+      if age < 90:
+          print(f'OK age={age}d')
+          sys.exit(0)
+      else:
+          print(f'STALE age={age}d (threshold=90d)')
+          sys.exit(1)
+      " || exit 1
+    severity: warning
+    fix: "Update docs/architecture/system-architecture.md **Last Updated** header and review content"
+    timeout_seconds: 5
+    enabled: true

@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.15.2-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.28.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -18,6 +18,8 @@ Unlike traditional "AI writes code" tools, Aria focuses on: **how to make AI und
 | Traditional Mode | Aria Mode |
 |-----------------|-----------|
 | AI is a tool — you ask, AI answers | AI is a collaborator — AI understands, you confirm, you deliver together |
+
+**Aria 2.0 (v2.0.0, in progress)** extends the methodology to autonomous execution. See [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md) for the two-layer architecture.
 
 ---
 
@@ -40,6 +42,8 @@ Unlike traditional "AI writes code" tools, Aria focuses on: **how to make AI und
 | **Docs in Sync** | Architecture docs evolve with your code |
 | **TDD Driven** | Test-first development with enforcement |
 | **Collaborative Thinking** | Structured brainstorming with AI participation |
+
+See the [Aria 2.0 PRD](docs/requirements/prd-aria-v2.md) for the roadmap and autonomous execution vision.
 
 ---
 
