@@ -21,10 +21,12 @@ updated-at: 2026-05-27T07:50:00Z
 按时间倒序:
 
 1. **本 doc** — strategic pivot session 综合 handoff
-2. **战略 memo**: [`.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md`](../../.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md) — aria-fleet + 三层架构 + 10CG.local 边界 (✅ D1-D6 Approved 2026-05-27)
-3. **Boundary audit**: [`.aria/notes/2026-05-27-boundary-audit-10cg-hardcode.md`](../../.aria/notes/2026-05-27-boundary-audit-10cg-hardcode.md) — 18 hardcode 信号 / 9 真技术债 / P0-P2 修复优先级
-4. **v1.29.0 carry-forward**: [`docs/handoff/2026-05-25-v1.29.0-flip-phase-a-approved.md`](./2026-05-25-v1.29.0-flip-phase-a-approved.md) — Phase B+C+D ship checklist (2026-06-07 D+14 hard date,还 11 天)
-5. **本 session shipped Spec**: `openspec/changes/aria-submodule-gate-block-flip/` (Approved)
+2. **Brainstorm DEC stub**: [`.aria/decisions/2026-05-27-aria-fleet-brainstorm.md`](../../.aria/decisions/2026-05-27-aria-fleet-brainstorm.md) — location-normalized DEC (D1-D6 Approved, 主体引用 memo)
+3. **战略 memo (主体内容)**: [`.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md`](../../.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md) — aria-fleet + 三层架构 + 10CG.local 边界 (~330 行)
+4. **Boundary audit**: [`.aria/notes/2026-05-27-boundary-audit-10cg-hardcode.md`](../../.aria/notes/2026-05-27-boundary-audit-10cg-hardcode.md) — 18 hardcode 信号 / 9 真技术债 / P0-P2 修复优先级
+5. **M7 Forgejo tracker**: [Aria #128](https://forgejo.10cg.pub/10CG/Aria/issues/128) — aria-fleet implementation M7+ placeholder
+6. **v1.29.0 carry-forward**: [`docs/handoff/2026-05-25-v1.29.0-flip-phase-a-approved.md`](./2026-05-25-v1.29.0-flip-phase-a-approved.md) — Phase B+C+D ship checklist (2026-06-07 D+14 hard date,还 11 天)
+7. **本 session shipped Spec**: `openspec/changes/aria-submodule-gate-block-flip/` (Approved)
 
 → **next session priorities** (按建议顺序):
 - ⭐⭐ **P0 boundary audit fixes** (Sprint 1, M6 之外的 hygiene cycle): 修 3 处 hardcoded `forgejo.10cg.pub` + CI 后端抽象
