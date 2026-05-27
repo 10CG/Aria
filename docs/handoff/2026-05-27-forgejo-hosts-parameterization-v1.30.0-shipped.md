@@ -242,8 +242,107 @@ aria-forgejo-hosts-parameterization Spec 已 archive, PR merged, all tests green
 ---
 
 **Created**: 2026-05-27T21:10:00Z
-**Session cumulative duration**: ~6h working time
-**Status**: ✅ Session FULLY CLOSED — Spec full A→D cycle ship + 5 memory candidates already in MEMORY.md from preceding micro-cycle + 3-way SHA parity (4 way) verified
+**Amendment 1**: 2026-05-27T~21:45Z — added §9 ship verification + §10 closeout audit (post user 4-question prompt)
+**Session cumulative duration**: ~7h working time (含 ship verification + closeout)
+**Status**: ✅ Session FULLY CLOSED — Spec full A→D cycle ship + 5+2 memory candidates in MEMORY.md (5 from preceding aria-fleet micro-cycle + 2 NEW this session) + 4-way SHA parity verified + ship verification 17/17 PASS
 **Next entry**: `/aria:state-scanner` → 本 doc surface (mtime 最新) → next session 选 §6 carry-forward Path
+
+---
+
+## §9 Ship verification (post-ship comprehensive audit, 2026-05-27T~21:30Z)
+
+执行 17-point ship integrity check:
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | aria-plugin 3-way SHA parity | ✅ local = origin = github = `2fbf4db` |
+| 2 | Main repo SHA parity (my push) | ✅ local = github = `da7ff0f`(post-rebase 1次,origin 后续被 sister `3865721` 覆盖,非本 ship 责任) |
+| 3 | gitlink in main repo | ✅ main sees aria @ `2fbf4db` |
+| 4 | PR #66 merged on Forgejo | ✅ `merged: True / state: closed / merge_commit: 2fbf4db` |
+| 5 | 5+1 SOT version consistency | ✅ plugin.json + marketplace.json (×2) + VERSION + CHANGELOG top + README.md = `1.30.0` |
+| 6 | CHANGELOG v1.29.0 placeholder present | ✅ comment block 在文件顶端,block-flip ship 时 replacement point |
+| 7 | CLAUDE.md project status | ✅ "插件版本: v1.30.0"(rebase 后含 sister v2.0.0 框架) |
+| 8 | Spec archived per Rule #5 + Phase D.2 | ✅ `openspec/archive/2026-05-27-aria-forgejo-hosts-parameterization/proposal.md`, `changes/` 已清 |
+| 9 | 6 audit reports committed | ✅ R1+R2 × {tl, ba, qa} |
+| 10 | Rule #6 substitute fixture | ✅ `aria-plugin-benchmarks/forgejo-hosts-parameterization/README.md` |
+| 11 | Architectural AC #12 — `_KNOWN_FORGEJO_HOSTS` removed | ✅ grep 返回 empty, constant 彻底清 |
+| 12 | New resolver `_common.py` 3 helpers | ✅ `_parse_env_forgejo_hosts` + `_read_config_forgejo_hosts` + `resolve_forgejo_hosts` |
+| 13 | Dual-path dogfood smoke (post-ship master) | ✅ Default: `forgejo_remote_detected: True / instance: forgejo.10cg.pub`; Env override: `False` |
+| 14 | Handoff doc + latest.md pointer | ✅ T-FORGEJO-PARAM 在 latest.md 顶部 |
+| 15 | No conflict markers | ✅ grep clean |
+| 16 | No stale locks | ✅ `.git/index.lock` not present |
+| 17 | Submodule pointers synced (aria-orch + standards) | ✅ checked out sister 最新 |
+
+**Pre-existing flake identified (not blocking ship)**:
+- `test_two_consecutive_runs_diff_zero` in `test_normalize_snapshot.py` 偶尔 fail
+- Diff: `handoff.age_hours: 181.58 vs 181.59`(36 秒 wallclock 漂移)
+- 验证: `git log -- test_normalize_snapshot.py` last edit `0a12f91`(远早于本 cycle); `git log -- handoff.py` last edit `63df609`(亦远早)
+- Repro: subset 跑一次 OK 一次 FAIL → timing flake 强信号
+- 决定: 不阻塞 ship; follow-up task 记下次 sprint 修(把 `age_hours` 比较 floor 到 0.1h 或 normalize tolerance)
+- 新固化 memory: `feedback_test_flake_diagnose_via_git_log_before_blocking_ship`(详 §10)
+
+---
+
+## §10 Session-end 4-question closeout audit (2026-05-27T~21:45Z)
+
+User 4-question prompt:
+1. 还有未完成任务/讨论吗?
+2. 还有需要文档固化的经验吗?
+3. UPM / US / Spec / PRD 维度是否完整更新?
+4. 收尾 + handoff 确保 next session `/aria:state-scanner` 优先 surface 本 doc?
+
+### Q1 答: 未完成项
+
+| # | 项 | 状态 |
+|---|-----|------|
+| Q1.1 | **v1.29.0 block-flip ship 启动** | 🟡 PAUSED — user requested "start v1.29.0 block-flip ship", AI 标记 D+14 hard date 风险(2026-06-07,today = D-11, 仅 ~3d warn-only 数据 vs 14d 承诺), user requested clarification, **未决** |
+| Q1.2 | **Pre-existing test flake** | 🟡 IDENTIFIED, NOT FIXED — 见 §9, follow-up |
+| Q1.3 | Sister terminal commit `3865721` 在 origin 但不在 github | ℹ️ NOTED — sister 责任范围, 不阻塞 next session |
+
+### Q2 答: Memory candidates 已固化
+
+**本 session NEW (committed this amendment)**:
+1. ✅ [feedback_claude_md_project_status_high_contention](../../../home/dev/.claude/projects/-home-dev-Aria/memory/feedback_claude_md_project_status_high_contention.md) — CLAUDE.md 项目状态 section 高 contention pattern, multi-track ship 实证
+2. ✅ [feedback_test_flake_diagnose_via_git_log_before_blocking_ship](../../../home/dev/.claude/projects/-home-dev-Aria/memory/feedback_test_flake_diagnose_via_git_log_before_blocking_ship.md) — Ship verification 中 test fail diagnose pattern (git log + repro 2-3 次)
+
+**Considered but deferred (already covered or too narrow)**:
+- 多 agent substance-level 收敛 audit case → 已被 `feedback_brainstorm_substance_convergence_pattern` 覆盖, 本 session 是 audit 应用(非 brainstorm), 可未来扩 existing
+- Sequenced multi-repo race recovery → 已被 `feedback_sequenced_multirepo_gitlink_bump` + `feedback_git_stash_pop_race_recovery_hazard` 覆盖
+- D+14 hard date semantic → 太 specific(单个 Spec 实证), 不固化为 memory pattern
+
+**MEMORY.md final state**: 43 + 2 = **45 entries**(+5 aria-fleet from earlier micro-cycle + 2 ship-cycle 共 +7 from prune baseline 38)
+
+### Q3 答: Aria conventions 各维度
+
+| 维度 | 状态 | 详 |
+|------|------|---|
+| **UPM** | N/A | Aria 自身无 UPM(per `project_aria_no_runtime_upm`),scan.py 上 `upm.configured=false` 是预期 |
+| **US** | 无 change needed | 本 cycle 非 US-tied (boundary audit hygiene cycle from aria-fleet strategic memo seed, 当前 US 无映射,aria-fleet 整体 → M7+ 才会触发新 US e.g. US-027 候选) |
+| **Spec** | ✅ archived | `openspec/archive/2026-05-27-aria-forgejo-hosts-parameterization/proposal.md` per Rule #5 + Phase D.2 |
+| **PRD** | 无 change needed | 本 Spec §Out of Scope 明确: PRD 触动 deferred 到 M7+ aria-fleet 主线;本 hygiene cycle 仅 collector / config layer, 不动 PRD |
+
+### Q4 答: 收尾 + next-session 入口验证
+
+- ✅ Memory 2 new entries 落盘 + MEMORY.md index 更新
+- ✅ 本 handoff §9 + §10 amendment 已写入
+- ✅ Next session `/aria:state-scanner` 走 Phase 1.15 handoff collector → 解析 `docs/handoff/latest.md` pointer → ★ Latest section 顶部是 `T-FORGEJO-PARAM` → surface 本 doc
+- ⚠️ 需 commit + push amendment (含 §9/§10 + 2 memory pointer cross-ref in §10) 才生效
+- ⚠️ Pending: 本 amendment commit 后 latest.md mtime 不变(已是顶部),scan.py 应仍 surface 本 doc
+
+### Closeout verdict
+
+✅ **Session SAFE to close**:
+- Ship integrity verified (17/17)
+- 未完成 discussions documented (Q1.1 v1.29.0 ship pause is owner-pending, NOT AI-blocked)
+- Memory 2 entries committed
+- Spec/Convention dimensions audited
+- Next-session entry path verified
+
+**Next session 优先级**(per §6 + Q1 carry-forward):
+1. ⚠️ **解 v1.29.0 ship 阻塞**: owner 决定 dry-run 准备 / 提前 ship / D+14 等待 — 3 options listed in §6
+2. ⭐⭐ v1.29.0 D+14 ship (2026-06-07, D-11)
+3. Sprint 2 boundary audit P0 续(C5+C6 CI backend abstraction L3 Spec ~8-12h)
+4. M6 sister terminal 推进监督
+5. M7 brainstorm(deferred)
 
 ---
