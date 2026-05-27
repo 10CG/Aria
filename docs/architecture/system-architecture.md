@@ -1,21 +1,22 @@
 # Aria System Architecture
 
-> **Version**: 1.9.0
+> **Version**: 2.0.0
 > **Status**: Active
 > **Created**: 2026-01-18
-> **Last Updated**: 2026-04-12
-> **Project Type**: Methodology Research
-> **Parent PRD**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
+> **Last Updated**: 2026-05-27
+> **Project Type**: Methodology Definition + Autonomous Reference Implementation
+> **Parent PRD (v1)**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
+> **Parent PRD (v2)**: [prd-aria-v2.md](../requirements/prd-aria-v2.md)
 
 ---
 
 ## 1. Executive Summary
 
-Aria 是一个**方法论研究项目**，探索 AI Agent 在软件工程全流程中的深度集成模式。它不是软件框架，而是一套规范、约定和工作流定义。
+Aria 是**方法论定义与端到端参考实现** (v1.x 方法论 + v2.0 自主运行时)，探索 AI Agent 在软件工程全流程中的深度集成模式。v1.x 是交互式 AI-DDD 方法论；v2.0 在此之上增加了**自主运行时** (aria-orchestrator)，实现了 AI-AI 分工的无人值守开发闭环。
 
-**核心架构模式**: 规范驱动的 AI 协作 (Spec-Driven AI Collaboration)
+**核心架构模式**: 规范驱动的 AI 协作 (Spec-Driven AI Collaboration) + 两层 AI 执行模型 (Two-Layer AI Execution)
 
-**关键特征**:
+**关键特征** (v1.x 继承):
 - 规范先行 (Spec First) - OpenSpec 需求规范
 - 结构化工作流 (Ten-Step Cycle) - 可重现的 AI 协作流程
 - 子模块化组织 (Modular Standards) - 方法论定义与工具分离
@@ -24,6 +25,14 @@ Aria 是一个**方法论研究项目**，探索 AI Agent 在软件工程全流�
 - 协作思考 (Brainstorm Skill) - AI 辅助的决策讨论和需求澄清
 - 自动触发系统 (Auto-Trigger) - 基于关键词的智能 Skill 调度
 - Hooks 系统 - 生命周期事件自动化处理
+
+**关键特征** (v2.0 新增):
+- 两层 AI 执行模型 (Two-Layer AI Execution) - Layer 1 AI PM + Layer 2 AI Engineer
+- 自主运行时 (Autonomous Runtime) - aria-orchestrator 实现无人值守开发闭环
+- 状态机驱动分发 (State Machine Dispatch) - S0_NEW → S9_CLOSED + S_FAIL 异常处理
+- 单一人工关口 (Single Human Gate) - S7_AWAITING_MERGE (AD10)，Feishu 通知 owner 审批
+
+**版本说明**: 四个独立版本流请参阅 [docs/architecture/version-scheme.md](version-scheme.md)。
 
 ---
 
@@ -56,6 +65,132 @@ Aria 是一个**方法论研究项目**，探索 AI Agent 在软件工程全流�
 | **可操作性** | 每个步骤都有明确输入输出 |
 | **可扩展性** | 支持新增 Skill 和 Agent |
 | **兼容性** | 与 Claude Code 无缝集成 |
+
+---
+
+## 2.5 Three-Layer Architecture (v2.0)
+
+Aria v2.0 的完整架构由三个独立层构成，每层职责清晰分离：
+
+| 层次 | 目录 / 仓库 | 职责 | 受众 |
+|------|-------------|------|------|
+| **方法论层 (Methodology)** | `standards/` (子模块) | Lab 可共享的方法论约定 — 十步循环、OpenSpec、Session Handoff、autonomous patterns | 所有采用 Aria 方法论的项目 |
+| **工具层 (Tools)** | `aria/` (aria-plugin 子模块) | Claude Code 交互式 Skills + Agents，供用户在 Claude Code session 内调用 | 任何安装了 aria-plugin 的 Claude Code 用户 |
+| **运行时层 (Runtime)** | `aria-orchestrator/` | v2.0 自主运行时 — Layer 1 (Hermes + Luxeno-routed GLM) + Layer 2 (aria-runner 容器 + CC + aria-plugin) | 10CG Lab 内部项目 |
+
+### 三层 ASCII 架构图
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Aria 三层架构 (v2.0)                          │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  方法论层 (Methodology Layer)  —  standards/ submodule     │  │
+│  │  Lab-shareable: 十步循环 / OpenSpec / autonomous/ patterns │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                           ↑ 约定参考                             │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  工具层 (Tools Layer)  —  aria/ (aria-plugin submodule)    │  │
+│  │  Interactive Skills + Agents for Claude Code sessions       │  │
+│  │  Universal: any Claude Code user can install aria-plugin    │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                           ↑ 工具调用                             │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  运行时层 (Runtime Layer)  —  aria-orchestrator/           │  │
+│  │                                                            │  │
+│  │  Layer 1 (AI PM):                                          │  │
+│  │  ┌──────────────────┐   ┌──────────────────────────────┐  │  │
+│  │  │  Hermes (agent)  │──▶│  Luxeno-routed GLM models    │  │  │
+│  │  │  (Feishu接入)     │   │  (via aria-layer1 / Luxeno) │  │  │
+│  │  └──────────────────┘   └──────────────────────────────┘  │  │
+│  │         │ YAML humanized commands (AD1 + AD6)              │  │
+│  │         ▼                                                  │  │
+│  │  Layer 2 (AI Engineer):                                    │  │
+│  │  ┌────────────────────────────────────────────────┐        │  │
+│  │  │  aria-runner container                         │        │  │
+│  │  │  ├── Claude Code (CC)                          │        │  │
+│  │  │  ├── aria-plugin (Skills + Agents)             │        │  │
+│  │  │  └── Nomad job orchestration                   │        │  │
+│  │  └────────────────────────────────────────────────┘        │  │
+│  │                                                            │  │
+│  │  10CG Lab Internal Only                                    │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**跨层链接**: 详细实施决策记录于 `aria-orchestrator/docs/architecture-decisions.md`。层边界契约（Layer 1/2 接口）固化于 `aria-orchestrator/docs/layer-boundary-contract.md` (T-B4 交付物)。
+
+---
+
+## 2.6 Autonomy Model (v2.0)
+
+### 状态机 S0-S9 + S_FAIL
+
+aria-orchestrator 实现了以下状态机驱动的分发循环（M2 shipped 2026-05-03，US-022）：
+
+```
+S0_NEW ──▶ S1_TRIAGED ──▶ S2_PLANNING ──▶ S3_IN_PROGRESS
+                                                  │
+                                                  ▼
+S9_CLOSED ◀── S8_MERGED ◀── S7_AWAITING_MERGE ◀── S4_DISPATCHED
+                                                  │
+                                         S5_REVIEWING ──▶ S6_RECONCILING
+                                                               │
+                                                               ▼
+                                                    S7_AWAITING_MERGE (返回)
+
+异常状态:
+任何状态 ──▶ S_FAIL (升级到 human 处理)
+```
+
+### 人工关口 (AD10)
+
+S7_AWAITING_MERGE 是**唯一**人工参与点（AD10 决策）。Owner 通过 Feishu 消息通知审批 PR merge。其余所有状态转换由 Layer 1 (Hermes) 自主驱动。
+
+### 崩溃恢复 (M5 shipped 2026-05-23，US-025)
+
+aria-runner 支持三种基础设施故障恢复模式：
+1. **进程杀死恢复** (process kill) — 重启后从最后已知状态继续
+2. **OOM 恢复** (OOM kill) — WAL 完整性校验 + 状态重建
+3. **WAL 损坏恢复** (WAL corruption) — backup restore + integrity_check
+
+以及三种 LLM 层故障模式（per Spec #2 §What B.2）：
+1. LLM API 超时 / 速率限制
+2. LLM 响应格式错误
+3. LLM 输出质量不达标（需要重试）
+
+---
+
+## 2.7 Layer Boundary (v2.0)
+
+Layer 1 / Layer 2 之间的接口契约由以下文件固化：
+
+- **`aria-orchestrator/docs/layer-boundary-contract.md`** — 层边界契约文档 (T-B4 交付物，TG-DOCS-B batch)。记录：
+  - cost.json schema（锁定于 Spec #1 commit `c29a800`：`metered_usd` / `subscription_usd` / `freshness_ts` 三字段）
+  - Layer 1 向 Layer 2 发送 YAML humanized commands 的格式规范
+  - 各状态的层归属边界 (S0-S4 Layer 1 主导; S5-S9 Layer 2 主导)
+  - 错误升级协议
+
+**重要约束**: cost.json schema 已于 Spec #1 `c29a800` 锁定，变更需新 Spec + AD-M6-* 决策槽。
+
+---
+
+## 2.8 Version Scheme Cross-Reference
+
+本项目存在四个**独立**版本流。详细说明见：[docs/architecture/version-scheme.md](version-scheme.md)
+
+简要对照：
+
+| 版本流 | 当前版本 | SoT 文件 |
+|--------|----------|----------|
+| Aria main repo | v1.7.0 | `VERSION` |
+| aria-plugin | v1.28.0 | `aria/.claude-plugin/plugin.json` |
+| aria-orchestrator | v2.x (in progress) | `aria-orchestrator/` pyproject.toml |
+| Aria 2.0 PRD | v2.0.0 | `docs/requirements/prd-aria-v2.md` |
+
+**关键说明**: aria-plugin **不随** Aria main repo 发布 v2.0.0 而 bump 到 v2.0。两者版本号语义独立。
 
 ---
 
@@ -808,29 +943,41 @@ C.2 Phase 包含两级完整性保证:
 
 ## 9. Evolution Roadmap
 
-### 9.1 当前阶段 (v1.0)
+### 9.1 当前阶段 (v1.x 已完成)
 
 ```
-状态: 核心流程已验证
+状态: 核心流程已验证 (v1.0 → v1.9)
 
-✅ 完成:
+已完成 (v1.x):
   - 十步循环定义
   - OpenSpec 格式
-  - Skills 框架
+  - Skills 框架 (36 Skills, 11 Agents)
   - 文档架构
-
-🚧 进行中:
-  - 实际项目验证
-  - 工具链完善
+  - 强制执行机制 (branch-manager + subagent-driver)
+  - 两阶段代码审查
+  - Phase C.2 多远程 Push Enforcement
+  - state-scanner v3.0.0 机械化 (SSM)
+  - 单次 session 间移交 (Rule #9)
 ```
 
-### 9.2 未来方向
+### 9.2 v2.0 进行中 (M1-M6)
 
-| 阶段 | 目标 | 时间线 |
-|------|------|--------|
-| v1.1 | 增强工作流自动化 | Q2 2026 |
-| v1.2 | 扩展到更多 AI 平台 | Q3 2026 |
-| v2.0 | 企业级功能支持 | Q4 2026 |
+| 里程碑 | 目标 | 状态 |
+|--------|------|------|
+| M0 | 架构设计 + Layer 1 基础 | Done 2026-04-17 |
+| M1 | Layer 1 base (Hermes + Luxeno 接入) | Done 2026-04-23 |
+| M2 | Layer 1 状态机 (S0-S9 dispatch loop) | Done 2026-05-03 (US-022, 268 tests) |
+| M3 | Layer 1 reconciler (孤儿任务恢复) | Done 2026-05-06 (US-023, ~5.5h vs 16h) |
+| M4 | Feishu 人工关口 (S7_AWAITING_MERGE) | Done 2026-05-09 (US-024) |
+| M5 | Replay + drift + audit immutable | Done 2026-05-23 (US-025, 793 tests) |
+| M6 | E2E resilience + cost acceptance + docs | In Progress (2026-05-24 Specs Approved) |
+
+### 9.3 v2.0 之后
+
+| 阶段 | 目标 | 备注 |
+|------|------|------|
+| v2.0.1 | TG-DOCS-B 架构文档 (如 v2.0 calendar 紧) | Q-final-1 Menu C 选项 |
+| post-M6 | aria-fleet 三层架构 (generic/workspace/instance) | Brainstorm DEC 2026-05-27 Approved |
 
 ---
 
@@ -842,6 +989,13 @@ C.2 Phase 包含两级完整性保证:
 | OpenSpec 项目定义 | standards/openspec/project.md | 需求规范格式 |
 | UPM 进度管理 | standards/core/progress-management/ | 进度追踪 |
 | System Architecture 规范 | standards/core/documentation/system-architecture-spec.md | 本文档格式定义 |
+| 版本方案说明 | [docs/architecture/version-scheme.md](version-scheme.md) | 四个独立版本流说明 (T-B2) |
+| v2.0 架构决策 | aria-orchestrator/docs/architecture-decisions.md | Layer 1/2 所有 AD 记录 |
+| Layer 边界契约 | aria-orchestrator/docs/layer-boundary-contract.md | cost.json schema + Layer 1/2 接口 (T-B4) |
+| 自主决策矩阵 | standards/autonomous/decision-autonomy-matrix.md | Lab 可共享的自主决策规则 (T-B3) |
+| 人性化命令模式 | standards/autonomous/humanized-command-patterns.md | Lab 可共享的 YAML 命令模式 (T-B3) |
+| v2.0 发版说明 | docs/release-notes-v2.0.0.md | Plugin Compatibility + FAQ |
+| Aria v2.0 PRD | docs/requirements/prd-aria-v2.md | 产品需求文档 |
 
 ---
 
@@ -849,6 +1003,7 @@ C.2 Phase 包含两级完整性保证:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 2.0.0 | 2026-05-27 | v2.0 架构文档全面更新 (TG-DOCS-B, US-026 M6)：新增三层架构章节 (§2.5)、自主模型章节 (§2.6 状态机 S0-S9 + S_FAIL + 崩溃恢复)、层边界章节 (§2.7 cost.json schema pin)、版本方案交叉引用 (§2.8)。Executive Summary 更新至"方法论定义 + 参考实现"定位。反映 M1-M5 已交付成果 (268 tests M2 + reconciler M3 + Feishu gate M4 + 793 tests M5)。父 PRD 增加 prd-aria-v2.md 引用 |
 | 1.9.0 | 2026-04-12 | Phase C.2 Integration Quality Gate (US-012)：三层多远程 Push Enforcement 架构 (Layer 1 state-scanner 多远程扩展 + Layer 2 phase-c-integrator C.2.5 + Layer 3 git-remote-helper internal skill)。aria-plugin v1.14.0→1.15.0。2026-04-12 发版事故根因修复 |
 | 1.8.0 | 2026-04-09 | state-scanner v2.9.0 状态感知扩展：Phase 1.12 本地/远程同步检测 (submodule 四级 fallback + upstream 探测 + 浅克隆兼容) 和 Phase 1.13 Issue 感知扫描 (Forgejo/GitHub 适配 + 15min 缓存 + 启发式关联)。子阶段数量 11→13 (上限 15 规约 D8)。aria-plugin v1.10.0→1.11.0。双 OpenSpec 并行 (Level 2 + Level 3)，post_spec 审计 2 轮收敛通过 |
 | 1.7.0 | 2026-04-03 | 可视化子系统：aria-dashboard (5 数据解析器 + 单文件 HTML + 跨项目兼容)。Skills 32→33 |
