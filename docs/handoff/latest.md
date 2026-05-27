@@ -11,7 +11,13 @@
 
 ---
 
-## ★ 最新 session #A — 🎉 **M6 Phase A 4/4 sub-Specs COMPLETE** — Spec #4 release-closeout Approved (2026-05-25 ~22:00 UTC, dev-claude)
+## ★ 最新 session #STRAT — Strategic Pivot Session (2026-05-25 → 27 跨 3 天, ~5.5h working, dev-claude) — **4 arcs ship**: v1.29.0 Phase A Approved + aria-dashboard 首次 self-dogfood + aria-fleet 三层架构战略 + boundary audit
+
+**Latest (T-STRAT)**: [2026-05-27-aria-fleet-strategic-pivot-session.md](./2026-05-27-aria-fleet-strategic-pivot-session.md) — 跨 3 day 综合 session: (1) v1.29.0 submodule-gate-block-flip Spec Phase A.1+A.2 CONVERGED Approved (`5d00826`) + 6 audit reports + carry-forward `2026-05-25-v1.29.0-flip-phase-a-approved.md` 含 D+14 ship checklist; (2) aria-dashboard v1.1.0 首次 Aria self-dogfood (`1730884`) — 37KB HTML + Playwright screenshot 实测 + 3 Forgejo issues filed ([#125 AB parser](https://forgejo.10cg.pub/10CG/Aria/issues/125) / [#126 audit frontmatter](https://forgejo.10cg.pub/10CG/Aria/issues/126) / [#127 UPM-less rendering](https://forgejo.10cg.pub/10CG/Aria/issues/127)); (3) **Strategic pivot** — Owner 关键洞察 "现有飞书 bot 接 Hermes, aria-hub 该是 Hermes tool pack" 推动 re-frame → **aria-fleet** 三层架构 (通用/workspace/instance) + 10CG.local 累积价值定义 + D1-D6 全部 Approved 2026-05-27 (`2e90312`); (4) Boundary audit — 18 hardcode 信号 / 9 真技术债 / P0-P2 修复优先级 (forgejo.10cg.pub 在通用层 3 处硬编码)。Forgejo #127 已 close (deferred-to-aria-fleet)。云端 routine 失效 (CF Access 挡)。**Next session priorities** (按 ROI): (a) MEMORY.md prune (99.4%, 前置 5 candidates) → (b) P0 boundary audit fix Sprint 1 (~2-3h hygiene) → (c) v1.29.0 D+14 ship (2026-06-07, ~11 天) → (d) M6 Spec #1 Phase B.1 (sister terminal)。**5 memory candidates** 待 add (feedback_cross_cutting_capability_as_agent_tool_pack / feedback_three_layer_universal_workspace_instance / feedback_channels_as_agent_render_outputs / feedback_cloud_routine_blocked_by_cf_access / feedback_audit_prompt_must_require_frontmatter).
+
+> **Note**: 本 session 是 T-V129 (2026-05-25 ~14:35) 的同 owner 接续, 跨午夜 UTC 3 次。T-V129 carry-forward 已并入本 T-STRAT (handoff §6 priority list)。
+
+## ★ 前 session #A — 🎉 **M6 Phase A 4/4 sub-Specs COMPLETE** — Spec #4 release-closeout Approved (2026-05-25 ~22:00 UTC, dev-claude)
 
 ## ★ 同日 session #V129 — Track V129: v1.29.0 submodule-gate block-flip Phase A Approved (2026-05-25 ~14:35 UTC, dev-claude) — Spec drafted + R1+R2 CONVERGED, Phase B+C+D 留 2026-06-07 ship
 

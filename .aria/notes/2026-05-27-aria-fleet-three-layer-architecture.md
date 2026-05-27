@@ -8,7 +8,7 @@
 >   - 3 Forgejo issues filed: [#125 AB parser](https://forgejo.10cg.pub/10CG/Aria/issues/125) / [#126 audit frontmatter](https://forgejo.10cg.pub/10CG/Aria/issues/126) / [#127 UPM-less rendering](https://forgejo.10cg.pub/10CG/Aria/issues/127)
 >   - US-024 M4 ship (2026-05-09) — Hermes + Feishu approval pipeline 已建立, MIT entry-point plugin API 验证
 >   - AD3 (M0 T4 Spike, 2026-04-16) — Hermes Option C tool pack 4.5h POC 13/13 pass
-> **Owner sign-off**: pending (本 memo 由 AI 起草, 待 owner review)
+> **Owner sign-off**: ✅ **Approved 2026-05-27** (simonfishgit, batch sign-off via "执行 A" 直接指令; D1-D6 全部按推荐通过, 详见 §8)
 
 ---
 
@@ -304,16 +304,24 @@ Hermes: 调 aria-fleet.get_project_state("aria")
 
 ---
 
-## §8 决策点 (待 owner sign-off)
+## §8 决策点 — ✅ Owner Approved 2026-05-27
 
-| 决策 | 推荐 | 备选 | 状态 |
-|------|------|------|------|
-| **D1 命名** | `aria-fleet` | `aria-atlas` / `aria-vantage` | pending owner |
-| **D2 架构** | 三层 (通用 / workspace / instance) | 当前 monolithic | pending owner |
-| **D3 实施时机** | M6 ship 后 (M7+) | 现在 (M6 之前) | pending owner |
-| **D4 workspace repo** | 10CG/aria-workspace 私有 repo | 直接放 10CG/Aria 主仓 | pending owner |
-| **D5 fleet 形态** | aria-orchestrator/extensions/aria-fleet/ tool pack | 独立 repo 10CG/aria-fleet | pending owner |
-| **D6 短期** | aria-dashboard skill 沿用 + boundary audit + 本 memo 沉淀 | 立即建 aria-fleet | pending owner |
+| 决策 | 选定 | 备选 (drop) | 状态 |
+|------|------|-------------|------|
+| **D1 命名** | `aria-fleet` | `aria-atlas` / `aria-vantage` / `aria-dashboard-hub` | ✅ **Approved** |
+| **D2 架构** | 三层 (通用 / workspace / instance) | 当前 monolithic | ✅ **Approved** |
+| **D3 实施时机** | M6 ship 后 (M7+) | 现在 (M6 之前) | ✅ **Approved** |
+| **D4 workspace repo** | 10CG/aria-workspace 私有 repo | 直接放 10CG/Aria 主仓 | ✅ **Approved** |
+| **D5 fleet 形态** | aria-orchestrator/extensions/aria-fleet/ tool pack | 独立 repo 10CG/aria-fleet | ✅ **Approved** |
+| **D6 短期** | aria-dashboard skill 沿用 + boundary audit + 本 memo 沉淀 | 立即建 aria-fleet | ✅ **Approved** |
+
+**Sign-off mechanism**: owner 直接通过 "执行 A" 指令 batch-approve 全部推荐选项 (2026-05-27 ~07:50 UTC, session continuation)。
+
+**Approved 后的硬约束**:
+- 通用层禁止新增 10CG-specific hardcode (P0 修复 boundary audit 报的 9 处技术债 进入 Sprint 1-2 backlog)
+- aria-orchestrator core 升级时, hub-related capability 必须以 entry-point plugin 形式接入,不允许 inline
+- M7 启动 brainstorm 时直接引用本 memo 作 starting point, 不重新讨论命名/架构/时机
+- Forgejo #127 (UPM-less rendering) 降级为 "deferred to aria-fleet" 并 close (per D6 短期路径)
 
 ---
 
