@@ -509,9 +509,17 @@ grep -q "AD-M6-9" aria-orchestrator/docs/architecture-decisions.md \
 
 ## Pre-archive checklist (run before Phase D.2)
 
-- [ ] AD-M6-8 is either filled with a real decision topic OR explicitly retired with justification. Not RESERVED.
-- [ ] standards/ submodule is on `master` branch: `git -C standards branch --show-current` → `master`.
-- [ ] Main Aria repo `git status` shows `standards` pointer updated (included in Phase C.1 commit).
-- [ ] CLAUDE.md AD11 compliance verified: Rules #1-#9 bodies are unchanged from pre-edit.
-- [ ] AC-9 (state-checks arch-doc-stale probe): if TG-DOCS-B shipped, run probe manually and confirm exit 0.
-- [ ] If TG-DOCS-B deferred to v2.0.1 per owner decision: document the deferral decision in `docs/release-notes-v2.0.0.md §Known Limitations` (T-A3.5 already includes this placeholder).
+- [x] AD-M6-8 is either filled with a real decision topic OR explicitly retired with justification. Not RESERVED. <!-- Retired 2026-05-27, verified 2026-05-28 -->
+- [x] standards/ submodule is on `master` branch: `git -C standards branch --show-current` → `master`. <!-- verified 2026-05-28 -->
+- [x] Main Aria repo `git status` shows `standards` pointer updated (included in Phase C.1 commit). <!-- pointer 73e6cd9 matches submodule master HEAD, verified 2026-05-28 -->
+- [x] CLAUDE.md AD11 compliance verified: Rules #1-#9 bodies are unchanged from pre-edit. <!-- 9 rules headers present at L389-448, verified 2026-05-28 -->
+- [x] AC-9 (state-checks arch-doc-stale probe): if TG-DOCS-B shipped, run probe manually and confirm exit 0. <!-- probe exit 0 (1 day old vs 90 day threshold), verified 2026-05-28 -->
+- [x] If TG-DOCS-B deferred to v2.0.1 per owner decision: document the deferral decision in `docs/release-notes-v2.0.0.md §Known Limitations` (T-A3.5 already includes this placeholder). <!-- N/A — TG-DOCS-B shipped in same session 2026-05-27, no deferral -->
+
+---
+
+## Phase D.2 Archive
+
+- [x] Pre-archive checklist 6/6 PASS (2026-05-28)
+- [x] Status updated to Implemented in proposal.md (2026-05-28)
+- [x] Archived to `openspec/archive/2026-05-28-aria-2.0-m6-docs/` (Phase D.2 close 2026-05-28)

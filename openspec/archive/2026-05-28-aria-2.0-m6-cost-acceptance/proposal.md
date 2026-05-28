@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #1 — Cost Acceptance (dual-track schema + cron sentinel + alarm)
 
 > **Level**: 3 (Full — cross-cuts aria-orchestrator + .aria/config.json + validate-m6-handoff.py + Feishu webhook + audit-log immutability cross-check)
-> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1)
+> **Status**: **Implemented** (Phase B+C SHIPPED 2026-05-27; Phase D.2 archive 2026-05-28). Phase A.2 CONVERGED 2026-05-24 via R3 stability; Phase B+C closed via aria-orchestrator PR #19 merged at `a531f10` → Aria main submodule pointer bump `01bfd5c`; 5 B.2 commits; 87/87 tests PASS; post_impl R1 NEEDS_FIX 3/3 → 14 IDs CLOSED; R2 non-NEEDS_FIX 3/3 → 2 advisory CLOSED; 2 deferred follow-ups (I-cr-R2-1 + I-tl-R2-1) tracked separately.
 > **Change ID**: `aria-2.0-m6-cost-acceptance`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)

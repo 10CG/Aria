@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #3 — Documentation Suite (CLAUDE.md v2.0 + Architecture + standards/autonomous)
 
 > **Level**: 3 (Full — cross-cuts CLAUDE.md / standards/autonomous / docs/architecture / aria-orchestrator/docs / Aria README)
-> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1; TG-DOCS-B may slip to v2.0.1 per Q-final-1 Menu C)
+> **Status**: **Implemented** (TG-DOCS-A + TG-DOCS-B BOTH SHIPPED 2026-05-27; Phase D.2 archive 2026-05-28). TG-DOCS-A: PR #129 merged Aria main `be1c2cc` + aria-plugin PR #65 `c337205` (T-A4); R1 PASS_WITH_WARNINGS 3/3 → R-fix 5 IDs CLOSED; 6/6 task groups. TG-DOCS-B: 3 parallel agent dispatches + 3 PRs merged (Aria main PR #130 `e71e9a8`; standards PR #10 `73e6cd9`; aria-orchestrator PR #20 `e5a7d06`); 6/6 task groups. **Spec #3 FULLY COMPLETE** (TG-DOCS-A + TG-DOCS-B v2.0.0-blocker shipped together; v2.0.1-deferral decision made obsolete by full ship). Phase A.2 CONVERGED 2026-05-24 via R3 stability check.
 > **Change ID**: `aria-2.0-m6-docs`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (post `a786444` + `e884e62` PRD patches, §M6 4-5w timeline)
