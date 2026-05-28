@@ -1,7 +1,25 @@
 # aria-ci-backend-abstraction — CI backend 抽象 + Aether 搬迁 + GHA stub (Sprint 2 boundary audit P0 C5+C6)
 
 > **Level**: 3 (Full — `proposal.md` + `tasks.md`, cross-file impact: new `ci_backends/` package + `pre_merge_gate.py` refactor + `tests/` rewrite + CLAUDE.md + 2 SKILL.md files)
-> **Status**: Draft — pending post_spec audit
+> **Status**: ✅ **Approved** (Rev1.1, 2026-05-28) — post_spec R1 REVISE × 2 + PASS_WITH_WARNINGS × 1 → Rev1 → **R2 PASS_WITH_WARNINGS × 3 unanimous CONVERGED** (per [[feedback_audit_convergence_patterns]] L3 effective convergence — agent withdrawal + verdict 改善 + 无振荡) + Rev1.1 polish for substance-converged R2 ba N-1 (query order paper-fix → corrected to ground truth main-first)
+> **Rev1.1 polish** (R2 close-out, 2026-05-28):
+>   - **R2 ba N-1 paper-fix correction**: §B.4 query order corrected from incorrect "PR-first then in-flight" (Rev1 paper-fix) to ground-truth-verified "main in-flight FIRST then PR CI SECOND" (matches `gate_check` L309-329). Hard Constraint #1 强制此顺序
+>   - **R2 trivials acknowledged but deferred to Phase B implementation** (per ba "does not block Phase B" + qa "do not require a revision round"):tech N-1 SKILL.md ref count body drift / tech N-2 task 2.7 import re-coupling / qa partial AC-7.2 body distribution / qa minor `priority?` mention in §D.2 / qa minor 5.6 cd prefix — implementer will fix during T-docs + T-tests with no Spec rewrite needed
+> **Rev1 changelog** (R1 post_spec audit fixes):
+>   - **C-1 fix**: AC-2.4 add message body assertion (tech F-01) — `assertIn("GHA backend probe succeeded but", str(exc.value)) and assertIn("PR welcome", str(exc.value))`
+>   - **3-agent CONVERGED `_compute_verdict`**: §B.4 重命名 `_compute_verdict` → `compute_verdict` (匹配现 ground truth L217 公共名) + extend signature to `(main_in_flight_runs: list[dict], pr_ci_status: str, backend_name: str) -> str` (加 backend_name 替代旧 hardcoded `"aether-ci-cli"` in `primitive_used` output field) — new Hard Constraint #10 locks
+>   - **§A.2 responsibility table** added (ba c1d6a8e3): 9 rows mapping 8 functions + 4 constants in pre_merge_gate.py → aether.py vs stay
+>   - **§A.4 `ci_backends: []` semantic lock** (ba b7e19f4a): `[]` = **explicit disable** (return None immediately, route to `no_ci_fallback`); missing/null = auto-detect via BACKENDS order — new AC-4.5
+>   - **§B.2 `_translate_value` complete table** (tech F-02): 2 keys with value-shape mapping
+>   - **AC-5.1 count fix** (ba F-05 + qa F-05 CONVERGED): "5 members: 2 ClassVar (`name`, `priority`) + 3 abstract (`probe`, `query_pr_ci`, `query_branch_in_flight`)";AND drop unused `priority` field (ba F-06 + qa F-06 CONVERGED) — BACKENDS list order is the explicit precedence
+>   - **Hard Constraint #11**: probe cache strategy locked = **Option B** (module-level `_probe_cache: dict[type[CIBackend], bool]` + `reset_probe_cache()` helper); drop lru_cache (tech F-04 + ba minor)
+>   - **§B.5 _no_aether_output rename verification**: Task 4.6 added — `grep -rn "_no_aether_output\|no_aether" aria/skills/phase-c-integrator/` returns 0 in code (md ok) post-rename (tech F-05)
+>   - **§B.4 query order annotation** (Rev1.1 corrected per R2 ba N-1): main in-flight FIRST then PR CI SECOND — matches ground truth `gate_check` L309-329 verified;Hard Constraint #1 (Aether behavior zero change) 强制此顺序;originally R1 ba minor finding implied reversal but ground truth IS main-first;Rev1 wrote paper-fix wrongly, Rev1.1 corrects
+>   - **Task 3.1-3.2 class split fix** (qa F-01): use ground truth 5 classes (ComputeVerdictTests 4 + TranslateInFlightRunTests 3 + GateCheckTests 7 + FallbackTests 3 + NormalizePrCiStatusTests 4 = 21);drop nonexistent "TestDetectAether"
+>   - **AC-7.2 vs Task count reconciliation** (qa F-02): new Task 1.7 — create `tests/test_ci_backends.py` with ≥11 module-tests (base.py contract 4 + aether.py migrated 3 + github_actions.py stub 2 + registry 2) → 21 rewritten + 16 in test_pre_merge_gate.py new + 11 in test_ci_backends.py new = 48 total (well above AC-7.2 "≥27")
+>   - **Task 5.5 dogfood command fix** (qa F-03): use `python3 aria/skills/phase-c-integrator/scripts/pre_merge_gate.py --pr-branch <branch>` (current CLI entry verified L368-380) + `cwd=<repo root>` annotation
+>   - **Task 8.7 v1.29.0 race guard added** (tech F-06): `git fetch --all && grep "## \[1.29.0\]" aria/CHANGELOG.md` — abort if v1.29.0 entry written by sister (block-flip ship 应早于本 Spec ship)
+>   - **Minor batch (10 items)**: SKILL.md ref count corrected 14 (was ~10);gate_check docstring updated to declare NIE-propagation contract;Out-of-Scope adds verdict-semantics fence;Rule #9 trigger explicit at session >4h OR cycle full;Phase D handoff template path locked;AC-7.3 dogfood NIE manual-verify command made concrete;test isolation Option B `reset_probe_cache()` signature locked
 > **Change ID**: `aria-ci-backend-abstraction`
 > **Decisions source**: [DEC 2026-05-28](../../../.aria/decisions/2026-05-28-ci-backend-abstraction-brainstorm.md) (Q1-Q5 owner-approved + R1 post_brainstorm audit PASS_WITH_WARNINGS × 3 unanimous, see §Audit findings in DEC)
 > **Boundary audit source**: `.aria/notes/2026-05-27-boundary-audit-10cg-hardcode.md` §修复 2 (P0 items C5+C6)
@@ -127,6 +145,11 @@ Per 2026-05-27 handoff §6 carry-forward S1 "C5+C6 CI backend abstraction (~8-12
 8. **Backend registry pattern = static import list** (backend-architect F-01) — `ci_backends/__init__.py` 用 static `from .aether import AetherBackend; from .github_actions import GitHubActionsBackend; BACKENDS = [AetherBackend, GitHubActionsBackend]` 模式;**禁止** decorator-based registration / `setuptools.entry_points` / 任何 dynamic discovery。理由:零 plugin discovery complexity + 顺序锁定 (Aether-first precedence per Q3 现网保护承诺)
 9. **Old + new config key 同时存在时 → new key wins** (tech-lead M3 + backend-architect F-04) — alias translation 在 `{**DEFAULT_CONFIG, **config}` merge **之前** 执行 (dedicated `_normalize_config(config)` step);冲突时 new key (`no_ci_fallback`) override old key (`no_aether_fallback`) + emit `both_keys_present` warning
 
+### New from R1 post_spec audit (Rev1, 2026-05-28)
+
+10. **`compute_verdict()` signature locked** (Rev1, R1 3-agent CONVERGED tech F-03 + ba a3f8c2d1 + qa F-04) — public function (no underscore), signature 扩展为 `compute_verdict(main_in_flight_runs: list[dict], pr_ci_status: str, backend_name: str, cfg: dict | None = None) -> dict`。`backend_name` 替代旧 hardcoded `"aether-ci-cli"` in `primitive_used` output field。Backward compat: 老 test 可通过 kwargs 调用 (`backend_name="aether-ci-cli"`) 保持 assertion 兼容
+11. **Probe cache strategy = Option B** (Rev1, R1 tech F-04 + ba minor) — 用 module-level `_probe_cache: dict[type[CIBackend], bool]` + `reset_probe_cache() -> None` helper export from `ci_backends/__init__.py`;**禁止** `@functools.lru_cache` (test isolation hazard)。`reset_probe_cache()` 调 `_probe_cache.clear()` (idempotent),tearDown 显式调用
+
 ---
 
 ## Acceptance Criteria
@@ -154,6 +177,7 @@ Per 2026-05-27 handoff §6 carry-forward S1 "C5+C6 CI backend abstraction (~8-12
       raise  # propagate up
   ```
 - AC-2.4: Test `test_gha_probe_true_query_nie_aborts_not_skips` — 装 mock gh + mock auth → 调 gate_check → assertRaises NotImplementedError (不调 _no_ci_output)
+- AC-2.5 (Rev1, R1 tech F-01 Critical): NIE message body assertion — test MUST also `assertIn("GHA backend probe succeeded but", str(exc.value))` AND `assertIn("PR welcome", str(exc.value))` to prevent Hard Constraint #4 (操作可 message) 字面 silent rot
 
 ### AC-3: Soft alias precedence (Hard constraint #3 + #9)
 - AC-3.1: 旧 key `no_aether_fallback` 单独存在 → 等价行为 + emit DeprecationWarning("`no_aether_fallback` is deprecated; use `no_ci_fallback`; will be removed in v2.0")
@@ -172,9 +196,10 @@ Per 2026-05-27 handoff §6 carry-forward S1 "C5+C6 CI backend abstraction (~8-12
 - AC-4.2: `resolve_ci_backend(config) -> CIBackend | None` 按 `BACKENDS` 顺序 probe (Aether 先 GHA 后);config 显式 `ci_backends: [{name: "..."}]` 时按 config 顺序
 - AC-4.3: Test `test_aether_takes_precedence_when_both_probe_true` — mock 装 aether + gh → resolve returns AetherBackend instance (per R1 qa F2)
 - AC-4.4: 无 decorator / 无 entry-point 验证 — `grep -rn "@register\|entry_points" aria/skills/phase-c-integrator/scripts/ci_backends/` returns 0
+- AC-4.5 (Rev1, R1 ba b7e19f4a): `ci_backends: []` (empty list) **explicit disable** semantic — Test `test_explicit_empty_ci_backends_disables` → `resolve_ci_backend({"ci_backends": []})` returns None;Test `test_missing_ci_backends_auto_detects` → `resolve_ci_backend({})` returns AetherBackend (assuming probe true);两者行为必须 distinguishable (区别于 missing vs empty)
 
 ### AC-5: Contract surface (Q4)
-- AC-5.1: `CIBackend` ABC 仅含 4 个 abstract member:`name: ClassVar[str]` + `priority: ClassVar[int]` + `@classmethod probe(cls) -> bool` + `query_pr_ci(pr_ref) -> CIStatus` + `query_branch_in_flight(branch) -> InFlightStatus`
+- AC-5.1 (Rev1, ba F-05 + qa F-05 CONVERGED count fix + F-06+F-06 priority drop): `CIBackend` ABC 含 **4 个 member 共 1 ClassVar + 3 abstract**:`name: ClassVar[str]` + `@classmethod probe(cls) -> bool` + `query_pr_ci(pr_ref) -> CIStatus` + `query_branch_in_flight(branch) -> InFlightStatus`。**`priority` field 已 drop** (Rev1) — BACKENDS list order in `__init__.py` 是 explicit precedence (Hard Constraint #8 + AC-4.1)
 - AC-5.2: `CIStatus` dataclass fields: `state: Literal["passing", "failing", "pending", "not_found"]` + `run_id: str | None` + `url: str | None` + `checked_at: str` (ISO 8601)
 - AC-5.3: `InFlightStatus` dataclass fields: `runs: list[dict]` + `checked_at: str` (runs 字段 list-of-dict 因 backend schema 不同)
 - AC-5.4: `pre_merge_gate.py` 调用使用 attribute access (`pr_status.state == "passing"`),不允许 dict-key access
@@ -243,9 +268,10 @@ class CIBackend(ABC):
     Per [DEC 2026-05-28] §Q4 (b) contract + Hard Constraint #8 (static registry).
     Implementations live in sibling files (aether.py, github_actions.py)
     and are registered in __init__.py via static import (no decorator).
+    Precedence is BACKENDS list order (see __init__.py) — no priority field
+    (Rev1, R1 ba F-06 + qa F-06: dropped unused priority).
     """
     name: ClassVar[str]
-    priority: ClassVar[int] = 0  # higher = preferred when multiple probe()=True
 
     @classmethod
     @abstractmethod
@@ -268,11 +294,25 @@ class CIBackend(ABC):
 
 #### A.2 `aria/skills/phase-c-integrator/scripts/ci_backends/aether.py`
 
-Migrate logic from current `pre_merge_gate.py`:
-- `detect_aether()` body → `AetherBackend.probe()` (classmethod)
-- `_query_aether()` (current L180-220) → `AetherBackend.query_pr_ci()` + `query_branch_in_flight()`
-- `verify_aether_in_flight_flag()` → absorbed into `query_branch_in_flight()`
-- Preserves subprocess + retry + JSON parsing logic byte-for-byte (zero behavior change)
+**Migration responsibility table** (Rev1, ba c1d6a8e3) — current `pre_merge_gate.py` symbols → new location:
+
+| Current symbol | Current line | New location | Migration note |
+|----------------|--------------|--------------|----------------|
+| `AETHER_CLI_MIN_SHA = "f29abee"` | L33 | `aether.py` module-level | Aether-specific constant |
+| `AETHER_CLI_MIN_DATE = "2026-05-06"` | L34 | `aether.py` module-level | Aether-specific constant |
+| `RETRY_BACKOFF = (5, 15, 45)` | L37 | `aether.py` module-level | Aether subprocess retry config |
+| `MAX_RETRY_ATTEMPTS` | L38 | `aether.py` module-level | derived from RETRY_BACKOFF |
+| `detect_aether()` body | L57-70 | `AetherBackend.probe()` (classmethod) | Aether-specific detection |
+| `verify_aether_in_flight_flag()` | L71-101 | `AetherBackend._verify_in_flight_flag()` (private instance method, called by `query_branch_in_flight()`) | Aether-specific |
+| `_run_aether_with_retry()` | L103-131 | `AetherBackend._run_with_retry()` (private instance method) | Aether-specific subprocess retry |
+| `_query_aether()` | L133-158 | `AetherBackend.query_pr_ci()` + `AetherBackend.query_branch_in_flight()` | Split: 当前函数同时返回 PR+main flat dict;new contract 拆 2 query method,return dataclass |
+| `_normalize_pr_ci_status()` | L160-186 | `AetherBackend._normalize_pr_ci_status()` (private) | Aether JSON schema parser, returns `CIStatus.state` enum |
+| `_translate_in_flight_run()` | L188-215 | `AetherBackend._translate_in_flight_run()` (private) | Aether JSON schema parser, populates `InFlightStatus.runs` list-of-dict |
+| `compute_verdict()` | L217-246 | **stays** `pre_merge_gate.py` (backend-agnostic verdict logic) — signature extended see §B.4 | Verdict computation works on `CIStatus.state` + `InFlightStatus.runs`, not backend-specific |
+| `_no_aether_output()` | L248-272 | rename to `_no_ci_output()` (stays `pre_merge_gate.py`) | Generalize message wording from "aether" to "CI backend" |
+| `gate_check()` | L274-385 | **stays** `pre_merge_gate.py` (orchestration logic) | Refactored body per §B.4 |
+
+**Behavior preservation**: 所有 migrated functions 保留 byte-for-byte subprocess command + JSON parsing + retry timing — only **call site** changes (in `gate_check`, via `backend.query_*()` instead of `_query_aether()` direct).
 
 #### A.3 `aria/skills/phase-c-integrator/scripts/ci_backends/github_actions.py`
 
@@ -291,7 +331,6 @@ from .base import CIBackend, CIStatus, InFlightStatus
 
 class GitHubActionsBackend(CIBackend):
     name: ClassVar[str] = "github-actions"
-    priority: ClassVar[int] = 50  # below Aether (100)
 
     @classmethod
     def probe(cls) -> bool:
@@ -370,6 +409,9 @@ def _normalize_config(config: dict) -> dict:
     """Translate legacy config keys to v1.31.0 schema with deprecation warnings.
 
     Per Hard Constraint #3 (alias support) + #9 (new key wins on conflict).
+    Operates at the `phase_c_integrator.pre_merge_gate` config sub-dict level
+    (caller responsibility to pass the right sub-dict, not the top-level
+    .aria/config.json dict).
     """
     out = dict(config)  # shallow copy
     for old, new in _OLD_TO_NEW.items():
@@ -393,11 +435,23 @@ def _normalize_config(config: dict) -> dict:
 
 
 def _translate_value(old_key: str, old_value):
-    """Per-key value-shape translation."""
+    """Per-key value-shape translation (Rev1 complete table, tech F-02).
+
+    Translation map (2 keys total):
+      primitive_preference: ["aether-ci-cli"]  → ci_backends: [{"name": "aether-ci-cli"}]
+                            ["foo", "bar"]    → ci_backends: [{"name": "foo"}, {"name": "bar"}]
+                            []                → ci_backends: []  (preserves Rev1 [] disable semantic)
+      no_aether_fallback:   "skip_with_warning" → no_ci_fallback: "skip_with_warning"  (no shape change)
+                            "abort"             → no_ci_fallback: "abort"              (no shape change)
+    """
     if old_key == "primitive_preference":
-        # Old: ["aether-ci-cli"] → New: [{"name": "aether-ci-cli"}]
+        # Old value is list[str], new value is list[{"name": str}]
         return [{"name": n} for n in old_value]
-    return old_value  # no shape change for no_aether_fallback
+    if old_key == "no_aether_fallback":
+        # String enum literal, no shape change
+        return old_value
+    # Defensive: unknown old key → return as-is (shouldn't reach since _OLD_TO_NEW filter upstream)
+    return old_value
 ```
 
 #### B.3 Replace `detect_aether()` (L57-70) → `resolve_ci_backend()`
@@ -406,20 +460,28 @@ def _translate_value(old_key: str, old_value):
 def resolve_ci_backend(config: dict) -> CIBackend | None:
     """Per [DEC 2026-05-28] §Q3 (b) config-first + probe fallback.
 
-    Order:
-      1. If config["ci_backends"] non-empty: try in user-specified order, return first probe()=True
-      2. Else: iterate ci_backends.BACKENDS (Aether → GHA) in static-import order
-      3. Both exhausted: return None → caller routes per no_ci_fallback
+    Semantics (Rev1, R1 ba b7e19f4a lock):
+      - config["ci_backends"] absent OR None  → auto-detect via BACKENDS list order
+      - config["ci_backends"] is empty list [] → **explicit disable** (return None
+        immediately, caller routes per no_ci_fallback). This is the canonical way
+        for user to bypass CI backend integration in v1.31.0+.
+      - config["ci_backends"] non-empty list  → try in user-specified order,
+        return first that probes True;exhausted (all probe False) → None
+
+    Returns None signals caller to route through no_ci_fallback path.
     """
-    explicit = config.get("ci_backends") or []
-    if explicit:
+    explicit = config.get("ci_backends")
+    if explicit is not None:
+        # Explicit user config (including [] = disable)
+        if not explicit:
+            return None  # [] = explicit disable per Rev1 ci_backends:[] semantic lock
         name_map = {b.name: b for b in BACKENDS}
         for entry in explicit:
             backend_cls = name_map.get(entry.get("name") if isinstance(entry, dict) else entry)
             if backend_cls and backend_cls.probe():
                 return backend_cls()
         return None
-    # Auto-detect
+    # Auto-detect (config missing or None)
     for backend_cls in BACKENDS:
         if backend_cls.probe():
             return backend_cls()
@@ -430,7 +492,18 @@ def resolve_ci_backend(config: dict) -> CIBackend | None:
 
 ```python
 def gate_check(pr_ref: str, branch: str, config: dict | None = None) -> dict:
-    cfg = _normalize_config({**DEFAULT_CONFIG, **(config or {})})
+    """Pre-merge gate orchestration (Rule #8).
+
+    Returns dict with `verdict` field (green/wait/fail) and `primitive_used`
+    (backend name) for downstream workflow-runner consumption.
+
+    Exception semantics (Rev1, Hard Constraint #7):
+      - NotImplementedError from backend.query_*() propagates (abort, NOT
+        caught and routed to no_ci_fallback). This breaks the prior contract
+        that "gate_check returns a structured verdict, never raises";callers
+        MUST be updated to expect NotImplementedError when backend is a stub.
+    """
+    cfg = _normalize_config({**DEFAULT_CONFIG, **(config or {})})  # alias translation BEFORE merge
     if not cfg["enabled"]:
         return {"verdict": VERDICT_GREEN, "skipped": True, "reason": "disabled"}
 
@@ -438,12 +511,46 @@ def gate_check(pr_ref: str, branch: str, config: dict | None = None) -> dict:
     if backend is None:
         return _no_ci_output(cfg["no_ci_fallback"])  # renamed from _no_aether_output
 
+    # Query order: main in-flight FIRST then PR CI SECOND (Rev1.1 corrected
+    # per R2 ba N-1 — matches ground truth gate_check L309-329:main in-flight
+    # queried L309-318 before PR CI queried L320-329). Hard Constraint #1
+    # (Aether behavior zero change) requires this exact order — early-fail on
+    # main in-flight short-circuits PR query (matches current Aether subprocess
+    # invocation count + log emission order).
     # Hard Constraint #7: NIE from query MUST propagate (abort, not skip)
-    pr_status = backend.query_pr_ci(pr_ref)            # raises NIE → propagate
     in_flight = backend.query_branch_in_flight(branch)  # raises NIE → propagate
+    pr_status = backend.query_pr_ci(pr_ref)             # raises NIE → propagate
 
-    # Verdict computation (unchanged logic, just uses CIStatus/InFlightStatus types)
-    return _compute_verdict(pr_status, in_flight, cfg)
+    # Verdict computation — existing public function compute_verdict() L217,
+    # signature extended in Rev1 to accept backend.name for primitive_used field.
+    # Rev1 Hard Constraint #10 locks signature.
+    return compute_verdict(
+        main_in_flight_runs=in_flight.runs,    # backward compat: list[dict] field
+        pr_ci_status=pr_status.state,          # backward compat: enum string
+        backend_name=backend.name,              # NEW Rev1 param: replaces hardcoded "aether-ci-cli"
+        cfg=cfg,                                # for wait_timeout / fallback config
+    )
+```
+
+**`compute_verdict()` signature (Rev1, Hard Constraint #10)** — extended from ground truth L217:
+
+```python
+def compute_verdict(
+    main_in_flight_runs: list[dict],   # was: list[dict] (no change)
+    pr_ci_status: str,                  # was: str (no change, accepts CIStatus.state enum value)
+    backend_name: str,                  # NEW Rev1 — replaces hardcoded "aether-ci-cli" in output
+    cfg: dict | None = None,            # NEW Rev1 — for wait_timeout / fallback access (was implicit)
+) -> dict:
+    """Compute pre-merge verdict from PR CI + main in-flight signals.
+
+    Output dict (unchanged keys except primitive_used uses backend_name):
+      verdict: "green" | "wait" | "fail"
+      primitive_used: backend_name  # was: hardcoded "aether-ci-cli"
+      primitive_version_sha: backend-specific (Aether: AETHER_CLI_MIN_SHA; GHA: "<stub>")
+      pr_ci_status: pr_ci_status   # echo for caller
+      main_in_flight: bool         # has_runs derived
+      ...
+    """
 ```
 
 #### B.5 Rename `_no_aether_output()` → `_no_ci_output()` (preserve all behavior)
