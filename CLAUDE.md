@@ -429,21 +429,25 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **详细规范 + 正向 pattern + exception 模板:** `standards/conventions/secret-hygiene.md`
 
-8. **PR merge 前必跑 pre-merge gate** - 详见 `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (v1.3.0+)
+8. **PR merge 前必跑 pre-merge gate** - 详见 `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (v1.3.0+, v1.31.0+ 通过 CI backend 抽象层支持多 CI 后端)
 
-**规则 #8 要点:** Phase C.2 PR merge 前必须通过 phase-c-integrator C.2.4 pre-merge precondition gate (内部调用 `aether ci status --branch main --in-flight --json` + PR CI status query) 验证 (a) 本 PR CI 已 passing; (b) main 分支无 in-flight CI run。`wait` 状态由 workflow-runner `wait_recoverable` 错误类型处理 (指数退避 + Ctrl-C escape hatch),**不**视为 workflow failure。
+**规则 #8 要点:** Phase C.2 PR merge 前必须通过 phase-c-integrator C.2.4 pre-merge precondition gate 验证 (a) 本 PR CI 已 passing; (b) main 分支无 in-flight CI run。Gate 通过 **CI backend 抽象层** (`aria/skills/phase-c-integrator/scripts/ci_backends/`) 调用配置的 CI primitive — v1.31.0+ 支持多 backend (Aether 默认 / GitHub Actions stub),通过 `.aria/config.json` 的 `phase_c_integrator.pre_merge_gate.ci_backends` 或自动 probe 选择。`wait` 状态由 workflow-runner `wait_recoverable` 错误类型处理 (指数退避 + Ctrl-C escape hatch),**不**视为 workflow failure。
 
 **触发场景:** Phase C.2 action 流程中 (auto_merge 或 user-triggered merge) 必须经过 C.2.4 gate。`auto_merge=true` workflow 自动调用; `auto_merge=false` user 触发 merge 前由 phase-c-integrator 强制 invoke。
 
 **Source incidents:** 2026-05-02 SilkNode PR-321 cancel PR-322 main CI Run #3161 (459s 部署观测丢失);Forgejo Issue [#60](https://forgejo.10cg.pub/10CG/Aria/issues/60)。
 
-**Exception:** 项目无 aether plugin (`aether` CLI 不可用) 时按配置 `phase_c_integrator.pre_merge_gate.no_aether_fallback` 降级:`skip_with_warning` (默认,记录到 workflow report) / `abort` (严格模式)。Exception 必须在项目 `.aria/config.json` 显式声明 `phase_c_integrator.pre_merge_gate.no_aether_fallback` 字段。
+**Exception:** 项目无可用 CI backend (所有 backend probe=False) 时按配置 `phase_c_integrator.pre_merge_gate.no_ci_fallback` 降级:`skip_with_warning` (默认,记录到 workflow report) / `abort` (严格模式)。Exception 必须在项目 `.aria/config.json` 显式声明字段。**Backward-compat (v1.31.0+):** 旧 key `no_aether_fallback` 仍可读取并发 deprecation warning,将于 v2.0 移除。
+
+**NIE-propagation 安全约束 (v1.31.0+, Hard Constraint #7):** 当某 backend probe=True 但 query 方法 raise `NotImplementedError` (stub backend, 如 GitHub Actions v1.31.0 stub),gate **必须 abort** (raise to caller),**不允许** catch-and-route 到 `no_ci_fallback`。这防止"装了 `gh` CLI 但实际用 Aether"的项目因 GHA stub 抢先注册而 Rule #8 静默降级。如需禁用 backend probing,显式设 `ci_backends: []` (explicit disable)。
 
 **Primitive responsibility split:**
-- aether 提供 (`aether ci status --branch X --in-flight --json` query primitive,P0-A): aether-cli #116 SHA `f29abee` (2026-05-06)
-- aria 消费 + verdict 计算 (P0-B `aether-pre-merge-check` skill 从未实施): phase-c-integrator C.2.4 + workflow-runner `wait_recoverable` + 本规则 #8 强制约束
+- **CI backend 实现** 提供 query primitives (each backend in `ci_backends/`):
+  - Aether (默认 backend, 10CG Lab 内部): `aether ci status --branch X --in-flight --json` query (aether-cli #116 SHA `f29abee` 2026-05-06)
+  - GitHub Actions (stub v1.31.0+, real 实现 deferred): `gh run list --json` 待实施
+- **aria 消费 + verdict 计算**: phase-c-integrator C.2.4 + workflow-runner `wait_recoverable` + 本规则 #8 强制约束
 
-**详细实施规范:** `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (与 Rule #7 引用 `standards/conventions/secret-hygiene.md` 同结构)
+**详细实施规范:** `aria/skills/phase-c-integrator/SKILL.md §C.2.4` + §C.2.4.X CI Backends (与 Rule #7 引用 `standards/conventions/secret-hygiene.md` 同结构)
 
 9. **Session handoff docs 必须写在 `docs/handoff/`** - 详见 `standards/conventions/session-handoff.md` (aria-plugin v1.21.0+)
 
@@ -510,10 +514,12 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.30.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
+插件版本: v1.31.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.1.0 + §C.2.4.5 submodule pointer regression gate
-                  warn-only mode + Forgejo hosts parameterization via ARIA_FORGEJO_HOSTS env;
-                  v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
+                  warn-only mode + Forgejo hosts parameterization via ARIA_FORGEJO_HOSTS env
+                  + CI backend abstraction (CIBackend ABC + AetherBackend full + GitHubActions stub)
+                  via ci_backends/ package + soft alias for legacy config keys;
+                  v1.29.0 reserved for block-flip ship 2026-06-07 D+14;v1.30.1 patch closed #125+#126)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
 PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 2026-05-24~25);
