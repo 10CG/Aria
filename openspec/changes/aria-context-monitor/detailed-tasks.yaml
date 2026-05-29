@@ -1,0 +1,232 @@
+metadata:
+  feature: aria-context-monitor
+  spec_path: openspec/changes/aria-context-monitor/
+  source: "#104"
+  datasource: "proposal.md ## Tasks (path B — no tasks.md)"
+  level: 2
+  target_version: aria-plugin v1.33.0
+  total_tasks: 9
+  ship_target: "single cycle (~4-5h end-to-end)"
+  generated_by: task-planner A.2/A.3
+  generated_at: "2026-05-29"
+  notes: >
+    4-8h granularity relaxed per single-dev + Claude Code workflow (Token × Attention,
+    #18 not yet shipped). Complexity reflects file/dependency count + logic surface,
+    not human-hours. 5 R2 carried minors absorbed inline (see r2_minor tags).
+
+# R2 carried minors (non-blocking, absorbed into tasks below):
+#   m1 config-loader DEFAULTS.json register context_monitor namespace + register task → TASK-006
+#   m2 used_percentage_proxy accuracy cross-validation → TASK-007
+#   m3 proxy null consistency (unavailable state) → TASK-004 + TASK-007
+#   m4 atomic-write tmp concurrent naming (use $$ PID) → TASK-003
+#   m5 internal skill loading boundary → TASK-002 + TASK-004
+
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    title: "[BLOCKING gate] Re-capture statusLine stdin + freeze schema field contract"
+    status: done
+    complexity: S
+    priority: P0
+    dependencies: []
+    blocking: true
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-token-telemetry/SKILL.md  # schema contract section (created here)
+    description: >
+      Re-capture a live statusLine stdin JSON and freeze the field contract into
+      aria-token-telemetry SKILL.md. Verify presence of context_window_size,
+      model.id (with [1m]), transcript_path, remaining_percentage, exceeds_200k_tokens.
+    verification:
+      - "Fresh statusLine stdin capture obtained (not the deleted spike capture)"
+      - "context_window_size field confirmed present → proceed to 1.2+"
+      - "FALLBACK CLAUSE: if context_window_size absent → trigger fallback-chain-as-primary, return to A.2 to revise Spec (do NOT proceed)"
+      - "Confirmed fields documented in aria-token-telemetry SKILL.md schema section"
+
+  - id: TASK-002
+    parent: "1.2"
+    title: "Implement aria-token-telemetry/scripts/token_telemetry.py (shared data layer)"
+    status: done
+    complexity: L
+    priority: P0
+    dependencies: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-token-telemetry/scripts/token_telemetry.py
+      - aria/skills/aria-token-telemetry/SKILL.md  # internal, user-invocable:false
+    description: >
+      Internal shared skill (reuse git-remote-helper US-012 Layer 3 precedent).
+      relay cache read (schema_version validation + JSONDecodeError/OSError→unavailable),
+      transcript JSONL usage parse, window 4-tier resolve
+      (cached_size_reuse > config > empirical_peak > default).
+      raw-counts parse MUST be independent of window% (Q2=a, #18 reuse basis).
+    r2_minor: "m5 — document internal skill loading boundary (user-invocable:false)"
+    verification:
+      - "relay cache read validates top-level schema_version (compare issues.json pattern)"
+      - "JSONDecodeError / OSError → source=unavailable, no exception raised"
+      - "transcript fallback resolves window via 4-tier chain correctly"
+      - "raw-counts interface callable independently of window% (reusable by #18)"
+
+  - id: TASK-003
+    parent: "1.3"
+    title: "Implement statusLine relay marker block + setup_relay.sh (idempotent injection)"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-001]
+    parallel_with: [TASK-002]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-context-monitor/scripts/setup_relay.sh
+    description: >
+      Idempotent relay injection: marker-anchor detection
+      (# >>> aria-context-monitor relay >>> / # <<< ... <<<), reuse $input variable,
+      inject AFTER input=$(cat) (position-sensitive), atomic tmp→rename write.
+      When user has no statusLine → build minimal reference (context bar + relay only,
+      no personal prefs). Inject generic relay ONLY (not PEAK/BUSY instance-layer prefs).
+    r2_minor: "m4 — atomic-write tmp file concurrent naming uses $$ PID"
+    verification:
+      - "run-twice idempotent (marker detection, no duplicate injection)"
+      - "relay line reuses $input, placed after input=$(cat)"
+      - "atomic write: tmp file named with $$ PID, mv→rename (no truncate-window corrupt)"
+      - "no-statusLine case builds minimal reference without personal prefs"
+
+  - id: TASK-006
+    parent: "1.6"
+    title: "Freeze staleness threshold constant (300s) + window_source enum (5 values) + config-loader registration"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-002]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-token-telemetry/scripts/token_telemetry.py  # constants
+      - aria/skills/config-loader/  # DEFAULTS.json + register
+    description: >
+      Freeze staleness threshold 300s (config context_monitor.staleness_threshold_seconds
+      overridable) + window_source enum (runtime/cached_size_reuse/config/empirical_peak/default).
+    r2_minor: "m1 — config-loader DEFAULTS.json register context_monitor namespace + register task"
+    verification:
+      - "staleness default 300s, config override works"
+      - "window_source enum has exactly 5 values"
+      - "config-loader DEFAULTS.json includes context_monitor namespace with documented keys"
+
+  - id: TASK-004
+    parent: "1.4"
+    title: "Implement aria-context-monitor SKILL.md (user-facing consumer)"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-002, TASK-006]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-context-monitor/SKILL.md
+    description: >
+      Consume telemetry → staleness判定 (300s default) → return structured JSON.
+      used_percentage (relay path) vs used_percentage_proxy (transcript path) chosen
+      by source (二选一, not混用) + confidence (high|estimate).
+    r2_minor:
+      - "m3 — proxy null consistency in unavailable state"
+      - "m5 — internal skill loading boundary (how context-monitor invokes token-telemetry)"
+    verification:
+      - "relay_cache fresh → source=relay_cache, confidence=high, used_percentage set, proxy=null"
+      - "transcript → source=transcript_fallback, confidence=estimate, used_percentage_proxy set, used_percentage=null"
+      - "unavailable → both used_percentage and used_percentage_proxy null (consistency)"
+      - "staleness > 300s → confidence downgraded to estimate"
+
+  - id: TASK-005
+    parent: "1.5"
+    title: "aria-doctor integration: relay 3-state detection + jq availability"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-003]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-doctor/  # relay detection
+    description: >
+      3-state detection (relay-installed / statusline-no-relay / no-statusline) +
+      jq availability check with graceful degradation message.
+    verification:
+      - "reports relay-installed when marker present"
+      - "reports statusline-no-relay when statusLine exists but no marker"
+      - "reports no-statusline when no statusLine configured"
+      - "jq missing → graceful degradation hint"
+
+  - id: TASK-009
+    parent: "1.9"
+    title: "Rule #6 deterministic structural substitute (fixtures + assertions)"
+    status: done
+    complexity: M
+    priority: P1
+    dependencies: [TASK-002]
+    agent: qa-engineer
+    deliverables:
+      - aria-plugin-benchmarks/context-monitor/  # relay/transcript/corrupt/stale fixtures + window 4-tier assertions
+    description: >
+      Deterministic structural substitute for Rule #6 (NOT LLM AB). token_telemetry
+      parse unit tests with fixtures: relay / transcript / corrupt / stale (1 each) +
+      window 4-tier assertions. Per feedback_deterministic_structural_skill_rule6_substitute.
+    verification:
+      - "4 fixtures present (relay/transcript/corrupt/stale)"
+      - "window 4-tier resolution asserted"
+      - "runs deterministically without LLM"
+
+  - id: TASK-007
+    parent: "1.7"
+    title: "Fallback path unit tests (7 scenarios)"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-002, TASK-003, TASK-004]
+    agent: qa-engineer
+    deliverables:
+      - aria/skills/aria-token-telemetry/  # test suite
+    description: >
+      Fallback unit tests: no statusLine / stale cache (>300s) / corrupt cache JSON /
+      transcript-only window 4-tier / setup_relay run-twice idempotent /
+      pre-existing relay marker / user has custom context bar.
+    r2_minor: "m2 — used_percentage_proxy accuracy cross-validation"
+    verification:
+      - "all 7 fallback scenarios covered with passing tests"
+      - "corrupt cache → unavailable, no exception"
+      - "used_percentage_proxy cross-validated for accuracy (avoid 22% drift)"
+      - "setup_relay run-twice produces no duplicate marker"
+
+  - id: TASK-008
+    parent: "1.8"
+    title: "Consumption integration docs (phase-b/c-developer call points + thresholds)"
+    status: done
+    complexity: S
+    priority: P2
+    dependencies: [TASK-004]
+    agent: knowledge-manager
+    deliverables:
+      - aria/skills/phase-b-developer/  # call point doc
+      - aria/skills/phase-c-integrator/  # call point doc
+    description: >
+      Document "pause vs continue" decision call points + threshold suggestions
+      (e.g. used% > 85 → suggest pause). Advisory only — skill provides data,
+      AI/phase skill makes pause decision (no auto-interrupt).
+    verification:
+      - "phase-b-developer documents call point + threshold suggestion"
+      - "phase-c-integrator documents call point"
+      - "explicit note: advisory, no auto-pause"
+
+execution_order:
+  # topological, respecting deps; P0 first within tiers; 002+003 parallelizable
+  - TASK-001            # BLOCKING gate (must pass before all others)
+  - [TASK-002, TASK-003]  # parallel (both depend only on 001)
+  - TASK-006
+  - TASK-004
+  - [TASK-005, TASK-009]  # parallel
+  - TASK-007
+  - TASK-008
+
+summary:
+  by_complexity:
+    S: 4   # 001, 006, 005, 008
+    M: 4   # 003, 004, 009, 007
+    L: 1   # 002
+  critical_path: "001 → 002 → 006 → 004 → 007 → 008"
+  blocking_gate: "TASK-001 — if context_window_size absent, return to A.2 (do not proceed)"

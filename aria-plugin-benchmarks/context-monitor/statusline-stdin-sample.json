@@ -1,0 +1,25 @@
+{
+  "model": {
+    "id": "claude-opus-4-8[1m]",
+    "display_name": "Opus 4.8 (1M context)"
+  },
+  "context_window": {
+    "total_input_tokens": 142208,
+    "total_output_tokens": 1274,
+    "context_window_size": 1000000,
+    "current_usage": {
+      "input_tokens": 131,
+      "output_tokens": 1274,
+      "cache_creation_input_tokens": 980,
+      "cache_read_input_tokens": 141097
+    },
+    "used_percentage": 14,
+    "remaining_percentage": 86
+  },
+  "exceeds_200k_tokens": false,
+  "fast_mode": false,
+  "version": "2.1.156",
+  "transcript_path": "<redacted-path>",
+  "session_id": "<redacted>",
+  "_schema_note": "captured 2026-05-29 TASK-001 gate; top-level + context_window keys are the frozen contract"
+}

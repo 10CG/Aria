@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "captured_at": "REPLACE_FRESH",
+  "model_id": "claude-opus-4-8[1m]",
+  "context_window_size": 1000000,
+  "used_percentage": 16,
+  "remaining_percentage": 84,
+  "total_input_tokens": 163371,
+  "current_usage": {"input_tokens": 2, "output_tokens": 3, "cache_creation_input_tokens": 814, "cache_read_input_tokens": 162555},
+  "exceeds_200k_tokens": false,
+  "transcript_path": "/redacted/session.jsonl"
+}
