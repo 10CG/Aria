@@ -514,14 +514,16 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.32.0 (aria-plugin, 32 user-facing + 6 internal Skills + 11 Agents + secret-guard
-                  default + aria-doctor v1.1.0 + §C.2.4.5 submodule pointer regression gate
+插件版本: v1.33.0 (aria-plugin, 33 user-facing + 7 internal Skills + 11 Agents + secret-guard
+                  default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
                   v1.30.1 closed #125+#126 (dashboard parser+audit frontmatter), v1.30.2 closed
                   #57+#56+#67 (multi-terminal sandbox+RECOMMENDATION_RULES+phase-d latest.md),
                   v1.30.3 closed #131 (Windows GBK guard), v1.32.0 = 4 SKILL.md progressive-
-                  disclosure restructure (avg -58% lines, all <500, 36-run AB verified);
+                  disclosure restructure (avg -58% lines, all <500, 36-run AB verified),
+                  v1.33.0 = aria-context-monitor #104 (context-monitor + token-telemetry skills
+                  + statusLine relay, runtime-truth context occupancy);
                   v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
@@ -540,7 +542,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-27 (v2.0.0 CLAUDE.md 升版 + 插件 v1.30.0 Forgejo hosts parameterization ship)
+**更新**: 2026-05-29 (插件 v1.33.0 ship — aria-context-monitor #104; 项目状态段同步)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
