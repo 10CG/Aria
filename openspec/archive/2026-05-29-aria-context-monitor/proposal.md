@@ -1,7 +1,7 @@
 # aria-context-monitor — 暴露 Claude Code context usage 给 skills/agents
 
 > **Level**: 2 (Minimal — proposal.md only; context-monitor skill + token-telemetry internal skill + statusLine relay, 不跨多 service)
-> **Status**: ✅ **Approved** — Phase A.2 CONVERGED 2026-05-29 via R1 (3 PWW + 1 FAIL, 2C+8M) → Rev1 (闭合全部 2C+8M) → R2 PASS_WITH_WARNINGS unanimous (qa PWW + tech-lead PWW + code-reviewer PASS, 0 new critical/major, 5 non-blocking minor carried to task-planner). Level 2 baseline per [[feedback_post_spec_audit_two_round_pragmatic_for_l2]]。
+> **Status**: ✅ **Shipped** (aria-plugin v1.33.0, 2026-05-29) — Phase A.2 CONVERGED via R1 (3 PWW + 1 FAIL, 2C+8M) → Rev1 → R2 PASS_WITH_WARNINGS unanimous. Phase B: 9 tasks done, TASK-001 BLOCKING gate live-verified `context_window_size` exists (runtime 2.1.156). Phase B.2 code-review PASS (0 Critical/0 Important, 4 Minor 全吸收). Phase C: merged main `e9baa4e` / aria `44b3e00`, dual-remote pushed + SHA verified. 25 deterministic tests green (Rule #6 structural substitute). Closes #104. Level 2 baseline per [[feedback_post_spec_audit_two_round_pragmatic_for_l2]]。
 > **R2 carried minors** (non-blocking, 实施期吸收): config-loader `DEFAULTS.json` 注册 `context_monitor` namespace + 注册 task / `used_percentage_proxy` 准确度交叉校验 / proxy null 一致性 (unavailable 态) / atomic-write tmp 文件并发命名 (用 `$$` PID) / internal skill 加载边界。
 > **Change ID**: `aria-context-monitor`
 > **Source**: Forgejo Aria [#104](https://forgejo.10cg.pub/10CG/Aria/issues/104)
