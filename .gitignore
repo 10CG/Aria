@@ -19,5 +19,9 @@
 .aria/t8-kairos-validation/
 __pycache__/
 
+# /skill-creator AB benchmark workspace (dev-local: subagent outputs + snapshots + review.html;
+# durable 结论已入 CHANGELOG + skills 本身; 2026-05-29 skills progressive-disclosure restructure)
+.aria/skill-restructure-workspace/
+
 # Per-cycle worktrees (B.1 worktree mode, repo-root level)
 worktrees/
