@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #2026-05-29 — 🎉 **Issues 清扫 (6 closed) + Skills 重构 v1.32.0 + context-monitor Phase A** (2026-05-29 ~02:40 UTC, dev-claude, 多 cycle)
+## ★ 最新 session #CTXMON-SHIP — 🎉 **#104 aria-context-monitor SHIPPED v1.33.0 (full A.2→D cycle)** (2026-05-29 ~06:07 UTC, dev-claude)
 
-**Latest**: [2026-05-29-issues-skills-restructure-context-monitor.md](./2026-05-29-issues-skills-restructure-context-monitor.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-29-aria-context-monitor-shipped-v1.33.0.md](./2026-05-29-aria-context-monitor-shipped-v1.33.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-CTXMON-SHIP display)**: [2026-05-29-aria-context-monitor-shipped-v1.33.0.md](./2026-05-29-aria-context-monitor-shipped-v1.33.0.md) — 接前 session P1 carry-forward (#104 Phase B)。**2 新 skill** (`aria-context-monitor` user-facing + `aria-token-telemetry` internal, git-remote-helper Layer3 先例) + statusLine relay 机制。让 AI 机读 runtime-truth context 占用 (实测 relay 路径与状态栏 **0 偏差** = #104 22% drift 根因修复)。**TASK-001 BLOCKING gate** live-verified `context_window_size` 存在 (runtime 2.1.156)。3 档 fallback + window 4 档 resolve + 口径分离 (used_percentage vs used_percentage_proxy)。aria-doctor v1.2.0 `check_context_relay` 3 态。25 deterministic tests (Rule #6 substitute)。**aria-plugin v1.33.0** (aria `44b3e00` / main `e9baa4e` / archive `bd3ce37`, 双远程 SHA 全验证)。主仓 README badge drift 修 (1.28.0→1.33.0)。#104 commented + closed。**Next**: v1.29.0 block-flip D+14 (owner F1) > #18 estimator (复用 token-telemetry) > Sprint2 C7+C8 > M6 余下 Spec。
+
+## ★ 前 session #2026-05-29 — 🎉 **Issues 清扫 (6 closed) + Skills 重构 v1.32.0 + context-monitor Phase A** (2026-05-29 ~02:40 UTC, dev-claude, 多 cycle)
 
 **Latest (T-20260529 display)**: [2026-05-29-issues-skills-restructure-context-monitor.md](./2026-05-29-issues-skills-restructure-context-monitor.md) — 多 cycle session: M6 Spec#1+#3 归档 `c259318`; **3 cluster → v1.30.1/2/3** (6 closed: #125+#126 / #57+#56+#67 / #131); **Skills 重构 v1.32.0** (`09bdf4d`, 4 SKILL.md -58% avg, 36-run AB: tokens -4.3% output -23%); **#104 context-monitor Phase A → Spec Approved** (`8527fbe`, R1 FAIL 2C+8M→Rev1→R2 PWW CONVERGED)。statusLine stdin 金矿 (reference_statusline_stdin_context_telemetry)。架构 = aria-token-telemetry internal skill (git-remote-helper Layer3 先例) + context-monitor + relay 3 档。**Next**: #104 Phase B (Task 1.1 BLOCKING gate) > v1.29.0 D+14 (owner F1) > #104 评论 > Sprint2 C7+C8 > #18 estimator > audit 质量集群。**版本线**: v1.32.0 用于 skills 重构, GHA backend + #104 现 target v1.33.0+。
 
