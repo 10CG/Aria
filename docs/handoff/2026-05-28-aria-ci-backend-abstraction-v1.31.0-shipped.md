@@ -278,3 +278,69 @@ aria-ci-backend-abstraction Spec 已 archive, PR merged, all tests green, 5 dogf
 **Created**: 2026-05-28T~14:00Z
 **Status**: ✅ Session FULLY CLOSED — Spec full A→D cycle ship + 4 sister rebases absorbed + 4-way SHA parity verified + handoff committed
 **Next entry**: `/aria:state-scanner` → 本 doc surface (mtime 最新) → next session 选 §6 carry-forward Path
+
+---
+
+## §9 Session-end 4-question closeout audit (2026-05-28T~14:30Z)
+
+User 4-question prompt: (1) 未完成任务/讨论? (2) 未固化经验? (3) UPM/US/Spec/PRD 维度? (4) 收尾 + handoff 入口确认?
+
+### Q1 答: 未完成项
+
+| # | 项 | 状态 |
+|---|-----|------|
+| Q1.1 | **本 cycle (aria-ci-backend-abstraction)** | ✅ FULLY CLOSED — 无残留 |
+| Q1.2 | **CLAUDE.md plugin 版本 stale** | ⚠️ NOTED (非本 cycle 责任) — sister ship v1.32.0 (gitlink `09bdf4d`) 后,CLAUDE.md 项目状态行仍写 `v1.31.0`。sister 的 v1.32.0 cycle 应 bump 此行;留作 sister/next-session courtesy fix(gitlink 已是 v1.32.0,doc-code 暂不一致) |
+| Q1.3 | **v1.29.0 block-flip ship** | 🟡 owner-pending(D-10, F1 BLOCKER on tripwire runner)— sister-prep'd,见 `2026-05-28-v1.29.0-dry-run-prep.md` |
+| Q1.4 | **本 session 新发现 follow-ups** | O1 GHA real impl / O2 Sprint 2 C7+C8 / S1-S5 deferred(全 §2 已记录,independent cycles 非阻塞) |
+
+### Q2 答: Memory 已固化
+
+**本 session NEW (committed this closeout)**:
+1. ✅ `feedback_concurrent_sot_conflict_mechanical_resolve` — 并发 ship 5 SOT conflict mechanical resolve(mine-wins version + CHANGELOG keep-both),4× sister rebase 实证
+2. ✅ `feedback_audit_convergence_patterns` **扩展** — 加 "Critical-but-addressable-downstream (checkpoint R-skip 信号)" 段(post_brainstorm Critical 落下游 phase 解决 → R2 skip)
+
+**Considered but deferred**:
+- "Owner 在 brainstorm 中段注入风险检查(Q2 现网调查)是健康 forcing function" → 已部分被 `feedback_brainstorm_owner_escalation_discipline` 覆盖,本次实证可未来扩(too narrow 单独固化)
+
+MEMORY.md: 46 → 47 entries(+1 new + 1 extend),index 9.5KB(容量充足)
+
+### Q3 答: Aria conventions 各维度
+
+| 维度 | 状态 | 详 |
+|------|------|---|
+| **UPM** | N/A | Aria 自身无 UPM(per [[project_aria_no_runtime_upm]]),无 UPMv2-STATE block — 预期 |
+| **US** | 无 change needed | 本 cycle = boundary-audit hygiene cycle(非 US-tied,同 Sprint 1 forgejo-hosts pattern)。US-026(M6)的 trajectory 由 sister M6 Specs 推进;本 cycle 不映射任何 US(C5+C6 来自 aria-fleet 战略 memo seed,M7+ 才触发 US e.g. US-027 候选)。grep verified:无 US 引用 CI backend / C5/C6 |
+| **Spec** | ✅ archived | `openspec/archive/2026-05-28-aria-ci-backend-abstraction/{proposal.md, tasks.md}` per Rule #5 + Phase D.2 |
+| **PRD** | 无 change needed | 本 Spec §Out of Scope 明确:PRD 触动 deferred 到 M7+ aria-fleet 主线;hygiene cycle 仅 collector/config/skill layer, 不动 PRD |
+
+### Q4 答: 收尾 + next-session 入口验证
+
+- ✅ Memory 1 new + 1 extend 落盘 + MEMORY.md index 更新
+- ✅ 本 handoff §9 amendment 写入
+- ✅ Spec archived + handoff doc + latest.md pointer(T-CIBACK 置顶)committed `ee68eb7`
+- ✅ Next session `/aria:state-scanner` Phase 1.15 handoff collector → `docs/handoff/latest.md` pointer `**Latest**:` bare 行 → ★ T-CIBACK 顶部 → surface 本 doc
+- ✅ 4-way SHA parity verified post-sync(本地已 pull sister v1.32.0,main `e9f0b5f` / aria `09bdf4d` 三方一致)
+- ⚠️ 需 commit + push 本 §9 amendment + memory(memory 是 local namespace 无 commit;handoff amendment 需 push)
+
+### Closeout verdict
+
+✅ **Session SAFE to close**:
+- 本 cycle ship integrity 完整(PR #68 merged + 3-way parity + 62 tests + Spec archived)
+- 未完成 discussions 全 documented(Q1.2 CLAUDE.md stale 是 sister 责任 NOT AI-blocked;Q1.3 v1.29.0 owner-pending)
+- Memory 2 entries 固化(1 new + 1 extend)
+- Spec/Convention 各维度 audited(US/PRD 无 change needed,理由记录)
+- Next-session 入口路径 verified
+
+**Next session 优先级**(per §6):
+1. ⭐⭐⭐ v1.29.0 block-flip D+14 ship(2026-06-07, D-10, F1 BLOCKER owner resolve)
+2. ⭐⭐ Sprint 2 C7+C8 finish(~1h L2)
+3. ⭐ GHA backend real impl(~4-6h L2, v1.32.0+ → 实际 next slot v1.33.0,因 sister 已占 v1.32.0)
+4. M6 sister推进 / M7 brainstorm
+5. (courtesy) CLAUDE.md plugin 版本 sync to sister's v1.32.0 if still stale
+
+---
+
+**Amendment 1**: 2026-05-28T~14:30Z — §9 4-question closeout audit(post user prompt)
+**Session cumulative duration**: ~12.5h(含 closeout + sync to sister v1.32.0)
+**Final status**: ✅ Session FULLY CLOSED — all 4 closeout questions answered, 2 memories committed, both repos synced to latest (sister v1.32.0 absorbed)
