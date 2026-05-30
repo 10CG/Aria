@@ -1,7 +1,7 @@
 # emergency-hotfix-and-audit-file-scope — hotfix lane + audit file-scope 过滤
 
 > **Level**: 2 (Minimal — proposal.md only; state-scanner 规则 + phase-a-planner doc + audit-engine 逻辑 + config + convention, 不跨多 service)
-> **Status**: ✅ **Approved** — Phase A.2 CONVERGED 2026-05-30 via R1 (3/3 REVISE, 3 Critical: file-scope 数据源 + Prod-Validated gate 无 enforcer + DEC-6 时机) → Rev1 → R2 (2 PWW + 1 REVISE: NEW-C NC1 git diff HEAD pre_merge 漏已提交变更) → Rev2 (merge-base diff) → R3 (PASS + PWW, 0 new Critical, tech-lead CONVERGED)。Level 2 baseline。triage-driven scope (#3 已 v1.34.0 默认 → 关闭)。连续 2 轮拦截 git 数据源/ref load-bearing 缺陷。
+> **Status**: ✅ **Shipped** (aria-plugin v1.35.0, 2026-05-30) — Phase A.2 CONVERGED via R1 (3/3 REVISE, 3 Critical) → Rev1 → R2 (2 PWW + 1 NEW Critical: git diff HEAD pre_merge) → Rev2 (merge-base diff) → R3 (0 new Critical). Phase B: 8 tasks done, Rule #6 doc-existence 10/10, code-review PASS (B.3→B.2 fix). Phase C: 3-repo merged (main `edf153a` / aria `9861d45` / standards `a7317f0`), dual-remote pushed + SHA verified. 连续 2 轮拦截 git 数据源/ref 缺陷。triage closed #3. Source #58.
 > **Change ID**: `emergency-hotfix-and-audit-file-scope`
 > **Source**: Forgejo Aria [#58](https://forgejo.10cg.pub/10CG/Aria/issues/58) (3-in-1, filed v1.16.0; triage 缩水到 2 gap)
 > **决策来源**: [DEC-20260530-002](../../../.aria/decisions/2026-05-30-emergency-hotfix-and-audit-file-scope.md)
