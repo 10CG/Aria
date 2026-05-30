@@ -1,0 +1,194 @@
+metadata:
+  feature: ai-native-estimator
+  spec_path: openspec/changes/ai-native-estimator/
+  source: "aria-plugin #18"
+  datasource: "proposal.md ## Tasks (path B — no tasks.md)"
+  level: 2
+  target_version: aria-plugin v1.34.0
+  total_tasks: 8
+  generated_by: task-planner A.2/A.3
+  generated_at: "2026-05-30"
+  decision: DEC-20260530-001
+  post_spec: "CONVERGED R1→Rev1→R2→Rev2→R3 (3-round, 2 Critical caught pre-impl)"
+  notes: >
+    v1 Token-axis thin slice. Depends on aria-token-telemetry (#104) — Task 1.0 adds
+    additive iter_transcript_usage(). Rule #6 = deterministic structural substitute
+    (no LLM AB, internal data logic). 4-8h granularity relaxed (single-dev + Claude Code).
+
+tasks:
+  - id: TASK-001
+    parent: "1.0"
+    title: "[token-telemetry additive] iter_transcript_usage() per-turn iterator"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: []
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-token-telemetry/scripts/token_telemetry.py  # new iter_transcript_usage
+      - aria/skills/aria-token-telemetry/tests/test_token_telemetry.py  # new tests
+    description: >
+      Add iter_transcript_usage(path) -> list[{uuid, timestamp, session_id, usage}]
+      iterating all assistant records with usage (passthrough raw field names).
+      Existing parse_transcript_usage UNCHANGED. Existing 15 py tests zero regression.
+    verification:
+      - "iter returns list of per-turn dicts with uuid + timestamp + session_id + usage (raw field names)"
+      - "parse_transcript_usage behavior unchanged (existing tests pass)"
+      - "existing token-telemetry suite (current 15 tests) zero regression"
+
+  - id: TASK-002
+    parent: "1.5"
+    title: "config-loader ai_native_estimator namespace"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: []
+    parallel_with: [TASK-003]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/config-loader/DEFAULTS.json
+      - aria/skills/config-loader/config-example.md
+    description: >
+      Register ai_native_estimator.{min_samples:3, bootstrap_seed:{L1,L2,L3 tokens},
+      window:10, enabled:true} namespace + field docs.
+    verification:
+      - "DEFAULTS.json has ai_native_estimator with all 4 keys"
+      - "config-example.md documents each field"
+
+  - id: TASK-003
+    parent: "1.1"
+    title: "estimator.py core: watermark + capture"
+    status: done
+    complexity: L
+    priority: P0
+    dependencies: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/ai-native-estimator/scripts/estimator.py
+    description: >
+      watermark {last_uuid, last_timestamp, session_id, transcript_path} R/W +
+      capture: uuid-anchor incremental (uuid-miss→timestamp fallback+warn, end_uuid=range-end
+      record uuid; out-of-range→warn no-raise); idempotency PRIMARY=empty-range skip;
+      cycle_id={spec_slug}-{end_uuid[:8]} + secondary cycle_id scan; Σ raw→short keys;
+      work_metric=output+cache_creation; wall_clock null-safe; atomic tmp→os.replace;
+      watermark updated (incl transcript_path) after success.
+    r2_minor: "NEW-C-1 idempotency=empty-range; W-1 transcript_path post-success update; W-2 short-key map"
+    verification:
+      - "watermark empty-range rerun → skip, no append, watermark not advanced (idempotent)"
+      - "uuid-miss → timestamp fallback + warn; out-of-range → warn, no exception"
+      - "cycle_id = {spec_slug}-{end_uuid[:8]}, stable across reruns"
+      - "wall_clock null when timestamp missing; atomic write"
+
+  - id: TASK-004
+    parent: "1.2"
+    title: "estimator.py query: forecast / history / velocity"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-003]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/ai-native-estimator/scripts/estimator.py  # query API
+    description: >
+      forecast(spec_level): same-level only; N≥3 median(work_metric); N<3 →
+      {status:insufficient, have, need, bootstrap, uncalibrated:true}; cross-level isolation;
+      forecast(None)→{status:insufficient, reason:no_spec_level} no-raise.
+      history() null-safe. velocity(window=10, captured_at desc, 2-col, empty→[]).
+    verification:
+      - "forecast N<3 must include status==insufficient + uncalibrated==true + bootstrap"
+      - "cross-level isolation: L1 N<3 returns insufficient even if L2 N≥3"
+      - "forecast(None) → insufficient reason=no_spec_level, no raise"
+      - "velocity empty → [] no raise; work_metric + wall_clock two cols"
+
+  - id: TASK-005
+    parent: "1.3"
+    title: "ai-native-estimator SKILL.md"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-003, TASK-004]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/ai-native-estimator/SKILL.md
+    description: >
+      user-facing query usage + wall_clock semantic boundary (calendar≠effort) +
+      work_metric formula fixed string + variance/watermark schema docs + captured_at ms note.
+    verification:
+      - "SKILL.md documents query API + wall_clock calendar≠effort boundary"
+      - "work_metric formula string fixed; variance/watermark schema documented"
+
+  - id: TASK-006
+    parent: "1.4"
+    title: "phase-d-closer integration (capture sub-step)"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-003, TASK-002]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/phase-d-closer/SKILL.md
+    description: >
+      Add capture as phase-d-closer CURRENT-last D sub-step (verify current last-step number
+      at impl, do not hardcode D.3; advisory non-blocking). cycle_meta = spec_slug +
+      spec_level (read proposal.md frontmatter Level, no Spec→null) + n_tasks (detailed-tasks.yaml
+      count, none→null); cycle_id generated by estimator from range end_uuid; no transcript skip+warn.
+    verification:
+      - "phase-d末位 sub-step calls estimator.capture (advisory, non-blocking)"
+      - "spec_level read from proposal frontmatter Level; no Spec → null"
+      - "no transcript → skip + warn, no abort"
+
+  - id: TASK-007
+    parent: "1.6"
+    title: "tests + fixtures (Rule #6 structural substitute)"
+    status: done
+    complexity: L
+    priority: P0
+    dependencies: [TASK-001, TASK-003, TASK-004, TASK-006]
+    agent: qa-engineer
+    deliverables:
+      - aria/skills/ai-native-estimator/tests/
+      - aria-plugin-benchmarks/ai-native-estimator/  # fixtures
+    description: >
+      fixtures: multi-turn transcript (uuid+timestamp+sessionId) / partial transcript (uuid越界) /
+      null-timestamp transcript / variance.jsonl mixed-level / empty variance / missing variance /
+      watermark (stale uuid + session切换). Unit tests covering all 11 Success Criteria:
+      capture incremental / uuid-miss fallback / out-of-range warn-no-raise / forecast 3-state
+      (uncalibrated assert) / cross-level isolation / wall_clock derive+null / raw全存 /
+      spec_level cluster (incl null) / idempotent empty-range / velocity empty+window / forecast(None).
+    verification:
+      - "all 11 Success Criteria have covering tests"
+      - "fixtures cover all error paths (partial/null-ts/empty/missing/mixed-level/session-switch)"
+      - "deterministic, no LLM (Rule #6 substitute)"
+
+  - id: TASK-008
+    parent: "1.7"
+    title: "cross-project portability verify"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-003, TASK-006]
+    agent: qa-engineer
+    deliverables:
+      - aria/skills/ai-native-estimator/tests/  # portability test
+    description: >
+      no-transcript sandbox project → capture skip+warn no-error; enabled:false → capture not triggered.
+    verification:
+      - "no-transcript → skip + warn, no exception"
+      - "enabled:false → capture not triggered"
+
+execution_order:
+  - TASK-001                 # token-telemetry iter API (foundation)
+  - [TASK-002, TASK-003]     # config namespace ∥ estimator core (both after 001; 002 independent)
+  - TASK-004                 # query API (after core)
+  - [TASK-005, TASK-006]     # SKILL.md ∥ phase-d integration
+  - TASK-007                 # tests (after all impl)
+  - TASK-008                 # portability
+
+summary:
+  by_complexity:
+    S: 3   # 002, 005, 008
+    M: 3   # 001, 004, 006
+    L: 2   # 003, 007
+  critical_path: "001 → 003 → 004 → 006 → 007"
+  rule6: "deterministic structural substitute (no LLM AB)"
+  version_bump: "aria-plugin v1.33.0 → v1.34.0 (new skill + token-telemetry additive)"
