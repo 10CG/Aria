@@ -3,7 +3,7 @@ metadata:
   spec_path: openspec/changes/concurrent-session-upm-safety/
   datasource: "tasks.md"
   source_issue: "Forgejo Aria #133 (dogfood: 10CG/SilkNode 双 session)"
-  status_basis: "Draft (合并版 — 双 #133 Spec 对账合并 per owner 2026-05-30); (b)backbone audit-CONVERGED, (a)/(c) 吸收 sister 未收敛 R2-CARRY → 建议 focused re-audit"
+  status_basis: "Approved (合并版 — 双 #133 Spec 对账合并 per owner 2026-05-30); (b)backbone 2-round CONVERGED + (a)/(c) focused re-audit R1(FAIL 2C)→Rev1→R2 CONVERGED 2026-05-30 (all Critical+Important CLOSED, 剩 Minor doc-hygiene)"
   merged_from: ["concurrent-session-upm-safety (本, b-convention CONVERGED)", "concurrent-track-proactive-coordination (sister, a/c 机制 未收敛)"]
   total_tasks: 9
   target_version: "aria-plugin v1.37.0 (tentative — Phase B step 0 复核)"
@@ -12,7 +12,7 @@ metadata:
 
 tasks:
   - id: TASK-000
-    parent: "0.1, 0.2, 0.3, 0.4"
+    parent: "0.0, 0.1, 0.2, 0.3, 0.4"
     title: "【前置】collision 字段持久化 (phantom-field fix, sister R1 C1)"
     status: pending
     complexity: M
@@ -24,14 +24,20 @@ tasks:
       - aria/skills/state-scanner/references/state-snapshot-schema.md
       - aria/skills/state-scanner/references/layer-l-integration.md
     description: >
-      抽 `_classify_collision` (renderer-local) 为共享 helper `classify(tracks)`→{kind,groups}
-      (新函数非 promote, 同 owner+container→none); collector 持久化 `tracks_multibranch.collision`
-      (additive, bump schema); renderer 改读 (回归 0, 老 snapshot fallback); meta-fix
-      layer-l-integration.md stale 字段名。Phase B 评估是否拆独立 prereq Spec (sister R2-CARRY #1:
-      含 _track_to_claim_record→reconcile_all 链, 远超抽函数)。
+      [0.0 FIRST] meta-fix `layer-l-integration.md:23,69` phantom 字段名 (collision_type/has_collision,
+      从未实现) — Phase 0 最先独立 commit (R1 C2)。
+      [0a] 新建 `lib/collision.py` 封装真实管线 (非抽函数, R1 C1): 公共 API `classify(tracks: list[dict])`
+      (collector 直接传 tracks)→ 内部经 `_track_to_claim_record`(处理可 raise ValueError) + `reconcile_all`
+      → 对 verdict 调 `_classify_collision(claims: list[ClaimRecord])`; 返回 `{kind, groups: list[list[str]]}`
+      (render-only emoji 丢弃; 同 (owner,container) 全相同→none 排除 self-serial)。collector 持久化
+      `tracks_multibranch.collision` (additive, bump schema)。
+      [0b] renderer 改读共享字段 (回归 0; 老 snapshot 无字段→.get() fallback {"kind":"none","groups":[]})。
+      字段 advisory-only, 不作 gating 输入 (lossy approximation, R1 I5)。
     verification:
+      - "0.0 meta-fix 首个 commit: layer-l-integration.md 无 phantom 字段名"
+      - "classify() 公共入参 list[dict] tracks; 内部转 list[ClaimRecord] 喂 _classify_collision (R1 C1)"
       - "tracks_multibranch.collision additive 持久化; helper unit test 跑真实 collector 输出 fixture"
-      - "renderer 改读共享字段回归 0; layer-l-integration.md 无 phantom 字段名"
+      - "renderer .get() fallback 回归 0; 字段标 advisory-only"
 
   - id: TASK-001
     parent: "1.1, 1.2, 1.3"
@@ -112,12 +118,18 @@ tasks:
     agent: backend-architect
     deliverables: [aria/skills/phase-d-closer/]
     description: >
-      D.1 写 UPM 前: default-branch 解析 (symbolic-ref→master→main, sync.py chain) + fresh fetch
-      (timeout=30, 独立 1.16 缓存; 失败复用 coordination_fetch error_kind + soft-warn, 不回显 raw stderr,
-      不阻塞) + behind-check (git.py 手法)。触发 iff behind>0 且 (collision!=none 或 触及 upm.source_file
-      [git log --name-only ∩]); 触及 UPM→强提示; 纯 behind>0→静默。fail-soft ≠ C.2.4.5 fail-hard。
+      插入点: phase-d-closer/references/execution-steps.md D.1 action 起始, 写 UPM 前 (R1 I8)。
+      (a) default-branch: 自实现 `git symbolic-ref refs/remotes/origin/HEAD`→fallback master→main
+      (无现成 resolver; sync.py `_ORIGIN_HEAD_REFS` 仅 fallback 顺序数据常量, R1 I1)。
+      (b) fresh fetch (timeout=30, 独立 1.16 缓存; 失败复用 coordination_fetch._classify_error error_kind
+      [network/auth_403/non_ff/git_missing/other] + soft-warn, 不回显 raw stderr, 不阻塞)。
+      (c) behind-check: 复用 `git rev-list --left-right --count` 命令形态 (sync.py:146 锁 @{upstream};
+      切口1 需 HEAD...origin/<def> → 复用 pattern 非调函数, R1 I2)。触发 iff behind>0 且 (collision!=none
+      或 触及 upm.source_file; source_file==None null-guard 跳过, R1 I4); 触及 UPM→强提示; 纯 behind>0→静默。
+      fail-soft ≠ C.2.4.5 fail-hard。
     verification:
       - "origin ahead + UPM-touch → 强提示; ahead 非 UPM + collision none → 静默"
+      - "upm.source_file==None null path fixture (R1 I4); credential 不泄漏断言 (含 token stderr → soft-warn 不含, R1 I7)"
       - "离线 fixture → soft-warn 不阻断 (测 fail-soft 路径)"
 
   - id: TASK-007
@@ -154,5 +166,5 @@ execution_order:
 notes:
   - "合并: 主解药 (b)convention [本] + (a)/(c) 深度机制 [sister 吸收]; collision 持久化 (TASK-000) 是 (a)/(c) 共同前置"
   - "Agent (A.3): tech-lead=设计+收尾; knowledge-manager=convention+doc; backend-architect=collision helper+检测+fetch-gate"
-  - "建议: 合并版 (a)/(c) 部分 focused re-audit 收敛 sister R2-CARRY 后再进 Phase B"
+  - "(a)/(c) focused re-audit DONE 2026-05-30: R1 FAIL(2C)→Rev1→R2 CONVERGED (3 agent: tech-lead PASS / qa PWW / backend PASS; all Critical+Important CLOSED; 剩 Minor doc-hygiene) → Approved, 可进 Phase A.3/B"
   - "关键路径: TASK-000/001 → TASK-002 → TASK-005/006 → TASK-007 → TASK-008"

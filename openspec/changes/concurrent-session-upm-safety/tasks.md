@@ -5,10 +5,13 @@
 
 ## 0. 【前置·共同依赖】collision 字段持久化 (sister R1 C1 phantom-field fix)
 
-- [ ] 0.1 抽 `_classify_collision` (renderer-local) 为共享 helper `classify(tracks)` → `{kind, groups}` (同 owner+container→none); **新函数**非直接 promote (sister R2-CARRY #2)
-- [ ] 0.2 `handoff_multibranch` collector 调用 + 持久化 `tracks_multibranch.collision` (additive, bump schema); helper 配 unit test 跑**真实** collector 输出 fixture
-- [ ] 0.3 `track_board` renderer 改读共享字段 (回归 0; 老 snapshot 无字段 → fallback) + meta-fix `layer-l-integration.md:23,69` stale 字段名
-- [ ] 0.4 Phase B 评估: 此项 (含 `_track_to_claim_record→reconcile_all` 链) 是否拆独立 prereq Spec (sister R2-CARRY #1)
+> **R1 裁定 (不拆独立 Spec)**: 无独立用户价值 → 本 Spec 内拆 0a/0b。**真实管线** = `tracks[]→_track_to_claim_record(lossy,可 raise)→reconcile_all→_classify_collision(claims: list[ClaimRecord])`, **非抽函数** (R1 C1)。
+
+- [ ] 0.0 **meta-fix 前置 (最先执行)**: 修 `layer-l-integration.md:23,69` stale phantom 字段名 `collision_type`/`has_collision` (从未实现, 防 AI 读旧文档传播 phantom; R1 C2)
+- [ ] 0.1 **(0a-helper)** 新建共享模块 (e.g. `lib/collision.py`) 封装整条管线为 `classify(tracks) -> {kind: none|cross_owner|self_multi_container, groups: list[list[str]]}`; 内部经 `_track_to_claim_record` (处理其可 raise ValueError) + `reconcile_all`; **render-only emoji 丢弃**; 同 `(owner,container)` 全相同→none 排除 self-serial (R1 M3); helper 输入是转换后 `list[ClaimRecord]` 非 `tracks[]` 直喂 (R1 C1/I3)
+- [ ] 0.2 **(0a-collector)** `handoff_multibranch` collector 调用 `classify` + 持久化 `tracks_multibranch.collision` (additive, bump schema); 配 unit test 跑**真实** `collect_handoff_multibranch` 输出 fixture (非手搓 schema)
+- [ ] 0.3 **(0b-renderer)** `track_board` renderer 改读共享 `collision` 字段 (回归 0; 老 snapshot 无字段→`.get()` fallback `{"kind":"none","groups":[]}`)
+- [ ] 0.4 **持久化 collision 字段标注 advisory-only** (R1 I5): schema 文档明确该字段不作任何 gating 输入 (lossy approximation 不升格决策依据)
 
 ## 1. 设计边界确认 (锚定双审计定案)
 
@@ -30,17 +33,18 @@
 
 ## 4. 【辅助·早发现】切口2 — 并发 churn 检测 (state-scanner, advisory)
 
-- [ ] 4.1 阶段 2 advisory iff `tracks_multibranch.collision.kind != none` 且 config `coordination.enabled == false` (config 读非 snapshot)
+- [ ] 4.1 阶段 2 advisory iff `tracks_multibranch.collision.kind != none` 且 config `coordination.enabled == false` (config 读非 snapshot; **读取插入点 = scan 推荐逻辑层, 非 renderer/collector**, R1 I8)
 - [ ] 4.2 **disjointness**: 切口2 iff enabled==false; cross_owner→phase1_gate iff enabled==true (enabled 互斥, 绝不双触发)
 - [ ] 4.3 提示含一键启用 config 片段; 判定不依赖"谁" (collision helper 按 owner+container 归类)
-- [ ] 4.4 fixture (真实 collector 输出, 含边界): 并发→提示; collision none + behind 0 → 不出现 (负向 AC-3)
+- [ ] 4.4 fixture (真实 collector 输出, 含边界, **三态** R1 I6): (a) enabled==false+collision!=none→提示; (b) enabled==true+collision!=none→切口2 不出现 (phase1_gate 处理); (c) enabled==true+collision==none→均不出现; (d) collision none + behind 0 → 不出现 (负向 AC-3)
 
 ## 5. 【辅助·写前同步】切口1 — phase-d-closer 收尾 fetch-gate (fail-soft)
 
-- [ ] 5.1 D.1 写 UPM 前: default-branch 解析 (symbolic-ref→master→main, sync.py:36-41 chain)
-- [ ] 5.2 fresh fetch (timeout=30, 独立 1.16 缓存); 失败仅复用 coordination_fetch error_kind + soft-warn, **不回显 raw stderr**, 不阻塞
-- [ ] 5.3 behind-check (git.py:167 手法); 触发 iff `behind>0 且 (collision.kind!=none 或 commits 触及 upm.source_file)`; 触及 UPM→强提示; 纯 behind>0→静默
-- [ ] 5.4 fixture: origin ahead + UPM-touch commit → 强提示; ahead 非 UPM + collision none → 静默; 离线 → soft-warn 不阻断 (测 fail-soft 路径)
+- [ ] 5.0 插入点: `phase-d-closer/references/execution-steps.md` D.1 action 起始, 写 UPM **前**新增 fetch-gate 子步骤 (R1 I8)
+- [ ] 5.1 D.1 写 UPM 前: default-branch 解析 — **自实现** `git symbolic-ref refs/remotes/origin/HEAD`→fallback `origin/master`→`origin/main` (**无现成 resolver 可调**; sync.py `_ORIGIN_HEAD_REFS` 仅 fallback 顺序数据常量, R1 I1)
+- [ ] 5.2 fresh fetch (timeout=30, 独立 1.16 缓存); 失败仅复用 `coordination_fetch._classify_error` 的 error_kind enum (`network`/`auth_403`/`non_ff`/`git_missing`/`other`) + soft-warn, **不回显 raw stderr**, 不阻塞
+- [ ] 5.3 behind-check — 复用 `git rev-list --left-right --count` **命令形态** (git.py:147/sync.py:146, 但其锁 `@{upstream}`; 切口1 需 `HEAD...origin/<def>` → 复用 pattern 非调函数, R1 I2); 触发 iff `behind>0 且 (collision.kind!=none 或 commits 触及 upm.source_file)`; **`upm.source_file==None` null-guard 跳过 UPM-touch (R1 I4)**; 触及 UPM→强提示; 纯 behind>0→静默
+- [ ] 5.4 fixture: (a) origin ahead + UPM-touch commit → 强提示; (b) ahead 非 UPM + collision none → 静默; (c) 离线 → soft-warn 不阻断; (d) **`upm.source_file==None` null path** (无 UPM 项目, R1 I4); (e) **credential 不泄漏断言** — 失败 stderr 含 token, 断言 soft-warn 输出不含该 token 字面 (R1 I7)
 
 ## 6. 文档同步 + 收尾 (Rule #3 + self-dogfood)
 
