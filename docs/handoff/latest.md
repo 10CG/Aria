@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #133-SPEC-APPROVED — 🟢 **#133 concurrent-session-upm-safety (a)/(c) re-audit CONVERGED → Approved** (2026-05-30 ~16:05 UTC, dev-claude)
+## ★ 最新 session #133-PHASE-B-TASK000 — 🟢 **#133 Phase B: TASK-000 (collision 持久化) DONE** (2026-05-30 ~17:20 UTC, dev-claude)
 
-**Latest**: [2026-05-30-133-spec-approved-phase-b-ready.md](./2026-05-30-133-spec-approved-phase-b-ready.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-133-phase-b-task000-done.md](./2026-05-30-133-phase-b-task000-done.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-133-PHASE-B-TASK000 display)**: [2026-05-30-133-phase-b-task000-done.md](./2026-05-30-133-phase-b-task000-done.md) — Phase B 启动 + **TASK-000 (前置 collision 字段持久化) 全部完成**。aria submodule 分支 `feature/concurrent-session-upm-safety` (5 commits, **未 push**): 0.0 meta-fix phantom 字段 + 0a 新建 `lib/collision.py` (单一真理源, `classify(tracks)->{kind,groups}` 经 reconcile_all) + collector 持久化 `tracks_multibranch.collision` (additive) + 0b renderer 改读 lib + 16 collision tests (含**真实-collector fixture** AC-0) + fix (3 真实 bug: collector NameError / classify staleness / test builder)。**711/711 tests PASS, 0 regression**。磁盘清理 ~5G (93%→63%)。**⚠️ 本 session 后半 shell 输出严重损坏** (重复行/EOF 泄漏/log 乱序) → 改文件中转验证。**主 carry**: Phase B 续 = **TASK-002** (convention 主解药, standards 仓) → TASK-003/005/006 → TASK-004/007/008 ship v1.37.0。**Next**: #133 Phase B > v1.29.0 D+14 (06-07 owner) > M6 Phase B (sister ~06-01)。
+
+## ★ 前 session #133-SPEC-APPROVED — 🟢 **#133 concurrent-session-upm-safety (a)/(c) re-audit CONVERGED → Approved** (2026-05-30 ~16:05 UTC, dev-claude)
+
+**Latest (T-133-SPEC-APPROVED)**: [2026-05-30-133-spec-approved-phase-b-ready.md](./2026-05-30-133-spec-approved-phase-b-ready.md) — display-only (本 session #133-PHASE-B-TASK000 已接替主线 bare pointer)
 
 **Latest (T-133-SPEC-APPROVED display)**: [2026-05-30-133-spec-approved-phase-b-ready.md](./2026-05-30-133-spec-approved-phase-b-ready.md) — 接前 session #133 双-Spec 合并 P1 carry。**focused post_spec re-audit** 收敛合并版 (a)/(c) sister R2-CARRY: **R1 FAIL(2 Critical+8 Important, 3 agent 真代码核验)→Rev1→R2 CONVERGED** (tech-lead PASS / qa PWW / backend PASS)。R1 拦截全是 phantom-reuse (classify 输入类型错配 / sync.py symbolic-ref 不存在 / git.py:167 off-target)。**TASK 0.4 裁定: 不拆独立 prereq Spec → 本 Spec 内拆 0a/0b**。Spec **Draft→Approved** (主仓 `d203687`, 含 R1+R2 报告)。**主 carry**: Approved → **下一步 Phase B** (TASK-000 0.0 meta-fix 首 commit → 0a lib/collision.py + collector → 0b renderer → TASK-002 convention)。target v1.37.0。`d203687` 未 push。**Next**: #133 Phase B > v1.29.0 D+14 (06-07 owner) > M6 Phase B (sister ~06-01)。
 
