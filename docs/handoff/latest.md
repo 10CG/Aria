@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #CTXMON-SHIP — 🎉 **#104 aria-context-monitor SHIPPED v1.33.0 (full A.2→D cycle)** (2026-05-29 ~06:07 UTC, dev-claude)
+## ★ 最新 session #ESTIMATOR-SHIP — 🎉 **#18 ai-native-estimator SHIPPED v1.34.0 (full brainstorm→A→D)** (2026-05-30 ~01:22 UTC, dev-claude)
 
-**Latest**: [2026-05-29-aria-context-monitor-shipped-v1.33.0.md](./2026-05-29-aria-context-monitor-shipped-v1.33.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-ai-native-estimator-shipped-v1.34.0.md](./2026-05-30-ai-native-estimator-shipped-v1.34.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-ESTIMATOR-SHIP display)**: [2026-05-30-ai-native-estimator-shipped-v1.34.0.md](./2026-05-30-ai-native-estimator-shipped-v1.34.0.md) — 本 session 第 2 个 full ship (前 #104 v1.33.0)。**#18 estimator** = Token 轴 cycle 工作量估算 v1 薄切片 (替代 4-8h 人工时假设)。8-turn brainstorm (7 DEC) → **post_spec 3-round CONVERGED** (R1 3/3 REVISE → Rev1 → R2 2PWW+1 NEW Critical → Rev2 → R3 2/2 PWW) —— spike-verified transcript schema **实施前拦截 2 个 load-bearing 缺陷** (parse_transcript_usage 复用错配 + cycle_id 幂等自相矛盾)。新 skill `ai-native-estimator` (forecast/history/velocity) + `aria-token-telemetry` 加 `iter_transcript_usage` (additive) + **phase-d-closer D.4** 收尾自动 capture (cycle 粒度 watermark, 幂等=空区间)。work_metric=output+cache_creation; wall_clock=被动元数据(非工作量)。40 deterministic tests。**aria-plugin v1.34.0** (aria `b489211` / main `d5130c7`, 双远程 SHA 全验证)。D.4 dogfood 实证 (capture 本 cycle work_metric 5.4M)。#18 closed。**Next**: #58 skill 改进 (owner 选的第 2 项) > v1.29.0 block-flip D+14 > CLAUDE.md v1.34.0 同步。
+
+## ★ 前 session #CTXMON-SHIP — 🎉 **#104 aria-context-monitor SHIPPED v1.33.0 (full A.2→D cycle)** (2026-05-29 ~06:07 UTC, dev-claude)
 
 **Latest (T-CTXMON-SHIP display)**: [2026-05-29-aria-context-monitor-shipped-v1.33.0.md](./2026-05-29-aria-context-monitor-shipped-v1.33.0.md) — 接前 session P1 carry-forward (#104 Phase B)。**2 新 skill** (`aria-context-monitor` user-facing + `aria-token-telemetry` internal, git-remote-helper Layer3 先例) + statusLine relay 机制。让 AI 机读 runtime-truth context 占用 (实测 relay 路径与状态栏 **0 偏差** = #104 22% drift 根因修复)。**TASK-001 BLOCKING gate** live-verified `context_window_size` 存在 (runtime 2.1.156)。3 档 fallback + window 4 档 resolve + 口径分离 (used_percentage vs used_percentage_proxy)。aria-doctor v1.2.0 `check_context_relay` 3 态。25 deterministic tests (Rule #6 substitute)。**aria-plugin v1.33.0** (aria `44b3e00` / main `e9baa4e` / archive `bd3ce37`, 双远程 SHA 全验证)。主仓 README badge drift 修 (1.28.0→1.33.0)。#104 commented + closed。**Next**: v1.29.0 block-flip D+14 (owner F1) > #18 estimator (复用 token-telemetry) > Sprint2 C7+C8 > M6 余下 Spec。
 
