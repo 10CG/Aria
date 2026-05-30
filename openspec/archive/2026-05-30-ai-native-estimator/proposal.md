@@ -1,7 +1,7 @@
 # ai-native-estimator — Token 轴工作量估算 (v1 薄垂直切片)
 
 > **Level**: 2 (Minimal — proposal.md only; 1 new skill + phase-d 集成 + 本地存储, 不跨多 service)
-> **Status**: ✅ **Approved** — Phase A.2 CONVERGED 2026-05-30 via R1 (3/3 REVISE, 3 convergent Critical: parse_transcript_usage 复用错配 + transcript 字段未验 + cycle_meta 来源) → Rev1 → R2 (2 PWW + 1 REVISE: NEW-C-1 幂等自相矛盾, backend 发现 + qa corroborate) → Rev2 → R3 (2/2 PASS_WITH_WARNINGS, 0 new Critical, tech-lead CONVERGED)。Level 2 baseline + spike-verified transcript schema。2 doc-hygiene warning 已清。
+> **Status**: ✅ **Shipped** (aria-plugin v1.34.0, 2026-05-30) — Phase A.2 CONVERGED via R1 (3/3 REVISE) → Rev1 → R2 (2 PWW + 1 NEW Critical: cycle_id 幂等) → Rev2 → R3 (2/2 PWW, 0 new Critical). Phase B: 8 tasks done, 40 deterministic tests, code-review PASS (0 Crit/0 Imp, 3 Minor 吸收). Phase C: merged main `9d983fb` / aria `b489211`, dual-remote pushed + SHA verified. spike-verified transcript schema 实施前拦截 2 load-bearing 缺陷。Refs #18.
 > **Change ID**: `ai-native-estimator`
 > **Source**: Forgejo aria-plugin [#18](https://forgejo.10cg.pub/10CG/aria-plugin/issues/18)
 > **决策来源**: [DEC-20260530-001](../../../.aria/decisions/2026-05-30-ai-native-estimator-v1-architecture.md)
