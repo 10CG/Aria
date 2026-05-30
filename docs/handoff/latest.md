@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #HOTFIX-FILESCOPE-SHIP — 🎉 **#58 emergency-hotfix + audit file-scope SHIPPED v1.35.0** (2026-05-30 ~03:13 UTC, dev-claude)
+## ★ 最新 session #M6-COST-HOTFIX-DEPLOY — 🎉 **M6 cost-snapshot `created_at` hotfix SHIPPED + DEPLOYED** (2026-05-30 ~08:54 UTC, dev-claude)
 
-**Latest**: [2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md](./2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-m6-cost-snapshot-hotfix-deployed.md](./2026-05-30-m6-cost-snapshot-hotfix-deployed.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-M6-COST-HOTFIX-DEPLOY display)**: [2026-05-30-m6-cost-snapshot-hotfix-deployed.md](./2026-05-30-m6-cost-snapshot-hotfix-deployed.md) — state-scanner 入口 → M6 e2e-resilience Phase B 闸门 FAIL (0/3 snapshot) → **逐层诊断出 4 层 blocker 链** (cron 从未部署 → 节点代码旧 → 节点 git 凭据过期 → **真根因: Spec #1 cost SQL 查不存在的 `created_at` 列**, cost-snapshot 对真 prod DB 从未跑通)。**emergency_hotfix cycle**: owner 拍板 `COALESCE(cycle_start_ts, state_entered_at)` → TDD (RED real-schema test → fix 2 SQL + 3 fixture 修 + **新 anti-recurrence regression gate** test_m6_cost_snapshot_real_schema.py) → code-reviewer 1 轮 PASS → Prod-Validated (read-only 真 DB) → PR #21 merge **aria-orch `72fa62b`** / 主仓 **`3183401`** (rebase over 另一终端 `eb7052e` 零冲突)。**部署 light-1** (节点刷新 72fa62b via git bundle 绕过过期凭据 + cron 重部署 + smoke `7ce85072` exit 0 + **cost.json + cost-2026-05-30.json 生成**, rolling **1/3**)。教训: archived Spec 可 prod 完全非功能 (`feedback_shipped_archived_spec_can_be_nonfunctional_on_prod`)。**Next**: ~2026-06-01 (3-day 满) **在 light-1 上**跑 Phase B 闸门 (Blocker #2: dev 读不到 node-local snapshot) > 节点 git 凭据修 (#-1) > v1.29.0 block-flip D+14 (2026-06-07)。
+
+## ★ 前 session #HOTFIX-FILESCOPE-SHIP — 🎉 **#58 emergency-hotfix + audit file-scope SHIPPED v1.35.0** (2026-05-30 ~03:13 UTC, dev-claude)
+
+**Latest (T-HOTFIX-FILESCOPE-SHIP)**: [2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md](./2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md) — display-only (本 session 2026-05-30 M6 cost-hotfix 已接替主线 bare pointer)
 
 **Latest (T-HOTFIX-FILESCOPE-SHIP display)**: [2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md](./2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md) — 本 session **第 3 个 full ship** (前 #104 v1.33.0 + #18 v1.34.0)。#58 (3-in-1 from SilkNode hotfix) **triage 缩水** (#3 已 v1.34.0 默认→close) → 做 #1 emergency hotfix lane (advisory; state-scanner `emergency_hotfix` 规则 priority 1.85 + phase-b **Prod-Validated commit trailer 机检 gate** + pre_merge→convergence) + #2 audit file-scope 二次过滤 (全 ops/docs ⊆ scope_skip_paths → challenge 降级 convergence; audit-engine 自取 **merge-base diff**)。**post_spec 3-round CONVERGED** —— 连续 2 轮拦截 git 数据源/ref load-bearing 缺陷 (changes collector 无路径 + `diff HEAD` pre_merge 漏已提交变更)。Rule #6 doc-existence 10/10。code-review PASS (B.3→B.2 cross-skill fix)。**v1.35.0** (aria `9861d45` / standards `a7317f0` / main `107d9f4`, 3-repo 双远程验证)。sister v1.34.1 CRLF hotfix #132 rebase 整合无 regression。D.4 dogfood (capture 769k incremental). #58 closed。**Next**: v1.29.0 block-flip D+14 (owner F1) > CLAUDE.md v1.35.0 同步 > memory 候选评估。
 
