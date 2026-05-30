@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #CLOSEOUT-133-SPEC-MERGED — 🎉 **shell-jq-crlf v1.36.0 ship + #133 双-Spec 对账合并** (2026-05-30 ~14:13 UTC, dev-claude)
+## ★ 最新 session #133-SPEC-APPROVED — 🟢 **#133 concurrent-session-upm-safety (a)/(c) re-audit CONVERGED → Approved** (2026-05-30 ~16:05 UTC, dev-claude)
 
-**Latest**: [2026-05-30-session-closeout-133-spec-merged.md](./2026-05-30-session-closeout-133-spec-merged.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-133-spec-approved-phase-b-ready.md](./2026-05-30-133-spec-approved-phase-b-ready.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-133-SPEC-APPROVED display)**: [2026-05-30-133-spec-approved-phase-b-ready.md](./2026-05-30-133-spec-approved-phase-b-ready.md) — 接前 session #133 双-Spec 合并 P1 carry。**focused post_spec re-audit** 收敛合并版 (a)/(c) sister R2-CARRY: **R1 FAIL(2 Critical+8 Important, 3 agent 真代码核验)→Rev1→R2 CONVERGED** (tech-lead PASS / qa PWW / backend PASS)。R1 拦截全是 phantom-reuse (classify 输入类型错配 / sync.py symbolic-ref 不存在 / git.py:167 off-target)。**TASK 0.4 裁定: 不拆独立 prereq Spec → 本 Spec 内拆 0a/0b**。Spec **Draft→Approved** (主仓 `d203687`, 含 R1+R2 报告)。**主 carry**: Approved → **下一步 Phase B** (TASK-000 0.0 meta-fix 首 commit → 0a lib/collision.py + collector → 0b renderer → TASK-002 convention)。target v1.37.0。`d203687` 未 push。**Next**: #133 Phase B > v1.29.0 D+14 (06-07 owner) > M6 Phase B (sister ~06-01)。
+
+## ★ 前 session #CLOSEOUT-133-SPEC-MERGED — 🎉 **shell-jq-crlf v1.36.0 ship + #133 双-Spec 对账合并** (2026-05-30 ~14:13 UTC, dev-claude)
 
 **Latest (T-CLOSEOUT-133-SPEC-MERGED display)**: [2026-05-30-session-closeout-133-spec-merged.md](./2026-05-30-session-closeout-133-spec-merged.md) — session-end closeout。本 session: **#132 P0 hotfix v1.34.1** + **shell-jq-crlf-hardening L3 全 A-D ship v1.36.0** (311 assertions, post_spec 3-round CONVERGED 拦 2 Critical) + **#133 triage → Spec Phase A (2-round CONVERGED)**。**关键: #133 撞 sister 并发起的竞争 Spec `concurrent-track-proactive-coordination` → owner 决策"合并为单一 Spec"** → 以本 (b)convention 主解药 + 审计 C1 因果框架为骨架, 吸收 sister (a)/(c) 深度机制 (collision 字段持久化 + phase-d fresh-fetch + R1/R2 9 findings), sister dir 归并删 (audit 保留 trail)。合并 Spec `concurrent-session-upm-safety` (主仓 `5e15beb`)。**主 carry**: 合并 Spec Status Draft, **(a)/(c) 待 focused re-audit** 收敛 sister R2-CARRY → 再 Phase B (9 TASK, 0 started)。#133 open。**Next**: #133 (a)/(c) re-audit → Phase B > v1.29.0 block-flip D+14 (06-07 owner) > M6 Phase B (sister ~06-01 light-1) > audit 集群 #54/#95。**前序 arc handoff**: `2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md` (shell-jq-crlf ship 详情)。
 
