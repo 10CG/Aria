@@ -1,0 +1,158 @@
+metadata:
+  feature: concurrent-session-upm-safety
+  spec_path: openspec/changes/concurrent-session-upm-safety/
+  datasource: "tasks.md"
+  source_issue: "Forgejo Aria #133 (dogfood: 10CG/SilkNode 双 session)"
+  status_basis: "Draft (合并版 — 双 #133 Spec 对账合并 per owner 2026-05-30); (b)backbone audit-CONVERGED, (a)/(c) 吸收 sister 未收敛 R2-CARRY → 建议 focused re-audit"
+  merged_from: ["concurrent-session-upm-safety (本, b-convention CONVERGED)", "concurrent-track-proactive-coordination (sister, a/c 机制 未收敛)"]
+  total_tasks: 9
+  target_version: "aria-plugin v1.37.0 (tentative — Phase B step 0 复核)"
+  complexity_summary: "3S + 5M + 1L"
+  design_constraint: "advisory-over-hardlock (DEC-20260519-001); 主解药=convention (TASK-002/003), 检测/fetch=advisory 辅助"
+
+tasks:
+  - id: TASK-000
+    parent: "0.1, 0.2, 0.3, 0.4"
+    title: "【前置】collision 字段持久化 (phantom-field fix, sister R1 C1)"
+    status: pending
+    complexity: M
+    dependencies: []
+    agent: backend-architect
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py
+      - aria/skills/state-scanner/scripts/renderers/track_board.py
+      - aria/skills/state-scanner/references/state-snapshot-schema.md
+      - aria/skills/state-scanner/references/layer-l-integration.md
+    description: >
+      抽 `_classify_collision` (renderer-local) 为共享 helper `classify(tracks)`→{kind,groups}
+      (新函数非 promote, 同 owner+container→none); collector 持久化 `tracks_multibranch.collision`
+      (additive, bump schema); renderer 改读 (回归 0, 老 snapshot fallback); meta-fix
+      layer-l-integration.md stale 字段名。Phase B 评估是否拆独立 prereq Spec (sister R2-CARRY #1:
+      含 _track_to_claim_record→reconcile_all 链, 远超抽函数)。
+    verification:
+      - "tracks_multibranch.collision additive 持久化; helper unit test 跑真实 collector 输出 fixture"
+      - "renderer 改读共享字段回归 0; layer-l-integration.md 无 phantom 字段名"
+
+  - id: TASK-001
+    parent: "1.1, 1.2, 1.3"
+    title: 设计边界确认 (锚定双审计定案)
+    status: pending
+    complexity: S
+    dependencies: []
+    agent: tech-lead
+    deliverables: [openspec/changes/concurrent-session-upm-safety/proposal.md]
+    description: >
+      锚定: 不 auto-enable/不硬锁; 主解药=convention; 复用边界 (tracks_multibranch 无条件采集 /
+      coordination.enabled config 键非 snapshot / C.2.4.5 fail-hard≠本 fail-soft / History prepend L5 不动);
+      #54 独立+交叉引用。
+    verification: ["proposal 定案与双 audit 报告一致, 后续任务无歧义"]
+
+  - id: TASK-002
+    parent: "2.1, 2.2, 2.4"
+    title: "【主解药】共享区 concurrent-safe 写法约定"
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    agent: knowledge-manager
+    deliverables: [standards/conventions/]
+    description: >
+      共享 thrash 区 (line-3 pointer / UPM body) append-friendly 或 per-session 隔离
+      (History prepend-desc 不动 L5); followup #NNN 表避免多 session 同 row (per-session sub-row /
+      轻量标记, 非复用 claim_lifecycle); 单 session 降级 + 正/反 pattern + exception。
+    verification:
+      - "翻转可验: 两 session 各按新约定写 → diff 无 conflict marker (旧写法产生 = 翻转)"
+      - "History prepend-desc 不动 (不撞 L5 forbidden)"
+
+  - id: TASK-003
+    parent: "2.3"
+    title: "【主解药】AI 记录外部状态硬证据自律约定 (Problem-2)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-001]
+    agent: knowledge-manager
+    deliverables: [standards/conventions/]
+    description: >
+      AI 在 handoff/UPM 记录外部系统状态须引硬证据 (RETURNING/显式 timestamp), 禁 updated_at
+      app-level 软代理作 canonical (Problem-2 根因)。作用域=AI 记录自律, 非用户 DB schema。#54 交叉引用。
+    verification: ["作用域限定 AI 记录非用户 DB; #54 交叉引用 (独立不合并)"]
+
+  - id: TASK-004
+    parent: "3.1, 3.2"
+    title: convention 机械 guard 评估
+    status: pending
+    complexity: M
+    dependencies: [TASK-002, TASK-003]
+    agent: backend-architect
+    deliverables: [aria/skills/state-scanner/]
+    description: 评估轻量 checker (followup dup-row / 共享区违规) vs 纯文档 dogfood; 按结论实现 guard (含自测) 或定 dogfood 验收标准。
+    verification: ["结论记录: guard+自测 或 dogfood 验收标准 (非纯自觉)"]
+
+  - id: TASK-005
+    parent: "4.1, 4.2, 4.3, 4.4"
+    title: "【辅助】切口2 — 并发 churn 检测 (state-scanner, advisory)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-000, TASK-002]
+    agent: backend-architect
+    deliverables: [aria/skills/state-scanner/]
+    description: >
+      阶段 2 advisory iff `collision.kind!=none` 且 config `coordination.enabled==false` (config 读)。
+      disjointness: 切口2 iff enabled==false / phase1_gate iff enabled==true (互斥)。判定不依赖"谁"
+      (collision helper 按 owner+container 归类)。提示含一键启用片段。不 auto-enable。
+    verification:
+      - "并发 fixture (真实 collector 输出) → advisory; disjointness 两态互斥可测"
+      - "collision none + behind 0 → advisory 不出现 (负向 AC-3); grep 无 auto-enable"
+
+  - id: TASK-006
+    parent: "5.1, 5.2, 5.3, 5.4"
+    title: "【辅助】切口1 — phase-d-closer fetch-gate (fail-soft advisory)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-000, TASK-002]
+    agent: backend-architect
+    deliverables: [aria/skills/phase-d-closer/]
+    description: >
+      D.1 写 UPM 前: default-branch 解析 (symbolic-ref→master→main, sync.py chain) + fresh fetch
+      (timeout=30, 独立 1.16 缓存; 失败复用 coordination_fetch error_kind + soft-warn, 不回显 raw stderr,
+      不阻塞) + behind-check (git.py 手法)。触发 iff behind>0 且 (collision!=none 或 触及 upm.source_file
+      [git log --name-only ∩]); 触及 UPM→强提示; 纯 behind>0→静默。fail-soft ≠ C.2.4.5 fail-hard。
+    verification:
+      - "origin ahead + UPM-touch → 强提示; ahead 非 UPM + collision none → 静默"
+      - "离线 fixture → soft-warn 不阻断 (测 fail-soft 路径)"
+
+  - id: TASK-007
+    parent: "6.1, 6.2"
+    title: CLAUDE.md/schema 索引 + 全量回归 (Rule #6 substitute)
+    status: pending
+    complexity: S
+    dependencies: [TASK-000, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006]
+    agent: knowledge-manager
+    deliverables: [CLAUDE.md, aria/skills/state-scanner/references/state-snapshot-schema.md]
+    description: CLAUDE.md 信息地图索引 convention; schema additive collision 字段记录; 全量回归零退化; Rule #6 structural substitute。
+    verification: ["CLAUDE.md 索引; 全量回归零退化"]
+
+  - id: TASK-008
+    parent: "6.3, 6.4"
+    title: self-thrash dogfood + 发版 + 多远程 + 关闭 #133
+    status: pending
+    complexity: L
+    dependencies: [TASK-004, TASK-005, TASK-006, TASK-007]
+    agent: tech-lead
+    deliverables: [aria/.claude-plugin/plugin.json, aria/VERSION, aria/CHANGELOG.md, VERSION, CLAUDE.md]
+    description: >
+      self-thrash dogfood (本 Spec ship 用自己的约定, per feedback_meta_dogfood_solution_validates_self_mid_ship);
+      ship 前复核版本 → 5 SOT bump + 多远程推送 + post-push SHA 验证 + Spec 归档 + 关闭 #133;
+      SOT/CLAUDE.md 高竞争区按 feedback_concurrent_sot_conflict_mechanical_resolve 处理。
+    verification: ["self-dogfood 应用; 三仓双远程 parity; #133 closed"]
+
+execution_order:
+  - "TASK-000 (collision 前置) + TASK-001 (设计锚定) 可并行"
+  - "【主解药】TASK-002 + TASK-003 (convention, deps 001)"
+  - "并行: TASK-004 (guard, deps 002+003) / TASK-005 (切口2, deps 000+002) / TASK-006 (切口1, deps 000+002)"
+  - "TASK-007 (doc+回归, deps 000+002-006) → TASK-008 (收尾发版, deps 004-007)"
+
+notes:
+  - "合并: 主解药 (b)convention [本] + (a)/(c) 深度机制 [sister 吸收]; collision 持久化 (TASK-000) 是 (a)/(c) 共同前置"
+  - "Agent (A.3): tech-lead=设计+收尾; knowledge-manager=convention+doc; backend-architect=collision helper+检测+fetch-gate"
+  - "建议: 合并版 (a)/(c) 部分 focused re-audit 收敛 sister R2-CARRY 后再进 Phase B"
+  - "关键路径: TASK-000/001 → TASK-002 → TASK-005/006 → TASK-007 → TASK-008"
