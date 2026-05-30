@@ -72,6 +72,7 @@ updated-at: 2026-05-30T11:57:00Z
 | P2 | M6 Blocker #-1(节点 git 凭据过期)+ Blocker #2(snapshot-locality 永久解) | arc-1 handoff §4 |
 | P2 | M6 e2e-resilience + release-closeout Phase B(闸门过后) | 2 Spec Approved |
 | P3 | 余下 issue:audit 集群 #54/#95/#79/#17(与本 session 教训强相关)/ #128 M7 / #59 / #120 / #32 / #5 | Forgejo |
+| P3 | **GitHub 镜像 issue sweep 未完成**(本 session 限流 + 无 token;镜像是代码 push,issue 全在 Forgejo,极可能空) | 需 GitHub token 或换 IP 重试 |
 
 ---
 
@@ -80,7 +81,7 @@ updated-at: 2026-05-30T11:57:00Z
 - **UPM/US**: M6 hotfix + #133 均 issue-driven 非 US-tied;US-026 (M6) 仍 in_progress
 - **Spec**: #133 `concurrent-track-proactive-coordination` proposal banked(REVISE);M6 Spec#1 加 POST-ARCHIVE CORRECTION 横幅;active 不变
 - **CLAUDE.md**: 无需改(无插件版本变;hotfix 是 aria-orch runtime)
-- **Memory**: 新增 `feedback_shipped_archived_spec_can_be_nonfunctional_on_prod`(arc 1);**候选(arc 2)**: audit 两轮拦 created_at-class 在代码前 = "spec-reuse verify 在 Phase A.2 的 ROI"(可并入既有 spec_reuse memory 作二/三实证补强)
+- **Memory**: 新增 `feedback_shipped_archived_spec_can_be_nonfunctional_on_prod`(arc 1);closeout 更新 2 处(见 §8 #2):`feedback_spec_reuse_data_source_must_match_actual_access` 升 4× 实证 + audit pre-code ROI + `feedback_forgejo_pat_docker_vs_git_split` 加 bundle 绕过技巧
 - **子模块**: aria-orch 72fa62b(已 bump + 推);aria/standards 本弧未改
 
 ---
@@ -101,3 +102,17 @@ updated-at: 2026-05-30T11:57:00Z
 - **#133 collision 持久化别低估**:不是抽函数,是迁移 reconcile 链 + 跨 render-time→collect-time 数据源;phase1_gate 不读 snapshot collision
 - **多终端 push 高频撞**:本 session 撞 3 次(M6 + #133 ×2),都靠 fetch+rebase 零冲突化解;push 前先 `git fetch` 是肌肉记忆
 - 本机 cron + 云端 routine 都设了 2026-06-01;dev 机届时需开机本机 cron 才跑(云端兜底不依赖)
+
+---
+
+## §8 Session closeout 5 点核查 (2026-05-30 ~12:00 UTC)
+
+| # | 核查项 | 结果 |
+|---|--------|------|
+| 0 | 本地↔远程同步 | ✅ 主仓 master `4550cb6` + 3 子模块指针三方 (local-record=origin=github) 一致;rebase-over-sister 后本地 submodule worktree 滞后 → `git submodule update` 对齐 (aria `0ab4c1b` / standards `ec4924e`,非 regression,master 正确记录 sister v1.36.0 bump)。残留 untracked 均预期:`.aria/scripts/m6-phase-b-gate-check.sh` (本机 cron 脚本故意不提交) + `aria-orchestrator/.aria/cache/` |
+| 1 | 未完成任务/讨论 | M6 carry-forward (3-day 累积自动 / Blocker #2/#-1) + #133 Rev2+拆 Spec + GitHub sweep 限流未完 — 均已留痕 carry-forward (§4) |
+| 2 | 待固化经验 | ✅ 2 memory 更新:`feedback_spec_reuse_data_source_must_match_actual_access` 加 M6+#133 (升 4× 实证 + "未审计→shipped 到 prod"反例 + audit pre-code ROI + "别信设计文档信源码") + `feedback_forgejo_pat_docker_vs_git_split` 加 git bundle 绕过过期节点凭据技巧。MEMORY.md 无需改 (索引行已存在) |
+| 3 | UPM/US/Spec/PRD 维度 | **UPM=N/A** (Aria 不用 UPM,`configured:False`);**US ✅ 已更** (US-026 加 Spec #1 post-archive hotfix + cron 部署 + 累积 1/3);**Spec ✅** (#133 proposal + M6 banners committed,active changes 准确);**PRD=N/A** (prd-aria-v2 Approved 本 session 无变) |
+| 4 | 收尾 + 入口验证 | ✅ handoff 写入 + latest.md bare pointer → 本 doc (验证 scan.py `_LATEST_POINTER_RE` 首取本 handoff;file exists / phase D-closed / status done)。新 session `/aria:state-scanner` Phase 1.15 即从本 doc 入 |
+
+→ **结论**: 本 session 干净收尾。新对话从 `/aria:state-scanner` 进入 → 自动 surface 本 handoff → §0 入口 + §6 priorities 为最优先路径。
