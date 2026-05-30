@@ -1,5 +1,10 @@
 # M6 Spec #1 Tasks — Cost Acceptance (dual-track schema + cron sentinel + alarm)
 
+> **⚠️ POST-ARCHIVE CORRECTION (2026-05-30 emergency hotfix)**: cost-aggregation SQL below
+> (T1.x / T3.7) uses `created_at` — **not a `dispatches` column**; shipped non-functional.
+> Corrected to `COALESCE(cycle_start_ts, state_entered_at)`. See proposal.md banner +
+> `.aria/notes/2026-05-30-m6-phase-b-blocker-chain-cost-snapshot.md`.
+
 > **Spec**: [aria-2.0-m6-cost-acceptance](./proposal.md)
 > **Level**: 3 (Full)
 > **Status**: Approved (Phase A.2 CONVERGED 2026-05-24 via R3 stability; Phase A.3 agent allocation locked 2026-05-26; ready for Phase B.1)
