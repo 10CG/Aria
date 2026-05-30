@@ -1,32 +1,34 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.23.0",
-  "issue_ref": "10CG/aria-plugin#50",
-  "generated_at": "2026-05-21T15:25:30Z",
+  "triage_tool_version": "1.33.0",
+  "issue_ref": "10CG/Aria#132",
+  "generated_at": "2026-05-30T00:44:12Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 50,
-      "title": "bug(state-scanner): _extract_status 提取过宽 → Status 长文本里 sub-task token 命中 fallback (us-036 reproduce)",
-      "body": "## Symptom\n\n`scripts/collectors/_status.py` 的 `_extract_status` 提取整个 Status 字段 (包括 sub-task 状态描述 / 历史路径 / Archival blockers / 进展更新等长文本)，`_normalize_status` 在 fallback `done/complete` 阶段命中文本里的 token，错误归 lifecycle `done`，把 still-blocked spec 错放进 `openspec.pending_archive[]`.\n\n## Reproduce\n\nProject: `10CG/nexus` (private Forgejo); proposal: `openspec/changes/us-036-memory-conflict-resolution/proposal.md`\n\n```python\nimport sys\nsys.path.insert(0, \".claude/plugins/marketplaces/10CG-aria-plugin/skills/state-scanner/scripts/collectors\")\nfrom _status import _extract_status, _normalize_status\n\nraw = _extract_status(open(\"openspec/changes/us-036-memory-conflict-resolution/proposal.md\").read())\nprint(f\"len(raw) = {len(raw)}\")           # 1529\nprint(f\"normalize = {_normalize_status(raw)}\")  # done (WRONG)\n```\n\nStatus 字段头部主语义 = `🟢 **Phase B Sprint 2 delivered**` (即 `implemented` lifecycle 且 archival_blocked), 但 1529 chars 里有 sub-task 描述 `\"(3) ~~TASK-101 multi-seed~~ ✅ closed 2026-05-09 (PR #53 实质完成, docs sync 标 **done**; ...)\"`. word-boundary `\\bdone\\b` 命中 → fallback `done`. \n\n## Root cause\n\n`_extract_status` 当前用 `_STATUS_PATTERNS` regex 在整 proposal text 上抓 `> **Status**: ...` 段, 没限制段内长度 / 行数 / sentence 边界. nexus 等大型 spec 习惯把 status field 当 mini-changelog 写 (sub-task 状态 + 归档历史 + 阻塞项), 导致 raw 长达 1500+ chars, fallback token shadow 必然发生.\n\nAria #101 fix (commit `154775a` 2026-05-13) 已经修了 substring shadow (word-boundary matching) 和加 `implemented` token, 但**提取范围**没改 — 同一类 bug 的另一面.\n\n## Proposed fix (任选一或组合)\n\n1. **首行/首句截断**: `_extract_status` 只返回 Status 字段第一个 sentence (`.split(/[.。]/)[0]`) 或第一行 (`.split(\"\\n\")[0]`). 主 lifecycle 语义通常在头部.\n2. **长度上限**: 截到前 N chars (N=200?), 截到则 log soft_error \"status_field_truncated\".\n3. **加权限制**: 多行 Status 字段时, fallback `done/complete` 仅在首行内有效; sub-line 命中触发 soft_error 而非归 done.\n4. **ignore 装饰文本**: skip strikethrough (`~~...~~`) / sub-bullet (`- ` / `* `) / 引用 (`> `) 在 Status 长文本里的内容.\n\n推荐 (1) — 治本 + 简单. nexus us-036 的 Status 长描述实际是 useful narrative (写给人读), 不应该被 truncate. 但 normalizer 只看 lifecycle keyword, 首行/首句覆盖即可.\n\n## Workaround (currently in place)\n\nnexus PR #70 已 land (10CG/nexus 5c85400): us-036 proposal Status 首段加 `**implemented**` lifecycle keyword, priority 5 命中, 不再走 fallback done. 单点 workaround, 不解决其他可能受影响的 spec.\n\n## Affected\n\nany OpenSpec proposal whose `> **Status**: ...` 字段是 multi-line / multi-sentence narrative 且头部主语义 phrase 不含 normalizer 识别的 lifecycle keyword (delivered / shipped / done 但属于 sub-task 时). \n\n## Related\n\n- Aria #101 (substring shadow 2026-05-13, commit `154775a`)\n- aria-plugin v1.20.0 (本次 reproduce 使用版本)\n- nexus PR #70 (us-036 workaround, 5c85400)\n\n## Version info\n\n- aria-plugin: v1.20.0 (manifest `marketplaces/10CG-aria-plugin/.claude-plugin/marketplace.json`)\n- nexus: `5c85400` (after us-036 workaround merge)\n- 复现日期: 2026-05-19",
+      "number": 132,
+      "title": "secret-guard.sh PreToolUse hook fail-closed blocks ALL tools on Windows: readarray -t doesn't strip CR from jq output (v1.33.0 P0)",
+      "body": "## Bug Report (P0 �� blocks ALL tool calls on Windows)\n\n**����**: aria-plugin v1.33.0 �������� `hooks/secret-guard.sh` (PreToolUse hook, `*` matcher) �� **����/CRLF Windows ����**�� 100% fail-closed, **���� session �����й��ߵ���** (Bash / Read / Edit / Write ȫ��, ֻ�� Grep/Glob �Ҵ�)��`/plugin update aria` + `/reload-plugins` ���������� session ̱����\n\n������ jq ������ Windows Git Bash �� `\\r` (CRLF), �� `readarray -t` ֻ strip `\\n` �� strip `\\r` �� `tool_type=\"string\\r\"` �� ����У�� `[[ \"$tool_type\" != \"string\" ]]` ��Ϊ�� �� fail-closed (exit 2)��\n\n> ���̵�: ������Ϣ `tool_name is type=string (expected string)` ����ì�� (˵�� string ��˵���� string), ���� `\\r` ���ն˹����س����� ` (expected string). Blocking.` ��ʾ�����ǵĵ��� CR ֢״��\n\n**���ֲ���**:\n1. Windows 10/11 (locale GBK/cp936), Claude Code + Git Bash, jq for Windows (native build, ���� CRLF)\n2. aria-plugin ���� v1.33.0 (���� secret-guard.sh hook)\n3. `/reload-plugins`\n4. ���⹤�ߵ��� �� ������ block\n\n**Ԥ����Ϊ**: �������ߵ��÷���, �� secret-bearing ��ȡ����\n\n**ʵ����Ϊ**: ȫ�����ߵ��ñ� block:\n\n```\n[secret-guard] FATAL: malformed PreToolUse input �� tool_name is type=string (expected string). Blocking.\n```\n\n## ������λ (Ӳ֤��)\n\n`hooks/secret-guard.sh:111-119`:\n\n```bash\n111: readarray -t _sg_fields < <(jq -r '(.tool_name | type), (.tool_name // \"\"), ...' 2>/dev/null <<<\"$input\")\n112: tool_type=\"${_sg_fields[0]:-}\"\n...\n119: if [[ \"$tool_type\" != \"string\" ]]; then    # �� \"string\\r\" != \"string\" �� ��\n```\n\n**ʵ�⸴��** (Windows Git Bash, jq 1.x native):\n\n```console\n$ input='{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"x\"}}'\n$ readarray -t f < <(jq -r '(.tool_name|type),(.tool_name//\"\")' <<<\"$input\")\n$ printf '%s' \"${f[0]}\" | xxd\n00000000: 7374 7269 6e67 0d                        string.\n          s  t  r  i  n  g  \\r   �� 0x0d CR ��Ⱦ\n\n$ [[ \"${f[0]}\" != \"string\" ]] && echo \"NOT EQUAL\"\nNOT EQUAL    �� bug ����\n```\n\n`jq` �� Windows native build ������ CRLF, `readarray -t` ֻȥ `\\n` �� `\\r`�������ĸ��ֶ� (`tool_type` / `tool` / `command` / `file_path`) ���� CR ��Ⱦ, ��ֻ type У�� �� ��ʹ�ƹ� type У��, ���� `case \"$tool\"` �� pattern ƥ��Ҳ����ĩβ `\\r` ��Ϊ�쳣��\n\n## �����޸�\n\n`secret-guard.sh:111` jq �ܵ�ĩβ�� `tr -d '\\r'` (һ������ȫ�����ֶ�):\n\n```bash\n# Before:\nreadarray -t _sg_fields < <(jq -r '...' 2>/dev/null <<<\"$input\")\n\n# After:\nreadarray -t _sg_fields < <(jq -r '...' 2>/dev/null <<<\"$input\" | tr -d '\\r')\n```\n\n**ʵ����֤** (�����Ѷ� cache ����Ӧ�ô��޸�):\n- ������������ ? (scan.py / git / python ȫ���ָ�)\n- `cat ~/.ssh/id_rsa` �Ա���ȷ BLOCKED ? (���ع�����������, `tr -d '\\r'` ֻ�� CR �����߼�)\n- secret-guard �� Windows �ָ���������\n\n## �� #131 / #61 ͬԴ\n\n���� aria-plugin �� **Windows CRLF/�����߽�** �ϵĵ�����ͬ�� bug:\n- **#61** (v1.21): subprocess `text=True` ȱ `encoding=\"utf-8\"` �� GBK ������\n- **#131** (v1.30.3): ͬ�� + None guard\n- **�� issue**: jq ���� CR + `readarray -t` �� strip �� hook fail-closed\n\n����: aria-plugin ���� shell hook / script �� `jq | readarray` / `jq | read` / `VAR=$(jq ...)` ģʽ, ͳһ `tr -d '\\r'` ���� (Windows native jq ���� CRLF �ǳ�̬)���ɿ��Ǽ�һ�� cross-platform ���� mock CRLF ���롣\n\n## ��ʱ workaround\n\n1. �� `!` �������� (�ƹ� PreToolUse hook) ע����ʱ����:\n   `! sed -i '1a exit 0' \"$CLAUDE_PLUGIN_ROOT/hooks/secret-guard.sh\"`\n   (����: secret-guard ��ȫʧЧ, �ص�����ǰ״̬)\n2. ��ֱ�� `! sed` Ӧ������ `tr -d '\\r'` �α��޸�\n3. ע��: cache ���� + marketplace SOT ���ݶ��д� bug, ����ʱ�� cache (`$CLAUDE_PLUGIN_ROOT`) �Ƿ�; repo Դ����ʽ�޸� (���ظ� cache �ᱻ�´� update ����)\n\n## ������\n\n**P0** �� fail-closed ���Ʊ����ǰ�ȫ, ���� Windows �ϰ����� session ����, �� silent-allow �����ƻ��ԡ���������/CRLF Windows �û������� v1.33.0 �� 100% ����, ����Ϊ�� Read/Edit ������, �û��޷������Ų� (������ `!` ���� shell �ƹ�)��\n\n## ������Ϣ\n\n- Aria Plugin: 1.33.0\n- OS: MINGW64_NT-10.0-19045 x86_64 (Windows 10 Pro ���İ�, locale cp936/GBK)\n- jq: Windows native build (���� CRLF)\n- ��������: `/plugin update aria` (1.20.0 �� 1.33.0) + `/reload-plugins`\n\n---\n*�� aria-report �Զ�����*\n",
       "state": "open",
-      "labels": [],
+      "labels": [
+        "bug"
+      ],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/50",
-      "created_at": "2026-05-19T10:49:22Z",
-      "updated_at": "2026-05-19T11:43:25Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/132",
+      "created_at": "2026-05-29T23:53:48Z",
+      "updated_at": "2026-05-29T23:53:48Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.20.0",
-      "current": "1.23.0",
-      "gap": "behind"
+      "reported": "1.33.0",
+      "current": "1.33.0",
+      "gap": "same"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "scripts/collectors/_status.py",
+          "file_path": "hooks/secret-guard.sh",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -35,8 +37,8 @@
           "warning": "file not found"
         },
         {
-          "file_path": "openspec/changes/us-036-memory-conflict-resolution/proposal.md",
-          "line": null,
+          "file_path": "secret-guard.sh",
+          "line": 111,
           "format": "backtick",
           "exists": false,
           "line_in_range": null,
@@ -44,9 +46,9 @@
           "warning": "file not found"
         },
         {
-          "file_path": "marketplaces/10CG-aria-plugin/.claude-plugin/marketplace.json",
-          "line": null,
-          "format": "backtick",
+          "file_path": "hooks/secret-guard.sh",
+          "line": 111,
+          "format": "prose_l",
           "exists": false,
           "line_in_range": null,
           "snippet": null,
@@ -68,7 +70,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "90ec746bfca9f602996fa5b47b0840ac0d0fdb38"
+          "head": "f36950d9d005b04f870cc89013b5cab0629bcb5f"
         }
       ]
     }
@@ -78,19 +80,33 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "Synthetic single-line Status field `> **Status**: 🟢 **Phase B Sprint 2 delivered** — archival blocked; ... docs sync 标 done; blockers: live verify outstanding` (178 chars) passed through _extract_status + _normalize_status imported from plugin cache v1.23.0 collectors/_status.py",
-        "expected_behavior": "normalize result is NOT 'done' — header semantics 'delivered' indicates an implemented-class / archival-blocked spec; a 'done' token buried in sub-task narrative must not shadow the lifecycle classification",
-        "actual_behavior": "_extract_status returns the entire 178-char single line (no length / sentence / first-line cap); _normalize_status falls through to the 'done' fallback via a word-boundary hit on the buried '标 done', returning lifecycle 'done'",
+        "input": "模拟 Windows native jq 的 CRLF 输出 (printf 'string\\r\\nBash\\r\\n...') → readarray -t → [[ \"$tool_type\" != \"string\" ]]",
+        "expected_behavior": "issue 声称: tool_type='string\\r' != 'string' 判真 → exit 2 → 阻断所有工具",
+        "actual_behavior": "RESULT: BLOCKED — $tool_type 含尾部 CR,!= 'string' 成立,触发 fail-closed",
         "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "应用建议修复 jq ... | tr -d '\\r' 后重跑同一 CRLF 输入",
+        "expected_behavior": "修复后 tool_type='string' == 'string' → 放行",
+        "actual_behavior": "RESULT: allowed — tr -d '\\r' 剥除 CR,type 校验通过",
+        "match": false
+      },
+      {
+        "case_id": "case-3",
+        "input": "Linux 原生 jq (LF-only) 跑真实 secret-guard.sh:111 jq 管道",
+        "expected_behavior": "Linux 无 CRLF,不应触发 bug (佐证 Windows-only)",
+        "actual_behavior": "RESULT: allowed — Linux jq 输出 LF,tool_type='string' 干净",
+        "match": false
       }
     ],
     "hit_count": 1,
-    "total_count": 1,
-    "hit_rate": "1/1"
+    "total_count": 3,
+    "hit_rate": "1/3"
   },
   "verdict": "confirmed",
-  "severity": "major",
-  "recommended_action": "next-cycle",
+  "severity": "critical",
+  "recommended_action": "hotfix",
   "deviation_note": null,
   "errors": []
 }
