@@ -1,0 +1,181 @@
+metadata:
+  feature: emergency-hotfix-and-audit-file-scope
+  spec_path: openspec/changes/emergency-hotfix-and-audit-file-scope/
+  source: "Aria #58"
+  datasource: "proposal.md ## Tasks (path B — no tasks.md)"
+  level: 2
+  target_version: aria-plugin v1.35.0
+  total_tasks: 8
+  generated_by: task-planner A.2/A.3
+  generated_at: "2026-05-30"
+  decision: DEC-20260530-002
+  post_spec: "CONVERGED R1→Rev1→R2→Rev2→R3 (3-round, 2 git data-source/ref Critical caught pre-impl)"
+  notes: >
+    Mostly prose/doc/config changes across 6 skills + convention. triage-driven scope
+    (#3 already v1.34.0 default → closed). Rule #6 = deterministic structural substitute
+    (doc-existence fixtures; behavior-conformance dogfood-only). advisory hotfix lane.
+
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    title: "state-scanner emergency_hotfix recommendation rule"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: []
+    agent: backend-architect
+    deliverables:
+      - aria/skills/state-scanner/references/rules/basic-rules.md
+      - aria/skills/state-scanner/RECOMMENDATION_RULES.md
+    description: >
+      New emergency_hotfix rule. 主触发 hotfix/* branch (git.current_branch); commit
+      hotfix(...) prefix corroborating (best-effort). priority 1.85 (< quick_fix 2);
+      confidence 85%; auto_execute No. Double-write: detail in basic-rules.md + index
+      row in RECOMMENDATION_RULES.md main table.
+    verification:
+      - "emergency_hotfix rule in basic-rules.md with priority 1.85 / confidence 85% / auto_execute No"
+      - "index row in RECOMMENDATION_RULES.md main table (double-write)"
+      - "trigger = hotfix/* branch primary; commit prefix corroborating"
+
+  - id: TASK-006
+    parent: "1.6"
+    title: "config-loader audit.scope_skip_paths namespace"
+    status: done
+    complexity: S
+    priority: P0
+    dependencies: []
+    parallel_with: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/config-loader/DEFAULTS.json
+      - aria/skills/config-loader/config-example.md
+    description: >
+      audit.scope_skip_paths default ["deploy/","docs/",".forgejo/workflows/",
+      ".github/workflows/"] + *.md suffix. Match semantics note (dir startswith after
+      trailing-slash normalization / suffix endswith).
+    verification:
+      - "DEFAULTS.json audit.scope_skip_paths default list present"
+      - "config-example.md documents match semantics (startswith/endswith)"
+
+  - id: TASK-004
+    parent: "1.4"
+    title: "audit-engine file-scope secondary filter"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-006]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/audit-engine/SKILL.md
+    description: >
+      file-scope 二次过滤: self-fetch `git diff --name-only $(git merge-base HEAD <base>)`
+      (base from config/symbolic-ref, fallback origin/main→master; all-fallback-fail →
+      skip+warn no-crash; NOT snapshot/changes). len==0 pass-through. After adaptive/
+      checkpoint resolution → min(resolved, convergence). Match: dir startswith (trailing-
+      slash normalized) / suffix endswith. + pre_merge→convergence (hotfix lane, only
+      audit.enabled + checkpoint!=off).
+    verification:
+      - "self-fetch via merge-base diff (not HEAD), base configurable, fallback-fail → skip+warn"
+      - "len==0 pass-through; all ⊆ skip_paths → min(resolved, convergence); any business file → unchanged"
+      - "pre_merge→convergence only audit-on"
+
+  - id: TASK-002
+    parent: "1.2"
+    title: "phase-a-planner hotfix lane overview + cross-ref"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/phase-a-planner/SKILL.md
+    description: >
+      emergency hotfix lane overview (trigger + skip A.1-A.3) + cross-ref to
+      phase-b-developer (B.3 gate) / audit-engine (pre_merge→convergence).
+    verification:
+      - "phase-a-planner documents lane overview + skip A.1-A.3 + cross-refs"
+
+  - id: TASK-003
+    parent: "1.3"
+    title: "phase-b-developer Prod-Validated trailer gate"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/phase-b-developer/SKILL.md
+    description: >
+      On hotfix branch + skipping unit tests, mechanical grep commit for Prod-Validated:
+      trailer. Present → allow manual prod validation substitute; absent → block, revert
+      to standard lane. (Existence-checked gate; content-truth via owner review.)
+    verification:
+      - "phase-b-developer SKILL.md has Prod-Validated trailer gate text"
+      - "no trailer → block + revert standard lane"
+
+  - id: TASK-005
+    parent: "1.5"
+    title: "phase-c-integrator pre_merge→convergence call point"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: [TASK-004]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/phase-c-integrator/SKILL.md
+    description: >
+      hotfix lane pre_merge→convergence call point (advisory).
+    verification:
+      - "phase-c-integrator documents hotfix pre_merge→convergence (advisory)"
+
+  - id: TASK-007
+    parent: "1.7"
+    title: "git-commit.md Prod-Validated trailer schema"
+    status: done
+    complexity: S
+    priority: P1
+    dependencies: []
+    agent: knowledge-manager
+    deliverables:
+      - standards/conventions/git-commit.md
+    description: >
+      Prod-Validated: single-line trailer schema (evidence newline → semicolon) +
+      emergency hotfix commit format (hotfix(scope) + 根因 + Prod-Validated). Cite
+      CLAUDE.md Submodule-Rollback as trailer precedent.
+    verification:
+      - "git-commit.md has Prod-Validated single-line trailer schema + hotfix commit format"
+
+  - id: TASK-008
+    parent: "1.8"
+    title: "Rule #6 deterministic structural substitute (doc-existence fixtures)"
+    status: done
+    complexity: M
+    priority: P0
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007]
+    agent: qa-engineer
+    deliverables:
+      - aria-plugin-benchmarks/emergency-hotfix-audit-file-scope/
+    description: >
+      Doc-existence fixture (grep-verifiable): emergency_hotfix rule fields (priority
+      1.85/confidence 85%/auto_execute No) / scope_skip_paths default + match semantics /
+      git-commit Prod-Validated trailer / phase-b trailer gate text / audit-engine
+      merge-base self-fetch + 0-file pass-through + min(resolved,convergence). Behavior-
+      conformance (advisory lane / file-scope filtering) marked dogfood-only.
+    verification:
+      - "structural fixture greps all doc-existence SC"
+      - "behavior-conformance SC marked dogfood-only (not fixture-claimed)"
+
+execution_order:
+  - [TASK-001, TASK-006, TASK-007]   # rule + config + convention (independent)
+  - TASK-004                          # audit-engine (after config)
+  - [TASK-002, TASK-003]              # phase-a overview + phase-b gate (after rule)
+  - TASK-005                          # phase-c (after audit-engine)
+  - TASK-008                          # Rule #6 fixtures (after all docs)
+
+summary:
+  by_complexity:
+    S: 4   # 006, 002, 005, 007
+    M: 4   # 001, 004, 003, 008
+  critical_path: "001 → 004 → 008"
+  rule6: "deterministic structural substitute (doc-existence fixtures; behavior dogfood-only)"
+  version_bump: "aria-plugin v1.34.1 → v1.35.0 (new rule + audit logic + convention)"
