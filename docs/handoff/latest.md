@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #SHELL-JQ-CRLF-SHIP — 🎉 **shell-jq-crlf-hardening SHIPPED v1.36.0 (#132 follow-up, full A-D)** (2026-05-30 ~09:28 UTC, dev-claude)
+## ★ 最新 session #ISSUE-SWEEP-133-BANKED — 🗂️ **全 issue 梳理 + #133 Spec banked (A.2 未收敛)** (2026-05-30 ~11:57 UTC, dev-claude)
 
-**Latest**: [2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md](./2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-issue-sweep-133-spec-banked.md](./2026-05-30-issue-sweep-133-spec-banked.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-ISSUE-SWEEP-133-BANKED display)**: [2026-05-30-issue-sweep-133-spec-banked.md](./2026-05-30-issue-sweep-133-spec-banked.md) — 本 session **第 2 弧**(第 1 弧 = M6 cost-snapshot created_at hotfix+deploy,见 `2026-05-30-m6-cost-snapshot-hotfix-deployed.md`)。**全生态 issue 梳理**(Forgejo 11 open / GitHub 镜像限流但 issue 全在 Forgejo)→ owner 选 **#133**(并发多 session UPM merge thrash)→ triage VALID → Level 2 proposal(切口 c phase-d 前置并发检测 + a-lite state-scanner opt-out 主动提示)→ **post_spec R1 NEEDS_FIX (3/3) → Rev1 → R2 未收敛 (1 NEEDS_FIX + 2 PWW)** → **banked**。**贯穿教训(本 session 三次实证)**: created_at-class —— 复用/断言任何数据必先对**真代码** verify 可达性+ref 语义不止存在性(M6 cost SQL `created_at` 列 / #133 R1 `collision_type` 字段 / R2 `_classify_collision` 输入类型 + phase1_gate 数据源)。audit 两轮把缺陷在**代码前**全拦下。真 scope 比想的大(collision 持久化需迁 reconcile 链 + phase1_gate 独立 claim-ref 源)→ 下次 Rev2 拆 collision-persistence 子 Spec(proposal §R2-CARRY 6 项)。主仓 `117c632`。**并行 sister track** 同日 ship shell-jq-crlf v1.36.0(见下条;本 session push 撞 sister 3 次 rebase 化解 = #133 实时佐证)。**Next**: 2026-06-01 M6 闸门(本机 cron + 云端 routine 双保险) > #133 Rev2+拆 Spec > v1.29.0 D+14 > audit 集群 #54/#95。
+
+## ★ 前 session #SHELL-JQ-CRLF-SHIP — 🎉 **shell-jq-crlf-hardening SHIPPED v1.36.0 (#132 follow-up, full A-D)** (2026-05-30 ~09:28 UTC, dev-claude [sister track])
+
+**Latest (T-SHELL-JQ-CRLF-SHIP)**: [2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md](./2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md) — display-only (本 session 2026-05-30 #133-banked 已接替主线 bare pointer;sister track 并行 ship,详情见本条)
 
 **Latest (T-SHELL-JQ-CRLF-SHIP display)**: [2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md](./2026-05-30-shell-jq-crlf-hardening-shipped-v1.36.0.md) — 本 session 2 个 full ship: **#132 P0 hotfix v1.34.1** (secret-guard.sh CRLF fail-closed 阻断 Windows 全工具 → `\| tr -d '\r'`, 225/225) + **shell-jq-crlf-hardening L3 Spec 全 Phase A-D v1.36.0** (#132 系统性 follow-up, 跨 aria+standards+main 三仓)。**CR 处理决策表** (门控值剥 CR vs 数据正文不剥 vs jq -n 构造器豁免): secret-scan silent-redaction-bypass 修 (content 数据正文保真) + relay 站点 + 新建 crlf-shim 测试框架 (双形态+双向 self-check, 8/8) + jq-crlf-guard 回归 guard (7/7) + standards `shell-jq-crlf-hygiene.md` convention。**post_spec challenge 3-round CONVERGED** —— 实施前拦截 2 load-bearing Critical (C1 silent-bypass 非空洞双向断言 + C2 content 篡改)。311 shell assertions PASS, Linux LF 零退化。10 TASK 全交付。3 仓双远程 parity (main `e3a7075` / aria `0ab4c1b` / standards `ec4924e`)。#132 closed。multi-terminal 高频并发 (sister 同日 #18/#58/M6-cost), target v1.35.0 被占→v1.36.0, 4× stale index.lock 恢复。**Next**: M6 Phase B 闸门 (sister, ~06-01 light-1) > v1.29.0 block-flip D+14 (06-07 owner) > audit 质量集群。
 
