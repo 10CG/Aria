@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #ESTIMATOR-SHIP — 🎉 **#18 ai-native-estimator SHIPPED v1.34.0 (full brainstorm→A→D)** (2026-05-30 ~01:22 UTC, dev-claude)
+## ★ 最新 session #HOTFIX-FILESCOPE-SHIP — 🎉 **#58 emergency-hotfix + audit file-scope SHIPPED v1.35.0** (2026-05-30 ~03:13 UTC, dev-claude)
 
-**Latest**: [2026-05-30-ai-native-estimator-shipped-v1.34.0.md](./2026-05-30-ai-native-estimator-shipped-v1.34.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md](./2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-HOTFIX-FILESCOPE-SHIP display)**: [2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md](./2026-05-30-emergency-hotfix-file-scope-shipped-v1.35.0.md) — 本 session **第 3 个 full ship** (前 #104 v1.33.0 + #18 v1.34.0)。#58 (3-in-1 from SilkNode hotfix) **triage 缩水** (#3 已 v1.34.0 默认→close) → 做 #1 emergency hotfix lane (advisory; state-scanner `emergency_hotfix` 规则 priority 1.85 + phase-b **Prod-Validated commit trailer 机检 gate** + pre_merge→convergence) + #2 audit file-scope 二次过滤 (全 ops/docs ⊆ scope_skip_paths → challenge 降级 convergence; audit-engine 自取 **merge-base diff**)。**post_spec 3-round CONVERGED** —— 连续 2 轮拦截 git 数据源/ref load-bearing 缺陷 (changes collector 无路径 + `diff HEAD` pre_merge 漏已提交变更)。Rule #6 doc-existence 10/10。code-review PASS (B.3→B.2 cross-skill fix)。**v1.35.0** (aria `9861d45` / standards `a7317f0` / main `107d9f4`, 3-repo 双远程验证)。sister v1.34.1 CRLF hotfix #132 rebase 整合无 regression。D.4 dogfood (capture 769k incremental). #58 closed。**Next**: v1.29.0 block-flip D+14 (owner F1) > CLAUDE.md v1.35.0 同步 > memory 候选评估。
+
+## ★ 前 session #ESTIMATOR-SHIP — 🎉 **#18 ai-native-estimator SHIPPED v1.34.0 (full brainstorm→A→D)** (2026-05-30 ~01:22 UTC, dev-claude)
 
 **Latest (T-ESTIMATOR-SHIP display)**: [2026-05-30-ai-native-estimator-shipped-v1.34.0.md](./2026-05-30-ai-native-estimator-shipped-v1.34.0.md) — 本 session 第 2 个 full ship (前 #104 v1.33.0)。**#18 estimator** = Token 轴 cycle 工作量估算 v1 薄切片 (替代 4-8h 人工时假设)。8-turn brainstorm (7 DEC) → **post_spec 3-round CONVERGED** (R1 3/3 REVISE → Rev1 → R2 2PWW+1 NEW Critical → Rev2 → R3 2/2 PWW) —— spike-verified transcript schema **实施前拦截 2 个 load-bearing 缺陷** (parse_transcript_usage 复用错配 + cycle_id 幂等自相矛盾)。新 skill `ai-native-estimator` (forecast/history/velocity) + `aria-token-telemetry` 加 `iter_transcript_usage` (additive) + **phase-d-closer D.4** 收尾自动 capture (cycle 粒度 watermark, 幂等=空区间)。work_metric=output+cache_creation; wall_clock=被动元数据(非工作量)。40 deterministic tests。**aria-plugin v1.34.0** (aria `b489211` / main `d5130c7`, 双远程 SHA 全验证)。D.4 dogfood 实证 (capture 本 cycle work_metric 5.4M)。#18 closed。**Next**: #58 skill 改进 (owner 选的第 2 项) > v1.29.0 block-flip D+14 > CLAUDE.md v1.34.0 同步。
 
