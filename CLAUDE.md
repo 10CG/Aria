@@ -175,6 +175,7 @@ v2.0 在"十步循环"之上建立了两层执行结构:
 ├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
 ├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+)
 ├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.28.0+ §C.2.4.5 mechanical gate companion)
+├── Shell jq CRLF 卫生 → standards/conventions/shell-jq-crlf-hygiene.md (aria-plugin v1.36.0+ #132 follow-up; CR 处理决策表 + jq-crlf-guard + crlf-shim 测试框架)
 ├── 进度管理       → standards/core/progress-management/
 ├── 研究文档       → docs/
 ├── 需求文档       → docs/requirements/ (PRD + User Stories)
@@ -514,7 +515,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.35.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.36.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -528,7 +529,9 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   v1.34.1 closed #132 (secret-guard CRLF fail-closed Windows hotfix — jq|tr -d '\r'),
                   v1.35.0 = emergency-hotfix-and-audit-file-scope #58 (emergency_hotfix 规则 priority
                   1.85 + phase-b Prod-Validated commit trailer gate + audit-engine file-scope 二次过滤
-                  降级 convergence; standards git-commit.md §6.4 trailer);
+                  降级 convergence; standards git-commit.md §6.4 trailer), v1.36.0 = shell-jq-crlf-
+                  hardening #132 follow-up (系统性加固全 plugin shell jq 消费点对 Windows CRLF +
+                  crlf-shim 测试框架 + jq-crlf-guard + standards shell-jq-crlf-hygiene convention);
                   v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
