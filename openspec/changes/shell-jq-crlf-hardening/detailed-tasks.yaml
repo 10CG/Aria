@@ -1,0 +1,213 @@
+metadata:
+  feature: shell-jq-crlf-hardening
+  spec_path: openspec/changes/shell-jq-crlf-hardening/
+  datasource: "tasks.md"
+  source_issue: "Forgejo Aria #132 (hotfix v1.34.1) follow-up"
+  status_basis: "Approved (Phase A.2 post_spec CONVERGED 2026-05-30, challenge 3-round)"
+  total_tasks: 10
+  target_version: "aria-plugin v1.36.0 (tentative — v1.35.0 已被 #58 占用;ship 前复核)"
+  complexity_summary: "3S + 6M + 1L"
+
+tasks:
+  # ── Phase 1: 测试框架先行 (基础设施, 必须最先做) ──────────────────────
+  - id: TASK-001
+    parent: "1.1, 1.2, 1.3"
+    title: 构建可复用 cross-platform CRLF 测试框架 (jq-shim 泛化)
+    status: pending
+    complexity: M
+    dependencies: []
+    agent: qa-engineer
+    deliverables:
+      - aria/hooks/tests/lib/crlf-shim.sh
+    description: >
+      泛化 #132 jq-shim (awk 每行补 \r\n 模拟 Windows native jq + PATH prepend)。
+      须覆盖两种消费形态 (readarray-pipe + command-subst);提供双向 self-check 原语
+      (不激活 shim 断言 CR 不存在 + 激活后断言存在,防 shim bug trivial-pass);
+      提供 silent-bypass 双向断言原语 (nofix vs fix 两态翻转)。被 hook + skill 测试复用 (单一 SoT)。
+    verification:
+      - "框架可被 secret-guard.test.sh 与新增 secret-scan/relay 测试 source 复用"
+      - "self-check 双向: shim 未激活时 CR 检测为 false, 激活后为 true"
+      - "两种消费形态 (readarray / $()) 各有 CR 保留自检且均通过"
+
+  # ── Phase 2: Tier 1 secret-scan (security, 按决策表) ─────────────────
+  - id: TASK-002
+    parent: "2.1"
+    title: secret-scan.sh 门控/比较值 CR 修复 (content 不剥)
+    status: pending
+    complexity: S
+    dependencies: []
+    agent: backend-architect
+    deliverables:
+      - aria/hooks/secret-scan.sh
+    description: >
+      按 CR 处理决策表: type-check 门控 (行 116) + tool (行 118, 喂 case) 剥尾 CR
+      (${VAR%$'\r'});content (行 123) 数据正文**不剥** (C2 — 剥除会篡改写回 LLM 内容)。
+    verification:
+      - "行 116/118 应用剥尾 CR;行 123 content 捕获保持原样"
+      - "code review 确认 content 经 :368 jq --arg 重注入路径未被改动"
+
+  - id: TASK-003
+    parent: "2.2, 2.3, 2.4"
+    title: secret-scan 双向非空洞 + content 保真回归测试
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-002]
+    agent: qa-engineer
+    deliverables:
+      - aria/hooks/tests/secret-scan.test.sh
+    description: >
+      双向断言 (C1): CRLF shim 下对 fixed hook 与 pristine-copy (sed 去 fix 副本) 各跑一次,
+      nofix 期望含 secret 输出不被 REDACT (bug 复现) / fixed 期望被 REDACT, 两态翻转。
+      content 保真 (R2-NEW-M): 接入点 = 截获 hook stdout 重注入 envelope,
+      jq -r '.tool_response.output' 取回写 content 逐字节比对 (禁 mock 内部路径)。
+    verification:
+      - "nofix 副本: 含 secret 的 CRLF 输入 → stdout 不含 REDACTED (bug 复现)"
+      - "fixed: 同输入 → stdout 含 REDACTED;两态结论相反 (仅 fixed pass = 空洞失败)"
+      - "content 含合法 \\r → fix 后 secret 仍 redact 且非 secret 正文 \\r 逐字节保留"
+      - "Linux LF 既有 secret-scan 全量 case 零退化"
+
+  # ── Phase 3: Tier 2 relay (correctness, 按决策表) ───────────────────
+  - id: TASK-004
+    parent: "3.1, 3.2, 3.3, 3.4"
+    title: setup_relay.sh 门控/marker/注入片段 CR 修复 + 幂等兼容
+    status: pending
+    complexity: M
+    dependencies: []
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-context-monitor/scripts/setup_relay.sh
+    description: >
+      行 44 __aria_cwd 剥尾 CR (修门控即透传保护下游 :48 写文件, :48 不独立改);
+      行 60/71 安装检测 marker (cmd) 剥尾 CR;行 133/134 注入的 runtime statusLine
+      片段 (used/model) 自身 CR-safe;保证幂等检测兼容旧 (无防护) 片段, 不致重复注入。
+    verification:
+      - "单值站点均用 ${VAR%$'\\r'} (jq -r '.scalar' 单标量单行)"
+      - "注入片段在 Windows jq 下生成的 used/model 不含 CR"
+
+  - id: TASK-005
+    parent: "3.6"
+    title: setup_relay CRLF 回归测试 (含幂等机验)
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-004]
+    agent: qa-engineer
+    deliverables:
+      - aria/skills/aria-context-monitor/scripts/tests/setup_relay.test.sh
+    description: >
+      复用框架。幂等机验: CRLF shim 下连续运行 setup_relay.sh 两次 →
+      settings.json statusLine 注入条目数第二次 == 第一次。各 CR 站点回归 case。
+    verification:
+      - "连续两次注入条目数相等 (不重复注入)"
+      - "cwd 门控在 CRLF 下正确通过 → relay 写缓存"
+
+  - id: TASK-006
+    parent: "3.5"
+    title: check_context_relay.sh relay-install 检测 CR 修复 + 测试
+    status: pending
+    complexity: S
+    dependencies: [TASK-001]
+    agent: backend-architect
+    deliverables:
+      - aria/skills/aria-doctor/scripts/check_context_relay.sh
+      - aria/skills/aria-doctor/scripts/tests/check_context_relay.test.sh
+    description: >
+      行 53 cmd=$(jq -r '.statusLine.command') 剥尾 CR;CRLF shim 回归 case 确认
+      relay-install 检测在 CRLF 下不误判。
+    verification:
+      - "CRLF shim 下 relay-install 检测结果与 LF 下一致"
+
+  # ── Phase 4: Tier 3 hygiene (验证驱动) ──────────────────────────────
+  - id: TASK-007
+    parent: "4.1, 4.2, 4.3"
+    title: Tier 3 站点验证 + 分类定案 (布尔/累加器/显示串)
+    status: pending
+    complexity: S
+    dependencies: []
+    agent: code-reviewer
+    deliverables:
+      - aria/skills/git-remote-helper/scripts/check_parity.sh
+      - aria/skills/aria-doctor/scripts/check_secret_guard_install.sh
+    description: >
+      4.1 check_parity 布尔 (383/386/389): 已实证 --argjson 容忍 true\r → 降 T3,
+      convention 文档说明, 不强制代码改动。4.2 JSON 累加器: 已 REFUTE 不累积 → 不改动。
+      4.3 check_secret_guard_install:74-76 显示串剥尾 CR (按需, 低优)。产出 = 分类定案记录
+      (供 TASK-008 guard allowlist + TASK-009 convention)。
+    verification:
+      - "布尔站点 + 累加器确认无害 (文档说明), 仅 4.3 显示串按需改"
+      - "定案记录列出每站点: 改动 / 豁免 / 文档说明"
+
+  # ── Phase 5: 回归防线 ───────────────────────────────────────────────
+  - id: TASK-008
+    parent: "5.1, 5.2, 5.3"
+    title: grep-based 回归 guard (含 allowlist 豁免 + 自测非空洞)
+    status: pending
+    complexity: M
+    dependencies: [TASK-002, TASK-004, TASK-006, TASK-007]
+    agent: backend-architect
+    deliverables:
+      - aria/hooks/tests/jq-crlf-guard.sh
+    description: >
+      扫描新增未防护 jq 读取消费点 (< <(jq / VAR=$(…jq -r '.field'));配 allowlist/豁免
+      (jq -n 构造器 15 处 + T3 已知安全站点, 类比 # secret-leak-ok-explicit 注释)。
+      落点倾向 test 阶段 (非 pre-commit, 降误报阻断面)。
+    verification:
+      - "自测非空洞: 故意引入未防护 jq -r '.field' 捕获 → guard 失败"
+      - "对 jq -n 构造器 + T3 站点不误报 (allowlist 生效)"
+
+  # ── Phase 6: Convention + doc 同步 (Rule #3) ────────────────────────
+  - id: TASK-009
+    parent: "6.1, 6.2, 6.3"
+    title: 新建 shell-jq-crlf-hygiene convention + CLAUDE.md 索引
+    status: pending
+    complexity: M
+    dependencies: [TASK-007, TASK-008]
+    agent: knowledge-manager
+    deliverables:
+      - standards/conventions/shell-jq-crlf-hygiene.md
+      - CLAUDE.md
+    description: >
+      CR 处理决策表 (门控/比较值 vs 数据正文 vs 构造器) + 正向 pattern + exception
+      (数据正文不剥 + tr -d '\r' 误删合法 CR 局限 + #61/#131/#132 同源家族清单)。
+      secret-hygiene 同结构。CLAUDE.md 信息地图 + 目录导航索引。
+    verification:
+      - "convention 含决策表 + exception 模板, 与 secret-hygiene 同结构"
+      - "CLAUDE.md 索引新 convention (standards/ 是 submodule, 注意 Rule #5 边界)"
+
+  # ── Phase 7: 收尾 ───────────────────────────────────────────────────
+  - id: TASK-010
+    parent: "7.1, 7.2, 7.3"
+    title: 收尾 — 全量测试 + 版本 bump + 多远程推送 + 归档
+    status: pending
+    complexity: L
+    dependencies: [TASK-003, TASK-005, TASK-006, TASK-008, TASK-009]
+    agent: tech-lead
+    deliverables:
+      - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+      - CLAUDE.md
+      - VERSION
+    description: >
+      全量 hook + skill shell 测试 PASS (Rule #6 deterministic structural substitute)。
+      ship 前 cat aria/VERSION + plugin.json 复核当前版本再 bump 5 SOT + CLAUDE.md doc 同步;
+      SOT/CLAUDE.md 高竞争区按 feedback_concurrent_sot_conflict_mechanical_resolve 处理
+      (version mine-wins + CHANGELOG keep-both)。push 前 git fetch + 多远程 (Forgejo+GitHub) +
+      post-push SHA 验证。归档 Spec (Phase D.2) + 关闭关联 issue (如开)。
+    verification:
+      - "全量测试 PASS;Linux LF 零退化"
+      - "5 SOT + 主仓 VERSION/CLAUDE.md 版本一致;三方 parity 一致"
+
+execution_order:
+  - "TASK-001 (框架先行, 阻塞所有测试)"
+  - "并行: TASK-002 / TASK-004 / TASK-006 / TASK-007 (独立代码/验证, 无相互依赖)"
+  - "并行: TASK-003 (deps 001,002) / TASK-005 (deps 001,004) — 框架 + 各自代码就绪后"
+  - "TASK-008 (deps 002,004,006,007 — 需站点分类定案)"
+  - "TASK-009 (deps 007,008 — convention 反映最终分类 + guard)"
+  - "TASK-010 (deps 全部 — 收尾发版)"
+
+notes:
+  - "Agent 分配 (A.3): qa-engineer=测试框架+回归测试; backend-architect=shell 代码修复+guard 工具; code-reviewer=T3 验证定案; knowledge-manager=convention+doc; tech-lead=收尾发版"
+  - "复杂度偏小: 多为单行/局部 shell 修复 + 测试;L 仅 TASK-010 收尾 (多文件 SOT + 多远程 + 归档)"
+  - "关键路径: TASK-001 → TASK-002/004 → TASK-003/005 → TASK-008 → TASK-009 → TASK-010"
