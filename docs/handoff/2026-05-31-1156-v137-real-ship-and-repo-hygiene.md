@@ -67,7 +67,7 @@ updated-at: 2026-05-31T11:56:00Z
 
 ### 低优先级 / cleanup
 
-- **`.aria/cache/` gitignore (aria-orchestrator)**: 子模块内 `?? .aria/cache/` 每次 scan 产生 `M aria-orchestrator` 噪音。建议在 aria-orchestrator 的 `.gitignore` 加 `.aria/cache/`。**owner 本 session 未拍板** (我提议时 owner 转入收尾请求)。非必须。
+- ✅ **`.aria/cache/` gitignore (aria-orchestrator)** — **DONE** (owner 拍板=是, session 收尾后执行): aria-orchestrator `b2484f2` 加 `.aria/cache/` 到 `.gitignore` (`.aria/config.json` 仍跟踪, 仅 ignore cache 子目录), 主仓 gitlink bump `1f98fb6`, 4 仓双远程 parity。`M aria-orchestrator` 噪音已消除。
 - MEMORY.md 余量仅 1.2KB (~7-8 entry); 下次满时按头部 convention 继续往 MEMORY-archive.md 沉历史里程碑指针。
 
 ---
@@ -147,12 +147,12 @@ c724313 docs(readme): sync README.zh.md to v1.37.0 parity (was stale at v1.21.3)
 c5bd6b3 fix(release): complete v1.37.0 SOT bump — 4 files dropped by #133 atomic-bump
 ```
 
-**全仓同步核对 (session 收尾时, local==origin==github)**:
+**全仓同步核对 (session 最终, local==origin==github)**:
 ```
-main             : accaa49  ✅ PARITY
+main             : 1f98fb6  ✅ PARITY (accaa49 v1.37.0 work + 5f5a9d0 handoff + 1f98fb6 gitignore bump)
 aria             : c724313  ✅ PARITY
 standards        : 95cbdc9  ✅ PARITY (未改, 沿用)
-aria-orchestrator: 72fa62b  ✅ PARITY (未改; 仅 benign .aria/cache/ 未跟踪)
+aria-orchestrator: b2484f2  ✅ PARITY (.gitignore +`.aria/cache/`, 消除 `M aria-orchestrator` 噪音)
 ```
 
 ---
