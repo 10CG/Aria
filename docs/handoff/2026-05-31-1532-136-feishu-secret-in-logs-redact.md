@@ -8,7 +8,7 @@ updated-at: 2026-05-31T15:32:00Z
 
 # Aria — Session Handoff (2026-05-31 ~15:32 UTC) — /state-scanner 顺出 #136 Feishu webhook secret-in-logs 日志脱敏 (full A→D + PR #22)
 
-> **Status**: 🟢 代码脱敏 + 审计 SHIPPED (PR #22 merged `1b69564` + 主仓 gitlink `9f2c4e1` 双远程 parity)。**issue #136 保持 open** — 残留 owner 轮换 (已泄漏 token 轮换前仍有效)。
+> **Status**: 🟢 代码脱敏 + 审计 SHIPPED (PR #22 merged `1b69564` + 主仓 gitlink `9c253b8` 双远程 parity)。**issue #136 保持 open** — 残留 owner 轮换 (已泄漏 token 轮换前仍有效)。
 > **Type**: /state-scanner 例行扫描 → owner 选 #136 → full A→D (triage → fix → PR review → merge → gitlink → issue comment)
 > **Rule #9 trigger**: 跨 A→D phases (单 cycle)
 > **本终端**: dev-claude — aria-orchestrator + 主仓 clean 已 push
@@ -18,7 +18,7 @@ updated-at: 2026-05-31T15:32:00Z
 ## §0 入口 (新 session 优先读)
 
 1. **本 doc**
-2. **主成果**: **#136 Feishu webhook secret-in-logs 代码脱敏 RESOLVED (action #2 + #3)**。`FeishuWebhookClient.send` 三条日志路径不再打印完整 webhook URL (含 `/hook/<TOKEN>`),改 `scheme://host/.../hook/***`。新增 `_redact_webhook_url()` + 8 单测 (unittest 8/8) + `aria:code-reviewer` 两阶段 PASS (0 Critical/0 Important)。aria-orchestrator PR #22 `1b69564` / 主仓 gitlink `9f2c4e1` (origin+github parity)。
+2. **主成果**: **#136 Feishu webhook secret-in-logs 代码脱敏 RESOLVED (action #2 + #3)**。`FeishuWebhookClient.send` 三条日志路径不再打印完整 webhook URL (含 `/hook/<TOKEN>`),改 `scheme://host/.../hook/***`。新增 `_redact_webhook_url()` + 8 单测 (unittest 8/8) + `aria:code-reviewer` 两阶段 PASS (0 Critical/0 Important)。aria-orchestrator PR #22 `1b69564` / 主仓 gitlink `9c253b8` (origin+github parity)。
 3. **⚠️ 残留 owner action (#136 仍 open)**: **轮换** `ARIA_FEISHU_WEBHOOK_URL` — 代码 fix 只阻止未来泄漏,已泄漏 token 轮换前仍有效。见 §2 + issue #136 comment 6211。
 4. **M6 主线时间闸门 (本 session 未碰)**: **06-01 02:30 UTC** AC-7 crontab gate 自动 PASS → 解锁 M6 e2e-resilience (Spec #2) Phase B。见前序 handoff `2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md`。
 
@@ -34,7 +34,7 @@ updated-at: 2026-05-31T15:32:00Z
 | 2 | **#136 triage VALID**: 定位 3 处 log 泄漏 (feishu_webhook.py:524/533/541) + submodule 同步核实 (无 in-flight fix) + 审计其余 layer1 runner | triage verdict |
 | 3 | **Phase B**: `_redact_webhook_url()` helper + import urllib.parse + 3 处 log 脱敏 + test_feishu_redact.py 8 单测;**测试抓出真 bug** (trailing-slash token 落倒数第二段) → rstrip 修复 | branch fix/feishu-webhook-redact-log-136 |
 | 4 | **Phase C PR #22**: `aria:code-reviewer` 两阶段 PASS (0C/0I, 3 Minor defensive→deferred);独立核验 3 路径全脱敏 + 审计声明 + 10 edge case probe | PR #22 |
-| 5 | **merge + gitlink**: Rule #8 gate (无 CI backend → skip_with_warning, 同仓本周先例) → merge `1b69564` → 主仓 gitlink bump `9f2c4e1` 双远程 push | origin+github parity |
+| 5 | **merge + gitlink**: Rule #8 gate (无 CI backend → skip_with_warning, 同仓本周先例) → merge `1b69564` → 主仓 gitlink bump `9c253b8` 双远程 push | origin+github parity |
 | 6 | **issue #136 status comment 6211** (action #2+#3 done, #1 rotation pending) → **保持 open** | comment 6211 |
 | 7 | memory 固化 (1 new) + 本 handoff | — |
 
@@ -98,7 +98,7 @@ updated-at: 2026-05-31T15:32:00Z
 | 仓 | HEAD | 远程 parity | 本 session 提交 |
 |----|------|-------------|------------------|
 | **aria-orchestrator** | `1b69564` | origin ✓ (无 github remote) | PR #22 `cc7280b` redact fix → merge `1b69564` |
-| **主仓 Aria** | `9f2c4e1` | origin ✓ + github ✓ | `9f2c4e1` gitlink bump (#136) |
+| **主仓 Aria** | `9c253b8` | origin ✓ + github ✓ | `9c253b8` gitlink bump (#136) |
 | **aria (plugin)** | `c724313` | origin ✓ + github ✓ | 未改 |
 | **standards** | `95cbdc9` | origin ✓ + github ✓ | 未改 |
 | Forgejo | — | — | issue **#136** comment 6211 (保持 open) |
