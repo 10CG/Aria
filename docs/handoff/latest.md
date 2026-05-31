@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #133-PHASE-B-IMPL-DONE — 🟢 **#133 Phase B 实施核心全完成 (TASK-000/002/003/005/006)** (2026-05-31 ~00:30 UTC, dev-claude)
+## ★ 最新 session #V137-REAL-SHIP — 🎉 **v1.37.0 真·发布修正 + 全仓卫生 (state-scanner 顺出 #133 ship 缺陷链)** (2026-05-31 ~11:56 UTC, dev-claude)
 
-**Latest**: [2026-05-31-133-phase-b-implementation-done.md](./2026-05-31-133-phase-b-implementation-done.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-31-1156-v137-real-ship-and-repo-hygiene.md](./2026-05-31-1156-v137-real-ship-and-repo-hygiene.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-V137-REAL-SHIP display)**: [2026-05-31-1156-v137-real-ship-and-repo-hygiene.md](./2026-05-31-1156-v137-real-ship-and-repo-hygiene.md) — `/aria:state-scanner` 例行扫描顺出 #133 ship 的 5 环缺陷链全部修复: stale rebase 清理 (detached HEAD 实为暂停 rebase 遗留) + 补回被 drop 的 ac-refocus audit report (`8d17640`) + **审出 v1.37.0 是 paper bump** (release commit 声称 5-SOT atomic 实只改 CHANGELOG, 4/5 SOT 漏改→市场见 1.36.0) → 补全 aria SOT (`c5bd6b3`, 双远程 push 后市场真见 1.37.0) + 主仓 gitlink/README badge 1.35→1.37 (`16d8fd9`) + gate 脚本纳管 (`a72faf1`) + README.zh 同步 16 版滞后→parity (`c724313`) + CLAUDE.md footer provenance (`accaa49`)。**7 commits 三仓双远程 parity** (main `accaa49` / aria `c724313` / standards `95cbdc9` / orchestrator `72fa62b`)。Forgejo **#135** (interrupt-collector git-op 盲区)。2 feedback memory + MEMORY.md archive 分层 (25.7→22.8KB + MEMORY-archive.md)。**无代码 carry**; carry = 时间闸门: **M6 Phase B (cron 06-01 03:00)** > v1.29.0 block-flip (06-07 D+14)。**Next**: M6 Phase B (待 06-01 gate-result) > block-flip (06-07) > #134 (可选 Spec)。
+
+## ★ 前 session #133-PHASE-B-IMPL-DONE — 🟢 **#133 Phase B 实施核心全完成 (TASK-000/002/003/005/006)** (2026-05-31 ~00:30 UTC, dev-claude)
+
+**Latest (T-133-PHASE-B-IMPL-DONE)**: [2026-05-31-133-phase-b-implementation-done.md](./2026-05-31-133-phase-b-implementation-done.md) — display-only (本 session #V137-REAL-SHIP 已接替主线 bare pointer; #133 该 session 后已 ship v1.37.0 并经本 session 修正 paper bump)
 
 **Latest (T-133-PHASE-B-IMPL-DONE display)**: [2026-05-31-133-phase-b-implementation-done.md](./2026-05-31-133-phase-b-implementation-done.md) — Phase B **实施核心 5 TASK 全完成**: TASK-000 collision 持久化 (aria 5 commits) + TASK-002/003 convention Problem-1+2 主解药 (standards `ed326b1`) + TASK-005 切口2 advisory rule 1.54 (aria `c256fb9`) + TASK-006 切口1 phase-d-closer fetch-gate (aria `c0d1d80`, self-contained `fetch_gate.py` + 12 tests)。**全量回归绿**: state-scanner 631 (含 16 collision) + fetch_gate 12, 0 regression。**2 feature 分支均未 push** (aria 7 commits + standards 1 commit; 主仓 gitlink 未 bump — TASK-008 ship 时三仓一起)。**剩收尾**: TASK-004 (guard 评估, 建议 dogfood) → TASK-007 (doc+回归) → **TASK-008 (ship v1.37.0, owner-gated: 5+1 SOT bump + 3 仓 push + 归档 + 关 #133)**。⚠️ 教训: Edit-anchor 静默失配本 session 5 次→每 Edit 后 grep -c 验证; "711 tests" 前序口径错, 实为 631。**Next**: #133 收尾 (TASK-004→007→008) > v1.29.0 D+14 (06-07) > M6 Phase B (sister ~06-01)。
 
