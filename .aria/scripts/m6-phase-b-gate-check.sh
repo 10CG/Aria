@@ -14,7 +14,12 @@ export NOMAD_ADDR="http://192.168.69.70:4646"
 OUT="/home/dev/Aria/.aria/notes/2026-06-01-m6-phase-b-gate-result.md"
 NODE="root@192.168.69.90"
 SSH="ssh -o ConnectTimeout=20 -o BatchMode=yes"
-VALIDATOR="/opt/aria-orchestrator/venv/bin/python /root/Aria/aria-orchestrator/docs/validate-m6-handoff.py --check-3-day-history"
+# --snapshots-dir → durable host volume (Blocker #2 fix, m6-cost-snapshot-durable-volume).
+# Snapshots are written by the cost-sentinel cron to the host volume (same as the DB),
+# NOT the node git checkout. Requires the cost-sentinel redeploy + snapshot migration to
+# have completed (TASK-005~007); before that the volume dir is empty.
+SNAPSHOTS_DIR="/opt/aether-volumes/aria-layer1/data/cost-snapshots"
+VALIDATOR="/opt/aria-orchestrator/venv/bin/python /root/Aria/aria-orchestrator/docs/validate-m6-handoff.py --check-3-day-history --snapshots-dir $SNAPSHOTS_DIR"
 
 {
   echo "# M6 Phase B Gate Check — auto-run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -29,7 +34,7 @@ VALIDATOR="/opt/aria-orchestrator/venv/bin/python /root/Aria/aria-orchestrator/d
   echo ""
   echo '## 2. snapshot files on node'
   echo '```'
-  $SSH "$NODE" 'ls -la /root/Aria/aria-orchestrator/.aria/cost-snapshots/cost-*.json 2>&1'
+  $SSH "$NODE" "ls -la $SNAPSHOTS_DIR/cost-*.json 2>&1"
   echo '```'
   echo ""
   echo '## 3. cost-sentinel cron 近期运行 (exit 状态)'
