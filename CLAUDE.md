@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.36.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.37.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -532,7 +532,11 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   1.85 + phase-b Prod-Validated commit trailer gate + audit-engine file-scope 二次过滤
                   降级 convergence; standards git-commit.md §6.4 trailer), v1.36.0 = shell-jq-crlf-
                   hardening #132 follow-up (系统性加固全 plugin shell jq 消费点对 Windows CRLF +
-                  crlf-shim 测试框架 + jq-crlf-guard + standards shell-jq-crlf-hygiene convention);
+                  crlf-shim 测试框架 + jq-crlf-guard + standards shell-jq-crlf-hygiene convention),
+                  v1.37.0 = concurrent-session-upm-safety #133 (并发写安全 convention 主解药 +
+                  tracks_multibranch.collision 持久化 lib/collision.py + 切口2 rule 1.54
+                  concurrent_churn_detected + 切口1 phase-d-closer fetch_gate; advisory-over-hardlock;
+                  standards concurrent-session-write-safety convention; 27 tests);
                   v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
@@ -551,7 +555,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-30 (插件 v1.35.0 ship — #58 emergency-hotfix+file-scope; 本日 3 ship #104/#18/#58 项目状态段同步)
+**更新**: 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety: 并发写安全 convention 主解药 + collision 持久化 + 切口1/2 advisory)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
