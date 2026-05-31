@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #BLOCKER2-DURABLE-VOLUME — 🟢 **Blocker #2 永久解: cost-snapshot durable host volume (state-scanner 顺出 M6 snapshot-locality)** (2026-05-31 ~14:00 UTC, dev-claude)
+## ★ 最新 session #136-FEISHU-REDACT — 🟢 **#136 Feishu webhook secret-in-logs 日志脱敏 SHIPPED (state-scanner 顺出, full A→D + PR #22)** (2026-05-31 ~15:32 UTC, dev-claude)
 
-**Latest**: [2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md](./2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-31-1532-136-feishu-secret-in-logs-redact.md](./2026-05-31-1532-136-feishu-secret-in-logs-redact.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-136-FEISHU-REDACT display)**: [2026-05-31-1532-136-feishu-secret-in-logs-redact.md](./2026-05-31-1532-136-feishu-secret-in-logs-redact.md) — `/aria:state-scanner` 例行扫描 → owner 选 #136 → full A→D: `FeishuWebhookClient.send` **三条**日志路径不再打印完整 webhook URL (含 `/hook/<TOKEN>`),新增 `_redact_webhook_url()` 脱敏为 `.../hook/***` (trailing-slash rstrip 防漏) + 8 单测 (unittest 8/8,**测试抓出真 trailing-slash bug**) + `aria:code-reviewer` 两阶段 PASS (0C/0I, 3 Minor deferred)。aria-orchestrator **PR #22** merge `1b69564` / 主仓 gitlink `9f2c4e1` (origin+github parity)。Rule #8 gate: 无 CI backend → skip_with_warning。审计: 泄漏隔离于 feishu_webhook.py。**issue #136 保持 open** — 残留 owner 轮换 `ARIA_FEISHU_WEBHOOK_URL` (已泄漏 token 轮换前仍有效)。⚠️ 本 session shell stdout 渲染严重损坏 → 用 flag-文件名编码结果 + API re-GET 二次核实 (一度误判假 ship + stale index.lock)。1 memory。**Next**: #136 轮换 (owner) > 06-01 M6 AC-7 gate > M6 e2e-resilience Phase B > v1.29.0 block-flip 06-07。
+
+## ★ 前 session #BLOCKER2-DURABLE-VOLUME — 🟢 **Blocker #2 永久解: cost-snapshot durable host volume (state-scanner 顺出 M6 snapshot-locality)** (2026-05-31 ~14:00 UTC, dev-claude)
+
+**Latest (T-BLOCKER2-DURABLE-VOLUME display)**: [2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md](./2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md) — display-only (本 session #136-FEISHU-REDACT 已接替主线 bare pointer; pointer for scan.py collector `_LATEST_POINTER_RE`)
 
 **Latest (T-BLOCKER2-DURABLE-VOLUME display)**: [2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md](./2026-05-31-1359-blocker2-cost-snapshot-durable-volume.md) — `/aria:state-scanner` 例行扫描顺出 M6 **Blocker #2 (snapshot-locality)** 永久解: owner 拍板 Option B → cost-snapshot 改写 **durable host volume** (`ARIA_COST_SNAPSHOT_DIR` env, = dispatches.db 同 volume) + AC-7 闸 on-node 读 volume。Level 2 Spec archived `2026-05-31-m6-cost-snapshot-durable-volume`;aria-orchestrator `3cd32fd` / 主仓 `dcc9124` 双远程 parity;prod 部署验证 (git bundle+scp 绕节点凭据 #-1 + `aether` 重部署 + smoke mtime proof 证写 volume not checkout + 迁移 2 snapshot)。**v1.37.0 假闭环同步确认** (实为本地 stale checkout, sister 已修)。Feishu webhook secret-in-logs → Forgejo **#136**。维度: US-026 补 Blocker #2 / Spec archived / UPM N/A / PRD 无需改。2 memory。**无代码 carry**;carry = ⏰ **06-01 02:00 cron 第 3 snapshot → 02:30 UTC crontab gate 自动 AC-7 PASS → 解锁 M6 e2e-resilience (Spec #2) Phase B**。**Next**: 06-01 gate-result 确认 PASS > M6 e2e-resilience Phase B (sister 未认领) > #136 Feishu > Blocker #-1 节点凭据 (owner) > v1.29.0 block-flip 06-07。
 
