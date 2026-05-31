@@ -555,7 +555,7 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety: 并发写安全 convention 主解药 + collision 持久化 + 切口1/2 advisory)
+**更新**: 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety: 并发写安全 convention 主解药 + collision 持久化 + 切口1/2 advisory; 同日 state-scanner session 补 v1.37.0 真·发布 — #133 release commit 实为 paper bump (4/5 SOT 漏改, 市场仍见 1.36.0), 补全 aria SOT `c5bd6b3` + 补回被 drop 的 ac-refocus audit report `8d17640` + README.zh 同步 v1.21.3→v1.37.0 + Forgejo #135 (interrupt-collector git-op 盲区))
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
