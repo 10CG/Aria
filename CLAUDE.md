@@ -176,6 +176,7 @@ v2.0 在"十步循环"之上建立了两层执行结构:
 ├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+)
 ├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.28.0+ §C.2.4.5 mechanical gate companion)
 ├── Shell jq CRLF 卫生 → standards/conventions/shell-jq-crlf-hygiene.md (aria-plugin v1.36.0+ #132 follow-up; CR 处理决策表 + jq-crlf-guard + crlf-shim 测试框架)
+├── 并发 Session 写入安全 → standards/conventions/concurrent-session-write-safety.md (aria-plugin v1.37.0+ #133; 并发安全写法主解药 + AI 记录硬证据自律 + 切口1/2 advisory; advisory-over-hardlock)
 ├── 进度管理       → standards/core/progress-management/
 ├── 研究文档       → docs/
 ├── 需求文档       → docs/requirements/ (PRD + User Stories)
