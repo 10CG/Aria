@@ -19,8 +19,9 @@ updated-at: 2026-05-31T00:30:00Z
 ## §0 入口 (新 session 优先读)
 
 1. **本 doc**
-2. **主 carry #133**: Spec Approved; Phase B **实施核心全完成**, 剩 **TASK-004 (guard 评估) → TASK-007 (doc+回归) → TASK-008 (ship v1.37.0, owner-gated)**
-3. **2 个未 push feature 分支** (见 §3): aria `feature/concurrent-session-upm-safety` (7 commits) + standards 同名 (1 commit)
+2. **主 carry #133**: Spec Approved; Phase B **TASK-000~007 全完成** (+TASK-004 standards `95cbdc9` guard 评估=dogfood + TASK-007 main `a144805` CLAUDE.md 索引+回归), **仅剩 TASK-008 (ship v1.37.0, owner-gated)**
+3. **2 个未 push feature 分支** (见 §3): aria `feature/concurrent-session-upm-safety` (7 commits) + standards 同名 (**2 commits**: ed326b1+95cbdc9)
+   - TASK-008 = self-thrash dogfood + 5+1 SOT bump v1.36.0→v1.37.0 + 3 仓双远程 push + Spec 归档 + 关 #133 (**owner-facing, ship 前确认**)
 4. **owner-gated 时敏**: v1.29.0 block-flip D+14 ship **2026-06-07**
 
 → **next session 入口**: `/aria:state-scanner` → 读本 doc §6。
