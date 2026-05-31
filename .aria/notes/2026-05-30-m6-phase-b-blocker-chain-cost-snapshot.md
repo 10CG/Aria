@@ -5,6 +5,8 @@
 > **净结论 (诊断时)**: M6 余下 2 Spec (e2e-resilience + release-closeout) 的 Phase B **无法启动**,被一条 4 层 blocker 链阻塞,其中**最深一层是 Spec #1 的代码缺陷**,需独立 fix cycle。
 >
 > **更新 (2026-05-30 同 session 后续)**: 代码缺陷 (#-2) 已走 emergency_hotfix cycle 修复并发版 (aria-orchestrator `72fa62b` PR #21 / 主仓 `3183401`),已部署 light-1 (#0 刷新到 72fa62b) + cron 重部署 + 首个 snapshot 产出 (机制 prod 功能正常)。**剩余: 3-day 累积 (1/3, cron 每日自动) + Blocker #2 (snapshot-locality, 闸门在 light-1 跑) + Blocker #-1 (节点 git 凭据)。** 详见末尾 §RESOLUTION。
+>
+> **更新 (2026-05-31, /state-scanner Blocker #2 处理)**: **Blocker #2 (snapshot-locality) RESOLVED** — owner 拍板 Option B「Host volume + on-node 闸」。snapshot 改写 durable host volume (`ARIA_COST_SNAPSHOT_DIR` env, = dispatches.db 同 volume),AC-7 闸 on-node 读 volume (wrapper `--snapshots-dir`)。Spec archived `openspec/archive/2026-05-31-m6-cost-snapshot-durable-volume`;aria-orchestrator master `3cd32fd` / 主仓 `47ed7a8`;prod 部署验证 (smoke mtime proof: 写 volume not checkout) + 迁移现有 2 snapshot。**3-day 累积现 2/3** (06-01 02:00 cron 第 3 个 → 02:30 crontab gate 自动 PASS)。**剩 Blocker #-1 (节点 git 凭据) 仍 owner-gated。** 副发现: cost-sentinel INFO 日志泄 Feishu webhook URL → Forgejo #136 (轮换+脱敏)。
 
 ---
 
