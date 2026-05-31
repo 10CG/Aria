@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #133-PHASE-B-TASK000 — 🟢 **#133 Phase B: TASK-000 (collision 持久化) DONE** (2026-05-30 ~17:20 UTC, dev-claude)
+## ★ 最新 session #133-PHASE-B-IMPL-DONE — 🟢 **#133 Phase B 实施核心全完成 (TASK-000/002/003/005/006)** (2026-05-31 ~00:30 UTC, dev-claude)
 
-**Latest**: [2026-05-30-133-phase-b-task000-done.md](./2026-05-30-133-phase-b-task000-done.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-05-31-133-phase-b-implementation-done.md](./2026-05-31-133-phase-b-implementation-done.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-133-PHASE-B-IMPL-DONE display)**: [2026-05-31-133-phase-b-implementation-done.md](./2026-05-31-133-phase-b-implementation-done.md) — Phase B **实施核心 5 TASK 全完成**: TASK-000 collision 持久化 (aria 5 commits) + TASK-002/003 convention Problem-1+2 主解药 (standards `ed326b1`) + TASK-005 切口2 advisory rule 1.54 (aria `c256fb9`) + TASK-006 切口1 phase-d-closer fetch-gate (aria `c0d1d80`, self-contained `fetch_gate.py` + 12 tests)。**全量回归绿**: state-scanner 631 (含 16 collision) + fetch_gate 12, 0 regression。**2 feature 分支均未 push** (aria 7 commits + standards 1 commit; 主仓 gitlink 未 bump — TASK-008 ship 时三仓一起)。**剩收尾**: TASK-004 (guard 评估, 建议 dogfood) → TASK-007 (doc+回归) → **TASK-008 (ship v1.37.0, owner-gated: 5+1 SOT bump + 3 仓 push + 归档 + 关 #133)**。⚠️ 教训: Edit-anchor 静默失配本 session 5 次→每 Edit 后 grep -c 验证; "711 tests" 前序口径错, 实为 631。**Next**: #133 收尾 (TASK-004→007→008) > v1.29.0 D+14 (06-07) > M6 Phase B (sister ~06-01)。
+
+## ★ 前 session #133-PHASE-B-TASK000 — 🟢 **#133 Phase B: TASK-000 (collision 持久化) DONE** (2026-05-30 ~17:20 UTC, dev-claude)
+
+**Latest (T-133-PHASE-B-TASK000 display)**: [2026-05-30-133-phase-b-task000-done.md](./2026-05-30-133-phase-b-task000-done.md) — display-only (本 session #133-PHASE-B-IMPL-DONE 已接替主线 bare pointer)
 
 **Latest (T-133-PHASE-B-TASK000 display)**: [2026-05-30-133-phase-b-task000-done.md](./2026-05-30-133-phase-b-task000-done.md) — Phase B 启动 + **TASK-000 (前置 collision 字段持久化) 全部完成**。aria submodule 分支 `feature/concurrent-session-upm-safety` (5 commits, **未 push**): 0.0 meta-fix phantom 字段 + 0a 新建 `lib/collision.py` (单一真理源, `classify(tracks)->{kind,groups}` 经 reconcile_all) + collector 持久化 `tracks_multibranch.collision` (additive) + 0b renderer 改读 lib + 16 collision tests (含**真实-collector fixture** AC-0) + fix (3 真实 bug: collector NameError / classify staleness / test builder)。**711/711 tests PASS, 0 regression**。磁盘清理 ~5G (93%→63%)。**⚠️ 本 session 后半 shell 输出严重损坏** (重复行/EOF 泄漏/log 乱序) → 改文件中转验证。**主 carry**: Phase B 续 = **TASK-002** (convention 主解药, standards 仓) → TASK-003/005/006 → TASK-004/007/008 ship v1.37.0。**Next**: #133 Phase B > v1.29.0 D+14 (06-07 owner) > M6 Phase B (sister ~06-01)。
 
