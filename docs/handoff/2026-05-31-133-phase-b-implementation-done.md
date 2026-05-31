@@ -119,5 +119,14 @@ ed326b1 docs(conventions): concurrent-session write safety Problem-1+2 (TASK-002
 
 ## §8 memory entries
 
-- ✅ 无新增 (本 session)。
-- 💭 候选 (下次评估): **"实施期每个 Edit 后用 grep -c 验证落地, 不假设成功"** —— 本 session 5 次 Edit-anchor 静默失配致误标 done + 1 次 runtime crash (collector import-guard 漏落)。这是高频实证教训, 值得立 feedback memory (区别于既有 `feedback_clear_cache_before_code_change`)。下次确认后写 `feedback_verify_edit_landed_grep_count`。
+本 session 固化 3 条 (均已 grep 验证):
+- ✅ **新增** `feedback_verify_edit_landed_grep_count` — 实施期每 Edit 后 grep -c 验证落地, 不假设成功 (~5 次 anchor 静默失配 + 1 次 collector runtime crash)。
+- ✅ **新增** `feedback_issue_close_comment_not_body_patch` — 关 issue 发 POST comment + 单独 PATCH state, 绝不 body+state 一起 (#133 原始正文被覆盖且 Forgejo 不可恢复)。
+- ✅ **扩展** `feedback_concurrent_sot_conflict_mechanical_resolve` — +rebase/merge auto-merge 可能不报 conflict 就静默吞 sister latest.md 条目, 必 grep 验证 sister slug。
+
+## §9 SHIP 收尾确认 (2026-05-31, 本对话最终收尾)
+
+- **3 仓 × 双远程 parity** ✅: main `36fabe8` / aria `e24a400` / standards `95cbdc9` (Forgejo origin + GitHub 全等, worktree clean)。
+- **维度核查** (Q3): UPM N/A (Aria self 无 UPM) / US #133 issue-driven 无对应 US 文件 (同 #132/#58, scan heuristic 报 US-124 是噪声) / Spec archived ✅ / PRD 不在范畴 (plugin convention 增强) / **CLAUDE.md 项目状态段补漏** v1.36.0→v1.37.0 + footer (`36fabe8`, TASK-007 当时只更新了信息地图索引漏了状态段)。
+- **#133 issue**: closed; 正文为重建 stub (原始报告被 ship-close PATCH 覆盖, 见 memory feedback_issue_close_comment_not_body_patch; triage comment 保留完整语境)。
+- **无 carry-forward** —— #133 全闭环。**下一优先级**: v1.29.0 block-flip D+14 (2026-06-07, owner-gated) > M6 e2e-resilience Phase B (sister)。
