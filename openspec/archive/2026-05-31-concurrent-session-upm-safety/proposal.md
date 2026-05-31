@@ -1,7 +1,7 @@
 # concurrent-session-upm-safety — 并发多 session UPM/handoff 安全 (convention 主解药 + 检测/fetch 辅助)
 
 > **Level**: 3 (Full — proposal.md + tasks.md;跨 standards convention + state-scanner + phase-d-closer;含 collision 字段持久化 collector 增量)
-> **Status**: ✅ **Approved** (合并版 — 双 #133 Spec 对账合并 per owner 2026-05-30; (b) backbone 2-round CONVERGED + (a)/(c) focused re-audit **R1 FAIL(2C)→Rev1→R2 CONVERGED 2026-05-30** [tech-lead PASS / qa PWW / backend PASS, all Critical+Important CLOSED]; ready Phase A.3 → Phase B)
+> **Status**: 🚢 **SHIPPED v1.37.0 (2026-05-31)** — Phase B 全完成 (TASK-000~008), 27 tests (collision 16 + fetch_gate 11) 0 regression, 3 仓双远程 parity (aria 71eb5e5 / standards 95cbdc9 / main ad14a73), #133 closed。前序: Approved (合并版 — 双 #133 Spec 对账合并 per owner 2026-05-30; (b) backbone 2-round CONVERGED + (a)/(c) focused re-audit R1 FAIL(2C)→Rev1→R2 CONVERGED)
 > **Change ID**: `concurrent-session-upm-safety`
 > **Source**: Forgejo Aria [#133](https://forgejo.10cg.pub/10CG/Aria/issues/133) (dogfood: SilkNode 双 session;本 session dev-claude 自身亦撞同类: latest.md prepend + 5 SOT 冲突 + 4× index.lock)
 > **Supersedes (合并)**: `concurrent-track-proactive-coordination` (sister 终端并发起草, L2 未收敛/banked) —— 其 (a)/(c) 深度机制 + R1/R2 audit findings 已吸收入本 Spec;原 dir 归并删除
