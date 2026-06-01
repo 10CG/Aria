@@ -387,311 +387,58 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ---
 
-## TG-B-scaffold — 6-mode scaffold + mock-layer rationale doc (~2h)
+## TG-B — Crash-recovery coverage matrix + state-machine determinism (~2-3h) [REWORKED per #138]
 
-<!-- P-4: Mock-layer-per-mode matrix thread -->
-- [ ] B-scaffold-1 Write mock-layer-per-mode rationale document
-  `aria-orchestrator/docs/crash-recovery-mock-layer-rationale.md` (Q-NEW-1 deliverable):
+<!-- TG-B Phase A rework 2026-06-01 (Forgejo 10CG/Aria #138): the original TG-B-scaffold/
+     infra/llm/statemachine tasks referenced fictional mock symbols (hermes_client /
+     layer2_client / recovery.py / ProcessKilledError / AllocTerminatedError — none exist;
+     aria-layer1 is a Hermes PLUGIN, not a client calling Hermes) AND an incorrect
+     "everything → S_FAIL" recovery model. The real architecture uses three models
+     (auto-resume / WAL durability / S_FAIL), and all six PRD §634 crash modes are already
+     covered by existing M2/M3 tests. This block is reworked to a coverage matrix + the one
+     genuine gap + a re-scoped determinism task. Re-estimate ~13h → ~2-3h. Full rationale:
+     openspec/changes/aria-2.0-m6-e2e-resilience/tgb-rework-analysis.md -->
 
-  Document the complete matrix from proposal §B.1 (6 rows: ID, failure type, mock layer, rationale).
-  Include a section "Mock-shape discipline" citing `[[feedback_test_mock_pattern_hides_prod_bug]]`
-  and `[[feedback_mock_layer_per_failure_semantic]]` — exact exception class + attribute shape for
-  each SDK-boundary mock must match production code. Any deviation in a test must use
-  `# mock-layer-deviation-ok: <reason>` comment.
+- [x] B-matrix-1 Author `aria-orchestrator/docs/crash-recovery-coverage-matrix.md` mapping the
+  six PRD §634 crash modes to (a) their correct recovery model (auto-resume / WAL durability /
+  S_FAIL) and (b) the authoritative existing tests. Replaces the fictional 6-mode/9-file suite
+  + FakeClock + mock-layer-rationale doc. **Done** (this Spec). The matrix is the AC-3 evidence
+  artifact cited by Spec #4 release-closeout.
 
-<!-- R1-I2-3/I2-4 fix: LLM test files split by provider (Luxeno/Zhipu have different exception
-     classes and base URLs). (R1 audit 2026-05-24) -->
-- [ ] B-scaffold-2 Create test file scaffold (empty test functions with docstrings) for all modes:
-  - `aria-orchestrator/tests/test_crash_infra1.py` (Hermes SIGKILL, SDK)
-  - `aria-orchestrator/tests/test_crash_infra2.py` (Layer 2 alloc SIGKILL, SDK)
-  - `aria-orchestrator/tests/test_crash_infra3_wal.py` (WAL × 4 scenarios, SDK)
-  - `aria-orchestrator/tests/test_crash_llm4_luxeno_429.py` (429 rate-limit, Luxeno path, SDK)
-  - `aria-orchestrator/tests/test_crash_llm4_zhipu_429.py` (429 rate-limit, Zhipu path, SDK)
-  - `aria-orchestrator/tests/test_crash_llm5_luxeno.py` (invalid JSON, Luxeno URL, httpx_mock)
-  - `aria-orchestrator/tests/test_crash_llm5_zhipu.py` (invalid JSON, Zhipu URL, httpx_mock)
-  - `aria-orchestrator/tests/test_crash_llm6_luxeno.py` (provider 5xx, Luxeno URL, httpx_mock)
-  - `aria-orchestrator/tests/test_crash_llm6_zhipu.py` (provider 5xx, Zhipu URL, httpx_mock)
+  Recovery-model corrections (load-bearing — the as-written §B got these wrong):
+  - Infra-1 (process/Hermes SIGKILL) → **auto-resume from DB** (NOT S_FAIL). Existing:
+    `test_t12_crash_recovery_s5_await_auto_resume` + `test_kill_minus_9_releases_advisory_lock`
+    + `test_t7_crash_recovery.py`.
+  - Infra-2 (Layer-2 alloc SIGKILL) → **S_FAIL** (correct). Existing:
+    `test_t2_alloc_status_provider.py` (ExitCode 137 = SIGKILL) + S5_AWAIT routing (T6.2).
+  - Infra-3 (WAL A/B/C/D) → **durability/auto-recover** (NOT S_FAIL for A/B/C). Existing:
+    `test_t22_t23_orm_wal.py::test_57`.
+  - LLM-4/5/6 → **S_FAIL(PROVIDER_5XX)** (correct; the invented `rate_limit_exhausted`/`HTTP_429`
+    structured events do not exist). Existing: `test_t9_provider_router.py` + B-llm-1 below.
 
-  Each file begins with:
-  ```python
-  # Mock layer: [SDK|HTTP] per crash-recovery-mock-layer-rationale.md
-  # Failure mode: <description>
-  ```
+- [x] B-llm-1 Close the one genuinely-uncovered branch: the LLM handlers'
+  `except Exception → S_FAIL(PROVIDER_5XX)` path for a **non-timeout** provider error
+  (`TimeoutError → S_FAIL(TIMEOUT)` was already covered by
+  `test_state_machine_skeleton.py::test_15d`). **Done**:
+  `tests/test_crash_llm_provider_error_s_fail.py` (5 tests) drives `_handle_s2_decide` /
+  `_handle_s3_build_cmd` with the REAL production exception classes (mock-shape discipline):
+  `LLMRouteExhausted(chain)` / `_LLMHTTPError(429)` / `ZhipuHTTPError(503)`. 869 tests green.
 
-  Verify scaffold structure is correct before filling in tests.
+- [ ] B-sm-1 State-machine **deterministic-transition** coverage (re-scoped per owner 2026-06-01:
+  deterministic transition table only, NOT 100% line coverage of the 4500-line `extension.py`).
+  For each deterministic state (S0_IDLE / S1_SCAN / S4_LAUNCH / S5_AWAIT / S7_HUMAN_GATE /
+  S8_MERGE / S9_CLOSE / S_FAIL): assert normal outbound transition + failure-injected outbound
+  transition + re-entry idempotency. Reuse `MockClock` (`aria_layer1/interfaces.py`) — the
+  existing AdvancingClock DI; do NOT introduce a new `FakeClock`, and do NOT create
+  `state_machine.py` (logic is distributed across extension/comment_poll/reconciler/tick_runner).
+  Survey existing coverage first (`test_state_machine_skeleton.py` + `test_t12` already cover
+  much of this) and add only the missing deterministic transitions. No `--cov-fail-under=100`.
 
-- [ ] B-scaffold-3 Add `FakeClock` class to `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/testing.py`
-  (or create file if absent). Class definition per proposal §B.3:
-  ```python
-  class FakeClock:
-      def __init__(self, start: datetime):
-          self._now = start
-      def now(self) -> datetime:
-          return self._now
-      def advance(self, seconds: int) -> None:
-          from datetime import timedelta
-          self._now += timedelta(seconds=seconds)
+- [ ] B-matrix-2 Cross-check: confirm every test referenced in the matrix exists and passes
+  (`python3 -m unittest discover -s tests`). Any matrix reference that does not resolve to a real
+  passing test is a matrix bug (drift guard — the failure mode this whole rework corrects).
 
-  class RealClock:
-      def now(self) -> datetime:
-          return datetime.now(timezone.utc)
-  ```
 
----
-
-## TG-B-infra — Infra-1/2/3 crash tests + WAL shell script (~4.5h)
-
-<!-- P-5: 4 WAL scenarios -->
-- [ ] B-infra-1 Implement `test_crash_infra1.py` (Hermes SIGKILL, SDK boundary):
-  - Reuse `test_t12` existing fixture structure if available.
-  - Mock `hermes_client.dispatch()` to raise `ProcessKilledError` at a mid-transition checkpoint.
-  - Assert: (a) state machine transitions to S_FAIL; (b) S_FAIL state is written to DB before
-    exception propagates (state write is atomic); (c) structured error log entry written with
-    `{"event": "process_killed", "recovery": "s_fail_set"}`.
-  - Mock at SDK boundary: `unittest.mock.patch('aria_layer1.hermes_client.HermesClient.dispatch',
-    side_effect=ProcessKilledError('simulated SIGKILL'))`.
-  - Do NOT use generic `Exception` as the mock — use exact `ProcessKilledError` class (mock-shape
-    discipline per `[[feedback_test_mock_pattern_hides_prod_bug]]`).
-
-- [ ] B-infra-2 Implement `test_crash_infra2.py` (Layer 2 alloc SIGKILL, SDK boundary):
-  - Light-1 node CANNOT be drained (Nomad drain requires node-level operator access, not alloc scope).
-    Reframe: alloc kill is simulated as `AllocTerminatedError` from `layer2_client.run_task()`.
-  - Assert: (a) state machine to S_FAIL; (b) S_FAIL state written; (c) structured log entry
-    `{"event": "alloc_killed", "node": "light-1", "recovery": "s_fail_set"}`.
-  - Document the light-1 drain reframe with comment:
-    ```python
-    # light-1 cannot be drained via alloc API (requires node-level access).
-    # Alloc kill is the correct failure semantic for this test.
-    # See crash-recovery-mock-layer-rationale.md Infra-2.
-    ```
-
-- [ ] B-infra-3 Implement `test_crash_infra3_wal.py` (WAL truncation × 4 scenarios, SDK boundary):
-  Must contain exactly 4 test functions, one per scenario (P-5):
-
-  - `test_wal_truncated_0_bytes_pre_checkpoint` (WAL-A):
-    - `tmpdir` fixture: create SQLite DB in WAL mode, truncate WAL to 0 bytes.
-    - Monkey-patch `sqlite3.connect()` to return connection that raises
-      `sqlite3.DatabaseError('database disk image is malformed')` on first execute.
-    - Assert: state machine → S_FAIL; `PRAGMA integrity_check` invoked in recovery handler;
-      log entry `{"event": "wal_fault", "scenario": "WAL-A", "recovery": "s_fail_set"}`.
-
-  - `test_wal_truncated_0_bytes_mid_checkpoint` (WAL-B):
-    - Simulate WAL zeroed during active checkpoint: mock `sqlite3.connect()` to raise
-      `sqlite3.OperationalError('database is locked')`.
-    - Same assertions as WAL-A.
-
-  - `test_wal_corrupted_garbage_bytes` (WAL-C):
-    - `tmpdir` fixture: create SQLite DB in WAL mode, write garbage bytes to WAL file.
-    - Same mock pattern as WAL-A.
-    - Same assertions.
-
-  <!-- R1-I2-2 fix: WAL-D assertion corrected — NO S_FAIL (SQLite auto-recreates WAL; recovery
-       succeeds; integrity preserved). S_FAIL is only for WAL-A/B/C where corruption detected.
-       (R1 audit 2026-05-24) -->
-  - `test_wal_file_deleted` (WAL-D):
-    - `tmpdir` fixture: create SQLite DB in WAL mode, delete WAL file entirely.
-    - Do NOT mock sqlite3.connect — use real filesystem (WAL-D is a real-file scenario).
-    - Assert: NO S_FAIL — recovery succeeds; a subsequent clean connection can read/write
-      successfully (no data corruption visible).
-    - Assert: structured log entry `{"event": "wal_fault", "scenario": "WAL-D", "recovery": "wal_auto_recreated"}`.
-    - Add comment:
-      ```python
-      # WAL-D: NOT a corruption scenario. SQLite auto-recreates WAL on reconnect.
-      # Recovery succeeds (no S_FAIL). Contrast with WAL-A/B/C which produce S_FAIL.
-      # See proposal §B.2 WAL-D row for expected outcome.
-      ```
-
-- [ ] B-infra-4 Write `aria-orchestrator/acceptance/m6-wal-fault.sh` (M-qa-R3-8, AC-3):
-  ```bash
-  #!/usr/bin/env bash
-  set -euo pipefail
-  # M6 WAL fault injection shell script (AC-3 artifact)
-  # Creates a temp SQLite DB, truncates WAL to 0 bytes, calls recovery handler.
-  TMPDIR=$(mktemp -d)
-  DB="${TMPDIR}/test.db"
-  sqlite3 "${DB}" "PRAGMA journal_mode=WAL; CREATE TABLE t (id INTEGER);" >/dev/null 2>&1
-  WAL="${DB}-wal"
-  truncate --size=0 "${WAL}"    # WAL-A simulation
-  # Call recovery handler
-  python3 -m aria_layer1.recovery --wal-check "${DB}"
-  STATUS=$?
-  rm -rf "${TMPDIR}"
-  if [ "${STATUS}" -eq 0 ] || [ "${STATUS}" -eq 1 ]; then
-      echo "[PASS] m6-wal-fault.sh: recovery handler returned expected status ${STATUS}"
-      exit 0
-  else
-      echo "[FAIL] m6-wal-fault.sh: unexpected exit code ${STATUS}"
-      exit 1
-  fi
-  ```
-  Make executable: `chmod +x aria-orchestrator/acceptance/m6-wal-fault.sh`.
-
----
-
-## TG-B-llm — LLM-4/5/6 crash tests (~1.5h)
-
-<!-- R1-I2-3 fix: LLM-4 split into Luxeno and Zhipu provider test files — different HTTP error
-     classes (_LLMHTTPError vs ZhipuHTTPError). (R1 audit 2026-05-24) -->
-<!-- R1-I2-4 fix: LLM-5/LLM-6 use provider-specific httpx_mock URL patterns (Luxeno ≠ Zhipu
-     base URLs). Split into provider-specific test files. (R1 audit 2026-05-24) -->
-<!-- R1-I2-5 fix: Mock target updated — `llm_client.complete()` doesn't exist. Real call sites:
-     `provider_router.call_llm` / `provider_router.route_for_state` / `silknode_client.call_llm`
-     / `zhipu_client.call_llm`. (R1 audit 2026-05-24) -->
-<!-- R1-I2-6 fix: Exception class names corrected — no `RateLimitError`/`ProviderUnavailableError`.
-     Use `_LLMHTTPError(status=429)` (silknode) / `ZhipuHTTPError(status=429)` (zhipu) for 429.
-     Use `LLMRouteExhausted` for router-level exhaustion. (R1 audit 2026-05-24) -->
-
-- [ ] B-llm-1 Implement LLM-4 (429 rate-limit) split into 2 test files:
-
-  **`test_crash_llm4_luxeno_429.py`** (Luxeno path, SDK boundary):
-  - Mock `silknode_client.call_llm` to raise `_LLMHTTPError(status=429)` (from
-    `aria_layer1.silknode_client._LLMHTTPError`) — exact production exception class.
-  - Use `FakeClock` to advance time past `retry_after` and verify retry attempt.
-  - Assert: (a) ProviderRouter classifies 429 → `HTTP_429` outcome; (b) after all retries
-    exhausted, `LLMRouteExhausted` is raised; (c) state machine → S_FAIL with log entry
-    `{"event": "rate_limit_exhausted", "recovery": "s_fail_set"}`.
-
-  **`test_crash_llm4_zhipu_429.py`** (Zhipu path, SDK boundary):
-  - Mock `zhipu_client.call_llm` to raise `ZhipuHTTPError(status=429)` (from
-    `aria_layer1.zhipu_client.ZhipuHTTPError`) — exact production exception class.
-  - Same assertions as Luxeno path.
-  - Add comment:
-    ```python
-    # Mock layer: SDK boundary. Luxeno and Zhipu have different HTTP error classes.
-    # See crash-recovery-mock-layer-rationale.md LLM-4.
-    ```
-
-- [ ] B-llm-2 Implement LLM-5 (invalid JSON) split by provider:
-
-  **`test_crash_llm5_luxeno.py`** (Luxeno base URL):
-  - Use `pytest_httpx` to intercept Luxeno provider HTTP call at its specific base URL:
-    ```python
-    httpx_mock.add_response(
-        method="POST",
-        url=re.compile(r"https://.*luxeno.*|https://.*silknode.*"),  # verify actual Luxeno URL
-        status_code=200,
-        content=b"{ bad json ["
-    )
-    ```
-  - Assert: (a) SDK adapter raises JSON parse error; (b) state machine → S_FAIL; (c) log entry
-    `{"event": "llm_response_malformed", "recovery": "s_fail_set"}`.
-
-  **`test_crash_llm5_zhipu.py`** (Zhipu base URL):
-  - Same pattern with Zhipu-specific URL (verify from `zhipu_client.py` base URL constant).
-
-  Both files add comment:
-  ```python
-  # Mock layer: HTTP (httpx_mock). Invalid JSON arrives as valid HTTP 200.
-  # Provider-specific URL patterns required (Luxeno ≠ Zhipu base URL).
-  # See crash-recovery-mock-layer-rationale.md LLM-5.
-  ```
-
-- [ ] B-llm-3 Implement LLM-6 (provider 5xx) split by provider:
-
-  **`test_crash_llm6_luxeno.py`** + **`test_crash_llm6_zhipu.py`**:
-  - `httpx_mock.add_response(status_code=503, json={"error": "service_unavailable"})` on
-    provider-specific URL.
-  - Assert: ProviderRouter classifies 503 → `HTTP_5XX` outcome (via `_classify_exception`);
-    after exhaustion `LLMRouteExhausted` raised; state machine → S_FAIL; log entry
-    `{"event": "provider_unavailable", "status_code": 503, "recovery": "s_fail_set"}`.
-  - Do NOT assert `ProviderUnavailableError` — that class does not exist in production code.
-    The classification is done via `_classify_exception` outcome string `"http_5xx"`.
-  - Add comment:
-    ```python
-    # Mock layer: HTTP (httpx_mock). 5xx classified as HTTP_5XX by provider_router._classify_exception.
-    # Provider-specific URL patterns required. See crash-recovery-mock-layer-rationale.md LLM-6.
-    ```
-
----
-
-## TG-B-statemachine — State machine coverage + AdvancingClock DI (~4h)
-
-<!-- R1-T2-2 fix: `aria_layer1/state_machine.py` does NOT exist. State machine logic is in 4
-     modules: extension.py, comment_poll.py, reconciler.py, tick_runner.py. All B-sm tasks
-     updated to use correct module paths and 4-module cov target per Q1 lock (2026-05-24).
-     (R1 audit 2026-05-24) -->
-<!-- R1-I2-5 fix: Mock target updated from `llm_client.complete()` (non-existent) to
-     `provider_router.call_llm` / `silknode_client.call_llm` / `zhipu_client.call_llm`.
-     (R1 audit 2026-05-24) -->
-<!-- R1-I2-7 fix: pyproject.toml addopts declaration added in B-sm-4. (R1 audit 2026-05-24) -->
-
-- [ ] B-sm-1 Audit state machine datetime.now() calls across all 4 modules:
-  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/extension.py`
-  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/comment_poll.py`
-  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/reconciler.py`
-  - `aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/tick_runner.py`
-
-  For each `datetime.now()` call found, replace with `self._clock.now()`. Add `clock` parameter
-  to each handler class constructor:
-  ```python
-  def __init__(self, ..., clock=None):
-      self._clock = clock or RealClock()
-  ```
-  Per AD-M6-6: injection at constructor level (not per-method) minimizes API surface change.
-  Document all replaced call sites in a comment block at top of each modified file:
-  ```python
-  # AdvancingClock DI: datetime.now() calls replaced with self._clock.now()
-  # to prevent wall-clock flakiness (per [[feedback_phase_b_velocity_patterns_2026-04-29]]).
-  # Replaced sites: [list file:line references here]
-  ```
-  Note: `aria_layer1/state_machine.py` does NOT exist and must NOT be created (Q1 lock 2026-05-24).
-
-- [ ] B-sm-2 Implement `test_state_machine_deterministic.py`:
-  For each deterministic state (S0_IDLE, S1_SCAN, S4_LAUNCH, S5_AWAIT, S7_HUMAN_GATE, S8_MERGE,
-  S9_CLOSE, S_FAIL), write tests covering:
-  - Normal outbound transition: e.g., `test_s0_idle_to_s1_scan_on_claim` — state machine in
-    S0_IDLE, issue claim succeeds → S1_SCAN (handler in extension.py).
-  - Failure-injected outbound transition: e.g., `test_s0_idle_to_sfail_on_infra2_kill` — state
-    machine in S0_IDLE, `AllocTerminatedError` raised during claim → S_FAIL.
-  - Re-entry idempotency: e.g., `test_s1_scan_reentry_is_noop` — state machine in S1_SCAN,
-    second entry attempt → remains S1_SCAN (no double-claim side effect).
-
-  Use `FakeClock` for all time-sensitive transitions. Zero live LLM calls.
-  Run with `--cov=aria_layer1.extension,aria_layer1.comment_poll,aria_layer1.reconciler,aria_layer1.tick_runner --cov-fail-under=100`.
-
-- [ ] B-sm-3 Implement `test_state_machine_stochastic_replay.py` (S2_DECIDE/S3_BUILD_CMD/S6_REVIEW
-  mocked replay):
-  Commit fixture files to `aria-orchestrator/tests/fixtures/state_machine/`:
-  - `s2_decide_response.json` — captured LLM response for S2_DECIDE transition.
-  - `s3_build_cmd_response.json` — captured LLM response for S3_BUILD_CMD transition.
-  - `s6_review_response.json` — captured LLM response for S6_REVIEW transition.
-  (Source: DEMO-M5-O3 captures or pre-flight captures from TG-A §A.5. If pre-flight captures
-  not yet available at test time, use placeholder fixtures and update in Phase B.2.)
-
-  Tests use `unittest.mock.patch` to mock `provider_router.call_llm` or `route_for_state`
-  (NOT `llm_client.complete()` — non-existent) to return fixture JSON without any real HTTP
-  call. Assert state transitions S2_DECIDE→S3_BUILD_CMD, S3_BUILD_CMD→S4_LAUNCH,
-  S6_REVIEW→S7_HUMAN_GATE fire correctly.
-
-  Verify zero live calls: add `conftest.py` fixture that fails the test if any real HTTP call
-  is made to provider URLs:
-  ```python
-  @pytest.fixture(autouse=True)
-  def no_live_llm_calls(httpx_mock):
-      """Fail if any live LLM HTTP call is attempted in stochastic replay tests."""
-      yield
-      # httpx_mock raises AssertionError if any unmatched request is made
-  ```
-
-- [ ] B-sm-4 Run full TG-B test suite and verify AC-4:
-  ```bash
-  pytest aria-orchestrator/tests/test_state_machine_deterministic.py \
-         aria-orchestrator/tests/test_state_machine_stochastic_replay.py \
-    --cov=aria_layer1.extension,aria_layer1.comment_poll,aria_layer1.reconciler,aria_layer1.tick_runner \
-    --cov-report=term-missing \
-    --cov-fail-under=100
-  ```
-  Must exit 0. If coverage < 100%, identify uncovered lines and add targeted tests.
-
-  Additionally, declare `--cov-fail-under=100` in `aria-orchestrator/pyproject.toml` to enforce
-  in CI (per I2-7 requirement):
-  ```toml
-  [tool.pytest.ini_options]
-  addopts = "--cov-fail-under=100"
-  ```
-  This ensures CI fails if coverage drops even when pytest is run without explicit `--cov-fail-under`.
-
----
 
 ## TG-C-corpus — Rubric + 10 sample files (~3h)
 

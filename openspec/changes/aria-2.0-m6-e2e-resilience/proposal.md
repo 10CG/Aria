@@ -308,9 +308,33 @@ after any TG-A schema migration (particularly the `is_synthetic` column addition
 
 ---
 
-#### B. TG-B: Crash Recovery (~13h, including +1h Q-NEW-1 hybrid)
+#### B. TG-B: Crash Recovery (~2-3h — REWORKED per #138; was ~13h)
 
-##### B.1 6-mode crash recovery test suite
+> **⚠️ REWORK NOTE (2026-06-01, Forgejo [10CG/Aria #138](https://forgejo.10cg.pub/10CG/Aria/issues/138)).**
+> Phase B recon found this section was drafted against (a) **fictional mock symbols** —
+> `hermes_client` / `layer2_client` / `recovery.py` / `ProcessKilledError` / `AllocTerminatedError`
+> do not exist; aria-layer1 is a Hermes **plugin** (TickHandler), it does NOT call Hermes, so
+> "mock `hermes_client.dispatch()`" is architecturally inverted — and (b) an **incorrect recovery
+> model**: the text below routes every crash mode to S_FAIL, but the real architecture uses **three**
+> models, two of which are NOT S_FAIL:
+> - **Infra-1 (process/Hermes kill) → auto-resume from DB** (NOT S_FAIL). Covered:
+>   `test_t12_crash_recovery_s5_await_auto_resume` + `test_kill_minus_9_releases_advisory_lock` +
+>   `test_t7_crash_recovery.py`.
+> - **Infra-3 (WAL) → durability/auto-recover** (NOT S_FAIL for A/B/C — the WAL-D row already admits
+>   this). Covered: `test_t22_t23_orm_wal.py::test_57`.
+> - **Infra-2 (alloc kill) + LLM-4/5/6 → S_FAIL** (correct). Covered:
+>   `test_t2_alloc_status_provider.py` (ExitCode 137) + `test_t9_provider_router.py` +
+>   `test_crash_llm_provider_error_s_fail.py`.
+>
+> All six modes are already exercised by existing M2/M3 tests + the one new handler test shipped
+> this Spec. The reworked TG-B (see tasks.md TG-B block) is: **(1)** a crash-recovery coverage
+> matrix (`aria-orchestrator/docs/crash-recovery-coverage-matrix.md`, the AC-3 evidence artifact);
+> **(2)** the one genuine gap closed (`test_crash_llm_provider_error_s_fail.py`); **(3)** a re-scoped
+> deterministic-transition coverage task (NOT 100% line cov of the 4500-line extension.py; reuse the
+> existing `MockClock`). The B.1–B.4 subsections below are **superseded** and retained only for the
+> audit trail. Full rationale: `openspec/changes/aria-2.0-m6-e2e-resilience/tgb-rework-analysis.md`.
+
+##### B.1 6-mode crash recovery test suite [SUPERSEDED — see REWORK NOTE]
 
 The crash recovery test suite covers all 6 modes enumerated in DEC-20260524-001 §2. All 6 modes
 are **mock-only** (zero live LLM cost). The hybrid mock layer (Q-NEW-1) mocks 4 modes at the
@@ -810,23 +834,34 @@ print("[PASS] AC-2")
 
 Must print `[PASS] AC-2` without assertion errors.
 
-### AC-3 — 6 crash modes all PASS
+### AC-3 — 6 crash modes all covered [REWORKED per #138]
+
+> **REWORK NOTE**: the original AC-3 ran 6 fictional `test_crash_*.py` files that reference
+> non-existent modules (see §B REWORK NOTE). Reworked AC-3 verifies the coverage **matrix** + the
+> real authoritative tests instead.
 
 **Evidence**:
 
 ```bash
-pytest aria-orchestrator/tests/test_crash_infra1.py \
-       aria-orchestrator/tests/test_crash_infra2.py \
-       aria-orchestrator/tests/test_crash_infra3_wal.py \
-       aria-orchestrator/tests/test_crash_llm4.py \
-       aria-orchestrator/tests/test_crash_llm5.py \
-       aria-orchestrator/tests/test_crash_llm6.py \
-  -v --tb=short
+# 1. The coverage matrix exists and every test it references resolves to a real passing test.
+test -f aria-orchestrator/docs/crash-recovery-coverage-matrix.md
+
+# 2. The authoritative existing crash-recovery tests + the one new gap test all pass:
+cd aria-orchestrator/hermes-extensions/aria-layer1
+python3 -m unittest \
+  tests.test_t12_reconciler_crash_recovery_integration \
+  tests.test_t7_crash_recovery \
+  tests.test_t2_alloc_status_provider \
+  tests.test_t22_t23_orm_wal \
+  tests.test_t9_provider_router \
+  tests.test_crash_llm_provider_error_s_fail
 ```
 
-- Exit code 0 (all 6 test files pass).
-- Each test file must contain ≥1 test for its crash mode.
-- `test_crash_infra3_wal.py` must contain exactly 4 test functions (one per WAL scenario WAL-A/B/C/D per P-5).
+- Exit code 0 (all authoritative crash-recovery tests pass).
+- The matrix maps each of the 6 PRD §634 modes to its recovery model (auto-resume / WAL durability
+  / S_FAIL) + ≥1 authoritative test. No fictional `test_crash_infra*.py` / `test_crash_llm[456].py`
+  files are required (they referenced non-existent mock targets).
+- B-matrix-2 cross-check: every test name in the matrix exists and passes (drift guard).
 
 Additionally, the WAL fault injection shell script exists and is executable:
 
