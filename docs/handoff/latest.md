@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #136-FEISHU-REDACT — 🟢 **#136 Feishu webhook secret-in-logs 日志脱敏 SHIPPED (state-scanner 顺出, full A→D + PR #22)** (2026-05-31 ~15:32 UTC, dev-claude)
+## ★ 最新 session #STATE-SCANNER-DIAG-71-72 — 🟢 **state-scanner 自查 → #136 ship + scan.py branch-cap 修复 + #71/#72 Spec Phase A Approved + ⏰ M6 AC-7 闸 PASS** (2026-06-01 ~04:41 UTC, dev-claude)
 
-**Latest**: [2026-05-31-1532-136-feishu-secret-in-logs-redact.md](./2026-05-31-1532-136-feishu-secret-in-logs-redact.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md](./2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-STATE-SCANNER-DIAG-71-72 display)**: [2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md](./2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md) — `/aria:state-scanner` 例行 → 4 arc: (1) **#136 Feishu secret-in-logs 脱敏 ship** (aria-orch PR #22 `1b69564` / 主仓 gitlink `9c253b8`, issue 保持 open 待 owner 轮换); (2) **scan.py branch-cap 根因修复** (origin 25→3 + github 30→1 删已合并分支, scan.py EXIT 10→0; aria-plugin **#71** + 440 大仓实证); (3) **输出格式 regression 诊断** (跨 5 版本定位 v1.32.0 重构把字段骨架移到 reference 致触达 gap; aria-plugin **#72**); (4) **#71+#72 合并 Spec `state-scanner-output-cap-hardening` Phase A Approved** (R1 NEEDS_FIX → Rev1 据实重写 → R2 CONVERGED, audit 拦下我起草失实 C1; 主仓 `2f10d81`)。**⏰ 关键: M6 AC-7 闸 06-01 02:30 自动 PASS (EXIT=0, 3/3 snapshot) → M6 e2e-resilience Phase B 解锁 = next session 头号**。⚠️ 本 session shell stdout 渲染严重损坏, 全程 flag-文件名 + 权威二次核实兜底 (踩假 SHA/假 issue 号/假 proposal 描述均勘误)。2 memory。**Next**: M6 e2e-resilience Phase B (已解锁) > #71/#72 Spec Phase B (v1.38.0) > #136 轮换 (owner) > v1.29.0 block-flip 06-07。
+
+## ★ 前 session #136-FEISHU-REDACT — 🟢 **#136 Feishu webhook secret-in-logs 日志脱敏 SHIPPED (state-scanner 顺出, full A→D + PR #22)** (2026-05-31 ~15:32 UTC, dev-claude)
+
+**Latest (T-136-FEISHU-REDACT display)**: [2026-05-31-1532-136-feishu-secret-in-logs-redact.md](./2026-05-31-1532-136-feishu-secret-in-logs-redact.md) — display-only (本 session #STATE-SCANNER-DIAG-71-72 已接替主线 bare pointer; pointer for scan.py collector `_LATEST_POINTER_RE`)
 
 **Latest (T-136-FEISHU-REDACT display)**: [2026-05-31-1532-136-feishu-secret-in-logs-redact.md](./2026-05-31-1532-136-feishu-secret-in-logs-redact.md) — `/aria:state-scanner` 例行扫描 → owner 选 #136 → full A→D: `FeishuWebhookClient.send` **三条**日志路径不再打印完整 webhook URL (含 `/hook/<TOKEN>`),新增 `_redact_webhook_url()` 脱敏为 `.../hook/***` (trailing-slash rstrip 防漏) + 8 单测 (unittest 8/8,**测试抓出真 trailing-slash bug**) + `aria:code-reviewer` 两阶段 PASS (0C/0I, 3 Minor deferred)。aria-orchestrator **PR #22** merge `1b69564` / 主仓 gitlink `9c253b8` (origin+github parity)。Rule #8 gate: 无 CI backend → skip_with_warning。审计: 泄漏隔离于 feishu_webhook.py。**issue #136 保持 open** — 残留 owner 轮换 `ARIA_FEISHU_WEBHOOK_URL` (已泄漏 token 轮换前仍有效)。⚠️ 本 session shell stdout 渲染严重损坏 → 用 flag-文件名编码结果 + API re-GET 二次核实 (一度误判假 ship + stale index.lock)。1 memory。**Next**: #136 轮换 (owner) > 06-01 M6 AC-7 gate > M6 e2e-resilience Phase B > v1.29.0 block-flip 06-07。
 
