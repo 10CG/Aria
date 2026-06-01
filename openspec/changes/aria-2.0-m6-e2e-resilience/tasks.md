@@ -424,19 +424,23 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   `_handle_s3_build_cmd` with the REAL production exception classes (mock-shape discipline):
   `LLMRouteExhausted(chain)` / `_LLMHTTPError(429)` / `ZhipuHTTPError(503)`. 869 tests green.
 
-- [ ] B-sm-1 State-machine **deterministic-transition** coverage (re-scoped per owner 2026-06-01:
+- [x] B-sm-1 State-machine **deterministic-transition** coverage (re-scoped per owner 2026-06-01:
   deterministic transition table only, NOT 100% line coverage of the 4500-line `extension.py`).
-  For each deterministic state (S0_IDLE / S1_SCAN / S4_LAUNCH / S5_AWAIT / S7_HUMAN_GATE /
-  S8_MERGE / S9_CLOSE / S_FAIL): assert normal outbound transition + failure-injected outbound
-  transition + re-entry idempotency. Reuse `MockClock` (`aria_layer1/interfaces.py`) — the
-  existing AdvancingClock DI; do NOT introduce a new `FakeClock`, and do NOT create
-  `state_machine.py` (logic is distributed across extension/comment_poll/reconciler/tick_runner).
-  Survey existing coverage first (`test_state_machine_skeleton.py` + `test_t12` already cover
-  much of this) and add only the missing deterministic transitions. No `--cov-fail-under=100`.
+  **Done**: survey first confirmed per-state transitions are already covered (S0→S1/S1→S0 skeleton
+  test_01/02; S4 test_t7_*; S5 cross-tick re-enter skeleton test_16; S7 incl S_FAIL test_t_reject_flow;
+  S8 test_t13; terminal exclusion test_t22_t23; LLM-error→S_FAIL this Spec). The genuine gap was the
+  **transition-table integrity** itself — 3 representations (extension.TRANSITION_TABLE /
+  transitions.LEGAL_TRANSITIONS_FULL / interfaces.LEGAL_TRANSITIONS) with only a weak `len()==9`
+  check, and `assert_legal_transition()`'s accept/reject/S_FAIL-universal-sink behaviour untested.
+  Closed by `tests/test_transition_table_determinism.py` (10 tests): 3-table drift-guard +
+  assert_legal_transition behaviour + terminal-no-outbound. Pure table assertions (no new `FakeClock`,
+  no `state_machine.py`). 879 tests green. No `--cov-fail-under=100` per re-scope.
 
-- [ ] B-matrix-2 Cross-check: confirm every test referenced in the matrix exists and passes
-  (`python3 -m unittest discover -s tests`). Any matrix reference that does not resolve to a real
-  passing test is a matrix bug (drift guard — the failure mode this whole rework corrects).
+- [x] B-matrix-2 Cross-check: confirm every test referenced in the matrix exists and passes.
+  **Done**: 75 authoritative crash-recovery tests pass (`test_t12` / `test_t7_crash_recovery` /
+  `test_t2_alloc_status_provider` / `test_t22_t23_orm_wal` / `test_t9_provider_router` /
+  `test_crash_llm_provider_error_s_fail`); every matrix test reference resolves to a real passing
+  test. This is the drift guard — the failure mode this whole rework corrects.
 
 
 
