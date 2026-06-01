@@ -3,12 +3,12 @@ track-id: m6-e2e-resilience-tga
 owner-container: simonfishgit/dev-claude
 phase: B
 status: in_progress
-updated-at: 2026-06-01T15:40:00Z
+updated-at: 2026-06-01T16:30:00Z
 ---
 
 # Aria — Session Handoff (2026-06-01 ~14:48 UTC) — M6 e2e-resilience (Spec #2) Phase B: TG-A 代码件全交付 + TG-B recon→#138 缺陷+LLM 子集
 
-> **Status**: 🟢 **TG-A 代码件全交付** (985 tests) + **TG-B recon 发现 spec 缺陷 → Forgejo #138 + 交付唯一真实可做子集** (869 tests, 3 commits on feature 分支)。
+> **Status**: 🟢 **TG-A 代码件全交付** (985 tests) + **TG-B recon→#138 缺陷→Phase A rework 完成** (owner 批准 reframe: 覆盖矩阵 doc + 已交付 gap + spec amend; 75 权威测试验证; TG-B 仅剩 B-sm-1)。feature 分支 4 commits + 主仓 spec amend。
 > **Type**: `/state-scanner` → M6 e2e-resilience Phase B → TG-A 代码件优先 (infra/validate/uptime/dispatch/acceptance) → 再 TG-B (recon→#138 缺陷+LLM crash 子集)
 > **Rule #9 trigger**: 跨多 arc (TG-A 5 task group + TG-B recon/issue/subset) + ship 实质代码 + 跨 phase
 > **本终端**: dev-claude (simonfishgit/dev-claude) — aria-orchestrator feature 分支 3 commits (`85b8f46`, origin 到 `f0acfc5`, **末 commit 待 push**);主仓 master 已提 handoff+probes 并双远程 push
@@ -18,10 +18,11 @@ updated-at: 2026-06-01T15:40:00Z
 ## §0 入口 (新 session 优先读)
 
 1. **本 doc**
-2. **⏰ 头号 — TG-B 重做 (blocked on #138 Phase A rework)**: TG-B-infra (Infra-1/2/3) mock 面虚构 + 重复 M3 既有 crash-recovery 覆盖 → **Forgejo #138** 记录,需先 Phase A 重映射 6-mode taxonomy 到既有测试 (test_t12/test_t22_t23) 再实施。**不要盲目实施 TG-B-infra**。LLM 子集已做 (见 §1)。
-3. **次选 — Phase C 集成 TG-A+TG-B 子集** (merge feature 分支 → 解锁 owner 168h 运营跑) / **TG-C 模板** (~2h, 内容待跑后填)。
-4. **aria-orchestrator feature 分支** `feature/aria-2.0-m6-e2e-resilience-tg-a` (HEAD `85b8f46`, 3 commits) — TG-A 全部代码 + TG-B LLM 子集在此。
-5. **owner-gated 残留** (不变): #136 Feishu 轮换 / v1.29.0 block-flip (06-07) / Blocker #-1 light-1 节点凭据 / issue_type_hint 运营依赖 (§3.1)。
+2. **TG-B 状态: Phase A rework 完成 (owner 批准 reframe), 仅剩 B-sm-1**: TG-B 已从"6-mode 虚构套件"reframe 为覆盖矩阵+已交付 gap (见 §1.7)。**唯一剩余 = B-sm-1** (确定性转换表补测, 先 survey 既有 skeleton/t12 覆盖再补缺口, 非 100% line cov)。
+3. **⏰ 头号候选**: (a) **B-sm-1** 完成 TG-B (~1-2h) → 然后 (b) **Phase C 集成** (merge feature 分支 → 解锁 168h 跑) 或 (c) **TG-C 模板** (~2h)。
+4. **可选 — 对 TG-B rework 跑 focused post_spec audit** (scope 缩减+经验验证, 风险低; 未跑)。
+5. **aria-orchestrator feature 分支** `feature/aria-2.0-m6-e2e-resilience-tg-a` (HEAD `5f56584`, 4 commits) — TG-A 全部 + TG-B LLM 子集 + 矩阵 doc。
+6. **owner-gated 残留** (不变): #136 Feishu 轮换 / v1.29.0 block-flip (06-07) / Blocker #-1 节点凭据 / issue_type_hint 运营依赖 (§3.1)。
 
 → **next session 入口**: `/aria:state-scanner` → 读本 doc §6。
 
@@ -36,14 +37,16 @@ updated-at: 2026-06-01T15:40:00Z
 | 3 | **T-docs** | AD-M6-4 (decided+impl) + AD-M6-5/6 (reserved) in architecture-decisions.md | `b903ee2` |
 | 4 | **TG-A-uptime + dispatch + acceptance** | `acceptance/check-m6-e2e-acceptance.py` (AC-1 alloc 168h gate + 7-probe + Day-3 / AC-2 分层 SQL / AC-6 preflight / AC-7 abi_compat delegate) + `tests/acceptance/test_m6_e2e_acceptance.py` (22 测) | `f0acfc5` |
 | 5 | **模板 + gate 记录** (主仓 .aria/probes/) | `m6-gate-check.md` (A-infra-1 PASS 记录) + `m6-preflight-provenance.md` + `m6-preflight-log.md` | `34494ae` (主仓) |
-| 6 | **TG-B recon → 缺陷 + LLM 子集** | **Forgejo #138** (TG-B-infra mock 面虚构 + 重复 M3 覆盖, 需 Phase A rework) + `test_crash_llm_provider_error_s_fail.py` (5 测, handler `except→S_FAIL(PROVIDER_5XX)` 真实分支) | `85b8f46` |
+| 6 | **TG-B recon → 缺陷 + LLM 子集** | **Forgejo #138** (TG-B-infra mock 面虚构 + 重复 M3 覆盖) + `test_crash_llm_provider_error_s_fail.py` (5 测, handler `except→S_FAIL(PROVIDER_5XX)` 真实分支) | `85b8f46` |
+| 7 | **TG-B Phase A rework** (owner 批准 reframe) | 分析 doc `tgb-rework-analysis.md` (`ca0a163`) + #138 评论 10930 + **覆盖矩阵 doc** `crash-recovery-coverage-matrix.md` (`5f56584`) + spec amend proposal§B/AC-3/tasks TG-B (`2b5918d`, 净 -317 行) | 见右 |
 
 **测试**: aria-layer1 **869** (含新 5 LLM crash) + aria-orchestrator tests/ **121** (含新 22 acceptance) = **全绿, 零回归**。
 **回归 sweep**: 6 个现存 schema/acceptance 测试文件 4.2→5.0 latest pin + applied 列表加 "007" (milestone bump 预期 blast radius)。
 **real-env smoke**: AC-7 PASS / AC-1 优雅报 missing anchor (rc=2, 7d 未跑) / AC-6 PASS (模板占位)。
 
-### TG-B recon 关键发现 (→ #138)
-TG-B-infra (Infra-1/2/3) 的整个 mock 面**虚构**: `hermes_client`/`layer2_client`/`recovery.py`/`ProcessKilledError`/`AllocTerminatedError` 全不存在; aria-layer1 **是 Hermes plugin 不调 Hermes** → mock 目标架构反。真实 crash-recovery **已被 M3 测试覆盖** (`test_t12` SIGKILL+lock+auto-resume / `test_t22_t23` WAL / `test_t9` router 429/5xx exhaustion; `MockClock` 已在 interfaces.py)。唯一真实未覆盖 gap = handler `except Exception → S_FAIL(PROVIDER_5XX)` 非 timeout 分支 → 已交付。`extension.py` 4500+ 行使 "100% cov ~4h" 估值失真。
+### TG-B recon 关键发现 + rework (→ #138, owner 批准 reframe)
+两个错误: **(A) mock 符号虚构** (`hermes_client`/`layer2_client`/`recovery.py`/`ProcessKilledError`/`AllocTerminatedError` 全不存在; aria-layer1 是 Hermes plugin 不调 Hermes) + **(B) recovery 模型错** (spec 全写 →S_FAIL, 真实是**三模型**: 进程 kill→**auto-resume from DB** / WAL→**durability** / LLM+死 alloc→**S_FAIL**)。全 6 模式已被既有 M2/M3 测试覆盖 (`test_t12`/`test_t7_crash_recovery`/`test_t2_alloc_status_provider`(ExitCode 137=SIGKILL)/`test_t22_t23`/`test_t9`) + 本 session 1 新测。
+**rework (owner 批准)**: TG-B = 覆盖矩阵 doc (映射 6 模式→既有测试+正确模型) + 已交付 gap + B-sm-1 确定性转换表 only (非 100% line cov 4500 行, 复用 MockClock)。重估 ~13h→~2-3h。**B-matrix-2 验证: 75 权威 crash-recovery 测试 PASS**。TG-B 现仅剩 **B-sm-1** (确定性转换表补测) 未做。
 
 ---
 
@@ -95,12 +98,11 @@ TG-B-infra (Infra-1/2/3) 的整个 mock 面**虚构**: `hermes_client`/`layer2_c
 **入口**: `/aria:state-scanner` → 读本 doc。
 
 **优先级**:
-1. **[P1 🚫 blocked]** **TG-B Phase A rework (#138)** — 重映射 6-mode 崩溃 taxonomy 到既有 M3 测试 + 更正虚构 mock 目标 + 重估 100% cov scale。需 brainstorm/spec, 非盲目实施。
-2. **[P1.5]** 真 168h 跑启动前先解 **issue_type_hint 运营依赖** (§3.1) —— 否则 AC-2 永远 FAIL。
-3. **[P2]** Phase C 集成 TG-A+TG-B 子集 (解锁 168h 跑) / TG-C 模板可先写 (内容待跑后填)。
-4. **[owner]** #136 轮换 / v1.29.0 block-flip 06-07 / Blocker #-1 节点凭据。
-
-**若选 Phase C 集成**: aria-orchestrator 仅 `origin` 远程 (无 github); pre-merge gate (Rule #8) 无 CI backend → skip_with_warning; merge 后主仓 gitlink bump + .aria/probes/ 一起提。
+1. **[P1]** **B-sm-1** 完成 TG-B (确定性转换表补测, ~1-2h, 先 survey 既有覆盖)。
+2. **[P1]** **Phase C 集成** (merge feature 分支 → 解锁 owner 168h 运营跑)。aria-orch 仅 origin (无 github); pre-merge gate 无 CI backend → skip_with_warning; merge 后主仓 gitlink bump + .aria/probes/ 一起提。
+3. **[P1.5]** 真 168h 跑启动前先解 **issue_type_hint 运营依赖** (§3.1) —— 否则 AC-2 永远 FAIL。
+4. **[P2]** TG-C 模板可先写 (内容待跑后填) / 对 TG-B rework 跑 focused post_spec audit (可选)。
+5. **[owner]** #136 轮换 / v1.29.0 block-flip 06-07 / Blocker #-1 节点凭据。
 
 ---
 
@@ -108,12 +110,12 @@ TG-B-infra (Infra-1/2/3) 的整个 mock 面**虚构**: `hermes_client`/`layer2_c
 
 | 仓 | HEAD | 远程 | 本 session 提交 |
 |----|------|------|------------------|
-| **aria-orchestrator** | `85b8f46` (feature 分支 `feature/aria-2.0-m6-e2e-resilience-tg-a`) | origin 到 `f0acfc5` (`85b8f46` 待 push) | `b903ee2` (TG-A-infra+validate) + `f0acfc5` (TG-A acceptance) + `85b8f46` (TG-B LLM 子集) |
-| **主仓 Aria** | master `34494ae` | ✓ origin + ✓ github (parity) | `34494ae` (handoff + 3 .aria/probes/); gitlink 仍 `1b69564` 未 bump |
+| **aria-orchestrator** | `5f56584` (feature 分支 `feature/aria-2.0-m6-e2e-resilience-tg-a`, 4 commits) | origin 到 `f0acfc5` (`85b8f46`+`5f56584` 待 push) | `b903ee2` (TG-A-infra+validate) + `f0acfc5` (TG-A acceptance) + `85b8f46` (TG-B LLM 子集) + `5f56584` (TG-B 覆盖矩阵 doc) |
+| **主仓 Aria** | master `2b5918d` | origin/github 到 `860895c` (`ca0a163`+`2b5918d` 待 push) | `34494ae` (handoff+probes) + `860895c` (handoff TG-B 更新) + `ca0a163` (TG-B 分析 doc) + `2b5918d` (spec amend TG-B); gitlink 仍 `1b69564` 未 bump |
 | **standards** | `95cbdc9` | ✓ | 未改 |
-| Forgejo | — | — | **10CG/Aria #138** (TG-B spec 缺陷, open) |
+| Forgejo | — | — | **10CG/Aria #138** (open) + 评论 10930 (rework 分析) |
 
-> ⚠️ aria-orchestrator feature 分支末 commit `85b8f46` (TG-B LLM 子集) 待 push;前 2 commits 已 push origin。
+> ⚠️ 待 push: aria-orch `85b8f46`+`5f56584` (origin) + 主仓 `ca0a163`+`2b5918d` (origin+github)。
 
 ---
 
