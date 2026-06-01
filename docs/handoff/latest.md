@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #STATE-SCANNER-DIAG-71-72 — 🟢 **state-scanner 自查 → #136 ship + scan.py branch-cap 修复 + #71/#72 Spec Phase A Approved + ⏰ M6 AC-7 闸 PASS** (2026-06-01 ~04:41 UTC, dev-claude)
+## ★ 最新 session #M6-TGA-CODE — 🟢 **M6 e2e-resilience (Spec #2) Phase B: TG-A 代码件全交付 + 验证 (985 tests green)** (2026-06-01 ~14:48 UTC, dev-claude)
 
-**Latest**: [2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md](./2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-01-1448-m6-e2e-resilience-tga-code.md](./2026-06-01-1448-m6-e2e-resilience-tga-code.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-M6-TGA-CODE display)**: [2026-06-01-1448-m6-e2e-resilience-tga-code.md](./2026-06-01-1448-m6-e2e-resilience-tga-code.md) — `/aria:state-scanner` → 选 M6 e2e-resilience Phase B → 选 **TG-A 代码件优先** → 5 task group 全做: TG-A-infra (**migration 007 is_synthetic, schema v5.0** + schema-guard 测) + TG-A-validate (abi_compat 配对三测) + T-docs (AD-M6-4/5/6) + TG-A-uptime/dispatch/acceptance (**`check-m6-e2e-acceptance.py`** AC-1 alloc 168h gate / AC-2 分层 SQL / AC-6 preflight / AC-7 delegate, 22 测) + pre-flight 模板。**aria-layer1 864 + tests/ 121 = 985 全绿零回归** (含 6 现存测试 4.2→5.0 milestone bump sweep)。**3 spec-vs-reality drift 按真代码修正** (版本值 5.0 not 文件名 v4.3 / DB=dispatches.db not aria_layer1.db / validate 静默 exit 0 不 echo token)。**⚠️ 运营依赖**: AC-2 读 `$.issue_type_hint` 但生产 dispatcher 不写该 key → 168h 跑前必须建立 (handoff §3.1)。⚠️ **aria-orchestrator feature 分支 2 commits `f0acfc5` 未 push**。**Next**: TG-B 崩溃恢复套件 (~13h mock-only) > issue_type_hint 运营依赖 > Phase C 集成 TG-A (可选) > 168h owner 运营跑。
+
+## ★ 前 session #STATE-SCANNER-DIAG-71-72 — 🟢 **state-scanner 自查 → #136 ship + scan.py branch-cap 修复 + #71/#72 Spec Phase A Approved + ⏰ M6 AC-7 闸 PASS** (2026-06-01 ~04:41 UTC, dev-claude)
+
+**Latest (T-STATE-SCANNER-DIAG-71-72)**: [2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md](./2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md) — display-only (本 session #M6-TGA-CODE 已接替主线 bare pointer; pointer for scan.py collector `_LATEST_POINTER_RE`)
 
 **Latest (T-STATE-SCANNER-DIAG-71-72 display)**: [2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md](./2026-06-01-0441-state-scanner-diagnosis-71-72-spec.md) — `/aria:state-scanner` 例行 → 4 arc: (1) **#136 Feishu secret-in-logs 脱敏 ship** (aria-orch PR #22 `1b69564` / 主仓 gitlink `9c253b8`, issue 保持 open 待 owner 轮换); (2) **scan.py branch-cap 根因修复** (origin 25→3 + github 30→1 删已合并分支, scan.py EXIT 10→0; aria-plugin **#71** + 440 大仓实证); (3) **输出格式 regression 诊断** (跨 5 版本定位 v1.32.0 重构把字段骨架移到 reference 致触达 gap; aria-plugin **#72**); (4) **#71+#72 合并 Spec `state-scanner-output-cap-hardening` Phase A Approved** (R1 NEEDS_FIX → Rev1 据实重写 → R2 CONVERGED, audit 拦下我起草失实 C1; 主仓 `2f10d81`)。**⏰ 关键: M6 AC-7 闸 06-01 02:30 自动 PASS (EXIT=0, 3/3 snapshot) → M6 e2e-resilience Phase B 解锁 = next session 头号**。⚠️ 本 session shell stdout 渲染严重损坏, 全程 flag-文件名 + 权威二次核实兜底 (踩假 SHA/假 issue 号/假 proposal 描述均勘误)。2 memory。**Next**: M6 e2e-resilience Phase B (已解锁) > #71/#72 Spec Phase B (v1.38.0) > #136 轮换 (owner) > v1.29.0 block-flip 06-07。
 
