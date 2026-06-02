@@ -409,10 +409,13 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   - Infra-1 (process/Hermes SIGKILL) → **auto-resume from DB** (NOT S_FAIL). Existing:
     `test_t12_crash_recovery_s5_await_auto_resume` + `test_kill_minus_9_releases_advisory_lock`
     + `test_t7_crash_recovery.py`.
-  - Infra-2 (Layer-2 alloc SIGKILL) → **S_FAIL** (correct). Existing:
-    `test_t2_alloc_status_provider.py` (ExitCode 137 = SIGKILL) + S5_AWAIT routing (T6.2).
-  - Infra-3 (WAL A/B/C/D) → **durability/auto-recover** (NOT S_FAIL for A/B/C). Existing:
-    `test_t22_t23_orm_wal.py::test_57`.
+  - Infra-2 (Layer-2 alloc SIGKILL) → **S_FAIL(CONTAINER_CRASH)** (correct). Existing routing:
+    `test_t11_nomad_integration_hardening.py` (exit 137 → CONTAINER_CRASH) +
+    `test_state_machine_skeleton.py::test_s5_alloc_terminated_nonzero_exit_causes_container_crash`
+    (provider-parse: `test_t2_alloc_status_provider.py`).
+  - Infra-3 (WAL) → **durability** covered by `test_t22_t23_orm_wal.py` `test_57_wal_durability_after_simulated_crash`
+    (clean-close). ⚠️ WAL **truncation/corruption** recovery (PRD §634 (a)/(b)) is a **deferred gap**
+    (no `recovery.py`/integrity_check; not tested) — see matrix "Known gaps", NOT claimed covered.
   - LLM-4/5/6 → **S_FAIL(PROVIDER_5XX)** (correct; the invented `rate_limit_exhausted`/`HTTP_429`
     structured events do not exist). Existing: `test_t9_provider_router.py` + B-llm-1 below.
 
@@ -425,7 +428,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   `LLMRouteExhausted(chain)` / `_LLMHTTPError(429)` / `ZhipuHTTPError(503)`. 869 tests green.
 
 - [x] B-sm-1 State-machine **deterministic-transition** coverage (re-scoped per owner 2026-06-01:
-  deterministic transition table only, NOT 100% line coverage of the 4500-line `extension.py`).
+  deterministic transition table only, NOT 100% line coverage of the ~3.5K-line (3543) `extension.py`).
   **Done**: survey first confirmed per-state transitions are already covered (S0→S1/S1→S0 skeleton
   test_01/02; S4 test_t7_*; S5 cross-tick re-enter skeleton test_16; S7 incl S_FAIL test_t_reject_flow;
   S8 test_t13; terminal exclusion test_t22_t23; LLM-error→S_FAIL this Spec). The genuine gap was the

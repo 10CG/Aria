@@ -320,17 +320,19 @@ after any TG-A schema migration (particularly the `is_synthetic` column addition
 > - **Infra-1 (process/Hermes kill) → auto-resume from DB** (NOT S_FAIL). Covered:
 >   `test_t12_crash_recovery_s5_await_auto_resume` + `test_kill_minus_9_releases_advisory_lock` +
 >   `test_t7_crash_recovery.py`.
-> - **Infra-3 (WAL) → durability/auto-recover** (NOT S_FAIL for A/B/C — the WAL-D row already admits
->   this). Covered: `test_t22_t23_orm_wal.py::test_57`.
-> - **Infra-2 (alloc kill) + LLM-4/5/6 → S_FAIL** (correct). Covered:
->   `test_t2_alloc_status_provider.py` (ExitCode 137) + `test_t9_provider_router.py` +
+> - **Infra-3 (WAL) → durability** (committed data survives clean close). Covered:
+>   `test_t22_t23_orm_wal.py::TestWALDurabilityAfterCrash::test_57_wal_durability_after_simulated_crash`.
+>   ⚠️ WAL **truncation/corruption** recovery (PRD §634 (a)/(b)) is a **deferred gap** — not
+>   implemented (no `recovery.py`), not covered (see matrix "Known gaps").
+> - **Infra-2 (alloc kill) + LLM-4/5/6 → S_FAIL** (correct). Covered (routing):
+>   `test_t11_nomad_integration_hardening.py` (exit 137 → CONTAINER_CRASH) + `test_t9_provider_router.py` +
 >   `test_crash_llm_provider_error_s_fail.py`.
 >
-> All six modes are already exercised by existing M2/M3 tests + the one new handler test shipped
-> this Spec. The reworked TG-B (see tasks.md TG-B block) is: **(1)** a crash-recovery coverage
+> 5 of 6 modes are fully exercised by existing M2/M3 tests + the new handler tests (Infra-3
+> truncation is a deferred gap, surfaced not papered over). The reworked TG-B (see tasks.md TG-B block) is: **(1)** a crash-recovery coverage
 > matrix (`aria-orchestrator/docs/crash-recovery-coverage-matrix.md`, the AC-3 evidence artifact);
 > **(2)** the one genuine gap closed (`test_crash_llm_provider_error_s_fail.py`); **(3)** a re-scoped
-> deterministic-transition coverage task (NOT 100% line cov of the 4500-line extension.py; reuse the
+> deterministic-transition coverage task (NOT 100% line cov of the ~3.5K-line (3543) extension.py; reuse the
 > existing `MockClock`). The B.1–B.4 subsections below are **superseded** and retained only for the
 > audit trail. Full rationale: `openspec/changes/aria-2.0-m6-e2e-resilience/tgb-rework-analysis.md`.
 
@@ -389,7 +391,7 @@ used by each provider's SDK adapter (Luxeno vs Zhipu have different base URLs). 
 fixture shape against one real captured response to confirm the SDK parses the mock body through
 the same code path as a real response.
 
-##### B.2 WAL truncation scenario enumeration (P-5)
+##### B.2 WAL truncation scenario enumeration (P-5) [SUPERSEDED — see §B REWORK NOTE]
 
 <!-- P-5: 4 WAL scenarios vs 3 -->
 PRD §634 sub-clauses enumerate **4 WAL truncation scenarios** (not 3 as initially counted in R2).
@@ -416,7 +418,7 @@ Assertions **per scenario** (WAL-D differs from WAL-A/B/C):
   connection can read/write successfully (no data corruption); (c) structured log entry
   `{"event": "wal_fault", "scenario": "WAL-D", "recovery": "wal_auto_recreated"}`.
 
-##### B.3 State machine deterministic transition coverage
+##### B.3 State machine deterministic transition coverage [SUPERSEDED — see §B REWORK NOTE]
 
 <!-- R1-T2-2 fix: `aria_layer1/state_machine.py` does NOT exist. State machine logic is
      distributed across 4 modules: extension.py, comment_poll.py, reconciler.py, tick_runner.py.
@@ -476,7 +478,7 @@ All state machine time-sensitive code paths must accept a `clock` parameter (def
 `RealClock()` which delegates to `datetime.now(timezone.utc)`). This prevents wall-clock
 flakiness in CI (per `[[feedback_phase_b_velocity_patterns_2026-04-29]]`).
 
-##### B.4 SQLite WAL fault injection shell script
+##### B.4 SQLite WAL fault injection shell script [SUPERSEDED — see §B REWORK NOTE]
 
 <!-- M-qa-R3-8 NEW: PRD §634 cov gap -->
 Per qa M-qa-R3-8, PRD §634 coverage gap: a shell script
@@ -846,15 +848,17 @@ Must print `[PASS] AC-2` without assertion errors.
 # 1. The coverage matrix exists and every test it references resolves to a real passing test.
 test -f aria-orchestrator/docs/crash-recovery-coverage-matrix.md
 
-# 2. The authoritative existing crash-recovery tests + the one new gap test all pass:
+# 2. The authoritative existing crash-recovery tests + the new gap/drift-guard tests all pass:
 cd aria-orchestrator/hermes-extensions/aria-layer1
 python3 -m unittest \
   tests.test_t12_reconciler_crash_recovery_integration \
   tests.test_t7_crash_recovery \
   tests.test_t2_alloc_status_provider \
+  tests.test_t11_nomad_integration_hardening \
   tests.test_t22_t23_orm_wal \
   tests.test_t9_provider_router \
-  tests.test_crash_llm_provider_error_s_fail
+  tests.test_crash_llm_provider_error_s_fail \
+  tests.test_transition_table_determinism
 ```
 
 - Exit code 0 (all authoritative crash-recovery tests pass).
@@ -863,38 +867,40 @@ python3 -m unittest \
   files are required (they referenced non-existent mock targets).
 - B-matrix-2 cross-check: every test name in the matrix exists and passes (drift guard).
 
-Additionally, the WAL fault injection shell script exists and is executable:
+**Infra-3 (WAL) coverage scope (R2 honesty fix per post_spec audit)**: `test_t22_t23_orm_wal.py`
+covers WAL **durability** (committed rows survive a clean close/reopen — recovery model B). It does
+**NOT** exercise WAL truncation-to-0-bytes or corruption (PRD §634 (a) WAL-truncated-startup-recovery
++ (b) `PRAGMA integrity_check` non-ok → refuse-startup). Those sub-requirements are **neither
+implemented nor tested** (no `recovery.py` / integrity_check-on-startup in `aria_layer1/`) — a
+**genuine deferred gap**, NOT covered (the original `m6-wal-fault.sh` + WAL-A/B/C suite assumed a
+`recovery.py` that never existed; per #138 it is dropped, not silently claimed covered). See the
+coverage matrix Infra-3 row + tgb-rework-analysis §2.
 
-```bash
-test -x aria-orchestrator/acceptance/m6-wal-fault.sh && echo "PASS" || echo "FAIL AC-3: m6-wal-fault.sh missing or not executable"
-```
+### AC-4 — State machine deterministic transition-table integrity [REWORKED per #138]
 
-Must print `PASS`.
-
-### AC-4 — State machine deterministic transition 100% coverage
-
-<!-- R1-T2-2 fix: `aria_layer1/state_machine.py` does not exist; cov target updated to 4-module
-     list per Q1 lock (2026-05-24). State machine logic distributed across extension.py,
-     comment_poll.py, reconciler.py, tick_runner.py. No new file extracted. (R1 audit 2026-05-24) -->
+> **REWORK NOTE (R1/R2 post_spec audit)**: the original AC-4 demanded `--cov-fail-under=100` over
+> the 4-module state machine + two test files (`test_state_machine_deterministic.py` /
+> `test_state_machine_stochastic_replay.py`) that **do not exist**. Per the B-sm-1 re-scope (owner
+> 2026-06-02 + tgb-rework-analysis §3.3): 100% line coverage of the ~3.5K-line `extension.py` is not
+> viable as specified, and the per-state transitions are already covered by existing tests
+> (`test_state_machine_skeleton.py` / `test_t12` / `test_t7_crash_recovery`). The genuine gap —
+> transition-table **integrity** across the 3 representations + `assert_legal_transition` behaviour —
+> is closed by the drift-guard below. No `--cov-fail-under=100`.
 
 **Evidence**:
 
 ```bash
-pytest aria-orchestrator/tests/test_state_machine_deterministic.py \
-       aria-orchestrator/tests/test_state_machine_stochastic_replay.py \
-  --cov=aria_layer1.extension,aria_layer1.comment_poll,aria_layer1.reconciler,aria_layer1.tick_runner \
-  --cov-report=term-missing \
-  --cov-fail-under=100
+cd aria-orchestrator/hermes-extensions/aria-layer1
+python3 -m unittest tests.test_transition_table_determinism
 ```
 
-- Exit code 0.
-- Coverage report shows 100% line + branch coverage for the 4-module state machine coverage
-  target (`extension`, `comment_poll`, `reconciler`, `tick_runner`) — deterministic transition
-  paths. Note: state machine logic distributed across 4 modules per M5 design; no
-  `aria_layer1.state_machine` module exists (AD-M6-? not needed; Q1 lock 2026-05-24).
-- `test_state_machine_stochastic_replay.py` uses committed fixture files only (zero live calls);
-  confirmed by: `grep -r "call_llm\|call_with_routing\|provider_router" aria-orchestrator/tests/test_state_machine_stochastic_replay.py | grep -v "mock\|patch\|MagicMock"`
-  returns no output (no live LLM calls in stochastic replay tests).
+- Exit code 0 (10 tests).
+- Asserts the 3 transition-table representations agree (`extension.TRANSITION_TABLE` /
+  `transitions.LEGAL_TRANSITIONS_FULL` / `interfaces.LEGAL_TRANSITIONS`) + `assert_legal_transition()`
+  accept/reject/S_FAIL-universal-sink behaviour + terminal-states-have-no-outbound. Per-state
+  transition coverage (normal + failure-injected + re-entry) is provided by existing tests per the
+  coverage matrix (S0↔S1 skeleton test_01/02; S5 cross-tick re-enter skeleton test_16; S8 test_t13;
+  S7+S_FAIL test_t_reject_flow). Stochastic states S2/S3/S6 use mocked replay (handler tests).
 
 ### AC-5 — Humanized samples: 10 files, median ≥7/10, cross-ref links present
 
