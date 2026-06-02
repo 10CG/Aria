@@ -3,12 +3,12 @@ track-id: m6-e2e-resilience-tga
 owner-container: simonfishgit/dev-claude
 phase: C
 status: done
-updated-at: 2026-06-02T04:00:00Z
+updated-at: 2026-06-02T05:30:00Z
 ---
 
 # Aria — Session Handoff (2026-06-01 ~14:48 → 2026-06-02 ~04:00 UTC) — M6 e2e-resilience (Spec #2) 代码侧 100% ship (TG-A + TG-B [#138 rework] + TG-C 模板) + Phase C 集成 ×2 [SESSION 收尾]
 
-> **Status**: ✅ **DONE — M6 e2e-resilience (Spec #2) 代码侧 100% ship + 集成 + CLAUDE.md 同步**。TG-A + TG-B (#138 rework) + TG-C 模板全交付; Phase C 集成 ×2 (PR #23 `bb27d76` + PR #24 `fb5914c`); 主仓 `7b668df` / orch `fb5914c` / gitlink `fb5914c` 全 parity; 2 feature 分支已删; 工作树 clean。**879 + 28 acceptance tests green**。**剩纯 owner/wall-clock = 168h 运营跑 → 填 TG-C corpus + 评分 → AC-5; Spec 未归档**。
+> **Status**: ✅ **DONE — M6 e2e-resilience (Spec #2) 代码侧 100% ship + 集成 + CLAUDE.md 同步 + TG-B rework post_spec audit CONVERGED**。TG-A + TG-B (#138 rework) + TG-C 模板全交付; Phase C 集成 ×3 (PR #23/#24/#25); **post_spec audit R1→Rev1→R2 CONVERGED** (3 Critical CLOSED, 含 C3 Infra-3 WAL over-claim → deferred gap surfaced); 主仓 `2126bae` / orch `05915eb` / gitlink `05915eb` 全 parity; 3 feature 分支已删; 工作树 clean。**880 + 28 acceptance tests green**。**剩纯 owner/wall-clock = 168h 运营跑 → 填 TG-C corpus + 评分 → AC-5; Spec 未归档** (+ Infra-3 WAL 截断 recovery deferred gap, 见 §2)。
 > **Type**: `/state-scanner` → M6 Phase B → TG-A (5 task group) → TG-B (recon→#138 spec 缺陷→owner reframe→覆盖矩阵+gap+B-sm-1) → Phase C 集成 → TG-C 模板 → Phase C 集成 ×2 → CLAUDE.md 同步 → 收尾
 > **Rule #9 trigger**: 跨多 arc (TG-A/B/C + #138 rework + Phase C ×2) + ship 实质代码 + 跨 phase B→C
 > **本终端**: dev-claude (simonfishgit/dev-claude) — 全部已 commit + 双远程 push, 工作树 clean, 无未 push/未提交残留。
@@ -43,8 +43,9 @@ updated-at: 2026-06-02T04:00:00Z
 | 9 | **TG-C 模板 + AC-5 gate** (内容待跑后填) | `evals/m6-prompt-quality/` rubric + README + 10 sample + 10 score 模板 + `--tg-c` (median-of-medians, 替换 stub) + `TestTgC` (6 测) | `c6df7ec` → PR #24 `fb5914c` |
 | 10 | **Phase C 集成 ×2** | TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 gitlink 2 次 bump (`424b45f`/`95360d7`); 双远程 parity; 2 feature 分支已删 | — |
 | 11 | **CLAUDE.md 项目状态更新** | 当前阶段 + 运行时版本 + PRD v2.0 + footer 反映 M6 Spec #2 代码侧完成 | `7b668df` |
+| 12 | **TG-B rework focused post_spec audit (CONVERGED)** | R1 SPLIT (tl NEEDS_FIX 3 Critical; qa+cr PWW) → Rev1 → R2 PWW 0 Critical;3 Critical CLOSED (C1 AC-4 重写删 100%cov+幻影文件 / C2 AC-3 删 m6-wal-fault.sh 硬门 / **C3 Infra-3 WAL over-claim → 诚实标 truncation deferred gap**) + I1 Infra-2 真 routing 引用 + LLM-5 真 json 测试 + 4500→3543 + [SUPERSEDED] 标记;审计报告 `.aria/audit-reports/post_spec-tgb-rework-R1R2-2026-06-02-*.md` | PR #25 `23e150e` + `05915eb` |
 
-**测试 (最终)**: aria-layer1 **879** (含 TG-B LLM crash 5 + 转换表 drift-guard 10) + aria-orchestrator tests/ **127** (含 acceptance 22 TG-A + 6 TG-C) = **全绿, 零回归**。
+**测试 (最终)**: aria-layer1 **880** (含 TG-B LLM crash 6 [+R2 json] + 转换表 drift-guard 10) + aria-orchestrator tests/ **127** (含 acceptance 22 TG-A + 6 TG-C) = **全绿, 零回归**。
 **回归 sweep**: 6 个现存 schema/acceptance 测试文件 4.2→5.0 latest pin + applied 列表加 "007" (milestone bump 预期 blast radius)。
 **real-env smoke**: AC-7 PASS / AC-1 优雅报 missing anchor (rc=2) / AC-6 PASS (模板占位) / `--tg-c` 对未填模板 exit 2 (corpus 未填, 优雅)。
 
@@ -58,7 +59,8 @@ updated-at: 2026-06-02T04:00:00Z
 
 | 优先级 | 项 | 类型 | 说明 |
 |--------|-----|------|------|
-| **P1 🚫** | **TG-B-infra + statemachine 重做** | **blocked on #138** | spec mock 面虚构 + 重复 M3 覆盖 → 需 Phase A rework (映射 6-mode 到 test_t12/test_t22_t23 + 更正 mock 目标 + 重估 100% cov scale)。**不要盲目实施**。LLM 子集已做 (§1.6)。 |
+| ✅ done | TG-A + TG-B + TG-C 模板 + Phase C 集成 + post_spec audit | — | 本 session 全部完成 (§1)。下方为 owner/wall-clock 残留 + 审计发现的 1 个 deferred gap。 |
+| **deferred gap** | **Infra-3 WAL 截断/损坏 recovery** (审计 C3) | 真实未实现未测 | PRD §634 (a) WAL 截断启动恢复 + (b) integrity_check-refuse-startup **无 `recovery.py` 实现、无测试**。test_57 只覆盖 clean-close durability。矩阵 "Known gaps" 已显式 surface。**Spec #4 release-closeout 必须把 Infra-3 当 durability-only-covered + truncation-deferred, 勿当 "Infra-3 fully handled"**。需 follow-up Spec (实现 recovery.py) 或 PRD §634 waiver。 |
 | **P1.5** | **issue_type_hint 运营依赖** | 阻断 AC-2 真跑 | 见 §3。生产 dispatcher 不写该 payload key → AC-2 分层永远查到 0。168h 跑前必须建立/核实真 key。 |
 | **P2** | TG-C 拟人样本 | 依赖 7d 跑产物 | rubric + 10 sample/score 模板可先写 (~2h), 内容待跑后填 |
 | **owner** | 168h E2E 运营跑 | wall-clock + $6 | Day-1 alloc anchor 记录 + 3 pre-flight 真 dispatch + 每日 probe + Day-3 gate + owner 评分 |
@@ -112,12 +114,13 @@ updated-at: 2026-06-02T04:00:00Z
 
 | 仓 | HEAD | 远程 | 本 session 提交 |
 |----|------|------|------------------|
-| **aria-orchestrator** | master `fb5914c` (PR #23 + #24 merged; 2 feature 分支已删) | ✓ origin | TG-A+TG-B 5 commits → PR #23 `bb27d76`; TG-C `c6df7ec` → PR #24 `fb5914c` |
-| **主仓 Aria** | master `7b668df` | ✓ origin + ✓ github (parity) | handoff/probes/分析/spec-amend/tasks + gitlink 2 bump `1b69564`→`bb27d76`→`fb5914c` + **CLAUDE.md 项目状态 `7b668df`** |
+| **aria-orchestrator** | master `05915eb` (PR #23+#24+#25 merged; 3 feature 分支已删) | ✓ origin | PR #23 `bb27d76` (TG-A+TG-B) + PR #24 `fb5914c` (TG-C) + PR #25 `23e150e` (audit Rev1) + `05915eb` (comment fix) |
+| **主仓 Aria** | master `2126bae` | ✓ origin + ✓ github (parity) | handoff/probes/spec-amend/tasks + CLAUDE.md + **audit Rev1 (proposal AC-3/4 + matrix + analysis + 审计报告)** + gitlink 4 bump → `05915eb` |
 | **standards** | `95cbdc9` | ✓ | 未改 |
-| Forgejo | — | — | **aria-orch PR #23** (`bb27d76`) + **PR #24** (`fb5914c`) merged + **10CG/Aria #138** (open) + 评论 10930 |
+| Forgejo | — | — | **aria-orch PR #23/#24/#25** merged + **10CG/Aria #138** (open, 评论 10930 rework 分析) |
 
-> ✅ 最终 SHA parity (主仓 7b668df origin=github / orch fb5914c origin / gitlink=fb5914c)。2 feature 分支 local+remote 已删 (遵 C.2)。工作树 clean。
+> ✅ 最终 SHA parity (主仓 `2126bae` origin=github / orch `05915eb` origin / gitlink=`05915eb`)。3 feature 分支 local+remote 已删 (遵 C.2)。工作树 clean。
+> **审计报告**: `.aria/audit-reports/post_spec-tgb-rework-R1R2-2026-06-02-aria-2.0-m6-e2e-resilience.md` (CONVERGED, 3 Critical CLOSED)。
 
 ---
 
