@@ -3,7 +3,7 @@ track-id: m6-e2e-resilience-tga
 owner-container: simonfishgit/dev-claude
 phase: C
 status: done
-updated-at: 2026-06-02T05:30:00Z
+updated-at: 2026-06-02T06:00:00Z
 ---
 
 # Aria — Session Handoff (2026-06-01 ~14:48 → 2026-06-02 ~04:00 UTC) — M6 e2e-resilience (Spec #2) 代码侧 100% ship (TG-A + TG-B [#138 rework] + TG-C 模板) + Phase C 集成 ×2 [SESSION 收尾]
@@ -93,9 +93,9 @@ updated-at: 2026-06-02T05:30:00Z
 | 维度 | 状态 | 说明 |
 |------|------|------|
 | **UPM** | **N/A** | Aria self `upm.configured=false` ([[project_aria_no_runtime_upm]]) |
-| **US** | ⏸️ 无需改 | US-026 (M6) 仍 in_progress; Spec #2 Phase B 进行中, 未完成不改 US |
-| **Spec** | ⏸️ 进行中 | `aria-2.0-m6-e2e-resilience` Approved, TG-A 代码 done, TG-B/C + 运营跑未做; **未归档** |
-| **PRD** | 无需改 | 不动里程碑 |
+| **US** | ✅ **已更新** | US-026 Spec #2 轨迹行更新: 代码侧 100% SHIPPED+集成+audit CONVERGED 2026-06-02; 仍 in_progress (Spec 未归档, 剩 168h 运营跑 + Spec #4); 标注 2 运营前置 + WAL deferred gap |
+| **Spec** | ✅ **已更新, 未归档** | `aria-2.0-m6-e2e-resilience` proposal 含 §B/AC-3/AC-4 rework (audit CONVERGED) + tasks TG-A/B/C 全 [x]; **未归档** (运营跑未做, 正确) |
+| **PRD** | ✅ 无需改 | M6 里程碑级描述不变 (per-Spec 状态由 US-026 跟踪, 非 PRD); CLAUDE.md 项目状态已同步 |
 
 ---
 
@@ -126,7 +126,11 @@ updated-at: 2026-06-02T05:30:00Z
 
 ## §8 Memory entries this session
 
-0 new committed。**最强候选 (下 session 评估)**: **"实施一个 spec 的 test suite 前, 必须 recon 真实代码确认 mock 目标 + 行为模型存在; spec 可整段引用虚构基础设施 (#138: hermes_client/recovery.py 不存在) + 错误 recovery 模型 (全写 →S_FAIL vs 真实 auto-resume/durability) — 尤其 crash/infra 模式。recon 把 ~13h 虚构实现转为 ~2-3h 真实交付 + actionable issue。"** —— 比既有 [[feedback_rebenchmark_test_diagnosis_not_metric]] 更具体到"spec 的整个 mock 面虚构 + 模型错"层面, 值得独立 entry。次候选: 本 session 4 次 spec-vs-reality drift (版本值/DB名/validate token/TG-B-infra) 均 recon-first 拦下, 强化 verify-before-assert 纪律。
+**2 new written** (2026-06-02 收尾固化):
+1. **[[feedback_recon_real_code_before_implementing_spec_test_suite]]** — 实施 spec 的 test/mock 前必 grep 真代码核验 mock 目标 + 行为模型存在;Approved spec 可整段虚构 (#138)。
+2. **[[feedback_spec_rework_leaves_downstream_ac_drift]]** — rework 一段 spec 后下游 AC/cross-ref 常遗留旧方案 + rework 自身会 over-claim → 必须 post_spec re-audit (本 session audit C1/C2/C3 实证)。
+
+MEMORY.md 索引已更新 (流程方法论 + Audit 收敛 两区各加 1)。§4 其余候选 (issue_type_hint payload 核实 / milestone schema bump blast radius) 与既有 memory 同源, 暂不新增。
 
 ---
 
