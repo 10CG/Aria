@@ -514,7 +514,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ## 项目状态
 
 ```
-当前阶段: v2.0 M6 执行中 (M1-M5 shipped)
+当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
 插件版本: v1.37.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
@@ -539,8 +539,13 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   standards concurrent-session-write-safety convention; 27 tests);
                   v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
-运行时版本: v2.0.0 (aria-orchestrator, M6 execution phase)
-PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 2026-05-24~25);
+运行时版本: v2.0.0 (aria-orchestrator master `fb5914c`, M6 execution phase;
+          Spec #2 e2e-resilience TG-A+TG-B+TG-C 模板代码侧 100% ship via PR #23+#24)
+PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 2026-05-24~25):
+          #1 cost-acceptance + #3 docs archived 2026-05-28; **#2 e2e-resilience 代码侧完成
+          2026-06-02** (TG-A runtime obs gate + TG-B crash-recovery 覆盖矩阵 [Phase A rework #138:
+          spec mock 虚构→映射既有 M2/M3 测试] + TG-C 拟人样本模板; Spec 未归档, 待 168h 运营跑
+          → 填 corpus + 评分 → AC-5); #4 release-closeout sequential (消费 #2 证据);
           M6 ship 后 (M7+) aria-fleet 三层架构 (通用/workspace/instance) 待 brainstorm
           → 详见 `.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md` (D1-D6 Approved)
 ```
@@ -555,7 +560,8 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety: 并发写安全 convention 主解药 + collision 持久化 + 切口1/2 advisory; 同日 state-scanner session 补 v1.37.0 真·发布 — #133 release commit 实为 paper bump (4/5 SOT 漏改, 市场仍见 1.36.0), 补全 aria SOT `c5bd6b3` + 补回被 drop 的 ac-refocus audit report `8d17640` + README.zh 同步 v1.21.3→v1.37.0 + Forgejo #135 (interrupt-collector git-op 盲区))
+**更新**: 2026-06-02 (M6 Spec #2 e2e-resilience 代码侧完成 — TG-A (migration 007 is_synthetic schema v5.0 + check-m6-e2e-acceptance.py AC-1/2/6/7) + TG-B (crash-recovery: recon 拦下 Forgejo #138 spec 缺陷 — Infra mock 面虚构 [hermes_client/layer2_client/recovery.py 不存在, aria-layer1 是 plugin] + recovery 模型错 [全写 →S_FAIL, 真实三模型 auto-resume/durability/S_FAIL] + 重复 M3 覆盖 → owner 批准 reframe → 覆盖矩阵 doc + LLM gap + B-sm-1 转换表 drift-guard) + TG-C (拟人样本 rubric+模板+AC-5 gate) via aria-orch PR #23 `bb27d76` + #24 `fb5914c`, 主仓 gitlink → `fb5914c`; 879+28 tests green; Spec 未归档待 168h 运营跑)
+> 前次 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety + state-scanner 补真·发布 paper bump 勘误 + Forgejo #135)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin
