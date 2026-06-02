@@ -3,12 +3,12 @@ track-id: m6-e2e-resilience-tga
 owner-container: simonfishgit/dev-claude
 phase: C
 status: in_progress
-updated-at: 2026-06-01T17:40:00Z
+updated-at: 2026-06-02T03:30:00Z
 ---
 
 # Aria — Session Handoff (2026-06-01 ~14:48 UTC) — M6 e2e-resilience (Spec #2) Phase B: TG-A 代码件全交付 + TG-B recon→#138 缺陷+LLM 子集
 
-> **Status**: 🟢 **TG-A + TG-B 全交付 + Phase C 集成完成** (aria-orch PR #23 merged `bb27d76` / 主仓 gitlink bump `424b45f` 双远程 parity; feature 分支已删)。M6 e2e-resilience (Spec #2) **代码侧全部 ship**; 879 tests green。**剩 = 168h 运营跑 (owner, 现已解锁) + TG-C (依赖跑产物); Spec 未归档**。
+> **Status**: 🟢 **TG-A + TG-B + TG-C 模板全交付 + Phase C 集成 ×2** (PR #23 `bb27d76` + PR #24 `fb5914c`; 主仓 gitlink → `fb5914c` (`95360d7`) 双远程 parity; 2 feature 分支已删)。M6 e2e-resilience (Spec #2) **代码侧 100% ship**; 879 + 28 acceptance tests green。**剩纯 owner/wall-clock = 168h 运营跑 → 填 TG-C corpus + 评分 → AC-5; Spec 未归档**。
 > **Type**: `/state-scanner` → M6 e2e-resilience Phase B → TG-A 代码件优先 (infra/validate/uptime/dispatch/acceptance) → 再 TG-B (recon→#138 缺陷+LLM crash 子集)
 > **Rule #9 trigger**: 跨多 arc (TG-A 5 task group + TG-B recon/issue/subset) + ship 实质代码 + 跨 phase
 > **本终端**: dev-claude (simonfishgit/dev-claude) — aria-orchestrator feature 分支 3 commits (`85b8f46`, origin 到 `f0acfc5`, **末 commit 待 push**);主仓 master 已提 handoff+probes 并双远程 push
@@ -18,10 +18,10 @@ updated-at: 2026-06-01T17:40:00Z
 ## §0 入口 (新 session 优先读)
 
 1. **本 doc**
-2. **✅ TG-A + TG-B 代码侧全 ship + Phase C 集成完成** (aria-orch PR #23 merged `bb27d76`, 主仓 gitlink `424b45f` 双远程 parity, feature 分支已删)。
-3. **⏰ 头号 — owner 启动 168h 运营跑 (现已解锁)**: 但**先解 issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) + Day-1 alloc anchor + 3 pre-flight ($6)。
-4. **次选**: TG-C 模板 (~2h, 内容待跑后填) / 对 TG-B rework 跑 focused post_spec audit (可选, 风险低)。
-5. **代码已全在 aria-orchestrator master `bb27d76`** (主仓 gitlink 已指向它)。
+2. **✅ M6 Spec #2 代码侧 100% ship + Phase C 集成 ×2** (TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 gitlink `95360d7`; 全 parity; 分支已删)。
+3. **⏰ 头号 — owner 启动 168h 运营跑 (现已全部解锁)**: ① **先解 issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) → ② Day-1 alloc anchor + 3 pre-flight ($6) → ③ 每日 probe + Day-3 gate → ④ **填 TG-C corpus** (`evals/m6-prompt-quality/corpus/sample-*.md`) + owner 评分 (`score-*-owner.md`) → ⑤ `check-m6-e2e-acceptance.py --tg-a` + `--tg-c` 全 PASS。
+4. **次选**: 对 TG-B rework 跑 focused post_spec audit (可选, 风险低)。
+5. **代码全在 aria-orchestrator master `fb5914c`** (主仓 gitlink 已指向)。
 6. **owner-gated 残留** (不变): #136 Feishu 轮换 / v1.29.0 block-flip (06-07) / Blocker #-1 节点凭据。
 
 → **next session 入口**: `/aria:state-scanner` → 读本 doc §6。
@@ -40,6 +40,8 @@ updated-at: 2026-06-01T17:40:00Z
 | 6 | **TG-B recon → 缺陷 + LLM 子集** | **Forgejo #138** (TG-B-infra mock 面虚构 + 重复 M3 覆盖) + `test_crash_llm_provider_error_s_fail.py` (5 测, handler `except→S_FAIL(PROVIDER_5XX)` 真实分支) | `85b8f46` |
 | 7 | **TG-B Phase A rework** (owner 批准 reframe) | 分析 doc `tgb-rework-analysis.md` (`ca0a163`) + #138 评论 10930 + **覆盖矩阵 doc** `crash-recovery-coverage-matrix.md` (`5f56584`) + spec amend proposal§B/AC-3/tasks TG-B (`2b5918d`, 净 -317 行) | 见右 |
 | 8 | **TG-B B-sm-1** (确定性转换表 drift-guard) | `test_transition_table_determinism.py` (10 测: 3-表一致性 + assert_legal_transition 行为 + 终态无出边) + tasks B-sm-1/B-matrix-2 标 done | `97f979b` |
+| 9 | **TG-C 模板 + AC-5 gate** (内容待跑后填) | `evals/m6-prompt-quality/` rubric + README + 10 sample + 10 score 模板 + `--tg-c` (median-of-medians, 替换 stub) + `TestTgC` (6 测) | `c6df7ec` → PR #24 `fb5914c` |
+| 10 | **Phase C 集成 ×2** | TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 gitlink 2 次 bump (`424b45f`/`95360d7`); 双远程 parity; 2 feature 分支已删 | — |
 
 **测试**: aria-layer1 **869** (含新 5 LLM crash) + aria-orchestrator tests/ **121** (含新 22 acceptance) = **全绿, 零回归**。
 **回归 sweep**: 6 个现存 schema/acceptance 测试文件 4.2→5.0 latest pin + applied 列表加 "007" (milestone bump 预期 blast radius)。
@@ -98,9 +100,9 @@ updated-at: 2026-06-01T17:40:00Z
 
 **入口**: `/aria:state-scanner` → 读本 doc。
 
-**优先级** (Phase C 已完成, 代码全 ship):
-1. **[owner ⏰]** 启动 **168h 运营跑** (现已解锁): 先解 **issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) → Day-1 alloc anchor 记录 → 3 pre-flight 真 dispatch ($6) → 每日 probe → Day-3 gate。
-2. **[P2]** TG-C 模板可先写 (内容待跑后填) / 对 TG-B rework 跑 focused post_spec audit (可选)。
+**优先级** (Phase C ×2 完成, M6 Spec #2 代码侧 100% ship):
+1. **[owner ⏰]** 启动 **168h 运营跑** (全解锁): 先解 **issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) → Day-1 alloc anchor → 3 pre-flight ($6) → 每日 probe → Day-3 gate → **填 TG-C corpus + 评分** → `--tg-a`+`--tg-c` 全 PASS → Spec #4 release-closeout 可消费证据。
+2. **[P2 可选]** 对 TG-B rework 跑 focused post_spec audit (scope 缩减+经验验证, 风险低)。
 3. **[owner]** #136 轮换 / v1.29.0 block-flip 06-07 / Blocker #-1 节点凭据。
 
 ---
@@ -109,12 +111,12 @@ updated-at: 2026-06-01T17:40:00Z
 
 | 仓 | HEAD | 远程 | 本 session 提交 |
 |----|------|------|------------------|
-| **aria-orchestrator** | master `bb27d76` (PR #23 merge; feature 分支已删) | ✓ origin | 5 commits via PR #23 (`b903ee2`/`f0acfc5`/`85b8f46`/`5f56584`/`97f979b`) → merge `bb27d76` |
-| **主仓 Aria** | master `424b45f` | ✓ origin + ✓ github (parity) | handoff/probes/分析/spec-amend/tasks + **gitlink bump `1b69564`→`bb27d76` (`424b45f`)** |
+| **aria-orchestrator** | master `fb5914c` (PR #23 + #24 merged; 2 feature 分支已删) | ✓ origin | TG-A+TG-B 5 commits → PR #23 `bb27d76`; TG-C `c6df7ec` → PR #24 `fb5914c` |
+| **主仓 Aria** | master `95360d7` | ✓ origin + ✓ github (parity) | handoff/probes/分析/spec-amend/tasks + **gitlink 2 bump `1b69564`→`bb27d76`→`fb5914c`** |
 | **standards** | `95cbdc9` | ✓ | 未改 |
-| Forgejo | — | — | **aria-orch PR #23** (merged `bb27d76`) + **10CG/Aria #138** (open) + 评论 10930 |
+| Forgejo | — | — | **aria-orch PR #23** (`bb27d76`) + **PR #24** (`fb5914c`) merged + **10CG/Aria #138** (open) + 评论 10930 |
 
-> ✅ Phase C 完成: 全 SHA parity (主仓 424b45f origin=github / orch bb27d76 origin / gitlink=bb27d76)。feature 分支 local+remote 已删 (遵 C.2)。
+> ✅ Phase C ×2 完成: 全 SHA parity (主仓 95360d7 origin=github / orch fb5914c origin / gitlink=fb5914c)。2 feature 分支 local+remote 已删 (遵 C.2)。
 
 ---
 
