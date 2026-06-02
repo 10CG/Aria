@@ -446,13 +446,19 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ## TG-C-corpus — Rubric + 10 sample files (~3h)
 
+<!-- TG-C templates SHIPPED 2026-06-02 (rubric + README + 10 sample + 10 score templates +
+     --tg-c acceptance + 6 unit tests). Sample command TEXT + owner SCORES are filled AFTER the
+     TG-A 7-day run produces real dispatches (run-dependent, owner-gated). Cross-ref (C-crossref-2)
+     already satisfied: standards/autonomous/humanized-command-patterns.md (Spec #3, shipped
+     2026-05-27) contains the reciprocal link. AC-5 PASS is achievable once the corpus is filled. -->
+
 <!-- TG-C tasks: knowledge-manager agent -->
-- [ ] C-corpus-1 Create corpus directory structure:
+- [x] C-corpus-1 Create corpus directory structure:
   ```bash
   mkdir -p aria-orchestrator/evals/m6-prompt-quality/corpus/
   ```
 
-- [ ] C-corpus-2 Write `aria-orchestrator/evals/m6-prompt-quality/rubric.md` with 7 rubric
+- [x] C-corpus-2 Write `aria-orchestrator/evals/m6-prompt-quality/rubric.md` with 7 rubric
   dimensions per proposal §C.2:
   - Header: `# M6 Humanized Command Rubric (PRD §639)`
   - Table: Dim | Name | Scoring guidance (7 rows, each integer 0-10 scale).
@@ -462,7 +468,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   - Section: "Scoring rationale" — brief note that D1 (naturalness) and D6 (technical accuracy)
     carry independent weight; a sample may score 10 on D1 but 0 on D6 and still fail median gate.
 
-- [ ] C-corpus-3 Create 10 sample file templates:
+- [x] C-corpus-3 Create 10 sample file templates:
   `aria-orchestrator/evals/m6-prompt-quality/corpus/sample-{01..10}.md`
 
   Each file template:
@@ -491,7 +497,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ## TG-C-scores — 10 owner score files + median (~1.5h)
 
-- [ ] C-scores-1 Create 10 owner score file templates:
+- [x] C-scores-1 Create 10 owner score file templates:
   `aria-orchestrator/evals/m6-prompt-quality/score-{01..10}-owner.md`
 
   Each file template:
@@ -522,7 +528,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
   Score files are filled by owner after TG-A E2E run completes and samples are collected.
 
-- [ ] C-scores-2 Implement median computation in acceptance script (--tg-c):
+- [x] C-scores-2 Implement median computation in acceptance script (--tg-c):
   ```python
   import statistics, re
   score_files = sorted(
@@ -548,11 +554,11 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 ## TG-C-crossref — BOTH-locations cross-ref links + verification (~1h)
 
 <!-- Cross-ref Spec #3 TG-DOCS-B BOTH-locations design -->
-- [ ] C-crossref-1 Verify all 10 `corpus/sample-*.md` files contain the cross-reference footer link
+- [x] C-crossref-1 Verify all 10 `corpus/sample-*.md` files contain the cross-reference footer link
   to `standards/autonomous/humanized-command-patterns.md`. If any sample file is missing the link,
   add it before finalizing TG-C.
 
-- [ ] C-crossref-2 Verify that Spec #3 TG-DOCS-B `standards/autonomous/humanized-command-patterns.md`
+- [x] C-crossref-2 Verify that Spec #3 TG-DOCS-B `standards/autonomous/humanized-command-patterns.md`
   (when it ships) contains the reciprocal link back to
   `aria-orchestrator/evals/m6-prompt-quality/`. This is a coordination checkpoint:
   - If Spec #3 has not shipped yet: add a TODO comment in `rubric.md`:
@@ -562,7 +568,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
     ```
   - If Spec #3 has shipped: grep verify and remove the TODO.
 
-- [ ] C-crossref-3 Document BOTH-locations design in `aria-orchestrator/evals/m6-prompt-quality/README.md`
+- [x] C-crossref-3 Document BOTH-locations design in `aria-orchestrator/evals/m6-prompt-quality/README.md`
   (create if absent):
   ```markdown
   # M6 Prompt Quality Corpus
@@ -586,18 +592,18 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
 
 ## TG-C-acceptance — check-m6-e2e-acceptance.py --tg-c section (~0.5h)
 
-- [ ] C-acceptance-1 Implement `--tg-c` section in `check-m6-e2e-acceptance.py`:
+- [x] C-acceptance-1 Implement `--tg-c` section in `check-m6-e2e-acceptance.py`:
   - File count checks (10 samples, 10 scores, rubric.md existence).
   - Cross-ref link grep (all 10 samples contain `humanized-command-patterns.md`).
   - Median score computation (per C-scores-2 logic above).
   - Exit code: 0 = all PASS, 1 = AC data fail (missing files, low median), 2 = infrastructure
     error (directory missing, score parse error).
 
-- [ ] C-acceptance-2 Unit test: run `--tg-c` against complete passing fixture (10 samples with
+- [x] C-acceptance-2 Unit test: run `--tg-c` against complete passing fixture (10 samples with
   cross-ref footers, 10 score files each with 7 scores all = 8, rubric.md exists) → exit 0,
   `[PASS] AC-5: 10 samples scored, median=8.0 >= 7.0`.
 
-- [ ] C-acceptance-3 Unit test: fixture with only 9 sample files → exit 1 or 2 with count error.
+- [x] C-acceptance-3 Unit test: fixture with only 9 sample files → exit 1 or 2 with count error.
   Fixture with 10 samples but corpus median = 6.5 → exit 1 `[FAIL] AC-5: median=6.5 < 7.0`.
   Fixture with sample missing cross-ref footer → exit 1 `[FAIL] AC-5: N samples missing cross-ref link`.
 
