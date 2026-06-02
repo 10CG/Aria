@@ -2,25 +2,25 @@
 track-id: m6-e2e-resilience-tga
 owner-container: simonfishgit/dev-claude
 phase: C
-status: in_progress
-updated-at: 2026-06-02T03:30:00Z
+status: done
+updated-at: 2026-06-02T04:00:00Z
 ---
 
-# Aria — Session Handoff (2026-06-01 ~14:48 UTC) — M6 e2e-resilience (Spec #2) Phase B: TG-A 代码件全交付 + TG-B recon→#138 缺陷+LLM 子集
+# Aria — Session Handoff (2026-06-01 ~14:48 → 2026-06-02 ~04:00 UTC) — M6 e2e-resilience (Spec #2) 代码侧 100% ship (TG-A + TG-B [#138 rework] + TG-C 模板) + Phase C 集成 ×2 [SESSION 收尾]
 
-> **Status**: 🟢 **TG-A + TG-B + TG-C 模板全交付 + Phase C 集成 ×2** (PR #23 `bb27d76` + PR #24 `fb5914c`; 主仓 gitlink → `fb5914c` (`95360d7`) 双远程 parity; 2 feature 分支已删)。M6 e2e-resilience (Spec #2) **代码侧 100% ship**; 879 + 28 acceptance tests green。**剩纯 owner/wall-clock = 168h 运营跑 → 填 TG-C corpus + 评分 → AC-5; Spec 未归档**。
-> **Type**: `/state-scanner` → M6 e2e-resilience Phase B → TG-A 代码件优先 (infra/validate/uptime/dispatch/acceptance) → 再 TG-B (recon→#138 缺陷+LLM crash 子集)
-> **Rule #9 trigger**: 跨多 arc (TG-A 5 task group + TG-B recon/issue/subset) + ship 实质代码 + 跨 phase
-> **本终端**: dev-claude (simonfishgit/dev-claude) — aria-orchestrator feature 分支 3 commits (`85b8f46`, origin 到 `f0acfc5`, **末 commit 待 push**);主仓 master 已提 handoff+probes 并双远程 push
+> **Status**: ✅ **DONE — M6 e2e-resilience (Spec #2) 代码侧 100% ship + 集成 + CLAUDE.md 同步**。TG-A + TG-B (#138 rework) + TG-C 模板全交付; Phase C 集成 ×2 (PR #23 `bb27d76` + PR #24 `fb5914c`); 主仓 `7b668df` / orch `fb5914c` / gitlink `fb5914c` 全 parity; 2 feature 分支已删; 工作树 clean。**879 + 28 acceptance tests green**。**剩纯 owner/wall-clock = 168h 运营跑 → 填 TG-C corpus + 评分 → AC-5; Spec 未归档**。
+> **Type**: `/state-scanner` → M6 Phase B → TG-A (5 task group) → TG-B (recon→#138 spec 缺陷→owner reframe→覆盖矩阵+gap+B-sm-1) → Phase C 集成 → TG-C 模板 → Phase C 集成 ×2 → CLAUDE.md 同步 → 收尾
+> **Rule #9 trigger**: 跨多 arc (TG-A/B/C + #138 rework + Phase C ×2) + ship 实质代码 + 跨 phase B→C
+> **本终端**: dev-claude (simonfishgit/dev-claude) — 全部已 commit + 双远程 push, 工作树 clean, 无未 push/未提交残留。
 
 ---
 
 ## §0 入口 (新 session 优先读)
 
-1. **本 doc**
-2. **✅ M6 Spec #2 代码侧 100% ship + Phase C 集成 ×2** (TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 gitlink `95360d7`; 全 parity; 分支已删)。
-3. **⏰ 头号 — owner 启动 168h 运营跑 (现已全部解锁)**: ① **先解 issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) → ② Day-1 alloc anchor + 3 pre-flight ($6) → ③ 每日 probe + Day-3 gate → ④ **填 TG-C corpus** (`evals/m6-prompt-quality/corpus/sample-*.md`) + owner 评分 (`score-*-owner.md`) → ⑤ `check-m6-e2e-acceptance.py --tg-a` + `--tg-c` 全 PASS。
-4. **次选**: 对 TG-B rework 跑 focused post_spec audit (可选, 风险低)。
+1. **本 doc** (本 session DONE; 无 carry-forward 代码工作, 剩全是 owner/wall-clock)
+2. **✅ M6 Spec #2 代码侧 100% ship + 集成** (TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 `7b668df` / gitlink `fb5914c`; 全 parity; 分支已删; CLAUDE.md 已同步)。
+3. **⏰ 头号 — owner 启动 168h 运营跑 (现已全部解锁)**: ① **先解 issue_type_hint 运营依赖** (§3.1, 否则 AC-2 永远 FAIL) → ② Day-1 alloc anchor + 3 pre-flight ($6) → ③ 每日 probe + Day-3 gate → ④ **填 TG-C corpus** (`evals/m6-prompt-quality/corpus/sample-*.md`) + owner 评分 (`score-*-owner.md`) → ⑤ `check-m6-e2e-acceptance.py --tg-a` + `--tg-c` 全 PASS → Spec #4 release-closeout 可消费 → M6 Spec #2 归档。
+4. **次选 (AI 可做)**: 对 TG-B rework 跑 focused post_spec audit (可选, 风险低) / Spec #4 release-closeout 推进。
 5. **代码全在 aria-orchestrator master `fb5914c`** (主仓 gitlink 已指向)。
 6. **owner-gated 残留** (不变): #136 Feishu 轮换 / v1.29.0 block-flip (06-07) / Blocker #-1 节点凭据。
 
@@ -42,10 +42,11 @@ updated-at: 2026-06-02T03:30:00Z
 | 8 | **TG-B B-sm-1** (确定性转换表 drift-guard) | `test_transition_table_determinism.py` (10 测: 3-表一致性 + assert_legal_transition 行为 + 终态无出边) + tasks B-sm-1/B-matrix-2 标 done | `97f979b` |
 | 9 | **TG-C 模板 + AC-5 gate** (内容待跑后填) | `evals/m6-prompt-quality/` rubric + README + 10 sample + 10 score 模板 + `--tg-c` (median-of-medians, 替换 stub) + `TestTgC` (6 测) | `c6df7ec` → PR #24 `fb5914c` |
 | 10 | **Phase C 集成 ×2** | TG-A+TG-B PR #23 `bb27d76` + TG-C PR #24 `fb5914c`; 主仓 gitlink 2 次 bump (`424b45f`/`95360d7`); 双远程 parity; 2 feature 分支已删 | — |
+| 11 | **CLAUDE.md 项目状态更新** | 当前阶段 + 运行时版本 + PRD v2.0 + footer 反映 M6 Spec #2 代码侧完成 | `7b668df` |
 
-**测试**: aria-layer1 **869** (含新 5 LLM crash) + aria-orchestrator tests/ **121** (含新 22 acceptance) = **全绿, 零回归**。
+**测试 (最终)**: aria-layer1 **879** (含 TG-B LLM crash 5 + 转换表 drift-guard 10) + aria-orchestrator tests/ **127** (含 acceptance 22 TG-A + 6 TG-C) = **全绿, 零回归**。
 **回归 sweep**: 6 个现存 schema/acceptance 测试文件 4.2→5.0 latest pin + applied 列表加 "007" (milestone bump 预期 blast radius)。
-**real-env smoke**: AC-7 PASS / AC-1 优雅报 missing anchor (rc=2, 7d 未跑) / AC-6 PASS (模板占位)。
+**real-env smoke**: AC-7 PASS / AC-1 优雅报 missing anchor (rc=2) / AC-6 PASS (模板占位) / `--tg-c` 对未填模板 exit 2 (corpus 未填, 优雅)。
 
 ### TG-B recon 关键发现 + rework (→ #138, owner 批准 reframe)
 两个错误: **(A) mock 符号虚构** (`hermes_client`/`layer2_client`/`recovery.py`/`ProcessKilledError`/`AllocTerminatedError` 全不存在; aria-layer1 是 Hermes plugin 不调 Hermes) + **(B) recovery 模型错** (spec 全写 →S_FAIL, 真实是**三模型**: 进程 kill→**auto-resume from DB** / WAL→**durability** / LLM+死 alloc→**S_FAIL**)。全 6 模式已被既有 M2/M3 测试覆盖 (`test_t12`/`test_t7_crash_recovery`/`test_t2_alloc_status_provider`(ExitCode 137=SIGKILL)/`test_t22_t23`/`test_t9`) + 本 session 1 新测。
@@ -112,17 +113,17 @@ updated-at: 2026-06-02T03:30:00Z
 | 仓 | HEAD | 远程 | 本 session 提交 |
 |----|------|------|------------------|
 | **aria-orchestrator** | master `fb5914c` (PR #23 + #24 merged; 2 feature 分支已删) | ✓ origin | TG-A+TG-B 5 commits → PR #23 `bb27d76`; TG-C `c6df7ec` → PR #24 `fb5914c` |
-| **主仓 Aria** | master `95360d7` | ✓ origin + ✓ github (parity) | handoff/probes/分析/spec-amend/tasks + **gitlink 2 bump `1b69564`→`bb27d76`→`fb5914c`** |
+| **主仓 Aria** | master `7b668df` | ✓ origin + ✓ github (parity) | handoff/probes/分析/spec-amend/tasks + gitlink 2 bump `1b69564`→`bb27d76`→`fb5914c` + **CLAUDE.md 项目状态 `7b668df`** |
 | **standards** | `95cbdc9` | ✓ | 未改 |
 | Forgejo | — | — | **aria-orch PR #23** (`bb27d76`) + **PR #24** (`fb5914c`) merged + **10CG/Aria #138** (open) + 评论 10930 |
 
-> ✅ Phase C ×2 完成: 全 SHA parity (主仓 95360d7 origin=github / orch fb5914c origin / gitlink=fb5914c)。2 feature 分支 local+remote 已删 (遵 C.2)。
+> ✅ 最终 SHA parity (主仓 7b668df origin=github / orch fb5914c origin / gitlink=fb5914c)。2 feature 分支 local+remote 已删 (遵 C.2)。工作树 clean。
 
 ---
 
 ## §8 Memory entries this session
 
-0 new committed (候选见 §4, 与既有 memory 同源, 可下 session 评估是否新增)。
+0 new committed。**最强候选 (下 session 评估)**: **"实施一个 spec 的 test suite 前, 必须 recon 真实代码确认 mock 目标 + 行为模型存在; spec 可整段引用虚构基础设施 (#138: hermes_client/recovery.py 不存在) + 错误 recovery 模型 (全写 →S_FAIL vs 真实 auto-resume/durability) — 尤其 crash/infra 模式。recon 把 ~13h 虚构实现转为 ~2-3h 真实交付 + actionable issue。"** —— 比既有 [[feedback_rebenchmark_test_diagnosis_not_metric]] 更具体到"spec 的整个 mock 面虚构 + 模型错"层面, 值得独立 entry。次候选: 本 session 4 次 spec-vs-reality drift (版本值/DB名/validate token/TG-B-infra) 均 recon-first 拦下, 强化 verify-before-assert 纪律。
 
 ---
 

@@ -11,7 +11,7 @@
 
 ---
 
-## ★ 最新 session #M6-TGA-CODE — 🟢 **M6 e2e-resilience (Spec #2) Phase B: TG-A 代码件全交付 + 验证 (985 tests green)** (2026-06-01 ~14:48 UTC, dev-claude)
+## ★ 最新 session #M6-TGA-CODE — ✅ **DONE: M6 e2e-resilience (Spec #2) 代码侧 100% ship — TG-A + TG-B (#138 rework) + TG-C 模板 + Phase C 集成 ×2** (2026-06-01 ~14:48 → 06-02 ~04:00 UTC, dev-claude)
 
 **Latest**: [2026-06-01-1448-m6-e2e-resilience-tga-code.md](./2026-06-01-1448-m6-e2e-resilience-tga-code.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
 
