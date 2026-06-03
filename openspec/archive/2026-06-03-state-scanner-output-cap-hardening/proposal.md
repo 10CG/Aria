@@ -1,6 +1,6 @@
 # state-scanner-output-cap-hardening
 
-> **Status**: ✅ **Approved** (Phase A.2 CONVERGED 2026-06-01 via R1 NEEDS_FIX/PWW/PWW → Rev1 → R2 PWW/PASS/PASS unanimous; 2 Critical CLOSED + 0 new Critical; Level 2 baseline 2-round per [[feedback_audit_convergence_patterns]])。Phase B+C+D 待下个 session。
+> **Status**: ✅ **SHIPPED 2026-06-03** (aria-plugin v1.38.0, PR #73 merge `c7ec539` 双远程 parity; 主仓 gitlink → `c7ec539`)。Phase A.2 CONVERGED 2026-06-01 (R1 NEEDS_FIX/PWW/PWW → Rev1 → R2 PWW/PASS/PASS unanimous; 2 Critical CLOSED)。Phase B full cycle: TG-A (10 区块字段骨架 + sync-check) + TG-B (3 层 resolver + 30 测; OQ3=warn-only / OQ4=10 核心块不 collapse); 45 新测 676 全绿零回归。Closes #71 + #72。
 > **Phase A.2 carry (Phase B 启动前须办)**: OQ3 (上界 clamp vs warn-only) owner 定 → TG-B.4「上界超限」测试据此断言; OQ4 (canonical 区块数 10 vs collapse) 在 TG-A.0 reconcile 锁定 (TG-A.3 sync-check 依赖其输出)。
 > **Rev1** 2026-06-01 post_spec R1 修正
 > **Level**: 2 (Minimal — proposal + tasks)
@@ -75,5 +75,5 @@
 
 1. ~~resolver 放哪~~ → **已定** (`_common.py`, R1 M-4)。
 2. default 是否从 20 提高? → 倾向保持 20 向后兼容, 大仓用 config/env 覆盖。
-3. cap 上界超限时 **clamp 还是 warn-only**? (R1 I4 — 倾向 warn-only + 尊重, 不静默改用户意图)。
+3. cap 上界超限时 **clamp 还是 warn-only**? → **已定 (owner 2026-06-03): warn-only + 尊重用户值** (log.warning 提示但仍用用户设的值, 不静默改意图)。TG-B.1 据此实现, TG-B.4「上界超限」测试断言 = 超限返回原值 + 发 warning。
 4. canonical 区块集最终是 10 还是 collapse README/Forgejo? (R1 C2 — Phase B 实施前 reconcile 锁定)。
