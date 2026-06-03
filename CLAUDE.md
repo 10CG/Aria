@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.37.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.38.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -537,6 +537,10 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   tracks_multibranch.collision 持久化 lib/collision.py + 切口2 rule 1.54
                   concurrent_churn_detected + 切口1 phase-d-closer fetch_gate; advisory-over-hardlock;
                   standards concurrent-session-write-safety convention; 27 tests);
+                  v1.38.0 = state-scanner-output-cap-hardening #71+#72 (TG-B handoff_multibranch
+                  MAX_BRANCHES_SCANNED 三层可配置 resolver [env>config>default 20, int 域 fail-soft,
+                  上界 500 warn-only per OQ3] + TG-A SKILL.md 输出格式补 10 区块字段骨架防 v1.32.0
+                  字段层漂移 + sync-check 测试; 45 新测 deterministic/structural Rule #6 substitute);
                   v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator master `fb5914c`, M6 execution phase;
@@ -560,8 +564,9 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-06-02 (M6 Spec #2 e2e-resilience 代码侧完成 — TG-A (migration 007 is_synthetic schema v5.0 + check-m6-e2e-acceptance.py AC-1/2/6/7) + TG-B (crash-recovery: recon 拦下 Forgejo #138 spec 缺陷 — Infra mock 面虚构 [hermes_client/layer2_client/recovery.py 不存在, aria-layer1 是 plugin] + recovery 模型错 [全写 →S_FAIL, 真实三模型 auto-resume/durability/S_FAIL] + 重复 M3 覆盖 → owner 批准 reframe → 覆盖矩阵 doc + LLM gap + B-sm-1 转换表 drift-guard) + TG-C (拟人样本 rubric+模板+AC-5 gate) via aria-orch PR #23 `bb27d76` + #24 `fb5914c`, 主仓 gitlink → `fb5914c`; 879+28 tests green; Spec 未归档待 168h 运营跑)
-> 前次 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety + state-scanner 补真·发布 paper bump 勘误 + Forgejo #135)
+**更新**: 2026-06-03 (插件 v1.38.0 ship — state-scanner-output-cap-hardening #71+#72: TG-B handoff_multibranch MAX_BRANCHES_SCANNED 三层可配置 resolver [env ARIA_HANDOFF_MAX_BRANCHES > config > default 20, int 域显式 fail-soft 拒 bool/float/非数字/≤0, 上界 500 warn-only 尊重用户值 per OQ3 owner 决策] + TG-A SKILL.md 输出格式 L146 补 10 区块字段骨架防 v1.32.0 progressive-disclosure 字段层漂移 + sync-check 测试双向锁定; 45 新测 [39 resolver/cap + 6 sync-check] deterministic/structural Rule #6 substitute, 676 全绿零回归; aria-plugin PR #73 merge `c7ec539` 双远程 parity; 主仓 gitlink → `c7ec539`)
+> 前次 2026-06-02 (M6 Spec #2 e2e-resilience 代码侧完成 — TG-A migration 007 schema v5.0 + TG-B crash-recovery 覆盖矩阵 [Forgejo #138 spec 缺陷 rework] + TG-C 拟人样本模板; aria-orch gitlink `fb5914c`; 879+28 tests green; Spec 未归档待 168h 运营跑)
+> 前前次 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety + state-scanner 补真·发布 paper bump 勘误 + Forgejo #135)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin

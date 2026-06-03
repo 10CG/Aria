@@ -34,6 +34,11 @@
       "api_timeout_seconds": 5,
       "limit": 20,
       "label_filter": []
+    },
+
+    "handoff_multibranch": {
+      "_comment": "#71 v1.38.0 — 多终端 handoff 看板扫描的远程分支上限。3 层优先级: env ARIA_HANDOFF_MAX_BRANCHES > 此 config 值 > 默认 20。大仓 (远程分支 > 20) 调高此值避免 handoff track 漏扫。超过推荐上界 500 仅告警不强改 (尊重用户值)。",
+      "max_branches": 20
     }
   },
 
