@@ -106,15 +106,16 @@ updated-at: 2026-06-04T00:00:00Z
 
 ---
 
-## §8 Memory entries this session (2 new — 收尾 owner 要求固化)
+## §8 Memory entries this session (3 new — 收尾 owner 要求固化)
 
-收尾时 owner 复核「值得总结但未固化的经验」, 固化 §3 两个 git 陷阱:
+收尾时 owner 复核「值得总结但未固化的经验」, 固化 3 条:
 1. **[[feedback_marketplace_json_dual_version_indent]]** — marketplace.json 两个不同缩进的 version 字段, `replace_all` 只命中缩进匹配的那条 (漏顶层); SOT bump 后 `grep -c '"X.Y.Z"' == 2` 验证。
 2. **[[feedback_git_mv_drops_unstaged_edits]]** — `git mv` 有未 staged 编辑的文件提交 index 旧内容 (rename 100%), 工作树编辑残留; Phase D 归档高频踩, mv 后重 `git add`。
+3. **[[feedback_latest_md_single_bare_pointer_invariant]]** — latest.md 恒只 1 个 bare `**Latest**:` pointer; ship 收尾降级前任 + `grep -c` 验证 ==1 (本次发现跨 session 累积到 4 个, 已清理为 1)。
 
 (§4 其余教训与既有 [[feedback_verify_edit_landed_grep_count]] / [[feedback_stale_git_index_lock_recovery]] / [[feedback_deterministic_structural_skill_rule6_substitute]] 同源, 不重复固化。)
 
-> **收尾核查 (2026-06-04)**: 0.三仓双远程全 parity (主仓 `36205e5` / aria `c7ec539` / standards `95cbdc9` / orch `05915eb`); 1.本对话无未完成任务/讨论; 2.经验固化完成 (上述 2 memory); 3.维度: UPM N/A + US 无需绑 + Spec 已归档 + PRD 无需改 (§5)。
+> **收尾核查 (2026-06-04)**: 0.三仓双远程全 parity (主仓 `4aabed4` / aria `c7ec539` / standards `95cbdc9` / orch `05915eb`), 0 未推送; 1.本对话无未完成任务/讨论; 2.经验固化完成 (上述 3 memory); 3.维度: UPM N/A + US 无需绑 + Spec 已归档 + PRD 无需改 (§5); 4.latest.md 已清理为单一 bare pointer, 新 session 入口唯一。
 
 ---
 
