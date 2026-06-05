@@ -9,6 +9,14 @@
 > **Ship deadline**: 2026-06-07 (D+14 hard date,parent v1.28.0 ship 2026-05-24)。*若 2026-06-07 (Sunday) owner 不在线, 顺延 06-08 Monday 不视为 deferral*
 > **Effort baseline (revised per R1 I-tl-5)**: ~5-6h end-to-end (Phase A.1 ~1h skeleton + A.2 audit ~1h + 2026-06-07 当天 §观察期数据汇总 ~1.5h + Phase B 实施 ~1.5h + Phase C dual-PR sequenced merge ~1h + Phase D archive + handoff ~0.5h)
 > **Risk class**: Backward-compatible (ecosystem 14d 已有警告;override 机制 已存在;config flag `phase_c_integrator.submodule_gate.mode` 仍可显式 `"warn"` 回退;`mode="off"` 紧急 bypass 保留)
+>
+> ---
+> **⚠️ Ship-day prep amendment (2026-06-05, D+12 — per [[feedback_dec_ship_target_staleness_verify]])**:
+> 1. **版本目标校正**: `aria-plugin v1.29.0` → **v1.40.0** (插件本 session 已 ship 到 v1.39.0;v1.29.0 slot 早跳过)。全文 `v1.29.0+` 表述 (= block 成默认的版本) → `v1.40.0+`。main repo v1.7.1 slot 仍空闲 ✓。
+> 2. **§A flip 行号已漂移**: A1 `submodule_gate.sh` 仍 L33 ✓;A2 SKILL.md inline bash L378→**L450**;A3 config/wording 全集见决策记录 (06-07 grep-batch 复核)。
+> 3. **观察数据 = 0**: `aria/metrics/` 仅 .gitkeep → `total_gate_executions=0` → **Trigger C (insufficient warm observation)**,非 Trigger B 正常翻转。14 天内三仓 10 PR merged 但 gate 0 执行 (gitlink bump 走 git 直驱绕过 telemetry 脚本)。06-07 owner 在 Risk R1 fallback (a) extend / (b) risk-accept flip / (c) defer 中选 + 签字。
+> 4. **prep 不动 flip/SOT/merge** — 全部留 2026-06-07 (D+14 hard date)。详见 `.aria/decisions/2026-06-07-v1.40.0-block-flip.md` (DRAFT skeleton)。
+> ---
 
 ---
 
