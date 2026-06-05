@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.38.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.39.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -564,9 +564,9 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-06-03 (插件 v1.38.0 ship — state-scanner-output-cap-hardening #71+#72: TG-B handoff_multibranch MAX_BRANCHES_SCANNED 三层可配置 resolver [env ARIA_HANDOFF_MAX_BRANCHES > config > default 20, int 域显式 fail-soft 拒 bool/float/非数字/≤0, 上界 500 warn-only 尊重用户值 per OQ3 owner 决策] + TG-A SKILL.md 输出格式 L146 补 10 区块字段骨架防 v1.32.0 progressive-disclosure 字段层漂移 + sync-check 测试双向锁定; 45 新测 [39 resolver/cap + 6 sync-check] deterministic/structural Rule #6 substitute, 676 全绿零回归; aria-plugin PR #73 merge `c7ec539` 双远程 parity; 主仓 gitlink → `c7ec539`)
-> 前次 2026-06-02 (M6 Spec #2 e2e-resilience 代码侧完成 — TG-A migration 007 schema v5.0 + TG-B crash-recovery 覆盖矩阵 [Forgejo #138 spec 缺陷 rework] + TG-C 拟人样本模板; aria-orch gitlink `fb5914c`; 879+28 tests green; Spec 未归档待 168h 运营跑)
-> 前前次 2026-05-31 (插件 v1.37.0 ship — #133 concurrent-session-upm-safety + state-scanner 补真·发布 paper bump 勘误 + Forgejo #135)
+**更新**: 2026-06-05 (插件 v1.39.0 ship — state-scanner-git-operation-awareness #135: interrupt collector 检测不到 git rebase/merge-in-progress 误报 interrupt:none 修复。git.py 新增 _detect_git_operation collector 字段 git.git_operation_in_progress {operation∈[none,rebase,merge,cherry_pick,revert,bisect], has_conflicts 条件求值, detail} 经 git rev-parse --git-dir [worktree/submodule gitfile 兼容, 相对路径 join project_root] 检测暂停 git 操作, fail-soft additive; 阶段 2 新增 git_operation_in_progress 推荐规则 priority 0.5 [与 interrupt.status 正交, 降级/阻止 checkout·分支推荐, has_conflicts 措辞升级]; 6 文档同步 + snapshot_schema_version 保持 1.0 additive; 21 新测 [16 detection 含多标记优先级+worktree+冲突+fail-soft / 5 rule 结构性] deterministic Rule #6 substitute, 712 全绿零回归 + dogfood 复算 triage case-1; post_spec 2-round CONVERGED R1 REVISE→Rev1→R2 全票 PASS 5/5 + Phase B.2 code-review PASS; aria-plugin PR 待 merge 双远程 parity)
+> 前次 2026-06-03 (插件 v1.38.0 ship — state-scanner-output-cap-hardening #71+#72: TG-B handoff_multibranch MAX_BRANCHES_SCANNED 三层可配置 resolver + TG-A SKILL.md 输出格式补 10 区块字段骨架 + sync-check; 45 新测 676 全绿; aria-plugin PR #73 merge `c7ec539` 双远程 parity)
+> 前前次 2026-06-02 (M6 Spec #2 e2e-resilience 代码侧完成 — TG-A migration 007 schema v5.0 + TG-B crash-recovery 覆盖矩阵 [Forgejo #138 spec 缺陷 rework] + TG-C 拟人样本模板; aria-orch gitlink `fb5914c`; 879+28 tests green; Spec 未归档待 168h 运营跑)
 **维护**: 10CG Lab
 **主仓库**: https://github.com/10CG/Aria
 **插件仓库**: https://github.com/10CG/aria-plugin

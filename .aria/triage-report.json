@@ -1,31 +1,50 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.36.0",
-  "issue_ref": "10CG/Aria#133",
-  "generated_at": "2026-05-30T11:19:13Z",
+  "triage_tool_version": "1.38.0",
+  "issue_ref": "10CG/Aria#135",
+  "generated_at": "2026-06-04T22:30:50Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 133,
-      "title": "并发多 session 编辑同一 UPM 致 merge thrash + 矛盾记录（建议 concurrent-safe / Layer L 更易发现）",
-      "body": "## Feature Request / Bug\n\n**描述**: 并发多个 Claude Code session 在同一 repo 跑 aria ten-step cycle 时, 都编辑同一 UPM 文件的相同区域 (line-3 \"Next session 入口\" handoff 指针列表 — 各 session 都 prepend 自己的 handoff; + followup 表 — 都改同一 #NNN row), 导致两类问题。\n\n**使用场景 (本次实例)**: 10CG/SilkNode 同时跑两 session — A (deepseek prod release Path A + byteplus 接入 B1), B (US-124 W7 prod release)。两者都按 ten-step cycle 收尾。\n\n**问题 1 — PR merge thrash**: 每次 B push UPM 改动到 main, A 的 PR 立刻 mergeable:false。A re-merge + 解 UPM 冲突 3 次 (a2bddf9→e91d74e8...), B 持续推更多 UPM 改动 (含同一 #111 deepseek row), 反复 mergeable:false, race 不收敛。\n\n**问题 2 — 矛盾记录 (更严重)**: 两 session 对同一 prod deepseek 状态写了相反归属:\n- B: \"prod DB 早是 canonical 自 2026-04-07 (依据 model_configs.updated_at), 炸弹非本 release 拉响\"\n- A: RETURNING 硬证据 (prod 改前 portkey_slug=deepseek→openai; r1/v3 target 改前指 deepseek-reasoner/chat) 证明是 A 今天 raw SQL 改的\n- 根因: updated_at 是 Prisma @updatedAt (app-level), raw SQL (psql) 不触发它, 故 updated_at 停旧值 ≠ 当前值设置时间 → B 误判 \"早 canonical\"。共享 #111 成对抗性编辑。\n\n**根因**: UPM single-source-of-truth + line-3 prepend + 共享 followup 表的约定假设串行 session。\n\n**已有但未启用**: state-scanner SKILL.md 的 multi-terminal-coordination (Layer L: claim / cross-owner collision / phase1_gate / track board) 默认 opt-out (state_scanner.coordination.enabled=false), 本项目未启用 → 没拦住 thrash。\n\n**建议**: (a) Layer L 对检测到并发 track 的项目更主动提示/默认引导启用; (b) UPM 记录约定改 concurrent-safe (handoff 指针 append-friendly / followup 避免多 session 改同一 row); (c) phase-d-closer 收尾前 git fetch 检测并发 main 改动 + 提示协调。\n\n**附带**: 并发 git 操作反复产生瞬时 .git/index.lock (两 session 共享 .git)。\n\n## 环境信息\n- Aria Plugin: 1.28.0 | Skills: 38 | OS: Linux x86_64 | 项目配置: yes\n\n---\n*由 aria-report 生成*",
+      "number": 135,
+      "title": "[改进] state-scanner interrupt collector 检测不到 git rebase/merge-in-progress — 误报 interrupt:none",
+      "body": "## 现象\n\n2026-05-31 一次 `/state-scanner` session 中, scan.py 的 interrupt collector (`collectors/interrupt.py`) 报告 `interrupt.status = none`, 但仓库实际处于一个**暂停中的 git interactive rebase** (`.git/rebase-merge/` 存在, git status: \"You are currently editing a commit while rebasing branch 'master'\")。\n\n该 rebase 是前一个 #133 混乱 ship session (index.lock + shell 输出损坏全程) 遗留的废弃产物, orig-head `b8b9a7f` 甚至不在已 ship 的 master 历史里。若 AI 信 `interrupt:none` 直接按\"clean detached HEAD\"处理 (如贸然 `git checkout master`), 会 abort/破坏该 rebase 中间态或产生混乱。\n\n## 根因\n\ninterrupt collector 只解析 `.aria/workflow-state.json` (Aria 自己的 workflow 中断状态), **不检测 git 层的 in-progress 操作**:\n- `.git/rebase-merge/` 或 `.git/rebase-apply/` (rebase in progress)\n- `.git/MERGE_HEAD` (merge in progress)\n- `.git/CHERRY_PICK_HEAD` / `.git/REVERT_HEAD` / `.git/BISECT_LOG`\n\ngit.py collector 已采集 `detached_head: true`, 但没区分\"普通 detached HEAD\" vs \"因 rebase 暂停而 detached\"。两者对推荐安全性影响完全不同。\n\n## 影响\n\n- 阶段 2 推荐基于 `interrupt:none` 给出常规工作流推荐, 完全忽略 pending git 操作\n- 若推荐含 checkout/分支操作, 可能破坏 rebase/merge 中间态\n- 与 handoff 记录的 \"rebase auto-merge dropped content\" 类故障叠加时静默风险更高\n\n## 建议修复\n\n1. git.py collector 增采 `git_operation_in_progress` 字段, 检测上述 `.git/*` 标记文件, 枚举 `{none, rebase, merge, cherry_pick, revert, bisect}` + 是否有冲突 (`git diff --diff-filter=U`)\n2. interrupt collector 或阶段 2 入口断言消费该字段: 非 none 时展示 warning + 阻止/降级常规推荐, 引导用户先 `--continue` / `--abort`\n3. snapshot schema additive 加该字段 (snapshot_schema_version 兼容 bump per §Versioning)\n\n## 证据 (本 session)\n\n- scan.py exit 10, snapshot `interrupt.status=none` + `git.detached_head=true`\n- 实际 `.git/rebase-merge/head-name=refs/heads/master`, `onto=a9665fb`, orig-head=`b8b9a7f` (NOT ancestor of origin/master)\n- 该 rebase 被识别为 stale 后 abort, **连带审出 #133 v1.37.0 paper version bump** (release commit 声称 5-SOT atomic bump 实际 4/5 SOT 漏改, 市场看不到 1.37.0) — 修复见主仓 commit `8d17640` (补回被 drop 的 audit report) + aria `c5bd6b3` (补全 SOT)。\n\n> 由 state-scanner dogfood 发现 (本 session)。\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/133",
-      "created_at": "2026-05-30T09:04:21Z",
-      "updated_at": "2026-05-30T09:04:21Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/135",
+      "created_at": "2026-05-31T05:31:42Z",
+      "updated_at": "2026-05-31T05:31:42Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.28.0",
-      "current": "1.36.0",
+      "reported": "1.37.0",
+      "current": "1.38.0",
       "gap": "behind"
     },
     "step3_code": {
-      "collection_status": "skipped",
-      "cited_paths": [],
-      "matches_description": null
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "collectors/interrupt.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".aria/workflow-state.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
     },
     "step4_history": {
       "collection_status": "skipped",
@@ -40,7 +59,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "06203295a10d2859e98662c76d5dc2c2b1fdc6ae"
+          "head": "18f39b2caaf1de67fd3385298e34d0ed12b12496"
         }
       ]
     }
@@ -50,29 +69,22 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "并发 session 各自 prepend 到 UPM/handoff 同一 line-3 指针区 + 改同一 followup #NNN row → git merge",
-        "expected_behavior": "issue 称: 反复 mergeable:false / merge thrash 不收敛",
-        "actual_behavior": "机制确定性成立 (并发同区编辑必致 git 冲突)。本 session 亲历同类: 在 Aria latest.md line-prepend + 5 SOT (plugin/marketplace/VERSION/CHANGELOG/README) 与 sister 并发 ship 反复冲突, 需 fetch+rebase 机械合并",
+        "input": "临时 git repo (init + 1 empty commit) 中创建 .git/rebase-merge/ (head-name=refs/heads/master, onto=a9665fb) 模拟暂停中的 rebase；运行 collectors.interrupt.collect_interrupt_state + collectors.git.collect_git_state",
+        "expected_behavior": "interrupt collector 或 git collector 应感知 in-progress rebase (issue 建议: git_operation_in_progress 字段 != none)",
+        "actual_behavior": "interrupt.status=none, git.detached_head=False, git 无 git_operation_in_progress key — 完全忽略 pending rebase；git status 明确显示 'You are currently rebasing branch master'",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "核验 issue 称的 'Layer L 存在但 opt-out 未拦住'",
-        "expected_behavior": "multi-terminal-coordination (Layer L) 存在但默认 opt-out, 项目未启用故未自动预防",
-        "actual_behavior": "确认: Spec 已 ship v1.22.0 (archive/2026-05-20-multi-terminal-coordination), 但 state_scanner.coordination.enabled 默认 false; Aria 自身亦未启用 → phase1_gate/claim/collision 检测不触发",
-        "match": true
-      },
-      {
-        "case_id": "case-3",
-        "input": "附带观测: 并发 git 操作产生瞬时 .git/index.lock",
-        "expected_behavior": "两 session 共享 .git 反复产生 index.lock",
-        "actual_behavior": "确认: 本 session 3-repo ship 期 4× 命中 stale index.lock (main + aria/standards submodule), 已立 memory feedback_stale_git_index_lock_recovery",
+        "input": "grep -rn 'rebase-merge|rebase-apply|MERGE_HEAD|CHERRY_PICK|git_operation_in_progress' aria/skills/state-scanner/scripts/ (当前 v1.38.0 工作树)",
+        "expected_behavior": "若 bug 已修, 应存在 .git/* 标记检测逻辑",
+        "actual_behavior": "零命中 — 代码层无任何 git 操作检测；interrupt.py 仅读 .aria/workflow-state.json, git.py 仅设 detached_head 不区分 rebase 暂停",
         "match": true
       }
     ],
-    "hit_count": 3,
-    "total_count": 3,
-    "hit_rate": "3/3"
+    "hit_count": 2,
+    "total_count": 2,
+    "hit_rate": "2/2"
   },
   "verdict": "confirmed",
   "severity": "major",
