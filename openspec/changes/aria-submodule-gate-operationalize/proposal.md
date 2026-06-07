@@ -1,6 +1,6 @@
 # aria-submodule-gate-operationalize — 修复 gate 生态零运营证据 (R-fix-1 + R-fix-2)
 
-> **Status**: ✅ **Approved** (Phase A.2 CONVERGED 2026-06-07 — post_spec R1 (qa REVISE / tl+cr PASS) → Rev1 (AC 路径无关 + OQ 补语义窗口/token-scope/log-降级) → R2 全票 PASS 3/3, 全部 R1 findings 撤回, 0 Critical/0 Major; Level 2 baseline。ready Phase B — 但 Phase B step 0 (tripwire 失败确认) 可能受 log/runner 可达性限制, 见 OQ2)
+> **Status**: 🔵 **TG-1 SHIPPED (2026-06-07, aria-plugin v1.40.0); TG-2 PENDING (infra)**。Phase A.2 CONVERGED 2026-06-07 (post_spec R1 qa REVISE → Rev1 → R2 全票 PASS 3/3)。**TG-1 (R-fix-1)** = gate `submodule-gate-executions.jsonl` per-invocation 计数 (含 PASS) + PostToolUse `submodule-gate-telemetry.sh` hook (OQ1=(a′), gitlink-commit 触发, warn-only) + 7 测; code-review PASS (Minor #1 锚定修复 + #2 timeout wrapper 已收)。**TG-2 (R-fix-2)** tripwire runner forgejo 凭据 = infra-gated, 待办。Spec 保留 changes/ 直到 TG-2 done。
 > **Level**: 2 (Minimal — proposal + tasks)
 > **Target**: aria-plugin **v1.40.0** (submodule_gate 调用面) + Aria 主仓 (tripwire workflow) v1.7.1
 > **Trigger**: block-flip D+14 defer 决策 (`.aria/decisions/2026-06-07-v1.40.0-block-flip.md` §FINAL) — Trigger C (0 gate executions) + tripwire 验活 5/5 失败 → 两层防御均无 live 运营证据, 翻转前置不满足。

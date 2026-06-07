@@ -6,11 +6,11 @@
 
 ## TG-1 (R-fix-1) — gate 在 git-直驱 ship 也执行 + 记 telemetry
 
-- [ ] **1.0** OQ1 裁定调用面 (pre-push hook (a) / standalone CLI (b) / convention (c)); 倾向 (a)
-- [ ] **1.1** 实现选定调用面: submodule pointer 变更时跑 `submodule_gate.sh` (warn 模式) + 写 `aria/metrics/submodule-gate-{warns,blocks,...}.jsonl`,覆盖 git-直驱 ship
-- [ ] **1.2** 不改道 git-直驱经 phase-c-integrator skill (约束); telemetry 路径与 parent 一致
-- [ ] **1.3** 单测: fixture 含 submodule pointer 变更的 push/ship → 断言 telemetry jsonl 新增正确行 (Rule #6 substitute)
-- [ ] **1.4** 单测: 无 submodule 变更 → 不写 telemetry (避免噪音)。**增量 (R1 qa)**: 相对既有 T-replay-6 (no-change 路径仅断言 exit 0 + "unchanged" 串), 本测新增 **jsonl 行数=0 断言** (扩展 T-replay-6 而非全新重复 fixture)
+- [x] **1.0** OQ1 裁定调用面 (pre-push hook (a) / standalone CLI (b) / convention (c)); 倾向 (a)
+- [x] **1.1** 实现选定调用面: submodule pointer 变更时跑 `submodule_gate.sh` (warn 模式) + 写 `aria/metrics/submodule-gate-{warns,blocks,...}.jsonl`,覆盖 git-直驱 ship
+- [x] **1.2** 不改道 git-直驱经 phase-c-integrator skill (约束); telemetry 路径与 parent 一致
+- [x] **1.3** 单测: fixture 含 submodule pointer 变更的 push/ship → 断言 telemetry jsonl 新增正确行 (Rule #6 substitute)
+- [x] **1.4** 单测: 无 submodule 变更 → 不写 telemetry (避免噪音)。**增量 (R1 qa)**: 相对既有 T-replay-6 (no-change 路径仅断言 exit 0 + "unchanged" 串), 本测新增 **jsonl 行数=0 断言** (扩展 T-replay-6 而非全新重复 fixture)
 
 ## TG-2 (R-fix-2) — tripwire runner 可成功运行
 
