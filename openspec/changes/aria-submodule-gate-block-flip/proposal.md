@@ -11,6 +11,8 @@
 > **Risk class**: Backward-compatible (ecosystem 14d 已有警告;override 机制 已存在;config flag `phase_c_integrator.submodule_gate.mode` 仍可显式 `"warn"` 回退;`mode="off"` 紧急 bypass 保留)
 >
 > ---
+> **🔴 D+14 OUTCOME (2026-06-07): DEFERRED — NOT flipped.** Trigger C (0 gate executions) + tripwire 验活 run #11 = FAILURE (历史 5/5 全失败, 兜底从未运行) → option b 的"独立兜底"前提不满足 → owner-approved 规则降级 (c) defer。根因待修: R-fix-1 telemetry invocation gap (git 直驱绕过脚本) + R-fix-2 tripwire run failure。新 hard date TBD (max D+42=2026-07-05)。详见 `.aria/decisions/2026-06-07-v1.40.0-block-flip.md` §FINAL DECISION。Spec 保留在 changes/ 不归档。
+>
 > **⚠️ Ship-day prep amendment (2026-06-05, D+12 — per [[feedback_dec_ship_target_staleness_verify]])**:
 > 1. **版本目标校正**: `aria-plugin v1.29.0` → **v1.40.0** (插件本 session 已 ship 到 v1.39.0;v1.29.0 slot 早跳过)。全文 `v1.29.0+` 表述 (= block 成默认的版本) → `v1.40.0+`。main repo v1.7.1 slot 仍空闲 ✓。
 > 2. **§A flip 行号已漂移**: A1 `submodule_gate.sh` 仍 L33 ✓;A2 SKILL.md inline bash L378→**L450**;A3 config/wording 全集见决策记录 (06-07 grep-batch 复核)。
