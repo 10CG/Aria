@@ -19,7 +19,7 @@ updated-at: 2026-06-08T00:00:00Z
 1. **本 doc**。
 2. ✅ **Spec `aria-submodule-gate-operationalize` 全 ship + 归档** → `openspec/archive/2026-06-08-aria-submodule-gate-operationalize/`(TG-1 v1.40.0 + TG-2 v1.41.0)。
 3. ✅ **TG-2 (R-fix-2)**: tripwire 从坏掉的 Forgejo Actions runner(5/5 失败)迁到 **host-cron** standalone 脚本 `aria/skills/phase-c-integrator/scripts/submodule-tripwire-audit.sh`;坏 workflow 标 DEPRECATED。dogfood 真仓库跑通首条成功 tripwire telemetry。
-4. 🔵 **block-flip 仍 DEFERRED 但机制层 unblock**(`.aria/decisions/2026-06-07-v1.40.0-block-flip.md` §UNBLOCK UPDATE)。重启剩 **owner 动作**:(a) 装 tripwire host-cron(脚本 §Install 有 cron 行)+ (b) 让若干真实 submodule ship 累积 **≥3 gate executions**(TG-1 hook 自动记)+ (c) 确认 tripwire 绿 → 重启 block-flip(新 hard date)。
+4. 🔵 **block-flip 仍 DEFERRED 但机制层 unblock**(`.aria/decisions/2026-06-07-v1.40.0-block-flip.md` §UNBLOCK UPDATE + §RESTART PROGRESS)。restart 前置进度:**(a) host-cron 已装 ✅**(2026-06-08, dev host crontab 周日 04:00 UTC, 逐字验证 exit 0 写 heartbeat)+ **(c) tripwire 绿 ✅**(验证运行 clean)→ **唯一剩 (b)**: 让若干真实 submodule ship 自然累积 **≥3 gate executions**(TG-1 PostToolUse hook 自动记 `submodule-gate-executions.jsonl`)→ 攒够即可重启 block-flip(定新 hard date)。
 5. **owner-gated 残留**(不变):M6 Spec #2 168h / #136 Feishu / i18n #140。
 
 → **next session 入口**: `/aria:state-scanner`。
@@ -46,7 +46,7 @@ updated-at: 2026-06-08T00:00:00Z
 
 | 优先级 | 项 | 说明 |
 |--------|-----|------|
-| **owner** | block-flip 重启 | 机制层已 unblock;剩 (a) 装 tripwire host-cron + (b) 攒 ≥3 真实 gate executions + (c) tripwire 绿 → 重启(新 hard date)。注:executions/tripwire 记录是 best-effort(gate fetch forgejo submodule 慢/超 timeout 则不记)。 |
+| **owner** | block-flip 重启 | 机制层已 unblock;**(a) host-cron 已装 ✅ + (c) tripwire 绿 ✅ (2026-06-08)** → **唯一剩 (b)**: 攒 ≥3 真实 gate executions(后续正常 ship 自然攒)→ 重启(新 hard date)。注:executions/tripwire 记录是 best-effort(gate fetch forgejo submodule 慢/超 timeout 则不记)。 |
 | **owner** | M6 Spec #2 168h / #136 Feishu / i18n #140 | 不变 |
 | (可选) | tripwire host-cron 也可换 SSH deploy key 让 Actions runner 复活 | 若日后给 runner 配 forgejo 凭据,坏 workflow 可复用(banner 已注);当前 host-cron 已够 |
 
@@ -84,7 +84,7 @@ updated-at: 2026-06-08T00:00:00Z
 
 **入口**: `/aria:state-scanner`。
 
-1. **[owner]** block-flip 重启(装 host-cron + 攒 ≥3 executions + tripwire 绿)。
+1. **[owner]** block-flip 重启(host-cron 已装 ✅ + tripwire 绿 ✅;**唯一剩**攒 ≥3 真实 gate executions → 定新 hard date 重启)。
 2. **[owner]** M6 Spec #2 168h / #136 Feishu / i18n #140。
 3. **[AI 可做]** 其余 open issue(aria-plugin #69 secret-guard exfil / #17 audit drift-guard; Aria #134/#137/#139)。
 

@@ -1,7 +1,7 @@
 # aria-submodule-gate-block-flip — v1.29.0 warn→block 翻转
 
 > **Level**: 2 (Minimal — proposal.md only; mechanism 全部继承自 parent Spec #124)
-> **Status**: ✅ **Approved** (Phase A.2 CONVERGED 2026-05-25 via R1 (REVISE/PWW/PWW) → Rev1 → R2 PWW unanimous 3/3 + 2 Critical CLOSED + 0 new Critical;Level 2 baseline per [[feedback_post_spec_audit_two_round_pragmatic_for_l2]]). Phase B+C+D 待 2026-06-07 (D+14) 执行。
+> **Status**: ⏸️ **DEFERRED (2026-06-07 D+14, NOT flipped)** — Trigger C (0 gate executions) + tripwire 验活 5/5 失败 → 两层防御无 live 证据 → owner-approved 规则降级 defer (见下 §D+14 OUTCOME)。机制层经 `aria-submodule-gate-operationalize` (R-fix-1 v1.40.0 + R-fix-2 v1.41.0, 已归档) **已 unblock**; 重启剩 owner 动作 (b) 攒 ≥3 真实 gate executions (host-cron 已装, tripwire 已绿)。新 hard date TBD (max D+42=2026-07-05)。*(原 Phase A.2 CONVERGED Approved 2026-05-25 via R1→Rev1→R2 PWW unanimous 3/3; ship deadline 2026-06-07 已过, 转 defer)*。
 > **Change ID**: `aria-submodule-gate-block-flip`
 > **Parent Spec**: `openspec/archive/2026-05-24-aria-submodule-pointer-regression-gate/` (Approved 2026-05-24, R1+R2 4-agent CONVERGED 3/3 unanimous)
 > **Parent Forgejo issue**: [Aria #124](https://forgejo.10cg.pub/10CG/Aria/issues/124) (state=closed, closed_at 2026-05-24T17:19:41Z — verified via API)
