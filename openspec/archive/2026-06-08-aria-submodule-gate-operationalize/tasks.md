@@ -14,16 +14,16 @@
 
 ## TG-2 (R-fix-2) — tripwire runner 可成功运行
 
-- [ ] **2.0** Phase B step 0 (必办先行): 经可达手段确认 tripwire 实际失败 step + 错误 (验证/推翻 SSH-auth 假设); 记录证据。**降级 (R1 qa info)**: 若日志全不可达 (SSH 不通 + runner 日志不可达 + forgejo web 不可用) → 以 .gitmodules SSH URL + workflow 静态分析 + 5/5 一致失败 为据, 把 SSH-auth 列为 **tentative-confirmed** + 显式记风险 (非 Spec 阻塞); OQ2 据此保守选 (b)/(c) (不依赖 runner reach forgejo)
-- [ ] **2.1** OQ2 裁定修复路径 (token-rewrite (a) / 免-checkout 重写 (b) / host-cron 迁移 (c)); 依 2.0 结果 + CF-Access 可达性
-- [ ] **2.2** 实施修复
-- [ ] **2.3** dogfood: dispatch tripwire (dry_run) → 确认 run 成功完成 (clean 或正确 detect),非 failure
-- [ ] **2.4** dogfood: 非 dry-run dispatch → 确认写 `submodule-gate-misses.jsonl` last_run record (首个真实 tripwire telemetry)
+- [x] **2.0** Phase B step 0 (必办先行): 经可达手段确认 tripwire 实际失败 step + 错误 (验证/推翻 SSH-auth 假设); 记录证据。**降级 (R1 qa info)**: 若日志全不可达 (SSH 不通 + runner 日志不可达 + forgejo web 不可用) → 以 .gitmodules SSH URL + workflow 静态分析 + 5/5 一致失败 为据, 把 SSH-auth 列为 **tentative-confirmed** + 显式记风险 (非 Spec 阻塞); OQ2 据此保守选 (b)/(c) (不依赖 runner reach forgejo)
+- [x] **2.1** OQ2 裁定修复路径 (token-rewrite (a) / 免-checkout 重写 (b) / host-cron 迁移 (c)); 依 2.0 结果 + CF-Access 可达性
+- [x] **2.2** 实施修复
+- [x] **2.3** dogfood: dispatch tripwire (dry_run) → 确认 run 成功完成 (clean 或正确 detect),非 failure
+- [x] **2.4** dogfood: 非 dry-run dispatch → 确认写 `submodule-gate-misses.jsonl` last_run record (首个真实 tripwire telemetry)
 
 ## 收尾 (Phase C/D)
-- [ ] **D1** 5+1 SOT bump aria-plugin v1.39.0→v1.40.0 (若 TG-1 改 aria-plugin) + 主仓 v1.7.1 (tripwire) + gitlink
-- [ ] **D2** 全量测试零回归 + Phase C 双远程 parity
-- [ ] **D3** 归档 Spec + handoff (Rule #9); 更新 block-flip defer 决策记录 (gate 已可运营, 可重启)
+- [x] **D1** 5+1 SOT bump aria-plugin v1.39.0→v1.40.0 (若 TG-1 改 aria-plugin) + 主仓 v1.7.1 (tripwire) + gitlink
+- [x] **D2** 全量测试零回归 + Phase C 双远程 parity
+- [x] **D3** 归档 Spec + handoff (Rule #9); 更新 block-flip defer 决策记录 (gate 已可运营, 可重启)
 
 ## 验收 (AC)
 

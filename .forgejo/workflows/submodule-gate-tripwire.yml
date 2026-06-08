@@ -1,5 +1,17 @@
 # Submodule Pointer Regression Tripwire — weekly post-merge ancestry audit
 #
+# ⚠️ DEPRECATED for execution (R-fix-2, Spec aria-submodule-gate-operationalize TG-2, 2026-06-08):
+#   This Forgejo Actions workflow FAILED 5/5 dispatches (runs #7–#11). Root cause
+#   (tentative-confirmed; runner logs unreachable via API + CF Access): the runner
+#   cannot clone the `ssh://forgejo@...` submodules (no forgejo credentials; forgejo
+#   is behind Cloudflare Access). `actions/checkout@v4 submodules:true` fails fast (~6s).
+#   → Audit MIGRATED to a HOST cron running the standalone, locally-runnable script:
+#       aria/skills/phase-c-integrator/scripts/submodule-tripwire-audit.sh
+#     where forgejo IS reachable and submodules ARE checked out. See that script's
+#     §Install for the cron line. Same misses.jsonl telemetry contract.
+#   This file is kept for reference / in case the runner gains forgejo access later.
+#   The v1.29.0 `schedule:` cron was NOT added (block-flip deferred; host-cron supersedes).
+#
 # Spec: aria/openspec/changes/aria-submodule-pointer-regression-gate (v1.28.0+)
 # Convention: standards/conventions/submodule-pointer-hygiene.md
 # Forgejo: Aria #124
