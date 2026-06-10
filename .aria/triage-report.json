@@ -1,50 +1,31 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.38.0",
-  "issue_ref": "10CG/Aria#135",
-  "generated_at": "2026-06-04T22:30:50Z",
+  "triage_tool_version": "1.41.0",
+  "issue_ref": "10CG/Aria#134",
+  "generated_at": "2026-06-08T03:49:03Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 135,
-      "title": "[改进] state-scanner interrupt collector 检测不到 git rebase/merge-in-progress — 误报 interrupt:none",
-      "body": "## 现象\n\n2026-05-31 一次 `/state-scanner` session 中, scan.py 的 interrupt collector (`collectors/interrupt.py`) 报告 `interrupt.status = none`, 但仓库实际处于一个**暂停中的 git interactive rebase** (`.git/rebase-merge/` 存在, git status: \"You are currently editing a commit while rebasing branch 'master'\")。\n\n该 rebase 是前一个 #133 混乱 ship session (index.lock + shell 输出损坏全程) 遗留的废弃产物, orig-head `b8b9a7f` 甚至不在已 ship 的 master 历史里。若 AI 信 `interrupt:none` 直接按\"clean detached HEAD\"处理 (如贸然 `git checkout master`), 会 abort/破坏该 rebase 中间态或产生混乱。\n\n## 根因\n\ninterrupt collector 只解析 `.aria/workflow-state.json` (Aria 自己的 workflow 中断状态), **不检测 git 层的 in-progress 操作**:\n- `.git/rebase-merge/` 或 `.git/rebase-apply/` (rebase in progress)\n- `.git/MERGE_HEAD` (merge in progress)\n- `.git/CHERRY_PICK_HEAD` / `.git/REVERT_HEAD` / `.git/BISECT_LOG`\n\ngit.py collector 已采集 `detached_head: true`, 但没区分\"普通 detached HEAD\" vs \"因 rebase 暂停而 detached\"。两者对推荐安全性影响完全不同。\n\n## 影响\n\n- 阶段 2 推荐基于 `interrupt:none` 给出常规工作流推荐, 完全忽略 pending git 操作\n- 若推荐含 checkout/分支操作, 可能破坏 rebase/merge 中间态\n- 与 handoff 记录的 \"rebase auto-merge dropped content\" 类故障叠加时静默风险更高\n\n## 建议修复\n\n1. git.py collector 增采 `git_operation_in_progress` 字段, 检测上述 `.git/*` 标记文件, 枚举 `{none, rebase, merge, cherry_pick, revert, bisect}` + 是否有冲突 (`git diff --diff-filter=U`)\n2. interrupt collector 或阶段 2 入口断言消费该字段: 非 none 时展示 warning + 阻止/降级常规推荐, 引导用户先 `--continue` / `--abort`\n3. snapshot schema additive 加该字段 (snapshot_schema_version 兼容 bump per §Versioning)\n\n## 证据 (本 session)\n\n- scan.py exit 10, snapshot `interrupt.status=none` + `git.detached_head=true`\n- 实际 `.git/rebase-merge/head-name=refs/heads/master`, `onto=a9665fb`, orig-head=`b8b9a7f` (NOT ancestor of origin/master)\n- 该 rebase 被识别为 stale 后 abort, **连带审出 #133 v1.37.0 paper version bump** (release commit 声称 5-SOT atomic bump 实际 4/5 SOT 漏改, 市场看不到 1.37.0) — 修复见主仓 commit `8d17640` (补回被 drop 的 audit report) + aria `c5bd6b3` (补全 SOT)。\n\n> 由 state-scanner dogfood 发现 (本 session)。\n",
+      "number": 134,
+      "title": "[改进] 禁止归档'仅 Phase A 收敛、实施未做'的 spec — 致 state-scanner 误判进度为完成",
+      "body": "## Feature Request / Bug\n\n**描述**: aria 应**禁止（或硬告警 + 要求确认）归档\"只完成 Phase A 设计、Phase B/C/D 实施未做\"的 spec**。当前 `phase-d-closer` / `openspec-archive` 允许 Phase-A-converged 即归档, 会让 state-scanner 误判真实进度为\"已完成\"。\n\n## 问题机理\n归档动作 = 移 spec 到 `openspec/archive/` + story status 标终态 `archived`。之后 state-scanner scan.py:\n- requirements story `status=archived` (terminal) → **不进 `priority_items`** (session 开头待办不浮现)\n- openspec 进 `archive[]` 不进 `changes[]` (不算活跃变更)\n\n结果: **设计完 ≠ 功能完, 但工具显示 \"done\"**, 待实施的大工作被隐藏 (只靠 UPM followup 脆弱兜底)。\n\n## 复现 (真实案例 US-123)\n1. `US-123 multi-region-saas-architecture` Phase A 经 R1→R5 audit 收敛 (Rev5 PASS_WITH_WARNINGS), 但 Phase B/C/D 实施 deferred (真 region 节点 provision SG/US/EU ~$900-1100/mo×3 + CF Workers 路由 + egress, 等商业拍板, 一行未做)\n2. 归档 spec → `openspec/archive/2026-05-30-...` + story status `Archived`\n3. scan.py → story `status=archived`, **不在 priority_items**, openspec 在 `archive[]` → US-123 被当\"已完成\"\n4. 撤回归档 (move 回 `changes/` + status 改 `In Progress`) 后再扫 → `status=in_progress` + **priority_items=1** → 才正确 surface 为待办\n\n## 预期 vs 实际\n- **预期**: 归档语义 = \"功能完成\"(实施 merged + verified)。实施未完成的 spec 不应被归档。\n- **实际**: 归档不校验实施完成度, Phase-A-only spec 可归档 → 误判完成。\n\n## 诱因\n仓库有\"Phase-A-converged 即归档\"惯例 (如 US-118 billing-relay-decoupling 在 \"Phase A Rev5, Phase B ready\" 归档)。但 US-118 实施很快跟上 (Phase B 已上 prod), US-123 实施 deferred 无限期 → 同惯例对 US-123 有害。**惯例只在\"实施紧跟\"时安全。**\n\n## 请求 (二选一或都做)\n1. `phase-d-closer` / `openspec-archive` 归档前**硬校验实施完成度**: tasks.md 全勾 OR 实施 PR merged OR Phase B-D done; 未达成则**禁止归档** (或硬告警 + 要求用户显式确认)\n2. state-scanner 区分 \"spec-converged-but-unimplemented\" 与 \"feature-done\": 归档时若实施未完成仍 surface 为 pending, 不被终态 status 完全吞掉\n\n## 环境\n- Aria Plugin: 1.28.0\n- 项目: SilkNode (10CG/SilkNode), linux, 有 .aria/config.json\n\n## 附加\nstate-scanner `_normalize_status` 把 `archived` 当 terminal 是对的; 问题在**归档动作本身不该发生在实施未完成时**。归档与\"设计定稿\"是两件事 — 设计定稿是 in_progress 的一个 milestone, 不是归档理由。\n\n---\n*由 aria-report 生成 (SilkNode owner 报告)*",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/135",
-      "created_at": "2026-05-31T05:31:42Z",
-      "updated_at": "2026-05-31T05:31:42Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/134",
+      "created_at": "2026-05-30T11:12:41Z",
+      "updated_at": "2026-05-30T11:12:41Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.37.0",
-      "current": "1.38.0",
+      "reported": "1.28.0",
+      "current": "1.41.0",
       "gap": "behind"
     },
     "step3_code": {
-      "collection_status": "ok",
-      "cited_paths": [
-        {
-          "file_path": "collectors/interrupt.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": ".aria/workflow-state.json",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        }
-      ],
-      "matches_description": false
+      "collection_status": "skipped",
+      "cited_paths": [],
+      "matches_description": null
     },
     "step4_history": {
       "collection_status": "skipped",
@@ -59,7 +40,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "18f39b2caaf1de67fd3385298e34d0ed12b12496"
+          "head": "490adef468ba879af21576408c9dea69754d1b4b"
         }
       ]
     }
@@ -69,26 +50,40 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "临时 git repo (init + 1 empty commit) 中创建 .git/rebase-merge/ (head-name=refs/heads/master, onto=a9665fb) 模拟暂停中的 rebase；运行 collectors.interrupt.collect_interrupt_state + collectors.git.collect_git_state",
-        "expected_behavior": "interrupt collector 或 git collector 应感知 in-progress rebase (issue 建议: git_operation_in_progress 字段 != none)",
-        "actual_behavior": "interrupt.status=none, git.detached_head=False, git 无 git_operation_in_progress key — 完全忽略 pending rebase；git status 明确显示 'You are currently rebasing branch master'",
-        "match": true
+        "input": "审查 v1.41.0 源码 openspec-archive/SKILL.md Step 1 + phase-d-closer/SKILL.md D.2 skip_evaluation",
+        "expected_behavior": "issue 称归档完全不校验实施完成度，Phase-A-only spec 可自由归档",
+        "actual_behavior": "存在 tasks.md 完成度 gate：openspec-archive Step 1 验证所有任务 [x] 否则中止；phase-d-closer D.2 skip_if=has uncompleted tasks。issue 描述不精确",
+        "match": false
       },
       {
         "case_id": "case-2",
-        "input": "grep -rn 'rebase-merge|rebase-apply|MERGE_HEAD|CHERRY_PICK|git_operation_in_progress' aria/skills/state-scanner/scripts/ (当前 v1.38.0 工作树)",
-        "expected_behavior": "若 bug 已修, 应存在 .git/* 标记检测逻辑",
-        "actual_behavior": "零命中 — 代码层无任何 git 操作检测；interrupt.py 仅读 .aria/workflow-state.json, git.py 仅设 detached_head 不区分 rebase 暂停",
+        "input": "Level 2 spec (proposal.md only，无 tasks.md) 归档路径 + skip_verification/--force 绕过选项",
+        "expected_behavior": "应有 gate 阻止实施未完成的 spec 归档",
+        "actual_behavior": "gate 完全键于 tasks.md：Level 2 spec 无 tasks.md 即无任何校验 → 可归档；且 skip_verification:true / --force 显式绕过。核心缺陷成立",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "request #2: state-scanner 区分 spec-converged-but-unimplemented vs feature-done (scan.py snapshot 实测)",
+        "expected_behavior": "归档后实施未完成仍 surface 为 pending，不被终态 status 吞掉",
+        "actual_behavior": "scan.py 无此区分；archived 为 terminal status → 不进 priority_items，openspec 进 archive[] 不进 changes[]。request #2 完全未实现",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "tasks.md 全勾 ≠ 实施完成 语义间隙 (checkbox 可全为 Phase A 设计任务 / 可被提前勾选)",
+        "expected_behavior": "归档语义 = 功能完成 (实施 PR merged + verified)",
+        "actual_behavior": "gate 仅验证 checkbox 状态，不验证 实施 PR merged / Phase B-D done。issue 请求的'OR 实施 PR merged OR Phase B-D done'三选一校验未实现",
         "match": true
       }
     ],
-    "hit_count": 2,
-    "total_count": 2,
-    "hit_rate": "2/2"
+    "hit_count": 3,
+    "total_count": 4,
+    "hit_rate": "3/4"
   },
-  "verdict": "confirmed",
+  "verdict": "partial-repro",
   "severity": "major",
   "recommended_action": "next-cycle",
-  "deviation_note": null,
+  "deviation_note": "issue 称'归档不校验实施完成度'，但 v1.41.0 已有 tasks.md 全勾 gate (openspec-archive Step 1 + phase-d-closer D.2 skip_if)。核心缺陷仍成立但描述不精确：gate 有 4 漏洞 — (a) 仅对有 tasks.md 的 Level 3 spec 生效，Level 2 spec 无 gate；(b) 校验 checkbox ≠ 实施 PR merged/verified；(c) skip_verification/--force 可绕过；(d) request #2 (state-scanner 区分 converged-but-unimplemented) 完全未实现。",
   "errors": []
 }
