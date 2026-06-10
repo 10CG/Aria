@@ -1,25 +1,25 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.41.0",
-  "issue_ref": "10CG/Aria#134",
-  "generated_at": "2026-06-08T03:49:03Z",
+  "triage_tool_version": "1.42.0",
+  "issue_ref": "10CG/Aria#137",
+  "generated_at": "2026-06-10T15:13:43Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 134,
-      "title": "[改进] 禁止归档'仅 Phase A 收敛、实施未做'的 spec — 致 state-scanner 误判进度为完成",
-      "body": "## Feature Request / Bug\n\n**描述**: aria 应**禁止（或硬告警 + 要求确认）归档\"只完成 Phase A 设计、Phase B/C/D 实施未做\"的 spec**。当前 `phase-d-closer` / `openspec-archive` 允许 Phase-A-converged 即归档, 会让 state-scanner 误判真实进度为\"已完成\"。\n\n## 问题机理\n归档动作 = 移 spec 到 `openspec/archive/` + story status 标终态 `archived`。之后 state-scanner scan.py:\n- requirements story `status=archived` (terminal) → **不进 `priority_items`** (session 开头待办不浮现)\n- openspec 进 `archive[]` 不进 `changes[]` (不算活跃变更)\n\n结果: **设计完 ≠ 功能完, 但工具显示 \"done\"**, 待实施的大工作被隐藏 (只靠 UPM followup 脆弱兜底)。\n\n## 复现 (真实案例 US-123)\n1. `US-123 multi-region-saas-architecture` Phase A 经 R1→R5 audit 收敛 (Rev5 PASS_WITH_WARNINGS), 但 Phase B/C/D 实施 deferred (真 region 节点 provision SG/US/EU ~$900-1100/mo×3 + CF Workers 路由 + egress, 等商业拍板, 一行未做)\n2. 归档 spec → `openspec/archive/2026-05-30-...` + story status `Archived`\n3. scan.py → story `status=archived`, **不在 priority_items**, openspec 在 `archive[]` → US-123 被当\"已完成\"\n4. 撤回归档 (move 回 `changes/` + status 改 `In Progress`) 后再扫 → `status=in_progress` + **priority_items=1** → 才正确 surface 为待办\n\n## 预期 vs 实际\n- **预期**: 归档语义 = \"功能完成\"(实施 merged + verified)。实施未完成的 spec 不应被归档。\n- **实际**: 归档不校验实施完成度, Phase-A-only spec 可归档 → 误判完成。\n\n## 诱因\n仓库有\"Phase-A-converged 即归档\"惯例 (如 US-118 billing-relay-decoupling 在 \"Phase A Rev5, Phase B ready\" 归档)。但 US-118 实施很快跟上 (Phase B 已上 prod), US-123 实施 deferred 无限期 → 同惯例对 US-123 有害。**惯例只在\"实施紧跟\"时安全。**\n\n## 请求 (二选一或都做)\n1. `phase-d-closer` / `openspec-archive` 归档前**硬校验实施完成度**: tasks.md 全勾 OR 实施 PR merged OR Phase B-D done; 未达成则**禁止归档** (或硬告警 + 要求用户显式确认)\n2. state-scanner 区分 \"spec-converged-but-unimplemented\" 与 \"feature-done\": 归档时若实施未完成仍 surface 为 pending, 不被终态 status 完全吞掉\n\n## 环境\n- Aria Plugin: 1.28.0\n- 项目: SilkNode (10CG/SilkNode), linux, 有 .aria/config.json\n\n## 附加\nstate-scanner `_normalize_status` 把 `archived` 当 terminal 是对的; 问题在**归档动作本身不该发生在实施未完成时**。归档与\"设计定稿\"是两件事 — 设计定稿是 in_progress 的一个 milestone, 不是归档理由。\n\n---\n*由 aria-report 生成 (SilkNode owner 报告)*",
+      "number": 137,
+      "title": "phase-d-closer D.3 写 handoff 时自动注入 multi-terminal-coordination frontmatter",
+      "body": "## Feature Request\n\n**描述**: phase-d-closer D.3 写 session handoff 时,建议自动注入 multi-terminal-coordination 的 YAML frontmatter(track-id / owner-container / phase / status / updated-at),而不是依赖人手写。\n\n**使用场景**: handoff_multibranch.py 已能解析 frontmatter 并重建多 track 看板(tracks_multibranch),但 phase-d-closer 写 handoff 时不自动加这段 frontmatter,全靠作者手写 → 极易漏。\n\n2026-05-31 在 SilkNode 实地踩到:两条并发 session 同日各自收尾,两份 handoff 都没写 frontmatter → 都被 handoff_multibranch.py 归为 legacy / owner-container=unknown,多 track 看板无法区分两份 handoff 分别来自哪台主机/哪条线,失去了多终端协调本应提供的识别能力。手动补齐 frontmatter 后,parse_handoff_frontmatter 即识别为非 legacy、owner-container 正确显示(实测 owner-container=dev-claude2),证明机制本身可用,缺的是 D.3 的自动注入。\n\n**建议方案**:\n1. phase-d-closer D.3 生成 handoff 时,自动在顶部写入 frontmatter 五字段\n2. owner-container 默认取主机名(hostname),或读 .aria/config.json 可配置别名\n3. track-id 从分支名/feature 推断;phase/status/updated-at 由 D.3 上下文填充\n4. 兼容已有 legacy handoff(无 frontmatter 仍走现有 fallback)\n\n## 环境信息\n- Aria Plugin: 1.36.0\n- Skills: 41\n- OS: Linux x86_64\n\n---\n*由 aria-report 自动生成 (SilkNode, 2026-05-31)*\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/134",
-      "created_at": "2026-05-30T11:12:41Z",
-      "updated_at": "2026-05-30T11:12:41Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/137",
+      "created_at": "2026-05-31T23:26:35Z",
+      "updated_at": "2026-06-04T08:28:17Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.28.0",
-      "current": "1.41.0",
+      "reported": "1.36.0",
+      "current": "1.42.0",
       "gap": "behind"
     },
     "step3_code": {
@@ -40,7 +40,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "490adef468ba879af21576408c9dea69754d1b4b"
+          "head": "0409a88aeef7c4ec4ae7a4baeff9535a57dc9476"
         }
       ]
     }
@@ -50,40 +50,33 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "审查 v1.41.0 源码 openspec-archive/SKILL.md Step 1 + phase-d-closer/SKILL.md D.2 skip_evaluation",
-        "expected_behavior": "issue 称归档完全不校验实施完成度，Phase-A-only spec 可自由归档",
-        "actual_behavior": "存在 tasks.md 完成度 gate：openspec-archive Step 1 验证所有任务 [x] 否则中止；phase-d-closer D.2 skip_if=has uncompleted tasks。issue 描述不精确",
+        "input": "审查 v1.42.0 aria/templates/session-handoff.md + execution-steps.md D.3",
+        "expected_behavior": "issue 称 D.3 不自动注入 frontmatter, 全靠作者手写",
+        "actual_behavior": "模板 v1.22.x+ 已含 5 字段 frontmatter + 完整派生规则 (track_id 规范化函数 / owner_container=git email local-part + ~/.aria/container-id 回退 hostname / phase enum); D.3 action 含 'fill template'。instruction 层注入已存在, 比 issue 建议方案 (hostname) 更丰富",
         "match": false
       },
       {
         "case_id": "case-2",
-        "input": "Level 2 spec (proposal.md only，无 tasks.md) 归档路径 + skip_verification/--force 绕过选项",
-        "expected_behavior": "应有 gate 阻止实施未完成的 spec 归档",
-        "actual_behavior": "gate 完全键于 tasks.md：Level 2 spec 无 tasks.md 即无任何校验 → 可归档；且 skip_verification:true / --force 显式绕过。核心缺陷成立",
+        "input": "grep phase-d-closer mechanics + hooks/handoff-location-guard.sh 找 frontmatter 校验 gate",
+        "expected_behavior": "D.3 写出的 handoff 应保证含 frontmatter",
+        "actual_behavior": "零机械校验: L1 hook 注释明示 'does NOT inspect file content or frontmatter'; handoff-mechanics.md grep frontmatter == 0; D.3 无写后验证子步 → AI 跳过模板/手写 handoff 时静默缺失",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "request #2: state-scanner 区分 spec-converged-but-unimplemented vs feature-done (scan.py snapshot 实测)",
-        "expected_behavior": "归档后实施未完成仍 surface 为 pending，不被终态 status 吞掉",
-        "actual_behavior": "scan.py 无此区分；archived 为 terminal status → 不进 priority_items，openspec 进 archive[] 不进 changes[]。request #2 完全未实现",
-        "match": true
-      },
-      {
-        "case_id": "case-4",
-        "input": "tasks.md 全勾 ≠ 实施完成 语义间隙 (checkbox 可全为 Phase A 设计任务 / 可被提前勾选)",
-        "expected_behavior": "归档语义 = 功能完成 (实施 PR merged + verified)",
-        "actual_behavior": "gate 仅验证 checkbox 状态，不验证 实施 PR merged / Phase B-D done。issue 请求的'OR 实施 PR merged OR Phase B-D done'三选一校验未实现",
+        "input": "审查 handoff.py + handoff_multibranch.py 对缺 frontmatter 的 surface 行为",
+        "expected_behavior": "缺 frontmatter 至少应有可见告警, 防多 track 看板静默退化",
+        "actual_behavior": "legacy fallback 正常工作 (owner_container='unknown', track_id='legacy:<branch>:<filename>') 但无 soft_error/警告 — 退化不可见, 与 SilkNode 2026-05-31 实地事故一致 (两份并发 handoff 全落 legacy, 看板无法区分)",
         "match": true
       }
     ],
-    "hit_count": 3,
-    "total_count": 4,
-    "hit_rate": "3/4"
+    "hit_count": 2,
+    "total_count": 3,
+    "hit_rate": "2/3"
   },
   "verdict": "partial-repro",
-  "severity": "major",
+  "severity": "minor",
   "recommended_action": "next-cycle",
-  "deviation_note": "issue 称'归档不校验实施完成度'，但 v1.41.0 已有 tasks.md 全勾 gate (openspec-archive Step 1 + phase-d-closer D.2 skip_if)。核心缺陷仍成立但描述不精确：gate 有 4 漏洞 — (a) 仅对有 tasks.md 的 Level 3 spec 生效，Level 2 spec 无 gate；(b) 校验 checkbox ≠ 实施 PR merged/verified；(c) skip_verification/--force 可绕过；(d) request #2 (state-scanner 区分 converged-but-unimplemented) 完全未实现。",
+  "deviation_note": "issue 称'D.3 不自动注入 frontmatter'不准确 — 模板 v1.22.x+ 已含 5 字段 + 派生规则 (早于报告版本 1.36.0), 注入机制在 instruction 层已存在且方案比 issue 建议更丰富。真实残留缺口 = 零机械 enforcement: (a) D.3 无写后 frontmatter 校验子步; (b) L1 hook 只管路径不管内容; (c) collector 对缺 frontmatter 的 handoff 静默 legacy fallback 无任何告警 → 不经模板的 ad-hoc handoff (SilkNode 事故路径) 静默丢失多终端识别能力。修复方向 = enforcement 而非注入: D.3 写后校验 + collector soft warning。",
   "errors": []
 }
