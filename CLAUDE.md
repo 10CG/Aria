@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.41.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.42.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -541,7 +541,12 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   MAX_BRANCHES_SCANNED 三层可配置 resolver [env>config>default 20, int 域 fail-soft,
                   上界 500 warn-only per OQ3] + TG-A SKILL.md 输出格式补 10 区块字段骨架防 v1.32.0
                   字段层漂移 + sync-check 测试; 45 新测 deterministic/structural Rule #6 substitute);
-                  v1.29.0 reserved for block-flip ship 2026-06-07 D+14)
+                  v1.29.0 reserved for block-flip ship 2026-06-07 D+14;
+                  v1.42.0 = archive-completeness-gate #134 [禁止归档仅-Phase-A-收敛 spec: lib/spec_complete.py
+                  单一可执行 complete SOT (archive-ready={done} only) + openspec-archive Step1 gate
+                  (--archive-design-only 逃生舱 + frontmatter archive_type 标记) + phase-d-closer D.2 三路堵
+                  Level 2 旁路 + state-scanner design_deferred[] surface (fresh-approved 合法在飞,
+                  complement-invariant 4 桶) + standards 废弃 Phase-A-converged 即归档惯例; DEC-20260609-001])
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator master `fb5914c`, M6 execution phase;
           Spec #2 e2e-resilience TG-A+TG-B+TG-C 模板代码侧 100% ship via PR #23+#24)
@@ -564,7 +569,8 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-06-08 (插件 v1.41.0 ship — aria-submodule-gate-operationalize TG-2 / R-fix-2: tripwire 5/5 Actions runner 失败 [runner 无 forgejo 凭据克隆 ssh:// submodule + CF Access; 日志 API 不可达 tentative-confirm] → OQ2=(c) host-cron 迁移。新 standalone scripts/submodule-tripwire-audit.sh [HEAD~1 vs HEAD per-submodule ancestry + cat-file-e 防误报; misses.jsonl heartbeat+miss; set -u 空数组守卫; host-cron 跑绕开 runner→forgejo 墙] + 坏 workflow 标 DEPRECATED。dogfood 真仓库跑通首条成功 tripwire telemetry。10 新测 + 13 gate replay 零回归; code-review PASS [I-2/M-2/M-3/M-4 收 + I-1 确认]。**TG-1+TG-2 全完成 → Spec 归档 `openspec/archive/2026-06-08-aria-submodule-gate-operationalize`; block-flip 机制层 unblock** [gate 记 executions + tripwire 可跑], 待攒 ≥3 真实 executions + tripwire 绿即可重启 (owner)。aria-plugin PR #77 merge `b9b5d12` 双远程 parity)
+**更新**: 2026-06-10 (插件 v1.42.0 ship — archive-completeness-gate #134: triage partial-repro → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 + post_spec 25-agent/4 轮 + verification 2 轮 [r1 抓 fresh-approved 第 4 桶黑洞] → DEC-20260609-001 两契约 [A 单一可执行 complete SOT spec_complete.py / B 单一标记载体 frontmatter archive_type] → agent-team 实施 [TG-A lib+collector / TG-B SKILL gates / TG-C standards 5 处] → code-review PASS [I-1 CRLF + I-2 渲染骨架 收]。731 tests [34 新] + 真树 dogfood [block-flip 落 design_deferred / fresh-approved 不卷入 / 100 archive 零误报]。meta-dogfood: 新 gate 上线第一刀阻断自己 spec 归档, 两条理由全对。aria PR #78 merge `18c6ba3` + standards `7ecf522` 双远程 parity; Spec 归档 `2026-06-10-aria-archive-completeness-gate`; #134 closed)
+> 前次 2026-06-08 (插件 v1.41.0 ship — aria-submodule-gate-operationalize TG-2 / R-fix-2: tripwire 5/5 Actions runner 失败 [runner 无 forgejo 凭据克隆 ssh:// submodule + CF Access; 日志 API 不可达 tentative-confirm] → OQ2=(c) host-cron 迁移。新 standalone scripts/submodule-tripwire-audit.sh [HEAD~1 vs HEAD per-submodule ancestry + cat-file-e 防误报; misses.jsonl heartbeat+miss; set -u 空数组守卫; host-cron 跑绕开 runner→forgejo 墙] + 坏 workflow 标 DEPRECATED。dogfood 真仓库跑通首条成功 tripwire telemetry。10 新测 + 13 gate replay 零回归; code-review PASS [I-2/M-2/M-3/M-4 收 + I-1 确认]。**TG-1+TG-2 全完成 → Spec 归档 `openspec/archive/2026-06-08-aria-submodule-gate-operationalize`; block-flip 机制层 unblock** [gate 记 executions + tripwire 可跑], 待攒 ≥3 真实 executions + tripwire 绿即可重启 (owner)。aria-plugin PR #77 merge `b9b5d12` 双远程 parity)
 > 前次 2026-06-07 (插件 v1.40.0 ship — aria-submodule-gate-operationalize TG-1 / R-fix-1: block-flip D+14 defer 的 unblock 前置。block-flip 经多 agent 动态工作流 + owner 门控 [先 dispatch tripwire 验活] 判定 = DEFER [Trigger C 0 gate executions + tripwire 5/5 验活失败, 两层防御无 live 证据]。R-fix-1 修 telemetry invocation gap: submodule_gate.sh 加 submodule-gate-executions.jsonl per-invocation 计数 [含 PASS, total_gate_executions 从推算变直接计数] + 新 PostToolUse Bash hook submodule-gate-telemetry.sh [OQ1=(a′), git commit 触 gitlink (awk 锚定 :160000 mode) 跑 gate warn+timeout15 记 execution, 零自锁 + 三层 no-op 守卫]; 不改道经 phase-c-integrator [过度工程警告]; 7 新测 + 全 hook 套件零回归; post_spec 2-round CONVERGED + code-review PASS [Minor #1 锚定/#2 timeout 已收]。TG-2 [R-fix-2 tripwire runner forgejo 凭据] infra-gated 待办, Spec 留 changes/。aria-plugin PR #76 merge `494b2f8` 双远程 parity)
 > 前前次 2026-06-05 (插件 v1.39.0 ship — state-scanner-git-operation-awareness #135: interrupt collector 检测不到 git rebase/merge-in-progress 误报 interrupt:none 修复; git.py _detect_git_operation collector 字段 + 阶段 2 priority 0.5 规则 [与 interrupt 正交]; 21 新测 712 全绿; aria-plugin PR #74 merge `49722ef` 双远程 parity)
 **维护**: 10CG Lab

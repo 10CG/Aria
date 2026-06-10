@@ -1,6 +1,6 @@
 # Proposal: archive-completeness-gate (#134)
 
-> **Status**: **Approved** (Phase A.1/A.2 CONVERGED; 引用 [DEC-20260609-001](../../../docs/decisions/DEC-20260609-001-archive-completeness-gate.md)。brainstorm 4 决策 + post_brainstorm 审计 [19 agents/3 轮] 32 修订 → DEC; post_spec 保真审计 [25 agents/4 轮] 3 blocking [carry_forward 归属/staleness/第三态] 24 修订落地; verification r1 抓出 fresh-approved 第 4 桶黑洞 → 修复 → **r2 PASS 2026-06-10** [3 lens unanimous, 11 态数学封闭 + 真树 4 spec 绿跑]。ready for Phase B.1)
+> **Status**: ✅ **Complete** — shipped aria-plugin v1.42.0 (PR [#78](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/78) merge `18c6ba3` 双远程 parity + standards `7ecf522`; 全链路: triage → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 → DEC → post_spec 25-agent/4 轮 → verification 2 轮 PASS → Phase B agent-team 实施 → code-review PASS [I-1/I-2/M-1/3/5/6 已收] → 731 tests + 真树 dogfood)
 > **Spec Level**: 3 (Full — proposal + tasks)
 > **关联 Issue**: Forgejo [#134](https://forgejo.10cg.pub/10CG/Aria/issues/134) (triage verdict = partial-repro)
 > **ship target**: aria-plugin v1.42.0 (当前 SOT plugin.json = v1.41.0)
