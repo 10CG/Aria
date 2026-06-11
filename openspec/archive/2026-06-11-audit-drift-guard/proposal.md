@@ -1,6 +1,6 @@
 # Proposal: audit-drift-guard (#17)
 
-> **Status**: **Approved** — Phase A.1/A.2 CONVERGED (post_spec R1/R2 FAIL→修订落地→**R3 PASS 2026-06-11** [unanimous PASS-family, 含 DEC §7 两处勘误 + spawn-300s 误标实证]; 9 Minor/Nit 残留全收; ready for Phase B。引用 [DEC-20260611-001](../../../docs/decisions/DEC-20260611-001-audit-drift-guard.md), brainstorm 4 决策 + post_brainstorm 19-agent/3 轮收敛审计 23 修订并入; R3 两条 blocking 按裁判闭合标准转化为契约 C-1/C-2 + 本 tasks.md 强制首批任务)
+> **Status**: ✅ **Complete** — shipped aria-plugin v1.44.0 (PR [#80](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/80) merge `5871e17` 双远程 parity; 全链路: triage → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 → DEC → post_spec R3 PASS → agent-team 实施 [TG-0 契约首 commit b67ccb5] → code-review PASS [I-1~I-3 收] → **dogfood: Drift Guard 机制首跑产出非空 drift_metrics, 抓 2I+4m 全收**)
 > **Spec Level**: 3 (Full — proposal + tasks)
 > **关联 Issue**: Forgejo [aria-plugin#17](https://forgejo.10cg.pub/10CG/aria-plugin/issues/17) (triage `confirmed`, [comment-12282](https://forgejo.10cg.pub/10CG/aria-plugin/issues/17#issuecomment-12282))
 > **ship target**: aria-plugin v1.44.0 (当前 SOT plugin.json = v1.43.0, 已验)
