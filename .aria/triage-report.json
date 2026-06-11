@@ -1,32 +1,32 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.43.0",
-  "issue_ref": "10CG/aria-plugin#17",
-  "generated_at": "2026-06-10T23:19:54Z",
+  "triage_tool_version": "1.44.0",
+  "issue_ref": "10CG/Aria#139",
+  "generated_at": "2026-06-11T07:27:41Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 17,
-      "title": "feat(audit-engine): 多轮挑战循环加固 — 新增\"原始目的锚定\"(Drift Guard) 防偏移检查",
-      "body": "## 问题描述\n\n`audit-engine` 的 challenge 模式采用「讨论组 → 挑战组 → 合并 → 挑战组再审」的多轮对抗式审计，收敛判定基于四元组 `(type, severity, category, scope)` 集合比较。\n\n当前收敛算法的一个结构性盲点：**只检测「结论集合是否稳定」，不检测「我们是否还在讨论最初那个问题」**。\n\n## 偏移（Drift）的发生路径\n\n以 `post_spec` 检查点为例：\n\n```\nRound 1:\n  原始目的(anchor) = proposal.md 中的 \"问题 A\"\n  讨论组产出 = 围绕 A 的决策集合 {d1, d2}\n  挑战组产出 = 指出 A 的方案可能引入副作用 B\n\nRound 2:\n  讨论组合并后 = 主要在处理 B 的风险\n  挑战组再审 = 围绕 B 的新实现方式提新风险 {c1, c2}\n\nRound 3:\n  讨论组 = 针对 c1, c2 继续修订\n  挑战组 = {c1, c2} 稳定\n  → 收敛判定: PASS（四元组集合两轮相同）\n  → 但\"问题 A 是否被正确解决\"从未被重新验证\n```\n\n结果：**一轮对抗式讨论从原始 anchor 慢慢漂走，集合稳定 ≠ 命中原始目的**。这在越长的 challenge 循环中越严重，且越容易被\"全员合并\"步骤放大。\n\n## 影响范围\n\n适用于所有启用 challenge 模式的检查点，其中高风险的是多轮数场景：\n\n- `post_spec` / `post_brainstorm`（方案层，本身就是开放式讨论，最易漂移）\n- `post_planning`（拆分任务时容易被\"新发现的约束\"带跑）\n- `pre_merge`（在合并前挑战组提出大量代码质量问题，可能让讨论从\"Spec 是否实现\"漂到\"代码风格/工程实践\"）\n\n影响最小：`post_closure`（已限 `max_rounds=1`）。\n\n## 建议加固方案\n\n在 `audit-engine` 中新增 **Anchor Check / Drift Guard** 机制，与收敛判定并列：\n\n### 1. 定义锚点 (Anchor) 数据结构\n\n每次启动审计时从 `context` 提取并冻结一份\"原始目的\"作为本次审计的 anchor：\n\n```json\n{\n  \"anchor\": {\n    \"checkpoint\": \"post_spec\",\n    \"primary_goal\": \"Spec proposal.md 中的 Why/Goal 段落\",\n    \"in_scope\": [\"Story 1\", \"AC-01\", \"AC-02\"],\n    \"out_of_scope_hints\": [\"性能优化\", \"UI 重构\"],\n    \"source_sha\": \"<freeze 时的 git SHA>\"\n  }\n}\n```\n\nAnchor 在 Round 1 开始前一次性固化，整个审计周期内不可变。\n\n### 2. 每轮末尾执行 Drift Check\n\n在 Round N 的\"收敛判定\"之前插入一个独立步骤：\n\n```\nfor decision in round_N.conclusions:\n    relevance_score = judge_against_anchor(decision, anchor)\n    # relevance ∈ {on-topic, adjacent, off-topic}\n\ndrift_ratio = count(off-topic) / count(all)\n```\n\n判定规则（建议可配）：\n\n| drift_ratio | 处理 |\n|---|---|\n| `< 20%` | 正常，进入收敛判定 |\n| `20% – 50%` | **Warning** — 在报告里标注，进入收敛判定但不允许\"全票 PASS\" |\n| `> 50%` | **Abort & Refocus** — 强制插入一轮\"回到 anchor\"讨论，Round 计数不前进；若连续 2 次偏移则中止审计并上报 |\n\n### 3. 报告中暴露 drift 指标\n\n`report-format.md` 新增字段：\n\n```json\n{\n  \"drift_metrics\": {\n    \"per_round\": [\n      {\"round\": 1, \"drift_ratio\": 0.10, \"off_topic_ids\": []},\n      {\"round\": 2, \"drift_ratio\": 0.35, \"off_topic_ids\": [\"c1\"]},\n      {\"round\": 3, \"drift_ratio\": 0.15, \"off_topic_ids\": []}\n    ],\n    \"converged_on_anchor\": true\n  }\n}\n```\n\n让\"是否收敛在原始目的上\"成为一个可被后续 skill 读取的**一等公民信号**。\n\n### 4. 兼容现有机制\n\n- Convergence 模式也可以启用 Drift Check（作为可选项，默认关闭避免过严）\n- `post_closure` 限 1 轮，不受影响\n- 新增字段对旧报告向后兼容（缺失视为 `drift_ratio=0`）\n\n## 参考\n\n- `skills/audit-engine/references/challenge-mode-schema.md` — 多轮数据流定义\n- `skills/audit-engine/references/convergence-algorithm.md` — 当前四元组收敛算法\n- `skills/audit-engine/SKILL.md` — 检查点与模式清单\n\n## 相关\n\n- audit-engine 当前为 experimental，建议作为 audit-engine v1.1 的核心增强\n- 若设计被接受，可在下一次 minor 版本中引入\n",
+      "number": 139,
+      "title": "[改进] 跨 worktree 交接断链：新会话在主 worktree 启动读不到 feature worktree 的 handoff，且无 EnterWorktree 引导",
+      "body": "## 问题描述\n\n单人多 worktree 并行场景下，新旧会话交接会断链：\n\n- 主 worktree 停在分支 X（如 `fix/...`），feature 的活在 `git worktree add` 出来的**独立目录**、分支 Y。\n- Phase D 把 session handoff 写在 **worktree Y**（分支 Y，**未合 main**）。\n- 下个会话默认在**主 worktree**（主目录）启动。\n- `/aria:state-scanner` 的 `scan.py` 按**当前工作目录**采集 git + `docs/handoff/`，因此只看到主 worktree（分支 X）的状态，**完全读不到 worktree Y 那份最新 handoff**。\n\n结果二选一，都不好：\n\n1. 新会话被引导进**错的状态**（主 worktree 分支那套），或\n2. 需要用户/Claude 手动察觉 → 关掉会话在正确目录重开 / 手动指绝对路径，体验差且易错。\n\n## 实地复现（2026-06-04 SilkNode）\n\n| | 主 worktree | feature worktree |\n|---|---|---|\n| 目录 | `/home/dev/SilkNode` | `/home/dev/SilkNode-cut2` |\n| 分支 | `fix/ossutil-internal-mirror` | `feat/cut2-batch1` |\n\n- handoff `docs/handoff/2026-06-04-cut2-batch1-phaseA-converged.md` 只在 worktree Y、分支 Y、**未合 main**。\n- 新会话在主目录 `/clear` 后启动；若在此跑 state-scanner，`scan.py` 扫主目录 → 读到 `fix/ossutil` 那套，读不到 cut2 handoff。\n- 该 handoff 顶部确实写了人读指引（\"在 `feat/cut2-batch1` 分支/worktree 上 `/aria:state-scanner`\"），但那是**给人读的散文**，`scan.py` 不解析、不会据此自动切 worktree。\n- 实测该 handoff **没有 frontmatter**（首行直接是 `# Session Closeout`）——也再次印证 #137。\n\n## 与现有 issue / 设计的关系（确认不重复）\n\n- **#137**（phase-d-closer 自动注入 frontmatter 五字段 track-id/owner/phase/status/updated-at）：**互补**。本 issue 建议 frontmatter **追加 `worktree` 路径字段**，作为机器可读的\"去哪个工作树继续\"。#137 解决\"看板识别 handoff 来自哪台主机/哪条线\"，本 issue 解决\"新会话该**进入**哪个 worktree\"。可考虑把 worktree 字段并入 #137 的注入逻辑一起做。\n- **P3 TASK-024/025 worktree 触发**（`references/layer-l-integration.md` §worktree 触发条件）：**互补但场景不同**。现有设计只在 `tracks_multibranch.collision.kind == \"cross_owner\"`（跨 owner 冲突）时**推荐创建**新 worktree。本 issue 是 **single-owner**、handoff 指向**已存在**的 worktree、需要新会话**进入**（`EnterWorktree path=<已存在 worktree>`）而非创建。cross_owner 触发器在此场景**不触发**（就一个 owner），属覆盖盲区。\n- `scan.py` 当前按 cwd 采集 handoff/git，**无跨 worktree 发现最新 handoff 的能力**。\n\n## 建议方案（供设计参考，非强制实现细节）\n\n1. **handoff frontmatter 增 `worktree` 字段**（配合 #137 一起注入）：记 Phase D 时所在 worktree 的本机绝对路径 + 分支名：\n\n   ```yaml\n   worktree: /home/dev/SilkNode-cut2\n   branch: feat/cut2-batch1\n   ```\n\n2. **state-scanner 跨 worktree 发现**：`scan.py`（或入口阶段）用 `git worktree list` 枚举所有 worktree，扫各自 `docs/handoff/` 找**全局 mtime 最新**的 handoff；若它不在当前 cwd 的 worktree → snapshot 标记 `handoff.in_other_worktree = {path, branch}`。\n3. **阶段 2 引导 EnterWorktree**：当最新 handoff 在别的 worktree 时，推荐输出明确提示，并在 Claude Code 环境下引导调用 `EnterWorktree path=<worktree>` 切过去再继续，而不是让用户手动关掉重开 / 手动指绝对路径。\n4. **兼容**：无多 worktree / handoff 就在当前 worktree → 走现有路径，零行为变化。\n\n## 环境信息\n\n- Aria Plugin: 1.37.0（state-scanner skill 3.1.1）\n- 复现项目：SilkNode（单人多 worktree 并行）\n- OS: Linux x86_64\n- 关联：#137（frontmatter 注入）、`layer-l-integration.md` P3 TASK-024/025（worktree 触发设计）\n\n---\n*手工撰写（非 aria-report 自动生成）— 2026-06-04 SilkNode cut2-batch1 交接实战触发*\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/17",
-      "created_at": "2026-04-14T18:17:00Z",
-      "updated_at": "2026-04-23T19:52:14Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/139",
+      "created_at": "2026-06-04T08:28:17Z",
+      "updated_at": "2026-06-04T08:28:17Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": null,
-      "current": "1.43.0",
-      "gap": null
+      "reported": "1.37.0（state-scanner",
+      "current": "1.44.0",
+      "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "report-format.md",
+          "file_path": "scan.py",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -35,7 +35,7 @@
           "warning": "file not found"
         },
         {
-          "file_path": "skills/audit-engine/references/challenge-mode-schema.md",
+          "file_path": "docs/handoff/2026-06-04-cut2-batch1-phaseA-converged.md",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -44,7 +44,7 @@
           "warning": "file not found"
         },
         {
-          "file_path": "skills/audit-engine/references/convergence-algorithm.md",
+          "file_path": "references/layer-l-integration.md",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -53,7 +53,7 @@
           "warning": "file not found"
         },
         {
-          "file_path": "skills/audit-engine/SKILL.md",
+          "file_path": "layer-l-integration.md",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -70,57 +70,53 @@
     },
     "step5_inflight": {
       "collection_status": "ok",
-      "remote_prs": [
-        {
-          "number": 70,
-          "title": "test(secret-guard): exfil coverage corpus — 26 probes RED-first (#69)",
-          "state": "open",
-          "html_url": "https://forgejo.10cg.pub/10CG/aria-plugin/pulls/70",
-          "head_branch": "feat/69-exfil-coverage-corpus",
-          "match_reasons": [
-            "fix"
-          ]
-        }
-      ],
+      "remote_prs": [],
       "local_branches": [],
       "worktrees": [
         {
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "79d5f2ee55111494a358dde3fb16d5ac2eec3664"
+          "head": "2a1d0619654217751367c80e8e77707f6daeace2"
         }
       ]
     }
   },
   "repro": {
     "exit_mode": "auto",
+    "hit_rate": "4/4",
     "cases": [
       {
         "case_id": "case-1",
-        "input": "核验 issue 引用的 4 个文件在 aria/skills/audit-engine/ 真实存在 (triage.py step3 'not found' 为主仓根解析 artifact)",
-        "expected_behavior": "引用文件存在且描述与结构一致",
-        "actual_behavior": "challenge-mode-schema.md / convergence-algorithm.md / report-format.md / SKILL.md 全部存在; convergence-algorithm.md 确认收敛 = 四元组 (type,severity,category,scope) 集合比较 + unanimous PASS, 与 issue 描述一致",
+        "input": "grep -rn 'worktree list' aria/skills/state-scanner/scripts/ (v1.44.0 @ aria 5871e17)",
+        "expected_behavior": "issue 声称 scan.py 按 cwd 采集, 无跨 worktree 发现能力",
+        "actual_behavior": "全 collectors 零 'git worktree list' 调用; handoff.py 仅扫 cwd 下 docs/handoff/",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "grep -ric 'anchor|drift' aria/skills/audit-engine/ (v1.43.0)",
-        "expected_behavior": "issue 称无原始目的锚定机制",
-        "actual_behavior": "零命中 — 收敛判定只测结论集合稳定性, 不测是否仍在讨论原始问题。结构性盲点在当前版本完全成立。memory 中的 'R3 unified-anchor forcing function' 是实践经验非机制, issue #79 (mid-implementation spec-drift) 是相邻不同层",
+        "input": "grep -i worktree aria/templates/session-handoff.md aria/skills/phase-d-closer/ standards/conventions/session-handoff.md",
+        "expected_behavior": "issue 声称 frontmatter 无 worktree 字段 (5 字段: track-id/owner-container/phase/status/updated-at)",
+        "actual_behavior": "零命中; v1.43.0 #137 enforcement 仅覆盖既有 5 字段, 未新增 worktree 字段",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "in-flight 复核: step5 匹配的 PR #70 是否处理本 issue",
-        "expected_behavior": "无 in-flight 处理 #17",
-        "actual_behavior": "PR #70 是 #69 (secret-guard exfil) 的, 'fix' 关键词 false positive; #17 无 in-flight。注: #69 已有 sister 在做 (情报)",
+        "input": "aria/skills/state-scanner/references/layer-l-integration.md §worktree 触发条件 (L67-75)",
+        "expected_behavior": "issue 声称 P3 TASK-024/025 仅 cross_owner 触发, single-owner 进入已存在 worktree 是盲区",
+        "actual_behavior": "确认: 触发=cross_owner 推荐**创建** worktree; '不触发: no collision / self-multi-container'; 且语义是创建非进入 (EnterWorktree)",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "sandbox e2e: 临时 repo + git worktree add -b feat/cut2; handoff 仅 commit 在 worktree Y; 在主 worktree 跑 scan.py v1.44.0",
+        "expected_behavior": "issue 声称主 worktree 新会话完全读不到 worktree Y 的最新 handoff",
+        "actual_behavior": "handoff.exists=False, latest_path=None; 分支未 push 时 tracks_multibranch.exists=False (branches_scanned=0) — Step 1.17 亦无法缓解",
         "match": true
       }
     ],
-    "hit_count": 3,
-    "total_count": 3,
-    "hit_rate": "3/3"
+    "hit_count": 4,
+    "total_count": 4
   },
   "verdict": "confirmed",
   "severity": "minor",
