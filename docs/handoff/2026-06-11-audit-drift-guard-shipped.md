@@ -51,7 +51,7 @@ owner 四项不变 (§0.4); follow-up 候选不变 (validate_schema_doc pre-exis
 
 ## §4-§5 memory / 同步状态
 
-无新 memory (§3 各条均为既有 memory 强化: workflow 审改分离 / verify-edit-landed / meta-dogfood)。Spec 归档 `2026-06-11-audit-drift-guard`; US/PRD/UPM 无需改; CLAUDE.md/VERSION 本 commit 同步 v1.44.0。
+**新建 1 memory** (收尾核查时补判): [[feedback_audit_workflow_land_edits_between_rounds]] — 审计 workflow 只审不改, R1 edits 主 loop 落地后开新 run 复审, R2 '未落地' FAIL 非设计缺陷 (#137/#17 三连同模式实证, 即 §3.1)。§3.2-3.4 为既有 memory 强化 (verify-edit-landed / meta-dogfood / triage in-flight)。Spec 归档 `2026-06-11-audit-drift-guard`; US/PRD/UPM 无需改; CLAUDE.md/VERSION 本 commit 同步 v1.44.0。
 
 ## §6 Next session 入口
 
@@ -73,3 +73,5 @@ owner 四项不变 (§0.4); follow-up 候选不变 (validate_schema_doc pre-exis
 - dogfood 审计报告 (新 schema 首份): `.aria/audit-reports/post_implementation-R1-2026-06-11-audit-drift-guard.md`
 - Forgejo: aria-plugin [#17](https://forgejo.10cg.pub/10CG/aria-plugin/issues/17) (closed) + [PR #80](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/80)
 - 前序 handoff: `2026-06-10-handoff-frontmatter-enforcement-shipped.md`
+
+> **收尾核查 (2026-06-11)**: 0.三仓双远程 parity 全验 (主仓 `87bb156` / aria `5871e17` / standards `1be388b`, ahead/behind 全 0, gitlink 一致, 工作树 clean); 1.对话任务全闭环 (carry-forward 均 owner-gated 或 backlog, 见 §2/§6); 2.经验固化 1 新 memory (§4); 3.维度: UPM N/A / US 未触碰 (#17 非 US 关联) / Spec 三 ship 全归档 + changes/ 余 3 (2 M6 owner-gated fresh-approved + block-flip DEFERRED 均预期, design_deferred 会正确 surface 后者) / PRD 未触碰 / CLAUDE.md+VERSION v1.44.0 同步; 4.latest.md 单 bare pointer ==1 + E1 自校验 ==5。
