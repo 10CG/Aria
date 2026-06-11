@@ -1,31 +1,68 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.42.0",
-  "issue_ref": "10CG/Aria#137",
-  "generated_at": "2026-06-10T15:13:43Z",
+  "triage_tool_version": "1.43.0",
+  "issue_ref": "10CG/aria-plugin#17",
+  "generated_at": "2026-06-10T23:19:54Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 137,
-      "title": "phase-d-closer D.3 写 handoff 时自动注入 multi-terminal-coordination frontmatter",
-      "body": "## Feature Request\n\n**描述**: phase-d-closer D.3 写 session handoff 时,建议自动注入 multi-terminal-coordination 的 YAML frontmatter(track-id / owner-container / phase / status / updated-at),而不是依赖人手写。\n\n**使用场景**: handoff_multibranch.py 已能解析 frontmatter 并重建多 track 看板(tracks_multibranch),但 phase-d-closer 写 handoff 时不自动加这段 frontmatter,全靠作者手写 → 极易漏。\n\n2026-05-31 在 SilkNode 实地踩到:两条并发 session 同日各自收尾,两份 handoff 都没写 frontmatter → 都被 handoff_multibranch.py 归为 legacy / owner-container=unknown,多 track 看板无法区分两份 handoff 分别来自哪台主机/哪条线,失去了多终端协调本应提供的识别能力。手动补齐 frontmatter 后,parse_handoff_frontmatter 即识别为非 legacy、owner-container 正确显示(实测 owner-container=dev-claude2),证明机制本身可用,缺的是 D.3 的自动注入。\n\n**建议方案**:\n1. phase-d-closer D.3 生成 handoff 时,自动在顶部写入 frontmatter 五字段\n2. owner-container 默认取主机名(hostname),或读 .aria/config.json 可配置别名\n3. track-id 从分支名/feature 推断;phase/status/updated-at 由 D.3 上下文填充\n4. 兼容已有 legacy handoff(无 frontmatter 仍走现有 fallback)\n\n## 环境信息\n- Aria Plugin: 1.36.0\n- Skills: 41\n- OS: Linux x86_64\n\n---\n*由 aria-report 自动生成 (SilkNode, 2026-05-31)*\n",
+      "number": 17,
+      "title": "feat(audit-engine): 多轮挑战循环加固 — 新增\"原始目的锚定\"(Drift Guard) 防偏移检查",
+      "body": "## 问题描述\n\n`audit-engine` 的 challenge 模式采用「讨论组 → 挑战组 → 合并 → 挑战组再审」的多轮对抗式审计，收敛判定基于四元组 `(type, severity, category, scope)` 集合比较。\n\n当前收敛算法的一个结构性盲点：**只检测「结论集合是否稳定」，不检测「我们是否还在讨论最初那个问题」**。\n\n## 偏移（Drift）的发生路径\n\n以 `post_spec` 检查点为例：\n\n```\nRound 1:\n  原始目的(anchor) = proposal.md 中的 \"问题 A\"\n  讨论组产出 = 围绕 A 的决策集合 {d1, d2}\n  挑战组产出 = 指出 A 的方案可能引入副作用 B\n\nRound 2:\n  讨论组合并后 = 主要在处理 B 的风险\n  挑战组再审 = 围绕 B 的新实现方式提新风险 {c1, c2}\n\nRound 3:\n  讨论组 = 针对 c1, c2 继续修订\n  挑战组 = {c1, c2} 稳定\n  → 收敛判定: PASS（四元组集合两轮相同）\n  → 但\"问题 A 是否被正确解决\"从未被重新验证\n```\n\n结果：**一轮对抗式讨论从原始 anchor 慢慢漂走，集合稳定 ≠ 命中原始目的**。这在越长的 challenge 循环中越严重，且越容易被\"全员合并\"步骤放大。\n\n## 影响范围\n\n适用于所有启用 challenge 模式的检查点，其中高风险的是多轮数场景：\n\n- `post_spec` / `post_brainstorm`（方案层，本身就是开放式讨论，最易漂移）\n- `post_planning`（拆分任务时容易被\"新发现的约束\"带跑）\n- `pre_merge`（在合并前挑战组提出大量代码质量问题，可能让讨论从\"Spec 是否实现\"漂到\"代码风格/工程实践\"）\n\n影响最小：`post_closure`（已限 `max_rounds=1`）。\n\n## 建议加固方案\n\n在 `audit-engine` 中新增 **Anchor Check / Drift Guard** 机制，与收敛判定并列：\n\n### 1. 定义锚点 (Anchor) 数据结构\n\n每次启动审计时从 `context` 提取并冻结一份\"原始目的\"作为本次审计的 anchor：\n\n```json\n{\n  \"anchor\": {\n    \"checkpoint\": \"post_spec\",\n    \"primary_goal\": \"Spec proposal.md 中的 Why/Goal 段落\",\n    \"in_scope\": [\"Story 1\", \"AC-01\", \"AC-02\"],\n    \"out_of_scope_hints\": [\"性能优化\", \"UI 重构\"],\n    \"source_sha\": \"<freeze 时的 git SHA>\"\n  }\n}\n```\n\nAnchor 在 Round 1 开始前一次性固化，整个审计周期内不可变。\n\n### 2. 每轮末尾执行 Drift Check\n\n在 Round N 的\"收敛判定\"之前插入一个独立步骤：\n\n```\nfor decision in round_N.conclusions:\n    relevance_score = judge_against_anchor(decision, anchor)\n    # relevance ∈ {on-topic, adjacent, off-topic}\n\ndrift_ratio = count(off-topic) / count(all)\n```\n\n判定规则（建议可配）：\n\n| drift_ratio | 处理 |\n|---|---|\n| `< 20%` | 正常，进入收敛判定 |\n| `20% – 50%` | **Warning** — 在报告里标注，进入收敛判定但不允许\"全票 PASS\" |\n| `> 50%` | **Abort & Refocus** — 强制插入一轮\"回到 anchor\"讨论，Round 计数不前进；若连续 2 次偏移则中止审计并上报 |\n\n### 3. 报告中暴露 drift 指标\n\n`report-format.md` 新增字段：\n\n```json\n{\n  \"drift_metrics\": {\n    \"per_round\": [\n      {\"round\": 1, \"drift_ratio\": 0.10, \"off_topic_ids\": []},\n      {\"round\": 2, \"drift_ratio\": 0.35, \"off_topic_ids\": [\"c1\"]},\n      {\"round\": 3, \"drift_ratio\": 0.15, \"off_topic_ids\": []}\n    ],\n    \"converged_on_anchor\": true\n  }\n}\n```\n\n让\"是否收敛在原始目的上\"成为一个可被后续 skill 读取的**一等公民信号**。\n\n### 4. 兼容现有机制\n\n- Convergence 模式也可以启用 Drift Check（作为可选项，默认关闭避免过严）\n- `post_closure` 限 1 轮，不受影响\n- 新增字段对旧报告向后兼容（缺失视为 `drift_ratio=0`）\n\n## 参考\n\n- `skills/audit-engine/references/challenge-mode-schema.md` — 多轮数据流定义\n- `skills/audit-engine/references/convergence-algorithm.md` — 当前四元组收敛算法\n- `skills/audit-engine/SKILL.md` — 检查点与模式清单\n\n## 相关\n\n- audit-engine 当前为 experimental，建议作为 audit-engine v1.1 的核心增强\n- 若设计被接受，可在下一次 minor 版本中引入\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/137",
-      "created_at": "2026-05-31T23:26:35Z",
-      "updated_at": "2026-06-04T08:28:17Z"
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/17",
+      "created_at": "2026-04-14T18:17:00Z",
+      "updated_at": "2026-04-23T19:52:14Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.36.0",
-      "current": "1.42.0",
-      "gap": "behind"
+      "reported": null,
+      "current": "1.43.0",
+      "gap": null
     },
     "step3_code": {
-      "collection_status": "skipped",
-      "cited_paths": [],
-      "matches_description": null
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "report-format.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/audit-engine/references/challenge-mode-schema.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/audit-engine/references/convergence-algorithm.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/audit-engine/SKILL.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
     },
     "step4_history": {
       "collection_status": "skipped",
@@ -33,14 +70,25 @@
     },
     "step5_inflight": {
       "collection_status": "ok",
-      "remote_prs": [],
+      "remote_prs": [
+        {
+          "number": 70,
+          "title": "test(secret-guard): exfil coverage corpus — 26 probes RED-first (#69)",
+          "state": "open",
+          "html_url": "https://forgejo.10cg.pub/10CG/aria-plugin/pulls/70",
+          "head_branch": "feat/69-exfil-coverage-corpus",
+          "match_reasons": [
+            "fix"
+          ]
+        }
+      ],
       "local_branches": [],
       "worktrees": [
         {
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "0409a88aeef7c4ec4ae7a4baeff9535a57dc9476"
+          "head": "79d5f2ee55111494a358dde3fb16d5ac2eec3664"
         }
       ]
     }
@@ -50,33 +98,33 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "审查 v1.42.0 aria/templates/session-handoff.md + execution-steps.md D.3",
-        "expected_behavior": "issue 称 D.3 不自动注入 frontmatter, 全靠作者手写",
-        "actual_behavior": "模板 v1.22.x+ 已含 5 字段 frontmatter + 完整派生规则 (track_id 规范化函数 / owner_container=git email local-part + ~/.aria/container-id 回退 hostname / phase enum); D.3 action 含 'fill template'。instruction 层注入已存在, 比 issue 建议方案 (hostname) 更丰富",
-        "match": false
+        "input": "核验 issue 引用的 4 个文件在 aria/skills/audit-engine/ 真实存在 (triage.py step3 'not found' 为主仓根解析 artifact)",
+        "expected_behavior": "引用文件存在且描述与结构一致",
+        "actual_behavior": "challenge-mode-schema.md / convergence-algorithm.md / report-format.md / SKILL.md 全部存在; convergence-algorithm.md 确认收敛 = 四元组 (type,severity,category,scope) 集合比较 + unanimous PASS, 与 issue 描述一致",
+        "match": true
       },
       {
         "case_id": "case-2",
-        "input": "grep phase-d-closer mechanics + hooks/handoff-location-guard.sh 找 frontmatter 校验 gate",
-        "expected_behavior": "D.3 写出的 handoff 应保证含 frontmatter",
-        "actual_behavior": "零机械校验: L1 hook 注释明示 'does NOT inspect file content or frontmatter'; handoff-mechanics.md grep frontmatter == 0; D.3 无写后验证子步 → AI 跳过模板/手写 handoff 时静默缺失",
+        "input": "grep -ric 'anchor|drift' aria/skills/audit-engine/ (v1.43.0)",
+        "expected_behavior": "issue 称无原始目的锚定机制",
+        "actual_behavior": "零命中 — 收敛判定只测结论集合稳定性, 不测是否仍在讨论原始问题。结构性盲点在当前版本完全成立。memory 中的 'R3 unified-anchor forcing function' 是实践经验非机制, issue #79 (mid-implementation spec-drift) 是相邻不同层",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "审查 handoff.py + handoff_multibranch.py 对缺 frontmatter 的 surface 行为",
-        "expected_behavior": "缺 frontmatter 至少应有可见告警, 防多 track 看板静默退化",
-        "actual_behavior": "legacy fallback 正常工作 (owner_container='unknown', track_id='legacy:<branch>:<filename>') 但无 soft_error/警告 — 退化不可见, 与 SilkNode 2026-05-31 实地事故一致 (两份并发 handoff 全落 legacy, 看板无法区分)",
+        "input": "in-flight 复核: step5 匹配的 PR #70 是否处理本 issue",
+        "expected_behavior": "无 in-flight 处理 #17",
+        "actual_behavior": "PR #70 是 #69 (secret-guard exfil) 的, 'fix' 关键词 false positive; #17 无 in-flight。注: #69 已有 sister 在做 (情报)",
         "match": true
       }
     ],
-    "hit_count": 2,
+    "hit_count": 3,
     "total_count": 3,
-    "hit_rate": "2/3"
+    "hit_rate": "3/3"
   },
-  "verdict": "partial-repro",
+  "verdict": "confirmed",
   "severity": "minor",
   "recommended_action": "next-cycle",
-  "deviation_note": "issue 称'D.3 不自动注入 frontmatter'不准确 — 模板 v1.22.x+ 已含 5 字段 + 派生规则 (早于报告版本 1.36.0), 注入机制在 instruction 层已存在且方案比 issue 建议更丰富。真实残留缺口 = 零机械 enforcement: (a) D.3 无写后 frontmatter 校验子步; (b) L1 hook 只管路径不管内容; (c) collector 对缺 frontmatter 的 handoff 静默 legacy fallback 无任何告警 → 不经模板的 ad-hoc handoff (SilkNode 事故路径) 静默丢失多终端识别能力。修复方向 = enforcement 而非注入: D.3 写后校验 + collector soft warning。",
+  "deviation_note": null,
   "errors": []
 }
