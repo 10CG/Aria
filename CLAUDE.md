@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.44.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.45.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -554,7 +554,14 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   Step 0 anchor 固化 + Step 5 独立 drift-checker + 三档处置 (可配 0.2/0.5) +
                   REFOCUS_ROUND 耗配额 + DRIFT_TERMINATED 终局态 → FAIL drift override;
                   challenge 默认开; 契约 C-1 config drift_guard / C-2 report schema drift_metrics;
-                  dogfood 机制首跑产出非空 drift_metrics; DEC-20260611-001])
+                  dogfood 机制首跑产出非空 drift_metrics; DEC-20260611-001]);
+                  v1.45.0 = cross-worktree-handoff-discovery #139 [Phase 1.15b handoff_worktrees
+                  collector: git worktree list --porcelain 枚举 + 复用 handoff.py 抽出 _resolve_latest
+                  helper (单份 H5 pointer→mtime, collect_handoff 逐字段零回归) + epoch 域 frontmatter
+                  updated-at 仲裁全局最新 (tie current-wins / other path 字典序) → 落他树阶段 2 advisory
+                  EnterWorktree; 纯机械发现零 frontmatter schema 变更 (加字段破 #137 E1 head-8 窗口);
+                  resolve_max_worktrees_scanned resolver 镜像 #71; 52 测试 739→791 零回归 + 三重 dogfood
+                  (真树 no-op + sandbox + 端到端 scan.py 多 worktree); DEC-20260611-002])
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator master `fb5914c`, M6 execution phase;
           Spec #2 e2e-resilience TG-A+TG-B+TG-C 模板代码侧 100% ship via PR #23+#24)
@@ -577,7 +584,8 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-06-11 (插件 v1.44.0 ship — audit-drift-guard #17: triage confirmed → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 23 修订 + 2 blocking 转契约 → DEC-20260611-001 → post_spec R3 PASS [抓 DEC 两勘误] → agent-team 实施 [TG-0 契约首 commit b67ccb5] → code-review PWW 全收 [I-1 防漂移文档自身漂移 / I-2 REFOCUS 撞 max_rounds 守卫] → **dogfood: Drift Guard 机制首跑产出非空 drift_metrics** [报告即新 schema 首份真实产物, 抓 2I+4m 全收]。aria PR #80 merge `5871e17` 双远程; Spec 归档 `2026-06-11-audit-drift-guard`; #17 closed。注意: challenge 审计现默认带 drift guard)
+**更新**: 2026-06-11 #2 (插件 v1.45.0 ship — cross-worktree-handoff-discovery #139: triage confirmed 4/4 → brainstorm 3 决策 (纯机械发现 / 两级语义+epoch 仲裁 / advisory 引导) → DEC-20260611-002 → Level 2 post_spec R1 FAIL 5M+7m → R2 PWW N-1..N-9 → R3 PASS → **agent-team 动态工作流实施** (TG-0 helper+resolver 亲自零回归 / TG-A collector / TG-B 文档 agent-team 5 文件 / TG-C 47 测试) → code-review 3-lens PWW [important ⑫ abandoned/legacy status verbatim + minor 全收: cap path 排序 / stat-fail kind / None 回退 / key-leak 守卫]。新 collector handoff_worktrees.py: git worktree list 枚举 + 复用 handoff.py 抽 _resolve_latest helper (单份 H5, collect_handoff 逐字段零回归) + epoch 域 updated-at 仲裁全局最新 → 落他树阶段 2 advisory EnterWorktree; 纯机械发现零 frontmatter schema 变更。三重 dogfood (真树 no-op + sandbox + 端到端 scan.py 多 worktree, triage case-4 修复); 52 测试 739→791 零回归; 8 文档同位; **不含 standards 变更**。aria PR #81 merge `a398b65` 双远程; Spec 归档 `2026-06-11-cross-worktree-handoff-discovery`; #139 closed)
+> 前次 2026-06-11 (插件 v1.44.0 ship — audit-drift-guard #17: triage confirmed → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 23 修订 + 2 blocking 转契约 → DEC-20260611-001 → post_spec R3 PASS [抓 DEC 两勘误] → agent-team 实施 [TG-0 契约首 commit b67ccb5] → code-review PWW 全收 [I-1 防漂移文档自身漂移 / I-2 REFOCUS 撞 max_rounds 守卫] → **dogfood: Drift Guard 机制首跑产出非空 drift_metrics** [报告即新 schema 首份真实产物, 抓 2I+4m 全收]。aria PR #80 merge `5871e17` 双远程; Spec 归档 `2026-06-11-audit-drift-guard`; #17 closed。注意: challenge 审计现默认带 drift guard)
 > 前次 2026-06-10 #2 (插件 v1.43.0 ship — handoff-frontmatter-enforcement #137: triage partial-repro [注入机制已存在, 缺 enforcement] → Level 2 post_spec R1/R2→R3 PASS → E1 D.3 写后自校验 + E2 scanner soft warning (resolved latest 双路径, mtime=SilkNode 事故主场景) + standards §2.3.7。739 tests + 真树 dogfood; meta-dogfood²: Level 2 归档走 v1.42.0 gap(a) Status-only 路径 + handoff 跑 E1 ==5。aria PR #79 merge `7214ae8` + standards `1be388b`; #137 closed)
 > 前次同日 (插件 v1.42.0 ship — archive-completeness-gate #134: triage partial-repro → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 + post_spec 25-agent/4 轮 + verification 2 轮 [r1 抓 fresh-approved 第 4 桶黑洞] → DEC-20260609-001 两契约 [A 单一可执行 complete SOT spec_complete.py / B 单一标记载体 frontmatter archive_type] → agent-team 实施 [TG-A lib+collector / TG-B SKILL gates / TG-C standards 5 处] → code-review PASS [I-1 CRLF + I-2 渲染骨架 收]。731 tests [34 新] + 真树 dogfood [block-flip 落 design_deferred / fresh-approved 不卷入 / 100 archive 零误报]。meta-dogfood: 新 gate 上线第一刀阻断自己 spec 归档, 两条理由全对。aria PR #78 merge `18c6ba3` + standards `7ecf522` 双远程 parity; Spec 归档 `2026-06-10-aria-archive-completeness-gate`; #134 closed)
 > 前次 2026-06-08 (插件 v1.41.0 ship — aria-submodule-gate-operationalize TG-2 / R-fix-2: tripwire 5/5 Actions runner 失败 [runner 无 forgejo 凭据克隆 ssh:// submodule + CF Access; 日志 API 不可达 tentative-confirm] → OQ2=(c) host-cron 迁移。新 standalone scripts/submodule-tripwire-audit.sh [HEAD~1 vs HEAD per-submodule ancestry + cat-file-e 防误报; misses.jsonl heartbeat+miss; set -u 空数组守卫; host-cron 跑绕开 runner→forgejo 墙] + 坏 workflow 标 DEPRECATED。dogfood 真仓库跑通首条成功 tripwire telemetry。10 新测 + 13 gate replay 零回归; code-review PASS [I-2/M-2/M-3/M-4 收 + I-1 确认]。**TG-1+TG-2 全完成 → Spec 归档 `openspec/archive/2026-06-08-aria-submodule-gate-operationalize`; block-flip 机制层 unblock** [gate 记 executions + tripwire 可跑], 待攒 ≥3 真实 executions + tripwire 绿即可重启 (owner)。aria-plugin PR #77 merge `b9b5d12` 双远程 parity)

@@ -1,6 +1,6 @@
 # Proposal: cross-worktree-handoff-discovery (#139)
 
-> **Status**: **Approved** (Phase A.1 post_spec CONVERGED 2026-06-11: R1 FAIL [5M+7m 全落地] → R2 PWW [N-1..N-9 全落地] → R3 PASS [2m+1info 收口]; ready for Phase B)
+> **Status**: ✅ **Complete** — shipped aria-plugin v1.45.0 (PR [#81](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/81) merge `a398b65` 双远程 parity; Phase A.1 post_spec R1 FAIL 5M+7m → R2 PWW N-1..N-9 → R3 PASS; Phase B agent-team 动态工作流实施 + code-review 3-lens PWW [important ⑫ + minor 全收]; 52 测试 739→791 零回归 + 三重 dogfood)
 > **关联 Issue**: Forgejo [#139](https://forgejo.10cg.pub/10CG/Aria/issues/139) (triage `confirmed` 4/4, [comment-12467](https://forgejo.10cg.pub/10CG/Aria/issues/139#issuecomment-12467))
 > **决策来源**: [DEC-20260611-002](../../../docs/decisions/DEC-20260611-002-cross-worktree-handoff-discovery.md) (brainstorm 3 问收敛, owner 两段确认)
 > **ship target**: aria-plugin v1.45.0 (当前 SOT plugin.json = v1.44.0 @ `5871e17`, 已验)
