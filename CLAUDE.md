@@ -516,7 +516,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02** 待 168h 运营跑, Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.45.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.46.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction
                   (CIBackend ABC + AetherBackend full + GitHubActions stub) via ci_backends/;
@@ -561,7 +561,18 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
                   updated-at 仲裁全局最新 (tie current-wins / other path 字典序) → 落他树阶段 2 advisory
                   EnterWorktree; 纯机械发现零 frontmatter schema 变更 (加字段破 #137 E1 head-8 窗口);
                   resolve_max_worktrees_scanned resolver 镜像 #71; 52 测试 739→791 零回归 + 三重 dogfood
-                  (真树 no-op + sandbox + 端到端 scan.py 多 worktree); DEC-20260611-002])
+                  (真树 no-op + sandbox + 端到端 scan.py 多 worktree); DEC-20260611-002];
+                  v1.46.0 = state-scanner-coordination-fetch-resilience #141 软错误① + aria-plugin #75
+                  [coordination_fetch 拆两条 fetch 修原子 fetch rc=128: collectors/coordination_fetch.py 把
+                  +refs/heads/* 与 refs/aria/coordination 合成单条原子 git fetch, 远端无 coord ref 项目 (多数
+                  非多终端协调) 整条 rc=128 失败 + 分支头不刷新 + 每扫描 spurious coordination_fetch_failed (exit 10);
+                  拆 Fetch1 分支头载重先跑 + Fetch2 协调 ref 仅 Fetch1 后 (benign 三重 AND 闸 rc==128 +
+                  couldn't-find-remote-ref + refs/aria/coordination 先于 _classify_error → 缺失不报错 success 保持;
+                  Fetch1 失败短路); additive coordination_ref_present 三态 cache 持久化不进 normalize DROP_KEYS;
+                  12 新测 803 全绿 (1 已知 timing flake 无关) + dogfood no-coord sandbox 真 git 修复确证; schema SOT
+                  新建 coordination_fetch section; post_spec R1 4/5 REVISE 8M → R2 5/5 PASS; code-review code-reviewer
+                  PASS + silent-failure-hunter → absent-vs-hidden ref 歧义 documented-limitation + 3 follow-up
+                  (F3 ls-remote / F4 LC_ALL=C / F5 track_board); DEC triage partial-repro #issuecomment-12658])
 主项目版本: v1.7.0
 运行时版本: v2.0.0 (aria-orchestrator master `fb5914c`, M6 execution phase;
           Spec #2 e2e-resilience TG-A+TG-B+TG-C 模板代码侧 100% ship via PR #23+#24)
@@ -584,7 +595,8 @@ US-020~027: v2.0 (待起草)
 
 ---
 
-**更新**: 2026-06-11 #2 (插件 v1.45.0 ship — cross-worktree-handoff-discovery #139: triage confirmed 4/4 → brainstorm 3 决策 (纯机械发现 / 两级语义+epoch 仲裁 / advisory 引导) → DEC-20260611-002 → Level 2 post_spec R1 FAIL 5M+7m → R2 PWW N-1..N-9 → R3 PASS → **agent-team 动态工作流实施** (TG-0 helper+resolver 亲自零回归 / TG-A collector / TG-B 文档 agent-team 5 文件 / TG-C 47 测试) → code-review 3-lens PWW [important ⑫ abandoned/legacy status verbatim + minor 全收: cap path 排序 / stat-fail kind / None 回退 / key-leak 守卫]。新 collector handoff_worktrees.py: git worktree list 枚举 + 复用 handoff.py 抽 _resolve_latest helper (单份 H5, collect_handoff 逐字段零回归) + epoch 域 updated-at 仲裁全局最新 → 落他树阶段 2 advisory EnterWorktree; 纯机械发现零 frontmatter schema 变更。三重 dogfood (真树 no-op + sandbox + 端到端 scan.py 多 worktree, triage case-4 修复); 52 测试 739→791 零回归; 8 文档同位; **不含 standards 变更**。aria PR #81 merge `a398b65` 双远程; Spec 归档 `2026-06-11-cross-worktree-handoff-discovery`; #139 closed)
+**更新**: 2026-06-12 (插件 v1.46.0 ship — state-scanner-coordination-fetch-resilience #141 软错误① + aria-plugin #75: triage partial-repro [软错误① coordination_fetch 原子 fetch rc=128 confirmed live; 软错误② handoff_multibranch cap 已 v1.38.0 #71/#72 修, out-of-scope] → POST comment-12658 → Level 2 Spec → post_spec R1 4/5 REVISE 8 major [版本 PATCH→MINOR 先例 parity / normalize DROP_KEYS 裁定 / lib::fetch_coordination_ref distinct 路径 out-of-scope / Fetch ordering 短路 / state-snapshot-schema 新建 section] → Rev1 全落地 → R2 5/5 PASS unanimous → **agent-team 实施** [核心 coordination_fetch.py 拆两条 fetch + test_coordination_fetch.py 12 测试 主 loop 亲自零回归; TG-C 文档主 loop] → code-review 2-lens [code-reviewer PASS + silent-failure-hunter: #1 git absent-vs-hidden ref 歧义 Critical→降级 documented-limitation (Aria Forgejo 部署不可达, repo 级 ACL 同管 refs/aria/*) + #2 LC_ALL=C locale + #5 track_board 黄条 → 3 follow-up F3/F4/F5]。拆两条 fetch: Fetch1 分支头载重先跑 + Fetch2 协调 ref benign 三重 AND 闸 → 缺失不报错 success 保持 True; additive coordination_ref_present 三态 cache 持久化不进 DROP_KEYS; 803 全绿 (1 已知 flake 无关) + dogfood no-coord sandbox 真 git 修复确证 + Aria 零回归。aria PR #82 merge `2d9bbb3` + release `e45ed3c` 双远程 parity; 主仓 gitlink → e45ed3c; Spec 归档 `2026-06-12-state-scanner-coordination-fetch-resilience`; aria-plugin #75 closed [PR Closes], Aria #141 closing)
+> 前次 2026-06-11 #2 (插件 v1.45.0 ship — cross-worktree-handoff-discovery #139: triage confirmed 4/4 → brainstorm 3 决策 (纯机械发现 / 两级语义+epoch 仲裁 / advisory 引导) → DEC-20260611-002 → Level 2 post_spec R1 FAIL 5M+7m → R2 PWW N-1..N-9 → R3 PASS → **agent-team 动态工作流实施** (TG-0 helper+resolver 亲自零回归 / TG-A collector / TG-B 文档 agent-team 5 文件 / TG-C 47 测试) → code-review 3-lens PWW [important ⑫ abandoned/legacy status verbatim + minor 全收: cap path 排序 / stat-fail kind / None 回退 / key-leak 守卫]。新 collector handoff_worktrees.py: git worktree list 枚举 + 复用 handoff.py 抽 _resolve_latest helper (单份 H5, collect_handoff 逐字段零回归) + epoch 域 updated-at 仲裁全局最新 → 落他树阶段 2 advisory EnterWorktree; 纯机械发现零 frontmatter schema 变更。三重 dogfood (真树 no-op + sandbox + 端到端 scan.py 多 worktree, triage case-4 修复); 52 测试 739→791 零回归; 8 文档同位; **不含 standards 变更**。aria PR #81 merge `a398b65` 双远程; Spec 归档 `2026-06-11-cross-worktree-handoff-discovery`; #139 closed)
 > 前次 2026-06-11 (插件 v1.44.0 ship — audit-drift-guard #17: triage confirmed → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 23 修订 + 2 blocking 转契约 → DEC-20260611-001 → post_spec R3 PASS [抓 DEC 两勘误] → agent-team 实施 [TG-0 契约首 commit b67ccb5] → code-review PWW 全收 [I-1 防漂移文档自身漂移 / I-2 REFOCUS 撞 max_rounds 守卫] → **dogfood: Drift Guard 机制首跑产出非空 drift_metrics** [报告即新 schema 首份真实产物, 抓 2I+4m 全收]。aria PR #80 merge `5871e17` 双远程; Spec 归档 `2026-06-11-audit-drift-guard`; #17 closed。注意: challenge 审计现默认带 drift guard)
 > 前次 2026-06-10 #2 (插件 v1.43.0 ship — handoff-frontmatter-enforcement #137: triage partial-repro [注入机制已存在, 缺 enforcement] → Level 2 post_spec R1/R2→R3 PASS → E1 D.3 写后自校验 + E2 scanner soft warning (resolved latest 双路径, mtime=SilkNode 事故主场景) + standards §2.3.7。739 tests + 真树 dogfood; meta-dogfood²: Level 2 归档走 v1.42.0 gap(a) Status-only 路径 + handoff 跑 E1 ==5。aria PR #79 merge `7214ae8` + standards `1be388b`; #137 closed)
 > 前次同日 (插件 v1.42.0 ship — archive-completeness-gate #134: triage partial-repro → brainstorm 4 决策 → post_brainstorm 19-agent/3 轮 + post_spec 25-agent/4 轮 + verification 2 轮 [r1 抓 fresh-approved 第 4 桶黑洞] → DEC-20260609-001 两契约 [A 单一可执行 complete SOT spec_complete.py / B 单一标记载体 frontmatter archive_type] → agent-team 实施 [TG-A lib+collector / TG-B SKILL gates / TG-C standards 5 处] → code-review PASS [I-1 CRLF + I-2 渲染骨架 收]。731 tests [34 新] + 真树 dogfood [block-flip 落 design_deferred / fresh-approved 不卷入 / 100 archive 零误报]。meta-dogfood: 新 gate 上线第一刀阻断自己 spec 归档, 两条理由全对。aria PR #78 merge `18c6ba3` + standards `7ecf522` 双远程 parity; Spec 归档 `2026-06-10-aria-archive-completeness-gate`; #134 closed)

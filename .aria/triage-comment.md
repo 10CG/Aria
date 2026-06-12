@@ -1,6 +1,8 @@
 ## Triage Report
 
-**Verdict**: `confirmed` | **Severity**: `minor` | **Recommended Action**: `next-cycle`
+**Verdict**: `partial-repro` | **Severity**: `major` | **Recommended Action**: `next-cycle`
+
+> 本 issue 含两个软错误,核验当前 v1.45.0 后**状态分裂**: 软错误 1 仍存在(confirmed), 软错误 2 已修复(fixed-in-v1.38.0)。
 
 ---
 
@@ -8,23 +10,24 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | `1.37.0` (state-scanner skill 3.1.1) |
-| Current | `1.44.0` |
-| Gap | behind (+7 minor) |
+| Reported | `1.37.0` |
+| Current | `1.45.0` |
+| Gap | behind (+8 versions) |
 
-版本落后 7 个 minor,但逐项核验 v1.38.0~v1.44.0: 中间最相关的 v1.43.0 (#137 handoff-frontmatter-enforcement) 仅 enforce 既有 5 字段,**未**新增 `worktree` 字段;无任何版本引入跨 worktree 发现 — issue 在当前版本依然成立。
+issue 报告基于 v1.37.0;当前 plugin 已到 v1.45.0。软错误 2 在报告**下一个**版本 (v1.38.0) 即已修复。
 
 ### Code Path
 
-issue 中引用均为相对路径,解析到当前树 (aria submodule `5871e17`, v1.44.0):
+> triage.py 自动核对将 cited path 当 repo-root 相对路径解析,误报 "file not found";实际两文件在 `aria/skills/state-scanner/scripts/collectors/`,已对 submodule `a398b65` (v1.45.0) 手动核验。
 
-- `aria/skills/state-scanner/scripts/scan.py` + `collectors/handoff.py` — 存在,行为与描述一致 (仅扫 cwd 下 `docs/handoff/`,无 `git worktree list` 调用)
-- `aria/skills/state-scanner/references/layer-l-integration.md` §worktree 触发条件 (L67-75) — 存在,与描述一致
-- `docs/handoff/2026-06-04-cut2-batch1-phaseA-converged.md` — SilkNode 仓文件,本仓不存在 (预期,triage.py step3 报 not found 系跨仓引用 artifact)
+- **`collectors/coordination_fetch.py`** — 存在。`_build_fetch_refspecs()` (line 75-86) 仍返回 `["+refs/heads/*:refs/remotes/<remote>/*", "refs/aria/coordination"]`,在 line 246 合成**单条原子 `git fetch`**。远端无 coordination ref 时整条 fetch rc=128 → 分支头连带未更新。**软错误 1 的根因仍在。** (line 84 注释的 "#57 Finding 1 fix" 只修了 refspec 语法 `refs/heads/*`→`src:dst`,与本 bug 正交。)
+- **`collectors/handoff_multibranch.py`** — 存在。line 289 `max_branches = resolve_max_branches_scanned(project_root)`,**已非硬编码**。cap 警告触发条件 `len(branches) > max_branches` (line 311)。**软错误 2 已修复。**
+- **`_common.py::resolve_max_branches_scanned`** — 三层可配置 resolver:`env ARIA_HANDOFF_MAX_BRANCHES` > `config state_scanner.handoff_multibranch.max_branches` > `default 20`;超 upper-bound(500) warn-only never-clamp (OQ3, v1.38.0)。
 
 ### Git History
 
-Step 4 skipped (cited paths 为相对路径未直接解析);人工核验 v1.38.0~v1.44.0 间无相关修复 commit。
+- **软错误 2** → 修复 = `state-scanner-output-cap-hardening` #71+#72 (**v1.38.0**,已归档 `openspec/archive/2026-06-03-state-scanner-output-cap-hardening`)。
+- **软错误 1** → 主仓 likely_fix_candidates 为空 (collector 在 aria submodule,非主仓路径);submodule 历史无对应修复 → 未修。
 
 ### In-flight
 
@@ -32,24 +35,23 @@ Step 4 skipped (cited paths 为相对路径未直接解析);人工核验 v1.38.0
 |----------|---------|
 | Remote PRs | none |
 | Local branches | none |
-| Worktrees | none (仅 main) |
+| Worktrees | none (仅主 worktree `master`) |
+
+**Cross-ref**: 软错误 1 与 **aria-plugin #75** (`coordination_fetch 恒 rc=128 当 refs/aria/coordination 远端不存在`) 是**同一 bug 的两处跟踪**。修复 cycle 应同时收口 #141(软错误1) + aria-plugin #75。
 
 ### Reproduction
 
-**Mode**: `auto` | **Hit rate**: `4/4`
+**Mode**: `auto` | **Hit rate**: `1/2`
 
-1. **case-1** — `grep -rn 'worktree list'` 全 state-scanner collectors: 零命中;`handoff.py` 仅扫 cwd `docs/handoff/`。✅ match
-2. **case-2** — frontmatter 体系 (template / phase-d-closer / standards §2.3.1) 无 `worktree` 字段;#137 (v1.43.0) 仅 enforce 既有 5 字段。✅ match
-3. **case-3** — layer-l-integration TASK-024/025: 触发条件 `collision.kind == "cross_owner"`,且语义是推荐**创建**新 worktree;明确 "不触发: self-multi-container"。single-owner **进入已存在** worktree 确为覆盖盲区。✅ match
-4. **case-4** — sandbox e2e: 临时 repo + `git worktree add -b feat/cut2`,handoff 仅 commit 在 worktree Y,主 worktree 跑 scan.py v1.44.0 → `handoff.exists=False`;分支未 push 时 `tracks_multibranch.exists=False` (branches_scanned=0),Step 1.17 亦无法缓解。✅ match
+- **case-1 (软错误 1)** — `match: true`。Live 复现 `git fetch origin --no-tags '+refs/heads/*:refs/remotes/origin/*' refs/aria/<nonexistent>` → `fatal: couldn't find remote ref ...` + `the remote end hung up` + **rc=128**;stderr 无 network_signal → `_classify_error` 落 `other` → `coordination_fetch_failed: other: git fetch failed with rc=128` (与 issue 逐字吻合),退化 stale cache (degraded=True)。
+- **case-2 (软错误 2)** — `match: false` (已修复)。v1.45.0 cap 三层可配置;SilkNode(500 分支)设 `state_scanner.handoff_multibranch.max_branches: 500` → `500 > 500` = False → `handoff_multibranch_branch_cap` 噪音消除。
 
-**补充发现 (triage 增量情报)**: Step 1.17 `handoff_multibranch` 仅扫 `refs/remotes/origin/*` — 即使 handoff 已 commit,只要 worktree 分支未 push,多 track 看板同样失明。建议方案 2 若实施,`git worktree list` 枚举可同时覆盖"未 push 本地分支"这一 multibranch 盲区。
+**deviation_note**: 整体非 confirmed 亦非 fixed-in-X,实质偏离 = 部分已修复(2 错中 1 已在 v1.38.0 修复)。
 
 ### Verdict Rationale
 
-四个声称 (cwd-only 采集 / frontmatter 无 worktree 字段 / TASK-024/025 盲区 / 新会话读不到 worktree handoff) 在当前 v1.44.0 全部代码级核验 + sandbox e2e 复现命中,verdict=`confirmed`。severity=`minor`: 限单人多 worktree 工作模式,有手动 workaround (在正确目录重开会话),但断链会把新会话引导进错误状态,与 Rule #9 防的 4 起历史 handoff 事故同类。action=`next-cycle`: 建议与 #137 的注入逻辑同位扩展 (frontmatter +`worktree` 字段 + scan.py `git worktree list` 跨 worktree 发现 + 阶段 2 EnterWorktree 引导),Level 2 OpenSpec 起 cycle。
+软错误 1 (coordination_fetch 原子 fetch) 在当前 v1.45.0 经 live 复现确认仍存在,影响所有未发布 `refs/aria/coordination` 的项目(即多数非多终端协调项目)——每次 scan 必失败、远端分支视图静默退化为 stale cache,故 severity=`major`(功能性退化但有 graceful degradation + soft error 非阻断,非 critical)。软错误 2 已在报告下一版本 v1.38.0(#71/#72)修复为可配置,无需再修——SilkNode 可即时通过 config 消除噪音。建议:(a) 软错误 2 → 告知 reporter 升级到 ≥v1.38.0 + 设 `max_branches` 即解;(b) 软错误 1 → 起 Level 2 cycle(拆两条 fetch / 或将 "couldn't find remote ref" 归类 benign),与 aria-plugin #75 一并收口,`next-cycle` 而非 hotfix。
 
 ---
 
-*Generated by `/issue-triage` v1.44.0 — Ref: 10CG/Aria#139*
-*Step 6 performed by AI (auto mode) — 2026-06-11*
+*Generated by `/issue-triage` v1.45.0 — Ref: 10CG/Aria#141*
