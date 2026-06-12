@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #17-DRIFT-GUARD — ✅ **DONE: aria-plugin #17 audit-drift-guard ship v1.44.0** (2026-06-11, simonfishgit/dev-claude)
+## ★ 最新 session #141-COORD-FETCH — ✅ **DONE: aria-plugin #141 coordination-fetch-resilience ship v1.46.0** (2026-06-12, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-11-cross-worktree-handoff-discovery-shipped.md](./2026-06-11-cross-worktree-handoff-discovery-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md](./2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-141-COORD-FETCH display)**: [2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md](./2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md) — `/aria:state-scanner` → owner triage #141 → 全 cycle: triage partial-repro (软错① coordination_fetch 原子 fetch rc=128 存在 / 软错② handoff cap 已 v1.38.0 修) → post_spec R1 4/5 REVISE 8 major → R2 5/5 PASS → agent-team (核心 coordination_fetch.py 拆两条 fetch + 12 测试 主 loop 亲自零回归; TG-C 文档) → code-review 2-lens (code-reviewer PASS + silent-failure-hunter: absent-vs-hidden ref 歧义 Critical→documented-limitation [部署不可达] + 3 follow-up F3/F4/F5) → aria PR #82 merge `2d9bbb3` + release `e45ed3c` → 主仓 gitlink `003c874`, **v1.46.0**。前置 Level 1: root README badge 1.44→1.45 hotfix `e6224b1`。关 #141+#75 + Spec 归档。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI 可做 (F3/F4/F5 开 issue)。先刷新本地 plugin cache 到 1.46.0 再 dogfood。
+
+## (前次) session #17-DRIFT-GUARD — aria #139 cross-worktree v1.45.0 (2026-06-11)
+
+**Latest (T-139 display)**: [2026-06-11-cross-worktree-handoff-discovery-shipped.md](./2026-06-11-cross-worktree-handoff-discovery-shipped.md) — prior #139 ship v1.45.0 (demoted from bare pointer)
 
 **Latest (T-17-DRIFT-GUARD display)**: [2026-06-11-audit-drift-guard-shipped.md](./2026-06-11-audit-drift-guard-shipped.md) — `/aria:state-scanner` → owner 选 #17 → full cycle (multi-agent 动态工作流): triage (`confirmed` 零 anchor/drift 机制; 情报 **#69 已有 sister PR #70 勿碰**) → brainstorm 4 决策 (D1=B refocus+FAIL 不硬中止 / D2=A 独立 drift-checker / D3=A challenge 默认开 / D4=B 阈值可配) → **post_brainstorm 19-agent/3 轮** 23 修订 + R3 2 blocking 转契约 C-1/C-2 → DEC-20260611-001 → post_spec R1/R2 FAIL→落地→**R3 PASS** (抓 DEC §7 两处勘误 + spawn-300s 误标) → Phase B agent-team (**TG-0 契约首 commit `b67ccb5`** grep 证据 → TG-A∥TG-B) → code-review PWW (I-1 **防漂移文档自身表述漂移** OSCILLATION keys 重取 / I-2 首次 REFOCUS 撞 max_rounds 守卫 [DEC 留白实施层补全] / I-3 + 4M 全收) → **dogfood: Drift Guard 机制首跑** (anchor 固化 + drift-checker 分类 + **非空 drift_metrics** [ratio=0, converged_on_anchor=true], 报告即新 schema 首份真实产物; 抓 2I+4m 全收) → **aria PR #80 merge `5871e17`** 双远程, **v1.44.0** (10 文件纯 prose+schema)。**注意: challenge 模式审计现默认带 drift guard** — 报告 frontmatter 新增 4 个 drift 字段默认 false + drift_metrics 章节, 预期行为勿当 bug。关 #17 + Spec 归档 `2026-06-11-audit-drift-guard`。**Next**: owner 四项 (block-flip 攒 executions / M6 #2 168h / #136 / #140) > AI 可做 (#139 / #75 / follow-up 候选; **#69 勿碰 sister in-flight**)。
 
