@@ -39,10 +39,10 @@ updated-at: 2026-06-12T07:00:00Z
 
 ## §2 未完成 / Carry-forward
 
-owner 四项不变 (§0.4)。**本 cycle 派生 3 follow-up** (code-review, 新 issue 待开):
-- **F3**: benign 闸 `git ls-remote --exit-code` 硬化 — 区分 "ref 真不存在" vs "ref 被 server ACL/`uploadpack.hideRefs` 隐藏" (silent-failure #1; **Aria Forgejo 部署不可达** — repo 级 ACL 同管 refs/aria/*, 故协议级残留非 in-deployment bug)。
-- **F4**: `_run` 注入 `LC_ALL=C` — 锁 git stderr 英文输出, 加固 benign 闸 + 既有 `_classify_error` 全英文 signal (跨切 16 collector, 应独立 change 全套件验证)。
-- **F5**: `track_board.py` 补黄条 — `coordination_ref_present=None` + `coordination_ref_fetch_failed` 时渲染"协调数据可能陈旧" (render-side; soft_error 已进 errors[]/exit 10, 仅看板 render 缺感知)。
+owner 四项不变 (§0.4)。**本 cycle 派生 3 follow-up** (code-review, 已开 issue 10CG/Aria):
+- **F3 ([#142](https://forgejo.10cg.pub/10CG/Aria/issues/142))**: benign 闸 `git ls-remote --exit-code` 硬化 — 区分 "ref 真不存在" vs "ref 被 server ACL/`uploadpack.hideRefs` 隐藏" (silent-failure #1; **Aria Forgejo 部署不可达** — repo 级 ACL 同管 refs/aria/*, 故协议级残留非 in-deployment bug)。
+- **F4 ([#143](https://forgejo.10cg.pub/10CG/Aria/issues/143))**: `_run` 注入 `LC_ALL=C` — 锁 git stderr 英文输出, 加固 benign 闸 + 既有 `_classify_error` 全英文 signal (跨切 16 collector, 应独立 change 全套件验证)。
+- **F5 ([#144](https://forgejo.10cg.pub/10CG/Aria/issues/144))**: `track_board.py` 补黄条 — `coordination_ref_present=None` + `coordination_ref_fetch_failed` 时渲染"协调数据可能陈旧" (render-side; soft_error 已进 errors[]/exit 10, 仅看板 render 缺感知)。
 - 既有 F1 (lib::fetch_coordination_ref benign) / F2 (分支头载重耦合解耦) 不变。
 
 ## §3 关键陷阱 (本 cycle 实证)
@@ -58,7 +58,7 @@ owner 四项不变 (§0.4)。**本 cycle 派生 3 follow-up** (code-review, 新 
 
 ## §6 Next session 入口
 
-`/aria:state-scanner`。优先级: owner 四项 > AI 可做 (F3/F4/F5 follow-up 开 issue / #136 / #140 [若 owner 授权])。**先刷新本地 plugin cache 到 1.46.0** 再 dogfood 新行为。
+`/aria:state-scanner`。优先级: owner 四项 > AI 可做 (F3 #142 / F4 #143 / F5 #144 follow-up / #136 / #140 [若 owner 授权])。**先刷新本地 plugin cache 到 1.46.0** 再 dogfood 新行为。
 
 ## §7 提交清单
 
