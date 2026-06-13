@@ -334,6 +334,10 @@ Skill 基准测试 (新增或修改 Skill 时):
 主项目:
   - [ ] 更新子模块指针 (git add aria)
   - [ ] 主项目/VERSION 更新插件版本记录
+  - [ ] 主项目 root README.md Plugin Version badge (L8 shields badge + Project Status 段) 同步插件版本
+        # 根因记录: root README badge 是 plugin 版本的派生显示, 但不在 aria/ 子模块 SOT 内,
+        # 每次 plugin bump 易漏 → 连续两次 ship (v1.44→45, v1.45→46) 都滞后一版。
+        # 自动兜底: custom check m6-version-badge-match (.aria/state-checks.yaml) 每次 scan 检出 DRIFT。
 
 多远程推送 (v1.15.0+ 自动化):
   - [x] Phase C.2.5 自动推送所有 enforced remote + post-push SHA 验证 (见 aria/skills/phase-c-integrator/SKILL.md)
