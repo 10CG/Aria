@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #141-COORD-FETCH — ✅ **DONE: aria-plugin #141 coordination-fetch-resilience ship v1.46.0** (2026-06-12, simonfishgit/dev-claude)
+## ★ 最新 session #143-LOCALE-HARDENING — ✅ **DONE: aria-plugin #143+#142 git-stderr-locale-hardening ship v1.46.1** (2026-06-13, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md](./2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md](./2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-143-LOCALE display)**: [2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md](./2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md) — `/aria:state-scanner` → owner "修 #142" → 验证 ls-remote absent=hidden=rc2 (git 不可解) → owner 选 ③ 合并 #142+#143 → Level 2 (post_spec R1 2/4 REVISE 3 major → R2 4/4 PASS) → 实施 _run LC_ALL=C (全 git-collector 英文 stderr 匹配任意 locale 可靠; env 断言 host-locale-agnostic + CJK 真测; 805 全绿 + 138 git-collector 零回归) → code-review PASS → aria PR #83 merge `2976dc3` + release `528d4af`, **v1.46.1**。#143 fixed / #142 wont-fix (git 协议不可解)。前序: badge 根治 `13bf409` + 3 follow-up 开 #142/#143/#144。**Next**: owner 四项 > AI (F5 #144 track_board / F1 / F2)。
+
+## (前次) session #141-COORD-FETCH — aria #141 cross-worktree-... v1.46.0 (2026-06-12)
+
+**Latest (T-141-COORD-FETCH display)**: [2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md](./2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md) — prior #141 ship v1.46.0 (demoted from bare pointer)
 
 **Latest (T-141-COORD-FETCH display)**: [2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md](./2026-06-12-state-scanner-coordination-fetch-resilience-shipped.md) — `/aria:state-scanner` → owner triage #141 → 全 cycle: triage partial-repro (软错① coordination_fetch 原子 fetch rc=128 存在 / 软错② handoff cap 已 v1.38.0 修) → post_spec R1 4/5 REVISE 8 major → R2 5/5 PASS → agent-team (核心 coordination_fetch.py 拆两条 fetch + 12 测试 主 loop 亲自零回归; TG-C 文档) → code-review 2-lens (code-reviewer PASS + silent-failure-hunter: absent-vs-hidden ref 歧义 Critical→documented-limitation [部署不可达] + 3 follow-up F3/F4/F5) → aria PR #82 merge `2d9bbb3` + release `e45ed3c` → 主仓 gitlink `003c874`, **v1.46.0**。前置 Level 1: root README badge 1.44→1.45 hotfix `e6224b1`。关 #141+#75 + Spec 归档。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI 可做 (F3 #142 / F4 #143 / F5 #144)。先刷新本地 plugin cache 到 1.46.0 再 dogfood。
 
