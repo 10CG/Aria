@@ -1,63 +1,36 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.45.0",
-  "issue_ref": "10CG/Aria#141",
-  "generated_at": "2026-06-12T05:26:27Z",
+  "triage_tool_version": "1.46.4",
+  "issue_ref": "10CG/Aria#145",
+  "generated_at": "2026-06-13T12:38:21Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 141,
-      "title": "state-scanner scan.py 两个软错误: coordination_fetch 必败 (refs/aria/coordination 不存在) + handoff_multibranch branch cap 噪音",
-      "body": "## Bug Report\n\n**描述**: 在 SilkNode 项目跑 `/aria:state-scanner`（scan.py exit 10），`errors[]` 报 2 个软错误，已定位根因。\n\n### 软错误 1: coordination_fetch — git fetch rc=128（真 bug）\n\n**现象**:\n```\ncoordination_fetch: fetch failed — kind=other msg=git fetch failed with rc=128\n```\n\n**根因**（已复现）: `collectors/coordination_fetch.py` 把 `refs/aria/coordination` 无条件加进 fetch refspec：\n\n```\n$ git fetch origin --no-tags '+refs/heads/*:refs/remotes/origin/*' refs/aria/coordination\nfatal: couldn't find remote ref refs/aria/coordination\nfatal: the remote end hung up unexpectedly\nForgejo: Failed to execute git command\n```\n\n远端从未发布过 `refs/aria/coordination` 的项目（大概率是多数项目），这条 fetch **每次必失败**——不是环境抖动。且 fetch 原子失败连带 `+refs/heads/*` 分支头也没拉到，snapshot 的远端视图退化为上次成功 fetch 的缓存。手动 `git fetch origin main` 正常，证明网络/凭据没问题。\n\n**预期行为**: coordination ref 不存在应视为良性情况（= 没有协调数据发布），不应拖垮整条 fetch。\n\n**建议**（任一）:\n- 拆两条 fetch：分支头一条 + coordination ref 一条（后者失败仅静默标记 coordination 不存在）\n- 或识别 stderr `couldn't find remote ref refs/aria/coordination` 归类为 benign，而非 `kind=other` fetch 失败\n\n### 软错误 2: handoff_multibranch — branch cap 500 > 20（建议增强）\n\n**现象**:\n```\nhandoff_multibranch_branch_cap — Remote branch count (500) exceeds cap (20); scanning only the first 20 branches (most-recent by committerdate).\n```\n\n**分析**: `collectors/handoff_multibranch.py:97` 硬编码 `MAX_BRANCHES_SCANNED = 20`。SilkNode 有 500 个远端分支（历史 feature 分支 merge 后未删），这条警告**每次扫描必报**，永远消不掉，成为固定噪音。\n\n**建议**（任一）:\n- cap 提到 `.aria/config.json` 可配置（如 `state_scanner.handoff_multibranch.branch_cap`）\n- 或超 cap 降级为 debug log（committerdate 排序下被裁掉的本来就是最老分支，信息价值低）\n\n## 环境信息\n- Aria Plugin: 1.37.0\n- Skills: 41\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n- 项目: SilkNode（远端 500 分支，Forgejo behind CF Access）\n\n---\n*由 aria-report 自动生成*\n",
+      "number": 145,
+      "title": "agent-creator ���ɵ���Ŀ�� agent �޷��� audit-engine/agent-team-audit ���ѣ������������������ѽڣ�",
+      "body": "## Enhancement / ����ȱ�ݷ���\n\n**����**: agent-creator/agent-gap-analyzer ���ɵ���Ŀ�� agent �� audit-engine/agent-team-audit ������֮�����ڽṹ���ѽ� �� ��Ŀ agent ���ɺ����κα��������ѡ�\n\n**���ֲ���**:\n1. agent-gap-analyzer ������Ŀ����ȱ��\n2. agent-creator ������Ŀר�� agent �� �䵽 `.aria/agents/`��capabilities tags / STCO ��ʽ��\n3. ���� audit-engine / agent-team-audit ��������\n\n**Ԥ����Ϊ**: agent-team-audit �ܷ��ֲ����� `.aria/agents/` ����Ŀ�� agent���� capabilities ·�ɵ���Ӧ�������������ơ�\n\n**ʵ����Ϊ**: agent-team-audit �� agent-selection-matrix��ʵ�� 1.46.0��д�� 4 ������ͨ�� agent��pre_merge=Tech Lead+Code Reviewer+Knowledge Manager / post_implementation=QA Engineer+Code Reviewer / post_spec=Tech Lead+Knowledge Manager����**��ȫ���� `.aria/agents/`**��������agent-creator ���ɵ���Ŀ agent û���κα��������� ���� ��ʹ��ȷ���� `.aria/agents/` Ҳ�ò��ˣ�agent-gap-analyzer��Ϊ��Ŀ������ȱ�ڡ��������ߵ��ڿ�ת��\n\n���䣺`.aria/agents/` Ҳ���� Claude Code ԭ�� subagent_type λ�ã�ԭ���� `.claude/agents/` �� plugin `agents/` ���أ���������Ŀ agent �Ȳ���ԭ�� subagent_type ֱ����Ҳ���ܱ� aria �Լ��ı�����ʹ�á�\n\n**ʵ֤��10cg.local ��Ŀ��**: ��Ϊ����Ŀר�� agent��shell-safety-auditor / ssh-egress-security-auditor / homelab-topology-auditor���� `.claude/agents/` + �� Claude Code ԭ�� Agent �����ֶ� fan-out �������������ƣ�ץ�� 2 ����Ŀ���� Critical���� pct exec ����ע�루`pct exec <id> -- sh -c '...'` �ƹ��� token ���������� ����ע�루������滻�У��ڶ������ݵ�Զ�� root shell������Щͨ�� tech-lead/code-reviewer �ӽǸ���ץ������֤����Ŀר�� agent �в���������ֵ������ǰ aria �ܹ��ò������ǡ�\n\n**�����Ľ�**:\n�� agent-creator Ӧ���ɵ� `.claude/agents/`����ͬʱ��������Ŀ agent ��ԭ�� subagent_type ��ֱ��\n�� agent-team-audit �� agent-selection-matrix Ӧ֧�ַ��ֲ�������Ŀ�� agent���� capabilities tags + ������·�ɣ�������д�� 4 ������ͨ�ý�ɫ������ aria �Զ�������Զֻ��ͨ���ӽ�\n\n## ������Ϣ\n- Aria Plugin: 1.46.0��ʵ��Ŀ¼��VERSION �ļ��� 1.41.0��\n- Skills: 41\n- OS: MINGW64_NT-10.0-19045 x86_64 (Windows Git Bash)\n- ��Ŀ���� (.aria/config.json): no\n\n---\n*�� aria-report Э�����ɣ�10cg.local��*",
       "state": "open",
-      "labels": [],
+      "labels": [
+        "aria-auto"
+      ],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/141",
-      "created_at": "2026-06-11T05:46:53Z",
-      "updated_at": "2026-06-11T05:46:53Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/145",
+      "created_at": "2026-06-13T02:26:19Z",
+      "updated_at": "2026-06-13T02:26:19Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.37.0",
-      "current": "1.45.0",
+      "reported": "1.46.0��ʵ��Ŀ¼��VERSION",
+      "current": "1.46.4",
       "gap": "behind"
     },
     "step3_code": {
-      "collection_status": "ok",
-      "cited_paths": [
-        {
-          "file_path": "collectors/coordination_fetch.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "collectors/handoff_multibranch.py",
-          "line": 97,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": ".aria/config.json",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: {\n2:   \"_comment\": \"Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)\",\n3:   \"version\": \"1.0\",\n4: \n5:   \"workflow\": {",
-          "warning": null,
-          "total_lines": 81
-        }
-      ],
-      "matches_description": false
+      "collection_status": "skipped",
+      "cited_paths": [],
+      "matches_description": null
     },
     "step4_history": {
-      "collection_status": "ok",
+      "collection_status": "skipped",
       "likely_fix_candidates": []
     },
     "step5_inflight": {
@@ -69,7 +42,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "e6224b1f1fbe869d673c1a98b5e9d1f3de974026"
+          "head": "7acfa0c7058228dcce9fb7260ca26d35eb130f00"
         }
       ]
     }
@@ -79,26 +52,40 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "软错误 1 (coordination_fetch): 在远端无 refs/aria/coordination 的项目跑 collect_coordination_fetch; live 复现机制 `git fetch origin --no-tags '+refs/heads/*:refs/remotes/origin/*' refs/aria/<nonexistent>` (本仓代码 _build_fetch_refspecs 行为, v1.45.0)",
-        "expected_behavior": "issue 预期: coordination ref 不存在应视为良性 (无协调数据发布), 不应拖垮整条 fetch; +refs/heads/* 分支头应正常更新",
-        "actual_behavior": "实测 rc=128: 'fatal: couldn't find remote ref ...' + 'the remote end hung up' → 单条原子 fetch 整体 abort, 分支头未更新; _classify_error 落 'other' → soft_error 'coordination_fetch_failed: other: git fetch failed with rc=128' (与 issue 逐字吻合); 退化为 stale cache (degraded=True)",
+        "input": "Read aria/skills/agent-creator/SKILL.md — 核实项目级 agent 生成目标路径 (aria 子模块 @1961f6c = v1.46.4)",
+        "expected_behavior": "issue 声称: agent-creator 把项目专属 agent 生成到 .aria/agents/ (STCO + capabilities tags)",
+        "actual_behavior": "确认。SKILL.md:71 『路径: .aria/agents/<name>.md』, :72 『自动创建 .aria/agents/ 目录』, description 亦明示 .aria/agents/。",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "软错误 2 (handoff_multibranch cap): 核验 v1.45.0 collectors/handoff_multibranch.py:289 + _common.py resolve_max_branches_scanned",
-        "expected_behavior": "issue (基于 1.37.0) 声称: MAX_BRANCHES_SCANNED 硬编码 20, 500 分支项目每次必报 cap 警告, 永远消不掉",
-        "actual_behavior": "v1.38.0 #71/#72 已改为三层可配置 (env>config>default 20, warn-only upper bound 500 never-clamp); cap 警告触发条件 len(branches)>max_branches, 设 max_branches>=branch_count 即消除 → 不复现 (已修复)",
+        "input": "Read aria/skills/agent-team-audit/references/agent-selection-matrix.md + grep -niE '.aria/agents|agent-router|project|capabilities|gap' 该 matrix",
+        "expected_behavior": "issue 声称: agent-team-audit 的 agent-selection-matrix 写死 4 个内置通用 agent (Tech Lead/Code Reviewer/QA Engineer/Knowledge Manager), 完全不读 .aria/agents/",
+        "actual_behavior": "确认。matrix 写死触发点→4 内置 agent 映射 (pre_merge=TL+CR+KM / post_implementation=QA+CR / post_spec=TL+KM); grep .aria/agents|agent-router|project|capabilities|gap 零命中。审计编排路径完全不感知项目级 agent, 无 capabilities 路由。",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "Read aria/skills/agent-router/SKILL.md:408 — 核实 .aria/agents/ 与 Claude Code 原生 subagent 加载机制的关系",
+        "expected_behavior": "issue 声称: .aria/agents/ 非 Claude Code 原生 subagent 位置 (原生在 .claude/agents/ 或 plugin agents/), 故项目 agent 不能作原生 subagent_type 直接调用",
+        "actual_behavior": "确认。agent-router/SKILL.md:408 明确『Claude Code Plugin 不会自动加载 .aria/agents/ 中的 Agent, 但 agent-router Skill 在执行时会读取它们的 description 和 capabilities』。项目 agent 只能被 Skill 层逻辑软注入 prompt, 不能作原生 subagent_type。",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "grep -rn '.aria/agents' aria/ + 核实是否存在任一编排器消费 .aria/agents/ (核对 reporter 全称表述『无任何编排器唤醒 / aria 自己的编排器也用不了』)",
+        "expected_behavior": "issue 声称: 项目 agent 生成后无任何编排器唤醒, 即使正确放到 .aria/agents/ 也用不了 (既不被原生 subagent_type 用, 也不能被 aria 自己的编排器使用)",
+        "actual_behavior": "实质偏离。agent-router/SKILL.md:397/402 主动扫描 .aria/agents/ 并运行时注入路由上下文; subagent-driver/references/handoff-contract.md:14 契约含 agent_source='project' (项目级 .aria/agents/)。即 agent-router→subagent-driver 任务路由路径会唤醒项目 agent。断裂特定于 audit 编排 (agent-team-audit) 路径, 非『所有编排器』; reporter『aria 自己的编排器也用不了』过宽。",
         "match": false
       }
     ],
-    "hit_count": 1,
-    "total_count": 2,
-    "hit_rate": "1/2"
+    "hit_count": 3,
+    "total_count": 4,
+    "hit_rate": "3/4"
   },
   "verdict": "partial-repro",
   "severity": "major",
   "recommended_action": "next-cycle",
-  "deviation_note": "Issue 报告 2 个软错误 (基于 plugin v1.37.0); 核验当前 v1.45.0 (aria submodule a398b65) 后状态分裂: 软错误 1 (coordination_fetch 原子 fetch) 仍存在并 live 复现 (rc=128, kind=other); 软错误 2 (handoff_multibranch 硬编码 cap 20) 已在 v1.38.0 #71/#72 修复 — 现为三层可配置 resolver (env ARIA_HANDOFF_MAX_BRANCHES > config state_scanner.handoff_multibranch.max_branches > default 20), SilkNode 可设 max_branches=500 消除 handoff_multibranch_branch_cap 噪音。故整体非 confirmed 亦非 fixed-in-X, 实质偏离 = 部分已修复。",
+  "deviation_note": "核心结构断裂 CONFIRMED: agent-team-audit 的 agent-selection-matrix (v1.46.4, 与 reporter 实测 v1.46.0 一致 — 期间 3 patch 均为 coordination-ref/state-scanner, 未碰 agent-team-audit) 写死 4 个内置通用 agent, 完全不读 .aria/agents/, 故 agent-creator/agent-gap-analyzer 生成的项目专属 audit agent 在审计编排路径下永不被唤醒; 且 .aria/agents/ 非 Claude Code 原生 subagent 位置 (case-3)。但 reporter 全称表述『无任何编排器唤醒 / aria 自己的编排器也用不了』过宽 (case-4): agent-router 确实主动扫描 .aria/agents/ 并注入任务路由上下文, subagent-driver 契约亦含 project agent_source。准确范围 = 断裂特定于 audit 编排 (agent-team-audit) 路径, 任务路由 (agent-router/subagent-driver) 路径已感知项目 agent。这影响修复设计: 无需重做全盘编排, 可让 audit selection-matrix 复用 agent-router 式的 .aria/agents/ 发现+capabilities 路由 (已有正确范式可参照)。",
   "errors": []
 }

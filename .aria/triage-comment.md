@@ -2,32 +2,30 @@
 
 **Verdict**: `partial-repro` | **Severity**: `major` | **Recommended Action**: `next-cycle`
 
-> 本 issue 含两个软错误,核验当前 v1.45.0 后**状态分裂**: 软错误 1 仍存在(confirmed), 软错误 2 已修复(fixed-in-v1.38.0)。
-
 ---
 
 ### Version
 
 | Field | Value |
 |-------|-------|
-| Reported | `1.37.0` |
-| Current | `1.45.0` |
-| Gap | behind (+8 versions) |
+| Reported | `1.46.0` (reporter 实测插件目录;其本地 VERSION 文件显示 1.41.0) |
+| Current | `1.46.4` |
+| Gap | behind |
 
-issue 报告基于 v1.37.0;当前 plugin 已到 v1.45.0。软错误 2 在报告**下一个**版本 (v1.38.0) 即已修复。
+断裂在 v1.46.0 与 v1.46.4 **行为一致** —— 期间 3 个 patch (v1.46.1~1.46.4) 均为 coordination-ref / state-scanner 范畴,未触碰 `agent-team-audit`(SKILL.md 与 selection-matrix 的"最后更新"仍为 2026-03-18,version 1.0.0)。故**版本差对本 issue 无影响**,非 outdated report。(附:reporter 环境 VERSION 文件 1.41.0 vs 实测目录 1.46.0 的本地滞后属其安装环境问题,与本 issue 无关。)
 
 ### Code Path
 
-> triage.py 自动核对将 cited path 当 repo-root 相对路径解析,误报 "file not found";实际两文件在 `aria/skills/state-scanner/scripts/collectors/`,已对 submodule `a398b65` (v1.45.0) 手动核验。
+issue 以概念位置描述(未引用具体文件行),Step 3 自动抽取 cited_paths 为空。triage 过程实际核实的 source(aria 子模块 @`1961f6c` = v1.46.4):
 
-- **`collectors/coordination_fetch.py`** — 存在。`_build_fetch_refspecs()` (line 75-86) 仍返回 `["+refs/heads/*:refs/remotes/<remote>/*", "refs/aria/coordination"]`,在 line 246 合成**单条原子 `git fetch`**。远端无 coordination ref 时整条 fetch rc=128 → 分支头连带未更新。**软错误 1 的根因仍在。** (line 84 注释的 "#57 Finding 1 fix" 只修了 refspec 语法 `refs/heads/*`→`src:dst`,与本 bug 正交。)
-- **`collectors/handoff_multibranch.py`** — 存在。line 289 `max_branches = resolve_max_branches_scanned(project_root)`,**已非硬编码**。cap 警告触发条件 `len(branches) > max_branches` (line 311)。**软错误 2 已修复。**
-- **`_common.py::resolve_max_branches_scanned`** — 三层可配置 resolver:`env ARIA_HANDOFF_MAX_BRANCHES` > `config state_scanner.handoff_multibranch.max_branches` > `default 20`;超 upper-bound(500) warn-only never-clamp (OQ3, v1.38.0)。
+- `aria/skills/agent-creator/SKILL.md:71-72` — 项目 agent 生成目标 = `.aria/agents/<name>.md`(确认)
+- `aria/skills/agent-team-audit/references/agent-selection-matrix.md` — 写死 4 内置 agent 触发点映射,**无** `.aria/agents/` / capabilities / 项目级 路由(grep 零命中)
+- `aria/skills/agent-router/SKILL.md:397/402/408` — agent-router **会**扫描 `.aria/agents/` 运行时注入;:408 明确 "Plugin 不会自动加载 `.aria/agents/`"
+- `aria/skills/subagent-driver/references/handoff-contract.md:14` — 契约含 `agent_source: "project" (.aria/agents/)`
 
 ### Git History
 
-- **软错误 2** → 修复 = `state-scanner-output-cap-hardening` #71+#72 (**v1.38.0**,已归档 `openspec/archive/2026-06-03-state-scanner-output-cap-hardening`)。
-- **软错误 1** → 主仓 likely_fix_candidates 为空 (collector 在 aria submodule,非主仓路径);submodule 历史无对应修复 → 未修。
+`No recent commits matched`(Step 4 skipped — 无 cited file)。`agent-team-audit` 自 2026-03-18 创建后未修改;无相关修复 commit。
 
 ### In-flight
 
@@ -35,23 +33,27 @@ issue 报告基于 v1.37.0;当前 plugin 已到 v1.45.0。软错误 2 在报告*
 |----------|---------|
 | Remote PRs | none |
 | Local branches | none |
-| Worktrees | none (仅主 worktree `master`) |
+| Worktrees | none(仅 main worktree `/home/dev/Aria` @master) |
 
-**Cross-ref**: 软错误 1 与 **aria-plugin #75** (`coordination_fetch 恒 rc=128 当 refs/aria/coordination 远端不存在`) 是**同一 bug 的两处跟踪**。修复 cycle 应同时收口 #141(软错误1) + aria-plugin #75。
+**无任何 in-flight 修复**。
 
 ### Reproduction
 
-**Mode**: `auto` | **Hit rate**: `1/2`
+**Mode**: `auto` | **Hit rate**: `3/4`
 
-- **case-1 (软错误 1)** — `match: true`。Live 复现 `git fetch origin --no-tags '+refs/heads/*:refs/remotes/origin/*' refs/aria/<nonexistent>` → `fatal: couldn't find remote ref ...` + `the remote end hung up` + **rc=128**;stderr 无 network_signal → `_classify_error` 落 `other` → `coordination_fetch_failed: other: git fetch failed with rc=128` (与 issue 逐字吻合),退化 stale cache (degraded=True)。
-- **case-2 (软错误 2)** — `match: false` (已修复)。v1.45.0 cap 三层可配置;SilkNode(500 分支)设 `state_scanner.handoff_multibranch.max_branches: 500` → `500 > 500` = False → `handoff_multibranch_branch_cap` 噪音消除。
+- **case-1** ✅ agent-creator 生成到 `.aria/agents/` — 确认(SKILL.md:71-72)
+- **case-2** ✅ agent-team-audit selection-matrix 写死 4 内置通用 agent + 不读 `.aria/agents/` — 确认(matrix grep 零命中)
+- **case-3** ✅ `.aria/agents/` 非 Claude Code 原生 subagent 位置 — 确认(agent-router:408)
+- **case-4** ❌ "无任何编排器唤醒 / aria 自己的编排器也用不了"(全称)— **偏离**:agent-router(:397/402)主动扫描 `.aria/agents/` 注入任务路由上下文,subagent-driver 契约含 `agent_source: "project"`。任务路由路径**会**唤醒项目 agent;断裂特定于 **audit 编排(agent-team-audit)路径**。
 
-**deviation_note**: 整体非 confirmed 亦非 fixed-in-X,实质偏离 = 部分已修复(2 错中 1 已在 v1.38.0 修复)。
+**Deviation note**: 核心结构断裂 CONFIRMED(agent-team-audit 永不唤醒项目专属 audit agent + `.aria/agents/` 非原生 subagent 位置),但 reporter 全称表述过宽 —— agent-router/subagent-driver **任务路由路径已感知项目 agent**。准确范围 = 断裂特定于 **audit 编排路径**。这影响修复设计:无需重做全盘编排,可让 audit selection-matrix 复用 agent-router 式的 `.aria/agents/` 发现 + capabilities 路由(已有正确范式可参照)。
 
 ### Verdict Rationale
 
-软错误 1 (coordination_fetch 原子 fetch) 在当前 v1.45.0 经 live 复现确认仍存在,影响所有未发布 `refs/aria/coordination` 的项目(即多数非多终端协调项目)——每次 scan 必失败、远端分支视图静默退化为 stale cache,故 severity=`major`(功能性退化但有 graceful degradation + soft error 非阻断,非 critical)。软错误 2 已在报告下一版本 v1.38.0(#71/#72)修复为可配置,无需再修——SilkNode 可即时通过 config 消除噪音。建议:(a) 软错误 2 → 告知 reporter 升级到 ≥v1.38.0 + 设 `max_branches` 即解;(b) 软错误 1 → 起 Level 2 cycle(拆两条 fetch / 或将 "couldn't find remote ref" 归类 benign),与 aria-plugin #75 一并收口,`next-cycle` 而非 hotfix。
+reporter 的核心痛点("项目专属 audit agent 生成后用不上,如 security auditor 抓到 2 个 tech-lead/code-reviewer 视角抓不到的 Critical")**真实且 confirmed**:`agent-gap-analyzer → agent-creator → .aria/agents/` 的生成链已建成,但下游 audit 消费方(`agent-team-audit`)的 selection-matrix 写死内置角色,使该链对 audit 用例完全无效。判 `partial-repro`(非 `confirmed`)是因 reporter 把断裂表述为"无任何编排器"全称,而 agent-router 路由路径实际可用 —— 这个偏离对修复范围判断有实质意义。`severity: major`(一整类已建成能力对 audit 用例失效,但有 agent-router workaround,非阻断主流程的 critical)。`recommended_action: next-cycle`(reporter 提出两个相互关联的设计选项 [agent-creator 改生成到 `.claude/agents/` + selection-matrix 支持项目 agent 发现],涉及与 Claude Code 原生 subagent 机制的边界,建议起正式 cycle 并以 brainstorm 收敛设计,非 hotfix)。
+
+> 注:`agent-team-audit` 为 **experimental 功能**(`experimental: true`,默认关闭,需 `experiments.agent_team_audit: true` 启用)—— 影响优先级判断,但不改变设计断裂的真实性。
 
 ---
 
-*Generated by `/issue-triage` v1.45.0 — Ref: 10CG/Aria#141*
+*Generated by `/issue-triage` v1.46.4 — Ref: 10CG/Aria#145*
