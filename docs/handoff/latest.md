@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #145-TRIAGE-REGISTRY — ✅ **DONE: #145 triage (partial-repro) + Agent Registry 归 aria-fleet M7** (2026-06-13 #5, simonfishgit/dev-claude)
+## ★ 最新 session #140-I18N-RESYNC — ✅ **DONE: i18n README 全量重译 v1.10.0/v1.7.2 → v1.46.4 + 防再漂 backstop (#140)** (2026-06-13 #6, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-145-triage-agent-registry-m7.md](./2026-06-13-145-triage-agent-registry-m7.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-i18n-readme-full-resync.md](./2026-06-13-i18n-readme-full-resync.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-140-I18N display)**: [2026-06-13-i18n-readme-full-resync.md](./2026-06-13-i18n-readme-full-resync.md) — #140 翻译版 README 正文滞后 30+ 版 (zh v1.10.0 / ja·ko v1.7.2 stub) → owner 选**三语全量重译** (Level 2 `aria-i18n-readme-full-resync`, 防再漂 **B 档**)。英文源校准 (Skills 36→**41** [34+7], agent-router/arch-common 归位 internal, 补 issue-triage, 移除 v1.13.0 残留) + zh/ja/ko 全量重译 (ja·ko 70 行 stub → 275 行, 三语 badge → v1.46.4, 移除"准备中"免责) + 防再漂 (`<!-- translated-from: v1.46.4 -->` 标记 + 新 state-check `i18n-readme-translation-currency` 检测正文滞后非仅 badge; dogfood scan.py PASS + 负向确证) + CLAUDE.md release checklist。commit `669ef60` 双远程齐平;Spec archived;**#140 closed [fixed]** (comment-12927, body 完整保留)。**Next**: owner 三项 (block-flip / M6 #2 168h / #136) > AI backlog (#145 小修 / M7 registry brainstorm)。
+
+## (前次) session #145-TRIAGE-REGISTRY — ✅ **DONE: #145 triage (partial-repro) + Agent Registry 归 aria-fleet M7** (2026-06-13 #5, simonfishgit/dev-claude)
+
+**Latest (T-145-REGISTRY pointer, superseded by #140-I18N)**: [2026-06-13-145-triage-agent-registry-m7.md](./2026-06-13-145-triage-agent-registry-m7.md) — superseded; 置顶 bare `**Latest**:` (#140-I18N) 是当前 session 入口
 
 **Latest (T-145-REGISTRY display)**: [2026-06-13-145-triage-agent-registry-m7.md](./2026-06-13-145-triage-agent-registry-m7.md) — #145 triage verdict **partial-repro/major**(agent-team-audit selection-matrix 写死 4-roster 不读 `.aria/agents/` + 项目 agent 非原生 subagent_type;"无任何编排器"过宽 — agent-router 软注入可用 3/4)。owner 升级 **Agent Registry 愿景** → 调研(🔴 session-start 时效:动态 agent 当前 session 用不了需重启 + marketplace 已覆盖主诉求差异化仅 3 gap)后**拆开**:#145 小收口 backlog + registry 归 aria-fleet M7(notes `.aria/notes/2026-06-13-agent-registry-for-aria-fleet.md` + #128 登记 [`#issuecomment-12913`](https://forgejo.10cg.pub/10CG/Aria/issues/128#issuecomment-12913))。非 ship cycle;commit `bbade04` 双远程;memory `feedback_dynamic_agent_session_start_vs_soft_injection`。**Next**: owner 四项(block-flip / M6 #2 168h / #136 / #140)> AI backlog(#145 小修 / M7 registry brainstorm)。
 
