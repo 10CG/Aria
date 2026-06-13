@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #F2-RUN-TIMEOUT — ✅ **DONE: aria-plugin F2-minimal lib _run timeout ship v1.46.4** (2026-06-13 #4, simonfishgit/dev-claude)
+## ★ 最新 session #145-TRIAGE-REGISTRY — ✅ **DONE: #145 triage (partial-repro) + Agent Registry 归 aria-fleet M7** (2026-06-13 #5, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-coordination-ref-run-timeout-shipped.md](./2026-06-13-coordination-ref-run-timeout-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-145-triage-agent-registry-m7.md](./2026-06-13-145-triage-agent-registry-m7.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-145-REGISTRY display)**: [2026-06-13-145-triage-agent-registry-m7.md](./2026-06-13-145-triage-agent-registry-m7.md) — #145 triage verdict **partial-repro/major**(agent-team-audit selection-matrix 写死 4-roster 不读 `.aria/agents/` + 项目 agent 非原生 subagent_type;"无任何编排器"过宽 — agent-router 软注入可用 3/4)。owner 升级 **Agent Registry 愿景** → 调研(🔴 session-start 时效:动态 agent 当前 session 用不了需重启 + marketplace 已覆盖主诉求差异化仅 3 gap)后**拆开**:#145 小收口 backlog + registry 归 aria-fleet M7(notes `.aria/notes/2026-06-13-agent-registry-for-aria-fleet.md` + #128 登记 [`#issuecomment-12913`](https://forgejo.10cg.pub/10CG/Aria/issues/128#issuecomment-12913))。非 ship cycle;commit `bbade04` 双远程;memory `feedback_dynamic_agent_session_start_vs_soft_injection`。**Next**: owner 四项(block-flip / M6 #2 168h / #136 / #140)> AI backlog(#145 小修 / M7 registry brainstorm)。
+
+## (前次) session #F2-RUN-TIMEOUT — ✅ **DONE: aria-plugin F2-minimal lib _run timeout ship v1.46.4** (2026-06-13 #4, simonfishgit/dev-claude)
 
 **Latest (T-F2-RUNTIMEOUT display)**: [2026-06-13-coordination-ref-run-timeout-shipped.md](./2026-06-13-coordination-ref-run-timeout-shipped.md) — owner "修 F2" → 澄清歧义 (F2 两读法) + 验证价值 (最低价值剩余项; timeout 唯一真实有用, dedup/耦合解耦风险 refactor) → owner 选 Minimal → Level 1 → lib _run 加 timeout=30 + TimeoutExpired→124 + None-guard (跳过 rc 对齐保 -1 防破坏 callers) → code-review PASS (全 11 callers 优雅处理 rc=124) → aria PR #86 merge `ffdbec5` + release `1961f6c`, **v1.46.4**。F2-minimal 收口 (无 issue); dedup+耦合解耦 backlog。**🏁 #141 派生 F1-F5 全处置**: F1 fixed v1.46.3 / F2 timeout-slice fixed v1.46.4 [余 backlog] / F3=#142 wont-fix / F4=#143 fixed / F5=#144 fixed。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI backlog (F2 dedup 低优)。
 
