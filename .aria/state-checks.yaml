@@ -126,3 +126,47 @@ checks:
     fix: "Update docs/architecture/system-architecture.md **Last Updated** header and review content"
     timeout_seconds: 5
     enabled: true
+
+  # --- i18n README 正文滞后防再漂 backstop (Issue #140, B 档) ---
+  - name: "i18n-readme-translation-currency"
+    description: |
+      防再漂 backstop (Issue #140, B 档): 比对每个 root i18n README 顶部的
+      <!-- translated-from: vX.Y.Z --> 标记 vs aria/.claude-plugin/plugin.json 版本。
+      标记 = 该翻译同步自哪个版本; 与当前 plugin 版本不一致 = 正文可能滞后。
+      检测的是正文滞后 (非仅 badge) — #140 核心教训: badge 称最新但正文旧, 比旧 badge 更误导。
+      WARN (非 BLOCK), 遵循 advisory-over-hardlock。文件缺失则跳过 (非所有项目有全语种)。
+    command: |
+      python3 - <<'PYEOF'
+      import json, re, sys
+      try:
+          plugin = json.load(open("aria/.claude-plugin/plugin.json")).get("version", "")
+      except Exception:
+          plugin = ""
+      stale, missing, ok = [], [], []
+      for f in ["README.zh.md", "README.ja.md", "README.ko.md"]:
+          try:
+              text = open(f, encoding="utf-8").read()
+          except FileNotFoundError:
+              continue
+          m = re.search(r"translated-from:\s*v?(\d+\.\d+\.\d+)", text)
+          if not m:
+              missing.append(f)
+          elif m.group(1) == plugin:
+              ok.append(f)
+          else:
+              stale.append(f + "@" + m.group(1))
+      if not plugin:
+          print("MALFORMED — plugin.json version unreadable"); sys.exit(1)
+      if missing:
+          print("MISSING marker: " + ", ".join(missing)); sys.exit(1)
+      if stale:
+          print("STALE vs plugin " + plugin + ": " + ", ".join(stale)); sys.exit(1)
+      print("OK (" + str(len(ok)) + " i18n READMEs current @ " + plugin + ")" if ok else "OK (no i18n READMEs present)")
+      PYEOF
+    severity: warning
+    fix: |
+      root i18n README 正文滞后于 plugin 版本。以当前 README.md 为源重新同步滞后语种,
+      并把各文件顶部 <!-- translated-from: vX.Y.Z --> 标记更新到当前版本。
+      参考 openspec/archive/*-aria-i18n-readme-full-resync。
+    timeout_seconds: 5
+    enabled: true

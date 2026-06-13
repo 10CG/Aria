@@ -338,6 +338,12 @@ Skill 基准测试 (新增或修改 Skill 时):
         # 根因记录: root README badge 是 plugin 版本的派生显示, 但不在 aria/ 子模块 SOT 内,
         # 每次 plugin bump 易漏 → 连续两次 ship (v1.44→45, v1.45→46) 都滞后一版。
         # 自动兜底: custom check m6-version-badge-match (.aria/state-checks.yaml) 每次 scan 检出 DRIFT。
+  - [ ] 主项目 root i18n README (README.{zh,ja,ko}.md) — 仅当本次发版有 README.md **正文实质变更** 时同步:
+        # 以 README.md (英文 SOT) 为源重译滞后语种 + 更新各文件顶部 <!-- translated-from: vX.Y.Z --> 标记。
+        # 策略 (Issue #140, aria-i18n-readme-full-resync B 档): full-translation 维护; 纯 badge/patch 无需重译
+        # (每 patch 重译正是滞后根因)。advisory-over-hardlock。
+        # 自动兜底: custom check i18n-readme-translation-currency 比对 translated-from 标记 vs plugin 版本,
+        # 检出正文滞后 (非仅 badge — #140 核心: badge current 但正文旧更误导)。
 
 多远程推送 (v1.15.0+ 自动化):
   - [x] Phase C.2.5 自动推送所有 enforced remote + post-push SHA 验证 (见 aria/skills/phase-c-integrator/SKILL.md)

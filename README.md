@@ -130,20 +130,20 @@ Each phase has a dedicated Skill that ensures consistent, repeatable workflows:
 
 ## What You Get
 
-### Skills (33 user-facing + 3 internal)
+### Skills (34 user-facing + 7 internal = 41 total)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
 | **Cycle Core** | state-scanner, workflow-runner, phase-a-planner, phase-b-developer, phase-c-integrator, phase-d-closer, spec-drafter, task-planner, progress-updater | Structured ten-step workflow |
 | **Collaborative Thinking** | brainstorm | Structured brainstorming sessions |
 | **Git Workflow** | commit-msg-generator, strategic-commit-orchestrator, branch-manager, branch-finisher | Commit and branch management |
-| **Dev Tools** | subagent-driver, agent-router, tdd-enforcer, requesting-code-review | TDD enforcement, code review |
-| **Architecture Docs** | arch-common, arch-search, arch-update, arch-scaffolder, api-doc-generator | Keep docs in sync with code |
-| **Requirements** | requirements-validator, requirements-sync, forgejo-sync, openspec-archive | Requirement tracking |
+| **Dev Tools** | subagent-driver, tdd-enforcer, requesting-code-review | TDD enforcement, code review |
+| **Architecture Docs** | arch-search, arch-update, arch-scaffolder, api-doc-generator | Keep docs in sync with code |
+| **Requirements & Issues** | requirements-validator, requirements-sync, forgejo-sync, openspec-archive, issue-triage | Requirement tracking and issue triage |
 | **Project Adaptation** | project-analyzer, agent-gap-analyzer, agent-creator | Analyze projects, identify Agent gaps, generate configs |
-| **Feedback** | aria-report | Bug reports and feature requests |
-| **Dashboard** | aria-dashboard | Project progress visualization |
-| **Infrastructure** | config-loader, audit-engine, agent-team-audit *(internal)* | Configuration, audit orchestration |
+| **Observability & Estimation** | aria-context-monitor, ai-native-estimator, aria-dashboard | Context/token telemetry, workload estimation, progress visualization |
+| **Feedback & Diagnostics** | aria-report, aria-doctor | Bug reports and environment health checks |
+| **Infrastructure** *(7 internal, non-user-invocable)* | config-loader, audit-engine, agent-team-audit, agent-router, arch-common, git-remote-helper, aria-token-telemetry | Configuration, audit orchestration, task routing, shared infra |
 
 ### Agents (11)
 
@@ -218,8 +218,8 @@ Aria/
 │   ├── core/                   # Core definitions (ten-step cycle)
 │   ├── openspec/               # Requirement spec format
 │   └── conventions/            # Conventions (git commit, etc.)
-├── aria/                       # Aria Plugin (submodule, v1.13.0)
-│   ├── skills/                 # 36 Skills (33 user-facing + 3 internal)
+├── aria/                       # Aria Plugin (submodule)
+│   ├── skills/                 # 41 Skills (34 user-facing + 7 internal)
 │   ├── agents/                 # 11 Agents (with STCO descriptions + capabilities)
 │   └── .claude-plugin/         # Plugin configuration
 ├── aria-plugin-benchmarks/     # Skill benchmark suite
