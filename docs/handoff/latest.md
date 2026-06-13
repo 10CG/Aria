@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #144-TRACKBOARD-F5 — ✅ **DONE: aria-plugin #144 track-board-coordination-stale-bar ship v1.46.2** (2026-06-13 #2, simonfishgit/dev-claude)
+## ★ 最新 session #F1-COORDREF-LIB — ✅ **DONE: aria-plugin F1 coordination-ref-lib-run-parity ship v1.46.3** (2026-06-13 #3, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-track-board-coordination-stale-bar-shipped.md](./2026-06-13-track-board-coordination-stale-bar-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-coordination-ref-lib-run-parity-shipped.md](./2026-06-13-coordination-ref-lib-run-parity-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-F1-COORDREF display)**: [2026-06-13-coordination-ref-lib-run-parity-shipped.md](./2026-06-13-coordination-ref-lib-run-parity-shipped.md) — owner "修 F1" → 验证 lib 有自己的 _run (独立于 collectors/_common, #61/#143 加固只打了 collector → 潜伏崩溃/locale) → owner 选 "修 a+b" → Level 2 (post_spec R1 2/3 REVISE 3 major 测试落点太松 → R2 3/3 PASS) → lib _run 加 #61/#143 + fetch_coordination_ref benign-absent (镜像 collector 复制非 import 防 layering) → 7 lib-直测 (非 mock wholesale) + 97 coordination 测试全过 + 818 全绿 → code-review PASS → aria PR #85 merge `0ccf42e` + release `82e0e75`, **v1.46.3**。F1 收口 (无 issue)。**🏁 #141 派生 F1-F5 全收口**: F1 fixed / F2 仍 open 低优 / F3=#142 wont-fix / F4=#143 fixed / F5=#144 fixed。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI (F2 低优)。
+
+## (前次) session #144-TRACKBOARD-F5 — aria #144 track-board v1.46.2 (2026-06-13 #2)
 
 **Latest (T-144-TRACKBOARD display)**: [2026-06-13-track-board-coordination-stale-bar-shipped.md](./2026-06-13-track-board-coordination-stale-bar-shipped.md) — owner "修 F5 #144" → 验证诊断 (track_board 确不读 errors[], half-silent 属实) → **Level 1** (render-only 低 blast-radius, 无 OpenSpec) → render_track_board 加黄条 "⚠ 协调 ref 未取到 ..." gate errors[] coordination_ref_fetch_failed → code-review PASS (errors[] 耦合优于备选 + M-1 fail-soft) → aria PR #84 merge `3e3cdc6` + release `bfcd47a`, **v1.46.2**。#144 fixed。**本 session F3/F4/F5 全收口** (#142 wont-fix / #143 fixed / #144 fixed)。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI (F1 / F2 低优)。
 
