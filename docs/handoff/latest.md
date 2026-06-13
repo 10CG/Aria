@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #F1-COORDREF-LIB — ✅ **DONE: aria-plugin F1 coordination-ref-lib-run-parity ship v1.46.3** (2026-06-13 #3, simonfishgit/dev-claude)
+## ★ 最新 session #F2-RUN-TIMEOUT — ✅ **DONE: aria-plugin F2-minimal lib _run timeout ship v1.46.4** (2026-06-13 #4, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-coordination-ref-lib-run-parity-shipped.md](./2026-06-13-coordination-ref-lib-run-parity-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-coordination-ref-run-timeout-shipped.md](./2026-06-13-coordination-ref-run-timeout-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-F2-RUNTIMEOUT display)**: [2026-06-13-coordination-ref-run-timeout-shipped.md](./2026-06-13-coordination-ref-run-timeout-shipped.md) — owner "修 F2" → 澄清歧义 (F2 两读法) + 验证价值 (最低价值剩余项; timeout 唯一真实有用, dedup/耦合解耦风险 refactor) → owner 选 Minimal → Level 1 → lib _run 加 timeout=30 + TimeoutExpired→124 + None-guard (跳过 rc 对齐保 -1 防破坏 callers) → code-review PASS (全 11 callers 优雅处理 rc=124) → aria PR #86 merge `ffdbec5` + release `1961f6c`, **v1.46.4**。F2-minimal 收口 (无 issue); dedup+耦合解耦 backlog。**🏁 #141 派生 F1-F5 全处置**: F1 fixed v1.46.3 / F2 timeout-slice fixed v1.46.4 [余 backlog] / F3=#142 wont-fix / F4=#143 fixed / F5=#144 fixed。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI backlog (F2 dedup 低优)。
+
+## (前次) session #F1-COORDREF-LIB — aria F1 coordination-ref-lib-run-parity v1.46.3 (2026-06-13 #3)
 
 **Latest (T-F1-COORDREF display)**: [2026-06-13-coordination-ref-lib-run-parity-shipped.md](./2026-06-13-coordination-ref-lib-run-parity-shipped.md) — owner "修 F1" → 验证 lib 有自己的 _run (独立于 collectors/_common, #61/#143 加固只打了 collector → 潜伏崩溃/locale) → owner 选 "修 a+b" → Level 2 (post_spec R1 2/3 REVISE 3 major 测试落点太松 → R2 3/3 PASS) → lib _run 加 #61/#143 + fetch_coordination_ref benign-absent (镜像 collector 复制非 import 防 layering) → 7 lib-直测 (非 mock wholesale) + 97 coordination 测试全过 + 818 全绿 → code-review PASS → aria PR #85 merge `0ccf42e` + release `82e0e75`, **v1.46.3**。F1 收口 (无 issue)。**🏁 #141 派生 F1-F5 全收口**: F1 fixed / F2 仍 open 低优 / F3=#142 wont-fix / F4=#143 fixed / F5=#144 fixed。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI (F2 低优)。
 
