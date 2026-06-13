@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #143-LOCALE-HARDENING — ✅ **DONE: aria-plugin #143+#142 git-stderr-locale-hardening ship v1.46.1** (2026-06-13, simonfishgit/dev-claude)
+## ★ 最新 session #144-TRACKBOARD-F5 — ✅ **DONE: aria-plugin #144 track-board-coordination-stale-bar ship v1.46.2** (2026-06-13 #2, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md](./2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-13-track-board-coordination-stale-bar-shipped.md](./2026-06-13-track-board-coordination-stale-bar-shipped.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-144-TRACKBOARD display)**: [2026-06-13-track-board-coordination-stale-bar-shipped.md](./2026-06-13-track-board-coordination-stale-bar-shipped.md) — owner "修 F5 #144" → 验证诊断 (track_board 确不读 errors[], half-silent 属实) → **Level 1** (render-only 低 blast-radius, 无 OpenSpec) → render_track_board 加黄条 "⚠ 协调 ref 未取到 ..." gate errors[] coordination_ref_fetch_failed → code-review PASS (errors[] 耦合优于备选 + M-1 fail-soft) → aria PR #84 merge `3e3cdc6` + release `bfcd47a`, **v1.46.2**。#144 fixed。**本 session F3/F4/F5 全收口** (#142 wont-fix / #143 fixed / #144 fixed)。**Next**: owner 四项 (block-flip / M6 #2 168h / #136 / #140) > AI (F1 / F2 低优)。
+
+## (前次) session #143-LOCALE-HARDENING — aria #143+#142 git-stderr-locale v1.46.1 (2026-06-13)
 
 **Latest (T-143-LOCALE display)**: [2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md](./2026-06-13-state-scanner-git-stderr-locale-hardening-shipped.md) — `/aria:state-scanner` → owner "修 #142" → 验证 ls-remote absent=hidden=rc2 (git 不可解) → owner 选 ③ 合并 #142+#143 → Level 2 (post_spec R1 2/4 REVISE 3 major → R2 4/4 PASS) → 实施 _run LC_ALL=C (全 git-collector 英文 stderr 匹配任意 locale 可靠; env 断言 host-locale-agnostic + CJK 真测; 805 全绿 + 138 git-collector 零回归) → code-review PASS → aria PR #83 merge `2976dc3` + release `528d4af`, **v1.46.1**。#143 fixed / #142 wont-fix (git 协议不可解)。前序: badge 根治 `13bf409` + 3 follow-up 开 #142/#143/#144。**Next**: owner 四项 > AI (F5 #144 track_board / F1 / F2)。
 
