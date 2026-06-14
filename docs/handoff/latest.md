@@ -11,9 +11,15 @@
 
 ---
 
-## ★ 最新 session #140-I18N-RESYNC — ✅ **DONE: i18n README 全量重译 v1.10.0/v1.7.2 → v1.46.4 + 防再漂 backstop (#140)** (2026-06-13 #6, simonfishgit/dev-claude)
+## ★ 最新 session #BLOCK-FLIP-TELEMETRY — ✅ **DONE: block-flip 重启诊断 + submodule-gate telemetry timeout 修复 (v1.46.5)** (2026-06-14, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-13-i18n-readme-full-resync.md](./2026-06-13-i18n-readme-full-resync.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-14-block-flip-restart-telemetry-fix.md](./2026-06-14-block-flip-restart-telemetry-fix.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+
+**Latest (T-BLOCKFLIP-TELEMETRY display)**: [2026-06-14-block-flip-restart-telemetry-fix.md](./2026-06-14-block-flip-restart-telemetry-fix.md) — owner "block-flip 重启" → recon 发现重启前置 ≥3 gate executions **无法靠等待满足**: tripwire 已绿 (2 clean host-cron) 但 executions=0/6 次 gitlink commit。**根因实测 (exit 124)**: R-fix-1 (v1.40.0) telemetry hook 的 `log_execution` 在 per-submodule forgejo fetch 后, fetch hang 超 hook `timeout 15` → gate 杀于记录前 (R-fix-1 未真闭合 gap)。owner **Path A 修 telemetry**: WARN 跳过 per-sub fetch (O(N)→O(1) 本地 refs) + bounded_fetch + hook wrap 15→25 + hooks.json 20→30; dogfood WARN 完成 9s + 记录真实 PASS。gate 14 PASS (新 scenario_11) / hook 7 / 821 OK。aria PR #87 `28c1a4d` + 主仓 `3fd376a` 双远程; i18n badge+marker 机械同步 v1.46.5。**block-flip 解锁**: 待 ≥3 真 executions 自 future ships 累积 → Trigger B flip (owner; D+42=2026-07-05)。memory `feedback_telemetry_verify_records_in_prod_not_just_code_exists`。**Next**: block-flip flip 监控 (查 executions.jsonl ≥3) > M6 #2 168h / #136 > #145 小修 / M7。
+
+## (前次) session #140-I18N-RESYNC — ✅ **DONE: i18n README 全量重译 v1.10.0/v1.7.2 → v1.46.4 + 防再漂 backstop (#140)** (2026-06-13 #6, simonfishgit/dev-claude)
+
+**Latest (T-140-I18N pointer, superseded by #BLOCK-FLIP)**: [2026-06-13-i18n-readme-full-resync.md](./2026-06-13-i18n-readme-full-resync.md) — superseded; 置顶 bare `**Latest**:` (#BLOCK-FLIP-TELEMETRY) 是当前 session 入口
 
 **Latest (T-140-I18N display)**: [2026-06-13-i18n-readme-full-resync.md](./2026-06-13-i18n-readme-full-resync.md) — #140 翻译版 README 正文滞后 30+ 版 (zh v1.10.0 / ja·ko v1.7.2 stub) → owner 选**三语全量重译** (Level 2 `aria-i18n-readme-full-resync`, 防再漂 **B 档**)。英文源校准 (Skills 36→**41** [34+7], agent-router/arch-common 归位 internal, 补 issue-triage, 移除 v1.13.0 残留) + zh/ja/ko 全量重译 (ja·ko 70 行 stub → 275 行, 三语 badge → v1.46.4, 移除"准备中"免责) + 防再漂 (`<!-- translated-from: v1.46.4 -->` 标记 + 新 state-check `i18n-readme-translation-currency` 检测正文滞后非仅 badge; dogfood scan.py PASS + 负向确证) + CLAUDE.md release checklist。commit `669ef60` 双远程齐平;Spec archived;**#140 closed [fixed]** (comment-12927, body 完整保留)。**Next**: owner 三项 (block-flip / M6 #2 168h / #136) > AI backlog (#145 小修 / M7 registry brainstorm)。
 
