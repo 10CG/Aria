@@ -170,3 +170,35 @@ checks:
       参考 openspec/archive/*-aria-i18n-readme-full-resync。
     timeout_seconds: 5
     enabled: true
+
+  # --- block-flip restart 监控 (owner reminder 2026-06-14; telemetry fixed v1.46.5) ---
+  - name: "block-flip-executions-progress"
+    description: |
+      block-flip 重启监控 (替代"1-2 周后查"一次性提醒, 每次 scan 自动 surface 进度)。
+      统计 aria/metrics/submodule-gate-executions.jsonl 的真实 telemetry executions
+      (mode=warn, telemetry hook 记录的真实 gitlink-bump ship), 追踪是否达 Trigger B
+      的 ≥3 minimum-observation guard。
+      - <3: 信息性进度 (pass)。telemetry 已修 v1.46.5, 但需 **active plugin ≥v1.46.5**
+        (现 cache v1.46.0 是旧 hook) + future ships gitlink bump 才累积。
+      - ≥3: WARNING (fail) 提示 owner 评估 Trigger B flip (block-flip Spec 仍 in changes/)。
+      根因/Spec: openspec/changes/aria-submodule-gate-block-flip/proposal.md §2026-06-14 RESTART。
+    command: |
+      F=aria/metrics/submodule-gate-executions.jsonl
+      if [ ! -f "$F" ]; then
+        echo "OK 0/3 executions (telemetry fixed v1.46.5; 需 plugin 更新 ≥v1.46.5 + future ship gitlink bump 累积)"; exit 0
+      fi
+      N=$(grep -c '"mode":"warn"' "$F" 2>/dev/null || echo 0)
+      N=$(printf '%s' "$N" | tr -dc '0-9'); [ -z "$N" ] && N=0
+      if [ "$N" -ge 3 ]; then
+        echo "READY ${N}/3 block-flip telemetry executions → 评估 Trigger B flip (确认是真实 ship 非手动测试 + tripwire 绿)"; exit 1
+      fi
+      echo "OK ${N}/3 executions (block-flip accumulating; telemetry fixed v1.46.5, 需 active plugin ≥v1.46.5)"; exit 0
+    severity: warning
+    fix: |
+      block-flip restart: ≥3 真实 telemetry gate executions 已累积 → 评估 warn→block flip
+      (phase-c-integrator SKILL.md §C.2.4.5)。确认 (a) executions 是真实 ship 非手动 gate
+      测试; (b) tripwire 仍绿 (submodule-gate-misses.jsonl tripwire_run:clean); (c) 在
+      D+42=2026-07-05 前 → prompt owner Trigger B flip。
+      Spec: openspec/changes/aria-submodule-gate-block-flip/proposal.md §2026-06-14 RESTART。
+    timeout_seconds: 5
+    enabled: true
