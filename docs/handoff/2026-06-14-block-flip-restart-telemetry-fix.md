@@ -20,6 +20,7 @@ updated-at: 2026-06-14T14:24:46Z
 2. Phase 1.15 自动 surface 本 doc。
 3. **本 session 无 in-flight 可 resume** — v1.46.5 已 ship + 双远程 parity; block-flip Spec 状态已更新 (待真 executions 累积, 非本 session 动作)。
 4. **block-flip 重启进展**: telemetry blocker 已修, 重启**前置变了** —— 不再是"修 telemetry", 而是 (1) 等 ≥3 真实 gate executions 自 future ships 自然累积 (telemetry 现可用) + (2) owner 确认 Trigger B flip。详见 §2。
+5. **✅ Session-end (2026-06-14): owner 已 `/plugin update aria` → active plugin = v1.46.5 + `/reload-plugins`**。cache `1.46.5` 含 WARN-skip 修复 + hook timeout 25 = **telemetry 修复现已 LIVE** (前提"active plugin ≥v1.46.5"满足)。→ 下个 gitlink-bump ship 起真实 executions 自动累积; `/state-scanner` 的 `block-flip-executions-progress` check 追踪 N/3, ≥3 自动提示 flip。
 
 ---
 
