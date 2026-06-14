@@ -1,7 +1,7 @@
 # aria-submodule-gate-block-flip — v1.29.0 warn→block 翻转
 
 > **Level**: 2 (Minimal — proposal.md only; mechanism 全部继承自 parent Spec #124)
-> **Status**: ⏸️ **DEFERRED (2026-06-07 D+14, NOT flipped)** — Trigger C (0 gate executions) + tripwire 验活 5/5 失败 → 两层防御无 live 证据 → owner-approved 规则降级 defer (见下 §D+14 OUTCOME)。机制层经 `aria-submodule-gate-operationalize` (R-fix-1 v1.40.0 + R-fix-2 v1.41.0, 已归档) **已 unblock**; 重启剩 owner 动作 (b) 攒 ≥3 真实 gate executions (host-cron 已装, tripwire 已绿)。新 hard date TBD (max D+42=2026-07-05)。*(原 Phase A.2 CONVERGED Approved 2026-05-25 via R1→Rev1→R2 PWW unanimous 3/3; ship deadline 2026-06-07 已过, 转 defer)*。
+> **Status**: ⏸️ **DEFERRED — telemetry blocker 已修 v1.46.5 (2026-06-14), 待 ≥3 真 executions 累积 → Trigger B flip**。原 D+14 (2026-06-07) defer 因 Trigger C (0 gate executions) + tripwire 5/5 失败。**2026-06-14 重启诊断**: tripwire 已绿 (2 clean host-cron runs), 但 executions 仍 0 —— **根因实测 (exit 124)**: R-fix-1 (v1.40.0) telemetry hook 的 `log_execution` 在 per-submodule forgejo fetch 之后, fetch hang 超 hook timeout → gate 杀于记录前 (R-fix-1 未真闭合 invocation gap)。owner Path A → **v1.46.5 修复** (WARN 跳过 per-sub fetch + bounded_fetch + timeout 加宽; dogfood: WARN 记录真实 execution)。重启剩: ≥3 真实 gate executions 自 future ships 累积 (telemetry 现可用) + owner 确认 flip。新 hard date TBD (max D+42=2026-07-05)。见下 §2026-06-14 RESTART。*(原 Phase A.2 CONVERGED Approved 2026-05-25; ship deadline 2026-06-07 已过, 转 defer)*。
 > **Change ID**: `aria-submodule-gate-block-flip`
 > **Parent Spec**: `openspec/archive/2026-05-24-aria-submodule-pointer-regression-gate/` (Approved 2026-05-24, R1+R2 4-agent CONVERGED 3/3 unanimous)
 > **Parent Forgejo issue**: [Aria #124](https://forgejo.10cg.pub/10CG/Aria/issues/124) (state=closed, closed_at 2026-05-24T17:19:41Z — verified via API)
@@ -12,6 +12,17 @@
 >
 > ---
 > **🔴 D+14 OUTCOME (2026-06-07): DEFERRED — NOT flipped.** Trigger C (0 gate executions) + tripwire 验活 run #11 = FAILURE (历史 5/5 全失败, 兜底从未运行) → option b 的"独立兜底"前提不满足 → owner-approved 规则降级 (c) defer。根因待修: R-fix-1 telemetry invocation gap (git 直驱绕过脚本) + R-fix-2 tripwire run failure。新 hard date TBD (max D+42=2026-07-05)。详见 `.aria/decisions/2026-06-07-v1.40.0-block-flip.md` §FINAL DECISION。Spec 保留在 changes/ 不归档。
+>
+> ---
+> **🟡 2026-06-14 RESTART DIAGNOSIS — telemetry blocker 修复, 待真数据.** owner "block-flip 重启" → 系统 recon 两前置:
+> - **tripwire (R-fix-2): ✅ 已绿** — `aria/metrics/submodule-gate-misses.jsonl` 有 2 条 `tripwire_run:clean` (2026-06-08, host-cron `0 4 * * 0` 已装)。D+14 的 tripwire failure 已由 host-cron 迁移 (v1.41.0 R-fix-2) 解决。
+> - **gate executions (R-fix-1): ❌ 仍 0 → 根因实测.** `submodule-gate-executions.jsonl` 不存在 / 6 次 gitlink commit 0 记录。active plugin v1.46.0 含 telemetry hook (排除"没装")。**复现 exit 124**: gate 的 `log_execution` 在 per-submodule `git fetch origin` 之后; Aria 3 个 submodule (standards/aria/aria-orchestrator) origin 均 forgejo (CF-Access), aria/aria-orch fetch hang 超 hook `timeout 15` → gate 被杀于 log_execution 前 → **R-fix-1 (v1.40.0) 实际未闭合 invocation gap** (D+14 Trigger C 根因持续)。
+>
+> **判定**: 重启前置 ≥3 executions **不是观察窗口问题, 是 telemetry 代码 bug** —— extend 等待徒劳。owner A/B/C 三路径 → 选 **A: 先修 telemetry 再攒真数据**。
+>
+> **修复 (v1.46.5, Level 1)**: `submodule_gate.sh` WARN/telemetry 模式跳过 per-sub fetch (O(N)→O(1) 本地 refs, WARN 仅 advisory) + `bounded_fetch` (timeout 包裹防无限 hang) + hook wrap 15→25 + hooks.json 20→30; block/merge-flow fetch 不变 (authoritative)。dogfood: WARN 完成 9s + 记录真实 PASS execution; gate 14 PASS (新 scenario_11) / hook 7 PASS / 821 OK。aria PR #87 merge `28c1a4d` 双远程。
+>
+> **重启剩余 (telemetry 现可用)**: (1) ≥3 真实 gate executions 自 future ships gitlink bump 自然累积 (frequent ship → 数天内可达); (2) owner 确认 Trigger B flip (或 D+42=2026-07-05 前 risk-accept)。Spec 仍保留在 changes/ 不归档。详见 `.aria/decisions/2026-06-07-v1.40.0-block-flip.md` + CLAUDE.md footer 2026-06-14。
 >
 > **⚠️ Ship-day prep amendment (2026-06-05, D+12 — per [[feedback_dec_ship_target_staleness_verify]])**:
 > 1. **版本目标校正**: `aria-plugin v1.29.0` → **v1.40.0** (插件本 session 已 ship 到 v1.39.0;v1.29.0 slot 早跳过)。全文 `v1.29.0+` 表述 (= block 成默认的版本) → `v1.40.0+`。main repo v1.7.1 slot 仍空闲 ✓。
