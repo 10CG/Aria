@@ -412,8 +412,11 @@ M3 (Week 13-16+)  Layer 2 cycle close + GLM 多模型 routing + Crash recovery (
 M4 (Week 17-19)   Human gate + Feishu 审批 (60h, US-024 brainstorm Q8' β' lock 2026-05-07)
 M5 (Week 20-25)   Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable (~120h, M3+M4 carryover scope 重估)
 M6 (Week 26-30)   E2E testing + docs + v2.0.0 release (~82h, US-026 brainstorm Q-final-1 Menu C lock 2026-05-24)
+M7 (post-v2.0.0)  aria-fleet 落地 (参考实现层): 跨项目只读聚合 tool pack + agent 生命周期管理 [US-028]
+                  (planning 2026-06-18; 2 sub-Spec Draft in openspec/changes/aria-2.0-m7-*;
+                   D1-D6 Approved 2026-05-27; **Phase B 时机门 = M6 ship 后**, 不计入 v2.0.0 合计)
 ─────────────────────────────────────────────────────
-合计:             ~807h ≈ 32 周单人 / 9.5 月 50% 投入  (845h - 38h M6 reframe)
+合计:             ~807h ≈ 32 周单人 / 9.5 月 50% 投入  (845h - 38h M6 reframe); M7 post-v2.0.0 另计
 
 **M4 reframe (2026-05-07, US-024 brainstorm Q1=A + Q8' β')**:
   - 旧: M4 (Week 17-21) Crash recovery + Replay + Reconciler (80h);
@@ -600,6 +603,7 @@ Out of scope:
 | US-025 | Aria 2.0 M5 — Replay + Reconciler 深度增强 + 防漂移 + Review loop + 审计日志 immutable | M5 | MEDIUM | (Layer 1 done 2026-05-15 Phase 1-6; T-deploy + Tier-1 live LLM gates + Tier-2 N≥3 owner-deferred to D.2 sign-off; Layer 2 review-loop container behavior 推 M6 H项) |
 | US-026 | Aria 2.0 M6 — v2.0 文档体系 + CLAUDE.md 修订 | M6 | MEDIUM |
 | US-027 | Aria 2.0 — Cost routing + 预算控制 (跨 milestone) | M3-M6 | MEDIUM |
+| US-028 | Aria 2.0 M7 — aria-fleet 落地: 跨项目只读聚合 tool pack + agent 生命周期管理 (post-v2.0.0; D1-D6 Approved 2026-05-27; 2 sub-Spec Draft 2026-06-18) | M7 | MEDIUM |
 
 ### OpenSpec Changes (待起草)
 

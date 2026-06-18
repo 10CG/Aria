@@ -3,8 +3,8 @@
 > **Level**: 3 (Full — 新建 tool pack 框架 + 取数模型 + 健康降维 + 接口 schema; 三个内部 task group)
 > **Status**: **Draft** (pending Phase A.2 audit → approval; 当前为 A.1 spec-drafter 产出, 未经 post_spec 审计收敛)
 > **Change ID**: `aria-2.0-m7-fleet-aggregation`
-> **Parent US**: ⚠️ 待立项 — PRD §US 中 US-027 = "Cost routing" (语义已占用), aria-fleet **无独立 US**; 须新建 US-028+ 作 aria-fleet tracker (规范先行, Phase A.2 approval 前补)。当前上游 = #128 + 下列 memos
-> **Parent PRD**: ⚠️ prd-aria-v2.md 里程碑止于 M6, **无 §M7** (实测 grep 零命中); M7 aria-fleet 尚未写入 PRD。规范先行: Phase A.2 approval 前须补 PRD M7 milestone stub 再正式立项。本 Spec 上游 = 下列 brainstorm memos + #128
+> **Parent US**: [US-028](../../../docs/requirements/user-stories/US-028.md) (Aria 2.0 M7 — aria-fleet 落地; 立 2026-06-18, 规范先行前置已补; **注**: US-027 = Cost-routing 语义已占用, aria-fleet 用独立 US-028)
+> **Parent PRD**: [prd-aria-v2.md](../../../docs/requirements/prd-aria-v2.md) §里程碑概览 M7 (post-v2.0.0) + §User Stories US-028 (M7 milestone stub 立 2026-06-18)
 > **Predecessor Spec**: aria-2.0-m6-release-closeout (M6 sequential, 消费 #2 e2e-resilience 证据; M6 ship 是 D3 时机门)
 > **Sibling Spec (M7 子能力 #1)**: aria-2.0-m7-agent-lifecycle (agent 生命周期管理 download-half-loop; 同属 M7, 两 sub-Spec 各自独立 MVP 边界, 无 ship 顺序硬依赖)
 > **Brainstorm Source**:

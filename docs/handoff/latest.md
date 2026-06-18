@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #BLOCK-FLIP-TELEMETRY — ✅ **DONE: block-flip 重启诊断 + submodule-gate telemetry timeout 修复 (v1.46.5)** (2026-06-14, simonfishgit/dev-claude)
+## ★ 最新 session #M7-FLEET-PLANNING — ✅ **DONE: M7 aria-fleet 双 brainstorm + 2 M7 OpenSpec 草稿 (planning, 无 ship)** (2026-06-18, simonfishgit/dev-claude)
 
-**Latest**: [2026-06-14-block-flip-restart-telemetry-fix.md](./2026-06-14-block-flip-restart-telemetry-fix.md) — pointer for scan.py collector `_LATEST_POINTER_RE` (bare `**Latest**:` no parens ensures next-session `/aria:state-scanner` Phase 1.15 surfaces 本 doc; T-suffixed entries below are display-only)
+**Latest**: [2026-06-18-m7-aria-fleet-brainstorm-openspec.md](./2026-06-18-m7-aria-fleet-brainstorm-openspec.md) — owner "M7 aria-fleet brainstorm" → "先 1 再 2" 双 brainstorm (轮1 agent 生命周期管理 / 轮2 fleet 跨项目只读聚合 MVP) → deep-research 对标 (22 源/25 对抗核实/4 方法论修正) → /goal 触发 **agent-team 动态工作流 (12 agents: 4 recon+2 draft+6 审计)** 起草 2 M7 OpenSpec (`openspec/changes/aria-2.0-m7-{fleet-aggregation,agent-lifecycle}/`, Status=**Draft**; post_spec R1 PASS_WITH_WARNINGS, 11 Important 全主 loop 落地)。**非 ship cycle** (插件不变 v1.46.5); 2 memo + #128 评论 `#issuecomment-13165`; commit `8d50cb8`/`1926654`/`fe93af5` 双远程 parity。**M6 ship 核查**: 7 天运营跑从未启动 (`.aria/probes/` 空, AC-1 FAIL) + AC-5 owner 评分 `[FILL]` → M6 ship 外部受阻 (owner 运营窗口, 不可伪造); /goal 含 M6-ship 前置 session 内不可达 → 无限 Stop-hook loop → owner `/goal clear`。**Next**: ⭐ 补 PRD M7 milestone stub + 新建 aria-fleet US (US-028+, US-027 已被 Cost-routing 占用) 解 M7 Spec approval 前置 > M6 ship (owner) > block-flip flip / #136。
+
+## (前次) session #BLOCK-FLIP-TELEMETRY — ✅ **DONE: block-flip 重启诊断 + submodule-gate telemetry timeout 修复 (v1.46.5)** (2026-06-14, simonfishgit/dev-claude)
+
+**Latest (T-BLOCKFLIP-TELEMETRY pointer, superseded by #M7-FLEET)**: [2026-06-14-block-flip-restart-telemetry-fix.md](./2026-06-14-block-flip-restart-telemetry-fix.md) — superseded; 置顶 bare `**Latest**:` (#M7-FLEET-PLANNING) 是当前 session 入口 (T-suffixed entries 为 display-only)
 
 **Latest (T-BLOCKFLIP-TELEMETRY display)**: [2026-06-14-block-flip-restart-telemetry-fix.md](./2026-06-14-block-flip-restart-telemetry-fix.md) — owner "block-flip 重启" → recon 发现重启前置 ≥3 gate executions **无法靠等待满足**: tripwire 已绿 (2 clean host-cron) 但 executions=0/6 次 gitlink commit。**根因实测 (exit 124)**: R-fix-1 (v1.40.0) telemetry hook 的 `log_execution` 在 per-submodule forgejo fetch 后, fetch hang 超 hook `timeout 15` → gate 杀于记录前 (R-fix-1 未真闭合 gap)。owner **Path A 修 telemetry**: WARN 跳过 per-sub fetch (O(N)→O(1) 本地 refs) + bounded_fetch + hook wrap 15→25 + hooks.json 20→30; dogfood WARN 完成 9s + 记录真实 PASS。gate 14 PASS (新 scenario_11) / hook 7 / 821 OK。aria PR #87 `28c1a4d` + 主仓 `3fd376a` 双远程; i18n badge+marker 机械同步 v1.46.5。**block-flip 解锁**: 待 ≥3 真 executions 自 future ships 累积 → Trigger B flip (owner; D+42=2026-07-05)。memory `feedback_telemetry_verify_records_in_prod_not_just_code_exists`。**Next**: block-flip flip 监控 (查 executions.jsonl ≥3) > M6 #2 168h / #136 > #145 小修 / M7。
 

@@ -3,8 +3,8 @@
 > **Level**: 3 (Full — net-new collection-repo skeleton + net-new materialization orchestrator Skill + lockfile schema + update-detector, spanning ①推荐→②加载→④更新-基础版 across L1/L2/L3; reuses 4 existing Skills as black-box dependencies but introduces a new orchestration layer + new artifact contract `.aria/agents-lock.yaml`)
 > **Status**: Draft (Phase A.1 起草; 待 post_spec audit + owner Approve)
 > **Change ID**: `aria-2.0-m7-agent-lifecycle`
-> **Parent US**: ⚠️ 待立项 — PRD §US 中 US-027 = "Cost routing" (语义已占用, **非** aria-fleet tracker; memo 曾误并 #128↔US-027), 且 `US-027.md` 文件不存在。aria-fleet 须新建独立 US (US-028+, 规范先行, Phase A.2 前补)。当前上游 = #128 + 下列 memos
-> **Parent PRD**: ⚠️ `prd-aria-v2.md` 里程碑止于 M6, **无 §M7** (实测 grep 零命中)。M7 aria-fleet 尚未写入 PRD; 规范先行: Phase A.2 approval 前须补 PRD M7 milestone stub。本 Spec 上游 = 下列 brainstorm memos (D1-D6 Approved) + #128
+> **Parent US**: [US-028](../../../docs/requirements/user-stories/US-028.md) (Aria 2.0 M7 — aria-fleet 落地; 立 2026-06-18, 规范先行前置已补; **注**: US-027 = Cost-routing 语义已占用, aria-fleet 用独立 US-028, memo 曾误并 #128↔US-027 已更正)
+> **Parent PRD**: [prd-aria-v2.md](../../../docs/requirements/prd-aria-v2.md) §里程碑概览 M7 (post-v2.0.0) + §User Stories US-028 (M7 milestone stub 立 2026-06-18)
 > **Sibling Spec (M7 并行子能力)**: `aria-2.0-m7-fleet-aggregation` (跨项目只读聚合 MVP, 来自 2026-06-18 memo; 与本 Spec 共享 aria-fleet L1/L2/L3 框架但 disjoint 交付物 — 本 Spec 管 agent 生命周期, sibling 管 state-snapshot 聚合)
 > **Brainstorm Source**: [.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md](../../../.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md) (§1 四决策收敛 + §2 六阶段飞轮 + §3 四块硬骨头 + §7 三层映射/M7 第一刀; owner 逐段确认通过 2026-06-16, 无正式 DEC) — 上游约束 [.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md](../../../.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md) (D1-D6 Approved, 本 Spec 不重议)
 > **Tracker**: Forgejo Aria #128 (M7 aria-fleet); Claude Code session-start 加载机制依据 #145 (动态 agent 当前 session 不可 spawn, 需重启)
