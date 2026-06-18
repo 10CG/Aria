@@ -640,8 +640,11 @@ PRD v2.0: Approved (2026-04-11) — M0-M5 done; M6 active (4 sub-Specs Approved 
           **M7 设计 brainstorm 已起步 (2026-06-18, 纯 planning 非 OpenSpec)**: 两子能力设计备忘录就绪 —
           agent 生命周期管理 `.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md`
           + fleet MVP 跨项目聚合 `.aria/notes/2026-06-18-aria-fleet-mvp-cross-project-aggregation.md`;
-          三层架构基线 `.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md` (D1-D6 Approved);
-          实施待 M6 ship 后据两份备忘录起 M7 OpenSpec
+          三层架构基线 `.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md` (D1-D6 Approved)。
+          **M7 OpenSpec 草稿已起 (2026-06-18, agent-team 动态工作流 + post_spec R1 审计)**:
+          `openspec/changes/aria-2.0-m7-fleet-aggregation/` + `aria-2.0-m7-agent-lifecycle/`
+          (各 proposal.md + tasks.md, **Status=Draft**)。**前置 (规范先行) 待补**: PRD M7 milestone stub +
+          aria-fleet 独立 US (US-027 已被 Cost-routing 占用); Phase B 仍受 D3 时机门 (M6 release-closeout ship 后)
 ```
 
 ### User Story 编号分区
