@@ -26,7 +26,7 @@
 >   1. `snapshot_read_only` — fleet 聚合器**绝不**改项目代码 / git / 任何非 `.aria/state-snapshot.json` 派生文件; ②刷新经 `scan.py` 幂等重生成派生快照不破此约 (caveat 见 §What B.2)
 >   2. `additive_schema_defensive_access` — 消费 snapshot post-v1.0 additive 字段 (design_deferred / pending_archive / issue_status / coordination_fetch / handoff_worktrees) **必须** 防御式访问 (`.get()` / `in` 检测), 不假设存在 (注: `issue_status` 顶层键在未配置 issue 扫描的项目可能缺失 → 用 `in` 检测顶层键存在; **无 `enabled` 子字段**, gating 由 config 决定)
 >   3. `no_cross_project_action` — MVP 只读; 不触发任何项目的 scan-as-action / ship / approval (区别于 ②刷新: 后者是聚合自身的取数动作, 不是对项目下指令)
-> **Audit trajectory**: post_spec R1 (2026-06-18, agent-team 对抗 panel 3 lens) = PASS_WITH_WARNINGS (0 Critical / 3 Important / 多 Minor); Important 全部主 loop 落地 (upm.configured=false phase fallback + AC-5 必测 case / issue_status `in`-检测无 enabled 子字段 / US-027·§M7 悬空引用更正)。**待**: owner approval + 规范先行前置 (PRD M7 milestone stub + aria-fleet 独立 US 立项) → 之后可开 Phase A.3/B。
+> **Audit trajectory**: **R1→R2 CONVERGED (2026-06-18)**。R1 (agent-team 3 lens) = PASS_WITH_WARNINGS (0 Critical / 3 Important / 多 Minor); Important 全部主 loop 落地 (upm.configured=false phase fallback + AC-5 必测 case / issue_status `in`-检测无 enabled 子字段 / frontmatter 悬空引用 → 锚定 US-028 + PRD M7)。**R2 (agent-team 3 lens) = unanimous PASS** (3/3, r1_landed=true, 0 residual/regression; live snapshot 机械核验 7 信号 path + US-028.md/PRD M7 锚点真实存在)。规范先行前置已补 (PRD M7 stub + US-028 立 2026-06-18)。**待**: owner Approve → Phase A.3; Phase B 受 D3 时机门 (M6 ship 后)。
 
 ---
 
