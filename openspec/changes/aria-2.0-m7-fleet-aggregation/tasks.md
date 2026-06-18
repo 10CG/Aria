@@ -2,7 +2,7 @@
 
 > **Spec**: [aria-2.0-m7-fleet-aggregation](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: **Draft** (pending Phase A.2 audit → approval; tasks 待 A.2 收敛后进 Phase A.3 agent 分配 → Phase B.1)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; ready for Phase A.3 agent 分配。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
 > **Created**: 2026-06-18
 > **Brainstorm Source**: `.aria/notes/2026-06-18-aria-fleet-mvp-cross-project-aggregation.md` (§2-§8) + D1-D6 (`.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md`)
 > **Estimated total**: ~26h impl (~11h TG-A + ~9h TG-B + ~6h TG-C); Phase A audit overhead ~1h

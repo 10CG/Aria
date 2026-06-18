@@ -1,7 +1,7 @@
 # Aria 2.0 M7 Spec — Fleet Cross-Project Read-Only Aggregation (MVP 第一刀)
 
 > **Level**: 3 (Full — 新建 tool pack 框架 + 取数模型 + 健康降维 + 接口 schema; 三个内部 task group)
-> **Status**: **Draft** (pending Phase A.2 audit → approval; 当前为 A.1 spec-drafter 产出, 未经 post_spec 审计收敛)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; Phase A.2 post_spec R1→R2 **CONVERGED** [R2 unanimous PASS 3/3]; ready for Phase A.3 agent 分配。**Phase B 受 D3 时机门 — M6 release-closeout ship 后方可开**)
 > **Change ID**: `aria-2.0-m7-fleet-aggregation`
 > **Parent US**: [US-028](../../../docs/requirements/user-stories/US-028.md) (Aria 2.0 M7 — aria-fleet 落地; 立 2026-06-18, 规范先行前置已补; **注**: US-027 = Cost-routing 语义已占用, aria-fleet 用独立 US-028)
 > **Parent PRD**: [prd-aria-v2.md](../../../docs/requirements/prd-aria-v2.md) §里程碑概览 M7 (post-v2.0.0) + §User Stories US-028 (M7 milestone stub 立 2026-06-18)

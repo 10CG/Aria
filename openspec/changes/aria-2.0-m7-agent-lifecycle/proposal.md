@@ -1,7 +1,7 @@
 # Aria 2.0 M7 Sub-Spec #1 — Agent Lifecycle Management (下行 pull 半环 MVP)
 
 > **Level**: 3 (Full — net-new collection-repo skeleton + net-new materialization orchestrator Skill + lockfile schema + update-detector, spanning ①推荐→②加载→④更新-基础版 across L1/L2/L3; reuses 4 existing Skills as black-box dependencies but introduces a new orchestration layer + new artifact contract `.aria/agents-lock.yaml`)
-> **Status**: Draft (Phase A.1 起草; 待 post_spec audit + owner Approve)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; Phase A.2 post_spec R1→R2 **CONVERGED** [R2 unanimous PASS 3/3]; ready for Phase A.3 agent 分配。**Phase B 受 D3 时机门 — M6 release-closeout ship 后方可开**)
 > **Change ID**: `aria-2.0-m7-agent-lifecycle`
 > **Parent US**: [US-028](../../../docs/requirements/user-stories/US-028.md) (Aria 2.0 M7 — aria-fleet 落地; 立 2026-06-18, 规范先行前置已补; **注**: US-027 = Cost-routing 语义已占用, aria-fleet 用独立 US-028, memo 曾误并 #128↔US-027 已更正)
 > **Parent PRD**: [prd-aria-v2.md](../../../docs/requirements/prd-aria-v2.md) §里程碑概览 M7 (post-v2.0.0) + §User Stories US-028 (M7 milestone stub 立 2026-06-18)

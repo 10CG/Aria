@@ -2,7 +2,7 @@
 
 > **Spec**: [aria-2.0-m7-agent-lifecycle](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: Draft (Phase A.1 起草; 待 post_spec audit + owner Approve)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; ready for Phase A.3 agent 分配。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
 > **Created**: 2026-06-18
 > **Brainstorm Source**: [.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md](../../../.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md) (§1/§2/§3/§7; owner 逐段确认 2026-06-16) + D1-D6 上游 (2026-05-27)
 > **Estimated total**: ~24h impl (单一 SoT; 与 proposal §Effort baseline 一致: TG-A ~6h + TG-B ~10h + TG-C ~4h + T-docs ~2h + ~2h buffer)
