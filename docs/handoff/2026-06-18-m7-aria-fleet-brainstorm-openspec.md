@@ -1,26 +1,26 @@
 ---
 track-id: aria-m7-fleet-planning
 owner-container: simonfishgit/dev-claude
-phase: A1-drafted
+phase: A-complete
 status: done
-updated-at: 2026-06-18T12:44:15Z
+updated-at: 2026-06-19T05:00:08Z
 ---
 
-# Aria — Session Handoff (2026-06-18) — M7 aria-fleet 双 brainstorm + M7 OpenSpec 起草 (planning, 无 ship)
+# Aria — Session Handoff (2026-06-18→19) — M7 aria-fleet 双 brainstorm + M7 OpenSpec **Phase A 全闭环** (planning, 无 ship)
 
-> **Status**: ✅ **DONE**（planning + Phase A.1 起草 session，**非 ship cycle / 不动插件版本**）。owner "M7 aria-fleet brainstorm" → "先 1 再 2" 双 brainstorm → deep-research 对标 → /goal 触发 agent-team 动态工作流起草 2 个 M7 OpenSpec 草稿。
-> **Cycle period**: 2026-06-15 → 2026-06-18（跨多日单 session）
-> **Next session 入口**: 读本 doc → `/aria:state-scanner` → §6。**下一步 = 补 PRD M7 stub + aria-fleet US（解锁 M7 Spec approval 前置）**。
+> **Status**: ✅ **DONE**（planning + **Phase A 全流程闭环** session，**非 ship cycle / 不动插件版本**）。owner "M7 aria-fleet brainstorm" → "先 1 再 2" 双 brainstorm → deep-research 对标 → /goal 触发 agent-team 动态工作流起草 2 个 M7 OpenSpec → **post_spec R1→R2 CONVERGED → owner Approved → Phase A.3 agent 分配 LOCKED**。
+> **Cycle period**: 2026-06-15 → 2026-06-19（跨多日单 session）
+> **Next session 入口**: 读本 doc → `/aria:state-scanner` → §6。**M7 Phase A 已全完成; 唯一阻塞 = M6 ship (owner 运营) 解 D3 → Phase B**。
 
 ---
 
 ## §0 入口（新 session 优先读）
 
 1. 运行 `/aria:state-scanner`，Phase 1.15 自动 surface 本 doc。
-2. **本 session 无 in-flight 可 resume** — 所有产物已 commit 双远程（主仓 `fe93af5`）。
-3. **核心产出**：M7 aria-fleet **两个 OpenSpec 草稿**已起（`openspec/changes/aria-2.0-m7-{fleet-aggregation,agent-lifecycle}/`，Status=**Draft**），经 post_spec R1 审计 + 11 Important 全落地。
-4. **下一步（owner 已排序）= 补 PRD M7 milestone stub + 新建 aria-fleet US（US-028+）** —— 这是 R1 审计标出的「规范先行」前置，解锁两 M7 Spec 正式 approval。
-5. **M6 ship 仍是 M7 Phase B 的硬时机门**（D3），且 **M6 ship 是 owner/外部依赖**（见 §3）：7 天运营跑（`.aria/probes/` 空，从未启动）+ AC-5 owner 人工评分（corpus `[FILL]` 空模板）。session 内无法完成，不可伪造。
+2. **本 session 无 in-flight 可 resume** — 所有产物已 commit 双远程（主仓 `3bf99e0`）。
+3. **核心产出**：M7 aria-fleet **两个 OpenSpec ✅ Approved**（`openspec/changes/aria-2.0-m7-{fleet-aggregation,agent-lifecycle}/`，**Phase A 全闭环**：A.1 起草 → A.2 post_spec **R1→R2 CONVERGED** [R2 unanimous PASS 6/6] → owner Approved → **A.3 agent 分配 LOCKED**）。规范先行前置已补（PRD §里程碑 M7 stub + **US-028**）。
+4. **M7 Phase A 已全完成** —— 唯一阻塞是 **Phase B 的 D3 时机门 = M6 ship**。可立即做的 AI 动作已无（A.3 已锁）。
+5. **M6 ship 是 owner/外部依赖**（见 §3）：7 天运营跑（`.aria/probes/` 空，从未启动）+ AC-5 owner 人工评分（corpus `[FILL]` 空模板）。session 内无法完成，不可伪造。M6 ship 后我接手 acceptance 编排 → v2.0.0 → M7 Phase B（按已锁 agent 分配 dispatch）。
 
 ---
 
@@ -36,8 +36,12 @@ updated-at: 2026-06-18T12:44:15Z
 | 落地修正 | post_spec R1 = PASS_WITH_WARNINGS（0 Critical / 11 Important 全主 loop 落地）+ grounding 验真 | commit `fe93af5` |
 | M6 ship 核查 | 亲跑 `check-m6-e2e-acceptance.py` → AC-1 FAIL（0/7 probe）+ AC-5 owner 评分 `[FILL]` → **确认 M6 ship 外部受阻** | — |
 | /goal clear | goal 含 session 内不可达前置（M6 ship）→ 无限 Stop-hook loop → owner clear | — |
+| **收尾 + 规范先行**（06-18→19） | session handoff 写入 + latest.md pointer 更新；补 PRD §里程碑 M7 stub + §US US-028 + 新建 US-028.md；两 Spec frontmatter 悬空引用 → 锚定 US-028/PRD M7 | commit `6ce393e` |
+| **post_spec R2 复审**（agent-team 3 lens × 2 Spec = 6 agents，新 run） | **6/6 unanimous PASS**，r1_landed=true 全条，0 Critical/Important residual/regression；2 Minor 处置（#128 标题 forgejo 核实 = "M7: aria-fleet implementation tracker" / audit-traj 措辞）→ **R1→R2 CONVERGED** | commit `e0f7517` |
+| **owner Approved** | 两 Spec Status Draft → Approved（+ US-028 + CLAUDE.md 同步） | commit `d2bd047` |
+| **Phase A.3 agent 分配 LOCKED** | 现有 roster 覆盖无 gap；两 Spec tasks.md 加 §Phase A.3 分配表（backend-architect 核心 / qa-engineer 测试 / knowledge-manager 文档 / tech-lead 架构评审 / code-reviewer post-impl） | commit `3bf99e0` |
 
-**本 session 无 ship cycle**（纯 planning + Phase A.1 起草；插件版本不变 v1.46.5；主项目版本不变）。
+**本 session 无 ship cycle**（纯 planning + **Phase A 全闭环**：A.1 起草 → A.2 R1→R2 CONVERGED → Approved → A.3 LOCKED；插件版本不变 v1.46.5；主项目版本不变）。
 
 ---
 
@@ -46,7 +50,7 @@ updated-at: 2026-06-18T12:44:15Z
 ### 高优先级
 | # | 项 | 性质 | 下一步 |
 |---|---|------|--------|
-| **H1** | **M7 两 Spec 正式 approval 前置** | AI-doable | **补 PRD M7 milestone stub + 新建 aria-fleet US（US-028+；US-027 已被 Cost-routing 占用）** → 再 R2 复审 → owner Approve（= owner 已排序的 [2]） |
+| ~~H1~~ | ✅ **DONE — M7 两 Spec Phase A 全闭环**（2026-06-19） | — | A.2 R1→R2 CONVERGED + owner Approved + A.3 agent 分配 LOCKED；规范先行前置已补（PRD §里程碑 M7 + US-028）。**Phase B 待 H2（M6 ship）解 D3 时机门** |
 | **H2** | **M6 ship**（= M7 Phase B 的 D3 时机门） | **owner/外部** | 启动 aria-layer1 7 天运营跑（168h Nomad uptime）+ 跑完 owner 评分 10 corpus 样本（AC-5）→ 我接手 `check-m6-e2e-acceptance` → `check-m6-release-readiness` → 归档 → v2.0.0 |
 | H3 | block-flip flip | telemetry 已修 v1.46.5 | 待 ≥3 真实 gate executions 累积（future ships）→ owner 确认 Trigger B；max D+42=2026-07-05 |
 | H4 | #136 Feishu secret 轮换 | owner | 代码脱敏已做，待 owner 轮换 webhook |
@@ -81,7 +85,7 @@ updated-at: 2026-06-18T12:44:15Z
 
 | 维度 | 涉及? | 状态 |
 |------|------|------|
-| OpenSpec | yes | 2 M7 sub-Spec 草稿新增（changes/，Draft）；M6 2 Spec 仍 approved 待 ship；block-flip deferred |
+| OpenSpec | yes | 2 M7 sub-Spec **Approved**（changes/，Phase A 全闭环 A.1→A.2 CONVERGED→Approved→A.3 LOCKED）；M6 2 Spec 仍 approved 待 ship；block-flip deferred |
 | aria-plugin | **no** | 版本不变 v1.46.5（无 ship） |
 | 主项目 | yes | CLAUDE.md 项目状态 2 次更新（brainstorm + OpenSpec 起草）；commit `8d50cb8`/`1926654`/`fe93af5` |
 | Auto-memory | yes | 2 new（见 §8） |
@@ -96,9 +100,9 @@ updated-at: 2026-06-18T12:44:15Z
 /aria:state-scanner
 ```
 
-1. ⭐ **H1 补 PRD M7 milestone stub + 新建 aria-fleet US（US-028+）** —— owner 已排序的下一步 [2]；解锁两 M7 Spec 正式 approval（规范先行）。完成后可 R2 复审 → Approve。
-2. **H2 M6 ship**（owner 外部运营）：启动 7 天跑 + corpus 评分 → 我接手 acceptance 编排 → v2.0.0 → 解 M7 Phase B 时机门。
-3. H3 block-flip flip（待真 executions）/ H4 #136 轮换（owner）。
+1. ⭐ **H2 M6 ship**（owner 外部运营，**M7 唯一阻塞**）：启动 aria-layer1 7 天运营跑（168h Nomad uptime）+ 跑完 owner 评分 10 corpus 样本（AC-5）→ 我接手 `check-m6-e2e-acceptance` → `check-m6-release-readiness` → 归档 → v2.0.0 → 解 M7 Phase B 时机门（D3）→ 按已锁 agent 分配 dispatch Phase B。
+2. H3 block-flip flip（待真 executions）/ H4 #136 轮换（owner）。
+3. **M7 Phase A 已全闭环**（A.1→A.2 CONVERGED→Approved→A.3 LOCKED），**无剩余 AI-doable 前置**；Phase B 纯 gated on H2。
 
 **不应该做的**：
 - 不要把"M6 ship"这类外部依赖写进单 session `/goal`（本 session 教训）。
@@ -110,10 +114,14 @@ updated-at: 2026-06-18T12:44:15Z
 ## §7 提交清单（multi-remote parity）
 
 ```
-[主仓 Aria]  master = fe93af5 | origin (forgejo) = github ✅ (parity 实测)
+[主仓 Aria]  master = 3bf99e0 | origin (forgejo) = github ✅ (parity 实测, 每 commit 后验)
   ├─ 8d50cb8  docs(notes): M7 双 brainstorm 2 设计备忘录
   ├─ 1926654  docs(claude-md): 项目状态记 M7 brainstorm
-  └─ fe93af5  feat(openspec): 起 M7 OpenSpec 2 sub-Spec 草稿 + post_spec R1
+  ├─ fe93af5  feat(openspec): 起 M7 OpenSpec 2 sub-Spec 草稿 + post_spec R1
+  ├─ 6ce393e  docs(m7): handoff + PRD M7 stub + US-028 (规范先行前置)
+  ├─ e0f7517  docs(m7): post_spec R2 CONVERGED — unanimous PASS
+  ├─ d2bd047  feat(openspec): M7 两 Spec owner Approved
+  └─ 3bf99e0  feat(openspec): M7 两 Spec Phase A.3 agent 分配 LOCKED
 [aria 子模块] 未碰 (28c1a4d)
 [standards]   未碰
 ```
@@ -130,8 +138,9 @@ updated-at: 2026-06-18T12:44:15Z
 |------|------|-------|
 | `feedback_static_benchmark_unfit_as_oneshot_selection_gate` | feedback | 固定测试集 pass/fail 不可当 agent/skill 择优 one-shot gate（基准可 harness-game + 排名不稳）；改 pairwise LLM-judge + live 集 + pass^k |
 | `reference_llm_judge_debiasing_trio` | reference | LLM-judge 去偏三件套（disjoint-family PoLL / position-swap / 五维 forced-choice）+ 引用源 |
+| `feedback_goal_hook_precondition_must_be_in_session_achievable` | feedback | `/goal` 条件不可含 session 内不可达的外部前置（时间/人工/基建）否则 Stop-hook 无限挡停；非"上限"可调，解法 /goal clear；受阻诚实上报不伪造 |
 
-**待补（本 session 教训，next session §4 #1 沉淀）**: `feedback_goal_hook_precondition_must_be_in_session_achievable` —— `/goal` 条件不可含 session 内不可达的外部前置（时间/人工/基建）。
+（3 new this session；MEMORY.md 索引已同步）
 
 ---
 
@@ -146,5 +155,5 @@ updated-at: 2026-06-18T12:44:15Z
 
 ---
 
-**Created**: 2026-06-18
-**Status**: ✅ DONE（planning + Phase A.1 起草）— M7 OpenSpec 草稿就绪，待 PRD M7 + US 前置 → approval；M6 ship 待 owner 运营窗口
+**Created**: 2026-06-18 | **Updated**: 2026-06-19（Approve + A.3 补入）
+**Status**: ✅ DONE（planning + **Phase A 全闭环**：A.1 起草 → A.2 R1→R2 CONVERGED → owner Approved → A.3 agent 分配 LOCKED）— 两 M7 Spec 可实施就绪；**唯一阻塞 = M6 ship（owner 运营窗口）解 D3 → Phase B**
