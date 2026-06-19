@@ -1,13 +1,13 @@
 [English](README.md) | **中文** | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-<!-- translated-from: v1.46.5 -->
+<!-- translated-from: v1.47.0 -->
 
 # Aria
 
 > 让 AI 成为你软件项目中真正的协作者
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.46.5-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.47.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -241,7 +241,7 @@ Aria/
 
 ```
 Project Version:  1.7.0
-Plugin Version:   1.46.5 (aria-plugin, 41 Skills + 11 Agents)
+Plugin Version:   1.47.0 (aria-plugin, 41 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
 Research Focus:   Reproducibility of AI collaboration patterns
