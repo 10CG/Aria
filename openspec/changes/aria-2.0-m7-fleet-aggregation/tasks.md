@@ -2,11 +2,11 @@
 
 > **Spec**: [aria-2.0-m7-fleet-aggregation](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; ready for Phase A.3 agent 分配。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; Phase A.3 agent 分配 LOCKED 2026-06-19 (见 §Phase A.3)。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
 > **Created**: 2026-06-18
 > **Brainstorm Source**: `.aria/notes/2026-06-18-aria-fleet-mvp-cross-project-aggregation.md` (§2-§8) + D1-D6 (`.aria/notes/2026-05-27-aria-fleet-three-layer-architecture.md`)
 > **Estimated total**: ~26h impl (~11h TG-A + ~9h TG-B + ~6h TG-C); Phase A audit overhead ~1h
-> **Agents**: (待 Phase A.3 分配) backend-architect (TG-A 取数+聚合 lead) + backend-architect/qa-engineer (TG-B 降维+接口) + knowledge-manager (TG-C workspace+文档)
+> **Agents (Phase A.3 LOCKED 2026-06-19)**: 见下 §Phase A.3 — Agent Allocation。无需新建 agent (现有 aria-plugin roster 覆盖)。
 
 ---
 
@@ -40,6 +40,23 @@ ls aria-orchestrator/hermes-extensions/aria-layer1/             # 须存在 (ext
 | TG-C-yaml | projects.yaml schema + config 校验 | §What C.1 | ~2h | knowledge-manager |
 | TG-C-schemaver | 跨 plugin schema 版本容忍 | §What C.2 | ~1.5h | knowledge-manager |
 | TG-C-docs | 三层映射 README + D1-D6 + Q-1..Q-5 | §What C.3 | ~2.5h | knowledge-manager |
+
+---
+
+## Phase A.3 — Agent Allocation (LOCKED 2026-06-19)
+
+> 现有 aria-plugin agent roster 完全覆盖本 Spec 任务类型, **无 coverage gap, 无需新建 agent** (agent-gap-analyzer 不触发)。Phase B 由 subagent-driver 按下表 dispatch。
+
+| Task Group | Primary Agent | 协同 | 分配理由 (capability match) |
+|------------|---------------|------|------------------------------|
+| TG-A 取数与聚合引擎 (L1 核心 Python) | `aria:backend-architect` | — | API/数据流/性能设计 → acquire/aggregate 引擎 + scan.py 退出码契约 + fail-soft 装配 |
+| TG-B 健康降维 (health.derive 7 信号) | `aria:backend-architect` | `aria:qa-engineer` (单测+防御断言) | 降维契约 = 数据建模; 7 信号 null/缺字段防御测试 = QA 强项 |
+| TG-B tool pack 接口 (fleet_status/project/blocked) | `aria:backend-architect` | — | 接口 schema (data+text) = API 设计 |
+| TG-C workspace 切片 + 三层文档 | `aria:knowledge-manager` | `aria:backend-architect` (projects.yaml schema/config) | README 三层映射 + 文档结构 = 知识管理; config schema = 后端 |
+| 跨切架构评审 (AD-M7-1/2/3 + L1/L2/L3 边界) | `aria:tech-lead` | — | 三层架构决策 + abi_compat 约束评审 (Phase B kickoff) |
+| Phase B post-implementation review | `aria:code-reviewer` | — | 规范合规 + 代码质量两阶段审查 (每 TG 完成后) |
+
+**分工原则** (memory `feedback_agent_team_dynamic_workflow_division`): 强依赖/零回归核心代码 (acquire/health/aggregate) 主 loop 亲自边验; 文档 (TG-C) + 单测落点交 workflow agent 并行 (disjoint 文件集)。
 
 ---
 

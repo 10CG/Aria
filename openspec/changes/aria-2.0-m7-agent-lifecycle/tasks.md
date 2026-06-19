@@ -2,11 +2,11 @@
 
 > **Spec**: [aria-2.0-m7-agent-lifecycle](./proposal.md)
 > **Level**: 3 (Full)
-> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; ready for Phase A.3 agent 分配。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
+> **Status**: ✅ **Approved** (owner sign-off 2026-06-18; post_spec R1→R2 CONVERGED; Phase A.3 agent 分配 LOCKED 2026-06-19 (见 §Phase A.3)。Phase B 受 D3 时机门 — M6 release-closeout ship 后)
 > **Created**: 2026-06-18
 > **Brainstorm Source**: [.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md](../../../.aria/notes/2026-06-16-agent-lifecycle-management-for-aria-fleet.md) (§1/§2/§3/§7; owner 逐段确认 2026-06-16) + D1-D6 上游 (2026-05-27)
 > **Estimated total**: ~24h impl (单一 SoT; 与 proposal §Effort baseline 一致: TG-A ~6h + TG-B ~10h + TG-C ~4h + T-docs ~2h + ~2h buffer)
-> **Agent allocation**: backend-architect (primary, TG-A/TG-B orchestrator + lockfile); qa-engineer (AC pytest 设计 + dogfood); tech-lead (Phase A.2 audit critic); code-reviewer (post_implementation)
+> **Agent allocation (Phase A.3 LOCKED 2026-06-19)**: 见下 §Phase A.3 — Agent Allocation。无需新建 agent (现有 aria-plugin roster 覆盖)。
 
 ---
 
@@ -20,6 +20,23 @@
 | T-docs | 文档 (SKILL.md / config schema / CLAUDE.md 信息地图 / standards 引用) | §Constraints + 信息地图 | ~2h |
 
 **依赖**: TG-A → TG-B (推荐/物化读库) → TG-C (更新读 lockfile + index)。T-docs 末尾。
+
+---
+
+## Phase A.3 — Agent Allocation (LOCKED 2026-06-19)
+
+> 现有 aria-plugin agent roster 完全覆盖本 Spec 任务类型, **无 coverage gap, 无需新建 agent**。**meta-note**: 本 Spec 实施的正是"agent 生命周期管理"能力本身, 但其 Phase B 实施仍用现成 plugin agent (非本 Spec 产出的集合库 agent — 那是 ship 后才有的产物)。Phase B 由 subagent-driver 按下表 dispatch。
+
+| Task Group | Primary Agent | 协同 | 分配理由 (capability match) |
+|------------|---------------|------|------------------------------|
+| TG-A 集合库骨架 (git repo layout + index + seed + L2 config) | `aria:backend-architect` | — | 目录契约 + index schema + L2 注入边界 = 系统/数据建模 |
+| TG-B 推荐+加载 orchestrator (核心新件) | `aria:backend-architect` | `aria:qa-engineer` (AC + dogfood) | 编排 4 Skill + 物化双层 + lockfile 原子写 = 后端核心; 物化/lockfile 测试 = QA |
+| TG-C 更新-基础版 detector | `aria:backend-architect` | `aria:qa-engineer` (三档处置单测) | semver 比较 + 三档处置逻辑 + 只读断言 |
+| T-docs (SKILL.md / config schema / 信息地图) | `aria:knowledge-manager` | — | SKILL.md progressive-disclosure + 文档结构 = 知识管理 |
+| 跨切架构评审 (AD-M7-1/2/3 + 三层映射 + session-start caveat) | `aria:tech-lead` | — | 集合库/lockfile/物化去 metadata 三决策评审 (Phase B kickoff) |
+| Phase B post-implementation review | `aria:code-reviewer` | — | 规范合规 + 代码质量两阶段审查 |
+
+**分工原则** (memory `feedback_agent_team_dynamic_workflow_division`): 强依赖/零回归核心 (物化 orchestrator + lockfile + detector) 主 loop 亲自边验 (memory `feedback_verify_edit_landed_grep_count`); 文档 (T-docs) + 单测交 workflow agent 并行 (disjoint 文件集)。
 
 ---
 
