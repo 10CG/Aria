@@ -152,6 +152,17 @@ Phase B.2 ~138h baseline 待新 session 启动。
 
 ---
 
+## [1.7.1] - 2026-06-21
+
+### submodule pointer gate warn→block flip (aria-plugin v1.49.0)
+
+主仓侧执行单元: aria 子模块 gitlink → v1.49.0 (`f3b7ac5`) + standards gitlink → `ddaf3d1` (block-flip wording + 并发 sister STD-GUIDE-003 吸收)。
+
+- C.2.4.5 submodule pointer regression gate 默认 mode `warn` → **`block`** (Trigger B: 5 gate executions + 4 clean host-cron tripwire + FP 0% + owner risk-accept 2026-06-21)。
+- 决策记录 `.aria/decisions/2026-06-21-v1.49.0-block-flip.md`; Spec 归档 `openspec/archive/2026-06-21-aria-submodule-gate-block-flip/`。
+- §B tripwire: host-cron (`0 4 * * 0`) 已运行 (v1.41.0 迁移), 无需 main repo workflow cron 追加 → 本 bump 仅 gitlink + doc, 保持 patch (1.7.0→1.7.1)。
+- Backward-compat: `mode=warn` legacy opt-out / `mode=off` bypass / env override 保留。
+
 ## [1.7.0] - 2026-05-10
 
 ### Added — phase-c-integrator pre-merge gate cycle ship (Spec: phase-c-integrator-pre-merge-gate, Forgejo Issue #60)
