@@ -529,6 +529,22 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 插件版本: v1.48.0 (aria-plugin, 34 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   warn-only mode + Forgejo hosts parameterization + CI backend abstraction;
+                  v1.48.0 = agent-team-audit-project-agent-augmentation #145 [PR #89 `a922e5c` 双远程]:
+                  agent-team-audit 选择 step 3 拆 3a 固定基线 / 3b 项目级 capabilities 增补 —
+                  `.aria/agents/` 中 capabilities 命中检查点"增补白名单"(pre_merge/post_implementation:
+                  security-audit, performance-optimization; post_spec 空, 锚定 capabilities-taxonomy.yaml)
+                  的项目专属 audit agent 加入审计批次 (复用 agent-router `.aria/agents/` 发现范式; 冷路径
+                  直读 frontmatter); **判据 = 专有标签阈值非 baseline 减法** (code-reviewer 已带 security-audit
+                  → 减法会盖住项目 security-auditor 恰打不中 reporter 用例 → 显式白名单解耦); augment-only
+                  (基线永远跑+项目 agent 纯加法); 增补 agent 受 max_parallel_agents 节流但不丢弃; 降级纯基线
+                  零回归 (空/无命中/缺字段skip/空list合法)。matrix 新增白名单列+step 3b 算法; SKILL.md 触发点表/
+                  输出分母 (=基线+增补); audit-points 各 agents 字段注记 (mid_post_spec 标注不在增补范围)。**与 M7
+                  agent-lifecycle 正交** (M7=物化到 .claude/agents/ 原生加载侧; 本=audit 消费侧; OOS: agent-creator→
+                  .claude/agents/ 让给 M7 / override / 扩 taxonomy / 改 agent-router / experiment 转正)。experimental
+                  skill (默认关), 能力随 experiment 转正才默认可用。Rule #6 = structural fixture (5 文件) + AC-5 dogfood
+                  (Aria 无 .aria/agents/ → 纯基线零回归)。post_spec R1 REVISE 7 findings → R2 CONVERGED (unanimous
+                  PASS); code-review Phase 1 PASS + Phase 2 I-1/I-2/M-1/M-2 全收。agent-team-audit skill 1.0.0→1.1.0。
+                  源自本日 #145 re-triage (`next-cycle`); 等待期填空与 M6/M7 主线解耦。Skills 不变 (34+7=41);
                   v1.47.0 = issue-sweep release train [4 cycle / 6 issue, PR #88 `281388d` 双远程]:
                   (A) secret-guard 扩 exfil 覆盖 #69 [Aether dogfood 5 FN + 6 探针实测 v1.46.5 仍漏 →
                   RED-first regex 254/254 + 2-lens 对抗 review 修真 FP/bypass]; (B) audit 数据可用性 #54 +
