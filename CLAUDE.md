@@ -173,7 +173,8 @@ v2.0 在"十步循环"之上建立了两层执行结构:
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
 ├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
-├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+)
+├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+; §1.3 周期vs会话收尾消歧 v1.50.0+)
+├── 会话收尾 (对话维度)  → aria/skills/session-closer/ (leaf skill, 正交于十步循环 Phase D; "对话收尾")
 ├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.49.0+ §C.2.4.5 mechanical gate companion, **block default** since v1.49.0; v1.28.0-v1.48.x warn-only)
 ├── Shell jq CRLF 卫生 → standards/conventions/shell-jq-crlf-hygiene.md (aria-plugin v1.36.0+ #132 follow-up; CR 处理决策表 + jq-crlf-guard + crlf-shim 测试框架)
 ├── 并发 Session 写入安全 → standards/conventions/concurrent-session-write-safety.md (aria-plugin v1.37.0+ #133; 并发安全写法主解药 + AI 记录硬证据自律 + 切口1/2 advisory; advisory-over-hardlock)
@@ -463,7 +464,9 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 9. **Session handoff docs 必须写在 `docs/handoff/`** - 详见 `standards/conventions/session-handoff.md` (aria-plugin v1.21.0+)
 
-**规则 #9 要点:** session handoff 文档 (`docs/handoff/{YYYY-MM-DD}-{slug}.md`) 必须写在 `docs/handoff/` (canonical), 禁止写 `.aria/handoff/*.md`。`.aria/` 是机器状态 namespace, `docs/` 是人类/AI 可读 prose namespace; handoff 是 prose 范畴。5 层 defense-in-depth: L1 PreToolUse hook 阻断写入 + L2 scan.py collector 检测 misplaced + L3 state-scanner 推荐迁移 + L4 本规范 (Convention SOT) + L5 phase-d-closer D.3 template 硬编码输出路径。
+**规则 #9 要点:** session handoff 文档 (`docs/handoff/{YYYY-MM-DD}-{slug}.md`) 必须写在 `docs/handoff/` (canonical), 禁止写 `.aria/handoff/*.md`。`.aria/` 是机器状态 namespace, `docs/` 是人类/AI 可读 prose namespace; handoff 是 prose 范畴。5 层 defense-in-depth: L1 PreToolUse hook 阻断写入 + L2 scan.py collector 检测 misplaced + L3 state-scanner 推荐迁移 + L4 本规范 (Convention SOT) + L5 phase-d-closer D.3 **及 session-closer step4** template 硬编码输出路径。
+
+**两种收尾 (session-closer-synthesis, 插件 v1.50.0+)**: handoff 由两个正交入口写出 —— **周期收尾** (`phase-d-closer`, cycle 单元, 十步循环 Phase D) vs **会话收尾** (`session-closer`, session 单元, leaf skill, owner 任意时刻调"对话收尾")。二者共享本规范 + 同一 handoff-write SOT (`handoff-mechanics.md`) 引用不复制, 工作单元不同不混淆。消歧矩阵见 `standards/conventions/session-handoff.md §1.3` (第三方 load-bearing)。
 
 **触发场景:** session 跨度 > 4h **或** 本 session 完整 ship ≥ 2 cycles/US **或** 本 session 跨 ≥ 2 phases。phase-d-closer D.2 archive 完成后, D.3 step 评估上述条件 (4-level fallback 信号), 满足则 prompt user 写 handoff (template `aria/templates/session-handoff.md`, 9-section skeleton 含 §0 入口 / §1-§7 标准段 / §8 memory entries)。
 
