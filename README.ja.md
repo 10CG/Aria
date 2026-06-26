@@ -1,13 +1,13 @@
 [English](README.md) | [中文](README.zh.md) | **日本語** | [한국어](README.ko.md)
 
-<!-- translated-from: v1.49.0 -->
+<!-- translated-from: v1.50.0 -->
 
 # Aria
 
 > AIをソフトウェアプロジェクトの真のコラボレーターに
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.49.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.50.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 

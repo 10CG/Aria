@@ -1,0 +1,40 @@
+{
+  "explore-session-no-cycle/with_skill": {
+    "A1_handoff_written": true,
+    "A2_ratelimit_unfinished": true,
+    "A3_crlf_missing_test": true,
+    "A4_retry_after_learning": true,
+    "A5_sync_warning": true,
+    "A6_leaf_no_phaseD": true,
+    "A7_memory_markers": true
+  },
+  "explore-session-no-cycle/without_skill": {
+    "A1_handoff_written": true,
+    "A2_ratelimit_unfinished": true,
+    "A3_crlf_missing_test": true,
+    "A4_retry_after_learning": true,
+    "A5_sync_warning": true,
+    "A6_leaf_no_phaseD": true,
+    "A7_memory_markers": false
+  },
+  "multi-thread-session/with_skill": {
+    "B1_handoff_written": true,
+    "B2_us012_unarchived": true,
+    "B3_arch_drift": true,
+    "B4_ttl_promise": true,
+    "B5_pytest_learning": true,
+    "B6_fourdim_consistency": true,
+    "B7_leaf_advisory": true,
+    "B8_memory_markers": true
+  },
+  "multi-thread-session/without_skill": {
+    "B1_handoff_written": true,
+    "B2_us012_unarchived": true,
+    "B3_arch_drift": true,
+    "B4_ttl_promise": true,
+    "B5_pytest_learning": true,
+    "B6_fourdim_consistency": true,
+    "B7_leaf_advisory": true,
+    "B8_memory_markers": false
+  }
+}
