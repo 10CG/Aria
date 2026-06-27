@@ -210,3 +210,5 @@
 **Author**: AI (Claude Opus 4.8 1M context) via owner-driven brainstorm + deep-research
 **Status**: M7 设计收敛已封存; 实施待 M6 ship 后 M7 OpenSpec 立项
 **Next**: (a) owner 决定是否接着做选项 2 (aria-fleet 整体 MVP scoping brainstorm, per "先 1 再 2"); (b) M6 ship 后据本 memo 起 M7 OpenSpec
+
+**Addendum 2026-06-27**: §1 决策 #2 "git 集合库从哪来" 已补 deep-research 输入 —— 见 [2026-06-27-agent-collection-backing-library-research.md](./2026-06-27-agent-collection-backing-library-research.md)。结论: 用 `VoltAgent/awesome-claude-code-subagents` (MIT, 154+ agents, 原生 CC subagent 格式) 做 seed, **选择性 cherry-pick** (非整库 vendor); 质量未验证须过 Rule #6 + 缺 capabilities 标签须 enrich 是两个硬成本。M7 真正工作量在"治理"非"收集"。
