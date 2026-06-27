@@ -5,7 +5,7 @@
 > **Change ID**: `session-closer-synthesis`
 > **Supersedes**: `session-closeout-internalization` (Approved, Phase B 9/10, 搁浅未 ship — 本 Spec 据 DEC-20260625-001 架构修订, 复用其 ~70-80% 实现)
 > **Brainstorm Source**: [.aria/decisions/DEC-20260625-001-session-closer-synthesis.md](../../../.aria/decisions/DEC-20260625-001-session-closer-synthesis.md) (5 决策收敛; 承接 DEC-20260605-001 轴 2)
-> **Parent US**: 待分配 — "对话管理流程 / handoff 强化" (US-010~019 区间); 暂以 DEC 为锚 (D.2 归档前锁定, TASK-008 checklist 项)
+> **Parent US**: [US-013](../../../docs/requirements/user-stories/US-013.md) 会话维度收尾仪式 (对话管理流程 / handoff 强化) — 锁定 2026-06-26 (ship 后回填, carry M1 闭环)
 > **Authored by**: Claude Opus 4.8 via `aria:phase-a-planner` + `aria:spec-drafter`, 2026-06-25
 > **Effort baseline**: ~5-6.5h (cherry-pick 重组 ~1h + handoff_autofill adapter 重建 ~1.5-2h [R1 M-1] + 复用既有 ref audit ~0.5h + leaf 重写 ~2h + 消歧 ~0.5h + capability AB ~1-1.5h + 发版 ~1h); 复用旧 3 脚本+3 测试省 ~3h
 > **ship_target**: aria-plugin **v1.49.0 → v1.50.0** (MINOR, 新 skill; 旧 spec 的 v1.40.0 已过期, 已 cat plugin.json 复验 2026-06-25)
