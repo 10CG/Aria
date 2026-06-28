@@ -322,8 +322,12 @@ after any TG-A schema migration (particularly the `is_synthetic` column addition
    `m6-preflight-log.md` 前 3 条 `cost_usd ≤ $2`, **不校验 `dispatch_id` 是否仍为 `<id>` 占位**。
    当前空模板的 `cost_usd: 0.00` 占位即可让 **AC-6 PASS** —— 即 AC-6 PASS **不能证明 pre-flight 真跑过**。
    缓解 (当前): Phase 0 执行者须人眼确认 3 个 dispatch_id 已填真值 + provenance 已选。
-   修复建议 (tracked, 见 Forgejo issue): AC-6 增加占位符检测 (dispatch_id != `<id>` 且 provenance
-   option ∈ {A,B,C}) 才判 PASS。
+   **✅ RESOLVED (#146, PR #26 merge `dd52d34`)**: `check_preflight` 增加占位符检测 —— 全量扫描要求
+   3 个非占位 `dispatch_id` (任意 `<...>` 判占位) + `m6-preflight-provenance.md` 的 `Selected option`
+   ∈ {A,B,C} (非 `[A|B|C]` 字面) 才判 PASS; 经 audit-engine pre_merge 3 轮收敛审计 (R2 qa 抓出 `[:3]`
+   窗口隐藏占位的二次 false-PASS 并修复)。**残留 (by design)**: 纯 prose `dispatch_id ...` 行仍计入
+   count, AC-6 PASS 仍 ≠ dispatch 真跑过 (DE↔dispatches.db 交叉核验 = out-of-scope over-reach); 靠
+   上述 Phase 0 人眼兜底。
 
 ---
 
