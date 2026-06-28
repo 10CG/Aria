@@ -306,6 +306,25 @@ after any TG-A schema migration (particularly the `is_synthetic` column addition
 - Test 3: `validate-m6-handoff.py --check-abi-compat` still exits 0 after migration 007 applied
   to a test database.
 
+##### A.8 Phase B kickoff errata (AI pre-run 2026-06-27)
+
+> AI 在 owner 启动前对代码件做了去风险预跑 (stdlib sqlite3 + acceptance 脚本干跑, 无 live 节点)。
+> 两处操作发现, 记录于此供 Phase 0/Phase 5 执行者参照 (亦在 runbook `.aria/probes/m6-7d-run-startup-checklist.md`)。
+
+1. **migration 007 必须经 `schema_migrate.py` runner 应用, 不可 raw `sqlite3 < 007.sql`**:
+   `aria_layer1/schema.sql` 已是 v5.0 含 `is_synthetic` 列 (新建库即带), 而 migration 007 是给停在
+   v4.2 的 **live DB** 升级用。SQLite 无 `ADD COLUMN IF NOT EXISTS`, 幂等性靠 runner 的版本守卫
+   (`_LATEST_SCHEMA_VERSION='5.0'` → 已达则 no-op)。对已 v5.0 库 raw apply 会抛
+   `duplicate column name: is_synthetic`。**已验**: runner 对 v5.0 库幂等 no-op PASS;
+   `check-m6-e2e-acceptance.py --check-abi-compat` 5 promises 全 PASS (代码级, 即 A.7 Test 3 通过)。
+
+2. **AC-6 false-green 风险**: `check-m6-e2e-acceptance.py --tg-a --check-preflight` 只校验
+   `m6-preflight-log.md` 前 3 条 `cost_usd ≤ $2`, **不校验 `dispatch_id` 是否仍为 `<id>` 占位**。
+   当前空模板的 `cost_usd: 0.00` 占位即可让 **AC-6 PASS** —— 即 AC-6 PASS **不能证明 pre-flight 真跑过**。
+   缓解 (当前): Phase 0 执行者须人眼确认 3 个 dispatch_id 已填真值 + provenance 已选。
+   修复建议 (tracked, 见 Forgejo issue): AC-6 增加占位符检测 (dispatch_id != `<id>` 且 provenance
+   option ∈ {A,B,C}) 才判 PASS。
+
 ---
 
 #### B. TG-B: Crash Recovery (~2-3h — REWORKED per #138; was ~13h)
