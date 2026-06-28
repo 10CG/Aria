@@ -52,7 +52,7 @@
 
 ## Open Questions (留 M7 立项)
 
-1. wshobson 是否确为 Aria agent 精确来源? 需逐 agent 比对 system-prompt 正文 (非仅命名) 才能 likely→confirmed; 若是, Aria 当前版本落后 upstream 多少 (更新提示基线)?
+1. ~~wshobson 是否确为 Aria agent 精确来源?~~ **✅ RESOLVED (2026-06-27, web 比对)**: Aria `backend-architect` body 开头与 wshobson 逐字近同 ("You are a backend system architect specializing in scalable...") + 同款 "Use PROACTIVELY when creating new backend services or APIs" description → **确定派生自 wshobson 早期版本**, 再叠 Aria 定制 (STCO description + `capabilities:` 标签 + color + 显式 model tier)。**Aria 副本已滞后 upstream**: 现 wshobson 已演进为 `## Purpose / ## Core Philosophy / ## Capabilities` 结构 + marketplace 命名空间前缀 (`backend-development-backend-architect`, model:inherit)。→ 这是 M7 TG-C 版本更新检测的天然基线; 重 vendor 须在 upstream 上重叠 Aria 定制层。
 2. VoltAgent vs 0xfurai 领域覆盖重叠/互补程度? 多源聚合 vs 单选?
 3. 各库 prompt 在 Aria Rule #6 benchmark (AB/pairwise LLM-judge) 下真实表现? with/without delta 是否正向 → 决定 cherry-pick 取舍标准。
 4. VoltAgent (有 tools/model 无 capabilities) → Aria STCO 格式的自动 enrichment 成本? 能否用 project-analyzer/agent-gap-analyzer 链反向推导 capabilities 标签?

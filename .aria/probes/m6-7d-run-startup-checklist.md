@@ -20,9 +20,11 @@
 ## Phase 0 — 启动前准备 (时钟未走)
 
 - [x] **A-infra-1** Spec #1 AC-7 (3-day cost history) gate PASS — 已于 2026-06-01 light-1 cron 确认 (`m6-gate-check.md`)。**无需重做**。
-- [ ] **migration 007 应用到 live DB** — 文件已 ship (`hermes-extensions/aria-layer1/aria_layer1/migrations/007_schema_v4.3_add_is_synthetic.sql`), 但须在 aria-layer1 节点对 live DB 实际 apply + 验证:
+- [ ] **migration 007 应用到 live DB** — 文件已 ship (`hermes-extensions/aria-layer1/aria_layer1/migrations/007_schema_v4.3_add_is_synthetic.sql`)。
+  > ⚠️ **必须经 `schema_migrate.py` runner 应用, 不可 raw `sqlite3 < 007.sql`** (2026-06-27 AI 预演确认): `schema.sql` 已是 v5.0 含 `is_synthetic`; SQLite 无 `ADD COLUMN IF NOT EXISTS`, 幂等性靠 runner 的版本守卫 (`_LATEST_SCHEMA_VERSION='5.0'` → 已达则 no-op)。raw apply 到已 v5.0 库会抛 `duplicate column name: is_synthetic`。runner 幂等 no-op 已验 PASS; AC-7 abi_compat 5 promises 已验 PASS (代码级)。
   ```bash
-  # 节点上: 确认 is_synthetic 列存在 (schema v5.0)
+  # 节点上: 经 runner 应用 (DB 若停在 v4.2 则升 5.0; 若已 5.0 则 no-op), 再确认列
+  sqlite3 <live aria_layer1.db> "SELECT value FROM schema_meta WHERE key='schema_version';"  # 期望 5.0
   sqlite3 <live aria_layer1.db> "PRAGMA table_info(dispatches);" | grep is_synthetic
   ```
 - [ ] **T-validate-schema-1** 逐列核对 live `dispatches` schema (drift guard, 写任何 SQL 前):
@@ -37,6 +39,7 @@
 - [ ] **选 pre-flight fixture provenance** (§A.5, 填 `m6-preflight-provenance.md`): A=replay M5 O3 (首选, 回归连续性) / B=fresh synthetic `[DEMO-M6-P*]` / C=cross-project Kairos/SilkNode。记 `Selected option:` + rationale。
 - [ ] **跑 3 次 pre-flight dispatch** (真 LLM, 每次 ≤$2, 合计 ≤$6) → 填 `m6-preflight-log.md` (dispatch_id + fixture_source + outcome[到 S9_CLOSE 或 8h 内 S_FAIL] + cost_usd 真值)。
 - [ ] **验 pre-flight 闸**: `check-m6-e2e-acceptance.py --tg-a --check-preflight` (前 3 条 cost_usd 全 ≤$2 → PASS, = AC-6)。
+  > ⚠️ **AC-6 false-green 警告** (2026-06-27 AI 干跑发现): 当前空模板的 `cost_usd: 0.00` 占位**也能让 AC-6 PASS** (gate 只看 cost ≤$2, 不看 dispatch_id 是否填)。**AC-6 PASS ≠ pre-flight 真跑过** —— 必须人眼确认 `m6-preflight-log.md` 的 3 个 `dispatch_id` 已填真值 + `m6-preflight-provenance.md` 的 `Selected option` 已选。
 
 ---
 
