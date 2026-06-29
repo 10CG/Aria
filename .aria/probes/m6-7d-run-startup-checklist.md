@@ -61,6 +61,7 @@
 
 - [ ] 每天写 `.aria/probes/m6-7d-day-{N}.md`: alloc status (uptime hours) + dispatch summary (S9 完成数 / S_FAIL / stuck>4h / synthetic 比) + stratification 表 (bug/feature/stale)。
 - [ ] **跑期凑够 dispatch 闸** (AC-2): ≥10 个走完 S0→S9_CLOSE; **≤70% synthetic** (即 ≥3 个真实); **bug/feature/stale 各 ≥1**。
+  > **B4 dispatch 语料**: tick 只派 `aria-auto` 标签 issue。用 `./seed-aria-auto-issues.sh --apply` (本目录) 批量造分层 `[DEMO-M6-P*]` 合成 issue (默认 12, 轮流 bug/feature/stale + aria-auto)。**前置**: #147 B4-code (PR #28 issue_type_hint) 已合并 + 部署到 light-1, 否则 dispatch 不带 `issue_type_hint`, AC-2 分层仍失败。跑后清理这些 DEMO issue。
 - [ ] (可选, 加分) **cross-project** Kairos/SilkNode 真 issue 走完 1 个 S0→S9 (is_synthetic=0) → AC-2 升 `PASS+` (P-9 条件: 目标 repo 可达 + 现有 PAT scope 够 + 无需新 scope)。
 
 ---
