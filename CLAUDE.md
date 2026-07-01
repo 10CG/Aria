@@ -529,7 +529,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; M6 Spec #1+#3 archived, **Spec #2 e2e-resilience 代码侧完成 2026-06-02**; **168h 运营跑 now make-ready (2026-06-30) — #147 Layer1 runtime 降级全部修复**[B1 Luxeno 早已修/B2 Feishu WS 重启复连/B3 stale 重启重载/B4-code issue_type_hint PR #28[audit 2 轮收敛]/B5 scan.sh PR #27/节点 fetch 凭据=只读 deploy key/#28 部署 light-1/M1 handoff 放置[prod tick 验证 "not found" 消失]/镜像确认/labels 建好], **只剩 owner 168h 运营仪式 (pre-flight→Day-1 anchor→B4-label 造 aria-auto issue→每日 probe→corpus+评分→AC-5)**; Spec #4 sequential 待)
 成熟度:   0.9 (M1-M5 端到端验证 + 多终端协调 + 跨 30+ Spec 实证 + AB benchmark 累积)
-插件版本: v1.50.1 (aria-plugin, 35 user-facing + 7 internal Skills + 11 Agents + secret-guard
+插件版本: v1.50.2 (aria-plugin, 35 user-facing + 7 internal Skills + 11 Agents + secret-guard
                   default + aria-doctor v1.2.0 + §C.2.4.5 submodule pointer regression gate
                   **block default (v1.49.0+ warn→block flip)** + Forgejo hosts parameterization + CI backend abstraction;
                   v1.50.0 = session-closer-synthesis [DEC-20260625-001, supersedes 搁浅的 session-closeout-internalization
