@@ -41,6 +41,53 @@
 - [ ] **验 pre-flight 闸**: `check-m6-e2e-acceptance.py --tg-a --check-preflight` (前 3 条 cost_usd 全 ≤$2 → PASS, = AC-6)。
   > ⚠️ **AC-6 false-green 警告** (2026-06-27 AI 干跑发现): 当前空模板的 `cost_usd: 0.00` 占位**也能让 AC-6 PASS** (gate 只看 cost ≤$2, 不看 dispatch_id 是否填)。**AC-6 PASS ≠ pre-flight 真跑过** —— 必须人眼确认 `m6-preflight-log.md` 的 3 个 `dispatch_id` 已填真值 + `m6-preflight-provenance.md` 的 `Selected option` 已选。
 
+### Phase 0 dispatch — 确切命令 (2026-07-01 补, 手动 fresh synthetic)
+
+> - **provenance A (replay M5 O3) 不可用**: capture 文件 `docs/demo-m5-o3-*.yaml` 不存在 → 用 **B (fresh synthetic)**。
+> - **pre-flight ≠ Phase 2 seed**: pre-flight 手动直派 `aria-layer2-runner` (**跳过 Layer 1**, fixture **不打 `aria-auto`** 防 tick 抢派), 只验 Layer 2 管道 + glm-5.2 + AC-6 cost; Layer 1 GLM triage 首验在 **Phase 2** (seed+tick)。
+> - **勿在 Phase 0 跑 `seed-aria-auto-issues.sh`** —— 那会让 tick 自动派 = 提前启动时钟。
+
+每次 (P1/P2/P3) 重复以下 4 步:
+
+**1) 造 fixture issue (不打 aria-auto)**
+```bash
+forgejo POST /repos/10CG/Aria/issues -d '{"title":"[DEMO-M6-P1] pre-flight smoke: 新增标记文件","body":"docs/aria-runner-smoke/ 下新增 DEMO-M6-P1.md 一行。M6 pre-flight 管道验证, 跑完关闭。"}'
+#  记返回的 number(N) + html_url
+```
+
+**2) light-1 手动 dispatch** (aria-layer2-runner: 5 required meta)
+```bash
+ssh light-1; export PATH=$PATH:/usr/local/bin
+N=<issue number>
+DISPATCH_ID=$(python3 -c 'import uuid;print(uuid.uuid4())')   # light-1 无 uuidgen
+IDEM=$(python3 -c 'import uuid;print(uuid.uuid4())')
+# bare hex — HCL image 已带 @sha256: 前缀 (m5-handoff F1 bug, 勿再加 sha256:)。
+# 镜像未重建 (claude-m5-91b8975-v11); 若重建过需在节点核实当前 sha (nomad job inspect 含 secret env → Rule #7, 只 grep image 行 + redirect)。
+IMAGE_SHA=5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5
+nomad job dispatch \
+  -meta ISSUE_ID="$N" \
+  -meta ISSUE_URL="https://forgejo.10cg.pub/10CG/Aria/issues/$N" \
+  -meta DISPATCH_ID="$DISPATCH_ID" \
+  -meta IMAGE_SHA="$IMAGE_SHA" \
+  -meta IDEMPOTENCY_KEY="$IDEM" \
+  aria-layer2-runner
+echo "DISPATCH_ID=$DISPATCH_ID"   # 记下它 + 输出的 Dispatched Job ID
+```
+
+**3) poll + 验证 glm-5.2**
+```bash
+nomad job status <Dispatched Job ID>        # 拿 ALLOC_ID
+nomad alloc logs -stderr -f <ALLOC_ID>      # 跟 Step 1/11..11/11
+# result.json (outputs volume, 一般 /opt/aether-volumes/.../outputs/<DISPATCH_ID>/result.json):
+#   claude_usage.model         → 期望 glm-5.2 (2026-07-01 切)
+#   claude_usage.total_cost_usd → 填 log (glm-5.2 同价, smoke 任务 <<$2)
+#   pr_url                      → 应生成 PR
+```
+
+**4) 填 log**: `m6-preflight-log.md` dispatch N — `dispatch_id`(真 UUID) + `fixture_source: fresh synthetic [DEMO-M6-P1]` + `outcome` + `cost_usd`(真值)。
+
+3 次跑完 → 关闭 `[DEMO-M6-P*]` issue (勿留 backlog) → 填 `m6-preflight-provenance.md` (option B) → 验 AC-6 (上一条) → 进 Phase 1。
+
 ---
 
 ## Phase 1 — Day 1: 启动 168h 时钟
