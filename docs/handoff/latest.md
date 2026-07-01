@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #M6-168H-PREFLIGHT-WALKTHROUGH — ✅ **DONE: M6 168h 跑 Phase 0 pre-flight 走查 (items 1-5 全绿) + 旧 dispatch 评估 + 只读脚本 ship** (2026-06-30 #2, simonfish/dev-claude)
+## ★ 最新 session #GLM-5.2-CUTOVER — ✅ **DONE: Layer 2 LLM 认知核实 (实跑 GLM 非 Claude) + glm-5.1→glm-5.2 切换 + SilkNode #830 (会话收尾, 无 cycle / 无插件版本变更)** (2026-07-01, simonfish/dev-claude)
 
-**Latest**: [2026-06-30-m6-168h-preflight-walkthrough.md](./2026-06-30-m6-168h-preflight-walkthrough.md) — 承接 makeready handoff, owner 要求**过一遍 M6 168h 跑 pre-flight**。对 light-1 节点实地核实 Phase 0: **items 1-5 全绿** (AC-7 14 连续日 cost 快照 / migration 007 已在 live DB schema 5.0+is_synthetic 41 列 / abi_compat exit 0 / #28 producer 部署确认 节点 HEAD a7afaaa `$.issue_type_hint` 生产消费对齐 / #146 AC-6 假绿修复已部署) —— AI 侧前置 100% make-ready。**旧 dispatch corpus 污染评估**: 25 旧行 (24 S_FAIL+1 S9_CLOSE) 全早于 06-13 → Day-1 anchor 时间窗过滤即排除, **无需清库** (option b)。只读摘要脚本 `.aria/probes/m6-list-stale-dispatches.py` ship (主仓 `c271f6e` 双远程 parity)。#147 评论 `#issuecomment-14055`。**无版本变更** (probe artifact only)。**剩余 = owner kickoff** (选 provenance→跑 3 真 dispatch→验 AC-6→Day-1 anchor)。#147 open。**Next**: ⭐ M6 168h 跑 (owner kickoff)。
+**Latest**: [2026-07-01-glm-5.2-cutover.md](./2026-07-01-glm-5.2-cutover.md) — owner 追问 Layer 2 LLM → 核实 **Layer 2 装 Claude Code CLI 但底层实跑 GLM (glm-5.1) via Luxeno, 非 Claude** (AD-M1-12; 两层都 GLM, CC 只是 agent 外壳) → owner 要升级 → SilkNode **#830** feature request (p2-high) → SilkNode 确认 **glm-5.2 上线可路由** (Anthropic 端点直通, z.ai 国际+bigmodel 国内双活, 同价) → **Layer 2 切换执行** (light-1 `nomad var` ANTHROPIC_DEFAULT_OPUS_MODEL glm-5.1→glm-5.2; CAS check-index; 8 keys/3 secret 全保; Rule #7) → cutover runbook (`aria-orchestrator/docs/glm-5.2-cutover-runbook.md`) + M6 checklist Phase 0 pre-flight dispatch 命令入库。Layer 1 保持 glm-4.5-air; **#830 留 open 待 pre-flight `result.json` model=glm-5.2 端到端验证**。aria-orch `a7afaaa→f3848b2`; 主仓 `3b5a003` 全 parity; 2 memory。**无插件/cycle 变更**。**Next**: ⭐ M6 168h 跑 kickoff (owner, 会首验 glm-5.2)。
+
+## (前次) session #M6-168H-PREFLIGHT-WALKTHROUGH — ✅ **DONE: M6 168h 跑 Phase 0 pre-flight 走查 (items 1-5 全绿) + 旧 dispatch 评估 + 只读脚本 ship** (2026-06-30 #2, simonfish/dev-claude)
+
+**Handoff**: [2026-06-30-m6-168h-preflight-walkthrough.md](./2026-06-30-m6-168h-preflight-walkthrough.md) — 承接 makeready handoff, owner 要求**过一遍 M6 168h 跑 pre-flight**。对 light-1 节点实地核实 Phase 0: **items 1-5 全绿** (AC-7 14 连续日 cost 快照 / migration 007 已在 live DB schema 5.0+is_synthetic 41 列 / abi_compat exit 0 / #28 producer 部署确认 节点 HEAD a7afaaa `$.issue_type_hint` 生产消费对齐 / #146 AC-6 假绿修复已部署) —— AI 侧前置 100% make-ready。**旧 dispatch corpus 污染评估**: 25 旧行 (24 S_FAIL+1 S9_CLOSE) 全早于 06-13 → Day-1 anchor 时间窗过滤即排除, **无需清库** (option b)。只读摘要脚本 `.aria/probes/m6-list-stale-dispatches.py` ship (主仓 `c271f6e` 双远程 parity)。#147 评论 `#issuecomment-14055`。**无版本变更** (probe artifact only)。**剩余 = owner kickoff** (选 provenance→跑 3 真 dispatch→验 AC-6→Day-1 anchor)。#147 open。**Next**: ⭐ M6 168h 跑 (owner kickoff)。
 
 ## (前次) session #M6-RUNTIME-REMEDIATION-MAKEREADY — ✅ **DONE: M6 #147 Layer1 runtime 降级全修复 → 168h 跑 now make-ready** (2026-06-30, simonfish/dev-claude)
 
