@@ -3,7 +3,7 @@ track-id: m6-preflight-luxeno-blocker
 owner-container: simonfish/dev-claude
 phase: session-close
 status: complete
-updated-at: 2026-07-02T15:17:02Z
+updated-at: 2026-07-02T17:13:57Z
 ---
 
 # Aria — Session Handoff (2026-07-02) — M6 pre-flight 走查: 抓到 Luxeno 延迟命门 + checklist 配方修正
@@ -38,6 +38,8 @@ updated-at: 2026-07-02T15:17:02Z
 13. **验证止血 (path B 重跑, issue #150/内部 1998)**:**铁证成功** —— 两 Layer 1 LLM call `ok (44567ms)` + `ok (53944ms)`(**都会在旧 30s 下 timeout,在 60s 下通过**)→ dispatch 推进 S1→S2→S3→**S4_LAUNCH 派容器**。原 Luxeno S3 命门解除。**但 Luxeno 45-54s 延迟 → 60s 仅勉强,坐实根因必须修**。
 14. **Blocker 2 (镜像 sha) — ✅ 修复 (PR #30)**:S4_LAUNCH 后容器 Driver Failure —— 自主 dispatch 传 `IMAGE_SHA=91b8975`(git 短sha)→ `@sha256:91b8975` 无效。根因 `_read_m1_image_sha` 读错字段(读 `image_sha_final` git-sha 而非 `image_sha256_final` digest;数据本对,代码 bug = "m5-handoff F1 bug")。**PR #30** merged(`daf7c79`):改读 digest + 剥 sha256: 前缀 + 回退;2 新测 + 95 pass;节点验证返回 bare 64-hex。
 15. **Blocker 3 发现 (未修): ISSUE_ID 正则**:自主 ISSUE_ID=数字内部 id(1998)撞容器 `initial.sh:106` `^[A-Z][A-Z0-9-]+$` → FATAL(同 manual canary '148')。正则在 **M5 镜像**内 → 改需重建镜像 或 tick 改 ID 格式。记 #147 [comment #14260](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14260)。
+16. **部署镜像 Step2 契约 byte 级确认**(一次性 nomad docker job `cat` 镜像内 initial.sh,#147 [comment #14270](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14270)):部署 M5 镜像确有正则(line 106)+ 读 **`inputs/<ISSUE_ID>/issue.yaml` 就地 envsubst 渲染**(line 145-147),**不吃 prompt.txt / 不用 dispatch_id 键**。→ **修法收敛 Option A**:容器契约稳定已知(= dispatch-issue.sh),让 Layer 1 复刻(letter-prefixed ISSUE_ID + stage issue.yaml),**放弃 prompt.txt 方向,不重建镜像**。
+17. **Luxeno 慢 = 网络诊断**(owner 疑 mihomo,#147 [#14270](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14270) + 更正 [#14272](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14272)):Aria **已接** mihomo;**绕过 mihomo 实测不变快**(直连真 IP 1.36s = mihomo 1.38s)。luxeno.ai=Cloudflare(104.21/172.67),从 Aria 网络访问 **CF 整体慢**(cloudflare.com 本身 1.8-3.4s),非 mihomo/luxeno-origin。**且网络仅占 44-54s call 的 ~3%,真瓶颈是 GLM 推理**。owner 后台 "Aria 慢" = server-side(推理/路由),需 Portkey 日志,是 Blocker 4 真战场。**结论:别优化 mihomo(无效)。**
 
 ## §2 未完成 / Carry-forward 清单
 
@@ -45,8 +47,8 @@ updated-at: 2026-07-02T15:17:02Z
 pre-flight 逐层剥出的阻塞链(每层 $0-低成本抓到):
 1. ~~Luxeno S3 timeout~~ → **止血** LUXENO_TIMEOUT_SEC=60 (PR #29) ✅ 验证过
 2. ~~镜像 sha 无效~~ → PR #30 ✅
-3. **[未修, milestone 级] Blocker 3 深评估 → 自主容器路径从未闭环**(#147 [comment #14265](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14265)):数据铁证 —— 唯一 S9_CLOSE=`smoke-m4-pr97`(字母前缀 manual);DEMO-M5-* 到 S5/S7(manual);**所有数字 id(自主)100% S_FAIL**。**tick prefix 不够** —— 过正则后立刻撞输入契约错位(容器读 `issue.yaml/ISSUE_ID`,自主 Layer1 产 `prompt.txt/dispatch_id`)。真 gap = Layer1↔容器输入契约从未对齐;**自主 E2E (Layer1→容器→glm-5.2→PR) 从未闭环, 非"差临门一脚"**。修法 (A) tick 补 issue.yaml staging 或 (B) 重建镜像;**前置 = 先取部署镜像 initial.sh 确认 Step2 真契约(需 heavy 节点 docker 访问, owner/基建)**。
-4. **[owner/基建, 真门] Luxeno/GLM 后端延迟** —— 45-54s/call(健康 <5s);查 Portkey 排队 / GLM 负载 / 路由 / 限流。**timeout=60 只让"慢但不挂"**, 168h 顺畅必须压低。#147 + SilkNode #830。
+3. **[未修, milestone 级] Blocker 3: 自主容器路径从未闭环 → 修法 = Option A(不重建镜像)**(#147 #14265+#14270):数据铁证 —— 唯一 S9_CLOSE=`smoke-m4-pr97`(字母前缀 manual);所有数字 id(自主)100% S_FAIL。**部署镜像契约已 byte 级确认**(§1 item16):容器要 `inputs/<ISSUE_ID>/issue.yaml` 就地渲染 + ISSUE_ID 字母前缀正则;自主 Layer1 产 `prompt.txt/dispatch_id` + 数字 id → 两维全错位,**自主 E2E 从未跑通**。**下一步 = 实现 Option A**:让 Layer 1 dispatch 复刻 dispatch-issue.sh(生成 issue.yaml + stage 到 `inputs/<letter-prefixed-ISSUE_ID>/` + 传字母前缀 ISSUE_ID),放弃 prompt.txt。milestone 级 tick+staging 工作,但不碰镜像。**前置(取镜像确认契约)已完成。**
+4. **[owner/基建, 真门] Luxeno/GLM 后端延迟** —— 45-54s/call(健康 <5s)。**网络已排除**(§1 item17:mihomo 无辜,CF-access 固有慢 ~1.5s 但只占 ~3%)。真瓶颈 = GLM **推理**(thinking 模型 + prompt 大小 + 后端路由);owner 后台 "Aria 慢" = server-side → 查 **Portkey/luxeno 日志**(prompt 大小 / z.ai 国际 vs bigmodel 国内路由 / 限流)。timeout=60 只"慢但不挂"。#147 + SilkNode #830。**别去优化 mihomo(实测无效)。**
 5. (清 3+4 后) **端到端 glm-5.2 真跑** → 读 result.json `claude_usage.model` → close #830 → 才进 Day-1 anchor。
 
 ### 中优先级
@@ -71,7 +73,7 @@ pre-flight 逐层剥出的阻塞链(每层 $0-低成本抓到):
 ## §5 多维度同步状态 (Aria 4 维度)
 - **代码/git**:主仓 master `4963ef3`,origin/github parity。**aria-orchestrator 子模块 → `daf7c79`**(PR #29 timeout env + cron/reconcile HCL + PR #30 image digest fix);gitlink 已 bump。
 - **文档**:checklist Phase 0 已修正;本 handoff 已更新至 image-fix + 阻塞链状态。
-- **Issue**:Aether #190、Aria #147 (4 new comments: 命门 #14217 / 诊断 #14222 / 阻塞链 #14260)、SilkNode #830 (#14224)、Aria #148/#149/#150 (closed)。aria-orchestrator PR #29 + #30 (merged)。
+- **Issue**:Aether #190、Aria #147 (6 new comments: 命门 #14217 / 诊断 #14222 / 止血+阻塞链 #14260 / Blocker3 评估 #14265 / 镜像契约+网络 #14270 / 网络更正 #14272)、SilkNode #830 (#14224)、Aria #148/#149/#150 (closed)。aria-orchestrator PR #29 + #30 (merged)。
 - **运行时**:Layer 1 tick 认证健康 / schema v5.0 / 集群基建健康;cron+reconcile `LUXENO_TIMEOUT_SEC=60`(止血, 已验证 44.6/53.9s call 通过);tick image digest 修复(读 bare 64-hex)。**待清: Blocker 3 ISSUE_ID 正则(镜像) + Luxeno 根因**。
 
 ## §6 Next session 入口 + 优先级建议
