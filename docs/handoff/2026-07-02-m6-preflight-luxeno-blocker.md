@@ -3,7 +3,7 @@ track-id: m6-preflight-luxeno-blocker
 owner-container: simonfish/dev-claude
 phase: session-close
 status: complete
-updated-at: 2026-07-02T15:05:10Z
+updated-at: 2026-07-02T15:17:02Z
 ---
 
 # Aria — Session Handoff (2026-07-02) — M6 pre-flight 走查: 抓到 Luxeno 延迟命门 + checklist 配方修正
@@ -15,6 +15,8 @@ updated-at: 2026-07-02T15:05:10Z
 > **🔴 M6 168h 跑现在启动无意义** —— dispatch 会全卡 `S3_BUILD_CMD`,因为 Layer 1 的 LLM call 经 **Luxeno/GLM 严重高延迟 (20s+ read timeout)** 全 fallback 链耗尽 → `S_FAIL`。真正的门 = **Luxeno/GLM 延迟**(owner/基建侧),已记入 **Aria #147**。
 
 `#147` 之前 B1 判 "Luxeno 已配好 resolved" 只验了**配置**;本 session 有 live 证据证明**性能/延迟**才是真阻塞。
+
+> **⚠️ 更大的重定义(session 后段深挖,§2 Blocker 3 / #147 #14265)**:pre-flight 逐层剥出**阻塞链** —— Luxeno timeout(止血 #29 ✅)→ 镜像 sha(#30 ✅)→ **自主容器路径从未闭环**(数据铁证:唯一 S9 是字母前缀 manual dispatch,所有数字-id 自主 dispatch 100% S_FAIL;Layer1↔容器输入契约从未对齐)。**M6 自主 E2E 不是"差启动",是从未跑通** → 需先取部署镜像确认契约 + 决策 tick-staging vs 镜像重建。
 
 ## §1 已完成 (按时间顺序)
 
@@ -43,7 +45,7 @@ updated-at: 2026-07-02T15:05:10Z
 pre-flight 逐层剥出的阻塞链(每层 $0-低成本抓到):
 1. ~~Luxeno S3 timeout~~ → **止血** LUXENO_TIMEOUT_SEC=60 (PR #29) ✅ 验证过
 2. ~~镜像 sha 无效~~ → PR #30 ✅
-3. **[未修] Blocker 3: ISSUE_ID 正则** —— 自主 ISSUE_ID=数字内部 id 撞容器 `initial.sh:106` `^[A-Z][A-Z0-9-]+$`。修需**重建 M5 镜像** 或 **tick 改传 letter-prefixed ISSUE_ID**(代码侧, 待评估容器是否他处依赖裸数字)。owner 决策 + 排期。
+3. **[未修, milestone 级] Blocker 3 深评估 → 自主容器路径从未闭环**(#147 [comment #14265](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14265)):数据铁证 —— 唯一 S9_CLOSE=`smoke-m4-pr97`(字母前缀 manual);DEMO-M5-* 到 S5/S7(manual);**所有数字 id(自主)100% S_FAIL**。**tick prefix 不够** —— 过正则后立刻撞输入契约错位(容器读 `issue.yaml/ISSUE_ID`,自主 Layer1 产 `prompt.txt/dispatch_id`)。真 gap = Layer1↔容器输入契约从未对齐;**自主 E2E (Layer1→容器→glm-5.2→PR) 从未闭环, 非"差临门一脚"**。修法 (A) tick 补 issue.yaml staging 或 (B) 重建镜像;**前置 = 先取部署镜像 initial.sh 确认 Step2 真契约(需 heavy 节点 docker 访问, owner/基建)**。
 4. **[owner/基建, 真门] Luxeno/GLM 后端延迟** —— 45-54s/call(健康 <5s);查 Portkey 排队 / GLM 负载 / 路由 / 限流。**timeout=60 只让"慢但不挂"**, 168h 顺畅必须压低。#147 + SilkNode #830。
 5. (清 3+4 后) **端到端 glm-5.2 真跑** → 读 result.json `claude_usage.model` → close #830 → 才进 Day-1 anchor。
 
