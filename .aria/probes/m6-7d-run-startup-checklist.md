@@ -41,52 +41,54 @@
 - [ ] **验 pre-flight 闸**: `check-m6-e2e-acceptance.py --tg-a --check-preflight` (前 3 条 cost_usd 全 ≤$2 → PASS, = AC-6)。
   > ⚠️ **AC-6 false-green 警告** (2026-06-27 AI 干跑发现): 当前空模板的 `cost_usd: 0.00` 占位**也能让 AC-6 PASS** (gate 只看 cost ≤$2, 不看 dispatch_id 是否填)。**AC-6 PASS ≠ pre-flight 真跑过** —— 必须人眼确认 `m6-preflight-log.md` 的 3 个 `dispatch_id` 已填真值 + `m6-preflight-provenance.md` 的 `Selected option` 已选。
 
-### Phase 0 dispatch — 确切命令 (2026-07-01 补, 手动 fresh synthetic)
+### Phase 0 dispatch — ⚠️ 手动 dispatch 路径待修复 (2026-07-02 canary 实证)
 
 > - **provenance A (replay M5 O3) 不可用**: capture 文件 `docs/demo-m5-o3-*.yaml` 不存在 → 用 **B (fresh synthetic)**。
 > - **pre-flight ≠ Phase 2 seed**: pre-flight 手动直派 `aria-layer2-runner` (**跳过 Layer 1**, fixture **不打 `aria-auto`** 防 tick 抢派), 只验 Layer 2 管道 + glm-5.2 + AC-6 cost; Layer 1 GLM triage 首验在 **Phase 2** (seed+tick)。
 > - **勿在 Phase 0 跑 `seed-aria-auto-issues.sh`** —— 那会让 tick 自动派 = 提前启动时钟。
 
-每次 (P1/P2/P3) 重复以下 4 步:
+#### 🔴 2026-07-02 canary 发现: 下方原"裸 nomad job dispatch"配方是坏的
 
-**1) 造 fixture issue (不打 aria-auto)**
-```bash
-forgejo POST /repos/10CG/Aria/issues -d '{"title":"[DEMO-M6-P1] pre-flight smoke: 新增标记文件","body":"docs/aria-runner-smoke/ 下新增 DEMO-M6-P1.md 一行。M6 pre-flight 管道验证, 跑完关闭。"}'
-#  记返回的 number(N) + html_url
-```
+真跑一次 canary (DEMO issue #148, DISPATCH_ID b663f5b2) 证明**旧配方必挂**, 且**成本 $0**(容器在入口 Step 1 就 FATAL, 从未到 LLM)。两处确证缺陷:
 
-**2) light-1 手动 dispatch** (aria-layer2-runner: 5 required meta)
+1. **ISSUE_ID 正则** (`docker/aria-runner/modes/initial.sh:106` = `^[A-Z][A-Z0-9-]+$`): 传 Forgejo 数字号 (如 `148`) 直接 `FATAL: ISSUE_ID 148 不符合正则`。ISSUE_ID 必须是 `DEMO-M6-P1` 这种大写字母开头的逻辑 ID, 非 issue number。
+2. **容器 Step 2 从预置 `issue.yaml` 加载任务** (`initial.sh:142-147`), **不从 `ISSUE_URL` 拉**。裸 `nomad job dispatch` 没 stage 输入 → 即使 ID 合规也会挂 `issue.yaml not found`。`ISSUE_URL` meta 对入口任务加载**无用**。
+
+**正确路径 (原则上)** = `scripts/dispatch-issue.sh <ISSUE_ID>` (它 stage `.aria/issues/<ID>.yaml` + referenced files → `/opt/aria-inputs/<ID>/` → 再 dispatch)。
+
+#### ⚠️ 但 manual dispatch 工具链已与自主路径分叉 — 用前必须先验证/修复
+
+`dispatch-issue.sh` 是 **M1 MVP 遗留**, 尚未确证能对当前 M5 镜像端到端跑通:
+
+- **validator 失效**: `dispatch-issue.sh:82` 引用 `openspec/changes/aria-2.0-m1-mvp/artifacts/validate-issue-schema.py`, 该 spec 已归档 → 路径不存在 (脚本 fallback "skip schema check")。真 `issue.yaml` schema 无 SOT 校验。
+- **repo `.aria/issues/` 为空**: 需现写 `DEMO-M6-P1.yaml` (字段: `title` / `files:` list / `metadata.target_repo` / `metadata.base_branch`, 从 `initial.sh:142-245` 反推; 精确 schema 待恢复 validator 确认)。
+- **卷在 heavy 节点**: `/opt/aria-inputs` **不在 light-1** (canary 实测), staging 须落到容器实际调度的节点 (dispatch 非确定性 → 需节点约束或共享卷确认)。
+- **契约可能分叉**: 自主路径 (`aria_layer1/prompt_render.py`) 把 **`prompt.txt`** 预渲染到 `/opt/aria-inputs/{dispatch_id}/` 供容器消费; manual 路径走 `issue.yaml`。部署的 M5 镜像 (`claude-m5-91b8975-v11`) 入口到底认哪个契约, 未确证。
+
+**→ OWNER 决策 (pre-flight 启动前必须定)**:
+- **(A) 修复 manual 路径**: 恢复/重写 issue-schema validator + 写 `.aria/issues/DEMO-M6-P*.yaml` + 理清节点/卷 staging + 确认 M5 镜像入口契约。工作量中等, 但保住"隔离 Layer 2 + 不启动时钟"的 pre-flight 本意。
+- **(B) pivot 到自主路径验证**: seed **1 个** `aria-auto` issue 让 tick 派 (已知可跑的 prompt.txt 路径, Hermes tick 认证已核实健康)。代价: engages Layer 1 + 接近启动时钟, 违背 pre-flight "隔离"初衷; 需重新界定它算不算启动 168h。
+
+#### ✅ canary 已证明 (基建健康, 阻塞面收窄)
+
+- 镜像 digest (`5b80ca6...`) 有效, registry **cold-pull 认证正常** (#147 修复生效, 越过 14 次历史 `S4_LAUNCH infrastructure` 失败)。
+- 调度到 heavy-2 + 容器正常启动到入口。
+- **唯一阻塞 = 输入 staging 契约 (上述 A/B), 非集群基建。**
+
+<details><summary>原坏配方 (存档, 勿直接用 — 见上方缺陷)</summary>
+
 ```bash
+# ❌ 会 FATAL: ISSUE_ID 数字号不合正则 + 无 issue.yaml staging
 ssh light-1; export PATH=$PATH:/usr/local/bin
 N=<issue number>
-DISPATCH_ID=$(python3 -c 'import uuid;print(uuid.uuid4())')   # light-1 无 uuidgen
-IDEM=$(python3 -c 'import uuid;print(uuid.uuid4())')
-# bare hex — HCL image 已带 @sha256: 前缀 (m5-handoff F1 bug, 勿再加 sha256:)。
-# 镜像未重建 (claude-m5-91b8975-v11); 若重建过需在节点核实当前 sha (nomad job inspect 含 secret env → Rule #7, 只 grep image 行 + redirect)。
-IMAGE_SHA=5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5
-nomad job dispatch \
-  -meta ISSUE_ID="$N" \
-  -meta ISSUE_URL="https://forgejo.10cg.pub/10CG/Aria/issues/$N" \
-  -meta DISPATCH_ID="$DISPATCH_ID" \
-  -meta IMAGE_SHA="$IMAGE_SHA" \
-  -meta IDEMPOTENCY_KEY="$IDEM" \
-  aria-layer2-runner
-echo "DISPATCH_ID=$DISPATCH_ID"   # 记下它 + 输出的 Dispatched Job ID
+DISPATCH_ID=$(python3 -c 'import uuid;print(uuid.uuid4())'); IDEM=$(python3 -c 'import uuid;print(uuid.uuid4())')
+IMAGE_SHA=5b80ca6cd04ab31b3d8165eb82f4ac9edd824b45e8181adf9325e80cf35148f5   # bare hex, HCL 已带 @sha256:
+nomad job dispatch -meta ISSUE_ID="$N" -meta ISSUE_URL="https://forgejo.10cg.pub/10CG/Aria/issues/$N" \
+  -meta DISPATCH_ID="$DISPATCH_ID" -meta IMAGE_SHA="$IMAGE_SHA" -meta IDEMPOTENCY_KEY="$IDEM" aria-layer2-runner
 ```
+</details>
 
-**3) poll + 验证 glm-5.2**
-```bash
-nomad job status <Dispatched Job ID>        # 拿 ALLOC_ID
-nomad alloc logs -stderr -f <ALLOC_ID>      # 跟 Step 1/11..11/11
-# result.json (outputs volume, 一般 /opt/aether-volumes/.../outputs/<DISPATCH_ID>/result.json):
-#   claude_usage.model         → 期望 glm-5.2 (2026-07-01 切)
-#   claude_usage.total_cost_usd → 填 log (glm-5.2 同价, smoke 任务 <<$2)
-#   pr_url                      → 应生成 PR
-```
-
-**4) 填 log**: `m6-preflight-log.md` dispatch N — `dispatch_id`(真 UUID) + `fixture_source: fresh synthetic [DEMO-M6-P1]` + `outcome` + `cost_usd`(真值)。
-
-3 次跑完 → 关闭 `[DEMO-M6-P*]` issue (勿留 backlog) → 填 `m6-preflight-provenance.md` (option B) → 验 AC-6 (上一条) → 进 Phase 1。
+**跑通后 (A 或 B)**: poll → 读 `result.json` 验 `claude_usage.model=glm-5.2` + cost → 填 `m6-preflight-log.md` (真 dispatch_id + fixture_source + outcome + cost_usd) → 3 次凑齐 → 关 `[DEMO-M6-P*]` issue → 填 `m6-preflight-provenance.md` (option B) → 验 AC-6 → 进 Phase 1。
 
 ---
 
