@@ -3,7 +3,7 @@ track-id: m6-preflight-luxeno-blocker
 owner-container: simonfish/dev-claude
 phase: session-close
 status: complete
-updated-at: 2026-07-02T21:32:39Z
+updated-at: 2026-07-02T21:40:59Z
 ---
 
 # Aria — Session Handoff (2026-07-02) — M6 pre-flight 走查: 抓到 Luxeno 延迟命门 + checklist 配方修正
@@ -50,6 +50,7 @@ pre-flight 逐层剥出的阻塞链(每层 $0-低成本抓到):
 2. ~~镜像 sha 无效~~ → PR #30 ✅
 3. **[未实施, milestone 级 Level 3] Blocker 3: 自主 E2E 从未闭环 → 架构已定 (C' 双通道, DEC-20260702-001)**:Option A(纯 tick 侧)recon 判**不可行**(输入卷每-heavy-节点本地,Layer1 写不到)→ brainstorm + 4-agent 审议收敛 **C' 双通道**(见 §1 item18)。**下一步 = Phase A**:spec-drafter 据 DEC-20260702-001 起 **Level 3 OpenSpec**(proposal + tasks,主仓 `openspec/changes/`,**独立 Spec 非 #2 补丁**)。**实施必含**(否则重演坑):① Layer1 侧同 scope 改动(发 ARIA-<repo>-<number> + metadata META + head_branch 统一)② compute-assertions 空-expected 禁恒真(假绿修)③ fetch 失败契约可区分 infra/agent-fail ④ title/body 消毒。**spec 前置待核实 4 项**(DEC §待核实): heavy 节点 NFS(诚实否 D)/ envsubst 白名单 byte 核 / RENDERING_CONTRACT expected_changes / DB 键迁移对 #147 AC-2 影响。
 4. **[owner/基建, 真门] Luxeno/GLM 后端延迟** —— 45-54s/call(健康 <5s)。**网络已排除**(§1 item17:mihomo 无辜,CF-access 固有慢 ~1.5s 但只占 ~3%)。真瓶颈 = GLM **推理**(thinking 模型 + prompt 大小 + 后端路由);owner 后台 "Aria 慢" = server-side → 查 **Portkey/luxeno 日志**(prompt 大小 / z.ai 国际 vs bigmodel 国内路由 / 限流)。timeout=60 只"慢但不挂"。#147 + SilkNode #830。**别去优化 mihomo(实测无效)。**
+5. **[doc-sync, Rule #3] CLAUDE.md 项目状态段现已实质误导** —— 仍写 "M6 168h 跑 now make-ready / 只剩 owner 运营仪式";本 session 根本性推翻(自主 E2E **从未闭环**, 4 层阻塞链, Blocker3 需 Level 3 Spec)。CLAUDE.md 项目状态 + footer 需更新反映阻塞链现实。**注意高 contention 区**(`[[feedback_claude_md_project_status_high_contention]]`), fetch 后再改。本 handoff (latest.md 指向) 是准的 canonical 入口; CLAUDE.md 是滞后的二级参考。可并入 Blocker3 Phase A 的 CLAUDE.md M6 依赖链更新一并做。
 5. (清 3+4 后) **端到端 glm-5.2 真跑** → 读 result.json `claude_usage.model` → close #830 → 才进 Day-1 anchor。
 
 ### 中优先级
@@ -108,9 +109,12 @@ aria-orchestrator (origin only, 内部不上 GitHub):
 
 无 aria-plugin 版本变更。
 
-## §8 Memory entries this session (0 new — 见 §4, 均已被 checklist/#147/现有 memory 覆盖)
+## §8 Memory entries this session (4 new)
 
-本 session 教训已固化进 in-repo 制品(checklist + #147 comment)或呼应现有 memory,无需新 memory 文件。
+- `feedback_dryrun_peels_blocker_chain` — make-ready 断言≠端到端跑通;pre-flight 逐层剥阻塞链
+- `feedback_fix_target_verify_data_vs_code` — 被要求"修数据"先核实真错;bug 常在代码读错字段 → pivot 改代码 (M1 handoff digest 案例)
+- `feedback_attribute_latency_by_measurement_not_hypothesis` — 归因慢前测分解+绕嫌疑层验证;别优化占比小的层 (Luxeno 网络非主因)
+- `feedback_code_grounded_multiagent_review_catches_altitude_misses` — 里程碑架构决策的多-agent 审议须让 agent 读真代码, 才能抓设计者 altitude 漏的 showstopper (C' DEC 4-agent 实证)
 
 ## Cross-references
 - Aria #147 (M6-blocker, Luxeno 延迟 comment #14217) / Aether #190 (PAT rotation UX)
