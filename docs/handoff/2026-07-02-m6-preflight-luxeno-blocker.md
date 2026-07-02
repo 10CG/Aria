@@ -3,7 +3,7 @@ track-id: m6-preflight-luxeno-blocker
 owner-container: simonfish/dev-claude
 phase: session-close
 status: complete
-updated-at: 2026-07-02T14:14:36Z
+updated-at: 2026-07-02T15:05:10Z
 ---
 
 # Aria — Session Handoff (2026-07-02) — M6 pre-flight 走查: 抓到 Luxeno 延迟命门 + checklist 配方修正
@@ -33,12 +33,19 @@ updated-at: 2026-07-02T14:14:36Z
 10. 清理 pre-flight 测试 issue #148 / #149(均关闭)。
 11. **诊断 ProviderRouter read timeout 配置**:`silknode_client.py:39` `DEFAULT_TIMEOUT_SECONDS=30` 硬编码、无 env override(唯一漏配, Forgejo/Feishu 都可配)。实测 GLM-via-Luxeno ~20-30s+(一次 `ok (20848ms)` + 多次 >30s timeout),骑 30s 线上。**判定 = 后端延迟, 非 timeout 配紧**。撤销"glm-4.7 discrepancy"(实为文档化 FALLBACK 档, `silknode_client.py:36`)。诊断补 #147 [comment #14222](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14222) + SilkNode #830 [comment #14224](https://forgejo.10cg.pub/10CG/SilkNode/issues/830#issuecomment-14224)。
 12. **止血: LUXENO_TIMEOUT_SEC env 可配 + 部署**:aria-orchestrator **PR #29** merged(`f4d9128`;env 可配默认仍 30;2 新测 + 36 tests pass)→ 节点 pull(editable 生效)→ **cron + reconcile 两 job 都设 `LUXENO_TIMEOUT_SEC=60`**(`nomad job plan` 零 drift + `-check-index` CAS apply + inspect 确认)。reconcile 当前 mechanical(LLM off)是预防性对称。**止血 only, 不改根因**。
+13. **验证止血 (path B 重跑, issue #150/内部 1998)**:**铁证成功** —— 两 Layer 1 LLM call `ok (44567ms)` + `ok (53944ms)`(**都会在旧 30s 下 timeout,在 60s 下通过**)→ dispatch 推进 S1→S2→S3→**S4_LAUNCH 派容器**。原 Luxeno S3 命门解除。**但 Luxeno 45-54s 延迟 → 60s 仅勉强,坐实根因必须修**。
+14. **Blocker 2 (镜像 sha) — ✅ 修复 (PR #30)**:S4_LAUNCH 后容器 Driver Failure —— 自主 dispatch 传 `IMAGE_SHA=91b8975`(git 短sha)→ `@sha256:91b8975` 无效。根因 `_read_m1_image_sha` 读错字段(读 `image_sha_final` git-sha 而非 `image_sha256_final` digest;数据本对,代码 bug = "m5-handoff F1 bug")。**PR #30** merged(`daf7c79`):改读 digest + 剥 sha256: 前缀 + 回退;2 新测 + 95 pass;节点验证返回 bare 64-hex。
+15. **Blocker 3 发现 (未修): ISSUE_ID 正则**:自主 ISSUE_ID=数字内部 id(1998)撞容器 `initial.sh:106` `^[A-Z][A-Z0-9-]+$` → FATAL(同 manual canary '148')。正则在 **M5 镜像**内 → 改需重建镜像 或 tick 改 ID 格式。记 #147 [comment #14260](https://forgejo.10cg.pub/10CG/Aria/issues/147#issuecomment-14260)。
 
 ## §2 未完成 / Carry-forward 清单
 
-### 高优先级 (建议下次 session 优先评估)
-- **[owner/基建, 真门] 解决 Luxeno/GLM 后端延迟** —— 根因 = GLM-via-Luxeno 单次 20-30s+(健康应 <5s)。查 Portkey 代理排队 / GLM 后端负载 / 国内外路由 / 限流叠加重试。**timeout 止血(LUXENO_TIMEOUT_SEC=60)只让"慢但不挂", 不解决慢**;168h 跑要顺畅必须压低延迟。#147 + SilkNode #830。**M6 168h 跑前置门。**
-- **验证止血 + 端到端 glm-5.2**(path B):重跑(新造 aria-auto issue → force tick 推进),看 S3 是否从 S_FAIL 变"慢成功";若过 S4_LAUNCH → 容器跑 **glm-5.2**(读 result.json `claude_usage.model`)可 close SilkNode #830。
+### 高优先级 (建议下次 session 优先评估) — 168h 跑阻塞链
+pre-flight 逐层剥出的阻塞链(每层 $0-低成本抓到):
+1. ~~Luxeno S3 timeout~~ → **止血** LUXENO_TIMEOUT_SEC=60 (PR #29) ✅ 验证过
+2. ~~镜像 sha 无效~~ → PR #30 ✅
+3. **[未修] Blocker 3: ISSUE_ID 正则** —— 自主 ISSUE_ID=数字内部 id 撞容器 `initial.sh:106` `^[A-Z][A-Z0-9-]+$`。修需**重建 M5 镜像** 或 **tick 改传 letter-prefixed ISSUE_ID**(代码侧, 待评估容器是否他处依赖裸数字)。owner 决策 + 排期。
+4. **[owner/基建, 真门] Luxeno/GLM 后端延迟** —— 45-54s/call(健康 <5s);查 Portkey 排队 / GLM 负载 / 路由 / 限流。**timeout=60 只让"慢但不挂"**, 168h 顺畅必须压低。#147 + SilkNode #830。
+5. (清 3+4 后) **端到端 glm-5.2 真跑** → 读 result.json `claude_usage.model` → close #830 → 才进 Day-1 anchor。
 
 ### 中优先级
 - ~~核实 glm-4.7 discrepancy~~ **已解决**:glm-4.7 是文档化 FALLBACK 档(`silknode_client.py:36`, primary glm-4.5-air → fallback glm-4.7),非配置错。
@@ -60,10 +67,10 @@ updated-at: 2026-07-02T14:14:36Z
 - **bash 双引号里的反引号会被命令替换**:`python3 -c "...\`\`\`..."` 会吞掉 markdown 代码块 → 用 quoted heredoc (`<<'PYEOF'`) 或 `-d @file`。
 
 ## §5 多维度同步状态 (Aria 4 维度)
-- **代码/git**:主仓 master `2c99d17`,origin/github parity。**aria-orchestrator 子模块 → `ed66327`**(PR #29 env-config + cron/reconcile timeout HCL);gitlink 已 bump。
-- **文档**:checklist Phase 0 已修正;本 handoff 已更新至 timeout 部署后状态。
-- **Issue**:Aether #190 (new)、Aria #147 (2 new comments: 命门 #14217 + 诊断 #14222)、SilkNode #830 (follow-up #14224)、Aria #148/#149 (closed)。aria-orchestrator PR #29 (merged)。
-- **运行时**:Layer 1 tick 认证健康 / schema v5.0 / 集群基建健康;**Luxeno LLM 延迟降级(根因未修)**;cron+reconcile 已加 `LUXENO_TIMEOUT_SEC=60`(止血)。
+- **代码/git**:主仓 master `4963ef3`,origin/github parity。**aria-orchestrator 子模块 → `daf7c79`**(PR #29 timeout env + cron/reconcile HCL + PR #30 image digest fix);gitlink 已 bump。
+- **文档**:checklist Phase 0 已修正;本 handoff 已更新至 image-fix + 阻塞链状态。
+- **Issue**:Aether #190、Aria #147 (4 new comments: 命门 #14217 / 诊断 #14222 / 阻塞链 #14260)、SilkNode #830 (#14224)、Aria #148/#149/#150 (closed)。aria-orchestrator PR #29 + #30 (merged)。
+- **运行时**:Layer 1 tick 认证健康 / schema v5.0 / 集群基建健康;cron+reconcile `LUXENO_TIMEOUT_SEC=60`(止血, 已验证 44.6/53.9s call 通过);tick image digest 修复(读 bare 64-hex)。**待清: Blocker 3 ISSUE_ID 正则(镜像) + Luxeno 根因**。
 
 ## §6 Next session 入口 + 优先级建议
 1. **先看 #147** 的 Luxeno **后端延迟**是否已修(owner/基建)。timeout 止血(=60)已部署但只是"慢但不挂";**根因未解前不要启动 168h**。
@@ -78,6 +85,12 @@ updated-at: 2026-07-02T14:14:36Z
 - `dfded80` chore(gitlink): aria-orch → f4d9128 (PR #29)
 - `666d879` chore(gitlink): aria-orch → 3dd4b5f (cron LUXENO_TIMEOUT_SEC=60)
 - `2c99d17` chore(gitlink): aria-orch → ed66327 (reconcile timeout parity)
+- `41e2da7` docs(handoff): 更新 handoff — timeout 止血部署
+- `4963ef3` chore(gitlink): aria-orch → daf7c79 (PR #30 image digest fix)
+
+aria-orchestrator (origin only):
+- PR #29 `f4d9128` LUXENO_TIMEOUT_SEC env-configurable + `3dd4b5f`/`ed66327` cron/reconcile =60
+- **PR #30 `daf7c79`** fix(tick): read image_sha256_final digest for IMAGE_SHA (#147 Blocker 2)
 
 aria-orchestrator (origin only, 内部不上 GitHub):
 - PR #29 merged `f4d9128` fix(silknode): LUXENO_TIMEOUT_SEC env-configurable
