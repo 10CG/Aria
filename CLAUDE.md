@@ -16,6 +16,8 @@
 **README.md** = "用户如何使用 Aria"
 **CLAUDE.md** = "AI 如何理解 Aria 项目"
 
+**CLAUDE.md 卫生** (Option A, 见 `standards/conventions/claude-md-hygiene.md`): 只放稳定内容; **不放** 版本 changelog (→ `aria/CHANGELOG.md` SOT) / session 进展流水 (→ `docs/handoff/`, Rule #9, 用 `/state-scanner` 查); 「项目状态」段 = live 覆写非 append log。enforcement: state-check `claude-md-changelog-free`。
+
 ## 工作语言
 
 **Aria 工作语言 = 中文**。AI 助手与 owner 对话默认中文叙述,不要大量中英混杂。

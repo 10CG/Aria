@@ -175,3 +175,27 @@ checks:
   #     gate 默认 block, Spec 归档 openspec/archive/2026-06-21-aria-submodule-gate-block-flip.
   #     决策记录 .aria/decisions/2026-06-21-v1.49.0-block-flip.md。监控目的 (决定何时 flip) 已达成,
   #     check 移除。今后 gate 行为由 phase-c-integrator T-flip-12 测试 + tripwire host-cron 守护。 ---
+
+  # --- CLAUDE.md 卫生: 禁 changelog/session 流水回涨 (claude-md-hygiene.md Option A) ---
+  - name: "claude-md-changelog-free"
+    description: |
+      CLAUDE.md 卫生规范 (standards/conventions/claude-md-hygiene.md, Option A 彻底移交):
+      CLAUDE.md 不得累积版本 changelog / session 流水。footer 只放指针, 不放
+      `> 前次` / `**更新**:` 滚动条目; 时效内容归 docs/handoff/ (Rule #9) +
+      CHANGELOG.md (SOT)。本 check = 防"砍完又长回来"的根因兜底 (2026-07-03 瘦身)。
+    command: |
+      ROLL=$(grep -cE '^> 前次|^\*\*更新\*\*:|^\*\*最近更新\*\*:' CLAUDE.md 2>/dev/null)
+      LINES=$(wc -l < CLAUDE.md)
+      if [ "${ROLL:-0}" -gt 0 ]; then
+        echo "REGROWTH — footer 有 $ROLL 条滚动 changelog (Option A 禁止, 移交 docs/handoff/)"; exit 1
+      fi
+      if [ "$LINES" -gt 640 ]; then
+        echo "BUDGET — CLAUDE.md $LINES 行 > 640 (疑 changelog/流水回涨, 核对时效内容是否该移交)"; exit 1
+      fi
+      echo "OK (no rolling changelog; $LINES lines)"
+    severity: warning
+    fix: |
+      把 footer 滚动条目 / 内联版本 changelog 移交 docs/handoff/ (Rule #9) + CHANGELOG.md (SOT);
+      项目状态段原地覆写非 append。见 standards/conventions/claude-md-hygiene.md (Option A)。
+    timeout_seconds: 5
+    enabled: true
