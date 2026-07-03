@@ -1,0 +1,246 @@
+metadata:
+  feature: aria-2.0-m6-dispatch-input-delivery
+  datasource: "tasks.md"
+  spec_level: 3
+  scope: aria-orchestrator
+  status: "Phase A.3 agent 分配完成 2026-07-03 (owner Approved; post_planning=off)"
+  total_tasks: 20
+  agents_used: [backend-architect, qa-engineer, knowledge-manager]
+  reviewer: tech-lead  # 架构 oversight, 非 task owner (post_spec 已 CONVERGED)
+  note: |
+    Aria 无 .aria/agents/ → 内置 aria roster。scope=aria-orchestrator 子模块
+    (Python extension.py + bash initial.sh/compute-assertions.sh + SQL 迁移 + docs)。
+    复杂度 S/M/L 为传统轴; token-axis 估算由 phase-d D.4 采集 (ai-native-estimator)。
+    TG-1↔TG-2 co-dependent (同 scope 落地); TG-4 gates TG-1; TG-6 gates all-deployed。
+
+tasks:
+  # ───────────────────────── TG-1 容器 (backend-architect) ─────────────────────────
+  - id: TASK-001
+    parent: "1.1"
+    title: "Step 1 ISSUE_ID 正则放宽接受 ARIA-<repo>-<number> (拒纯数字, DEMO-/TEST- 保留)"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: [docker/aria-runner/modes/initial.sh]
+    agent: backend-architect
+    verification: ["AC-2: 接受 ARIA-<repo>-<number>, 拒 bare numeric (regression test)"]
+
+  - id: TASK-002
+    parent: "1.2,1.3"
+    title: "Step 2 双模式输入解析 + ARIA- 走 always-fetch (ISSUE_URL + PAT 取 title/body; META 取 target_repo/base_branch/files_hint)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables: [docker/aria-runner/modes/initial.sh]
+    agent: backend-architect
+    verification: ["DEMO-/TEST- 读文件 (校验非空+YAML), ARIA- 无视既存文件 fetch"]
+
+  - id: TASK-003
+    parent: "1.4"
+    title: "Fetch 校验 + retry 分类 (2xx+合法JSON 拒 CF-Access 伪成功页; retriable 退避 vs non-retriable 即失败)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-002]
+    deliverables: [docker/aria-runner/modes/initial.sh]
+    agent: backend-architect
+    verification: ["AC-3: 每失败类可测; no || true; no 静默 continue"]
+
+  - id: TASK-004
+    parent: "1.5,1.6"
+    title: "title/body 消毒管线 (YAML-safe + CRLF→LF + 长度上限 + 注入隔离, 走 envsubst 白名单不二次展开) + base_branch default_branch 兜底"
+    status: pending
+    complexity: M
+    dependencies: [TASK-002]
+    deliverables: [docker/aria-runner/modes/initial.sh]
+    agent: backend-architect
+    verification: ["AC-7: body 不被 envsubst 二次展开 (白名单验证); base_branch 不硬编码 master"]
+
+  - id: TASK-005
+    parent: "1.7"
+    title: "RED-first: 在真 initial.sh call-site 复现空-expected 假绿; 修 compute-assertions 空列表→unknown/skip (file-mode 纵深防御)"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables: [docker/aria-runner/lib/compute-assertions.sh, docker/aria-runner/tests/]
+    agent: backend-architect
+    co_verify: qa-engineer  # RED 测在真 call-site 而非脚本孤立
+    verification: ["AC-4a: RED 先复现再修; 空 expected 永不 SUCCESS"]
+
+  - id: TASK-006
+    parent: "1.8,1.9,1.10"
+    title: "三态 outcome (fetch 跳过 compute-assertions call; AUTONOMOUS_COMPLETED=exit0+commit+PR→exit0; outcome-class stderr marker + fail-closed UNKNOWN)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-005]
+    deliverables: [docker/aria-runner/modes/initial.sh]
+    agent: backend-architect
+    co_verify: qa-engineer
+    verification: ["AC-4b/c/d: fetch→S9 非死锁; marker 走 Layer1 读的通道非 result.json; marker 缺/坏→UNKNOWN 非 SUCCESS"]
+
+  # ───────────────────────── TG-2 Layer1 + schema (backend-architect) ─────────────────────────
+  - id: TASK-007
+    parent: "2.1"
+    title: "additive nullable 列迁移 (005_schema_v4_additive.sql: raw_issue_number/target_repo/base_branch/files_hint/outcome_class); seed 写入"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/schema.sql, "hermes-extensions/aria-layer1/aria_layer1/migrations/005_schema_v4_additive.sql", hermes-extensions/aria-layer1/aria_layer1/extension.py]
+    agent: backend-architect
+    verification: ["AC-12: 既有 M3/M4/M5 additive 范式; _handle_s4_launch 从 dispatch_row 读; NULL 历史行优雅降级"]
+
+  - id: TASK-008
+    parent: "2.2,2.3"
+    title: "dispatch ISSUE_ID=ARIA-<repo>-<number> + Nomad META builder 扩 target_repo/base_branch/files_hint (读持久化列)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-007]
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/extension.py]
+    agent: backend-architect
+    verification: ["AC-5: 发 ARIA-<repo>-<number> + META 字段读持久化列非 env"]
+
+  - id: TASK-009
+    parent: "2.4"
+    title: "ISSUE_URL 重建 = {target_repo}/issues/{raw_issue_number} (从持久化列, 不解析复合 issue_id, 不用硬编码 env)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-007, TASK-008]
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/extension.py]
+    agent: backend-architect
+    verification: ["AC-11: 在 id!=number issue 上验证 (不被早期 id==number 遮蔽)"]
+
+  - id: TASK-010
+    parent: "2.5"
+    title: "head_branch = aria/{issue_id} 与容器 BRANCH 在新 scheme 下统一 (保 S6_REVIEW PR 绑定)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-008]
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/extension.py]
+    agent: backend-architect
+    verification: ["S6_REVIEW PR 绑定不断"]
+
+  - id: TASK-011
+    parent: "2.6"
+    title: "FailReason.INPUT_FETCH_FAILED + _handle_s5_await 消费 outcome-class marker (get_alloc_logs; exit≠0→区分 INPUT_FETCH_FAILED/CONTAINER_CRASH; exit0→记 outcome_class 单载体列; fail-closed)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-006, TASK-007]
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/interfaces.py, hermes-extensions/aria-layer1/aria_layer1/extension.py]
+    agent: backend-architect
+    co_verify: qa-engineer
+    verification: ["AC-6: infra-fail vs agent-fail 可区分 fixture 测试"]
+
+  - id: TASK-012
+    parent: "2.7"
+    title: "sibling check-m6-e2e-acceptance.py outcome-class-aware (AUTONOMOUS_COMPLETED 排除 verified-SUCCESS 计数/分层) — 跨 Spec 协调"
+    status: pending
+    complexity: M
+    dependencies: [TASK-011]
+    deliverables: ["aria-orchestrator/.../check-m6-e2e-acceptance.py"]
+    agent: backend-architect
+    co_verify: qa-engineer
+    verification: ["AC-4c: state='S9_CLOSE' 单独不混淆 AUTONOMOUS_COMPLETED 与 verified SUCCESS"]
+
+  # ───────────────────────── TG-3 键值迁移 + 查询普查 (backend-architect) ─────────────────────────
+  - id: TASK-013
+    parent: "3.1,3.2"
+    title: "issue_id 值重格式化 ARIA-<repo>-<number> (值级, 键不重构) + clean-DB vs 历史迁移决策文档化"
+    status: pending
+    complexity: M
+    dependencies: [TASK-008]
+    deliverables: [hermes-extensions/aria-layer1/aria_layer1/schema.sql, "migrations/"]
+    agent: backend-architect
+    verification: ["partial-unique-active 不变式保留; 与 TG-2.1 additive 列 disjoint"]
+
+  - id: TASK-014
+    parent: "3.3"
+    title: "普查所有 issue_id-keyed acceptance/dispatch 查询容忍新格式; 验 #147 issue_type_hint stratification (json_extract) 不受影响"
+    status: pending
+    complexity: S
+    dependencies: [TASK-013]
+    deliverables: ["aria-orchestrator/acceptance/*", "查询普查报告"]
+    agent: backend-architect
+    verification: ["AC-8: 每 issue_id-keyed 查询容忍新格式"]
+
+  # ───────────────────────── TG-4 镜像 (backend-architect 驱动, owner-gated build) ─────────────────────────
+  - id: TASK-015
+    parent: "4.1,4.2"
+    title: "aether-build-container 重建 aria-runner (仅 TG-1 容器码) + push registry + 冻结单一 IMAGE_SHA (记回滚旧 sha)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006]
+    deliverables: ["registry image_sha256 记录", ".aria/probes/ or runbook"]
+    agent: backend-architect
+    gate: "owner-triggered (aether-build-container 是 owner-triggered 原语); 仅 TG-1 baked"
+    verification: ["AC-9: 单一冻结 IMAGE_SHA + 回滚路径文档"]
+
+  # ───────────────────────── TG-5 契约+文档同步 (knowledge-manager) ─────────────────────────
+  - id: TASK-016
+    parent: "5.1,5.2,5.3"
+    title: "AD-M6-10 (六段) + AD4 风险表 cell 订正 (:384 mislabel, AD-M0-5 body 不碰) + AD-M1-4 amend (file-mode 5-AND + AUTONOMOUS_COMPLETED + INPUT_FETCH_FAILED)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-006, TASK-011]  # 设计定案后落文档
+    deliverables: [aria-orchestrator/docs/architecture-decisions.md]
+    agent: knowledge-manager
+    verification: ["AC-10 部分: AD-M6-10 written / AD4 cell corrected / AD-M1-4 amended; 落笔前核实 AD-M1-4 body :1360 既有 drift (R2 km caveat)"]
+
+  - id: TASK-017
+    parent: "5.4,5.5"
+    title: "layer-boundary-contract.md §5 Task Content Delivery Mechanism (双通道 file/fetch schema + file-mode lifecycle) + CLAUDE.md M6 依赖链更新"
+    status: pending
+    complexity: M
+    dependencies: [TASK-016]
+    deliverables: [aria-orchestrator/docs/layer-boundary-contract.md, CLAUDE.md]
+    agent: knowledge-manager
+    verification: ["AC-10 部分: §5 added; CLAUDE.md input-delivery↔遥测依赖链 (fetch-before-edit 高 contention)"]
+
+  # ───────────────────────── TG-6 E2E dogfood + pre-run (qa-engineer) ─────────────────────────
+  - id: TASK-018
+    parent: "6.1"
+    title: "heavy 节点 Forgejo egress/auth live-test (fetch 可达性, 跑前)"
+    status: pending
+    complexity: S
+    dependencies: []  # 可早跑 (prereq 探针)
+    deliverables: ["egress live-test 结果记录"]
+    agent: qa-engineer
+    verification: ["heavy 节点容器出站可达内网 Forgejo + PAT auth OK (防 CF-Access 伪成功页)"]
+
+  - id: TASK-019
+    parent: "6.2"
+    title: "E2E dogfood: 真数字-id 自主 dispatch → S9_CLOSE with merged PR (非仅单测)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-006, TASK-011, TASK-012, TASK-013, TASK-015, TASK-018]
+    deliverables: ["E2E dogfood 记录 (dispatch → S9/merged PR)"]
+    agent: qa-engineer
+    verification: ["AC-1 (最重要门): 真数字-id 自主 dispatch 到 S9_CLOSE + merged PR"]
+
+  - id: TASK-020
+    parent: "6.3"
+    title: "验证 fetch 失败对 Layer 1 可区分 infra-fail vs agent-fail"
+    status: pending
+    complexity: M
+    dependencies: [TASK-011, TASK-019]
+    deliverables: ["fail-mode 区分验证记录"]
+    agent: qa-engineer
+    verification: ["AC-6: INPUT_FETCH_FAILED 与 CONTAINER_CRASH 两分支实测可区分"]
+
+execution_order:
+  # 拓扑排序 (尊重 DAG); TG-1↔TG-2 co-dependent 同 scope 落地
+  phase_1_parallel_start: [TASK-001, TASK-005, TASK-007, TASK-018]  # 无前置, 可并行起
+  critical_path: "TASK-001→002→003/004→006→(011)→019 (container fetch + 三态 + Layer1 消费 + E2E)"
+  gates:
+    image_build: "TASK-015 gates on 全 TG-1 (001-006)"
+    e2e_dogfood: "TASK-019 gates on 006+011+012+013+015+018 全部部署"
+  co_dependency: "TG-1 (001-006) 与 TG-2 (007-012) 必须同 scope 一起落 (regex 先于输入加载; 缺 Layer1 则修复不生效 — qa OBJECTION ①)"
+
+summary:
+  by_complexity:
+    S: [TASK-001, TASK-009, TASK-010, TASK-014, TASK-018]  # 5
+    M: [TASK-002, TASK-003, TASK-004, TASK-005, TASK-007, TASK-008, TASK-012, TASK-013, TASK-015, TASK-016, TASK-017, TASK-020]  # 12
+    L: [TASK-006, TASK-011, TASK-019]  # 3
+  by_agent:
+    backend-architect: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015]  # 15 (容器+Layer1+schema+镜像)
+    knowledge-manager: [TASK-016, TASK-017]  # 2 (文档同步)
+    qa-engineer: [TASK-018, TASK-019, TASK-020]  # 3 (E2E+egress+fail-mode); 另 co_verify TASK-005/006/011/012
+  owner_gated: [TASK-015]  # aether-build-container owner-triggered

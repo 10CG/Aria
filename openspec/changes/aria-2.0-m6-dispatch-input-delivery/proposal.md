@@ -1,7 +1,7 @@
 # Aria 2.0 M6 — Layer1→Layer2 Dispatch Input Delivery (C' dual-channel)
 
 > **Level**: 3 (Full — cross-cuts container entrypoint + Layer 1 dispatch + acceptance assertions + boundary contract; new immutable image build; 4 internal task groups)
-> **Status**: ✅ **Approved** (owner sign-off 2026-07-03; Phase A.2 post_spec CONVERGED via R3 unanimous PASS; ready for Phase A.3 agent allocation → Phase B.1)
+> **Status**: ✅ **Approved** (owner sign-off 2026-07-03; Phase A.2 post_spec CONVERGED via R3 unanimous PASS; **Phase A.3 agent 分配 LOCKED 2026-07-03** — `detailed-tasks.yaml` 20 tasks [backend-architect 15 / knowledge-manager 2 / qa-engineer 3; TASK-015 owner-gated build]; ready for Phase B.1)
 > **Audit trajectory** (convergence mode, 5-agent team, code-grounded against `aria-orchestrator` daf7c79):
 >   - R1 (2026-07-03): **5/5 REVISE** — 3 Critical (AD-M0-5 misattribution [2-agent] / fetch-outcome↔state-machine dead-end [qa] / AC-6 fetch-fail indistinguishable [qa]) + 4 Major (ISSUE_URL not fixed [4-agent] / retry classification dropped / META "R7 64KB" factual error / compute-assertions call-site) + 1 Minor. All landed.
 >   - R2 (2026-07-03): **4 PASS + 1 REVISE** — backend-architect found 2 fix-introduced Criticals (corpus-exclusion label stranded on cross-node-unreadable `result.json` / B.3-vs-D.1 raw-number contradiction). Both landed (outcome-class stderr-marker → DB persistence → acceptance stratify; seed additive columns).
