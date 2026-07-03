@@ -1,6 +1,6 @@
 # secret-scan-honest-downgrade
 
-> **Status**: ✅ **Approved (owner sign-off 2026-07-03)** — post_spec CONVERGED (R4 3/3 PASS unanimous, verdict PASS 0 Critical/0 Major; 轨迹 R1→R2→R3→R4 = 3→2→1→0 REVISE)。Phase B 执行中。审计报告 `.aria/audit-reports/post_spec-R4-*-secret-scan-honest-downgrade.md`。
+> **Status**: ✅ **SHIPPED 2026-07-03** (aria-plugin **v1.51.0**, PR [#93](https://forgejo.10cg.pub/10CG/aria-plugin/pulls/93) merge `16bcc07` + standards PR [#12](https://forgejo.10cg.pub/10CG/aria-standards/pulls/12) merge `55b7309`, 双远程 parity; 主仓 `f38dcd8`)。post_spec CONVERGED (R4 3/3 PASS, 轨迹 3→2→1→0 REVISE) → Phase B (49/49 + code-review APPROVE) → Phase C 两协调 PR。防御反馈闭环拆 aria-plugin #92。Closes #91 (part②)。
 > **Level**: 2 (Minimal — proposal only; hook 行为降级 + cross-repo 文档诚实化, 无新增能力)
 > **Target**: `aria/hooks/secret-scan.sh` + `aria/hooks/tests/secret-scan.test.sh` + `aria/README.md` + `aria/README.zh.md` (aria-plugin) · `standards/conventions/secret-hygiene.md` + `standards/conventions/shell-jq-crlf-hygiene.md` (standards) · 主仓 root `VERSION` — **cross-repo (3 repos)**
 > **Target version**: aria-plugin v1.50.2 → **v1.51.0** (MINOR — 改 hook 观察行为 [warn-only detection 取代无效 redact, 且新增 additionalContext/systemMessage 告警 = additive] + 撤回文档宣称能力; backward-compat: hook 仍 `exit 0` always、仍扫描、无消费者依赖"有效 redaction")
