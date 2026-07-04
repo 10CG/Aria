@@ -526,7 +526,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped; 成熟度 ~0.9 — 端到端验证 + 多终端协调 + 跨 30+ Spec + AB 累积)
   M6 sub-Specs: #1 cost + #3 docs 已归档; #2 e2e-resilience 代码侧完成 (未归档, 待 168h 跑); #4 release-closeout sequential 待
   ⚠️ 168h 自主跑 ≠ make-ready: pre-flight (2026-07-02) 证自主 E2E 从未闭环 (数字-id dispatch 100% S_FAIL)。三门未清:
-    - Blocker 3 输入投递: Level 3 Spec `aria-2.0-m6-dispatch-input-delivery` Approved 2026-07-03 → Phase A.3 complete (30 tasks, post_planning R1→R2 CONVERGED 2026-07-04) → Phase B 执行中
+    - Blocker 3 输入投递 (`aria-2.0-m6-dispatch-input-delivery`, A.3 30-task post_planning CONVERGED): **Phase B.2 实现完成 + pre-merge code-reviewed** (aria-orchestrator `feature/m6-dispatch-input-delivery`, 26/30 task 绿 / 1 Critical 修 / WIP 未 merge)。**卡 Phase C.2 合并**于 4 owner/infra 门: build(021) / deploy(镜像先) / egress(028) / E2E dogfood(029=AC-1, 受 **Blocker 4**)
     - Blocker 4 Luxeno 后端延迟 45-54s (owner/基建门, 非 mihomo)
     - 遥测 Spec (AC-6 评分依赖, 独立, 待起) — **依赖链** (input-delivery ↔ 遥测, disjoint 不互相包含): input-delivery 只修 Blocker 3 (使自主 dispatch 能闭环到 S9_CLOSE, AC-1); 168h 跑要在 AC-6 cost 维度可评分仍须遥测 Spec 独立 ship — input-delivery ship 不代表 168h 跑对 AC-6 可评分
   M7 aria-fleet: 2 sub-Spec (fleet-aggregation + agent-lifecycle) Approved 2026-06-18; Phase B 受 D3 门 (M6 release-closeout ship 后)
