@@ -3,7 +3,7 @@ track-id: m6-blocker3-b2-impl-postplanning-rollout
 owner-container: simonfish/f9c6e8cd
 phase: B
 status: in_progress
-updated-at: 2026-07-04T10:49:05Z
+updated-at: 2026-07-04T11:21:38Z
 ---
 
 # Aria — Session Handoff (2026-07-04) — M6 Blocker 3 Phase B.2 完整实现 (agent-team workflow) + post_planning rollout + 并发和解
@@ -101,6 +101,9 @@ aria-orchestrator (feature/m6-dispatch-input-delivery @ `1ee225a`, origin only, 
 - `feedback_agent_disconnect_not_worklost` — workflow agent "failed" 常只是返回报告断线, 工作完整;诊断先查工作树+verify 结果
 - `feedback_premerge_review_catches_reproduced_critical_after_green_tests` — 6 agent TDD+1239 测试绿仍有 1 reproduced Critical;adversarial review 不可省
 - `feedback_validate_invariant_at_source_not_mixed_output` — 校验"模板变量遗漏展开"要查模板 (source) 非 rendered output (混入用户数据会误判 sigil)
+- `feedback_workflow_partition_by_file_domain` — 多-agent workflow 按文件域分 track (disjoint 并行/同文件串行); subagent 不 commit + 只跑自己域测试 (session-closer 内省补; 共 5 条)
+
+> **session-closer 收尾 (2026-07-04)**: 机械核验 = 4 仓双远程 parity / 0 sync warning; unfinished (tasks.md `[ ]`) = WIP 未 merge 预期 (Phase D 勾); consistency 5 advisory = Aria 无 runtime UPM 预期态。无机械补漏; AI 内省补 1 memory (file-domain workflow)。**leaf 终结** —— dispatch-input-delivery cycle 为 WIP (未 ship), 无 "shipped 未归档" advisory。
 
 ## Cross-references
 - Spec: `openspec/changes/aria-2.0-m6-dispatch-input-delivery/` (proposal + tasks + detailed-tasks.yaml)
