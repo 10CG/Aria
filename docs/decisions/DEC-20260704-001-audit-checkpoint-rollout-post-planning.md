@@ -17,7 +17,7 @@ Aria 的 audit-engine 多轮收敛审计**引擎 + 全部检查点已存在并�
 
 ## 并发 (2026-07-04, 记录以备协调)
 
-本 session 与另一容器 (simonfishgit) **并发对同一 Spec 做了 A.3** —— 本 session 30-task 版 (dogfood 靶子) vs 对方 20-task 版 (`7ce3cee`, 先落 remote + 更新 proposal Status)。协调裁决 = **保留对方已落地的 20-task 版** (正确、完整、proposal 已更新), 本 session 30-task 草稿保存于分支 `backup/a3-30task-dogfood-2026-07-04` 备查。本 DEC 的 post_planning 决策**独立于该裁决** (rollout 治理 ≠ 选哪份 A.3)。教训: 同 repo 建多小时 feature 前应 claim/coordinate (memory `feedback_concurrent_feature_collision_claim_before_build`)。
+本 session 与另一容器 (simonfishgit) **并发对同一 Spec 做了 A.3** —— 本 session 30-task 版 (dogfood 靶子) vs 对方 20-task 版 (`7ce3cee`, 先落 remote)。**裁决 (owner 2026-07-04)**: 双子星容器明确**停止处理本任务、全权移交本侧** → 采用本 session **30-task 细粒度版** (1:1 对 tasks.md + verification↔AC + 富 notes; FailReason 转录 slip 已 dogfood 修正), **supersede 对方 20-task 版** (保留在 git 历史 `7ce3cee` 备查; 早前推的对比分支 `backup/a3-30task-dogfood-2026-07-04` 即此版)。本 DEC 的 post_planning 决策**独立于该裁决** (rollout 治理 ≠ 选哪份 A.3)。教训: 同 repo 建多小时 feature 前应 claim/coordinate (memory `feedback_concurrent_feature_collision_claim_before_build`) —— 本次 file-level 无硬冲突但 feature-level 撞, 靠 owner 事后仲裁 + 移交解决。
 
 ## 约束条件
 
@@ -63,7 +63,7 @@ Aria 的 audit-engine 多轮收敛审计**引擎 + 全部检查点已存在并�
 ## 后续
 
 - **config 改动** (本 DEC 同批): `.aria/config.json` `checkpoints.post_planning` = convergence + `teams.post_planning` + `_comment` 更新引用本 DEC。
-- **落地的 A.3** = 并发裁决保留的对方 20-task 版 (`detailed-tasks.yaml` @ `7ce3cee`); 本 session 30-task 草稿 (dogfood 靶子) 存于 `backup/a3-30task-dogfood-2026-07-04`。若 owner 后续偏好细粒度版可从该分支恢复。
+- **落地的 A.3** = 本 session **30-task 版** (`detailed-tasks.yaml`; owner 2026-07-04 全权归本侧后采用, supersede 对方 20-task `7ce3cee`, 后者留 git 历史)。proposal.md Status 同步更新为 30 tasks。
 - **shared spec 修正**: tasks.md 1.8 「dies at :37」→ 精确机制 (随本 rollout 前序 commit 落地)。
 - **观察窗**: 首个走 post_planning 的 Spec 即二次 dogfood; 评估 verdict 质量 / 成本 / 是否调 adaptive。
 - **mid_post_spec**: Phase B 首次 SMOKE-触发 dogfood 后另立 rollout amendment 决定是否锁定。
