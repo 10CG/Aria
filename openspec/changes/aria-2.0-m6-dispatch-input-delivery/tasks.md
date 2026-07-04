@@ -32,7 +32,7 @@
 - [ ] 1.5 Title/body sanitization pipeline: YAML-safe escape + CRLF→LF + length cap + injection isolation; route through existing envsubst whitelist (body not re-expanded)
 - [ ] 1.6 `base_branch` from META with Forgejo `default_branch` fallback (never hardcode `master`)
 - [ ] 1.7 **RED-first** at the real `initial.sh` call-site: reproduce current empty-`expected_changes` false-green; fix compute-assertions to emit `unknown`/`skip` (not `true`) on empty lists (file-mode defense-in-depth)
-- [ ] 1.8 Fetch mode **skips** the `compute-assertions.sh` call entirely (no `issue.yaml` exists → current unconditional call dies at `:37`); wire the skip at `initial.sh:513`
+- [ ] 1.8 Fetch mode **skips** the `compute-assertions.sh` call entirely; wire the skip at `initial.sh:513-515`. (Mechanism, corrected by mid_post_spec dogfood 2026-07-04: the call at `:514` has `| tail -5 || true` under `set -euo pipefail` — compute-assertions.sh's `exit 1` at `:37` is **swallowed**, container does NOT die there; real dead-end is `FILE_TOUCHED_HIT`/`DIFF_CONTAINS_HIT` defaulting `false` at `:517-518` → 5-AND fail → `ASSERTION_MISMATCH` `:534` → `exit 1` `:595` → `S_FAIL`. Skip avoids this dead-end.)
 - [ ] 1.9 Define `AUTONOMOUS_COMPLETED` outcome (fetch mode) = `claude_exit==0 AND commit AND PR` (no file/diff hits); map to `exit 0`
 - [ ] 1.10 Emit the outcome-**class** stderr marker on the channel Layer 1 reads (cf. `redo.sh` precedent, consumed via `get_alloc_logs`): on success distinguish `AUTONOMOUS_COMPLETED` vs file-mode `SUCCESS`; on fetch failure emit `INPUT_FETCH_FAILED` + `exit 1`. (Do **not** rely on `result.json` — Layer 1 never reads it and it is on cross-node-unreadable storage.)
 
