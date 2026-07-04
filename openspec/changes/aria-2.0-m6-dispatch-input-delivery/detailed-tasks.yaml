@@ -13,7 +13,7 @@ metadata:
   decision_source: "docs/decisions/DEC-20260702-001-layer2-input-delivery-architecture.md"
   total_tasks: 30
   task_groups: 6
-  status: "A.3 complete — ready for post_planning audit → B.1"
+  status: "A.3 complete — post_planning R1→R2 CONVERGED 2026-07-04 (6 Major+minors fixed, R2 all-PASS); ready for B.1"
   new_agents_required: false
   agent_roster: [backend-architect, qa-engineer, knowledge-manager]
   estimation_note: >
@@ -139,7 +139,7 @@ tasks:
     dependencies: []
     deliverables:
       - aria-orchestrator/docker/aria-runner/lib/compute-assertions.sh   # false-green at :94-120 (HIT init true, empty loops skip)
-      - aria-orchestrator/docker/aria-runner/tests/compute-assertions/   # fixtures dir exists (ca-01..ca-06) — add empty-expected fixture
+      - aria-orchestrator/docker/aria-runner/tests/compute-assertions/   # fixtures dir has ca-01..ca-07 — add empty-expected fixture as ca-08
     verification:
       - "AC-4(a): RED test at the REAL initial.sh call-site proves pre-fix empty-expected false-green, then passes"
       - "empty expected_file_touched[]/expected_diff_contains[] → emit unknown/skip, NEVER default true"
@@ -158,7 +158,7 @@ tasks:
       - aria-orchestrator/docker/aria-runner/modes/initial.sh   # call site :514 (guarded by -f at :513)
     verification:
       - "fetch mode has no issue.yaml → compute-assertions.sh must be SKIPPED, not fed a stub; skip wired at initial.sh:513-515"
-      - "RED test MUST exercise the REAL initial.sh call-chain (not isolated compute-assertions.sh): compute-assertions.sh exits 1 internally at :37, but the call at :514 has `| tail -5 || true` (under set -euo pipefail :26) that SWALLOWS it — container does NOT die there. The externally-observable pre-fix failure is: assertion-results.json never written → FILE_TOUCHED_HIT/DIFF_CONTAINS_HIT stay false (:517-518) → 5-AND fails → FINAL_OUTCOME=ASSERTION_MISMATCH (:534) → exit 1 (:595) → S_FAIL(CONTAINER_CRASH). Post-fix: AUTONOMOUS_COMPLETED → exit 0."
+      - "RED test MUST exercise the REAL initial.sh call-chain (not isolated compute-assertions.sh): compute-assertions.sh exits 1 internally (guard :37, exit :39), but the call at :514 has `| tail -5 || true` (under set -euo pipefail :26) that SWALLOWS it — container does NOT die there. The externally-observable pre-fix failure is: assertion-results.json never written → FILE_TOUCHED_HIT/DIFF_CONTAINS_HIT stay false (:517-518) → 5-AND fails → FINAL_OUTCOME=ASSERTION_MISMATCH (:534) → exit 1 (:595) → S_FAIL(CONTAINER_CRASH). Post-fix: AUTONOMOUS_COMPLETED → exit 0."
     notes: >
       R1 qa: naive empty-guard would collide with state machine → ASSERTION_MISMATCH → exit1 → S_FAIL in a new form. Skip, don't stub.
       mid_post_spec dogfood (2026-07-04): corrected "dies at :37" imprecision — the die is swallowed by `|| true`; real fail path is ASSERTION_MISMATCH downstream, NOT a crash at the call. An isolation-only RED test (compute-assertions.sh with a bad path) would pass in both pre/post-fix states → white-washes the fix (feedback_test_mock_pattern_hides_prod_bug). Same real-call-site risk as TASK-007.
@@ -212,11 +212,13 @@ tasks:
     dependencies: []
     deliverables:
       - aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/migrations/008_schema_vNEXT_additive.sql
+      - aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/schema_migrate.py  # _MIGRATIONS list + _LATEST_SCHEMA_VERSION @ :58-67 (register new tuple + bump — else existing prod DB no-op-skips @ :105)
       - aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/schema.sql        # schema_meta version (currently 5.0)
       - aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/extension.py      # _phase1_scan_and_seed @ :1110
       - aria-orchestrator/hermes-extensions/aria-layer1/tests/
     verification:
-      - "AC-12: additive nullable columns raw_issue_number/target_repo/base_branch/files_hint (+ optional outcome_class) on dispatches; established migrations/00N_additive.sql pattern (M3 v2/M4 v3/M5 precedent)"
+      - "AC-12: additive nullable columns raw_issue_number/target_repo/base_branch/files_hint + outcome_class (NOT optional — TASK-016 is the single carrier and has no migration of its own, so the column MUST land here) on dispatches; established migrations/00N_additive.sql pattern (M3 v2/M4 v3/M5 precedent)"
+      - "post_planning R1 (backend-architect): new to_version tuple registered in schema_migrate.py _MIGRATIONS + _LATEST_SCHEMA_VERSION bumped (else apply_migrations no-op-skips on existing prod DB @ :105)"
       - "seed (_phase1_scan_and_seed) writes them; historical rows (NULL) degrade gracefully"
     notes: >
       Migration file: next numeric prefix is 008 (007 is latest). CONFIRM in B: exact schema_version
@@ -253,6 +255,7 @@ tasks:
       - aria-orchestrator/hermes-extensions/aria-layer1/tests/
     verification:
       - "AC-5: META fields read from persisted columns (2.1) via dispatch_row — NOT global env; each tiny (well within 100KB/field META cap, prompt_render.py:42)"
+      - "AC-12 (read half): _handle_s4_launch reads the persisted columns from dispatch_row (pairs with TASK-011 write half)"
 
   - id: TASK-014
     parent: "2.4"
@@ -305,9 +308,10 @@ tasks:
       - "AC-4(c): exit_code==0 → read marker to distinguish AUTONOMOUS_COMPLETED vs file-mode SUCCESS → PERSIST outcome_class into DB (single carrier)"
       - "AC-4(d) fail-closed: marker absent/malformed on exit 0 → outcome_class=UNKNOWN (NOT SUCCESS); fixture covers absent + malformed"
     notes: >
-      R1 qa Critical + R2 backend-architect Critical A. SINGLE CARRIER (R3 tech-lead M-1): pick outcome_class
-      column (TASK-011 migration) OR dispatch_audit_log payload (#147 B4 json_extract pattern, db.py:622) —
-      NOT both. Column is simpler to stratify in acceptance SQL → prefer column. This is the biggest task.
+      R1 qa Critical + R2 backend-architect Critical A. SINGLE CARRIER (R3 tech-lead M-1): use the outcome_class
+      column added by TASK-011 (now UNCONDITIONAL per post_planning R1) — NOT dispatch_audit_log payload. This task
+      has no migration of its own, so the column MUST come from TASK-011 (post_planning R1 qa: else stuck, no escape).
+      Column is simpler to stratify in acceptance SQL. This is the biggest task.
 
   - id: TASK-017
     parent: "2.7"
@@ -320,13 +324,17 @@ tasks:
     dependencies: [TASK-016]
     deliverables:
       - aria-orchestrator/acceptance/check-m6-e2e-acceptance.py   # total_s9 = COUNT(*) WHERE state='S9_CLOSE'
+      - aria-orchestrator/tests/acceptance/test_m6_e2e_acceptance.py   # existing TestDispatchStrat — add case per verification
     verification:
       - "AC-4(c): AUTONOMOUS_COMPLETED excluded from verified-SUCCESS counts / stratified separately"
       - "query on state='S9_CLOSE' alone must NOT conflate AUTONOMOUS_COMPLETED with verified SUCCESS"
+      - "post_planning R1 (qa): add a case to existing test_m6_e2e_acceptance.py::TestDispatchStrat asserting a mixed-in outcome_class='AUTONOMOUS_COMPLETED' row is excluded/stratified (code-only edit = paper-fix of the very corpus-poisoning defense this Spec exists for)"
     notes: >
       CROSS-SPEC coordination — edits Spec #2 (aria-2.0-m6-e2e-resilience) file, which is not yet archived.
       Delivered by THIS Spec (it is the mechanism that makes the label load-bearing). Without it R2 Critical A
-      recurs at the acceptance layer. Coordinate with #138 (e2e-resilience rework) before touching its file.
+      recurs at the acceptance layer. post_planning R1 (km): coordinate by checking recent commits / open branches
+      on check-m6-e2e-acceptance.py before editing — do NOT rely on #138 (its scope is Spec #2 TG-B crash-recovery,
+      NOT this TG-A acceptance query; Spec #2 tasks.md A-acceptance items lag the already-landed code).
 
   # -------------------------------------------------------------------------
   # TG-3 — Key format value migration + query survey
@@ -357,7 +365,7 @@ tasks:
     agent: backend-architect
     dependencies: [TASK-018]
     deliverables:
-      - aria-orchestrator/openspec-or-docs/           # decision note (record in Spec tasks.md or migration comment)
+      - openspec/changes/aria-2.0-m6-dispatch-input-delivery/tasks.md   # §3.2 decision note (main-repo Spec), or the 008 migration header comment
     verification:
       - "clean-DB vs historical-migration decision recorded with rationale"
 
@@ -393,7 +401,12 @@ tasks:
       - aria-orchestrator/docker/aria-runner/           # image build via /aether:aether-build-container
     verification:
       - "AC-9: only container-side code baked into image (TG-2/TG-3 are Hermes/light-1, deployed separately); pushed to internal registry"
-    notes: "Gates on TG-1 ONLY. Uses aether-build-container skill (Aria #120 GA path). image_sha256 digest — NOT git short-sha (m5-handoff F1 bug, PR #30)."
+    notes: >
+      Gates on TG-1 ONLY. Uses aether-build-container skill (Aria #120 GA path). image_sha256 digest — NOT git
+      short-sha (m5-handoff F1 bug, PR #30). post_planning R1 (tech-lead): aether-build-container is an
+      OWNER-TRIGGERED primitive — this is a 2nd owner gate (besides S7 merge); model as owner-action (AI preps,
+      owner triggers build), task stays in_progress after AI prep (feedback_t15_owner_blocking_pattern) so
+      phase_4→phase_5 does not silently stall.
 
   - id: TASK-022
     parent: "4.2"
@@ -438,10 +451,17 @@ tasks:
     dependencies: [TASK-023]
     deliverables:
       - aria-orchestrator/docs/architecture-decisions.md   # cell @ :384
+      - docs/decisions/DEC-20260702-001-layer2-input-delivery-architecture.md   # main-repo; forward-correction footnote at amend-AD-M0-5 lines (22/69/88) — see notes
     verification:
       - "AC-10: fix the 'AD-M0-5 约定' mislabel + scope bind-mount premise to single-node + xref AD-M6-10"
       - "DO NOT touch the AD-M0-5 body (:1035, m0-handoff schema — unrelated decision)"
-    notes: "R1 2-agent Critical/Major. DEC line 22 carried the same misattribution — corrected here."
+      - "post_planning R1 (km): add forward-correction footnote to DEC-20260702-001 lines 22/69/88 (they still say 'amend AD-M0-5' — the misattribution this Spec debunks)"
+    notes: >
+      R1 2-agent Critical/Major. post_planning R1 (km): proposal says "DEC line 22 corrected here" but
+      DEC-20260702-001 still says "amend AD-M0-5" at lines 22/69/88 (the very misattribution this Spec debunks).
+      Add a forward-correction footnote at those DEC lines (feedback_inline_deferral_notation pattern): the
+      bind-mount premise is an AD4-cell mislabel, not an AD-M0-5 decision — see AD-M6-10 + this AD4 correction.
+      (Do NOT touch AD-M0-5 body.)
 
   - id: TASK-025
     parent: "5.3"
@@ -474,6 +494,7 @@ tasks:
       - aria-orchestrator/docs/layer-boundary-contract.md
     verification:
       - "AC-10: §5 dual-channel field schema table (file vs fetch) + file-mode lifecycle declaration"
+      - "post_planning R1 (km): also bump the file's **Last Updated** header + add §5 to the ## Overview enumeration sentence (else the new section is orphaned from the overview)"
     notes: "Pre-existing gap — contract currently says nothing about how the container obtains full issue content."
 
   - id: TASK-027
@@ -520,7 +541,7 @@ tasks:
     complexity: L
     est_hours: 10
     agent: qa-engineer
-    dependencies: [TASK-016, TASK-017, TASK-020, TASK-022, TASK-028]
+    dependencies: [TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-020, TASK-022, TASK-028]
     deliverables:
       - aria-orchestrator/           # E2E dogfood run evidence (dispatch row → S9_CLOSE, merged PR)
     verification:
@@ -539,7 +560,7 @@ tasks:
     complexity: M
     est_hours: 6
     agent: qa-engineer
-    dependencies: [TASK-016, TASK-029]
+    dependencies: [TASK-016, TASK-022, TASK-028]
     deliverables:
       - aria-orchestrator/hermes-extensions/aria-layer1/tests/
     verification:
