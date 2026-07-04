@@ -52,21 +52,22 @@
   },
 
   "audit": {
-    "_comment": "Enabled 2026-05-19 for DEC-20260519-001 multi-terminal-coordination post_spec R1 audit. Other checkpoints kept off until verified per Aria step-by-step rollout.",
+    "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood.",
     "enabled": true,
     "mode": "convergence",
     "max_rounds": 4,
     "checkpoints": {
       "post_brainstorm": "off",
       "post_spec": "convergence",
-      "post_planning": "off",
+      "post_planning": "convergence",
       "mid_implementation": "off",
       "post_implementation": "off",
       "pre_merge": "off",
       "post_closure": "off"
     },
     "teams": {
-      "post_spec": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"]
+      "post_spec": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"],
+      "post_planning": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"]
     }
   },
 
