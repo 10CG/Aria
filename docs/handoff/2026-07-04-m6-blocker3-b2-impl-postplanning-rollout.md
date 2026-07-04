@@ -64,7 +64,7 @@ updated-at: 2026-07-04T11:21:38Z
 - **render invariant 该查 source 非 output**:校验「模板变量是否遗漏展开」要查**模板本身** (envsubst 前),查 rendered output 会把用户数据里的字面 sigil 误判。(通用:validate at the source, not the mixed output)
 
 ## §5 多维度同步状态 (Aria 4 维度)
-- **代码/git**:aria-orchestrator `feature/m6-dispatch-input-delivery @ ef61f55` (push origin, WIP 未 merge)。主仓 master (见 §7, 双远程 parity)。**submodule 指针 daf7c79 未动**。
+- **代码/git**:aria-orchestrator `feature/m6-dispatch-input-delivery @ 1ee225a` (B.2 + Critical 修 + review follow-ups, push origin, WIP 未 merge)。主仓 master `e985edf` (见 §7, 双远程 parity)。**submodule 指针 daf7c79 未动**。
 - **文档**:主仓 CLAUDE.md M6 状态 + DEC-20260702-001 勘误 + tasks.md §3.2 决策 + DEC-20260704-001 (rollout);aria-orchestrator AD-M6-10 + AD-M1-4 amend + layer-boundary §5 (在 feature 分支)。
 - **决策**:**DEC-20260704-001** (post_planning rollout);消费 DEC-20260702-001 (Blocker 3 架构)。
 - **配置**:`.aria/config.json` `post_planning: convergence` 启用 (首个官方 gate 已跑通)。
@@ -73,7 +73,7 @@ updated-at: 2026-07-04T11:21:38Z
 
 ## §6 Next session 入口 + 优先级建议
 1. **⭐ 清 4 个 owner/infra 门** (真闭环命门):Blocker 4 (Luxeno) → build (021) → deploy → egress (028) → E2E dogfood (029, AC-1)。E2E 绿才进 Phase C.2。
-2. **AI-side 可先做** (非阻塞, 提升 merge 就绪度):补 AC-3 retriable 测试 + 写 `initial-sh-unit/test.sh` (消灭幽灵引用) + 清 TASK-015 重言式测试 + deploy runbook 加「镜像先」约束。
+2. **AI-side follow-ups ✅ 已完成** (2026-07-04, feature `1ee225a`):initial-sh-unit 单测 (23/23, 消灭幽灵引用) + TASK-015 重言式清理 + deploy-order §6 note。残留仅少数非阻塞 Minor (§2 中优先级 ⏳ 项)。
 3. **Phase C** (门清 + E2E 绿后):aria-orchestrator 开 PR → pre-merge gate (Rule #8) → merge → **bump 主仓 submodule 指针** → Phase D 归档 + `detailed-tasks.yaml` status 更新。
 4. **协调**:同 Spec 任何后续工作**先 fetch + 查看板/handoff** (双子星活跃, DEC-20260704-002 Layer L 防重复在建)。
 
