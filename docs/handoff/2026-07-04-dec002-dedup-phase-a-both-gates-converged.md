@@ -10,10 +10,9 @@ updated-at: 2026-07-04T10:55:52Z
 
 ## §0 入口 (新 session 优先读)
 
-承 2026-07-04 上午 handoff (`2026-07-04-dedup-coordination-brainstorm-dec.md`) 的 **DEC-20260704-002 实施主线**。本 session 从 `/state-scanner` 入口选 [1], **一口气把防重复机制 spec 走完整个 Phase A**: recon → A.1 spec (post_spec R3 CONVERGED) → owner sign-off → A.2/A.3 detailed-tasks (post_planning R5 CONVERGED)。已提交 `3b10c17` (master, **未 push**)。
+承 2026-07-04 上午 handoff (`2026-07-04-dedup-coordination-brainstorm-dec.md`) 的 **DEC-20260704-002 实施主线**。本 session 从 `/state-scanner` 入口选 [1], **一口气把防重复机制 spec 走完整个 Phase A**: recon → A.1 spec (post_spec R3 CONVERGED) → owner sign-off → A.2/A.3 detailed-tasks (post_planning R5 CONVERGED) → **提交并推送双远程 (parity `e60a6af`)** + CLAUDE.md 项目状态段同步。**push 时化解 2 次双子星并发 non-fast-forward** (fetch-rebase + latest.md 手动多轨语义合并) —— 一次贴切的 live dogfood (本 spec 正是要机制化防这个)。
 
-> **⭐ 头号即时待办: push `3b10c17`** (master ahead 1 vs origin+github)。owner 授权了 commit, push 待确认。
-> **⭐ 主线下一步: DEC-002 Phase B 实施** (20 tasks, 独立大 session, 见 §6)。
+> **⭐ 主线下一步: DEC-002 Phase B 实施** (20 tasks, 独立大 session, 见 §6)。**开工前 fetch + 看双子星** —— 本 session 单 push 就撞了 2 次, 双子星 (M6 Blocker3 B.2) 高度活跃。
 
 > **⚠️ 关键项目认知不变**: owner 并行跑双子星 (dev-claude2)。本 session 开工前 fetch 确认远程无双子星在做 DEC-002 (advisory 放行)。大活前仍须 fetch + 看板。memory [[project_dev_claude2_parallel_session]]。
 
@@ -26,14 +25,16 @@ updated-at: 2026-07-04T10:55:52Z
 5. **owner sign-off** → spec Approved。
 6. **A.2/A.3 detailed-tasks.yaml** (20 tasks, agent backend-architect 8 / qa-engineer 7 / knowledge-manager 5; 无新 agent)。
 7. **post_planning 审计 CONVERGED**: R1 (7M+17m; 4 REVISE+1 PASS) → R2 (2M+7m) → R3 (1M) → R4 (1 新 Major) → **R5 (0 findings; BA+cr PASS)**。报告 `.aria/audit-reports/post_planning-R5-CONVERGED-*.md`。
-8. **提交 `3b10c17`** (`feat(spec)`, master, 未 push): 3 spec 文件 + 2 审计报告。
+8. **提交** spec + 审计报告 (`feat(spec)`) + 会话收尾 handoff (`docs(handoff)`)。
 9. **2 条 memory** (§8) + 会话收尾 handoff (本文档)。
+10. **推送双远程 (化解 2 次双子星并发)**: push 撞 non-fast-forward (双子星推了 M6 Blocker3 B.2 共 6 提交) → fetch-first → rebase ×2 → **latest.md 手动多轨合并** (双子星 M6-B2 = bare `**Latest**:` 主线 / 我 DEC002 = `**Handoff**:` 并发下午 / 恒 1 bare pointer 不变式守住; keep-both, advisory-over-hardlock 不 clobber)。最终 spec `b25f942` / handoff `0798ed9` / CLAUDE.md `e60a6af` 三方 parity。
+11. **CLAUDE.md 项目状态段同步** (`e60a6af`, live 覆写 Option A): 加 aria-plugin 方法论轨一行 (DEC-002 Phase A CONVERGED, 与 M6/M7 正交)。
 
 ## §2 未完成 / Carry-forward 清单
 
 ### 本 session 直接产出的 carry-forward (最高优先级)
-1. ⭐ **push `3b10c17`** (master ahead 1 vs origin+github; `has_pending_push=true`)。owner 确认后 `git push origin master && git push github master`。
-2. ⭐ **DEC-002 Phase B 实施** (carry-id: `carry-dec002-dedup-phase-b`): spec Approved + A.3 LOCKED, 20 tasks 待实施。**独立大 session** (~115h/token)。Phase B.1 = branch。分工建议 (memory `feedback_agent_team_dynamic_workflow_division`): TG-1 核心 gate 代码 (002 CLI wrapper/003 advisory/004 surface) 主 loop 亲验; TG-2/TG-4 文档交 workflow agent 并行 (disjoint)。**跨-repo**: standards(§2.3)先 merge → aria-plugin → 主仓 gitlink。
+1. ~~push spec+handoff~~ ✅ **已完成** (双远程 parity `e60a6af`, 化解 2 次双子星并发 + latest.md 多轨合并 + CLAUDE.md 同步)。
+2. ⭐ **DEC-002 Phase B 实施** (carry-id: `carry-dec002-dedup-phase-b`) — **本 handoff 头号 carry-forward**: spec Approved + A.3 LOCKED, 20 tasks 待实施。**独立大 session** (~115h/token)。Phase B.1 = branch。分工建议 (memory `feedback_agent_team_dynamic_workflow_division`): TG-1 核心 gate 代码 (002 CLI wrapper/003 advisory/004 surface) 主 loop 亲验; TG-2/TG-4 文档交 workflow agent 并行 (disjoint)。**跨-repo**: standards(§2.3)先 merge → aria-plugin → 主仓 gitlink。
 3. **#94 关闭 + #95 部分回应**: 仅当 DEC-002 Phase B+C+D ship 后。本 session 未关。
 
 ### 承前 handoff、本 session 未触碰 (仍 open)
@@ -47,6 +48,7 @@ updated-at: 2026-07-04T10:55:52Z
 - **接活/接线 recon 陷阱**: 只读引擎代码会漏"接线点/config 键"—— 必读集成设计文档 + 既有 rules ([[feedback_recon_integration_docs_before_wiring_spec]])。本 session 两处 Critical 皆此因。
 - **自指防假绿 spec 的 plan 反复重开假绿**: telemetry source 机制 4 轮才收敛 ([[feedback_selfreferential_antifalsegreen_plan_needs_more_audit_rounds]])。Phase B 实施 TG-3 探针/harness 时尤须警惕。
 - **owner-container 手填漂移** (本 spec 要修的病根本身): 实测 `~/.aria/container-id` **label 空** (uuid `bfe8285d`) → 机械 get_identity 会产出 `simonfish/bfe8285d`, 但历史 handoff 手填 `simonfish/dev-claude`。本 handoff 沿用 `simonfish/dev-claude` 保连续性。**建议 Phase B TASK-009 落地后, 给 container-id 文件设 label=`dev-claude` 使机械值与历史一致**。
+- **push 高竞争 + latest.md 多轨手动合并** (live dogfood): 本 session push 撞 2 次双子星 non-fast-forward。**push 前必 fetch-first**; `latest.md`/`CLAUDE.md` 是 multi-track 高竞争区 (memory [[feedback_claude_md_project_status_high_contention]] / [[feedback_concurrent_sot_conflict_mechanical_resolve]] / [[feedback_latest_md_single_bare_pointer_invariant]])。latest.md 合并规则: keep-both 两轨条目 + 恒 1 bare `**Latest**:` (主线/最新远程 push 为 bare, 并发轨降 `**Handoff**:`), advisory-over-hardlock 不 clobber 对方内容。
 
 ## §4 实战教训 (memory 沉淀来源)
 
@@ -57,7 +59,7 @@ updated-at: 2026-07-04T10:55:52Z
 
 ## §5 多维度同步状态 (Aria 4 维度)
 
-- **代码/git**: 主仓 master `3b10c17` **ahead 1 vs origin+github (未 push, has_pending_push=true)**; aria `16bcc07` / standards `55b7309` (detached 同步态); aria-orchestrator `daf7c79` origin=equal。
+- **代码/git**: 主仓 master `e60a6af` **origin+github parity equal (已推送, 无 pending push)**; aria `16bcc07` / standards `55b7309` (detached 同步态); aria-orchestrator `daf7c79` origin=equal。**注**: 本 session 期间双子星把 master 从 e9d8104 推进到 M6 Blocker3 B.2 (6 提交), 我 2 提交 rebase 其上线性化。
 - **文档**: 新增 spec `interactive-session-dedup-coordination` (proposal+tasks+detailed-tasks) + 2 审计报告。
 - **决策**: DEC-20260704-002 (本 session 实施其 Phase A)。
 - **Issue**: aria-plugin #94/#95 仍 open (待 Phase B ship 后关)。
@@ -70,8 +72,7 @@ updated-at: 2026-07-04T10:55:52Z
 /aria:state-scanner   # 看板 + 推荐; 会 surface 本 handoff (Phase 1.15)
 ```
 
-1. ⭐ **push `3b10c17`** (若 owner 未推): `git push origin master && git push github master` + post-push SHA 验证 (memory `feedback_git_minus_c_for_submodule_push`)。
-2. ⭐ **DEC-002 Phase B** (carry-id `carry-dec002-dedup-phase-b`): 独立大 session, Phase B.1 起。开工前 fetch + 看双子星是否在做同一件 (机制修好前的人肉认领)。
+1. ⭐ **DEC-002 Phase B** (carry-id `carry-dec002-dedup-phase-b`): 独立大 session, Phase B.1 起。**开工前 fetch + 看双子星是否在做同一件** (机制修好前的人肉认领; 本 session push 撞 2 次证双子星活跃)。(push 已完成, 见 §7。)
 3. **M6 Blocker3 Phase B** (M6 主线, 与防重复正交): 独立择时。
 4. **#95 系统修复 + pre-#134 sweep**: 独立排期。
 
@@ -79,11 +80,13 @@ updated-at: 2026-07-04T10:55:52Z
 
 ## §7 提交清单 (commit hash + multi-remote parity)
 
-主仓 (master, **未 push**, ahead 1 vs origin+github):
-- `3b10c17` feat(spec): DEC-002 防重复机制 Phase A — interactive-session-dedup-coordination (接活改造 Layer L advisory)
+主仓 (master, **已推送双远程, parity `e60a6af`**; SHA 经 2 次 rebase 变化):
+- `b25f942` feat(spec): DEC-002 防重复机制 Phase A — interactive-session-dedup-coordination (接活改造 Layer L advisory)
+- `0798ed9` docs(handoff): 会话收尾 2026-07-04 下午 — DEC-002 防重复机制 Phase A 全程
+- `e60a6af` docs(claude): 项目状态段反映 DEC-002 防重复机制 Phase A CONVERGED (与 M6/M7 正交)
+- (rebase 基点 = 双子星 M6 Blocker3 B.2 的 `2e4b727`)
 
-无 aria / standards / aria-orchestrator 子模块变更 (本 session spec 落主仓 openspec/, 实现代码待 Phase B)。
-无插件版本变更。
+无 aria / standards / aria-orchestrator 子模块变更 (本 session spec 落主仓 openspec/, 实现代码待 Phase B)。无插件版本变更。
 
 ## §8 Memory entries this session (2 new)
 
