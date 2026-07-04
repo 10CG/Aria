@@ -530,6 +530,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
     - Blocker 4 Luxeno 后端延迟 45-54s (owner/基建门, 非 mihomo)
     - 遥测 Spec (AC-6 评分依赖, 独立, 待起) — **依赖链** (input-delivery ↔ 遥测, disjoint 不互相包含): input-delivery 只修 Blocker 3 (使自主 dispatch 能闭环到 S9_CLOSE, AC-1); 168h 跑要在 AC-6 cost 维度可评分仍须遥测 Spec 独立 ship — input-delivery ship 不代表 168h 跑对 AC-6 可评分
   M7 aria-fleet: 2 sub-Spec (fleet-aggregation + agent-lifecycle) Approved 2026-06-18; Phase B 受 D3 门 (M6 release-closeout ship 后)
+  aria-plugin 方法论轨 (与 M6/M7 正交): `interactive-session-dedup-coordination` (DEC-20260704-002 防交互 session [双子星] 重复, 接活 Layer L 死代码 → advisory 认领 + 结构化 carry-id + 完成 TASK-024): **Phase A ✅ CONVERGED** (owner-approved; post_spec R3 + post_planning R5 unanimous PASS; A.3 20-task LOCKED [BA 8/qa 7/km 5]); Phase B 待 (关闭 aria-plugin #94 + 部分回应 #95)
   → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
 
 版本: 插件 aria-plugin v1.51.0 (42 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
