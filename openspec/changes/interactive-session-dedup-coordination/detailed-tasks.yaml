@@ -1,0 +1,465 @@
+# Detailed Tasks — Interactive Session Dedup (Layer L Advisory Activation + Structured Carry-ID)
+# Phase A.3 output (task-planner v2.0). Datasource: tasks.md (path A, dual-layer).
+# Spec: openspec/changes/interactive-session-dedup-coordination/{proposal.md,tasks.md}
+# Scope: aria-plugin (aria/ submodule @ 16bcc07) + standards (submodule) + Aria 主仓.
+#        All aria/ paths verified against submodule HEAD 16bcc07 (post_spec R1-R3 + post_planning R1 code-grounded).
+# post_planning R1 fixes 已落地 (见各 task PP-R1-* 标注 + metadata audit_trajectory).
+
+metadata:
+  feature: interactive-session-dedup-coordination
+  title: "Layer L Advisory Activation + Structured Carry-ID (完成 TASK-024)"
+  level: 3
+  datasource: "tasks.md"
+  scope_repos: ["aria-plugin (aria/ submodule)", "standards (submodule)", "Aria 主仓"]
+  aria_submodule_head: "16bcc07"
+  decision_source: "docs/decisions/DEC-20260704-002-interactive-session-duplicate-prevention.md"
+  total_tasks: 20
+  task_groups: 4
+  status: "A.3 complete — post_planning R5 CONVERGED (BA+cr PASS; R1→R5 verdict 单调改善无振荡); ready for Phase B.1"
+  new_agents_required: false
+  agent_roster: [backend-architect, qa-engineer, knowledge-manager]
+  agent_allocation: { backend-architect: 8, qa-engineer: 7, knowledge-manager: 5 }
+  estimation_note: >
+    Complexity S/M/L/XL 为主 sizing 信号 (file-impact + dependency count)。
+    Hour 估算是粗锚 (S≈3h / M≈6h / L≈10h); 真轴 = token (ai-native-estimator @ phase-d-closer)。
+  repo_membership_note: >
+    PP-R1 [tech-lead Major]: 明确各 deliverable repo 归属 (git 实测)。
+    **Aria 主仓直接 track** (非任何 submodule): `.aria/config.json` / `.aria/state-checks.yaml` /
+    `aria-plugin-benchmarks/` / `CLAUDE.md` / `openspec/**`。
+    **主仓 located 但非 git-track** (运行时产物): `.aria/coordination-telemetry.jsonl` (append-only, TASK-011 运行时写)。
+    **aria-plugin 子模块**: `aria/skills/**` / `aria/templates/**` / `aria/.claude-plugin/**` / `aria/{VERSION,CHANGELOG.md,README.md}`。
+    **standards 子模块**: `standards/conventions/**`。
+    Straddle-repo task (跨两 repo deliverable): TASK-012 (state-scanner probe [子模块] + .aria/state-checks.yaml [主仓]) —
+    子模块尾随 aria-plugin PR, 主仓尾 (.aria/state-checks.yaml) 随最终 gitlink re-bump commit。
+  co_dependency_note: >
+    PP-R1 [tech-lead Minor 收紧]: **仅 TG-2 doc-only (TASK-006/007 + handoff-mechanics prose) 与 TG-1
+    真 disjoint 文件集, 可交 workflow agent 并行**。TASK-008 (写 SKILL.md, 与 002/004 同文件) + TASK-010
+    (写 tests/, 与 005 同目录) **非并行** —— 靠依赖边 (008→002) + 同 agent (005/010 同 qa) 串行化避冲突。
+    per feedback_agent_team_dynamic_workflow_division: 强依赖/零回归核心 gate 代码 (TG-1 002/003/004 +
+    CLI wrapper) 主 loop 亲验; 低冲突文档主体交 workflow agent。
+  cross_repo_sequencing: >
+    standards(TASK-006)先 merge → bump 子模块指针 → aria-plugin(TG-1 gate code + CLI wrapper / TG-2 code
+    008/009 + 模板007 / TG-3 probe+telemetry 子模块尾 / 017 layer-l)在 standards 指针更新后 merge →
+    主仓(019 config / 012 state-check 尾 / 013+014+018 benchmarks / 015 errata / 016 CLAUDE.md /
+    dogfood 承载)最后 re-bump gitlink。TASK-020 release = 跨 repo fan-out (C.2.5)。
+  audit_trajectory:
+    post_spec: "R1 (2C+6M+11m) → R2 (0C+3M+7m) → R3 unanimous PASS 5/5 CONVERGED (2026-07-04)"
+    post_planning: "R1 (7M+17m; 4R+1P) → R2 (2M+7m; 4P+1R) → R3 (1M; 4P+1R) → R4 (1 新 Major; cr PASS+BA REVISE, 跨-TG 时序矛盾) → R5 (0 findings; BA+cr PASS) **CONVERGED** 2026-07-04。telemetry source 三分法 (production/harness/None) + pytest 污染锁测经 R2-R5 收敛至时序自洽无环。"
+
+# ===========================================================================
+# TG-1 — 接线 + block→advisory (P1 修死代码/完成 TASK-024, 首要交付)
+#        核心 gate 代码, 强依赖零回归 → 主 loop 亲自边验
+# ===========================================================================
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    task_group: TG-1
+    title: "config schema: 复用 coordination.enabled + 加 coordination.mode 子键"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    repo: aria-plugin
+    dependencies: []
+    deliverables:
+      - aria/skills/config-loader/                              # 默认值 mode=advisory (纯 aria-plugin; .aria/config.json dogfood 全交 TASK-019, PP-R1 tech-Minor)
+    verification:
+      - "复用既有 state_scanner.coordination.enabled (不新建 coordination_gate); 加 mode: advisory|block 默认 advisory"
+      - "文档化: mode 与 enabled 正交 (仅 enabled==true 相关), 不改 rule 1.54 (#133 AC-2) disjointness"
+    notes: "R1-C2. advanced-rules.md:531-566 rule 1.54 disjointness 锚定 .enabled。config 默认回退锁测在 TASK-005(f)。"
+
+  - id: TASK-002
+    parent: "1.2"
+    task_group: TG-1
+    title: "AI 编排层接线 run_gate — 新增 CLI 入口 + SKILL.md 编排 (完成 TASK-024, 非 scan.py)"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/state-scanner/scripts/phase1_gate.py       # PP-R1 [BA Major]: 新增 CLI 入口 (__main__/argparse 或独立 wrapper), run_gate 现纯库函数无 CLI → AI subprocess 调不到
+      - aria/skills/state-scanner/SKILL.md                     # 阶段 2/Phase B-entry 编排层: 读 collision.kind → 用户确认进 Phase B → subprocess 调 CLI
+    verification:
+      - "PP-R1 [BA Major]: phase1_gate.py 新增可被 Bash 工具执行的 CLI 入口 (输入 raw_track_id/phase/mode; JSON 输出 GateResult 契约); advisory 模式无需真 user_decision callback (恒 proceed+surface)"
+      - "PP-R4 [BA]: 本 task 仅**预留** CLI 调用点(先不传 source, 因 source 参数由 TASK-011 才加入 run_gate() 签名 — 002 deps 无 011 且加 002→011 会成环 011→004→002)。`source='production'` 硬编码由 **TASK-011 事后回填**此 CLI 调用点(011 owns source 贯穿)。此处非 002 自身验收项, 避免结构性不可达成"
+      - "AI 编排层 (阶段 2 检查 collision.kind → 用户确认进 Phase B) 经 subprocess 调该 CLI 传 carry-id 原始串; 对齐 layer-l-integration.md:15 Design A (不在 scan.py) + :44 (Phase B 启动前); manual arm"
+      - "SC#1: opt-in coordination.enabled=true 下真调用"
+      - "PP-R2 [BA Minor]: **CLI 契约仅为 advisory 设计** —— CLI 单次 JSON I/O 传不了活体 user_decision 回调; 若 mode=block 经 CLI 调用, 交互决策点退化为 user_decision=None 安全默认(abort), 非原始'询问用户可覆盖'。**本 Spec 不实现 block 的 CLI 化交互协议, 此为已知限制**(生产默认 advisory, block 分支仅 TASK-005(a) 函数级直测覆盖)"
+    notes: "R1-C1 + PP-R1-BA-Major. 接线点 = AI 编排层; run_gate 现无 CLI/无 __main__ (grep 确认) → CLI wrapper 是 TASK-002 显式 deliverable, 为 005(d)/008/012 提供稳定调用契约。complexity M→L (含 CLI 契约)。"
+
+  - id: TASK-003
+    parent: "1.3"
+    task_group: TG-1
+    title: "run_gate mode 参数 + advisory outcome (跳过 abort, 写 claim step8/9)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/state-scanner/scripts/phase1_gate.py       # mode 参数; advisory 放行走 step8/9 (acquire_claim:573 + resilient_push:640)
+    verification:
+      - "advisory: 占用7c(:517)/偏移7b(:476)/push-fail step9(:640) 均跳过 _call_decision 的 abort/yield, 像 7d(:561) 无条件写+推 claim + 返回 surface 标记"
+      - "reconcile winner 判定 (lib/reconcile.py::reconcile(), 定义 :163) 不改; block 模式保留原 abort/yield/block"
+      - "SC#2: advisory occupied own_claim != None 且真调 acquire_claim/push"
+    notes: "R1-M1. 放行必写 claim 否则 reconcile 无从仲裁。"
+
+  - id: TASK-004
+    parent: "1.4"
+    task_group: TG-1
+    title: "阶段 2 surface 输出契约: 7c/7b 分支分化 + copy-able carry-id"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-002, TASK-003]                          # PP-R1 [BA Minor]: +002 (同编辑 SKILL.md)
+    deliverables:
+      - aria/skills/state-scanner/scripts/phase1_gate.py       # surface 记录结构 (competing_verdict 复用)
+      - aria/skills/state-scanner/SKILL.md                     # 阶段 2 推荐区 🔴 渲染契约
+    verification:
+      - "7c 占用 → 🔴 '<owner/container> <age> 前已认领 <carry-id>' + 回显 copy-able carry-id 串 (R1-m5)"
+      - "7b 时钟偏移 → 🔴 '⚠️ 时钟偏移 <skew>s(>30s) — winner 可能有误, 查时钟'; 保留 max_clock_skew_seconds (ctx @:492 经 competing_verdict 传递)"
+      - "SC: advisory 分支分化 surface 不 blanket 静默 (R2-Major-B)"
+    notes: "R2-Major-B. 放行移除 abort 动作不移除告警面。"
+
+  - id: TASK-005
+    parent: "1.5"
+    task_group: TG-1
+    title: "P1 golden test (run_gate 首个直测 + advisory + 7b + 缝合 + config 默认锁测)"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-002, TASK-003, TASK-004]
+    deliverables:
+      - aria/skills/state-scanner/tests/                       # run_gate 编排器直测 (现无直测)
+    verification:
+      - "(a) run_gate 直测: advisory 三路径放行+own_claim!=None+真调 acquire/push; block 保留 abort/yield"
+      - "(b) reconcile 确定性不受 mode 影响; (c) coordination.enabled 关闭零调用 (向后兼容)"
+      - "(d) 接线缝合测试: 经 TASK-002 CLI 入口传 carry-id 原始串 → 拿到 advisory GateResult (非只测 phase1_gate 内部函数)"
+      - "(e) advisory 7b 断言仍暴露 max_clock_skew_seconds 告警 (非只放行)"
+      - "(f) PP-R1 [qa Major]: 默认值 flip 锁测 — **不传 mode 参数**(run_gate()/CLI Python 参数默认, 非'JSON 缺 mode 键' —— config-loader 是 SKILL.md prose 非 Python 模块, 无缺键合并函数可测) → 按 advisory 放行 (非 abort/非 None); per feedback_default_value_flip_needs_lock_in_test"
+      - "(注 PP-R4 [BA]: telemetry 生产分区污染锁测**移至 TASK-012**自测 — 它需 TASK-011 的分区机制存在, 而 005 deps 无 011; 放 012 [已 deps 011] 才有非平凡意义, 避免 005 先于 011 落地时平凡为真=复现 #95 假绿)"
+    notes: "R1-m10 + R2 + PP-R1-qa-Major. run_gate 现无直测, 本 task 首个。"
+
+# ===========================================================================
+# TG-2 — 结构化 carry-id + handoff 稳定身份 (P2 根治病根 + 根除漂移)
+# ===========================================================================
+  - id: TASK-006
+    parent: "2.1"
+    task_group: TG-2
+    title: "standards §2.3 结构化 carry-id schema (§6 prose 层)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: knowledge-manager
+    repo: standards
+    dependencies: []
+    deliverables:
+      - standards/conventions/session-handoff.md               # §2.3 carry-id schema + Rule #9 Extension
+    verification:
+      - "§6 (现'Next session 入口 + 优先级建议'段) 每条优先级 carry-forward = {id, desc}; carry-id 挂载于各优先级条目 (PP-R1 cr 消歧)"
+      - "id 约定 kebab carry-<slug> (禁 :, track_id.py:28 不译冒号); 复用 frontmatter track-id 时取相同原始串且不强制 carry- 前缀 (R2-Minor)"
+      - "carry-id 留 §6 prose 不进 frontmatter (flat-only 退化 legacy 硬约束); 显式划界 §6(human) vs §2 carry_forward_inventory(机读, 当前无同名 section, id 化留 #95/follow-up)"
+    notes: "R1-M5 + R2-Minor + PP-R1-cr. standards 子模块先 merge。"
+
+  - id: TASK-007
+    parent: "2.2"
+    task_group: TG-2
+    title: "template §6 skeleton 加 {id, desc} carry-id"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    repo: aria-plugin
+    dependencies: [TASK-006]
+    deliverables:
+      - aria/templates/session-handoff.md                      # §6 skeleton (:181-197); aria-plugin 子模块 track (R1-M4)
+    verification:
+      - "§6 加 {id, desc} carry-id 结构 (prose markdown, 非 frontmatter); SC(carry-id skeleton) 直接交付物"
+    notes: "R1-M4: 模板在 aria-plugin 子模块非主仓 (git 实测)。"
+
+  - id: TASK-008
+    parent: "2.3"
+    task_group: TG-2
+    title: "carry-id → gate 消费路径 (原始串喂 run_gate CLI 内部归一)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    repo: aria-plugin
+    dependencies: [TASK-002, TASK-006]
+    deliverables:
+      - aria/skills/state-scanner/SKILL.md                     # 编排层: 读 §6 选 carry-id → 原始串喂 TASK-002 CLI
+    verification:
+      - "carry-id 原始串作 raw_track_id 喂 run_gate CLI, 由 run_gate 内部 (:354) derive_track_id 归一; 调用方不预归一 (R1-m6)"
+      - "human-in-the-loop, 无 collector 自动解析 §6"
+
+  - id: TASK-009
+    parent: "2.4"
+    task_group: TG-2
+    title: "handoff-write 改用 identity.py::get_identity() 填 owner-container (含 handoff_autofill.py 代码改造)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect                                    # PP-R1 [km Major]: handoff_autofill.py 是真 Python 代码改造 (机制变更) → backend-architect; km review handoff-mechanics.md prose
+    repo: aria-plugin
+    dependencies: []                                            # PP-R1 [BA Minor]: 去掉冗余 dep TASK-006 (get_identity API 已存在, 不需 carry-id schema 先行)
+    deliverables:
+      - aria/skills/session-closer/scripts/handoff_autofill.py       # 代码: 新增 get_identity() 调用填 owner-container (现 263 行零处提及)
+      - aria/skills/phase-d-closer/references/handoff-mechanics.md   # 共享 SOT prose (km review)
+      - aria/skills/phase-d-closer/SKILL.md                          # D.3
+      - aria/skills/session-closer/SKILL.md                          # step4
+    verification:
+      - "写入时调 get_identity().owner_container (identity.py:67-70) 填 frontmatter; 替代 AI 手填"
+      - "SC: dogfood 新 handoff owner-container = <owner>/<container_id> 机械生成; 根除 6-变体漂移 (真产物断言见 TASK-019(c))"
+      - "PP-R2 [km Minor]: km 在 Phase C code review 对 handoff-mechanics.md prose 改动做**一致性签核**(措辞/术语对齐 standards/conventions/session-handoff.md §2.3 + 现有 §6/carry-id 表述); 把'km review'从 notes 提升为可核验条目。**disposition (PP-R3 km Minor)**: km 签核为 blocking (prose 一致性未过则 TASK-009 不算完成; 分歧 escalate owner)"
+    notes: "PP-R1-km-Major (agent 拆) + BA-Minor (去 dep 006)。代码在 handoff_autofill.py, prose 在 handoff-mechanics.md。"
+
+  - id: TASK-010
+    parent: "2.5"
+    task_group: TG-2
+    title: "向后兼容回归测试 (a-f, 含 identity 接线 stitch test)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    repo: aria-plugin
+    dependencies: [TASK-007, TASK-008, TASK-009]
+    deliverables:
+      - aria/skills/state-scanner/tests/                       # handoff.py frontmatter 解析回归
+      - aria/skills/state-scanner/lib/                         # (若 carry-id norm 单测在 lib)
+    verification:
+      - "(a) §6 加 carry-id 后 handoff.py 仍取 5 字段、doc 不退化 legacy"
+      - "(b) carry-id 归一单测 (carry-m6-blocker3-spec 幂等 / carry:x 约定禁用)"
+      - "(c) 旧无-carry-id §6 行不触发 gate 消费 (不当隐式 carry-id 保留病根, R1-m2)"
+      - "(d) 两容器 get_identity 产出不同 container_id (home_dir 注入)"
+      - "(e) 同 handoff track-id ≡ 对应 carry-id 归一后一致 (R1-M5)"
+      - "(f) PP-R1 [qa Major]: handoff-write identity **接线 stitch test** — 经 session-closer/phase-d-closer 真实写入路径生成 handoff, 断言其 frontmatter owner-container == 同进程 get_identity().owner_container (非只测 identity 模块自身差异化; 防 #95 死代码 per feedback_completion_signals_vs_runtime_invocation)"
+
+# ===========================================================================
+# TG-3 — runtime 探针 + AB harness (P3 防再死代码 + trigger 定夺)
+# ===========================================================================
+  - id: TASK-011
+    parent: "3.2"
+    task_group: TG-3
+    title: "遥测埋点 .aria/coordination-telemetry.jsonl (结构性来源字段)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    repo: aria-plugin                                          # writer 逻辑在 state-scanner 子模块; .aria/coordination-telemetry.jsonl 是运行时产物 (主仓 runtime, 非 track)
+    dependencies: [TASK-003, TASK-004]                          # PP-R1 [BA Minor]: +004 (collision_surfaced schema ↔ 004 surface record)
+    deliverables:
+      - aria/skills/state-scanner/                             # telemetry writer (append-only JSONL)
+    verification:
+      - "记录 claim_written / collision_surfaced+latency / collision_missed / false_positive / claim_friction"
+      - "每条打 arm 标签 + 结构性来源字段 (非自报) + 时间戳; surface 字段形状对齐 TASK-004 surface record"
+      - "PP-R3 [BA Major]: **source 贯穿架构钉死于本 task** — `run_gate()` 新增 `source: Optional[str] = None` 关键字参数; telemetry 写入按 source 分区: **本 task 回填 TASK-002 建的 CLI 调用点**传 source='production'(002 只预留调用点, 011 加 source 参数并回填) / **`run_gate_synthetic()` wrapper 本 task 创建于 aria-plugin `state-scanner/`**(硬编码 source='harness'; TASK-013 harness 从主仓 benchmarks import 之)/ **source=None(库直调/pytest)→ 写非生产分区(绝不 production)**。此为唯一 source 拥有者 + run_gate_synthetic 创建者, 避免 011(BA)与 012/013(qa)对同模块做互不兼容假设"
+    notes: "R2-Major-C + PP-R3-BA-Major (source 参数贯穿 owner)。来源字段结构性不可调用方覆盖 (source=None 默认非生产)。"
+
+  - id: TASK-012
+    parent: "3.1"
+    task_group: TG-3
+    title: "runtime-invocation 探针 (双入口分区防伪 + 自测)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    repo: straddle                                             # 探针实现 in state-scanner [子模块] + .aria/state-checks.yaml [主仓] (PP-R1 tech Major straddle)
+    dependencies: [TASK-011, TASK-002]
+    deliverables:
+      - aria/skills/state-scanner/                            # 探针实现 (aria-plugin 子模块)
+      - .aria/state-checks.yaml                               # custom check (主仓; issue-cache-freshness 同构)
+    verification:
+      - "断言 run_gate 生产分区有新近记录 (非只单测/非 harness 自报可伪造)"
+      - "PP-R1 [BA Major]: 防伪 = **(a) 双入口分区唯一方案** (生产 CLI 入口 vs harness 显式 --synthetic/run_gate_synthetic() wrapper, 写不同 telemetry 分区, 探针只读生产分区)。**删除方案 (b) 调用栈 frame** —— subprocess CLI 架构下生产/harness 走同一脚本入口, inspect.stack() 见同模块路径无法结构性区分, (b) 退化成可覆盖假绿"
+      - "补防伪机制自测: harness 入口调用绝不被误记为生产分区 (R3-qa-advisory)"
+      - "PP-R2 [qa Major] + PP-R4 [BA]: **生产分区来源默认值钉死** — source 贯穿契约由 **TASK-011 拥有**(run_gate() 加 source kwarg, source=None→非生产分区)。**pytest 直调污染锁测 = 本 task(012)自测**(012 deps [011,002] 有分区机制; 非放 005/010 那些无 011 dep 的 TG-1 task — 那会平凡为真复现 #95, 亦是 PP-R2 原假引用'005(a)/010(f)'的纠正, per feedback_verify_edit_landed_grep_count): 断言 pytest 直调 run_gate()(source=None)后生产分区记录数不变。探针只读生产分区, 库直调不污染"
+    notes: "#95 修法示范 + PP-R1-BA-Major (探针 (a) only) + PP-R2-qa-Major (生产分区默认值 + pytest 污染锁测)。运行时活体检查非自证循环。"
+
+  - id: TASK-013
+    parent: "3.3"
+    task_group: TG-3
+    title: "合成双-session dedup harness (时序模型 + collision_missed + control 臂)"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: qa-engineer
+    repo: 主仓                                                 # PP-R1 [tech Minor pin]: harness 归 aria-plugin-benchmarks/ (主仓)
+    dependencies: [TASK-011, TASK-003, TASK-008]
+    deliverables:
+      - aria-plugin-benchmarks/                                # synthetic harness (主仓 track, 非 change dir 以免 archive 带走)
+    verification:
+      - "明确时序模型 (session B 何时检查/跳过 gate, 相对已完成工作量)"
+      - "构造 ≥1 collision_missed 失败案例 (某臂刻意不在 A 完成前调 gate = 复现 #94) + 定义检出侧 (harness 事后对比 ground-truth 补写, 合成→确定性)"
+      - "三 trigger arm (auto/semi/manual) + **control 臂 (不调 gate, 按定义纳入作基线对照, PP-R1 qa Minor)** 各自 harness 驱动 (即便 stub); 量每臂检出率+假阳性+摩擦+时延"
+      - "PP-R3 [BA/qa Minor]: harness 从主仓 benchmarks import aria-plugin 子模块的 `run_gate_synthetic()`(TASK-011 创建); 同一 git checkout 内跨子模块 Python import, 锚定 import 路径/PYTHONPATH 避免实施期路径问题"
+    notes: "R1-M2 + R2-qa-Minor-1 + PP-R1 (control 臂 + repo pin) + PP-R3 (import 锚定)。"
+
+  - id: TASK-014
+    parent: "3.4"
+    task_group: TG-3
+    title: "预注册决策规则 + manual arm = P1 live arm"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    repo: 主仓                                                 # PP-R1 [tech Minor pin]: AB 预注册规则归 aria-plugin-benchmarks/ (主仓, 非 change dir)
+    dependencies: [TASK-013]
+    deliverables:
+      - aria-plugin-benchmarks/                                # AB 预注册规则文档 (主仓, 非 change dir 以免 archive 带走)
+    verification:
+      - "跑前预注册阈值: 检出≥90% / 假阳性≤5% / 摩擦≤500 token/认领"
+      - "manual arm = P1 交付 live arm (runtime 探针断言对象); auto/semi 标 pending (AB 定夺 follow-up)"
+
+# ===========================================================================
+# TG-4 — 文档同步 + errata + Rule#6 + dogfood + 发布 (P4 完整闭环)
+# ===========================================================================
+  - id: TASK-015
+    parent: "4.1"
+    task_group: TG-4
+    title: "母 spec ERRATA.md (TASK-024 deferred + 2.5/P3 标记失真) + 双向链接"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    repo: 主仓
+    dependencies: []
+    deliverables:
+      - openspec/archive/2026-05-20-multi-terminal-coordination/ERRATA.md   # 新增, 不改归档 tasks.md/proposal.md (主仓)
+      - openspec/changes/interactive-session-dedup-coordination/proposal.md # PP-R2 [km Minor]: References 段补 ERRATA.md 前向链接 (成双向; 现只单向链归档 proposal.md)
+    verification:
+      - "标注 2.5 + P3 勾 [x] 但 layer-l-integration.md 自陈 TASK-024 集成 deferred、run_gate scan.py 零调用, 现由本 Spec 接续"
+      - "说清与 #134 archive_type/design_deferred 关系 (#134 归档前 gate; 本案归档后回溯纠错, ERRATA.md 是落点惯例, 供 #95 复用)"
+      - "PP-R1 [km Minor]: ERRATA.md 与本 Spec proposal.md References **双向链接** (承接 tasks.md 4.1 验收点)"
+    notes: "R1-M6 + R2 + PP-R1-km-Minor. 主仓。"
+
+  - id: TASK-016
+    parent: "4.2"
+    task_group: TG-4
+    title: "CLAUDE.md Rule #9 Extension 段新增 (非替换)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    repo: 主仓
+    dependencies: [TASK-002]
+    deliverables:
+      - CLAUDE.md                                              # 主仓; Rule #9 Extension 段
+    verification:
+      - "新增一句 Layer L 从 'P3 未接线/TASK-024 deferred' → 'advisory 认领已接活' (现状未提缺口, 新增非替换, R1-m7)"
+      - "#137 enforcement 不涉 frontmatter 变更 (grep ==5 不变), 文档化此判定"
+
+  - id: TASK-017
+    parent: "4.2"
+    task_group: TG-4
+    title: "layer-l-integration.md doc-sync (live 设计文档)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    repo: aria-plugin
+    dependencies: [TASK-002, TASK-003]
+    deliverables:
+      - aria/skills/state-scanner/references/layer-l-integration.md   # aria-plugin 子模块
+    verification:
+      - "'P3 TASK-024 将把...集成' (未来时) + ':14 要求 reconcile 后再 claim' (advisory 默认失真) → 更新为 'TASK-024 已完成 / advisory 接活' (PP-R1 cr: 行号 :12→:14, :12 是 config 行)"
+      - "block 模式措辞: 'advisory 默认下 claim 先写 reconcile 后仲裁; block 保留原姿态' (tech-lead R3 软提示, 避免对 block 失真)"
+      - "PP-R1 [cr rec]: 全文件 grep '将把'/'P3 scope' 兜底 (stale 未来时陈述亦散落 :4/:69/:77, 非仅点名行)"
+    notes: "R2-Minor: 不同步 = §Why.2 批判的自我拆台 (#95, Rule #3)。R1-C1 依据行 :15 不改。"
+
+  - id: TASK-018
+    parent: "4.3"
+    task_group: TG-4
+    title: "Rule #6 substitute (structural + runtime-invocation) + human review"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    repo: 主仓                                                 # PP-R1 [tech Major]: aria-plugin-benchmarks/ 是主仓 track (非 aria 子模块)
+    dependencies: [TASK-005, TASK-010, TASK-012, TASK-013]
+    deliverables:
+      - aria-plugin-benchmarks/                               # structural + runtime-invocation 断言存档 (主仓)
+    verification:
+      - "测 gate 接线真被调 + carry-id 撞检确定性 + advisory surface 正确性 + handoff identity 无漂移"
+      - "非 LLM with/without; human review 确认真接活 (feedback_deterministic_structural_skill_rule6_substitute + feedback_completion_signals_vs_runtime_invocation)"
+    notes: "state-scanner 行为变更触发 Rule #6, structural 类型。"
+
+  - id: TASK-019
+    parent: "4.4"
+    task_group: TG-4
+    title: "Aria 主仓 dogfood (config enabled:true + ≥1 双子星场景)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    repo: 主仓
+    dependencies: [TASK-002, TASK-003, TASK-004, TASK-007, TASK-008, TASK-009, TASK-012]   # PP-R1 [BA Minor]: +007 (dogfood 需 §6 skeleton 真实路径)
+    deliverables:
+      - .aria/config.json                                     # 主仓: coordination.enabled: true + mode: advisory (TASK-001 已不碰此文件, 全归此, PP-R1 tech Minor)
+    verification:
+      - "(a) config 设 enabled:true + mode:advisory 作 dogfood 闭环 (使 runtime 探针从第一天有真实调用对象, 非一次性)"
+      - "(b) 承载 ≥1 双子星并发场景 (人读 §6 skeleton 选 carry-id 真实路径), 断言 carry-id 认领撞车被检出且 surface (可证伪)"
+      - "(c) PP-R2 [qa Major]: **真实产物断言** — 取一份真实写出的 docs/handoff/*.md, 断言其 frontmatter owner-container == 同环境 get_identity().owner_container 输出 (兑现 SC#5 '机械生成非手填' 于真产物; TASK-010(f) 是 handoff_autofill wiring 级, 本条是 artifact 级; 注: handoff_autofill.py 无写文件函数, 真写经 AI Write, 故本条是 dogfood 人工/半自动核对而非纯 pytest)"
+    notes: "R2-M3: 默认 off 但 Aria 自身显式启用, 否则探针注定探测不到。"
+
+  - id: TASK-020
+    parent: "4.5"
+    task_group: TG-4
+    title: "版本发布 (跨 repo C.2 + Rule #8 + Phase D 归档)"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: backend-architect
+    repo: cross-repo
+    dependencies: [TASK-005, TASK-010, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019]
+    deliverables:
+      - aria/.claude-plugin/plugin.json                       # minor bump (SOT, 子模块)
+      - aria/.claude-plugin/marketplace.json                  # 2 version 字段 (子模块)
+      - aria/VERSION                                          # 子模块
+      - aria/CHANGELOG.md                                     # 子模块
+      - aria/README.md                                        # 子模块
+      - VERSION                                               # 主仓插件版本记录
+      - README.md                                             # 主仓 root README Plugin Version badge (L8 + Project Status)
+      - CLAUDE.md                                             # 主仓「项目状态」段插件版本行
+    verification:
+      - "aria-plugin minor bump + standards 子模块 (§2.3) + 跨 repo C.2 + Rule #8 pre-merge gate (C.2.4)"
+      - "Phase D 归档: 5+1 SOT atomic bump (plugin/marketplace/VERSION/CHANGELOG/README) + 子模块指针 + 多远程推送 origin+github"
+      - "PP-R1 [km observation]: 主仓 VERSION/README badge(L8+Project Status)/CLAUDE.md 项目状态行同步 (feedback_root_readme_badge_drifts_outside_submodule_sot; m6-version-badge-match 是兜底非主防)"
+      - "#94 关闭 (接线+身份+carry-id+advisory 四项落地) + #95 部分回应 (runtime 探针范式) 记录"
+    notes: "cross_repo_sequencing: standards→aria-plugin→主仓 gitlink re-bump。release train 打包。"
+
+# ===========================================================================
+# Execution Order (拓扑, 尊重结构化 dependencies; PP-R1 tech/BA Minor 修箭头记法)
+# ===========================================================================
+execution_order: >
+  并行入口 (deps=[]): TASK-001 (config) / TASK-006 (standards §2.3) / TASK-009 (identity) / TASK-015 (errata)。
+  TG-1: 001 → {002, 003}; {002,003} → 004; {002,003,004} → 005。 (004 deps [002,003], 非 002→004 串;
+    005 deps [002,003,004])。
+  TG-2: 006 → 007; {002,006} → 008; 009 独立 (deps=[]); {007,008,009} → 010。
+  TG-3: {003,004} → 011; {011,002} → 012; {011,003,008} → 013 → 014。
+  TG-4: 015 独立; 002 → 016; {002,003} → 017; {005,010,012,013} → 018;
+    {002,003,004,007,008,009,012} → 019; 全部 → 020。
+  主 loop 亲验: TG-1 (002 含 CLI wrapper / 003 / 004 核心 gate 强依赖零回归) + 020 (release)。
+  workflow agent 并行 (真 disjoint): TG-2 doc-only (006 standards / 007 template)。
+
+summary:
+  by_complexity: { S: 7, M: 9, L: 4, XL: 0 }              # PP-R1 [BA Minor] 订正: S 7 (001/007/008/014/015/016/017) / M 9 (003/004/006/009/010/011/012/018/019) / L 4 (002/005/013/020)
+  est_hours_total: "~115h (S7×3 + M9×6 + L4×10 = 21+54+40; coarse anchor; 真轴 = token via ai-native-estimator @ phase-d-closer)"
+  by_agent:
+    backend-architect: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-008, TASK-009, TASK-011, TASK-020]   # 8 (含 009 code 改造, PP-R1 km Major)
+    qa-engineer: [TASK-005, TASK-010, TASK-012, TASK-013, TASK-014, TASK-018, TASK-019]                    # 7
+    knowledge-manager: [TASK-006, TASK-007, TASK-015, TASK-016, TASK-017]                                  # 5 (009 code 移出→BA; km review 009 prose)
+  verification_to_sc_mapping: >
+    proposal Success Criteria 共 **11 项** (PP-R1 计数订正 10→11)。逐条映射:
+    SC#1(探针生产调用)↔002/011/012/019 (PP-R1 km/qa Major: 探针+遥测核心是 011/012, 非只 002/019) /
+    SC#2(advisory)↔003/005 / SC(7b)↔004/005(e) / SC(carry-id skeleton)↔006/007/008 (PP-R1 +007) /
+    SC(向后兼容)↔010 / SC(identity)↔009/010(d,f)/019(c) [artifact 级真产物断言] / SC(AB harness)↔013/014 / SC(Rule#6)↔018 /
+    SC(dogfood)↔019 / SC(errata+CLAUDE.md+layer-l)↔015/016/017 / SC(#94关闭)↔020。
+    (基础设施 task 001 config / 011 telemetry 支撑上述, 非独立 SC。)
