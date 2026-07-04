@@ -49,7 +49,7 @@
 ## TG-3 — Key format migration + query survey
 
 - [ ] 3.1 Reformat `issue_id` **value** to `ARIA-<repo>-<number>` (value-level; the **key** is not restructured — composite embedded in TEXT, partial-unique-active invariant preserved). Distinct from the additive input columns of TG-2.1 (those are separate additive migrations, not a key change).
-- [ ] 3.2 Decide + document clean-DB vs historical-migration for existing `issue_id` rows
+- [ ] 3.2 Decide + document clean-DB vs historical-migration for existing `issue_id` rows. **DECISION (Phase B.2, 2026-07-04): forward-only reformat, NO backfill / NO historical migration.** Rationale: `issue_id` is opaque TEXT everywhere (per §3.3 survey); old-format autonomous rows are already terminal (per #147 pre-flight — all S_FAIL), so the partial-unique-active invariant is unaffected; new dispatches emit `ARIA-<repo>-<number>`, historical rows retain old format + degrade gracefully (NULL additive columns tolerated). Recorded in migration `008_schema_v5.1_additive.sql` header.
 - [ ] 3.3 Survey every acceptance/dispatch query keying on `issue_id`; confirm new-format tolerance; verify #147 issue_type_hint stratification (json_extract path) unaffected
 
 ## TG-4 — Image rebuild + freeze

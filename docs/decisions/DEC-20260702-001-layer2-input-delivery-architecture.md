@@ -19,7 +19,7 @@ Aria 2.0 M6 pre-flight 逐层剥出阻塞链, 揭示 **Blocker 3: Layer1→Layer
 |------|------|------|
 | 基建 | Layer 1 (light-1 本地盘) 与容器 (heavy 本地卷) 盘不共享 | 输入必须走节点无关通道 |
 | 契约 | 容器入口正则 `^[A-Z][A-Z0-9-]+$` (在部署 M5 镜像里, byte 级确认) | ISSUE_ID 必须字母前缀 |
-| 契约 | AD-M0-5: "prompt 写 bind mount, meta 只传小参数" 隐含"bind mount 双方可达" | 跨节点场景该假设不成立 → 本决策 **amend AD-M0-5** |
+| 契约 | AD-M0-5: "prompt 写 bind mount, meta 只传小参数" 隐含"bind mount 双方可达" | 跨节点场景该假设不成立 → 本决策 **amend AD-M0-5**〔勘误†〕|
 | 命名 | Forgejo issue **number 是 per-repo 唯一, 非全局** | 键必须 (repo, number) 复合防碰撞 |
 | 规范 | Rule #4 向后兼容 / Rule #3 文档同步 / Rule #5 Spec 位置 | file 模式保留为辅助通道 (非"兼容已上线行为"—自主从未跑通) |
 
@@ -66,7 +66,7 @@ Step 2 输入获取:
 |-------|---------|------|
 | tech-lead | CONCERNS | C' 双通道升级 (metadata 走 META 保跨-repo 解耦) / always-fetch 杀 stale-read / (repo,number) 复合键 / envsubst 白名单 / 遥测可区分 / "对称输出"是类比非证明 (fetch 新增容器出站依赖须实测) |
 | backend-architect | CONCERNS | fetch 失败契约 (可重试分类+可观测) / base_branch API 派生非硬编码 / title-body YAML 转义+CRLF+长度+注入 / target_repo CF-Access 伪成功页风险 / 双模判据加固 |
-| knowledge-manager | CONCERNS | **Level 3** / amend **AD-M0-5** + 新 **AD-M6-10** / **layer-boundary-contract §5** 缺口 / NFS 矛盾核实 D / "向后兼容"用词纠正 / 遥测依赖显式记边 |
+| knowledge-manager | CONCERNS | **Level 3** / amend **AD-M0-5**〔勘误†〕+ 新 **AD-M6-10** / **layer-boundary-contract §5** 缺口 / NFS 矛盾核实 D / "向后兼容"用词纠正 / 遥测依赖显式记边 |
 | **qa-engineer** | **OBJECTION** | **① Layer 1 侧改动被漏 → 修复可能不生效** (Step1 正则先于 Step2) / **② expected_changes 空→假绿** (污染 corpus) / **③ 分支名冲突** (aria/{数字} vs aria/ARIA-*) |
 
 ## 决策点清单 (供 spec-drafter 无歧义引用)
@@ -85,7 +85,7 @@ Step 2 输入获取:
 
 ## 连带文档同步 (Rule #3, 本 Spec 交付项)
 
-- **amend AD-M0-5** (仅跨节点场景; 单机测试 file 模式仍可用) + 回填 AD4 风险表 cross-reference (旧文字会误导)
+- **amend AD-M0-5**〔勘误†〕(仅跨节点场景; 单机测试 file 模式仍可用) + 回填 AD4 风险表 cross-reference (旧文字会误导)
 - 新增 **AD-M6-10** (六段格式: 决策/背景/Alternatives/理由/风险/回滚) — 下一可用号 (AD-M6-9 last, AD-M6-8 Retired)
 - **layer-boundary-contract.md 新增 §5 "Task Content Delivery Mechanism"** (双通道 file/fetch 字段级 schema 对照表 + file 模式生命周期声明) — 现契约完全没描述容器如何拿完整 issue 内容, 是既有缺口
 - 与 **AD-M6-5** (pre-flight fixture provenance, 测试用) 消歧: 二者不同决策
@@ -118,6 +118,14 @@ immutable IMAGE_SHA: 旧镜像 sha 保留, dispatch META 指回旧 sha 即回滚
 2. 部署 M5 镜像 initial.sh Step 5 envsubst 变量白名单 + body 处理 (byte 级核对, 别据文档假设)
 3. `RENDERING_CONTRACT.md` 字段契约 (expected_changes 结构) + compute-assertions 空输入行为 (先 RED 复现)
 4. DB 键迁移策略对 #147 issue_type_hint AC-2 join 的影响
+
+## 〔勘误†〕2026-07-04 前向勘误 (post_planning R1, aria-2.0-m6-dispatch-input-delivery TASK-024)
+
+本 DEC 上文 §约束条件 (line 22) / §Agent Team 审议结论 knowledge-manager 行 (line 69) / §连带文档同步 (line 88) 三处均写"amend AD-M0-5"——这是**本 Spec 自己debunk 的误标**。Spec Phase A 代码 recon 核实: `aria-orchestrator/docs/architecture-decisions.md` 中并不存在一条名为"prompt 写 bind mount / meta 传小参数"的 **AD-M0-5 决议**；`AD-M0-5` 实际内容是 `m0-handoff.yaml` schema 锁定 12 字段 (`:1035`)，与本 DEC 讨论的 bind-mount 假设**是两回事**，`AD-M0-5` body **未被本 Spec 触及**。
+
+该 bind-mount 假设的真实出处是 **AD4 风险表第 2 行的表内 cell** (`architecture-decisions.md:384`)，从未升格为独立 AD 决议——之前的 cell 文字把它误标成"AD-M0-5 约定"。本 Spec 的实际落地是：① 更正该 AD4 cell 的误标 + 把假设的作用域限定为**单节点** + 交叉引用新增的 **AD-M6-10**；② `AD-M0-5` body 原样保留不动。详见 `architecture-decisions.md` AD4 风险表 cell (`:384`) 与新增 AD-M6-10 章节。
+
+上文三处"amend AD-M0-5"字面表述保留原样（历史决策记录不回改），本节仅作前向指针，指向实际生效的更正。
 
 ---
 
