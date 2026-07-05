@@ -34,7 +34,7 @@
 - [x] 4.2 doc-sync 双处(R1-m7 + R2-Minor):(a) **CLAUDE.md** Rule #9 Extension 段 **新增**一句 Layer L 从"P3 未接线/TASK-024 deferred"→"advisory 认领已接活"说明(现状文字未提此缺口,是**新增非替换**);(b) **`aria/skills/state-scanner/references/layer-l-integration.md`**(live 设计文档,aria-plugin 子模块)把 "P3 TASK-024 将把...集成"(未来时)+ ":12 要求 reconcile 后再 claim"(advisory 默认下失真)更新为"TASK-024 已完成 / advisory 接活" —— 否则同一文档家族重演 §Why.2 批判的自相矛盾(#95 自我拆台,Rule #3);#137 enforcement 不涉 frontmatter 变更(本 Spec 不加 frontmatter 字段,grep `==5` 不变),文档化此判定
 - [x] 4.3 Rule #6 substitute(structural + runtime-invocation,非 LLM with/without):测 gate 接线真被调 + carry-id 撞检确定性 + advisory surface 正确性 + handoff identity 无漂移;human review 确认真接活(per `feedback_deterministic_structural_skill_rule6_substitute` + `feedback_completion_signals_vs_runtime_invocation`)
 - [x] 4.4 Aria 主仓 dogfood(R1-M3):(a) `.aria/config.json` 设 `state_scanner.coordination.enabled: true` + `mode: advisory` 作 dogfood 闭环(使 runtime 探针从第一天有真实调用对象,非一次性验证);(b) 本机制实际承载 ≥1 双子星并发场景,断言 carry-id 认领撞车被检出且 surface(可证伪指标)
-- [ ] 4.5 版本发布:aria-plugin minor bump + standards 子模块(§2.3 变更)+ 跨 repo C.2 + Rule #8 pre-merge gate(C.2.4)+ Phase D 归档(plugin.json/marketplace.json/VERSION/CHANGELOG/README + 子模块指针 + 多远程推送);#94 关闭 + #95 部分回应记录
+- [x] 4.5 版本发布:aria-plugin minor bump + standards 子模块(§2.3 变更)+ 跨 repo C.2 + Rule #8 pre-merge gate(C.2.4)+ Phase D 归档(plugin.json/marketplace.json/VERSION/CHANGELOG/README + 子模块指针 + 多远程推送);#94 关闭 + #95 部分回应记录
 
 ---
 
