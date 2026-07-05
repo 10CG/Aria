@@ -1,0 +1,396 @@
+# Detailed Tasks — archive-gate-runtime-reality (#95)
+# Phase A.3 output (task-planner v2.0). Datasource: tasks.md (path A, dual-layer).
+# Spec: openspec/changes/aria-archive-gate-runtime-reality/{proposal.md,tasks.md} (post_spec CONVERGED R5 5/5)
+# Decision SOT: docs/decisions/DEC-20260704-003 (含 Amendment 1: B→C)
+# Scope: aria-plugin (aria/ submodule @ 16bcc07) code + standards (submodule) + Aria 主仓 (spec/version)
+# post_planning R1 fixes 已落地 (见各 task PP-R1-* 标注 + metadata.audit_trajectory)。
+
+metadata:
+  feature: aria-archive-gate-runtime-reality
+  title: "归档 gate 硬化 — C 分级证据闸 (block 死代码 / warn 模糊) + D auto-issue (#95)"
+  level: 3
+  datasource: "tasks.md"
+  scope_repos: ["aria-plugin (aria/ submodule)", "standards (submodule)", "Aria 主仓"]
+  aria_submodule_head: "16bcc07"
+  decision_source: "docs/decisions/DEC-20260704-003-archive-gate-completion-vs-runtime-reality.md"
+  ship_target: "aria-plugin v1.52.0 (当前 SOT plugin.json = v1.51.0)"
+  total_tasks: 25
+  task_groups: 6
+  status: "A.3 complete — post_planning CONVERGED (R4 5/5 unanimous PASS; R1→R4 verdict 单调改善无振荡); ready for Phase B.1"
+  new_agents_required: false
+  agent_roster: [backend-architect, qa-engineer, knowledge-manager]
+  agent_allocation: { backend-architect: 12, qa-engineer: 8, knowledge-manager: 5 }
+  estimation_note: >
+    Complexity S/M/L 为主 sizing 信号 (file-impact + dependency)。Hour 粗锚 (S≈3h/M≈6h/L≈10h);
+    真轴 = token (ai-native-estimator @ phase-d-closer)。
+  repo_membership_note: >
+    PP-R1 [ba/km Major fix]: deliverable repo 归属 (git 实测路径)。
+    **aria-plugin 子模块**: aria/skills/state-scanner/scripts/lib/spec_complete.py (核心 gate) +
+    aria/skills/state-scanner/tests/{test_spec_complete.py, test_archive_gate_integration.sh, fixtures/} +
+    aria/skills/openspec-archive/{SKILL.md,CHANGELOG.md} + aria/skills/phase-d-closer/{SKILL.md,references/} +
+    aria/skills/state-scanner/scripts/collectors/openspec.py +
+    aria/skills/state-scanner/references/state-snapshot-schema.md (**无 scripts/ 层**, PP-R1 ba fix) +
+    aria/{VERSION,CHANGELOG.md,README.md} + aria/.claude-plugin/{plugin.json,marketplace.json}.
+    **standards 子模块**: standards/conventions/ 或 standards/openspec/project.md (归档惯例).
+    **Aria 主仓直接 track** (PP-R1 km fix): 根 README.md (L8 badge + Project Status 段, 现已 drift 需修) +
+    根 VERSION (插件版本表) + 主仓 submodule 指针 re-bump commit (TASK-024, Phase C.2 tail).
+    hooks.json: 本 spec 未新增 hook → N/A (PP-R1 km minor: 显式记录无需变更)。
+  file_domain_tracks: >
+    per feedback_workflow_partition_by_file_domain: B.2 按 disjoint 文件域分 track; 同文件串行; subagent 不 commit
+    (主控统一) + 只跑自己域测试。TG-1 core-lib (spec_complete.py) = **主 loop 亲验** (零回归核心 gate);
+    TG-2/3/4/6 (SKILL.md/collectors/docs disjoint) 依赖 TG-1 CLI 契约 (TASK-007) 稳定后交 workflow agent 并行;
+    TG-5 tests 依赖各 TG-1 契约。
+  paper_fix_guard: >
+    PP-R1 [ba/qa Major]: D 幂等/backend降级 + tri-state 两消费方一致性 行为在 SKILL.md Bash 编排层 (非纯 Python),
+    纯 pytest 测不到 → TASK-024 增 **integration test (test_archive_gate_integration.sh)** 真跑 openspec-archive/
+    phase-d-closer Bash gate 端到端 (镜像 #134 initial-sh-integration 真 call-site 范式), 依赖 TASK-012/013。
+  headless_default_note: >
+    PP-R1 [cr Major]: D headless 默认自动创建 (非 stall 非静默, v2.0 Layer 2 自主归档核心) 在 TASK-012 实现锚定
+    + TASK-022 测试锚定; TASK-011 '无论是否 ack' 仅触发条件, headless 非阻塞交互模式单独 verify。
+  audit_trajectory: "post_spec R1→R5 CONVERGED; post_planning R1 5/5 REVISE (metadata/路径/拆分/paper-fix集成测试/headless/版本+re-submodule fixed) → R2 4PASS/1REVISE (qa C-warn frontmatter 集成测试对称 fixed) → R3 3PASS/2REVISE (TASK-012 frontmatter 写入承诺 + execution_order stale 行 fixed) → R4"
+
+# ============ TG-1: core lib (spec_complete.py) — 主 loop 亲验 ============
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    track: TG-1-core-lib
+    title: "lib 扩展骨架: 复用 #134 归一化/carry-forward, 不重写"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification: ["复用 _status._normalize_status + lib.carry_forward + 保留 is_spec_complete/complete 字段 (grep 确认 import 非 copy, 既有 collector 消费方不破坏)"]
+
+  - id: TASK-002
+    parent: "1.2"
+    track: TG-1-core-lib
+    title: "符号提取纯函数: 从 deliverables 提取点名 identifier"
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "提取源 = detailed-tasks.yaml deliverables + proposal Key Deliverables + tasks 行内代码路径 (非仅 prose)"
+      - "Layer L golden: 从 detailed-tasks.yaml deliverables 提取到 phase1_gate (tasks.md 2.5 纯散文无符号)"
+      - "无法提取 → 明确返回不可核验 (非猜)"
+
+  - id: TASK-003
+    parent: "1.3 (pt1)"
+    track: TG-1-core-lib
+    title: "生产引用核验 pt1: 剥注释/docstring + 代码引用(i) + dynamic-dispatch(ii)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-002]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "剥注释(#)/docstring 后匹配: (i)代码引用 import/调用 X(/属性 X./装饰器 @X (ii)dynamic-dispatch getattr/importlib/globals 字符串"
+      - "搜索限代码文件 (排除 *.md/docs/CHANGELOG/audit-reports) + 排除测试文件 + dogfood·ops 目录 + 定义文件自身"
+      - "SC↔golden(剥注释后 phase1_gate 零 i/ii 引用) / 正控1(真实代码引用不 block) / 正控3(dispatch 不 block)"
+
+  - id: TASK-004
+    parent: "1.3 (pt2)"
+    track: TG-1-core-lib
+    title: "生产引用核验 pt2: aria-plugin 集成面(iii) + 通用调用面(iv)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-003]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "(iii)集成面 = SKILL.md Bash 调用该脚本/符号 (真调用非散文提及) / hooks.json·config 注册"
+      - "(iv)通用调用面 = shell/cron/Makefile/CI 按字面路径调用 (整脚本路径, 内联 python -c 函数级归 i)"
+      - "SC↔正控2(SKILL.md/hooks.json 集成不误 block, 如 m6-phase-b-gate-check.sh) / 正控4(通用路径调用不误 block)"
+
+  - id: TASK-005
+    parent: "1.3b"
+    track: TG-1-core-lib
+    title: "fail-toward-warn 默认: 非穷尽划分兜底降级"
+    status: pending
+    complexity: S
+    dependencies: [TASK-004]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "落两清单之外的生产出现形态 → 降 block 为 warn; hard-BLOCK 只在 全属不算引用类 或 零出现"
+      - "SC↔正控5 (未分类形态 fail-toward-warn, 误分类恒偏假阴)"
+
+  - id: TASK-006
+    parent: "1.4"
+    track: TG-1-core-lib
+    title: "产物抽验纯函数: ab-results/部署证据 (遥测归 A out-of-scope)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-001]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification: ["dogfood/benchmark/deploy 声称核验可链接产物; 遥测类走 warn 不列产物类别"]
+
+  - id: TASK-007
+    parent: "1.5"
+    track: TG-1-core-lib
+    title: "tri-state gate_result JSON 契约 + CLI (沿用 #134 exit code)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-005, TASK-006]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "exit 0=allow/1=block + stdout JSON gate_result:{verdict:pass|warn|block, blocking_reasons, warnings}"
+      - "与 #134 complete 字段正交: 保留 complete, verdict 独立 (可 complete=true ∧ verdict=block)"
+      - "SC↔tri-state 一致 (两 Bash 消费方读同一 verdict)"
+
+  - id: TASK-008
+    parent: "1.6"
+    track: TG-1-core-lib
+    title: "全 fail-soft: 解析/grep 失败 → 放行 + soft_error 不硬崩"
+    status: pending
+    complexity: S
+    dependencies: [TASK-007]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification: ["stdlib-only + grep shell-out; 所有新增判定 (符号提取/引用核验/产物抽验) 异常 → 放行+soft_error"]
+
+  - id: TASK-009
+    parent: "2.1-2.4"
+    track: TG-1-core-lib
+    title: "C-block 判定装配: 识别集成类声称 + 零生产语义引用→block"
+    status: pending
+    complexity: M
+    dependencies: [TASK-004, TASK-005]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "识别 tasks.md [x] 代码集成关键词; 提取符号且零生产语义引用 (i-iv 全无) → verdict=block"
+      - "SC↔golden 负例 block + 正控 1-4 不 block"
+
+  - id: TASK-010
+    parent: "3.1-3.4"
+    track: TG-1-core-lib
+    title: "C-warn 判定装配: 模糊声称 → warn + unverified_claims 列表"
+    status: pending
+    complexity: M
+    dependencies: [TASK-006, TASK-007]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification: ["无产物/无法核验 → verdict=warn + unverified_claims (供归档写 frontmatter); 恒不 block; 传 D 兜底"]
+
+  - id: TASK-011
+    parent: "4.1 + 4.5-4.6 (lib 侧)"
+    track: TG-1-core-lib
+    title: "D payload 纯函数 (lib 侧): deferred/unverified 聚合 + issue body + 去重 marker"
+    status: pending
+    complexity: M
+    dependencies: [TASK-010]
+    deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
+    agent: backend-architect
+    verification:
+      - "聚合 deferred 未勾项 + 任何 unverified_claims (无论是否 ack) → D payload"
+      - "body 含 spec_id + 未完成/unverified 清单 + 归档 SHA 回链 + 去重 marker <!-- archive-tracker:{spec_id} -->"
+      - "(实际 Forgejo API 调用 = TASK-012 openspec-archive Step2 SKILL.md Bash 侧; lib 只产 payload)"
+
+# ============ TG-2: openspec-archive SKILL.md ============
+  - id: TASK-012
+    parent: "2.4 + 4.2-4.5 + 5.1"
+    track: TG-2-openspec-archive
+    title: "openspec-archive SKILL.md: Step1 C-gate + Step2 D auto-issue (单一 owner + headless 默认)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-007, TASK-011]
+    deliverables: ["aria/skills/openspec-archive/SKILL.md", "aria/skills/openspec-archive/CHANGELOG.md"]
+    agent: knowledge-manager
+    verification:
+      - "Step1 Bash 调 spec_complete.py 读 gate_result.verdict: block→BLOCK (含 complete=true∧verdict=block); 复用 --archive-design-only 逃生舱; warn→surface + --ack-unverified"
+      - "**warn 路径 frontmatter 写入 (PP-R3 qa/ba Major fix, SC-8)**: warn 时把 unverified_claims **真写入**归档 proposal.md frontmatter (镜像 #134 design-only 路径写 archive_type/archived_reason 模式; 现有 SKILL.md 无此字段=全新行为, 须显式实现, 对齐 TASK-024 集成测试断言)"
+      - "Step2 D: 唯一 issue 创建点; Forgejo 默认 + 非-Forgejo 降级草稿; API 失败打印草稿+WARN 不静默; marker 幂等去重"
+      - "**headless 默认 (PP-R1 cr fix)**: 无人 ack 时 D 自动创建 tracker (非 stall 非静默); ack 仅交互模式人工确认记录"
+
+# ============ TG-3: phase-d-closer ============
+  - id: TASK-013
+    parent: "5.2 + 2.4(D.2 侧)"
+    track: TG-3-phase-d-closer
+    title: "phase-d-closer SKILL.md + references: D.2 gate (verdict=block→BLOCK + 委托 Step2)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-007, TASK-012]
+    deliverables: ["aria/skills/phase-d-closer/SKILL.md", "aria/skills/phase-d-closer/references/execution-steps.md"]
+    agent: knowledge-manager
+    verification:
+      - "D.2 Bash 调 spec_complete.py 读 verdict; **verdict=block → BLOCK 归档 (PP-R1 cr fix, 非仅委托)**"
+      - "检出 deferred/unverified 委托 openspec-archive Step2 建 issue (不各自建, 单一 owner)"
+
+# ============ TG-4: collectors + schema (additive) ============
+  - id: TASK-014
+    parent: "5.3"
+    track: TG-4-collectors-schema
+    title: "collectors/openspec.py + state-snapshot-schema.md: 归档后 tracker surface (若需, additive)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-011]
+    deliverables:
+      - "aria/skills/state-scanner/scripts/collectors/openspec.py"
+      - "aria/skills/state-scanner/references/state-snapshot-schema.md"
+    agent: backend-architect
+    verification:
+      - "additive 字段, 不 bump snapshot_schema_version; .get(field,[]) 防 KeyError"
+      - "**若 collector 实际改动 (PP-R2 qa minor)**: 必配 canonical-instance unit test (per feedback_validator_repo_drift_guard_test), 跑 committed snapshot fixture; 若判定无需改 collector 则显式记 N/A"
+
+# ============ TG-6: docs / standards / version / submodule ============
+  - id: TASK-015
+    parent: "5.4"
+    track: TG-6-docs-standards
+    title: "standards 归档惯例补 '完成=可核实完成 (有 call-site/产物支撑)'"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: ["standards/openspec/project.md (归档惯例段) 或 standards/conventions/session-handoff.md"]
+    agent: knowledge-manager
+    verification: ["归档惯例明文 '完成=可核实完成'; 与 #134 D4 惯例一致不冲突"]
+
+  - id: TASK-016
+    parent: "版本发布 (CLAUDE.md 清单)"
+    track: TG-6-docs-standards
+    title: "版本 bump v1.52.0: aria 5+1 SOT + 主仓 root README badge+Project Status + 根 VERSION"
+    status: pending
+    complexity: M
+    dependencies: [TASK-012, TASK-013, TASK-014, TASK-024, TASK-025]  # PP-R2 tech-lead: 版本 bump 序于 e2e(024) + benchmark(025) 后
+    deliverables:
+      - "aria/.claude-plugin/plugin.json"
+      - "aria/.claude-plugin/marketplace.json"
+      - "aria/VERSION"
+      - "aria/CHANGELOG.md"
+      - "aria/README.md"
+      - "README.md (主仓 root: L8 badge + Project Status 段, PP-R1 km fix — 现已 drift 1.51.0 vs 1.50.2)"
+      - "VERSION (主仓 root: 插件版本表)"
+    agent: knowledge-manager
+    verification:
+      - "aria 5+1 版本文件一致 v1.52.0; 主仓 root README badge + Project Status 段**同步**修 (custom check 只核 badge, Project Status 靠人工/本 task)"
+      - "hooks.json N/A (本 spec 未新增 hook, 显式记录); i18n README 仅正文实质变更时重译 (#140 B 档: 纯版本 bump 免重译)"
+
+  - id: TASK-017
+    parent: "Phase C.2 tail (submodule 指针)"
+    track: TG-6-docs-standards
+    title: "主仓 submodule 指针 re-bump 到 aria post-merge master SHA (Phase C.2 tail)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-016]
+    deliverables: ["Aria 主仓 gitlink (aria submodule pointer)"]
+    agent: knowledge-manager
+    verification:
+      - "aria-plugin PR merge 后, 主仓 git add aria 指针到 post-merge master SHA (feedback_submodule_pointer_post_merge_bump)"
+      - "phase-c-integrator 仅校验祖先关系不自动 bump → 本 task 显式兜底"
+
+# ============ TG-5: tests (test_spec_complete.py + integration) — TG-1 后 ============
+  - id: TASK-018
+    parent: "6.1"
+    track: TG-5-tests
+    title: "C-block fixture + unit: golden 负例 + 4 类正控 + complete=true∧block combo"
+    status: pending
+    complexity: L
+    dependencies: [TASK-009]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py", "aria/skills/state-scanner/tests/fixtures/ (扩展既有)"]
+    agent: qa-engineer
+    verification:
+      - "golden: phase1_gate 剥注释后零生产语义引用 → block (尽管 3 collector 注释/108 单测/docs)"
+      - "4 类正控 (代码引用/集成面/dispatch/通用路径) 不 block; 未分类 fail-toward-warn (正控5)"
+      - "**complete=true ∧ verdict=block combo (PP-R1 qa fix)**: tasks 全[x] 但死代码 → 仍 block"
+
+  - id: TASK-019
+    parent: "6.2"
+    track: TG-5-tests
+    title: "C 误报有界 + 判别力: N≥8 语料 (覆盖 4 类正控各 ≥1, 防 vacuous-pass)"
+    status: pending
+    complexity: M
+    dependencies: [TASK-009]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
+    agent: qa-engineer
+    verification: ["N≥8 已归档正常 spec (列具体), C-block 全 0 例; 含 4 类正控各 ≥1"]
+
+  - id: TASK-020
+    parent: "6.3"
+    track: TG-5-tests
+    title: "C-warn 测试: 无产物→warn+unverified_claims; ack=True/False 两分支都传 D"
+    status: pending
+    complexity: S
+    dependencies: [TASK-010]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
+    agent: qa-engineer
+    verification: ["warn verdict + unverified_claims 写出; **ack=True 与 ack=False 两分支断言 D payload 均含被 warn 项 (PP-R1 qa fix, 验 ack 解耦)**"]
+
+  - id: TASK-021
+    parent: "6.4"
+    track: TG-5-tests
+    title: "C fail-soft 降级路径 unit: 符号提取/引用核验/产物抽验/解析 失败 → 放行+soft_error"
+    status: pending
+    complexity: S
+    dependencies: [TASK-008]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
+    agent: qa-engineer
+    verification: ["每条新增判定 fail-soft 降级都有对应测试 (SC↔fail-soft 全覆盖, 含产物抽验)"]
+
+  - id: TASK-022
+    parent: "6.5"
+    track: TG-5-tests
+    title: "D 测试 (lib payload unit): 单一 owner + 幂等去重 + fail-soft + headless payload"
+    status: pending
+    complexity: M
+    dependencies: [TASK-011]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
+    agent: qa-engineer
+    verification:
+      - "**显式断言 (PP-R1 qa/ba fix)**: 单一 owner (payload 只产一份) / marker 去重不重复 / fail-soft 降级 / headless (无 ack 仍产 D payload)"
+      - "(Forgejo API 真调用/backend 降级 = integration 层 TASK-024, 非纯 pytest)"
+
+  - id: TASK-023
+    parent: "6.6"
+    track: TG-5-tests
+    title: "tri-state 契约 unit: gate_result.verdict schema + blocking_reasons/warnings 结构"
+    status: pending
+    complexity: S
+    dependencies: [TASK-007]
+    deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
+    agent: qa-engineer
+    verification: ["verdict 三态 schema + 字段结构断言 (两消费方一致性由 TASK-024 integration 端到端验)"]
+
+  - id: TASK-024
+    parent: "6.7"
+    track: TG-5-tests
+    title: "集成/真树 dogfood: openspec-archive/phase-d-closer Bash gate 端到端 (防 paper-fix)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-012, TASK-013, TASK-018, TASK-019]
+    deliverables:
+      - "aria/skills/state-scanner/tests/test_archive_gate_integration.sh (新增, 镜像 #134 initial-sh-integration 范式)"
+    agent: qa-engineer
+    verification:
+      - "**真跑 Bash gate (PP-R1 ba/qa Major fix)**: openspec-archive Step1/Step2 + phase-d-closer D.2 真调 spec_complete.py"
+      - "两消费方对同一 spec verdict 判定一致 (端到端非浅层); D 幂等去重真跑 (dry-run)"
+      - "**C-warn frontmatter 真实写入 (PP-R2 qa Major fix, 对称 paper_fix_guard)**: warn 路径 → unverified_claims 真写入归档文件 frontmatter 端到端断言 (Bash 层, 非仅 lib gate_result)"
+      - "**backend 降级两场景拆分 (PP-R2 qa/ba minor)**: (a) 非-Forgejo 项目 → 输出草稿+提示; (b) Forgejo 已配但 API 调用失败 → 打印草稿+WARN 不静默 —— 两断言独立"
+      - "真树 dogfood: 对 aria 现有归档 spec 语料跑 C-gate 0 误 block; golden 负例可复现 block"
+
+  - id: TASK-025
+    parent: "Rule #6 (发版前质量审计)"
+    track: TG-6-docs-standards
+    title: "Rule #6 benchmark disposition: openspec-archive + phase-d-closer SKILL.md 逻辑变更"
+    status: pending
+    complexity: S
+    dependencies: [TASK-012, TASK-013]
+    deliverables: ["aria-plugin-benchmarks/ab-results/ (若跑) 或 disposition 记录"]
+    agent: qa-engineer
+    verification:
+      - "PP-R2 tech-lead: 本 spec 改 openspec-archive + phase-d-closer SKILL.md 逻辑 → Rule #6 触发 (修改 Skill 逻辑)"
+      - "disposition: 跑 /skill-creator benchmark (with/without AB) 存 ab-results/, 或显式记 N/A + owner sign-off 理由 (procedural archive skill 的 AB 信号有限)"
+      - "非 OpenSpec 需求 (Rule #6: benchmark 是验证活动)"
+
+execution_order: >
+  TG-1 主 loop 亲验先行: 001→002→003→004→005 ‖ 006 → 007(契约)→008 → 009 ‖ 010 → 011。
+  TG-1 CLI 契约 (007) 稳定后 → TG-2(012)→TG-3(013) / TG-4(014) / TG-6(015) workflow agent 并行 (disjoint)。
+  TG-5 unit 随 TG-1 契约推进 (009→018/019, 010→020, 008→021, 011→022, 007→023)。
+  TASK-024 integration/dogfood 收口 (依赖 012/013/018/019, 端到端跑 Bash gate)。
+  **TG-5 同文件串行 (PP-R2 tech-lead minor)**: TASK-018~023 共写 test_spec_complete.py → 单 track=单 agent(qa) 串行, 不并行 (per feedback_workflow_partition_by_file_domain); TASK-024 独立 test_archive_gate_integration.sh 可与 unit 并行。
+  版本 bump (016, 依赖 012/013/014/024/025 — 序于 e2e+benchmark 后) → Phase C merge → submodule re-bump (017, C.2 tail)。
+  dependencies 字段为权威偏序; 本 prose 为可读概览 (PP-R1 minor: 二者对齐)。
+  注: tasks.md 5.5 (dogfood 自身含 Success Criteria 段) = complete-on-arrival (proposal 已含该段, post_spec CONVERGED 确认), 无独立 task (PP-R1 minor)。

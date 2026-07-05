@@ -79,7 +79,7 @@ archive-completeness-gate (#134, v1.42.0) 建了 `lib/spec_complete.py` 完成�
 - [ ] **正控 4 — 通用路径调用不误 block (R4 qa-fix)**: 经 shell/cron/Makefile/CI 按字面路径调用 (如 `m6-phase-b-gate-check.sh` 调 `validate-m6-handoff.py`, 无 .py import) 的符号 → C-block 不触发
 - [ ] **正控 5 — 未分类形态 fail-toward-warn**: 落在 alive/散文 两清单之外的生产出现形态 → 降级 warn (非 hard-block), 兑现"误分类偏向不误 block"
 - [ ] **C 误报有界 + 判别力 (防 vacuous-pass)**: 语料库 **N≥8** 个已归档正常 spec (列具体 N 个, 须覆盖上述正控 1-4 至少各 1) → C-block 全 **0 例** (falsifiable: 每 spec 列 verdict + 符号核验结果)
-- [ ] **C-warn + 兜底**: 无可链接产物的 dogfood/benchmark 声称触发 warn + 写 frontmatter `unverified_claims` 标记, 且被 ack 项进 D open issue
+- [ ] **C-warn + 兜底**: 无可链接产物的 dogfood/benchmark 声称触发 warn + 写 frontmatter `unverified_claims` 标记, 且 unverified 声称 (**无论是否 ack**) 进 D open issue (未 ack 同样兜底, 更关键)
 - [ ] **D 幂等 + 可见**: 带 deferred/ack-unverified 项归档产出**恰 1 个** open issue (重复归档同 spec 不重复开), body 含 spec_id + SHA 回链; API 失败时 issue 草稿打印可见 (非静默)
 - [ ] **tri-state 一致**: openspec-archive 与 phase-d-closer 对同一 spec 读同一 `gate_result.verdict`, 二者判定一致 (无解读漂移)
 - [ ] **fail-soft 全覆盖**: 全部新增判定 (C 符号提取/引用核验/产物抽验 + D) 解析异常/grep 失败 → 放行 + soft_error, **且每条降级路径有对应 unit test** (R1 F6)
