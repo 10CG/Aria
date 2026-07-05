@@ -1,5 +1,7 @@
 # Proposal: archive-gate-runtime-reality (#95)
 
+> **归档**: 2026-07-05 (v1.53.0 shipped, aria-plugin PR #96 + standards #13 merged). Dogfood: 本 spec 经自身 C-gate 跑 verdict=warn/0-block/complete=True — deliverables 已 shipped(alive)故不 block; 7 warn 为 dogfood/benchmark 声称无静态可链接产物(fail-toward-warn 设计, benign: dogfood 已跑 integration test, benchmark N/A disposition)。
+
 > **Status**: **Approved** (post_spec convergence CONVERGED 2026-07-04, R5 unanimous PASS 5/5)
 > **审计轨迹 (post_spec, 5-agent convergence)**: R1 5/5 REVISE [3 CRIT — Gate B 交叉核对被实证不可用, owner 拍板 B→C] → R2 3 REVISE [C 符号提取/D headless] → R3 3 REVISE [1 收敛 CRIT: 注释算引用] → R4 4 PASS/1 REVISE [清单非穷尽] → **R5 5/5 PASS** [仅 minor]。B→C 转换见 DEC-003 Amendment 1。
 > **Spec Level**: 3 (Full — proposal + tasks)
