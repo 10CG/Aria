@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.51.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.52.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -238,8 +238,8 @@ Aria/
 ## Project Status
 
 ```
-Project Version:  1.7.0
-Plugin Version:   1.50.2 (aria-plugin, 42 Skills + 11 Agents)
+Project Version:  1.7.3
+Plugin Version:   1.52.0 (aria-plugin, 42 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
 Research Focus:   Reproducibility of AI collaboration patterns

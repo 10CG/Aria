@@ -215,6 +215,7 @@ claim 触发点(全自动 / 半自动确认 / 手动)标 **pending**,走遥测 +
 
 - 决策记录: [DEC-20260704-002](../../../docs/decisions/DEC-20260704-002-interactive-session-duplicate-prevention.md) + 母决策 [DEC-20260519-001](../../../docs/decisions/DEC-20260519-001-multi-terminal-coordination.md)
 - 母 Spec(Layer L 引擎 + errata 对象): [multi-terminal-coordination](../../archive/2026-05-20-multi-terminal-coordination/proposal.md);集成设计意图 `aria/skills/state-scanner/references/layer-l-integration.md`(TASK-024 接线点)
+- 母 Spec 勘误(归档后回溯纠错,TASK-015): [ERRATA.md](../../archive/2026-05-20-multi-terminal-coordination/ERRATA.md) —— 标注母 spec tasks.md 2.5 + P3 勾 `[x]` 但 TASK-024 集成实际 deferred、`run_gate` 零调用,现由本 Spec 接续(双向链接回本 proposal)
 - 相关约定: [Rule #9 session-handoff](../../../standards/conventions/session-handoff.md) §2.3;既有 config key + 互斥不变式 `aria/skills/state-scanner/references/rules/advanced-rules.md` rule 1.54(#133 AC-2)
 - 关联 Issue: [#94](https://forgejo.10cg.pub/10CG/aria-plugin/issues/94)(双子星防重复失效)/ [#95](https://forgejo.10cg.pub/10CG/aria-plugin/issues/95)(勾选≠运行病根)
 - 事故 handoff: [`2026-07-04-dedup-coordination-brainstorm-dec.md`](../../../docs/handoff/2026-07-04-dedup-coordination-brainstorm-dec.md)

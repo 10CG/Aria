@@ -34,6 +34,11 @@
       "limit": 20,
       "label_filter": [],
       "scan_submodules": true
+    },
+    "coordination": {
+      "_comment": "DEC-20260704-002 dogfood: 启用 Layer L advisory 认领闸门 (interactive-session-dedup-coordination TASK-019). enabled=true 使 phase1_gate.run_gate 在 cross-owner/self-multi-container collision + 用户进 Phase B 时被 AI 编排层调用; mode=advisory (放行+写推 claim+surface). runtime 探针 coordination-gate-invocation 从此有真实生产调用对象。",
+      "enabled": true,
+      "mode": "advisory"
     }
   },
 

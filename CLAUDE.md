@@ -479,6 +479,8 @@ branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/re
 详见 `openspec/changes/multi-terminal-coordination/`
 (Approved 2026-05-19 per DEC-20260519-001) + `standards/conventions/session-handoff.md §2.3`。
 
+**更新** (`interactive-session-dedup-coordination`, 完成 TASK-024 集成 + advisory 改造后): 上文所述 Layer L (`phase1_gate`) 的 `run_gate()` 原为死代码 —— 母 spec 的 TASK-024 集成从未落地 (P3 deferred, run_gate 零生产调用点; 缺口记录于 aria-plugin `skills/state-scanner/references/layer-l-integration.md`)。经 DEC-20260704-002 接活为 **advisory 认领**: AI 编排层 (state-scanner 阶段 2 / Phase B-entry) 首次接线 `run_gate()`,详见该 Spec proposal.md。
+
 **详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
 
 ---
@@ -530,10 +532,10 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
     - Blocker 4 Luxeno 后端延迟 45-54s (owner/基建门, 非 mihomo)
     - 遥测 Spec (AC-6 评分依赖, 独立, 待起) — **依赖链** (input-delivery ↔ 遥测, disjoint 不互相包含): input-delivery 只修 Blocker 3 (使自主 dispatch 能闭环到 S9_CLOSE, AC-1); 168h 跑要在 AC-6 cost 维度可评分仍须遥测 Spec 独立 ship — input-delivery ship 不代表 168h 跑对 AC-6 可评分
   M7 aria-fleet: 2 sub-Spec (fleet-aggregation + agent-lifecycle) Approved 2026-06-18; Phase B 受 D3 门 (M6 release-closeout ship 后)
-  aria-plugin 方法论轨 (与 M6/M7 正交): `interactive-session-dedup-coordination` (DEC-20260704-002 防交互 session [双子星] 重复, 接活 Layer L 死代码 → advisory 认领 + 结构化 carry-id + 完成 TASK-024): **Phase A ✅ CONVERGED** (owner-approved; post_spec R3 + post_planning R5 unanimous PASS; A.3 20-task LOCKED [BA 8/qa 7/km 5]); Phase B 待 (关闭 aria-plugin #94 + 部分回应 #95)
+  aria-plugin 方法论轨 (与 M6/M7 正交): `interactive-session-dedup-coordination` (DEC-20260704-002 防交互 session [双子星] 重复, 接活 Layer L 死代码 → advisory 认领 + 结构化 carry-id + 完成 TASK-024): **✅ SHIPPED v1.52.0 (2026-07-05)** — Phase B 全 19 impl 任务完成 (run_gate 死代码→advisory 接活 + CLI + carry-id schema + 机械 owner-container + telemetry 分区防伪 + 14d 新鲜度探针 + 可证伪 harness + dogfood); 双轮 code-grounded 对抗审计 R1(2C+8I)→R2 CONVERGED(0C); 关 aria-plugin #94 / 部分回应 #95; Phase D 归档 `openspec/archive/2026-07-05-interactive-session-dedup-coordination`
   → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
 
-版本: 插件 aria-plugin v1.51.0 (42 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
+版本: 插件 aria-plugin v1.52.0 (42 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
   → 完整版本变更史见 aria/CHANGELOG.md (SOT); 运行时 Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 

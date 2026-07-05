@@ -199,3 +199,26 @@ checks:
       项目状态段原地覆写非 append。见 standards/conventions/claude-md-hygiene.md (Option A)。
     timeout_seconds: 5
     enabled: true
+
+  # --- Layer L coordination gate 运行时活体探针 (防 run_gate 再退化死代码) ---
+  - name: "coordination-gate-invocation"
+    description: |
+      若 state_scanner.coordination.enabled=true, 生产 telemetry 分区
+      (.aria/coordination-telemetry.jsonl) 必须含 ≥1 条 **14 天内** 的
+      source=production 记录 —— 证明 run_gate() 近期真经 CLI 生产入口被调
+      (非死代码 / 非陈旧一次性记录)。TASK-012 runtime-invocation 探针
+      (DEC-20260704-002; aria-plugin #95 修法示范)。
+      **新鲜度窗口** (audit fix): append-only 分区不修剪, 故只计近 14d 记录,
+      否则一条历史记录会让探针永久假绿、检不出事后再退化 (对齐
+      issue-cache-freshness 现在时语义)。**只读生产分区**: public API
+      (run_gate 无 source 参 / run_gate_synthetic 强制 harness) 结构上无法写
+      生产分区; 仅 CLI _main 经私有 _gated(_source=production) 可写。gate
+      关闭时探针恒 OK。
+    command: |
+      python3 aria/skills/state-scanner/scripts/coordination_probe.py .
+    severity: warning
+    fix: |
+      确认 coordination.enabled=true 后, dogfood 一次 (TASK-019) 或在近 14d 内
+      经 CLI 生产入口真调 run_gate(); STALE 意味机制虽接线但近期未被调用 (退化风险)。
+    timeout_seconds: 5
+    enabled: true
