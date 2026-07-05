@@ -3,7 +3,7 @@ track-id: 95-archive-gate-runtime-reality-shipped
 owner-container: dev-claude
 phase: session-close
 status: complete
-updated-at: 2026-07-05T02:20:40Z
+updated-at: 2026-07-05T03:23:26Z
 ---
 
 # Aria — Session Handoff (2026-07-05) — #95 归档 gate 硬化 全周期 ship v1.53.0
@@ -27,7 +27,7 @@ updated-at: 2026-07-05T02:20:40Z
 ## §2 未完成 / Carry-forward
 
 - **Rule #6 benchmark disposition** (TASK-025): 推荐 **N/A** (确定性 gate 以 60 unit+9 integration+116 dogfood 替代 AB), 记 `archive/.../rule6-benchmark-disposition.md`。owner merge 时**隐含接受** (未显式反对); 若日后要跑 benchmark 可补。
-- **E: pre-#134 孤儿 sweep** (proposal out-of-scope): 独立一次性审计 —— 用 #95 gate 审所有 2026-06-10 前归档 spec 运行时真实性。**gate 已 ship 可跑**。B.2 实测 116 归档 sweep 已顺带发现 2 edge (m1-mvp entrypoint 重命名 / audit-drift-guard markdown-only) 均正确 fail-toward-warn。
+- ~~**E: pre-#134 孤儿 sweep**~~ **✅ 本 session 已跑完** (2026-07-05): #95 gate 审 100 个 pre-#134 归档 → **block 0 / warn 22 (benign) / pass 78** —— **零死代码孤儿** (唯一 Layer L 孤儿已被 DEC-002 接活)。历史归档无系统性"勾了但死代码"问题 (推论被证伪)。gate 对 100 真实 spec 零误 block (SC 零影响第三次实证)。报告 `.aria/audit-reports/e-sweep-pre134-orphans-2026-07-05.md`。无后续 action。
 - **A: runtime-invocation 探针泛化** (out-of-scope, 交 DEC-002 先趟): DEC-002 已 ship coordination_probe (14d 新鲜度探针)。#95 可 follow-up 泛化为通用 runtime 探针范式。
 - **collectors/openspec.py 对称 reader** (TASK-014 N/A): 若日后要 state-scanner surface 归档后 D-tracker 状态可加 (当前 issue_status collector 已通用覆盖)。
 
@@ -49,15 +49,18 @@ updated-at: 2026-07-05T02:20:40Z
 - **版本**: aria-plugin **v1.53.0** (5+1 SOT + 主仓 badge/Project Status/VERSION 全同步)。
 
 ## §6 Next session 入口
-1. **E: pre-#134 孤儿 sweep** (gate 已 ship 可跑): `spec_complete.py --gate` 遍历所有 2026-06-10 前归档 spec, 审运行时真实性。
-2. **A 探针泛化** (#95 follow-up, 视 DEC-002 探针成型)。
-3. **M6 Blocker 3 Phase B** (M6 主线, 与本 track 正交, 前 session WIP aria-orchestrator `1ee225a` 待 owner 清 4 门)。
+1. ~~E sweep~~ **已本 session 完成** (0 孤儿, 见 §2)。
+2. **A 探针泛化** (#95 follow-up, 视 DEC-002 探针成型) — 独立可选。
+3. **M6 Blocker 3 Phase B** (M6 主线, 与本 track 正交, 前 session WIP aria-orchestrator `1ee225a` 待 owner 清 4 门) — 本 session **未动**。
 
 ## §7 提交清单
 主仓 (origin+github parity): `de82258`→`1f44fa1`(A.1)→`ca50fe1`(A.2/A.3)→`e7bf8ca`(rule6)→`100a820`(指针 bump v1.53.0) + 本 session 收尾提交 (archive/CLAUDE.md/handoff)。
 aria-plugin: PR #96 merge `93b7406` (v1.53.0)。standards: PR #13 merge `2d13264`。
 
-## §8 Memory entries (本 session)
-- `feedback_validate_convention_assumption_before_gate` — 依赖惯例的 gate 必先对 corpus 实证 (已写)
-- `feedback_completion_signals_vs_runtime_invocation` — 勾选/单测 ≠ 运行时 invocation (已补, 修断链)
-- (待写) gate-tracks-runtime-reality: 并发 disjoint spec 意外正交 (DEC-002 接活 → #95 gate un-block)
+## §8 Memory entries (本 session, 3 条全写入)
+- `feedback_validate_convention_assumption_before_gate` — 依赖惯例的 gate 必先对 corpus 实证
+- `feedback_completion_signals_vs_runtime_invocation` — 勾选/单测 ≠ 运行时 invocation (补, 修断链)
+- `feedback_gate_tracks_reality_synthetic_fixture` — gate 追踪现实随现实变; block 契约钉合成 fixture 非真实语料; 并发 disjoint spec 可意外正交交互 (DEC-002 接活 phase1_gate → #95 gate un-block)
+
+## §9 会话收尾核验 (session-closer, 2026-07-05)
+机械兜底: 三仓 parity equal (无未推); 本 session #95 已归档不在 changes/; unfinished/consistency flags 全属其他 spec (M6/M7, 非本对话)。内省: 本对话零遗留线程; 3 memory 覆盖可固化教训无新增。leaf 终结。
