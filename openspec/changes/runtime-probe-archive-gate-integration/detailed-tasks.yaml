@@ -14,7 +14,7 @@ metadata:
   ship_target: "aria-plugin v1.54.0 (当前 SOT plugin.json = v1.53.0)"
   total_tasks: 20
   task_groups: 6
-  status: "A.2/A.3 complete — post_planning CONVERGED (R1 5M+5m → PP-R1-fix → R2 tl/cr/ba/km PASS + qa F4 → PP-R2-fix → R3 qa 单点确认 PASS 0-new); ready for Phase B.1"
+  status: "Phase B complete 2026-07-08 — 19/20 done + TASK-020 in_progress (主仓 surface 待 merge); pre_merge R1→R3 CONVERGED; PR#97 待 owner merge"
   new_agents_required: false
   agent_roster: [backend-architect, qa-engineer, knowledge-manager, main-loop]
   agent_allocation: { backend-architect: 8, qa-engineer: 7, knowledge-manager: 2, main-loop: 3 }
@@ -53,7 +53,7 @@ tasks:
     parent: "1.1"
     track: TG-1-probe-lib
     title: "lib/runtime_probe.py descriptor 解析 + 校验 (值层五无效形态)"
-    status: pending
+    status: done
     complexity: M
     dependencies: []
     deliverables: ["aria/skills/state-scanner/scripts/lib/runtime_probe.py"]
@@ -67,7 +67,7 @@ tasks:
     parent: "1.2"
     track: TG-1-probe-lib
     title: "probe(descriptor, repo, now) 三态判定 (pass/warn/skipped)"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-001]
     deliverables: ["aria/skills/state-scanner/scripts/lib/runtime_probe.py"]
@@ -82,7 +82,7 @@ tasks:
     parent: "1.3"
     track: TG-1-probe-lib
     title: "coordination_probe.py 改薄壳 (四态逐字节保持 + read-failure 假绿修复)"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-002]
     deliverables: ["aria/skills/state-scanner/scripts/coordination_probe.py"]
@@ -97,7 +97,7 @@ tasks:
     parent: "1.4"
     track: TG-2-fm-helper
     title: "frontmatter 块提取 helper 物理 move 到 lib 叶子 + runtime_probe 受限 YAML 子集手写解析"
-    status: pending
+    status: done
     complexity: M
     dependencies: []
     deliverables:
@@ -115,7 +115,7 @@ tasks:
     parent: "2.1"
     track: TG-3-gate-fold
     title: "gate_result 读 proposal frontmatter 声明 + runtime_probe 键条件性存在契约 + IO 失败语义"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-004]
     deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
@@ -129,7 +129,7 @@ tasks:
     parent: "2.2"
     track: TG-3-gate-fold
     title: "折入裁决: pass/warn/skipped/声明无效 → verdict 单调升级永不 block"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-005, TASK-002]
     deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
@@ -142,7 +142,7 @@ tasks:
     parent: "2.3"
     track: TG-3-gate-fold
     title: "probe-warn routing → unverified_claims[] + gate_result.runtime_probe 条件性字段"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-006]
     deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
@@ -155,7 +155,7 @@ tasks:
     parent: "2.4"
     track: TG-3-gate-fold
     title: "探针全异常兜底 (silent-failure 防线)"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-006, TASK-007]  # PP-R1 tl/cr Major fix: 007→008 串行化 (同文件 spec_complete.py, 逻辑独立但禁并行)
     deliverables: ["aria/skills/state-scanner/scripts/lib/spec_complete.py"]
@@ -168,7 +168,7 @@ tasks:
     parent: "2.5"
     track: TG-4-docs
     title: "openspec-archive SKILL.md 写入契约扩展 (Step 2 + Step 1 schema + dry_run + claim 注释)"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-007]
     deliverables: ["aria/skills/openspec-archive/SKILL.md"]
@@ -176,14 +176,14 @@ tasks:
     verification:
       - "Step 2 warn_overlay: 触发条件对齐宿主原语义 (verdict=='warn') 不扩展; runtime_probe 结构化结果 (outcome/count/ts/symbol) 作为额外键与 unverified_claims 同批写入 (SC-10 正控契约)"
       - "内容归属 (R3 裁决): runtime_probe 键仅当探针自身 outcome ∈ {warn, 声明无效} 才写 (他因 warn 时 pass 探针键不写); pass/skipped 不落盘 (SC-10 负控契约)"
-      - "无既有 frontmatter 块 (118/118 现状) → 文件绝对起始插入新 ---...--- 块原内容下移; 已有块追加键 (SC-10)"
+      - "无既有 frontmatter 块 (118/118 现状) → 文件绝对起始插入新 ---...--- 块原内容下移; 已有块追加键 — 带声明 spec 结果字段 merge-append 进既有 runtime_probe mapping, 不删改作者字段不产生重复键 (B.2 裁决 2026-07-08, 细则见 SKILL.md 同名键规则) (SC-10)"
       - "dry_run 回显契约扩展 (:188): + (若将写入) runtime_probe 结构化结果; Step 1 --gate stdout schema (:115-116) 补注条件字段; claim 注释 (:180) 泛化 (tasks.md 原文行 或 runtime_probe:<symbol> 合成标签); unverified_claims_written 邻域 flag additive (SC-10)"
 
   - id: TASK-010
     parent: "4.4"
     track: TG-4-docs
     title: "文档同步: 声明 schema reference + phase-d-closer 提及 + standards 归档惯例 + Version History"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-009]
     deliverables:
@@ -201,7 +201,7 @@ tasks:
     parent: "3.1"
     track: TG-5-tests
     title: "单元测试: probe 库三态 × descriptor 值层五形态 × 文本层解析"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-002, TASK-004]
     deliverables: ["aria/skills/state-scanner/tests/test_runtime_probe.py"]
@@ -214,7 +214,7 @@ tasks:
     parent: "3.2"
     track: TG-5-tests
     title: "集成测试: gate 折入各路径 + IO 边界 + block 组合 + fault-injection"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-005, TASK-006, TASK-007, TASK-008]
     deliverables: ["aria/skills/state-scanner/tests/test_spec_complete.py"]
@@ -229,7 +229,7 @@ tasks:
     parent: "3.3"
     track: TG-5-tests
     title: "SC-1 零回归 re-sweep 脚本 (同 worktree 双跑 diff=0)"
-    status: pending
+    status: done
     complexity: M
     dependencies: [TASK-005, TASK-007, TASK-008]  # PP-R1 qa Major fix: diff 基线须在 gate-fold 全量定稿 (008) 后, DAG 自身保证非 waves 补偿 (007/008 传递含 006)
     deliverables: ["aria/skills/state-scanner/tests/resweep_zero_regression.sh"]
@@ -241,7 +241,7 @@ tasks:
     parent: "3.4"
     track: TG-5-tests
     title: "可证伪 harness: 「探针恒 pass」变体注入"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-011, TASK-012]
     deliverables: ["aria/skills/state-scanner/tests/test_runtime_probe.py"]
@@ -253,7 +253,7 @@ tasks:
     parent: "3.5"
     track: TG-5-tests
     title: "CLI 向后兼容回归: 四态逐字节 + 假绿修复锁定"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-003]
     deliverables: ["aria/skills/state-scanner/tests/test_coordination_probe_cli.sh"]
@@ -266,13 +266,13 @@ tasks:
     parent: "3.6"
     track: TG-5-tests
     title: "持久化 E2E: warn-outcome 正控 + 对称负控 (扩展 test_archive_gate_integration.sh)"
-    status: pending
+    status: done
     complexity: L
     dependencies: [TASK-007, TASK-008, TASK-009]  # PP-R2 qa Major fix (F4): E2E 消费 spec_complete.py 终态需含 008 兜底; 同 013 修复理由 (DAG 自身保证非 waves 补偿)
     deliverables: ["aria/skills/state-scanner/tests/test_archive_gate_integration.sh"]
     agent: qa-engineer
     verification:
-      - "正控: 活跃期声明 + warn 形态分区合成 spec 走 Step 1-2 脚本化流程 → runtime_probe 键真落盘 (无既有块时验证块插入文件绝对起始) + probe-warn 条目在 unverified_claims 同批 list-of-object 契约格式 (顺带修正既有 §3 precedent 'unverified_claims: %d' 计数偏差) + d_payload 含该条目 (SC-10 正控)"
+      - "正控: 活跃期声明 + warn 形态分区合成 spec 走 Step 1-2 脚本化流程 → runtime_probe 键真落盘 (无既有块时验证块插入文件绝对起始; 带声明 spec 验证 merge-append — 声明字段原样保留 ∪ 结果字段追加, B.2 裁决 2026-07-08) + probe-warn 条目在 unverified_claims 同批 list-of-object 契约格式 (顺带修正既有 §3 precedent 'unverified_claims: %d' 计数偏差) + d_payload 含该条目 (SC-10 正控)"
       - "断言经 _frontmatter_block()/_read_archive_type() 真实解析路径 (非裸 grep) + _staleness_days 无扰 (SC-10)"
       - "对称负控 (a): pass-outcome fixture 同流程 → 归档 frontmatter 无 runtime_probe 键; (b): 混合场景 (probe=pass ∧ 无关声称致 verdict=warn) → unverified_claims 写入但 runtime_probe 键缺席 (SC-10 负控)"
       - "post_spec qa 观察吸收: (b') probe=skipped ∧ 无关 warn 同构负控 (键缺席); (c') 声明无效 flavor E2E 一例 (键落盘 outcome=invalid 形态 + unverified_claims 同批) — 低成本顺带消 SC-10 两个已知未覆盖 flavor"
@@ -281,7 +281,7 @@ tasks:
     parent: "4.3"
     track: TG-5-tests
     title: "零回归真语料确认: coordination 归档 spec 保持无声明过 re-sweep"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-013]
     deliverables: ["aria/skills/state-scanner/tests/resweep_zero_regression.sh"]
@@ -294,7 +294,7 @@ tasks:
     parent: "4.1"
     track: TG-6-dogfood-ship
     title: "Phase B-entry 真调 phase1_gate CLI (advisory claim → 产 production telemetry 记录)"
-    status: pending
+    status: done
     complexity: S
     dependencies: []
     deliverables: [".aria/coordination-telemetry.jsonl (gitignored 机器态)"]
@@ -308,7 +308,7 @@ tasks:
     parent: "4.2"
     track: TG-6-dogfood-ship
     title: "lib 层真分区 dogfood 一次性观测 (记录进 closure 报告/handoff)"
-    status: pending
+    status: done
     complexity: S
     dependencies: [TASK-018, TASK-002]
     deliverables: ["closure 报告/handoff §dogfood 段 (一次性观测记录, 非代码)"]
@@ -321,7 +321,7 @@ tasks:
     parent: "4.5"
     track: TG-6-dogfood-ship
     title: "版本发布全 surface (Phase C.1 执行)"
-    status: pending
+    status: in_progress  # aria 侧 5 文件已提交 (2273eb0); 主仓 3 surface + 双指针 bump 待 PR#97 merge 后
     complexity: S
     dependencies: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017]
     deliverables:
