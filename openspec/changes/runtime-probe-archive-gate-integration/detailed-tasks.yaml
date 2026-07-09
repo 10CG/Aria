@@ -14,7 +14,7 @@ metadata:
   ship_target: "aria-plugin v1.54.0 (当前 SOT plugin.json = v1.53.0)"
   total_tasks: 20
   task_groups: 6
-  status: "Phase B complete 2026-07-08 — 19/20 done + TASK-020 in_progress (主仓 surface 待 merge); pre_merge R1→R3 CONVERGED; PR#97 待 owner merge"
+  status: "SHIPPED v1.54.0 2026-07-09 — 20/20 done; PR#97 merged (565e214a); 主仓 surface + 双指针 bump 完成; Phase D 归档待"
   new_agents_required: false
   agent_roster: [backend-architect, qa-engineer, knowledge-manager, main-loop]
   agent_allocation: { backend-architect: 8, qa-engineer: 7, knowledge-manager: 2, main-loop: 3 }
@@ -321,7 +321,7 @@ tasks:
     parent: "4.5"
     track: TG-6-dogfood-ship
     title: "版本发布全 surface (Phase C.1 执行)"
-    status: in_progress  # aria 侧 5 文件已提交 (2273eb0); 主仓 3 surface + 双指针 bump 待 PR#97 merge 后
+    status: done  # aria PR#97 merged (565e214a); 主仓 3 surface + aria 指针 bump 完成
     complexity: S
     dependencies: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017]
     deliverables:

@@ -5,7 +5,7 @@
 > Make AI a genuine collaborator in your software projects
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.53.0-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.54.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -130,7 +130,7 @@ Each phase has a dedicated Skill that ensures consistent, repeatable workflows:
 
 ## What You Get
 
-### Skills (34 user-facing + 7 internal = 41 total)
+### Skills (35 user-facing + 7 internal = 42 total)
 
 | Category | Skills | Purpose |
 |----------|--------|---------|
@@ -219,7 +219,7 @@ Aria/
 │   ├── openspec/               # Requirement spec format
 │   └── conventions/            # Conventions (git commit, etc.)
 ├── aria/                       # Aria Plugin (submodule)
-│   ├── skills/                 # 41 Skills (34 user-facing + 7 internal)
+│   ├── skills/                 # 42 Skills (35 user-facing + 7 internal)
 │   ├── agents/                 # 11 Agents (with STCO descriptions + capabilities)
 │   └── .claude-plugin/         # Plugin configuration
 ├── aria-plugin-benchmarks/     # Skill benchmark suite
@@ -239,7 +239,7 @@ Aria/
 
 ```
 Project Version:  1.7.3
-Plugin Version:   1.53.0 (aria-plugin, 42 Skills + 11 Agents)
+Plugin Version:   1.54.0 (aria-plugin, 42 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
 Research Focus:   Reproducibility of AI collaboration patterns

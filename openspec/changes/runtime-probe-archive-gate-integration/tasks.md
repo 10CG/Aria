@@ -34,4 +34,4 @@
 - [x] 4.2 lib 层真分区 dogfood: 以代码内构造的 coordination descriptor 对真实 `.aria/coordination-telemetry.jsonl` 直跑 `runtime_probe`, 记录 outcome+ts 于 closure 报告/handoff (一次性 ship-time 观测, **不固化为永久 pytest 断言**) (SC-7)
 - [x] 4.3 零回归真语料确认: coordination 归档 spec **保持无声明** (不回改归档, owner 决策), 作为 3.3 re-sweep 语料一部分核验零动作路径
 - [x] 4.4 文档同步 (Rule #3): state-scanner references 声明 schema 文档 (含活跃期自写声明惯例 + stdlib-only 受限子集 + 注释剥离规则 + known-tradeoff 整读非流式) + phase-d-closer SKILL.md additive 提及 + standards `openspec/project.md` 归档惯例一行 **+ 同步新增该文件自身 Version History 行 (#95 编辑同文件留有 2.2.1 行先例)** (openspec-archive SKILL.md 写入契约扩展由 2.5 承载, 非本条)
-- [ ] 4.5 版本发布全 surface: aria 侧 5 文件 (plugin.json + marketplace.json + VERSION + CHANGELOG + README) + 主仓 3 surface (**/VERSION 插件版本行** + README badge + Project Status 段) + **子模块指针 bump: aria (必) + standards (project.md 变更故亦须)** — 逐面核对 CLAUDE.md 版本发布检查清单
+- [x] 4.5 版本发布全 surface: aria 侧 5 文件 (plugin.json + marketplace.json + VERSION + CHANGELOG + README) + 主仓 3 surface (**/VERSION 插件版本行** + README badge + Project Status 段) + **子模块指针 bump: aria (必) + standards (project.md 变更故亦须)** — 逐面核对 CLAUDE.md 版本发布检查清单
