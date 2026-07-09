@@ -1,3 +1,20 @@
+---
+unverified_claims:
+  - claim: "持久化 E2E (SC-10, warn-outcome + 对称负控): 扩展 `test_archive_gate_integration.sh` — **正控**: 含活跃期声明 + warn 形态分区的合成 spec fixture 走 openspec-archive Step 1-2 脚本化流程 → 断言 `runtime_probe` 键真落盘 (**无既有块时验证块插入文件绝对起始**) + probe-warn 条目在 `unverified_claims` 同批 (**list-of-object 契约格式, 顺带修正既有 §3 precedent 的 `unverified_claims: %d` 计数偏差**) + `d_payload` 含该条目 + **断言经 `_frontmatter_block()`/`_read_archive_type()` 真实解析路径** (非裸 grep) + `_staleness_days` 无扰; **对称负控 (R3)**: (a) pass-outcome fixture 同流程 → 断言归档 frontmatter **无** runtime_probe 键; (b) 混合场景 fixture (probe=pass ∧ 无关声称致 verdict=warn) → 断言 unverified_claims 写入但 runtime_probe 键缺席"
+    reason: "symbol 'unverified_claims' unclassified reference form"
+    symbols: ["unverified_claims"]
+  - claim: "持久化 E2E (SC-10, warn-outcome + 对称负控): 扩展 `test_archive_gate_integration.sh` — **正控**: 含活跃期声明 + warn 形态分区的合成 spec fixture 走 openspec-archive Step 1-2 脚本化流程 → 断言 `runtime_probe` 键真落盘 (**无既有块时验证块插入文件绝对起始**) + probe-warn 条目在 `unverified_claims` 同批 (**list-of-object 契约格式, 顺带修正既有 §3 precedent 的 `unverified_claims: %d` 计数偏差**) + `d_payload` 含该条目 + **断言经 `_frontmatter_block()`/`_read_archive_type()` 真实解析路径** (非裸 grep) + `_staleness_days` 无扰; **对称负控 (R3)**: (a) pass-outcome fixture 同流程 → 断言归档 frontmatter **无** runtime_probe 键; (b) 混合场景 fixture (probe=pass ∧ 无关声称致 verdict=warn) → 断言 unverified_claims 写入但 runtime_probe 键缺席"
+    reason: "symbol 'd_payload' unclassified reference form"
+    symbols: ["d_payload"]
+  - claim: "Phase B-entry 真调 `phase1_gate` CLI (advisory claim, Layer L 编排契约; collision=self_multi_container + enabled=true 场景合法) → 产 production telemetry 记录 (顺带转绿 coordination-gate-invocation check); **失败 fallback**: 重试一次, 仍失败 → 记 known-limitation, 不阻塞其余 Phase 4 (SC-7 fallback)"
+    reason: "遥测/运行时-invoke 核验属 fix A (out-of-scope); 静态 C 无法核验 → warn"
+    symbols: []
+  - claim: "lib 层真分区 dogfood: 以代码内构造的 coordination descriptor 对真实 `.aria/coordination-telemetry.jsonl` 直跑 `runtime_probe`, 记录 outcome+ts 于 closure 报告/handoff (一次性 ship-time 观测, **不固化为永久 pytest 断言**) (SC-7)"
+    reason: "遥测/运行时-invoke 核验属 fix A (out-of-scope); 静态 C 无法核验 → warn"
+    symbols: []
+unverified_ack: true
+unverified_ack_reason: "pre-merge 4 视角 (code-reviewer/silent-failure-hunter/qa/tech-lead) R1(1C/7I/13M)→R2→R3 零新 finding CONVERGED 已实证完成性; 见 .aria/audit-reports/pre_merge-FINAL-1783481672438-runtime-probe-archive-gate-integration-aggregated.md。4 claim 均为 #95 静态闸对已 ship 工作的 fail-toward-warn: 2 符号 (unverified_claims/d_payload) live 于 aria 子模块 grep scope 外; 2 dogfood 运行时 claim 由 TASK-018/019 完成 (telemetry 记录 + probe=pass 观测)。本归档系 #95 warn_overlay 机制首次真实行使 (此前 118/118 归档零 frontmatter 实例)。"
+---
 # Proposal: runtime-probe-archive-gate-integration (#95 follow-up A)
 
 > **Status**: ✅ **SHIPPED v1.54.0 (2026-07-09)** — aria-plugin PR #97 merged (merge commit `565e214a`); 主仓 v1.54.0 surface + aria/standards 双指针 bump 完成; Phase D 归档 `openspec/archive/2026-07-09-runtime-probe-archive-gate-integration`。〔历史〕Approved (owner sign-off 2026-07-05; post_spec 5-agent convergence R1→R4 **CONVERGED** — R4 5/5 unanimous PASS)。**Phase A.2/A.3 complete 2026-07-06** — `detailed-tasks.yaml` 20 tasks / 6 文件域 TG / BA 8·QA 7·KM 2·main-loop 3 / 9 波次; **post_planning CONVERGED** (R1 5M+5m [含 warnings[] 双写转写丢失 + wave4 同文件并行] → R2 + qa F4 → R3 单点确认 PASS 0-new)。**Phase B complete 2026-07-08** — 20 任务全落地 (TASK-020 aria 侧已提交, 主仓 surface 待 merge 后随指针 bump); **pre_merge 4 视角 R1 (1C/7I/13M) → R1-fix → R2 (3 PASS + 1 窄幅) → R2-fix → R3 零新 finding CONVERGED** (报告 `.aria/audit-reports/pre_merge-FINAL-1783481672438-*`); **aria-plugin PR #97 待 owner 签字 merge (C.2)**, 签字注意项见 PR body (L2 蒸发裁决可复议 / merge-append / crash known-limitation)
