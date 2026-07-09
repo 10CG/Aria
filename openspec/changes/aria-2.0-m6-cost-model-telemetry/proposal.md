@@ -1,7 +1,7 @@
 # Aria 2.0 M6 — Layer 2 cost/model 遥测回报 + 容器模型接线统一
 
 > **Level**: 3 (Full — 跨容器 3 执行体 [initial/changes/redo] + commit-lint + Layer 1 解析 + schema migration + cost.json 聚合 + Nomad Var 配置面)
-> **Status**: ✅ **Approved (owner sign-off 2026-07-09)** — Phase A.1 起草 + DEC 4-agent 设计审议 + **post_spec 5-agent R1→R2→R3 CONVERGED** (报告 `.aria/audit-reports/post_spec-FINAL-1783602519132-*`)。**Phase B 开工: Track-1 (Layer 1 遥测管道 Phase 4-5) 动态工作流实施中 (owner 决策 2026-07-09)**。
+> **Status**: ✅ **Approved (owner 2026-07-09)** — A.1 + DEC 4-agent 审议 + post_spec R1→R3 CONVERGED。**Track-1 (Layer1 遥测管道 Phase 4-5) 实施完成 (动态工作流 2026-07-09)**: aria-orchestrator `feature/m6-cost-model-telemetry` @ `92acce5` (叠 input-delivery, migration 009; dispatch_telemetry 表 + marker 解析 fail-toward-warn + cost.json 评分; 979+196 tests 绿; 动态工作流 code-reviewer PASS + silent-failure-hunter 1 Important echo-caveat 已修 / 0 Critical)。**Track-1 合并 gate input-delivery** (选项 A stacked)。Track-2 容器侧 gate input-delivery; Track-3 AC-10 gate Luxeno Blocker 4。
 > **⚠️ 协调修正 (开工前踩点, 2026-07-09)**: DEC §7/post_spec 均判「Track-1 Layer1 侧可独立」—— **实测不成立**: input-delivery 分支已占 migration **008 (5.0→5.1)** + 改 schema.sql/db.py, 与 Track-1 建表 migration **文件级重叠** (线性 migration 单链不可并行占号)。**owner 决策 A (2026-07-09)**: Track-1 **叠在 `feature/m6-dispatch-input-delivery` 分支**上 (migration **009, 5.1→5.2**, 链 007→008→009 干净), 现在实施, **合并排在 input-delivery 之后**。〔本 session 第 4 次「feature 声称 disjoint / file-level 重叠」, 审计只查了 `docker/` 未查 `hermes-extensions/aria-layer1/`; 呼应 `[[feedback_concurrent_feature_collision_claim_before_build]]` + `[[feedback_cross_doc_claim_verify_at_target]]`〕
 > Track-2 容器侧 gate input-delivery 合并; Track-3 AC-10 gate Luxeno Blocker 4
 > **Change ID**: `aria-2.0-m6-cost-model-telemetry`

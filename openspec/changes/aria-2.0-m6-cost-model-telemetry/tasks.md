@@ -39,21 +39,21 @@
 
 ## Phase 4 — Layer 1 解析 + dispatch_telemetry 表 (AD-M6-15, **Track-1 独立**) [§What D]
 
-- [ ] 4.1 schema.sql 内联 `CREATE TABLE IF NOT EXISTS dispatch_telemetry` (PK=dispatch_id 单列, served+intended+4 token 维+cost_usd_reported+source+recorded_at, FK dispatch_id) + schema_version 字面量 bump
-- [ ] 4.2 migration `migrations/00N_*.sql` (末 `UPDATE schema_meta`) + `_MIGRATIONS` 加元组 + `_LATEST_SCHEMA_VERSION` bump + `_apply_backfill_rules` 新 migration_id early-return 分支 [migration 5 步, memory schema_migration_to_version_bump]。**A.2/A.3 detailed-tasks 必须把此 4 子步拆独立可勾选 verification, 不得合并一条** (006/007/008 已踩 3 次)
-- [ ] 4.3 **新建 `DispatchTelemetry` dataclass** (独立于 Dispatch — 全新表非加 field) + 专属 `from_row()` (仿 Dispatch.from_row optional-column graceful degrade) (memory schema_column_dataclass_field_pair)
-- [ ] 4.4 `extension.py` S5 终态 additive 解析 TELEMETRY marker (锚定 regex 防伪) → 写 dispatch_telemetry; **dispatch_id 取自 marker 自带字段** (容器直发 NOMAD_META_DISPATCH_ID, 见 3.2/§What C; 无 issue_id→映射); token 求和按 **3.6 决议**落地 (a: main+commit-lint 求和一行 / b: 仅 main + 求和范围收窄入 OOS)
-- [ ] 4.5 **fail-toward-warn**: marker 缺失/畸形不阻塞 dispatch 终态判定 [→ AC-8]
-- [ ] 4.6 集成测试: migration round-trip (新旧库) + schema_version==新值 + dataclass from_row + marker 解析落库 [→ AC-5]
+- [x] 4.1 schema.sql 内联 `CREATE TABLE IF NOT EXISTS dispatch_telemetry` (PK=dispatch_id 单列, served+intended+4 token 维+cost_usd_reported+source+recorded_at, FK dispatch_id) + schema_version 字面量 bump
+- [x] 4.2 migration `migrations/00N_*.sql` (末 `UPDATE schema_meta`) + `_MIGRATIONS` 加元组 + `_LATEST_SCHEMA_VERSION` bump + `_apply_backfill_rules` 新 migration_id early-return 分支 [migration 5 步, memory schema_migration_to_version_bump]。**A.2/A.3 detailed-tasks 必须把此 4 子步拆独立可勾选 verification, 不得合并一条** (006/007/008 已踩 3 次)
+- [x] 4.3 **新建 `DispatchTelemetry` dataclass** (独立于 Dispatch — 全新表非加 field) + 专属 `from_row()` (仿 Dispatch.from_row optional-column graceful degrade) (memory schema_column_dataclass_field_pair)
+- [x] 4.4 `extension.py` S5 终态 additive 解析 TELEMETRY marker (锚定 regex 防伪) → 写 dispatch_telemetry; **dispatch_id 取自 marker 自带字段** (容器直发 NOMAD_META_DISPATCH_ID, 见 3.2/§What C; 无 issue_id→映射); token 求和按 **3.6 决议**落地 (a: main+commit-lint 求和一行 / b: 仅 main + 求和范围收窄入 OOS)
+- [x] 4.5 **fail-toward-warn**: marker 缺失/畸形不阻塞 dispatch 终态判定 [→ AC-8]
+- [x] 4.6 集成测试: migration round-trip (新旧库) + schema_version==新值 + dataclass from_row + marker 解析落库 [→ AC-5]
 
 ## Phase 5 — cost.json 聚合评分 (AD-M6-15 延伸, **Track-1 独立**) [§What E]
 
-- [ ] 5.1 `m6-cost-snapshot.py` 增读 dispatch_telemetry: served-model 正确性断言 (served==期望, served!=期望→FAIL) [→ AC-6]
-- [ ] 5.2 token 趋势 SUM(4 维); **窗口锚点 = telemetry JOIN dispatches 用 `COALESCE(cycle_start_ts,state_entered_at)` (与 metered_usd 同口径, 保多窗口可比)** + 返工链 `rework_of`/issue_id rollup + NULL/0 COALESCE [→ AC-7]
-- [ ] 5.3 覆盖率**状态位** `telemetry_coverage_status: ok|degraded` (阈值 ≥90%, 非仅比例) + 缺行 dispatch 显式列出 (防假可评分) [→ AC-7]
-- [ ] 5.6 cost_usd_reported 强 caveat (Anthropic 定价套非 Anthropic 模型, 仅 token 相对代理永不作 USD) + cache 维 caveat (GLM 大概率恒 0, 不作节省信号) [→ 待核实-8]
-- [ ] 5.4 cost_usd_reported 仅 informational 段, 不汇 metered_usd; cost.json 顶层 additive telemetry key
-- [ ] 5.5 回归: `check-m6-cost-acceptance.py` AC-2/AC-2b 仍 PASS (additive key 不破子集断言) [→ AC-9]
+- [x] 5.1 `m6-cost-snapshot.py` 增读 dispatch_telemetry: served-model 正确性断言 (served==期望, served!=期望→FAIL) [→ AC-6]
+- [x] 5.2 token 趋势 SUM(4 维); **窗口锚点 = telemetry JOIN dispatches 用 `COALESCE(cycle_start_ts,state_entered_at)` (与 metered_usd 同口径, 保多窗口可比)** + 返工链 `rework_of`/issue_id rollup + NULL/0 COALESCE [→ AC-7]
+- [x] 5.3 覆盖率**状态位** `telemetry_coverage_status: ok|degraded` (阈值 ≥90%, 非仅比例) + 缺行 dispatch 显式列出 (防假可评分) [→ AC-7]
+- [x] 5.6 cost_usd_reported 强 caveat (Anthropic 定价套非 Anthropic 模型, 仅 token 相对代理永不作 USD) + cache 维 caveat (GLM 大概率恒 0, 不作节省信号) [→ 待核实-8]
+- [x] 5.4 cost_usd_reported 仅 informational 段, 不汇 metered_usd; cost.json 顶层 additive telemetry key
+- [x] 5.5 回归: `check-m6-cost-acceptance.py` AC-2/AC-2b 仍 PASS (additive key 不破子集断言) [→ AC-9]
 
 ## Phase 6 — 连带文档同步 (Rule #3) [§连带文档同步]
 
@@ -76,7 +76,7 @@
 
 ## 早期文档 (Phase A 定稿即做, 不等 Phase 6)
 
-- [ ] A.0 CLAUDE.md M6 状态段「遥测 Spec ... 待起」→「Drafting (`aria-2.0-m6-cost-model-telemetry`, post_spec CONVERGED)」轻量替换 (审议 km4: high-contention 段, 过期误导多终端; 完整依赖链叙事仍 Phase 6.4 做; fetch 后改防并发覆盖)
+- [x] A.0 CLAUDE.md M6 状态段「遥测 Spec ... 待起」→「Drafting (`aria-2.0-m6-cost-model-telemetry`, post_spec CONVERGED)」轻量替换 (审议 km4: high-contention 段, 过期误导多终端; 完整依赖链叙事仍 Phase 6.4 做; fetch 后改防并发覆盖)
 
 ---
 
