@@ -1,0 +1,224 @@
+# A.2 detailed-tasks (路径 A: 解析 tasks.md) — agent-router-auto-project-agent-injection
+metadata:
+  feature: agent-router-auto-project-agent-injection
+  datasource: "tasks.md"
+  spec_level: 3
+  spec_rev: Rev4
+  plan_rev: Rev4   # PP-R1 (0C+15M) 全吸收=Rev2; PP-R2 (0C+2M) 全吸收=Rev3; PP-R3 (0C+1M doc-sync) 全吸收=本 Rev4
+  total_tasks: 18
+  planned_at: 2026-07-09
+  baseline_sha: "93b7406"   # aria 子模块 base; AC-3/AC-13 旧文本基线 = git show 93b7406:<path> (PP-R1 五方收敛修复)
+  verification_record: "openspec/changes/agent-router-auto-project-agent-injection/verification.md"
+    # 验证类 task (013/014/015/017/018) 记录统一落此文件 (#95 archive gate 可锚, PP-R1 cfda85fc)
+  agent_division: >
+    动态分工: TG-A/TG-B (两文件咬合的决策规则成文) = main-loop 亲自编辑 + 亲验;
+    TG-D fixture 实跑 = general-purpose subagent 并行执行, main-loop 机械断言;
+    TG-C/TG-E 机械步 = main-loop。
+    记号约定 (PP-R1 8f399eda): 「,」= main-loop 顺序无关 (串行执行器, 任一序正确);
+    「∥」仅表 subagent 真并行窗。
+
+tasks:
+  - id: TASK-001
+    parent: TG-A
+    title: "§CAP 2.1 required_caps: 显式传参(归一失败剔除+WARN) + L1 + L2-negation 恒时 + L2-addition 净值门控/上界3"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables: [aria/skills/agent-router/ROUTING_RULES.md]
+    agent: main-loop
+    verification: ["§2.1 六要素齐: 第0优先(含归一失败剔除+WARN)/L1(task_type 单值注记)/negation 恒时/addition 净值<2 门控+上界3/编排公式/空集退化"]
+  - id: TASK-002
+    parent: TG-A
+    title: "§CAP 2.2 归一(off-tax 惰性) + 2.3 评分公式(valid_caps/precision/除零防护/零分不入池)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-001]
+    deliverables: [aria/skills/agent-router/ROUTING_RULES.md]
+    agent: main-loop
+    verification: ["公式含 valid_caps 定义 + precision 分母=valid_caps + valid_caps=∅ 不产出候选 + match_rate==0 不入池 + off-tax 惰性双语义 (零分+不计分母)"]
+  - id: TASK-003
+    parent: TG-A
+    title: "§CAP 2.4 两段式 + 2.5 平局 + 2.6 recommend 混排 (Rev4 决策核心区全款)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-002]
+    deliverables: [aria/skills/agent-router/ROUTING_RULES.md]
+    agent: main-loop
+    verification:
+      # PP-R1 c49ccd88/231ce90a: verification 扩到与 title 范围等宽
+      - "2.4 rationale (数学冲突唯一硬理由 + 有界务实近似)"
+      - "Stage 1: 基线侧候选间 <0.1 严格 (含 B12 吸收候选一并适用, 引 ROUTING_RULES 原字「多个 Agent」)"
+      - "Stage 2 挑战者行: 纯 CAP 候选 (显式排除吸收 CAP 分录) 中 match_rate 最高"
+      - "R-a 三条件 (match_rate==1.0 / |req|>=2 / precision>=0.5)"
+      - "R-b 有序四分支 (按序判定注记; 分支0 单标签禁令; 近分先判含R-c; 领先且>=threshold 直派; 领先但<threshold 降级; 其余采纳 Stage 1)"
+      - "decision_path 赋值通则 (采纳 Stage 1→baseline; R-b 逻辑裁定→R-b)"
+      - "B12 消歧段三款 (吸收分 governing / baseline+project 组合 / junk-caps 唯一归属)"
+      - "2.5 precision tiebreak + 字典序 + 理论注记"
+      - "2.6 五要素 (R-a 置顶/降序混排/同分项目级前/decision 级单值/适用范围句含 auto 内降级)"
+      - "R-a 覆盖面诚实刻画段 + max_candidates 居 legacy 注 (PP-R2 06f8cdc4 残余两条款)"
+  - id: TASK-004
+    parent: TG-A
+    title: "ROUTING_RULES L3 版本 1.0.0→1.1.0 + 维护指南规则类型枚举 → 五类"
+    status: pending
+    complexity: S
+    dependencies: [TASK-003]
+    deliverables: [aria/skills/agent-router/ROUTING_RULES.md]
+    agent: main-loop
+    verification: ["L3=1.1.0", "维护指南含五类 (现状枚举仅三类 FP/TT/关键词 — 补 技术栈 既有漏项 + CAP 新增, PP-R1 0faf0dbd 措辞校准)"]
+  - id: TASK-005
+    parent: TG-B
+    title: "SKILL.md §205 step3 忠实4+1 + step4 侧别聚合 + step5 三分支骨架"
+    status: pending
+    complexity: L
+    dependencies: [TASK-003]
+    deliverables: [aria/skills/agent-router/SKILL.md]
+    agent: main-loop
+    verification:
+      - "3a-3d 原文保留 + 3e 六款 (门控最先/扫描+缓存见§4/健壮性/同名B12含吸收+警告/归一/评分零分不入池)"
+      - "step4 侧别语义 (吸收分基线侧; CAP 分录不参与 Stage 2 遴选)"
+      - "step5: manual 注释修正 (两形态均不经 3e) / auto 两段式 + 内部降级按 §2.6 句 / recommend 分支保留"
+      - "cross-ref §CAP 落点存在"
+  - id: TASK-006
+    parent: TG-B
+    title: "§393 改写 (五款) + §277 legacy 标注"
+    status: pending
+    complexity: M
+    dependencies: [TASK-005]
+    deliverables: [aria/skills/agent-router/SKILL.md]
+    agent: main-loop
+    verification:
+      # PP-R1 9fad3a8d: 补齐 §6 明定五款
+      - "D4 rationale 句保留 (Plugin 不自动加载/Skill 层运行时注入)"
+      - "「扫描已在路由中生效」类暗示删除, 指向 §205 3e"
+      - "缓存子段 = §4 新语义 (last_full_scan int epoch + per-file + TTL 新注释 + 原子写/降级)"
+      - "「FP/TT/关键词 + capabilities」→「FP/TT/技术栈/关键词 (基线) + capabilities (项目级)」措辞修正"
+      - "§277 标 legacy + 指向 .aria/config.json (§5 限定语义)"
+  - id: TASK-007
+    parent: TG-B
+    title: "§145 输出契约 (5 字段收窄范围) + 连带 10 段"
+    status: pending
+    complexity: M
+    dependencies: [TASK-005]
+    deliverables: [aria/skills/agent-router/SKILL.md]
+    agent: main-loop
+    verification: ["§145 五字段 (agent_source/decision_path 单值+通则/required_caps_trace 含 explicit/off_taxonomy_tags/warnings) + 收窄条款 (仅 auto_match+recommend 且 3e 执行时; 跳过支旧 shape)", "连带 10 段逐一触达 (§35/§47/§93/§132 +required_caps 行/§145/§250/§305/§323 +R-a 示例/§383 +3e 退化行/§438)"]
+  - id: TASK-008
+    parent: TG-B
+    title: "SKILL.md L17 header 整行(含邻接文字) + L449 footer 统一 1.2.0"
+    status: pending
+    complexity: S
+    dependencies: [TASK-006, TASK-007]
+    deliverables: [aria/skills/agent-router/SKILL.md]
+    agent: main-loop
+    verification: ["L17 行与 footer 行均含 1.2.0 (grep)", "版本残留检查排除历史语境标注 (如 §393 机制引入版本注) — 断言目标是「当前版本声明」两处, 非全文无旧串 (PP-R1 4391eab2 防假阳性)"]
+  - id: TASK-009
+    parent: TG-C
+    title: ".aria/config.template.json 补 agent_router 块 (3 key + 注释)"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: [.aria/config.template.json]
+    agent: main-loop
+    note: "主仓文件: 工作树编辑可即时 (与 TG-D 并行无碍); commit/落地随 Phase C 主仓分支, TASK-018 核对 (PP-R1 88aea66b 归属消歧)"
+    verification: ["3 key 齐 (scan_project_agents/plugin_only/cache_ttl_seconds) + cache_ttl_seconds 新语义注释"]
+  - id: TASK-010
+    parent: TG-C
+    title: "capabilities-taxonomy.yaml 头注释补 agent-router 消费者"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: [aria/references/capabilities-taxonomy.yaml]
+    agent: main-loop
+    verification: ["头注释含 agent-router (aria 子模块文件, 随子模块分支)"]
+  - id: TASK-011
+    parent: TG-C
+    title: "US-011 三锚点 errata + DEC-20260621-001 勘误 (L13/L90 两处 + L21 顺带)"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables: [docs/requirements/user-stories/US-011.md, .aria/decisions/DEC-20260621-001-agent-team-audit-project-agent-augmentation.md]
+    agent: main-loop
+    note: "主仓文件: 工作树编辑可即时; commit 随 Phase C 主仓分支, TASK-018 核对"
+    verification: ["US-011 AC-4/D4/Scope 三处逐一注记", "DEC L13+L90 按实文措辞勘误 + L21 借力表述顺带 (PP-R1 f9ca1715)"]
+  - id: TASK-012
+    parent: TG-D
+    title: "fixture harness: 9 类 fixture + 新/旧双文本 runner 变体"
+    status: pending
+    complexity: M
+    dependencies: [TASK-008, TASK-004]   # PP-R2 三方收敛: RULES 终笔编辑 (L3 版本+五类) 在 004, runner 注入全文需终态
+    deliverables:
+      - "scratchpad fixture 目录: proj-a / proj-empty / 宽标签(valid 8) / 同名 backend-architect / 双 R-a specialist / 单标签 specialist (AC-2b, PP-R1 ea485f92 点名) / broken frontmatter / off-taxonomy / 纯插件=0.1 边界对"
+      - "runner 新文本变体 (注入改写后 SKILL/RULES 全文)"
+      - "runner 旧文本变体: 基线 = git show 93b7406:skills/agent-router/SKILL.md 与 ROUTING_RULES.md (metadata.baseline_sha; git show 为 SOT; 本 session scratchpad 副本仅当次缓存不跨 session 承诺, PP-R2 e72e707a) — 供 TASK-014/AC-3 与 AC-13 对照 (PP-R1 五方收敛 bb5647de 修复: 基线取自 git 历史, 免疫工作树改写时机)"
+      - "AC-14 专属可变 fixture 副本 proj-a-cache/ (mutation 隔离, PP-R1 e1356060)"
+    agent: main-loop (构建)
+    verification: ["9 类 fixture + 双 runner 变体 + 隔离副本齐备"]
+  - id: TASK-013
+    parent: TG-D
+    title: "裁决类 AC 实跑: AC-1,2,4-8,10-14,16 (显式传参 pin; 双跑)"
+    status: pending
+    complexity: L
+    dependencies: [TASK-012]
+    deliverables: ["verification.md §TASK-013 (metadata.verification_record)"]
+    agent: subagent(general-purpose) 并行执行 + main-loop 机械断言
+    verification:
+      - "各 AC 双跑字段级一致且中靶"
+      - "AC-14 于专属副本 proj-a-cache/ 串行末位执行 (不与并行 AC 共享可变 fixture, PP-R1 99f7aa18/e1356060)"
+      - "fail-回炉政策: 不一致→修 SKILL/RULES 文本→重建 runner→**重跑全部文本消费型验证 = TASK-013+014+015 全体** (非仅本 task AC 批; 三者共享注入文本, 013 recovery 后 014/015 既有结果失效 — PP-R2 e186fbc9/ba2b1df6 范围显式)"
+  - id: TASK-014
+    parent: TG-D
+    title: "AC-3 零回归三支基线对照 (旧文本 runner 变体 vs 新; 含 plugin_only×同名组合) — AC-3 唯一归属"
+    status: pending
+    complexity: M
+    dependencies: [TASK-012]
+    deliverables: ["verification.md §TASK-014"]
+    agent: subagent(general-purpose) + main-loop 断言
+    verification: ["三支: 新文本各支输出 shape 逐字段等同旧文本基线跑 (基线来源 = TASK-012 旧 runner 变体 @ 93b7406)", "若 TASK-013 recovery 修改文本 → 本 task 随全批重跑 (共享注入文本)"]
+  - id: TASK-015
+    parent: TG-D
+    title: "AC-15 推断层专项 (非空 fixture; L1 词边界 ≥2 tag + negation; 不断言 L2-addition)"
+    status: pending
+    complexity: S
+    dependencies: [TASK-012]
+    deliverables: ["verification.md §TASK-015"]
+    agent: subagent(general-purpose) + main-loop 断言
+    verification: ["trace.l1 二 tag (explicit:false) + negated 移除生效"]
+  - id: TASK-016
+    parent: TG-E
+    title: "aria-plugin v1.54.0 发版 5 文件"
+    status: pending
+    complexity: S
+    dependencies: [TASK-013, TASK-014, TASK-015]
+    deliverables: [aria/.claude-plugin/plugin.json, aria/.claude-plugin/marketplace.json, aria/VERSION, aria/CHANGELOG.md, aria/README.md]
+    agent: main-loop
+    verification: ["5 文件版本一致 1.54.0 (marketplace.json 两处 version 均改)"]
+  - id: TASK-017
+    parent: TG-E
+    title: "AC-9a 插件侧机械核对"
+    status: pending
+    complexity: S
+    dependencies: [TASK-016, TASK-010, TASK-004]   # PP-R1 四方收敛: 补消费边 (taxonomy 头注 + RULES 版本为其核对对象)
+    deliverables: ["verification.md §TASK-017"]
+    agent: main-loop
+    verification: ["SKILL (L17/L449/§393 五款/连带 10 段) + ROUTING_RULES (L3/§CAP/五类) + taxonomy 头注 + 发版 5 文件 — 逐项 grep 通过"]
+  - id: TASK-018
+    parent: TG-E
+    title: "主仓侧 (Phase C): TASK-009/011 落地 + 主仓版本三处 + pointer bump + AC-9b 核对"
+    status: pending
+    complexity: M
+    dependencies: [TASK-017, TASK-009, TASK-011]   # PP-R1 四方收敛: 补生产者边
+    deliverables: [VERSION, README.md, .aria/config.template.json, docs/requirements/user-stories/US-011.md, .aria/decisions/DEC-20260621-001-agent-team-audit-project-agent-augmentation.md, "gitlink (aria submodule pointer)", "verification.md §TASK-018 (AC-9b)"]
+    agent: main-loop
+    note: "Phase C 主仓分支执行"
+    verification:
+      - "主仓 VERSION 文件的**插件版本记录行** (现 v1.53.0) → v1.54.0; 主项目版本轴 (1.7.3) 不动 (PP-R1 c2e2b374 双版本轴消歧)"
+      - "root README badge L8 + Project Status 段**两处**均 v1.54.0 (PP-R1 9c7dc5e9)"
+      - "pointer bump = aria gitlink → 合并后 SHA; AC-9b 主仓清单 (config.template/US-011/DEC/VERSION/badge) 逐项核对"
+      - "i18n 免重译 (#140 B 档)"
+
+execution_order: >
+  TG-A: TASK-001→002→003, 然后 004,005 (均依赖 003, main-loop 顺序无关) →
+  TG-B: 005→006,007 (顺序无关)→008 →
+  TG-D: 012 → (013∥014∥015 subagent 真并行; AC-14 在 013 内串行末位隔离副本) →
+  TG-E: 016→017 → TASK-018 (Phase C)。
+  TASK-009/010/011 无前置, 工作树编辑可随时 (建议与 TG-D 同窗); 其「落地」由 017/018 依赖边收口。
