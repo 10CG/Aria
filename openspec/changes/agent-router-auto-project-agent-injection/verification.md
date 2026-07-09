@@ -43,10 +43,11 @@ follow-up 素材 (不在本 spec 范围 — Stage 1 基线「既有性质, 本 c
 5. threshold 比较 >= vs > 未明文 (v1.0.0 起)
 建议: 开 follow-up issue 收纳 (Phase D 归档时经 D auto-issue 或手动)。
 
-## §TASK-017 — AC-9a 插件侧机械核对
+## §TASK-017 — AC-9a 插件侧机械核对 (2026-07-09)
 
-(待 TASK-016 发版后执行)
+**PASS 28/28**: SKILL L17+footer 1.2.0 / §393 五款 / 连带 10 段 / RULES L3 1.1.0 + CAP-1..7 + 空基线分支 + 维护指南五类 / taxonomy 头注 / 发版 5 文件 (初核 27/28, 1 项为 grep pattern 含反引号误差, 修 pattern 复验通过)。
 
-## §TASK-018 — AC-9b 主仓侧核对
+## §TASK-018 — AC-9b 主仓侧核对 (2026-07-09, Phase C 主仓分支)
 
-(Phase C 主仓分支执行)
+**PASS 7/7**: config.template agent_router 3 key / US-011 errata ×3 / DEC 勘误 ×3 (L15/L24/L94) / 主仓 VERSION 插件记录 v1.55.0 / README badge L8 + Project Status 双处 / gitlink aria→1a46350 (forward bump)。i18n 免重译 (#140 B 档, 纯 badge/版本)。
+注: 版本 v1.54.0→v1.55.0 让位 — 并行 session ship runtime-probe 抢注 v1.54.0, 5 SOT 撞车 rebase 机械解 (memory feedback_concurrent_sot_conflict_mechanical_resolve 再证)。

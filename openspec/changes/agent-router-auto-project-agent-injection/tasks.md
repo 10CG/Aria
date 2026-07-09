@@ -34,7 +34,7 @@
 
 - [x] TASK-016 aria-plugin v1.54.0: plugin.json (SOT) + marketplace.json 两处 + VERSION + CHANGELOG.md + README.md
 - [x] TASK-017 **AC-9a 插件侧**机械核对 (SKILL/ROUTING_RULES/taxonomy/插件 5 文件 grep 断言; **在 TASK-016 后执行**)
-- [ ] TASK-018 主仓侧: US-011 三锚点 + DEC L13/L90 勘误落地 + 主仓 VERSION + root README badge + **submodule pointer bump** (gitlink) + **AC-9b 主仓侧核对** (于本 task 末执行, R4 918a4d69); i18n 免重译 (#140 B 档) 〔主仓文件, Phase C 执行〕
+- [x] TASK-018 主仓侧: US-011 三锚点 + DEC L13/L90 勘误落地 + 主仓 VERSION + root README badge + **submodule pointer bump** (gitlink) + **AC-9b 主仓侧核对** (于本 task 末执行, R4 918a4d69); i18n 免重译 (#140 B 档) 〔主仓文件, Phase C 执行〕
 
 ## 执行顺序
 
