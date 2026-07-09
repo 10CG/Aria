@@ -33,6 +33,8 @@ updated-at: 2026-07-09
 - **双子星版本抢注**: 本 session v1.54.0 被并行 ship (runtime-probe) 抢注 → 让位顺延 v1.55.0, 5 SOT 撞车 rebase 机械解 **×2** (aria + 主仓各一次)。大活前 fetch + 看版本号是否被占。
 - **rebase 冲突解时 `git add -A` 会携带落后 submodule checkout 入库** (本 session standards 指针差点回滚, C.2.4.5 gate 拦截) — 冲突解后 `git ls-tree HEAD <sub>` 核对指针再 continue。
 - **Workflow args 曾被字符串化** (args.runs undefined 秒败) — script 内联 fallback `typeof args === 'string' ? JSON.parse(args) : args` 兜底。
+- **goal 直驱 session 绕过 state-scanner → DEC-002 claim gate 未跑** (本 session 实证): B.1 前未 claim 未做版本预检 → 双子星撞车全靠事后 rebase 解。大活前手动补: fetch 三仓 + claim CLI + 版本号预检 (memory feedback_goal_driven_session_must_claim_at_phase_b_entry)。
+- fixture 原始证据 (48 runner JSON / assert_report.json) 为 session 级 artifact (scratchpad + workflow transcript), 不入库 — 归档的 verification.md 汇总是唯一 durable 记录, 复跑用 spec 内 AC 定义 + git show 基线即可重建。
 - aria-plugin / 主仓 CI 均路径过滤 — 非 issue-triage/orchestrator 路径的 PR 是零 run, C.2.4 gate 恒 wait, 按 Rule #8 exception 留痕降级 (勿傻等)。
 
 ## §4 实战教训 (memory 沉淀来源)
@@ -40,6 +42,7 @@ updated-at: 2026-07-09
 1. **prose Skill 的 AC 验证 = fixture runner 模式**: 注入全文 + 忠实执行器 + 结构化输出 + 双跑一致性 + `ambiguity_notes` 反馈环 — 双跑分叉即真文本歧义的可证伪信号 (AC-16b 实锤空基线分支缺失)。→ memory
 2. **python str.replace 批量修版必须逐处 grep 验证** — PP-R3 抓到 2 处静默 no-op (既有 memory feedback_verify_edit_landed_grep_count 再证, 本 session 违反一次被审计逮住)。
 3. 审计驱动设计演进有效: R-a precision 门 / B12 得分归属 / 显式传参解耦 / 空基线分支 全部来自审计轮 (非首稿)。
+4. **goal 直驱全周期跳过 state-scanner = 也跳过 claim gate** → 双子星撞车 ×2 事后解; B-entry 手动补 claim + 版本预检。→ memory
 
 ## §5 多维度同步状态
 
@@ -63,10 +66,11 @@ updated-at: 2026-07-09
 - 主仓: `413554f`+`1eea524`+standards 修正 → merge `e4e1629` (PR#155) + Phase D 收尾 commit (归档+CLAUDE.md+handoff, 见 git log); origin=github ✓
 - 中间产物: `.aria/audit-reports/` 42 份 (post_spec 21 + post_planning 20 + ACCEPTED/CONVERGED 汇总)
 
-## §8 Memory entries this session (2 new)
+## §8 Memory entries this session (3 new)
 
 - `feedback_prose_skill_fixture_runner_double_run_ambiguity` — prose Skill AC 验证的 fixture runner 模式 + 双跑分叉=真歧义信号
 - `feedback_workflow_args_stringified_inline_fallback` — Workflow args 字符串化坑 + script 内联 fallback 解药
+- `feedback_goal_driven_session_must_claim_at_phase_b_entry` — goal 直驱绕过 state-scanner 时 B-entry 手动补 claim + 版本预检 (会话收尾内省补录)
 
 ## Cross-references
 
