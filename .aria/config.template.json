@@ -1,17 +1,18 @@
 {
   "_comment": "Aria 项目级配置 — 所有字段可选，未设置使用默认值。复制为 config.json 后修改。",
   "version": "1.0",
-
   "workflow": {
     "auto_proceed": false
   },
-
   "state_scanner": {
     "confidence_threshold": 90,
     "auto_execute_enabled": false,
-    "auto_execute_rules": ["commit_only", "quick_fix", "doc_only"],
+    "auto_execute_rules": [
+      "commit_only",
+      "quick_fix",
+      "doc_only"
+    ],
     "audit_log_path": ".aria/audit.log",
-
     "sync_check": {
       "_comment": "Phase 1.12 — 本地/远程同步检测 (v2.9.0)",
       "enabled": true,
@@ -19,14 +20,17 @@
       "check_remote": false,
       "warn_after_hours": 24
     },
-
     "issue_scan": {
       "_comment": "Phase 1.13 — Issue 感知扫描 (v2.9.0, opt-in, 需网络+token)",
       "enabled": false,
       "platform": null,
       "platform_hostnames": {
-        "forgejo": ["forgejo.10cg.pub"],
-        "github": ["github.com"]
+        "forgejo": [
+          "forgejo.10cg.pub"
+        ],
+        "github": [
+          "github.com"
+        ]
       },
       "cache_ttl_seconds": 900,
       "cache_path": ".aria/cache/issues.json",
@@ -35,38 +39,49 @@
       "limit": 20,
       "label_filter": []
     },
-
     "handoff_multibranch": {
       "_comment": "#71 v1.38.0 — 多终端 handoff 看板扫描的远程分支上限。3 层优先级: env ARIA_HANDOFF_MAX_BRANCHES > 此 config 值 > 默认 20。大仓 (远程分支 > 20) 调高此值避免 handoff track 漏扫。超过推荐上界 500 仅告警不强改 (尊重用户值)。",
       "max_branches": 20
     }
   },
-
   "tdd": {
     "strictness": "advisory"
   },
-
   "benchmarks": {
     "require_before_merge": true,
     "skill_change_block_mode": "warn"
   },
-
   "experiments": {
     "agent_team_audit": false,
-    "agent_team_audit_points": ["pre_merge"]
+    "agent_team_audit_points": [
+      "pre_merge"
+    ]
   },
-
   "phase_c_integrator": {
     "_comment": "v1.3.0+ — Forgejo Issue #60 phase-c-integrator pre-merge gate (consume aether --in-flight primitive)",
     "pre_merge_gate": {
       "enabled": true,
-      "primitive_preference": ["aether-ci-cli"],
+      "primitive_preference": [
+        "aether-ci-cli"
+      ],
       "no_aether_fallback": "skip_with_warning",
       "wait_timeout_seconds": 1800,
-      "wait_check_intervals": [30, 60, 120, 300, 300],
+      "wait_check_intervals": [
+        30,
+        60,
+        120,
+        300,
+        300
+      ],
       "primitive_call_timeout_seconds": 30,
       "poll_chunk_seconds": 5,
       "user_escape_hatch": true
     }
+  },
+  "agent_router": {
+    "_comment": "agent-router step 3e 门控与缓存 (v1.55.0+, ROUTING_RULES §CAP)。scan_project_agents=false 或 plugin_only=true → 跳过项目级 capability 匹配退化纯基线; cache_ttl_seconds: 0=仅 per-file stat 比对, >0=距 last_full_scan 超时强制重扫 (对 stat 粒度漏检的时间兜底, 语义 v1.54.0 起为更严方向)",
+    "scan_project_agents": true,
+    "plugin_only": false,
+    "cache_ttl_seconds": 0
   }
 }

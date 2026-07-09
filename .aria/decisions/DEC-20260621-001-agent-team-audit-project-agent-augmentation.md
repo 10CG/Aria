@@ -12,6 +12,8 @@
 
 **现成范式**: `agent-router` v1.1.0 **已实现**所需机制 —— 扫描 `.aria/agents/*.md` → 合并候选 → 按 capabilities + FP/TT/关键词路由 (含缓存 `.aria/cache/project-agents.json` + 同名保护)。本修复复用这套**发现 + capabilities 匹配**范式, 不另造。
 
+> ⚠️ **勘误 (2026-07-09, #153 发现 B)**: 上句「已实现所需机制」对 **auto 路由路径失实** — v1.1.0 的扫描/capability 匹配是文末孤儿段, 从未接进主执行流程, auto 从不消费 `.aria/agents/` (cesura 实测)。本 DEC 消费的「发现 + frontmatter 读取」范式本身可用 (audit 侧冷路径直读, 不依赖 router 先跑), 故本 DEC 的修复不受影响; router 侧由 v1.55.0 `agent-router-auto-project-agent-injection` 接线修复。
+
 ## 约束条件
 
 | 类型 | 约束 | 影响 |
@@ -19,6 +21,7 @@
 | 优先级 | `agent-team-audit` = `experimental: true`, 默认关闭, `agent_team_audit_points` 默认仅 `["pre_merge"]` | 真实影响面有限 → 最小 scope, Level 2 |
 | 向后兼容 (Rule #4) | 现有 4-agent 流程零回归 | 增补必须 additive, 降级到纯基线 |
 | 复用 (反重复造轮子) | agent-router 已有发现+capabilities 范式; capabilities-taxonomy.yaml 已有词表 | 不新造扫描/词表/schema |
+> ⚠️ 勘误注 (2026-07-09): 「已有范式」在 v1.1.0 仅为文档描述, auto 路由未实际执行 (#153); 见上方 L13 勘误。
 | taxonomy 粒度 | `security-audit` 是单一粗标签, 基线 code-reviewer 已带它 | 排除"baseline 减法"判据 (见方案修正) |
 
 ## 考虑的方案
@@ -88,6 +91,7 @@
 - ❌ Override / 替换语义 → 本 cycle 仅 augment
 - ❌ 扩 taxonomy 加细粒度 specialist 标签 (shell-safety / ssh-egress 等) → 用既有标签, 细化留后续 cycle
 - ❌ 改 `agent-router` / 任务路由路径 → triage 已确认那条路正常 (项目 agent 在任务路由已被感知, 断裂特定于 audit 编排路径)
+  > ⚠️ **勘误 (2026-07-09, #153 发现 B)**: 「那条路正常/已被感知」失实 — 感知仅发生于显式要求扫描的会话路径, auto 模式从不感知 (cesura 实测证伪)。当时判「断裂特定于 audit 编排路径」不完整: 任务路由 auto 路径同样断裂。v1.55.0 修复。
 
 ## 风险与缓解
 
