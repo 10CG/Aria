@@ -11,7 +11,11 @@
 
 ---
 
-## ★ 最新 session #RUNTIME-PROBE-A2A3-CONVERGED — ✅ **DONE: runtime-probe Phase A.2/A.3 — detailed-tasks.yaml 20 任务 (6 TG / BA8·QA7·KM2·main-loop3 / 9 波) + post_planning 5-agent R1→R3 CONVERGED + 提交 `9065a7f` 三方 parity; ready for Phase B.1** (2026-07-06, aria-runner-bot/023236f2)
+## ★ 最新 session #AGENT-ROUTER-INJECTION-SHIPPED — ✅ **DONE: #153 发现 B 全周期 ship (aria-plugin v1.55.0) — triage 分拆 (A→M7#128/B→本cycle) + post_spec R1→R4 (152 findings, owner 接受) + post_planning R4 CONVERGED (5/5) + 16 AC × 双跑 48-runner fixture 全绿 (回炉1轮修真歧义) + 双仓 PR (#98/#155) 三 gate + 归档 + #153 closed** (2026-07-09, simonfish/dev-claude)
+
+**Latest**: [2026-07-09-agent-router-injection-shipped-v1.55.0.md](./2026-07-09-agent-router-injection-shipped-v1.55.0.md) — agent-router auto 从不消费 `.aria/agents/` (孤儿段+短路+无评分) → §CAP 成文 (显式传参/L1/L2 + precision 门 + 同名吸收) + 两段式决策接主链; fixture runner 模式 (注入全文+忠实执行器+双跑一致, 分叉=真歧义实锤空基线分支) ; C.2.4.5 指针 gate 拦到 standards 真回归 (rebase add -A 携带落后 checkout); 版本两度让位双子星 (v1.54.0 被 runtime-probe 抢注→v1.55.0)。**Next**: ⭐ M6 owner 4 门; aria-plugin#99 基线模糊小修; M7 (发现 A 正主)。无阻塞 carry-forward。
+
+## (前 Latest, 2026-07-06) session #RUNTIME-PROBE-A2A3-CONVERGED — ✅ **DONE: runtime-probe Phase A.2/A.3 — detailed-tasks.yaml 20 任务 (6 TG / BA8·QA7·KM2·main-loop3 / 9 波) + post_planning 5-agent R1→R3 CONVERGED + 提交 `9065a7f` 三方 parity; ready for Phase B.1** (2026-07-06, aria-runner-bot/023236f2)
 
 **Latest**: [2026-07-06-runtime-probe-a2a3-postplanning-converged.md](./2026-07-06-runtime-probe-a2a3-postplanning-converged.md) — 承前 handoff 头号 carry 执行 A.2/A.3: task-planner 出 20 任务 (1:1 parent 双射, 三层裁决硬约束转写) → **post_planning R1 5 Major** (wave4 同文件并行 tl+cr / **warnings[] 双写转写丢失** cr [orchestrator 转写真丢 SOT 语义, 派生审计价值再证] / 013 依赖漏边 / metadata 枚举 / 010 双点位) **+ 5 minor → PP-R1-fix** (串行约束编码进 DAG 边) → **R2** tl/cr/ba/km PASS + qa F4 (016 依赖漏 008, 013 同构判准一致性) → PP-R2-fix → **R3 单点确认 PASS 0-new → CONVERGED**。收敛前 minors 随手清。**Next**: ⭐ **Phase B** (wave 0 = TASK-018 phase1_gate CLI 真调**先于分支** → B.1 → B.2 agent-team 6 TG/9 波 → ship v1.54.0); 次: M6 owner 4 门 / VERSION 陈旧 / i18n README。无新增 memory (3 教训均既有 memory 复用验证)。⚠️ Phase B 前 fetch + 双子星; TASK-018 本身即 claim。
 
@@ -295,7 +299,7 @@
 
 **Predecessor (T-G)**: [2026-07-05-95-archive-gate-runtime-reality-shipped.md](./2026-07-05-95-archive-gate-runtime-reality-shipped.md) — Track G = M6 (US-026) Phase A.1+A.2 closed for 3/4 sub-Specs: Spec #1 cost-acceptance (`c29a800`) + Spec #2 e2e-resilience + Spec #3 docs (both `413dd75`); 16 audit reports total (3× R1 4-agent + 3× R2 3-agent + 2× R3 1-agent stability); 4 PRD patches landed (a786444 + e884e62/8a5fdc4); 8 owner Q-locks; 3 new memory entries (combined-mode value / migration slot draft-time-verify / gate logic cross-Spec SoT validate); Spec #4 release-closeout deferred to next session (本 2026-05-25 已 ship — 见上 T-Spec4 pointer);~6.2h session;13 commits (7 dev-claude + 6 dev-claude2 interleave 零冲突)。**M6 Phase A Spec batch DONE** (3/4 sub-Specs)。
 
-## ★ 最新 session #B — 🎉 **Aria #124 FULLY SHIPPED v1.28.0** + 5 memories + 工作语言双写 (2026-05-24 ~10:50 → 2026-05-25 ~00:10 UTC, dev-claude, ~13h 跨度)
+## (历史, 2026-05-25) session #B — 🎉 **Aria #124 FULLY SHIPPED v1.28.0** + 5 memories + 工作语言双写 (2026-05-24 ~10:50 → 2026-05-25 ~00:10 UTC, dev-claude, ~13h 跨度)
 
 **Latest (T-A124)**: [2026-07-05-95-archive-gate-runtime-reality-shipped.md](./2026-07-05-95-archive-gate-runtime-reality-shipped.md) — Session-end audit amendment 补 §B handoff 后 2 commits (`2b12a44` openspec archive file moves + `963e90d` CLAUDE.md 工作语言 section) + 完整 4-question audit。**Predecessor 综合 handoff** [`2026-05-24-aria-124-fully-shipped-v1.28.0.md`](./2026-05-24-aria-124-fully-shipped-v1.28.0.md): 3 cycles end-to-end — (a) Track E follow-ups #16+#17 (aria-orch PR #18 `0ce52b9`); (b) Aria #124 Phase A (brainstorm CONVERGED via R1 4-agent + R2 双反转 + ai-engineer 3rd path unified anchor + R3 4/4 ACCEPT_R3 + post_spec R1+R2 CONVERGED) DEC-20260524-002; (c) **Aria #124 Phase B+C+D FULLY SHIPPED** — aria-plugin **v1.28.0** (PR #64 `82c8abd`) Phase C.2.4.5 (B+) hardened pre-merge gate (warn-only; 14d obs → v1.29.0 block flip 2026-06-07) + standards convention `4b834d0` + main Aria tripwire workflow + benchmark Rule #6 substitute + CLAUDE.md cross-ref + **5 new memories** (4 brainstorm patterns + 1 user_chinese_conversation_default) + Layer L claim acquired+released. **13/13 replay test assertions PASS**. **11x SHA parity verified**. Forgejo Aria #124 + aria-orch #16/#17 all closed.
 
@@ -321,7 +325,7 @@
 
 **Predecessor latest**: [2026-07-05-95-archive-gate-runtime-reality-shipped.md](./2026-07-05-95-archive-gate-runtime-reality-shipped.md) — burndown of 4 v1.24.0 roadmap items + O7 (Aether tracking issue #143) + O8 (v1.27.0 aria-doctor --self-test + --help)
 
-## ★ 最新 session #2 (2026-05-23 ~15:30 UTC) — 🎉 **Track E CLOSED** (aria-layer2-docker-auth-cold-pull-fix shipped)
+## (历史, 2026-05-23) session #2 (2026-05-23 ~15:30 UTC) — 🎉 **Track E CLOSED** (aria-layer2-docker-auth-cold-pull-fix shipped)
 
 **Co-Latest**: [2026-07-05-95-archive-gate-runtime-reality-shipped.md](./2026-07-05-95-archive-gate-runtime-reality-shipped.md) — Track E full Phase A→D ship handoff (并行 dev-claude session, 与 burndown 同日 ship). Multi-track day: 4 concurrent tracks shipped same date (Track B/D/E/burndown)。
 

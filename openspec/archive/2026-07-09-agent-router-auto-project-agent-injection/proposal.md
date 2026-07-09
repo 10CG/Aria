@@ -1,7 +1,7 @@
 # agent-router-auto-project-agent-injection — auto 路由消费项目级 Agent (发现 B)
 
 > **Level**: 3 (Full — 两段式决策规则 + 输出契约扩展 + 缓存 schema 变更 + 配置增补)
-> **Status**: Draft (Rev4 — post_spec R1 39 + R2 49 + R3 37 + R4 27 findings 全吸收)
+> **Status**: done (Rev4; shipped v1.55.0 2026-07-09, aria-plugin#98 + Aria#155)
 > **Created**: 2026-07-08
 > **Parent Issue**: [#153](https://forgejo.10cg.pub/10CG/Aria/issues/153) 发现 B
 > **Target**: agent-router SKILL v1.1.0 → v1.2.0; aria-plugin v1.53.0 → v1.54.0 (Skill 逻辑变更 = MINOR)
