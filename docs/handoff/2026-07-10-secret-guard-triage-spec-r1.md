@@ -2,11 +2,13 @@
 track-id: secret-guard-bash3-multiline-hardening
 owner-container: aria-runner-bot/023236f2
 phase: A.1-postspec-R1
-status: paused
-updated-at: 2026-07-11T11:43:00Z
+status: superseded
+updated-at: 2026-07-11T22:42:00Z
 ---
 
 # Aria — Session Handoff (2026-07-10) — secret-guard 三缺陷 triage + Spec A.1 起草 + post_spec R1 审计 (proposal 文件待干净重生成)
+
+> ⚠️ **SUPERSEDED (2026-07-11)**: 本 session 的 secret-guard 线 (triage + proposal + R1 审计 + 计划 R2) 已被**双子星 session 并行 ship 取代** —— 四票 (#154/#156/#157/#152) 由 v1.55.2/v1.55.4 全修全 closed; 本线 proposal **冗余** (已由 v1.55.3「双子星和解」从 master 删除); follow-up #160 (命令替换/NUL-in-field/log_ack) 经 v1.55.4 逐项实测覆盖后 closed。本线 **R1 审计发现被 harvest 进 v1.55.4** (NUL-in-field=backend Critical-2 / log_ack=qa M-3 / 命令替换=部件 B)。重复开发根因由「协调机制 3 缺陷修复」spec 处理。**本 handoff 保留作历史记录** (triage 方法 / 通道不可靠事故 / §4 教训 / §8 memory); §0/§6 的「重生成 proposal / 跑 R2」前向动作已 **moot**, 无需执行。
 
 > owner-container 为手填 (机械命令 `handoff_autofill.py --owner-container` 因本 session 后段 shell 环境不稳未跑; 值取本容器近期 handoff 一致串)。
 
