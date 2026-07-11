@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.55.1",
+  "issue_ref": "10CG/Aria#154",
+  "generated_at": "2026-07-11T11:41:31Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 154,
+      "title": "Bug: secret-guard.sh crashes on macOS/zsh - readarray not found, blocks ALL tools",
+      "body": "## Bug Report\n\n**描述**: secret-guard.sh PreToolUse hook 在 macOS/zsh 环境因 `readarray` 不兼容崩溃，导致所有工具调用被拦截，会话完全瘫痪。\n\n**复现步骤**:\n1. 在 macOS (Darwin 22.6.0) + zsh shell + Aria Plugin v1.47.0\n2. 执行任何工具调用 (Bash, Read, Write, Skill 等)\n3. PreToolUse hook 触发 secret-guard.sh\n\n**预期行为**: Hook 正常执行 secret 检查后放行工具调用\n\n**实际行为**:\n```\nPreToolUse hook error: secret-guard.sh line 118: readarray: command not found\n[secret-guard] FATAL: malformed PreToolUse input - tool_name missing or null. Blocking.\n```\n所有工具全部被拦截，会话陷入死锁 - 无法通过任何工具调用修改设置文件。\n\n**根因分析**:\n1. **直接原因**: line 118 使用 `readarray`，这是 bash 内置命令。macOS 默认 shell 是 zsh，zsh 无 `readarray`\n2. **连锁崩溃**: 118 行崩溃后 `_sg_fields` 数组为空，`tool_type` 为空字符串，触发 line 125-131 的误判\n3. **Shebang 被忽略**: Shebang 声明了 `#!/usr/bin/env bash`，但 Claude Code hook runner 使用 `$SHELL` (zsh) 执行 command 模式的 hooks\n\n**修复建议**:\n将 `readarray -t _sg_fields < <(...)` 替换为 zsh/bash 兼容写法:\n```bash\n_sg_fields=()\nwhile IFS= read -r line; do\n  _sg_fields+=(\"$line\")\ndone < <(jq -r ...)\n```\n或让 hook runner 尊重 shebang，对声明 bash 的脚本使用 bash 执行。\n\n**环境信息**:\n- Aria Plugin: v1.47.0\n- OS: macOS Darwin x86_64\n- Shell: zsh\n- Hook: hooks/secret-guard.sh line 118\n\n---\n*由 aria-report 自动生成*",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/154",
+      "created_at": "2026-07-09T01:10:43Z",
+      "updated_at": "2026-07-10T01:19:29Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.47.0",
+      "current": "1.55.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "secret-guard.sh",
+          "line": 118,
+          "format": "prose_line",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "hooks/secret-guard.sh",
+          "line": 118,
+          "format": "prose_line",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "9e4245ac004833c9b5c7751912cbb92599e52de1"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "skip",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "hooks/secret-guard.sh:118 readarray -t 在 macOS 默认 shell (bash 3.2 / zsh) 执行",
+        "expected_behavior": "hook 正常执行",
+        "actual_behavior": "根因代码级确认: readarray 是 bash-4.0+ builtin, macOS 系统 bash=3.2.57 + zsh 均无 (本机 sh -c readarray → not found 佐证); 崩溃后 _sg_fields 空 → tool_type 空 → line 125 fail-closed 拦截全部工具。本机 Linux/bash5.2 无 macOS/zsh 环境, 无法直接复现崩溃, 根因确凿",
+        "match": null,
+        "notes": "复现受环境限制 (无 macOS/bash3.2/zsh); 根因 = shell builtin 兼容性, 代码级确认"
+      }
+    ],
+    "hit_count": 0,
+    "total_count": 1,
+    "hit_rate": "0/1"
+  },
+  "verdict": "confirmed",
+  "severity": "critical",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

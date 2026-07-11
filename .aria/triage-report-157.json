@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.55.1",
+  "issue_ref": "10CG/Aria#157",
+  "generated_at": "2026-07-11T11:41:31Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 157,
+      "title": "[security] secret-guard: 多行 command 仅首行被检查 — v1.26.0 四字段逐行解析在换行处截断",
+      "body": "## Bug Report (security)\n\n**描述**: `hooks/secret-guard.sh` 自 v1.26.0 起改用「单次 jq + 四字段逐行读」解析 PreToolUse 输入。但 `tool_input.command` 本身可以是多行的(heredoc、多行脚本)。逐行读会在命令的**第一个换行处截断** —— 命令第 2 行及之后**从未进入任何拦截正则**,同时命令第 2 行被错当成 `file_path`。\n\n结果:**secret-guard 只检查你命令的第一行。** 这是 Rule #7 执行载体的静默失效。\n\n### 受影响代码\n\n`hooks/secret-guard.sh:118`\n\n```bash\nreadarray -t _sg_fields < <(jq -r '(.tool_name | type), (.tool_name // \"\"), (.tool_input.command // \"\"), (.tool_input.file_path // \"\")' 2>/dev/null <<<\"$input\" | tr -d '\\r')\ntool_type=\"${_sg_fields[0]:-}\"\ntool=\"${_sg_fields[1]:-}\"\ncommand=\"${_sg_fields[2]:-}\"     # ← 多行 command 时, 只是第 1 行\nfile_path=\"${_sg_fields[3]:-}\"   # ← 多行 command 时, 其实是命令第 2 行\n```\n\n`:108-110` 的注释解释了为何选择 per-line 而非 `@tsv`(保留空字段),但没有考虑字段值自身含换行的情形。\n\n### 复现\n\n对 `hooks/secret-guard.sh` 直接投喂 PreToolUse JSON:\n\n| # | `tool_input.command` | 期望 | 实测 |\n|---|---|---|---|\n| A | `printenv` | 拦截 | `exit 2` 拦截 ✅ |\n| B | `echo begin\\nprintenv` | 拦截 | **`exit 0` 放行** ⚠ |\n| C | `set -e\\necho begin\\nprintenv` | 拦截 | **`exit 0` 放行** ⚠ |\n| D | `printenv\\necho done` | 拦截 | `exit 2` 拦截 ✅ |\n\nB/C 中 `printenv` 就位于它所在行的**行首**,因此这与 #152 的 `^` 锚定问题**是两个独立缺陷**:\n\n- 只修 #152 的锚定 → B/C 仍然逃逸(那些行根本没被送进正则)\n- 只修本截断 → `true; printenv`(#152 的单行中段)仍然逃逸\n\n**两个都必须修。**\n\n字段错位可直接观察:\n\n```\n$ readarray -t f < <(jq -r '(.tool_name|type),(.tool_name//\"\"),(.tool_input.command//\"\"),(.tool_input.file_path//\"\")' <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hi\\nenv\"}}')\n$ declare -p f\nf=([0]=\"string\" [1]=\"Bash\" [2]=\"echo hi\" [3]=\"env\" [4]=\"\")   # 长度 5, 期望 4\n```\n\n### 回归窗口\n\n由 `e9dc0f7` (v1.26.0, \"O3 closure — jq consolidation + bash builtin regex sweep\") 引入。\n\n**v1.26.0 → v1.55.0 全部受影响。** 同一 commit 同时引入了 #154(`readarray` 在 macOS bash 3.2 上不存在)。\n\n### 为什么长期未被发现\n\nAria 主仓自己的 `.claude/settings.json` 挂的是 `.claude/scripts/secret-guard.sh` —— 一份 2026-05-20 的**旧本地副本**,它用命令替换完整捕获多行:\n\n```bash\ncommand=\"$(printf '%s' \"$input\" | jq -r '.tool_input.command // \"\"' 2>/dev/null)\"\n```\n\n即 **Aria 自己 dogfood 的是没问题的旧副本,而通过 `hooks/hooks.json` 分发给下游(以及 aria-runner Layer 2 容器)的是会截断的新版本**。dual-install 漂移掩盖了回归。\n\n### 修复方向\n\n重写 `:118` 的字段提取,使其对含换行的字段值安全。候选:\n\n1. 用 NUL 分隔(`jq -j ... \"\\0\"` + `read -r -d ''`),字段值内不可能含 NUL;\n2. 逐字段独立 `jq` 调用(退回 v1.26.0 之前的形态,牺牲 O3 性能收益);\n3. `jq -r @base64` 逐字段编码后解码。\n\n**约束**:\n\n- 必须保留 `| tr -d '\\r'` 的等效行为(#132:Windows 原生 jq 输出 CRLF,否则全工具 fail-closed);\n- 必须保留空字段(`:108-110` 原注释的诉求);\n- 必须兼容 **bash 3.2**(见 #154),因此不能用 `readarray` / `mapfile` / `declare -A`;\n- 需要不依赖 macOS 的 CI 回归测试。\n\n### 关联\n\n- #154 — 同一 commit、同一行引入的 macOS bash 3.2 死锁(`readarray` 不存在)\n- #156 — #154 的重复\n- #152 — `^` 锚定导致的单行中段逃逸(**独立缺陷**,与本条互不覆盖)\n\n三者同文件同 hook,建议合并为一个修复 cycle。\n\n### 环境\n\n- 受影响版本:aria-plugin v1.26.0 – v1.55.0\n- 复现环境:Linux x86_64 / bash 5.2 / jq(与 OS 无关,纯解析逻辑缺陷)\n- 发现途径:`/issue-triage` 核对 #154 / #152 期间的代码审读 + 实测\n\n---\n*由 `/issue-triage` 核对流程发现,非 aria-report 自动生成*\n",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/157",
+      "created_at": "2026-07-10T01:18:07Z",
+      "updated_at": "2026-07-10T01:19:19Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.26.0",
+      "current": "1.55.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "hooks/secret-guard.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "hooks/secret-guard.sh",
+          "line": 118,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".claude/settings.json",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: {\n2:   \"hooks\": {\n3:     \"PreToolUse\": [\n4:       {\n5:         \"matcher\": \"Bash\",",
+          "warning": null,
+          "total_lines": 35
+        },
+        {
+          "file_path": ".claude/scripts/secret-guard.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: #!/usr/bin/env bash\n2: # PreToolUse hook — block raw reads of secret stores into LLM tool output.\n3: #\n4: # === THREAT MODEL + KNOWN LIMITATIONS (Read this before trusting the hook) ===\n5: #",
+          "warning": null,
+          "total_lines": 563
+        },
+        {
+          "file_path": "hooks/hooks.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "9e4245ac004833c9b5c7751912cbb92599e52de1"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-A",
+        "input": "{\"command\":\"env | grep TOKEN\"} (单行)",
+        "expected_behavior": "BLOCK exit 2",
+        "actual_behavior": "exit 2 拦截",
+        "match": true,
+        "notes": "对照组"
+      },
+      {
+        "case_id": "case-B",
+        "input": "{\"command\":\"echo begin\\nprintenv\"} (多行)",
+        "expected_behavior": "BLOCK exit 2",
+        "actual_behavior": "exit 0 放行",
+        "match": true,
+        "notes": "多行截断: printenv 在第2行, readarray 逐行读只取第1行送正则"
+      },
+      {
+        "case_id": "case-C",
+        "input": "{\"command\":\"set -e\\necho begin\\nprintenv\"} (多行)",
+        "expected_behavior": "BLOCK exit 2",
+        "actual_behavior": "exit 0 放行",
+        "match": true,
+        "notes": "同 B"
+      },
+      {
+        "case_id": "case-D",
+        "input": "{\"command\":\"printenv\\necho done\"} (首行即命中)",
+        "expected_behavior": "BLOCK exit 2",
+        "actual_behavior": "exit 2 拦截",
+        "match": true,
+        "notes": "证实截断点在第1行之后 — 首行命中仍拦"
+      }
+    ],
+    "hit_count": 4,
+    "total_count": 4,
+    "hit_rate": "4/4"
+  },
+  "verdict": "confirmed",
+  "severity": "critical",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

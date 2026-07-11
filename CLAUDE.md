@@ -538,7 +538,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
   aria-plugin 方法论轨 (与 M6/M7 正交): `agent-router-auto-project-agent-injection` (#153 发现 B「agent-creator 生成物 auto 路由从不消费」): **✅ SHIPPED v1.55.0 (2026-07-09)** — 项目级 capability 匹配接入 auto 主链: §CAP 评分成文 (显式传参/L1 词边界/L2 受约束 + off-tax 惰性 + precision 门拦 generalist) + 两段式决策 (Stage1 基线一致 + Stage2 R-a 序数直派/R-b 有序分支含单标签禁令与空基线分支) + 同名吸收得分归属 + 输出契约 additive (agent_source/decision_path/trace) + 缓存 per-file 语义; US-011 三锚点 errata + DEC-20260621-001 勘误; post_spec R1→R4 (152 findings, owner 接受) + post_planning R1→R4 CONVERGED (unanimous 5/5) + 16 AC × 双跑 48 runner structural fixture 全绿 (回炉 1 轮修真歧义 — 双跑分叉实锤空基线分支缺失); 版本两度让位并行 ship (v1.54.0 runtime-probe 抢注, 5 SOT 撞车 rebase 机械解 ×2 + C.2.4.5 指针 gate 拦到 standards 真回归); 关 #153 (发现 A 归 M7 #128); Phase D 归档 `openspec/archive/2026-07-09-agent-router-auto-project-agent-injection`
   → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
 
-版本: 插件 aria-plugin v1.55.1 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
+版本: 插件 aria-plugin v1.55.2 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
   → 完整版本变更史见 aria/CHANGELOG.md (SOT); 运行时 Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 

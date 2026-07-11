@@ -62,6 +62,19 @@
 #   Read/Edit:   SECRET_GUARD_ACK_PATH="$file_path" claude ...
 #                (one-shot — must re-set before each subsequent Read/Edit on same path)
 
+# ── Re-exec under bash if launched by another shell (#154 root fix) ─────────
+# Claude Code's hook runner executes `command` hooks via $SHELL and ignores the
+# `#!/usr/bin/env bash` shebang. On macOS $SHELL is zsh, so this hook can arrive
+# under zsh — where bash-isms (read -d '', [[ =~ ]], 0-based arrays, process
+# substitution) misparse every field → tool_type empty → fail-closed → ALL
+# tools blocked. That is the #154 deadlock's deeper cause: replacing `readarray`
+# alone is insufficient because the whole body is bash-specific. Re-exec
+# guarantees the body always runs under bash (3.2+, present on macOS as
+# /bin/bash). POSIX-sh syntax only above this line so zsh/sh reach it.
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
+
 set -uo pipefail   # NOT -e — we control exit codes
 
 # ── Fail-closed if jq missing ─────────────────────────────────────────────
@@ -99,7 +112,45 @@ fi
 # Previously `.tool_name // ""` returned empty for array/null/object → silent
 # case-star fallthrough to exit 0. Now we explicitly check type and fail-closed
 # on malformed structure.
-tool_type="$(printf '%s' "$input" | jq -r '.tool_name | type' 2>/dev/null)"
+#
+# v1.26.0 O3 perf: single jq call extracting all 4 fields at entry, one per
+# line. Replaces 3 prior jq invocations (type check + tool_name + per-branch
+# command/file_path extract). Saves ~2 × jq startup overhead. Case branches
+# below no longer re-invoke jq for their fields.
+#
+# Field extraction: NUL-delimited (#154/#156/#157 fix). The prior `readarray -t`
+# per-line form (e9dc0f7, v1.26.0) had two defects sharing this one line:
+#   #154/#156: `readarray` is a bash-4.0+ builtin — macOS system /bin/bash (3.2)
+#     and zsh lack it → hook crashes → _sg_fields empty → tool_type empty →
+#     fail-closed below blocks ALL tools (session deadlock).
+#   #157: per-line read truncates any field VALUE containing a newline (a
+#     multiline tool_input.command: heredoc / multi-line script) at its first
+#     newline. Line 2+ then never reaches ANY pattern below (silent Rule #7
+#     failure — only the command's first line is scanned), and line 2 is
+#     misparsed as file_path.
+# Fix: `jq -j` joins the 4 fields with a NUL byte (JSON string values can never
+# contain NUL, so it is an unambiguous separator), and `read -r -d ''` splits on
+# NUL. Newline-safe (field values keep embedded newlines) AND portable to bash
+# 3.2 / zsh (no readarray/mapfile). A trailing NUL after the 4th field yields
+# exactly 4 successful reads. `while ... < <(...)` (process substitution, not a
+# pipe) keeps the array in the current shell.
+#
+# `tr -d '\r'` strips carriage returns from jq output (#132): Windows native jq
+# builds emit CRLF; without stripping, tool_type becomes "string\r" and fails
+# the `!= "string"` check below, fail-closing ALL tools on Windows. Embedded CR
+# is meaningless for secret-pattern matching, so stripping the whole stream is
+# safe (orthogonal to NUL split: jq -j adds no newline, tr removes any CR;
+# multiline command newline bytes are preserved).
+_sg_fields=()
+while IFS= read -r -d '' _sg_f; do
+  _sg_fields+=("$_sg_f")
+done < <(jq -j '(.tool_name | type) + "\u0000" + (.tool_name // "") + "\u0000" + (.tool_input.command // "") + "\u0000" + (.tool_input.file_path // "") + "\u0000"' 2>/dev/null <<<"$input" | tr -d '\r')
+tool_type="${_sg_fields[0]:-}"
+tool="${_sg_fields[1]:-}"
+command="${_sg_fields[2]:-}"
+file_path="${_sg_fields[3]:-}"
+unset _sg_fields _sg_f
+
 if [[ "$tool_type" != "string" ]]; then
   if [[ "$tool_type" == "null" ]] || [[ -z "$tool_type" ]]; then
     # Missing/null tool_name on a non-empty input — likely malformed harness
@@ -110,8 +161,6 @@ if [[ "$tool_type" != "string" ]]; then
   echo "[secret-guard] FATAL: malformed PreToolUse input — tool_name is type=$tool_type (expected string). Blocking." >&2
   exit 2
 fi
-
-tool="$(printf '%s' "$input" | jq -r '.tool_name' 2>/dev/null)"
 
 # ── log_ack with hard failure handling ────────────────────────────────────
 # R4-C-1 fix: definition moved here from below `case` block so Read|Edit
@@ -143,14 +192,15 @@ log_ack() {
 # ── R2 Multi-tool dispatch ─────────────────────────────────────────────────
 case "$tool" in
   Read|Edit)
-    file_path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // ""' 2>/dev/null)"
+    # v1.26.0 O3 perf: file_path already extracted by entry jq call (line ~107).
+    # If file_path absent (e.g. tool_input shape variation), entry call set it to "".
     [[ -z "$file_path" ]] && exit 0
 
     # R2-C-6 fix: case-insensitive + expanded path list. Common high-value
     # secret file paths a future-Claude might Read without realizing.
     # Note: lowercased file_path for the match.
     lower_path="$(printf '%s' "$file_path" | tr '[:upper:]' '[:lower:]')"
-    if echo "$lower_path" | grep -qE '\.env(\.[a-z0-9_.-]+)?$|\.envrc$|/secrets?/|/credentials?/|id_rsa$|id_ed25519$|id_ecdsa$|\.pem$|\.key$|\.gpg$|\.age$|\.p12$|\.pfx$|\.jks$|\.tfstate$|\.tfstate\.backup$|/\.aws/credentials$|/\.aws/config$|/\.kube/config$|kubeconfig$|service[_-]account.*\.json$|gcp[_-]key.*\.json$|firebase.*\.json$|\.ssh/known_hosts$|/secret[_-]token|/master[_-]key|/encryption[_-]key'; then
+    if echo "$lower_path" | grep -qE '\.env(\.[a-z0-9_.-]+)?$|\.envrc$|/secrets?/|/credentials?/|id_rsa$|id_ed25519$|id_ecdsa$|\.ssh/id_[a-z0-9_]+$|\.pem$|\.key$|\.gpg$|\.age$|\.p12$|\.pfx$|\.jks$|\.tfstate$|\.tfstate\.backup$|/\.aws/credentials$|/\.aws/config$|/\.kube/config$|kubeconfig$|/\.docker/config\.json$|service[_-]account.*\.json$|gcp[_-]key.*\.json$|firebase.*\.json$|\.ssh/known_hosts$|/secret[_-]token|/master[_-]key|/encryption[_-]key'; then
       # R3-C-9 fix: SECRET_GUARD_ACK_PATH cannot be unset across processes
       # (env var lives in the parent shell, hook subprocess can't unset it).
       # Previously hook just emitted "consumed" NOTE which was dead code.
@@ -211,7 +261,7 @@ EOF
 esac
 
 # ── Bash command analysis ─────────────────────────────────────────────────
-command="$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2>/dev/null)"
+# v1.26.0 O3 perf: command already extracted by entry jq call (line ~107).
 [[ -z "$command" ]] && exit 0
 
 # R2-I-5 fix: command length cap. A 10 MB command would make the 30+ regex
@@ -366,6 +416,29 @@ declare -a risky_patterns=(
   'cat[[:space:]]+[^|]*\.envrc'
   '(head|tail|less|more)[[:space:]]+[^|]*\.env'
 
+  # v1.25.0 O4 (closes v1.24.0 known-limit (c) F2): Local key-file reads via
+  # plain Bash readers — mirrors Read|Edit branch file_path regex at line 153
+  # to cover the gap where `cat ~/.ssh/id_rsa` (no SSH wrapper) wasn't blocked.
+  # SSH-wrapped variant remains at line ~398. Pattern list intentionally
+  # parallels the file_path regex (id_rsa / id_ed25519 / id_ecdsa / .pem /
+  # .key / .p12 / .pfx / .jks / .gpg / .age / .tfstate / .aws/credentials /
+  # .aws/config / .kube/config / kubeconfig) to maintain Bash↔Read parity.
+  # #69: + base64 reader; non-standard ssh key names under .ssh/ (id_[A-Za-z0-9_]+);
+  #      .docker/config.json (base64 registry auth). Standard id_rsa/ed25519/ecdsa
+  #      still match anywhere (backward-compat); non-standard names anchored to .ssh/
+  #      to keep FP low (`cat id_number.txt` must not block).
+  '(cat|head|tail|less|more|strings|hexdump|od|xxd|base64)[[:space:]]+[^|]*(id_rsa|id_ed25519|id_ecdsa|\.ssh/id_[A-Za-z0-9_]+|\.pem|\.key|\.p12|\.pfx|\.jks|\.gpg|\.age|\.tfstate|/\.aws/(credentials|config)|/\.kube/config|/kubeconfig|/\.docker/config\.json)(\b|/|$|[[:space:]])'
+
+  # 2026-07-01 incident: shell rc / login-env files commonly hold
+  # `export SECRET=...` lines (e.g. FORGEJO_TOKEN in ~/.bashrc). A plain
+  # `grep FORGEJO_TOKEN ~/.bashrc` (or cat/head) leaked the value straight to
+  # tool output — double gap: `grep` was absent from every reader alternation
+  # above, AND .bashrc/.profile/etc were not in the file list. Mirror the .env
+  # treatment: block reads of these files by any common reader (ack-overridable
+  # for legit non-secret reads via SECRET_GUARD_ACK_PATH). `grep` added here.
+  '(cat|grep|egrep|fgrep|rg|head|tail|less|more|strings|awk|sed)[[:space:]]+[^|]*(\.bashrc|\.bash_profile|\.bash_login|\.zshrc|\.zprofile|\.profile|\.bash_aliases|/etc/environment|/etc/profile)(\b|/|$|[[:space:]])'
+  'ssh[^|]*(cat|grep|head|tail|less|more|strings|awk)[^|]*(\.bashrc|\.bash_profile|\.zshrc|\.profile|/etc/environment|/etc/profile)'
+
   # R4-C-4 fix: K8s / Docker container-mounted secret paths in Bash
   # (Read|Edit branch already covers via path regex; mirror here for Bash)
   '(cat|head|tail|less|more|strings|hexdump|od|xxd|tr|awk|perl|rev)[[:space:]]+[^|]*/(var/)?run/secrets/'
@@ -391,8 +464,8 @@ declare -a risky_patterns=(
   'while[[:space:]]+(IFS=|read)[^|]*<[[:space:]]*[^|]*\.env'
   '<[[:space:]]*[^|]*\.env[[:space:]]*(\$\(|`)[^)]*cat'
   '\bcp[[:space:]]+[^|]*\.env[[:space:]]+/dev/(stdout|tty)'
-  '^[[:space:]]*\.[[:space:]]+[^|]*\.env'                 # `. .env` source
-  '^[[:space:]]*source[[:space:]]+[^|]*\.env'             # `source .env`
+  '(^|[;&|]|[[:space:]])[[:space:]]*\.[[:space:]]+[^|]*\.env'                 # `. .env` source
+  '(^|[;&|]|[[:space:]])[[:space:]]*source[[:space:]]+[^|]*\.env'             # `source .env`
 
   # SSH-remote reads of secret files / dumps (R2-I-3 expanded)
   'ssh[^|]*(cat|head|tail|less|more|printenv|env|find|strings|hexdump|od|dd|awk|perl)[^|]*(\.env|\.envrc|/secrets|/credentials|id_rsa|id_ed25519|\.pem|\.key)'
@@ -407,7 +480,7 @@ declare -a risky_patterns=(
   'set[[:space:]]*\|[[:space:]]*grep[[:space:]]+[^|]*(pass|secret|token|key|credential)'
 
   # Docker env dumps (compose / direct / inspect)
-  'docker[[:space:]]+(compose[[:space:]]+)?exec[^|]*[[:space:]](printenv|env)([[:space:]]+\||[[:space:]]*$)'
+  'docker[[:space:]]+(compose[[:space:]]+)?exec[^|]*[[:space:]](printenv|env)([[:blank:]]*($|[;&|]|[[:cntrl:]]))'
   'docker[[:space:]]+inspect[^|]*--format[^|]*\.Config\.Env'
 
   # R2-C-5 fix: kubectl exec env|cat|printenv (the K8s secret leak path)
@@ -416,10 +489,10 @@ declare -a risky_patterns=(
   'kubectl[[:space:]]+exec[^|]*--[^|]*(cat|head|tail)[^|]*(/run/secrets|\.env|/etc/[^|]*passwd)'
 
   # Bare printenv / bare env (no args = dump everything)
-  '^[[:space:]]*printenv([[:space:]]+\||[[:space:]]*$)'
-  '^[[:space:]]*env([[:space:]]+\||[[:space:]]*$)'
-  '^[[:space:]]*/bin/printenv'                              # absolute path
-  '^[[:space:]]*/usr/bin/printenv'
+  '(^|[;&|]|[[:space:]])[[:space:]]*printenv([[:blank:]]*($|[;&|]|[[:cntrl:]]))'
+  '(^|[;&|]|[[:space:]])[[:space:]]*env([[:blank:]]*($|[;&|]|[[:cntrl:]]))'
+  '(^|[;&|]|[[:space:]])[[:space:]]*/bin/printenv'                              # absolute path
+  '(^|[;&|]|[[:space:]])[[:space:]]*/usr/bin/printenv'
 
   # psql sensitive-column reads
   'psql[^|]*(key_encrypted|encrypted_data|encrypted_blob|ciphertext|key_material)'
@@ -519,12 +592,34 @@ declare -a risky_patterns=(
   'psql[[:space:]]+[^|]*-f[[:space:]]+[^|]+\.sql'
 
   # R3-I-6: compgen -e / set -o posix; set (env-dump cousins)
-  '^[[:space:]]*compgen[[:space:]]+-e([[:space:]]+\||[[:space:]]*$)'
+  '(^|[;&|]|[[:space:]])[[:space:]]*compgen[[:space:]]+-e([[:blank:]]*($|[;&|]|[[:cntrl:]]))'
   'set[[:space:]]+-o[[:space:]]+posix.*set[[:space:]]*\|[[:space:]]*grep'
+
+  # ── #69 (Aether v1.28.0 14-day dogfood — 5 confirmed FN + corpus) ──────────
+  # FN3: HashiCorp Vault HTTP API form (header + token literal). CLI forms
+  # (`vault read|kv get|agent`) covered at ~line 359; this adds the curl/HTTP path.
+  '(-H|--header)[[:space:]]*["'"'"']?[[:space:]]*X-Vault-Token:'           # vault HTTP auth header (require -H/--header so doc/grep mention of the name doesn't FP)
+  'hvs\.[A-Za-z0-9]{24,}'                                                  # vault service token literal (≥24 → skip hvs.<benign-id>; real tokens ~95 chars)
+  # FN4: kubectl exec indirect shell wrap — `-- sh -c '...env|cat...'` bypasses
+  # the literal-reader-after-`--` patterns at ~line 444.
+  'kubectl[[:space:]]+exec[^|]*--[^|]*(sh|bash)[[:space:]]+-c[^|]*(env|printenv|cat)'
+  # base64/dd of key files (base64 added to reader set ~line 397; dd mirrors line 410)
+  'dd[[:space:]]+[^|]*if=[^|]*(\.ssh/id_[A-Za-z0-9_]+|id_rsa|id_ed25519|id_ecdsa|\.pem|\.key|\.p12|\.pfx)'  # if= any arg position (dd bs=4k if=key)
+  # FN5 + exfil-to-destination class (R3-C-8 threat-model extension, see ~line 536):
+  # remote-copy (download OR upload) / local-copy / archive-pipe of key files &
+  # the .ssh dir to a destination. `\bcp` avoids matching the `cp` inside `scp`.
+  'scp[[:space:]]+[^|]*(\.ssh/id_[A-Za-z0-9_]+|id_rsa|id_ed25519|id_ecdsa|\.pem|\.key)'              # scp host:secret . | scp secret host: (/private/ dropped — redundant w/ .pem + macOS FP)
+  'rsync[[:space:]]+[^|]*(\.ssh/id_[A-Za-z0-9_]+|id_rsa|id_ed25519|id_ecdsa|\.pem|\.key)'
+  '\bcp[[:space:]]+[^|]*(\.ssh/id_[A-Za-z0-9_]+|id_rsa|id_ed25519|id_ecdsa|\.pem|\.key)([[:space:]]|$)'  # cp key dest (also matches key as final EOL arg)
+  'tar[[:space:]]+[^|]*\.ssh([^a-zA-Z]|$)[^|]*\|[[:space:]]*(ssh|nc|curl|wget)'                      # tar ~/.ssh | ssh evil (.ssh boundary so .sshconfig doesn't FP)
+  'wget[[:space:]]+[^|]*--post-file=[^|]*'                                                           # wget --post-file=.env
 )
 
 for pat in "${risky_patterns[@]}"; do
-  if echo "$command" | grep -qE "$pat"; then
+  # v1.26.0 O3 perf: bash builtin `=~` (POSIX ERE) replaces `echo | grep -qE`
+  # subprocess fork. ~100 patterns × ~3ms subprocess fork = ~300ms saved per
+  # hook invocation (the dominant cost). bash 3.2+ guaranteed (ubiquitous).
+  if [[ "$command" =~ $pat ]]; then
     if [[ $has_filter -eq 0 ]]; then
       cat >&2 <<EOF
 [secret-guard] BLOCKED: command reads a secret-bearing source without a
