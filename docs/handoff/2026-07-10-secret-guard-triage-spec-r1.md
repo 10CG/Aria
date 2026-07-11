@@ -3,7 +3,7 @@ track-id: secret-guard-bash3-multiline-hardening
 owner-container: aria-runner-bot/023236f2
 phase: A.1-postspec-R1
 status: paused
-updated-at: 2026-07-11T01:38:00Z
+updated-at: 2026-07-11T11:43:00Z
 ---
 
 # Aria — Session Handoff (2026-07-10) — secret-guard 三缺陷 triage + Spec A.1 起草 + post_spec R1 审计 (proposal 文件待干净重生成)
@@ -69,12 +69,12 @@ updated-at: 2026-07-11T01:38:00Z
 
 | repo | 状态 |
 |---|---|
-| main `7244f23` | origin = github = `7244f23` (parity ✓); 本 session **未提交任何主仓变更** |
+| main `759b980` | origin = github = `759b980` (三方一致, ls-remote 核验); handoff + latest.md + triage 产物**已提交并推送** |
 | 未提交 (working tree) | `openspec/changes/secret-guard-bash3-multiline-hardening/` (proposal **损坏**, 勿提交至重生成) + `.aria/triage-{report,comment}-*` (triage 产物) + `M aria-orchestrator` (**绝不 stage**) |
 | Forgejo issue | #157 + #158 已 POST (远程已落盘, 已核) |
 | aria / standards | 未动 |
 
-> 本 session 无 commit/push (工作停在 proposal 起草+审计, 未到 Phase C)。下 session 重生成 proposal + R2 后再论提交。
+> **已提交并推送** (`759b980`, 三方一致): handoff + latest.md pointer + triage 产物。push 首拒 (并发 `9e4245a` = aria-plugin#99 收尾) → rebase 化解 (latest.md pointer 双留, 我的在顶) → fast-forward。aria 子模块 checkout 已同步至指针 `8fea71d4` (v1.55.1)。**仍未提交** (故意): 损坏 proposal + `M aria-orchestrator` 指针。
 
 ## §8 Memory entries this session
 
@@ -93,7 +93,7 @@ owner 中途喊停要求反思 (裸 NUL 反复踩坑), 本收尾为 owner 显式
 - **持久化的真件** (已 ground-truth 核): handoff 本体 + §2/§3 增补 / latest.md 修复 / Forgejo (PR#100 恢复 + #102) / triage 产物。
 - **方法论**: 每个 Edit/Write 改后必用**独立通道** (git status / mtime / 独立 GET) 核验, 非工具回执。这是本 session 最大教训, 收尾过程本身又实证一遍。
 
-**⚠️ 未提交**: 本 handoff + latest.md + triage 产物均 uncommitted; 损坏的 proposal 与 `M aria-orchestrator` **绝不 stage**。handoff 要持久化需 owner 决定是否 commit (安全 stage 清单: `docs/handoff/*` + `.aria/triage-*`, 排除 proposal 目录 + aria-orchestrator 指针)。
+**✅ 已提交并推送** (`759b980`, 三方一致 ls-remote 核验): handoff + latest.md + triage 产物 (8 文件, safety-gate 核验排除 proposal + aria-orchestrator)。push 首拒 (并发 `9e4245a` aria-plugin#99 收尾) → rebase 化解 latest.md pointer 冲突 (双留, 我顶) → fast-forward → 三方核验。aria 子模块 checkout 已同步 `8fea71d4`。**仍未提交** (故意, 绝不 stage): 损坏 proposal (待重生成) + `M aria-orchestrator` (Track-1 未合并)。〔本 §7/§10 对齐补记为 759b980 之后的 follow-up commit。〕
 
 ## Cross-references
 
