@@ -11,9 +11,13 @@
 >
 > **本 spec 补入 (simonfish 侧发现, 本 spec R1 漏)**: **zsh re-exec guard** —— Claude Code hook runner 用 $SHELL (macOS=zsh) 忽略 shebang, 整 bash-specific 脚本体在 zsh 下 fail-closed 阻断全部工具。**这是 #154 在 macOS 上的真实执行路径, 本 spec SC-1 只测 bash 3.2 夹具、未覆盖 zsh 执行整脚本**。已在 v1.55.2 实现 (顶部 `[ -z "$BASH_VERSION" ] && exec bash`); 本 spec 的部件 A/C 应把 zsh 端到端纳入 SC。
 >
-> **待实现 (本 spec 部件 B 剩余, 权威设计在此)**: 命令替换 `$(env)`/反引号 + 组合 `{ env; }` + 单层包装器 `sudo env`/`nice env`/`timeout env` 的命令位识别全覆盖 (spike 36/37 + 误报矩阵已备)。缺此 = fail-safe 漏拦 (非活可利用洞)。**下一步**: 本 spec 走 post_spec R2 → 批准 → 实现部件 B (可由 aria-runner-bot 续或 simonfish 侧接), 复用 v1.55.x 已落地的测试框架。
+> **部件 B 已实现 (v1.55.4, simonfish 侧, 2026-07-11)**: 命令替换 `$(env)`/反引号 + 组合 `{ env; }` + 单层包装器 (sudo/nice/timeout/xargs/nohup/stdbuf/doas/env/time/eval/setsid/ionice/unbuffer, dumper 须首个非 flag token) + `command env` 直接形式 (排除 `command -v env`) + shell 关键字位 (then/do/else/elif) + printenv 始终拦 + env 重定向 gap。**实现前重建 spike 正/反例矩阵 (51/51, 双子星 spike 在其容器本机无) + pre-merge code-review (2 Important 包装器过匹配/关键字位 + 1 Minor 赋值 FP 全修)**。**同时修掉 v1.55.2 引入的 FP 回归** (普通空格被当命令分隔符, `echo env`/`kubectl get env` 误拦)。测试 297→347。
 >
-> **Status**: Adopted-as-authoritative / 部件 A+守卫已 ship, 部件 B 待实现 (原: Draft post_spec R1 REVISE x4)
+> **残留 (fail-safe, 接受)**: 未列包装器 (flock/watch/proxychains 等) + 深层 shell 关键字位仍可能漏拦 —— 按 hook 威胁模型 (防意外泄漏非对抗证明) + 本 spec AD-3 (包装器残留 fail-safe) 接受。AD-3(a) `env FOO=1 printenv` 简单形式已被 wrapper 的 env 分支覆盖。
+>
+> **本 spec 全部部件已实现** (A 字段提取/re-exec/NUL 守卫/log_ack @ v1.55.2-3 + B 命令位 @ v1.55.4)。**可归档** (post_spec R2 免走 —— 实现已端到端验证 + code-review 收敛, 设计意图已实现)。
+>
+> **Status**: done (全部件已实现 + 验证 + code-review: A/re-exec/NUL/log_ack @ v1.55.2-3, B 命令位 @ v1.55.4; dev-claude 起草设计, simonfish 侧实现, 双子星撞车和解 owner 决策 B)
 > **Spec Level**: 3 (Full — proposal + tasks)。理由: 代码量小 (单文件 ~15 行核心改动), 但 **blast radius 极高** —— 改的是 Rule #7 执行载体 `secret-guard.sh`, 拦在**每一次工具调用**必经路径 (PreToolUse x 两 matcher)。任一回归 = 全工具 fail-closed (死锁) 或 secret 静默泄漏。按 blast radius 定级 L3 (与 `shell-jq-crlf-hardening` #132 精确同型; 对照 `secret-scan-honest-downgrade` L2 因 PostToolUse 非阻塞)。
 > **ship target**: aria-plugin (SOT `plugin.json` = v1.55.1) -> 下一 PATCH
 > **变更目标**: `aria/` 子模块 (`hooks/secret-guard.sh` + `hooks/tests/`)。Spec 按 Rule #5 置主仓 `openspec/changes/`。
