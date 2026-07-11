@@ -1,6 +1,6 @@
 # Proposal: 协调机制 3 缺陷修复 — claim 生命周期 + 语义重叠 + 认领强制
 
-> **Status**: Approved (owner 决策 2026-07-11: (a)=A1 插件内强制 + orchestrator follow-up 标记 / (b)=B1 linked_issue advisory / (c)=都做含一次性清理)。Phase B 实施中。
+> **Status**: ✅ Shipped v1.56.0 (2026-07-11) — Phase B 全三部件实现 (aria PR#106 merge `504da89`); pre-merge 对抗 review R1 1 Critical (sweep TTL 误杀活 session → SWEEP_TTL=24h) + 5 Important 全修; 测试 968→1006; 一次性清理真协调 ref 完成 (唯一 active = 本 cycle claim, 收尾 D.2b 释放)。orchestrator follow-up (defect a Layer 2 维度) 另行开票。
 > **Level**: 3 (Full — blast radius: 改 DEC-002 Layer L 协调机制, 影响多终端/多 session 撞车防护)
 > **Created**: 2026-07-11
 > **Source**: 2026-07-11 双子星撞车实战暴露 (aria-runner-bot 与 simonfish 并发做同一批 secret-guard, claim gate 未拦)

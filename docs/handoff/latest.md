@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #PARTB-V1.55.4-COORD — 🔶 **PARTIAL: secret-guard 部件 B ship v1.55.4 (item 2 全) + 协调机制 spec 批准 + Part C 核心 WIP (item 1 起步)** (2026-07-11, simonfish/bfe8285d)
+## ★ 最新 session #COORD-LIFECYCLE-V1.56.0 — ✅ **DONE: 协调机制 claim 生命周期闭环 v1.56.0 ship (3 缺陷全修) + #159/#160 实测关票** (2026-07-11, simonfish/bfe8285d)
 
-**Latest**: [2026-07-11-partB-v1.55.4-and-coordination-spec.md](./2026-07-11-partB-v1.55.4-and-coordination-spec.md) — 和解后 owner「1+2 都执行」→ **item 2 全 ship**: dev-claude spec 部件 B (命令替换/组合/包装器/关键字位命令位覆盖) v1.55.4 + 修 v1.55.2 引入的 `echo env` 假阳性回归; spike 51/51 + code-review 2I/1M 全修; 双子星 spec 全实现归档。**item 1 起步**: 协调 3 缺陷 L3 spec 批准 (a=A1 插件内强制/b=B1 linked_issue advisory/c=都做) + Part C 核心 `release_claim_by_track` (按 track_id+container 释放, 4 测试, aria `wip/coordination-part-c` WIP)。**item 1 Phase B 大部分未做** (Part C 接线/清理 + A1 + B1, 见 §2, 完整 L3 cycle 待续)。**Next**: ⭐ item 1 Phase B 从 wip 分支接 (C→A1→B1)。核心教训: 抢先 ship ≠ 质量更高; 安全正则每版跑正/反例矩阵。
+**Latest**: [2026-07-11-coordination-lifecycle-v1.56.0.md](./2026-07-11-coordination-lifecycle-v1.56.0.md) — item 1 Phase B 全三部件 ship: **Part C** release_gate CLI (track+container 定位, 全匹配释放) + apply_tree_edits CAS + GC 真写入 + sweep (SWEEP_TTL=24h) + phase-d-closer D.2b 接线 + 一次性清理真 ref (0 stale active, 本 cycle claim D.2b dogfood 释放); **Part A1** coordination.enabled 默认→true (opt-out ⚠️行为变更) + B.0 REQUIRE claim + doc lock-in; **Part B1** linked_issue schema/CLI/overlap advisory。pre-merge review 1C (sweep 30min TTL 误杀活 session→24h) + 5I 全修; 测试 968→1006 (含 pytest 裸函数假绿修); aria PR#106 `504da89`; spec 归档。另: #159/#160 实测证明已被 v1.55.2/v1.55.4 全覆盖, 零代码关票。follow-up: orchestrator#31 (bot 强制 claim) + plugin#107 (heartbeat 接线)。**本轨终结, 无 carry**; 承前 M6 owner 4 门。
+
+## (前 Latest, 2026-07-11) session #PARTB-V1.55.4-COORD — 🔶 **PARTIAL: secret-guard 部件 B ship v1.55.4 (item 2 全) + 协调机制 spec 批准 + Part C 核心 WIP (item 1 起步)** (2026-07-11, simonfish/bfe8285d)
+
+**Handoff**: [2026-07-11-partB-v1.55.4-and-coordination-spec.md](./2026-07-11-partB-v1.55.4-and-coordination-spec.md) — 和解后 owner「1+2 都执行」→ **item 2 全 ship**: dev-claude spec 部件 B (命令替换/组合/包装器/关键字位命令位覆盖) v1.55.4 + 修 v1.55.2 引入的 `echo env` 假阳性回归; spike 51/51 + code-review 2I/1M 全修; 双子星 spec 全实现归档。**item 1 起步**: 协调 3 缺陷 L3 spec 批准 (a=A1 插件内强制/b=B1 linked_issue advisory/c=都做) + Part C 核心 `release_claim_by_track` (按 track_id+container 释放, 4 测试, aria `wip/coordination-part-c` WIP)。**item 1 Phase B 大部分未做** (Part C 接线/清理 + A1 + B1, 见 §2, 完整 L3 cycle 待续)。**Next**: ⭐ item 1 Phase B 从 wip 分支接 (C→A1→B1)。核心教训: 抢先 ship ≠ 质量更高; 安全正则每版跑正/反例矩阵。
 
 ## (前 Latest, 2026-07-11) session #SECRET-GUARD-TWIN-RECONCILE — ✅ **DONE: 双子星撞车质量重评 + owner 决策 B 和解 + v1.55.3 NUL 安全加固** (2026-07-11, simonfish/bfe8285d)
 
