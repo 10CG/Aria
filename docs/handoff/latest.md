@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #SECRET-GUARD-4ISSUE — ✅ **DONE: secret-guard 四票并案 triage + 修复全周期 ship v1.55.2** (2026-07-11, simonfish/bfe8285d)
+## ★ 最新 session #SECRET-GUARD-TWIN-RECONCILE — ✅ **DONE: 双子星撞车质量重评 + owner 决策 B 和解 + v1.55.3 NUL 安全加固** (2026-07-11, simonfish/bfe8285d)
 
-**Latest**: [2026-07-11-secret-guard-four-issue-fix-v1.55.2.md](./2026-07-11-secret-guard-four-issue-fix-v1.55.2.md) — `/issue-triage` 四票核对 (#154/#156 macOS readarray 崩溃 + #157 多行截断 + #152 中段逃逸; #156 dup 关闭) → **Level 2 修复 cycle**: 缺陷 A (line 118 readarray→jq -j NUL 分隔 + read -r -d '') + **re-exec-to-bash guard** (zsh 端到端实测揭示 #154 更深根因: hook runner 用 $SHELL=zsh 忽略 shebang, 整脚本 bash-ism 在 zsh fail-closed 阻断全部工具 — 单改字段提取不够) + 缺陷 B (^ 锚定 7 处前缀含换行 + bare dump 后缀重构 4 处) + dual-install 副本字节同步。测试 260→292 (RED-first + 4 静态 + 6 zsh 端到端) + code-review (Important#1 后缀逃逸修) + **dogfood** (修好的 hook 拦住写它的 commit)。PR#103 merged `023351b`, 四票全 closed。**Next**: ⭐ M6 owner 4 门 (Blocker 4 Luxeno); 次: secret-guard 子壳逃逸 carry / #101。陷阱: harness 把源码 backtick/引号间空格转真 NUL (grep -P 骗人, 用 python 二进制核验); zsh 兼容必须真 end-to-end 跑不能只断言。
+**Latest**: [2026-07-11-secret-guard-twin-reconcile-v1.55.3.md](./2026-07-11-secret-guard-twin-reconcile-v1.55.3.md) — v1.55.2 ship 后 owner 质疑「确定我们质量更高吗」→ 实读双子星 L3 spec + 实测 → **双子星 (aria-runner-bot 自主运行时, 非 dev-claude2) 质量更高**, 我 v1.55.2 有它抓到的**真安全洞 NUL-in-field 绕过** (JSON \u0000 转义 jq 解码成真 NUL 与字段分隔符同形 → command 截断使 dumper 溢出到 file_path 绕过; 实测 exit0) → owner **决策 B 和解** (不回退): v1.55.3 补 NUL 字段数守卫 + log_ack 多行净化 + #152 归因订正 (e8e847c 非 e9dc0f7), 双子星 spec 转权威设计 (部件 B 命令替换全覆盖待实现, 补入我的 zsh re-exec 发现)。撞车根因: 自主 bot 干活不 claim + track-id 字符串匹配防不了语义重叠 + claim 从不释放 (协调机制 3 缺陷)。测试 292→297。PR#104 merged `c209c5b`。**Next**: ⭐ 协调机制 3 缺陷 (不修会再撞); 双子星 spec 部件 B; M6 owner 4 门。核心教训: 抢先 ship ≠ 质量更高。
+
+## (前 Latest, 2026-07-11) session #SECRET-GUARD-4ISSUE — ✅ **DONE: secret-guard 四票并案 triage + 修复全周期 ship v1.55.2** (2026-07-11, simonfish/bfe8285d)
+
+**Handoff**: [2026-07-11-secret-guard-four-issue-fix-v1.55.2.md](./2026-07-11-secret-guard-four-issue-fix-v1.55.2.md) — `/issue-triage` 四票核对 (#154/#156 macOS readarray 崩溃 + #157 多行截断 + #152 中段逃逸; #156 dup 关闭) → **Level 2 修复 cycle**: 缺陷 A (line 118 readarray→jq -j NUL 分隔 + read -r -d '') + **re-exec-to-bash guard** (zsh 端到端实测揭示 #154 更深根因: hook runner 用 $SHELL=zsh 忽略 shebang, 整脚本 bash-ism 在 zsh fail-closed 阻断全部工具 — 单改字段提取不够) + 缺陷 B (^ 锚定 7 处前缀含换行 + bare dump 后缀重构 4 处) + dual-install 副本字节同步。测试 260→292 (RED-first + 4 静态 + 6 zsh 端到端) + code-review (Important#1 后缀逃逸修) + **dogfood** (修好的 hook 拦住写它的 commit)。PR#103 merged `023351b`, 四票全 closed。**Next**: ⭐ M6 owner 4 门 (Blocker 4 Luxeno); 次: secret-guard 子壳逃逸 carry / #101。陷阱: harness 把源码 backtick/引号间空格转真 NUL (grep -P 骗人, 用 python 二进制核验); zsh 兼容必须真 end-to-end 跑不能只断言。
 
 > ⚠️ **双子星并发撞车 (2026-07-10~11)**: dev-claude 容器 (aria-runner-bot) 并发起了 **L3 spec `secret-guard-bash3-multiline-hardening`** 修同一批 issue, 停在 post_spec R1 (REVISE×4, proposal 待重生成, **未 ship**)。本 session (simonfish) 已 **Level 2 全周期 ship v1.55.2 + 关闭 4 票**, 其 spec 现 **stale/superseded** —— 实现已覆盖其目标 (NUL 分隔 + 分隔符全覆盖 + heredoc 多行 + zsh re-exec, 且 zsh 根因是双子星 spec 未捕获的更深层)。双子星回来应归档该 spec (issue 已 closed)。见次条 handoff。
 

@@ -1,6 +1,19 @@
 # Proposal: secret-guard-bash3-multiline-hardening
 
-> **Status**: Draft (post_spec R1 REVISE x4 / PWW x1 -> R1-fix applied 本次干净重生成, 待 R2 收敛 + owner 批准)
+> **⚠️ ADOPTION NOTE (owner 决策 2026-07-11, 双子星撞车和解)**: 本 spec (dev-claude/aria-runner-bot 起草) 经评估**质量高于**并发的 simonfish 侧 Level 2 实现 (已 ship v1.55.2/v1.55.3) —— 本 spec 的 post_spec R1 抓到了那个实现的真实缺陷 (NUL-in-field 绕过 Critical-2)。owner 决策 **B (和解, 非回退)**: 保留已 ship 的实现, 把本 spec 转为**权威设计**, 已 ship 部分标注如下, 未实现部分 (部件 B) 按本 spec 继续。
+>
+> **已实现 (v1.55.2 + v1.55.3, simonfish 侧)**:
+> - 部件 A 字段提取 NUL 分隔 + read -d '' (v1.55.2) ✓
+> - **NUL-in-field 守卫** (本 spec Critical-2 / SC-8): 字段数守卫恒 4, 否则 fail-closed (v1.55.3) ✓
+> - **log_ack 多行净化** (本 spec qa M-3 / SC-9): CR/LF/TAB→空格 (v1.55.3) ✓
+> - **#152 归因订正** (本 spec R1 code-reviewer): e8e847c 非 e9dc0f7 (v1.55.3 changelog) ✓
+> - 部件 B **部分**: `^` 锚定前缀含分隔符+换行 + bare dump 后缀 (`;`/`&`/无空格`|`/换行) (v1.55.2/hotfix) ✓ —— 但**未达本 spec 的"命令替换/包装器全覆盖"** (见待实现)
+>
+> **本 spec 补入 (simonfish 侧发现, 本 spec R1 漏)**: **zsh re-exec guard** —— Claude Code hook runner 用 $SHELL (macOS=zsh) 忽略 shebang, 整 bash-specific 脚本体在 zsh 下 fail-closed 阻断全部工具。**这是 #154 在 macOS 上的真实执行路径, 本 spec SC-1 只测 bash 3.2 夹具、未覆盖 zsh 执行整脚本**。已在 v1.55.2 实现 (顶部 `[ -z "$BASH_VERSION" ] && exec bash`); 本 spec 的部件 A/C 应把 zsh 端到端纳入 SC。
+>
+> **待实现 (本 spec 部件 B 剩余, 权威设计在此)**: 命令替换 `$(env)`/反引号 + 组合 `{ env; }` + 单层包装器 `sudo env`/`nice env`/`timeout env` 的命令位识别全覆盖 (spike 36/37 + 误报矩阵已备)。缺此 = fail-safe 漏拦 (非活可利用洞)。**下一步**: 本 spec 走 post_spec R2 → 批准 → 实现部件 B (可由 aria-runner-bot 续或 simonfish 侧接), 复用 v1.55.x 已落地的测试框架。
+>
+> **Status**: Adopted-as-authoritative / 部件 A+守卫已 ship, 部件 B 待实现 (原: Draft post_spec R1 REVISE x4)
 > **Spec Level**: 3 (Full — proposal + tasks)。理由: 代码量小 (单文件 ~15 行核心改动), 但 **blast radius 极高** —— 改的是 Rule #7 执行载体 `secret-guard.sh`, 拦在**每一次工具调用**必经路径 (PreToolUse x 两 matcher)。任一回归 = 全工具 fail-closed (死锁) 或 secret 静默泄漏。按 blast radius 定级 L3 (与 `shell-jq-crlf-hardening` #132 精确同型; 对照 `secret-scan-honest-downgrade` L2 因 PostToolUse 非阻塞)。
 > **ship target**: aria-plugin (SOT `plugin.json` = v1.55.1) -> 下一 PATCH
 > **变更目标**: `aria/` 子模块 (`hooks/secret-guard.sh` + `hooks/tests/`)。Spec 按 Rule #5 置主仓 `openspec/changes/`。
