@@ -1,92 +1,43 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.47.0",
-  "issue_ref": "10CG/Aria#145",
-  "generated_at": "2026-06-21T02:43:40Z",
+  "triage_tool_version": "1.55.0",
+  "issue_ref": "10CG/Aria#154",
+  "generated_at": "2026-07-09T17:00:57Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 145,
-      "title": "agent-creator ���ɵ���Ŀ�� agent �޷��� audit-engine/agent-team-audit ���ѣ������������������ѽڣ�",
-      "body": "## Enhancement / ����ȱ�ݷ���\n\n**����**: agent-creator/agent-gap-analyzer ���ɵ���Ŀ�� agent �� audit-engine/agent-team-audit ������֮�����ڽṹ���ѽ� �� ��Ŀ agent ���ɺ����κα��������ѡ�\n\n**���ֲ���**:\n1. agent-gap-analyzer ������Ŀ����ȱ��\n2. agent-creator ������Ŀר�� agent �� �䵽 `.aria/agents/`��capabilities tags / STCO ��ʽ��\n3. ���� audit-engine / agent-team-audit ��������\n\n**Ԥ����Ϊ**: agent-team-audit �ܷ��ֲ����� `.aria/agents/` ����Ŀ�� agent���� capabilities ·�ɵ���Ӧ�������������ơ�\n\n**ʵ����Ϊ**: agent-team-audit �� agent-selection-matrix��ʵ�� 1.46.0��д�� 4 ������ͨ�� agent��pre_merge=Tech Lead+Code Reviewer+Knowledge Manager / post_implementation=QA Engineer+Code Reviewer / post_spec=Tech Lead+Knowledge Manager����**��ȫ���� `.aria/agents/`**��������agent-creator ���ɵ���Ŀ agent û���κα��������� ���� ��ʹ��ȷ���� `.aria/agents/` Ҳ�ò��ˣ�agent-gap-analyzer��Ϊ��Ŀ������ȱ�ڡ��������ߵ��ڿ�ת��\n\n���䣺`.aria/agents/` Ҳ���� Claude Code ԭ�� subagent_type λ�ã�ԭ���� `.claude/agents/` �� plugin `agents/` ���أ���������Ŀ agent �Ȳ���ԭ�� subagent_type ֱ����Ҳ���ܱ� aria �Լ��ı�����ʹ�á�\n\n**ʵ֤��10cg.local ��Ŀ��**: ��Ϊ����Ŀר�� agent��shell-safety-auditor / ssh-egress-security-auditor / homelab-topology-auditor���� `.claude/agents/` + �� Claude Code ԭ�� Agent �����ֶ� fan-out �������������ƣ�ץ�� 2 ����Ŀ���� Critical���� pct exec ����ע�루`pct exec <id> -- sh -c '...'` �ƹ��� token ���������� ����ע�루������滻�У��ڶ������ݵ�Զ�� root shell������Щͨ�� tech-lead/code-reviewer �ӽǸ���ץ������֤����Ŀר�� agent �в���������ֵ������ǰ aria �ܹ��ò������ǡ�\n\n**�����Ľ�**:\n�� agent-creator Ӧ���ɵ� `.claude/agents/`����ͬʱ��������Ŀ agent ��ԭ�� subagent_type ��ֱ��\n�� agent-team-audit �� agent-selection-matrix Ӧ֧�ַ��ֲ�������Ŀ�� agent���� capabilities tags + ������·�ɣ�������д�� 4 ������ͨ�ý�ɫ������ aria �Զ�������Զֻ��ͨ���ӽ�\n\n## ������Ϣ\n- Aria Plugin: 1.46.0��ʵ��Ŀ¼��VERSION �ļ��� 1.41.0��\n- Skills: 41\n- OS: MINGW64_NT-10.0-19045 x86_64 (Windows Git Bash)\n- ��Ŀ���� (.aria/config.json): no\n\n---\n*�� aria-report Э�����ɣ�10cg.local��*",
+      "number": 154,
+      "title": "Bug: secret-guard.sh crashes on macOS/zsh - readarray not found, blocks ALL tools",
+      "body": "## Bug Report\n\n**描述**: secret-guard.sh PreToolUse hook 在 macOS/zsh 环境因 `readarray` 不兼容崩溃，导致所有工具调用被拦截，会话完全瘫痪。\n\n**复现步骤**:\n1. 在 macOS (Darwin 22.6.0) + zsh shell + Aria Plugin v1.47.0\n2. 执行任何工具调用 (Bash, Read, Write, Skill 等)\n3. PreToolUse hook 触发 secret-guard.sh\n\n**预期行为**: Hook 正常执行 secret 检查后放行工具调用\n\n**实际行为**:\n```\nPreToolUse hook error: secret-guard.sh line 118: readarray: command not found\n[secret-guard] FATAL: malformed PreToolUse input - tool_name missing or null. Blocking.\n```\n所有工具全部被拦截，会话陷入死锁 - 无法通过任何工具调用修改设置文件。\n\n**根因分析**:\n1. **直接原因**: line 118 使用 `readarray`，这是 bash 内置命令。macOS 默认 shell 是 zsh，zsh 无 `readarray`\n2. **连锁崩溃**: 118 行崩溃后 `_sg_fields` 数组为空，`tool_type` 为空字符串，触发 line 125-131 的误判\n3. **Shebang 被忽略**: Shebang 声明了 `#!/usr/bin/env bash`，但 Claude Code hook runner 使用 `$SHELL` (zsh) 执行 command 模式的 hooks\n\n**修复建议**:\n将 `readarray -t _sg_fields < <(...)` 替换为 zsh/bash 兼容写法:\n```bash\n_sg_fields=()\nwhile IFS= read -r line; do\n  _sg_fields+=(\"$line\")\ndone < <(jq -r ...)\n```\n或让 hook runner 尊重 shebang，对声明 bash 的脚本使用 bash 执行。\n\n**环境信息**:\n- Aria Plugin: v1.47.0\n- OS: macOS Darwin x86_64\n- Shell: zsh\n- Hook: hooks/secret-guard.sh line 118\n\n---\n*由 aria-report 自动生成*",
       "state": "open",
-      "labels": [
-        "aria-auto"
-      ],
-      "comments": [
-        {
-          "id": 12888,
-          "body": "## Triage Report\n\n**Verdict**: `partial-repro` | **Severity**: `major` | **Recommended Action**: `next-cycle`\n\n---\n\n### Version\n\n| Field | Value |\n|-------|-------|\n| Reported | `1.46.0` (reporter 实测插件目录;其本地 VERSION 文件显示 1.41.0) |\n| Current | `1.46.4` |\n| Gap | behind |\n\n断裂在 v1.46.0 与 v1.46.4 **行为一致** —— 期间 3 个 patch (v1.46.1~1.46.4) 均为 coordination-ref / state-scanner 范畴,未触碰 `agent-team-audit`(SKILL.md 与 selection-matrix 的\"最后更新\"仍为 2026-03-18,version 1.0.0)。故**版本差对本 issue 无影响**,非 outdated report。(附:reporter 环境 VERSION 文件 1.41.0 vs 实测目录 1.46.0 的本地滞后属其安装环境问题,与本 issue 无关。)\n\n### Code Path\n\nissue 以概念位置描述(未引用具体文件行),Step 3 自动抽取 cited_paths 为空。triage 过程实际核实的 source(aria 子模块 @`1961f6c` = v1.46.4):\n\n- `aria/skills/agent-creator/SKILL.md:71-72` — 项目 agent 生成目标 = `.aria/agents/<name>.md`(确认)\n- `aria/skills/agent-team-audit/references/agent-selection-matrix.md` — 写死 4 内置 agent 触发点映射,**无** `.aria/agents/` / capabilities / 项目级 路由(grep 零命中)\n- `aria/skills/agent-router/SKILL.md:397/402/408` — agent-router **会**扫描 `.aria/agents/` 运行时注入;:408 明确 \"Plugin 不会自动加载 `.aria/agents/`\"\n- `aria/skills/subagent-driver/references/handoff-contract.md:14` — 契约含 `agent_source: \"project\" (.aria/agents/)`\n\n### Git History\n\n`No recent commits matched`(Step 4 skipped — 无 cited file)。`agent-team-audit` 自 2026-03-18 创建后未修改;无相关修复 commit。\n\n### In-flight\n\n| Category | Matches |\n|----------|---------|\n| Remote PRs | none |\n| Local branches | none |\n| Worktrees | none(仅 main worktree `/home/dev/Aria` @master) |\n\n**无任何 in-flight 修复**。\n\n### Reproduction\n\n**Mode**: `auto` | **Hit rate**: `3/4`\n\n- **case-1** ✅ agent-creator 生成到 `.aria/agents/` — 确认(SKILL.md:71-72)\n- **case-2** ✅ agent-team-audit selection-matrix 写死 4 内置通用 agent + 不读 `.aria/agents/` — 确认(matrix grep 零命中)\n- **case-3** ✅ `.aria/agents/` 非 Claude Code 原生 subagent 位置 — 确认(agent-router:408)\n- **case-4** ❌ \"无任何编排器唤醒 / aria 自己的编排器也用不了\"(全称)— **偏离**:agent-router(:397/402)主动扫描 `.aria/agents/` 注入任务路由上下文,subagent-driver 契约含 `agent_source: \"project\"`。任务路由路径**会**唤醒项目 agent;断裂特定于 **audit 编排(agent-team-audit)路径**。\n\n**Deviation note**: 核心结构断裂 CONFIRMED(agent-team-audit 永不唤醒项目专属 audit agent + `.aria/agents/` 非原生 subagent 位置),但 reporter 全称表述过宽 —— agent-router/subagent-driver **任务路由路径已感知项目 agent**。准确范围 = 断裂特定于 **audit 编排路径**。这影响修复设计:无需重做全盘编排,可让 audit selection-matrix 复用 agent-router 式的 `.aria/agents/` 发现 + capabilities 路由(已有正确范式可参照)。\n\n### Verdict Rationale\n\nreporter 的核心痛点(\"项目专属 audit agent 生成后用不上,如 security auditor 抓到 2 个 tech-lead/code-reviewer 视角抓不到的 Critical\")**真实且 confirmed**:`agent-gap-analyzer → agent-creator → .aria/agents/` 的生成链已建成,但下游 audit 消费方(`agent-team-audit`)的 selection-matrix 写死内置角色,使该链对 audit 用例完全无效。判 `partial-repro`(非 `confirmed`)是因 reporter 把断裂表述为\"无任何编排器\"全称,而 agent-router 路由路径实际可用 —— 这个偏离对修复范围判断有实质意义。`severity: major`(一整类已建成能力对 audit 用例失效,但有 agent-router workaround,非阻断主流程的 critical)。`recommended_action: next-cycle`(reporter 提出两个相互关联的设计选项 [agent-creator 改生成到 `.claude/agents/` + selection-matrix 支持项目 agent 发现],涉及与 Claude Code 原生 subagent 机制的边界,建议起正式 cycle 并以 brainstorm 收敛设计,非 hotfix)。\n\n> 注:`agent-team-audit` 为 **experimental 功能**(`experimental: true`,默认关闭,需 `experiments.agent_team_audit: true` 启用)—— 影响优先级判断,但不改变设计断裂的真实性。\n\n---\n\n*Generated by `/issue-triage` v1.46.4 — Ref: 10CG/Aria#145*\n",
-          "user": "simonfish",
-          "created_at": "2026-06-13T13:06:18Z"
-        }
-      ],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/145",
-      "created_at": "2026-06-13T02:26:19Z",
-      "updated_at": "2026-06-13T17:24:21Z"
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/154",
+      "created_at": "2026-07-09T01:10:43Z",
+      "updated_at": "2026-07-09T01:10:43Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.46.0��ʵ��Ŀ¼��VERSION",
-      "current": "1.47.0",
+      "reported": "1.47.0",
+      "current": "1.55.0",
       "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": ".aria/agents/<name>.md",
-          "line": null,
-          "format": "backtick",
+          "file_path": "secret-guard.sh",
+          "line": 118,
+          "format": "prose_line",
           "exists": false,
           "line_in_range": null,
           "snippet": null,
           "warning": "file not found"
         },
         {
-          "file_path": "aria/skills/agent-team-audit/references/agent-selection-matrix.md",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: # Agent 选择矩阵 (Agent Selection Matrix)\n2: \n3: ## 触发点 → Agent 映射\n4: \n5: | 触发点 | Tech Lead | Code Reviewer | QA Engineer | Knowledge Manager |",
-          "warning": null,
-          "total_lines": 53
-        },
-        {
-          "file_path": "aria/skills/subagent-driver/references/handoff-contract.md",
-          "line": 14,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": true,
-          "snippet": "11: handoff:\n12:   task_id: \"triage-engine-implementation\"\n13:   agent_from: \"backend-architect\"\n14:   agent_source: \"plugin\"          # \"plugin\" (内置) | \"project\" (项目级 .aria/agents/)\n15:   decisions_made:\n16:     - \"triage.sh 使用 bash + python3 heredoc 模式\"\n17:     - \"配置走 orchestrator.dispatch_policy 独立节点\"",
-          "warning": null,
-          "total_lines": 57
-        },
-        {
-          "file_path": "aria/skills/agent-creator/SKILL.md",
-          "line": 71,
-          "format": "prose_l",
-          "exists": true,
-          "line_in_range": true,
-          "snippet": "68: \n69: ### 5. 写入\n70: \n71: - 路径: `.aria/agents/<name>.md`\n72: - 自动创建 `.aria/agents/` 目录 (如不存在)\n73: \n74: ## 同名保护",
-          "warning": null,
-          "total_lines": 84
-        },
-        {
-          "file_path": "aria/skills/agent-router/SKILL.md",
-          "line": 397,
-          "format": "prose_l",
-          "exists": true,
-          "line_in_range": true,
-          "snippet": "394: \n395: ### 机制\n396: \n397: agent-router 在执行路由决策时,**主动扫描 `.aria/agents/` 目录**,将发现的项目级 Agent 注入当前路由上下文。\n398: \n399: ```\n400: 路由决策流程:",
-          "warning": null,
-          "total_lines": 449
-        },
-        {
-          "file_path": "SKILL.md",
-          "line": 71,
-          "format": "prose_l",
+          "file_path": "hooks/secret-guard.sh",
+          "line": 118,
+          "format": "prose_line",
           "exists": false,
           "line_in_range": null,
           "snippet": null,
@@ -96,7 +47,7 @@
       "matches_description": false
     },
     "step4_history": {
-      "collection_status": "ok",
+      "collection_status": "skipped",
       "likely_fix_candidates": []
     },
     "step5_inflight": {
@@ -108,7 +59,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "f9b91aafc69f5c7874262f9aa2fc53fe74a193cc"
+          "head": "7244f238b5fceb70a782bb54410d5b3c2f395db5"
         }
       ]
     }
@@ -118,40 +69,51 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "grep agent-creator SKILL.md 写入目标 @ aria 281388d (v1.47.0)",
-        "expected_behavior": "agent-creator 生成项目 agent 到 .aria/agents/",
-        "actual_behavior": "SKILL.md:71 确认路径 = .aria/agents/<name>.md",
-        "match": true
+        "input": "BASH_ENV='enable -n readarray' bash aria/hooks/secret-guard.sh <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hello\"}}'",
+        "expected_behavior": "issue 声称: hook 崩溃于 line 118 readarray: command not found, 随后打印 FATAL malformed PreToolUse input 并拦截工具",
+        "actual_behavior": "exit=2. stderr 逐字为 'aria/hooks/secret-guard.sh: line 118: readarray: command not found' + '[secret-guard] FATAL: malformed PreToolUse input — tool_name missing or null. Blocking.'",
+        "match": true,
+        "notes": "本机 bash 5.2 无法直接复刻 macOS bash 3.2, 采用等价机制注入: enable -n readarray 移除内建, 触发与 bash 3.2 相同的 command-not-found 查找失败路径。"
       },
       {
         "case_id": "case-2",
-        "input": "grep -rn '.aria/agents|capabilities|项目级|project agent' skills/agent-team-audit/ @ v1.47.0",
-        "expected_behavior": "agent-team-audit selection-matrix 能发现 .aria/agents/ 项目 agent + capabilities 路由",
-        "actual_behavior": "ZERO MATCH — selection-matrix 仍写死 4 内置通用 agent,完全不读 .aria/agents/ (v1.47.0 cycle B/C 改了 audit 别的检查点但未触碰此断裂)",
-        "match": true
+        "input": "同上 shim, 输入 '{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"README.md\"}}'",
+        "expected_behavior": "issue 声称: 所有工具调用 (Bash, Read, Write, Skill 等) 全部被拦截, 会话死锁",
+        "actual_behavior": "exit=2, 同一 FATAL 输出。hooks.json 将 secret-guard 注册在 PreToolUse 的 matcher 'Bash' 与 'Read|Edit|Write|MultiEdit' 两处, 两条路径同时失效。",
+        "match": true,
+        "notes": "PreToolUse hook exit 2 = fail-closed 拦截 (secret-guard.sh:125-131, 为 #132 Windows CRLF 安全而设计), 把 bash 版本不兼容放大成全工具死锁。"
       },
       {
         "case_id": "case-3",
-        "input": "核实 .aria/agents/ 是否 Claude Code 原生 subagent_type 位置 (agent-router:408)",
-        "expected_behavior": ".aria/agents/ 项目 agent 可被原生 subagent_type 或编排器使用",
-        "actual_behavior": "确认非原生位置 — plugin 不自动加载 .aria/agents/;仅 agent-router 运行时主动扫描注入",
+        "input": "bash aria/hooks/secret-guard.sh <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hello\"}}'  (对照组, bash 5.2, readarray 可用)",
+        "expected_behavior": "issue 隐含: readarray 可用时 hook 正常放行",
+        "actual_behavior": "exit=0 放行, 无 stderr。证明故障变量确为 readarray 内建之有无, 非输入格式或 jq。",
         "match": true
       },
       {
         "case_id": "case-4",
-        "input": "核实 reporter '无任何编排器唤醒 / aria 自己也用不了' 全称表述",
-        "expected_behavior": "全盘编排路径都用不上项目 agent",
-        "actual_behavior": "偏离 — agent-router(:397/402) 任务路由路径会主动扫描 .aria/agents/ 注入;subagent-driver 契约含 agent_source:project。断裂特定于 audit 编排 (agent-team-audit) 路径,非全盘",
-        "match": false
+        "input": "核对 issue 根因分析第 3 点: 'Shebang 被忽略, hook runner 使用 $SHELL (zsh) 执行 command 模式 hooks' — 检查 hooks.json 在报告版本与当前版本的调用串",
+        "expected_behavior": "issue 声称: hook 由 zsh 执行, 故 zsh 无 readarray 导致崩溃",
+        "actual_behavior": "不成立。hooks.json 在 v1.47.0 (commit 05091ea) 与 v1.55.0 均为 'bash ${CLAUDE_PLUGIN_ROOT}/hooks/secret-guard.sh' — 显式以 bash 执行, zsh 从不解释该脚本。且报错格式 'script: line N: cmd: command not found' 是 bash 的格式, zsh 为 'script:N: command not found: cmd'。",
+        "match": false,
+        "notes": "真实根因: macOS 自带 /bin/bash 为 3.2 (GPLv2 冻结), 而 readarray/mapfile 是 bash 4.0 引入的内建。issue 提出的两个修复中, '让 hook runner 尊重 shebang' 是 no-op。"
+      },
+      {
+        "case_id": "case-5",
+        "input": "核对 issue 环境信息 'Aria Plugin: v1.47.0' — 逐字复刻 aria-report 的抽取命令 cat $CLAUDE_PLUGIN_ROOT/VERSION | grep -m1 '^[0-9]'",
+        "expected_behavior": "issue 声称: 报告者运行的插件版本为 1.47.0",
+        "actual_behavior": "版本号不可信。该 grep 命中 VERSION 第 40 行 —— 一个围栏代码块内的冻结示例串 '1.47.0'。实测四个已安装版本 (1.50.1 / 1.50.2 / 1.53.0) 及工作树 (1.55.0) 经此命令全部输出 '1.47.0'。",
+        "match": false,
+        "notes": "衍生缺陷 (此前无 issue): aria-report/SKILL.md:59 版本抽取错误, 污染所有 aria-report 生成的 issue 的环境信息段。缺陷本身与版本无关 — 已在工作树 1.55.0 的 secret-guard.sh:118 直接确认 readarray 仍在。"
       }
     ],
     "hit_count": 3,
-    "total_count": 4,
-    "hit_rate": "3/4"
+    "total_count": 5,
+    "hit_rate": "3/5"
   },
   "verdict": "partial-repro",
-  "severity": "major",
-  "recommended_action": "next-cycle",
-  "deviation_note": "核心结构断裂在 v1.47.0 仍 CONFIRMED (agent-team-audit selection-matrix 永不发现/唤醒 .aria/agents/ 项目专属 audit agent + capabilities 路由零支持)。但 reporter 全称表述 '无任何编排器' 过宽 —— agent-router/subagent-driver 任务路由路径已感知项目 agent,断裂特定于 audit 编排路径。这影响修复范围:无需重做全盘编排,可让 audit selection-matrix 复用 agent-router 式的 .aria/agents/ 发现 + capabilities 路由 (已有正确范式)。注:本 verdict 与 2026-06-13 (v1.46.4) 首次 triage 结论一致 —— 8 天内无修复 commit、无 in-flight 分支,断裂持续。agent-team-audit 为 experimental (默认关闭),影响优先级但不改断裂真实性。",
+  "severity": "critical",
+  "recommended_action": "hotfix",
+  "deviation_note": "缺陷症状 100% 复现 (case-1/2/3, 3/3): exit 2 fail-closed, stderr 与 issue 逐字一致, Bash 与 Read 两个 matcher 同时失效。偏离在归因与环境两处 (case-4/5, 0/2): (1) 根因不是 'zsh 无 readarray / shebang 被忽略' — hooks.json 自 v1.47.0 起即以 'bash <script>' 显式调用, 真凶是 macOS 自带 bash 3.2 缺 readarray (bash 4.0 才引入), 因此 issue 提议的 '让 hook runner 尊重 shebang' 修复是 no-op; (2) 自报版本 v1.47.0 是 aria-report 版本抽取缺陷的 产物 (VERSION:40 围栏代码块内的冻结串), 不代表报告者的真实版本。缺陷在当前 1.55.0 依然存在。",
   "errors": []
 }

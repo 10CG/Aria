@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.55.0",
+  "issue_ref": "10CG/Aria#152",
+  "generated_at": "2026-07-09T17:01:04Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 152,
+      "title": "secret-guard: env/printenv 拦截正则 ^ 锚定命令开头，复合命令中段 env 逃逸",
+      "body": "## Bug Report\n\n**描述**: secret-guard.sh (PreToolUse) 拦截 env/printenv 的正则用 `^` 锚定整条命令开头，导致复合命令中段的 `env` 无法匹配、直接放行，凭据明文流入 LLM tool 输出。这不是对抗性写法，是日常用 `;` 拼接的命令。\n\n**复现步骤**:\n1. 单独命令 `env | grep TOKEN` → hook 正常 BLOCK (exit 2)\n2. 复合命令 `echo hi; env | grep TOKEN` → hook ALLOW (exit 0)，漏\n3. 真实触发形态 `ls ...; echo \"--- env ---\"; env | grep -iE 'foo|bar'; ls ...` → ALLOW (exit 0)，凭据 (FORGEJO_TOKEN / CF_ACCESS_CLIENT_SECRET) 明文进入 transcript + prompt 缓存\n\n**预期行为**: 命令中任意位置的 env/printenv 全量 dump 都应被拦截\n**实际行为**: 仅当 env 位于整条命令最开头时才拦截；分隔符 (; && || |) 后的 env 逃逸\n\n**根因**: pattern `^[[:space:]]*env([[:space:]]+\\|[[:space:]]*$)` 的 `^` 只匹配命令开头。建议改为在命令分隔符后也匹配，例如 `(^|[;&|]|&&|\\|\\|)[[:space:]]*env(...)`；printenv 及其它同样 `^` 锚定的读取器 pattern 需一并排查修复。\n\n**附带**: 插件 VERSION 文件内容为 1.47.0，但目录/plugin.json 为 1.53.0，版本标记不一致。\n\n## 环境信息\n- Aria Plugin: 1.53.0 (目录) / 1.47.0 (VERSION 文件，不一致)\n- Skills: 42\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): no\n\n---\n*由 aria-report 自动生成*",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/152",
+      "created_at": "2026-07-07T01:33:24Z",
+      "updated_at": "2026-07-07T01:33:24Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.53.0",
+      "current": "1.55.0",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "skipped",
+      "cited_paths": [],
+      "matches_description": null
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "7244f238b5fceb70a782bb54410d5b3c2f395db5"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "bash aria/hooks/secret-guard.sh <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"env\"}}'",
+        "expected_behavior": "issue 步骤 1 声称: 单独命令 env 被正常 BLOCK (exit 2)",
+        "actual_behavior": "exit=2, BLOCKED, 匹配 pattern '^[[:space:]]*env([[:space:]]+\\||[[:space:]]*$)'",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "同上, command = 'cd /tmp && env'",
+        "expected_behavior": "issue 步骤 2 声称: 分隔符后的 env 逃逸, hook ALLOW (exit 0)",
+        "actual_behavior": "exit=0 放行, 无拦截。逃逸复现。",
+        "match": true,
+        "notes": "hook 只解析命令字符串, 从不执行它, 故本用例不产生任何 secret 输出 (Rule #7 合规)。"
+      },
+      {
+        "case_id": "case-3",
+        "input": "同上, command = 'true; printenv'",
+        "expected_behavior": "issue 声称: printenv 及其它同样 ^ 锚定的 reader pattern 一并逃逸",
+        "actual_behavior": "exit=0 放行。secret-guard.sh:463-466 的 printenv / env / /bin/printenv / /usr/bin/printenv 四条 pattern 均以 ^ 锚定, 同一缺陷。",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "核对 issue 附带发现: 'VERSION 文件内容为 1.47.0, 但目录/plugin.json 为 1.53.0'",
+        "expected_behavior": "issue 声称: VERSION 文件与 plugin.json 版本标记不一致",
+        "actual_behavior": "症状真, 归因错。VERSION 文件头部 (**版本**: 行) 与 plugin.json 始终一致 (四个缓存安装 1.46.5/1.50.1/1.50.2/1.53.0 逐一核对通过)。'1.47.0' 来自 aria-report/SKILL.md:59 的 grep -m1 '^[0-9]' 命中 VERSION:40 围栏代码块内的 冻结示例串。是 aria-report 的抽取缺陷, 不是 VERSION 文件漂移。",
+        "match": false,
+        "notes": "该抽取缺陷同时污染 #154 / #156 的环境信息段, 应单独立 issue。"
+      }
+    ],
+    "hit_count": 3,
+    "total_count": 4,
+    "hit_rate": "3/4"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}
