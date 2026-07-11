@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #SECRET-GUARD-TWIN-RECONCILE — ✅ **DONE: 双子星撞车质量重评 + owner 决策 B 和解 + v1.55.3 NUL 安全加固** (2026-07-11, simonfish/bfe8285d)
+## ★ 最新 session #PARTB-V1.55.4-COORD — 🔶 **PARTIAL: secret-guard 部件 B ship v1.55.4 (item 2 全) + 协调机制 spec 批准 + Part C 核心 WIP (item 1 起步)** (2026-07-11, simonfish/bfe8285d)
 
-**Latest**: [2026-07-11-secret-guard-twin-reconcile-v1.55.3.md](./2026-07-11-secret-guard-twin-reconcile-v1.55.3.md) — v1.55.2 ship 后 owner 质疑「确定我们质量更高吗」→ 实读双子星 L3 spec + 实测 → **双子星 (aria-runner-bot 自主运行时, 非 dev-claude2) 质量更高**, 我 v1.55.2 有它抓到的**真安全洞 NUL-in-field 绕过** (JSON \u0000 转义 jq 解码成真 NUL 与字段分隔符同形 → command 截断使 dumper 溢出到 file_path 绕过; 实测 exit0) → owner **决策 B 和解** (不回退): v1.55.3 补 NUL 字段数守卫 + log_ack 多行净化 + #152 归因订正 (e8e847c 非 e9dc0f7), 双子星 spec 转权威设计 (部件 B 命令替换全覆盖待实现, 补入我的 zsh re-exec 发现)。撞车根因: 自主 bot 干活不 claim + track-id 字符串匹配防不了语义重叠 + claim 从不释放 (协调机制 3 缺陷)。测试 292→297。PR#104 merged `c209c5b`。**Next**: ⭐ 协调机制 3 缺陷 (不修会再撞); 双子星 spec 部件 B; M6 owner 4 门。核心教训: 抢先 ship ≠ 质量更高。
+**Latest**: [2026-07-11-partB-v1.55.4-and-coordination-spec.md](./2026-07-11-partB-v1.55.4-and-coordination-spec.md) — 和解后 owner「1+2 都执行」→ **item 2 全 ship**: dev-claude spec 部件 B (命令替换/组合/包装器/关键字位命令位覆盖) v1.55.4 + 修 v1.55.2 引入的 `echo env` 假阳性回归; spike 51/51 + code-review 2I/1M 全修; 双子星 spec 全实现归档。**item 1 起步**: 协调 3 缺陷 L3 spec 批准 (a=A1 插件内强制/b=B1 linked_issue advisory/c=都做) + Part C 核心 `release_claim_by_track` (按 track_id+container 释放, 4 测试, aria `wip/coordination-part-c` WIP)。**item 1 Phase B 大部分未做** (Part C 接线/清理 + A1 + B1, 见 §2, 完整 L3 cycle 待续)。**Next**: ⭐ item 1 Phase B 从 wip 分支接 (C→A1→B1)。核心教训: 抢先 ship ≠ 质量更高; 安全正则每版跑正/反例矩阵。
+
+## (前 Latest, 2026-07-11) session #SECRET-GUARD-TWIN-RECONCILE — ✅ **DONE: 双子星撞车质量重评 + owner 决策 B 和解 + v1.55.3 NUL 安全加固** (2026-07-11, simonfish/bfe8285d)
+
+**Handoff**: [2026-07-11-secret-guard-twin-reconcile-v1.55.3.md](./2026-07-11-secret-guard-twin-reconcile-v1.55.3.md) — v1.55.2 ship 后 owner 质疑「确定我们质量更高吗」→ 实读双子星 L3 spec + 实测 → **双子星 (aria-runner-bot 自主运行时, 非 dev-claude2) 质量更高**, 我 v1.55.2 有它抓到的**真安全洞 NUL-in-field 绕过** (JSON \u0000 转义 jq 解码成真 NUL 与字段分隔符同形 → command 截断使 dumper 溢出到 file_path 绕过; 实测 exit0) → owner **决策 B 和解** (不回退): v1.55.3 补 NUL 字段数守卫 + log_ack 多行净化 + #152 归因订正 (e8e847c 非 e9dc0f7), 双子星 spec 转权威设计 (部件 B 命令替换全覆盖待实现, 补入我的 zsh re-exec 发现)。撞车根因: 自主 bot 干活不 claim + track-id 字符串匹配防不了语义重叠 + claim 从不释放 (协调机制 3 缺陷)。测试 292→297。PR#104 merged `c209c5b`。**Next**: ⭐ 协调机制 3 缺陷 (不修会再撞); 双子星 spec 部件 B; M6 owner 4 门。核心教训: 抢先 ship ≠ 质量更高。
 
 ## (前 Latest, 2026-07-11) session #SECRET-GUARD-4ISSUE — ✅ **DONE: secret-guard 四票并案 triage + 修复全周期 ship v1.55.2** (2026-07-11, simonfish/bfe8285d)
 
