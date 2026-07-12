@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #SMALL-BATCH-V1.56.1 — ✅ **DONE: 小票并批 v1.56.1 (agent team recon×5) + #136 审计移交 + i18n 数字同步** (2026-07-12, simonfish/bfe8285d)
+## ★ 最新 session #147-RECHECK-138-CLOSE — ✅ **DONE: #147 live 复查收敛 (10 天全绿) + #138 spec-defect 关票 (7 处残留补齐)** (2026-07-12, simonfish/bfe8285d)
 
-**Latest**: [2026-07-12-small-batch-v1.56.1.md](./2026-07-12-small-batch-v1.56.1.md) — owner /goal「agent team + 动态工作流, 2+3+4 都处理完」。5 recon 并行, 3 个改变预设: **#158 真 bug 修** (版本抽取 jq 读 plugin.json SOT, 旧 grep 恒报 1.47.0 污染全部生成 issue) + **#101 真漂移修** (路由摘要表 6 行对齐 canonical + 表级 banner) + **#102 幻觉票证伪关** (票内架构全 git 历史不存在) + **#136 已修票** (脱敏 cc7280b 在 HEAD, 全仓审计零残留, 留 open 仅剩 owner 轮换) + **i18n 免重译** (真实基线 v1.46.4→master 零正文变更, 三语机械数字同步 marker→v1.56.1)。aria v1.56.1 PR#108 `0964496`; review PASS 0C/0I; 关 #158/plugin#101/plugin#102。**Next**: ⭐ #147 M6-blocker triage (承前); carry-136-rotation (owner)。教训: 小票并批先 recon 存活性 — 4 票 2 票不需要代码。
+**Latest**: [2026-07-12-147-live-recheck-138-rework-closeout.md](./2026-07-12-147-live-recheck-138-rework-closeout.md) — owner /goal「1+2 连做」。**#138 关**: rework 实质 6-01 已落地, 补 7 处旁支残留 (概览表/依赖树/Precision 表/Status/AD-M6-6·R-M6-14 RETIRED/Effort) + test 数订正, 主仓 `1fe4c3e`。**#147 收敛**: agent 只读探查 + 主 loop DB 抽验 — 6 job 全绿 / gateway 07-05 节点重启自愈 / Feishu WS 连着 / tick sentinel 消失 (PR#30 生效) / 07-02 后 0 dispatch (预期静默) / #136 脱敏活体达标; 剩余阻塞不变 = Blocker 3 (input-delivery 未部署) + Blocker 4 (未验证维持), 收敛 comment 已贴。**AI 侧 backlog 清空, 剩余全 owner 门** (M6 4 门 / 136 轮换 / 168h 仪式)。
+
+## (前 Latest, 2026-07-12) session #SMALL-BATCH-V1.56.1 — ✅ **DONE: 小票并批 v1.56.1 (agent team recon×5) + #136 审计移交 + i18n 数字同步** (2026-07-12, simonfish/bfe8285d)
+
+**Handoff**: [2026-07-12-small-batch-v1.56.1.md](./2026-07-12-small-batch-v1.56.1.md) — owner /goal「agent team + 动态工作流, 2+3+4 都处理完」。5 recon 并行, 3 个改变预设: **#158 真 bug 修** (版本抽取 jq 读 plugin.json SOT, 旧 grep 恒报 1.47.0 污染全部生成 issue) + **#101 真漂移修** (路由摘要表 6 行对齐 canonical + 表级 banner) + **#102 幻觉票证伪关** (票内架构全 git 历史不存在) + **#136 已修票** (脱敏 cc7280b 在 HEAD, 全仓审计零残留, 留 open 仅剩 owner 轮换) + **i18n 免重译** (真实基线 v1.46.4→master 零正文变更, 三语机械数字同步 marker→v1.56.1)。aria v1.56.1 PR#108 `0964496`; review PASS 0C/0I; 关 #158/plugin#101/plugin#102。**Next**: ⭐ #147 M6-blocker triage (承前); carry-136-rotation (owner)。教训: 小票并批先 recon 存活性 — 4 票 2 票不需要代码。
 
 ## (前 Latest, 2026-07-11) session #COORD-LIFECYCLE-V1.56.0 — ✅ **DONE: 协调机制 claim 生命周期闭环 v1.56.0 ship (3 缺陷全修) + #159/#160 实测关票** (2026-07-11, simonfish/bfe8285d)
 
