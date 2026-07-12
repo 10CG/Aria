@@ -11,9 +11,13 @@
 
 ---
 
-## ★ 最新 session #COORD-LIFECYCLE-V1.56.0 — ✅ **DONE: 协调机制 claim 生命周期闭环 v1.56.0 ship (3 缺陷全修) + #159/#160 实测关票** (2026-07-11, simonfish/bfe8285d)
+## ★ 最新 session #SMALL-BATCH-V1.56.1 — ✅ **DONE: 小票并批 v1.56.1 (agent team recon×5) + #136 审计移交 + i18n 数字同步** (2026-07-12, simonfish/bfe8285d)
 
-**Latest**: [2026-07-11-coordination-lifecycle-v1.56.0.md](./2026-07-11-coordination-lifecycle-v1.56.0.md) — item 1 Phase B 全三部件 ship: **Part C** release_gate CLI (track+container 定位, 全匹配释放) + apply_tree_edits CAS + GC 真写入 + sweep (SWEEP_TTL=24h) + phase-d-closer D.2b 接线 + 一次性清理真 ref (0 stale active, 本 cycle claim D.2b dogfood 释放); **Part A1** coordination.enabled 默认→true (opt-out ⚠️行为变更) + B.0 REQUIRE claim + doc lock-in; **Part B1** linked_issue schema/CLI/overlap advisory。pre-merge review 1C (sweep 30min TTL 误杀活 session→24h) + 5I 全修; 测试 968→1006 (含 pytest 裸函数假绿修); aria PR#106 `504da89`; spec 归档。另: #159/#160 实测证明已被 v1.55.2/v1.55.4 全覆盖, 零代码关票。follow-up: orchestrator#31 (bot 强制 claim) + plugin#107 (heartbeat 接线)。**本轨终结, 无 carry**; 承前 M6 owner 4 门。
+**Latest**: [2026-07-12-small-batch-v1.56.1.md](./2026-07-12-small-batch-v1.56.1.md) — owner /goal「agent team + 动态工作流, 2+3+4 都处理完」。5 recon 并行, 3 个改变预设: **#158 真 bug 修** (版本抽取 jq 读 plugin.json SOT, 旧 grep 恒报 1.47.0 污染全部生成 issue) + **#101 真漂移修** (路由摘要表 6 行对齐 canonical + 表级 banner) + **#102 幻觉票证伪关** (票内架构全 git 历史不存在) + **#136 已修票** (脱敏 cc7280b 在 HEAD, 全仓审计零残留, 留 open 仅剩 owner 轮换) + **i18n 免重译** (真实基线 v1.46.4→master 零正文变更, 三语机械数字同步 marker→v1.56.1)。aria v1.56.1 PR#108 `0964496`; review PASS 0C/0I; 关 #158/plugin#101/plugin#102。**Next**: ⭐ #147 M6-blocker triage (承前); carry-136-rotation (owner)。教训: 小票并批先 recon 存活性 — 4 票 2 票不需要代码。
+
+## (前 Latest, 2026-07-11) session #COORD-LIFECYCLE-V1.56.0 — ✅ **DONE: 协调机制 claim 生命周期闭环 v1.56.0 ship (3 缺陷全修) + #159/#160 实测关票** (2026-07-11, simonfish/bfe8285d)
+
+**Handoff**: [2026-07-11-coordination-lifecycle-v1.56.0.md](./2026-07-11-coordination-lifecycle-v1.56.0.md) — item 1 Phase B 全三部件 ship: **Part C** release_gate CLI (track+container 定位, 全匹配释放) + apply_tree_edits CAS + GC 真写入 + sweep (SWEEP_TTL=24h) + phase-d-closer D.2b 接线 + 一次性清理真 ref (0 stale active, 本 cycle claim D.2b dogfood 释放); **Part A1** coordination.enabled 默认→true (opt-out ⚠️行为变更) + B.0 REQUIRE claim + doc lock-in; **Part B1** linked_issue schema/CLI/overlap advisory。pre-merge review 1C (sweep 30min TTL 误杀活 session→24h) + 5I 全修; 测试 968→1006 (含 pytest 裸函数假绿修); aria PR#106 `504da89`; spec 归档。另: #159/#160 实测证明已被 v1.55.2/v1.55.4 全覆盖, 零代码关票。follow-up: orchestrator#31 (bot 强制 claim) + plugin#107 (heartbeat 接线)。**本轨终结, 无 carry**; 承前 M6 owner 4 门。
 
 ## (前 Latest, 2026-07-11) session #PARTB-V1.55.4-COORD — 🔶 **PARTIAL: secret-guard 部件 B ship v1.55.4 (item 2 全) + 协调机制 spec 批准 + Part C 核心 WIP (item 1 起步)** (2026-07-11, simonfish/bfe8285d)
 

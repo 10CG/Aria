@@ -1,13 +1,13 @@
 [English](README.md) | **中文** | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-<!-- translated-from: v1.51.0 -->
+<!-- translated-from: v1.56.1 -->
 
 # Aria
 
 > 让 AI 成为你软件项目中真正的协作者
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.50.1-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.56.1-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -132,7 +132,7 @@ flowchart LR
 
 ## 你能得到什么
 
-### Skills (34 个面向用户 + 7 个内部 = 41 个总计)
+### Skills (35 个面向用户 + 7 个内部 = 42 个总计)
 
 | 分类 | Skills | 用途 |
 |----------|--------|---------|
@@ -221,7 +221,7 @@ Aria/
 │   ├── openspec/               # 需求规范格式
 │   └── conventions/            # 约定 (git commit 等)
 ├── aria/                       # Aria 插件 (子模块)
-│   ├── skills/                 # 41 个 Skills (34 个面向用户 + 7 个内部)
+│   ├── skills/                 # 42 个 Skills (35 个面向用户 + 7 个内部)
 │   ├── agents/                 # 11 个 Agents (带 STCO 描述 + capabilities)
 │   └── .claude-plugin/         # 插件配置
 ├── aria-plugin-benchmarks/     # Skill 基准测试套件
@@ -240,8 +240,8 @@ Aria/
 ## 项目状态
 
 ```
-Project Version:  1.7.0
-Plugin Version:   1.49.0 (aria-plugin, 41 Skills + 11 Agents)
+Project Version:  1.7.3
+Plugin Version:   1.56.1 (aria-plugin, 42 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
 Research Focus:   Reproducibility of AI collaboration patterns
