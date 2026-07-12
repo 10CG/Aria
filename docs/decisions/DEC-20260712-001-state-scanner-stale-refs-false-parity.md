@@ -1,7 +1,8 @@
 # DEC-20260712-001 — state-scanner 陈旧 ref 假同步 (parity false-green)
 
-> **状态**: **v2 (2026-07-12)** — post_spec R1 判 FAIL (3/3 agent unanimous, 机制级 Critical 全部实证), v1 药方被推翻; owner 批准重设计方向 (F3′ 并行 fetch-all)。v1 决策 D1/D2/D3 已作废, 见 §3。
-> **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 post_spec R1 的 3C + 12M/m)
+> **状态**: **v7 (2026-07-12)** — post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
+> **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 R1 的 3C + 12M/m) | **v6 修订**: 2026-07-12 (折入 R2-R5; **R5 的 5 Critical + F10′ 裁定**)
+> **审计轨迹**: [R1+R2](../../.aria/audit-reports/post_spec-R1-R2-2026-07-12T1850Z-state-scanner-stale-refs-false-parity-aggregated.md) → [R3+R4](../../.aria/audit-reports/post_spec-R3-R4-2026-07-12T2000Z-state-scanner-stale-refs-false-parity-aggregated.md) → [**R5**](../../.aria/audit-reports/post_spec-R5-2026-07-12T2230Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **触发**: 本 session 亲历 — `/state-scanner` 开局报 `parity=equal / overall_parity=true`, 实际本地落后 `origin/master` **4 个 commit** (双子星并发 session 已 ship v1.56.0 + v1.56.1)。
 > **决策人**: 10CG Lab owner (v1: 范围/阈值; v2: 重设计方向 F3′)
 > **前置 grounding**: probe-first 代码探查 (v1) + **post_spec R1 三方独立实证** (v2, 含真 git fixture 跑真 collector)
@@ -179,7 +180,31 @@ phase1_gate.py --raw-track-id state-scanner-stale-refs-false-parity --phase A.1 
 
 `--phase` 是自由字段, 无需改代码即可前移认领。**本 session 的 R1 回炉恰好印证了 #109 的成本论证**: Phase A (含 5-agent 审计) 是最贵的窗口, 若两个 session 并发做同一 Spec, 浪费的正是这一段。
 
-> ⚠️ (R1 m3) 「#109 首次活体验证」的措辞需与 `coordination-gate-invocation` 探针分区实证交叉核对再落笔 (memory `feedback_spec_precedent_verify_execution_history`: shipped ≠ executed)。
+> ✅ **(v6 结案 —— 该警示已交叉核对完毕, 结论: 「#109 首次活体验证」这个说法是错的, 已删除该断言。)**
+> **实测**: `coordination-gate-invocation` 探针分区显示 **2 条生产 run_gate 记录**, 且 2026-07-09 的 handoff 记有更早的真实生产调用 (`carry-followup-99`)。⇒ **本 track 不是首次活体验证**, 该机制在本 track 之前就已被真实调用过。
+> ⇒ memory `feedback_spec_precedent_verify_execution_history` 的又一次实证: **写下「首次 / 从未」这类时间断言前, 必须先查执行史。**
+
+---
+
+## 3b. v6 新增决策 (owner 2026-07-12, 折入 R2-R5)
+
+| ID | 决策 | 依据 |
+|----|------|------|
+| **D7** | **`ahead` 不算正证据** —— `overall_parity` 语义 = 「本地与远端一致」。修的是「**落后时假绿**」(危险: 会在旧代码上开工重复劳动), **不是「领先时假红」** (领先不导致重复劳动)。 | R4-C7 (tech-lead ↔ code-reviewer 正面冲突, owner 采纳 code-reviewer)。与现有代码 `has_equal_evidence` / golden fixture / AB rubric **三者一致 ⇒ blast radius 最小**。tech-lead 反方论据存档, 若 Phase B dogfood 实测告警疲劳可重开 |
+| **D8** | **拆 3 个 Spec** (主 / Spec B Rule #7 / Spec C issue-cache) | 5/5 agent 一致建议。落地顺序: **Spec C (独立) → Spec B (Rule #7, 须先于主 Spec) → 主 Spec** |
+| **D9** | **一切「不变量」必须写成 fail-CLOSED 兜底 (补集定义), 不得写成正向枚举** | 同一不变量在本 Spec 起草期**复发 7 次** (QA-C1 零证据 / 陈旧证据 / 从未获取 / v3 只豁免 ahead / v4 枚举 fail-open / **R5: `has_unreachable_remote` 正向枚举** / **R5: `可信` 的 null**)。⇒ **谓词定义域横扫表 (proposal §横扫) + tasks 5.1d 机械闸** |
+| ~~**D10**~~ 🔴 **SUPERSEDED by D14** | ~~扩本 Spec 加 F10′~~ (detached-HEAD 仓库改用 commit-based parity), **不拆 Spec D** | **R5-C-A**: `multi_remote.py:169` 在 `branch is None` 时**在触碰任何 remote-tracking ref 之前就返回** ⇒ 子模块 (detached HEAD 是其规范常态) 的**非-origin 远端 drift 结构性不可见** ⇒ **本 Spec 要杀的 bug 在 v5 公式下原样存活**。**今日活体复现**: `standards`/`aria-orchestrator` 的 github 镜像各落后 2 commit + gitlink 从 GitHub 不可达, 而 `/state-scanner` 报 `overall_parity: true`。**不补这一块, 本 Spec 声称修好的那个 bug 在它自己 §Why 引的场景下原样存活。** 修法**不是发明新机制** —— `sync.py:200-330` 已有验证可工作的 commit-based 算法 (只是硬编码只查 origin), 参数化搬过来即可 |
+| **D11** | **deadline 砍掉的 leg ⇒ `fetch_ok="not_attempted"` (三态), 裁决权交回 `可信(r)`; 并按 `fetched_at` 升序排队防饥饿。🔴 __不__ 归 benign 桶, 也 __不__ 无条件标 `not_refreshed`** | **R5-C-C** + **owner 自查推翻 v6 初稿**。v5 无条件标 `not_refreshed` (∈blocking) ⇒ 大仓恒红; 但 backend-architect 建议的「归 benign ①」**会制造假绿** —— benign 判据是「fetch **不能**改变它」, 而「我们没去问」fetch **完全能**改变 ⇒ 大仓 origin 快腿提供 ∃ 证据 + github 被砍判 benign ⇒ `overall_parity: true`, 而 github 可能真领先 100 commit ⇒ **本 Spec 要杀的 bug 经由新机制复活 (第八次复发)**。**正解 (code-reviewer M-2)**: 两端都不做 —— 只把 `fetched_at` 留在原地, 让 `可信(r)` 说话 (窗内 ⇒ 证据仍有效; 窗外 ⇒ 诚实 blocking)。**恒红的真正根因是饥饿, 不是分桶** ⇒ 优先级排队解决 |
+| **D12** | **Spec B 词表 = (b) 保留 `coordination_fetch` 旧词表**, 不发明第三套; `issue_scan` 的第二个分类器**有意不合并** | **R5-M-4** (三方独立收敛): v1 只披露矛盾、无任务承载裁定。母 Spec 的 fail-CLOSED 兜底使**正确性不依赖词表长相**; 但词表必须单一 |
+| **D13** | **三份 Spec 的「0 failed」判据豁免 `test_two_consecutive_runs_diff_zero`**, 由**母 Spec 认领消除** (4 条漂移通道) | **R5-C-E**: owner 连跑两次实测 —— baseline **本来就是 1 红** (`Ran 1006 tests, failures=1`)。**Spec B 被指定「应先落地」, 却按自己的 AC-3 结构性无法 ship** |
+
+| 🔴 **D14** | **F10′ → F10″ 换原语: orphaned-gitlink 可达性** (取代 D10) | **R6 三方独立证伪 F10′**: 「镜像落后」在 git 眼里是 **`ahead`** 不是 `behind` (`rev-list --left-right 79b7cd6...9df1722` → `2 0`; `multi_remote.py:205` 映射 `ahead=parts[0]`) ⇒ 而 `ahead` 的非阻断性被 **AC-8/D7 + golden fixture (`main github->ahead ⇒ overall_parity: true`) + AB rubric (`:143` "Should exclude parity: ahead")** 三重锁死 ⇒ **F10′ 上线后事故场景仍是 `true`, AC-16 与 AC-8 字面互斥**。<br>**根因**: `parity` 天生无法区分「我有未推的 commit」(开发常态) 与「**已发布的 gitlink** 在 remote 上不可达」(完整性破损)。**今天断掉的不变量是跨仓可达性, 不是 parity。**<br>**F10″**: `gitlink_orphaned(R) := 主仓在 R 上【已发布】commit 引用的 gitlink G, 在子模块的 R 上不可达` (判定: `git -C S branch -r --contains G --list "R/*"` 为空)。<br>**实测已验** (真仓真命令): 事故态**正确报警** / 开发期**零误报** (只看已发布的, 不看本地 HEAD) / **零分支名假设**。<br>**一次性免疫 R6 全部 3 Critical + M-4**: 不碰 parity ⇒ 与 AC-8 零冲突, **D7 不必重开**; 不猜分支名 ⇒ 免疫 C-2 (实测三个子模块的 `refs/remotes/github/HEAD` **全不存在**); shallow 守卫语义清晰; **pin 住旧 commit 的子模块天然免疫** (只要可达就不报警, 与"新不新"无关) |
+
+> 🔴 **D7 的盲区 (R6 揭出, 但 D14 使其不必重开)**: D7 的理据「本 Spec 修的是**落后时假绿**, 不是**领先时假红** (领先不会导致重复劳动)」—— **这句话对 mirror remote 是错的**。领先 github 恰恰就是危害本身 (镜像陈旧 / `clone --recursive` 断裂 / 市场版本滞后)。**今天的事故 + CLAUDE.md 记的 2026-04-10 事故, 都是「领先」形态。**
+> **但 D14 换原语后, D7 不必重开** —— F10″ 用可达性而非 parity 表达该不变量, 两者正交。
+> **元教训**: v6 修 R5-m-1 时, owner 让**理据**去迁就**公式** (`ahead ⇒ true`)。而 v5 原本的理据 (「有未推送 commit 确实不是已同步的」) 对 mirror 才是对的。⇒ **当理据与公式矛盾时, 不要默认公式是对的; 先问「这个矛盾在保护什么」。**
+
+> ⚠️ **v1 的两条决策已被实证推翻, 此处留痕**: 「F1+F2+F3+F4 全包」与「`warn_after_hours` 24→1」—— **前提不成立** (R1: age 是 repo 级, `age≈0` 对**所有** remote 都不触发; 阈值降到 **3.6 秒**都救不回 github)。
 
 ---
 

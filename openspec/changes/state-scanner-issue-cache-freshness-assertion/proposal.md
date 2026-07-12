@@ -1,6 +1,6 @@
 # Proposal: `issue-cache-freshness` 检查重定义 + snapshot `generated_at` 字段
 
-> **Status**: Draft (待 owner sign-off)
+> **Status**: **Draft v2** (v1 → post_spec **R5 FAIL** [AC-3 的修法把恒红从 cache 路径搬到 live 路径 / §3 根因归错 / 0-failed 假前提] → **v2: AC-3 单边化 + §3 撤回 + AC-5 豁免**) → 待 post_spec **R6**
 > **Level**: 2 (Minimal — 单一关注点: 一个 custom check 的断言重定义 + 一个 additive schema 字段)
 > **Created**: 2026-07-12
 > **Source**: `state-scanner-stale-refs-false-parity` 的 R1/R2/R3 发现; 经 owner 决策**拆出独立 Spec** —— 与 parity 机制**零代码路径重叠** (5/5 agent 一致建议)
@@ -69,15 +69,33 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 - 它从「1.13 跑没跑的外部反向证据」变成「1.13 **在本次 scan 内**是否产出了新鲜结果」—— 语义更准确, 且**可在健康常态下 pass、在真故障时 fail**。
 - 更新该 check 的 `description` (它不再是「外部反向证据」)。
 
-### 3. 消除既有 flaky 测试
+### 3. ❌ **~~消除既有 flaky 测试~~ — v2 撤回: 根因归错了** (R5-C-E, owner 实测)
 
-`tests/test_normalize_snapshot.py::TestStabilityIntegration::test_two_consecutive_runs_diff_zero` **当前是环境相关的 flaky 测试**:
-- cache > 30min ⇒ run1 `custom_checks` 报 `failed:1`; 该 scan 的 1.13 刷新 cache ⇒ run2 报 `failed:0` ⇒ **两次 snapshot 不一致 ⇒ 红**
-- cache < 30min ⇒ 两次都 `failed:0` ⇒ **绿**
+> 🔴 **v1 声称**: `test_two_consecutive_runs_diff_zero` 的 flaky 源于 `custom_checks` 的 `failed:1 → failed:0` (cache > 30min 时 run1 红 run2 绿), 且**本 Spec 的修法能从根上消除它**。
+>
+> **实测证伪。** owner 连跑两次全量测试 (未修改代码, aria HEAD `0964496`):
+> ```
+> Run A: Ran 1006 tests ... FAILED (failures=1)   test_two_consecutive_runs_diff_zero
+> Run B: Ran 1006 tests ... FAILED (failures=1)   同一测试, 不同漂移键
+> ```
+> **跨 4 次观测 (code-reviewer 2 + owner 2) 暴露 4 条互不相同的漂移通道** —— **没有一条是 `custom_checks`**:
+>
+> | # | 漂移键 | 根因 |
+> |---|--------|------|
+> | 1 | `remote_refs_age` | `sync.py:396/405` 读 FETCH_HEAD mtime; **scan 自己的 Phase 1.16 会改写 FETCH_HEAD** |
+> | 2 | `issue_status.repos[].source` | `issue_scan.py:822` cache 命中返 `"cache"` / live 返 `"live"` (900s TTL 在两跑间翻转) |
+> | 3 | `coordination_fetch.degraded` / `degradation_reason` | 真实网络抖动 ⇒ 一跑降级一跑不降级 |
+> | 4 | `errors[]` 数组 | 同上 soft error 时有时无 |
+>
+> **根因同一**: 该「稳定性测试」**跑的是真 scan 打真网络** —— 两跑之间的网络/TTL/缓存状态本来就会变。**4 条都不在 `normalize_snapshot.py` 的 `TIMESTAMP_KEYS`/`DROP_KEYS` 名单里。**
 
-⇒ **同一份代码, 红绿取决于跑之前 30 分钟内有没有跑过 scan。** (R2/R3 双方实测各得到过红和绿。)
+**v2 裁定**:
+- **本 Spec 的修法 (`generated_at` + 重定义 check) 一条漂移通道都消不掉** ⇒ **不再声称能消除该 flaky 测试**。
+- **该测试由母 Spec 认领消除** (母 Spec tasks **12.10**, 4 条通道全认领)。
+- **本 Spec 的 AC-5 显式豁免它** (否则本 Spec 结构性无法 ship)。
 
-本 Spec 的修法**从根上消除**这个 run-to-run 依赖 (同 snapshot 内比较 ⇒ 恒定)。
+> 📌 **这与 R4 给姊妹 Spec B 的「AC-1 靶点错位」是同一 species**: **一个可以「碰巧通过」而真 flaky 依旧的 AC。**
+> 📌 **仓内已有逐字先例**: `DROP_KEYS` 的 `cached`/`age_seconds`/`refs_fetched` 注释 (v1.30.2) **明写**「TTL-based, varies between consecutive runs… Stability test requires drop」—— **同一 class 已解过一次, v1 又原样引入。**
 
 ---
 
@@ -88,7 +106,7 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 | schema | 顶层 `generated_at` (additive, 不 bump version) |
 | 下游收益 | **m7-fleet-aggregation** 的 CAVEAT-age 可以从「文件 mtime 兜底」升级为「权威字段」 |
 | collector 顺序 | **不改** (与母 Spec 解耦的关键) |
-| 既有测试 | `test_two_consecutive_runs_diff_zero` 从 flaky 变确定性 |
+| 既有测试 | ❌ **v2 撤回** —— 本 Spec **消不掉** `test_two_consecutive_runs_diff_zero` 的 flaky (实测 4 条漂移通道无一是 `custom_checks`)。由**母 Spec tasks 12.10** 认领 |
 | 采用者 | `issue-cache-freshness` 从恒红变为有意义的信号 |
 
 ---
@@ -100,20 +118,55 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 - **AC-3 (`generated_at` 存在 + 容忍 cache 命中)** 🔴 **v1 初稿写反了一个代码事实** (R4 code-reviewer X-1):
   v1 断言 `generated_at <= issue_status.fetched_at` (scan 开始早于 issue fetch)。**但 `issue_scan` 有 900s 缓存** —— cache 命中时 (`issue_scan.py:766`) 它把**缓存里的** `fetched_at` (**上一次** scan 的时刻) 原样端出 ⇒ **`fetched_at` 早于 `generated_at`** ⇒ **该断言恒 false**。而 15 分钟内重复 scan **命中缓存是常态路径**。
   ⇒ **我会在一个专门修「恒红」的 Spec 里, 用一条制造「缓存路径恒红」的断言。** (对偶不变量: 假绿的反面是恒红。)
-  **正确断言**:
+  🔴 **v2 再修正 — v1 的「正确断言」把恒红从 cache 路径搬到了 live 路径** (R5-C-D; tech-lead + code-reviewer **独立收敛**, owner 实测裁决):
+  ```
+  ❌ v1 的修法:  fetched_at 非空 ∧ 0 ≤ (generated_at − fetched_at) ≤ 2 × cache_ttl_seconds
+                                    ^^^^  这个下界是致命的
+  ```
+  **代码实测**:
+  - `generated_at` = `build_snapshot` **入口** (本 Spec §1; `scan.py:91`)
+  - `issue_scan` 是 **Phase 1.13**, 跑在入口**之后**
+  - `issue_scan.py:650` / `:711` **live 路径**: `"fetched_at": _now_iso()` ⇒ **fetch 当刻**, **必然晚于** `generated_at`
+
+  | 路径 | Δ = `generated_at − fetched_at` | v1 的 AC-3 |
+  |------|--------------------------------|-----------|
+  | **cache MISS (live fetch)** | **−8s (负)** | 🔴 **FAIL — 恒红** |
+  | cache HIT (600s 前) | +600s | PASS |
+  | cache HIT (TTL 边缘 900s) | +900s | PASS |
+  | 真陈旧 (1.13 被跳过, 3600s) | +3600s | FAIL ✅ (正确) |
+
+  **cache-miss = 每个 session 首次 scan + 任何间隔 >900s 的 scan + 每次 CI = 常态路径。**
+  ⇒ 🔴 **在一个专门修「恒红」的 Spec 里, 第二次制造恒红 —— 只是换了个路径。**
+
+  > ⚠️ **跨 agent 裁决留痕**: qa-engineer 判此 AC **PASS**, tech-lead + code-reviewer 判 **FAIL**。**owner 实测裁决: 后两者对** —— qa 只 emulate 了 **cache-HIT** 路径, **从未测 cache-MISS/live**。**这不是反证, 是漏测。**
+  > ⇒ memory `feedback_cross_agent_verdict_independent_verify` 的**新形态**: 不是「两个 agent 同时错」, 而是「**一个 agent 只测了一半的定义域就报 PASS**」。
+
+  ✅ **v2 的正确断言 (单边)**:
   ```
   issue_status.fetched_at 非空
-  ∧ 0 ≤ (generated_at − fetched_at) ≤ 2 × issue_scan.cache_ttl_seconds
+  ∧ (generated_at − fetched_at) ≤ 2 × issue_scan.cache_ttl_seconds     # 只要上界
   ```
-  (与 `state-checks.yaml:14-15` 已有的「2×TTL (默认 30min)」自述对齐, 且**显式允许 cache-hit**。)
-- **AC-4 (稳定性测试转确定性)**: `test_two_consecutive_runs_diff_zero` 在「cache 陈旧」与「cache 新鲜」两种前置条件下**都必须绿** (当前: 前者红后者绿)。
-- **AC-5 (无回归)**: `python3 aria/skills/state-scanner/tests/run_tests.py` → 0 failed ∧ 无既有绿测试转红。
+  **下界毫无必要** —— `fetched_at` 比 `generated_at` **晚**是**好事**, 它恰恰说明「**1.13 在本次 scan 里真的跑了**」(负值 = live fetch = 最健康的信号)。
+  (上界与 `state-checks.yaml:14-15` 已有的「2×TTL (默认 30min)」自述对齐, 且**显式允许 cache-hit**。防「恒绿真空」由 **AC-2** 承担。)
+
+- 🆕 **AC-3b (对偶 pin —— live 与 cached 两条路径都必须 PASS)**:
+  **cache-MISS (live fetch)** ⇒ AC-3 **必须 PASS** (Δ 为负);  **cache-HIT (窗口内)** ⇒ AC-3 **必须 PASS** (Δ 为正且 ≤ 2×TTL)。
+  > **这是母 Spec v6 新增的「对偶验收」机械闸的实例**: **每条 AC 必须同时给出「健康常态必 PASS」+「真故障必 FAIL」两个 fixture。**
+  > **AC-2「防恒绿真空」已经是这个形状 —— v1 只是没有对称地把它应用到 AC-3, 于是 AC-3 制造了新恒红。**
+
+- **AC-4 (~~稳定性测试转确定性~~)** 🔴 **v2 撤回** (见 §3): 本 Spec **不再声称**能消除 `test_two_consecutive_runs_diff_zero` 的 flaky —— 实测的 4 条漂移通道**没有一条是 `custom_checks`**, 本 Spec 的修法**一条都消不掉**。**该测试由母 Spec tasks 12.10 认领。**
+  > v1 的两个前置条件 (「cache 陈旧」/「cache 新鲜」) **钉错了轴** —— 真正的决定因子是 **FETCH_HEAD 热度 + issue-cache 热度 + 网络抖动**。
+
+- **AC-5 (无回归)** 🔴 **v2 修正 baseline 假前提 (R5-C-E)**:
+  `python3 aria/skills/state-scanner/tests/run_tests.py` → **0 failed, 除 `test_two_consecutive_runs_diff_zero`** ∧ 无既有绿测试转红。
+  > ⚠️ **baseline 不是 0 failed** —— owner 连跑两次实测: `Ran 1006 tests ... FAILED (failures=1)`。**若坚持「0 failed」, 本 Spec 结构性无法 ship。**
 
 ---
 
 ## Tasks
 
-- [ ] 1.1 写 AC-1 红测试 (cache > 30min 前置) + AC-4 双前置条件测试 —— 确认当前代码 RED
+- [ ] 1.1 写 AC-1 红测试 (cache > 30min 前置) + 🆕 **AC-3b 对偶 pin** (live/cache-miss 与 cached/cache-hit **两条路径都必须 PASS**) —— 确认当前代码 RED。
+      ⚠️ **v1 的「AC-4 双前置条件测试」已撤回** (§3: 根因归错, 前置条件钉错了轴)
 - [ ] 2.1 `scan.py` `build_snapshot` 入口捕获 `generated_at` (ISO 8601 UTC), 写顶层
 - [ ] 2.2 确认 `generated_at` 被 `normalize_snapshot.TIMESTAMP_KEYS` 打码 (已在清单, 需 pin 测试)
 - [ ] 3.1 `.aria/state-checks.yaml` 的 `issue-cache-freshness` 断言改为同 snapshot 内 `fetched_at` vs `generated_at`
