@@ -33,10 +33,7 @@ the 3-day history accumulates, then re-check.
 | TG-A-dispatch | Dispatch tracker SQL + stratification + pre-flight | §What A.2, A.5, A.6 | ~3.5h | backend-architect |
 | TG-A-validate | validate-m6-handoff.py paired test triple | §What A.7 | ~1h | backend-architect |
 | TG-A-acceptance | check-m6-e2e-acceptance.py (--tg-a section) | §Acceptance AC-1, AC-2, AC-6, AC-7 | ~1h | backend-architect |
-| TG-B-scaffold | 6-mode test scaffold + mock-layer-per-mode rationale doc | §What B.1 (P-4) | ~2h | qa-engineer |
-| TG-B-infra | Infra-1/2/3 crash tests (SDK boundary, 4 WAL scenarios + shell script) | §What B.1, B.4 (P-5) | ~4.5h | qa-engineer |
-| TG-B-llm | LLM-4/5/6 crash tests (SDK + HTTP layer) | §What B.1 | ~1.5h | qa-engineer |
-| TG-B-statemachine | State machine det 100% cov + stochastic mocked replay + AdvancingClock DI | §What B.2, B.3 | ~4h | qa-engineer |
+| TG-B (REWORKED per #138) | crash-recovery coverage matrix (B-matrix-1/2) + LLM S_FAIL gap 测试 (B-llm-1) + transition-table determinism (B-sm-1); 原 scaffold/infra/llm/statemachine 4 任务引用虚构符号已整体重做, 见 §TG-B 主段 rework 注 | §What B (rework) | ~2-3h | qa-engineer |
 | TG-C-corpus | Rubric + 10 sample files from E2E run | §What C.1, C.2 | ~3h | knowledge-manager |
 | TG-C-scores | 10 owner score files + median computation | §What C.3 | ~1.5h | knowledge-manager |
 | TG-C-crossref | BOTH-locations cross-ref links + acceptance | §What C.3, AC-5 | ~1h | knowledge-manager |
@@ -423,7 +420,7 @@ These tests verify abi_compat promises remain intact after any TG-A schema migra
   `except Exception → S_FAIL(PROVIDER_5XX)` path for a **non-timeout** provider error
   (`TimeoutError → S_FAIL(TIMEOUT)` was already covered by
   `test_state_machine_skeleton.py::test_15d`). **Done**:
-  `tests/test_crash_llm_provider_error_s_fail.py` (5 tests) drives `_handle_s2_decide` /
+  `tests/test_crash_llm_provider_error_s_fail.py` (6 tests, 2 handler 类 S2/S3 × 真实异常场景) drives `_handle_s2_decide` /
   `_handle_s3_build_cmd` with the REAL production exception classes (mock-shape discipline):
   `LLMRouteExhausted(chain)` / `_LLMHTTPError(429)` / `ZhipuHTTPError(503)`. 869 tests green.
 
@@ -662,13 +659,9 @@ TG-A-infra (A-infra-2, A-infra-3)     — establish is_synthetic mechanism (AD-M
     │                       │
     │                       └── TG-A-acceptance (A-acceptance-1..3)  — acceptance script TG-A section
     │
-    ├── TG-B-scaffold (B-scaffold-1..3)  — parallel with TG-A-dispatch; no dependency on 7d run
-    │       │
-    │       └── TG-B-infra (B-infra-1..4)  — depends on scaffold + FakeClock
-    │               │
-    │               ├── TG-B-llm (B-llm-1..3)  — parallel with B-infra
-    │               │
-    │               └── TG-B-statemachine (B-sm-1..4)  — depends on FakeClock (B-scaffold-3)
+    ├── TG-B [REWORKED per #138] (B-matrix-1 → B-llm-1 / B-sm-1 → B-matrix-2)
+    │         — parallel with TG-A-dispatch; no dependency on 7d run; 无 FakeClock
+    │           (原 B-scaffold/B-infra/B-sm 树引用虚构 scaffold, 见 §TG-B rework 注)
     │
     └── TG-C-corpus (C-corpus-1..3)  — sequential after TG-A 7d run completes (needs real samples)
             │
@@ -695,14 +688,14 @@ TG-C-corpus templates (C-corpus-1..3) may be written in advance; sample content 
 
 | Precision item | DEC source | §What section | Task(s) |
 |----------------|------------|---------------|---------|
-| P-4: Mock-layer-per-mode matrix (Q-NEW-1 hybrid 4 SDK + 2 HTTP) | DEC §4 + Q-NEW-1 | §What B.1 (full table) | B-scaffold-1, B-infra-1..3, B-llm-1..3 |
-| P-5: 4 WAL scenarios (WAL-A/B/C/D) vs 3 enumeration | DEC §4 P-5 + PRD §634 | §What B.2 (4-scenario table) | B-infra-3 |
-| P-6: TG-A → TG-B handoff checkpoint contract | DEC §4 P-6 | §What A.7 (checkpoint list) | A-validate-1, TG-B-scaffold start condition |
+| P-4: Mock-layer-per-mode matrix (Q-NEW-1 hybrid 4 SDK + 2 HTTP) | DEC §4 + Q-NEW-1 | §What B.1 (full table) | ~~B-scaffold-1, B-infra-1..3, B-llm-1..3~~ → B-matrix-1 覆盖矩阵替代 (rework #138: mock 面虚构, 6 模式映射既有 M2/M3 测试) |
+| P-5: 4 WAL scenarios (WAL-A/B/C/D) vs 3 enumeration | DEC §4 P-5 + PRD §634 | §What B.2 (4-scenario table) | ~~B-infra-3~~ → B-matrix-1 (WAL durability 既有 test_57 覆盖; truncation/corruption = 矩阵 Known gaps 显式 deferred) |
+| P-6: TG-A → TG-B handoff checkpoint contract | DEC §4 P-6 | §What A.7 (checkpoint list) | A-validate-1 (~~TG-B-scaffold start condition~~ rework 后 TG-B 无 scaffold, checkpoint 语义不变) |
 | P-7: is_synthetic tagging mechanism (Mech A LOCKED — migration 007; Mech B removed R1 audit) | DEC §4 P-7 | §What A.2 (P-7 block) | T-validate-schema-1 + A-infra-2 + AD-M6-4 |
 | P-8: Pre-flight dispatch fixture provenance (Option A/B/C) | DEC §4 P-8 | §What A.5 (P-8 block) | A-dispatch-5 + AD-M6-5 |
 | P-9: Cross-project Kairos/silknode acceptance conditions | DEC §4 P-9 | §What A.6 (P-9 block) | A-dispatch-6 |
 | Q-NEW-1: Hybrid mock layer +1h scope | Owner Q-NEW-1 2026-05-24 | §What B.1 (hybrid table) + §Effort baseline | B-scaffold-1 + mock-layer-per-mode rationale doc |
-| AD-M6-6: AdvancingClock DI at constructor | §How AD table | §What B.3 (FakeClock class) | B-scaffold-3, B-sm-1 |
+| AD-M6-6: AdvancingClock DI at constructor | §How AD table | §What B.3 (FakeClock class) | ~~B-scaffold-3, B-sm-1~~ → RETIRED (rework #138: 复用既有 interfaces.MockClock, 不做构造器 DI 重构; B-sm-1 为纯 transition-table 断言无需 clock) |
 
 ---
 

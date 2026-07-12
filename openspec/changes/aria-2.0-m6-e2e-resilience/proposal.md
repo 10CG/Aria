@@ -1,7 +1,7 @@
 # Aria 2.0 M6 Spec #2 — E2E Resilience (runtime observability + crash recovery + humanized samples)
 
 > **Level**: 3 (Full — cross-cuts runtime observability + crash recovery + humanized command samples; three internal task groups)
-> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check; ready for Phase A.3 → Phase B.1)
+> **Status**: **Approved** (Phase A.2 CONVERGED 2026-05-24 via R3 stability check)。**代码侧完成** (TG-A obs + TG-B [REWORKED per #138, 2026-06-01] + acceptance 脚本; TG-B 产物: crash-recovery-coverage-matrix + 2 测试文件)。**未归档**: 待 168h 运营跑 (TG-A 7d 数据 + TG-C 样本依赖之; 前置见 Aria #147 阻塞链)。
 > **Change ID**: `aria-2.0-m6-e2e-resilience`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, ~82h total, post `a786444` PRD patch, §638-646)
@@ -735,7 +735,7 @@ TG-C Humanized Samples (sequential after TG-A 7d run):
 |----|-------|----------|
 | AD-M6-4 | is_synthetic tagging mechanism | **LOCKED to Mechanism A** (R1 audit 2026-05-24). Mechanism B (title prefix) was removed: `dispatches.title` column does not exist in live schema. Migration 007 adds `is_synthetic INTEGER DEFAULT 0` (additive, schema v5.0). See T-schema-1 in TG-A-infra. |
 | AD-M6-5 | Pre-flight fixture provenance (Option A replay vs Option B fresh synthetic vs Option C cross-project) | **Deferred to Phase B kickoff**. Check whether `aria-orchestrator/docs/demo-m5-o3-*.yaml` capture files exist from M5. If yes, prefer Option A (regression continuity). Document in `.aria/probes/m6-preflight-provenance.md`. |
-| AD-M6-6 | AdvancingClock DI injection point | Clock parameter injected at handler class constructor level (e.g., `AriaExtension(clock=FakeClock(...))`) rather than per-method. State machine logic is distributed across 4 modules (extension.py, comment_poll.py, reconciler.py, tick_runner.py — per Q1 lock 2026-05-24; no `state_machine.py`). All time-sensitive internal methods in those 4 modules read `self._clock.now()` instead of `datetime.now()`. |
+| AD-M6-6 | AdvancingClock DI injection point | **RETIRED (TG-B rework #138, 2026-06-01)**: 原决策 (构造器级注入 `AriaExtension(clock=FakeClock(...))` + 4 模块 `datetime.now()` 全替换) 随虚构 scaffold 一并废止 — rework 后 B-sm-1 是纯 transition-table 断言 (无时钟依赖), 时钟 mock 需求由既有 `interfaces.MockClock` (interfaces.py:282) 覆盖, 不做 DI 重构。原文见 git 史。 |
 
 ---
 
@@ -1036,7 +1036,7 @@ python3 aria-orchestrator/docs/validate-m6-handoff.py --check-abi-compat
 | R-M6-11 | TG-C sample quality < median 7/10 requires re-run or supplemental dispatches | Medium | Acceptance only after TG-A 7d completes; if median < 7, owner can dispatch additional targeted runs (synthetic, ≤70% cap still applies) to top up corpus; rubric dimensions D1-D7 are independently scoreable — individual low scores addressable |
 | R-M6-12 | Spec #1 3-day history gate blocks TG-A start if owner forgets daily cron | Low | Spec #2 Day-1 probe explicitly checks `validate-m6-handoff.py --check-3-day-history` as first step; documented in Phase B.1 checklist |
 | R-M6-13 | is_synthetic column migration (Mechanism A) conflicts with in-flight M6 Spec #1 schema work | Low | Spec #1 is additive (reads existing columns, writes JSON artifact); migration 005 adds only new column with `DEFAULT 0`; verify no Spec #1 migration is pending before running 005 |
-| R-M6-14 | AdvancingClock DI injection requires refactor across 4 state machine modules | Medium | AD-M6-6 decision: clock injected at constructor level of each handler class. Phase B implementer must audit all `datetime.now()` calls in `extension.py`, `comment_poll.py`, `reconciler.py`, `tick_runner.py` and replace with `self._clock.now()`; existing tests may need update to pass `FakeClock` (no `state_machine.py` — Q1 lock) |
+| R-M6-14 | ~~AdvancingClock DI injection requires refactor across 4 state machine modules~~ **RETIRED** (TG-B rework #138: 无 DI 重构无 FakeClock, 风险随 AD-M6-6 废止消灭) | ~~Medium~~ — | 见 AD-M6-6 RETIRED 注 |
 | R-M6-15 | Spec #2 body propagation gap: P-4..P-9 precision items not carried through to tasks.md | Low | Per `[[feedback_spec_v2_body_propagation_2pass]]`: each precision item is cross-referenced to both §What sections and tasks.md task numbers in the Precision items cross-reference table |
 
 ---
@@ -1057,18 +1057,13 @@ TG-A: Runtime Observability
   A.tg-a-acceptance check-m6-e2e-acceptance.py --tg-a section   ~1h
 TG-A subtotal                                                    ~10-10.5h
 
-TG-B: Crash Recovery
-  B.1  6-mode crash test suite scaffold + mock-layer matrix doc  ~2h
-  B.1a Infra-1 (Hermes SIGKILL, SDK, reuse test_t12)            ~1h
-  B.1b Infra-2 (Layer 2 alloc SIGKILL, SDK, light-1 reframe)    ~1h
-  B.1c Infra-3 (WAL × 4 scenarios, SDK + m6-wal-fault.sh)       ~2h  (+1h P-5 4-scenario vs 3)
-  B.1d LLM-4 (429 rate-limit, SDK)                              ~0.5h
-  B.1e LLM-5 (invalid JSON, httpx_mock)                         ~0.5h
-  B.1f LLM-6 (provider 5xx, httpx_mock)                         ~0.5h
-  B.2  State machine det 100% cov + stochastic mocked replay     ~2.5h
-  B.3  AdvancingClock DI refactor + FakeClock class              ~1.5h
-  B.4  Mock-layer-per-mode rationale doc (Q-NEW-1 +1h)           ~1h
-TG-B subtotal                                                    ~12.5-13h
+TG-B: Crash Recovery [REWORKED per #138 — 原 B.1a-f/B.2/B.3/B.4 明细基于虚构
+  scaffold (hermes_client/recovery.py/FakeClock), 整体废止, 原文见 git 史]
+  B-matrix-1  crash-recovery coverage matrix (6 模式→既有 M2/M3 测试映射)   ~1h
+  B-llm-1     LLM handler except→S_FAIL(PROVIDER_5XX) 真 gap (6 tests)     ~0.5h
+  B-sm-1      transition-table determinism (10 tests, 无 FakeClock)        ~0.5h
+  B-matrix-2  矩阵引用测试全量 cross-check (75 tests)                       ~0.5h
+TG-B subtotal (reworked)                                         ~2-3h (原估 ~12.5-13h)
 
 TG-C: Humanized Samples
   C.1  Corpus structure + rubric.md (7 dims) setup               ~1h
