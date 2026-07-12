@@ -282,7 +282,15 @@ mtime 路径整体退役 (repo 全局单值, 当 fallback 都不合格); 新鲜�
 - **AC-5 (snapshot 自洽)**: `tracks_multibranch` 中**与 HEAD 同分支** (`branch` == HEAD upstream) 的 track commit 对 HEAD 不可达时 ⇒ `overall_parity == false` 或该 remote `reason` 非空。(**不能用「任意 HEAD 不可达的 commit」** —— 任何有其它活跃分支的仓库本来就有 ⇒ 健康仓假红 + 误触设计闸。)
 - **AC-6 (子模块覆盖)**: 子模块 remote 从未 fetch ⇒ **不得**提供 `equal` 正证据。
 - **AC-7 (降级只作用于正证据)**: 不可信且 `behind` **不得**降级为 `unknown`; 不可信且 `ahead` **不得**让 `has_pending_push` 变 false。
-- **AC-8 (`ahead` 常态)**: 有未推送 commit 的健康仓 ⇒ `overall_parity` **仍 true** + `has_pending_push: true`。
+- **AC-8 (`ahead` 不阻断, 但也不是正证据)** — **owner 裁定 2026-07-12 (DEC)**:
+  `overall_parity` 的语义 = 「**本地与远端一致**」。有未推送 commit 的仓库**确实不是已同步的** ⇒ 报 `false` 是**诚实**的, 且下游给的 `push` 建议**是对的**。**与现有代码 (`has_equal_evidence` 要求 `equal`) / golden fixture / AB rubric 三者一致 ⇒ blast radius 最小。**
+  > ⚠️ **v4 的 AC-8 措辞把「健康」与「已同步」偷换了概念** (R4 tech-lead C7 / code-reviewer X-5 双方都指出它与 AC-12 **字面互斥**)。一个有未推送 commit 的仓库**是健康的, 但不是已同步的**。
+  > **本 Spec 修的是「落后时假绿」** (危险: 会在旧代码上开工、重复别人的劳动 —— 本 session 即受害者), **不是「领先时假红」** (领先不会导致重复劳动)。两者不可混为一谈。
+  >
+  > **断言**: `origin=equal + github=ahead` 的仓库 (golden fixture 场景) ⇒ `overall_parity: true` ∧ `has_pending_push: true`。**前提: ≥1 个 remote 为 `可信 ∧ equal`。**
+  > 单 remote 且 `ahead` ⇒ `overall_parity: false` (无正证据) + `has_pending_push: true` + 建议 `push` —— 见 **AC-12**, 二者现已**自洽, 不再互斥**。
+  >
+  > tech-lead 的反方论据 (「单 repo+单 remote+未推送 = 中位数采用者, 按『健康常态该是什么值』判据答案应是 true」) 记录在案 —— 若未来 Phase B dogfood 实测告警疲劳成立, 可重开此裁定。
 - **AC-9 (TTL 不复发旧病)**: 30s 内连跑两次 scan ⇒ 第二次 TTL 命中 ⇒ **不降级** + 两次 snapshot diff == 0; **fetch 失败 + stale cache ⇒ `fetched_at` 不得推进**。
 - **AC-10 (F9′ 平行计算点)**: origin fetch 失败时, `sync_status.current_branch` 与 `sync_status.multi_remote[origin]` **不得自相矛盾**。**断言字段由 OQ-E 的裁定决定** (不能停留在「不得自相矛盾」的 prose 谓词)。
 - 🆕 **AC-11 (benign unknown 不阻断 —— 防 R3-C5 恒红回归)**: **detached-HEAD 子模块** + 全部 remote 刷新成功 + 主仓 equal ⇒ `overall_parity` **仍为 true**。**本仓可直接 dogfood** (`aria` 子模块正是 detached HEAD)。
