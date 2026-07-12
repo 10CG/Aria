@@ -1,5 +1,6 @@
 ---
 track-id: state-scanner-stale-refs-false-parity
+linked-issue: 10CG/aria-plugin#110
 owner-container: aria-runner-bot/023236f2
 phase: A.1-postspec-R4
 status: active
@@ -49,12 +50,16 @@ updated-at: 2026-07-12
 | `openspec/changes/state-scanner-stale-refs-false-parity/` | **主 Spec (L3)** — 核心机制 F1′-F6′/F9′ |
 | `openspec/changes/state-scanner-snapshot-stderr-secret-leak/` | **Spec B (L2)** — Rule #7 裸 stderr 收口, **应先落地** |
 | `openspec/changes/state-scanner-issue-cache-freshness-assertion/` | **Spec C (L2)** — 正交, 含新增 `generated_at` 字段 |
-| `.aria/audit-reports/post_spec-R1-R2-...-aggregated.md` | R1+R2 聚合报告 (R3/R4 待补) |
+| `.aria/audit-reports/post_spec-R1-R2-...-aggregated.md` | R1+R2 聚合报告 |
+| `.aria/audit-reports/post_spec-R3-R4-...-aggregated.md` | **R3+R4 聚合报告** (含 v5 公式合成解 + 6 条元教训) |
+| **aria-plugin [#110](https://forgejo.10cg.pub/10CG/aria-plugin/issues/110)** | **缺陷追踪票** (含活体证据 / 根因 / 方案 / 4 轮审计摘要) |
 
 ## §2 未完成 / Carry-forward
 
 - **carry-state-scanner-false-parity**: post_spec **R5** (5 agent)。R4 的全部发现已折入 v5, 五位一致「R5 应当 PASS」。R5 通过后 → owner sign-off → A.2/A.3。
-- **R3/R4 审计报告未落盘** (只有 R1+R2 聚合报告)。
+  tech-lead 建议: **R5 只审 F4′ 的最终公式 + R4 的 5 个修正点**, 不必跑全量。
+- ~~R3/R4 审计报告未落盘~~ **✅ 已补** (`post_spec-R3-R4-2026-07-12T2000Z-...-aggregated.md`)
+- ~~缺陷无 issue 追踪~~ **✅ 已开票 aria-plugin [#110](https://forgejo.10cg.pub/10CG/aria-plugin/issues/110)**
 - **DEC 需更新到 v5** (含: 删除「#109 首次活体验证」这个**已被证伪**的时间断言 —— 2026-07-09 handoff 有更早的真实生产调用 `carry-followup-99`)。
 - (承前) M6 owner 4 门 / M7 D3 门 / carry-136-rotation / 168h 跑。
 
