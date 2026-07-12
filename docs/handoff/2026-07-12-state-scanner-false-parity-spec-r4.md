@@ -61,6 +61,9 @@ updated-at: 2026-07-12
 - ~~R3/R4 审计报告未落盘~~ **✅ 已补** (`post_spec-R3-R4-2026-07-12T2000Z-...-aggregated.md`)
 - ~~缺陷无 issue 追踪~~ **✅ 已开票 aria-plugin [#110](https://forgejo.10cg.pub/10CG/aria-plugin/issues/110)**
 - **DEC 需更新到 v5** (含: 删除「#109 首次活体验证」这个**已被证伪**的时间断言 —— 2026-07-09 handoff 有更早的真实生产调用 `carry-followup-99`)。
+- 🔴 **`DEC-20260712-001` 编号撞车** (session 收尾时并发发现): 双子星的 commit `f399e71` 引用 `DEC-20260712-001 = task-level auth 禁令撤销`, 而 `docs/decisions/DEC-20260712-001-*.md` 是**本 session 的 state-scanner parity 决策**。**全仓无对应文件** ⇒ 他们那条是 dangling ref。
+  ⇒ 后果: 按 `git log` 去查 DEC 的人会查错。**建议**: 双子星侧改用 `DEC-20260712-002` (或补文件), 本 Spec 的 `-001` 有几十处引用不宜改。
+  ⇒ **根因是 DEC 编号无 claim 机制** —— 与本 Spec 追的「并发 session 撞车」是同一族问题, 可考虑并入 aria-plugin #109 的协调层讨论。
 - (承前) M6 owner 4 门 / M7 D3 门 / carry-136-rotation / 168h 跑。
 
 ## §3 关键风险 / 已知陷阱
