@@ -1,6 +1,6 @@
 # DEC-20260712-001 — state-scanner 陈旧 ref 假同步 (parity false-green)
 
-> **状态**: **v8 (2026-07-14)** — v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
+> **状态**: **v9 (2026-07-14)** — v9 新增 **D15′/D18/D19** (§3d: R7 三 C 合并解 + RC-8 + Spec C 基底; D15 由 D15′ 取代)。v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
 > **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 R1 的 3C + 12M/m) | **v6 修订**: 2026-07-12 (折入 R2-R5; **R5 的 5 Critical + F10′ 裁定**)
 > **审计轨迹**: [R1+R2](../../.aria/audit-reports/post_spec-R1-R2-2026-07-12T1850Z-state-scanner-stale-refs-false-parity-aggregated.md) → [R3+R4](../../.aria/audit-reports/post_spec-R3-R4-2026-07-12T2000Z-state-scanner-stale-refs-false-parity-aggregated.md) → [**R5**](../../.aria/audit-reports/post_spec-R5-2026-07-12T2230Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **触发**: 本 session 亲历 — `/state-scanner` 开局报 `parity=equal / overall_parity=true`, 实际本地落后 `origin/master` **4 个 commit** (双子星并发 session 已 ship v1.56.0 + v1.56.1)。
@@ -203,6 +203,14 @@ phase1_gate.py --raw-track-id state-scanner-stale-refs-false-parity --phase A.1 
 > 🔴 **D7 的盲区 (R6 揭出, 但 D14 使其不必重开)**: D7 的理据「本 Spec 修的是**落后时假绿**, 不是**领先时假红** (领先不会导致重复劳动)」—— **这句话对 mirror remote 是错的**。领先 github 恰恰就是危害本身 (镜像陈旧 / `clone --recursive` 断裂 / 市场版本滞后)。**今天的事故 + CLAUDE.md 记的 2026-04-10 事故, 都是「领先」形态。**
 > **但 D14 换原语后, D7 不必重开** —— F10″ 用可达性而非 parity 表达该不变量, 两者正交。
 > **元教训**: v6 修 R5-m-1 时, owner 让**理据**去迁就**公式** (`ahead ⇒ true`)。而 v5 原本的理据 (「有未推送 commit 确实不是已同步的」) 对 mirror 才是对的。⇒ **当理据与公式矛盾时, 不要默认公式是对的; 先问「这个矛盾在保护什么」。**
+
+### §3d v8 裁决第二批 (2026-07-14, R7 三 C 的合并解 — **代裁**: owner /goal「按你的建议裁决并完成 v8→R8」授权; R8 重点复核)
+
+| ID | 裁决 | 理由 |
+|----|------|------|
+| 🔍 **D15′** | **取代 D15: `可信(r)` 拆成两个角色谓词** — `证据资格(r) := fetched_at ≠ null ∧ (now − fetched_at) ≤ evidence_window (默认 1h, 键 sync_freshness.evidence_window_seconds)` 供 **∃ 正证据子句**; `豁免资格(r) := fetched_at ≠ null ∧ generation_age(r) ≤ k_eff ∧ (now − fetched_at) ≤ hard_cap (默认 7d)` 供 **¬blocking 降级判定**。equal ∧ 豁免 ∧ ¬证据资格 ⇒ 新状态 `stale_unverified`: **不供 ∃、不阻断、必须可见** (warnings + aging 列表)。**k_eff 收敛耦合 (RC-3)**: `k_eff = min(K_CAP=8, max(k_min=3, observed_rotation))`, `observed_rotation = ⌈max_host_legs / max(1, 上轮实际每 scan 覆盖数)⌉` (cache 记录), **不恒红由构造保证 (k_eff ≥ rotation)**; rotation > K_CAP ⇒ 显式接受滚动红 + advisory 指引 (边界外行为有定义)。 | R7 backend C-1/C-2/C-3 的合并解: 单一 可信 承担两角色是三 C 的共同根 — ∃ 资格要「世界时间新鲜」(防 C-3 陈旧 equal 替全仓作证, 事故 14h ≫ 1h), ¬blocking 豁免要「注意力节律新鲜」(防 C-2 恒红); 拆开后各自量纲正确。与 AC-15(b)「origin 不能替 github 作证」同构。K_CAP 防 k_eff 自适应被超大 rotation 推到假绿 |
+| **D18** | **RC-8: `orphan_unverified` / `stale_unverified` 持续 ≥ k_eff 代 ⇒ 升级 blocking** (per-leg cache 记录连续 unverified 代数); 且两状态必须渲染进输出区块 (进 AC, 不许只活在 reason 枚举) | 「没去问 ⇒ 放行」与第八次复发同构 (R7 狩猎 M-1); advisory 可见通道有被吞史 ⇒ 单靠可见不够, 需时限升级 — 与「过期即诚实」同一逻辑。k_eff 代 = 防饥饿保证内必然轮到, 正常运行永不触发; 触发即真异常 (fetch 连败/退避死锁) |
+| **D19** | **Spec C 求值基底 = (a) lag-1** (check 读上一份 snapshot, 不挪 collector 位置); AC-2 改**两跑断言** (「故障后的下一次 scan 该 check FAIL」) + lag-1 语义公示 | R7 qa C-1 二选一: (b) 挪位/内存接线破坏 Spec C 与母 Spec 的解耦叙事 (拆分理由), 且 §1 已论证挪位后检查变同义反复; lag-1 对「外部反向证据」型检查是诚实语义 (审计的是上一次 scan 的产物), 滞后一拍换独立性, 值 |
 
 ### §3c v8 裁决 (2026-07-14, R6 的 3 条 owner 待裁 — **代裁**: owner /goal「1+2 都做」授权, spec approval 时 owner 终审; R7 重点复核)
 
