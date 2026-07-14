@@ -1,6 +1,6 @@
 # Proposal: state-scanner 陈旧 ref 假同步修复 — 「新鲜度靠获取, 不靠测量」
 
-> **Status**: **Draft v7** (2026-07-14: §13/AC-16/AC-17 已按 F10″ 重写 + R6 7 Major 折入 + 3 条 owner 待裁按 DEC §3c D15-D17 代裁 [owner /goal 授权, 终审待 spec approval] → **待 R7** [窄范围: F10″ + R6 Majors + D15-D17])。前史: v1→R1→v2→R2→v3→R3→v4+拆Spec→R4→v5→R5 FAIL[公式的上游数据不存在]→v6+F10′→R6 FAIL[F10′ 用错原语]→F10″ 换原语 (owner 裁定 2026-07-12, 实测已验)
+> **Status**: **Draft v7** → 🔴 **R7 FAIL 3/3** (2026-07-14, backend/qa/复发狩猎三视角; 去重 ~8C/~15M, 聚合报告 `.aria/audit-reports/post_spec-R7-2026-07-14-state-scanner-stale-refs-false-parity-aggregated.md`)。**v8 待办核心**: D15 双角色窗拆分 (∃ 证据资格=短墙钟窗 / ¬blocking 豁免=代际窗 — backend C-3 修法方向, 三 C 合并解) + D15 全量落位消 split-brain (F1′/F4′/tasks 3.5/4.2/AC-15/OQ-D) + k/rotation 耦合约束 + §13 定义域补第 6/7/8 分支 (contains rc=129 / 非 gitlink tree / S 无 R remote) + **Fetch 1 加 --prune** (无 prune 结构性看不见 ref 删除 = 第十次复发最强候选) + 13.2 五分支各配红测试 + generation 写入侧约束镜像 3.7 + Spec C v4 求值基底裁定 (lag-1 两跑断言 vs 挪位)。前史: v1→R1→v2→R2→v3→R3→v4+拆Spec→R4→v5→R5 FAIL[公式的上游数据不存在]→v6+F10′→R6 FAIL[F10′ 用错原语]→F10″ 换原语 (owner 裁定 2026-07-12, 实测已验)
 > ⚠️ **F10′ 已被 R6 证伪, 勿按其伪码实施** —— 见下方 §F10′ 的 🔴 SUPERSEDED 批注 + [R6 报告](../../../.aria/audit-reports/post_spec-R6-2026-07-12T2300Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **Level**: 3 (Full — 十步循环统一入口的裁决逻辑 + collector 编排 + 网络行为 + 影响所有采用者的配置 + snapshot schema)
 > **Created**: 2026-07-12 | **v6 修订**: 2026-07-12 (R5 的 5 Critical + 9 Major; **新增 F10′** per owner 裁定)
@@ -636,12 +636,12 @@ OQ-B 说「保留原 `coordination_fetch` 块 origin-only 原样, 另开 `remote
 > **4 条都不在 `normalize_snapshot.py` 的 `TIMESTAMP_KEYS`/`DROP_KEYS` 名单里。**
 > 📌 **仓内已有逐字先例**: `DROP_KEYS` 的 `cached`/`age_seconds`/`refs_fetched` 注释 (v1.30.2) **明写**「TTL-based, varies between consecutive runs… Stability test requires drop」—— **同一 class 已解过一次**。
 >
-> ⚠️ **Spec C 的 §3 把根因归错了** (它说 flaky 源于 `custom_checks` 的 `failed:1→0`) —— **实测 4 条漂移键没有一条是 custom_checks** ⇒ Spec C 的修法一条都消不掉。
+> 🔬 **v7 CE 归因复验修正 (2026-07-14)**: 上表是 R5 时点的 4 条; CE 干净条件复验后**通道实数 6 条** — 补 (5) `custom_checks[issue-cache-freshness]` (**确是**通道, 条件=缓存缺失/mtime>30min; R5「无一是 custom_checks」只在新鲜热缓存条件下成立) + (6) 天数型 output 跨日界 (结构性潜伏)。⇒ Spec C 的归因**条件性正确**, 其修法可杀通道 #5 (仅此一条); 全清单与根治排序 (offline 旁路为主) 见 **tasks 12.10 (SOT)**, 本段不再复制。
 > ⚠️ **Spec B 受害最重**: 它被指定「**应先落地**」, 却既不碰 `remote_refs_age` 也不碰 `source` 也不碰网络抖动 ⇒ **它的 AC-3 (0 failed) 在自己的 PR 上结构性恒红 ⇒ Spec B 按自己的闸门无法 ship。**
 >
 > **v6 判据** (三份 Spec 统一):
 > **`0 failed`** ∧ **无既有绿测试转红** ∧ **新增测试数 = N** ∧ **baseline 既有的 1 红 (`test_two_consecutive_runs_diff_zero`) 由 <本 Spec / Spec B / Spec C> 中的哪一份消除, 必须显式声明**。
-> ⇒ **本 Spec 认领全部 4 条漂移通道** (tasks 8.4 + 12.10)。**Spec B / Spec C 的判据改为「0 failed **除** `test_two_consecutive_runs_diff_zero` (由母 Spec 消除, 见其 tasks 12.10)」** —— 否则它们无法独立 ship。
+> ⇒ **本 Spec 认领全部漂移通道 (v7 修正: 6 条, SOT=tasks 12.10)** (tasks 8.4 + 12.10)。**Spec B / Spec C 的判据改为「0 failed **除** `test_two_consecutive_runs_diff_zero` (由母 Spec 消除, 见其 tasks 12.10)」** —— 否则它们无法独立 ship。
 
 - **AC-1**: remote 不可信 + 真实落后 → `parity != "equal"` 且 **`reason == "not_refreshed"`** (显式断言走过 F1′ 路径, 防死代码 ship)。
 - **AC-2**: origin 刷新成功且 equal + github fetch 失败且真落后 → github `unknown` + **network 类 `reason`** + `overall_parity: false`。

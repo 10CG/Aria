@@ -13,12 +13,14 @@
 
 ## 最新 handoff
 
-**[2026-07-12 — state-scanner「陈旧 ref 假同步」缺陷: 发现 + Spec + post_spec R1-R4 + 拆 3 Spec](./2026-07-12-state-scanner-false-parity-spec-r4.md)**
+**[2026-07-14 — false-parity 轨接手: v7 (F10″ 重写 + D15-D17 代裁 + CE 结案) → R7 FAIL 3/3](./2026-07-14-false-parity-v7-r7-fail-d15-triple-hit.md)**
 
-- track-id: `state-scanner-stale-refs-false-parity` | phase: **A.1-postspec-R4** | status: **active**
-- 发现并实证 state-scanner (十步循环统一入口) 报**假的「已同步」** —— 本 session 自身即受害者
-  (开局报 parity=equal, 实际落后 origin/master 4 commit)
-- 核心洞察: **新鲜度不能「测量」, 只能「获取」**
-- Phase A.1 完成 + post_spec 4 轮 × 5 agent 对抗审计 (收敛单调, 待 R5)
-- 拆 3 个 Spec: 主 Spec (L3 核心机制) + secret-leak (L2, Rule #7, 先落地) + issue-cache (L2, 正交)
-- **下一步**: post_spec R5 → owner sign-off → A.2/A.3。落地顺序: Spec C → Spec B → 主 Spec
+- track-id: `state-scanner-stale-refs-false-parity` | phase: **A.1-postspec-R7** | status: **active**
+- simonfish 接手 bot 轨 (claim 带 linked_issue #110): CE 归因结案 (custom_checks 确是通道,
+  条件=缓存缺失/mtime>30min, 通道 4→6, 根治=offline 旁路为主) + 3 待裁代裁 (DEC §3c D15-D17)
+  + v7 `ed21aba` (§13 按 F10″ 重写 + AC-16/17 重述含反惯例 fixture + R6 7 Major 全折)
+- **R7 三视角 FAIL 3/3** (去重 8C/12M): D15 三中弹 (split-brain / k-rotation 脱钩 / hard_cap
+  放宽) + F10″ 定义域被真 git 证伪 (rc=129 / **no-prune 视图 = 第十次复发最强候选**)
+- **下一步**: 按 R7 聚合报告折 v8 (两个非机械点: D15′ 双角色窗 + RC-8 升格, 建议 owner 过目)
+  → R8。聚合: `.aria/audit-reports/post_spec-R7-2026-07-14-*-aggregated.md`
+- 前序: [R5/R6 + F10″ 换原语](./2026-07-12-false-parity-r5-r6-f10-primitive-swap.md) (bot)
