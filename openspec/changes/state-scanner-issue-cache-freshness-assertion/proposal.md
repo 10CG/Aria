@@ -1,6 +1,6 @@
 # Proposal: `issue-cache-freshness` 检查重定义 + snapshot `generated_at` 字段
 
-> **Status**: **Draft v2** (v1 → post_spec **R5 FAIL** [AC-3 的修法把恒红从 cache 路径搬到 live 路径 / §3 根因归错 / 0-failed 假前提] → **v2: AC-3 单边化 + §3 撤回 + AC-5 豁免**) → 待 post_spec **R6**
+> **Status**: **Draft v3** (v1 → R5 FAIL → v2 [AC-3 单边化 + §3 撤回 + AC-5 豁免] → **v3 2026-07-14: §3 的撤回按 CE 归因复验条件性反转** — custom_checks 确是漂移通道之一 [缓存缺失/mtime>30min 条件下], v1 归因条件性正确; 但 flaky 整体消除仍归母 Spec 12.10 [实测共 6 通道, 本 Spec 修法只杀其一]) → 待 post_spec **R6**
 > **Level**: 2 (Minimal — 单一关注点: 一个 custom check 的断言重定义 + 一个 additive schema 字段)
 > **Created**: 2026-07-12
 > **Source**: `state-scanner-stale-refs-false-parity` 的 R1/R2/R3 发现; 经 owner 决策**拆出独立 Spec** —— 与 parity 机制**零代码路径重叠** (5/5 agent 一致建议)
@@ -69,7 +69,13 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 - 它从「1.13 跑没跑的外部反向证据」变成「1.13 **在本次 scan 内**是否产出了新鲜结果」—— 语义更准确, 且**可在健康常态下 pass、在真故障时 fail**。
 - 更新该 check 的 `description` (它不再是「外部反向证据」)。
 
-### 3. ❌ **~~消除既有 flaky 测试~~ — v2 撤回: 根因归错了** (R5-C-E, owner 实测)
+### 3. ⚠️ **消除既有 flaky 测试 — v3 修正: v1 归因条件性正确, 但只是 6 条通道之一** (R5-C-E → CE 归因复验 2026-07-14 结案)
+
+> 🔬 **v3 (CE 复验, 干净条件 5 组对照)**: `custom_checks` **确是**漂移通道 — 触发条件 = issues.json **缺失或 mtime>30min** (v1 说的 cache>30min 场景**成立**); 新鲜热缓存下不触发 (R5 的观察在那个条件下也对)。R5 与 R6 的矛盾根源 = **缓存新鲜度这个隐藏变量**。
+> ⇒ v1 的归因**条件性正确**, v2 的全称撤回 (「无一是 custom_checks」) **过强, 收回**。
+> ⇒ 但 v2 的**结论**保留: 实测共 **6 条**漂移通道, 本 Spec 的修法只能杀 custom_checks 这一条 ⇒ **仍不声称消除该 flaky 测试** — 整体消除归母 Spec tasks 12.10 (offline 旁路为主)。
+
+<details><summary>v2 原撤回文 (保留溯源; 其全称否定已被 CE 复验推翻)</summary>
 
 > 🔴 **v1 声称**: `test_two_consecutive_runs_diff_zero` 的 flaky 源于 `custom_checks` 的 `failed:1 → failed:0` (cache > 30min 时 run1 红 run2 绿), 且**本 Spec 的修法能从根上消除它**。
 >
@@ -90,7 +96,9 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 > **根因同一**: 该「稳定性测试」**跑的是真 scan 打真网络** —— 两跑之间的网络/TTL/缓存状态本来就会变。**4 条都不在 `normalize_snapshot.py` 的 `TIMESTAMP_KEYS`/`DROP_KEYS` 名单里。**
 
 **v2 裁定**:
-- **本 Spec 的修法 (`generated_at` + 重定义 check) 一条漂移通道都消不掉** ⇒ **不再声称能消除该 flaky 测试**。
+- ~~本 Spec 的修法一条漂移通道都消不掉~~ (v3 修正: 能消掉 custom_checks 这一条) ⇒ **仍不声称消除该 flaky 测试** (只杀 6 之 1)。
+
+</details>
 - **该测试由母 Spec 认领消除** (母 Spec tasks **12.10**, 4 条通道全认领)。
 - **本 Spec 的 AC-5 显式豁免它** (否则本 Spec 结构性无法 ship)。
 
@@ -106,7 +114,7 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 | schema | 顶层 `generated_at` (additive, 不 bump version) |
 | 下游收益 | **m7-fleet-aggregation** 的 CAVEAT-age 可以从「文件 mtime 兜底」升级为「权威字段」 |
 | collector 顺序 | **不改** (与母 Spec 解耦的关键) |
-| 既有测试 | ❌ **v2 撤回** —— 本 Spec **消不掉** `test_two_consecutive_runs_diff_zero` 的 flaky (实测 4 条漂移通道无一是 `custom_checks`)。由**母 Spec tasks 12.10** 认领 |
+| 既有测试 | ⚠️ **v3**: 本 Spec 的修法可消除 custom_checks 这**一条**漂移通道 (CE 复验: 它确是通道, 条件=缓存缺失/mtime>30min), 但整体 flaky 共 **6 条**通道, **仍由母 Spec tasks 12.10 认领消除** (offline 旁路为主) |
 | 采用者 | `issue-cache-freshness` 从恒红变为有意义的信号 |
 
 ---
@@ -154,7 +162,7 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
   > **这是母 Spec v6 新增的「对偶验收」机械闸的实例**: **每条 AC 必须同时给出「健康常态必 PASS」+「真故障必 FAIL」两个 fixture。**
   > **AC-2「防恒绿真空」已经是这个形状 —— v1 只是没有对称地把它应用到 AC-3, 于是 AC-3 制造了新恒红。**
 
-- **AC-4 (~~稳定性测试转确定性~~)** 🔴 **v2 撤回** (见 §3): 本 Spec **不再声称**能消除 `test_two_consecutive_runs_diff_zero` 的 flaky —— 实测的 4 条漂移通道**没有一条是 `custom_checks`**, 本 Spec 的修法**一条都消不掉**。**该测试由母 Spec tasks 12.10 认领。**
+- **AC-4 (~~稳定性测试转确定性~~)** ⚠️ **v3 措辞修正** (见 §3): 本 Spec **不声称**消除 `test_two_consecutive_runs_diff_zero` 的 flaky (CE 复验: custom_checks 确是 6 条通道之一且本 Spec 可杀之, 但其余 5 条不在本 Spec 射程)。**该测试由母 Spec tasks 12.10 认领。** 本 Spec 的可验收面改为: 修后 custom_checks 通道单独不再翻转 (冷缓存双跑 `custom_checks.*` 路径 diff=0)。
   > v1 的两个前置条件 (「cache 陈旧」/「cache 新鲜」) **钉错了轴** —— 真正的决定因子是 **FETCH_HEAD 热度 + issue-cache 热度 + 网络抖动**。
 
 - **AC-5 (无回归)** 🔴 **v2 修正 baseline 假前提 (R5-C-E)**:

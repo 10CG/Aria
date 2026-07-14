@@ -1,4 +1,4 @@
-# Tasks: state-scanner 陈旧 ref 假同步修复 (v6 — 核心机制 + F10′ 数据生成层)
+# Tasks: state-scanner 陈旧 ref 假同步修复 (v7 — 核心机制 + F10″ 跨仓可达性层; R6 7 Major 折入 + D15-D17)
 
 > **Spec**: [proposal.md](./proposal.md) | **Level**: 3
 > **Status**: Draft v6 (v1→R1→v2→R2→v3→R3→v4→R4→v5→**R5 FAIL [公式的上游数据不存在]**→**v6 + F10′**; 待 **R6** 收敛 → A.2/A.3 lock)
@@ -46,10 +46,15 @@
 
 ### 🆕 v6 红测试 (R5 的 5 个 Critical 各配一条; **每条成对给「健康必绿」+「故障必红」两个 fixture**)
 
-- [ ] 2.15 🔴 **AC-16 (F10′ 正向 — 本 Spec 的存在理由, R5-C-A)**: detached-HEAD 子模块 + 其 github 镜像**真实落后** ⇒ 该 remote `parity == "behind"` (**不是 `unknown/detached_head`**) ⇒ `overall_parity` **必须 false**。
-      **fixture = 今天的活体现场**: `standards` gitlink `79b7cd6` / origin `79b7cd6` / github `9df1722` (落后 2 commit)。
-      ⚠️ **未修改代码上必须 RED** —— 今天它跑出 `overall_parity: true` (**这就是本 Spec 要杀的 bug 在 v5 公式下原样存活的证据**)
-- [ ] 2.16 🆕 **AC-17 (F10′ 对偶 — 防 F10′ 自己过冲成恒红)**: detached-HEAD 子模块 + 其全部 remote **真的 equal** ⇒ `overall_parity` **必须 true** (子模块**提供正证据**, 而非仅「不阻断」)。本仓 dogfood (镜像修复后 `standards`/`aria-orchestrator` 两 remote 已全部一致)
+- [ ] 2.15 🔴 **AC-16 (F10″ 正向 — 本 Spec 的存在理由; v7 按 D14 重述)**: 主仓在 R 上**已发布** commit 引用的子模块 gitlink 在该子模块的 R 上**不可达** ⇒ `gitlink_orphaned(R) == true` ⇒ blocking ⇒ `overall_parity` **必须 false** + `multi_remote_drift` 给出 `git -C S push R <branch>` 修复建议。
+      **fixture = 2026-07-12 活体事故态**: 主仓 github/master=`dfb3118` 引用 `standards@79b7cd6`, standards 的 github 只到 `9df1722` (G 不可达)。
+      ⚠️ **未修改代码上必须 RED** (事故当天 scanner 报 `overall_parity: true`)。
+      ⚠️ fixture 断言**不触碰 parity**: 该场景 git 算出 `ahead`, AC-8 照旧非阻断 — 两者必须同时成立 (F10′ 互斥教训)
+- [ ] 2.16 🆕 **AC-17 (F10″ 对偶 — 防过冲成恒红; v7 按 D14 重述, 四分支)**:
+      **(a)** 已发布 gitlink 全 remote 可达 (detached-HEAD 子模块) ⇒ 不阻断; 本仓 dogfood 镜像修复后态
+      **(b)** 本地 HEAD 领先 (新 gitlink 未发布) ⇒ **零误报** (F10″ 只看已发布 C)
+      **(c)** 🔴 **反惯例 fixture**: 子模块默认分支叫 `trunk` (非 master/main) 且 `refs/remotes/R/HEAD` 不存在 ⇒ 正反两向仍正确 — **锁死零分支名假设** (R6-C-2 + 「本仓 dogfood 不是 authority」教训: 本仓三子模块恰好全叫 master, 结构上测不出命名依赖)
+      **(d)** pin 住旧 commit 但可达 ⇒ 不报警 (R6-M-4)
 - [ ] 2.17 🆕 **AC-14 (`has_unreachable_remote` fail-CLOSED — 防第六次复发, R5-C-B)**: 分类器返回 **catch-all** (`other`/`unknown`/`git_error`) ⇒ `has_unreachable_remote` **必须 true**。
       **fixture 注入 owner 实测的真实 stderr** (今天全部落 `other`): `Failed to connect to <host> port 443` / `gnutls_handshake() failed` / `Permission denied (publickey)`。
       **对偶**: `fetch_ok == "not_attempted"` (deadline 砍掉) ⇒ **必须 false** (我们没试 ≠ 对方不可达)
@@ -80,6 +85,8 @@
       **若 fetch 顺序固定 ⇒ deadline 每次砍掉同一批靠后的 leg ⇒ 它们的 `fetched_at` 永远推不进 ⇒ 恒 blocking 且永不翻身。**
       🔴 **这才是 C-C「大仓恒红」的真正根因 —— 不是分桶, 是饥饿。** (v6 起草时误诊为分桶问题, 差点用「归 benign」这个假绿方案去治它。)
 - [ ] 3.5c 🆕 **advisory-only 覆盖率信号** (**不进裁决层**): `remote_refresh.skipped_count` + `skipped_remotes[]`; 输出区块提示「本次有 N 条 remote 未刷新 (预算用尽) —— 调大 `refresh_deadline_seconds` 或收窄 `enforced_remotes`」
+- [ ] 3.5d 🆕 **永久失败 leg 退避 (v7 — R6-M-2)**: per-leg 持久化 `consecutive_failures`; `fetch_ok=false` 连续 n 次 ⇒ 之后 2^n 次 scan 跳过该 leg (cap 8), 成功即清零。被退避跳过 = `fetch_ok="not_attempted"` (裁决权照常归 `可信(r)`, 过期则 blocking — **退避不豁免诚实**) + advisory 列入 `skipped_remotes[]` 并标 `backoff`。
+      > 无退避 ⇒ 吊销的 deploy key 恒在防饥饿队首 (`fetched_at` 最老) ⇒ 每次 scan 白烧同 host 预算, 挤占健康 leg。
 - [ ] 3.6 snapshot 记 per-remote `{fetched_at, fetch_ok, error_kind}`。`error_kind` **复用姊妹 Spec B 的分类器** (枚举, 永不含 stderr 原文)
 - [ ] 3.7 **`fetched_at` 只在 Fetch 1 真成功刷新时推进** —— stale-serve/degraded (`coordination_fetch.py:379-390` 现返回 `cached:True` + 任意陈旧 `last_fetch_at`) **不得**推进
 - [ ] 3.8 **TTL 命中时逐 remote replay** per-remote map (现 cache schema 只有 3 个标量键, **无 per-remote 结构**)
@@ -88,6 +95,11 @@
 - [ ] 3.11 **SKILL.md 写死可关闭性契约**: 「关闭 `remote_refresh` ⇒ 所有 parity 变 unknown」
 - [ ] 3.12 fetch 结果缓存**原子写** (tmp+rename) —— 它现在承载**裁决输入**
 - [ ] 3.13 **跨进程同仓并发** (两个终端同时 scan) 写明为**已知可接受降级**: 依赖 git 自身 ref lock; 争用 ⇒ `fetch_ok=false` ⇒ 降级 unknown (**假红方向, 可接受**)。否则 dogfood 时会被当 bug 追
+- [ ] 3.14 🆕 **三态→旧 bool shim 映射写死 (v7 — R6-M-3)**: 旧 `coordination_fetch.success` (bool) **:= (fetch_ok == true)** — 保守方向, `not_attempted` 映射 false。**同时更新插件内消费者 `track_board.py` 改读三态**: `⚠离线` 仅在 `fetch_ok == false` 触发, `not_attempted` 渲染为「未刷新」而非离线 (防假警报 — bool shim 的 false 有两种语义, 内部消费者必须用三态区分)。映射表配 lock 测试 (3 态 × 2 消费面 = 6 格全断言)。
+- [ ] 3.15 🆕 **#141 two-fetch 保留声明 (v7 — R6-M-7)**: `remote_refresh` 对 origin 的 coordination orphan-ref fetch (Fetch 2) **独立于 branch-refs (Fetch 1), 不合并**; F6′「一次往返」量词只作用于 branch-refs 层 (见 proposal F6′ v7 精化)。测试: mock `_run` 断言 origin 恰好 2 次 fetch (branch + coordination)、非-origin 恰好 1 次。
+- [ ] 3.16 🔍 **`可信(r)` 窗改代际制 (v7 — D15, R6-M-1; R7 重点审)**: cache 持久化全局 `scan_generation` 计数器 + per-leg `generation_fetched`; `可信(r) := fetched_at ≠ null ∧ (scan_generation − generation_fetched) ≤ k (默认 3) ∧ (now − fetched_at) ≤ hard_cap (默认 7d)`。generation 字段缺失 (旧 cache) ⇒ 视同 null ⇒ ¬可信 (fail-CLOSED)。
+      > **为什么**: wall-clock 300s 窗预设 daemon 连跑; scanner 是事件驱动, 60 腿仓 + 小时级 scan 间隔 ⇒ 全腿恒窗外 ⇒ 恒红 (R6-M-1)。代际窗下防饥饿队列保证 ≤⌈legs/预算⌉ 代全腿必刷 ⇒ 稳态不恒红; hard_cap 防「数月未 scan ⇒ 代际新鲜但墙钟古老」的陈旧证据假绿回流。
+      > **AC-15 语义不变** (窗内/窗外判据照旧), 只换窗的定义; AC-15 fixture 补一组: 60 腿模拟 3 次 scan 轮转后全腿可信 (不恒红) + 单腿 8d 未刷 (hard_cap) ⇒ 照常 blocking。
 
 ## 4. F1′ — 两个正交轴
 
@@ -133,7 +145,8 @@
       - **姊妹 Spec B 分类器的兜底值** `unknown` / `git_error` / `permission_denied` / `timeout` —— backend-architect 用**真实 `git fetch` 连接失败**复现: 其 stderr **一个已知 pattern 都没中** ⇒ 落 catch-all ⇒ 按正向枚举**不阻断**
       ⇒ **同一不变量的第五次复发**。**教训: 「把不变量写进文档」≠「把它写进兜底默认值」。**
 - [ ] 5.1c 🆕 **机械防漏格 pin 测试** (把「逐格填」从纪律变成机制): 构造一个**代码里不存在的** reason 值 ⇒ **必须阻断**。断言公式实现走 `¬benign` 兜底而非正向 blocking 枚举
-- [ ] 5.1d 🆕 **谓词定义域横扫闸 (v6 新增 — 防第八次复发)**: 断言 **proposal.md §谓词定义域横扫表的谓词集合** 与 **Spec 正文中出现的谓词集合** 逐字相等。新增谓词而不登记 ⇒ 检查失败。
+- [ ] 5.1d 🆕 **谓词定义域横扫闸 (v6 新增; v7 按 D16 落位)**: 横扫表 **SOT 搬 aria-plugin** (`skills/state-scanner/references/predicate-domain-table.md`), 主仓 proposal §横扫表保留为审计快照 (表头注明 SOT=插件侧)。**机械 lock 测试** (插件 unit test): 断言 multi_remote/sync 代码中出现的布尔谓词集合 ⊆ 表中登记集合; 新增谓词不登记 ⇒ 测试失败。
+      > **D16 理由**: 表在主仓则插件测试结构性读不到 (R6-M-5); review checklist 被否 — 9 次复发史证明纪律不守恒, 机制才守恒。
       > **R5 元教训**: R4 把「类修不能点修」**只点修在 `blocking_unknown` 上**, 没横扫「还有哪些谓词是正向枚举 / 定义域不完整」⇒ **第六次复发在 `has_unreachable_remote`** (4.1), **第七次在 `可信` 的 null** (4.2)。横扫**当场又抓出** `has_unpublished_branch` **被引用 4 次却从未定义** (5.4) —— **前五轮 25 个 agent-round 无人发现**。
       > ⇒ **把「类修」从纪律变成机制。**
 - [ ] 5.2 **公式** (⚠️ `∀` 里**没有**独立的 `可信(r)` 项):
@@ -206,15 +219,18 @@
 - [ ] 12.2 🔴 **无回归 (v6 修正 baseline 假前提 — R5-C-E)**: `run_tests.py` → **0 failed** ∧ 无既有绿测试转红 ∧ 新增测试数 = N。
       ⚠️ **baseline 不是 0 failed** —— owner 连跑两次实测 (未修改代码 `0964496`): `Ran 1006 tests ... FAILED (failures=1)`, 失败的是 `test_two_consecutive_runs_diff_zero`。
       ⇒ **本 Spec 认领消除它** (见 12.10)。**Spec B / Spec C 的判据改为「0 failed **除** 该测试 (由母 Spec 消除)」** —— 否则 **Spec B (被指定应先落地) 按自己的 AC-3 结构性无法 ship**
-- [ ] 12.10 🆕 **消除 `test_two_consecutive_runs_diff_zero` 的 4 条漂移通道 (v6 新增 — R5-C-E)**:
+- [ ] 12.10 🆕 **消除 `test_two_consecutive_runs_diff_zero` 的漂移通道 (v6 新增 — R5-C-E; v7 按 CE 复验实测修正: 4 条 → 6 条, 见下补充)**:
       | # | 漂移键 | 根因 | 修法 |
       |---|--------|------|------|
       | 1 | `remote_refs_age` | `sync.py:396/405` 读 FETCH_HEAD mtime; **scan 自己的 Phase 1.16 会改写 FETCH_HEAD** | 已由 8.4 覆盖 (F3′ 后恒 "1m" ⇒ 废弃/删除) |
       | 2 | `issue_status.repos[].source` | `issue_scan.py:822` cache 命中返 `"cache"` / live 返 `"live"` (900s TTL 两跑间翻转) | 加入 `normalize_snapshot.DROP_KEYS` |
       | 3 | `coordination_fetch.degraded` / `degradation_reason` | 真实网络抖动 ⇒ 一跑降级一跑不降级 | 加入 `DROP_KEYS` |
       | 4 | `errors[]` 数组 | 同上 soft error 时有时无 | 按 collector 归一 (或与 9.7 的 offline 旁路合并解决) |
+      🔴 **数组/嵌套键粒度 (v7 — R6-M-6)**: `DROP_KEYS` 现按**键名全局**丢弃 — 对 `errors[]`/`source` 这类**多处出现**的键会连承重字段一起误伤 (如 handoff.latest_source 与 issue_status.repos[].source 同名不同义)。⇒ drop 规则必须**带路径限定** (JSONPath 式, 如 `issue_status.repos[*].source`), 数组元素按 (collector, kind) 匹配归一而非按 index; 加反向测试: drop 后承重字段 (如 `latest_source`) 仍在。
       📌 **仓内已有逐字先例**: `DROP_KEYS` 的 `cached`/`age_seconds`/`refs_fetched` 注释 (v1.30.2) **明写**「TTL-based, varies between consecutive runs… Stability test requires drop」—— **同一 class 已解过一次, 别再原样引入**
-      ⚠️ **Spec C 的 §3 把根因归错了** (它说 flaky 源于 `custom_checks` 的 `failed:1→0`) —— **实测 4 条漂移键没有一条是 custom_checks**
+      🔬 **v7 CE 归因复验 (2026-07-14, 干净条件 + 冷/热/陈旧 5 组对照, 结案)**: **custom_checks 确是漂移通道 — 但条件限定** (issues.json **缺失或 mtime>30min** 时触发; 新鲜热缓存 <15min 下不是)。R5「无一是 custom_checks」与 R6「冷缓存复现」**都对, 各自在不同缓存态观察** — 矛盾根源是缓存新鲜度这个隐藏变量。⇒ v6 本行原写的「Spec C §3 归因错」**撤回**, Spec C 的归因是**条件性正确** (其修法可杀通道 #1, 但仅此一条 — flaky 整体消除仍归本任务)。
+      **v7 通道清单修正 (4→6)**: 上表 4 条外补: (5) `custom_checks.results[issue-cache-freshness].{status,output}` + `custom_checks.{passed,failed}` — 缓存缺失/mtime>30min, 4 路径 (CE 实测; scan.py Phase 1.11 先于 1.13 执行、check 读 mtime 而 1.13 随后重写缓存 = 机制级确认); (6) 结构性潜伏 — custom_checks 天数型 output 跨午夜日界翻转 + 缓存恰跨 30min 边界的热态时间窗。
+      🔴 **根治手段排序 (CE 数据裁定)**: **主 = 9.7 offline 旁路** (两次 scan 钉在同一冻结环境态, 一次封死全类) — 因为 (a) custom_checks 的 `output`/`status` 是**契约字段**, 测试 `test_rule_4_output_NOT_scrubbed` 明确 pin 住不许 scrub ⇒ **DROP_KEYS 结构性不可用于通道 #5**; (b) 6 通道共性 = 环境状态依赖, 通道数随 check 数线性涨, 逐条 DROP 是打地鼠。DROP_KEYS 仅作通道 #2/#3 的辅助。
 - [ ] 12.3 处理会机械性破裂的既有测试: `test_local_refs_stale_flag` / `test_scan_with_two_remotes_local_refs` / `test_full_main_repo_flow_with_config_overrides`
 - [ ] 12.4 **AC-3**: mock `_run` 断言「每个 (repo,remote) 恰好 fetch 一次」(**集合/计数不变量, 非 strict order** —— 真并行下调用序由线程调度决定)
 - [ ] 12.5 **dogfood (本仓)**: `aria` 子模块 detached-HEAD + 全 remote 真 equal ⇒ `overall_parity` **仍 true** (AC-17); **`standards` / `aria-orchestrator` 的 github 镜像若落后 ⇒ 必须报出来** (AC-16); `sync_status` 与 `tracks_multibranch` 不再自相矛盾
@@ -224,13 +240,33 @@
 - [ ] 12.8 版本 bump + 5 处 SOT 同步 + 主仓 badge
 - [ ] 12.9 释放 track claim
 
-## 🔴 13. ~~F10′ — detached-HEAD 仓库的 commit-based parity~~ **SUPERSEDED (R6 证伪) — 勿实施**
+## 🔴 13. F10″ — orphaned-gitlink 跨仓可达性 (v7, 按 D14 重写; 取代已证伪的 F10′)
+
+> **不变量**: 主仓在 R 上**已发布**的 commit 引用的每个子模块 gitlink, 必须在该子模块的 R 上**可达** — 否则 `clone --recursive` from R 断裂 (2026-04-10 + 2026-07-12 两次真实事故形态)。**完全不经 parity 表达** (F10′ 教训: 该事故在 git 眼里是 `ahead`, 与 AC-8 互斥)。
+
+- [ ] 13.1 🔴 **`gitlink_orphaned(R)` 实现** (multi_remote.py 新函数, per-remote per-submodule):
+      ```
+      C = git rev-parse refs/remotes/{R}/{main_branch}     # main_branch = 主仓当前分支名 (scan 已知, 非猜测)
+      G = git rev-parse {C}:{submodule_path}               # 已发布 commit 里的 gitlink
+      reachable = git -C {S} branch -r --contains {G} --list "{R}/*" 非空
+      orphaned(R,S) = ¬reachable ∧ ¬shallow(S) ∧ 可信(S 的 R leg)
+      ```
+      **主仓侧基准分支零猜测**: 用主仓 scan 的 `current_branch` (如 master); `refs/remotes/R/{current_branch}` 缺失 ⇒ 该 R 上无已发布基准 ⇒ **skip 并记 `no_published_ref`** (属 has_pending_push 家族, 非 orphan; 不猜 HEAD/main)
+- [ ] 13.2 🔴 **定义域五分支逐一落位** (横扫表 v7 行为 SOT, 5.1d 闸校验):
+      C 缺失 ⇒ skip+可见 / G 解析失败 (path 非 gitlink) ⇒ soft-error 可见 / S 未 init ⇒ skip+`uninitialized` / shallow(S) ⇒ **unknown (benign 可见, 非阻断)** / S 的 R leg ¬可信 ⇒ **`unverified` — 不判 orphaned** (陈旧 remote-tracking refs 上跑 contains 会假阳: gitlink 可能在上次 fetch 后才推上去)
+- [ ] 13.3 **裁决接线**: `gitlink_orphaned(R) == true` ⇒ 进 F4′ **blocking** ∀ 子句; `multi_remote_drift` 建议文案「主仓在 R 上引用的子模块 commit 在 R 上不存在 — 从 R clone --recursive 会断裂。修法: git -C S push R <branch>」
+- [ ] 13.4 **新 reason 枚举登记**: `gitlink_orphaned` (blocking) / `no_published_ref` / `uninitialized` / `shallow_unverifiable` / `orphan_unverified` — F4′ 裁决表 + schema doc enum + 横扫表 (5.1d)
+- [ ] 13.5 **依赖 F3′ 新鲜度**: contains 判定读的是**本地 remote-tracking refs** — 只有 F3′ fetch 后才反映远端现实; leg ¬可信 ⇒ 13.2 的 unverified 分支 (与 D15 代际窗联动)
+- [ ] 13.6 ⚠️ **行为变更公示 (CHANGELOG 显著标注)**: 事故形态 (镜像缺 gitlink) 下 `overall_parity` 从 `true` 变 **`false`** — 有意, 即本 Spec 存在理由; parity 语义 (含 `ahead` 非阻断) **零变更**
+- [ ] 13.7 **性能**: contains 检查纯本地 (无网络), per (R,S) 一次 `branch -r --contains`; 60 腿仓 ≤ 秒级 — 落 §承重性能实测 附表
+- [ ] 13.8 **golden fixture 重新采集** (`tests/fixtures/reference-snapshot-aria.json` 采自事故现场, F10″ 下该现场应报警 — 必须换镜像修复后的健康态重采, 并另存事故态为 AC-16 fixture)
+- [ ] 13.9 **AC-16/AC-17 四分支 fixture 见 2.15/2.16** (含反惯例 trunk 分支 fixture — 锁零分支名假设)
+
+### ~~F10′ 原方案~~ **SUPERSEDED (R6 证伪) — 勿实施, 保留仅供溯源**
 
 > 🔴 **R6 三方独立证伪**: F10′ 要修的事故在 git 眼里是 **`ahead`** 不是 `behind` (`rev-list --left-right` → `2 0`), 而 `ahead` 的非阻断性被 **AC-8/D7 + golden fixture + AB rubric** 三重锁死 ⇒ **F10′ 上线后 `overall_parity` 仍是 `true`**。
 > 另有 C-2 (`{HEAD,master,main}` 是又一个正向枚举; 实测三个子模块的 `refs/remotes/github/HEAD` **全不存在**) + C-3 (伪码丢了 shallow 守卫) + M-4 (pin 住的子模块恒红)。
->
-> ✅ **owner 裁定: 换原语 → F10″ (orphaned-gitlink 可达性), 实测已验。** 设计见 [proposal.md §F10″](./proposal.md); 证据见 [R6 报告](../../../.aria/audit-reports/post_spec-R6-2026-07-12T2300Z-state-scanner-stale-refs-false-parity-aggregated.md)。
-> **v7 待办**: 本节 (13.1-13.8) 按 F10″ 重写; 2.15/2.16 (AC-16/AC-17) 按 F10″ 重述。
+> ✅ **owner 裁定: 换原语 → F10″ (见上)。** 证据: [R6 报告](../../../.aria/audit-reports/post_spec-R6-2026-07-12T2300Z-state-scanner-stale-refs-false-parity-aggregated.md)。
 
 ### ~~以下为 F10′ 原任务, 保留仅供溯源~~
 

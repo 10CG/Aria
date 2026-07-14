@@ -1,6 +1,6 @@
 # DEC-20260712-001 — state-scanner 陈旧 ref 假同步 (parity false-green)
 
-> **状态**: **v7 (2026-07-12)** — post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
+> **状态**: **v8 (2026-07-14)** — v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
 > **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 R1 的 3C + 12M/m) | **v6 修订**: 2026-07-12 (折入 R2-R5; **R5 的 5 Critical + F10′ 裁定**)
 > **审计轨迹**: [R1+R2](../../.aria/audit-reports/post_spec-R1-R2-2026-07-12T1850Z-state-scanner-stale-refs-false-parity-aggregated.md) → [R3+R4](../../.aria/audit-reports/post_spec-R3-R4-2026-07-12T2000Z-state-scanner-stale-refs-false-parity-aggregated.md) → [**R5**](../../.aria/audit-reports/post_spec-R5-2026-07-12T2230Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **触发**: 本 session 亲历 — `/state-scanner` 开局报 `parity=equal / overall_parity=true`, 实际本地落后 `origin/master` **4 个 commit** (双子星并发 session 已 ship v1.56.0 + v1.56.1)。
@@ -203,6 +203,14 @@ phase1_gate.py --raw-track-id state-scanner-stale-refs-false-parity --phase A.1 
 > 🔴 **D7 的盲区 (R6 揭出, 但 D14 使其不必重开)**: D7 的理据「本 Spec 修的是**落后时假绿**, 不是**领先时假红** (领先不会导致重复劳动)」—— **这句话对 mirror remote 是错的**。领先 github 恰恰就是危害本身 (镜像陈旧 / `clone --recursive` 断裂 / 市场版本滞后)。**今天的事故 + CLAUDE.md 记的 2026-04-10 事故, 都是「领先」形态。**
 > **但 D14 换原语后, D7 不必重开** —— F10″ 用可达性而非 parity 表达该不变量, 两者正交。
 > **元教训**: v6 修 R5-m-1 时, owner 让**理据**去迁就**公式** (`ahead ⇒ true`)。而 v5 原本的理据 (「有未推送 commit 确实不是已同步的」) 对 mirror 才是对的。⇒ **当理据与公式矛盾时, 不要默认公式是对的; 先问「这个矛盾在保护什么」。**
+
+### §3c v8 裁决 (2026-07-14, R6 的 3 条 owner 待裁 — **代裁**: owner /goal「1+2 都做」授权, spec approval 时 owner 终审; R7 重点复核)
+
+| ID | 裁决 | 理由 |
+|----|------|------|
+| 🔍 **D15** | **M-1 大仓恒红 → `可信(r)` 的窗从「wall-clock 300s」改为「scan 代际 + wall-clock 硬上限」双条件**: `可信(r) := fetched_at ≠ null ∧ generation_age(r) ≤ k (默认 3 次 scan) ∧ (now − fetched_at) ≤ hard_cap (默认 7d)` | 三个原选项皆有硬伤: (a) 窗随 leg 数自适应 — staleness 容忍度与仓库大小无原理关联; (b) 放弃 deadline — 60 腿仓 scan 墙钟无上界; (c) 裸接受 — 恒红照旧。**根因**: wall-clock 窗预设了 daemon 式连续运行, 而 scanner 是**事件驱动**的 — 它只在 scan 时刻获得新知, 「新鲜度」的自然单位是 **scan 代际**而非秒。防饥饿队列 (D11) 保证 ≤⌈legs/预算⌉ 代内全腿必刷 ⇒ 稳态下全腿代际 ≤3 ⇒ 不恒红; hard_cap 7d 防「两次 scan 相隔数月 ⇒ 代际新鲜但墙钟古老」的陈旧证据假绿回流 (违反形态 #2 的回流口)。**实现**: cache 持久化 scan generation 计数器 + per-leg `generation_fetched`。⚠️ **本条改 `可信(r)` 核心定义 — R7 必须重点对抗审查** (第十次复发候选位) |
+| **D16** | **M-5 谓词横扫表 → 搬 aria-plugin** (`skills/state-scanner/references/predicate-domain-table.md`) **+ 机械 lock 测试** (unit test 断言 multi_remote/sync 引入的每个布尔谓词在表中登记); 主仓 proposal 保留副本仅作审计快照, 表头注明 SOT=插件侧 | 二选一里「review checklist」被否: 本轨 9 次复发史证明纪律性检查不守恒, 机制才守恒 (D9 同理)。表在主仓则插件 unit test 结构性读不到 (R6-M-5 的原始发现) ⇒ 唯一能机械化的位置是插件内 |
+| **D17** | **OQ-F 转正: `verify_mode: ls_remote` 退役** (删除 scanner 内 ls-remote 平行校验路径, 单一计算路径 = F3′ fetch + local_refs) ; ship 前强验需求由 **C.2.5 gate 的独立一次性 ls-remote 校验脚本**承载 (在 phase-c-integrator, 不在 scanner) | 平行计算点是本 Spec 病灶家族 (F9′ sync.py 平行点同因); scanner 内双路径 = 语义漂移温床。「ship 前要直接问远端」是真需求, 但属 gate 场景 (一次性、可慢、可失败即阻断), 与 scanner 的常态扫描 (预算内、fail-soft) 是两种契约, 分开各自最优 |
 
 > ⚠️ **v1 的两条决策已被实证推翻, 此处留痕**: 「F1+F2+F3+F4 全包」与「`warn_after_hours` 24→1」—— **前提不成立** (R1: age 是 repo 级, `age≈0` 对**所有** remote 都不触发; 阈值降到 **3.6 秒**都救不回 github)。
 
