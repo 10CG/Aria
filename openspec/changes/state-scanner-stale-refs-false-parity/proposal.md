@@ -1,6 +1,6 @@
 # Proposal: state-scanner 陈旧 ref 假同步修复 — 「新鲜度靠获取, 不靠测量」
 
-> **Status**: **Draft v8** (2026-07-14: R7 全部 8 Critical + 12 Major + 10 minor 折入 — D15′ 双角色谓词 [证据资格 1h / 豁免资格 k_eff+7d, DEC §3d] 全量落位 [F1′/F3′/F4′/OQ-D/横扫表/AC-15/tasks 3.5/3.16/4.2] + k_eff 收敛不等式 + Fetch1 --prune + §13 八分支 + gitlink_integrity 独立结构 + D18 时限升级 + D19 Spec C lag-1; 聚合报告 `.aria/audit-reports/post_spec-R7-2026-07-14-*-aggregated.md`) → **待 R8** (窄范围: D15′ 对抗 [第 11 次复发候选位] + RC 修复文本核验 + RM 抽查)
+> **Status**: **Draft v8** → 🔴 **R8 FAIL 3/3** (2026-07-14; 去重 4C/14M/15m, 聚合 `.aria/audit-reports/post_spec-R8-2026-07-14-state-scanner-stale-refs-false-parity-aggregated.md`)。**收敛显著**: R7 20 条中 15 条三方确认落地扎实, 三方一致「D15′ 轴对, 不换轴」。**v9 待办**: 🔴 8C-1 裁决点 (equal 三档 E∧¬X 守卫重叠格 — 两审计 agent 修法方向相反 [¬X 优先偏红 vs E 优先偏绿], **建议 owner 裁**) + 8C-2 stale_unverified 载体钉死 (evidence_grade 独立字段) + 8C-3 k_eff 分母 per-host + 8C-4 lag-1 第四冻结面 + 14M 机械修 (含 可信 引用清扫 ≥6 处 + 5.1d 闸加守卫互斥/退役谓词零引用两维度) + Spec C v5 (迁移态/AC-4 任务链)。
 > ⚠️ **F10′ 已被 R6 证伪, 勿按其伪码实施** —— 见下方 §F10′ 的 🔴 SUPERSEDED 批注 + [R6 报告](../../../.aria/audit-reports/post_spec-R6-2026-07-12T2300Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **Level**: 3 (Full — 十步循环统一入口的裁决逻辑 + collector 编排 + 网络行为 + 影响所有采用者的配置 + snapshot schema)
 > **Created**: 2026-07-12 | **v6 修订**: 2026-07-12 (R5 的 5 Critical + 9 Major; **新增 F10′** per owner 裁定)
