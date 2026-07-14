@@ -1,6 +1,6 @@
 # Proposal: state-scanner snapshot 裸 stderr 泄露收口 (Rule #7)
 
-> **Status**: **Draft v2** (v1 → post_spec **R5 FAIL** [三处词表互斥无裁定 / tasks 未跟 §正文 / 0-failed 假前提] → **v2: OQ-B1+OQ-B2 已裁 + tasks 同步 + AC-3/AC-4 可满足化**) → 待 post_spec **R6**
+> **Status**: **Draft v2** (v1 → post_spec **R5 FAIL** [三处词表互斥无裁定 / tasks 未跟 §正文 / 0-failed 假前提] → **v2: OQ-B1+OQ-B2 已裁 + tasks 同步 + AC-3/AC-4 可满足化**) → 待 post_spec **R6** *(簿记注 2026-07-14: 母 Spec 已行至 R9; 本 Spec 自身仍待其独立 post_spec 轮 — 落地顺序 C→B→主 不变)*
 > **Level**: 2 (Minimal — 单一关注点: 把裸 git stderr 换成分类枚举; 零架构变更)
 > **Created**: 2026-07-12
 > **Source**: `state-scanner-stale-refs-false-parity` 的 post_spec R2 (code-reviewer M-1) 发现; 经 owner 决策**拆出独立 Spec 优先 ship** —— Rule #7 是**不可协商规则**, 不该等一个仍在收敛的架构 Spec (5/5 agent 一致建议)
@@ -142,7 +142,7 @@ owner 用**生产分类器**跑真实 stderr 实测:
 - **AC-2 (机制防复发)**: grep collector 目录, 断言零处把原始 stderr 传入 `soft_error`。
 - **AC-3 (无回归)** 🔴 **v2 修正 baseline 假前提 (R5-C-E)**:
   `python3 aria/skills/state-scanner/tests/run_tests.py` → **0 failed, 除 `test_two_consecutive_runs_diff_zero`** ∧ 无既有绿测试转红。
-  > ⚠️ **v1 写的「0 failed」是假前提** —— owner 连跑两次实测 (未修改代码): `Ran 1006 tests ... FAILED (failures=1)`, 失败的正是 `test_two_consecutive_runs_diff_zero` (**run-to-run 漂移通道 — v5 注: R5 时点计 4 条, CE 复验后实数 6 条 [含条件性 custom_checks + 日界潜伏], SOT=母 Spec tasks 12.10**: `remote_refs_age` / `issue_status.repos[].source` / `coordination_fetch.degraded` / `errors[]` 等)。
+  > ⚠️ **v1 写的「0 failed」是假前提** —— owner 连跑两次实测 (未修改代码): `Ran 1006 tests ... FAILED (failures=1)`, 失败的正是 `test_two_consecutive_runs_diff_zero` (**run-to-run 漂移通道 — 母 Spec CE 复验注 (2026-07-14): R5 时点计 4 条, CE 复验后实数 6 条 [含条件性 custom_checks + 日界潜伏], SOT=母 Spec tasks 12.10**: `remote_refs_age` / `issue_status.repos[].source` / `coordination_fetch.degraded` / `errors[]` 等)。
   > **本 Spec 既不碰这些通道中的任何一条** ⇒ 若坚持「0 failed」, **本 Spec 在自己的 PR 上结构性恒红 ⇒ 按自己的闸门无法 ship** —— 而它恰恰是被指定「**应先落地**」的那一个。
   > ⇒ **该测试由母 Spec 认领消除** (母 Spec tasks 12.10)。本 Spec 显式豁免它。
 - **AC-4 (分类器复用)** 🔴 **v2 措辞修正 (R5-M-4; 见 §2c OQ-B1 裁定)**:
