@@ -1,6 +1,6 @@
 # Proposal: `issue-cache-freshness` 检查重定义 + snapshot `generated_at` 字段
 
-> **Status**: **Draft v4** (2026-07-14: **R7-qa C-1 一票否决题按 D19 裁定 — 求值基底 = (a) lag-1**: 重定义 check 读**上一份** snapshot [Phase 1.11 时本次 issue_status 尚不存在, 本次文件尚未写盘 — 这是结构事实非选择]; collector 不挪位置的承诺保留; **AC-2 改两跑断言** + lag-1 语义公示; AC-4 可验收面按 R7 RM-12 收窄到单 check 子树) ← v3 (§3 撤回条件性反转) ← v2 ← v1
+> **Status**: **Draft v5** (2026-07-14, R8 折入: §2 lag-1 残留清扫 [「**上一份** snapshot 内 (lag-1, v5 修正 — 见 D19 bullet)」→上一份] + 迁移态定义 [缺 generated_at ⇒ 视同首跑 SKIP] + 坏 JSON ⇒ SKIP + AC-2 主句限定 [故障态须 fetched_at 陈旧超 2×TTL] + AC-4 落地链补齐 [3.1 增 output 确定性子任务 + 3.4 双跑 diff 测试任务 + fixture 预置健康上一份前置] + AC-3/3b 叙事按 lag-1 重述) ← v4 (D19 lag-1) ← v3 ← v2 ← v1
 > **Level**: 2 (Minimal — 单一关注点: 一个 custom check 的断言重定义 + 一个 additive schema 字段)
 > **Created**: 2026-07-12
 > **Source**: `state-scanner-stale-refs-false-parity` 的 R1/R2/R3 发现; 经 owner 决策**拆出独立 Spec** —— 与 parity 机制**零代码路径重叠** (5/5 agent 一致建议)
@@ -66,7 +66,7 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 从「cache 文件 mtime vs 墙钟 now」改为「**本次 snapshot 内** `issue_status.fetched_at` vs `generated_at`」。
 
 - 该检查**不再**依赖 collector 顺序 ⇒ **`custom_checks` 不需要挪位置**。
-- 🔴 **v4 (D19) 求值基底写死 = lag-1**: check 在 Phase 1.11 执行时, 本次 scan 的 `issue_status` 尚不存在、本次 snapshot 尚未写盘 (scan.py L237-240 结尾一次性写) ⇒ **唯一自洽读数源 = 上一份 `.aria/state-snapshot.json`** (两操作数 [`generated_at`, `issue_status.fetched_at`] 同源同代, 断言内部一致)。**语义公示: 本 check 是 lag-1 探测器** — 审计的是**上一次** scan 的产物, 故障在**下一次** scan 被看见 (外部反向证据型检查的诚实语义: 滞后一拍换独立性)。上一份 snapshot 不存在 (首跑) ⇒ check SKIP 可见 (非 PASS 非 FAIL)。
+- 🔴 **v4 (D19) 求值基底写死 = lag-1**: check 在 Phase 1.11 执行时, 本次 scan 的 `issue_status` 尚不存在、本次 snapshot 尚未写盘 (scan.py L237-240 结尾一次性写) ⇒ **唯一自洽读数源 = 上一份 `.aria/state-snapshot.json`** (两操作数 [`generated_at`, `issue_status.fetched_at`] 同源同代, 断言内部一致)。**语义公示: 本 check 是 lag-1 探测器** — 审计的是**上一次** scan 的产物, 故障在**下一次** scan 被看见 (外部反向证据型检查的诚实语义: 滞后一拍换独立性)。上一份 snapshot 不存在 (首跑) ⇒ check SKIP 可见 (非 PASS 非 FAIL)。🆕 **v5 定义域补格**: 上一份**存在但缺 `generated_at` 或 `issue_status.fetched_at`** (采用者升级后首跑的必然迁移态) ⇒ **视同首跑 ⇒ SKIP 可见** (按 FAIL 走会让每个升级者第一 scan 必红 = 修恒红的 Spec 自造红); 上一份**损坏/非法 JSON** (scan.py 写盘非原子, 中断可致) ⇒ 同 SKIP 可见。
 - 它从「1.13 跑没跑的外部反向证据」变成「1.13 **在本次 scan 内**是否产出了新鲜结果」—— 语义更准确, 且**可在健康常态下 pass、在真故障时 fail**。
 - 更新该 check 的 `description` (它不再是「外部反向证据」)。
 
@@ -123,7 +123,7 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 ## Verification — 可证伪锚点
 
 - **AC-1 (红测试, 恒红)**: 构造「上次 scan 在 > 30min 前」的环境 → 当前代码下 `issue-cache-freshness` **必须 FAIL**; 修复后 **必须 PASS**。
-- **AC-2 (真故障仍能捕获; v4 按 D19 改两跑断言)**: 令 `issue_scan` 失败 (fetch error / 配置错) 于第 N 次 scan → **第 N+1 次 scan** 该 check **必须 FAIL** (lag-1 语义; 单跑断言在 lag-1 基底下结构性不可证伪 — R7-qa C-1)。**(防「恒绿真空」—— 本 Spec 的对偶验收。)** fixture = 预置一份含故障态 issue_status 的上一份 snapshot + 跑一次 scan 断言 check FAIL。
+- **AC-2 (真故障仍能捕获; v4 两跑; v5 限定故障态)**: 令 `issue_scan` 失败**且缓存 fetched_at 陈旧超 2×TTL** 于第 N 次 scan → **第 N+1 次 scan** 该 check **必须 FAIL** (v5 [agent2 m-5]: 失败但 cache 仍在 2×TTL 内 ⇒ Δ 小 ⇒ check PASS 是正确行为, 主句不得覆盖该态) (lag-1 语义; 单跑断言在 lag-1 基底下结构性不可证伪 — R7-qa C-1)。**(防「恒绿真空」—— 本 Spec 的对偶验收。)** fixture = 预置一份含故障态 issue_status 的上一份 snapshot + 跑一次 scan 断言 check FAIL。
 - **AC-3 (`generated_at` 存在 + 容忍 cache 命中)** 🔴 **v1 初稿写反了一个代码事实** (R4 code-reviewer X-1):
   v1 断言 `generated_at <= issue_status.fetched_at` (scan 开始早于 issue fetch)。**但 `issue_scan` 有 900s 缓存** —— cache 命中时 (`issue_scan.py:766`) 它把**缓存里的** `fetched_at` (**上一次** scan 的时刻) 原样端出 ⇒ **`fetched_at` 早于 `generated_at`** ⇒ **该断言恒 false**。而 15 分钟内重复 scan **命中缓存是常态路径**。
   ⇒ **我会在一个专门修「恒红」的 Spec 里, 用一条制造「缓存路径恒红」的断言。** (对偶不变量: 假绿的反面是恒红。)
@@ -159,11 +159,11 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
   (上界与 `state-checks.yaml:14-15` 已有的「2×TTL (默认 30min)」自述对齐, 且**显式允许 cache-hit**。防「恒绿真空」由 **AC-2** 承担。)
 
 - 🆕 **AC-3b (对偶 pin —— live 与 cached 两条路径都必须 PASS)**:
-  **cache-MISS (live fetch)** ⇒ AC-3 **必须 PASS** (Δ 为负);  **cache-HIT (窗口内)** ⇒ AC-3 **必须 PASS** (Δ 为正且 ≤ 2×TTL)。
+  **上一份 scan 走 cache-MISS (live fetch) 路径** ⇒ AC-3 **必须 PASS** (Δ 为负);  **上一份 scan 走 cache-HIT (窗口内) 路径** ⇒ AC-3 **必须 PASS** (Δ 为正且 ≤ 2×TTL)。(v5 [agent3 m-8]: lag-1 下两操作数同取上一份 snapshot, 「路径」指上一次 scan 的路径; fixture 预置对应路径形态的上一份)
   > **这是母 Spec v6 新增的「对偶验收」机械闸的实例**: **每条 AC 必须同时给出「健康常态必 PASS」+「真故障必 FAIL」两个 fixture。**
   > **AC-2「防恒绿真空」已经是这个形状 —— v1 只是没有对称地把它应用到 AC-3, 于是 AC-3 制造了新恒红。**
 
-- **AC-4 (~~稳定性测试转确定性~~)** ⚠️ **v4 收窄** (R7 RM-12: v3 的「custom_checks.* 全子树 diff=0」会被通道 #6 [其它 check 天数型 output 跨日界] 打破): 可验收面 = 冷缓存双跑后 **`custom_checks.results[name==issue-cache-freshness]` 单条子树 diff=0** (含 status/output) — 本 check 的 output 必须确定性渲染 (不嵌墙钟时刻/随机 Δ, 任务 3.1 钉住)。flaky 整体消除仍归母 Spec tasks 12.10 (offline 旁路)。
+- **AC-4 (~~稳定性测试转确定性~~)** ⚠️ **v4 收窄; v5 落地链补齐 (R8 8M-9/M-7)**: 可验收面 = 双跑后 **`custom_checks.results[name==issue-cache-freshness]` 单条子树 diff=0** — **fixture 前置: 预置一份健康的上一份 snapshot (含 generated_at)** (lag-1 下真冷环境 run1=SKIP vs run2=PASS 结构性 diff≠0 — 「冷缓存」一词的 v2 语义 [issues.json 冷热] 已不适用, 决定因子=上一份 snapshot 在场性); output 确定性渲染由 **任务 3.1b** 钉住 (固定文案, 不嵌 Δ 秒数/时刻 — output 是 test_rule_4 pin 死的契约字段, normalize 兜不了); 双跑 diff 测试由 **任务 3.4** 承载。flaky 整体消除仍归母 Spec tasks 12.10。
   > v1 的两个前置条件 (「cache 陈旧」/「cache 新鲜」) **钉错了轴** —— 真正的决定因子是 **FETCH_HEAD 热度 + issue-cache 热度 + 网络抖动**。
 
 - **AC-5 (无回归)** 🔴 **v2 修正 baseline 假前提 (R5-C-E)**:
@@ -180,7 +180,9 @@ $ python3 -c "import json; print(sorted(json.load(open('.aria/state-snapshot.jso
 - [ ] 2.2 确认 `generated_at` 被 `normalize_snapshot.TIMESTAMP_KEYS` 打码 (已在清单, 需 pin 测试)
 - [ ] 3.1 `.aria/state-checks.yaml` 的 `issue-cache-freshness` 断言改为同 snapshot 内 `fetched_at` vs `generated_at`
 - [ ] 3.2 更新该 check 的 `description` + `fix` 文案
-- [ ] 3.3 AC-2 (v4 两跑): 第 N 跑注入 issue_scan 故障 → 断言**第 N+1 跑** check FAIL (lag-1; fixture 可预置故障态上一份 snapshot 单跑等价实现); 另: 首跑无上一份 snapshot ⇒ check SKIP 可见
+- [ ] 3.1b 🆕 v5 (8M-9): check 的 output **确定性渲染** — 固定文案模板, 不嵌 Δ 秒数/绝对时刻/随机成分; lock 测试断言同态双跑 output 逐字节相等
+- [ ] 3.3 AC-2 (v4 两跑; v5 限定故障态 = fetched_at 陈旧超 2×TTL): 第 N 跑注入故障 → 断言**第 N+1 跑** check FAIL (fixture 可预置故障态上一份 snapshot 单跑等价实现); 另: 首跑/迁移态 (缺字段)/坏 JSON ⇒ check SKIP 可见 (三态各一 fixture)
+- [ ] 3.4 🆕 v5 (8M-9): AC-4 双跑 diff 测试实现 — 预置健康上一份 snapshot → 双跑 → 断言单 check 子树 diff=0
 - [ ] 4.1 文档: `references/state-snapshot-schema.md` 加 `generated_at`; `references/issue-scanning.md` 同步
 - [ ] 4.2 **关联收益**: 通知 / 记录 `aria-2.0-m7-fleet-aggregation` 的 CAVEAT-age 可升级 (其 proposal L82 的 probe 结论已过时)
 - [ ] 5.1 版本 bump + SOT 同步 + CHANGELOG

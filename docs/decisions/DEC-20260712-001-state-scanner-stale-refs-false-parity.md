@@ -1,6 +1,6 @@
 # DEC-20260712-001 — state-scanner 陈旧 ref 假同步 (parity false-green)
 
-> **状态**: **v9 (2026-07-14)** — v9 新增 **D15′/D18/D19** (§3d: R7 三 C 合并解 + RC-8 + Spec C 基底; D15 由 D15′ 取代)。v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
+> **状态**: **v10 (2026-07-14)** — v10 新增 **D20** (§3e: 8C-1 三档全分割, E 优先)。v9 新增 **D15′/D18/D19** (§3d: R7 三 C 合并解 + RC-8 + Spec C 基底; D15 由 D15′ 取代)。v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。
 > **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 R1 的 3C + 12M/m) | **v6 修订**: 2026-07-12 (折入 R2-R5; **R5 的 5 Critical + F10′ 裁定**)
 > **审计轨迹**: [R1+R2](../../.aria/audit-reports/post_spec-R1-R2-2026-07-12T1850Z-state-scanner-stale-refs-false-parity-aggregated.md) → [R3+R4](../../.aria/audit-reports/post_spec-R3-R4-2026-07-12T2000Z-state-scanner-stale-refs-false-parity-aggregated.md) → [**R5**](../../.aria/audit-reports/post_spec-R5-2026-07-12T2230Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **触发**: 本 session 亲历 — `/state-scanner` 开局报 `parity=equal / overall_parity=true`, 实际本地落后 `origin/master` **4 个 commit** (双子星并发 session 已 ship v1.56.0 + v1.56.1)。
@@ -203,6 +203,12 @@ phase1_gate.py --raw-track-id state-scanner-stale-refs-false-parity --phase A.1 
 > 🔴 **D7 的盲区 (R6 揭出, 但 D14 使其不必重开)**: D7 的理据「本 Spec 修的是**落后时假绿**, 不是**领先时假红** (领先不会导致重复劳动)」—— **这句话对 mirror remote 是错的**。领先 github 恰恰就是危害本身 (镜像陈旧 / `clone --recursive` 断裂 / 市场版本滞后)。**今天的事故 + CLAUDE.md 记的 2026-04-10 事故, 都是「领先」形态。**
 > **但 D14 换原语后, D7 不必重开** —— F10″ 用可达性而非 parity 表达该不变量, 两者正交。
 > **元教训**: v6 修 R5-m-1 时, owner 让**理据**去迁就**公式** (`ahead ⇒ true`)。而 v5 原本的理据 (「有未推送 commit 确实不是已同步的」) 对 mirror 才是对的。⇒ **当理据与公式矛盾时, 不要默认公式是对的; 先问「这个矛盾在保护什么」。**
+
+### §3e v9 裁决 (2026-07-14, R8 8C-1 — **代裁**: owner「按你的建议裁决」授权; R9 复核)
+
+| ID | 裁决 | 理由 |
+|----|------|------|
+| 🔍 **D20** | **8C-1 (equal 三档守卫重叠格) 裁 E 优先 — 三档改全分割**: `E ⇒ 供 ∃ 作证` / `¬E ∧ X ⇒ stale_unverified` / `¬E ∧ ¬X ⇒ not_refreshed (blocking)` (E=证据资格, X=豁免资格) — 守卫两两互斥、并集全覆盖, 无重叠格。**附带三条款** (两审计共同要求): (1) D18 计数器**清零在豁免判定之前** (本 scan fetch 成功 ⇒ 先清零再评 X — 消灭「恢复 scan 落 E∧¬X」路径); (2) AC-15(a)/(b) 措辞同步 (b 的 blocking 前提 = ¬E∧¬X); (3) 5.1d 闸加**守卫全分割断言**维度 (N 档谓词组: 两两互斥 + 并集=全域, 机械可判)。**DEC 公式一律指针引用 proposal F4′ (8M-2)**, 本条不复制公式细节。 | **E 无法被 artifact 伪造**是裁决基石: 写入侧三条 fail-CLOSED (tasks 3.7/3.16 — fetched_at/generation_fetched 只在真成功时推进) ⇒ `fetched_at ≈ now` ⟹ 1h 内必有一次真实成功 fetch ⟹ 证据世界时间新鲜。反方 (¬X 优先偏红) 担心的钳位/lost-update 场景**恰好只能把 fetched_at 覆盖成更旧** (E→false, 方向安全), 造不出假 E=true; D18 恢复路径由清零先序条款消灭; 退避腿 56min 场景 (E 真成立) 按 D15′「作证要世界时间新鲜」立意应作证 — 数据 56min 新鲜却因代际簿记 blocking 是自相矛盾。E ⇒ 墙钟 ≤1h ≤7d ⟹ hard_cap 臂对 E 腿自然蕴含, 无冲突 |
 
 ### §3d v8 裁决第二批 (2026-07-14, R7 三 C 的合并解 — **代裁**: owner /goal「按你的建议裁决并完成 v8→R8」授权; R8 重点复核)
 

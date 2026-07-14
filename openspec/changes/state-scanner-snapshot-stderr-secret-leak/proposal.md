@@ -142,8 +142,8 @@ owner 用**生产分类器**跑真实 stderr 实测:
 - **AC-2 (机制防复发)**: grep collector 目录, 断言零处把原始 stderr 传入 `soft_error`。
 - **AC-3 (无回归)** 🔴 **v2 修正 baseline 假前提 (R5-C-E)**:
   `python3 aria/skills/state-scanner/tests/run_tests.py` → **0 failed, 除 `test_two_consecutive_runs_diff_zero`** ∧ 无既有绿测试转红。
-  > ⚠️ **v1 写的「0 failed」是假前提** —— owner 连跑两次实测 (未修改代码): `Ran 1006 tests ... FAILED (failures=1)`, 失败的正是 `test_two_consecutive_runs_diff_zero` (**4 条 run-to-run 漂移通道**: `remote_refs_age` / `issue_status.repos[].source` / `coordination_fetch.degraded` / `errors[]`)。
-  > **本 Spec 既不碰这 4 条中的任何一条** ⇒ 若坚持「0 failed」, **本 Spec 在自己的 PR 上结构性恒红 ⇒ 按自己的闸门无法 ship** —— 而它恰恰是被指定「**应先落地**」的那一个。
+  > ⚠️ **v1 写的「0 failed」是假前提** —— owner 连跑两次实测 (未修改代码): `Ran 1006 tests ... FAILED (failures=1)`, 失败的正是 `test_two_consecutive_runs_diff_zero` (**run-to-run 漂移通道 — v5 注: R5 时点计 4 条, CE 复验后实数 6 条 [含条件性 custom_checks + 日界潜伏], SOT=母 Spec tasks 12.10**: `remote_refs_age` / `issue_status.repos[].source` / `coordination_fetch.degraded` / `errors[]` 等)。
+  > **本 Spec 既不碰这些通道中的任何一条** ⇒ 若坚持「0 failed」, **本 Spec 在自己的 PR 上结构性恒红 ⇒ 按自己的闸门无法 ship** —— 而它恰恰是被指定「**应先落地**」的那一个。
   > ⇒ **该测试由母 Spec 认领消除** (母 Spec tasks 12.10)。本 Spec 显式豁免它。
 - **AC-4 (分类器复用)** 🔴 **v2 措辞修正 (R5-M-4; 见 §2c OQ-B1 裁定)**:
   `_classify_error` 从 `coordination_fetch.py` 提到 `_common.py` 后 —— **`coordination_fetch` 的既有测试全绿 ∧ 枚举标签集合不变** (`network`/`auth_403`/`non_ff`/`git_missing`/`other`)。
