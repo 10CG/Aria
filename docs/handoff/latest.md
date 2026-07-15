@@ -13,12 +13,11 @@
 
 ## 最新 handoff
 
-**[2026-07-14 — false-parity v9 (D20) → R9 PASS-with-fixes → v10 — 轨收敛, 待 owner sign-off](./2026-07-14-false-parity-v10-r9-pass.md)**
+**[2026-07-15 — 会话收尾: 单对话六 cycle (v1.56.0/v1.56.1 ship + 4 票闭环 + false-parity v7→v10 收敛)](./2026-07-15-session-close-six-cycle-marathon.md)**
 
-- track-id: `state-scanner-stale-refs-false-parity` | phase: **A.1-complete-awaiting-signoff** | status: **active**
-- 🎉 **R1-R8 八轮全 FAIL 后, R9 首个非 FAIL (PASS-with-fixes ×2, 0 Critical)**: D20 (8C-1 裁 E 优先,
-  三档全分割) 本体经受住全部证伪; 唯一实质补丁 = 负墙钟龄钳位 (时钟回拨可伪造 E)
-- v10 = R9 全部 12M/13m fixes 折入 + 机械复核 (代 R10, 两审计一致建议); 三 spec 自洽
-  (主 v10 / B v2 / C v6); 11 次复发形态全部机制化进 5.1d 闸六维度
-- **下一步**: owner sign-off (三 spec + D15′-D20 五代裁终审) → A.2/A.3 → Phase B (Spec C 先行)
-- 前序: [v8→R8](./2026-07-14-false-parity-v8-r8-convergence.md) / [v7→R7](./2026-07-14-false-parity-v7-r7-fail-d15-triple-hit.md) / [R5-R6+F10″](./2026-07-12-false-parity-r5-r6-f10-primitive-swap.md) (bot)
+- track-id: `session-close-20260711-0715-marathon` | phase: **session-close** | status: **done**
+- 会话维度总账: 两连发 ship (v1.56.0 协调生命周期 / v1.56.1 小票并批) + 关票 6 + false-parity
+  轨接手推至 **R9 PASS-with-fixes (九轮首个非 FAIL) → v10 收敛**; memory +4; 四仓 parity ✓
+- 🔴 **下一步全等 owner**: ⭐ false-parity 三 spec sign-off + D15′-D20 代裁终审 → Phase B
+  (Spec C 先行) | #136 轮换 | M6 4 门 | 168h 仪式。AI 侧 backlog 全清
+- 前序: [false-parity v10-r9-pass](./2026-07-14-false-parity-v10-r9-pass.md) (轨级最新) 及本篇 Cross-references 列出的六 cycle handoff
