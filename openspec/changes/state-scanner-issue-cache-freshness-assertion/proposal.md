@@ -1,6 +1,6 @@
 # Proposal: `issue-cache-freshness` 检查重定义 + snapshot `generated_at` 字段
 
-> **Status**: **🔧 Phase B 实现中 (v6 Approved → B.2 review-driven 机制精修)** — Approved v6 (owner sign-off 2026-07-15) → **B.2 实现 + Phase B 对抗 review (2026-07-16, 3-agent code-grounded)** 发现 v6 的 **Δ-only 机制对真实数据近乎无用** (collector 1×TTL 门控缓存 ⇒ STALE 不可达; fetch 失败 fetched_at=None ⇒ 绿真空), **owner 裁 A1+B1 机制精修** (见下 §What Changes 修订)。核心已实现+全绿 (1031 tests), 真实 dogfood 验证生命周期正确。
+> **Status**: **✅ SHIPPED v1.57.0 (2026-07-16)** — Approved v6 (owner sign-off 2026-07-15) → B.2 实现 + Phase B 对抗 review (3-agent code-grounded) 发现 v6 的 **Δ-only 机制对真实数据近乎无用** (collector 1×TTL 门控缓存 ⇒ STALE 不可达; fetch 失败 fetched_at=None ⇒ 绿真空) → **owner 裁 A1+B1 机制精修** (见下 §What Changes) → post_impl 确认 review (fix_introduced_regression: no) → **ship**: aria-plugin `a9e8652` (gitlink 主仓 `36050cc`), 双远程 parity 验证。1031 real-green + 1 AC-5 豁免 flaky; 真实 dogfood 全生命周期正确。双动态工作流交付 (蓝图 + 对抗 review + post_impl 确认)。**Phase D 归档待**。
 > **B.2 机制精修 (owner 2026-07-16, A1+B1)**:
 > - **A1**: check 主信号从「Δ vs 2×TTL 上界」改为「issue-fetch 健康」—— issue_scan 启用但上一份 snapshot `issue_status.fetched_at` **缺失** (持续 fetch 失败/全 repo 失败) ⇒ **STALE (暴露, 非绿真空)**; 上界 Δ 降为**次要防御守卫**。**保 AC-2 正交性**: 瞬时 `fetch_error` **但 fetched_at 仍新鲜** ⇒ 仍 OK (键于 fetched_at 在场, 非 fetch_error)。
 > - **B1**: skip 触发从 `exit 2` 改为 **stdout `##SKIP##` marker + exit 0** (exit 2 与 grep/diff/argparse 错误码撞车, 会静默把采纳者真故障从 fail 降级 skip)。custom_checks.py 按 marker 识别。
