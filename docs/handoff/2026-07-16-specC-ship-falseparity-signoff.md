@@ -24,8 +24,9 @@ updated-at: 2026-07-16
 
 ## §2 未完成 / Carry-forward
 
-- 🔴 **Spec B stderr-leak 实现** (最优先, 落地序 C→B→主): v5 spec 已收敛 (option B), 待 Phase B 实现 (类型化通道 GitErrorClass + 助手内部自分类 + AC-2 best-effort lint + code-review 完整性闸)。
-- 🔴 **主 spec stale-refs-false-parity 实现**: v10 Approved + tasks.md 已备 (119 任务), 待 Phase B。落地序最后 (F3′ 依赖 Spec B 先收口 stderr 暴露面)。
+> **更新 (session 续跑 2026-07-16)**: Spec B 已在本 session 后续 ship —— ~~Spec B stderr-leak 实现~~ **✅ SHIPPED v1.58.0** (aria `cae92e8` / 主仓 `ef91405`; 类型化通道 GitErrorClass 无 stderr 字段 + 助手内部自分类 + coordination_fetch 委托 + AC-2 best-effort lint; 双动态工作流 review code-reviewer PASS + silent-failure PASS-with-fixes fold done; 归档 `openspec/archive/2026-07-16-state-scanner-snapshot-stderr-secret-leak`)。**C(v1.57.0)+B(v1.58.0) 三 spec 之两已 ship**。
+
+- 🔴 **主 spec stale-refs-false-parity 实现** (现唯一剩项, 落地序最后): v10 Approved + tasks.md 已备 (119 任务), 待 Phase B。F3′ 依赖 Spec B 先收口 stderr 暴露面 —— **该前置已满足** (B 已 ship), 主 spec 可起 Phase B。
 - **Spec C follow-up** (非阻塞, 已文档化): (a) 聚合 fetched_at 部分失败盲点 (主 repo 失败但 submodule 新鲜→OK) — per-repo 收紧待 follow-up; (b) config/snapshot 持续损坏永久 SKIP — 区分「broken」vs「not-applicable」待收紧; (c) task 3.4 heavy 双 subprocess cache-hit shim (轻量确定性版已覆盖)。
 - (承前, owner 门) M6 4 门 (input-delivery + Blocker 4 Luxeno) / 168h 跑 / #136 webhook 轮换 / #151 credentials。
 - **#165 GitHub 镜像漏推**: 本 session ship 严格走「子模块远程合并优先→gitlink bump」+ ls-remote 独立验证, 未复发 (但 #165 issue 仍 open, 需机制化)。
@@ -49,10 +50,11 @@ updated-at: 2026-07-16
 
 ## §6 Next session 入口 + 优先级
 
-1. ⭐ **Spec B stderr-leak 实现** (Phase B, 落地序 C→B→主 之 B): v5 option B spec 已收敛。
-2. **主 spec stale-refs 实现** (Phase B, 序最后): v10 + tasks 已备。
-3. owner 门: M6 4 门 / 168h / #136 / #151。
-4. Spec C 3 条 follow-up (非阻塞, §2)。
+> Spec B 已本 session ship (§2 更新), 仅剩主 spec。
+
+1. ⭐ **主 spec stale-refs-false-parity 实现** (Phase B, 三 spec 之末; 前置 Spec B 已 ship 满足 F3′ 依赖): v10 + tasks.md (119 任务) 已备。
+2. owner 门: M6 4 门 / 168h / #136 / #151。
+3. Spec C 3 条 follow-up + Spec B lint 中转变量 gap (非阻塞, code-review 兜底)。
 
 ## §8 Memory entries this session
 
