@@ -79,14 +79,14 @@ aria-orchestrator/extensions/aria-fleet/
 
 ##### A.2 ①读 — 读现有快照 + 显示陈旧度 (默认快路径)
 
-`acquire.read_snapshot(project)`: 读取项目 `<path>/.aria/state-snapshot.json`, 解析 JSON, 计算 `snapshot_age` (now − 文件 mtime, 或 snapshot 内 `generated_by` 旁的时间锚 — 注: snapshot 顶层无 `generated_at` 字段, 实测仅 `generated_by`/`project_root`/`snapshot_schema_version`, 故 age 以**文件 mtime** 为权威, fallback 见约束)。
+`acquire.read_snapshot(project)`: 读取项目 `<path>/.aria/state-snapshot.json`, 解析 JSON, 计算 `snapshot_age` (now − snapshot 顶层 `generated_at`; 见更新后的 CAVEAT-age)。
 
 **取数契约** (memo §4 ①):
 - 默认快路径: 直接返回 cached snapshot dict + `snapshot_age` (秒/小时)。
 - 不触网、不跑 scan.py。
 - 项目无 `.aria/state-snapshot.json` (从未 scan 过) → 返回 `{available: false, reason: "no-snapshot"}`, 不报错 (fail-soft)。
 
-**约束 (CAVEAT-age)**: snapshot 顶层**无** `generated_at` 字段 (recon 实测仅 `snapshot_schema_version`/`generated_by`/`project_root`)。`snapshot_age` **必须**以文件系统 mtime 为权威源; 若 mtime stat 失败 → age=null (与 handoff.age_hours 的 `float|null` 语义一致, 见 caveat-7)。
+**约束 (CAVEAT-age)** ⚠️ **已更新 (Spec C `state-scanner-issue-cache-freshness-assertion` ship, aria-plugin v1.57.0+)**: snapshot 顶层**现有** `generated_at` 字段 (ISO 8601 UTC, scan 入口时刻)。`snapshot_age` **应优先**用 `generated_at` 计算 (权威, 反映 scan 真实时刻而非文件落盘时刻); **文件 mtime 仅作向后兼容 fallback** —— 读到旧 schema 快照 (采用者未升级 aria-plugin, 无 `generated_at`) 时降级用 mtime; 两者皆缺 → age=null (与 handoff.age_hours 的 `float|null` 语义一致, 见 caveat-7)。**注**: 本约束更新为文档层 (m7-fleet Phase B 未启动, `acquire.py` 尚无代码); 真正的「mtime 兜底→权威字段」切换在 m7-fleet 自己 Phase B 实现 `acquire.read_snapshot` 时落地。(L114 附近 fleet 聚合输出示例的 `generated_at` 是聚合层自己的时间戳, 与本单项目 snapshot 字段是两回事。)
 
 **[AC-2]** ①读 对有快照项目返回 dict + 非 null age; 对无快照项目返回 `available:false` 不抛异常。
 

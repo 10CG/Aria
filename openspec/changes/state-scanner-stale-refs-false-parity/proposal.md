@@ -1,6 +1,6 @@
 # Proposal: state-scanner 陈旧 ref 假同步修复 — 「新鲜度靠获取, 不靠测量」
 
-> **Status**: **Draft v10** — ✅ **R9 PASS-with-fixes 2/2 (0 Critical — R1-R8 八轮全 FAIL 后首个非 FAIL), fixes 已全部折入本版** (2026-07-14; D20 三档全分割经受住全部证伪, 唯一实质补丁=负墙钟龄钳位; 12M/13m 全为镜像/残留文本级, 已修并机械复核 [代 R10, 两审计一致建议]; 聚合 `.aria/audit-reports/post_spec-R9-2026-07-14-*-aggregated.md`)。**下一步: owner sign-off → Phase A.2/A.3** (落地顺序: Spec C → Spec B → 主 Spec)。
+> **Status**: **✅ Approved v10 (owner sign-off 2026-07-15)** — R9 PASS-with-fixes 2/2 (0 Critical — R1-R8 八轮全 FAIL 后首个非 FAIL), fixes 已全部折入本版 (2026-07-14; D20 三档全分割经受住全部证伪, 唯一实质补丁=负墙钟龄钳位; 12M/13m 全为镜像/残留文本级, 已修并机械复核 [代 R10, 两审计一致建议]; 聚合 `.aria/audit-reports/post_spec-R9-2026-07-14-*-aggregated.md`)。**owner 终审通过 D15′-D20 五条代裁 (D15′ 双角色谓词 / D16 SOT 搬入 aria-plugin+lock / D18 豁免代际上界 / D19 漂移通道#5 划归 Spec C / D20 evidence_grade 三档全分割 E 优先)**。**下一步: Phase A.2/A.3** (落地顺序: Spec C → Spec B → 主 Spec; Spec B 待其独立 post_spec R6 收敛后签)。
 > ⚠️ **F10′ 已被 R6 证伪, 勿按其伪码实施** —— 见下方 §F10′ 的 🔴 SUPERSEDED 批注 + [R6 报告](../../../.aria/audit-reports/post_spec-R6-2026-07-12T2300Z-state-scanner-stale-refs-false-parity-aggregated.md)
 > **Level**: 3 (Full — 十步循环统一入口的裁决逻辑 + collector 编排 + 网络行为 + 影响所有采用者的配置 + snapshot schema)
 > **Created**: 2026-07-12 | **v6 修订**: 2026-07-12 (R5 的 5 Critical + 9 Major; **新增 F10′** per owner 裁定)

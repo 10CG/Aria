@@ -76,10 +76,11 @@ ls aria-orchestrator/hermes-extensions/aria-layer1/             # 须存在 (ext
   - deps: TA-scaffold-1
 
 - [ ] **TA-read-1** `acquire.read_snapshot(project)` ①读 默认快路径: 读
-  `<path>/.aria/state-snapshot.json` → 解析 JSON → 计算 `snapshot_age` (**文件 mtime 权威**,
-  CAVEAT-age: snapshot 顶层无 generated_at)。不触网不跑 scan。无快照项目 → `{available:false,
-  reason:"no-snapshot"}` fail-soft。mtime stat 失败 → age=null。
-  单测: 有快照 / 无快照 / mtime-fail(null age)。 [AC-2]
+  `<path>/.aria/state-snapshot.json` → 解析 JSON → 计算 `snapshot_age` (**优先 snapshot 顶层
+  `generated_at` 权威**; 旧 schema 无 generated_at 时 fallback 文件 mtime — CAVEAT-age 已更新,
+  Spec C `state-scanner-issue-cache-freshness-assertion` ship 后 generated_at 存在)。不触网不跑 scan。
+  无快照项目 → `{available:false, reason:"no-snapshot"}` fail-soft。generated_at 与 mtime 皆缺 → age=null。
+  单测: 有 generated_at / 旧 schema 用 mtime / 无快照 / 皆缺(null age)。 [AC-2]
   - deps: TA-scaffold-2
 
 - [ ] **TA-read-2** snapshot 解析防御: 顶层缺键 / JSON 损坏 → fail-soft 标 reason, 不抛。

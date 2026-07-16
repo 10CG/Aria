@@ -11,25 +11,17 @@ checks:
   # --- Issue 扫描新鲜度 (防止 Phase 1.13 被跳过) ---
   - name: "issue-cache-freshness"
     description: |
-      若 issue_scan.enabled=true, 则 .aria/cache/issues.json 必须存在且
-      在 2×TTL (默认 30min) 内。陈旧或缺失意味着 Phase 1.13 未执行
-      (或被 AI 跳过)。此检查是 Phase 1.13 是否真的跑了的反向证据。
+      若 issue_scan.enabled=true, 断言上一份 .aria/state-snapshot.json 内
+      generated_at 与 issue_status.fetched_at 的差 (数据陈旧度) 在 2×cache_ttl 内。
+      lag-1 语义: 求值时本次 snapshot 尚未写盘, 读到的是上一次 scan 的产物 (审计上一次,
+      故障下一次 scan 才见)。只设上界 — 负 Δ (live fetch, fetched_at 晚于 scan 入口)
+      是最健康信号, PASS。缺上一份/缺字段/坏 JSON → SKIP (可见, 非 PASS 非 FAIL)。
+      (Spec C: state-scanner-issue-cache-freshness-assertion; 旧机制看 issues.json 文件
+      mtime, 跨两次 scan 比较天然滞后而恒红 — 已废弃。)
     command: |
-      if ! grep -q '"issue_scan"' .aria/config.json 2>/dev/null; then
-        echo "OK (disabled)"; exit 0
-      fi
-      if ! grep -A2 '"issue_scan"' .aria/config.json | grep -q '"enabled": true'; then
-        echo "OK (disabled)"; exit 0
-      fi
-      if [ ! -f .aria/cache/issues.json ]; then
-        echo "MISSING — Phase 1.13 never ran"; exit 1
-      fi
-      if [ -z "$(find .aria/cache/issues.json -mmin -30 2>/dev/null)" ]; then
-        echo "STALE — cache > 30min, Phase 1.13 likely skipped"; exit 1
-      fi
-      echo "OK"
+      python3 aria/skills/state-scanner/scripts/issue_cache_freshness_probe.py .
     severity: warning
-    fix: "rm .aria/cache/issues.json && 重跑 /state-scanner 触发 Phase 1.13 live fetch"
+    fix: "重跑 /state-scanner 触发 Phase 1.13 live fetch 刷新 issue_status.fetched_at; 持续 STALE 则核查 issue_scan 是否被跳过"
     timeout_seconds: 5
     enabled: true
 
