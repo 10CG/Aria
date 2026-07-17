@@ -13,12 +13,12 @@
 
 ## 最新 handoff
 
-**[2026-07-17 — 主 spec Phase 0 (prereq) 独立 ship v1.59.0 + 镜像修复 + #165](./2026-07-17-mainspec-phase0-v1.59.0-ship.md)**
+**[2026-07-17 — reconcile clock-skew #111 fix ship v1.59.1 (含诊断纠正)](./2026-07-17-reconcile-clock-skew-111-v1.59.1.md)**
 
-- track-id: `state-scanner-stale-refs-false-parity` | phase: **D-phase0-shipped** | status: **done**
-- 主 spec 第一个 sub-cycle (Phase 0 prereq) 独立 ship **v1.59.0** (B→C→D; F5′ INERT + sync_freshness
-  键 + D16 表骨架 + 8 测试 / 1072 绿); 修 aria-orchestrator 镜像 + 开 Aria #165 + 追平 3 版 badge drift
-- 🔴 **下一步 = 主 spec Phase 1 (core, 最高风险 F3′ remote_refresh collector, 专门 session)**;
-  #165 建议并入 Phase 2 Track A (复用 F10″); owner 门 (M6 4 门 / 168h / #136 / #151)
-- claim **yielded**; 四仓 parity ✓ (ls-remote 独立核验); ⚠️ clock_skew 20663s 容器时钟待查
-- 前序: [specC-ship + 三 spec sign-off](./2026-07-16-specC-ship-falseparity-signoff.md) / [六 cycle marathon](./2026-07-15-session-close-six-cycle-marathon.md)
+- track-id: `reconcile-yielded-terminal-fix` | phase: **D-shipped** | status: **done**
+- 修 aria-plugin #111 (Layer-L reconcile clock_skew 20663s 误报): 真因 = clock_skew 检测纳入
+  stale 历史 candidate → 修为只算 fresh candidate; aria **v1.59.1** `19dad0b` / 主仓 `3e209d3`
+- 🔴 **诊断纠正**: 初始 #111 诊断 (yielded→terminal) 被 TDD RED-前影响面 + 现有 golden 测试推翻
+  (yielded=可恢复暂停, 是 active candidate); 现象对、修复层错。code-review PASS 0C/0I
+- claim **done**; 四仓 parity ✓ (F10″ gitlink 全可达); ⚠️ clock_skew 不是时钟问题 (容器时钟准)
+- 前序 (同 session): [Phase 0 ship v1.59.0](./2026-07-17-mainspec-phase0-v1.59.0-ship.md) / [specC-ship](./2026-07-16-specC-ship-falseparity-signoff.md)
