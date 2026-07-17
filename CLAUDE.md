@@ -542,7 +542,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
   aria-plugin 方法论轨 (与 M6/M7 正交): `state-scanner-stale-refs-false-parity` (false-parity 三 spec 之主; sync_status/overall_parity 陈旧 remote-tracking ref 下撒谎报 parity=equal): **Phase 0 (prereq) SHIPPED v1.59.0 (2026-07-17)** — 零行为变更基础独立先行 ship 于 Level-3 core: F5′ resolve_enforced_remotes 纯函数 (INERT, enforced_remotes:[] → 自动发现全部远程陷阱守卫, 零调用点直到 Phase 1 F4′) + sync_freshness.* config 键 (DEFAULTS) + D16 predicate-domain-table.md 表骨架 + 8 测试 (全量 1072 绿); F5′ INERT 确认 → Rule #6 benchmark N/A; aria `a537e7d` / 主仓 gitlink `e54a891`。**Phase 1 (core, 不可拆, 最高风险 F3′ remote_refresh collector) 待专门 session** (四段式 roadmap 见 docs/handoff/2026-07-17-mainspec-phase0-v1.59.0-ship.md §6); v10 Approved (九轮审计 R1-R8 全 FAIL → R9 PASS-with-fixes)。**follow-up**: Aria #165 (镜像漏推预防侧, 方案 B 复用 Phase 2 F10″ 谓词 建议并入非单开)
   → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
 
-版本: 插件 aria-plugin v1.59.0 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
+版本: 插件 aria-plugin v1.59.1 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
   → 完整版本变更史见 aria/CHANGELOG.md (SOT); 运行时 Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
