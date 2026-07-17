@@ -13,11 +13,12 @@
 
 ## 最新 handoff
 
-**[2026-07-15 — 会话收尾: 单对话六 cycle (v1.56.0/v1.56.1 ship + 4 票闭环 + false-parity v7→v10 收敛)](./2026-07-15-session-close-six-cycle-marathon.md)**
+**[2026-07-17 — 主 spec Phase 0 (prereq) 独立 ship v1.59.0 + 镜像修复 + #165](./2026-07-17-mainspec-phase0-v1.59.0-ship.md)**
 
-- track-id: `session-close-20260711-0715-marathon` | phase: **session-close** | status: **done**
-- 会话维度总账: 两连发 ship (v1.56.0 协调生命周期 / v1.56.1 小票并批) + 关票 6 + false-parity
-  轨接手推至 **R9 PASS-with-fixes (九轮首个非 FAIL) → v10 收敛**; memory +4; 四仓 parity ✓
-- 🔴 **下一步全等 owner**: ⭐ false-parity 三 spec sign-off + D15′-D20 代裁终审 → Phase B
-  (Spec C 先行) | #136 轮换 | M6 4 门 | 168h 仪式。AI 侧 backlog 全清
-- 前序: [false-parity v10-r9-pass](./2026-07-14-false-parity-v10-r9-pass.md) (轨级最新) 及本篇 Cross-references 列出的六 cycle handoff
+- track-id: `state-scanner-stale-refs-false-parity` | phase: **D-phase0-shipped** | status: **done**
+- 主 spec 第一个 sub-cycle (Phase 0 prereq) 独立 ship **v1.59.0** (B→C→D; F5′ INERT + sync_freshness
+  键 + D16 表骨架 + 8 测试 / 1072 绿); 修 aria-orchestrator 镜像 + 开 Aria #165 + 追平 3 版 badge drift
+- 🔴 **下一步 = 主 spec Phase 1 (core, 最高风险 F3′ remote_refresh collector, 专门 session)**;
+  #165 建议并入 Phase 2 Track A (复用 F10″); owner 门 (M6 4 门 / 168h / #136 / #151)
+- claim **yielded**; 四仓 parity ✓ (ls-remote 独立核验); ⚠️ clock_skew 20663s 容器时钟待查
+- 前序: [specC-ship + 三 spec sign-off](./2026-07-16-specC-ship-falseparity-signoff.md) / [六 cycle marathon](./2026-07-15-session-close-six-cycle-marathon.md)
