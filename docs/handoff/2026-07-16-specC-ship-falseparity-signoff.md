@@ -50,11 +50,26 @@ updated-at: 2026-07-16
 
 ## §6 Next session 入口 + 优先级
 
-> Spec B 已本 session ship (§2 更新), 仅剩主 spec。
+> Spec B 已本 session ship (§2 更新)。**主 spec Phase B 已起 (Phase 0 done)**, 见下四段式。
 
-1. ⭐ **主 spec stale-refs-false-parity 实现** (Phase B, 三 spec 之末; 前置 Spec B 已 ship 满足 F3′ 依赖): v10 + tasks.md (119 任务) 已备。
-2. owner 门: M6 4 门 / 168h / #136 / #151。
-3. Spec C 3 条 follow-up + Spec B lint 中转变量 gap (非阻塞, code-review 兜底)。
+**⭐ 主 spec stale-refs-false-parity (Level 3 / 119 任务, 多 session; 四段式拆分 wf_b50b921e)**:
+分支 `feature/state-scanner-stale-refs-false-parity` @ aria (基 cae92e8/v1.58.0)。
+- ✅ **Phase 0 (prereq) 完成** (aria feature `e2a2b22`, 零行为变更, 未 merge): F5′
+  resolve_enforced_remotes 纯函数 (INERT, [] 陷阱守卫) + sync_freshness.* 键 (DEFAULTS+template)
+  + D16 predicate-domain-table.md 骨架 + 8 测试。**可独立 ship v1.59.0 或累积 Phase 1 同 ship** (待定)。
+- 🔴 **Phase 1 (core, 不可拆)**: F1′ 两轴双谓词 (证据资格/豁免资格/evidence_grade 三档) + F2′
+  退役 mtime + **F3′ remote_refresh 新 collector** (多 remote 并行 fetch + --prune + per-host
+  限流 + deadline + 防饥饿 + 退避 —— **最高风险单元**) + F4′ overall_parity 四子句重写 (gitlink
+  子句占位 False) + F6′ shim + **9.7 offline 三面冻结 (必须同 PR, 否则自造漂移)**。依赖 Phase 0。
+- **Phase 2 A/B (并行)**: Track A F10″ gitlink_orphaned 八分支 + gitlink_integrity[]; Track B
+  F9′ sync.py 消费 F1′/F3′ 信号 (⚠️ **只碰新鲜度标注, 绝不碰 US-008 方向性判据 sync.py:312-328**)
+  + 退役 verify_mode=ls_remote (OQ-F)。依赖 Phase 1。
+- **Phase 3 (integration/收尾)**: **12.10 六漂移通道核实** (本 spec 是 flaky 认领消除方, 非豁免!)
+  + golden fixture 重采 + 下游 (handoff_autofill/drift 建议/m7-fleet 通知) + 发布。依赖 Phase 2 双合并。
+- **关键陷阱** (蓝图): F5′ `enforced_remotes:[]`=自动发现全部 (非空集); overall_parity 会从 3 独立
+  机制翻 false (CHANGELOG 须逐条列); F3′ 并发基建需 ARIA_SCAN_FETCH_BUDGET 测试 seam; 缓存 shape 迁移兜底。
+
+**其它 carry-forward**: owner 门 (M6 4 门 / 168h / #136 / #151); Spec C 3 follow-up + Spec B lint 中转变量 gap (code-review 兜底)。
 
 ## §8 Memory entries this session
 
