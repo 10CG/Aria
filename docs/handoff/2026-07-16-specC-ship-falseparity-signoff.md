@@ -3,12 +3,12 @@ track-id: specC-ship-falseparity-20260715-0716
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-07-16
+updated-at: 2026-07-17
 ---
 
-# Session Handoff — false-parity 三 spec sign-off + Spec C 全循环 ship v1.57.0
+# Session Handoff — false-parity 三 spec: sign-off + C(v1.57.0)/B(v1.58.0) 全循环 ship + 主 spec Phase 0
 
-> 本对话 2026-07-15 → 07-16。从 `/state-scanner` 开局, 完成: (1) false-parity 三 spec owner sign-off; (2) Spec B stderr-leak R6→R7→R8 收敛; (3) Spec C 完整十步循环 A→D ship v1.57.0 (双动态工作流 agent team 驱动)。
+> 本对话 2026-07-15 → 07-17。从 `/state-scanner` 开局, 完成: (1) false-parity 三 spec owner sign-off; (2) Spec B stderr-leak spec 阶段 R6→R7→R8 收敛 (option B); (3) **Spec C 全循环 ship v1.57.0** (A→D+归档); (4) **Spec B 全循环 ship v1.58.0** (A→D+归档); (5) **主 spec Phase B 起步** (B.1 分支 + 蓝图 4 段式 roadmap + Phase 0 prereq done)。全程双/三动态工作流 agent team 驱动。session-closer 收尾 (内省 + 机械补漏)。
 
 ## §0 入口 (新 session 优先读)
 
@@ -37,16 +37,19 @@ updated-at: 2026-07-16
 - 🔴 **skip 哨兵别用 exit 2** (B1): exit 2 是 grep/diff/argparse 的错误码, 会把采纳者真故障静默降级 fail→skip。用 stdout marker (`##SKIP##` 首个非空行)。
 - **机制变更连环 fix-introduced Critical** (Spec B R6→R7→R8 + Spec C A1 也过 post_impl 确认): 每次改 sound 静态检查的靶点都引入新盲区 (变量名→属性→元组→跨函数)。**教训**: 「可证明 sound 的全目录静态分析」对某些属性极难精确规约, 结构级保证 (类型不可达) > 静态闸; 机制变更后必过确认轮 (memory `feedback_multiround_audit_catches_fix_introduced_regression` 强复现)。
 
-## §5 多维度同步状态
+## §5 多维度同步状态 (session-close 最终态)
 
 | 维度 | 状态 |
 |------|------|
-| 主仓 | `2e7dec1` 双远程 parity ✓ (ls-remote 独立验证) |
-| aria-plugin | `a9e8652` **v1.57.0** 双远程 parity ✓ (marketplace 已发布) |
-| Spec C | ✅ SHIPPED + 归档 (十步循环闭环) |
-| Spec B / 主 spec | v5 / v10 Approved, 待实现 (序 C→B→主) |
-| 协调 ref | self_multi_container collision (持续, 非阻塞; 本 session 未走 claim 生命周期 — goal-直驱绕过 state-scanner Phase B claim) |
-| 测试 | aria-plugin state-scanner 1031 real-green + 1 AC-5 豁免 flaky |
+| 主仓 | `dd26267` 双远程 parity ✓ (ls-remote 独立验证) |
+| aria-plugin master | `cae92e8` **v1.58.0** 双远程 parity ✓ (marketplace 已发布 C+B) |
+| Spec C issue-cache | ✅ SHIPPED **v1.57.0** + 归档 (A→D 闭环) |
+| Spec B stderr-leak | ✅ SHIPPED **v1.58.0** + 归档 (A→D 闭环) |
+| 主 spec stale-refs | v10 Approved; **Phase 0 done on feature `e2a2b22` (未 merge/未推)**; Phase 1-3 待 |
+| 协调 ref | self_multi_container collision (持续, 非阻塞; 本 session goal-直驱绕过 state-scanner Phase B claim) |
+| 测试 | state-scanner 1055 real-green + 1 AC-5 豁免 flaky (主 spec Phase 3 认领消除该 flaky) |
+| **四维一致性** (consistency_check) | advisory flags = M6/M7 active change 不在 UPM —— **Aria 无 UPM 配置的既有 advisory, 非漂移**; 本 session 三 spec 与代码/git 全一致 |
+| **机械补漏** (autofill §2) | autofill 拉出的 unfinished tasks 全属 M6 cost-model-telemetry 等 = **独立 owner/bot 轨, 非本对话线程**; 本对话真实 carry-forward 见 §2/§6 |
 
 ## §6 Next session 入口 + 优先级
 
@@ -73,8 +76,14 @@ updated-at: 2026-07-16
 
 ## §8 Memory entries this session
 
-- 本 session 待落: **check 判据须对真实数据值域验证 (防「恒红→恒绿真空」)** — 见 §3 第一条, 与 `feedback_windowed_predicate_needs_convergence_inequality` / `feedback_predicate_tiers_need_total_partition_proof` 相邻但正交 (那些是谓词内部完整性, 本条是判据 vs 真实数据分布的匹配)。
-- 复用确认: `feedback_multiround_audit_catches_fix_introduced_regression` (Spec B R6→R8 三连 + Spec C A1 强复现) / `feedback_agent_team_dynamic_workflow_division` (本 session 双动态工作流实践: 蓝图+review 交 agent team, 核心主 loop 亲验) / `feedback_sequenced_multirepo_gitlink_bump` (#165 顺序严格执行未复发)。
+**已落 (2 条)**:
+- `feedback_check_predicate_must_validate_against_real_data_range` — 检查判据须对真实数据值域验证 (防「恒红→恒绿真空」; Spec C Δ 机制近乎无用实证)。与 `feedback_windowed_predicate...` / `feedback_predicate_tiers...` 正交 (那些是谓词内部完整性, 本条是判据 vs 真实数据分布匹配)。
+- `feedback_freeze_task_must_coland_with_volatile_state_phase` — 大 spec 分批: 冻结/稳定化任务须与引入易变态的 phase 同 PR (主 spec 9.7 offline 冻结须 Phase 1 非 Phase 3, 否则自造 regression)。
+
+**[候选 memory]** (评估后不单落, 已被现有覆盖):
+- C→B→主 落地序兑现 (Spec B classify_git_error 被主 spec F3′ 复用) → `feedback_sub_pr_scope_splitting_pattern` 已覆盖。
+
+**复用确认 (强复现)**: `feedback_multiround_audit_catches_fix_introduced_regression` (Spec B spec 阶段 R6→R8 三连 fix-introduced Critical + Spec C A1 post_impl 确认) / `feedback_agent_team_dynamic_workflow_division` (三 spec 双/三动态工作流: 蓝图+review+确认交 agent team, 核心主 loop 亲验) / `feedback_sequenced_multirepo_gitlink_bump` (#165 顺序严格执行, 两次 ship 均 ls-remote 验证未复发) / `feedback_code_grounded_multiagent_review_catches_altitude_misses` (review 抓 Spec C Δ 近乎无用 + Spec B lint denylist 洞, 纸面/测试都漏)。
 
 ## Cross-references
 - Spec C archived: `openspec/archive/2026-07-16-state-scanner-issue-cache-freshness-assertion/`
