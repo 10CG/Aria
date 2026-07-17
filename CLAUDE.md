@@ -541,7 +541,7 @@ v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产�
   aria-plugin 方法论轨 (与 M6/M7 正交): `state-scanner-snapshot-stderr-secret-leak` (false-parity 三 spec 之 B; Rule#7: git 命令 stderr 直传 snapshot 泄露凭据 URL): **✅ SHIPPED v1.58.0 (2026-07-16)** — 类型化错误通道: `_common.py` GitErrorClass (frozen, 无 stderr 字段, 结构级不可承载 secret) + classify_git_error(rc,stderr,cmd) 消费 stderr 取 bounded label 即丢弃 (label∈{network,auth_403,non_ff,git_missing,other}); 5 直传 callsite (git×2/sync×3) + 4 助手内部自分类 (handoff_multibranch×3 benign-skip 保全/handoff_worktrees×1) + coordination_fetch._classify_error 委托 (措辞逐字节保 test_p1_layer_h, 无第三份); 次级泄露收口 (_run timeout/FileNotFound 分支 argv 含凭据 URL 经通道丢弃); §3b signal 扩充 (network+4 / publickey; R6-m1 守卫裸本地权限错不误标) + AC-2 best-effort lint (AST 追 _run 第三返回值, option B: 结构保证=类型不可承载, routing=lint+review); **B.2 review-driven fold**: silent-failure 抓 lint denylist 洞 (form B return-plain 助手可达) → 加 Return denylist + docstring 诚实化; code-reviewer PASS + silent-failure PASS-with-fixes (fix_introduced_regression: no); 双动态工作流 + 1047 real-green; aria `cae92e8` / 主仓 gitlink `de9abae`; 关 aria-plugin #92 (secret-scan 反馈闭环相关) 部分; Phase D 归档待。**三 spec 落地序 C→B→主: C(v1.57.0)+B(v1.58.0) 已 ship; 主 stale-refs v10 待实现 (B 已先于其 F3′)**
   → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
 
-版本: 插件 aria-plugin v1.58.0 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
+版本: 插件 aria-plugin v1.59.0 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`f3848b2`)
   → 完整版本变更史见 aria/CHANGELOG.md (SOT); 运行时 Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
