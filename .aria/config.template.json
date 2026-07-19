@@ -26,6 +26,12 @@
       "hard_cap_days": 7,
       "k_min": 3
     },
+    "multi_remote": {
+      "_comment": "Phase 0.5 remote_refresh (F3′, main spec stale-refs-false-parity, aria-plugin v1.59.0+): refresh_deadline_seconds=本次 scan 允许花在 fetch 调度上的墙钟总预算, 到点未准入的 leg 记 fetch_ok=not_attempted (不阻断, 交回 evidence_grade 三档裁决); per_host_fetch_limit=按解析后 hostname 去重的每 host 并发上限 (非法值 clamp 到 ≥1, 防 sshd MaxStartups 随机丢连); fetch_timeout_seconds=单条 fetch 子进程超时。与顶层 enforced_remotes/read_only_remotes 共用同一 state_scanner.multi_remote 命名空间, 无独立配置门。",
+      "refresh_deadline_seconds": 15,
+      "per_host_fetch_limit": 4,
+      "fetch_timeout_seconds": 30
+    },
     "issue_scan": {
       "_comment": "Phase 1.13 — Issue 感知扫描 (v2.9.0, opt-in, 需网络+token)",
       "enabled": false,
