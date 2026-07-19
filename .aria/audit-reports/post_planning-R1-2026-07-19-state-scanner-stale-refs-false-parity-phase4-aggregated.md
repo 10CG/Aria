@@ -11,7 +11,7 @@
 | backend-architect | PASS_WITH_ISSUES | 0 | 1 | 4 |
 | knowledge-manager | PASS_WITH_ISSUES | 0 | 4 | 4 |
 | code-reviewer | PASS_WITH_ISSUES | 0 | 4 | 6 |
-| qa-engineer | (见附注) | — | — | — |
+| qa-engineer | PASS_WITH_ISSUES | 1 | 2 | 1 |
 
 **R1 合并**: 1 Critical + 13 Major (去重后 9 类) + 18 Minor。无 FAIL。
 
@@ -56,6 +56,15 @@
 
 见同目录 `post_planning-R1-fixes-*.md` 与 tracker issue。R2 收敛判定在处置完成后进行。
 
-## 附注: qa-engineer 席位
+## 附注: qa-engineer 席位 (已回填)
 
-R1 派出 5 席，qa-engineer 未在收敛判定前返回。其审计面（测试有无牙 / AC 覆盖 / 退役后覆盖真空）与 code-reviewer 的逐条核对、以及本 cycle 已跑的两轮 pre-merge 对抗 review 部分重叠，但**不构成替代**——该席位的独立结论缺失应记为本次 R1 的覆盖缺口，R2 需补。
+⚠️ 本节初版写「未在收敛判定前返回…应记为覆盖缺口, R2 需补」。**该席位随后返回了**, 且是 R1 最重的一份 —— 报出 **1 Critical + 2 Major + 1 Minor**, 其 Critical 是本轮唯一一条「已 ship 的真实红测试」。初版未回填导致落盘报告低估自己的覆盖面 (post_planning R2 N-3 抓出)。
+
+**qa-engineer 席位结论**:
+- **Critical**: `session-closer/tests/test_handoff_autofill.py::test_unreachable_remote_warns` 在归档 commit `9af7b21` 上**真实挂着** (agent 实跑复现)。根因: `552e030` 把判据从 `reachable is False` 改为 `fetch_ok == "false"` (修复本身正确), 夹具未跟改。**为什么没发现**: `state-scanner/tests/run_tests.py` 的 `TESTS_DIR` 硬编码只扫自己的 `tests/` (该脚本 :20-21), 结构上看不见 `session-closer/tests/` ⇒ 「1248 全绿」的验证范围覆盖不到本次改动的真实爆炸半径 (改了 A skill 里、消费方在 B skill 的代码, 只跑了 A 的测试)。
+- **Major-1**: I2 观测性字段 (`enforced_remotes_resolved` / `excluded_read_only` / `enforced_set_empty`) 产出侧**零直接断言** —— 生产代码注释自陈「裁决基于子集就必须让子集可读」, 却无测试钉死。
+- **Major-2**: 测试数声称「1219 → 1248」与实测不符, 双端 worktree 实跑 + `git diff` 净新增 `def test_` 计数交叉验证, 真实起点为 **1232** (delta +16)。
+- **Minor-1**: `_aggregate_flags` 的既有测试仍在手工构造 `reachable: False` 喂给一个生产侧不可达的输入形态 (非本 cycle 引入, tasks 5.5 已诚实记录)。
+- 该席位另对本 cycle 新增测试逐类做了**可证伪验证** (含实际去掉 `ARIA_SCAN_OFFLINE` 复跑, 确认 `test_ac9_repeated_scans_are_byte_stable` 的「恒绿」自述属实而非自欺), 结论: 新增测试整体有牙。
+
+**根因机制状况 (R2 N-3)**: Critical 的结构性根因 —— 无跨 skill 全量测试入口 —— **尚未机制化修复**。本次靠一次性人工扫 12 个 `skills/*/tests` 目录兜住; `TESTS_DIR` 硬编码未变, 全仓仅 state-scanner 一个 runner。⇒ 下次跨 skill 改动同类漏检会原样复发。已纳入 Aria #168 跟踪。
