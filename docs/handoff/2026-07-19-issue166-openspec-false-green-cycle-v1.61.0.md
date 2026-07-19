@@ -13,7 +13,7 @@ updated-at: 2026-07-19
 ## §0 入口 (新 session 优先读)
 
 - **本对话干了什么** (时序): (1) `/state-scanner` 开局 → 选中新 issue **Aria #166** → (2) `/issue-triage` 核对 (verdict `confirmed`/`major`/`next-cycle`, 3/3 复现, 判定与 #110/主 spec **同类不同根**不并入) → POST triage comment → (3) **Phase A**: Level 2 Spec + **post_spec convergence R1→R4 CONVERGED** (抓 1 Critical + 1 Major, 见 §3) → (4) **Phase B**: TDD 三缺陷 (各 baseline-failing RED 先行) + code-review + silent-failure-hunter (抓 1 fix-introduced regression) → (5) **Phase C**: 撞并发版本抢注 → 让位 v1.61.0 + rebase → PR #112 merged → 四远程核验 → (6) **Phase D**: 归档 + 关 #166 + 开 follow-up #113/#114 → (7) **收尾后追加治理变更**: owner 就「AI 自行跳过 post_planning」裁决 → 落地**不可协商规则 #10**。
-- **当前态**: 全部提交推送, **四仓双远程 parity ✓** (主仓 `73472cd` / aria **v1.61.0** `55ab21d` / standards `79b7cd6` / orchestrator `92acce5` WIP 未动)。#166 **closed**, aria-plugin #113/#114 open。
+- **当前态**: 全部提交推送, **四仓双远程 parity ✓** (主仓 `073314c` / standards `a96a56b` / aria **v1.61.0** `55ab21d` / standards `79b7cd6` / orchestrator `92acce5` WIP 未动)。#166 **closed**, aria-plugin #113/#114 open。
 - **下一步**: 本 cycle 已闭环, 无残留。可接的线索见 §6。
 
 ## §1 已完成
@@ -42,7 +42,7 @@ updated-at: 2026-07-19
 
 **机械补漏 (autofill 交叉核验)**: `handoff_autofill` 报 199 条 unfinished, **逐条核验后全部属其他 7 个 active spec** (m6 ×4 / m7 ×2 / 主 stale-refs ×40) —— **本 cycle 零残留** (归档 spec 12/12 全勾)。非本对话线程, 不在此承接。
 
-**承前 (非本对话线程)**: `aria-orchestrator` 工作树 = WIP feature checkout (`feature/m6-cost-model-telemetry` @ `92acce5`), 全程未动; 主 spec `state-scanner-stale-refs-false-parity` 由并发 session ship 核心后**保持 active** (29 TODO, 见其 handoff)。
+**承前 (非本对话线程)**: `aria-orchestrator` 工作树 = WIP feature checkout (`feature/m6-cost-model-telemetry` @ `92acce5`), 全程未动; 主 spec `state-scanner-stale-refs-false-parity` —— ⚠️ **本 handoff 写就后状态已变**: 并发轨在 2026-07-19 晚些时候收口 29 TODO → **ship v1.62.0 并已归档** (`openspec/archive/2026-07-19-state-scanner-stale-refs-false-parity/`, 主仓 `8d15267`)。本对话末次 rebase 即落在其上; aria gitlink 现为 `9af7b21` (v1.62.0, 非本对话 ship 的 v1.61.0 `55ab21d`)。
 
 ## §3 关键风险 / 已知陷阱
 
@@ -57,7 +57,8 @@ updated-at: 2026-07-19
 
 | 维度 | 状态 |
 |------|------|
-| 主仓 | `73472cd` 双远程 parity ✓ (autofill warnings=[], 收尾后二次确认) |
+| 主仓 | `073314c` 双远程 parity ✓ (末次 rebase 到并发轨 v1.62.0 之上) |
+| standards | `a96a56b` 双远程 ✓ — 本轮新增 `conventions/configured-gate-authority.md` (规则 #10 下沉) |
 | aria-plugin master | `55ab21d` **v1.61.0** 双远程 parity ✓ (gitlink 可达双远程 — **先推 GitHub 再 bump**, 规避 #165 根因) |
 | standards / aria-orchestrator | `79b7cd6` (detached) / `92acce5` (WIP feature checkout, 全程未动) |
 | 版本一致性 | plugin.json(SOT)/marketplace ×2/VERSION/CHANGELOG/README 五处 = 1.61.0; 主仓 badge + Project Status + i18n ×3 + VERSION 表同步 |
