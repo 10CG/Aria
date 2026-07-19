@@ -10,6 +10,23 @@
 > **Target**: aria-plugin (子模块 `aria/`)
 
 > ### 🔀 范围已拆分 (owner 2026-07-12, 5/5 agent 一致建议)
+
+> **归档状态 (2026-07-19, Phase D.2)**: 四段式核心 v1.60.0 + Phase 4 收口 v1.62.0 全部 ship。
+> tasks 102/119 done。归档门 `gate_result` verdict=**warn** / **0 block** / complete=False —— warn 来自
+> 符号引用形态无法分类 (fail-toward-warn 设计), 非死代码。
+>
+> **明示未做 (不冒充完成, owner 已裁定可 defer)**:
+> - **3.16 k_eff `observed_rotation` 持久化 — DEFERRED** (fail-CLOSED)。k_eff=k_min 冷启动兜底,
+>   **AC-15 防饥饿仅对 rotation ≤ k_min=3 的采用者完全成立**; 大仓 (rotation>3) 会被砍腿 →
+>   expired → blocking 偏红。**不得记 AC-15 已完全满足。**
+> - **3.5d 永久失败 leg 退避** (per-leg consecutive_failures + 2^n 跳过): 未实现。
+> - **11.1 `/skill-creator` AB benchmark**: 本 cycle 未跑 (改动集中在机械 collector, 未动
+>   SKILL.md description/指令面 — deterministic skill 的 Rule #6 substitute 路径)。
+> - **3.10 / 13.7**: 人工审计产出 (collector 依赖逐一核对表 / gitlink contains 性能实测附表) 未产出。
+> - **13.x SUPERSEDED 区** (F10′ 原方案, R6 证伪): 保留仅供溯源, 一律不勾。
+>
+> **follow-up**: Aria #165 (镜像漏推) — 本 cycle 产出 A/B/C 评估报告 (issue 评论), 核心结论:
+> F10″ **不可**直接复用为 bump 守卫。
 > | Spec | 内容 | 与本 Spec 的关系 |
 > |------|------|------------------|
 > | **[state-scanner-snapshot-stderr-secret-leak](../state-scanner-snapshot-stderr-secret-leak/proposal.md)** (L2) | Rule #7: 裸 git stderr → 分类枚举 | **应先落地** —— 本 Spec 的 F3′ 把该暴露面放大 N×M 倍。本 Spec **复用**它提炼出的分类器。 |
