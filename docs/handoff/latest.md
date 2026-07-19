@@ -26,6 +26,7 @@
 - post_spec **R1→R4 CONVERGED** (R1 Critical: 缺陷2 位置钉错 —— 继承 issue 自身 mis-citation; R2 Major: surfacing 机制假设被源码证伪) + silent-failure-hunter 抓 fix-introduced regression
 - 🔴 **最贵一课**: 开局 scan 已报 `self_multi_container` collision, 判为 benign 跳过 claim → 精确撞上轨 B (同 skill 同文件 + 抢注 v1.60.0), 被迫让位 v1.61.0 + rebase
 - Spec 已归档; #166 closed; follow-up aria-plugin #113/#114 open
+- ⚖️ **收尾后追加治理变更**: 新增**不可协商规则 #10**「已启用的审计检查点不得由 AI 自行豁免」(触发: 本 cycle AI 自行跳过 post_planning; owner 裁决照跑, 并否决「跟踪 AI 判断准确率再放权」方案)
 
 ### 轨 B — 主 spec false-parity marathon (并发, 抢注 v1.60.0)
 
