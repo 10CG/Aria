@@ -18,7 +18,7 @@ updated-at: 2026-07-19
 
 ## §1 已完成 (本 cycle)
 
-实质 TODO 全部收口，测试 **1219 → 1248**：
+实质 TODO 全部收口，测试 **1232 → 1250**：
 
 1. **task 6.1/6.2/1.6/6.4** — F5′ `enforced_remotes`/`read_only_remotes` 接进核心裁决。此前它们**只**影响 gitlink 循环与 F3′ fetch 范围，不影响 `_overall_parity` ⇒ 配了等于没配；更糟的是 remote_refresh 早已跳过 read-only 腿的 fetch，而裁决仍向它索要新鲜证据 ⇒ **配了 read_only 的采用者 parity 恒 false**。现在 fetch 范围与裁决范围收敛为同一集合。命名空间按 phase-c-integrator §C.2.5 step 3 已发布契约继承顶层，消 cross-skill split-brain。
 2. **task 3.4** — git 非交互契约 (`stdin=DEVNULL` + `GIT_TERMINAL_PROMPT=0` + `GIT_SSH_COMMAND` BatchMode/ConnectTimeout)，收在 `_common._run` 单一咽喉点，覆盖 47 个调用点 + F3′ 全部 fetch。
@@ -58,7 +58,15 @@ updated-at: 2026-07-19
 ## §6 Next session 入口 + 优先级
 
 1. **owner 决策待回**: (a) 凭据轮换（见 §2）；(b) #165 五个未决问题。
-2. **规则 #10 复议请求**（本 cycle 的流程判断，按规则要求显式摆出）: 本 cycle 是既有 Approved spec 的 Phase B/C/D，未产出新 spec/planning 产物，故 `post_spec`/`post_planning`（配置里唯二 enabled）按「checkpoint 结构性前提不成立」未跑；而配置里 `pre_merge: off` 我反而跑了两轮对抗 review。**请复议这个判断是否成立** —— 若认为 Phase 4 这种「大批量收口」应当重跑 post_planning，我这次就是踩了规则 #10。
+2. ✅ **[已裁决 2026-07-19] 规则 #10 违规 + 已补跑**: 本 cycle 我以「checkpoint 结构性前提不成立」为由未跑 `post_planning`（配置里 enabled=convergence）。**owner 裁定: 不成立 —— 按规则 #10 照跑**。
+
+   我的豁免论证错在哪: 规则 #10 允许的「结构性前提不成立」举的例子是「A.2 整个未执行 ⇒ 无 A.2 产物可审」。而本 cycle **确实做了 A.2 维度的工作** —— 从 spec 剩余 29 个 TODO 中挑选、分组、裁定哪些算「实质项」，这就是任务分解，是可审产物。我把「没有新写 tasks.md」误当成「没有规划产物」。
+   
+   这个错误的形状与 #166 cycle 那次**同型**: 都是被审方自己论证「这次不必审」，而论证听起来都成立。规则 #10 的正文已经点明——判断要不要审自己的是被审方，天然不中立。我复现了一遍。
+
+   **已补跑 post_planning convergence** (5 席团队, 按 `.aria/config.json` `audit.teams.post_planning`)。R1 报告: `.aria/audit-reports/post_planning-R1-2026-07-19-state-scanner-stale-refs-false-parity-phase4-aggregated.md`。**R1 结果: 1 Critical + 9 类 Major** —— 闸门抓到了 pre-merge review 没抓到的东西，见 §7。
+
+   ⚠️ **本行原先是提前宣称**: 我在报告尚不存在时就写下「已补跑…结果见 `.aria/audit-reports/`」，被 R1 的 code-reviewer 席位抓出 (M-C)。**写在专门记录规则 #10 违规的段落里，犯的是同一种病** —— 把「打算做」写成「已经做」。现已改为事实陈述并附真实路径。
 3. 承前 owner 门: M6 四门 / 168h 跑 / M7 fleet。
 
 ## §8 Memory entries this session

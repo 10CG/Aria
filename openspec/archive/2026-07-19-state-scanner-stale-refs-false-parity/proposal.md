@@ -1,3 +1,20 @@
+---
+unverified_claims:
+  - claim: "**裁决接线**: `gitlink_orphaned(R) == true` ⇒ 进 F4′ **blocking** ∀ 子句; `multi_remote_drift` 建议文案「主仓在 R 上引用的子模块 commit 在 R 上不存在 — 从 R clone --recursive 会断裂。修法: git -C S push R <branch>」 (✅ Phase 4 收口, v1.62.0)"
+    reason: "symbol 'multi_remote_drift' unclassified reference form"
+    symbols: ["multi_remote_drift"]
+  - claim: "🆕 **AC-11 (防 R3-C5 恒红)**: **detached-HEAD 子模块** + 全部 remote 刷新成功 + 主仓 equal → `overall_parity` **仍 true**。**本仓可直接 dogfood** (`aria` 子模块正是 detached)"
+    reason: "dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在"
+    symbols: []
+  - claim: "**跨进程同仓并发** (两个终端同时 scan) 写明为**已知可接受降级**: 依赖 git 自身 ref lock; 争用 ⇒ `fetch_ok=false` ⇒ 降级 unknown (**假红方向, 可接受**)。🆕 **v8 (RM-6a) 声明扩到 cache 层**: tmp+rename 防损坏不防 lost-update — 迟写者覆盖早写者的 per-leg 更新 ⇒ 偏红/重复 fetch (可接受, 方向正确); 计数器回退的 fail-OPEN 缝由 3.16 钳位封死。否则 dogfood 时会被当 bug 追"
+    reason: "dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在"
+    symbols: []
+  - claim: "**dogfood (本仓)**: `aria` 子模块 detached-HEAD + 全 remote 真 equal ⇒ `overall_parity` **仍 true** (AC-17); **`standards` / `aria-orchestrator` 的 github 镜像若落后 ⇒ 必须报出来** (AC-16); `sync_status` 与 `tracks_multibranch` 不再自相矛盾 (✅ Phase 4 收口, v1.62.0)"
+    reason: "dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在"
+    symbols: []
+unverified_ack: true
+unverified_ack_reason: "post_planning R1 补审 (报告 .aria/audit-reports/post_planning-R1-2026-07-19-state-scanner-stale-refs-false-parity-phase4-aggregated.md) 抓出本 spec 归档时走手工 git mv 而非 openspec-archive skill, #95 两条机械通道 (warn_overlay frontmatter / D auto-issue tracker) 均未点亮 (R1 M-B)。本 frontmatter 为补写。逐条 ack: (1) multi_remote_drift 符号未分类属归档门 _ARTIFACT_PATH_TOKEN_RE / 符号分类器的已知局限 (非本 change 引入), 该符号在 basic-rules.md dispatch 表与 RECOMMENDATION_RULES.md 均有活引用, 非死代码; (2)(3)(4) 三条 dogfood 声称同属分类器只认 ab-results|ab-suite 路径的结构性局限 —— 真实 dogfood 执行记录见 dogfood-evidence.md (与本文件同目录, 按姊妹 spec 2026-07-19-state-scanner-openspec-collector-false-green 先例补写)。**AC-16 正向腿 (镜像真落后必须报出) 在本仓实测恒 vacuous** (live snapshot 全 ok/no_matching_remote), 该腿未获正面验证, 见 dogfood-evidence.md §限制。"
+---
 # Proposal: state-scanner 陈旧 ref 假同步修复 — 「新鲜度靠获取, 不靠测量」
 
 > **Status**: **✅ Approved v10 (owner sign-off 2026-07-15)** — R9 PASS-with-fixes 2/2 (0 Critical — R1-R8 八轮全 FAIL 后首个非 FAIL), fixes 已全部折入本版 (2026-07-14; D20 三档全分割经受住全部证伪, 唯一实质补丁=负墙钟龄钳位; 12M/13m 全为镜像/残留文本级, 已修并机械复核 [代 R10, 两审计一致建议]; 聚合 `.aria/audit-reports/post_spec-R9-2026-07-14-*-aggregated.md`)。**owner 终审通过 D15′-D20 五条代裁 (D15′ 双角色谓词 / D16 SOT 搬入 aria-plugin+lock / D18 豁免代际上界 / D19 漂移通道#5 划归 Spec C / D20 evidence_grade 三档全分割 E 优先)**。**下一步: Phase A.2/A.3** (落地顺序: Spec C → Spec B → 主 Spec; Spec B 待其独立 post_spec R6 收敛后签)。
@@ -11,27 +28,33 @@
 
 > ### 🔀 范围已拆分 (owner 2026-07-12, 5/5 agent 一致建议)
 
-> **归档状态 (2026-07-19, Phase D.2)**: 四段式核心 v1.60.0 + Phase 4 收口 v1.62.0 全部 ship。
-> tasks 102/119 done。归档门 `gate_result` verdict=**warn** / **0 block** / complete=False —— warn 来自
-> 符号引用形态无法分类 (fail-toward-warn 设计), 非死代码。
+> **归档状态 (2026-07-19, Phase D.2 + post_planning R1 补审后修订)**: 四段式核心 v1.60.0 + Phase 4 收口 v1.62.0 ship。
+> tasks **103/119 done, 活跃未勾 8** (另 8 条在 SUPERSEDED 区, 一律不勾)。归档门 `gate_result` verdict=**warn** / **0 block**。
 >
-> **明示未做 (不冒充完成, owner 已裁定可 defer)**:
-> - **3.16 k_eff `observed_rotation` 持久化 — DEFERRED** (fail-CLOSED)。k_eff=k_min 冷启动兜底,
->   **AC-15 防饥饿仅对 rotation ≤ k_min=3 的采用者完全成立**; 大仓 (rotation>3) 会被砍腿 →
->   expired → blocking 偏红。**不得记 AC-15 已完全满足。**
-> - **3.5d 永久失败 leg 退避** (per-leg consecutive_failures + 2^n 跳过): 未实现。
-> - **11.1 `/skill-creator` AB benchmark**: 本 cycle 未跑 (改动集中在机械 collector, 未动
->   SKILL.md description/指令面 — deterministic skill 的 Rule #6 substitute 路径)。
-> - **3.10 / 13.7**: 人工审计产出 (collector 依赖逐一核对表 / gitlink contains 性能实测附表) 未产出。
+> ⚠️ **本段经 post_planning R1 补审修订** (审计报告: `.aria/audit-reports/post_planning-R1-2026-07-19-state-scanner-stale-refs-false-parity-phase4-aggregated.md`)。
+> 该审计是**补跑** —— 原 cycle AI 自行豁免了 post_planning, owner 按不可协商规则 #10 裁定不认可。R1 抓到 1 Critical + 9 类 Major,
+> 下列披露清单中标 🆕 的三项是 R1 抓出的**原披露遗漏**。
+>
+> **🔴 AC-5 声称降级 (R1 C-1)**: 原状态段与 CHANGELOG 把 AC-5 记为「已实现」。**准确表述是: AC-5 只实现到 advisory/检测级, 未实现到裁决级。**
+> AC-5 原文要求「track 不可达 ⇒ `overall_parity == false` **或** `reason` 非空」; 实际实现 (`scan.py:_check_snapshot_self_consistency`)
+> 是在「`overall_parity` 已为 true 且 `reason` 为空」时才启动检测, 检出后**不翻转 `overall_parity`、不写 `reason`**, 只 append
+> `snapshot_self_contradiction` 到 `errors[]`。且该 kind 当时不在 `state-snapshot-schema.md`、不在任何 dispatch、`output-formats.md` 不渲染 `errors` ⇒
+> **在使用者侧与「未实现」不可区分**。task 2.12 保持勾选 (代码确实落地且经对抗 review 加固), 但**不得据此声称 AC-5 裁决维度已满足**。
+>
+> **明示未做 (owner 已裁定可 defer; 🆕 = R1 抓出的原遗漏)**:
+> - **3.16 k_eff `observed_rotation` 持久化 — DEFERRED** (fail-CLOSED)。k_eff=k_min 冷启动, **AC-15 防饥饿仅对 rotation ≤ k_min=3 的采用者完全成立**。**不得记 AC-15 已完全满足。**
+>   - 🆕 补充 (R1 m-3): AC-15 有**两个**失效源, 原披露只覆盖 3.16 一个。另一个是 3.5d —— AC-15(c) 防饥饿的全称量词写的是「每条**非退避** leg」, 该 carve-out 的前提机制 3.5d 不存在。
+> - **3.5d 永久失败 leg 退避** (per-leg `consecutive_failures` + 2^n 跳过): 未实现。🆕 (R1 M-G) 原披露只写「未实现」无影响面论证 —— 它落在 spec 自述的恒红根因面上 (proposal AC-15(c): 「这才是 C-C 的真正根因: 不是分桶, 是饥饿」)。一条永久失败的 remote 每次 scan 照常占 deadline 预算, 既挤压其它 leg 又让自己永久 ¬E∧¬X ⇒ blocking。**影响面数字待补** (本仓 6-8 腿下是否实际可达)。
+> - 🆕 **5.5 `_aggregate_flags` docstring 三段式** — 原披露**完全缺席** (R1 M-D)。背后事实: `_aggregate_flags` **零生产调用点** (仅定义 + 测试导入), 符合 v1.53.0 归档门 block 档字面定义而门给 0 block。**待裁定: 删除 (连同测试) 或写明保留理由。**
+> - 🆕 **7.2 SOT 清扫 — 已回退勾选** (R1 M-A): 本 cycle 清的是 `verify_mode`/ls_remote (属 task 1.10), 不是本条要求的 F2′ `warn_after_hours` 清扫。详见 tasks.md 该条批注 (含一处待 owner 裁的理由互斥)。
+> - **3.10 / 13.7**: 人工审计产出 (collector 依赖核对表 / gitlink contains 性能实测附表) 未产出。
+> - **11.1 `/skill-creator` AB benchmark**: 未跑。🆕 (R1 M-E) 原理由「未动 SKILL.md 指令面」**被本 cycle 自己的 diff 否证** —— `basic-rules.md` 改 77 行新增 dispatch 第七路 + `degrade_when`, 那就是「什么状态给什么建议」的规则表; 且 task 11.2 修了 AB rubric (承认判分标准失准) 却不跑用它的 AB。**该豁免理由不成立, 应改走 deterministic skill 的 Rule #6 substitute 路径显式命名替代证据, 或补跑。**
 > - **13.x SUPERSEDED 区** (F10′ 原方案, R6 证伪): 保留仅供溯源, 一律不勾。
 >
-> **follow-up**: Aria #165 (镜像漏推) — 本 cycle 产出 A/B/C 评估报告 (issue 评论), 核心结论:
-> F10″ **不可**直接复用为 bump 守卫。
-> | Spec | 内容 | 与本 Spec 的关系 |
-> |------|------|------------------|
-> | **[state-scanner-snapshot-stderr-secret-leak](../state-scanner-snapshot-stderr-secret-leak/proposal.md)** (L2) | Rule #7: 裸 git stderr → 分类枚举 | **应先落地** —— 本 Spec 的 F3′ 把该暴露面放大 N×M 倍。本 Spec **复用**它提炼出的分类器。 |
-> | **[state-scanner-issue-cache-freshness-assertion](../state-scanner-issue-cache-freshness-assertion/proposal.md)** (L2) | `issue-cache-freshness` 重定义 + `generated_at` 字段 | **零代码路径重叠**。原「四者同根 = collector 顺序」的叙事**是错的** (R1 已论证): F3′ 是「消费者早于生产者」的真顺序 bug; 它是「外部反向证据被放进被审计进程内部」的设计混淆。 |
-> | **本 Spec** (L3) | F1′/F2′/F3′/F4′/F5′/F6′/F9′ —— **不可再拆的核心机制** | fetch 无降级 = 白烧网络; 降级无 fetch = 恒红; F9′ 不同步落地 = 上线当天就制造新的自相矛盾。 |
+> **归档流程偏离 (R1 M-B, 最该补救)**: 本 spec 走的是手工 `git mv` 而非 `openspec-archive` skill ⇒ #95 的两条机械通道均未点亮 —— warn_overlay frontmatter (Step 2) 与 D auto-issue tracker (Step 7, 门控 `d_payload != null`)。对照组: 同日归档的姊妹 spec `../2026-07-19-state-scanner-openspec-collector-false-green/proposal.md` 首行即 frontmatter。**已补: 见本文件 frontmatter + tracker issue。**
+>
+> **follow-up**: Aria #165 (镜像漏推) — 本 cycle 产出 A/B/C 评估报告 (issue 评论), 核心结论: F10″ **不可**直接复用为 bump 守卫。
+
 
 ---
 
@@ -792,7 +815,7 @@ OQ-B 说「保留原 `coordination_fetch` 块 origin-only 原样, 另开 `remote
 
 ## 关联
 
-- **拆出的姊妹 Spec**: [snapshot-stderr-secret-leak](../state-scanner-snapshot-stderr-secret-leak/proposal.md) (Rule #7, **应先落地**) / [issue-cache-freshness-assertion](../state-scanner-issue-cache-freshness-assertion/proposal.md) (正交)
+- **拆出的姊妹 Spec**: [snapshot-stderr-secret-leak](../2026-07-16-state-scanner-snapshot-stderr-secret-leak/proposal.md) (Rule #7, **应先落地**) / [issue-cache-freshness-assertion](../2026-07-16-state-scanner-issue-cache-freshness-assertion/proposal.md) (正交)
 - **承重先例 (必读)**: `openspec/archive/2026-06-12-state-scanner-coordination-fetch-resilience` (**#141** — two-fetch 语义, `fetch_ok` 锚定依据) / `openspec/archive/2026-04-25-state-scanner-mechanical` (**AD-SSME-6** — `state-snapshot-schema.md` 才是 schema SOT; `multi_remote.py:4` 声称 git-remote-helper 是 canonical 的 docstring 是**被取代的 stale 声明**, **不得**据此把 SOT 迁回代码)
 - **下游 Spec**: `aria-2.0-m7-fleet-aggregation` (Approved — 消费 `overall_parity`)
 - **aria-plugin #109**: 同一失败模式的**协调层**维度; 本 Spec 是**扫描层**维度。R1 核实真 disjoint。**互补**: 即使认领点前移, 若 `sync_status` 撒谎说「已同步」, AI 照样在落后树上开工。

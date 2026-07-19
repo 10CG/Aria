@@ -201,7 +201,7 @@
 ## 7. F2′ — 退役 mtime 实现 (保留概念)
 
 - [x] 7.1 退役 `local_refs_stale` / `warn_after_hours` 的 FETCH_HEAD-mtime 路径
-- [x] 7.2 **无条件清扫 ≥8 处 SOT** (⚠️ v2 曾把条件写反成「若保留才清扫」—— **退役 = 死配置键, 清扫更必须**): `config-loader/DEFAULTS.json:38` / `.aria/config.template.json:21` (**采用者模板**) / `.aria/config.json` / `config-loader/SKILL.md:79` / `sync-detection.md` ×4 / `git-remote-helper/schema.md:58` / `state-snapshot-schema.md:490` (✅ Phase 4 收口, v1.62.0)
+- [ ] 7.2 **无条件清扫 ≥8 处 SOT** (⚠️ v2 曾把条件写反成「若保留才清扫」—— **退役 = 死配置键, 清扫更必须**): `config-loader/DEFAULTS.json:38` / `.aria/config.template.json:21` (**采用者模板**) / `.aria/config.json` / `config-loader/SKILL.md:79` / `sync-detection.md` ×4 / `git-remote-helper/schema.md:58` / `state-snapshot-schema.md:490` (⚠️ **post_planning R1 M-A 回退勾选**: 本 cycle 清扫的是 `verify_mode`/ls_remote 的 SOT (属 task 1.10 的退役), **不是本条要求的 F2′ `warn_after_hours`/`local_refs_stale` 清扫** —— 7.2 在 `## 7. F2′ 退役 mtime` 章节下。实测至少 4 处仍带退役键: `config-loader/DEFAULTS.json:38` / `config-loader/SKILL.md:79` / `.aria/config.template.json:21` (**采用者模板**) / `.aria/config.json:20`。**另有一处理由互斥待 owner 裁**: `multi_remote.py:164` 写「`sync_check.warn_after_hours` remains for sync.py's own consumption」, 而 `sync-detection.md:358` 写「三个字段从未被任何代码路径消费」—— 二者不可能同真, 保留决定本身缺一个成立的理由。)
 - [x] 7.3 清理 `_scan_repo` 的 `stale` 死返回值
 
 ## 8. F9′ — `sync.py` 平行计算点 (按 OQ-E 裁定)
@@ -217,7 +217,7 @@
 - [x] 9.2 `multi_remote_drift` 建议**按 ≥6 种成因分派** (behind/diverged→pull / ahead→push / benign unknown→**不触发** / no_local_tracking_ref→`has_unpublished_branch` / not_refreshed·network·auth→查网络凭据)。**不是一律 fetch/pull** (US-008 directional guard)
 - [x] 9.3 `multi_remote_drift` 规则**无去重/冷却** (grep 零命中) ⇒ 按 OQ-C 处理
   > **2026-07-19 进展**: 已在 `references/rules/basic-rules.md` §1.35 补充 OQ-C 说明 (文档层, prompt-based
-  > skill 无代码实现面)。**OQ-C 本身仍未裁定** (1.3 checkbox 未勾) ⇒ 本条**记为需 owner 在 Phase A 裁定
+  > skill 无代码实现面)。~~**OQ-C 本身仍未裁定** (1.3 checkbox 未勾)~~ **[已过时 — OQ-C 由 owner 2026-07-19 裁定「不造有状态冷却」, 1.3 已勾, `degrade_when` 已落 basic-rules.md §1.35; post_planning R1 抓出本段为反向残留]** ⇒ 本条**记为需 owner 在 Phase A 裁定
   > OQ-C 后再落地**, 未强行实现去重/冷却机制 (倾向记录见 proposal.md OQ-C: 用 `has_unreachable_remote`
   > 在建议层降级, debounce 不作用于裁决层)。
 - [x] 9.4 **`aria-2.0-m7-fleet-aggregation` (Approved) 消费 `overall_parity`** ⇒ 语义变更需同步该 Spec (其 TB-health-3 pin 到 schema doc)
@@ -276,10 +276,10 @@
 - [x] 12.4 **AC-3**: mock `_run` 断言「每个 (repo,remote) 恰好 fetch 一次」(**集合/计数不变量, 非 strict order** —— 真并行下调用序由线程调度决定)
 - [x] 12.5 **dogfood (本仓)**: `aria` 子模块 detached-HEAD + 全 remote 真 equal ⇒ `overall_parity` **仍 true** (AC-17); **`standards` / `aria-orchestrator` 的 github 镜像若落后 ⇒ 必须报出来** (AC-16); `sync_status` 与 `tracks_multibranch` 不再自相矛盾 (✅ Phase 4 收口, v1.62.0)
       > ⚠️ **v5 的 12.5 已经写了「github 镜像若落后 ⇒ 必须报出来」, 但 v5 的设计做不到** —— **F10′ 之前, 这条 dogfood 任务在 Phase B 必然失败** ⇒ 会撞上 2.14 设计闸 ⇒ 打回 Phase A。**R5 在 Phase A 就抓住了它。** 这正是「dogfood 任务写了但设计不支持」的活体案例。
-- [ ] 12.6 归档语料 sweep 无新 block (TODO: 归档语料 sweep 未跑 (Phase D 归档活动, 本 Spec 尚未进入 Phase D))
+- [x] 12.6 归档语料 sweep 无新 block (✅ Phase 4: 已跑, `gate_result` verdict=warn / **blocking_reasons=[]** 即 0 block — 见 commit `e7883b0`。原批注「本 Spec 尚未进入 Phase D」为陈旧文本, post_planning R1 M-F 抓出。)
 - [x] 12.7 **跨仓落地**: aria-plugin PR → merge → **submodule pointer bump 到 post-merge master SHA** (C.2.4.5 block-default gate) → 主项目 `VERSION` → **多远程推送 (origin + github, 两仓)** (✅ Phase 4 收口, v1.62.0)
 - [x] 12.8 版本 bump + 5 处 SOT 同步 + 主仓 badge (✅ Phase 4 收口, v1.62.0)
-- [ ] 12.9 释放 track claim (TODO: track claim 释放未做 (工作进行中, 收尾前不应释放))
+- [x] 12.9 释放 track claim (✅ Phase 4: 已释放 — `refs/aria/coordination:claims/bfe8285d/s-123d@1436.yaml` 记 `status: done`。原批注「工作进行中, 收尾前不应释放」为陈旧文本, post_planning R1 M-F 抓出。)
 
 ## 🔴 13. F10″ — orphaned-gitlink 跨仓可达性 (v7, 按 D14 重写; 取代已证伪的 F10′)
 
