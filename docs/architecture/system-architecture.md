@@ -891,7 +891,7 @@ C.2 Phase 包含两级完整性保证:
 │                                                             │
 │  Layer 1: state-scanner (检测)                              │
 │  ├── sync_status.multi_remote.* 新字段                      │
-│  ├── overall_parity: in_sync / drift / ahead / unknown      │
+│  ├── overall_parity: bool (F4′ 四子句裁决, 非枚举)          │
 │  └── multi_remote_drift 推荐规则 (priority 1.35, warning)   │
 │                                                             │
 │  Layer 2: phase-c-integrator C.2.5 (执行)                   │

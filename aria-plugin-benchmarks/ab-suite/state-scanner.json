@@ -140,8 +140,10 @@
         "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced",
         "Should trigger multi_remote_drift recommendation rule (priority 1.35) when overall_parity is false",
         "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
-        "Should exclude parity: ahead and parity: unknown from overall_parity computation",
-        "Should NOT trigger drift warning when only has_pending_push or has_unreachable_remote is true"
+        "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+        "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+        "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+        "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning"
       ]
     },
     {
