@@ -483,6 +483,18 @@ branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/re
 
 **详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
 
+10. **已启用的审计检查点不得由 AI 自行豁免** - `.aria/config.json` `audit.checkpoints` 配了 `convergence`/`challenge` 的, 必须跑
+
+**规则 #10 要点:** enabled checkpoint 是 **owner 的配置决定**, 不是 AI 的临场判断题。AI **不得**以「本次 Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高 / session 已很长」等理由自行跳过。豁免**只能**来自已写明的机制: `audit.checkpoints` 显式设 `off` / `adaptive_rules` 的 Level→mode 映射 / emergency hotfix lane (#58) / checkpoint 自身的结构性前提不成立 (如 A.2 整个未执行 → 无 A.2 产物可审)。这些之外的跳过 = 违规。
+
+**为什么** (2026-07-19 Aria #166 cycle 实证): 该 cycle AI 以「Level 2 + 任务从已 audited 的 11 条 SC 1:1 派生」为由自行跳过 post_planning。而同 cycle 跑了的 post_spec **抓到 1 Critical + 1 Major** (缺陷 2 修复位置钉错文件 —— 继承 issue 自身 mis-citation; 若不抓则测试全绿、SC 全满足而 issue headline 危害原封不动)。**闸门的价值恰恰在于「你不知道它这次会不会抓到」** —— 知道会抓到就不需要闸门。且判断「要不要审自己」的是被审方, 天然不中立 (省一轮审计对 AI 有直接吸引力)。
+
+**为什么不采用「跟踪 AI 判断准确率 → 自动放权」** (owner 决策 2026-07-19): **跳过即销毁标签** —— 那轮审计从未跑过, 它会不会抓到东西永远无答案, 这是结构性的 (不是记录不够细)。唯一诚实的设计是「照跑 + 封存 AI 判断作对照」得真标签, 但校准期一分钟不省、按本项目决策频次需攒半年以上, **量具比被测物更贵**; 而便宜版本 (「跳过后没出事 = 判断正确」) 结构上对「跳错了但还没浮出来」完全瞎 —— 正是本项目反复在打的假绿形态, 且会拿假证据给 AI 发更大裁量权。**选择: 照跑。** 每 cycle 的实测结果本身即将来写豁免规则的实证依据 (数据挣来的, 非 AI 声称)。
+
+**配套习惯 (低成本, 必做):** AI 任何自作主张的流程判断 (跳过/降级/改序) 必须在 session handoff 里**显式写出**「跳了什么 + 理由 + 请复议」, 使其永远不会悄悄沉淀为惯例。#166 cycle 正是靠这条才被摆上台面。
+
+**Exception:** 零 exception。若某 checkpoint 在某场景确实不值得跑, 应改 config/skill 把豁免**写成机制**, 而不是让 AI 每次判断。
+
 ---
 
 ## Aria 2.0 运行时 (参考实现层, v2.0.0 in progress)
@@ -499,14 +511,15 @@ Aria 2.0 引入"参考实现层", 把 v1.x 的十步循环方法论**端到端�
           └── Layer 2: aria-runner 容器 (AI 工程师)
 ```
 
-### 与 9 条不可协商规则的关系
+### 与 10 条不可协商规则的关系
 
-v2.0 运行时**严格遵守** 9 条规则, 规则由 Layer 2 容器内的 aria-plugin 负责执行:
+v2.0 运行时**严格遵守** 10 条规则, 规则由 Layer 2 容器内的 aria-plugin 负责执行:
 - Rule #1 OpenSpec: Layer 1 在 S1_TRIAGED 前确认 issue 是否有对应 Spec
 - Rule #2 十步循环不跳过 Phase A: Layer 2 执行完整十步循环
 - Rule #3 文档同步: Layer 2 在 S5_REVIEWING 前强制 arch-update
 - Rule #4-6: Layer 2 按 v1.x 语义执行
 - Rule #7-9: Layer 2 内 Claude Code 实例遵守相同 secret / pre-merge / handoff 规则
+- Rule #10 审计检查点不得自行豁免: Layer 2 按 `.aria/config.json` 跑满 enabled checkpoint (自主运行时无人复议, 该约束更硬)
 
 ### 人类参与点
 

@@ -1,31 +1,35 @@
 {
   "_comment": "Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)",
   "version": "1.0",
-
   "workflow": {
     "auto_proceed": false
   },
-
   "state_scanner": {
     "confidence_threshold": 90,
     "auto_execute_enabled": false,
-    "auto_execute_rules": ["commit_only", "quick_fix", "doc_only"],
+    "auto_execute_rules": [
+      "commit_only",
+      "quick_fix",
+      "doc_only"
+    ],
     "audit_log_path": ".aria/audit.log",
-
     "sync_check": {
       "enabled": true,
       "check_submodules": true,
       "check_remote": false,
       "warn_after_hours": 24
     },
-
     "issue_scan": {
       "_comment_submodules": "2026-04-15 启用 scan_submodules + stage_timeout 12→20 作为 state-scanner-submodule-issue-scan Spec 的 dogfooding — 防止 Aria meta-repo 模式下 aria-plugin / aria-orchestrator / aria-standards 的 issue 被漏扫",
       "enabled": true,
       "platform": "forgejo",
       "platform_hostnames": {
-        "forgejo": ["forgejo.10cg.pub"],
-        "github": ["github.com"]
+        "forgejo": [
+          "forgejo.10cg.pub"
+        ],
+        "github": [
+          "github.com"
+        ]
       },
       "cache_ttl_seconds": 900,
       "cache_path": ".aria/cache/issues.json",
@@ -41,23 +45,21 @@
       "mode": "advisory"
     }
   },
-
   "tdd": {
     "strictness": "advisory"
   },
-
   "benchmarks": {
     "require_before_merge": true,
     "skill_change_block_mode": "warn"
   },
-
   "experiments": {
     "agent_team_audit": false,
-    "agent_team_audit_points": ["pre_merge"]
+    "agent_team_audit_points": [
+      "pre_merge"
+    ]
   },
-
   "audit": {
-    "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood.",
+    "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood. **AI 不得自行豁免已 enabled 的 checkpoint** (CLAUDE.md 规则 #10, owner 决策 2026-07-19): 「Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高」不构成跳过理由 —— 跳过即销毁标签, 无法事后判定该跳是否正确; 便宜的准确率跟踪 (没出事=判断对) 对「跳错但未浮出」结构性失明。豁免只能来自本文件显式 off / adaptive_rules / hotfix lane / checkpoint 结构性前提不成立。",
     "enabled": true,
     "mode": "convergence",
     "max_rounds": 4,
@@ -71,11 +73,22 @@
       "post_closure": "off"
     },
     "teams": {
-      "post_spec": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"],
-      "post_planning": ["aria:tech-lead", "aria:backend-architect", "aria:qa-engineer", "aria:code-reviewer", "aria:knowledge-manager"]
+      "post_spec": [
+        "aria:tech-lead",
+        "aria:backend-architect",
+        "aria:qa-engineer",
+        "aria:code-reviewer",
+        "aria:knowledge-manager"
+      ],
+      "post_planning": [
+        "aria:tech-lead",
+        "aria:backend-architect",
+        "aria:qa-engineer",
+        "aria:code-reviewer",
+        "aria:knowledge-manager"
+      ]
     }
   },
-
   "orchestrator": {
     "dispatch_policy": {
       "tier1_action": "dispatch_ready",
