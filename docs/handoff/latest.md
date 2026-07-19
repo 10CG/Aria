@@ -13,12 +13,13 @@
 
 ## 最新 handoff
 
-**[2026-07-17 — 会话收尾: 单对话多 cycle (镜像修复 + Phase 0 v1.59.0 + reconcile #111 v1.59.1)](./2026-07-17-session-close-multi-cycle.md)**
+**[2026-07-19 — 主 spec state-scanner-stale-refs-false-parity 四段式核心 SHIPPED v1.60.0](./2026-07-19-mainspec-false-parity-core-ship-v1.60.0.md)**
 
-- track-id: `session-close-20260714-0717` | phase: **session-close** | status: **done**
-- 会话维度总账 (2026-07-14→07-17): 修 aria-orchestrator 镜像 + 开 Aria #165 → 主 spec Phase 0
-  ship **v1.59.0** → 查 clock_skew 挖出并修 aria-plugin #111 ship **v1.59.1**; memory +2; 四仓 parity ✓
-- 🔴 **下一步 = 主 spec Phase 1 (core, 最高风险 F3′, 专门 session)**; owner 侧: #165 评估 (建议并入
-  Phase 2 F10″) / M6 4 门 / 168h / #136 / #151。AI 侧无独立小活
-- 本 session cycle handoff: [Phase 0 v1.59.0](./2026-07-17-mainspec-phase0-v1.59.0-ship.md) /
-  [reconcile #111 v1.59.1](./2026-07-17-reconcile-clock-skew-111-v1.59.1.md) | 前序: [specC-ship](./2026-07-16-specC-ship-falseparity-signoff.md)
+- track-id: `state-scanner-stale-refs-false-parity` | phase: **C-shipped-D-partial** | status: **active**
+- 主 spec 四段式核心全实施 + ship **v1.60.0** (Phase 1 F1′-F6′/9.7 + Phase 2A F10″ gitlink [R5-C-A 事故解药]
+  + Phase 2B F9′ sync + Phase 3 golden/12.10); 6 agent-team 动态工作流 + 主 loop 亲验 (抓修 gitlink ok
+  BLOCKER false-green); 全套件 1219 绿 + dogfood 验证; aria `e162f7b` / 主仓 `d319d6f` 双远程 parity ✓
+- ⚠️ **行为变更 13.6**: overall_parity 事故形态 true→false; Fetch1 --prune
+- 🔴 **spec 保持 active (未归档)**: 79/119 done, k_eff DEFERRED, **29 TODO** (F5′ 6.1/6.2 接 overall_parity /
+  非交互 git 3.4 / tracks 2.12 / 命名空间 1.6) — 下一步见本 handoff §6; owner 门: M6/M7/#165
+- 前序: [Phase 0 v1.59.0](./2026-07-17-mainspec-phase0-v1.59.0-ship.md) / [specC-ship](./2026-07-16-specC-ship-falseparity-signoff.md)
