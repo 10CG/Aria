@@ -51,7 +51,7 @@ unverified_ack_reason: "post_planning R1 补审 (报告 .aria/audit-reports/post
 > - **11.1 `/skill-creator` AB benchmark**: 未跑。🆕 (R1 M-E) 原理由「未动 SKILL.md 指令面」**被本 cycle 自己的 diff 否证** —— `basic-rules.md` 改 77 行新增 dispatch 第七路 + `degrade_when`, 那就是「什么状态给什么建议」的规则表; 且 task 11.2 修了 AB rubric (承认判分标准失准) 却不跑用它的 AB。**该豁免理由不成立, 应改走 deterministic skill 的 Rule #6 substitute 路径显式命名替代证据, 或补跑。**
 > - **13.x SUPERSEDED 区** (F10′ 原方案, R6 证伪): 保留仅供溯源, 一律不勾。
 >
-> **归档流程偏离 (R1 M-B, 最该补救)**: 本 spec 走的是手工 `git mv` 而非 `openspec-archive` skill ⇒ #95 的两条机械通道均未点亮 —— warn_overlay frontmatter (Step 2) 与 D auto-issue tracker (Step 7, 门控 `d_payload != null`)。对照组: 同日归档的姊妹 spec `../2026-07-19-state-scanner-openspec-collector-false-green/proposal.md` 首行即 frontmatter。**已补: 见本文件 frontmatter + tracker issue。**
+> **归档流程偏离 (R1 M-B, 最该补救)**: 本 spec 走的是手工 `git mv` 而非 `openspec-archive` skill ⇒ #95 的两条机械通道均未点亮 —— warn_overlay frontmatter (Step 2) 与 D auto-issue tracker (Step 7, 门控 `d_payload != null`)。对照组: 同日归档的姊妹 spec `../2026-07-19-state-scanner-openspec-collector-false-green/proposal.md` 首行即 frontmatter。**已补: 见本文件 frontmatter + tracker issue [Aria #168](https://forgejo.10cg.pub/10CG/Aria/issues/168)。** (⚠️ 本句原先也是提前宣称 —— frontmatter 补了但 tracker 当时未建, 跑 R2 前自查抓出并补实。)
 >
 > **follow-up**: Aria #165 (镜像漏推) — 本 cycle 产出 A/B/C 评估报告 (issue 评论), 核心结论: F10″ **不可**直接复用为 bump 守卫。
 
