@@ -175,6 +175,7 @@ v2.0 在"十步循环"之上建立了两层执行结构:
 ├── 需求规范       → standards/openspec/project.md
 ├── 提交规范       → standards/conventions/git-commit.md
 ├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
+├── 闸门权限归属   → standards/conventions/configured-gate-authority.md (Rule #10, 2026-07-19; AI 不得自行豁免 enabled 闸门)
 ├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+; §1.3 周期vs会话收尾消歧 v1.50.0+)
 ├── 会话收尾 (对话维度)  → aria/skills/session-closer/ (leaf skill, 正交于十步循环 Phase D; "对话收尾")
 ├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.49.0+ §C.2.4.5 mechanical gate companion, **block default** since v1.49.0; v1.28.0-v1.48.x warn-only)
@@ -483,17 +484,21 @@ branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/re
 
 **详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
 
-10. **已启用的审计检查点不得由 AI 自行豁免** - `.aria/config.json` `audit.checkpoints` 配了 `convergence`/`challenge` 的, 必须跑
+10. **已启用的审计检查点不得由 AI 自行豁免** - 详见 `standards/conventions/configured-gate-authority.md`
 
-**规则 #10 要点:** enabled checkpoint 是 **owner 的配置决定**, 不是 AI 的临场判断题。AI **不得**以「本次 Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高 / session 已很长」等理由自行跳过。豁免**只能**来自已写明的机制: `audit.checkpoints` 显式设 `off` / `adaptive_rules` 的 Level→mode 映射 / emergency hotfix lane (#58) / checkpoint 自身的结构性前提不成立 (如 A.2 整个未执行 → 无 A.2 产物可审)。这些之外的跳过 = 违规。
+**规则 #10 要点:** `.aria/config.json` `audit.checkpoints` 配了 `convergence`/`challenge` 的闸门, **必须跑**。enabled 闸门是 **owner 的配置决定**, 不是 AI 的临场判断题 —— 不得以「变更小 / Level 低 / 被审对象是已审内容的 1:1 派生 / 性价比不高 / session 已很长 / 后面还有闸门兜底」等**价值评估**理由自行跳过、降级或改序。**闸门的价值恰恰在于「你事先不知道它这次会不会抓到」**; 且判断「要不要审自己」的是被审方, 天然不中立。
 
-**为什么** (2026-07-19 Aria #166 cycle 实证): 该 cycle AI 以「Level 2 + 任务从已 audited 的 11 条 SC 1:1 派生」为由自行跳过 post_planning。而同 cycle 跑了的 post_spec **抓到 1 Critical + 1 Major** (缺陷 2 修复位置钉错文件 —— 继承 issue 自身 mis-citation; 若不抓则测试全绿、SC 全满足而 issue headline 危害原封不动)。**闸门的价值恰恰在于「你不知道它这次会不会抓到」** —— 知道会抓到就不需要闸门。且判断「要不要审自己」的是被审方, 天然不中立 (省一轮审计对 AI 有直接吸引力)。
+**豁免白名单 (fail-closed, 仅此四类):** config 显式 `off` / `adaptive_rules` 的 Level→mode 映射 / 已成文的 lane 降级 (如 emergency hotfix) / 闸门的**结构性前提不成立** (审的对象整个未产生)。⚠️ 最易滑过的边界: 「对象不存在」合法, 「对象存在但做得简单所以不值得审」**不合法**。
 
-**为什么不采用「跟踪 AI 判断准确率 → 自动放权」** (owner 决策 2026-07-19): **跳过即销毁标签** —— 那轮审计从未跑过, 它会不会抓到东西永远无答案, 这是结构性的 (不是记录不够细)。唯一诚实的设计是「照跑 + 封存 AI 判断作对照」得真标签, 但校准期一分钟不省、按本项目决策频次需攒半年以上, **量具比被测物更贵**; 而便宜版本 (「跳过后没出事 = 判断正确」) 结构上对「跳错了但还没浮出来」完全瞎 —— 正是本项目反复在打的假绿形态, 且会拿假证据给 AI 发更大裁量权。**选择: 照跑。** 每 cycle 的实测结果本身即将来写豁免规则的实证依据 (数据挣来的, 非 AI 声称)。
+**Source incident (2026-07-19 Aria #166 cycle):** AI 以「Level 2 + 任务是已 audited 11 条 SC 的 1:1 派生」跳过 enabled 的 post_planning; 而同 cycle **跑了的** post_spec 抓到 1 Critical + 1 Major (缺陷 2 修复位置钉错文件 —— 若不抓则测试全绿、验收全满足而 issue 危害原封不动)。
 
-**配套习惯 (低成本, 必做):** AI 任何自作主张的流程判断 (跳过/降级/改序) 必须在 session handoff 里**显式写出**「跳了什么 + 理由 + 请复议」, 使其永远不会悄悄沉淀为惯例。#166 cycle 正是靠这条才被摆上台面。
+**配套习惯 (低成本, 必做):** AI **任何**自作主张的流程判断 (跳过/降级/改序/替代) 必须在 session handoff 显式写「跳了什么 + 理由 + 请复议」, 使其永不悄悄沉淀为惯例。#166 正是靠这条才被摆上台面。
 
-**Exception:** 零 exception。若某 checkpoint 在某场景确实不值得跑, 应改 config/skill 把豁免**写成机制**, 而不是让 AI 每次判断。
+**Exception:** 零 exception。某闸门若确实不该跑, 应改 config/skill 把豁免**写成机制**, 而非让 AI 每次判断。
+
+> **已否决方案**: 「跟踪 AI 判断准确率 → 逐步放权」经评估否决 (owner 2026-07-19) —— **跳过即销毁标签** (结构性); 唯一诚实设计「照跑+封存判断作对照」量具比被测物贵; 便宜版本「没出事=判断对」对「跳错但未浮出」结构性失明, 会拿假证据发更大裁量权 (**假绿长在元层面**)。**不要再提议**。完整论证见规范 §4。
+
+**详细规范 + fail-closed 白名单 + 否决论证 + enforcement layer 诚实声明 + 采用方落地四步:** `standards/conventions/configured-gate-authority.md`
 
 ---
 
