@@ -1,43 +1,79 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.55.0",
-  "issue_ref": "10CG/Aria#154",
-  "generated_at": "2026-07-09T17:00:57Z",
+  "triage_tool_version": "1.59.1",
+  "issue_ref": "10CG/Aria#166",
+  "generated_at": "2026-07-18T01:32:10Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 154,
-      "title": "Bug: secret-guard.sh crashes on macOS/zsh - readarray not found, blocks ALL tools",
-      "body": "## Bug Report\n\n**描述**: secret-guard.sh PreToolUse hook 在 macOS/zsh 环境因 `readarray` 不兼容崩溃，导致所有工具调用被拦截，会话完全瘫痪。\n\n**复现步骤**:\n1. 在 macOS (Darwin 22.6.0) + zsh shell + Aria Plugin v1.47.0\n2. 执行任何工具调用 (Bash, Read, Write, Skill 等)\n3. PreToolUse hook 触发 secret-guard.sh\n\n**预期行为**: Hook 正常执行 secret 检查后放行工具调用\n\n**实际行为**:\n```\nPreToolUse hook error: secret-guard.sh line 118: readarray: command not found\n[secret-guard] FATAL: malformed PreToolUse input - tool_name missing or null. Blocking.\n```\n所有工具全部被拦截，会话陷入死锁 - 无法通过任何工具调用修改设置文件。\n\n**根因分析**:\n1. **直接原因**: line 118 使用 `readarray`，这是 bash 内置命令。macOS 默认 shell 是 zsh，zsh 无 `readarray`\n2. **连锁崩溃**: 118 行崩溃后 `_sg_fields` 数组为空，`tool_type` 为空字符串，触发 line 125-131 的误判\n3. **Shebang 被忽略**: Shebang 声明了 `#!/usr/bin/env bash`，但 Claude Code hook runner 使用 `$SHELL` (zsh) 执行 command 模式的 hooks\n\n**修复建议**:\n将 `readarray -t _sg_fields < <(...)` 替换为 zsh/bash 兼容写法:\n```bash\n_sg_fields=()\nwhile IFS= read -r line; do\n  _sg_fields+=(\"$line\")\ndone < <(jq -r ...)\n```\n或让 hook runner 尊重 shebang，对声明 bash 的脚本使用 bash 执行。\n\n**环境信息**:\n- Aria Plugin: v1.47.0\n- OS: macOS Darwin x86_64\n- Shell: zsh\n- Hook: hooks/secret-guard.sh line 118\n\n---\n*由 aria-report 自动生成*",
+      "number": 166,
+      "title": "[reliability] state-scanner collect_openspec 布局不符时静默全零 — 消费方 OpenSpec 维度假绿 8 周 (+2 个连带盲区)",
+      "body": "## 摘要\n\nAether 的 OpenSpec 维度在 state-scanner 里**假绿约 8 周**（2026-05-22 → 2026-07-17）：每次扫描恒报 `configured=false / 0 active / 0 pending_archive / 0 archived`，而磁盘上实有 **3 个活跃变更 + 60 个归档**。该假绿已污染下游 —— 2026-07-16 的 Aether handoff §5 把「OpenSpec：0 active change，0 pending archive」当作**已核验的四维同步状态**写入交接。\n\n排查中实测出 **3 个独立缺陷**，均可复现，按严重度排列。共同模式：**沉默**。三者都不是报错、不是 WARN，而是返回一个看起来完全正常的\"干净\"结果。\n\n环境：aria-plugin 1.56.1 · state-scanner 3.1.1 · 消费方 Aether (10CG/Aether `1493823`)\n\n---\n\n## 缺陷 1 [Major] — 缺 `openspec/changes/` → 静默全零，且连 `archive/` 也不扫\n\n### 根因\n\n`skills/state-scanner/scripts/collectors/openspec.py:164-170`：\n\n```python\nchanges_dir = spec_root / \"changes\"\narchive_dir = spec_root / \"archive\"\n\nif not changes_dir.is_dir():\n    r.data = { \"configured\": False, \"changes\": {\"total\": 0, ...},\n               \"archive\": {\"total\": 0, ...}, \"pending_archive\": [], ... }\n    return r          # ← archive_dir 已算出但从未被使用\n```\n\n`changes/` 不存在即提前 return，**`archive/` 存在与否根本不看**。所以这是**两个**假绿：活跃变更归零，历史归档也归零。\n\n### 为什么危险\n\n`configured=false` 承载了两种语义完全相反的情况，消费方无法区分：\n\n1. 本项目真的没用 OpenSpec（合法，应当静默）\n2. 本项目**重度使用** OpenSpec，但布局不符预期（严重，应当尖叫）\n\nAether 属第 2 类，得到的却是第 1 类的待遇。没有 `soft_error`，没有 WARN，`errors[]` 是空数组。扫描输出看上去和一个干净的非-OpenSpec 项目一模一样。\n\n这正是 `feedback_gate_validation_needs_baseline_failing_scenario` 说的那件事：**一个在该失败时不会失败的检查不是检查**。\n\n### 漂移是怎么发生的（值得注意 —— 无人操作失误）\n\n1. 2026-05-22（Aether `369cc39`）最后一个变更归档 → `openspec/changes/` 空了\n2. **git 不跟踪空目录 → 目录自动消失**\n3. 其后新建的 #182(06-27) / #190-191(07-04) / #245(07-15) 全部建在 `openspec/` 下 —— 因为 `changes/` 已经不存在了，没有任何东西暗示该约定\n4. 扫描器从此静默全零，无人察觉，直到 8 周后偶然核对磁盘\n\n**没有人做错任何事。** 是\"归档完最后一个变更\"这个**正常操作**触发了 git 的空目录语义，进而静默拆掉了整个维度。任何遵循十步循环的项目在归档完最后一个 spec 后都会踩到。\n\n### 复现\n\n```bash\nmkdir -p /tmp/repro/openspec/archive/2026-01-01-foo && cd /tmp/repro && git init -q\necho '---\\nstatus: Draft\\n---' > openspec/my-change-proposal.md   # 无 changes/ 层\npython3 .../scan.py --output snap.json                             # exit 0, errors=[]\n# → openspec.configured=false, changes.total=0, archive.total=0 (实为 1)\n```\n\n### 建议\n\n`changes/` 缺失但 `openspec/` 存在时**不要静默**。至少：\n\n```python\nif not changes_dir.is_dir():\n    if spec_root.is_dir():        # openspec/ 在但 changes/ 不在 = 布局漂移, 非\"没配置\"\n        r.soft_error(\"openspec_layout_drift\",\n                     f\"{spec_root} exists but {changes_dir} does not — \"\n                     \"active changes (if any) are invisible to this collector\")\n    ...\n```\n\n并且提前 return 前仍应扫 `archive/`（它和 `changes/` 是正交的，存在就该扫）。\n\n可选增强：`openspec/` 下发现含 `proposal.md` 的目录却不在 `changes/` 里 → 直接点名指出疑似漂移的目录。\n\n---\n\n## 缺陷 2 [Major] — `d_payload` 只聚合 `tasks.md` → 用 `detailed-tasks.yaml` 的项目，归档安全网恒不触发\n\n`openspec-archive` Skill v1.1.0 的 Step 7（#95「归档不吞未完成」）设计意图是：归档时若有 deferred / unverified 残留，自动建 tracker issue，**headless 也不静默**。\n\n但 `d_payload` 聚合自 `tasks.md` 的未勾选项 + carry-forward 注释（`openspec.py:244` `tasks_file = d / \"tasks.md\"`）。**Aether 用的是 `detailed-tasks.yaml`，没有 `tasks.md`** —— 该数据源本身是 aria `task-planner` 的合法产出（Aether 的 spec frontmatter 甚至显式标注 `datasource: proposal.md  # path B (无 tasks.md)`）。\n\n实测三个 spec 全部 `d_payload: null`：\n\n```\n=== 245-aether-conventions ===   # 17 个 task, TASK-017 确为未完成 (owner-gated)\n complete: False | verdict: pass\n complete_reason: tasks.md absent — verdict by normalized Status only; ...\n d_payload: NULL      ← \"干净归档, 无残留追踪\"\n```\n\n后果：**这类项目一旦把 spec 标 done 归档，所有残留待办被静默埋进 archive，一个 tracker issue 都不会建。** 安全网存在，但对这类项目恒为空转 —— 而且它的\"没触发\"和\"真干净\"在输出上完全一致。\n\n本次 Aether 归档 190-191 时，我不得不**手工**核实其 proposal 里 3 项 `deferred_out_of_scope` 是否各自落了 issue（结论：#200 closed / #201 closed / #195 open，确实干净）。这个结论是手工核出来的，不是安全网给的。若换成 245，标 done 就会直接埋掉 TASK-017。\n\n### 建议\n\n`d_payload` / `complete` 判定支持 `detailed-tasks.yaml` 数据源（读 `tasks[].status` + `deferred_out_of_scope`），或至少在 `tasks.md` 缺失且存在 `detailed-tasks.yaml` 时发 `soft_error` —— 让\"安全网在本项目不生效\"这件事**可见**，而不是伪装成\"干净归档\"。\n\n注：`complete_reason` 里那句 `tasks.md absent — verdict by normalized Status only` 措辞是诚实的，值得肯定 —— 但它只出现在 gate 的 JSON 里，Step 7 的 `d_payload=null` 路径没有任何对应提示。\n\n---\n\n## 缺陷 3 [Minor] — `_normalize_status(\"Completed\")` → `unknown`\n\n```\n'Complete'          -> done\n'Completed'         -> unknown      ← \n'COMPLETED'         -> unknown      ←\n'Status: Completed' -> unknown      ←\n'Done'              -> done\n'Complete 2026-07-17' -> done\n```\n\n根因：`_status.py` done 家族的 token 是 `(\"done\", \"complete\")`，而 `_has_token()` 是词边界锚定的（`\\bcomplete\\b`，#101 修 substring shadow 时引入，防 `incomplete` 误配 `complete`）。`Completed` 的 `\\b` 后置断言失败 → 落入 `unknown`。\n\n即 #101 的修复对合法**词形变化**过度收紧了。`Completed` 是极自然的状态写法，写下去静默失效，且 `unknown` 会进一步触发 `design_deferred` 出面（谓词含 `st == \"unknown\"`）→ 噪音。\n\n### 建议\n\ndone 家族 token 加 `\"completed\"`。已验证安全：`\\bcompleted\\b` **不会**匹配 `uncompleted`（`n`/`c` 均为词字符，无边界），不重开 #101。\n\n---\n\n## 影响面\n\n这三个缺陷都不是 Aether 独有 —— 任何满足以下条件的 aria 消费方都会中：\n\n- **缺陷 1**：归档完最后一个 spec 之后（= 每个走完十步循环的项目，迟早）\n- **缺陷 2**：用 `detailed-tasks.yaml` 而非 `tasks.md`（= aria task-planner path B 的正常产出）\n- **缺陷 3**：Status 写 `Completed` 而非 `Complete`\n\nAether 侧已自行缓解（`openspec/changes/.gitkeep` 锁目录常驻 + 3 个变更迁回 + Phase D 补齐），见 10CG/Aether `1493823`。但那只是**消费方自救**，根因在 collector：**布局不符时应当尖叫，而不是返回一个漂亮的零。**\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/154",
-      "created_at": "2026-07-09T01:10:43Z",
-      "updated_at": "2026-07-09T01:10:43Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/166",
+      "created_at": "2026-07-17T14:36:40Z",
+      "updated_at": "2026-07-17T14:36:40Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.47.0",
-      "current": "1.55.0",
+      "reported": "1.56.1",
+      "current": "1.59.1",
       "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "secret-guard.sh",
-          "line": 118,
-          "format": "prose_line",
+          "file_path": "proposal.md",
+          "line": null,
+          "format": "backtick",
           "exists": false,
           "line_in_range": null,
           "snippet": null,
           "warning": "file not found"
         },
         {
-          "file_path": "hooks/secret-guard.sh",
-          "line": 118,
-          "format": "prose_line",
+          "file_path": "tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "detailed-tasks.yaml",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "openspec.py",
+          "line": 244,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "_status.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/state-scanner/scripts/collectors/openspec.py",
+          "line": 164,
+          "format": "prose_l",
           "exists": false,
           "line_in_range": null,
           "snippet": null,
@@ -59,61 +95,46 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "7244f238b5fceb70a782bb54410d5b3c2f395db5"
+          "head": "dc4568dfd1fd59cb796193424b68b82643213fd6"
         }
       ]
     }
   },
   "repro": {
     "exit_mode": "auto",
+    "hit_count": 3,
+    "total_count": 3,
+    "hit_rate": "3/3",
     "cases": [
       {
         "case_id": "case-1",
-        "input": "BASH_ENV='enable -n readarray' bash aria/hooks/secret-guard.sh <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hello\"}}'",
-        "expected_behavior": "issue 声称: hook 崩溃于 line 118 readarray: command not found, 随后打印 FATAL malformed PreToolUse input 并拦截工具",
-        "actual_behavior": "exit=2. stderr 逐字为 'aria/hooks/secret-guard.sh: line 118: readarray: command not found' + '[secret-guard] FATAL: malformed PreToolUse input — tool_name missing or null. Blocking.'",
+        "input": "collect_openspec(Path) on a tree where openspec/ exists, openspec/changes/ absent, openspec/archive/2026-01-01-foo/ present (1 archived spec). Run against aria submodule v1.59.1 collectors/openspec.py.",
+        "expected_behavior": "issue 声称: 布局漂移应尖叫 (soft_error/WARN); archive/ 正交, 存在就该扫 → archive.total>=1",
+        "actual_behavior": "configured=False, changes.total=0, archive.total=0 (磁盘实有 1), errors=[] 完全静默 — 与非-OpenSpec 干净项目输出一模一样。openspec.py:164 早 return, archive_dir 算出未用",
         "match": true,
-        "notes": "本机 bash 5.2 无法直接复刻 macOS bash 3.2, 采用等价机制注入: enable -n readarray 移除内建, 触发与 bash 3.2 相同的 command-not-found 查找失败路径。"
+        "notes": "缺陷 1 [Major] 确认。根因 openspec.py:164-170 early-return, 无 spec_root.is_dir() 分支"
       },
       {
         "case_id": "case-2",
-        "input": "同上 shim, 输入 '{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"README.md\"}}'",
-        "expected_behavior": "issue 声称: 所有工具调用 (Bash, Read, Write, Skill 等) 全部被拦截, 会话死锁",
-        "actual_behavior": "exit=2, 同一 FATAL 输出。hooks.json 将 secret-guard 注册在 PreToolUse 的 matcher 'Bash' 与 'Read|Edit|Write|MultiEdit' 两处, 两条路径同时失效。",
+        "input": "grep openspec.py:243-247 的 carry-forward 聚合源; 检查 detailed-tasks.yaml 数据源是否被 d_payload 覆盖",
+        "expected_behavior": "用 detailed-tasks.yaml (task-planner path B 合法产出) 的项目, 归档安全网 (openspec-archive Step 7 #95) 应能感知残留 deferred/unverified",
+        "actual_behavior": "line 244 tasks_file = d / 'tasks.md' — 仅聚合 tasks.md; 无 detailed-tasks.yaml 分支, 也无 'tasks.md 缺失但有 detailed-tasks.yaml' 的 soft_error → 该类项目安全网恒空转且不可见",
         "match": true,
-        "notes": "PreToolUse hook exit 2 = fail-closed 拦截 (secret-guard.sh:125-131, 为 #132 Windows CRLF 安全而设计), 把 bash 版本不兼容放大成全工具死锁。"
+        "notes": "缺陷 2 [Major] 确认 (静态核验; 端到端安全网空转需 openspec-archive Step 7 联动, 本 triage 只核 collector 源侧)"
       },
       {
         "case_id": "case-3",
-        "input": "bash aria/hooks/secret-guard.sh <<< '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hello\"}}'  (对照组, bash 5.2, readarray 可用)",
-        "expected_behavior": "issue 隐含: readarray 可用时 hook 正常放行",
-        "actual_behavior": "exit=0 放行, 无 stderr。证明故障变量确为 readarray 内建之有无, 非输入格式或 jq。",
-        "match": true
-      },
-      {
-        "case_id": "case-4",
-        "input": "核对 issue 根因分析第 3 点: 'Shebang 被忽略, hook runner 使用 $SHELL (zsh) 执行 command 模式 hooks' — 检查 hooks.json 在报告版本与当前版本的调用串",
-        "expected_behavior": "issue 声称: hook 由 zsh 执行, 故 zsh 无 readarray 导致崩溃",
-        "actual_behavior": "不成立。hooks.json 在 v1.47.0 (commit 05091ea) 与 v1.55.0 均为 'bash ${CLAUDE_PLUGIN_ROOT}/hooks/secret-guard.sh' — 显式以 bash 执行, zsh 从不解释该脚本。且报错格式 'script: line N: cmd: command not found' 是 bash 的格式, zsh 为 'script:N: command not found: cmd'。",
-        "match": false,
-        "notes": "真实根因: macOS 自带 /bin/bash 为 3.2 (GPLv2 冻结), 而 readarray/mapfile 是 bash 4.0 引入的内建。issue 提出的两个修复中, '让 hook runner 尊重 shebang' 是 no-op。"
-      },
-      {
-        "case_id": "case-5",
-        "input": "核对 issue 环境信息 'Aria Plugin: v1.47.0' — 逐字复刻 aria-report 的抽取命令 cat $CLAUDE_PLUGIN_ROOT/VERSION | grep -m1 '^[0-9]'",
-        "expected_behavior": "issue 声称: 报告者运行的插件版本为 1.47.0",
-        "actual_behavior": "版本号不可信。该 grep 命中 VERSION 第 40 行 —— 一个围栏代码块内的冻结示例串 '1.47.0'。实测四个已安装版本 (1.50.1 / 1.50.2 / 1.53.0) 及工作树 (1.55.0) 经此命令全部输出 '1.47.0'。",
-        "match": false,
-        "notes": "衍生缺陷 (此前无 issue): aria-report/SKILL.md:59 版本抽取错误, 污染所有 aria-report 生成的 issue 的环境信息段。缺陷本身与版本无关 — 已在工作树 1.55.0 的 secret-guard.sh:118 直接确认 readarray 仍在。"
+        "input": "_normalize_status('Completed') / 'COMPLETED' / 'Status: Completed' 实调 aria v1.59.1 collectors/_status.py",
+        "expected_behavior": "'Completed' 是自然的完成态写法, 应归一为 done",
+        "actual_behavior": "三者全 → 'unknown' (Complete/Done 正常). 根因 _status.py:199 done 家族 token ('done','complete') + _has_token 词边界锚定 \\bcomplete\\b, 'Completed' 后置边界失败 → #101 substring-shadow 修复对合法词形变化过度收紧",
+        "match": true,
+        "notes": "缺陷 3 [Minor] 确认. 建议 done 家族加 'completed' token; \\bcompleted\\b 不匹配 uncompleted, 不重开 #101"
       }
-    ],
-    "hit_count": 3,
-    "total_count": 5,
-    "hit_rate": "3/5"
+    ]
   },
-  "verdict": "partial-repro",
-  "severity": "critical",
-  "recommended_action": "hotfix",
-  "deviation_note": "缺陷症状 100% 复现 (case-1/2/3, 3/3): exit 2 fail-closed, stderr 与 issue 逐字一致, Bash 与 Read 两个 matcher 同时失效。偏离在归因与环境两处 (case-4/5, 0/2): (1) 根因不是 'zsh 无 readarray / shebang 被忽略' — hooks.json 自 v1.47.0 起即以 'bash <script>' 显式调用, 真凶是 macOS 自带 bash 3.2 缺 readarray (bash 4.0 才引入), 因此 issue 提议的 '让 hook runner 尊重 shebang' 修复是 no-op; (2) 自报版本 v1.47.0 是 aria-report 版本抽取缺陷的 产物 (VERSION:40 围栏代码块内的冻结串), 不代表报告者的真实版本。缺陷在当前 1.55.0 依然存在。",
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
   "errors": []
 }

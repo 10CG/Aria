@@ -13,6 +13,22 @@
 
 ## 最新 handoff
 
+> ⚠️ **2026-07-19 是双轨并发日** — 同日两个 session 在同一 repo 各自 ship 一个版本 (v1.60.0 / v1.61.0),
+> 两篇 handoff **都要读**。本页按结束时间倒序并列; 语义权威仍以多 track 看板为准 (见页首说明)。
+
+### 轨 A — Aria #166 OpenSpec 假绿三缺陷 (较晚结束)
+
+**[2026-07-19 — 会话收尾: #166 triage → 完整十步循环 → ship v1.61.0](./2026-07-19-issue166-openspec-false-green-cycle-v1.61.0.md)**
+
+- track-id: `issue166-openspec-false-green-20260717-0719` | phase: **session-close** | status: **done**
+- 单 cycle 会话: `/state-scanner` 开局 → triage Aria #166 → A→B→C→D 一气走完 → ship aria-plugin **v1.61.0**
+- 三缺陷: changes/ 缺失静默全零+不扫 archive (`layout_drift`) / gate_result 对 yaml-only spec 归档安全网失明 / `Completed`→unknown
+- post_spec **R1→R4 CONVERGED** (R1 Critical: 缺陷2 位置钉错 —— 继承 issue 自身 mis-citation; R2 Major: surfacing 机制假设被源码证伪) + silent-failure-hunter 抓 fix-introduced regression
+- 🔴 **最贵一课**: 开局 scan 已报 `self_multi_container` collision, 判为 benign 跳过 claim → 精确撞上轨 B (同 skill 同文件 + 抢注 v1.60.0), 被迫让位 v1.61.0 + rebase
+- Spec 已归档; #166 closed; follow-up aria-plugin #113/#114 open
+
+### 轨 B — 主 spec false-parity marathon (并发, 抢注 v1.60.0)
+
 **[2026-07-19 — 会话收尾: 主 spec false-parity marathon (README 修 → Phase 0→1→2/3 → ship v1.60.0)](./2026-07-19-session-close-mainspec-marathon.md)**
 
 - track-id: `session-close-20260717-0719-mainspec-marathon` | phase: **session-close** | status: **done**
