@@ -18,6 +18,6 @@
 - [x] T3.3 doc: status-field-guide.md done token 表 + #166 note
 
 ## 收尾
-- [x] T4.1 SC-10/SC-11: 全量 1072 tests (唯一 failure = 既有 time-bucket flaky `remote_refs_age`, 属 sync collector 与本 diff 零交集, 重跑绿) + dogfood 合成 fixture → scan.py **exit=10** / configured=False / archive.total=1 / layout_drift detail 点名 stray
+- [x] T4.1 SC-10/SC-11: 全量 **1232 tests 绿** (rebase 到主 spec Phase 1-3 基线 `e162f7b` 后; rebase 前 1072, 当时唯一 failure = 既有 time-bucket flaky `remote_refs_age` 属 sync collector 与本 diff 零交集, 已被对方 `3ceb177` 根治) + dogfood 合成 fixture → scan.py **exit=10** / configured=False / archive.total=1 / layout_drift detail 点名 stray。**产物**: `openspec/changes/state-scanner-openspec-collector-false-green/dogfood-evidence.md` (真实执行记录落盘)
 - [x] T4.2 output-formats.md 补 layout_drift worked-example (区别于「未配置」模板)
 - [x] T4.3 code-review **PASS** (0 Critical/0 Important, 4 Minor) + silent-failure-hunter 抓 **1 MEDIUM fix-introduced regression** (`except OSError: pass` 静默吞咽 = 本 change 立意要杀的同款反模式) → 已修: helper 收 `r` 参数发 `openspec_scan_failed` + archive iterdir 对称 fail-soft + 补 2 个 OSError 测试

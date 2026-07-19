@@ -1,3 +1,11 @@
+---
+unverified_claims:
+  - claim: "T4.1 SC-10/SC-11: 全量 1232 tests 绿 + dogfood 合成 fixture → scan.py exit=10 / configured=False / archive.total=1 / layout_drift detail 点名 stray"
+    reason: "dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在"
+    symbols: []
+unverified_ack: true
+unverified_ack_reason: "归档门 artifact 分类器的产物路径正则 (_ARTIFACT_PATH_TOKEN_RE) 硬编码只认 ab-results|ab-suite (AB benchmark 目录), 故任何非-AB 的 dogfood 声称结构上恒不可 auto-link → 恒 warn, 与本声称真伪无关。真实 dogfood 执行记录已落盘为可读产物 dogfood-evidence.md (与 proposal 同目录), 含缺陷1 端到端 scan.py exit=10 + archive.total=1 实测输出、缺陷2 baseline 反转 (code-reviewer 独立 stash 复核)、缺陷3 _has_token 词边界实测。分类器该局限已记为 follow-up 观察 (非本 change 引入)。"
+---
 # Proposal: state-scanner-openspec-collector-false-green (#166)
 
 > **Status**: Approved (post_spec convergence R1→R4 CONVERGED, verdict=PASS, 0 Critical/0 Major outstanding; owner sign-off pending)
