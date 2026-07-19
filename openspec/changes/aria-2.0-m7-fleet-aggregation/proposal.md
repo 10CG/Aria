@@ -145,6 +145,16 @@ L1 契约层。把单项目丰富 snapshot 降维成 `{phase, health, blockers[]
 | 在飞中断 | `interrupt.status != "none"` | str (none/in_progress/suspended/failed/corrupted) | 非 none = blocked |
 | 设计未实施 | `openspec.design_deferred` 非空 | list[{id,status,staleness_days,reason}] | warn 候选 (additive v1.42.0+, `.get("design_deferred",[])`) |
 | sync 不齐 | `sync_status.multi_remote.overall_parity == false` | bool | warn (parity 多 remote 仲裁微妙, 见 caveat-5) |
+
+**约束 (CAVEAT-parity) ⚠️ 语义已扩 (`state-scanner-stale-refs-false-parity` Spec, aria feature 分支
+四段式已实施 Phase1-3, 待合并/归档)**: `overall_parity` 的公式从旧 4 条扩为 **v8 四子句**
+(`enforced≠∅ ∧ ∃fresh-equal ∧ ∀¬gitlink_blocking ∧ ∀parity∉{behind,diverged}∧¬blocking_unknown`)。
+对本 TB-health-1 的降维消费**无 breaking 影响** —— derive 仍只读顶层 `overall_parity` bool, 不展开
+四子句 —— 但 bool 现在**额外覆盖两个新失败面**: (a) `gitlink_integrity[]` 层的 submodule remote
+orphan 判定 (`_gitlink_blocking`, 与本行原有的 `remotes[]` 层 behind/diverged/unknown 并列, 见
+`references/state-snapshot-schema.md §overall_parity 精确定义`); (b) 新鲜度门 (per-remote
+`evidence_grade∈{fresh,stale_unverified,expired}` 参与 ∃fresh-equal 子句判定, 陈旧证据不再计入
+"已核实一致")。**TB-health-3 的仲裁注解应连带更新**指向新 schema doc 章节 (非旧 4 条版本)。
 | handoff 陈旧 | `handoff.age_hours` (高) + `openspec.carry_forward_inventory.total > 0` | float\|null / int | warn (age_hours 可能 null, caveat-6) |
 | 待归档堆积 | `openspec.pending_archive` 非空 | list[{id,reason}] | warn (additive v1.42.0+, bonus signal) |
 | 审计 FAIL | `audit.last_audit.verdict == "FAIL"` | str\|null (PASS/PASS_WITH_WARNINGS/FAIL) | blocked verdict (`.get` 防 null) |

@@ -140,6 +140,11 @@ ls aria-orchestrator/hermes-extensions/aria-layer1/             # 须存在 (ext
 - [ ] **TB-health-3** parity 多 remote 仲裁注解 (caveat-5): `overall_parity==false` 含
   behind/diverged/unknown 多义; B.1 降维只读 bool 不展开仲裁 (Q-2 阈值标定时细化); 注释指向
   state-snapshot-schema.md §overall_parity worked examples。
+  > **同步 (2026-07-19, `state-scanner-stale-refs-false-parity` 主 spec 四段式已实施, 待合并归档)**:
+  > `overall_parity` 语义已从旧 4 条扩为 v8 四子句, 新增 gitlink_integrity 阻塞层 + per-remote
+  > evidence_grade 新鲜度门 (详见 proposal.md 本任务对应表行下方 CAVEAT-parity 注)。B.1 降维读法
+  > (只消费顶层 bool, 不展开) **不受影响**, 但本任务实现时 worked examples 指向的 schema doc 章节
+  > 已是新版四子句定义, 非旧版; 无需等待主 spec 归档即可按新 schema doc 现状编写注解。
   - deps: TB-health-1
 
 - [ ] **TB-readonly-1** 只读契约守卫 (abi_compat #1+#3): 静态审查 tool pack 无 git mutate /

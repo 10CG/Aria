@@ -216,7 +216,15 @@
 - [ ] 9.1 `handoff_autofill.py:52` 把降级后的 `reason` 升级为 warning —— 否则 F1′ 的 `unknown` 被 session-closer **静默吞掉** = 新假绿通道
 - [ ] 9.2 `multi_remote_drift` 建议**按 ≥6 种成因分派** (behind/diverged→pull / ahead→push / benign unknown→**不触发** / no_local_tracking_ref→`has_unpublished_branch` / not_refreshed·network·auth→查网络凭据)。**不是一律 fetch/pull** (US-008 directional guard)
 - [ ] 9.3 `multi_remote_drift` 规则**无去重/冷却** (grep 零命中) ⇒ 按 OQ-C 处理
-- [ ] 9.4 **`aria-2.0-m7-fleet-aggregation` (Approved) 消费 `overall_parity`** ⇒ 语义变更需同步该 Spec (其 TB-health-3 pin 到 schema doc)
+  > **2026-07-19 进展**: 已在 `references/rules/basic-rules.md` §1.35 补充 OQ-C 说明 (文档层, prompt-based
+  > skill 无代码实现面)。**OQ-C 本身仍未裁定** (1.3 checkbox 未勾) ⇒ 本条**记为需 owner 在 Phase A 裁定
+  > OQ-C 后再落地**, 未强行实现去重/冷却机制 (倾向记录见 proposal.md OQ-C: 用 `has_unreachable_remote`
+  > 在建议层降级, debounce 不作用于裁决层)。
+- [x] 9.4 **`aria-2.0-m7-fleet-aggregation` (Approved) 消费 `overall_parity`** ⇒ 语义变更需同步该 Spec (其 TB-health-3 pin 到 schema doc)
+  > **2026-07-19 完成**: 已在 `openspec/changes/aria-2.0-m7-fleet-aggregation/proposal.md` (TB-health-1
+  > 信号表 sync-不齐 行下) + `tasks.md` (TB-health-3 任务下) 各补一条 CAVEAT-parity/同步注, 说明
+  > `overall_parity` 现含 gitlink_integrity 阻塞层 + per-remote evidence_grade 新鲜度门 (v8 四子句),
+  > 指向新版 schema doc 章节。**只改文档, 未改 m7 代码** (m7 Phase B 未启动, 无代码可改)。
 - [ ] 9.5 重新生成 golden fixture `tests/fixtures/reference-snapshot-aria.json` (现记 `overall_parity: true` + 子模块全 `equal`, 采自事故现场)
 - [ ] 9.6 `validate_schema_doc.py` **会真跑 scan.py** ⇒ F3′ 后每次校验触发全量网络 fetch。加 offline/mock 模式; 且它只校验 top-level key, per-remote 嵌套字段无守护
 - [ ] 9.7 🔴 **offline 旁路 — 12.10 指定的稳定性根治主手段, v8 (RM-12) 从一行扩成完整契约**:
