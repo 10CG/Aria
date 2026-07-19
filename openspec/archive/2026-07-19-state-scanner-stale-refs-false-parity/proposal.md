@@ -30,6 +30,9 @@ unverified_ack_reason: "post_planning R1 补审 (报告 .aria/audit-reports/post
 
 > **归档状态 (2026-07-19, Phase D.2 + post_planning R1 补审后修订)**: 四段式核心 v1.60.0 + Phase 4 收口 v1.62.0 ship。
 > tasks **104/119 done, 活跃未勾 7** (另 8 条在 SUPERSEDED 区, 一律不勾)。
+> ⚠️ **I-2 (post_planning R2)**: 7.2 的诚实回退使本归档产物按归档门重跑会得 `complete: false`
+> (`tasks.md has 15/119 unchecked task(s)`)。**这是刻意的诚实回退, 不是漏归档** —— 未来做一致性
+> 扫描的人请勿当作事故; 若需重归档需走 `--archive-design-only` 逃生舱。
 > ⚠️ 此数字在同一 session 内漂过三次 (每次勾选/回退后手写数字即作废: 102→103→104)。**下次归档请在最后一步用 `grep -c` 机械取数再写入**, 不要手抄。归档门 `gate_result` verdict=**warn** / **0 block**。
 >
 > ⚠️ **本段经 post_planning R1 补审修订** (审计报告: `.aria/audit-reports/post_planning-R1-2026-07-19-state-scanner-stale-refs-false-parity-phase4-aggregated.md`)。
