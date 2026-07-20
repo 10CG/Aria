@@ -29,19 +29,40 @@ metadata:
     payload (改写) — TestRuntimeProbeFoldL2ProposalOnlyEvaporates 为未触碰护栏
     (仅 docstring 措辞收窄)。
   rule6_reexamine_20260720: >
-    ⚠️ **豁免适用性需 owner 复检 (本 cycle 不自行裁定)**。owner 于 2026-07-20 第二次裁决
-    收窄了 deterministic substitute 机制的先例范围, 并立新判据: 「判断依据是**内容是否
-    影响 AI 行为**, 而非文件落在哪个目录 —— `references/` 不能整体归入确定性代码层,
-    其中 `references/rules/*` 类 dispatch 表属指令面」。本 cycle TASK-009 改了两个
-    references 文件, 按新判据自查:
-      - `state-snapshot-schema.md` (+5 行): 字段语义描述, 纯事实文档 → 明确可豁免;
-      - `runtime-probe-declaration.md` (+25/-6): 改「前置条件」段 —— 内容是**对代码新
-        行为的事实性同步** (Rule #3 要求), 但该文档是给 spec 作者 (人或 AI) 读的
-        **authoring 向导**, 其中含处方性建议 ("补任一数据源即可", 原为 "先补 tasks.md
-        升级为 L3")。它不是 skill 运行时消费的 dispatch 表, 但也不是纯 schema。
-    ⇒ **边界不明**, 按机制边界 (c)「拿不准算不算指令语义 → 照跑 (宁跑勿豁)」与不可协商
-    规则 #10 配套习惯, **不自行豁免**, 提请 owner 在 Phase C 发版前裁定: 照跑 AB, 抑或
-    认定 authoring 向导的事实性同步仍属边界 (a) 可豁免。
+    ✅ **已裁定 (owner 2026-07-20 第三次收敛, 成文于
+    `standards/conventions/skill-benchmark-exemption.md`)**。判据改为「内容是否影响 AI
+    行为, 以及那个行为 AB 套件测不测得到」, 逐 hunk 判不逐文件判。该规范 §5 已裁样例表
+    **逐条点名本 cycle 的两个 references 文件**:
+      - `state-snapshot-schema.md` (+5 行字段语义): 描述性 → 第一行 substitute
+        (SC 级结构化测试已在场);
+      - `runtime-probe-declaration.md` (+25/-6, 改「前置条件」段): **处方性 · authoring
+        向导** → **第三行** (处方性但治的行为在固定测试集覆盖之外)。
+    第三行**不是简单豁免**, 须同时满足 §3 三条, 本 cycle 均已落地:
+      (1) **点名行为**: 本改动影响的是「**spec 作者 (AI 或人) 读向导后, 判断自己这份
+          spec 写的 `runtime_probe:` 声明会不会被归档门评估**」。#113 把 yaml-only 子态
+          从「不评估」反转为「评估」, 向导若不跟改, 作者会据旧承诺得出两种错误结论:
+          放弃声明, 或为让声明生效而多补一份 `tasks.md` 升 L3 (实际已无必要)。
+          **为什么固定测试集结构上测不到它**: ab-suite 的 state-scanner 11 个 eval 全是
+          **scanning** 场景 (查看状态 / 扫描 upstream 落后 / 检查版本一致性), 无一是
+          authoring 场景; 全套件 `grep -rl runtime_probe` **零命中**
+          (spec-drafter 2 / phase-a-planner 2 / openspec-archive 2 亦均非「读向导→判断
+          自己该怎么填」形态)。对套件结构上测不到的行为跑 AB = 测量剧场。
+      (2) **定向可证伪 fixture (新建, 非以现有测试代替)**:
+          `skills/state-scanner/tests/test_runtime_probe_authoring_guide_contract.py`
+          —— 把向导前置条件表对三种 spec 形态宣称的「声明是否被评估」逐行与
+          `gate_result` 实际行为对撞 (作者被误导的失败形态即「向导说的 ≠ 实际的」)。
+          与既有 `test_gate_yaml_probe_reach.py` 分工: 后者验运行时行为本身对不对,
+          本 fixture 验向导有没有如实描述它 —— 运行时对而文档撒谎时, 只有本 fixture 会红。
+          **可证伪性双路径实证**: (A) 回退 #113 对该向导的改动 → 4/4 红 (前提守卫捕获
+          「机读契约消失」); (B) 保留表格但把 yaml-only 行 ✅ 篡改为 ❌ (文档撒谎但仍
+          机读) → **精确只红 `test_yaml_only_form_matches_doc` 一条**, 另 3 条保持绿,
+          证明 mismatch 断言是活的且不误伤。全量 1318 → **1322 绿**。
+      (3) **记套件缺口**: aria-plugin **#117**
+          「AB 测试集缺 authoring 维度 — 全套件零 eval 覆盖『作者读处方性向导做判断』
+          类行为」, 含实测证据表 + 补齐建议 + 与 #116 (既有 eval 测量有效性被污染) 的
+          正交关系说明。**套件盲区是债不是豁免理由**, 后续再援引第三行须回该 issue 追加
+          记录, 使「同一盲区被反复豁免」可见。
+    ⇒ 三条齐备, substitute 成立, **无需跑 AB**。
   rule6_note: >
     Rule #6 AB benchmark 豁免 — 适用 deterministic substitute 机制 (CLAUDE.md 规则 #6
     豁免机制段, owner 裁决 2026-07-20 于本 spec 复议时升级成文): 改动集中在
