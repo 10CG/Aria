@@ -17,11 +17,10 @@
       "_comment": "Phase 1.12 — 本地/远程同步检测 (v2.9.0)",
       "enabled": true,
       "check_submodules": true,
-      "check_remote": false,
-      "warn_after_hours": 24
+      "check_remote": false
     },
     "sync_freshness": {
-      "_comment": "Phase 1.12 新鲜度 (main spec stale-refs-false-parity, aria-plugin v1.59.0+): evidence_window_seconds=有新鲜 equal 正证据的墙钟窗 (∃侧); hard_cap_days=陈旧 equal 豁免的墙钟硬上界 (降级侧); k_min=豁免代际下限。旧键 freshness_window / sync_check.warn_after_hours 将退役。",
+      "_comment": "Phase 1.12 新鲜度 (main spec stale-refs-false-parity, aria-plugin v1.59.0+): evidence_window_seconds=有新鲜 equal 正证据的墙钟窗 (∃侧); hard_cap_days=陈旧 equal 豁免的墙钟硬上界 (降级侧); k_min=豁免代际下限。旧键 freshness_window / sync_check.warn_after_hours **已退役并从本模板移除** (F2′, aria-plugin v1.62.2): 二者从未被任何生产代码路径读取, 语义已由 evidence_grade 取代。",
       "evidence_window_seconds": 3600,
       "hard_cap_days": 7,
       "k_min": 3
