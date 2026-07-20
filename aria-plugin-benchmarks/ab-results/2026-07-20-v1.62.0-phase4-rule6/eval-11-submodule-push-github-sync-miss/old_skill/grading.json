@@ -1,0 +1,31 @@
+{
+  "eval_id": "eval-11-submodule-push-github-sync-miss",
+  "arm": "old_skill",
+  "expectations": [
+    {
+      "text": "检出 github remote 落后, 不因本地与 origin 一致而静默通过",
+      "passed": true,
+      "evidence": "L13-16 还原失效机制: 「本地 master 与 origin 完全一致, 但 GitHub 镜像从未收到这批 commit。由于当时只对 origin 做单远程检查, git push origin 返回 Everything up-to-date」; L93-103 逐 remote 字段表给出 github 的 parity: ahead / ahead_count N; L197: 「aria 子模块: github 落后 2 commits」; L215 判定表「aria 子模块 | github | ahead (N commits) | 是 | git -C aria push github master」。"
+    },
+    {
+      "text": "区分「本地 vs origin」与「origin vs github」两个不同的比较轴",
+      "passed": true,
+      "evidence": "L20: 「本仓 (主仓 / 每个子模块) 对每一个已配置远程分别算 parity, 而不是只看 origin」; L93-103 双列表并置 origin 与 github 的字段取值; L160-167 按主仓 gitlink 是否已推 github 拆两种形态给出不同判据落点; L255-256: 「git push origin 返回 Everything up-to-date 只是关于 origin 一个远程的陈述, 它对 github 什么都没说」。"
+    },
+    {
+      "text": "给出子模块层的补推命令 (git -C aria push github master)",
+      "passed": true,
+      "evidence": "L215 判定表内命令列; L226-232 修复顺序脚本: 「git -C aria push origin master / git -C aria push github master」→「git push origin master / git push github master」; L220-223 顺序理由 (子模块先、主仓后, 否则造出 orphaned)。"
+    },
+    {
+      "text": "点出 gitlink 风险: 主仓 gitlink 指向的子模块 commit 若在 github 不可达, 从 github clone --recursive 会断裂",
+      "passed": true,
+      "evidence": "落在 (b) 档 —— 成因与谓词完整, 但第七路 dispatch 明确自述为未接入的已知缺口。成因: L146-148「主仓在 R 上已发布的那个 commit 所引用的子模块 gitlink, 在子模块自己的 R 上是否可达」; L165-167「形态 B (主仓 gitlink 已推 github, 子模块 commit 没推): github 上主仓引用了一个 github 侧根本不存在的 aria commit ⇒ status: orphaned ⇒ clause 3 破 ⇒ overall_parity: false, 红」; L222-223「否则主仓 gitlink 指向一个 GitHub 上不存在的 commit, 正好造出 §4.3 的 orphaned 断裂」。缺口自述 L180-182: 「⚠️ 已知缺口 (快照自述): overall_parity=false 由 gitlink blocking 触发时, §1.35 的 dispatch 表尚未新增 gitlink 专属第七路建议 (git -C S push R <branch>, AC-16 设计意图), 待后续增量接入。也就是说形态 B 会红, 但修复文案还得靠人/输出层补」。断言只要求「点出风险」故判通过。"
+    },
+    {
+      "text": "不把 reachable 字段当作可达性判据 (它自 task 1.10 起恒 true); 真实信号是 fetch_ok 三态 / evidence_grade",
+      "passed": true,
+      "evidence": "判据落点正确: L101-102 用 evidence_grade / fetch_ok 承载可达与新鲜度; L108: 「has_unreachable_remote: 只看 fetch_ok == \"false\" (零枚举 fail-CLOSED)」; L56-57: 「refresh_deadline_seconds 砍掉来不及跑的 leg, 记 fetch_ok=\"not_attempted\", 不等于 \"false\" —— \"我们没去问\" 不等于 \"对方不可达\"」; L115-123 evidence_grade 三档全分割。扣分点 (不足以判 failed): L99 的字段表仍逐行列出 `reachable | true | true`, 未标注该字段自 task 1.10 起恒 true 已失去判据价值; with_skill 已将其从字段清单整体移除, 此处是两臂的细微差异。"
+    }
+  ]
+}

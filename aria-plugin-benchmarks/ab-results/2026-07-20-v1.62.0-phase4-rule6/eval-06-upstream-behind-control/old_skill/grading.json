@@ -1,0 +1,26 @@
+{
+  "eval_id": "eval-06-upstream-behind-control",
+  "arm": "old_skill",
+  "expectations": [
+    {
+      "text": "报告当前分支相对 upstream 的 ahead/behind 具体数字",
+      "passed": true,
+      "evidence": "L44-51 current_branch 结构含具体数值示例: 「ahead: 2 # 本地领先 upstream 的 commit 数 / behind: 7 # 本地落后 upstream 的 commit 数 / diverged: true」; L147 输出样例: 「当前分支: feature/xxx (⚠️ 落后 origin/feature/xxx 7 commits, 领先 2)」; L175 阈值规则 branch_behind_upstream (落后 ≥ 5, priority 1.98)。"
+    },
+    {
+      "text": "方向性建议正确 —— 落后建议 pull, 领先建议 push, 不一律给同一个动作",
+      "passed": true,
+      "evidence": "L185-192 分派表: 「behind > 0, ahead == 0 → 纯落后 → git pull --rebase 或 git merge」/「ahead > 0, behind == 0 → 纯领先, 本地几天的活儿没推 → git push。不要做任何 \"update to remote\" 类操作」/「diverged == true → 真分叉 → 人工决策: rebase 还是 merge。别自动化」; L181 给出方向不对称的理由: 「方向搞反的代价不对称: 落后时执行 update/pull 是安全的; 领先时误执行 git submodule update --remote 会直接丢弃本地未推送的 commit。所以先看方向, 再动手」。"
+    },
+    {
+      "text": "覆盖子模块 drift 的两个方向 (workdir_vs_tree 与 tree_vs_remote)",
+      "passed": true,
+      "evidence": "L110-111 两字段并列: 「workdir_vs_tree: false # 工作目录偏离主仓库记录 ← 你问的\"子模块有没有偏离主仓库记录\"」「tree_vs_remote: true # 主仓库记录与远程不一致」; L196-199 两方向分别处置 (hint_type update / push / manual_check 三分, 以及 workdir_vs_tree 为真时「先判清是哪一边动的, 再决定是\"提交 gitlink\"还是\"同步 checkout\"」); L101 三方比对定义完整。"
+    },
+    {
+      "text": "对无法判定的情形给出 reason 而非猜测",
+      "passed": true,
+      "evidence": "L51 reason 值域; L54-62 null 语义表 (no_upstream / detached_head / shallow_clone 各自对应 ahead/behind 为 null); L190: 「reason == \"no_upstream\" → ...此时\"没报落后\"不代表没落后, 是根本没测」; L192: 「shallow_clone → 浅克隆, 落后数不可算 → git fetch --unshallow 后重扫」; L198: 「hint_type == manual_check —— tree_vs_remote 为 true 但两个计数都是 0/null → 手动查, 别自动操作」; L209 对 fetch_ok == not_attempted: 「意味着这条 remote 这轮压根没查, 不是\"查过没问题\"」。"
+    }
+  ]
+}

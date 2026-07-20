@@ -1,0 +1,45 @@
+{
+  "run_name": "2026-07-20-v1.62.0-phase4-rule6",
+  "skill_name": "state-scanner",
+  "purpose": "Rule #6 补跑 AB — owner 裁决 2026-07-20 (先例收窄到 v1.59/v1.60, Phase 4 不适用 deterministic substitute 豁免)",
+  "under_test": "v1.62.0 Phase 4 对 references/rules/basic-rules.md 的 77 行改动: multi_remote_drift dispatch 第七路 (gitlink 层成因) + degrade_when 离线降级横幅",
+  "arms": {
+    "with_skill": "aria/skills/state-scanner @ v1.62.2 (当前)",
+    "old_skill": "v1.61.0 快照 (Phase 4 之前 — 其 basic-rules.md 自述「dispatch 表尚未新增第七路」)",
+    "without_skill": "无 skill, 纯 git 常识基线 (Rule #6 canonical 问题: skill 本身是否有正向价值)"
+  },
+  "methodology_caveats": [
+    "产出为描述性 result.md 而非实执行 —— 沿用本测试集 2026-04-12 历史范式, 且本仓正并发跑其它测试, 实执行 fetch/写操作会互相污染。",
+    "⚠️ rubric 本身在本 cycle 被修改过 (task 11.2): 原文「exclude ahead and unknown from overall_parity」会把正确的新行为判为错, 已按 v4+ 语义精确化。用新 rubric 评 old_skill 是问「哪一版的行为符合正确语义」, 不是问「old_skill 在它自己的目标下做得好不好」—— 这两个问题不同, 结论只能用于前者。",
+    "eval-06 是控制组, 打的是本次未触碰的面 (upstream ahead/behind + 子模块 drift), 用于检测回归而非验证改进。它没有 without_skill 臂。",
+    "样本量小 (2 个目标 eval + 1 个控制), 只能支持定性结论, 不足以做统计显著性声称。"
+  ],
+  "assertions": {
+    "eval-10-multi-remote-parity-drift": [
+      { "id": "A1", "text": "按 per-remote 报告同步状态, 而非单一合并状态", "discriminating": "skill-vs-baseline" },
+      { "id": "A2", "text": "枚举全部已配置 remote (origin + github), 且覆盖主仓与子模块两层", "discriminating": "skill-vs-baseline" },
+      { "id": "A3", "text": "指出 github 落后并给出 behind_count 这类具体量化字段", "discriminating": "skill-vs-baseline" },
+      { "id": "A4", "text": "不出现 'Everything up-to-date' 式歧义表述 —— 必须把 origin 已同步与 github 未同步区分开", "discriminating": "skill-vs-baseline" },
+      { "id": "A5", "text": "触发 multi_remote_drift 规则并点名其 priority 1.35", "discriminating": "skill-vs-baseline" },
+      { "id": "A6", "text": "给出 per-remote 修复命令 (形如 git -C <path> push github master)", "discriminating": "skill-vs-baseline" },
+      { "id": "A7", "text": "对 parity: ahead 的处理正确 —— 不阻断也不算正证据, 由 has_pending_push 单独承载 (故 overall_parity: true 与 has_pending_push: true 并存不矛盾)", "discriminating": "new-vs-old (v4+ 语义)" },
+      { "id": "A8", "text": "对 parity: unknown 做二分而非一律排除 —— benign (detached_head/shallow_clone/remote_branch_missing/no_local_tracking_ref+fresh) 不阻断, blocking_unknown (not_refreshed/network/auth/未识别) fail-CLOSED 阻断", "discriminating": "new-vs-old (v4+ 语义)" },
+      { "id": "A9", "text": "要求正证据: overall_parity: true 需至少一个 enforced remote 同时满足 parity: equal 与 evidence_grade: fresh (陈旧 equal 不算证据)", "discriminating": "new-vs-old (v4+ 语义)" },
+      { "id": "A10", "text": "提及 gitlink 层成因 (第七路): 主仓在某 remote 上引用的子模块 commit 在该 remote 不存在 ⇒ clone --recursive 断裂, 修法是推子模块而非动 gitlink", "discriminating": "new-vs-old (Phase 4 新增面 — 本次 AB 的核心靶点)" },
+      { "id": "A11", "text": "提及离线降级: has_unreachable_remote 为真 (或无任何新鲜证据) 时不走逐条 dispatch, 改出降级横幅", "discriminating": "new-vs-old (Phase 4 新增面 — 核心靶点)" }
+    ],
+    "eval-11-submodule-push-github-sync-miss": [
+      { "id": "B1", "text": "检出 github remote 落后, 不因本地与 origin 一致而静默通过", "discriminating": "skill-vs-baseline" },
+      { "id": "B2", "text": "区分「本地 vs origin」与「origin vs github」两个不同的比较轴", "discriminating": "skill-vs-baseline" },
+      { "id": "B3", "text": "给出子模块层的补推命令 (git -C aria push github master)", "discriminating": "skill-vs-baseline" },
+      { "id": "B4", "text": "点出 gitlink 风险: 主仓 gitlink 指向的子模块 commit 若在 github 不可达, 从 github clone --recursive 会断裂", "discriminating": "new-vs-old (Phase 4 新增面)" },
+      { "id": "B5", "text": "不把 reachable 字段当作可达性判据 (它自 task 1.10 起恒 true); 真实信号是 fetch_ok 三态 / evidence_grade", "discriminating": "new-vs-old" }
+    ],
+    "eval-06-upstream-behind-control": [
+      { "id": "C1", "text": "报告当前分支相对 upstream 的 ahead/behind 具体数字", "discriminating": "regression-check" },
+      { "id": "C2", "text": "方向性建议正确 —— 落后建议 pull, 领先建议 push, 不一律给同一个动作", "discriminating": "regression-check" },
+      { "id": "C3", "text": "覆盖子模块 drift 的两个方向 (workdir_vs_tree 与 tree_vs_remote)", "discriminating": "regression-check" },
+      { "id": "C4", "text": "对无法判定的情形给出 reason 而非猜测", "discriminating": "regression-check" }
+    ]
+  }
+}

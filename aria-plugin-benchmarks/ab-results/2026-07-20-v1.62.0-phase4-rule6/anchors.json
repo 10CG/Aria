@@ -1,0 +1,698 @@
+{
+ "eval-10-multi-remote-parity-drift": {
+  "old_skill": {
+   "status": "present",
+   "chars": 8631,
+   "anchors": {
+    "A1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "per-remote|逐\\s*remote|每个\\s*remote|按 remote": [
+       40,
+       138
+      ]
+     }
+    },
+    "A2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin": [
+       1,
+       31,
+       91,
+       97,
+       100
+      ],
+      "github": [
+       1,
+       31,
+       95,
+       96,
+       97
+      ]
+     }
+    },
+    "A3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "behind_count|落后\\s*\\d+|behind\\s*[:=]\\s*\\d+": [
+       44,
+       91,
+       95
+      ]
+     }
+    },
+    "A4": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "Everything up-to-date|已是最新|全部同步": []
+     }
+    },
+    "A5": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "multi_remote_drift": [
+       114,
+       130
+      ],
+      "1\\.35": [
+       114
+      ]
+     }
+    },
+    "A6": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C .* push": [
+       99,
+       130,
+       142,
+       144
+      ]
+     }
+    },
+    "A7": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "has_pending_push": [
+       71,
+       110,
+       111,
+       114,
+       116
+      ]
+     }
+    },
+    "A8": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "blocking_unknown|benign|二分": [
+       70,
+       111
+      ]
+     }
+    },
+    "A9": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "evidence_grade": [
+       34,
+       44,
+       56,
+       68,
+       149
+      ],
+      "fresh": [
+       31,
+       54,
+       58,
+       60,
+       68
+      ]
+     }
+    },
+    "A10": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "gitlink": [
+       69,
+       74,
+       76,
+       125,
+       127
+      ],
+      "clone --recursive|递归 clone|断裂": []
+     }
+    },
+    "A11": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "degrade|降级|离线|has_unreachable_remote": [
+       72,
+       112,
+       160
+      ]
+     }
+    }
+   }
+  },
+  "with_skill": {
+   "status": "present",
+   "chars": 9047,
+   "anchors": {
+    "A1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "per-remote|逐\\s*remote|每个\\s*remote|按 remote": [
+       27,
+       106,
+       149,
+       182
+      ]
+     }
+    },
+    "A2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin": [
+       4,
+       46,
+       52,
+       59,
+       78
+      ],
+      "github": [
+       4,
+       46,
+       52,
+       67,
+       79
+      ]
+     }
+    },
+    "A3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "behind_count|落后\\s*\\d+|behind\\s*[:=]\\s*\\d+": [
+       61,
+       70,
+       78,
+       79,
+       130
+      ]
+     }
+    },
+    "A4": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "Everything up-to-date|已是最新|全部同步": [
+       152,
+       182
+      ]
+     }
+    },
+    "A5": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "multi_remote_drift": [
+       100
+      ],
+      "1\\.35": [
+       100,
+       107,
+       109,
+       111,
+       118
+      ]
+     }
+    },
+    "A6": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C .* push": [
+       119,
+       140,
+       169
+      ]
+     }
+    },
+    "A7": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "has_pending_push": [
+       87,
+       106,
+       109,
+       144,
+       161
+      ]
+     }
+    },
+    "A8": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "blocking_unknown|benign|二分": [
+       98,
+       117,
+       118
+      ]
+     }
+    },
+    "A9": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "evidence_grade": [
+       31,
+       63,
+       71,
+       78,
+       79
+      ],
+      "fresh": [
+       26,
+       32,
+       36,
+       63,
+       71
+      ]
+     }
+    },
+    "A10": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "gitlink": [
+       27,
+       46,
+       69,
+       82,
+       97
+      ],
+      "clone --recursive|递归 clone|断裂": [
+       165
+      ]
+     }
+    },
+    "A11": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "degrade|降级|离线|has_unreachable_remote": [
+       13,
+       88,
+       123,
+       144
+      ]
+     }
+    }
+   }
+  },
+  "without_skill": {
+   "status": "present",
+   "chars": 5530,
+   "anchors": {
+    "A1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "per-remote|逐\\s*remote|每个\\s*remote|按 remote": [
+       28
+      ]
+     }
+    },
+    "A2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin": [
+       25,
+       31,
+       74,
+       79,
+       88
+      ],
+      "github": [
+       19,
+       25,
+       32,
+       47,
+       50
+      ]
+     }
+    },
+    "A3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "behind_count|落后\\s*\\d+|behind\\s*[:=]\\s*\\d+": [
+       102,
+       103
+      ]
+     }
+    },
+    "A4": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "Everything up-to-date|已是最新|全部同步": []
+     }
+    },
+    "A5": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "multi_remote_drift": [],
+      "1\\.35": []
+     }
+    },
+    "A6": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C .* push": [
+       159,
+       160
+      ]
+     }
+    },
+    "A7": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "has_pending_push": []
+     }
+    },
+    "A8": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "blocking_unknown|benign|二分": []
+     }
+    },
+    "A9": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "evidence_grade": [],
+      "fresh": []
+     }
+    },
+    "A10": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "gitlink": [
+       50,
+       53,
+       73,
+       86,
+       96
+      ],
+      "clone --recursive|递归 clone|断裂": []
+     }
+    },
+    "A11": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "degrade|降级|离线|has_unreachable_remote": []
+     }
+    }
+   }
+  }
+ },
+ "eval-11-submodule-push-github-sync-miss": {
+  "old_skill": {
+   "status": "present",
+   "chars": 9561,
+   "anchors": {
+    "B1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "github.*落后|落后.*github|未推送": [
+       184,
+       197
+      ]
+     }
+    },
+    "B2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin.*github|两个.*轴|本地.*origin": [
+       14,
+       51,
+       93,
+       95,
+       139
+      ]
+     }
+    },
+    "B3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C aria push github": [
+       198,
+       215,
+       228
+      ]
+     }
+    },
+    "B4": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "gitlink": [
+       24,
+       62,
+       132,
+       136,
+       144
+      ],
+      "clone --recursive|断裂": [
+       153,
+       223
+      ]
+     }
+    },
+    "B5": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "fetch_ok|evidence_grade": [
+       56,
+       82,
+       101,
+       102,
+       108
+      ]
+     }
+    }
+   }
+  },
+  "with_skill": {
+   "status": "present",
+   "chars": 9637,
+   "anchors": {
+    "B1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "github.*落后|落后.*github|未推送": [
+       149
+      ]
+     }
+    },
+    "B2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin.*github|两个.*轴|本地.*origin": [
+       49,
+       50,
+       51,
+       158,
+       159
+      ]
+     }
+    },
+    "B3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C aria push github": [
+       184
+      ]
+     }
+    },
+    "B4": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "gitlink": [
+       92,
+       97,
+       100,
+       103,
+       114
+      ],
+      "clone --recursive|断裂": [
+       99,
+       115,
+       137,
+       162
+      ]
+     }
+    },
+    "B5": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "fetch_ok|evidence_grade": [
+       34,
+       74,
+       75,
+       79,
+       91
+      ]
+     }
+    }
+   }
+  },
+  "without_skill": {
+   "status": "present",
+   "chars": 6050,
+   "anchors": {
+    "B1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "github.*落后|落后.*github|未推送": [
+       65,
+       134
+      ]
+     }
+    },
+    "B2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "origin.*github|两个.*轴|本地.*origin": [
+       12,
+       56,
+       65,
+       83,
+       117
+      ]
+     }
+    },
+    "B3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "git -C aria push github": [
+       134
+      ]
+     }
+    },
+    "B4": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "gitlink": [
+       38,
+       40,
+       81,
+       83,
+       118
+      ],
+      "clone --recursive|断裂": []
+     }
+    },
+    "B5": {
+     "all_patterns_hit": false,
+     "per_pattern_lines": {
+      "fetch_ok|evidence_grade": []
+     }
+    }
+   }
+  }
+ },
+ "eval-06-upstream-behind-control": {
+  "old_skill": {
+   "status": "present",
+   "chars": 9908,
+   "anchors": {
+    "C1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "ahead|behind": [
+       32,
+       48,
+       49,
+       50,
+       56
+      ]
+     }
+    },
+    "C2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "pull": [
+       149,
+       181,
+       187
+      ],
+      "push": [
+       4,
+       115,
+       162,
+       188,
+       197
+      ]
+     }
+    },
+    "C3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "workdir_vs_tree|tree_vs_remote|工作目录.*记录": [
+       110,
+       111,
+       174,
+       198,
+       199
+      ]
+     }
+    },
+    "C4": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "reason": [
+       35,
+       51,
+       56,
+       76,
+       88
+      ]
+     }
+    }
+   }
+  },
+  "with_skill": {
+   "status": "present",
+   "chars": 9922,
+   "anchors": {
+    "C1": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "ahead|behind": [
+       38,
+       61,
+       62,
+       63,
+       68
+      ]
+     }
+    },
+    "C2": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "pull": [
+       3,
+       176,
+       205,
+       206,
+       207
+      ],
+      "push": [
+       3,
+       109,
+       132,
+       138,
+       198
+      ]
+     }
+    },
+    "C3": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "workdir_vs_tree|tree_vs_remote|工作目录.*记录": [
+       39,
+       127,
+       128,
+       141,
+       217
+      ]
+     }
+    },
+    "C4": {
+     "all_patterns_hit": true,
+     "per_pattern_lines": {
+      "reason": [
+       64,
+       68,
+       89,
+       100,
+       197
+      ]
+     }
+    }
+   }
+  }
+ }
+}

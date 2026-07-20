@@ -1,0 +1,32 @@
+{
+  "eval_id": "eval-11-submodule-push-github-sync-miss",
+  "arm": "without_skill",
+  "contamination_note": "本臂受 CLAUDE.md 自动加载结构性污染 (assertions.json caveats), 且本 run 的污染证据比 eval-10 without_skill 强得多 —— 本臂逐字使用了 CLAUDE.md 「项目状态」段里出现的 state-scanner 私有术语: L35-36 与 L76-79 的证据等级三档写作 `unknown` / `stale_unverified` / `expired` / `fresh`, 这正是 CLAUDE.md 记载的 evidence_grade∈{fresh,stale_unverified,expired} 三值域; L148 的「fail-closed, 宁可报\"我不知道\"也不报假绿」对应 CLAUDE.md 的 fail-CLOSED 表述; L149-151 的 gitlink 可达性硬闸与推送顺序对应 CLAUDE.md 的 Aria #165 与多仓 gitlink bump 顺序条目。因此 B5 的通过 (证据分级取代 reachable/静态判据) 几乎可以确定不是模型自身 git 常识, 而是污染搬运; B4 的通过 (gitlink 断裂风险) 亦受同源污染影响, 但该风险属通用 submodule 知识, 污染归因中等。B1/B2/B3 属纯 git 常识层, 污染归因低。另需记方法论不对称: 本臂实跑只读 git 并据实报「当前没有发现本地领先 GitHub 的漏推」(L93), 与两个 skill 臂的描述性推演不是同一个任务。",
+  "expectations": [
+    {
+      "text": "检出 github remote 落后, 不因本地与 origin 一致而静默通过",
+      "passed": true,
+      "evidence": "L10-12 抓住失效机制: 「事件的本质是: \"push 成功\" 只对某一个 remote 成立, 却被当成了对全部 remote 成立。git push origin master 之后再跑一次会回 Everything up-to-date —— 这句话的主语是 origin, 跟 GitHub mirror 没有任何关系」; L14-17: 「不能只看当前分支的 upstream。upstream 只有一个 (通常是 origin), 以它为准就天然看不见 mirror」; L63-70 逐 remote parity 表。本 run 实查后未发现漏推 (L93), 但检出路径与拒绝豁免的逻辑成立, 且 L132-136 给出\"若领先则补推\"的条件动作。"
+    },
+    {
+      "text": "区分「本地 vs origin」与「origin vs github」两个不同的比较轴",
+      "passed": true,
+      "evidence": "L65-70 表格把「领先/落后 origin」与「领先/落后 github」拆成两列独立判定; L56-61 remote 拓扑逐仓列 origin 与 github 两侧 URL; L69-70 对 standards 与 aria-orchestrator 分别辨析「两个 remote 都一致 ⇒ 落后但非漏推」与「镜像缺失」两种不同形态, 说明两个轴确实被分开推理。"
+    },
+    {
+      "text": "给出子模块层的补推命令 (git -C aria push github master)",
+      "passed": true,
+      "evidence": "L132-136: 「重跑逐 remote ahead/behind, 对任何\"本地领先 X\"的 remote 补推: git -C aria push github master # 若 github 落后 / git push github master # 主仓同理」; L137-141 追加 post-push SHA 回验 (git -C aria ls-remote github refs/heads/master), 并指出「git push 返回 0 只说明服务端接受了」。"
+    },
+    {
+      "text": "点出 gitlink 风险: 主仓 gitlink 指向的子模块 commit 若在 github 不可达, 从 github clone --recursive 会断裂",
+      "passed": true,
+      "evidence": "落在 (c) 档 —— 作为可执行的发版硬闸建议给出 (但归属 git 常识层, 非 scanner dispatch 路)。L38-43: 「主仓提交里记录的子模块 SHA (gitlink), 必须在每一个 remote 的 master 上可达。只推了 Forgejo 的话, GitHub 上的主仓会指向一个 GitHub 侧根本不存在的子模块 commit —— 别人 git submodule update 直接失败。这一步比 ahead/behind 更能抓住\"主仓推了、子模块 mirror 没推\"的组合事故」; L46-48 给出机械判据 merge-base --is-ancestor; L81-87 实查表; L149-151: 「发版流程把 gitlink 可达性作为硬闸...子模块先 merge + 先推全部 remote, 主仓 gitlink bump 后推 —— 顺序反了就会在 GitHub 上留下悬空 gitlink」。⚠️ 见 contamination_note (中等归因)。此项三臂全过, 无区分度。"
+    },
+    {
+      "text": "不把 reachable 字段当作可达性判据 (它自 task 1.10 起恒 true); 真实信号是 fetch_ok 三态 / evidence_grade",
+      "passed": true,
+      "evidence": "断言的字段名前提在本臂不存在 (无 snapshot schema), 按语义判定: 本臂拒绝把静态/缓存判据当可达证据, 改用获取时间分级。L29-36: 「refs/remotes/github/master 是上一次 fetch 时的缓存快照, 不是 GitHub 的实时状态...此时 ahead/behind 算出 0 0 只是\"我不知道\", 不是\"已同步\"...ref 缺失 → 证据等级 unknown, 不得判 equal / ref 陈旧 → stale_unverified, 只能判\"疑似\" / ref 新鲜 → fresh, 才允许判 equal」; L72-79 逐仓落表并把 standards / aria-orchestrator 标 expired; L95-100 据此把全部 0/0 判为非正证据; L147-148: 「同步判定引入证据分级, 不允许 unknown 静默降级成 equal...这是 fail-closed」。⚠️ 见 contamination_note: 三档命名与 CLAUDE.md 逐字同形, 本项通过高度疑为污染搬运而非模型自身知识。"
+    }
+  ]
+}

@@ -1,13 +1,34 @@
 {
   "skill_name": "state-scanner",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "source_evals_count": 11,
   "selected_count": 11,
   "changelog": [
-    {"version": "1.4.0", "date": "2026-04-12", "changes": "新增 Phase 1.12 多远程 parity 测试用例 2 个 (eval-10 multi-remote-parity-drift + eval-11 submodule-push-github-sync-miss), 对应 v1.15.0 US-012"},
-    {"version": "1.3.0", "date": "2026-04-12", "changes": "新增 Phase 1.8 扩展 (README skill count/badge) + Phase 1.14 (Forgejo config) 测试用例 2 个, 对应 v1.14.0"},
-    {"version": "1.2.0", "date": "2026-04-09", "changes": "新增 Phase 1.12 (sync detection) + Phase 1.13 (issue awareness) 测试用例 3 个, 对应 state-scanner v2.9.0"},
-    {"version": "1.1.0", "date": "2026-03-18", "changes": "建立首版固定测试集"}
+    {
+      "version": "1.4.0",
+      "date": "2026-04-12",
+      "changes": "新增 Phase 1.12 多远程 parity 测试用例 2 个 (eval-10 multi-remote-parity-drift + eval-11 submodule-push-github-sync-miss), 对应 v1.15.0 US-012"
+    },
+    {
+      "version": "1.3.0",
+      "date": "2026-04-12",
+      "changes": "新增 Phase 1.8 扩展 (README skill count/badge) + Phase 1.14 (Forgejo config) 测试用例 2 个, 对应 v1.14.0"
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-04-09",
+      "changes": "新增 Phase 1.12 (sync detection) + Phase 1.13 (issue awareness) 测试用例 3 个, 对应 state-scanner v2.9.0"
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-03-18",
+      "changes": "建立首版固定测试集"
+    },
+    {
+      "version": "1.5.0",
+      "date": "2026-07-20",
+      "note": "Rule #6 补跑 AB (2026-07-20-v1.62.0-phase4-rule6) 暴露的测试集缺陷修复: A5 写反 (本场景 1.35 正确行为是不触发, 按字面评分会把正确答案判错) / A3 字段真值冲突 (漏推形态是 ahead, behind_count 恒 0) / A10 与 B4 拆成「描述成因链」与「作为已接线 dispatch 给出」两条 —— 后者才是 v1.62.0 vs v1.61.0 的判别式, 合并成一条会让 (b) 自述缺口与 (c) 已接线同分, 连 baseline 靠通用常识也满分。 另修 eval-11 同型字段真值错误 (第 4 条同样误用 behind_count)。"
+    }
   ],
   "evals": [
     {
@@ -136,14 +157,16 @@
       "expectations": [
         "Should output multi_remote section with per-remote sync status, not a single combined status",
         "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
-        "Should detect that github remote is behind origin by N commits, report specific behind_count",
+        "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
         "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced",
-        "Should trigger multi_remote_drift recommendation rule (priority 1.35) when overall_parity is false",
+        "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire — the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
         "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
         "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
         "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
         "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
-        "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning"
+        "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+        "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+        "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) — NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion."
       ]
     },
     {
@@ -155,10 +178,12 @@
         "Should NOT report all remotes as synced when only origin was pushed",
         "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
         "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
-        "Should report the exact missing remote name and behind_count in the fix suggestion",
+        "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
         "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
         "Should show has_unreachable_remote: false when both remotes reachable but github behind",
-        "Should include git-remote-helper reference in the scan output when helper is available"
+        "Should include git-remote-helper reference in the scan output when helper is available",
+        "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+        "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note."
       ]
     }
   ]

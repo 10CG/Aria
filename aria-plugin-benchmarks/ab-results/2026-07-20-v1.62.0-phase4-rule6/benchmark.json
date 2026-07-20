@@ -1,0 +1,98 @@
+{
+ "skill_name": "state-scanner",
+ "run": "2026-07-20-v1.62.0-phase4-rule6",
+ "purpose": "Rule #6 补跑 AB (owner 裁决 2026-07-20: deterministic substitute 先例收窄到 v1.59/v1.60, Phase 4 不适用豁免)",
+ "under_test": "v1.62.0 Phase 4 对 references/rules/basic-rules.md 的 77 行改动 (multi_remote_drift dispatch 第七路 + degrade_when)",
+ "configurations": [
+  {
+   "name": "with_skill",
+   "desc": "aria/skills/state-scanner @ v1.62.2",
+   "passed": 20,
+   "total": 20,
+   "evals": 3,
+   "pass_rate": 1.0
+  },
+  {
+   "name": "old_skill",
+   "desc": "v1.61.0 快照 (Phase 4 之前)",
+   "passed": 19,
+   "total": 20,
+   "evals": 3,
+   "pass_rate": 0.95
+  },
+  {
+   "name": "without_skill",
+   "desc": "无 skill 基线 — ⚠️ 结构性污染, 见 caveats",
+   "passed": 12,
+   "total": 16,
+   "evals": 2,
+   "pass_rate": 0.75
+  }
+ ],
+ "per_eval": {
+  "eval-06-upstream-behind-control": {
+   "old_skill": {
+    "passed": 4,
+    "total": 4,
+    "contamination_note": null
+   },
+   "with_skill": {
+    "passed": 4,
+    "total": 4,
+    "contamination_note": null
+   }
+  },
+  "eval-10-multi-remote-parity-drift": {
+   "old_skill": {
+    "passed": 10,
+    "total": 11,
+    "contamination_note": null
+   },
+   "with_skill": {
+    "passed": 11,
+    "total": 11,
+    "contamination_note": null
+   },
+   "without_skill": {
+    "passed": 7,
+    "total": 11,
+    "contamination_note": "本臂受 CLAUDE.md 自动加载结构性污染 (assertions.json caveats)。CLAUDE.md 「项目状态」段逐字含 evidence_grade∈{fresh,stale_unverified,expired} / gitlink_integrity[] / overall_parity 四子句 / fail-CLOSED / Aria #165 镜像漏推 等 token, 并含 CLAUDE.md 版本发布检查清单里的多远程推送灾备命令 (git -C aria push github master)。因此以下断言的通过存在污染嫌疑而非模型自身 git 常识: A2 (enforced remote 覆盖面观念) / A6 (灾备 push 命令与 CLAUDE.md 清单逐字同形) / A9 (陈旧 ref 假绿的语义) / A10 (gitlink 跨仓可达性 + 推子模块在先的顺序, CLAUDE.md 有 #165 与 feedback_sequenced_multirepo_gitlink_bump 索引)。反证污染并非全覆盖: 本臂全文未出现 evidence_grade / stale_unverified / overall_parity / multi_remote_drift 任一 CLAUDE.md 中存在的字段名 (A5/A7/A8/A11 均 failed), 说明它是在用纯 git 词汇自行推理, 而非照抄状态段。另有一项方法论不对称需记: 本臂实跑了只读 git 命令并据实否证了场景前提 (L120), 而两个 skill 臂按测试范式作描述性推演 —— 三臂并非在回答同一个问题, 见 grading-summary.md 缺陷清单。"
+   }
+  },
+  "eval-11-submodule-push-github-sync-miss": {
+   "old_skill": {
+    "passed": 5,
+    "total": 5,
+    "contamination_note": null
+   },
+   "with_skill": {
+    "passed": 5,
+    "total": 5,
+    "contamination_note": null
+   },
+   "without_skill": {
+    "passed": 5,
+    "total": 5,
+    "contamination_note": "本臂受 CLAUDE.md 自动加载结构性污染 (assertions.json caveats), 且本 run 的污染证据比 eval-10 without_skill 强得多 —— 本臂逐字使用了 CLAUDE.md 「项目状态」段里出现的 state-scanner 私有术语: L35-36 与 L76-79 的证据等级三档写作 `unknown` / `stale_unverified` / `expired` / `fresh`, 这正是 CLAUDE.md 记载的 evidence_grade∈{fresh,stale_unverified,expired} 三值域; L148 的「fail-closed, 宁可报\"我不知道\"也不报假绿」对应 CLAUDE.md 的 fail-CLOSED 表述; L149-151 的 gitlink 可达性硬闸与推送顺序对应 CLAUDE.md 的 Aria #165 与多仓 gitlink bump 顺序条目。因此 B5 的通过 (证据分级取代 reachable/静态判据) 几乎可以确定不是模型自身 git 常识, 而是污染搬运; B4 的通过 (gitlink 断裂风险) 亦受同源污染影响, 但该风险属通用 submodule 知识, 污染归因中等。B1/B2/B3 属纯 git 常识层, 污染归因低。另需记方法论不对称: 本臂实跑只读 git 并据实报「当前没有发现本地领先 GitHub 的漏推」(L93), 与两个 skill 臂的描述性推演不是同一个任务。"
+   }
+  }
+ },
+ "delta": {
+  "with_vs_old": 0.05,
+  "note_with_vs_old": "ΔPASS 仅 +1 条 (A11 离线降级)。A10/B4 (gitlink 第七路) 的实质提升 —— 从 (b) 自述缺口到 (c) 已接线 dispatch —— 被断言措辞抹平, 二值分数上未体现。",
+  "with_vs_without": "NOT COMPARABLE — 见 caveats.baseline_contamination 与 caveats.genre_confound"
+ },
+ "caveats": {
+  "baseline_contamination": "CLAUDE.md 自动加载进每个 agent 的 context, 其项目状态段含 evidence_grade / gitlink_integrity / fail-CLOSED / overall_parity 各一次。eval-11 的 baseline 逐字用了 stale_unverified / expired / fail-closed, 与该段同形 ⇒ B5 的通过应视为搬运而非模型自身知识。eval-10 的 baseline 反而全程用纯 git 词汇自行推理, 未借字段名 ⇒ 两个 baseline 的污染程度不同, 其得分不可跨 eval 比较, 也不可用于回答 Rule #6 canonical 的「skill 本身是否有价值」。在本仓内做干净的 without_skill 臂结构上不可能。",
+  "genre_confound": "两个 without_skill 臂实跑了只读 git 并据实否证了场景前提 (真实仓库已是 v1.62.2, 不存在漏推); skill 臂按本测试集历史范式作描述性推演。三臂实际不在回答同一个问题, delta 混入体裁红利。后续 run 需统一钉死产出形态。",
+  "rubric_self_modified": "rubric 由本 cycle 的 task 11.2 修改过。用新 rubric 评 old_skill 问的是「哪一版行为符合正确语义」, 不是「old_skill 在其自身目标下做得好不好」。",
+  "sample_size": "2 个目标 eval + 1 个控制, 单次运行无重复。只支持定性结论, 不做统计显著性声称。"
+ },
+ "suite_defects_found": [
+  "A5 写反: 本场景 overall_parity=true, 1.35 的正确行为是不触发; 按字面评分会把正确答案判错。",
+  "A3 与字段真值冲突: 漏推形态是 ahead, behind_count 恒 0, 断言却要 behind_count。",
+  "A10/B4 需拆条: 「是否描述成因链」与「是否作为已接线 dispatch 给出且不自述为缺口」必须分开, 后者才是判别式。",
+  "(另 4 条见 grading-summary.md 第 4 节)"
+ ],
+ "verdict": "Phase 4 的指令面改动有正向证据但幅度小: A11 三向干净区分 (with_skill 三个 run 全部产出降级行为分支, old_skill 与 baseline 零产出); A10/B4 有实质提升但未被现有断言捕获; 控制组零回归。Rule #6 canonical 维度 (skill vs no-skill) 本次不可用。"
+}

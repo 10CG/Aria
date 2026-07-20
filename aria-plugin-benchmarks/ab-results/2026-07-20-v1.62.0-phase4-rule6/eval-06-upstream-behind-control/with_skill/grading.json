@@ -1,0 +1,26 @@
+{
+  "eval_id": "eval-06-upstream-behind-control",
+  "arm": "with_skill",
+  "expectations": [
+    {
+      "text": "报告当前分支相对 upstream 的 ahead/behind 具体数字",
+      "passed": true,
+      "evidence": "L54-63 sync_status.current_branch 字段表逐条给出 upstream / upstream_configured / ahead (int) / behind (int) / diverged; L174 输出样例: 「当前分支: feature/xxx (⚠️ 落后 origin/feature/xxx 3 commits)」; L205 判据用具体阈值 (behind >= 5 触发 branch_behind_upstream priority 1.98)。"
+    },
+    {
+      "text": "方向性建议正确 —— 落后建议 pull, 领先建议 push, 不一律给同一个动作",
+      "passed": true,
+      "evidence": "L203-211 分派表逐行给出反向动作: 「behind > 0, ahead == 0 → git pull (或 --rebase)...别 push —— 非 fast-forward, 要么被拒要么诱发强推」/「ahead > 0, behind == 0 → git push...别 pull/update --remote —— 没必要, 且 submodule 侧同样动作会丢本地 commit」/「diverged == true → 人工决策 rebase 或 merge...更别 push -f」; L197-199 显式反制旧行为: 「旧版把 overall_parity: false 的所有成因一律建议 git push, 那本身就是方向性 bug」; L230-231: 「不能一律 pull 也不能一律 push」。"
+    },
+    {
+      "text": "覆盖子模块 drift 的两个方向 (workdir_vs_tree 与 tree_vs_remote)",
+      "passed": true,
+      "evidence": "L127-128 两个字段并列定义: 「drift.workdir_vs_tree | bool —— 工作目录偏离主仓记录 (head_commit != tree_commit)」「drift.tree_vs_remote | bool —— 主仓记录与远程不一致」; L217-220 两方向各自给出不同处置 (workdir_vs_tree → 先判哪边是对的, git add 提 gitlink 或 git submodule update; tree_vs_remote + behind_count>0 → update --remote; tree_vs_remote + ahead_count>0 → push, 绝不 update); L119-133 完整三方比对字段 (tree_commit / head_commit / remote_commit)。"
+    },
+    {
+      "text": "对无法判定的情形给出 reason 而非猜测",
+      "passed": true,
+      "evidence": "L64 reason 值域 (no_upstream / shallow_clone / detached_head / not_a_git_repo); L66-73 fail-soft 语义表把 null 的 behind 与对应 reason 绑定; L208-211 每个 reason 给出前置修复而非方向性动作, 其中 L211: 「parity == unknown 且 reason ∈ {not_refreshed, network_timeout, auth_failed} 或其他未识别 reason → 检查网络/凭据后重扫。不给 pull/push 建议 (方向未知, 盲建议有害, fail-CLOSED)」; L210: 「别信 behind: null 是\"没落后\"」; L141-142 子模块侧对应 hint_type: manual_check「方向不明, 请手动检查, 不发方向性建议」。"
+    }
+  ]
+}

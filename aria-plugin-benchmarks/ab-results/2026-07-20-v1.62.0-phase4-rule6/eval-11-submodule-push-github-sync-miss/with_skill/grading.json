@@ -1,0 +1,31 @@
+{
+  "eval_id": "eval-11-submodule-push-github-sync-miss",
+  "arm": "with_skill",
+  "expectations": [
+    {
+      "text": "检出 github remote 落后, 不因本地与 origin 一致而静默通过",
+      "passed": true,
+      "evidence": "L22-25 直接点名失效机制: 「为什么这次不会像 git push 那样被 \"Everything up-to-date\" 骗过...本地 refs/remotes/github/master 是陈旧的, 于是本地以为已推, push 报 \"Everything up-to-date\", 而 GitHub 上其实没有那个 commit」; L158-159 面板逐 remote: 「子模块 aria origin ✅ equal (fresh) github ⚠️ ahead N commits (fresh)」; L180: 「需要补推的是 github 这一侧」。检出手段是 Phase 0.5 对每条 (repo, remote) 腿真 fetch (L27-28), 不以 origin 一致为豁免。"
+    },
+    {
+      "text": "区分「本地 vs origin」与「origin vs github」两个不同的比较轴",
+      "passed": true,
+      "evidence": "L49-52 逐仓列出 (repo, remote) 全组合共约 8 条腿, 每条独立判定; L133-145 把事件拆成两个形态并给出不同判据落点 (形态一 gitlink 层 orphaned ⇒ overall_parity false; 形态二 仅 has_pending_push, gitlink 仍 ok); L158-159 面板同一行并置 origin/github 两个独立结论。另在 L99-100 明确 gitlink 层与 parity 层「正交」。"
+    },
+    {
+      "text": "给出子模块层的补推命令 (git -C aria push github master)",
+      "passed": true,
+      "evidence": "L183-184: 「第一步 (方向是推子模块, 不是动主仓 gitlink —— 主仓引用是对的, 缺的是镜像那侧) / git -C aria push github master」; L186-190 主仓与 standards 后续步骤; L193: 「顺序不可颠倒: 子模块先于主仓 gitlink」。"
+    },
+    {
+      "text": "点出 gitlink 风险: 主仓 gitlink 指向的子模块 commit 若在 github 不可达, 从 github clone --recursive 会断裂",
+      "passed": true,
+      "evidence": "落在 (c) 档 —— 已接线的可执行 dispatch 路, 无缺口保留。L99-100: 「它才是本事件\"从 GitHub clone --recursive 会断裂\"的直接检测者...主仓在 remote R 上已发布的那个 commit 所引用的子模块 gitlink, 在子模块自己的 R 上是否分支可达」; L136-137: 「(R=github, S=aria) → status: \"orphaned\" → clause 3 不满足 → overall_parity: false...别人从 GitHub clone --recursive 会拿到一个 GitHub 上不存在的 aria commit, 直接断裂」; L160-162 输出面板渲染该条; L170: 「第七路在 gitlink_integrity[] 层逐 (R,S) 对判, 与前六路正交, 同一次 scan 两层可同时命中, 两条建议都要出」——明确作为已接线的第七路而非设计意图。"
+    },
+    {
+      "text": "不把 reachable 字段当作可达性判据 (它自 task 1.10 起恒 true); 真实信号是 fetch_ok 三态 / evidence_grade",
+      "passed": true,
+      "evidence": "L68-77 的 RemoteEntry 字段清单里 reachable 已完全不出现 (对比 old_skill L99 仍逐行列出 reachable: true/true), 判据一律落在 fetch_ok 与 evidence_grade 上: L34: 「fetch_ok 三态 \"true\" / \"false\" / \"not_attempted\" (\"没去问\" ≠ \"对方不可达\")」; L79-84 evidence_grade 三档 + 「只有它能当正证据」; L95: 「has_unreachable_remote (存在 fetch_ok == \"false\", 零枚举 fail-CLOSED)」; L76 亦记 method 只剩 local_refs (ls_remote 已于 task 1.10 退役)。"
+    }
+  ]
+}

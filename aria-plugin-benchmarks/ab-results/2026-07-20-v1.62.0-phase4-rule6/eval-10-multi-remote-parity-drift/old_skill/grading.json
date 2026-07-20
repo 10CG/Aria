@@ -1,0 +1,61 @@
+{
+  "eval_id": "eval-10-multi-remote-parity-drift",
+  "arm": "old_skill",
+  "expectations": [
+    {
+      "text": "按 per-remote 报告同步状态, 而非单一合并状态",
+      "passed": true,
+      "evidence": "L40-44: 「2.1 逐 remote 条目 (RemoteEntry) ... 关键字段: name / remote_head / parity / behind_count / ahead_count / reachable / reason / method / evidence_grade / fetch_ok」; L95-101 面板逐 (仓, remote) 一行; L138: 「按 remote 逐条给, 不发笼统的 git push」。"
+    },
+    {
+      "text": "枚举全部已配置 remote (origin + github), 且覆盖主仓与子模块两层",
+      "passed": true,
+      "evidence": "L42: 「sync_status.multi_remote.main_repo.remotes[*] 与 sync_status.multi_remote.submodules[*].remotes[*]」; L32: 「对主仓 + 每个子模块 × 每个 enforced remote 逐条判 parity」; L165 解释 enforced_remotes 为 [] 时自动发现全部远程。"
+    },
+    {
+      "text": "指出 github 落后并给出 behind_count 这类具体量化字段",
+      "passed": true,
+      "evidence": "L95-100: 「主仓库: github 落后 1 commit ... 当前: origin=<sha7> | github=<sha7> (ahead 1)」「aria 子模块: github 落后 N commits ... (ahead N)」; L104 明确辨析面板措辞的\"远程视角\"与字段 parity: \"ahead\" + ahead_count 的对应关系。与 with_skill 同, 断言措辞与字段真值冲突, 本臂给出正确方向语义 + 量化字段, 按评分纪律 5 判通过。"
+    },
+    {
+      "text": "不出现 'Everything up-to-date' 式歧义表述 —— 必须把 origin 已同步与 github 未同步区分开",
+      "passed": true,
+      "evidence": "全文无该短语, 且始终逐 remote 绑定结论。L95-101 面板对 origin/github 分别落判 (github 待补 / standards 两远程一致); L156-159 复核判据逐条绑定 name=github。未出现无主语的\"已同步\"。"
+    },
+    {
+      "text": "触发 multi_remote_drift 规则并点名其 priority 1.35",
+      "passed": true,
+      "evidence": "断言与场景冲突 (评分纪律 5)。L114: 「推荐规则 multi_remote_drift (priority 1.35) 不会触发 —— 它的触发条件是 overall_parity == false; 且即便触发, 六路 dispatch 里 parity == ahead 那一路显式 triggers_rule: false」; L116 进一步诚实声明「漏推镜像在当前判据下是 info 级\"待推送\"提示, 不是告警」并解释 overall_parity 的语义边界。规则名 + 优先级点到, 不触发的判断正确。"
+    },
+    {
+      "text": "给出 per-remote 修复命令 (形如 git -C <path> push github master)",
+      "passed": true,
+      "evidence": "L141-147: 「git -C aria push github master」「git -C standards push github master」「git push github master」, 且 L141 标注顺序 (子模块先, 主仓后)。"
+    },
+    {
+      "text": "对 parity: ahead 的处理正确 —— 不阻断也不算正证据, 由 has_pending_push 单独承载 (故 overall_parity: true 与 has_pending_push: true 并存不矛盾)",
+      "passed": true,
+      "evidence": "L110-112: 「has_pending_push: true」「overall_parity: true —— 因为 parity: ahead 不计入 overall_parity (它只进 has_pending_push); 子句 2 由 origin=equal/fresh 满足, 子句 4 只排除 behind/diverged/blocking_unknown」; L71 定义 has_pending_push 为存在 ahead。"
+    },
+    {
+      "text": "对 parity: unknown 做二分而非一律排除 —— benign (detached_head/shallow_clone/remote_branch_missing/no_local_tracking_ref+fresh) 不阻断, blocking_unknown (not_refreshed/network/auth/未识别) fail-CLOSED 阻断",
+      "passed": true,
+      "evidence": "语义到位但粒度弱于 with_skill。L70 子句 4 写作「∀ r: parity ∉ {behind, diverged} 且 ¬blocking_unknown(r)」 —— 用补集谓词而非排除全部 unknown, 二分语义成立; L54 列出 unknown 的 reason 全枚举。但本臂未把 benign 与 blocking 两侧逐条归档 (无 with_skill L116-121 那张对照表), 只在 L111/L120 隐含。判通过, 但此断言在两个 skill 臂间区分度低。"
+    },
+    {
+      "text": "要求正证据: overall_parity: true 需至少一个 enforced remote 同时满足 parity: equal 与 evidence_grade: fresh (陈旧 equal 不算证据)",
+      "passed": true,
+      "evidence": "按该语义作答。L58: 「fresh —— ... 只有它能当 overall_parity 存在子句的正证据」; L59: 「stale_unverified ... 诊断态: 可见, 不作证, 不阻断」; L60: 「expired ... 若原 parity == \"equal\", 会被 _apply_freshness_downgrade 改写成 parity: \"unknown\" + reason: \"not_refreshed\" —— 绝不允许双重陈旧的 equal 冒充\"已同步\"」; L66-70 四子句 (第 2 条「两者都要」)。"
+    },
+    {
+      "text": "提及 gitlink 层成因 (第七路): 主仓在某 remote 上引用的子模块 commit 在该 remote 不存在 ⇒ clone --recursive 断裂, 修法是推子模块而非动 gitlink",
+      "passed": true,
+      "evidence": "落在 (b) 档 —— 成因描述完整, 但第七路 dispatch 明确自述为已知缺口/未接线。成因: L127-128「github 上主仓已发布的 commit 引用了一个 aria 的新 commit, 而该 commit 在 aria 的 github 上不存在 ⇒ gitlink_integrity[(github, aria)].status == \"orphaned\" ⇒ 子句 3 被打破 ⇒ overall_parity: false, 镜像上的 clone 会拉不到子模块」; 修法方向正确 L132「先把子模块推齐所有 remote, 再推主仓 gitlink」。缺口自述 L130: 「已知缺口 (我如实标注): multi_remote_drift 的六路 dispatch 表只覆盖 remotes[] 层, 尚未新增 gitlink 专属的第七路。AC-16 设想的建议 git -C S push R <branch> 目前只是 proposal 里的设计意图, 未接入机械 dispatch...规则给不出针对性的 gitlink 修复语句 —— 需要我在输出层额外检查」。断言只要求「提及」故判通过, 但与 with_skill 的 (c) 档存在实质下游可用性差异。"
+    },
+    {
+      "text": "提及离线降级: has_unreachable_remote 为真 (或无任何新鲜证据) 时不走逐条 dispatch, 改出降级横幅",
+      "passed": false,
+      "evidence": "落在 (a) 档 —— 完全没提。全文对 has_unreachable_remote 只做字段定义 (L72: 「只看 fetch_ok == \"false\" 三态...not_attempted 不算不可达」) 与本场景取值 (L112: 「has_unreachable_remote: false」), 从未出现「不走 dispatch / 改出降级横幅 / 离线降级」这一行为分支。L160 提到 fetch 被 deadline 砍时「应重跑而不是当成结论」, 属复核建议, 不构成规则层的降级横幅分支。"
+    }
+  ]
+}

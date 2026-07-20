@@ -1,0 +1,62 @@
+{
+  "eval_id": "eval-10-multi-remote-parity-drift",
+  "arm": "without_skill",
+  "contamination_note": "本臂受 CLAUDE.md 自动加载结构性污染 (assertions.json caveats)。CLAUDE.md 「项目状态」段逐字含 evidence_grade∈{fresh,stale_unverified,expired} / gitlink_integrity[] / overall_parity 四子句 / fail-CLOSED / Aria #165 镜像漏推 等 token, 并含 CLAUDE.md 版本发布检查清单里的多远程推送灾备命令 (git -C aria push github master)。因此以下断言的通过存在污染嫌疑而非模型自身 git 常识: A2 (enforced remote 覆盖面观念) / A6 (灾备 push 命令与 CLAUDE.md 清单逐字同形) / A9 (陈旧 ref 假绿的语义) / A10 (gitlink 跨仓可达性 + 推子模块在先的顺序, CLAUDE.md 有 #165 与 feedback_sequenced_multirepo_gitlink_bump 索引)。反证污染并非全覆盖: 本臂全文未出现 evidence_grade / stale_unverified / overall_parity / multi_remote_drift 任一 CLAUDE.md 中存在的字段名 (A5/A7/A8/A11 均 failed), 说明它是在用纯 git 词汇自行推理, 而非照抄状态段。另有一项方法论不对称需记: 本臂实跑了只读 git 命令并据实否证了场景前提 (L120), 而两个 skill 臂按测试范式作描述性推演 —— 三臂并非在回答同一个问题, 见 grading-summary.md 缺陷清单。",
+  "expectations": [
+    {
+      "text": "按 per-remote 报告同步状态, 而非单一合并状态",
+      "passed": true,
+      "evidence": "L77-80 主仓逐 remote 表 (origin / github 各一行, 带 tracking SHA + ahead/behind + 判定); L91-94 aria 子模块同构表; L28: 「算每个 remote 的 ahead/behind (核心判据)」并逐 remote 跑 rev-list。"
+    },
+    {
+      "text": "枚举全部已配置 remote (origin + github), 且覆盖主仓与子模块两层",
+      "passed": true,
+      "evidence": "L68-114 覆盖主仓 + aria + standards + aria-orchestrator 四层, 每层列 origin/github; L112: 「github 没有配置该 remote」对 aria-orchestrator 如实标注不适用而非静默略过。⚠️ 见 contamination_note: enforced remote 覆盖面观念可能来自 CLAUDE.md 发布清单。"
+    },
+    {
+      "text": "指出 github 落后并给出 behind_count 这类具体量化字段",
+      "passed": true,
+      "evidence": "断言在本 run 事实上不可满足 (评分纪律 5): 本臂实查后否证了场景前提, L125: 「主仓和 aria 子模块的 origin 与 github 两个 remote 的 tracking ref 都指向同一个 SHA, ahead/behind 全是 0 0」, L127: 「所以我不会给你一份\"修 v1.15.0 漏推\"的命令 —— 那会是在修一个不存在的问题」。量化维度成立: L79-80 / L92-94 / L102-103 每条 remote 均给出 ahead/behind 具体数字而非\"有差异\"式糊话。判通过依据是给出了正确的量化判断, 而非因诚实报\"未落后\"扣分。"
+    },
+    {
+      "text": "不出现 'Everything up-to-date' 式歧义表述 —— 必须把 origin 已同步与 github 未同步区分开",
+      "passed": true,
+      "evidence": "反向断言。全文无该短语, 且所有\"已同步\"结论均绑定具体 remote 名 (L79-80 逐行 origin/github 各自落判); L131: 「上面所有 0 0 都是基于本地 remote-tracking ref」并附各 ref 刷新时间戳; L180: 「ls-remote 直接问远端, 不经过本地缓存 —— 这是唯一不会被陈旧 tracking ref 骗到的核验方式」。"
+    },
+    {
+      "text": "触发 multi_remote_drift 规则并点名其 priority 1.35",
+      "passed": false,
+      "evidence": "全文零次出现 multi_remote_drift 或 1.35 (anchors 亦零命中)。本臂无规则体系概念, 只做 git 层判定。注: 本断言在两个 skill 臂上同样以\"正确论证不触发\"的形式通过, 故它实际测的是\"是否知道该规则的存在与语义\", 对 baseline 有区分度。"
+    },
+    {
+      "text": "给出 per-remote 修复命令 (形如 git -C <path> push github master)",
+      "passed": true,
+      "evidence": "L157-166: 「git -C aria push github master」「git -C standards push github master」「git push github master」「git push github --tags」, 并在 L169 给出顺序理由。⚠️ 见 contamination_note: 该命令串与 CLAUDE.md 版本发布检查清单的灾备 fallback 逐字同形。"
+    },
+    {
+      "text": "对 parity: ahead 的处理正确 —— 不阻断也不算正证据, 由 has_pending_push 单独承载 (故 overall_parity: true 与 has_pending_push: true 并存不矛盾)",
+      "passed": false,
+      "evidence": "全文无 has_pending_push / overall_parity 概念, 也没有\"ahead 不进裁决、单独由待推送 flag 承载\"这一分层。L38-40 只把 N/0 直译为「该 remote 落后, 需要 push」, 属单层动作映射, 未表达两个 flag 正交的语义。"
+    },
+    {
+      "text": "对 parity: unknown 做二分而非一律排除 —— benign (detached_head/shallow_clone/remote_branch_missing/no_local_tracking_ref+fresh) 不阻断, blocking_unknown (not_refreshed/network/auth/未识别) fail-CLOSED 阻断",
+      "passed": false,
+      "evidence": "无 unknown 状态的分档概念。L35-40 的 parity 判据只有 0 0 / N 0 / 0 N / N M 四格, 无第五态 unknown, 更无 benign 与 blocking 的二分或 fail-CLOSED 补集。L112 遇到\"github remote 不存在\"时写「不适用」, 是个案处理而非谓词域。"
+    },
+    {
+      "text": "要求正证据: overall_parity: true 需至少一个 enforced remote 同时满足 parity: equal 与 evidence_grade: fresh (陈旧 equal 不算证据)",
+      "passed": true,
+      "evidence": "按该语义作答 (非仅提词, 且未使用 CLAUDE.md 中现成的字段名, 属自主推理)。L62: 「refs/remotes/* 是本地缓存, 不是远程真相...所以陈旧的 tracking ref 会让 0 0 变成一个假的\"已同步\"结论。本次按要求没跑 fetch, 因此下面所有判定都标注了证据新鲜度」; L133-138 逐仓列出 ref 刷新时间戳后才下\"证据算新鲜, 结论可信度较高\"的判断; L138: 「严格讲, 不 fetch 就没有远程真相。如果你要一个够硬的结论 (比如发版前的放行判定), 应该先刷新再判」; L147: 「刷新后重跑...若仍是 0 0, 那就是确凿的已同步」—— 新鲜度被当作\"equal ⇒ 已同步\"的必要条件。⚠️ 见 contamination_note。"
+    },
+    {
+      "text": "提及 gitlink 层成因 (第七路): 主仓在某 remote 上引用的子模块 commit 在该 remote 不存在 ⇒ clone --recursive 断裂, 修法是推子模块而非动 gitlink",
+      "passed": true,
+      "evidence": "落在 (c) 档 —— 作为可执行建议给出 (但归属 git 常识层, 非 scanner dispatch 路)。L50: 「主仓 gitlink 推上去了, 但 gitlink 指向的 commit 在镜像 remote 上不存在, 于是从 GitHub clone 的人 submodule update 会直接失败」; L53 给出可达性检查命令 git -C aria branch -r --contains <gitlink-sha>; L96 对本仓实查结论; L169: 「顺序不能反: 主仓 gitlink 先落地而子模块 commit 还没到 GitHub, 那段时间内从 GitHub clone 的人会拿到一个指向不存在 commit 的 gitlink」, 修法方向 (先推子模块, L158-163) 正确。⚠️ 见 contamination_note: CLAUDE.md 含 Aria #165 镜像漏推与顺序 memory 索引。此项三臂全过, 无区分度。"
+    },
+    {
+      "text": "提及离线降级: has_unreachable_remote 为真 (或无任何新鲜证据) 时不走逐条 dispatch, 改出降级横幅",
+      "passed": false,
+      "evidence": "落在 (a) 档 —— 完全没提。全文无 has_unreachable_remote / 离线 / 降级 / degrade 任一表述 (anchors 亦零命中)。L138-147 的\"先 fetch 再判\"是前置建议, 不是\"取不到新鲜证据时切换到降级输出形态\"的行为分支; 且本臂根本没有\"逐条 dispatch\"这一被降级的对象。"
+    }
+  ]
+}

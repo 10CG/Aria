@@ -1,0 +1,61 @@
+{
+  "eval_id": "eval-10-multi-remote-parity-drift",
+  "arm": "with_skill",
+  "expectations": [
+    {
+      "text": "按 per-remote 报告同步状态, 而非单一合并状态",
+      "passed": true,
+      "evidence": "L149: 「per-remote 而非单一状态: 每个 (repo, remote) 一行, 带 parity / ahead_count / behind_count / evidence_grade / fetch_ok」; L58-79 快照示例逐条列 origin/github 两个 RemoteEntry; L135-141 渲染面板逐 (仓, remote) 一行。"
+    },
+    {
+      "text": "枚举全部已配置 remote (origin + github), 且覆盖主仓与子模块两层",
+      "passed": true,
+      "evidence": "L52: 「enforced_remotes_resolved: [\"origin\", \"github\"]」; L34: 「主仓 + 每一个子模块 × 每一个 remote」; L74-81 submodules[] 含 aria 与 standards 各自两条 remote; L150: 「主仓 + 每个已声明子模块 (含未 init 的, gitlink 层照样出条目)」。"
+    },
+    {
+      "text": "指出 github 落后并给出 behind_count 这类具体量化字段",
+      "passed": true,
+      "evidence": "L68-70: 「parity: \"ahead\" ← 本地领先镜像 = 漏推的形态 / ahead_count: 1 / behind_count: 0」; L135: 「主仓库: github 待推送 (本地领先 1 commit)」; L151: 「ahead_count / behind_count 直接落到行内, 不写\"有差异\"这种糊话」。注: 断言措辞「github 落后」与本场景的字段真值冲突 —— 以本地 HEAD 为基准漏推形态是 parity=ahead 而非 behind (L46 明确辨析), 本臂给出了正确的方向语义 + 具体量化计数, 按评分纪律 5 判通过。"
+    },
+    {
+      "text": "不出现 'Everything up-to-date' 式歧义表述 —— 必须把 origin 已同步与 github 未同步区分开",
+      "passed": true,
+      "evidence": "反向断言, 出现该短语但上下文是反制。L152: 「不出现 \"Everything up-to-date\" 式歧义: git push 对 origin 会回 \"Everything up-to-date\", 但那只是对这一个 remote 的结论...绝不出现无主语的\"已同步\"」; L182: 「别用 git push 的输出当同步判据...对 github 零信息量」; L153 进一步要求陈旧腿逐条点名不许折进汇总 ✅。"
+    },
+    {
+      "text": "触发 multi_remote_drift 规则并点名其 priority 1.35",
+      "passed": true,
+      "evidence": "断言与场景冲突 (评分纪律 5)。本臂点名规则与优先级并给出正确的不触发论证: L100: 「⇒ overall_parity: true, 因此 multi_remote_drift (priority 1.35) 在本场景不触发」; L102-109 说明这是刻意的语义分工 (ahead 归 has_pending_push, behind/diverged 才进 1.35), 并在 L111 给出「若真触发」时按 dispatch 逐条分派而非整块发 push 建议。诚实的不触发判断即正确答案, 不因未触发判 failed。"
+    },
+    {
+      "text": "给出 per-remote 修复命令 (形如 git -C <path> push github master)",
+      "passed": true,
+      "evidence": "L169-172: 「git -C aria push github master」 → 「git push github master」; L140: 「修复: git -C aria push github master」; 并在 L163-165 说明顺序约束 (先子模块后主仓)。"
+    },
+    {
+      "text": "对 parity: ahead 的处理正确 —— 不阻断也不算正证据, 由 has_pending_push 单独承载 (故 overall_parity: true 与 has_pending_push: true 并存不矛盾)",
+      "passed": true,
+      "evidence": "L86-87: 「overall_parity: true ← 见下方判据推演, 不是 false / has_pending_push: true ← 本场景的真正信号」; L98: 「子句 4 ∀ r: parity ∉ {behind, diverged} ... github 是 ahead, 不在集合内, 满足」; L106 表格把 ahead 归为「正常状态, 不是数据不一致告警」; L109 引 dispatch 表 ahead 路 triggers_rule: false。"
+    },
+    {
+      "text": "对 parity: unknown 做二分而非一律排除 —— benign (detached_head/shallow_clone/remote_branch_missing/no_local_tracking_ref+fresh) 不阻断, blocking_unknown (not_refreshed/network/auth/未识别) fail-CLOSED 阻断",
+      "passed": true,
+      "evidence": "L116-121 完整二分表: 「detached_head / shallow_clone / remote_branch_missing → benign unknown, 不触发, 零证据不当负证据」「no_local_tracking_ref ∧ evidence_grade == fresh → benign unknown」「no_local_tracking_ref ∧ ≠fresh → 改路由 1.36」「not_refreshed / network_timeout / auth_failed → 不可验证, 不建议 pull/push」「其他 / 未来新增枚举 → fail-CLOSED 补集」。L98 子句 4 用 ¬blocking_unknown(r) 而非排除全部 unknown。"
+    },
+    {
+      "text": "要求正证据: overall_parity: true 需至少一个 enforced remote 同时满足 parity: equal 与 evidence_grade: fresh (陈旧 equal 不算证据)",
+      "passed": true,
+      "evidence": "按该语义作答而非仅提词。L96: 「∃ r: parity == \"equal\" ∧ evidence_grade == \"fresh\" — origin 满足。注意两个条件都要: 一个 stale_unverified 的 equal 不算正证据 (这是 14h 假绿事故的根)」; L31 说明新鲜度判据唯一来源是 evidence_grade 而非 remote_refs_age; L111 说明 expired 会被 _apply_freshness_downgrade 改写成 unknown/not_refreshed。"
+    },
+    {
+      "text": "提及 gitlink 层成因 (第七路): 主仓在某 remote 上引用的子模块 commit 在该 remote 不存在 ⇒ clone --recursive 断裂, 修法是推子模块而非动 gitlink",
+      "passed": true,
+      "evidence": "落在 (c) 档 —— 作为已接线的可执行建议给出, 无任何「未接线/设计意图」保留。L165: 「反过来会让 github 上的主仓引用一个 github 上不存在的子模块 commit —— 那时 gitlink_integrity[(github, aria)] 会翻成 orphaned, 这是 overall_parity 第三子句的恒阻断状态, 而且任何人从 github clone --recursive 都会当场断裂」; 修法方向正确 (L169 推子模块在先, 不动 gitlink); L82-85 快照里 gitlink_integrity[] 作为常规输出字段, L97 作为 overall_parity 子句 3; L183: 「主仓推成功 + 子模块没推 = gitlink_orphaned, 比\"两边都没推\"更糟」。"
+    },
+    {
+      "text": "提及离线降级: has_unreachable_remote 为真 (或无任何新鲜证据) 时不走逐条 dispatch, 改出降级横幅",
+      "passed": true,
+      "evidence": "落在 (c) 档 —— 作为已接线机制陈述, 含裁决/建议分层。L123: 「has_unreachable_remote == true (或全部 enforced 腿的 evidence_grade ∈ {stale_unverified, expired}) 时, 1.35 不走 dispatch, 改出一条「离线 / 远端不可达, 同步状态不可知」降级横幅 (OQ-C 裁定 2026-07-19)。降级只在建议层, 裁决层照常 fail-CLOSED」; L88/L144 has_unreachable_remote 作为汇总 flag 输出。"
+    }
+  ]
+}
