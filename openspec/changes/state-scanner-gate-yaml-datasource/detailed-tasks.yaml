@@ -1,0 +1,227 @@
+# Detailed Tasks — state-scanner-gate-yaml-datasource (aria-plugin #113)
+# Phase A.3 output (task-planner v2.0). Datasource: proposal.md (path B — 本 spec 无 tasks.md,
+# 即本文件使本 spec 自身成为 yaml-only 类; 归档时按决策 14 自反性核对 gate 输出)。
+# Spec: openspec/changes/state-scanner-gate-yaml-datasource/proposal.md (post_spec R1→R5 CONVERGED)
+# Scope repo: aria 子模块 @ 9af7b21 (v1.62.0; 全部行号引用对此 HEAD 校验)。
+
+metadata:
+  feature: state-scanner-gate-yaml-datasource
+  title: "detailed-tasks.yaml 数据源接入 state-scanner 三消费点 (gate/complete/carry_forward)"
+  level: 2
+  datasource: "proposal.md"
+  scope_repo: "aria"
+  scope_repo_head: "9af7b21"
+  linked_issue: "10CG/aria-plugin#113"
+  total_tasks: 10
+  task_groups: 4
+  status: "A.3 complete — post_planning R1→R2 CONVERGED (R1 6 Major 簇 + 8 Minor 全闭合; R2 3/3 PASS 零新 finding); ready for B.1"
+  new_agents_required: false
+  agent_roster: [backend-architect, qa-engineer, knowledge-manager]
+  estimation_note: >
+    Complexity S/M/L 为主信号 (file-impact + dependency count); 小时数为粗锚
+    (S≈3h / M≈6h / L≈10h); canonical effort 轴为 token (ai-native-estimator,
+    phase-d-closer 收尾采集)。
+  tdd_note: >
+    全程 TDD: 每 SC 先落 baseline-failing RED 测试再实现 (上游 #166 先例)。
+    SC-9 基线数字随统计口径不同 (run_tests.py 1248 / pytest 1264, PP-R1 backend
+    实测) — 最终 before→after 以 Phase B 落地实测记账为准, 勿拿口径差误判回归。
+    carve-out 仅 test_gate_yaml_only_source.py::test_yaml_only_warns_and_builds_
+    payload (改写) — TestRuntimeProbeFoldL2ProposalOnlyEvaporates 为未触碰护栏
+    (仅 docstring 措辞收窄)。
+  rule6_note: >
+    Rule #6 AB benchmark 豁免记录 (PP-R1 km, 对齐姊妹 spec stale-refs-false-parity
+    先例): 本 change 改动集中在 deterministic collector/lib 机械层, 未动 SKILL.md
+    description/指令面 — 走 Rule #6 substitute 路径 (结构化测试替代), 请 owner 复议。
+
+# ---------------------------------------------------------------------------
+# TG-1 — Parser SOT (lib/detailed_tasks.py)
+# ---------------------------------------------------------------------------
+tasks:
+  - id: TASK-001
+    task_group: TG-1
+    title: "切片器物理归位: _TASK_ID_LINE_RE + _split_task_blocks 迁入 lib/detailed_tasks.py"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/scripts/lib/detailed_tasks.py   # 新建, 承接 spec_complete.py:293/:376
+      - aria/skills/state-scanner/scripts/lib/spec_complete.py    # re-import (符号名不变)
+      - aria/skills/state-scanner/tests/                          # 边界一致性回归测试
+    verification:
+      - "SC-9: #95 符号提取既有测试零行为变化; 边界一致性测试 (同 fixture 新旧位置同块边界)"
+    notes: "决策 8; carry_forward.py 先例同型; _extract_yaml_key_list 留原地。零跨文件引用已证 (R2 tech-lead grep)。"
+
+  - id: TASK-002
+    task_group: TG-1
+    title: "status 抽取层: range-bounded + indent-anchored 解析 + 归一化链 + fail-CLOSED 白名单"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: backend-architect
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/state-scanner/scripts/lib/detailed_tasks.py   # parse_detailed_tasks() 返回契约见 proposal §1
+      - aria/skills/state-scanner/tests/                          # SC-3a/b/c/d/e/f + SC-5 + SC-11 + SC-14 + SC-15 + SC-16 RED-first
+    verification:
+      - "SC-3a/b/c: 文件级 parse-fail 三态各独立测试 (伪 yaml 真语料形状 / 无 tasks: / 零条目)"
+      - "SC-3d: status 缺键或空值→status-missing 残留; id 缺→None 透传"
+      - "SC-3e/3f: 计数自洽 (范围=tasks: 至下一 0 缩进顶层键; base indent=范围内首个匹配捕获组; 双反例: 深嵌套 + execution_order 兄弟键)"
+      - "SC-5: blocked/in_progress/未知值→残留; SC-11: CRLF 判定一致; SC-14: 归一化顺序 (剥\\r→quote-aware 剥注释→strip→剥引号); SC-15: 末块尾随顶层键; SC-16: metadata.status 隔离 (直喂真实 dual-layer 文本)"
+    notes: "决策 16/17/18 + R5 两 Minor (数字以实测为准; base indent 范围内首个匹配钉入 docstring)。剥注释 import collectors.custom_checks._strip_inline_comment (禁 frontmatter_block naive 副本)。"
+
+# ---------------------------------------------------------------------------
+# TG-2 — gate_result / is_spec_complete (spec_complete.py)
+# ---------------------------------------------------------------------------
+  - id: TASK-003
+    task_group: TG-2
+    title: "gate_result yaml-only 分支三态化 + scoped 属实性条目 + 既有测试改写"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: backend-architect
+    dependencies: [TASK-002]
+    deliverables:
+      - aria/skills/state-scanner/scripts/lib/spec_complete.py    # :1298-1327 三态 + 残留集两半镜像 + -unparseable + done-family title 滤波条目
+      - aria/skills/state-scanner/tests/test_gate_yaml_only_source.py  # test_yaml_only_warns_and_builds_payload 按新契约改写 (SC-9 carve-out)
+      - aria/skills/state-scanner/tests/                          # SC-1 / SC-2 / SC-2b RED-first
+    verification:
+      - "SC-1: 残留精确列举 (reason/line 确切串含尾注剥离); SC-2: full-pass 三条件; SC-2b: done-family 集成 title→恰一条 scoped 条目 + pending title 负控不双报"
+      - "SC-1 扩展 (PP-R1 backend): 标注残留进 gate deferred_items — fixture (1 done + 1 独立 [TODO:] 标注) → deferred_items 同含 status 残留与标注残留双 shape 条目 (∪ 右支的 gate 路径 RED 锚点)"
+      - "SC-3a/b/c gate 端到端回引 (PP-R1 qa): parse-fail 三态的最终 gate 响应 (warn + -unparseable + 非 None d_payload + soft_error) 在本任务断言 (TASK-002 只测 parser 层)"
+      - "SC-4 (PP-R1 4-agent): dual-layer 真实 fixture (dispatch-input-delivery 形态) → gate_result 输出与 v1.62.0 byte-identical 断言 (新增, 非仅 test_both_sources_no_false_warn 的不误 warn)"
+      - "blanket -source-unsupported 串退役; deferred_items 形状与 _build_d_payload :1133-1136 契约零改"
+    notes: "决策 4/7/13/15。claim 串字面量文档化于分支相邻注释 (决策 11); Step2→Step 7 命名顺改 (spec_complete.py :41/:74/:1119/:1124/:1143 五处 — 落地前 grep 复证行号, PP-R1 tl)。L/10h 超 4-8h 惯例 25% 显式留痕 (同函数域切面不强拆, PP-R1 backend)。"
+
+  - id: TASK-004
+    task_group: TG-2
+    title: "probe fold 可达性窄化重构 (仅 yaml-present 臂) + 护栏测试 docstring 收窄"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    dependencies: [TASK-003, TASK-005]   # PP-R1: 同文件域串行链 003→005→004 依赖边显式编码
+    deliverables:
+      - aria/skills/state-scanner/scripts/lib/spec_complete.py    # yaml 臂 fall-through; d_payload 组装移 fold 后; project_root 臂内计算; :1430 注释改写
+      - aria/skills/state-scanner/tests/test_spec_complete.py     # TestRuntimeProbeFoldL2ProposalOnlyEvaporates docstring 收窄 (断言不动)
+      - aria/skills/state-scanner/tests/                          # SC-12 + SC-13 RED-first
+    verification:
+      - "SC-12: yaml-only + runtime_probe 声明→探针被评估, probe-warn 进 unverified_claims + d_payload"
+      - "SC-13: proposal-only + 声明→仍零评估, 锁测试字面保绿; tasks.md-unreadable 早退不变"
+    notes: "决策 9 (反转 DEC-20260705-001 仅限 yaml-only 子类, 前提失效论证已在 proposal)。"
+
+  - id: TASK-005
+    task_group: TG-2
+    title: "is_spec_complete yaml tasks-branch (OR 左半对称扩展) + docstring :12-16 同步"
+    status: pending
+    complexity: M
+    est_hours: 5
+    agent: backend-architect
+    dependencies: [TASK-002, TASK-003]   # PP-R1: 003 同文件 (spec_complete.py) 强制串行, 依赖边显式编码
+    deliverables:
+      - aria/skills/state-scanner/scripts/lib/spec_complete.py    # :207-238 区域 yaml 分支 + :12-13 形式化定义三支化 + :15-16 prose bullet 改写 (两半分立, PP-R1 tl)
+      - aria/skills/state-scanner/tests/                          # SC-6 RED-first (三态: 全 done True / 残留∧Status≠done False / 残留∧Status=done True)
+    verification:
+      - "SC-6 三态; design_deferred 对 yaml-全-done spec 不再误入 (openspec.py:248-255 谓词联动断言)"
+    notes: "「干净」定义与 gate 残留轴同一 (决策 7); complete 轴不看集成 title (正交)。"
+
+# ---------------------------------------------------------------------------
+# TG-3 — collector (openspec.py)
+# ---------------------------------------------------------------------------
+  - id: TASK-006
+    task_group: TG-3
+    title: "carry_forward_inventory yaml fallback (precedence 一致)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-002]
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/openspec.py  # :265-283 tasks.md 缺失时读 yaml 原始文本过既有 regex
+      - aria/skills/state-scanner/tests/                          # SC-7 RED-first (命中 + precedence 负控)
+    verification:
+      - "SC-7: yaml-only [TODO:] 命中; dual-layer 同标注不计; unreadable tasks.md 不落 fallback (:272 continue 保持)"
+    notes: "_extract_carry_forward_annotations regex SOT 零改。"
+
+# ---------------------------------------------------------------------------
+# TG-4 — golden / e2e / docs
+# ---------------------------------------------------------------------------
+  - id: TASK-007
+    task_group: TG-4
+    title: "SC-8 golden 真语料测试 + SC-9 全量回归账目"
+    status: pending
+    complexity: M
+    est_hours: 5
+    agent: qa-engineer
+    dependencies: [TASK-003, TASK-004, TASK-005]
+    deliverables:
+      - aria/skills/state-scanner/tests/                          # golden 3 spec (per-fixture: context-monitor 2 / ai-native-estimator 1 / emergency-hotfix 0 集成 title) + _require_meta_archive 先例
+    verification:
+      - "SC-8: 3/3 残留轴干净; 2 spec 带 SC-2b scoped 条目 (RED baseline 钉实测); emergency-hotfix full-pass"
+      - "SC-9: 全量绿 (基线 1248 + carve-out 账目 + before→after 计数记档)"
+    notes: "RED baseline 数字以实测输出为准 (R5 Minor-1)。"
+
+  - id: TASK-008
+    task_group: TG-4
+    title: "SC-10 dogfood 端到端 (scan.py 合成 fixture + --gate CLI)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: [TASK-003, TASK-005, TASK-006]   # PP-R1 qa: --gate SC-1/SC-2 fixture 是 003 交付物
+    deliverables:
+      - aria/skills/state-scanner/tests/                          # 端到端: 合成 yaml-only 项目 scan.py (carry_forward 计数 + design_deferred 不误入) + --gate CLI SC-1/SC-2 fixture
+    verification:
+      - "SC-10 端到端两路径绿; 自反性检查点写入 handoff 备忘 (本 spec 归档时核对 gate 输出)"
+    notes: "决策 14。"
+
+  - id: TASK-009
+    task_group: TG-4
+    title: "四处文档同步 (Rule #3)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-003, TASK-004, TASK-006]   # PP-R1 tl/km: schema :329 描述 006 行为
+    deliverables:
+      - aria/skills/state-scanner/references/runtime-probe-declaration.md  # :26-30 前置条件两子态改写
+      - aria/skills/state-scanner/references/state-snapshot-schema.md      # :329 carry_forward_inventory yaml fallback 语义
+      - aria/skills/openspec-archive/SKILL.md                              # 仅 :273 溯源注释一行 (PP-R1 3-agent+owner 亲验: :274「§Step2 warn_overlay」指代正确, 原列入系幽灵范围已删; proposal 声明 :272-278 契约零变)
+      - aria/skills/task-planner/DUAL_LAYER_SPEC.md                        # 一行反向指针 (status 枚举消费方)
+    verification:
+      - "四文件与实现行为一致 (对照 SC-12/SC-13/SC-7 实测输出核验措辞)"
+    notes: "路径已勘正 (task-planner 无 references/ 子目录)。"
+
+  - id: TASK-010
+    task_group: TG-4
+    title: "follow-up issue 开立 + 发版五处 + gitlink bump + badge"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: knowledge-manager
+    dependencies: [TASK-007, TASK-008, TASK-009]
+    deliverables:
+      - aria/CHANGELOG.md                                          # v1.63.0 条目
+      - aria/.claude-plugin/plugin.json                            # SOT + marketplace ×2 + VERSION + README
+      - README.md                                                  # 主仓 root badge L8 + Project Status 段 (PP-R1 km: 不在子模块 SOT 内易漏, 独立落点)
+      - aria                                                       # 主仓 gitlink 指针 bump commit (PP-R1 km: 复发模式 #165, 须为可核验项; 先推子模块双远程再 bump, 规避 orphan)
+      - openspec/changes/state-scanner-gate-yaml-datasource/       # follow-up issue 号回填 (C-gate liveness parity, cross-link 本 spec)
+    verification:
+      - "版本五处一致 (SOT plugin.json=1.63.0); follow-up issue 已开并 cross-link; 主仓 badge/i18n 检查 (custom checks m6-version-badge-match / i18n-currency 过)"
+      - "gitlink bump commit 存在且指向 aria post-merge master SHA (双远程可达 — 先推 GitHub 再 bump, #165 根因规避)"
+      - "自反性检查点闭环 (PP-R1 qa, 决策 14): 确认 handoff 登记的归档期 gate 输出核对项已写入且指派 Phase D"
+    notes: "Phase C/D 边界任务; 多远程推送走 C.2.5 自动化。⚠️ 并发让位 3 次先例 — bump 前 re-check SOT 版本。"
+
+execution_order:
+  - TASK-001
+  - TASK-002
+  - [TASK-003, TASK-006]   # 文件域 disjoint 并行 (003=spec_complete.py / 006=openspec.py); PP-R1 4-agent: 005 移出本波
+  - TASK-005               # 同文件域 (spec_complete.py) 强制串行于 003 后 (依赖边已编码, 非注释兜底)
+  - TASK-004               # 同文件域, 串行于 005 后
+  - [TASK-007, TASK-008, TASK-009]
+  - TASK-010
+
+summary:
+  complexity: {S: 5, M: 3, L: 2}
+  est_total_hours: 50

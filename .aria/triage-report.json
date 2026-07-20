@@ -1,33 +1,42 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.59.1",
-  "issue_ref": "10CG/Aria#166",
-  "generated_at": "2026-07-18T01:32:10Z",
+  "triage_tool_version": "1.62.0",
+  "issue_ref": "10CG/aria-plugin#113",
+  "generated_at": "2026-07-19T18:41:01Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 166,
-      "title": "[reliability] state-scanner collect_openspec 布局不符时静默全零 — 消费方 OpenSpec 维度假绿 8 周 (+2 个连带盲区)",
-      "body": "## 摘要\n\nAether 的 OpenSpec 维度在 state-scanner 里**假绿约 8 周**（2026-05-22 → 2026-07-17）：每次扫描恒报 `configured=false / 0 active / 0 pending_archive / 0 archived`，而磁盘上实有 **3 个活跃变更 + 60 个归档**。该假绿已污染下游 —— 2026-07-16 的 Aether handoff §5 把「OpenSpec：0 active change，0 pending archive」当作**已核验的四维同步状态**写入交接。\n\n排查中实测出 **3 个独立缺陷**，均可复现，按严重度排列。共同模式：**沉默**。三者都不是报错、不是 WARN，而是返回一个看起来完全正常的\"干净\"结果。\n\n环境：aria-plugin 1.56.1 · state-scanner 3.1.1 · 消费方 Aether (10CG/Aether `1493823`)\n\n---\n\n## 缺陷 1 [Major] — 缺 `openspec/changes/` → 静默全零，且连 `archive/` 也不扫\n\n### 根因\n\n`skills/state-scanner/scripts/collectors/openspec.py:164-170`：\n\n```python\nchanges_dir = spec_root / \"changes\"\narchive_dir = spec_root / \"archive\"\n\nif not changes_dir.is_dir():\n    r.data = { \"configured\": False, \"changes\": {\"total\": 0, ...},\n               \"archive\": {\"total\": 0, ...}, \"pending_archive\": [], ... }\n    return r          # ← archive_dir 已算出但从未被使用\n```\n\n`changes/` 不存在即提前 return，**`archive/` 存在与否根本不看**。所以这是**两个**假绿：活跃变更归零，历史归档也归零。\n\n### 为什么危险\n\n`configured=false` 承载了两种语义完全相反的情况，消费方无法区分：\n\n1. 本项目真的没用 OpenSpec（合法，应当静默）\n2. 本项目**重度使用** OpenSpec，但布局不符预期（严重，应当尖叫）\n\nAether 属第 2 类，得到的却是第 1 类的待遇。没有 `soft_error`，没有 WARN，`errors[]` 是空数组。扫描输出看上去和一个干净的非-OpenSpec 项目一模一样。\n\n这正是 `feedback_gate_validation_needs_baseline_failing_scenario` 说的那件事：**一个在该失败时不会失败的检查不是检查**。\n\n### 漂移是怎么发生的（值得注意 —— 无人操作失误）\n\n1. 2026-05-22（Aether `369cc39`）最后一个变更归档 → `openspec/changes/` 空了\n2. **git 不跟踪空目录 → 目录自动消失**\n3. 其后新建的 #182(06-27) / #190-191(07-04) / #245(07-15) 全部建在 `openspec/` 下 —— 因为 `changes/` 已经不存在了，没有任何东西暗示该约定\n4. 扫描器从此静默全零，无人察觉，直到 8 周后偶然核对磁盘\n\n**没有人做错任何事。** 是\"归档完最后一个变更\"这个**正常操作**触发了 git 的空目录语义，进而静默拆掉了整个维度。任何遵循十步循环的项目在归档完最后一个 spec 后都会踩到。\n\n### 复现\n\n```bash\nmkdir -p /tmp/repro/openspec/archive/2026-01-01-foo && cd /tmp/repro && git init -q\necho '---\\nstatus: Draft\\n---' > openspec/my-change-proposal.md   # 无 changes/ 层\npython3 .../scan.py --output snap.json                             # exit 0, errors=[]\n# → openspec.configured=false, changes.total=0, archive.total=0 (实为 1)\n```\n\n### 建议\n\n`changes/` 缺失但 `openspec/` 存在时**不要静默**。至少：\n\n```python\nif not changes_dir.is_dir():\n    if spec_root.is_dir():        # openspec/ 在但 changes/ 不在 = 布局漂移, 非\"没配置\"\n        r.soft_error(\"openspec_layout_drift\",\n                     f\"{spec_root} exists but {changes_dir} does not — \"\n                     \"active changes (if any) are invisible to this collector\")\n    ...\n```\n\n并且提前 return 前仍应扫 `archive/`（它和 `changes/` 是正交的，存在就该扫）。\n\n可选增强：`openspec/` 下发现含 `proposal.md` 的目录却不在 `changes/` 里 → 直接点名指出疑似漂移的目录。\n\n---\n\n## 缺陷 2 [Major] — `d_payload` 只聚合 `tasks.md` → 用 `detailed-tasks.yaml` 的项目，归档安全网恒不触发\n\n`openspec-archive` Skill v1.1.0 的 Step 7（#95「归档不吞未完成」）设计意图是：归档时若有 deferred / unverified 残留，自动建 tracker issue，**headless 也不静默**。\n\n但 `d_payload` 聚合自 `tasks.md` 的未勾选项 + carry-forward 注释（`openspec.py:244` `tasks_file = d / \"tasks.md\"`）。**Aether 用的是 `detailed-tasks.yaml`，没有 `tasks.md`** —— 该数据源本身是 aria `task-planner` 的合法产出（Aether 的 spec frontmatter 甚至显式标注 `datasource: proposal.md  # path B (无 tasks.md)`）。\n\n实测三个 spec 全部 `d_payload: null`：\n\n```\n=== 245-aether-conventions ===   # 17 个 task, TASK-017 确为未完成 (owner-gated)\n complete: False | verdict: pass\n complete_reason: tasks.md absent — verdict by normalized Status only; ...\n d_payload: NULL      ← \"干净归档, 无残留追踪\"\n```\n\n后果：**这类项目一旦把 spec 标 done 归档，所有残留待办被静默埋进 archive，一个 tracker issue 都不会建。** 安全网存在，但对这类项目恒为空转 —— 而且它的\"没触发\"和\"真干净\"在输出上完全一致。\n\n本次 Aether 归档 190-191 时，我不得不**手工**核实其 proposal 里 3 项 `deferred_out_of_scope` 是否各自落了 issue（结论：#200 closed / #201 closed / #195 open，确实干净）。这个结论是手工核出来的，不是安全网给的。若换成 245，标 done 就会直接埋掉 TASK-017。\n\n### 建议\n\n`d_payload` / `complete` 判定支持 `detailed-tasks.yaml` 数据源（读 `tasks[].status` + `deferred_out_of_scope`），或至少在 `tasks.md` 缺失且存在 `detailed-tasks.yaml` 时发 `soft_error` —— 让\"安全网在本项目不生效\"这件事**可见**，而不是伪装成\"干净归档\"。\n\n注：`complete_reason` 里那句 `tasks.md absent — verdict by normalized Status only` 措辞是诚实的，值得肯定 —— 但它只出现在 gate 的 JSON 里，Step 7 的 `d_payload=null` 路径没有任何对应提示。\n\n---\n\n## 缺陷 3 [Minor] — `_normalize_status(\"Completed\")` → `unknown`\n\n```\n'Complete'          -> done\n'Completed'         -> unknown      ← \n'COMPLETED'         -> unknown      ←\n'Status: Completed' -> unknown      ←\n'Done'              -> done\n'Complete 2026-07-17' -> done\n```\n\n根因：`_status.py` done 家族的 token 是 `(\"done\", \"complete\")`，而 `_has_token()` 是词边界锚定的（`\\bcomplete\\b`，#101 修 substring shadow 时引入，防 `incomplete` 误配 `complete`）。`Completed` 的 `\\b` 后置断言失败 → 落入 `unknown`。\n\n即 #101 的修复对合法**词形变化**过度收紧了。`Completed` 是极自然的状态写法，写下去静默失效，且 `unknown` 会进一步触发 `design_deferred` 出面（谓词含 `st == \"unknown\"`）→ 噪音。\n\n### 建议\n\ndone 家族 token 加 `\"completed\"`。已验证安全：`\\bcompleted\\b` **不会**匹配 `uncompleted`（`n`/`c` 均为词字符，无边界），不重开 #101。\n\n---\n\n## 影响面\n\n这三个缺陷都不是 Aether 独有 —— 任何满足以下条件的 aria 消费方都会中：\n\n- **缺陷 1**：归档完最后一个 spec 之后（= 每个走完十步循环的项目，迟早）\n- **缺陷 2**：用 `detailed-tasks.yaml` 而非 `tasks.md`（= aria task-planner path B 的正常产出）\n- **缺陷 3**：Status 写 `Completed` 而非 `Complete`\n\nAether 侧已自行缓解（`openspec/changes/.gitkeep` 锁目录常驻 + 3 个变更迁回 + Phase D 补齐），见 10CG/Aether `1493823`。但那只是**消费方自救**，根因在 collector：**布局不符时应当尖叫，而不是返回一个漂亮的零。**\n",
+      "number": 113,
+      "title": "[state-scanner] gate_result 完整支持 detailed-tasks.yaml 数据源 — 取代 v1.61.0 的 blanket unverified 兜底",
+      "body": "## 背景\n\n`state-scanner-openspec-collector-false-green` (v1.61.0, 关 Aria #166 缺陷2) 的显式 follow-up。\n\nv1.61.0 让归档安全网对 `detailed-tasks.yaml`-only spec (task-planner path B 的正常产出) **可见**: `gate_result()` 在 tasks.md-absent 分支追一条 `archive-safety-net-source-unsupported` 的 `unverified_claims` 条目 + `verdict=warn` + 构造非 None `d_payload`, 使 warn_overlay frontmatter 与 D auto-issue tracker 两条通道在 headless 归档下都点亮。\n\n但那只是**诚实的「无法核验」态** —— gate 并不解析 yaml, 所以分不清「真干净」和「有残留」, 于是**对所有** yaml-only spec 一律 warn + 建 tracker。\n\n## 诉求\n\n`gate_result()` / `_build_d_payload()` 真正解析 `detailed-tasks.yaml` (读 `tasks[].status` + `deferred_out_of_scope`), 使:\n\n1. 有残留 (未完成 task / deferred 项) → 精确列举进 `d_payload` → tracker 内容有实际信息量;\n2. 真干净 → `verdict=pass`, **不再** warn、不建 tracker —— 消除当前对该类项目的 blanket 噪声;\n3. 顺带修复 collector 快照侧同根问题: `collectors/openspec.py:244` 的 `carry_forward_inventory` 也只读 `tasks.md`, 对 yaml-only 项目恒 0 (展示侧假绿, 与归档 gate 侧同一病根 —— yaml 未被解析)。\n\n## 参考\n\n- 归档 spec: `openspec/archive/2026-07-19-state-scanner-openspec-collector-false-green/proposal.md` §缺陷2 + §非目标\n- 实现点: `aria/skills/state-scanner/scripts/lib/spec_complete.py::gate_result` (:1298 起) + `_build_d_payload` (:1115)\n- 上游 issue: 10CG/Aria#166 (closed)\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/166",
-      "created_at": "2026-07-17T14:36:40Z",
-      "updated_at": "2026-07-17T14:36:40Z"
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/113",
+      "created_at": "2026-07-19T14:51:19Z",
+      "updated_at": "2026-07-19T14:51:19Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.56.1",
-      "current": "1.59.1",
+      "reported": "1.61.0",
+      "current": "1.62.0",
       "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "proposal.md",
+          "file_path": "detailed-tasks.yaml",
           "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "collectors/openspec.py",
+          "line": 244,
           "format": "backtick",
           "exists": false,
           "line_in_range": null,
@@ -44,46 +53,20 @@
           "warning": "file not found"
         },
         {
-          "file_path": "detailed-tasks.yaml",
+          "file_path": "openspec/archive/2026-07-19-state-scanner-openspec-collector-false-green/proposal.md",
           "line": null,
           "format": "backtick",
-          "exists": false,
+          "exists": true,
           "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "openspec.py",
-          "line": 244,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "_status.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "skills/state-scanner/scripts/collectors/openspec.py",
-          "line": 164,
-          "format": "prose_l",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
+          "snippet": "1: ---\n2: unverified_claims:\n3:   - claim: \"T4.1 SC-10/SC-11: 全量 1232 tests 绿 + dogfood 合成 fixture → scan.py exit=10 / configured=False / archive.total=1 / layout_drift detail 点名 stray\"\n4:     reason: \"dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在\"\n5:     symbols: []",
+          "warning": null,
+          "total_lines": 135
         }
       ],
       "matches_description": false
     },
     "step4_history": {
-      "collection_status": "skipped",
+      "collection_status": "ok",
       "likely_fix_candidates": []
     },
     "step5_inflight": {
@@ -95,42 +78,39 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "dc4568dfd1fd59cb796193424b68b82643213fd6"
+          "head": "60b33ccb74ad3611f03ec12e5d86da78bc3425e3"
         }
       ]
     }
   },
   "repro": {
     "exit_mode": "auto",
-    "hit_count": 3,
-    "total_count": 3,
-    "hit_rate": "3/3",
     "cases": [
       {
         "case_id": "case-1",
-        "input": "collect_openspec(Path) on a tree where openspec/ exists, openspec/changes/ absent, openspec/archive/2026-01-01-foo/ present (1 archived spec). Run against aria submodule v1.59.1 collectors/openspec.py.",
-        "expected_behavior": "issue 声称: 布局漂移应尖叫 (soft_error/WARN); archive/ 正交, 存在就该扫 → archive.total>=1",
-        "actual_behavior": "configured=False, changes.total=0, archive.total=0 (磁盘实有 1), errors=[] 完全静默 — 与非-OpenSpec 干净项目输出一模一样。openspec.py:164 早 return, archive_dir 算出未用",
-        "match": true,
-        "notes": "缺陷 1 [Major] 确认。根因 openspec.py:164-170 early-return, 无 spec_root.is_dir() 分支"
+        "input": "gate_result() on yaml-only fixture spec-residue (detailed-tasks.yaml: T2 status=pending + deferred_out_of_scope 1 项; 无 tasks.md), v1.62.0 aria @ 9af7b21",
+        "expected_behavior": "issue 声称: gate 不解析 yaml, 无论内容一律 blanket warn + unverified_claims 'archive-safety-net-source-unsupported' + 非 None d_payload",
+        "actual_behavior": "verdict=warn, unverified_claims=['archive-safety-net-source-unsupported'], d_payload 非 None, soft_errors=[] — 与声称完全一致 (spec_complete.py:1298-1327 仅 .is_file() 探测, 从不打开 yaml)",
+        "match": true
       },
       {
         "case_id": "case-2",
-        "input": "grep openspec.py:243-247 的 carry-forward 聚合源; 检查 detailed-tasks.yaml 数据源是否被 d_payload 覆盖",
-        "expected_behavior": "用 detailed-tasks.yaml (task-planner path B 合法产出) 的项目, 归档安全网 (openspec-archive Step 7 #95) 应能感知残留 deferred/unverified",
-        "actual_behavior": "line 244 tasks_file = d / 'tasks.md' — 仅聚合 tasks.md; 无 detailed-tasks.yaml 分支, 也无 'tasks.md 缺失但有 detailed-tasks.yaml' 的 soft_error → 该类项目安全网恒空转且不可见",
-        "match": true,
-        "notes": "缺陷 2 [Major] 确认 (静态核验; 端到端安全网空转需 openspec-archive Step 7 联动, 本 triage 只核 collector 源侧)"
+        "input": "gate_result() on yaml-only fixture spec-clean (detailed-tasks.yaml 全 tasks status=done, 无 deferred; 无 tasks.md)",
+        "expected_behavior": "issue 声称: 真干净 spec 也无法得到 pass, 与有残留 spec 输出无差别 (blanket 噪声)",
+        "actual_behavior": "输出与 case-1 逐字段相同 (warn + 同一 claim + 非 None d_payload) — gate 无法区分真干净与有残留",
+        "match": true
       },
       {
         "case_id": "case-3",
-        "input": "_normalize_status('Completed') / 'COMPLETED' / 'Status: Completed' 实调 aria v1.59.1 collectors/_status.py",
-        "expected_behavior": "'Completed' 是自然的完成态写法, 应归一为 done",
-        "actual_behavior": "三者全 → 'unknown' (Complete/Done 正常). 根因 _status.py:199 done 家族 token ('done','complete') + _has_token 词边界锚定 \\bcomplete\\b, 'Completed' 后置边界失败 → #101 substring-shadow 修复对合法词形变化过度收紧",
-        "match": true,
-        "notes": "缺陷 3 [Minor] 确认. 建议 done 家族加 'completed' token; \\bcompleted\\b 不匹配 uncompleted, 不重开 #101"
+        "input": "collect_openspec() on 合成 project root: spec-residue 的 detailed-tasks.yaml 含 '[TODO: ...]' 与 '[deferred: ...]' (均匹配 _CARRY_FORWARD_RE); 正控 spec-tasksmd 的 tasks.md 含同款 '[TODO: ...]'",
+        "expected_behavior": "issue 声称: carry_forward_inventory 只读 tasks.md, yaml-only spec 恒 0 (展示假绿)",
+        "actual_behavior": "carry_forward_inventory.total=1, by_change 仅含 spec-tasksmd; yaml 内两条可匹配标注贡献 0。正控命中证明 regex 正常, 缺口在 collectors/openspec.py:266 只开 tasks.md (issue 引 :244 行号有漂移, 声称本身成立)",
+        "match": true
       }
-    ]
+    ],
+    "hit_count": 3,
+    "total_count": 3,
+    "hit_rate": "3/3"
   },
   "verdict": "confirmed",
   "severity": "major",
