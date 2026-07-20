@@ -13,6 +13,17 @@
 
 ## 最新 handoff
 
+**[2026-07-20 — 会话收尾: aria-plugin #113 Phase B 实施 + pre-merge review 处置](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
+
+- track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **B-complete** | status: **active** (Phase C 待续)
+- B.1 建分支 → B.2 TASK-001~009 全 TDD 实施 (新 `lib/detailed_tasks.py` parser SOT / gate 三态化 + scoped 属实性 / probe fold 窄化 / is_spec_complete yaml 分支 / collector fallback / 四处文档) → dogfood + 自反性检查点 → **pre-merge 两路 review 全数处置** → 测试 **1250→1318 全绿** → aria `13f9582` (未推送)
+- 🔴 最重一课: **修复类 change 在自己的兜底路径重犯要治的病** (fold 崩溃 fail-toward-GREEN, #166 同款在消灭它的 change 内复发); 且「有记录」≠「有路由」(`soft_errors` 无人消费)
+- 🔴 两路 review 4 条 Important 里 **3 条是「测试声称了它没验证的东西」** —— #95 在测试层的复发
+- **下一步**: rebase 到并发轨 v1.62.2 (零文件重叠) → TASK-010 发版 → Phase C PR/合并 → Phase D
+- ⚠️ 主仓 behind 3 commit; 新发现同根第四处 (`handoff_autofill.py` 亦只读 tasks.md) 待开 follow-up
+
+---
+
 **[2026-07-20 — 会话收尾: aria-plugin #113 gate yaml 数据源 cycle, Phase A 完整收官](./2026-07-20-issue113-phase-a-yaml-datasource.md)**
 
 - track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **A-complete** | status: **active** (Phase B 待下 session)

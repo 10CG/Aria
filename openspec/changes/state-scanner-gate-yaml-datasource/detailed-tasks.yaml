@@ -90,7 +90,7 @@ tasks:
       - aria/skills/state-scanner/tests/                          # SC-1 / SC-2 / SC-2b RED-first
     verification:
       - "SC-1: 残留精确列举 (reason/line 确切串含尾注剥离); SC-2: full-pass 三条件; SC-2b: done-family 集成 title→恰一条 scoped 条目 + pending title 负控不双报"
-      - "SC-1 扩展 (PP-R1 backend): 标注残留进 gate deferred_items — fixture (1 done + 1 独立 [TODO:] 标注) → deferred_items 同含 status 残留与标注残留双 shape 条目 (∪ 右支的 gate 路径 RED 锚点)"
+      - "SC-1 扩展 (PP-R1 backend): 标注残留进 gate deferred_items — fixture (1 done + 1 独立 carry-forward 标注) → deferred_items 同含 status 残留与标注残留双 shape 条目 (∪ 右支的 gate 路径 RED 锚点)。⚠️ 本行有意不写标注字面量: 描述性提及会被 _CARRY_FORWARD_RE 命中, 令本 spec 自身归档时误判有残留 (B.2 dogfood 实测, 同 memory reference_secret_guard_false_positive_on_spec_docs 类)"
       - "SC-3a/b/c gate 端到端回引 (PP-R1 qa): parse-fail 三态的最终 gate 响应 (warn + -unparseable + 非 None d_payload + soft_error) 在本任务断言 (TASK-002 只测 parser 层)"
       - "SC-4 (PP-R1 4-agent): dual-layer 真实 fixture (dispatch-input-delivery 形态) → gate_result 输出与 v1.62.0 byte-identical 断言 (新增, 非仅 test_both_sources_no_false_warn 的不误 warn)"
       - "blanket -source-unsupported 串退役; deferred_items 形状与 _build_d_payload :1133-1136 契约零改"
@@ -143,7 +143,7 @@ tasks:
       - aria/skills/state-scanner/scripts/collectors/openspec.py  # :265-283 tasks.md 缺失时读 yaml 原始文本过既有 regex
       - aria/skills/state-scanner/tests/                          # SC-7 RED-first (命中 + precedence 负控)
     verification:
-      - "SC-7: yaml-only [TODO:] 命中; dual-layer 同标注不计; unreadable tasks.md 不落 fallback (:272 continue 保持)"
+      - "SC-7: yaml-only 行内 carry-forward 标注命中; dual-layer 同标注不计; unreadable tasks.md 不落 fallback (:272 continue 保持)"
     notes: "_extract_carry_forward_annotations regex SOT 零改。"
 
 # ---------------------------------------------------------------------------

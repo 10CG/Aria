@@ -88,7 +88,7 @@ stdlib-only 硬约束下不引入 PyYAML; 先例 `custom_checks.py:62` minimal p
 | **SC-3a/b/c/d** | 文件级: (a) markdown 围栏伪 yaml (真实语料形状) / (b) 无顶层 `tasks:` / (c) 零 `- id:` 条目 → 各自 warn + `-unparseable` + 非 None d_payload + soft_error。(d) 条目级: 缺 `status` 键**或空值/纯引号空** → 计残留 `status-missing`; 缺 `id` → parent_id=None 透传 | 护栏 |
 | **SC-3e** (计数自洽, R2 簇 R-c; R3 补算法) | `tasks:` 块内 **base-indent 直接子项** `- ` 行数 ≠ `_TASK_ID_LINE_RE` 匹配数 (如 `- \n  id:` 分行 / id 非首字段条目) → parse_ok=False → case-3 blanket (隐形条目不静默消失) | 护栏: 无此项则隐形条目 = 理论新假绿 |
 | **SC-3f** (计数负控**双反例**, R3+R4) | (i) 深缩进嵌套 `- ` 子列表 (deliverables/verification) 不计入; (ii) **`tasks:` 之后的 0 缩进兄弟顶层键 (`execution_order:` 等) 内部的同缩进 `- ` 项不计入** (计数范围止于该键行) — 两反例下 parse_ok=True 正常三态; fixture 用真实 golden 形状 (3 份皆含 execution_order:, 无边界裁剪时 baseline-failing: 16/9、14/8、13/8 假 mismatch) | 护栏: 朴素读法两个方向各自恒 mismatch 退 blanket → 全语料失活 |
-| **SC-4** | dual-layer (真实 fixture `dispatch-input-delivery` 形态) → tasks.md 路径, yaml status 不被读取, 输出与 v1.62.0 byte-identical | 保护性 |
+| **SC-4** (收窄, amendment A-5) | dual-layer (真实 fixture `dispatch-input-delivery` 形态) → tasks.md 路径, yaml status 不被读取; 输出与 v1.62.0 **byte-identical, 除 `d_payload.body` 内一处 `Step2`→`Step 7` 文案顺改** (marker 与幂等性不变)。测试须**显式断言 d_payload 全结构**, 非仅 tag 缺席 | 保护性; pre-merge 128-spec 全量对拆: 归一化该文案后残差 0/125 |
 | **SC-5** | `blocked`/`in_progress` (生产者文档声明、语料未观测) 及未知新值 → 计残留 | 护栏 |
 | **SC-6** | yaml-only 全 done 零标注 → `complete=True`; 有残留 ∧ Status≠done → False; 有残留 ∧ Status=done → True (OR 右半) | 当前: 恒单信号 (实测 3/3 False) |
 | **SC-7** | yaml-only 含 `[TODO: ...]` → inventory 命中; dual-layer 同标注 → 不计 | 当前: 恒 0 |
@@ -156,3 +156,21 @@ stdlib-only 硬约束下不引入 PyYAML; 先例 `custom_checks.py:62` minimal p
 16. **(新) 归一化顺序对齐先例真实执行序** (R2 簇 R-a): 剥注释→strip→剥引号; quote-aware SOT 复用 custom_checks (非 frontmatter_block naive 副本); SC-14。
 17. **(新, R3 补算法 + R4 补边界) 结构自洽计数为 parse_ok 第四态** (R2 簇 R-c): 隐形条目「既不完成也不残留」是理论新假绿, 计数不一致退 blanket (AC-5 先例纪律)。**计数必须 indent-anchored 且 range-bounded**: base indent 取首个 `- id:` 匹配捕获组, 只数同缩进直接子项 (R3: 深嵌套 17/17 误伤); 计数范围止于下一个 0 缩进顶层键 (R4: 同缩进兄弟键 `execution_order:` 等 11/17 误伤含 3/3 golden — **两位 R4 审计员按同一规格文本各自实现得出 16/16 MATCH vs 11/17 MISMATCH 相反结果, 即规格欠定的实证**); SC-3e + SC-3f (双反例) 钉死。
 18. **(新) 块边界截断 = 新层二次后处理**: 不改共享 `_split_task_blocks` 本体 (SC-9 carve-out 严防方向); 顶层键字符级规则 + 折叠标量在键行截断; SC-15。
+
+---
+
+### Phase B.2 实施期 amendment (append-only, 不改上文原陈述)
+
+**A-1. 决策 16 的 import 方向反转 (2026-07-20 实施期证伪)**: 上文决策 16 写「`lib/detailed_tasks.py` **import** `collectors/custom_checks.py` 的 quote-aware `_strip_inline_comment`」, 且经 R4 code-reviewer 核为「custom_checks 仅 import `._common`, 无 lib.* 反向依赖 → 新 lib→collectors import 无循环风险」。**实施实测证伪**: 该分析漏了**包 `__init__` 才是环的载体** —— `import collectors.custom_checks` 会执行 `collectors/__init__.py` → `collectors.openspec` → `spec_complete` → 回到尚在初始化的 `detailed_tasks` (真 ImportError)。
+
+**处置** (沿用本仓对同一问题的既定解法, `lib/carry_forward.py` #134 A1.1b): `_strip_inline_comment` **物理搬进 `lib/detailed_tasks.py`**, 由 `collectors/custom_checks.py` re-import —— 定义仍单源, 依赖边方向改为 collectors → lib。**语义零变** (函数体逐字节相同), 决策 16 的实质结论 (复用 quote-aware SOT, 拒 `frontmatter_block.py` naive 副本) 完全保持。
+
+**A-2. 顶层名 `lib` 绑定禁令 (同一 amendment 的附带修复)**: `custom_checks` 的 re-import 必须用**裸模块名** (`from detailed_tasks import`)。用 `from lib.detailed_tasks import` 会把有歧义的顶层名 `lib` 绑成 `scripts/lib` 并毒化 `sys.modules` —— 该模块经 `collectors/__init__` 极早加载, 会令全套测试里 `from lib import ...` 的消费方 (`test_collision` / `test_coordination_ref_lib`) 解析到错误的包 (实测 2 模块 ImportError)。测试文件同理: 不得把 `scripts/` 插到 `sys.path[0]` (会 suite-wide 遮蔽 state-scanner 根的 `lib` 包)。
+
+**A-3. SC-3e 触发例勘正**: 上文 SC-3e 举的「`- \n  id:` 分行」实测**不构成**隐形条目 —— 既有 `_TASK_ID_LINE_RE` 的 `-\s*id:` 中 `\s*` 跨行, 该写法被正常捕获、status 照读。真正的隐形条目是「`- ` 项的 id **非首字段**」与「`- ` 项**无 id 键**」两类, 测试按实测改写 (更少误报, 方向更优)。
+
+**A-5. SC-4「byte-identical」的诚实收窄 (pre-merge code-review I-1)**: reviewer 对 **128 份真实 archive spec** 跑改动前/后全量对拆, 证实 `_fold_probe_and_build_payload` 抽取是**真行为保持** (把 `Step2`→`Step 7` 一处字符串归一化后, 非-yaml-only spec 残差 **0/125**)。但也证实 SC-4 与 §Downstream 的「dual-layer 全路径 byte-identical」**字面为假**: `Step2`→`Step 7` 顺改(km R4 Minor)波及 `_build_d_payload` 的 `lines.append("> 归档 SHA 回链: 由 openspec-archive Step 7 归档提交后填入")` —— 该行进的是 `d_payload.body`, 是**运行时输出**而非注释, 故 64/128 真实 spec 的 body 文案变了。
+
+**裁定: 保留改名, 收窄声称。** 理由: 原文 `Step2` 对该动作是**事实错误**的引用 (填 SHA 回链的是 Step 7 D auto-issue, Step 2 是 warn_overlay), 为维持字节恒等而把错误步骤名留在 user-visible 输出里不可取。实际危害≈0: dedup marker `<!-- archive-tracker:{spec_id} -->` 未变, Step 7 的 search-before-create 幂等性不受影响。**SC-4 相应改述为「除本 amendment 记录的 Step 7 文案顺改外 byte-identical」** (见 SC 表)。
+
+**A-4. 自反性 dogfood 抓到的 false-positive**: 本 spec 自己的 `detailed-tasks.yaml` 在 verification 文字里为描述 fixture 而写了 carry-forward 标注**字面量**, 被 `_CARRY_FORWARD_RE` 命中 → 自身归档时会误判有 2 条标注残留。同 memory `reference_secret_guard_false_positive_on_spec_docs` 一类。已按同一解药改写措辞 (描述性提及不写字面量) 并留 ⚠️ 注记; 复跑标注残留归零。证据: `dogfood-evidence.md §3`。
