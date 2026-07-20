@@ -356,6 +356,42 @@ Skill 基准测试 (新增或修改 Skill 时):
 > 仅推送 Forgejo 会导致市场版本滞后。2026-04-10 事故: aria v1.11.1 发版后未推送 GitHub,
 > 市场停留在 v1.11.0。
 
+#### 两条硬约束 (owner 裁决 2026-07-20, 方案 D + 纪律层; 根治 Aria #165 镜像漏推三次复发)
+
+多远程一致靠**本地双推**保证 —— 只要每次变更都经本地 `git push origin && git push github`,
+两个远程就同步。#165 三次复发的根因不是双推本身不够, 而是有路径**绕过了本地双推**。故立两条:
+
+**约束 1 — 子模块合并一律本地做, 禁止 Forgejo 服务端合并** (方案 D, 消除绕过路径):
+
+> 子模块 (aria / standards / aria-orchestrator) 的分支合并**必须在本地** `git merge` + `git push origin && git push github`
+> 完成, **禁止**用 Forgejo Web UI / API 的 `Do: merge` (服务端合并)。
+
+为什么: 服务端合并的 merge commit **只在 Forgejo 生成**, 本地 master 从未 fast-forward ⇒
+(a) 本地双推与 phase-c-integrator C.2.5 **结构上都不触发** (没有本地 commit 可推);
+(b) 主仓随后 bump 子模块 gitlink 时, 目标 SHA 尚未镜像到 GitHub ⇒ orphaned gitlink,
+从 GitHub `clone --recursive` 当场断裂。2026-07-14 aria-orchestrator 事故 (65 秒窗口) 即此。
+用 Web UI merge 是习惯不是必须; 改本地合并后, #165 的服务端合并根因直接消失。
+
+> **例外**: 主仓 (Aria) 自身的 PR 走 Forgejo merge 是可以的 —— 主仓没有「被别人 bump gitlink」
+> 的下游, 且主仓 merge 后本会经 C.2.5 / 灾备双推。约束 1 只针对**被主仓 gitlink 引用的子模块**。
+
+**约束 2 — 推后逐个 `ls-remote` 核验, 不信 push 回执** (纪律层, 治漏推 + 半推):
+
+> 双推完成后, 对每个 remote 独立 `git ls-remote <remote> master` 取 SHA 与本地比对,
+> **全部一致才算推成功**。**不得**以 push 命令的退出码 / 回执 (`Everything up-to-date` /
+> `Connection closed` 等) 作为成功判据。
+
+为什么: push 回执**两个方向都会骗人** —— (a) 连接在拆除阶段断开会报失败, 但 ref 其实已更新
+(假阴性, 诱发不必要的 force/回滚); (b) 连推两个 remote 时**前一个被并发拒、后一个成功**会造成
+**镜像半推分叉** (2026-07-20 本会话自制的第四种 #165 形态: 你以为推了, 其实只成了一半)。
+唯一可信判据是独立 ls-remote 查询, 且该查询本身可能因同一条坏连接失败 → **重试几次再下结论**,
+不能用「查询也失败」佐证「操作失败」。发现分叉后的安全处置见
+memory `feedback_partial_push_creates_mirror_divergence` (force 前三项前置核验)。
+
+> **与 phase-c-integrator C.2.5 的关系**: C.2.5 的 post-push SHA 验证做的正是约束 2 的机械化;
+> 手工双推 (灾备路径 / 子模块本地合并后) 时约束 2 由人/AI 执行。约束 1 是 C.2.5 触发前提的
+> 上游保证 —— 只有本地合并才让 master fast-forward, C.2.5 才有本地 HEAD 可推。
+
 ### 版本信息一致性
 
 所有版本信息文件必须保持一致：
