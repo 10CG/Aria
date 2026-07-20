@@ -28,6 +28,20 @@ metadata:
     carve-out 仅 test_gate_yaml_only_source.py::test_yaml_only_warns_and_builds_
     payload (改写) — TestRuntimeProbeFoldL2ProposalOnlyEvaporates 为未触碰护栏
     (仅 docstring 措辞收窄)。
+  rule6_reexamine_20260720: >
+    ⚠️ **豁免适用性需 owner 复检 (本 cycle 不自行裁定)**。owner 于 2026-07-20 第二次裁决
+    收窄了 deterministic substitute 机制的先例范围, 并立新判据: 「判断依据是**内容是否
+    影响 AI 行为**, 而非文件落在哪个目录 —— `references/` 不能整体归入确定性代码层,
+    其中 `references/rules/*` 类 dispatch 表属指令面」。本 cycle TASK-009 改了两个
+    references 文件, 按新判据自查:
+      - `state-snapshot-schema.md` (+5 行): 字段语义描述, 纯事实文档 → 明确可豁免;
+      - `runtime-probe-declaration.md` (+25/-6): 改「前置条件」段 —— 内容是**对代码新
+        行为的事实性同步** (Rule #3 要求), 但该文档是给 spec 作者 (人或 AI) 读的
+        **authoring 向导**, 其中含处方性建议 ("补任一数据源即可", 原为 "先补 tasks.md
+        升级为 L3")。它不是 skill 运行时消费的 dispatch 表, 但也不是纯 schema。
+    ⇒ **边界不明**, 按机制边界 (c)「拿不准算不算指令语义 → 照跑 (宁跑勿豁)」与不可协商
+    规则 #10 配套习惯, **不自行豁免**, 提请 owner 在 Phase C 发版前裁定: 照跑 AB, 抑或
+    认定 authoring 向导的事实性同步仍属边界 (a) 可豁免。
   rule6_note: >
     Rule #6 AB benchmark 豁免 — 适用 deterministic substitute 机制 (CLAUDE.md 规则 #6
     豁免机制段, owner 裁决 2026-07-20 于本 spec 复议时升级成文): 改动集中在

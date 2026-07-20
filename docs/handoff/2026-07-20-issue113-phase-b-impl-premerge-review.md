@@ -63,12 +63,13 @@ updated-at: 2026-07-20
 | 测试 | **1318 全绿** (基线 1250 + 68); carve-out 账目见 dogfood-evidence §4 |
 | OpenSpec | 本 spec Approved, tasks 10/10 仍 pending (Phase C/D 前不勾) |
 | 审计 | post_spec R5 + post_planning R2 双 CONVERGED (上 session); 本 session 跑 pre-merge 轻量 review ×2 (config 里 `pre_merge=off`, 属 Rule #10 白名单显式豁免, 非自行跳过) |
-| Rule #6 | 本 cycle 走 deterministic substitute 豁免 (owner 2026-07-20 已升级成机制); ⚠️ 并发轨同日**补跑了 AB** (`44b8579`, 主 spec Phase 4 轨), 与本 cycle 无关但同规则 |
+| Rule #6 | 🔴 **豁免适用性待 owner 复检, 本 cycle 不自行裁定** —— rebase 带回 owner 2026-07-20 **第二次裁决**: 收窄先例范围 + 立新判据「依据是内容是否影响 AI 行为, 非文件目录; `references/` 不能整体归入确定性层」。本 cycle 改了 2 个 references 文件, 自查见 `detailed-tasks.yaml: rule6_reexamine_20260720` (schema.md 明确可豁免; `runtime-probe-declaration.md` 是 authoring 向导含处方性建议, **边界不明**) → 按边界 (c)「宁跑勿豁」+ 规则 #10 配套习惯提请裁定。并发轨同日已为主 spec Phase 4 补跑 AB (`44b8579`) |
 | 协调 ref | claim `aria-plugin-113-gate-result-yaml-20260719` **active** (Phase D.2b 释放) |
 | memory | +2 新 (fix-recurs-in-fallback / test-claims-vs-verifies) + MEMORY.md 索引 |
 
 ## §6 Next session 入口 + 优先级
 
+0. 🔴 **owner 裁定项 (发版前, 唯一阻塞)**: 本 cycle 的 Rule #6 豁免在 owner 第二次裁决的新判据下**边界不明** —— `runtime-probe-declaration.md` 是给 spec 作者读的 authoring 向导 (含处方性建议), 既非 `references/rules/*` dispatch 表, 也非纯 schema。我按边界 (c)「宁跑勿豁」**未自行豁免**。请裁: 照跑 AB, 或认定 authoring 向导的事实性同步属边界 (a)。详见 `detailed-tasks.yaml: rule6_reexamine_20260720`。
 1. **rebase aria 到 v1.62.2** → 跑全量测试确认仍 1318 绿 (对方新增 `skills/run_all_tests.sh` 跨 skill 入口, 值得试)。
 2. **TASK-010 + Phase C**: 版本五处→v1.63.0 / CHANGELOG / **先推子模块双远程再 bump gitlink** / badge / PR / C.2.4 gate / C.2.5。
 3. **follow-up issue**: C-gate liveness parity **+ 新发现的 `handoff_autofill.py` 同根第四处** (§2)。
