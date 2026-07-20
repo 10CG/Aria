@@ -13,14 +13,20 @@
 
 ## 最新 handoff
 
-**[2026-07-20 — 会话收尾: aria-plugin #113 Phase B 实施 + pre-merge review 处置](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
+**[2026-07-20 — 会话收尾: 规则 #10 补审 → 三条裁决落地 → 规则 #6 补跑 AB](./2026-07-20-session-close-rule10-audit-and-rule6-ab.md)**
 
-- track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **B-complete** | status: **active** (Phase C 待续)
-- B.1 建分支 → B.2 TASK-001~009 全 TDD 实施 (新 `lib/detailed_tasks.py` parser SOT / gate 三态化 + scoped 属实性 / probe fold 窄化 / is_spec_complete yaml 分支 / collector fallback / 四处文档) → dogfood + 自反性检查点 → **pre-merge 两路 review 全数处置** → 测试 **1250→1318 全绿** → aria `13f9582` (未推送)
-- 🔴 最重一课: **修复类 change 在自己的兜底路径重犯要治的病** (fold 崩溃 fail-toward-GREEN, #166 同款在消灭它的 change 内复发); 且「有记录」≠「有路由」(`soft_errors` 无人消费)
-- 🔴 两路 review 4 条 Important 里 **3 条是「测试声称了它没验证的东西」** —— #95 在测试层的复发
-- **下一步**: rebase 到并发轨 v1.62.2 (零文件重叠) → TASK-010 发版 → Phase C PR/合并 → Phase D
-- ⚠️ 主仓 behind 3 commit; 新发现同根第四处 (`handoff_autofill.py` 亦只读 tasks.md) 待开 follow-up
+- track-id: `session-close-20260719-0720-rule10-audit-rule6-ab` | phase: **session-close** | status: **done**
+- 主 spec Phase 4 收口 ship **v1.62.0** → owner 按不可协商规则 #10 要求补跑 post_planning → R1 5 席抓 **1 Critical + 9 类 Major**（含一条**已 ship 的红测试**与 **AC-5 虚标**）→ R2 2 席确认零 fix-introduced regression + 3 新 → ship **v1.62.1**（本 spec 的病在姊妹消费方复发）→ owner 裁三条 → ship **v1.62.2**（删死配置键 + 跨 skill 测试入口）→ owner 裁「先例收窄 + 补跑 AB」→ Rule #6 AB 三臂 8 run
+- 🔴 最重一课: **规则 #10 首次在真实 cycle 上执行就抓到了两轮 pre-merge review 没抓到的东西**；而我在该规则写下的当天又复现了一次它要防的行为（自行豁免 post_planning，论证听起来成立）
+- 🔴 「提前宣称」本会话出现 **5 次**（第 4 次发生在修前两次的 commit 里，第 5 次发生在写完对应 memory 之后）—— 把「打算做」写成「已经做」并附一个还不存在的证据路径
+- 🔴 AB 最大产出是「测不准在哪里」: 一条**写反的断言**（会把正确答案判错）+ baseline 结构性污染（CLAUDE.md 自动加载）+ 三臂体裁混淆
+- **下一步**: 凭据轮换（问了三次未回）/ Rule #6 边界收敛（两条轨同日各自撞上）/ [#116](https://forgejo.10cg.pub/10CG/aria-plugin/issues/116) / [#169](https://forgejo.10cg.pub/10CG/Aria/issues/169) / [#168](https://forgejo.10cg.pub/10CG/Aria/issues/168)
+
+> ⚠️ **并发轨 (本指针不代表全部)**: 同日另有 in-flight 轨
+> **[aria-plugin #113 Phase B 实施 + pre-merge review 处置](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
+> (track-id `aria-plugin-113-gate-result-yaml-20260719`, phase **B-complete**, status **active — Phase C 待续**,
+> aria `13f9582` 未推送)。该轨在本文件被本会话收尾覆盖前持有指针；**它仍未完成，不要因为指针换了就当它结束**。
+> 多 track 并发时以看板 (`tracks_multibranch`) 为语义权威，本单指针仅向后兼容。
 
 ---
 
