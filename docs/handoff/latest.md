@@ -13,6 +13,15 @@
 
 ## 最新 handoff
 
+**[2026-07-20 — 会话收尾: aria-plugin #113 gate yaml 数据源 cycle, Phase A 完整收官](./2026-07-20-issue113-phase-a-yaml-datasource.md)**
+
+- track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **A-complete** | status: **active** (Phase B 待下 session)
+- triage confirmed/major → **claim 先行** (上 session 血泪兑现) → A.1 Spec **post_spec R1→R5 CONVERGED** (owner 裁决延长 R5; R4 双实现者相反结果=规格欠定实证) → A.2/A.3 10 任务 path B → **post_planning R1→R2 CONVERGED** (规则 #10 照跑首战, R1 抓 6 Major 全属派生盲区) → owner sign-off (Approved)
+- **下一步**: Phase B.1 直接开工 (claim 在手无需重 gate; 任务 DAG + 全部规格钉子就绪; ship target v1.63.0, bump 前 re-check SOT)
+- 主仓 `2f4ada6`+handoff; aria 未动 (v1.62.0); 27 审计报告入库
+
+---
+
 > ⚠️ **2026-07-19 是双轨并发日** — 同日两个 session 在同一 repo 各自 ship 一个版本 (v1.60.0 / v1.61.0),
 > 两篇 handoff **都要读**。本页按结束时间倒序并列; 语义权威仍以多 track 看板为准 (见页首说明)。
 
