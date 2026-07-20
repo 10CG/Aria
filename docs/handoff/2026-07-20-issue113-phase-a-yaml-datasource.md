@@ -33,7 +33,7 @@ updated-at: 2026-07-20
 - **Phase B.1→B.2**: 按 `detailed-tasks.yaml` 10 任务实施 (全程 TDD; 关键规格细节都已钉死在 proposal §1-§4 与决策 1-18, **实现者无需再做设计判断**)。
 - **Phase C**: aria PR + C.2.4 pre-merge gate + C.2.5 多远程; ⚠️ bump 前 re-check SOT 版本 (并发让位 3 次先例; ship target v1.63.0 基于当前 v1.62.0)。
 - **Phase D**: 归档 + **自反性检查点** (决策 14: 本 spec 归档时核对 gate 对自身 detailed-tasks.yaml 的输出 — 预期按 title 落 SC-2/SC-2b 态) + **follow-up issue 开立** (C-gate liveness parity, cross-link 本 spec, TASK-010 承接) + 关 #113。
-- **Phase B 落地时的 4 个钉子** (审计留的, 任务 notes 已承接): base-indent「范围内首个匹配」docstring 钉死 (R5) / 叙事数字 11/17 以实测为准 (R5) / Step2 五处行号 grep 复证 (R1 tl) / rule6_note 请 owner 复议。
+- **Phase B 落地时的 3 个钉子** (审计留的, 任务 notes 已承接): base-indent「范围内首个匹配」docstring 钉死 (R5) / 叙事数字 11/17 以实测为准 (R5) / Step2 五处行号 grep 复证 (R1 tl)。~~rule6_note 复议~~ → **已裁决 (2026-07-20): owner 选「升级成机制」** — CLAUDE.md 规则 #6 新增 deterministic substitute 豁免机制段 (fail-closed 三边界) + AB_TEST_OPERATIONS.md 同步 + rule6_note 改引机制 (含边界 (a) 对 TASK-009 SKILL.md :273 一行的逐行点名)。
 - **claim 生命周期**: Phase D.2b 时 `release_gate` 释放 (track `aria-plugin-113-gate-result-yaml-20260719`)。
 
 **机械补漏 (autofill 交叉核验)**: unfinished 列表全部属其他 active spec (m6 ×4 / m7 ×2 — 承前, 非本对话线程, 不在此承接)。本 cycle 自身零残留 (Phase A 产物全提交)。
@@ -65,7 +65,7 @@ updated-at: 2026-07-20
 ## §6 Next session 入口 + 优先级
 
 1. **Phase B.1 (主线)**: 读 `openspec/changes/state-scanner-gate-yaml-datasource/{proposal.md,detailed-tasks.yaml}` → 建分支 → 按执行序实施。claim 已在手, **无需重新 phase1_gate** (同 track 续作); 若 scan 报新 collision 属其他 track 再议。
-2. rule6_note 豁免 → owner 复议 (一句话确认即可)。
+2. ~~rule6_note 豁免复议~~ → **已裁决「升级成机制」** (CLAUDE.md 规则 #6 豁免机制段, 2026-07-20), 无需再议; 下次同类确定性层变更直接引机制。
 3. (承前) #114 定性 / #165 A 方案 owner 门 / secret rotation 2026-08-02 hard cap (**13 天**)。
 4. 🔴 Phase C bump 前 re-check plugin.json SOT 版本 (并发抢注 3 次先例)。
 

@@ -29,9 +29,11 @@ metadata:
     payload (改写) — TestRuntimeProbeFoldL2ProposalOnlyEvaporates 为未触碰护栏
     (仅 docstring 措辞收窄)。
   rule6_note: >
-    Rule #6 AB benchmark 豁免记录 (PP-R1 km, 对齐姊妹 spec stale-refs-false-parity
-    先例): 本 change 改动集中在 deterministic collector/lib 机械层, 未动 SKILL.md
-    description/指令面 — 走 Rule #6 substitute 路径 (结构化测试替代), 请 owner 复议。
+    Rule #6 AB benchmark 豁免 — 适用 deterministic substitute 机制 (CLAUDE.md 规则 #6
+    豁免机制段, owner 裁决 2026-07-20 于本 spec 复议时升级成文): 改动集中在
+    deterministic collector/lib 机械层, SC 级结构化测试替代 AB。⚠️ 边界 (a) 提醒:
+    TASK-009 含 openspec-archive/SKILL.md :273 一行溯源注释 — 属「事实性同步」例外,
+    此处逐行点名并声明非指令语义变更 (description 零变动)。
 
 # ---------------------------------------------------------------------------
 # TG-1 — Parser SOT (lib/detailed_tasks.py)

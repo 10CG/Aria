@@ -423,6 +423,13 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
 
+**豁免机制 — deterministic substitute (owner 裁决 2026-07-20, 源自 #113 rule6_note 复议; 将 stale-refs 先例惯例化, 对齐规则 #10「豁免应写成机制而非逐次裁量」):**
+变更**全部**落在确定性代码层 (`skills/*/scripts` / `tests` / `references` 文档) 且该 Skill 的 SKILL.md **零变动**时, 以结构化测试 (SC 级 baseline-failing 单元/集成测试, 必须在场) **替代** AB benchmark, 不再逐次人工复议。边界 (fail-closed):
+- (a) SKILL.md 有变动 → 仅当变动是**事实性同步** (溯源注释 / 行号勘正 / 术语修正) 且 frontmatter `description` 零变动, 仍可豁免, 但须在 spec 里**逐行点名**该变动并声明非指令语义变更;
+- (b) `description` 或指令流程 (步骤 / 判定规则 / 对 AI 行为有影响的措辞) 变动 → **一律照跑 AB, 零裁量**;
+- (c) 拿不准算不算指令语义 → 照跑 (宁跑勿豁)。
+豁免使用时仍须在 spec/tasks 留 `rule6_note` 引用本机制 (留痕保留, 复议豁免)。
+
 **操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
 
 **详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`

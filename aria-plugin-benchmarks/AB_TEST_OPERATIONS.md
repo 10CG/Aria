@@ -437,6 +437,18 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 2. 测试编排的**决策质量**而非执行结果
 3. Expectation: "识别正确的 Phase 步骤" / "推荐合理的执行顺序"
 
+### 确定性代码层变更 — deterministic substitute 豁免 (owner 裁决 2026-07-20)
+
+变更**全部**落在 Skill 的确定性代码层 (`skills/*/scripts` / `tests` / `references`) 且 SKILL.md 零变动时,
+**不跑 AB benchmark**, 以结构化测试 (SC 级 baseline-failing 单元/集成测试) 替代。
+
+**理由**: AB 测试回答的是「AI 读了新指令后表现变好了吗」; 确定性 Python 层的行为与 AI 无关
+(同输入必同输出), 其质检对口的是机械测试 — 对它跑 LLM AB 等于测不到点、贵且噪。
+
+**边界与留痕**: 完整 fail-closed 边界三条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑 /
+拿不准照跑) 见 CLAUDE.md 规则 #6 豁免机制段 (SOT)。使用豁免的 spec 须留 `rule6_note` 引用该机制。
+先例: `state-scanner-stale-refs-false-parity` (v1.59-1.62) + `state-scanner-gate-yaml-datasource` (#113, 机制化触发点)。
+
 ---
 
 ## 数据积累策略
