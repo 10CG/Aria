@@ -423,16 +423,30 @@ Skill 基准测试 (新增或修改 Skill 时):
 
 **触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
 
-**豁免机制 — deterministic substitute (owner 裁决 2026-07-20, 源自 #113 rule6_note 复议; 将 stale-refs **v1.59.0 / v1.60.0 两个 phase** 的先例惯例化, 对齐规则 #10「豁免应写成机制而非逐次裁量」):**
-变更**全部**落在确定性代码层 (`skills/*/scripts` / `tests` / `references` 文档) 且该 Skill 的 SKILL.md **零变动**时, 以结构化测试 (SC 级 baseline-failing 单元/集成测试, 必须在场) **替代** AB benchmark, 不再逐次人工复议。边界 (fail-closed):
-- (a) SKILL.md 有变动 → 仅当变动是**事实性同步** (溯源注释 / 行号勘正 / 术语修正) 且 frontmatter `description` 零变动, 仍可豁免, 但须在 spec 里**逐行点名**该变动并声明非指令语义变更;
-- (b) `description` 或指令流程 (步骤 / 判定规则 / 对 AI 行为有影响的措辞) 变动 → **一律照跑 AB, 零裁量**;
-- (c) 拿不准算不算指令语义 → 照跑 (宁跑勿豁)。
+**豁免机制 — deterministic substitute (owner 裁决 2026-07-20, 三次收敛后成文):**
+
+> **判据 = 内容是否影响 AI 行为, 以及那个行为 AB 套件测不测得到。**
+> **不按文件落在哪个目录判** —— `references/` 下同时住着纯描述性内容 (schema / 字段 / 命令语法) 与
+> 处方性内容 (`references/rules/*` 的 dispatch 表 / 判定规则), 后者与 SKILL.md 正文同性质。
+> 同一文件两者并存时**逐 hunk 判**; 任一 hunk 落在「处方性且在测量范围内」⇒ 整个变更照跑。
+
+| 内容性质 | AB 测得到吗 | 处置 |
+|----------|------------|------|
+| 描述性 (schema / 字段 / 命令 / 溯源注释 / 行号勘正) | 不适用 | **substitute**: 结构化测试 (SC 级 baseline-failing, 必须在场) 替代 AB |
+| 处方性 · 运行时指令面 (SKILL.md 正文 / dispatch 表 / 判定规则) | 能 | **照跑 AB, 零裁量** |
+| 处方性 · 但治的行为在固定测试集覆盖外 (典型: authoring 向导) | 不能 | **不是简单豁免** —— 须同时: 点名行为 + 建可证伪的定向 fixture + 把套件缺口开成 issue (缺一回落照跑) |
+| 拿不准 | — | **照跑** (宁跑勿豁) |
+
+**SKILL.md 有变动**: 仅当是事实性同步 (溯源注释 / 行号勘正 / 术语修正) 且 frontmatter `description` 零变动,
+才可能落进第一行, 且须在 spec 里**逐行点名**并声明非指令语义变更; `description` 或指令流程变动 ⇒ 一律照跑。
+
+**第三行不是逃生舱**: 它比照跑更麻烦 (定向 fixture + 记缺口), 这是刻意设计 ——
+对一个 AB 结构上测不到的行为跑 AB 是**测量剧场**, 但"跳过验证"同样不可接受, 所以换成能验到的手段 + 把盲区记成债。
+
 豁免使用时仍须在 spec/tasks 留 `rule6_note` 引用本机制 (留痕保留, 复议豁免)。
 
-> ⚠️ **先例范围收窄 (owner 裁决 2026-07-20 第二次)**: 本机制初版写「将 stale-refs 先例惯例化」, 笼统指代会把该 spec 的 **Phase 4 (v1.62.0)** 一并盖进来 —— 而 Phase 4 改了 `references/rules/basic-rules.md` 77 行 (新增 `multi_remote_drift` dispatch 第七路 + `degrade_when` 离线降级), 那是「在什么状态下给什么建议」的**判定规则**, 按边界 (b) 属指令流程变动, **一律照跑零裁量**。⇒ 先例仅指 **v1.59.0 (F5′ 纯函数 INERT) 与 v1.60.0 (F1′-F10″ collector 代码层)** 这两个 phase; **Phase 4 不适用豁免, 已按裁决补跑 AB**。
->
-> **一般化教训**: `references/` 目录**不能整体**归入「确定性代码层」—— 它同时住着两类东西: 纯事实文档 (schema / 字段定义 / 跨平台命令) 与 **AI 判定规则** (`references/rules/*` 的 dispatch 表)。后者是 AI 读了照做的指令面, 与 SKILL.md 正文同性质。判断依据应是**内容是否影响 AI 行为**, 而不是**文件落在哪个目录**。
+**完整判据 + 决策表 + 已裁定样例 + AB 自身的两个已知测量缺陷:**
+`standards/conventions/skill-benchmark-exemption.md` (SOT)
 
 **操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
 
