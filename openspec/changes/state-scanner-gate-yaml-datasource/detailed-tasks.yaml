@@ -10,7 +10,7 @@ metadata:
   level: 2
   datasource: "proposal.md"
   scope_repo: "aria"
-  scope_repo_head: "9af7b21"
+  scope_repo_head: "6e1eb24"   # v1.62.1 (并发轨 rebase 对账 2026-07-20); 全部行号在 9af7b21 校验, v1.62.1 零触碰 lib/collectors → 原样有效
   linked_issue: "10CG/aria-plugin#113"
   total_tasks: 10
   task_groups: 4

@@ -53,8 +53,8 @@ updated-at: 2026-07-20
 
 | 维度 | 状态 |
 |------|------|
-| 主仓 | `2f4ada6` + 本 handoff commit → push 双远程 (§7) |
-| aria / standards / orchestrator | `9af7b21` (v1.62.0, 未动) / `a96a56b` (未动) / `92acce5` (WIP, 未动) |
+| 主仓 | rebase 到并发轨 v1.62.1 之上 (`564fc46` — 主 spec Phase 4 post_planning 补跑轨, 首次 push 双远程被 non-ff 拒后 fetch+rebase 零冲突) → push 双远程 (§7) |
+| aria / standards / orchestrator | `6e1eb24` (**v1.62.1**, 并发轨 bump; **零触碰本 spec 实现点**, 行号基线原样有效) / `79b7cd6` (并发轨 bump) / `92acce5` (WIP, 未动) |
 | OpenSpec | **active 7** (新增本 spec Approved; 其余 6 承前); 归档 128 |
 | 审计 | post_spec R5 PASS + post_planning R2 PASS (converged=true ×2); 27 报告入库 |
 | 四维一致性 | 「active change 不在 UPM」×7 = 既有 advisory (Aria 无 UPM 配置, 承前判定不变) |
