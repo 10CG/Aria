@@ -13,7 +13,17 @@
 
 ## 最新 handoff
 
-**[2026-07-21 — 会话收尾: Rule #6 判据成文 + #165 从基建收敛成两条规范](./2026-07-21-session-close-rule6-formalization-and-165-convergence.md)**
+**[2026-07-21 — 会话收尾: 版本一致性债清理 + meta-repo tag 规范分流](./2026-07-21-version-consistency-cleanup-and-meta-repo-tag-convention.md)**
+
+- track-id: `session-close-20260721-version-consistency-tag-convention` | phase: **session-close** | status: **done**
+- 从一次 `/state-scanner` 起步: 扫出 aria v1.63.0 主仓 release-closeout 漏做 (3 红 check 同源) → 清掉, 顺势清完主仓一批**版本一致性债**
+- 已完成: (1) v1.63.0 closeout 4 派生面同步 + CLAUDE.md 645→639 压预算 (2) VERSION 116→37 行按 §4.2 重写 (清 1.6.0/1.7.3 矛盾 + changelog dump + 校正子模块版本) (3) CLAUDE.md orchestrator SHA `f3848b2`→`86bb684` (4) **standards §4.3 tag 规则分流** (owner 选方案 B)
+- ⚖️ **方法论增量**: §4.3 从「VERSION 必须与 tag 一致」一刀切 → 按判据「有无下游按本仓 git tag 拉取」分流 (分发型严格 / meta-repo VERSION-file-only) —— 消主仓「VERSION≠tag」**永久假 drift**。→ memory `feedback_perpetual_red_check_may_encode_stale_convention`
+- ✅ **#165 观察期加正面证据**: standards 改动全程约束 1 (本地合并) + 约束 2 (ls-remote 核验 ×4 全 MATCH), 零 orphan gitlink —— 一次干净正向 dogfood
+- 🔴 **下一步**: 凭据轮换 (**第五次未回**) / #165 观察期 / Rule #6 成文首次实战 / #169 #168 #116
+- custom checks **8/8 绿** (起点 3 红全转绿); 三仓双远程一致 (主仓 `faebb3d`)
+
+**[2026-07-21 — 会话收尾: Rule #6 判据成文 + #165 从基建收敛成两条规范](./2026-07-21-session-close-rule6-formalization-and-165-convergence.md)** (predecessor, 同容器同日前序)
 
 - track-id: `session-close-20260720-0721-rule6-formalize-165-converge` | phase: **session-close** | status: **done**
 - 承接上一份 session-close 之后的增量: Rule #6 判据 **从「按文件目录」改为「按内容是否影响 AI 行为」** (下沉 `standards/conventions/skill-benchmark-exemption.md`, 新增「AB 测不到的处方性内容」第三行) + **#165 从「配 push mirror」收敛成两条零基建规范** (方案 D 消除服务端合并 + 纪律层 ls-remote 核验)
