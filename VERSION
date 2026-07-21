@@ -1,97 +1,37 @@
 # Aria 项目版本信息
 
 > **版本**: 1.7.3
-> **最后更新**: 2026-06-21
+> **最后更新**: 2026-07-21
 
 ## 版本号
 
 ```
-1.6.0
+1.7.3
 ```
 
 ## 说明
 
 - **Major (1)**: 方法论核心框架稳定
-- **Minor (6)**: state-scanner-inter-cycle-surfacing — aria-plugin v1.17.7 → v1.18.0 ship 全 18 任务实装 (G2 UPM Pending Followups parser + G3 handoff_doc pointer detection + G4 in_progress US priority_items + 2 新推荐规则 + git.status_clean derived field + 4 schema 字段 backward-compat contract + SKILL.md T5 兜底降级 + TX.6 backward-compat verify tests + TX.3 三-arm AB benchmark)。3 sub-PR 串行交付,每个 sub-PR 经 4-5 轮 multi-agent pre_merge audit 收敛。
-- **Patch (0)**: 新 minor,patch 归零
+- **Minor / Patch**: 累积演进 (v2.0 运行时参考实现层 + 多终端协调 + state-scanner 机械化等); 精确逐版本变更不在本快照, 见下方各 SOT。
+
+> 主项目版本反映整体方法论成熟度, ≠ 各子模块版本之和 (见 `standards/conventions/version-management.md` §5.3)。
+> 详细变更史: 插件 → `aria/CHANGELOG.md` (SOT) | 规范 → `standards/openspec/project.md` §Version History | 主项目 → `docs/handoff/` + git log。
 
 ## 子模块版本
 
 | 子模块 | 版本 | 仓库 |
 |--------|------|------|
-| standards | v2.1.0 | https://github.com/10CG/aria-standards |
-| aria-orchestrator | HEAD (master) | 内部 |
+| aria (插件) | v1.63.0 | https://github.com/10CG/aria-plugin |
+| standards | v2.2.2 | https://github.com/10CG/aria-standards |
+| aria-orchestrator | v2.0.0 | 内部 (10CG Lab) |
 
-## 插件版本
-
-| 插件 | 版本 | 仓库 | 更新日期 |
-|------|------|------|----------|
-| aria (子模块) | v1.63.0 | https://github.com/10CG/aria-plugin | 2026-07-20 |
-
-### aria v1.16.0 变更摘要 (minor, meta-repo 支持)
-
-- **state-scanner Phase 1.13 `scan_submodules` opt-in** — 递归扫描 `.gitmodules` 中所有 submodule 的 Forgejo/GitHub issues, 每个 submodule 独立 fail-soft; 支持 meta-repo 模式 (Aria 主 repo + aria-plugin / aria-orchestrator / aria-standards)
-- **`stage_timeout_seconds` 自适应**: 关闭时保持 12s 向后兼容, 开启时 `max(20, (N+1)×api_timeout_seconds)` 按 submodule 数线性扩展
-- **cache schema_version 守卫**: 识别 pre-v1.1 旧缓存 → 一次性 cold re-fetch, 避免 silent corruption
-- **open_blocker_issues 推荐规则跨 repo 聚合**: 任一 repo (主 + submodule) 的 blocker/critical label 触发降级推荐
-- **SKILL.md**: 2.9.0 → 2.10.0 | **issue-scanning.md**: 1.0.0 → 1.1.0
-- **Benchmark**: +41.7pp pass rate (ab-results/2026-04-15-state-scanner-submodule-issue-scan/)
-- **向后兼容**: `scan_submodules=false` (默认) 场景与 v1.15.2 字节级一致
-
-### aria v1.15.2 变更摘要 (patch, cleanup)
-
-- **check_parity.sh shell injection 防护** (MEDIUM) — Python heredoc 变量注入 → 环境变量传参 + 单引号 heredoc
-- check_parity.sh 死代码清理 (TIMEOUT_CMD 未使用的 19 行)
-- verify_post_push.py `--max-retries` 命名注释增强 (明确 4 attempts = 1 initial + 3 retries)
-- fallback 路径可移植性 (`ARIA_PLUGIN_ROOT` 环境变量支持)
-
-### aria v1.15.1 变更摘要 (patch)
-
-- **git-remote-helper timeout 默认值**: 5s → 15s (dogfood 发现 Forgejo SSH over CF Access 实测 ~8s)
-- max_per_remote_seconds: 34 → 74
-- 快速网络可设 --timeout=5 回到 34s 上界
-
-### aria v1.15.0 变更摘要
-
-- **US-012 多远程一致性保障** (aria-plugin#13) — 3 层加固防止发版遗漏推送
-  - Layer 3: `git-remote-helper` internal skill (canonical JSON schema + 3 脚本)
-  - Layer 1: state-scanner Phase 1.12 原地扩展多远程 parity (保持 D8 配额 14/15)
-  - Layer 2: phase-c-integrator C.2.5 Multi-Remote Push Enforcement + Per-Remote Matrix Gating
-- **根因修复**: 2026-04-12 v1.14.0 事件 (Aria#13) — "Everything up-to-date" 歧义 + 缺 post-push SHA 验证
-- **AB Benchmark**: delta +40.82% POSITIVE (49 assertions, 7 evals × with/without)
-- **Dogfooding**: 本次 v1.15.0 发版用新 helper 做 post-push SHA 验证, 双仓库双远程零差异
-- **Skills 总数**: 36 (30 面向用户 + 6 内部, +1 git-remote-helper)
-- **Agents 总数**: 11
+> 各子模块当前 gitlink SHA 见 `git submodule status` (指针 SOT), 本表只记语义版本避免 SHA 快照过期。
 
 ## 对应 Tag
 
 ```
-v1.0.0 (初始发布)
-v1.0.1
-v1.0.2
-v1.0.3
-v1.0.4
-v1.0.5
-v1.1.0
-v1.2.0
-v1.3.0
-v1.4.0
-v1.4.1
-v1.4.2
-v1.5.0 (当前)
+v1.7.3
 ```
 
-## 发布说明
-
-v1.5.0 核心成果 — aria-orchestrator M3-slim 智能分诊:
-
-- ✅ triage.sh 路由决策引擎 (scan → triage-result.json, configurable dispatch_policy)
-- ✅ 飞书分级通知 (🟢 Tier 1 / 🟡 Tier 2 / 🔴 Tier 3)
-- ✅ heartbeat.sh triage 集成 (fallback 降级, 不触发 circuit breaker)
-- ✅ notify-feishu.sh JSON 转义修复 (python3 payload 构造)
-- ✅ Agent Team 4 轮规划审计 + 2 轮 pre-merge 审计收敛
-- ✅ D23: M3 拆分 — dispatch/状态机/审批 → v2.0
-
-## 下一步
-
-- [ ] v2.0.0 - PRD v2.0 两层 AI 分工架构 (US-010~017, ~750h)
+> ⚠️ 实际 git tag 最新为 `v1.5.0` —— 主项目自 v1.5.0 后经 VERSION 文件 bump 演进但未补 tag。
+> 按 §4.3 (VERSION 须与 git tag 一致), 是否补打 `v1.6.0`..`v1.7.3` 由 owner 决定。
