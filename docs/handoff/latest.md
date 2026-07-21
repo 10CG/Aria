@@ -13,20 +13,21 @@
 
 ## 最新 handoff
 
-**[2026-07-20 — 会话收尾: 规则 #10 补审 → 三条裁决落地 → 规则 #6 补跑 AB](./2026-07-20-session-close-rule10-audit-and-rule6-ab.md)**
+**[2026-07-21 — 会话收尾: Rule #6 判据成文 + #165 从基建收敛成两条规范](./2026-07-21-session-close-rule6-formalization-and-165-convergence.md)**
 
-- track-id: `session-close-20260719-0720-rule10-audit-rule6-ab` | phase: **session-close** | status: **done**
-- 主 spec Phase 4 收口 ship **v1.62.0** → owner 按不可协商规则 #10 要求补跑 post_planning → R1 5 席抓 **1 Critical + 9 类 Major**（含一条**已 ship 的红测试**与 **AC-5 虚标**）→ R2 2 席确认零 fix-introduced regression + 3 新 → ship **v1.62.1**（本 spec 的病在姊妹消费方复发）→ owner 裁三条 → ship **v1.62.2**（删死配置键 + 跨 skill 测试入口）→ owner 裁「先例收窄 + 补跑 AB」→ Rule #6 AB 三臂 8 run
-- 🔴 最重一课: **规则 #10 首次在真实 cycle 上执行就抓到了两轮 pre-merge review 没抓到的东西**；而我在该规则写下的当天又复现了一次它要防的行为（自行豁免 post_planning，论证听起来成立）
-- 🔴 「提前宣称」本会话出现 **5 次**（第 4 次发生在修前两次的 commit 里，第 5 次发生在写完对应 memory 之后）—— 把「打算做」写成「已经做」并附一个还不存在的证据路径
-- 🔴 AB 最大产出是「测不准在哪里」: 一条**写反的断言**（会把正确答案判错）+ baseline 结构性污染（CLAUDE.md 自动加载）+ 三臂体裁混淆
-- **下一步**: 凭据轮换（问了三次未回）/ Rule #6 边界收敛（两条轨同日各自撞上）/ [#116](https://forgejo.10cg.pub/10CG/aria-plugin/issues/116) / [#169](https://forgejo.10cg.pub/10CG/Aria/issues/169) / [#168](https://forgejo.10cg.pub/10CG/Aria/issues/168)
+- track-id: `session-close-20260720-0721-rule6-formalize-165-converge` | phase: **session-close** | status: **done**
+- 承接上一份 session-close 之后的增量: Rule #6 判据 **从「按文件目录」改为「按内容是否影响 AI 行为」** (下沉 `standards/conventions/skill-benchmark-exemption.md`, 新增「AB 测不到的处方性内容」第三行) + **#165 从「配 push mirror」收敛成两条零基建规范** (方案 D 消除服务端合并 + 纪律层 ls-remote 核验)
+- 🔴 本段核心教训: **我把「观察」直接滑成「行动建议」** —— 撞见 standards 漏推就说「该配 push mirror」, 而漏推是纪律类 (本地双推就能防), 不是 push mirror 的机制类 (服务端合并)。owner 一句「本地双推不就够了」纠正。→ memory `feedback_match_evidence_class_to_solution_class`
+- 🔴 两条规范**都当场约束了我自己**: Rule #6 成文后 Phase 4 应照跑 (已补); 多远程约束 1 (禁 Forgejo 服务端合并) 正是本会话给 aria 子模块一直在做的
+- ⚠️ 执行纪律衰减: cwd 混淆本会话第 3 次 / 反引号吃内容第 2 次 —— **均已有 memory 但仍在犯, 靠「记住」不够**
+- **下一步**: 凭据轮换 (第四次未回) / #165 观察期 (下个跨子模块 ship 走约束 1) / Rule #6 成文的首次实战 / #169 #168 #116
 
-> ⚠️ **并发轨 (本指针不代表全部)**: 同日另有 in-flight 轨
-> **[aria-plugin #113 Phase B 实施 + pre-merge review 处置](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
+> ⚠️ **并发轨 (本指针不代表全部)**: 同期 in-flight 轨 **仍未完成** —
+> **[aria-plugin #113 Phase B 实施 + pre-merge review](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
 > (track-id `aria-plugin-113-gate-result-yaml-20260719`, phase **B-complete**, status **active — Phase C 待续**,
-> aria `13f9582` 未推送)。该轨在本文件被本会话收尾覆盖前持有指针；**它仍未完成，不要因为指针换了就当它结束**。
-> 多 track 并发时以看板 (`tracks_multibranch`) 为语义权威，本单指针仅向后兼容。
+> spec `state-scanner-gate-yaml-datasource` 未归档, claim 未释放, aria `13f9582` 未推送)。
+> 本会话两次收尾均接管指针但保留标注该轨; **它跨了两次收尾仍 active, 不要因指针换了就当它结束**。
+> 多 track 并发以看板 (`tracks_multibranch`) 为语义权威。
 
 ---
 
