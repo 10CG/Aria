@@ -46,13 +46,15 @@ updated-at: 2026-07-21
 - **git**: 主仓 `faebb3d` (origin=github=local) / standards `45a4301` (三方一致) / aria `da15d0f` (三方一致) / aria-orchestrator detached `86bb684` 只读。
 - **custom checks**: **8/8 绿** (起点 3 红: m6-version-badge-match / i18n-readme-translation-currency / claude-md-changelog-free 全转绿)。
 - **规范新增**: standards `version-management.md` §4.3 tag 规则分流 (分发型 vs meta-repo) + §3.3/§6.2 配套一致性补注。
-- **#165 观察期正面证据 (本段)**: standards 改动全程遵守约束 1 (本地 commit + 本地双推, 非 Forgejo 服务端合并) → bump 主仓 gitlink; 约束 2 逐个 ls-remote 核验共 4 组 (standards×2 + 主仓×2) 全 MATCH, 零 orphan gitlink。**是约束 1/2 一次干净的正向 dogfood**, 计入 #165 关闭条件 (条约束遵守无 orphan)。
+- **#165 观察期双重证据 (本段)**:
+  - **正面 (约束 1)**: standards 改动全程遵守约束 1 (本地 commit + 本地双推, 非 Forgejo 服务端合并) → bump 主仓 gitlink, 零 orphan gitlink。
+  - 🎯 **真实捕获 (约束 2, 满足 #165 关闭条件 2)**: 写本 handoff 的 commit `52fec63` 双推时, **github push 报 "access rights" 失败但 origin 成功 → 镜像半推分叉** (origin=52fec63 / github=faebb3d)。约束 2 的独立 ls-remote 核验**当场抓到** (没信 push 回执), 确认 github 是本地严格祖先 → ff 重推 (无需 force) 恢复。这是 #165 关闭条件 2「约束 2 至少捕获一次真实漏推-半推」的**首次达成**, 且是极致 meta-dogfood: 一条关于 #165 纪律的 commit 自身触发了 #165 捕获。根因是 CF Access/SSH 瞬时 auth 抖动 (同 session github 已成功推 5 次), 非真权限丢失。见 memory `feedback_partial_push_creates_mirror_divergence`。
 - **并发**: 本段与 bot **零撞车** (三仓推送均 fast-forward, 无 non-ff 拒绝)。
 
 ## §6 Next session 入口 + 优先级
 
 1. 🔴 **凭据轮换** (§2, 第五次未回)。owner-gated, 我只能持续 surface。
-2. **#165 观察期**: 继续按约束 1 (子模块本地合并) + 约束 2 (ls-remote 核验)。本段已加一次正面证据。
+2. **#165 观察期**: 继续按约束 1 (子模块本地合并) + 约束 2 (ls-remote 核验)。本段既有约束 1 正面证据, **又靠约束 2 真实捕获一次镜像半推分叉 (关闭条件 2 首达)** —— owner 可评估 #165 是否临近关闭 (关闭条件: ≥3 跨子模块 cycle 遵守约束 1 无 orphan / 约束 2 至少捕获一次 [✅本段达成] / 期间无新事故)。
 3. **Rule #6 成文首次实战**: 下个改 `references/rules/*` / authoring 向导的 cycle 按 §skill-benchmark-exemption 决策表走。
 4. **#169 / #168 / #116** 承前。
 5. 承前 owner 门: M6 四门 / 168h 跑 / M7 fleet。
