@@ -21,7 +21,7 @@
 
 | 子模块 | 版本 | 仓库 |
 |--------|------|------|
-| aria (插件) | v1.63.0 | https://github.com/10CG/aria-plugin |
+| aria (插件) | v1.64.0 | https://github.com/10CG/aria-plugin |
 | standards | v2.2.2 | https://github.com/10CG/aria-standards |
 | aria-orchestrator | v2.0.0 | 内部 (10CG Lab) |
 

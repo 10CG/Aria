@@ -95,5 +95,16 @@
       "tier3_action": "human_only",
       "dry_run": false
     }
+  },
+  "phase_c_integrator": {
+    "_comment": "Rule #8 C.2.4 pre-merge gate 的显式声明 (2026-07-22, #113 Phase C 第 4 次遇到同一情形后落配置). 本仓 (Aria meta-repo + aria-plugin 子模块) 的 CI 全部路径过滤: aria 唯一 workflow .forgejo/workflows/issue-triage-tests.yml 仅在 skills/issue-triage/** 触发; 主仓 CI 仅在 orchestrator 相关路径触发。⇒ 任何落在这些路径之外的变更 **结构上永远不会产生 CI run**, 而 backend 把 '零 run' 映射成 pending (ci_backends/aether.py: `if not runs: return \"pending\"`), gate 因此恒返回 verdict=wait, 等到 wait_timeout 也不会变。",
+    "_lane": "已确立 lane (Rule #10 白名单第 4 类「闸门的结构性前提不成立 — 审的对象整个未产生」): verdict=wait 且确认本次变更路径无 CI 覆盖 且 in_flight_runs=[] 时, 应用 Rule #8 exception skip_with_warning + 在 PR/handoff 留痕, **不傻等 30 分钟**。执行先例: v1.54.0 / v1.55.0 / v1.55.2 / v1.64.0(#113)。⚠️ 边界: 变更**触及** skills/issue-triage/** 或 orchestrator 路径时 CI 真会跑, 此 lane 不适用, 必须等真实 verdict。",
+    "_not_ci_backends_empty": "⚠️ 刻意 **不** 设 ci_backends:[] —— 那会触发 no_ci_fallback 对**所有**变更跳过闸门, 包括真有 CI 覆盖的路径, 等于用假绿换恒红。完整机制化需 gate 支持路径覆盖感知 (区分「无覆盖」与「pending」), 属代码变更, 见 aria-plugin#122 (路径覆盖感知的 not_applicable 态)。",
+    "pre_merge_gate": {
+      "enabled": true,
+      "ci_backends": null,
+      "no_ci_fallback": "skip_with_warning",
+      "wait_timeout_seconds": 1800
+    }
   }
 }

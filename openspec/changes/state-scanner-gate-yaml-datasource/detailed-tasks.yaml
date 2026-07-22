@@ -243,9 +243,9 @@ tasks:
       - aria/.claude-plugin/plugin.json                            # SOT + marketplace ×2 + VERSION + README
       - README.md                                                  # 主仓 root badge L8 + Project Status 段 (PP-R1 km: 不在子模块 SOT 内易漏, 独立落点)
       - aria                                                       # 主仓 gitlink 指针 bump commit (PP-R1 km: 复发模式 #165, 须为可核验项; 先推子模块双远程再 bump, 规避 orphan)
-      - openspec/changes/state-scanner-gate-yaml-datasource/       # follow-up issue 号回填 (C-gate liveness parity, cross-link 本 spec)
+      - openspec/changes/state-scanner-gate-yaml-datasource/       # follow-up issue 号已回填: aria-plugin #120 (C-gate liveness parity, cross-link 本 spec) + #121 (handoff_autofill 同根因第四处消费方, Phase B 机械 autofill 交叉核验新发现)
     verification:
-      - "版本五处一致 (SOT plugin.json=1.63.0); follow-up issue 已开并 cross-link; 主仓 badge/i18n 检查 (custom checks m6-version-badge-match / i18n-currency 过)"
+      - "版本五处一致 (SOT plugin.json=**1.64.0** — ⚠️ 起草时写的 1.63.0 已被并发轨占用, **第 5 次版本让位**, 本行为勘正后的事实值); follow-up issue 已开并 cross-link (#120 + #121); 主仓 badge/i18n 检查 (custom checks m6-version-badge-match / i18n-currency 过)"
       - "gitlink bump commit 存在且指向 aria post-merge master SHA (双远程可达 — 先推 GitHub 再 bump, #165 根因规避)"
       - "自反性检查点闭环 (PP-R1 qa, 决策 14): 确认 handoff 登记的归档期 gate 输出核对项已写入且指派 Phase D"
     notes: "Phase C/D 边界任务; 多远程推送走 C.2.5 自动化。⚠️ 并发让位 3 次先例 — bump 前 re-check SOT 版本。"
