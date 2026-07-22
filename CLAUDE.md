@@ -8,632 +8,142 @@
 
 ## 文档边界
 
-| 文档 | 受众 | 目的 |
-|------|------|------|
-| **README.md** | 人类用户 | 项目介绍、快速开始、使用指南 |
-| **CLAUDE.md** | AI 助手 | 项目定位、上下文地图、不可协商规则 |
-
-**README.md** = "用户如何使用 Aria"
-**CLAUDE.md** = "AI 如何理解 Aria 项目"
-
-**CLAUDE.md 卫生** (Option A, 见 `standards/conventions/claude-md-hygiene.md`): 只放稳定内容; **不放** 版本 changelog (→ `aria/CHANGELOG.md` SOT) / session 进展流水 (→ `docs/handoff/`, Rule #9, 用 `/state-scanner` 查); 「项目状态」段 = live 覆写非 append log。enforcement: state-check `claude-md-changelog-free`。
+- **README.md** = 人类用户 ("如何使用 Aria") | **CLAUDE.md** = AI 助手 ("如何理解 Aria 项目")
+- **CLAUDE.md 卫生** (Option A, `standards/conventions/claude-md-hygiene.md`, 对齐 Claude Code 官方 memory 指南 ≤200 行目标): 只放稳定的「每 session 都该知道的事实」。**不放**: 版本 changelog (→ `aria/CHANGELOG.md` SOT) / session 进展流水 (→ `docs/handoff/`, Rule #9) / **Skill 设计内部术语** (→ 各 SKILL.md 按需加载; 抄进本文件会污染 AB baseline, 实证 aria-plugin #116)。「项目状态」段 = live 覆写, 预算 15-20 行。enforcement: state-check `claude-md-changelog-free`。
 
 ## 工作语言
 
-**Aria 工作语言 = 中文**。AI 助手与 owner 对话默认中文叙述,不要大量中英混杂。
-
-**保留英文**(技术 token,翻译反而损害清晰度): 代码 / 命令 / 文件路径 / git SHA / branch / PR# / 版本号 / commit message / spec 术语 (Phase A.1 / Rule #7 / OpenSpec / Layer L / Q-NEW etc.) / 工具/Skill/Agent 名 / memory 引用。
-
-**用中文**: 叙述 / 解释 / 进度更新 / 建议 / 风险说明 / 询问 (含 AskUserQuestion options) / handoff prose 段落 / audit verdict 判定。
-
-详细 do/don't + 实证: memory `user_chinese_conversation_default`。
-
----
+**中文叙述为主**。保留英文技术 token: 代码 / 命令 / 路径 / SHA / branch / PR# / 版本号 / spec 术语 / Skill·Agent 名 / memory 引用。叙述 / 解释 / 建议 / 询问 (含 AskUserQuestion options) / handoff prose 用中文。详: memory `user_chinese_conversation_default`。
 
 ## 项目定位
 
-Aria 是一个**方法论研究项目**，而非框架实现。它探索如何让 AI Agent 深度参与软件工程全流程，从需求到交付的完整协作模式。
+**方法论研究项目** (非框架实现): 探索 AI Agent 深度参与软件工程全流程。
 
-### 核心假设
-
-```
-传统模式: 人类主导 → AI 辅助
-Aria 模式: AI 理解 → 人类确认 → 协作交付
-```
-
-### 身份演进 (v1.x → v2.0)
-
-```
-v1.x 定位: 方法论研究项目 (人类交互式)
-v2.0 定位: 方法论定义 + 端到端参考实现 (AI 自主式)
-```
-
-v1.x 的十步循环已被验证为可执行, v2.0 把同一套方法论放到**无人值守**场景下验证。两者共享方法论本体, 区分在于**执行主体**:
-- v1.x: 人类 + Claude Code (interactive)
-- v2.0: Hermes (Layer 1) + aria-runner 容器 (Layer 2)
-
-详细运行时架构见 [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md) (AD1-AD12)。
-
-### 研究目标
-
-1. **可重现的 AI 协作流程** - 不同项目、不同 AI 都能获得一致结果
-2. **最小化的上下文传递成本** - AI 能快速理解项目状态
-3. **结构化的决策记录** - 每个"为什么"都有据可查
-
----
+- 协作模式: AI 理解 → 人类确认 → 协作交付 (对比传统: 人类主导 → AI 辅助)
+- v1.x = 人类 + Claude Code (interactive); v2.0 = 同一套方法论放到**无人值守** (Hermes Layer 1 + aria-runner Layer 2)
+- 研究目标: 可重现的 AI 协作流程 / 最小化上下文传递成本 / 结构化决策记录
+- 运行时架构详见 [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md) (AD1-AD12)
 
 ## 核心概念
 
-### AI-DDD (AI-Assisted Domain-Driven Design)
+**十步循环**: A 规划 (A.0 状态扫描 → A.1 规范创建 → A.2 任务规划 → A.3 Agent 分配) → B 开发 (B.1 分支创建 → B.2 执行验证; Skill 变更时含 benchmark) → C 集成 (C.1 提交 → C.2 合并) → D 收尾 (D.1 进度更新 → D.2 归档)。SOT: `standards/core/ten-step-cycle/`。
 
-领域驱动设计的 AI 增强版，强调 AI 对业务领域的理解和建模能力。
+**两层 AI 分工 (v2.0)**: Layer 1 主管 (Hermes + Luxeno-routed GLM, PM 角色: triage/派发/审批; 只加载 ~1K token 元知识, **不加载** aria-plugin, AD7) / Layer 2 工程师 (aria-runner 容器 + Claude Code + aria-plugin 完整加载, 执行完整十步循环)。两层用拟人命令 (自然语言 YAML) 通信, 非结构化 RPC (AD1 + AD6)。
 
-### 十步循环 (Ten-Step Cycle)
+**OpenSpec 需求规范**: Level 1 = Skip (简单修复) / Level 2 = `proposal.md` / Level 3 = `proposal.md` + `tasks.md`。
 
-```
-A. 规划 (Spec & Planning)
-├── A.0 状态扫描    → 理解当前在哪
-├── A.1 规范创建    → 定义要去哪
-├── A.2 任务规划    → 规划怎么去
-└── A.3 Agent 分配  → 谁去执行
-
-B. 开发 (Development)
-├── B.1 分支创建    → 隔离工作空间
-├── B.2 执行验证    → 开发+评审 (Skill 变更时含 /skill-creator benchmark)
-
-C. 集成 (Integration)
-├── C.1 提交        → 记录变更
-└── C.2 合并        → 集成到主干
-
-D. 收尾 (Closure)
-├── D.1 进度更新    → 同步状态
-└── D.2 归档        → 完成闭环
-```
-
-### 两层 AI 分工 (v2.0 新增)
-
-v2.0 在"十步循环"之上建立了两层执行结构:
-
-- **Layer 1 (主管)**: Hermes + Luxeno-routed GLM models, 做 PM 角色 (triage / 派发 / 审批)
-- **Layer 2 (工程师)**: aria-runner 容器 + Claude Code + aria-plugin, 做工程师角色 (执行十步循环)
-
-两层通过**拟人命令**(自然语言 YAML) 通信, 不用结构化 RPC。详见 AD1 + AD6。
-
-**重要**: Layer 1 **不加载** aria-plugin, 只加载 ~1K token 元知识 (AD7); Layer 2 **完整加载** aria-plugin, 执行完整十步循环。
-
-### OpenSpec 需求规范
-
-标准化的需求描述格式，让 AI 和人类对"做什么"达成共识。
-
-- **Level 1**: Skip - 简单修复，无需规范
-- **Level 2**: Minimal - `proposal.md`
-- **Level 3**: Full - `proposal.md` + `tasks.md`
-
----
-
-## 认知框架
-
-理解 Aria 项目的四个原则:
-
-### 1. 规范先行 (Spec First)
-
-```
-❌ 先写代码，后补文档
-✅ 先写规范，后写代码
-
-原因: AI 需要理解"为什么"才能给出好的建议
-```
-
-### 2. 小步迭代 (Incremental)
-
-```
-❌ 大爆炸式重构
-✅ 每个任务 4-8 小时可完成
-
-原因: 小步快跑，风险可控，AI 容易验证
-```
-
-### 3. 文档同步 (Docs in Sync)
-
-```
-❌ 代码和文档分离维护
-✅ 架构文档与代码同步演进
-
-原因: AI 通过文档理解结构，文档过时 = AI 误解
-```
-
-### 4. 向后兼容 (Backward Compatible)
-
-```
-❌ 破坏性变更
-✅ 所有变更保持兼容
-
-原因: 方法论需要稳定性，频繁弃用会破坏信任
-```
-
----
+**协作原则**: 规范先行 (先 spec 后代码) / 小步迭代 (任务 4-8h 粒度) / 文档同步 (文档过时 = AI 误解) / 向后兼容 (破坏性变更须 MAJOR)。
 
 ## 信息地图
 
-### 子模块职责
+| 子模块/目录 | 职责 |
+|-------------|------|
+| `standards/` | 方法论定义 (十步循环 / OpenSpec / conventions) |
+| `aria/` | 工具集 Plugin (Skills + Agents + Hooks) |
+| `aria-plugin-benchmarks/` | Skill AB 基准测试 (固定套件 / 结果存档 / 运维手册) |
+| `docs/handoff/` | Session handoff records (Rule #9 canonical) |
+| `aria-orchestrator/` | v2.0 运行时 Layer 1/2 (仅 10CG Lab 内部) |
 
-| 子模块/目录 | 职责 | 关键内容 |
-|-------------|------|----------|
-| `standards/` | 方法论定义 | 十步循环、OpenSpec、约定 (含 secret-hygiene / **session-handoff**) |
-| `aria/` | 工具集 (Plugin) | Skills + Agents + Hooks 配置 |
-| `aria-plugin-benchmarks/` | Skill 基准测试 | AB 测试套件、结果存档、运维手册 |
-| `docs/handoff/` | Session handoff records | 跨 session 优先级 / carry-forward / 实战教训传递 (Rule #9) |
-| `aria-orchestrator/` | v2.0 运行时 (Layer 1/2) | Hermes fork / Docker 镜像 / Nomad job / ADR |
+常用定位:
 
-### 目录导航
+- 需求规范 → `standards/openspec/project.md` | 提交规范 → `standards/conventions/git-commit.md`
+- Secret 卫生 → `standards/conventions/secret-hygiene.md` (Rule #7)
+- 闸门权限归属 → `standards/conventions/configured-gate-authority.md` (Rule #10)
+- Session handoff → `standards/conventions/session-handoff.md` (Rule #9; §1.3 周期 vs 会话收尾消歧)
+- Rule #6 豁免判据 → `standards/conventions/skill-benchmark-exemption.md`
+- 版本/tag 规则 → `standards/conventions/version-management.md` (§4.3 分发型 vs meta-repo)
+- 其余 conventions (submodule-pointer / jq-CRLF / 并发写入安全等) → `standards/conventions/`
+- 需求文档 → `docs/requirements/` | 架构文档 → `docs/architecture/system-architecture.md`
+- 项目配置 → `.aria/config.json` (从 config.template.json 复制)
+- AB 运维手册 → `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` | AB 结果 → `aria-plugin-benchmarks/ab-results/`
 
-```
-需要理解 X? 找这里:
+**Plugin 调用** (Aria 仓内直调; 其他项目经 Plugin 安装用 `/aria:` 前缀): Skills 如 `/state-scanner` `/spec-drafter` `/workflow-runner`; Agents 如 `/tech-lead` `/backend-architect` `/knowledge-manager`。
 
-├── 项目定位       → standards/methodology/aria-brand-guide.md
-├── 工作流程       → standards/core/ten-step-cycle/
-├── 需求规范       → standards/openspec/project.md
-├── 提交规范       → standards/conventions/git-commit.md
-├── Secret 卫生   → standards/conventions/secret-hygiene.md (Rule #7)
-├── 闸门权限归属   → standards/conventions/configured-gate-authority.md (Rule #10, 2026-07-19; AI 不得自行豁免 enabled 闸门)
-├── Session handoff → standards/conventions/session-handoff.md (Rule #9, v1.21.0+; §1.3 周期vs会话收尾消歧 v1.50.0+)
-├── 会话收尾 (对话维度)  → aria/skills/session-closer/ (leaf skill, 正交于十步循环 Phase D; "对话收尾")
-├── Submodule pointer 卫生 → standards/conventions/submodule-pointer-hygiene.md (aria-plugin v1.49.0+ §C.2.4.5 mechanical gate companion, **block default** since v1.49.0; v1.28.0-v1.48.x warn-only)
-├── Shell jq CRLF 卫生 → standards/conventions/shell-jq-crlf-hygiene.md (aria-plugin v1.36.0+ #132 follow-up; CR 处理决策表 + jq-crlf-guard + crlf-shim 测试框架)
-├── 并发 Session 写入安全 → standards/conventions/concurrent-session-write-safety.md (aria-plugin v1.37.0+ #133; 并发安全写法主解药 + AI 记录硬证据自律 + 切口1/2 advisory; advisory-over-hardlock)
-├── 进度管理       → standards/core/progress-management/
-├── 研究文档       → docs/
-├── 需求文档       → docs/requirements/ (PRD + User Stories)
-├── 架构文档       → docs/architecture/system-architecture.md
-├── Session handoff → docs/handoff/{date}-{slug}.md (canonical, Rule #9)
-├── 项目配置       → .aria/config.json (从 config.template.json 复制)
-├── 配置加载       → aria/skills/config-loader/ (内部基础设施)
-├── Skill 基准测试 → aria-plugin-benchmarks/AB_TEST_OPERATIONS.md
-├── AB 测试数据    → aria-plugin-benchmarks/ab-results/latest/summary.yaml
-├── AB 固定测试集  → aria-plugin-benchmarks/ab-suite/
-├── Aria 2.0 架构决策  → aria-orchestrator/docs/architecture-decisions.md
-└── Layer 边界契约     → aria-orchestrator/docs/layer-boundary-contract.md
-```
+**子模块操作**: 更新 `git submodule update --remote [aria|standards]`; 首次 clone 后 `git submodule update --init --recursive`; 查状态 `git submodule status`。
 
-### Plugin 调用方式 (Aria 项目内部)
-
-在 Aria 项目内部，Skills 和 Agents 可以直接调用：
-
-```
-Skills:
-  /state-scanner
-  /spec-drafter
-  /workflow-runner
-
-Agents:
-  /tech-lead
-  /backend-architect
-  /knowledge-manager
-```
-
-其他项目通过 Plugin 安装后使用 `/aria:` 前缀。
-
-### Git 子模块操作
+**Forgejo API** (CF Access 后, 用 CLI wrapper `/home/dev/.npm-global/bin/forgejo`):
 
 ```bash
-# 更新所有子模块到远程最新
-git submodule update --remote
-
-# 更新单个子模块
-git submodule update --remote aria
-git submodule update --remote standards
-
-# 初始化 (首次 clone 后)
-git submodule update --init --recursive
-
-# 查看子模块状态
-git submodule status
+forgejo <METHOD> <ENDPOINT> [curl options]
+forgejo GET /repos/10CG/Aria/pulls                                # 列出 PR
+forgejo POST /repos/10CG/Aria/pulls -d '{"title":"...","head":"branch","base":"master"}'
 ```
-
-### Forgejo API (PR Operations)
-
-Forgejo 位于 Cloudflare Access 后，使用 `forgejo` CLI wrapper：
-
-```bash
-# 路径: /home/dev/.npm-global/bin/forgejo
-# 用法: forgejo <METHOD> <ENDPOINT> [curl options]
-
-forgejo GET /repos/10CG/Aria/pulls                    # 列出 PR
-forgejo GET /repos/10CG/Aria/pulls/1                   # 查看 PR
-forgejo POST /repos/10CG/Aria/pulls -d '{              # 创建 PR
-  "title": "feat: description",
-  "head": "feature-branch", "base": "master"
-}'
-forgejo POST /repos/10CG/Aria/pulls/1/merge -d '{"Do": "merge"}'  # 合并
-```
-
----
 
 ## 技术约束
 
-### Aria 不做什么
+- Aria 定义「如何思考 / 如何协作 / 如何决策」+ 文档格式 / 流程 / 命名规范; **不提供**代码生成模板, 不强制语言, 不绑定 AI 模型, 不提供 CI/CD 配置。
+- 例外: `aria-orchestrator/` 是方法论的**参考实现** (仅 10CG Lab 内部, 不对外发布, 不构成 Aria 对「实现」的背书)。
 
-- ❌ 不提供代码生成模板
-- ❌ 不强制特定编程语言
-- ❌ 不绑定特定 AI 模型
-- ❌ 不提供 CI/CD 配置
+## 版本管理
 
-### Aria 的边界
+- SemVer。Aria 约定: 新增 Skill / Skill 架构重构 = MINOR+; 文档更新 / bug 修复 = PATCH。
+- **版本 SOT = `aria/.claude-plugin/plugin.json`**; 派生文件 (marketplace.json / VERSION / CHANGELOG.md / README.md) 必须与其一致。
+- 发布同步面: aria 子模块 5 文件 + 主仓 gitlink + 主仓 VERSION + root README badge + i18n README (**仅正文实质变更**才重译, #140 B 档)。机械兜底: custom checks `m6-version-badge-match` / `i18n-readme-translation-currency`。
+- Skill 变更发版前须过 Rule #6 benchmark。多远程推送由 phase-c-integrator §C.2.5 自动化 (post-push SHA 验证); 手工路径守下方两条硬约束。
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Aria 的边界                           │
-├─────────────────────────────────────────────────────────┤
-│  ✅ 定义: 如何思考、如何协作、如何决策                 │
-│  ✅ 规范: 文档格式、工作流程、命名约定                 │
-│  ❌ 实现: 具体代码、工具配置、部署脚本                 │
-│  ✅ 实现 (v2.0): 端到端参考实现 (aria-orchestrator,    │
-│                  仅限 10CG Lab 内部)                    │
-└─────────────────────────────────────────────────────────┘
-```
+### 多远程推送 — 两条硬约束 (owner 裁决 2026-07-20, 根治 Aria #165)
 
-**v2.0 的例外**: Aria 2.0 的运行时层 (`aria-orchestrator/`) 是**方法论的参考实现**, 不是通用框架。它仅供 10CG Lab 内部使用, 不对外发布, 不构成 Aria 对"实现"的背书。其他项目仍应把 Aria 方法论视为"如何思考", 而非"用什么工具"。
+多远程一致靠**本地双推** (`git push origin && git push github`) 保证; #165 三次复发的根因都是有路径绕过了它。
 
----
+**约束 1 — 子模块合并一律本地做, 禁止 Forgejo 服务端合并**: 子模块 (aria / standards / aria-orchestrator) 的分支合并必须本地 `git merge` + 双推, **禁**用 Forgejo Web UI / API 的 `Do: merge`。原因: 服务端合并的 merge commit 只在 Forgejo 生成, 本地 master 从未 fast-forward ⇒ 本地双推与 C.2.5 结构上都不触发, 主仓随后 bump gitlink 即产生 orphaned gitlink, GitHub `clone --recursive` 断裂 (2026-07-14 事故)。例外: 主仓 (Aria) 自身 PR 可走 Forgejo merge — 它没有「被 bump gitlink」的下游。
 
-## 版本管理规范
-
-### 版本号语义
-
-遵循 [Semantic Versioning 2.0.0](https://semver.org/):
-
-```
-MAJOR.MINOR.PATCH
-
-MAJOR: 破坏性变更 / 架构重构
-MINOR: 新功能 / 向后兼容
-PATCH: Bug 修复 / 小改进
-```
-
-### Aria 特殊约定
-
-| 变更类型 | 版本变更 | 示例 |
-|----------|----------|------|
-| 新增 Skill | MINOR+ | 1.2.0 → 1.3.0 |
-| Skill 架构重构 | MINOR+ | 1.2.0 → 1.3.0 |
-| 文档更新 | PATCH | 1.3.0 → 1.3.1 |
-| Bug 修复 | PATCH | 1.3.0 → 1.3.1 |
-| 破坏性变更 | MAJOR+ | 1.x → 2.0 |
-
-### 版本信息文件架构
-
-```
-aria/
-├── .claude-plugin/
-│   ├── plugin.json       # 主版本文件 (真理来源 Source of Truth)
-│   └── marketplace.json   # 市场发布配置
-├── hooks/
-│   └── hooks.json        # Hooks 配置 (SessionStart 中断恢复检测)
-├── VERSION               # 人类可读版本快照
-├── CHANGELOG.md          # 版本变更记录
-└── README.md             # 包含版本号
-```
-
-### 版本发布检查清单
-
-每次发布新版本时，必须更新以下文件：
-
-```yaml
-真理来源 (Source of Truth):
-  - [ ] aria/.claude-plugin/plugin.json (version 字段)
-
-派生文件 (必须同步):
-  - [ ] aria/.claude-plugin/marketplace.json (version, plugins[].version)
-  - [ ] aria/hooks/hooks.json (确保 hooks 配置正确)
-  - [ ] aria/VERSION (创建或更新)
-  - [ ] aria/CHANGELOG.md (添加新版本条目)
-  - [ ] aria/README.md (更新版本号和 Skills 数量)
-
-Skill 基准测试 (新增或修改 Skill 时):
-  - [ ] /skill-creator benchmark 已执行 (with/without AB 对比)
-  - [ ] with_skill 通过率高于 without_skill (delta 为正值)
-  - [ ] 人类已审阅结果并确认 Skill 有正向价值
-  - [ ] 结果已存入 aria-plugin-benchmarks/ab-results/ (常态化积累)
-
-主项目:
-  - [ ] 更新子模块指针 (git add aria)
-  - [ ] 主项目/VERSION 更新插件版本记录
-  - [ ] 主项目 root README.md Plugin Version badge (L8 shields + Project Status 段) 同步插件版本
-        # badge 不在 aria/ 子模块 SOT 内, 每次 bump 易漏; 兜底 custom check m6-version-badge-match。
-  - [ ] 主项目 root i18n README (README.{zh,ja,ko}.md) — **仅当 README.md 正文实质变更** 时重译 (#140 B 档: 纯 badge/patch 免重译)
-        # 更新各文件顶部 <!-- translated-from: vX.Y.Z --> 标记; 兜底 custom check i18n-readme-translation-currency。
-
-多远程推送 (v1.15.0+ 自动化):
-  - [x] Phase C.2.5 自动推送所有 enforced remote + post-push SHA 验证 (见 aria/skills/phase-c-integrator/SKILL.md)
-  - [ ] 若 C.2.5 报错 → 按错误提示手动修复后继续
-  - [ ] 灾备 (C.2.5 完全不可用时, 保留作为人工 fallback):
-    - aria 子模块: git -C aria push origin master && git -C aria push github master
-    - standards 子模块 (如有变更): git -C standards push origin master && git -C standards push github master
-    - 主项目: git push origin master && git push github master
-```
-
-> **为什么需要多远程推送**: Claude Code 插件市场从 GitHub 拉取,Forgejo 是主开发仓库。
-> 仅推送 Forgejo 会导致市场版本滞后。2026-04-10 事故: aria v1.11.1 发版后未推送 GitHub,
-> 市场停留在 v1.11.0。
-
-#### 两条硬约束 (owner 裁决 2026-07-20, 方案 D + 纪律层; 根治 Aria #165 镜像漏推三次复发)
-
-多远程一致靠**本地双推**保证 —— 只要每次变更都经本地 `git push origin && git push github`,
-两个远程就同步。#165 三次复发的根因不是双推本身不够, 而是有路径**绕过了本地双推**。故立两条:
-
-**约束 1 — 子模块合并一律本地做, 禁止 Forgejo 服务端合并** (方案 D, 消除绕过路径):
-
-> 子模块 (aria / standards / aria-orchestrator) 的分支合并**必须在本地** `git merge` + `git push origin && git push github`
-> 完成, **禁止**用 Forgejo Web UI / API 的 `Do: merge` (服务端合并)。
-
-为什么: 服务端合并的 merge commit **只在 Forgejo 生成**, 本地 master 从未 fast-forward ⇒
-(a) 本地双推与 phase-c-integrator C.2.5 **结构上都不触发** (没有本地 commit 可推);
-(b) 主仓随后 bump 子模块 gitlink 时, 目标 SHA 尚未镜像到 GitHub ⇒ orphaned gitlink,
-从 GitHub `clone --recursive` 当场断裂。2026-07-14 aria-orchestrator 事故 (65 秒窗口) 即此。
-用 Web UI merge 是习惯不是必须; 改本地合并后, #165 的服务端合并根因直接消失。
-
-> **例外**: 主仓 (Aria) 自身的 PR 走 Forgejo merge 是可以的 —— 主仓没有「被别人 bump gitlink」
-> 的下游, 且主仓 merge 后本会经 C.2.5 / 灾备双推。约束 1 只针对**被主仓 gitlink 引用的子模块**。
-
-**约束 2 — 推后逐个 `ls-remote` 核验, 不信 push 回执** (纪律层, 治漏推 + 半推):
-
-> 双推完成后, 对每个 remote 独立 `git ls-remote <remote> master` 取 SHA 与本地比对,
-> **全部一致才算推成功**。**不得**以 push 命令的退出码 / 回执 (`Everything up-to-date` /
-> `Connection closed` 等) 作为成功判据。
-
-为什么: push 回执**两个方向都会骗人** —— (a) 连接在拆除阶段断开会报失败, 但 ref 其实已更新
-(假阴性, 诱发不必要的 force/回滚); (b) 连推两个 remote 时**前一个被并发拒、后一个成功**会造成
-**镜像半推分叉** (2026-07-20 本会话自制的第四种 #165 形态: 你以为推了, 其实只成了一半)。
-唯一可信判据是独立 ls-remote 查询, 且该查询本身可能因同一条坏连接失败 → **重试几次再下结论**,
-不能用「查询也失败」佐证「操作失败」。发现分叉后的安全处置见
-memory `feedback_partial_push_creates_mirror_divergence` (force 前三项前置核验)。
-
-> **与 phase-c-integrator C.2.5 的关系**: C.2.5 的 post-push SHA 验证做的正是约束 2 的机械化;
-> 手工双推 (灾备路径 / 子模块本地合并后) 时约束 2 由人/AI 执行。约束 1 是 C.2.5 触发前提的
-> 上游保证 —— 只有本地合并才让 master fast-forward, C.2.5 才有本地 HEAD 可推。
-
-### 版本信息一致性
-
-所有版本信息文件必须保持一致：
-
-| 文件 | 字段 | 示例 |
-|------|------|------|
-| plugin.json | `version` | `"1.3.0"` |
-| marketplace.json | `version`, `plugins[].version` | `"1.3.0"` |
-| VERSION | `版本` | `1.3.0` |
-| CHANGELOG.md | `## [X.Y.Z]` | `## [1.3.0]` |
-| README.md | `**Version**: X.Y.Z` | `**Version**: 1.3.0` |
-
-**重要**: `plugin.json` 是版本号的**真理来源 (Source of Truth)**，其他文件必须与其保持一致。
-
----
-
-## 与其他方法论的关系
-
-```
-                    DDD (领域驱动设计)
-                           │
-                           │ 延伸
-                           ▼
-                    AI-DDD (本项目的核心)
-                           │
-                           │ 具体化
-                           ▼
-                  十步循环 (工作流)
-                           │
-                           │ 形式化
-                           ▼
-                 OpenSpec (需求规范)
-```
-
----
+**约束 2 — 推后逐个 `ls-remote` 核验, 不信 push 回执**: 双推后对每个 remote 独立 `git ls-remote <remote> master` 取 SHA 与本地比对, **全部一致才算推成功**; push 退出码 / 回执两个方向都会骗人 (假阴性诱发误 force; 半推造成镜像分叉)。ls-remote 自身失败 → 重试几次再下结论。分叉后处置见 memory `feedback_partial_push_creates_mirror_divergence`。
 
 ## 不可协商规则
 
-这些规则是 Aria 的基石，违背它们就不符合 Aria 方法论:
+违背以下规则就不符合 Aria 方法论。每条详情见其 SOT, 此处只放判据本体:
 
-1. **所有需求变更必须有 OpenSpec** - Level 2 或 Level 3
-2. **十步循环不能跳过 Phase A** - 必须先理解现状再行动
-3. **文档与代码必须同步更新** - 架构文档与代码一致
-4. **每个提交必须遵循规范** - Conventional Commits 格式
-5. **项目变更必须在项目的 openspec/changes/ 目录** - 不得放在 `standards/openspec/changes/`
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  规则 #5: 变更位置边界 (OpenSpec 兼容)                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  aria-standards/openspec/changes/  → 已废弃，不应使用           │
-│                                                                 │
-│  项目/openspec/changes/            ← 正确位置                   │
-│  ├── Aria/openspec/changes/        → Aria 自身的变更            │
-│  └── your-project/openspec/changes/ → 用户项目的变更            │
-│                                                                 │
-│  原因: aria-standards 是共享子模块，变更应属于项目自身           │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-6. **Skill 基准测试必须使用 `/skill-creator`** - 不得使用自研 runner
-
-**规则 #6 要点:** 只有 with/without AB 对比能回答"Skill 是否提升了质量"。自研 runner (`aria-plugin-benchmarks/runner/`) 已废弃。
-
-**触发时机:** 新增 Skill / 修改 Skill 逻辑 / 修改 description / 发版前质量审计
-
-**豁免机制 — deterministic substitute (owner 裁决 2026-07-20, 三次收敛后成文):**
-
-> **判据 = 内容是否影响 AI 行为, 以及那个行为 AB 套件测不测得到。**
-> **不按文件落在哪个目录判** —— `references/` 下同时住着纯描述性内容 (schema / 字段 / 命令语法) 与
-> 处方性内容 (`references/rules/*` 的 dispatch 表 / 判定规则), 后者与 SKILL.md 正文同性质。
-> 同一文件两者并存时**逐 hunk 判**; 任一 hunk 落在「处方性且在测量范围内」⇒ 整个变更照跑。
+1. **所有需求变更必须有 OpenSpec** — Level 2 或 Level 3。
+2. **十步循环不能跳过 Phase A** — 先理解现状再行动。
+3. **文档与代码必须同步更新** — 架构文档与代码一致。
+4. **每个提交遵循 Conventional Commits**。
+5. **项目变更放本项目 `openspec/changes/`** — 不放 `standards/openspec/changes/` (standards 是共享子模块, 变更属项目自身)。
+6. **Skill 基准测试必须用 `/skill-creator`** (自研 runner 已废弃)。触发: 新增 Skill / 改逻辑 / 改 description / 发版审计。**豁免判据 = 内容是否影响 AI 行为 + 那个行为 AB 套件测不测得到** (不按文件目录判; 同文件两性质并存时逐 hunk 判):
 
 | 内容性质 | AB 测得到吗 | 处置 |
 |----------|------------|------|
-| 描述性 (schema / 字段 / 命令 / 溯源注释 / 行号勘正) | 不适用 | **substitute**: 结构化测试 (SC 级 baseline-failing, 必须在场) 替代 AB |
-| 处方性 · 运行时指令面 (SKILL.md 正文 / dispatch 表 / 判定规则) | 能 | **照跑 AB, 零裁量** |
-| 处方性 · 但治的行为在固定测试集覆盖外 (典型: authoring 向导) | 不能 | **不是简单豁免** —— 须同时: 点名行为 + 建可证伪的定向 fixture + 把套件缺口开成 issue (缺一回落照跑) |
-| 拿不准 | — | **照跑** (宁跑勿豁) |
+| 描述性 (schema / 字段 / 命令 / 勘正) | 不适用 | substitute: SC 级 baseline-failing 结构化测试替代 |
+| 处方性 · 运行时指令面 | 能 | 照跑 AB, 零裁量 |
+| 处方性 · 套件覆盖外 (典型: authoring 向导) | 不能 | 点名行为 + 建可证伪定向 fixture + 套件缺口开 issue (缺一照跑) |
+| 拿不准 | — | 照跑 (宁跑勿豁) |
 
-**SKILL.md 有变动**: 仅当是事实性同步 (溯源注释 / 行号勘正 / 术语修正) 且 frontmatter `description` 零变动,
-才可能落进第一行, 且须在 spec 里**逐行点名**并声明非指令语义变更; `description` 或指令流程变动 ⇒ 一律照跑。
+   `description` 或指令流程变动一律照跑; 豁免须在 spec/tasks 留 `rule6_note`。跑 benchmark 本身不需要 OpenSpec。SOT: `standards/conventions/skill-benchmark-exemption.md` + 手册 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`。
 
-**第三行不是逃生舱**: 它比照跑更麻烦 (定向 fixture + 记缺口), 这是刻意设计 ——
-对一个 AB 结构上测不到的行为跑 AB 是**测量剧场**, 但"跳过验证"同样不可接受, 所以换成能验到的手段 + 把盲区记成债。
+7. **Secret 写入/读取命令必须 redirect output** — stdout/stderr 不得流入 chat-visible 通道 (Bash 强制 `>/dev/null 2>&1`; Python subprocess 强制 `capture_output=True` 且不 print)。验证用 metadata (status code / key 名 / 长度), 不读 secret value 字面。Exception 须 `# secret-leak-ok-explicit` + 理由 + owner sign-off。SOT: `standards/conventions/secret-hygiene.md`。
+8. **PR merge 前必跑 pre-merge gate** — phase-c-integrator C.2.4 验证 (a) 本 PR CI passing; (b) main 无 in-flight CI run; 经 CI backend 抽象层调用 (Aether 默认)。无可用 backend 按 `no_ci_fallback` 显式降级; stub backend 抛 NotImplementedError 时 gate 必须 abort, 不得静默降级。SOT: `aria/skills/phase-c-integrator/SKILL.md §C.2.4`。
+9. **Session handoff 必须写 `docs/handoff/`** — 禁 `.aria/handoff/` (零 exception; 5 层 enforcement)。两个正交入口: 周期收尾 (phase-d-closer, cycle 单元) vs 会话收尾 (session-closer, session 单元)。机读 frontmatter 5 字段; 多终端场景经 claim/reconcile advisory 协调 (phase1_gate)。SOT: `standards/conventions/session-handoff.md`。
+10. **已启用的审计检查点不得由 AI 自行豁免** — enabled 闸门是 owner 的配置决定, 不是 AI 临场判断; 不得以「变更小 / Level 低 / 1:1 派生 / 性价比 / session 已长」等价值评估跳过、降级或改序。**豁免白名单 (仅四类, 封闭)**: config 显式 off / adaptive_rules 映射 / 已成文 lane 降级 / 结构性前提不成立 (审的对象整个未产生; 「存在但简单」不算)。AI 任何自作主张的流程判断必须写进 handoff 请复议。「跟踪 AI 判断准确率 → 放权」已否决, **不要再提议** (论证见规范 §4)。SOT: `standards/conventions/configured-gate-authority.md`。
 
-豁免使用时仍须在 spec/tasks 留 `rule6_note` 引用本机制 (留痕保留, 复议豁免)。
-
-**完整判据 + 决策表 + 已裁定样例 + AB 自身的两个已知测量缺陷:**
-`standards/conventions/skill-benchmark-exemption.md` (SOT)
-
-**操作:** `/skill-creator` → benchmark 流程 → 结果存入 `aria-plugin-benchmarks/ab-results/`
-
-**详细运维手册:** `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`
-
-**不需要 OpenSpec:** 运行 benchmark 是验证活动。发现需要改进时才需要 OpenSpec。
-
-7. **Secret 写入/读取命令必须 redirect output** - 详见 `standards/conventions/secret-hygiene.md`
-
-**规则 #7 要点:** Secret 命令的 stdout/stderr 不得流入 chat-visible 通道。Bash 强制 `>/dev/null 2>&1`; Python `subprocess` 强制 `capture_output=True` (且不 print) 或 `stdout=DEVNULL`。验证用 metadata (status code / 字段长度 / `nomad var get -out=keys` 仅取 key 名), 不读 secret value 字面。Exception 必须 `# secret-leak-ok-explicit` 注释 + 理由 + 隔离环境证据 + owner sign-off。
-
-**触发场景:** `nomad var put/get` / `kubectl create secret` / `vault kv put` / `gh secret set` / `forgejo POST /tokens` / cloud secret manager / DB password commands / `cat <key-file>` / `echo $SECRET` / `nomad job inspect` (含 runtime env)。完整清单见规范 §2。
-
-**Source incidents:** 2026-05-02 Aria 自身 (4 keys via `nomad inspect`) + 2026-05-06 truffle-hound (4 keys via Python subprocess inherit stdio); Forgejo Issue [#78](https://forgejo.10cg.pub/10CG/Aria/issues/78).
-
-**详细规范 + 正向 pattern + exception 模板:** `standards/conventions/secret-hygiene.md`
-
-8. **PR merge 前必跑 pre-merge gate** - 详见 `aria/skills/phase-c-integrator/SKILL.md §C.2.4` (v1.3.0+, v1.31.0+ 通过 CI backend 抽象层支持多 CI 后端)
-
-**规则 #8 要点:** Phase C.2 PR merge 前必须通过 phase-c-integrator C.2.4 pre-merge precondition gate 验证 (a) 本 PR CI 已 passing; (b) main 分支无 in-flight CI run。Gate 通过 **CI backend 抽象层** (`aria/skills/phase-c-integrator/scripts/ci_backends/`) 调用配置的 CI primitive — v1.31.0+ 支持多 backend (Aether 默认 / GitHub Actions stub),通过 `.aria/config.json` 的 `phase_c_integrator.pre_merge_gate.ci_backends` 或自动 probe 选择。`wait` 状态由 workflow-runner `wait_recoverable` 错误类型处理 (指数退避 + Ctrl-C escape hatch),**不**视为 workflow failure。
-
-**触发场景:** Phase C.2 action 流程中 (auto_merge 或 user-triggered merge) 必须经过 C.2.4 gate。`auto_merge=true` workflow 自动调用; `auto_merge=false` user 触发 merge 前由 phase-c-integrator 强制 invoke。
-
-**Source incidents:** 2026-05-02 SilkNode PR-321 cancel PR-322 main CI Run #3161 (459s 部署观测丢失);Forgejo Issue [#60](https://forgejo.10cg.pub/10CG/Aria/issues/60)。
-
-**Exception:** 项目无可用 CI backend (所有 backend probe=False) 时按配置 `phase_c_integrator.pre_merge_gate.no_ci_fallback` 降级:`skip_with_warning` (默认,记录到 workflow report) / `abort` (严格模式)。Exception 必须在项目 `.aria/config.json` 显式声明字段。**Backward-compat (v1.31.0+):** 旧 key `no_aether_fallback` 仍可读取并发 deprecation warning,将于 v2.0 移除。
-
-**NIE-propagation 安全约束 (v1.31.0+, Hard Constraint #7):** 当某 backend probe=True 但 query 方法 raise `NotImplementedError` (stub backend, 如 GitHub Actions v1.31.0 stub),gate **必须 abort** (raise to caller),**不允许** catch-and-route 到 `no_ci_fallback`。这防止"装了 `gh` CLI 但实际用 Aether"的项目因 GHA stub 抢先注册而 Rule #8 静默降级。如需禁用 backend probing,显式设 `ci_backends: []` (explicit disable)。
-
-**Primitive responsibility split:**
-- **CI backend 实现** 提供 query primitives (each backend in `ci_backends/`):
-  - Aether (默认 backend, 10CG Lab 内部): `aether ci status --branch X --in-flight --json` query (aether-cli #116 SHA `f29abee` 2026-05-06)
-  - GitHub Actions (stub v1.31.0+, real 实现 deferred): `gh run list --json` 待实施
-- **aria 消费 + verdict 计算**: phase-c-integrator C.2.4 + workflow-runner `wait_recoverable` + 本规则 #8 强制约束
-
-**详细实施规范:** `aria/skills/phase-c-integrator/SKILL.md §C.2.4` + §C.2.4.X CI Backends (与 Rule #7 引用 `standards/conventions/secret-hygiene.md` 同结构)
-
-9. **Session handoff docs 必须写在 `docs/handoff/`** - 详见 `standards/conventions/session-handoff.md` (aria-plugin v1.21.0+)
-
-**规则 #9 要点:** session handoff 文档 (`docs/handoff/{YYYY-MM-DD}-{slug}.md`) 必须写在 `docs/handoff/` (canonical), 禁止写 `.aria/handoff/*.md`。`.aria/` 是机器状态 namespace, `docs/` 是人类/AI 可读 prose namespace; handoff 是 prose 范畴。5 层 defense-in-depth: L1 PreToolUse hook 阻断写入 + L2 scan.py collector 检测 misplaced + L3 state-scanner 推荐迁移 + L4 本规范 (Convention SOT) + L5 phase-d-closer D.3 **及 session-closer step4** template 硬编码输出路径。
-
-**两种收尾 (session-closer-synthesis, 插件 v1.50.0+)**: handoff 由两个正交入口写出 —— **周期收尾** (`phase-d-closer`, cycle 单元, 十步循环 Phase D) vs **会话收尾** (`session-closer`, session 单元, leaf skill, owner 任意时刻调"对话收尾")。二者共享本规范 + 同一 handoff-write SOT (`handoff-mechanics.md`) 引用不复制, 工作单元不同不混淆。消歧矩阵见 `standards/conventions/session-handoff.md §1.3` (第三方 load-bearing)。
-
-**触发场景:** session 跨度 > 4h **或** 本 session 完整 ship ≥ 2 cycles/US **或** 本 session 跨 ≥ 2 phases。phase-d-closer D.2 archive 完成后, D.3 step 评估上述条件 (4-level fallback 信号), 满足则 prompt user 写 handoff (template `aria/templates/session-handoff.md`, 9-section skeleton 含 §0 入口 / §1-§7 标准段 / §8 memory entries)。
-
-**Source incidents:** 4 起 dogfood (SilkNode 2026-05-09 1 起 + Aria self 2026-05-13 3 起,含 H0 spec 起草本 session 自身);Forgejo Issue [#92](https://forgejo.10cg.pub/10CG/Aria/issues/92) (triage [#6170](https://forgejo.10cg.pub/10CG/Aria/issues/92#issuecomment-6170)).
-
-**Exception:** **零 exception** (与 Rule #7 不同, handoff 路径选择无 ambiguity 边缘场景)。任何 `.aria/handoff/*.md` 写入企图都应 redirect 到 `docs/handoff/`。
-
-**Extension** (multi-terminal-coordination, aria-plugin v1.22.x+):
-Rule #9 在 v1.22.x 引入机读 frontmatter schema (Layer H, §2.3, 5 字段:
-`track-id` / `owner-container` / `phase` / `status` / `updated-at`)。state-scanner
-Phase 1.16/1.17 从此跨分支 fetch + 重建多 track 看板,根除单写者 `latest.md` pointer
-branch-local siloing 问题。Layer L (TASK-010~022, P2 shipped) 补充 claim/reconcile
-协调机制:急切认领闸门 (phase1_gate) + orphan ref claim YAML + 确定性 reconcile 6-rule。
-详见 `openspec/changes/multi-terminal-coordination/`
-(Approved 2026-05-19 per DEC-20260519-001) + `standards/conventions/session-handoff.md §2.3`。
-
-**更新** (`interactive-session-dedup-coordination`, 完成 TASK-024 集成 + advisory 改造后): 上文所述 Layer L (`phase1_gate`) 的 `run_gate()` 原为死代码 —— 母 spec 的 TASK-024 集成从未落地 (P3 deferred, run_gate 零生产调用点; 缺口记录于 aria-plugin `skills/state-scanner/references/layer-l-integration.md`)。经 DEC-20260704-002 接活为 **advisory 认领**: AI 编排层 (state-scanner 阶段 2 / Phase B-entry) 首次接线 `run_gate()`,详见该 Spec proposal.md。
-
-**详细规范 + 9-section template + 5 层 enforcement matrix + migration notes:** `standards/conventions/session-handoff.md`
-
-10. **已启用的审计检查点不得由 AI 自行豁免** - 详见 `standards/conventions/configured-gate-authority.md`
-
-**规则 #10 要点:** `.aria/config.json` `audit.checkpoints` 配了 `convergence`/`challenge` 的闸门, **必须跑**。enabled 闸门是 **owner 的配置决定**, 不是 AI 的临场判断题 —— 不得以「变更小 / Level 低 / 被审对象是已审内容的 1:1 派生 / 性价比不高 / session 已很长 / 后面还有闸门兜底」等**价值评估**理由自行跳过、降级或改序。**闸门的价值恰恰在于「你事先不知道它这次会不会抓到」**; 且判断「要不要审自己」的是被审方, 天然不中立。
-
-**豁免白名单 (fail-closed, 仅此四类):** config 显式 `off` / `adaptive_rules` 的 Level→mode 映射 / 已成文的 lane 降级 (如 emergency hotfix) / 闸门的**结构性前提不成立** (审的对象整个未产生)。⚠️ 最易滑过的边界: 「对象不存在」合法, 「对象存在但做得简单所以不值得审」**不合法**。
-
-**Source incident (2026-07-19 Aria #166 cycle):** AI 以「Level 2 + 任务是已 audited 11 条 SC 的 1:1 派生」跳过 enabled 的 post_planning; 而同 cycle **跑了的** post_spec 抓到 1 Critical + 1 Major (缺陷 2 修复位置钉错文件 —— 若不抓则测试全绿、验收全满足而 issue 危害原封不动)。
-
-**配套习惯 (低成本, 必做):** AI **任何**自作主张的流程判断 (跳过/降级/改序/替代) 必须在 session handoff 显式写「跳了什么 + 理由 + 请复议」, 使其永不悄悄沉淀为惯例。#166 正是靠这条才被摆上台面。
-
-**Exception:** 零 exception。某闸门若确实不该跑, 应改 config/skill 把豁免**写成机制**, 而非让 AI 每次判断。
-
-> **已否决方案**: 「跟踪 AI 判断准确率 → 逐步放权」经评估否决 (owner 2026-07-19) —— **跳过即销毁标签** (结构性); 唯一诚实设计「照跑+封存判断作对照」量具比被测物贵; 便宜版本「没出事=判断对」对「跳错但未浮出」结构性失明, 会拿假证据发更大裁量权 (**假绿长在元层面**)。**不要再提议**。完整论证见规范 §4。
-
-**详细规范 + fail-closed 白名单 + 否决论证 + enforcement layer 诚实声明 + 采用方落地四步:** `standards/conventions/configured-gate-authority.md`
-
----
-
-## Aria 2.0 运行时 (参考实现层, v2.0.0 in progress)
-
-Aria 2.0 引入"参考实现层", 把 v1.x 的十步循环方法论**端到端自动化**。这一层**不改变方法论本体**, 只改变执行主体。
-
-### 分层叙述
+## Aria 2.0 运行时
 
 ```
 方法论层  standards/          ← 思考/协作/决策规范 (v1.x 不变)
-工具层    aria-plugin (+ CC)  ← 交互式使用 (不变) + Layer 2 容器内嵌
-运行时层  aria-orchestrator/  ← v2.0 新增, 仅 10CG Lab 内部
-          ├── Layer 1: Hermes + Luxeno-routed GLM models (AI 主管)
-          └── Layer 2: aria-runner 容器 (AI 工程师)
+工具层    aria-plugin (+ CC)  ← 交互式使用 + Layer 2 容器内嵌
+运行时层  aria-orchestrator/  ← Layer 1 主管 + Layer 2 工程师 (仅 10CG Lab 内部)
 ```
 
-### 与 10 条不可协商规则的关系
-
-v2.0 运行时**严格遵守** 10 条规则, 规则由 Layer 2 容器内的 aria-plugin 负责执行:
-- Rule #1 OpenSpec: Layer 1 在 S1_TRIAGED 前确认 issue 是否有对应 Spec
-- Rule #2 十步循环不跳过 Phase A: Layer 2 执行完整十步循环
-- Rule #3 文档同步: Layer 2 在 S5_REVIEWING 前强制 arch-update
-- Rule #4-6: Layer 2 按 v1.x 语义执行
-- Rule #7-9: Layer 2 内 Claude Code 实例遵守相同 secret / pre-merge / handoff 规则
-- Rule #10 审计检查点不得自行豁免: Layer 2 按 `.aria/config.json` 跑满 enabled checkpoint (自主运行时无人复议, 该约束更硬)
-
-### 人类参与点
-
-v2.0 保留 **1 个** 人类参与点 (AD10 human gate): S7_AWAITING_MERGE, 产品负责人通过 Feishu 签字 merge PR。其他阶段完全自主。
-
-### 详细入口
-
-- 架构决策: [aria-orchestrator/docs/architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md)
-- Layer 边界契约: [aria-orchestrator/docs/layer-boundary-contract.md](aria-orchestrator/docs/layer-boundary-contract.md)
-- PRD v2.0: [docs/requirements/prd-aria-v2.md](docs/requirements/prd-aria-v2.md)
-- 系统架构: [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md)
-- M0 Spec (历史): [openspec/archive/2026-04-17-aria-2.0-m0-prerequisite/proposal.md](openspec/archive/2026-04-17-aria-2.0-m0-prerequisite/proposal.md)
-
----
+v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin 执行; 自主运行时无人复议, Rule #10 更硬)。人类参与点仅 1 个 (AD10): S7_AWAITING_MERGE 由产品负责人 Feishu 签字 merge。入口: [architecture-decisions.md](aria-orchestrator/docs/architecture-decisions.md) / [layer-boundary-contract.md](aria-orchestrator/docs/layer-boundary-contract.md) / [PRD v2.0](docs/requirements/prd-aria-v2.md) / [系统架构](docs/architecture/system-architecture.md)。
 
 ## 项目状态
 
 ```
-当前阶段: v2.0 M6 执行中 (M1-M5 shipped; 成熟度 ~0.9 — 端到端验证 + 多终端协调 + 跨 30+ Spec + AB 累积)
-  M6 sub-Specs: #1 cost + #3 docs 已归档; #2 e2e-resilience 代码侧完成 (未归档, 待 168h 跑); #4 release-closeout sequential 待
-  ⚠️ 168h 自主跑 ≠ make-ready: pre-flight (2026-07-02) 证自主 E2E 从未闭环 (数字-id dispatch 100% S_FAIL)。三门未清:
-    - Blocker 3 输入投递 (`aria-2.0-m6-dispatch-input-delivery`, A.3 30-task post_planning CONVERGED): **Phase B.2 实现完成 + pre-merge code-reviewed** (aria-orchestrator `feature/m6-dispatch-input-delivery`, 26/30 task 绿 / 1 Critical 修 / WIP 未 merge)。**卡 Phase C.2 合并**于 4 owner/infra 门: build(021) / deploy(镜像先) / egress(028) / E2E dogfood(029=AC-1, 受 **Blocker 4**)
-    - Blocker 4 Luxeno 后端延迟 45-54s (owner/基建门, 非 mihomo)
-    - 遥测 Spec (AC-6 评分依赖, 独立) — **Approved + Track-1 实施完成** (`aria-2.0-m6-cost-model-telemetry`, owner 批准 2026-07-09; DEC-20260709-001 v2 4-agent 设计审议 + post_spec 5-agent R1→R3 CONVERGED)。范围: Layer2 cost/model 遥测回报 + 容器模型接线统一 [smart-sonnet 清 + 单源 ANTHROPIC_DEFAULT_OPUS_MODEL + served-model 观测 (记 served 非 intended, echo 失效模式待 AC-10 活体)]。**Track-1 (Layer1 遥测管道 Phase 4-5) 动态工作流实施完成**: aria-orchestrator `feature/m6-cost-model-telemetry` @ `92acce5` (叠 input-delivery, migration 009 [5.1→5.2]; dispatch_telemetry 表 + marker 解析 fail-toward-warn + cost.json 评分; 979+196 tests 绿; code-reviewer PASS + silent-failure-hunter echo-caveat 修/0 Critical) —— **合并 gate input-delivery** (选项 A stacked, schema/migration 文件级重叠不可并行占号)。⚠️ 红旗: glm-5.2 cutover 对容器疑 inert (--model smart-sonnet 非 canonical alias 使 ANTHROPIC_DEFAULT_OPUS_MODEL 结构性 inert) 待 AC-10 活体验。Track-2 容器侧 gate input-delivery; Track-3 AC-10 gate Luxeno Blocker 4。**依赖链** (input-delivery ↔ 遥测 disjoint): 168h 跑 AC-6 cost 维度可评分须遥测 Spec 独立 ship — input-delivery ship 不代表对 AC-6 可评分
-  M7 aria-fleet: 2 sub-Spec (fleet-aggregation + agent-lifecycle) Approved 2026-06-18; Phase B 受 D3 门 (M6 release-closeout ship 后)
-  aria-plugin 方法论轨 (已 ship 归档, v1.52.0–v1.58.0, 与 M6/M7 正交): interactive-session-dedup-coordination / archive-gate-runtime-reality / runtime-probe-archive-gate-integration / agent-router-auto-project-agent-injection / coordination-claim-lifecycle-and-overlap / state-scanner-issue-cache-freshness(C) / state-scanner-snapshot-stderr-secret-leak(B) — 详见 aria/CHANGELOG.md (SOT) + docs/handoff/ + 各 openspec/archive/
-  aria-plugin 方法论轨 (与 M6/M7 正交): `state-scanner-stale-refs-false-parity` (false-parity 三 spec 之主; sync_status/overall_parity 陈旧 remote-tracking ref 下撒谎报 parity=equal): **Phase 0 SHIPPED v1.59.0 / Phase 1-3 核心 SHIPPED v1.60.0 / Phase 4 收口 SHIPPED v1.62.0 (2026-07-19)**。核心四段式 (F1′ 双轴谓词 evidence_grade + F2′ 退役 mtime + F3′ remote_refresh 并行 fetch + F4′ overall_parity 四子句 fail-CLOSED + F10″ gitlink_integrity 九分支域 + F9′ sync.py 消费) 见 v1.60.0 条目与 CHANGELOG。**Phase 4 (29 TODO 实质收口, v1.62.0)**: 6.1/6.2/1.6 F5′ enforced/read_only 接进核心裁决 (⚠️行为变更: 两键从惰性配置变承重; 命名空间按 phase-c-integrator §C.2.5 契约继承顶层, 消 cross-skill split-brain) + 3.4 git 非交互契约 (stdin/GIT_TERMINAL_PROMPT/BatchMode 收在 _run 单一咽喉点) + 2.12 AC-5 跨 collector 自洽检测 (装配层实现, 检测集=裁决集) + 1.10/7.2 退役 verify_mode=ls_remote (第三个独立可达性计算点) + 13.3/9.2 drift 第七路 + OQ-C 裁定 (不造有状态冷却) + 文档/测试收口。测试 1232→1250; **双轮独立对抗 review 2C+5I+3M 全修** (AC-5 探针 fail-OPEN 且被自己测试锁死 / task 1.6 继承在最常见配置形态下未生效 / reachable 退役留下活消费方 —— 三条均属「勾选完成≠运行现实」); 真实 dogfood 抓到主仓落后并发 bot 4 commit (本 spec 能力自证)。aria PR#115 `9af7b21`。**spec tasks 102/119 done, 9 项活跃未勾明示未做** (3.5d 退避 / 3.16 k_eff observed_rotation DEFERRED fail-CLOSED / 5.5 死码 docstring / 3.10·13.7 审计产出 / 11.1 AB benchmark)。**follow-up**: Aria #165 (镜像漏推) 已产出 A/B/C 评估报告 (issue 评论) — 核心结论: F10″ **不可**直接复用为 bump 守卫 (私有符号 + 深绑 scan 缓存 + 收敛语义在单点无定义), B 成本按「新写」估; 推荐 C 但先做 A (owner 门: push mirror 凭据)。**post_planning 补跑 (owner 按不可协商规则 #10 裁定, 我曾自行豁免)**: R1 5 席 → 1 Critical + 9 类 Major + 18 Minor; R2 2 席 → 零 fix-introduced regression + 3 条新发现。**闸门抓到了两轮 pre-merge review 没抓到的东西**, 含一条**已 ship 的红测试** (session-closer 夹具未随 reachable→fetch_ok 修复跟改; state-scanner runner 的 TESTS_DIR 硬编码看不见别的 skill = 结构性漏检) 与 **AC-5 虚标** (勾了但只实现到 advisory 级, 裁决级未实现 —— 已在归档 proposal + CHANGELOG 两处降级声称)。R2 另抓残留 → **v1.62.1** (parity=equal + 陈旧证据在 handoff 零告警而 scanner 判 False, 本 spec 的病在姊妹消费方复发)。停在 R2 未收敛, 剩余全挂 **Aria #168** (需 owner 裁: 7.2 理由互斥 / M-I 架构偏离 / 跨 skill 测试入口)。本 session 与 bot 撞车 3 次, **三次都是 overall_parity 诚实报 False 抓到的**。详见 docs/handoff/
-  aria-plugin 方法论轨 (与 M6/M7 正交): `state-scanner-openspec-collector-false-green` (Aria #166 三缺陷: OpenSpec 维度沉默假绿, 消费方 Aether 中招 8 周): **✅ SHIPPED v1.61.0 (2026-07-19)** — 缺陷1 `collectors/openspec.py` changes/ 缺失 early-return 静默全零且连带不扫正交 archive/ (归档完最后一个 spec → git 丢弃空目录 → 与「没用 OpenSpec」输出等价) → 移 early-return (loop 改 guarded iterable 防 FileNotFoundError) + archive/ 始终扫 + 高置信 `layout_drift` soft_error (archive 非空或裸/错位 proposal 才发, 冷启动与无 openspec/ 静默) + configured 保 False 由 soft_error 消歧 (新组合 configured=False ∧ archive.total>0); 缺陷2 `lib/spec_complete.py::gate_result` 对 detailed-tasks.yaml-only spec 早退致归档安全网失明 (verdict=pass/d_payload=None, headless 一个 tracker 不建) → 追 unverified_claims 条目(含 symbols) + verdict=warn + 构造非 None d_payload, 点亮 warn_overlay frontmatter + D auto-issue 两条 #95 既有通道 (零改 openspec-archive, 遵循 `_fold_runtime_probe` 主线双写先例); 缺陷3 `_status.py` done 家族加 `completed` (#101 词边界过度收紧致 Completed→unknown + design_deferred 噪音; `\bcompleted\b` 不匹配 uncompleted, #101 保持闭合)。post_spec convergence **R1→R4 CONVERGED** (R1 3-agent 收敛 Critical: 缺陷2 位置钉错——继承 issue 自身 mis-citation, 真实生产者是 gate_result 非 collector 展示字段; R2 3-agent 收敛 Major: 「仅 warn 即经 Step7 surface」被源码证伪, D-tracker 门控 d_payload!=null 不看 verdict; R3 rationale-only Major 先例定性弄反; R4 零新 finding); pre-merge code-reviewer PASS(0C/0I) + silent-failure-hunter 抓 **1 MEDIUM fix-introduced regression** (stray 检测器 `except OSError: pass` 系本 change 立意要杀的同款静默吞咽) → 改发 `openspec_scan_failed` + archive iterdir 对称 fail-soft + 2 OSError 测试。TDD 三缺陷各 baseline-failing RED 先行 + 3 对称负控; 13 新测试; 全量 **1232 绿**; dogfood scan.py exit=10 + archive.total 正确。**版本让位** v1.60.0 给并发 ship 的主 spec, rebase 无冲突 (改动区域不相交)。aria `55ab21d` (PR #112) / 主仓 gitlink `d7b2a4f`。**follow-up**: aria-plugin #113 (gate_result 完整解析 detailed-tasks.yaml — 精确 per-spec verdict 取代 blanket unverified + 顺带修 carry_forward_inventory 展示假绿) + #114 (归档门 artifact 分类器路径正则硬编码 ab-results|ab-suite 致非-AB dogfood 声称恒 warn, 归档本 spec 时实证)。Phase D 归档 `openspec/archive/2026-07-19-state-scanner-openspec-collector-false-green` (verdict=warn 经 #95 warn_overlay 记入 frontmatter: 归档门 artifact 分类器路径正则硬编码只认 ab-results|ab-suite, 非-AB dogfood 声称结构性恒 warn — 真实执行记录已落盘 dogfood-evidence.md)
-  → 详细进展见 docs/handoff/ (latest, Rule #9 canonical) + 各 Spec proposal.md + Aria #147
-
-版本: 插件 aria-plugin v1.64.0 (35 user-facing + 7 internal Skills, 11 Agents) | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (`86bb684`)
-  → 完整版本变更史见 aria/CHANGELOG.md (SOT); 运行时 Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
+当前阶段: v2.0 M6 执行中 (M1-M5 shipped)。168h 自主跑三门未清:
+  - Blocker 3 输入投递: spec aria-2.0-m6-dispatch-input-delivery — B.2 实现完成
+    (aria-orchestrator feature/m6-dispatch-input-delivery), 卡 C.2 合并于 4 owner/infra 门
+  - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门)
+  - 遥测 spec aria-2.0-m6-cost-model-telemetry — Track-1 实施完成
+    (feature/m6-cost-model-telemetry, 合并 gate input-delivery); 168h AC-6 可评分须其独立 ship
+  M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
+  aria-plugin 方法论轨: v1.52.0–v1.64.0 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
+    残余 deferred 挂 Aria #168; 并发 in-flight track 见 docs/handoff/latest.md
+版本: 插件 aria-plugin v1.64.0 | 主项目 v1.7.3 | 运行时 aria-orchestrator v2.0.0 (86bb684)
+  Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
-### User Story 编号分区
+进展查询: `/state-scanner` (live) | session 史 → `docs/handoff/` (Rule #9 canonical) | 版本史 → `aria/CHANGELOG.md` (SOT) | 活跃 spec 详情 → `openspec/changes/*/proposal.md`
 
-```
-US-001~009: v1.x 已有 (done/in_progress/pending)
-US-010~019: v1.x 新增 (Agent Team 质量 + 项目适配)
-US-020~027: v2.0 (待起草)
-```
+**User Story 编号分区**: US-001~009 v1.x 已有 | US-010~019 v1.x 新增 | US-020~027 v2.0 待起草
 
 ---
 
-> **进展查询**: 当前状态见上「项目状态」段 (live 覆写) | session 进展史 → `docs/handoff/` (Rule #9 canonical, 用 `/state-scanner` 查) | 版本变更史 → `aria/CHANGELOG.md` (SOT)
-> **CLAUDE.md 不保留 changelog / session 流水** (规矩: `standards/conventions/claude-md-hygiene.md`, Option A 彻底移交 — 时效内容归各自 canonical 家, CLAUDE.md 只放稳定「如何理解项目」)
-
-**维护**: 10CG Lab
-**主仓库**: https://github.com/10CG/Aria
-**插件仓库**: https://github.com/10CG/aria-plugin
-**规范仓库**: https://github.com/10CG/aria-standards
+**维护**: 10CG Lab | **主仓**: https://github.com/10CG/Aria | **插件**: https://github.com/10CG/aria-plugin | **规范**: https://github.com/10CG/aria-standards

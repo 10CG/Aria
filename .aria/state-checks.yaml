@@ -181,8 +181,8 @@ checks:
       if [ "${ROLL:-0}" -gt 0 ]; then
         echo "REGROWTH — footer 有 $ROLL 条滚动 changelog (Option A 禁止, 移交 docs/handoff/)"; exit 1
       fi
-      if [ "$LINES" -gt 640 ]; then
-        echo "BUDGET — CLAUDE.md $LINES 行 > 640 (疑 changelog/流水回涨, 核对时效内容是否该移交)"; exit 1
+      if [ "$LINES" -gt 200 ]; then
+        echo "BUDGET — CLAUDE.md $LINES 行 > 200 (官方 memory 指南目标; 疑 changelog/流水/skill 设计术语回涨, 核对时效内容是否该移交)"; exit 1
       fi
       echo "OK (no rolling changelog; $LINES lines)"
     severity: warning
