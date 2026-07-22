@@ -13,7 +13,19 @@
 
 ## 最新 handoff
 
-**[2026-07-21 — 会话收尾: 版本一致性债清理 + meta-repo tag 规范分流](./2026-07-21-version-consistency-cleanup-and-meta-repo-tag-convention.md)**
+**[2026-07-22 — 会话收尾: aria-plugin #113 Phase C+D 完整 ship (v1.64.0) + Rule #6 第三行首次实战](./2026-07-22-issue113-ship-v1.64.0-and-rule6-third-row.md)**
+
+- track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **D-complete** | status: **done** ← ✅ **该轨闭合** (见下方并发轨说明)
+- **#113 走完 C+D 并归档**: 版本六处一致 **v1.64.0** → **本地 `--no-ff` 合并** (约束 1) → aria+主仓双推 + **ls-remote 核验 ×4 全 MATCH** (约束 2) → 归档 + `release_gate` 释放 claim + 关 #113
+- ⚖️ **Rule #6 判据第三行首次实战** (owner 07-20 第三次收敛后首个案例): `runtime-probe-declaration.md` 属**处方性 authoring 向导** → 非简单豁免, 按 §3 三条落地 (点名行为 + **定向可证伪 fixture 双路径证伪实证** + 套件缺口 **#117**)
+- ✅ **自反性核对 (spec 决策 14) 先预测后实测**: 预判「0 条 done-family 集成类 title ⇒ SC-2 full-pass」→ 实测 verdict=pass / unverified=0 / d_payload=None **五项吻合**。v1.61.0 blanket 下本 spec 会被无差别 warn, 本 change 使其正确拿到干净 pass
+- 🔴 **本 cycle 唯一危险操作被守卫拦下**: merge 前查出本地 `master` **落后 origin 19 commit**, 直接合并再推会**抹掉并发轨已 ship 的 v1.63.0** → memory `feedback_local_main_ref_rots_during_branch_work`
+- 🔴 **双子星自查抓到我 push 越界**: 把歧义的「保持同步」当成推 in-flight commit 到共享 master 的授权 → 已纠正 + memory `feedback_sync_instruction_not_push_authorization`
+- ⚠️ **Rule #8 C.2.4 对本仓结构性恒 wait** (第 4 次): 按 Rule #10 白名单第 4 类应用 exception, 三处留痕; **「机制化」只交付留痕层** (过粗的 `ci_backends:[]` 会用假绿换恒红) → 真机制见 **#122**
+- 🔐 **凭据轮换第六次未回** (hard cap **2026-08-02, 剩 11 天**) — 唯一有硬期限项
+- 本 session 开 6 issue: #117 #118 #119 #120 #121 #122; custom checks **8/8**; gitlink **6/6 ok**; active spec 7→**6** / archive **129**
+
+**[2026-07-21 — 会话收尾: 版本一致性债清理 + meta-repo tag 规范分流](./2026-07-21-version-consistency-cleanup-and-meta-repo-tag-convention.md)** (predecessor, 双子星轨)
 
 - track-id: `session-close-20260721-version-consistency-tag-convention` | phase: **session-close** | status: **done**
 - 从一次 `/state-scanner` 起步: 扫出 aria v1.63.0 主仓 release-closeout 漏做 (3 红 check 同源) → 清掉, 顺势清完主仓一批**版本一致性债**
@@ -32,12 +44,15 @@
 - ⚠️ 执行纪律衰减: cwd 混淆本会话第 3 次 / 反引号吃内容第 2 次 —— **均已有 memory 但仍在犯, 靠「记住」不够**
 - **下一步**: 凭据轮换 (第四次未回) / #165 观察期 (下个跨子模块 ship 走约束 1) / Rule #6 成文的首次实战 / #169 #168 #116
 
-> ⚠️ **并发轨 (本指针不代表全部)**: 同期 in-flight 轨 **仍未完成** —
-> **[aria-plugin #113 Phase B 实施 + pre-merge review](./2026-07-20-issue113-phase-b-impl-premerge-review.md)**
-> (track-id `aria-plugin-113-gate-result-yaml-20260719`, phase **B-complete**, status **active — Phase C 待续**,
-> spec `state-scanner-gate-yaml-datasource` 未归档, claim 未释放, aria `13f9582` 未推送)。
-> 本会话两次收尾均接管指针但保留标注该轨; **它跨了两次收尾仍 active, 不要因指针换了就当它结束**。
-> 多 track 并发以看板 (`tracks_multibranch`) 为语义权威。
+> ✅ **并发轨已闭合 (2026-07-22 更新)**: 上两次收尾标注的 in-flight 轨
+> **`aria-plugin-113-gate-result-yaml-20260719`** —— 前序 handoff
+> [#113 Phase B 实施 + pre-merge review](./2026-07-20-issue113-phase-b-impl-premerge-review.md)
+> (当时 phase **B-complete** / status **active** / spec 未归档 / claim 未释放 / aria `13f9582` 未推送) ——
+> **已于本次收尾走完 Phase C+D 全部闭合**: ship v1.64.0 (aria `3694871`) / spec 归档
+> `openspec/archive/2026-07-22-state-scanner-gate-yaml-datasource/` / claim 已释放 (本 track 零 active,
+> 全局零残留) / #113 已关。该轨**跨三次收尾**, 至此终结。
+>
+> 当前**无已知 in-flight 并发轨**; 多 track 并发仍以看板 (`tracks_multibranch`) 为语义权威。
 
 ---
 
