@@ -77,7 +77,7 @@ tasks:
   - id: TASK-001
     task_group: TG-1
     title: "切片器物理归位: _TASK_ID_LINE_RE + _split_task_blocks 迁入 lib/detailed_tasks.py"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -93,7 +93,7 @@ tasks:
   - id: TASK-002
     task_group: TG-1
     title: "status 抽取层: range-bounded + indent-anchored 解析 + 归一化链 + fail-CLOSED 白名单"
-    status: pending
+    status: done
     complexity: L
     est_hours: 10
     agent: backend-architect
@@ -114,7 +114,7 @@ tasks:
   - id: TASK-003
     task_group: TG-2
     title: "gate_result yaml-only 分支三态化 + scoped 属实性条目 + 既有测试改写"
-    status: pending
+    status: done
     complexity: L
     est_hours: 10
     agent: backend-architect
@@ -134,7 +134,7 @@ tasks:
   - id: TASK-004
     task_group: TG-2
     title: "probe fold 可达性窄化重构 (仅 yaml-present 臂) + 护栏测试 docstring 收窄"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -151,7 +151,7 @@ tasks:
   - id: TASK-005
     task_group: TG-2
     title: "is_spec_complete yaml tasks-branch (OR 左半对称扩展) + docstring :12-16 同步"
-    status: pending
+    status: done
     complexity: M
     est_hours: 5
     agent: backend-architect
@@ -169,7 +169,7 @@ tasks:
   - id: TASK-006
     task_group: TG-3
     title: "carry_forward_inventory yaml fallback (precedence 一致)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -187,7 +187,7 @@ tasks:
   - id: TASK-007
     task_group: TG-4
     title: "SC-8 golden 真语料测试 + SC-9 全量回归账目"
-    status: pending
+    status: done
     complexity: M
     est_hours: 5
     agent: qa-engineer
@@ -202,7 +202,7 @@ tasks:
   - id: TASK-008
     task_group: TG-4
     title: "SC-10 dogfood 端到端 (scan.py 合成 fixture + --gate CLI)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: qa-engineer
@@ -216,7 +216,7 @@ tasks:
   - id: TASK-009
     task_group: TG-4
     title: "四处文档同步 (Rule #3)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -233,7 +233,7 @@ tasks:
   - id: TASK-010
     task_group: TG-4
     title: "follow-up issue 开立 + 发版五处 + gitlink bump + badge"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: knowledge-manager
