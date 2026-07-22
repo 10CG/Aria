@@ -126,6 +126,8 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
 
 ## 项目状态
 
+> 写入前读我: 本段**覆写非追加**, 预算 15-20 行。新事实先落 canonical 家 (CHANGELOG / handoff / proposal), 这里只放指针; **skill 设计术语不入内** (污染 AB baseline, #116)。规矩: `claude-md-hygiene.md §2.4`。
+
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)。168h 自主跑三门未清:
   - Blocker 3 输入投递: spec aria-2.0-m6-dispatch-input-delivery — B.2 实现完成

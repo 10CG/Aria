@@ -172,23 +172,30 @@ checks:
   - name: "claude-md-changelog-free"
     description: |
       CLAUDE.md 卫生规范 (standards/conventions/claude-md-hygiene.md, Option A 彻底移交):
-      CLAUDE.md 不得累积版本 changelog / session 流水。footer 只放指针, 不放
-      `> 前次` / `**更新**:` 滚动条目; 时效内容归 docs/handoff/ (Rule #9) +
-      CHANGELOG.md (SOT)。本 check = 防"砍完又长回来"的根因兜底 (2026-07-03 瘦身)。
+      CLAUDE.md 不得累积版本 changelog / session 流水 / skill 设计内部术语。footer 只放指针;
+      时效内容归 docs/handoff/ (Rule #9) + CHANGELOG.md (SOT)。双预算 (行 200 + 字节 24000,
+      2026-07-22): 行数对齐官方 memory 指南, 字节堵长行钻空。写入时刻纪律见规范 §2.4。
+      本 check = 防"砍完又长回来"的根因兜底 (2026-07-03 首瘦 + 2026-07-22 二瘦)。
     command: |
       ROLL=$(grep -cE '^> 前次|^\*\*更新\*\*:|^\*\*最近更新\*\*:' CLAUDE.md 2>/dev/null)
       LINES=$(wc -l < CLAUDE.md)
+      BYTES=$(wc -c < CLAUDE.md)
       if [ "${ROLL:-0}" -gt 0 ]; then
         echo "REGROWTH — footer 有 $ROLL 条滚动 changelog (Option A 禁止, 移交 docs/handoff/)"; exit 1
       fi
       if [ "$LINES" -gt 200 ]; then
         echo "BUDGET — CLAUDE.md $LINES 行 > 200 (官方 memory 指南目标; 疑 changelog/流水/skill 设计术语回涨, 核对时效内容是否该移交)"; exit 1
       fi
-      echo "OK (no rolling changelog; $LINES lines)"
+      if [ "$BYTES" -gt 24000 ]; then
+        echo "BUDGET — CLAUDE.md $BYTES 字节 > 24000 (行数达标但单行爆表 = 长行钻空; 见 claude-md-hygiene.md §2.4)"; exit 1
+      fi
+      echo "OK (no rolling changelog; $LINES lines, $BYTES bytes)"
     severity: warning
     fix: |
       把 footer 滚动条目 / 内联版本 changelog 移交 docs/handoff/ (Rule #9) + CHANGELOG.md (SOT);
-      项目状态段原地覆写非 append。见 standards/conventions/claude-md-hygiene.md (Option A)。
+      项目状态段在 15-20 行内原地覆写非 append, 新事实先落 canonical 家、这里只放指针,
+      skill 设计术语不入内 (污染 AB baseline, aria-plugin #116)。
+      见 standards/conventions/claude-md-hygiene.md §2.3/§2.4 (Option A + 写入时刻纪律)。
     timeout_seconds: 5
     enabled: true
 
