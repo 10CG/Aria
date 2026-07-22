@@ -13,7 +13,17 @@
 
 ## 最新 handoff
 
-**[2026-07-22 — 会话收尾: aria-plugin #113 Phase C+D 完整 ship (v1.64.0) + Rule #6 第三行首次实战](./2026-07-22-issue113-ship-v1.64.0-and-rule6-third-row.md)**
+**[2026-07-22 — 会话收尾: CLAUDE.md 官方规格瘦身 (#116 根因修复) + 进货口双堵 + #165 收窗裁定](./2026-07-22-claude-md-official-spec-diet-and-116-root-fix.md)**
+
+- track-id: `session-close-20260722-claude-md-diet-116-root-fix` | phase: **session-close** | status: **done**
+- **本段主线 = 一次完整的「前提被推翻」**: #116 triage (confirmed/major, repro 3/3) → brainstorm 收敛 C+D+生命周期补偿方案 → **owner 质疑「CLAUDE.md 不该描述 skill」** → 官方文档证实 (≤200 行, skill 细节归 SKILL.md) → **根因修复 CLAUDE.md 639→149 行, 污染 4 术语→0** (`32dca5f`, DEC-20260722-001), 补偿方案整套降为备选 (裁决门=下次真实 AB)
+- **进货口双堵** (owner 指示): check 双预算 (行 200 + **字节 24000** 堵长行钻空) + standards `claude-md-hygiene.md` **v1.1.0 §2.4 写入时刻纪律** + CLAUDE.md 状态段「写入前读我」现场提示 (standards `f986a60` / 主仓 `c13a232`)
+- **#165 三条件盘点 3/3** (含独立复核 bot v1.64.0 本地 merge 合规) → **owner 裁定延长观察窗**: 收窗判定点 = **下一次 aria-orchestrator 子模块合并** (07-14 事故路径, 窗内未覆盖)
+- 新开 [10cg.local #20](https://forgejo.10cg.pub/10CG/10cg.local/issues/20) (github egress 抖动, 与 #165 正交互链); 撞车 bot v1.64.0 一次 (rebase 折入, 既有 memory 全程覆盖)
+- 🔴 **凭据轮换第七次 surface** (bot 记 hard cap **2026-08-02**, 唯一硬期限项)
+- custom checks **8/8** (新双预算生效: 151 lines / 13139 bytes); 三仓双远程 ls-remote 核验一致
+
+**[2026-07-22 — 会话收尾: aria-plugin #113 Phase C+D 完整 ship (v1.64.0) + Rule #6 第三行首次实战](./2026-07-22-issue113-ship-v1.64.0-and-rule6-third-row.md)** (predecessor, 并发 bot 轨, 已闭合)
 
 - track-id: `aria-plugin-113-gate-result-yaml-20260719` | phase: **D-complete** | status: **done** ← ✅ **该轨闭合** (见下方并发轨说明)
 - **#113 走完 C+D 并归档**: 版本六处一致 **v1.64.0** → **本地 `--no-ff` 合并** (约束 1) → aria+主仓双推 + **ls-remote 核验 ×4 全 MATCH** (约束 2) → 归档 + `release_gate` 释放 claim + 关 #113
