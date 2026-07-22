@@ -1,73 +1,91 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.62.0",
-  "issue_ref": "10CG/aria-plugin#113",
-  "generated_at": "2026-07-19T18:41:01Z",
+  "triage_tool_version": "1.63.0",
+  "issue_ref": "10CG/aria-plugin#116",
+  "generated_at": "2026-07-22T12:32:04Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 113,
-      "title": "[state-scanner] gate_result 完整支持 detailed-tasks.yaml 数据源 — 取代 v1.61.0 的 blanket unverified 兜底",
-      "body": "## 背景\n\n`state-scanner-openspec-collector-false-green` (v1.61.0, 关 Aria #166 缺陷2) 的显式 follow-up。\n\nv1.61.0 让归档安全网对 `detailed-tasks.yaml`-only spec (task-planner path B 的正常产出) **可见**: `gate_result()` 在 tasks.md-absent 分支追一条 `archive-safety-net-source-unsupported` 的 `unverified_claims` 条目 + `verdict=warn` + 构造非 None `d_payload`, 使 warn_overlay frontmatter 与 D auto-issue tracker 两条通道在 headless 归档下都点亮。\n\n但那只是**诚实的「无法核验」态** —— gate 并不解析 yaml, 所以分不清「真干净」和「有残留」, 于是**对所有** yaml-only spec 一律 warn + 建 tracker。\n\n## 诉求\n\n`gate_result()` / `_build_d_payload()` 真正解析 `detailed-tasks.yaml` (读 `tasks[].status` + `deferred_out_of_scope`), 使:\n\n1. 有残留 (未完成 task / deferred 项) → 精确列举进 `d_payload` → tracker 内容有实际信息量;\n2. 真干净 → `verdict=pass`, **不再** warn、不建 tracker —— 消除当前对该类项目的 blanket 噪声;\n3. 顺带修复 collector 快照侧同根问题: `collectors/openspec.py:244` 的 `carry_forward_inventory` 也只读 `tasks.md`, 对 yaml-only 项目恒 0 (展示侧假绿, 与归档 gate 侧同一病根 —— yaml 未被解析)。\n\n## 参考\n\n- 归档 spec: `openspec/archive/2026-07-19-state-scanner-openspec-collector-false-green/proposal.md` §缺陷2 + §非目标\n- 实现点: `aria/skills/state-scanner/scripts/lib/spec_complete.py::gate_result` (:1298 起) + `_build_d_payload` (:1115)\n- 上游 issue: 10CG/Aria#166 (closed)\n",
+      "number": 116,
+      "title": "[benchmark] AB without_skill 臂被 CLAUDE.md 自动加载结构性污染 — 且会顺着 :153 判据磨钝测试集",
+      "body": "## 问题\n\nAB 测试的 `without_skill` 臂在 Aria 仓内**结构上无法做干净**：`CLAUDE.md` 会自动加载进每个 subagent 的 context，而它的「项目状态」段里就写着各 Skill 的设计术语。于是 baseline 读到的不是「没有 skill 的世界」，而是「skill 设计的摘要」。\n\n## 实证 (2026-07-20 state-scanner Rule #6 补跑 AB)\n\n产物: `aria-plugin-benchmarks/ab-results/2026-07-20-v1.62.0-phase4-rule6/`\n\n`CLAUDE.md` 当前含 `evidence_grade` / `gitlink_integrity` / `fail-CLOSED` / `overall_parity` 各一次。结果:\n\n- **eval-11 的 baseline 逐字用了 `stale_unverified` / `expired` / `fail-closed`**，与 CLAUDE.md 状态段同形 —— 该臂的 `B5` 通过应视为**搬运**而非模型自身知识。\n- 它还独立重建了整个 spec 的核心论证：「0/0 不是 `parity=equal` 的正证据；remote-tracking ref 是缓存快照；没新鲜 fetch 就宣布已同步正是假绿的机制」，并自行推出 gitlink orphan 危害、fail-closed、enforced remotes、push mirror。\n- **对照**: eval-10 的 baseline 反而全程用纯 git 词汇自行推理，未借任何字段名 ⇒ **两个 baseline 的污染程度不同，得分不可跨 eval 比较**。\n\n⇒ 该轮 AB 的 `without_skill` 那一列 (0.75) 被明确标注为不可用，未据此列下任何「skill 有价值」的结论。\n\n## 为什么这不只是「数字不准」\n\n`AB_TEST_OPERATIONS.md:153` 有一条判据：\n\n> **判断标准**: 如果 without_skill 也能轻松通过这个 expectation，那它没有区分度，应该替换。\n\n这条在污染下会**反向伤害测试集** —— 一个被污染的 baseline 会通过那些**对真实采用者确实有区分度**的断言，于是这条启发式会指导我们把**好的断言删掉**。换句话说，污染不是让分数偏高而已，它会顺着这条规则把测量工具本身逐步磨钝。\n\n本轮实测就撞到了这个形状：`A10/B4` (gitlink 成因链) 三臂全过，按 :153 该删；但语义评分显示 `old_skill` 落在「自述缺口未接线」档、`with_skill` 落在「已接线 dispatch」档 —— **区分度是真的，只是断言措辞太宽**。正确处置是拆条（已做，ab-suite v1.5.0），而不是删除。\n\n## 附带的第二个缺陷: 体裁混淆 (genre confound)\n\n同一轮里，两个 `without_skill` 臂**实跑了只读 git 并据实否证了场景前提**（真实仓库已是 v1.62.2，不存在测试集描述的「漏推 v1.15.0」），而 skill 臂按本测试集的历史范式作**描述性推演**。\n\n三臂实际不在回答同一个问题，delta 里混入了体裁红利。`AB_TEST_OPERATIONS.md` 目前没有钉死产出形态（「实执行」还是「描述会怎么做」）。\n\n## 备选解法 (待评估，非本 issue 决定)\n\n- **[A] 仓外隔离 baseline**: 把 `without_skill` 臂放到一个不含 Aria 文档的临时目录，只给它一个裸 git fixture。成本中等；能真正解决污染，但 fixture 与真实仓库形态的差距会引入新的失真。\n- **[B] 显式剥离 CLAUDE.md**: 给 baseline subagent 的 prompt 里明确「忽略 CLAUDE.md 的项目状态段」。成本极低；但**不可靠** —— 已在 context 里的东西无法真正「不读」，且无法验证它是否遵守了。\n- **[C] 接受污染 + 改判据**: 承认 in-repo baseline 恒被污染，把 Rule #6 的问题从「skill vs 无 skill」改成「新版 vs 旧版」(deterministic 的先例已经在往这个方向走)，并把 `:153` 那条判据改成「三臂全过时先做语义分档，再决定是拆条还是删除」。成本最低；代价是 Rule #6 的 canonical 问题在本仓永远答不了。\n- **[D] 钉死产出形态**: 与上面正交，独立要做 —— 在 `AB_TEST_OPERATIONS.md` 里明确每个 eval 是「实执行」还是「描述性推演」，三臂统一。\n\n倾向 **C + D**（最低成本 + 直面结构性事实），但 A 值得在有余力时试一次，用来标定 C 的偏差有多大。\n\n## 附带的文档缺口\n\n`AB_TEST_OPERATIONS.md:188` 只写「without_skill: 不加载任何 skill 直接执行」，未提 CLAUDE.md 的自动加载面，也未提产出形态。无论最终选哪个方案，这两处都要补。\n\n## 关联\n\n- 本轮 AB: `aria-plugin-benchmarks/ab-results/2026-07-20-v1.62.0-phase4-rule6/`（`benchmark.json` 的 `caveats` 段有完整记录）\n- 触发 cycle: 主 spec `state-scanner-stale-refs-false-parity` Phase 4 的 Rule #6 补跑（owner 裁决 2026-07-20：`deterministic substitute` 先例收窄到 v1.59.0/v1.60.0，Phase 4 不适用豁免）\n- 相关规则: Aria CLAUDE.md 规则 #6 及其豁免机制段\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/113",
-      "created_at": "2026-07-19T14:51:19Z",
-      "updated_at": "2026-07-19T14:51:19Z"
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/116",
+      "created_at": "2026-07-20T15:21:11Z",
+      "updated_at": "2026-07-20T20:25:06Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.61.0",
-      "current": "1.62.0",
+      "reported": "1.62.0-phase4-rule6",
+      "current": "1.63.0",
       "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "detailed-tasks.yaml",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "collectors/openspec.py",
-          "line": 244,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "tasks.md",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "openspec/archive/2026-07-19-state-scanner-openspec-collector-false-green/proposal.md",
+          "file_path": "CLAUDE.md",
           "line": null,
           "format": "backtick",
           "exists": true,
           "line_in_range": null,
-          "snippet": "1: ---\n2: unverified_claims:\n3:   - claim: \"T4.1 SC-10/SC-11: 全量 1232 tests 绿 + dogfood 合成 fixture → scan.py exit=10 / configured=False / archive.total=1 / layout_drift detail 点名 stray\"\n4:     reason: \"dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在\"\n5:     symbols: []",
+          "snippet": "1: # Aria - AI-DDD Methodology\n2: \n3: > **项目本质**: AI-DDD 方法论的定义与端到端参考实现 (v1.x 方法论 + v2.0 自主运行时)\n4: > **核心假设**: AI 不仅是协作者 (v1.x), 更是 SDLC 的自主执行者 (v2.0)\n5: > **版本**: 2.0.0",
           "warning": null,
-          "total_lines": 135
+          "total_lines": 639
+        },
+        {
+          "file_path": "AB_TEST_OPERATIONS.md",
+          "line": 153,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "AB_TEST_OPERATIONS.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "AB_TEST_OPERATIONS.md",
+          "line": 188,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "benchmark.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
         }
       ],
       "matches_description": false
     },
     "step4_history": {
       "collection_status": "ok",
-      "likely_fix_candidates": []
+      "likely_fix_candidates": [
+        {
+          "sha": "3e209d3",
+          "message": "chore(release): aria v1.59.1 gitlink bump + 主仓版本同步 — reconcile #111 fix",
+          "file": "CLAUDE.md",
+          "match_reason": [
+            "fix"
+          ]
+        }
+      ]
     },
     "step5_inflight": {
       "collection_status": "ok",
@@ -78,7 +96,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "60b33ccb74ad3611f03ec12e5d86da78bc3425e3"
+          "head": "dfe5fc30b87948dd9d98aec10b31d6512bd84002"
         }
       ]
     }
@@ -88,23 +106,23 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "gate_result() on yaml-only fixture spec-residue (detailed-tasks.yaml: T2 status=pending + deferred_out_of_scope 1 项; 无 tasks.md), v1.62.0 aria @ 9af7b21",
-        "expected_behavior": "issue 声称: gate 不解析 yaml, 无论内容一律 blanket warn + unverified_claims 'archive-safety-net-source-unsupported' + 非 None d_payload",
-        "actual_behavior": "verdict=warn, unverified_claims=['archive-safety-net-source-unsupported'], d_payload 非 None, soft_errors=[] — 与声称完全一致 (spec_complete.py:1298-1327 仅 .is_file() 探测, 从不打开 yaml)",
+        "input": "读 aria-plugin-benchmarks/AB_TEST_OPERATIONS.md :153/:188 + cited 证据路径",
+        "expected_behavior": "issue 引用的 :153 判据文本 + :188 without_skill 描述 + ab-results artifact 真实存在",
+        "actual_behavior": ":153 = '如果 without_skill 也能轻松通过这个 expectation...应该替换' 逐字吻合; :188 = 'without_skill: 不加载任何 skill 直接执行' 吻合; artifact ab-results/2026-07-20-v1.62.0-phase4-rule6/ 存在 (benchmark.json/eval-10/eval-11/grading-summary.md)",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "gate_result() on yaml-only fixture spec-clean (detailed-tasks.yaml 全 tasks status=done, 无 deferred; 无 tasks.md)",
-        "expected_behavior": "issue 声称: 真干净 spec 也无法得到 pass, 与有残留 spec 输出无差别 (blanket 噪声)",
-        "actual_behavior": "输出与 case-1 逐字段相同 (warn + 同一 claim + 非 None d_payload) — gate 无法区分真干净与有残留",
+        "input": "grep CLAUDE.md 中 skill 设计术语 evidence_grade/gitlink_integrity/fail-CLOSED/overall_parity",
+        "expected_behavior": "issue 称 CLAUDE.md 当前含这 4 术语各一次 (baseline 自动加载即被污染)",
+        "actual_behavior": "4 术语在 CLAUDE.md 各出现 1 次 (吻合); 均落在保留的 stale-refs 方法论轨条目内",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "collect_openspec() on 合成 project root: spec-residue 的 detailed-tasks.yaml 含 '[TODO: ...]' 与 '[deferred: ...]' (均匹配 _CARRY_FORWARD_RE); 正控 spec-tasksmd 的 tasks.md 含同款 '[TODO: ...]'",
-        "expected_behavior": "issue 声称: carry_forward_inventory 只读 tasks.md, yaml-only spec 恒 0 (展示假绿)",
-        "actual_behavior": "carry_forward_inventory.total=1, by_change 仅含 spec-tasksmd; yaml 内两条可匹配标注贡献 0。正控命中证明 regex 正常, 缺口在 collectors/openspec.py:266 只开 tasks.md (issue 引 :244 行号有漂移, 声称本身成立)",
+        "input": "验本会话 CLAUDE.md trim 是否改变污染面 + 有无 in-flight 修复",
+        "expected_behavior": "确认污染是结构性 (非本会话新增/可清除) + 无 in-flight branch/PR",
+        "actual_behavior": "本会话 trim 删 v1.52-v1.58 条目使 stale_unverified 掉到 0, 但 4 核心术语仍在 (污染减小未消除, 强化 option C 前提 in-repo 恒污染); triage step5 in-flight = 0 PR/0 分支/0 worktree",
         "match": true
       }
     ],
