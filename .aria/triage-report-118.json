@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.64.0",
+  "issue_ref": "10CG/aria-plugin#118",
+  "generated_at": "2026-07-26T23:00:00Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 118,
+      "title": "[tdd-enforcer] examples/python 教学示例测试无法收集 — src/ 不在 path, 无 conftest",
+      "body": "## 症状\n\n`skills/tdd-enforcer/examples/python/tests/test_calculator.py` 无法被 pytest 收集:\n\n```\nImportError while importing test module '.../tests/test_calculator.py'.\ntests/test_calculator.py:14: in <module>\n    from calculator import Calculator\nE   ModuleNotFoundError: No module named 'calculator'\n```\n\n## 根因\n\n这是一份**教学示例**, 结构如下:\n\n```\nexamples/python/\n├── src/calculator.py     # 被测代码 (class Calculator)\n├── src/__init__.py\n└── tests/test_calculator.py   # from calculator import Calculator\n```\n\n`src/` 既不在 `sys.path`, 也没有 `conftest.py` / `pytest.ini` / `pyproject.toml` 把它加进去。README 教用户 `pytest tests/test_calculator.py -v`, 但那样跑 `src/` 不在路径上, 收集即失败。\n\n**为什么现在才浮出来**: 全仓此前只有各 skill 自己的 runner (state-scanner 的 `run_tests.py` 把 `TESTS_DIR` 硬编码成自身目录), 没有任何 runner 跑过这个 examples 目录。v1.62.2 新增的 `skills/run_all_tests.sh` (Aria #168 跨 skill 入口) 是第一个 `find -name tests` 扫到它的 —— 于是这个一直存在的破损才第一次被看见。\n\n**注意它是环境依赖的**: 建 runner 的 session 报「7 OK / 0 FAIL / 2 SKIP / exit 0」, 因为那台环境**没装 pytest** → 该 examples 目录走 SKIP。装了 pytest 的环境 (如本次) SKIP 落地成 FAIL, runner exit=1。即那句 \"exit 0\" 是绿在「缺依赖」上。\n\n## 复现\n\n```bash\ncd skills/tdd-enforcer/examples/python/tests\npython3 -m pytest -q      # → ImportError, 1 error during collection\n# 对照: 加上 src 到路径即通过\nPYTHONPATH=../src python3 -m pytest -q   # → 14 passed, 1 skipped\n```\n\n## 修复方向 (任一)\n\n- 在 `examples/python/` 加 `conftest.py` (`sys.path.insert(0, str(Path(__file__).parent / \"src\"))`) 或 `pyproject.toml` (`[tool.pytest.ini_options] pythonpath = [\"src\"]`), 并让 README 的运行命令与之一致;\n- 或把 `src/` 布局改成可直接 import 的形态。\n\n严重度低 (教学示例, 非生产路径), 但它会让 `run_all_tests.sh` 在装了 pytest 的环境恒红。\n\n## 关联\n\n- 暴露它的 runner: `skills/run_all_tests.sh` (Aria #168)\n- runner 自身另有一处缺陷 (承诺详情却不打印), 见姊妹 issue\n",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/118",
+      "created_at": "2026-07-20T21:04:18Z",
+      "updated_at": "2026-07-22T04:46:00Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.62.2",
+      "current": "1.64.0",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "skills/tdd-enforcer/examples/python/tests/test_calculator.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "conftest.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "pyproject.toml",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "run_tests.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/run_all_tests.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "run_all_tests.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "tests/test_calculator.py",
+          "line": 14,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "e5aebb08a0630268efbe62f72be56d8a1c73ea51"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "ls aria/skills/tdd-enforcer/examples/python/{src,tests}/ + 探查 conftest.py/pytest.ini/pyproject.toml",
+        "expected_behavior": "issue 声称结构: src/calculator.py + src/__init__.py + tests/test_calculator.py, 且无任何 path 配置文件 (triage.py cited-path not-found 为路径假象, 文件实在 aria/ 子模块下)",
+        "actual_behavior": "结构逐项吻合; conftest.py / pytest.ini / pyproject.toml 三者均不存在。README :42/:58/:77 确实教裸 `pytest tests/test_calculator.py -v`",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "cd aria/skills/tdd-enforcer/examples/python/tests && python3 -m pytest -q (隔离 venv, pytest 9.1.1)",
+        "expected_behavior": "ImportError during collection: ModuleNotFoundError: No module named 'calculator'",
+        "actual_behavior": "逐字复现: test_calculator.py:14 from calculator import Calculator → ModuleNotFoundError; 'Interrupted: 1 error during collection'",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "同目录 PYTHONPATH=../src python3 -m pytest -q (issue 的对照命令)",
+        "expected_behavior": "14 passed, 1 skipped",
+        "actual_behavior": "14 passed, 1 skipped in 0.02s — 与 issue 数字逐字吻合",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "宿主环境 python3 -m pytest --version",
+        "expected_behavior": "issue 声称破损是环境依赖的: 未装 pytest 的环境走 SKIP 假绿",
+        "actual_behavior": "宿主恰无 pytest (No module named pytest) — 佐证「exit 0 绿在缺依赖上」的形态; 复现须建 venv 才能触发真实 FAIL",
+        "match": true
+      }
+    ],
+    "hit_count": 4,
+    "total_count": 4,
+    "hit_rate": "4/4"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

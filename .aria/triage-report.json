@@ -1,69 +1,32 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.63.0",
-  "issue_ref": "10CG/aria-plugin#116",
-  "generated_at": "2026-07-22T12:32:04Z",
+  "triage_tool_version": "1.64.0",
+  "issue_ref": "10CG/aria-plugin#119",
+  "generated_at": "2026-07-26T23:02:33Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 116,
-      "title": "[benchmark] AB without_skill 臂被 CLAUDE.md 自动加载结构性污染 — 且会顺着 :153 判据磨钝测试集",
-      "body": "## 问题\n\nAB 测试的 `without_skill` 臂在 Aria 仓内**结构上无法做干净**：`CLAUDE.md` 会自动加载进每个 subagent 的 context，而它的「项目状态」段里就写着各 Skill 的设计术语。于是 baseline 读到的不是「没有 skill 的世界」，而是「skill 设计的摘要」。\n\n## 实证 (2026-07-20 state-scanner Rule #6 补跑 AB)\n\n产物: `aria-plugin-benchmarks/ab-results/2026-07-20-v1.62.0-phase4-rule6/`\n\n`CLAUDE.md` 当前含 `evidence_grade` / `gitlink_integrity` / `fail-CLOSED` / `overall_parity` 各一次。结果:\n\n- **eval-11 的 baseline 逐字用了 `stale_unverified` / `expired` / `fail-closed`**，与 CLAUDE.md 状态段同形 —— 该臂的 `B5` 通过应视为**搬运**而非模型自身知识。\n- 它还独立重建了整个 spec 的核心论证：「0/0 不是 `parity=equal` 的正证据；remote-tracking ref 是缓存快照；没新鲜 fetch 就宣布已同步正是假绿的机制」，并自行推出 gitlink orphan 危害、fail-closed、enforced remotes、push mirror。\n- **对照**: eval-10 的 baseline 反而全程用纯 git 词汇自行推理，未借任何字段名 ⇒ **两个 baseline 的污染程度不同，得分不可跨 eval 比较**。\n\n⇒ 该轮 AB 的 `without_skill` 那一列 (0.75) 被明确标注为不可用，未据此列下任何「skill 有价值」的结论。\n\n## 为什么这不只是「数字不准」\n\n`AB_TEST_OPERATIONS.md:153` 有一条判据：\n\n> **判断标准**: 如果 without_skill 也能轻松通过这个 expectation，那它没有区分度，应该替换。\n\n这条在污染下会**反向伤害测试集** —— 一个被污染的 baseline 会通过那些**对真实采用者确实有区分度**的断言，于是这条启发式会指导我们把**好的断言删掉**。换句话说，污染不是让分数偏高而已，它会顺着这条规则把测量工具本身逐步磨钝。\n\n本轮实测就撞到了这个形状：`A10/B4` (gitlink 成因链) 三臂全过，按 :153 该删；但语义评分显示 `old_skill` 落在「自述缺口未接线」档、`with_skill` 落在「已接线 dispatch」档 —— **区分度是真的，只是断言措辞太宽**。正确处置是拆条（已做，ab-suite v1.5.0），而不是删除。\n\n## 附带的第二个缺陷: 体裁混淆 (genre confound)\n\n同一轮里，两个 `without_skill` 臂**实跑了只读 git 并据实否证了场景前提**（真实仓库已是 v1.62.2，不存在测试集描述的「漏推 v1.15.0」），而 skill 臂按本测试集的历史范式作**描述性推演**。\n\n三臂实际不在回答同一个问题，delta 里混入了体裁红利。`AB_TEST_OPERATIONS.md` 目前没有钉死产出形态（「实执行」还是「描述会怎么做」）。\n\n## 备选解法 (待评估，非本 issue 决定)\n\n- **[A] 仓外隔离 baseline**: 把 `without_skill` 臂放到一个不含 Aria 文档的临时目录，只给它一个裸 git fixture。成本中等；能真正解决污染，但 fixture 与真实仓库形态的差距会引入新的失真。\n- **[B] 显式剥离 CLAUDE.md**: 给 baseline subagent 的 prompt 里明确「忽略 CLAUDE.md 的项目状态段」。成本极低；但**不可靠** —— 已在 context 里的东西无法真正「不读」，且无法验证它是否遵守了。\n- **[C] 接受污染 + 改判据**: 承认 in-repo baseline 恒被污染，把 Rule #6 的问题从「skill vs 无 skill」改成「新版 vs 旧版」(deterministic 的先例已经在往这个方向走)，并把 `:153` 那条判据改成「三臂全过时先做语义分档，再决定是拆条还是删除」。成本最低；代价是 Rule #6 的 canonical 问题在本仓永远答不了。\n- **[D] 钉死产出形态**: 与上面正交，独立要做 —— 在 `AB_TEST_OPERATIONS.md` 里明确每个 eval 是「实执行」还是「描述性推演」，三臂统一。\n\n倾向 **C + D**（最低成本 + 直面结构性事实），但 A 值得在有余力时试一次，用来标定 C 的偏差有多大。\n\n## 附带的文档缺口\n\n`AB_TEST_OPERATIONS.md:188` 只写「without_skill: 不加载任何 skill 直接执行」，未提 CLAUDE.md 的自动加载面，也未提产出形态。无论最终选哪个方案，这两处都要补。\n\n## 关联\n\n- 本轮 AB: `aria-plugin-benchmarks/ab-results/2026-07-20-v1.62.0-phase4-rule6/`（`benchmark.json` 的 `caveats` 段有完整记录）\n- 触发 cycle: 主 spec `state-scanner-stale-refs-false-parity` Phase 4 的 Rule #6 补跑（owner 裁决 2026-07-20：`deterministic substitute` 先例收窄到 v1.59.0/v1.60.0，Phase 4 不适用豁免）\n- 相关规则: Aria CLAUDE.md 规则 #6 及其豁免机制段\n",
+      "number": 119,
+      "title": "[state-scanner] run_all_tests.sh 对 pytest 套件承诺「见下方详情」却恒不打印 — grep pattern 只匹配 unittest",
+      "body": "## 缺陷\n\n`skills/run_all_tests.sh` 对 FAIL 的套件打印 `FAIL (N tests) — 见下方详情`, 随后用\n\n```bash\necho \"$out\" | grep -E '^(FAIL|ERROR):' | sed 's/^/    /' | head -10\n```\n\n抽取详情。这个 pattern 匹配的是 **unittest** 的形态 (`FAIL: test_x (mod.Class)` / `ERROR: test_x (...)` —— 冒号紧跟标识符), 但对 **pytest** 套件恒不命中:\n\n| 框架 | 失败行形态 | `^(FAIL\\|ERROR):` 命中? |\n|------|-----------|------------------------|\n| unittest | `ERROR: test_foo (module.Class)` | ✅ |\n| pytest | `ERROR test_calculator.py` (无冒号) | ❌ |\n| pytest | `FAILED tests/x.py::test_y` (是 `FAILED` 不是 `FAIL:`) | ❌ |\n\n后果: **所有 pytest 套件 FAIL 时, \"见下方详情\" 后面什么都不打印** —— 承诺了详情却恒空。本次 tdd-enforcer 那条 FAIL 正是如此, 得手动 `cd` 进目录复跑才知道是 ImportError。\n\n## 复现\n\n```bash\nbash skills/run_all_tests.sh\n# tdd-enforcer/examples/python  FAIL (0 tests) — 见下方详情\n# (下方无任何详情行)\n```\n\n## 修复方向\n\n抽取分支应区分框架, 或对 pytest 分支改用能命中的 pattern。参考:\n- pytest 汇总行: `^(FAILED|ERROR) ` (含空格, 无冒号) 及 `short test summary info` 段;\n- 或直接对 FAIL 套件回显 `$out` 的尾部 N 行 (最稳, 框架无关), 而非试图按 pattern 提炼。\n\n## 关联\n\n- runner 出处: Aria #168 跨 skill 测试入口\n- 首个被它恒空处理的真实 FAIL: tdd-enforcer examples (姊妹 issue #118)\n- 附带观察: runner 的 pytest-SKIP 设计 (未装 pytest ⇒ SKIP 不算红) 是对的, 但也意味着 \"exit 0\" 在缺 pytest 的环境是**环境依赖的绿** —— 装了 pytest 才会暴露真实 FAIL。非缺陷, 但值得在 runner 头注释里点明, 以免 \"本机 7 OK/exit 0\" 被当成跨环境结论。\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/116",
-      "created_at": "2026-07-20T15:21:11Z",
-      "updated_at": "2026-07-20T20:25:06Z"
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/119",
+      "created_at": "2026-07-20T21:04:43Z",
+      "updated_at": "2026-07-26T23:02:23Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.62.0-phase4-rule6",
-      "current": "1.63.0",
-      "gap": "behind"
+      "reported": null,
+      "current": "1.64.0",
+      "gap": null
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "CLAUDE.md",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: # Aria - AI-DDD Methodology\n2: \n3: > **项目本质**: AI-DDD 方法论的定义与端到端参考实现 (v1.x 方法论 + v2.0 自主运行时)\n4: > **核心假设**: AI 不仅是协作者 (v1.x), 更是 SDLC 的自主执行者 (v2.0)\n5: > **版本**: 2.0.0",
-          "warning": null,
-          "total_lines": 639
-        },
-        {
-          "file_path": "AB_TEST_OPERATIONS.md",
-          "line": 153,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "AB_TEST_OPERATIONS.md",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "AB_TEST_OPERATIONS.md",
-          "line": 188,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "benchmark.json",
+          "file_path": "skills/run_all_tests.sh",
           "line": null,
           "format": "backtick",
           "exists": false,
@@ -75,17 +38,8 @@
       "matches_description": false
     },
     "step4_history": {
-      "collection_status": "ok",
-      "likely_fix_candidates": [
-        {
-          "sha": "3e209d3",
-          "message": "chore(release): aria v1.59.1 gitlink bump + 主仓版本同步 — reconcile #111 fix",
-          "file": "CLAUDE.md",
-          "match_reason": [
-            "fix"
-          ]
-        }
-      ]
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
     },
     "step5_inflight": {
       "collection_status": "ok",
@@ -96,7 +50,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "dfe5fc30b87948dd9d98aec10b31d6512bd84002"
+          "head": "e5aebb08a0630268efbe62f72be56d8a1c73ea51"
         }
       ]
     }
@@ -106,23 +60,23 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "读 aria-plugin-benchmarks/AB_TEST_OPERATIONS.md :153/:188 + cited 证据路径",
-        "expected_behavior": "issue 引用的 :153 判据文本 + :188 without_skill 描述 + ab-results artifact 真实存在",
-        "actual_behavior": ":153 = '如果 without_skill 也能轻松通过这个 expectation...应该替换' 逐字吻合; :188 = 'without_skill: 不加载任何 skill 直接执行' 吻合; artifact ab-results/2026-07-20-v1.62.0-phase4-rule6/ 存在 (benchmark.json/eval-10/eval-11/grading-summary.md)",
+        "input": "grep -n aria/skills/run_all_tests.sh (cited 代码核对)",
+        "expected_behavior": "issue 引用: :81 打印 'FAIL (N tests) — 见下方详情', :83 用 grep -E '^(FAIL|ERROR):' 抽详情",
+        "actual_behavior": "两行逐字吻合 (:81 / :83), pattern 原样存在",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "grep CLAUDE.md 中 skill 设计术语 evidence_grade/gitlink_integrity/fail-CLOSED/overall_parity",
-        "expected_behavior": "issue 称 CLAUDE.md 当前含这 4 术语各一次 (baseline 自动加载即被污染)",
-        "actual_behavior": "4 术语在 CLAUDE.md 各出现 1 次 (吻合); 均落在保留的 stale-refs 方法论轨条目内",
+        "input": "三种失败行形态灌入 pattern: 'ERROR: test_foo (module.Class)' / 'ERROR test_calculator.py' / 'FAILED tests/x.py::test_y'",
+        "expected_behavior": "仅 unittest 冒号形态命中; pytest 两种形态 (无冒号 ERROR / FAILED) 均不命中",
+        "actual_behavior": "命中数 1 (unittest 行); pytest 两行 0 命中 — 与 issue 对照表逐格吻合",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "验本会话 CLAUDE.md trim 是否改变污染面 + 有无 in-flight 修复",
-        "expected_behavior": "确认污染是结构性 (非本会话新增/可清除) + 无 in-flight branch/PR",
-        "actual_behavior": "本会话 trim 删 v1.52-v1.58 条目使 stale_unverified 掉到 0, 但 4 核心术语仍在 (污染减小未消除, 强化 option C 前提 in-repo 恒污染); triage step5 in-flight = 0 PR/0 分支/0 worktree",
+        "input": "端到端: 隔离 venv pytest 上 PATH 后 bash aria/skills/run_all_tests.sh (触发 tdd-enforcer 真实 FAIL, 即 #118)",
+        "expected_behavior": "pytest 套件 FAIL 时 '见下方详情' 后什么都不打印",
+        "actual_behavior": "'tdd-enforcer/examples/python FAIL (0 tests) — 见下方详情' 下一行直接是 workflow-runner 套件, 零详情行; 同轮 unittest 套件 FAIL 则打出 8 条 ERROR 详情 — 框架不对称实证",
         "match": true
       }
     ],
@@ -131,7 +85,7 @@
     "hit_rate": "3/3"
   },
   "verdict": "confirmed",
-  "severity": "major",
+  "severity": "minor",
   "recommended_action": "next-cycle",
   "deviation_note": null,
   "errors": []
