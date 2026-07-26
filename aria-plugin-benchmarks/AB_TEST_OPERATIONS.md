@@ -150,7 +150,28 @@ aria-plugin-benchmarks/
 | "推荐的工作流包含 Phase A-D 步骤" | "输出有格式" |
 | "架构搜索结果指向正确的文件路径" | "执行了命令" |
 
-**判断标准**: 如果 without_skill 也能轻松通过这个 expectation，那它没有区分度，应该替换。
+**判断标准**: 如果 without_skill 也能轻松通过这个 expectation，它*可能*没有区分度 — 但**不得据此直接删除或替换**。各臂全过 (三臂运行时含 old_skill) 时，先做**语义分档**，再决定是拆条还是删除:
+
+1. 把各臂产出按质量/完整度分档比较 (语义级，不看 pass/fail 二值)。
+2. 各臂落**不同档** (如 old_skill「自述缺口未接线」 vs with_skill「已接线」) → 区分度是真的，只是断言措辞太宽 → **拆条** (细化成能分开各档的断言)，不删。实例: A10/B4 三臂全过但语义分档显示真实差距，处置为拆条 (ab-suite v1.5.0，见 aria-plugin #116)。
+3. 语义分档也显示各臂**无差异** → 才替换/删除。
+
+背景: baseline 臂并非零 context (见「场景 1」without_skill 注)，可能被仓内自动加载文档污染而「假通过」。污染下按通过率直接删断言，删掉的恰是**对真实采用者有区分度**的断言 — 测量工具被逐步磨钝 (aria-plugin #116 + DEC-20260722-001)。
+
+### 产出形态钉死 (实执行 vs 描述性推演)
+
+每个 eval case 必须**显式声明产出形态**，且**所有臂统一** (两臂或三臂: with_skill / old_skill / without_skill):
+
+| 形态 | 定义 | 适用 |
+|------|------|------|
+| `descriptive` (描述性推演) | 按场景给定的前提推演「会怎么做」，**不得**以真实仓库当前态否证场景前提 | 默认；场景是构造的历史/假想态时必选 |
+| `live` (实执行) | 允许实跑只读命令，以真实仓库状态作答 | 仅当 eval 明确测「对真实仓库的诊断能力」 |
+
+规则:
+
+1. eval prompt 里写明形态；未声明视为 `descriptive`。
+2. grader 评分前先核对各臂产出形态一致。任一臂形态偏离 (如 baseline 实跑 git 否证了场景前提，而 skill 臂做描述性推演) → 三臂实际不在回答同一个问题，delta 混入**体裁红利 (genre confound)** → 该 eval 标注后**不得计入总 delta**。
+3. 历史教训: 2026-07-20 run 中两个 without_skill 臂实跑只读 git 并据实否证场景前提 (真实仓已 v1.62.2，不存在测试集描述的「漏推 v1.15.0」)，skill 臂按历史范式作描述性推演 — delta 不可比 (aria-plugin #116)。
 
 ### 版本管理
 
@@ -186,6 +207,9 @@ changelog:
   2. 并行 spawn 2 个 subagent:
      - with_skill: 加载 SKILL.md 后执行任务
      - without_skill: 不加载任何 skill 直接执行
+       (注意: 并非零 context — 项目 CLAUDE.md 仍会自动加载进 subagent，这是仓内
+       baseline 的已知污染面。解读 baseline 通过率、应用「Expectations 编写原则」
+       的判断标准时必须计入; 实证与根因治理见 aria-plugin #116 + DEC-20260722-001)
   3. grader agent 逐项评分 (AI 语义级)
   4. aggregate_benchmark.py → benchmark.json + benchmark.md
   5. generate_review.py → HTML 可视化
