@@ -22,7 +22,22 @@
 - 🔴 **凭据轮换第八次 surface — hard cap 2026-08-02 = 明天** (唯一硬期限 carry)
 - 新 memory 3 条: grep 截断语料 / 全称谓词空真 / AB 污染参照面须含 MEMORY.md
 
-**[2026-07-22 — 会话收尾: CLAUDE.md 官方规格瘦身 (#116 根因修复) + 进货口双堵 + #165 收窗裁定](./2026-07-22-claude-md-official-spec-diet-and-116-root-fix.md)** (predecessor)
+**[2026-07-27 — 并发轨 (bot): aria-plugin #122 Phase A 完结 (post_spec R1-R4 + post_planning R1-R6, 10 轮 / 33 agent)](./2026-07-27-issue122-phase-a-dual-gate-convergence.md)** (predecessor, **⛔ 该轨产物已 superseded**)
+
+> **⚠️ 事后勘误 (2026-08-02)**: 该轨的 Spec `phase-c-integrator-ci-path-coverage` 与本轨 (`simonfishgit`) 的 `phase-c-gate-path-coverage-not-applicable` 同治 #122。**后者已于 07-31 走完十步循环 ship 为 v1.65.0 并归档** ⇒ 前者全部 Spec 产物 (含其后的 A1/A2/A3 修订) **不再是待实施项**。该轨 §6 的「下一步」已全部作废。**仍然有效的部分**: 其 post_spec R5/R6 审计 (13 agent 实例) 抓到的缺陷对**已 ship 的实现**成立, 已实跑复现并开 issue —— [aria-plugin #124](https://forgejo.10cg.pub/10CG/aria-plugin/issues/124) (fail-OPEN 误放行) / [#125](https://forgejo.10cg.pub/10CG/aria-plugin/issues/125) (同缩进解析) / [#126](https://forgejo.10cg.pub/10CG/aria-plugin/issues/126) (内部异常误诊)。详见 [2026-08-02 勘误 handoff](./2026-08-02-dual-spec-collision-postmortem-and-shipped-defects.md)。
+
+- track-id: `phase-c-integrator-ci-path-coverage` | phase: **A.3** | status: **⛔ superseded** (原记 active)
+- **本段主线 = 一次「审计比产物更值钱」的完整实证**: 为 #122 (C.2.4 gate 对路径过滤型 CI 结构性恒 wait) 走完整个 Phase A, 两个 enabled 闸门跑满 **10 轮 / 33 个 agent 实例**。产出 proposal.md (60KB, Level 2) + detailed-tasks.yaml (66KB, **27 任务 / 18 波 / 5 lane**) + **10 份**审计报告
+- **critical 轨迹**: post_spec **5→4→1→1(争议)** / post_planning **2→2→1→0→0→0**。两次 max_rounds 耗尽均经 `AskUserQuestion` 请 owner 裁 (post_spec [1] 接受 / post_planning 先 [2] 加轮至 6 再 [1] 接受), **零自行豁免**
+- ⚖️ **两条病灶主线走完各自四次形变**: post_spec「空集/退化集真值真空」(空 changed_files → 零 event → 空 unit 集 → **unit 定义域结构性偏窄**) / post_planning「承诺不在它该在的层」(散文 → **方向/作用域写反** → **没配可执行断言** → **写入时序方向**)
+- 🔑 **核心教训: 加了机械核对 ≠ 那类错误被封住 —— 核对的维度必须与错误的维度同构**。三项**无向**不变量全绿的同时 3 条方向性错误安然存在 (R5 实证)。四类现全部写进 TASK-020 常驻 verification
+- 🔑 **停止加轮的判据是 major 数是否还在降, 不是 critical 是否归零** (R4 critical 已归零, major 在 R5/R6 回升持平 6→7; 两席独立判定「加轮收不敛」)。**换新鲜眼睛 > 加轮**: R5 派入未看过 R2-R4 的 tech-lead, 一轮抓出该轮 5/6 major
+- 🔴 **本段零提交** — 12 个新文件 untracked; 且主仓/aria **双双 behind 远程** (并发轨 `simonfishgit` ship 了 v1.64.1)。提交前须 fetch+rebase, 且**排除 `aria-orchestrator`** (#165 事故形状)
+- ✅ **B.1 前置复证就地做掉**: v1.64.1 与本 spec 引用的 7 个文件**零交集** ⇒ ~30 处行号在 `6ffd8cd` 上原样有效
+- 🔴 凭据轮换**第八次** surface (hard cap **2026-08-02, 剩 ~6 天**); #116 剩余 scope 已被并发轨做掉可销
+- 🔴🔴 **附注 §0.5 (写完 7 分钟后发现, 阻塞 Phase B)**: 并发轨 `simonfishgit` 于 11:52 ship 了**同治 #122 的第二份 Spec** `phase-c-gate-path-coverage-not-applicable` (`257a20d`) —— 核心设计同构。**那份 post_spec 真收敛 + owner 签字但无 A.2/A.3; 本段这份有 27 任务但 post_spec 靠 override 收场。哪份为准 = owner 裁决 (Rule #10)**。⇒ `feedback_concurrent_duplicate_audit_fetch_before_start` 第四次实证: **10 轮闸门审的是产物质量, 不审产物是否该存在**
+
+**[2026-07-22 — 会话收尾: CLAUDE.md 官方规格瘦身 (#116 根因修复) + 进货口双堵 + #165 收窗裁定](./2026-07-22-claude-md-official-spec-diet-and-116-root-fix.md)** (predecessor, 已闭合)
 
 - track-id: `session-close-20260722-claude-md-diet-116-root-fix` | phase: **session-close** | status: **done**
 - **本段主线 = 一次完整的「前提被推翻」**: #116 triage (confirmed/major, repro 3/3) → brainstorm 收敛 C+D+生命周期补偿方案 → **owner 质疑「CLAUDE.md 不该描述 skill」** → 官方文档证实 (≤200 行, skill 细节归 SKILL.md) → **根因修复 CLAUDE.md 639→149 行, 污染 4 术语→0** (`32dca5f`, DEC-20260722-001), 补偿方案整套降为备选 (裁决门=下次真实 AB)
