@@ -1,0 +1,762 @@
+# Detailed Tasks — phase-c-integrator-ci-path-coverage (aria-plugin #122)
+# Phase A.2/A.3 output (task-planner v2.0). Datasource: proposal.md (path B — 本 spec 无 tasks.md)。
+# Spec: openspec/changes/phase-c-integrator-ci-path-coverage/proposal.md
+#       (post_spec R1→R4; max_rounds 耗尽, owner 2026-07-26 裁定 [1] 接受 ⇒ converged=false + overridden_by_user=true)
+# Scope repo: aria 子模块 @ 3694871 (v1.64.0 master; **全部行号引用对此 HEAD 校验**)。
+# 本文件已按 post_planning **R1-R6** 全量修订 (逐轮 finding 与处置见 .aria/audit-reports/post_planning-R*-*-aggregated.md)。
+
+metadata:
+  feature: phase-c-integrator-ci-path-coverage
+  title: "C.2.4 gate 路径覆盖感知 — not_applicable 态取代路径过滤型 CI 的结构性恒 wait"
+  level: 2
+  datasource: "proposal.md"
+  spec: "openspec/changes/phase-c-integrator-ci-path-coverage/proposal.md"
+  scope_repo: "aria"
+  created: "2026-07-26T01:47:00+00:00"
+  updated: "2026-07-27T03:00:00+00:00"   # post_planning R6-fix (⚠️ 每次 fix 必同步本字段 — R3-D/R4-E/R5 三次同形状漏更)
+  scope_repo_head: "3694871"   # v1.64.0 — **行号校验基线**。
+                               # ✅ **2026-07-27 已复证**: 并发 bot 轨在本 session 期间 ship 了
+                               # v1.64.1 (aria master 现为 `6ffd8cd`), 但 `git diff --name-only
+                               # 3694871..6ffd8cd` 与本文件引用的 7 个文件 (phase-c-integrator/
+                               # {scripts,tests,SKILL.md} + config-loader/SKILL.md) **零交集**
+                               # ⇒ 全部 ~30 处行号引用在 `6ffd8cd` 上**原样有效** (照 #113
+                               # 「v1.62.1 零触碰本 spec 实现点」先例记账)。
+                               # **B.1 建分支前仍须 re-verify**: 若 aria master 已前进,
+                               # 逐处 grep 复证全部 :NNN 引用。(cr N11 勘正: 上一版写「15 个 in-flight
+                               # feature 分支」不对应任何实测读法 — 实测 local feature/* = 13,
+                               # 跨 remote 去重 = 37, --no-merged master = 0。本仓存在多条并发轨且
+                               # master 可能随时被推进, 这才是 re-verify 的理由。)
+  spec_repo: "Aria"            # 主仓 — Spec + 审计报告 + config/CLAUDE.md 落此
+  linked_issue: "10CG/aria-plugin#122"
+  ship_target: "aria-plugin v1.65.0 (MINOR)"
+  total_tasks: 27
+  task_groups: 6
+  status: "A.3 complete — post_planning R1-R6 全量吸收 (R1 incomplete 2/5 席 → R2 1F+2PWW → R3 1F+1PWW → R4 2PWW/0C → R5 2PWW/0C → R6 2PWW/0C); max_rounds=6 耗尽 → **owner 2026-07-27 裁定 [1] 接受, Phase A 完结** (converged=false + overridden_by_user=true); ready for B.1"
+  new_agents_required: false
+  agent_roster: [backend-architect, qa-engineer, code-reviewer, knowledge-manager, owner]   # R5 tl#8: 补 owner (照 2026-07-09-runtime-probe 的 `main-loop` 先例) —— 缺的这项恰覆盖唯二两个 Rule #10 owner 触点
+  estimation_note: >
+    Complexity S/M/L 为主信号 (file-impact + dependency count); 小时数为粗锚 (S≈3h / M≈6h / L≈10h);
+    canonical effort 轴为 token (ai-native-estimator, phase-d-closer 收尾采集)。
+  tdd_note: >
+    全程 TDD: 每层先落 baseline-failing RED 再实现。写测试者 (qa-engineer) 与写实现者
+    (backend-architect) **逐对分离**。承重算法按 post_planning F8/F9 拆到「每段各自红→绿独立可见」
+    的粒度 —— R1-R4 在步骤 2/3/4/5/7 **每一个**都抓出过 critical/major, 合成单一交付单元会让
+    19 条断言的红海无法定位子系统。
+    ⚠️ **红→绿窗口的诚实范围** (post_planning R2 be-Finding-1; **R3 cr-NEW-3 指出 R2 声称已补但实际
+    replace 静默失败, 此处为真正落地**): 4 对拆分里只有 **2 对自身闭合** —— TASK-002/003 (纯 match()
+    布尔层) 与 TASK-008/009 (最终聚合层)。TASK-004/005 与 TASK-006/007 的断言按 proposal 定义全部打在
+    `_match_coverage` 上, 而联合逻辑要到 TASK-009 才存在 ⇒ 这两对**没有自身独立的红→绿窗口**, 其 RED
+    在 TASK-009 收口。拆分对**定位子系统**仍有价值 (哪一段的断言红了一目了然), 但**不得**拿
+    「TASK-004/006 全绿」当 TASK-005/007 的收尾判据 —— 那是不可满足的承诺。
+  context_refs_note: >
+    (post_planning F20) subagent **不跨调用保留** R1-R4 上下文。每任务的 context_refs 是唯一的
+    上下文通道 —— 派发时必须原样传入, 不得假定 agent「已经知道」。
+  schema_note: >
+    (post_planning F13 + R2 cr-N10 勘正) 本文件对齐 aria/skills/task-planner/DUAL_LAYER_SPEC.md v2.0.0:
+    必需字段按 SOT 步骤 3 (id/title/status/complexity/deliverables); `parent` 按 SOT **路径 B**
+    规定省略 (datasource=proposal.md, 无 tasks.md); `estimated_hours`/`dependencies` 本文件作常填项。
+    扩展字段 **6 个**: load_bearing / covers_ac / context_refs / gate_condition /
+    **task_level_assertions** / **blocks_merge** —— 属本 spec 试点, 已开 follow-up 拟升 SOT (见 TASK-024)。
+    (R4 cr-F4 补后两个: 漏掉的恰是**携带 R3-A 那条约束的字段** —— 若 `task_level_assertions` 不进
+    SOT 讨论, 「嵌套键不得叫 `id`, 否则 `_TASK_ID_LINE_RE` 会多数出条目致整份文件 parse_ok=False」
+    这条教训就只活在本文件的一段就地注释里, 下一份 spec 自创嵌套结构时会原样复发。)
+
+tasks:
+  # ══════════════════ Group 1: spike 闸门 (blocking) ══════════════════
+  - id: TASK-001
+    title: "[spike, BLOCKING] 实测 aether CLI 的仓解析方式"
+    status: pending
+    complexity: S
+    estimated_hours: "1-3"
+    dependencies: []
+    deliverables:
+      - "openspec/changes/phase-c-integrator-ci-path-coverage/proposal.md (§5 结论回填)"
+    agent: backend-architect
+    reason: "backend 集成契约与子进程语义属该 lane"
+    context_refs:
+      - "proposal.md §5 (作用仓一致性 — 机械化)"
+      - ".aria/audit-reports/post_spec-R3-*-aggregated.md (R3-E) / post_spec-R4-*-aggregated.md"
+    load_bearing:
+      - "在两个不同 CWD (主仓根 / aria 子模块根) 各跑 `aether ci status --branch <双仓同名分支> --json` 比对"
+      - "同名分支实测存在 3 个: feature/benchmark-transparency-enhancement 等"
+    verification:
+      - "两次调用的 JSON 输出可区分且与预期仓一致 (证实), 或明确证否"
+      - "结论逐字回填 proposal §5, 替换「未实证承重假设」措辞"
+      - "**若两次调用恰好同 CI 状态导致无法区分**, 须换一对当前状态确认不同的分支重跑 —— **不得在证据不足时默认判定任一方向** (R2 qa#6: 三个下游 gate_condition 都没预留「实验不确定」分支)"
+    notes: >
+      §5 的「gate_check 把 repo_root 作为 backend 子进程工作目录」建立在「aether 由 CWD 决定查哪个仓」
+      这个**未实证承重假设**上 (R3/R4 两席独立指出)。实读: AetherBackend.__init__ 无 cwd 参数,
+      subprocess.run @:150/:173 均未传 cwd=, _query 发的命令无仓参数。若 aether 按 git remote /
+      配置文件解析仓, 整条机制化是空转 ⇒ 走 TASK-001b。
+
+  - id: TASK-001b
+    title: "[owner] spike 证否分支 — 上报并重设计作用仓那条腿"
+    status: pending
+    complexity: S
+    estimated_hours: "owner"
+    dependencies: [TASK-001]
+    deliverables:
+      - "(条件性) proposal.md §5 重写 + 本文件 TASK-014/015 **+ TASK-019 的 `gate_check:298` 那一项** 重规划 (R5 cr-NF-1 勘正: 上一版写「3 项」, 把两个 ungated 承重输入误递给 owner ⇒ Rule #10 的裁决输入本身失真) (R4 cr-F1: 上一版漏了 019, 而 019 是 #122 的核心修复)"
+    agent: owner
+    reason: "设计方向变更属 owner 裁决面 (Rule #10)"
+    gate_condition: "仅当 TASK-001 结论为『aether 不按 CWD 解析仓』时激活; 否则**由 owner** 置 `completed` 并注明 N/A"
+    verification:
+      - "owner 已裁定替代方案, 或确认接受 §5 那条腿失效并把它降为非目标 + 已知残留"
+      - "⚠️ **终态写入由 TASK-014/015 各自的 `gate_condition` 承接** (R6 tl-NEW-1 改为指针, 避免两处并行下达)。原则: 裁定后 owner 须把 TASK-014/015 的 `status` 显式落入 done-family (完成替代方案则 `completed`; 降为非目标亦置 `completed` + 注明 N/A 与已知残留), **不得留在 `blocked`** —— `blocked` ∉ done-family `{done, completed}` (fail-CLOSED, `lib/detailed_tasks.py:83`), 两个残留任务会让 `_is_spec_complete_by_yaml` 恒返回 `(False, \"2/27 non-done\")` ⇒ 要么 spec 卡住无法归档, 要么有人改 status 绕过门。**(R5 tl#2 + cr OBS-1: 这段论证文件里已为 001b/025b 各写过一次, 却没为自己新引入的两个 blocked 任务写 — 同一病灶第三次)**"
+    notes: >
+      (post_planning F3) 让「证否」在依赖图上有落点, 而不是散文里的一句「上报 owner」。
+      (R2 cr-N1) **本任务已成为 TASK-014 的显式前驱并前移至 wave_1b** —— 上一版它入度=出度=0 且排在
+      wave_14, 而它要裁决的对象在 wave_3/4 ⇒ 机器可读层上「证否 ⇒ 停下来等 owner」这条边**仍不存在**,
+      图会照常放行, TASK-014/015 悬空在「不许删弱 AC-14、也没有 owner 裁定」态 = F3 点名的 Rule #10
+      反模式。happy path 下本任务在 wave_1b 即被 owner 置 completed + N/A, 不引入等待。
+      (R2 be-F4) **归档门耦合同 TASK-025b**: `status` 被 state-scanner 归档门消费,
+      done-family = {done, completed} **fail-CLOSED** ⇒ 本节点最终必须被显式置于 done-family
+      (无论走重规划还是 N/A 分支), 否则 Phase D 归档必红。该状态变更需 owner 触点,
+      不得由执行 TASK-001 的 AI 顺带代为标记。
+
+  # ══════════════════ Group 2: _match_coverage 纯函数 (4 段 RED/GREEN) ══════════════════
+  - id: TASK-002
+    title: "[RED] 步骤 7 — match() 布尔层"
+    status: pending
+    complexity: S
+    estimated_hours: "2-3"
+    dependencies: []
+    deliverables:
+      - "aria/skills/phase-c-integrator/tests/test_ci_path_coverage.py (新增)"
+    agent: qa-engineer
+    reason: "RED 测试与实现须分离 (TDD); AC 可证伪性属 qa lane"
+    covers_ac: [AC-8a]
+    context_refs: ["proposal.md §2 步骤 7"]
+    verification:
+      - "全部断言在实现前为 RED, 逐条记录「它怎么会红」"
+    notes: >
+      纯字符串层, 零依赖。**实际并行集合 = wave_2a 内的 TASK-012** (R4 be 勘正: 原写「可与
+      TASK-004/006/012/016 并行」—— 004/006/016 现已因同文件域串行边各自后移, 不再同波)。表驱动: 零段补偿双向 / `*` 不跨 `/` /
+      字面 `.` 不被通配污染 / 大小写敏感 / `?`+`[]`+空+前导 `/` 落 unsupported。
+
+  - id: TASK-003
+    title: "[GREEN] 步骤 7 — match() 实现"
+    status: pending
+    complexity: S
+    estimated_hours: "2-3"
+    dependencies: [TASK-002]
+    deliverables:
+      - "aria/skills/phase-c-integrator/scripts/lib/ci_path_coverage.py (新增)"
+    agent: backend-architect
+    reason: "承重匹配算法属 backend lane"
+    load_bearing:
+      - "支持集仅「字面 + `*` + `**`」; `**`→`.*` / `*`→`[^/]*` / 其余 re.escape / 全串锚定 \\A..\\Z"
+      - "**不用 fnmatch** (其 `*` 跨 `/`)"
+      - "零段补偿: `/**` 结尾额外接受裸前缀; `**/` 开头额外接受剩余串"
+      - "裸目录名 / 尾随斜杠同时接受本身与其下任意深度"
+      - "移出支持集 → covered=True, confident=False, reason=unsupported_pattern_feature"
+    context_refs: ["proposal.md §2 步骤 7", "post_spec R2 N-J (`?` 语义写反的实证)"]
+    verification: ["TASK-002 全绿"]
+
+  - id: TASK-004
+    title: "[RED] 步骤 2 — on: 子树解析器"
+    status: pending
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-002]   # ⚠️ 同文件域串行边 (post_planning R2 cr-N3): 与 TASK-002/006 写同一个
+                               # test_ci_path_coverage.py。上一版三者皆 dependencies:[] 且 wave_2 注释
+                               # 写「文件域 disjoint」—— 真并行派发会各自从零创建同一文件,
+                               # last-writer-wins ⇒ 静默丢掉 2/3 的 RED 断言, 且丢失后
+                               # TASK-003 的「TASK-002 全绿」对已不含断言的文件求值 ⇒ **恒真假绿**。
+    deliverables:
+      - "aria/skills/phase-c-integrator/tests/test_ci_path_coverage.py"
+      - "aria/skills/phase-c-integrator/tests/fixtures/workflows/{submodule,meta}/ (**冻结 4 份真实 workflow + 来源 SHA/抓取日期 — R5 tl#4 从 TASK-010 前置到此**)"
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-5b, AC-5b2, AC-5j, AC-5k, AC-5n, AC-8b, AC-13]   # R2: 5n 用母编号 (proposal 无子标号);
+                                                                     # AC-8b 从 TASK-006 移来 (be-F3: 它测步骤 2 的标量归一化)
+    context_refs:
+      - "proposal.md §2 步骤 2"
+      - "post_spec R4 报告 (R4-B token 命中 / R4-C `---` 语义)"
+      - "**proposal.md §验收标准 AC-7** (R6 tl-NEW-2: fixture 的**生产规格**在此 —— `submodule` 1 份 + `meta` 3 份的**双 root 拓扑**、附来源 SHA + 抓取日期、6 条 covered/not-covered 断言逐条钉路径前缀。R5-B 把交付物搬来却没搬规格: §2 步骤 2 全段零 fixture 内容, 本任务自身只需能跑 `on:` 解析的 workflow, 单 root 4 份完全够用 ⇒ **最自然的产出就是不满足 AC-7 的 fixture**)"
+      - "**proposal.md §验收标准 AC-13** (同上缺口双重命中)"
+    verification:
+      - "全部断言实现前为 RED"
+      - "AC-5b 三条负控齐备 (run 块体 / 注释 / paths 内的 `**` 均不触发)"
+      - "AC-5b2 双向 (首行 `---` 不触发 / 内容行后的 `---` 触发)"
+      - "**fixture 目录按 AC-7 逐字冻结** (双 root、4 份、SHA + 抓取日期齐备) —— 判据: **TASK-010 直接复用即可写出 AC-7 全部 6 条断言而无需补冻** (R6 tl-NEW-2: 给该 deliverable 装上验收判据)"
+      - "**AC-5n 的缩进半条**: 构造缩进介于 N 与 E 之间的行 ⇒ `reason=\"unrecognized_indent_structure\"` (R6 qa-R6-A: 上一版 AC-5n 被 004/008 同时 covers_ac 而**两处 verification 均零字提及**)"
+    notes: >
+      (post_planning F5 + KM-2) **AC-13 此前零任务认领** —— 它是 R3 专为「R2 引入的零测试设计点」
+      补的正面验证: `"on":` / `'on':` 引号写法须与裸 `on:` **逐字段等价**。proposal §2 明说本仓语料
+      4/4 裸 `on:`, **套件测不到该形态** ⇒ 没有 RED 则实现者只按语料写裸形态, 采用方仓库走
+      no_events_parsed ⇒ 恒 wait 且**无任何 AC 会红**。复用 AC-7 的冻结 fixture 改写 `on:` 键即可。
+      **(R5 tl#4)** 该 fixture 目录原列在 TASK-010 (wave_6b) 的 deliverables —— 而本任务在 **wave_2b**,
+      即**消费者排在生产者上游四个波次**。两种分叉都真实: 自己现编 inline mini-YAML ⇒ AC-13 退化成玩具输入
+      (而它存在的全部理由就是真实语料才有鉴别力); 照字面自己冻结 ⇒ TASK-010 再冻一次 ⇒ 同目录两次独立创建
+      = 本文件花两轮消灭的 last-writer-wins 在一个**未声明的文件域**上复发。⚠️ 同文件交集不变量对它
+      **双重失明**: 该目录原不在本任务 deliverables 里 (交集为空), 且判据是「有路径相连」**方向无关**。
+
+  - id: TASK-005
+    title: "[GREEN] 步骤 2 — 解析器实现"
+    status: pending
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-003, TASK-004]
+    deliverables: ["aria/skills/phase-c-integrator/scripts/lib/ci_path_coverage.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    load_bearing:
+      - "通用预处理 (剥注释 → strip → 剥成对引号) **优先于**一切同行残留判断"
+      - "`on:` 键识别接受 `on:` / `\"on\":` / `'on':`, **且必须是列 0 的文档顶层键**"
+      - "5 条缩进规则 (N 锁定 / 同行残留 / 空行注释跳过不终止 / E 参照缩进 / ≤N 终止)"
+      - "非块状 on: — 标量或流式序列 ⇒ 全覆盖; 流式映射 `on: {…}` ⇒ fail-CLOSED"
+      - "零 event 兜底: event 数为 0 ⇒ covered=True, confident=False, reason=no_events_parsed"
+      - "token 扫描**位置式**命中判据 (值/键首字符为 `&`/`*`/`!`, 或键位以 `<<` 开头; 串中间的 `*` 不算), 作用域限 on: 块行区间 + 跳过纯注释行"
+      - "`---`: 首个非空非注释内容行**之后**才是多文档分隔; 之前是 YAML 文档起始标记 ⇒ 忽略"
+    verification:
+      - "本任务 load_bearing 逐条 code review 核"
+      - "⚠️ **本任务无自身独立的红→绿窗口** (post_planning R2 be-Finding-1): TASK-004 的断言全部打在 `_match_coverage` 上, 而联合逻辑要到 TASK-009 才存在 ⇒ 不得以「TASK-004 全绿」为收尾判据 (那是不可满足的承诺, 压力会指向偷跑本属 TASK-009 的聚合代码)。TASK-004 的断言由 **TASK-009 的 verification 统一核验**"
+
+  - id: TASK-006
+    title: "[RED] 步骤 3+4 — 事件贡献判定 + 单 event 路径覆盖"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    dependencies: [TASK-004]   # 同文件域串行边 (cr-N3), 同 TASK-004 说明
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_ci_path_coverage.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-5e, AC-5h, AC-5i-1, AC-5i-2, AC-5l, AC-8c]   # R2 be-F3: AC-8b 移出至 TASK-004
+    context_refs: ["proposal.md §2 步骤 3 + 步骤 4"]
+    verification:
+      - "AC-5i-2 (paths 与 paths-ignore **共存**) 独立成例 —— 专盯 `if 'paths' … elif 'paths-ignore'` 的顺序写反"
+      - "AC-5h 用杜撰的 `future_event`, **不用** `pull_request_target` (它已进 paths-aware 白名单)"
+
+  - id: TASK-007
+    title: "[GREEN] 步骤 3+4 实现"
+    status: pending
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-005, TASK-006]
+    deliverables: ["aria/skills/phase-c-integrator/scripts/lib/ci_path_coverage.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    load_bearing:
+      - "封闭黑名单 **18 项** (post_planning KM-1 勘正: 上一版误写 19)。**以 proposal §2 步骤 3 的枚举本身为准**, 不写死数字断言"
+      - "paths-aware 白名单: push / pull_request / pull_request_target"
+      - "其余任何事件名 ⇒ covered=True, confident=False, reason=unrecognized_event"
+      - "步骤 4 判定序 4 行, **自上而下首个命中即返回**; 第 1 行 `paths-ignore` 短路 (无论 paths 是否同时存在)"
+      - "第 4 行 (非空 paths) 的 confident=True; reason = covered_by_paths_match / no_paths_match"
+    verification:
+      - "本任务 load_bearing 逐条 code review 核"
+      - "⚠️ **本任务无自身独立的红→绿窗口** (同 TASK-005, be-Finding-1): TASK-006 的断言由 **TASK-009 的 verification 统一核验**"
+
+  - id: TASK-008
+    title: "[RED] 步骤 5 — units 构造 + 前置守卫 + 聚合"
+    status: pending
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-002, TASK-004, TASK-006]
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_ci_path_coverage.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-5a, AC-5m, AC-5n]        # R2: 5n 用母编号; AC-5f-2 改为任务级断言 (见 task_level_assertions)
+    task_level_assertions:
+      # ⚠️ 嵌套键**必须**是 `assertion_id` 而非 `id` (post_planning R3 cr-NEW-1, 实跑证实 + 反事实证因):
+      #    lib/detailed_tasks.py 的 _TASK_ID_LINE_RE = `^([ \t]*)-\s*id:` 是 MULTILINE 且**不限缩进**,
+      #    嵌套的 `- id:` 会被数进 id_matches (28) 而 base-indent 直接项只有 27 ⇒ 自洽性检查判
+      #    `structural self-inconsistency` ⇒ parse_ok=False, tasks=[] ⇒ 本 spec 的归档门退回
+      #    v1.64.0 (#113) 刚废除的 blanket 姿态, 且 TASK-001b/025b 援引的「status 被归档门消费,
+      #    done-family fail-CLOSED」强制力整个失效 (解析器读不到任何 status)。
+      - assertion_id: "TASK-008-A1"
+        source: "proposal §2「`_match_coverage` 自带防御性早退 (R4-D)」设计段 (非 proposal AC)"
+        assertion: "`_match_coverage(<非空 workflow_files>, [])` ⇒ covered=true, confident=false, reason=changed_files_empty"
+      # (R2 qa#1 + cr-N7) 上一版自造编号 `AC-5f-2`, proposal 中零命中 ⇒ TASK-020 被要求「从 proposal
+      # 重新枚举, 不得以 covers_ac 并集为准」时, 它会被判为异常项而最省力的处置是删掉 —— 而它正是
+      # F6 用来给 R4-D 防御性早退补上自身层 RED 的唯一断言。改为显式的任务级断言, 不冒充 AC。
+    context_refs:
+      - "proposal.md §2 步骤 5"
+      - ".aria/audit-reports/post_spec-R3-*-aggregated.md (R3-A 空 unit 集) + post_spec-R4-*-aggregated.md (R4-A units 定义域)"
+    verification:
+      - "AC-5a **参数化**: X 遍历全部 5 个整-workflow-级 reason (workflow_unreadable / flow_mapping_on_block / no_events_parsed / unrecognized_yaml_construct / unrecognized_indent_structure), 每组断言整体 covered=true"
+      - "AC-5m fixture 直接用 .forgejo/workflows/submodule-gate-tripwire.yml 真实内容 (仅 workflow_dispatch)"
+      - "**AC-5n 的异常半条**: mock 内部辅助函数抛任意异常 ⇒ `covered=true, confident=false, reason.startswith(\"exception:\")` 且**不传播** (R6 qa-R6-A: 这是整个手写 parser「永不 raise」承诺的**唯一安全网**, 漏写即 gate_check 崩溃 —— 而上一版此条只以一句 load_bearing 存在于 **GREEN 任务** TASK-009 里, RED 侧零对应文字)"
+      - "**task_level_assertions TASK-008-A1**: `_match_coverage(<非空 workflow_files>, [])` ⇒ covered=true, confident=false, reason=changed_files_empty (R3 cr-NEW-4: 上一版此处仍写自造标号 `AC-5f-2`, 与旁边两处矛盾)"
+    notes: >
+      (post_planning F6) R4-D 的防御性早退此前**在自己那一层零 RED** —— 唯一相关的 AC-5f 派给了
+      测 coverage() 的任务。把 TASK-009 那行删掉全套测试仍绿 = 守卫成了没有测试保护的注释,
+      而它防的病 (R1 最初那个最高置信度 skip) 复发时无信号。
+
+  - id: TASK-009
+    title: "[GREEN] 步骤 5 实现 + _match_coverage 防御性早退"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    dependencies: [TASK-007, TASK-008, TASK-010]   # R5 tl#3: AC-7 的 RED 须先于本任务 (步骤 5 聚合) 落地
+    deliverables: ["aria/skills/phase-c-integrator/scripts/lib/ci_path_coverage.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    context_refs:
+      - "proposal.md §2 步骤 5 (units 定义 + 前置守卫 + 聚合 reason 4 条规则)"
+      - ".aria/audit-reports/post_spec-R3-*-aggregated.md (R3-A 空 unit 集) + post_spec-R4-*-aggregated.md (R4-A units 定义域)"
+    load_bearing:
+      - "units = pair_units + workflow_level_units; 后者为 (workflow, None) 型, 同时参与 covered 的 OR 与 confident 的 AND"
+      - "`if not units: return covered=True, confident=False, reason=no_paths_aware_event` —— **显式早退, 禁止 any()/all() 的语言默认值代为决策**"
+      - "唯一允许 covered=False 的三项条件"
+      - "聚合 reason 4 条确定性规则 (含 mixed_confidence_partial_match + 排序键)"
+      - "函数首行 changed_files 防御性早退 (**R4-D**, 非 R4-B — post_planning KM-7: proposal §2 此处标注有误, 以本条为准)"
+      - "**永不 raise** (与 coverage() 薄壳同契约; AC-5n 的异常半条测本层)"
+    verification:
+      - "TASK-008 全绿"
+      - "TASK-004 与 TASK-006 的**全部**断言, **以及 TASK-010 中仅 AC-7 那一组**断言, 在此一并转绿。⚠️ **TASK-010 的其余 AC (5c/5d/5f/5g/7b/11) 属 `coverage()` 层, 在 TASK-011 转绿 —— 不得为让它们变绿而把薄壳代码提前写进本任务** (R6 tl-NEW-3: 上一版「三个任务的全部断言」有广读法, 会让实现者把三目录扫描+git diff 提前写进本任务 ⇒ TASK-011 退化成空任务、其红→绿窗口消失 = R5-A 修的失效模式换位置复发, 且搅动 R2 立起的双层结构) (be-Finding-1: 那两对无自身窗口, 其红→绿在本任务收口)"
+      - "load_bearing 逐条 code review 核 — 特别是「无 any()/all() 对可能为空的集合直接求值」"
+
+  # ══════════════════ Group 3: coverage() 薄壳 ══════════════════
+  - id: TASK-010
+    title: "[RED] coverage() 薄壳 (步骤 0/1/8) + 单出口 sweep"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    dependencies: [TASK-008]   # ⚠️ **R5 tl#3 把边掉了个方向**。原 R2 qa#4: AC-7 明文「直接测 `_match_coverage` 纯函数」且用真实冻结
+               # fixture 跑完整流水线。qa 描述的危害是「若 009 先完成, AC-7 从未在实现不完整态被观察到红,
+               # 直接以绿态出现」—— 但它给的建议修法 (给 010 加 009 依赖) 恰好**强制 009 先完成**, 与自述
+               # 危害相反。R2/R3/R4 三轮把 finding 原文与错边并排放着无人对读。**正确方向是 RED-before-GREEN**:
+               # TASK-010 (写 AC-7 断言) 先, TASK-009 (步骤 5 聚合实现) 后 —— 见 TASK-009.dependencies。
+               # AC-7 是全 spec **唯一**不靠 mock、直跑真实完整流水线的验收测试, 红→绿窗口价值最高。
+    deliverables:
+      - "aria/skills/phase-c-integrator/tests/test_ci_path_coverage.py"
+      # fixture 目录由 TASK-004 冻结 (R5 tl#4), 本任务**复用**不重建
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-5c, AC-5d, AC-5f, AC-5g, AC-7, AC-7b, AC-11]
+    context_refs: ["proposal.md §2 步骤 0/1/8 + AC-7/7b/11"]
+    verification:
+      - "AC-5g 须断言 gate_check **不抛异常**且 main() 退出码 0"
+      - "AC-7b 是 drift guard: 只断言不抛异常 + 字段齐全 + workflows_seen>=1, **不钉 covered 真值**"
+      - "**AC-11(a) 的 sweep 必须覆盖 TASK-002/004/006/008 与本任务两批全部输入** (post_planning F7)"
+      - "AC-11(b) 两个字面值互不相同的正例"
+      - "**AC-7 的 6 条断言逐条写出** (R6 qa-R6-B —— 上一版 AC-7 只有 `covers_ac` 声明, 4 条 verification **无一提及它**; 三整轮的注意力被「AC-7 该排在哪个依赖位置」占据, 没人退一步问「它的断言内容有没有被要求写出」= memory `feedback_verify_predicate_inputs_exist` 的「注意力被公式独占」): root=`submodule` 3 条 (`['skills/issue-triage/x.py']`→covered / `['skills/state-scanner/scan.py']`→**not** covered / 并集→covered); root=`meta` 3 条 (`['aria/skills/issue-triage/x.py']`→covered / `['docs/foo.md']`→**not** covered / `['aria-orchestrator/docker/aria-runner/Dockerfile']`→covered)"
+    notes: >
+      (post_planning F1) **AC-5c/AC-5d 从 TASK-002 移到这里** —— 它们是步骤 1 (`coverage()` 层) 的行为。
+      挂在纯函数层时: `_match_coverage(workflow_files=[], …)` 走步骤 5 前置守卫返回 no_paths_aware_event,
+      **不可能**返回 no_workflow_files ⇒ 照 AC 字面写在纯函数层必红, 且与 AC-5m 撞车; 而压力最小的
+      出路是把三目录扫描塞进纯函数让它变绿 ⇒ **摧毁 R2 双层结构、重开已闭合的 critical**。
+      (post_planning F7) **AC-11 同样从 TASK-002 移来** —— 它要 sweep AC-5a~5n 全部输入, 而 5f/5g/5c/5d
+      的输入由本任务产出; 挂在先执行的 TASK-002 上会让 sweep 静默缩水, 排除掉的恰是 R1 抓到的
+      最高置信 skip (5f) 与 exit 128 (5g)。
+
+  - id: TASK-011
+    title: "[GREEN] coverage() 薄壳实现"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    dependencies: [TASK-009, TASK-010]
+    deliverables: ["aria/skills/phase-c-integrator/scripts/lib/ci_path_coverage.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    load_bearing:
+      - "`git -C <repo_root> diff --name-only -z <main_branch>...<pr_branch>`; `stdout.rstrip('\\0').split('\\0')` 再滤空串"
+      - "非零退出码 / 异常 / 结果为空 ⇒ 立即 covered=True, confident=False, 不进步骤 1+"
+      - "repo_root_resolved 回填 (`git -C <root> rev-parse --show-toplevel`)"
+      - "三目录扫描 (.forgejo / .github / .gitea) × (*.yml, *.yaml)"
+      - "**per-file 读失败产出 workflow_unreadable unit 并计入 workflows_seen** —— 不得静默跳过"
+      - "永不 raise"
+    verification: ["TASK-010 全绿", "load_bearing 逐条 code review 核"]
+
+  # ══════════════════ Group 4: backend (拆 gate / 非 gate) ══════════════════
+  - id: TASK-012
+    title: "[RED] backend not_found 契约 (含 :329 改判)"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: []
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_ci_backends.py", "aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    context_refs: ["proposal.md §1 (含破坏性面 4 项)"]
+    verification:
+      - "test_pre_merge_gate.py:329 的 `_normalize_pr_ci_status([]) == \"pending\"` 改判为 `\"not_found\"`"
+      - "**同步改名** `test_empty_runs_pending` (:328) → `test_empty_runs_not_found`, docstring 注明 v1.65.0 契约变更 (proposal §1 破坏性面 1) —— 否则仓里会留下一个叫 `..._pending` 却断言 `not_found` 的用例, 后来者 grep `pending` 排查恒 wait 时会被它误导 (cr-N9)"
+      - "`test_ci_backends.py` 新增 backend 侧镜像断言 (**该文件现对 `_normalize_pr_ci_status` / `not_found` 零覆盖**, 实测确认) —— 否则它出现在 deliverables 却无人能判做没做对 (cr-N8)"
+      - "非空 runs 映射的既有断言逐字节不变 (证明只改了空集分支)"
+    notes: >
+      :329 的改判是**有意契约变更**, 不是顺手改绿。改前先 grep 复证行号 (metadata.scope_repo_head)。
+
+  - id: TASK-013
+    title: "[GREEN] aether.py 返回值 + docstring + CIBackend 契约声明 (**无 gate**)"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: [TASK-012]
+    deliverables:
+      - "aria/skills/phase-c-integrator/scripts/ci_backends/aether.py"
+      - "aria/skills/phase-c-integrator/scripts/ci_backends/base.py"
+    agent: backend-architect
+    reason: "同 TASK-003"
+    load_bearing:
+      - ":223-224 `return \"pending\"` → `return \"not_found\"`; 非空 runs 映射逐字节不变"
+      - ":216-221 docstring 同步 (现写「→ passing | failing | pending」+「unknown statuses route to pending」)"
+      - "**`base.py`**: `CIBackend.query_pr_ci` docstring 声明 `not_found` 自 v1.65.0 起**有生产者** (此前 `CIStatus.state` 的 Literal :29 含它但全仓零生产者)。⚠️ **仅此一条** —— proposal §5 把 `CIBackend` ABC 的 **repo_root 契约**声明列在 gated 的那条腿里, 归 TASK-015, 不在本任务 (cr-N8)"
+    verification:
+      - "TASK-012 全绿"
+      - "`base.py` 的改动仅限 docstring 声明, 不含 repo_root 相关签名 (那属 TASK-015 的 gated 面)"
+    notes: "(post_planning F3) 从原 TASK-007 拆出 —— 这部分**不依赖 spike 结论**, 不应被闸门拖住。"
+
+  - id: TASK-014
+    title: "[RED] backend repo_root 透传 (**gated by TASK-001**)"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: [TASK-001, TASK-001b, TASK-012]
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_ci_backends.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-14]
+    gate_condition: "仅当 TASK-001 结论为『aether 按 CWD 解析仓』时执行; **证否则本任务与 TASK-015 的 `status` 置 `blocked` —— 但 `blocked` 是过渡态**: 若 TASK-001b 的 owner 裁定**已落地** (本任务 status 已在 done-family), **不得回写 `blocked`**; 若尚未落地, 置 `blocked` 并**由 owner** 在 Phase D 归档前改为 `completed` + N/A 备注 (R6 tl-NEW-1: 上一版把收口指令写在 wave_1b 的 TASK-001b 上, 而 blocked 由 wave_3/4 的本任务制造 ⇒ 收口排在它要收的口**之前**, 证否分支实际终态仍是 2 个 blocked ⇒ R5-D 原样复发) (DUAL_LAYER_SPEC 枚举内), 备注指向 TASK-001b 待 owner 重规划。**不得**通过删弱 AC-14 让套件变绿 (Rule #10 反模式)。(R2 be-F5: 上一版只规定「不能做什么」, 没规定等待期间的 status ⇒ 不同执行者一个留 pending 一个标 blocked, 归档门行为随执行者摇摆)"
+    context_refs: ["proposal.md §5 + AC-14"]
+    verification:
+      - "AC-14 含**两条**断言: ① `subprocess.run` 实收 `cwd == 传入的 repo_root` (裸比较, 验证透传); ② `os.path.realpath(cwd) == path_coverage['repo_root_resolved']` (R4 勘正 — `cwd` 默认 `\".\"` 而 resolved 是绝对路径, 直接 `==` 恒不等)"
+      - "同步 test_ci_backends.py :152-157 与 :191-195 两处 `_backend()` 工厂 (二者用 `__new__` 绕过 `__init__`, 不补 repo_root 会 AttributeError)"
+    notes: >
+      (post_planning F4) 原 TASK-006 无条件承接 AC-14 且 `dependencies: []` ⇒ 可与 spike 并发,
+      等于把未实证的承重假设**先做成既成事实**再让 spike 追认 (spike-first 顺序反转)。
+      (post_planning F3) 无 gate 时 AC-14 会变成**结构上没有 GREEN 的 RED**, 压力全指向删弱它 = Rule #10 反模式。
+
+  - id: TASK-015
+    title: "[GREEN] repo_root 构造参数 + subprocess cwd + 透传链 (**gated**)"
+    status: pending
+    complexity: M
+    estimated_hours: "2-4"
+    dependencies: [TASK-013, TASK-014, TASK-017]
+    deliverables:
+      - "aria/skills/phase-c-integrator/scripts/ci_backends/aether.py"
+      - "aria/skills/phase-c-integrator/scripts/ci_backends/base.py"
+      - "aria/skills/phase-c-integrator/scripts/ci_backends/github_actions.py"
+      - "aria/skills/phase-c-integrator/scripts/pre_merge_gate.py"
+    agent: backend-architect
+    reason: "同 TASK-003"
+    gate_condition: "同 TASK-014 (含证否时 status 置 `blocked`)"
+    # ⚠️ dependencies 含 TASK-017: 同文件域串行边 (pre_merge_gate.py)。R3 的 deliverable-交集
+    #    机械核对抓到 015↔017 与 015↔019 两对同文件却无依赖路径 —— 与刚修的 TASK-016 同类。
+    load_bearing:
+      - "`AetherBackend.__init__(..., repo_root: str | None = None)` —— None 时退回 ambient cwd, 保持向后兼容"
+      - "`_run_with_retry` (:173) 与 `_verify_in_flight_flag` (:150) 的 `subprocess.run(..., cwd=...)`"
+      - "`_instantiate` (:151-161) + `resolve_ci_backend` 透传 repo_root"
+      - "**`GitHubActionsBackend` 同步接受并忽略** (post_planning F14 裁定) —— 保证 CIBackend ABC 契约单一; 否则 `_instantiate` 统一传 `repo_root=` 会在指向 github_actions 的配置下 TypeError, 本仓测不到、采用方仓库崩"
+    verification:
+      - "TASK-014 全绿"
+      - "`resolve_ci_backend` 对**两个** backend 都能带 repo_root 实例化 (F14 兄弟断言)"
+    notes: "(post_planning F3) 原 TASK-009 的 load_bearing[8] (透传链) 移入本任务 —— 它是同一闸门的下游, 此前无任何 gate 标记 ⇒ 照建不误 = 被 backend 忽略的死代码 (paper fix)。"
+
+  # ══════════════════ Group 5: gate 接线 ══════════════════
+  - id: TASK-016
+    title: "[RED] compute_verdict catch-all 极性 (baseline-failing)"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: [TASK-012]   # ⚠️ 同文件域串行边 (test_pre_merge_gate.py) —— **R3 两席独立命中**:
+                               # R2-fix 声称补了三条同文件域边, 实际只落了两条, 这条漏了而
+                               # order_note 在两处断言它已存在 = 同一次修订里同形状复发。
+                               # 与 R2-C 的「新建文件 last-writer-wins」不同, 这里是 modify-modify:
+                               # 012 改 :328-329 的改判改名, 016 追加三条 baseline-failing 断言,
+                               # 任一方基于陈旧读取写回都会吞掉对方 —— 而 016 承载的 AC-10 是本 change
+                               # **唯一**在 v1.64.0 上实测为红的项。
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-10]
+    context_refs: ["proposal.md §3 + §Why 增量事实 2"]
+    verification:
+      - "三条断言在 v1.64.0 上**实测为红** (返回 green) —— 先看到红再进 TASK-017"
+      - "写法为 `compute_verdict([], x)[\"verdict\"] == VERDICT_WAIT` (**返回 dict 不是 str**, R2 N-γ)"
+    notes: >
+      (post_planning F9) 从原 TASK-008 拆出。这是本 change **唯一**在 v1.64.0 上实测为红的项,
+      应尽早落地, 给出一个干净的红→绿窗口证明极性真的反转了。
+      **(R4 be 勘正)** 原批注写「**且零依赖** ⇒ 应第一个落地」—— R3-fix 为消同文件域并发写入把本任务
+      改成 `dependencies: [TASK-012]` 后该表述已失真。「尽早落地」的原始意图现由 **wave_2b** (紧随
+      TASK-012) 承接, 它仍是全 spec 第一个触达实现代码的 RED 任务。⚠️ **不得**据旧表述跳过对
+      TASK-012 完成状态的确认直接并发起手 —— 那会原样复现 R3-B 刚修的 `test_pre_merge_gate.py`
+      并发写入冲突, 而 AC-10 的三条 baseline-failing 断言正是靠这条串行边才能被稳定观察到红。
+
+  - id: TASK-017
+    title: "[GREEN] compute_verdict catch-all 极性反转"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: [TASK-016]
+    deliverables: ["aria/skills/phase-c-integrator/scripts/pre_merge_gate.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    load_bearing:
+      - "catch-all 从 fail-OPEN (`else → green`) 改 fail-CLOSED; **不新增 not_applicable 分支** (与 passing 同列进既有 in-flight 判定, 结构保证 Rule #8 (a)(b) 独立性)"
+      - ":190 / :193 两条注释同步 (现写死 `pr_ci_status == \"passing\"`)"
+    verification: ["TASK-016 全绿", "对 v1.64.0 既有 4 值 (passing/failing/pending/error) × 2 in-flight 态**逐字节等价**"]
+
+  - id: TASK-018
+    title: "[RED] gate_check 接线 + raw_message 模板选择器"
+    status: pending
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-010, TASK-016]
+    deliverables: ["aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py"]
+    agent: qa-engineer
+    reason: "同 TASK-002"
+    covers_ac: [AC-1, AC-2, AC-3, AC-4, AC-6, AC-12, AC-15]
+    context_refs: ["proposal.md §3 + §4"]
+    verification:
+      - "AC-1/2/3/15 各钉一条模板**逐字串**"
+      - "AC-4 对抗性: 断言 `coverage()` **未被调用**"
+      - "AC-12 三组 mock **按 §2 的 7 键完整 schema 构造** (reason 任取合法值, covered_by=None, repo_root_resolved=None) —— 否则 mock #1 落模板 3 会在断言前 KeyError"
+
+  - id: TASK-019
+    title: "[GREEN] gate_check 接线实现"
+    status: pending
+    complexity: L
+    estimated_hours: "6-10"
+    dependencies: [TASK-011, TASK-015, TASK-017, TASK-018]
+    deliverables: ["aria/skills/phase-c-integrator/scripts/pre_merge_gate.py"]
+    agent: backend-architect
+    reason: "同 TASK-003"
+    gate_condition: "TASK-001 **证否**时: **判定规则 (非仅结论 — R6 qa-R6-C)**: 评估本任务就绪性时把 TASK-015 **从 `dependencies` 的必要性判断中剔除** (015 在此分支永久 blocked 属**预期**而非异常), **改为要求 `TASK-001b ∈ done-family`**。⚠️ 字面 `dependencies:` 字段**不移除** TASK-015 —— 静态图不变, 本规则只在证否分支的就绪性评估中应用 (上一版只写「转移到哪」没写「如何执行转移」⇒ 严格按 dependencies 判就绪的执行者/未来调度器会看到 019 永久卡在「依赖永久 blocked 的 015」的死锁态)。据此本任务对 TASK-015 的依赖**转移到 TASK-001b** (015 退出图, 但 **001b 必须留在可达集** —— R5 tl#1: 上一版写「视为已消解」, 而 015 是 019/020 通往 TASK-001b (owner 裁定) 的**唯一路径**, 消解后证否分支上能到达 001b 的只剩被置 blocked 不执行的 014/015), `pre_merge_gate.py` 的同文件域串行由**既有的 TASK-017 直接边**保持 (dependencies 已含它, 无需新增); 同时本任务**仅 `gate_check:298` 那一项**失效 (非 3 项 — R5 cr-NF-1), **其余项含 `--repo-root` CLI 与 Usage 照常执行**。—— R4 cr-F1: 上一版 TASK-019 无 gate_condition 而依赖 gated 的 TASK-015 ⇒ 证否时连带阻断 8 个下游任务 (含 #122 核心修复 019 / Rule #6 023 / 发版 024), 三种执行者分叉 (严守图停摆 / 对 1 参签名传 2 参 TypeError / 自行跳过=Rule #10 反模式) 都真实存在"
+    context_refs:
+      - "proposal.md §3 (**模板选择器 5 行判定序表 — 5 条模板的逐字文本只在此**, load_bearing 未内联)"
+      - "proposal.md §4 (输出 schema + 7 个构造点 + :343)"
+      - "proposal.md §5 (repo_root 机制 — `gate_check:298` 的连接点在此)"
+    load_bearing:
+      - "四重合取 not_app 判定 (not covered ∧ confident ∧ workflows_seen≥1 ∧ changed_files_count≥1)"
+      - "`path_coverage_aware=false` 时**无条件回折** not_found → pending (开关只关覆盖计算, 不关翻译)"
+      - "raw_message 由 compute_verdict **内部合成** — 5 行互斥全覆盖判定序, 第 5 行兜底 `\"\"`; **不得**在 gate_check 事后打补丁改 dict"
+      - "`path_coverage` keyword-only 参数穿透 **7 个构造点** (:196/:237/:250/:290/:307/:322/:335), 未计算时传 None, 键恒存在"
+      - "**`gate_check:343` 的 `compute_verdict(...)` 调用点 — 第一实参改传派生 `pr_ci_status`, 不再是 `pr_status.state`** (post_planning F15: proposal §4 用祈使句下达「tasks 须点名」, 上一版只点了 path_coverage 半条; 漏改则四重合取算出的 not_applicable 被丢弃 ⇒ compute_verdict 收到 not_found ⇒ 落新 catch-all ⇒ 恒 wait ⇒ #122 一字未修)"
+      - "DEFAULT_CONFIG 加 `path_coverage_aware=true` —— 缺键即 `cfg[...]` KeyError (`gate_check:287` 是 `{**DEFAULT_CONFIG, **user_normalized}`)"
+      - "`--repo-root` CLI (默认 CWD) + `gate_check(..., repo_root=\".\")` **带默认值** (不破坏既有 3 参调用点与测试)"
+      - "(元, 非动作) ⚠️ **下一条 (`gate_check:298` 改传) 属 repo_root **backend** 腿, 受 TASK-001 spike 闸门约束; 证否时仅该条失效**。其余项照常执行 —— **含 `--repo-root` CLI 与 `:20-21` Usage: 它们服务于 ungated 的 `coverage(repo_root, …)` 调用 (TASK-011 的 `git -C <repo_root>`), 与 aether 的仓解析语义无关** (R5 cr-NF-1: 上一版标「以下 3 项」把两个 ungated 承重输入误纳入闸门 ⇒ 证否时抹掉 `--repo-root` 会让 ungated 的 `coverage()` 失去入参, 或诱使把 `\".\"` 硬编码 ⇒ §5 在**覆盖侧**要根治的跨仓假绿原样保留且**无 AC 会红**; 且「以下 3 项」其下只有 2 条、第三项在标记上方 = 位置歧义 tl#6)"
+      - "**`gate_check:298` 的 `backend = resolve_ci_backend(cfg)` 调用改传 `resolve_ci_backend(cfg, repo_root)`** (R3 be-Finding-2): 这是 `gate_check` 内**唯一**的 `resolve_ci_backend` 调用点, 而 TASK-015 只点名改它的**签名**与内部转发、TASK-019 只点名给 `gate_check` **新增**参数 —— 两边都没点名「这一行调用本身要把 repo_root 传进去」。漏改则 `--repo-root` 只停留在局部变量, 从未送进 backend 查询链, §5 要根治的跨仓假绿完全不受影响。且 **AC-14 测不到** (TASK-014 用 `_backend()` 工厂直接构造, 绕开 `gate_check`/`resolve_ci_backend`) ⇒ 与 F15 同形状但更隐蔽 (连事后兜底断言都没有)"
+      - ":20-21 Usage 加 `[--repo-root PATH]`"
+    verification: ["TASK-018 全绿", "load_bearing 逐条 code review 核 (TASK-018 不覆盖 DEFAULT_CONFIG 缺键与 :20-21 Usage)"]
+
+  # ══════════════════ Group 6: 验证 / 文档 / 发版 ══════════════════
+  - id: TASK-020
+    title: "全量回归 + AC 独立枚举核对"
+    status: pending
+    complexity: S
+    estimated_hours: "2-3"
+    dependencies: [TASK-019, TASK-015]
+    deliverables: ["(无文件产出; 核对留痕入 Phase C commit body)"]
+    agent: code-reviewer
+    gate_condition: "同 TASK-019 —— TASK-001 证否时对 TASK-015 的依赖**转移到 TASK-001b**, 全量回归照常执行 (R4 cr-F1 + R5 tl#1)"
+    context_refs: ["proposal.md §验收标准 (全章 — 本任务须从此重新枚举, 不得读 covers_ac)"]
+    reason: >
+      (post_planning F20) **交叉换人** —— AC 覆盖完备性的唯一兜底不能由写下 covers_ac 的同一角色自查。
+    verification:
+      - "phase-c-integrator 目录**全量** pytest 绿。基线 **62 passed** (test_pre_merge_gate.py 37 + test_ci_backends.py 25, 在 aria @3694871 实测; post_planning KM-3 勘正上一版误写的「全量 37」)"
+      - "跨 skill 全量回归 `python3 -m pytest aria/skills/ -q`, **两步骤 (R6 qa-R6-E 消歧)**: ① **B.1 创建分支、代码尚未改动时**跑一次并把数字记进 commit body 或本文件占位段; ② 本任务执行时**读取该已存档数字**比对。⚠️ 上一版括注写「基线须在 TASK-020 开始时先记录」—— 本任务在 wave_9, 此刻实现已基本完成, 那样测出的数**已含本 change 自己的效果**, 拿它跟自己比 ⇒ 回归检测能力归零 (恒真)。禁止的是**伪造/事后补写**基线, 不是「读取已存档数字」这个合法动作"
+      - "**从 proposal.md §验收标准 章节重新枚举 AC 清单再比对**, 不得以本文件 covers_ac 的并集为准"
+      - "⚠️ **spike 证否分支**: AC-14 必然未实现。其处置**以 TASK-001b 的 owner 裁定为准, 不得由本任务自行判定** (R5 tl#1) —— TASK-014 明文「不得通过删弱 AC-14 让套件变绿 (Rule #10 反模式)」, 而「证否所以 AC-14 N/A」是合理但**无成文 lane 的 AI 流程裁量** (memory `feedback_written_exception_exact_condition_match` 的形状)"
+      - "**实跑归档门解析器** (R3 cr-NEW-1 要求 — 此前 27 个任务无一会碰到它)。**执行位置**: CWD = `aria/skills/state-scanner/scripts/` 或 `sys.path.insert(0, <该路径>)` —— 从仓根直接跑会 `ModuleNotFoundError` (R4 cr-F3: 一条看起来跑不起来的核对项最省力的处置就是「环境问题, 跳过」⇒ 守卫退化成注释)。可粘贴调用形: `from pathlib import Path; from lib.detailed_tasks import parse_detailed_tasks; r = parse_detailed_tasks(Path(\"<本文件绝对路径>\").read_text(encoding=\"utf-8\"))`, 断言 `r[\"parse_ok\"] is True and len(r[\"tasks\"]) == 27`。⚠️ **实参是文件*文本*不是路径** —— 传路径会**静默**返回 `parse_ok=False, tasks=[]`, 与真实结构性损坏输出**完全相同** (R5 tl#5 实测踩中); 见到 False 先确认实参, **不要**据此重构 YAML (那正是 R3-A 钉住的东西)。防的是「yaml 里任何位置出现第二个 `- id:` 行 ⇒ 自洽性检查判 structural self-inconsistency ⇒ 归档门退回 blanket 姿态且读不到任何 status」"
+      - "(元, 非动作) ⚠️ **本文件不是合法 YAML** (`execution_order` 的 block sequence 与 `order_note` 同层混排, `yaml.safe_load` 报 ParserError) —— 下面这条核对**须用行解析或先剥离 `execution_order` 段**, 不要 `yaml.safe_load` 整文件。这是既有房规 (20 份 detailed-tasks.yaml 里 5 份同样如此, 含已 ship 的归档与 standards 模板), 归档门本身按设计就是 scoped 行解析器 (`lib/detailed_tasks.py` docstring 明写 NOT a general YAML parser) — R4 cr-F2"
+      - "**deliverable 同文件交集 × 依赖可达性核对**: 逐 deliverable 求同文件任务对, 每对在 dependencies 传递闭包上须有路径相连。—— 拓扑校验对**缺边天然免疫** (缺边不产生 wave 违例), 这是唯一能抓到它的机械手段 (R2/R3 各被它抓到一次)。**判定规则须锁死 (R6 qa-R6-D: 三次独立实现给出 32/33/32 三个计数)**: 仅取每条 deliverable 字符串中 ` (` 之前的部分, 再按 ` / ` 拆多路径, 逐字符串相等比较; 不做前缀/后缀模糊匹配"
+      - "**方向敏感核对 (R5 tl 元建议 — 现有三项不变量全是无向的, 对方向性错误天然免疫)**: (a) 任务引用另一任务的 deliverable ⇒ 生产者须是消费者的**前驱**; (b) 每对 RED/GREEN ⇒ RED 须是 GREEN 的前驱; (c) 受 gate 约束的任务 ⇒ 其 owner 裁决节点须留在可达集 —— ⚠️ **须对每个 `gate_condition` 描述的分支各重建一次依赖图** (剔除被置 blocked 的任务、应用其声明的就绪性判定规则) 后再算可达性; **只在 as-written 图上算 = 恒绿** (R6 tl-NEW-4: as-written 图上 001b 本就是 019/020 的祖先, 不重建就抓不到它被创造出来要抓的那个错误)。**(d) 状态/度量的写入时序 (R6 tl 第四类)**: 任何被多方写入的可变状态 (`status` / 基线数字 / 版本号), 其**收口写入的执行波次须晚于所有会覆盖它的写入**; 度量型基线的采集点须**早于**它要守护的变更。—— R5 的 5 个 major 里有 3 个是这一类 (AC-7 的边写反 / fixture 生产者在消费者下游 / owner 裁定被解锁动作切断), 而无向不变量三项全绿"
+    notes: "上一版把「AC-1~AC-15 逐条勾选」交给写 covers_ac 的同一角色, 是 AC-13 漏派唯一可能被发现的机制却自证。"
+
+  - id: TASK-021
+    title: "文档同步 11 处"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    dependencies: [TASK-019]
+    deliverables:
+      - "aria/skills/phase-c-integrator/SKILL.md (**:40-53 配置总表** / :160-179 含 :176 / :240 / :241-245 / :258-270 / :272-281 / :283-289 / §C.2.4.X)"
+      - "aria/skills/config-loader/SKILL.md (:241-281)"
+      - ".aria/config.template.json (:73-90, 主仓)"
+      - "aria/CHANGELOG.md"
+    agent: knowledge-manager
+    reason: "跨文档同步与措辞保真属该 lane"
+    context_refs: ["proposal.md §6 表格 12 行"]
+    verification:
+      - "四个落点与实测输出核验措辞一致 (Rule #3 要求「与实现行为一致」, 非「改了就算」)"
+      - ":283-289 降级行为段保留**两条并列**前提「黑名单可能过宽 / 白名单可能不全」, 不得改写成单条替换"
+    notes: >
+      (R2 cr-N5) **新增第 11 处: `SKILL.md:40-53` 配置总表** —— proposal §6 表未列, R2 实读补入。
+      它是 SKILL.md 首屏逐行列出 `phase_c_integrator.pre_merge_gate.` 全部 7 个 key 的表;
+      不补则 `path_coverage_aware` 在 config-loader 权威清单与 §C.2.4 参数表里都有、唯独首屏没有。
+      (post_planning KM-4) 标题「12 处」→「10 处」的算术: proposal §6 表 12 行中 row 10
+      (`aether.py:216-221` docstring + `pre_merge_gate.py:20-21` Usage) 已转落 TASK-013/TASK-019,
+      row 11 (AB 套件) 转落 TASK-022 —— 不在本任务 deliverables 内。
+      (post_planning KM-5) :283-289 的勘正归属是 **R2** (P5 极性反转是 R2 事件), 上一版误写 R3。
+
+  - id: TASK-022
+    title: "AB 套件 — 2 个 not_applicable fixture + 真单测指针 + suite 1.1.0"
+    status: pending
+    complexity: S
+    estimated_hours: "2-3"
+    dependencies: [TASK-020]
+    deliverables:
+      - "aria-plugin-benchmarks/ab-suite/phase-c-integrator-pre-merge-gate.json (1.0.0 → 1.1.0)"
+      - "aria-plugin-benchmarks/ab-suite/phase-c-integrator-pre-merge-gate-fixtures/not_applicable_green.json"
+      - "aria-plugin-benchmarks/ab-suite/phase-c-integrator-pre-merge-gate-fixtures/not_applicable_main_inflight_wait.json"
+      - "aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py (两条配对用例)"
+    agent: qa-engineer
+    reason: "AB 套件与测试指针属 qa lane"
+    context_refs: ["proposal.md §6 AB 段 + AC-9"]
+    load_bearing:
+      - "**只追加, 不改既有 8 个 structural_metrics 的定义与分母** (proposal AC-9)"
+      - "**不得**把新 fixture 的预期 wait 纳入 `primary_pass_gate_metric` 的统计口径 —— 该指标是 `wait_triggered_when_in_flight_mock_present`, 统计 **in-flight 触发的 wait**, 不含路径覆盖触发的 wait"
+      - "**不得**复述 `ARIA_AETHER_MOCK_RESPONSE_FILE` (该机制不存在; benchmark.md:70 已勘误)。真实机制是 `mock.patch.object(gate, \"resolve_ci_backend\", …)` + `fixtures[].test_case_in_unit_tests` 指针"
+    verification:
+      - "suite JSON 的 `git diff` 中: `primary_pass_gate_metric` 与既有 6 个 `fixtures[]` 条目**逐字节不变**; 新增只体现为 `fixtures[]` 追加 2 项 + `version` 1.0.0→1.1.0 + `changelog` 追加"
+      - "(元, 非动作) (R2 cr-N4 勘正) 上一版写「既有 8 个 structural_metrics 的定义/分母 git diff 为零」—— **`structural_metrics` 根本不在 suite JSON 里**, 它只存在于 ab-results 归档的 benchmark.json ⇒ 该断言在任何执行路径下恒真 = 零信息量。分母侧的可红断言已移至 TASK-023。"
+      - "两个新 fixture 的 `test_case_in_unit_tests` 各指向**真实存在且跑得起来**的单测方法"
+    notes: >
+      (post_planning F11) 上一版把这两条约束只写在 TASK-023 (跑 benchmark) 的判据里, 而那时 JSON
+      已经被改了。执行者新增 fixture 时最自然的动作就是把新 wait 纳入 gate metric 口径 —— 分母一改,
+      TASK-023 拿 2026-05-10 基线做的对比就不同口径, 判据形式上绿、实质零信息量 = Rule #6 闸门被
+      静默降级成 measurement theater, 而 `blocks_merge` 那道门恰恰失效。
+
+  - id: TASK-023
+    title: "[Rule #6] AB benchmark 跑 + 存档"
+    status: pending
+    complexity: S
+    estimated_hours: "2-3"
+    dependencies: [TASK-022]
+    deliverables: ["aria-plugin-benchmarks/ab-results/<date>-v1.65.0-phase-c-integrator-ci-path-coverage/"]
+    agent: qa-engineer
+    reason: "同 TASK-022"
+    covers_ac: [AC-9]
+    blocks_merge: true
+    context_refs: ["proposal.md AC-9", "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md §场景1"]
+    verification:
+      - "命令点名**全称套件** `phase-c-integrator-pre-merge-gate` (裸名 `phase-c-integrator` 会命中无关 parent 套件 — commit-generation / merge-conflict-handling / multi-remote-merge-push 三个 LLM eval)"
+      - "基线路径**写死** `ab-results/2026-05-10-phase-c-integrator-pre-merge-gate/benchmark.json` (**不用 latest symlink** — 它指向 state-scanner 的归档且自 2026-05-15 未更新)"
+      - "既有 8 个 `structural_metrics.*.measured` 保持**整数 100** (该字段是 int, `unit:\"percent\"` 另存)"
+      - "`primary_pass_gate.measured == \"100%\"` (**这个才是字符串**)"
+      - "`test_counts` 三组 `failed == 0`"
+      - "新增 2 个 not_applicable 指标无历史对照, 只需 `measured == 100`"
+      - "**(R2 cr-N4) 分母不变的可红断言**: 新归档 benchmark.json 的既有 8 个 `structural_metrics` **键名集合**与基线逐字相同, 且新增 2 个 not_applicable 指标是**独立键**、未被合并进 `wait_triggered_when_in_flight_mock_present`。—— 「8 个 measured 保持 100」对分母变化天然不敏感 (分母变大而新项也 pass 时比值仍是 100), 单靠它 Rule #6 闸门会被静默降级成 measurement theater"
+
+  - id: TASK-024
+    title: "发版同步面 + 主仓 gitlink bump + follow-up issue 开立"
+    status: pending
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-021, TASK-023]   # ⚠️ **TASK-021 边是 R2 补的** (be-Finding-2 + cr-N2):
+                                         # TASK-021 的 4 个 deliverables 有 3 个物理落在 aria 子模块内,
+                                         # 必须先合入 aria master, gitlink 才能指向「完整」的 post-merge SHA。
+                                         # 上一版仅靠 wave 编号保证顺序 = 纯编排层安排, dependencies 图允许
+                                         # 反序 ⇒ **#165 orphaned gitlink 模式在低一层复发**。
+                                         # (DUAL_LAYER_SPEC 本身写「显式依赖: 基于 deliverables 推断」,
+                                         #  暗示存在不读 execution_order 的拓扑推导路径。)
+    deliverables:
+      # aria 子模块 5 文件**之 4** (第 5 个 `aria/CHANGELOG.md` 在 TASK-021 — R3 cr-NEW-5)
+      - "aria/.claude-plugin/plugin.json (版本 SOT: 1.64.0 → 1.65.0)"
+      - "aria/.claude-plugin/marketplace.json"
+      - "aria/VERSION"
+      - "aria/README.md"
+      # 主仓派生面 4 项 —— **R2 cr-N2 + qa#3 补齐**, 上一版只覆盖 1/4
+      - "README.md (主仓: badge :8 **+ Project Status :242 `Plugin Version`**)"
+      - "README.zh.md / README.ja.md / README.ko.md (各 3 处: `<!-- translated-from: -->` :3 + badge :10 + Project Status :244)"
+      - "CLAUDE.md (主仓: 项目状态段**两处**版本引用 —— `:141` 版本行 `插件 aria-plugin v1.64.0` **+ `:139` 方法论轨区间右端 `v1.52.0–v1.64.0 已 ship`**。二者都无机械兜底: `m6-version-badge-match` 只读 README.md, `m6-claude-md-version` 只校主项目版本 — R3 cr-NEW-6)"
+      - "VERSION (主仓根: 子模块版本表 `| aria (插件) | v1.64.0 |` 行)"
+      # 跨仓 + 登记
+      - "(主仓) aria gitlink bump commit"
+      - "(Forgejo) follow-up issue ×9 (proposal §Follow-up 8 条 + DUAL_LAYER_SPEC 扩展字段升 SOT 1 条 —— 该条**须点名**「嵌套键不得为 `id`」这条字段约束, 否则 R3-A 的教训不进 SOT, R4 cr-F4)"
+    agent: knowledge-manager
+    reason: "版本同步面与跨仓收尾属该 lane"
+    context_refs: ["CLAUDE.md §版本管理", "proposal.md §Follow-up (8 条)", "openspec/archive/2026-07-22-*/detailed-tasks.yaml TASK-010 (同位置先例)"]
+    verification:
+      - "版本五处一致 (bump 前 **re-check SOT 当前版本** — 上一 cycle 记录「第 5 次版本让位」)。**若真发生版本让位, 须同步勘正 TASK-021 已落的 `aria/CHANGELOG.md` 标题** (它是第 5 处但不在本任务 deliverables 内 — R3 cr-NEW-5)"
+      - "**custom checks `m6-version-badge-match` + `i18n-readme-translation-currency` 双绿** (R2 cr-N2: 后者逐字比对 3 份 i18n README 的 `translated-from` marker 与 plugin.json 版本 ⇒ bump 后**必然 stale 转红**; 这是 CLAUDE.md 点名的机械兜底, 带红交付 = 把 Rule #10 推给下游)"
+      - "i18n 是否重译按 #140 B 档判 —— 本 change 不增删 Skill/Agent, 预期**免重译**、仅动 marker 与版本号 (与上一次发版 commit `013c945` 同形态)"
+      - "**9 条** follow-up issue 已开并 cross-link 本 spec; 其中 #7 (5 个 fixture 的 `_consumed_by` 仍留已勘误的 ARIA_AETHER_MOCK_RESPONSE_FILE) 与 #8 (`ab-results/latest` stale symlink) 落在 TASK-022/023 动过的目录里, 不得绕过而不登记"
+      - "**gitlink bump commit 指向 aria post-merge master SHA 且双远程 `ls-remote` 可达** (Aria #165 三次复发的根因面)"
+    notes: >
+      (post_planning F2, **critical**) 上一版**零任务**覆盖这一整面 —— 声明了 ship_target: v1.65.0
+      却只派生了 5 个版本 SOT 文件里的 1 个 (CHANGELOG), plugin.json 仍 1.64.0 ⇒ 违反 CLAUDE.md
+      「派生文件必须与 SOT 一致」; 主仓 gitlink 无人 bump ⇒ 正是 #165 的 orphaned gitlink /
+      `clone --recursive` 断裂形态。上一 cycle 的同位置任务逐项都有, 且 gitlink 那行就是**上一次
+      post_planning 加的**, 注释写着「复发模式 #165, 须为可核验项」。
+
+  - id: TASK-025a
+    title: "[AI] CLAUDE.md 规则 #8 + _lane 回改 — 起草独立 commit 待签"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    dependencies: [TASK-024]
+    deliverables:
+      - "CLAUDE.md (主仓, 规则 #8 补一句)"
+      - ".aria/config.json (主仓, phase_c_integrator._lane 回改)"
+    agent: knowledge-manager
+    reason: "文本起草属该 lane; 落地授权属 owner (TASK-025b)"
+    context_refs: ["proposal.md §7 (拟写入的确切文本)", "CLAUDE.md 规则 #10"]
+    verification:
+      - "按 proposal §7 给出的确切文本**逐字**落盘, 不自行改写"
+      - "预算核算: 当前 151 行 / 13139 字节, 预算 ≤200 行 / ≤24000 字节 (custom check `claude-md-changelog-free`) —— 新增后重跑 check 绿"
+      - "**未把 P1-P5 / 四重合取 / 零段补偿等 skill 内部设计术语写入** (防 aria-plugin #116 baseline 污染)"
+      - "**拆独立 commit, 不随实现 PR 合并**"
+
+  - id: TASK-025b
+    title: "[owner] Rule #10 权限面 sign-off"
+    status: pending
+    complexity: S
+    estimated_hours: "owner"
+    dependencies: [TASK-025a]
+    deliverables: ["(owner sign-off; 无 AI 产出)"]
+    agent: owner
+    reason: "CLAUDE.md 规则本体与 _lane 是 owner 的配置决定 (Rule #10), AI 不得代劳"
+    verification: ["owner 逐字核验 §7 文本后签字合并"]
+    notes: >
+      (post_planning F19) 从原 TASK-014 拆出 AI 段。**归档门耦合**: detailed-tasks.yaml 的 status
+      自 v1.63.0 起被 state-scanner 归档门消费, done-family 白名单 = {done, completed} **fail-CLOSED**。
+      一个永远等 owner 的 pending 任务 ⇒ Phase D 归档门必红 ⇒ 要么 spec 卡住无法归档, 要么有人改
+      status 绕过门 (Rule #10 反模式)。owner 签字后立即置 completed。
+
+execution_order:
+  - wave_1: [TASK-001]                                  # spike, blocking
+  - wave_1b: [TASK-001b]                                # ⚠️ R2 cr-N1: **紧随 spike** — 上一版排在 wave_14,
+                                                        # 即它要裁决的对象 (TASK-014/015 @wave_3/4) 之后 10 波。
+                                                        # happy path 下 owner 在此置 completed + N/A, 零等待。
+  - wave_2a: [TASK-002, TASK-012]                       # 按文件域分波: test_ci_path_coverage.py (002→004→006)
+  - wave_2b: [TASK-004, TASK-016]                       #   与 test_pre_merge_gate.py (012→016) **各自单线**。
+  - wave_2c: [TASK-006]                                 #   R3: TASK-016 从 2a 移到 2b —— 它与 012 同文件, R2 漏了这条边。
+  - wave_3: [TASK-003, TASK-013, TASK-017, TASK-014]     # 三 agent 并行; TASK-014 gated (dep: 001, 001b, 012)
+  - wave_4: [TASK-005, TASK-015]
+  - wave_5: [TASK-007, TASK-008]
+  - wave_6: [TASK-010]                                   # ⚠️ R5 tl#3 **对调**: AC-7 (TASK-010) 是 RED, 须先于
+  - wave_6b: [TASK-009]                                  #   步骤 5 聚合实现 (TASK-009) —— R2 qa#4 的建议修法与其
+                                                         #   自述危害相反, 三轮无人对读。RED-before-GREEN。
+  - wave_7: [TASK-011, TASK-018]
+  - wave_8: [TASK-019]
+  - wave_9: [TASK-020]
+  - wave_10: [TASK-021, TASK-022]
+  - wave_11: [TASK-023]
+  - wave_12: [TASK-024]
+  - wave_13: [TASK-025a]
+  - wave_14: [TASK-025b]                                 # owner 门 (TASK-001b 已前移至 wave_1b)
+  order_note: >
+    (post_planning F16 + **R2 修订**) 本序与各任务 dependencies **逐条对齐**, 无散文-only 的边。
+    R2 补上的边: TASK-004←TASK-002 / TASK-006←TASK-004 (同文件域, cr-N3) 与
+    TASK-024←TASK-021 (gitlink 时序, be-Finding-2)。**R3 补上第四条 TASK-016←TASK-012**
+    —— R2 声称补了三条同文件域边, 实际只落两条, 而本段当时已断言它存在 (R3 两席独立命中,
+    同一次修订里同形状复发)。
+    ⚠️ 教训: 「全部编码进 dependencies」这句**不能靠自述**。拓扑校验对**缺边天然免疫**
+    (缺边不产生 wave 违例), 唯一可靠的机械核对是**逐 deliverable 求同文件交集, 交集非空
+    且依赖图上无路径相连即报** —— 本文件的核验脚本已按此实现。
+    TASK-001b 仅在 spike 证否时激活 (gate_condition), 否则由 owner 在 wave_1b 置 completed + N/A。
+    同文件域串行链 (现已全部编码进 dependencies):
+      lib/ci_path_coverage.py    = 003→005→007→009→011  (backend-architect 单线)
+      pre_merge_gate.py          = 017→015→019            (backend-architect 单线; R3 补)
+      test_ci_path_coverage.py   = 002→004→006→008→010  (qa-engineer 单线)
+      test_pre_merge_gate.py     = 012→016→018          (qa-engineer 单线; 022 追加两条用例)
+      ci_backends/*.py           = 013→015              (backend-architect 单线)
+    —— 满足 feedback_workflow_partition_by_file_domain 的「同文件串行 / disjoint 并行」。
+
+agent_allocation:
+  backend-architect: [TASK-001, TASK-003, TASK-005, TASK-007, TASK-009, TASK-011, TASK-013, TASK-015, TASK-017, TASK-019]
+  qa-engineer: [TASK-002, TASK-004, TASK-006, TASK-008, TASK-010, TASK-012, TASK-014, TASK-016, TASK-018, TASK-022, TASK-023]
+  code-reviewer: [TASK-020]
+  knowledge-manager: [TASK-021, TASK-024, TASK-025a]
+  owner: [TASK-001b, TASK-025b]
+
+allocation_rationale: >
+  (post_planning F20 重写 — 上一版的理由建立在 subagent 并不具备的跨轮记忆上)
+  纯**能力匹配**: 承重算法与 backend 接线属 backend-architect lane; RED 测试与 AC 可证伪性属
+  qa-engineer lane (且 TDD 要求写测试者与写实现者分离 — 本表 **9 对** RED/GREEN **逐对满足** (R4 cr 实测勘正: 上一版写 10 对; 分离性主张本身为真 —— 9 个 RED 全 qa-engineer, 9 个 GREEN 全 backend-architect));
+  AC 覆盖完备性的最终核对交叉换给 code-reviewer (不由写 covers_ac 的角色自证);
+  跨文档同步与版本面属 knowledge-manager lane; Rule #10 权限面归 owner, AI 不得代劳。
+  上下文传递**不依赖 agent 记忆**, 全靠各任务的 context_refs + load_bearing 显式携带。
