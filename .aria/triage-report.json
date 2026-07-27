@@ -1,44 +1,55 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.64.0",
-  "issue_ref": "10CG/aria-plugin#119",
-  "generated_at": "2026-07-26T23:02:33Z",
+  "triage_tool_version": "1.64.1",
+  "issue_ref": "10CG/aria-plugin#122",
+  "generated_at": "2026-07-27T00:15:15Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 119,
-      "title": "[state-scanner] run_all_tests.sh 对 pytest 套件承诺「见下方详情」却恒不打印 — grep pattern 只匹配 unittest",
-      "body": "## 缺陷\n\n`skills/run_all_tests.sh` 对 FAIL 的套件打印 `FAIL (N tests) — 见下方详情`, 随后用\n\n```bash\necho \"$out\" | grep -E '^(FAIL|ERROR):' | sed 's/^/    /' | head -10\n```\n\n抽取详情。这个 pattern 匹配的是 **unittest** 的形态 (`FAIL: test_x (mod.Class)` / `ERROR: test_x (...)` —— 冒号紧跟标识符), 但对 **pytest** 套件恒不命中:\n\n| 框架 | 失败行形态 | `^(FAIL\\|ERROR):` 命中? |\n|------|-----------|------------------------|\n| unittest | `ERROR: test_foo (module.Class)` | ✅ |\n| pytest | `ERROR test_calculator.py` (无冒号) | ❌ |\n| pytest | `FAILED tests/x.py::test_y` (是 `FAILED` 不是 `FAIL:`) | ❌ |\n\n后果: **所有 pytest 套件 FAIL 时, \"见下方详情\" 后面什么都不打印** —— 承诺了详情却恒空。本次 tdd-enforcer 那条 FAIL 正是如此, 得手动 `cd` 进目录复跑才知道是 ImportError。\n\n## 复现\n\n```bash\nbash skills/run_all_tests.sh\n# tdd-enforcer/examples/python  FAIL (0 tests) — 见下方详情\n# (下方无任何详情行)\n```\n\n## 修复方向\n\n抽取分支应区分框架, 或对 pytest 分支改用能命中的 pattern。参考:\n- pytest 汇总行: `^(FAILED|ERROR) ` (含空格, 无冒号) 及 `short test summary info` 段;\n- 或直接对 FAIL 套件回显 `$out` 的尾部 N 行 (最稳, 框架无关), 而非试图按 pattern 提炼。\n\n## 关联\n\n- runner 出处: Aria #168 跨 skill 测试入口\n- 首个被它恒空处理的真实 FAIL: tdd-enforcer examples (姊妹 issue #118)\n- 附带观察: runner 的 pytest-SKIP 设计 (未装 pytest ⇒ SKIP 不算红) 是对的, 但也意味着 \"exit 0\" 在缺 pytest 的环境是**环境依赖的绿** —— 装了 pytest 才会暴露真实 FAIL。非缺陷, 但值得在 runner 头注释里点明, 以免 \"本机 7 OK/exit 0\" 被当成跨环境结论。\n",
+      "number": 122,
+      "title": "[phase-c-integrator] C.2.4 gate 对路径过滤型 CI 结构性恒 wait — 需路径覆盖感知的 not_applicable 态",
+      "body": "## 问题\n\nRule #8 C.2.4 pre-merge gate 对**路径过滤型 CI** 的仓库结构性恒 `wait`。\n\n`ci_backends/aether.py::_normalize_pr_ci_status`:\n\n```python\nif not runs:\n    return \"pending\"     # ← 「CI 还没跑完」与「CI 永远不会为这些路径跑」被折叠成同一个值\n```\n\n`pending` → `verdict=wait` → 调用方指数退避等到 `wait_timeout_seconds`(默认 1800s)。但如果变更路径压根不在任何 workflow 的 `paths:` 过滤内，**等多久都不会变**。\n\n## 本仓实例\n\n- aria 唯一 workflow `.forgejo/workflows/issue-triage-tests.yml` → `paths: skills/issue-triage/**`\n- 主仓 CI → 仅 orchestrator 相关路径\n\n⇒ 绝大多数变更（state-scanner / session-closer / 版本文件 / 文档）零 CI run，C.2.4 恒 `wait`。\n\n**已重复 4 次**，每次都靠人/AI 现场判断后应用 Rule #8 exception：v1.54.0 / v1.55.0 / v1.55.2 / v1.64.0(#113)。v1.55.0 的 handoff 甚至写了「**勿傻等**」。\n\n## 为什么这是「恒红」而非小麻烦\n\n「假绿的反面是恒红，同样零信息量」——一个永远返回 `wait` 的闸门，会被学会忽略，届时它对**真正**该拦的情况（CI 真的 pending / 真的 failing）也失去拦截力。\n\n## 为什么不能用 `ci_backends: []` 糊过去\n\n设 `ci_backends: []` 会触发 `no_ci_fallback` 对**所有**变更跳过闸门——包括真有 CI 覆盖的 `skills/issue-triage/**` 与 orchestrator 路径，等于**用假绿换恒红**。已在 `.aria/config.json` 的 `phase_c_integrator._not_ci_backends_empty` 显式记录不这么做的理由。\n\n## 建议\n\n让 gate **路径覆盖感知**，把三态分开：\n\n| 情况 | 当前 | 建议 |\n|------|------|------|\n| CI 在跑，未完成 | `pending` → wait | `pending` → wait（不变） |\n| CI 跑完，成功/失败 | `passing`/`failing` | 不变 |\n| **变更路径无任何 workflow 覆盖** | `pending` → **恒 wait** | 新态 `not_applicable` → 直接 `skip_with_warning` + 留痕，**不等待** |\n\n实现方向：解析仓内 workflow 的 `on.push.paths` / `on.pull_request.paths`，与本次变更文件集求交；空交集 ⇒ `not_applicable`。需要考虑无 `paths:` 过滤（=全覆盖）、`paths-ignore`、多 workflow 并存。\n\n配套：新态必须有测试覆盖「有覆盖→仍 wait」的反向对照，避免修成对所有情况都 skip 的假绿。\n\n## 关联\n\n- `.aria/config.json` → `phase_c_integrator._comment` / `_lane` / `_not_ci_backends_empty`（本次落的显式声明，属**留痕**非行为变更）\n- Rule #8 (CLAUDE.md) / `skills/phase-c-integrator/SKILL.md §C.2.4`\n- Rule #10「豁免应写成机制而非逐次裁量」——本 issue 即那条的落地缺口\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/119",
-      "created_at": "2026-07-20T21:04:43Z",
-      "updated_at": "2026-07-26T23:02:23Z"
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/122",
+      "created_at": "2026-07-22T04:45:38Z",
+      "updated_at": "2026-07-26T23:47:10Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": null,
-      "current": "1.64.0",
-      "gap": null
+      "reported": "1.54.0",
+      "current": "1.64.1",
+      "gap": "behind"
     },
     "step3_code": {
       "collection_status": "ok",
       "cited_paths": [
         {
-          "file_path": "skills/run_all_tests.sh",
+          "file_path": ".forgejo/workflows/issue-triage-tests.yml",
           "line": null,
           "format": "backtick",
-          "exists": false,
+          "exists": true,
           "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
+          "snippet": "1: # issue-triage unit tests — main repo CI integration\n2: #\n3: # Runs pytest for aria/skills/issue-triage/tests/ from the main repo context\n4: # (where the aria submodule is checked out as aria/).\n5: # Triggered on changes to the issue-triage skill or its tests.",
+          "warning": null,
+          "total_lines": 62
+        },
+        {
+          "file_path": ".aria/config.json",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: {\n2:   \"_comment\": \"Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)\",\n3:   \"version\": \"1.0\",\n4:   \"workflow\": {\n5:     \"auto_proceed\": false",
+          "warning": null,
+          "total_lines": 111
         }
       ],
-      "matches_description": false
+      "matches_description": true
     },
     "step4_history": {
-      "collection_status": "skipped",
+      "collection_status": "ok",
       "likely_fix_candidates": []
     },
     "step5_inflight": {
@@ -50,7 +61,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "e5aebb08a0630268efbe62f72be56d8a1c73ea51"
+          "head": "a33da6cf8cf675db9a5eea4c56578dd082c255fe"
         }
       ]
     }
@@ -60,23 +71,23 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "grep -n aria/skills/run_all_tests.sh (cited 代码核对)",
-        "expected_behavior": "issue 引用: :81 打印 'FAIL (N tests) — 见下方详情', :83 用 grep -E '^(FAIL|ERROR):' 抽详情",
-        "actual_behavior": "两行逐字吻合 (:81 / :83), pattern 原样存在",
+        "input": "grep aether.py '_normalize_pr_ci_status' + 'if not runs' (cited 代码核对)",
+        "expected_behavior": "issue 引用: `if not runs: return \"pending\"` — 「CI 没跑完」与「CI 永远不会跑」折叠为同一值",
+        "actual_behavior": "aether.py:223-224 逐字吻合; 函数注释自述 'unknown statuses route to pending so the caller waits' — 折叠是有意保守设计, 但未区分结构性零覆盖",
         "match": true
       },
       {
         "case_id": "case-2",
-        "input": "三种失败行形态灌入 pattern: 'ERROR: test_foo (module.Class)' / 'ERROR test_calculator.py' / 'FAILED tests/x.py::test_y'",
-        "expected_behavior": "仅 unittest 冒号形态命中; pytest 两种形态 (无冒号 ERROR / FAILED) 均不命中",
-        "actual_behavior": "命中数 1 (unittest 行); pytest 两行 0 命中 — 与 issue 对照表逐格吻合",
+        "input": "python3 直调 AetherBackend._normalize_pr_ci_status([]) + grep pre_merge_gate.py verdict 映射",
+        "expected_behavior": "[] → 'pending' → gate verdict=wait → 退避等满 wait_timeout_seconds (1800s) 也不会变",
+        "actual_behavior": "实测 [] → 'pending'; pre_merge_gate.py:187 pending → VERDICT_WAIT — 链路成立",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "端到端: 隔离 venv pytest 上 PATH 后 bash aria/skills/run_all_tests.sh (触发 tdd-enforcer 真实 FAIL, 即 #118)",
-        "expected_behavior": "pytest 套件 FAIL 时 '见下方详情' 后什么都不打印",
-        "actual_behavior": "'tdd-enforcer/examples/python FAIL (0 tests) — 见下方详情' 下一行直接是 workflow-runner 套件, 零详情行; 同轮 unittest 套件 FAIL 则打出 8 条 ERROR 详情 — 框架不对称实证",
+        "input": "核对「已重复 4 次」claim + 路径过滤前提 (aria 仓 workflow paths)",
+        "expected_behavior": "v1.54.0/v1.55.0/v1.55.2/v1.64.0 四次现场 exception; aria 唯一 workflow 仅覆盖 skills/issue-triage/**",
+        "actual_behavior": ".aria/config.json _lane (owner 2026-07-25 复议记录) 确认 4 次 + 定案「#122 优先落地是唯一真机制」; workflow paths 核实仅 issue-triage。另: 2026-07-26 v1.64.1 ship 发生第 5 次 (owner 手工特批, 有 commit 留痕) — 复发仍在持续",
         "match": true
       }
     ],
@@ -85,7 +96,7 @@
     "hit_rate": "3/3"
   },
   "verdict": "confirmed",
-  "severity": "minor",
+  "severity": "major",
   "recommended_action": "next-cycle",
   "deviation_note": null,
   "errors": []
