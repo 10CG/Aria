@@ -1,6 +1,16 @@
 # 归并分析 — aria-plugin #122 双 Spec 碰撞
 
-> **性质**: owner 裁决的**输入**, 不是裁决本身 (Rule #10 — 哪份为准属 owner 权限面)。
+> ## ✅ 已裁决 (owner, 2026-07-30): **以 R 为准**
+>
+> owner 采纳 §5 推荐路线 —— R 为 Spec 基线 + 并入 L 的发现 + 用 L 的任务骨架重建 A.2/A.3。
+>
+> **执行状态**:
+> - ✅ L 已标记 [SUPERSEDED](./proposal.md) (保留目录: 10 份审计报告是证据轨迹, 27 任务骨架待复用)
+> - ✅ R 已并入 **3 条真缺口 + 1 条欠定** (R 的 §修订记录 A1)。⚠️ **与本文 §5 原推荐的差异**: 逐条核实后 **L-6 / L-7 未并入** —— R 已用别的方式解决同一问题 (独立 tempdir / paths-ignore 存在即 covered), 详见 A1「未并入」段。本文 §3/§5 写作时未做这层核实, 以 A1 为准。
+> - ⏸️ **A.2/A.3 重建待 post_spec 闸门裁决** (A1 是实质 Spec 变更, Rule #10 不自行豁免; 见 R 文末「闸门待裁」)
+> - ↗️ L-1 (catch-all fail-OPEN) 转独立 issue, 不阻塞
+>
+> **性质**: 本文原为 owner 裁决的**输入**; 裁决已作出, 现转为决策留痕。
 > **产出时间**: 2026-07-27, 主仓 `92943ca` (rebase 后)
 > **被比较的两份**:
 > - **L (local)** = `openspec/changes/phase-c-integrator-ci-path-coverage/` — 本容器 `aria-runner-bot/023236f2`, 创建 2026-07-25

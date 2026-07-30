@@ -1,6 +1,18 @@
 # Proposal: phase-c-integrator-ci-path-coverage (aria-plugin #122)
 
-> **Status**: 📝 **Draft (R4-fix)** — post_spec 收敛轨迹 R1 [4×FAIL+1×PWW, 5 critical] → R2 [4×FAIL+1×PWW, 4 critical] → R3 [1×FAIL+2×PWW, 1 critical] → **R4 [1×FAIL+1×PWW, 0 critical 共识 —— 两席对同一 finding 判 critical vs major, 分歧点是「后果是假绿」vs「被 4 条既有 AC 机械兜住、无法静默 ship」]** → R4-fix。`max_rounds=4` 耗尽 ⇒ 降级策略 **owner 2026-07-26 裁定 [1] 接受当前结论** ⇒ `converged: false, overridden_by_user: true`, 进 A.2。审计轨迹全文见 `.aria/audit-reports/post_spec-R{1,2,3,4}-*-aggregated.md`
+> # ⛔ SUPERSEDED (owner 裁定 2026-07-30)
+>
+> **本 Spec 已被 [`phase-c-gate-path-coverage-not-applicable`](../phase-c-gate-path-coverage-not-applicable/proposal.md) 取代, 不进 Phase B, 不再修订。**
+>
+> 两份 Spec 同治 aria-plugin #122 且核心设计同构 (并发碰撞, 互不知情各跑 4 轮 post_spec)。owner 2026-07-30 裁定以对方为基线, 理由: 对方 post_spec **真收敛 + 已签字** (本 Spec `converged:false` 靠 owner override 收场且 R4 留一条 critical/major 定性争议) / 对方状态模型可满射核对 (本 Spec 四重合取有三项**自认不可证伪**, 见 AC-12 注记) / 对方纯 additive (本 Spec 改 backend 且**关不掉**, 见下「破坏性面」第 2 项)。
+>
+> **本 Spec 的 4 条实跑发现已并入取代者** (其 §修订记录 A1): `-z`/尾随 NUL (步骤 0) · `---` YAML 文档起始标记语义 (步骤 2) · 位置式 anchor 命中判据 (步骤 2) · AB 套件三处勘正 (AC-9)。另 2 条 (`_match_coverage` 纯函数拆分 / `paths-ignore` 极性) 经核实取代者已用别的方式解决, 未并入。`compute_verdict` catch-all fail-OPEN (AC-10, 实跑 3/3) 属正交既有缺陷, 转独立 issue。
+>
+> **保留本目录的理由**: 10 份审计报告 (`post_spec-R1~R4` + `post_planning-R1~R6`) 是 33 个 agent 实例的证据轨迹, 且 `detailed-tasks.yaml` 的 27 任务 / 18 波 / TDD 9 对 RED/GREEN **骨架**将用于重建取代者的 A.2/A.3。碰撞全量对比见 [MERGE-ANALYSIS.md](./MERGE-ANALYSIS.md)。
+>
+> ---
+
+> **Status**: ⛔ **Superseded** (2026-07-30) — 原状态: 📝 Draft (R4-fix) — post_spec 收敛轨迹 R1 [4×FAIL+1×PWW, 5 critical] → R2 [4×FAIL+1×PWW, 4 critical] → R3 [1×FAIL+2×PWW, 1 critical] → **R4 [1×FAIL+1×PWW, 0 critical 共识 —— 两席对同一 finding 判 critical vs major, 分歧点是「后果是假绿」vs「被 4 条既有 AC 机械兜住、无法静默 ship」]** → R4-fix。`max_rounds=4` 耗尽 ⇒ 降级策略 **owner 2026-07-26 裁定 [1] 接受当前结论** ⇒ `converged: false, overridden_by_user: true`, 进 A.2。审计轨迹全文见 `.aria/audit-reports/post_spec-R{1,2,3,4}-*-aggregated.md`
 > **Created**: 2026-07-25
 > **Spec Level**: 2 (单域 — C.2.4 gate 的 PR-CI 状态判定链路)
 > **关联 Issue**: [10CG/aria-plugin #122](https://forgejo.10cg.pub/10CG/aria-plugin/issues/122) (open, 0 评论, 无 in-flight — 本地 fetch + Forgejo API 双核实)
