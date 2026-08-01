@@ -13,7 +13,16 @@
 
 ## 最新 handoff
 
-**[2026-07-22 — 会话收尾: CLAUDE.md 官方规格瘦身 (#116 根因修复) + 进货口双堵 + #165 收窗裁定](./2026-07-22-claude-md-official-spec-diet-and-116-root-fix.md)**
+**[2026-08-01 — 会话收尾: triage-修复列车 (#116 尾款/#118/#119) + #122 not_applicable 完整 cycle (v1.64.1 + v1.65.0 双 ship)](./2026-08-01-triage-fix-train-and-122-not-applicable-ship.md)**
+
+- track-id: `session-close-20260801-triage-fix-train-122-ship` | phase: **session-close** | status: **done**
+- **三列递进**: #116 剩余 scope Level 1 (`e5aebb0`) → #118/#119 打包 triage+修复 **v1.64.1** (`6ffd8cd`, C.2.4 wait 上报 owner 特批第 2 次) → **#122 完整 Level 2 cycle → v1.65.0** (`5a9ca18`): triage → spec post_spec **R1→R4 CONVERGED** (R1 5/5 REVISE 含 4 Critical) → owner 双项签字 → TDD (测试 62→97, 跨 skill 1546 绿) → **Rule #6 三臂 AB** (零回归; without 臂**真污染零命中** → DEC-20260722-001 决策 4 裁 [C] 关闭, **#116 闭环**)
+- ⚖️ **C.2.4 恒 wait 机制化终结**: path_coverage not_applicable 态 ship + **meta-dogfood 首个生产判定** (ship 自身合并 verdict=green 零人工裁决 — 6 个同形场景第一次走正门); 2026-07-25 裁决存档 `DEC-20260731-001` + `_lane` 过渡规则 (2) 退役与 gitlink bump 同 commit co-land
+- **四 issue 关闭**: #116 / #118 / #119 / #122; claim 3 acquire/3 release 零残留; custom checks **8/8**; 三仓双远程核验一致 (主仓 `2f17dd3`)
+- 🔴 **凭据轮换第八次 surface — hard cap 2026-08-02 = 明天** (唯一硬期限 carry)
+- 新 memory 3 条: grep 截断语料 / 全称谓词空真 / AB 污染参照面须含 MEMORY.md
+
+**[2026-07-22 — 会话收尾: CLAUDE.md 官方规格瘦身 (#116 根因修复) + 进货口双堵 + #165 收窗裁定](./2026-07-22-claude-md-official-spec-diet-and-116-root-fix.md)** (predecessor)
 
 - track-id: `session-close-20260722-claude-md-diet-116-root-fix` | phase: **session-close** | status: **done**
 - **本段主线 = 一次完整的「前提被推翻」**: #116 triage (confirmed/major, repro 3/3) → brainstorm 收敛 C+D+生命周期补偿方案 → **owner 质疑「CLAUDE.md 不该描述 skill」** → 官方文档证实 (≤200 行, skill 细节归 SKILL.md) → **根因修复 CLAUDE.md 639→149 行, 污染 4 术语→0** (`32dca5f`, DEC-20260722-001), 补偿方案整套降为备选 (裁决门=下次真实 AB)
