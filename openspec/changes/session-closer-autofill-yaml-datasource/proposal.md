@@ -64,10 +64,10 @@
 
 ## Tasks
 
-- [ ] 1.1 `grep_unchecked_tasks` yaml fallback 分支 (open-attempt 存在性语义) + `_load_detailed_tasks_api` importlib 直载 helper + 三形态 sentinel (稳定判别位)
-- [ ] 1.2 SC-1~SC-9 测试 (先写 SC-1/SC-7 验证 baseline FAIL, 再实现)
-- [ ] 1.3 双侧回归 (SC-6) + Rule #6 substitute 留痕
-- [ ] 1.4 开 follow-up issue: proposal-inline 任务形态 (第三形态) 的 carry-forward 盲区
+- [x] 1.1 `grep_unchecked_tasks` yaml fallback 分支 (open-attempt 存在性语义) + `_load_detailed_tasks_api` importlib 直载 helper + 三形态 sentinel (稳定判别位) — aria-plugin `1180d08`
+- [x] 1.2 SC-1~SC-9 测试 (先写 SC-1/SC-7 验证 baseline FAIL — 已验 4 FAIL + 2 error → 全绿) — 同 commit
+- [x] 1.3 双侧回归 (session-closer 50 OK + state-scanner 1322 OK) + 真数据 dogfood 零噪音 + Rule #6 substitute 留痕 (本文件 rule6_note)
+- [x] 1.4 follow-up issue 已开: [aria-plugin #123](https://forgejo.10cg.pub/10CG/aria-plugin/issues/123) (proposal-inline 第三形态)
 
 ## Success Criteria
 
