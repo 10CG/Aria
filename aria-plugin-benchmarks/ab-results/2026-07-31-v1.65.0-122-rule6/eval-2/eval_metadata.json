@@ -1,0 +1,10 @@
+{
+ "eval_id": 2,
+ "prompt": "Phase C C.2 merge: Attempting to merge feature/oauth2-social-login into main. Conflict detected in backend/config/settings.py. Handle gracefully.",
+ "output_mode": "descriptive",
+ "arms": [
+  "with_skill",
+  "old_skill",
+  "without_skill"
+ ]
+}

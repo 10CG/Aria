@@ -1,6 +1,6 @@
 # Proposal: phase-c-gate-path-coverage-not-applicable (aria-plugin #122)
 
-> **Status**: ✅ **Approved** (owner sign-off 2026-07-27, 签字面两项均批: 机制本体 + `path_coverage_enabled` 默认 true; post_spec R1→R4 CONVERGED, R4 qa PASS 0/0/0) — ready for Phase B
+> **Status**: ✅ **Complete** (shipped aria-plugin **v1.65.0**, 2026-07-31) — Phase A: post_spec R1→R4 CONVERGED + owner sign-off 2026-07-27 (两项均批含默认 true)。Phase B: path_coverage.py + gate 集成 + SC-1~28 全落 (测试 62→97, 全量跨 skill 1546 绿); 文档四面同步 (SKILL.md 八处/config-loader/workflow-state-schema)。Rule #6 照跑 AB (三臂 descriptive 统一): new-vs-old 零回归 + 定向语义正向; without 臂真污染零命中 → DEC-20260722-001 决策 4 重测门裁 [C] 关闭 (#116 闭环)。Phase C: 本地 --no-ff 合并 → aria master `5a9ca18`, 双远程 ls-remote 核验一致 (origin 首查撞 SSH 瞬断, 重试即恢复 — 10cg.local #20 再添一例); **C.2.4 meta-dogfood = not_applicable 首个生产判定** (aether backend 真在场, verdict=green + 双留痕, 六次复发场景第一次零人工裁决)。Phase D: DEC-20260731-001 先存档后改写 + `_lane` 过渡规则 (2) 退役与 gitlink bump 同 commit co-land + #122 关闭。
 > **Created**: 2026-07-27
 > **Spec Level**: 2 (Minimal — 单域 [C.2.4 gate 增路径覆盖感知三态], 全部落点在 phase-c-integrator; blast radius 限 gate 输出 additive 扩展, covered 路径既有字段逐字段不变)
 > **关联 Issue**: [10CG/aria-plugin #122](https://forgejo.10cg.pub/10CG/aria-plugin/issues/122) (open; triage verdict=`confirmed`/`major`/`next-cycle`, 3/3 复现, [issuecomment-16979](https://forgejo.10cg.pub/10CG/aria-plugin/issues/122#issuecomment-16979))

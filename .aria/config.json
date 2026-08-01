@@ -1,111 +1,111 @@
 {
-  "_comment": "Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)",
-  "version": "1.0",
-  "workflow": {
-    "auto_proceed": false
+ "_comment": "Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)",
+ "version": "1.0",
+ "workflow": {
+  "auto_proceed": false
+ },
+ "state_scanner": {
+  "confidence_threshold": 90,
+  "auto_execute_enabled": false,
+  "auto_execute_rules": [
+   "commit_only",
+   "quick_fix",
+   "doc_only"
+  ],
+  "audit_log_path": ".aria/audit.log",
+  "sync_check": {
+   "enabled": true,
+   "check_submodules": true,
+   "check_remote": false
   },
-  "state_scanner": {
-    "confidence_threshold": 90,
-    "auto_execute_enabled": false,
-    "auto_execute_rules": [
-      "commit_only",
-      "quick_fix",
-      "doc_only"
+  "issue_scan": {
+   "_comment_submodules": "2026-04-15 启用 scan_submodules + stage_timeout 12→20 作为 state-scanner-submodule-issue-scan Spec 的 dogfooding — 防止 Aria meta-repo 模式下 aria-plugin / aria-orchestrator / aria-standards 的 issue 被漏扫",
+   "enabled": true,
+   "platform": "forgejo",
+   "platform_hostnames": {
+    "forgejo": [
+     "forgejo.10cg.pub"
     ],
-    "audit_log_path": ".aria/audit.log",
-    "sync_check": {
-      "enabled": true,
-      "check_submodules": true,
-      "check_remote": false
-    },
-    "issue_scan": {
-      "_comment_submodules": "2026-04-15 启用 scan_submodules + stage_timeout 12→20 作为 state-scanner-submodule-issue-scan Spec 的 dogfooding — 防止 Aria meta-repo 模式下 aria-plugin / aria-orchestrator / aria-standards 的 issue 被漏扫",
-      "enabled": true,
-      "platform": "forgejo",
-      "platform_hostnames": {
-        "forgejo": [
-          "forgejo.10cg.pub"
-        ],
-        "github": [
-          "github.com"
-        ]
-      },
-      "cache_ttl_seconds": 900,
-      "cache_path": ".aria/cache/issues.json",
-      "stage_timeout_seconds": 20,
-      "api_timeout_seconds": 5,
-      "limit": 20,
-      "label_filter": [],
-      "scan_submodules": true
-    },
-    "coordination": {
-      "_comment": "DEC-20260704-002 dogfood: 启用 Layer L advisory 认领闸门 (interactive-session-dedup-coordination TASK-019). enabled=true 使 phase1_gate.run_gate 在 cross-owner/self-multi-container collision + 用户进 Phase B 时被 AI 编排层调用; mode=advisory (放行+写推 claim+surface). runtime 探针 coordination-gate-invocation 从此有真实生产调用对象。",
-      "enabled": true,
-      "mode": "advisory"
-    }
-  },
-  "tdd": {
-    "strictness": "advisory"
-  },
-  "benchmarks": {
-    "require_before_merge": true,
-    "skill_change_block_mode": "warn"
-  },
-  "experiments": {
-    "agent_team_audit": false,
-    "agent_team_audit_points": [
-      "pre_merge"
+    "github": [
+     "github.com"
     ]
+   },
+   "cache_ttl_seconds": 900,
+   "cache_path": ".aria/cache/issues.json",
+   "stage_timeout_seconds": 20,
+   "api_timeout_seconds": 5,
+   "limit": 20,
+   "label_filter": [],
+   "scan_submodules": true
   },
-  "audit": {
-    "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood. **AI 不得自行豁免已 enabled 的 checkpoint** (CLAUDE.md 规则 #10, owner 决策 2026-07-19): 「Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高」不构成跳过理由 —— 跳过即销毁标签, 无法事后判定该跳是否正确; 便宜的准确率跟踪 (没出事=判断对) 对「跳错但未浮出」结构性失明。豁免只能来自本文件显式 off / adaptive_rules / hotfix lane / checkpoint 结构性前提不成立。",
-    "enabled": true,
-    "mode": "convergence",
-    "max_rounds": 4,
-    "checkpoints": {
-      "post_brainstorm": "off",
-      "post_spec": "convergence",
-      "post_planning": "convergence",
-      "mid_implementation": "off",
-      "post_implementation": "off",
-      "pre_merge": "off",
-      "post_closure": "off"
-    },
-    "teams": {
-      "post_spec": [
-        "aria:tech-lead",
-        "aria:backend-architect",
-        "aria:qa-engineer",
-        "aria:code-reviewer",
-        "aria:knowledge-manager"
-      ],
-      "post_planning": [
-        "aria:tech-lead",
-        "aria:backend-architect",
-        "aria:qa-engineer",
-        "aria:code-reviewer",
-        "aria:knowledge-manager"
-      ]
-    }
-  },
-  "orchestrator": {
-    "dispatch_policy": {
-      "tier1_action": "dispatch_ready",
-      "tier2_action": "approval_required",
-      "tier3_action": "human_only",
-      "dry_run": false
-    }
-  },
-  "phase_c_integrator": {
-    "_comment": "Rule #8 C.2.4 pre-merge gate 的显式声明 (2026-07-22 落配置; 2026-07-25 owner 复议后重写立场). 本仓 (Aria meta-repo + aria-plugin 子模块) 的 CI 全部路径过滤: aria 唯一 workflow .forgejo/workflows/issue-triage-tests.yml 仅在 skills/issue-triage/** 触发; 主仓 CI 仅在 orchestrator 相关路径触发。⇒ 任何落在这些路径之外的变更 **结构上永远不会产生 CI run**, 而 backend 把 '零 run' 映射成 pending (ci_backends/aether.py: `if not runs: return \"pending\"`), gate 因此恒返回 verdict=wait, 等到 wait_timeout 也不会变。",
-    "_lane": "⚠️ 本注释经 2026-07-25 owner 复议后重写 —— 前一版 (Phase C v1.64.0 时写) 把它框成「已确立 lane」是**错的, 已废止**。事实认定 (复议结论): Rule #8 的**成文** exception 触发条件是「所有 backend probe=False」(SOT: aria/skills/phase-c-integrator/SKILL.md §C.2.4「无可用 backend」条 [line 285]; CLAUDE.md 规则 #8 为精简指针 — 用 section anchor 非行号引, 因 CLAUDE.md 2026-07-22 由 639→149 行, 行号引用已烂过)。而本仓路径过滤致 **verdict=wait** (backend probe=True + 零 run 映射为 pending) 是**另一个分支, 成文条件不覆盖**。把 verdict=wait 当成 skip 是被审方用成文机制没覆盖的条件自我豁免 —— Rule #10 反模式。v1.54.0/55.0/55.2/v1.64.0 是 4 次错过机制化, 不是「先例 lane」。地位: **不是自助 lane, 不授权任何 AI 自我豁免 C.2.4**。v1.64.0(#113) 实例经 owner 一次性 ratify (2026-07-25), 仅此一次, 不构成先例。过渡规则 (✅ owner 定案 2026-07-25): (1) #122 (路径覆盖感知 not_applicable 态) **优先落地**, 是唯一真机制; (2) 在 #122 前, 遇 C.2.4 **verdict=wait** 一律**上报 owner 裁, 不自我豁免**。⚠️ 诚实声明: 本规则 (2) 当前**仅文档级** —— 它约束的是 AI 编排层行为 (verdict=wait 由 workflow-runner wait_recoverable 处理, 无 config 键能机械强制「超时后不放行」), 只有 #122 落地才把它变成机械态。与 no_ci_fallback (probe=False 分支) **正交, 未改**。",
-    "_not_ci_backends_empty": "⚠️ 刻意 **不** 设 ci_backends:[] —— 那会触发 no_ci_fallback 对**所有**变更跳过闸门, 包括真有 CI 覆盖的路径, 等于用假绿换恒红。完整机制化 (区分「无覆盖」与「pending」) 属代码变更, 见 aria-plugin#122 (路径覆盖感知的 not_applicable 态; owner 2026-07-25 定案优先)。",
-    "pre_merge_gate": {
-      "enabled": true,
-      "ci_backends": null,
-      "no_ci_fallback": "skip_with_warning",
-      "wait_timeout_seconds": 1800,
-      "_open_question_no_ci_fallback": "⏳ 待 owner 定 (2026-07-25 提出): probe=False (真无 backend) 分支当前 skip_with_warning (静默降级放行) 与新原则「不自我豁免」张力何解? 选项: 保持 skip_with_warning (无 backend 是不同场景, 单人 lab 项目可能无 CI 本就正常) / 改 abort (与不自豁免一致, 但无 CI 项目将无法经 gate 合并)。AI 不擅自翻此键 —— 它是与 verdict=wait 正交的独立政策问题 (镜像原错误: 勿把一个分支的规则套到另一分支)。"
-    }
+  "coordination": {
+   "_comment": "DEC-20260704-002 dogfood: 启用 Layer L advisory 认领闸门 (interactive-session-dedup-coordination TASK-019). enabled=true 使 phase1_gate.run_gate 在 cross-owner/self-multi-container collision + 用户进 Phase B 时被 AI 编排层调用; mode=advisory (放行+写推 claim+surface). runtime 探针 coordination-gate-invocation 从此有真实生产调用对象。",
+   "enabled": true,
+   "mode": "advisory"
   }
+ },
+ "tdd": {
+  "strictness": "advisory"
+ },
+ "benchmarks": {
+  "require_before_merge": true,
+  "skill_change_block_mode": "warn"
+ },
+ "experiments": {
+  "agent_team_audit": false,
+  "agent_team_audit_points": [
+   "pre_merge"
+  ]
+ },
+ "audit": {
+  "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood. **AI 不得自行豁免已 enabled 的 checkpoint** (CLAUDE.md 规则 #10, owner 决策 2026-07-19): 「Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高」不构成跳过理由 —— 跳过即销毁标签, 无法事后判定该跳是否正确; 便宜的准确率跟踪 (没出事=判断对) 对「跳错但未浮出」结构性失明。豁免只能来自本文件显式 off / adaptive_rules / hotfix lane / checkpoint 结构性前提不成立。",
+  "enabled": true,
+  "mode": "convergence",
+  "max_rounds": 4,
+  "checkpoints": {
+   "post_brainstorm": "off",
+   "post_spec": "convergence",
+   "post_planning": "convergence",
+   "mid_implementation": "off",
+   "post_implementation": "off",
+   "pre_merge": "off",
+   "post_closure": "off"
+  },
+  "teams": {
+   "post_spec": [
+    "aria:tech-lead",
+    "aria:backend-architect",
+    "aria:qa-engineer",
+    "aria:code-reviewer",
+    "aria:knowledge-manager"
+   ],
+   "post_planning": [
+    "aria:tech-lead",
+    "aria:backend-architect",
+    "aria:qa-engineer",
+    "aria:code-reviewer",
+    "aria:knowledge-manager"
+   ]
+  }
+ },
+ "orchestrator": {
+  "dispatch_policy": {
+   "tier1_action": "dispatch_ready",
+   "tier2_action": "approval_required",
+   "tier3_action": "human_only",
+   "dry_run": false
+  }
+ },
+ "phase_c_integrator": {
+  "_comment": "Rule #8 C.2.4 pre-merge gate 配置。历史背景 (2026-07-22~25): 本仓 CI 全路径过滤曾致 gate 结构性恒 wait (零 run 被映射为 pending), 累计 5 次人工裁决绕行 — 已由 aria-plugin#122 (v1.65.0, path_coverage_enabled 默认 true) 机制化: 变更路径零 workflow 覆盖 → not_applicable → 跳过 (a) PR CI wait 并双留痕, (b) main in-flight 照查。完整裁决史与原注释全文见 docs/decisions/DEC-20260731-001-c24-wait-adjudication-retirement.md。",
+  "_lane": "✅ 过渡规则已退役 (2026-07-31, 与主仓 gitlink bump v1.65.0 同 commit co-land): 2026-07-25 owner 复议的过渡规则 (2) [verdict=wait 一律上报 owner] 随 #122 机制落地终结 — 此后 verdict=wait 真正意味着「CI 在跑或该跑没跑完」, 按 workflow-runner wait 正常处理。替代义务 (SKILL.md §C.2.4 v1.65.0+): not_applicable 放行必须 surface 警告行; path_coverage.decision=unknown 必须上报评估器失败。原裁决全文 (含 4 次错过机制化论证) 已逐字存档: docs/decisions/DEC-20260731-001-c24-wait-adjudication-retirement.md。",
+  "_not_ci_backends_empty": "⚠️ 刻意不设 ci_backends:[] — 那会对所有变更跳过闸门, 含真有 CI 覆盖的路径。「区分无覆盖与 pending」已由 #122 path_coverage 机制实现 (v1.65.0); 本注记保留以防未来复起此念。",
+  "pre_merge_gate": {
+   "enabled": true,
+   "ci_backends": null,
+   "no_ci_fallback": "skip_with_warning",
+   "wait_timeout_seconds": 1800,
+   "_open_question_no_ci_fallback": "⏳ 待 owner 定 (2026-07-25 提出): probe=False (真无 backend) 分支当前 skip_with_warning (静默降级放行) 与新原则「不自我豁免」张力何解? 选项: 保持 skip_with_warning (无 backend 是不同场景, 单人 lab 项目可能无 CI 本就正常) / 改 abort (与不自豁免一致, 但无 CI 项目将无法经 gate 合并)。AI 不擅自翻此键 —— 它是与 verdict=wait 正交的独立政策问题 (镜像原错误: 勿把一个分支的规则套到另一分支)。"
+  }
+ }
 }

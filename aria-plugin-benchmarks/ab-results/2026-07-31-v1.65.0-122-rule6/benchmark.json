@@ -1,0 +1,45 @@
+{
+  "skill_name": "phase-c-integrator",
+  "date": "2026-07-31",
+  "suite_version": "1.1.0",
+  "arms": {
+    "with_skill": {"pass_rate": 1.0, "mean_score": 1.0},
+    "old_skill": {"pass_rate": 1.0, "mean_score": 1.0},
+    "without_skill": {"pass_rate": 0.67, "mean_score": 0.78}
+  },
+  "per_eval": [
+    {
+      "id": 1,
+      "scores": {"with": 1.0, "old": 1.0, "without": 0.8},
+      "tier_notes": "with=old (A, C.1 未变更): feat(auth) + 单 commit 分组 + 增强标记 + context_for_next 输出契约完整。without (B): git 常识优秀甚至更细 (migration/路由遗漏嫌疑排查), 但增强标记/输出契约/commit-msg-generator 委派全缺 — skill 价值面缺席。"
+    },
+    {
+      "id": 2,
+      "scores": {"with": 1.0, "old": 1.0, "without": 0.7},
+      "tier_notes": "定向观察面。with (A+): 正确执行 v1.65.0 path coverage 评估, settings.py 判 covered 不落 not_applicable 短路, (b) 轴保留, 输出含 path_coverage 键。old (A): 忠实旧语义 pending 恒 wait+retry, 无 path coverage 概念 (非缺陷)。without (B): 冲突工艺一流并靠 CLAUDE.md 泄漏提到 Rule #8 两轴, 但缺三态语义/退避/submodule gate/输出契约。"
+    },
+    {
+      "id": 3,
+      "scores": {"with": 1.0, "old": 1.0, "without": 0.85},
+      "tier_notes": "with=old (A, C.2.5 未变更): 六步 + per-remote matrix + 失败优先级表 + verify 4-attempt + detached HEAD + helper 降级。without (B+): 双推/逐 remote ls-remote 全等/子模块先行三关键点全中, 但机制面 (matrix gating/配置键/重试参数/schema) 缺失, 且高分显著受 CLAUDE.md 硬约束段近逐字泄漏抬升。"
+    }
+  ],
+  "delta_new_vs_old": 0.0,
+  "contamination": {
+    "true_pollution_hits": [],
+    "legal_surface_hits": [
+      "eval-1/without: OpenSpec 引用; Phase B.1 / feature 分支命名 (十步循环面)",
+      "eval-2/without: Rule #8 pre-merge gate (a) PR CI passing + (b) main 无 in-flight 两轴判据; 无 CI backend 显式降级 (no_ci_fallback 概念转述, 未用键名); 双推 + 逐 remote ls-remote 不信 push 回执 (硬约束 2 近逐字); Rule #7",
+      "eval-3/without: orphaned gitlink / clone --recursive 断裂 / 禁服务端合并 (硬约束 1 整段); 双推 + 逐个 ls-remote 核验 + 假阴性诱发误 force / 半推镜像分叉 (硬约束 2 近逐字); Rule #10 handoff 复议; [memory 面] force-with-lease 三项前置核验 / aria-runner-bot / GitHub Secret Scanning push range / CF Access 抖动"
+    ],
+    "generic_knowledge": "feat(auth) 类型与 scope 判定、commit 原子性分组、heredoc 提交、force-with-lease 优于 force、union 合并 vs 同键语义裁决、ls-remote 验远端 SHA 的一般做法、merge --abort 保底 — 均可由模型 git 常识独立推出, 不计污染。"
+  },
+  "caveats": [
+    "v1.65.0 核心新路径 (not_applicable 短路 + surface 警告行) 无 eval 正面踩中; eval-2 仅为 covered 分支负向验证。建议 ab-suite 补零覆盖场景 eval (升 MINOR) 或按 Rule #6 表 3 行建定向 fixture + 套件缺口 issue。",
+    "delta_new_vs_old = 0.0 是『additive 变更零回归』信号, 非无效变更; 新语义正向在场已由 eval-2 语义分档确认。",
+    "without 臂 mean 0.78 含 CLAUDE.md 合法留存面泄漏红利 (eval-3 尤甚); 对外部采用者的真实 skill delta 大于表观 +0.22。",
+    "pass 阈值取 0.8; 0.7 阈值下 without pass_rate 为 1.0, 档位与 delta 结论不受影响。",
+    "memory/MEMORY.md 是 CLAUDE.md 之外的第二自动加载污染面 (eval-3/without 四处命中), DEC-20260722-001 重测门参照面未含它, 建议下轮纳入。",
+    "产出形态核对: 九臂全部 descriptive, 无 genre confound, 三 eval 全部计入 delta。"
+  ]
+}

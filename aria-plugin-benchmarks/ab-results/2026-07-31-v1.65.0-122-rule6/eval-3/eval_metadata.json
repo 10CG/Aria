@@ -1,0 +1,10 @@
+{
+ "eval_id": 3,
+ "prompt": "Phase C C.2.5: PR 刚合并到 master (aria 子模块)。项目配置了 origin (Forgejo) + github (GitHub mirror) 双 remote, 还有 1 个子模块。请执行 Multi-Remote Push Enforcement: 主动推送所有 enforced remote 并做 post-push SHA 验证。描述执行流程和任何失败处理。",
+ "output_mode": "descriptive",
+ "arms": [
+  "with_skill",
+  "old_skill",
+  "without_skill"
+ ]
+}
