@@ -1,7 +1,7 @@
 # session-closer autofill yaml datasource (aria-plugin #121)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: ✅ **Approved** (owner sign-off 2026-08-01; post_spec R1→R3 CONVERGED, R3 5/5 PASS 零 Critical/Major 残留)
+> **Status**: ✅ **Done** (shipped v1.65.1 2026-08-01: aria-plugin `52d6f22`, Aria gitlink `d4818e4`; #121 closed, follow-up #123 已开; Approved 2026-08-01 owner sign-off, post_spec R1→R3 CONVERGED)
 > **Created**: 2026-08-01
 > **Issue**: [aria-plugin #121](https://forgejo.10cg.pub/10CG/aria-plugin/issues/121) (triage confirmed, repro 2/2, severity major — [issuecomment-17136](https://forgejo.10cg.pub/10CG/aria-plugin/issues/121#issuecomment-17136))
 > **根因谱系**: aria-plugin #113 `state-scanner-gate-yaml-datasource` (已归档 `openspec/archive/2026-07-22-state-scanner-gate-yaml-datasource/`) 的同根因**第四处消费方**
