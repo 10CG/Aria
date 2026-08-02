@@ -6,7 +6,8 @@
 > ⚠️ **流程留痕 (作者自陈)**: R3 审计进行中 (14:45) 作者改写了本文件与 `secret-hygiene.md`, 违反「审计只审不改、编辑落轮间」纪律 (R3 tech-lead 察觉并按新版复核)。后果 = R3 五方读到**不同版本**, 其 SOT 相关 findings 中 §4.4 一条实为读旧版所致 (已核实工作树该处早已订正)。本轮起严格遵守: R4 期间零编辑。
 > **Created**: 2026-08-02
 > **Issue**: [Aria #170](https://forgejo.10cg.pub/10CG/Aria/issues/170) (partial-repro → 目标重定向)
-> **审计轨迹** (计数均为**五方合计**, 非单方): R1 (1C+13M+21m) → 大改 → R2 (2C+13M+24m, 严重度未下降) → **owner 裁定缩到最小可 ship, 架构面另排** → R3 (去重 2C+15M: SC 互斥 / 两条 R2 静默丢弃 / SOT 订正三重脱节 / 作者中途改文件引发的文档不一致 —— **四类并列, 前三类与中途改写无关**) → R4 (2 PASS + 3 REVISE, 0C; 剩余全为文本项, 含一条被实测证伪的「不可兼得」断言) → 本版
+> **审计轨迹** (五方合计, **统一口径 = 原始计数**, 去重数另注; R4 code-reviewer m-1 勘正前一版三处混用口径):
+> R1 `1C+13M+21m` → 大改 → R2 `4C+13M+24m` (严重度未下降) → **owner 裁定缩到最小可 ship, 架构面另排** → R3 `3C+15M+15m` (去重后 2C; 四类并列: SC 互斥 / 两条 R2 静默丢弃 / SOT 订正三重脱节 / 作者中途改文件引发的文档不一致 —— **前三类与中途改写无关**) → R4 `0C+8M+18m` (2 PASS + 3 REVISE; 全为文本项, 含一条被实测证伪的「不可兼得」断言) → 收尾编辑 (R4 机械项) → ship
 >
 > **本 cycle 三次「未实测即断言」** (作者自陈, 供转出 4/5 收口者引以为戒): (1) R1「六形态无假阴无假阳」→ R2 证伪 (`curl -v … >/dev/null` 是假阴); (2) R2 采信 `-out=keys` 为合法安全写法 → R3 实机核验为非法 flag; (3) R3「SC-3/SC-4 不可兼得」→ R4 实测可兼得 (放宽字符类)。三次均由审计方实跑推翻, 无一由作者自查发现。
 
@@ -43,7 +44,12 @@ nomad var get <真读>; nomad var get -out=X <另一路径>  # 同族双出现, 
 
 ### 测试面盲区
 
-`hooks/tests/secret-guard.test.sh` 现有 347 条中, `nomad var` / `/v1/var/` 相关全为**读向** (L56-L418 共 37 处), 写向零锁定。
+`hooks/tests/secret-guard.test.sh` 现有 347 条中相关用例全为**读向**, 写向零锁定。两个口径分开说 (R4 code-reviewer m-2 勘正):
+
+- `/v1/var/` **HTTP** 形态: L56-L418 区间内共 **37 处**;
+- `nomad var` **CLI** 形态: `:55` / `:601` / `:681` **三条, 全在该区间之外**。
+
+(该文件头部注释当时写「~50 cases」也是陈旧的 —— 本 spec R1 曾据此把基线误记为 ~50, 收尾时一并同步为实况。)
 
 ## What
 
@@ -87,7 +93,7 @@ nomad var get <真读>; nomad var get -out=X <另一路径>  # 同族双出现, 
 | 豁免机制 | **一律不做** | R1/R2 两版豁免设计均被实测推翻 (整命令扫描下必泄漏); 零豁免 = 零新增风险面 |
 | 安全形态出路 | 沿用既有 `>/dev/null` credit | 已在 BLOCKED 提示清单内; 与 `secret-hygiene.md` §3.4 现有推荐一致 |
 | 要求 2 (读写分离) | 不做, 关闭 | Nomad 官方文档证伪其前提 |
-| 提示文案 | **不改** | 全局共享 heredoc, 加专属内容会污染无关拦截 (R1 qa M1) |
+| 提示文案 | **不改** | 全局共享 heredoc, 加专属内容会污染无关拦截 (R1 qa M1)。**验收锚点 (R4 code-reviewer m-5)**: `git diff` 中 `secret-guard.sh` 的改动**仅限** risky_patterns 数组内的新增行, heredoc 区 (`:654-:682`) 零改动 —— 这同时是 rule6_note「未改任何 AI 指令面」论证的可证伪支撑。**实测已核**: 本 cycle `secret-guard.sh` diff 仅 +10 行 (1 条 pattern + 9 行设计意图注释), 全部落在 risky_patterns 数组内 |
 | stderr 假阴 / FP 守卫 / ack 文案 | **转出** | 各自独立裁量面, 混入本 spec 会重演 R1/R2 的范围失控 |
 | SOT `-out=keys` 订正 | 本 cycle co-land | owner 裁定; 事实性错误, 与本 spec 同源 (都是 nomad var 命令的正确用法) |
 | 备选: PostToolUse `secret-scan.sh` 替代 | 否决 (保留为纵深) | 它确在本次事故中检出泄漏, 但 PostToolUse 在执行**之后**运行, 值已进上下文 — 只能告警不能阻断 (本 session 起草时又实证一次) |
@@ -98,8 +104,8 @@ nomad var get <真读>; nomad var get -out=X <另一路径>  # 同族双出现, 
 - **覆盖率上限 (R4 tech-lead M-3)**: 新 pattern 仅对**单命令**有效。复合命令 (`a; b`) 中任一段携带 redirect credit 时全段放行 —— 含「一次写多个 var」这一日常形态 (SC-8 锁定现状, 归转出 1)。故本 spec 是**部分覆盖**, 不宜表述为「`put` 已受保护」。
 - 版本: PATCH → aria-plugin **v1.65.2** (SOT `plugin.json` 现 1.65.1)。
 - 兼容: 纯新增拦截面 (此前 `put` 零覆盖), 既有放行/拦截行为不变 — 由 SC-5 全量回归 (347 条) 锁定。
-- 风险: 新 pattern 的 FP 面 — **实测远小于起草时预估** (R3 三方收敛 + 作者复核): 尾边界 `([[:space:]]|$)` 使「`put` 后紧跟引号」的文本提及**不匹配**, 故 `grep -rn 'nomad var put' aria/` 与 `echo "改用 nomad var put"` 均**放行**; 仅当被引文本里 `put` 后**真有空格**时才拦 (如 `git commit -m "fix: nomad var put 回显"`)。本 spec 接受该残余 FP, 出路是既有 `# guard:ack` 逃生门 (注意其文案/实现不符, 转出 3)。既有 `(get|list)` 条已有同类且**更宽**的 FP —— 本 session dogfood **四次**实证 (读 `--help` ×2 / 审计 agent 测试命令 / 作者写文档时引用命令文本的 heredoc), 故非新增行为类别。
-- ship 同步面: aria 子模块 5 文件 + standards 子模块 1 文件 + 主仓双 gitlink + VERSION + README badge (i18n B 档)。
+- 风险: 新 pattern 的 FP 面 — **实测远小于起草时预估** (R3 三方收敛 + 作者复核): 尾边界 `([[:space:]]|$)` 使「`put` 后紧跟引号」的文本提及**不匹配**, 故 `grep -rn 'nomad var put' aria/` 与 `echo "改用 nomad var put"` 均**放行**; 仅当被引文本里 `put` 后**真有空格**时才拦 (如 `git commit -m "fix: nomad var put 回显"`)。**最高频的一类是 `nomad var put --help` / `-h`** (R4 code-reviewer m-8: 实测均 exit=2, 原版为 0) —— 它落在「`put` 后真有空格」通则内, 而本 cycle 的 dogfood 里就有两次是读 `--help`, 说明这是开发者最常撞的形态, §转出 4 收口时不必重新发现。本 spec 接受该残余 FP, 出路是既有 `# guard:ack` 逃生门 (注意其文案/实现不符, 转出 3)。既有 `(get|list)` 条已有同类且**更宽**的 FP —— 本 session dogfood **五次**实证 (读 `--help` ×2 / 审计 agent 测试命令 / 写文档时 heredoc 内引用命令文本 / grep 搜索词含该串), 故非新增行为类别。
+- ship 同步面 (R4 code-reviewer m-6 拆清口径): aria 子模块 = **2 交付文件** (`hooks/secret-guard.sh` + 其测试) **+ 5 版本同步文件**; standards 子模块 1 文件; 主仓双 gitlink + VERSION + README badge (i18n B 档)。
 - issue 收尾: ship 后 #170 发进展 comment; **不关闭 issue** — 要求 1 (轮换 T4 + revoke `446b79`) 是 owner/infra 项且仍阻塞 cesura, 须由 owner 决定何时关或拆分。
 
 ## 转出 (本 spec 明确不做, ship 时逐条开 issue)
@@ -136,7 +142,7 @@ Rule #6 触发面是 **Skill**, 其 SOT 四分表逐行以「Skill 内容」为�
 ## Success Criteria
 
 - [x] SC-1 (baseline-failing, 核心): `nomad var put -in=json <path> @file` / `nomad var put <path> KEY=<literal>` / `nomad var put -out=json <path> @f` / `nomad var put -out=table <path> @f` / `nomad var put -out=none <path> @f` **五条改前实测 exit=0, 改后 exit=2**。第五条含 `-out=none`: 本 spec **无豁免**, 故它同样被拦 — 这是刻意的保守选择, 出路是加 `>/dev/null` (SC-2)
-- [x] SC-2 (既有 credit 仍生效, 改前改后均 exit=0): `nomad var put … >/dev/null` / `nomad var put … &>/dev/null` / `nomad var put -out=none … >/dev/null` / **`nomad var put p @f -o /dev/null`** (第四条: `-o /dev/null` 虽是 curl flag 且 nomad 不识别, 但 hook 的 credit 谓词 `secret-guard.sh:390` **不锚定命令**, 实测确实放行 — 锁定该真实放行面而非声称「与 nomad 无关」, R4 tech-lead r4-m-3; 归转出 2 一并收口)。**警示注记 (转出 2 的相邻面)**: `nomad var put -verbose … >/dev/null` 实测亦 exit=0 放行, 但 `-verbose` 的输出**按 nomad 设计走 stderr** ⇒ 该组合仍会泄漏。故 SOT `secret-hygiene.md` §3.4 的 `>/dev/null 2>&1` 全 redirect 才是完整写法; 本 spec 不在 hook 侧收口该面 (转出 2), 但已在 SOT 补警示段
+- [x] SC-2 (既有 credit 仍生效, 改前改后均 exit=0): `nomad var put … >/dev/null` / `nomad var put … &>/dev/null` / `nomad var put -out=none … >/dev/null` / **`nomad var put p @f -o /dev/null`** (第四条, 口径经 R4 code-reviewer m-7 精确化: nomad CLI **不接受** `-o` — 实跑 `flag provided but not defined: -o` ⇒ 该形态在真实使用中不可能出现; 但 hook 侧仍放行, 因为 `secret-guard.sh:390` 的 credit 谓词是**无工具语境的裸正则**。用例锁定的是**后者**这个真实放行面。该根因与「裸扫 `-v` 会撞 `grep -v` credit」**同源** — credit 正则不看调用的是哪个工具, 归转出 2 一起修比分两次便宜)。**警示注记 (转出 2 的相邻面)**: `nomad var put -verbose … >/dev/null` 实测亦 exit=0 放行, 但 `-verbose` 的输出**按 nomad 设计走 stderr** ⇒ 该组合仍会泄漏。故 SOT `secret-hygiene.md` §3.4 的 `>/dev/null 2>&1` 全 redirect 才是完整写法; 本 spec 不在 hook 侧收口该面 (转出 2), 但已在 SOT 补警示段
 - [x] SC-3 (尾边界, 改后): `nomad var putty foo` **exit=0** (非 nomad var put 调用, 不得误配)
 - [x] SC-4 (FP 面**按实测**锁定 — R3 三方收敛勘正): 尾边界使「`put` 后紧跟引号」不匹配, 故 `grep -rn 'nomad var put' aria/` 与 `echo "改用 nomad var put"` **改后仍 exit=0 (放行)**; 仅 `put` 后**真有空格**的文本提及被拦, 以 `git commit -m "fix: nomad var put 回显"` **exit=2** 锁定。附阳性对照: 真执行形态 `nomad var put <path> @f` exit=2 (证明拦截确由新 pattern 产生)。
   > ⚠️ **实现约束 (R3 backend + code-reviewer 提出, R4 tech-lead 勘正论证)**: 尾边界是 SC-3 的硬约束; SC-4 前两条的 `exit=0` 是**当前字符类 `[[:space:]]` 的副产物, 非不可改变** —— 放宽字符类 (如 `([^[:alnum:]]|$)`) 可在保住 SC-3 的前提下把引号收尾的提及也拦住 (作者已实测复现: `nomad var putty` 仍 exit=0, 而 `grep -rn 'nomad var put'` 与 `echo "…"` 转为 exit=2, credit 未破)。但那会**扩大 FP 面**, 与本 spec「接受残余 FP、不扩打击面」的裁定相反, 故本 spec 选择 `[[:space:]]`。实施者不得为凑某条 FP 断言而改动该字符类; 若未来要改, 须连同转出 4 一并重评 FP 面。
