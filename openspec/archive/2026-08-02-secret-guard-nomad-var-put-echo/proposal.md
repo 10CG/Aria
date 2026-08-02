@@ -1,7 +1,7 @@
 # secret-guard: 补 `nomad var put` 拦截 (Aria #170 第 3 环, 最小范围)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: ✅ **Approved** (owner sign-off 2026-08-02; post_spec R1→R4, R4 = 2 PASS + 3 REVISE 且 0 Critical, 剩余文本项已按审计方逐字建议全部落地; tech-lead 与 code-reviewer 均明示不必开 R5)
+> **Status**: ✅ **Done** (shipped 2026-08-02: aria-plugin `183836b` v1.65.4 / standards `7e2b48c` v1.1.1 / Aria `5b914c5`; 6 项转出已立案 aria-plugin#128-132 + Aria#171; #170 保持 open — 要求 1 属 owner/infra。Approved owner sign-off 2026-08-02; post_spec R1→R4, R4 = 2 PASS + 3 REVISE 且 0 Critical, 剩余文本项已按审计方逐字建议全部落地; tech-lead 与 code-reviewer 均明示不必开 R5)
 >
 > ⚠️ **流程留痕 (作者自陈)**: R3 审计进行中 (14:45) 作者改写了本文件与 `secret-hygiene.md`, 违反「审计只审不改、编辑落轮间」纪律 (R3 tech-lead 察觉并按新版复核)。后果 = R3 五方读到**不同版本**, 其 SOT 相关 findings 中 §4.4 一条实为读旧版所致 (已核实工作树该处早已订正)。本轮起严格遵守: R4 期间零编辑。
 > **Created**: 2026-08-02
@@ -131,19 +131,19 @@ Rule #6 触发面是 **Skill**, 其 SOT 四分表逐行以「Skill 内容」为�
 - [x] 1.2 测试族 19 条 hook 断言 + SC-7 SOT grep 断言 — **baseline 已验**: 未加 pattern 时恰 7 条 FAIL (SC-1 五条 + SC-4 commit-msg + 阳性对照), 加后全绿
 - [x] 1.3 `secret-hygiene.md` **4 个推荐位** `-out=keys` 订正 + 两段反坑警示 + Version 1.1.0→1.1.1 (standards 子模块; **已预落地于工作树**, 见 Status 流程留痕)
 - [x] 1.4 全量回归 366/366 + hooks/tests/ 全部 6 个脚本 PASS
-- [ ] 1.5 开 §转出 **六项** issue
+- [x] 1.5 开 §转出 **六项** issue — aria-plugin#128/#129/#130/#131/#132 + Aria#171
 
 ## Success Criteria
 
-- [ ] SC-1 (baseline-failing, 核心): `nomad var put -in=json <path> @file` / `nomad var put <path> KEY=<literal>` / `nomad var put -out=json <path> @f` / `nomad var put -out=table <path> @f` / `nomad var put -out=none <path> @f` **五条改前实测 exit=0, 改后 exit=2**。第五条含 `-out=none`: 本 spec **无豁免**, 故它同样被拦 — 这是刻意的保守选择, 出路是加 `>/dev/null` (SC-2)
-- [ ] SC-2 (既有 credit 仍生效, 改前改后均 exit=0): `nomad var put … >/dev/null` / `nomad var put … &>/dev/null` / `nomad var put -out=none … >/dev/null` / **`nomad var put p @f -o /dev/null`** (第四条: `-o /dev/null` 虽是 curl flag 且 nomad 不识别, 但 hook 的 credit 谓词 `secret-guard.sh:390` **不锚定命令**, 实测确实放行 — 锁定该真实放行面而非声称「与 nomad 无关」, R4 tech-lead r4-m-3; 归转出 2 一并收口)。**警示注记 (转出 2 的相邻面)**: `nomad var put -verbose … >/dev/null` 实测亦 exit=0 放行, 但 `-verbose` 的输出**按 nomad 设计走 stderr** ⇒ 该组合仍会泄漏。故 SOT `secret-hygiene.md` §3.4 的 `>/dev/null 2>&1` 全 redirect 才是完整写法; 本 spec 不在 hook 侧收口该面 (转出 2), 但已在 SOT 补警示段
-- [ ] SC-3 (尾边界, 改后): `nomad var putty foo` **exit=0** (非 nomad var put 调用, 不得误配)
-- [ ] SC-4 (FP 面**按实测**锁定 — R3 三方收敛勘正): 尾边界使「`put` 后紧跟引号」不匹配, 故 `grep -rn 'nomad var put' aria/` 与 `echo "改用 nomad var put"` **改后仍 exit=0 (放行)**; 仅 `put` 后**真有空格**的文本提及被拦, 以 `git commit -m "fix: nomad var put 回显"` **exit=2** 锁定。附阳性对照: 真执行形态 `nomad var put <path> @f` exit=2 (证明拦截确由新 pattern 产生)。
+- [x] SC-1 (baseline-failing, 核心): `nomad var put -in=json <path> @file` / `nomad var put <path> KEY=<literal>` / `nomad var put -out=json <path> @f` / `nomad var put -out=table <path> @f` / `nomad var put -out=none <path> @f` **五条改前实测 exit=0, 改后 exit=2**。第五条含 `-out=none`: 本 spec **无豁免**, 故它同样被拦 — 这是刻意的保守选择, 出路是加 `>/dev/null` (SC-2)
+- [x] SC-2 (既有 credit 仍生效, 改前改后均 exit=0): `nomad var put … >/dev/null` / `nomad var put … &>/dev/null` / `nomad var put -out=none … >/dev/null` / **`nomad var put p @f -o /dev/null`** (第四条: `-o /dev/null` 虽是 curl flag 且 nomad 不识别, 但 hook 的 credit 谓词 `secret-guard.sh:390` **不锚定命令**, 实测确实放行 — 锁定该真实放行面而非声称「与 nomad 无关」, R4 tech-lead r4-m-3; 归转出 2 一并收口)。**警示注记 (转出 2 的相邻面)**: `nomad var put -verbose … >/dev/null` 实测亦 exit=0 放行, 但 `-verbose` 的输出**按 nomad 设计走 stderr** ⇒ 该组合仍会泄漏。故 SOT `secret-hygiene.md` §3.4 的 `>/dev/null 2>&1` 全 redirect 才是完整写法; 本 spec 不在 hook 侧收口该面 (转出 2), 但已在 SOT 补警示段
+- [x] SC-3 (尾边界, 改后): `nomad var putty foo` **exit=0** (非 nomad var put 调用, 不得误配)
+- [x] SC-4 (FP 面**按实测**锁定 — R3 三方收敛勘正): 尾边界使「`put` 后紧跟引号」不匹配, 故 `grep -rn 'nomad var put' aria/` 与 `echo "改用 nomad var put"` **改后仍 exit=0 (放行)**; 仅 `put` 后**真有空格**的文本提及被拦, 以 `git commit -m "fix: nomad var put 回显"` **exit=2** 锁定。附阳性对照: 真执行形态 `nomad var put <path> @f` exit=2 (证明拦截确由新 pattern 产生)。
   > ⚠️ **实现约束 (R3 backend + code-reviewer 提出, R4 tech-lead 勘正论证)**: 尾边界是 SC-3 的硬约束; SC-4 前两条的 `exit=0` 是**当前字符类 `[[:space:]]` 的副产物, 非不可改变** —— 放宽字符类 (如 `([^[:alnum:]]|$)`) 可在保住 SC-3 的前提下把引号收尾的提及也拦住 (作者已实测复现: `nomad var putty` 仍 exit=0, 而 `grep -rn 'nomad var put'` 与 `echo "…"` 转为 exit=2, credit 未破)。但那会**扩大 FP 面**, 与本 spec「接受残余 FP、不扩打击面」的裁定相反, 故本 spec 选择 `[[:space:]]`。实施者不得为凑某条 FP 断言而改动该字符类; 若未来要改, 须连同转出 4 一并重评 FP 面。
   > (前一版此处写「二者不可兼得」—— 未实测的不可能性断言, 已被 R4 证伪并改写。本 cycle 同类错误第三次, 见 §审计轨迹。)
-- [ ] SC-5 (全量回归, **只承担「无外溢」**): `bash aria/hooks/tests/secret-guard.test.sh` 全绿 (基线 **347** 条 + 新增 **19** → 366); `secret-scan.test.sh` 等 hooks/tests/ 下其余 5 个脚本全绿。**分工声明 (R4 tech-lead r4-m-4)**: 该 347 条对本 spec 的目标行为**零鉴别力** (打 patch 前后均 347/347 — R4 实跑二次确认), 故正确性由 SC-1 (baseline-failing) 承担, SC-5 仅证明新 pattern 未外溢破坏既有判定; 不得把 SC-5 全绿当作「功能正确」的证据
-- [ ] SC-6 (读向不回归): `nomad var get <path>` / `nomad var list` 仍 exit=2; SOT 订正后推荐的投影写法 (`-out=json` 管道接 jq 的 `.Items` 取 keys, **与 SOT 逐字一致**) 仍 exit=0。附负向锚点: 同写法但 keys 后带方括号 → exit=2 (方括号破坏 hook 的 jq filter 识别, 实测) —— 该锚点防止 SOT 与 hook 再次分裂
-- [ ] SC-7 (SOT 订正**完备性 + 正确性**双向断言):
+- [x] SC-5 (全量回归, **只承担「无外溢」**): `bash aria/hooks/tests/secret-guard.test.sh` 全绿 (基线 **347** 条 + 新增 **19** → 366); `secret-scan.test.sh` 等 hooks/tests/ 下其余 5 个脚本全绿。**分工声明 (R4 tech-lead r4-m-4)**: 该 347 条对本 spec 的目标行为**零鉴别力** (打 patch 前后均 347/347 — R4 实跑二次确认), 故正确性由 SC-1 (baseline-failing) 承担, SC-5 仅证明新 pattern 未外溢破坏既有判定; 不得把 SC-5 全绿当作「功能正确」的证据
+- [x] SC-6 (读向不回归): `nomad var get <path>` / `nomad var list` 仍 exit=2; SOT 订正后推荐的投影写法 (`-out=json` 管道接 jq 的 `.Items` 取 keys, **与 SOT 逐字一致**) 仍 exit=0。附负向锚点: 同写法但 keys 后带方括号 → exit=2 (方括号破坏 hook 的 jq filter 识别, 实测) —— 该锚点防止 SOT 与 hook 再次分裂
+- [x] SC-7 (SOT 订正**完备性 + 正确性**双向断言):
   - (a) 正向: 订正后示例的 `-out` 取值逐条在合法枚举内 (集群不可达, 只验 flag 解析层);
   - (b) **负向 (R3 code-reviewer M-2: 正向谓词测不到残留)**: 全文 grep `-out=keys` 的每一处命中都必须位于**警示语境** (即紧邻「不存在 / 不要用 / Invalid value」等否定词), 零处位于推荐语境 — 机械断言, 防订正遗漏
-- [ ] SC-8 (覆盖率上限 `KNOWN-LIMIT`, **锁现状非断言正确**, R4 tech-lead M-3): `nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2` **改前改后均 exit=0** —— 复合命令任一段携带 redirect 即令全段获 credit, 故第二条 put (正是 #170 的泄漏形态) 零保护。这是「一次写多个 var」的日常形态, 本 spec **已知不覆盖**, 归转出 1。用例以 `KNOWN-LIMIT` 命名: **该用例转红 = 转出 1 已收口**, 届时须同步更新而非无声漂移
+- [x] SC-8 (覆盖率上限 `KNOWN-LIMIT`, **锁现状非断言正确**, R4 tech-lead M-3): `nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2` **改前改后均 exit=0** —— 复合命令任一段携带 redirect 即令全段获 credit, 故第二条 put (正是 #170 的泄漏形态) 零保护。这是「一次写多个 var」的日常形态, 本 spec **已知不覆盖**, 归转出 1。用例以 `KNOWN-LIMIT` 命名: **该用例转红 = 转出 1 已收口**, 届时须同步更新而非无声漂移
