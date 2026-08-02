@@ -13,7 +13,20 @@
 
 ## 最新 handoff
 
-**[2026-08-02 — 双 Spec 碰撞事后勘误 + ship 版本三个 live 缺陷](./2026-08-02-dual-spec-collision-postmortem-and-shipped-defects.md)**
+**[2026-08-02 — 会话收尾: #121 完整 ship (v1.65.1) + #170 secret-guard 四轮审计 cycle (v1.65.4/v1.65.5 + standards v1.1.1/v1.1.2)](./2026-08-02-121-ship-and-170-secret-guard-four-round-audit.md)**
+
+- track-id: `session-close-20260802-121-ship-170-secret-guard` | phase: **session-close** | status: **done**
+- **两条主线**: (1) aria-plugin **#121** triage→ship **v1.65.1** (`52d6f22`, yaml-only spec carry-forward 假绿, #113 跨 skill 第四处消费方; post_spec R1→R3, R1 四方独立命中 `parse_ok=False` 洞); (2) Aria **#170** T4 凭据泄漏 → triage → **目标重定向** → post_spec **R1→R4** (20 份报告) → ship **v1.65.4/v1.65.5** + standards **v1.1.1/v1.1.2**
+- ⚖️ **#170 要求 2 前提被官方文档证伪**: `PUT /v1/var/` response body **含解密 Items** ⇒ 无 redirect 的写向 PUT 确实回显, **现行拦截正确**, 零代码改动。真 gap 在 `nomad var put` 零覆盖 —— 它在 stdout 非 TTY 时 `-out` 默认切 json, 渲染完整变量到 **stdout** (issue 原文归因 stderr, 不符)
+- 🔑 **一个 cycle 内三次「未实测即断言」全部由审计方推翻, 无一自查发现** — 其中一条写在**专门修正前一次事实错误的段落里**; 另一条继承自审计方自己未核实的 finding → memory `feedback_never_write_unverified_impossibility_claims`
+- 🔑 **Rule #7 SOT 教了一条跑不通的命令且是双重错误** (`-out=keys` flag 不存在 + `2>/dev/null` 会被自家 hook 拦), 后果与该规范要防的事故同构 → memory `feedback_sot_example_commands_are_never_executed`
+- 🔑 **我在 R3 审计进行中改了审计对象**, 五个 agent 读到不同版本 (一位据旧版报假 finding) → 更新 memory: 「审计只审不改」的对偶是**主 loop 也不得在轮次进行中改**
+- ⚠️ **诚实声明: 本 spec 是部分覆盖** — 整命令扫描下复合命令任一段带 redirect 即全段放行, `put p1 >/dev/null; put p2` 第二段零保护 (已 `KNOWN-LIMIT` 锁定, 归 #128)
+- 6 项转出立案 (aria-plugin#128-132 + Aria#171); **#170 保持 open** (要求 1 轮换 T4 属 owner/infra, 仍阻塞 cesura)
+- 并发版本撞车: v1.65.2/1.65.3 被并发轨占用 → 顺延 1.65.4, rebase 后双方测试均绿 (366/366 + 40/40)
+- 🔴🔴 **凭据轮换 hard cap 今天已过期**, 第十次 surface; custom checks **8/8**; 三仓双远程一致 (主仓 `db2e983`)
+
+**[2026-08-02 — 双 Spec 碰撞事后勘误 + ship 版本三个 live 缺陷](./2026-08-02-dual-spec-collision-postmortem-and-shipped-defects.md)** (同日并发轨, 先写)
 
 - track-id: `phase-c-integrator-ci-path-coverage` | phase: **post-mortem** | status: **done** (该轨闭合)
 - **一次净产出为负的循环, 与它挽回的部分**: 本轨对 #122 做 A1/A2/A3 三轮 Spec 修订 + 两轮闸门 (R5 5 席 / R6 1 席新眼睛), 而并发轨同期**走完十步循环 ship 了 v1.65.0** —— 修订对象在 07-31 已归档
