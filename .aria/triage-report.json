@@ -1,68 +1,38 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.65.0",
-  "issue_ref": "10CG/aria-plugin#121",
-  "generated_at": "2026-08-01T14:27:30Z",
+  "triage_tool_version": "1.65.1",
+  "issue_ref": "10CG/Aria#170",
+  "generated_at": "2026-08-01T16:30:19Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 121,
-      "title": "[session-closer] handoff_autofill 只扫 tasks.md — yaml-only spec 报 0 未完成 (同根因第四处消费方)",
-      "body": "## 缺陷\n\n`skills/session-closer/scripts/handoff_autofill.py::grep_unchecked_tasks` 只扫 `tasks.md`:\n\n```python\ndef grep_unchecked_tasks(changes_dir):\n    \"\"\"新增轻量 grep(非既有 collector): 扫 active openspec/changes/*/tasks.md 原始 `- [ ]`。\"\"\"\n    for name in sorted(os.listdir(changes_dir)):\n        tasks = os.path.join(changes_dir, name, \"tasks.md\")\n        if os.path.isfile(tasks):      # ← yaml-only spec 在此静默跳过\n            ...\n```\n\n对**没有 `tasks.md`、只有 `detailed-tasks.yaml`** 的 spec（task-planner path B 产出，常见 L2），它报 **0 未完成**。\n\n## 实证\n\n`openspec/changes/state-scanner-gate-yaml-datasource/` 目录内容：\n\n```\ndetailed-tasks.yaml    ← 10 个 task, 全 status: pending\ndogfood-evidence.md\nproposal.md\n                       ← 无 tasks.md\n```\n\nsession-closer 的 §2 carry-forward 汇编对该 spec 报 **0 未完成**，实际 **10 个 pending**。\n\n## 这是同一病根的第四处消费方\n\naria-plugin #113 修的是「消费方只认 `tasks.md`，遇 yaml-only 即静默假绿」这个根因。已修三处：\n\n| # | 消费方 | 状态 |\n|---|--------|------|\n| 1 | `lib/spec_complete.py::gate_result` | ✅ #113 修 |\n| 2 | `lib/spec_complete.py::is_spec_complete` | ✅ #113 修 |\n| 3 | `collectors/openspec.py` carry_forward | ✅ #113 修 |\n| 4 | **`session-closer/scripts/handoff_autofill.py::grep_unchecked_tasks`** | ❌ **本 issue** |\n\n第四处在 #113 的 Impact 分析之外（跨 skill：state-scanner → session-closer），是 #113 Phase B 收尾时由**机械 autofill 交叉核验**抓到的——正是 session-closer 自己的机制抓到了 session-closer 自己的洞。\n\n## 建议\n\n复用 #113 新建的 parser SOT `lib/detailed_tasks.py`（已有 range-bounded + indent-anchored + 字段列锚定 + fail-CLOSED 白名单），而不是在 session-closer 里第二次实现 yaml 解析。⚠️ 注意跨 skill import 路径与 #113 踩过的循环导入 / `lib` 顶层名绑定毒化两个坑。\n\n## 关联\n\n- 根因 spec: aria-plugin #113 / `openspec/changes/state-scanner-gate-yaml-datasource/`\n- 同族: #166（沉默假绿）\n- 跨 skill 漏检的结构性成因见 Aria #168（各 skill runner 只扫自己 `tests/`）\n",
+      "number": 170,
+      "title": "aether-build-container T4 push 凭据经 nomad var put 回显泄漏 — secret-guard 拦 curl PUT 促使改用不安全替代",
+      "body": "## Bug Report (Security — 凭据泄漏)\n\n**描述**: 用 aether-build-container skill build cesura 镜像时, T4 push 凭据 (`aria-build-bot-2026-Q3` 的 FORGEJO_BOT_USER + FORGEJO_BOT_PAT) 泄漏到 AI tool output (PostToolUse secret-scan 检测 2 个 secret-shape, 恰对应 per-run var 的 2 个 Items)。根因是 aria secret-guard 与 aether-build-container skill 的交互 + 操作者绕过。\n\n**根因链 (3 环)**:\n1. aether-build-container Step 5b-bis 原版用 `curl -X PUT .../v1/var/nomad/jobs/build-container-<id> --data-binary @<600 file> >/dev/null` 写 T4 到 per-run var — 本身安全 (PUT 上传, response 丢弃, 不回显 secret)。\n2. **aria-plugin secret-guard hook 拦截 `/v1/var/` 模式** (BLOCKED, matched `curl[^|]*/v1/var/`)。该 hook 意图拦【读】secret 到输出, 但也拦了【写】(PUT) — PUT --data-binary 写入不会把 secret 读到输出, 属**读写不分的过度拦截**。\n3. 操作者 (AI) 为绕过 guard 改用 `nomad var put @file`。但 **nomad var put 成功后回显写入的 Items 值** (实证: dummy var `{Items:{probe:X}}` → nomad var put 输出 grep 命中 1 次)。操作者用 `>/dev/null` 只挡 stdout, 回显走 stderr → 泄漏。\n\n**预期行为**: 写 per-run push 凭据 var 不应导致 secret 回显到 tool output。\n**实际行为**: T4 的 2 个 Items 值泄漏到 tool output。\n\n**影响**: T4 = `aria-build-bot-2026-Q3` (fingerprint sha256=`446b79`, write:package, cross-project: aria-build DooD runner + aether-build-container push `10cg/*`)。泄漏值已进 AI 服务商 prompt cache, 不可撤回。\n\n**要求维护方**:\n1. **安排轮换 T4** (`aria-build-bot-2026-Q3`), revoke 旧 PAT `446b79` — 存 `nomad/jobs/aria-build` 的 FORGEJO_BOT_PAT, nomad-variables backend 5-step。\n2. **修 secret-guard**: `/v1/var/` 区分读 vs 写 — `curl -X PUT/POST --data-binary` (写 var) 不应拦 (不回显 secret); 或提供安全写 var 的白名单模式。\n3. **修 aether-build-container skill/文档**: 若因 secret-guard 必须替代 curl PUT, 用 `nomad var put ... >/dev/null 2>&1` (全丢弃 stderr); 并在 skill 注明 nomad var put/get 回显 items 的坑。\n\n**已缓解**: per-run var (`build-container-<id>`) 已 purge; build 未成功 (另有独立 BUILD_ARGS 传参 bug, 与本泄漏无关)。\n\n## 环境信息\n- Aria Plugin: 1.56.1\n- Aether Plugin: 1.10.23 / Aether CLI: 1.16.62\n- OS: Linux x86_64\n- 触发: cesura repo build\n\n---\n*由 aria-report 生成 (跨 aria/aether: secret-guard=aria, build-container skill=aether, 凭据=aria-build)*",
       "state": "open",
       "labels": [],
-      "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/121",
-      "created_at": "2026-07-22T03:22:18Z",
-      "updated_at": "2026-07-22T12:41:08Z"
+      "comments": [
+        {
+          "id": 17045,
+          "body": "**催办 / 阻塞升级（+9 天无响应）**\n\n本 issue 自 2026-07-22 创建至今零进展（无评论、无指派）。它正阻塞 **cesura 第 2 段部署**：\n\n- `retention` GC 代码已 ship（cesura `81cf6f7`，98 tests 绿）但**未部署** —— `run_retention` 是全域唯一 GC，未上线期间 job/cache 表 + host-vol spilled 文件**持续无限增长**，运维成本随天数累积。\n- 重 build 新镜像**硬依赖 T4（`aria-build-bot-2026-Q3`）轮换**：旧 PAT `446b79` 已泄漏待 revoke，用它 push 即将 401；轮换前不敢动手（handoff 红线）。\n\n恳请优先安排本 issue 三项要求中的**第 1 项（轮换 T4 + revoke `446b79`）** —— 这是 cesura 解阻塞的唯一前提。第 2 项（secret-guard 读写分离）与第 3 项（skill/文档修正）可后续跟进。\n\n— simonfish（cesura owner）\n",
+          "user": "simonfish",
+          "created_at": "2026-07-31T14:06:51Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/170",
+      "created_at": "2026-07-22T03:19:38Z",
+      "updated_at": "2026-07-31T14:06:51Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": null,
-      "current": "1.65.0",
-      "gap": null
+      "reported": "1.56.1",
+      "current": "1.65.1",
+      "gap": "behind"
     },
     "step3_code": {
-      "collection_status": "ok",
-      "cited_paths": [
-        {
-          "file_path": "tasks.md",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "detailed-tasks.yaml",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "collectors/openspec.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "lib/detailed_tasks.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        }
-      ],
-      "matches_description": false
+      "collection_status": "skipped",
+      "cited_paths": [],
+      "matches_description": null
     },
     "step4_history": {
       "collection_status": "skipped",
@@ -77,7 +47,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "3a93759072ddfbda8720651a53db353300ae743e"
+          "head": "b93ed25d6004e5096ce233db97cd42a8c80905b3"
         }
       ]
     }
@@ -87,26 +57,47 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "隔离 tempdir fixture: changes/yaml-only-spec/ 只含 detailed-tasks.yaml (2 task 全 status: pending, 无 tasks.md); import handoff_autofill.py (v1.65.0 aria submodule) 调 grep_unchecked_tasks(changes_dir)",
-        "expected_behavior": "issue 声称: yaml-only spec 被静默跳过, 报 0 未完成 (实际 2 pending)",
-        "actual_behavior": "返回 [] — yaml-only-spec 报 0 未完成, 实际 detailed-tasks.yaml 有 2 个 pending; 与 L166-167 只拼 tasks.md 路径的代码逐行一致",
-        "match": true
+        "input": "issue 环 2 原版命令逐字喂当前 hook (v1.65.1): curl -X PUT http://.../v1/var/nomad/jobs/build-container-<id> --data-binary @<file> >/dev/null",
+        "expected_behavior": "issue 声称 secret-guard BLOCKED (matched `curl[^|]*/v1/var/`), 促使操作者改用 nomad var put",
+        "actual_behavior": "exit=0 放行, 未拦截。根因: `>/dev/null` 命中 has_filter (secret-guard.sh L384-386 R2-C-10 stdout-redirect credit) 提前放行, 走不到 risky_patterns",
+        "match": false
       },
       {
         "case_id": "case-2",
-        "input": "对照组: 同 changes_dir 下 changes/md-spec/tasks.md 含 2 个 `- [ ]` + 1 个 `- [x]`",
-        "expected_behavior": "tasks.md 路径正常工作 (issue 只声称 yaml-only 受影响)",
-        "actual_behavior": "正确返回 2 个 unchecked item, source=tasks.md:md-spec — 缺陷限定在 yaml-only 分支缺失, 与 issue 描述一致",
+        "input": "同命令喂 issue 报告版本 v1.56.1 的 hook (git show 0964496:hooks/secret-guard.sh, 688 行)",
+        "expected_behavior": "若因果链成立, 报告版本上应 BLOCKED",
+        "actual_behavior": "exit=0 同样放行 — 该 filter credit 自 secret-guard 引入即存在 (e8e847c cherry-pick 自 SilkNode), 两版本行为一致; issue 复述的因果链在其自报版本上亦不成立",
+        "match": false
+      },
+      {
+        "case_id": "case-3",
+        "input": "写向 PUT 无 redirect: curl -X PUT http://nomad:4646/v1/var/x --data-binary @<file> (v1.65.1 与 v1.56.1 各跑一次)",
+        "expected_behavior": "issue 核心主张: /v1/var/ pattern 读写不分, 写向 PUT 不回显 secret 却被拦 = 过度拦截",
+        "actual_behavior": "两版本均 exit=2 BLOCKED。缺陷类别成立: risky_patterns L404-405 只匹配路径不看 HTTP 方法/数据方向, PUT/POST 写入与 GET 读取同等拦截; 对照 GET 亦 exit=2 (符合设计)",
         "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "操作者替代路径 nomad var put -in=json <path> @<file> >/dev/null 喂 hook (两版本)",
+        "expected_behavior": "issue 称绕过 guard 成功",
+        "actual_behavior": "exit=0 放行属实 — risky_patterns 只列 `nomad var (get|list)`, put 不在内 (设计上正确: put 不读)。绕过成立",
+        "match": true
+      },
+      {
+        "case_id": "case-5",
+        "input": "环 3 回显机制: 本机 nomad CLI v1.11.2 `nomad var put --help` 的 -out/-verbose 语义 (集群不可达, 无法端到端写真 var)",
+        "expected_behavior": "issue 称 nomad var put 成功后回显 Items 值且走 stderr, 故 >/dev/null 挡不住",
+        "actual_behavior": "CLI 文档明载 -out 默认「stdout 是终端时 none, 输出被重定向时 json」— >/dev/null 恰恰触发完整变量 JSON 渲染 (含 Items), 但渲染目标是 stdout (被 /dev/null 吞); 走 stderr 的是 -verbose 档 (Provides additional information via standard error to preserve standard output)。回显风险确实存在且单 >/dev/null 不足以防, 但 issue 归因的 stderr 默认路径与 CLI 文档不符。无集群未能实测",
+        "match": null
       }
     ],
     "hit_count": 2,
-    "total_count": 2,
-    "hit_rate": "2/2"
+    "total_count": 5,
+    "hit_rate": "2/5"
   },
-  "verdict": "confirmed",
+  "verdict": "partial-repro",
   "severity": "major",
   "recommended_action": "next-cycle",
-  "deviation_note": null,
+  "deviation_note": "核心缺陷成立但因果链与 issue 复述实质偏离。成立: (a) /v1/var/ risky pattern 读写不分, 无 redirect 的写向 PUT 被拦 (case-3 两版本 exit=2); (b) nomad var put 不在 pattern 内, 绕过成立 (case-4)。不成立: issue 给的带 >/dev/null 的原版 PUT 命令在 v1.56.1 与 v1.65.1 均不被拦 (case-1/2) — stdout-redirect filter credit 自 hook 引入即存在, 故「secret-guard 拦了这条命令促使改用 nomad var put」的具体叙述不成立 (真实被拦的应是某条无 redirect 变体)。环 3 回显方向亦有偏差: CLI 文档显示重定向触发的 JSON 渲染走 stdout, stderr 是 -verbose 档 (case-5, 无集群未实测)。修复设计须按实测因果重写, 不可照 issue 叙述直改。",
   "errors": []
 }
