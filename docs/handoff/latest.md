@@ -13,7 +13,17 @@
 
 ## 最新 handoff
 
-**[2026-08-01 — 会话收尾: triage-修复列车 (#116 尾款/#118/#119) + #122 not_applicable 完整 cycle (v1.64.1 + v1.65.0 双 ship)](./2026-08-01-triage-fix-train-and-122-not-applicable-ship.md)**
+**[2026-08-02 — 双 Spec 碰撞事后勘误 + ship 版本三个 live 缺陷](./2026-08-02-dual-spec-collision-postmortem-and-shipped-defects.md)**
+
+- track-id: `phase-c-integrator-ci-path-coverage` | phase: **post-mortem** | status: **done** (该轨闭合)
+- **一次净产出为负的循环, 与它挽回的部分**: 本轨对 #122 做 A1/A2/A3 三轮 Spec 修订 + 两轮闸门 (R5 5 席 / R6 1 席新眼睛), 而并发轨同期**走完十步循环 ship 了 v1.65.0** —— 修订对象在 07-31 已归档
+- 🔴 **挽回: R5/R6 的 finding 拿去实跑 ship 的 `path_coverage.py`, 3/3 全部命中** → [#124](https://forgejo.10cg.pub/10CG/aria-plugin/issues/124) **fail-OPEN 误放行** (非 ASCII 路径 → 误判 not_applicable, 根因缺 `-z` + `core.quotePath` 转义) / [#125](https://forgejo.10cg.pub/10CG/aria-plugin/issues/125) 同缩进块序列解析不出 ⇒ 恒 wait / [#126](https://forgejo.10cg.pub/10CG/aria-plugin/issues/126) 内部异常上报为 `git-diff-failed`
+- 🔑 **第五次实证 `feedback_concurrent_duplicate_audit_fetch_before_start`, 且这次是「提出纪律的人第二天违反了它」** —— 07-30 起草 `a1-entry-claim-duplicate-work-guard` 论证「闸门不审产物是否该存在」, 07-31 起草 A3 前自己没 fetch
+- 🔑 **审计发现与 Spec 修订的价值可分离**: 500 行 Spec 修订全作废, R5/R6 的 finding **100% 存活** —— 因为它们描述的是**实现层缺陷**而非 Spec 文本缺陷。⇒ finding 应表述为「实现若这样写会怎样」, 跨载体可迁移
+- ⚖️ **A2/A3 两个 commit 已 skip**: 它们只改已归档 Spec, 而**归档是「实际 ship 了什么」的历史记录, 不可回写** (否则后人会以为实现照着 D12-D16 建)。全文存 `REMEDIATION-DESIGN-A3.md` 并标注哪些条款对修 #124/#125/#126 有用、哪条属「未命中的防御」
+- 🔴 凭据轮换 **hard cap 2026-08-02 = 今天**, 第九次 surface, 逾期无补救
+
+**[2026-08-01 — 会话收尾: triage-修复列车 (#116 尾款/#118/#119) + #122 not_applicable 完整 cycle (v1.64.1 + v1.65.0 双 ship)](./2026-08-01-triage-fix-train-and-122-not-applicable-ship.md)** (predecessor)
 
 - track-id: `session-close-20260801-triage-fix-train-122-ship` | phase: **session-close** | status: **done**
 - **三列递进**: #116 剩余 scope Level 1 (`e5aebb0`) → #118/#119 打包 triage+修复 **v1.64.1** (`6ffd8cd`, C.2.4 wait 上报 owner 特批第 2 次) → **#122 完整 Level 2 cycle → v1.65.0** (`5a9ca18`): triage → spec post_spec **R1→R4 CONVERGED** (R1 5/5 REVISE 含 4 Critical) → owner 双项签字 → TDD (测试 62→97, 跨 skill 1546 绿) → **Rule #6 三臂 AB** (零回归; without 臂**真污染零命中** → DEC-20260722-001 决策 4 裁 [C] 关闭, **#116 闭环**)
