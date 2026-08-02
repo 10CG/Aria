@@ -1,6 +1,6 @@
 {
   "skill_name": "phase-c-integrator-pre-merge-gate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "workflow_skill_subextension",
   "parent_skill": "phase-c-integrator",
   "spec": "openspec/changes/phase-c-integrator-pre-merge-gate/proposal.md",
@@ -8,7 +8,11 @@
   "release_pr": "10CG/aria-plugin#42 (v1.19.0)",
   "fixtures_dir": "phase-c-integrator-pre-merge-gate-fixtures/",
   "changelog": [
-    {"version": "1.0.0", "date": "2026-05-10", "changes": "Initial fixture suite for v1.19.0 ship: 4 happy + 2 negative fixtures matching Spec D1 §Contract Source schema"}
+    {
+      "version": "1.0.0",
+      "date": "2026-05-10",
+      "changes": "Initial fixture suite for v1.19.0 ship: 4 happy + 2 negative fixtures matching Spec D1 §Contract Source schema"
+    }
   ],
   "fixtures": [
     {
@@ -52,6 +56,13 @@
       "expected_verdict": "fail (after retry exhaustion)",
       "test_case_in_unit_tests": "test_pre_merge_gate (timeout path; integration scenario)",
       "purpose": "Spec QA-2 R2 patch — verify subprocess timeout + 3-retry behavior"
+    },
+    {
+      "id": "NEG-3-internal-error-surface",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-3-internal-error-surface.json",
+      "expected_verdict": "green (path_coverage unknown → fail-toward-covered), 但 surface 措辞须分档",
+      "test_case_in_unit_tests": "test_path_coverage.InternalErrorReasonTests.test_internal_error_has_own_reason",
+      "purpose": "aria-plugin #126 — D9 surface 的 reason 分档措辞。既有 6 fixture 结构上碰不到 path_coverage unknown 分支 (Rule #6 判据表第三行第 2 条义务: 定向可证伪 fixture)"
     }
   ],
   "primary_pass_gate_metric": {

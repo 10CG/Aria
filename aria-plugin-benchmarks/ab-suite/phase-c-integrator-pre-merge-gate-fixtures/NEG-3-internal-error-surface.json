@@ -1,0 +1,24 @@
+{
+  "_fixture_id": "NEG-3-internal-error-surface",
+  "_description": "aria-plugin #126 定向 fixture (Rule #6 判据表第三行「套件覆盖外」的第 2 条义务)。既有 6 个 fixture (green / wait / wait_then_green / fail / NEG-1 / NEG-2) 结构上都碰不到 path_coverage 的 unknown 分支, 更碰不到 D9 surface 的 reason 分档措辞 —— 本 fixture 补这个缺口。",
+  "_target_behavior": "SKILL.md §C.2.4 路由决策 (b) 的 surface 义务: path_coverage.decision == unknown 时, AI 必须按 reason 分档措辞。internal-error 表示**评估器自身异常** (非 git 问题、非 workflow 解析问题), 文案须点明「请报 issue」; 不得与 git-diff-failed / workflow-parse-failed 共用同一句「评估失败」。",
+  "_why_the_distinction_matters": "#126 的根因: v1.65.2 前, 全捕获兜底把内部异常写成 `git-diff-failed: internal error <exc>`。git-diff-failed 在判定规则里有确切语义 (规则 1: git diff 失败 / main ref 缺失 / shallow 缺 merge-base) ⇒ 排查者会去查 git 与 main ref, 而真 bug 在 parser 里, 且内部 bug 通常确定性触发 ⇒ 每次都稳定地指向错误方向。",
+  "_discriminating_question": "给定下方 gate 输出, AI 在 workflow report 里写的 surface 行, 是否把「评估器自身出了 bug, 需要报 issue」与「git 环境有问题, 需要查 ref」区分开?",
+  "_arm_expectations": {
+    "with_skill": "surface 行点明评估器自身异常 + 提示报 issue; 不引导去查 git / main ref / shallow clone",
+    "without_skill": "大概率笼统写「评估失败」或误引导去查 git 环境 (因 reason 字面在 v1.65.2 前即含 git-diff-failed, 且 unknown 的另两个 reason 确实是 git/解析问题)"
+  },
+  "_consumed_by": "Documentation + eval prompt data. 确定性侧由 test_path_coverage.InternalErrorReasonTests 覆盖 (reason 字面值断言); 本 fixture 覆盖的是 AI 的 surface 措辞行为 —— 两者正交, 不互替。",
+  "_ships_with": "v1.65.3 (#125 + #126)",
+  "verdict": "green",
+  "pr_ci_status": "pending",
+  "in_flight_runs": [],
+  "raw_message": "path_coverage evaluation failed (internal-error); treated as covered per fail-toward-covered",
+  "path_coverage": {
+    "decision": "unknown",
+    "workflows_scanned": 0,
+    "matched_workflows": [],
+    "changed_files_count": 3,
+    "reason": "internal-error: RuntimeError: unexpected indent state in _extract_paths"
+  }
+}
