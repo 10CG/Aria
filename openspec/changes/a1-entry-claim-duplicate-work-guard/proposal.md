@@ -12,6 +12,21 @@
 
 ## Why
 
+### ⭐ 第五次实证 + 主机制 dogfood (2026-08-02 补, 起草后新增)
+
+**第五次碰撞, 且这次最难辩解**: 本 Spec 于 2026-07-30 起草, 论点是「闸门审产物质量, 不审产物是否该存在」。**起草后的第二天 (07-31), 起草者自己在做 A3 修订前没有 fetch** —— 而并发轨已于 07-31 把同一个 #122 走完十步循环 ship 为 v1.65.0 并归档。08-02 才发现, 三天投入 (A1/A2/A3 + R5 五席 + R6 一席) 的修订对象**在修订期间已经归档**。
+
+⇒ **提出这条纪律的人, 在提出后的第二天违反了它。** 这是「纪律不足以替代机制」的最强证据 —— 不是不知道, 是知道也做不到。
+
+**主机制已 dogfood 成功 (同日)**: 在起手修 aria-plugin #124 **之前**, 按本 Spec §1 的调用形态实跑:
+
+```bash
+python3 .../phase1_gate.py --raw-track-id "aria-plugin-124-path-coverage-z-flag" \
+  --phase A.1 --mode advisory --linked-issue "aria-plugin#124" --repo-path .
+```
+
+返回 `outcome=passed` / `proceed=true` / **`push_success=true`** / `linked_issue_overlap=[]`。⇒ **`--phase A.1` 无需改 phase1_gate 代码这一前提已实测坐实** (D6), claim 确实立即写并推远端 (主机制不依赖 spec 是否 push 的关键前提亦坐实)。
+
 ### 症状 (实证: aria-plugin #122, 2026-07-25~27)
 
 两个容器 (`aria-runner-bot/023236f2` 与 `simonfishgit`) 对**同一个 issue** 各自起草了一份 Spec, 核心设计同构, 各跑满 4 轮 post_spec。第二份 (`R`) 于 07-27 11:52 落地远端时, 第一份 (`L`) 已跑完 10 轮闸门并写完 handoff — 双方全程互不知情。
@@ -108,7 +123,8 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | D3 | 副机制**每轮**跑, 非仅首轮 | 本次事故 R 恰在 L 末轮后落地; 多轮审计跨天 |
 | D4 | 副机制的盲区**写进 Spec 正文**, 不藏进脚注 | 假绿的反面是恒红, 但「以为覆盖了其实没有」比两者都糟 |
 | D5 | 不做中心化 spec 登记表 | owner 未授权; 残余窗口秒级, 性价比不成立 |
-| D6 | `--phase A.1` 不改 phase1_gate 代码 | 已核 CLI `--phase` 无 `choices` 约束 |
+| D6 | `--phase A.1` 不改 phase1_gate 代码 | 已核 CLI `--phase` 无 `choices` 约束; **2026-08-02 实跑坐实** (aria-plugin#124 起手前真调, `outcome=passed` / `push_success=true`) |
+| D7 (08-02) | 主机制的承重前提「claim 立即推远端」**已实测**, 非推断 | dogfood 返回 `push_success: true`。这是主机制优于原建议 (grep 远端 spec) 的**唯一**理由 —— spec 可以本地躺两天, claim 不能。前提若不成立整个方案坍塌, 故必须实测而非援引文档 |
 
 **Rule #6 (rule6_note)**: `phase-a-planner/SKILL.md` 与 `audit-engine/SKILL.md` 的改动均为**处方性·运行时指令面** (新增 AI 必须执行的步骤 + 告警消费义务) → 判据决策表第二行, **照跑 AB, 零裁量**。新增 `sibling_spec_probe.py` 为确定性代码 → 结构化测试覆盖 (SC-4~6), 与 AB 并行不互替。**不申请豁免。**
 
