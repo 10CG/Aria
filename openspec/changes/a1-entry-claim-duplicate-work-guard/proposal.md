@@ -104,6 +104,14 @@ L 的 proposal 头部写着「关联 Issue ... **无 in-flight — 本地 fetch 
 
 **实测负例保护**: `10CG/Aria#147` 与 `10CG/aria-plugin#110` 的 basename 分别是 `Aria` / `aria-plugin` ⇒ **不匹配** (正确)。`Aria` 与 `aria` 经 casefold 视为同仓 —— 本 Lab 无大小写相异的同名仓, 且误配方向仍是 fail-toward-reporting。
 
+**⭐ 极性只在 org 轴成立 —— basename 轴是精确匹配 (R2-fix/M2, 诚实标注)**: 上面的 fail-toward-reporting 论证**只覆盖 org 维度**。`repo_basename` 用的是**精确相等**, 对真实存在的别名**恒漏**: R2 语料统计 `aria-orch` **24 次** vs `aria-orchestrator` **10 次** —— 同一个仓的两种写法, 归一后 basename 不等 ⇒ 不匹配 ⇒ 漏报。⇒ **本机制在 basename 轴是 fail-toward-silence, 与 org 轴方向相反**。处置 (Phase A.2 定): (i) 维护一张仓别名表 (小、封闭、可核); 或 (ii) 显式声明「书写必须用全称」并加机械校验。**不得**用模糊匹配 (前缀/编辑距离) —— 那会把 org 轴刚论证过的「误报便宜」推到一个误报不再便宜的量级。
+
+**⭐ 取样口径订正 (R2-fix/minor)**: 上方三族表取自 **coordination ref (13 条)**, 而 `--linked-issue` 的**实际输入来源是 proposal 头部的 prose 字段 (139 篇语料)** —— **两者不是同一个总体**。ref 只记录了「已经调用过 CLI 的人写了什么」, prose 记录的是「下一个人会照抄什么」。R2 指出 prose 语料的最高频族**未进上表**。⇒ 归一规则的语料基准须以 **prose 为准**、ref 为辅, 三族表在 Phase A.2 按 prose 重新统计后定稿。
+
+**⭐ 与 `derive_track_id` 归一的组合 (R2-fix/M4)**: §0 的 `casefold` 与既有 `derive_track_id` 的 `lower + /._→-` 是**两套独立归一**, R1-fix 未论证其组合。R2 反例: 三个不同的 §0 issue 可塌成同一 track_id。⇒ 本 Spec 的 track-id 派生 (§1) **必须先经 §0 归一再交 `derive_track_id`**, 且该组合的碰撞域须在 Phase A.2 穷举核验 (语料小, 可穷举)。
+
+**`number` 的类型与空白 (R2-fix/minor)**: `number` 一律解析为 **`int`** 后比较 (故 `#007` 与 `#7` 等价); `#` 两侧的空白在步骤 1/2 已剥。§0 自称「钉到字符级」而 R1-fix 版本对此欠定, 此处补齐。
+
 **存量数据不迁移**: 归一发生在**比较时**, 13 条已有记录原样有效, 无需改写 ref (改写共享 ref 是外向且难撤销动作, 不在本 Spec 范围)。
 
 > ⚠️ **本条改 `lib/collision.py`, 打破了原 §非目标「不改 phase1_gate 自身代码」** —— 该非目标条款已作废并在 §非目标 就地更正。R1 前的判断 (「机制已 ship, 只需换调用点」) 被证伪: **机制 ship 了不等于机制能用**, 它的匹配谓词在真实语料上是坏的。这与本 Spec 自己援引的 `feedback_completion_signals_vs_runtime_invocation` 同形 —— 「已 ship」不是「已验证在生产语料上工作」。
@@ -114,22 +122,37 @@ L 的 proposal 头部写着「关联 Issue ... **无 in-flight — 本地 fetch 
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py" \
-  --raw-track-id "<spec-slug 或 handoff §6 carry-id>" \
+  --raw-track-id "<basename>-<number>-<container-short>" \
   --phase A.1 \
   --mode advisory \
-  --linked-issue "<repo>#<n>" \
-  --repo-path "<repo root>"
+  --linked-issue "<org>/<repo>#<n>" \
+  --include-terminal \
+  --repo-path "<主仓根>"
 ```
 
+> 模板已随 R2-fix 同步 (原写 `<spec-slug 或 handoff §6 carry-id>` / `<repo>#<n>` / `<repo root>`, 三处均已被下方条款取代)。`--include-terminal` 是 R2-fix/C2 新增的 CLI flag。
+
 - **`--phase` 是自由字符串** (CLI 无 `choices` 约束, 已核 + 实跑) ⇒ `A.1` 无需改 phase1_gate 代码。
-- **⭐ `--raw-track-id` 取值单一来源 (R1-fix/M1-CR — 原文「spec-slug 或 carry-id」双来源无优先级)**: A.1 时 spec-slug 尚未定型且极易改名 (见 §3c)。⇒ **A.1 一律用 issue 派生的稳定串** `<归一后 repo_basename>-<number>` (如 `aria-plugin-122`); 无关联 issue 的 spec 才回落 spec-slug。该串在 A.1→B 全程不变, 使 §3c 的改名孤儿问题从源头消失, 且与 D.2b 的 release 按同一 key 定位。
+- **⭐ `--raw-track-id` 取值 (R1-fix/M1-CR 提出, **R2-fix/C1 重新设计**)**: `<归一后 repo_basename>-<number>-<container-short>` (如 `aria-plugin-122-023236f2`); 无关联 issue 的 spec 才回落 `<spec-slug>-<container-short>`。`container-short` 取 `~/.aria/container-id` 的前 8 位 (与 handoff frontmatter 的 `owner-container` 同源)。
+  > **⛔ R1-fix 的版本会当场杀死主机制 (R2/C1, 主控实读复验)**: R1-fix 写的是纯 issue 派生串 `aria-plugin-122` (无容器段)。而 `lib/collision.py:219-220` 明写:
+  > ```python
+  > if c.track_id == own_track_id:
+  >     continue  # same-name collision — reconcile's job, not ours
+  > ```
+  > ⇒ **两轨做同一个 issue ⇒ 派生出同一个 track_id ⇒ 互相被这一行排除 ⇒ `linked_issue_overlap` 恒 `[]`**。R1 的 C1 是「格式不归一致漏报」, R1-fix 修好了格式, 却用另一条自己新写的规则把**同一个信号**又掐断了 —— 精确的同一个后果。
+  > **职责分离才是正解**: 「**是不是同一个 issue**」由 `linked_issue` 承载 (§0 归一); 「**是不是同一条轨**」由 `track_id` 承载。R1-fix 把前者的语义塞进了后者, 于是两轨在 `track_id` 维度失去了可辨性 —— 而 overlap 检测**正是靠这个可辨性**工作的。加容器段即恢复分离。
+  > **仍然解决 §3c**: track_id 不含 spec-slug ⇒ 改名不改 track_id ⇒ 无孤儿。**且不再与 SC-10 冲突** —— R1-fix 版本的残余通道 (reconcile 同名路径) 30min 熄灭, 与 SC-10 的「保护窗 ≥72h」直接矛盾; 本版走的是正常 overlap 通道, 不依赖 reconcile。
+  > **同容器同 issue 两轨**是真正的同名碰撞, 交 reconcile —— 那正是 `:219-220` 注释所指的场景, 语义正确。
 - **⭐ `--repo-path` 必须钉死 (R1-fix/M8-TL)**: 一律传**主仓根** (`openspec/` 与 `.aria/` 所在仓), **不是**代码落点所在的子模块根。否则两容器各按所在仓传参 ⇒ `auto_bootstrap` 静默建出**两条不同的 coordination ref** ⇒ 双方永远看不见对方。本 Spec 自述跨仓落点 (Spec 落主仓 / 代码落 aria), 该歧义是现实的。
 - **`--linked-issue` 在 A.1 是条件必需**: spec 有「关联 Issue」字段时**必传**; 无关联 issue 的 spec (纯内部重构) 可省。与 Phase B 的「可选」不同 —— A.1 正是 issue 维度碰撞的发生点。取值格式见 §0 (三族任一均可, 归一在 `linked_issue_overlaps` 内完成; **建议统一书写 org 限定形**以减少人工判别成本)。
 - **⭐ 与 `coordination.enabled` 的关系 (R1-fix/M3)**: A.1 认领**受同一开关控制** —— `state_scanner.coordination.enabled == false` ⇒ **零调用**, 与 Phase B 现状对称。已核实 `phase1_gate.py` **本身不读 config**, skip 判断全在调用方 SKILL.md 层 ⇒ 该 skip 条件必须在 phase-a-planner/SKILL.md **显式写出**, 否则 opt-out 项目在 A.1 仍被强制写 claim + push 远端 (对未配 coordination ref 的第三方项目是外向副作用)。`mode` 沿用同一配置, 不新增开关。
 - **⭐ fetch 降级必须进 JSON `error` 契约 (R1-fix/M7-BA)**: BA 实跑复现 —— 首次真实调用即触发 fetch 失败而 `error: null`。⇒ SC-1/SC-2 赖以成立的「读到的是最新 claim」这一新鲜度前提**当前不成立**。处置: `phase1_gate` 输出的 `error` 字段须携带 fetch 降级状态, A.1 消费面见到降级时**按「未能核实」措辞告警**, 不得渲染成「无碰撞」(零证据不得当正证据 —— 与 state-scanner 的 QA-C1 不变量同源)。
 - **消费**: `linked_issue_overlap[]` 非空 ⇒ 在 A.1 起草**前**渲染 🔴 告警, 列出对方 track-id / owner-container / claimed_at / **双方 `linked_issue` 原始串** (§0 归一后 org 不参与匹配, 回显原串是误配的唯一人工判别手段) / **`status`**。
   - **报告形态钉死 (R1-fix/C3-CR)**: 用 `AskUserQuestion` 显式请裁, 选项至少含「另起/接手/并轨」。**不是**渲染一行就自行决定 —— 「继续起草」是对已知碰撞的处置决定, 属 owner 权限面 (Rule #10); 也**不是**硬阻断 (那撞 §非目标与 AD10 的单人类参与点)。advisory 的含义是**机制不阻断**, 不是**AI 可自行放行**。
-- **⭐ `done` 状态的同 issue claim 必须可见 (R1-fix/C2)**: `collision.py:210` 的 `_TERMINAL = ("done","abandoned","unknown")` 把它们直接 skip。**A.1 场景下 `done` 恰恰是最该看见的信号** —— 它意味着「对方已经把这件事做完了」。改为: `linked_issue_overlaps` 增可选参数 `include_terminal`(默认 False 保持既有调用方语义不变), A.1 调用点传 True, 命中 `done` 时**降级为提示**「⚠️ 同 issue 已有 track 标记 done —— 该 issue 可能已被解决, 起草前请核实」。`abandoned` / `unknown` 同样回显但措辞区分。
+- **⭐ `done` 状态的同 issue claim 必须可见 (R1-fix/C2, **R2-fix 补可达性**)**: `collision.py:210` 的 `_TERMINAL = ("done","abandoned","unknown")` 把它们直接 skip。**A.1 场景下 `done` 恰恰是最该看见的信号** —— 它意味着「对方已经把这件事做完了」。改为: `linked_issue_overlaps` 增可选参数 `include_terminal`(默认 False 保持既有调用方语义不变), 命中终态时**降级为提示**「⚠️ 同 issue 已有 track 标记 `<status>` —— 该 issue 可能已被解决/放弃, 起草前请核实」。
+  > **⛔ R1-fix 漏了参数的传递链 (R2/C2)**: R1-fix 写了参数、写了 SC-5, 但**没写它怎么从 CLI 传到那一层** ⇒ 唯一生产调用路径拿的永远是默认 False ⇒ **SC-5 只能被单测满足, 生产不可达**。这是 memory `feedback_completion_signals_vs_runtime_invocation` 的又一实例 —— 与 R1 用来推翻「已 ship ≠ 能用」的**是同一条 memory**, 在同一份 Spec 的下一版上复发。
+  > **R2-fix 补齐传递链 (三段缺一不可)**: (1) `phase1_gate.py` 新增 CLI flag `--include-terminal` (store_true); (2) `run_gate` 签名透传至 `linked_issue_overlaps`; (3) phase-a-planner 的 A.1 调用模板**显式带上该 flag**。**SC-5 的断言目标改为「经 CLI 全链路」而非直调库函数** —— 否则红窗仍只覆盖单测层。
+  > **`yielded` 的归属 (R2-fix/M3)**: 该状态在 R1-fix 的 SC-2 (active) 与 SC-5 (done) 之间**无归属**, 而 §0 归一落地后历史 `yielded` 记录会以「活跃竞品」形态触发 `AskUserQuestion`。⇒ 显式归入**终态族**, 措辞与 `done` 区分 (「对方已让出该轨」), 由 SC-5 一并覆盖。
   > **为什么这条是 critical**: 第 5 次事故的**最终形态**就是「对方已 ship 并把 claim 置 done」。按 A2 前的设计, 那一刻 overlap 恒空 ⇒ **机制对自己的 motivating case 失明**。
 
 ### 2. audit-engine 每轮入口竞品扫描 (副机制, 覆盖不同盲区)
@@ -219,17 +242,21 @@ A.1 认领**不是** Phase B 认领的简单前移: 它引入了 Phase B 没有�
 |----|------|------|---------|
 | **SC-1a** ⭐ (C1) | `linked_issue` 三族两两配对: `aria-plugin#122` × `10CG/aria-plugin#122` × `10CG/aria-plugin #122` | **两两互相命中** (归一后 `(basename, number)` 相等) | 现状代码 (裸 `!=`) 在**全部三对**上必红 |
 | **SC-1b** ⭐ (C1 负控) | `10CG/Aria#147` × `10CG/aria-plugin#147` (同 org 同号, **不同仓**) | **不得**命中 | 「只比 number」的退化实现在此必红 |
+| **SC-1d** ⭐ (R2-fix/M1) | `10CG/aria-plugin#1` × `otherorg/aria-plugin#1` (**两侧都有 org 且不同**) | **命中** (org 不参与匹配) | **这是唯一能区分两种实现的用例** — 「两侧都有 org 才比 org」的实现在此必红。R1-fix 的 SC-1a/1b **都无法区分**它们 (1a 的对子里至少一侧无 org, 1b 的 basename 本就不同) ⇒ §0 最重的那条规则原本零覆盖 |
+| **SC-1e** (R2-fix/M2 已知限) | `10CG/aria-orch#5` × `10CG/aria-orchestrator#5` (真实别名) | **不命中** — 并断言该结果被**显式记为已知限**而非静默 | 锁定 basename 轴是 fail-toward-silence 的事实, 防它被误读成「已覆盖」 |
+| **SC-1f** (R2-fix/minor) | `#007` × `#7` | **命中** (`number` 解析为 int) | 字符串比较的实现必红 |
 | **SC-1c** (C1 兜底) | 不可解析值 (`no-hash-here` / `repo#abc` / `#5`) | 退回**原字符串精确比较**, 不抛异常, 不因解析失败判「不匹配」 | 解析失败即 return False 的实现必红 |
 | **SC-2** (行为类) | A.1 起草前, 同 issue 已有他轨 active claim | AI **在起草前**经 `AskUserQuestion` 请裁, 选项含另起/接手/并轨; 告警含对方 track-id / owner-container / claimed_at / **双方 linked_issue 原始串** / status | 定向 AB fixture; 「渲染一行后自行继续」的臂应可分辨 |
 | **SC-3** (行为类) | spec 有「关联 Issue」字段但调用未传 `--linked-issue` | AI 不得跳过该参数 | 定向 AB fixture (**不冒充结构化测试** — 原文 SC-3 声称「A.1 流程断言」而无任何拥有者) |
 | **SC-4** ⭐ (C2) | 副机制: 同 issue 竞品**在 `openspec/archive/` 下** | **命中**, 措辞标「已完成的 Spec」 | glob 只写 `changes/` 的实现必红 —— 这正是第 5 次事故的真实形态 |
-| **SC-5** ⭐ (C2) | 主机制: 同 issue 他轨 claim 状态为 `done` | **可见** (降级提示, 非 skip) | `_TERMINAL` 直接 skip 的现状必红 |
+| **SC-5** ⭐ (C2, **R2-fix 改断言层**) | 主机制: 同 issue 他轨 claim 状态为 `done` / `abandoned` / `yielded` | **经 CLI 全链路可见** (降级提示, 措辞按 status 分档) — 断言目标是 `phase1_gate` CLI 的 JSON 输出, **不是**直调 `linked_issue_overlaps` | `_TERMINAL` 直接 skip 的现状必红; **且 R1-fix 版本 (只测库函数) 在「参数没接到 CLI」的实现上会绿** ⇒ 断言层必须是 CLI |
+| **SC-5b** ⭐ (R2-fix/C1) | 两个**不同容器**对同一 issue 各自 A.1 认领 | 双方 `linked_issue_overlap` **各含对方** | **R1-fix 的纯 issue 派生 track-id 在此必红** (两轨 track_id 相同 ⇒ 被 `:219-220` 互相排除 ⇒ 双方恒 `[]`)。这是 C1 的直接红窗 |
 | **SC-6** | 副机制: 远端存在同 issue 的他名**活跃** spec 目录 | 报告命中, 含目录名 + 所在 ref | |
 | **SC-7** | 副机制: 远端无同 issue spec | 报告空, **exit 0**, 不阻断 | |
 | **SC-8** | 副机制: fetch 失败 / 无远端 | **不静默** — 报告 `degraded` + 注明「本轮竞品扫描未执行」+ **exit 非 0** (与 SC-7 的 exit 0 形成可辨对照, 原文缺此契约) | 静默返回空报告的实现必红 |
 | **SC-9** | 反向对照 (三条): (a) 本轨自己的 spec 目录**不得**自命中; (b) 本轨自己的 claim (同 track_id) 不得计入 overlap; (c) 扫描范围超上限时**必须** `log()` 披露被丢弃范围 | 三条各自可红 | (c) 抓 silent cap |
 | **SC-10** ⭐ (C3) | A.1 claim 在 `SWEEP_TTL` 内被 heartbeat 刷新后, 超过原 TTL 仍为 `active` | 保护窗覆盖 ≥72h (实测事故窗上界) | 无 heartbeat 的现状在 24h+ 必红 |
-| **SC-11** ⭐ (M2/3b+3c) | (a) A.1 判定「不起该 Spec」后 claim 状态为 `abandoned`; (b) issue 派生 track-id 在 slug 改名前后**不变** | 两条各自可红 | (a) 抓僵尸 claim; (b) 抓孤儿 claim |
+| **SC-11** ⭐ (M2/3b+3c) | (a) A.1 判定「不起该 Spec」后 claim 状态为 `abandoned`; (b) track-id (`<basename>-<number>-<container-short>`, **R2-fix 形态**) 在 slug 改名前后**不变**; (c) **无关联 issue 的回落分支** (`<spec-slug>-<container-short>`) 改名**会**变 —— 断言该分支须走 release+acquire 两步 | 三条各自可红 | (a) 抓僵尸 claim; (b) 抓孤儿 claim; (c) **R2/minor 指出本 Spec 自己的 claim 就落在这半且原本零覆盖** |
 | **SC-12** (M3) | `coordination.enabled == false` | A.1 **零调用** phase1_gate, 不写 claim, 不推远端 | 无条件调用的实现必红 (对第三方项目是外向副作用) |
 | **SC-13** (M7) | fetch 降级发生时 | `error` 字段非空; A.1 消费面渲染「未能核实」而**非**「无碰撞」 | 现状 (`error: null`) 必红 — BA 已实跑复现 |
 
@@ -253,7 +280,7 @@ A.1 认领**不是** Phase B 认领的简单前移: 它引入了 Phase B 没有�
 | `skills/state-scanner/lib/collision.py` | ⭐ **R1-fix/C1+C2**: `linked_issue` 归一比较 (§0 四步规则) + `linked_issue_overlaps` 增 `include_terminal` 可选参数 (默认 False) |
 | `skills/state-scanner/tests/` (既有宿主) | 扩展 — SC-1a/1b/1c (归一三族 + 负控 + 不可解析兜底) / SC-5 (`done` 可见) / SC-9b |
 | `skills/state-scanner/scripts/phase1_gate.py` | **R1-fix/M7**: fetch 降级进 JSON `error` 契约 (SC-13) |
-| `skills/phase-a-planner/SKILL.md` | A.1 入口认领步骤 + overlap 消费 (`AskUserQuestion` 请裁) + `--raw-track-id` 用 issue 派生串 + `--repo-path` 钉主仓根 + `coordination.enabled` skip 条件 + §3b/3c 的 release 义务 |
+| `skills/phase-a-planner/SKILL.md` | A.1 入口认领步骤 + overlap 消费 (`AskUserQuestion` 请裁) + `--raw-track-id` 用 **issue+容器派生串** (R2-fix/C1) + `--include-terminal` flag (R2-fix/C2) + `--repo-path` 钉主仓根 + `coordination.enabled` skip 条件 + §3b/3c 的 release 义务 |
 | `skills/spec-drafter/SKILL.md` | ⭐ **R1-fix/M7-CR**: 第二落点 (它 `user-invocable: true`, 可绕过 phase-a-planner) —— 与 Phase B 的双落点对称 |
 | `skills/audit-engine/SKILL.md` + `references/execution-modes.md` | per-round 入口探针 (**非** Step 0.5, 见 §2 命名订正) + 盲区声明; `execution-modes.md` 是每轮循环所在处, **原 Impact 表漏列** |
 | `skills/audit-engine/scripts/sibling_spec_probe.py` | **新增** (目录也新建; 已核对 `run_all_tests.sh` / 打包无影响) |
@@ -296,9 +323,40 @@ A.1 认领**不是** Phase B 认领的简单前移: 它引入了 Phase B 没有�
 **⚠️ R1-fix 引入的新表面 (供下轮)**:
 1. **§0 的归一规则本身是新承重逻辑**, 未经任何席位审过。尤其: casefold 跨仓误配的边界 / 「最后一个 `#`」拆分对含 `#` 的仓名 / 不可解析值的退回路径。
 2. **`include_terminal` 参数改的是既有生产函数** —— 默认 False 保既有语义, 但 Phase B 调用方是否真的一处都不受影响, 需实测而非推断。
-3. **issue 派生 track-id (`<basename>-<number>`)** 与既有 `derive_track_id` 归一的交互未验。
+3. ~~**issue 派生 track-id** 与既有 `derive_track_id` 归一的交互未验~~ → **R2 已审并判 CRITICAL** (C1: 该形态直接杀死主机制), R2-fix 已改为含容器段; 归一组合顺序已规定但碰撞域仍待 A.2 穷举。
 
 **本轮教训**: R1 推翻了本 Spec 的核心卖点「机制已 ship, 只需换调用点」。**已 ship ≠ 能用** —— `linked_issue_overlaps` 在生产语料上从来就没工作过, 而它已经存在了很久且有测试。这是 memory `feedback_completion_signals_vs_runtime_invocation` 的又一实例, 且这次的「完成信号」是**最有迷惑性的一种: 代码存在、有测试、被调用过、返回值合法** —— 只是它的匹配谓词对真实数据恒假。
+
+---
+
+### R2-fix (2026-08-02) — 新鲜眼睛定向轮全量吸收
+
+**输入**: owner 裁「再跑一轮 + 派新眼睛」。席位 `pr-review-toolkit:type-design-analyzer` (团队外, 未参与 R1 五席; 选它因 R1-fix 的三处新承重逻辑全是谓词与契约问题)。**REVISE, critical=2 major=4 minor=4 (+1 OUT_OF_SCOPE)**。
+
+**两条 critical 全部落在 R1-fix 自己新写的逻辑上。**
+
+| 簇 | 处置 |
+|---|---|
+| **C1** R1-fix 的 issue 派生 track-id 与 `collision.py:219-220` 互斥 ⇒ **主机制信号通道恒空** | track-id 改 `<basename>-<number>-<container-short>`。**职责分离**: 「同一 issue」由 `linked_issue` 承载, 「同一条轨」由 `track_id` 承载 —— R1-fix 把前者塞进后者, 两轨遂在 track_id 维度失去可辨性, 而 overlap 正靠它工作。仍解 §3c (不含 slug ⇒ 改名不改 id), 且不再与 SC-10 冲突。**新增 SC-5b 作直接红窗** |
+| **C2** `include_terminal` 生产不可达 ⇒ SC-5 只能被单测满足 | 补三段传递链 (CLI flag → `run_gate` 透传 → A.1 模板显式带); **SC-5 断言层从库函数改为 CLI 全链路** |
+| **M1** SC-1a/1b 无法区分「org 不参与」与「两侧有 org 才比」 | **新增 SC-1d** (`10CG/aria-plugin#1` × `otherorg/aria-plugin#1` → 命中) —— 唯一能区分两种实现的用例 |
+| **M2** 极性只在 org 轴成立, basename 轴精确匹配对真实别名恒漏 | §0 **诚实标注**「basename 轴是 fail-toward-silence, 与 org 轴方向相反」+ 语料实证 (`aria-orch` 24× vs `aria-orchestrator` 10×) + 处置二选一留 A.2; **新增 SC-1e** 锁定该已知限不被误读成已覆盖 |
+| **M3** `yielded` 无归属 | 显式归终态族, 措辞与 `done` 区分, SC-5 覆盖 |
+| **M4** §0 casefold 与 `derive_track_id` 归一未组合 | 规定组合顺序 (先 §0 后 derive) + 碰撞域 A.2 穷举核验 |
+| **minor ×4** | `unknown` 分档措辞不可达 (sentinel 被 `:215` 先行过滤, 已知限记录) · `number` 一律解析为 int (`#007`≡`#7`, **新增 SC-1f**) · **自认领声明与 ref 不符**并订正 (那次用的是 spec-slug 回落分支; 且该 claim 自己就是 §3c 孤儿, 显式记录不静默) · 取样口径订正 (三族表取自 ref 13 条, 而实际输入来源是 prose 139 篇, **两者不是同一总体**; 定稿须以 prose 为准) |
+
+**未吸收**: 无。OUT_OF_SCOPE 1 条 (`release_gate.py:225` help 与 `gc.py` 的 TTL 相差 48 倍) 转 owner。
+
+**R2 确认设计对了的 5 处, 其中一条撤销了 R1-fix 自己的担忧**: §0 比较键**确实是良定义的等价关系** (18 元语料穷举, 自反/对称/传递零违例); R1-fix `:297-299` 担心的「不可解析值退回精确比较破坏传递性」**不成立** —— 两类不可能跨类相等, 论域被干净划分。**该担忧已撤销**。另: 「最后一个 `#` 拆分」对现实语料无害 / casefold 论断与 SC-1b 负控经语料复核属实 / 同 track-id 不会造成 claim 覆盖写 (存储键是 `container/session`) ⇒ C1 的后果**仅限 overlap 失效, 不丢数据** / 「存量不迁移只在比较时归一」的收窄正确。
+
+**⚠️ R2-fix 引入的新表面 (供下轮)**:
+1. **`container-short` 进入 track_id** —— 它使 track_id 与容器绑定。跨容器接手 (owner 让 A 容器接 B 容器的活) 时 release/acquire 的语义未定。
+2. **CLI flag `--include-terminal`** 是新的公开接口面, 与既有 `--mode` / `--linked-issue` 的组合语义未穷举。
+3. **§0 归一与 `derive_track_id` 的组合顺序**是新规定, 碰撞域尚未穷举 (已标 A.2 待办, 但**在做之前它是未验证的**)。
+
+**元教训 (本轮最值钱)**: C1 **不是「没想到的边界」, 是两条 R1-fix 条款互相拆台** —— 为 M1-CR 写的「issue 派生 track-id」违反了 C2 修法所依赖的隐含前提「两轨 track_id 必须不同」。R1-fix 逐条吸收了 12 个簇, **每条单独看都对, 但没有做条款之间的交叉一致性检查**。
+
+⇒ **新的自查动作**: 多簇 fix 之后, 必须问一遍「**这些新条款有没有互相依赖或互相否定的隐含前提**」。这与既有的 `feedback_fix_recurs_in_its_own_fallback_path` (修复在自己兜底路径复发) 是**不同的形状** —— 那条讲单个 fix 内部, 这条讲**多个 fix 之间**。
 
 ---
 
@@ -312,6 +370,7 @@ A.1 认领**不是** Phase B 认领的简单前移: 它引入了 Phase B 没有�
 
 - **07-30 起草时**: 人工代偿 (fetch 双远程 + 核实 `openspec/changes/` 无同主题 spec, 主仓 `4e034d2`)。⚠️ **R1 指出: 那次核实用的正是被本 Spec 自己证伪的那一招** —— 只扫 `openspec/changes/`, 恰好漏掉归档区 (即 C2)。
 - **08-02**: 作者为 aria-plugin#124 认领了 (§Why 的 dogfood), 却**没有为本轨认领** —— TL 查 ref 实测零命中。⇒ **同一个 session 内, 作者对别的轨用了这个机制, 对本轨没用。**
-- **R1-fix 时 (本次)**: 已按 §1 的形态为本轨补认领, track-id 用 §1 订正后的 issue 派生形。
+- **R1-fix 时**: 为本轨补认领, track-id 用当时 §1 的 issue 派生形 (`aria-a1-entry-claim-guard`)。⚠️ **R2/minor 订正**: 该声明与 ref 实据**不符** —— 那次认领用的是 spec-slug 形而非当时 §1 规定的 issue 派生形 (本 Spec 无关联 issue 字段, 恰好触发了回落分支), 声明写得比事实精确。**且那条 claim 现在自己就是一条 §3c 孤儿** —— 它落在 SC-11 未覆盖的那半 (无 issue ⇒ 回落 spec-slug ⇒ 改名即孤儿)。
+- **R2-fix 时 (本次)**: track-id 形态已按 R2/C1 改为**含容器段**。原 claim 需 release 后按新形态重新 acquire —— **该动作留待 Phase B 实施时做**, 现在做会在 Spec 尚未定稿时把新形态固化进 ref。**此刻本 Spec 有一条已知的孤儿 claim**, 显式记在此处而非静默。
 
 > 这三条本身就是本 Spec 的论据: 三次机会里人工代偿**错了一次** (07-30 漏归档区)、**忘了一次** (08-02)。纪律的执行率在作者自己身上都不到 1/3。
