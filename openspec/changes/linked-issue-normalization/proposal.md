@@ -55,6 +55,10 @@ if c.linked_issue != own_linked_issue:
 1. 剥首尾空白; 按**最后一个** `#` 拆为 `left` / `number_str`;
 2. `number_str` 必须能解析为非负整数, 否则该值**不可解析** (见 4)。解析为 **`int`** 后比较 (故 `#007` ≡ `#7`);
 3. `left` 剥尾部空白 (处置 C 族); 若含 `/`, 取**最后一段**为 `repo_basename`, 其前为 `org`; 否则 `repo_basename = left`, `org = None`。`repo_basename` 空 ⇒ 不可解析;
+   - **⭐ `repo_basename` 内的 `.` 与 `_` 一律译为 `-` (spike S5 追加)**: `10cg.local` ≡ `10cg-local` ≡ `10cg_local`。
+     > **为什么必须加 (S5 实测)**: 既有 `derive_track_id` (`track_id.py:71`) 已经把 `/` `.` `_` 全译成 `-`。若本 Spec 只做 casefold, **两层归一不一致** —— `10cg.local#20` 与 `10cg-local#20` 在**本 Spec 判不同仓**, 却在 `derive_track_id` 后**塌成同一 track_id**。
+     > **且这不是理论风险**: `10CG/10cg.local` 是**真实仓** (Forgejo API 实测, **11 个 open issue**, 本项目 handoff 引用过 `10cg.local #20`)。post_spec R3 曾判此类为「dormant, 本组织无含 `.`/`_` 的仓名」—— **R3 的仓名清单不完整**, S5 穷举时发现。
+     > **副作用是正收益**: 它顺带修好了「同仓两种拼写」这一类别名的一个**真实子集** (`.`/`_`/`-` 互换), 而无需引入别名表 (S4 已判别名表不划算)。
 4. **不可解析的值** ⇒ **不参与归一, 退回原字符串精确比较** —— 绝不因解析失败就判「不匹配」而静默放行;
 5. 匹配当且仅当 `repo_basename.casefold()` 相等 **且** `number` 相等。**`org` 不参与匹配**。
 
@@ -89,6 +93,8 @@ if c.linked_issue != own_linked_issue:
 
 **Rule #6 (rule6_note)**: 改动面为 `lib/collision.py` 的一个内部比较谓词 + 其测试, **零 SKILL.md / 零 description / 零 AI 指令面** ⇒ 判据表**第一行「描述性 (命令 / 勘正)」** ⇒ **substitute: SC 级 baseline-failing 结构化测试替代** (SC-1~6 均在现状代码上可红)。与 v1.65.2 (#124 纯脚本修复) 同一判据路径。**不申请豁免。**
 
+> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— SC-1~6 的 baseline-failing 状态在 Phase B 须实跑留证 (同该裁定要求的「全部实跑, 非声称」)。
+
 ---
 
 ## Success Criteria
@@ -99,7 +105,8 @@ if c.linked_issue != own_linked_issue:
 | **SC-2** | `10CG/Aria#147` × `10CG/aria-plugin#147` (同 org 同号, **不同仓**) | **不得**命中 | 「只比 number」的退化实现必红 |
 | **SC-3** | `10CG/aria-plugin#1` × `otherorg/aria-plugin#1` (**两侧都有 org 且不同**) | **命中** (org 不参与) | **唯一能区分「org 不参与」与「两侧有 org 才比 org」两种实现的用例** (R2/M1: SC-1/SC-2 都无法区分) |
 | **SC-4** | `#007` × `#7` | **命中** (number 解析为 int) | 字符串比较必红 |
-| **SC-5** | `10CG/aria-orch#5` × `10CG/aria-orchestrator#5` (真实别名) | **不命中**, 且该结果**被显式记为已知限** | 锁定 basename 轴 fail-toward-silence, 防被误读成已覆盖 |
+| **SC-5** | `10CG/aria-orch#5` × `10CG/aria-orchestrator#5` (**截断型**别名) | **不命中**, 且该结果**被显式记为已知限** | 锁定 basename 轴 fail-toward-silence, 防被误读成已覆盖。**spike S4 实测: 该形态在真实输入总体 (「关联 Issue」字段值) 中实例数 = 0** ⇒ 已知限而非待修项 |
+| **SC-5b** ⭐ (spike S5) | `10CG/10cg.local#20` × `10CG/10cg-local#20` × `10CG/10cg_local#20` (**分隔符型**别名, 真实仓) | **两两命中** | 只做 casefold 的实现必红。**与 SC-5 是两类**: 分隔符型**能**归一 (与 `derive_track_id` 对齐), 截断型不能 —— 两者的处置不同, SC 须分开钉 |
 | **SC-6** | 不可解析值 (`no-hash-here` / `repo#abc` / `#5` / `10CG/#7`) | 退回**原串精确比较**; 不抛异常; **不因解析失败判「不匹配」** | 解析失败即 `return False` 的实现必红 |
 | **SC-7** | 等价关系性质: 对语料全集断言自反 / 对称 / 传递 | 三性质零违例 | 非等价关系的实现 (如单向前缀匹配) 必红 |
 | **SC-8** | 既有调用方回归 | `linked_issue_overlaps` 签名与返回 schema 逐字段不变; Phase B 路径行为除「原漏报现能报」外无差异 | 改了 schema 的实现必红 |
