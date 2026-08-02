@@ -125,11 +125,20 @@ nomad var get <真读>; nomad var get -out=X <另一路径>  # 同族双出现, 
 
 ## rule6_note
 
-**Rule #6 不适用 — 走 Rule #10 豁免白名单第四类「结构性前提不成立」** (R2 knowledge PASS 已核: 对照 `configured-gate-authority.md` §2 与 `skill-benchmark-exemption.md` 原文, 未见越界自行豁免):
+> **框定裁决 (owner 2026-08-02)**: 走 **substitute 框定**, 与同一 hook 的历史先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/` 一致。前一版曾写成「Rule #6 不适用 — Rule #10 白名单第四类·结构性前提不成立」, R4 code-reviewer m-3 指出该框定与提供 substitute 逻辑上二选一, 且与先例不一致; 按 Rule #10「AI 自作主张的流程判断须请复议」上报后由 owner 裁定统一为本框定。
 
-Rule #6 触发面是 **Skill**, 其 SOT 四分表逐行以「Skill 内容」为主语。本变更对象 `hooks/secret-guard.sh` 是 PreToolUse harness hook — 无 SKILL.md、无 description、不参与 skill 加载或触发, AB 套件被测对象与之无交集, 属「审的对象整个未产生」。本版**未改任何提示文案** (R1 曾拟改, 现转出), 故连「hook 文案是 AI 指令面」这一唯一灰区也不复存在。跨仓核实: 本 cycle 零 SKILL.md 改动。
+**Rule #6**: deterministic detector hook → structural fixture + unit-test corpus + dogfood (per memory `feedback_deterministic_structural_skill_rule6_substitute`); **不**走 `/skill-creator` AB —— hook 非 capability skill, 无 SKILL.md / 无 description / 不参与 skill 触发, AB 套件的被测对象 (触发准确率 / 输出质量 / token 效率) 与之无交集。
 
-**substitute**: SC-1 baseline-failing 结构化测试。
+**substitute 实证** (全部实跑, 非声称):
+
+| 面 | 证据 |
+|----|------|
+| structural fixture (RED→GREEN) | 未加 pattern 的原版 hook 上 **7 条断言 FAIL** (SC-1 五条 + SC-4 commit-msg + 阳性对照), 加后全绿 |
+| corpus 零回归 | 347 → 366 全绿; `hooks/tests/` 其余 5 个脚本全绿 |
+| 真 hook dogfood | 本 cycle 起草期间**真实撞到 5 次** (读 `--help` ×2 / 审计 agent 测试命令 / 写文档 heredoc 引用命令文本 / grep 搜索词含该串) —— 这些实证直接支撑了 §转出 4 的 severity 上调 |
+| 指令面未触碰 (可证伪) | `git diff` 显示 `secret-guard.sh` 仅 +10 行且**全部落在 risky_patterns 数组内**, BLOCKED heredoc (`:654-:682`) 零改动 — 见决策表「提示文案」行的验收锚点 |
+
+跨仓核实: 本 cycle 零 SKILL.md 改动。
 
 ## Tasks
 
