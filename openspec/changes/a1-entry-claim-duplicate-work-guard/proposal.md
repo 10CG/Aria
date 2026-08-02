@@ -1,12 +1,25 @@
 # Proposal: a1-entry-claim-duplicate-work-guard
 
-> **Status**: 📝 **Draft (A.1)** — 待 post_spec 闸门 (见文末「闸门待裁」)
+> # ⏸️ BLOCKED — spike-first (owner 裁定 2026-08-02)
+>
+> **本 Spec 暂停推进, 不进 Phase B, 不再逐轮 fix。** 三轮 post_spec 后判定**不收敛** (同口径 major **4→6 上升**), owner 裁定 **A+B**:
+>
+> - **A — 缩范围**: 原 §0 (`linked_issue` 归一) 已**抽出为独立 Spec** [`linked-issue-normalization`](../linked-issue-normalization/proposal.md), 单独交付。它是三轮审计中**唯一被反复确认「可直接实现」**的一块, 且修的是一个**今天就在生产中静默失效**的已 ship 机制 —— 不依赖本 Spec 的任何未落地部分。
+> - **B — spike 先行**: 本 Spec 余下部分的关键设计决策**无法靠写 Spec 推出**, 须先实测。spike 清单见 **§Spike (阻塞项)**。**spike 有结论前, 本 Spec 不重启, 也不再吸收新一轮 finding。**
+>
+> **为什么停**: R1 (5 席) 4C/8M → R2 (新眼睛) 2C/4M → **R3 (第三双新眼睛) 2C/6M**。R2→R3 是唯一同口径可比的两轮, major **上升**。且 memory 的处方「换新鲜眼睛 > 加轮」**已连用两轮未奏效**。R3 另指出: R1 的原始 critical **C3 经两轮「全量吸收」仍未真正关闭** —— 每轮注意力被最新一批 critical 吸走, 而早前处置里标「Phase A.2 定」的占位符**从没人验证过它能不能定**。这正是 §Spike 要终结的模式。
+>
+> **保留本目录的理由**: 三轮 / 7 个 agent 实例的审计轨迹是资产; 问题本身 (5 次重复劳动) 未解决, 只是解法方向需要实证支撑。
+>
+> ---
+
+> **Status**: ⏸️ **Blocked (spike-first)** — 原状态: 📝 Draft (A.1)
 > **Created**: 2026-07-30
 > **Spec Level**: 2 (单域 — 把已 ship 的 claim 机制的调用点从 Phase B 前移到 A.1; 无新机制)
 > **触发**: owner 2026-07-30 「接受方法论建议」—— 源于 aria-plugin #122 双 Spec 碰撞 (两轨互不知情各跑 4 轮 post_spec, 合计 10 轮 / 33+ agent 实例)
 > **⚠️ 本 Spec 修正了触发它的那条建议本身** — 见 §Why「原建议为何无效」
 > **代码落点**: `aria/` 子模块 (`skills/phase-a-planner/` + `skills/audit-engine/`); Spec 落主仓 (Rule #5)
-> **ship target**: aria-plugin v1.66.0 (MINOR — SKILL.md 指令面扩展)
+> **ship target**: ⏸️ **未定** — spike 完成并重写后再定 (原写 v1.66.0, 但该版本号已由抽出的 [`linked-issue-normalization`](../linked-issue-normalization/proposal.md) 认领)
 
 ---
 
@@ -81,7 +94,15 @@ L 的 proposal 头部写着「关联 Issue ... **无 in-flight — 本地 fetch 
 
 ## What Changes
 
-### 0. ⭐ `linked_issue` 归一 (R1-fix/C1 — **上游, 不修则下面全部白修**)
+### 0. ⭐ `linked_issue` 归一 — ⬆️ **已抽出为独立 Spec, 本节仅存档**
+
+> **📤 owner 2026-08-02 裁定 A: 本节内容已移交 [`linked-issue-normalization`](../linked-issue-normalization/proposal.md) 独立交付。**
+>
+> **该 Spec 是 SOT, 本节是抽出时的快照, 不再维护。** 两处若有出入以新 Spec 为准。
+> 抽出时已并入的 R2/R3 修订: basename 轴 fail-toward-silence 成文 (D4/SC-5) · org 判别用例 (SC-3) · `number` 解析为 int (SC-4) · 「不可解析退回精确比较不破坏传递性」的担忧已由 R2 穷举撤销 (D3)。
+> **未随抽出带走的**: 取样口径订正 (三族表取自 ref 13 条而实际输入是 prose 139 篇) —— 它变成了 spike **S4**, 因为它要的是重新统计而非一句订正。
+>
+> 以下为存档原文 ↓
 
 **R1 四席独立命中 + 主控实跑复验**: `lib/collision.py:217` 的匹配是**裸字符串 `!=`**, 无任何归一; 而生产 ref `refs/aria/coordination` 与 proposal 头部**三个变体族并存**:
 
@@ -357,6 +378,29 @@ A.1 认领**不是** Phase B 认领的简单前移: 它引入了 Phase B 没有�
 **元教训 (本轮最值钱)**: C1 **不是「没想到的边界」, 是两条 R1-fix 条款互相拆台** —— 为 M1-CR 写的「issue 派生 track-id」违反了 C2 修法所依赖的隐含前提「两轨 track_id 必须不同」。R1-fix 逐条吸收了 12 个簇, **每条单独看都对, 但没有做条款之间的交叉一致性检查**。
 
 ⇒ **新的自查动作**: 多簇 fix 之后, 必须问一遍「**这些新条款有没有互相依赖或互相否定的隐含前提**」。这与既有的 `feedback_fix_recurs_in_its_own_fallback_path` (修复在自己兜底路径复发) 是**不同的形状** —— 那条讲单个 fix 内部, 这条讲**多个 fix 之间**。
+
+---
+
+## 🔬 Spike (阻塞项) — owner 2026-08-02 裁定 B
+
+> **原则**: 下列问题**写 Spec 推不出来, 必须实测**。这是 memory `feedback_spike_first_for_data_hypotheses` 的形状 —— 量化/可行性假说先 spike, 避免无用的 Spec 轮次。
+> **为什么现在才做**: 三轮审计里这些问题被反复标成「Phase A.2 定 / 穷举 / 重评」共 **7 处**, R3 指出**至少 3 处直接决定机制是否工作**, 而占位符本身**从未被验证能不能兑现** —— C1 (heartbeat) 就是被这样一路推到 R3 才发现根本做不了。
+> **产出形态**: 每条一个可证伪的结论 + 支撑数据, 落 `.aria/spikes/`。**不写代码实现, 只回答能不能 / 怎样才能。**
+
+| # | 问题 | 为什么必须实测 | 完成判据 |
+|---|------|--------------|---------|
+| **S1** | **heartbeat 能不能做?** A.1 claim 需保护窗 ≥72h, 而 `SWEEP_TTL=24h` | R3/C1 实证: `constants.py:43-44` 逐字「**NO production heartbeat loop exists (heartbeat() has zero production call sites)**」; `identity.py:252`「Each call returns a fresh value」⇒ heartbeat 按 `(container, session)` 定位, 而 subprocess 边界无 session 持久化。**R2-fix 曾判「heartbeat 更可取」—— 方向反了, 它比延长 TTL 更难** | 产出三选一的实测结论: (a) session_id 落盘复用可行 (含并发/过期处置); (b) heartbeat 匹配键改 `(container, track_id)` 可行 (仿 `release_claim_by_track`); (c) 两者都不可行 ⇒ 只能延长 TTL, 并量化其对 sweep 语义的代价 |
+| **S2** | **探针 fetch 怎么接?** 自带 vs 复用 `remote_refresh` 缓存 | R3/M4: `remote_refresh` 是 state-scanner **Phase 0.5 专属**子系统, 只在 `/state-scanner` 运行时刷新; audit-engine 多轮循环跨天运行, **无机制保证每轮之间跑过 state-scanner** ⇒ 复用缓存 = D3 要修的「首轮扫描不够」换条更深的路径复现。**两个选项不对等, 而 Spec 把它们平权列出** | 实测: 一次轻量 `git fetch enforced_remotes` 的耗时与失败率; 与复用缓存的新鲜度实测对比。产出「自带 fetch」的可行性结论与代价数字 |
+| **S3** | **track-id 该怎么派生?** | 这一项**三版三个答案且每版都被推翻**: 原始 (spec-slug, 改名即孤儿) → R1-fix (issue 派生, **R2 证其杀死主机制**) → R2-fix (加容器段, **R3 证 `container-short` 前 8 位截断可能让不同容器塌成同一段** —— `get_container_id()` label 优先, 而模板明确邀请用户设 human-readable label) | 穷举 `container_id` 的真实取值空间 (uuid vs label, 长度分布); 产出一个**碰撞域已知且可证伪**的派生规则; 并回答 R3/M2「接手」在该规则下的可操作定义 (现无跨容器 release 函数) |
+| **S4** | **basename 别名怎么处置?** | R2/M2 语料实证 `aria-orch` **24×** vs `aria-orchestrator` **10×** ⇒ 精确匹配恒漏。别名表 vs 书写强制, 两者代价未量化 | 按 **prose 语料 (139 篇)** 而非 ref (13 条) 重新统计别名分布 (R2 指出两者**不是同一总体**); 产出别名表规模估计与维护成本 |
+| **S5** | **归一 × `derive_track_id` 的碰撞域** | R3 已**部分穷举**并找到两类 (分隔符碰撞 dormant / number 表示不一致)。需完整穷举后才能定派生规则 | 对真实仓名全集 × 真实 issue 号全集穷举, 产出碰撞清单 (可为空) |
+| **S6** | **D5 重评: 要不要中心化 spec 登记表** | 原 D5 的「不做」建立在「残余缺口仅秒级」之上, 而 §4 已证那是**实质低估** (跳 A.1 / opt-out / legacy 轨三条窗口**无界**) | 按真实缺口面重新评估; 结论可以是仍然不做, 但依据须换成真实数字 |
+
+**S1-S6 之外的两处 A.2 待办** (AB 缺口 issue 归属 / `execution-modes.md` 双循环改哪个) **不属 spike** —— 它们是**已经有确定答案的文档决策** (R3/M5 已给: 两段都要改), 待 Spec 重启时直接落即可。
+
+### spike 完成后
+
+带 S1-S6 的结论**重写**本 Spec (而非在现文上继续打补丁 —— 三轮已证打补丁会持续引入等量新缺陷)。重写后重新走 post_spec。
 
 ---
 
