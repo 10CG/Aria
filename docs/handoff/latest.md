@@ -13,7 +13,19 @@
 
 ## 最新 handoff
 
-**[2026-08-02 — 会话收尾: #121 完整 ship (v1.65.1) + #170 secret-guard 四轮审计 cycle (v1.65.4/v1.65.5 + standards v1.1.1/v1.1.2)](./2026-08-02-121-ship-and-170-secret-guard-four-round-audit.md)**
+**[2026-08-04 — 会话收尾: #122 碰撞 → 三次 ship → Spec 不收敛 → spike → 重写 → 双 Spec R1-fix](./2026-08-04-issue122-collision-to-dual-spec-r1fix.md)**
+
+- track-id: `aria-a1-entry-claim-guard` | phase: **session-close** | status: **done**
+- **本段主线 = 一条「审计 → 发现审计本身出错 → 订正」的完整链**。最值钱的不是 Spec, 是**三次自我订正**, 而**没有一条是自查发现的** —— 分别由审计席位 / custom check / 工作流镜头 / 并发轨的 rebase 抓到
+- **ship**: aria-plugin **v1.65.2** (#124 fail-OPEN 误放行) + **v1.65.3** (#125 恒 wait / #126 误诊); 新开 #127 (AB 套件缺 D9 surface 维度, Rule #6 第三行第 3 条义务)
+- 🔑 **我的 spike S4 错了, 且是以我指控 R2 的同一方式错的** —— 逐字复跑: R2 量 issue **引用位置** (含 `docs/`) 得 25/11 与其报的 24/10 一致; 我量**全文裸 token** (只 `openspec/`) 得 16/799。**口径与范围都不同, 谁也没推翻谁**; 且 R2 的口径更贴近 `--linked-issue` 真实取值。三处引用已同批订正 → memory `feedback_critique_repeats_the_error_it_names`
+- 🔑 **一天两次「声称完成而实际没落盘」** (发布同步面漏主仓 6 处 / AB fixture 从未提交却三处声称已做, 致 v1.65.3 ship 时 Rule #6 义务 2 事实上不在仓里) —— 根因同一: **动作 scoped 而声称 global** → memory `feedback_scoped_git_add_splits_claim_from_landing`
+- 🔑 **多簇 fix 互相拆台三次, 每次都致主机制失效**; 最后一例 (`无` 作 `--linked-issue` 实参致两份无关 Spec 互相误报) **三个对抗镜头都没抓到** —— 接缝落在角度之间 → memory `feedback_fixes_contradict_each_other_across_clusters`
+- ⚖️ **「换新鲜眼睛 > 加轮」这条处方连用两轮后失效** (R2/R3 都是新眼睛仍不收敛)。真正起作用的是 owner 裁的 **A+B (缩范围 + spike-first)** —— 六条 spike 里**两条推翻了上游审计结论**, 那是再跑几轮审计问不出来的
+- 🔴 **`a1-entry-claim` 两个阻塞项**: C1 两个 A.1 落点的 `allowed-tools` **都无 `Bash`** (主机制在它自己指定的执行位置上不可调用, 三轮审计+六条 spike 都没查过 frontmatter) / C2 heartbeat 换了匹配键但**没人调它**。**未裁前不具备实施条件**
+- 🔴🔴 **凭据轮换已过 hard cap (2026-08-02)**, 本 session surface 十余次未动; custom checks **8/8**; 双远端 equal
+
+**[2026-08-02 — 会话收尾: #121 完整 ship (v1.65.1) + #170 secret-guard 四轮审计 cycle (v1.65.4/v1.65.5 + standards v1.1.1/v1.1.2)](./2026-08-02-121-ship-and-170-secret-guard-four-round-audit.md)** (predecessor)
 
 - track-id: `session-close-20260802-121-ship-170-secret-guard` | phase: **session-close** | status: **done**
 - **两条主线**: (1) aria-plugin **#121** triage→ship **v1.65.1** (`52d6f22`, yaml-only spec carry-forward 假绿, #113 跨 skill 第四处消费方; post_spec R1→R3, R1 四方独立命中 `parse_ok=False` 洞); (2) Aria **#170** T4 凭据泄漏 → triage → **目标重定向** → post_spec **R1→R4** (20 份报告) → ship **v1.65.4/v1.65.5** + standards **v1.1.1/v1.1.2**
