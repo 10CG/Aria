@@ -1,0 +1,67 @@
+{
+  "lens": "self-recurrence",
+  "spec_key": "linked-issue-normalization",
+  "verdict": "ISSUES_FOUND",
+  "problems": [
+    {
+      "finding_id": "M2",
+      "problem": "M2 要治的病逐字是「换总体举证 —— 正是 S4 指控 R2 的同一错误」, 而 M2 自己的更正文本把「输入总体」这个标签贴到了 M8 同一交付里明写「不是同一个总体」的那个集合上。M4 的更正文本犯同一错。落地后 proposal 会同时含两个互斥的「输入总体」定义, 且这正是本 Spec 承重论证 (0 实例 ⇒ 已知限而非待修) 所依赖的口径轴。",
+      "evidence": "M2 exact_change 原文:「S4 实测截断型别名在**输入总体 (proposal「关联 Issue」字段值)** 上 0 实例」。M4 exact_change 原文:「**输入总体** (真正会被传给 `--linked-issue` 的值 = proposal「关联 Issue」字段值; 141 篇中 12 篇有该字段)」。M8 exact_change 原文:「**输入总体** = 真正会被传给 `--linked-issue` 的值 (今天只有 CLI 直传, 落盘可见于 `refs/aria/coordination`); **复制源总体** = proposal 头部「关联 Issue」字段值 … **两者不是同一个总体。**」实测两集合大小不同: `git ls-tree -r refs/aria/coordination` 逐 blob 取值 ⇒ 带 linked_issue 的 claim **16** 条; `grep -rhE '^\\s*>?\\s*\\*\\*关联 Issue\\*\\*' openspec/{changes,archive}/*/proposal.md` ⇒ **12** 个字段值。同一标签指称 16 与 12 两个集合。",
+      "corrected_change": "M2 与 M4 里所有「输入总体 (proposal「关联 Issue」字段值)」逐字改为「**复制源总体** (proposal「关联 Issue」字段值, 141 篇中 12 个)」, 并各自补一句在真·输入总体上的实测:「**输入总体** (ref 16 值) 上同样 0 实例 —— 实测 basename 只有 `aria-plugin` / `Aria` / `AUDIT-TEST-DO-NOT-USE`, 无截断型、无含 `.`/`_` 者」。S4 的 0 实例结论若原本测的是 proposal 字段值, 必须原样标为**复制源总体**的结论, 不得以「输入总体」之名援引。全文只允许 M8 那一处给出这两个词的定义, 其余处一律引用而不重新定义。"
+    },
+    {
+      "finding_id": "C1",
+      "problem": "C1 新加的「⚠️ 举例约束 (C1 防复发)」按「正例 / 反例」分轴, 但 SC-6 的红机制要求的是一个**期望命中的正例**且必须用裸 `#5` —— 该正例落在注释的全称禁令下、不在「反例不受此约束」的豁免里。⇒ 防复发注释当场杀掉了它要保护的 SC-6 唯一可红的形状, 与 A1「剥引号后 pattern 的 `*` 暴露成 alias」同一形状: 新条款的作用域画在了错误的轴上。",
+      "evidence": "C1 exact_change 原文:「**故本 Spec 全文的「期望命中」正例一律必须带 repo 段**; 凡出现裸 `#n` 的正例即与本规则自相矛盾。**反例不受此约束** —— SC-6 的不可解析枚举**必须**保留裸 `#5` / `10CG/#7`」。实读 proposal.md:110 的 SC-6「怎么会红」列:「解析失败即 `return False` 的实现必红」—— 该红机制只能由「两个逐字相同的不可解析串必须**命中**」构成, 即一个使用裸 `#5` 的期望命中正例。实跑现状生产函数: `linked_issue_overlaps([claim(linked='#5')], 'mine', '#5')` 返回非空 (命中, baseline 绿); 若实现改成解析失败即不匹配, 该例转红 —— 它是 SC-6 唯一能红的用例。",
+      "corrected_change": "注释的分轴改为「归一路径 vs 原串路径」而非「正例 / 反例」, 逐字:「凡期望**经归一命中**的正例必须带 repo 段; 期望**经步骤 4 原串精确比较命中**的正例**必须**使用逐字相同的不可解析串 (如 `#5` × `#5`), 这类正例不带 repo 段是规则 4 的直接推论, **不构成矛盾**。」同时把 SC-6 由值枚举改成显式配对, 否则该 SC 仍无法机械断言: `#5` × `#5` ⇒ **命中**; `#5` × `#7` ⇒ 不命中; `10CG/#7` × `otherorg/#7` ⇒ **不命中** (原串不同, 尽管归一后会同键 —— 这是 D3 论域划分的承重断言)。"
+    },
+    {
+      "finding_id": "C2",
+      "problem": "C2 要治的病是「在引用『substitute 须实证而非声称』之后紧接着声称了一个未实测的范围」。C2 的更正文本给整张表加了一句全称出处声称「直接调用生产 `linked_issue_overlaps` 实跑, 非声称」, 但同一条 fix 的 risk 段自认 SC-9 未跑; 且 SC-7 / SC-8a / SC-8b 三行在结构上就不可能由「调用 linked_issue_overlaps」测得。⇒ 一个全称的取证声称罩住了它并不覆盖的行, 与原病同形。(表里的红绿数据本身我复跑属实, 问题只在出处声称的范围。)",
+      "evidence": "C2 exact_change 表头原文:「**baseline 实测结果 (R1-fix 起草者 2026-08-02 直接调用生产 `linked_issue_overlaps` 实跑, 非声称)**」。同条 risk_of_self_recurrence 原文:「SC-9 (回显原串) 我只做了代码实读 (`collision.py:228`) **未跑用例**」。表内 SC-7 一行取值理由写的是「结构上不可红」(推理); SC-8a 需 `inspect.signature`、SC-8b 需 key-set 内省, 均非「调用」。我独立复跑全表 (直接 import `lib.collision.linked_issue_overlaps`): SC-1 三对全不命中 (红) / SC-2 绿 / SC-3 红 / SC-4 两对全红 / SC-5 绿 / SC-5b 三对全红 / SC-5c 绿 / SC-6 与 SC-6b 绿 / SC-9 绿 且返回条目 `linked_issue` 值 = 未归一原串 `10CG/aria-plugin #122`, keys 恰为那 7 个 —— 红绿内容属实。",
+      "corrected_change": "表加第 5 列「取证方式」并删掉表头的单一方法全称句: SC-1/2/3/4/5/5b/5c/6/6b/9 = 「实跑生产 `linked_issue_overlaps`」; SC-7 = 「结构推理 (不可红), 未跑」; SC-8a/8b = 「`inspect` / key-set 内省, 未调用本函数」; SC-8c = 「跑既有测试」。SC-9 一行按本轮实跑结果落定 (绿, 现状回显未归一原串 `10CG/aria-plugin #122`, keys = 那 7 个), 不再是纯代码实读推断。"
+    },
+    {
+      "finding_id": "M7",
+      "problem": "M7 要治的病是「唯一现成的操作化路径判别力为零」+ 审计报告的计数问题。M7 的更正文本发了一条「订正 6→4」, 而这条订正本身数错了, 且错的方向恰好是把**唯一一条端到端经本谓词的既有测试**排除在 SC-8c 的冻结面之外 —— 即 fix 在自己新写的订正里重犯「误判哪些测试锁得住本谓词」。",
+      "evidence": "M7 exact_change 脚注原文:「另有 `:177` `:188` `:195` `:539` 四处触及 `linked_issue` 但走 `parse_claim` / `acquire_claim`, **不经**本谓词。R1 报告称「6 个」应是把两类合计。」实读 `aria/skills/state-scanner/tests/test_release_by_track.py:527-561`: `class TestPhase1GateLinkedIssueCli` 的 `test_linked_issue_written_and_overlap_surfaced` (`:533`) 用 subprocess 跑 `scripts/phase1_gate.py --linked-issue`, 在 `:554-557` 断言 `overlap = out[\"linked_issue_overlap\"]`、`len(overlap) == 1`、`overlap[0][\"track_id\"] == \"secret-guard-hardening\"` —— 该键正是 `scripts/phase1_gate.py:1232` 调 `linked_issue_overlaps` 的产物。`:539` 只是该测试**内部**的 `acquire_claim(..., linked_issue=...)` 参数行, 不构成「该测试不经本谓词」。⇒ 依赖本谓词行为的既有测试是 **5** 个 (4 直调 + 1 端到端), 不是 4 个。",
+      "corrected_change": "SC-8c 的「既有 4 个测试逐字不改全绿」改为「既有 **5** 个测试逐字不改全绿: `TestLinkedIssueOverlaps` 的 4 个方法 (`:224` / `:232` / `:236` / `:245`) + `TestPhase1GateLinkedIssueCli::test_linked_issue_written_and_overlap_surfaced` (`:533`, 端到端经 `phase1_gate.py:1232`)」。脚注删去「`:539` … 不经本谓词」, 改为「`:539` 是端到端测试内部的 acquire 行; 该测试**整体经**本谓词, 是唯一覆盖『谓词 → CLI JSON `linked_issue_overlap[]`』接线的既有测试, 也是 M5 风险注点名的 `phase1_gate.py:1235` fail-soft 吞异常路径的唯一现成观测点」。R1 的「6 个」应更正为「4 直调 + 2 CLI 类方法」而非「两类合计的口径错误」。"
+    },
+    {
+      "finding_id": "M8",
+      "problem": "M8 要治的病逐字是「继承表把 R3 之后新增、零审计的承重条款一并罩进免审范围」。M8 改写后的结论句仍然把「比较键的等价关系」整体列为可不重审 —— 而本轮 fix 恰好改动了比较键的**两个分量**, 且 M8 自己的 new_surfaces 把这些改动标为「零审计记录」。⇒ 免审名目在本轮之后指称的已不是被三轮确认过的那个键, 原病原样复发。",
+      "evidence": "M8 exact_change 第 5 项原文:「**只有算法本体中已被三轮确认的那部分** (比较键的等价关系、org 不参与匹配的极性) 可不重审」。同一交付 new_surfaces 第 1 条:「**规则 2 的 `number_str.isascii() and number_str.isdigit()` 谓词** (M3) —— 全新, 零审计记录。…是承重的字符级判据」(number 分量); 第 2 条:「**「每段各自 `str.strip()`」的统一空白规则** (minor-m1) —— 全新, 零审计, 且**改变了行为面**」(两个分量)。M8 自己第 3 项亦承认:「R2 的 18 元穷举验证的键是 `(basename.casefold(), number)`, **不含**规则 3 后加的 `./_ → -` 译码」(basename 分量)。",
+      "corrected_change": "`:149` 的免审名目逐字限定到被验证过的那一版:「可不重审的只有两项: (a) **R2 用 18 元语料穷举验证过的那一版比较键** —— `(repo_basename.casefold(), int(number))`, **不含** S5 译码 / **不含**统一 strip / **不含** isascii+isdigit 谓词 —— 的自反·对称·传递三性质; (b)「org 不参与匹配」的极性判断。**本轮对比较键的三处修改 (S5 译码 / 统一 strip / isascii+isdigit 谓词) 一律在审计范围内**, 见文末『本轮新增未审表面』清单。」"
+    },
+    {
+      "finding_id": "M3",
+      "problem": "M3 要治的病是「谓词欠定 ⇒ 两个独立实现者得相反结果」。M3 新写的规则 2 里「`number` 无上界 (Python int 任意精度), 不设长度限」+「判定在前、`int()` 在后」这组条款在 CPython ≥3.11 上是假的: 谓词判「可解析」之后 `int()` 会抛 ValueError。⇒ 一条为消除欠定而新写的字符级条款, 自己在实现面重新制造了分叉, 并造出一条新的异常路径 —— 恰是 M5 风险注点名「清单里没有的第三条行为变化」的具体实例, 同时直接违反 SC-6 与 M3 自己新写的 SC-6b 的「不抛异常」。",
+      "evidence": "M3 exact_change 规则 2 原文:「**前导零不剥、不截断**: `#0007` ≡ `#7`。`number` **无上界** (Python int 任意精度), **不设长度限**。」以及「⇒ 两个谓词双向分叉, 必须同时钉住 `isascii()` 与 `isdigit()`, 且**判定在前、`int()` 在后**」。本机实跑 (python3 3.11.2): `sys.get_int_max_str_digits()` == **4300**; `('9'*4301).isascii()` == True 且 `('9'*4301).isdigit()` == True ⇒ 按规则 2 判「可解析」; 随后 `int('9'*4301)` 抛 `ValueError: Exceeds the limit (4300 digits) for integer string conversion`。生产路径上该异常被 `aria/skills/state-scanner/scripts/phase1_gate.py:1235` 的 `except Exception` 吞成 `out[\"linked_issue_overlap\"] = []` (实读 `:1235-1237`)。",
+      "corrected_change": "删去「`number` 无上界 (Python int 任意精度), 不设长度限」, 换成封闭且可照写的条款:「`number_str` strip 后长度 **> `sys.get_int_max_str_digits()` (CPython 默认 4300) 时判不可解析**, 退回步骤 4 原串比较; 且实现**不得**依赖 `int()` 不抛异常 —— `int()` 调用必须包在 `try/except ValueError → 判不可解析` 里。」并在 SC-6b 的枚举补一条: `aria-plugin#<4301 个 9>` × `aria-plugin#<4301 个 9>` ⇒ **命中** (原串相同) 且**不抛异常** —— 「判定在前、`int()` 在后且不 catch」的实现在此必红。"
+    },
+    {
+      "finding_id": "M4",
+      "problem": "M4 要治的病是「把一次测量当常驻事实, 且该数字三轮无人能重算」, 其堵法逐字是「口径 / 日期 / 复现命令」。但 M4 新装的数字在**被审计的那个 commit 上**就复现不出来, 而它给的「复现命令」在语法上根本产不出这组数 —— 防复发装置本身失效, 下一轮读者拿到不同数字时仍然无法分辨是语料漂了还是原测量就错。",
+      "evidence": "M4 exact_change 原文:「`openspec/**/*.md` 全文总体 (**250 文件**, 2026-08-02 实跑): `aria-orch`(排除 `-orchestrator`) **16** 次 vs `aria-orchestrator` **736** 次」+「复现: `grep -c` 于上述两个文件集」。我在审计对象 commit `c6aa29a` 上逐文件复算 (`git ls-tree -r --name-only c6aa29a -- openspec | grep '\\.md$'`, 逐 blob `git show | grep -oE`): 文件 **276** (非 250); `aria-orchestrator` 出现 **745** 次 / 命中 **681** 行; `aria-orch` 排除后 **16** 次。HEAD 上同样是 276 / 745 / 681 / 16。736 在「次数」口径 (745) 与「行数」口径 (681) 上都对不上; 且 `grep -c` 输出的是行数不是次数, 也无法表达「排除 `-orchestrator`」。",
+      "corrected_change": "数字改成可复现值并给出真命令:「`openspec` 下 tracked `*.md` **276** 文件 (`git ls-files 'openspec/**/*.md' | wc -l`); `aria-orchestrator` **745** 次 (`git ls-files -z 'openspec/**/*.md' | xargs -0 grep -oE 'aria-orchestrator' | wc -l`); `aria-orch` 排除 `-orchestrator` 后 **16** 次 (`… grep -oE 'aria-orch([^e]|$)' | wc -l`); 于 `c6aa29a` 与 HEAD 复算一致。」口径标注写成「**次数 (grep -o)**」而非 `grep -c`; 「数字只承载定性」那句保留。"
+    },
+    {
+      "finding_id": "M3",
+      "problem": "M3 新增的 SC-6b 场景列只给**单值**不给比较对象, 而「判不可解析」在 SC-8a/8b 冻结的返回契约下不可观测 (7 键 dict 无任何字段暴露解析结果) ⇒ 两个独立的测试作者会写出判别力相反的测试。这正是 M3 root_cause 引的 spec-underdetermination 形状, 在 M3 自己新写的 SC 上原样复发。",
+      "evidence": "M3 exact_change 新增行原文:「| **SC-6b** | `number_str` 边界枚举: `aria-plugin#+7` / `aria-plugin#1_0` / `aria-plugin#１２３` (全角) / `aria-plugin#²` (上标) | 四者**全部**判不可解析 ⇒ 退回原串比较; 不抛异常 | 用裸 `int()` 的实现在前三个上必红 |」—— 无配对。实跑证明自配对判别力为零: 现状裸 `!=` 下 `('aria-plugin#+7','aria-plugin#+7')` 命中 (绿); 裸 `int()` 实现下也命中 (`int('+7')==7`, 两侧同键); 正确实现下同样命中 (原串相同) ⇒ 三种实现全绿, SC-6b 自写的「用裸 `int()` 的实现在前三个上必红」不成立。只有跨值配对才红: 我实跑 `('aria-plugin#+7','aria-plugin#7')` 现状不命中 (符合期望), 而裸 `int()` 实现会命中。实读 `lib/collision.py:221-231` 确认返回 dict 仅 7 键, 无解析状态字段。",
+      "corrected_change": "SC-6b 场景列改成显式配对:「`aria-plugin#+7` × `aria-plugin#7` / `aria-plugin#1_0` × `aria-plugin#10` / `aria-plugin#１２３` × `aria-plugin#123` / `aria-plugin#²` × `aria-plugin#2` 四对**均不命中**; 且四个左值**与自身配对必命中** (原串相同, 走步骤 4); 全程不抛异常」。「怎么会红」列改为:「裸 `int()` 实现在前三对上命中 ⇒ 红; 裸 `isdigit()` 实现在 `#²` 上 `int()` 抛 ValueError ⇒ 红; 解析失败即判不匹配的实现在四个自配对上不命中 ⇒ 红」。"
+    },
+    {
+      "finding_id": "M1",
+      "problem": "M1 要治的病逐字是「母 Spec 原文的落点指针『(见 §1 消费面)』在抽出时被删 ⇒ D2 唯一的代价缓解无处落地」。M1 的更正文本新写了一个指针「与 SC-5 同一处置形式」, 而同一交付的 minor-batch (m4) 正在把 SC-5 的那个处置形式删掉 ⇒ 落地当天该指针即悬空, 与被治的病同一形状。",
+      "evidence": "M1 exact_change 原文:「⇒ **成文已知限 (与 SC-5 同一处置形式)**: 本 Spec **不**补自己那一侧」。同一交付 minor-batch 的 (m4) 原文:「**SC-5 去循环定义**: 「期望」列由「**不命中**, 且该结果**被显式记为已知限**」改为纯行为断言「**不命中**」… **已知限的成文改由 D4 + §极性段承担**」。⇒ 落地后 SC-5 不再含任何「成文已知限」的处置形式。(M1 引用的两条代码事实我已实读核准: `lib/collision.py:228` 确有 `\"linked_issue\": c.linked_issue`, docstring `:204-205` 确已列该键; `scripts/phase1_gate.py:1119-1131` 的 `_claim_to_dict` 与 `:1134-1169` 的 `_gate_result_to_dict` 确均无 `linked_issue` 字段; 母 Spec `:120` §2.3 确逐字要求「双方 `linked_issue` 原始串」、`:285` Impact 表确有 `phase1_gate.py` 行。)",
+      "corrected_change": "把「(与 SC-5 同一处置形式)」改为「(与 basename 截断轴的已知限**同一处置形式** —— 成文落 D4 + §极性段 basename 轴, **不**写进任何 SC 的期望列, 理由同 m4: 期望列写「被记为已知限」是循环定义)」。另: 决策记录 D2 行 (`:88`) 的「代价由「回显原串」兜」在本轮之后已只成立一半, 须同步改为「代价由「回显**对方**原串」兜半边; 自己那一侧见 §极性段的成文已知限」, 否则同一份文档里 D2 仍宣称代价已被兜住。"
+    },
+    {
+      "finding_id": "M8",
+      "problem": "M8 这条 fix 的整个论点是「表里的数字被用来承重却不准确, 且来源声称经实测证伪」。它自己的更正文本在同一段脚注里又装了一个新数字, 而该数字实测为 5 不是 3。数量级不大, 但落点恰是 M8 用来支撑「E 族不可解析」的举证句 —— 同形复发。",
+      "evidence": "M8 exact_change 原文:「**实测证伪**: 逐字照抄整个字段值得到的是 **E 族** … **其中 3 条**尾部还带 `#issuecomment-NNNNN` 锚点, 拆分后取到的是 `issuecomment-12236))`」。实跑 `grep -rhE '^\\s*>?\\s*\\*\\*关联 Issue\\*\\*' openspec/changes/*/proposal.md openspec/archive/*/proposal.md | grep -c '#issuecomment-'` ⇒ **5** (对应 `Aria#137` / `aria-plugin#17` / `Aria#139` / `aria-plugin#122` / `aria-plugin#113`)。(同段其余计数我复核**属实**: 141 篇 proposal / 12 个字段值; 按最内层链接文字分族 A=1 / C=4 / D=6 / E=11, 与表一致。)",
+      "corrected_change": "「其中 **3 条**」改为「其中 **5** 条 (`Aria#137` / `aria-plugin#17` / `Aria#139` / `aria-plugin#122` / `aria-plugin#113`)」, 并把复现命令补全为 `grep -rhE '^\\s*>?\\s*\\*\\*关联 Issue\\*\\*' openspec/{changes,archive}/*/proposal.md | grep -c '#issuecomment-'`。另建议在五族表下加一行口径说明:「A/C/D 三族按**最内层链接文字**分族, 互斥, 合计 11; E 族是**外壳轴**, 与 A/C/D 正交, 11/11 全覆盖 —— 四列不可相加」, 否则 1+4+6+11=22 > 11 会被下一轮当成新的计数错误。"
+    }
+  ]
+}

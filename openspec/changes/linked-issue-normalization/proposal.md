@@ -66,7 +66,14 @@ if c.linked_issue != own_linked_issue:
 
 **org 轴**: 本机制是 advisory。漏报 = 静默无用 (昂贵, 已致 5 次重复劳动); 误报 = 多一行告警 (便宜, 人一眼可辨) ⇒ **fail toward reporting**, org 不参与匹配。代价: `otherorg/aria-plugin#122` 与 `10CG/aria-plugin#122` 会误配 ⇒ **surface 必须回显双方 `linked_issue` 原始串**, 让人一眼判别。
 
-**basename 轴 (诚实标注, R2/M2)**: `repo_basename` 用**精确相等**, 对真实别名**恒漏** —— R2 语料统计 `aria-orch` **24 次** vs `aria-orchestrator` **10 次**。⇒ **本机制在 basename 轴是 fail-toward-silence, 与 org 轴方向相反**。
+**basename 轴 (诚实标注, R2/M2)**: `repo_basename` 用**精确相等**, 对真实的**截断型**别名**恒漏** ⇒ **本机制在 basename 轴是 fail-toward-silence, 与 org 轴方向相反**。
+
+> **⚠️ R2 的 24/10 未被推翻 —— 它是另一个口径 (R1-fix 复核订正, 主控实跑)**:
+> - **R2 的口径** = issue **引用位置**, 范围含 `docs/`。2026-08-04 逐字复跑 `grep -rhoE '\baria-orch[a-z]* ?#[0-9]+' openspec/ docs/ | sed -E 's/ ?#[0-9]+//' | sort | uniq -c` → **25 `aria-orch` / 11 `aria-orchestrator`**, 与 R2 报的 24/10 一致 (数据长了 1)。拆开看 **`docs/` 独占 24/8**, `openspec/` 只有 1/3。
+> - **spike S4 的口径** = **全文裸 token**, 范围只有 `openspec/` → **16 / 799**。
+> - ⇒ **两组口径不同、范围也不同, 不可比, 谁也没推翻谁。** S4 报告里「比例是反的 / R2 量错了总体」**本身就是一次跨总体比较** —— 与它指控 R2 的错误**同形**。该措辞已作废, S4 报告须同批订正。
+> - **真正让本轴降为「已知限」的是 S4 的另一半结论**: 在**真实输入总体** (会被传给 `--linked-issue` 的「关联 Issue」字段值) 上截断型别名 **= 0 实例**; R1-fix 补测**已落盘总体** (coordination ref 的 16 个值) 同样 **0 实例** (basename 只有 `aria-plugin` / `Aria` / `AUDIT-TEST-DO-NOT-USE`)。**两个总体各自为 0, 不是跨总体推断。本 Spec 不以「比例反了」为依据。**
+> - **R2 的口径其实更贴近 `--linked-issue` 的真实取值** (它量的是 issue 引用形态), 这也是为什么不能把它当作被推翻。
 
 **本 Spec 不解决 basename 别名** (那需要别名表或书写强制, 属母 Spec 的 spike 范围)。此处**只做两件事**: (a) 把该限度**写进 SC-5 作为断言**, 防它被误读成「已覆盖」; (b) 在 surface 文案中不暗示「已穷尽核实」。
 

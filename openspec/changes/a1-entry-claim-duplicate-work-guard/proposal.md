@@ -1,6 +1,6 @@
 # Proposal: a1-entry-claim-duplicate-work-guard
 
-> **Status**: 📝 **Draft (rewrite v2, spike-informed)** — 待 post_spec 闸门
+> **Status**: 📝 **Draft (rewrite v2 + R1-fix)** — ⛔ **有两个阻塞性未决项** (C1 `allowed-tools` / C2 heartbeat 触发点), **不具备进 A.2 的条件**; 待 owner 裁
 > **Created**: 2026-07-30 · **重写**: 2026-08-02
 > **Spec Level**: 2
 > **代码落点**: `aria/` 子模块; Spec 落主仓 (Rule #5)
@@ -48,7 +48,7 @@
 
 | 上游结论 | spike 实测 |
 |---|---|
-| R2/M2:「`aria-orch` 24 次 vs `aria-orchestrator` 10 次, basename 别名恒漏是活跃问题」 | **S4**: 全文 **19 vs 802** (比例是反的); 在**真正会被传给 `--linked-issue` 的总体**里别名实例 **= 0**。R2 自己指出过「ref 与 prose 不是同一总体」, 却在举证时下移一层犯了同一个错 |
+| R2/M2:「basename 截断型别名恒漏是活跃问题」 | **S4 (⚠️ 2026-08-04 订正)**: 在**真正会被传给 `--linked-issue` 的总体**里截断型别名 **= 0 实例**, ref 已落盘总体同样 0 ⇒ 降为已知限。**但 S4 原报的「比例是反的 / R2 量错了总体」已作废** —— 逐字复跑 R2 的口径得 25/11 (与其 24/10 一致), 两组口径与范围都不同, **S4 自己做了一次跨总体比较, 与它指控 R2 的错误同形**。R2 的口径其实更贴近 `--linked-issue` 真实取值 |
 | R3/M3a:「`./_` 分隔符碰撞属 dormant, 本组织无含 `.`/`_` 的仓名」 | **S5**: `10CG/10cg.local` 是**真实仓** (Forgejo API 实测, 11 open issues, handoff 引用过) ⇒ **活跃, 非 dormant** |
 
 ---
@@ -69,7 +69,13 @@
 
 1. **进模板**: `spec-drafter` 的 proposal 模板增「关联 Issue」字段。无关联时**显式写 `无`**, 不留空 —— 空与「忘了写」不可区分;
 2. **格式固定**: `<org>/<repo>#<n>` 单一形态。`phase1_gate` help 示例即此形; 写全 org 可让「org 不参与匹配」在人工判别时有据 (回显原串时看得出是不是同一个仓);
-3. **机械校验**: 新增 custom check —— proposal 有该字段且值可被前置 Spec 的归一解析, 或显式为 `无`。**severity: warning** (advisory-over-hardlock);
+3. **机械校验**: 新增 custom check —— proposal 有该字段且**从字段值中抽出的 canonical token** 可被前置 Spec 的归一解析, 或显式为 `无`。**severity: warning** (advisory-over-hardlock);
+   > **⚠️ 必须先定「抽取规则」, 否则 check 上线即恒红 (R1-fix/C3, 2 席实跑)**: 实跑 141 篇 —— 13 篇有该字段者, 直接拿字段值喂前置 Spec 的归一 **OK = 0 / 不可解析 = 13**。原因: **真实写法是 markdown 链接形**, 例如
+   > ```
+   > > **关联 Issue**: [10CG/aria-plugin #122](https://forgejo.10cg.pub/10CG/aria-plugin/issues/122) (open; ...)
+   > ```
+   > 而 §1.2 规定的是裸形 `<org>/<repo>#<n>` 且**没给抽取规则**。⇒ (a) check 恒红 (129 篇存量恒黄); (b) 若照抄字段值传 `--linked-issue`, 收到的是**整个 markdown 链接** ⇒ **前置 Spec 要治的格式病在上一层复现**。
+   > **抽取规则须在 A.2 定死并给可证伪 SC** (候选: 取字段值内第一个匹配 `[\w.-]+/[\w.-]+\s*#\d+` 的片段并剥内部空白)。**本 Spec 现有措辞不足以实现。**
 4. **不追溯**: 存量 128 篇无字段的 proposal 不回填 (多为已归档)。
 
 > **为什么校验而非仅模板**: 模板只影响新建, 且 AI 可以删。本 Spec 的 §Why 自证「AI 会遗漏步骤」—— **无机械回声的义务会退化**。
@@ -85,7 +91,22 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
   --repo-path "<主仓根>"
 ```
 
+> **⚠️⚠️ token 为 `无` 时: 整个 `--linked-issue` 参数必须省略, 绝不可传 `--linked-issue 无` (R1-fix/NEW-01, 主控实跑复现)**
+>
+> `linked_issue_overlaps` **只在 `own_linked_issue` falsy 时短路** (`collision.py:207-208` 实读: `if not own_linked_issue: return []`), 而 `"无"` 是 **truthy** ⇒ **两份毫无关系的 Spec 只要都写 `无`, 就会互相命中 overlap**。实跑复现:
+>
+> ```
+> linked_issue_overlaps([claimA(linked_issue='无'), claimB(linked_issue='无')], 'spec-a-uuid1', '无')
+> → [{'track_id': 'spec-b-uuid2', 'linked_issue': '无', ...}]   # ❌ 误报
+> ```
+>
+> ⇒ **`无` 的语义是「已核实无关联」(一条正证据), 不是一个可参与相等比较的 token。** 此时 track-id 走 §2.1 的回落形 `<spec-slug>-<container_uuid>`, 主机制对该轨**不产生输入** —— 该已知限须写进 §6 缺口表。
+>
+> **这条是 §1 的「显式写 `无`」与本节「实参逐字节取 token」两条 fix 之间的接缝** —— 三个对抗验证镜头都没抓到 (M3 只在 §4 探针层处理了 `无` 的归属, 没下移到 CLI 实参层), 由整合者实测发现。**属「多条 fix 互相拆台」的第二类形状。**
+
 **触发时机**: A.1 **起草前**, 作为**独立标题级步骤** (仿 `phase-b-developer` 的 `### B.0`), **不塞进现有 A.1 的 YAML 动作列表** —— §Why 已证埋进长列表的单行指令会被静默跳过 (R3/M6)。
+
+> **⚠️ `### B.0` 是形态类比而非实存锚点 (R1-fix/M8)**: `phase-b-developer/SKILL.md` 里**没有**字面的 `### B.0` 标题。此处引它是指「**独立标题级、与主流程动作列表平级**」这一形态, 不是要求实现者去找那个字符串。
 
 #### §2.1 track-id 派生 (spike S3 定案)
 
@@ -113,20 +134,42 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > **session_id 落盘复用方案判否** —— 被本方案取代, 且引入并发/过期新面。
 > **冗余**: 每次调 `phase1_gate` 都写一条新 claim (生产 ref 实证 27+ 条) ⇒ 再调即自然续期。但它依赖「AI 记得再调」—— 而那正是本 Spec 存在的理由 ⇒ **heartbeat 为主, 再调作冗余, 不可只靠后者**。
 
+> ## ⛔ 未决项 (R1-fix/C2 — 3 席命中): **换了匹配键, 但没说谁调、什么时机调**
+>
+> `heartbeat()` 的**生产调用点仍为 0** (`constants.py:43-44` 自陈:「NO production heartbeat loop exists」)。**换匹配键不产生刷新者** ⇒ 保护窗实质仍是 24h ⇒ **SC-5~7 可以全绿而问题原样存在**。
+>
+> **spike S1 §6 明确把「谁在什么时机调」交还给 Spec** (「属 Spec 范围不属 spike」), 而重写**没有接住**。
+>
+> **且判否「再调 phase1_gate」的理由原样适用于 heartbeat** —— 若 heartbeat 也靠 AI 记得调, 两者没有区别。⇒ **必须给它一个不依赖 AI 记性的触发点**, 候选:
+> - (i) 挂在 A.1 内已有的**机械步骤**上 (如每次写 proposal 文件后), 由 skill 指令强制;
+> - (ii) 挂在 `state-scanner` 的 Phase 0.5/1.16 (它每次 `/state-scanner` 必跑, 且已在 coordination 链路上);
+> - (iii) 承认做不到, 改走延长 TTL 并量化 sweep 语义代价 (spike S1 的选项 c)。
+>
+> **A.2 前必须定死其一。** 在此之前 §2.2 只是「把匹配键修对了」, 不构成保护窗的解决方案。**这也是 §2.3 的 `--sweep-stale` 风险 (C5) 是否升级为数据面风险的判定条件。**
+
 #### §2.3 overlap 消费
 
 `linked_issue_overlap[]` 非空 ⇒ **在起草前**经 `AskUserQuestion` 请裁。
 
 - **告警须含**: 对方 track-id / owner-container / claimed_at / **双方 `linked_issue` 原始串** (org 不参与匹配, 回显原串是误配的唯一人工判别手段) / `status`;
 - **选项**: 「另起」/「**我去释放对方的 claim 后再开始 (两步人工)**」/「并轨」。
-  > **「接手」不是一键动作 (spike S3 实测)**: `release_claim_by_track` 只匹配调用者**自己的** container (`claim_lifecycle.py:425`), **无任何函数支持释放别的容器的 claim**; 且既有 `_takeover_eligible` 因含容器段后两轨必然不同 track_id 而**对本场景不可达**。⇒ 措辞即定义, 避免实现者以为有一键路径。**跨容器 release 不在本 Spec 引入** (写别人的 claim 是权限面变更, 应独立评估);
+  > **「接手」不是一键动作 (spike S3 实测)**: `release_claim_by_track` 只匹配调用者**自己的** container (`claim_lifecycle.py:425`), **无任何函数支持*定向*释放某个指定容器的 claim**; 且既有 `_takeover_eligible` 因含容器段后两轨必然不同 track_id 而**对本场景不可达**。
+  >   **⚠️ 事实订正 (R1-fix/C5, 主控实读)**: 原文写「无任何函数支持释放别的容器的 claim」**为假** —— `release_gate.py --sweep-stale` 的 help 逐字写着「active 且 heartbeat 超 STALE_TTL → abandoned (**跨 container**)」。存在的是**无差别的陈旧清扫**, 不是定向接手。⇒ 「两步人工」的结论仍成立 (sweep 不能用来「接手某条特定的轨」), 但理由须改为「**只有无差别 sweep, 没有定向 release**」。
+  >   **⚠️ 与 §2.2 复合的风险 (R1-fix/C2 关联)**: 若 heartbeat 最终仍无人调 (见 §2.2 的未决项), 所有 claim 在 `STALE_TTL`=30min 后即 stale ⇒ **`--sweep-stale` 对几乎所有并发轨可达**。phase-d-closer 逐周期带该 flag ⇒ 这不是理论风险。**§2.2 的「谁调 heartbeat」不落地, 本条即从「已知限」升级为「数据面风险」。**⇒ 措辞即定义, 避免实现者以为有一键路径。**跨容器 release 不在本 Spec 引入** (写别人的 claim 是权限面变更, 应独立评估);
 - **不硬阻断** (撞 §非目标与 AD10), 但**也不是 AI 渲染一行后自行决定** —— 「继续起草」是对已知碰撞的处置决定, 属 owner 权限面 (Rule #10)。**advisory 的含义是机制不阻断, 不是 AI 可自行放行。**
 
 #### §2.4 终态可见 + 传递链 (R3/C2)
 
-`done` / `abandoned` / `yielded` 的同 issue claim **必须可见** —— A.1 场景下 `done` 恰恰是最该看见的信号 (「对方已经做完了」)。`collision.py:210` 的 `_TERMINAL` 会直接 skip 它们。
+`done` / `abandoned` 的同 issue claim **必须可见** —— A.1 场景下 `done` 恰恰是最该看见的信号 (「对方已经做完了」)。`collision.py:210` 的 `_TERMINAL` 会直接 skip 它们。
 
-**`include_terminal` 的传递链 (三段缺一不可)**:
+> **⚠️ 事实订正 (R1-fix/C4, 3 席 + 主控实读)**: 实读 `collision.py:210` —— `_TERMINAL = ("done", "abandoned", "unknown")`。
+> - **不含 `yielded`** ⇒ `yielded` **今天就已可见**, 不需要本机制去救; 原文把它列进来是**错的事实断言**, SC-8 的该子例 **baseline 即绿**;
+> - **含 `unknown`** ⇒ 它被 skip 而原文**完全没讨论**。`unknown` 的证据方向与 `done`/`abandoned` **相反** —— 后两者是「对方明确结束了」(正证据), 前者是「读不出对方状态」(**零证据**)。⇒ **不得与 done/abandoned 合并措辞**: `unknown` 命中时须按「未能核实对方状态」呈现, 与 §2.5 的 fetch 降级同一极性 (零证据不得当正证据)。
+
+**`include_terminal` 的传递链 (**四**段缺一不可 — R1-fix/C6 补第 0 段)**:
+
+0. **`lib/collision.py` 的 `linked_issue_overlaps` 增 keyword-only 形参** `include_terminal: bool = False` —— 实读现签名为 `(claims, own_track_id, own_linked_issue)`, **无该形参**; 不加则 `_main():1232` 传参直接 `TypeError`。**⇒ `lib/collision.py` 必须进 Impact 表** (原表零覆盖)。
+   > ⚠️ 与前置 Spec 的边界: `linked-issue-normalization` 的 §非目标写「签名与返回 schema 不变」。本段**要改签名** ⇒ 两 Spec 须协调: 建议由**本 Spec** 承担该签名变更 (前置 Spec 只改内部谓词), 并在前置 Spec 的非目标处加一句「`include_terminal` 形参由 `a1-entry-claim` 引入, 不属本 Spec 变更面」。**该协调项须 owner 确认。**
 1. `phase1_gate.py` 新增 CLI flag `--include-terminal` (store_true);
 2. **在 `_main()` 的现有调用处** (`phase1_gate.py:1232`) 加关键字参数 —— **不碰** `run_gate` / `_run_gate_impl` 签名;
    > R3/C2 实测: `linked_issue_overlaps` 生产代码**只有这一处调用**, 位于 `_main()`、在 `run_gate` 返回**之后**独立追加; `_run_gate_impl` (334-1075 行) 对它 grep 命中 **0**。原 R2-fix 写「`run_gate` 签名透传」**架构上就是错的** —— 照它做会改错函数, 精确复现它自己要修的「生产不可达」。
@@ -146,6 +189,25 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 ⇒ **A.1 须双落点**, 与 Phase B 对称 (后者有 `phase-b-developer` + `branch-manager` 两处):
 1. `phase-a-planner/SKILL.md`;
 2. **`spec-drafter/SKILL.md`** —— 它 `user-invocable: true` (实测 `:9`), 可直接绕过 phase-a-planner。
+
+> ## ⛔ 阻塞性前提 (R1-fix/C1 — 4 席独立命中 + 主控实读)
+>
+> **两个指定落点的 `allowed-tools` 都不支持本机制的核心动作。** 实读 frontmatter:
+>
+> | Skill | `allowed-tools` (逐字) | 缺 |
+> |---|---|---|
+> | `phase-a-planner/SKILL.md:9` | `Read, Write, Glob, Grep, Task, Skill` | **无 `Bash`** · **无 `AskUserQuestion`** |
+> | `spec-drafter/SKILL.md:10` | `Read, Write, Glob, Grep, AskUserQuestion` | **无 `Bash`** |
+>
+> ⇒ §2 的 `python3 .../phase1_gate.py` 命令**在两个宿主上都跑不了**; §2.3 的 `AskUserQuestion` 请裁**在 phase-a-planner 上也跑不了**。
+>
+> **这是整份 Spec 的阻塞项** —— 主机制在它自己指定的执行位置上不可调用, 而三轮审计 + 六条 spike 全都没查过 frontmatter。
+>
+> **处置 (须与 owner 确认, 二选一)**:
+> - **(a) 扩 `allowed-tools`**: `phase-a-planner` 加 `Bash, AskUserQuestion`; `spec-drafter` 加 `Bash`。⚠️ 扩权是 skill 能力面变更, 会影响 Rule #6 的判据 (从「指令面」升到「能力面」), 且 `Bash` 是最宽的一项 —— **须 owner 明确批准**, 不由本 Spec 自行决定;
+> - **(b) 改由已持 `Bash` 的宿主代调**: 例如经 `Task`/`Skill` 委派, 或把认领动作前移到 `state-scanner` 的阶段 4 (它已在 workflow-runner 链路上)。⚠️ 这会改变「A.1 起草前」这个时点的语义, 须重新论证。
+>
+> **两条 Impact 都未列 `allowed-tools` 字段变更** —— 无论选哪条都要补进 §Impact。**本前提未解决前, §2/§3 不具备实施条件。**
 
 > **口径待定 (S6 附带发现)**: `owner-container` (形如 `simonfish/bfe8285d`) 与 claim 的 container 段 (`bfe8285d`) **口径已经不同**。本 Spec 采用 claim 侧口径 (uuid), 并把「两标识关系需成文」记为 follow-up —— **不在本 Spec 统一二者** (那会牵动 handoff frontmatter 规范, 属 standards 变更)。
 
