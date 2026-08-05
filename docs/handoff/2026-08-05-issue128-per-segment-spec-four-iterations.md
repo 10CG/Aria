@@ -36,6 +36,8 @@ updated-at: 2026-08-05T02:30:00Z
 - **前序 handoff §6 的 #120 / #117 / #123** 三项跨多个 session 未动。
 - **6 项 #170 转出** (aria-plugin#128-132 + Aria#171) 中只有 #128 在推进。
 
+- 🔴 **[收尾机械检查新发现] `silknode-contract-deferral-expiry` 今日到期** — custom checks 由 8/8 转为 **7/8**。这是**设计好的时间驱动 WARN**, 非 bug 非本段引入: `.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md` 的 `expires_at: 2026-08-05T23:59:59Z` 正是今天, `status: deferred`。该 waiver 覆盖的是 **Contract 2 (业务数据分类约束) 在 M2 从未被机械 enforce**。按决策文件 §70 需 owner 三选一: **关闭 waiver** (acceptance 全 MET) / **续期** (新文件 + 新 expires_at) / **upgrade 至 `standards/governance/silknode-no-storage.md`**。在处置前该 check 会持续红。
+
 **机械补漏**: §2 汇编 186 条 (159 tasks.md + **27 detailed-tasks.yaml** —— 后者仍是 #121 修复在起作用); consistency 10 条 advisory (active change 未入 UPM, 常态)。
 
 ## §3 关键风险 / 已知陷阱
@@ -70,7 +72,8 @@ updated-at: 2026-08-05T02:30:00Z
 2. 🔴 **#170 要求 1** (轮换 T4 + revoke `446b79`) — cesura 解阻塞唯一前提。可与第 1 项同批。
 3. **[Aria#172](https://forgejo.10cg.pub/10CG/Aria/issues/172) plugin cache 更新** — **优先级高于 #128 继续推进**: 在它解决前, #128 的 Phase B 验收只能靠 canonical 直调, dogfood 一项始终缺失。
 4. **#128 spec R4** — v4 待审。重点审 v3→v4 的新增面 (13 处转内建 / 判据补漏 / SC-14~17), 那些没被任何一轮看过。R4 若收敛即可进 Phase B。
-5. 承前: #120 / #117 / #123 / #170 其余转出 (#129-132, Aria#171)。
+5. 🔴 **`silknode-contract-deferral-expiry` waiver 今日到期** (custom checks 8/8 → 7/8) — owner 三选一: 关闭 waiver / 续期 / upgrade 至 `standards/governance/silknode-no-storage.md`。决策依据见 `.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md`。
+6. 承前: #120 / #117 / #123 / #170 其余转出 (#129-132, Aria#171)。
 
 ## §7 提交清单
 
@@ -82,6 +85,8 @@ updated-at: 2026-08-05T02:30:00Z
 | aria-orchestrator | `86bb684` (detached) | — | 本段未触碰 |
 
 本段提交: `2890b25` (本地 hook 副本移除) + `a89d999` (spec v4 + 15 份审计报告 + triage 产物)。**本段零版本发布**。
+
+custom checks: **7/8** —— 唯一红项 `silknode-contract-deferral-expiry` 为今日到期的时间驱动 WARN (见 §2), 非本段引入。
 
 ## §8 Memory entries this session (2 new)
 
