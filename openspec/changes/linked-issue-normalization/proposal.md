@@ -170,7 +170,17 @@ if c.linked_issue != own_linked_issue:
 
 > **U-2 裁定留痕 (owner 2026-08-04)**: 走**方案 A** —— 保留 `SKILL.md:176` 文案同步 + 逐 hunk 判定。否决方案 B (撤下同步行以保「零 SKILL.md」前提) 的理由: 那会主动留下一处**代码已归一而 SKILL.md 仍描述旧语义**的文档漂移, 直接违反 Rule #3; 拿「回避一次 Rule #6 论证」换「Rule #3 破损」是坏交易。**本条与 Impact 表的 `SKILL.md:176` 行同批落地, 互相引用。**
 
-**baseline 实测结果 (R1 三席 + R1-fix 起草者 + R1-fix 综合者三方独立复跑, 逐格一致)**:
+**baseline 实测结果 —— ✅ 已实跑留证 (2026-08-05, aria 子模块 `af87cae` / v1.65.5)**:
+
+> **留证 artifact**: [`.aria/repro/sc-baseline-linked-issue-normalization.py`](../../../.aria/repro/sc-baseline-linked-issue-normalization.py) —— 自包含、stdlib-only、只读、目标路径走 argv。复现:
+> ```
+> python3 .aria/repro/sc-baseline-linked-issue-normalization.py aria/skills/state-scanner
+> cd aria/skills/state-scanner && python3 -m pytest tests/test_release_by_track.py \
+>     -k "TestLinkedIssueOverlaps or TestPhase1GateLinkedIssueCli" -q     # = SC-8c
+> ```
+> **结果: 14/14 与下表逐格一致** (13 格由脚本跑出, SC-8c 由 pytest 跑出 `6 passed`)。脚本自身机械比对「实测红集合 == Spec 声称的证据面」, 不符即 exit 1。
+> ⇒ owner 2026-08-02 裁定 (`db2e983`) 要求的「substitute 须**实证而非声称**, 全部实跑」**在 A.1 阶段即已闭环**, 不再是 Phase B 的待办。
+> *(下表原署名「R1 三席 + R1-fix 起草者 + R1-fix 综合者三方独立复跑」—— 三次复跑均**无留证 artifact**, 即「声称已跑」而不可复核。本次实跑证实其结论正确, 但**结论正确不等于当时留了证**; 这条区别正是本 Spec 要治的病的同一形状。)*
 
 | SC | baseline | 性质 | 算进 substitute 证据面? | 取证方式 |
 |----|---------|------|---|---|
@@ -192,7 +202,7 @@ if c.linked_issue != own_linked_issue:
 ⇒ **substitute 的证据面 = SC-1 / SC-3 / SC-4 / SC-5b 四条 baseline-failing**; 其余为负控 / 已知限 / 回落语义 / 冻结断言 —— 它们锁住「修复后不应退化」的行为, 有价值但**不能算进 substitute 的证据面** (负控恒绿是正确的, 不是证据)。
 **⚠️ 原文的「SC-1~6 均在现状代码上可红」经三方实测不成立, 已按实测改写。** 表内不设「直接调用生产函数实跑」的全称句 —— SC-7 / SC-8a / SC-8b 结构上不可能由调用该函数测得, 保留全称句就是在引用「须实证而非声称」之后紧接着声称一个未实测范围。
 
-> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-3 / SC-4 / SC-5b 四条**的 baseline-failing 状态在 Phase B 须实跑留证 (同该裁定要求的「全部实跑, 非声称」)。
+> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-3 / SC-4 / SC-5b 四条**的 baseline-failing 状态**已于 2026-08-05 实跑留证**, artifact 见上方 baseline 表 (`.aria/repro/sc-baseline-linked-issue-normalization.py`, 14/14 一致)。该裁定要求的「全部实跑, 非声称」**已满足**, 非 Phase B 待办。
 
 > *(订正留痕: 本段原写「SC-1~6 的 baseline-failing 状态」—— 与上方 baseline 实测表直接矛盾 (SC-2/5/6 实测为绿)。**该假声明在同一节内出现两次, 上方一处已由 FIX-11 改掉, 这一处编辑清单未点名、险些残留** —— 属「多簇 fix 互相拆台」的同一形状, 由 R1-fix 落盘后的交叉一致性检查抓到。)*
 
@@ -290,9 +300,10 @@ if c.linked_issue != own_linked_issue:
 8. **三个 terminal 集合互不相同的披露** — R1-fix 实读新发现, 编辑清单未列;
 9. **六族表 + ⭐分族规则 (结构分) + F 族「形状频次 5 / 真实仓名 2」两数分离** — U-5 裁定后新写, **分族规则本身是新的通用形状**;
 10. **三总体定义 (已落盘 / 复制源 / 未来输入)** — 全新, 是全文多处结论的共同前提;
-11. **rule6_note 的逐 hunk 判定论证** — U-2 裁定方案 A 后新写, 是 **Rule #6 合规论证**。
+11. **rule6_note 的逐 hunk 判定论证** — U-2 裁定方案 A 后新写, 是 **Rule #6 合规论证**;
+12. **`.aria/repro/sc-baseline-linked-issue-normalization.py` 这份 baseline 留证 artifact 本身** — 2026-08-05 新建, 它是 substitute 证据面的**唯一可复核载体**, 其用例构造是否忠实于 SC 表的措辞**尚未被任何席位审过**。
 
-*(仅剩 SC-7 fixture 内容口径未定, 见 §Success Criteria 的 🚧 TODO(U-3)。)*
+*(仅剩 SC-7 fixture 内容口径未定, 见 §Success Criteria 的 🚧 TODO(U-3) —— 注意它与上面第 12 项是**两份不同的语料**: 本 artifact 装的是 SC-1~9 的判定用例, U-3 那份装的是 SC-7 的等价关系语料全集。)*
 
 **R3 的三条订正 (留痕)**: R3 原文是 6 项要点、**无「可实现性评估表」这一措辞**、`release-by-track` 同样无 caveat —— 上表 R3 行原写的「在其可实现性评估表中」是**合理复述非逐字引用**, 已改为不带该措辞的表述。
 
@@ -305,7 +316,7 @@ if c.linked_issue != own_linked_issue:
 **但本 Spec 的情形特殊, 提请 owner 一并裁**: 其内容已经过 R1/R2/R3 三轮审计并被逐轮确认 (见上表)。可选处置:
 
 (1) **照跑完整 post_spec**;
-(2) **定向轮 —— 审计范围 = 抽出偏差 ∪ 上文「本轮新增未审表面」清单全部 11 项** (含规则 2 的 `isascii()+isdigit()` 谓词与长度上界、统一 strip 规则、S5 译码、规则 3 的封闭重写判据与授权清单、6 条新 SC、rule6_note 的 baseline 表与逐 hunk 判定、§Why 的一对限定词、三 terminal 集合披露、六族表与结构分族规则、三总体定义)。**仅**「比较键的等价关系 (R2 验过的那一版)」与「org 不参与匹配的极性」两项可凭三轮资产免审 —— **「不重审算法本体」的旧措辞在本轮已失效, 撤回**;
+(2) **定向轮 —— 审计范围 = 抽出偏差 ∪ 上文「本轮新增未审表面」清单全部 12 项** (含规则 2 的 `isascii()+isdigit()` 谓词与长度上界、统一 strip 规则、S5 译码、规则 3 的封闭重写判据与授权清单、6 条新 SC、rule6_note 的 baseline 表与逐 hunk 判定、§Why 的一对限定词、三 terminal 集合披露、六族表与结构分族规则、三总体定义、**baseline 留证 artifact 的用例构造**)。**仅**「比较键的等价关系 (R2 验过的那一版)」与「org 不参与匹配的极性」两项可凭三轮资产免审 —— **「不重审算法本体」的旧措辞在本轮已失效, 撤回**;
 (3) ~~判定审计资产可继承、免跑并留痕请复议~~ —— **已被 R1 自身证伪, 从选项中撤回** (R1 的 2 条 critical 都是「抽出/新增时引入」的, 不在被继承的三轮资产里)。
 
 ⇒ 处置 (3) 撤回; 处置 (2) 已按「本轮新增未审表面」清单重新定界 —— **旧措辞会豁免掉本轮全部零审计的承重条款, 触 Rule #10**。
@@ -322,6 +333,7 @@ R1 编辑清单 (`.aria/audit-reports/post_spec-R1-fix-editlist-linked-issue-nor
 - **17 条 FIX 现已全部落地** (`d7c00fd` 落 14 条; owner 裁 U-2/U-5/U-6 后本轮补落 FIX-02 / FIX-11 / FIX-13)。
 - **owner 裁定留痕 (2026-08-04)**: **U-2 = 方案 A** (保留 `SKILL.md:176` 同步 + 逐 hunk 判定) · **U-5 = 第三条路** (结构分族, F 族的「形状频次 5」与「真实仓名 2」两个数各标口径、不互相冒充) · **U-6 = 12 行 / 11 值分开写**。
 - **仅剩 U-3 未裁**: SC-7 的 fixture 内容口径 (D1 与 SC-7 互指的循环), **Phase B 开工前必须写死**。
+- **2026-08-05 追加**: SC baseline **实跑留证已闭环** —— artifact `.aria/repro/sc-baseline-linked-issue-normalization.py`, 14/14 与表一致 (13 格脚本 + SC-8c pytest `6 passed`)。原「Phase B 须实跑留证」义务提前在 A.1 完成。**未审表面清单同步涨到 12 项** (artifact 的用例构造本身未经席位审)。
 - **本轮实跑订正的数字**: `aria-orchestrator` 全文裸 token 计数原写 `799`, 三种口径下均复现不出 ⇒ 按实跑改为 **735** (250 文件口径); 存量 ref 计数 `13` → **16**; 已落盘总体 B 族 `9` → **11**。
 - **本轮新发现 (无审计记录)**: 本仓 terminal 集合有**三个互不相同**的定义 (见 §接口面)。
 
