@@ -1,82 +1,54 @@
-## Triage 更正 — 我上一条 (issuecomment-17187) 的 case-3 判定是错的
+## Triage Report
 
-上一条把「无 redirect 的写向 `curl -X PUT /v1/var/` 被拦」判为**过度拦截**, 依据是 issue 原文的前提「PUT 上传, response 丢弃, 不回显 secret」。**我没有核实这个前提, 它是错的。**
-
-### 事实
-
-HashiCorp Nomad Variables API 官方文档 (Create/Update Variable, `PUT /v1/var/:var_path`) 的成功响应示例:
-
-```json
-{
-  "Namespace": "prod",
-  "Path": "example/first",
-  "CreateIndex": 1457,
-  "ModifyIndex": 1457,
-  "CreateTime": 1662061225600373000,
-  "ModifyTime": 1662061225600373000,
-  "Items": {
-    "user": "<值>",
-    "password": "<值>"
-  }
-}
-```
-
-(官方示例的 `Items` 里是**明文键值对**; 此处按 secret 卫生把示例值替换为占位符 — 原文档给的是可读的明文口令字面量, 这正是要点所在。)
-
-原文: 「The response body returns the created or updated variable along with metadata created by the server」—— **response body 含解密后的 `Items` 值**。
-
-### 因此
-
-无 redirect 的写向 PUT **确实会把 secret 打进 tool output**。secret-guard 拦它是**正确行为, 不是 bug**。而 issue 原文那句「response 丢弃」指的正是 `>/dev/null` —— 而带 `>/dev/null` 的形态本来就被放行 (上一条 case-1/2 已实测)。
-
-**结论: issue 要求 2 (`/v1/var/` 读写分离) 的前提整个不成立, 该项无需修改。** 现行 hook 在这个面上的判据是准的:
-
-| 写向形态 | 是否回显 secret | 现行 hook | 判定 |
-|----------|----------------|-----------|------|
-| `curl -X PUT ... --data-binary @file >/dev/null` | 否 | exit=0 放行 | ✅ 正确 |
-| `curl -X PUT ... --data-binary @file -o /dev/null` | 否 | exit=0 放行 | ✅ 正确 |
-| `curl -X PUT ... --data-binary @file` (无 redirect) | **是** (response 含 Items) | exit=2 拦 | ✅ 正确 |
-| `curl -v -X PUT ...` | **是** (verbose 回显请求体) | exit=2 拦 | ✅ 正确 |
-| `curl --trace-ascii - -X PUT ...` | **是** | exit=2 拦 | ✅ 正确 |
-| `curl -X PUT ... -d '{"Items":{...}}'` | **是** (值上 argv) | exit=2 拦 | ✅ 正确 |
-
-六种形态逐条实测, 安全的放行、危险的拦住, 无假阴也无假阳。
+**Verdict**: `confirmed` | **Severity**: `critical` | **Recommended Action**: `next-cycle`
 
 ---
 
-## 但实测暴露了一个**真** gap (本次修复的新目标)
+### Version
 
-`nomad var put` **完全不在 risky_patterns 内** (pattern 只列了 `nomad var (get|list)`), 而它有个反直觉的默认行为 —— 本机 nomad v1.11.2 `nomad var put --help` 原文:
+| Field | Value |
+|-------|-------|
+| Reported | `1.65.4` |
+| Current | `1.65.5` |
+| Gap | behind 1 patch (v1.65.5 仅同步陈旧注释计数, 零行为变更) |
 
-```
--out (go-template | hcl | json | none | table)
-   Format to render created or updated variable. Defaults to "none" when
-   stdout is a terminal and "json" when the output is redirected.
-```
+### Code Path
 
-**在 Claude Code 的 Bash 工具里 stdout 是 pipe 而非 terminal**, 于是 nomad 判定为「输出被重定向」→ 默认渲染完整变量 JSON (含 `Items` 值) → **直接进 AI 上下文**。而 hook 对它零拦截:
+- `hooks/secret-guard.sh` `has_filter` 计算区 (`:318-:400`) — 全部 credit 判据对**整条 `$command` 字符串**求值, 无分段。
+- `:653` `if [[ $has_filter -eq 0 ]]` — 单一全局开关控制**所有** 141 条 pattern 的拦截与否。
+- 结论: 命令任一位置出现 credit 串 ⇒ 该命令的**全部**段落免疫**全部** pattern。
 
-| 形态 | 是否回显 | 现行 hook | 判定 |
-|------|---------|-----------|------|
-| `nomad var put -in=json <path> @file` (非 TTY) | **是** (-out 默认切 json) | exit=0 放行 | ❌ **gap** |
-| `nomad var put <path> PAT=<value>` | **是** (值上 argv + 渲染) | exit=0 放行 | ❌ **gap** |
-| `nomad var put -out=none ...` | 否 | exit=0 放行 | ✅ 正确 |
-| `nomad var put ... >/dev/null` | 否 (渲染被吞) | exit=0 放行 | ✅ 正确 |
+### Reproduction
 
-这才是本次事故第 3 环的真实机制 —— 也解释了为什么绕道 `nomad var put` 会泄漏, 但机制不是 issue 说的「回显走 stderr」(stderr 是 `-verbose` 档), 而是**非 TTY 下 stdout 渲染**。
+**Mode**: `auto` | **Hit rate**: `5/5`
 
-### 附带发现: 测试面结构性盲区
+| case | 形态 | 实测 |
+|------|------|------|
+| case-1 | 对照: `cat /opt/.env` 单条 | exit=2 ✅ 单命令路径无缺陷 |
+| case-2 | `cat /opt/.env; echo hi >/dev/null` | **exit=0** — `.env` 读被完全无关的一段掩护 |
+| case-3 | `nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2` | **exit=0** — 第二条零保护 |
+| case-4 | `vault read secret/x; nomad var put p @f >/dev/null` | **exit=0** — 跨 pattern 家族同样泄漏 |
+| case-5 | 管道 `\| head -5 >/dev/null` 与 `&& echo done >/dev/null` | **exit=0** ×2 — 非仅分号, `\|` 与 `&&` 同受影响 |
 
-`hooks/tests/secret-guard.test.sh:56-59` 的 `/v1/var/` 用例**全为读向** (GET / wget)。上面那张「六种写向形态」表里的正确行为**一条都没有测试锁定** —— 将来任何人调整 has_filter 逻辑都可能无声破坏它, 而且没有红灯。
+### 为什么定 `critical`
 
-## 修复范围 (owner 已定案)
+1. **它使 #170 的修复在最常见形态下失效** — case-3 的第二段正是 #170 的泄漏形态本身。v1.65.4 花了四轮审计加的那条 pattern, 在「一次写多个 var」这一日常写法下等于没加。
+2. **影响面是全部 141 条 pattern, 不是某一条** — case-4 证实跨家族。`.env` / SSH key / vault / cloud secret manager 全部可被同一手法绕过。
+3. **触发门槛极低** — AI 与运维脚本天然大量使用 `a; b`、`a && b`、`a | b`。只要任一段带 `>/dev/null` / `-o /dev/null` 等 credit, 整条命令免疫。
+4. 非 `critical` 的唯一理由是 hook 自述为 speed-bump 且 PostToolUse `secret-scan.sh` 是第二道防线 —— 但后者在工具执行**之后**运行, 值已进上下文, 只能告警不能阻断。**纵深防御可, 替代不可**。
 
-1. **拦 `nomad var put` 的不安全形态** (无 `-out=none` 且无 stdout redirect), 安全形态继续放行;
-2. **补写向测试用例族** — 把上面两张表的 10 条行为全部锁定 (含现已正确的 6 条, 防回归);
-3. 要求 2 (读写分离) **关闭, 无需修改** —— 前提经官方文档证伪。
+### 补充: 这不是回归, 是自始存在
 
-Level 2 spec 起草中, 走完整 post_spec 审计。要求 1 (轮换 T4 + revoke `446b79`) 仍是 owner/infra 项, 不在本 cycle。要求 3 已转交 aether ([aether-plugin#11](https://forgejo.10cg.pub/10CG/aether-plugin/issues/11), 前提同样做了修正 —— 现行 skill 用的是 curl PUT 而非 `nomad var put`, 原建议不适用)。
+该性质自 secret-guard 从 SilkNode cherry-pick 引入 (`e8e847c`) 即存在, 历次 audit (Round 1-4 + 后续迭代) 均未触及。它在 #170 cycle 中被连续三方独立命中, 是因为那次有两版豁免设计**建立在「判定作用于单命令」的错误假设上**, 实测才把地基暴露出来。
+
+### 已有的现状锁定
+
+`hooks/tests/secret-guard.test.sh` 有一条 `KNOWN-LIMIT` 用例锁定 case-3 形态 (`expected=0`)。**本 issue 收口后该用例会转红**, 届时须同步更新为 `expected=2` —— 这是设计好的提示信号, 不是回归。
+
+### In-flight
+
+无相关 PR / 本地分支 / worktree。
 
 ---
 
-*更正由 `/issue-triage` 复核产生 — 教训: 「X 坏了」类 issue 在动手前必须独立核实 X 真的坏了, 上一条我拿 issue 的前提当事实用了。*
+*Generated by `/issue-triage` v1.65.5 — Ref: 10CG/aria-plugin#128*

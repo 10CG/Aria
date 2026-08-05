@@ -1,38 +1,50 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.65.1",
-  "issue_ref": "10CG/Aria#170",
-  "generated_at": "2026-08-01T16:30:19Z",
+  "triage_tool_version": "1.65.5",
+  "issue_ref": "10CG/aria-plugin#128",
+  "generated_at": "2026-08-04T01:32:14Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 170,
-      "title": "aether-build-container T4 push 凭据经 nomad var put 回显泄漏 — secret-guard 拦 curl PUT 促使改用不安全替代",
-      "body": "## Bug Report (Security — 凭据泄漏)\n\n**描述**: 用 aether-build-container skill build cesura 镜像时, T4 push 凭据 (`aria-build-bot-2026-Q3` 的 FORGEJO_BOT_USER + FORGEJO_BOT_PAT) 泄漏到 AI tool output (PostToolUse secret-scan 检测 2 个 secret-shape, 恰对应 per-run var 的 2 个 Items)。根因是 aria secret-guard 与 aether-build-container skill 的交互 + 操作者绕过。\n\n**根因链 (3 环)**:\n1. aether-build-container Step 5b-bis 原版用 `curl -X PUT .../v1/var/nomad/jobs/build-container-<id> --data-binary @<600 file> >/dev/null` 写 T4 到 per-run var — 本身安全 (PUT 上传, response 丢弃, 不回显 secret)。\n2. **aria-plugin secret-guard hook 拦截 `/v1/var/` 模式** (BLOCKED, matched `curl[^|]*/v1/var/`)。该 hook 意图拦【读】secret 到输出, 但也拦了【写】(PUT) — PUT --data-binary 写入不会把 secret 读到输出, 属**读写不分的过度拦截**。\n3. 操作者 (AI) 为绕过 guard 改用 `nomad var put @file`。但 **nomad var put 成功后回显写入的 Items 值** (实证: dummy var `{Items:{probe:X}}` → nomad var put 输出 grep 命中 1 次)。操作者用 `>/dev/null` 只挡 stdout, 回显走 stderr → 泄漏。\n\n**预期行为**: 写 per-run push 凭据 var 不应导致 secret 回显到 tool output。\n**实际行为**: T4 的 2 个 Items 值泄漏到 tool output。\n\n**影响**: T4 = `aria-build-bot-2026-Q3` (fingerprint sha256=`446b79`, write:package, cross-project: aria-build DooD runner + aether-build-container push `10cg/*`)。泄漏值已进 AI 服务商 prompt cache, 不可撤回。\n\n**要求维护方**:\n1. **安排轮换 T4** (`aria-build-bot-2026-Q3`), revoke 旧 PAT `446b79` — 存 `nomad/jobs/aria-build` 的 FORGEJO_BOT_PAT, nomad-variables backend 5-step。\n2. **修 secret-guard**: `/v1/var/` 区分读 vs 写 — `curl -X PUT/POST --data-binary` (写 var) 不应拦 (不回显 secret); 或提供安全写 var 的白名单模式。\n3. **修 aether-build-container skill/文档**: 若因 secret-guard 必须替代 curl PUT, 用 `nomad var put ... >/dev/null 2>&1` (全丢弃 stderr); 并在 skill 注明 nomad var put/get 回显 items 的坑。\n\n**已缓解**: per-run var (`build-container-<id>`) 已 purge; build 未成功 (另有独立 BUILD_ARGS 传参 bug, 与本泄漏无关)。\n\n## 环境信息\n- Aria Plugin: 1.56.1\n- Aether Plugin: 1.10.23 / Aether CLI: 1.16.62\n- OS: Linux x86_64\n- 触发: cesura repo build\n\n---\n*由 aria-report 生成 (跨 aria/aether: secret-guard=aria, build-container skill=aether, 凭据=aria-build)*",
+      "number": 128,
+      "title": "[架构] secret-guard 判定是整命令字符串扫描 — 复合命令下 credit/豁免必泄漏到其他段",
+      "body": "## 缺陷\n\n`hooks/secret-guard.sh` 的**全部**判定 (pattern 匹配 / `has_filter` credit / 任何豁免) 都基于**整条命令字符串**。shell 复合命令 (`a; b`) 下, 任一段出现的 credit 串会给**所有**段放行。\n\n实测 (当前 master):\n\n```\ncat /opt/.env; echo hi >/dev/null                       → exit=0   ← .env 读被放行\nnomad var put p1 @f1 >/dev/null; nomad var put p2 @f2    → exit=0   ← 第二条零保护\n```\n\n第二行是「一次写多个 var」的日常形态, 而它的第二段正是 aria-plugin #170 的泄漏形态本身。\n\n## 为什么现在提\n\n#170 的修复 cycle 里, 我先后提出两版豁免设计 (全局 `has_filter` credit → pattern 作用域豁免), **两版都被审计实测推翻** —— 根因都是这条: 只要判定作用于整条命令, 任何\"安全形态豁免\"都会顺着复合命令泄漏。post_spec R1/R2 共 3 方独立命中。\n\n更要命的是: **347 条全量回归对两次退化都全绿** —— 现有测试集对这一维度结构上无鉴别力。\n\n## 根治方向\n\n按 shell 分隔符 (`;` `&&` `||` `|` 换行) 切段, 逐段独立跑 pattern 匹配 + credit 判定。\n\n影响面大: 141 条 pattern 与 366 条用例的语义都要重新审视 (某些用例可能依赖当前的整命令语义)。属独立 Level 2/3 spec, 不是补丁。\n\n## 现状锁定\n\nv1.65.4 已加 `KNOWN-LIMIT` 用例锁定该行为 (`hooks/tests/secret-guard.test.sh`, 名为 `put: KNOWN-LIMIT compound credit leak`, `expected=0`)。**该用例转红 = 本 issue 已收口**, 届时须同步更新用例而非无声漂移。\n\n---\n*从 spec `secret-guard-nomad-var-put-echo` §转出 拆出 (Aria #170 cycle, post_spec R1→R4)。该 spec 刻意缩到最小范围 ship, 本项为明确让渡的部分。*",
       "state": "open",
       "labels": [],
-      "comments": [
-        {
-          "id": 17045,
-          "body": "**催办 / 阻塞升级（+9 天无响应）**\n\n本 issue 自 2026-07-22 创建至今零进展（无评论、无指派）。它正阻塞 **cesura 第 2 段部署**：\n\n- `retention` GC 代码已 ship（cesura `81cf6f7`，98 tests 绿）但**未部署** —— `run_retention` 是全域唯一 GC，未上线期间 job/cache 表 + host-vol spilled 文件**持续无限增长**，运维成本随天数累积。\n- 重 build 新镜像**硬依赖 T4（`aria-build-bot-2026-Q3`）轮换**：旧 PAT `446b79` 已泄漏待 revoke，用它 push 即将 401；轮换前不敢动手（handoff 红线）。\n\n恳请优先安排本 issue 三项要求中的**第 1 项（轮换 T4 + revoke `446b79`）** —— 这是 cesura 解阻塞的唯一前提。第 2 项（secret-guard 读写分离）与第 3 项（skill/文档修正）可后续跟进。\n\n— simonfish（cesura owner）\n",
-          "user": "simonfish",
-          "created_at": "2026-07-31T14:06:51Z"
-        }
-      ],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/170",
-      "created_at": "2026-07-22T03:19:38Z",
-      "updated_at": "2026-07-31T14:06:51Z"
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/128",
+      "created_at": "2026-08-02T16:51:08Z",
+      "updated_at": "2026-08-02T16:54:27Z"
     },
     "step2_version": {
       "collection_status": "ok",
-      "reported": "1.56.1",
-      "current": "1.65.1",
+      "reported": "1.65.4",
+      "current": "1.65.5",
       "gap": "behind"
     },
     "step3_code": {
-      "collection_status": "skipped",
-      "cited_paths": [],
-      "matches_description": null
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "hooks/secret-guard.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "hooks/tests/secret-guard.test.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
     },
     "step4_history": {
       "collection_status": "skipped",
@@ -47,7 +59,7 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "b93ed25d6004e5096ce233db97cd42a8c80905b3"
+          "head": "bf9e16d9f510d8a2cba79c44108c41a9b5bc2f57"
         }
       ]
     }
@@ -57,47 +69,47 @@
     "cases": [
       {
         "case_id": "case-1",
-        "input": "issue 环 2 原版命令逐字喂当前 hook (v1.65.1): curl -X PUT http://.../v1/var/nomad/jobs/build-container-<id> --data-binary @<file> >/dev/null",
-        "expected_behavior": "issue 声称 secret-guard BLOCKED (matched `curl[^|]*/v1/var/`), 促使操作者改用 nomad var put",
-        "actual_behavior": "exit=0 放行, 未拦截。根因: `>/dev/null` 命中 has_filter (secret-guard.sh L384-386 R2-C-10 stdout-redirect credit) 提前放行, 走不到 risky_patterns",
-        "match": false
+        "input": "baseline 对照: 单条 `cat /opt/.env` 喂 v1.65.5 hook",
+        "expected_behavior": "单命令下防护正常, 应拦",
+        "actual_behavior": "exit=2 拦住 — 单命令路径无缺陷, 确认问题只在复合命令",
+        "match": true
       },
       {
         "case_id": "case-2",
-        "input": "同命令喂 issue 报告版本 v1.56.1 的 hook (git show 0964496:hooks/secret-guard.sh, 688 行)",
-        "expected_behavior": "若因果链成立, 报告版本上应 BLOCKED",
-        "actual_behavior": "exit=0 同样放行 — 该 filter credit 自 secret-guard 引入即存在 (e8e847c cherry-pick 自 SilkNode), 两版本行为一致; issue 复述的因果链在其自报版本上亦不成立",
-        "match": false
+        "input": "`cat /opt/.env; echo hi >/dev/null` — 分号分隔, 第二段携带无关 redirect",
+        "expected_behavior": "issue 主张: 任一段的 credit 会给全部段放行",
+        "actual_behavior": "exit=0 放行。`.env` 读被一段完全无关的 `echo hi >/dev/null` 掩护 — 与 issue 逐字一致",
+        "match": true
       },
       {
         "case_id": "case-3",
-        "input": "写向 PUT 无 redirect: curl -X PUT http://nomad:4646/v1/var/x --data-binary @<file> (v1.65.1 与 v1.56.1 各跑一次)",
-        "expected_behavior": "issue 核心主张: /v1/var/ pattern 读写不分, 写向 PUT 不回显 secret 却被拦 = 过度拦截",
-        "actual_behavior": "两版本均 exit=2 BLOCKED。缺陷类别成立: risky_patterns L404-405 只匹配路径不看 HTTP 方法/数据方向, PUT/POST 写入与 GET 读取同等拦截; 对照 GET 亦 exit=2 (符合设计)",
+        "input": "`nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2` — 批量写 var 日常形态",
+        "expected_behavior": "第二条 put 无 redirect, 应被 v1.65.4 新增的 put pattern 拦",
+        "actual_behavior": "exit=0 放行 — 第二条零保护。**v1.65.4 (#170 修复) 的唯一交付物在最常见的批量写形态下等于没加**; 该段正是 #170 的泄漏形态本身",
         "match": true
       },
       {
         "case_id": "case-4",
-        "input": "操作者替代路径 nomad var put -in=json <path> @<file> >/dev/null 喂 hook (两版本)",
-        "expected_behavior": "issue 称绕过 guard 成功",
-        "actual_behavior": "exit=0 放行属实 — risky_patterns 只列 `nomad var (get|list)`, put 不在内 (设计上正确: put 不读)。绕过成立",
+        "input": "`vault read secret/x; nomad var put p @f >/dev/null` — 跨 pattern 家族",
+        "expected_behavior": "credit 泄漏是否跨家族 (非仅同族)",
+        "actual_behavior": "exit=0 放行 — vault 读被 nomad 段的 credit 掩护。证实 credit 是命令级全局, 与 pattern 家族无关",
         "match": true
       },
       {
         "case_id": "case-5",
-        "input": "环 3 回显机制: 本机 nomad CLI v1.11.2 `nomad var put --help` 的 -out/-verbose 语义 (集群不可达, 无法端到端写真 var)",
-        "expected_behavior": "issue 称 nomad var put 成功后回显 Items 值且走 stderr, 故 >/dev/null 挡不住",
-        "actual_behavior": "CLI 文档明载 -out 默认「stdout 是终端时 none, 输出被重定向时 json」— >/dev/null 恰恰触发完整变量 JSON 渲染 (含 Items), 但渲染目标是 stdout (被 /dev/null 吞); 走 stderr 的是 -verbose 档 (Provides additional information via standard error to preserve standard output)。回显风险确实存在且单 >/dev/null 不足以防, 但 issue 归因的 stderr 默认路径与 CLI 文档不符。无集群未能实测",
-        "match": null
+        "input": "分隔符覆盖: `cat /opt/.env | head -5 >/dev/null` (管道) 与 `nomad var get nomad/jobs/x && echo done >/dev/null` (&&)",
+        "expected_behavior": "issue 称 `;` `&&` `||` `|` 各类分隔符同受影响",
+        "actual_behavior": "两条均 exit=0 放行 — 管道与 && 形态同样泄漏, 非仅分号",
+        "match": true
       }
     ],
-    "hit_count": 2,
+    "hit_count": 5,
     "total_count": 5,
-    "hit_rate": "2/5"
+    "hit_rate": "5/5"
   },
-  "verdict": "partial-repro",
-  "severity": "major",
+  "verdict": "confirmed",
+  "severity": "critical",
   "recommended_action": "next-cycle",
-  "deviation_note": "核心缺陷成立但因果链与 issue 复述实质偏离。成立: (a) /v1/var/ risky pattern 读写不分, 无 redirect 的写向 PUT 被拦 (case-3 两版本 exit=2); (b) nomad var put 不在 pattern 内, 绕过成立 (case-4)。不成立: issue 给的带 >/dev/null 的原版 PUT 命令在 v1.56.1 与 v1.65.1 均不被拦 (case-1/2) — stdout-redirect filter credit 自 hook 引入即存在, 故「secret-guard 拦了这条命令促使改用 nomad var put」的具体叙述不成立 (真实被拦的应是某条无 redirect 变体)。环 3 回显方向亦有偏差: CLI 文档显示重定向触发的 JSON 渲染走 stdout, stderr 是 -verbose 档 (case-5, 无集群未实测)。修复设计须按实测因果重写, 不可照 issue 叙述直改。",
+  "deviation_note": null,
   "errors": []
 }
