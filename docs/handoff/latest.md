@@ -13,6 +13,18 @@
 
 ## 最新 handoff
 
+**[2026-08-05 — 会话收尾: #128 逐段判定 spec 四版迭代 + 本地 hook 副本清理 (零版本发布)](./2026-08-05-issue128-per-segment-spec-four-iterations.md)**
+
+- track-id: `session-close-20260804-0805-issue128-per-segment-spec` | phase: **session-close** | status: **done**
+- **主线**: aria-plugin **#128** (secret-guard 整命令扫描致复合命令 credit 泄漏, triage confirmed/**critical**/5-5) 的 **四版设计 + 三轮五席审计** (15 份报告); spec 落 **v4 待 R4**, **Phase B 未开始, 本段零 ship**
+- ⚖️ **owner 两项裁定**: (1) 性能**拉回根治** (`has_filter` 13 处转 bash 内建纳入范围) 而非靠判定重排绕开; (2) 移除本仓 `.claude/scripts/` 本地 hook 副本 (`2890b25`)
+- 🔑 **本 cycle 我有 8 条断言被审计实测推翻, 无一自查发现** —— 其中第 6 条 (把已核实的 141 改成 139) **是在修正前 5 条的那次重写里新引入的**
+- 🔑 **反事实构造纪律** (R3 tech-lead 教, 本段最有价值产出): 每条 SC 问「机制没实现这条会变红吗」→ 单轮抓出 **8 条恒绿断言**, 含自称核心锚点的 SC-6 (12 条里 5 条在恒 fallback 坏实现下同样全绿) 与 SC-4 (而 rule6_note 正拿它当 Rule #6 substitute 证据) → memory `feedback_counterfactual_test_for_every_new_sc`
+- 🔑 **「最小」≠「可靠」**: v2 缩到只切 `;` `&&` 自以为最小可靠, 实测 5/5 安全写法误报 (这两个记号大量嵌在 `{ }` / `for…done` / `[[ … && … ]]` 里)
+- 🔴 **新发现 [Aria#172](https://forgejo.10cg.pub/10CG/Aria/issues/172)**: plugin cache 停在 1.63.0 ⇒ v1.64/v1.65 全部 hook 修复在 Aria 自身运行时**从未生效**, **仓内 hook dogfood 全部失真** —— 优先级高于 #128 继续推进
+- 🔴🔴 凭据轮换 **逾期 3 天** (第十一次 surface); #170 要求 1 仍阻塞 cesura
+- 三仓双远程一致 (主仓 `a89d999`); 本段**零版本发布**
+
 **[2026-08-04 — 会话收尾: #122 碰撞 → 三次 ship → Spec 不收敛 → spike → 重写 → 双 Spec R1-fix](./2026-08-04-issue122-collision-to-dual-spec-r1fix.md)**
 
 - track-id: `aria-a1-entry-claim-guard` | phase: **session-close** | status: **done**
