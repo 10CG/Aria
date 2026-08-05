@@ -159,7 +159,7 @@ if c.linked_issue != own_linked_issue:
 
 | # | 决策 | 要点 |
 |---|------|------|
-| D1 | 比较键 = `(normalize(basename), int(number))` —— `normalize` = strip + `./_ → -` 译码 + `casefold()` (定义见 §归一规则) | **等价关系已被验证但证据不可复核**: R2 曾用 18 元语料穷举自反/对称/传递零违例, **该语料未入库、现已不存在**; R1/BA 在加入 `./_ → -` 译码后**用本 Spec 文本内的字面值重新穷举**, 同样零违例 —— 那是 R1 的实测, **不是可继承的 R2 资产** (R2 验的键是 `(repo_basename.casefold(), int(number))` —— **不含**译码、**不含** strip, 与 §审计资产继承 (a) 逐字同一写法)。⇒ **Phase B 必须建 committed fixture** (`tests/fixtures/linked_issue_corpus.txt`, 口径见 SC-7) 取代上述两次口头引用; fixture 入库前, D1 的等价关系主张按「**已论证、未留证**」计 |
+| D1 | 比较键 = `(normalize(basename), int(number))` —— `normalize` = strip + `./_ → -` 译码 + `casefold()` (定义见 §归一规则) | **等价关系已被验证但证据不可复核**: R2 曾用 18 元语料穷举自反/对称/传递零违例, **该语料未入库、现已不存在**; R1/BA 在加入 `./_ → -` 译码后**用本 Spec 文本内的字面值重新穷举**, 同样零违例 —— 那是 R1 的实测, **不是可继承的 R2 资产** (R2 验的键是 `(repo_basename.casefold(), int(number))` —— **不含**译码、**不含** strip, 与 §审计资产继承 (a) 逐字同一写法)。⇒ **Phase B 必须建 committed fixture** (`tests/fixtures/linked_issue_corpus.jsonl`, **口径见 §SC-7 fixture 口径**, U-3 已裁) 取代上述两次口头引用; fixture 入库前, D1 的等价关系主张按「**已论证、未留证**」计 |
 | D2 | `org` 不参与匹配 | advisory 下漏报昂贵、误报便宜 ⇒ fail-toward-reporting; 代价由「回显**对方**原串」兜 —— **仅半幅** (自己那一侧不在 CLI 输出中, 见 §极性段成文已知限 + SC-9), 对转述该 JSON 的下游不成立 |
 | D3 | 不可解析值退回**原串精确比较** | R2 复核: 两类不可能跨类相等, **论域被干净划分, 不破坏传递性** (此结论撤销了母 Spec R1-fix 自己的担忧) |
 | D4 | basename 轴的 fail-toward-silence **成文为已知限**, 不在本 Spec 解决 | 依据 = S4 实测**复制源总体** 0 实例 + R1-fix 实测**已落盘总体** 0 实例 (两个总体各自为 0, **非跨总体推断**); 别名表 / 书写强制均需语料决策 ⇒ 属 spike 范围 (母 Spec)。**「回显原串」半幅限度同挂本条, 见 §极性段** |
@@ -221,14 +221,40 @@ if c.linked_issue != own_linked_issue:
 | **SC-5c** ⭐ | `10CG/aria plugin#1` × `10CG/aria-plugin#1` (**段内空格**) | **不命中** | 把段内空格也译成 `-` 的**过宽**实现必红 (钉住规则 3 边界清单只授权三条重写) |
 | **SC-6** | 不可解析值的**显式配对**: (a) `#5` × `#5` ⇒ **命中**; (b) `#5` × `#7` ⇒ 不命中; (c) `10CG/#7` × `otherorg/#7` ⇒ **不命中** (原串不同, 尽管归一后会同键 —— **D3 论域划分的承重断言**); (d) `no-hash-here` × `no-hash-here` ⇒ **命中**; (e) `repo#abc` × `repo#abc` ⇒ **命中** | 全部走步骤 4 **原串精确比较**; **不抛异常**; **不因解析失败判「不匹配」** | 解析失败即 `return False` 的实现在 (a)(d)(e) 三个自配对上必红 |
 | **SC-6b** ⭐ | `number_str` 边界**配对**: `aria-plugin#+7` × `aria-plugin#7` / `aria-plugin#1_0` × `aria-plugin#10` / `aria-plugin#１２３` × `aria-plugin#123` / `aria-plugin#²` × `aria-plugin#2` 四对; 外加四个左值**各自与自身配对**; 外加 `aria-plugin#<4301 个 9>` 与自身配对 | 四对**均不命中**; 五个自配对**均命中** (原串相同, 走步骤 4); **全程不抛异常** | 裸 `int()` 的实现在前三对上命中 ⇒ 红; 裸 `isdigit()` 的实现在 `#²` 上 `int()` 抛 ValueError ⇒ 红; 「判定在前、`int()` 在后且不 catch」的实现在 4301 位自配对上抛 ValueError ⇒ 红; 「解析失败即判不匹配」的实现在五个自配对上不命中 ⇒ 红 |
-| **SC-7** | 等价关系性质: 对 **committed fixture** `tests/fixtures/linked_issue_corpus.txt` 断言自反 / 对称 / 传递 | 三性质零违例 | 非等价关系的实现 (如单向前缀匹配) 必红。**本 fixture 同时是 D1 的证据载体** (D1 引的 18 元语料已不存在)。⚠️ **判别力自陈**: 任何「算 key 再比较」的实现都自动满足三性质 ⇒ 本条是**回归护栏, 不是主判据** |
+| **SC-7** | 等价关系性质: 对 **committed fixture** `tests/fixtures/linked_issue_corpus.jsonl` 断言自反 / 对称 / 传递 | 三性质零违例 | 非等价关系的实现 (如单向前缀匹配) 必红。**本 fixture 同时是 D1 的证据载体** (D1 引的 18 元语料已不存在)。**内容与格式见 §SC-7 fixture 口径 (U-3 裁定)** —— 该节是唯一定义处, D1 与本行都只引用不重定义。⚠️ **判别力自陈**: 任何「算 key 再比较」的实现都自动满足三性质 ⇒ 本条是**回归护栏, 不是主判据** |
 | **SC-8a** | `inspect.signature(linked_issue_overlaps)` 逐字 == `(claims, own_track_id, own_linked_issue)`, 后两参**无默认值** | 逐字不变 | 改签名 / 加默认值的实现必红 |
 | **SC-8b** | 返回条目 `sorted(keys())` 逐字 == `['claimed_at','container','linked_issue','owner','session','status','track_id']` | 逐字不变 | 增删键的实现必红 |
 | **SC-8c** | 既有 **6** 条测试逐字不改全绿 + **新增 CLI 全链路 near-miss 负控** | 全绿 | 见下方 SC-8c 展开 |
 | **SC-9** ⭐ | 命中条目的 `linked_issue` 值 | **回显未归一的原始串** (如 `10CG/aria-plugin #122` 原样, 不是归一后的 key) | 把归一结果写回该键的实现必红。*(现状即如此, `collision.py:228`; 本条是冻结断言, baseline 绿)* |
 
-> 🚧 **TODO(U-3) — SC-7 的 fixture 内容口径尚未定义**。D1 说「口径见 SC-7」、SC-7 说「fixture 是 D1 的证据载体」—— **两处互指, 没人真的定义了 fixture 该装什么** (memory `feedback_verify_predicate_inputs_exist` 的形状: 判据打磨到位, 它要判的输入不存在)。
-> **编辑清单的建议 (未采纳为定案, 待 owner/主控裁)**: 至少含各族各 2 例 + SC-5/5b/5c/6/6b 的全部字面值 + R2 那 18 元的可复原部分。**Phase B 开工前必须写死, 否则 SC-7 无法实现。**
+### SC-7 fixture 口径 (U-3 裁定 2026-08-05, 解除 D1↔SC-7 互指循环)
+
+> **原问题**: D1 说「口径见 SC-7」、SC-7 说「fixture 是 D1 的证据载体」—— 两处互指, **没人定义过它装什么** (memory `feedback_verify_predicate_inputs_exist`: 判据打磨到位, 它要判的输入不存在)。以下为定案。
+
+**文件**: `skills/state-scanner/tests/fixtures/linked_issue_corpus.jsonl`
+
+**⚠️ 格式必须是 JSON Lines, 不能是裸 txt —— 有两个硬约束**:
+
+1. **`#` 是数据不是注释符**。语料每个值都含 `#`, 任何以 `#` 起注释的纯文本格式都会产生歧义。
+2. **段首尾空白是被测语义的一部分**。规则 1 的「每段各自 strip」必须可测 ⇒ 语料要能承载 `" aria-plugin#7 "` 这类值, 而裸文本行的首尾空白**会被编辑器/`git diff --check`/pre-commit 静默吃掉**, 属不可靠载体。
+
+**格式规约**: 每行一条; 空行忽略; 以 `//` 开头 (允许前导空白) 的行为注释忽略; **其余每行必须是一个合法的 JSON 字符串字面量** (`json.loads(line)` 得 `str`, 否则测试失败)。JSON 引号保证首尾空白与不可见字符**逐字节保真**。
+
+**内容 (五组, 去重后目标规模 40–80)**:
+
+| 组 | 装什么 | 为什么必须有 |
+|---|---|---|
+| **G1 六族代表** | A/B/C/D/F 各 ≥2 例 (E 族按其定义不可解析, ≥2 例) | 覆盖 §Why 六族表的每一族, 使语料与该表同步演进 |
+| **G2 SC 字面值全集** | SC-1 / 4 / 5 / 5b / 5c / 6 / 6b 表内出现的**全部**字面串 | 使 fixture 成为行为 SC 的**超集** ⇒ 等价关系断言与行为断言跑在同一论域上 |
+| **G3 跨路径边界对** | 成对的「可解析 / 不可解析」近形值 (如 `aria-plugin#7` × `aria-plugin#7x`, `10CG/#7` × `10CG/x#7`) ≥4 对 | **D3「论域被干净划分」的承重语料** —— 传递性唯一可能破的地方就是归一路径与原串路径的交界 |
+| **G4 空白变体** | 每段首尾空白的组合 (`" aria-plugin#7"` / `"aria-plugin #7 "` / `"10CG / aria-plugin#7"`) ≥4 例; 外加**段内**空白反例 ≥2 例 | 规则 1 的 strip 与 SC-5c 的段内空白禁令是一对相反断言, 两侧都要有语料 |
+| **G5 大小写 × 译码组合** | `casefold` 与 `./_ → -` 的**笛卡尔组合** (`10CG/10cg.Local#20` / `10cg/10CG_LOCAL#20` …) ≥4 例 | D1 的等价关系主张覆盖的是**复合后**的键, 单独测任一分量都不够 |
+
+**⚠️ 判别力自陈 (照抄 SC-7 的自陈, 防被误读为主判据)**: 本语料能红的实现 = 单向前缀/子串匹配 (**对称性**红) · 「解析失败即 `return False`」(不可解析值的**自反性**红) · 归一与原串两路交叉判等 (**传递性**红)。**不能**红的 = 任何「先算 key 再比较」的实现 —— 它自动满足三性质。**⇒ SC-7 是回归护栏, 主判据仍在 SC-1~6b。**
+
+**漂移守卫 (必须, memory `feedback_validator_repo_drift_guard_test`)**: 另加一条测试断言 **G2 成立** —— 即 SC-1/4/5/5b/5c/6/6b 用到的每个字面串都在语料里。否则语料会随 SC 表演进而静默失配, 变成恒绿装饰。
+
+**规模上界**: 传递性检查是 **O(n³)**, n=80 时约 5×10⁵ 次谓词调用 (秒级)。**语料超过 80 条须改用按归一键分桶的等价类检查**, 不得裸跑三重循环。
 
 **SC-8c 展开 (R1/M7 + 实读订正)**:
 
@@ -261,7 +287,7 @@ if c.linked_issue != own_linked_issue:
 | `skills/state-scanner/lib/collision.py` docstring `:182-206` | 文案同步 — 说明匹配按归一后的 `<repo>#<n>`, org 不参与; **措辞不得暗示「已穷尽核实 / 已覆盖全部别名」** |
 | `skills/state-scanner/tests/test_release_by_track.py` (既有宿主) | 扩展 — SC-1~9; 既有 6 条 (`:206-247` 4 条 + `:527-575` 2 条) 逐字不改 |
 | `skills/state-scanner/SKILL.md:176` | 文案同步 — 「同 issue 不同 track-id 的『同一件事两个名字』」补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」。**纯事实勘正 hunk, 见 rule6_note 的逐 hunk 判定** (U-2 裁定方案 A) |
-| `skills/state-scanner/tests/fixtures/linked_issue_corpus.txt` (**新建**) | SC-7 语料全集 + D1 的证据载体 (**内容口径待 U-3 裁**) |
+| `skills/state-scanner/tests/fixtures/linked_issue_corpus.jsonl` (**新建**) | SC-7 语料全集 + D1 的证据载体; **格式 = JSON Lines, 内容五组 G1–G5, 见 §SC-7 fixture 口径** (U-3 已裁)。另需一条**漂移守卫测试**断言 G2 成立 |
 | 发版 5 文件 + 主仓 gitlink | v1.66.0 MINOR |
 
 测试基线: state-scanner 现 **1322** tests, 本 change 新增按 SC 子用例下界 **≥35**。全量跨 skill 套件须绿 (`run_all_tests.sh`)。
@@ -303,7 +329,9 @@ if c.linked_issue != own_linked_issue:
 11. **rule6_note 的逐 hunk 判定论证** — U-2 裁定方案 A 后新写, 是 **Rule #6 合规论证**;
 12. **`.aria/repro/sc-baseline-linked-issue-normalization.py` 这份 baseline 留证 artifact 本身** — 2026-08-05 新建, 它是 substitute 证据面的**唯一可复核载体**, 其用例构造是否忠实于 SC 表的措辞**尚未被任何席位审过**。
 
-*(仅剩 SC-7 fixture 内容口径未定, 见 §Success Criteria 的 🚧 TODO(U-3) —— 注意它与上面第 12 项是**两份不同的语料**: 本 artifact 装的是 SC-1~9 的判定用例, U-3 那份装的是 SC-7 的等价关系语料全集。)*
+13. **§SC-7 fixture 口径 整节 (U-3 裁定)** — 2026-08-05 新写, 含 JSON Lines 格式规约、G1–G5 内容分组、漂移守卫要求、O(n³) 规模上界。**零审计记录**, 且它定义的是 D1 等价关系主张的**唯一证据载体**。
+
+*(U-1…U-6 至此全部裁定完毕。注意第 12 与第 13 项是**两份不同的语料**: 前者 (`.aria/repro/…py`) 装 SC-1~9 的判定用例, 后者 (`…corpus.jsonl`) 装 SC-7 的等价关系语料全集。)*
 
 **R3 的三条订正 (留痕)**: R3 原文是 6 项要点、**无「可实现性评估表」这一措辞**、`release-by-track` 同样无 caveat —— 上表 R3 行原写的「在其可实现性评估表中」是**合理复述非逐字引用**, 已改为不带该措辞的表述。
 
@@ -316,7 +344,7 @@ if c.linked_issue != own_linked_issue:
 **但本 Spec 的情形特殊, 提请 owner 一并裁**: 其内容已经过 R1/R2/R3 三轮审计并被逐轮确认 (见上表)。可选处置:
 
 (1) **照跑完整 post_spec**;
-(2) **定向轮 —— 审计范围 = 抽出偏差 ∪ 上文「本轮新增未审表面」清单全部 12 项** (含规则 2 的 `isascii()+isdigit()` 谓词与长度上界、统一 strip 规则、S5 译码、规则 3 的封闭重写判据与授权清单、6 条新 SC、rule6_note 的 baseline 表与逐 hunk 判定、§Why 的一对限定词、三 terminal 集合披露、六族表与结构分族规则、三总体定义、**baseline 留证 artifact 的用例构造**)。**仅**「比较键的等价关系 (R2 验过的那一版)」与「org 不参与匹配的极性」两项可凭三轮资产免审 —— **「不重审算法本体」的旧措辞在本轮已失效, 撤回**;
+(2) **定向轮 —— 审计范围 = 抽出偏差 ∪ 上文「本轮新增未审表面」清单全部 13 项** (含规则 2 的 `isascii()+isdigit()` 谓词与长度上界、统一 strip 规则、S5 译码、规则 3 的封闭重写判据与授权清单、6 条新 SC、rule6_note 的 baseline 表与逐 hunk 判定、§Why 的一对限定词、三 terminal 集合披露、六族表与结构分族规则、三总体定义、**baseline 留证 artifact 的用例构造**、**SC-7 fixture 口径整节**)。**仅**「比较键的等价关系 (R2 验过的那一版)」与「org 不参与匹配的极性」两项可凭三轮资产免审 —— **「不重审算法本体」的旧措辞在本轮已失效, 撤回**;
 (3) ~~判定审计资产可继承、免跑并留痕请复议~~ —— **已被 R1 自身证伪, 从选项中撤回** (R1 的 2 条 critical 都是「抽出/新增时引入」的, 不在被继承的三轮资产里)。
 
 ⇒ 处置 (3) 撤回; 处置 (2) 已按「本轮新增未审表面」清单重新定界 —— **旧措辞会豁免掉本轮全部零审计的承重条款, 触 Rule #10**。
@@ -332,7 +360,7 @@ R1 编辑清单 (`.aria/audit-reports/post_spec-R1-fix-editlist-linked-issue-nor
 - **`ca4db78` 实际只落了 1 处** (§极性段的 R2 24/10 口径订正), **其余 16 条从未落地** —— 2026-08-04 本轮补落。
 - **17 条 FIX 现已全部落地** (`d7c00fd` 落 14 条; owner 裁 U-2/U-5/U-6 后本轮补落 FIX-02 / FIX-11 / FIX-13)。
 - **owner 裁定留痕 (2026-08-04)**: **U-2 = 方案 A** (保留 `SKILL.md:176` 同步 + 逐 hunk 判定) · **U-5 = 第三条路** (结构分族, F 族的「形状频次 5」与「真实仓名 2」两个数各标口径、不互相冒充) · **U-6 = 12 行 / 11 值分开写**。
-- **仅剩 U-3 未裁**: SC-7 的 fixture 内容口径 (D1 与 SC-7 互指的循环), **Phase B 开工前必须写死**。
+- **U-3 已裁 (2026-08-05)**: SC-7 fixture 口径成文为独立小节 —— **JSON Lines 格式** (因 `#` 是数据、段首尾空白是被测语义, 裸 txt 不可靠) + G1–G5 五组内容 + 漂移守卫 + 规模上界。D1↔SC-7 互指循环解除, 定义处唯一。**U-1…U-6 至此全部裁定完毕。**
 - **2026-08-05 追加**: SC baseline **实跑留证已闭环** —— artifact `.aria/repro/sc-baseline-linked-issue-normalization.py`, 14/14 与表一致 (13 格脚本 + SC-8c pytest `6 passed`)。原「Phase B 须实跑留证」义务提前在 A.1 完成。**未审表面清单同步涨到 12 项** (artifact 的用例构造本身未经席位审)。
 - **本轮实跑订正的数字**: `aria-orchestrator` 全文裸 token 计数原写 `799`, 三种口径下均复现不出 ⇒ 按实跑改为 **735** (250 文件口径); 存量 ref 计数 `13` → **16**; 已落盘总体 B 族 `9` → **11**。
 - **本轮新发现 (无审计记录)**: 本仓 terminal 集合有**三个互不相同**的定义 (见 §接口面)。
