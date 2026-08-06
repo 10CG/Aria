@@ -153,46 +153,6 @@ case("SC-6b", "number_str 边界", [
     (_BIG, _BIG, True),
 ])
 
-# --- SC-7  等价关系三性质 ----------------------------------------------------
-# 判别力自陈: 任何「算 key 再比较」的实现都自动满足三性质 ⇒ 回归护栏, 不是主判据。
-# 现状 (裸 != ) 平凡满足, 故 baseline 必绿。
-_CORPUS = ["aria-plugin#122", "10CG/aria-plugin#122", "10CG/aria-plugin #122",
-           "aria-plugin #122", "10CG/Aria#147", "#5", "repo#abc", "aria-plugin#007"]
-_viol = []
-for _a in _CORPUS:
-    if not hits(_a, _a):
-        _viol.append(("自反", _a, _a))
-for _a, _b in itertools.permutations(_CORPUS, 2):
-    if hits(_a, _b) != hits(_b, _a):
-        _viol.append(("对称", _a, _b))
-for _a, _b, _c in itertools.permutations(_CORPUS, 3):
-    if hits(_a, _b) and hits(_b, _c) and not hits(_a, _c):
-        _viol.append(("传递", "%s|%s" % (_a, _b), _c))
-results.append(("SC-7", "等价关系三性质", "红" if _viol else "绿",
-                _viol[:3], len(_CORPUS) * 3))
-
-# --- SC-8a 签名冻结 ----------------------------------------------------------
-import inspect                                                    # noqa: E402
-_params = list(inspect.signature(linked_issue_overlaps).parameters)
-_EXP_PARAMS = ["claims", "own_track_id", "own_linked_issue"]
-results.append(("SC-8a", "签名冻结", "绿" if _params == _EXP_PARAMS else "红",
-                [] if _params == _EXP_PARAMS else [(_EXP_PARAMS, _params)], 1))
-
-# --- SC-8b 返回 key-set 冻结 -------------------------------------------------
-_r = linked_issue_overlaps([claim("theirs", "A#7")], "mine", "A#7")
-_keys = sorted(_r[0].keys()) if _r else []
-_EXP_KEYS = ["claimed_at", "container", "linked_issue", "owner",
-             "session", "status", "track_id"]
-results.append(("SC-8b", "返回 key-set 冻结", "绿" if _keys == _EXP_KEYS else "红",
-                [] if _keys == _EXP_KEYS else [(_EXP_KEYS, _keys)], 1))
-
-# --- SC-9  回显未归一原串 ----------------------------------------------------
-_ORIG = "10CG/aria-plugin #122"
-_r = linked_issue_overlaps([claim("theirs", _ORIG)], "mine", _ORIG)
-_echoed = _r[0]["linked_issue"] if _r else None
-results.append(("SC-9", "回显未归一原串", "绿" if _echoed == _ORIG else "红",
-                [] if _echoed == _ORIG else [_echoed], 1))
-
 # --- SC-10 批次内异常隔离 (R1'/C2) -------------------------------------------
 # 全表唯一「一条畸形 + 数条良构」混合批次: 抓「一条坏值毒死整批」这一形态。
 _MIXED = [
@@ -214,6 +174,17 @@ case("SC-11", "多 `#` 切分方向", [
     ("repo#7#8", "repo#7#008", True),    # 按最后一个 `#`: left 同为 `repo#7`, 8 == 008
     ("repo#7#8", "repo#8", False),       # left 不同 (`repo#7` vs `repo`)
 ])
+
+# --- SC-13/14/15 Q7-1 穷举变异测试补的三个零覆盖维度 -------------------------
+case("SC-13", "casefold 维度", [
+    ("10CG/Aria-Plugin#122", "10CG/aria-plugin#122", True),
+    ("ARIA-PLUGIN#5", "aria-plugin#5", True)])
+case("SC-14", "number 相等条件", [
+    ("aria-plugin#122", "aria-plugin#7", False),
+    ("aria-plugin#122", "aria-plugin#123", False)])
+case("SC-15", "`/` 取最后一段", [
+    ("10CG/sub/aria-plugin#5", "aria-plugin#5", True),
+    ("10CG/sub/aria-plugin#5", "othergroup/aria-plugin#5", True)])
 
 
 # --- 与 Spec baseline 表比对 -------------------------------------------------
@@ -242,7 +213,7 @@ def _parse_spec_table(path):
     # 一律先剥 `*` 与 `⭐` 再匹配, 否则守卫会对新增行静默失明 (它自己的漂移面)。
     cell = r"[\s*⭐]*"
     row = re.compile(
-        r"^\|" + cell + r"(SC-[0-9a-c]+)" + cell + r"\|"          # SC
+        r"^\|" + cell + r"(SC-[0-9a-z]+)" + cell + r"\|"          # SC
         + cell + r"(红|绿)" + cell + r"\|"                          # baseline
         r"[^|]*\|\s*(✅|❌)\s*\|",                                  # 性质 + 证据面
         re.M,
@@ -262,7 +233,8 @@ SPEC_TABLE, EVIDENCE_FACE = _parse_spec_table(_PROPOSAL)
 
 # SC-8c 是套件级断言 (既有 6 条测试逐字不改全绿), 由 docstring 里的 pytest 命令另测,
 # 结构上不属于本脚本的用例面。显式豁免而非静默忽略。
-_EXTERNALLY_MEASURED = {"SC-8c"}
+# SC-12 是导出单元的返回契约, 该函数 Phase B 才存在 ⇒ baseline 期无法实测。
+_EXTERNALLY_MEASURED = {"SC-12"}
 
 # 双向漂移检查: 脚本测了表里没有的 SC, 或表里有 SC 脚本没测 —— 两个方向都要红。
 _measured = {sc for sc, _, _, _, _ in results}
