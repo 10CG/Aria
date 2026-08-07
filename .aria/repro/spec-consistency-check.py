@@ -132,15 +132,18 @@ elif sc_set:
         notes.append("C4: Impact 表覆盖全部 %d 条 SC" % len(sc_set))
 
 # --- C5: 悬空 SC 引用 ---------------------------------------------------------
+# §移出范围 已于 2026-08-07 随审计轨切出 Spec。被移出的 SC 仍可能在 Spec 里被
+# 提及 (如 SC-9 恢复说明里引「R1′ 曾被移出」), 故改为显式常量 + 审计轨指针。
+MOVED_OUT = {"SC-7", "SC-8a", "SC-8b", "SC-8c"}   # SC-9 已于 R3′ 恢复, 不在此列
 moved = section("移出范围") or ""
 referenced = set(re.findall(r"SC-[0-9a-z]+", TEXT))
 moved_refs = set(re.findall(r"SC-[0-9a-z]+", moved))
-dangling = referenced - sc_set - moved_refs
+dangling = referenced - sc_set - moved_refs - MOVED_OUT
 if dangling:
     fail("C5", "被引用但既无定义、也不在 §移出范围 里说明: %s" % sorted(dangling))
 else:
     notes.append("C5: 无悬空 SC 引用 (引用 %d 种, 定义 %d, 移出说明 %d)"
-                 % (len(referenced), len(sc_set), len(moved_refs)))
+                 % (len(referenced), len(sc_set), len(moved_refs | MOVED_OUT)))
 
 # --- C6: artifact 行号引用 ----------------------------------------------------
 for m in re.finditer(r"artifact `:(\d+)(?:-(\d+))?`", TEXT):
@@ -171,8 +174,13 @@ if bl_sec:
 C8_PAT = re.compile(r"(\d{2,4})\s*篇\*{0,2}\s*tracked proposal")
 c8_hits = list(C8_PAT.finditer(TEXT))
 if not c8_hits:
-    fail("C8", "触发模式零命中 —— 本检查恒绿, 属装饰。要么文档措辞已变 (修正则), "
-               "要么该语料已移除 (删本检查)。**不允许空真通过。**")
+    # 2026-08-07: 自指语料计数 (「141 篇 tracked proposal」) 已随三总体节整体移出
+    # 至审计轨 ⇒ Spec 内零命中是**正确状态**, 非空真通过。但仍须区分「本就没有」
+    # 与「措辞漂移导致认不出」: 用一个更宽的探针确认 Spec 里确实不含任何自指语料计数。
+    if re.search(r"tracked proposal|openspec/\*/\*/\*\.md", TEXT):
+        fail("C8", "Spec 内仍有自指语料痕迹但精确模式零命中 —— 措辞可能已漂移, 修正则")
+    else:
+        notes.append("C8: Spec 内无自指语料计数 (已随三总体节移出审计轨) — 不适用")
 for m in c8_hits:
     ctx = TEXT[max(0, m.start() - 400): m.end() + 600]
     if not re.search(r"git archive|随仓增长|只承载定性|SHA", ctx):

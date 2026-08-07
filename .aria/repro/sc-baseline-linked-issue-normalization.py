@@ -153,6 +153,13 @@ case("SC-6b", "number_str 边界", [
     (_BIG, _BIG, True),
 ])
 
+# --- SC-9  回显未归一原串 (R3' 恢复: D2 极性论证的唯一守护) ------------------
+_ORIG = "10CG/aria-plugin #122"
+_r9 = linked_issue_overlaps([claim("theirs", _ORIG)], "mine", _ORIG)
+_echo = _r9[0]["linked_issue"] if _r9 else None
+results.append(("SC-9", "回显未归一原串", "绿" if _echo == _ORIG else "红",
+                [] if _echo == _ORIG else [_echo], 1))
+
 # --- SC-10 批次内异常隔离 (R1'/C2) -------------------------------------------
 # 全表唯一「一条畸形 + 数条良构」混合批次: 抓「一条坏值毒死整批」这一形态。
 _MIXED = [
