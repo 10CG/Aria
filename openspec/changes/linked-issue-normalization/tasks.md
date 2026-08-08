@@ -1,13 +1,19 @@
 # Tasks — `linked-issue-normalization`
 
 > **Spec**: [proposal.md](./proposal.md) | **审计轨**: [audit-trail](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)
-> **Level**: 3 | **Status**: 📝 **A.2 + A.3 R1-fix** (2026-08-08) — post_planning R1 五席 5/5 REVISE / verdict FAIL (3 Critical + 12 Major); 本版为 R1-fix, 待 R2
+> **Level**: 3 | **Status**: 📝 **A.2 + A.3 R2-fix (组 5 按规律重做)** (2026-08-08) — post_planning R1 5/5 REVISE·FAIL → R1-fix → R2 2 PASS/3 REVISE·FAIL; **owner 裁定停止逐条补丁, 按规律重做组 5**; 待 R3 (只审组 5)
 > **Scope**: **跨两仓** — `aria` 子模块 (代码+测试+文档+版本) + 主仓 (gitlink + 版本引用面 + Spec)
 > **ship target**: aria-plugin **v1.66.0** (MINOR — 行为面扩大)
 
 > **为什么本 Spec 从 Level 2 升 Level 3**: Q5 裁定 (owner 2026-08-06) 要求 `SKILL.md:176` 的 hunk **照跑 AB, 不走 substitute**, 并写明「本条须进 `tasks.md` 作为独立任务」。而本 Spec 当时是 Level 2 (按 CLAUDE.md 只产出 `proposal.md`) ⇒ **owner 亲裁的 Rule #6 处置唯一落地载体不存在** (R3′ 两席独立命中)。本文件解决它 —— 见 **4.1**。
 
-> **📌 编号不可变约束说明**: 2026-08-08 A.2 首次把本文件由 R3′ 手术产物 (`B-1..B-6` 表格) 重写为 checkbox 形态时, 前一版 `B-n` 从未被任何 `detailed-tasks.yaml` 的 `parent` 引用 (该文件此前不存在), 故无引用被破坏。**本次 R1-fix 只在组 5 末尾追加 5.5–5.8, 不改动任何既有编号** (1.1–1.6 / 2.1–2.3 / 3.1–3.3 / 4.1 / 5.1–5.4 语义与编号均保持)。
+> **📌 编号不可变约束 — 一次违反的更正 (2026-08-08)**
+>
+> **R1-fix 时我在此处写过「只追加 5.5–5.8, 不改动任何既有编号 (5.1–5.4 语义与编号均保持)」—— 该声明不成立, 现撤回。** 对 `a52ab81` 实测: `5.3` 由「主仓同步面 3 项」改指为「aria 子模块合并 + 双推」, `5.4` 由「i18n translated-from ×3」改指为「主仓 gitlink + VERSION + README」(即 `TASK-016`/`TASK-017` 两个 ID 被原地改指), 违 [`DUAL_LAYER_SPEC.md`](../../../aria/skills/task-planner/DUAL_LAYER_SPEC.md) §编号不可变约束; 且五份已 commit 的 R1 报告按旧含义引用这两个 ID, 造成静默错位。post_planning R2 / tech-lead N6 命中。
+>
+> **本轮 (R2-fix) 起严格执行该约束**: 组 5 的重做**不改动任何既有编号的含义** —— `5.2`–`5.8` 全部**保留编号并标 `(CANCELLED)`** 且注明被谁取代, 重做后的任务**追加为 `5.9`–`5.14`**。`TASK-015`–`TASK-021` 同样保留并标 cancelled。⇒ R1/R2 两轮共十份报告对旧 ID 的引用**继续成立**, 不再制造第二次错位。
+>
+> **A.2 首次重写的说明 (仍然成立)**: 2026-08-08 首次把本文件由 R3′ 手术产物 (`B-1..B-6` 表格) 改为 checkbox 形态时, 前一版 `B-n` 从未被任何 `detailed-tasks.yaml` 的 `parent` 引用 (该文件此前不存在), 故无引用被破坏。
 >
 > **顺带修掉的机械盲区**: 表格形态使 `handoff_autofill` 的 unfinished 扫描完全看不见本 Spec (2026-08-08 handoff §2 实证: 159 条 unfinished 里本 Spec 零条)。checkbox 形态后该盲区对本 Spec 消失; **该 backstop 对非 checkbox 形态 tasks 的失明本身是插件侧待修项**, 不在本 Spec 范围。
 
@@ -18,11 +24,12 @@
 | 阶段 | 归属 | 理由 |
 |------|------|------|
 | Phase B 实施 + 组 1–4 | **本文件** | change 自身的交付物 |
-| **发版同步面 (组 5)** | **本文件** | 版本 bump 与版本引用面是本 change 的交付物之一 (proposal §Impact 已列), 不是 Phase C 的通用动作 |
+| **版本引用面编辑 + 双向断言 (组 5)** | **本文件** | 版本号本身是本 change 的交付物 (proposal §Impact 已列) |
+| **aria 子模块合并 + 双远程推送** | **`phase-c-integrator` C.2.5**, 不在本文件 (**owner 裁定 2026-08-08**) | R1-fix 曾把它写成 TASK-016 手工步骤 ⇒ **绕开两个默认开的闸门** (`pre_merge_gate.enabled=true` Rule #8 + `submodule_gate.mode="block"`), 而该 Skill (SKILL.md:242) 本就建模子模块合并。R2/tech-lead N1 判为 Rule #10 违规 |
 | **Phase C**: PR 创建 / **pre-merge gate (Rule #8)** / merge | **`phase-c-integrator`**, 不在本文件 | 通用流程, 由该 Skill 的 C.2.4 承担 (CI passing + main 无 in-flight run); 本文件不复述其判据 |
 | **Phase D**: cycle 进度更新 / **Spec 归档** / **周期 handoff (Rule #9)** | **`phase-d-closer`**, 不在本文件 | 同上; 归档门会消费本文件全部 checkbox 状态, 故组 5 必须真做完而非声称 |
 
-**⚠️ 组 5 与 Phase C 的时序**: 组 5 的 aria 子模块 bump + 合并 (5.2/5.3) 必须**先于**主仓 gitlink bump (5.4) —— 否则 gitlink 指向未合并的 feature SHA, 产生 orphaned gitlink (CLAUDE.md 多远程硬约束 1, 2026-07-14 事故形状)。主仓自身的 PR 走 Phase C。
+**⚠️ 组 5 与 Phase C 的交接**: 本文件只做**版本面编辑 + 双向断言** (5.9–5.11), 断言必须在**交付 Phase C 之前**通过 —— 这样任何计数错都在**可回退点之前**发红 (R1-fix 曾把断言排在合并双推之后, R2/tech-lead N4 命中)。断言过后由 **5.13** 交付给 `phase-c-integrator`: 由它做 aria 子模块合并 + 双推 + 主仓 gitlink bump + PR + pre-merge gate。**gitlink 必须指向合并后的 `master` SHA, 这条约束随交接一并移交, 由 C.2.5 的既有机制保证。**
 
 ---
 
@@ -34,9 +41,9 @@
 | **2** | 实现 (GREEN) — 归一谓词 + 导出单元 + 守卫 | proposal §What Changes 五步 · D7 · D9 |
 | **3** | 文档同步 ×3 (两处 substitute + 一处 AB) | proposal §Impact · rule6_note 逐 hunk 表 |
 | **4** | Rule #6 AB (⛔ 不豁免) | Q5 裁定 (owner 2026-08-06) |
-| **5** | 回归 + 发版同步面 + 留证工件处置 | proposal §Impact + post_planning R1 三条 Critical |
+| **5** | 回归 + **版本引用面 (按引用点而非文件数)** + 双向断言 + 留证工件处置 + 交付 Phase C | proposal §Impact + post_planning R1/R2 五条 Critical |
 
-**排序依据**: 组 1 → 组 2 是 RED-first (SC 的 baseline-failing 状态已于 A.1 实跑留证)。**例外: 1.6 (SC-12) 反向依赖 2.1** —— 被测函数 `normalize_linked_issue` 在 2.1 之前不存在, 测试连 import 都不成立, 故 1.6 排在 2.1 之后。组 3 依赖 2.2/2.3 (**3.1 与组 2 同文件, 必须串行**)。**3.3 必须早于 4.1** (AB 测的是该 hunk 的行为影响)。组 5 gate 在组 1–4 全绿之后, 内部按 5.1 → 5.2 → 5.3 → 5.4 → {5.5, 5.6} → 5.7 串。**5.8 例外: 可在 2.3 之后任意时点执行** (它自 2.2 落地即恒红, 不必等发版), 排在末位仅为阅读顺序 —— 依赖字段以 `detailed-tasks.yaml` 为准。
+**排序依据**: 组 1 → 组 2 是 RED-first (SC 的 baseline-failing 状态已于 A.1 实跑留证)。**例外: 1.6 (SC-12) 反向依赖 2.1** —— 被测函数 `normalize_linked_issue` 在 2.1 之前不存在, 测试连 import 都不成立, 故 1.6 排在 2.1 之后。组 3 依赖 2.2/2.3 (**3.1 与组 2 同文件, 必须串行**)。**3.3 必须早于 4.1** (AB 测的是该 hunk 的行为影响)。组 5 gate 在组 1–4 全绿之后, 内部按 **5.1 → 5.9 → 5.10 → 5.11 → 5.13** 串 (`5.2`–`5.8` 已 CANCELLED, 见组 5 段首)。**5.12 例外: 可在 2.3 之后任意时点执行** (`sc-baseline` 脚本自 2.2 落地即恒红, 不必等发版)。**5.14 例外: 与 4.1 同批, 早于 5.13**。依赖字段以 `detailed-tasks.yaml` 为准。
 
 ---
 
@@ -73,33 +80,66 @@
       > **判据 (不得只判「跑了」)**: 按 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` 发版前清单 —— (a) `with_skill` 表现优于 `without_skill`; (b) **无 `WITHOUT_BETTER` verdict** (有则必须修复); (c) 与上次结果比对无回归; (d) `summary.yaml` 已生成并审查。
       > **若判定该 hunk 落在套件覆盖外**: 按 CLAUDE.md Rule #6 表第三行走**三件套** —— 点名行为 + 建可证伪定向 fixture + 套件缺口开 issue (参 aria-plugin #117 / #127); **三件缺一则照跑, 不得静默豁免** (Rule #10)。
 
-## 5. 回归 + 发版同步面 + 留证工件处置
+## 5. 回归 + 版本引用面 + 双向断言 + 留证处置 + 交付 Phase C
+
+> **📌 本组已于 2026-08-08 按 owner 裁定「停止逐条补丁、按规律重做」整组重derive。**
+> `5.2`–`5.8` **保留编号并标 CANCELLED** (编号不可变约束; R1/R2 十份报告对 `TASK-015`–`TASK-021` 的引用继续成立)。
+>
+> **为什么整组重做而不是继续补**: post_planning R2 五席测出 2C + 11M, 对比 R1 的 3C + 12M **基本持平**, 且 fix 引入占比经两席独立测算为 **83% / 62%** (均 >1/2) ⇒ 边际产出已转负 (memory `feedback_audit_marginal_return_goes_negative` + `feedback_stop_adding_rounds_when_major_count_flattens` 双向点亮)。三席从三个不同轴 (fix 改坏了什么 / 缺陷迁到哪层 / 同形状扫没扫完) 都指向同一结论: **组 5 是按错误维度 (文件数) 枚举出来的, 逐条补丁只会沿接缝再生产缺陷。**
+>
+> **重做的维度**: 发版同步面的正确单位是**版本引用点**, 不是文件数; 且**版本史类文件 (append-only 账本) 的不变量与普通文件不同** —— 前者是「头部当前版本行 == SOT」, 后者是「旧值零命中 + 新值计数匹配」。R1-fix 把两类混在一条零命中断言里, 造出一个恒红 (R2/tech-lead N2)。
+
+### 现行 — 5.1
 
 - [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors**; 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
-      > ⛔ **不得用 `Ran N` 数换算子用例**: 45 是**场景数**, `Ran` 数的是 test 方法数, 两者单位不同 (既有 `test_invalid_shapes_and_paths` = 1 方法 4 场景)。子用例齐备性判据 = **逐 SC 清单核对 17 条 SC 各自的场景全部落盘**, 与 `Ran` 数无关。
-      > ⚠️ 环境陷阱: 单模块模式与 pytest 对 `test_collision.py` 会给 ImportError —— 那是 aria-plugin **#134** 的既有 bug (破 70 天), 非本 change 回归。验收一律以 `tests/` 内**全量** `run_tests.py` 为准。
-- [ ] 5.2 **aria 子模块** 5 文件 bump 到 **v1.66.0** — `.claude-plugin/plugin.json` (版本 SOT) / `.claude-plugin/marketplace.json` / `VERSION` / `CHANGELOG.md` / `README.md`
-- [ ] 5.3 **aria 子模块分支合并 + 双远程推送** — 本地 `git merge` 到 `master` (⛔ **禁** Forgejo Web UI / API 的服务端 merge) → `git push origin && git push github` → **逐个 `git ls-remote <remote> master` 取 SHA 与本地比对, 全部一致才算成功**
-      > 依据 CLAUDE.md「多远程推送 — 两条硬约束」。服务端合并会使本地 master 从未 fast-forward ⇒ 双推与 C.2.5 结构上都不触发 ⇒ 主仓随后 bump gitlink 即产生 orphaned gitlink, GitHub `clone --recursive` 断裂 (2026-07-14 事故)。**push 回执两个方向都会骗人, 必须独立 `ls-remote`。**
-- [ ] 5.4 **主仓** gitlink + `VERSION` 子模块版本表行 + `README.md` **两处**版本引用 (badge + `Plugin Version:` 行)
-      > gitlink 必须指向 aria 子模块 **5.3 合并后的 `master` SHA**, 不是 feature 分支 SHA。
-- [ ] 5.5 **主仓 i18n README ×3** — `README.{zh,ja,ko}.md` 各 **3 处**版本引用 (`translated-from` 标记 + badge + `Plugin Version:` 行)
-      > #140 B 档: 正文无实质变更时**只更这三处标记/版本, 不重译正文**。
-- [ ] 5.6 **`CLAUDE.md` 两处版本引用** — 版本区间行 (`v1.52.0–v1.65.5 已 ship`) + 「版本:」行的 `插件 aria-plugin v1.65.5`
-      > ⚠️ 只改这两处数字。**不得**把本 Spec 的设计术语写进 CLAUDE.md (污染 AB baseline, aria-plugin #116); 「项目状态」段是覆写非追加, 预算 15-20 行。
-- [ ] 5.7 **版本引用点归零机械断言** (post_planning R1 Critical-1 的根因修法) — bump 完成后执行:
-      ```
-      grep -rn "1\.65\.5" README.md README.zh.md README.ja.md README.ko.md CLAUDE.md VERSION \
-                          aria/.claude-plugin/plugin.json aria/.claude-plugin/marketplace.json \
-                          aria/VERSION aria/README.md
-      ```
-      **必须零命中** (`aria/CHANGELOG.md` 显式排除 —— 它是版本史, 保留旧版本号是正确的)。
-      > **为什么需要这一条**: 5.2–5.6 是按**文件**枚举, 而错误的维度是**版本引用点**。两条 enabled check 对此结构性失明 —— `m6-version-badge-match` 只比 `README.md` 的 badge, `i18n-readme-translation-currency` 只比 `translated-from` 标记 ⇒ **`README.md` 的 `Plugin Version:` 行 + i18n ×3 的 badge 与 `Plugin Version:` 行共 7 处残留 v1.65.5 时两条 check 仍全绿** (post_planning R1 实测 14 个主仓引用点)。本条是唯一**维度匹配**的判据 (memory `feedback_invariant_dimension_must_match_error_dimension`)。
-      > **同时跑不带路径的 `git status`** 核验实际落地面 (memory `feedback_scoped_git_add_splits_claim_from_landing` —— 该形状本项目一天内两次实证)。
-- [ ] 5.8 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 该脚本断言 8 条 SC 处于 **baseline-failing (红)** 状态; 2.2 落地后它们全部转绿 ⇒ 脚本 `:277` `sys.exit(1)` **恒红**
-      > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`), 而它是 substitute 论证**唯一可复核的留证载体**。两条路择一并成文: (a) 加「post-implementation 模式」使其在实现后断言**转绿**并保留 baseline 结果为存档; (b) 显式退役并把 baseline 结果冻结成一份带 SHA 的存档报告, 脚本本身移出 `.aria/repro/`。**不得留成恒红。**
+      > ⛔ **不得用 `Ran N` 数换算场景数**: 45 是**场景数**, `Ran` 数的是 test 方法数 (既有 `test_invalid_shapes_and_paths` = 1 方法 4 场景)。场景齐备性判据 = **逐 SC 清单核对 17 条 SC 的场景全部落盘**, 与 `Ran` 数正交。
+      > ⚠️ 环境陷阱: 单模块模式与 pytest 对 `test_collision.py` 会给 ImportError —— aria-plugin **#134** 的既有 bug (破 70 天), 非本 change 回归。验收一律以 `tests/` 内**全量** `run_tests.py` 为准。
 
----
+### CANCELLED (编号保留, 勿复用)
+
+- [ ] ~~5.2 aria 子模块 5 文件 bump~~ **(CANCELLED)** → 由 **5.9** 取代 (按引用点重derive, 补 `marketplace.json` 第二个 version 字段)
+- [ ] ~~5.3 aria 子模块分支合并 + 双推~~ **(CANCELLED — owner 裁定 2026-08-08)** → **委派 `phase-c-integrator` C.2.5**, 见 **5.13**。理由: 手写它绕开 `pre_merge_gate` (Rule #8) 与 `submodule_gate=block` 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
+- [ ] ~~5.4 主仓 gitlink + VERSION + README 两处~~ **(CANCELLED)** → 版本面归 **5.10**; gitlink 归 **5.13** (随合并一并移交)
+- [ ] ~~5.5 主仓 i18n README ×3~~ **(CANCELLED)** → 并入 **5.10**
+- [ ] ~~5.6 CLAUDE.md 两处版本引用~~ **(CANCELLED)** → 并入 **5.10**
+- [ ] ~~5.7 版本引用点归零机械断言~~ **(CANCELLED)** → 由 **5.11** 取代。原条三处坏: 含 `aria/VERSION` (append-only 发布账本) ⇒ **恒红**; 只断言旧值缺席不断言新值出现 ⇒ 写错新版本号免疫; 排在合并双推**之后** ⇒ 只可能在不可回退点之后发红
+- [ ] ~~5.8 sc-baseline 脚本处置~~ **(CANCELLED)** → 由 **5.12** 取代 (补归档后 `FATAL` 分支)
+
+### 现行 — 5.9 起 (取代上方 CANCELLED)
+
+- [ ] 5.9 **aria 子模块版本面** bump 到 v1.66.0 — **按引用点枚举, 不按文件数**
+      > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, **历史行原样保留**) · `CHANGELOG.md` (**追加**条目, 历史保留)
+      > CHANGELOG 与 README 措辞: **不得写成「已覆盖全部别名」** —— basename 截断轴是成文已知限, 写错等于对外抹掉它。
+      > MINOR 而非 PATCH (行为面扩大)。
+
+- [ ] 5.10 **主仓版本引用面** — 14 个引用点, 逐点改
+      > `VERSION` :24 子模块表行 (1) · `README.md` badge + `Plugin Version:` 行 (2) · `README.{zh,ja,ko}.md` 各 `translated-from` + badge + `Plugin Version:` 行 (**9**) · `CLAUDE.md` 版本区间行 + 「版本:」行 (2)
+      > i18n 按 #140 B 档: 正文无实质变更 ⇒ **只改这三处, 不重译正文**。
+      > CLAUDE.md: **只改数字**。不得把本 Spec 设计术语写进去 (污染 AB baseline, aria-plugin #116); 「项目状态」段覆写非追加、预算 15-20 行 (`claude-md-hygiene.md`)。
+
+- [ ] 5.11 **版本引用面双向断言** — **必须在 5.13 交付 Phase C 之前通过** (可回退点之前)
+      > **两类文件两种不变量, 不得混判**:
+      > 1. **普通引用文件** (主仓 `VERSION` / `README*.md` / `CLAUDE.md`, aria `plugin.json` / `marketplace.json` / `README.md`): 旧值 `1.65.5` **零命中** **且** 新值 `1.66.0` 出现次数 **等于**该文件的预期点数 (先枚举预期值再断言, 不是只查缺席)。
+      > 2. **append-only 版本史** (`aria/VERSION` / `aria/CHANGELOG.md`): **不做零命中** (历史保留旧版本号是正确的) —— 判据是**头部「当前版本」行 == `plugin.json` 的版本**。
+      > ⛔ 只断言旧值缺席是**缺席断言**, 维度只对一半: 删行或写错新版本号都判绿 (R2/tech-lead N3)。
+      > 同时跑**不带路径**的 `git status` 核验实际落地面与声称一致 (memory `feedback_scoped_git_add_splits_claim_from_landing`)。
+      > **为什么两条 enabled check 不够**: `m6-version-badge-match` 只比 `README.md` 的 badge, `i18n-readme-translation-currency` 只比 `translated-from` 标记 ⇒ 主仓 7 处 (`README.md` 的 `Plugin Version:` 行 + i18n ×3 的 badge 与 `Plugin Version:` 行) 残留旧版本时两条 check 仍全绿 = 假绿 (R1/code-reviewer Critical-1 实测)。本条是唯一维度匹配的判据。
+
+- [ ] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红
+      > 该脚本 `:275-277` 断言那 8 条 SC 处于 **baseline-failing (红)**; 2.2 落地后它们转绿 ⇒ **恒红**。且它从 `proposal.md` **现场解析** (`:205-215` FATAL fail-CLOSED) ⇒ Spec 归档后**换一种恒红**。两条失效路径都要处理。
+      > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同时修 `proposal.md:181/:219` 两处 artifact 指针**避免 dangling。
+      > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
+
+- [ ] 5.13 **交付 `phase-c-integrator`** (Phase C 委派点)
+      > 交出去的是: aria 子模块**分支合并 + 双远程推送 + 逐远端 `ls-remote` 核验** + 主仓 **gitlink bump** (须指向合并后 `master` SHA) + PR + **pre-merge gate (Rule #8, C.2.4)**。这些**不在本文件复述判据** —— 由该 Skill 的既有机制与闸门保证 (owner 裁定 2026-08-08)。
+      > 本任务的验收只有两条: (1) **5.11 已通过**; (2) 交接时把「aria 侧已 bump 但未合并」这一状态显式告知, 使 C.2.5 知道要合并哪个分支。
+      > **推送授权 (AI 建议, 待 owner 确认)**: 推共享 master 属外向且难撤销动作, 按 memory `feedback_sync_instruction_not_push_authorization` **每次推前须 owner 显式确认**; AI 可执行但不得自我授权。*(注: R2/tech-lead 以 AD10 论证「须标 `agent: owner`」—— 该论据不成立, AD10 (`architecture-decisions.md:752-756`) 治的是 Aria 2.0 无人值守流水线的 `S7_AWAITING_MERGE`, 不治交互式 session 的 Phase C。真正管这件事的是上述 memory。)*
+
+- [ ] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
+      > **事实**: `AB_TEST_OPERATIONS.md:396` 逐字为「Tier 1: 核心 Skills (**10 个**, 每次发版必测)」, state-scanner 在内; 发版前清单 `:545` 要求「Tier 1 Skills 全量 AB 测试已执行」。而 4.1 只跑 `SKILL.md:176` 单个 hunk 的定向 AB。
+      > **AI 建议**: 单 hunk 定向 AB + **成文披露「本次未跑 Tier 1 全量」** + 开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订。
+      > **理由**: 两次先例的单 skill Rule #6 run 均未跑 Tier 1 全量、均无 `summary.yaml` ⇒ 已是**事实上的偏离**; 按 memory `feedback_written_exception_exact_condition_match`「**N 次非正式援引 ≠ 成文 lane**」, 第三次不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但**测不到要测的东西** (#117 / #127 的套件缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。
+      > ⛔ 无论走哪条, **不得**以「改动小 / 纯括注 / 性价比」为由降级 —— Q5 是 owner 亲裁 (Rule #10)。
 
 ## ⚠️ Phase B 开工前必读 — 三条已知限 (不修, 成文)
 

@@ -3,9 +3,15 @@
 # Spec: openspec/changes/linked-issue-normalization/{proposal.md,tasks.md}
 # Audit trail (append-only, 不维护与 Spec 一致性): .aria/audit-reports/linked-issue-normalization-audit-trail.md
 #
-# 版本: R1-fix (2026-08-08). post_planning R1 五席 5/5 REVISE / verdict FAIL
-#   (3 Critical + 12 Major 去重后)。本版逐条吸收, 待 R2。
+# 版本: R2-fix (2026-08-08) — 组 5 按规律整组重derive (owner 裁定)。
+#   R1 五席 5/5 REVISE / FAIL (3C + 12M) → R1-fix → R2 2 PASS / 3 REVISE / FAIL (2C + 11M)。
 #   R1 报告: .aria/audit-reports/post_planning-R1-1786178267137-linked-issue-normalization-*.md
+#   R2 报告: .aria/audit-reports/post_planning-R2-1786182330124-linked-issue-normalization-*.md
+#   决策单: .aria/decisions/2026-08-08-post-planning-inflection-owner-decision-sheet.md
+#
+# ⚠️ 编号不可变: TASK-015..021 保留编号标 cancelled (含义冻结, 使 R1/R2 十份报告的引用
+#   继续成立); 重做后的任务追加为 TASK-022..027。R1-fix 曾原地改指 TASK-016/017 造成
+#   十份报告静默错位 (R2/tech-lead N6), 本版不再重犯。
 
 metadata:
   feature: linked-issue-normalization
@@ -30,26 +36,38 @@ metadata:
     裸 `VERSION` / `README.md` 指主仓那一份 (aria 子模块内同名文件另有其路径)。
 
   ship_target: "aria-plugin v1.66.0 (MINOR — 行为面扩大)"
-  total_tasks: 21
+  total_tasks: 27   # 20 active + 7 cancelled (编号保留, 见 cancelled_ledger)
   task_groups: 5
-  status: "A.2 + A.3 R1-fix 2026-08-08 — post_planning R1 verdict FAIL 已逐条吸收; 待 R2"
+  status: >
+    A.2 + A.3 **R2-fix (组 5 按规律整组重derive)** 2026-08-08 — post_planning R1 5/5 REVISE·FAIL
+    → R1-fix → R2 2 PASS / 3 REVISE·FAIL (2C + 11M, 对比 R1 3C + 12M 基本持平; fix 引入占比
+    两席独立测算 83% / 62% 均 >1/2 ⇒ 拐点已过)。**owner 裁定 2026-08-08: 停止逐条补丁, 按规律
+    重做组 5; 删 TASK-016 委派 phase-c-integrator。** 待 R3 (只审组 5)。
   new_agents_required: false
   agent_roster: [qa-engineer, backend-architect, knowledge-manager]
 
   # R1/tech-lead F3 fix: 显式声明本文件的范围边界
   scope_boundary:
-    in_this_file: "Phase B 实施 (组 1-4) + 发版同步面与留证工件处置 (组 5)"
+    in_this_file: "Phase B 实施 (组 1-4) + 版本引用面编辑与双向断言与留证处置 (组 5)"
     delegated:
       - who: "phase-c-integrator"
-        what: "Phase C — PR 创建 / pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run) / merge"
-        why: "通用流程, 本文件不复述其判据"
+        what: >
+          Phase C — **aria 子模块分支合并 + 双远程推送 + 逐远端 ls-remote 核验** (C.2.5) +
+          **主仓 gitlink bump** (须指向合并后 master SHA) + PR 创建 +
+          pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)
+        why: >
+          **owner 裁定 2026-08-08**。R1-fix 曾把子模块合并写成 TASK-016 的手工步骤 ⇒ 绕开两个
+          默认开的闸门 (`pre_merge_gate.enabled=true` Rule #8 + `submodule_gate.mode="block"`),
+          而该 Skill (SKILL.md:242) 本就建模子模块合并, C.2.5 正是 TASK-016 手工重写的东西。
+          R2/tech-lead N1 判为 Rule #10 违规。本文件不复述其判据。交接点 = TASK-026。
       - who: "phase-d-closer"
         what: "Phase D — cycle 进度更新 / Spec 归档 / 周期 handoff (Rule #9)"
-        why: "同上; 归档门会消费本文件全部 21 个 checkbox 状态, 故组 5 必须真做完而非声称"
+        why: "同上; 归档门会消费本文件全部 27 个 checkbox 状态 (20 active + 7 cancelled), 故组 5 必须真做完而非声称"
     why_group5_is_here: >
-      版本 bump 与版本引用面是本 change 自身的交付物 (proposal §Impact 已列), 不是 Phase C
-      的通用动作。组 5 的 aria 子模块 bump+合并 (5.2/5.3) 必须先于主仓 gitlink bump (5.4),
-      否则 gitlink 指向未合并的 feature SHA ⇒ orphaned gitlink (2026-07-14 事故形状)。
+      **版本号本身**是本 change 的交付物 (proposal §Impact 已列) ⇒ 版本面编辑 (TASK-022/023)
+      与双向断言 (TASK-024) 在本文件。**合并 / 双推 / gitlink 不在本文件** (见 delegated)。
+      断言必须在交付 Phase C **之前**通过 —— 这样任何计数错都在**可回退点之前**发红
+      (R1-fix 曾把断言排在合并双推之后, R2/tech-lead N4 命中)。
 
   spec_maturity_note: >
     proposal.md 已过 post_spec R1'/R2'/R3' 三轮 × 五席 (均 5/5 REVISE), 但三轮实测算法本体
@@ -94,7 +112,22 @@ metadata:
       m6-version-badge-match 只比 README.md 的 badge; i18n-readme-translation-currency
       只比 translated-from 标记 ⇒ README.md 的 "Plugin Version:" 行 + i18n ×3 的 badge 与
       "Plugin Version:" 行共 **7 处**残留旧版本时两条 enabled check 仍全绿 = 假绿。
-    mechanical_fix: "TASK-020 的零命中断言 — 唯一维度匹配的判据 (memory feedback_invariant_dimension_must_match_error_dimension)"
+    mechanical_fix: "TASK-024 的**双向**断言 — 唯一维度匹配的判据 (memory feedback_invariant_dimension_must_match_error_dimension)"
+    two_classes_of_file:
+      # R2/tech-lead N2 + code-reviewer N-1: R1-fix 把两类混在一条零命中断言里, 造出恒红
+      normal_reference:
+        files: ["VERSION", "README.md", "README.zh.md", "README.ja.md", "README.ko.md", "CLAUDE.md",
+                "aria/.claude-plugin/plugin.json", "aria/.claude-plugin/marketplace.json", "aria/README.md"]
+        invariant: "旧值零命中 **且** 新值出现次数 == 该文件预期点数 (先枚举预期值再断言)"
+      append_only_ledger:
+        files: ["aria/VERSION", "aria/CHANGELOG.md"]
+        invariant: "**不做零命中** (历史保留旧版本号是正确的) —— 判据是头部「当前版本」行 == plugin.json"
+        why: >
+          aria/VERSION 实测 167 行, `发布日期(旧)` 堆叠回溯至 v1.47.0, `:58` 还有裸 1.47.0。
+          对它要求旧值零命中 ⇒ 要么恒红要么迫使销毁发布注 —— 而恒红正是 TASK-025 要杀的对偶。
+      one_sided_assertion_is_half_dimension: >
+        只断言旧值缺席是**缺席断言**: 删行 / 写错新版本号都判绿 (R2/tech-lead N3)。故必须双向。
+    aria_side_points: "4 个普通引用点文件中 marketplace.json 含 **2** 个 version 字段 (:3/:16) — R1-fix 按文件数算漏一处"
 
   known_env_trap:
     issue: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/134"
@@ -464,7 +497,11 @@ tasks:
     parent: "5.2"
     task_group: TG-5
     title: "aria 子模块 5 文件 bump 到 v1.66.0"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-022"
+    cancel_reason: >
+      按引用点重derive (补 marketplace.json 第二个 version 字段 + aria/VERSION 改为账本口径)
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -485,7 +522,11 @@ tasks:
     parent: "5.3"
     task_group: TG-5
     title: "aria 子模块分支合并 + 双远程推送 + 逐远端 ls-remote 核验"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "phase-c-integrator C.2.5"
+    cancel_reason: >
+      owner 裁定 2026-08-08 委派 — 手写它绕开 pre_merge_gate (Rule #8) 与 submodule_gate=block 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -511,7 +552,11 @@ tasks:
     parent: "5.4"
     task_group: TG-5
     title: "主仓 gitlink + VERSION 子模块表行 + README.md 两处版本引用"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-023 (版本面) + TASK-026 (gitlink)"
+    cancel_reason: >
+      版本面归 023; gitlink 随合并一并移交 Phase C
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -532,7 +577,11 @@ tasks:
     parent: "5.5"
     task_group: TG-5
     title: "主仓 i18n README ×3 — 各 3 处版本引用 (translated-from + badge + Plugin Version 行)"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-023"
+    cancel_reason: >
+      并入主仓版本引用面
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -555,7 +604,11 @@ tasks:
     parent: "5.6"
     task_group: TG-5
     title: "CLAUDE.md 两处版本引用"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-023"
+    cancel_reason: >
+      并入主仓版本引用面
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -575,7 +628,11 @@ tasks:
     parent: "5.7"
     task_group: TG-5
     title: "版本引用点归零机械断言 (Critical-1 的根因修法)"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-024"
+    cancel_reason: >
+      原条三处坏: 含 append-only 账本 aria/VERSION ⇒ 恒红; 缺席断言维度只对一半; 排在合并双推之后 ⇒ 只可能在不可回退点之后发红
     complexity: S
     est_hours: 3
     agent: qa-engineer
@@ -602,7 +659,11 @@ tasks:
     parent: "5.8"
     task_group: TG-5
     title: "sc-baseline 留证脚本处置 — 不得留成恒红"
-    status: pending
+    status: cancelled
+    cancelled_at: "2026-08-08 (R2-fix)"
+    superseded_by: "TASK-025"
+    cancel_reason: >
+      补归档后 proposal.md 解析 FATAL 这第二条失效路径
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -623,39 +684,188 @@ tasks:
       全程在打这个对偶, 不能自己留一个。
       **依赖 TASK-009 即可执行, 不必等发版** (tasks.md 把它排在 5.8 仅为阅读顺序)。
 
+
 # ---------------------------------------------------------------------------
-# 依赖图 (DAG) — 与上方 dependencies 字段逐条一致 (R1 minor: 首版图与字段不符)
+# TG-5 现行任务 (R2-fix 按规律重derive; 取代 cancelled 的 TASK-015..021)
+# ---------------------------------------------------------------------------
+  - id: TASK-022
+    parent: "5.9"
+    task_group: TG-5
+    title: "aria 子模块版本面 bump 到 v1.66.0 — 按引用点枚举"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-014]
+    deliverables:
+      - aria/.claude-plugin/plugin.json          # 版本 SOT (1 点)
+      - aria/.claude-plugin/marketplace.json     # **2 点**: :3 与 :16 两个 version 字段
+      - aria/README.md
+      - aria/VERSION                             # append-only 账本 — 只改头部当前版本行 + 追加发布注
+      - aria/CHANGELOG.md                        # 追加条目, 历史保留
+    verification:
+      - "plugin.json 为 SOT; marketplace.json **两个** version 字段都已改 (:3 与 :16)"
+      - "aria/VERSION: 头部「当前版本」行 == plugin.json; **历史行原样保留** (它是 append-only 账本)"
+      - "aria/CHANGELOG.md 为**追加**条目, 未改写历史"
+      - "CHANGELOG 与 README 措辞不得写成「已覆盖全部别名」— basename 截断轴是成文已知限"
+      - "MINOR 而非 PATCH (行为面扩大)"
+    notes: >
+      取代 TASK-015。两处修正: (1) marketplace.json 有 **2** 个 version 字段, 按文件数算会漏一处
+      (R2/code-reviewer N-2); (2) aria/VERSION 实测 167 行是 append-only 发布账本, 不能按普通
+      引用文件处理 (R2/tech-lead N2)。
+
+  - id: TASK-023
+    parent: "5.10"
+    task_group: TG-5
+    title: "主仓版本引用面 — 14 个引用点逐点改"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-022]
+    deliverables:
+      - VERSION             # :24 子模块表行 (1 点)
+      - README.md           # badge + "Plugin Version:" 行 (2 点)
+      - README.zh.md        # translated-from + badge + "Plugin Version:" 行 (3 点)
+      - README.ja.md        # 同 (3 点)
+      - README.ko.md        # 同 (3 点)
+      - CLAUDE.md           # 版本区间行 + 「版本:」行 (2 点)
+    verification:
+      - "14 个引用点全部更新 (1 + 2 + 3 + 3 + 3 + 2), 逐点核对而非逐文件"
+      - "i18n 按 #140 B 档: 正文无实质变更 ⇒ 只改这三处, **不重译正文**"
+      - "CLAUDE.md 只改数字; 未把本 Spec 设计术语写进去 (污染 AB baseline, aria-plugin #116)"
+      - "CLAUDE.md「项目状态」段仍在 15-20 行预算内且为覆写非追加 (claude-md-hygiene.md §2.4)"
+    notes: >
+      取代 TASK-017/018/019 三条 (原按文件分三任务, 且 R1-fix 首版漏 README.md 的
+      "Plugin Version:" 行 + i18n ×3 的 badge 与 "Plugin Version:" 行共 7 处, 而两条 enabled
+      check 对这 7 处结构性失明 ⇒ 假绿; R1/code-reviewer Critical-1)。**gitlink 不在本任务** —
+      随合并一并移交 Phase C (TASK-026)。
+
+  - id: TASK-024
+    parent: "5.11"
+    task_group: TG-5
+    title: "版本引用面双向断言 — 必须在交付 Phase C 之前通过"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: [TASK-023]
+    deliverables: []
+    verification:
+      - "**普通引用文件** (主仓 VERSION/README*.md/CLAUDE.md + aria plugin.json/marketplace.json/README.md): 旧值 1.65.5 **零命中** 且 新值 1.66.0 出现次数 == 各文件预期点数"
+      - "预期点数**先枚举后断言** (不是只查缺席) — 见 metadata.version_reference_surface.breakdown"
+      - "**append-only 账本** (aria/VERSION, aria/CHANGELOG.md): **不做零命中**; 判据为头部「当前版本」行 == plugin.json"
+      - "跑**不带路径**的 `git status` 核验实际落地面与声称一致"
+      - "本断言**在 TASK-026 交付 Phase C 之前**通过 — 任何计数错须在可回退点之前发红"
+    notes: >
+      取代 TASK-020, 修其三处坏 (R2/tech-lead N2/N3/N4 + code-reviewer N-1):
+      (1) 原条把 append-only 账本 aria/VERSION 纳入零命中 ⇒ **恒红**, 而恒红正是 TASK-025 要杀
+      的对偶 —— 在修恒红的同一批编辑里造了一个恒红 (memory feedback_fix_recurs_in_its_own_fallback_path);
+      (2) 原条只断言旧值缺席 = **缺席断言**, 维度只对一半 (删行/写错新版本号都判绿);
+      (3) 原条排在合并双推**之后** ⇒ 只可能在不可回退点之后发红且无回边。
+      两条 enabled check 的失明面见 metadata.version_reference_surface.enabled_check_blindness。
+
+  - id: TASK-025
+    parent: "5.12"
+    task_group: TG-5
+    title: "sc-baseline 留证脚本处置 — 两条失效路径都要处理"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-009]
+    deliverables:
+      - .aria/repro/sc-baseline-linked-issue-normalization.py
+    verification:
+      - "路径一 (恒红): TASK-008 落地后那 8 条 SC 转绿 ⇒ 脚本 :275-277 恒红 — 已处置"
+      - "路径二 (归档后): 脚本从 proposal.md 现场解析 (:205-215 FATAL fail-CLOSED) ⇒ Spec 归档后换一种恒红 — 已处置"
+      - "两条路择一并在脚本顶部成文: (a) 加 post-implementation 模式断言那 8 条**已转绿** + baseline 结果冻成同目录存档 (须同时解决归档后解析路径); (b) 显式退役 + baseline 冻成带 SHA 的存档报告 + 脚本移出 .aria/repro/ + **同批修 proposal.md:181/:219 两处 artifact 指针**避免 dangling"
+      - "无论哪条, substitute 论证的可复核性仍然成立"
+    notes: >
+      取代 TASK-021 (原条只覆盖第一条失效路径, R2/tech-lead F4 指出第二条未覆盖)。
+      恒红与假绿同为零信息量 (memory feedback_false_green_dual_is_permanent_red) —— 本 Spec
+      全程在打这个对偶, 不能自己留一个。依赖 TASK-009 即可执行, 不必等发版。
+
+  - id: TASK-026
+    parent: "5.13"
+    task_group: TG-5
+    title: "交付 phase-c-integrator (Phase C 委派点)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-024, TASK-025, TASK-027]
+    deliverables: []
+    verification:
+      - "TASK-024 双向断言已通过 (硬前置)"
+      - "交接时显式告知「aria 侧已 bump 但未合并」及待合并分支名, 使 C.2.5 知道合并对象"
+      - "⛔ 本任务**不复述** C.2.5 / C.2.4 的判据 — 合并 / 双推 / ls-remote 核验 / gitlink bump / PR / pre-merge gate 全部由 phase-c-integrator 的既有机制与闸门保证"
+    notes: >
+      **owner 裁定 2026-08-08**: 删 TASK-016 (手写合并绕开 pre_merge_gate 与 submodule_gate
+      两个默认开的闸门, R2/tech-lead N1 判 Rule #10 违规), 改为委派。
+      **推送授权 (AI 建议, 待 owner 确认)**: 推共享 master 属外向且难撤销, 按 memory
+      feedback_sync_instruction_not_push_authorization **每次推前须 owner 显式确认**; AI 可执行
+      但不得自我授权。注: R2/tech-lead 以 AD10 论证「须标 agent: owner」—— 该论据不成立,
+      AD10 (architecture-decisions.md:752-756) 治的是 Aria 2.0 无人值守流水线的 S7_AWAITING_MERGE,
+      不治交互式 session 的 Phase C。
+
+  - id: TASK-027
+    parent: "5.14"
+    task_group: TG-5
+    title: "Rule #6 AB 门范围披露 (AI 建议, 待 owner 确认)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: [TASK-013]
+    deliverables:
+      - .aria/decisions/          # 披露记录 (或并入本 change 的 handoff)
+    verification:
+      - "成文披露「本次未跑 Tier 1 全量 AB」及理由, 不得默默缩门"
+      - "开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订"
+      - "⛔ 不得以「改动小 / 纯括注 / 性价比」为由降级 — Q5 是 owner 亲裁 (Rule #10)"
+    notes: >
+      **事实**: AB_TEST_OPERATIONS.md:396 逐字为「Tier 1: 核心 Skills (**10 个**, 每次发版必测)」,
+      state-scanner 在内; 发版前清单 :545 要求「Tier 1 Skills 全量 AB 测试已执行」。而 TASK-013
+      只跑 SKILL.md:176 单个 hunk 的定向 AB。
+      **注: R2/tech-lead 的「28 Skills / ~$14 / 6-8h」口径不是 Tier 1 全量** (Tier 1 = 10 个)。
+      **AI 建议**: 单 hunk 定向 AB + 成文披露 + 开 convention issue。理由: 两次先例的单 skill
+      Rule #6 run 均未跑 Tier 1 全量、均无 summary.yaml ⇒ 已是事实上的偏离; 按 memory
+      feedback_written_exception_exact_condition_match「N 次非正式援引 ≠ 成文 lane」, 第三次
+      不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但测不到要测的东西 (#117/#127 的套件
+      缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。**待 owner 确认。**
+
+# ---------------------------------------------------------------------------
+# 依赖图 (DAG) — R2-fix; 只画 active 20 条 (TASK-015..021 已 cancelled)
 # ---------------------------------------------------------------------------
 #
 #  TG-1 测试链 (同文件同 agent, 串行):
 #    001 → 002 → 003 → 004 → 005 ┐
-#                                 │
 #  TG-2 实现链 (同文件同 agent, 串行):
 #    001,002,003,004,005 → 007 → 008 → 009 → 010
-#                           │
+#                           │        └──▶ 025  (sc-baseline 处置, 不必等发版)
 #                           └──▶ 006  (SC-12; RED-first 的唯一例外)
-#                                  │
-#  TG-3 (不同文件, 可并行):  008 ──┼──▶ 011
-#                                  └──▶ 012 ──▶ 013 (TG-4 AB)
+#  TG-3 (不同文件, 可并行):  008 ──┬──▶ 011
+#                                  └──▶ 012 ──▶ 013 (TG-4 AB) ──▶ 027 (门范围披露)
 #
-#  TG-5:  {005,006,009,010,011,012,013} ──▶ 014 ──▶ 015 ──▶ 016 ──▶ 017 ──┬──▶ 018 ┐
-#                                                                          └──▶ 019 ┴──▶ 020
-#         009 ──▶ 021   (sc-baseline 处置, 不必等发版)
+#  TG-5:  {005,006,009,010,011,012,013} ──▶ 014 ──▶ 022 ──▶ 023 ──▶ 024 ──┐
+#         025 ──────────────────────────────────────────────────────────┤
+#         027 ──────────────────────────────────────────────────────────┴──▶ 026 (交付 Phase C)
 #
-#  真并行组 (不同文件):  {011, 012}  ·  {018, 019}
-#  ⛔ 无同文件并行边 — collision.py 的 007/008/009/010 与
-#     test_release_by_track.py 的 001..005 均已串成链 (见 metadata.file_domain_serialization)
-#  关键路径: 001→002→003→004→005→007→008→009→010→014→015→016→017→018→020
+#  真并行组 (不同文件):  {011, 012}
+#  ⛔ 无同文件并行边 (见 metadata.file_domain_serialization)
+#  关键路径: 001→002→003→004→005→007→008→009→010→014→022→023→024→026
+#  ⚠️ 024 (双向断言) 必须在 026 (交付 Phase C) 之前 —— 可回退点之前发红
 #
-# 复杂度汇总: S ×14 · M ×6 · L ×1 · XL ×0   |  粗锚工时 ≈ 88h (14×3 + 6×6 + 1×10)
-# Agent 分摊:  qa-engineer ×9 · backend-architect ×7 · knowledge-manager ×5
+# active 复杂度: S ×14 · M ×5 · L ×1   |  粗锚工时 ≈ 82h (14×3 + 5×6 + 1×10)
+# active Agent:  qa-engineer ×10 · backend-architect ×6 · knowledge-manager ×4
+# 总计 27 条 = 20 active + 7 cancelled (TASK-015..021, 编号保留含义冻结)
 #
-# ⚠️ 上三行为派生值。**不要靠人工重算, 跑这条命令**:
+# ⚠️ 上三行为派生值。**不要靠人工重算, 跑这条命令** (只统计 active):
 #
-#   python3 -c "import yaml,collections as c; t=yaml.safe_load(open('openspec/changes/linked-issue-normalization/detailed-tasks.yaml'))['tasks']; x=c.Counter(i['complexity'] for i in t); a=c.Counter(i['agent'] for i in t); print(len(t),'tasks |',dict(x),'|',x['S']*3+x['M']*6+x['L']*10,'h |',dict(a))"
+#   python3 -c "import yaml,collections as c; t=[i for i in yaml.safe_load(open('openspec/changes/linked-issue-normalization/detailed-tasks.yaml'))['tasks'] if i['status']!='cancelled']; x=c.Counter(i['complexity'] for i in t); a=c.Counter(i['agent'] for i in t); print(len(t),'active |',dict(x),'|',x['S']*3+x['M']*6+x['L']*10,'h |',dict(a))"
 #
 #    **订正史 (两次, 同一处)**: A.3 首版写 S×12/M×4/67h (实为 S×11/M×5/73h);
 #    R1-fix 版写 Agent 8/7/6 (实为 9/7/5) —— 而 R1-fix 时这里**已经有一条「每次必须重算」
-#    的警告**, 警告没拦住, 拦住的是机械核验。⇒ 这是「不变量写进文档 ≠ 写进机械兜底」
-#    (memory feedback_invariant_needs_failclosed_default) 的干净实例, 故本版把警告换成
-#    可复跑命令。proposal §Impact 的「≥45」下界行有同款订正史 (三次失准) — 同一形状。
+#    的警告**, 警告没拦住, 拦住的是机械核验。⇒「不变量写进文档 ≠ 写进机械兜底」
+#    (memory feedback_invariant_needs_failclosed_default) 的干净实例, 故换成可复跑命令。
