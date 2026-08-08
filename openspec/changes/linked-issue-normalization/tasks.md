@@ -11,7 +11,21 @@
 >
 > **R1-fix 时我在此处写过「只追加 5.5–5.8, 不改动任何既有编号 (5.1–5.4 语义与编号均保持)」—— 该声明不成立, 现撤回。** 对 `a52ab81` 实测: `5.3` 由「主仓同步面 3 项」改指为「aria 子模块合并 + 双推」, `5.4` 由「i18n translated-from ×3」改指为「主仓 gitlink + VERSION + README」(即 `TASK-016`/`TASK-017` 两个 ID 被原地改指), 违 [`DUAL_LAYER_SPEC.md`](../../../aria/skills/task-planner/DUAL_LAYER_SPEC.md) §编号不可变约束; 且五份已 commit 的 R1 报告按旧含义引用这两个 ID, 造成静默错位。post_planning R2 / tech-lead N6 命中。
 >
-> **本轮 (R2-fix) 起严格执行该约束**: 组 5 的重做**不改动任何既有编号的含义** —— `5.2`–`5.8` 全部**保留编号并标 `(CANCELLED)`** 且注明被谁取代, 重做后的任务**追加为 `5.9`–`5.14`**。`TASK-015`–`TASK-021` 同样保留并标 cancelled。⇒ R1/R2 两轮共十份报告对旧 ID 的引用**继续成立**, 不再制造第二次错位。
+> **本轮 (R2-fix) 起严格执行该约束**: 组 5 的重做**不改动任何既有编号的含义** —— `5.2`–`5.8` 全部**保留编号并标 `(CANCELLED)`** 且注明被谁取代, 重做后的任务**追加为 `5.9`–`5.14`**。`TASK-015`–`TASK-021` 同样保留并标 cancelled。
+>
+> **⚠️ 二次更正 (post_planning R3, tech-lead X5 + knowledge-manager)**: R2-fix 时我在此写「R1/R2 两轮共十份报告对旧 ID 的引用**继续成立**」—— **该句对五份 R1 报告为假, 现撤回**。R2-fix 冻结的是 **R1-fix 之后**的语义, 而 R1 报告 (`post_planning-R1-*`) 引用的 `TASK-016` 是**gitlink 任务**、`TASK-017` 是**i18n 任务**。**同一段落、同一形状、第二次** —— 撤回一句假自陈的同时又立了一句。
+>
+> **⇒ old → new 重映射表 (读旧报告时按此换算)**:
+>
+> | ID | R1 报告 (`a52ab81` 语义) | R2 报告 (`3fc6f3f` 语义) | 现状 (`2cf2569`+) |
+> |---|---|---|---|
+> | `TASK-015` | aria 子模块 5 文件 bump | 同左 | cancelled → `TASK-022` |
+> | `TASK-016` | **主仓同步面 3 项 (gitlink/VERSION/badge)** | **aria 子模块合并 + 双推** | cancelled → `TASK-028` (合并+gitlink) |
+> | `TASK-017` | **i18n translated-from ×3** | **主仓 gitlink + VERSION + README** | cancelled → `TASK-023` + `TASK-028` |
+> | `TASK-018` | — (不存在) | 主仓 i18n ×3 | cancelled → `TASK-023` |
+> | `TASK-019` | — | CLAUDE.md 两处 | cancelled → `TASK-023` |
+> | `TASK-020` | — | 零命中断言 | cancelled → `TASK-024` |
+> | `TASK-021` | — | sc-baseline 处置 | cancelled → `TASK-025` |
 >
 > **A.2 首次重写的说明 (仍然成立)**: 2026-08-08 首次把本文件由 R3′ 手术产物 (`B-1..B-6` 表格) 改为 checkbox 形态时, 前一版 `B-n` 从未被任何 `detailed-tasks.yaml` 的 `parent` 引用 (该文件此前不存在), 故无引用被破坏。
 >
@@ -43,7 +57,7 @@
 | **4** | Rule #6 AB (⛔ 不豁免) | Q5 裁定 (owner 2026-08-06) |
 | **5** | 回归 + **版本引用面 (按引用点而非文件数)** + 双向断言 + 留证工件处置 + 交付 Phase C | proposal §Impact + post_planning R1/R2 五条 Critical |
 
-**排序依据**: 组 1 → 组 2 是 RED-first (SC 的 baseline-failing 状态已于 A.1 实跑留证)。**例外: 1.6 (SC-12) 反向依赖 2.1** —— 被测函数 `normalize_linked_issue` 在 2.1 之前不存在, 测试连 import 都不成立, 故 1.6 排在 2.1 之后。组 3 依赖 2.2/2.3 (**3.1 与组 2 同文件, 必须串行**)。**3.3 必须早于 4.1** (AB 测的是该 hunk 的行为影响)。组 5 gate 在组 1–4 全绿之后, 内部按 **5.1 → 5.9 → 5.10 → 5.11 → 5.13** 串 (`5.2`–`5.8` 已 CANCELLED, 见组 5 段首)。**5.12 例外: 可在 2.3 之后任意时点执行** (`sc-baseline` 脚本自 2.2 落地即恒红, 不必等发版)。**5.14 例外: 与 4.1 同批, 早于 5.13**。依赖字段以 `detailed-tasks.yaml` 为准。
+**排序依据**: 组 1 → 组 2 是 RED-first (SC 的 baseline-failing 状态已于 A.1 实跑留证)。**例外: 1.6 (SC-12) 反向依赖 2.1** —— 被测函数 `normalize_linked_issue` 在 2.1 之前不存在, 测试连 import 都不成立, 故 1.6 排在 2.1 之后。组 3 依赖 2.2/2.3 (**3.1 与组 2 同文件, 必须串行**)。**3.3 必须早于 4.1** (AB 测的是该 hunk 的行为影响)。组 5 gate 在组 1–4 全绿之后, 内部按 **5.1 → 5.9 → 5.10 → 5.11 → 5.13 → 5.15** 串 (**5.15 在闸门 5.13 之后**: 先获批再合并) (`5.2`–`5.8` 已 CANCELLED, 见组 5 段首)。**5.12 例外: 可在 2.3 之后任意时点执行** (`sc-baseline` 脚本自 2.2 落地即恒红, 不必等发版)。**5.14 例外: 与 4.1 同批, 早于 5.13**。依赖字段以 `detailed-tasks.yaml` 为准。
 
 ---
 
@@ -91,19 +105,21 @@
 
 ### 现行 — 5.1
 
-- [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors**; 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
+- [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors** (基线 **1322** tests; 跨 skill 基线 **9 OK / 累计 1698**); 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
       > ⛔ **不得用 `Ran N` 数换算场景数**: 45 是**场景数**, `Ran` 数的是 test 方法数 (既有 `test_invalid_shapes_and_paths` = 1 方法 4 场景)。场景齐备性判据 = **逐 SC 清单核对 17 条 SC 的场景全部落盘**, 与 `Ran` 数正交。
       > ⚠️ 环境陷阱: 单模块模式与 pytest 对 `test_collision.py` 会给 ImportError —— aria-plugin **#134** 的既有 bug (破 70 天), 非本 change 回归。验收一律以 `tests/` 内**全量** `run_tests.py` 为准。
 
-### CANCELLED (编号保留, 勿复用)
+### CANCELLED (编号保留, 勿复用) — ⚠️ 故意**不用 checkbox 语法**
 
-- [ ] ~~5.2 aria 子模块 5 文件 bump~~ **(CANCELLED)** → 由 **5.9** 取代 (按引用点重derive, 补 `marketplace.json` 第二个 version 字段)
-- [ ] ~~5.3 aria 子模块分支合并 + 双推~~ **(CANCELLED — owner 裁定 2026-08-08)** → **委派 `phase-c-integrator` C.2.5**, 见 **5.13**。理由: 手写它绕开 `pre_merge_gate` (Rule #8) 与 `submodule_gate=block` 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
-- [ ] ~~5.4 主仓 gitlink + VERSION + README 两处~~ **(CANCELLED)** → 版本面归 **5.10**; gitlink 归 **5.13** (随合并一并移交)
-- [ ] ~~5.5 主仓 i18n README ×3~~ **(CANCELLED)** → 并入 **5.10**
-- [ ] ~~5.6 CLAUDE.md 两处版本引用~~ **(CANCELLED)** → 并入 **5.10**
-- [ ] ~~5.7 版本引用点归零机械断言~~ **(CANCELLED)** → 由 **5.11** 取代。原条三处坏: 含 `aria/VERSION` (append-only 发布账本) ⇒ **恒红**; 只断言旧值缺席不断言新值出现 ⇒ 写错新版本号免疫; 排在合并双推**之后** ⇒ 只可能在不可回退点之后发红
-- [ ] ~~5.8 sc-baseline 脚本处置~~ **(CANCELLED)** → 由 **5.12** 取代 (补归档后 `FATAL` 分支)
+> **为什么不用 `- [ ]`**: `DUAL_LAYER_SPEC.md:258` 的示例用 `- [ ] X.Y (CANCELLED)` 保留编号, 但**与归档门互相拆台** —— 实跑 `spec_complete.py --gate` 会把它们计入 unchecked (R2-fix 时实测 `27/27 unchecked`), 完工后恒为 `7/27` ⇒ 那 7 条永远不能合法勾 `[x]` ⇒ **归档门的 tasks 分支永久失效, 只剩 Status 分支 = 声称**; `handoff_autofill` 亦会永久误报 7 条 phantom。故本文件用**加粗删除线**保留编号而不进 checkbox 计数 (post_planning R3, 三席独立命中)。插件侧该冲突已记, 见下方指针。
+
+- **~~5.2 aria 子模块 5 文件 bump~~ **(CANCELLED)** → 由 **5.9** 取代 (按引用点重derive, 补 `marketplace.json` 第二个 version 字段)
+- **~~5.3 aria 子模块分支合并 + 双推~~ **(CANCELLED — owner 裁定 2026-08-08)** → **委派 `phase-c-integrator` C.2.5**, 见 **5.13**。理由: 手写它绕开 `pre_merge_gate` (Rule #8) 与 `submodule_gate=block` 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
+- **~~5.4 主仓 gitlink + VERSION + README 两处~~ **(CANCELLED)** → 版本面归 **5.10**; gitlink 归 **5.13** (随合并一并移交)
+- **~~5.5 主仓 i18n README ×3~~ **(CANCELLED)** → 并入 **5.10**
+- **~~5.6 CLAUDE.md 两处版本引用~~ **(CANCELLED)** → 并入 **5.10**
+- **~~5.7 版本引用点归零机械断言~~ **(CANCELLED)** → 由 **5.11** 取代。原条三处坏: 含 `aria/VERSION` (append-only 发布账本) ⇒ **恒红**; 只断言旧值缺席不断言新值出现 ⇒ 写错新版本号免疫; 排在合并双推**之后** ⇒ 只可能在不可回退点之后发红
+- **~~5.8 sc-baseline 脚本处置~~ **(CANCELLED)** → 由 **5.12** 取代 (补归档后 `FATAL` 分支)
 
 ### 现行 — 5.9 起 (取代上方 CANCELLED)
 
@@ -130,16 +146,26 @@
       > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同时修 `proposal.md:181/:219` 两处 artifact 指针**避免 dangling。
       > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
 
-- [ ] 5.13 **交付 `phase-c-integrator`** (Phase C 委派点)
-      > 交出去的是: aria 子模块**分支合并 + 双远程推送 + 逐远端 `ls-remote` 核验** + 主仓 **gitlink bump** (须指向合并后 `master` SHA) + PR + **pre-merge gate (Rule #8, C.2.4)**。这些**不在本文件复述判据** —— 由该 Skill 的既有机制与闸门保证 (owner 裁定 2026-08-08)。
-      > 本任务的验收只有两条: (1) **5.11 已通过**; (2) 交接时把「aria 侧已 bump 但未合并」这一状态显式告知, 使 C.2.5 知道要合并哪个分支。
-      > **推送授权 (AI 建议, 待 owner 确认)**: 推共享 master 属外向且难撤销动作, 按 memory `feedback_sync_instruction_not_push_authorization` **每次推前须 owner 显式确认**; AI 可执行但不得自我授权。*(注: R2/tech-lead 以 AD10 论证「须标 `agent: owner`」—— 该论据不成立, AD10 (`architecture-decisions.md:752-756`) 治的是 Aria 2.0 无人值守流水线的 `S7_AWAITING_MERGE`, 不治交互式 session 的 Phase C。真正管这件事的是上述 memory。)*
+- [ ] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
+      > **交出去的**: PR 创建 + **pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)** + 主仓自身 PR 流程。这些**不在本文件复述判据**。
+      > **⛔ 不交出去的 (改由 5.15 承载)**: aria 子模块的**合并动作本身** + 双推 + 逐远端 ls-remote + 主仓 gitlink bump。
+      > **为什么这样切 (post_planning R3, 四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是「`phase-c-integrator:242` 本就建模子模块合并」—— **该引用是误引** (`:242` 实为 *Path coverage 评估*的执行上下文契约)。真实合并链 = C.2.4:253 → `branch-manager` merge action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`), **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; 且 `aria/skills/` 全仓对该约束**零处编码** (已开 aria-plugin **#136**)。⇒ 委派掉合并等于删掉计划里唯一的守卫。
+      > **两件事正交, 不是二选一**: 「**谁执行合并**」(硬约束 1: 本地 vs 服务端) 与「**哪个闸门批准合并**」(Rule #8 CI 状态) 互不替代。R2/N1 把二者混成一件, owner 据此裁定的「删任务改委派」因此只解决了后者。本版**两者都要**。
+      > 验收: (1) **5.11 已通过**; (2) 交接时显式告知待合并的子模块分支名与「aria 侧已 bump 未合并」状态。
+
 
 - [ ] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
       > **事实**: `AB_TEST_OPERATIONS.md:396` 逐字为「Tier 1: 核心 Skills (**10 个**, 每次发版必测)」, state-scanner 在内; 发版前清单 `:545` 要求「Tier 1 Skills 全量 AB 测试已执行」。而 4.1 只跑 `SKILL.md:176` 单个 hunk 的定向 AB。
       > **AI 建议**: 单 hunk 定向 AB + **成文披露「本次未跑 Tier 1 全量」** + 开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订。
       > **理由**: 两次先例的单 skill Rule #6 run 均未跑 Tier 1 全量、均无 `summary.yaml` ⇒ 已是**事实上的偏离**; 按 memory `feedback_written_exception_exact_condition_match`「**N 次非正式援引 ≠ 成文 lane**」, 第三次不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但**测不到要测的东西** (#117 / #127 的套件缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。
       > ⛔ 无论走哪条, **不得**以「改动小 / 纯括注 / 性价比」为由降级 —— Q5 是 owner 亲裁 (Rule #10)。
+
+- [ ] 5.15 **aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump** (承载 CLAUDE.md 多远程两条硬约束)
+      > **硬约束 1**: 本地 `git merge` 到子模块 `master` —— ⛔ **禁**用 Forgejo Web UI / API 的 `Do: merge` / `Do: squash`。服务端合并使本地 master 从未 fast-forward ⇒ 双推与 C.2.5 结构上都不触发 ⇒ 主仓 bump gitlink 即产生 orphaned gitlink, GitHub `clone --recursive` 断裂 (2026-07-14 事故)。
+      > **硬约束 2**: `git push origin && git push github` 后**逐个** `git ls-remote <remote> master` 取 SHA 与本地比对, **全部一致才算成功** —— push 退出码与回执两个方向都会骗人。`ls-remote` 自身失败 → 重试几次再下结论。
+      > **主仓 gitlink**: `git add aria` 必须记**合并后的 `master` SHA**, 不是 feature 分支 SHA。⚠️ 子模块若处于 detached HEAD, `git add aria` 会记 HEAD ⇒ 先确认已在 master 上。
+      > **⚠️ 本条与 5.13 正交**: 它规定合并**怎么做**, 5.13 的闸门规定合并**是否获批**。两条都必须过。
+      > **推送授权 (AI 建议, 待 owner 确认)**: 推共享 master 属外向且难撤销, 按 memory `feedback_sync_instruction_not_push_authorization` **每次推前须 owner 显式确认**; AI 可执行但不得自我授权。*(注: R2/tech-lead 以 AD10 论证「须标 `agent: owner`」不成立 —— AD10 (`architecture-decisions.md:752-756`) 治的是 Aria 2.0 无人值守流水线的 `S7_AWAITING_MERGE`, 不治交互式 session 的 Phase C。)*
 
 ## ⚠️ Phase B 开工前必读 — 三条已知限 (不修, 成文)
 
