@@ -52,14 +52,34 @@ metadata:
     delegated:
       - who: "phase-c-integrator"
         what: >
-          Phase C — **aria 子模块分支合并 + 双远程推送 + 逐远端 ls-remote 核验** (C.2.5) +
-          **主仓 gitlink bump** (须指向合并后 master SHA) + PR 创建 +
-          pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)
+          **仅** PR 创建 + pre-merge gate (Rule #8, C.2.4) + 主仓自身 PR 流程。
+          ⛔ **不含** aria 子模块的合并动作 / 双推 / ls-remote 核验 / 主仓 gitlink bump
+          —— 那些由 **TASK-028** 承载 (R3-fix 起)。
         why: >
-          **owner 裁定 2026-08-08**。R1-fix 曾把子模块合并写成 TASK-016 的手工步骤 ⇒ 绕开两个
-          默认开的闸门 (`pre_merge_gate.enabled=true` Rule #8 + `submodule_gate.mode="block"`),
-          而该 Skill (SKILL.md:242) 本就建模子模块合并, C.2.5 正是 TASK-016 手工重写的东西。
-          R2/tech-lead N1 判为 Rule #10 违规。本文件不复述其判据。交接点 = TASK-026。
+          **R4-fix 更正落地缺口 (R4/delegation-lens C1)**: R3-fix 已在 tasks.md 与
+          TASK-026/028 完成这次切分, 但**本块逐字未改**, 仍写着「合并+双推+gitlink 交
+          phase-c-integrator」并仍引用已被推翻的 `SKILL.md:242` ⇒ 同一份文件两处相反。
+          **这是本 session 第三次「fix 落在一部分地方而非全部」。**
+        blocked_by: "aria-plugin#136"
+        blocking_note: >
+          ⚠️ **R4/delegation-lens C2**: `phase-c-integrator` **没有 gate-only 形态** —— C.2.4 的
+          触发条件逐字是「即将调用 branch-manager merge action」, green 后 `:253` 直接调用它,
+          而 merge 的唯一实现是 `branch-manager:621-634` 的服务端 `Do: merge`。⇒ 「只要闸门不要
+          合并」这个切分**在现有工具里不可实现**: 要么服务端合并 aria PR (违硬约束 1), 要么闸门
+          根本不触发 (Rule #8 落空)。
+          **⇒ 在 aria-plugin#136 (给 branch-manager 加本地合并分叉) 落地之前, 本 change 的
+          子模块合并只能由 owner 手工本地执行, pre-merge gate 需单独调用。这是交付顺序上的
+          真实阻塞, 不是措辞问题。**
+        gate_leg_caveat: >
+          ⚠️ **R4/delegation-lens C3 (插件活体缺陷, 已开号)**: 委派的闸门两条腿对本 Spec 都
+          不触发且都**失败为绿** —— (a) 两仓 workflow 的 `paths` 只覆盖 `issue-triage`/`docker`
+          ⇒ `not_applicable` ⇒ PR CI 步被跳过; (b) `pre_merge_gate.py:427` 的
+          `--main-branch` **缺省 "main" 而本项目是 "master"** ⇒ 实跑
+          `aether ci status --branch main --in-flight` 返回 `{"runs":[]}` RC=0 ⇒
+          「main 无 in-flight」**恒真**。SKILL.md 靠一句「显式传真值」纸面兜, 但 Rule #8 闸门
+          的 fail-OPEN 缺省值本身即错 (memory `feedback_invariant_needs_failclosed_default`)。
+          ⇒ 调用时**必须显式** `--main-branch master`, 并核验它真的查到了 master。
+
       - who: "phase-d-closer"
         what: "Phase D — cycle 进度更新 / Spec 归档 / 周期 handoff (Rule #9)"
         why: >
@@ -126,7 +146,15 @@ metadata:
       m6-version-badge-match 只比 README.md 的 badge; i18n-readme-translation-currency
       只比 translated-from 标记 ⇒ README.md 的 "Plugin Version:" 行 + i18n ×3 的 badge 与
       "Plugin Version:" 行共 **7 处**残留旧版本时两条 enabled check 仍全绿 = 假绿。
-    mechanical_fix: "TASK-024 的**双向**断言 — 唯一维度匹配的判据 (memory feedback_invariant_dimension_must_match_error_dimension)"
+    mechanical_fix: >
+      TASK-024 的**双向 + 整仓差集**断言。**R4-fix 关键升级 (R4/completeness-lens 单点最优建议)**:
+      原设计是**文件白名单** ⇒ 对**未来新增的版本引用点 fail-OPEN** (修了实例没修类), 且逼着
+      人去数「失明几处」(R2-fix 写 7, 实为 **10** —— 漏计 CLAUDE.md 2 + VERSION 1)。
+      改为**整仓 grep 差集**: bump 后对**全部 tracked 文件** grep 旧版本号, 命中集合减去**显式
+      成文的排除集** (版本史 + 审计史 + Spec 自身的订正留痕) 必须为**空**; 任何未在排除集里的
+      新命中即红。⇒ 「失明几处」变成不必算的数, 且新增引用点自动被覆盖 (fail-CLOSED)。
+      判据依据: memory `feedback_invariant_dimension_must_match_error_dimension` +
+      `feedback_invariant_needs_failclosed_default` (正向白名单对新值天然 fail-OPEN)。
     two_classes_of_file:
       # R2/tech-lead N2 + code-reviewer N-1: R1-fix 把两类混在一条零命中断言里, 造出恒红
       normal_reference:
@@ -136,13 +164,23 @@ metadata:
       append_only_ledger:
         files: ["aria/VERSION", "aria/CHANGELOG.md"]
         invariant: >
-          **双向** (R3-fix, tech-lead X3): (a) 头部「当前版本」行 == plugin.json;
-          **且** (b) **旧值命中数不减** (`aria/VERSION` ≥2, `aria/CHANGELOG.md` ≥1)。
-          ⛔ 只判 (a) 是单向的: **销毁发布史凑绿**时判绿 (覆盖 `发布日期` 行 / 改写
-          `## [1.65.5]` 标题两个反例), 而那正是它替换掉的恒红所激励的作弊路径。
-        why: >
-          aria/VERSION 实测 167 行, `发布日期(旧)` 堆叠回溯至 v1.47.0, `:58` 还有裸 1.47.0。
-          对它要求旧值零命中 ⇒ 要么恒红要么迫使销毁发布注 —— 而恒红正是 TASK-025 要杀的对偶。
+          **不做零命中** (历史保留旧版本号是正确的)。双向判据 = (a) **全部**「当前版本」声明
+          == plugin.json; **且** (b) **文件行数不减** (append-only 的可靠不变量)。
+        why_not_old_value_count: >
+          ⚠️ **R4-fix 第三次更正同一处**: R3-fix 写「旧值命中数 ≥2」是恒红 (`:3` 是 bump 必须改
+          掉的当前版本行, 正确执行后剩 1); R4 中途改成「≥1」**同样不可靠** —— 实测旧版本在
+          aria/VERSION 的保留形态**不一致**: `1.65.4` **0 次** · `1.65.3` **0 次** · `1.65.2` 1 次 ·
+          `1.65.1` 1 次 · `1.64.0` 1 次。⇒ 「历史行原样保留」这个前提**本身不成立**, 任何基于
+          旧值命中数的阈值都会对某些 bump 恒红。**改用「行数不减」** —— 它直接对应「不许销毁
+          历史」这个真实意图, 且不假设任何保留形态。
+          *(同一处三次踩同一个坑, 记于此: 每次我都在「修恒红」的编辑里造新恒红 —— memory
+          `feedback_fix_recurs_in_its_own_fallback_path`。)*
+        known_stale_second_declaration: >
+          ⚠️ **`aria/VERSION:56-59` 有第二处当前版本声明** (`## 版本号` 围栏块), 实读为
+          **`1.47.0`** —— 陈旧 18 个版本, 正是 aria-report **#158** 「版本字段污染」的那个冻结串
+          (该 issue 的修法是把消费方改读 `plugin.json` SOT, 并未修这个块本身)。
+          ⇒ 判据 (a) 写「**全部**当前版本声明」而非「头部」—— 原措辞会静默排除它。
+          **该块的陈旧本身是 pre-existing 缺陷, 不在本 Spec 范围**, 但实施者须知道它存在。
       one_sided_assertion_is_half_dimension: >
         只断言旧值缺席是**缺席断言**: 删行 / 写错新版本号都判绿 (R2/tech-lead N3)。故必须双向。
     aria_side_points: "**3 个**普通引用文件 / **4 个**点 (marketplace.json 含 2 个 version 字段 :3/:16) — R2-fix 误写成「4 个文件」, 与本 Spec 反复强调的「文件数 ≠ 引用点数」同形状复发 (R3-fix 已改)"
@@ -542,7 +580,7 @@ tasks:
     title: "aria 子模块分支合并 + 双远程推送 + 逐远端 ls-remote 核验"
     status: cancelled
     cancelled_at: "2026-08-08 (R2-fix)"
-    superseded_by: "phase-c-integrator C.2.5"
+    superseded_by: "TASK-028 (承载硬约束 1+2) + phase-c-integrator (仅 PR/闸门) — R4-fix 更正: R3-fix 已收回合并动作, 本字段原写「全交 C.2.5」"
     cancel_reason: >
       owner 裁定 2026-08-08 委派 — 手写它绕开 pre_merge_gate (Rule #8) 与 submodule_gate=block 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
     complexity: M
@@ -574,7 +612,7 @@ tasks:
     title: "主仓 gitlink + VERSION 子模块表行 + README.md 两处版本引用"
     status: cancelled
     cancelled_at: "2026-08-08 (R2-fix)"
-    superseded_by: "TASK-023 (版本面) + TASK-026 (gitlink)"
+    superseded_by: "TASK-023 (版本面) + **TASK-028** (gitlink) — R4-fix 更正: R3-fix 把 gitlink 从 TASK-026 移到 TASK-028, 本字段未跟改"
     cancel_reason: >
       版本面归 023; gitlink 随合并一并移交 Phase C
     complexity: S
@@ -772,11 +810,13 @@ tasks:
     dependencies: [TASK-023]
     deliverables: []
     verification:
-      - "**普通引用文件** (主仓 VERSION/README*.md/CLAUDE.md + aria plugin.json/marketplace.json/README.md): 旧值 1.65.5 **零命中** 且 新值 1.66.0 出现次数 == 各文件预期点数"
-      - "预期点数**先枚举后断言** (不是只查缺席) — 见 metadata.version_reference_surface.breakdown"
-      - "**append-only 账本** (aria/VERSION, aria/CHANGELOG.md): **不做零命中**; 判据为头部「当前版本」行 == plugin.json"
+      - "**整仓差集断言 (fail-CLOSED)**: 对全部 tracked 文件 grep 旧版本号 `1.65.5`, 命中集合减去**显式成文排除集**后必须为**空**"
+      - "排除集 (成文, 逐条给理由): `aria/VERSION` + `aria/CHANGELOG.md` (append-only 版本史) · `.aria/audit-reports/**` (审计史) · `openspec/changes/linked-issue-normalization/**` 内的订正留痕行 (本 Spec 自述历史)"
+      - "⛔ 任何**不在排除集**里的新命中即红 —— 不许临时往排除集加条目来凑绿, 加条目须同批写理由"
+      - "**新值计数**: 普通引用文件的 `1.66.0` 出现次数 == breakdown 的预期点数 (主仓 14 + aria 侧 4 = 18)"
+      - "**append-only 账本**: (a) **全部**「当前版本」声明 == plugin.json (注意 `aria/VERSION:56-59` 的第二处声明) **且** (b) 文件行数不减"
       - "跑**不带路径**的 `git status` 核验实际落地面与声称一致"
-      - "本断言**在 TASK-026 交付 Phase C 之前**通过 — 任何计数错须在可回退点之前发红"
+      - "本断言在 TASK-028 (合并+双推+gitlink) 之前通过 — 任何计数错须在可回退点之前发红"
     notes: >
       取代 TASK-020, 修其三处坏 (R2/tech-lead N2/N3/N4 + code-reviewer N-1):
       (1) 原条把 append-only 账本 aria/VERSION 纳入零命中 ⇒ **恒红**, 而恒红正是 TASK-025 要杀
@@ -816,10 +856,11 @@ tasks:
     complexity: S
     est_hours: 3
     agent: backend-architect
-    dependencies: [TASK-024, TASK-025, TASK-027]
+    dependencies: [TASK-028]
     deliverables: []
     verification:
-      - "TASK-024 双向断言已通过 (硬前置)"
+      - "TASK-024 双向断言已通过 (硬前置, 经 TASK-028 传递)"
+      - "**TASK-028 已完成** — 子模块已本地合并双推、主仓 gitlink 已 bump 到合并后 master SHA"
       - "交接时显式告知待合并的子模块分支名 + 「aria 侧已 bump 未合并」状态"
       - "**交出去的仅**: PR 创建 + pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run) + 主仓自身 PR 流程"
       - "⛔ **未**把 aria 子模块的合并动作 / 双推 / ls-remote 核验 / gitlink bump 交出去 —— 那些由 TASK-028 承载"
@@ -868,7 +909,7 @@ tasks:
     complexity: M
     est_hours: 6
     agent: backend-architect
-    dependencies: [TASK-026]
+    dependencies: [TASK-024, TASK-025, TASK-027]
     deliverables:
       - aria/                 # 子模块 master ref (本地合并提交)
       - aria                  # 主仓 gitlink (160000 commit 条目, 非目录 — R2 曾指出需入 deliverables)
@@ -888,26 +929,30 @@ tasks:
       论证不成立 (AD10 治的是无人值守流水线的 S7_AWAITING_MERGE, 不治交互式 Phase C)。
 
 # ---------------------------------------------------------------------------
-# 依赖图 (DAG) — R2-fix; 只画 active 20 条 (TASK-015..021 已 cancelled)
+# 依赖图 (DAG) — R4-fix; active **21** 条 (R3-fix 版误写 20 且漏 TASK-028)
 # ---------------------------------------------------------------------------
 #
-#  TG-1 测试链 (同文件同 agent, 串行):
-#    001 → 002 → 003 → 004 → 005 ┐
-#  TG-2 实现链 (同文件同 agent, 串行):
-#    001,002,003,004,005 → 007 → 008 → 009 → 010
-#                           │        └──▶ 025  (sc-baseline 处置, 不必等发版)
-#                           └──▶ 006  (SC-12; RED-first 的唯一例外)
-#  TG-3 (不同文件, 可并行):  008 ──┬──▶ 011
-#                                  └──▶ 012 ──▶ 013 (TG-4 AB) ──▶ 027 (门范围披露)
+#  TG-1 → TG-2 → TG-3/TG-4 (组 1-4, 本轮未审, 略)
+#    ... → 014 (全量回归)
 #
-#  TG-5:  {005,006,009,010,011,012,013} ──▶ 014 ──▶ 022 ──▶ 023 ──▶ 024 ──┐
-#         025 ──────────────────────────────────────────────────────────┤
-#         027 ──────────────────────────────────────────────────────────┴──▶ 026 (交付 Phase C)
+#  TG-5:  014 → 022 (aria 版本面) → 023 (主仓 14 点) → 024 (整仓差集断言)
+#         024 ┐
+#         025 ├──▶ 028 (子模块合并+双推+ls-remote+gitlink bump) ──▶ 026 (交付 PR/闸门)
+#         027 ┘
+#         025 ◀── 009   (sc-baseline 处置, 不必等发版)
+#         027 ◀── 013   (AB 门范围披露)
 #
-#  真并行组 (不同文件):  {011, 012}
+#  ⚠️ **028 先于 026**: gitlink bump 必须在主仓 PR **之前**, 否则 PR 里 gitlink 未变,
+#     C.2.4.5 只输出 `OK: aria unchanged` ⇒ 该 bump 全程无 PR、无闸门
+#     (memory feedback_submodule_pointer_post_merge_bump; R4/delegation-lens Major)
+#  ⚠️ **024 先于 028**: 断言须在可回退点之前发红
+#  ⚠️ **026 受 aria-plugin #136 阻塞**: 该 Skill 无 gate-only 形态, 见其 blocking_note
+#
+#  真并行组 (不同文件, 组 3): {011, 012}
+#    *(R3-fix 版称「真并行组」只列这一对 — R4/completeness-lens 指出全图实有 32 对无序对;
+#      本行的意思是「**同 agent 可并发落盘**的对」, 已改措辞避免被读成「全图只有 1 对」)*
 #  ⛔ 无同文件并行边 (见 metadata.file_domain_serialization)
-#  关键路径: 001→002→003→004→005→007→008→009→010→014→022→023→024→026
-#  ⚠️ 024 (双向断言) 必须在 026 (交付 Phase C) 之前 —— 可回退点之前发红
+#  关键路径: 001→…→010→014→022→023→024→028→026
 #
 # active 复杂度: S ×14 · M ×6 · L ×1   |  粗锚工时 ≈ 88h (14×3 + 6×6 + 1×10)
 # active Agent:  qa-engineer ×10 · backend-architect ×7 · knowledge-manager ×4
