@@ -41,10 +41,10 @@
 
 ---
 
-## 📌 与母 Spec 的未决接缝 (须 owner 协调, 不在本 Spec 权限内)
+## ✅ 与母 Spec 的接缝 — 已关闭 (owner 裁定 2026-08-08)
 
-`a1-entry-claim-duplicate-work-guard` `:171-172` 逐字要求「在前置 Spec 的非目标处加一句『`include_terminal` 形参由 `a1-entry-claim` 引入, 不属本 Spec 变更面』」并标注「**该协调项须 owner 确认**」。
+母 Spec `a1-entry-claim-duplicate-work-guard:172` 逐字请求「在前置 Spec 的非目标处加一句『`include_terminal` 形参由 `a1-entry-claim` 引入, 不属本 Spec 变更面』」并标注「**该协调项须 owner 确认**」。
 
-R2′ 的 X3 被记为「随 Q6 消失」—— 但那只消掉了**测试层**冲突 (SC-8a 移出); 本 Spec §接口面 与 D6 仍无条件写「签名与 schema 不变」, **与母 Spec 的形参新增仍冲突** (R3′/tech-lead M7 命中: owner 决策单 Q3 把它框成了「SC-8a 措辞怎么写」, 母 Spec 请求的那一半从未进入 owner 视野)。
+**owner 2026-08-08 同意, 该句已落 [proposal.md §非目标](./proposal.md)。** ⇒ D6/§接口面 的「签名不变」自此限定于本 Spec 变更面; 母 Spec 追加 keyword-only 形参不视为违反、不构成回归。
 
-**⇒ 待 owner 裁: 是否按母 Spec 的请求在 §非目标 加那一句 (additive, 零成本)。**
+*(R2′ 曾把它记为「随 Q6 消失」—— 那只消掉了测试层冲突; R3′/tech-lead M7 指出协调项本体一处未动。至此关闭。)*

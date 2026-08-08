@@ -251,7 +251,11 @@ if c.linked_issue != own_linked_issue:
 - **不做** basename 别名归一 (D4 已成文为已知限);
 - **不改写**存量 coordination ref 数据 (D5);
 - **不动** `_TERMINAL` 的 skip 语义 (`include_terminal` 属母 Spec, 且 R3 已证其接线点描述有误);
-- **不引入** track-id 形态变更 (母 Spec 范围, R3 判其有碰撞域风险)。
+- **不引入** track-id 形态变更 (母 Spec 范围, R3 判其有碰撞域风险);
+- ⭐ **`include_terminal` 形参由 `a1-entry-claim` 引入, 不属本 Spec 变更面** (owner 裁定 2026-08-08)。
+  > **本条按母 Spec `:172` 的逐字请求加入**, 关闭该跨 Spec 协调项。母 Spec §2.4 第 0 段要求给 `lib/collision.py::linked_issue_overlaps` 增 keyword-only 形参 `include_terminal: bool = False` (不加则其 `_main():1232` 传参直接 `TypeError`), 并建议**由母 Spec 承担该签名变更**、前置 Spec 只改内部谓词。
+  > ⇒ **D6 与 §接口面 的「签名与 schema 不变」自此限定于本 Spec 的变更面**: 本 Spec 不改签名; 母 Spec 落地时追加 keyword-only 形参**不视为对本 Spec 的违反, 也不构成回归**。
+  > *(R2′ 曾把该协调项记为「随 Q6 消失」—— 那只消掉了测试层冲突 (SC-8a 移出), 母 Spec 请求的这一句一直未落; R3′/tech-lead M7 命中。)*
 
 ---
 
