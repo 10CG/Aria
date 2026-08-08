@@ -3,7 +3,7 @@ track-id: linked-issue-normalization
 owner-container: aria-runner-bot/023236f2
 phase: session-close
 status: done
-updated-at: 2026-08-08T17:50:00Z
+updated-at: 2026-08-08T18:20:00Z
 ---
 
 # Session Handoff (2026-08-08) — post_planning 四轮闸门 + 三起跨仓归属转交
@@ -209,3 +209,30 @@ updated-at: 2026-08-08T17:50:00Z
 - 🔴 **aria-plugin #136 未起 Spec** —— 面更大 (处方性 SKILL 变更 + **照跑 AB**, 套件 `ab-suite/branch-manager.json` 存在 + 需 gate-only 形态)。**#137 应先 ship** (让闸门先具备判别力)。
 - 🟡 **本容器有 5 条 `active` claim**: 4 条来自 2026-08-02 (`linked-issue-normalization` / `aria-plugin-125-126` / `aria-a1-entry-claim-guard` / `aria-plugin-124-path-coverage-z-flag`) + 本段新增 1 条。`--sweep-stale` 扫不掉前 4 条, 因 `heartbeat_at` 冻结在 acquire (**aria-plugin #107**)。其中 3 条的真实状态我不确定, **未猜测性 release**。
 - 🟡 **dogfood 观察**: 本段认领时 `linked_issue_overlap: []`, 而我传的是 org 限定形 `10CG/aria-plugin#137` —— 若他人用裸形认领, 当前裸 `!=` 谓词会漏报, 这个 `[]` 便分不清「真没有」与「谓词没匹配」。**我此刻正依赖着 `linked-issue-normalization` 要修的那个缺陷。**
+
+### §10.5 Aria #165 第四次复发 —— 当场检出并修复 (owner 授权)
+
+收尾时重跑 `scan.py`, `overall_parity` **转 false** 且 `gitlink_integrity` 出现 **`orphaned`**。
+
+**诊断** (逐项实测):
+
+| | aria-orchestrator master |
+|---|---|
+| `origin` (Forgejo) | `237045a` ✅ 主仓 gitlink 可达 |
+| `github` (镜像) | `86bb684` ❌ **`237045a` 不可达** |
+
+⇒ 并发轨把 aria-orchestrator 的 commit **只推了 origin**, 随后把主仓 gitlink bump 到它并**双推了主仓** ⇒ **GitHub 上主仓 gitlink 指向镜像里不存在的 commit, `clone --recursive` 断裂**。这就是 #165 的形状, 第四次。
+
+**值得记的三点**:
+
+1. **这次是机械检出的, 不是靠人注意到。** `gitlink_integrity[]` (per-(R,S) 9 分支状态) 直接把 `github/aria-orchestrator: orphaned` 打出来并把 `overall_parity` 拉成 false。⇒ memory `feedback_mirror_sync_needs_mechanical_backstop` 要的「机械兜底」**在检测侧确实起作用了**; 缺的仍是**bump 前的预防侧守卫** (那正是 aria-plugin #136 那类)。
+2. **两条硬约束的 enforcement 是不对称的。** 并发轨在子模块侧**遵守了硬约束 1** (`22d7f97` 是本地 merge commit, 非服务端 `Do: merge`), 但**漏了硬约束 2** (双推 + 逐远端核验)。⇒ #136 治的是约束 1 的工具层缺失; 本次暴露约束 2 **同样缺 bump 前守卫**。
+3. **并发轨 handoff 里「四仓双远程一致」这句实测不成立** —— 大概核了主仓与 standards/aria 而漏了 aria-orchestrator 的 github。一份已 commit 的 handoff 里的假绿声明, 与本 session 反复栽的「声称 vs 落地」同形。
+
+**我自己第一次修复尝试也失败了, 而且是同一族的坑**: `git push github master` 被拒 —— 因为我在 `feature/m6-cost-model-telemetry` 上工作, 子模块的**本地 `master` ref 陈旧在 `b2484f2`** (memory `feedback_local_main_ref_rots_during_branch_work` 的实时实证), `push <branch>` 推的是那个陈旧本地 ref 而非目标 commit。改推**显式 SHA** `git push github 237045a:refs/heads/master` 才成 (已验 `86bb684` 是 `237045a` 祖先 ⇒ 纯 fast-forward, 无 force)。
+
+> ⚠️ **本 session 内逐远端 `ls-remote` 核验连续抓到两件事**: (a) 并发轨的漏推; (b) **我自己那次失败的修复**。两次 push 的 hint 都很容易一眼滑过。硬约束 2 的价值在这一段是可量化的。
+
+**修复后机械核验**: `overall_parity: true` · `gitlink_integrity` **6/6 全 `ok`** · checks 8/8 · 顺手把子模块陈旧本地 master 追到 `237045a` (仅 update-ref, 未动 feature 分支, HEAD 仍 `92acce5`)。
+
+**Carry**: 约束 2 缺 bump 前守卫 —— 建议与 **#136** 一并处置 (那张已建议「主仓 bump gitlink 前断言被指向 commit 在**每个** enforced remote 上可达」; `gitlink_integrity` 已在**事后**做这件事, 守卫应在**事前**)。
