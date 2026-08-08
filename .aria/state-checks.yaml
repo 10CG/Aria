@@ -239,3 +239,27 @@ checks:
       经 CLI 生产入口真调 run_gate(); STALE 意味机制虽接线但近期未被调用 (退化风险)。
     timeout_seconds: 5
     enabled: true
+
+  # --- 运行时 plugin 版本 vs 仓内 SOT (Aria #172: "ship 了" ≠ "本仓用上了") ---
+  - name: "plugin-cache-currency"
+    description: |
+      比对 Claude Code 实际加载的 aria-plugin 版本 (installed_plugins.json 记录,
+      多条取最旧) 与仓内版本 SOT (aria/.claude-plugin/plugin.json)。
+      Aria #172 实测: cache 停在 1.63.0 而 SOT 已 1.65.5 ⇒ v1.64/v1.65 的全部
+      hook 修复在 Aria 自己的运行时从未生效 ⇒ **仓内一切 hook/skill dogfood 验收
+      失真** (测到的是旧副本)。与 memory feedback_release_phase_d_5_files_
+      synchronization 同族, 只是这次"用户"是我们自己。
+      滞后有两层, 本探针检其**后果**故两层任一断裂都红, 并在 STALE 文案里回报
+      marketplace clone 自称版本以分辨该刷 marketplace 还是直接装。
+      判据全分割: SOT 缺失 / 无安装记录 → SKIP (零证据不当正证据);
+      版本串不可解析 → FAIL (fail-closed); < SOT → STALE; == → PASS; > → AHEAD。
+    command: |
+      python3 .aria/probes/plugin-cache-currency.py
+    severity: warning
+    fix: |
+      STALE 第 1 层 (marketplace 也旧): 依次跑 `/plugin marketplace update 10CG-aria-plugin`
+      再 `/plugin update aria@10CG-aria-plugin`; 第 2 层只需后者。装完**重启 session** 使新
+      副本生效, 并复验 `nomad var put p @f` 得 exit=2 (aria-plugin #170 的修复现场)。
+      AHEAD: 本地 aria/ 子模块 checkout 陈旧 —— `git submodule update --remote aria`。
+    timeout_seconds: 5
+    enabled: true
