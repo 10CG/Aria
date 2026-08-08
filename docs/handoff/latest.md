@@ -14,6 +14,8 @@
 
 > **勿再照抄「凭据轮换逾期」** —— 该期限经核实不成立, 轮换本身已转交 [Aether #283](https://forgejo.10cg.pub/10CG/Aether/issues/283)。
 
-> **⚠️ 并发轨同日增量 (更晚)**: [post_planning 四轮 handoff](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) 已追加 **§10** —— owner 追加「先做 [1] 发布路径」: 陈旧 memory 更正 (治 SHA 孤立的药方造成了镜像孤立 = #165 一条来路) · aria-plugin **#137 走完 A.1** (`premerge-gate-mainbranch-failclosed`, 待 post_spec) · 一次并发撞车 (由 `ls-remote` 抓到, 干净 rebase) · **一条「更正的更正」**: memory store 是容器本地的, 双方对「某 memory 是否存在」的相反测量可同时为真 ⇒ **CLAUDE.md 引容器本地 memory 名有可移植性问题** (第三方一条都没有)。
+> **⚠️ 并发轨同日增量 (更晚, 已二次收尾)**: [post_planning 四轮 handoff](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) 已追加 **§10 + §11** —— owner 追加「先做 [1] 发布路径」: 陈旧 memory 更正 (治 SHA 孤立的药方造成了镜像孤立 = #165 一条来路) · aria-plugin **#137 走完 A.1** (`premerge-gate-mainbranch-failclosed`, 待 post_spec) · **Aria #165 第四次复发当场检出并修复** (`github/aria-orchestrator` 落后使主仓 gitlink orphaned; 由 `gitlink_integrity` **机械检出**, 非人注意到; 修复后 6/6 ok) · **一条「更正的更正」**: memory store 是容器本地的, 双方对「某 memory 是否存在」的相反测量可同时为真 ⇒ **CLAUDE.md/standards 引 memory 名对第三方恒悬空**。
+>
+> ⚠️ 该段 §10.5 实测: 本 handoff 「四仓双远程一致」一句**不成立** (漏核 `aria-orchestrator` 的 github) —— 已修复, 记录留痕, 未改本文件正文。
 
 **前序**: [2026-08-08 post_planning 四轮闸门 + 三起跨仓归属转交](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) (并发轨, 同日) · [2026-08-05 #128 四版迭代](./2026-08-05-issue128-per-segment-spec-four-iterations.md) (本容器)

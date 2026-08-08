@@ -3,7 +3,7 @@ track-id: linked-issue-normalization
 owner-container: aria-runner-bot/023236f2
 phase: session-close
 status: done
-updated-at: 2026-08-08T18:20:00Z
+updated-at: 2026-08-08T18:40:00Z
 ---
 
 # Session Handoff (2026-08-08) — post_planning 四轮闸门 + 三起跨仓归属转交
@@ -16,10 +16,11 @@ updated-at: 2026-08-08T18:20:00Z
 
 ## §0 入口 (新 session 优先读)
 
-- **当前态**: 主仓 `97a3885`, **双远端 ls-remote 核验一致, 零 ahead**。工作区仅 `aria-orchestrator` (一贯排除)。custom checks **8/8**。
+- **当前态**: 主仓 **`036dddf`** (§0 初写时为 `97a3885` —— §10 之后又落 4 个 commit, **此处已随收尾更新**), 双远端 `ls-remote` 核验一致, 零 ahead。工作区仅 `aria-orchestrator` (一贯排除)。custom checks **8/8**。
 - **`[1]` 已完成**: 凭据轮换转交 Aether · silknode waiver 拆分关闭 · terminal 语义开号 · 探针去恒红。
 - **`[2]` 停在 R4-fix, 闸门未收敛** (`max_rounds=4` 已耗尽): `converged: false`。产物 21 active + 7 cancelled 任务, 全部机械核验通过, **但仍有 2 条不可在本 Spec 内修的 Critical** (见 §2)。
-- **`[3]` 未启动**: `secret-guard-per-segment-evaluation` R4。**前置已清** —— 双子星是成文交接不是撞车 (见 §4.1)。
+- **`[3]` 未启动**: `secret-guard-per-segment-evaluation` R4。⚠️ **§0 初写时的「前置已清」判断已过期** —— 收尾时发现并发轨 (`simonfishgit`) 当日 08:42 / 12:08 / 16:34-17:31 均有活动 (2 张 issue + 3 个 commit) ⇒ **下段开跑前必须重新 fetch + 查看板**, 不得沿用 §4.1。
+- **`[1]` (owner 收尾后追加)**: 发布路径 —— 陈旧 memory 已更正 · aria-plugin **#137 走完 A.1** (待 post_spec) · **#165 第四次复发已当场检出并修复**。详见 **§10**。
 - **下一步**: 见 §6。
 
 ## §1 已完成 (本段)
@@ -107,11 +108,14 @@ updated-at: 2026-08-08T18:20:00Z
 
 ## §6 Next session 入口 + 优先级
 
-1. 🔴 **`[3]` `secret-guard-per-segment-evaluation` R4** —— 双子星成文交接的项, R4 是 `max_rounds` 最后一轮。**开跑前必 fetch + 查看板** (对方终端可能已重启)。
-2. 🔴 **三个 owner 裁量项待裁** (§2): TASK-025 择一 / TASK-028 推送授权 / TASK-027 AB 门范围。**未裁前那三条任务不得判 done** (已进 verification)。
-3. 🟡 **`CLAUDE.md` 两处**: 悬空 memory 指针 (硬约束 2) + Aria #177 的类级修法 (发布同步面那行)。均属 owner 领地。
-4. 🟡 **`[2]` 是否还要动**: 闸门 `max_rounds` 已耗尽 (`converged: false`)。按 §4.1, **建议不再审这份计划**, 改做 code-reviewer 的结构性建议 —— 把 `spec_complete.py --gate` 与一个 `version-surface-assert.py` 做成 Phase B 前置 smoke。**Phase B 开工受 #136 阻塞** (子模块合并路径)。
-5. **不要逐条修 R4 剩余 Major** —— 四轮实测每次都再生产等量缺陷 (§4.1)。
+> ⚠️ **本段已随收尾更新** —— §6 初写于 §10 之前, 那一版不含 `[1]` 的产物。
+
+1. 🔴 **`premerge-gate-mainbranch-failclosed` 跑 post_spec** (enabled `convergence`) —— owner 裁定本段不跑、下段跑 (理由: 本 session 已 17 个审计 agent + 四轮 fix, 疲劳期 fix 引入占比实测 80%+)。**这是排期不是跳闸门。** Spec 已 commit, track 已在 A.1 认领。
+2. 🔴 **`[3]` `secret-guard-per-segment-evaluation` R4** —— 双子星成文交接项, R4 是 `max_rounds` 最后一轮。**开跑前必 fetch + 查看板** (见 §0 更新)。
+3. 🔴 **aria-plugin #136 起 Spec** —— 应在 #137 ship **之后** (让闸门先具备判别力)。建议把「**硬约束 2 的 bump 前守卫**」并入 (§10.5: `gitlink_integrity` 已在事后检出, 守卫应在事前)。
+4. 🟡 **三个 owner 裁量项待裁** (TASK-025 择一 / TASK-028 推送授权 / TASK-027 AB 门范围) —— 未裁前那三条任务不得判 done。
+5. 🟡 **两件 owner 领地**: CLAUDE.md 的 memory 引用可移植性 (§11.2) · Aria #177 类级根因 (`CLAUDE.md:81`)。
+6. **不要逐条修 R4 剩余 Major** —— 四轮实测每次再生产等量缺陷 (§4.1)。
 
 ## §7 同步状态 (autofill 机械汇编)
 
@@ -236,3 +240,41 @@ updated-at: 2026-08-08T18:20:00Z
 **修复后机械核验**: `overall_parity: true` · `gitlink_integrity` **6/6 全 `ok`** · checks 8/8 · 顺手把子模块陈旧本地 master 追到 `237045a` (仅 update-ref, 未动 feature 分支, HEAD 仍 `92acce5`)。
 
 **Carry**: 约束 2 缺 bump 前守卫 —— 建议与 **#136** 一并处置 (那张已建议「主仓 bump gitlink 前断言被指向 commit 在**每个** enforced remote 上可达」; `gitlink_integrity` 已在**事后**做这件事, 守卫应在**事前**)。
+
+---
+
+## §11 会话收尾 (session-closer, 第二次执行)
+
+> §0-§9 是第一次收尾; owner 随后追加 `[1]`, 故 §10 增量 + 本段为**同一 session 的第二次收尾**。已同批修正 §0/§6 的陈旧态 —— §10 之后它们与正文相反, 正是本 session 反复抓的「同一份文件两处相反」。
+
+### §11.1 机械兜底 (step 0/3)
+
+- **§7 sync**: `[main] master = 036dddf | github=equal origin=equal` —— **warnings 0**。
+- **§2 unfinished**: **180** 条, 与第一次收尾同数。
+- **§5 consistency**: **10 → 11** flags, 全 `active_change_not_in_upm` (Aria 无 UPM, 恒亮)。
+
+> **⚠️ 一个有信息量的交叉核 —— 本 session 第二次撞 `handoff_autofill` 盲区**: 新 Spec `premerge-gate-mainbranch-failclosed` **被 consistency 看见** (活跃 change +1) 却**没进 unfinished** —— 它是 Level 2 只有 `proposal.md` 无 `tasks.md` checkbox。这正是 aria-plugin **#123** 记的「proposal-inline 任务 (Level 2 proposal-only spec) 报 0 未完成」第三形态盲区。
+>
+> 第一次撞的是**表格形态** (§1.5, 已由 A.2 转 checkbox 修掉)。⇒ 该 backstop 对**两种非 checkbox 形态**都失明; 而它是 §2 的兜底。**这一 session 两次实证同一个盲区族。**
+
+### §11.2 内省 — 本段待固化 (step 1/2)
+
+```
+[候选 memory]
+- 「自己开的 issue 也要 probe」—— 本段我把自己开的 #137 订正了两处 (「两条腿都绿」实为只有一条; 漏了 :300 那个缺省), 且订正来自 probe 生产态而非重读 issue。type: feedback (与既有 reporter-miscite 同族但主体是自己)
+- 「memory store 是容器本地的」—— 已落 feedback_memory_store_is_container_local_not_shared ✅
+- 「修镜像推显式 SHA 而非分支名」—— 已追加进 feedback_local_main_ref_rots_during_branch_work ✅
+
+[未写下经验]
+- 「机械兜底自身的盲区要成对记」: handoff_autofill 只数 checkbox ⇒ 表格形态 (已修) 与 Level-2 proposal-only (aria-plugin #123, 未修) 两种形态都失明; 而 CANCELLED 的删除线处置又让「被取消」这个状态在机械层完全不可见 (§2 已记)。三者共同点: **backstop 的可见性单位 (checkbox) 窄于它要兜的情形集** —— 与既有 knob-granularity 同形, 但那条讲豁免开关, 这条讲**可见性单位**。是否值得独立一条待判。
+- 「并发轨的 handoff 也可能有假绿声明」: 本段实测「四仓双远程一致」不成立 (§10.5)。⇒ 读并发轨 handoff 时, 其同步状态类声明与自己的一样需要独立核 —— 不因为它是别人写的就更可信。
+```
+
+### §11.3 本段 carry (§10.4 之外)
+
+- 🟡 **本容器 5 条 `active` claim** (4 条 2026-08-02 陈旧 + 本段 `premerge-gate-mainbranch-failclosed`)。`--sweep-stale` 扫不掉陈旧的 4 条, 因 `heartbeat_at` 冻结在 acquire (**aria-plugin #107**)。其中 3 条真实状态我不确定, **未猜测性 release**。
+- 🟡 **`handoff_autofill` 看不见新 Spec** (§11.1) ⇒ 下段若靠 §2 机械清单判「还剩什么」, 会漏掉 `premerge-gate-mainbranch-failclosed`。已开号 aria-plugin #123, 此处只是又一次实证。
+
+### §11.4 leaf 终结
+
+本段**不调**任何 phase-a/b/c/d / workflow-runner / openspec-archive (session-closer 是 leaf)。检出「有 shipped 未归档 cycle」= 无 (`pending_archive: 0`)。
