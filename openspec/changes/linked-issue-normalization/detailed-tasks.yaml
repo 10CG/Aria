@@ -1,0 +1,437 @@
+# Detailed Tasks — linked-issue-normalization
+# Phase A.2 + A.3 output (task-planner v2.0). Datasource: tasks.md (path A, dual-layer).
+# Spec: openspec/changes/linked-issue-normalization/{proposal.md,tasks.md}
+# Audit trail (append-only, 不维护与 Spec 一致性): .aria/audit-reports/linked-issue-normalization-audit-trail.md
+# Scope repo: aria (aria-plugin) @ af87cae — 全部路径与行号已对该 HEAD 实测核验。
+
+metadata:
+  feature: linked-issue-normalization
+  title: "linked_issue 跨格式归一比较 (collision.py 谓词 + 导出单元)"
+  level: 3
+  datasource: "tasks.md"
+  scope_repo: "aria"
+  scope_repo_head: "af87cae"
+  ship_target: "aria-plugin v1.66.0 (MINOR — 行为面扩大)"
+  total_tasks: 17
+  task_groups: 5
+  status: "A.2 + A.3 complete 2026-08-08 — 待 post_planning 闸门 (config: audit.checkpoints.post_planning=convergence, enabled)"
+  new_agents_required: false
+  agent_roster: [qa-engineer, backend-architect, knowledge-manager]
+
+  spec_maturity_note: >
+    proposal.md 已过 post_spec R1'/R2'/R3' 三轮 × 五席 (均 5/5 REVISE), 但三轮实测算法本体
+    零偏差 —— 缺陷集中在证据层与文档一致性层, 且 R3' 的 26 条 major 中 22 条是该轮 fix 自身
+    引入 (拐点已过, memory feedback_audit_marginal_return_goes_negative)。故本次 A.2 分解
+    直接采信 275 行交付面, 不重新审议算法; post_planning 的审议对象应是**任务分解与验收的
+    可执行性**, 不是归一规则本体。
+
+  estimation_note: >
+    Complexity S/M/L/XL 是主排序信号 (文件影响面 + 依赖数)。工时是粗锚 (S≈3h / M≈6h / L≈10h);
+    本项目 canonical 工作量轴是 token 轴 (ai-native-estimator), 由 phase-d-closer 收尾采集,
+    此处不重新推导。
+
+  test_baseline_note: >
+    state-scanner 基线 = 1322 tests, 已于 2026-08-08 实测确认 (cd skills/state-scanner/tests
+    && python3 run_tests.py → "Ran 1322 tests / OK" / exit 0; 跨 skill run_all_tests.sh →
+    9 OK / 0 FAIL / 累计 1698)。本 change 新增子用例下界 45 (TG-1 六项括注加总, 与 proposal
+    §Impact 逐条推导独立吻合)。
+
+  known_env_trap:
+    issue: "https://forgejo.10cg.pub/10CG/aria-plugin/issues/134"
+    summary: >
+      tests/test_collision.py:29-30 的 sys.path insert 顺序倒置, 该模块只在**全量** discovery
+      时靠字母序更早模块的副作用才能导入。单模块跑 (python3 run_tests.py collision) 与 pytest
+      跑均硬失败 ImportError, 并连带把 test_coordination_ref_lib.py 打成 collection error。
+    impact_on_this_spec: >
+      Phase B 迭代 lib/collision.py 时最自然的两条命令都会给出 ImportError 而非测试结果。
+      **实施者请勿误判为自己改坏了** —— 它 2026-05-30 (4d87060) 就坏了, 与本 Spec 无关。
+      验收一律以 tests/ 目录内的**全量** run_tests.py 为准。
+    in_scope: false   # Level 1 修复, 已独立开号; 不并入本 Spec 以守范围纪律
+
+  co_dependency_note: >
+    TG-1 (测试) → TG-2 (实现) 是 RED-first: TG-1 落盘后应立即复现 proposal baseline 表里
+    那 8 条 baseline-failing (SC-1/1b/3/4/5b/11/13/15)。TG-3 可与 TG-2 并行 (不同文件),
+    但 3.3 必须早于 4.1 (AB 测的是该 hunk 的行为影响)。TG-5 gate 在 TG-1..TG-4 全绿之后。
+
+# ---------------------------------------------------------------------------
+# TG-1 — 测试先行 (RED). 宿主 tests/test_release_by_track.py (既有 6 条逐字不改)
+# ---------------------------------------------------------------------------
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    task_group: TG-1
+    title: "SC-1/1b/2/3/4 — 跨族配对 + 三切分点 strip + 负控 + org 不参与 + int 十进制"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥13 (SC-1:6 + SC-1b:3 + SC-2:1 + SC-3:1 + SC-4:2)"
+      - "SC-1/1b/3/4 在未改 collision.py 的工作树上必须 RED (对齐 proposal baseline 表)"
+      - "SC-2 在 baseline 上为 GREEN (负控) — 若它 baseline 就红, 说明用例写错了"
+    notes: >
+      SC-1b 是唯一覆盖第三个 strip 点 (/-split 之后) 的用例 — 「#-split 后 strip 了、
+      /-split 后忘了」的实现只有它能杀 (R1'/C1 变异实证)。举例必须带 repo 段, 见
+      proposal §举例约束 (R1/C1 根因就是 SC-4 用了裸 #007 × #7)。
+
+  - id: TASK-002
+    parent: "1.2"
+    task_group: TG-1
+    title: "SC-5/5b/5c — basename 轴三态 (截断型不归一 / 分隔符型归一 / 段内空格负控)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥5 (SC-5:1 + SC-5b:3 + SC-5c:1)"
+      - "SC-5b baseline RED; SC-5 与 SC-5c baseline GREEN"
+      - "SC-5 的期望列写行为本身 (不命中), 不得写「被记为已知限」(循环定义, R1/minor 已判)"
+    notes: >
+      SC-5b 用真实仓 10CG/10cg.local (Forgejo 实测 11 个 open issue)。SC-5c 钉住 D8 的
+      硬否决判据「不跨越分隔位、不改变段数」—— 把段内空格也译成 - 的过宽实现必红。
+
+  - id: TASK-003
+    parent: "1.3"
+    task_group: TG-1
+    title: "SC-6/6b/10 — 原串回落 + number_str 边界五类 + 一条畸形毒不死整批"
+    status: pending
+    complexity: L
+    est_hours: 10
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥15 (SC-6:5 + SC-6b:9 + SC-10:1)"
+      - "三条 baseline 全 GREEN — 它们是护栏, 防的是**修复自身**引入的病, 不是现状的病"
+      - "SC-10 必须构造「一条畸形 + 数条良构」混合批次并断言 A、B 两项仍在返回值里"
+      - "全程不抛异常 (含 4301 位自配对)"
+    notes: >
+      SC-10 是全表唯一的混合批次用例。它防的失效面比本 Spec 要治的原缺陷更宽 —— 原缺陷
+      影响单个 issue 的双方, 这里是「任意一条畸形 linked_issue 使全体 session 的重叠检测
+      集体失明」(异常逃到 phase1_gate.py:1235 的 except Exception 被吞成 [])。
+
+  - id: TASK-004
+    parent: "1.4"
+    task_group: TG-1
+    title: "SC-11/13/15/14 — 切分方向双轴 + casefold + number 相等必要条件"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥8 (SC-11:2 + SC-13:2 + SC-15:2 + SC-14:2)"
+      - "SC-11/13/15 baseline RED; SC-14 baseline GREEN (护栏)"
+      - "SC-11 语料必须含 2 个以上 # 的值, 否则「取最后一个 #」写反不会被任何断言察觉"
+    notes: >
+      SC-13 (casefold) 与 SC-14 (number 必要条件) 在 Q7-1 穷举变异测试之前是**零覆盖**维度 —
+      变异体在全部既有 SC 上零发红。SC-15 是 SC-11 的姊妹条 (/ 方向 vs # 方向)。
+
+  - id: TASK-005
+    parent: "1.5"
+    task_group: TG-1
+    title: "SC-9 — 命中条目回显未归一原始串 (D2 极性论证的唯一守护)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥1; baseline GREEN (现状即回显原串, collision.py:228 实测确认)"
+      - "断言值为逐字原串 (如 '10CG/aria-plugin #122'), 不是归一后的 key"
+    notes: >
+      ⚠️ 本条 R1' 曾被移出、R3' 恢复 —— 移出理由「与 D2 半幅配对, 配对对象消失」因果反了:
+      Q1 裁定「自己那一侧永不补」后, 回显对方原串成为 D2 fail-toward-reporting 的**唯一**
+      缓解。且 normalize_linked_issue 返回 (basename, number) 丢弃 org ⇒ 本字段是输出里
+      唯一携带 org 的通道。无本条则 Phase B 顺手把回显改成归一键即全绿, D2 整个极性论证
+      (「人一眼可辨」) 落空。**不得再次移出。**
+
+  - id: TASK-006
+    parent: "1.6"
+    task_group: TG-1
+    title: "SC-12 — 导出单元返回契约 (可解析→二元组; 三类不可解析→None)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: [TASK-007]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_release_by_track.py
+    verification:
+      - "子用例 ≥3 — 三类不可解析各一例: 无 # (no-hash-here) / 谓词不满足 (repo#abc) / basename 空 (10CG/#7)"
+      - "用异常 / 空串 / (None, None) 替代 None 的实现必红"
+    notes: >
+      唯一依赖实现的 TG-1 任务 (normalize_linked_issue Phase B 才存在) ⇒ 无 baseline 行,
+      依赖 TASK-007。母 Spec §2.1 的 track-id 派生依赖 None 这一语义, 不钉住母 Spec 就得靠猜。
+
+# ---------------------------------------------------------------------------
+# TG-2 — 实现 (GREEN). 单文件: lib/collision.py
+# ---------------------------------------------------------------------------
+  - id: TASK-007
+    parent: "2.1"
+    task_group: TG-2
+    title: "导出纯函数 normalize_linked_issue(value) -> tuple[str, int] | None"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    dependencies: [TASK-001, TASK-002, TASK-003, TASK-004]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py
+    verification:
+      - "SC-12 全绿 (返回契约)"
+      - "归一 = 每段 strip → repo_basename 内 ./_ → - 译码 → casefold(), 建议按此顺序书写"
+      - "None 与 proposal 规则 4 的不可解析枚举三条一一对应"
+    notes: >
+      D9/Q2 裁定 = 导出 (非私有)。三者施加顺序不影响结果 (R1'/backend 已扫全部 1,114,112
+      个 Unicode 码点 + 3019 basename × 6 种排列, 0 处不一致), 但**固定写作 strip → 译码
+      → casefold** 以便 review。⛔ 只授权这三条重写, D8 的其余一律不授权。
+
+  - id: TASK-008
+    parent: "2.2"
+    task_group: TG-2
+    title: "linked_issue_overlaps 内部比较谓词切换为归一键 (签名与 schema 不变)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-007]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py   # 裸 != 谓词在 :217 (实测确认)
+    verification:
+      - "SC-1/1b/2/3/4/5/5b/5c/13/14/15 全绿"
+      - "函数签名与返回 schema 逐字不变 ⇒ Phase B 现有调用方零改动 (D6)"
+      - "collision.py:228 的 linked_issue 回显**不动** (SC-9 守着)"
+    notes: >
+      现状是 `if c.linked_issue != own_linked_issue: continue` (:217 实测)。
+      ⚠️ 本文件内还有 collision.py:155 与 :307 两处 _TERMINAL = {done, abandoned}, 与本谓词
+      用的 :210 {done, abandoned, unknown} **不同** — 属既有分歧 (已开 aria-plugin #133),
+      本 Spec 只披露不改, 不要顺手统一。
+
+  - id: TASK-009
+    parent: "2.3"
+    task_group: TG-2
+    title: "解析守卫与异常隔离 (存在性守卫 / try-except ValueError / limit > 0 前置)"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: backend-architect
+    dependencies: [TASK-007]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py
+    verification:
+      - "SC-6/6b/10 全绿; 全程不抛异常"
+      - "不含 # 的字符串**先判不可解析**, 不得执行无守卫的 rsplit unpack / 下标取值"
+      - "int() 必须包在 try/except ValueError → 判不可解析"
+      - "长度上界: limit = sys.get_int_max_str_digits(); 仅当 limit > 0 且 len > limit 才判不可解析"
+    notes: >
+      ⚠️ `limit > 0` 前置不可省 — 0 是 Python 文档化的「无限制」哨兵。照抄成裸 `len > limit`
+      在 limit==0 时退化为 `len > 0` ⇒ 对任意非空 number_str 恒真 ⇒ **本 Spec 要修的缺陷
+      原样复活, 且看起来「实现完全照抄了 Spec」** (memory feedback_fix_recurs_in_its_own_fallback_path
+      的同一形状)。实现不得依赖 int() 不抛异常。
+
+# ---------------------------------------------------------------------------
+# TG-3 — 文档同步 ×3 (两处 substitute + 一处照跑 AB)
+# ---------------------------------------------------------------------------
+  - id: TASK-010
+    parent: "3.1"
+    task_group: TG-3
+    title: "collision.py docstring :182-206 同步 (归一键 / org 不参与)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-008]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py   # docstring :182-206
+    verification:
+      - "说明匹配按归一后的 <repo>#<n>, org 不参与"
+      - "⛔ 措辞不得暗示「已穷尽核实 / 已覆盖全部别名」(basename 截断轴是已知限)"
+    notes: "Rule #6 判据 = 判据表第一行「描述性」⇒ substitute (SC 级 baseline-failing 结构化测试替代)。纯 Python docstring, 零 AI 指令面。"
+
+  - id: TASK-011
+    parent: "3.2"
+    task_group: TG-3
+    title: "claim_schema.py:107-114 字段文档两处失准同批修"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-008]
+    deliverables:
+      - aria/skills/state-scanner/lib/claim_schema.py   # :107-114
+    verification:
+      - "(a) 'SAME linked_issue' → same **normalized key**"
+      - "(b) 'Two **active** claims' → 实际跳的是 _TERMINAL = (done, abandoned, unknown), **yielded 不在内**"
+    notes: >
+      两处失准都被本 Spec **加剧** (实测确认原文逐字为 "Two active claims with the SAME
+      linked_issue"): §接口面第 2 条正是要把 3 条 yielded claim 变成新可命中目标。它是
+      schema 文档 (读者最可能当权威), 不改则 ship 后成为唯一仍描述旧语义的面 ⇒ 违 Rule #3。
+      判据路径与 TASK-010 完全相同 ⇒ substitute。
+
+  - id: TASK-012
+    parent: "3.3"
+    task_group: TG-3
+    title: "SKILL.md:176 括注同步 — 补「(按归一后的 <repo>#<n> 比较, org 不参与)」"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-008]
+    deliverables:
+      - aria/skills/state-scanner/SKILL.md   # :176 (实测确认为 claim 生命周期闭环那行)
+    verification:
+      - "括注落在 :176 现有「同 issue 不同 track-id 的『同一件事两个名字』」之后"
+      - "⛔ 本 hunk **必须**由 TASK-013 照跑 AB — 不申请豁免、不走 substitute"
+    notes: >
+      Rule #6 判据 = 「行为变更后的语义追加」, 落不进 skill-benchmark-exemption.md §2 具名的
+      三个子类型 (溯源注释 / 行号勘正 / 术语修正) ⇒ **覆盖外分支** ⇒ 该 convention §4
+      明写「AI 不可以在决策表之外自创理由…落进『拿不准』格时默认照跑」。
+
+# ---------------------------------------------------------------------------
+# TG-4 — Rule #6 AB (owner Q5 亲裁, 不可豁免)
+# ---------------------------------------------------------------------------
+  - id: TASK-013
+    parent: "4.1"
+    task_group: TG-4
+    title: "用 /skill-creator 对 SKILL.md:176 的 hunk 照跑 AB"
+    status: pending
+    complexity: M
+    est_hours: 6
+    agent: qa-engineer
+    dependencies: [TASK-012]
+    deliverables:
+      - aria-plugin-benchmarks/ab-results/   # 本轮结果目录 (日期 + 版本命名)
+    verification:
+      - "AB 经 /skill-creator 执行 (Rule #6: 自研 runner 已废弃)"
+      - "结果落 aria-plugin-benchmarks/ab-results/ 并在 tasks.md 5.x 前完成"
+      - "⛔ 不得以「改动小 / 纯括注 / 性价比」为由降级 — Q5 是 owner 亲裁 (Rule #10)"
+    notes: >
+      时点硬约束: **TASK-012 实施之后、TG-5 发版之前** (AB 测的是该 hunk 的行为影响, 而
+      hunk 是 Phase B 交付物)。⚠️ 已知套件缺口: aria-plugin #117 (AB 套件缺 authoring 维度)
+      与 #127 (phase-c-integrator 两套件覆盖不到 D9 surface 措辞) — 若本轮 AB 判定该 hunk
+      属套件覆盖外, 按 CLAUDE.md Rule #6 表第三行处理 (点名行为 + 建可证伪定向 fixture +
+      套件缺口开 issue; **缺一照跑**), 不得静默豁免。
+
+# ---------------------------------------------------------------------------
+# TG-5 — 回归 + 发版同步面 (9 处落点)
+# ---------------------------------------------------------------------------
+  - id: TASK-014
+    parent: "5.1"
+    task_group: TG-5
+    title: "全量回归 — 1322 基线 + 新增 ≥45; 跨 skill run_all_tests.sh 全绿"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: qa-engineer
+    dependencies: [TASK-005, TASK-006, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013]
+    deliverables: []
+    verification:
+      - "cd aria/skills/state-scanner/tests && python3 run_tests.py → Ran ≥1367 / OK (1322 + ≥45)"
+      - "bash aria/skills/run_all_tests.sh → 0 FAIL (基线 9 OK / 累计 1698 + 新增)"
+      - "既有 6 条 (test_release_by_track.py :206-247 与 :527-575) 逐字未改"
+    notes: >
+      ⚠️ 见 metadata.known_env_trap (aria-plugin #134): 验收一律以 tests/ 内的**全量**
+      run_tests.py 为准; 单模块模式与 pytest 对 test_collision.py 会给 ImportError, 那是
+      70 天前的既有 bug, 不是本 change 的回归。
+
+  - id: TASK-015
+    parent: "5.2"
+    task_group: TG-5
+    title: "aria 子模块 5 文件 bump 到 v1.66.0"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-014]
+    deliverables:
+      - aria/.claude-plugin/plugin.json          # 版本 SOT
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+    verification:
+      - "plugin.json 为 SOT, 其余 4 文件与其一致"
+      - "MINOR 而非 PATCH — 行为面扩大 (原本漏报的现在能报出来)"
+      - "CHANGELOG 须写明 basename 截断轴仍是已知限, 不得写成「已覆盖全部别名」"
+    notes: "rule6_note 引的先例 v1.65.2 是 PATCH, 因其为纯脚本修复无行为面扩大 — 本 change 不同。"
+
+  - id: TASK-016
+    parent: "5.3"
+    task_group: TG-5
+    title: "主仓同步面 3 项 — gitlink + VERSION 子模块版本表行 + root README badge"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-015]
+    deliverables:
+      - VERSION
+      - README.md
+    verification:
+      - "主仓 gitlink 指向 aria 子模块**合并后**的 master SHA (非 feature 分支 SHA)"
+      - "custom check m6-version-badge-match → OK badge=1.66.0"
+    notes: >
+      ⚠️ 子模块合并一律本地 git merge + 双推, **禁** Forgejo 服务端合并 (CLAUDE.md 多远程
+      硬约束 1 — 服务端合并会产生 orphaned gitlink, 已致 2026-07-14 事故)。推后逐个
+      ls-remote 核验, 不信 push 回执 (硬约束 2)。
+
+  - id: TASK-017
+    parent: "5.4"
+    task_group: TG-5
+    title: "i18n README translated-from 标记 ×3 (#140 B 档: 只更标记不重译)"
+    status: pending
+    complexity: S
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-015]
+    deliverables:
+      - README.zh.md
+      - README.ja.md
+      - README.ko.md
+    verification:
+      - "custom check i18n-readme-translation-currency → OK (3 i18n READMEs current @ 1.66.0)"
+      - "正文无实质变更 ⇒ 只更 <!-- translated-from: vX.Y.Z --> 标记, 不重译"
+    notes: >
+      该 check 逐字比对标记 vs plugin.json ⇒ **任何** bump 都会让三份判 STALE。
+      TASK-015~017 合计 9 处落点; 按早期 proposal 的「5 文件 + gitlink」字面执行会漏 3 处
+      并触发两条 enabled check。**收尾跑不带路径的 git status 核验** (memory
+      feedback_scoped_git_add_splits_claim_from_landing — 该形状本项目一天内两次实证)。
+
+# ---------------------------------------------------------------------------
+# 依赖图 (DAG)
+# ---------------------------------------------------------------------------
+#
+#   TASK-001 ┐
+#   TASK-002 ├──▶ TASK-007 ──▶ TASK-008 ──┬──▶ TASK-010 ┐
+#   TASK-003 │        │            │       ├──▶ TASK-011 ├─┐
+#   TASK-004 ┘        │            │       └──▶ TASK-012 ─┴─▶ TASK-013 ┐
+#                     └──▶ TASK-009 ───────────────────────────────────┤
+#   TASK-005 (独立, baseline GREEN 护栏) ───────────────────────────────┤
+#   TASK-006 ◀── TASK-007 ─────────────────────────────────────────────┤
+#                                                                      ▼
+#                                             TASK-014 ──▶ TASK-015 ──┬──▶ TASK-016
+#                                                                     └──▶ TASK-017
+#
+# 并行组: {001,002,003,004,005} 可并行 (同一文件不同用例, 建议串行落盘避免冲突)
+#         {010,011,012} 可并行 (三个不同文件)
+#         {016,017} 可并行
+# 关键路径: 001..004 → 007 → 008 → 012 → 013 → 014 → 015 → 016
+#
+# 复杂度汇总: S ×11 · M ×5 · L ×1 · XL ×0   |  粗锚工时 ≈ 73h (11×3 + 5×6 + 1×10)
+# Agent 分摊:  qa-engineer ×8 · knowledge-manager ×5 · backend-architect ×4
+#
+# ⚠️ 本三行为派生值, 每次增删任务或改 complexity 必须重算 — 首版即写错一次
+#    (S×12/M×4/67h), 由机械核验抓到。proposal §Impact 的「≥45」下界行有同款订正史
+#    (三次因漏改而失准) — 同一形状。
