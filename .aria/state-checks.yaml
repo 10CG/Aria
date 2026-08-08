@@ -41,6 +41,24 @@ checks:
       if [ ! -f "$WAIVER" ]; then
         echo "OK (waiver file absent — likely pre-2026-05-07 state)"; exit 0
       fi
+      # 2026-08-08: waiver may reach a terminal status (owner 裁定拆分取代). Without
+      # this branch the probe compares an expires_at that no longer governs anything
+      # and is therefore PERMANENTLY red — zero information, same as a false green
+      # (memory feedback_false_green_dual_is_permanent_red).
+      # fail-CLOSED: only this explicit whitelist short-circuits; any other/unknown/
+      # empty status falls through to the expires_at comparison below, and a terminal
+      # status that fails to name a successor is reported MALFORMED rather than OK.
+      STATUS=$(grep -E '^status:' "$WAIVER" | head -1 | sed -E 's/^status:[[:space:]]*//; s/[[:space:]]*$//')
+      case "$STATUS" in
+        superseded_by_split|closed|resolved)
+          FM=$(awk 'NR==1 && /^---$/{next} /^---$/{exit} {print}' "$WAIVER")
+          SUCC=$(printf '%s\n' "$FM" | grep -cE '^[[:space:]]*-[[:space:]]+https?://')
+          if [ "${SUCC:-0}" -lt 1 ]; then
+            echo "MALFORMED — status=$STATUS but no superseded_by URL in frontmatter of $WAIVER"; exit 1
+          fi
+          echo "OK (status=$STATUS, ${SUCC} successor ref(s) — see §2026-08-08 Closure)"; exit 0
+          ;;
+      esac
       EXPIRES=$(grep -E '^expires_at:' "$WAIVER" | head -1 | sed -E 's/^expires_at:[[:space:]]*//; s/T.*$//; s/[[:space:]]*$//')
       if [ -z "$EXPIRES" ]; then
         echo "MALFORMED — expires_at not found in $WAIVER"; exit 1

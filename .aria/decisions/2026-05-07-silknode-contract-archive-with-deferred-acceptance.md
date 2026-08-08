@@ -4,7 +4,12 @@ spec_id: aria-2.0-silknode-integration-contract
 expires_at: 2026-08-05T23:59:59Z
 sign_off_mechanism: pr_approval
 approved_by: solo-lab (uni.concept.wzfq@gmail.com) via archive commit
-status: deferred
+status: superseded_by_split
+closed_at: 2026-08-08
+closed_by: owner (uni.concept.wzfq@gmail.com)
+superseded_by:
+  - https://forgejo.10cg.pub/10CG/SilkNode/issues/979
+  - https://forgejo.10cg.pub/10CG/Aria/issues/175
 audit_loop_rounds: 3
 audit_loop_outcome: converged
 ---
@@ -156,6 +161,49 @@ owner 追问: 「aria 是负责管理 AI 开发的, 为什么就不处理 PII/�
 - **契约 1 → 归属迁移**: 在 silknode/Luxeno 侧成文并自测; Aria 侧仅保留失效触发记录, 不假装能 enforce 外部代码。
 
 **以上均为分析与建议, 不构成决定。** `status` 字段维持 `deferred` 未改动 —— 关闭 / 续期 / upgrade / 重写 的裁决权归 owner (per AD-M0-9)。
+
+---
+
+## 2026-08-08 Closure — owner 裁定「按 v1.1 建议拆分处置」
+
+> **Decider**: solo-lab (uni.concept.wzfq@gmail.com) | **Trigger**: `/state-scanner` 会话入口把本探针的红色列为待办, owner 在四条路 (拆分 / 直接关闭 / 续期 / 照原文 upgrade) 中选**拆分处置**。
+> **frontmatter 变更**: `status: deferred` → `status: superseded_by_split` + `closed_at` / `closed_by` / `superseded_by`。
+
+### 裁定
+
+原 SOP 第 3 步的三个选项 (关闭 / 续期 / upgrade) 全部建立在「契约 1+2 作为一个整体」之上, 而 §v1.1 的两条前提质疑已经证明这个整体不该存在。故**先拆再处置**, 本豁免作为一个整体**被拆分取代而非续期**:
+
+| | 处置 | 载体 | 状态 |
+|---|---|---|---|
+| **契约 1** (约束 SilkNode/Luxeno 实现行为) | **归属转交 SilkNode 侧成文 + 自测** | [SilkNode #979](https://forgejo.10cg.pub/10CG/SilkNode/issues/979) | 已提交, 待 SilkNode 回执 |
+| **契约 2** (约束 Aria 自身业务数据范围) | **重写为两条可执行项**, 不照抄原文 | [Aria #175](https://forgejo.10cg.pub/10CG/Aria/issues/175) | 已开号, 待 Level 2 Spec |
+| **Aria 侧对契约 1 的残留义务** | 仅保留「假设失效 ⇒ 触发 `r1-legal-memo` 重评」记录; **不再声称能 enforce 外部代码** | 本段 + #979 | 生效 |
+
+契约 2 的两条替代项 (方向已固化在 #175):
+
+1. **数据卫生纪律** —— 送入 LLM 的 issue/diff/prompt 不得含真实 PII / 支付凭据 / 医疗记录, 需样例时用合成数据 (与 Rule #7 同族, 可机械 enforce)
+2. **法务结论的适用范围声明** —— `r1-legal-memo` v1.1 IS-4 以「当前 10CG Lab 自身项目场景」为条件; 项目领域数据本属敏感类别时该结论对其不适用, 需单独评估
+
+### 诚实交代: 本次关闭**不是** acceptance 全 MET
+
+原 SOP 的「关闭 waiver」选项预设「acceptance 全 MET」。本次不是:
+
+- **(c) 仍是 MISSED 且不再补** —— `silknode_storage_check` / `business_data_classification_check` 两个检查器**不会在 Aria 侧实现**。这不是拖延, 是裁定它们不该在 Aria 侧存在 (前者越界扫外部仓库 → 转 #979; 后者依附的契约 2 原文本身要被重写 → 归 #175 重新定义验收)。
+- **(d) 三个 grep 仍全 0 且不再补** —— 原 acceptance 要求的「逐字抄进 CLAUDE.md / PRD」被裁定为**不应执行** (v1.1 已论证: 一旦动笔即与通用方法论定位自相矛盾)。
+
+⇒ 本豁免是**被两个新载体取代**, 而非被满足。两个载体各自的验收由其 issue / Spec 定义, **不继承本文件的 acceptance 表**。任何后续查询请以 #979 / #175 为准, 本文件自此只作历史记录。
+
+### 探针相应调整
+
+`.aria/state-checks.yaml::silknode-contract-deferral-expiry` 原逻辑只比较 `expires_at` 与 now, **不看 `status`** ⇒ 本豁免一经拆分取代, 该探针会**永久红**。恒红与假绿一样是零信息量 (memory `feedback_false_green_dual_is_permanent_red`), 故同批调整为: **先读 `status`, 命中终态集合则 OK 并回显取代载体; 否则回落原 `expires_at` 比较**。
+
+调整遵循本文件 2026-05-07 的同一先例 —— 该探针本身就是与豁免决定同 commit 落地的 (~15 行 YAML)。终态集合取 `superseded_by_split` / `closed` / `resolved`, 采**显式白名单 + 其余回落日期比较** (fail-CLOSED, per memory `feedback_invariant_needs_failclosed_default`) —— 未知 status 值不得被当成「已处置」。
+
+### 跨引用 (本段新增)
+
+- [SilkNode #979](https://forgejo.10cg.pub/10CG/SilkNode/issues/979) — 契约 1 归属转交
+- [Aria #175](https://forgejo.10cg.pub/10CG/Aria/issues/175) — 契约 2 重写 (需 Level 2 Spec)
+- `.aria/decisions/2026-08-08-credential-rotation-ownership-transfer-to-aether.md` — 同 session 同形状的另一起跨仓归属转交 (Aether #283); 两起共同的判据是「**谁有执行面**」而非「谁发现的 / 谁记录的」
 
 ---
 
