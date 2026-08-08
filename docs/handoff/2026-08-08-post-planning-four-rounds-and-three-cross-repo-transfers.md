@@ -3,7 +3,7 @@ track-id: linked-issue-normalization
 owner-container: aria-runner-bot/023236f2
 phase: session-close
 status: done
-updated-at: 2026-08-08T16:30:00Z
+updated-at: 2026-08-08T17:50:00Z
 ---
 
 # Session Handoff (2026-08-08) — post_planning 四轮闸门 + 三起跨仓归属转交
@@ -161,3 +161,51 @@ updated-at: 2026-08-08T16:30:00Z
 - 归属迁移: `.aria/decisions/2026-08-08-credential-rotation-ownership-transfer-to-aether.md`
 - waiver 关闭: `.aria/decisions/2026-05-07-silknode-contract-archive-with-deferred-acceptance.md` §2026-08-08 Closure
 - 本段 issue: Aether#283 · SilkNode#979 · Aria#175 · Aria#177 · aria-plugin#133(comment) · #134 · #136 · #137
+
+
+---
+
+## §10 收尾后增量 — owner 追加「先做 [1]」(发布路径) + 一次并发撞车
+
+> 本段在 §0-§9 写完并推送后继续。**同一 session, 故追加而非另起 handoff** (会话是单元)。
+
+### §10.1 已完成
+
+1. **陈旧 memory 更正** — `feedback_coupled_pr_merge_discipline` 逐字教人对子模块 PR 用 Forgejo `Do=merge`, 那正是 CLAUDE.md 硬约束 1 明文禁止的动作。**没有简单删掉**: 它的洞见 (merge-commit 保 SHA / squash·rebase 孤立指针) 仍然对, 错的是药方。改写后记下一层关系 —— **它为治「squash 造成的 SHA 孤立」而开的药, 恰好造成了「服务端合并造成的镜像孤立」= #165 那个孤立。同一个词两种孤立, 前者的解法是后者的成因。** 这大概是 #165 三次复发的一条来路 (纪律层禁止 / 工具层照做 / 记忆层教人做, 三处不一致)。好在两约束不冲突: 本地 `git merge --no-ff` 同样保 SHA。
+2. **aria-plugin #137 走完 A.1** — Spec `openspec/changes/premerge-gate-mainbranch-failclosed/proposal.md` (Level 2, 7 条 SC), commit `ab4da15`。track 已在 **A.1** 主动认领 (`outcome=passed`, 无竞争) —— 比闸门要求的 Phase B 提前, 正是 #135 指出的「闸门在真实成本点下游」那个缺口。
+3. **probe 修正了我自己开的 issue #137 两处 + 补一处遗漏** (已发评论):
+   - 正文「**两条腿都失败为绿**」→ **只有 (b) 成立**。实读 `path_coverage.py:21/:24` 规则 1: `git diff 失败 → unknown` 而 unknown 是 **fail-toward-covered** ⇒ main 分支名错时 (a) 那条腿反而**更保守**; 观测到的 `not_applicable` 来自「workflow paths 真的不覆盖变更文件」(规则 8) 这个设计内条件, 与分支名无关。**我把两件事混成了一件。**
+   - 漏了 **`:300` 函数签名**那个 fail-OPEN 缺省 (只点了 `:427` CLI)。两处必须同批改。
+   - 挖出要害: **后端结构上无法区分「分支不存在」与「分支无 run」** —— 自己实跑 `aether ci status --branch main/master --in-flight --json` 返回**完全同形** (`status:ok`, `runs:[]`, RC=0), 而 `aether.py:117-135` 只在 aether 自身失败时抛。⇒ **修法不能只改缺省值**, 必须加独立存在性核验, 否则显式传错分支名仍恒绿。
+
+### §10.2 一次并发撞车 —— 以及 `ls-remote` 当场挣回成本
+
+推 `d321b68` 时 **non-fast-forward 被拒**: 双远端在 `a6ff6a3`, 不是我先前的 `97a3885`。**双子星 (`simonfishgit`) 在我工作期间推了两个 commit** (`068d387` gitlink bump + `a6ff6a3` 会话收尾)。
+
+> **push 的 hint 很容易一眼滑过 —— 抓到它的是逐远端 `ls-remote` 核验** (硬约束 2)。这是本 session 第二次由该核验兜住 (第一次是常规确认)。文件级零交集, 干净 rebase, 未 force。
+
+**对方那一段与本段高度重叠且处理得当**: 它独立发现了同一条 hard-cap 传递失真 (并自承单 session 内传了三次); 与我的 `096e21d` 撞车后**逐项比优劣、撤回自己三处劣解只保留 memo 增量**; 还顺带补了一个 #165 形状的 orphaned gitlink。
+
+### §10.3 更正的更正 —— 一条比双方原断言都大的发现
+
+对方 handoff 纠正我: 「CLAUDE.md 引了不存在的 memory `feedback_partial_push_creates_mirror_divergence`」**不实**, 它核实**三处齐全**; 真正悬空的是 `feedback_concurrent_duplicate_audit_fetch_before_start`。
+
+**在本容器 (`023236f2`) 实测, 两项恰好相反**:
+
+| | 文件 | `MEMORY.md` 索引 | 目录求总体 |
+|---|---|---|---|
+| `..._partial_push_creates_mirror_divergence` | **不存在** | 0 | `mirror\|push` 仅 2 文件, 均非它 |
+| `..._concurrent_duplicate_audit_fetch_before_start` | **存在** (3774B, Jul 12) | 1 | — |
+
+**但我不认为它测错了。** 关键在一个双方都没说明的前提: **memory store 是容器本地的, 不在仓里** (`~/.claude/projects/*/memory/`)。`bfe8285d` 有它自己一份。⇒ **两个测量可以同时为真。**
+
+**⇒ 真正的发现**: `CLAUDE.md` 是**仓内共享**文件, 却引用**容器本地**的 memory 文件名。谁的 store 缺那条, 那句引用对谁就是悬空的 —— 而**任何第三方采用 Aria 的项目一条都没有**。⇒ 「某 memory 不存在」这一整类断言, **不说明测的是哪个 store 时跨容器不可比**; 而 CLAUDE.md / 成文规范里引 memory 名这个做法本身有可移植性问题 (Aria 对外发布的是方法论与插件, memory 不随之分发)。
+
+**建议**: (a) 双方 handoff 此后写「某 memory 不存在」时必须带 store 路径与容器 id; (b) 评估 CLAUDE.md / standards 里引 memory 名的做法 —— 或改引 `standards/conventions/` 的成文条款 (那些**在仓里**), 或明确标注「本条指向 Lab 内部 memory, 第三方不适用」。**未自行改 CLAUDE.md** (owner 领地)。
+
+### §10.4 §10 段的 Carry-forward
+
+- 🔴 **`premerge-gate-mainbranch-failclosed` 待 post_spec** (enabled `convergence`) —— owner 裁定**下一段跑**。理由是本 session 已 17 个审计 agent + 四轮 fix, 疲劳期 fix 引入占比实测 80%+, 聚合与修的质量在新 session 更好。**这不是跳闸门, 是排期。**
+- 🔴 **aria-plugin #136 未起 Spec** —— 面更大 (处方性 SKILL 变更 + **照跑 AB**, 套件 `ab-suite/branch-manager.json` 存在 + 需 gate-only 形态)。**#137 应先 ship** (让闸门先具备判别力)。
+- 🟡 **本容器有 5 条 `active` claim**: 4 条来自 2026-08-02 (`linked-issue-normalization` / `aria-plugin-125-126` / `aria-a1-entry-claim-guard` / `aria-plugin-124-path-coverage-z-flag`) + 本段新增 1 条。`--sweep-stale` 扫不掉前 4 条, 因 `heartbeat_at` 冻结在 acquire (**aria-plugin #107**)。其中 3 条的真实状态我不确定, **未猜测性 release**。
+- 🟡 **dogfood 观察**: 本段认领时 `linked_issue_overlap: []`, 而我传的是 org 限定形 `10CG/aria-plugin#137` —— 若他人用裸形认领, 当前裸 `!=` 谓词会漏报, 这个 `[]` 便分不清「真没有」与「谓词没匹配」。**我此刻正依赖着 `linked-issue-normalization` 要修的那个缺陷。**
