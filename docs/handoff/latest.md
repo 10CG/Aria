@@ -1,11 +1,17 @@
 # Latest Session Handoff
 
-→ [2026-08-08 — post_planning 四轮闸门 + 三起跨仓归属转交](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md)
+→ [2026-08-08 — silknode waiver 前提质疑 + handoff 链失真两例](./2026-08-08-silknode-waiver-premise-challenge-and-handoff-drift.md)
 
-**一句话**: post_planning 四轮 / 17 个审计 agent, **每一轮都 FAIL 而每一轮的缺陷都是上一轮 fix 造的** —— owner 裁定「整组重做」使 Major-only 首次下降 (6→6→4), 但 R4 换 2 席新鲜眼睛后一次性抓出 **4+2 条 Critical, 全是前三轮 15 个 agent 漏掉的** ⇒ 真教训是**换了内容没换机制**: 委派而不核实目标 ×2 · 枚举不完整 ×2 · 假自陈 ×2 · 同一处恒红 ×3。处方 = 换镜头 + 把断言做成 Phase B 前置 smoke, 不是加轮。
+**一句话**: 由一条到期的 waiver 起, owner **三次质疑前提**逐层深入 —— 「silknode 的东西为什么在 aria 处理」→「aria 是管开发的, 为什么就不处理 PII」→「**你为什么要管**」—— 最终推翻 2026-05-07 三轮四席审计的共识: 根因是 `r1-legal-memo` §建议动作把**运营层合规声明指向了产品层规范文档**。本段零代码改动, 产出集中在治理判定与方法论沉淀。
 
-**本段最重的外溢产出**: **aria-plugin #136** — `branch-manager` 的合并动作是 repo-type-agnostic 的服务端 `Do: merge`, **CLAUDE.md 硬约束 1 在插件层零实现**, 疑为 **Aria #165 三次复发的真正根因** (三次的每一次都可由「按插件流程正常操作」产生); **aria-plugin #137** — `pre_merge_gate.py:427` `--main-branch` 缺省 `"main"` 而本项目是 `master` ⇒ Rule #8 那条腿恒绿。
+**本段最重的产出**: 发现 handoff 链上**两类传递失真** —— (1) 「凭据轮换 hard cap 2026-08-02」是从**另一组已 Resolved 豁免**上借来的, 从无 decision 给当前这组定过期限, 却跨约 10 份 handoff 传成「逾期不可」(**我本人单个 session 内传了三次**); (2) `feedback_concurrent_duplicate_audit_fetch_before_start` 被 5 份 handoff 引用 (含「第五次实证」) 但该文件**从未存在**。⇒ memory `feedback_handoff_carried_deadline_drifts_from_source`: **carry 项累积修辞不累积证据; 期限与交叉引用都只传名字不传验证**。可提前十次发现的信号是我自己写过的那句「逾期后果未成文」。
 
-**✅ 已闭**: 凭据轮换 → Aether #283 (并查出 `2026-08-02` cap 是从已关闭豁免上借的, 传了 10 次) · silknode waiver 拆分关闭 → SilkNode #979 + Aria #175 · terminal 语义 → aria-plugin #133 · 探针去恒红 → checks **8/8** · master `97a3885` 双远端核验一致零 ahead。
+**⚠️ 纠正上一份**: 上一份 handoff 称「CLAUDE.md 引了**不存在的** memory `feedback_partial_push_creates_mirror_divergence`」—— **该说法不实**, 本段核实该条文件 + 索引 + CLAUDE.md 引用**三处齐全**。真正悬空的是上面那条 `..._fetch_before_start`。两个方向的失真同时发生。
 
-**⚠️ 遗留**: 🔴 `[3]` secret-guard-per-segment R4 未启动 (双子星成文交接, R4 是最后一轮) · 🔴 三个 owner 裁量项待裁 (TASK-025 择一 / 推送授权 / AB 门范围) · 🟡 CLAUDE.md 引了**不存在的 memory** `feedback_partial_push_creates_mirror_divergence` (最高危失效模式的处置指南是悬空指针) · 🟡 Aria #177 类级根因 (`CLAUDE.md:81` 四错一行) · 🟡 `[2]` Phase B 受 #136 阻塞
+**✅ 已闭**: silknode waiver 重评 SOP 第 1-2 步 ((c) 由 DEFERRED 实为 **MISSED** / (d) 与 90 天前逐字相同) · `r1-legal-memo` 补 §IS-4 结论适用条件 (合规结论是**运营事实**非工具属性, orchestrator `237045a` + gitlink `068d387`) · 与并发轨 `096e21d` 撞车后**逐项比优劣**, 撤回我方三处劣解只保留 memo 增量 · 顺带补齐一个 #165 形状的 orphaned gitlink · 四仓双远程一致, checks **8/8**。
+
+**⚠️ 遗留**: 🔴 [Aria#172](https://forgejo.10cg.pub/10CG/Aria/issues/172) plugin cache 陈旧 (**未解决前仓内 hook 验收全失真**, 优先级最高) · 🔴 #128 spec R4 未启动 (Phase B 受 aria-plugin #136 阻塞) · 🟡 清理 5 份 handoff 里的悬空 memory 引用 · 承前: SilkNode #979 回执 / Aria #175 / #136 / #137 / Aria #177 / 三个 owner 裁量项 / #120 / #117 / #123。
+
+> **勿再照抄「凭据轮换逾期」** —— 该期限经核实不成立, 轮换本身已转交 [Aether #283](https://forgejo.10cg.pub/10CG/Aether/issues/283)。
+
+**前序**: [2026-08-08 post_planning 四轮闸门 + 三起跨仓归属转交](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) (并发轨, 同日) · [2026-08-05 #128 四版迭代](./2026-08-05-issue128-per-segment-spec-four-iterations.md) (本容器)
