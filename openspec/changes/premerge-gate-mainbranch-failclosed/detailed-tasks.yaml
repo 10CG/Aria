@@ -1,0 +1,410 @@
+metadata:
+  feature: premerge-gate-mainbranch-failclosed
+  title: 'Rule #8 pre-merge gate 的 main 分支腿 fail-CLOSED 化 — 收敛散文/helper 两份实现'
+  level: 3
+  datasource: openspec/changes/premerge-gate-mainbranch-failclosed/tasks.md
+  scope_repos:
+  - repo: aria
+    role: submodule
+    paths:
+    - skills/phase-c-integrator/SKILL.md
+    - skills/phase-c-integrator/scripts/pre_merge_gate.py
+    - skills/phase-c-integrator/tests/test_pre_merge_gate.py
+    head: af87cae
+  - repo: Aria
+    role: main
+    paths:
+    - CLAUDE.md
+    - openspec/changes/premerge-gate-mainbranch-failclosed/
+    head: 98ad1f5
+  path_convention: aria/ 子模块内路径相对该子模块根; 主仓路径相对仓根
+  ship_target: MAJOR (待 owner 确认) — CLAUDE.md:35「破坏性变更须 MAJOR」与 :79「MINOR+」两条下界求交唯一解; MAJOR ⇒ v2.0.0 激活 pre_merge_gate.py:68/:116 弃用到期承诺 (TASK-020)
+  total_tasks: 20
+  audit_state: post_spec R1-R5 跑满 25 agent-run, converged=false, overridden_by_user=true (owner 2026-08-09); post_planning 待跑 (owner 裁定要跑)
+  spec_authoring_note: '本 Spec 的实现细节凡编排层无法验证者一律降为 spike (TASK-002/003/004), 不在 proposal 层规定。 依据: post_spec 五轮实测编排层每轮 fix 引入 73-100% 新 Major, 总量五轮持平。 Spec 负责钉「什么算对」(SC), 不负责钉「怎么写」。spike 结论回写 proposal, 不在本文件另立规定。
+
+    '
+tasks:
+- id: TASK-001
+  parent: '0.1'
+  task_group: TG-0
+  title: TDD 前置 — 全部机械断言的空壳, 先看到全红
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: qa-engineer
+  dependencies: []
+  deliverables:
+  - aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py
+  verification:
+  - SC-M1 `grep -c 'aether ci status' SKILL.md` 期望 0, 实施前实测 4 ⇒ 必须 RED
+  - 'SC-M2 `grep -c ''"branch": "main"'' SKILL.md` 期望 0, 实施前实测 1 ⇒ 必须 RED (上一版遗漏本条, post_planning R1 两席命中)'
+  - SC-M3a `grep -c -- '--main-branch "<MAIN_BRANCH>"' SKILL.md` 期望 2, 实施前实测 0 ⇒ 必须 RED
+  - SC-M3b `grep -cE -- '--main-branch +(main|master)([[:space:]]|$)' SKILL.md` 期望 0 ⇒ **负控**, 今日已 0
+  - SC-M3c 折叠块内含 --pr-branch 的块数期望 0 ⇒ **负控**, 今日已 0
+  - SC-M4 三条 pattern 期望 0/0/0, 实施前实测 1/1/1 ⇒ 必须 RED
+  - 'SC-M5 `grep -c ''default: main''` 期望 0, 实施前实测 1 ⇒ 必须 RED'
+  - '**贴出实施前实跑输出证明全部 RED 项确实红** — 不接受「应该会红」的声称'
+  - '**对抗性验证**: 另建「写死 --main-branch main」与「调用藏进折叠块」两个 fixture, 断言集必须**拒绝**它们 (编排层已验证 M3b/M3c 分别拒绝之)'
+  notes: '本条排在最前是因为 post_spec 五轮里编排层写出过两次恒红断言与一次恒绿断言。 红窗本身必须先被验证, 否则后续「变绿」不构成证据。
+
+    '
+- id: TASK-002
+  parent: '0.2'
+  task_group: TG-0
+  title: spike — helper 路径解析形态 (四种 cwd 全可达)
+  status: pending
+  complexity: M
+  est_hours: 4
+  agent: backend-architect
+  dependencies:
+  - TASK-001
+  deliverables:
+  - spike 结论回写 openspec/changes/premerge-gate-mainbranch-failclosed/proposal.md §1
+  verification:
+  - 'SC-M12: 主仓根 / aria 子模块根 / standards 子模块根 / 模拟 plugin 安装态 四种 cwd 全部可达'
+  - 不可达时 abort (不得放行), 但健康常态下不得 abort — 两个方向都要有用例
+  - '须核两个环境变量的归属: 本文件内 ARIA_PLUGIN_ROOT 3 处 (:262/:559/:610) vs CLAUDE_PLUGIN_ROOT 1 处 (:737); 全仓 CLAUDE_ 66 / ARIA_ 5 ⇒ **方向需 owner 裁 (tasks.md 未决 #2)**'
+  notes: '⛔ 不得沿用 R4-fix 版的两分支 git rev-parse 形态 (R5 四席实测在 standards/aria-orchestrator 子模块根与 plugin 安装态下全不可达 ⇒ 恒红)。
+
+    ⚠️ 上一版给的两条 spike 输入均已被证伪并更正: (a)「:262/:559/:610 用 CLAUDE_PLUGIN_ROOT」实为 ARIA_ (方向相反); (b)「3 个副本位置」把同一 inode 数了两次又漏了三份 cache — find 得 5 条路径, 主仓根与子模块根解析到同一文件。详见 proposal §1 表。'
+- id: TASK-003
+  parent: '0.3'
+  task_group: TG-0
+  title: spike — 存在性核验的精确比对实现
+  status: pending
+  complexity: M
+  est_hours: 4
+  agent: backend-architect
+  dependencies:
+  - TASK-001
+  deliverables:
+  - spike 结论回写 proposal.md §5
+  verification:
+  - 'SC-M6: 受控裸仓远端只有 refs/heads/wip/master 时传 master ⇒ fail + kind=main-branch-not-found'
+  - 'SC-M13: 传 ''mast*'' / ''m[a]ster'' / ''maste?'' 三个 glob 形态 ⇒ 全部 fail (锚定 pattern 实现必须在此 RED)'
+  - 判据固定为「返回 ref 名列表中存在 == 'refs/heads/' + main_branch 的精确匹配」, spike 只决定取列表方式
+  notes: '本条是 R2 承重 Critical 的真正闭合腿。前两次修法都不够: 裸分支名 → 尾段 glob 误匹配 (wip/master 被当 master); 锚定 refs/heads/<name> → 只关掉尾段那半, name 含 glob 元字符时仍全返 RC=0 (受控实验实测)。
+
+    '
+- id: TASK-004
+  parent: '0.4'
+  task_group: TG-0
+  title: spike — 异常与重试的复用形态 (⛔ 不得再造)
+  status: pending
+  complexity: S
+  est_hours: 3
+  agent: backend-architect
+  dependencies:
+  - TASK-001
+  deliverables:
+  - spike 结论回写 proposal.md §5 退出码表
+  verification:
+  - 'SC-M7: 非零非 2 退出码 (实测 remote 名不存在/坏 URL/网络不可达均为 128, 用法错误 129) ⇒ fail + kind=main-branch-verify-failed, 未重试'
+  - 'SC-M8: TimeoutExpired ⇒ 按 SKILL.md:259 重试后 fail; 测试须 mock time.sleep, 耗时 >60s 视为红'
+  - 'catch-all 分支存在: 任何未枚举情形 (FileNotFoundError / OSError / 输出不可解析) 一律 fail, 不得放行'
+  - '**须说明复用方式** — path_coverage.py:93 的 (TimeoutExpired, FileNotFoundError, OSError) 三合一 + aether.py:38 的 RETRY_BACKOFF/_run_with_retry'
+  notes: '在一份治「同一算法两份实现」的 Spec 里再造第二份重试实现是自相矛盾 (R5 两席命中)。 本条的产出若是「新写一份」, 必须显式论证为何不能复用。
+
+    '
+- id: TASK-005
+  parent: '0.5'
+  task_group: TG-0
+  title: 测试隔离接缝 — 使 test_sc22 守卫保持有效而非被放宽
+  status: pending
+  complexity: M
+  est_hours: 4
+  agent: qa-engineer
+  dependencies:
+  - TASK-003
+  - TASK-004
+  deliverables:
+  - aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py
+  verification:
+  - 既有 test_sc22_no_real_git_subprocess_in_suite (:710) 在本 change 落地后仍 PASS 且仍能拦住真实 git 子进程 — 用一个故意违规的桩验证它会红
+  - SC-M6/SC-M13 能用真实 git 受控裸仓运行, 不被该守卫误拦
+  - 接缝粒度 (函数级 vs subprocess 级) 须写明
+  notes: '⚠️ 编排层曾断言「test_sc22 patch 的是 path_coverage 模块的 subprocess, 看不见 gate 层」—— 受控实验推翻: `import subprocess` 使模块对象全局共享, patch.object 本就跨模块生效。 ⇒ 真实后果是该守卫会因新 subprocess 而转红 (不是静默恒绿), 处方必须是建接缝而非扩大 patch。
+
+    '
+- id: TASK-006
+  parent: '1.1'
+  task_group: TG-1
+  title: pre_merge_gate.py 三处 main 字面量去除 + 参数必填 + help 文案
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: backend-architect
+  dependencies:
+  - TASK-001
+  deliverables:
+  - aria/skills/phase-c-integrator/scripts/pre_merge_gate.py
+  verification:
+  - SC-M4 三条 grep 由 1/1/1 转 0/0/0
+  - SC-M5 help 文案 grep 由 1 转 0
+  - 'SC-M9: gate_check(pr_branch=...) 不传 main_branch ⇒ TypeError'
+  - :21 docstring / :300 签名 / :427 CLI 三处同批改 — 只改 CLI 会留函数签名这条内部路径恒绿
+  notes: 'help 文案 (default: main) 若不同批改, --help 输出会继续显示与必填矛盾的字样, 且该裸词不被 SC-M4 捕获。'
+- id: TASK-007
+  parent: '1.2'
+  task_group: TG-1
+  title: 新增 --remote / remote 参数 (默认 origin) 并写下失效方向不对称的理由
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: backend-architect
+  dependencies:
+  - TASK-006
+  deliverables:
+  - aria/skills/phase-c-integrator/scripts/pre_merge_gate.py
+  - proposal.md §5 补该理由
+  verification:
+  - 核验与 in-flight 查询使用**同一个 main_branch 值**且**同一个 cwd** (⚠️ 上一版写「同一个 remote 值」—— in-flight 那侧 aether 无 remote 概念, 该量在被测面上不存在故恒绿)
+  - 'proposal 中写明: 错 remote 走 128 ⇒ fail-CLOSED; 错 branch 走 runs:[] ⇒ fail-OPEN — 这就是 remote 可有缺省而 main_branch 不可的理由'
+  notes: R5 指出同一 change 内两条相反判据 (一个必填一个有缺省) 若无成文理据即是不一致。
+- id: TASK-008
+  parent: '1.3'
+  task_group: TG-1
+  title: _verify_branch_exists() 实现 + 插入点 (三早退之后, path coverage 之前)
+  status: pending
+  complexity: M
+  est_hours: 5
+  agent: backend-architect
+  dependencies:
+  - TASK-003
+  - TASK-004
+  - TASK-005
+  - TASK-007
+  deliverables:
+  - aria/skills/phase-c-integrator/scripts/pre_merge_gate.py
+  - aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py
+  verification:
+  - SC-M6 / SC-M13 / SC-M7 / SC-M8 全绿
+  - 'SC-M10 负控: enabled=false 早退保持六键、无 gate_error, **且 assert ls-remote 未被调用**'
+  - 'SC-M11 负控: 分支存在且有 in-flight ⇒ verdict=wait 不变'
+  - no-backend (:338) 与 precheck 失败 (:345) 两条早退亦须各有一条用例 — SC-M10 只覆盖 enabled=false, R5 三席指出 §非目标『由 SC-M10 机械钉住』对另两条不成立
+  - '**落地新 subprocess 后重跑全量套件**, 并复检 test_sc22 仍能拦真实 git 子进程 (post_planning R1 三席: 该接缝此前无人复检)'
+  notes: '插入点在三早退之后: 否则 owner 关闭的闸门与 no_ci_fallback 降级会被变成 fail。 在 path coverage 之前: 它更早消费 main_branch。
+
+    '
+- id: TASK-009
+  parent: '1.4'
+  task_group: TG-1
+  title: 诊断信息写入 raw_message (主通道) + gate_error additive 副本
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: backend-architect
+  dependencies:
+  - TASK-008
+  deliverables:
+  - aria/skills/phase-c-integrator/scripts/pre_merge_gate.py
+  verification:
+  - SC-M6 断言的 message 内容落在 raw_message 上 (SKILL.md:255 逐字规定 fail 的 surface 通道是 raw_message)
+  - gate_error 为 additive 可选键, 四类早退分支保持既有六键不变 (SKILL.md:279)
+  - verdict 仍是 green/wait/fail 三态, 未新增第四枚举值
+  notes: 'gate_error 目前无代码消费者 (write_gate_state 签名无该形参), 故信息不得只放它。 沿用 v1.65.0 path_coverage 的 additive 先例。
+
+    '
+- id: TASK-010
+  parent: '1.5'
+  task_group: TG-1
+  title: 既有 24 处 gate_check( 调用补 main_branch="master" + test_sc12 断言更正
+  status: pending
+  complexity: S
+  est_hours: 3
+  agent: qa-engineer
+  dependencies:
+  - TASK-006
+  deliverables:
+  - aria/skills/phase-c-integrator/tests/test_pre_merge_gate.py
+  verification:
+  - 实测 24 处 gate_check( 调用点、显式传 main_branch 的 0 处 — 补完后应为 24/24
+  - test_sc12_default_true_lock (:663) 断言由 main_branch="main" 改为 "master"
+  - 本任务执行点只断言 **TG-1 范围内**测试绿; 全量收口在 TASK-008 之后 (⚠️ 上一版写「全量 111 tests 绿」—— 111 是变更前基线, 且 SC-M1/M3* 要到 TG-2 才转绿, 在本任务执行点不可达)
+  notes: proposal 早先版本称『既有用例逐字不改』, 已由 R1 四席证伪并更正。
+- id: TASK-011
+  parent: '2.1'
+  task_group: TG-2
+  title: SKILL.md 两处散文流程收敛为强制 helper 调用 (承重, D1)
+  status: pending
+  complexity: L
+  est_hours: 6
+  agent: tech-lead
+  dependencies:
+  - TASK-002
+  - TASK-003
+  deliverables:
+  - aria/skills/phase-c-integrator/SKILL.md
+  verification:
+  - SC-M1 `grep -c 'aether ci status' SKILL.md` 由 4 转 0 — 一条断言覆盖 :167/:168/:243/:244 四行
+  - '**SC-M3a** `--main-branch "<MAIN_BRANCH>"` 计数由 0 转 2 — 两处散文各一条'
+  - '**SC-M3b** 无 `--main-branch main|master` 字面值 (负控) —— ⚠️ **本条是 PC1 修复**: 上一版全套验收对 --main-branch 失明, 写死 main 能 0/0/2 全过'
+  - '**SC-M3c** 折叠块内不含调用 (负控) —— 修复「全文件计数无位置维度」的失明面'
+  - 去掉全部可执行命令字面量 — 含 :240 的 `aether --help | grep -q` (SC-M1/M2 两条 pattern 都不命中它, 须人工核)
+  notes: '⚠️ `### 步骤执行` (:99 段) 的 C.2.4 条目在 :101 开 :216 闭的 yaml 围栏内, 且该处没有「5 步」结构 (R5/tech-lead)。 该处改法须单独 spike, 不得照搬 :218 段的形态。
+
+    '
+- id: TASK-012
+  parent: '2.2'
+  task_group: TG-2
+  title: SKILL.md 步骤 6 归属确认 — 留折叠块外, 不动语义
+  status: pending
+  complexity: S
+  est_hours: 1
+  agent: tech-lead
+  dependencies:
+  - TASK-009
+  - TASK-011
+  deliverables:
+  - aria/skills/phase-c-integrator/SKILL.md
+  verification:
+  - 步骤 6 (:252-255) 仍在折叠块外、仍是命令式、语义未变
+  - 若既有措辞已覆盖 raw_message 的 surface, **不加句** (避免 no-op 编辑)
+  notes: '步骤 6 是纯 AI 义务 (路由 + v1.65.0/#126 两条强制 surface 警告, helper 只输出 JSON 不产文案), 且是 DEC-20260731-001 逐字记载的 owner 交换条件。有被折进「⛔不要手工执行」块而降级的实际风险。
+
+    '
+- id: TASK-013
+  parent: '2.3'
+  task_group: TG-2
+  title: SKILL.md Output schema 与注记同步 (:267 / :270 / :279)
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: knowledge-manager
+  dependencies:
+  - TASK-009
+  - TASK-011
+  deliverables:
+  - aria/skills/phase-c-integrator/SKILL.md
+  verification:
+  - 'SC-M2 `grep -c ''"branch": "main"'' SKILL.md` 由 1 转 0'
+  - :267 schema 含 gate_error 且示例的 branch 用占位符 (若写字面 main 会与 SC-M2 对撞)
+  - :279 早退注记逐字仍是**四类** (含 backend query 失败) — 改成三类会把该契约掉出去, 而 test_sc15 正在守它
+  notes: :270 是 in_flight_runs 输出示例 (取自 SilkNode PR-321 真实事故 run 3161), 与输入占位符不同层。
+- id: TASK-014
+  parent: '2.4'
+  task_group: TG-2
+  title: helper 定位约定一致性 — 不得并存互斥两套
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: tech-lead
+  dependencies:
+  - TASK-002
+  - TASK-011
+  deliverables:
+  - aria/skills/phase-c-integrator/SKILL.md
+  verification:
+  - SKILL.md:262 / :559 / :610 的 helper 定位形态与 TASK-002 定稿一致, 全文无互斥两套
+  notes: 'R5/code-reviewer: 实施后同一文件将并存 git-toplevel 式与 env-var 式两套约定, 与本 Spec 收敛成一条路径的主旨对冲。'
+- id: TASK-015
+  parent: '3.1'
+  task_group: TG-3
+  title: 'Rule #6 照跑 AB (判据表第二行, 零裁量)'
+  status: pending
+  complexity: M
+  est_hours: 4
+  agent: qa-engineer
+  dependencies:
+  - TASK-011
+  - TASK-012
+  - TASK-013
+  - TASK-014
+  deliverables:
+  - aria-plugin-benchmarks/ab-results/
+  verification:
+  - '**须用 `/skill-creator` 跑** (CLAUDE.md 规则 #6 逐字: 自研 runner 已废弃), 非任意 runner'
+  - 两套件 ab-suite/phase-c-integrator.json + phase-c-integrator-pre-merge-gate.json 均跑完, 结果存 ab-results/
+  - '结果判据按 AB_TEST_OPERATIONS.md 发版前 checklist: WITHOUT_BETTER verdict 审查 + 回归比对 + summary.yaml 审查'
+  - '**不得以「套件对 C.2.4 覆盖薄」为由降档** — 判据表第二行是零裁量的'
+  notes: '定档依据是 SOT 直接管辖条款「description 或指令流程变动 ⇒ 一律第二行」。 编排层曾在此摆动两次 (先「照跑」理由浅, 后「第三行」实证错), 均因绕开该条款去做实证。 已知套件缺口承 aria-plugin #127; D1 的行为证据主要由 SC-M1/SC-M3a-c/SC-M12 承担, AB 是合规义务。
+
+    '
+- id: TASK-016
+  parent: '3.2'
+  task_group: TG-3
+  title: 'CLAUDE.md 规则 #8 同步 — 新增第三条阻断腿'
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: knowledge-manager
+  dependencies:
+  - TASK-008
+  deliverables:
+  - CLAUDE.md
+  verification:
+  - '规则 #8 那段反映新增的分支存在性核验腿'
+  - '对照先例 commit 7661e96 (v1.31.0 CI backend 抽象化在同一提交同步过 Rule #8) 核同步粒度'
+  notes: '本 Spec 改写了 Rule #8 指名的 SOT 段, §Impact 早先版本缺此行。'
+- id: TASK-017
+  parent: '3.3'
+  task_group: TG-3
+  title: 发版同步面 — 整仓引用点差集枚举
+  status: pending
+  complexity: M
+  est_hours: 3
+  agent: knowledge-manager
+  dependencies:
+  - TASK-006
+  deliverables:
+  - 版本引用点清单 (随 Phase C 落地)
+  verification:
+  - 按**引用点整仓差集**枚举, 非文件白名单 — 白名单对未来新增点天然 fail-OPEN
+  - 两条 custom check (m6-version-badge-match / i18n-readme-translation-currency) **不构成机械兜底**, 不得据此声称已覆盖
+  notes: '类级根因见 Aria #177。R5/knowledge-manager 指出本 Spec 早先版本正是 #177「下次原样重犯」预言的即时复现样本。'
+- id: TASK-018
+  parent: '3.4'
+  task_group: TG-3
+  title: blast radius 核验 + 外部采用方通告
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: backend-architect
+  dependencies:
+  - TASK-006
+  deliverables:
+  - 核验记录 (随 Phase B 留证)
+  verification:
+  - grep 口径须含 `pre-merge gate` 这个不含下划线的写法 — 否则搜不到 CLAUDE.md (实测该文件不写 gate_check)
+  - 覆盖 aria/ aria-orchestrator/ standards/ docs/ CLAUDE.md, 且含 sh/json/yaml 不只 py/md
+  - 该口径结构上看不见外部采用方 (Kairos 等) ⇒ 须有下游通告项
+  notes: 破坏性变更 (MAJOR), 下游通告不可省。
+- id: TASK-019
+  parent: '4.1'
+  task_group: TG-4
+  title: 开 follow-up issue (5 项, 本 Spec 不修)
+  status: pending
+  complexity: S
+  est_hours: 2
+  agent: knowledge-manager
+  dependencies: []
+  deliverables:
+  - Forgejo issue ×N
+  verification:
+  - '(1) main_branch 自动解析设计面 — R2 实测 ls-remote --symref 有 RC=0 但无 ref: 行两态 (unborn / detached)'
+  - (2) phase-d-closer/fetch_gate.py 字面 ("master","main") 回落 + state-scanner/lib/worktree_manager.py:170 同形
+  - (3) workflow-runner gate_state 无 gate_error / main_branch_resolved 位置
+  - (4)「显式传错分支名」此前零测试覆盖
+  - (5) C.2.4.5 的 SKILL.md:189-191 裸 git 命令 + submodule_gate.sh — 与 D1 根因**同类**的最近兄弟
+  - '**每条 follow-up 必须有可 GET 的 issue 编号/URL 回填本文件** —— ⚠️ 上一版五条 verification 全是「issue 该写什么」, 该任务可在零 issue 创建下自称完成 (post_planning R1 两席命中)'
+  notes: '第 (5) 项是 R5/code-reviewer 指出的: D1 治的根因类 (散文裸命令 + helper 两份实现) 在同一文件里还有一个未处置的兄弟。修实例不修类的判据要求它至少被开号。
+
+    '
+- id: TASK-020
+  parent: '3.5'
+  task_group: TG-3
+  title: v2.0 弃用到期承诺的承接 (仅当 ship_target 确认为 MAJOR)
+  status: pending
+  complexity: M
+  est_hours: 4
+  agent: backend-architect
+  dependencies:
+  - TASK-006
+  deliverables:
+  - aria/skills/phase-c-integrator/scripts/pre_merge_gate.py
+  verification:
+  - '`pre_merge_gate.py:68` 「Old keys still readable until v2.0」与 `:116` 「will be removed in v2.0」两处到期承诺被落实或显式改期'
+  - 若改期, 须写下理由并同步 SKILL.md 相应措辞
+  - ⚠️ 本任务**条件触发** — ship_target 若最终不是 MAJOR 则整条 cancelled, 须在本文件留痕而非静默删除
+  notes: 'post_planning R1 两席指出: 定 MAJOR 即 v2.0.0, 会激活被改文件自带的弃用到期承诺, 而原 19 条任务无一承接。'
