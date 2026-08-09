@@ -1,8 +1,9 @@
 # secret-guard: fail-safe 逐段判定 (aria-plugin #128)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: 📝 **Draft (R5-fix)** — R1 `6C+19M` → R2 `5C+12M` → R3 `4C+13M` → **owner 裁定拉回性能根治** → v4 → 2026-08-08 前提刷新 → R4 (5 席全 REVISE, `6C+13M+17m`, `max_rounds=4` 耗尽未收敛) → owner 裁定 [2] 先修 Critical → v5 = R4-fix → **R5 (owner 批准的超配额全量重审, 5 席全 REVISE, 去重后 `5C`; 判定 22 条新错**由 R4-fix 自身引入**)** → **owner 2026-08-09 裁定: 换执笔人 + C-1 采候选 A** → 本版 R5-fix。审计轨迹全文见 `.aria/audit-reports/post_spec-R{1,2,3,4,5}-*` + R4/R5 汇总 `post_spec-R{4,5}-*-aggregated.md`
-> **执笔者 (流程事实, 复核时须知)**: v1–v5 由作者 (主 loop) 执笔; **本版 R5-fix 由 tech-lead 执笔, 主 loop 只做核验** —— owner 2026-08-09 裁定, 依据是本 cycle 五次「勘正动作里新引入错误」中最近一次 (R4-fix, 104 行, R5 判定引入 22 条未去重新错、其中 3 条 Critical 由勘正本身造成), 结论是**执笔者与复核者同一人时这类错误系统性逃逸**。
+> **Status**: 📝 **Draft (v7 = R5-fix + owner 13 条裁定)** — R1 `6C+19M` → R2 `5C+12M` → R3 `4C+13M` → **owner 裁定拉回性能根治** → v4 → 2026-08-08 前提刷新 → R4 (5 席全 REVISE, `6C+13M+17m`, `max_rounds=4` 耗尽未收敛) → owner 裁定 [2] 先修 Critical → v5 = R4-fix → **R5 (owner 批准的超配额全量重审, 5 席全 REVISE, 去重后 `5C`; 判定 22 条新错**由 R4-fix 自身引入**)** → owner 2026-08-09 裁定 換执笔人 + C-1 采候选 A → v6 = R5-fix (tech-lead 执笔) → **owner 2026-08-09 逐条裁完 13 条待决项 (采 12 / 改判 1 / 其中 1 条的一个子项经实测驳回) = 本版 v7**。审计轨迹全文见 `.aria/audit-reports/post_spec-R{1,2,3,4,5}-*` + R4/R5 汇总 `post_spec-R{4,5}-*-aggregated.md`; 13 条裁定逐条理由见 `.aria/notes/2026-08-09-secret-guard-128-owner-decision-queue.md`
+> **⚠️ 收敛状态未变**: 本版只落 owner 对 13 条**已知**待决项的裁定, **不构成新一轮审计**。spec 仍 `converged: false`, 未进 A.2。
+> **执笔者 (流程事实, 复核时须知)**: v1–v5 由作者 (主 loop) 执笔; v6 = R5-fix **由 tech-lead 执笔, 主 loop 只做核验** (owner 2026-08-09 裁定, 依据是本 cycle 五次「勘正动作里新引入错误」中最近一次 —— R4-fix 104 行被 R5 判定引入 22 条新错、其中 3 条 Critical 由勘正本身造成; 结论是**执笔者与复核者同一人时这类错误系统性逃逸**)。**本版 v7 由主 loop 执笔** —— 被改的文本作者是 tech-lead, 故「勘正者 ≠ 原作者」这条仍满足; 但主 loop 正是有过 R4-fix 前科的那一方, ⇒ **v7 须由非主 loop 的一席复核后方可视为落定**, 重点复核对象是 §What.1 命令位置清单与 `BLOCK_KW_RE` (v7 唯一改动规范性实现文本的地方)。
 > **Created**: 2026-08-04
 > **Issue**: [aria-plugin #128](https://forgejo.10cg.pub/10CG/aria-plugin/issues/128) — triage **confirmed / critical / 5-5 复现** ([17512](https://forgejo.10cg.pub/10CG/aria-plugin/issues/128#issuecomment-17512)) + [分隔符更正 17545](https://forgejo.10cg.pub/10CG/aria-plugin/issues/128#issuecomment-17545)
 
@@ -15,7 +16,8 @@
 > | v3 | **fail-safe 降级**: 先检测块结构, 不可安全分段则退回整命令判定 | R3: 判据**不封闭** (`exec >/dev/null; …` 无块标记仍误报); 命令位置清单漏 换行/`&`/`time`; **重排只在 benign 负载有效**, 最坏负载 +583% |
 > | v4 | v3 + **`has_filter` 13 处转 bash 内建** (owner 裁定拉回) + 启发式表述 + 判据补漏 | R4: 转内建**不是语义保持变换** (两席独立实证 fail-open); `exec`/`time` 漏「仅命令位置」; 「行首/换行之后」不得裸 `^`; **SC-16 的事实前提被实测证伪** |
 > | v5 = R4-fix | v4 + **段级换行守卫** (强制) + 两处判据限定补齐 + SC-16 收窄为 `(?:` 一项 + SC-6/14/15 扩容 + SC-9 拆两腿 | R5: 段级守卫**治 fail-open 却造出更宽的 fail-close** (三席独立实测); SC-14 验收公式与自己的 fixture 互斥; SC-6 的 `case` fixture 结构性恒绿; 一处**虚构的文档自我历史**; 转出 9 复现命令**自证伪**; 三个引用标签是编的 |
-> | **v6 = R5-fix (本版)** | v5 − 段级守卫 + **逐行内建 helper** (复刻 grep 逐行语义, owner 采候选 A) + SC-14 验收公式拆两组 + SC-6 的 `case` 改隔离单元断言 + 事实/命令/标签/数字四类勘误 + SC-8 补最坏档 + SC-9b 落 Task | 待 owner 判 |
+> | v6 = R5-fix | v5 − 段级守卫 + **逐行内建 helper** (复刻 grep 逐行语义, owner 采候选 A) + SC-14 验收公式拆两组 + SC-6 的 `case` 改隔离单元断言 + 事实/命令/标签/数字四类勘误 + SC-8 补最坏档 + SC-9b 落 Task | 无设计层推翻; owner 逐条裁完遗留的 13 条待决项 |
+> | **v7 = R5-fix + 13 条裁定 (本版)** | 命令位置清单 −`in` +`!` (保 `&`) · 后台记号补 `<&` · 表头 keyword/内建 · B-2 改判为转出 10 · 关键决策补「手写扫描 vs 解析器」· 转出 1 量词口径定案 141/81/79/7/5 · SC-3 有效面交计数器 · Task 1.12 bump 前 re-check · Task 1.8 补 sed 重读约束 · 五行表/schema/结构/时态四处编辑 | 待非主 loop 一席复核 |
 >
 > **v5→v6 的性质**: R5 五席一致认为**设计层已收敛**, 不再有设计争议; v5 被推翻的**全部**是勘正动作自身的执行精度 (实现语义选择 / 验收公式 / 事实核实 / 计数口径)。本版据此只改这四类, **不动** fail-safe 降级 + 先 pattern 后 credit + 13 处转内建这三条设计主干。「勘正动作里新引入错误」本 cycle 至此累计五次 (R2 的 68/52 · R3 的 `case`→1 · R3 抓的 `done` 论据 · R4-M-1 换证 · R4-fix 整体), **换执笔人是对这条复发规律的直接处置, 不是对 v5 内容的整体否定** —— v5 把 R4 五席诊断全部读进去了, 无一条被无视。
 >
@@ -49,9 +51,13 @@ vault read secret/x; nomad var put p @f >/dev/null     → exit=0   ← 跨 patt
 |------|------|
 | 块字符 | `{` `}` `(` `)` 反引号 `[[` `]]` `<<` `<<<` |
 | 块起始关键字 (**命令位置 且 词边界**) | `for` `while` `until` `if` `case` `select` |
-| **作用域型内建 (R3-C-1)** | `exec` `time` — **命令位置 且 词边界** |
-| **后台记号 (R3-C-1)** | `&` (单独出现, 非 `&&` / `&>` / `>&` / `\|&`) |
+| **作用域型 keyword / 内建 (R3-C-1)** | `exec` `time` — **命令位置 且 词边界** |
+| **后台记号 (R3-C-1)** | `&` (单独出现, 非 `&&` / `&>` / `>&` / `\|&` / `<&`) |
 
+> **表头措辞 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-5)**: `time` 是 shell **keyword**、`exec` 是 **builtin** (`type -t` 实测分别为 `keyword` / `builtin`), 原表头「作用域型内建」对 `time` 不准, 已改。两者共同点是**建立 shell 级作用域**, 与是不是内建无关 —— 这才是它们进本表的理由。
+>
+> **后台记号排除清单补 `<&` (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-6)**: `<&` 是 `>&` 的镜像重定向形态 (`exec 3<&0` / `cat <&3` 实测合法), 原清单列了 `>&` 却漏它。漏它的后果是**多降级** (把 `<&` 的 `&` 当裸 `&`) —— 方向安全但损覆盖。**注意它与命令位置表里保留的 `&` 不冲突**: 本行管的是「`&` 要不要触发降级」, 位置表管的是「`&` 之后算不算命令位置」, 两者正交 (见 §命令位置定义的驳回记录)。
+>
 > **两条 token 类判据一律「命令位置 **且** 词边界」, 不得只写其一 (R4 tech-lead R4-C-2 → R5 tech-lead R5-C-3 二次收窄)**
 >
 > R4 只补了「仅命令位置」。**位置限定挡不住命令位置上的子串**: `timeout` 的 `time` 子串就落在行首 = 命令位置。R5-fix 执笔者机械复验两个读法 (`entangle.sh`, 只差 `\b`):
@@ -69,7 +75,15 @@ vault read secret/x; nomad var put p @f >/dev/null     → exit=0   ← 跨 patt
 >
 > 语义上也只有命令位置且成词的 `exec` / `time` 才建立 shell 级作用域, `docker exec` / `find -exec` / `timeout` 里的那些不是。**关键字行同改**: 两行本来就必须同精度 —— R4-C-2 定 Critical 的理由正是「两行两种精度直接产出两种实现」, 只给其中一行加词边界会原样重开该缺陷。SC-14 锁该方向 (本版按 R5 qa-engineer C-1 拆了验收公式)。
 
-**命令位置**定义 (R3-C-1 指出前一版清单有漏且「行首」二义): 行首 / **换行之后** / `;` / `&&` / `\|\|` / `\|` / `&` / `do` / `then` / `else` / `elif` / `in` 之后。
+**命令位置**定义 (R3-C-1 指出前一版清单有漏且「行首」二义): 行首 / **换行之后** / `;` / `&&` / `\|\|` / `\|` / `&` / `!` / `do` / `then` / `else` / `elif` 之后。
+
+> **本清单 owner 2026-08-09 裁定改过两项 (R5 code-reviewer m-5, 三项建议中采两项驳一项)**。仍是 **12 类** —— 删一加一, 故 §What.1 与 Task 1.1(c) 的「其余 10 类」计数**不受影响** (原提案估的「两处连带计数」代价不成立)。
+>
+> | 变动 | 处置 | 依据 |
+> |------|------|------|
+> | 错项 `in` | **删除** | `in` 只出现在 `for` / `select` / `case` 三种文法里, 其后是**词表或模式**, 永远不是命令位置。留着只会让 `echo in for` 这类无风险命令被无谓降级; 且这三种构造自身的关键字都在命令位置上, 删 `in` 不损失任何覆盖 |
+> | 漏项 `!` | **补入** | `!` 后接命令 (可含复合命令), 实测 `bash -n -c '! for f in a; do :; done'` 与 `! time true` 均合法 ⇒ 不补则 `!` 后的关键字漏检 |
+> | 「死条目 `&`」 | **驳回, 保留 `&`** | 该项**不成立**。后台记号行判降级的是**裸 `&`**, 显式排除 `&&` / `&>` / `>&` / `\|&`; 而 `cat x \|& for f in a; do …; done` 语法合法 (`bash -n` 实测), 此形态下 `\|&` 不触发后台记号, 紧邻 `[[:space:]]*for` 的位置 token 正是 `&` (`\|` 之后跟的是 `&` 不是空白) ⇒ **删 `&` 会让 `\|&` 后接关键字不再降级, 循环体被切碎**, 是一次覆盖回归。「X 已被 Y 吸收」类的冗余判断必须枚举 Y 的**排除项**后才能下 |
 
 > **⚠️ 「行首」/「换行之后」在 bash `[[ =~ ]]` 下不得写作裸 `^` (R4 backend-architect **CRITICAL-2**, 实现约束)**: bash 走 glibc regex 且无 `REG_NEWLINE`, `^` **只锚定整串开头, 不锚定每行行首** —— 与 grep 的逐行语义相反。backend-architect R4 独立实测: `[[ $'a\nb' =~ ^b ]]` 不匹配; 按「行首→`^`」的直觉翻译, `$'sleep 1\nfor f in a; do cat /opt/.env; done >/dev/null'` 的 `safe_to_split()` 返回 TRUE (应为 FALSE), 循环体被错切成独立段 ⇒ **重开 v2 那次 5/5 误报的同一失效模式**。**必须显式写作含真实换行字符的交替**。逐项核过 12 类位置: 只有「行首」「换行之后」2 类依赖 `^` 语义需专门处理; 其余 10 类靠字面 token / 字符类匹配 (`[[:space:]]` 天然含换行), 不受影响。
 >
@@ -77,7 +91,7 @@ vault read secret/x; nomad var put p @f >/dev/null     → exit=0   ← 跨 patt
 >
 > ```bash
 > nl=$'\n'
-> BLOCK_KW_RE='(^|'"$nl"'|;|&&|\|\||\||&|do|then|else|elif|in)[[:space:]]*(for|while|until|if|case|select)\b'
+> BLOCK_KW_RE='(^|'"$nl"'|;|&&|\|\||\||&|!|do|then|else|elif)[[:space:]]*(for|while|until|if|case|select)\b'
 > ```
 >
 > **⛔ 不得写 `(^|\n)`** —— bash ERE 里 `\n` 是**字母 n**, 不是换行符。它**既漏又多** (实测 `a1_newline.sh` / `a1_pick.sh`):
@@ -124,7 +138,9 @@ ALLOW
 
 **但重排本身不足以解决性能** (R3 backend C-1 + tech-lead C-3 双方实测推翻作者原判):
 
-> ⚠️ **下表四行原本混用了三个不同基线且一处都没标注 (R4 code-reviewer M-2)** —— 而这张表是 owner 拉回 §What.4 的直接依据。已补「基线」列。「省 80%」与「+102%」**不可比**: 前者是两种逐段实现互比, 后者是逐段 vs 现状整命令。SC-8 的闸门口径是**相对现状整命令**, 与前两行不同源。
+> ⚠️ **下表五行原本混用了三个不同基线且一处都没标注 (R4 code-reviewer M-2)** —— 而这张表是 owner 拉回 §What.4 的直接依据。已补「基线」列。「省 80%」与「+102%」**不可比**: 前者是两种逐段实现互比, 后者是逐段 vs 现状整命令。SC-8 的闸门口径是**相对现状整命令**, 与前两行不同源。
+>
+> **行数与单位 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-7)**: 引言原写「四行」而表身是五行, 已改。第五行的 `177.8` / `267.7` **源报告未标单位, 本版不补** —— 补一个未经核实的单位正是 memory `feedback_never_write_unverified_impossibility_claims` 点名的形态。该行已显式标注「无单位, 不作验收依据」; SC-8 本就要求**五档 Phase B 全部复算**, 该行数字不进任何闸门。
 
 | 负载 | 每段先算 credit | 先 pattern 后 credit | 结论 | **基线 (R4 补)** |
 |------|----------------|---------------------|------|------------------|
@@ -132,7 +148,7 @@ ALLOW
 | 3 段全 benign | 158ms | **22ms** | 省 86% | 同上 |
 | **2 段全命中** | — | — | **+102%** | pattern-first vs **现状整命令判定** |
 | **3 段全命中 (即本 spec 推荐的迁移写法)** | — | — | **+583%** | pattern-first vs **现状整命令判定** |
-| ↑ 同档「此档重排还更慢」 | 177.8 | 267.7 | **重排反而更慢** | pattern-first vs credit-first (**第三个基线**) |
+| ↑ 同档「此档重排还更慢」 | 177.8 (**无单位**) | 267.7 (**无单位**) | **重排反而更慢** (方向可用, 绝对值不可引用) | pattern-first vs credit-first (**第三个基线**) |
 
 作者原判「重排已化解性能矛盾」**只在 benign 负载成立**, 取样漏掉最坏情况; 而最坏负载恰是 spec 自己在迁移建议里推荐的「逐段补 redirect」。
 
@@ -204,15 +220,11 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 - `# guard:ack` 维持**命令级**语义 (SC-12 锁定 —— R2 M-5 指出该裁定此前无 SC 无 task)。
 - **跨段 pattern fail-open**: 逐段化后依赖跨 `;` 上下文的 pattern 会失配 (实证 `set -o posix; set | grep foo` 2→0)。本版不兜底, SC-7 锁现状。
 
-### Key Deliverables
-
-- `aria/hooks/secret-guard.sh` — `safe_to_split()` + `split_top()` + **`_sg_line_match()` 逐行 helper** + 判定循环重排 + BLOCKED 消息补段落
-- `aria/hooks/tests/secret-guard.test.sh` — 分段器单元测试 + fail-safe 降级族 + credit 多行正负双向族 + 端到端族 + `KNOWN-LIMIT` 转正
-- **`aria/hooks/tests/corpus_census.py`** (新增, 随 spec 归档) — 语料统计**与 13 处 credit 判据统计**的**权威计数器**, 见 §6
-
 ### 6. 数字口径必须可复算 (根治反复出现的计数争议)
 
-本 cycle 同一统计出过**五个**结果 (作者 68/52/16 · R1 tech-lead 72/53/19 · R1 qa 53/17/2 · R2 qa 65/49/16 · 作者权威计数器 65/49/16), 根因是**数法未固化**而非谁算错。
+本 cycle 同一统计出过**五个**结果 (作者 68/52/16 · R1 tech-lead 72/53/19 · **R1 qa 53/17/2 —— 见下, schema 不同不可并列** · R2 qa 65/49/16 · 作者权威计数器 65/49/16), 根因是**数法未固化**而非谁算错。
+
+> **`53/17/2` 与其余四组不同 schema, 并列即误导 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-8)**: 其余四组都是「含边界总数 / 拦 / 放行」且**后两项相加等于第一项** (52+16=68 · 53+19=72 · 49+16=65, 三组自洽); `53/17/2` 的 17+2=19≠53 ⇒ 它数的不是同一组量。本版保留该条目**只作为「口径混乱到什么程度」的史料**, **不得**把它当作与另四组同轴的第五个候选值参与任何比较或取舍。
 
 **定案 65/49/16/15/1 + 5** (作者权威计数器与 R2 qa 双独立扫描器交叉确认, R2 tech-lead / code-reviewer 亦复现一致)。计数器随 spec 交付 (`corpus_census.py`), 口径与 §2 规则表同源: quote-aware, 顶层 `;` `&&` `||` `|`, 换行单列。
 
@@ -261,7 +273,9 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 >
 > **修正后的实现约束**: (1) `(?:…)` 必须去掉 (真编译失败); (2) `\b` / `\s` / `\w` **允许保留** —— 它们是 glibc GNU 扩展、本 hook 已在生产使用, 但须在 SC-16 记为「已知 GNU 依赖」, 非 glibc 平台 (macOS / BSD / musl) 的行为差异**归转出 9**; (3) **不得**把 `\b` 机械改写成 `([^a-zA-Z]|$)` 之类 —— 语义真的会变 (`\b` 视 `_` 与数字为词内字符, 字符类不视), 而 13 处 credit 里恰有 2 处含 `\b` (`grep[[:space:]]+(-v|--invert-match)\b` / `(sha256sum|md5sum|sha1sum|sha512sum)\b`)。
 >
-> **为什么这条定 Critical**: SC-15 (语义不变) 与 SC-16 (不含 `\b`) 在**必然发生的输入**上互斥 —— 逐字保留则 SC-16 不过, 改写则 SC-15 不过或在其 26 条视野外静默改变拦截面。Rule #10 下 Phase B 两条闸门都不能自行豁免, 而 spec 原本没给裁定。本次改法即为该裁定。
+> **为什么 R4 当时把这条定 Critical (历史陈述 —— 该死结现已解开, owner 2026-08-09 采 R5 tech-lead R5-M-3 D-1 改显式时态)**: 在 **R4 时的旧 SC-16** 里写着「正则不得含 `\b`」, 它与 SC-15 (语义不变) 在**必然发生的输入**上互斥 —— 逐字保留则旧 SC-16 不过, 改写则 SC-15 不过或在其 26 条视野外静默改变拦截面。Rule #10 下 Phase B 两条闸门都不能自行豁免, 而当时的 spec 没给裁定, 故定 Critical。
+>
+> **⇒ 现状: 该互斥已不存在**。本版 SC-16 已按 R4 的事实勘正重写为「`\b` / `\s` / `\w` 允许保留, 记为已知 GNU 依赖」, 与 SC-15 不再冲突。读到上一段请勿理解为死结仍在。
 >
 > **另**: SC-16 是**语法层**检查 (能否编译), 结构上抓不到「编译通过但语义窄」的错误 —— R4 backend-architect CRITICAL-2 的裸 `^` 正是此类。两者互补, 不可相互替代。
 >
@@ -269,10 +283,19 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 >
 > **跨版本搬运纪律 (R4-M-1)**: 从上一轮报告搬运的实测数字, **必须在新规则下重跑**后才可写入 —— v4 的 `&` 已成降级标记, R3 在 v3 规则下测的「由 0 翻 2」在 v4 下不复成立。
 
+### Key Deliverables
+
+> 位置说明 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-11): 本小节原插在 §5 与 §6 之间, 打断了 §1→§6 的编号连续性, 已移到 §6 之后、`## 关键决策` 之前 —— 它是对 §1–§6 全部机制的产物汇总, 放在编号段落**结束之后**才符合它的角色。
+
+- `aria/hooks/secret-guard.sh` — `safe_to_split()` + `split_top()` + **`_sg_line_match()` 逐行 helper** + 判定循环重排 + BLOCKED 消息补段落
+- `aria/hooks/tests/secret-guard.test.sh` — 分段器单元测试 + fail-safe 降级族 + credit 多行正负双向族 + 端到端族 + `KNOWN-LIMIT` 转正
+- **`aria/hooks/tests/corpus_census.py`** (新增, 随 spec 归档) — 语料统计**与 13 处 credit 判据统计**的**权威计数器**, 见 §6
+
 ## 关键决策
 
 | 决策 | 选择 | 理由 |
 |------|------|------|
+| **实现手段** (owner 2026-08-09 补, R5 tech-lead R5-M-3 B-3 — 五轮反复撞 shell 语法边界, 该选择此前从未显式记录) | **手写 bash 扫描 (字符/token 级), 不引入外部 shell 解析器** | 三条理由: (1) **零依赖**是本 hook 的硬约束 —— 它跑在每次 PreToolUse 上, 引入 `bashlex` / `shfmt` / `tree-sitter-bash` 等于给每次工具调用加一个进程与一份安装面, 与 §What.4 刚花整轮根治的 fork 成本背道而驰; (2) 真解析器改变的是**覆盖率上界**而非本版目标 —— 转出 2/3/5/8 四条的出路都写着「需真正的 shell 语法解析」, 那是**另一个 spec 的范围**, 本版明确只做「可安全分段」子集并 fail-safe 降级其余; (3) 代价已知且已计价 —— `safe_to_split()` 是启发式、判据类别不封闭 (R3-C-2), 残余误报归转出 8。**若未来要翻这个决定, 入口是转出 2/8 而非本 spec** |
 | **块结构** | **fail-safe 降级到整命令判定** (**启发式, 不保证穷尽**) | v2 的「切了再说」实测 5/5 误报; 但判据类别**不封闭** (R3-C-2: `exec` 类无标记仍需降级) ⇒ 承诺强度下调, 残余误报归转出 8 |
 | 切分记号 | 顶层 `;` `&&` `\|\|` | `&`/换行各有实测反例; `\|\|` 排除会留一字符绕过 |
 | 管道 | 不切 | 12 条 pattern 把 `\|` 编码进正则 |
@@ -316,7 +339,13 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 
 ## 转出 (ship 时逐条开 issue; **复现命令内联**, R2 knowledge M-2: 不得只引用未提交的审计报告)
 
-1. **[架构, 高]** 跨段 pattern fail-open — `set -o posix; set | grep foo` (2→0); `set -o posix && set | grep buildid` 同。工作面 = 1 条 `.*` + **81** 条 `[^|]*` pattern 待逐条裁定。
+1. **[架构, 高]** 跨段 pattern fail-open — `set -o posix; set | grep foo` (2→0); `set -o posix && set | grep buildid` 同。工作面 = **1 条 `.*` + 81 条含 `[^|]` 的 pattern** 待逐条裁定 (其中 `[^|]*` **79** 条 / `[^|]+` **7** 条 / 两者兼有 **5** 条; 数组共 **141** 条 pattern)。
+
+   > **口径勘正 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-4, 连续三轮未改)**: 前三版写「81 条 `[^|]*`」—— 把**任意量词**的数 (81) 配了**星号**的记号 (真值 79), 是第七次计数争议的种子。本版三个数由机械扫描定案, 并按 §6 纪律**纳入 `corpus_census.py`** (Task 1.4 + SC-18), 此后不得手数。
+   >
+   > 扫描口径 (已实跑, 与 §6 的 13 处判据抽取同源): 取 `risky_patterns=(` 到其闭合 `)` 之间**以单引号或双引号起始**的行 —— **单引号 139 + 双引号 2 = 141**。⚠️ 只数单引号行会得 139 (漏两条 `ssh…` 双引号 pattern), 从而把三个数各少算 2, 得出错误的 `79/77/7`。
+   >
+   > **这是 `141 → 139` 第二次发生**: 头部「被实测推翻的作者断言」第 (6) 条记的正是「R1→R2 重写时把已核实的 141 改成 139」。同一个数、同一个差额 2、同一个根因 (漏数双引号行) —— 裁定本条时的机械扫描第一遍也踩了它。⇒ 这不是谁粗心, 是**抽取规则没固化**, 故本版把它写进 `corpus_census.py` 而非只在正文改数。
 2. **[缺陷, 高]** 块结构内的泄漏 — 本版降级为现状, 未修复。复现: `{ cat /opt/.env; echo x; } >/dev/null` / `for f in a b; do cat /opt/.env; done >/dev/null` / `( cat /opt/.env; echo x ) >/dev/null` 均 exit=0。需块结构解析。
 3. **[缺陷, 中]** `ssh host '…'` / `sh -c '…'` 外壳逃逸 — 复现: `ssh h 'cat /opt/.env; true >/dev/null'` exit=0, 含 Aria#170 形态的 ssh 版。需嵌套 shell 解析。
 4. **[缺陷, 中]** `&` / 换行 两个切分记号 — `&` 与 `&>` `>&` `|&` `2>&1` 冲突 (复现: `cat /opt/.env &>/dev/null` 若切 `&` 则由 0 翻 2); 换行切碎 heredoc (复现: `cat <<EOF\nsecret\nEOF\nnomad var get x`)。
@@ -336,6 +365,25 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
    ```
 
    **不得**写成 `[[ "foobar" =~ \bbar\b ]]` —— 裸写时反斜杠在 quote removal 阶段就被剥掉 (`printf '%s\n' \bbar\b` 输出 `bbarb`), 正则引擎根本没看到 `\b`, 于是**在已证实支持 `\b` 的 glibc 机器上也判「两者相同 = 失配」**, 是一条自证伪命令 (v5 原文即此形态, R5 knowledge-manager C-2 发现, R5-fix 执笔者实跑复核属实)。加双引号 (`=~ "\bbar\b"`) 同样错 —— 引号会强制字面匹配。此坑纯属 shell 词法, 与平台正则库无关; 对 `secret-guard.sh` 里写在双引号字符串**字面量内**的 `"…\\b…"` 不构成影响。本 spec 不处理, 仅立案。memory `feedback_sot_example_commands_are_never_executed` 点名的正是这一形态: **规范判据对 ≠ 示例可执行**。
+
+10. **[安全, 中] (R5 tech-lead R5-M-3 B-2 → owner 2026-08-09 改判: 归因错位, 转出立案, 本 spec 不修)** BLOCKED 回显把**整条命令**送进 chat-visible 通道, 命令行内联真值时即触 Rule #7。
+
+    **原提法与其错处**: 审计席提的是「§What.5 要求 BLOCKED 消息指出触发段落, 而段落原文可能是 secret 载体」。风险成立, **但归因给了本 spec**。实测: canonical `secret-guard.sh:695` 现在就有 `Command was: $command`, 而**段落是整条命令的子串** ⇒ 本 spec 的「补段落」增加**零个新字节**。真实暴露面比审计席描述的更大 (整条 > 段落), 且**先于本 spec 存在**。
+
+    **复现 (假值, 不涉真 secret)**:
+
+    ```bash
+    printf '%s' '{"tool_name":"Bash","tool_input":{"command":"nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9"}}' \
+      | bash aria/hooks/secret-guard.sh 2>&1 >/dev/null | tail -2
+    # 实测输出末行: Command was: nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9   (exit 2)
+    ```
+
+    路径可达性已核: `nomad[[:space:]]+var[[:space:]]+put([[:space:]]|$)` 在 `risky_patterns` 内 (`:416`), 故「命令行内联真值 → 被拦 → 整条回显」是**今天就能走通**的链路。
+
+    **为什么不在本 spec 修**: 脱敏回显是**行为变更**, 需自带验收面 (哪些片段脱敏 / 脱敏后 BLOCKED 消息还能不能定位问题 / 与 SC-1·SC-3 的 exit code 断言正交但要改测试期望)。本 spec 已因 `has_filter` 拉回扩过一次范围, 再扩即失控。
+
+    **历史泄漏面已普查 (owner 2026-08-09 指示, 只出 metadata)**: 扫 909 份 transcript + 2 份 log, 去重后 **263 条 BLOCKED 回显**。两个独立模态交叉 —— (a) 5 条内联真值键名判据 (`value=` / `--password` / `Authorization:` 等) 命中 **3 处, 全部是本次复现探针的假值**; (b) 高熵串判据命中 33 处, 分刀后 **30 处是路径段**、2 处是同一探针假值、余 **1 处经字符类掩码定型为 UUID** (`=999999aa-a999-9aa9-a99a-99aa9a9aaaaa`, 在一条 `export` 命令里)。⇒ **未发现真实内联真值泄漏, 无需凭据轮换** (对照 memory `feedback_secret_in_logs_fix_requires_rotation`: 若曾泄漏, 代码脱敏不闭环)。判据为启发式不保证穷尽, 但两模态交叉后残余候选已归零。
+    > 扫描器自身踩过一个坑, 记录以免重犯: 首版用 `Command was: (.*)` 在 JSONL 上取命令, `(.*)` 会吃掉**整条 JSON 记录的剩余部分**, 于是把 Anthropic 的 `toolu_` / `req_` ID 当成 188 个"高熵凭据"。必须 `json.loads` 后在**单个字符串值内部**定位并在其换行处终止。
 
 ## rule6_note
 
@@ -358,14 +406,15 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 - [ ] 1.2 `split_top()` — quote/转义感知, 切顶层 `;` `&&` `||`; 空段跳过
 - [ ] 1.3 判定循环: 降级分支 + 逐段 + **先 pattern 后 credit** + BLOCKED 消息补段落
 - [ ] 1.3b **`has_filter` 13 处 `echo\|grep -qE` 改 bash 内建, 经 `_sg_line_match()` 逐行 helper** (owner 2026-08-04 裁定拉回范围; owner 2026-08-09 裁定采候选 A)。**规范写法见 §What.4 代码块, 逐字照抄, 13 处正则文本一个字节不动**; **不得**改用段级换行守卫 `[[ "$seg" != *$'\n'* ]] &&` (R4 曾写死, R5 三席实测它治一半造更宽的另一半, 已撤回), **不得**改用 `${BASH_REMATCH[0]}` 变体, **不得**自行"等价改写" helper。**保留 `\b`** 的 2 处不得改写为字符类 (R4 code-reviewer C-1)。验收 = SC-15
-- [ ] 1.4 `corpus_census.py` 权威计数器 (随 spec 交付) — 语料 5 数 **+ §6 规定的 13 处 credit 判据三组口径** (行号清单 / 字面量词分布 / 换行影响面**两个基线口径各一个数**)
+- [ ] 1.4 `corpus_census.py` 权威计数器 (随 spec 交付) — 语料 5 数 **+ §6 规定的 13 处 credit 判据三组口径** (行号清单 / 字面量词分布 / 换行影响面**两个基线口径各一个数**) **+ risky_patterns 量词口径** (owner 2026-08-09 采 B-4: pattern 总数 141 = 单引号 139 + 双引号 2 / 含 `[^|]` **81** / `[^|]*` **79** / `[^|]+` **7** / 两者兼有 **5** / `.*` **1**; 抽取须含双引号起始行, 只数单引号会各少 2)
 - [ ] 1.5 测试: 分段器单元 + fail-safe 降级族 (含 `case` 的**隔离单元断言**) + **credit 多行正负双向族** + 端到端族 + `KNOWN-LIMIT` 转正
 - [ ] 1.6 CHANGELOG 行为变更标注 + 迁移写法
 - [ ] 1.7 `secret-hygiene.md` 计数回填
-- [ ] 1.8 全量回归 (canonical 直调) + 性能**五档**相对基线实测 (SC-8)
-- [ ] 1.9 开转出 **1、2、3、4、5、8、9** issue (**R4 knowledge-manager Critical-1 勘正**: 6 已由 owner 拉回本 spec 范围 = Task 1.3b, **不开**; 7 已随 Aria#172 关闭, 衍生票 Aria#178 已开, **不开**; 8 与 9 前一版漏在「1-6」范围外); 回填 Aria#170 覆盖率声明; close aria-plugin#128。**转出 9 的复现命令须逐字照抄该条目正文** (已实跑验证的变量形式), 不得改写为裸 `\b` 写法
+- [ ] 1.8 全量回归 (canonical 直调) + 性能**五档**相对基线实测 (SC-8)。**执行约束 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-9)**: 本任务的任何验证脚本若经 `sed` / `perl -i` 等**就地编辑**, 必须**重读脚本确认正则未被破坏**后才可采信其输出 —— 本 cycle v2 原型被 `sed` 写坏正则后仍输出「全绿」, 作者干净重写才发现。**该纪律不新增 SC**: 「脚本没被写坏」无法构造可证伪的断言, 硬造只会得到一条恒绿 SC (memory `feedback_counterfactual_test_for_every_new_sc`), 故落在 Task 执行面而非验收面
+- [ ] 1.9 开转出 **1、2、3、4、5、8、9、10** issue (**R4 knowledge-manager Critical-1 勘正**: 6 已由 owner 拉回本 spec 范围 = Task 1.3b, **不开**; 7 已随 Aria#172 关闭, 衍生票 Aria#178 已开, **不开**; 8 与 9 前一版漏在「1-6」范围外; **10 系 owner 2026-08-09 对 B-2 的改判**, BLOCKED 整条命令回显属 canonical 存量非本 spec 引入); 回填 Aria#170 覆盖率声明; close aria-plugin#128。**转出 9 与转出 10 的复现命令须逐字照抄各自条目正文** (均已实跑验证), 转出 9 不得改写为裸 `\b` 写法, 转出 10 不得把假值占位符换成真值
 - [ ] 1.10 **ship 后执行 SC-9b** (投递面腿, R5 qa-engineer M-2 指出 SC-9b 此前无 Task 承载): 版本 bump 落地并经 marketplace 刷新后, 用 `cmp` 比对 plugin cache 副本与 canonical, 再经 harness hook 链复验 ≥1 条本 spec 新增拦截形态。**挂 release-closeout, 不计入 Phase C 合并门槛** (理由见 SC-9b)
 - [ ] 1.11 **ship 同步面逐点核对** (§Impact 的 14 点表, R5 knowledge-manager M-1): bump 后对 14 个引用点逐个 `grep` 确认无残留旧版本号; **不得**以「机械兜底 check 全绿」代替 —— Aria#177 已实测两条 check 对其中 7 点结构性失明
+- [ ] 1.12 **版本 bump 前 re-check SOT** (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-1 — §Impact 写了「bump 前 re-check」却无 Task 承载)。**时序: 在 bump 动作之前**, 与 1.11 (bump 之后逐点核对) 成对, 两头各一次。动作: 重读 `aria/.claude-plugin/plugin.json` 确认 SOT 仍为预期基线 (本 spec 起草时 1.65.5), 若已被并发轨推进则**目标版本号顺延重算**, 不得沿用 spec 正文写死的 `v1.65.6`。依据: Aria#170 已撞过一次并发 bump; CLAUDE.md 项目状态段与版本行是 multi-track ship 的高争用面 (memory `feedback_claude_md_project_status_high_contention`)
 
 ## Success Criteria
 
@@ -373,7 +422,7 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 
 - [ ] SC-1 (baseline-failing, 核心): 5 条泄漏形态 (`;` ×3 / `&&` / `||`) **改前 exit=0, 改后 exit=2**。作者原型已验 5/5
 - [ ] SC-2 (零影响回归锁, **逐条列名**): 15 条纯管道 + 5 条换行边界用例改前改后**均不变**
-- [ ] SC-3 (拦截面不回归): **49** 条含边界的 `expected=2` 用例改后仍 exit=2; 任一转 0 = 安全回归
+- [ ] SC-3 (拦截面不回归): **49** 条含边界的 `expected=2` 用例改后仍 exit=2; 任一转 0 = 安全回归。**有效面须机械确定 (owner 2026-08-09 采 R5 tech-lead R5-M-3 B-10)**: 「哪 49 条」**以 `corpus_census.py` 输出的用例名清单为准**, 不得手挑、不得凭「看起来含边界」判定 —— SC-2 已要求逐条列名, SC-3 的基数更大却无有效面定义, 是同一份 spec 内的不对称。该清单与 SC-18 断言的 `65/49/16` 同源
 - [ ] SC-4 (quote-aware, **反事实可证伪** — R3-M-2 证原 3 条 fixture 在「引号盲实现」下 3/3 仍 exit=2, 被 fail-safe 吞掉): 改用 R3 tech-lead 验证过的 `perl -ne 'print if /a;b/' /opt/.env` —— 引号内含 `;` 且**无块结构标记**故不会走 fallback, 引号盲实现会把它切成两段而两段均不匹配 ⇒ **切错必 exit=0, 正确必 exit=2**。原三条降为辅助用例 (标注其零鉴别力)
 - [ ] SC-5 (分段器单元测试, 数组基数断言): `a; b`→2 / `a && b`→2 / `a \|\| b`→2 / `a \| b`→**1** / `;` 在引号内→**1** / `\;` 转义→**1** / 换行→**1** / `a & b`→**1** / `a &> f`→**1** / `case x in a) ;; esac`→**2** (R3-M-3 机械核验: `split_top()` 直接按 `;` 切, `;;` 产生 2 段; 该命令由 `safe_to_split()` 在上层拦下, **两层职责不可混淆** —— 前一版写 →1 是把两层搞混了)
 - [ ] SC-6 (fail-safe 降级族, **必须断言分支本身而非 exit code** — R3-M-1 + R4 qa-engineer §2 证 12 条里 5 条在「恒 fallback 的坏实现」下同样全绿, 因两路 exit 相同): 对每条**直接断言 `safe_to_split()` 的返回值** (fallback / split), 而非仅端到端 exit。**共 16 项** = 13 条端到端须 `safe_to_split=false` + **1 条隔离单元断言** + 2 条端到端须 `safe_to_split=true` (`ls -la; pwd` / `cat /opt/.env; echo hi >/dev/null`)。
@@ -473,5 +522,7 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
 - [ ] SC-18 (**权威计数器自身被断言**, R4→R5 code-reviewer M-3 三轮未落): 跑 `python3 aria/hooks/tests/corpus_census.py`, 其输出与 spec 正文**逐数字机械比对**, 任一不一致即失败 ——
   - 语料面: `65 / 49 / 16 / 15 / 1` + 换行边界 `5 (4 拦 + 1 放)` (§Impact 迁移面 / SC-2 / SC-3 的基数全部引用它)
   - 判据面 (§6 新增口径): 13 处判据行号清单恰 **13** 条 · `[[:space:]]+` **10** 处 / `[[:space:]]*` **12** 处 / 含 `[[:space:]]` **13** 处 · 换行影响面**两个基线口径各一个数** (严格 **11/13**、宽松 **13/13**)
+  - pattern 量词面 (owner 2026-08-09 采 B-4, 转出 1 的工作面基数): pattern 总数 **141** (单引号 **139** + 双引号 **2**) · 含 `[^|]` **81** · `[^|]*` **79** · `[^|]+` **7** · 两者兼有 **5** · `.*` **1**
+  - SC-3 有效面 (采 B-10): 输出 49 条 `expected=2` 含边界用例的**用例名清单**, 供 SC-3 逐条比对
   - **为什么必须有**: 这个计数器是 SC-2/SC-3 基数的唯一来源, 它算错一次就成为「权威的错答案」; 而同一份 spec 已为 `secret-hygiene.md` 的计数专门配了 SC-13, 计数器自己却三轮无断言 —— 不对称。
   - **反事实**: 计数器实现漂移 (如 quote-aware 状态机改坏) → 本 SC 红; 若无本 SC, 它只会让 SC-2/SC-3 的基数静默变错而**没有任何 SC 转红**
