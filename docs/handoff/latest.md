@@ -1,21 +1,17 @@
 # Latest Session Handoff
 
-→ [2026-08-08 — silknode waiver 前提质疑 + handoff 链失真两例](./2026-08-08-silknode-waiver-premise-challenge-and-handoff-drift.md)
+→ [2026-08-09 — Aria #172 闭环 + aria-plugin #128 R4/R5 + 换人执笔](./2026-08-09-issue172-closure-and-128-r4-r5-authorship-swap.md)
 
-**一句话**: 由一条到期的 waiver 起, owner **三次质疑前提**逐层深入 —— 「silknode 的东西为什么在 aria 处理」→「aria 是管开发的, 为什么就不处理 PII」→「**你为什么要管**」—— 最终推翻 2026-05-07 三轮四席审计的共识: 根因是 `r1-legal-memo` §建议动作把**运营层合规声明指向了产品层规范文档**。本段零代码改动, 产出集中在治理判定与方法论沉淀。
+**一句话**: Aria #172 (plugin cache 陈旧) 从「以为是没装」查成**两层滞后卡在 marketplace clone** —— Claude Code 只认本地 clone 说的版本, 所以单跑 `/plugin update` **毫无动作也不报错**。修复闭环、ship 机械探针、关闭 #172。随后 aria-plugin #128 跑完 R4 与超配的 R5。
 
-**本段最重的产出**: 发现 handoff 链上**两类传递失真** —— (1) 「凭据轮换 hard cap 2026-08-02」是从**另一组已 Resolved 豁免**上借来的, 从无 decision 给当前这组定过期限, 却跨约 10 份 handoff 传成「逾期不可」(**我本人单个 session 内传了三次**); (2) `feedback_concurrent_duplicate_audit_fetch_before_start` 被 5 份 handoff 引用 (含「第五次实证」) 但该文件**从未存在**。⇒ memory `feedback_handoff_carried_deadline_drifts_from_source`: **carry 项累积修辞不累积证据; 期限与交叉引用都只传名字不传验证**。可提前十次发现的信号是我自己写过的那句「逾期后果未成文」。
+**本段最重的产出**: **R5 五席判定我自己执笔的 R4-fix (104 行) 引入 22 条新错**, 其中 3 条 Critical 是勘正本身造成的 —— 核心那条改法 (换行守卫) 治了 fail-open 却造出覆盖面更广的 fail-close, 三席独立确认。owner 据此裁定**换人执笔**: R5-fix 由 tech-lead 写, 主 loop 只核验。结果主 loop 复核出 0 问题, 反倒是执笔方纠正了主 loop 汇总里的两处判错。⇒ memory `feedback_author_and_verifier_must_differ_for_corrections`: **勘正动作由原作者执笔时, 错误系统性逃逸; 挑复核范围也不行 —— 挑的依据出自同一个已被证伪的自我模型**。本 cycle 此类已第五次复发。
 
-**⚠️ 纠正上一份**: 上一份 handoff 称「CLAUDE.md 引了**不存在的** memory `feedback_partial_push_creates_mirror_divergence`」—— **该说法不实**, 本段核实该条文件 + 索引 + CLAUDE.md 引用**三处齐全**。真正悬空的是上面那条 `..._fetch_before_start`。两个方向的失真同时发生。
+**✅ 已闭**: [Aria#172](https://forgejo.10cg.pub/10CG/Aria/issues/172) 修复 + 四条独立证据复验 + 关闭 · 机械兜底探针 `plugin-cache-currency` ship (`71bdd60`, checks 8/8→**9/9**) · 衍生 [Aria#178](https://forgejo.10cg.pub/10CG/Aria/issues/178) 立案 · 补 `aria-orchestrator` 的 github remote (此前该腿是 `no_matching_remote` = **静默盲区非绿灯**, 补后 gitlink 6/6 ok) · #128 走完 R4 + R5 + R5-fix + A-1 (`333bc1a`)。
 
-**✅ 已闭**: silknode waiver 重评 SOP 第 1-2 步 ((c) 由 DEFERRED 实为 **MISSED** / (d) 与 90 天前逐字相同) · `r1-legal-memo` 补 §IS-4 结论适用条件 (合规结论是**运营事实**非工具属性, orchestrator `237045a` + gitlink `068d387`) · 与并发轨 `096e21d` 撞车后**逐项比优劣**, 撤回我方三处劣解只保留 memo 增量 · 顺带补齐一个 #165 形状的 orphaned gitlink · 四仓双远程一致, checks **8/8**。
-
-**⚠️ 遗留**: 🔴 [Aria#172](https://forgejo.10cg.pub/10CG/Aria/issues/172) plugin cache 陈旧 (**未解决前仓内 hook 验收全失真**, 优先级最高) · 🔴 #128 spec R4 未启动 (Phase B 受 aria-plugin #136 阻塞) · 🟡 清理 5 份 handoff 里的悬空 memory 引用 · 承前: SilkNode #979 回执 / Aria #175 / #136 / #137 / Aria #177 / 三个 owner 裁量项 / #120 / #117 / #123。
+**⚠️ 遗留**: 🔴 **#128 的 13 条待 owner 裁量** —— `.aria/notes/2026-08-09-secret-guard-128-owner-decision-queue.md`, 其中 **B-2 触 Rule #7** (BLOCKED 回显段落自身可能含 secret) 建议优先 · 🔴 #128 spec **未收敛未进 A.2** (裁完再定走向; 若走 override 须 owner 显式记 `converged: false, overridden_by_user: true`) · 🟡 Aria#178 落点未定 · 🟡 清理 5 份 handoff 的悬空 memory 引用 · 承前: SilkNode #979 / Aria #175 / #177 / aria-plugin #136 / #137 / 三个 owner 裁量项 / #120 / #117 / #123。
 
 > **勿再照抄「凭据轮换逾期」** —— 该期限经核实不成立, 轮换本身已转交 [Aether #283](https://forgejo.10cg.pub/10CG/Aether/issues/283)。
 
-> **⚠️ 并发轨同日增量 (更晚, 已二次收尾)**: [post_planning 四轮 handoff](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) 已追加 **§10 + §11** —— owner 追加「先做 [1] 发布路径」: 陈旧 memory 更正 (治 SHA 孤立的药方造成了镜像孤立 = #165 一条来路) · aria-plugin **#137 走完 A.1** (`premerge-gate-mainbranch-failclosed`, 待 post_spec) · **Aria #165 第四次复发当场检出并修复** (`github/aria-orchestrator` 落后使主仓 gitlink orphaned; 由 `gitlink_integrity` **机械检出**, 非人注意到; 修复后 6/6 ok) · **一条「更正的更正」**: memory store 是容器本地的, 双方对「某 memory 是否存在」的相反测量可同时为真 ⇒ **CLAUDE.md/standards 引 memory 名对第三方恒悬空**。
->
-> ⚠️ 该段 §10.5 实测: 本 handoff 「四仓双远程一致」一句**不成立** (漏核 `aria-orchestrator` 的 github) —— 已修复, 记录留痕, 未改本文件正文。
+> **#172 之前的「仓内实测」结论都带旧副本前提** —— 本仓 plugin 现为 1.65.5 (与 canonical 字节相同), hook/skill dogfood 重新可信; 但同版本下「canonical 直调」与「走 harness hook 链」执行环境仍不同, 那是 #178 的范围。
 
-**前序**: [2026-08-08 post_planning 四轮闸门 + 三起跨仓归属转交](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) (并发轨, 同日) · [2026-08-05 #128 四版迭代](./2026-08-05-issue128-per-segment-spec-four-iterations.md) (本容器)
+**前序**: [2026-08-08 silknode waiver 前提质疑 + handoff 链失真两例](./2026-08-08-silknode-waiver-premise-challenge-and-handoff-drift.md) (本容器) · [2026-08-08 post_planning 四轮闸门 + 三起跨仓归属转交](./2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md) (并发轨 `aria-runner-bot/023236f2`, 已二次收尾, 含 §10.5 Aria #165 第四次复发的机械检出)
