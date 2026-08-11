@@ -1,5 +1,27 @@
 # Latest Session Handoff
 
+**Latest**: [2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md](./2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md) — premerge-gate-mainbranch-failclosed @ phase=A.2-audit updated=2026-08-11
+
+> ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
+> `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
+> 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
+> **两条在飞的 track**:
+>
+> | track-id | owner-container | phase | 最新 handoff |
+> |---|---|---|---|
+> | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | A.2-audit (blocked) | [2026-08-11](./2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md) |
+> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | A.1 (未收敛) | [2026-08-09](./2026-08-09-issue172-closure-and-128-r4-r5-authorship-swap.md) |
+>
+> 📌 **这是一处对成文约定的有意偏离, 请复议** (`session-handoff.md §2.3`: 多 track ⇒ 只写
+> deprecation banner 不写真实指针)。偏离理由: 机械 `latest_md_writer` 当前不可用 —— snapshot
+> 实测 503 个 track 里 `status=="active"` 有 **31 个**, 绝大多数是 5 月的历史交接 (frontmatter
+> 从未收口), 直接跑会产出 31 行陈旧噪声 banner; 而"不写指针"的替代物是 mtime, 它刚误判过。
+> ⇒ 详见 2026-08-11 handoff §4.4 / §9-3。
+
+---
+
+## 并发轨 (#128) — 以下为原有内容, 未改动
+
 → [2026-08-09 — Aria #172 闭环 + aria-plugin #128 R4/R5 + 换人执笔](./2026-08-09-issue172-closure-and-128-r4-r5-authorship-swap.md)
 
 **一句话**: Aria #172 (plugin cache 陈旧) 从「以为是没装」查成**两层滞后卡在 marketplace clone** —— Claude Code 只认本地 clone 说的版本, 所以单跑 `/plugin update` **毫无动作也不报错**。修复闭环、ship 机械探针、关闭 #172。随后 aria-plugin #128 跑完 R4 与超配的 R5。
