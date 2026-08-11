@@ -6,7 +6,7 @@
 >
 > 📌 **本版的处方边界 (R5 后新增)**: 凡编排层**无法验证**的实现细节, 本 Spec **不再规定**, 一律降为 `tasks.md` 里的 **Phase B spike** —— 五轮实证「继续规定」只会产出新缺陷。**Spec 负责钉住『什么算对』(SC), 不负责钉住『怎么写』。**
 > **Created**: 2026-08-08
-> **Spec Level**: **3** (原 2 — R4/knowledge-manager 指出范围重定后未重核。判据表逐字「Level 3 = Architecture changes, 输出 proposal.md + **tasks.md**」**直接管辖**; 本 Spec 的 **TDD 前置 / 实现 / SKILL.md / 合规与同步面 / follow-up 五组共 20 条任务**须 `tasks.md` 承载, 同姊妹 Spec `linked-issue-normalization` 升级理由。⚠️ 上一版此处与 §Impact 均写「**9 条阻塞项**」—— 该数与本 Spec 内任何可数集合都对不上 (§What Changes 7 / `tasks.md` checkbox 20 / 组 0 五条 / SC 13 / 决策 11), 是范围重定前的陈旧数, **已删**; Level 3 由判据表条款直接管辖, 不需要这个数)
+> **Spec Level**: **3** (原 2 — R4/knowledge-manager 指出范围重定后未重核。判据表逐字「Level 3 = Architecture changes, 输出 proposal.md + **tasks.md**」**直接管辖**; 本 Spec 的 **TDD 前置 / 实现 / SKILL.md / 合规与同步面 / follow-up 五组共 21 条任务**须 `tasks.md` 承载, 同姊妹 Spec `linked-issue-normalization` 升级理由。⚠️ 上一版此处与 §Impact 均写「**9 条阻塞项**」—— 该数与本 Spec 内任何可数集合都对不上 (§What Changes 7 / `tasks.md` checkbox 21 / 组 0 五条 / SC 17 / 决策 11), 是范围重定前的陈旧数, **已删**; Level 3 由判据表条款直接管辖, 不需要这个数)
 > **关联 Issue**: [aria-plugin #137](https://forgejo.10cg.pub/10CG/aria-plugin/issues/137)
 > **代码落点**: `aria/` 子模块 `skills/phase-c-integrator/`; Spec 落主仓 (Rule #5)。⚠️ **落点跨两个仓** —— TASK-020 的删除面含主仓 `.aria/config.template.json` (见 §Impact)
 > **ship target**: **MAJOR** (见 §版本 — CLAUDE.md:35「破坏性变更须 MAJOR」与 :79「MINOR+」两条下界求交, 唯一解 MAJOR)。**2026-08-10 依 owner 授权裁定确认 MAJOR**, 不再是「待确认」(Rule #10 留痕: 该裁定由 AI 依 owner 显式授权作出, **须写入 handoff 请复议**)。MAJOR ⇒ v2.0.0 会激活 `pre_merge_gate.py:68/:116` 自带的弃用到期承诺 (TASK-020 承接)。号段落地时计算, 不预写字面量
@@ -76,6 +76,7 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 | **helper 的物理拷贝数 ≠ 访问路径数** | `find` 得 **5 条路径**: marketplaces · 仓内 · cache/1.65.5 · cache/1.63.0 · cache/1.56.1。但**主仓根与 aria 子模块根解析到同一 inode** (是同一个文件); 真正能独立漂移的是 plugin 安装态那份, 且旧 cache 版本内容不同 | post_planning R1 两席 (各自指出不同的错法) + 编排层复核 |
 | `SKILL.md:242` 要求 cwd = **目标仓根** (子模块合并 → 子模块根) | ⚠️ **作用域限于步骤 2.5「Path coverage 评估」** —— 实读该句讲的是 `evaluate_path_coverage(main_branch, pr_branch)` 的调用上下文, **不是 C.2 合并全流程的契约**。引用它必须带这个限定 | 既有 + 编排层 2026-08-10 实读更正 |
 | `SKILL.md:610` 要求路径 **相对项目根** | 逐字:「(路径相对项目根; `ARIA_PLUGIN_ROOT` 环境变量优先)」 | 编排层 2026-08-10 实读 |
+| **仓内已 ship 的同类先例 (spike 应援引而非再造)** | `aria/hooks/submodule-gate-telemetry.sh:60-62` 实读 = 「`${CLAUDE_PLUGIN_ROOT:-}` 优先 → 不中则自定位 → 仍不中即 `exit 0` (fail-closed)」。**可移植的是这个结构** (显式优先序 + 不中即收口), ⚠️ **不是 `BASH_SOURCE` 本身** —— hook 是脚本自己定位自己, 而 C.2.4 是 AI 照 `SKILL.md` 敲一条命令, 敲之前没有 `BASH_SOURCE`。⛔ 亦**不得**据此把「cwd 相对候选」升为主路径 (第 5 种 cwd 结构上够不到, 见上文 (b)) | post_planning R2/backend-architect + 编排层实读 |
 
 > ⚠️ **上一版本表的前两行都写错了** (末两行是本版新增): 称「`:262/:559/:610` 均用 `CLAUDE_PLUGIN_ROOT`」(实为 `ARIA_`, 方向相反) · 称「3 个副本位置」(把同一 inode 数了两次, 又漏了三份 cache)。**两条都是 spike 的输入 —— 输入错则 spike 必错**, 故此处列出实测值而非结论, 由 spike 自行判断该沿用哪个约定。
 >
@@ -104,13 +105,17 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 `<details><summary>helper 内部算法 (供理解与排障, ⛔ 不要手工执行)</summary>` … `</details>`。
 
 - 折叠块须**补上 §3 新增的分支存在性核验步** (否则折叠块自称描述 helper 内部算法却漏掉本 change 唯一会 BLOCK 合并的那一步);
-- 折叠块**不是**保护机制 —— 折叠对 AI 文本阅读无隐藏效果, 真正的保护是**去掉命令字面量** (SC-M2 钉住)。
+- 折叠块**不是**保护机制 —— 折叠对 AI 文本阅读无隐藏效果, 真正的保护是**去掉命令字面量**。
+  ⚠️ **上一版把这条委派给 SC-M2 是误派** (post_planning R2/code-reviewer): SC-M2 的量是**输出示例**里的 `"branch": "main"` (唯一命中 `:270`), 与「可执行命令字面量」无关 —— 一个保留 `:240` 的 `aether --help | grep -q` 的实现能让 SC-M1/M2/M3a/M3b/M3c **五条全绿**而本要求被违反。⇒ 本要求改由 **SC-M1** (四行 `aether ci status`) + **SC-M15** (折叠块内可执行命令字面量计数 = 0, 覆盖 `:240` 这类非 `aether ci status` 形状) 两条共同钉住, **不再留「须人工核」的裁量腿**;
+- 🔴 **折叠块之外必须留下 `<MAIN_BRANCH>` 的取值来源** (**SC-M16** 钉住)。实测 `SKILL.md:242` 是全文件**唯一**告知「本项目传 `master`」的一行, 而它属**步骤 2.5**, 正落在本节要整体折叠的 1-5 步之内。终态叠加 (`--main-branch` 必填 + SC-M3a 要求写占位符 + SC-M3b 禁字面值) 会让 AI 在折叠块外读到一个带占位符的必填参数, 而唯一说明取什么值的句子躺在一个自称「⛔ 不要手工执行」的块里。⇒ 折叠块外须存在 ≥1 处说明 `<MAIN_BRANCH>` 取值来源的指令。
 
 ### 3. `SKILL.md §C.2.4` 的**步骤 6 不动** (归属声明)
 
 步骤 6 (`:252-255`) 是**纯 AI 义务**: 路由决策 + v1.65.0 / #126 两条强制 surface 警告 (helper 只输出 JSON, 不产文案), 且是 `DEC-20260731-001` 逐字记载的 owner 交换条件。
 
-⇒ **它留在折叠块外, 保持命令式**, 本 change 不修改其语义。仅在其 `fail` 分支的措辞里补一句「若 `raw_message` 含 `gate_error` 诊断则一并 surface」。
+⇒ **它留在折叠块外, 保持命令式**, 本 change 不修改其语义。其 `fail` 分支**仅在既有措辞未覆盖 `raw_message` 的 surface 时**才补一句「若 `raw_message` 含 `gate_error` 诊断则一并 surface」。
+
+> ⚠️ **本行由确定式改为条件式** (post_planning R2/tech-lead): 实读 `SKILL.md:255` 逐字已是「`fail` → BLOCK + 输出 verdict + **raw_message**, phase-c-integrator return failure」⇒ **大概率零改动**。上一版此处与 §Impact 均写确定式「补一句」, 与 `tasks.md` TASK-012 / `detailed-tasks.yaml` 的条件式 (「若既有措辞已覆盖则**不加句**, 避免 no-op 编辑」) 直接矛盾; **本版让确定式一侧改口**, 断言的量 (步骤 6 语义未变 + 折叠块外) 未动。
 
 ### 4. helper 三处 `main` 字面量去掉, 参数必填
 
@@ -195,6 +200,36 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 **在三早退之后**: 否则 owner 显式关闭的闸门与 `no_ci_fallback` 既有降级会被变成 `fail`。
 **在 path coverage 之前**: 它更早消费 `main_branch`, 放它之后等于放行一次未核验的使用。
 
+⚠️ **本节只管本 change 新增的存在性核验这一个插入点。TASK-020 的 legacy-key fail-CLOSED 是位置不同的另一个插入点, 见 §6.1 —— 两节不得互相援引。**
+
+### 6.1 TASK-020 的 legacy-key fail-CLOSED 插入点 (post_planning R2 唯一 Critical 的闭合)
+
+```
+:325 _normalize_config()      ⛔ 不得放这里 — 它是 gate_check 的第一条可执行语句, 在 enabled 早退之前
+:328 enabled=false          → 早退 (green)
+★ legacy-key 硬失败 (TASK-020 新增)          ← 唯一合法插入点
+:337 resolve_ci_backend(cfg)                  [消费 ci_backends ← 旧键 primitive_preference 的新键]
+:338 no backend → _no_ci_output(cfg["no_ci_fallback"])  [消费 no_ci_fallback ← 旧键 no_aether_fallback 的新键]
+:345 precheck 失败          → 早退 (fail)
+★ 存在性核验 (§6, 本 change 的另一处新增)
+```
+
+**在 `enabled` 早退之后**: `enabled` **不是**别名键 (`_OLD_TO_NEW` 实读只有 `primitive_preference` / `no_aether_fallback` 两个) ⇒ 读它不依赖任何翻译; 且 owner 显式关闭的闸门不得因一个已不再被消费的陈旧键而 BLOCK —— 与 D9/§6/**SC-M10** 是同一条理由, 本节与它们**同向**。
+**在 `resolve_ci_backend` 之前**: 两个别名键的**首个消费者**分别在 `:337` 与 `:339`。若把硬失败推到三早退**之后** (与存在性核验同点), 一个设了 `no_aether_fallback: "abort"` 又恰好无可用 backend 的采用方, 会在 `:339` 用 **DEFAULT 的 `skip_with_warning`** 静默降级放行 —— **正是 TASK-020 要治的那条 fail-OPEN 原样复发** (memory `fix-recurs-in-fallback`)。
+
+⇒ 该插入点由三条用例**唯一确定** (缺任一条, 两个独立实施者即可得相反结果 —— 这正是 R2 判 Critical 的形状):
+
+| 输入 | 期望 | 排除掉的错实现 |
+|---|---|---|
+| `enabled=false` + 任一 legacy key | `green` + 六键不变 + 无 `gate_error` (= **SC-M10 的交叉输入变体**) | 放进 `_normalize_config` 或 `enabled` 早退之前 |
+| `enabled=true` + `no_aether_fallback` + 无可用 backend | `fail` + `raw_message` 点名旧键 | 放到三早退之后 |
+| `enabled=true` + 任一 legacy key + backend 正常 | `fail` + `raw_message` | 完全没实现 |
+
+**信号通道 (承重, 不得偏离)**: 硬失败**必须**产出 `verdict="fail"` + `raw_message` 的正常六键输出, 由 `main()` 正常 `print` 后退出; **不得**以未捕获异常穿过 `gate_check()` / `main()`。理由实读: `:325` 前后与 `main()` 对 `gate_check()` 的调用**均无 `try/except`**, `if __name__ == "__main__": sys.exit(main())` 外再无兜底 ⇒ 裸 `raise` 会让进程崩溃、stdout 无 JSON、`verdict` 从未被构造; 而 `workflow-runner/SKILL.md:354-357` 的 verdict 路由只有四条臂 (green / fail / timeout / Ctrl-C), **无异常臂**, `gate_error` 全仓零消费者。
+⇒ **验收必须含一条走 CLI 真实路径的用例** (`main()` 或 `python3 pre_merge_gate.py …`), 断言 stdout 是可解析 JSON 且 `verdict == "fail"`。**只在 `_normalize_config` 上做 `assertRaises` 的单元断言不满足本条** —— 那种写法会让这个 Critical 在 CI 里保持沉默, 只在真实采用方跑 CLI 时以 traceback 现形 (post_planning R2/backend-architect)。
+
+> **与 §非目标「不动 `no_ci_fallback` 既有降级语义」的关系**: 本插入点只对**含旧键名**的 config 触发。v2.0 后旧键已不是合法键, 而只用新键 `no_ci_fallback` 的 config 到达 `:339` 的路径与语义**零改变**。
+
 ### 7. `verdict` 三态封闭; 诊断信息**主通道是 `raw_message`**
 
 `verdict` 仍是 `green` / `wait` / `fail`。理由: `pre_merge_gate.py:47-49` / `SKILL.md:267` schema / `SKILL.md:252-255` 路由 / `gate_state_helper.py:32-34` 四处均封闭枚举, 且 `gate_state_helper.py:147` 是 `"status": verdict` 原样写入无校验。
@@ -246,7 +281,7 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 | **SC-M1** | `grep -c 'aether ci status' aria/skills/phase-c-integrator/SKILL.md` | **0** | **4** | 必红。**一条断言覆盖 `:167`/`:168`/`:243`/`:244` 全部四行** |
 | **SC-M2** | `grep -c '"branch": "main"' .../SKILL.md` | **0** | **1** | 必红 (`:270`) |
 | **SC-M3a** | `grep -c -- '--main-branch "<MAIN_BRANCH>"' .../SKILL.md` | **2** | **0** | 必红 —— **D1 承重红窗**。断言的是**占位符形态**, 两处散文各一条 |
-| **SC-M3b** | `grep -cE -- '--main-branch +(main\|master)([[:space:]]\|$)' .../SKILL.md` | **0** | **0** | **负控**: 写死字面值的实现在此必红。⚠️ **本条是 PC1 的修复** —— 上一版只断言 `--pr-branch` 存在, 而 `--main-branch main` 写死能通过全部断言 (实测 0/0/2 全过)。**断言的量必须是病灶所在的量** |
+| **SC-M3b** | `grep -cE -- "--main-branch +['\"]?(main\|master)['\"]?([[:space:]]\|$)" .../SKILL.md` | **0** | **0** | **负控**: 写死字面值 (**裸的与带引号的都算**) 的实现在此必红。⚠️ **本条是 PC1 的修复** —— 上一版只断言 `--pr-branch` 存在, 而 `--main-branch main` 写死能通过全部断言 (实测 0/0/2 全过)。**断言的量必须是病灶所在的量**。<br>⚠️ **本版扩了拒绝域** (post_planning R2/code-reviewer): 上一版 pattern 不含引号 ⇒ 额外写一条 `--main-branch "master"` 示例可从中逃逸, 而本行的声称是「写死字面值必红」—— **声称强于拒绝域**。已实测: 新 pattern 今日仍 **0** (拒绝域扩大但今日值不变), 且对合成串 `--main-branch "master"` / `--main-branch master` 各命中 1、对 `--main-branch "<MAIN_BRANCH>"` 零命中 |
 | **SC-M3c** | 提取 `<details>…</details>` 全部折叠块, 统计其中含 `--pr-branch` 的块数 | **0** | **0** ⚠️**空真** | **负控**: 把调用藏进折叠块的实现在此必红。⚠️ 修复 code-reviewer 指出的第二个失明面 —— SC-M1/M3a 都是**全文件计数, 无位置维度**, 而病灶逐字是「AI 走散文那份」, **位置就是病灶所在的量**。<br>⚠️ **今日的 0 是空真, 不得当正面证据读**: 实测 `SKILL.md` 内 `<details>` 块数 = **0**, 「含 `--pr-branch` 的块数 = 0」是因为**根本没有块**, 不是因为调用在块外。本条今日的信息量全部来自 :204 已验过的**拒绝能力**; 要等 TASK-011 建出折叠块后它才开始有正面信息量 |
 
 > **SC-M3a/b/c 已做对抗性验证** (不只验当前值): 构造「好实现 (占位符+调用在折叠块外)」「坏实现 A (写死 `--main-branch main`)」「坏实现 B (调用藏进折叠块)」三个 fixture 实跑 —— 好实现全过, **两个坏实现各被 M3b / M3c 拒绝**。
@@ -256,10 +291,14 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 | **SC-M7** | `ls-remote` 返回 **128** (mock 或指向不存在的 remote 名) | `fail` + `kind=="main-branch-verify-failed"`, **未重试** | — | 当「不存在」→ 误报 / 当「存在」→ 恒绿, 两向都红 |
 | **SC-M8** | `ls-remote` 抛 `TimeoutExpired` (**mock**; 须 mock `time.sleep`) | 3 attempts 后 `fail` + `kind=="main-branch-verify-failed"` | — | 未按 `:259` 重试的实现红; 未 mock sleep 致 >60s 亦红 |
 | **SC-M9** | `gate_check(pr_branch=...)` 不传 `main_branch` | `TypeError` | — | 现状签名有缺省 ⇒ 静默成功 ⇒ 必红。**唯一覆盖内部调用路径**。(本 skill 的函数名是 `gate_check`; `run_gate` 属 `state-scanner/phase1_gate.py`) |
-| **SC-M10** | 负控: `enabled=false` 早退 | 六键不变、无 `gate_error`, **且 `assert ls-remote 未被调用`** | — | 缺后半条因果断言则健康与不健康实现都绿 (D9 守不住) |
+| **SC-M10** | 负控: `enabled=false` 早退。**两个 fixture 变体, 缺一不可**: (a) 干净 config; (b) **含任一 legacy key 的 config** (交叉输入) | 六键不变、无 `gate_error`, **且 `assert ls-remote 未被调用`** | — | 缺后半条因果断言则健康与不健康实现都绿 (D9 守不住)。⚠️ **变体 (b) 是本版新增** (post_planning R2 Critical): 上一版 fixture 不含 legacy key ⇒ 整套断言对「TASK-020 的硬失败被放进 `_normalize_config`」这个交叉输入**失明**, 而受影响的正是 TASK-020 点名要保护的人群里 `enabled=false` 的那部分 (他们的每次合并被 BLOCK)。插入点规定见 **§6.1** |
 | **SC-M11** | 负控: 分支存在且有 in-flight | `verdict=wait` 不变 | — | 核验不得改变正常路径判决 |
 | **SC-M12** | **参数化五种 cwd** 跑 §1 的调用: 主仓根 / `aria` 子模块根 / `standards` 子模块根 / `aria-orchestrator` 子模块根 / **采用方仓根 (有 `.aria/`、无 `aria/` 无 `skills/`, 插件装在仓外)** | **五种全部可达并正常执行** (非 `No such file`) | — | **两个已被否决形态的判别器**: 「两分支 `git rev-parse` 解析」在第 3/4/5 种下红 (R5 四席实测); 「cwd 相对多候选探测为主路径」在第 5 种下红 (结构上够不到仓外)。⚠️ 上一版只测一种 cwd, 对该失效**恒绿**; 且上一版的「模拟 plugin 安装态」曾被取成 cwd = marketplace 目录本身 —— 那让候选 1 直接命中, 是**假绿且不对称的 fixture**, 已作废。第 5 种须按真形态搭 (实测 `/home/dev/Kairos` `/home/dev/SilkNode` 即此形态) |
 | **SC-M13** | 受控裸仓: 远端只有 `refs/heads/master`, 传 `--main-branch 'mast*'` (及 `m[a]ster` / `maste?`) | `verdict=fail` + `kind=="main-branch-not-found"` | — | **锚定 pattern 实现必红** —— 实测这三个 pattern 对该远端全返 RC=0。**本条钉住「精确比对」而非「锚定」, 是 R2 承重 Critical 的真正闭合腿** |
+| **SC-M14** | 共享重试 helper 的 `subprocess` 抛 `UnicodeDecodeError` (**mock**) | `fail` + `kind=="main-branch-verify-failed"`, **未重试**, 且异常不逸出 `gate_check()` | — | 照搬 `aether.py:176` 的 `text=True` 而不换 decode 策略的实现在此必红 —— 它不是 `TimeoutExpired`, 不被 `:180` 捕获 ⇒ 裸抛穿过 gate。⚠️ **本条是给 §5 catch-all 里唯一无编号的那一支补编号** (post_planning R2/qa-engineer): 无编号的行为要求不会被任何机械勾稽点找到, 只能靠人工读散文 |
+| **SC-M15** | 提取 `<details>…</details>` 全部折叠块, 统计块内**可执行命令字面量**行数 (pattern = 行内 code 或 fenced code 中以 `aether ` / `git ` / `python3 ` / `bash ` 起头的串) | **0** | **0** ⚠️**空真** (今日 `<details>` 块数 = 0) | 保留 `:240` 的 `aether --help \| grep -q`、或任何非 `aether ci status` 形状可执行字面量的实现在此必红。**它是 §2「去掉全部可执行命令字面量」的机械腿** —— R2/code-reviewer 构造的逃逸实现 (SC-M1/M2/M3a/M3b/M3c 五条全绿而要求被违反) 在此被拒。<br>⚠️ 与 SC-M3c 同为空真, **今日的 0 不得当正面证据**, 要等 TASK-011 建出折叠块后才有正面信息量 |
+| **SC-M16** | 折叠块**之外**存在 ≥1 处说明 `<MAIN_BRANCH>` 取值来源的指令 (判据: 同时含 `<MAIN_BRANCH>` 与「本项目」或 `master` 的段落, 且该段落不在任何 `<details>` 块内) | **≥1** | **1** (`:242`, 但它属步骤 2.5 —— 正在将被折叠的范围内) | **守恒断言**: TASK-011 把 1-5 步整体折叠而不把取值说明外提的实现在此掉到 **0** ⇒ 红。<br>⚠️ **今日的 1 不是正面证据** (今日无折叠块, 任何行都在块外); 它守的是「落地后不掉到 0」 |
+| **SC-M17** | `grep -cE 'still (readable\|works)\|removed in v2\.0\|仍读\|v2\.0 移除' aria/skills/config-loader/SKILL.md` | **0** | **2** (`:249` `:257`) | 必红。**双重身份**: (a) TASK-020 删除面在 `config-loader` 这个**另一个 skill** 上的机械腿; (b) Rule #6 判据表第三行要求的「**可证伪定向 fixture**」—— 该 skill 全无 AB 套件 (实跑 `ls ab-suite/ \| grep -i config` = 空), 见 §Rule #6 |
 
 **打桩边界 (前一版自相矛盾, 本版钉死)**: **SC-M6 与 SC-M13 用真实 `ls-remote` + 受控裸仓**, §5 的**零命中用例** (`--main-branch develop`) 同属这一档。**SC-M8 必须 mock** —— 真实 `ls-remote` 无法产出确定性 timeout。**SC-M7 两种手段皆可**: 「指向不存在的 remote 名」经受控实验实测**确定性返 128** (非 mock 亦可复现), 或直接 mock; 唯**不得**用依赖网络可达性的手段。
 
@@ -280,6 +319,19 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 
 ⇒ ship 前须过 `ab-suite/phase-c-integrator.json` 与 `ab-suite/phase-c-integrator-pre-merge-gate.json`, 结果存 `ab-results/`。**已知**: 两套件对 C.2.4 覆盖薄 (承 aria-plugin #127), 本 Spec **不以此降档**, 且诚实声明**D1 的行为证据主要由 SC-M1 / SC-M3a-c / SC-M12 承担**, AB 是合规义务而非本 change 的主要证据来源。
 
+#### `config-loader` 这个 skill 的 Rule #6 归档 (post_planning R2/tech-lead 指出的覆盖缺口)
+
+TASK-020 的删除面含 **`aria/skills/config-loader/SKILL.md:249` `:257`** —— 那是**另一个 skill**, 本轮新入 scope, 而**它全无 AB 套件** (实跑 `ls aria-plugin-benchmarks/ab-suite/ | grep -i config` → 空)。上一版对它**无 `rule6_note` / 无 substitute SC / 无套件缺口 issue**, 三样全无。
+
+`rule6_note` (config-loader): **判据表第三行 —— 处方性 · 套件覆盖外**。「照跑」在这里**结构上不可能** (被照跑的对象不存在), 故走 SOT 为该行规定的三件套, **三样全给**:
+
+1. **点名行为**: 本 change 对该文件的改动仅限「两行 legacy key 别名的 v2.0 到期措辞随代码同批删除」, **不触碰该 skill 的任何运行时指令流程、不改 `description`**;
+2. **可证伪定向 fixture**: **SC-M17** (今日 2 → 期望 0, baseline-failing);
+3. **套件缺口开 issue**: TASK-019 第 **(8)** 项。
+
+> ⚠️ **Rule #10 留痕**: 这是 AI 作出的判据行归属判断, **须写入 handoff 请复议**。若复议认为该改动属第二行, 则须先建 `config-loader` 的 AB 套件再跑 —— **不得**以「改动小 / 1:1 派生」为由跳过 (CLAUDE.md 规则 #10 明列的四类白名单不含这些)。
+> ⚠️ `phase-c-integrator` 那两套件**不受本段影响, 原样照跑第二行零裁量**。
+
 ---
 
 ## 非目标
@@ -290,7 +342,8 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 - **不改** `branch-manager` 合并动作 (aria-plugin #136);
 - **不改** `workflow-runner` 的 `gate_state` schema;
 - **不改** `SKILL.md` 步骤 6 的语义 (D4);
-- **不动** `no_ci_fallback` / stub backend 既有降级语义 —— `enabled=false` 那条由 **SC-M10** 机械钉住; `:338` no-backend 与 `:345` precheck 失败**两条不在 SC-M10 覆盖内**, 由 **TASK-008 的两条专用用例**钉住。⚠️ 上一版此行让 SC-M10 一条代管三条早退, `detailed-tasks.yaml` 已记录该缺口而正文未回写, 本版补齐;
+- **不动** `no_ci_fallback` / stub backend 既有降级语义 —— `enabled=false` 那条由 **SC-M10** 机械钉住; `:338` no-backend 与 `:345` precheck 失败**两条不在 SC-M10 覆盖内**, 由 **TASK-008 的两条专用用例**钉住, **且那两条用例须各带同款因果断言 `assert ls-remote 未被调用`** (⚠️ 上一版只要求「各有一条用例」—— 少了因果断言则: 把核验错插在 `:338`/`:345` **之前**的实现, 只要 fixture 的 `main_branch` 恰好指向真实存在的分支 (最省事的写法), 就会静默跑一次 `ls-remote` 再照常早退, 返回六键与健康实现完全相同 ⇒ 测试全绿而 D9 对这两条分支从未被验证; post_planning R2/qa-engineer)。⚠️ 上一版此行还让 SC-M10 一条代管三条早退, `detailed-tasks.yaml` 已记录该缺口而正文未回写, 本版一并补齐;
+  ⚠️ **TASK-020 的 legacy-key 硬失败是本条的例外面, 但只对含旧键名的 config 生效** —— 它在 `:337` **之前**触发 (§6.1), 而只用新键 `no_ci_fallback` 的 config 到达 `:339` 的路径与语义**零改变**;
 - **不修**同形兄弟位置 —— `phase-d-closer/fetch_gate.py` 的字面 `("master","main")` 回落 · `state-scanner/lib/worktree_manager.py:170` 的 `base_branch: str = "master"` (与 `pre_merge_gate.py:300` 完全同形)。⚠️ **Phase B 实施者不得照抄 `fetch_gate.py`**。开 follow-up。
 
 ---
@@ -299,19 +352,19 @@ Rule #8 pre-merge gate 的「main 无 in-flight CI run」这条腿在本项目�
 
 | 文件 | 变更 |
 |------|------|
-| `aria/skills/phase-c-integrator/SKILL.md` | **两处**散文流程重整 (`### 步骤执行` :99 段 + `### C.2.4` :218 段) · 四行裸命令去除 · `:270` 示例 · `:267` schema 增 `gate_error` · `:279` 四类早退注记同步 · 步骤 6 的 `fail` 分支补一句 · **TASK-020 删除面 `:48` `:49` `:285` `:286` `:349` `:350` `:351`** (7 行; ⚠️ 早前清单只列 6 行, 漏 `:349` —— 那行逐字是「Legacy alias (auto-translated + DeprecationWarning, removed in v2.0):」) · `:262`/`:559` 定位约定 (TASK-014) |
+| `aria/skills/phase-c-integrator/SKILL.md` | **两处**散文流程重整 (`### 步骤执行` :99 段 + `### C.2.4` :218 段) · 四行裸命令去除 · `:270` 示例 · `:267` schema 增 `gate_error` · `:279` 四类早退注记同步 · 步骤 6 的 `fail` 分支**条件式**补句 (既有措辞已覆盖则零改动, 见 §3) · **TASK-020 删除面 `:48` `:49` `:285` `:286` `:349` `:350` `:351`** (7 行; ⚠️ 早前清单只列 6 行, 漏 `:349` —— 那行逐字是「Legacy alias (auto-translated + DeprecationWarning, removed in v2.0):」; ⚠️ **这 7 个行号以 `af87cae` 为准, TASK-011 落地后 `:285+` 必然位移 —— 一律按内容锚重定位, 不得按行号核**) · `:262`/`:559` 定位约定 (TASK-014) |
 | `.../scripts/pre_merge_gate.py` | `:21` `:300` `:427` + help 文案 · `--remote` / `remote` 参数 · `_verify_branch_exists()` · `raw_message` 诊断 + `gate_error` additive 键 · 核验点插入 · **TASK-020: `_OLD_TO_NEW` (`:68-72`) 与 `:79` `:82` `:85` `:89` `:108` `:116` 的软弃用路径** |
 | **`.../scripts/ci_backends/aether.py`** | **新入 scope (D-4, 2026-08-10 裁定)** —— 抽 `_run_with_retry` (`:164-187`) 的重试循环为与 binary/argv 无关的共享 helper; 自身改**薄包装**保持行为等价 |
 | `.../tests/test_ci_backends.py` | **须新增**针对 `_run_with_retry` **本身**的直接用例 —— 实测 `grep -c '_run_with_retry'` = **0**, 现有 25 条系统性绕过它, 其异常选择行为零覆盖 ⇒ 「25 tests 全绿」是**恒绿判据**, 只能当必要不充分条件 |
-| `.../tests/test_pre_merge_gate.py` | SC-M1..**SC-M13**; 既有 **24 处**调用补 `main_branch="master"` (口径见 §4); `test_sc12` (`:663`) 断言改 `"master"`; **为 gate 层核验建独立打桩接缝**; **TASK-020: 三个 `test_old_key_*` (`:407` `:421` `:433`) 由「断言翻译成功 + DeprecationWarning」改为断言硬失败** |
+| `.../tests/test_pre_merge_gate.py` | SC-M1..**SC-M17** 中落在本文件的那些 (SC-M17 落 `config-loader/SKILL.md`, 由 TASK-020 承); 既有 **24 处**调用补 `main_branch="master"` (口径见 §4); `test_sc12` (`:663`) 断言改 `"master"`; **为 gate 层核验建独立打桩接缝**; **TASK-020: 三个 `test_old_key_*` (`:407` `:421` `:433`) 由「断言翻译成功 + DeprecationWarning」改为断言硬失败** |
 | `aria/skills/config-loader/SKILL.md` | **TASK-020 删除面** —— `:249` `:257` 两处「alias still works, emits DeprecationWarning, removed in v2.0」措辞随 v2.0 到期同批改。⚠️ 该文件属**另一个 skill**, 上一版 Impact 表未提 |
 | 🔴 **`.aria/config.template.json` (主仓)** | **TASK-020 删除面, 且在另一个仓** —— `:75` `primitive_preference` / `:78` `no_aether_fallback` 两个 legacy key。它是 CLAUDE.md 指定的**采用方复制源**; 本仓 live `.aria/config.json` 实测 legacy 命中 **0** ⇒ **受影响的是采用方不是本仓**。⚠️ 上一版 Impact 表完全未提该文件, 也未声明本 change 的落点跨两个仓 |
 | **`CLAUDE.md`** | 规则 #8 那段须同步 —— 本 Spec 给 pre-merge gate **新增第三条阻断腿**。先例: v1.31.0 CI backend 抽象化在同一提交同步过 Rule #8 (`commit 7661e96`) |
-| `openspec/changes/.../tasks.md` + `detailed-tasks.yaml` | **新建** (Level 3) —— 承载 **组 0 TDD 前置 / 组 1 实现 / 组 2 SKILL.md / 组 3 合规与同步面 / 组 4 follow-up** 五组共 **20** 条任务。⚠️ 上一版此行写「9 条阻塞项」(不可核的陈旧数, 已删), 且两文件曾 19 checkbox vs 20 task **不同步** (TASK-020 只在 yaml), 本版补齐 |
-| AB | 两套件照跑, 结果存 `ab-results/` |
+| `openspec/changes/.../tasks.md` + `detailed-tasks.yaml` | **新建** (Level 3) —— 承载 **组 0 TDD 前置 / 组 1 实现 / 组 2 SKILL.md / 组 3 合规与同步面 / 组 4 follow-up** 五组共 **21** 条任务 (⚠️ 本版新增 **TASK-021 终局全量收口** —— 上一版唯一一次「重跑全量套件」挂在拓扑 L4 的 TASK-008 上, 其后仍有 4 条任务改被测文件, 全清单无终局收口, post_planning R2/code-reviewer `blocks_phase_b`)。⚠️ 上一版此行写「9 条阻塞项」(不可核的陈旧数, 已删), 且两文件曾 19 checkbox vs 20 task **不同步** (TASK-020 只在 yaml), 本版补齐 |
+| AB | `phase-c-integrator` 两套件照跑 (第二行零裁量), 结果存 **`aria-plugin-benchmarks/ab-results/`** (主仓 tracked 目录, 已补入 `scope_repos[Aria].paths` —— ⚠️ 上一版它是唯一「真实仓内路径却未被 scope 声明」的 deliverable)。`config-loader` 走判据表**第三行三件套**, 见 §Rule #6 |
 | 外部 | **无外部动作** —— 不改 #137 body, 不发 supersede 评论 (见 §Why)。留痕与否由 owner 决定 |
-| 发版同步面 | 按**引用点整仓差集**枚举 (非文件白名单)。⚠️ 上一版缺此行, 而姊妹 Spec 同日开出的 **Aria #177** 正是预警「下次会原样重犯」—— 本 Spec 是该预言的即时复现样本, 此行为补入 |
-| follow-up issue | (1) `main_branch` 自动解析设计面; (2) `fetch_gate.py` / `worktree_manager.py:170` 同形回落; (3) `workflow-runner` `gate_state` 无 `gate_error` 位置 —— 实测 `grep -rn 'gate_error' aria/` = **0 命中**, 且 `workflow-runner/SKILL.md:354-357` 的 verdict 路由只有四条臂 (green / fail / timeout / Ctrl-C), **没有「gate 抛异常」这条臂**; (4)「显式传错分支名」此前零测试覆盖; (5) C.2.4.5 的 `SKILL.md:189-191` 裸 git 命令 + `submodule_gate.sh` (与 D1 根因**同类**的最近兄弟); (6) **helper 定位形态的其余落点** —— `SKILL.md:310` (裸 `aria/`) · `:392` `:557` (skill 目录相对) · `:610` (`ARIA_` + 可执行探测/降级分支) · `:737` (`CLAUDE_`) · **跨文件** `state-scanner/references/sync-detection.md:587` (与 `:262`/`:559` 同属 v1.15.2 一次拉平的等价类, 见 TASK-014) |
+| 🔴 **发版同步面 (8 文件, TASK-017 承接)** | 按**引用点整仓差集**枚举 (非文件白名单), **但下列 8 个已知落点必须在最终清单内且已在 `scope_repos.paths`**: aria 子模块 `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `VERSION` · `CHANGELOG.md` · `README.md`; 主仓 `VERSION` · `README.md` (`:8` 的 `Plugin-v1.65.5-blue` badge) · `README.{ja,ko,zh}.md` (**仅正文实质变更才重译**, CLAUDE.md #140 B 档)。<br>⚠️ **上一版这 8 个文件全无 task、全不在 scope** (post_planning R2/tech-lead, `blocks_phase_b`): 20 条任务做完后 `plugin.json` 仍是 **1.65.5** 而代码里的 `will be removed in v2.0` 已被执行 ⇒ **一个 1.65.x 版本违背了自己的承诺**; 且 custom check `m6-version-badge-match` 比的是 badge ↔ `plugin.json`, 两边都没动 ⇒ **对该失效方向 fail-OPEN**。类级根因见 **Aria #177** —— 本 Spec 一度是该预言的即时复现样本 |
+| follow-up issue | (1) `main_branch` 自动解析设计面; (2) `fetch_gate.py` / `worktree_manager.py:170` 同形回落; (3) `workflow-runner` `gate_state` 无 `gate_error` 位置 —— 实测 `grep -rn 'gate_error' aria/` = **0 命中**, 且 `workflow-runner/SKILL.md:354-357` 的 verdict 路由只有四条臂 (green / fail / timeout / Ctrl-C), **没有「gate 抛异常」这条臂**; (4)「显式传错分支名」此前零测试覆盖; (5) C.2.4.5 的 `SKILL.md:189-191` 裸 git 命令 + `submodule_gate.sh` (与 D1 根因**同类**的最近兄弟); (6) **helper 定位形态的其余落点** —— `SKILL.md:310` (裸 `aria/`) · `:392` (skill 目录相对) · `:610` (`ARIA_` + 可执行探测/降级分支) · `:737` (`CLAUDE_`) · **跨文件** `state-scanner/references/sync-detection.md:587` (与 `:262`/`:559` 同属 v1.15.2 一次拉平的等价类, 见 TASK-014)。⚠️ **`:557` 已从本枚举移除** —— 实读它逐字是 v1.28.0 host-cron 迁移段的 `standalone scripts/submodule-tripwire-audit.sh`, 是 **tripwire 独立脚本, 不是 helper 定位形态** (post_planning R2/code-reviewer); 它仍留在 TASK-014 的负控白名单里作「零改动」要求 (无害), 但**不得作为形态实例写进 issue 正文**; (7) **`standards/openspec/project.md` 自身 `:21` (双层) 与 `:118` (单层) 两处表述矛盾** —— 转记 standards 维护者 (⚠️ `tasks.md` 早前逐字称「TASK-019 已纳入」而清单里从来没有它, post_planning R2/knowledge-manager); (8) **`config-loader` 无 AB 套件的套件缺口** (判据表第三行第三件, 见 §Rule #6) |
 
 ### 版本
 
@@ -354,7 +407,7 @@ grep -rniE 'pre_merge_gate|gate_check|pre-merge gate' \
 
 `phase-c-integrator` 现 **111** tests (`test_pre_merge_gate.py` 46 + `test_ci_backends.py` 25 + `test_path_coverage.py` 40) —— 2026-08-10 实跑 `python3 -m pytest -q` 复核: **111 passed**, 且**当前全绿** ⇒ TASK-001 的红窗前提成立。
 
-本 change 新增的**机械断言 = SC-M1..SC-M13 共 13 条** (其中 SC-M3 拆 a/b/c、SC-M4 含三条 grep, 故落到测试**用例**数会更多 —— 用例数由 Phase B 定, 本文件不预写)。⚠️ 上一版写「新增 12」, 与任何计数法都对不上, 已换成可核的量。另修改既有 24 处调用 + 1 处断言 + 1 处守卫接缝。
+本 change 新增的**机械断言 = SC-M1..SC-M17, 按编号计 17 条 / 按 SC 表行计 19 行** (SC-M3 拆 a/b/c 占 3 行; 计数法必须写明, memory `critique-repeats-error`) (⚠️ 本版由 13 增至 17: **SC-M14** UnicodeDecodeError catch-all 补编号 · **SC-M15** 折叠块内零可执行命令字面量 · **SC-M16** 折叠块外保留 `<MAIN_BRANCH>` 取值来源 · **SC-M17** `config-loader` 的 v2.0 到期措辞归零) (其中 SC-M3 拆 a/b/c、SC-M4 含三条 grep, 故落到测试**用例**数会更多 —— 用例数由 Phase B 定, 本文件不预写)。⚠️ 上一版写「新增 12」, 与任何计数法都对不上, 已换成可核的量。另修改既有 24 处调用 + 1 处断言 + 1 处守卫接缝。
 
 **D-4 的等价判据 (⚠️ 本版换量)**: 曾写「`test_ci_backends.py` 25 tests 保持全绿 = 等价的唯一证据」—— **那是恒绿判据**: 实测 `grep -c '_run_with_retry' tests/test_ci_backends.py` = **0**, 那 25 条系统性绕过它 (改 mock `subprocess.run` 或 `_query`), **异常选择行为零覆盖** ⇒ 把 `except TimeoutExpired` 放宽成三元组会静默改掉 aether 的异常契约而 25 条全绿。
 ⇒ 等价判据换成**针对 `_run_with_retry` 本身的新建直接用例** (只捕 `TimeoutExpired` / backoff `5,15,45` × 3 attempts / 超时哨兵可区分); 25 tests 全绿降为**必要不充分**条件。
