@@ -1,6 +1,33 @@
 # Proposal: premerge-gate-mainbranch-failclosed
 
+> # ⛔ 范围已重定 (2026-08-12) — 本 Spec 现为 **B 侧**
+>
+> **裁定**: [DEC-20260812-001](../../../docs/decisions/DEC-20260812-001-premerge-gate-spec-split.md) (owner,
+> 经 audit-engine §降级策略 `AskUserQuestion` 三路径选择)。
+> **触发**: post_planning `max_rounds = 4` **走满未收敛** (R1→R4: 4R/1P · 4R/1P · 4R/1P · **5R/0P**;
+> 去重 Major **四轮持平 ~13**; 每轮 fix 引入 53%→70%→**71%**; 而**旧 finding 无一复发**)
+> ⇒ 问题在**被审对象的规模**, 不在执笔也不在审计。
+>
+> **已拆出 A 侧**: [`premerge-gate-branch-existence`](../premerge-gate-branch-existence/proposal.md)
+> (Level 2, **MINOR**, 纯 additive) —— 承接 **分支存在性核验 + `--remote` + `raw_message` 诊断 +
+> 测试隔离接缝 + 异常/重试按轴复用**, 即**关掉 #137 那条恒绿腿所需的全部内容**。
+>
+> **本 Spec (B 侧) 保留**: `SKILL.md` 两处散文收敛为 helper 调用 (承重 D1) · 折叠块 ·
+> **`--main-branch` 改必填 (D5, 破坏性)** · 24 处调用补参 · helper 路径解析 spike ·
+> **MAJOR** · v2.0 弃用到期承诺承接 (跨两仓 5 文件) · 发版同步面 9 项 · Rule #6 AB。
+>
+> ⚠️ **R4 的 3 条 Critical 全部属本侧** (`TASK-017` gitlink 求值时点 / `.aria/config.template.json`
+> 键名面零机械断言 / `CLAUDE.md:113` 被 TASK-020 条件性证伪而无任务承接)。**A 侧不继承任何 Critical。**
+>
+> 📌 **下方正文与 `tasks.md` / `detailed-tasks.yaml` 尚未按 A/B 划界重写** —— 迁往 A 的条款
+> (原 §5 / §6 / §7 的一部分 + TASK-003/004/005/007/008/009) **须留 cancelled 痕迹而非静默删**
+> (同 TASK-020 的条件任务纪律)。**这是 Phase A.1 的待办, 见 DEC §5。**
+>
+> ---
+
 > **Status**: 📝 **Approved for Phase B (owner override)** — post_spec 跑满 **R1–R5, 25 个 agent-run**, `converged: **false**`, `overridden_by_user: **true**` (owner 2026-08-09)。
+> ⚠️ **该 Status 写于拆分前, 现已陈旧** —— post_planning 其后跑满 R1–R4 均 FAIL, Phase B 入口
+> 被该闸门阻断 (6 条 `blocks_phase_b`), 拆分裁定即因此而来。**本侧当前不具备进 Phase B 的条件。**
 >
 > ⚠️ **闸门状态必须被如实读**: 这**不是收敛**。owner 依据五轮量化数据 (每轮 fix 引入 73–100% 的新 Major, 总量五轮持平 21→26→22→27→21) 裁定**停止「审计→改文档」循环, 改由 Phase B 的 TDD 承接剩余缺陷**。`max_rounds` 6 中已用 5, 余 1 轮未用。
 >
