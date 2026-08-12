@@ -274,7 +274,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — 分段器单元 (数组基数断言)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-003]
@@ -290,7 +290,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — fail-safe 降级族 17 项 (断言 safe_to_split 返回值本身)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-002, TASK-011]
@@ -310,7 +310,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — SC-14 判据 token 过度触发族 (A 组 5 条 + B 组 2 条)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 4
     dependencies: [TASK-002, TASK-011]
@@ -329,7 +329,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — credit 多行正负双向族 + 28 分支逐支覆盖"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-007, TASK-010]
@@ -350,7 +350,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — 端到端族 + KNOWN-LIMIT 转正 + quote-aware + ack + 迁移回归"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-004, TASK-006, TASK-008]
@@ -390,7 +390,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — 内部错误注错探针 (SC-20) + BLOCKED 段落断言 (SC-21)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 4
     dependencies: [TASK-005, TASK-006]
@@ -409,7 +409,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "SC-9a dogfood 脚本 — 5 类实际使用形态 (canonical 直调, pre-merge 主闸)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: [TASK-007, TASK-015]
@@ -428,7 +428,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "语料去重 + 全文件无重复用例名自检 (SC-17)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-008]
