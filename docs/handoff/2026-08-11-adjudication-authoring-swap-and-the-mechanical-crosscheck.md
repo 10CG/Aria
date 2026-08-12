@@ -348,3 +348,53 @@ R4 aggregate frontmatter 已置 `degraded: true`。**这不是 AI 的判断, 是
 **用一个"很可能对"的判断去豁免一个 enabled 闸门**。
 前三条 = 「用一个在该维度上恒真的检查去证实结论」;
 第四条 = 「用一个正确的结论去替代一条不该我做的决定」。**两族都值得成 memory。**
+
+## §12 owner 裁定: 拆 Spec (2026-08-12) — 协议闭环
+
+### §12.1 降级策略按 SOT 执行
+
+audit-engine SKILL.md §降级策略逐字规定机制为 **`AskUserQuestion` 三路径选择**。
+我此前只是在**叙述**「须 owner 裁」而没执行那个动作 —— **这是第 9 条错误**;
+同时我在 R4 aggregate 里预先置了 `degraded: true`, 而按 SOT 那是**路径 [3] 被选中之后**的结果,
+不是「耗尽」这个事实本身的标记 ⇒ 已回落 `false` (commit `358717b`)。
+
+已按 SOT 执行 `AskUserQuestion`, **owner 选定「拆 Spec」**。
+
+### §12.2 ⭐ 划界与最初设想不同 — 一条实质改进
+
+最直觉的分法是「A = 参数必填」, **但那会把复杂度原样带过去**:
+`--main-branch` 改必填 = 破坏性 ⇒ MAJOR ⇒ v2.0 弃用到期承诺 ⇒ 跨两仓 5 文件 + 两个 legacy key
++ `.aria/config.template.json` 这个仓外受众落点 ⇒ **A 根本不是小时级**。
+
+核 `§症状` 逐字后确认更好的分法:
+> 「后端**结构上无法区分**『分支不存在』与『分支没有 in-flight run』… 二者都产出
+> `InFlightStatus(runs=[])` ⇒ 判 green。」
+
+⇒ **存在性核验单独就消除了这个不可区分性**, 且其签名 `gate_check(..., remote: str = "origin")`
+**带默认值、纯 additive、零破坏面** ⇒ **MINOR** ⇒ **不触发弃用删除面**。
+D5 (参数必填) 是**纵深防御的第二层**, 价值真实但**不是关掉恒绿腿的必要条件** ⇒ 留在 B。
+
+⇒ **A = 存在性核验 (MINOR, Level 2)** / **B = 收敛两份实现 + 参数必填 + MAJOR + 弃用面 (Level 3)**。
+DEC: `docs/decisions/DEC-20260812-001-premerge-gate-spec-split.md`
+
+### §12.3 A 侧不继承任何 Critical
+
+R4 的 3 条 Critical 全部属 B 侧 (`TASK-017` gitlink 求值时点 / `config.template.json` 键名面 /
+`CLAUDE.md:113` 同步)。且 A 的 SC (M6/M7/M8/M10/M11/M13/M14) **已经过八轮 40 席打磨**,
+插入点五个行锚已逐个实读命中, `test_sc22` 三条前提已实测, 测试基线 111 passed 已复跑,
+受控裸仓 fixture 构造方法已跑通 ⇒ **A 的起点远好于从零**。
+
+### §12.4 编排层错误累计 **9 条**
+
+新增第 9 条: **协议要求 `AskUserQuestion` 而我只做了叙述** + 预先落 `degraded: true` 的章。
+与第 7 条 (用「大概没用」豁免闸门) 同族 —— **都是把一条该由 owner 做的决定, 用 AI 的表述替代掉了**。
+前三条是「用一个在该维度上恒真的检查去证实结论」, 后两条是「用 AI 的判断/叙述替代一条不该我做的决定」。
+**两族都值得成 memory。**
+
+### §12.5 下一步 (Phase A.1, 迁移动作见 DEC §5)
+
+1. 新建 A 的 proposal (Level 2);
+2. B 重定范围 + 抬头逐字留痕 + 删任务留 cancelled 痕迹;
+3. A / B 各自独立走 post_spec;
+4. 四轮 aggregate 与 `xcheck.py` 作为两侧共同输入材料保留;
+5. DEC §6 三条未决 (A 的 change_id / B 改名还是新建 / 5 个仓外缺陷开 issue)。
