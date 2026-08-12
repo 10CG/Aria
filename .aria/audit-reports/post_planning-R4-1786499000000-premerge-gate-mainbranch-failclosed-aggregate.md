@@ -5,7 +5,7 @@ rounds: 4
 converged: false
 oscillation: false
 overridden_by_user: false
-degraded: true
+degraded: false
 verdict: FAIL
 timestamp: 2026-08-12T02:00:00.000Z
 context: openspec/changes/premerge-gate-mainbranch-failclosed/detailed-tasks.yaml
@@ -105,7 +105,7 @@ R4 的任务书里「被审对象 = R2-fix (`0dd26ce`)」**已陈旧** —— �
 ## 处置 — `max_rounds` 结构性耗尽, 降级策略是 owner 裁量
 
 按 audit-engine `report-storage.md`: `converged: false` + `drift_terminated: false`
-⇒ **触发降级策略**。本报告 frontmatter 已置 `degraded: true`。
+⇒ **触发降级策略**, 其机制 SOT 逐字规定为 **`AskUserQuestion` 三路径选择** (SKILL.md §降级策略)。frontmatter 保持 `degraded: false` —— 按 SOT, `degraded: true` 是**路径 [3] 被选中**后的结果, AI 不得预先落章。
 **这不是 AI 的判断, 是协议走到终点。** (⚠️ 我在 R3 后曾以「大概没用」为由想停在 R3 —— 那是
 Rule #10 之外的性价比理由, 已纠正并跑满 R4。)
 
