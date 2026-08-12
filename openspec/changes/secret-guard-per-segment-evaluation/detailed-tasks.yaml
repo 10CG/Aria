@@ -57,7 +57,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "safe_to_split() — 块字符判据 (BLOCK_CHARS, 引号外)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 4
     dependencies: []
@@ -76,7 +76,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "safe_to_split() — 块起始关键字 + exec/time 作用域判据 (两行同精度)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-001]
@@ -96,7 +96,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "safe_to_split() — 后台记号裸 & 降级判据 (§What.1 第 4 行)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 4
     dependencies: [TASK-001]
@@ -115,7 +115,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 2
     title: "split_top() — quote/转义感知, 切顶层 ; && ||"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-001]
@@ -134,7 +134,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 3
     title: "判定循环重构 — 降级分支 + 逐段 + 先 pattern 后 credit + has_filter 每段重置"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-002, TASK-003]
@@ -154,7 +154,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 4
     title: "新增逻辑的内部运行时错误收敛到 exit 2 (fail-closed)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 4
     dependencies: [TASK-004, TASK-007]
@@ -175,7 +175,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 3
     title: "BLOCKED 消息补触发段落"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-004]
@@ -192,7 +192,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 4
     title: "has_filter 13 处 grep -qE 改 _sg_line_match() 逐行 helper"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-004]
@@ -212,7 +212,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 5
     title: "corpus_census.py — 语料面 5 数 + SC-3 有效面用例名清单"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: []
@@ -231,7 +231,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 5
     title: "corpus_census.py — 13 处判据三组口径 + pattern 量词口径 + \\b=16"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: [TASK-008]
@@ -251,7 +251,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 5
     title: "corpus_census.py — 82 条 spanning pattern 的 55 家族分组 + 28 分支覆盖表"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-009]
