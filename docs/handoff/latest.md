@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md](./2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md) — premerge-gate-mainbranch-failclosed @ phase=A.2-audit updated=2026-08-11
+**Latest**: [2026-08-12-issue128-a2-a3-postplanning-and-the-fifth-judge-axis.md](./2026-08-12-issue128-a2-a3-postplanning-and-the-fifth-judge-axis.md) — secret-guard-per-segment-evaluation (#128) @ phase=A.3 (Phase A 闭环) updated=2026-08-12
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -10,7 +10,9 @@
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | A.2-audit (blocked) | [2026-08-11](./2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md) |
-> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | A.1 (未收敛) | [2026-08-09](./2026-08-09-issue172-closure-and-128-r4-r5-authorship-swap.md) |
+> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **A.3 (Phase A 闭环, 待 Phase B)** | [2026-08-12](./2026-08-12-issue128-a2-a3-postplanning-and-the-fifth-judge-axis.md) |
+>
+> **2026-08-12 更新 (simonfish/bfe8285d)**: bare pointer 已指向 #128 的新 handoff (2026-08-12, 全仓最新); #128 行 phase 由「A.1 未收敛」更新为「A.3 (Phase A 闭环)」—— 六轮 post_spec + post_planning R1 均未收敛, 进 A.2/A.3 为 owner override。premerge-gate 行未动 (非本 track)。
 >
 > 📌 **这是一处对成文约定的有意偏离, 请复议** (`session-handoff.md §2.3`: 多 track ⇒ 只写
 > deprecation banner 不写真实指针)。偏离理由: 机械 `latest_md_writer` 当前不可用 —— snapshot
