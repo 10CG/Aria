@@ -4,8 +4,8 @@ metadata:
   spec_level: 2
   datasource: "proposal.md"          # 路径 B — 本 spec 无 tasks.md, 粗粒度层内联在 proposal.md ## Tasks
   parent_task_count: 13              # 1.1 1.2 1.3 1.3b 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.10a 1.11
-  total_tasks: 28
-  estimated_hours: 150
+  total_tasks: 29                    # v10: +TASK-029 (§What.1 第 4 行后台记号判据, 见 findings)
+  estimated_hours: 154               # v10: +4h (TASK-029)
   planned_at: "2026-08-12"
   planned_by: "task-planner (A.2) via main loop"
 
@@ -17,6 +17,17 @@ metadata:
     gate_record: ".aria/audit-reports/post_spec-R6-sweep-1786404620467-secret-guard-per-segment-evaluation.md"
     precedent: "phase-c-integrator-ci-path-coverage (2026-07-26)"
 
+  # ── A.3 入口前提 (Rule #10 显式记录) ─────────────────────────────────
+  a3_entry:
+    post_planning_verdict: "REVISE×5 (R1, 五席全 REVISE, 4 席 ready_for_a3=no)"
+    converged: false                 # post_planning R1 未收敛 (与 post_spec 同, 从未达 PASS)
+    overridden_by_user: true         # owner 2026-08-12 裁定「修完 R1 findings + 机械闸加第 5 轴, 不再开 R2, 核对表全绿即进 A.3」
+    basis: "post_planning 机械闸五轴 (a-e) ALL-GREEN — 判据 (e)「§What 设计条目→Task」是本轮新加的第 5 轴, 抓到 §What.1 第 4 行零任务承载 (TASK-029 已闭环)"
+    gate_record: ".aria/audit-reports/post_planning-R1-sweep-1786404620467-secret-guard-per-segment-evaluation.md"
+    a3_note: "A.3 (agent 预分配) 在本 spec 近乎 no-op — 29 条 task 的 agent 字段在 A.2 已填, 全落现有 roster (backend-architect 9 / qa-engineer 15 / knowledge-manager 5), 无新 agent。R1 五席一致确认分派合理。"
+    r1_fix_authorship: "yaml 3 处事实错主 loop 自修; 其余 16 项 + F2/F3 由 backend-architect 执笔 (换人执笔: 它非 F-1 表/SC-20/§What.5/yaml 的作者)"
+    still_open_for_owner: "R1 期间 backend-architect 报告的 TASK-005 exec_order 例外 (因真实依赖 TASK-007 保留在 order 4, 未随同 parent 兄弟降到 3) 已标注但供复核席重点检查; SC-16 的 8/18 依赖『后台记号判据与关键字判据不共享正则』这一 Phase B 未实现的假设, 正文已标注。"
+
   # ── 分解时的三条硬约束 (来自 A.2 派单) ───────────────────────────────
   invariants:
     - id: INV-1
@@ -26,15 +37,16 @@ metadata:
       rule: "SC → 承载 Task 全表 (proposal.md ##Success Criteria 抬头) 不得被分解破坏。22 条 SC 必须全部有 detailed task 承载。"
       encoded_as: "每条任务的 carries_sc 字段; 见文末 sc_coverage_crosscheck"
     - id: INV-3
-      rule: "改造对象 = aria/hooks/secret-guard.sh 单文件 + 其测试 + 新增计数器脚本。不得扩到其他文件。"
-      encoded_as: "每条任务的 deliverables 字段"
+      rule: "改造对象 = aria/hooks/secret-guard.sh 单文件 + 其测试 + 新增计数器脚本, 此为**代码改造面**的边界, 不得扩到其他代码文件 (tech-lead MINOR-4 勘正, v10: 原「不得扩到其他文件」未限定「代码」, 与 TASK-023..026 的 ship 面文档 deliverables — CLAUDE.md / README* / VERSION / CHANGELOG.md 等版本引用点 — 表面冲突。ship 面文档是标准发版机制的一部分, 不算代码改造对象, 不受本条约束)。"
+      encoded_as: "每条任务的 deliverables 字段; 代码类任务 (TASK-001..022 及 TASK-029) 与 ship 面任务 (TASK-023..028) 分属两类, 后者的 deliverables 天然落在本条豁免范围内"
 
   # ── 分解口径说明 ────────────────────────────────────────────────────
   decomposition_notes:
-    - "parent 1.5 (测试) 原为 XL 单条且承载 16 条 SC — 拆为 TASK-011..020 共 10 条, 每条承载 1-4 条 SC。"
+    - "parent 1.5 (测试) 原为 XL 单条且承载 16 条 SC — 拆为 TASK-011..020 共 10 条, 每条承载 1-5 条 SC (R1 code-reviewer m-1: TASK-015 承载 5 条, 原写 1-4 被自家数据证伪)。"
     - "parent 1.4 (计数器) 原为 L 单条且有 4 组输出 — 拆为 TASK-008..010 三条, 按输出面分。"
     - "parent 1.3 内含三个正交关切 (循环重构 / 内部错误 fail-closed / BLOCKED 消息) — 拆为 TASK-004..006。"
     - "不预测测试套件目标总数 (TL6-F8): 权威值 = 实跑 `PASS: N / N`。改前基线 366/366, 净变化 = −1 (SC-17 去重) + 新增用例数。"
+    - "**exec_order 语义写死 (v10, code-reviewer M-1 + tech-lead MINOR-1 勘正)**: exec_order = proposal.md ##Tasks 末尾顺序表的段号 (parent 归属哪个顺序表段, exec_order 就是那个段号), 与依赖图的『谁先谁后』是两回事。B-实现段内的细粒度先后完全交给 dependencies / parallel_groups 两个字段决定, exec_order 不作波次、不逐任务递增。**唯一例外**: TASK-005 因对 TASK-007 有真实跨段依赖 (需 `_sg_line_match()` 先存在才能包住其失败面), exec_order 显式保留在 4 (未跟随同 parent 1.3 的 TASK-004/006 降到 3), 该例外已在 TASK-005 自身 notes 里标注, 不是遗漏。"
 
 tasks:
   # ══════════════════════════════════════════════════════════════════
@@ -56,12 +68,13 @@ tasks:
     verification:
       - "块字符集合 = { } ( ) 反引号 [[ ]] << <<< , 引号外命中即返回 false"
       - "本条不含关键字/作用域判据 (TASK-002), 便于隔离验证"
+      - "⚠️ **跨任务引号状态机一致性契约 (v10, 你 R1 F2/Major-2, 与 TASK-003 共同持有)**: 本任务与 TASK-003 (`split_top()`) 都需要「逐字符引号/转义追踪」, 但各自独立实现时可能对单引号 / 双引号 / `$'...'` ANSI-C 转义 / 反引号内转义规则处理不一致 (SC-4 存在的部分原因)。**两任务必须共用同一份引号状态机约定**: 逐字符扫描, 状态优先级固定为「转义 (`\\`) → 单引号 → 双引号 → `$'...'`」, 不得两任务各自发明顺序。**验收**: 补一组含引号/转义/反引号混合的探针 (至少覆盖: 单引号内的 `;`、双引号内的 `&&`、`$'...'` 内的换行、反引号内的管道 `|`), 同时喂本任务的块字符判据与 TASK-003 的 `split_top()`, 逐字符断言二者对「该字符是否落在引号内」的判定完全一致"
     notes: "引号感知**只对本行成立** — §What.1 表头的「引号外」限定词不统摄关键字/作用域/后台记号三行 (R6 SFH-m1)。"
 
   - id: TASK-002
     parent: "1.1"
     exec_phase: "B-实现"
-    exec_order: 2
+    exec_order: 1
     title: "safe_to_split() — 块起始关键字 + exec/time 作用域判据 (两行同精度)"
     status: pending
     complexity: M
@@ -78,37 +91,55 @@ tasks:
       - "命令位置 12 类中仅「行首」「换行之后」2 类需专门处理, 其余 10 类靠字面 token"
     blocking_constraint: "BLOCK_KW_RE 正则文本以 proposal.md §What.1 为规范, 逐字照抄。`!?` 改法 owner 已裁不采 (归转出 11), 不得自行采用。"
 
+  - id: TASK-029
+    parent: "1.1"
+    exec_phase: "B-实现"
+    exec_order: 1
+    title: "safe_to_split() — 后台记号裸 & 降级判据 (§What.1 第 4 行)"
+    status: pending
+    complexity: S
+    estimated_hours: 4
+    dependencies: [TASK-001]
+    agent: aria:backend-architect
+    carries_sc: [SC-6]
+    deliverables:
+      - aria/hooks/secret-guard.sh
+    verification:
+      - "判据文本逐字取 proposal.md §What.1 第 4 行 (:74) 与 :78 脚注: 命中单独出现的裸 `&` 即降级 (返回 false), **排除** `&&` / `&>` / `>&` / `\\|&` / `<&` 五种形态 —— 缺 `<&` 排除项会把 `exec 3<&0` / `cat <&3` 这类合法重定向误判为裸后台记号, 多降级 (方向安全但损覆盖)"
+      - "本判据与「块起始关键字 / exec·time 作用域」两行 (TASK-002) 结构上正交: 表内第 4 行管『& 是否触发降级』, 命令位置清单管『& 之后算不算命令位置』, 两者不共享同一处正则 (**不写死行号** —— 见 proposal.md §What.1「后台记号排除清单补 `<&`」脚注的驳回记录)"
+      - "验收 = SC-6 第 18 项 (v10 新增后台记号型 fixture) + 该 fixture 反查机械闸判据 (d) 确认不含 BLOCK_CHARS"
+    notes: "v10 新增 (R1 tech-lead 判据 (e)「§What 设计条目 → Task」穷举反查抓到的缺口): §What.1 第 4 行判据此前保留在正文里, 但 detailed-tasks 从未有独立条目承载它, TASK-001/TASK-002 的 verification 也未提及 —— 判据本身没丢, 丢的是任务派单, 属机械闸此前 9 条判据都没走到的一条轴。"
+
   - id: TASK-003
     parent: "1.2"
     exec_phase: "B-实现"
-    exec_order: 3
+    exec_order: 2
     title: "split_top() — quote/转义感知, 切顶层 ; && ||"
     status: pending
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-001]
     agent: aria:backend-architect
-    carries_sc: []                 # 见 findings_for_post_planning F-1
-    verified_by: [SC-5]            # 本任务是被验对象; SC-5 的承载 Task 按 proposal 全表 = 1.5
+    carries_sc: [SC-5]             # v10: F-1 修正版落地, proposal SC-5 承载改「1.2 · 1.5」, 1.2 正式入承载集, verified_by 转正为 carries_sc
     deliverables:
       - aria/hooks/secret-guard.sh
     verification:
       - "切: 顶层 ; && || ; 不切: | 换行 & &> >& |& 2>&1 引号内 \\; 转义"
       - "空段跳过"
       - "职责边界: split_top 直接按 ; 切 (`case x in a) ;; esac` 产生 2 段), 由 safe_to_split 在上层拦下 — 两层不可混淆 (R3-M-3)"
+      - "⚠️ **跨任务引号状态机一致性契约 (v10, 你 R1 F2/Major-2, 与 TASK-001 共同持有)**: 本任务与 TASK-001 (块字符判据) 都需要「逐字符引号/转义追踪」, 但各自独立实现时可能对单引号 / 双引号 / `$'...'` ANSI-C 转义 / 反引号内转义规则处理不一致 (SC-4 存在的部分原因)。**两任务必须共用同一份引号状态机约定**: 逐字符扫描, 状态优先级固定为「转义 (`\\`) → 单引号 → 双引号 → `$'...'`」, 不得两任务各自发明顺序。**验收**: 补一组含引号/转义/反引号混合的探针 (至少覆盖: 单引号内的 `;`、双引号内的 `&&`、`$'...'` 内的换行、反引号内的管道 `|`), 同时喂 TASK-001 的块字符判据与本任务的 `split_top()`, 逐字符断言二者对「该字符是否落在引号内」的判定完全一致"
 
   - id: TASK-004
     parent: "1.3"
     exec_phase: "B-实现"
-    exec_order: 4
+    exec_order: 3
     title: "判定循环重构 — 降级分支 + 逐段 + 先 pattern 后 credit + has_filter 每段重置"
     status: pending
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-002, TASK-003]
     agent: aria:backend-architect
-    carries_sc: []                 # 见 findings_for_post_planning F-1
-    verified_by: [SC-1]            # Task 1.3 正文写「验收 = SC-1 第 2/3 条」, 但 proposal 全表未把 1.3 列入 SC-1 承载
+    carries_sc: [SC-1]             # v10: F-1 修正版落地, proposal SC-1 承载改「1.3 · 1.3b · 1.5 · 1.8」, 1.3 正式入承载集, verified_by 转正为 carries_sc
     deliverables:
       - aria/hooks/secret-guard.sh
     verification:
@@ -126,21 +157,23 @@ tasks:
     status: pending
     complexity: S
     estimated_hours: 4
-    dependencies: [TASK-004]
+    dependencies: [TASK-004, TASK-007]
     agent: aria:backend-architect
     carries_sc: [SC-20]
     deliverables:
       - aria/hooks/secret-guard.sh
     verification:
-      - "safe_to_split / split_top / _sg_line_match 的任何非预期失败必须收敛到 exit 2"
-      - "实现手段任选 (ERR trap + 正常出口清 trap / 显式返回值判别), 但「rc 不得为 1」是硬要求"
+      - "覆盖四个对象 (缺一不可, v10 补第 4 个 —— 原写只列前三个): safe_to_split() / split_top() / _sg_line_match() / **逐段循环本身**, 其任何非预期失败必须收敛到 exit 2"
+      - "⛔ 手段写死为**子 shell 隔离**, 非任选 (你 R1 F1 + code-reviewer m-4 —— ERR trap / 临时 set -e / 直接 `||` 包裹调用点三者均实测对 `set -uo pipefail` 下的 unbound variable 无效, rc 仍为 1; 详见 proposal.md §What.5 实测表): 命令替换 (`out=\"$(...)\" || { exit 2; }`) 或显式子 shell (`( ... ); rc=$?; [[ $rc -ne 0 ]] && exit 2`), 二选一, 仅这两种手段有效"
+      - "「rc 不得为 1」是硬要求; 子 shell 隔离的代价须一并落实: 子 shell 内对外层变量的写入在边界外不可见, 判定结果须经 stdout (配 `$(...)`) 或子 shell 自身退出码传递, **不得**依赖对共享变量的直接赋值"
       - "与 canonical 既有 10 处 fail-closed 纪律一致 (jq 缺失 / JSON 畸形 / 字段数≠4 全部 exit 2)"
     hazard: "set -uo pipefail 下 unbound variable / 语法错只给 rc=1, 而 PreToolUse **非 2 即放行** ⇒ 该次 Bash 调用完全不受审查 (R6 SFH-M1 实测)。"
+    notes: "deps 补 TASK-007 (v10 依赖补全) —— 本任务要包住 `_sg_line_match()` 的失败面, 而该函数由 TASK-007 建, 必须先于本任务存在。**exec_order 例外 (v10 明确标注, 非遗漏)**: 本任务 parent 为 1.3 (proposal 顺序表段号 3), 但因这条跨段依赖, exec_order 保留原值 **4** (与 TASK-007 相同), 不随 TASK-004/TASK-006 一起降到 3 —— 这是本轮 exec_order 整顿中唯一的显式例外: 若强行定为 3 会与 TASK-007(4) 的依赖方向倒挂, 触发 verify_a2.py 判据 (C)。parallel_groups 已把本任务移到 TASK-007 所在 wave 之后的下一个 wave, 不与其同批并行。"
 
   - id: TASK-006
     parent: "1.3"
     exec_phase: "B-实现"
-    exec_order: 4
+    exec_order: 3
     title: "BLOCKED 消息补触发段落"
     status: pending
     complexity: S
@@ -157,14 +190,14 @@ tasks:
   - id: TASK-007
     parent: "1.3b"
     exec_phase: "B-实现"
-    exec_order: 5
+    exec_order: 4
     title: "has_filter 13 处 grep -qE 改 _sg_line_match() 逐行 helper"
     status: pending
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-004]
     agent: aria:backend-architect
-    carries_sc: [SC-15, SC-16]
+    carries_sc: [SC-1, SC-15, SC-16]   # v10: F-1 修正版落地, SC-1 承载补 1.3b, TASK-007 是 1.3b 下唯一 detailed task
     deliverables:
       - aria/hooks/secret-guard.sh
     verification:
@@ -177,7 +210,7 @@ tasks:
   - id: TASK-008
     parent: "1.4"
     exec_phase: "B-实现"
-    exec_order: 6
+    exec_order: 5
     title: "corpus_census.py — 语料面 5 数 + SC-3 有效面用例名清单"
     status: pending
     complexity: M
@@ -190,12 +223,13 @@ tasks:
     verification:
       - "语料面输出 65 / 49 / 16 / 15 / 1 + 换行边界 5 (4 拦 + 1 放)"
       - "输出 49 条 expected=2 含边界用例的**用例名清单** (非仅计数) 供 SC-3 逐条比对"
+      - "同批产出 SC-2 的用例名清单: 15 条纯管道 + 5 条换行边界 (qa M-3 —— 同源于 65=49+16, 16 中 15 纯管道 + 1 KNOWN-LIMIT; 5 条换行边界另计, 4 拦 + 1 放)"
       - "口径 quote-aware, 顶层 ; && || | , 换行单列"
 
   - id: TASK-009
     parent: "1.4"
     exec_phase: "B-实现"
-    exec_order: 6
+    exec_order: 5
     title: "corpus_census.py — 13 处判据三组口径 + pattern 量词口径 + \\b=16"
     status: pending
     complexity: M
@@ -210,12 +244,12 @@ tasks:
       - "换行影响面**两个基线口径各一个数** (严格 11/13 · 宽松 13/13) 并注明基线字符串"
       - "pattern 量词面: 总数 141 (单引号 139 + 双引号 2) / 含 [^|] 81 / [^|]* 79 / [^|]+ 7 / 兼有 5 / .* 1"
       - "**含 \\b 的条数 = 16** — 抽取口径写死为「bash 求值数组后逐元素判」"
-    hazard: "抽取须含双引号起始行。只数单引号 → 141 变 139、三个量词数各少 2、\\b 变 15。`141→139` 本 cycle 已发生两次, 同一根源 (:507 那条双引号 ssh pattern)。"
+    hazard: "抽取须含双引号起始行。只数单引号 → 141 变 139、`[^|]` 81→79、`[^|]*` 79→77、**`[^|]+` 不变 (仍 7)**、`\\b` 16→15 (R1 code-reviewer m-2 勘正: 原写「三个量词数各少 2」为假 —— 两条双引号 pattern :506/:507 都含 `[^|]`/`[^|]*` 但都不含 `[^|]+`; proposal 转出 1 的「79/77/7」本就是对的)。`141→139` 本 cycle 已发生两次, 同一根源 (:507 那条双引号 ssh pattern)。"
 
   - id: TASK-010
     parent: "1.4"
     exec_phase: "B-实现"
-    exec_order: 6
+    exec_order: 5
     title: "corpus_census.py — 82 条 spanning pattern 的 55 家族分组 + 28 分支覆盖表"
     status: pending
     complexity: M
@@ -230,6 +264,7 @@ tasks:
       - "82 条可跨段 pattern 按「首个字面命令 token」机械分组 (正则前缀里的 alternation 组整体算一个 key), 定案 **55 家族**"
       - "输出「家族名 → pattern 行号列表」全表, 供 SC-19 完备判据逐条比对"
       - "13 处 credit 判据的 alternation 分支全表与语料覆盖数, 定案 **28 分支 / 14 条零覆盖**"
+    notes: "⚠️ **55 / 28 / 14 三个数无脚本背书** (code-reviewer M-3) —— 它们是 v9 执笔席人工机械扫描所得, `corpus_census.py` 在本任务落地前尚不存在; 本任务的实跑输出才是权威值。census 落地后若与这三个数不一致, 唯一合法动作 = 写 handoff 请 owner 复议, **不得**调分组器/覆盖判据实现去凑成 55/28/14。**归键约定须作为本任务的显式输入** (决定 55 家族还是 56 的边界): 守卫类 pattern (`guard:` 相关) 与「无可提取命令字面 token」的 5 条 pattern 各自归入哪个/哪些 key, 不得由实现顺手决定, 须在脚本注释或输出里写死约定本身。"
 
   # ══════════════════════════════════════════════════════════════════
   # exec_phase 1 (续) — 测试 (parent 1.5 拆分, 与实现同段)
@@ -305,9 +340,10 @@ tasks:
     verification:
       - "基础 26 条 = 每处判据 命中/不命中 各 1 条"
       - "维度 1 多行正负双向: 13 处每处 2 条 (正向 = 该不给 credit 就别给; 负向 = 该给就得给)"
-      - "维度 2 分支覆盖: 28 分支逐支各 1 条, **14 条零覆盖分支必须补齐** (含 --invert-match / sed 的 Nd 与 D / wc -c 与 -w)"
+      - "维度 2 分支覆盖: **14 条零覆盖分支每条 ≥1 条正向 fixture** (其余 14 条有覆盖分支由 SC-11 兜底; R1 code-reviewer m-3 勘正: 原写「28 逐支各 1」超写了 SC-15 硬判据); 14 条里的 sed 分支是 `[Ss]/…/` 大写与 `[0-9]+d`, **不含 `[Dd]`** (它是 SC-15 表里 ⚠️「仅偶然命中」行, 不在 14 计数内)"
       - "统一判据 = 改前改后判定逐条一致, 无例外条款"
     notes: "credit 误判方向是 **fail-open** (错给 credit = 该段免疫拦截), 不是 fail-safe。SC-11 全语料对本条恒绿, 不能替代。"
+    execution_constraint: "本任务批量插入结构高度相似的 fixture (13 处判据 × 2 条多行正负 + 14 条零覆盖分支各 ≥1 条), 若经 sed / perl -i 批量编辑, 必须重读确认正则/fixture 文本未被破坏后才可采信 (qa M-2 —— v2 原型 `secret-guard.test.sh` 被 sed 写坏正则仍全绿的事故正是同一层, 批量插相似 fixture 是该事故的诱因形态)。"
 
   - id: TASK-015
     parent: "1.5"
@@ -317,7 +353,7 @@ tasks:
     status: pending
     complexity: M
     estimated_hours: 8
-    dependencies: [TASK-004, TASK-006]
+    dependencies: [TASK-004, TASK-006, TASK-008]
     agent: aria:qa-engineer
     carries_sc: [SC-1, SC-2, SC-4, SC-11, SC-12]
     deliverables:
@@ -347,6 +383,7 @@ tasks:
       - "逐条登记改后 exit (允许为 0, **但不许静默**)"
       - "SC-7 按四分判定表执行 (PASS / OVER-ACHIEVED / FAIL / FAIL), **不得**用「转红=已收口」这个非法豁免"
     notes: "本族是 spec 对 `2→0` 方向的唯一测量手段。SC-3 / SC-11 / 全语料对该方向**结构性失明** — 语料里跨段形态是空集, 其全绿是真空成立。"
+    execution_constraint: "本任务批量插入 55 家族探针 (结构高度相似, 仅命令 token/pattern 下标不同), 若经 sed / perl -i 批量编辑, 必须重读确认正则/fixture 文本未被破坏后才可采信 (qa M-2, 与 TASK-014 同款约束)。"
 
   - id: TASK-017
     parent: "1.5"
@@ -362,8 +399,10 @@ tasks:
     deliverables:
       - aria/hooks/tests/secret-guard.test.sh
     verification:
-      - "注入「未绑定变量」「正则编译失败」两类故障, 断言 hook 退出码 ∈ {0, 2}, **绝不为 1**"
-      - "SC-21: 机械 grep BLOCKED stderr 含触发段落原文"
+      - "⛔ SC-20 判据勘正 (qa-C1 + backend-F4 + code-reviewer M-2 三席同现): **exit 恒为 2, 非 2 (含 0 与 1) 即该条红** —— 原写「∈{0, 2} 绝不为 1」是错的; SC-20 本身要求两个注入点改后都必须 exit=2, 不存在容许 0 的分支, 若实现在某注入点下返回 0 (放行), 同样是 fail-open, 必须判红"
+      - "注入清单改为 SC-20 表定义的 A/B 两条 unbound (删除「正则编译失败」—— 它不在 SC-20 清单内, 且 `[[ =~ ]]` 编译失败在 `set -uo pipefail` 下不中止脚本、也不改变已有退出码路径, 拿它做注入是真空断言, 测不出任何东西, v10 执笔席实测确认): **A** = `_sg_line_match` 少传第 2 参数 (`$2: unbound variable`); **B** = `safe_to_split()` 引用别处作用域的 `$nl` (`nl: unbound variable`)"
+      - "SC-21 补双断言, 不得只断言一半: (a) 既有的 `Command was: <整条命令>` 行在场; (b) 新增的触发段落行内容**恰为**被命中的那一段 (机械字符串相等, 非 grep 的『含』语义) —— 只用『含』会被『把整条命令又回显一遍』这类误实现假通过, 因为整条天然包含该段作为子串"
+    execution_constraint: "本任务的故障注入探针与 BLOCKED 断言结构彼此相似, 若经 sed / perl -i 编辑, 必须重读确认未破坏后才可采信 (qa M-2 同款约束)。"
 
   - id: TASK-018
     parent: "1.5"
@@ -373,7 +412,7 @@ tasks:
     status: pending
     complexity: M
     estimated_hours: 6
-    dependencies: [TASK-015]
+    dependencies: [TASK-007, TASK-015]
     agent: aria:qa-engineer
     carries_sc: [SC-9a]
     deliverables:
@@ -392,7 +431,7 @@ tasks:
     status: pending
     complexity: S
     estimated_hours: 2
-    dependencies: []
+    dependencies: [TASK-008]
     agent: aria:qa-engineer
     carries_sc: [SC-17]
     deliverables:
@@ -400,6 +439,7 @@ tasks:
     verification:
       - "删除 bash_case \"FP-fix timeout run-env\" 的字节级重复 (实测 :641 与 :673 各一份)"
       - "加一条「全文件无重复用例名」自检"
+    notes: "deps 补 TASK-008 (v10, 依赖补全指令) —— census 须先于去重跑, 防语料基线漂移: 若去重先执行, census 统计到的就已经是去重后的语料, 与 spec 正文写死的改前基线数字 (65/49/16 等) 不再对应同一状态。"
 
   - id: TASK-020
     parent: "1.5"
@@ -409,7 +449,7 @@ tasks:
     status: pending
     complexity: S
     estimated_hours: 3
-    dependencies: [TASK-019]
+    dependencies: [TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019]
     agent: aria:qa-engineer
     carries_sc: [SC-13]
     deliverables:
@@ -417,7 +457,7 @@ tasks:
     verification:
       - "权威值 = 实跑输出的 `PASS: N / N` 里那个 N, **不预测目标常数**"
       - "三个引用点须与实跑输出一致, 机械 grep 比对"
-    notes: "TL6-F8 的处方勘正: 前一版要求给一个目标总数, 而那个数 Phase B 写完新用例前不可能知道, 硬写就是造一条注定要改的断言。改为派生值。"
+    notes: "TL6-F8 的处方勘正: 前一版要求给一个目标总数, 而那个数 Phase B 写完新用例前不可能知道, 硬写就是造一条注定要改的断言。改为派生值。deps 补全 (v10, 依赖补全指令): 本任务读的是 `secret-guard.test.sh` **实跑**的 `PASS: N / N`, 须在全部用例写完 (TASK-011..019) 之后才有意义 —— 提前跑只会读到一个尚未完整的 N。因此本任务从 parallel_groups 的原 group 6 单独提出成 group 7, 见 execution_order。"
 
   # ══════════════════════════════════════════════════════════════════
   # exec_phase 2 — Phase B 验证 (顺序表第 7 段)
@@ -459,6 +499,7 @@ tasks:
       - "第五档 = 命中 pattern 数组靠后位置 + 每段自带 filter token (负载串已写死)"
       - "口径 = 进程内计时只计判定段 (跨进程计时噪声 32–126ms 不可用); 须注明轮数 / 计时方式 / 机器 load / $BASH_VERSION"
       - "⛔ 不达标时唯一合法动作 = 把五档实测数据写进 handoff 请 owner 复议; **不得**自行降阈值 / 换口径 / 删档 / 宣布不适用"
+      - "⚠️ **改前基线取值机制 (v10, 你 R1 F3/Major-3)**: 本任务依赖 [TASK-007, TASK-021] 执行, 届时工作树内的 `aria/hooks/secret-guard.sh` 已是逐段判定落地后的最终形态, 改前基线不再存在于工作树里; 而 SC-8 禁止引用旧版本报告过的数字, 必须实测取得。**改前基线须经 `git show <B.1 分支基点 SHA>:aria/hooks/secret-guard.sh` 提取到独立临时文件**, 全程**不依赖、不修改当前工作树状态**。**禁止**用 `git stash` / `git checkout <old-sha> -- <path>` 之类在同一工作树来回切换的手段取旧版本 — 那会在切换窗口期抹掉 TASK-001..021 已落地的改动, 存在误伤风险 (哪怕之后能 stash pop 恢复, 窗口期内任何并发读取/测试都会读到错误状态, 与 memory `feedback_git_stash_pop_race_recovery_hazard` 同类)"
     notes: "须报告 $BASH_VERSION — here-string 在 bash < 5.1 走临时文件, 「零 fork 无 I/O」结论不适用 (转出 9b)。"
 
   # ══════════════════════════════════════════════════════════════════
@@ -477,10 +518,14 @@ tasks:
     carries_sc: []
     deliverables:
       - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/README.md
+      - aria/VERSION
+      - aria/CHANGELOG.md
     verification:
       - "(1) 重读 plugin.json 确认 SOT 仍为预期基线 (起草时 1.65.5)"
       - "(2) 若已被并发轨推进则**目标版本号顺延重算**, 不得沿用 spec 正文写死的 v1.65.6"
-      - "(3) 执行 bump 本身"
+      - "(3) 执行 bump 本身 —— 覆盖 aria 子模块 5 SOT 派生文件 (tech-lead MAJOR-1, Aria#177 类级根因): plugin.json (SOT) 之外补 marketplace.json (**点名 :3 与 :16 两处 version 字段**, 与主仓 CLAUDE.md §版本管理 记录的「aria 子模块 5 文件」一致) / aria/README.md / aria/VERSION / aria/CHANGELOG.md"
     notes: "Aria#170 已撞过一次并发 bump; CLAUDE.md 项目状态段与版本行是 multi-track ship 高争用面。本 A.2 期间并发轨已推进 8 个 commit — 该风险是活的。"
 
   - id: TASK-024
@@ -504,6 +549,7 @@ tasks:
     verification:
       - "对 §Impact 的 14 个引用点逐个 grep 确认无残留旧版本号"
       - "⛔ **不得**以「机械兜底 check 全绿」代替 — 实读 9 条 check 后定案是**覆盖 4 / 零覆盖 10** (含 VERSION)"
+      - "主仓 gitlink (指向 aria 子模块的 commit 指针) 须同步 bump —— TASK-023 只更新 aria 子模块内部 5 文件, 若主仓 gitlink 不跟进, 子模块已是新版本但主仓仍指向旧 commit, 即 Aria#177 判定的类级根因 (submodule pointer 与派生文件不同步) 在本 spec 的重演"
 
   - id: TASK-025
     parent: "1.6"
@@ -513,7 +559,7 @@ tasks:
     status: pending
     complexity: S
     estimated_hours: 3
-    dependencies: [TASK-016, TASK-023]
+    dependencies: [TASK-016, TASK-023, TASK-024]
     agent: aria:knowledge-manager
     carries_sc: [SC-10, SC-19]
     deliverables:
@@ -531,7 +577,7 @@ tasks:
     status: pending
     complexity: S
     estimated_hours: 2
-    dependencies: [TASK-020, TASK-021]
+    dependencies: [TASK-020, TASK-021, TASK-024]
     agent: aria:knowledge-manager
     carries_sc: [SC-13]
     deliverables:
@@ -589,16 +635,18 @@ tasks:
 execution_order:
   - phase: "B-实现"
     order: "1 → 6"
-    tasks: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007,
+    tasks: [TASK-001, TASK-002, TASK-029, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007,
             TASK-008, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014,
             TASK-015, TASK-016, TASK-017, TASK-018, TASK-019, TASK-020]
     parallel_groups:
+      # v10 restructured (依赖补全 + TASK-029 新增 + TASK-005/019/020 移位, 详见各任务 notes):
       - [TASK-001]
-      - [TASK-002, TASK-003]                       # 都只依赖 TASK-001
-      - [TASK-004, TASK-008, TASK-019]             # TASK-008/019 无依赖, 可与 004 并行
-      - [TASK-005, TASK-006, TASK-007, TASK-009, TASK-011]
-      - [TASK-010, TASK-012, TASK-013, TASK-015, TASK-017]
-      - [TASK-014, TASK-016, TASK-018, TASK-020]
+      - [TASK-002, TASK-003, TASK-029]             # 都只依赖 TASK-001
+      - [TASK-004, TASK-008]                       # TASK-008 无依赖, 可与 004 并行; TASK-019 v10 移出本组 (新增依赖 TASK-008, 同组即自相矛盾)
+      - [TASK-006, TASK-007, TASK-009, TASK-011, TASK-019]   # TASK-019 v10 移入 (只依赖 TASK-008); TASK-005 v10 移出本组 (新增依赖 TASK-007, 同组即自相矛盾)
+      - [TASK-005, TASK-010, TASK-012, TASK-013, TASK-015, TASK-017]   # TASK-005 v10 移入 (依赖 TASK-004 与本组的 TASK-007 均已在前序组完成)
+      - [TASK-014, TASK-016, TASK-018]             # TASK-020 v10 移出本组, 见下
+      - [TASK-020]                                 # v10 单独成组 7 (依赖补全 TASK-011..018 —— 它读实跑 N, 须在全部用例写完之后)
   - phase: "B-验证"
     order: "7"
     tasks: [TASK-021, TASK-022]
@@ -616,12 +664,12 @@ execution_order:
 # INV-2 交叉核对: 22 条 SC 全部有 detailed task 承载
 # ══════════════════════════════════════════════════════════════════
 sc_coverage_crosscheck:
-  SC-1:   [TASK-015, TASK-021]
+  SC-1:   [TASK-004, TASK-007, TASK-015, TASK-021]   # v10: F-1 修正版, SC-1 承载补 1.3 (TASK-004) · 1.3b (TASK-007)
   SC-2:   [TASK-015, TASK-021]
   SC-3:   [TASK-008, TASK-021]
   SC-4:   [TASK-015]
-  SC-5:   [TASK-011]
-  SC-6:   [TASK-002, TASK-012]
+  SC-5:   [TASK-003, TASK-011]                       # v10: F-1 修正版, SC-5 承载补 1.2 (TASK-003)
+  SC-6:   [TASK-002, TASK-012, TASK-029]             # v10: TASK-029 新增, 承载 SC-6 第 18 项 (后台记号型 fixture)
   SC-7:   [TASK-016]
   SC-8:   [TASK-022]
   SC-9a:  [TASK-018]
@@ -653,41 +701,82 @@ findings_for_post_planning:
       - "**不**把实现 Task 算作承载的: SC-1 → 1.5·1.8 (未含 1.3) / SC-5 → 1.5 (未含 1.2)"
       - "而 Task 1.3 正文明写「(a) 每段开头重置 has_filter … **验收 = SC-1 第 2/3 条**」—— 即 1.3 自认被 SC-1 验收, 表却未把它列入 SC-1 的承载"
       - "Task 1.2 正文零 SC 引用, 但它显然被 SC-5 (分段器单元, 数组基数断言) 验收"
-    two_readings:
-      - "读法 A「承载 = 谁产出这条 SC 的验证物 (测试/回归脚本)」⇒ SC-6/14/15/16/20/21 那六行错 (实现 Task 不产出验证物)"
-      - "读法 B「承载 = 谁被这条 SC 验收」⇒ SC-1/5 那两行漏 (漏了 1.3 与 1.2)"
-      - "两种读法都无法让整张表同时成立 ⇒ 表的定义本身未写下"
+    diagnosis: |
+      **v10 复判 (owner 2026-08-12 裁定 2 采修正版; 本条非 v10 执笔席自己的 finding, 按 owner
+      指示复核并更正其表述, 取代下方原 `two_readings` 字段)**: 原「两种读法」诊断把问题定位成
+      "读者可以有两种理解方式, 都讲得通" —— 这站不住。三个独立席位 (tech-lead /
+      knowledge-manager / code-reviewer, 互不相同的三个复核角色) 独立判出同一结论, 不是一处
+      悬而未决的语义歧义。
+
+      **真实情况是一种定义 + 两行漏填**: 全表 22 行里, 已有自证句式的行 (SC-9b「承载 Task =
+      1.10」/ SC-19「1.5 + 1.6」/ SC-20「1.3 + 1.5」/ SC-21「1.3」) 一贯遵循同一条定义 ——
+      承载 = 工作派单索引, 为满足这条 SC 哪些 Task 必须动手, 天然含实现 Task。SC-1 / SC-5
+      是 v9 之前就存在的老 SC, v9 只给**新增**的 SC-9b/19/20/21 配了自证句式, 没有回填给
+      同批的老 SC —— 根因是这道回填动作漏做, 不是定义本身有歧义。(旁证: SC-21 当时的自证
+      句式写的是「承载 Task = 1.3」, 单看这一条本身与 F-1 表原行「1.3 · 1.5」就已不一致 ——
+      这是同一根因 [回填不彻底] 在自证句式层面而非表格层面的又一实例, v10 已一并按 F-1 表
+      订正为「1.3 · 1.5」, 见 proposal.md SC-21 条目自身与 code-reviewer m-5)
+
+      **对「读法 A (承载 = 谁产验证物) 是稻草人」的 Q2 复核 (v10 执笔席独立验证, 非照抄)**:
+      读法 A 若成立, 需 SC-6/14/15/16/20/21 六行**全部**剔除实现 Task (1.1/1.3/1.3b), 改动面
+      达六行; 读法 B 只需给 SC-1/SC-5 两行**各补一项**。owner 实际裁定的修正版与读法 B 完全
+      一致, 未触碰 SC-6/14/15/16/20/21 任何一行 (结果层面确认)。过程层面: 读法 A 从未在任何
+      一条 SC 自身的「承载 Task = …」自证句式里出现过 (这些句式清一色把实现 Task 与验证
+      Task 并列), 它只是审计时从两行"看起来不完整"的老 SC 反推出的一种**理论上自洽但从未
+      被表本身实践过**的读法。⇒ 确认为稻草人, 本轮不采纳读法 A 的任何部分。
     why_it_matters: |
       这张表是 v9 机械闸判据 (a) 的产物, 而机械闸 ALL-GREEN 正是 owner 裁定进 A.2 的依据。
       判据 (a) 检的是「每条 SC 是否有承载者」这个**存在性**问题, 检不出「承载的定义是什么」这个
       **语义**问题 —— 于是表在存在性上全绿、在语义上不自洽, 两者不矛盾。
       这与 R6 的根因诊断同族: 机械闸能收口可穷举的判据, 收不了判据本身的定义缺口。
     a2_disposition: |
-      本次 A.2 **按表的字面收敛**, 不擅自扩表 (INV-2 要求不得破坏映射)。受影响的三条 detailed
-      task 改用 `verified_by` / `feeds_sc` 字段旁挂, 语义不丢但不进 carries_sc:
+      **v9 原处置 (历史记录, 已被 v10 取代, 保留说明处置曾经历的过程)**: 按表的字面收敛,
+      不擅自扩表 (INV-2 要求不得破坏映射)。受影响的三条 detailed task 改用 `verified_by` /
+      `feeds_sc` 字段旁挂, 语义不丢但不进 carries_sc:
         TASK-003 (parent 1.2) verified_by: [SC-5]
         TASK-004 (parent 1.3) verified_by: [SC-1]
         TASK-010 (parent 1.4) feeds_sc: [SC-15, SC-19]   # 只产出分组/分支数据, 不承载验收
+
+      **v10 处置 (owner 2026-08-12 裁定 2 采修正版落地, 本条闭环)**: proposal.md 表头写死
+      「承载」定义, SC-1 行改「1.3 · 1.3b · 1.5 · 1.8」, SC-5 行改「1.2 · 1.5」, 并给两行
+      补齐 SC-9b/19/20/21 式的自证句式回填。本文件同步转正 (旁挂字段升级为正式 carries_sc):
+        TASK-003 (parent 1.2): `verified_by` 移除, `carries_sc` 补 SC-5
+        TASK-004 (parent 1.3): `verified_by` 移除, `carries_sc` 补 SC-1
+        TASK-007 (parent 1.3b): `carries_sc` 补 SC-1 (SC-1 承载新含 1.3b, TASK-007 是其下
+          唯一 detailed task)
+        TASK-010 (parent 1.4) 的 `feeds_sc: [SC-15, SC-19]` **不变** —— SC-15 / SC-19 的
+          承载集未被本次修正触及 (只改了 SC-1 / SC-5 两行), 1.4 仍不在其中, 该旁挂法仍是
+          正确处置, 不随 SC-1/SC-5 一起转正, 不得因为"顺手也转正掉"而扩权。
+      `sc_coverage_crosscheck` 的 SC-1 / SC-5 / SC-6 (SC-6 另因 TASK-029 新增而变) 三行、
+      `uncovered: []` 均已同步, 详见文件对应位置。
     recommendation: |
-      在 proposal 里**写死「承载」的定义**, 二选一并把表按该定义重算:
+      (原 v9 建议, 已由 owner 裁定采纳其等价物 [裁定 2], 本字段保留作历史记录, 不再是待办)
+      在 proposal 里写死「承载」的定义, 二选一并把表按该定义重算:
         (1) 采读法 A ⇒ 从 SC-6/14/15/16/20/21 移除实现 Task, 表只列验证物产出方; 或
         (2) 采读法 B ⇒ 给 SC-1 补 1.3、给 SC-5 补 1.2, 表列「被验方 + 验证物产出方」两列。
       建议 (2) —— 它能同时保留「谁被验」这个 Phase B 真正需要的信息, 且与 Task 1.3 正文
-      已有的「验收 = SC-x」写法同源。**本条不由 A.2 执笔方自行裁定** (Rule #10: 表是已过闸的
-      产物, 改它属于改闸门产物)。
+      已有的「验收 = SC-x」写法同源。**本条不由 A.2 执笔方自行裁定** (**v10 勘正引用条款**:
+      原引 Rule #10, 现改引 **INV-2 + proposal.md:19 的本 spec 局部先例** —— INV-2 明文
+      「SC → Task 全表不得被分解破坏」; proposal.md:19 已建立「Phase B 撞到 (机械闸) 覆盖
+      缺口须回报 owner、不得就地自行裁定」这条本 spec 内部先例。两者合起来即是"已过闸产物
+      的定义缺口须回报 owner 裁定"的 spec 局部依据, 不必外部引用更重的 Rule #10 —— Rule #10
+      讲的是"不得自行豁免 enabled 闸门", 而这里从来不是要不要豁免闸门, 是闸门产物本身有没有
+      定义缺口, 引 Rule #10 属于**证据类别与解法类别不匹配** [memory
+      `feedback_match_evidence_class_to_solution_class`], v10 已改正)。owner 已按此裁定
+      (裁定 2), 本条到此闭环。
 
 summary:
   by_complexity:
-    S: {count: 13, hours: 40}
+    S: {count: 14, hours: 44}
     M: {count: 15, hours: 110}
     L: {count: 0, hours: 0}
     XL: {count: 0, hours: 0}
   by_agent:
-    aria:backend-architect: {count: 8, hours: 49}
+    aria:backend-architect: {count: 9, hours: 53}
     aria:qa-engineer: {count: 15, hours: 85}
     aria:knowledge-manager: {count: 5, hours: 16}
   by_exec_phase:
-    B-实现: {count: 20, hours: 117}
+    B-实现: {count: 21, hours: 121}
     B-验证: {count: 2, hours: 14}
     ship-前: {count: 4, hours: 10}
     ship-时: {count: 1, hours: 6}
