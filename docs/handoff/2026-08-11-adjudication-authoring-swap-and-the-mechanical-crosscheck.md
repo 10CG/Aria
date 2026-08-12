@@ -210,3 +210,56 @@ gitlink_integrity 6/6 ok。工作树只剩有意排除的 `aria-orchestrator` gi
 - R2 汇总: `.aria/audit-reports/post_planning-R2-1786409000000-premerge-gate-mainbranch-failclosed-aggregate.md`
 - 交叉检查脚本 (**建议固化进仓**): `scratchpad/xcheck.py`
 - 关联: aria-plugin [#137](https://forgejo.10cg.pub/10CG/aria-plugin/issues/137) · [#127](https://forgejo.10cg.pub/10CG/aria-plugin/issues/127) · Aria [#177](https://forgejo.10cg.pub/10CG/Aria/issues/177) · [#178](https://forgejo.10cg.pub/10CG/Aria/issues/178)
+
+---
+
+## §10 收尾后增量 — post_planning R3 (2026-08-12)
+
+> 上文写于 R3 之前。R3 已跑完, **结论推翻了 §4.2 对「机械交叉检查」的乐观定性**, 一并更正于此。
+
+### §10.1 R3 = FAIL, 且指标**回升**
+
+| 轮次 | 干预手段 | fix 引入占比 | Critical |
+|---|---|---|---|
+| post_spec R1–R5 | 原作者执笔 | 73–100% | — |
+| post_planning R1→R2 | **换人执笔** | **53%** ↓ | 3→1 ↓ |
+| post_planning R2→R3 | 换人执笔 + **机械交叉检查** | **70%** ↑ | 1→**2** ↑ |
+
+原始条数 52 → 30 → 27 (缓降), **去重 Major 三轮持平**, 阻塞项 6 → 12 → 10。
+aggregate: `.aria/audit-reports/post_planning-R3-1786494000000-*-aggregate.md`。
+
+### §10.2 🔴 更正 §4.2 —— 那道机械检查被证伪 (维度错配)
+
+§4.2 称它「可能比换人执笔更接近根治」。**R3 证伪了这个判断。**
+席位做了 5 个针对性构造验其拒绝能力, **4 个被放行** —— 包括把依赖边**反向**、
+把护栏句换成「一律按行号逐字核」(只因含「内容锚」三字而 PASS)、新造插入点冲突。
+两处**恒绿判据**; 且它自己就是「只修实例不修类」的产物 (硬编码本 Spec 专属串、
+为放行一个任务而加的字面量)。
+
+**根因**: 它是**无向存在性**检查, 而失效是**方向性**与**类推广性**的 ——
+memory `feedback_invariant_dimension_must_match_error_dimension` 逐字预言了这个结果。
+
+### §10.3 ⚠️ 编排层第 6 条自身错误 (本 session 第三次同形)
+
+**我曾声称「已验 xcheck.py 的拒绝能力」—— 那个验证不充分。**
+我用的两个 fixture (删依赖边 / 删护栏句) 恰好只打在它覆盖得住的「有没有」维度上,
+而缺陷活在方向性维度。**我用一个无向的 fixture 去"证实"它能防方向性错误。**
+
+本 session 三次同形:
+1. `set -e` 使 `ls-remote` 实验**结构上只可能观测到 rc=0**;
+2. 抽一条**冗余**依赖边当对抗 fixture (路径经 TASK-005 传递仍成立);
+3. 本条。
+
+⇒ **三次都是「用一个在该维度上恒真的检查去证实结论」。** 这条值得单独成 memory。
+
+### §10.4 处置: AI 停止自行加轮
+
+`max_rounds` 4 **已用 3**。八轮 40 席、三种结构性干预, 无一收敛, 最后一种让指标回升。
+**AI 不再自行发起 R4** —— 用掉最后一轮之后按 audit-engine 必须进降级策略, 那是 owner 裁量;
+且把它花在已被证伪的同形策略上是可预见的浪费。
+
+**Phase B 仍被闸门阻断** (10 条 `blocks_phase_b`, 含两条 Critical)。Rule #10: AI 不得自行豁免。
+
+三个方向供 owner 裁 (AI 不代裁): **拆 Spec** / **用掉 R4 + 接受降级** (有 `phase-c-integrator-ci-path-coverage`
+先例) / **换验收手段的类别** (本 Spec 已三次证明「拿 grep 计数当验收」在 D1 上不适用 —— TASK-014 换了三次量,
+而它自己的 notes 逐字写着「若第四次再来, 请优先怀疑这个手段本身」, **第四次已经来了**)。
