@@ -10,7 +10,15 @@
 >
 > **已拆出 A 侧**: [`premerge-gate-branch-existence`](../premerge-gate-branch-existence/proposal.md)
 > (Level 2, **MINOR**, 纯 additive) —— 承接 **分支存在性核验 + `--remote` + `raw_message` 诊断 +
-> 测试隔离接缝 + 异常/重试按轴复用**, 即**关掉 #137 那条恒绿腿所需的全部内容**。
+> 测试隔离接缝 + 异常/重试按轴复用**。
+>
+> 🔴 **更正 (2026-08-12, A 侧 post_spec R1 四席独立命中)**: 上一版此处逐字写「即**关掉 #137 那条恒绿腿
+> 所需的全部内容**」—— **该句不成立, 已作废**。A 承接的是**关掉 `gate_check()` 那份实现里的恒绿腿**所需的内容;
+> 而本 Spec §根因逐字「**同一算法有两份实现, 而 AI 走的是没被加固的那份**」—— `SKILL.md:243`
+> (§C.2.4 执行流程编号步骤本体) 仍硬编码 `aether ci status --branch main`, 且本仓
+> `git ls-remote --heads origin main` 实测**零行 + RC=0** ⇒ **A ship 后散文路径仍恒绿**。
+> ⇒ **#137 的闭环判据挂在本侧 D1** (两处散文收敛为 helper 调用), **不得据 A ship 关闭 #137**。
+> 详见 A 侧 §残余暴露。
 >
 > **本 Spec (B 侧) 保留**: `SKILL.md` 两处散文收敛为 helper 调用 (承重 D1) · 折叠块 ·
 > **`--main-branch` 改必填 (D5, 破坏性)** · 24 处调用补参 · helper 路径解析 spike ·
