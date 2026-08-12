@@ -504,3 +504,64 @@ aggregate: `.aria/audit-reports/post_spec-R2-1786549000000-premerge-gate-branch-
 `max_rounds` 4 (A 侧) 已用 **2**。verdict 由 **FAIL → PASS_WITH_WARNINGS**, Critical 归零。
 未收敛 (3 REVISE; 收敛要求全席 PASS)。R2-fix 后 R3。
 A 侧 Phase B 仍被阻断 (7 条 `blocks_phase_b`)。
+
+## §15 Spec A post_spec R3 — 严重度压住了, 总量稳态没变 (2026-08-12)
+
+**4 REVISE / 1 PASS · 0C + 14M + 10m = 24 · 9 条阻塞 · R2-fix 引入率 79%。**
+aggregate: `.aria/audit-reports/post_spec-R3-1786554000000-premerge-gate-branch-existence-aggregate.md`
+
+### §15.1 三轮轨迹 — 清晰但不乐观
+
+| 轮 | 投票 | 原始 | **Critical** | fix 引入率 |
+|---|---|---|---|---|
+| R1 | 5R/0P | 26 | **6** | — |
+| R2 | 3R/2P | 23 | **0** | 74% |
+| R3 | **4R/1P** | 24 | **0** | **79%** ↑ |
+
+**好**: Critical **连续两轮归零** —— B 侧四轮 (3→1→2→3) **从未做到**。
+**坏**: Major 持平 ~13-14 · 引入率**继续升** · REVISE 从 3 **退回** 4。
+
+⇒ **「兄弟位置清点」没有压下引入率。** 它抓到了真东西 (挖出 SC-M15),
+但**每修一条仍引入约等量新条目** —— 与 B 侧四轮**同一形状**:
+**对单条 finding 收敛, 对总量不收敛**。差别只在 **A 的严重度天花板更低**。
+
+### §15.2 🔴 编排层第 14 条错误 — 我给 owner 的二选一建立在假前提上
+
+我写的 `🚧 BLOCKER` 断言「Level 2 ⇒ 不出 tasks.md ⇒ 唯一载体是散文」。**tech-lead 实读证伪**:
+`task-planner/SKILL.md:52-66` 逐字「ELSE → **路径 B**: 从 proposal.md 分解 → 输出**仅 detailed-tasks.yaml**」;
+**实证**: 归档里 4 例「有 yaml 无 tasks.md」, 其中三例 frontmatter 逐字 `Level: 2`,
+yaml 分别有 **31 / 21 / 28 条 TASK-**。
+
+⇒ **owner 被要求在错误的二选一上裁定**; 且**真实缺口被假前提遮住且在 Level 2 内可修** ——
+路径 B 逐字「始终从 proposal.md 读取 `## Success Criteria`」, 而 O-1/O-2/O-3 与 F-1/F-2/F-3
+**全部不在那一节**里 ⇒ **能否被分解成 TASK 取决于写在哪一节, 与 Level 无关**。
+
+**形状**: 第三族的变体 —— 前几次是**引文有偏**, 这次是**前提根本没查**就拿去让 owner 裁。
+
+### §15.3 另外三重
+
+- **出路 (i) 的兜底不成立**: §C.2.5 核的是「本地 commit 有没有到达 remote」, 与「gitlink 有没有被 bump」
+  **是两条正交的轴**; §C.2.4.5 逐字判 **no-change = PASS** ⇒ 忘了 `git add aria` 也全绿
+  (memory `invariant-dimension`);
+- **兄弟清点只做了 A→B 一个方向** —— 反方向 (B 正确落地会不会打爆 A 的 SC) **一条都没查**,
+  而 A 新增的三条 doc 侧 SC **全部断言 B 的 D1 要重写的那段**。R3 因此抓出 `SC-A-step` 的
+  (c-含) 腿**正是 A 自己判为 landmine 的哨兵形态**, 以及三条禁令**不含 `--pr-branch`**;
+- **`SC-A14` 腿 2 的红机制建立在错误的总体上** —— `sys.stdout.errors=='strict'` 是在**裸 python**
+  里量的, 而实测 `pytest` 默认 fd 捕获下是 **`replace`/不抛** ⇒ **对坏实现恒绿**,
+  而它是入口解码→出口净化整条修复链的**唯一机械腿**。
+
+### §15.4 位置与交给 owner 的判断材料
+
+`max_rounds` 4 (A 侧) 已用 **3**, **只剩 1 轮**。A 侧 Phase B 仍被阻断 (9 条)。
+
+三轮数据支持一个比「拆分能收敛」更精确的结论:
+**拆分把严重度压住了 (Critical 6→0→0, B 侧从未做到), 但没有改变总量稳态** (Major 持平, 引入率上升)。
+
+- 若目标是「**不带 Critical 进 Phase B**」⇒ A 已连续两轮达标;
+- 若目标是「**收敛 (全席 PASS)**」⇒ 三轮数据不支持"再一轮就能到"。
+
+⚠️ 且 BLOCKER 块须先按实证重写, owner 才有可裁的**真实**选项。
+
+### §15.5 编排层错误累计 **14 条**, 三族
+
+第三族 (取材/前提有偏) 已达 **4 次**, 且**在恶化**: 从「引文选择性」到「前提根本没查就拿去让 owner 裁」。
