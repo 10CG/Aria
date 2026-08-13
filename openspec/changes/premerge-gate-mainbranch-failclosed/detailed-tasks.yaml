@@ -41,7 +41,7 @@ metadata:
   line_anchor_convention: '🔴 **全局** (2026-08-11 补, post_planning R2 诊断的「只修实例不修类」): 本文件与 tasks.md 内的一切 `:NNN` 行号一律**以基线 SHA 为准** (aria = af87cae, 主仓 = 7582238), 它们是**定位辅助, 不是验收量**。本 change 会改动的文件 — phase-c-integrator/SKILL.md · scripts/pre_merge_gate.py · scripts/ci_backends/aether.py · tests/test_pre_merge_gate.py · tests/test_ci_backends.py · config-loader/SKILL.md · .aria/config.template.json — 其行号在**任何 排在改动之后的任务**求值时都可能已位移 (最重的是 TASK-011 改动 SKILL.md :99-:216 与 :218 起两段 ⇒ :218+ 全部前后移)。⇒ **所有验收一律按内容锚重定位, 不得按行号核**; 凡本文件某条 verification 出现行号锚, 该 task 须自带一句指回本约定的护栏 (机械可查)。 ⚠️ R1-fix 轮只给 TASK-014 写了这条护栏 (R1/M3 同时点名 012/013/014), R2 三席各自又抓到新实例 (TASK-012/013/020) — 那正是 memory fix-the-class 的形状: 修实例必问「这形状还有几个兄弟位置」。'
   ship_target: 'MAJOR — 2026-08-10 依 owner 授权裁定确认, 不再是「待确认」(Rule #10 留痕: 该裁定由 AI 作出, 须写入 handoff 请复议)。定档依据: CLAUDE.md:35「破坏性变更须 MAJOR」与 :79「MINOR+」 两条下界求交唯一解。破坏面承重腿已换 — 上一版的「24 处 gate_check( 调用 TypeError」实测全部 落在 tests/test_pre_merge_gate.py 单文件内 (唯一非测试调用 :435 已显式传参), 不构成对外破坏面; 改为 (i) 本仓可自证的现实缺陷: --main-branch 缺省 "main" 而本仓主干是 master, D1 所治的恒绿 在 Aria 自己身上是现实态 + (ii) 对外 CLI 契约由可选变必填。MAJOR ⇒ v2.0.0 激活 pre_merge_gate.py:68/:116 弃用到期承诺 ⇒ TASK-020 的**触发条件已满足, 当前生效**。 ⚠️ 2026-08-11 更正 (post_planning R2/code-reviewer): 上一版本字段逐字写「不再是条件触发」, 与本文件 TASK-020 的 title/末条 verification 及 tasks.md 的「条件性不得抹掉」**直接矛盾** — ship_target 是 AI 依 owner 授权作出的裁定且三份文件都要求写入 handoff 请复议, 复议若改档为 MINOR, 读本字段的执行者会保留 TASK-020 而读 TASK-020 的执行者会 cancel 它 (两个独立执行者对 同一输入得相反结果)。**本版让本字段这个陈旧摘要一侧改口**: TASK-020 仍是条件任务, 只是条件 当前为真; 复议改档则整条 cancelled 并留痕。'
   total_tasks: 21
-  audit_state: 'post_spec R1-R5 跑满 25 agent-run, converged=false, overridden_by_user=true (owner 2026-08-09); post_planning R1 已跑完 (2026-08-09, 5 席: 4 REVISE / 1 PASS, 去重后 3 Critical + 12 Major + 8 minor, converged=false); 2026-08-10 由非原作者执笔完成一轮 A.2 产物勘正 (A-I 组, 其中 D 组经对抗复核整组作废并改口), 原作者只做独立核验; post_planning R2 已跑完 (2026-08-11, 5 席: 4 REVISE / 1 PASS, 去重后 1 Critical + ~13 Major, 12 条 blocks_phase_b, converged=false, fix 引入占比 53%) — R2 诊断 fix 方向全部正确, 失效集中在 「只修实例不修类」与「移交给没核过的下游」两个形状; ⇒ R2-fix 由**非 R2 席位**的执笔方完成 (修上一轮「R1-fix 执笔方 tech-lead 同时是 R2 席位」的结构性冲突), 且 fix 后跑了一道机械的条款间 交叉检查 (xcheck.py 四项)。 🔴 **post_planning R3 已跑完 (2026-08-12, 5 席: 4 REVISE / 1 PASS, 原始 2C+17M+8m=27, 10 条 blocks_phase_b, converged=false, fix 引入占比 70% — 回升)。R3 把那道机械交叉检查本身送上 审判席并证伪了它**: tech-lead 在副本上做 5 个对抗构造, **4 个被放行** (边反向仍 PASS — CHECK1 判据 `n in ANC[tid] or tid in ANC[n]` 是**无向**的, 而 R2 那两条 Major 全是**方向性**错误; 明令「按行号逐字核」的句子因含「内容锚」三字而 PASS — CHECK3 验的是**词是否出现**不是性质; 删掉真 owner 的 verification 仍 PASS — CHECK2 把**作废/否定语境**的提及算作 owner; 新造插入点冲突仍 PASS — CHECK4 前半段**零断言**、后半段 9 条硬编码串**抄自产生它的那次 fix** ⇒ 相对该 fix 是**重言式**)。qa-engineer 与 backend-architect 用各自的隔离副本变异独立复现同一结论。 ⇒ **本字段不得再被读成「R2 诊断的两个失效形状已被机械杜绝」** — 那道检查当时报的 FAIL 是真的 (缺边/缺护栏确实缺), 但那是**一次性补齐**, 之后它是一道恒绿闸门。根因: 它是**无向存在性**检查, 而失效是**方向性**与**类推广性**的 (memory invariant-dimension 逐字预言了这个结果)。 🔴 **R3-fix (2026-08-12) 由不在 R3 五席名单内的执笔方完成, 且对 xcheck.py 本身做了四项改造 + 补两项同族检查 (SC 表今日实测回源 / task_group↔DAG 方向), 每项均以「好实现 PASS + 坏实现 FAIL」 的对抗 fixture 验过拒绝能力 — 不接受只贴当前取值 PASS。** | 2026-08-12: post_planning R1-R4 走满未收敛 (max_rounds 耗尽), owner 裁定拆 Spec (DEC-20260812-001); 本文件 6 条任务 (TASK-003/004/005/007/008/009) 规格过户 A 侧, 依 DEC §5.3 标 cancelled 留痕未删。'
+  audit_state: 'post_spec R1-R5 跑满 25 agent-run, converged=false, overridden_by_user=true (owner 2026-08-09); post_planning R1 已跑完 (2026-08-09, 5 席: 4 REVISE / 1 PASS, 去重后 3 Critical + 12 Major + 8 minor, converged=false); 2026-08-10 由非原作者执笔完成一轮 A.2 产物勘正 (A-I 组, 其中 D 组经对抗复核整组作废并改口), 原作者只做独立核验; post_planning R2 已跑完 (2026-08-11, 5 席: 4 REVISE / 1 PASS, 去重后 1 Critical + ~13 Major, 12 条 blocks_phase_b, converged=false, fix 引入占比 53%) — R2 诊断 fix 方向全部正确, 失效集中在 「只修实例不修类」与「移交给没核过的下游」两个形状; ⇒ R2-fix 由**非 R2 席位**的执笔方完成 (修上一轮「R1-fix 执笔方 tech-lead 同时是 R2 席位」的结构性冲突), 且 fix 后跑了一道机械的条款间 交叉检查 (xcheck.py 四项)。 🔴 **post_planning R3 已跑完 (2026-08-12, 5 席: 4 REVISE / 1 PASS, 原始 2C+17M+8m=27, 10 条 blocks_phase_b, converged=false, fix 引入占比 70% — 回升)。R3 把那道机械交叉检查本身送上 审判席并证伪了它**: tech-lead 在副本上做 5 个对抗构造, **4 个被放行** (边反向仍 PASS — CHECK1 判据 `n in ANC[tid] or tid in ANC[n]` 是**无向**的, 而 R2 那两条 Major 全是**方向性**错误; 明令「按行号逐字核」的句子因含「内容锚」三字而 PASS — CHECK3 验的是**词是否出现**不是性质; 删掉真 owner 的 verification 仍 PASS — CHECK2 把**作废/否定语境**的提及算作 owner; 新造插入点冲突仍 PASS — CHECK4 前半段**零断言**、后半段 9 条硬编码串**抄自产生它的那次 fix** ⇒ 相对该 fix 是**重言式**)。qa-engineer 与 backend-architect 用各自的隔离副本变异独立复现同一结论。 ⇒ **本字段不得再被读成「R2 诊断的两个失效形状已被机械杜绝」** — 那道检查当时报的 FAIL 是真的 (缺边/缺护栏确实缺), 但那是**一次性补齐**, 之后它是一道恒绿闸门。根因: 它是**无向存在性**检查, 而失效是**方向性**与**类推广性**的 (memory invariant-dimension 逐字预言了这个结果)。 🔴 **R3-fix (2026-08-12) 由不在 R3 五席名单内的执笔方完成, 且对 xcheck.py 本身做了四项改造 + 补两项同族检查 (SC 表今日实测回源 / task_group↔DAG 方向), 每项均以「好实现 PASS + 坏实现 FAIL」 的对抗 fixture 验过拒绝能力 — 不接受只贴当前取值 PASS。** | 2026-08-12: post_planning R1-R4 走满未收敛 (max_rounds 耗尽), owner 裁定拆 Spec (DEC-20260812-001); 本文件 6 条任务 (TASK-003/004/005/007/008/009) 规格过户 A 侧, 依 DEC §5.3 标 cancelled 留痕未删。 | 2026-08-13: 6 条 cancelled 留下的悬空依赖边已就地声明调度语义 (cancelled 前置视同满足, 但不得据此认为内容在 B 内可用)。'
   spec_authoring_note: '本 Spec 的实现细节凡编排层无法验证者一律降为 spike (TASK-002/003/004), 不在 proposal 层规定。 依据: post_spec 五轮实测编排层每轮 fix 引入 73-100% 新 Major, 总量五轮持平。 Spec 负责钉「什么算对」(SC), 不负责钉「怎么写」。spike 结论回写 proposal, 不在本文件另立规定。
 
     '
@@ -337,7 +337,10 @@ tasks:
   - ⚠️ 行号锚 (`:99` `:101` `:167` `:168` `:216` `:218` `:240` `:242` `:243` `:244` `:270`) 以基线 SHA 为准; **本任务自己就是最大的位移源** ⇒ 任务内一旦动过前一段, 后一段行号立即失效, 一律按内容锚 (小节标题 / 步骤序号 / 命令文本) 重定位 — 见 metadata.line_anchor_convention。 (2026-08-12 补 `:270` — 它出现在 SC-M15 那条 verification 里而上一版护栏枚举漏了它)
   notes: '⚠️ `### 步骤执行` (:99 段) 的 C.2.4 条目在 :101 开 :216 闭的 yaml 围栏内, 且该处没有「5 步」结构 (R5/tech-lead)。 该处改法须单独 spike, 不得照搬 :218 段的形态。
 
-    🔴 2026-08-11 补一条可求值的收口 (post_planning R2/tech-lead 指出该 spike 无 deliverable / 无 SC / 无红窗, 塞在 L 级实现任务的 notes 里): **围栏内改法的结论须先回写 proposal §2 再动手改文件**, 且改完后 SC-M1 覆盖的 :167/:168 两行必须归零 —— 那两行正是围栏内的裸命令, 「只改 :218 段」的实现会让 SC-M1 停在 2 而非 0。⚠️ 本条**未**提升为独立 TG-0 任务: 它依赖 TASK-002 的定稿形态, 而 TASK-002 本身在 TG-0, 拆出来会多一层排队而不多一分红窗 (SC-M1 的红窗已由 TASK-001 在 TG-0 建好且覆盖这两行)。**此判断请在 handoff 复议。**'
+    🔴 2026-08-11 补一条可求值的收口 (post_planning R2/tech-lead 指出该 spike 无 deliverable / 无 SC / 无红窗, 塞在 L 级实现任务的 notes 里): **围栏内改法的结论须先回写 proposal §2 再动手改文件**, 且改完后 SC-M1 覆盖的 :167/:168 两行必须归零 —— 那两行正是围栏内的裸命令, 「只改 :218 段」的实现会让 SC-M1 停在 2 而非 0。⚠️ 本条**未**提升为独立 TG-0 任务: 它依赖 TASK-002 的定稿形态, 而 TASK-002 本身在 TG-0, 拆出来会多一层排队而不多一分红窗 (SC-M1 的红窗已由 TASK-001 在 TG-0 建好且覆盖这两行)。**此判断请在 handoff 复议。**
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-003 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
 - id: TASK-012
   parent: '2.2'
   task_group: TG-2
@@ -356,7 +359,9 @@ tasks:
   - 若既有措辞已覆盖 raw_message 的 surface, **不加句** (避免 no-op 编辑)。⚠️ 实读 SKILL.md:255 逐字已含 raw_message ⇒ 大概率零改动; proposal §3 与 §Impact 的确定式措辞已于 2026-08-11 改为条件式与本条对齐
   notes: '步骤 6 是纯 AI 义务 (路由 + v1.65.0/#126 两条强制 surface 警告, helper 只输出 JSON 不产文案), 且是 DEC-20260731-001 逐字记载的 owner 交换条件。有被折进「⛔不要手工执行」块而降级的实际风险。
 
-    '
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-009 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
 - id: TASK-013
   parent: '2.3'
   task_group: TG-2
@@ -375,7 +380,10 @@ tasks:
   - Output schema 块含 gate_error 且示例的 branch 用占位符 (若写字面 main 会与 SC-M2 对撞)。**内容锚** = `"verdict"` 六键 schema 那个 fenced block (行号以 af87cae 为准 = :267) 与其后的 in_flight_runs 示例 (= :270)
   - 早退注记逐字仍是**四类** (含 backend query 失败) — 改成三类会把该契约掉出去, 而 test_sc15 正在守它。**内容锚** = 「各早退分支 (no-backend / precheck 失败 / backend query 失败 / enabled:false) 保持六键不变」那句 (行号以 af87cae 为准 = :279)
   - '⚠️ **行号必然位移** — TASK-011 改动 :99-:216 与 :218 起两段 ⇒ :267/:270/:279 全部前后移; 验收一律 按上列内容锚重定位, 不得按行号核 (2026-08-11 补, post_planning R2/code-reviewer: R1/M3 点名的 012/013/014 三处上一版只修了 014 —— memory fix-the-class)。'
-  notes: :270 是 in_flight_runs 输出示例 (取自 SilkNode PR-321 真实事故 run 3161), 与输入占位符不同层。
+  notes: ':270 是 in_flight_runs 输出示例 (取自 SilkNode PR-321 真实事故 run 3161), 与输入占位符不同层。
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-009 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
 - id: TASK-014
   parent: '2.4'
   task_group: TG-2
@@ -460,7 +468,10 @@ tasks:
   verification:
   - '🔴 **机械腿 (2026-08-12 新增, post_planning R3/knowledge-manager: 本条曾是全 Spec 唯一仍用纯散文、 无可复跑量化断言的合规同步任务 — 一个只在 CLAUDE.md 里加一句语焉不详甚至语义不对应的实现, 没有任何机械勾稽点会拒绝它, 与本 Spec 通篇用来定级 Major 的「无编号即不被任何机械勾稽点找到」同形)**: `grep -cE ''分支存在性|main-branch-not-found'' CLAUDE.md` 由**今日实测 0** 转 **≥1**。 **怎么会红**: 只加一句不指名新增那条腿的话。'
   - '⚠️ **诚实标注: 上面那条机械腿是必要不充分的** — 一句含关键词但语义不对应的话仍能通过它。 剩余的「语义是否真反映新增的分支存在性核验腿」由**对照先例 commit 7661e96 (v1.31.0 CI backend 抽象化在同一提交同步过 Rule #8) 的同步粒度**人工核; **本条不假装这一半是机械的**。 若人工核与机械腿冲突, 以人工核为准并在 handoff 留痕。'
-  notes: '本 Spec 改写了 Rule #8 指名的 SOT 段, §Impact 早先版本缺此行。'
+  notes: '本 Spec 改写了 Rule #8 指名的 SOT 段, §Impact 早先版本缺此行。
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-008 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
 - id: TASK-017
   parent: '3.3'
   task_group: TG-3
@@ -583,7 +594,10 @@ tasks:
 
     **已核, 判定不入删除面**: aria-plugin-benchmarks/aria-ci-backend-abstraction/README.md:103 与 :215 — 前者逐字是 "FallbackTests | 3 | Rewritten (key `no_aether_fallback` → `no_ci_fallback`)" (对**已完成迁移**的过去时记述), 后者是一条历史 warning 文案存档; 二者都不是「仍可读」的在效承诺, 且改动 benchmark 材料会污染 AB baseline (CLAUDE.md #116)。若复核不认同该判定, 请在 handoff 里推翻而非静默补进删除面。
 
-    ⚠️ complexity/est_hours 由 M/4h 上调为 L/6h — 承接面从 1 文件扩到 5 文件跨 2 仓, 且新增 fail-CLOSED 通道设计与文案验收。'
+    ⚠️ complexity/est_hours 由 M/4h 上调为 L/6h — 承接面从 1 文件扩到 5 文件跨 2 仓, 且新增 fail-CLOSED 通道设计与文案验收。
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-009 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
 - id: TASK-021
   parent: '3.0'
   task_group: TG-3
@@ -615,4 +629,7 @@ tasks:
 
     ⇒ 本任务的**唯一职责是收口**: 依赖全部改被测文件的任务 (008/009/010/011/012/013/014/020), 位于它们之后, 且 TASK-015 (Rule #6 AB) 依赖本任务 ⇒ AB 跑的 SKILL.md 就是 ship 的 SKILL.md。
 
-    ⚠️ 本任务是本轮**唯一新增的任务**。其余修法一律为逐处最小改 — 新增任务本身是新表面 (memory marginal-return-negative), 之所以仍加是因为「终局收口」在结构上无法由任何既有任务承担: 每一条既有任务都还有下游在改被测文件。'
+    ⚠️ 本任务是本轮**唯一新增的任务**。其余修法一律为逐处最小改 — 新增任务本身是新表面 (memory marginal-return-negative), 之所以仍加是因为「终局收口」在结构上无法由任何既有任务承担: 每一条既有任务都还有下游在改被测文件。
+
+
+    ⚠️ **依赖边处置 (2026-08-13, R5 finding)**: 本条的 dependencies 中含已 cancelled 的任务 TASK-008/TASK-009 —— 其规格已过户 A 侧 `premerge-gate-branch-existence`。**调度语义显式规定**: cancelled 前置**视同已满足**(不阻塞本条调度), 因为其交付物由 A 侧承接而非在 B 内产出。⛔ 但**不得**据此认为该前置的内容已在 B 内可用 —— 若本条的 verification 依赖那些内容, 须改为依赖 A 侧的落地产物或显式标注跨 Spec 前提。'
