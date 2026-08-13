@@ -250,7 +250,7 @@ tasks:
     parent: "1.4"
     exec_phase: "B-实现"
     exec_order: 5
-    title: "corpus_census.py — 82 条 spanning pattern 的 55 家族分组 + 28 分支覆盖表"
+    title: "corpus_census.py — 82 条 spanning pattern 的 57 家族分组 + 28 分支覆盖表"
     status: done
     complexity: M
     estimated_hours: 8
@@ -261,10 +261,10 @@ tasks:
     deliverables:
       - aria/hooks/tests/corpus_census.py
     verification:
-      - "82 条可跨段 pattern 按「首个字面命令 token」机械分组 (正则前缀里的 alternation 组整体算一个 key), 定案 **55 家族**"
+      - "82 条可跨段 pattern 按「首个字面命令 token」机械分组 (正则前缀里的 alternation 组整体算一个 key), 定案 **57 家族**"
       - "输出「家族名 → pattern 行号列表」全表, 供 SC-19 完备判据逐条比对"
       - "13 处 credit 判据的 alternation 分支全表与语料覆盖数, 定案 **28 分支 / 14 条零覆盖**"
-    notes: "⚠️ **55 / 28 / 14 三个数无脚本背书** (code-reviewer M-3) —— 它们是 v9 执笔席人工机械扫描所得, `corpus_census.py` 在本任务落地前尚不存在; 本任务的实跑输出才是权威值。census 落地后若与这三个数不一致, 唯一合法动作 = 写 handoff 请 owner 复议, **不得**调分组器/覆盖判据实现去凑成 55/28/14。**归键约定须作为本任务的显式输入** (决定 55 家族还是 56 的边界): 守卫类 pattern (`guard:` 相关) 与「无可提取命令字面 token」的 5 条 pattern 各自归入哪个/哪些 key, 不得由实现顺手决定, 须在脚本注释或输出里写死约定本身。"
+    notes: "⚠️ **家族数原 55 无脚本背书, census 落地实测 57** (code-reviewer M-3 + **owner 2026-08-13 裁定采实测 57**; 28/14 两数 census 实测 MATCH) —— 55/28/14 曾是 v9 执笔席人工机械扫描所得, `corpus_census.py` 在本任务落地前尚不存在; 本任务的实跑输出才是权威值。**归键约定已由 owner 裁定写死**「`\\b` 视作停止字面 token 串」(census 现约定, 决定 57 家族的边界): 守卫类 pattern (`guard:` 相关) 与「无可提取命令字面 token」的 5 条 pattern 各自归入哪个/哪些 key 由该约定确定, 已在 `corpus_census.py` 的 `grouping_convention` 输出里写死。"
 
   # ══════════════════════════════════════════════════════════════════
   # exec_phase 1 (续) — 测试 (parent 1.5 拆分, 与实现同段)
@@ -379,11 +379,11 @@ tasks:
       - aria/hooks/tests/secret-guard.test.sh
     verification:
       - "12 条写死探针 (11 条 2→0 + 1 条 2→2 反例) 全部落地, 反例刻意保留"
-      - "补齐至 **55 家族全覆盖**, 每族 ≥1 条, 分组以 corpus_census.py 输出为准"
+      - "补齐至 **57 家族全覆盖**, 每族 ≥1 条, 分组以 corpus_census.py 输出为准"
       - "逐条登记改后 exit (允许为 0, **但不许静默**)"
       - "SC-7 按四分判定表执行 (PASS / OVER-ACHIEVED / FAIL / FAIL), **不得**用「转红=已收口」这个非法豁免"
     notes: "本族是 spec 对 `2→0` 方向的唯一测量手段。SC-3 / SC-11 / 全语料对该方向**结构性失明** — 语料里跨段形态是空集, 其全绿是真空成立。"
-    execution_constraint: "本任务批量插入 55 家族探针 (结构高度相似, 仅命令 token/pattern 下标不同), 若经 sed / perl -i 批量编辑, 必须重读确认正则/fixture 文本未被破坏后才可采信 (qa M-2, 与 TASK-014 同款约束)。"
+    execution_constraint: "本任务批量插入 57 家族探针 (结构高度相似, 仅命令 token/pattern 下标不同), 若经 sed / perl -i 批量编辑, 必须重读确认正则/fixture 文本未被破坏后才可采信 (qa M-2, 与 TASK-014 同款约束)。"
 
   - id: TASK-017
     parent: "1.5"

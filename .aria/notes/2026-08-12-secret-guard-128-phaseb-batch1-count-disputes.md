@@ -1,5 +1,21 @@
 # #128 Phase B 批 1 — census 落地逼出的两个计数争议 (owner 复议项)
 
+## ✅ owner 裁定 (2026-08-13) + 落实
+
+owner 2026-08-13 逐条裁定 (大白话解释后确认): **family 采 57 · newline 采 13 · 两个反事实表按实测改**。主 loop 已落实到 proposal.md + detailed-tasks.yaml:
+
+| 争议 | 裁定 | 落实点 |
+|------|------|--------|
+| family 55→57 | 采 census 实测 57 + 写死「`\b` 视作停止字面 token 串」约定 | proposal §转出1/§Impact/SC-18/SC-19 (全覆盖 57 / 余 45 补齐 = 57−12) + yaml TASK-010/016 |
+| newline 11→13 | 采 13 (两基线均 13/13) | proposal §6 表 + §6 论证 + SC-18 |
+| SC-6 恒split 15→16 | 采实测 16 (case 隔离断言在完整 stub 下同红) | proposal SC-6 反事实表 |
+| SC-1 粘性 | 厘清两变体 (急切版红 2/3/5 / 最小版仅红 #3) | proposal §What.3 + SC-1 反事实 |
+
+**解锁**: SC-18 现可绿 (census 输出 57/13 == 正文); TASK-016 (SC-19 探针补齐 57 家族) + TASK-020 (SC-13 回填) 可施工。下方原始复议记录保留作审计轨迹。
+
+---
+
+
 > 归档时间: 2026-08-12 | 执笔: 主 loop | 语境: secret-guard-per-segment-evaluation Phase B 批 1
 > (TASK-001..010 落地)。census (`corpus_census.py`) 首次实跑, SC-18 机械比对 23 个数, **21 MATCH /
 > 2 MISMATCH**。两个 MISMATCH 恰好都落在 spec 正文自己声明「无脚本背书 / 不要凑数」的数上。
