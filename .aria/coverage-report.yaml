@@ -1,0 +1,76 @@
+schema_version: "1"
+project: "Aria"
+timestamp: "2026-08-13T02:28:26Z"
+_generated: "由 /aria:agent-gap-analyzer 逻辑产出 (主 loop 执行)。输入 = .aria/project-profile.yaml + config.audit.teams + 本 session 九轮 45 席的实际派工记录 (post_planning R1-R4 + post_spec R1-R5)。⚠️ 本报告的 covered 判定不是纸面映射, 每条都注明了它在本 session 实际抓到什么。"
+
+covered:
+  - scenario: "OpenSpec 规范起草与条款间一致性审计"
+    matched_agent: "aria:knowledge-manager"
+    matched_capabilities: ["doc-audit", "spec-compliance", "rule-5-6-9-10"]
+    match_rate: 1.0
+    evidence: "post_planning R1 席位判 PASS(唯一) 并给出可执行路径; post_spec R5 抓出 Level 条件① 自造谓词"
+  - scenario: "架构与任务拆解 / DAG 语义"
+    matched_agent: "aria:tech-lead"
+    matched_capabilities: ["architecture-decision", "task-decomposition", "dag-semantics"]
+    match_rate: 1.0
+    evidence: "R2 抓出 TASK-010→008 移交给不依赖它的下游; R4 证伪「Level 2 ⇒ 无 task 载体」"
+  - scenario: "实现可行性 / 异常·重试·解码三轴 / 插入点"
+    matched_agent: "aria:backend-architect"
+    matched_capabilities: ["implementation-feasibility", "error-handling", "code-reading"]
+    match_rate: 1.0
+    evidence: "post_planning R2 与 tech-lead 独立命中同一 Critical(TASK-020 插入点); R4 给出唯一一次零 findings 的 PASS"
+  - scenario: "验收可证伪性 / 恒红恒绿空真检测"
+    matched_agent: "aria:qa-engineer"
+    matched_capabilities: ["test-strategy", "falsifiability", "fixture-design"]
+    match_rate: 1.0
+    evidence: "R4 单席推翻另外三席对 SC-A-note 边界「真闭合」的判定 (三席只验局部区间)"
+  - scenario: "逐字核对 / 计数口径 / 悬空引用"
+    matched_agent: "aria:code-reviewer"
+    matched_capabilities: ["line-level-verification", "count-methodology", "cross-ref"]
+    match_rate: 1.0
+    evidence: "多轮抓出行锚偏移与前缀伪命中 (grep -o 'SC-M[0-9]*' 把 SC-M3 计入)"
+
+gaps:
+  - scenario: "勘正执笔 (fix authoring) —— 与审计席位必须分离"
+    required_capabilities: ["spec-authoring", "minimal-edit-discipline", "self-adversarial-verification"]
+    best_partial_match:
+      agent: "aria:tech-lead"
+      matched: ["spec-authoring"]
+      match_rate: 0.33
+    suggested_agent:
+      name: "spec-fix-author"
+      capabilities: ["spec-authoring", "minimal-edit-discipline", "self-adversarial-verification", "sibling-position-census"]
+    rationale: |
+      本 session 实证: 勘正由原作者执笔时错误系统性逃逸 (memory feedback_author_and_verifier_must_differ_for_corrections)。
+      但 config.audit.teams 的 5 席全是审计席位 —— 从中选执笔方会造成「执笔方兼审计席位」的结构性冲突
+      (本 session 第 3 条错误, R1-fix 用 tech-lead 时发生)。R2-fix 起改用名单外执笔方, 冲突消除。
+      ⇒ 该角色是真实缺口, 目前由 general-purpose 顶替, 无 capabilities 标签、无 STCO 定义。
+    workaround_used_this_session: "general-purpose (R2-fix / R3-fix / R4-fix / A-R1-fix / A-R2-fix …)"
+
+  - scenario: "对抗性复核 (refutation) —— 验建议而非验证据"
+    required_capabilities: ["adversarial-verification", "evidence-replay", "prescription-refutation"]
+    best_partial_match:
+      agent: "aria:tech-lead"
+      matched: ["evidence-replay"]
+      match_rate: 0.33
+    suggested_agent:
+      name: "adversarial-reviewer"
+      capabilities: ["adversarial-verification", "evidence-replay", "prescription-refutation", "rejection-capability-testing"]
+    rationale: |
+      本 session 最有价值的一次产出来自它: 10 席裁定工作流里 5 席对抗复核**推翻了 2 席的处方**,
+      而那 2 席的**证据全部成立** —— 错的是从证据推出的处方。
+      主 loop 独立复核证据 ≠ 对抗复核建议。该能力在现有 roster 里无专门承载。
+    workaround_used_this_session: "aria:tech-lead 以 refute-prompt 临时充当"
+
+summary:
+  total_scenarios: 7
+  covered: 5
+  gaps: 2
+  coverage_rate: "71.4%"
+  note: |
+    5 个 covered 场景全部由 config.audit.teams.post_spec / post_planning 的固定 5 席承担, 本 session
+    九轮 45 席实测全部胜任 (每席都有独立命中记录, 无空转席位)。
+    2 个 gap 都不是"审计能力"缺口, 而是**审计之外的两个角色**: 执笔方与对抗复核方 ——
+    它们在 Aria 的 agent roster 里没有对应定义, 本 session 用 general-purpose + prompt 临时构造。
+    ⇒ 建议 (不在本 session 范围, 需 owner 裁): 用 /aria:agent-creator 补这两个 STCO 定义,
+    否则每次都靠 prompt 重建, 且「执笔方须在审计名单外」这条纪律无机械保证。

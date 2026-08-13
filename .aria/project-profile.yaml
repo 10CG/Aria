@@ -1,0 +1,33 @@
+schema_version: "1"
+name: "Aria"
+_generated: "2026-08-13T02:27:46Z by /aria:project-analyzer 逻辑 (主 loop 执行, 补做 —— 本仓此前从未产出该文件)"
+tech_stack:
+  primary_language: "Python 3.11 (stdlib-only 约束)"
+  runtime: "Python 3.11 + Bash + Claude Code plugin runtime"
+  framework: null          # 方法论研究项目, 非应用框架
+  frontend: null
+  mobile: null
+packages:                  # meta-repo: 同组织一等 repo, 非 vendored
+  - { path: "aria/",              role: "plugin (Skills + Agents + Hooks)", repo: "10CG/aria-plugin" }
+  - { path: "standards/",         role: "方法论定义 SOT",                    repo: "10CG/aria-standards" }
+  - { path: "aria-orchestrator/", role: "v2.0 运行时 Layer 1/2 (Lab 内部)",  repo: "10CG/aria-orchestrator" }
+  - { path: "aria-plugin-benchmarks/", role: "Skill AB 基准套件 (主仓内)" }
+patterns:
+  architecture: "meta-repo + plugin (Skill/Agent/Hook 三件套)"
+  testing: "pytest (stdlib unittest 风格) + Bash 测试脚本 + AB benchmark (skill-creator)"
+  ci_cd: "Forgejo Actions (Aether 集群); 双远程 origin(Forgejo) + github(镜像)"
+  orm: null
+  deployment: "Claude Code plugin marketplace + Nomad (orchestrator)"
+  audit: "audit-engine 多轮收敛审计 (convergence mode, 5 席固定编制)"
+work_modes:
+  - "OpenSpec 需求规范起草与审计 (Level 1/2/3)"
+  - "Skill / Agent / Hook 开发与 AB 基准"
+  - "多轮收敛审计编排 (post_spec / post_planning)"
+  - "跨仓 (meta-repo) 同步与双远程发布"
+  - "方法论沉淀 (conventions / memory / handoff)"
+detected_from:
+  - { file: "CLAUDE.md",                     fields: ["项目定位", "信息地图", "技术约束", "不可协商规则"] }
+  - { file: ".aria/config.json",             fields: ["audit.teams", "audit.checkpoints", "state_scanner"] }
+  - { file: ".gitmodules",                   fields: ["submodule paths"] }
+  - { file: "aria/skills/*/SKILL.md",        fields: ["skill roster"] }
+  - { file: "aria-plugin-benchmarks/ab-suite/", fields: ["benchmark suites"] }
