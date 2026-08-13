@@ -3,7 +3,21 @@
 > **Status**: 📝 **Draft (A.1)** — 由 [DEC-20260812-001](../../../docs/decisions/DEC-20260812-001-premerge-gate-spec-split.md) 从
 > `premerge-gate-mainbranch-failclosed` 拆出的 **A 侧**。
 > **Created**: 2026-08-12
-> **Spec Level**: **2** (proposal only)。**R3 更正定档依据的来源** (R3 tech-lead minor): 上一版用的是
+>
+> ## 🔴 定档状态 (2026-08-13 owner 裁定, [DEC-20260813-001](../../../docs/decisions/DEC-20260813-001-versioning-and-level-rulebook-precede-spec-a.md))
+>
+> **本 Spec 的版本档与 Level 档目前均 `未定`, 且不由本 Spec 自行解决。** owner 于 2026-08-13 裁定:
+> **先修定档规则书, 再定 A 的档** —— 因为两个定档的题面追到底是同一个根因: **定档规则书按单仓形态
+> (mobile/backend/shared/standards) 写成, 未跟上 Aria 的 meta-repo + plugin 形态**。
+>
+> ⇒ **下方保留的 `Spec Level: 2` 与 `版本: MINOR` 是本 Spec 此前的主张, 不是已生效的定档**, 逐字保留
+> 供前置 change 与后续审计对账, 不得据此推进 Phase B。R5 的 `blocks_phase_b` 两条 (**M-4** Level 条件①
+> 自造谓词 / **M-5** 版本定档未过 SOT) **由该 DEC 承接**, A 结构上无法在自己范围内闭合它们。
+>
+> **前置 change**: 一个 change 修两条轴 (版本轴 = `CLAUDE.md:79` ↔ `version-management.md` 的优先级;
+> Level 轴 = `LEVEL_GUIDE.md` 模块地图 + 关键词面/路径面仲裁 + 条件③ 限定词 + 条件④ 定义), 待起草。
+>
+> **Spec Level**: **2** (proposal only) — ⚠️ **此前主张, 见上方定档状态**。**R3 更正定档依据的来源** (R3 tech-lead minor): 上一版用的是
 > 本 Spec 自造的三条判据 (「无架构变更 · 无跨仓**内容**同步面 · 无破坏性**契约**变更」), 其中「跨仓内容
 > 同步面」这个概念在 SOT 里**不存在**, 而 SOT 的「跨模块」腿**全文未被逐字评估** (memory
 > `exact-exception-condition`: 援引成文判据须字段级匹配, 不是精神匹配)。
@@ -33,7 +47,7 @@
 > 承载」, 该前提被 `task-planner` 路径 B 证伪, 见文首 BLOCKER; 🔴 **R4 再收窄「可执行载体」四个字** ——
 > 路径 B **必读**该章节是真的, **必然为它出一条 TASK 不是**, 详见文首 R4 更正框);
 > (b) **契约不破但运行时行为翻转**, 见 §行为兼容面。
-> **版本**: **MINOR** —— 本 change 全部为 additive (新增可选参数 + 新增核验步 + 新增 additive 输出键),
+> **版本**: **MINOR** (⚠️ **此前主张, 非已生效定档** — 见文首「定档状态」+ DEC-20260813-001) —— 本 change 全部为 additive (新增可选参数 + 新增核验步 + 新增 additive 输出键),
 > **API 形状层零破坏面** ⇒ 不触发 `pre_merge_gate.py:68/:116` 的 v2.0 弃用到期承诺
 > **关联 Issue**: [aria-plugin #137](https://forgejo.10cg.pub/10CG/aria-plugin/issues/137)
 > **代码落点**: `aria/` 子模块 `skills/phase-c-integrator/`; Spec 落主仓 (Rule #5)
@@ -142,7 +156,15 @@
   **本轮统一为: 四件仓外写动作 (1 评论 + 3 issue) 一并归入 D-a, 由 owner 一次裁定**, §Impact 与归属表均改为引用本条。
 - **D-b (无兜底的 O-1 是否接受)**: 上面已证 O-1 结构上无机械兜底。owner 需明确: 接受「靠 D.2 执行纪律」,
   还是要求 A ship 前先补一个 gitlink 方向的 custom check (那会**新开一个 change**, 不在 A 的交付面内)。
-- **D-c (Level 2 vs 3)**: 🔴 **R4 把本条从「成本收益题」改回「规则驱动题」** (R4 tech-lead ×2,
+- **D-c (Level 2 vs 3)**: ✅ **已裁 (2026-08-13, [DEC-20260813-001](../../../docs/decisions/DEC-20260813-001-versioning-and-level-rulebook-precede-spec-a.md))** ——
+  owner 裁定「**先修规则书再定档**」, 本条不在 A 内了结。⚠️ **且本条题面本身有缺**: 上呈的只有条件 ③,
+  而逐字求值实测 **①③④ 三条全是 UNDECIDABLE**, ② 是四条里唯一站得住的 NO ——
+  `LEVEL_GUIDE.md:156` 是「满足任一」的 OR, **判 Level 2 需要四条全 NO** ⇒「维持 Level 2」这个结论
+  **不是被推翻, 是从未被求出来过**。三条的病灶各不相同: ① `:129-133` 三步检测法有关键词面与路径面
+  两个判据面而**未规定冲突时听谁** (且路径面四条 glob 对 `aria/skills/**` 恒零命中) · ③ 原文七字
+  **无「破坏性」限定**而本 Spec 自承「这些**是**契约变更」· ④「子模块」全文仅此一处**无定义**。
+  ⇒ 全部移交前置 change。**下方 R4 的原始论证逐字保留供对账。**
+  🔴 **R4 把本条从「成本收益题」改回「规则驱动题」** (R4 tech-lead ×2,
   均 `blocks_phase_b`) —— 它有**两个规则输入, 都不是 AI 能自行了结的**, 上一版通篇只呈现了成本面:
   - **(i) SOT 跨模块条件 ③「需要 API 契约变更」** (逐条对账见抬头): A 确实要给 `gate_check()` /
     `_build_output` 加形参、给 Output schema 加键; SOT 该条**未限定「破坏性」** ⇒ 若判 YES,
@@ -164,6 +186,11 @@
 > ⇒ 分别裁可能产出**违反 `LEVEL_GUIDE.md:29` + `:162` 的组合** (Breaking=YES 而 Level=2)。
 > ⇒ 改为: **不得混为一题, 但须按序裁 —— 先版本 (MINOR vs MAJOR), 后 Level (2 vs 3)**;
 > 版本裁 MAJOR 时 Level 不必再裁, 直接 Level 3。
+>
+> 🔴 **2026-08-13 更正 (DEC-20260813-001)**: 上面这句的**排序仍然对, 但两个题面都是错的** ——
+> 版本那题漏了 **PATCH** (`CLAUDE.md:79` 逐字可达), Level 那题只上呈了四条件里的 ③。owner 裁定的结果
+> 既不是 MINOR 也不是 MAJOR, 而是**先修定档规则书**。⇒ 本框的「按序裁」在前置 change ship 后仍适用, 但
+> **候选集须是完整的三档 × 四条件**。
 
 ---
 
@@ -1033,6 +1060,14 @@ A 的两处 hunk 是**为本 change 新产生的行为写新文档** (schema 新
 
 ### 版本
 
+> 🔴 **本节结论已失效为「此前主张」** (2026-08-13 owner 裁定, [DEC-20260813-001](../../../docs/decisions/DEC-20260813-001-versioning-and-level-rulebook-precede-spec-a.md))。
+> 三档**全部**逐字 SOT 可达, 且两套分法冲突而 SOT 无仲裁规则:
+> **PATCH** ← `CLAUDE.md:79`「bug 修复 = PATCH」+ `version-management.md:70`「Bug 修复」;
+> **MINOR** ← `version-management.md:55`「功能增强（向下兼容）」+ `:5` 引用并入的 SemVer 兼容性排序轴;
+> **MAJOR** ← `CLAUDE.md:35`「破坏性变更须 MAJOR」+ `version-management.md:19`「主版本 (重大变更、可能不兼容)」
+> (但 `version-management.md:34-40` §2.1 四条 MAJOR 触发条件**逐条零命中**)。
+> ⇒ 定档移交前置 change。**下方逐字保留以供对账。**
+
 **MINOR。** 全部为 additive: 新增**带默认值**的可选参数 · 新增核验步 (插在既有早退之后, 既有分支语义零改动) ·
 新增 **additive 可选**输出键。
 
@@ -1075,6 +1110,12 @@ CLI 侧 `pre_merge_gate.py:427` 的 `--main-branch` 默认值亦是 `"main"`。
 > ⚠️ **版本定档留给 owner 复议的点**: 「一个此前恒 `green` 的闸门开始 `fail`」是否够得上 CLAUDE.md 的
 > 「破坏性变更须 MAJOR」? 本 Spec 判 **MINOR**, 理由: 输出 schema 与函数签名向后兼容 (API 形状不变),
 > 翻转的是**被修复的缺陷本身**, 且 CLAUDE.md 版本规则把 MAJOR 系于**破坏性契约变更**而非行为修正。
+> 🔴 **更正 (2026-08-13, DEC-20260813-001 §2.1)**: 上面这句引文**在 SOT 里没有出处** —— 实跑
+> `grep -c '契约' CLAUDE.md` = **0**。真实原文是 `CLAUDE.md:35` 逐字「向后兼容 (**破坏性变更**须 MAJOR)」,
+> **不含「契约」二字**。而正是这两个被插入的字在排除 MAJOR (把触发面从「破坏性变更」收窄成「破坏性*契约*变更",
+> 于是「API 形状不变」就足以出罪)。⇒ **本段的 MINOR 结论所依赖的排除论证不成立**, 整个版本定档已按
+> DEC-20260813-001 移交前置 change。同时更正题面本身: 此处「MINOR vs MAJOR」二选一**漏了 PATCH**
+> (`CLAUDE.md:79` 逐字「bug 修复 = PATCH」+ `version-management.md:70`「Bug 修复」双命中)。
 > **该判断是 AI 作出的, 按规则 #10 留痕请复议** —— 若 owner 认为运行时翻转足以拉 MAJOR,
 > A 就与 B 的 MAJOR 面重叠, 拆分收益会显著缩水, 须重议划界。
 

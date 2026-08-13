@@ -26,8 +26,23 @@
 | **勘正执笔方** | memory `feedback_author_and_verifier_must_differ_for_corrections`。⚠️ R1-fix 用 `tech-lead` 执笔而它同时是 R2 席位 ⇒ **审了自己写的东西** (编排层第 3 条错误)。R2-fix 起改用名单外执笔方 | `general-purpose` + 专用简报 |
 | **对抗复核方** | 「证据成立 ≠ 建议成立」—— 10 席裁定工作流里 5 席对抗复核**推翻了 2 席的处方**, 而那 2 席的证据全部成立 | `aria:tech-lead` + refute-prompt |
 
-⇒ 二者均无 STCO 定义、无 capabilities 标签 ⇒ **「执笔方须在审计名单外」这条纪律目前无机械保证**,
-每次靠 prompt 重建。**建议用 `/aria:agent-creator` 补定义 —— 需 owner 裁, 不在本 session 范围。**
+### ✅ 2026-08-13 补齐 (owner 授权「创建 agent team, 拉入所有相关的 agent」)
+
+两个角色已按 `agent-creator` SKILL.md §3 的 STCO 格式落成文定义:
+
+| 角色 | 文件 | capabilities |
+|---|---|---|
+| 勘正执笔方 | `.aria/agents/spec-fix-author.md` | `spec-authoring` · `minimal-edit-discipline` · `self-adversarial-verification` · `sibling-position-census` |
+| 对抗复核方 | `.aria/agents/adversarial-reviewer.md` | `adversarial-verification` · `evidence-replay` · `prescription-refutation` · `rejection-capability-testing` |
+
+**首次投产**: 同日的 11 席动态工作流 (题面 3 调研 + 2 对抗 / B 侧 3 执笔 + 3 对抗)。
+
+⚠️ **诚实边界 — 这没有把纪律变成机械保证**: `.aria/agents/` 是 Aria 的 IDE-agnostic namespace
+(agent-creator SKILL.md 规定的路径), 而 **Claude Code 的 subagent 注册表读的是 `.claude/agents/`**
+⇒ 这两份定义**不会被 harness 自动注册为可直调的 agentType**, 实际仍由 `general-purpose` 承载,
+只是 prompt 基底从「即兴重建」升级为「引用成文 SOT」。
+**「执笔席位 ∩ 审计席位 = ∅」的真正 enforcement 需要 config 层表达** (候选: `teams.authors` /
+`teams.auditors` 两个互斥键), 尚未设计 —— 已转记为 `coverage-report.yaml` 的唯一剩余 gap, **属新 change, 需 owner 裁**。
 
 ## 3. 动态工作流的使用记录
 

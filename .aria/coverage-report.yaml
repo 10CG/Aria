@@ -30,47 +30,64 @@ covered:
     match_rate: 1.0
     evidence: "多轮抓出行锚偏移与前缀伪命中 (grep -o 'SC-M[0-9]*' 把 SC-M3 计入)"
 
-gaps:
+closed_gaps:
+  # 2026-08-13 owner 授权「创建 agent team, 拉入所有相关的 agent」后, 用 /aria:agent-creator 的 STCO 格式补齐。
   - scenario: "勘正执笔 (fix authoring) —— 与审计席位必须分离"
-    required_capabilities: ["spec-authoring", "minimal-edit-discipline", "self-adversarial-verification"]
-    best_partial_match:
-      agent: "aria:tech-lead"
-      matched: ["spec-authoring"]
-      match_rate: 0.33
-    suggested_agent:
-      name: "spec-fix-author"
-      capabilities: ["spec-authoring", "minimal-edit-discipline", "self-adversarial-verification", "sibling-position-census"]
-    rationale: |
-      本 session 实证: 勘正由原作者执笔时错误系统性逃逸 (memory feedback_author_and_verifier_must_differ_for_corrections)。
-      但 config.audit.teams 的 5 席全是审计席位 —— 从中选执笔方会造成「执笔方兼审计席位」的结构性冲突
-      (本 session 第 3 条错误, R1-fix 用 tech-lead 时发生)。R2-fix 起改用名单外执笔方, 冲突消除。
-      ⇒ 该角色是真实缺口, 目前由 general-purpose 顶替, 无 capabilities 标签、无 STCO 定义。
-    workaround_used_this_session: "general-purpose (R2-fix / R3-fix / R4-fix / A-R1-fix / A-R2-fix …)"
-
+    resolved_by: ".aria/agents/spec-fix-author.md"
+    capabilities: ["spec-authoring", "minimal-edit-discipline", "self-adversarial-verification", "sibling-position-census"]
+    first_production_use: "2026-08-13 动态工作流 track2 (B 侧 6 条 blocks_phase_b), 3 席以本定义为 prompt 基底"
+    residual: |
+      ⚠️ 定义落在 `.aria/agents/` (Aria IDE-agnostic namespace, 依 agent-creator SKILL.md §5 的规定路径),
+      **Claude Code 的 subagent 注册表读的是 `.claude/agents/`** ⇒ 本定义不会被 harness 自动注册为可直调的
+      agentType, 目前由编排层 (主 loop / Workflow 脚本) 读取后拼进 prompt 使用。
+      ⇒ 「执笔方须在审计名单外」这条纪律**仍无 harness 层机械保证**, 但已从「每次靠 prompt 即兴重建」
+      降级为「有成文 SOT 可引」。真正的机械保证需要 config 层表达 (例如 teams.authors / teams.auditors
+      两个互斥键), 尚未设计 —— 属新 change, 未启动。
   - scenario: "对抗性复核 (refutation) —— 验建议而非验证据"
-    required_capabilities: ["adversarial-verification", "evidence-replay", "prescription-refutation"]
+    resolved_by: ".aria/agents/adversarial-reviewer.md"
+    capabilities: ["adversarial-verification", "evidence-replay", "prescription-refutation", "rejection-capability-testing"]
+    first_production_use: "2026-08-13 动态工作流 5 席对抗复核 (题面 2 席 + B 侧 3 席)"
+    residual: "同上 —— `.aria/agents/` 不进 CC 注册表, 由编排层注入。"
+
+gaps:
+  - scenario: "「执笔席位与审计席位不相交」的机械保证"
+    required_capabilities: ["config-level-role-partition"]
     best_partial_match:
-      agent: "aria:tech-lead"
-      matched: ["evidence-replay"]
-      match_rate: 0.33
+      agent: null
+      matched: []
+      match_rate: 0.0
     suggested_agent:
-      name: "adversarial-reviewer"
-      capabilities: ["adversarial-verification", "evidence-replay", "prescription-refutation", "rejection-capability-testing"]
+      name: null
+      capabilities: []
     rationale: |
-      本 session 最有价值的一次产出来自它: 10 席裁定工作流里 5 席对抗复核**推翻了 2 席的处方**,
-      而那 2 席的**证据全部成立** —— 错的是从证据推出的处方。
-      主 loop 独立复核证据 ≠ 对抗复核建议。该能力在现有 roster 里无专门承载。
-    workaround_used_this_session: "aria:tech-lead 以 refute-prompt 临时充当"
+      这不是 agent 缺口而是 **config schema 缺口**: `.aria/config.json` 的 `audit.teams.*` 只表达审计编制,
+      无处表达「谁不得执笔」。目前靠编排层纪律 + 本报告的成文记录, 无机械 enforcement。
+      设计选项 (未裁): (a) teams.authors / teams.auditors 两个互斥键; (b) 每席位加 role 标签;
+      (c) 保持现状, 靠 charter 成文 + handoff 复议。**属新 change, 需 owner 裁。**
+
+_historical_gap_rationale:
+  spec-fix-author: |
+    勘正由原作者执笔时错误系统性逃逸 (memory feedback_author_and_verifier_must_differ_for_corrections)。
+    config.audit.teams 的 5 席全是审计席位 —— 从中选执笔方会造成「执笔方兼审计席位」的结构性冲突
+    (2026-08 premerge-gate 轨第 3 条编排层错误, R1-fix 用 tech-lead 时发生)。R2-fix 起改用名单外执笔方, 冲突消除。
+    2026-08-13 之前由 general-purpose 顶替, 无 capabilities 标签、无 STCO 定义。
+  adversarial-reviewer: |
+    最有价值的一次产出来自它: 10 席裁定工作流里 5 席对抗复核**推翻了 2 席的处方**,
+    而那 2 席的**证据全部成立** —— 错的是从证据推出的处方。
+    主 loop 独立复核证据 ≠ 对抗复核建议。该能力在原 roster 里无专门承载。
+    2026-08-13 之前由 aria:tech-lead 以 refute-prompt 临时充当。
 
 summary:
-  total_scenarios: 7
-  covered: 5
-  gaps: 2
-  coverage_rate: "71.4%"
+  total_scenarios: 8
+  covered: 7          # 5 原 covered + 2 本次经 agent-creator 闭合
+  gaps: 1             # 剩余唯一缺口是 config schema 层, 非 agent 层
+  coverage_rate: "87.5%"
   note: |
-    5 个 covered 场景全部由 config.audit.teams.post_spec / post_planning 的固定 5 席承担, 本 session
-    九轮 45 席实测全部胜任 (每席都有独立命中记录, 无空转席位)。
-    2 个 gap 都不是"审计能力"缺口, 而是**审计之外的两个角色**: 执笔方与对抗复核方 ——
-    它们在 Aria 的 agent roster 里没有对应定义, 本 session 用 general-purpose + prompt 临时构造。
-    ⇒ 建议 (不在本 session 范围, 需 owner 裁): 用 /aria:agent-creator 补这两个 STCO 定义,
-    否则每次都靠 prompt 重建, 且「执笔方须在审计名单外」这条纪律无机械保证。
+    5 个原 covered 场景全部由 config.audit.teams.post_spec / post_planning 的固定 5 席承担,
+    premerge-gate 轨九轮 45 席实测全部胜任 (每席都有独立命中记录, 无空转席位)。
+    2026-08-13 owner 授权后补齐两个 STCO 定义 (`.aria/agents/spec-fix-author.md` /
+    `adversarial-reviewer.md`), 并在同日的动态工作流里**首次投入生产** (11 席: 题面 3 调研 + 2 对抗;
+    B 侧 3 执笔 + 3 对抗)。
+    ⚠️ **诚实边界**: 定义落 `.aria/agents/` 不等于 harness 会注册它 —— Claude Code 读的是 `.claude/agents/`。
+    本次这两个角色仍由 `general-purpose` 承载, 只是 prompt 基底改为引用成文定义而非即兴重建。
+    「执笔席位 ∩ 审计席位 = ∅」的机械 enforcement 仍缺, 已转记为唯一剩余 gap。
