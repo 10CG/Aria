@@ -13,6 +13,17 @@ owner 2026-08-13 逐条裁定 (大白话解释后确认): **family 采 57 · new
 
 **解锁**: SC-18 现可绿 (census 输出 57/13 == 正文); TASK-016 (SC-19 探针补齐 57 家族) + TASK-020 (SC-13 回填) 可施工。下方原始复议记录保留作审计轨迹。
 
+### 附: census 语料面口径澄清 (主 loop 2026-08-13 定, 第 5 个 Phase B 逼出的设计点)
+
+落实裁定时发现 **census 挂了** (`extracted 331 triples but found 360 bash_case source lines`): 批 2 加的多行 bash_case (反斜杠续行, 如 SC-12) 破坏了 census 单行抽取。深层是**语料面口径**: `65/49/16` 是改前 305 条基线语料的属性, census 却扫会随批 2 增长的活文件 (直接扫得 `with_top_boundary=111`)。
+
+**处置 (主 loop 定, 未改正文数字, 属实现约定)**:
+1. **修 census extract 支持反斜杠续行** (`corpus_census.py`, 让默认扫活文件不再 crash + 防将来)。
+2. **SC-18 语料面口径写死**: 须 `census --corpus <(git show af87cae:…/secret-guard.test.sh)` 对改前基线跑; family/判据/pattern 面 `--hook` 默认当前 hook, 一次调用自洽 (实测: 基线语料 65/49/16/15/5 + 当前 hook family 57 + newline 13/13, 全对正文)。已写进 proposal SC-18。
+3. **census 默认无 `--corpus` 扫活文件的语料数无 SC-18 意义** (仅当前参考)。
+
+这是 census 落地又一次逼出的口径缺陷 (同 family/newline 族), 但主 loop 判定为实现约定 (不改正文断言值, 只定调用方式), 未拦 owner。
+
 ---
 
 

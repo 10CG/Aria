@@ -860,7 +860,8 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
     ⇒ 观察到「误报变多」不能推出「关键字正则挂了」, 反之亦然。**两个方向必须分别核**: 前者由 SC-6 的 8 项转红指认, 后者由 SC-15 的「改前改后逐条一致」指认。
   - **本 SC 是语法层检查, 结构上抓不到「编译通过但语义窄」** (如 R4 backend-architect CRITICAL-2 的裸 `^`) —— 那类由 SC-6 的换行 fixture 承担, 两者不可相互替代
 - [ ] SC-17 (语料重复用例清理, **连续三轮未处理; v9 补 Task 承载 = 1.5(iv)** — R6 tech-lead TL6-F3: 「SC 无 Task」本 cycle 第 5 次复发): 删除 `secret-guard.test.sh` 中字节级重复的 `bash_case "FP-fix timeout run-env"` (v9 实测在 `:641` 与 `:673` 各一份, 内容逐字节相同; 全文件仅此一处重名), 并断言全文件无重复用例名。**净效果 = 总数 −1**, 计入 SC-13 的三点比对
-- [ ] SC-18 (**权威计数器自身被断言**, R4→R5 code-reviewer M-3 三轮未落): 跑 `python3 aria/hooks/tests/corpus_census.py`, 其输出与 spec 正文**逐数字机械比对**, 任一不一致即失败 ——
+- [ ] SC-18 (**权威计数器自身被断言**, R4→R5 code-reviewer M-3 三轮未落): 跑 `python3 aria/hooks/tests/corpus_census.py --corpus <(git show <改前基点 SHA>:aria/hooks/tests/secret-guard.test.sh)`, 其输出与 spec 正文**逐数字机械比对**, 任一不一致即失败 ——
+  > **⚠️ 语料面须对改前基线 test 跑 (主 loop 2026-08-13 定案, Phase B 施工逼出的口径澄清)**: 语料面数字 (`65/49/16/15/1/5`) 是**改前 305 条基线语料**的属性; 而 `secret-guard.test.sh` 是活文件, 批 2 起新增 ~108 条测试 fixture (SC-1/6/14... 很多含 `;`), 直接扫活文件会数出 `with_top_boundary=111` 而非 65。故 SC-18 **必须**用 `--corpus` 指向改前基点的 test 快照 (`git show af87cae:…` 或 B.1 分支基点)。判据面/pattern 面/family 面扫 hook (`--hook` 默认即当前 form B), 与 corpus 正交, 一次调用同时自洽输出「基线语料 + 当前 hook 的 57 家族/13 换行影响」。census 默认无 `--corpus` 扫活文件仅供当前参考, 其语料面数字**无 SC-18 意义**。(census extract 已修多行 bash_case 续行, 默认扫活文件不再 crash, 但这不改变上面的口径。)
   - 语料面: `65 / 49 / 16 / 15 / 1` + 换行边界 `5 (4 拦 + 1 放)` (§Impact 迁移面 / SC-2 / SC-3 的基数全部引用它)
   - 判据面 (§6 新增口径): 13 处判据行号清单恰 **13** 条 · `[[:space:]]+` **10** 处 / `[[:space:]]*` **12** 处 / 含 `[[:space:]]` **13** 处 · 换行影响面**两个基线口径各一个数** (严格 **13/13**、宽松 **13/13**)
   - pattern 量词面 (owner 2026-08-09 采 B-4, 转出 1 的工作面基数): pattern 总数 **141** (单引号 **139** + 双引号 **2**) · 含 `[^|]` **81** · `[^|]*` **79** · `[^|]+` **7** · 两者兼有 **5** · `.*` **1**
