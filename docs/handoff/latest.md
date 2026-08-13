@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-12-issue128-phaseb-batch1-2-and-count-disputes.md](./2026-08-12-issue128-phaseb-batch1-2-and-count-disputes.md) — secret-guard-per-segment-evaluation (#128) @ phase=B (批1+批2 落地, 19/29 task, 卡 4 owner 复议) updated=2026-08-12
+**Latest**: [2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md](./2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md) — premerge-gate-mainbranch-failclosed @ phase=A.1-audit (blocked) updated=2026-08-13
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -9,8 +9,10 @@
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
-> | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | A.2-audit (blocked) | [2026-08-11](./2026-08-11-adjudication-authoring-swap-and-the-mechanical-crosscheck.md) |
+> | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | **A.1-audit (blocked)** — 拆为 A/B 两 Spec | [2026-08-13](./2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **B (批1+批2 落地, 19/29 task, 卡 4 owner 复议)** | [2026-08-12 (Phase B)](./2026-08-12-issue128-phaseb-batch1-2-and-count-disputes.md) |
+>
+> **2026-08-13 更新 (aria-runner-bot/023236f2, 本轨会话收尾)**: bare pointer 改指本轨 2026-08-13 handoff (全仓最新)。本轨经 **post_planning R1–R4 (B 侧) 走满未收敛 → owner 裁定拆 Spec (DEC-20260812-001) → 新建 A 侧 `premerge-gate-branch-existence` (Level 2) → post_spec R1–R5 (owner 把 max_rounds 4→6)**, 仍 `converged: false`。**九轮 45 席、34 commit 全部双推核验。** ⚠️ **下一步不是跑 R6** —— R5 证明 owner 的题面本身是错的 (版本选项集缺 PATCH; Level 条件①与③同性质却只上呈③), 详见新 handoff §6.1。#128 行未动 (非本 track)。
 >
 > **2026-08-12 更新 #2 (simonfish/bfe8285d, Phase B session)**: bare pointer 由 A.3 handoff 改指 **Phase B handoff** (全仓最新); #128 行 phase A.3 → **B** (批1 hook 逐段判定+census / 批2 测试族, 19/29 task done, 回归 474/474, 主 loop 全核验)。**卡 4 个 owner 复议项** (census/测试落地逼出的 spec 精度缺陷: family 55→57 / newline 11→13 / SC-6 恒split 15→16 / SC-1 粘性变体 — 详见新 handoff §2 + `.aria/notes/2026-08-12-*-count-disputes.md`)。premerge-gate 行未动 (非本 track)。
 >
