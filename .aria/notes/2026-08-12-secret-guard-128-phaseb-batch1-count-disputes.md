@@ -24,6 +24,19 @@ owner 2026-08-13 逐条裁定 (大白话解释后确认): **family 采 57 · new
 
 这是 census 落地又一次逼出的口径缺陷 (同 family/newline 族), 但主 loop 判定为实现约定 (不改正文断言值, 只定调用方式), 未拦 owner。
 
+### 附 2: printf 族 SC-19 gap (第 6 个 Phase B 逼出点, **待 owner 裁**)
+
+TASK-016 (SC-19 补 57 族探针) 落地时发现 **printf 族 (pattern idx88 `printf -v NAME <进程替换读 env>`) 无法构造 rule 5 合规探针**:
+- idx88 pattern 要求字面「进程替换重定向读 env」记号 (含 `(`) 才能匹配。
+- 含该记号的命令**必被 safe_to_split 块字符判据降级**走 fallback (整条判定) → 改后仍 exit=2 (主 loop 实测两形态 canon=2 curr=2)。
+- ⇒ **printf 族天然不属于跨段 fail-open 风险面** (它由 SC-6 块字符降级族间接覆盖), 但也因此**无法构造 SC-19 探针**: 2→0 探针不可能 (天然不翻转); 反例探针须含块字符, 违反 rule 5「探针不含块字符哪怕引号内」。单成员族无替代 pattern。
+
+**agent 处置 (正确)**: 按 SC-19 明文「不自行缩口径 / 不 special-case pass / 不 ship 违规探针」, self-check 诚实 FAIL (56/57), 回归 531/532, 写 handoff 请复议。
+
+**主 loop 建议 (owner 裁)**: **豁免 printf 族** —— SC-19 完备判据「57 族全覆盖」改为「覆盖全部**可跨段** family」; printf (唯一 pattern 要求块字符, 天然不可跨段) 排除; self-check 改 56/56 → PASS → 回归 532/532 全绿; 正文记 printf 天然安全的理由。备选 (不建议): 重写 idx88 去 `(` 要求 (改检测行为, 风险大) / 放松 rule 5 (依赖引号内块字符不降级的实现细节)。
+
+**此 gap 卡 TASK-020/021 的「回归全绿」口径**, 待 owner 裁后收尾 B-验证。
+
 ---
 
 
