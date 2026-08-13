@@ -7,16 +7,31 @@
 > 本 Spec 自造的三条判据 (「无架构变更 · 无跨仓**内容**同步面 · 无破坏性**契约**变更」), 其中「跨仓内容
 > 同步面」这个概念在 SOT 里**不存在**, 而 SOT 的「跨模块」腿**全文未被逐字评估** (memory
 > `exact-exception-condition`: 援引成文判据须字段级匹配, 不是精神匹配)。
-> ⇒ **逐字照 SOT `spec-drafter/LEVEL_GUIDE.md:26` 的 Q2 三腿走一遍**「是否**架构变更 / 跨模块 / Breaking**?
-> → YES → Level 3」: (a) **架构变更 = NO** —— §5 已钉死 A 不动 `ci_backends/aether.py`, 不碰 backend 抽象层;
-> (b) **跨模块 = NO** —— 代码面落在**单一 skill** `phase-c-integrator` 的 3 个文件内 (§Impact 逐行列明);
-> 发版同步面是任何 MINOR 插件发版都有的**仪式**, 不是本 change 的模块面; (c) **Breaking = NO** ——
+> ⇒ **逐字照 SOT `spec-drafter/LEVEL_GUIDE.md:29` 的 Q2 三腿走一遍**「是否**架构变更 / 跨模块 / Breaking**?
+> → YES → Level 3」 (🔴 **R4 更正行锚**: 上一版写 `:26`, 实跑 `sed -n '26p'` 得的是 Q1 分支的
+> 「YES ▶ LEVEL 1 (Skip)」行 —— 引文内容准确, 行号错位 3 行):
+> (a) **架构变更 = NO** —— §5 已钉死 A 不动 `ci_backends/aether.py`, 不碰 backend 抽象层;
+> (b) **跨模块 = 🔴 R4 改判: 三条 NO + 一条上呈 `D-c`** —— 上一版逐字「代码面落在**单一 skill** 的 3 个
+> 文件内 / 发版同步面是仪式」**仍是自造谓词**, 那两句一个字都不在 SOT 的条件里 (R4 tech-lead,
+> `blocks_phase_b`; 我实读 `LEVEL_GUIDE.md:156-160` 复核成立 —— 这正是 R3 m-1 点名却未真正闭合的那条腿)。
+> SOT 逐字给的是**四条件 OR 列表**「满足任一 ⇒ `:162` **自动提升为 Level 3**」, 逐条对账:
+> ① **涉及 2 个及以上模块** = **NO** (代码面全在 `phase-c-integrator` 一个 skill 内, §Impact 逐行列明);
+> ② **修改 `shared/` 目录** = **NO** (本仓无该目录, §Impact 三文件均不在);
+> ③ **需要 API 契约变更** = ⚠️ **AI 不自行判定, 上呈 `D-c`** —— A 要给 `gate_check()` 与 `_build_output`
+> 加形参、给 `SKILL.md` Output schema 加 `gate_error` 键 (§4/§Impact 逐字), 这些**是**契约变更; 而 SOT
+> 该条**未限定「破坏性」** ⇒「additive 契约变更算不算」是**成文条件的解释问题, 不是 AI 的裁量空间**
+> (规则 #10 + memory `exact-exception-condition`);
+> ④ **影响多个子模块** = **NO** (代码落 `aria/` 一个子模块; Spec 落主仓是 Rule #5 强制的落点, 不是模块面);
+> (c) **Breaking = NO, 但该答案以「版本裁定 = MINOR」为前提** (🔴 R4 新增依赖声明, 见 `D-c`) ——
 > API 形状层零破坏 (§版本), 运行时行为翻转已单列 §行为兼容面并**已作为 owner 待裁点留痕**。
-> ⇒ Q2 = NO ⇒ **Level 2** (`standards/openspec/project.md:116` 逐字「2 | Minimal | Medium features (1-3 days) | proposal.md」)。
+> ⇒ **(a)(c) 两腿 = NO, (b) 的条件 ③ 待 `D-c` 裁**; 三腿全 NO 时 ⇒ **Level 2**
+> (`standards/openspec/project.md:117` 逐字「2 | Minimal | Medium features (1-3 days) | proposal.md」
+> —— 🔴 **R4 更正行锚**: 上一版写 `:116`, 该行逐字是 `| 1 | Skip | Simple fixes, typos | No spec needed |`)。
 > ⚠️ **两处不能省略的限定** (R1): (a) **发版同步面照常适用** —— MINOR ship 必触发 CLAUDE.md 的
 > 「子模块 5 文件 + 主仓 gitlink + VERSION + badge + i18n」, **清单本体落 §Impact「发版同步面」行 (唯一 SOT),
-> 可执行载体落 `## Success Criteria` §交付义务 `O-1`** (🔴 **R3 更正** —— 上一版此处逐字「Level 2 无 tasks.md
-> 承载」, 该前提被 `task-planner` 路径 B 证伪, 见文首 BLOCKER);
+> **A.2 落点**落 `## Success Criteria` §交付义务 `O-1`** (🔴 **R3 更正** —— 上一版此处逐字「Level 2 无 tasks.md
+> 承载」, 该前提被 `task-planner` 路径 B 证伪, 见文首 BLOCKER; 🔴 **R4 再收窄「可执行载体」四个字** ——
+> 路径 B **必读**该章节是真的, **必然为它出一条 TASK 不是**, 详见文首 R4 更正框);
 > (b) **契约不破但运行时行为翻转**, 见 §行为兼容面。
 > **版本**: **MINOR** —— 本 change 全部为 additive (新增可选参数 + 新增核验步 + 新增 additive 输出键),
 > **API 形状层零破坏面** ⇒ 不触发 `pre_merge_gate.py:68/:116` 的 v2.0 弃用到期承诺
@@ -77,15 +92,31 @@
    逐字一致); 而 O-1/O-2/O-3 与 F-1/F-2/F-3 上一版**全部写在 `## Impact` / `## Rule #6` / 本块**里 ——
    **三处都在路径 B 的解析范围之外**。**把「写在抬头」当路由**这件事本身就是上一版的第二个未核实前提。
 
-⇒ **本轮的处置 (Level 2 内即可完成, 不需要 owner 在 Level 上裁)**: 六项义务**移入 `## Success Criteria`
-章节**的一个显式小节 (见该节末 `### 交付义务`), 使路径 B **必然**把它们读进 `detailed-tasks.yaml`。
+⇒ **本轮的处置**: 六项义务**移入 `## Success Criteria` 章节**的一个显式小节 (见该节末 `### 交付义务`),
+使路径 B **必然读到**它们。
+
+> 🔴 **R4 更正 —— 上一版这里逐字写「使路径 B **必然**把它们读进 `detailed-tasks.yaml`」, 那一步在
+> delegate 处不成立** (R4 tech-lead, `blocks_phase_b`; 我本轮回源复跑复核成立, 非转述):
+> `DUAL_LAYER_SPEC.md:90-93` 把路径 B 的三个解析源**各带用途**分派 —— 逐字「`## What` 章节: 功能概述 /
+> `### Key Deliverables`: 交付物列表 / `## Success Criteria` 章节: **验收标准**」, 而 `:104-152` 的 yaml
+> schema 里「验收标准」的落点是**每条 task 内的 `verification:` 字段, 不是 task 本身**;
+> 我实跑 `grep -rn 'Success Criteria' aria/skills/task-planner/` = **仅 2 命中** (`SKILL.md:67` +
+> `DUAL_LAYER_SPEC.md:93`), **全 skill 无一句把 SC 条目转成 TASK**; `SKILL.md:74-84` 的分解规则输入侧
+> 也一个字未提 SC。另两项实测: `grep -c '^## What$'` = **0** 且 `grep -c '^### Key Deliverables'` = **0**
+> ⇒ **路径 B 文档化的两个任务源章节 A 一个都没有**。
+> ⇒ **「读到」是必然的** (`SKILL.md:67` 逐字「**始终**从 proposal.md 读取 `## Success Criteria` 章节」),
+> **「出六条 TASK」不是** —— 后者是 **A.2 执行者的义务** (§交付义务 抬头的祈使句), **无机械闸门**,
+> 与该表「有机械闸门吗」列六项全写「没有」自洽。**本 Spec 不假装它有** (与 O-1 同一处理)。
+> ⚠️ 形状 = memory `delegate-verify` 第 (2) 问「**方式合约吗**」: R3 只把义务**换了位置**,
+> 没核被委派方是否以那个方式消费它。
+
 本块自此**只保留真正需要 owner 裁的那部分**。
 
 **三项义务与它们「漏做会不会红」的实测 (这部分 R3 五席复核无异议, 逐字保留):**
 
 | # | 义务 | 移入后的载体 | 漏做时会红吗 |
 |---|---|---|---|
-| **O-1** | 发版同步面 (`aria` 子模块 5 文件 + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n) | `## Success Criteria` §交付义务 O-1 (⇒ 路径 B 出一条 TASK) | **不会** —— custom check `m6-version-badge-match` 比的是 badge ↔ `plugin.json`, **对「主仓 gitlink 未 bump」这个方向结构上失明** (post_planning R3 已实证; 姊妹 Spec B 的 R4 三条 Critical 之一 `TASK-017` 漏 gitlink 就是这形状的已实现版本) |
+| **O-1** | 发版同步面 (`aria` 子模块 5 文件 + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n) | `## Success Criteria` §交付义务 O-1 (🔴 **R4 更正**: 路径 B **必读该章节**; **「出一条 TASK」无机械保证**, 见上框) | **不会** —— custom check `m6-version-badge-match` 比的是 badge ↔ `plugin.json`, **对「主仓 gitlink 未 bump」这个方向结构上失明** (post_planning R3 已实证; 姊妹 Spec B 的 R4 三条 Critical 之一 `TASK-017` 漏 gitlink 就是这形状的已实现版本) |
 | **O-2** | **Rule #6 照跑 AB** (本轮改判第二行后**新揽**的义务) | 同上, O-2 | **不会** —— 无任何闸门读 proposal 散文 |
 | **O-3** | 「**不得据 A ship 关闭 #137**」+ 是否在 #137 上留评论 | 同上, O-3 | **不会**, 且**出一条 TASK 也不够** —— 在 #137 上留评论是**仓外写动作**, TASK 只能把它排上日程, 不能授权它 |
 
@@ -111,12 +142,28 @@
   **本轮统一为: 四件仓外写动作 (1 评论 + 3 issue) 一并归入 D-a, 由 owner 一次裁定**, §Impact 与归属表均改为引用本条。
 - **D-b (无兜底的 O-1 是否接受)**: 上面已证 O-1 结构上无机械兜底。owner 需明确: 接受「靠 D.2 执行纪律」,
   还是要求 A ship 前先补一个 gitlink 方向的 custom check (那会**新开一个 change**, 不在 A 的交付面内)。
-- **D-c (Level 2 vs 3 —— 现在是一个小得多的问题)**: 移入 `## Success Criteria` 后, **Level 2 已能拿到逐条
-  `TASK-{NNN}` 载体**。取 Level 3 的**增量收益只剩 `tasks.md` 那层粗粒度勾稽 + parent 映射**
-  (`DUAL_LAYER_SPEC.md:76-79`), **不再是「有没有 task」**。⇒ 本 Spec 建议**维持 Level 2**, 但按规则 #10
-  留痕请复议 —— 定档本身是 AI 判断。
+- **D-c (Level 2 vs 3)**: 🔴 **R4 把本条从「成本收益题」改回「规则驱动题」** (R4 tech-lead ×2,
+  均 `blocks_phase_b`) —— 它有**两个规则输入, 都不是 AI 能自行了结的**, 上一版通篇只呈现了成本面:
+  - **(i) SOT 跨模块条件 ③「需要 API 契约变更」** (逐条对账见抬头): A 确实要给 `gate_check()` /
+    `_build_output` 加形参、给 Output schema 加键; SOT 该条**未限定「破坏性」** ⇒ 若判 YES,
+    `LEVEL_GUIDE.md:162` 逐字「**自动提升为 Level 3**」, **不留成本收益的余地**。
+  - **(ii) 依赖版本裁定 (新增依赖声明)**: Q2 的第三腿就是 Breaking (`LEVEL_GUIDE.md:29`), 而
+    §行为兼容面 末尾正把「恒 green 的闸门开始 fail 够不够 MAJOR」留给 owner ⇒ **本 Spec (c) 腿的
+    `Breaking = NO` 以「版本裁定 = MINOR」为前提; 若裁 MAJOR, 则按 `LEVEL_GUIDE.md:29` + `:162`
+    自动改判 Level 3**, 同样无需再走成本收益。
+  - **成本面 (仅在上面两个输入都指向 NO 时才是决定性的)**: 移入 `## Success Criteria` 后,
+    六项义务**已落在路径 B 的解析范围内** (⚠️ 是「**读得到**」, **不是**「必然出六条 `TASK-{NNN}`」——
+    见文首 R4 更正框); 取 Level 3 的增量收益 = `tasks.md` 那层粗粒度勾稽 + parent 映射
+    (`DUAL_LAYER_SPEC.md:76-79`) **外加把六项义务钉成 checkbox**。
+  ⇒ 本 Spec 仍**建议维持 Level 2**, 但按规则 #10 留痕请复议 —— 定档本身是 AI 判断。
 
-> ⚠️ 本块**不含**版本定档 (MINOR vs MAJOR) 那个待裁点 —— 它在 §行为兼容面 末尾, 是**另一件事** (那是「行为翻转够不够 MAJOR」, 这里是「义务有没有承载」)。两处都须 owner 裁, 不得合并处理。
+> ⚠️ 本块**不含**版本定档 (MINOR vs MAJOR) 那个待裁点 —— 它在 §行为兼容面 末尾, 是**另一件事**
+> (那是「行为翻转够不够 MAJOR」, 这里是「档位」)。
+> 🔴 **R4 收窄上一版的「两处都须 owner 裁, 不得合并处理」** (R4 tech-lead, `blocks_phase_b`):
+> 原措辞会诱导 owner 把两处当**互不相干**的题分别裁, 而 `D-c` 的 (c) 腿是版本裁定的**函数**
+> ⇒ 分别裁可能产出**违反 `LEVEL_GUIDE.md:29` + `:162` 的组合** (Breaking=YES 而 Level=2)。
+> ⇒ 改为: **不得混为一题, 但须按序裁 —— 先版本 (MINOR vs MAJOR), 后 Level (2 vs 3)**;
+> 版本裁 MAJOR 时 Level 不必再裁, 直接 Level 3。
 
 ---
 
@@ -193,11 +240,13 @@ A ship 不构成 aria-plugin #137 的闭环, 不得据 A ship 关闭 #137。**
 按散文逐字执行 ⇒ 核验步查 `master` (存在, 放行) → 步骤 3 查 `main` (`runs:[]`, RC=0) ⇒ **verdict 仍 green**。
 
 > 🔴 **R3 改标注的形态 —— 上一版要求标注的那句话是一颗 landmine, 而它正是本 Spec 自己在下面
-> 拒绝过的哨兵形态** (R3 tech-lead, `blocks_phase_b`; 我本轮实读 B `:156`/`:161` 与
-> `SKILL.md:243` 复核成立)。
+> 拒绝过的哨兵形态** (R3 tech-lead, `blocks_phase_b`; 我本轮实读 B `:154`/`:156` 与
+> `SKILL.md:243` 复核成立 —— 🔴 **R4 更正行锚**: 上一版写 B `:156`/`:161`, 其中 `:161` 逐字是
+> 「折叠块**之外**必须留下 `<MAIN_BRANCH>` 的取值来源」, 与「折叠」这件事无关; 承载「5 步移入折叠块」的
+> 是 **B `:154`** 的节标题, 折叠标记本体在 **B `:156`**)。
 > **上一版逐字要求**「在新增步骤处**逐字标注这条不一致**」, 并由 `SC-A-step` 的 (c-含) 腿要求正文
 > 同时含 `步骤 3` 与 `#137`。**问题**: 被标注的那条不一致 (「步骤 3 仍硬编码 `main`」) 是一个
-> **会被 B 的 D1 修好的瞬时事实** —— B `:161` 逐字把步骤 1-5 整体折叠、`SC-M1` 断言
+> **会被 B 的 D1 修好的瞬时事实** —— B `:154` 逐字把步骤 1-5 整体折叠 (标记本体见 B `:156`)、`SC-M1` 断言
 > `grep -c 'aether ci status' SKILL.md` = **0** (注解逐字「一条断言覆盖 `:167`/`:168`/`:243`/`:244`
 > 全部四行」), 而 `SKILL.md:243` 今日逐字就是 `aether ci status --branch main --in-flight --json`。
 > ⇒ B 正确落地后**两条路都坏**: 留着标注 = 随 plugin 分发给第三方一句**同页面即可证伪的假话**
@@ -264,7 +313,7 @@ A ship 不构成 aria-plugin #137 的闭环, 不得据 A ship 关闭 #137。**
 | **SC-M16** | 折叠块**外**存在 ≥1 处说明 `<MAIN_BRANCH>` 取值来源的段落 | **≥1** | 不会 —— 方向相反 (A 加文本只可能帮它转绿, 且该腿由 B 自己的 D1 交付) | 无需约束 |
 | 🔴 **SC-M18** | 同一 pattern (`still (readable\|works)\|removed in v2\.0\|仍读\|v2\.0 移除`) 跑在**四个文件**上: `pre_merge_gate.py` / `phase-c-integrator/SKILL.md` / `tests/test_pre_merge_gate.py` / `.aria/config.template.json` | **0/0/0/0** | 不会 (判定不变) —— A 不碰 v2.0 弃用面, 新增文本不含该 pattern | ⚠️ **R3 更正操作数** (三席同时命中): 上一版把总体缩写成「在 `SKILL.md` 的计数」= **1/4**。我实跑四个分量今日值 = **2 / 4 / 3 / 0**, 与 B `:364` 逐一对上; 其中**前三个里有两个正是 A 要直接编辑的文件**。结论不变但**拒绝域比上一版给的宽** ⇒ 落地时**不得**据「只要不动 `SKILL.md` 就安全」放心在 `.py` / 测试里写下带 `removed in v2.0` 形状的兼容注释 |
 | **SC-M4 / SC-M5** | `pre_merge_gate.py` 的 `default="main"` / `main_branch: str = "main"` / `--main-branch main` / help 文案 `default: main` | **0** | 不会 —— A **不改** `--main-branch` 缺省 (§非目标 逐字), 新增的是 `--remote`(默认 `origin`) / `remote: str = "origin"` / help「default: origin」, 四条 pattern 全不命中 | 无需约束 |
-| **SC-M6 · M7 · M8 · M11 · M13 · M14** (6 条) | 行为型断言 (受控裸仓 / 128 / `TimeoutExpired` / `wait` 不变 / glob pattern / `UnicodeDecodeError`) | 见 B 表 | **SC 层面不会** —— 这 6 条正是 `DEC-20260812-001 §2` 点名**过户给 A** 的号段 (A 侧同款 = `SC-A6`/`A7`/`A8`/`A11`/`A13`/`A14`), A 的实现就是它们要断言的东西 | 🔴 **但任务层面有真实碰撞** (R3 qa-engineer): 我实跑确认 B 的 `TASK-003…TASK-009` **七条全部 `status: pending`, 无一 cancelled**, 目标文件正是 A §Impact 的前两行。⇒ A 先 ship 后, 任何未读 DEC 抬头警告而直接执行 B 这些 pending task 的实现者会**重复实现 A 已实现的核验** (重复函数定义 / merge conflict)。**A 本轮不改 B** (跨轨改会撞车, 见 F-3 同款理由) ⇒ **列为 A 的 D.2 handoff 必写项**, 与 `D-a` 一并上呈 |
+| **SC-M6 · M7 · M8 · M11 · M13 · M14** (6 条) | 行为型断言 (受控裸仓 / 128 / `TimeoutExpired` / `wait` 不变 / glob pattern / `UnicodeDecodeError`) | 见 B 表 | **SC 层面不会** —— 这 6 条正是 `DEC-20260812-001 §2` 点名**过户给 A** 的号段 (A 侧同款 = `SC-A6`/`A7`/`A8`/`A11`/`A13`/`A14`), A 的实现就是它们要断言的东西 | 🔴 **R4 改判处置 —— 上一版把一条 owner 已裁定的 A.1 动作自行降级成了 handoff 备忘** (R4 tech-lead, `blocks_phase_b`, `introduced_by_r3fix: false` = 真实历史遗留): **`DEC-20260812-001 §5.3` 逐字「B 的 `detailed-tasks.yaml` 删去迁往 A 的任务时**须留 `cancelled` 痕迹, 不得静默删**」, DEC 抬头逐字「裁定人: owner」「状态: Approved」, 且该条与「新建 A 的 proposal」**同在 §5「迁移动作 (Phase A.1, 待执行)」这一张清单上** ⇒ 它是 A.1 的动作, 不是 D.2 的备忘 (规则 #10: AI 不得把 enabled 的 owner 决定降级/改序)。✅ **该动作已执行** (owner 已批准的动作, 非新决定): B 的 `TASK-003/004/005/007/008/009` **六条**已标 `status: cancelled` + 逐条 notes 留痕 (⛔ 不得再实现 + 指向 A 侧承接)。我本轮实测复核: 21 条 task **一条未删**, status 分布 = **`pending` 15 / `cancelled` 6**。⚠️ **上一版那句「七条全部 pending」的「七」也是错的**: `TASK-006` = 「`pre_merge_gate.py` 三处 `main` 字面量去除 + 参数必填 + help 文案」= **B 自己 D5 的交付物, 从未过户**, 今日正确地仍为 `pending`。⇒ 碰撞面**已在源头消除**, 不再依赖 handoff 纪律 |
 | **SC-M9** | `gate_check(pr_branch=...)` 不传 `main_branch` ⇒ `TypeError` | — | **A→B 方向不会** —— A 不改 `main_branch` 缺省 (§非目标 逐字) | ⚠️ **R3 补核销** (R3 knowledge-manager: 上一版对它既未列也未在任何排除说明里出现, 是**静默遗漏**而非显式核销)。**⚠️ 它在反方向上会打爆 A —— 见表 2** |
 | **SC-M10** | 负控 `enabled=false` 早退, **两个 fixture 变体** (干净 config / 含 legacy key 的 config) | 六键不变 + `assert ls-remote 未被调用` | 不会 —— A 的同款负控是 `SC-A10`, 断言方向一致; A 不碰 legacy key 面 (§Why ⛔ 清单) | 无需约束 |
 | **SC-M12** | 参数化**五种 cwd** 跑 B §1 的 helper 调用 | 五种全部可达 | 不会 —— A **不建** B §1 那个 helper 调用面 (§非目标 逐字) | ⚠️ 与 A 的 `SC-A-cwd` **同轴不同物**: `SC-M12` 约束「helper 脚本从哪些 cwd **够得到**」, `SC-A-cwd` 约束「gate 内部 subprocess **用哪个** cwd」。两者的 ⛔ 条款一致 (**均禁为解析路径而 `cd`**, A §3 与 B §1 逐字同句) ⇒ 无矛盾 |
@@ -301,7 +350,7 @@ A ship 不构成 aria-plugin #137 的闭环, 不得据 A ship 关闭 #137。**
 | A 侧 SC | 操作数 | B 会改动它吗 (实测依据) | 判定 |
 |---|---|---|---|
 | `SC-A-doc` | `SKILL.md` §C.2.4 Output schema json 块 (`:265-277`) 的**顶层**键集 | **会碰该块** —— B 的 `SC-M2` 目标 `"branch": "main"` 我实读在 **`:270`, 就在块内** | ✅ **不打爆** —— `:270` 缩进 **4 空格**, 被本 SC 钉死的正则 `^  "([A-Za-z_]+)":` (行首**恰两**空格) 天然排除; 我实跑该正则今日仍得 **7** 键, 与 `_build_output` 实产 7 键相等 |
-| `SC-A-step (a)(b)` | `:238` 与 `:257` 之间区块的行首步骤编号序列 | **会** —— B §2 把步骤 1-5 折进 `<details>`, A 的新步骤在其内 | ⚠️ **如实标注: A 此侧无法断言, 且不为它编造断言。** 折叠后行首编号是否保留取决于 B 尚未写出的落地文本; 任何在此侧写死的「折叠后也应如何」都是钉合成 fixture (memory `gate_tracks_reality_synthetic_fixture`)。**归属已成文在 B 侧**: B `:156` 逐字「折叠块须**补上 §3 新增的分支存在性核验步**」⇒ **B 的 D1 自带重验本步的义务**, 不是无人认领 |
+| `SC-A-step (a)(b)` | `:238` 与 `:257` 之间区块的行首步骤编号序列 | **会** —— B §2 把步骤 1-5 折进 `<details>`, A 的新步骤在其内 | ⚠️ **如实标注 (🔴 R4 收窄 —— 上一版这句范围开大了)**: **不可断言的是 (a)(b) 所用的「行首编号」这个表示形式**, 折叠后编号是否保留取决于 B 尚未写出的落地文本, 在此侧写死「折叠后也应如何」是钉合成 fixture (memory `gate_tracks_reality_synthetic_fixture`)。**但承重的量是「顺序」不是「编号」** (§Impact hunk ① 逐字「号本身非承重, 承重的是它落在 2 与 2.5 之间」), 而顺序**有**与折叠形态无关的测量点 —— 按出现位置断言三个内容锚的相对次序 (`resolve_ci_backend` < 新步骤锚 < `evaluate_path_coverage`)。⇒ **上一版由「编号不可测」推出「整条不可断言」, 是把非承重量的不可测当成了承重量的不可测** (R4 tech-lead; 我复核成立, 且这正是本 Spec 在 (c-含) 上已经走通过的同一条路)。**本轮明确不补这条断言, 理由见下方 ⛔ 框。** 🔴 **R4 同时更正委派锚与委派范围**: 上一版引 B `:156`, 我实读该句在 **B `:158`**; 且它逐字只保证「折叠块须**补上** §3 新增的分支存在性核验步」= **存在性**, 对**编号是否保留 / 步骤间顺序一个字未提** (memory `delegate-verify`: 引一行说「X 本就做这件事」须确认那行讲的就是这件事) ⇒ **委派只接住了「这一步不会丢」, 没接住「它在正确的位置」** |
 | `SC-A-step (c-禁)` | 该步骤正文 | 会 (步骤进折叠块 ⇒ 落入 `SC-M3c`/`SC-M15` 的判域) | ✅ **本轮升级为类级禁令后不打爆** (见上方 ⚠️) |
 | `SC-A-step (c-含)` | 该步骤正文须含的 token | 🔴 **会打爆** —— 上一版要求含 `步骤 3` 并标注「步骤 3 仍硬编码 `main`」, 而 B 的 `SC-M1` 使 `aether ci status` 归零 (覆盖 `:243` 步骤 3 本体) | ✅ **本轮已改判据** —— (c-含) 只保留 `#137` 这一个 token, 标注对象改为**本步自身的作用域边界** (见 §残余暴露 的 R3 框) |
 | `SC-A-note` | `SKILL.md` §C.2.4「枚举归层注记」段 (今日 `:279`) | **不会** —— 我实跑 B `SC-M18` 的 pattern 在 `SKILL.md` 的 4 处命中是 **`:49` `:285` `:286` `:349`, 无一在 `:279`**; B §3 明文「步骤 6 不动」, §2 只折叠步骤 1-5 | ✅ **不打爆** (B 删 `:285`/`:286` 会使行号下移, 但本 SC 是**内容锚**不是行号锚) |
@@ -313,8 +362,34 @@ A ship 不构成 aria-plugin #137 的闭环, 不得据 A ship 关闭 #137。**
 
 ⇒ **方向 2 归纳**: 18 条中 **B 落地会打爆的是 3 类** —— `SC-A-step (c-含)` (本轮已改判据) ·
 **一切不显式传 `main_branch` 的新 fixture** (本轮新增明文要求) · `SC-A-baseline` 的 111 (本轮加时序限定);
-另有 1 条 (`SC-A-step (a)(b)`) **A 此侧结构上无法断言, 已如实标注并指出 B 侧已成文的承接点**;
+另有 1 条 (`SC-A-step (a)(b)`) **其「行首编号」表示形式在此侧不可断言 (承重的「顺序」则另有 fold-invariant
+的测量点, 本轮明确不补, 见下框)**, B 侧 `:158` 的承接只覆盖「该步不会丢」这一半;
 其余 14 条实测不受影响。
+
+> ⛔ **R4 明确不修项 —— 不给 `SC-A-step` 补「内容序」那条腿 (本轮唯一一条「席位判对了、但我选择不改」)**。
+> **席位判对的部分我已在表内如实吸收**: (a)(b) 的不可断言只及于「编号」这个表示形式, 承重的「顺序」确实
+> 另有 fold-invariant 的测量点。**不补的三条理由, 逐条可证伪**:
+> 1. **它是新增断言面, 不是修正**。本轮 fix 引入率已达 **93%** (28 条里 26 条由上一轮 fix 自造),
+>    而 `SC-A-step` 是全表被返工最多的一条 (R2 新增 → R3 改三处 → R4 仍在争)。**在引入率 93% 时新开
+>    一条机械判据, 是本轮可选动作里预期新增条目最多的那个。**
+> 2. **它自己带着一个未解的 `spec-underdetermination`, 且落在三个锚里最要紧的那个上**: 「新步骤锚」这个
+>    token **今日不存在**, 要由本 Spec 现编 —— 编 `_verify_branch_exists` 则该 token 是否出现在
+>    `SKILL.md` 由实现者自由决定 (§Impact 只要求写成 **helper 调用形态**, **未规定函数名须进文档**);
+>    编 `#137` 则与 (c-含) 腿共用同一 token, 两腿耦合成一个量。**在这个 token 定死之前, (a)(b) 的新判据
+>    无法写成两个独立实现者会得同一结果的形式。**
+>    ⚠️ **本条的一半是我自查推翻的**: 起草本框时我写下「另两个锚也不唯一 ——
+>    `grep -c 'evaluate_path_coverage' SKILL.md` = 3 (`:242`/`:249`/`:583`)」, 随后实跑得
+>    **`evaluate_path_coverage` = 1** (仅 `:242`, **唯一**) · **`resolve_ci_backend` = 2**
+>    (`:241` 在 §C.2.4 内 · `:319` 在 §C.2.4.X 内 ⇒ 套用本轮为 `SC-A-note` 新加的**章节内首个匹配**规则后
+>    **在 §C.2.4 内唯一**)。⇒ **那半个理由不成立, 已删除, 不并入结论** (memory `critique-repeats-error`:
+>    指控别人量错时最容易在指控里犯同款 —— 这次是在「论证别人的锚不唯一」时自己编了个计数)。
+>    **剩下成立的是「新步骤锚未定」这一条**, 它单独已足以支撑「今日写不成」。
+> 3. **不补的残余风险有界且已定位**: 风险 = B 折叠时改用无序列表 ⇒ (a)(b) 从「必红」退化为「无从求值」。
+>    它**不会造成假绿** (无从求值 ≠ 判 PASS), 且 (c) 三禁一含、`SC-A-doc`、`SC-A-note` 三条不依赖编号,
+>    hunk ① 的存在性仍被 B `:158` 接住。
+> ⇒ **处置**: 本条**留给 Phase B 在写 `SC-A-step` 用例时按上面的测量点补**, 并**如实登记为 A 的已知缺口** ——
+> ⛔ 不在本轮 Spec 层新造判据。**这不是「不值得改」的价值评估** (那会撞规则 #10), 而是「改法本身今日欠定」;
+> 若 owner 要求本轮补, 须先裁定新步骤锚 token 的写法。
 
 **为什么不为它建 SC**: 散文路径由 AI 读文档执行, **没有任何机械 harness 能"执行 SKILL.md 散文"**;
 唯一能机械化的形态是「断言缺陷仍在」的哨兵 —— 它在 B 落地后必须被删, 是 landmine
@@ -640,6 +715,14 @@ backend query 失败) 保持**六键不变**; `gate_error` **只在本 Spec 新�
 > CLI 路径一样生效), **⛔ 不得依赖 ambient 的 `aether` / `gh` binary**。
 > **适用集 (11 条)**: `SC-A6` · `SC-A13` · `SC-A-zero` · `SC-A7` · `SC-A8` · `SC-A11` · `SC-A14` · `SC-A-order` ·
 > `SC-A-cli` · `SC-A-cwd` · 🔴 **`SC-A10c`** (R3 移入, 见下)。
+> 🔴 **`SC-A10c` 是本配方在 `precheck()` 一项上的唯一例外 (R4 补回 —— 上一版把这个括注在移动中丢了)**
+> (R4 code-reviewer, `blocks_phase_b`; 我实读 R3-fix 前版本确认该限定原文即在, 移入时未随迁):
+> **`SC-A10c` 必须打桩 backend (这正是它移入适用集的理由), 但其 `precheck()` 必须返 `(False, …)`**
+> —— 它断言的就是 `:345` 那道早退。**照本配方给它配 `(True, "")` ⇒ gate 不早退 ⇒ 核验执行 ⇒
+> 它自己那条「`assert ls-remote 未被调用`」在完全正确的实现下必败 = 恒红**; 而照 SC 行实现又与本条文
+> 冲突 ⇒ **两个独立实现者得相反结果** (memory `spec-underdetermination`)。
+> ⇒ **配方逐字收窄为**: 适用集全体须提供可解析 backend 且 `probe()`→`True`;
+> **`precheck()`→`(True, "")` 适用于除 `SC-A10c` 外的 10 条**。
 > **例外 (2 条)**: `SC-A10` (`enabled=false` —— 在 `:328` 返回, **早于 backend 解析**, 结构上与 backend 无关,
 > 是唯一真正的 ambient-free 例外) · `SC-A10b` (backend **必须**为 `None` ⇒ **须 mock `resolve_ci_backend` 返 `None`**,
 > ⛔ **同样不得依赖 ambient「这台机器碰巧没有 binary」** —— 例外的是「不提供可用 backend」这一点,
@@ -701,7 +784,7 @@ backend query 失败) 保持**六键不变**; `gate_error` **只在本 Spec 新�
 | **SC-A-cwd** | 同一实现、同一参数 (`main_branch="master"`, `remote="origin"`), 分别以进程 cwd = W₁ (`origin` → 裸仓 R₁, **无** `master`) 与 cwd = W₂ (`origin` → 裸仓 R₂, **有** `master`) 各跑一次 | W₁ ⇒ `fail`+`not-found`; W₂ ⇒ **不因核验 fail** | 实测 `origin` 在主仓解析到 `Aria.git`、在 `aria` 子模块解析到 `aria-plugin.git`, **两边都有 `master`** | **任何不从进程 cwd 解析仓根的实现必红** (常量路径 / `__file__` / 脚本目录 ⇒ 两次得**同一**判决)。⚠️ **诚实限制**: 本条**不能**区分「继承 ambient cwd」与「显式传 `cwd=`」—— 两者都过。那条要求由 §3 正面规定承担, **无机械锚**, 不为它编造断言 |
 | **SC-A-doc** | doc↔code 一致性 (**限 hunk ②, 即 json 块那一处**): 从 `SKILL.md` §C.2.4 Output schema json 块 (`:265-277`) **实际解析**出的**顶层**键名集合 (⛔ 不得硬编码 doc 侧) == `_build_output` 的实产键全集 (六固定键 ∪ `path_coverage` ∪ `gate_error`) | 相等 | doc 侧 **7** / code 侧 **7** (R2 复跑, 见下两条解析规则) | **只落 `.py` 而漏 `SKILL.md` schema 键 (或反之) 的实现必红**; 单独回退 `SKILL.md` 那个 hunk 亦必红。⚠️ **本条不是 Rule #6 substitute** (见 §Rule #6), 它只防 doc 漂移。⚠️ **不管 `:279` 那句归纳** —— 那处由 `SC-A-note` 管 |
 | **SC-A-step** | **hunk ① 的机械锚 (R2 新增; R3 钉死两处抽取边界 + 升级 (c))**。取 `SKILL.md` §C.2.4 中 `**执行流程**:` 的**首个**匹配 (今日 `:238`) 与 `**Subprocess 调用规范**:` (今日 `:257`) **之间**的区块, 按出现顺序提取行首步骤编号 (`^[0-9]+(\.[0-9]+)?\.`), 断言三腿: **(a)** 存在编号 `N` 满足 `2 < N < 2.5`; **(b)** `N` 在提取序列中的**位置**恰在 `2` 与 `2.5` **之间**; **(c) 类级三禁一含** —— **「该步骤正文」= 自 `N` 的编号行起, 到下一个行首步骤编号行之前的全部文本 (含缩进续行)**; 该正文 ⛔ **不含任何以 `--` 起头的 CLI flag 字面量** · ⛔ **不含** `aether ci status` · ⛔ **不含**以 `aether `/`git `/`python3 `/`bash ` 起头的可执行命令字面量; 且**含** `#137` | (a)(b)(c) 全部成立 | 实跑该区块编号序列 = `1. 2. 2.5. 3. 4. 5. 6.` ⇒ **区间 (2, 2.5) 内零编号** ⇒ **今日必红** | **(a)** 只落 `.py` 与测试、一个字节不动执行流程的实现必红 —— 这正是 R2 点名的「16/16 全绿而 Rule #6 第二行的**唯一**定档依据当场不存在」那个洞。**(b)** 加了步骤但落在 2.5 之后 ⇒ 红 (§Impact ① 逐字「承重的是它落在 2 与 2.5 之间」)。**(c-禁 1/2/3)** 把步骤写成**任何带 flag 的 CLI 示范** / `aether ci status` 形状 / 任何裸命令 ⇒ 红 —— 分别对应 B 侧 `SC-M3a`+`SC-M3b`+**`SC-M3c`** · `SC-M1` · `SC-M15` 的拒绝域, 清点见 §残余暴露 的**双向**兄弟位置表。**(c-含)** 加了步骤但不指向 `#137` ⇒ 红。🔴 **R3 三处改动的理由**: (1) 起点锚**必须写明「首个」** —— 我实跑扫描全文件, `**执行流程**:` 命中 **`[238, 582]`** (`:582` 属 §C.2.5), 取末次匹配的实现得起点 582 > 终点 257 ⇒ **空/负区间 ⇒ 三腿与被测实现无关地全红 = 恒红** (R3 code-reviewer); (2) 「该步骤正文」**必须写明抽取边界** —— 否则把违规命令写在**缩进续行**上的坏实现, 在「只取编号行」的实现下被误判 GREEN, 两种同样合理的抽取给出相反判决 (R3 qa-engineer, memory `spec-underdetermination`); (3) **(c-禁 1) 由点名 `--main-branch` 升级为「任何 `--` flag」** —— 点名法对下一个 flag 名天然失明, `SC-M3c` 的 `--pr-branch` 即为实例; **(c-含) 删去 `步骤 3` 这个 token** —— 它要求标注一个**会被 B 修好的瞬时事实**, 留着 = 分发一句可证伪的假话、删掉 = 在正确的 B 实现下必红, 两条路都坏 (见 §残余暴露 的 R3 框)。⚠️ 与 `SC-A-order` **同形**: R1 给**代码侧**顺序约束补了锚, **doc 侧同款顺序约束没补** (memory `fix-the-class`) |
-| **SC-A-note** | **hunk ③ 的机械锚 (R2 新增)**。🔴 **R3 钉死区块边界** (上一版逐字「含 `各早退分支` 的那**段**」, 而「段」无机械定义): 取 `SKILL.md` §C.2.4 中 **Output schema 的 json 围栏结束行 (` ``` `) 之后、`**配置参数**:` 之前**的全部文本 (今日 = `:278`–`:280`)。断言四腿: **(a) 负控** —— 「保持六键不变」那对括号内的枚举**仍恰 4 项**且**不含** `main-branch`; **(b)** 该区块**另有**一处同时含 `gate_error` 与 `main-branch`; **(c)** 该区块含逐字 `无 path_coverage`; 🔴 **(d) 第四处落点 (R3 新增)** —— 对 `pre_merge_gate.py` 中 `_build_output` 的 **docstring** (经 `ast.get_docstring` 取, ⛔ 不得按行号切) 跑 (a)(b)(c) 同款三问。🔴 **两个操作数共用一条解析规则 (R3 钉死)**: 先 `re.sub(r'\s+', '', 区块)` **抹掉全部空白**再匹配, token 相应写作 `各早退分支(…)保持…六键不变` / `gate_error` / `main-branch` / `无path_coverage` | (a)(b)(c)(d) 全部成立 | 我逐条实跑 (两操作数各一遍): **`SKILL.md` 区块 = `:278`–`:280`** ⇒ (a) 枚举 `no-backend/precheck失败/backendquery失败/enabled:false` = **恰 4 项**且无 `main-branch` ✅ · (b) **零命中** · (c) **零命中**; **docstring = `:241`–`:246`** ⇒ (a) 枚举 `enabled:false/no-backend/precheck失败/backendquery失败` = **恰 4 项** ✅ · (b) **零命中** · (c) **零命中** ⇒ **(b)(c)(d) 今日必红, (a) 今日绿 (负控本就该绿)** | **(b)(c)** 只改 json 块、把 `:279` 原样留作「四类」的实现必红 (`SC-A-doc` 对它双向失明, 一个字节都不读)。**(a)** 把第五类**塞进**「保持六键不变」括号的实现必红 —— 那会把「六键 **+ `gate_error`**」错报成六键, 是本 hunk 最可能的错法。**(c)** 把第五类写成也带 `path_coverage` 的实现必红 (直接违反 §4)。**(d)** 只改 `SKILL.md:279`、把 A 自己要加形参的那个函数的 docstring 原样留作「四类」的实现必红 —— 那正是上一版 18/18 全绿而规则 #3 被违反的那条缝。⚠️ **区块边界改法的理由**: 上一版按「含 `各早退分支` 的那段」取, 而 `:279` 今日是单行段落、`:280` 为空行 ⇒ **完全合规**的实现若把第五类另起一段写, (b)(c) 对它**必红** (R3 code-reviewer)。新边界的两个锚都是稳定标题/围栏, 合规实现无论分几段都落在区块内。⚠️ **抹空白这条规则不是修辞, 是本轮实测逼出来的**: docstring 里那句话被 Python 源码换行拆成 `各早退` + `分支 (…)`, 我实跑确认 —— **不抹空白则 `各早退分支` 这个锚在 docstring 里零命中 ⇒ (d) 与被测实现无关地恒红**; 换成「压成单空格」也不行 (CJK 换行处会留下一个空格)。⛔ 不写死这条规则, (d) 就是又一个 `spec-underdetermination` (与 `SC-A-doc` 的两条解析规则同一处理)。⚠️ 逐字 token (`无 path_coverage`) 由 §4 规定, 不是本 SC 自造 |
+| **SC-A-note** | **hunk ③ 的机械锚 (R2 新增)**。🔴 **R3 钉死区块边界** (上一版逐字「含 `各早退分支` 的那**段**」, 而「段」无机械定义): 取 `SKILL.md` §C.2.4 中 **Output schema 的 json 围栏结束行 (` ``` `) 之后、`**配置参数**:` 之前**的全部文本 (今日 = `:278`–`:280`)。🔴 **R4 补「首个匹配」限定 —— 这两个锚在全文件都不唯一, 与 `SC-A-step` 旧锚同款病, 而同一 commit 里只给 `SC-A-step` 加了这条限定** (R4 qa-engineer, `blocks_phase_b`; 我实跑 `grep -n '\*\*Output schema\*\*\|\*\*配置参数\*\*:' SKILL.md` = **四行** `264` / `281` / `501` / `523`, 其中 `:501`+`:523` 落在 `### C.2.4.5 Submodule Pointer Regression Gate` (`:376`–`:569`) 内、结构模式逐字同形): **两个锚一律取 `### C.2.4` 标题行 (今日 `:218`) 之后、下一个 `###` 标题行 (今日 `:306`) 之前的首个匹配**, ⛔ 不得对锚点短语做不限章节的全文件搜索。**不加这条会怎么坏 (实测形态)**: 取末次匹配的实现从 `:501` 起抓 §C.2.4.5 的文本块, 该块永远不含 `gate_error`/`main-branch`/`无 path_coverage`, 也永远满足负控形态 ⇒ **(a) 恒绿、(b)(c) 恒红, 与 A 在 `:279` 的真实编辑是否正确完全脱钩** (memory `false_green_dual_is_permanent_red`)。⚠️ **`SC-A-step` 的起点/终点锚同受本条约束** —— 它已有的「首个」限定与本条同义, 此处一并统一表述, 不改其判据。断言四腿: **(a) 负控** —— 「保持六键不变」那对括号内的枚举**仍恰 4 项**且**不含** `main-branch`; **(b)** 该区块**另有**一处同时含 `gate_error` 与 `main-branch`; **(c)** 该区块含逐字 `无 path_coverage`; 🔴 **(d) 第四处落点 (R3 新增)** —— 对 `pre_merge_gate.py` 中 `_build_output` 的 **docstring** (经 `ast.get_docstring` 取, ⛔ 不得按行号切) 跑 (a)(b)(c) 同款三问。🔴 **两个操作数共用一条解析规则 (R3 钉死)**: 先 `re.sub(r'\s+', '', 区块)` **抹掉全部空白**再匹配, token 相应写作 `各早退分支(…)保持…六键不变` / `gate_error` / `main-branch` / `无path_coverage` | (a)(b)(c)(d) 全部成立 | 我逐条实跑 (两操作数各一遍): **`SKILL.md` 区块 = `:278`–`:280`** ⇒ (a) 枚举 `no-backend/precheck失败/backendquery失败/enabled:false` = **恰 4 项**且无 `main-branch` ✅ · (b) **零命中** · (c) **零命中**; **docstring = `:241`–`:246`** ⇒ (a) 枚举 `enabled:false/no-backend/precheck失败/backendquery失败` = **恰 4 项** ✅ · (b) **零命中** · (c) **零命中** ⇒ **(b)(c)(d) 今日必红, (a) 今日绿 (负控本就该绿)** | **(b)(c)** 只改 json 块、把 `:279` 原样留作「四类」的实现必红 (`SC-A-doc` 对它双向失明, 一个字节都不读)。**(a)** 把第五类**塞进**「保持六键不变」括号的实现必红 —— 那会把「六键 **+ `gate_error`**」错报成六键, 是本 hunk 最可能的错法。**(c)** 把第五类写成也带 `path_coverage` 的实现必红 (直接违反 §4)。**(d)** 只改 `SKILL.md:279`、把 A 自己要加形参的那个函数的 docstring 原样留作「四类」的实现必红 —— 那正是上一版 18/18 全绿而规则 #3 被违反的那条缝。⚠️ **区块边界改法的理由**: 上一版按「含 `各早退分支` 的那段」取, 而 `:279` 今日是单行段落、`:280` 为空行 ⇒ **完全合规**的实现若把第五类另起一段写, (b)(c) 对它**必红** (R3 code-reviewer)。新边界的两个锚都是稳定标题/围栏, 合规实现无论分几段都落在区块内。⚠️ **抹空白这条规则不是修辞, 是本轮实测逼出来的**: docstring 里那句话被 Python 源码换行拆成 `各早退` + `分支 (…)`, 我实跑确认 —— **不抹空白则 `各早退分支` 这个锚在 docstring 里零命中 ⇒ (d) 与被测实现无关地恒红**; 换成「压成单空格」也不行 (CJK 换行处会留下一个空格)。⛔ 不写死这条规则, (d) 就是又一个 `spec-underdetermination` (与 `SC-A-doc` 的两条解析规则同一处理)。⚠️ 逐字 token (`无 path_coverage`) 由 §4 规定, 不是本 SC 自造 |
 | **SC-A-sc22** | 既有 `test_sc22` (`:710`) 落地后**仍 PASS 且仍能拦住真实 git 子进程** | 用一个**故意违规的桩**验证它会红 | 今日 PASS | 被放宽 (而非建接缝) 的实现红 |
 | **SC-A-baseline** | `phase-c-integrator` 全量套件 | **111 + 新增 ≥ 全绿** | **111 passed** (2026-08-11 实跑) | 任何回归红。🔴 **R3 加时序限定** (方向 2 清点新发现): **`111` 是「基线 `af87cae` 且 B 尚未 ship」这个时序下的量** —— B 的 `TASK-010`/`TASK-021` 会改同一套件的用例数与调用形状。⇒ 若 B 先 ship, 本条**必须以 B ship 后的实跑数重定基线, ⛔ 不得照抄 111** (memory `freshness_must_be_fetched_not_measured`: 新鲜度只能获取不能测量)。A 侧对称的那一半 (A ship 打爆 B 的 `111` 与 `24 处`) 见 §残余暴露 表 1 末段 |
 
@@ -743,7 +826,7 @@ backend query 失败) 保持**六键不变**; `gate_error` **只在本 Spec 新�
 | 档位 | SC |
 |---|---|
 | **真实 `ls-remote` + 受控裸仓** (⛔ 不得打桩核验入口 / `ls-remote`; **backend 必须打桩**) | SC-A6 · SC-A13 · SC-A-zero · **SC-A-cwd** · **SC-A-cli** · **SC-A11** (⚠️ R1: 若把核验入口打桩, 本条就不再验"核验放行了一个真实存在的分支", 退化为恒真 —— 须用**分支确实存在**的受控裸仓 + mock backend 提供 in-flight runs) |
-| **两种手段皆可** | **SC-A7** —— ⚠️ R1 更正: 上一版逐字「必须 mock (真实 `ls-remote` 无法产出确定性 128)」, 该理据**实测为假** (`git ls-remote --heads /tmp/does-not-exist-repo-xyz master` ⇒ **确定性 rc=128**); 且 B 侧 `:358-361` 早在 post_planning R3 就把同一句更正过, A 承接时把更正丢了 |
+| **两种手段皆可** | **SC-A7** —— ⚠️ R1 更正: 上一版逐字「必须 mock (真实 `ls-remote` 无法产出确定性 128)」, 该理据**实测为假** (`git ls-remote --heads /tmp/does-not-exist-repo-xyz master` ⇒ **确定性 rc=128**); 且 B 侧 `:366-369` (🔴 **R4 更正行锚**: 上一版写 `:358-361`, 我实读那四行是 B 的 `SC-M12`/`SC-M13`/`SC-M14`/`SC-M15` 表行, 与打桩边界无关; 被引的「打桩边界 (前一版自相矛盾, 本版钉死)」+「⚠️ 上一版此段有**两处**自相矛盾」在 `:366`–`:369`。该错锚**承自 R2-fix, 非本轮引入**, 是 memory `reporter-miscite` 的一个未清实例) 早在 post_planning R3 就把同一句更正过, A 承接时把更正丢了。⚠️ **被这条锚支撑的实质结论不受影响** —— 「真实 `ls-remote` 可产出确定性 128」我实跑复现 `rc=128` |
 | **必须 mock** (真实环境结构上造不出) | SC-A8 (`TimeoutExpired` + mock `time.sleep`) · SC-A14 **两腿** (腿 1: `FileNotFoundError` = git 二进制缺失 / `UnicodeDecodeError` / 任取异常类; **腿 2** 注入含孤立代理码位的 stderr 探针 —— 🔴 **R3: 与腿 1 同一进程内、同一批 mock, 断言点在 `gate_check()` 的返回值上**, 不再走 `main(argv=…)` 与进程退出码。上一版把「进程出口」与「同一批 mock」写在同一档里, 二者互斥 —— 子进程注不进 in-process mock) |
 | **走 §6 的 mixin 打桩接缝** (断言"未被调用", 需可观测的打桩点) | SC-A10 · SC-A10b · SC-A10c · **SC-A-order** (**两腿同档** —— 腿 2 只改 `config`, 打桩形态不变) |
 | **纯文件读取, 不涉 subprocess** | **SC-A-doc** · **SC-A-step** · **SC-A-note** (三条一一对应 §Impact 的三处 `SKILL.md` hunk ①②③。🔴 **R3 更正上一版的「无第四处」**: 那句只声称**没有第四处 `SKILL.md` hunk**, 是对的; 但清点跑在「**hunk 数**」上而非「**同一陈述的落点数**」上, 于是漏掉 `pre_merge_gate.py:241-246` 的 `_build_output` docstring —— 它是 `SKILL.md:279` 那句枚举的**第二份拷贝**, 且就在 A 要加形参的那个函数里。已由 **`SC-A-note` 的第 (d) 腿**接住, ⇒ `SC-A-note` 的操作数现为**两份文件**, 本档「纯文件读取」的定性不变) |
@@ -769,7 +852,7 @@ backend query 失败) 保持**六键不变**; `gate_error` **只在本 Spec 新�
 
 | # | 义务 | 完成判据 | 有机械闸门吗 |
 |---|---|---|---|
-| **O-1** | 发版同步面: `aria` 子模块 5 文件 (`plugin.json` SOT + `marketplace.json` + `VERSION` + `CHANGELOG.md` + `README.md`) + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n README | 逐项贴出 `git show --stat` / `git diff` 证据; **gitlink 一项须贴 `git diff --submodule=short` 显示指针前后 SHA** | **没有** —— 见文首 `D-b`: `m6-version-badge-match` 只比 badge ↔ `plugin.json`; §C.2.4.5 判 no-change = PASS; §C.2.5 与双推 `ls-remote` 核的是另一条轴。**本 Spec 不假装它有** |
+| **O-1** | 发版同步面: `aria` 子模块 5 文件 (`plugin.json` SOT + `marketplace.json` + `VERSION` + `CHANGELOG.md` + `README.md`) + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n README | 逐项贴出 `git show --stat` / `git diff` 证据; **gitlink 一项须贴 `git show --submodule=short <ship-commit> -- aria` 显示指针前后两个 SHA** (🔴 **R4 换命令** —— R4 code-reviewer: 上一版给的 `git diff --submodule=short` **在提交后恒空**, 对它唯一要防的方向零区分力。我本轮实测三跑: 干净工作树上 `git diff --submodule=short -- aria` = **0 行**, 且**已 bump 与从未 bump 的仓上同为 0 行** ⇒ 贴 0 行输出与漏 `git add aria` 的证据**逐字节相同**; 换用的命令实测 `git show --submodule=short fb5ed36 -- aria` 输出含 `-Subproject commit 183836b…` / `+Subproject commit af87cae…` 两行, 而对未 bump 的 commit (`98ad1f5`) 输出 **0 行** ⇒ **两向可区分**。memory `redfix-change-quantity`: 换的是**量**, 不是阈值; 与同格另一半 `git show --stat` 的 commit 基准也对齐了) | **没有** —— 见文首 `D-b`: `m6-version-badge-match` 只比 badge ↔ `plugin.json`; §C.2.4.5 判 no-change = PASS; §C.2.5 与双推 `ls-remote` 核的是另一条轴。**本 Spec 不假装它有** |
 | **O-2** | **Rule #6 照跑 AB** (第二行, 零裁量) | 两套件 `ab-suite/phase-c-integrator.json` + `ab-suite/phase-c-integrator-pre-merge-gate.json` 各跑完, 结果落 `ab-results/`; 并**带上 §Rule #6 已成文的有效性限定** | 没有 —— 无闸门读 proposal 散文 |
 | **O-3** | 「**不得据 A ship 关闭 #137**」的仓外落点 | 见文首 `D-a` (**仓外写动作, 须 owner 授权**) | 没有 |
 | **F-1** | 抽取共享重试 helper (`_run_with_retry` 跨 backend 抽象) 开 follow-up issue | 见文首 `D-a` | 没有 |
@@ -777,10 +860,19 @@ backend query 失败) 保持**六键不变**; `gate_error` **只在本 Spec 新�
 | **F-3** | 同形兄弟位置 (`fetch_gate.py` / `worktree_manager.py:170`) 开 follow-up issue | 见文首 `D-a` + 本文 §非目标 的去重规则 | 没有 |
 
 **A 的 D.2 handoff 另须写明 (非 task, 是交接事实)**: A ship 会打爆 B 侧三条任务级预写量
-(`tasks.md:85` 的「24 处」· `detailed-tasks.yaml:488` 的「显式传 0 处」· `tasks.md:122` 的基线 `111`),
-且 B 的 `TASK-003…TASK-009` **七条今日仍 `status: pending`** (我实跑确认) 而其中六条的规格已过户给 A ——
-**A 不改 B** (跨轨改会撞车), 但**必须交接**, 否则后续实现者会重复实现 A 已实现的核验。
-逐条依据见 §残余暴露 的**表 1**。
+(`tasks.md:85` 的「24 处」· `detailed-tasks.yaml:488` 的「显式传 0 处」· `tasks.md:122` 的基线 `111`)。
+**A 不改 B 的这三处**(跨轨改会撞车), 但**必须交接**。逐条依据见 §残余暴露 的**表 1**。
+
+> 🔴 **R4 更正 —— 上一版把「六条已过户任务仍 pending」也塞在本段, 那不是交接事实, 是 owner 已裁定的
+> A.1 动作** (R4 tech-lead, `blocks_phase_b`; **非本轮 fix 引入**): `DEC-20260812-001 §5.3` 逐字要求
+> 「B 删去迁往 A 的任务时**须留 `cancelled` 痕迹, 不得静默删**」, 状态 Approved。
+> ✅ **已执行** —— B 的 `TASK-003/004/005/007/008/009` **六条**已标 `cancelled` + 逐条 notes 留痕;
+> 我实测复核 status 分布 = **`pending` 15 / `cancelled` 6**, 21 条一条未删。
+> ⚠️ 上一版的「七条」也是错的: `TASK-006` 是 B 自己 D5 的交付物, 从未过户, 今日正确地仍 `pending`。
+> ⇒ **本段不再承载它** —— 它已在源头消除, 不需要靠 D.2 纪律兜。
+> ⚠️ **留痕 (规则 #10 自查)**: 上一版把这条降级为 handoff 备忘时, A 全文对 `DEC §5` **零引用**
+> ⇒ owner 在 `D-a`/`D-b`/`D-c` 三个待裁点上**看不到它** —— 这正是「AI 自作主张的流程判断」那个形状,
+> 与本 Spec 反复援引的规则 #10 同款。本轮已改。
 
 ---
 
@@ -841,7 +933,14 @@ A 的两处 hunk 是**为本 change 新产生的行为写新文档** (schema 新
 - **不改** `--main-branch` 的缺省 (B 侧 D5);
 - **不改** `SKILL.md` 两处散文流程的**既有** 4 行裸命令 (`:167` `:168` `:243` `:244`) / 不建折叠块 (B 侧 D1)。
   ⚠️ **但 A 必须新增执行流程编号步骤** (v1.65.0 步骤 2.5 先例) —— 二者不矛盾: 新增一步 ≠ 收敛既有两处。
-  由此产生的「新步骤用 `<MAIN_BRANCH>` 而步骤 3 硬编码 `main`」这条不一致, 按 §残余暴露在**该步骤处逐字标注**;
+  🔴 **R4 修正本条的第二半句 —— 它是同一陈述的第四份拷贝, R3 只改了另外三份** (R4 tech-lead + qa-engineer
+  + code-reviewer 三席独立命中, 均 `blocks_phase_b`; memory `fix-the-class`, 且 R3 正是在诊断出同款病的
+  那一轮里漏了自己这一处)。**上一版逐字**「由此产生的『新步骤用 `<MAIN_BRANCH>` 而步骤 3 硬编码 `main`』
+  这条不一致, 按 §残余暴露在**该步骤处逐字标注**」—— 那正是 §残余暴露 的 R3 框判定为 **landmine** 并已作废的
+  标注对象 (「步骤 3 仍硬编码 `main`」是**会被 B 的 D1 修好的瞬时事实**: 留着 = 随 plugin 分发给第三方一句
+  同页面即可证伪的假话, 违反规则 #3)。⇒ **本条改为**: 新增步骤处**只标注本步自身的作用域边界**并指向 `#137`,
+  ⛔ **不得标注「步骤 3 硬编码 `main`」这条会过期的事实** —— 与 §残余暴露 R3 框 · `SC-A-step` (c-含) ·
+  §Impact hunk ① 三处口径统一 (那三处已是 R3 改后的口径, 本条是最后一处);
 - **不动** `ci_backends/aether.py` (§5 已钉死; 机械判据 = `git diff --stat` 不得出现该文件);
 - **不引入** `main_branch` 自动解析 —— 实测 `ls-remote --symref` 存在 RC=0 但无 `ref:` 行两态 (unborn / detached), 需独立设计;
 - **不改** `path_coverage.py` 代码与行为;
@@ -878,8 +977,9 @@ A 的两处 hunk 是**为本 change 新产生的行为写新文档** (schema 新
 > 🔴 **R3 更正两处** (R3 tech-lead + code-reviewer):
 > **(1) 承载**: 上一版逐字「Level 2 无 `tasks.md`, 唯一载体是 D.2 会归档的散文」——
 > **这个前提是假的** (`task-planner` 路径 B 仍出 `detailed-tasks.yaml`, 实证见文首)。
-> F-1/F-2/F-3 已与 O-1/O-2/O-3 一并移入 **`## Success Criteria` §交付义务**, 由 A.2 路径 B 各出一条 task,
-> **不再依赖 Level 定档**。
+> F-1/F-2/F-3 已与 O-1/O-2/O-3 一并移入 **`## Success Criteria` §交付义务**, **A.2 须为各出一条 task**
+> (🔴 **R4 改措辞**: 上一版逐字「**由** A.2 路径 B 各出一条 task」把它写成了机制, 而它是**执行者义务**
+> —— 路径 B 必读该章节, 但不把 SC 条目转成 TASK, 见文首 R4 更正框), **不再依赖 Level 定档**。
 > **(2) 授权口径统一**: 上一版把「开三个 issue」自派给「A 侧, A 的 D.2」, 而同一份文件的 §Impact「外部」行
 > 逐字写「**无外部动作**」—— **一件事两个口径**, 执行者必须临场裁量该不该做外向动作, 而「临场裁量」
 > 正是 O-3 被上提 owner 的理由。⇒ **三个 issue 与 O-3 的评论合并为文首 `D-a` 一次裁定**;
@@ -914,7 +1014,7 @@ A 的两处 hunk 是**为本 change 新产生的行为写新文档** (schema 新
 > ⚠️ 本约束**只改标注的指向对象, 不改 §残余暴露 的闭环判据** —— 闭环判据仍挂 B 侧 D1 (那句在 proposal 内, 不进 `SKILL.md`)。
 | `aria/skills/phase-c-integrator/scripts/ci_backends/aether.py` | ⛔ **不入 scope** (§5 钉死; 只引用其 `:38` 常量值)。抽取共享重试 helper **留 follow-up** |
 | 外部 | 🔴 **R3 统一口径**: 上一版本行逐字「**无外部动作** —— 不改 #137 body, 不发评论」, 而 §非目标 的 Follow-up 归属表同时把**三个 issue** 派给「A 侧, A 的 D.2」—— **同一份文件对同一类动作两个口径** (R3 code-reviewer)。⇒ **本行改为**: A 的交付面内**零外部写动作**; 潜在的四件仓外写动作 (**在 #137 留 1 条评论 + 开 F-1/F-2/F-3 三个 issue**) **全部归入文首 `D-a`, 由 owner 一次授权**, ⛔ A 不自行决定。⚠️ **无论授权与否, `不得据 A ship 关闭 #137` 这条禁令都成立** (§残余暴露) —— 授权只决定它有没有仓外落点 |
-| 发版同步面 | **MINOR 独立发版 ⇒ CLAUDE.md 整张清单照常适用**: `aria` 子模块 5 文件 (`plugin.json` SOT + `marketplace.json` + `VERSION` + `CHANGELOG.md` + `README.md`) + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n README (**仅正文实质变更才重译**, #140 B 档) + **Rule #6 AB**。🔴 **R3 更正承载**: 上一版逐字「**Level 2 无 `tasks.md` 承载此清单**」—— 前提已被证伪 (`task-planner` 路径 B 仍出 `detailed-tasks.yaml`, 见文首)。**本行是清单本体的唯一 SOT; 其可执行载体 = `## Success Criteria` §交付义务 `O-1`** (A.2 路径 B 必读)。⚠️ **仍无机械兜底** —— 见下方风险声明与文首 `D-b`。不触发 v2.0 弃用删除面 |
+| 发版同步面 | **MINOR 独立发版 ⇒ CLAUDE.md 整张清单照常适用**: `aria` 子模块 5 文件 (`plugin.json` SOT + `marketplace.json` + `VERSION` + `CHANGELOG.md` + `README.md`) + **主仓 gitlink** + 主仓 `VERSION` + root README badge + i18n README (**仅正文实质变更才重译**, #140 B 档) + **Rule #6 AB**。🔴 **R3 更正承载**: 上一版逐字「**Level 2 无 `tasks.md` 承载此清单**」—— 前提已被证伪 (`task-planner` 路径 B 仍出 `detailed-tasks.yaml`, 见文首)。**本行是清单本体的唯一 SOT; 其 A.2 落点 = `## Success Criteria` §交付义务 `O-1`** (路径 B **必读该章节**; 🔴 **R4**: **不**保证为它出一条 TASK, 见下框)。⚠️ **仍无机械兜底** —— 见下方风险声明与文首 `D-b`。不触发 v2.0 弃用删除面 |
 
 > ⚠️ **发版清单的机械承载缺口 (R1 如实标注; R2 上提)**: Level 2 = proposal only ⇒ 上面这张清单**没有 checkbox 承载**,
 > 而 custom check `m6-version-badge-match` 比的是 badge ↔ `plugin.json`, **对「主仓 gitlink 未 bump」这个方向
@@ -922,9 +1022,13 @@ A 的两处 hunk 是**为本 change 新产生的行为写新文档** (schema 新
 > ⇒ **本 Spec 不假装它有机械兜底**。
 > 🔴 **R3 更正路由 (上一版的「上提到文首」不构成路由)**: R2 逐字称「A.2 的入口必然读到文首」,
 > 但 `task-planner/DUAL_LAYER_SPEC.md:90-93` 把路径 B 的解析内容**穷举为三项**, **不含文首 BLOCKER 块**
-> (R3 knowledge-manager; 我实读复核)。⇒ **本清单的可执行载体现为 `## Success Criteria` §交付义务 `O-1`**
+> (R3 knowledge-manager; 我实读复核)。⇒ **本清单的落点现为 `## Success Criteria` §交付义务 `O-1`**
 > (路径 B 逐字「始终从 proposal.md 读取 `## Success Criteria` 章节」), **文首 BLOCKER 只保留待 owner 裁的
 > `D-b` (无兜底是否接受)**。两处都不复述清单本体 —— **清单本体的唯一 SOT 是本行**。
+> 🔴 **R4 收窄「载体」二字** (同文首 R4 更正框): 路径 B **必读**该章节是真的, **必然为 O-1 出一条 TASK 不是**
+> —— `DUAL_LAYER_SPEC.md:93` 把 `## Success Criteria` 的用途分派为「**验收标准**」(落 `verification:` 字段),
+> 全 skill 无一句把 SC 条目转成 TASK。⇒ **移入只买到「A.2 一定看得见」, 没买到机械承载**;
+> 这与本框「不假装它有机械兜底」**同向**, 不构成新缺口, 但上一版的「可执行载体」四个字言过其实。
 > ⛔ **不得**以「Level 低 / 变更小」自行降级 (规则 #10)。
 
 ### 版本
