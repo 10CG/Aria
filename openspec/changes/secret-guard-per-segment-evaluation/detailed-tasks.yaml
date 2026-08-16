@@ -467,7 +467,7 @@ tasks:
     exec_phase: "B-验证"
     exec_order: 7
     title: "全量回归 (canonical 直调) + SC-16 正则可移植性实跑"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-020]
