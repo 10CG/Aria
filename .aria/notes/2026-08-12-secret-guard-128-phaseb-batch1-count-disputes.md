@@ -24,7 +24,7 @@ owner 2026-08-13 逐条裁定 (大白话解释后确认): **family 采 57 · new
 
 这是 census 落地又一次逼出的口径缺陷 (同 family/newline 族), 但主 loop 判定为实现约定 (不改正文断言值, 只定调用方式), 未拦 owner。
 
-### 附 2: printf 族 SC-19 gap (第 6 个 Phase B 逼出点, **待 owner 裁**)
+### 附 2: printf 族 SC-19 gap (第 6 个 Phase B 逼出点, **owner 2026-08-16 裁定豁免**)
 
 TASK-016 (SC-19 补 57 族探针) 落地时发现 **printf 族 (pattern idx88 `printf -v NAME <进程替换读 env>`) 无法构造 rule 5 合规探针**:
 - idx88 pattern 要求字面「进程替换重定向读 env」记号 (含 `(`) 才能匹配。
@@ -35,7 +35,7 @@ TASK-016 (SC-19 补 57 族探针) 落地时发现 **printf 族 (pattern idx88 `p
 
 **主 loop 建议 (owner 裁)**: **豁免 printf 族** —— SC-19 完备判据「57 族全覆盖」改为「覆盖全部**可跨段** family」; printf (唯一 pattern 要求块字符, 天然不可跨段) 排除; self-check 改 56/56 → PASS → 回归 532/532 全绿; 正文记 printf 天然安全的理由。备选 (不建议): 重写 idx88 去 `(` 要求 (改检测行为, 风险大) / 放松 rule 5 (依赖引号内块字符不降级的实现细节)。
 
-**此 gap 卡 TASK-020/021 的「回归全绿」口径**, 待 owner 裁后收尾 B-验证。
+**✅ owner 2026-08-16 裁定豁免 printf 族 (采主 loop 建议)**: 落实 = (1) proposal SC-19 完备判据收窄「全部 57 族」→「全部可跨段 56 族」+ printf 天然安全说明; (2) test self-check 排除 printf (census `family_count==57` 仍断言, 验归键未漂; 只对 56 可跨段族要求探针) → 回归 532/532 全绿。TASK-020/021 解锁, B-验证收尾。
 
 ---
 
