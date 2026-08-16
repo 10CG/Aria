@@ -369,7 +369,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "测试 — 跨段 fail-open 探针族 (SC-19) + SC-7 现状锁"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 8
     dependencies: [TASK-010, TASK-015]
@@ -446,7 +446,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 6
     title: "SC-13 三点机械比对接线 (测试头注释 / secret-hygiene.md / SC-11 正文)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019]
@@ -486,7 +486,7 @@ tasks:
     exec_phase: "B-验证"
     exec_order: 7
     title: "五档性能实测 (进程内计时, 只计 hook 判定段)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: [TASK-007, TASK-021]

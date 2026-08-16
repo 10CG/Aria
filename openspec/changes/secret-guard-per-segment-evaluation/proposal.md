@@ -759,7 +759,7 @@ owner 裁决理由: 绕开 (重排) 只在部分负载有效, 且与 spec 自己
   - **为什么必须两腿而非二选一** (五席论据互补): canonical 直调**结构上证明不了「用户真的会被拦住」** —— Aria#172 的教训恰是 canonical 一直正确、用户加载的却是错的; 但 harness 链有**时序矛盾** (qa-engineer): pre-merge 闸验的是 PR 里的代码, 不是已部署的 cache, 两者本就不同物; tech-lead 另实测 harness 链在 Phase B 阶段**结构上跑不到**本 spec 的改动。⇒ canonical 作 pre-merge 主闸 (SC-9a), harness 链作 **ship 后**投递面验证 (SC-9b)
   - 规范层的一般化归 [Aria#178](https://forgejo.10cg.pub/10CG/Aria/issues/178); 本 SC 是它在本 spec 的单点应用
 - [ ] SC-10 (CHANGELOG): 含行为变更段 + ≥2 条迁移写法示例 (机械 grep)
-- [ ] SC-11 (全量回归): `secret-guard.test.sh` 全绿 + 其余 5 脚本全绿; **总数注明 zsh 在场与否** (改前基线 366 / 360, v9 执笔席实跑复核 `PASS: 366 / 366`)。**总数是派生值不是目标常数** —— 权威值 = 实跑输出的 `PASS: N / N` 里那个 `N`, 口径定义见 Task 1.5, 三点一致由 SC-13 断言 (R6 tech-lead TL6-F8)
+- [ ] SC-11 (全量回归): `secret-guard.test.sh` 全绿 + 其余 5 脚本全绿; **总数注明 zsh 在场与否** (改前基线 366 / 360, v9 执笔席实跑复核 `PASS: 366 / 366`; **改后实跑 `PASS: 541 / 541`** 主 loop 2026-08-16 复核, zsh 在场; 净增 = 批2/TASK-016/17/21/22 新用例 − SC-17 去重 1)。**总数是派生值不是目标常数** —— 权威值 = 实跑输出的 `PASS: N / N` 里那个 `N`, 口径定义见 Task 1.5, 三点一致由 SC-13 断言 (R6 tech-lead TL6-F8)
 - [ ] SC-12 (`guard:ack` 命令级锁定): 已 ack 的复合命令改后仍 exit=0 (防实现把 ack 下沉段级 — R2 实测下沉会由 0 变 2)
 - [ ] SC-13 (SOT 计数回填断言, **v9 由两点扩为三点** — R6 tech-lead TL6-F8): 下列**三处**的 secret-guard 自测计数必须与 `secret-guard.test.sh` **实跑输出**的 `N` 逐一一致 (机械 grep 比对, R2 knowledge M-1):
   1. `standards/conventions/secret-hygiene.md` —— 现有 **3 处**引用 (`:23` Path↔Layer 表 / `:286` 测试清单 / `:318` 实证边界段, v9 执笔席实读确认, 现值均为 366)
