@@ -593,7 +593,7 @@ tasks:
     exec_phase: "ship-时"
     exec_order: 12
     title: "开 9 张转出 issue + 回填 Aria#170 覆盖率声明 + close aria-plugin#128"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: [TASK-024, TASK-025, TASK-026]
@@ -614,7 +614,7 @@ tasks:
     exec_phase: "ship-后"
     exec_order: 13
     title: "SC-9b 投递面腿 — harness hook 链复验"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-027]
