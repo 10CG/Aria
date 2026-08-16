@@ -510,7 +510,7 @@ tasks:
     exec_phase: "ship-前"
     exec_order: 8
     title: "re-check SOT + 执行版本 bump"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-021, TASK-022]
@@ -533,7 +533,7 @@ tasks:
     exec_phase: "ship-前"
     exec_order: 9
     title: "ship 同步面 14 点逐点核对"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-023]
@@ -556,7 +556,7 @@ tasks:
     exec_phase: "ship-前"
     exec_order: 10
     title: "CHANGELOG — 两类行为变更标注"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 3
     dependencies: [TASK-016, TASK-023, TASK-024]
@@ -574,7 +574,7 @@ tasks:
     exec_phase: "ship-前"
     exec_order: 11
     title: "secret-hygiene.md 自测计数回填"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-020, TASK-021, TASK-024]
