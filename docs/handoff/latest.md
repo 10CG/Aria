@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md](./2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md) — premerge-gate-mainbranch-failclosed @ phase=A.1-audit (blocked) updated=2026-08-13
+**Latest**: [2026-08-16-issue128-ship-v1.66.1-and-version-collision.md](./2026-08-16-issue128-ship-v1.66.1-and-version-collision.md) — secret-guard-per-segment-evaluation (#128) @ phase=ship-done (v1.66.1, cycle 完成, 待 Phase D 归档) updated=2026-08-16
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -10,7 +10,9 @@
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | **A.1-audit (blocked)** — 拆为 A/B 两 Spec | [2026-08-13](./2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md) |
-> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **B (批1+批2 落地, 19/29 task, 卡 4 owner 复议)** | [2026-08-12 (Phase B)](./2026-08-12-issue128-phaseb-batch1-2-and-count-disputes.md) |
+> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **ship-done (v1.66.1, 29/29 task, cycle 完成, 待 Phase D 归档)** | [2026-08-16 (ship)](./2026-08-16-issue128-ship-v1.66.1-and-version-collision.md) |
+>
+> **2026-08-16 更新 (simonfish/bfe8285d, #128 ship session)**: bare pointer 改指 #128 ship handoff (全仓最新)。#128 **ship 完成 v1.66.1** (29/29 task): owner 4 复议裁定落实 (family 57 / newline 13 / SC-6 恒split 16 / SC-1 变体) + printf 族豁免 + **SC-8 median→min flaky 修复** + **ship 中途撞并发轨 v1.66.0 (#137) → 版本顺延重算 1.65.6→1.66.1** (三仓 rebase 改动面正交 + gitlink 完整无 orphaned) + 9 转出 issue (aria-plugin#138-146) + close #128 + 回填 Aria#170。cycle 完成, 剩 Phase D 归档。premerge-gate 行未动 (非本 track)。
 >
 > **2026-08-13 更新 (aria-runner-bot/023236f2, 本轨会话收尾)**: bare pointer 改指本轨 2026-08-13 handoff (全仓最新)。本轨经 **post_planning R1–R4 (B 侧) 走满未收敛 → owner 裁定拆 Spec (DEC-20260812-001) → 新建 A 侧 `premerge-gate-branch-existence` (Level 2) → post_spec R1–R5 (owner 把 max_rounds 4→6)**, 仍 `converged: false`。**九轮 45 席、34 commit 全部双推核验。** ⚠️ **下一步不是跑 R6** —— R5 证明 owner 的题面本身是错的 (版本选项集缺 PATCH; Level 条件①与③同性质却只上呈③), 详见新 handoff §6.1。#128 行未动 (非本 track)。
 >
