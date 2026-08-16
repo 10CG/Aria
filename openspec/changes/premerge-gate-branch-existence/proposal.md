@@ -17,7 +17,16 @@
 > **前置 change**: 一个 change 修两条轴 (版本轴 = `CLAUDE.md:79` ↔ `version-management.md` 的优先级;
 > Level 轴 = `LEVEL_GUIDE.md` 模块地图 + 关键词面/路径面仲裁 + 条件③ 限定词 + 条件④ 定义), 待起草。
 >
-> **Spec Level**: **2** (proposal only) — ⚠️ **此前主张, 见上方定档状态**。**R3 更正定档依据的来源** (R3 tech-lead minor): 上一版用的是
+> ## ✅ Level 已裁定 = **3** (2026-08-16, [DEC-20260816-002](../../../docs/decisions/DEC-20260816-002-fix-first-outcome-oriented.md) §2)
+>
+> owner 裁定「**先修 bug**」: **按 Level 3 走本 Spec** (Level 3 天然包含 Level 2 的交付面, 不欠交付),
+> **版本档留到发版前再定** —— 版本只在发版那一刻承重, 不改变这三处代码怎么写。
+> ⇒ 本 Spec **不再等待**「定档规则书」前置 change (它挡发版, 不挡写代码)。
+> **`tasks.md` 已产出** (A.2, 19 条任务 · 18/18 SC 覆盖 · 六项交付义务各一条)。
+> ⚠️ **A.2 入口经 owner override**: post_spec `converged: false` / `overridden_by_user: true`,
+> **4 条 `blocks_phase_b` 仍未闭合**, 由 `tasks.md` 的 `TASK-019` 显式承接。
+>
+> **Spec Level**: ~~2 (proposal only)~~ → **3** — ⚠️ 下方为 Level 2 时期的原始论证, 逐字保留供对账。**R3 更正定档依据的来源** (R3 tech-lead minor): 上一版用的是
 > 本 Spec 自造的三条判据 (「无架构变更 · 无跨仓**内容**同步面 · 无破坏性**契约**变更」), 其中「跨仓内容
 > 同步面」这个概念在 SOT 里**不存在**, 而 SOT 的「跨模块」腿**全文未被逐字评估** (memory
 > `exact-exception-condition`: 援引成文判据须字段级匹配, 不是精神匹配)。

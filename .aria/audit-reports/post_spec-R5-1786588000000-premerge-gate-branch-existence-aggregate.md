@@ -4,7 +4,7 @@ mode: convergence
 rounds: 5
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 verdict: PASS_WITH_WARNINGS
 timestamp: 2026-08-13T02:30:00.000Z
@@ -14,6 +14,20 @@ drift_terminated: false
 drift_check_skipped: true
 is_refocus: false
 ---
+
+> ## 🔴 owner override (2026-08-16)
+>
+> **owner 明确裁定「接受当前结论, 直接进 A.2」** ⇒ `overridden_by_user: true`。
+> `converged` 保持 **false** (它是事实, 不因 override 改变); `degraded` 保持 false
+> (按 audit-engine SOT, `degraded: true` 是降级路径 [3] 被选中后的结果, 本次不是)。
+>
+> **override 时 A 侧仍未闭合 4 条 `blocks_phase_b`** (M-4 Level 条件① 与 M-5 版本定档
+> 已由 [DEC-20260816-002](../../docs/decisions/DEC-20260816-002-fix-first-outcome-oriented.md) 的定档方向解决, 余 4 条):
+> M-1 `CLAUDE.md:113` 规则 #8 同步归属 (回到未裁) · M-2 B 的 `TASK-013` 与 A 的 hunk ②③ 是同一份交付物 ·
+> code-reviewer M-2 `SC-A-doc` 锚点定位规则未推广 · knowledge-manager 一条。
+> **这 4 条被带进 A.2**, 须在任务清单里显式承接或显式声明不承接。
+>
+> **max_rounds 6 仍余 1 轮未用** —— override 不消耗它; 若 A.2 之后需要, 该轮仍在。
 
 # post_spec R5 汇总 — Spec A (owner 加轮后的第 1 轮, max_rounds 6 已用 5)
 
