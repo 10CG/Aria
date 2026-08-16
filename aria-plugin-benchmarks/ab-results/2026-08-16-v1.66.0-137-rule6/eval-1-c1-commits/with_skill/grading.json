@@ -1,0 +1,14 @@
+{
+ "expectations": [
+  {
+   "text": "输出含 Conventional Commits type(scope): 形式",
+   "passed": true,
+   "evidence": ""
+  },
+  {
+   "text": "给出分组理由而非机械堆砌",
+   "passed": true,
+   "evidence": ""
+  }
+ ]
+}

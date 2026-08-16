@@ -1,0 +1,14 @@
+{
+ "expectations": [
+  {
+   "text": "推送到 origin 与 github 两个 remote",
+   "passed": true,
+   "evidence": ""
+  },
+  {
+   "text": "推后独立 SHA 核验, 不只信回执",
+   "passed": false,
+   "evidence": ""
+  }
+ ]
+}

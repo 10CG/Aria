@@ -1,0 +1,13 @@
+{
+ "eval_id": 3,
+ "eval_name": "c25-multi-remote-push",
+ "prompt": "Phase C C.2.5 多远程推送 + post-push SHA 验证",
+ "assertions": [
+  {
+   "text": "推送到 origin 与 github 两个 remote"
+  },
+  {
+   "text": "推后做独立 SHA 核验 (ls-remote), 不只信 push 回执"
+  }
+ ]
+}

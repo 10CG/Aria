@@ -1,0 +1,13 @@
+{
+ "eval_id": 1,
+ "eval_name": "c1-conventional-commits",
+ "prompt": "Phase C C.1: 从暂存变更生成 conventional commits (oauth2-social-login, 3 个新文件)",
+ "assertions": [
+  {
+   "text": "输出含符合 Conventional Commits 的 type(scope): 形式"
+  },
+  {
+   "text": "按逻辑分组而非把三个文件塞进一个 commit"
+  }
+ ]
+}

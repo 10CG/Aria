@@ -1,0 +1,64 @@
+{
+ "skill_name": "phase-c-integrator",
+ "iteration": 1,
+ "purpose": "Rule #6 AB — aria-plugin #137 main 分支存在性核验",
+ "configurations": {
+  "with_skill": {
+   "label": "new (61b4d76)",
+   "pass_rate": 1.0,
+   "passed": 10,
+   "total": 10,
+   "per_eval": {
+    "eval-1-c1-commits": {
+     "passed": 2,
+     "total": 2
+    },
+    "eval-2-c2-conflict": {
+     "passed": 2,
+     "total": 2
+    },
+    "eval-3-c25-multiremote": {
+     "passed": 2,
+     "total": 2
+    },
+    "eval-4-c24-gate-branchname": {
+     "passed": 4,
+     "total": 4
+    }
+   },
+   "mean_tokens": 86967,
+   "mean_duration_s": 205.5
+  },
+  "old_skill": {
+   "label": "baseline (af87cae)",
+   "pass_rate": 0.6,
+   "passed": 6,
+   "total": 10,
+   "per_eval": {
+    "eval-1-c1-commits": {
+     "passed": 2,
+     "total": 2
+    },
+    "eval-2-c2-conflict": {
+     "passed": 2,
+     "total": 2
+    },
+    "eval-3-c25-multiremote": {
+     "passed": 1,
+     "total": 2
+    },
+    "eval-4-c24-gate-branchname": {
+     "passed": 1,
+     "total": 4
+    }
+   },
+   "mean_tokens": 80652,
+   "mean_duration_s": 161.8
+  }
+ },
+ "delta": {
+  "pass_rate": 0.4,
+  "tokens": 6315,
+  "duration_s": 43.7
+ }
+}

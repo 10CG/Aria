@@ -30,3 +30,6 @@ __pycache__/
 
 # Per-cycle worktrees (B.1 worktree mode, repo-root level)
 worktrees/
+
+# AB 中间工作区 (结果已落 ab-results/, 无需入库)
+aria-plugin-benchmarks/ab-workspace/

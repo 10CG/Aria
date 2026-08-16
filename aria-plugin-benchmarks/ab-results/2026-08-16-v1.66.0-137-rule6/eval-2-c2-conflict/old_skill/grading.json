@@ -1,0 +1,14 @@
+{
+ "expectations": [
+  {
+   "text": "给出冲突解决的具体步骤",
+   "passed": true,
+   "evidence": ""
+  },
+  {
+   "text": "要求解决后重跑验证 / 禁盲目 ours-theirs",
+   "passed": true,
+   "evidence": ""
+  }
+ ]
+}

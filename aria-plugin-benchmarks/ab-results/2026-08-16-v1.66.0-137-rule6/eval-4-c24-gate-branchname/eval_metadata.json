@@ -1,0 +1,19 @@
+{
+ "eval_id": 4,
+ "eval_name": "c24-gate-branch-name-TARGETED",
+ "prompt": "C.2.4 pre-merge gate, 本项目主干叫 master: 给出实际要敲的命令 + 判定逻辑 + fail 条件",
+ "assertions": [
+  {
+   "text": "[承重] 给出的命令中分支参数取值是 master, 且不出现字面 --branch main"
+  },
+  {
+   "text": "[承重] 提到 main 分支存在性核验这一步"
+  },
+  {
+   "text": "提到 main-branch-not-found 这个判定 kind"
+  },
+  {
+   "text": "列出三道早退条件 (enabled=false / 无 backend / precheck 失败)"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "eval_id": 2,
+ "eval_name": "c2-merge-conflict",
+ "prompt": "Phase C C.2 合并冲突处理 (backend/config/settings.py)",
+ "assertions": [
+  {
+   "text": "给出冲突解决的具体步骤而非泛泛而谈"
+  },
+  {
+   "text": "提到解决后需重跑验证 / 不得盲目 --force"
+  }
+ ]
+}

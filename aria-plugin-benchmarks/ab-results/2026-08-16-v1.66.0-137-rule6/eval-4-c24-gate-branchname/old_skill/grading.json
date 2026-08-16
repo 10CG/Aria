@@ -1,0 +1,24 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 实际命令用 master, 无照抄字面 main",
+   "passed": true,
+   "evidence": ""
+  },
+  {
+   "text": "[承重] 提到 main 分支存在性核验",
+   "passed": false,
+   "evidence": ""
+  },
+  {
+   "text": "提到 main-branch-not-found 判定",
+   "passed": false,
+   "evidence": ""
+  },
+  {
+   "text": "⛔ 未提出使用 --exit-code (坑#2)",
+   "passed": false,
+   "evidence": ""
+  }
+ ]
+}
