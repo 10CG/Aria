@@ -1,0 +1,88 @@
+# 收尾说明 — #137 已修, 这 2838 行转为复盘材料
+
+> **归档日期**: 2026-08-16 · **owner 裁定**: 「把那 7 条实测坑抽出来单独存一份 (半页),
+> 剩下 2800 行归档当复盘材料, **不再是必须走完的流程**」
+> **同批归档**: `../2026-08-16-premerge-gate-mainbranch-failclosed/` (B 侧)
+
+---
+
+## 1. 修复本身 (已 ship 到 aria-plugin master)
+
+| commit | 内容 |
+|---|---|
+| `c6b8f6e` | `gate_check()` 加 main 分支存在性核验 + `--remote` 参数 + `gate_error` 输出键 |
+| `65448ab` | 抽出 7 条实测坑为半页参考 (`skills/phase-c-integrator/references/`) |
+| `61b4d76` | SKILL.md 散文流程里写死的 `main` 换成 `<MAIN_BRANCH>` 占位符 —— **#137 的另一半** |
+
+**实证 (本仓真实环境)**:
+
+```
+--main-branch main    → verdict=fail  + kind=main-branch-not-found   ← 此前恒 green
+--main-branch master  → verdict=green                                 ← 正常路径不受影响
+```
+
+**验收**: 111 → **119 passed**, 1.9s, 零回归 · 8 条新测试在修复前**全红** ·
+拒绝能力对抗验证: 坏实现「读退出码」被 **4 条**拒、「子串宽松匹配」被 **2 条**拒。
+
+⇒ **#137 的两份实现现在都加固了** (`gate_check()` 有核验 · 散文流程不再分发会踩坑的字面命令)。
+
+---
+
+## 2. 这 2838 行里真正有用的部分
+
+**已抽出**: `aria/skills/phase-c-integrator/references/pre-merge-gate-empirical-traps.md` (半页, 7 条)。
+每一条都是实测踩出来的、不能靠读代码想出来的 —— ls-remote 零命中返 rc=0 · `--exit-code` 返 rc=2 ·
+参数被当 glob · `UnicodeDecodeError` 不是 `OSError` 子类 · surrogateescape 的孤立代理码位在下游
+`json.dumps` 才炸 · 核验插入点 · 测试隔离须在 mixin 一处统一打桩 (单次 ls-remote 实测 **8.7 秒** × 28 处测试)。
+
+**其余部分的性质** (实测): `proposal.md` 1165 行中 **254 行 (21%)** 是审计轮次与自我修订的痕迹
+(「上一版」「本轮更正」「R3 作废」「席位」…)。**审的是文档自不自洽, 不是修复对不对。**
+
+---
+
+## 3. 为什么一个 112 行函数的小改动会长成 2838 行 (复盘)
+
+| # | 原因 |
+|---|---|
+| 1 | **方法论被满负荷套在一个 bug 修复上** —— 十步循环 + 多轮收敛审计是给实质性变更设计的 |
+| 2 | **AI 从未质疑这件事** —— 每个岔路口都在问「流程内选哪条」, 从没问「这个修复需不需要这套流程」。更糟: 规范逐字写着「简单修复 → 直接开发, 跳过 Spec」, 而 AI **两次把它从选项集里拿掉**并称之为「逐字排除」(该陈述为假, 见 `DEC-20260816-002 §1.1`) |
+| 3 | **审计开始审自己** —— Spec 一大, 每轮修复引入的新问题与修掉的约等量 (53%→70%→71%→73%), 大部分 finding 关于文档内部一致性 |
+| 4 | **拆分是净负的** —— 拆前不存在「谁改手册」「那两处归谁」这类问题, 拆后才有; 它们最终成了阻断项 |
+
+**最终账**: 九轮 45 席 + 15 席 + 4 席 + 1 席 · 85 份审计报告 · 5 份裁定文档 · **代码 0 行**, 历时 8 天;
+改用「直接修」后 **327 行改动 / 约 1 小时**。
+
+---
+
+## 4. 真正剩下的事 (轻量 follow-up, ⛔ 不是必走流程)
+
+`gate_check()` 与散文流程两份实现**都已加固**, #137 的缺陷面已闭合。以下是**可选的质量改进**,
+不构成任何闸门:
+
+1. **散文流程收敛为强制 helper 调用** —— 现在两份实现仍并存 (只是都对了)。彻底解法是让散文流程
+   直接调 `pre_merge_gate.py` 而不是让 AI 敲命令。**价值真实, 但不紧急。**
+2. **`--main-branch` 改必填** —— 纵深防御第二层, 防「显式传错分支名」。**破坏性变更**, 需单独定档。
+3. **`v2.0` 弃用到期承诺** (`pre_merge_gate.py:68/:116` 的 legacy key 别名) —— 只在真发 MAJOR 时触发。
+4. **`.aria/config.template.json` 仍带两个 legacy key** —— 影响**新采用方**: 若将来 legacy 别名被删,
+   照模板复制的采用方第一次跑 gate 即硬失败。**这条对外, 值得单独开 issue。**
+
+---
+
+## 5. 方法论侧的三条结论 (owner 已同意)
+
+1. **审计的对象要换** —— 一条 finding 若不影响「代码会不会写错」, 就不该记为 blocker。
+   按此判据, 最后一轮那 26 条大约只剩 3–5 条。
+2. **bug 修复不该走需求变更的流程** —— 判据可以很简单: **有没有新增用户能感知的能力?**
+   没有就是修复。#137 没有 —— 它只是让一个本该拦的东西真的拦住。
+3. **规模大不该靠拆 Spec 解决, 该靠缩小一次交付的范围** —— 就像本次: 先只修核心, 其余挂着。
+
+---
+
+## 6. 关联
+
+- 裁定: [`DEC-20260816-002`](../../../docs/decisions/DEC-20260816-002-fix-first-outcome-oriented.md) (先修 bug) ·
+  [`DEC-20260816-001`](../../../docs/decisions/DEC-20260816-001-fifteen-pending-adjudications.md) (**已作废**) ·
+  [`DEC-20260813-001`](../../../docs/decisions/DEC-20260813-001-versioning-and-level-rulebook-precede-spec-a.md) ·
+  [`DEC-20260812-001`](../../../docs/decisions/DEC-20260812-001-premerge-gate-spec-split.md) (拆分)
+- 审计报告 85 份: `.aria/audit-reports/post_spec-R*-premerge-gate-*` / `post_planning-R*-premerge-gate-*`
+- issue: aria-plugin [#137](https://forgejo.10cg.pub/10CG/aria-plugin/issues/137)
