@@ -9,8 +9,10 @@
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
-> | `premerge-gate-mainbranch-failclosed` | `aria-runner-bot/023236f2` | **A.1-audit (blocked)** — 拆为 A/B 两 Spec | [2026-08-13](./2026-08-13-nine-rounds-two-specs-and-narrowing-the-owners-choices.md) |
+> | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **ship-done (v1.66.1, 29/29 task, cycle 完成, 待 Phase D 归档)** | [2026-08-16 (ship)](./2026-08-16-issue128-ship-v1.66.1-and-version-collision.md) |
+>
+> **2026-08-16 更新 #2 (aria-runner-bot/023236f2, 本轨会话收尾)**: **bare pointer 未动** —— #128 那份仍是全仓最新 (本轨 handoff 写于 08-16 深夜但内容截至 08-16)。本轨行改为 ✅ **shipped/done**: owner 一句「这么简单的东西为什么搞这么复杂」把整条轨从流程里拽出 —— 当天完成 **#137 修复 + 发版 v1.66.0 + 归档 2838 行规格 + 清空 10 件仓外积压**。⭐ 最该记的是那笔账: 112 行函数的改动造了 2838 行规格 / 85 份审计报告 / 5 份裁定, **代码 0 行 8 天**; 直接修 = **327 行 1 小时**。⚠️ 本轨已 done, **无未闭合 spec 任务**; 剩下的是 9 件新 issue 待裁 (`aria-plugin#147` 与 `Aria#181` 建议优先)。#128 行未动 (非本 track)。
 >
 > **2026-08-16 更新 (simonfish/bfe8285d, #128 ship session)**: bare pointer 改指 #128 ship handoff (全仓最新)。#128 **ship 完成 v1.66.1** (29/29 task): owner 4 复议裁定落实 (family 57 / newline 13 / SC-6 恒split 16 / SC-1 变体) + printf 族豁免 + **SC-8 median→min flaky 修复** + **ship 中途撞并发轨 v1.66.0 (#137) → 版本顺延重算 1.65.6→1.66.1** (三仓 rebase 改动面正交 + gitlink 完整无 orphaned) + 9 转出 issue (aria-plugin#138-146) + close #128 + 回填 Aria#170。cycle 完成, 剩 Phase D 归档。premerge-gate 行未动 (非本 track)。
 >
