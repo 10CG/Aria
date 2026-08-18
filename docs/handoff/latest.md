@@ -1,16 +1,18 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-16-issue128-ship-v1.66.1-and-version-collision.md](./2026-08-16-issue128-ship-v1.66.1-and-version-collision.md) — secret-guard-per-segment-evaluation (#128) @ phase=ship-done (v1.66.1, cycle 完成, 待 Phase D 归档) updated=2026-08-16
+**Latest**: [2026-08-18-issue128-phase-d-archive-and-sc9b-close.md](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) — secret-guard-per-segment-evaluation (#128) @ phase=D (status=done, SC-9b 复验 PASS + 归档完成, track 闭环) updated=2026-08-18
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
 > 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
-> **两条在飞的 track**:
+> **track 状态 (在飞 0 条: premerge-gate 2026-08-16 终结 / #128 2026-08-18 终结)**:
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
-> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **ship-done (v1.66.1, 29/29 task, cycle 完成, 待 Phase D 归档)** | [2026-08-16 (ship)](./2026-08-16-issue128-ship-v1.66.1-and-version-collision.md) |
+> | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **✅ done (2026-08-18 归档, track 终结)** | [2026-08-18 (Phase D)](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) |
+>
+> **2026-08-18 更新 (simonfish/bfe8285d, #128 Phase D session)**: bare pointer 改指 #128 Phase D handoff (全仓最新)。**#128 track 终结**: SC-9b 复验 PASS (plugin 刷新后 cmp 字节相同 + 活体 harness 链拦截 #170 形态) + TASK-028 回填 + spec 归档 `openspec/archive/2026-08-18-*` (gate verdict=warn, tracker Aria#183) + claim 释放 (含 sweep 5 / gc 24)。rebase 时合入并发轨 08-16 #2 更新 (premerge-gate 行取其版本): 该轨亦已 shipped/done ⇒ **两条 track 均已终结, 在飞 0 条**。
 >
 > **2026-08-16 更新 #2 (aria-runner-bot/023236f2, 本轨会话收尾)**: **bare pointer 未动** —— #128 那份仍是全仓最新 (本轨 handoff 写于 08-16 深夜但内容截至 08-16)。本轨行改为 ✅ **shipped/done**: owner 一句「这么简单的东西为什么搞这么复杂」把整条轨从流程里拽出 —— 当天完成 **#137 修复 + 发版 v1.66.0 + 归档 2838 行规格 + 清空 10 件仓外积压**。⭐ 最该记的是那笔账: 112 行函数的改动造了 2838 行规格 / 85 份审计报告 / 5 份裁定, **代码 0 行 8 天**; 直接修 = **327 行 1 小时**。⚠️ 本轨已 done, **无未闭合 spec 任务**; 剩下的是 9 件新 issue 待裁 (`aria-plugin#147` 与 `Aria#181` 建议优先)。#128 行未动 (非本 track)。
 >

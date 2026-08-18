@@ -627,7 +627,16 @@ tasks:
       - "经 harness hook 链复验 ≥1 条本 spec 新增拦截形态"
       - "四分判定: BLOCKED-BY-ENV (未 ship 且字节不同) / PASS / FAIL (字节相同但未拦住) / **FAIL-DELIVERY (已 ship 但字节不同 = Aria#172 本体)**"
     gate: "⛔ **不计入 Phase C 合并门槛** — cmp 不一致在 Phase B/C 窗口期是结构必然 (本 spec 第一步就把 SOT bump 了, cache 要等 merge→push→marketplace 刷新→按新版本号建目录整条链走完)。"
-    notes: "FAIL-DELIVERY 分支须引 plugin-cache-currency 探针作机械前置, 不得只凭「经 marketplace 刷新后」这句无校验的前置条件。"
+    notes: "FAIL-DELIVERY 分支须引 plugin-cache-currency 探针作机械前置, 不得只凭「经 marketplace 刷新后」这句无校验的前置条件。
+      【2026-08-18 复验回填, 四分判定 = PASS】ship 时 (2026-08-16) 判 BLOCKED-BY-ENV (cache 仅 1.63.0/1.65.5);
+      owner 2026-08-18 刷新 marketplace + /plugin update 建 1.66.1 目录后复验:
+      (1) 机械前置 plugin-cache-currency 转 PASS (installed=1.66.1 = SOT);
+      (2) cmp 指名版本目录 cache/.../aria/1.66.1/hooks/secret-guard.sh vs canonical (aria @ 3b97c35) 字节相同;
+      (3) harness hook 链实测新增拦截形态 — #170 compound-credit 形状
+      'nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2' 被活体 PreToolUse 链 BLOCKED,
+      报错含逐段定位 'Triggering segment: nomad var put p2 @f2' (#128 独有行为);
+      对照: 同形态 1.65.5 副本直调 exit 0 (旧版确实漏) / 1.66.1 直调 exit 2 / 单段基线两版均 2 / 合规写法 exit 0。
+      无需重启 session (CLAUDE_PLUGIN_ROOT 调用时解析至 1.66.1)。"
 
 # ══════════════════════════════════════════════════════════════════
 # 执行顺序 (来自 proposal.md ##Tasks 末尾的顺序表 — 编号序 ≠ 执行序)
