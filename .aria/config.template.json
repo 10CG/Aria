@@ -69,13 +69,15 @@
     ]
   },
   "phase_c_integrator": {
-    "_comment": "v1.3.0+ — Forgejo Issue #60 phase-c-integrator pre-merge gate (consume aether --in-flight primitive)",
+    "_comment": "v1.3.0+ — Forgejo Issue #60 phase-c-integrator pre-merge gate; v1.31.0+ CI backend 抽象层键名: ci_backends (null=auto-detect / []=显式禁用 / [{name:...}]=显式列表) + no_ci_fallback。旧键 primitive_preference / no_aether_fallback **已退役并从本模板移除** (Aria #181): alias 仍被 _normalize_config 读取但每次运行发 DeprecationWarning, v2.0 移除。",
     "pre_merge_gate": {
       "enabled": true,
-      "primitive_preference": [
-        "aether-ci-cli"
+      "ci_backends": [
+        {
+          "name": "aether-ci-cli"
+        }
       ],
-      "no_aether_fallback": "skip_with_warning",
+      "no_ci_fallback": "skip_with_warning",
       "wait_timeout_seconds": 1800,
       "wait_check_intervals": [
         30,

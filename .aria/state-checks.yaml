@@ -241,6 +241,28 @@ checks:
     enabled: true
 
   # --- 运行时 plugin 版本 vs 仓内 SOT (Aria #172: "ship 了" ≠ "本仓用上了") ---
+  - name: "config-template-key-currency"
+    description: |
+      Aria #181 机械兜底: 断言 .aria/config.template.json 的 phase_c_integrator.
+      pre_merge_gate 段 (a) 经 _normalize_config 零 DeprecationWarning — 模板分发
+      弃用键 = 把 deprecation 警告直接发给新采用方; (b) 全部键 ∈ DEFAULT_CONFIG ∪
+      {_comment} — 代码改键名而模板没跟时, 在 alias 存在前就先红。本类缺陷本仓 live
+      config 恒 0 命中 (受影响的全是仓外采用方), dogfood 发现不了, 只能机械看模板。
+      作用域 = 仅 pre_merge_gate 段 (事故发生段 + 仓内唯一有 DEFAULT_CONFIG 注册表
+      可比对的段; 其他段无 schema 注册表, 全模板断言不可 fail-closed 实现)。
+      判据分割: 模板/段/导入缺失 → SKIP (零证据不当正证据); 弃用键或未知键 → FAIL。
+      拒绝能力已验: 旧键合成模板 FAIL (2 warning + 2 unknown) / 漂移键合成模板 FAIL。
+    command: |
+      python3 .aria/probes/config-template-key-currency.py
+    severity: warning
+    fix: |
+      模板键落后代码: 把 .aria/config.template.json 中被点名的键改为 FAIL 文案里
+      DeprecationWarning 指出的新键名 (值语义对照 pre_merge_gate._translate_value),
+      并在段 _comment 里补一句退役说明 (体例见 sync_check 段 _comment 的 F2′ 先例)。
+      未知键: 对照 pre_merge_gate.DEFAULT_CONFIG 勘正拼写或删除。参考 Aria #181。
+    timeout_seconds: 10
+    enabled: true
+
   - name: "plugin-cache-currency"
     description: |
       比对 Claude Code 实际加载的 aria-plugin 版本 (installed_plugins.json 记录,
