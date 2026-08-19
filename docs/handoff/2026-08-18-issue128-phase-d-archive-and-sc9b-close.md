@@ -36,10 +36,10 @@ updated-at: 2026-08-18T13:30:24Z
 
 ## §2 未完成 / Carry-forward 清单 (全部承前 2026-08-16 handoff §2/§6)
 
-- 🟡 **SC-8 median→min 待 owner 最终确认** — proposal SC-8 统计量口径已改 min 并 ship; owner 尚未单独确认。若倾向保 median 须加 N (实测 N=60 median 稳 +26.5%, 回归 6×)。spec 已归档, 若需改动走新 Level 1/2。
+- ✅ **SC-8 median→min: owner 2026-08-19 确认采 min 口径** (原为 🟡 待确认项, 已中和; 无需加 N 保 median, 已 ship 的 min 口径即终态)。
 - 🟡 (可选) **9 转出 issue (aria-plugin#138-146) 高优先 triage**: #138 跨段 fail-open (架构, 需完整 shell 解析) / #145 BLOCKED 回显 Rule #7。
 - 🟡 (承前, **性质已变**) **并发轨 premerge-gate 合看** — 本 session 推送时撞其 08-16 收尾 commit (`970982b`) 才得知: 该轨已终结 (owner 直修 #137 当天 ship v1.66.0, 两 Spec 2838 行归档)。原「合看」项失效; 剩余是其 9 件新 issue 待裁 (aria-plugin#147 / Aria#181 建议优先), 见 [其 2026-08-16 handoff](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md)。
-- 🟡 Archive tracker #183: 3 条 unverified claims 的人工复核状态已记录 (SC-9b 本 session PASS; SC-13/性能实测见 2026-08-16 handoff §1), owner 认可后可关闭。
+- ✅ Archive tracker #183: 3 条 unverified claims 的人工复核状态已记录 (SC-9b 本 session PASS; SC-13/性能实测见 2026-08-16 handoff §1); **owner 2026-08-19 认可并指示关闭, 已关**。
 
 ## §3 关键决策 / 经验
 
@@ -49,7 +49,7 @@ updated-at: 2026-08-18T13:30:24Z
 ## §6 Next session 入口 + 优先级建议
 
 入口: `/aria:state-scanner`。#128 track 已终结, 无本轨后续。可选方向 (均待 owner 定):
-1. SC-8 min 口径确认 (§2 第 1 条);
+1. ~~SC-8 min 口径确认~~ (✅ owner 2026-08-19 已确认采 min, §2 第 1 条);
 2. premerge-gate 轨遗留 issue 裁定 (§2 第 3 条: 该轨已终结, aria-plugin#147 / Aria#181 优先);
 3. aria-plugin#138-146 triage;
 4. M6 三门 (Blocker 3/4 / 遥测独立 ship) 仍卡 owner/基建, 非 AI 侧可动。
