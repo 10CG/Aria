@@ -37,7 +37,7 @@ updated-at: 2026-08-20T01:40:00Z
 
 - 🟡 **`plugin-cache-currency` STALE (结构窗口)**: installed 1.66.1 < SOT 1.66.2 — 待 marketplace 刷新后 `/plugin update`, 并复验 v1.66.2 行为 (BLOCKED 回显应为 `value=[REDACTED]` 形态)。与 #128 ship 后同款窗口。
 - 🟡 **aria-plugin#152 待裁**: gate 盲区修法三候选 (A. path_coverage 感知首推 / B. 文档处方 / C. 上游)。A 最治本。
-- 🟡 **runner registration token 已回显进对话** (见 §3 事故) — 建议 owner 在 Forgejo UI 重新生成使旧值作废。
+- 🟡 **runner registration token 已回显进对话** (见 §3 事故 + §6 防御三层) — token 本体仍待 owner 在 Forgejo UI 重新生成作废 (三层防御已 ship 但不追溯已泄值)。
 - 🟡 backlog 余量: aria-plugin#150 (Rule #6 判据表缺口, 规则层) / #139-144/#146/#132 (secret-guard 转出族) / Aria#180 (heartbeat 零调用, 本次撞车的间接根因) / Aria#182 (handoff status 不收口) 等。
 - ⏸️ M6 三门照旧卡 owner/基建, 非 AI 侧可动。
 - (未做) D.4 estimator capture — 本批为无 spec 的 Level 1 批次, 无 spec-slug 锚点; advisory 跳过, 在此留痕。
@@ -65,6 +65,13 @@ Forgejo: #181/#147/#145 closed (评论在案) | #152 opened | #138 spike comment
 ## §5 Next session 入口
 
 入口: `/aria:state-scanner`。候选优先级: ① marketplace 刷新后复验 v1.66.2 (SC-9b 同款四分判定); ② #152 裁定; ③ registration token 作废确认; ④ backlog (§2)。
+
+## §6 续 (同 session 第二批): 凭据回显防御三层 (owner 裁定「L3 单独立 + 现在修 L1/L2」)
+
+- **L1 ✅ ship v1.66.3** (aria `c7a37e2` + tag / 主仓 `451aba0` / standards `faaede2`): secret-guard 增 Forgejo 凭据响应端点族 3 pattern (+12 用例, 5 block 基线红; census 族基线 57→60 显式过账; 552/552 全绿)。#153 closed。gate green 经 not_applicable (hooks/** 零 CI 覆盖, 依契约 surface 留痕)。
+- **L2 ✅ merge Aether `08d9700`** (PR #318, RED `252efe7` → GREEN `f475cdd`): wrapper 方法感知 DENY (registration-token 全方法 / tokens+oauth2 仅写方法 — GET 枚举是轮换在册步骤, 保持放行且脱敏生效) + 打印点字段脱敏 (`[REDACTED-BY-WRAPPER len=N]`, 四打印点, 自愈读变量不受影响) + `FORGEJO_RAW=1` 逃生舱。16 断言 + cf403 回归绿; aether-cli 自带 HTTP 不受影响 (forgejo_impl.go 已核)。安装副本已同步 byte-identical; **活体验证: 事故原命令现 exit 3 被拒**。#317 closed。
+- **L3 ⏳ #154 已范围修正** (comment 19339): 实测发现 tripwire **已存在** (`secret-scan.sh`, 本 session 真触发过) 但 registration-token JSON 形状活体复现穿过 — 缺口 = 无通用 JSON 凭据键模式 (全是 provider 前缀)。交付物收窄为「补键形模式 + FAKE 白名单 + 日志 sha256 留痕」, 待排期。
+- ⚠️ 本批自身留痕: 我在 L2 测试 fixture 里曾复用真实泄漏 token 前 6 字符 (secret-scan 抓到, 已换 ZZZZZZ — fixture 值必须与真值零关联); Aether 仓无 github 镜像 (`push_mirrors=[]`), 单推 origin 即为全同步面。
 
 ## Cross-references
 
