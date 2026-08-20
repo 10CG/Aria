@@ -1,16 +1,19 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-18-issue128-phase-d-archive-and-sc9b-close.md](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) — secret-guard-per-segment-evaluation (#128) @ phase=D (status=done, SC-9b 复验 PASS + 归档完成, track 闭环) updated=2026-08-18
+**Latest**: [2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) — issue-batch-181-147-145-triage-fixes @ phase=shipped (v1.66.2 三 ship + #152 立案, track 终结) updated=2026-08-20
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
 > 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
-> **track 状态 (在飞 0 条: premerge-gate 2026-08-16 终结 / #128 2026-08-18 终结)**:
+> **track 状态 (在飞 0 条: premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 均终结)**:
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **✅ done (2026-08-18 归档, track 终结)** | [2026-08-18 (Phase D)](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) |
+> | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
+>
+> **2026-08-20 更新 (simonfish/023236f2, issue-batch 收尾)**: bare pointer 改指本轨 2026-08-20 handoff (全仓最新)。本轨 = 4 件 triage 全裁 + #181 修关 (主仓 fd594bc) + **aria-plugin v1.66.2 ship** (#147+#145, aria 5c32ac7 / standards c8ff650 / 主仓 085196d) + #138 spike 数据归档 + **aria-plugin#152 立案** (Rule #8 gate 盲区: 新分支首推不评 paths 过滤; 本次先误诊 runner 停摆)。⚠️ 两件请 owner 过目: runner registration-token 曾回显进对话 (请重新生成作废) · 「先修 runner 再 ship」按意图执行为「CI 真绿再 ship」(新 handoff §3 请复议)。既有各行未动 (非本 track)。
 >
 > **2026-08-18 更新 (simonfish/bfe8285d, #128 Phase D session)**: bare pointer 改指 #128 Phase D handoff (全仓最新)。**#128 track 终结**: SC-9b 复验 PASS (plugin 刷新后 cmp 字节相同 + 活体 harness 链拦截 #170 形态) + TASK-028 回填 + spec 归档 `openspec/archive/2026-08-18-*` (gate verdict=warn, tracker Aria#183) + claim 释放 (含 sweep 5 / gc 24)。rebase 时合入并发轨 08-16 #2 更新 (premerge-gate 行取其版本): 该轨亦已 shipped/done ⇒ **两条 track 均已终结, 在飞 0 条**。
 >
