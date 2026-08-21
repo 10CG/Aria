@@ -37,7 +37,7 @@ updated-at: 2026-08-20T01:40:00Z
 
 - 🟡 **`plugin-cache-currency` STALE (结构窗口)**: installed 1.66.1 < SOT 1.66.2 — 待 marketplace 刷新后 `/plugin update`, 并复验 v1.66.2 行为 (BLOCKED 回显应为 `value=[REDACTED]` 形态)。与 #128 ship 后同款窗口。
 - 🟡 **aria-plugin#152 待裁**: gate 盲区修法三候选 (A. path_coverage 感知首推 / B. 文档处方 / C. 上游)。A 最治本。
-- 🟡 **runner registration token 已回显进对话** (见 §3 事故 + §6 防御三层) — token 本体仍待 owner 在 Forgejo UI 重新生成作废 (三层防御已 ship 但不追溯已泄值)。
+- ✅ **registration token 事件闭环 (2026-08-21)**: owner 经 UI 重置作废 (simonfish, repo admin 已核) + 主机侧 5/5 runner 逐台进容器对账 (aether-runner-1..5 @ heavy-1..5 .80-.84, 泄漏窗口零陌生注册)。⚠️ 顺带发现拓扑文档漂移: heavy 已扩 5 节点, aether-status skill 文档与 memory 原记 3 节点 (memory 已更正; Aether 侧文档待其自修)。
 - 🟡 backlog 余量: aria-plugin#150 (Rule #6 判据表缺口, 规则层) / #139-144/#146/#132 (secret-guard 转出族) / Aria#180 (heartbeat 零调用, 本次撞车的间接根因) / Aria#182 (handoff status 不收口) 等。
 - ⏸️ M6 三门照旧卡 owner/基建, 非 AI 侧可动。
 - (未做) D.4 estimator capture — 本批为无 spec 的 Level 1 批次, 无 spec-slug 锚点; advisory 跳过, 在此留痕。
