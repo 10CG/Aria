@@ -1,3 +1,7 @@
+---
+archive_type: implementation-deferred
+archived_reason: "SUPERSEDED-BY-SHIP: 并发轨已于 2026-08-19 直接修复并 ship aria-plugin v1.66.2 (aria de1eba5, 11 调用点 errors=replace + repo-wide AST 守卫, Closes aria-plugin#147); owner 2026-08-21 裁定归档 design-only 存档追溯。残值项处置: traps#5 已修 (aria 6e2adc8), 其余备忘 Aria#185。"
+---
 # subprocess 解码加固: 结构性消除 text=True 解码异常 (aria-plugin #147)
 
 > **Level**: Minimal (Level 2 Spec)
