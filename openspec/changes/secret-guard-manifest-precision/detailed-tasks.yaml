@@ -56,7 +56,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "SC-1 fixtures: 真实泄露形态 + 3 变体 (基线 RED)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: []
@@ -74,7 +74,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 2
     title: "Bash 面 claude-config pattern (12 reader + jq) + :785/:786 源组扩展"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-001]
@@ -93,7 +93,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 3
     title: "SC-3 fixtures: credit 收紧 9 条 (5 直接 + 2 行级排除 + 1 混合源 + 1 .env 对照)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-002]
@@ -111,7 +111,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 4
     title: "What.1b credit 收紧: 段内重匹配 claude-config 源名 → 收紧模式封闭白名单"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 5
     dependencies: [TASK-002, TASK-003]
@@ -130,7 +130,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "SC-2 fixtures: Read/Edit 嵌套探针 ×3 (基线 RED) + ACK 成对 2 例 (无 nonce RED / 有 nonce 恒绿)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: []
@@ -147,7 +147,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 2
     title: "Read/Edit 面 :546 正则追加 claude-config 三条目"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 1
     dependencies: [TASK-005]
@@ -164,7 +164,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 1
     title: "路径清单型 pattern 行枚举 (适用面点名落盘)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: []
@@ -182,7 +182,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 2
     title: "SC-5 误杀守卫 fixtures (基线 GREEN, 先于 pattern 改动)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-007]
@@ -198,7 +198,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 2
     title: "SC-4 fixtures: issue 形态 + 3 变体 + 多行 + .env 面 (基线 RED)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-007]
@@ -215,7 +215,7 @@ tasks:
     exec_phase: "B-实现"
     exec_order: 5
     title: "前置字符白名单实现 (枚举行逐行应用)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 6
     dependencies: [TASK-008, TASK-009, TASK-002]
@@ -235,7 +235,7 @@ tasks:
     exec_phase: "B-验证"
     exec_order: 6
     title: "基线计数实测 @400f0bc + 全量回归 (SC-6)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-004, TASK-006, TASK-010]
@@ -252,7 +252,7 @@ tasks:
     exec_phase: "B-验证"
     exec_order: 7
     title: "文档同步: hook 头注释 (条目 + 已知限三类) + secret-hygiene.md 计数 (SC-7, 换人执笔)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-011]
@@ -271,7 +271,7 @@ tasks:
     exec_phase: "ship-前"
     exec_order: 8
     title: "版本 re-check + bump (aria 5 SOT + CHANGELOG 两类)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-000, TASK-012]
@@ -288,7 +288,7 @@ tasks:
     exec_phase: "ship-时"
     exec_order: 9
     title: "三仓本地合并 + 双推 + ls-remote + gitlink 完整性 + 主仓同步面"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-013]
@@ -305,7 +305,7 @@ tasks:
     exec_phase: "ship-后"
     exec_order: 10
     title: "交付面复验 (cmp 指名版本目录 + 活体 harness ≥1 新拦截形态, #178/#128 SC-9b 同款)"
-    status: pending
+    status: pending   # BLOCKED-BY-ENV: cache 尚无 1.66.4 目录 (marketplace 刷新后跑 cmp + 活体 harness 复验)
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-014]
@@ -324,7 +324,7 @@ tasks:
     exec_phase: "ship-后"
     exec_order: 10
     title: "close #179 + D.2b release claim + 已知限是否立案"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-014]
