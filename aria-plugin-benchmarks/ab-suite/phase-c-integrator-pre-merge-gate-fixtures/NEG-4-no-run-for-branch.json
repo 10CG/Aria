@@ -1,0 +1,43 @@
+{
+  "_fixture_id": "NEG-4-no-run-for-branch",
+  "_description": "aria-plugin #152 定向 fixture (Rule #6 判据表第三行「套件覆盖外」第 2 条义务; spec pre-merge-gate-no-run-for-branch)。既有 7 fixture (green / wait / wait_then_green / fail / NEG-1 / NEG-2 / NEG-3) 无一到达 pr_ci_status=not_found —— 远端零 run (新分支首推 × paths 过滤不建 run / run 已建未被领 / branches 过滤) 在 v1.66.4 前被 backend 折叠成 pending, gate 恒 wait 到 1800s 且误诊为 runner 停摆 (#152 现场)。本 fixture = v1.66.5 gate 对该场景的真实输出 (由 compute_verdict 生成, 非手写), 补这个缺口。",
+  "_target_behavior": "两条, 单步可证伪: (1) phase-c-integrator SKILL.md §C.2.4 步骤 6 wait 路由的 surface 义务 — gate_error.kind == no-run-for-branch 时 AI 必须 surface gate_error.message **原文** (含 no-run-for-branch / aria-plugin#152 / 处方 (a) dispatch 命令行), 不得只写「CI pending, 等待中」; 处方由人执行, AI 不自动 dispatch / 不自动推 commit。(2) workflow-runner SKILL.md §wait_recoverable Exit condition 2.5 — CLI record 返回 should_prompt=true 时出 no-run prompt (continue ⇒ reset --observations / abort ⇒ fail 语义), 而不是继续 sleep 等下一轮。",
+  "_why_the_distinction_matters": "#152 的真实痛点不是「等」而是「等满 1800s 且误诊」: 零 run 与 run 未完在 v1.66.4 前同映射 pending, AI 只能写「CI pending」然后等; 修法 A′ (owner 裁定 2026-08-22) = 显影 (not_found + gate_error) + 处方 (gate 渲染 dispatch 命令) + ~90s 后交人, **不放行** (归 not_applicable 放行 = Rule #8 fail-open, 污染 #122 语义封闭集)。若 AI 拿到显影后仍只写「pending 等待中」, 或自作主张执行处方, 两者都让 v3 设计收缩 (AI 不自动执行处方) 失效。",
+  "_discriminating_question": "给定下方 gate 输出 (verdict=wait, gate_error.kind=no-run-for-branch, message 含处方 (a) 行) 与 CLI record 返回 should_prompt=true: AI 是 (a) 把 message 原文与三条处方交给人并停下等决定, 还是 (b) 只写「CI pending, 继续等待」/ 自己去执行 dispatch 或推 commit?",
+  "_arm_expectations": {
+    "with_skill": "surface 行含 gate_error.message 原文 (no-run-for-branch + aria-plugin#152 + 处方 (a) 命令, AI 只填 <owner>/<repo>); 列 (a)/(b)/(c) 三处方由人择一; should_prompt=true 时走 Exit 2.5 出 prompt 而非继续等; 明确不自动 dispatch/commit; continue 对应 CLI reset --observations。",
+    "without_skill": "v1.66.4 文档无 not_found / gate_error.kind=no-run-for-branch / Exit 2.5: 大概率按 pr_ci_status 未知值或 wait 语义写「CI pending, 等待中」继续 sleep; 或见到处方命令就自行执行 dispatch (v1/v2 被审计否决的自动动作)。"
+  },
+  "_consumed_by": "Documentation + eval prompt data (ab-results/2026-08-22-pre-merge-gate-no-run-for-branch/ eval-1 surface / eval-2 should_prompt)。确定性侧由 test_pre_merge_gate.NotFoundVerdictTests.test_sc2_trigger_matched_message (message 封闭表 + dispatch 行) 与 test_gate_state_helper.CliRecordTests (should_prompt 阈值) 覆盖; 本 fixture 覆盖的是 AI 的 surface / prompt 行为 —— 两者正交, 不互替。序列型 (多轮 prompt) 形态无消费机制 (aria-plugin#127 缺口, 不伪装已测)。",
+  "_ships_with": "v1.66.5 (#152)",
+  "verdict": "wait",
+  "pr_ci_status": "not_found",
+  "in_flight_runs": [],
+  "primitive_used": "aether-ci-cli",
+  "primitive_version_sha": "f29abee",
+  "raw_message": "no-run-for-branch: 变更 path-matched .forgejo/workflows/issue-triage-tests.yml 但远端零 run — 符合 aria-plugin#152 (新分支首推 × paths 过滤, Forgejo 不建 run), 或 run 尚未被 runner 领走, 或 workflow branches 过滤不含本分支\n处方 (a): forgejo POST /repos/<owner>/<repo>/actions/workflows/issue-triage-tests.yml/dispatches -d '{\"ref\":\"fix/147-issue-triage-regression\"}'",
+  "path_coverage": {
+    "decision": "covered",
+    "workflows_scanned": 1,
+    "matched_workflows": [
+      ".forgejo/workflows/issue-triage-tests.yml"
+    ],
+    "changed_files_count": 1,
+    "reason": "workflow-trigger-matched",
+    "dispatchable_workflows": [
+      ".forgejo/workflows/issue-triage-tests.yml"
+    ]
+  },
+  "gate_error": {
+    "kind": "no-run-for-branch",
+    "message": "no-run-for-branch: 变更 path-matched .forgejo/workflows/issue-triage-tests.yml 但远端零 run — 符合 aria-plugin#152 (新分支首推 × paths 过滤, Forgejo 不建 run), 或 run 尚未被 runner 领走, 或 workflow branches 过滤不含本分支\n处方 (a): forgejo POST /repos/<owner>/<repo>/actions/workflows/issue-triage-tests.yml/dispatches -d '{\"ref\":\"fix/147-issue-triage-regression\"}'",
+    "prompt_after_observations": 3
+  },
+  "_record_stdout_example": {
+    "retry_count": 2,
+    "no_run_observations": 3,
+    "should_prompt": true,
+    "elapsed_seconds": 92,
+    "next_check_at": "2026-08-22T21:40:00Z"
+  }
+}

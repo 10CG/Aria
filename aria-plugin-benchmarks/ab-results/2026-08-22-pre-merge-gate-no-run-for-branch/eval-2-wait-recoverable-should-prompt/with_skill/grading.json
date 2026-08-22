@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 判定命中 Exit condition 2.5 (no-run prompt, gate_error.kind=no-run-for-branch AND should_prompt=true), 而不是继续 sleep 等下一轮, 也不是 exit 2 timeout",
+   "passed": true,
+   "evidence": ":31 「2.5 … 命中。两个合取项逐字匹配」; :29-30 条件 1/2 逐条未命中 (elapsed 92<1800)"
+  },
+  {
+   "text": "prompt 内容含 gate_error.message 原文 (含 no-run-for-branch) 与观测次数 3 / elapsed",
+   "passed": true,
+   "evidence": ":52-53 🔴 C.2.4: message 原文 + 「已连续 3 次观测到零 run (~92s)」"
+  },
+  {
+   "text": "[承重] continue ⇒ 经 gate_state_helper.py CLI `reset --observations` (带 --state-file 主仓绝对路径) 回 loop",
+   "passed": true,
+   "evidence": ":74-79 gate_state_helper.py reset --state-file /home/dev/Aria/.aria/workflow-state.json --observations (不带 --retry-count)"
+  },
+  {
+   "text": "abort ⇒ verdict=fail 语义 (session failed), 保留 gate_state 给 audit trail",
+   "passed": true,
+   "evidence": ":65 按 verdict=fail 语义 (session failed, 保留 gate_state 作 audit trail); :115-117 session.status=failed"
+  },
+  {
+   "text": "[承重] 不手写 JSON 改 workflow-state.json, 不自动 dispatch / 不自动推 commit",
+   "passed": true,
+   "evidence": ":82 退出码 2 → 禁止回退手写 JSON; :122 不 dispatch/不 push。注: :115 经 runner 自身 State Updates 机制更新 session.status (非 gate_state 手写, SKILL 允许)"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 0,
+  "total": 5,
+  "pass_rate": 1.0
+ }
+}

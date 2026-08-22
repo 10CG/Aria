@@ -1,0 +1,7 @@
+{
+  "retry_count": 2,
+  "no_run_observations": 3,
+  "should_prompt": true,
+  "elapsed_seconds": 92,
+  "next_check_at": "2026-08-22T21:40:00Z"
+}

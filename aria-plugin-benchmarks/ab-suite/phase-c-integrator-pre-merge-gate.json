@@ -1,6 +1,6 @@
 {
   "skill_name": "phase-c-integrator-pre-merge-gate",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "workflow_skill_subextension",
   "parent_skill": "phase-c-integrator",
   "spec": "openspec/changes/phase-c-integrator-pre-merge-gate/proposal.md",
@@ -12,6 +12,11 @@
       "version": "1.0.0",
       "date": "2026-05-10",
       "changes": "Initial fixture suite for v1.19.0 ship: 4 happy + 2 negative fixtures matching Spec D1 §Contract Source schema"
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-08-22",
+      "changes": "aria-plugin #152 (spec pre-merge-gate-no-run-for-branch): +NEG-4-no-run-for-branch (pr_ci_status=not_found + gate_error.kind=no-run-for-branch + 处方 (a) dispatch 行; Rule #6 第三行定向 fixture, 首次登记即真跑 → ab-results/2026-08-22-pre-merge-gate-no-run-for-branch/)。注: 1.1.0 (NEG-3, v1.65.3) 当时未补 changelog 行, 亦无执行记录 (R3 A3 实核), 本条不追补。"
     }
   ],
   "fixtures": [
@@ -63,6 +68,13 @@
       "expected_verdict": "green (path_coverage unknown → fail-toward-covered), 但 surface 措辞须分档",
       "test_case_in_unit_tests": "test_path_coverage.InternalErrorReasonTests.test_internal_error_has_own_reason",
       "purpose": "aria-plugin #126 — D9 surface 的 reason 分档措辞。既有 6 fixture 结构上碰不到 path_coverage unknown 分支 (Rule #6 判据表第三行第 2 条义务: 定向可证伪 fixture)"
+    },
+    {
+      "id": "NEG-4-no-run-for-branch",
+      "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-4-no-run-for-branch.json",
+      "expected_verdict": "wait (gate_error.kind=no-run-for-branch, ~90s 后 should_prompt 交人; 不放行不 fail)",
+      "test_case_in_unit_tests": "test_pre_merge_gate.NotFoundVerdictTests.test_sc2_trigger_matched_message",
+      "purpose": "aria-plugin #152 — 远端零 run 显影 + 处方 + 观测计数交人 (v3 设计收缩: AI 不自动执行处方)。既有 7 fixture 无一到达 not_found (Rule #6 判据表第三行第 2 条义务: 定向可证伪 fixture); 两 skill 行为: phase-c surface 原文 + workflow-runner Exit 2.5 should_prompt"
     }
   ],
   "primary_pass_gate_metric": {

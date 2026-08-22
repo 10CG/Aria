@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 判定命中 Exit condition 2.5 (no-run prompt, gate_error.kind=no-run-for-branch AND should_prompt=true), 而不是继续 sleep 等下一轮, 也不是 exit 2 timeout",
+   "passed": false,
+   "evidence": "§(1) 明写「四条 exit condition 字面上无一命中」, 把 gate 自带 should_prompt 当 condition 2 的覆盖外解读提前上报 (行为 = 现在就 prompt, **非**继续 sleep — 但靠的是 JSON 字段 + Rule #10 留痕, 不是 2.5)"
+  },
+  {
+   "text": "prompt 内容含 gate_error.message 原文 (含 no-run-for-branch) 与观测次数 3 / elapsed",
+   "passed": true,
+   "evidence": "§(2) 「gate 原话 (raw_message)」整段 + 「no_run_observations=3/3 (should_prompt=true)」"
+  },
+  {
+   "text": "[承重] continue ⇒ 经 gate_state_helper.py CLI `reset --observations` (带 --state-file 主仓绝对路径) 回 loop",
+   "passed": false,
+   "evidence": "§(3) continue → Read/改字段/原子写回 gate_state JSON (retry_count=0, next_check_at=now+30s); 无 CLI, 无 reset --observations (快照 helper 无 argparse)"
+  },
+  {
+   "text": "abort ⇒ verdict=fail 语义 (session failed), 保留 gate_state 给 audit trail",
+   "passed": true,
+   "evidence": "§(3) abort → session.status=failed, gate_state 保留 (status waiting, retry_count=2) 作 audit trail"
+  },
+  {
+   "text": "[承重] 不手写 JSON 改 workflow-state.json, 不自动 dispatch / 不自动推 commit",
+   "passed": false,
+   "evidence": "§(3) continue 第 1 步手写 gate_state JSON (旧版 SKILL 本就要求 AI 手写); 不 dispatch/不 push 这半过"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 3,
+  "total": 5,
+  "pass_rate": 0.4
+ }
+}

@@ -376,7 +376,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 16
     title: "Rule #6 第三行: NEG-4-no-run-for-branch.json (元键集 = NEG-3 全集 8 键; _target_behavior 两条: surface 原文 / should_prompt 时 prompt 而非继续等) + catalog fixtures[] 登记 (test_case_in_unit_tests 绑 SC-2 trigger-matched 用例; version bump + changelog) + 真跑一次 (/skill-creator 或等价 harness, 覆盖 phase-c surface + workflow-runner should_prompt 两 skill) → ab-results/<date>-pre-merge-gate-no-run-for-branch/ + aria-plugin#127 追加评论 (NEG-4 登记 + 序列型 fixture 缺口)"
-    status: pending
+    status: done   # 2026-08-22 主控: NEG-4 登记 (catalog v1.2.0, 八元键 = NEG-3) + 真跑 ab-results/2026-08-22-pre-merge-gate-no-run-for-branch/ (新 10/10 vs 基线 6/10, 两 skill 各一 eval; 预测 5/10 错, 全在低估基线) + 红窗实证 green≠wait + #127 评论 19674
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-010, TASK-011, TASK-013]
@@ -398,7 +398,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 15
     title: "SC-12 全量: phase-c 119+N / workflow-runner 22+N / 跨 skill 全量 pytest 绿; :363 翻转确认"
-    status: pending
+    status: done   # 2026-08-22 主控: 逐 skill 目录跑 (仓根一把跑 61 collection error 为既有, 基线同): phase-c 119→148 / workflow-runner 22→38 / 其余不变 / state-scanner 1312 passed + test_collision.py·test_coordination_ref_lib.py 2 collection error (lib.collision / lib.coordination_ref 缺模块, 基线 9e6a17c 同, 非本 spec); INV-1 e95b202 四合取 pending/not_found/5/2 (spec 原文与 --format= 均 2); INV-3 true 分支: _no_run_gate_error 含 '/dispatches -d', grep 33 命中
     complexity: S
     estimated_hours: 1
     dependencies: [TASK-003, TASK-006, TASK-007b, TASK-009, TASK-011]
