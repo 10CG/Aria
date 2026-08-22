@@ -1,14 +1,14 @@
 # secret-guard: claude 配置文件入敏感清单 (双平面) + 参数位置误报收敛 (Aria #179)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: ✅ **Approved · Phase A 闭环 (A.1-A.3 完成, 2026-08-22)** — post_spec CONVERGED (R1→R2, 2 轮) + post_planning CONVERGED (R1 + 确认, 五轴 0 fail); `detailed-tasks.yaml` v2 17 任务 / 44h, ready for Phase B。**TASK-0 安全门仍待 owner 答复** (ship 前置门, 不阻塞 B.1-B.2 实现)
+> **Status**: ✅ **Approved · Phase A 闭环 (A.1-A.3 完成, 2026-08-22)** — post_spec CONVERGED (R1→R2, 2 轮) + post_planning CONVERGED (R1 + 确认, 五轴 0 fail); `detailed-tasks.yaml` v2 17 任务 / 44h, ready for Phase B。**TASK-0 已闭 (08-09 当日已轮换, 见 pending_owner 记录)**
 >
 > ```yaml
 > converged: true    # R1 3×REVISE (3C+6M+6m) → v2/v2.1 → R2 (A1 REVISE 2M / A2·A3 APPROVE) → v3 → 终判 3/3 PASS
 > rounds: 2
 > pending_owner:
 >   - "~~批准进 A.2~~ (✅ 2026-08-22)"
->   - "TASK-0 安全门 (ship 前置, 独立于批准): 核实 2026-08-09 泄露的 *_API_TOKEN 轮换状态 — R1 A3-C1: handoff 全量检索无轮换记录, 疑似活凭据"
+>   - "✅ TASK-0 已闭 (2026-08-22 核实): 泄露键 = NEXUS_API_TOKEN (settings.json env 唯一 token 键, Nexusm 记忆服务 nexus.internal.10cg.pub); 租户 API key 清单仅存 10cg-prod-dogfood-r20260809 (created 2026-08-09T16:25Z, 即 issue 提交 5h 后轮换, 旧 key 已不存在) — 轮换当日已完成, 缺的只是 handoff 记录; 另: Aether#283 把该 token 归为 nexus/devpi 镜像属误判, 实为 Nexusm 记忆服务"
 > ```
 > **Issue**: [Aria#179](https://forgejo.10cg.pub/10CG/Aria/issues/179) (triage: confirmed / major / next-cycle, 复现 4/4 @ 1.66.3, `.aria/triage-report-179.json`)
 > **认领**: track `secret-guard-manifest-precision` @ simonfish/bfe8285d (phase1_gate advisory, 2026-08-22, 无碰撞无同 issue 重叠)
