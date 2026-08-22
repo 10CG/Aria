@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) — secret-guard-manifest-precision (#179) @ phase=D (status=done, v1.66.4 ship + 归档, track 终结) updated=2026-08-22
+**Latest**: [2026-08-22-session-close-179-full-cycle-and-147-supersession.md](./2026-08-22-session-close-179-full-cycle-and-147-supersession.md) — session-close-20260822-179-cycle-147-supersession @ phase=session-close (status=done; 08-18→08-22 整段对话收尾, 周期账目在 #128/#179 周期 handoff) updated=2026-08-22
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -14,6 +14,8 @@
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-22 更新 #3 (simonfish/bfe8285d, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新, 覆盖 08-18→08-22 整段对话; 周期账目仍在 #128 08-18 / #179 08-22 两份周期 handoff)。会话层散项: #147 spec 被并发轨 v1.66.2 覆盖 (归档 design-only) / #181 triage / 僵尸 spec 归档 #186 / a1-entry C1-C2 裁定 / NEXUS token 核实已轮换 / **4 条新 memory**。并发轨 #152 已进 A.3 (目标 v1.66.5)。carry 全为 owner 复议项。既有各行未动。
 >
 > **2026-08-22 更新 #2 (simonfish/bfe8285d, #179 十步循环全程)**: bare pointer 改指 #179 Phase D handoff (全仓最新)。**#179 track 终结**: triage → spec (post_spec 2 轮) → A.2/A.3 (post_planning 1 轮+确认) → B (TDD 14 commit, 对抗 review 抓 1 处自洽假绿回归, Amendment-1/2) → **ship aria-plugin v1.66.4** (三仓双推核验) → 归档 + tracker #187。同 session: 僵尸 spec ci-path-coverage 归档 (#186) / a1-entry C1/C2 裁定 / NEXUS token 核实 08-09 已轮换。待 owner 复议: SC-8 五次性能数据 + Amendment 范围修正 (见 handoff §2)。既有各行未动。
 >

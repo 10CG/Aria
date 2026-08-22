@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.66.3",
+  "issue_ref": "10CG/Aria#179",
+  "generated_at": "2026-08-22T04:52:40Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 179,
+      "title": "secret-guard: 敏感文件清单遗漏 ~/.claude/settings.json 致真实 token 泄露，且命令文本匹配产生误报",
+      "body": "## Bug Report\n\n**描述**: secret-guard hook 存在一漏一误两个方向相反的问题，2026-08-09 在实际使用中同时命中。\n\n---\n\n### 问题一（漏报，严重）：敏感文件清单不含 `~/.claude/settings.json`\n\n该文件的 `env` 节点是 Claude Code 存放 API token 的标准位置（接入内网服务时的各类 `*_API_TOKEN`）。但 secret-guard 的敏感文件正则只覆盖 shell 启动文件：\n\n```\n(\\.bashrc|\\.bash_profile|\\.bash_login|\\.zshrc|\\.zprofile|\\.profile|\\.bash_aliases|/etc/environment|/etc/profile)\n```\n\n实测 (aria 1.65.5)：`grep -c 'settings\\.json' hooks/secret-guard.sh` = **0**\n（脚本共 698 行；提及 claude 配置目录 7 次，均为日志路径等无关用途）\n\n**复现步骤**:\n\n1. 在 `~/.claude/settings.json` 的 `env` 里配置任意服务 token\n2. 执行 `jq -c '{model, env: (.env // {})}' ~/.claude/settings.json`\n3. hook 放行，token 明文进入对话上下文\n\n**预期行为**: 与读取 `.bashrc` 同等对待 —— 拦截并提示改用字段白名单（`jq '{API_TIMEOUT_MS}'`）或 `jq 'keys'`\n\n**实际行为**: 完全静默放行\n\n**影响**: 已导致一次真实 token 泄露。按 hook 自身的警示语「Treat as public leak」，该凭据需轮换。值得注意的是 hook 文档已明确把 `jq '{safe_alias: .nested.safe_field}'` 列为推荐做法，说明设计上已考虑 JSON 配置场景，只是没把 Claude 自己的配置文件纳入**触发**清单。\n\n---\n\n### 问题二（误报）：判据基于命令文本匹配，不区分「读取目标」与「参数中出现的字符串」\n\n**复现步骤**:\n\n1. 执行 `grep -oE '\\(\\.bashrc\\|[^)]*\\)' <path>/hooks/secret-guard.sh`（意图：查看 secret-guard 自身的敏感文件正则）\n2. 被 hook 拦截，理由是命中 `.bashrc`\n\n**预期行为**: 读取目标是 `secret-guard.sh`，应放行\n\n**实际行为**: 因命令行任意位置出现 `.bashrc` 字面量而拦截\n\n**影响**: 无法用常规手段审计 hook 自身的规则；任何在参数、正则、注释中提及这些文件名的命令都会被误伤。\n\n**错误输出**:\n\n```\n[secret-guard] BLOCKED: command reads a secret-bearing source without a\nvalue-REDACTING filter. Matched pattern: (cat|grep|egrep|fgrep|rg|head|tail|\nless|more|strings|awk|sed)[[:space:]]+[^|]*(\\.bashrc|...)\n```\n\n---\n\n**建议方案**:\n\n1. 将 `~/.claude/settings.json`、`.claude/settings.local.json` 纳入敏感文件清单（优先级高于问题二 —— 漏报的代价是真实泄露，误报只是不便）\n2. 收紧匹配位置：仅当敏感文件名出现在**路径参数位置**时触发，而非命令行任意位置；或对读取 hook 脚本自身的自省场景加白名单\n\n## 环境信息\n\n- Aria Plugin: 1.65.5\n- Skills: 42\n- OS: Linux x86_64\n- Claude Code: 2.1.226\n- 项目配置 (.aria/config.json): no\n\n---\n*由 aria-report 自动生成*\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 18276,
+          "body": "## 补充：问题二的新增实例，暴露出更深一层\n\n在为本 issue 的修复方向起草规范文档时再次被拦，这次的形态比原报告里那个更严重。\n\n**命令**（本质是**写文件**，不是读）：\n\n```bash\ncat >> openspec/changes/.../spec.md <<'EOF'\n...\n**MUST NOT 读取整个 env 对象** (`jq '.env'` / `jq '{model, env}'` 等) —— 该节点与\nAPI token 同居一室, 读整个对象会使凭据进入输出。\n...\nEOF\n```\n\n**拦截原因**：\n\n```\nMatched pattern: cat[[:space:]]+[^|]*\\.env(\\b|/|$|[[:space:]])\n```\n\nheredoc 正文里出现的 `env.HTTPS_PROXY` 与 `jq '.env'` 字面量命中了 `\\.env`。\n\n### 比原报告更深的一层\n\n原报告指出判据不区分「读取目标」与「参数中出现的字符串」。这个实例进一步说明：**连读写方向都不区分**。\n\n`cat >> file <<'EOF'` 是标准的写入重定向，全程没有任何读取行为，但因为命令以 `cat` 开头、后续文本中出现 `.env`，即被判定为 `reads a secret-bearing source`。\n\n**讽刺之处**：被拦住的这段正文，恰恰是为修复本 issue 的问题一而起草的防护条款（「采集 MUST 按键名精确取值、MUST NOT 读整个 env 对象」）。\n\n### 误报实例汇总\n\n| 命令形态 | 命中字面量 | 实际行为 |\n|---|---|---|\n| `grep -oE '\\(\\.bashrc\\|[^)]*\\)' hooks/secret-guard.sh` | `.bashrc` | 读 `secret-guard.sh`，意图是审计 hook 自身规则 |\n| `cat >> spec.md <<'EOF' ... EOF` | `.env` | **写**文档文件，零读取行为 |\n\n（同一排查会话中还有第三次拦截，那次是**正确拦截** —— 命令确实在 `grep` 真实的 `.bashrc`，虽然只取行号。列在此处以示对照：并非所有拦截都是误报，问题只在上表这两类。）\n\n### 补充建议\n\n在原报告两条之外，判据可考虑先做一次极简 shell 解析，至少区分三件事：\n\n1. **重定向方向** —— `>` / `>>` 为写入，不应触发读取类规则\n2. **heredoc 正文** —— `<<'EOF' ... EOF` 之间是数据而非命令参数\n3. **引号内的正则/字符串字面量 vs 真实路径参数**\n\n其中第 1 条成本最低、收益最直接：仅需检测命令中是否存在写入重定向，即可排除本实例这一整类误报。\n\n---\n*补充于 2026-08-09，与原报告同一排查会话*\n",
+          "user": "simonfish",
+          "created_at": "2026-08-09T11:24:43Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/179",
+      "created_at": "2026-08-09T11:14:39Z",
+      "updated_at": "2026-08-09T11:24:43Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.65.5",
+      "current": "1.66.3",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "~/.claude/settings.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "secret-guard.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".claude/settings.local.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "5ce965133438e5ce232514fd1559f625f1744358"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "hook stdin 探针 (命令文本不执行): jq -c '{model, env: (.env // {})}' ~/.claude/settings.json @ aria 400f0bc (1.66.3+)",
+        "expected_behavior": "issue 声称漏报: 放行 (exit 0)",
+        "actual_behavior": "exit 0 — 漏报在当前版本原样存在; 中间三版 (1.66.1/2/3) 均未触及 manifest",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "对照: cat ~/.bashrc 同 hook",
+        "expected_behavior": "shell 启动文件在清单内, 应拦 exit 2",
+        "actual_behavior": "exit 2 — manifest 对既有清单工作正常, 缺口特定于 claude 配置文件",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "误报形态: grep -oE '(.bashrc|...)' aria/hooks/secret-guard.sh (读 hook 自身, 敏感名仅在正则参数中)",
+        "expected_behavior": "issue 声称误报: 拦截 (exit 2)",
+        "actual_behavior": "exit 2 — 误报在当前版本原样存在; 本 triage 过程中主 loop 写报告命令亦被同类误拦一次 (文本含敏感名字面量), 活体二次复现",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "grep -c 'settings\\.json' aria/hooks/secret-guard.sh @ 400f0bc",
+        "expected_behavior": "issue 实测 (1.65.5) = 0",
+        "actual_behavior": "0 — 与 issue 一致",
+        "match": true
+      }
+    ],
+    "hit_count": 4,
+    "total_count": 4,
+    "hit_rate": "4/4"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}
