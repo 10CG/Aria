@@ -1,0 +1,379 @@
+metadata:
+  feature: secret-guard-manifest-precision
+  issue: Aria#179
+  spec_level: 2
+  datasource: "proposal.md"          # 路径 B — 无 tasks.md, 粗粒度层内联在 proposal.md ## Tasks (TASK-0 + 1.1..1.7)
+  parent_task_count: 8
+  total_tasks: 17
+  estimated_hours: 44
+  planned_at: "2026-08-22"
+  planned_by: "task-planner (A.2+A.3) via main loop; v2 = post_planning R1 findings 修订 (P1 PASS / P2 3M / P3 1M+4m 全落)"
+  baseline_sha: "400f0bc"            # aria submodule 冻结基线, 全部行号/计数/基线红绿对此 SHA
+
+  a2_entry:
+    converged: true                  # post_spec R1→R2 2 轮 (3 席终判 3/3 PASS)
+    overridden_by_user: false
+    owner_approval: "2026-08-22 批准进 A.2"
+    gate_record: ".aria/audit-reports/post_spec-R2-1787375602111-secret-guard-manifest-precision-aggregated.md"
+
+  invariants:
+    - id: INV-1
+      rule: "TDD 顺序: 每对 (fixture 任务 → 实现任务) fixture 先落且对基线为 RED (新拦截/新放行) 或 GREEN (守卫); 实现任务的验收 = 对应 fixture 翻绿且守卫不翻红。SC-5 守卫 (TASK-008) 必须早于前置白名单改动 (TASK-010) — 约束范围仅此一对 (proposal What.3 ERE 陷阱); TASK-002 的新增 pattern 行与 TASK-008 可并行。"
+      encoded_as: "dependencies 字段 + exec_order; 守卫任务 TASK-008 排在 TASK-010 之前"
+    - id: INV-2
+      rule: "代码改造面 = aria/hooks/secret-guard.sh + aria/hooks/tests/secret-guard.test.sh 两文件; 文档面 = hook 头注释 + standards secret-hygiene.md 计数; ship 面文档 (版本 5 SOT / CHANGELOG / 主仓同步点) 属发版机制不受此限。"
+      encoded_as: "各任务 deliverables"
+    - id: INV-3
+      rule: "SC-1..SC-7 全部有承载 task; 见文末 sc_coverage_crosscheck。"
+      encoded_as: "carries_sc 字段"
+    - id: INV-4
+      rule: "TASK-000 (owner 轮换核实) 是 ship 前置门, 与 B 阶段实现并行, 不阻塞 B.1-B.2, 但 TASK-013 (bump) 依赖它。"
+      encoded_as: "TASK-013.dependencies 含 TASK-000"
+
+tasks:
+  # ══════ owner 门 ══════
+  - id: TASK-000
+    parent: "TASK-0"
+    exec_phase: "owner-门"
+    exec_order: 0
+    title: "owner 核实 2026-08-09 泄露 *_API_TOKEN 的轮换状态 (ship 前置)"
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    dependencies: []
+    agent: owner
+    carries_sc: []
+    deliverables:
+      - "proposal.md Status 头 pending_owner 项回填: 已轮换 (服务名 + 日期) / 当场轮换"
+    verification:
+      - "proposal.md 含轮换确认记录; 无则 TASK-013 不得启动"
+    gate: "⛔ ship 前置。R1 A3-C1: docs/handoff 全量检索无该凭据轮换记录。"
+    notes: "AI 不执行轮换 (凭据操作属 owner 权限面); 只记录 owner 答复。"
+
+  # ══════ 1.1 Bash 面漏报 + credit 收紧 ══════
+  - id: TASK-001
+    parent: "1.1"
+    exec_phase: "B-实现"
+    exec_order: 1
+    title: "SC-1 fixtures: 真实泄露形态 + 3 变体 (基线 RED)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: []
+    agent: aria:qa-engineer
+    carries_sc: [SC-1]
+    deliverables:
+      - "aria/hooks/tests/secret-guard.test.sh (#179 段: bash_case ×4, want=2)"
+    verification:
+      - "对 400f0bc 跑: 4/4 FAIL (exit 0 ≠ want 2) — 留痕 RED"
+      - "形态: jq -c '{model, env: (.env // {})}' ~/.claude/settings.json / cat ~/.claude/settings.json / grep TOKEN ~/.claude/settings.local.json / python3 -c '...' ~/.claude.json"
+    notes: "误拦点不在测试文件 (hook Read/Edit 面只看 file_path, Write 不经 hook, 不检查内容 — P2 实测) 而在 AI 用来写 fixture 的**外层 Bash 命令** (heredoc/cat >>) 文本含敏感名字面量时被 Bash 面误拦 (triage + 两轮审计均活体命中)。规避: 外层命令附 # guard:ack: 或用 Edit 工具写入; 持久化的 fixture 字符串本身不需要 ack。"
+
+  - id: TASK-002
+    parent: "1.1"
+    exec_phase: "B-实现"
+    exec_order: 2
+    title: "Bash 面 claude-config pattern (12 reader + jq) + :785/:786 源组扩展"
+    status: pending
+    complexity: M
+    estimated_hours: 4
+    dependencies: [TASK-001]
+    agent: aria:backend-architect
+    carries_sc: [SC-1]
+    deliverables:
+      - "aria/hooks/secret-guard.sh: risky_patterns 新增 claude-config 行 (reader 组 = 既有 12 + jq; 敏感名组 3 条目, 抽成 bash 变量供 TASK-004 复用); :785/:786 源组追加同 3 条目"
+      - "独立 commit 落地 (P2-1: 作为 TASK-003 RED 留痕的可引用中间态 SHA)"
+    verification:
+      - "TASK-001 四条 fixture 翻 GREEN"
+      - "python3 -c 变体经 :785 扩展承载而非新 pattern (R1 A1-M1)"
+      - "既有套件无新红"
+
+  - id: TASK-003
+    parent: "1.1"
+    exec_phase: "B-实现"
+    exec_order: 3
+    title: "SC-3 fixtures: credit 收紧 9 条 (5 直接 + 2 行级排除 + 1 混合源 + 1 .env 对照)"
+    status: pending
+    complexity: M
+    estimated_hours: 3
+    dependencies: [TASK-002]
+    agent: aria:qa-engineer
+    carries_sc: [SC-3]
+    deliverables:
+      - "aria/hooks/tests/secret-guard.test.sh (#179 SC-3 段)"
+    verification:
+      - "对 TASK-002 独立 commit 的树跑 (留痕引用该 SHA, 同 #128 af87cae 引用式): 'jq {env}' / 行级过滤 ×2 / 混合源 三类 RED (exit 0 ≠ 2); 直读无管道 jq '{model}' <file> 对该树已 GREEN (TASK-002 已拦); keys / wc / >/dev/null 三类 GREEN; .env 对照 GREEN (不变)"
+      - "9 条明细 = 直读无管道 1 + 管道 jq {env} 1 + keys/wc/>/dev/null 3 + 行级排除 2 + 混合源 1 + .env 对照 1"
+      - "期望值逐条与 proposal SC-3 表一致"
+
+  - id: TASK-004
+    parent: "1.1"
+    exec_phase: "B-实现"
+    exec_order: 4
+    title: "What.1b credit 收紧: 段内重匹配 claude-config 源名 → 收紧模式封闭白名单"
+    status: pending
+    complexity: M
+    estimated_hours: 5
+    dependencies: [TASK-002, TASK-003]
+    agent: aria:backend-architect
+    carries_sc: [SC-3]
+    deliverables:
+      - "aria/hooks/secret-guard.sh: _sg_compute_credit 内 claude-config 源检测 (对 $seg 重匹配, 不依赖 pattern 命中通道) + 收紧模式下仅 :332/:384/:387/:373-380 四类 credit 生效"
+    verification:
+      - "TASK-003 九条全 GREEN (含混合源恒收紧)"
+      - "非 claude-config 源 credit 行为零变化: 既有 credit 相关 case 全绿"
+    notes: "源名组正则在 pattern 行与 credit 检测两处出现 — 抽成同一 bash 变量引用, 防两处漂移 (R2 A1 附带建议)。"
+
+  # ══════ 1.2 Read/Edit 面 ══════
+  - id: TASK-005
+    parent: "1.2"
+    exec_phase: "B-实现"
+    exec_order: 1
+    title: "SC-2 fixtures: Read/Edit 嵌套探针 ×3 (基线 RED) + ACK 成对 2 例 (无 nonce RED / 有 nonce 恒绿)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: []
+    agent: aria:qa-engineer
+    carries_sc: [SC-2]
+    deliverables:
+      - "aria/hooks/tests/secret-guard.test.sh (read_case ×3 want=2; ACK 成对: 同路径无 nonce want=2 + 有 nonce want=0, 沿 test.sh R3-C-9 套路)"
+    verification:
+      - "探针用 read_case helper (嵌套 tool_input.file_path, R1 A2-M2); 对 400f0bc: 3/3 RED"
+      - "ACK 成对中「无 nonce want=2」对基线 RED (基线 exit 0); 「有 nonce want=0」对基线**恒绿** (路径未入清单走不到 ack 块, P3-M1) — 它不是 baseline-failing fixture, 其判定价值在 TASK-006 后: 证明新条目接入了 ACK-PATH-ONESHOT 逃生舱"
+
+  - id: TASK-006
+    parent: "1.2"
+    exec_phase: "B-实现"
+    exec_order: 2
+    title: "Read/Edit 面 :546 正则追加 claude-config 三条目"
+    status: pending
+    complexity: S
+    estimated_hours: 1
+    dependencies: [TASK-005]
+    agent: aria:backend-architect
+    carries_sc: [SC-2]
+    deliverables:
+      - "aria/hooks/secret-guard.sh :546 lower_path 正则 +3 分支 (29→32)"
+    verification:
+      - "TASK-005 的 4 条基线 RED case (嵌套探针 ×3 + ACK 无 nonce) 翻 GREEN; 有 nonce case 保持 GREEN 且 ack 日志出现 ACK-PATH-ONESHOT (证明新条目接入逃生舱)"
+
+  # ══════ 1.3 误报收敛 ══════
+  - id: TASK-007
+    parent: "1.3"
+    exec_phase: "B-实现"
+    exec_order: 1
+    title: "路径清单型 pattern 行枚举 (适用面点名落盘)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: []
+    agent: aria:backend-architect
+    carries_sc: []                   # v2: 前置/枚举任务, 非 SC-4 判定承载 (P2-2/P1-m3); 判定在 TASK-009/010
+    deliverables:
+      - ".aria/notes/secret-guard-179-pattern-rows.md: risky_patterns 逐行分类 (路径清单型 / 命令注入型), 路径清单型行号清单"
+    verification:
+      - "清单含 :709 shell-rc 行 + .env 行 + id_rsa 等 sibling + 新增 claude-config 行; 命令注入型 (base64/sops/age 等) 明确排除"
+      - "交叉核对: TASK-009 的 .env 面 fixture 所触及的行 ∈ 本清单 (枚举与 fixture 覆盖一致)"
+    notes: "R1 A2-M1/A3-M1: 活体误拦命中的是 .env 面, 枚举不全则 SC-4 的 .env 面 fixture 无法翻绿。"
+
+  - id: TASK-008
+    parent: "1.3"
+    exec_phase: "B-实现"
+    exec_order: 2
+    title: "SC-5 误杀守卫 fixtures (基线 GREEN, 先于 pattern 改动)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-007]
+    agent: aria:qa-engineer
+    carries_sc: [SC-5]
+    deliverables:
+      - "aria/hooks/tests/secret-guard.test.sh (守卫段: cat ~/.bashrc / grep X ~/.zshrc / sed -n 1p /etc/profile / cat .bashrc 单空格裸名 / cat \"$HOME/.bashrc\" / 多行 heredoc 中段 cat ~/.bashrc; 全部 want=2)"
+    verification:
+      - "对 400f0bc 跑: 6/6 GREEN (既有行为); 本任务完成前不得动任何 pattern"
+
+  - id: TASK-009
+    parent: "1.3"
+    exec_phase: "B-实现"
+    exec_order: 2
+    title: "SC-4 fixtures: issue 形态 + 3 变体 + 多行 + .env 面 (基线 RED)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-007]
+    agent: aria:qa-engineer
+    carries_sc: [SC-4]
+    deliverables:
+      - "aria/hooks/tests/secret-guard.test.sh (误报段 ×6, want=0)"
+    verification:
+      - "对 400f0bc 跑: 6/6 RED (exit 2 ≠ want 0)"
+      - "变体覆盖前缀 ( | \\ 三种 + heredoc 多行 + .env 面字面量位置"
+
+  - id: TASK-010
+    parent: "1.3"
+    exec_phase: "B-实现"
+    exec_order: 5
+    title: "前置字符白名单实现 (枚举行逐行应用)"
+    status: pending
+    complexity: M
+    estimated_hours: 6
+    dependencies: [TASK-008, TASK-009, TASK-002]
+    agent: aria:backend-architect
+    carries_sc: [SC-4, SC-5]
+    deliverables:
+      - "aria/hooks/secret-guard.sh: TASK-007 清单内每行的敏感名组前加 (^|[[:space:]\"'=/]) 白名单 (单一语义, 无排除集)"
+    verification:
+      - "TASK-009 六条翻 GREEN 且 TASK-008 六条仍 GREEN (反事实: 写反方向 TASK-008 必红)"
+      - "cat .bashrc 单空格形态专项核验 (与 [[:space:]]+ 争用, R1 A1-M2)"
+      - "整串 [[ =~ ]] 语义下 ^ = 串首, 多行 fixture 通过"
+    notes: "依赖 TASK-002: claude-config 行也在枚举面内, 须在其落地后统一加白名单。"
+
+  # ══════ 1.4 回归 ══════
+  - id: TASK-011
+    parent: "1.4"
+    exec_phase: "B-验证"
+    exec_order: 6
+    title: "基线计数实测 @400f0bc + 全量回归 (SC-6)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-004, TASK-006, TASK-010]
+    agent: aria:qa-engineer
+    carries_sc: [SC-6]
+    deliverables:
+      - "回归记录 (基线 pass 数 @400f0bc → 实现后 pass 数, 含新增 case 数)"
+    verification:
+      - "实现后全绿且 pass 数 ≥ 基线 + 新增数; 基线数对 git archive 400f0bc 冻结树实测 (非活树)"
+
+  # ══════ 1.5 文档 ══════
+  - id: TASK-012
+    parent: "1.5"
+    exec_phase: "B-验证"
+    exec_order: 7
+    title: "文档同步: hook 头注释 (条目 + 已知限三类) + secret-hygiene.md 计数 (SC-7, 换人执笔)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-011]
+    agent: aria:knowledge-manager
+    carries_sc: [SC-7]
+    deliverables:
+      - "aria/hooks/secret-guard.sh 头注释: claude-config 三条目 + 误报已知限 (a)(b) + 漏报结构限 (bare-filename/glob)"
+      - "standards/conventions/secret-hygiene.md 自测计数回填 (TASK-011 实测值)"
+    verification:
+      - "执笔 agent ≠ TASK-002/004/010 的实现 agent (knowledge-manager vs backend-architect)"
+      - "计数与 TASK-011 记录一致"
+
+  # ══════ 1.6 ship ══════
+  - id: TASK-013
+    parent: "1.6"
+    exec_phase: "ship-前"
+    exec_order: 8
+    title: "版本 re-check + bump (aria 5 SOT + CHANGELOG 两类)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-000, TASK-012]
+    agent: aria:backend-architect
+    carries_sc: []
+    deliverables:
+      - "aria: plugin.json / marketplace.json (两处缩进) / VERSION / CHANGELOG.md / README 版本"
+    verification:
+      - "bump 前重读 plugin.json SOT; 并发轨已推进则顺延重算 (#128/#147 教训)"
+      - "TASK-000 已回填 (INV-4)"
+
+  - id: TASK-014
+    parent: "1.6"
+    exec_phase: "ship-时"
+    exec_order: 9
+    title: "三仓本地合并 + 双推 + ls-remote + gitlink 完整性 + 主仓同步面"
+    status: pending
+    complexity: M
+    estimated_hours: 4
+    dependencies: [TASK-013]
+    agent: aria:backend-architect
+    carries_sc: []
+    deliverables:
+      - "aria master / standards master / 主仓 gitlink bump + CLAUDE.md 版本行 + root README badge + VERSION"
+    verification:
+      - "每 remote 独立 ls-remote 与本地一致 (CLAUDE.md 约束 2); 子模块本地 merge 非 Forgejo 服务端 (约束 1); gitlink_integrity 无 orphaned"
+      - "子模块 detached HEAD 时用 push HEAD:master (本 cycle traps#5 已踩)"
+
+  - id: TASK-015
+    parent: "1.6"
+    exec_phase: "ship-后"
+    exec_order: 10
+    title: "交付面复验 (cmp 指名版本目录 + 活体 harness ≥1 新拦截形态, #178/#128 SC-9b 同款)"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-014]
+    agent: aria:qa-engineer
+    carries_sc: [SC-1]
+    deliverables:
+      - "release-closeout 记录 (四分判定)"
+    verification:
+      - "marketplace 刷新后 cmp cache/<新版本>/hooks/secret-guard.sh vs canonical 字节相同"
+      - "活体 PreToolUse 链对 SC-1 真实泄露形态 BLOCKED (harness 链, 非 canonical 直调)"
+    gate: "不计入 Phase C 合并门槛 (cache 滞后是结构必然)"
+
+  # ══════ 1.7 收尾 ══════
+  - id: TASK-016
+    parent: "1.7"
+    exec_phase: "ship-后"
+    exec_order: 10
+    title: "close #179 + D.2b release claim + 已知限是否立案"
+    status: pending
+    complexity: S
+    estimated_hours: 2
+    dependencies: [TASK-014]
+    agent: aria:knowledge-manager
+    carries_sc: []
+    deliverables:
+      - "Aria#179 关闭评论 (版本 + SC 摘要) + state PATCH"
+      - "release_gate.py --raw-track-id secret-guard-manifest-precision --sweep-stale --gc"
+      - "已知限 (prose 位置 / 引号定界裸名 / bare-filename) 若 owner 要立案则开 issue, 否则注记于 #179 关闭评论"
+    verification:
+      - "claim released + push_success=true; issue closed"
+
+execution_order:
+  - phase: "owner-门"
+    order: "0 (与 B 并行)"
+    tasks: [TASK-000]
+  - phase: "B-实现"
+    order: "1 → 5"
+    tasks: [TASK-001, TASK-005, TASK-007, TASK-002, TASK-006, TASK-008, TASK-009, TASK-003, TASK-004, TASK-010]
+    parallel_groups:
+      - [TASK-001, TASK-005, TASK-007]          # order 1: 三条独立 fixture/枚举起点
+      - [TASK-002, TASK-006, TASK-008, TASK-009] # order 2: 002←001, 006←005, 008/009←007
+      - [TASK-003]                               # order 3: ←002 (独立 commit 后)
+      - [TASK-004]                               # order 4: ←002,003 (改 secret-guard.sh credit 区)
+      - [TASK-010]                               # order 5: ←002,008,009 — 与 004 同文件, 串行防并发 Edit (P3-m3)
+  - phase: "B-验证"
+    order: "6 → 7"
+    tasks: [TASK-011, TASK-012]                  # 012←011 串行
+  - phase: "ship-前"
+    order: "8"
+    tasks: [TASK-013]
+  - phase: "ship-时"
+    order: "9"
+    tasks: [TASK-014]
+  - phase: "ship-后"
+    order: "10"
+    tasks: [TASK-015, TASK-016]
+
+sc_coverage_crosscheck:
+  SC-1: [TASK-001, TASK-002, TASK-015]
+  SC-2: [TASK-005, TASK-006]
+  SC-3: [TASK-003, TASK-004]
+  SC-4: [TASK-009, TASK-010]
+  SC-5: [TASK-008, TASK-010]
+  SC-6: [TASK-011]
+  SC-7: [TASK-012]
+
+agent_summary:
+  aria:backend-architect: [TASK-002, TASK-004, TASK-006, TASK-007, TASK-010, TASK-013, TASK-014]
+  aria:qa-engineer: [TASK-001, TASK-003, TASK-005, TASK-008, TASK-009, TASK-011, TASK-015]
+  aria:knowledge-manager: [TASK-012, TASK-016]
+  owner: [TASK-000]

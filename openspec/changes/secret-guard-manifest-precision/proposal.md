@@ -1,13 +1,13 @@
 # secret-guard: claude 配置文件入敏感清单 (双平面) + 参数位置误报收敛 (Aria #179)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: 📝 **Draft (v3) — post_spec CONVERGED (R1→R2, 2 轮), 待 owner 批准进 A.2**
+> **Status**: ✅ **Approved · Phase A 闭环 (A.1-A.3 完成, 2026-08-22)** — post_spec CONVERGED (R1→R2, 2 轮) + post_planning CONVERGED (R1 + 确认, 五轴 0 fail); `detailed-tasks.yaml` v2 17 任务 / 44h, ready for Phase B。**TASK-0 安全门仍待 owner 答复** (ship 前置门, 不阻塞 B.1-B.2 实现)
 >
 > ```yaml
 > converged: true    # R1 3×REVISE (3C+6M+6m) → v2/v2.1 → R2 (A1 REVISE 2M / A2·A3 APPROVE) → v3 → 终判 3/3 PASS
 > rounds: 2
 > pending_owner:
->   - 批准进 A.2
+>   - "~~批准进 A.2~~ (✅ 2026-08-22)"
 >   - "TASK-0 安全门 (ship 前置, 独立于批准): 核实 2026-08-09 泄露的 *_API_TOKEN 轮换状态 — R1 A3-C1: handoff 全量检索无轮换记录, 疑似活凭据"
 > ```
 > **Issue**: [Aria#179](https://forgejo.10cg.pub/10CG/Aria/issues/179) (triage: confirmed / major / next-cycle, 复现 4/4 @ 1.66.3, `.aria/triage-report-179.json`)
