@@ -1,19 +1,22 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-22-session-close-179-full-cycle-and-147-supersession.md](./2026-08-22-session-close-179-full-cycle-and-147-supersession.md) — session-close-20260822-179-cycle-147-supersession @ phase=session-close (status=done; 08-18→08-22 整段对话收尾, 周期账目在 #128/#179 周期 handoff) updated=2026-08-22
+**Latest**: [2026-08-22-issue152-phase-a-twelve-rounds-and-the-check-that-checks-itself.md](./2026-08-22-issue152-phase-a-twelve-rounds-and-the-check-that-checks-itself.md) — pre-merge-gate-no-run-for-branch @ phase=B.1-done (status=active) — #152 Phase A 十二轮 CONVERGED + B 三前置 (simonfish/023236f2)
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
 > 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
-> **track 状态 (在飞 0 条: premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 / #179 08-22 均终结)**:
+> **track 状态 (在飞 1 条: `pre-merge-gate-no-run-for-branch` 08-22 B.1-done; 其余 premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 / #179 08-22 均终结)**:
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
+> | `pre-merge-gate-no-run-for-branch` (aria-plugin#152) | `simonfish/023236f2` | 🟢 **active — B.1-done** (A 双 CONVERGED: post_spec R7 5/5 + post_planning R5 5/5; claim s-a637@2033 active; 下一步 TASK-004) | [2026-08-22 (session-close)](./2026-08-22-issue152-phase-a-twelve-rounds-and-the-check-that-checks-itself.md) |
 > | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **✅ done (2026-08-18 归档, track 终结)** | [2026-08-18 (Phase D)](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) |
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-22 更新 #4 (simonfish/023236f2, session-closer 会话收尾)**: bare pointer 改指本轨 handoff (全仓最新)。**新在飞轨 `pre-merge-gate-no-run-for-branch`** (#152): Phase A 全闭合 (12 轮, 三次 owner 加轮) + B 前置三项 done (claim / 两仓 feature 分支 / dispatch 探针 dispatch_viable=true; **#152 盲区未复现**, Why 降级); 上下文 76% 停。下个 session 从 TASK-004 起。前一 Latest (bfe8285d #3) 保留为 Active (parallel predecessor)。
 >
 > **2026-08-22 更新 #3 (simonfish/bfe8285d, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新, 覆盖 08-18→08-22 整段对话; 周期账目仍在 #128 08-18 / #179 08-22 两份周期 handoff)。会话层散项: #147 spec 被并发轨 v1.66.2 覆盖 (归档 design-only) / #181 triage / 僵尸 spec 归档 #186 / a1-entry C1-C2 裁定 / NEXUS token 核实已轮换 / **4 条新 memory**。并发轨 #152 已进 A.3 (目标 v1.66.5)。carry 全为 owner 复议项。既有各行未动。
 >
