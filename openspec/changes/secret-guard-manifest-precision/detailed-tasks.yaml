@@ -305,7 +305,7 @@ tasks:
     exec_phase: "ship-后"
     exec_order: 10
     title: "交付面复验 (cmp 指名版本目录 + 活体 harness ≥1 新拦截形态, #178/#128 SC-9b 同款)"
-    status: pending   # BLOCKED-BY-ENV: cache 尚无 1.66.4 目录 (marketplace 刷新后跑 cmp + 活体 harness 复验)
+    status: done   # 2026-08-22 四分判定 PASS: plugin-cache-currency OK 1.66.4; cmp cache/1.66.4 vs canonical 9e6a17c 字节相同; 活体 PreToolUse 链: jq .model settings.json BLOCKED (报错 pattern 即新行) / grep 正则字面量位置 (\.bashrc| 放行 exit 0
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-014]

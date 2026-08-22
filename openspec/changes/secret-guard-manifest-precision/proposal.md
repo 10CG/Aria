@@ -1,7 +1,7 @@
 # secret-guard: claude 配置文件入敏感清单 (双平面) + 参数位置误报收敛 (Aria #179)
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: 🚀 **Shipped v1.66.4 (2026-08-22) — 16/17 task done, TASK-015 交付面复验 BLOCKED-BY-ENV 待 marketplace 刷新; 待 Phase D 归档** — post_spec CONVERGED (R1→R2, 2 轮) + post_planning CONVERGED (R1 + 确认, 五轴 0 fail); `detailed-tasks.yaml` v2 17 任务 / 44h, ready for Phase B。**TASK-0 已闭 (08-09 当日已轮换, 见 pending_owner 记录)**
+> **Status**: ✅ **Shipped v1.66.4 (2026-08-22) — 17/17 task done (TASK-015 交付面复验 PASS); 待 Phase D 归档** — post_spec CONVERGED (R1→R2, 2 轮) + post_planning CONVERGED (R1 + 确认, 五轴 0 fail); `detailed-tasks.yaml` v2 17 任务 / 44h, ready for Phase B。**TASK-0 已闭 (08-09 当日已轮换, 见 pending_owner 记录)**
 >
 > ```yaml
 > converged: true    # R1 3×REVISE (3C+6M+6m) → v2/v2.1 → R2 (A1 REVISE 2M / A2·A3 APPROVE) → v3 → 终判 3/3 PASS
