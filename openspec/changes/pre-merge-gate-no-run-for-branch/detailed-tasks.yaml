@@ -417,7 +417,7 @@ tasks:
     exec_phase: "B.2 → C.2 dogfood"
     exec_order: 17
     title: "SC-13 活体 + SC-16 (b)(c) + traps :241 终计数: aria-plugin throwaway 分支首推 path-matched 变更 → gate (aria-plugin 根) 实测 not_found + kind → 经 workflow-runner 路径 (wait_check_intervals 临时 [5,5,5]; --state-file 主仓绝对路径) 第 3 次观测出 prompt → 处置后轮询至非 not_found 或 600s → 先抄证据 (workflow-state 片段 + telemetry 行 + Δt) 进 traps §六 → 再删分支 (worktree 命令: `git -C aria worktree add <tmp> -b probe/152-live feature/152-no-run-for-branch` — **基于 feature HEAD** 非 9e6a17c: gate/path_coverage 按 cwd 取仓根, 基线树跑出的是 pending, R4 A4-M2; gate 的 cwd = <tmp> 根, 前提 003/006/009 已提交到 feature 分支 (R5 A4-m3); 收尾动作 `git -C aria worktree remove <tmp>` + `git -C aria branch -D probe/152-live` + 删远端; 收尾断言 (与 TASK-001 同口径): `git -C aria worktree list` 不含 tmp, 本地与远端 probe/* 为空) + CLI clear; SC-16: (b) 活体前 spec_complete.py gate 对本 spec probe = warn + unverified_claims; (c) 活体后 = pass"
-    status: pending
+    status: done   # 2026-08-22 主控: SC-16 (b) warn (partition missing, unverified_claims runtime_probe:record) → SC-13 活体 ep1 (盲区二次未复现, 8s 内 pending) + ep2 (branches 过滤结构性零 run: not_found×3 → should_prompt=true @55s → 处置 (b) → 15s pending) → SC-16 (c) pass count 7; traps §六 证据行 + SKILL.md :243 计数 11 (aria b62354e); 收尾断言全过 (gate_state null / probe 分支零 / worktree 零)
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-009, TASK-010, TASK-011, TASK-013]
