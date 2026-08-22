@@ -45,7 +45,8 @@ metadata:
           inv1 <c>  not_found    # 合取 2: 本提交语义
           git -C aria show <c>:skills/phase-c-integrator/scripts/pre_merge_gate.py | grep -c '"not_found"'   # 合取 3: ≥1
           git -C aria show --stat <c> | grep -c -E 'aether.py|pre_merge_gate.py'                             # 合取 4: == 2
-        历史 aether.py 与当前树 base.py 组合 (本 spec 不动 base.py)。assert 使失败 = 非零退出; 反例 (sed 零 run 分支为
+        历史 aether.py 与当前树 base.py 组合 (本 spec 不动 base.py)。
+        **TASK-003 实跑勘正 (2026-08-22)**: 合取 4 的 `git show --stat` 含 commit message 正文 — message 里出现文件名字面 (如「aether.py :225」) 会把计数推到 3 (实测), 与文件集无关; 已 amend 去掉字面后 == 2。稳健形式 `git show --stat --format= <c>` 只数文件行; TASK-013 复核用两种形式都跑, 以 --format= 为准。assert 使失败 = 非零退出; 反例 (sed 零 run 分支为
         not_found 后) 合取 1 如期 FAIL (R4 A1 实测); 主控与 R5 A2/A5 在 HEAD 复跑通过。
     - id: INV-2
       rule: "每对 (测试任务 → 实现任务): 测试先落且对基线 RED (新行为) 或 GREEN (守卫, 且已证明对坏实现会红); 实现任务验收 = 对应 SC 翻绿且守卫不翻红。"
@@ -136,7 +137,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 3
     title: "SC-6 / SC-7 守卫先落 (GREEN @ 基线 9e6a17c, 含坏实现对照): not_applicable 短路 assert_not_called + 无 gate_error (漏 return 变体必红); 六个早退 return 点八变体键集快照 (坏实现对照: 任一落点多加/少一键必红)"
-    status: pending
+    status: done   # 2026-08-22 aria 5b9337f: EarlyExitContractTests 2 项 GREEN@9e6a17c; m1/m2/m3 各红 (主控独立复跑 m1/m2)
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-000b]
@@ -154,7 +155,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 4
     title: "SC-1/2/3/4 测试先落 (RED): _normalize_pr_ci_status([])→not_found; compute_verdict not_found 6 档+None 参数化 (含 raw_message 副本通道 / #152 子串闭集 / internal-error 请报 issue); _effective_prompt_threshold 五 case + warn; main-busy 时 kind 断言"
-    status: pending
+    status: done   # 2026-08-22 aria 5b9337f: 9 RED (SC-2 红在 green≠wait / SC-1 pending≠not_found / SC-3 AttributeError / SC-4 红在 kind); 具名 test_sc2_trigger_matched_message 在
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-000b, TASK-004]
@@ -173,7 +174,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 5
     title: "§1 + §2.2 同 commit: aether.py 零 run→not_found (+:218 docstring); compute_verdict 新 elif (位置: not_applicable 之后 / main_in_flight_runs 之前, 防呆注释) + gate_error=None 哨兵 + _no_run_gate_error(path_coverage, threshold) 封闭表 (reason 前缀匹配) + _effective_prompt_threshold(cfg) 单校验点 + DEFAULT_CONFIG 加 no_run_prompt_after_observations=3 + _build_output 穿 gate_error"
-    status: pending
+    status: done   # 2026-08-22 aria e95b202 (仅两生产文件): 129 passed; INV-1 四合取 pending/not_found/5/2 过; 合成模板探针 OK 10 keys
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-002]
@@ -195,7 +196,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 6
     title: "SC-5 / SC-10 测试先落 (RED): gate_check e2e not_found (enabled/disabled 两变体 + (c1) 不含字面 <pr_branch> + raw_message 同步 + (d) verify-failed 后缀); PR 分支 not-found→fail pr-branch-not-found (path_coverage 在场⇔enabled) / verify-failed→wait / 非 not_found 时新名未被触发 (assert_not_called) / 旧名包装以关键字形参 main_branch= 仍可用"
-    status: pending
+    status: done   # 2026-08-22 aria a9d148c: 4 RED (pr_verify 未调 / 后缀缺 / wait≠fail / 旧名非委托) + 4 基线绿守卫; 既有 64 零回归
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-004, TASK-003]
@@ -213,7 +214,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 7
     title: "§2.1 gate_check: _verify_branch_exists 搬迁改名 + _verify_main_branch_exists 保关键字签名与 timeout 默认的包装 (:449 字面不改) + not_found 时 PR 分支核验第七个早退 (pr-branch-not-found, fail, 副本通道) + verify_note 哨兵/消毒 + 回填 <pr_branch> 与 raw_message 重同步 + 注释/--remote help 更新"
-    status: pending
+    status: done   # 2026-08-22 aria 3b12cc6: 72 passed; 第七早退 pr-branch-not-found fail / verify_note / <pr_branch> 回填 (dispatch_viable=true 分支)
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-005, TASK-003, TASK-001]
@@ -273,7 +274,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 10
     title: "SC-11 (a)-(d) 测试先落 (RED): write_gate_state(gate_error_kind) 连续计数/归零/retry_count·started_at 不变; reset_no_run_observations / reset_retry_count(+started_at=now) 只动指定字段; v1.1 旧 state .get 默认; CLI record 端到端 (文件缺失起步 / 独立重读落盘 / wait→waiting / --intervals / telemetry source=test + ts ISO / --threshold should_prompt / 透传 in-flight-runs+raw-message / 缺 --source 或 --state-file exit 2 / reset·clear 缺失文件 exit 2 / record verdict≠wait 缺失文件 exit 2 / reset --observations 成功路径 obs=0 其余键逐字不变 / reset --retry-count 成功路径 retry_count=0 + started_at 更新 + 其余不变)"
-    status: pending
+    status: done   # 2026-08-22 aria f8024c7: 16 RED (TypeError gate_error_kind / AttributeError reset_* / CLI stdout 空 + exit 0≠2), 既有 22 绿
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-000b]
@@ -291,7 +292,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 11
     title: "gate_state_helper.py: write_gate_state(gate_error_kind=) 单点计数 + carry-forward; reset_no_run_observations / reset_retry_count; CLI main (record/reset/clear; --state-file 与 --source 必填; wait→waiting 映射; 骨架创建; telemetry 派生路径 + source + ts ISO; stdout JSON 含 elapsed_seconds/next_check_at; exit 0/2); 模块 docstring :2-18 改「CLI 为运行时入口」"
-    status: pending
+    status: done   # 2026-08-22 aria 97915a1: 38 passed; 真 CLI --source test 产物落 scratchpad, 主仓 .aria/ 零污染; format_version 1.1
     complexity: L
     estimated_hours: 5
     dependencies: [TASK-008]
@@ -310,7 +311,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 12
     title: "SC-14 文档机检脚本先落 (RED @ 文档未改时): test_doc_sync_no_run.py — 六条断言: SKILL.md 所有 pr_ci_status 枚举行含 not_found / :172-183 含 gate_error / 主仓 config.template.json 含两 key / DEC 文末「前向指针」+ 小节 📌 / path_coverage.py:36 为 8 / **DEFAULT_CONFIG 含 no_run_prompt_after_observations** (此条依赖 003 故为 GREEN, 其余五条 RED; 主仓文件断言沿 test_spec_complete.py:94-104 parents[4]+skip 先例)"
-    status: pending
+    status: done   # 2026-08-22 aria 33922ef: 5 RED / 1 GREEN (DEFAULT_CONFIG), 无 SkipTest; 副产品: phase-c SKILL.md 为 CRLF
     complexity: S
     estimated_hours: 1.5
     dependencies: [TASK-003]
@@ -328,7 +329,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 13
     title: "workflow-runner 面: SKILL.md §wait_recoverable (:249-264 JSON 块 / :313 / :326 / :332-336 exit 2 双 reset+started_at 与 2.5 no-run prompt / :338-358 步骤 2·3c′·3d 经 CLI 显式 --state-file 全旗标 / :345 / :389) + references/workflow-state-schema.md (:38-52 / :110-131 no_run_observations / :125) + config-loader/SKILL.md 登记 + 主仓 .aria/config.template.json:73-91 补两 key + 主仓 .gitignore:19-21 加分区"
-    status: pending
+    status: done   # 2026-08-22 aria <see log> + 主仓本 commit: workflow-runner SKILL/schema/config-loader + 模板两 key + .gitignore 分区; 探针 OK 10 keys; doc-sync 4F/2P; INV-5 零命中; CRLF 保持
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-009, TASK-003, TASK-010a]

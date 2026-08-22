@@ -69,7 +69,7 @@
     ]
   },
   "phase_c_integrator": {
-    "_comment": "v1.3.0+ — Forgejo Issue #60 phase-c-integrator pre-merge gate; v1.31.0+ CI backend 抽象层键名: ci_backends (null=auto-detect / []=显式禁用 / [{name:...}]=显式列表) + no_ci_fallback。旧键 primitive_preference / no_aether_fallback **已退役并从本模板移除** (Aria #181): alias 仍被 _normalize_config 读取但每次运行发 DeprecationWarning, v2.0 移除。",
+    "_comment": "v1.3.0+ — Forgejo Issue #60 phase-c-integrator pre-merge gate; v1.31.0+ CI backend 抽象层键名: ci_backends (null=auto-detect / []=显式禁用 / [{name:...}]=显式列表) + no_ci_fallback。旧键 primitive_preference / no_aether_fallback **已退役并从本模板移除** (Aria #181): alias 仍被 _normalize_config 读取但每次运行发 DeprecationWarning, v2.0 移除。v1.66.5+ (#152) 补登记 path_coverage_enabled / no_run_prompt_after_observations 两键。",
     "pre_merge_gate": {
       "enabled": true,
       "ci_backends": [
@@ -88,7 +88,9 @@
       ],
       "primitive_call_timeout_seconds": 30,
       "poll_chunk_seconds": 5,
-      "user_escape_hatch": true
+      "user_escape_hatch": true,
+      "path_coverage_enabled": true,
+      "no_run_prompt_after_observations": 3
     }
   },
   "agent_router": {
