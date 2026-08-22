@@ -6,6 +6,7 @@ seats: [A1-backend-architect, A2-qa-engineer, A3-code-reviewer]
 verdicts_r2: {A1: REVISE, A2: APPROVE, A3: APPROVE}
 verdicts_final: {A1: PASS, A2: APPROVE, A3: APPROVE}
 converged: true
+verdict: PASS
 rounds_total: 2
 timestamp: 2026-08-22T09:40:00Z
 ---
