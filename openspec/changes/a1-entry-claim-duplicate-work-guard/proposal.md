@@ -1,6 +1,6 @@
 # Proposal: a1-entry-claim-duplicate-work-guard
 
-> **Status**: 📝 **Draft (rewrite v2 + R1-fix)** — ⛔ **有两个阻塞性未决项** (C1 `allowed-tools` / C2 heartbeat 触发点), **不具备进 A.2 的条件**; 待 owner 裁
+> **Status**: 📝 **Draft (rewrite v2 + R1-fix + 两阻塞项已裁)** — **C1/C2 owner 裁定 2026-08-22 已下** (C1=(a) 扩 allowed-tools / C2=(ii)+(iii) heartbeat 挂 state-scanner 入口编排层 + STALE_TTL 30min→24h 量级): 待 rework 把两裁定落版 (§2.2/§3/阻塞性前提三处 + Impact 表补 allowed-tools 变更面) 后进 A.2
 > **Created**: 2026-07-30 · **重写**: 2026-08-02
 > **Spec Level**: 2
 > **代码落点**: `aria/` 子模块; Spec 落主仓 (Rule #5)
@@ -146,6 +146,8 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > - (iii) 承认做不到, 改走延长 TTL 并量化 sweep 语义代价 (spike S1 的选项 c)。
 >
 > **A.2 前必须定死其一。** 在此之前 §2.2 只是「把匹配键修对了」, 不构成保护窗的解决方案。**这也是 §2.3 的 `--sweep-stale` 风险 (C5) 是否升级为数据面风险的判定条件。**
+>
+> **✅ owner 裁定 (2026-08-22): 采 (ii)+(iii) 组合** —— heartbeat 挂 state-scanner 入口的 **AI 编排层** (scan.py collector 保持只读, 与 phase1_gate B-entry 既有挂法同构; 每次 `/state-scanner` 必跑, 不依赖 AI 记性); 同时 `STALE_TTL` 30min → **24h 量级**收窄版兜底, 使「漏跑一次扫描」不至于立即暴露在 `--sweep-stale` 下。落版义务: (ii) 的挂载点写进 state-scanner SKILL.md 编排契约 + (iii) 的 TTL 变更量化 sweep 语义代价 (spike S1 选项 c 的评估框架); 关联 Aria#180 (heartbeat 零调用) 由本裁定一并解。
 
 #### §2.3 overlap 消费
 
@@ -208,6 +210,8 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > - **(b) 改由已持 `Bash` 的宿主代调**: 例如经 `Task`/`Skill` 委派, 或把认领动作前移到 `state-scanner` 的阶段 4 (它已在 workflow-runner 链路上)。⚠️ 这会改变「A.1 起草前」这个时点的语义, 须重新论证。
 >
 > **两条 Impact 都未列 `allowed-tools` 字段变更** —— 无论选哪条都要补进 §Impact。**本前提未解决前, §2/§3 不具备实施条件。**
+>
+> **✅ owner 裁定 (2026-08-22): 采 (a) 扩权** —— phase-a-planner 加 `Bash, AskUserQuestion`; spec-drafter 加 `Bash`。理由: (b) 放弃 `/spec-drafter` 直调路径的覆盖, 而入口覆盖 (S6: 9 种身份 7 种无 claim) 正是本 Spec 核心目标; 扩权风险由 harness 权限系统兜底 (Bash 调用仍逐条过 permission 配置)。落版义务: Impact 表补两个 SKILL.md 的 `allowed-tools` 变更 + Rule #6 按能力面变更申报 benchmark。
 
 > **口径待定 (S6 附带发现)**: `owner-container` (形如 `simonfish/bfe8285d`) 与 claim 的 container 段 (`bfe8285d`) **口径已经不同**。本 Spec 采用 claim 侧口径 (uuid), 并把「两标识关系需成文」记为 follow-up —— **不在本 Spec 统一二者** (那会牵动 handoff frontmatter 规范, 属 standards 变更)。
 
