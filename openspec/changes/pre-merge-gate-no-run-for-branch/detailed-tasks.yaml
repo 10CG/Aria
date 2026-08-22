@@ -233,7 +233,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 8
     title: "[条件: dispatch_viable=true] SC-8/SC-9 + SC-2 dispatch 子项 + SC-5 (c2) 测试先落 (RED): _parse_workflow dispatchable 四例 (标量/flow/块/无) 且 triggers 逐字同; evaluate_path_coverage 8 reason 参数化 (decision/reason/matched 不变守卫 + dispatchable_workflows 仅 trigger-matched 非空); message 含 workflows/x.yml/dispatches 且不含 .forgejo/workflows/x.yml/dispatches (basename 守卫); DISPATCH_VIABLE monkeypatch False / 列表空 → 不含 dispatches; SC-5 dispatch 变体含 feat/x"
-    status: pending
+    status: done   # 2026-08-22 aria 2039162: 4 RED (KeyError dispatchable / dispatchable_workflows 缺 / 无 dispatches / 无 feat/x) + SC-9 GUARD 基线值写死 + 三负控
     conditional_on: "metadata.dispatch_viable == true (false ⇒ status: completed, notes 'N/A — dispatch_viable=false, INV-3 整组不做')"
     complexity: S
     estimated_hours: 2
@@ -253,7 +253,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 9
     title: "[条件: dispatch_viable=true] §4 + 渲染实现 (GREEN): _parse_workflow 加 dispatchable + _result(dispatchable_workflows=) 仅规则 6 传 + DISPATCH_VIABLE 裸全局常量 (注释引 traps §六 证据行; 可 monkeypatch) + _no_run_gate_error 渲染 dispatch 行 (basename, <owner>/<repo> <pr_branch> 占位, 禁 str.format)"
-    status: pending
+    status: done   # 2026-08-22 aria 8898518: 144 passed; DISPATCH_VIABLE 裸全局负控 False⇒无 dispatches / True⇒workflows/a.yml/dispatches (无 .forgejo/ 前缀)
     conditional_on: "metadata.dispatch_viable == true (false ⇒ status: completed, notes 'N/A — …')"
     complexity: S
     estimated_hours: 2
@@ -329,7 +329,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 13
     title: "workflow-runner 面: SKILL.md §wait_recoverable (:249-264 JSON 块 / :313 / :326 / :332-336 exit 2 双 reset+started_at 与 2.5 no-run prompt / :338-358 步骤 2·3c′·3d 经 CLI 显式 --state-file 全旗标 / :345 / :389) + references/workflow-state-schema.md (:38-52 / :110-131 no_run_observations / :125) + config-loader/SKILL.md 登记 + 主仓 .aria/config.template.json:73-91 补两 key + 主仓 .gitignore:19-21 加分区"
-    status: done   # 2026-08-22 aria <see log> + 主仓本 commit: workflow-runner SKILL/schema/config-loader + 模板两 key + .gitignore 分区; 探针 OK 10 keys; doc-sync 4F/2P; INV-5 零命中; CRLF 保持
+    status: done   # 2026-08-22 aria e32c53a + 主仓 2366fb4: workflow-runner SKILL/schema/config-loader + 模板两 key + .gitignore 分区; 探针 OK 10 keys; doc-sync 4F/2P; INV-5 零命中; CRLF 保持
     complexity: M
     estimated_hours: 3
     dependencies: [TASK-009, TASK-003, TASK-010a]
@@ -350,7 +350,7 @@ tasks:
     exec_phase: "B.2"
     exec_order: 14
     title: "phase-c-integrator 面 + 决策/知识面: SKILL.md §C.2.4 (:46-54 与 :292-302 两配置表 / :172-183 摘要块 / :248 步骤 2.2 / :252-263 步骤 4·5·6 surface 义务+处方段+「直调时无计数, 读者按 message 处置」声明 / :276-290 schema·归层注记·三类在场·kind 二维消歧表) + traps §六 在 TASK-001 建的节上方插入 F3 / F4 / (b) 轴同形 / F6 404+basename 四行 (不动 TASK-0a 行; :241 计数由 TASK-014 终改) + path_coverage.py:36 勘正 8 + 主仓 DEC-20260731-001 前向指针 (小节 📌 行 + 文末日期段, 原文不回改) + state-scanner/references/runtime-probe-declaration.md:135-139 预言句改指本 spec (SC-14 脚本已归 TASK-010a, 本任务只让其翻绿)"
-    status: pending
+    status: done   # 2026-08-22 aria <TASK-011 commit> + 主仓本 commit (DEC 前向指针): doc-sync 6/6 绿, 148 passed; CRLF 保持; INV-5 零命中; traps §六 4 坑 (+TASK-0a 行 +副产品行)
     complexity: M
     estimated_hours: 4
     dependencies: [TASK-006, TASK-007b, TASK-010, TASK-001, TASK-010a]
