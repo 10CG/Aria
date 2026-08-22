@@ -1,3 +1,7 @@
+---
+archive_type: implementation-deferred
+archived_reason: "SUPERSEDED: owner 2026-07-30 裁定由 phase-c-gate-path-coverage-not-applicable 取代 (同治 aria-plugin#122, 并发碰撞); 取代者已于 2026-07-31 归档并随 premerge-gate 轨 ship。原「保留目录供取代者 A.2 重建骨架」理由随之失效, owner 2026-08-22 裁定归档 (design-only, 10 份审计报告 + MERGE-ANALYSIS 随目录保留)。无残留待办。"
+---
 # Proposal: phase-c-integrator-ci-path-coverage (aria-plugin #122)
 
 > # ⛔ SUPERSEDED (owner 裁定 2026-07-30)
