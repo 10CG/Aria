@@ -106,3 +106,10 @@ secret-guard 一漏一误, 方向相反, 2026-08-09 实际使用中同日命中,
 - **修正**: (1) 白名单按两族: 全名型 `(^|[[:space:]"'=/])`; 后缀型 `(^|[[:space:]"'=/*A-Za-z0-9_.-])` —— 每族仍是单一白名单 (无排除集, A3-M2 语义保持), 两族对 FP 前缀 `(` `|` `\` 均不触发; (2) 适用行 = TASK-007 枚举的 13 行 + 新增 claude-config 行 (判据: 敏感名 token 紧跟 `[^|]*` 处于 reader 参数位置); `/`-根路径行 / token 起始行 / find-xargs 组合行 / 重定向行 / ssh-kubectl 远程行明确不动 (理由见 `.aria/notes/secret-guard-179-pattern-rows.md`); (3) SC-5 扩两条后缀族守卫: `cat prod.env` → 2, `find . -name '*.env' -exec cat {} \;` → 2。
 - **与原 SC 的关系**: SC-4 形态全部仍成立 (两族均放行 FP 前缀); SC-5 扩充后更强; 「全部路径清单型」的字面范围收窄为枚举集 —— **属范围修正, 请 owner 复议** (若 owner 要求覆盖不动的行, 需逐行评估各自合法前缀词汇, 另起任务)。
 - **原失效断言处标记**: What.3 首段「适用面点名」bullet 现由本 Amendment 取代 (inline 指向见该段末)。
+
+### Amendment-2 (2026-08-22, Phase B 对抗 code review C-1/I-1/I-2) — `/`-根敏感名不套白名单; 两族集合删 `~`; 名组分隔符弹性
+
+- **触发证据**: 独立 code-reviewer 对 TASK-010 首版构造探针: `cat ${HOME}/.aws/credentials` / `cat "${HOME}/.kube/config"` / `cat $(echo ~)/.aws/credentials` 从基线 exit 2 变 exit 0 — **白名单套在 `/`-起头名 (`/.aws/credentials` `/.kube/config` `/kubeconfig` `/.docker/config.json` `/etc/profile` `/etc/environment`) 上时, 「前一字符」是路径前缀末字符 (`}` `)` `~` 词字符), 不是 basename 边界**。TASK-010 首版给两族加 `~` 只压住 `~/.aws/...` 一个症状 (且与 Amendment-1 / A2-m1 矛盾), 591 全绿是假绿 (SC-5 守卫全为 basename 形态)。
+- **修正**: (1) 三条含 `/`-根名的行 (key-file 行 / shell-rc 行 / ssh shell-rc 行) 拆成 `(([^|]*PP)?(basename 名)|[^|]*(/-根名))` 两分支, `/`-根名保持原 `[^|]*` 任意位置匹配 (它们的 FP 形状 `(/\.aws/...` 极罕见, 不在本 spec 治理类); (2) 两族白名单**删 `~`**, 回到 Amendment-1 定义; (3) I-2: 新名组 `\.claude/settings\.json` 对 `./` 与 `//` 分隔变体 (`~/.claude/./settings.json`) 双平面逃逸 — 名组改 `\.claude/+(\./+)*settings(\.local)?\.json`, Read 面同步 (同类变体在既有 `.aws/credentials` 等名上为既有缺口, 不在本 spec 修)。
+- **守卫扩充**: SC-5 +4 (`${HOME}` / `"${HOME}"` / `$(echo ~)` / `${PREFIX}/etc/profile`), SC-1/SC-2 +3 (I-2 变体); 全部先 RED (7/7) 后 GREEN。
+- **教训 (入 handoff)**: 自写 fixture + 自写实现 = 自洽假绿; 守卫集必须含每个名形态族 (basename 型 / `/`-根型) 而非只含"看起来像真路径"的样本。对抗 review 读码 + 自造探针是唯一抓住它的手段。
