@@ -10,7 +10,7 @@ runtime_probe:
 > **frontmatter 注**: 本 spec 是 `runtime_probe:` 声明式归档门探针 (DEC-20260705-001, `state-scanner/references/runtime-probe-declaration.md`) 的**首个采用者**; 评估前置 = A.2 产出 `detailed-tasks.yaml` (L2 yaml-only 子态自 v1.63.0 起评估)。探针只在 D.2 归档时一次性核验「近 14d 有 source=production 记录」, 非常驻 (R3 #1: 常驻 liveness 在本项目健康常态下恒红)。
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: ✅ **Approved** (owner sign-off 2026-08-22; post_spec CONVERGED R7 5/5 PASS) — ready for A.2 task-planner → post_planning
+> **Status**: ✅ **Approved** (owner sign-off 2026-08-22; post_spec CONVERGED R7 5/5 PASS; **post_planning CONVERGED R5 5/5 PASS** 2026-08-23, 1 次 owner 加轮 — `detailed-tasks.yaml` v5, 20 任务 51h) — ready for B.1
 > **审计轨迹 (post_spec, convergence, 5 席)**: R1 5/5 REVISE (2C/23M, 17 簇) → v2 → R2 5/5 REVISE (1C/21M, 14 簇; Major 持平 ⇒ **v3 设计收缩**: 删 AI 自动执行处方, 改 ~90s 提前交人) → R3 5/5 REVISE (0C/18M, 10 簇) → v4 → R4 2 PASS / 3 REVISE (0C/5M) → max_rounds=4 耗尽, **owner 裁 +2 轮** → v5 → R5 3 PASS / 2 REVISE (0C/2M) → v6 → R6 4 PASS / 1 REVISE (0C/1M: SC-5 自相矛盾一行修) → max_rounds=6 耗尽, **owner 裁 +1 轮** → v7 → **R7 5/5 PASS (0C/0M/4m) → CONVERGED**。Major 曲线 23→21→18→5→2→1→0。聚合报告 `.aria/audit-reports/post_spec-R{1..7}-1787379154696-pre-merge-gate-no-run-for-branch-aggregated.md`; R7 后按 A1-R7-m1/m2 + A4-R7-m1 落两处 minor (SC-13 证据抄录前移 / 处方 (b) branches 限定), 不改任何 verdict/kind/SC 语义
 >
 > ```yaml
@@ -23,6 +23,7 @@ runtime_probe:
 >   - "v3 设计收缩 (AI 不自动执行处方, 改为 ~90s 提前交人 + gate 渲染处方命令): **接受** (v5 现状); 自动动作若要, 另起 follow-up spec"
 >   - "audit-engine 二次降级裁定 (max_rounds=6 耗尽, R6 4/5 PASS + A1 条件 PASS): 选 [2] 再加轮 R7 形式全票 (max_rounds 6→7)"
 >   - "A.1 批准进 A.2 (post_spec CONVERGED R7 5/5)"
+>   - "2026-08-23 post_planning max_rounds=4 耗尽 (R4 1/5 PASS): 选 [2] 加 1 轮 → R5 5/5 PASS CONVERGED"
 > ```
 > **Issue**: [aria-plugin#152](https://forgejo.10cg.pub/10CG/aria-plugin/issues/152) (2026-08-20 立案, 三步判别式实证; 候选 A/B/C 未定)
 > **Owner 裁定 (2026-08-22, 本 session AskUserQuestion)**: **A′ = 显影 + 处方, 不放行** — 取 A 的「靠远端 run 史感知」与 B 的「处方文字」, 去掉 A 的「归 not_applicable 放行」。
