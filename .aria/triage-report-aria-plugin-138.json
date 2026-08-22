@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.66.1",
+  "issue_ref": "10CG/aria-plugin#138",
+  "generated_at": "2026-08-18T13:46:06Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 138,
+      "title": "[架构][secret-guard] 跨段 pattern fail-open — 逐段判定引入的唯一 fail-open 方向 (v1.66.1)",
+      "body": "**类别**: 架构, 高\n\n逐段判定后, 依赖跨顶层 `;`/`&&`/`||` 上下文才能匹配的 pattern 会失配, 今天拦得住的命令改后放行 (`2→0`)。\n\n**复现**:\n```\nset -o posix; set | grep foo          # 2 → 0\nset -o posix && set | grep buildid    # 同\n```\n\n**工作面**: 82 条可跨段 pattern (含 `[^|]` 或 `.*`) / 56 个可跨段家族。v1.66.1 SC-19 实测 51 族 `2→0` + 5 族结构性反例 (段内自足独立命中)。printf 族因唯一 pattern 要求块字符→必降级, 天然不可跨段, 已豁免。\n\n**根治**: 需完整 shell 语法解析 (识别跨段上下文), 属另一 spec 范围。v1.66.1 已**申报 + 测量** (CHANGELOG 第 2 类 + SC-19 探针集), 未兜底。\n\n---\n衍生自 **aria-plugin#128** (secret-guard 逐段 fail-safe 判定, v1.66.1 ship 2026-08-16)。本 spec 明确**不修**此项, ship 时按纪律转出立案。详见 spec `openspec/changes/secret-guard-per-segment-evaluation/proposal.md` §转出。",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/138",
+      "created_at": "2026-08-16T14:53:01Z",
+      "updated_at": "2026-08-16T14:54:07Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.66.1",
+      "current": "1.66.1",
+      "gap": "same"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "openspec/changes/secret-guard-per-segment-evaluation/proposal.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "1743f25bcb60a33faccef8a300eaa6dd11930057"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "printf JSON{command:'set -o posix; set | grep foo'} | bash aria/hooks/secret-guard.sh (aria @ 3b97c35 = v1.66.1) vs cache 1.65.5 副本",
+        "expected_behavior": "v1.66.1 exit 0 (放行), 旧版 exit 2 (拦截) — 2→0",
+        "actual_behavior": "new(1.66.1) exit=0 / old(1.65.5) exit=2",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "同上, command='set -o posix && set | grep buildid'",
+        "expected_behavior": "同 2→0",
+        "actual_behavior": "new exit=0 / old exit=2",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "对照: command='set | grep foo' (无 set -o posix 段)",
+        "expected_behavior": "(issue 未声称) 用于确认失配确由跨段上下文引起",
+        "actual_behavior": "new exit=0 / old exit=0 — 单段本就不拦, 拦截依赖跨 `;`/`&&` 的 `set -o posix … set |` 上下文, 逐段判定切断了它",
+        "match": true,
+        "notes": "版本 gap=same (1.66.1); 无 in-flight PR/分支; 该项是 #128 明确不修的转出项, 属新 spec 范围"
+      }
+    ],
+    "hit_count": 3,
+    "total_count": 3,
+    "hit_rate": "3/3"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

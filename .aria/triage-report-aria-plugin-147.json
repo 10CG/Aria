@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.66.1",
+  "issue_ref": "10CG/aria-plugin#147",
+  "generated_at": "2026-08-18T13:46:06Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 147,
+      "title": "[缺陷][类级] UnicodeDecodeError 是 ValueError 族而非 OSError 族 — text=True 调用点的 except 元组普遍接不住它 (含被当作「先例」的 aether.py)",
+      "body": "## 一句话\n\n`issubclass(UnicodeDecodeError, OSError)` = **False**, 而 `issubclass(UnicodeDecodeError, ValueError)` = **True**。\n\n仓内大量 `subprocess.run(..., text=True)` 的调用点, `except` 元组写的是 `OSError` 族 (`OSError` / `FileNotFoundError` / `TimeoutExpired`)。**远端返回非 UTF-8 字节时, 解码异常从这些元组底下直接穿过去。**\n\n## 为什么会普遍写错\n\n直觉上「子进程出问题」= `OSError` 族。但 `text=True` 让 **subprocess 自己解码**, 解码失败属 `ValueError` 族 —— 和「进程起不来」是两条完全不同的继承链:\n\n```\nUnicodeDecodeError -> UnicodeError -> ValueError -> Exception\nOSError                             -> Exception      # 两条链只在 Exception 汇合\n```\n\n## 初筛结果 (⚠️ 是初筛, 不是定论)\n\n全仓 `--include=*.py` 扫 `text=True`, 共 **26 个文件**。按「第一处 `subprocess.run` 往后 900 字符内的 `except` 子句是否含 `ValueError`/`Exception` 族」粗筛:\n\n- **接不住: 21** (其中约 10 个是生产文件, 约 11 个是测试文件)\n- **接得住: 3** (`fetch_gate.py` 用了 `(OSError, ValueError)` · `closeout_trigger.py` 与 `identity.py` 用了 `except Exception`)\n\n**这个数字需要逐处复核**, 不能直接当 21 个 bug —— 可能有外层 try、或输出根本不来自不可信源。列出来是为了给复核一个起点。\n\n生产文件里比较值得先看的:\n\n| 文件 | except 元组 |\n|---|---|\n| `phase-c-integrator/scripts/ci_backends/aether.py` | `(TimeoutExpired, FileNotFoundError, OSError)` |\n| `state-scanner/lib/worktree_manager.py` | `FileNotFoundError` / `OSError` |\n| `state-scanner/lib/coordination_ref.py` | `TimeoutExpired` |\n| `state-scanner/scripts/phase1_gate.py` | `(OSError, TimeoutExpired)` |\n| `state-scanner/scripts/collectors/custom_checks.py` | `TimeoutExpired` |\n| `git-remote-helper/scripts/verify_post_push.py` | `(TimeoutExpired, OSError)` |\n\n## ⚠️ 最要紧的一处: 这个坑长在「先例」上\n\n`ci_backends/aether.py` 的那个元组**正被当作可复用的先例引用** —— 它出现在 `phase-c-integrator` 的实现指引里, 用意是「异常轴复用既有先例, 不要再造一套」。\n\n于是形成一个放大器: **照着先例抄元组 + 用 `text=True` 的人, 会稳定地复制这个缺口。**\n\n(v1.66.0 的 #137 修复躲过了它, 但**不是因为元组对**, 而是因为那处刻意没用 `text=True` —— 自己取 bytes 用 `surrogateescape` 解码。这说明缺口靠「复用先例」这条纪律**防不住**。)\n\n## 两种修法 (未定, 供讨论)\n\n**A. 逐处补 `ValueError`** —— 改动小、位置明确。但它是「修实例」: 下一个新写的调用点仍会照直觉写 `OSError` 族。\n\n**B. 不用 `text=True`, 统一取 bytes 自己解码** —— `capture_output=True` + `errors=\"surrogateescape\"` 解码永不抛, 从**结构上**消除这类异常; 代价是需要在出口做净化 (孤立代理码位会在下游 `json.dumps` 时炸)。\n\n倾向 B, 因为它让缺口不可能再长出来; 但 B 的改动面比 A 大, 且出口净化本身是个新的要记住的事。\n\n## 复现 (已实跑)\n\n```python\nimport subprocess\nsubprocess.run([\"printf\", r\"\\xff\\xfe\"], capture_output=True, text=True)\n# UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0\n#   isinstance(e, OSError)    = False   <- 所以 OSError 族的 except 接不住\n#   isinstance(e, ValueError) = True\n```\n\n对照 (不用 `text=True` 则永不抛):\n\n```python\nr = subprocess.run([\"printf\", r\"\\xff\\xfe\"], capture_output=True)\nr.stdout.decode(\"utf-8\", errors=\"surrogateescape\")   # '\\udcff\\udcfe'\n```\n",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/147",
+      "created_at": "2026-08-16T15:04:54Z",
+      "updated_at": "2026-08-16T15:12:13Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.66.0",
+      "current": "1.66.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "--include=*.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "fetch_gate.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "closeout_trigger.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "identity.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "phase-c-integrator/scripts/ci_backends/aether.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "state-scanner/lib/worktree_manager.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "state-scanner/lib/coordination_ref.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "state-scanner/scripts/phase1_gate.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "state-scanner/scripts/collectors/custom_checks.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "git-remote-helper/scripts/verify_post_push.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "ci_backends/aether.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "1743f25bcb60a33faccef8a300eaa6dd11930057"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "subprocess.run(['printf', r'\\xff\\xfe'], capture_output=True, text=True)",
+        "expected_behavior": "UnicodeDecodeError 抛出; isinstance(e, OSError)=False, isinstance(e, ValueError)=True (issue 声称)",
+        "actual_behavior": "UnicodeDecodeError | isinstance OSError: False | isinstance ValueError: True; bytes 路径 decode(errors='surrogateescape') 得 '\\udcff\\udcfe' 不抛",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "AST 普查 aria/ @ 3b97c35 (v1.66.1): 每个 subprocess.run(..., text=True) 调用点, 逐层向上找包住它的 try, 看 except 是否含 ValueError/UnicodeDecodeError/UnicodeError/Exception/bare",
+        "expected_behavior": "issue 初筛: 26 文件含 text=True; 按文件 21 接不住 (≈10 生产 + ≈11 测试) / 3 接得住",
+        "actual_behavior": "27 文件 / 46 调用点 (生产 16, 测试 30)。生产 12 调用点接不住 (9 文件: verify_post_push.py:65,:89 / issue-triage collectors/_common.py:39 / ci_backends/aether.py:150,:173 / coordination_ref.py:255 / worktree_manager.py:117 / custom_checks.py:342 / spec_complete.py:863,:874 / phase1_gate.py:240 / validate_schema_doc.py:130 无 try) ; 4 接得住 (fetch_gate.py:68 ValueError / closeout_trigger.py:90 Exception / identity.py:173 Exception / state-scanner collectors/_common.py:406 显式 UnicodeDecodeError)。测试 27 调用点无 try (测试里裸抛可接受)。口径不同 (调用点 vs 文件, AST 包围 try vs 900 字符窗口), 数量级一致, 类级判断成立",
+        "match": true,
+        "notes": "影响面分层: state-scanner collector 内的站点被 scan.py:478 顶层 except Exception 兜住 → soft_error 降级非崩溃; CLI 入口 (phase1_gate/verify_post_push/aether/pre_merge_gate 路径) 会以 traceback 退出 (响亮 fail-closed, 非静默)"
+      },
+      {
+        "case_id": "case-3",
+        "input": "grep 'TimeoutExpired, FileNotFoundError, OSError' 在 phase-c-integrator 文档/代码里被当先例引用的位置",
+        "expected_behavior": "issue 声称: aether.py 的元组正被 phase-c-integrator 实现指引作为『异常轴复用先例』引用, 形成放大器",
+        "actual_behavior": "pre_merge_gate.py:310-316 docstring 写明『异常轴取 path_coverage.py 的 (TimeoutExpired, FileNotFoundError, OSError) 元组』(先例是 path_coverage.py:93, 非 aether.py; aether.py 被引的是重试轴 RETRY_BACKOFF), 且同一处已附警告『⛔ 不传 text=True … 元组接不住』; references/pre-merge-gate-empirical-traps.md 坑 #4 也已成文。放大器结构存在, 但引用处自带解毒说明",
+        "match": true,
+        "notes": "issue 把先例文件误记为 aether.py (实为 path_coverage.py 的同款元组); 结论不变"
+      }
+    ],
+    "hit_count": 3,
+    "total_count": 3,
+    "hit_rate": "3/3"
+  },
+  "verdict": "confirmed",
+  "severity": "minor",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

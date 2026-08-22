@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.66.1",
+  "issue_ref": "10CG/aria-plugin#145",
+  "generated_at": "2026-08-18T13:46:07Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 145,
+      "title": "[安全][secret-guard] BLOCKED 回显把整条命令送进 chat-visible 通道 (Rule #7)",
+      "body": "**类别**: 安全, 中。**归因勘正**: 这是 canonical `secret-guard.sh` 既有暴露面 (`Command was: $command`), **先于 v1.66.1 存在**, 非本版引入 (逐段判定的「触发段落」行是整条命令的子串, 不新增暴露面)。\n\n命令行内联真值时, BLOCKED 回显整条命令即触 Rule #7。\n\n**复现 (假值, 不涉真 secret)**:\n```bash\nprintf '%s' '{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9\"}}' \\\n  | bash aria/hooks/secret-guard.sh 2>&1 >/dev/null | tail -2\n# 实测末行: Command was: nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9   (exit 2)\n```\n\n**历史泄漏面已普查** (owner 指示): 扫 909 transcript + 2 log, 263 条 BLOCKED 回显, 两模态交叉 (键名判据 + 高熵串), **未发现真实内联真值泄漏, 无需凭据轮换**。\n\n**脱敏时范围提醒**: 若日后脱敏 BLOCKED 回显, 须**同时**覆盖 `Command was: $command` 与新增的「触发段落」行 (只脱敏前者会让后者成唯一残留泄漏面)。\n\n---\n衍生自 **aria-plugin#128** (secret-guard 逐段 fail-safe 判定, v1.66.1 ship 2026-08-16)。本 spec 明确**不修**此项, ship 时按纪律转出立案。详见 spec `openspec/changes/secret-guard-per-segment-evaluation/proposal.md` §转出。",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/145",
+      "created_at": "2026-08-16T14:53:05Z",
+      "updated_at": "2026-08-16T14:54:07Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.66.1",
+      "current": "1.66.1",
+      "gap": "same"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "secret-guard.sh",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "openspec/changes/secret-guard-per-segment-evaluation/proposal.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "1743f25bcb60a33faccef8a300eaa6dd11930057"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "printf JSON{command:'nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9'} | bash aria/hooks/secret-guard.sh 2>&1 >/dev/null | tail",
+        "expected_behavior": "exit 2 且 stderr 末行含 'Command was: nomad var put secret/demo value=FAKE_…'",
+        "actual_behavior": "exit=2; stderr 含 'Command was: nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9' 与 'Triggering segment: nomad var put secret/demo value=FAKE_PLACEHOLDER_NOT_A_SECRET_9x9' (两行都回显整段)",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "同输入 | cache 1.65.5 旧副本 | grep -c 'Command was:'",
+        "expected_behavior": "issue 归因勘正: 暴露面先于 v1.66.1 存在",
+        "actual_behavior": "1 (旧版同样回显 Command was:) — 先于 v1.66.1; 1.66.1 新增的 'Triggering segment' 行是第二处",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "grep -n 'Command was|Triggering segment' aria/hooks/secret-guard.sh",
+        "expected_behavior": "两处发射点都要纳入脱敏范围 (issue 提醒)",
+        "actual_behavior": "secret-guard.sh:936 'Command was: $command' (heredoc) + :939 echo \"Triggering segment: $seg\" >&2 — 两处均走 stderr, exit 2 时被 harness 作为拦截原因回喂给 AI (chat-visible)",
+        "match": true
+      }
+    ],
+    "hit_count": 3,
+    "total_count": 3,
+    "hit_rate": "3/3"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}
