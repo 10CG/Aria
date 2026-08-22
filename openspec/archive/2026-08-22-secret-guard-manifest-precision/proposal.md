@@ -1,3 +1,11 @@
+---
+unverified_claims:
+  - claim: "archive-safety-net-integration-claims-unverified"
+    reason: "detailed-tasks.yaml 含已完成集成类 task title, yaml 数据源暂无 symbol-liveness 核验; 需人工复核"
+    symbols: []
+unverified_ack: true
+unverified_ack_reason: "人工核验齐全: TASK-015 交付面复验 PASS (cache 1.66.4 cmp 字节相同 + 活体 PreToolUse 链两向探针: SC-1 形态 BLOCKED / 旧误报形态放行); Phase B 对抗 code review 30 组探针 + 复核 PASS_WITH_WARNINGS (.aria/audit-reports/phase-b-review-179-*); 全量 599/599。owner 2026-08-22 进 Phase D。"
+---
 # secret-guard: claude 配置文件入敏感清单 (双平面) + 参数位置误报收敛 (Aria #179)
 
 > **Level**: Minimal (Level 2 Spec)

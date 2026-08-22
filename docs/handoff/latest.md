@@ -1,18 +1,21 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-22-session-close-credential-defense-and-mirror-collisions.md](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) — credential-echo-defense-three-layers @ phase=shipped (session closeout 08-18→08-22, 五 ship + 事故闭环, 在飞 0 条) updated=2026-08-22
+**Latest**: [2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) — secret-guard-manifest-precision (#179) @ phase=D (status=done, v1.66.4 ship + 归档, track 终结) updated=2026-08-22
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
 > 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
-> **track 状态 (在飞 0 条: premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 均终结)**:
+> **track 状态 (在飞 0 条: premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 / #179 08-22 均终结)**:
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **✅ done (2026-08-18 归档, track 终结)** | [2026-08-18 (Phase D)](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) |
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
+> | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-22 更新 #2 (simonfish/bfe8285d, #179 十步循环全程)**: bare pointer 改指 #179 Phase D handoff (全仓最新)。**#179 track 终结**: triage → spec (post_spec 2 轮) → A.2/A.3 (post_planning 1 轮+确认) → B (TDD 14 commit, 对抗 review 抓 1 处自洽假绿回归, Amendment-1/2) → **ship aria-plugin v1.66.4** (三仓双推核验) → 归档 + tracker #187。同 session: 僵尸 spec ci-path-coverage 归档 (#186) / a1-entry C1/C2 裁定 / NEXUS token 核实 08-09 已轮换。待 owner 复议: SC-8 五次性能数据 + Amendment 范围修正 (见 handoff §2)。既有各行未动。
 >
 > **2026-08-22 更新 (simonfish/023236f2, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新, 覆盖 08-18→08-22 整段对话; 周期账目仍在 08-20 batch handoff)。本段后半: superseded spec `subprocess-decode-hardening` 残值 harvest 完毕 (守卫三轴 `400f0bc`, 对方已归档 `909d771`) · registration-token 事件闭环 (owner 重置 + 5/5 runner 对账) · plugin 1.66.3 交付面四分判定 PASS。未闭合: #152 修法裁定 / #154 L3 排期 / Rule #10 复议点未回应 / Aether 拓扑文档漂移未立案。既有各行未动。
 >
