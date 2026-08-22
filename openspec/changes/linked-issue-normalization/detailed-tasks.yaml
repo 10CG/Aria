@@ -24,18 +24,18 @@ metadata:
   # YAML 两套根。现改为多仓声明, 且**全部 deliverables 路径一律从主仓根起算全限定**。
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
-      head: "af87cae"
+      head: "9e6a17c"   # 2026-08-22 R5 前更新 (= v1.66.4 ship 点; R4 版 af87cae 已落后 4 版)
       surface: "lib/collision.py · lib/claim_schema.py · SKILL.md · tests/ · 5 个版本文件"
       path_prefix: "aria/"
     - repo: "Aria (主仓)"
-      head: "2cf2569"   # R3-fix 时更新 (R2-fix 版停在 a52ab81, 落后 2 提交)
+      head: "084209f"   # 2026-08-22 R5 前更新 (本 change 文件自 97a3885 起未动; 主仓在此期间 ship 了 v1.66.0–v1.66.4)
       surface: "gitlink · VERSION · README.md · README.{zh,ja,ko}.md · CLAUDE.md · Spec 本体 · .aria/repro/ · .aria/decisions/ · aria-plugin-benchmarks/ab-results/"
       path_prefix: ""
   path_convention: >
     本文件所有 deliverables 路径**从主仓根起算**。aria 子模块内的文件一律带 `aria/` 前缀。
     裸 `VERSION` / `README.md` 指主仓那一份 (aria 子模块内同名文件另有其路径)。
 
-  ship_target: "aria-plugin v1.66.0 (MINOR — 行为面扩大)"
+  ship_target: "aria-plugin v1.67.0 (MINOR — 行为面扩大)"
   total_tasks: 28   # 21 active + 7 cancelled (编号保留含义冻结)
   task_groups: 5
   status: >
@@ -43,6 +43,10 @@ metadata:
     → R1-fix → R2 2 PASS / 3 REVISE·FAIL (2C + 11M, 对比 R1 3C + 12M 基本持平; fix 引入占比
     两席独立测算 83% / 62% 均 >1/2 ⇒ 拐点已过)。**owner 裁定 2026-08-08: 停止逐条补丁, 按规律
     重做组 5; 删 TASK-016 委派 phase-c-integrator。** 待 R3 (只审组 5)。
+    **→ R3 5/5 FAIL → R3-fix → R4 两席新鲜眼睛 FAIL (4+2C) → R4-fix (97a3885, 2026-08-08)。max_rounds=4 耗尽。
+    owner 2026-08-22 裁定: 加 1 轮 R5 (max_rounds 4→5, 两席新鲜眼睛)。R5 前机械收口 (bfe8285d):
+    ship target v1.66.0→v1.67.0 / #137 已修 (v1.66.0) C3 解除 / R4 M3 (6 个 test 点名) · M5 (013/025/027
+    deliverables 补全) · M7 (dangling 指针改 git grep 口径) · 5.8→5.12 指针 / scope_repos head 刷新。**
   new_agents_required: false
   agent_roster: [qa-engineer, backend-architect, knowledge-manager]
 
@@ -79,6 +83,11 @@ metadata:
           「main 无 in-flight」**恒真**。SKILL.md 靠一句「显式传真值」纸面兜, 但 Rule #8 闸门
           的 fail-OPEN 缺省值本身即错 (memory `feedback_invariant_needs_failclosed_default`)。
           ⇒ 调用时**必须显式** `--main-branch master`, 并核验它真的查到了 master。
+          **2026-08-22 更新 (R5 前机械收口)**: aria-plugin#137 已于 **v1.66.0 (aria `8683551`) 修复** ——
+          修法是 `_verify_main_branch_exists()` 对 `--remote` 做分支存在性核验, 不存在即 fail-CLOSED
+          (`main branch 'X' not found on remote`), **缺省值仍为 "main"** (实读 `pre_merge_gate.py:547`)。
+          ⇒ (b) 腿「恒真」已解除 (缺省 main 在本仓会直接失败而非静默绿); 「必须显式传 master」仍成立。
+          (a) 腿 (paths 过滤 ⇒ not_applicable) 未变, 由并发轨 aria-plugin#152 (v1.66.5 目标) 处理。
 
       - who: "phase-d-closer"
         what: "Phase D — cycle 进度更新 / Spec 归档 / 周期 handoff (Rule #9)"
@@ -242,7 +251,7 @@ tasks:
       - "场景数 ≥13 (SC-1:6 + SC-1b:3 + SC-2:1 + SC-3:1 + SC-4:2) — 逐 SC 清单核对, 不用 Ran 数换算"
       - "SC-1/1b/3/4 在未改 collision.py 的工作树上必须 RED (对齐 proposal baseline 表)"
       - "SC-2 在 baseline 上为 GREEN (负控) — 若它 baseline 就红, 说明用例写错了"
-      - "既有 6 个 test 方法名与函数体逐字未变 (git diff 核, 非行号区间核)"
+      - "既有 6 个 test 方法 (= `TestLinkedIssueOverlaps` 4 个 + `TestPhase1GateLinkedIssueCli` 2 个; 宿主文件另有 28 个既有 test 方法同样不得改动) 名与函数体逐字未变 (git diff 核, 非行号区间核)"
     notes: >
       SC-1b 是唯一覆盖第三个 strip 点 (/-split 之后) 的用例 — 「#-split 后 strip 了、
       /-split 后忘了」的实现只有它能杀 (R1'/C1 变异实证)。举例必须带 repo 段 (R1/C1 根因
@@ -510,6 +519,7 @@ tasks:
     dependencies: [TASK-012]
     deliverables:
       - aria-plugin-benchmarks/ab-results/          # 主仓普通 tree (实测, 非子模块); 本轮结果子目录含 summary.yaml
+      - aria-plugin-benchmarks/ab-suite/            # 仅「覆盖外 → 三件套」分支: 可证伪定向 fixture 的家 (先例 ab-suite/phase-c-integrator-pre-merge-gate-fixtures/; R4 M5)
     verification:
       # R1-fix: 首版只要求「跑了 + 落盘 + 时点」, 无结果判据 ⇒ AB 判 WITHOUT_BETTER 仍绿
       - "AB 经 /skill-creator 执行 (Rule #6: 自研 runner 已废弃)"
@@ -543,7 +553,7 @@ tasks:
       - "cd aria/skills/state-scanner/tests && python3 run_tests.py → OK, 0 failures/errors"
       - "bash aria/skills/run_all_tests.sh → 0 FAIL"
       - "17 条 SC 的场景逐条清单核对全部落盘 (与 Ran 数无关, 见 metadata.test_counting_contract)"
-      - "既有 6 个 test 方法名与函数体逐字未变 (git diff 核)"
+      - "既有 6 个 test 方法 (`TestLinkedIssueOverlaps` 4 + `TestPhase1GateLinkedIssueCli` 2) 名与函数体逐字未变 (git diff 核); 宿主文件其余 28 个既有 test 方法亦逐字未变"
     notes: >
       ⛔ **不得用 `Ran N` 换算场景数** (首版写 "Ran ≥1367" 被三席同时命中)。
       ⚠️ 环境陷阱见 metadata.known_env_trap (aria-plugin #134): 单模块模式与 pytest 对
@@ -552,7 +562,7 @@ tasks:
   - id: TASK-015
     parent: "5.2"
     task_group: TG-5
-    title: "aria 子模块 5 文件 bump 到 v1.66.0"
+    title: "aria 子模块 5 文件 bump 到 v1.67.0"
     status: cancelled
     cancelled_at: "2026-08-08 (R2-fix)"
     superseded_by: "TASK-022"
@@ -626,7 +636,7 @@ tasks:
     verification:
       - "gitlink 指向 aria 子模块 **TASK-016 合并后的 master SHA**, 不是 feature 分支 SHA"
       - "README.md **两处**版本引用都已更新 (badge + 'Plugin Version:' 行)"
-      - "custom check m6-version-badge-match → OK badge=1.66.0"
+      - "custom check m6-version-badge-match → OK badge=1.67.0"
     notes: >
       ⚠️ m6-version-badge-match **只比 badge**, 对 'Plugin Version:' 行结构性失明 ⇒ 它 OK
       不代表本任务完成; 齐备性由 TASK-020 的零命中断言兜 (R1/code-reviewer Critical-1)。
@@ -651,7 +661,7 @@ tasks:
     verification:
       - "三份各 **3 处**版本引用全部更新 (共 9 处) — 不只是 translated-from 标记"
       - "正文无实质变更 ⇒ 只更这三处, **不重译正文** (#140 B 档)"
-      - "custom check i18n-readme-translation-currency → OK (3 i18n READMEs current @ 1.66.0)"
+      - "custom check i18n-readme-translation-currency → OK (3 i18n READMEs current @ 1.67.0)"
     notes: >
       ⚠️ **R1/code-reviewer Critical-1 的一半**: 首版本任务只写「translated-from 标记 ×3」,
       漏掉每份的 badge 与 'Plugin Version:' 行共 6 处。而 i18n-readme-translation-currency
@@ -749,7 +759,7 @@ tasks:
   - id: TASK-022
     parent: "5.9"
     task_group: TG-5
-    title: "aria 子模块版本面 bump 到 v1.66.0 — 按引用点枚举"
+    title: "aria 子模块版本面 bump 到 v1.67.0 — 按引用点枚举"
     status: pending
     complexity: S
     est_hours: 3
@@ -813,7 +823,7 @@ tasks:
       - "**整仓差集断言 (fail-CLOSED)**: 对全部 tracked 文件 grep 旧版本号 `1.65.5`, 命中集合减去**显式成文排除集**后必须为**空**"
       - "排除集 (成文, 逐条给理由): `aria/VERSION` + `aria/CHANGELOG.md` (append-only 版本史) · `.aria/audit-reports/**` (审计史) · `openspec/changes/linked-issue-normalization/**` 内的订正留痕行 (本 Spec 自述历史)"
       - "⛔ 任何**不在排除集**里的新命中即红 —— 不许临时往排除集加条目来凑绿, 加条目须同批写理由"
-      - "**新值计数**: 普通引用文件的 `1.66.0` 出现次数 == breakdown 的预期点数 (主仓 14 + aria 侧 4 = 18)"
+      - "**新值计数**: 普通引用文件的 `1.67.0` 出现次数 == breakdown 的预期点数 (主仓 14 + aria 侧 4 = 18)"
       - "**append-only 账本**: (a) **全部**「当前版本」声明 == plugin.json (注意 `aria/VERSION:56-59` 的第二处声明) **且** (b) 文件行数不减"
       - "跑**不带路径**的 `git status` 核验实际落地面与声称一致"
       - "本断言在 TASK-028 (合并+双推+gitlink) 之前通过 — 任何计数错须在可回退点之前发红"
@@ -836,10 +846,14 @@ tasks:
     dependencies: [TASK-009]
     deliverables:
       - .aria/repro/sc-baseline-linked-issue-normalization.py
+      - openspec/changes/linked-issue-normalization/proposal.md           # (b) 路: artifact 指针同批修 (R4 M5/M7)
+      - openspec/changes/linked-issue-normalization/tasks.md              # 同上
+      - openspec/changes/linked-issue-normalization/detailed-tasks.yaml   # 同上 (本文件自引)
+      - .aria/repro/archive/                                              # (b) 路: 脚本移出 .aria/repro/ 的存档目的地 (带 SHA 的存档报告同放)
     verification:
       - "路径一 (恒红): TASK-008 落地后那 8 条 SC 转绿 ⇒ 脚本 :275-277 恒红 — 已处置"
       - "路径二 (归档后): 脚本从 proposal.md 现场解析 (:205-215 FATAL fail-CLOSED) ⇒ Spec 归档后换一种恒红 — 已处置"
-      - "两条路择一并在脚本顶部成文: (a) 加 post-implementation 模式断言那 8 条**已转绿** + baseline 结果冻成同目录存档 (须同时解决归档后解析路径); (b) 显式退役 + baseline 冻成带 SHA 的存档报告 + 脚本移出 .aria/repro/ + **同批修 proposal.md 的 **3 处** artifact 指针 (:181 / :183 / :219)**避免 dangling"
+      - "两条路择一并在脚本顶部成文: (a) 加 post-implementation 模式断言那 8 条**已转绿** + baseline 结果冻成同目录存档 (须同时解决归档后解析路径); (b) 显式退役 + baseline 冻成带 SHA 的存档报告 + 脚本移出 .aria/repro/ + **同批修全部交付面引用**避免 dangling: 口径 = `git grep -l sc-baseline-linked-issue-normalization` 减 append-only 史 (.aria/audit-reports/ · docs/handoff/ · 脚本自身) ⇒ 08-08 实测 proposal.md (3 行) + tasks.md + detailed-tasks.yaml (2 处); 执行时重跑 git grep, 不抄此清单 (R4 M7)"
       - "无论哪条, substitute 论证的可复核性仍然成立"
       - "⚠️ **路径二须可执行验证** (R3-fix, tech-lead X8): 原验收「已处置」在 Phase B 任何时点都不可能红 (失效发生在 Phase D 归档)。判据改为: **把 spec 目录临时改名后重跑脚本仍不 FATAL** —— 这在 Phase B 即可执行"
       - "⛔ **(a)/(b) 的择一是 owner 裁量项** (R3-fix, code-reviewer M-3): 实施者不得自行择一; 未获 owner 表态前本任务不得判 done"
@@ -885,6 +899,7 @@ tasks:
     dependencies: [TASK-013]
     deliverables:
       - .aria/decisions/          # 披露记录 (或并入本 change 的 handoff)
+      - openspec/changes/linked-issue-normalization/proposal.md   # rule6_note 段 (§Impact) 同批更新 — Rule #6 要求豁免/缩门在 spec/tasks 留 rule6_note (R4 M5)
     verification:
       - "成文披露「本次未跑 Tier 1 全量 AB」及理由, 不得默默缩门"
       - "开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订"
