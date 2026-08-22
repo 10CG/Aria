@@ -9,7 +9,7 @@ metadata:
   planned_at: "2026-08-22"
   planned_by: "task-planner (A.2+A.3) via main loop; v2 = post_planning R1 12 簇; v3 = R2 8 簇; v4 = R3 6 簇; v5 = R4 5 簇; **post_planning CONVERGED: R5 5/5 PASS (0C/0M, 9 minor 已随 R5 落)** — A.2/A.3 闭合, ready for B.1"
   schema_note: "沿 #179 / ci-path-coverage 两先例: 路径 B 仍带 parent (分组标签, 非 tasks.md 编号); estimated_hours 用数值 (int 或 .5, 无 validator); A.3 的 Agent 分配理由用 reason 字段 (逐任务)"
-  dispatch_viable: null              # TASK-001 回填 true|false (机检占位; null = 未探)
+  dispatch_viable: true              # TASK-001 2026-08-22: HTTP 204, run 2s 内出现 (31968 success; 成对 31969 failure 同 started_at, 见 traps §六); 条件组 TASK-007a/007b 执行
   estimation_note: "锚 = #179 同形态 17 任务 44h 实测; 20 任务中 15 个 <4h 是 TDD 配对刻意拆分 (qa RED → be GREEN) 或单步前置/收尾任务, 配对 (002+003 7h / 005+006 6h / 007a+007b 4h / 008+009 9h) 近 4-8h 带 (008+009 略超, helper CLI 为 L)"
   tdd_note: "每对 (RED 测试任务 → GREEN 实现任务) 分属 qa-engineer / backend-architect 两 agent; 守卫 (GUARD) 任务钉基线 SHA 9e6a17c 且在被守护变更之前落"
   exec_order_note: "exec_order 是拓扑序的 advisory tie-break, 非串行调度; parallel_tracks 声明的轨可并行。机检不变量 (v3 起程序化断言): 每任务 exec_order > 其所有 dependencies 的 exec_order; TASK-003 ∈ 005/006/007a/007b/010a/010/011/012/013/014/015/016 (12 项) 的依赖闭包"
@@ -73,7 +73,7 @@ tasks:
     exec_phase: "B.1-entry"
     exec_order: 0
     title: "Phase B-entry 认领: phase1_gate advisory claim (track pre-merge-gate-no-run-for-branch, --linked-issue aria-plugin#152) + 三面 fetch 复查"
-    status: pending
+    status: done   # 2026-08-22T20:33:47Z claim s-a637@2033 passed, push_success, overlap []
     complexity: S
     estimated_hours: 0.5
     dependencies: []
@@ -93,7 +93,7 @@ tasks:
     exec_phase: "B.1"
     exec_order: 1
     title: "B.1 分支创建 (两仓): aria 子模块 feature/152-no-run-for-branch @ 9e6a17c (确认在分支上再 commit, 非 detached HEAD) + 主仓 feature/152-no-run-for-branch @ master (承载 config.template / .gitignore / DEC / ab-suite+ab-results / spec yaml 状态 / gitlink / 14 版本点)"
-    status: pending
+    status: done   # aria feature/152-no-run-for-branch@9e6a17c (从 detached 上分支) + 主仓 feature/152-no-run-for-branch@118563f
     complexity: S
     estimated_hours: 0.5
     dependencies: [TASK-000]
@@ -112,7 +112,7 @@ tasks:
     exec_phase: "B.1-前置"
     exec_order: 2
     title: "TASK-0a: workflow_dispatch 纯 API 活体探针 → dispatch_viable 布尔 + 证据落 traps §6 (仓内 SOT) + memory 镜像修正"
-    status: pending
+    status: done   # dispatch_viable=true (HTTP 204, Δt≈2s); 副产品: 首推 push run 31967 正常建立 — #152 盲区未复现, 复现条件未定 (traps §六); 探针已删, 三断言过
     complexity: S
     estimated_hours: 1.5
     dependencies: [TASK-000b]
