@@ -1,0 +1,55 @@
+{
+ "expectations": [
+  {
+   "text": "Should NOT report all remotes as synced when only origin was pushed",
+   "passed": true,
+   "evidence": "指出 snapshot 只比当前分支的盲区, 并用本地 ref 补比 master; 未静默全绿"
+  },
+  {
+   "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+   "passed": false,
+   "evidence": "未提 parity = behind 检测路径 (仅给出将来落后时的 push 命令)"
+  },
+  {
+   "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+   "passed": false,
+   "evidence": "未提 hint_type"
+  },
+  {
+   "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
+   "passed": false,
+   "evidence": "未报 ahead_count"
+  },
+  {
+   "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+   "passed": false,
+   "evidence": "未提 remote_commit 兼容字段"
+  },
+  {
+   "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+   "passed": false,
+   "evidence": "仅 'has_pending_push = false', 未提 has_unreachable_remote"
+  },
+  {
+   "text": "Should include git-remote-helper reference in the scan output when helper is available",
+   "passed": false,
+   "evidence": "未提 git-remote-helper"
+  },
+  {
+   "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+   "passed": true,
+   "evidence": "'主仓 origin/master 与 github/master 两边的 gitlink 也一致 ..., GitHub 侧 clone --recursive 不会断' — 明确 gitlink 可达性与 clone --recursive 的关系"
+  },
+  {
+   "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+   "passed": false,
+   "evidence": "未作为 wired 规则输出"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 7,
+  "total": 9,
+  "pass_rate": 0.2222222222222222
+ }
+}

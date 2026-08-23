@@ -1,0 +1,55 @@
+{
+ "expectations": [
+  {
+   "text": "Should NOT report all remotes as synced when only origin was pushed",
+   "passed": true,
+   "evidence": "未静默通过: 指出 snapshot parity 未验证, 并用 ls-remote 逐仓核 master; 真实仓库两端一致"
+  },
+  {
+   "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+   "passed": true,
+   "evidence": "机制说明: 'github 落后会直接报 parity=behind/has_pending_push=true 并压 overall_parity=false' (场景未复现, 但字段路径正确陈述)"
+  },
+  {
+   "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+   "passed": false,
+   "evidence": "未提 hint_type: push"
+  },
+  {
+   "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
+   "passed": false,
+   "evidence": "未报 ahead_count (无落后)"
+  },
+  {
+   "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+   "passed": false,
+   "evidence": "未提 submodules[].remote_commit 兼容字段"
+  },
+  {
+   "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+   "passed": false,
+   "evidence": "未提 has_unreachable_remote 字段 (仅 8 leg fetch_ok)"
+  },
+  {
+   "text": "Should include git-remote-helper reference in the scan output when helper is available",
+   "passed": false,
+   "evidence": "未提 git-remote-helper"
+  },
+  {
+   "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+   "passed": false,
+   "evidence": "仅 'no_published_ref ... 不是 orphaned, 不阻断', 未说明 gitlink 不可达导致 clone --recursive 断裂"
+  },
+  {
+   "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+   "passed": false,
+   "evidence": "未作为 wired 规则输出"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 7,
+  "total": 9,
+  "pass_rate": 0.2222222222222222
+ }
+}

@@ -68,30 +68,30 @@
 >
 > 每项括注为该项贡献的**子用例场景数**, 全组加总 = **45**, 与 proposal §Impact 的逐条推导独立吻合 (两处任一变动须同批重算)。**「子用例场景」≠ unittest `Ran N` 计数的 test 方法数** —— 一个 test 方法可含多个场景 (本文件既有 `test_invalid_shapes_and_paths` 即 1 方法 4 场景), 故验收**不得**用 `Ran` 数换算, 见 5.1。
 
-- [ ] 1.1 SC-1 / SC-1b / SC-2 / SC-3 / SC-4 — 跨族两两配对 + 三个切分点各自 strip + 不同仓负控 + org 不参与 + int 十进制比较 **(13)**
-- [ ] 1.2 SC-5 / SC-5b / SC-5c — basename 轴三态: 截断型**不**归一 (已知限) / 分隔符型 `./_→-` 归一 / 段内空格**不**译码 **(5)**
-- [ ] 1.3 SC-6 / SC-6b / SC-10 — 不可解析值退回原串精确比较 + `number_str` 边界五类 + **一条畸形毒不死整批** **(15)**
-- [ ] 1.4 SC-11 / SC-13 / SC-15 / SC-14 — 切分方向双轴 (`#` 取最后 / `/` 取最后) + `casefold` 维度 + `number` 相等这一必要条件 **(8)**
-- [ ] 1.5 SC-9 — 命中条目回显**未归一原始串** **(1)**
+- [x] 1.1 SC-1 / SC-1b / SC-2 / SC-3 / SC-4 — 跨族两两配对 + 三个切分点各自 strip + 不同仓负控 + org 不参与 + int 十进制比较 **(13)**
+- [x] 1.2 SC-5 / SC-5b / SC-5c — basename 轴三态: 截断型**不**归一 (已知限) / 分隔符型 `./_→-` 归一 / 段内空格**不**译码 **(5)**
+- [x] 1.3 SC-6 / SC-6b / SC-10 — 不可解析值退回原串精确比较 + `number_str` 边界五类 + **一条畸形毒不死整批** **(15)**
+- [x] 1.4 SC-11 / SC-13 / SC-15 / SC-14 — 切分方向双轴 (`#` 取最后 / `/` 取最后) + `casefold` 维度 + `number` 相等这一必要条件 **(8)**
+- [x] 1.5 SC-9 — 命中条目回显**未归一原始串** **(1)**
       > ⛔ **治理约束**: 本条 R1′ 曾被移出、R3′ 恢复。Q1 裁定「自己那一侧永不补」后, 回显对方原串成为 D2 fail-toward-reporting 的**唯一**缓解, 且它是输出里唯一携带 `org` 的通道。**不得再次移出。**
-- [ ] 1.6 SC-12 — 导出单元返回契约: 可解析返回 `(basename, number)`, 三类不可解析各返回 `None` **(3)**
+- [x] 1.6 SC-12 — 导出单元返回契约: 可解析返回 `(basename, number)`, 三类不可解析各返回 `None` **(3)**
       > ⚠️ **本条是组 1→组 2 RED-first 排序的唯一例外**: 依赖 **2.1** (被测函数在此之前不存在)。
 
 ## 2. 实现 (GREEN) — `aria/skills/state-scanner/lib/collision.py`
 
-- [ ] 2.1 导出纯函数 `normalize_linked_issue(value: str) -> tuple[str, int] | None` — §归一规则五步; `None` 与规则 4 的不可解析枚举一一对应 (D9)
-- [ ] 2.2 `linked_issue_overlaps` 内部比较谓词切换为归一键 `(normalize(basename), int(number))` — **签名与返回 schema 不变** (D6, 限本 Spec 变更面)
-- [ ] 2.3 解析守卫与异常隔离 — 不含 `#` 先判不可解析 (不得无守卫拆分) · `number_str.isascii() and number_str.isdigit()` 谓词 · `int()` 必包 `try/except ValueError` · `limit = sys.get_int_max_str_digits()` 且**仅当 `limit > 0`** 时比长度 (D7 四条)
+- [x] 2.1 导出纯函数 `normalize_linked_issue(value: str) -> tuple[str, int] | None` — §归一规则五步; `None` 与规则 4 的不可解析枚举一一对应 (D9)
+- [x] 2.2 `linked_issue_overlaps` 内部比较谓词切换为归一键 `(normalize(basename), int(number))` — **签名与返回 schema 不变** (D6, 限本 Spec 变更面)
+- [x] 2.3 解析守卫与异常隔离 — 不含 `#` 先判不可解析 (不得无守卫拆分) · `number_str.isascii() and number_str.isdigit()` 谓词 · `int()` 必包 `try/except ValueError` · `limit = sys.get_int_max_str_digits()` 且**仅当 `limit > 0`** 时比长度 (D7 四条)
 
 ## 3. 文档同步
 
-- [ ] 3.1 `lib/collision.py` docstring 同步 — 说明按归一后 `<repo>#<n>` 比较、org 不参与; **措辞不得暗示「已穷尽核实 / 已覆盖全部别名」** (走 substitute)
-- [ ] 3.2 `lib/claim_schema.py` `ClaimRecord.linked_issue` 字段文档两处失准同批修 (SAME → same normalized key; active → 实际跳的是 `_TERMINAL` 且不含 `yielded`) (走 substitute)
-- [ ] 3.3 `skills/state-scanner/SKILL.md:176` 括注 — 补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」
+- [x] 3.1 `lib/collision.py` docstring 同步 — 说明按归一后 `<repo>#<n>` 比较、org 不参与; **措辞不得暗示「已穷尽核实 / 已覆盖全部别名」** (走 substitute)
+- [x] 3.2 `lib/claim_schema.py` `ClaimRecord.linked_issue` 字段文档两处失准同批修 (SAME → same normalized key; active → 实际跳的是 `_TERMINAL` 且不含 `yielded`) (走 substitute)
+- [x] 3.3 `skills/state-scanner/SKILL.md:176` 括注 — 补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」
 
 ## 4. Rule #6 AB (⛔ 不申请豁免、不走 substitute)
 
-- [ ] 4.1 用 `/skill-creator` 对 **3.3 的 hunk** 照跑 AB — 时点: **3.3 实施之后、组 5 发版之前**
+- [x] 4.1 用 `/skill-creator` 对 **3.3 的 hunk** 照跑 AB — 时点: **3.3 实施之后、组 5 发版之前**
       > **判据 (不得只判「跑了」)**: 按 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` 发版前清单 —— (a) `with_skill` 表现优于 `without_skill`; (b) **无 `WITHOUT_BETTER` verdict** (有则必须修复); (c) 与上次结果比对无回归; (d) `summary.yaml` 已生成并审查。
       > **若判定该 hunk 落在套件覆盖外**: 按 CLAUDE.md Rule #6 表第三行走**三件套** —— 点名行为 + 建可证伪定向 fixture + 套件缺口开 issue (参 aria-plugin #117 / #127); **三件缺一则照跑, 不得静默豁免** (Rule #10)。
 
@@ -106,7 +106,7 @@
 
 ### 现行 — 5.1
 
-- [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors** (基线 **1322** tests; 跨 skill 基线 **9 OK / 累计 1698**); 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
+- [x] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors** (基线 **1322** tests; 跨 skill 基线 **9 OK / 累计 1698**); 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
       > ⛔ **不得用 `Ran N` 数换算场景数**: 45 是**场景数**, `Ran` 数的是 test 方法数 (既有 `test_invalid_shapes_and_paths` = 1 方法 4 场景)。场景齐备性判据 = **逐 SC 清单核对 17 条 SC 的场景全部落盘**, 与 `Ran` 数正交。
       > ⚠️ 环境陷阱: 单模块模式与 pytest 对 `test_collision.py` 会给 ImportError —— aria-plugin **#134** 的既有 bug (破 70 天), 非本 change 回归。验收一律以 `tests/` 内**全量** `run_tests.py` 为准。
 

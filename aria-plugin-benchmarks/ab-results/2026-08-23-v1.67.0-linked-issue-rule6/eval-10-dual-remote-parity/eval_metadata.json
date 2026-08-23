@@ -1,0 +1,43 @@
+{
+ "eval_id": 10,
+ "eval_name": "dual-remote-parity",
+ "prompt": "我的项目配置了两个 remote: origin (Forgejo) 和 github (GitHub mirror)。我刚发布了 aria-plugin v1.15.0 子模块更新, 用 git push origin 推送到了 Forgejo, 但忘记推送到 github。请扫描项目状态, 告诉我哪些 remote 已同步哪些落后, 以及对应的修复命令。",
+ "assertions": [
+  {
+   "text": "Should output multi_remote section with per-remote sync status, not a single combined status"
+  },
+  {
+   "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules"
+  },
+  {
+   "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error."
+  },
+  {
+   "text": "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced"
+  },
+  {
+   "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire — the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right."
+  },
+  {
+   "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote"
+  },
+  {
+   "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)"
+  },
+  {
+   "text": "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)"
+  },
+  {
+   "text": "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)"
+  },
+  {
+   "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning"
+  },
+  {
+   "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break."
+  },
+  {
+   "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) — NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion."
+  }
+ ]
+}

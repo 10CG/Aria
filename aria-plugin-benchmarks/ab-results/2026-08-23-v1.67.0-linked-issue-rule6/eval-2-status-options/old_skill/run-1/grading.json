@@ -1,0 +1,20 @@
+{
+ "expectations": [
+  {
+   "text": "Should show numbered options for user selection",
+   "passed": true,
+   "evidence": "'推荐工作流' [1]-[4] 编号选项"
+  },
+  {
+   "text": "Should mention custom input option",
+   "passed": true,
+   "evidence": "'回复编号 (如 1) 或写自定义组合 (如 \"先 2 再 1\")'"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 0,
+  "total": 2,
+  "pass_rate": 1.0
+ }
+}

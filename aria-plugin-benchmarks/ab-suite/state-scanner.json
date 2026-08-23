@@ -1,9 +1,14 @@
 {
   "skill_name": "state-scanner",
-  "version": "1.5.0",
-  "source_evals_count": 11,
-  "selected_count": 11,
+  "version": "1.6.0",
+  "source_evals_count": 12,
+  "selected_count": 12,
   "changelog": [
+    {
+      "version": "1.6.0",
+      "date": "2026-08-23",
+      "changes": "新增 eval-12 Layer L claim 段定向用例 (linked_issue 跨格式重叠告警的比较规则), 对应 Aria spec linked-issue-normalization TASK-013 Rule #6 三件套; 此前 11 条 eval 对 SKILL.md Layer L / --linked-issue 段零覆盖"
+    },
     {
       "version": "1.4.0",
       "date": "2026-04-12",
@@ -184,6 +189,18 @@
         "Should include git-remote-helper reference in the scan output when helper is available",
         "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
         "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "我在 Aria 项目里准备进 Phase B。refs/aria/coordination 里已有别的容器的一条 active claim, 内容是:\n\n```yaml\nclaimed_at: '2026-08-22T20:33:47Z'\ncontainer: 023236f2\nlinked_issue: 10CG/aria-plugin#152\nowner: simonfish\nphase: B\nstatus: active\ntrack_id: pre-merge-gate-no-run-for-branch\n```\n\n我自己打算用另一个 track-id `ci-gate-first-push-fix` 运行 phase1_gate, 并传 `--linked-issue 'aria-plugin #152'` (注意我写的是裸仓名, 没有 org 前缀, # 前面还有个空格)。请只回答: (1) state-scanner 的 linked_issue 重叠告警会不会把那条 claim 报出来? 为什么 (比较规则是什么)? (2) 如果我传的是 `10CG/Aria#152` 呢? (3) 这个告警会阻断我进 Phase B 吗? 不要跑命令, 直接依据 state-scanner skill 的说明回答。",
+      "expected_output": "答 (1) 会报: 比较按归一后的 <repo>#<n> (仓名 + 号), org 与空白差异不影响; (2) 不会: Aria 与 aria-plugin 是不同仓; (3) 不阻断, 是 🔴 advisory 提示。",
+      "expectations": [
+        "[承重] 明确回答 (1) 会报出重叠 (会命中 / 会告警), 而不是「不会」或「不确定」",
+        "[承重] 说明原因是按归一后的 <repo>#<n> (仓名 + 号) 比较, org 前缀不参与 / 空白不影响",
+        "[承重] 回答 (2) 10CG/Aria#152 不会命中 (不同仓 Aria vs aria-plugin)",
+        "回答 (3) 告警是 advisory (🔴 提示) 不阻断 Phase B",
+        "不声称比较是精确字符串相等 / 不说「格式不同所以认不出」"
       ]
     }
   ]

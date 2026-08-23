@@ -1,0 +1,25 @@
+{
+ "expectations": [
+  {
+   "text": "Should check README.md version against VERSION file or plugin.json",
+   "passed": true,
+   "evidence": "§8 表: plugin.json 1.66.4 = SOT, root README badge Plugin-v1.66.4 一致, aria/VERSION 对比"
+  },
+  {
+   "text": "Should mention CHANGELOG date as reference source for date sync",
+   "passed": false,
+   "evidence": "CHANGELOG 顶条 '[1.66.4] 2026-08-22 一致' 仅作版本比对, 未提出作为日期同步参照源"
+  },
+  {
+   "text": "Should output readme_status section",
+   "passed": true,
+   "evidence": "§8 '版本一致性核对' 表含 README badge / i18n README 行"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 1,
+  "total": 3,
+  "pass_rate": 0.6666666666666666
+ }
+}

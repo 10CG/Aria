@@ -1,0 +1,50 @@
+{
+ "expectations": [
+  {
+   "text": "Should show an Open Issues section only when issue_scan.enabled is true",
+   "passed": true,
+   "evidence": "'🎫 Open Issues' 区块, 平台 Forgejo 44 open"
+  },
+  {
+   "text": "Should detect platform using 4-tier priority (config.platform -> hostname map -> URL inference -> fallback)",
+   "passed": false,
+   "evidence": "未描述 4 级平台检测优先级"
+  },
+  {
+   "text": "Should call forgejo CLI wrapper (not raw curl) and handle 10 fetch_error enum values (network_unavailable, cli_missing, auth_missing, auth_failed, rate_limited, not_found_or_no_access, timeout, platform_unknown, parse_error, unknown)",
+   "passed": false,
+   "evidence": "未提 forgejo CLI wrapper 调用, 仅 'fetch_error: 无', 未列 10 个枚举"
+  },
+  {
+   "text": "Should use cache with 15-minute TTL at .aria/cache/issues.json",
+   "passed": true,
+   "evidence": "'数据来源: cache (... 刚刷新) | ttl 15m' (路径未写)"
+  },
+  {
+   "text": "Should NOT manage API tokens inside the skill (rely on existing CLI wrapper auth)",
+   "passed": true,
+   "evidence": "无任何 token 管理动作/描述"
+  },
+  {
+   "text": "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
+   "passed": true,
+   "evidence": "§C 已挂活跃 Spec: #177 等 → linked-issue-normalization, #175 → US-025, 标 heuristic: true"
+  },
+  {
+   "text": "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
+   "passed": true,
+   "evidence": "'open_blocker_issues 规则是按 blocker/critical label 触发的 ... 因无 label 未触发' (规则正确引用, 条件未满足)"
+  },
+  {
+   "text": "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing",
+   "passed": false,
+   "evidence": "离线/CLI 缺失场景未触发, 未说明降级行为"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 3,
+  "total": 8,
+  "pass_rate": 0.625
+ }
+}

@@ -5,7 +5,7 @@
 > **Spec Level**: **3** (原 2; R3′ 因 Q5 的 AB 任务需 `tasks.md` 承载而升级 — 单域 — `lib/collision.py` 的一个比较谓词 + 一个导出单元)
 > **关联 Issue**: 无
 > **代码落点**: `aria/` 子模块 `skills/state-scanner/`; Spec 落主仓 (Rule #5)
-> **ship target**: aria-plugin v1.67.0 (MINOR — 行为面扩大)。*2026-08-22 改: 原写 v1.66.0, 已被 #137 占用; 1.66.x 现已到 v1.66.4 (并发轨 #152 预占 v1.66.5)。按本 Spec 自判 MINOR ⇒ v1.67.0; **若 owner 改判 PATCH (谓词 bug 修复) 则为 v1.66.6, 请复议**。*
+> **ship target**: aria-plugin v1.67.0 (MINOR — 行为面扩大)。*2026-08-22 改: 原写 v1.66.0, 已被 #137 占用; 1.66.x 现已到 v1.66.4 (并发轨 #152 预占 v1.66.5)。按本 Spec 自判 MINOR ⇒ v1.67.0; **若 owner 改判 PATCH (谓词 bug 修复) 则为 v1.66.6, 请复议**。2026-08-23 Phase B 中并发轨 #152 已 ship **v1.66.5** (aria `a0fe720`), 本轨 feature 分支已 merge 之 (`394cffd`) ⇒ 基线 = 1.66.5, CHANGELOG 新条目接在 [1.66.5] 之上。*
 
 > **📌 本文件只规定「要建什么」。** 「规定是怎么来的」(三轮审计轨迹 / 总体定义与判族 / 未审表面清单 / 跨 Spec 裁定史 / 全部订正留痕) 已于 2026-08-07 整体移出至 **[审计轨](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)**。
 >

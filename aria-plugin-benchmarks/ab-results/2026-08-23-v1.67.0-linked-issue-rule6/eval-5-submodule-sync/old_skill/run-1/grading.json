@@ -1,0 +1,40 @@
+{
+ "expectations": [
+  {
+   "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+   "passed": true,
+   "evidence": "§8 表逐列三个子模块"
+  },
+  {
+   "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+   "passed": true,
+   "evidence": "表列 '工作区 HEAD / 主仓 gitlink 记录 / 远程 master'; fallback 未触发不可验证"
+  },
+  {
+   "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+   "passed": true,
+   "evidence": "'tree_vs_remote=true ... hint: git submodule update --remote aria' 被引用, 落后 15 检出; 同时解释为何改用 merge"
+  },
+  {
+   "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+   "passed": false,
+   "evidence": "'8 条 fetch leg 全部成功' — 扫描执行了 fetch, 非读 FETCH_HEAD age"
+  },
+  {
+   "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+   "passed": false,
+   "evidence": "未提及四级 fallback"
+  },
+  {
+   "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+   "passed": true,
+   "evidence": "exit 10 软错误下扫描继续并给出完整区块"
+  }
+ ],
+ "summary": {
+  "passed": 4,
+  "failed": 2,
+  "total": 6,
+  "pass_rate": 0.6666666666666666
+ }
+}

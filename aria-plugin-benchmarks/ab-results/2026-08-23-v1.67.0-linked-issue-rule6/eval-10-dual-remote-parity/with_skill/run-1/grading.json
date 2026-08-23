@@ -1,0 +1,70 @@
+{
+ "expectations": [
+  {
+   "text": "Should output multi_remote section with per-remote sync status, not a single combined status",
+   "passed": true,
+   "evidence": "§A/§B 表逐 remote (origin/github) 逐仓状态"
+  },
+  {
+   "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
+   "passed": true,
+   "evidence": "主仓 + aria/standards/aria-orchestrator 均列 origin 与 github"
+  },
+  {
+   "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
+   "passed": false,
+   "evidence": "未给出 ahead_count; 真实仓库无 mirror 落后, github 对 feature 分支仅 'no_local_tracking_ref'"
+  },
+  {
+   "text": "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced",
+   "passed": true,
+   "evidence": "明确区分 'origin 有, github 没有' 与 master 两端一致"
+  },
+  {
+   "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire — the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
+   "passed": false,
+   "evidence": "未讨论 multi_remote_drift (1.35) 是否触发"
+  },
+  {
+   "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
+   "passed": true,
+   "evidence": "'git -C /home/dev/Aria/aria push github master && git -C /home/dev/Aria push github master'"
+  },
+  {
+   "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+   "passed": false,
+   "evidence": "未讨论 parity: ahead 与 has_pending_push 语义"
+  },
+  {
+   "text": "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+   "passed": false,
+   "evidence": "把 no_local_tracking_ref / no_published_ref 说成非 orphan 不阻断, 但未区分 benign unknown vs blocking_unknown (fail-closed)"
+  },
+  {
+   "text": "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+   "passed": false,
+   "evidence": "未陈述 overall_parity true 需 equal+fresh 正面证据规则 (只说本次判决按未核实对待)"
+  },
+  {
+   "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+   "passed": false,
+   "evidence": "has_unreachable_remote 场景未触发未说明"
+  },
+  {
+   "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+   "passed": false,
+   "evidence": "未描述 gitlink orphan → clone --recursive 断裂因果链 (仅 '不是 orphan')"
+  },
+  {
+   "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) — NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion.",
+   "passed": false,
+   "evidence": "未把 gitlink 修复作为 multi_remote_drift 已接线路由输出"
+  }
+ ],
+ "summary": {
+  "passed": 4,
+  "failed": 8,
+  "total": 12,
+  "pass_rate": 0.3333333333333333
+ }
+}
