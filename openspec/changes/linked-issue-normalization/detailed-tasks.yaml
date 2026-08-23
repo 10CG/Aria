@@ -762,7 +762,7 @@ tasks:
     parent: "5.9"
     task_group: TG-5
     title: "aria 子模块版本面 bump 到 v1.67.0 — 按引用点枚举"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -788,7 +788,7 @@ tasks:
     parent: "5.10"
     task_group: TG-5
     title: "主仓版本引用面 — 14 个引用点逐点改"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -815,15 +815,15 @@ tasks:
     parent: "5.11"
     task_group: TG-5
     title: "版本引用面双向断言 — 必须在交付 Phase C 之前通过"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: qa-engineer
     dependencies: [TASK-023]
     deliverables: []
     verification:
-      - "**整仓差集断言 (fail-CLOSED)**: 旧值 **不写死字面**, 执行时取 `OLD=$(git show HEAD:aria/.claude-plugin/plugin.json | jq -r .version)` (bump 提交前的 SOT 值; R5 C-a: 写死 `1.65.5` 在 1.66.4 基线上零命中 = 恒真); 对**主仓与 aria 子模块两个 repo** 各跑 `git grep -lF \"$OLD\"` (git grep 不进子模块, R5 minor), 命中集合减去**按类成文的排除集**后必须为**空**"
-      - "排除集 (按**类**成文, 不按文件实例; R5 M-3: 实例白名单对 handoff/archive/他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` (记录当时事实, 不随版本走) · (3) **其他** OpenSpec change 目录 `openspec/changes/<其他>/**` (引用其自身 ship 版本是事实陈述) · (4) 本 Spec 目录 `openspec/changes/linked-issue-normalization/**` 的订正留痕行"
+      - "**整仓差集断言 (fail-CLOSED)**: 旧值 **不写死字面**, 执行时取 `OLD=$(git -C aria show \"$(git rev-parse HEAD:aria)\":.claude-plugin/plugin.json | jq -r .version)` (主仓 gitlink 指向的子模块提交里的 SOT 值; **执行实测 (2026-08-23)**: 原写 `git show HEAD:aria/.claude-plugin/plugin.json` 对 gitlink 报 `exists on disk, but not in HEAD`, OLD 取空 ⇒ grep 匹配全仓 = 必崩, 已改; R5 C-a: 写死 `1.65.5` 在 1.66.4 基线上零命中 = 恒真); 对**主仓与 aria 子模块两个 repo** 各跑 `git grep -lF \"$OLD\"` (git grep 不进子模块, R5 minor), 命中集合减去**按类成文的排除集**后必须为**空**"
+      - "排除集 (按**类**成文, 不按文件实例; R5 M-3: 实例白名单对 handoff/archive/他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `.aria/repro/archive/**` `docs/handoff/**` `docs/decisions/**` `openspec/archive/**` `aria-plugin-benchmarks/ab-results/**` (记录当时事实, 不随版本走; 执行实测补 4 个目录) · (3) **其他** OpenSpec change 目录 `openspec/changes/<其他>/**` (引用其自身 ship 版本是事实陈述) · (4) 本 Spec 目录 `openspec/changes/linked-issue-normalization/**` 的订正留痕行 · (5) **行级**「功能引入标注」: 行内 `<OLD>+` (如 `v1.66.5+ #152 新增`) 或 JSON `_comment`/`_description`/`_ships_with` 字段 (执行实测: 上一版本 ship 时在 SKILL.md / pre_merge_gate.py / config.template / fixture 留下 19 处这类标注, 按文件实例排除恒红, 只能按行内形态排除) —— 执行脚本留存 `.aria/repro/vdiff.sh`"
       - "⛔ 任何**不落入上述四类**的命中即红 —— 不许临时加第五类来凑绿; 新加类须同批写理由。**三态基线自证 (R5 执行时必跑)**: 未 bump 时命中 ≥ 18 (红) / 正确 bump 后 0 (绿) / 故意漏改 1 点 ≥ 1 (红)"
       - "**新值计数**: 普通引用文件的 `1.67.0` 出现次数 == breakdown 的预期点数 (主仓 14 + aria 侧 4 = 18)"
       - "**append-only 账本**: (a) 头部「当前版本」行 == plugin.json, **且** `aria/VERSION:60-64` `## 版本号` 围栏块 (实读 `1.47.0`, pre-existing, aria-report#158 冻结串) **显式排除于 (a) 之外** —— 范围外但实施者须知其存在 (R5 M-4: 原「全部」把范围外的块纳入 ⇒ 守范围的正确实现恒红) **且** (b) 文件行数不减"

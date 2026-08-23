@@ -124,19 +124,19 @@
 
 ### 现行 — 5.9 起 (取代上方 CANCELLED)
 
-- [ ] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
+- [x] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
       > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, 判据 = **文件行数不减**, 见 5.11 ③) · `CHANGELOG.md` (**追加**条目, 历史保留)
       > CHANGELOG 与 README 措辞: **不得写成「已覆盖全部别名」** —— basename 截断轴是成文已知限, 写错等于对外抹掉它。
       > MINOR 而非 PATCH (行为面扩大)。
 
-- [ ] 5.10 **主仓版本引用面** — 14 个引用点, 逐点改
+- [x] 5.10 **主仓版本引用面** — 14 个引用点, 逐点改
       > `VERSION` :24 子模块表行 (1) · `README.md` badge + `Plugin Version:` 行 (2) · `README.{zh,ja,ko}.md` 各 `translated-from` + badge + `Plugin Version:` 行 (**9**) · `CLAUDE.md` 版本区间行 + 「版本:」行 (2)
       > i18n 按 #140 B 档: 正文无实质变更 ⇒ **只改这三处, 不重译正文**。
       > CLAUDE.md: **只改数字**。不得把本 Spec 设计术语写进去 (污染 AB baseline, aria-plugin #116); 「项目状态」段覆写非追加、预算 15-20 行 (`claude-md-hygiene.md`)。
 
-- [ ] 5.11 **版本引用面双向 + 整仓差集断言** — **必须在 5.15 (合并/双推/gitlink) 之前通过**
+- [x] 5.11 **版本引用面双向 + 整仓差集断言** — **必须在 5.15 (合并/双推/gitlink) 之前通过**
       > **① 整仓差集 (fail-CLOSED, R4-fix 关键升级; R5 修正)**: 旧值**不写死字面** —— 执行时 `OLD=$(git show HEAD:aria/.claude-plugin/plugin.json | jq -r .version)` (R5 C-a: 写死 `1.65.5` 在 1.66.4 基线零命中 = 恒真); bump 后对**主仓与 aria 子模块两仓**各 `git grep -lF "$OLD"` (git grep 不进子模块), 命中集合**减去按类成文的排除集**后必须为**空**。
-      > 排除集按**类**成文 (R5 M-3: 实例白名单对 handoff / archive / 他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` · (3) 其他 OpenSpec change 目录 · (4) 本 Spec 目录的订正留痕行。
+      > 排除集按**类**成文 (R5 M-3: 实例白名单对 handoff / archive / 他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` · (3) 其他 OpenSpec change 目录 · (4) 本 Spec 目录的订正留痕行 · (5) 行级「功能引入标注」(`<OLD>+` / JSON `_comment` 等; 执行实测补, 详见 yaml TASK-024)。旧值取法: `git -C aria show "$(git rev-parse HEAD:aria)":.claude-plugin/plugin.json` (原写法对 gitlink 必崩, 执行实测改)。
       > ⛔ **任何不落入四类的命中即红**; 不许临时加第五类凑绿。**三态自证**: 未 bump 命中 ≥18 (红) / 正确 bump 0 (绿) / 故意漏 1 点 ≥1 (红)。
       > **为什么换掉文件白名单**: 白名单对**未来新增的版本引用点 fail-OPEN** (修实例不修类), 且逼人去数「两条 check 失明几处」—— R2-fix 写 7, 实为 **10** (漏计 CLAUDE.md 2 + VERSION 1)。整仓差集使这个数**不必算** (R4/completeness-lens 单点最优建议)。
       > **② 新值计数**: 普通引用文件里 `1.67.0` 出现次数 == 预期点数 (主仓 **14** + aria 侧 **4** = **18**)。只断言旧值缺席是**缺席断言**, 删行或写错新版本号都判绿。
