@@ -44,6 +44,8 @@ metadata:
     两席独立测算 83% / 62% 均 >1/2 ⇒ 拐点已过)。**owner 裁定 2026-08-08: 停止逐条补丁, 按规律
     重做组 5; 删 TASK-016 委派 phase-c-integrator。** 待 R3 (只审组 5)。
     **→ R3 5/5 FAIL → R3-fix → R4 两席新鲜眼睛 FAIL (4+2C) → R4-fix (97a3885, 2026-08-08)。max_rounds=4 耗尽。
+    → R5 两席新鲜眼睛 (executability / claim-landing) FAIL 2C+7M, 全为 fix 副产品 (4 条 08-22 收口引入, 4 条 R4-fix 落地不完整)。
+    **owner 2026-08-23 裁定: 修 9 条后 override 进 Phase B.1, 不再开审计轮** (Rule #10 留痕: 审计轨 §10)。
     owner 2026-08-22 裁定: 加 1 轮 R5 (max_rounds 4→5, 两席新鲜眼睛)。R5 前机械收口 (bfe8285d):
     ship target v1.66.0→v1.67.0 / #137 已修 (v1.66.0) C3 解除 / R4 M3 (6 个 test 点名) · M5 (013/025/027
     deliverables 补全) · M7 (dangling 指针改 git grep 口径) · 5.8→5.12 指针 / scope_repos head 刷新。**
@@ -154,7 +156,7 @@ metadata:
     enabled_check_blindness: >
       m6-version-badge-match 只比 README.md 的 badge; i18n-readme-translation-currency
       只比 translated-from 标记 ⇒ README.md 的 "Plugin Version:" 行 + i18n ×3 的 badge 与
-      "Plugin Version:" 行共 **7 处**残留旧版本时两条 enabled check 仍全绿 = 假绿。
+      "Plugin Version:" 行等共 **10 处** (R2-fix 曾写 7, R4 实算 10) 残留旧版本时两条 enabled check 仍全绿 = 假绿。
     mechanical_fix: >
       TASK-024 的**双向 + 整仓差集**断言。**R4-fix 关键升级 (R4/completeness-lens 单点最优建议)**:
       原设计是**文件白名单** ⇒ 对**未来新增的版本引用点 fail-OPEN** (修了实例没修类), 且逼着
@@ -185,7 +187,7 @@ metadata:
           *(同一处三次踩同一个坑, 记于此: 每次我都在「修恒红」的编辑里造新恒红 —— memory
           `feedback_fix_recurs_in_its_own_fallback_path`。)*
         known_stale_second_declaration: >
-          ⚠️ **`aria/VERSION:56-59` 有第二处当前版本声明** (`## 版本号` 围栏块), 实读为
+          ⚠️ **`aria/VERSION:60-64` 有第二处当前版本声明** (`## 版本号` 围栏块; R5 行号复核), 实读为
           **`1.47.0`** —— 陈旧 18 个版本, 正是 aria-report **#158** 「版本字段污染」的那个冻结串
           (该 issue 的修法是把消费方改读 `plugin.json` SOT, 并未修这个块本身)。
           ⇒ 判据 (a) 写「**全部**当前版本声明」而非「头部」—— 原措辞会静默排除它。
@@ -295,7 +297,7 @@ tasks:
     notes: >
       SC-10 是全表唯一的混合批次用例。它防的失效面比原缺陷更宽 —— 原缺陷影响单个 issue
       的双方, 这里是「任意一条畸形 linked_issue 使全体 session 的重叠检测集体失明」
-      (异常逃到 aria/skills/state-scanner/scripts/phase1_gate.py:1235 的 except Exception
+      (异常逃到 aria/skills/state-scanner/scripts/phase1_gate.py:1236 的 except Exception
       被吞成 [])。
 
   - id: TASK-004
@@ -684,7 +686,7 @@ tasks:
     deliverables:
       - CLAUDE.md           # :139 版本区间行 + :141 「版本:」行
     verification:
-      - "两处均已更新: 版本区间 (v1.52.0–v1.65.5 已 ship) + 「版本:」行的 插件 aria-plugin v1.65.5"
+      - "两处均已更新: 版本区间上界与「版本:」行的 `插件 aria-plugin vX.Y.Z` 均 == 新版本 (不写死字面; 基线实读为 v1.66.4, 不是 R1 时的 v1.65.5)"
       - "⛔ 未把本 Spec 的设计术语写进 CLAUDE.md (污染 AB baseline, aria-plugin #116)"
       - "「项目状态」段仍在 15-20 行预算内, 且为覆写非追加 (claude-md-hygiene.md §2.4)"
     notes: >
@@ -769,11 +771,11 @@ tasks:
       - aria/.claude-plugin/plugin.json          # 版本 SOT (1 点)
       - aria/.claude-plugin/marketplace.json     # **2 点**: :3 与 :16 两个 version 字段
       - aria/README.md
-      - aria/VERSION                             # append-only 账本 — 只改头部当前版本行 + 追加发布注
+      - aria/VERSION                             # append-only 账本 — 改头部当前版本行 + 追加发布注; 判据 = TASK-024 (a)+(b) (行数不减), 非「历史行原样保留」(R5 M-5)
       - aria/CHANGELOG.md                        # 追加条目, 历史保留
     verification:
       - "plugin.json 为 SOT; marketplace.json **两个** version 字段都已改 (:3 与 :16)"
-      - "aria/VERSION: 头部「当前版本」行 == plugin.json; **历史行原样保留** (它是 append-only 账本)"
+      - "aria/VERSION: 头部「当前版本」行 == plugin.json; **文件行数不减** (append-only 账本; R4 实测「历史行原样保留」前提不成立, 判据与 TASK-024 (b) 同一口径)"
       - "aria/CHANGELOG.md 为**追加**条目, 未改写历史"
       - "CHANGELOG 与 README 措辞不得写成「已覆盖全部别名」— basename 截断轴是成文已知限"
       - "MINOR 而非 PATCH (行为面扩大)"
@@ -805,9 +807,9 @@ tasks:
       - "CLAUDE.md「项目状态」段仍在 15-20 行预算内且为覆写非追加 (claude-md-hygiene.md §2.4)"
     notes: >
       取代 TASK-017/018/019 三条 (原按文件分三任务, 且 R1-fix 首版漏 README.md 的
-      "Plugin Version:" 行 + i18n ×3 的 badge 与 "Plugin Version:" 行共 7 处, 而两条 enabled
-      check 对这 7 处结构性失明 ⇒ 假绿; R1/code-reviewer Critical-1)。**gitlink 不在本任务** —
-      随合并一并移交 Phase C (TASK-026)。
+      "Plugin Version:" 行 + i18n ×3 的 badge 与 "Plugin Version:" 行 + CLAUDE.md 2 + VERSION 1 共 10 处 (R2-fix 曾写 7), 而两条 enabled
+      check 对这 10 处结构性失明 ⇒ 假绿; R1/code-reviewer Critical-1)。**gitlink 不在本任务** —
+      由 TASK-028 (本地合并 + 双推 + gitlink bump) 承载, 早于 TASK-026 (R5 C-b: 原写「移交 TASK-026」与 TASK-028 相反)。
 
   - id: TASK-024
     parent: "5.11"
@@ -820,11 +822,11 @@ tasks:
     dependencies: [TASK-023]
     deliverables: []
     verification:
-      - "**整仓差集断言 (fail-CLOSED)**: 对全部 tracked 文件 grep 旧版本号 `1.65.5`, 命中集合减去**显式成文排除集**后必须为**空**"
-      - "排除集 (成文, 逐条给理由): `aria/VERSION` + `aria/CHANGELOG.md` (append-only 版本史) · `.aria/audit-reports/**` (审计史) · `openspec/changes/linked-issue-normalization/**` 内的订正留痕行 (本 Spec 自述历史)"
-      - "⛔ 任何**不在排除集**里的新命中即红 —— 不许临时往排除集加条目来凑绿, 加条目须同批写理由"
+      - "**整仓差集断言 (fail-CLOSED)**: 旧值 **不写死字面**, 执行时取 `OLD=$(git show HEAD:aria/.claude-plugin/plugin.json | jq -r .version)` (bump 提交前的 SOT 值; R5 C-a: 写死 `1.65.5` 在 1.66.4 基线上零命中 = 恒真); 对**主仓与 aria 子模块两个 repo** 各跑 `git grep -lF \"$OLD\"` (git grep 不进子模块, R5 minor), 命中集合减去**按类成文的排除集**后必须为**空**"
+      - "排除集 (按**类**成文, 不按文件实例; R5 M-3: 实例白名单对 handoff/archive/他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` (记录当时事实, 不随版本走) · (3) **其他** OpenSpec change 目录 `openspec/changes/<其他>/**` (引用其自身 ship 版本是事实陈述) · (4) 本 Spec 目录 `openspec/changes/linked-issue-normalization/**` 的订正留痕行"
+      - "⛔ 任何**不落入上述四类**的命中即红 —— 不许临时加第五类来凑绿; 新加类须同批写理由。**三态基线自证 (R5 执行时必跑)**: 未 bump 时命中 ≥ 18 (红) / 正确 bump 后 0 (绿) / 故意漏改 1 点 ≥ 1 (红)"
       - "**新值计数**: 普通引用文件的 `1.67.0` 出现次数 == breakdown 的预期点数 (主仓 14 + aria 侧 4 = 18)"
-      - "**append-only 账本**: (a) **全部**「当前版本」声明 == plugin.json (注意 `aria/VERSION:56-59` 的第二处声明) **且** (b) 文件行数不减"
+      - "**append-only 账本**: (a) 头部「当前版本」行 == plugin.json, **且** `aria/VERSION:60-64` `## 版本号` 围栏块 (实读 `1.47.0`, pre-existing, aria-report#158 冻结串) **显式排除于 (a) 之外** —— 范围外但实施者须知其存在 (R5 M-4: 原「全部」把范围外的块纳入 ⇒ 守范围的正确实现恒红) **且** (b) 文件行数不减"
       - "跑**不带路径**的 `git status` 核验实际落地面与声称一致"
       - "本断言在 TASK-028 (合并+双推+gitlink) 之前通过 — 任何计数错须在可回退点之前发红"
     notes: >
@@ -881,7 +883,7 @@ tasks:
     notes: >
       **R3-fix 重写 (四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是
       「`phase-c-integrator/SKILL.md:242` 本就建模子模块合并」—— **该引用是误引**, `:242` 实为
-      *Path coverage 评估*的执行上下文契约。真实合并链 = C.2.4:253 → `branch-manager` merge
+      *Path coverage 评估*的执行上下文契约。真实合并链 = C.2.4:261 (R5 行号复核) → `branch-manager` merge
       action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`),
       **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; `aria/skills/` 全仓对该约束零处
       编码 (已开 aria-plugin **#136**)。⇒ 委派掉合并 = 删掉计划里唯一的守卫。
@@ -896,7 +898,7 @@ tasks:
     complexity: S
     est_hours: 3
     agent: qa-engineer
-    dependencies: [TASK-013]
+    dependencies: [TASK-013, TASK-025]   # R5 M-1: 两任务同改 proposal.md (rule6_note vs artifact 指针), 跨 agent 同文件必须串行
     deliverables:
       - .aria/decisions/          # 披露记录 (或并入本 change 的 handoff)
       - openspec/changes/linked-issue-normalization/proposal.md   # rule6_note 段 (§Impact) 同批更新 — Rule #6 要求豁免/缩门在 spec/tasks 留 rule6_note (R4 M5)
@@ -966,7 +968,7 @@ tasks:
 #  真并行组 (不同文件, 组 3): {011, 012}
 #    *(R3-fix 版称「真并行组」只列这一对 — R4/completeness-lens 指出全图实有 32 对无序对;
 #      本行的意思是「**同 agent 可并发落盘**的对」, 已改措辞避免被读成「全图只有 1 对」)*
-#  ⛔ 无同文件并行边 (见 metadata.file_domain_serialization)
+#  ⛔ 无同文件并行边 (见 metadata.file_domain_serialization; R5 M-1 曾因 025/027 同改 proposal.md 破坏, 现以 027 依赖 025 串行; 无序对数以自证命令为准, 不写死 32)
 #  关键路径: 001→…→010→014→022→023→024→028→026
 #
 # active 复杂度: S ×14 · M ×6 · L ×1   |  粗锚工时 ≈ 88h (14×3 + 6×6 + 1×10)

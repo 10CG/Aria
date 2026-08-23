@@ -1,7 +1,7 @@
 # Tasks — `linked-issue-normalization`
 
 > **Spec**: [proposal.md](./proposal.md) | **审计轨**: [audit-trail](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)
-> **Level**: 3 | **Status**: 📝 **A.2 + A.3 R2-fix (组 5 按规律重做)** (2026-08-08) — post_planning R1 5/5 REVISE·FAIL → R1-fix → R2 2 PASS/3 REVISE·FAIL; **owner 裁定停止逐条补丁, 按规律重做组 5**; 待 R3 (只审组 5)
+> **Level**: 3 | **Status**: 📝 **A.3 done, post_planning R1→R5 均 FAIL (max_rounds 5 耗尽)** — owner 2026-08-23 裁定: 修 R5 的 2C+7M 后 **override 进 Phase B.1** (Rule #10 留痕, 见审计轨 §9/§10); 不再开审计轮
 > **Scope**: **跨两仓** — `aria` 子模块 (代码+测试+文档+版本) + 主仓 (gitlink + 版本引用面 + Spec)
 > **ship target**: aria-plugin **v1.67.0** (MINOR — 行为面扩大)
 
@@ -39,11 +39,11 @@
 |------|------|------|
 | Phase B 实施 + 组 1–4 | **本文件** | change 自身的交付物 |
 | **版本引用面编辑 + 双向断言 (组 5)** | **本文件** | 版本号本身是本 change 的交付物 (proposal §Impact 已列) |
-| **aria 子模块合并 + 双远程推送** | **`phase-c-integrator` C.2.5**, 不在本文件 (**owner 裁定 2026-08-08**) | R1-fix 曾把它写成 TASK-016 手工步骤 ⇒ **绕开两个默认开的闸门** (`pre_merge_gate.enabled=true` Rule #8 + `submodule_gate.mode="block"`), 而该 Skill (SKILL.md:242) 本就建模子模块合并。R2/tech-lead N1 判为 Rule #10 违规 |
+| **aria 子模块合并 + 双远程推送 + gitlink bump** | **本文件 5.15 (TASK-028) 本地执行** (CLAUDE.md 硬约束 1+2); `phase-c-integrator` **只**承接 PR + pre-merge 闸门 (5.13) | owner 2026-08-08 曾裁「委派 C.2.5」, 依据「SKILL.md:242 本就建模子模块合并」—— R3 证实该引用是误引 (见 5.13 注), 真实合并链是被硬约束 1 禁止的服务端 `Do: merge` ⇒ R3-fix 收回合并动作到 5.15; 本行 R5 才改 (R4 C1 / R5 C-b 第四次命中「改了 yaml 没改这里」) |
 | **Phase C**: PR 创建 / **pre-merge gate (Rule #8)** / merge | **`phase-c-integrator`**, 不在本文件 | 通用流程, 由该 Skill 的 C.2.4 承担 (CI passing + main 无 in-flight run); 本文件不复述其判据 |
 | **Phase D**: cycle 进度更新 / **Spec 归档** / **周期 handoff (Rule #9)** | **`phase-d-closer`**, 不在本文件 | 同上; 归档门会消费本文件全部 checkbox 状态, 故组 5 必须真做完而非声称 |
 
-**⚠️ 组 5 与 Phase C 的交接**: 本文件只做**版本面编辑 + 双向断言** (5.9–5.11), 断言必须在**交付 Phase C 之前**通过 —— 这样任何计数错都在**可回退点之前**发红 (R1-fix 曾把断言排在合并双推之后, R2/tech-lead N4 命中)。断言过后由 **5.13** 交付给 `phase-c-integrator`: 由它做 aria 子模块合并 + 双推 + 主仓 gitlink bump + PR + pre-merge gate。**gitlink 必须指向合并后的 `master` SHA, 这条约束随交接一并移交, 由 C.2.5 的既有机制保证。**
+**⚠️ 组 5 与 Phase C 的交接**: 本文件只做**版本面编辑 + 双向断言** (5.9–5.11), 断言必须在**交付 Phase C 之前**通过 —— 这样任何计数错都在**可回退点之前**发红 (R1-fix 曾把断言排在合并双推之后, R2/tech-lead N4 命中)。断言过后先由 **5.15** (TASK-028) 本地做 aria 子模块合并 + 双推 + 逐远端 ls-remote 核验 + 主仓 gitlink bump (gitlink 必须指向合并后的 `master` SHA), 再由 **5.13** 交付 `phase-c-integrator` 做主仓 PR + pre-merge gate。**不交 C.2.5 做合并** (硬约束 1; R5 C-b 改正)。
 
 ---
 
@@ -102,7 +102,7 @@
 >
 > **为什么整组重做而不是继续补**: post_planning R2 五席测出 2C + 11M, 对比 R1 的 3C + 12M **基本持平**, 且 fix 引入占比经两席独立测算为 **83% / 62%** (均 >1/2) ⇒ 边际产出已转负 (memory `feedback_audit_marginal_return_goes_negative` + `feedback_stop_adding_rounds_when_major_count_flattens` 双向点亮)。三席从三个不同轴 (fix 改坏了什么 / 缺陷迁到哪层 / 同形状扫没扫完) 都指向同一结论: **组 5 是按错误维度 (文件数) 枚举出来的, 逐条补丁只会沿接缝再生产缺陷。**
 >
-> **重做的维度**: 发版同步面的正确单位是**版本引用点**, 不是文件数; 且**版本史类文件 (append-only 账本) 的不变量与普通文件不同** —— 前者是「头部当前版本行 == SOT」, 后者是「旧值零命中 + 新值计数匹配」。R1-fix 把两类混在一条零命中断言里, 造出一个恒红 (R2/tech-lead N2)。
+> **重做的维度**: 发版同步面的正确单位是**版本引用点**, 不是文件数; 且**版本史类文件 (append-only 账本) 的不变量与普通文件不同** —— 前者是「头部当前版本行 == SOT 且文件行数不减」(5.11 ③), 后者是「旧值零命中 + 新值计数匹配」。R1-fix 把两类混在一条零命中断言里, 造出一个恒红 (R2/tech-lead N2)。
 
 ### 现行 — 5.1
 
@@ -115,7 +115,7 @@
 > **为什么不用 `- [ ]`**: `DUAL_LAYER_SPEC.md:258` 的示例用 `- [ ] X.Y (CANCELLED)` 保留编号, 但**与归档门互相拆台** —— 实跑 `spec_complete.py --gate` 会把它们计入 unchecked (R2-fix 时实测 `27/27 unchecked`), 完工后恒为 `7/27` ⇒ 那 7 条永远不能合法勾 `[x]` ⇒ **归档门的 tasks 分支永久失效, 只剩 Status 分支 = 声称**; `handoff_autofill` 亦会永久误报 7 条 phantom。故本文件用**加粗删除线**保留编号而不进 checkbox 计数 (post_planning R3, 三席独立命中)。插件侧该冲突已记, 见下方指针。
 
 - **~~5.2 aria 子模块 5 文件 bump~~ **(CANCELLED)** → 由 **5.9** 取代 (按引用点重derive, 补 `marketplace.json` 第二个 version 字段)
-- **~~5.3 aria 子模块分支合并 + 双推~~ **(CANCELLED — owner 裁定 2026-08-08)** → **委派 `phase-c-integrator` C.2.5**, 见 **5.13**。理由: 手写它绕开 `pre_merge_gate` (Rule #8) 与 `submodule_gate=block` 两个默认开的闸门 (R2/tech-lead N1, Rule #10 违规)
+- **~~5.3 aria 子模块分支合并 + 双推~~ **(CANCELLED — owner 裁定 2026-08-08)** → 当时裁「委派 `phase-c-integrator` C.2.5」; **R3-fix 起由 5.15 承接** (合并动作本地做, 闸门由 5.13 单独调; 原裁定依据 `SKILL.md:242` 系误引)。编号冻结, 含义见 5.15
 - **~~5.4 主仓 gitlink + VERSION + README 两处~~ **(CANCELLED)** → 版本面归 **5.10**; gitlink 归 **5.13** (随合并一并移交)
 - **~~5.5 主仓 i18n README ×3~~ **(CANCELLED)** → 并入 **5.10**
 - **~~5.6 CLAUDE.md 两处版本引用~~ **(CANCELLED)** → 并入 **5.10**
@@ -125,7 +125,7 @@
 ### 现行 — 5.9 起 (取代上方 CANCELLED)
 
 - [ ] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
-      > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, **历史行原样保留**) · `CHANGELOG.md` (**追加**条目, 历史保留)
+      > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, 判据 = **文件行数不减**, 见 5.11 ③) · `CHANGELOG.md` (**追加**条目, 历史保留)
       > CHANGELOG 与 README 措辞: **不得写成「已覆盖全部别名」** —— basename 截断轴是成文已知限, 写错等于对外抹掉它。
       > MINOR 而非 PATCH (行为面扩大)。
 
@@ -135,13 +135,13 @@
       > CLAUDE.md: **只改数字**。不得把本 Spec 设计术语写进去 (污染 AB baseline, aria-plugin #116); 「项目状态」段覆写非追加、预算 15-20 行 (`claude-md-hygiene.md`)。
 
 - [ ] 5.11 **版本引用面双向 + 整仓差集断言** — **必须在 5.15 (合并/双推/gitlink) 之前通过**
-      > **① 整仓差集 (fail-CLOSED, R4-fix 关键升级)**: bump 后对**全部 tracked 文件** grep 旧版本号 `1.65.5`, 命中集合**减去显式成文排除集**后必须为**空**。
-      > 排除集 (逐条给理由, 成文): `aria/VERSION` + `aria/CHANGELOG.md` (append-only 版本史) · `.aria/audit-reports/**` (审计史) · 本 Spec 目录内的订正留痕行 (自述历史)。
-      > ⛔ **任何不在排除集里的新命中即红**; 不许临时往排除集加条目凑绿, 加条目须同批写理由。
+      > **① 整仓差集 (fail-CLOSED, R4-fix 关键升级; R5 修正)**: 旧值**不写死字面** —— 执行时 `OLD=$(git show HEAD:aria/.claude-plugin/plugin.json | jq -r .version)` (R5 C-a: 写死 `1.65.5` 在 1.66.4 基线零命中 = 恒真); bump 后对**主仓与 aria 子模块两仓**各 `git grep -lF "$OLD"` (git grep 不进子模块), 命中集合**减去按类成文的排除集**后必须为**空**。
+      > 排除集按**类**成文 (R5 M-3: 实例白名单对 handoff / archive / 他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` · (3) 其他 OpenSpec change 目录 · (4) 本 Spec 目录的订正留痕行。
+      > ⛔ **任何不落入四类的命中即红**; 不许临时加第五类凑绿。**三态自证**: 未 bump 命中 ≥18 (红) / 正确 bump 0 (绿) / 故意漏 1 点 ≥1 (红)。
       > **为什么换掉文件白名单**: 白名单对**未来新增的版本引用点 fail-OPEN** (修实例不修类), 且逼人去数「两条 check 失明几处」—— R2-fix 写 7, 实为 **10** (漏计 CLAUDE.md 2 + VERSION 1)。整仓差集使这个数**不必算** (R4/completeness-lens 单点最优建议)。
       > **② 新值计数**: 普通引用文件里 `1.67.0` 出现次数 == 预期点数 (主仓 **14** + aria 侧 **4** = **18**)。只断言旧值缺席是**缺席断言**, 删行或写错新版本号都判绿。
-      > **③ append-only 账本** (`aria/VERSION` / `aria/CHANGELOG.md`) 判据不同: (a) **全部**「当前版本」声明 == `plugin.json` **且** (b) **文件行数不减**。
-      > ⚠️ (a) 写「**全部**」而非「头部」是因为 **`aria/VERSION:56-59` 有第二处当前版本声明** (`## 版本号` 围栏块), 实读 **`1.47.0`** —— 陈旧 18 版, 正是 aria-report **#158** 版本字段污染的那个冻结串。该块的陈旧属 pre-existing 缺陷, 不在本 Spec 范围, 但实施者须知道它存在。
+      > **③ append-only 账本** (`aria/VERSION` / `aria/CHANGELOG.md`) 判据不同: (a) 头部「当前版本」行 == `plugin.json`, `aria/VERSION:60-64` 围栏块**显式排除** **且** (b) **文件行数不减**。
+      > ⚠️ (a) 之所以点名围栏块: **`aria/VERSION:60-64` 有第二处当前版本声明** (`## 版本号` 围栏块), 实读 **`1.47.0`** —— 陈旧 18 版, 正是 aria-report **#158** 版本字段污染的那个冻结串。该块的陈旧属 pre-existing 缺陷, **不在本 Spec 范围 ⇒ 从 (a) 显式排除** (R5 M-4: R4-fix 写「全部声明 == SOT」与「范围外」自相矛盾, 守范围的正确实现恒红), 但实施者须知道它存在。
       > ⚠️ (b) 用「行数不减」而非「旧值命中数 ≥N」: **R4 实测保留形态不一致** (`1.65.4` 0 次 · `1.65.3` 0 次 · `1.65.2`/`1.65.1`/`1.64.0` 各 1 次) ⇒ 任何基于旧值命中数的阈值都会对某些 bump **恒红**。R3-fix 写 ≥2、R4 中途写 ≥1, **同一处三次踩同一个坑** —— 每次都是在「修恒红」的编辑里造新恒红 (memory `feedback_fix_recurs_in_its_own_fallback_path`)。
       > **④** 同时跑**不带路径**的 `git status` 核验实际落地面与声称一致 (memory `feedback_scoped_git_add_splits_claim_from_landing`)。
       > **类级根因已开号**: `CLAUDE.md:81`「发布同步面」那行同款四错, 见 **Aria #177**。本任务只治本 change 的实例。
@@ -154,7 +154,7 @@
 - [ ] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
       > **交出去的**: PR 创建 + **pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)** + 主仓自身 PR 流程。这些**不在本文件复述判据**。
       > **⛔ 不交出去的 (改由 5.15 承载)**: aria 子模块的**合并动作本身** + 双推 + 逐远端 ls-remote + 主仓 gitlink bump。
-      > **为什么这样切 (post_planning R3, 四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是「`phase-c-integrator:242` 本就建模子模块合并」—— **该引用是误引** (`:242` 实为 *Path coverage 评估*的执行上下文契约)。真实合并链 = C.2.4:253 → `branch-manager` merge action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`), **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; 且 `aria/skills/` 全仓对该约束**零处编码** (已开 aria-plugin **#136**)。⇒ 委派掉合并等于删掉计划里唯一的守卫。
+      > **为什么这样切 (post_planning R3, 四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是「`phase-c-integrator:242` 本就建模子模块合并」—— **该引用是误引** (`:242` 实为 *Path coverage 评估*的执行上下文契约)。真实合并链 = C.2.4:261 (R5 行号复核) → `branch-manager` merge action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`), **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; 且 `aria/skills/` 全仓对该约束**零处编码** (已开 aria-plugin **#136**)。⇒ 委派掉合并等于删掉计划里唯一的守卫。
       > **两件事正交, 不是二选一**: 「**谁执行合并**」(硬约束 1: 本地 vs 服务端) 与「**哪个闸门批准合并**」(Rule #8 CI 状态) 互不替代。R2/N1 把二者混成一件, owner 据此裁定的「删任务改委派」因此只解决了后者。本版**两者都要**。
       > 验收: (1) **5.15 已完成** (子模块已本地合并双推、主仓 gitlink 已 bump); (2) 交接时显式告知该状态。
       > ⛔ **真实阻塞 (R4/delegation-lens C2)**: `phase-c-integrator` **没有 gate-only 形态** —— C.2.4 的触发条件逐字是「即将调用 branch-manager merge action」, green 后 `:253` 直接调用它, 而 merge 的唯一实现是服务端 `Do: merge`。⇒ 「只要闸门不要合并」**在现有工具里不可实现**。**在 aria-plugin #136 落地前, 5.15 的合并只能由 owner 手工本地执行, pre-merge gate 需单独调用。**
