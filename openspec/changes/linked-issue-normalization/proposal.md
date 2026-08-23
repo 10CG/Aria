@@ -175,12 +175,14 @@ if c.linked_issue != own_linked_issue:
 
 **不申请豁免。**
 
+> **AB 执行记录 (2026-08-23, TASK-013/027)**: `SKILL.md:176` hunk 已照跑 —— state-scanner 全套件 11 条 + 定向 eval-12, 基线 `9e6a17c` vs 新版 `0fe2e0d`→`880060d`; 既有 11 条零回归, eval-12 基线 2/5→3/5 / 新版 4/5→5/5 (iteration-1 承重断言 1 两臂皆 hedge ⇒ 括注补归一细则后 iteration-2 满分)。结果 `aria-plugin-benchmarks/ab-results/2026-08-23-v1.67.0-linked-issue-rule6/RESULT.md`。**门范围披露**: 未跑 Tier 1 全量 10 Skill, owner 裁「单 Skill 全套件 + 定向 fixture + 披露」, 决策 `.aria/decisions/2026-08-23-rule6-ab-scope-single-skill-disclosure.md`, convention 修订 aria-standards#17, 套件缺口 aria-plugin#157。
+
 
 
 **baseline 实测结果 —— ✅ 已实跑留证 (2026-08-05 首测, 2026-08-07 复跑)**:
-> **留证 artifact**: [`.aria/repro/sc-baseline-linked-issue-normalization.py`](../../../.aria/repro/sc-baseline-linked-issue-normalization.py) —— 自包含、stdlib-only、只读、目标路径走 argv。复现:
+> **留证 artifact (2026-08-23 起为冻结存档, TASK-025 路径 (b))**: [`.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md`](../../../.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md) —— 对 aria `9e6a17c` (基线) 与 `880060d` (实现后) 各一份原样输出; 脚本已退役移至同目录 `.py` (自包含、stdlib-only、只读、目标路径走 argv)。复现 (须对基线 SHA 的 worktree 跑, 对 HEAD 跑必红):
 > ```
-> python3 .aria/repro/sc-baseline-linked-issue-normalization.py aria/skills/state-scanner
+> git -C aria worktree add /tmp/aria-base 9e6a17c && python3 .aria/repro/archive/sc-baseline-linked-issue-normalization.py /tmp/aria-base/skills/state-scanner
 > cd aria/skills/state-scanner && python3 -m pytest tests/test_release_by_track.py \
 >     -k "TestLinkedIssueOverlaps or TestPhase1GateLinkedIssueCli" -q     # 既有测试回归
 > ```
@@ -216,7 +218,7 @@ if c.linked_issue != own_linked_issue:
 
 **⚠️ 上述「语料替换未披露」问题已随 Q6 缩范围消解**: SC-7 与其 fixture 整节已移出本 Spec (见 §移出范围), 不再有「表内规定 fixture 而 artifact 用内联串」的落差。
 
-> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-1b / SC-3 / SC-4 / SC-5b / SC-11 / SC-13 / SC-15 八条**的 baseline-failing 状态**已于 2026-08-05 实跑留证**, artifact 见上方 baseline 表 (`.aria/repro/sc-baseline-linked-issue-normalization.py`, 14/14 一致)。该裁定要求的「全部实跑, 非声称」**已满足**, 非 Phase B 待办。
+> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-1b / SC-3 / SC-4 / SC-5b / SC-11 / SC-13 / SC-15 八条**的 baseline-failing 状态**已于 2026-08-05 实跑留证**, artifact 见上方 baseline 表 (冻结报告 `.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md`; 2026-08-23 对基线 `9e6a17c` 复跑 16/16 一致, 脚本已退役入同目录)。该裁定要求的「全部实跑, 非声称」**已满足**, 非 Phase B 待办。
 
 > *(订正留痕: 本段原写「SC-1~6 的 baseline-failing 状态」—— 与上方 baseline 实测表直接矛盾 (SC-2/5/6 实测为绿)。**该假声明在同一节内出现两次, 上方一处已由 FIX-11 改掉, 这一处编辑清单未点名、险些残留** —— 属「多簇 fix 互相拆台」的同一形状, 由 R1-fix 落盘后的交叉一致性检查抓到。)*
 

@@ -841,13 +841,14 @@ tasks:
     parent: "5.12"
     task_group: TG-5
     title: "sc-baseline 留证脚本处置 — 两条失效路径都要处理"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
     dependencies: [TASK-009]
     deliverables:
-      - .aria/repro/sc-baseline-linked-issue-normalization.py
+      - .aria/repro/archive/sc-baseline-linked-issue-normalization.py      # 退役后位置 (路径 (b), owner 2026-08-23)
+      - .aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md   # 冻结报告 (基线 9e6a17c 16/16 + 实现后 880060d 证据面全绿)
       - openspec/changes/linked-issue-normalization/proposal.md           # (b) 路: artifact 指针同批修 (R4 M5/M7)
       - openspec/changes/linked-issue-normalization/tasks.md              # 同上
       - openspec/changes/linked-issue-normalization/detailed-tasks.yaml   # 同上 (本文件自引)
@@ -894,7 +895,7 @@ tasks:
     parent: "5.14"
     task_group: TG-5
     title: "Rule #6 AB 门范围披露 (AI 建议, 待 owner 确认)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: qa-engineer

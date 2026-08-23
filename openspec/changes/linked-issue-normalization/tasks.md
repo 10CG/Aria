@@ -146,7 +146,7 @@
       > **④** 同时跑**不带路径**的 `git status` 核验实际落地面与声称一致 (memory `feedback_scoped_git_add_splits_claim_from_landing`)。
       > **类级根因已开号**: `CLAUDE.md:81`「发布同步面」那行同款四错, 见 **Aria #177**。本任务只治本 change 的实例。
 
-- [ ] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红
+- [x] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红 → **owner 2026-08-23 裁 (b)**: 脚本退役移至 `.aria/repro/archive/`, 冻结报告 `…-REPORT.md` (基线 `9e6a17c` 16/16 一致 + 实现后 `880060d` 证据面全绿), 三个交付面引用同批改 (git grep 口径)
       > 该脚本 `:275-277` 断言那 8 条 SC 处于 **baseline-failing (红)**; 2.2 落地后它们转绿 ⇒ **恒红**。且它从 `proposal.md` **现场解析** (`:205-215` FATAL fail-CLOSED) ⇒ Spec 归档后**换一种恒红**。两条失效路径都要处理。
       > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同批修全部交付面引用**避免 dangling —— 口径 = `git grep -l "sc-baseline-linked-issue-normalization"` 的结果减去 append-only 史 (`.aria/audit-reports/*` / `docs/handoff/*` / 脚本自身), 08-08 实测 = `proposal.md` (3 行) + `tasks.md` + `detailed-tasks.yaml` (2 处) 三个文件 (R4/completeness-lens M7: 原只枚举 proposal.md)。
       > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
@@ -161,7 +161,7 @@
       > ⚠️ **委派的闸门两条腿对本 Spec 都不触发且都失败为绿 (R4/delegation-lens C3, 已开 aria-plugin #137)**: (a) 两仓 workflow 的 `paths` 只覆盖 `issue-triage`/`docker` ⇒ `not_applicable` ⇒ PR CI 步跳过; (b) `pre_merge_gate.py:427` 的 `--main-branch` **缺省 `"main"` 而本项目是 `master`** ⇒ 实跑返回 `{"runs":[]}` RC=0 ⇒「main 无 in-flight」**恒真**。⇒ 调用时**必须显式** `--main-branch master` 并核验它真查到了 master。**2026-08-22 更新**: #137 已修 (v1.66.0, 分支存在性核验 fail-CLOSED, 缺省仍 main) ⇒ (b) 腿恒真解除; (a) 腿由并发轨 aria-plugin#152 处理。
 
 
-- [ ] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
+- [x] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
       > **事实**: `AB_TEST_OPERATIONS.md:396` 逐字为「Tier 1: 核心 Skills (**10 个**, 每次发版必测)」, state-scanner 在内; 发版前清单 `:545` 要求「Tier 1 Skills 全量 AB 测试已执行」。而 4.1 只跑 `SKILL.md:176` 单个 hunk 的定向 AB。
       > **AI 建议**: 单 hunk 定向 AB + **成文披露「本次未跑 Tier 1 全量」** + 开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订。
       > **理由**: 两次先例的单 skill Rule #6 run 均未跑 Tier 1 全量、均无 `summary.yaml` ⇒ 已是**事实上的偏离**; 按 memory `feedback_written_exception_exact_condition_match`「**N 次非正式援引 ≠ 成文 lane**」, 第三次不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但**测不到要测的东西** (#117 / #127 的套件缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。
