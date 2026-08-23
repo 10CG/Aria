@@ -46,10 +46,10 @@ runtime_probe:
 |---|---|---|---|
 | F1 | backend 把「零 run」与「run 未完」**同映射**为 `pending`: `if not runs: return "pending"` | `ci_backends/aether.py:225-226` | 盲区的机器侧根因在这一行 |
 | F2 | `CIStatus.state` Literal **早有** `not_found` 槽位, gate 输出「目前不产生」 | `ci_backends/base.py:29`; `SKILL.md:288` | 不需要新枚举值 |
-| F3 | aria-plugin 自 2026-07-20 起按 CLAUDE.md 硬约束 1 **本地合并不开 PR** (最近 PR = #115, 07-19) | `forgejo GET /repos/10CG/aria-plugin/pulls?state=closed` (R1 A5 复核) | `pull_request` 触发面结构性死亡, 只剩 `push` ⇒ 每条新分支恒中 |
+| F3 | aria-plugin 自 2026-07-20 起按 CLAUDE.md 硬约束 1 **本地合并不开 PR** (最近 PR = #115, 07-19) | `forgejo GET /repos/10CG/aria-plugin/pulls?state=closed` (R1 A5 复核) | `pull_request` 触发面结构性死亡, 只剩 `push`。**⚠️ Phase B TASK-001 追记 (2026-08-22)**: 「每条新分支首推恒中」**未复现** — 探针分支 (master tip 起, path-matched 首推) 的 `push` run 正常建立 (31967); 与 #152 现场的差异条件未定 (traps §六)。本 spec 机制对零 run 的任一来源 (未被领 / branches 过滤 / #152 条件) 都成立, 不依赖盲区恒在; 但 Why 的「恒中」措辞降级为「已观测一次, 条件未定」 |
 | F4 | backend 所查 `/actions/tasks` **只列已被 runner 领走的任务**; 返回**全量历史无截断** (returned==total_count 三仓) | 2026-08-20 handoff §教训 4; Aether CLI `internal/ci/status.go:45-47` + R1 A1 实测 | 「零 run」有第二来源 = run 已建未被领 (瞬态) ⇒ 不能判 `fail`; 且 **episode 内 `not_found` 单调** (有过 task 就不会回零) |
 | F5 | 「PR 分支不存在」与「存在但零 run」在 backend 出口**逐字节同形** (`aether ci status --branch zzz-no-such-branch-152 --json` → `runs=[]`) | R1 A1 实测 | `not_found` 解码前须排除「分支不存在」 |
-| F6 | 本 Forgejo (11.0.6+gitea-1.22.0): `/actions/runs`、`/actions/workflows` **404**; `POST …/actions/workflows/{file}/dispatches` **路由存在** (`{"ref":""}` → 400 `ref is empty`), 按文件名寻址; 带合法 ref 是否真建 run **未验** | 本 session + R1 A4/A5 复跑 | TASK-0a 纯 API 探针裁决 (§3.5); memory `reference_forgejo_new_branch_paths_filter_no_run` 的「dispatch 在 gitea-1.22 系不可用」与 F6 互斥, 探针后以 traps §6 为 SOT 修正 |
+| F6 | 本 Forgejo (11.0.6+gitea-1.22.0): `/actions/runs`、`/actions/workflows` **404**; `POST …/actions/workflows/{file}/dispatches` **路由存在**, 按文件名寻址。**TASK-0a 已裁决 (2026-08-22): `dispatch_viable = true`** — HTTP 204, 2s 内建 run (31968 success); 副作用: 一次 dispatch 产生成对 run (31969 failure, 同 `started_at`), gate 取最近 run 时 tie 可能读到 failure (traps §六; 处方 (a) 文案须提示) | 本 session + R1 A4/A5 复跑 + TASK-001 活体 | memory `reference_forgejo_new_branch_paths_filter_no_run` 的「dispatch 在 gitea-1.22 系不可用」已按 traps 修正 |
 | F7 | `gate_state_helper.py` 是 **reference 实现, 运行时零消费方** (全部 SKILL.md 零引用, 无 `main()`; docstring 自陈 markdown-driven) | R2 A1 实测 | 任何「由 helper 保证」的不变量都必须先把 helper 接进运行时 (memory `completion_signals_vs_runtime_invocation`) |
 
 ### 为什么不能按 issue 原案 A 放行

@@ -1,0 +1,49 @@
+{
+ "skill_name": "phase-c-integrator + workflow-runner",
+ "iteration": 1,
+ "purpose": "Rule #6 AB — aria-plugin #152 pre-merge-gate-no-run-for-branch (NEG-4 定向: C.2.4 surface 原文 + wait_recoverable Exit 2.5 should_prompt)",
+ "harness": "/skill-creator SKILL.md Steps 1-4 手工编排 (同轮 spawn 4 subagent, PREDICTION.md 先落, 主控实读 answer.md 逐条取证 grading, benchmark.json 按 2026-08-16 先例手工生成; aggregate_benchmark.py 要 run-N/ 层, 未用)",
+ "configurations": {
+  "with_skill": {
+   "label": "new (aria c19c284, feature/152-no-run-for-branch)",
+   "per_eval": {
+    "eval-1-c24-no-run-surface": {
+     "passed": 5,
+     "total": 5
+    },
+    "eval-2-wait-recoverable-should-prompt": {
+     "passed": 5,
+     "total": 5
+    }
+   },
+   "pass_rate": 1.0,
+   "passed": 10,
+   "total": 10,
+   "mean_tokens": 98376,
+   "mean_duration_s": 186.9
+  },
+  "old_skill": {
+   "label": "baseline (aria 9e6a17c = v1.66.4)",
+   "per_eval": {
+    "eval-1-c24-no-run-surface": {
+     "passed": 4,
+     "total": 5
+    },
+    "eval-2-wait-recoverable-should-prompt": {
+     "passed": 2,
+     "total": 5
+    }
+   },
+   "pass_rate": 0.6,
+   "passed": 6,
+   "total": 10,
+   "mean_tokens": 94878,
+   "mean_duration_s": 250.8
+  }
+ },
+ "delta": {
+  "pass_rate": 0.4,
+  "tokens": 3498,
+  "duration_s": -63.9
+ }
+}

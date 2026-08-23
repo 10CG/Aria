@@ -1,0 +1,22 @@
+{
+  "eval_id": 2,
+  "eval_name": "wait-recoverable-should-prompt-TARGETED",
+  "prompt": "你是 aria workflow-runner, 正在 SKILL.md §wait_recoverable 循环中等待 phase-c-integrator C.2.4 gate (主仓 /home/dev/Aria, 合并对象是 aria-plugin 子模块分支)。这是第 3 次重查 (前两次同样结果): gate 返回 inputs/gate-output.json 里的 JSON; 随后你按 SKILL.md 维护了 gate_state, inputs/record-stdout.json 是 gate_state_helper CLI record 的 stdout。请按 SKILL.md 决定下一步: 写出 (1) 你命中的 exit condition 判定与理由; (2) 你对用户输出的内容 (原文); (3) 用户分别回答 continue / abort 时你要执行的具体命令或动作。",
+  "assertions": [
+    {
+      "text": "[承重] 判定命中 Exit condition 2.5 (no-run prompt, gate_error.kind=no-run-for-branch AND should_prompt=true), 而不是继续 sleep 等下一轮, 也不是 exit 2 timeout"
+    },
+    {
+      "text": "prompt 内容含 gate_error.message 原文 (含 no-run-for-branch) 与观测次数 3 / elapsed"
+    },
+    {
+      "text": "[承重] continue ⇒ 经 gate_state_helper.py CLI `reset --observations` (带 --state-file 主仓绝对路径) 回 loop"
+    },
+    {
+      "text": "abort ⇒ verdict=fail 语义 (session failed), 保留 gate_state 给 audit trail"
+    },
+    {
+      "text": "[承重] 不手写 JSON 改 workflow-state.json, 不自动 dispatch / 不自动推 commit"
+    }
+  ]
+}

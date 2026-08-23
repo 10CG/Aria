@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] surface 行包含 gate_error.message 原文 (至少同时含子串 no-run-for-branch 与 aria-plugin#152)",
+   "passed": true,
+   "evidence": "answer.md:17 🔴 C.2.4 行逐字引 gate_error.message (含 no-run-for-branch / aria-plugin#152 / 处方 (a) 行)"
+  },
+  {
+   "text": "[承重] 不把状态只描述为「CI pending / 等待中」: 明确指出远端零 run (run 不存在 / 未建 / 未被领) 与 pending 的区别",
+   "passed": true,
+   "evidence": ":79「零 run 不是一种状态, 是几种世界的折叠」; surface 行写「远端零 run」而非 pending"
+  },
+  {
+   "text": "列出处方 (a) dispatch 命令 (含 /dispatches) 并说明由用户执行, AI 只填 <owner>/<repo>; 另列 (b) 推实质 commit / (c) 继续等待或放弃",
+   "passed": true,
+   "evidence": ":18-21 (a) 填 10CG/aria-plugin + 成对 run tie 警告 / (b) 推实质 commit 到 fix/147-… (paths skills/issue-triage/**) / (c) continue·abort"
+  },
+  {
+   "text": "[承重] 明确不自行执行 dispatch / 推 commit (答案中不出现 AI 自己去执行这些远端写动作的计划)",
+   "passed": true,
+   "evidence": ":74-81 「不会」+ 四条理由, 引 SKILL 原文「由你执行; AI 不自动执行」"
+  },
+  {
+   "text": "提到连续观测计数 / 阈值 3 / ~90s 交人 / should_prompt, 或指出交互式直调时无计数",
+   "passed": true,
+   "evidence": ":27-28 workflow-runner 下 obs=1 首轮 / 交互式直调无计数不写计数句; :68 第 3 次 ~90s 弹处方"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 0,
+  "total": 5,
+  "pass_rate": 1.0
+ }
+}

@@ -33,9 +33,20 @@
 - 首个生产判定: v1.65.0 自身的 C.2 合并 (meta-dogfood) — verdict=green via
   not_applicable, 六次复发场景 (v1.54.0/v1.55.0/v1.55.2/v1.64.0/v1.64.1/本次)
   第一次零人工裁决走正门。
+- 📌 前向指针 (2026-08-22): verdict=wait 自 v1.66.5 另含「结构性零 run」语义
+  (pr_ci_status=not_found + gate_error.kind=no-run-for-branch, ~90s 后带处方
+  交人), 见文末。
 
 ## 交叉引用
 
 - Spec: `openspec/archive/2026-07-31-phase-c-gate-path-coverage-not-applicable/`
 - Issue: 10CG/aria-plugin#122 | 审计: `.aria/audit-reports/post_spec-R{1,2,3,4}-1785112156889-*`
 - 上一份同族裁决: DEC-20260722-001 (AB baseline 污染根因修复)
+
+## 📌 前向指针 (2026-08-22)
+
+- Spec: `openspec/changes/pre-merge-gate-no-run-for-branch/proposal.md` (归档后
+  `openspec/archive/<date>-pre-merge-gate-no-run-for-branch/`)
+- Issue: 10CG/aria-plugin#152
+- 本 DEC 退役的是 wait 的**人工裁决**; #152 给 wait 加的是**机器显影 + 观测计数
+  后交人**, 不恢复裁决, 不与本 DEC 冲突。

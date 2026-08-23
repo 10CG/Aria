@@ -1,0 +1,25 @@
+{
+  "verdict": "wait",
+  "pr_ci_status": "not_found",
+  "in_flight_runs": [],
+  "primitive_used": "aether-ci-cli",
+  "primitive_version_sha": "f29abee",
+  "raw_message": "no-run-for-branch: 变更 path-matched .forgejo/workflows/issue-triage-tests.yml 但远端零 run — 符合 aria-plugin#152 (新分支首推 × paths 过滤, Forgejo 不建 run), 或 run 尚未被 runner 领走, 或 workflow branches 过滤不含本分支\n处方 (a): forgejo POST /repos/<owner>/<repo>/actions/workflows/issue-triage-tests.yml/dispatches -d '{\"ref\":\"fix/147-issue-triage-regression\"}'",
+  "path_coverage": {
+    "decision": "covered",
+    "workflows_scanned": 1,
+    "matched_workflows": [
+      ".forgejo/workflows/issue-triage-tests.yml"
+    ],
+    "changed_files_count": 1,
+    "reason": "workflow-trigger-matched",
+    "dispatchable_workflows": [
+      ".forgejo/workflows/issue-triage-tests.yml"
+    ]
+  },
+  "gate_error": {
+    "kind": "no-run-for-branch",
+    "message": "no-run-for-branch: 变更 path-matched .forgejo/workflows/issue-triage-tests.yml 但远端零 run — 符合 aria-plugin#152 (新分支首推 × paths 过滤, Forgejo 不建 run), 或 run 尚未被 runner 领走, 或 workflow branches 过滤不含本分支\n处方 (a): forgejo POST /repos/<owner>/<repo>/actions/workflows/issue-triage-tests.yml/dispatches -d '{\"ref\":\"fix/147-issue-triage-regression\"}'",
+    "prompt_after_observations": 3
+  }
+}
