@@ -302,3 +302,10 @@ R1 编辑清单 (`.aria/audit-reports/post_spec-R1-fix-editlist-linked-issue-nor
 - **owner 2026-08-22 裁定: 加 1 轮 R5** (`max_rounds` 4→5, 沿 R4 两席新鲜眼睛先例), 而非 override 进 B。
 - **R5 前机械收口** (主仓本 commit): ship target v1.66.0→**v1.67.0** (1.66.x 已被 #137/#128/#181/#179 占满, #152 预占 v1.66.5; MINOR 口径沿 Spec 自判, PATCH 则 v1.66.6 请 owner 复议) · **R4 C3 解除** (aria-plugin#137 已于 v1.66.0 修, 分支存在性 fail-CLOSED, 缺省仍 main) · R4 剩余 M3 (6 个既有 test 逐名点名, 宿主 34 个) / M5 (TASK-013/025/027 deliverables 补 verification 强制改动文件) / M7 (dangling 指针枚举改 `git grep` 口径) / 5.8→5.12 指针 · `scope_repos[].head` 刷到 aria `9e6a17c` / 主仓 `084209f`。M2 (真并行组 1/32) R4-fix 已改措辞, 未重枚举。
 - **R4 C2 (aria-plugin#136 无 gate-only 形态) 仍 open**: 对本 change 的实际后果 = 子模块合并按 CLAUDE.md 硬约束 1 本地手工 + gate 单独调 (TASK-028 已如此成文), 不阻塞 B。
+
+## 10. R5 (2026-08-22) FAIL → owner 2026-08-23 裁定 override 进 Phase B (Rule #10 留痕)
+
+- R5 两席新鲜眼睛 (executability-lens / claim-landing-lens) 2/2 REVISE, 去重 **2C + 7M**, **0 条新发现**: 4 条由 08-22 机械收口 (`09eb919`) 直接引入 (旧值字面未随新值改 ⇒ 差集断言恒真 / 补 deliverables 造 025↔027 同文件并行边 / 刷 head 不刷行号锚 / 状态头三处改两处), 4 条 R4-fix 落地不完整 (tasks.md 委派文字第四次未切 / 账本判据与失明计数旧文残留), 1 条 R4-fix 设计未在基线实跑 (整仓差集对 handoff/archive 恒红)。聚合: `post_planning-R5-1787435452341-*-aggregated.md`。
+- **owner 裁定 (2026-08-23, 四选一)**: 修 9 条后 **override 进 B.1**, 不开 R6。编排层 (bfe8285d) 按 Rule #10 记录: 这是 owner 显式 override (`overridden_by_user` 语义), 非 AI 自裁; 判据「fix 引入占比 >1/2 连续五轮」支持「再审计无边际收益」, 但 converged 仍为 false。
+- **R5 九条修法 (本 commit)**: C-a/M-3 差集断言旧值改为执行时 `git show HEAD:plugin.json` 动态取 + 两仓各跑 git grep + 排除集按**类**成文 (账本 / 历史目录 / 他 Spec / 本 Spec 留痕) + 三态自证 · C-b tasks.md :42/:46/:118 与 yaml TASK-023 notes 改为「合并/双推/gitlink 由 TASK-028 本地做, phase-c-integrator 只承接 PR+gate」· M-1 TASK-027 依赖加 TASK-025 (同文件 proposal.md 串行), 程序化复算: 30 无序对, 同文件并行边 0 · M-2 行号锚 VERSION:60-64 / phase1_gate.py:1233·1236 / C.2.4:261 · M-4 账本 (a) 改「头部 + 显式排除围栏块」· M-5 TASK-022 / tasks.md:105·128 / proposal §Impact 统一「行数不减」· M-6 失明计数 7→10 三处 · M-7 tasks.md 状态头。
+- **未修 (成文为已知限)**: 三文件引用的 memory 文件名 9/10 本机不存在 (跨容器 memory 不同步, 非交付面) · run_all 基线数字随本机 pytest 有无而异 · 历史叙述里的 `1.65.5` 字面 (yaml:692, 记录 R1 当时事实)。
