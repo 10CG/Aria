@@ -923,7 +923,7 @@ tasks:
     parent: "5.15"
     task_group: TG-5
     title: "aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump (承载多远程两条硬约束)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect

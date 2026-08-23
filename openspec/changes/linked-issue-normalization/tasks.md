@@ -167,7 +167,7 @@
       > **理由**: 两次先例的单 skill Rule #6 run 均未跑 Tier 1 全量、均无 `summary.yaml` ⇒ 已是**事实上的偏离**; 按 memory `feedback_written_exception_exact_condition_match`「**N 次非正式援引 ≠ 成文 lane**」, 第三次不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但**测不到要测的东西** (#117 / #127 的套件缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。
       > ⛔ 无论走哪条, **不得**以「改动小 / 纯括注 / 性价比」为由降级 —— Q5 是 owner 亲裁 (Rule #10)。
 
-- [ ] 5.15 **aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump** (承载 CLAUDE.md 多远程两条硬约束)
+- [x] 5.15 **aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump** (承载 CLAUDE.md 多远程两条硬约束)
       > **硬约束 1**: 本地 `git merge` 到子模块 `master` —— ⛔ **禁**用 Forgejo Web UI / API 的 `Do: merge` / `Do: squash`。服务端合并使本地 master 从未 fast-forward ⇒ 双推与 C.2.5 结构上都不触发 ⇒ 主仓 bump gitlink 即产生 orphaned gitlink, GitHub `clone --recursive` 断裂 (2026-07-14 事故)。
       > **硬约束 2**: `git push origin && git push github` 后**逐个** `git ls-remote <remote> master` 取 SHA 与本地比对, **全部一致才算成功** —— push 退出码与回执两个方向都会骗人。`ls-remote` 自身失败 → 重试几次再下结论。
       > **主仓 gitlink**: `git add aria` 必须记**合并后的 `master` SHA**, 不是 feature 分支 SHA。⚠️ 子模块若处于 detached HEAD, `git add aria` 会记 HEAD ⇒ 先确认已在 master 上。
