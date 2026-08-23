@@ -4,6 +4,7 @@ round: 2
 converged: false
 overridden_by_user: false
 incomplete: false
+verdict: REVISE
 ---
 
 # post_spec R2 — a1-entry-claim-duplicate-work-guard (重写版 v2 + R1-fix + C1/C2 裁定落版 + 3 轮 rework)
