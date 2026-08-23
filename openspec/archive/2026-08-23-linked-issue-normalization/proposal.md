@@ -1,6 +1,6 @@
 # Proposal: linked-issue-normalization
 
-> **Status**: 📝 **Draft (A.3 done, post_planning 未收敛)** — post_spec R1/R1′/R2′/R3′ 四轮 (均 REVISE, 算法本体零问题) → owner 2026-08-07 切分交付面/审计史 → A.2/A.3 2026-08-08 → post_planning R1→R4 全 FAIL (`max_rounds=4` 耗尽, 拐点形态) → owner 2026-08-22 加 1 轮 R5 (两席新鲜眼睛) → **R5 FAIL (2C+7M, 全为 fix 副产品)** → **owner 2026-08-23 裁定: 修 R5 九条后 override 进 Phase B.1** (Rule #10 留痕见审计轨 §10) → **Phase B/C 完成 2026-08-23**: aria v1.67.0 @ `ca52d1c` (双推 + tag), 主仓 **PR #189** gate green, 21/21 task done; 待 owner merge → Phase D 归档
+> **Status**: ✅ **Complete (2026-08-23, aria-plugin v1.67.0 @ ca52d1c; 主仓 PR #189 merged c453504)** — 原 Draft (A.3 done, post_planning 未收敛) — post_spec R1/R1′/R2′/R3′ 四轮 (均 REVISE, 算法本体零问题) → owner 2026-08-07 切分交付面/审计史 → A.2/A.3 2026-08-08 → post_planning R1→R4 全 FAIL (`max_rounds=4` 耗尽, 拐点形态) → owner 2026-08-22 加 1 轮 R5 (两席新鲜眼睛) → **R5 FAIL (2C+7M, 全为 fix 副产品)** → **owner 2026-08-23 裁定: 修 R5 九条后 override 进 Phase B.1** (Rule #10 留痕见审计轨 §10) → **Phase B/C 完成 2026-08-23**: aria v1.67.0 @ `ca52d1c` (双推 + tag), 主仓 **PR #189** gate green, 21/21 task done; 待 owner merge → Phase D 归档
 > **Created**: 2026-08-02 | **重构**: 2026-08-07 (owner 裁定: 交付面与审计史切开)
 > **Spec Level**: **3** (原 2; R3′ 因 Q5 的 AB 任务需 `tasks.md` 承载而升级 — 单域 — `lib/collision.py` 的一个比较谓词 + 一个导出单元)
 > **关联 Issue**: 无

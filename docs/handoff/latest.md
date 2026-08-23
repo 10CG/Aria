@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-23-issue152-phase-b-through-d-ship-v1.66.5.md](./2026-08-23-issue152-phase-b-through-d-ship-v1.66.5.md) — pre-merge-gate-no-run-for-branch @ phase=D-done (status=done) — #152 Phase B→C→D 全程, v1.66.5 ship + 归档, track 终结 (simonfish/023236f2)
+**Latest**: [2026-08-23-linked-issue-normalization-r5-override-ship-v1.67.0.md](./2026-08-23-linked-issue-normalization-r5-override-ship-v1.67.0.md) — linked-issue-normalization @ phase=D-done (status=done) — R5 不收敛→owner override→B/C/D 全程, aria-plugin v1.67.0 ship + 归档, track 终结 updated=2026-08-23
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -9,12 +9,15 @@
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
+> | `linked-issue-normalization` (Aria#177 相关) | `simonfish/bfe8285d` | ✅ **done (2026-08-23 ship v1.67.0 @ ca52d1c + 归档, track 终结; R1→R5 post_planning 全 FAIL 后 owner override)** | [2026-08-23 (Phase D)](./2026-08-23-linked-issue-normalization-r5-override-ship-v1.67.0.md) |
 > | `pre-merge-gate-no-run-for-branch` (aria-plugin#152) | `simonfish/023236f2` | ✅ **done (2026-08-23 ship v1.66.5 @ a0fe720 + 归档 + #152 closed, track 终结)** | [2026-08-23 (Phase B→D)](./2026-08-23-issue152-phase-b-through-d-ship-v1.66.5.md) · [2026-08-22 (Phase A)](./2026-08-22-issue152-phase-a-twelve-rounds-and-the-check-that-checks-itself.md) |
 > | `premerge-gate-branch-existence` (原 `-mainbranch-failclosed`) | `aria-runner-bot/023236f2` | ✅ **shipped/done** — #137 修复 ship v1.66.0, 两 Spec 共 2838 行已归档 | [2026-08-16](./2026-08-16-fix-first-137-shipped-and-2838-lines-archived.md) |
 > | `secret-guard-per-segment-evaluation` (#128) | `simonfish/bfe8285d` | **✅ done (2026-08-18 归档, track 终结)** | [2026-08-18 (Phase D)](./2026-08-18-issue128-phase-d-archive-and-sc9b-close.md) |
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-23 更新 #2 (simonfish/bfe8285d, linked-issue-normalization Phase D)**: bare pointer 改指本轨 Phase D handoff (全仓最新)。**本轨终结**: R5 两席 FAIL (0 新发现) → owner override 进 B → 19 SC 测试 + 实现 → Rule #6 AB 真跑 (eval-12 新版 5/5 vs 基线 3/5, 括注因 AB 改写) → 合入 v1.66.5 → **ship aria-plugin v1.67.0** (三仓核验) → PR #189 审计 (0 Critical) → merge `c453504` → 归档 + claim 释放。carry: Level 1 hotfix (测试 class 位于 unittest.main 之后, 建议并入下一 PATCH) / #157 / standards#17。既有各行未动。
 >
 > **2026-08-23 更新 (simonfish/023236f2, #152 Phase B→C→D 全程)**: bare pointer 改指本轨终结 handoff (全仓最新)。**#152 track 终结**: Phase B 20/20 (TDD 成对 13 commits) + Rule #6 AB (新 10/10 vs 基线 6/10) + SC-13 活体两 episode → ship **v1.66.5** (`a0fe720`, 补打 v1.66.1/v1.66.4 tag) + 主仓 `2a1a0b2` → 归档 (runtime_probe 首个声明者 pass count 7) + #152 closed + #156 立案 + claim 释放。owner action: plugin cache 刷到 1.66.5。
 >
