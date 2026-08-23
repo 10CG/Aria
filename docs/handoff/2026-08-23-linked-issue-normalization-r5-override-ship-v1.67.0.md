@@ -41,6 +41,28 @@ updated-at: 2026-08-23T10:40:00Z
 - 🟡 上 session carry 未动: #182 (handoff status 收口) / #184 (brainstorm 被绕过) / #179 周期 handoff §2 三项 owner 复议 / Aether#283 两项凭据未核。`a1-entry-claim` rework 已被 023236f2 接走。
 - ⏸️ M6/M7 六门控 spec 不变。
 
+### owner 复议闭环 (2026-08-23, #179 周期 handoff §2 三项 + #137)
+
+- ✅ **aria-plugin#137 关闭**: v1.66.0 (`8683551` release / `61b4d76` 散文) 已修 —— `_verify_main_branch_exists()` 对不存在分支 fail-CLOSED, 原「main 无 in-flight 恒真」解除 (缺省值仍 `main`, 但不再静默绿)。评论留证后 close。
+- ✅ **Amendment-1/2 范围修正 + 行为变化知悉**: owner 确认, **维持 v1.66.4 现状不返工** (白名单两族 + 适用集枚举 14 行 + `/`-根名不套白名单; `cat x.profile` 从拦变放属设计本意)。
+- ✅ **review 三条残余弱点挂 aria-plugin#138 评论** (不新开): `| tee /dev/stderr | jq keys` 旁路 · jq 错误信息回显输入值 · `node -p` 未覆盖。三条均未修, 记已知限, 随 #138 排期。
+- ⚠️ **SC-8 空载复测 (owner 裁「复测一次再结」) — PASS, 但请知悉判据方差**:
+
+  2026-08-23 22:35 UTC 单跑 (不并发), 起跑 `loadavg=2.97`, 测量期 `4.78`, bash 5.2.15, N=10 calls/round × 20 rounds, 进程内 EPOCHREALTIME 只计判定段:
+
+  | tier | old_min | new_min | 增幅(min) |
+  |---|---|---|---|
+  | (a) 单条 benign | 381855µs | 96731µs | **-74.7%** |
+  | (b) 2 段全 benign | 340311µs | 149420µs | **-56.1%** |
+  | (c) 2 段全命中 | 374809µs | 103994µs | **-72.3%** |
+  | (d) 3 段全命中 | 364443µs | 129977µs | **-64.3%** |
+  | **(e) 最坏档 (末位 pattern + 每段 filter)** | 374291µs | 551060µs | **+47.2%** |
+
+  全量 599/599 PASS (FAIL 0)。**tier (e) 过闸 (≤50%) 但仅余 2.8pp。**
+
+  **⚠️ 待 owner 知悉的真问题不是这一次的值, 是判据本身的方差**: tier (e) 六次实测 = `+58%` (load≈12, FAIL) / `+6.8%` (PASS) / `+83%` (load 15-22, FAIL) / `+0.8%` (PASS) / `+9.2%` (PASS) / **`+47.2%` (本次, 最低负载, PASS)** —— 跨度 0.8%–83%, 且**本次是六次里负载最低的一跑, 增幅却排第三高**。换句话说「高负载导致超标」这个解释被本次数据削弱: min-of-20-rounds 去噪后仍有约 ±40pp 抖动, 闸门通过与否在这台 4 核共享机上接近抛硬币。按 Rule #10 不自判「噪声」也不改阈值/口径/档位, 原样呈报。**若 owner 认为该判据需要加固, 可选方向**: 提高 rounds (20→100) 或 N / 改用 taskset 绑核 / 把 (e) 档从闸门降为 advisory 观测项 —— 三者都属改 enabled 闸门配置, 须 owner 裁。
+  - 附带发现 (minor, 未修): 脚本 `:1863` 的自述行仍写 `median-of-rounds`, 而 2026-08-16 判据已改 min (`increase(min)` 才是主判据, median 只作审计参考) —— 文案陈旧, 建议随下次 secret-guard 改动顺手改。
+
 **机械补漏**: 本轨 21/21 done, 归档门无 d_payload; consistency flags 全 `active_change_not_in_upm` (恒亮)。
 
 ## §3 关键风险 / 已知陷阱
@@ -75,7 +97,7 @@ updated-at: 2026-08-23T10:40:00Z
 
 ## §6 Next session 入口 + 优先级建议
 
-`/aria:state-scanner`。本轨终结。候选: (1) Level 1 hotfix (§2 首条, 建议并入下一 PATCH); (2) 关 aria-plugin#137; (3) 上 session carry (#182 / #184 / #179 三项复议); (4) 主项目版本 1.7.3 vs 1.7.5 漂移 (Level 1 doc)。并发轨 023236f2 在做 a1-entry + state-scanner issue batch, 起任何 state-scanner 改动前先 fetch 三面 + 读其 handoff。
+`/aria:state-scanner`。本轨终结。候选: (1) Level 1 hotfix (§2 首条, 建议并入下一 PATCH); (2) ~~关 aria-plugin#137~~ **已关 (2026-08-23)**; (3) 上 session carry —— **#179 三项已结** (见 §2 owner 复议闭环), 余 #182 / #184; (4) 主项目版本 1.7.3 vs 1.7.5 漂移 (Level 1 doc); (5) **SC-8 判据方差**待 owner 定方向 (见 §2 末条)。并发轨 023236f2 在做 a1-entry + state-scanner issue batch, 起任何 state-scanner 改动前先 fetch 三面 + 读其 handoff。
 
 ## §7 提交清单 (commit hash + multi-remote parity)
 
