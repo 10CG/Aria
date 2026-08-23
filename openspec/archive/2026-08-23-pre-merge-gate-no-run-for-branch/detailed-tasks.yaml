@@ -460,7 +460,7 @@ tasks:
     exec_phase: "D"
     exec_order: 19
     title: "Phase D: §6 待办 — aria-plugin#152 收尾留言 (版本 / 行为 / dispatch_viable / memory 修正) + 立案「Rule #8 (b) 腿对未被领取 main run 不可见」issue (引 F4 + §1) + (#127 评论已在 TASK-012) → 周期 handoff (phase-d-closer D.3) → release_gate claim 释放 → openspec-archive (归档门评估 runtime_probe = pass, SC-16 (c) 复核) + proposal Status → Complete 含审计轨迹句"
-    status: pending
+    status: done   # 2026-08-23 主控: #152 收尾评论 19712/19718 + closed (GET 确认); (b) 轴立案 aria-plugin#156; #127 评论 19674 (TASK-012); 归档 = 本任务末步 (D.2 gate → openspec-archive → release_gate → 周期 handoff), 时窗内 (production 记录 2026-08-22, max_age 14d)
     complexity: S
     estimated_hours: 2
     dependencies: [TASK-015, TASK-001]
