@@ -46,6 +46,7 @@ metadata:
     **→ R3 5/5 FAIL → R3-fix → R4 两席新鲜眼睛 FAIL (4+2C) → R4-fix (97a3885, 2026-08-08)。max_rounds=4 耗尽。
     → R5 两席新鲜眼睛 (executability / claim-landing) FAIL 2C+7M, 全为 fix 副产品 (4 条 08-22 收口引入, 4 条 R4-fix 落地不完整)。
     **owner 2026-08-23 裁定: 修 9 条后 override 进 Phase B.1, 不再开审计轮** (Rule #10 留痕: 审计轨 §10)。
+    **Phase B/C 2026-08-23 (bfe8285d)**: 21/21 done; aria v1.67.0 @ ca52d1c 双推 + tag; 主仓 PR #189 (gate green, path not_applicable); 待 owner merge → Phase D。
     owner 2026-08-22 裁定: 加 1 轮 R5 (max_rounds 4→5, 两席新鲜眼睛)。R5 前机械收口 (bfe8285d):
     ship target v1.66.0→v1.67.0 / #137 已修 (v1.66.0) C3 解除 / R4 M3 (6 个 test 点名) · M5 (013/025/027
     deliverables 补全) · M7 (dangling 指针改 git grep 口径) · 5.8→5.12 指针 / scope_repos head 刷新。**
@@ -869,7 +870,7 @@ tasks:
     parent: "5.13"
     task_group: TG-5
     title: "交付 phase-c-integrator — 只委派 PR 与 pre-merge 闸门, 不委派合并动作"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect

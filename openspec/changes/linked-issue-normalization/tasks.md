@@ -151,7 +151,7 @@
       > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同批修全部交付面引用**避免 dangling —— 口径 = `git grep -l "sc-baseline-linked-issue-normalization"` 的结果减去 append-only 史 (`.aria/audit-reports/*` / `docs/handoff/*` / 脚本自身), 08-08 实测 = `proposal.md` (3 行) + `tasks.md` + `detailed-tasks.yaml` (2 处) 三个文件 (R4/completeness-lens M7: 原只枚举 proposal.md)。
       > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
 
-- [ ] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
+- [x] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
       > **交出去的**: PR 创建 + **pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)** + 主仓自身 PR 流程。这些**不在本文件复述判据**。
       > **⛔ 不交出去的 (改由 5.15 承载)**: aria 子模块的**合并动作本身** + 双推 + 逐远端 ls-remote + 主仓 gitlink bump。
       > **为什么这样切 (post_planning R3, 四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是「`phase-c-integrator:242` 本就建模子模块合并」—— **该引用是误引** (`:242` 实为 *Path coverage 评估*的执行上下文契约)。真实合并链 = C.2.4:261 (R5 行号复核) → `branch-manager` merge action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`), **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; 且 `aria/skills/` 全仓对该约束**零处编码** (已开 aria-plugin **#136**)。⇒ 委派掉合并等于删掉计划里唯一的守卫。
