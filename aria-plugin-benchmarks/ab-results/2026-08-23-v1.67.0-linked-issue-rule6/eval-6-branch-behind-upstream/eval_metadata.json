@@ -1,0 +1,25 @@
+{
+ "eval_id": 6,
+ "eval_name": "branch-behind-upstream",
+ "prompt": "我的 feature 分支已经开发几天了，怀疑主分支已经有新的改动我没拉下来。请扫描状态告诉我当前分支是否落后 upstream，并提示我是否需要 git pull。注意项目可能有 detached HEAD 或 shallow clone 场景需要处理。",
+ "assertions": [
+  {
+   "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count"
+  },
+  {
+   "text": "Should report current_branch.ahead and current_branch.behind when upstream exists"
+  },
+  {
+   "text": "Should handle missing upstream with reason: no_upstream, not exit with error"
+  },
+  {
+   "text": "Should handle detached HEAD with reason: detached_head"
+  },
+  {
+   "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git"
+  },
+  {
+   "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)"
+  }
+ ]
+}

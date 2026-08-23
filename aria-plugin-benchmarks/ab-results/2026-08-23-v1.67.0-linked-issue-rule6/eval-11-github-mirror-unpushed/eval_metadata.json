@@ -1,0 +1,34 @@
+{
+ "eval_id": 11,
+ "eval_name": "github-mirror-unpushed",
+ "prompt": "复现 2026-04-12 发版事件: aria 子模块在 Forgejo 合并 PR 成功, 本地 master 已同步 Forgejo, 但 GitHub mirror 未推送。state-scanner 扫描时应检测到 GitHub remote 落后, 而非因 'Everything up-to-date' 静默通过。请扫描并告诉我哪些 remote 需要补推。",
+ "assertions": [
+  {
+   "text": "Should NOT report all remotes as synced when only origin was pushed"
+  },
+  {
+   "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind"
+  },
+  {
+   "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote"
+  },
+  {
+   "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push)."
+  },
+  {
+   "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head"
+  },
+  {
+   "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind"
+  },
+  {
+   "text": "Should include git-remote-helper reference in the scan output when helper is available"
+  },
+  {
+   "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks."
+  },
+  {
+   "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note."
+  }
+ ]
+}

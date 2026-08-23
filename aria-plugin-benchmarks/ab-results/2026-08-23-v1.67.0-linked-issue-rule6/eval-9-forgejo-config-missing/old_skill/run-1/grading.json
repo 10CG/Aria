@@ -1,0 +1,45 @@
+{
+ "expectations": [
+  {
+   "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+   "passed": true,
+   "evidence": "'origin = ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git' 检出"
+  },
+  {
+   "text": "Should check for existence of CLAUDE.local.md file",
+   "passed": true,
+   "evidence": "'检测到 Forgejo 远程 ... 但缺少 CLAUDE.local.md'"
+  },
+  {
+   "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+   "passed": true,
+   "evidence": "'写成 forgejo: YAML 键或 ## forgejo 标题都能被 collector 识别; 但别只放在代码块里'"
+  },
+  {
+   "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+   "passed": true,
+   "evidence": "'forgejo_config collector: config_status=missing'"
+  },
+  {
+   "text": "Should suggest running /forgejo-sync to create configuration when missing",
+   "passed": true,
+   "evidence": "'运行 /forgejo-sync 可引导创建配置'"
+  },
+  {
+   "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+   "passed": true,
+   "evidence": "'本次只读扫描, 未触碰任何文件'; 未创建文件"
+  },
+  {
+   "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+   "passed": false,
+   "evidence": "无 Forgejo 远程场景未触发未说明"
+  }
+ ],
+ "summary": {
+  "passed": 6,
+  "failed": 1,
+  "total": 7,
+  "pass_rate": 0.8571428571428571
+ }
+}

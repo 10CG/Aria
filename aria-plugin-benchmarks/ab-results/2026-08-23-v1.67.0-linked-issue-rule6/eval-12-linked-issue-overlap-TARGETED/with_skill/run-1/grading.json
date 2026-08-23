@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 明确回答 (1) 会报出重叠 (会命中 / 会告警), 而不是「不会」或「不确定」",
+   "passed": false,
+   "evidence": "[承重] 未给明确答案: '取决于这个带空格的裸仓名能否被解析, 分两种情况 ... 单凭 skill 文本无法百分之百断定走哪条路' — 回答为「不确定」"
+  },
+  {
+   "text": "[承重] 说明原因是按归一后的 <repo>#<n> (仓名 + 号) 比较, org 前缀不参与 / 空白不影响",
+   "passed": true,
+   "evidence": "[承重] '按归一后的 <repo>#<n> 比较, org 不参与' + 'org 有没有 (10CG/) 不影响结果'"
+  },
+  {
+   "text": "[承重] 回答 (2) 10CG/Aria#152 不会命中 (不同仓 Aria vs aria-plugin)",
+   "passed": true,
+   "evidence": "[承重] '归一后是 Aria#152, 对方是 aria-plugin#152, repo 名不同 → 不会报'"
+  },
+  {
+   "text": "回答 (3) 告警是 advisory (🔴 提示) 不阻断 Phase B",
+   "passed": true,
+   "evidence": "'SKILL.md 明说它是 advisory 告警, 渲染为 🔴 提示但不阻断'"
+  },
+  {
+   "text": "不声称比较是精确字符串相等 / 不说「格式不同所以认不出」",
+   "passed": true,
+   "evidence": "主张比较规则是归一后 <repo>#<n>, 未声称精确字符串相等; 空格分支仅作为「不可解析回落」的条件性引述 (见 A1 扣分)"
+  }
+ ],
+ "summary": {
+  "passed": 4,
+  "failed": 1,
+  "total": 5,
+  "pass_rate": 0.8
+ }
+}

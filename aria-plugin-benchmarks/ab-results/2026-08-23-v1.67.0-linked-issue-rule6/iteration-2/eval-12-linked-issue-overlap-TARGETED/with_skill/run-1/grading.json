@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 明确回答 (1) 会报出重叠 (会命中 / 会告警), 而不是「不会」或「不确定」",
+   "passed": true,
+   "evidence": "「## (1) 会报出来。比较规则是「归一化后的 <repo>#<n> 相等」」— 明确, 无 hedge"
+  },
+  {
+   "text": "[承重] 说明原因是按归一后的 <repo>#<n> (仓名 + 号) 比较, org 前缀不参与 / 空白不影响",
+   "passed": true,
+   "evidence": "列出四条规则: 仓名取最后一段 / org 不参与 / 大小写与首尾空白不影响 / ./_ 视同 -; 表格示范两值归一同为 aria-plugin#152"
+  },
+  {
+   "text": "[承重] 回答 (2) 10CG/Aria#152 不会命中 (不同仓 Aria vs aria-plugin)",
+   "passed": true,
+   "evidence": "「(2) 传 10CG/Aria#152 则不会报 … aria 和 aria-plugin 是两个不同的仓名」"
+  },
+  {
+   "text": "回答 (3) 告警是 advisory (🔴 提示) 不阻断 Phase B",
+   "passed": true,
+   "evidence": "「(3) 不会阻断 … 渲染为红色提示但不阻断 … proceed == true 不受影响」"
+  },
+  {
+   "text": "不声称比较是精确字符串相等 / 不说「格式不同所以认不出」",
+   "passed": true,
+   "evidence": "全文主张归一比较; 「裸仓名和 # 前的空格都不会让它漏报」"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 0,
+  "total": 5,
+  "pass_rate": 1.0
+ }
+}

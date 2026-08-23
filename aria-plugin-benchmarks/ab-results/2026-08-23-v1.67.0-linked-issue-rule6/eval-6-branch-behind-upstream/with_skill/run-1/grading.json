@@ -1,0 +1,40 @@
+{
+ "expectations": [
+  {
+   "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+   "passed": false,
+   "evidence": "未展示 rev-parse @{u} 检测步骤 (不可验证)"
+  },
+  {
+   "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+   "passed": true,
+   "evidence": "'ahead 0 / behind 0, 本地 826b356 = 远端 826b356, parity = equal'"
+  },
+  {
+   "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+   "passed": false,
+   "evidence": "upstream 存在, no_upstream 分支未触发亦未说明"
+  },
+  {
+   "text": "Should handle detached HEAD with reason: detached_head",
+   "passed": false,
+   "evidence": "报告 'git.detached_head = false' 与 standards 子模块 detached, 但未展示 reason: detached_head 处理"
+  },
+  {
+   "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+   "passed": false,
+   "evidence": "仅 'git.shallow = false', 未提 --is-shallow-repository / .git/shallow fallback"
+  },
+  {
+   "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+   "passed": false,
+   "evidence": "behind upstream = 0, 规则未触发; 正确给出 '不需要 git pull' 但 branch_behind_upstream 规则行为不可验证"
+  }
+ ],
+ "summary": {
+  "passed": 1,
+  "failed": 5,
+  "total": 6,
+  "pass_rate": 0.16666666666666666
+ }
+}

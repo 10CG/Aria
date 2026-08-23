@@ -1,0 +1,25 @@
+{
+ "expectations": [
+  {
+   "text": "Should mention .aria/config.json or config-loader",
+   "passed": true,
+   "evidence": "'/home/dev/Aria/.aria/config.json (5.6 KB...)' + config.template.json"
+  },
+  {
+   "text": "Should describe config fields like auto_proceed or confidence_threshold",
+   "passed": true,
+   "evidence": "confidence_threshold=90, workflow.auto_proceed=false, auto_execute_enabled=false"
+  },
+  {
+   "text": "Should mention default values when config is absent",
+   "passed": false,
+   "evidence": "未提及 config 缺失时采用的默认值"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 1,
+  "total": 3,
+  "pass_rate": 0.6666666666666666
+ }
+}

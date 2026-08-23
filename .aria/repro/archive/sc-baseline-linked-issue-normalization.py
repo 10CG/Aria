@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """linked-issue-normalization — SC-1~11 baseline 实测 (Rule #6 substitute 的证据载体)。
 
+⛔ 已退役 (2026-08-23, TASK-025 路径 (b), owner 裁定): 实现 (aria 880060d) 落地后本脚本对现行代码恒红,
+Spec 归档后 proposal 解析路径亦失效。承重证据已冻结在同目录 REPORT.md (两个 SHA 的原样输出)。
+复现须对 worktree@9e6a17c + proposal@a6cdeef 跑; 不要对 HEAD 跑本脚本并把红当作回归。
+
 用途
 ----
 OpenSpec `linked-issue-normalization` 的 rule6_note 走 **substitute 框定**: 判据表

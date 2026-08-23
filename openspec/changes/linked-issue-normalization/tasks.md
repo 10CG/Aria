@@ -68,30 +68,30 @@
 >
 > 每项括注为该项贡献的**子用例场景数**, 全组加总 = **45**, 与 proposal §Impact 的逐条推导独立吻合 (两处任一变动须同批重算)。**「子用例场景」≠ unittest `Ran N` 计数的 test 方法数** —— 一个 test 方法可含多个场景 (本文件既有 `test_invalid_shapes_and_paths` 即 1 方法 4 场景), 故验收**不得**用 `Ran` 数换算, 见 5.1。
 
-- [ ] 1.1 SC-1 / SC-1b / SC-2 / SC-3 / SC-4 — 跨族两两配对 + 三个切分点各自 strip + 不同仓负控 + org 不参与 + int 十进制比较 **(13)**
-- [ ] 1.2 SC-5 / SC-5b / SC-5c — basename 轴三态: 截断型**不**归一 (已知限) / 分隔符型 `./_→-` 归一 / 段内空格**不**译码 **(5)**
-- [ ] 1.3 SC-6 / SC-6b / SC-10 — 不可解析值退回原串精确比较 + `number_str` 边界五类 + **一条畸形毒不死整批** **(15)**
-- [ ] 1.4 SC-11 / SC-13 / SC-15 / SC-14 — 切分方向双轴 (`#` 取最后 / `/` 取最后) + `casefold` 维度 + `number` 相等这一必要条件 **(8)**
-- [ ] 1.5 SC-9 — 命中条目回显**未归一原始串** **(1)**
+- [x] 1.1 SC-1 / SC-1b / SC-2 / SC-3 / SC-4 — 跨族两两配对 + 三个切分点各自 strip + 不同仓负控 + org 不参与 + int 十进制比较 **(13)**
+- [x] 1.2 SC-5 / SC-5b / SC-5c — basename 轴三态: 截断型**不**归一 (已知限) / 分隔符型 `./_→-` 归一 / 段内空格**不**译码 **(5)**
+- [x] 1.3 SC-6 / SC-6b / SC-10 — 不可解析值退回原串精确比较 + `number_str` 边界五类 + **一条畸形毒不死整批** **(15)**
+- [x] 1.4 SC-11 / SC-13 / SC-15 / SC-14 — 切分方向双轴 (`#` 取最后 / `/` 取最后) + `casefold` 维度 + `number` 相等这一必要条件 **(8)**
+- [x] 1.5 SC-9 — 命中条目回显**未归一原始串** **(1)**
       > ⛔ **治理约束**: 本条 R1′ 曾被移出、R3′ 恢复。Q1 裁定「自己那一侧永不补」后, 回显对方原串成为 D2 fail-toward-reporting 的**唯一**缓解, 且它是输出里唯一携带 `org` 的通道。**不得再次移出。**
-- [ ] 1.6 SC-12 — 导出单元返回契约: 可解析返回 `(basename, number)`, 三类不可解析各返回 `None` **(3)**
+- [x] 1.6 SC-12 — 导出单元返回契约: 可解析返回 `(basename, number)`, 三类不可解析各返回 `None` **(3)**
       > ⚠️ **本条是组 1→组 2 RED-first 排序的唯一例外**: 依赖 **2.1** (被测函数在此之前不存在)。
 
 ## 2. 实现 (GREEN) — `aria/skills/state-scanner/lib/collision.py`
 
-- [ ] 2.1 导出纯函数 `normalize_linked_issue(value: str) -> tuple[str, int] | None` — §归一规则五步; `None` 与规则 4 的不可解析枚举一一对应 (D9)
-- [ ] 2.2 `linked_issue_overlaps` 内部比较谓词切换为归一键 `(normalize(basename), int(number))` — **签名与返回 schema 不变** (D6, 限本 Spec 变更面)
-- [ ] 2.3 解析守卫与异常隔离 — 不含 `#` 先判不可解析 (不得无守卫拆分) · `number_str.isascii() and number_str.isdigit()` 谓词 · `int()` 必包 `try/except ValueError` · `limit = sys.get_int_max_str_digits()` 且**仅当 `limit > 0`** 时比长度 (D7 四条)
+- [x] 2.1 导出纯函数 `normalize_linked_issue(value: str) -> tuple[str, int] | None` — §归一规则五步; `None` 与规则 4 的不可解析枚举一一对应 (D9)
+- [x] 2.2 `linked_issue_overlaps` 内部比较谓词切换为归一键 `(normalize(basename), int(number))` — **签名与返回 schema 不变** (D6, 限本 Spec 变更面)
+- [x] 2.3 解析守卫与异常隔离 — 不含 `#` 先判不可解析 (不得无守卫拆分) · `number_str.isascii() and number_str.isdigit()` 谓词 · `int()` 必包 `try/except ValueError` · `limit = sys.get_int_max_str_digits()` 且**仅当 `limit > 0`** 时比长度 (D7 四条)
 
 ## 3. 文档同步
 
-- [ ] 3.1 `lib/collision.py` docstring 同步 — 说明按归一后 `<repo>#<n>` 比较、org 不参与; **措辞不得暗示「已穷尽核实 / 已覆盖全部别名」** (走 substitute)
-- [ ] 3.2 `lib/claim_schema.py` `ClaimRecord.linked_issue` 字段文档两处失准同批修 (SAME → same normalized key; active → 实际跳的是 `_TERMINAL` 且不含 `yielded`) (走 substitute)
-- [ ] 3.3 `skills/state-scanner/SKILL.md:176` 括注 — 补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」
+- [x] 3.1 `lib/collision.py` docstring 同步 — 说明按归一后 `<repo>#<n>` 比较、org 不参与; **措辞不得暗示「已穷尽核实 / 已覆盖全部别名」** (走 substitute)
+- [x] 3.2 `lib/claim_schema.py` `ClaimRecord.linked_issue` 字段文档两处失准同批修 (SAME → same normalized key; active → 实际跳的是 `_TERMINAL` 且不含 `yielded`) (走 substitute)
+- [x] 3.3 `skills/state-scanner/SKILL.md:176` 括注 — 补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」
 
 ## 4. Rule #6 AB (⛔ 不申请豁免、不走 substitute)
 
-- [ ] 4.1 用 `/skill-creator` 对 **3.3 的 hunk** 照跑 AB — 时点: **3.3 实施之后、组 5 发版之前**
+- [x] 4.1 用 `/skill-creator` 对 **3.3 的 hunk** 照跑 AB — 时点: **3.3 实施之后、组 5 发版之前**
       > **判据 (不得只判「跑了」)**: 按 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` 发版前清单 —— (a) `with_skill` 表现优于 `without_skill`; (b) **无 `WITHOUT_BETTER` verdict** (有则必须修复); (c) 与上次结果比对无回归; (d) `summary.yaml` 已生成并审查。
       > **若判定该 hunk 落在套件覆盖外**: 按 CLAUDE.md Rule #6 表第三行走**三件套** —— 点名行为 + 建可证伪定向 fixture + 套件缺口开 issue (参 aria-plugin #117 / #127); **三件缺一则照跑, 不得静默豁免** (Rule #10)。
 
@@ -106,7 +106,7 @@
 
 ### 现行 — 5.1
 
-- [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors** (基线 **1322** tests; 跨 skill 基线 **9 OK / 累计 1698**); 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
+- [x] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` 报 **OK 且 0 failures/errors** (基线 **1322** tests; 跨 skill 基线 **9 OK / 累计 1698**); 跨 skill `bash aria/skills/run_all_tests.sh` **0 FAIL**
       > ⛔ **不得用 `Ran N` 数换算场景数**: 45 是**场景数**, `Ran` 数的是 test 方法数 (既有 `test_invalid_shapes_and_paths` = 1 方法 4 场景)。场景齐备性判据 = **逐 SC 清单核对 17 条 SC 的场景全部落盘**, 与 `Ran` 数正交。
       > ⚠️ 环境陷阱: 单模块模式与 pytest 对 `test_collision.py` 会给 ImportError —— aria-plugin **#134** 的既有 bug (破 70 天), 非本 change 回归。验收一律以 `tests/` 内**全量** `run_tests.py` 为准。
 
@@ -124,19 +124,19 @@
 
 ### 现行 — 5.9 起 (取代上方 CANCELLED)
 
-- [ ] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
+- [x] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
       > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, 判据 = **文件行数不减**, 见 5.11 ③) · `CHANGELOG.md` (**追加**条目, 历史保留)
       > CHANGELOG 与 README 措辞: **不得写成「已覆盖全部别名」** —— basename 截断轴是成文已知限, 写错等于对外抹掉它。
       > MINOR 而非 PATCH (行为面扩大)。
 
-- [ ] 5.10 **主仓版本引用面** — 14 个引用点, 逐点改
+- [x] 5.10 **主仓版本引用面** — 14 个引用点, 逐点改
       > `VERSION` :24 子模块表行 (1) · `README.md` badge + `Plugin Version:` 行 (2) · `README.{zh,ja,ko}.md` 各 `translated-from` + badge + `Plugin Version:` 行 (**9**) · `CLAUDE.md` 版本区间行 + 「版本:」行 (2)
       > i18n 按 #140 B 档: 正文无实质变更 ⇒ **只改这三处, 不重译正文**。
       > CLAUDE.md: **只改数字**。不得把本 Spec 设计术语写进去 (污染 AB baseline, aria-plugin #116); 「项目状态」段覆写非追加、预算 15-20 行 (`claude-md-hygiene.md`)。
 
-- [ ] 5.11 **版本引用面双向 + 整仓差集断言** — **必须在 5.15 (合并/双推/gitlink) 之前通过**
+- [x] 5.11 **版本引用面双向 + 整仓差集断言** — **必须在 5.15 (合并/双推/gitlink) 之前通过**
       > **① 整仓差集 (fail-CLOSED, R4-fix 关键升级; R5 修正)**: 旧值**不写死字面** —— 执行时 `OLD=$(git show HEAD:aria/.claude-plugin/plugin.json | jq -r .version)` (R5 C-a: 写死 `1.65.5` 在 1.66.4 基线零命中 = 恒真); bump 后对**主仓与 aria 子模块两仓**各 `git grep -lF "$OLD"` (git grep 不进子模块), 命中集合**减去按类成文的排除集**后必须为**空**。
-      > 排除集按**类**成文 (R5 M-3: 实例白名单对 handoff / archive / 他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` · (3) 其他 OpenSpec change 目录 · (4) 本 Spec 目录的订正留痕行。
+      > 排除集按**类**成文 (R5 M-3: 实例白名单对 handoff / archive / 他 Spec 的事实性引用恒红): (1) append-only 账本 `aria/VERSION` + `aria/CHANGELOG.md` · (2) 历史记录类目录 `.aria/audit-reports/**` `.aria/decisions/**` `.aria/notes/**` `docs/handoff/**` `openspec/archive/**` · (3) 其他 OpenSpec change 目录 · (4) 本 Spec 目录的订正留痕行 · (5) 行级「功能引入标注」(`<OLD>+` / JSON `_comment` 等; 执行实测补, 详见 yaml TASK-024)。旧值取法: `git -C aria show "$(git rev-parse HEAD:aria)":.claude-plugin/plugin.json` (原写法对 gitlink 必崩, 执行实测改)。
       > ⛔ **任何不落入四类的命中即红**; 不许临时加第五类凑绿。**三态自证**: 未 bump 命中 ≥18 (红) / 正确 bump 0 (绿) / 故意漏 1 点 ≥1 (红)。
       > **为什么换掉文件白名单**: 白名单对**未来新增的版本引用点 fail-OPEN** (修实例不修类), 且逼人去数「两条 check 失明几处」—— R2-fix 写 7, 实为 **10** (漏计 CLAUDE.md 2 + VERSION 1)。整仓差集使这个数**不必算** (R4/completeness-lens 单点最优建议)。
       > **② 新值计数**: 普通引用文件里 `1.67.0` 出现次数 == 预期点数 (主仓 **14** + aria 侧 **4** = **18**)。只断言旧值缺席是**缺席断言**, 删行或写错新版本号都判绿。
@@ -146,12 +146,12 @@
       > **④** 同时跑**不带路径**的 `git status` 核验实际落地面与声称一致 (memory `feedback_scoped_git_add_splits_claim_from_landing`)。
       > **类级根因已开号**: `CLAUDE.md:81`「发布同步面」那行同款四错, 见 **Aria #177**。本任务只治本 change 的实例。
 
-- [ ] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红
+- [x] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红 → **owner 2026-08-23 裁 (b)**: 脚本退役移至 `.aria/repro/archive/`, 冻结报告 `…-REPORT.md` (基线 `9e6a17c` 16/16 一致 + 实现后 `880060d` 证据面全绿), 三个交付面引用同批改 (git grep 口径)
       > 该脚本 `:275-277` 断言那 8 条 SC 处于 **baseline-failing (红)**; 2.2 落地后它们转绿 ⇒ **恒红**。且它从 `proposal.md` **现场解析** (`:205-215` FATAL fail-CLOSED) ⇒ Spec 归档后**换一种恒红**。两条失效路径都要处理。
       > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同批修全部交付面引用**避免 dangling —— 口径 = `git grep -l "sc-baseline-linked-issue-normalization"` 的结果减去 append-only 史 (`.aria/audit-reports/*` / `docs/handoff/*` / 脚本自身), 08-08 实测 = `proposal.md` (3 行) + `tasks.md` + `detailed-tasks.yaml` (2 处) 三个文件 (R4/completeness-lens M7: 原只枚举 proposal.md)。
       > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
 
-- [ ] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
+- [x] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
       > **交出去的**: PR 创建 + **pre-merge gate (Rule #8, C.2.4: 本 PR CI passing + main 无 in-flight run)** + 主仓自身 PR 流程。这些**不在本文件复述判据**。
       > **⛔ 不交出去的 (改由 5.15 承载)**: aria 子模块的**合并动作本身** + 双推 + 逐远端 ls-remote + 主仓 gitlink bump。
       > **为什么这样切 (post_planning R3, 四席独立命中 Critical)**: R2-fix 曾把合并整体委派出去, 依据是「`phase-c-integrator:242` 本就建模子模块合并」—— **该引用是误引** (`:242` 实为 *Path coverage 评估*的执行上下文契约)。真实合并链 = C.2.4:261 (R5 行号复核) → `branch-manager` merge action → `curl -X POST .../pulls/{n}/merge -d '{"Do":"merge"}'` (`branch-manager/SKILL.md:625-634`), **正是 CLAUDE.md 硬约束 1 对子模块明文禁止的服务端合并**; 且 `aria/skills/` 全仓对该约束**零处编码** (已开 aria-plugin **#136**)。⇒ 委派掉合并等于删掉计划里唯一的守卫。
@@ -161,13 +161,13 @@
       > ⚠️ **委派的闸门两条腿对本 Spec 都不触发且都失败为绿 (R4/delegation-lens C3, 已开 aria-plugin #137)**: (a) 两仓 workflow 的 `paths` 只覆盖 `issue-triage`/`docker` ⇒ `not_applicable` ⇒ PR CI 步跳过; (b) `pre_merge_gate.py:427` 的 `--main-branch` **缺省 `"main"` 而本项目是 `master`** ⇒ 实跑返回 `{"runs":[]}` RC=0 ⇒「main 无 in-flight」**恒真**。⇒ 调用时**必须显式** `--main-branch master` 并核验它真查到了 master。**2026-08-22 更新**: #137 已修 (v1.66.0, 分支存在性核验 fail-CLOSED, 缺省仍 main) ⇒ (b) 腿恒真解除; (a) 腿由并发轨 aria-plugin#152 处理。
 
 
-- [ ] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
+- [x] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
       > **事实**: `AB_TEST_OPERATIONS.md:396` 逐字为「Tier 1: 核心 Skills (**10 个**, 每次发版必测)」, state-scanner 在内; 发版前清单 `:545` 要求「Tier 1 Skills 全量 AB 测试已执行」。而 4.1 只跑 `SKILL.md:176` 单个 hunk 的定向 AB。
       > **AI 建议**: 单 hunk 定向 AB + **成文披露「本次未跑 Tier 1 全量」** + 开 issue 把「单 hunk 变更的 AB lane」提为 convention 修订。
       > **理由**: 两次先例的单 skill Rule #6 run 均未跑 Tier 1 全量、均无 `summary.yaml` ⇒ 已是**事实上的偏离**; 按 memory `feedback_written_exception_exact_condition_match`「**N 次非正式援引 ≠ 成文 lane**」, 第三次不披露地偏离是最坏选项。跑全量 10 Skills 字面合规但**测不到要测的东西** (#117 / #127 的套件缺口使该 hunk 大概率仍不可见), 属维度不匹配的投入。
       > ⛔ 无论走哪条, **不得**以「改动小 / 纯括注 / 性价比」为由降级 —— Q5 是 owner 亲裁 (Rule #10)。
 
-- [ ] 5.15 **aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump** (承载 CLAUDE.md 多远程两条硬约束)
+- [x] 5.15 **aria 子模块合并 + 双推 + 逐远端核验 + 主仓 gitlink bump** (承载 CLAUDE.md 多远程两条硬约束)
       > **硬约束 1**: 本地 `git merge` 到子模块 `master` —— ⛔ **禁**用 Forgejo Web UI / API 的 `Do: merge` / `Do: squash`。服务端合并使本地 master 从未 fast-forward ⇒ 双推与 C.2.5 结构上都不触发 ⇒ 主仓 bump gitlink 即产生 orphaned gitlink, GitHub `clone --recursive` 断裂 (2026-07-14 事故)。
       > **硬约束 2**: `git push origin && git push github` 后**逐个** `git ls-remote <remote> master` 取 SHA 与本地比对, **全部一致才算成功** —— push 退出码与回执两个方向都会骗人。`ls-remote` 自身失败 → 重试几次再下结论。
       > **主仓 gitlink**: `git add aria` 必须记**合并后的 `master` SHA**, 不是 feature 分支 SHA。⚠️ 子模块若处于 detached HEAD, `git add aria` 会记 HEAD ⇒ 先确认已在 master 上。

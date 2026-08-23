@@ -1,11 +1,11 @@
 # Proposal: linked-issue-normalization
 
-> **Status**: 📝 **Draft (A.3 done, post_planning 未收敛)** — post_spec R1/R1′/R2′/R3′ 四轮 (均 REVISE, 算法本体零问题) → owner 2026-08-07 切分交付面/审计史 → A.2/A.3 2026-08-08 → post_planning R1→R4 全 FAIL (`max_rounds=4` 耗尽, 拐点形态) → owner 2026-08-22 加 1 轮 R5 (两席新鲜眼睛) → **R5 FAIL (2C+7M, 全为 fix 副产品)** → **owner 2026-08-23 裁定: 修 R5 九条后 override 进 Phase B.1** (Rule #10 留痕见审计轨 §10; 下一步 B.1 分支 + claim)
+> **Status**: 📝 **Draft (A.3 done, post_planning 未收敛)** — post_spec R1/R1′/R2′/R3′ 四轮 (均 REVISE, 算法本体零问题) → owner 2026-08-07 切分交付面/审计史 → A.2/A.3 2026-08-08 → post_planning R1→R4 全 FAIL (`max_rounds=4` 耗尽, 拐点形态) → owner 2026-08-22 加 1 轮 R5 (两席新鲜眼睛) → **R5 FAIL (2C+7M, 全为 fix 副产品)** → **owner 2026-08-23 裁定: 修 R5 九条后 override 进 Phase B.1** (Rule #10 留痕见审计轨 §10) → **Phase B/C 完成 2026-08-23**: aria v1.67.0 @ `ca52d1c` (双推 + tag), 主仓 **PR #189** gate green, 21/21 task done; 待 owner merge → Phase D 归档
 > **Created**: 2026-08-02 | **重构**: 2026-08-07 (owner 裁定: 交付面与审计史切开)
 > **Spec Level**: **3** (原 2; R3′ 因 Q5 的 AB 任务需 `tasks.md` 承载而升级 — 单域 — `lib/collision.py` 的一个比较谓词 + 一个导出单元)
 > **关联 Issue**: 无
 > **代码落点**: `aria/` 子模块 `skills/state-scanner/`; Spec 落主仓 (Rule #5)
-> **ship target**: aria-plugin v1.67.0 (MINOR — 行为面扩大)。*2026-08-22 改: 原写 v1.66.0, 已被 #137 占用; 1.66.x 现已到 v1.66.4 (并发轨 #152 预占 v1.66.5)。按本 Spec 自判 MINOR ⇒ v1.67.0; **若 owner 改判 PATCH (谓词 bug 修复) 则为 v1.66.6, 请复议**。*
+> **ship target**: aria-plugin v1.67.0 (MINOR — 行为面扩大)。*2026-08-22 改: 原写 v1.66.0, 已被 #137 占用; 1.66.x 现已到 v1.66.4 (并发轨 #152 预占 v1.66.5)。按本 Spec 自判 MINOR ⇒ v1.67.0; **若 owner 改判 PATCH (谓词 bug 修复) 则为 v1.66.6, 请复议**。2026-08-23 Phase B 中并发轨 #152 已 ship **v1.66.5** (aria `a0fe720`), 本轨 feature 分支已 merge 之 (`394cffd`) ⇒ 基线 = 1.66.5, CHANGELOG 新条目接在 [1.66.5] 之上。*
 
 > **📌 本文件只规定「要建什么」。** 「规定是怎么来的」(三轮审计轨迹 / 总体定义与判族 / 未审表面清单 / 跨 Spec 裁定史 / 全部订正留痕) 已于 2026-08-07 整体移出至 **[审计轨](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)**。
 >
@@ -175,12 +175,14 @@ if c.linked_issue != own_linked_issue:
 
 **不申请豁免。**
 
+> **AB 执行记录 (2026-08-23, TASK-013/027)**: `SKILL.md:176` hunk 已照跑 —— state-scanner 全套件 11 条 + 定向 eval-12, 基线 `9e6a17c` vs 新版 `0fe2e0d`→`880060d`; 既有 11 条零回归, eval-12 基线 2/5→3/5 / 新版 4/5→5/5 (iteration-1 承重断言 1 两臂皆 hedge ⇒ 括注补归一细则后 iteration-2 满分)。结果 `aria-plugin-benchmarks/ab-results/2026-08-23-v1.67.0-linked-issue-rule6/RESULT.md`。**门范围披露**: 未跑 Tier 1 全量 10 Skill, owner 裁「单 Skill 全套件 + 定向 fixture + 披露」, 决策 `.aria/decisions/2026-08-23-rule6-ab-scope-single-skill-disclosure.md`, convention 修订 aria-standards#17, 套件缺口 aria-plugin#157。
+
 
 
 **baseline 实测结果 —— ✅ 已实跑留证 (2026-08-05 首测, 2026-08-07 复跑)**:
-> **留证 artifact**: [`.aria/repro/sc-baseline-linked-issue-normalization.py`](../../../.aria/repro/sc-baseline-linked-issue-normalization.py) —— 自包含、stdlib-only、只读、目标路径走 argv。复现:
+> **留证 artifact (2026-08-23 起为冻结存档, TASK-025 路径 (b))**: [`.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md`](../../../.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md) —— 对 aria `9e6a17c` (基线) 与 `880060d` (实现后) 各一份原样输出; 脚本已退役移至同目录 `.py` (自包含、stdlib-only、只读、目标路径走 argv)。复现 (须对基线 SHA 的 worktree 跑, 对 HEAD 跑必红):
 > ```
-> python3 .aria/repro/sc-baseline-linked-issue-normalization.py aria/skills/state-scanner
+> git -C aria worktree add /tmp/aria-base 9e6a17c && python3 .aria/repro/archive/sc-baseline-linked-issue-normalization.py /tmp/aria-base/skills/state-scanner
 > cd aria/skills/state-scanner && python3 -m pytest tests/test_release_by_track.py \
 >     -k "TestLinkedIssueOverlaps or TestPhase1GateLinkedIssueCli" -q     # 既有测试回归
 > ```
@@ -216,7 +218,7 @@ if c.linked_issue != own_linked_issue:
 
 **⚠️ 上述「语料替换未披露」问题已随 Q6 缩范围消解**: SC-7 与其 fixture 整节已移出本 Spec (见 §移出范围), 不再有「表内规定 fixture 而 artifact 用内联串」的落差。
 
-> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-1b / SC-3 / SC-4 / SC-5b / SC-11 / SC-13 / SC-15 八条**的 baseline-failing 状态**已于 2026-08-05 实跑留证**, artifact 见上方 baseline 表 (`.aria/repro/sc-baseline-linked-issue-normalization.py`, 14/14 一致)。该裁定要求的「全部实跑, 非声称」**已满足**, 非 Phase B 待办。
+> **框定合规 (owner 2026-08-02 裁定 `db2e983`)**: 本条走 **substitute 框定** —— 判据表某一行 + 对应处置, **不**声称「Rule #6 不适用 / Rule #10 白名单第四类」。owner 该次裁定确立: **提供 substitute 与声称「不适用」逻辑上二选一**, 前者才对 (先例 `openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration/`)。**substitute 须实证而非声称** —— **SC-1 / SC-1b / SC-3 / SC-4 / SC-5b / SC-11 / SC-13 / SC-15 八条**的 baseline-failing 状态**已于 2026-08-05 实跑留证**, artifact 见上方 baseline 表 (冻结报告 `.aria/repro/archive/sc-baseline-linked-issue-normalization-REPORT.md`; 2026-08-23 对基线 `9e6a17c` 复跑 16/16 一致, 脚本已退役入同目录)。该裁定要求的「全部实跑, 非声称」**已满足**, 非 Phase B 待办。
 
 > *(订正留痕: 本段原写「SC-1~6 的 baseline-failing 状态」—— 与上方 baseline 实测表直接矛盾 (SC-2/5/6 实测为绿)。**该假声明在同一节内出现两次, 上方一处已由 FIX-11 改掉, 这一处编辑清单未点名、险些残留** —— 属「多簇 fix 互相拆台」的同一形状, 由 R1-fix 落盘后的交叉一致性检查抓到。)*
 

@@ -1,0 +1,50 @@
+{
+ "expectations": [
+  {
+   "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+   "passed": true,
+   "evidence": "'aria/README.md 版本行 1.66.4 ... readme.submodules.aria.version_match=true' vs plugin.json 1.66.4"
+  },
+  {
+   "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+   "passed": true,
+   "evidence": "'42 个含 SKILL.md 的目录 ... user-invocable: false 7 个' 35 user-facing"
+  },
+  {
+   "text": "Should compare Skill count with the number stated in README",
+   "passed": true,
+   "evidence": "'35 user-facing + 7 internal = 42 total' 数量一致"
+  },
+  {
+   "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+   "passed": true,
+   "evidence": "'缺 2 个: issue-triage 和 session-closer'"
+  },
+  {
+   "text": "Should output skill_list_missing items at info severity level (not warning)",
+   "passed": true,
+   "evidence": "'匹配规则: readme_outdated (Skill 列表不完整, info 级)'"
+  },
+  {
+   "text": "Should check Plugin badge version in root README against plugin.json version",
+   "passed": true,
+   "evidence": "'plugin badge 版本 README.md:8 ... Plugin-v1.66.4-blue 一致'"
+  },
+  {
+   "text": "Should report badge mismatch as warning severity",
+   "passed": false,
+   "evidence": "无 badge mismatch 发生, 未说明 warning 级别"
+  },
+  {
+   "text": "Should gracefully handle missing aria submodule (skip, not error)",
+   "passed": false,
+   "evidence": "aria 子模块存在, 缺失处理未触发"
+  }
+ ],
+ "summary": {
+  "passed": 6,
+  "failed": 2,
+  "total": 8,
+  "pass_rate": 0.75
+ }
+}

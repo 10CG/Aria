@@ -1,0 +1,1226 @@
+{
+  "metadata": {
+    "skill_name": "state-scanner",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-08-23T06:47:31Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 334.2,
+        "tokens": 102478,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output should include Git status information",
+          "passed": true,
+          "evidence": "\u00a71 \u5f53\u524d\u72b6\u6001\u8868: \u5206\u652f/\u5de5\u4f5c\u6811\u53d8\u66f4/\u6700\u8fd1\u63d0\u4ea4; \u00a78 \u540c\u6b65\u72b6\u6001"
+        },
+        {
+          "text": "Should provide workflow recommendation",
+          "passed": true,
+          "evidence": "\u00a710 \u63a8\u8350\u5de5\u4f5c\u6d41 [1]-[4] \u542b\u7f6e\u4fe1\u5ea6"
+        },
+        {
+          "text": "Output should use structured format with sections",
+          "passed": true,
+          "evidence": "\u7f16\u53f7\u5c0f\u8282 1-10, \u8868\u683c\u7ed3\u6784"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 10,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333333333333333,
+        "passed": 4,
+        "failed": 8,
+        "total": 12,
+        "time_seconds": 390.3,
+        "tokens": 81495,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should output multi_remote section with per-remote sync status, not a single combined status",
+          "passed": true,
+          "evidence": "\u00a78.1 \u8868\u9010\u4ed3\u9010 remote ls-remote SHA"
+        },
+        {
+          "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
+          "passed": true,
+          "evidence": "\u4e3b\u4ed3 + aria + standards + aria-orchestrator \u5747\u5217 origin/github"
+        },
+        {
+          "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
+          "passed": false,
+          "evidence": "\u672a\u7ed9 ahead_count; \u771f\u5b9e\u65e0\u843d\u540e"
+        },
+        {
+          "text": "Should NOT output 'Everything up-to-date' ambiguously \u2014 must distinguish origin-synced from github-not-synced",
+          "passed": true,
+          "evidence": "\u660e\u786e 'master + tag \u4e24\u7aef\u5bf9\u9f50; \u552f\u4e00\u53ea\u5728 origin \u7684\u662f feature \u5206\u652f'"
+        },
+        {
+          "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire \u2014 the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
+          "passed": false,
+          "evidence": "\u672a\u8ba8\u8bba 1.35 \u89c4\u5219"
+        },
+        {
+          "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
+          "passed": true,
+          "evidence": "\u00a7D: 'git -C /home/dev/Aria push github master' \u53ca\u5b50\u6a21\u5757 push github HEAD:master"
+        },
+        {
+          "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+          "passed": false,
+          "evidence": "\u672a\u8ba8\u8bba parity: ahead \u8bed\u4e49"
+        },
+        {
+          "text": "Should BISECT parity: unknown rather than blanket-excluding it \u2014 benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+          "passed": false,
+          "evidence": "'parity unknown \u4ec5\u56e0 detached' \u89c6\u4e3a\u826f\u6027, \u4f46\u672a\u7ed9 benign vs blocking_unknown \u4e8c\u5206\u89c4\u5219"
+        },
+        {
+          "text": "Should require positive evidence for overall_parity: true \u2014 at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+          "passed": false,
+          "evidence": "\u672a\u9648\u8ff0 equal+fresh \u6b63\u9762\u8bc1\u636e\u89c4\u5219"
+        },
+        {
+          "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true \u2014 degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+          "passed": false,
+          "evidence": "unreachable \u573a\u666f\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        },
+        {
+          "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+          "passed": false,
+          "evidence": "'\u4e0d\u662f orphan, \u4e0d\u963b\u65ad' \u2014 \u672a\u63cf\u8ff0 clone --recursive \u65ad\u88c2\u56e0\u679c\u94fe"
+        },
+        {
+          "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) \u2014 NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion.",
+          "passed": false,
+          "evidence": "\u672a\u4f5c\u4e3a\u5df2\u63a5\u7ebf dispatch \u8def\u7531\u8f93\u51fa"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 11,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2222222222222222,
+        "passed": 2,
+        "failed": 7,
+        "total": 9,
+        "time_seconds": 188.0,
+        "tokens": 85357,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should NOT report all remotes as synced when only origin was pushed",
+          "passed": true,
+          "evidence": "\u6307\u51fa snapshot \u53ea\u6bd4\u5f53\u524d\u5206\u652f\u7684\u76f2\u533a, \u5e76\u7528\u672c\u5730 ref \u8865\u6bd4 master; \u672a\u9759\u9ed8\u5168\u7eff"
+        },
+        {
+          "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+          "passed": false,
+          "evidence": "\u672a\u63d0 parity = behind \u68c0\u6d4b\u8def\u5f84 (\u4ec5\u7ed9\u51fa\u5c06\u6765\u843d\u540e\u65f6\u7684 push \u547d\u4ee4)"
+        },
+        {
+          "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+          "passed": false,
+          "evidence": "\u672a\u63d0 hint_type"
+        },
+        {
+          "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view \u2014 behind_count is 0 when the mirror simply never received the push).",
+          "passed": false,
+          "evidence": "\u672a\u62a5 ahead_count"
+        },
+        {
+          "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+          "passed": false,
+          "evidence": "\u672a\u63d0 remote_commit \u517c\u5bb9\u5b57\u6bb5"
+        },
+        {
+          "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+          "passed": false,
+          "evidence": "\u4ec5 'has_pending_push = false', \u672a\u63d0 has_unreachable_remote"
+        },
+        {
+          "text": "Should include git-remote-helper reference in the scan output when helper is available",
+          "passed": false,
+          "evidence": "\u672a\u63d0 git-remote-helper"
+        },
+        {
+          "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+          "passed": true,
+          "evidence": "'\u4e3b\u4ed3 origin/master \u4e0e github/master \u4e24\u8fb9\u7684 gitlink \u4e5f\u4e00\u81f4 ..., GitHub \u4fa7 clone --recursive \u4e0d\u4f1a\u65ad' \u2014 \u660e\u786e gitlink \u53ef\u8fbe\u6027\u4e0e clone --recursive \u7684\u5173\u7cfb"
+        },
+        {
+          "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+          "passed": false,
+          "evidence": "\u672a\u4f5c\u4e3a wired \u89c4\u5219\u8f93\u51fa"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 12,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 82.0,
+        "tokens": 64578,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "[\u627f\u91cd] \u660e\u786e\u56de\u7b54 (1) \u4f1a\u62a5\u51fa\u91cd\u53e0 (\u4f1a\u547d\u4e2d / \u4f1a\u544a\u8b66), \u800c\u4e0d\u662f\u300c\u4e0d\u4f1a\u300d\u6216\u300c\u4e0d\u786e\u5b9a\u300d",
+          "passed": false,
+          "evidence": "[\u627f\u91cd] '\u5f88\u53ef\u80fd\u662f\u5b57\u9762\u6bd4\u8f83 ... \u4e0d\u80fd\u6307\u671b\u5b83\u628a\u90a3\u6761 claim \u62a5\u51fa\u6765' \u2014 \u56de\u7b54\u4e3a\u300c\u4e0d\u4f1a/\u4e0d\u786e\u5b9a\u300d"
+        },
+        {
+          "text": "[\u627f\u91cd] \u8bf4\u660e\u539f\u56e0\u662f\u6309\u5f52\u4e00\u540e\u7684 <repo>#<n> (\u4ed3\u540d + \u53f7) \u6bd4\u8f83, org \u524d\u7f00\u4e0d\u53c2\u4e0e / \u7a7a\u767d\u4e0d\u5f71\u54cd",
+          "passed": false,
+          "evidence": "[\u627f\u91cd] 'skill \u6587\u6863\u6ca1\u6709\u5199\u6bd4\u8f83\u89c4\u5219', \u672a\u8bf4\u660e\u5f52\u4e00 <repo>#<n> / org \u4e0d\u53c2\u4e0e"
+        },
+        {
+          "text": "[\u627f\u91cd] \u56de\u7b54 (2) 10CG/Aria#152 \u4e0d\u4f1a\u547d\u4e2d (\u4e0d\u540c\u4ed3 Aria vs aria-plugin)",
+          "passed": true,
+          "evidence": "[\u627f\u91cd] '\u4e0d\u4f1a\u62a5\u300210CG/Aria#152 \u548c 10CG/aria-plugin#152 \u662f\u4e24\u4e2a\u4e0d\u540c\u4ed3\u5e93\u7684 issue'"
+        },
+        {
+          "text": "\u56de\u7b54 (3) \u544a\u8b66\u662f advisory (\ud83d\udd34 \u63d0\u793a) \u4e0d\u963b\u65ad Phase B",
+          "passed": true,
+          "evidence": "'linked_issue_overlap[] \u662f advisory \u544a\u8b66, \u6e32\u67d3\u4e3a \ud83d\udd34 \u63d0\u793a\u4f46\u4e0d\u963b\u65ad'"
+        },
+        {
+          "text": "\u4e0d\u58f0\u79f0\u6bd4\u8f83\u662f\u7cbe\u786e\u5b57\u7b26\u4e32\u76f8\u7b49 / \u4e0d\u8bf4\u300c\u683c\u5f0f\u4e0d\u540c\u6240\u4ee5\u8ba4\u4e0d\u51fa\u300d",
+          "passed": false,
+          "evidence": "'\u53ea\u80fd\u6309\u6700\u4fdd\u5b88\u7684\u5047\u8bbe\u7406\u89e3: \u5f88\u53ef\u80fd\u662f\u5b57\u9762\u6bd4\u8f83 ... \u4e24\u4e2a\u5b57\u7b26\u4e32\u4e0d\u76f8\u7b49' \u2014 \u5373\u300c\u683c\u5f0f\u4e0d\u540c\u6240\u4ee5\u8ba4\u4e0d\u51fa\u300d"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 571.4,
+        "tokens": 98720,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should show numbered options for user selection",
+          "passed": true,
+          "evidence": "'\u63a8\u8350\u5de5\u4f5c\u6d41' [1]-[4] \u7f16\u53f7\u9009\u9879"
+        },
+        {
+          "text": "Should mention custom input option",
+          "passed": true,
+          "evidence": "'\u56de\u590d\u7f16\u53f7 (\u5982 1) \u6216\u5199\u81ea\u5b9a\u4e49\u7ec4\u5408 (\u5982 \"\u5148 2 \u518d 1\")'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 496.1,
+        "tokens": 106068,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should check README.md version against VERSION file or plugin.json",
+          "passed": true,
+          "evidence": "\u00a78 \u8868: plugin.json 1.66.4 = SOT, root README badge Plugin-v1.66.4 \u4e00\u81f4, aria/VERSION \u5bf9\u6bd4"
+        },
+        {
+          "text": "Should mention CHANGELOG date as reference source for date sync",
+          "passed": false,
+          "evidence": "CHANGELOG \u9876\u6761 '[1.66.4] 2026-08-22 \u4e00\u81f4' \u4ec5\u4f5c\u7248\u672c\u6bd4\u5bf9, \u672a\u63d0\u51fa\u4f5c\u4e3a\u65e5\u671f\u540c\u6b65\u53c2\u7167\u6e90"
+        },
+        {
+          "text": "Should output readme_status section",
+          "passed": true,
+          "evidence": "\u00a78 '\u7248\u672c\u4e00\u81f4\u6027\u6838\u5bf9' \u8868\u542b README badge / i18n README \u884c"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 276.6,
+        "tokens": 82203,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should mention .aria/config.json or config-loader",
+          "passed": true,
+          "evidence": "'/home/dev/Aria/.aria/config.json (5.6 KB...)' + config.template.json"
+        },
+        {
+          "text": "Should describe config fields like auto_proceed or confidence_threshold",
+          "passed": true,
+          "evidence": "confidence_threshold=90, workflow.auto_proceed=false, auto_execute_enabled=false"
+        },
+        {
+          "text": "Should mention default values when config is absent",
+          "passed": false,
+          "evidence": "\u672a\u63d0\u53ca config \u7f3a\u5931\u65f6\u91c7\u7528\u7684\u9ed8\u8ba4\u503c"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 366.4,
+        "tokens": 91502,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should output a sync_status section (\ud83d\udd04 \u540c\u6b65\u72b6\u6001 or equivalent) listing each submodule",
+          "passed": true,
+          "evidence": "\u00a78 \u8868\u9010\u5217\u4e09\u4e2a\u5b50\u6a21\u5757"
+        },
+        {
+          "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+          "passed": true,
+          "evidence": "\u8868\u5217 '\u5de5\u4f5c\u533a HEAD / \u4e3b\u4ed3 gitlink \u8bb0\u5f55 / \u8fdc\u7a0b master'; fallback \u672a\u89e6\u53d1\u4e0d\u53ef\u9a8c\u8bc1"
+        },
+        {
+          "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+          "passed": true,
+          "evidence": "'tree_vs_remote=true ... hint: git submodule update --remote aria' \u88ab\u5f15\u7528, \u843d\u540e 15 \u68c0\u51fa; \u540c\u65f6\u89e3\u91ca\u4e3a\u4f55\u6539\u7528 merge"
+        },
+        {
+          "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+          "passed": false,
+          "evidence": "'8 \u6761 fetch leg \u5168\u90e8\u6210\u529f' \u2014 \u626b\u63cf\u6267\u884c\u4e86 fetch, \u975e\u8bfb FETCH_HEAD age"
+        },
+        {
+          "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+          "passed": false,
+          "evidence": "\u672a\u63d0\u53ca\u56db\u7ea7 fallback"
+        },
+        {
+          "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+          "passed": true,
+          "evidence": "exit 10 \u8f6f\u9519\u8bef\u4e0b\u626b\u63cf\u7ee7\u7eed\u5e76\u7ed9\u51fa\u5b8c\u6574\u533a\u5757"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.16666666666666666,
+        "passed": 1,
+        "failed": 5,
+        "total": 6,
+        "time_seconds": 249.2,
+        "tokens": 77786,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+          "passed": false,
+          "evidence": "\u672a\u5c55\u793a rev-parse @{u} \u68c0\u6d4b\u6b65\u9aa4"
+        },
+        {
+          "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+          "passed": true,
+          "evidence": "'\u76f8\u5bf9\u81ea\u5df1\u7684 upstream: ahead 0 / behind 0'"
+        },
+        {
+          "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+          "passed": false,
+          "evidence": "no_upstream \u8def\u5f84\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        },
+        {
+          "text": "Should handle detached HEAD with reason: detached_head",
+          "passed": false,
+          "evidence": "'detached HEAD: \u5426' \u4ec5\u4e3a\u5b57\u6bb5\u503c, \u672a\u5c55\u793a reason: detached_head \u5904\u7406"
+        },
+        {
+          "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+          "passed": false,
+          "evidence": "'shallow clone: \u5426', \u672a\u63d0\u68c0\u6d4b\u65b9\u6cd5\u4e0e fallback"
+        },
+        {
+          "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+          "passed": false,
+          "evidence": "behind = 0 \u89c4\u5219\u672a\u89e6\u53d1; \u7ed9\u51fa '\u4e0d\u9700\u8981 git pull', \u89c4\u5219\u884c\u4e3a\u4e0d\u53ef\u9a8c\u8bc1"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 7,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 4,
+        "failed": 4,
+        "total": 8,
+        "time_seconds": 429.9,
+        "tokens": 109003,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should show an Open Issues section only when issue_scan.enabled is true",
+          "passed": true,
+          "evidence": "'\ud83c\udfab Open Issues (Forgejo, \u5171 44 open, 4 \u4e2a repo ...)'"
+        },
+        {
+          "text": "Should detect platform using 4-tier priority (config.platform -> hostname map -> URL inference -> fallback)",
+          "passed": false,
+          "evidence": "\u672a\u63cf\u8ff0 4 \u7ea7\u5e73\u53f0\u68c0\u6d4b"
+        },
+        {
+          "text": "Should call forgejo CLI wrapper (not raw curl) and handle 10 fetch_error enum values (network_unavailable, cli_missing, auth_missing, auth_failed, rate_limited, not_found_or_no_access, timeout, platform_unknown, parse_error, unknown)",
+          "passed": false,
+          "evidence": "\u672a\u63d0 CLI wrapper \u4e0e fetch_error \u679a\u4e3e"
+        },
+        {
+          "text": "Should use cache with 15-minute TTL at .aria/cache/issues.json",
+          "passed": false,
+          "evidence": "\u4ec5 '\u6570\u636e\u6765\u6e90: cache, \u521a\u83b7\u53d6', \u65e0 15 \u5206\u949f TTL / \u8def\u5f84"
+        },
+        {
+          "text": "Should NOT manage API tokens inside the skill (rely on existing CLI wrapper auth)",
+          "passed": true,
+          "evidence": "\u65e0 token \u7ba1\u7406"
+        },
+        {
+          "text": "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
+          "passed": true,
+          "evidence": "'\u542f\u53d1\u5f0f\u5173\u8054\u7ed3\u679c: 6 \u6761\u5173\u8054\u5230 OpenSpec ... 1 \u6761\u5173\u8054 User Story (#175 \u2192 US-025)'"
+        },
+        {
+          "text": "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
+          "passed": true,
+          "evidence": "'\u6240\u6709 issue \u90fd\u6ca1\u6709 label, \u6240\u4ee5 scanner \u7ed9\u4e0d\u51fa\u673a\u68b0\u7684 severity' \u2014 \u6761\u4ef6\u672a\u6ee1\u8db3\u4e14\u6b63\u786e\u8bf4\u660e"
+        },
+        {
+          "text": "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing",
+          "passed": false,
+          "evidence": "\u79bb\u7ebf/CLI \u7f3a\u5931\u964d\u7ea7\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 8,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 355.7,
+        "tokens": 92614,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+          "passed": true,
+          "evidence": "'aria/README.md:44 ... plugin.json description' \u4e0e badge 1.66.4 \u4e00\u81f4"
+        },
+        {
+          "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+          "passed": true,
+          "evidence": "'42 \u4e2a\u542b SKILL.md \u7684\u76ee\u5f55 ... user-invocable: false \u7684\u5185\u90e8 Skill 7 \u4e2a' \u5e76\u5217\u51fa 7 \u4e2a\u540d"
+        },
+        {
+          "text": "Should compare Skill count with the number stated in README",
+          "passed": true,
+          "evidence": "'\u56db\u5904\u6570\u5b57\u5168\u90e8\u4e00\u81f4, \u4e5f\u4e0e\u76ee\u5f55\u4e00\u81f4'"
+        },
+        {
+          "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+          "passed": true,
+          "evidence": "'\u76ee\u5f55\u91cc\u6709\u3001\u5217\u8868\u91cc\u6ca1\u6709: issue-triage\u3001session-closer'"
+        },
+        {
+          "text": "Should output skill_list_missing items at info severity level (not warning)",
+          "passed": false,
+          "evidence": "\u6f0f\u9879\u62a5\u544a\u672a\u6807 info \u7ea7\u522b"
+        },
+        {
+          "text": "Should check Plugin badge version in root README against plugin.json version",
+          "passed": true,
+          "evidence": "'\u4e3b\u4ed3 badge v1.66.4 = ... plugin.json (1.66.4)'"
+        },
+        {
+          "text": "Should report badge mismatch as warning severity",
+          "passed": false,
+          "evidence": "\u65e0 mismatch, \u672a\u63d0 warning \u7ea7\u522b"
+        },
+        {
+          "text": "Should gracefully handle missing aria submodule (skip, not error)",
+          "passed": false,
+          "evidence": "\u7f3a\u5931\u5b50\u6a21\u5757\u5904\u7406\u672a\u89e6\u53d1"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 9,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8571428571428571,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 316.0,
+        "tokens": 96142,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+          "passed": true,
+          "evidence": "'origin = ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git' \u68c0\u51fa"
+        },
+        {
+          "text": "Should check for existence of CLAUDE.local.md file",
+          "passed": true,
+          "evidence": "'\u68c0\u6d4b\u5230 Forgejo \u8fdc\u7a0b ... \u4f46\u7f3a\u5c11 CLAUDE.local.md'"
+        },
+        {
+          "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+          "passed": true,
+          "evidence": "'\u5199\u6210 forgejo: YAML \u952e\u6216 ## forgejo \u6807\u9898\u90fd\u80fd\u88ab collector \u8bc6\u522b; \u4f46\u522b\u53ea\u653e\u5728\u4ee3\u7801\u5757\u91cc'"
+        },
+        {
+          "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+          "passed": true,
+          "evidence": "'forgejo_config collector: config_status=missing'"
+        },
+        {
+          "text": "Should suggest running /forgejo-sync to create configuration when missing",
+          "passed": true,
+          "evidence": "'\u8fd0\u884c /forgejo-sync \u53ef\u5f15\u5bfc\u521b\u5efa\u914d\u7f6e'"
+        },
+        {
+          "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+          "passed": true,
+          "evidence": "'\u672c\u6b21\u53ea\u8bfb\u626b\u63cf, \u672a\u89e6\u78b0\u4efb\u4f55\u6587\u4ef6'; \u672a\u521b\u5efa\u6587\u4ef6"
+        },
+        {
+          "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+          "passed": false,
+          "evidence": "\u65e0 Forgejo \u8fdc\u7a0b\u573a\u666f\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 437.1,
+        "tokens": 117035,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Output should include Git status information",
+          "passed": true,
+          "evidence": "\u00a71 \u5f53\u524d\u72b6\u6001: \u5206\u652f/HEAD 826b356/ahead 0 behind 0/\u53d8\u66f4\u6587\u4ef6 2; \u00a78 \u540c\u6b65\u72b6\u6001"
+        },
+        {
+          "text": "Should provide workflow recommendation",
+          "passed": true,
+          "evidence": "\u00a710 \u63a8\u8350\u5de5\u4f5c\u6d41 [1]-[4], \u7f6e\u4fe1\u5ea6 ~85%"
+        },
+        {
+          "text": "Output should use structured format with sections",
+          "passed": true,
+          "evidence": "\u7f16\u53f7\u5c0f\u8282 1-10 + Handoff \u611f\u77e5"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 10,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333333333333333,
+        "passed": 4,
+        "failed": 8,
+        "total": 12,
+        "time_seconds": 214.6,
+        "tokens": 76212,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should output multi_remote section with per-remote sync status, not a single combined status",
+          "passed": true,
+          "evidence": "\u00a7A/\u00a7B \u8868\u9010 remote (origin/github) \u9010\u4ed3\u72b6\u6001"
+        },
+        {
+          "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
+          "passed": true,
+          "evidence": "\u4e3b\u4ed3 + aria/standards/aria-orchestrator \u5747\u5217 origin \u4e0e github"
+        },
+        {
+          "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
+          "passed": false,
+          "evidence": "\u672a\u7ed9\u51fa ahead_count; \u771f\u5b9e\u4ed3\u5e93\u65e0 mirror \u843d\u540e, github \u5bf9 feature \u5206\u652f\u4ec5 'no_local_tracking_ref'"
+        },
+        {
+          "text": "Should NOT output 'Everything up-to-date' ambiguously \u2014 must distinguish origin-synced from github-not-synced",
+          "passed": true,
+          "evidence": "\u660e\u786e\u533a\u5206 'origin \u6709, github \u6ca1\u6709' \u4e0e master \u4e24\u7aef\u4e00\u81f4"
+        },
+        {
+          "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire \u2014 the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
+          "passed": false,
+          "evidence": "\u672a\u8ba8\u8bba multi_remote_drift (1.35) \u662f\u5426\u89e6\u53d1"
+        },
+        {
+          "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
+          "passed": true,
+          "evidence": "'git -C /home/dev/Aria/aria push github master && git -C /home/dev/Aria push github master'"
+        },
+        {
+          "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+          "passed": false,
+          "evidence": "\u672a\u8ba8\u8bba parity: ahead \u4e0e has_pending_push \u8bed\u4e49"
+        },
+        {
+          "text": "Should BISECT parity: unknown rather than blanket-excluding it \u2014 benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+          "passed": false,
+          "evidence": "\u628a no_local_tracking_ref / no_published_ref \u8bf4\u6210\u975e orphan \u4e0d\u963b\u65ad, \u4f46\u672a\u533a\u5206 benign unknown vs blocking_unknown (fail-closed)"
+        },
+        {
+          "text": "Should require positive evidence for overall_parity: true \u2014 at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+          "passed": false,
+          "evidence": "\u672a\u9648\u8ff0 overall_parity true \u9700 equal+fresh \u6b63\u9762\u8bc1\u636e\u89c4\u5219 (\u53ea\u8bf4\u672c\u6b21\u5224\u51b3\u6309\u672a\u6838\u5b9e\u5bf9\u5f85)"
+        },
+        {
+          "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true \u2014 degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+          "passed": false,
+          "evidence": "has_unreachable_remote \u573a\u666f\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        },
+        {
+          "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+          "passed": false,
+          "evidence": "\u672a\u63cf\u8ff0 gitlink orphan \u2192 clone --recursive \u65ad\u88c2\u56e0\u679c\u94fe (\u4ec5 '\u4e0d\u662f orphan')"
+        },
+        {
+          "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) \u2014 NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion.",
+          "passed": false,
+          "evidence": "\u672a\u628a gitlink \u4fee\u590d\u4f5c\u4e3a multi_remote_drift \u5df2\u63a5\u7ebf\u8def\u7531\u8f93\u51fa"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 11,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2222222222222222,
+        "passed": 2,
+        "failed": 7,
+        "total": 9,
+        "time_seconds": 214.9,
+        "tokens": 76206,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should NOT report all remotes as synced when only origin was pushed",
+          "passed": true,
+          "evidence": "\u672a\u9759\u9ed8\u901a\u8fc7: \u6307\u51fa snapshot parity \u672a\u9a8c\u8bc1, \u5e76\u7528 ls-remote \u9010\u4ed3\u6838 master; \u771f\u5b9e\u4ed3\u5e93\u4e24\u7aef\u4e00\u81f4"
+        },
+        {
+          "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+          "passed": true,
+          "evidence": "\u673a\u5236\u8bf4\u660e: 'github \u843d\u540e\u4f1a\u76f4\u63a5\u62a5 parity=behind/has_pending_push=true \u5e76\u538b overall_parity=false' (\u573a\u666f\u672a\u590d\u73b0, \u4f46\u5b57\u6bb5\u8def\u5f84\u6b63\u786e\u9648\u8ff0)"
+        },
+        {
+          "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+          "passed": false,
+          "evidence": "\u672a\u63d0 hint_type: push"
+        },
+        {
+          "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view \u2014 behind_count is 0 when the mirror simply never received the push).",
+          "passed": false,
+          "evidence": "\u672a\u62a5 ahead_count (\u65e0\u843d\u540e)"
+        },
+        {
+          "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+          "passed": false,
+          "evidence": "\u672a\u63d0 submodules[].remote_commit \u517c\u5bb9\u5b57\u6bb5"
+        },
+        {
+          "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+          "passed": false,
+          "evidence": "\u672a\u63d0 has_unreachable_remote \u5b57\u6bb5 (\u4ec5 8 leg fetch_ok)"
+        },
+        {
+          "text": "Should include git-remote-helper reference in the scan output when helper is available",
+          "passed": false,
+          "evidence": "\u672a\u63d0 git-remote-helper"
+        },
+        {
+          "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+          "passed": false,
+          "evidence": "\u4ec5 'no_published_ref ... \u4e0d\u662f orphaned, \u4e0d\u963b\u65ad', \u672a\u8bf4\u660e gitlink \u4e0d\u53ef\u8fbe\u5bfc\u81f4 clone --recursive \u65ad\u88c2"
+        },
+        {
+          "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+          "passed": false,
+          "evidence": "\u672a\u4f5c\u4e3a wired \u89c4\u5219\u8f93\u51fa"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 12,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 73.8,
+        "tokens": 59507,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "[\u627f\u91cd] \u660e\u786e\u56de\u7b54 (1) \u4f1a\u62a5\u51fa\u91cd\u53e0 (\u4f1a\u547d\u4e2d / \u4f1a\u544a\u8b66), \u800c\u4e0d\u662f\u300c\u4e0d\u4f1a\u300d\u6216\u300c\u4e0d\u786e\u5b9a\u300d",
+          "passed": false,
+          "evidence": "[\u627f\u91cd] \u672a\u7ed9\u660e\u786e\u7b54\u6848: '\u53d6\u51b3\u4e8e\u8fd9\u4e2a\u5e26\u7a7a\u683c\u7684\u88f8\u4ed3\u540d\u80fd\u5426\u88ab\u89e3\u6790, \u5206\u4e24\u79cd\u60c5\u51b5 ... \u5355\u51ed skill \u6587\u672c\u65e0\u6cd5\u767e\u5206\u4e4b\u767e\u65ad\u5b9a\u8d70\u54ea\u6761\u8def' \u2014 \u56de\u7b54\u4e3a\u300c\u4e0d\u786e\u5b9a\u300d"
+        },
+        {
+          "text": "[\u627f\u91cd] \u8bf4\u660e\u539f\u56e0\u662f\u6309\u5f52\u4e00\u540e\u7684 <repo>#<n> (\u4ed3\u540d + \u53f7) \u6bd4\u8f83, org \u524d\u7f00\u4e0d\u53c2\u4e0e / \u7a7a\u767d\u4e0d\u5f71\u54cd",
+          "passed": true,
+          "evidence": "[\u627f\u91cd] '\u6309\u5f52\u4e00\u540e\u7684 <repo>#<n> \u6bd4\u8f83, org \u4e0d\u53c2\u4e0e' + 'org \u6709\u6ca1\u6709 (10CG/) \u4e0d\u5f71\u54cd\u7ed3\u679c'"
+        },
+        {
+          "text": "[\u627f\u91cd] \u56de\u7b54 (2) 10CG/Aria#152 \u4e0d\u4f1a\u547d\u4e2d (\u4e0d\u540c\u4ed3 Aria vs aria-plugin)",
+          "passed": true,
+          "evidence": "[\u627f\u91cd] '\u5f52\u4e00\u540e\u662f Aria#152, \u5bf9\u65b9\u662f aria-plugin#152, repo \u540d\u4e0d\u540c \u2192 \u4e0d\u4f1a\u62a5'"
+        },
+        {
+          "text": "\u56de\u7b54 (3) \u544a\u8b66\u662f advisory (\ud83d\udd34 \u63d0\u793a) \u4e0d\u963b\u65ad Phase B",
+          "passed": true,
+          "evidence": "'SKILL.md \u660e\u8bf4\u5b83\u662f advisory \u544a\u8b66, \u6e32\u67d3\u4e3a \ud83d\udd34 \u63d0\u793a\u4f46\u4e0d\u963b\u65ad'"
+        },
+        {
+          "text": "\u4e0d\u58f0\u79f0\u6bd4\u8f83\u662f\u7cbe\u786e\u5b57\u7b26\u4e32\u76f8\u7b49 / \u4e0d\u8bf4\u300c\u683c\u5f0f\u4e0d\u540c\u6240\u4ee5\u8ba4\u4e0d\u51fa\u300d",
+          "passed": true,
+          "evidence": "\u4e3b\u5f20\u6bd4\u8f83\u89c4\u5219\u662f\u5f52\u4e00\u540e <repo>#<n>, \u672a\u58f0\u79f0\u7cbe\u786e\u5b57\u7b26\u4e32\u76f8\u7b49; \u7a7a\u683c\u5206\u652f\u4ec5\u4f5c\u4e3a\u300c\u4e0d\u53ef\u89e3\u6790\u56de\u843d\u300d\u7684\u6761\u4ef6\u6027\u5f15\u8ff0 (\u89c1 A1 \u6263\u5206)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 417.1,
+        "tokens": 94747,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should show numbered options for user selection",
+          "passed": true,
+          "evidence": "'\u53ef\u9009\u64cd\u4f5c' [1]-[4] \u7f16\u53f7\u9009\u9879"
+        },
+        {
+          "text": "Should mention custom input option",
+          "passed": true,
+          "evidence": "'\u8bf7\u9009\u7f16\u53f7 (1-4) \u6216\u7ed9\u81ea\u5b9a\u4e49\u7ec4\u5408 (\u4f8b\u5982\u300c5.1 + 5.9\u300d)'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 507.5,
+        "tokens": 94300,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should check README.md version against VERSION file or plugin.json",
+          "passed": true,
+          "evidence": "\u00a78 \u8868 A: plugin.json (SOT) 1.66.4 vs aria/README.md \u7248\u672c\u884c 1.66.4; root README badge v1.66.4"
+        },
+        {
+          "text": "Should mention CHANGELOG date as reference source for date sync",
+          "passed": false,
+          "evidence": "CHANGELOG \u53ea\u4f5c\u4e3a\u7248\u672c\u884c '[1.66.4] - 2026-08-22' \u5217\u51fa, \u672a\u628a CHANGELOG \u65e5\u671f\u8bf4\u6210\u65e5\u671f\u540c\u6b65\u7684\u53c2\u7167\u6e90"
+        },
+        {
+          "text": "Should output readme_status section",
+          "passed": true,
+          "evidence": "\u00a78 \u542b README \u7248\u672c\u4e00\u81f4\u6027\u8868 (aria/README.md \u7248\u672c\u884c, root README badge, i18n translated-from)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 353.3,
+        "tokens": 82308,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should mention .aria/config.json or config-loader",
+          "passed": true,
+          "evidence": "'/home/dev/Aria/.aria/config.json \u5b58\u5728 (5603 \u5b57\u8282...)'"
+        },
+        {
+          "text": "Should describe config fields like auto_proceed or confidence_threshold",
+          "passed": true,
+          "evidence": "\u8868: state_scanner.confidence_threshold 90 / auto_execute_enabled false"
+        },
+        {
+          "text": "Should mention default values when config is absent",
+          "passed": false,
+          "evidence": "\u672a\u63d0\u53ca config \u7f3a\u5931\u65f6\u7684\u9ed8\u8ba4\u503c (\u4ec5\u63d0 'vs DEFAULT_CONFIG' \u952e\u6bd4\u5bf9, \u65e0\u9ed8\u8ba4\u503c\u8bf4\u660e)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 358.3,
+        "tokens": 92189,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should output a sync_status section (\ud83d\udd04 \u540c\u6b65\u72b6\u6001 or equivalent) listing each submodule",
+          "passed": true,
+          "evidence": "'\ud83d\udd04 \u540c\u6b65\u72b6\u6001' \u8868\u9010\u5217 standards / aria-orchestrator / aria"
+        },
+        {
+          "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+          "passed": true,
+          "evidence": "\u8868\u5217 '\u4e3b\u4ed3\u8bb0\u5f55 (tree) / \u672c\u5730\u68c0\u51fa (head) / \u8fdc\u7a0b master' \u4e09\u65b9\u6bd4\u8f83; fallback \u672a\u88ab\u89e6\u53d1\u4e0d\u53ef\u9a8c\u8bc1"
+        },
+        {
+          "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+          "passed": true,
+          "evidence": "aria \u843d\u540e 15 commits \u68c0\u51fa; \u63d0\u53ca 'scan.py \u7684 drift hint \u662f git submodule update --remote aria' \u5e76\u89e3\u91ca\u4e3a\u4f55\u672c\u573a\u666f\u6539\u7528 merge"
+        },
+        {
+          "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+          "passed": false,
+          "evidence": "\u7b54\u6848\u81ea\u8ff0 'Phase 0.5 \u5df2\u5bf9 ... 8 \u6761 leg \u5168\u90e8 fetch \u6210\u529f' \u2014 \u626b\u63cf\u6267\u884c\u4e86 fetch, \u672a\u8d70\u8bfb FETCH_HEAD age \u8def\u5f84"
+        },
+        {
+          "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+          "passed": false,
+          "evidence": "\u672a\u63d0\u53ca origin/HEAD \u56db\u7ea7 fallback"
+        },
+        {
+          "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+          "passed": true,
+          "evidence": "exit 10 \u8f6f\u9519\u8bef (snapshot_consistency) \u4e0b snapshot \u4ecd\u53ef\u7528, \u5176\u4f59\u533a\u5757\u7167\u5e38\u8f93\u51fa"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.16666666666666666,
+        "passed": 1,
+        "failed": 5,
+        "total": 6,
+        "time_seconds": 338.0,
+        "tokens": 87592,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+          "passed": false,
+          "evidence": "\u672a\u5c55\u793a rev-parse @{u} \u68c0\u6d4b\u6b65\u9aa4 (\u4e0d\u53ef\u9a8c\u8bc1)"
+        },
+        {
+          "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+          "passed": true,
+          "evidence": "'ahead 0 / behind 0, \u672c\u5730 826b356 = \u8fdc\u7aef 826b356, parity = equal'"
+        },
+        {
+          "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+          "passed": false,
+          "evidence": "upstream \u5b58\u5728, no_upstream \u5206\u652f\u672a\u89e6\u53d1\u4ea6\u672a\u8bf4\u660e"
+        },
+        {
+          "text": "Should handle detached HEAD with reason: detached_head",
+          "passed": false,
+          "evidence": "\u62a5\u544a 'git.detached_head = false' \u4e0e standards \u5b50\u6a21\u5757 detached, \u4f46\u672a\u5c55\u793a reason: detached_head \u5904\u7406"
+        },
+        {
+          "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+          "passed": false,
+          "evidence": "\u4ec5 'git.shallow = false', \u672a\u63d0 --is-shallow-repository / .git/shallow fallback"
+        },
+        {
+          "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+          "passed": false,
+          "evidence": "behind upstream = 0, \u89c4\u5219\u672a\u89e6\u53d1; \u6b63\u786e\u7ed9\u51fa '\u4e0d\u9700\u8981 git pull' \u4f46 branch_behind_upstream \u89c4\u5219\u884c\u4e3a\u4e0d\u53ef\u9a8c\u8bc1"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 7,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 450.7,
+        "tokens": 116958,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should show an Open Issues section only when issue_scan.enabled is true",
+          "passed": true,
+          "evidence": "'\ud83c\udfab Open Issues' \u533a\u5757, \u5e73\u53f0 Forgejo 44 open"
+        },
+        {
+          "text": "Should detect platform using 4-tier priority (config.platform -> hostname map -> URL inference -> fallback)",
+          "passed": false,
+          "evidence": "\u672a\u63cf\u8ff0 4 \u7ea7\u5e73\u53f0\u68c0\u6d4b\u4f18\u5148\u7ea7"
+        },
+        {
+          "text": "Should call forgejo CLI wrapper (not raw curl) and handle 10 fetch_error enum values (network_unavailable, cli_missing, auth_missing, auth_failed, rate_limited, not_found_or_no_access, timeout, platform_unknown, parse_error, unknown)",
+          "passed": false,
+          "evidence": "\u672a\u63d0 forgejo CLI wrapper \u8c03\u7528, \u4ec5 'fetch_error: \u65e0', \u672a\u5217 10 \u4e2a\u679a\u4e3e"
+        },
+        {
+          "text": "Should use cache with 15-minute TTL at .aria/cache/issues.json",
+          "passed": true,
+          "evidence": "'\u6570\u636e\u6765\u6e90: cache (... \u521a\u5237\u65b0) | ttl 15m' (\u8def\u5f84\u672a\u5199)"
+        },
+        {
+          "text": "Should NOT manage API tokens inside the skill (rely on existing CLI wrapper auth)",
+          "passed": true,
+          "evidence": "\u65e0\u4efb\u4f55 token \u7ba1\u7406\u52a8\u4f5c/\u63cf\u8ff0"
+        },
+        {
+          "text": "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
+          "passed": true,
+          "evidence": "\u00a7C \u5df2\u6302\u6d3b\u8dc3 Spec: #177 \u7b49 \u2192 linked-issue-normalization, #175 \u2192 US-025, \u6807 heuristic: true"
+        },
+        {
+          "text": "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
+          "passed": true,
+          "evidence": "'open_blocker_issues \u89c4\u5219\u662f\u6309 blocker/critical label \u89e6\u53d1\u7684 ... \u56e0\u65e0 label \u672a\u89e6\u53d1' (\u89c4\u5219\u6b63\u786e\u5f15\u7528, \u6761\u4ef6\u672a\u6ee1\u8db3)"
+        },
+        {
+          "text": "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing",
+          "passed": false,
+          "evidence": "\u79bb\u7ebf/CLI \u7f3a\u5931\u573a\u666f\u672a\u89e6\u53d1, \u672a\u8bf4\u660e\u964d\u7ea7\u884c\u4e3a"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 8,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 345.1,
+        "tokens": 88687,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+          "passed": true,
+          "evidence": "'aria/README.md \u7248\u672c\u884c 1.66.4 ... readme.submodules.aria.version_match=true' vs plugin.json 1.66.4"
+        },
+        {
+          "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+          "passed": true,
+          "evidence": "'42 \u4e2a\u542b SKILL.md \u7684\u76ee\u5f55 ... user-invocable: false 7 \u4e2a' 35 user-facing"
+        },
+        {
+          "text": "Should compare Skill count with the number stated in README",
+          "passed": true,
+          "evidence": "'35 user-facing + 7 internal = 42 total' \u6570\u91cf\u4e00\u81f4"
+        },
+        {
+          "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+          "passed": true,
+          "evidence": "'\u7f3a 2 \u4e2a: issue-triage \u548c session-closer'"
+        },
+        {
+          "text": "Should output skill_list_missing items at info severity level (not warning)",
+          "passed": true,
+          "evidence": "'\u5339\u914d\u89c4\u5219: readme_outdated (Skill \u5217\u8868\u4e0d\u5b8c\u6574, info \u7ea7)'"
+        },
+        {
+          "text": "Should check Plugin badge version in root README against plugin.json version",
+          "passed": true,
+          "evidence": "'plugin badge \u7248\u672c README.md:8 ... Plugin-v1.66.4-blue \u4e00\u81f4'"
+        },
+        {
+          "text": "Should report badge mismatch as warning severity",
+          "passed": false,
+          "evidence": "\u65e0 badge mismatch \u53d1\u751f, \u672a\u8bf4\u660e warning \u7ea7\u522b"
+        },
+        {
+          "text": "Should gracefully handle missing aria submodule (skip, not error)",
+          "passed": false,
+          "evidence": "aria \u5b50\u6a21\u5757\u5b58\u5728, \u7f3a\u5931\u5904\u7406\u672a\u89e6\u53d1"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 9,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8571428571428571,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 279.0,
+        "tokens": 93174,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+          "passed": true,
+          "evidence": "'forgejo_remote_detected: true, instance: forgejo.10cg.pub'"
+        },
+        {
+          "text": "Should check for existence of CLAUDE.local.md file",
+          "passed": true,
+          "evidence": "'\u68c0\u6d4b\u5230 Forgejo \u8fdc\u7a0b (forgejo.10cg.pub) \u4f46\u7f3a\u5c11 CLAUDE.local.md'"
+        },
+        {
+          "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+          "passed": true,
+          "evidence": "'\u626b\u63cf\u5668\u5224\u5b9a\u300c\u5df2\u914d\u7f6e\u300d\u9760\u7684\u662f\u6587\u4ef6\u91cc\u6b63\u6587\u51fa\u73b0 forgejo: YAML \u952e\u6216 # forgejo \u6807\u9898; \u4ee3\u7801\u56f4\u680f\u91cc\u7684\u793a\u4f8b\u4e0d\u7b97\u6570'"
+        },
+        {
+          "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+          "passed": true,
+          "evidence": "'forgejo_config = {... config_status: \"missing\"}'"
+        },
+        {
+          "text": "Should suggest running /forgejo-sync to create configuration when missing",
+          "passed": true,
+          "evidence": "'\u8fd0\u884c /forgejo-sync \u53ef\u5f15\u5bfc\u521b\u5efa\u914d\u7f6e (\u9700\u786e\u8ba4)'"
+        },
+        {
+          "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+          "passed": true,
+          "evidence": "\u53ea\u8bfb\u626b\u63cf, \u7ed9\u51fa\u6a21\u677f\u4f46\u672a\u521b\u5efa; '\u4f60\u786e\u8ba4 [y] \u624d\u843d\u76d8'"
+        },
+        {
+          "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+          "passed": false,
+          "evidence": "\u65e0 Forgejo \u8fdc\u7a0b\u573a\u666f\u672a\u89e6\u53d1\u672a\u8bf4\u660e"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.592,
+        "stddev": 0.2781,
+        "min": 0.1667,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 337.9833,
+        "stddev": 132.1025,
+        "min": 82.0,
+        "max": 571.4
+      },
+      "tokens": {
+        "mean": 90662.1667,
+        "stddev": 12942.9892,
+        "min": 64578,
+        "max": 109003
+      }
+    },
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.6462,
+        "stddev": 0.2761,
+        "min": 0.1667,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 332.45,
+        "stddev": 121.1685,
+        "min": 73.8,
+        "max": 507.5
+      },
+      "tokens": {
+        "mean": 89909.5833,
+        "stddev": 16209.7407,
+        "min": 59507,
+        "max": 117035
+      }
+    },
+    "delta": {
+      "pass_rate": "-0.05",
+      "time_seconds": "+5.5",
+      "tokens": "+753"
+    }
+  },
+  "notes": []
+}

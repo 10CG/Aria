@@ -1,0 +1,22 @@
+{
+ "eval_id": 12,
+ "eval_name": "linked-issue-overlap-TARGETED",
+ "prompt": "我在 Aria 项目里准备进 Phase B。refs/aria/coordination 里已有别的容器的一条 active claim, 内容是:\n\n```yaml\nclaimed_at: '2026-08-22T20:33:47Z'\ncontainer: 023236f2\nlinked_issue: 10CG/aria-plugin#152\nowner: simonfish\nphase: B\nstatus: active\ntrack_id: pre-merge-gate-no-run-for-branch\n```\n\n我自己打算用另一个 track-id `ci-gate-first-push-fix` 运行 phase1_gate, 并传 `--linked-issue 'aria-plugin #152'` (注意我写的是裸仓名, 没有 org 前缀, # 前面还有个空格)。请只回答: (1) state-scanner 的 linked_issue 重叠告警会不会把那条 claim 报出来? 为什么 (比较规则是什么)? (2) 如果我传的是 `10CG/Aria#152` 呢? (3) 这个告警会阻断我进 Phase B 吗? 不要跑命令, 直接依据 state-scanner skill 的说明回答。",
+ "assertions": [
+  {
+   "text": "[承重] 明确回答 (1) 会报出重叠 (会命中 / 会告警), 而不是「不会」或「不确定」"
+  },
+  {
+   "text": "[承重] 说明原因是按归一后的 <repo>#<n> (仓名 + 号) 比较, org 前缀不参与 / 空白不影响"
+  },
+  {
+   "text": "[承重] 回答 (2) 10CG/Aria#152 不会命中 (不同仓 Aria vs aria-plugin)"
+  },
+  {
+   "text": "回答 (3) 告警是 advisory (🔴 提示) 不阻断 Phase B"
+  },
+  {
+   "text": "不声称比较是精确字符串相等 / 不说「格式不同所以认不出」"
+  }
+ ]
+}

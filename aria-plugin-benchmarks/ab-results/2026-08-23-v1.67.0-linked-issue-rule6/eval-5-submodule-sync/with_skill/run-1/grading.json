@@ -1,0 +1,40 @@
+{
+ "expectations": [
+  {
+   "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+   "passed": true,
+   "evidence": "'🔄 同步状态' 表逐列 standards / aria-orchestrator / aria"
+  },
+  {
+   "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+   "passed": true,
+   "evidence": "表列 '主仓记录 (tree) / 本地检出 (head) / 远程 master' 三方比较; fallback 未被触发不可验证"
+  },
+  {
+   "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+   "passed": true,
+   "evidence": "aria 落后 15 commits 检出; 提及 'scan.py 的 drift hint 是 git submodule update --remote aria' 并解释为何本场景改用 merge"
+  },
+  {
+   "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+   "passed": false,
+   "evidence": "答案自述 'Phase 0.5 已对 ... 8 条 leg 全部 fetch 成功' — 扫描执行了 fetch, 未走读 FETCH_HEAD age 路径"
+  },
+  {
+   "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+   "passed": false,
+   "evidence": "未提及 origin/HEAD 四级 fallback"
+  },
+  {
+   "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+   "passed": true,
+   "evidence": "exit 10 软错误 (snapshot_consistency) 下 snapshot 仍可用, 其余区块照常输出"
+  }
+ ],
+ "summary": {
+  "passed": 4,
+  "failed": 2,
+  "total": 6,
+  "pass_rate": 0.6666666666666666
+ }
+}

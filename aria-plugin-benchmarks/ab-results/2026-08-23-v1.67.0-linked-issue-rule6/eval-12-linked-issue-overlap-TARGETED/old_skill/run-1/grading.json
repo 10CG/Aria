@@ -1,0 +1,35 @@
+{
+ "expectations": [
+  {
+   "text": "[承重] 明确回答 (1) 会报出重叠 (会命中 / 会告警), 而不是「不会」或「不确定」",
+   "passed": false,
+   "evidence": "[承重] '很可能是字面比较 ... 不能指望它把那条 claim 报出来' — 回答为「不会/不确定」"
+  },
+  {
+   "text": "[承重] 说明原因是按归一后的 <repo>#<n> (仓名 + 号) 比较, org 前缀不参与 / 空白不影响",
+   "passed": false,
+   "evidence": "[承重] 'skill 文档没有写比较规则', 未说明归一 <repo>#<n> / org 不参与"
+  },
+  {
+   "text": "[承重] 回答 (2) 10CG/Aria#152 不会命中 (不同仓 Aria vs aria-plugin)",
+   "passed": true,
+   "evidence": "[承重] '不会报。10CG/Aria#152 和 10CG/aria-plugin#152 是两个不同仓库的 issue'"
+  },
+  {
+   "text": "回答 (3) 告警是 advisory (🔴 提示) 不阻断 Phase B",
+   "passed": true,
+   "evidence": "'linked_issue_overlap[] 是 advisory 告警, 渲染为 🔴 提示但不阻断'"
+  },
+  {
+   "text": "不声称比较是精确字符串相等 / 不说「格式不同所以认不出」",
+   "passed": false,
+   "evidence": "'只能按最保守的假设理解: 很可能是字面比较 ... 两个字符串不相等' — 即「格式不同所以认不出」"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 3,
+  "total": 5,
+  "pass_rate": 0.4
+ }
+}

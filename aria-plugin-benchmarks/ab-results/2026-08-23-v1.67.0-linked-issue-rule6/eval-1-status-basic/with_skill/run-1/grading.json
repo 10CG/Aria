@@ -1,0 +1,25 @@
+{
+ "expectations": [
+  {
+   "text": "Output should include Git status information",
+   "passed": true,
+   "evidence": "§1 当前状态: 分支/HEAD 826b356/ahead 0 behind 0/变更文件 2; §8 同步状态"
+  },
+  {
+   "text": "Should provide workflow recommendation",
+   "passed": true,
+   "evidence": "§10 推荐工作流 [1]-[4], 置信度 ~85%"
+  },
+  {
+   "text": "Output should use structured format with sections",
+   "passed": true,
+   "evidence": "编号小节 1-10 + Handoff 感知"
+  }
+ ],
+ "summary": {
+  "passed": 3,
+  "failed": 0,
+  "total": 3,
+  "pass_rate": 1.0
+ }
+}

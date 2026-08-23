@@ -1,0 +1,25 @@
+{
+ "expectations": [
+  {
+   "text": "Should check README.md version against VERSION file or plugin.json",
+   "passed": true,
+   "evidence": "§8 表 A: plugin.json (SOT) 1.66.4 vs aria/README.md 版本行 1.66.4; root README badge v1.66.4"
+  },
+  {
+   "text": "Should mention CHANGELOG date as reference source for date sync",
+   "passed": false,
+   "evidence": "CHANGELOG 只作为版本行 '[1.66.4] - 2026-08-22' 列出, 未把 CHANGELOG 日期说成日期同步的参照源"
+  },
+  {
+   "text": "Should output readme_status section",
+   "passed": true,
+   "evidence": "§8 含 README 版本一致性表 (aria/README.md 版本行, root README badge, i18n translated-from)"
+  }
+ ],
+ "summary": {
+  "passed": 2,
+  "failed": 1,
+  "total": 3,
+  "pass_rate": 0.6666666666666666
+ }
+}
