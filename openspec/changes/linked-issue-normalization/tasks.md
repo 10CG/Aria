@@ -3,7 +3,7 @@
 > **Spec**: [proposal.md](./proposal.md) | **审计轨**: [audit-trail](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)
 > **Level**: 3 | **Status**: 📝 **A.2 + A.3 R2-fix (组 5 按规律重做)** (2026-08-08) — post_planning R1 5/5 REVISE·FAIL → R1-fix → R2 2 PASS/3 REVISE·FAIL; **owner 裁定停止逐条补丁, 按规律重做组 5**; 待 R3 (只审组 5)
 > **Scope**: **跨两仓** — `aria` 子模块 (代码+测试+文档+版本) + 主仓 (gitlink + 版本引用面 + Spec)
-> **ship target**: aria-plugin **v1.66.0** (MINOR — 行为面扩大)
+> **ship target**: aria-plugin **v1.67.0** (MINOR — 行为面扩大)
 
 > **为什么本 Spec 从 Level 2 升 Level 3**: Q5 裁定 (owner 2026-08-06) 要求 `SKILL.md:176` 的 hunk **照跑 AB, 不走 substitute**, 并写明「本条须进 `tasks.md` 作为独立任务」。而本 Spec 当时是 Level 2 (按 CLAUDE.md 只产出 `proposal.md`) ⇒ **owner 亲裁的 Rule #6 处置唯一落地载体不存在** (R3′ 两席独立命中)。本文件解决它 —— 见 **4.1**。
 
@@ -64,7 +64,7 @@
 
 ## 1. 测试先行 (RED) — `aria/skills/state-scanner/tests/test_release_by_track.py`
 
-> 宿主为既有文件; **既有 6 条测试逐字不改**。⚠️ **锚定方式改为内容锚而非行号锚** (post_planning R1 minor): 本组会往同文件插入用例必致行号位移, 故判据是「既有 6 个 test 方法名及其函数体逐字未变」(用 `git diff` 核), 不是「`:206-247` / `:527-575` 区间未变」。
+> 宿主为既有文件; **既有 6 条测试逐字不改**。⚠️ **锚定方式改为内容锚而非行号锚** (post_planning R1 minor): 本组会往同文件插入用例必致行号位移, 故判据是「既有 6 个 test 方法 —— 即 `TestLinkedIssueOverlaps` 的 4 个 (`test_same_issue_different_track_flagged` / `test_same_track_not_flagged` / `test_terminal_and_no_issue_ignored` / `test_none_own_issue_short_circuits`) + `TestPhase1GateLinkedIssueCli` 的 2 个 (`test_linked_issue_written_and_overlap_surfaced` / `test_no_linked_issue_no_overlap_key`) —— 名及其函数体逐字未变; 宿主文件其余 28 个既有 test 方法 (共 34, 基线 `9e6a17c`) 同样逐字未变」(用 `git diff` 核) (R4/completeness-lens M3: 行号锚换内容锚时丢了指称对象, 本版补点名), 不是「`:206-247` / `:527-575` 区间未变」。
 >
 > 每项括注为该项贡献的**子用例场景数**, 全组加总 = **45**, 与 proposal §Impact 的逐条推导独立吻合 (两处任一变动须同批重算)。**「子用例场景」≠ unittest `Ran N` 计数的 test 方法数** —— 一个 test 方法可含多个场景 (本文件既有 `test_invalid_shapes_and_paths` 即 1 方法 4 场景), 故验收**不得**用 `Ran` 数换算, 见 5.1。
 
@@ -124,7 +124,7 @@
 
 ### 现行 — 5.9 起 (取代上方 CANCELLED)
 
-- [ ] 5.9 **aria 子模块版本面** bump 到 v1.66.0 — **按引用点枚举, 不按文件数**
+- [ ] 5.9 **aria 子模块版本面** bump 到 v1.67.0 — **按引用点枚举, 不按文件数**
       > `.claude-plugin/plugin.json` (版本 SOT, 1 点) · `.claude-plugin/marketplace.json` (**2 点**: `:3` 与 `:16` 两个 `version` 字段) · `README.md` · `VERSION` (**append-only 发布账本** —— 只改头部「当前版本」行 + 追加本次发布注, **历史行原样保留**) · `CHANGELOG.md` (**追加**条目, 历史保留)
       > CHANGELOG 与 README 措辞: **不得写成「已覆盖全部别名」** —— basename 截断轴是成文已知限, 写错等于对外抹掉它。
       > MINOR 而非 PATCH (行为面扩大)。
@@ -139,7 +139,7 @@
       > 排除集 (逐条给理由, 成文): `aria/VERSION` + `aria/CHANGELOG.md` (append-only 版本史) · `.aria/audit-reports/**` (审计史) · 本 Spec 目录内的订正留痕行 (自述历史)。
       > ⛔ **任何不在排除集里的新命中即红**; 不许临时往排除集加条目凑绿, 加条目须同批写理由。
       > **为什么换掉文件白名单**: 白名单对**未来新增的版本引用点 fail-OPEN** (修实例不修类), 且逼人去数「两条 check 失明几处」—— R2-fix 写 7, 实为 **10** (漏计 CLAUDE.md 2 + VERSION 1)。整仓差集使这个数**不必算** (R4/completeness-lens 单点最优建议)。
-      > **② 新值计数**: 普通引用文件里 `1.66.0` 出现次数 == 预期点数 (主仓 **14** + aria 侧 **4** = **18**)。只断言旧值缺席是**缺席断言**, 删行或写错新版本号都判绿。
+      > **② 新值计数**: 普通引用文件里 `1.67.0` 出现次数 == 预期点数 (主仓 **14** + aria 侧 **4** = **18**)。只断言旧值缺席是**缺席断言**, 删行或写错新版本号都判绿。
       > **③ append-only 账本** (`aria/VERSION` / `aria/CHANGELOG.md`) 判据不同: (a) **全部**「当前版本」声明 == `plugin.json` **且** (b) **文件行数不减**。
       > ⚠️ (a) 写「**全部**」而非「头部」是因为 **`aria/VERSION:56-59` 有第二处当前版本声明** (`## 版本号` 围栏块), 实读 **`1.47.0`** —— 陈旧 18 版, 正是 aria-report **#158** 版本字段污染的那个冻结串。该块的陈旧属 pre-existing 缺陷, 不在本 Spec 范围, 但实施者须知道它存在。
       > ⚠️ (b) 用「行数不减」而非「旧值命中数 ≥N」: **R4 实测保留形态不一致** (`1.65.4` 0 次 · `1.65.3` 0 次 · `1.65.2`/`1.65.1`/`1.64.0` 各 1 次) ⇒ 任何基于旧值命中数的阈值都会对某些 bump **恒红**。R3-fix 写 ≥2、R4 中途写 ≥1, **同一处三次踩同一个坑** —— 每次都是在「修恒红」的编辑里造新恒红 (memory `feedback_fix_recurs_in_its_own_fallback_path`)。
@@ -148,7 +148,7 @@
 
 - [ ] 5.12 **`.aria/repro/sc-baseline-linked-issue-normalization.py` 处置** — 不得留成恒红
       > 该脚本 `:275-277` 断言那 8 条 SC 处于 **baseline-failing (红)**; 2.2 落地后它们转绿 ⇒ **恒红**。且它从 `proposal.md` **现场解析** (`:205-215` FATAL fail-CLOSED) ⇒ Spec 归档后**换一种恒红**。两条失效路径都要处理。
-      > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同时修 `proposal.md:181/:219` 两处 artifact 指针**避免 dangling。
+      > 两条路择一并在脚本顶部成文: **(a)** 加 post-implementation 模式, 断言那 8 条**已转绿**, 并把 baseline 结果冻成同目录存档 (需同时解决归档后解析路径问题); **(b)** 显式退役, baseline 结果冻成带 SHA 的存档报告、脚本移出 `.aria/repro/`, **同批修全部交付面引用**避免 dangling —— 口径 = `git grep -l "sc-baseline-linked-issue-normalization"` 的结果减去 append-only 史 (`.aria/audit-reports/*` / `docs/handoff/*` / 脚本自身), 08-08 实测 = `proposal.md` (3 行) + `tasks.md` + `detailed-tasks.yaml` (2 处) 三个文件 (R4/completeness-lens M7: 原只枚举 proposal.md)。
       > 恒红与假绿同为零信息量 (memory `feedback_false_green_dual_is_permanent_red`) —— 本 Spec 全程在打这个对偶, 不能自己留一个。
 
 - [ ] 5.13 **交付 `phase-c-integrator`** —— **只委派 PR 与 pre-merge 闸门, 不委派合并动作**
@@ -158,7 +158,7 @@
       > **两件事正交, 不是二选一**: 「**谁执行合并**」(硬约束 1: 本地 vs 服务端) 与「**哪个闸门批准合并**」(Rule #8 CI 状态) 互不替代。R2/N1 把二者混成一件, owner 据此裁定的「删任务改委派」因此只解决了后者。本版**两者都要**。
       > 验收: (1) **5.15 已完成** (子模块已本地合并双推、主仓 gitlink 已 bump); (2) 交接时显式告知该状态。
       > ⛔ **真实阻塞 (R4/delegation-lens C2)**: `phase-c-integrator` **没有 gate-only 形态** —— C.2.4 的触发条件逐字是「即将调用 branch-manager merge action」, green 后 `:253` 直接调用它, 而 merge 的唯一实现是服务端 `Do: merge`。⇒ 「只要闸门不要合并」**在现有工具里不可实现**。**在 aria-plugin #136 落地前, 5.15 的合并只能由 owner 手工本地执行, pre-merge gate 需单独调用。**
-      > ⚠️ **委派的闸门两条腿对本 Spec 都不触发且都失败为绿 (R4/delegation-lens C3, 已开 aria-plugin #137)**: (a) 两仓 workflow 的 `paths` 只覆盖 `issue-triage`/`docker` ⇒ `not_applicable` ⇒ PR CI 步跳过; (b) `pre_merge_gate.py:427` 的 `--main-branch` **缺省 `"main"` 而本项目是 `master`** ⇒ 实跑返回 `{"runs":[]}` RC=0 ⇒「main 无 in-flight」**恒真**。⇒ 调用时**必须显式** `--main-branch master` 并核验它真查到了 master。
+      > ⚠️ **委派的闸门两条腿对本 Spec 都不触发且都失败为绿 (R4/delegation-lens C3, 已开 aria-plugin #137)**: (a) 两仓 workflow 的 `paths` 只覆盖 `issue-triage`/`docker` ⇒ `not_applicable` ⇒ PR CI 步跳过; (b) `pre_merge_gate.py:427` 的 `--main-branch` **缺省 `"main"` 而本项目是 `master`** ⇒ 实跑返回 `{"runs":[]}` RC=0 ⇒「main 无 in-flight」**恒真**。⇒ 调用时**必须显式** `--main-branch master` 并核验它真查到了 master。**2026-08-22 更新**: #137 已修 (v1.66.0, 分支存在性核验 fail-CLOSED, 缺省仍 main) ⇒ (b) 腿恒真解除; (a) 腿由并发轨 aria-plugin#152 处理。
 
 
 - [ ] 5.14 **Rule #6 AB 门范围披露** (AI 建议走此路, **待 owner 确认**) — 与 4.1 同批, 早于 5.13
@@ -184,7 +184,7 @@
 | `.aria/repro/mutation-sweep-*.py` | 「11 个维度」只枚举 `normalize()` **函数内部**旗标; 规则 4 回落分支、`org` 处理、`int` 十进制比较、空 basename 判定**未参数化** (实测这 4 个都已被现有 SC 杀死, 不是覆盖洞, 但「枚举完」的措辞不成立) | 它的 exit 0 **不等于**穷尽。新增归一逻辑时须手工判断是否引入新维度 |
 | 同上 · `UNOBSERVABLE` 字典 | 两条「行为不可观测」条款 (规则 1 对 `left` 的 strip · D7 的 4300 位上界) 是**硬编码 fail-OPEN 豁免**, 且其支撑实证 (「47,211 候选串零差异」) **在仓里无可执行产物** —— 结论经三席各自独立复现为真, 但留证方式不可复核 | 若归一流程改动使这两维变得可观测而无 SC 杀它, 脚本仍会打绿 |
 
-**⇒ 三件工具的定位是「便宜的辅助」, 不是「机械闸门」。** 唯一可当作证据的是 `sc-baseline-*.py` —— **但见 5.8: 它在实现落地后会恒红, 必须处置。**
+**⇒ 三件工具的定位是「便宜的辅助」, 不是「机械闸门」。** 唯一可当作证据的是 `sc-baseline-*.py` —— **但见 5.12 (原 5.8 已 CANCELLED, 由 5.12 承接): 它在实现落地后会恒红, 必须处置。**
 
 **⛔ 同样不要在 Phase B 逐条修 R3′ 的 24 条残留** —— 那是拐点后的循环 (memory `feedback_audit_marginal_return_goes_negative`)。
 

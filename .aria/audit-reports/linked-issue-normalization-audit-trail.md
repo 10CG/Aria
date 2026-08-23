@@ -291,3 +291,14 @@ R1 编辑清单 (`.aria/audit-reports/post_spec-R1-fix-editlist-linked-issue-nor
 > - **R2 的口径其实更贴近 `--linked-issue` 的真实取值** (它量的是 issue 引用形态), 这也是为什么不能把它当作被推翻。
 
 > **移出时状态**: 250 文件口径的 735/16 在 `git archive 65f17de` 下可精确复现; 而工作树 HEAD 的值三轮各不同 (738/18 → 740/20 → 739/19), 印证「自指语料只能钉 SHA, 不能钉值」。
+
+---
+
+## 9. post_planning R1–R4 (2026-08-08) 与 owner 2026-08-22 裁定 R5 加轮
+
+> 追记 (2026-08-22, 容器 bfe8285d)。R1–R4 本体见 `.aria/audit-reports/post_planning-R{1..4}-*-linked-issue-normalization-*.md` 与 handoff `2026-08-08-post-planning-four-rounds-and-three-cross-repo-transfers.md`。
+
+- R1 5/5 FAIL (3C+12M) → R2 FAIL (2C+11M, owner 裁整组重做组 5) → R3 5/5 FAIL (2C+7M, 两 C 均 R2-fix 造) → R4 两席新鲜眼睛 FAIL (4+2C, 全为前三轮 15 席漏掉) → R4-fix `97a3885`。`max_rounds=4` 耗尽, 停 14 天。
+- **owner 2026-08-22 裁定: 加 1 轮 R5** (`max_rounds` 4→5, 沿 R4 两席新鲜眼睛先例), 而非 override 进 B。
+- **R5 前机械收口** (主仓本 commit): ship target v1.66.0→**v1.67.0** (1.66.x 已被 #137/#128/#181/#179 占满, #152 预占 v1.66.5; MINOR 口径沿 Spec 自判, PATCH 则 v1.66.6 请 owner 复议) · **R4 C3 解除** (aria-plugin#137 已于 v1.66.0 修, 分支存在性 fail-CLOSED, 缺省仍 main) · R4 剩余 M3 (6 个既有 test 逐名点名, 宿主 34 个) / M5 (TASK-013/025/027 deliverables 补 verification 强制改动文件) / M7 (dangling 指针枚举改 `git grep` 口径) / 5.8→5.12 指针 · `scope_repos[].head` 刷到 aria `9e6a17c` / 主仓 `084209f`。M2 (真并行组 1/32) R4-fix 已改措辞, 未重枚举。
+- **R4 C2 (aria-plugin#136 无 gate-only 形态) 仍 open**: 对本 change 的实际后果 = 子模块合并按 CLAUDE.md 硬约束 1 本地手工 + gate 单独调 (TASK-028 已如此成文), 不阻塞 B。

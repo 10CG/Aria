@@ -61,7 +61,7 @@
   "_comment": "Step-by-step rollout (DEC-20260519-001). post_spec enabled 2026-05-19. post_planning enabled 2026-07-04 per DEC-20260704-001 (mid_post_spec dogfood on a concurrent A.3 draft found a per-artifact transcription drift + a shared spec-wording drift → post_planning audits A.2/A.3). Remaining checkpoints kept off until dogfood-verified; mid_post_spec deferred pending a Phase-B SMOKE-triggered dogfood. **AI 不得自行豁免已 enabled 的 checkpoint** (CLAUDE.md 规则 #10, owner 决策 2026-07-19): 「Spec 小 / 任务是已审 SC 的 1:1 派生 / 性价比不高」不构成跳过理由 —— 跳过即销毁标签, 无法事后判定该跳是否正确; 便宜的准确率跟踪 (没出事=判断对) 对「跳错但未浮出」结构性失明。豁免只能来自本文件显式 off / adaptive_rules / hotfix lane / checkpoint 结构性前提不成立。",
   "enabled": true,
   "mode": "convergence",
-  "max_rounds": 4,
+  "max_rounds": 5,
   "checkpoints": {
    "post_brainstorm": "off",
    "post_spec": "convergence",

@@ -1,11 +1,11 @@
 # Proposal: linked-issue-normalization
 
-> **Status**: 📝 **Draft (A.1)** — post_spec 已跑 R1′/R2′/R3′ 三轮 (均 5/5 REVISE); 三轮实测**算法本体零问题**, 缺陷集中在证据层与文档一致性层
+> **Status**: 📝 **Draft (A.3 done, post_planning 未收敛)** — post_spec R1/R1′/R2′/R3′ 四轮 (均 REVISE, 算法本体零问题) → owner 2026-08-07 切分交付面/审计史 → A.2/A.3 2026-08-08 → post_planning R1→R4 全 FAIL (`max_rounds=4` 耗尽, 拐点形态) → **owner 2026-08-22 裁定加 1 轮 R5 (max_rounds 4→5, 两席新鲜眼睛)**; R5 前机械收口已落 (ship target 改 v1.67.0 / #137 已修 C3 解除 / R4 剩余 M3·M5·M7·5.8 指针 / scope_repos head 刷新)
 > **Created**: 2026-08-02 | **重构**: 2026-08-07 (owner 裁定: 交付面与审计史切开)
 > **Spec Level**: **3** (原 2; R3′ 因 Q5 的 AB 任务需 `tasks.md` 承载而升级 — 单域 — `lib/collision.py` 的一个比较谓词 + 一个导出单元)
 > **关联 Issue**: 无
 > **代码落点**: `aria/` 子模块 `skills/state-scanner/`; Spec 落主仓 (Rule #5)
-> **ship target**: aria-plugin v1.66.0 (MINOR — 行为面扩大)
+> **ship target**: aria-plugin v1.67.0 (MINOR — 行为面扩大)。*2026-08-22 改: 原写 v1.66.0, 已被 #137 占用; 1.66.x 现已到 v1.66.4 (并发轨 #152 预占 v1.66.5)。按本 Spec 自判 MINOR ⇒ v1.67.0; **若 owner 改判 PATCH (谓词 bug 修复) 则为 v1.66.6, 请复议**。*
 
 > **📌 本文件只规定「要建什么」。** 「规定是怎么来的」(三轮审计轨迹 / 总体定义与判族 / 未审表面清单 / 跨 Spec 裁定史 / 全部订正留痕) 已于 2026-08-07 整体移出至 **[审计轨](../../../.aria/audit-reports/linked-issue-normalization-audit-trail.md)**。
 >
@@ -269,7 +269,7 @@ if c.linked_issue != own_linked_issue:
 | `skills/state-scanner/tests/test_release_by_track.py` (既有宿主) | 扩展 — **SC-1 / 1b / 2 / 3 / 4 / 5 / 5b / 5c / 6 / 6b / 10 / 11 / 12 / 13 / 14 / 15 / 9** (17 条); 既有 6 条 (`:206-247` 4 条 + `:527-575` 2 条) 逐字不改, 回归由全量套件承担 |
 | `skills/state-scanner/SKILL.md:176` | 文案同步 — 「同 issue 不同 track-id 的『同一件事两个名字』」补「(按归一后的 `<repo>#<n>` 比较, org 不参与)」。**纯事实勘正 hunk, 见 rule6_note 的逐 hunk 判定** (U-2 裁定方案 A) |
 | **发版同步面 (R3-fix 2026-08-08: 改为**版本引用点**口径 — 原「文件数」口径经 post_planning R1 Critical 实测漏 7 处)** | **普通引用文件 18 个引用点**: 主仓 14 (`README.md` badge + `Plugin Version:` 行 = 2 · `README.{zh,ja,ko}.md` 各 translated-from + badge + `Plugin Version:` 行 = 9 · `CLAUDE.md` 版本区间行 + 「版本:」行 = 2 · `VERSION` 子模块表行 = 1) + aria 侧 4 (`plugin.json` 1 · `marketplace.json` **2** 个 version 字段 · `aria/README.md` 1); **append-only 账本 2 个** (`aria/VERSION` / `aria/CHANGELOG.md`) 判据不同 —— 头部当前版本行 == SOT **且旧值命中数不减**, 不做零命中; 外加主仓 **gitlink** (非文本引用)。**⛔ 两条 enabled custom check 不是机械兜底**: `m6-version-badge-match` 只比 `README.md` 的 badge, `i18n-readme-translation-currency` 只比 `translated-from` 标记 ⇒ **7 处**残留旧版本时二者仍全绿 = 假绿。齐备性判据见 `tasks.md` **5.11** 的双向断言。类级根因 (`CLAUDE.md:81` 同款错误清单) 已开 **Aria #177**。 |
-| 版本号 | v1.66.0 **MINOR** (行为面扩大 —— 原本漏报的现在能报出来; rule6_note 引的先例 v1.65.2 是 PATCH, 因其为纯脚本修复无行为面扩大) |
+| 版本号 | v1.67.0 **MINOR** (行为面扩大 —— 原本漏报的现在能报出来; rule6_note 引的先例 v1.65.2 是 PATCH, 因其为纯脚本修复无行为面扩大) |
 
 测试基线: state-scanner 现 **1322** tests, 本 change 新增按 SC 子用例下界 **≥45**。全量跨 skill 套件须绿 (`run_all_tests.sh`)。
 
