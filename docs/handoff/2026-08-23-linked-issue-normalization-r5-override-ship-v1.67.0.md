@@ -34,7 +34,9 @@ updated-at: 2026-08-23T10:40:00Z
 
 ## §2 未完成 / Carry-forward 清单 (AI 内省, load-bearing)
 
-- 🟡 **Level 1 hotfix 待排期 (code-reviewer Important)**: `aria/skills/state-scanner/tests/test_release_by_track.py` 两个新 class (`TestLinkedIssueNormalizationSC` / `TestNormalizeLinkedIssueContract`) 位于 `if __name__ == "__main__": unittest.main()` 之后 ⇒ 直接 `python3 test_release_by_track.py` 只跑 34 条 (官方 `run_tests.py` / `run_all_tests.sh` / discover 走 import, 53 条都跑, CI 不受影响)。修法 = 纯移动两个 class 到 main 守卫之前。**建议并入下一次 aria PATCH 而非单独发版** (22 个版本引用点的同步成本 > 收益); 若 owner 要求独立 hotfix 则 v1.67.1。
+- ✅ **Level 1 hotfix 已修 (2026-08-23 当日, 未发版)**: `aria/skills/state-scanner/tests/test_release_by_track.py` 两个新 class 已移到 `if __name__ == "__main__"` 守卫之前 (aria master `e1be8f3`, 双端已推)。两条调用路径实测均 `Ran 53 OK`; `run_all_tests.sh` 7 OK / 0 FAIL (1693 tests)。**未 bump 版本、未 bump 主仓 gitlink** —— 随下一次 aria PATCH 的发版同步面自动带出。
+  > ⚠️ **给下一个发版者**: aria `master` (`e1be8f3`) 比主仓 gitlink (`58a49e7` = v1.67.1) 领先 1 个纯测试布局 commit。下次 bump gitlink 时会连带发出, CHANGELOG 请顺手提一句 (本条 commit message 已自述)。
+  > 📌 时序: 本 hotfix 原计划「并入下一 PATCH」, 但并发轨 023236f2 在本 session 尾声先 ship 了 **v1.67.1** (state-scanner 四缺陷批 #134/#149/#151/#155, gitlink `ca52d1c→58a49e7`), 其改动面未碰本文件 ⇒ 错过那班车, 故当日直接落 master 等下一班。
 - 🟡 code-reviewer Minor: CHANGELOG 1.67.0 条目「Aria#177 相关」措辞易误读 (应为「版本面校验类级根因见 #177」); `vdiff.sh` 硬编码仓路径; `.git` 后缀仓名译码为 `repo-git` (规则 3 推论, 非 bug)。随上条一起。
 - 🟡 **aria-plugin#157 / aria-standards#17** 新立案待 owner 排期 (套件 Layer L 段零覆盖 / AB lane convention)。
 - 🟡 **aria-plugin#137 在 Forgejo 仍 open** 但 v1.66.0 已修 (分支存在性 fail-CLOSED); #136 仍 open (phase-c-integrator 无 gate-only 形态, 本轨按硬约束 1 手工本地合并绕过)。建议关 #137。
@@ -97,7 +99,13 @@ updated-at: 2026-08-23T10:40:00Z
 
 ## §6 Next session 入口 + 优先级建议
 
-`/aria:state-scanner`。本轨终结。候选: (1) Level 1 hotfix (§2 首条, 建议并入下一 PATCH); (2) ~~关 aria-plugin#137~~ **已关 (2026-08-23)**; (3) 上 session carry —— **#179 三项已结** (见 §2 owner 复议闭环), 余 #182 / #184; (4) 主项目版本 1.7.3 vs 1.7.5 漂移 (Level 1 doc); (5) **SC-8 判据方差**待 owner 定方向 (见 §2 末条)。并发轨 023236f2 在做 a1-entry + state-scanner issue batch, 起任何 state-scanner 改动前先 fetch 三面 + 读其 handoff。
+`/aria:state-scanner`。本轨终结, **本 session 的 carry 已全部落地或转交**:
+
+- ~~(1) Level 1 hotfix~~ ✅ 已修 (aria master `e1be8f3`, 未发版, 见 §2 首条)
+- ~~(2) 关 aria-plugin#137~~ ✅ 已关 (2026-08-23, 留 v1.66.0 修复证据)
+- ~~(3) #179 三项复议~~ ✅ 已结 (见 §2 owner 复议闭环)
+- **余待 owner 定方向**: (a) **SC-8 判据方差** — 六次跨度 0.8%–83%, 空载这次 +47.2% 距闸仅 2.8pp, 三个加固方向见 §2 末条; (b) 主项目版本 `1.7.3` vs root `VERSION` 头 `1.7.5` 漂移 (Level 1 doc); (c) #182 (handoff status 收口) / #184 (brainstorm 被绕过) 未动。
+- **并发轨 (023236f2)**: 本 session 尾声 ship **v1.67.1** (state-scanner 四缺陷批 #134/#149/#151/#155) + a1-entry rework 走到 post_spec R2 未收敛 → owner 裁 (iii) 撤/方向 b 缩 scope。起任何 state-scanner 改动前先 fetch 三面 + 读其 [2026-08-23 会话收尾](./2026-08-23-session-close-v1.67.1-batch-and-a1-entry-r2-direction-b.md)。并发轨 023236f2 在做 a1-entry + state-scanner issue batch, 起任何 state-scanner 改动前先 fetch 三面 + 读其 handoff。
 
 ## §7 提交清单 (commit hash + multi-remote parity)
 
