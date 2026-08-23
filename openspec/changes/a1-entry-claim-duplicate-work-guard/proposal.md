@@ -1,11 +1,11 @@
 # Proposal: a1-entry-claim-duplicate-work-guard
 
-> **Status**: 📝 **Draft (rewrite v2 + R1-fix + 两阻塞项已裁)** — **C1/C2 owner 裁定 2026-08-22 已下** (C1=(a) 扩 allowed-tools / C2=(ii)+(iii) heartbeat 挂 state-scanner 入口编排层 + STALE_TTL 30min→24h 量级): 待 rework 把两裁定落版 (§2.2/§3/阻塞性前提三处 + Impact 表补 allowed-tools 变更面) 后进 A.2
+> **Status**: 📝 **Draft (rewrite v2 + R1-fix + C1/C2 落版 + rework r1–r3)** — **post_spec R2 (2026-08-23, 5 席) REVISE 未收敛**: 3 critical 簇 (C-A §1 抽取规则 defer 恒红 [R1 遗留] / C-B track-id 无方向区分 release 连坐 [R1 遗留升级] / C-C A.1 track-id 含容器段与 Phase B/D carry-id 不一致 [新]) + 17 major 簇 (与 R1 持平; CR 实核 R1-fix editlist 12 项未落) — **待 owner 方向裁定** (换人执笔一次性清 R1 editlist + 三 critical 后 R3 / 缩 scope 拆 §4 探针与 §1 抽取规则 / (iii) 维持或撤销), 见 `.aria/audit-reports/post_spec-R2-1787481000000-a1-entry-claim-rewrite-aggregated.md` §处置建议 与本文 §2.2「请 owner 复议」。AI 不自行选。
 > **Created**: 2026-07-30 · **重写**: 2026-08-02
 > **Spec Level**: 2
 > **代码落点**: `aria/` 子模块; Spec 落主仓 (Rule #5)
-> **ship target**: 待定 (v1.66.0 已由 [`linked-issue-normalization`](../linked-issue-normalization/proposal.md) 认领)
-> **前置依赖**: **[`linked-issue-normalization`](../linked-issue-normalization/proposal.md) 必须先 ship** —— 本 Spec 的 overlap 检测建立在它的归一之上; 它不落地则主机制在真实语料上恒漏报。
+> **ship target**: 待定
+> **前置依赖**: **[`linked-issue-normalization`](../linked-issue-normalization/proposal.md) 已 ship** (**R1 rework 核验订正**: 原文写「v1.66.0 已认领」, 实际以 **v1.67.0** 合并提交 `ca52d1c` 于 **2026-08-23T09:14:07Z** 合入 `origin/master`, 早于本文件本轮修订落盘) —— 前置依赖已满足, 本 Spec 的 overlap 检测可建立在其归一之上; `linked_issue_overlaps` 三参数签名未变 (详见「事实断言逐条实读清单」#16)。
 
 > ## 📌 这是一次**重写**, 不是修订
 >
@@ -134,20 +134,33 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > **session_id 落盘复用方案判否** —— 被本方案取代, 且引入并发/过期新面。
 > **冗余**: 每次调 `phase1_gate` 都写一条新 claim (生产 ref 实证 27+ 条) ⇒ 再调即自然续期。但它依赖「AI 记得再调」—— 而那正是本 Spec 存在的理由 ⇒ **heartbeat 为主, 再调作冗余, 不可只靠后者**。
 
-> ## ⛔ 未决项 (R1-fix/C2 — 3 席命中): **换了匹配键, 但没说谁调、什么时机调**
+> ## ✅ 已定项 (R1-fix/C2 — 3 席命中 → 2026-08-22 owner 裁定落版): **谁调、什么时机调**
 >
 > `heartbeat()` 的**生产调用点仍为 0** (`constants.py:43-44` 自陈:「NO production heartbeat loop exists」)。**换匹配键不产生刷新者** ⇒ 保护窗实质仍是 24h ⇒ **SC-5~7 可以全绿而问题原样存在**。
 >
-> **spike S1 §6 明确把「谁在什么时机调」交还给 Spec** (「属 Spec 范围不属 spike」), 而重写**没有接住**。
+> **spike S1 §6 明确把「谁在什么时机调」交还给 Spec** (「属 Spec 范围不属 spike」), 而重写当时**没有接住**, 转 owner 裁定。**以下逐字取自 `git show 86540f2:openspec/changes/a1-entry-claim-duplicate-work-guard/proposal.md`** (R1 rework 核验 major-3 订正 —— 上一轮此处曾被整段删除换成 AI 转述且与原文有实质偏差, 未请复议; 现按硬约束恢复原文字面, 不再转述):
 >
-> **且判否「再调 phase1_gate」的理由原样适用于 heartbeat** —— 若 heartbeat 也靠 AI 记得调, 两者没有区别。⇒ **必须给它一个不依赖 AI 记性的触发点**, 候选:
-> - (i) 挂在 A.1 内已有的**机械步骤**上 (如每次写 proposal 文件后), 由 skill 指令强制;
-> - (ii) 挂在 `state-scanner` 的 Phase 0.5/1.16 (它每次 `/state-scanner` 必跑, 且已在 coordination 链路上);
-> - (iii) 承认做不到, 改走延长 TTL 并量化 sweep 语义代价 (spike S1 的选项 c)。
+> > **✅ owner 裁定 (2026-08-22): 采 (ii)+(iii) 组合** —— heartbeat 挂 state-scanner 入口的 **AI 编排层** (scan.py collector 保持只读, 与 phase1_gate B-entry 既有挂法同构; 每次 `/state-scanner` 必跑, 不依赖 AI 记性); 同时 `STALE_TTL` 30min → **24h 量级**收窄版兜底, 使「漏跑一次扫描」不至于立即暴露在 `--sweep-stale` 下。落版义务: (ii) 的挂载点写进 state-scanner SKILL.md 编排契约 + (iii) 的 TTL 变更量化 sweep 语义代价 (spike S1 选项 c 的评估框架); 关联 Aria#180 (heartbeat 零调用) 由本裁定一并解。
 >
-> **A.2 前必须定死其一。** 在此之前 §2.2 只是「把匹配键修对了」, 不构成保护窗的解决方案。**这也是 §2.3 的 `--sweep-stale` 风险 (C5) 是否升级为数据面风险的判定条件。**
+> **落版 (AI, 2026-08-23)** ((i) 见下方「候选 (i) 未采纳」, 以下 (ii)/(iii) 即本节落版):
 >
-> **✅ owner 裁定 (2026-08-22): 采 (ii)+(iii) 组合** —— heartbeat 挂 state-scanner 入口的 **AI 编排层** (scan.py collector 保持只读, 与 phase1_gate B-entry 既有挂法同构; 每次 `/state-scanner` 必跑, 不依赖 AI 记性); 同时 `STALE_TTL` 30min → **24h 量级**收窄版兜底, 使「漏跑一次扫描」不至于立即暴露在 `--sweep-stale` 下。落版义务: (ii) 的挂载点写进 state-scanner SKILL.md 编排契约 + (iii) 的 TTL 变更量化 sweep 语义代价 (spike S1 选项 c 的评估框架); 关联 Aria#180 (heartbeat 零调用) 由本裁定一并解。
+> **(ii) 调用点 = `state-scanner` 入口的 AI 编排层, 每次 `/state-scanner` 必跑**:
+> - **具体 CLI 入口 (R1 rework 核验 major-1 补钉)**: 「AI 编排层调用 heartbeat CLI」原文未点名具体入口, 现定为 `skills/state-scanner/scripts/phase1_gate.py` 新增 **`--heartbeat-only` 模式** —— 复用其既有 identity/fetch/push 管道; 只刷新**本容器本 track** 的 `heartbeat_at`, **不写新 claim, 不判碰撞** (与 A.1 acquire 调用是同一 CLI 文件下的两个独立模式)。若 A.2 落地时改为独立脚本 `scripts/heartbeat_gate.py`, 亦属同一变更面 (已按此登记进 Impact 表, 见下方)。自本条起, 本节及 SC-21 提到的「heartbeat CLI」均特指该入口;
+> - **既有同构先例**: `phase1_gate` 的 Phase B-entry 挂法就是这个模式 —— **实读** `skills/state-scanner/SKILL.md:149`「接线点 = AI 编排层, 不是 `scan.py`」+ `references/layer-l-integration.md:15`「Design A 条件触发: 闸门仅在用户确认要进入 Phase B 时调用, 不在 scan.py 内自动执行」。heartbeat 挂同一层 (AI 编排层调用 `--heartbeat-only`, collector 内不跑), `skills/state-scanner/scripts/scan.py` 的 collector 逻辑**保持只读, 零改动**;
+> - **与 B-entry 的关键差异**: B-entry 是**条件触发** (`coordination.enabled==true` 且 `tracks_multibranch.collision.kind` 非空才调); heartbeat 是**无条件** —— 只要本会话在 coordination ref 里持有 active claim, **每次 `/state-scanner` 被调用都刷新**, 不依赖碰撞检测结果 (它是维持性动作, 不是碰撞响应动作);
+> - **落点**: `skills/state-scanner/SKILL.md` 的 Layer L Phase B 集成段 (`:143-178` 一带) 新增对称的「Layer L A.1 heartbeat 集成」小节, 写明触发条件/调用形态 (`--heartbeat-only`) /失败处置 (fail-soft, 不阻断 `/state-scanner` 主流程);
+> - 关联 Aria#180 (heartbeat 零调用) 由本裁定一并解。
+>
+> **(iii) `STALE_TTL` 30min → 24h 量级** —— **实读落点 = `lib/constants.py:36`** (`STALE_TTL: int = 1800  # seconds`)。
+> - **⚠️ 事实订正 (rework, 主控实读 aria@cb6bd5d)**: §2.3 原版称「所有 claim 在 `STALE_TTL`=30min 后即 stale ⇒ `--sweep-stale` 对几乎所有并发轨可达」, **这条因果链不成立**。实读 `lib/gc.py:341`—— `sweep_stale_active` 的 `stale_ttl_seconds` 默认值是 **`SWEEP_TTL`** (`lib/constants.py:51`, 86400s/24h), **不是** `STALE_TTL`; 且 `release_gate.py:141`(`sweep_stale_active(repo, now=ts)`) **未传** `stale_ttl_seconds` 覆盖, 故 `--sweep-stale` 的实际清扫阈值从来就是 24h, 与 `STALE_TTL` 的取值**无关**。`STALE_TTL` 实际控制的是 `reconcile._is_stale()` (`lib/reconcile.py:154-163`) 判定的「takeover-eligible」软信号 —— advisory、可在下次 read 时逆转 (`lib/constants.py:40-42` 逐字), 与 `--sweep-stale` 的**不可逆**改写是两回事。⇒ `release_gate.py:225` 的 help 文本 (`「顺带扫描: active 且 heartbeat 超 STALE_TTL → abandoned」`) 与 `state-scanner/SKILL.md:176` 的同款描述本身用词不准 (把 `SWEEP_TTL` 的行为记成了 `STALE_TTL`) —— 本 Spec 沿用了这处不准确描述, 现订正; 文档措辞本身的勘正**不在本 Spec 变更面** (非目标, 留 follow-up)。
+> - **落版后的准确效果**: `STALE_TTL` 30min→24h 把 reconcile 的「stale/可 takeover」软信号窗口, 从「30min 未刷新即标 stale」**放宽**对齐到与 `SWEEP_TTL` 同量级 (owner 采 (iii) 的**收窄版**: 只到 24h, 不无限延长 —— 「收窄」修饰的是 (iii) 候选本身相对「无限延长」的克制, 不是 `STALE_TTL` 数值方向; `STALE_TTL` 数值本身是**放宽/变大**) —— 不再出现「heartbeat 编排层偶尔漏跑一次 (\<24h) 就被判 takeover-eligible」的假阳性。`--sweep-stale` 的**破坏性**清扫窗口本就是 24h, 不因本次改动而变。两个信号收敛到同一量级后, **残余风险**: 若 (ii) 的 `/state-scanner` 编排层调用**连续缺席超过 ~24h** (即 `SWEEP_TTL`), claim 仍会被 (a) reconcile 标 takeover-eligible 且 (b) `--sweep-stale` 清成 `abandoned` —— 但只要两次 `/state-scanner` 间隔 **≤24h**, claim 不 stale, 也不进 sweep 候选;
+> - **不变量注释处置** (R1 rework 核验 minor-1 改标题 —— 原标题「TTL 变更量化的 sweep 语义代价」与内容不符: 内容讲的是常量注释同步, 不是 sweep 代价): `lib/constants.py:32` 现有注释断言不变量「`STALE_TTL == 3 × HEARTBEAT_INTERVAL`」(`HEARTBEAT_INTERVAL=600s`, `:28`) —— 若只改 `STALE_TTL` 不动 `HEARTBEAT_INTERVAL`, 该注释所述不变量将不再成立, 须在 B 阶段二选一: 显式改写注释承认「不变量在 heartbeat 编排层落地后已由『AI 编排层调用节律』替代『HEARTBEAT_INTERVAL 常量』」, 或按比例调 `HEARTBEAT_INTERVAL`。**sweep 语义代价 = 0**(阈值是 `SWEEP_TTL`, 见上方「落版后的准确效果」) —— 这里唯一要处理的是**文档不变量注释**要不要同步改, 与 sweep 行为本身无关。**本 Spec 不预判**, 留 A.2 任务项;
+>
+> **候选 (i) 未采纳**: 挂在 A.1 机械步骤上 (如每次写 proposal 文件后) 被 (ii)「每次 `/state-scanner` 必跑」覆盖同一诉求且触点更集中, 不再单独引入第二个挂载面。
+>
+> **⚠️ 实读订正 · 请 owner 复议** (R1 rework 核验 major-3(a)): owner 裁定原文的理据——「`STALE_TTL` 30min → 24h 量级收窄版兜底, 使『漏跑一次扫描』不至于立即暴露在 `--sweep-stale` 下」——**与实读不符**: 上方「⚠️ 事实订正」已确认 `--sweep-stale` 的实际阈值从来就是 `SWEEP_TTL` (24h), 从未读取过 `STALE_TTL`; 改 `STALE_TTL` 对 `--sweep-stale` **零影响**, 其真实效果只是把 `reconcile._is_stale()` 的 advisory「takeover-eligible」软信号窗口从 30min 放宽到 24h。⇒ 裁定理据所指向的风险 (「漏跑一次扫描就暴露在不可逆清扫下」) 本来就不成立 —— 无论改不改 `STALE_TTL`, `--sweep-stale` 的不可逆窗口一直是 24h; 真正因 (iii) 改善的是 advisory 软信号面, 不是理据描述的那个 sweep 风险。**请 owner 确认**: 订正后是否仍采 (iii) (改 `STALE_TTL` 至 24h 量级, 效果落在 advisory/takeover-eligible 面, 是把两个原本量级悬殊的软硬信号对齐的一个自洽改动, 与原理据描述的 sweep 风险无关), 还是改为只采 (ii) (heartbeat 编排层每次 `/state-scanner` 必跑落地后, 30min 的 advisory 窗口触发面已收窄, 或许不必再动常量)? **AI 不替裁**, 本版按「暂按裁定字面 (iii) 落版, 标 pending owner」处理 —— 上方「落版」段的 (iii) 内容维持不变, 待 owner 回应后再定是否回撤。
+>
+> **✅ 协调项已解** (`origin/feature/linked-issue-normalization` 分支状态, R1 rework 核验 major 订正, 主控实读): 该分支已于合并提交 `ca52d1c` (v1.67.0, `2026-08-23T09:14:07Z`) 合入 `origin/master` (`git merge-base --is-ancestor origin/feature/linked-issue-normalization origin/master` 成立), **早于本轮 rework 落盘**。实读 `origin/master` 上的 `lib/collision.py`: 新增 `normalize_linked_issue()` (`:178`) / `_linked_issue_matches()` (`:219`) 两个 helper, 插在 `linked_issue_overlaps` (`:230`) 定义之前 —— **确认未改** `linked_issue_overlaps` 的三参数签名 (`claims, own_track_id, own_linked_issue`)。行号已整体下移: `_TERMINAL` 由 `cb6bd5d:210` → `origin/master:268`; `if not own_linked_issue`/`return []` 由 `:207-208` → `:265-266`; `if c.track_id == own_track_id`/`continue` 由 `:219-220` → `:278-279`。**本节引用的 `lib/gc.py`/`lib/constants.py` 行号已核, 未漂移** (`git diff --stat ca52d1c^1 ca52d1c` 实测只触及 `SKILL.md` / `claim_schema.py` / `collision.py` / **一个** test 文件 `test_release_by_track.py`, 外加发布同步面文件 `marketplace.json`/`plugin.json`/`CHANGELOG.md`/`README.md`/`VERSION`; **R1 rework 核验 minor-2 订正**: 原文「两个 test 文件」为误记, 实为一个; 不含 `gc.py`/`constants.py`)。详见下方「事实断言逐条实读清单」#3/#5/#6/#16。已按 R1 rework 核验 major-2 补入 Impact 表 `lib/collision.py` 一行 (原表零覆盖), 见下方。
 
 #### §2.3 overlap 消费
 
@@ -157,7 +170,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 - **选项**: 「另起」/「**我去释放对方的 claim 后再开始 (两步人工)**」/「并轨」。
   > **「接手」不是一键动作 (spike S3 实测)**: `release_claim_by_track` 只匹配调用者**自己的** container (`claim_lifecycle.py:425`), **无任何函数支持*定向*释放某个指定容器的 claim**; 且既有 `_takeover_eligible` 因含容器段后两轨必然不同 track_id 而**对本场景不可达**。
   >   **⚠️ 事实订正 (R1-fix/C5, 主控实读)**: 原文写「无任何函数支持释放别的容器的 claim」**为假** —— `release_gate.py --sweep-stale` 的 help 逐字写着「active 且 heartbeat 超 STALE_TTL → abandoned (**跨 container**)」。存在的是**无差别的陈旧清扫**, 不是定向接手。⇒ 「两步人工」的结论仍成立 (sweep 不能用来「接手某条特定的轨」), 但理由须改为「**只有无差别 sweep, 没有定向 release**」。
-  >   **⚠️ 与 §2.2 复合的风险 (R1-fix/C2 关联)**: 若 heartbeat 最终仍无人调 (见 §2.2 的未决项), 所有 claim 在 `STALE_TTL`=30min 后即 stale ⇒ **`--sweep-stale` 对几乎所有并发轨可达**。phase-d-closer 逐周期带该 flag ⇒ 这不是理论风险。**§2.2 的「谁调 heartbeat」不落地, 本条即从「已知限」升级为「数据面风险」。**⇒ 措辞即定义, 避免实现者以为有一键路径。**跨容器 release 不在本 Spec 引入** (写别人的 claim 是权限面变更, 应独立评估);
+  >   **⚠️ 与 §2.2 复合的风险 (R1-fix/C2 关联) — 已解决 + 残余风险**: §2.2 的「谁调 heartbeat」现已落版 (AI 编排层挂 `/state-scanner` 入口, 每次必跑 + `STALE_TTL` **放宽**到 `SWEEP_TTL` 同量级, 即 (iii) 的收窄版——只到 24h、不无限延长)。phase-d-closer 逐周期带 `--sweep-stale` flag, 故这条不是理论风险, 但已从「无人认领的裸暴露」降为「有界残余」: **残余风险 = 若 A.1 期间连续 ≥24h 未触发任何 `/state-scanner` 调用** (heartbeat 编排层随之连续 ≥24h 未刷新), claim 才会先被 reconcile 标 takeover-eligible, 继而落入 `--sweep-stale` 的清扫窗口; **反之, 两次 `/state-scanner` 间隔 ≤24h, claim 不 stale**。⇒ 措辞即定义, 避免实现者以为有一键路径。**跨容器 release 不在本 Spec 引入** (写别人的 claim 是权限面变更, 应独立评估);
 - **不硬阻断** (撞 §非目标与 AD10), 但**也不是 AI 渲染一行后自行决定** —— 「继续起草」是对已知碰撞的处置决定, 属 owner 权限面 (Rule #10)。**advisory 的含义是机制不阻断, 不是 AI 可自行放行。**
 
 #### §2.4 终态可见 + 传递链 (R3/C2)
@@ -170,11 +183,12 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 **`include_terminal` 的传递链 (**四**段缺一不可 — R1-fix/C6 补第 0 段)**:
 
-0. **`lib/collision.py` 的 `linked_issue_overlaps` 增 keyword-only 形参** `include_terminal: bool = False` —— 实读现签名为 `(claims, own_track_id, own_linked_issue)`, **无该形参**; 不加则 `_main():1232` 传参直接 `TypeError`。**⇒ `lib/collision.py` 必须进 Impact 表** (原表零覆盖)。
+0. **`lib/collision.py` 的 `linked_issue_overlaps` 增 keyword-only 形参** `include_terminal: bool = False` —— 实读现签名为 `(claims, own_track_id, own_linked_issue)`, **无该形参**; 不加则 `_main():1233` 传参直接 `TypeError`。**⇒ `lib/collision.py` 已补入 Impact 表** (R1 rework 核验 major-2 补, 原表零覆盖)。⚠️ **行号订正 (rework)**: 原文写 `:1232`, **实读** (aria@cb6bd5d) 调用语句 `out["linked_issue_overlap"] = linked_issue_overlaps(` 在 **`:1233`**; `:1232` 是其前一行 `claims = read_claims(repo).claims`。
    > ⚠️ 与前置 Spec 的边界: `linked-issue-normalization` 的 §非目标写「签名与返回 schema 不变」。本段**要改签名** ⇒ 两 Spec 须协调: 建议由**本 Spec** 承担该签名变更 (前置 Spec 只改内部谓词), 并在前置 Spec 的非目标处加一句「`include_terminal` 形参由 `a1-entry-claim` 引入, 不属本 Spec 变更面」。**该协调项须 owner 确认。**
+   > **✅ 协调项现状已解 (R1 rework 核验 major 订正, 主控实读 `origin/master`)**: `origin/feature/linked-issue-normalization` 已于 `ca52d1c` (v1.67.0, 2026-08-23T09:14:07Z) 合入 `origin/master`, 早于本文件落盘。该分支在 `lib/collision.py` 落地的 `normalize_linked_issue()` / `_linked_issue_matches()` 两个 helper, 插在 `linked_issue_overlaps` 定义之前 —— **确认未改** `linked_issue_overlaps` 的三参数签名 (`claims, own_track_id, own_linked_issue`, 现 `origin/master:230-234`), 与本 Spec 「由本 Spec 承担签名变更」的协调建议**不冲突**。合并已使行号整体下移约 53-59 行: `_TERMINAL` 由 `cb6bd5d:210` → `origin/master:268`; `if c.track_id == own_track_id` 由 `:219-220` → `:278-279`; `phase1_gate.py:1233` (调用处) **不受影响** (该合并未触及 `phase1_gate.py`)。本 Spec 正文与 Impact 表引用的 `collision.py` 行号统一以 `origin/master` 为准, 已在下方「事实断言逐条实读清单」#3/#5/#6/#16 逐条核对。
 1. `phase1_gate.py` 新增 CLI flag `--include-terminal` (store_true);
-2. **在 `_main()` 的现有调用处** (`phase1_gate.py:1232`) 加关键字参数 —— **不碰** `run_gate` / `_run_gate_impl` 签名;
-   > R3/C2 实测: `linked_issue_overlaps` 生产代码**只有这一处调用**, 位于 `_main()`、在 `run_gate` 返回**之后**独立追加; `_run_gate_impl` (334-1075 行) 对它 grep 命中 **0**。原 R2-fix 写「`run_gate` 签名透传」**架构上就是错的** —— 照它做会改错函数, 精确复现它自己要修的「生产不可达」。
+2. **在 `_main()` 的现有调用处** (`phase1_gate.py:1233`) 加关键字参数 —— **不碰** `run_gate` / `_run_gate_impl` 签名;
+   > R3/C2 实测: `linked_issue_overlaps` 生产代码**只有这一处调用**, 位于 `_main()`、在 `run_gate` 返回**之后**独立追加; `_run_gate_impl` (**`:335`–`:1032`**, 至下一个顶层定义 `run_gate` 前 —— R1 rework 核验 minor-4 订正: 原文误记 `334-1075`, 见「事实断言逐条实读清单」#17) 对它 grep 命中 **0**。原 R2-fix 写「`run_gate` 签名透传」**架构上就是错的** —— 照它做会改错函数, 精确复现它自己要修的「生产不可达」。
 3. A.1 调用模板**显式带该 flag**。
 
 **SC 的断言层必须是 CLI 全链路**, 不是直调库函数 —— 否则「参数没接到 CLI」的实现仍能绿。
@@ -192,11 +206,11 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 1. `phase-a-planner/SKILL.md`;
 2. **`spec-drafter/SKILL.md`** —— 它 `user-invocable: true` (实测 `:9`), 可直接绕过 phase-a-planner。
 
-> ## ⛔ 阻塞性前提 (R1-fix/C1 — 4 席独立命中 + 主控实读)
+> ## ✅ 阻塞性前提 — 已裁 (R1-fix/C1 — 4 席独立命中 + 主控实读 → 2026-08-22 owner 裁定落版)
 >
-> **两个指定落点的 `allowed-tools` 都不支持本机制的核心动作。** 实读 frontmatter:
+> **两个指定落点的 `allowed-tools` 都不支持本机制的核心动作。** 实读 frontmatter (rework 复读 aria@cb6bd5d 未变, 见下方「事实断言逐条实读清单」#1/#2):
 >
-> | Skill | `allowed-tools` (逐字) | 缺 |
+> | Skill | `allowed-tools` (逐字, 变更前) | 缺 |
 > |---|---|---|
 > | `phase-a-planner/SKILL.md:9` | `Read, Write, Glob, Grep, Task, Skill` | **无 `Bash`** · **无 `AskUserQuestion`** |
 > | `spec-drafter/SKILL.md:10` | `Read, Write, Glob, Grep, AskUserQuestion` | **无 `Bash`** |
@@ -205,13 +219,19 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 >
 > **这是整份 Spec 的阻塞项** —— 主机制在它自己指定的执行位置上不可调用, 而三轮审计 + 六条 spike 全都没查过 frontmatter。
 >
-> **处置 (须与 owner 确认, 二选一)**:
-> - **(a) 扩 `allowed-tools`**: `phase-a-planner` 加 `Bash, AskUserQuestion`; `spec-drafter` 加 `Bash`。⚠️ 扩权是 skill 能力面变更, 会影响 Rule #6 的判据 (从「指令面」升到「能力面」), 且 `Bash` 是最宽的一项 —— **须 owner 明确批准**, 不由本 Spec 自行决定;
-> - **(b) 改由已持 `Bash` 的宿主代调**: 例如经 `Task`/`Skill` 委派, 或把认领动作前移到 `state-scanner` 的阶段 4 (它已在 workflow-runner 链路上)。⚠️ 这会改变「A.1 起草前」这个时点的语义, 须重新论证。
+> owner 2026-08-22 就此下裁。**以下逐字取自 `git show 86540f2:openspec/changes/a1-entry-claim-duplicate-work-guard/proposal.md`** (R1 rework 核验 major-3 订正 —— 上一轮此处只保留了「采 (a) 扩权」前半句, 「理由」与「落版义务」两个从句被删并换成下方另起的 (a)/(b) 转述, 与原文有实质偏差且未请复议; 现恢复完整原文字面):
 >
-> **两条 Impact 都未列 `allowed-tools` 字段变更** —— 无论选哪条都要补进 §Impact。**本前提未解决前, §2/§3 不具备实施条件。**
+> > **✅ owner 裁定 (2026-08-22): 采 (a) 扩权** —— phase-a-planner 加 `Bash, AskUserQuestion`; spec-drafter 加 `Bash`。理由: (b) 放弃 `/spec-drafter` 直调路径的覆盖, 而入口覆盖 (S6: 9 种身份 7 种无 claim) 正是本 Spec 核心目标; 扩权风险由 harness 权限系统兜底 (Bash 调用仍逐条过 permission 配置)。落版义务: Impact 表补两个 SKILL.md 的 `allowed-tools` 变更 + Rule #6 按能力面变更申报 benchmark。
 >
-> **✅ owner 裁定 (2026-08-22): 采 (a) 扩权** —— phase-a-planner 加 `Bash, AskUserQuestion`; spec-drafter 加 `Bash`。理由: (b) 放弃 `/spec-drafter` 直调路径的覆盖, 而入口覆盖 (S6: 9 种身份 7 种无 claim) 正是本 Spec 核心目标; 扩权风险由 harness 权限系统兜底 (Bash 调用仍逐条过 permission 配置)。落版义务: Impact 表补两个 SKILL.md 的 `allowed-tools` 变更 + Rule #6 按能力面变更申报 benchmark。
+> **落版 (AI, 2026-08-23)**:
+> - **(a) 扩 `allowed-tools`** [已采纳]: 判否 (b) 是因为 (b) 放弃 `/spec-drafter` 直调路径的覆盖, 而入口覆盖 (S6: 9 种身份 7 种无 claim) 正是本 Spec 核心目标; 扩权风险由 harness 权限系统兜底 (`Bash` 调用仍逐条过 permission 配置);
+> - **(b) 改由已持 `Bash` 的宿主代调** [已否]: 例如经 `Task`/`Skill` 委派, 或把认领动作前移到 `state-scanner` 的阶段 4。会改变「A.1 起草前」这个时点的语义且放弃 `/spec-drafter` 直调覆盖, 与 §3 核心目标冲突, 不采纳。
+>
+> **落版执行** (owner 裁定原文的「落版义务」):
+> 1. **Impact 表补两行, 逐字标明变更前后** —— 见下方 §Impact 表 `skills/phase-a-planner/SKILL.md` / `skills/spec-drafter/SKILL.md` 两行 (frontmatter `allowed-tools`);
+> 2. **Rule #6 判据影响** (R1 rework 核验 major-4 订正): `allowed-tools` 扩权是 skill **能力面**变更, 影响该 skill **全部**运行场景 (含既有 AB 套件的既有 eval case)。按 `standards/conventions/skill-benchmark-exemption.md` §1「逐 hunk 判, 不逐文件判」核验: `aria-plugin-benchmarks/ab-suite/phase-a-planner.json` / `spec-drafter.json` **两套件均实存** (2026-08-23 实核, 各 2 eval case) ⇒ 该能力面 hunk 落判据表**第二行「处方性 · 运行时指令面 / 能 / 照跑 AB, 零裁量」** —— **须照跑现有两套件**; 与此同时, 本 Spec 新增的 A.1 claim 行为 (a)(b)(c, 见下方 rule6_note 中段) 各自独立归入判据表**第三行「套件覆盖外」**并建定向 fixture。二者**不互相替代**: 照跑 AB 验的是「扩权后 skill 在既有 eval 场景下行为是否漂移」, 定向 fixture 验的是「新增 A.1 claim 行为本身, 现有 eval 结构性覆盖不到」。**订正**: 上一版此处误判「能力面部分不单独申请豁免、也不需要单独判据, 由覆盖该 diff 的定向 fixture 同批覆盖即可」——两套件确实实存, 该误判与 owner 原话「Rule #6 按能力面变更申报 benchmark」(即: 该去申报/跑一次 benchmark) 实质相悖, 现按核实结果订正为「照跑」, 与 owner 原话字面对齐。此判断记入下方 rule6_note 段, 供 A.2 复核。
+>
+> **⚠️ 实读订正 · 请 owner 复议** (R1 rework 核验 major-3(b)): 上一轮把 owner 原话「落版义务: ... + Rule #6 按能力面变更申报 benchmark」改写成「不单独申请豁免、也不需要单独判据」, 二者语义相悖 (原话要求「去申报/跑 benchmark」, 改写读作「不需要单独判据、可并入覆盖外档定向 fixture 同批带过」) 且未经复议即落版 —— 已按上方「落版执行」项 2 撤销该改写。**所幸核实结论 (两套件实存 ⇒ 应照跑) 与 owner 原话字面 (「申报 benchmark」) 本就一致**, 本项技术处置**无需另行复议**, 此处仅记录订正过程供 owner 核对上一轮偏差; 如 owner 认为「申报 benchmark」另有所指 (例如指走一遍 `/skill-creator` 完整流程, 而非本版采用的「现有两套件全量跑一遍, 零裁量」), 请指出。
 
 > **口径待定 (S6 附带发现)**: `owner-container` (形如 `simonfish/bfe8285d`) 与 claim 的 container 段 (`bfe8285d`) **口径已经不同**。本 Spec 采用 claim 侧口径 (uuid), 并把「两标识关系需成文」记为 follow-up —— **不在本 Spec 统一二者** (那会牵动 handoff frontmatter 规范, 属 standards 变更)。
 
@@ -258,6 +278,35 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 ---
 
+## 事实断言逐条实读清单 (rework, R1 聚合报告处方)
+
+> **触发**: post_spec R1 聚合报告 (`.aria/audit-reports/post_spec-R1-1785710000000-a1-entry-claim-rewrite-aggregated.md`) 判定「三条最重 critical 都是设计对了但对既有代码的事实断言与实读不符」⇒ 下一版须补本清单。该聚合报告实际给出**两条** CR 处方: (i) 本清单 (已落, 见下表); (ii) **track-id 形态 × 生命周期动词影响矩阵** —— 本轮 **defer 到 A.2**, 理由: 该矩阵需要「track-id 形态」(含容器段 vs §2.1 回落 slug 形) 与「生命周期动词」(acquire/heartbeat/release/sweep/gc) 两轴逐格核对, 而各动词的具体调用点/参数在 A.2 任务拆解前尚未定形 (例如 §2.1 「需新增直取 uuid 字段的 accessor」尚未有任务编号), Spec 文档层面此刻构建该矩阵只能停留在猜测态; A.2 派生任务时矩阵会随任务自然成形, 届时补更实。
+> **方法**: 本表逐条列出 Spec 全文引用的 `文件:行号` 事实断言, 与 rework 时**现在实读**结果比对。**实读环境**: aria 子模块 `git -C aria rev-parse --short HEAD` = **`cb6bd5d`** (分支 `fix/issue-batch-149-151-155-134`)。**`collision.py` 相关行 (#3/#4/#5/#6/#16) 额外复核 `origin/master`** (`ca52d1c`, v1.67.0, 已含 `linked-issue-normalization` 合并, 2026-08-23T09:14:07Z 落地 —— **早于本轮 rework 落盘**, R1 rework 核验 minor-2 订正: 原文引用具体 mtime `09:32:38Z` 会随每次落盘漂移, 改为只用相对顺序描述; 详见 §2.2/§2.4 协调项)。行号漂移是预期内的 (spec 写于 v1.65.x 附近, aria 现已到 v1.66.5+); **不一致的已在正文对应处订正**, 本表汇总一份可核对的清单, 不重复正文的完整论证。
+
+| # | 断言原文 (Spec 引用) | 现在实读结果 (aria@cb6bd5d, collision.py 相关另核 origin/master@ca52d1c) | 一致性 |
+|---|---|---|---|
+| 1 | `phase-a-planner/SKILL.md:9` — `allowed-tools: Read, Write, Glob, Grep, Task, Skill` | 确认 `:9` 逐字一致 (`origin/master` 上该合并未触及此文件, 行号同样未变) | ✅ 一致 |
+| 2 | `spec-drafter/SKILL.md:10` — `allowed-tools: Read, Write, Glob, Grep, AskUserQuestion`; `:9` — `user-invocable: true` | 确认 `:10`/`:9` 逐字一致 (`origin/master` 未触及此文件) | ✅ 一致 |
+| 3 | `collision.py:210` — `_TERMINAL = ("done", "abandoned", "unknown")`, 在 `linked_issue_overlaps` 内 | `cb6bd5d:210` 逐字一致。**R1 rework 核验 major 补**: `origin/master` (`ca52d1c`, 已含前置 Spec 合并) 上同一行下移至 **`:268`**, 取值逐字未变。**附注**: `collision.py` 内还有第二处同名 `_TERMINAL = ("done", "abandoned")` (cb6bd5d `:307` / origin/master `:366`, 在 `classify()` 内, **不含** `unknown`) —— 两处同名不同值, 属**不同函数的局部变量**, 本 Spec 引用的都是这一处, 未混淆, 但记于此避免后续实现者看错函数 | ✅ 一致 (+ 新增附注 + master 行号已核) |
+| 4 | `linked_issue_overlaps` 现签名 `(claims, own_track_id, own_linked_issue)`, 无 `include_terminal` 形参 | `cb6bd5d:177-181` 逐字一致, 三参数, 无该形参。**R1 rework 核验 major 补**: `origin/master` 上该签名下移至 `:230-234`, **仍为三参数, 未加 `include_terminal`** | ✅ 一致 (+ 见 §2.4 协调项: sibling 分支未改签名, master 行号已核) |
+| 5 | `collision.py:207-208` — `if not own_linked_issue: return []` | `cb6bd5d:207`/`:208` 逐字一致。**R1 rework 核验 major 补**: `origin/master` 上下移至 **`:265`/`:266`**, 逐字未变 | ✅ 一致 (+ master 行号已核) |
+| 6 | `collision.py:219-220` — `if c.track_id == own_track_id: continue` | `cb6bd5d:219`/`:220` 逐字一致。**R1 rework 核验 major 补**: `origin/master` 上下移至 **`:278`/`:279`**, 逐字未变 | ✅ 一致 (+ master 行号已核) |
+| 7 | `phase1_gate.py:1232` — `_main()` 调用 `linked_issue_overlaps` 处 | **不一致**: `:1232` 是 `claims = read_claims(repo).claims`; 实际调用语句 `out["linked_issue_overlap"] = linked_issue_overlaps(` 在 **`:1233`** | ❌ 不一致 → **已订正** (§2.4 item 0/2, D5, Impact 表, 共 4 处 `:1232`→`:1233`) |
+| 8 | `claim_lifecycle.py` `heartbeat()` 定义, 按 `(container_id, session_id)` 匹配 | 确认 `def heartbeat(` 在 `:178`, 机制 (读 claims → 按 container+session 定位 → 写回) 描述准确 | ✅ 一致 |
+| 9 | `release_claim_by_track` docstring 逐字引用 (「release_claim locates by (container, session), but a later invocation runs with a FRESH session_id...this variant locates by (normalized track_id, container) and ignores session」) | 确认 `def release_claim_by_track(` 在 `:377`, docstring `:387-393` 实质内容逐句对应 (措辞小幅改写但语义与用词一一对应) | ✅ 一致 |
+| 10 | `claim_lifecycle.py:425` — `release_claim_by_track` 只匹配调用者自己的 container | 确认 `:425` 逐字 `if rec.container == resolved.container_id` | ✅ 一致 |
+| 11 | `identity.py` — `get_container_id()` label 优先, 现有 accessor 不能直接拿 `uuid` 字段 | 确认 `def get_container_id(` 在 `:191`, label-优先 return 在 `:222` (`return label if label else uuid`), hostname 兜底在 `:242`; grep 全文无独立的「只返回 uuid 不看 label」accessor, 「需新增」判断成立 | ✅ 一致 |
+| 12 | `GateResult.error` docstring (`phase1_gate.py:210`) 早已预留 `"fetch_degraded"` token 但从未被赋值 | 确认 `:210` 逐字 (「Possible values: ... "fetch_degraded", ...」); 全文 grep `"fetch_degraded"` 字面量**仅此一处**, 无任何 `error=` 赋值语句用到它。**附注**: `:475` 有一条 `logger` 日志消息文案含「fetch degraded」字样 (检测逻辑客观存在, 只是没有把结果写进结构化 `error` 字段) —— 支持而非削弱原断言 | ✅ 一致 (+ 新增附注) |
+| 13 | `STALE_TTL` = 30min, 定义处 | 确认 **`lib/constants.py:36`** — `STALE_TTL: int = 1800  # seconds`; 同文件 `:51` `SWEEP_TTL: int = 86400  # seconds (24h)`; `:32` 有「`STALE_TTL == 3 × HEARTBEAT_INTERVAL`」不变量注释 (`HEARTBEAT_INTERVAL=600s`, `:28`) | ✅ 一致 (落点已写入 Impact 表 + §2.2) |
+| 14 | **新增发现 (原文未列, rework 审出)**: §2.3 称「所有 claim 在 `STALE_TTL`=30min 后即 stale ⇒ `--sweep-stale` 对几乎所有并发轨可达」 | **不一致**: 实读 `gc.py:341` (`sweep_stale_active` 的 `stale_ttl_seconds` 默认值是 `SWEEP_TTL` 非 `STALE_TTL`) + `release_gate.py:141` (`sweep_stale_active(repo, now=ts)` 未传覆盖值) ⇒ `--sweep-stale` 的实际阈值从来就是 `SWEEP_TTL`(24h), 与 `STALE_TTL` 取值无关。`STALE_TTL` 实际控制的是 `reconcile.py:154-163` 的 `_is_stale()`(takeover-eligible 软信号, 可逆)。**该混淆同样出现在 `release_gate.py:225` 的 help 文本、`state-scanner/SKILL.md:176` 与 `phase-d-closer/SKILL.md:56` 三处描述里** (三处都把 `SWEEP_TTL` 的行为写成了 `STALE_TTL`; `phase-d-closer/SKILL.md:56` 一处为 R1 rework 核验 minor-3 补) —— 本 Spec 沿用了这处代码库既有的不准确表述, 非本 Spec 独有 | ❌ 不一致 → **已订正** (§2.2/§2.3), 文档措辞本身的勘正记为 follow-up (非本 Spec 变更面) |
+| 15 | `state-scanner/SKILL.md:149` + `references/layer-l-integration.md:15` — B-entry「接线点 = AI 编排层, 不是 `scan.py`」/「Design A 条件触发」 | 确认两处逐字一致, 用作 heartbeat 编排层挂载点的既有先例引用 (§2.2 C2 落版) | ✅ 一致 (新增引用, 供 C2 落版佐证) |
+| 16 | `origin/feature/linked-issue-normalization` (原记「另一容器在改」) 是否已改 `linked_issue_overlaps` 签名 | **R1 rework 核验 major 订正**: 该分支**已合并** —— `git -C aria merge-base --is-ancestor origin/feature/linked-issue-normalization origin/master` 成立, 合并提交 `ca52d1c` (v1.67.0) 时间戳 `2026-08-23T09:14:07Z`, **早于本轮 rework 落盘** (R1 rework 核验 minor-2 订正: 不再引用会漂移的具体 mtime); 「另一容器在改」在本轮实读时已是过期描述。实读 `origin/master:lib/collision.py` diff: 新增 `normalize_linked_issue()` (`:178`) / `_linked_issue_matches()` (`:219`) 两 helper, **未改**三参数签名; `_TERMINAL`/`linked_issue_overlaps` 等下游行号已整体下移 53-59 行 (逐行对照见 #3/#4/#5/#6) | ✅ 已合并, 签名未变, 行号已按 origin/master 核对完毕 (不再是「待重新核验」的悬置项) |
+| 17 | `_run_gate_impl` (原文标 `334-1075` 行) 对 `linked_issue_overlaps` grep 命中 0 (§2.4 item 2, R3/C2 实测结论) | **不一致**: `def _run_gate_impl` 实际起始行是 **`:335`** (非 `:334`), 其后至下一个顶层定义 `def run_gate` (**`:1032`**) 前结束, 并非 `:1075`。**grep 命中 0 的结论本身不受行号误差影响, 仍成立** (R1 rework 核验 minor-4 补) | ❌ 不一致 → **已订正** (§2.4 item 2 行号改引 `:335`–`:1032` 区间, 不再用误记的 `334-1075`) |
+
+**未逐条实读的低风险断言**: S1/S3/S4/S5/S6 各 spike 报告内部的实测数据 (语料统计 141/13 篇、事故窗 48-72h、fetch 耗时 ~13.8s 等) 属**一次性历史测量**, 非可重复 grep 的代码事实, 不纳入本清单 (清单聚焦「代码当前状态」类断言); spike 报告本身的可信度已由 owner 2026-08-02 的 A+B 裁定认可, 不在本次 rework 复核范围。
+
+---
+
 ## 决策记录
 
 | # | 决策 | 依据 |
@@ -266,7 +315,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | D2 | 字段格式固定 `<org>/<repo>#<n>` + custom check (warning) | 模板只影响新建且可被删; 无机械回声的义务会退化 (§Why 自证) |
 | D3 | track-id = `<basename>-<str(int(n))>-<container_uuid>` | **S3**: 不含容器段则两轨同 id ⇒ 被 `:219-220` 互斥 ⇒ 主机制死 (R2/C1); uuid 不截断不用 label (label 碰撞域不可控且模板鼓励设置) |
 | D4 | heartbeat 匹配键改 `(container, track_id)`, 刷新全部匹配 | **S1**: `release_claim_by_track` 为**同一 defect** 做过同款修法, 照抄即可; session 落盘方案被它取代 |
-| D5 | `include_terminal` 在 **`_main()` 现有调用处**加参数, 不碰 `run_gate` 签名 | **R3/C2** 实测: `linked_issue_overlaps` 只在 `:1232` 被调用, `_run_gate_impl` 零命中 |
+| D5 | `include_terminal` 在 **`_main()` 现有调用处**加参数, 不碰 `run_gate` 签名 | **R3/C2** 实测: `linked_issue_overlaps` 只在 `:1233` 被调用 (rework 订正: 原 R3 记 `:1232`, 实读为其下一行), `_run_gate_impl` 零命中 |
 | D6 | 「接手」= **两步人工**, 不引入跨容器 release | **S3** 实测无该函数; 既有 takeover 路径对本场景不可达; 写别人的 claim 是权限面变更 |
 | D7 | 探针自带 fetch, **不称轻量**, 配 30s 预算 + 重试 | **S2** 实测 ~13.8s/轮; 复用缓存判否 (缓存只由 scan.py 刷新) |
 | D8 | A.1 双落点 (phase-a-planner + spec-drafter) | **S6** 实测入口覆盖率是杠杆 (9 身份 vs 2 在 ref); `spec-drafter` `user-invocable: true` 可绕过 |
@@ -274,10 +323,16 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | D10 | 不做中心化登记表 | **S6**: 解决不了「没走进入口」这个共同根因 |
 | D11 | 探针不阻断, 命中 exit 0; 非 0 仅用于探针自身失败 | 与主机制同为 advisory |
 
-**Rule #6 (rule6_note)**: `phase-a-planner` / `spec-drafter` / `audit-engine` 三处 SKILL.md 的改动均为**处方性 · 运行时指令面**。但 R1/QA **双套件实测**证明现有 AB (`phase-a-planner` 5 eval / `audit-engine` 2 eval) **结构性覆盖不到**本 Spec 的新行为 ⇒ 落判据表**第三行「套件覆盖外」**, 三条缺一不可:
-1. **点名行为**: (a) A.1 起草前必调 phase1_gate 且传 `--linked-issue`; (b) overlap 非空时经 `AskUserQuestion` 请裁而非自行放行; (c) fetch 降级时按「未能核实」而非「无碰撞」;
-2. **建可证伪定向 fixture**: 上述三条各一个 eval, 双臂须能分辨;
-3. **套件缺口开 issue**: 与 `aria-plugin#117` (缺 authoring 维度) / `#127` (缺 D9 surface 维度) 同族, 归并或新开由 A.2 定。
+**Rule #6 (rule6_note)**: 本 Spec 涉及**五处** SKILL.md 改动 (R1 rework 核验 minor-3 订正 —— 原版只列「四处/两档」, 未纳入 Impact 表已有的 `skills/config-loader/SKILL.md` 一行, 与 Impact 表互相矛盾, 现补齐第三档避免遗漏): **四处**处方性 · 运行时指令面改动 (按 CLAUDE.md 判据表分两档) + **一处**描述性改动:
+
+- **`state-scanner/SKILL.md`「Layer L A.1 heartbeat 集成」小节** (C2 落版新增, 见 Impact 表): `aria-plugin-benchmarks/ab-suite/state-scanner.json` 套件实存 (`880060d` 刚对 `SKILL.md:176` 跑过 AB) ⇒ 落判据表**第二行「处方性 · 运行时指令面 / 能 / 照跑 AB, 零裁量」**。点名行为 **(d)**: 「持有 active claim 时, 每次 `/state-scanner` 入口调用都触发 `phase1_gate.py --heartbeat-only` 刷新该 claim」(R1 rework 核验 major-1 补钉具体 CLI, 原文泛称「heartbeat CLI」未点名入口) —— 该套件当前 eval case 未覆盖此新分支, A.2 须在既有套件内**新增 1 个 eval case** 钉住它 (与下方 SC-21 呼应; 这是「照跑 AB」义务的一部分, **不是**另起「覆盖外」fixture —— 刻意不把 (d) 塞进下面 (a)(b)(c) 那份「覆盖外」清单, 否则会把同一处 SKILL.md diff 同时判进两档, 复现本条要修的内部矛盾);
+- **`phase-a-planner` / `spec-drafter` / `audit-engine` 三处 SKILL.md**——本 Spec 各自新增的 A.1/per-round 处方性行为——R1/QA **双套件实测**证明**现有固定 eval case** (与套件文件是否实存是两回事) **结构性覆盖不到**这批新行为 ⇒ 落判据表**第三行「套件覆盖外」**, 三条缺一不可:
+  1. **点名行为**: (a) A.1 起草前必调 phase1_gate 且传 `--linked-issue`; (b) overlap 非空时经 `AskUserQuestion` 请裁而非自行放行; (c) fetch 降级时按「未能核实」而非「无碰撞」;
+  2. **建可证伪定向 fixture**: 上述三条各一个 eval, 双臂须能分辨;
+  3. **套件缺口开 issue**: 与 `aria-plugin#117` (缺 authoring 维度) / `#127` (缺 D9 surface 维度) 同族, 归并或新开由 A.2 定。
+- **`config-loader/SKILL.md`** (R1 rework 核验 minor-3 新增归档) —— `coordination` 在 A.1 的 skip 语义**登记** (记录既有 `coordination.enabled` 字段在新增 A.1 skip 分支下的行为, 不新增判定规则、不改变任何 AI 决策路径) ⇒ 纯**描述性**内容, 落判据表**第一行「描述性」**; substitute = **SC-9** (状态类结构化测试, 断言 `enabled==false` 时 A.1 零调用/不写 claim/不推远端), 不需 AB。
+
+**能力面附注 (C1 落版义务, 2026-08-22; R1 rework 核验 major-4 重判)**: `phase-a-planner` / `spec-drafter` 两处 frontmatter `allowed-tools` 扩权 (加 `Bash, AskUserQuestion` / 加 `Bash`) 是**能力面**变更, 影响该 skill **全部**运行场景 (含既有 AB 套件的既有 eval case), 与上面「套件覆盖外」三条**指令面**变更 (点名行为 a/b/c) 性质不同, 虽落在同一份 SKILL.md diff 里, 但按`standards/conventions/skill-benchmark-exemption.md` §1「**逐 hunk 判, 不逐文件判**」: `aria-plugin-benchmarks/ab-suite/phase-a-planner.json` / `spec-drafter.json` **两套件均实存** (2026-08-23 实核, 各 2 eval case) ⇒ 该能力面 hunk 独立落判据表**第二行「处方性 · 运行时指令面 / 能 / 照跑 AB, 零裁量」** —— **须照跑现有两套件**, 验的是「扩权后 skill 在既有 eval 场景下行为是否漂移」; 与上方 (a)(b)(c) 那部分的「覆盖外」定向 fixture **各自独立、互不替代**, 后者验的是「新增 A.1 claim 行为本身, 现有 eval 结构性覆盖不到」。**订正**: 上一版此处误判「能力面部分不单独申请豁免、也不需要单独判据, 由覆盖该 diff 的定向 fixture 同批带过即可」——两套件确实实存, 该误判与 owner 原话「Rule #6 按能力面变更申报 benchmark」(即: 该去申报/跑一次 benchmark) 实质相悖, 现改按「照跑」执行, 与 §3「落版执行」项 2 的订正同源 (详见 §3「⚠️ 实读订正 · 请 owner 复议」major-3(b) —— 该处核实结论与 owner 原话字面本就一致, 不构成新的复议项)。
 
 确定性代码层由 SC 覆盖, 与上述并行不互替。**不申请豁免。**
 
@@ -326,6 +381,15 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | **SC-18** (代码) | 探针 fetch 失败 / 无远端 | `degraded` + 「本轮竞品扫描未执行」+ **exit 非 0** (与 SC-17 的 exit 0 形成可辨对照) |
 | **SC-19** (代码) | 反向对照三条 | (a) 不得自命中本轨 spec 目录; (b) 不得把自己的 claim (同 track_id) 计入 overlap; (c) 扫描超上限**必须** `log()` 披露丢弃范围 |
 
+### 保护窗可生产验证性 (heartbeat, R1 rework 核验 major 补)
+
+> **触发**: 上一轮核验指出 —— §2.2 已自陈「换匹配键不产生刷新者 ⇒ SC-5~7 可以全绿而问题原样存在」, C2 裁定 (谁调/何时调 heartbeat + `STALE_TTL` 量级) 落版后, 全文却没有任何 SC 或 fixture 钉住这两点; 这正是 `feedback_completion_signals_vs_runtime_invocation` 同形的坑 (「已落版的一段 SKILL.md 文字」≠「会被生产调用的机制」)。下两条补上, **编号追加在 SC-19 之后**而非插入既有 SC-16/17 —— 遵守「不改 SC 编号」硬约束, 不重排已有 SC:
+
+| SC | 类 | 场景 | 期望 | 怎么会红 |
+|----|---|------|------|---------|
+| **SC-20** | 代码 | 读取 `constants.STALE_TTL`; 对一条 23h 未刷新的 active claim 跑 `reconcile._is_stale()` | `STALE_TTL >= 86400` (24h 量级); `_is_stale()` 对 23h 未刷新返回 **False** (未 stale, 不可 takeover) | 现状 `STALE_TTL=1800`(30min) 时, 23h 未刷新必被判 stale ⇒ 必红 |
+| **SC-21** | 行为 (定向 fixture, 与 rule6_note state-scanner 档呼应) | `/state-scanner` 入口被调用, 本会话在 coordination ref 持有 active claim | 两臂可辨 (R1 rework 核验 major-1 补钉具体 CLI, 原文泛称「heartbeat CLI」): (A) heartbeat 编排层已挂载 ⇒ 每次调用**都**触发 `phase1_gate.py --heartbeat-only` 刷新该 claim —— **可辨臂 (A) 的判据 = 该 CLI 被 subprocess 调用且 `claim.heartbeat_at` 被刷新**; (B) 未挂载 ⇒ 不触发, `heartbeat()` 生产调用点仍为 0 | 当前实现两臂**不可辨** —— `constants.py:43-44` 自陈「NO production heartbeat loop exists」, 无论挂不挂都是同一 (未触发) 结果 |
+
 ---
 
 ## 非目标
@@ -348,16 +412,24 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 |------|------|------|
 | `skills/state-scanner/lib/claim_lifecycle.py` | heartbeat 增 by-track 变体 (仿 `release_claim_by_track` 并存模式) | **S1** (原版 Impact 表零覆盖) |
 | `skills/state-scanner/lib/identity.py` | 新增直取 `uuid` 字段的 accessor (跳过 label); hostname 兜底分支成文 | **S3** (原版 Impact 表零覆盖) |
-| `skills/state-scanner/scripts/phase1_gate.py` | CLI flag `--include-terminal`; **在 `_main():1232` 加关键字参数**; `error` 契约携带 `fetch_degraded` | **R3/C2** |
-| `skills/state-scanner/tests/` (既有宿主) | SC-1~10, 14, 15 | R1/C4 |
+| `skills/state-scanner/lib/collision.py` | `linked_issue_overlaps` 增 keyword-only 形参 `include_terminal: bool = False` (现三参数签名 `origin/master:230-234`; `_TERMINAL` 定义 `origin/master:268`; 详见「事实断言逐条实读清单」#3/#4/#5/#6/#16) | **R1-fix/C6** (R1 rework 核验 major-2 补, 原表零覆盖) |
+| `skills/state-scanner/lib/constants.py` | `STALE_TTL` (**`:36`**, 现 `1800` 秒/30min) 改为 **`86400` 量级/24h**; `:32` 的「`STALE_TTL == 3 × HEARTBEAT_INTERVAL`」不变量注释需同步改写或按比例调 `HEARTBEAT_INTERVAL` (`:28`, 二选一, A.2 定)。**R1 rework 核验 minor-1 补**: `:40`「Deliberately much longer than STALE_TTL」/ `:43-44`「NO production heartbeat loop exists」/ `:50`「Revisit when a heartbeat loop ships」三处 `SWEEP_TTL` 注释在 heartbeat 落地 (本 Spec) 后全部过期, 须随 A.2 实现同步改写 (三处描述的前提——「无生产 heartbeat」——本 Spec 之后不再成立) | **C2 落版** (owner 2026-08-22) |
+| `skills/state-scanner/scripts/phase1_gate.py` | CLI flag `--include-terminal`; **在 `_main():1233` 加关键字参数**; `error` 契约携带 `fetch_degraded` | **R3/C2** (rework 订正行号 1232→1233) |
+| `skills/state-scanner/scripts/phase1_gate.py` (第二处变更, 与上一行同文件不同能力) | 新增 **`--heartbeat-only` 模式** (复用其 identity/fetch/push 管道; 只刷本容器本 track 的 `heartbeat_at`, 不写新 claim, 不判碰撞) —— §2.2 (ii)「AI 编排层调用 heartbeat CLI」指的即此入口; 若 A.2 落地时改为独立脚本 `scripts/heartbeat_gate.py` 亦属同一变更面 | **C2 落版** (owner 2026-08-22, 采 (ii); R1 rework 核验 major-1 补, 原表零覆盖该具体入口) |
+| `skills/state-scanner/tests/` (既有宿主) | SC-1~10, 14, 15, **20** | R1/C4 (SC-20: R1 rework 核验 major 补) |
 | `skills/phase-a-planner/SKILL.md` | A.1 **独立标题级**认领步骤 + overlap 消费 + release 义务 + `coordination.enabled` skip | R3/M6 |
+| `skills/phase-a-planner/SKILL.md` frontmatter `allowed-tools` | **`:9`** `Read, Write, Glob, Grep, Task, Skill` → `Read, Write, Glob, Grep, Task, Skill, Bash, AskUserQuestion` | **C1 落版** (owner 2026-08-22, 采 (a)) |
 | `skills/spec-drafter/SKILL.md` | 第二落点 + proposal 模板增「关联 Issue」字段 | **S6** + **S4** |
+| `skills/spec-drafter/SKILL.md` frontmatter `allowed-tools` | **`:10`** `Read, Write, Glob, Grep, AskUserQuestion` → `Read, Write, Glob, Grep, AskUserQuestion, Bash` | **C1 落版** (owner 2026-08-22, 采 (a)) |
+| `skills/state-scanner/SKILL.md` | Layer L Phase B 集成段 (`:143-178` 一带) 新增对称的「Layer L A.1 heartbeat 集成」小节: AI 编排层挂载点、无条件触发 (每次 `/state-scanner`)、fail-soft 处置 | **C2 落版** (owner 2026-08-22, 采 (ii)) |
 | `skills/audit-engine/SKILL.md` + `references/execution-modes.md` | per-round 探针; **Convergence 与 Challenge 两段都改** | R3/M5 |
 | `skills/audit-engine/scripts/sibling_spec_probe.py` + `tests/` | **新增** (目录也新建) | — |
 | `skills/state-scanner/references/layer-l-integration.md` | 该活文档明确断言「闸门仅在 Phase B 触发」, 本 Spec 后即过时 | R1/M8 |
 | `skills/config-loader/SKILL.md` | coordination 在 A.1 的 skip 语义登记 | R1/M3 |
 | `.aria/state-checks.yaml` | 新增「关联 Issue」字段校验 check | **S4** |
-| AB 套件 | 定向 fixture ×3 + 缺口 issue | rule6_note |
+| AB 套件 — `phase-a-planner.json` / `spec-drafter.json` (能力面 hunk, 照跑档) | `allowed-tools` 扩权 hunk 影响全场景, 两套件均实存 (2026-08-23 实核) ⇒ **现有 AB 全量照跑, 零裁量**; 验「扩权后既有 eval 场景行为是否漂移」 | rule6_note 能力面附注 (R1 rework 核验 major-4 订正, 原判「不单独申请豁免」有误) |
+| AB 套件 — `phase-a-planner` / `spec-drafter` / `audit-engine` (覆盖外档) | 定向 fixture ×3 (a/b/c) + 缺口 issue; 验「新增 A.1 claim 行为本身, 现有 eval 结构性覆盖不到」, 与上一行「照跑现有 AB」互不替代 | rule6_note |
+| `aria-plugin-benchmarks/ab-suite/state-scanner.json` (照跑 AB 档) | 新增 1 eval case 钉 (d) 「持 active claim 时 `/state-scanner` 入口每次触发 `phase1_gate.py --heartbeat-only`」, 与 SC-21 呼应 | rule6_note (R1 rework 核验 major 补; CLI 具体化见 major-1) |
 
 **follow-up (不在本 Spec)**: `owner-container` 与 claim container 段的口径统一 (S6 附带发现)。
 
@@ -374,20 +446,29 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | post_spec R3 (第三双新眼睛, code-architect) | 2C/6M/3m — **同口径 major 4→6 上升 ⇒ 判定不收敛** |
 | **owner 裁定 A+B** | §0 抽出独立交付; 其余转 spike |
 | **spike S1–S6** | 六条全完成; **S4/S5 各推翻一条上游审计结论** |
-| **本次重写** | 据 spike 结论重写 (非打补丁) |
+| **重写 v2** | 据 spike 结论重写 (非打补丁) |
+| **post_spec R1 (rewrite v2, 5 席: TL/BA/QA/CR/KM)** | **5/5 REVISE** — 去重后 **5 个 critical 簇**; **三条最重 critical 都是「设计对了但对既有代码的事实断言与实读不符」** (与旧版 R3/C2 同形) |
+| **R1-fix** | 全量吸收 (C1~C6 事实订正 + NEW-01), **C1 (allowed-tools 阻塞) / C2 (heartbeat 谁调) 两项转 owner 裁定, 未即时落版** |
+| **owner 裁定 C1/C2 (2026-08-22)** | C1=(a) 扩 allowed-tools / C2=(ii)+(iii) heartbeat 挂 state-scanner 编排层 + STALE_TTL 放宽 (30min→24h 量级, (iii) 收窄版: 只到 24h 不无限延长) |
+| **rework 第 1 轮** | C1/C2 落版 + 新增「事实断言逐条实读清单」(R1 聚合报告处方) |
+| **上一轮核验 (6 findings: 3 major/2 minor/1 待归属确认)** | rule6_note 四处 SKILL.md 分类内部矛盾 / heartbeat 无 SC 或 fixture 钉住 / collision.py 协调项已过期 (sibling 分支已合并) / STALE_TTL 方向词误写 / 「附注」悬空引用 / R1 报告第二条处方 (ii) 未处置 |
+| **rework 第 2 轮** | 逐条处理上一轮 6 findings: rule6_note 改四处二档 + 新增 (d) 点名行为; 新增 SC-20/SC-21 (追加编号, 不重排既有 SC); collision.py 协调项按 `origin/master@ca52d1c` (已合并, 早于本文件落盘) 改写为已解事实 + 补 master 行号; 方向词/悬空引用订正; R1 报告 (ii) 处方 defer 到 A.2 并写明理由 |
+| **上一轮核验 (第 2 轮独立核验, 8 findings: 4 major/4 minor)** | owner 裁定原文两处被整段删除换 AI 转述且与原文有实质偏差 (major-3, 最重) / heartbeat 具体 CLI 入口未点名 (major-1) / `lib/collision.py` 缺 Impact 表行 (major-2) / rule6_note 能力面 hunk 误判「不单独申请豁免」而两套件实存 (major-4) / constants.py 三处过期注释未列 (minor-1) / mtime 引用会漂移 + diff --stat 文件数误记 (minor-2) / rule6_note「四处」计数漏 config-loader (minor-3) / `_run_gate_impl` 行号误记 (minor-4) |
+| **rework 第 3 轮 (本次)** | 逐条落实上一轮 8 findings: §2.2/§3 两处 owner 裁定原文按 `git show 86540f2` 逐字恢复 (blockquote), 下接「落版 (AI)」与「⚠️ 实读订正 · 请 owner 复议」两段 (major-3, 含 STALE_TTL/sweep 理据矛盾请 owner 复议 + Rule #6 措辞误改已撤销); heartbeat 具体入口钉为 `phase1_gate.py --heartbeat-only` (major-1, 同步改 §2.2/(d)/SC-21/Impact 表); Impact 表补 `lib/collision.py` 行 (major-2); rule6_note 能力面附注按逐 hunk 判重写为「两套件均实存 ⇒ 照跑」, Impact 表 AB 行拆两行 (major-4); constants.py 行补三处过期注释 (minor-1, 含标题订正); mtime 引用改相对表述 + diff --stat 订正为一个 test 文件 (minor-2); rule6_note「四处」改「五处」补 config-loader 描述性档 (minor-3, 含 STALE_TTL/SWEEP_TTL 混用第三处引用); `_run_gate_impl` 行号订正为 `:335`–`:1032` (minor-4); 事实清单新增 #17 — **待 post_spec R2 (convergence 续审)** |
 
-报告: `.aria/audit-reports/post_spec-R{1,2,3}-*-a1-entry-claim-*` · spike: `.aria/spikes/2026-08-02-*` · 原版全文见 git 史 (`b7c4933` 之前)
+报告: 旧版三轮 `.aria/audit-reports/post_spec-R{1,2,3}-*-a1-entry-claim-duplicate-work-guard-*` (`b7c4933` 之前) · **重写 v2 R1** `.aria/audit-reports/post_spec-R1-1785710000000-a1-entry-claim-rewrite-*` (5 席 + 聚合 + R1-fix editlist) · spike: `.aria/spikes/2026-08-02-*`
 
 ---
 
-## ⚠️ 闸门待裁 (Rule #10 — AI 不自行判定)
+## 闸门状态 (Rule #10 — AI 不自行判定)
 
-`audit.checkpoints.post_spec = "convergence"` **enabled**, 封闭豁免白名单四类无一适用 ⇒ **默认应跑 post_spec**。
+`audit.checkpoints.post_spec = "convergence"` **enabled**, 封闭豁免白名单四类无一适用 ⇒ **本版按默认跑 post_spec, 不豁免**。
 
-**本版与前三轮的关键不同, 供 owner 参考**:
-1. 三处曾反复出错的承重逻辑 (heartbeat / track-id / `include_terminal` 接线) **现在都有实测支撑**, 不再是「Phase A.2 定」的占位符;
-2. 原版 **7 处「A.2 待办」已清零** —— 每一条要么有 spike 结论, 要么被明确判为非目标;
-3. **S4/S5 推翻了两条上游审计结论** ⇒ 继续打补丁会把那两条错误原样吸收。这是重写而非修订的直接理由;
-4. 但**重写本身是新表面** —— 尤其 **§1 (字段可得性) 是全新章节**, 以及 §2.1/§2.2 的具体条款措辞, **从未经任何席位审过**。
+**已裁事实** (取代原「⚠️ 闸门待裁」段的未决措辞 — 该段写于重写 v2 刚成文、尚未提交审计之时; 现 post_spec **R1 已跑**):
 
-**AI 不预判裁决。** 本 Spec 在裁决前不进 A.2/A.3。
+1. **重写 v2 的 post_spec R1 (5 席) 已跑完**, 判定 **5/5 REVISE**, 去重后 5 个 critical 簇 —— **不是豁免, 是走了正常闸门**, 结果证实「重写本身是新表面」的顾虑成立 (原第 4 点预判命中): §1/§2.1/§2.2 的新增条款确实被审出事实断言与实读不符的问题;
+2. **R1-fix 已全量吸收**, 其中 C1 (两处 SKILL.md `allowed-tools` 缺 `Bash`/`AskUserQuestion`, 主机制不可执行) 与 C2 (heartbeat 换了匹配键但无人调) 两项因涉及 skill 能力面扩权 / TTL 常量变更, 判断超出「审计聚合报告直接吸收」的裁量范围, 转 owner 裁定;
+3. **owner 已于 2026-08-22 下裁**: C1 采 (a) 扩权, C2 采 (ii)+(iii) 组合; **本次 rework 已把两项裁定落版本文** (§2.2/§2.3/§3 + Impact 表), 并按 R1 聚合报告的处方补齐「事实断言逐条实读清单」;
+4. **下一步**: 本版进 **post_spec R2 (convergence 续审)** —— 审 rework 新落的 C1/C2 落版内容与新增的事实核验清单本身, 而非从零重审整份 Spec。
+
+**AI 不预判 R2 的裁决结果。** 本 Spec 在 R2 通过并经 owner 批准前不进 A.2/A.3。
