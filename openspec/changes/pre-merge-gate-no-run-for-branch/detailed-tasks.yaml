@@ -439,7 +439,7 @@ tasks:
     exec_phase: "C"
     exec_order: 18
     title: "ship v1.66.5: (i) aria 子模块: CHANGELOG + 5 版本引用点 (plugin.json / marketplace.json :3+:16 / VERSION / CHANGELOG / README) → 本地 --no-ff merge (禁 Forgejo 服务端合并) + **补打漏掉的 tag: v1.66.4@9e6a17c 与 v1.66.1@3b97c35 (plugin.json 首次 =1.66.1 的 commit, R3 A4-m4 实核) (R2 A1-m7: 两 remote ls-remote 均无)** (version-management §4.3) + tag v1.66.5 + 双推 + 逐 remote ls-remote 核验 (失败重试 ≥3 次再下结论); (ii) 主仓: 在 TASK-000b 建的 feature/152-no-run-for-branch 上承载全部主仓改动 (config.template + .gitignore / DEC 前向指针 / ab-suite + ab-results / spec 目录 yaml 状态 / gitlink bump / 14 个版本字符串点 CLAUDE.md:139,:141 · VERSION:24 · README.md:8,:242 · i18n ×3 各 3) → 主仓 PR (硬约束 1 例外允许 Forgejo merge) 或本地 merge → 双推核验; pre_merge gate C.2.4 自 dogfood + C.2.4.5 submodule gate"
-    status: pending
+    status: done   # 2026-08-23 主控: aria f90881b (5 文件) → 本地 --no-ff merge a0fe720 + tags v1.66.1@3b97c35 / v1.66.4@9e6a17c / v1.66.5@a0fe720 双推, ls-remote origin==github 全一致; 主仓 de75443 (gitlink + 14 点) → merge 2a1a0b2 双推一致 (merge 前 local==origin==github 断言; 途中 origin/master 两次前进 914a4c7/826b356 均为对方轨 linked-issue-normalization, 零交集, 重同步后合); C.2.4 两仓 green (not_applicable) + C.2.4.5 PASS; custom checks 9/10 — plugin-cache-currency STALE 属 owner 交互动作 (/plugin update + 重启), 非机械可完成
     complexity: M
     estimated_hours: 2
     dependencies: [TASK-012, TASK-013, TASK-014, TASK-001]
