@@ -229,7 +229,9 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 > | `NO_FIELD` | 四态之一 | 它在**层 0** 处理为 `no_field`, **不进**其层 1 的三态契约 | ✅ 兼容 (分层位置不同, 语义一致) |
 > | **`BAD_TOKEN`** | 四态之一: 有 code span 但**某个 token 元素**归一失败 | **无对应态** —— 其三态契约里没有这一格 | ❌ **实质差异, 需协调 (见下)** |
 >
-> **⇒ 唯一实质差异 = `BAD_TOKEN` 在探针的三态契约里无归宿。** 本席的建议映射 (**建议, 非单方面裁定** —— 归属由主控协调):
+> **⇒ 唯一实质差异 = `BAD_TOKEN` 在探针的三态契约里无归宿。**
+>
+> **✅ 已闭环 (R3/M7 回灌, 主控 2026-08-25)**: 探针 Spec 已在其 §3「消解 SEAM-2」补了**逐格映射表**, 并对 `BAD_TOKEN` 采**层 1 与层 2 并集** —— 即**采纳**本席建议的「触发 URL 回落」那一半, 并在其上追加「层 1 已解析出的元素不丢弃」。其反例逐字: 字段行 `` `10CG/aria-plugin#122, TBD` `` 判 `BAD_TOKEN` 时, **只走层 2 会让有效的 `#122` 丢失 (∅)**。⇒ **本 Spec 的四态定义无需任何改动**; 下方「本席的建议映射」保留为当时的建议留痕, 以探针 Spec §3 的映射表为准。 本席的建议映射 (**建议, 非单方面裁定** —— 归属由主控协调):
 > **`BAD_TOKEN` 在探针的层 1 应按 `NO_TOKEN` 处置** (即**触发** URL 回落)。理由: 在**读取侧**,「有 code span 但元素读不出 issue 号」与「读不到 code span」是**同一件事** —— 都没拿到可用的 canonical 键, 都该让 URL 回落去试。**⛔ 但写入侧必须仍报 warning** (E5), 两侧不得因此合并。
 > **反向不成立**: 若探针把 `BAD_TOKEN` 映射成 `TOKEN(s)`, 脏元素会直接进它的比较键集合 —— 与它自己 §3 层 2 的「绝不把脏串喂进主机制匹配面」逐字冲突。
 > **若探针 Spec 最终不采纳该映射**, 本 Spec 的四态**不改** (写入侧的分档有独立价值: `BAD_TOKEN` 的 fix 文案要点名坏元素, `NO_TOKEN` 的要点名「首个非空白不是反引号」), 但两份 Spec 须在各自文内**互相点名该分歧**, 不得任由它留在缝里。
@@ -306,7 +308,7 @@ $ grep -n "^  - name:\|python3 " .aria/state-checks.yaml
     enabled: true
 ```
 
-> **⚠️ 骨架只用既有 10 条 check 已在用的键** (`name` / `description` / `command` / `severity` / `fix` / `timeout_seconds` / `enabled`) —— `collectors/custom_checks.py:63` 自陈是「Minimal YAML parser — strictly scoped to state-checks.yaml shape」且 `:122-123` 逐字「This is a narrow parser — it / intentionally rejects YAML features outside the documented schema.」, 对**未知键**的行为**本轮未验**。⇒ 落地时**不得**为本 check 引入任何新键; 确有需要时须先在该 parser 上实跑确认不抛 `ValueError`。
+> **⚠️ 骨架只用既有 check 已在用的键** (**R3/M6 订正**: 原写「10 条」—— 实测 `grep -c '^  - name:' .aria/state-checks.yaml` = **11** (第 11 条 `main-project-version-consistency` 由并发轨 `2ae012f` 于本 Spec 起草当日引入)。**口径 (命令) 才是规范, 数字是当日观测** —— 与本 Spec §Why 的同一条纪律一致, 复核一律重跑该命令) (`name` / `description` / `command` / `severity` / `fix` / `timeout_seconds` / `enabled`) —— `collectors/custom_checks.py:63` 自陈是「Minimal YAML parser — strictly scoped to state-checks.yaml shape」且 `:122-123` 逐字「This is a narrow parser — it / intentionally rejects YAML features outside the documented schema.」, 对**未知键**的行为**本轮未验**。⇒ 落地时**不得**为本 check 引入任何新键; 确有需要时须先在该 parser 上实跑确认不抛 `ValueError`。
 
 **探针的判据分割 (fail-CLOSED, 五臂)**:
 
@@ -378,7 +380,7 @@ except Exception:
 | # | 决策 | 依据 |
 |---|------|------|
 | **D1** ⭐ | **抽取规则钉到字符级 (E0–E6), 不 defer 到 A.2** | 直接消解 R2 的 **C-A**。实测: 14/14 存量字段直喂归一 = `None`; 「取第一个 code span」的坏实现在 **6** 条真实字段上抽出 `confirmed`/`partial-repro`。规则不定 ⇒ check 上线恒红或抽错, 二者必居其一 |
-| **D2** ⭐ | **定位谓词 = 行首 depth-1 + fence 排除 + 文档序第一条**; 明确否决「只扫头部 N 行」 | 母 Spec `:88` 是**真实的**假阳性实例 (memory `reference_secret_guard_false_positive_on_spec_docs` 同形)。否决「头部 N 行」的依据是实测: 两份归档件的真字段在 `:61` / `:45`, 任何 N 都是拍脑袋且造假阴性 |
+| **D2** ⭐ | **定位谓词 = 行首 depth-1 + fence 排除 + 文档序第一条**; 明确否决「只扫头部 N 行」 | 该假阳性形态是**真实的** (**R3/M5 订正**: 原写「母 Spec `:88`」—— 该引用现已悬空: 母 Spec 的 §1 整节已于同批迁出本 Spec, 其 `:88` 现为 `## What Changes`, 全文 depth-2 `> > **关联 Issue**` 命中 **0**; 真身是**迁出前**的 `cc1bdef:75`, 本文件 §Why 的 grep 逐字输出保留了当时的原文, 探针 Spec `:99` 引的也是该 SHA。⇒ **稳定锚点改用**「本文件 §Why 的 grep 输出 + `cc1bdef:75`」, 不再引会随迁出漂移的行号) (memory `reference_secret_guard_false_positive_on_spec_docs` 同形)。否决「头部 N 行」的依据是实测: 两份归档件的真字段在 `:61` / `:45`, 任何 N 都是拍脑袋且造假阴性 |
 | **D3** ⭐ *(round-2 改判)* | **check 宿主 = `aria/skills/state-scanner/scripts/linked_issue_field_probe.py`** —— **plugin 分发面** (形态 ii), 不用内联 shell (i), 不落 `.aria/probes/` (iii) | 消解 **M-10**。**改判依据**: 形态 (ii)/(iii) 并存且 (ii) 已有两个既有实例 (`.aria/state-checks.yaml:22` / `:235` 调 `issue_cache_freshness_probe.py` / `coordination_probe.py`, `ls -la` 得 7716 / 11115 bytes) ⇒ round-1 的「check 无法分发」推论过头。归属判据 = **判定对象的性质**: 既有两条 `.aria/probes/` 都是「Aria 对自己分发物的自检」(config 模板 / plugin 安装态), 而「proposal 有无该字段」是**每个采用方都要的通用检查**。选 `state-scanner` 而非 `spec-drafter`: 既有两条 plugin 侧宿主全在此、custom check 由 state-scanner Phase 1.11 执行、`normalize_linked_issue()` 就在 `state-scanner/lib/`。逐条见 §4 |
 | **D4** | **复用 `normalize_linked_issue()`, 不自写第二份归一**; 导入失败 ⇒ `##SKIP##`, **不 fallback 到自写正则**; 导入方式 = **包父目录 + `from lib.collision import`** (**不是**同目录邻居 `coordination_probe.py` 的裸模块写法) | 姊妹 Spec `linked-issue-normalization` 的 **D9** 就是为此把它导出为公开单元 (`collision.py:178` 实读)。自写 fallback = 造出第二个归一实现, 两份必然漂移 (memory `feedback_spec_underdetermination_two_implementer_test`)。**导入方式两种写法本轮各实跑一次**: 包父目录 ✅ 得 `('aria-plugin', 122)` / 裸模块 ❌ 抛 `ImportError: attempted relative import with no known parent package` (因 `collision.py:46` 是 `from .claim_schema import ClaimRecord`) —— 与 `coordination_probe.py:80-85` 的相反选择**各自都对**, 理由见 §4 |
 | **D5** | **作用域只含 `openspec/changes/`** | `archive/` 140 份不可改且不再被消费; 且实测 **0 份合规** (126 `NO_FIELD` + 14 `NO_TOKEN`) ⇒ 扫它 = **恒红** = 零信息 |
@@ -466,7 +468,7 @@ except Exception:
 3. **fence 状态机** (E0 谓词 2) —— 引入 markdown 结构解析。不加它, SC-1(b) 那类「文档里的示例」无法与真字段区分。**已知限 (三条, 成文不假装覆盖)**: (i) 只认「三个反引号」与 `~~~` 两种围栏标记, **不处理**缩进代码块 (4 空格); (ii) **不处理嵌套围栏的长度差异** (更长的围栏内包更短的围栏) —— 本文件 `:123` 自己就有一个 4 反引号 code span 内含 3 反引号, 它不在行首故不触发状态机, 但**同形写法出现在行首时会误翻转**; (iii) blockquote 内的围栏只认**一层** `> ` 前缀 (`(?:> ?)?`), 两层及以上 (`> > ` + 围栏) 未处理 —— 该形态在真实语料上零实例, 未构造夹具。
 4. **对 `standards/` 子模块的写入** —— 跨仓交付面。走 aria-standards 自身 PR + 主仓 gitlink bump, 且受 CLAUDE.md 多远程硬约束 1/2 管辖 (本地合并 + 双推 + `ls-remote` 逐个核验)。本 Spec **未**估算该流程的耗时/门。**round-2 追加**: 宿主改判后本 Spec 的写入面变成**三个仓** (`standards/` 模板 + `aria/` 两处 + 主仓 `.aria/state-checks.yaml` 与 Spec), 交付顺序与 gitlink bump 次序**未排**, 属 A.2。
 5. **与母 Spec 同文件不同 hunk 地改 `spec-drafter/SKILL.md`** —— 两 Spec 若非同批 ship 会产生 merge 面接触。依赖方向已声明为「任意顺序」, 但**落地顺序的 merge 冲突面未评估**。
-6. **`.aria/state-checks.yaml` 的 minimal YAML parser 对未知键的行为未验** —— §4 骨架**只用既有 10 条 check 已在用的 7 个键**以规避它, 但「未知键会怎样」这一事实本轮**没有实测**, 只读了 parser 的自陈 (`:63` / `:122-123`)。⇒ 落地时**不得**为本 check 引入新键。
+6. **`.aria/state-checks.yaml` 的 minimal YAML parser 对未知键的行为未验** —— §4 骨架**只用既有 check (当日观测 11 条) 已在用的 7 个键**以规避它, 但「未知键会怎样」这一事实本轮**没有实测**, 只读了 parser 的自陈 (`:63` / `:122-123`)。⇒ 落地时**不得**为本 check 引入新键。
 
 ---
 

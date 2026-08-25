@@ -172,7 +172,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > **A.1 认领时派生的那一串, 即本 cycle 的 carry-id。** `phase-b-developer` B.0 (`skills/phase-b-developer/SKILL.md:92` 的 `--raw-track-id "<本 cycle carry-id/Spec id>"`)、`branch-manager` (`skills/branch-manager/SKILL.md:146` 的 `### 前置: REQUIRE claim`)、`phase-d-closer` D.2b (`skills/phase-d-closer/SKILL.md:51-52`, `:55` 逐字「carry-id = Phase B-entry 时传给 phase1_gate 的同一原始串」) **三处逐字节复用同一串, 不再各自派生**。
 
 - **三处 SKILL.md 的占位措辞须改为明示**: 「**A.1 认领时派生的那一串**; 未走 A.1 的 session 沿用 Spec id」⇒ Impact 表补这三行;
-- `standards/conventions/session-handoff.md` §2.3 结构化 `{id, desc}` 的 `id` **同为该串** ⇒ Impact 表补该行 (R2/M-14 的一半);
+- `standards/conventions/session-handoff.md` **§2.3.8** 结构化 `{id, desc}` 的 `id` **同为该串** (**R3/KM-1 订正**: 原写 §2.3 —— 实读该文件 `:101` §2.3 是「机读 frontmatter schema」, `:217` §2.3.8 才是「结构化 Carry-id schema (§6 prose 层, **非 frontmatter**)」, 且 `:238` §2.3.8.3 逐字把「留 §6 prose, 不进 frontmatter」列为**硬约束** ⇒ 引 §2.3 会把实现者引向违反该硬约束) ⇒ Impact 表补该行 (R2/M-14 的一半);
 - **为什么必须统一而不是在 D.2b 打补丁**: 实读 `lib/track_id.py:61-76` 的归一四步**不含任何去容器段逻辑** ⇒ 两个不同原串归一后必是两个不同 `track_id`, 而 `release_claim_by_track` 按 `(container, 归一 track_id)` 定位 (`lib/claim_lifecycle.py:377` 定义, `:425` `if rec.container == resolved.container_id`) ⇒ 不统一就**没有任何**归一层能把它们接上;
 - **已知限 (成文, 不假装覆盖)**: 存量 active claim 仍是**旧形态** (无容器段), 本 Spec **不改写存量 ref** (见 §非目标) ⇒ 过渡期两形态并存, **新轨用新形态、旧轨自然随 GC 退场**。这段过渡期内, 旧形态轨的 A.1↔D.2b 断链**仍然存在**;
 - **闭环由 SC-23 钉住** (A.1 认领 → 走完循环 → D.2b `release_gate.py --raw-track-id <A.1 原串>` ⇒ 该 claim 不再 active)。
@@ -209,13 +209,14 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 >   > **⚠️ 它不是「无视 opt-out」**: heartbeat **同样受 `state_scanner.coordination.enabled` 门控** —— `enabled == false` ⇒ **heartbeat 零调用**, 与 §2.5 是**同一条开关**, 不是两条。旧版「每次 `/state-scanner` 必跑」的字面读法会让只读型命令在 opt-out 项目上每次写 claim + 推远端 (对未配 coordination ref 的第三方是外向副作用), 这是 R2/M-7 的命中点。**由 SC-28 钉住** (`enabled == false` ⇒ 入口零 heartbeat 调用), 与 SC-9 是同一开关的两半;
 > - **落点**: `skills/state-scanner/SKILL.md` 的 Layer L Phase B 集成段 (`:143-178` 一带) 新增对称的「Layer L A.1 heartbeat 集成」小节, 写明触发条件/调用形态 (`--heartbeat-only`) /失败处置 (fail-soft, 不阻断 `/state-scanner` 主流程);
 > - **`--heartbeat-only` 刷哪条 track (R2/M-12 + R2-CR-M1 补, rework v3 —— 旧版只写「只刷本容器本 track」而 track 来源未定义, 且 claim 按 `(container, session)` 键控在跨 subprocess 时不可判定)**。**来源是三级回落, 顺序固定**:
->   - **① 本 session 已跑过的 `phase1_gate` 的 `track_id` (编排层 telemetry)** —— **这不是新机制, Phase B 已有逐字先例**: 实读 `skills/phase-b-developer/SKILL.md:88` 的 B.0 块写着 `check: phase1_gate telemetry / 编排层记忆 (本 session 是否已跑 phase1_gate)`。A.1 的 heartbeat 用**同一个** telemetry 通道取 track_id;
->   - **② 回落 = handoff §6 的结构化 carry-id**, 与 B-entry 闸门取 `raw_track_id` 的**同一个来源** —— 即 §2.1b 定义的那一串 (`standards/conventions/session-handoff.md` §2.3 的 `{id, desc}` 之 `id`);
+>   - **① 本 session 已跑过 `phase1_gate` ⇒ 该 claim 在 coordination ref 内可按 `(container, session)` 直接定位, 从 `claims/<container>/<session>.yaml` 的 `track_id` 字段读出** —— **机读持久化状态, 非记忆**;
+>     > **⚠️ 先例引用订正 (R3/TL-M6 —— 上一轮主控指令误引, 主控担责)**: 上一版此处引 `skills/phase-b-developer/SKILL.md:88` 的 `check: phase1_gate telemetry / 编排层记忆 (本 session 是否已跑 phase1_gate)` 作「同一个 telemetry 通道取 track_id」的逐字先例。**实读证伪**: 该行是**布尔谓词** —— 它回答「**跑没跑**」, **不携带 `track_id`**; Phase B 的 track_id 在同文件 `:92` 另取自 `--raw-track-id "<本 cycle carry-id/Spec id>"`。⇒ 该先例**不能**用来论证「telemetry 提供 track 来源」, 已撤。替代的机读来源见本行正文 (coordination ref 内本 session 自己的 claim)。
+>   - **② 回落 = handoff §6 的结构化 carry-id**, 与 B-entry 闸门取 `raw_track_id` 的**同一个来源** —— 即 §2.1b 定义的那一串 (`standards/conventions/session-handoff.md` **§2.3.8** 的 `{id, desc}` 之 `id`);
 >   - **③ 两级都取不到 ⇒ 跳过 + `log()`, 不猜** (fail-soft) —— 与本节失败处置同一档; 「猜一个 track 去刷」会刷错**别人**的 claim, 是比不刷更坏的失败;
->   - **CLI 形态**: `python3 .../phase1_gate.py --heartbeat-only --raw-track-id "<carry-id>" --repo-path <主仓根>` —— 由 AI 编排层**显式传入**, CLI 侧**不做任何推断**;
+>   - **CLI 形态**: `python3 .../phase1_gate.py --heartbeat-only --raw-track-id "<carry-id>" --phase A.1 --repo-path <主仓根>` (**`--phase` 不可省 — R3/BA-M1**: `phase1_gate.py:1191` 的 `--phase` 是 `required=True`, 主控实跑 `--raw-track-id x --heartbeat-only` → `error: the following arguments are required: --phase` ⇒ 旧版字面形态**第一次实跑即被 argparse 拒**, 到不了 heartbeat 分支。本 Spec 取「文档补 `--phase`」而**不**放开该参数: 零代码改动; `--heartbeat-only` 不写新 claim, `--phase` 仅作占位不落盘) —— 由 AI 编排层**显式传入**, CLI 侧**不做任何推断**;
 >   - **匹配**: 按 `(container, 归一 track_id)` 刷新**全部**匹配的 active claim (与本节「增并存变体」的匹配键一致), **不写新 claim、不判碰撞**;
 >
->   > **⚠️ 对 R2-CR-M1 反对意见的正面答复**: CR-M1 指「给 heartbeat 指定 track 来源等于回到依赖 AI 记性, 而那正是 (ii) 要消灭的」。**该反对不成立**: **① 是编排层 telemetry** (与 Phase B 的 `check:` 谓词同一机制, 由 harness 侧记录本 session 是否跑过 `phase1_gate` 及其参数), **② 是 handoff §6 的结构化机读字段** —— **两级都不是「AI 记性」**, 都是可被机械读取、可被测试夹具构造的持久化状态。(ii) 要消灭的是「AI 记得**去调用**」, 本条解决的是「调用时**参数从哪来**」, 两者正交。
+>   > **⚠️ 对 R2-CR-M1 反对意见的答复 (R3/TL-M6 后重写)**: CR-M1 指「给 heartbeat 指定 track 来源等于回到依赖 AI 记性, 而那正是 (ii) 要消灭的」。**答复**: **① 是 coordination ref 内本 (container, session) claim 的 `track_id` 字段**, **② 是 handoff §6 的结构化机读字段** —— **两级都不是「AI 记性」**, 都是磁盘上可被机械读取、可被测试夹具构造的持久化状态。**⚠️ 但须诚实声明该答复的边界**: ① 只在**同一 session 内**可用 (跨 session 时 `session_id` 是 FRESH 的, 按 `(container, session)` 找不到旧 claim —— 这正是 §2.2 存在的理由); 跨 session 场景**只剩 ②**, 而 ② 依赖「上一次会话写过 handoff §6」。⇒ **本条不主张已彻底消除人为环节, 只主张两级来源都是机读的**; 「handoff §6 缺失时 heartbeat 静默不跑」是**成文的已知限**, 见本节 ③。
 >   >
 >   > **⚠️ 显式否决 CR-M1 的 B 方案 (「不指定 track, 直接刷新本容器全部 active claim」)**: **不采。** 该方案会把**被遗忘、未 release 的 claim 永久 keep-alive** —— 它们将永不 stale、永不进 `--sweep-stale` 候选, 变成僵尸 claim 长期占据 overlap 告警面。这与 §5.2 的显式 release 义务和 **SC-7**（超 `SWEEP_TTL` 未刷新仍被 sweep）**直接相反**: B 方案下 SC-7 结构性无法为真。
 > - **`--heartbeat-only` 的 fetch 代价与复用 (R2-CR-m6 补, rework v3)** —— **它不得自带第二次 fetch**:
@@ -383,7 +384,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > **迁往**: [`openspec/changes/sibling-spec-probe/proposal.md`](../sibling-spec-probe/proposal.md) —— 原 §4 的全部内容 (`sibling_spec_probe.py` 新脚本 / 扫描范围含 `archive/` / per-round 入口挂载 / fetch 代价与超时预算 / 规模上限 / 消费面与 exit code / 盲区声明) 由该 Spec 承担, 连同 R2 簇 **M-1** (「同 issue」匹配谓词未定义)、**M-5** (「各自默认分支」取法未定义 + in-flight 竞品不可见)、**M-6 的 audit-engine 档**、**M-17 的「§4 无 stdout 契约」子项**, 以及 R1 editlist **FIX-10**。原 SC-16/17/18/19 一并迁出 (见 Success Criteria 表内保留的迁出行)。
 > **为什么迁**: R2 的 M-1/M-5 都是 **R1 still-open** 且落在 `audit-engine` 这个与 A.1 认领**不同的宿主**上; `ab-suite/audit-engine.json` 实测**不存在** (rework v3 实核), 使原 rule6_note 的「覆盖外」档按判据表「缺一照跑」根本不成立 —— 这三件都属探针自己的收敛面。
 > **依赖方向 (逐字, 不得读成隐式前置)**:
-> - **探针 spec 不是主体的阻塞前置。** 主体的 §6 缺口表里「legacy 轨 / 一方跳过入口」两行原写「§4 探针部分覆盖」, 现按实际改为「**由 `sibling-spec-probe` 覆盖, 未 ship 前该缺口无覆盖**」—— 成文, 不假装覆盖。
+> - **探针 spec 不是主体的阻塞前置。** 主体的 §6 缺口表里「legacy 轨 / 一方跳过入口」两行原写「§4 探针**部分**覆盖」(**R3/TL-M5**: 迁出时必须保留「**部分**」这个限定词 —— 探针自测覆盖率 90.5%, 非全覆盖; 丢掉限定词会把一个已知缺口读成已闭合), 现按实际改为「**由 `sibling-spec-probe` 覆盖, 未 ship 前该缺口无覆盖**」—— 成文, 不假装覆盖。
 > - **主体是探针 spec 的语义母体**: 探针的「同一条轨」「同一个 issue」判据一律引用主体 §2.1 的 track-id 契约与 `linked_issue` 语义, 不得自行重定义。
 
 ### §5 claim 生命周期 — A.1 引入的新退出路径
@@ -436,7 +437,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 ## 事实断言逐条实读清单 — ⛔ **整表已切出**
 
-> **迁往**: [审计轨 §5](../../../.aria/audit-reports/a1-entry-claim-audit-trail.md#5-事实断言逐条实读清单) —— **按字节搬运, 未重写任何一句**。34 行断言表 (原 #1–#17 订正 + rework v3 新增 #18–#34) 全部在那里。
+> **迁往**: [审计轨 §5](../../../.aria/audit-reports/a1-entry-claim-audit-trail.md#5-事实断言逐条实读清单) —— **⚠️ 搬运性质分节陈述 (R3/CR-M-M1 订正 —— 原写「按字节搬运, 未重写任何一句」对 §5 **为假**, 主控担责)**: 审计轨 **§1 (轮次轨迹表)** 是**逐字搬**, CR 席 diff 确认连续块命中; 审计轨 **§5 (事实断言实读清单)** **不是**纯搬运 —— 该表在本轮**先**按新基线 `d50f9c3` 重测重生成 (含新增 #18–#34), **然后**才移出, 与已提交前身相比 22/29 行找不到。§2/§3/§4 各含一条本轮新写的编者注。⇒ 「无损搬运 ⇒ 撤回成本低」这条安全性论证**只对 §1 成立**。34 行断言表 (原 #1–#17 订正 + rework v3 新增 #18–#34) 全部在那里。
 > **切分理由 (主控 2026-08-25 裁定, 已标请 owner 复议)**: 该表是**核验证据**不是交付面 —— 与姊妹 Spec 2026-08-07 owner 裁定「交付面与审计史切开」同类; 且它可由 `verify_line_refs.py` 随时重新生成, 不需要人肉维护在交付面里。
 > **本文件正文里所有 `文件:行号` 引用的实读基线 = aria 子模块 `d50f9c3`** (= v1.67.1 `58a49e7` + 2 commit)。**复核命令 (逐字)**: `git -C aria show d50f9c3:<path> | sed -n '<N>p'`。主仓语料口径的基线 = `cc1bdef`。
 > **正文里形如「见清单 #N」的交叉引用**, 一律指审计轨 §5 表内的第 N 行。
@@ -451,7 +452,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | D1 | ~~「关联 Issue」字段可得性提为 §1~~ ⇒ **⛔ 已随 §1 迁至 [`linked-issue-field-availability`](../linked-issue-field-availability/proposal.md)** (owner 2026-08-23 方向 b) | 原依据 `141/13/9%` 已作废 —— rework v3 实测口径见「事实断言逐条实读清单」#30 |
 | D2 | ~~字段格式固定 `<org>/<repo>#<n>` + custom check (warning)~~ ⇒ **⛔ 已随 §1 迁出** (同上) | 同上 |
 | D3 | track-id = `<basename>-<str(int(n))>-<container_uuid>` | **S3**: 不含容器段则两轨同 id ⇒ 被 `lib/collision.py:278-279` 互斥 ⇒ 主机制死 (R2/C1); uuid 不截断不用 label (label 碰撞域不可控且模板鼓励设置)。**⭐ rework v3 补注 —— 更简的备选已被实测证伪**: 「去掉容器段, 靠 reconcile 同名碰撞 (7c) 报警」不成立 —— 7c 只在竞品未 stale 时触发 (`_takeover_eligible` 命中即走 7d「No prompt needed」零 surface), 而 `heartbeat()` 生产调用点为 0 (`lib/constants.py:43-44`) + `STALE_TTL`=1800 ⇒ 事故窗 (48–72h) 内同名通道**结构性静默** (= Aria #180); 而 overlap 通道 (`lib/collision.py:265-292`) **不做新鲜度过滤**, 对 stale claim 同样可见。⇒ **容器段的真正作用是把碰撞检测从新鲜度脆弱的通道挪到新鲜度免疫的通道** (详见 §2.1) |
-| D4 | heartbeat 匹配键改 `(container, track_id)`, 刷新全部匹配 | **S1**: `release_claim_by_track` 为**同一 defect** 做过同款修法, 照抄即可; session 落盘方案被它取代 |
+| D4 (**⛔ 已被 D16 取代 — R3/BA-M2 订正**) | ~~heartbeat 匹配键**改** `(container, track_id)`~~ ⇒ **以 D16 为准: 增 by-track 并存变体, 不改既有 `heartbeat()` 的 `(container, session)` 键**。旧措辞是 R2/M-17 第 2 项点名的两读之一, §2.2 `:188` 与 D16 已统一而本行残留未同步 | **S1**: `release_claim_by_track` 为**同一 defect** 做过同款修法, 照抄即可; session 落盘方案被它取代 |
 | D5 | `include_terminal` 在 **`_main()` 现有调用处**加参数, 不碰 `run_gate` 签名 | **R3/C2** 实测: `linked_issue_overlaps` 只在 `:1233` 被调用 (rework 订正: 原 R3 记 `:1232`, 实读为其下一行), `_run_gate_impl` 零命中 |
 | D6 | 「接手」= **两步人工**, 不引入跨容器 release | **S3** 实测无该函数; 既有 takeover 路径对本场景不可达; 写别人的 claim 是权限面变更 |
 | D7 | ~~探针自带 fetch, 不称轻量, 配 30s 预算 + 重试~~ ⇒ **⛔ 已随 §4 迁至 [`sibling-spec-probe`](../sibling-spec-probe/proposal.md)** (owner 2026-08-23 方向 b) | **S2** 实测数据一并移交该 Spec |
@@ -612,7 +613,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | **`skills/phase-b-developer/SKILL.md`** (新增行) | B.0 步骤块 `:92` 的 `--raw-track-id "<本 cycle carry-id/Spec id>"` 占位措辞改为明示「**A.1 认领时派生的那一串**; 未走 A.1 的 session 沿用 Spec id」(**只改占位串取值口径, 不改闸门语义**) | **R2/C-C** + editlist **FIX-14 选项 A** |
 | **`skills/branch-manager/SKILL.md`** (新增行) | `:146` 的 `### 前置: REQUIRE claim` 步骤块内同款 carry-id 占位措辞同步 | 同上 |
 | **`skills/phase-d-closer/SKILL.md`** (新增行) | D.2b (`:42` 表行, `:51-52` 调用) 的 `--raw-track-id "<本 cycle 的 carry-id 原始串>"` 与 `:55` 的说明句同步为同一口径。**⚠️ `:56` 的「超 STALE_TTL」误写属既有缺陷, 记 follow-up, 不在本 Spec 改** | 同上 + 清单 #14 |
-| **`standards/conventions/session-handoff.md`** (新增行) | §2.3 结构化 `{id, desc}` 的 `id` 即本 cycle carry-id (= A.1 原串) —— **`track_id.py` 自称该文件为 SOT** ⇒ 不登记就是让 SOT 与实现脱钩 | **R2/M-14** (一半) |
+| **`standards/conventions/session-handoff.md`** (新增行) | **§2.3.8** (非 §2.3 —— R3/KM-1) 结构化 `{id, desc}` 的 `id` 即本 cycle carry-id (= A.1 原串) —— **`track_id.py` 自称该文件为 SOT** ⇒ 不登记就是让 SOT 与实现脱钩 | **R2/M-14** (一半) |
 | **`skills/state-scanner/docs/coordination-ref-schema.md`** (新增行) | **§3.2 (`:129` 起, 现枚举 reader 侧 unknown 行为 5 条于 `:133-139`)** 后**追加第 6 条**: unknown claim 在 A.1 消费面的可见性与措辞语义 (经独立键 `unknown_schema_claims`; 措辞「已检测到 N 条无法解析的 claim, 存在性已确认、内容未知」; **不得**并入 `linked_issue_overlap[]`, **不得**与 `done`/`abandoned` 同档)。**断言形登记** (该文件**已实读确认存在**, 见清单 #28), 不写「若存在」条件形 | **R2/M-14** (另一半) + editlist **FIX-17** |
 | `skills/state-scanner/references/layer-l-integration.md` | **三处, 缺一即留悬空引用**: ① `:15` 断言「Design A 条件触发: 闸门仅在用户确认要进入 Phase B 时调用, 不在 scan.py 内自动执行」, 本 Spec 增 A.1 触发点后即过时, 须同步; ② **`:45` 的函数名是悬空的** —— 该行逐字 `` | `heartbeat` | `phase-b-developer` mid-cycle | 每 10min (caller 负责调度) | `lib/claim_lifecycle.py::update_heartbeat()` | ``, 而 `git grep update_heartbeat` 全 aria **只命中这一行自身** (清单 #33) ⇒ **`update_heartbeat()` 这个函数不存在**, 真名是 `heartbeat()` (`lib/claim_lifecycle.py:178`), 须改名; ③ **同一行的 caller/节律也与事实矛盾** —— 它写 caller = `phase-b-developer` 每 10min, 而 `lib/constants.py:43-44` 逐字自陈 `NO production heartbeat loop exists (heartbeat() has zero production call sites…)` ⇒ 该行描述的是一个**从未存在过的调度**, 须改写为本 Spec 落地后的真实 caller/节律 (`/state-scanner` 入口 AI 编排层, 每次调用, 受 `coordination.enabled` 门控) | R1/M8 + **rework v3 实读新增 (A-8)** |
 | `skills/config-loader/SKILL.md` | ① `coordination` 在 A.1 的 skip 语义登记 (既有 `enabled` `:134` / `mode` `:140` 同节); ② **新增 `state_scanner.coordination.unattended` (boolean, default false) 登记** | R1/M3 + **R2/M-15** (editlist FIX-16) |

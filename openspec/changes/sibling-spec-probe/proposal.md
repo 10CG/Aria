@@ -290,7 +290,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | `reason` | `str \| null` | **`status != "ok"` 或 `verdict == "not_established"` 时必非空** (二者是**或**关系 —— `own_keys` 为空时运行面一切正常 `status="ok"`, 判定面却是 `not_established`, 只写「status 非 ok 才要 reason」会让这一格恒空); 枚举 `"no_enforced_remote"` \| `"remote_unresolved"` \| `"fetch_failed"` \| `"cap_applied"` \| `"own_token_absent"` |
 | **`verdict`** | `str` | **判定面 (一等字段)**: `"sibling_found"` \| `"no_sibling_found"` \| `"not_established"` |
 | `own_spec_dir` | `str` | 本轨 spec 目录名 (自命中排除键) |
-| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"wu_empty"` \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` |
+| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"wu_empty"` \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) |
 | `own_keys` | `list` | 本轨比较键 (每项 `["k",<basename>,<n>]` 或 `["r",<原串>]`) |
 | `remotes` | `list[obj]` | 每 remote 一项: `name` / `default_branch` (`str\|null`) / `resolved_by` (`"ls_remote_symref"\|null`) / `error_kind` (`str\|null`) / `scanned` (`int`) / `capped` (`bool`) |
 | `hits` | `list[obj]` | **恒为 list, 永不为 `null`**; 每项 `remote` / `branch` / `corpus` (`"changes"\|"archive"`) / `spec_dir` / `path` / `field_line` (`int`) / `key` / `layer` |
@@ -505,7 +505,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 3. **`MAX_PROPOSALS_SCANNED = 1000` 常量** (§6) —— 新的规模面。数值依据是本仓 147 篇的实测外推, **对第三方仓未验证**。刻意**不做**成 config key (避免新配置面), 代价是采用者无法调整。
 4. **新建 `ab-suite/audit-engine.json`** (rule6_note 第 2 条) —— 从零建一份 AB 套件会把 `ab-suite/` 的 `.json` 从实测的 **31** 增到 **32**, 且是 `#150` 所列无套件 skill 中的第一个被补上的。**未审**: 建套件本身是否需要单独走 `/skill-creator` 的基线流程 (`AB_TEST_OPERATIONS.md` §场景 2「新增 Skill 首次基线」说要), 以及那次基线跑是否属于本 Spec 的交付范围。**另**: `AB_TEST_OPERATIONS.md` 的资产盘点写「Skill eval suites 28 个 ✅ 全量覆盖」, 与实测 31 个 `.json` 及 `#150` 的「14/43 无套件」**三方互不一致** —— 已记 follow-up, 本 Spec 不修。
 5. **对 `execution-modes.md` 两块插入逐字相同的串** (§8) —— SC-17 用「计数恰为 2」做断言。**已知弱点**: 若将来出现第三个模式块, 该断言会把「正确地插了三处」判成红。这是**有意的**保守 (漏插比多插危险), 但须在 SC-17 的 docstring 里写明, 否则下一个人会以为它是 bug。
-6. **对姊妹 Spec `linked-issue-field-availability` 的消费契约** (§3 层 1) —— 本 Spec 单方面声明了它的抽取器返回三态 (`TOKEN(s)` / `无` / `NO_TOKEN`)。**该 Spec 由另一执笔席同批起草, 本席未与其交叉核对** ⇒ 若其最终定稿的返回形态不是三态, §3 层 1/1.5/2 的分派条件须同批修订。**这是本轮最实的跨 Spec 风险。**
+6. **对姊妹 Spec `linked-issue-field-availability` 的消费契约** (§3 层 1) —— **⚠️ R3/M7 状态更新 (主控 2026-08-25)**: 本条原自陈「单方面声明、未交叉核对、本轮最实的跨 Spec 风险」。**该风险已闭环**: 姊妹 Spec 已落盘并被本 Spec 实读, §3 已补四态逐格映射 (`BAD_TOKEN` 取层1∪层2 并集), 姊妹侧亦已回灌确认其四态定义无需改动 ⇒ **不再是单方面声明**。以下为当时的原始记述 (留痕): 本 Spec 单方面声明了它的抽取器返回三态 (`TOKEN(s)` / `无` / `NO_TOKEN`)。**该 Spec 由另一执笔席同批起草, 本席未与其交叉核对** ⇒ 若其最终定稿的返回形态不是三态, §3 层 1/1.5/2 的分派条件须同批修订。**这是本轮最实的跨 Spec 风险。**
 7. **§3 层 0 的字段行定位规则** —— 母 Spec §4 全文没有这一层 (它默认「字段行」是无歧义的)。本席在实跑中撞到假阳性后新增, 并用 SC-18 的三臂对照钉住。**它同时是一条跨 Spec 接缝**: 层 0 定位的是**行**, 姊妹 Spec 的抽取器定位的是**行内的 token** —— 两者若各自演化, 会出现「姊妹认这行、探针不认」或反之。**未与姊妹席对齐**, 与第 6 条同源。
 
 ---
