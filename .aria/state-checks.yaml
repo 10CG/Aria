@@ -285,3 +285,32 @@ checks:
       AHEAD: 本地 aria/ 子模块 checkout 陈旧 —— `git submodule update --remote aria`。
     timeout_seconds: 5
     enabled: true
+
+  - name: "main-project-version-consistency"
+    description: |
+      主项目版本 (root VERSION 头部 `> **版本**: X`, meta-repo 的 SOT — 见
+      standards/conventions/version-management.md §4.3「VERSION 文件即 SOT, 不打 tag」)
+      与其全部 9 个当前值引用点的一致性。
+      owner 2026-08-25 核实立案: 2026-08-16 两次 bump (1.7.3→1.7.4→1.7.5) **只改了头部**,
+      其余 8 点全留在 1.7.3 / 1.7.0, 漂移存活 9 天。根因 = Aria#177 点名的类级问题 ——
+      CLAUDE.md「发布同步面」14 点清单**全是 aria-plugin 版本**, 主项目版本这条线从来
+      没有同步面清单; 既有两条 version check (m6-version-badge-match /
+      i18n-readme-translation-currency) 也只比插件版本 ⇒ 主项目漂移在机械层完全不可见。
+      ⚠️ `VERSION` 的 `## 版本号` 裸 semver 块看似与头部重复, 实为**机械解析入口** ——
+      任何「首个裸 semver 行胜」的解析器 (如 aria issue-triage 5 路链 path 3) 读到的是它
+      不是头部。必须同步, 不可当死条目删。
+      判据全分割: VERSION 缺失/头部不可解析 → FAIL (fail-closed); 任一点文件缺失或
+      匹配不到声明 → FAIL; 任一点值 != SOT → FAIL 列出全部漂移点; 全一致 → PASS。
+      本 check 的覆盖面 == 探针内 POINTS 清单 (它就是同步面清单的机读形态), 新增引用点
+      须同步加入。
+    command: |
+      python3 .aria/probes/main-project-version-consistency.py
+    severity: warning
+    fix: |
+      以 root VERSION 头部 `> **版本**: X` 为准, 把 FAIL 文案列出的漂移点逐个改成 X
+      (`## 对应 Tag` 块写 `vX`)。⛔ 不要反向把头部改成漂移值 —— 头部是 SOT 且有递增链
+      (git log -S 可核), 其余点是被漏改的派生面。
+      若是新增了引用点而 check 没覆盖 → 加进 .aria/probes/main-project-version-consistency.py
+      的 POINTS 清单 (清单即覆盖面)。
+    timeout_seconds: 5
+    enabled: true

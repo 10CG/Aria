@@ -240,7 +240,7 @@ Aria/
 ## 项目状态
 
 ```
-Project Version:  1.7.3
+Project Version:  1.7.5
 Plugin Version:   1.67.1 (aria-plugin, 42 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
