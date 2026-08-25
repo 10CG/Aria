@@ -5,7 +5,7 @@
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
 > 在 rebase/checkout 后会被刚落地的历史文件顶掉 —— 2026-08-10 实测发生过一次)。
-> **track 状态 (在飞 1 条: `a1-entry-claim-duplicate-work-guard` 08-23 A.1 rework v3 pending; 对方容器 `linked-issue-normalization` 在 Phase B 见其 handoff; `pre-merge-gate-no-run-for-branch` 08-23 done; 其余 premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 / #179 08-22 均终结)**:
+> **track 状态 (在飞 1 条: `a1-entry-claim-duplicate-work-guard` 08-25 post_spec R3 REVISE, 待 owner 裁方向 (a)/(b)/(c)/(d); 同批新拆 `linked-issue-field-availability` / `sibling-spec-probe` 两子 Spec 各自 R1 亦 REVISE, 随母裁定处置; 对方容器 `linked-issue-normalization` 已 ship v1.67.0 终结; 其余 premerge-gate 08-16 / #128 08-18 / issue-batch 08-20 / credential-defense 08-22 / #179 08-22 / #152 08-23 均终结)**:
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
