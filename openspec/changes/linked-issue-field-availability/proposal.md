@@ -127,7 +127,7 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 
 **二者关系 (M-2 要求成文)**:
 
-| | `standards/openspec/templates/proposal-minimal.md` | `aria/skills/spec-drafter/SKILL.md` |
+| 维度 | `standards/openspec/templates/proposal-minimal.md` | `aria/skills/spec-drafter/SKILL.md` |
 |---|---|---|
 | 角色 | **SOT** — 模板正文的唯一权威 | **消费方** — 声明该字段为必填 + 指向本 Spec §3 的写法 |
 | 现状 | 0 命中 (上方实测) | 0 命中 (上方实测) |
@@ -191,6 +191,31 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 **E5 — 合法性**: token 串**合法当且仅当** —— 逐字节等于 `无` (单个 U+65E0, 无空白、无其他字符), **或** 每个 token 元素经 `normalize_linked_issue()` 返回**非 `None`**。任一元素返回 `None` ⇒ **`BAD_TOKEN`**, 并在输出里**点名**那个元素。
 
 **E6 — `--linked-issue` 实参**: = **第一个 token 元素逐字节**, 不做二次加工; **且 token 串逐字节等于 `无` 时整个 `--linked-issue` 参数省略** (§2 的 NEW-01)。
+
+> ## 🔴 E0–E6 的**交付形态** — 可 import 的纯函数 (R3/C3, 主控 2026-08-25 补)
+>
+> **R3 判定**: 三条约束不可同时满足 —— 探针 Spec 声称 (逐字采纳本 Spec 的 E0) ∧ (不得内含第二份抽取实现) ∧ (不改 state-scanner);
+> 而本 Spec round-1/2 的唯一宿主是**项目根扫描的 CLI check**, **无导出 API**, 且作用域写死 `changes/`;
+> 探针要的是**远端 ref 上任意 blob** (含 `archive/`) 求四态 ⇒ **E0–E6 实现无归属**, 探针那句「姊妹非阻塞」在实现层为假。
+>
+> **处置 — 本 Spec 承诺把 E0–E6 交付为可 import 的纯函数** (先例: 已 ship 的姊妹 Spec `linked-issue-normalization` 的 **D9** 正是为同一理由把 `normalize_linked_issue` 从私有改为导出):
+>
+> ```python
+> # aria/skills/state-scanner/lib/linked_issue_field.py  (新建模块, stdlib-only)
+> def extract_linked_issue_field(text: str) -> "FieldVerdict":
+>     """对一份 proposal 的**全文文本**求 E0–E6 四态。
+>     输入是 str (不是路径) —— 探针要在远端 ref 的 blob 上调用, 没有本地文件。
+>     返回 FieldVerdict(verdict, token_str, token_elements, line_no)
+>       verdict ∈ {"NO_FIELD", "NO_TOKEN", "BAD_TOKEN", "OK"}
+>     """
+> ```
+>
+> - **输入是文本 blob 而非文件路径** —— 这是让探针能复用的**承重约束**: 探针读的是 `git cat-file` 出来的字节, 没有可 stat 的路径;
+> - CLI check (`linked_issue_field_probe.py`) 与探针 (`sibling_spec_probe.py`) **都 import 它**, 二者都不自写第二份;
+> - **作用域** (只扫 `changes/`) 是 **CLI check 的策略**, 不进纯函数 —— 纯函数只回答「这段文本的字段是什么态」;
+> - ⇒ **Impact 表新增该模块行**; 探针 Spec 的「非阻塞」措辞同批订正 (它可先 ship 并全走层 2, 该函数 ship 后再接层 1)。
+>
+> **⚠️ 本条是 R3 之后新增的交付形态承诺 (未经审计轮) —— 请 R4 优先审。**
 
 **四态判定 (穷尽, 无第五态)**:
 
@@ -265,6 +290,24 @@ $ grep -n "^  - name:\|python3 " .aria/state-checks.yaml
 
 **⭐ 本 Spec 取形态 (ii) — plugin 分发面**: 宿主 = **`aria/skills/state-scanner/scripts/linked_issue_field_probe.py`** (新建)。
 
+> ## 🔴 分发面 × 白名单的冲突 (R3/C2 — TL 与 CR **两席独立同判**, 主控担责)
+>
+> **缺陷**: round-1 把白名单写成脚本内的 `GRANDFATHERED` 常量 (6 条 **Aria 本仓路径**)。
+> round-2 主控把宿主改判到 **plugin 分发面**后, 二者冲突: 那 6 条路径**在采用方仓里不存在**
+> ⇒ 陈旧守卫子情形 (a)「路径当前不存在」**全命中** ⇒ **采用方注册后首跑即 `exit 1` 恒红**;
+> 而 `fix` 文案还让他们去改**随 plugin 分发的脚本** (改了下次 plugin 更新即被覆盖)。
+> **根因 = 主控 round-2 的宿主改判只改了一半** —— 白名单**天然是仓本地的**, 脚本却变成了全局的。
+>
+> **处置**: **白名单移出脚本, 改为仓本地数据文件** `.aria/linked-issue-field-grandfathered.txt`
+> (每行一条 `openspec/changes/<slug>` 路径; `#` 起首为注释)。
+> - 探针经 `--grandfathered <path>` 接收; **该参数缺省或文件不存在 ⇒ 白名单为空集**, 不是错误;
+> - ⇒ **分发件里零 Aria 路径**; 采用方拿到的是「白名单为空」= 其作用域内所有 proposal 都必须合规,
+>   这对新采用方是**正确的默认**(他们没有需要 grandfather 的存量);
+> - ⇒ 陈旧守卫的三个子情形只作用于**仓本地文件里的条目**, 采用方空文件 ⇒ 该守卫恒不触发, 不再恒红;
+> - `fix` 文案改指仓本地文件, **明确禁止**改分发件。
+>
+> **⚠️ 本条是 R3 之后新增的处置 (主控 2026-08-25), 未经审计轮 —— 请 R4 优先审。**
+
 > **📌 这是 round-2 的改判 (round-1 原取形态 iii `.aria/probes/`)。** 改判依据是主控实读指出的一个事实: **形态 (ii) 与 (iii) 并存, 且「随 plugin 分发的脚本被项目级 check 调用」已有两个既有实例** —— `.aria/state-checks.yaml:22` 与 `:235` 分别调 `aria/skills/state-scanner/scripts/issue_cache_freshness_probe.py` / `coordination_probe.py`, 二文件实存 (`ls -la` 得 7716 / 11115 bytes)。round-1 只看到「`.aria/probes` 不在 aria/ 内」这一条实读, 就推出「check 无法分发」—— **实读为真, 推论过头**。
 
 **改判后的理由 (逐条钉到字符级)**:
@@ -296,14 +339,16 @@ $ grep -n "^  - name:\|python3 " .aria/state-checks.yaml
       白名单含已离开作用域的陈旧条目同样 FAIL — 防它退化成永久静默豁免。
       判据分割 (零证据不当正证据): 作用域缺失 / 归一 SOT 不可导入 -> ##SKIP##。
     command: |
-      python3 aria/skills/state-scanner/scripts/linked_issue_field_probe.py .
+      python3 aria/skills/state-scanner/scripts/linked_issue_field_probe.py . \
+        --grandfathered .aria/linked-issue-field-grandfathered.txt
     severity: warning
     fix: |
       在被点名的 proposal.md 头部 blockquote 补一行 (行首无空白, `>` 后恰一个空格):
         > **关联 Issue**: `<org>/<repo>#<n>`      # 多个用 ", " 分隔
       无关联时逐字写: > **关联 Issue**: `无`
-      被点名为「白名单陈旧条目」时: 删除 skills/state-scanner/scripts/linked_issue_field_probe.py
-      的 GRANDFATHERED 里那一行 (该 proposal 已归档/改名/已合规)。
+      被点名为「白名单陈旧条目」时: 删除本仓 .aria/linked-issue-field-grandfathered.txt
+      里那一行 (该 proposal 已归档/改名/已合规)。注意: 白名单是**仓本地数据**,
+      不在 plugin 分发件里 — 任何情况下都不要去改 aria/ 子模块下的探针脚本。
     timeout_seconds: 10
     enabled: true
 ```
@@ -404,6 +449,21 @@ except Exception:
 
 ## Success Criteria
 
+> ## ⛔ 验证宿主 (R3/QA-F6, 主控 2026-08-25 补 —— **不补这段就是复发本 Spec 自己要治的病**)
+>
+> R3/QA 判定: 本 Spec 的 SC-1~6 / SC-8 全部标「代码」类却**没有一条声明测试宿主** —— 而本 Spec 存在的理由 (R2/C-A) 正是
+> 「承重规则 defer 到 A.2 ⇒ 上线即恒红」, 以及姊妹母 Spec 的 R1/C4「把 SC 挂在**不存在的**测试宿主上」。**同一个病在这里复发了。**
+>
+> | SC | 被测对象 | **宿主 (逐字路径)** | 现状 |
+> |---|---|---|---|
+> | SC-1~4 (E0–E6 四态与定位) | `lib/linked_issue_field.py::extract_linked_issue_field(text)` (纯函数, R3/C3 新增) | **`aria/skills/state-scanner/tests/test_linked_issue_field.py`** (新建; 目录实存, 与 `test_release_by_track.py` / `test_coordination_default_lockin.py` 同级) | 目录实存, 文件待建 |
+> | SC-5 (探针判据分区五臂) | `scripts/linked_issue_field_probe.py` **CLI 全链路** (exit code + stdout) | **同上文件** (以 `subprocess` 跑 CLI, 仿 `test_release_by_track.py:531` 的 `_GATE = Path(_SKILL_ROOT)/"scripts"/...` 既有体例) | 同上 |
+> | SC-6 (模板 SOT) | `standards/openspec/templates/proposal-minimal.md` 文本 | **`aria/skills/state-scanner/tests/test_linked_issue_field.py`** 内一条结构断言 (读**主仓**该文件; 跨仓读取属已知限, 见下) | 同上 |
+> | SC-8 (脚本路径不得回落 `.aria/probes/`) | 仓内文件布局 | 同上 (`Path` 存在性断言) | 同上 |
+>
+> **⚠️ SC-6 的跨仓已知限**: 该断言从 `aria/` 子模块内的测试去读**主仓** `standards/` 子模块的文件 —— 在 plugin 单独分发时该路径不存在。
+> ⇒ 该条**必须** fail-soft 成 **skip 而非 fail** (零证据不当负证据), 并在 skip 时打印原因。**这是本 Spec 的已知限, 成文不假装覆盖。**
+
 > **编号说明**: 本 Spec 从 **SC-1** 重新编号 (独立文件独立命名空间)。**本 Spec 的 SC-1 ~ SC-5 共同承接母 Spec 旧 SC-13** (「proposal 无『关联 Issue』字段 / 值不可解析 ⇒ custom check warning; 显式 `无` 则通过」) —— 旧 SC-13 把「定位 / token / 多值 / `无` / 判据分区」五件事捆在一条断言里, 按 R2 的 **M-16** (「把 CLI 可验字段与消费层措辞捆在一条」) 拆开, 每条只留**一个**可机械判定的断言。母 Spec 侧保留 SC-13 行, 内容改为「→ 已迁 `linked-issue-field-availability`」。
 
 | SC | 类别 | 场景 | 期望 | **它怎么会红** |
@@ -412,7 +472,7 @@ except Exception:
 | **SC-2** | 代码 | **E2 token 起始位**。输入 `> **关联 Issue**: [10CG/aria-plugin #122](url) (triage \`confirmed\`)` | 判 **`NO_TOKEN`**, 且**不得**抽出 `confirmed` | 「取该行第一个 code span」的实现抽出 `confirmed` ⇒ 红。该形状在真实语料上 **6** 条 (路径见 §3 E2 引用块), 夹具须至少复用其中 1 条的**逐字原文** |
 | **SC-3** | 代码 | **E4/E5/E6 多值**。(a) token 串 `10CG/a#1, 10CG/b#2`; (b) token 串 `10CG/a#1, [b](url)` | (a) **合法**, 两元素各自解析成功, `--linked-issue` 实参逐字节 = `10CG/a#1`; (b) **`BAD_TOKEN`** 且输出点名 `[b](url)` | 把整串直喂归一的实现在 (a) 上判不可解析 ⇒ 红; 只校验第一个元素的实现在 (b) 上判合法 ⇒ 红; 对 (a) 把实参取成整串或第二元素的实现 ⇒ 红 |
 | **SC-4** | 代码 | **`无` 两分支**。(a) `> **关联 Issue**: \`无\` — 说明`; (b) `> **关联 Issue**: 无 (由 \`x\` 发现)` (裸 `无`, 无 code span) | (a) **合法**, 且**不产生任何 `--linked-issue` 实参**; (b) **`NO_TOKEN`** | 把 `无` 当普通 token 传给 `--linked-issue` 的实现 ⇒ 红 (母 Spec NEW-01 实测: 两份无关 Spec 都写 `无` 会互相命中 overlap); 接受裸 `无` 的实现在 (b) 上 ⇒ 红。**(b) 有真实语料实例**: `openspec/archive/2026-08-23-linked-issue-normalization/proposal.md:6` 逐字 `> **关联 Issue**: 无` (实跑 `cat -A` 见 §实读清单) |
-| **SC-5** | 代码 | **探针判据分区四臂**。(a) 作用域内新增一份 `NO_FIELD` 且**不在** `GRANDFATHERED`; (b) 仅 `GRANDFATHERED` 内的 6 条不合规; (c) `GRANDFATHERED` 含一条已不在作用域的 path; (d) 归一模块不可导入 | (a) **exit 1** 且输出点名该 path; (b) **exit 0** 首行 `OK`; (c) **exit 1** 且文案含「allowlist 陈旧」并点名该 path; (d) **exit 0** 首行以 `##SKIP##` 开头 | (a) 判 OK 的实现 (正向枚举 / catch-all 放行) ⇒ 红; (c) 静默忽略的实现 ⇒ 红 (allowlist 退化成永久豁免); (d) 判 OK 的实现 ⇒ 红 (零证据当正证据)。**四臂两两可辨** —— (a) 与 (c) 都 exit 1, 靠文案区分; (b) 与 (d) 都 exit 0, 靠首行标记区分 |
+| **SC-5** | 代码 | **探针判据分区四臂**。(a) 作用域内新增一份 `NO_FIELD` 且**不在** `GRANDFATHERED`; (b) 仅 `GRANDFATHERED` 内的 6 条不合规; (c) **仓本地** `.aria/linked-issue-field-grandfathered.txt` 含一条已不在作用域的 path; (d) 归一模块不可导入 | (a) **exit 1** 且输出点名该 path; (b) **exit 0** 首行 `OK`; (c) **exit 1** 且文案含「allowlist 陈旧」并点名该 path; (d) **exit 0** 首行以 `##SKIP##` 开头 | (a) 判 OK 的实现 (正向枚举 / catch-all 放行) ⇒ 红; (c) 静默忽略的实现 ⇒ 红 (allowlist 退化成永久豁免); (d) 判 OK 的实现 ⇒ 红 (零证据当正证据)。**四臂两两可辨** —— (a) 与 (c) 都 exit 1, 靠文案区分; (b) 与 (d) 都 exit 0, 靠首行标记区分 **(e) (R3/C2 补)**: `--grandfathered` 指向一个**不存在**的文件 (= 采用方首跑场景) ⇒ 白名单视为**空集**, 探针**正常判定作用域内 proposal**, **不得** `exit 1`; 把「白名单文件缺失」当错误、或把 6 条 Aria 路径硬编码进脚本的实现 **必红** |
 | **SC-6** | 代码 | **SOT 模板自身合规 + 引用未断**。`standards/openspec/templates/proposal-minimal.md` 含**恰一条**满足 E0 三谓词的行; 其 `## Template Usage Notes` 段含「无关联时逐字写 `` `无` ``」一条; `aria/skills/spec-drafter/SKILL.md` 里对该模板的相对路径引用解析到**存在的文件** | 如左 | 模板加了字段但写成裸文本 / markdown 链接 (不过 E0) ⇒ 红; 加了字段但漏 Usage Note ⇒ 红; spec-drafter 的引用路径漂移/失效 ⇒ 红。**baseline 必红**: 实测该模板今天 `grep -c "关联 Issue"` = **0**。⚠️ 本条**不断言** E5 (D8: 模板值是 placeholder) |
 | **SC-7** | **行为 (定向 fixture)** | spec-drafter 新建一份 Level 2 proposal | 产出的 `proposal.md` 头部含一条过 E0 + E2 + E5 的字段行; 无关联时逐字 `` `无` `` | 省略该行 / 写成 markdown 链接形 / 留空 的臂应可分辨。**类别是「行为」不是「代码」** —— 断言对象是 AI 的 authoring 行为, **无代码宿主**, 不冒充结构化测试 (母 Spec R2 的 M-16 同款教训) |
 | **SC-8** | 代码 | **check 宿主真被注册且真能跑, 且脚本真在分发面内**。三条同批: (a) `.aria/state-checks.yaml` 含 name 为 `linked-issue-field-availability` 的条目, 其 `command` 指向的文件存在; (b) 该文件路径**位于 `aria/skills/` 之下** (= 随 plugin 分发, 不是 `.aria/`); (c) 实跑该 command 得到 exit ∈ {0, 1} 且 **stdout 首行前缀 ∈ {`OK`, `FAIL`, `##SKIP##`}** | 如左 | 只建脚本不注册 (或路径拼错) ⇒ (a) 红; **把探针放回 `.aria/probes/` ⇒ (b) 红** (这一臂直接钉住 D3 的改判, 防它被悄悄退回); 探针崩溃 (traceback → stdout 空) ⇒ (c) 红。**baseline 必红** (三者今天都不存在)。⚠️ (c) **不断言 exit 值本身** —— 断言值就把测试绑死在当日语料上 |
@@ -438,6 +498,8 @@ except Exception:
 
 | 文件 | 变更 | 来源 |
 |------|------|------|
+| **`aria/skills/state-scanner/lib/linked_issue_field.py`** (**新建**) | E0–E6 交付为**可 import 的纯函数** `extract_linked_issue_field(text: str) -> FieldVerdict`; 输入文本 blob 非路径 (探针要在远端 ref 的 blob 上调用)。CLI check 与 `sibling-spec-probe` **都 import 它**, 二者不自写第二份 | **R3/C3** |
+| **`.aria/linked-issue-field-grandfathered.txt`** (**新建, 仓本地数据**) | `GRANDFATHERED` 白名单移出分发件; 每行一条 `openspec/changes/<slug>`; 探针经 `--grandfathered <path>` 读取, 缺省/文件不存在 ⇒ 空集 | **R3/C2** |
 | `standards/openspec/templates/proposal-minimal.md` (**跨项目共享子模块 · SOT**) | 头部 blockquote 增 `> **关联 Issue**: \`{<org>/<repo>#<n>}\``; `## Template Usage Notes` 增「无关联时逐字写 `` `无` ``, 不留空、不删行」一条。实测该文件当前 0 命中 | **R2/M-2** (F-39) |
 | `aria/skills/spec-drafter/SKILL.md` | 声明该字段为**必填** + 写法引本 Spec §3; **不重复模板正文** (SOT 在 standards, `:429` 已有委托引用)。⚠️ **与母 Spec 同文件不同 hunk** (母 Spec 改「A.1 第二落点」与 frontmatter `allowed-tools`) ⇒ **逐 hunk 判 Rule #6**, 两 Spec 互不覆盖、互不替代; 落地时须逐 hunk 对齐 | **R2/M-2** (F-40) |
 | `aria/skills/state-scanner/scripts/linked_issue_field_probe.py` (**plugin 分发面**) | **新建** — E0–E6 抽取 + 五臂 fail-CLOSED 分区 + `GRANDFATHERED` 白名单 + 三子情形陈旧守卫; 入参照既有两条取 `argv[0]` 作 project root | **R2/M-10** (round-2 改判宿主) |
