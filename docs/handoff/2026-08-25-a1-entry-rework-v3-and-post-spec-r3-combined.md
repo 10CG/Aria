@@ -1,9 +1,9 @@
 ---
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
-phase: A.1-post-spec-R3-awaiting-owner-direction
+phase: A.1-post-spec-R4-awaiting-owner-direction
 status: active
-updated-at: 2026-08-25T03:10:00Z
+updated-at: 2026-08-25T09:40:00Z
 ---
 
 # Session Handoff (2026-08-25) — a1-entry rework v3 落版 (方向 b) + post_spec R3 五席联审 REVISE
@@ -11,6 +11,20 @@ updated-at: 2026-08-25T03:10:00Z
 > **一句话**: owner 2026-08-23 两条裁定全部落版 (换人执笔三席 + 主控逐条核验), 拆出两份 Level 2 子 Spec, 跑完 post_spec **R3 (母) / R1 (两子) 五席联审** —— **REVISE, 3 critical + 19 major, 未收敛**; 12 项机械订正已落, **3 条 critical + ~7 条设计类 major 待 owner 裁方向** (Rule #10: AI 不自行选)。
 >
 > ⭐ **这段会话最该留下的一件事**: **过半新缺陷是本轮修复动作自身引入的** —— 2/3 的 critical 可直接追溯到「拆 Spec」这个动作与「主控 round-2 的两条指令」。memory `no-ruling-shortens` 说的「拆 Spec 降复杂度是净负」在本轮拿到了第二次实证; `stop-adding-rounds` (major 17→19 不降) 与 `marginal-return-negative` (fix 引入占比接近 1/2) 两条判据同时逼近。
+
+## §0′ R4 结果 (2026-08-25 追加 — owner 已裁方向 a「清完再换新席跑 R4」, 已执行完毕)
+
+> **决策包**: `.aria/audit-reports/post_spec-R4-1787764438000-a1-entry-combined-aggregated.md`
+
+- **R3 的 3 条 critical + 9 条设计类 major 已全部清账** (commit `09af752` / `322f280`);
+- **R4 五席全新镜头** (type-design / silent-failure-hunter / code-architect / pr-test-analyzer / code-explorer) 跑完 ⇒ **REVISE, 约 9 个 critical 簇**;
+- **critical 走势 3 → 3 → 9, 首次上升且近 3 倍; 8/9 由 R3 清账动作自身引入或未真正修复**;
+- **两个独立席位主动建议「已过拐点, 不要再加通用审计轮」**;
+- **根因判断**: 9 条里 5 条同源 —— **本机制的核心状态 (track-id 派生 / `spec_slug` / `track_form` 写入) 没有代码宿主**, 全活在两份 SKILL.md 的散文模板里。⇒ 任何「代码类」SC 落上去都结构性不可测; 而 claim 字段透传实测需 **17 处 / 5 文件** (`linked_issue` 先例), 散文承载不了这种精度。
+- **待 owner 裁**: (a) 再跑 R5 / (b) 收缩交付面 / (c) 进 A.2 把 critical 转承重任务 / **(d) ⭐ 给派生与写入一个真正的代码宿主** (本轮新识别, 针对根因而非症状, 但须 owner 复议 §2.1a「本 Spec 不新增拼接函数」的既有取舍) / (e) 另裁。
+- **主控本轮两项流程失误已留痕**: ① 审计进行中就地改被审文件 (席 4/5 的行号因此可能陈旧, type-design 已逐条重锚定); ② 一次伪引文 (`sed | grep` 后拼接非相邻行), 已订正并写进 memory。
+
+---
 
 ## §0 入口 (新 session 优先读)
 
