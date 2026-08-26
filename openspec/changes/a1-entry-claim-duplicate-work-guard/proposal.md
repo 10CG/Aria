@@ -743,6 +743,21 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 ---
 
+
+---
+
+### R3 清账轮 (2026-08-25, owner 方向 a) **新引入且未经任何审计**的表面 — 请 R4 优先审
+
+> 本段由主控在 R3 之后、R4 之前追加。下列每一条都是**为修 R3 的 critical 而新造的**, 因此**没有任何一轮审计看过它们**。
+
+1. **claim schema 增两个 additive 字段 `spec_slug` / `track_form`** (§5.3 / §5.1) —— 是本轮最大的新表面。风险面: (a) 两个字段与既有 `linked_issue` 三者的**职责边界**是否真的互不重叠; (b) 旧 claim 无字段时的 fail-CLOSED 退化 (退回 ALL matching + log) 是否**真的比连坐更安全**; (c) 不 bump `schema_version` 的判断是否与 `coordination-ref-schema.md` §3 的演进契约相容。
+2. **`release_claim_by_track` 增 keyword-only `spec_slug` 过滤** —— 声称「不传时行为逐字节不变」, **未实测**。
+3. **`lib/linked_issue_field.py` 新模块 + `extract_linked_issue_field(text)` 纯函数** (字段 spec C3) —— 新的跨 Spec 复用面; 输入从「路径」改成「文本 blob」这个决定**未经审计**。
+4. **`.aria/linked-issue-field-grandfathered.txt` 仓本地数据文件** (字段 spec C2) —— 新的数据面; 「文件不存在 ⇒ 空集而非错误」这条 fail-open 方向的选择**与本 Spec 别处的 fail-CLOSED 取向相反**, 需专门审它是否是对的例外。
+5. **`--heartbeat-only` 的遥测分区隔离** (§2.2, R3/TL-M2) —— 新增一个 `_source` 取值或跳过遥测; 对既有 `coordination_probe` 计数口径的影响**只做了推理未实测**。
+6. **锚点从 `A.0 - REQUIRE claim` 改为 `前置: REQUIRE claim`** (R3/QA-F1) —— 改了 SC-22 的正则与 5 处概念提法; **是否还有第 6 处兄弟位置未扫到**, 请复核。
+7. **主控在本轮的一次误判留痕** (§5.1 判定式段): 一度把形态判定式换成被原依据明确否决过的「读 `linked_issue`」, 恢复 D12 第三列时才发现。⇒ 请 R4 特别检查**其余被我改动的条款里, 有没有同样覆盖掉了某条原依据**。
+
 ## 本轮未做 / 存疑 (给 R3 审计席)
 
 > **写在这里而不是省略**: 隐瞒未做项会让下一轮审计在错误的完成度假设上工作 (memory `past-summary≠measurement`)。
