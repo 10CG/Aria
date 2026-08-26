@@ -216,6 +216,35 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 > - ⇒ **Impact 表新增该模块行**; 探针 Spec 的「非阻塞」措辞同批订正 (它可先 ship 并全走层 2, 该函数 ship 后再接层 1)。
 >
 > **⚠️ 本条是 R3 之后新增的交付形态承诺 (未经审计轮) —— 请 R4 优先审。**
+>
+> ## 🔧 跨 skill import 的可运行模式 (R4/S-1 + R4/F-1 —— **本仓有先例, 审计席的「无先例」前提经主控实读推翻**)
+>
+> R4/code-architect 席判「跨 skill runtime import 在本仓无先例、且有反例」并据此给 Critical。
+> **主控实读: 反例为真但不是禁令, 且先例确实存在** ——
+> - **反例** (`skills/phase-d-closer/scripts/fetch_gate.py:111-112` 逐字): 「Mirrors state-scanner sync.py::_resolve_default_branch (replicated to keep phase-d-closer self-contained — **no cross-skill runtime import**)」。这是**那一处**的取舍 (为 self-contained 而复制), 不是仓级禁令;
+> - **先例** (`skills/session-closer/scripts/handoff_autofill.py:403-407` 逐字, 主控实读):
+>   ```python
+>   # state-scanner/lib 是兄弟 skill 的包; 加其 skill root 使 `from lib.identity` 解析。
+>   _ss_root = str(Path(__file__).resolve().parents[2] / "state-scanner")
+>   if _ss_root not in sys.path:
+>       sys.path.insert(0, _ss_root)
+>   from lib.identity import get_identity
+>   ```
+>   同文件 `:48-51` 另有一处 (`.../state-scanner/scripts` + `from collectors.multi_remote import ...`)。
+>   ⇒ **「兄弟 skill 的 lib 通过插入其 skill root 来 import」在本仓是已在生产运行的模式。**
+>
+> **⇒ 本 Spec 采用该模式, 逐字钉死** (不得指向 `.../state-scanner/lib` —— 那会因 `lib/collision.py` 的相对 import `from .claim_schema import ClaimRecord` 抛 `attempted relative import with no known parent package`, 姊妹 Spec 已实跑证实):
+> ```python
+> _SS_ROOT = str(Path(__file__).resolve().parents[2] / "state-scanner")
+> if _SS_ROOT not in sys.path:
+>     sys.path.insert(0, _SS_ROOT)
+> from lib.linked_issue_field import extract_linked_issue_field   # 跨 skill 消费方 (sibling-spec-probe) 的用法
+> ```
+> **已知限 (成文)**: 该写法把 `state-scanner` 的 skill root 放进 `sys.path`, 于是**顶层包名 `lib` 与 `collectors` 被占用**。
+> 若 `audit-engine` 将来自己长出 `lib/` 或 `collectors/`, 会与之**同名冲突** (`coordination_probe.py:80-83` 点名过同名包陷阱)。
+> ⇒ **A.2 的一条显式约束**: `audit-engine` 内**不得**新建名为 `lib/` 或 `collectors/` 的顶层目录; 探针自己的 helper 一律放 `scripts/` 下并用模块名前缀。
+> **降级说明**: R4/S-1 原判 Critical 的依据是「无先例 ⇒ 不可行」; 前提被推翻后, 真实缺陷是「**没给 import 代码**」—— 本段即补上, 严重度按 Major 处置。
+
 
 **四态判定 (穷尽, 无第五态)**:
 

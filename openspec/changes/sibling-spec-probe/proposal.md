@@ -136,6 +136,36 @@
 > **处置**: 姊妹 Spec 已同批承诺把 E0–E6 交付为**可 import 的纯函数** `lib/linked_issue_field.py::extract_linked_issue_field(text: str) -> FieldVerdict` —— **输入是文本 blob 而非路径**, 正是为本 Spec 的调用形态定的; 本 Spec **import 它**, 一条都不复制。
 > **⇒ 依赖方向的准确措辞 (取代原「姊妹非阻塞」这一句)**: 本 Spec **可先于姊妹 ship** —— 此时层 1 恒 `NO_TOKEN`、**全部走层 2** (= 今天的状态, 见下方「姊妹 Spec 未 ship 时的行为」); 姊妹 ship 后本 Spec **必须**改为 import 该纯函数以接通层 1, **该改动是本 Spec 的 follow-up 而非前置**。原措辞「姊妹非阻塞」**在行为层为真、在实现层为假**, 现按此拆开表述。
 > **⚠️ 本条是 R3 之后新增的订正 (未经审计轮) —— 请 R4 优先审。**
+>
+> ## 🔧 跨 skill import 的可运行模式 (R4/S-1 + R4/F-1 —— **本仓有先例, 审计席的「无先例」前提经主控实读推翻**)
+>
+> R4/code-architect 席判「跨 skill runtime import 在本仓无先例、且有反例」并据此给 Critical。
+> **主控实读: 反例为真但不是禁令, 且先例确实存在** ——
+> - **反例** (`skills/phase-d-closer/scripts/fetch_gate.py:111-112` 逐字): 「Mirrors state-scanner sync.py::_resolve_default_branch (replicated to keep phase-d-closer self-contained — **no cross-skill runtime import**)」。这是**那一处**的取舍 (为 self-contained 而复制), 不是仓级禁令;
+> - **先例** (`skills/session-closer/scripts/handoff_autofill.py:403-407` 逐字, 主控实读):
+>   ```python
+>   # state-scanner/lib 是兄弟 skill 的包; 加其 skill root 使 `from lib.identity` 解析。
+>   _ss_root = str(Path(__file__).resolve().parents[2] / "state-scanner")
+>   if _ss_root not in sys.path:
+>       sys.path.insert(0, _ss_root)
+>   from lib.identity import get_identity
+>   ```
+>   同文件 `:48-51` 另有一处 (`.../state-scanner/scripts` + `from collectors.multi_remote import ...`)。
+>   ⇒ **「兄弟 skill 的 lib 通过插入其 skill root 来 import」在本仓是已在生产运行的模式。**
+>
+> **⇒ 本 Spec 采用该模式, 逐字钉死** (不得指向 `.../state-scanner/lib` —— 那会因 `lib/collision.py` 的相对 import `from .claim_schema import ClaimRecord` 抛 `attempted relative import with no known parent package`, 姊妹 Spec 已实跑证实):
+> ```python
+> _SS_ROOT = str(Path(__file__).resolve().parents[2] / "state-scanner")
+> if _SS_ROOT not in sys.path:
+>     sys.path.insert(0, _SS_ROOT)
+> from lib.collision import normalize_linked_issue
+> from lib.linked_issue_field import extract_linked_issue_field
+> ```
+> **已知限 (成文)**: 该写法把 `state-scanner` 的 skill root 放进 `sys.path`, 于是**顶层包名 `lib` 与 `collectors` 被占用**。
+> 若 `audit-engine` 将来自己长出 `lib/` 或 `collectors/`, 会与之**同名冲突** (`coordination_probe.py:80-83` 点名过同名包陷阱)。
+> ⇒ **A.2 的一条显式约束**: `audit-engine` 内**不得**新建名为 `lib/` 或 `collectors/` 的顶层目录; 探针自己的 helper 一律放 `scripts/` 下并用模块名前缀。
+> **降级说明**: R4/S-1 原判 Critical 的依据是「无先例 ⇒ 不可行」; 前提被推翻后, 真实缺陷是「**没给 import 代码**」—— 本段即补上, 严重度按 Major 处置。
+
 > **姊妹 Spec 未 ship 时的行为 (成文, 不假装覆盖)**: 四态里只有 `NO_FIELD` / `NO_TOKEN` 会出现 (canonical 层恒无输出) ⇒ 全部依赖层 2。**这就是今天的状态** —— 实测基线 `cc1bdef` 上经层 0 定位到的 **14** 行字段中, 冒号后第一个非空白字符是反引号的 **= 0 行** (§审计轨 #14)。⇒ 姊妹 Spec 提升的是探针的**上限**, 不是它的**可用性**。
 
 **层 1.5 — `无` 的归属 (承重, 勿省 — FIX-10)**
@@ -410,7 +440,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 本 Spec 的处方性 · 运行时指令面改动落在 **`audit-engine`** 一个 skill 上 (`SKILL.md` + `references/execution-modes.md`, §8): 「每轮审计入口必跑 `sibling_spec_probe.py`, Convergence 与 Challenge 两块对称」。
 
-**结构性事实 (本轮实核)**: `aria-plugin-benchmarks/ab-suite/` 下**没有 `audit-engine.json`** (目录 30 个 `.json` + 4 个 fixture 目录 + `version.yaml`, 无该文件; §实读清单 #2)。
+**结构性事实 (本轮实核)**: `aria-plugin-benchmarks/ab-suite/` 下**没有 `audit-engine.json`** (目录 **31** 个 `.json` (**R4/S-3 订正**: 原写 30, 与本文件后段「实测的 31」自相矛盾; 实测为 31) + 4 个 fixture 目录 + `version.yaml`, 无该文件; §实读清单 #2)。
 
 按 CLAUDE.md Rule #6 判据表:
 
@@ -420,7 +450,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | 第三行「套件覆盖外」: 点名行为 + 可证伪定向 fixture + 套件缺口开 issue (**缺一照跑**) | 三条**逐条处置如下** |
 
 1. **点名行为 (能做, 本 Spec 落)**: (α) 每轮审计入口调用 `sibling_spec_probe.py` 并把结果渲染进当轮 `### Round N` 记录; (β) `verdict == "not_established"` 时渲染「未能核实」而**非**「无竞品」。—— **这两条是 audit-engine 自己的新行为**, 与母 Spec rule6_note 里那三条 (a)(b)(c) (全是 A.1 / phase1_gate 侧行为) **无一重合**; 母 Spec 把 audit-engine 列进覆盖外档却零点名, 正是 R2/TL-M9 判的那条 major, 本条即其处置。
-2. **可证伪定向 fixture (能做, A.2 落)**: 为 (α)(β) 各建 1 个 eval case, 双臂须能分辨。**宿主 = 新建 `aria-plugin-benchmarks/ab-suite/audit-engine.json`** (格式照既有套件, 见 `spec-drafter.json`; 建立流程照 `AB_TEST_OPERATIONS.md` §场景 2「新增 Skill 首次基线」)。
+2. **可证伪定向 fixture (能做, A.2 落)**: 为 (α)(β) 各建 1 个 eval case, 双臂须能分辨。**宿主 = 新建 `aria-plugin-benchmarks/ab-suite/audit-engine.json`** (格式照既有套件, 见 `spec-drafter.json`; **必须经 `/skill-creator` 产出 (R4/S-2 补)** —— CLAUDE.md 不可协商规则 #6 逐字「**Skill 基准测试必须用 `/skill-creator`** (自研 runner 已废弃)」⇒ **手工仿写既有套件的 JSON 格式不满足该规则**。建立流程照 `AB_TEST_OPERATIONS.md` §场景 2「新增 Skill 首次基线」)。
 3. **套件缺口开 issue (已存在, 不新开)**: **`10CG/aria-plugin#150`** —— 标题逐字「[benchmark] Rule #6 判据表第三行的兜底「缺一照跑」对 14/43 个 skill 结构上不可执行 — 它们根本没有 AB 套件」(本轮实核, §实读清单 #26)。它记录的正是本 Spec 撞到的**类级**问题。同族先例 `10CG/aria-plugin#157` (state-scanner 套件对 Layer L 段零覆盖) 亦已在册。
 
 **⚠️ 哪半做不到, 明写**: 判据表第三行的兜底是「缺一**照跑**」。本 Spec 三条都做得到, 兜底按字面不触发 —— **但这只是因为第 2 条被解释成「新建套件」**。若 A.2 因任何原因未能建成 `audit-engine.json`, 第 2 条即缺失, 兜底触发, 而**兜底本身在无套件时结构上不可执行** —— 这正是 `#150` 的内容。**此时不得自判豁免** (Rule #10; `standards/conventions/skill-benchmark-exemption.md` 的封闭白名单四类无一适用), 必须显式上呈 owner 请裁。
