@@ -439,8 +439,12 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 > **R3 判定 C-B「只闭一半」**: §5.1/§5.2 解决了「探索性放弃**一个方向**不 release」, 但**漏了对偶路径** ——
 > 方向 1 **走完循环**到 D.2b 时, `release_claim_by_track` 的 docstring 逐字写着
-> 「If several active claims match (same session), **ALL matching active claims are released**」
+> 「If several active claims match (**same container re-claimed a track across sessions — the NORMAL case, since every session mints a fresh session_id and B.0 REQUIRE-claim runs per session**), **ALL matching active claims are released**」
 > (`lib/claim_lifecycle.py`, `release_claim_by_track` docstring; 实读基线 `d50f9c3`)。
+>
+> **⚠️ 引文订正 (R4/code-explorer 抓, 主控复核确认自己错了)**: 本段上一版把该 docstring 引成「If several active claims match **(same session)**, ALL matching…」。**原文没有「same session」这四个字** —— 实读 `claim_lifecycle.py:396-399` 逐字为上方新引文。**错法**: 主控当初跑的是 `sed -n '387,400p' | grep -iE "all|matching"`, grep **丢掉了不含关键词的 `:397-398` 两行**, 而主控把返回的 `:396` 与 `:399` 当作相邻行**拼接**成了一句 —— 造出一句原文不存在、且语义方向相反的引文。**机械核验器对此天然免疫** (两行都真实存在), 这是「该行存在 ≠ 该断言属实」的又一实例。
+>
+> **⇒ 订正后 C1 的结论不但不弱, 反而更强**: 原文明说多条 claim 匹配同一 track 是「**同一容器跨 session 重新认领 — the NORMAL case**」, 因为每个 session 都生成新 session_id 且 B.0 每 session 都跑 ⇒ **同 track 多 claim 是常态而非边角**, D.2b 的 ALL-matching 释放因此**几乎必然**触及仍在制的其他方向。
 > 而 issue 派生形下, 同 issue 的 N 个方向**共用同一个 track_id** (各自 session 不同) ⇒
 > **方向 1 收尾会把仍在制的方向 2/3 的 claim 一并释放**。SC-27 原本只有两臂, 结构性抓不到这条。
 

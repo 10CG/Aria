@@ -470,7 +470,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 - **不扩展**扫描范围到非默认分支 (P11 —— 按 owner 缩 scope 裁定; 成本前提的实测反证已上呈复议);
 - **不回填**存量 132 篇无「关联 Issue」字段的 proposal (那是姊妹 Spec 的范围);
 - **不修**代码库既有的 `STALE_TTL` / `SWEEP_TTL` 措辞误写等与探针无关的缺陷;
-- **不修** `fetch_gate.py:23` / `:111` 对 `state-scanner sync.py::_resolve_default_branch` 的**悬空函数名引用** —— 本轮实读确认 `sync.py` 在 `d50f9c3` 上**没有**该函数 (只有同族常量 `_ORIGIN_HEAD_REFS:46`), 属既有文档缺陷, **记 follow-up, 不混进本 Spec 变更面**。
+- **不修** `fetch_gate.py:21` / `:111` 对 `state-scanner sync.py::_resolve_default_branch` 的**悬空函数名引用** (**R4 行号订正**: 原引 `:23`, 实读 `:23` 是另一句「state-scanner git.py — but the original locks ``@{upstream}``」; `sync.py::_resolve_default_branch` 那句在 **`:21`**。断言内容本身独立核实为真 —— `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中确无该函数) —— 本轮实读确认 `sync.py` 在 `d50f9c3` 上**没有**该函数 (只有同族常量 `_ORIGIN_HEAD_REFS:46`), 属既有文档缺陷, **记 follow-up, 不混进本 Spec 变更面**。
 
 ---
 
@@ -489,7 +489,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 **跨 skill 复用的形态待 A.2 定 (本 Spec 只钉约束, 不钉手段)**: 本仓既有惯例是**复制而非跨 skill runtime import** —— `phase-d-closer/scripts/fetch_gate.py:111-112` 逐字「replicated to keep phase-d-closer self-contained — **no cross-skill runtime import**」。本 Spec 的约束是: **归一逻辑 (`normalize_linked_issue`) 一律不得复制** (P4, 双实现漂移是前置 Spec 刚治过的病); `resolve_enforced_remotes` 是 32 行 (`:255-286`) 的纯函数, 复制或 import 由 A.2 定, 但**任一选择都须配一条断言两侧行为一致的测试**。
 
 **follow-up (不在本 Spec)**:
-1. `fetch_gate.py:23` / `:111` 的悬空函数名引用 `sync.py::_resolve_default_branch` (实读: `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中无该函数);
+1. `fetch_gate.py:21` / `:111` 的悬空函数名引用 `sync.py::_resolve_default_branch` (实读: `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中无该函数);
 2. `AB_TEST_OPERATIONS.md` §现有资产盘点写「Skill eval suites 28 个 ✅ **全量覆盖**」, 而实测 `ab-suite/` 有 **31** 个 `.json`, `10CG/aria-plugin#150` 又记「14/43 个 skill 没有套件」—— **三方互不一致**, 且「✅ 全量覆盖」是**假绿标注**。建议并入 `#150`;
 3. P11 复议项 (扫描范围是否扩到非默认分支)。
 
