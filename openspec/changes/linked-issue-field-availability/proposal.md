@@ -190,7 +190,31 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 
 **E5 — 合法性**: token 串**合法当且仅当** —— 逐字节等于 `无` (单个 U+65E0, 无空白、无其他字符), **或** 每个 token 元素经 `normalize_linked_issue()` 返回**非 `None`**。任一元素返回 `None` ⇒ **`BAD_TOKEN`**, 并在输出里**点名**那个元素。
 
-**E6 — `--linked-issue` 实参**: = **第一个 token 元素逐字节**, 不做二次加工; **且 token 串逐字节等于 `无` 时整个 `--linked-issue` 参数省略** (§2 的 NEW-01)。
+**E6 — `--linked-issue` 实参**: = **第一个 token 元素逐字节**, 不做二次加工。
+
+> ## 🔴 K8 (R4) — E6 的门**太窄**, 未填写的模板 placeholder 会复现 NEW-01 且更易触发 (2026-08-27 补, 未经审计轮)
+>
+> **R4/type-design B-C1 实跑**: 本 Spec 自己给 SOT 模板的默认值是 `` `{<org>/<repo>#<n>}` `` (D8: 模板不要求自身过 E5),
+> 它按 E5 判 **`BAD_TOKEN`**; 而 E6 **只对 `无` 设门** ⇒ **一份照模板新建、作者还没填 issue 号的 proposal**,
+> 其 placeholder 会被**逐字节**喂进 `--linked-issue`。用真实 `linked_issue_overlaps` 实跑确认: **两份毫无关系的 Spec 互相命中**。
+> ⇒ 这就是 NEW-01 (`无` 是 truthy 导致互相误报) 的原样复现, 而且**触发条件比 `无` 更弱** —— `无` 还要作者主动写,
+> placeholder **什么都不做就中**。探针侧同时中招 (原串键相等)。
+>
+> **落版 — E6 的门从「等于 `无`」扩为按 verdict 分档 (穷尽四态)**:
+>
+> | verdict | `--linked-issue` |
+> |---|---|
+> | `OK` 且 token 串逐字节 `无` | **整个参数省略** (原 NEW-01 条款) |
+> | `OK` 且为真 token | 传第一个 token 元素逐字节 |
+> | **`BAD_TOKEN`** | **整个参数省略** + 消费面按「字段不合规, 本轮无 issue 输入」呈现 —— **不得**把脏串喂进匹配面 |
+> | **`NO_TOKEN` / `NO_FIELD`** | **整个参数省略** (本就无 token 可传) |
+>
+> **一句话判据**: **只有 `OK` 且非 `无` 的那一格产生 `--linked-issue` 实参**, 其余三格一律省略。
+> **新增 SC-9 (代码, CLI 全链路)**: 两份 proposal 的字段值都是模板 placeholder `` `{<org>/<repo>#<n>}` `` ⇒
+> 二者经 A.1 认领后 `linked_issue_overlap[]` **互不命中** (因为都没传该参数);
+> **怎么会红**: 把 `BAD_TOKEN` 的 token 串照传的实现 ⇒ 互相命中 ⇒ 必红。**baseline 必红** (今天没有 E0–E6 实现, 而朴素实现会照传)。
+> **⚠️ 探针侧同批**: `sibling-spec-probe` 的层 1 对 `BAD_TOKEN` 取「层 1 ∪ 层 2 并集」——
+> 其中层 1 的**原串键**同样会让两份 placeholder 相等。探针 Spec 须同批加一条: **原串键不得由 `BAD_TOKEN` 的常量串产生** (交叉点名)。
 
 > ## 🔴 E0–E6 的**交付形态** — 可 import 的纯函数 (R3/C3, 主控 2026-08-25 补)
 >
@@ -501,7 +525,7 @@ except Exception:
 | **SC-2** | 代码 | **E2 token 起始位**。输入 `> **关联 Issue**: [10CG/aria-plugin #122](url) (triage \`confirmed\`)` | 判 **`NO_TOKEN`**, 且**不得**抽出 `confirmed` | 「取该行第一个 code span」的实现抽出 `confirmed` ⇒ 红。该形状在真实语料上 **6** 条 (路径见 §3 E2 引用块), 夹具须至少复用其中 1 条的**逐字原文** |
 | **SC-3** | 代码 | **E4/E5/E6 多值**。(a) token 串 `10CG/a#1, 10CG/b#2`; (b) token 串 `10CG/a#1, [b](url)` | (a) **合法**, 两元素各自解析成功, `--linked-issue` 实参逐字节 = `10CG/a#1`; (b) **`BAD_TOKEN`** 且输出点名 `[b](url)` | 把整串直喂归一的实现在 (a) 上判不可解析 ⇒ 红; 只校验第一个元素的实现在 (b) 上判合法 ⇒ 红; 对 (a) 把实参取成整串或第二元素的实现 ⇒ 红 |
 | **SC-4** | 代码 | **`无` 两分支**。(a) `> **关联 Issue**: \`无\` — 说明`; (b) `> **关联 Issue**: 无 (由 \`x\` 发现)` (裸 `无`, 无 code span) | (a) **合法**, 且**不产生任何 `--linked-issue` 实参**; (b) **`NO_TOKEN`** | 把 `无` 当普通 token 传给 `--linked-issue` 的实现 ⇒ 红 (母 Spec NEW-01 实测: 两份无关 Spec 都写 `无` 会互相命中 overlap); 接受裸 `无` 的实现在 (b) 上 ⇒ 红。**(b) 有真实语料实例**: `openspec/archive/2026-08-23-linked-issue-normalization/proposal.md:6` 逐字 `> **关联 Issue**: 无` (实跑 `cat -A` 见 §实读清单) |
-| **SC-5** | 代码 | **探针判据分区四臂**。(a) 作用域内新增一份 `NO_FIELD` 且**不在** `GRANDFATHERED`; (b) 仅 `GRANDFATHERED` 内的 6 条不合规; (c) **仓本地** `.aria/linked-issue-field-grandfathered.txt` 含一条已不在作用域的 path; (d) 归一模块不可导入 | (a) **exit 1** 且输出点名该 path; (b) **exit 0** 首行 `OK`; (c) **exit 1** 且文案含「allowlist 陈旧」并点名该 path; (d) **exit 0** 首行以 `##SKIP##` 开头 | (a) 判 OK 的实现 (正向枚举 / catch-all 放行) ⇒ 红; (c) 静默忽略的实现 ⇒ 红 (allowlist 退化成永久豁免); (d) 判 OK 的实现 ⇒ 红 (零证据当正证据)。**四臂两两可辨** —— (a) 与 (c) 都 exit 1, 靠文案区分; (b) 与 (d) 都 exit 0, 靠首行标记区分 **(e) (R3/C2 补)**: `--grandfathered` 指向一个**不存在**的文件 (= 采用方首跑场景) ⇒ 白名单视为**空集**, 探针**正常判定作用域内 proposal**, **不得** `exit 1`; 把「白名单文件缺失」当错误、或把 6 条 Aria 路径硬编码进脚本的实现 **必红** |
+| **SC-5** | 代码 | **探针判据分区四臂**。(a) 作用域内新增一份 `NO_FIELD` 且**不在** `GRANDFATHERED`; (b) 仅 `GRANDFATHERED` 内的 6 条不合规; (c) **仓本地** `.aria/linked-issue-field-grandfathered.txt` 含一条已不在作用域的 path; (d) 归一模块不可导入 | (a) **exit 1** 且输出点名该 path; (b) **exit 0** 首行 `OK`; (c) **exit 1** 且文案含「allowlist 陈旧」并点名该 path; (d) **exit 0** 首行以 `##SKIP##` 开头 | (a) 判 OK 的实现 (正向枚举 / catch-all 放行) ⇒ 红; (c) 静默忽略的实现 ⇒ 红 (allowlist 退化成永久豁免); (d) 判 OK 的实现 ⇒ 红 (零证据当正证据)。**四臂两两可辨** —— (a) 与 (c) 都 exit 1, 靠文案区分; (b) 与 (d) 都 exit 0, 靠首行标记区分 **(e) (R3/C2 补; ⚠️ R4/K9 订正措辞)**: `--grandfathered` 指向一个**不存在**的文件 ⇒ **「文件缺失」这件事本身不得成为错误** —— 白名单视为**空集**, 探针**照常判定**作用域内全部 proposal 并按判据表出结论。**原措辞「不得 exit 1」在本仓自相矛盾且教出真 fail-open** (R4/silent-failure + type-design 两席同判): 本仓该文件今天就不存在, 而作用域 9 份里有 6 份 `NO_FIELD` ⇒ **必然** exit 1; 照原字面去消解矛盾的实现 = **`rm` 一条命令就永久静默整条 enabled check**。⇒ 正确的断言拆成两句: **(e1)** 文件缺失时**不得**因「读不到白名单」而报错/中止 (须继续判定); **(e2)** 文件缺失时若作用域内存在不合规项, **仍须 exit 1 并逐条点名** (缺白名单 ⇒ 无人被豁免, 这才是采用方的正确默认); 把「白名单文件缺失」当错误、或把 6 条 Aria 路径硬编码进脚本的实现 **必红** |
 | **SC-6** | 代码 | **SOT 模板自身合规 + 引用未断**。`standards/openspec/templates/proposal-minimal.md` 含**恰一条**满足 E0 三谓词的行; 其 `## Template Usage Notes` 段含「无关联时逐字写 `` `无` ``」一条; `aria/skills/spec-drafter/SKILL.md` 里对该模板的相对路径引用解析到**存在的文件** | 如左 | 模板加了字段但写成裸文本 / markdown 链接 (不过 E0) ⇒ 红; 加了字段但漏 Usage Note ⇒ 红; spec-drafter 的引用路径漂移/失效 ⇒ 红。**baseline 必红**: 实测该模板今天 `grep -c "关联 Issue"` = **0**。⚠️ 本条**不断言** E5 (D8: 模板值是 placeholder) |
 | **SC-7** | **行为 (定向 fixture)** | spec-drafter 新建一份 Level 2 proposal | 产出的 `proposal.md` 头部含一条过 E0 + E2 + E5 的字段行; 无关联时逐字 `` `无` `` | 省略该行 / 写成 markdown 链接形 / 留空 的臂应可分辨。**类别是「行为」不是「代码」** —— 断言对象是 AI 的 authoring 行为, **无代码宿主**, 不冒充结构化测试 (母 Spec R2 的 M-16 同款教训) |
 | **SC-8** | 代码 | **check 宿主真被注册且真能跑, 且脚本真在分发面内**。三条同批: (a) `.aria/state-checks.yaml` 含 name 为 `linked-issue-field-availability` 的条目, 其 `command` 指向的文件存在; (b) 该文件路径**位于 `aria/skills/` 之下** (= 随 plugin 分发, 不是 `.aria/`); (c) 实跑该 command 得到 exit ∈ {0, 1} 且 **stdout 首行前缀 ∈ {`OK`, `FAIL`, `##SKIP##`}** | 如左 | 只建脚本不注册 (或路径拼错) ⇒ (a) 红; **把探针放回 `.aria/probes/` ⇒ (b) 红** (这一臂直接钉住 D3 的改判, 防它被悄悄退回); 探针崩溃 (traceback → stdout 空) ⇒ (c) 红。**baseline 必红** (三者今天都不存在)。⚠️ (c) **不断言 exit 值本身** —— 断言值就把测试绑死在当日语料上 |

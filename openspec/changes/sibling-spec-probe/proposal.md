@@ -108,7 +108,7 @@
 |---|---|---|---|---|
 | `NO_FIELD` | — | **层 3** (不可见) | ∅ | `"no_field"` |
 | `NO_TOKEN` | — | **层 2** (URL 回落) | 该字段行内全部 `/<org>/<repo>/issues/<n>` 片段成键; 无片段则 ∅ 并落层 3 | `"url_fallback"` (无片段时 `"no_token_no_url"`) |
-| **`BAD_TOKEN`** | — | **层 1 与层 2 都跑, 取并集** | 层 1: 逐 token 元素成键 (可解析→归一键, 不可解析→原串键) **∪** 层 2: 该行 URL 片段成键 | `"bad_token"` |
+| **`BAD_TOKEN`** | — | **层 1 与层 2 都跑, 取并集** | 层 1: 逐 token 元素成键 (可解析→归一键, 不可解析→原串键) **∪** 层 2: 该行 URL 片段成键 | `"bad_token"` **⚠️ R4/C-M3 + 姊妹 K8 交叉补 (2026-08-27, 未经审计轮)**: 层 1 的**原串键** `("r", t)` 对**常量串无守卫** —— 两份都还没填 issue 号的 proposal, 其字段值都是 SOT 模板的 placeholder `` `{<org>/<repo>#<n>}` `` (判 `BAD_TOKEN`), 原串相等 ⇒ **互相命中**, 与姊妹 Spec 的 NEW-01 同形且**什么都不做就中**。**落版**: 原串键**排除一个成文的常量黑名单** —— 至少含 SOT 模板 placeholder 的逐字串与字面 `无`; 命中黑名单的 token 元素**不产生任何键**。黑名单逐字内容与姊妹 Spec §3 的模板默认值**同源**, 任一改动须同批改另一侧。**新增 SC-19**: 两份 proposal 字段值均为该 placeholder ⇒ **不命中**; 照产原串键的实现必红 |
 | `OK` | token 串**逐字节等于** `无` | **层 1.5** | **∅** (且**不进**层 2) | `"wu_empty"` |
 | `OK` | 其余 (token 串非 `无`) | **层 1** | 逐 token 元素 (姊妹 E4: 按 ASCII `,` split 后各段 `strip()`) 成键 | `"canonical"` |
 
@@ -325,7 +325,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | `reason` | `str \| null` | **`status != "ok"` 或 `verdict == "not_established"` 时必非空** (二者是**或**关系 —— `own_keys` 为空时运行面一切正常 `status="ok"`, 判定面却是 `not_established`, 只写「status 非 ok 才要 reason」会让这一格恒空); 枚举 `"no_enforced_remote"` \| `"remote_unresolved"` \| `"fetch_failed"` \| `"cap_applied"` \| `"own_token_absent"` |
 | **`verdict`** | `str` | **判定面 (一等字段)**: `"sibling_found"` \| `"no_sibling_found"` \| `"not_established"` |
 | `own_spec_dir` | `str` | 本轨 spec 目录名 (自命中排除键) |
-| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"wu_empty"` \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) |
+| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"wu_empty"` \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) **⚠️ R4/C-M1 拼写统一**: 本枚举值逐字为 `"bad_token_union"`; §3 映射表若出现 `"bad_token"` 一律以本表为准 (R3/TL-P2 只修了一侧) |
 | `own_keys` | `list` | 本轨比较键 (每项 `["k",<basename>,<n>]` 或 `["r",<原串>]`) |
 | `remotes` | `list[obj]` | 每 remote 一项: `name` / `default_branch` (`str\|null`) / `resolved_by` (`"ls_remote_symref"\|null`) / `error_kind` (`str\|null`) / `scanned` (`int`) / `capped` (`bool`) |
 | `hits` | `list[obj]` | **恒为 list, 永不为 `null`**; 每项 `remote` / `branch` / `corpus` (`"changes"\|"archive"`) / `spec_dir` / `path` / `field_line` (`int`) / `key` / `layer` |

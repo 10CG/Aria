@@ -163,6 +163,24 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 **本 Spec 不新增拼接函数** —— 新增代码落点只有 `lib/identity.py` 的直取 `uuid` accessor (见 Impact 表)。「拼接无代码宿主」这一半**成文交付**, 不用「以后加个 helper」把它糊过去 (memory `knob-granularity`: 诚实交付一半 + 说明哪半是哪半)。
 
+> ## 🔴 K3 (R4) — 「不新增拼接函数」的**另一半代价**必须一并成文 (2026-08-27 补, 未经审计轮)
+>
+> **R4 实跑证据**: SC-2 的两臂在 `d50f9c3` 上**都是绿的** —— 臂(i) 含容器段绿; 主控 R3 加的负控臂(ii)
+> 「容器段置空 ⇒ overlap 必须变空」**也绿**, 因为今天的代码本来就这样。根因: **夹具手写字符串**,
+> **全程不执行任何派生逻辑** —— 而派生逻辑**没有代码宿主可执行**。
+> (R3 主控还一度把 SC-2 的夹具约束写成「必须由 §2.1a 的 compose 函数派生」, 而本节明说不存在该函数 ——
+> 那是「要求调一个不存在的函数」, 已订正。)
+>
+> **⇒ 交付一半是允许的, 但必须把另一半的代价写下来** (memory `knob-granularity` 只写了前半):
+>
+> **本 Spec 声明: 只要 track-id 派生没有代码宿主, 以下 SC **不能是代码类**, 一律降级为**行为类定向 fixture**,
+> 并**明说它们只能由 AB eval 覆盖、不冒充结构化测试**: **SC-1 / SC-2 / SC-4 / SC-15**。
+> - 降级**不是**放弃: 每条仍须在 rule6_note 的「覆盖外」档建**可证伪定向 fixture** (双臂须能分辨 AI 是否按 §2.1 规则拼串);
+> - **禁止**把它们写成「代码 (CLI 全链路)」—— 那是本项目 R1/C4 点名过的「把 SC 挂在不存在的宿主上」;
+> - **若 owner 采纳 R4 的选项 (d)「给派生一个代码宿主」, 本段连同这四条 SC 的类别一并回滚为代码类** —— 届时它们才真有牙齿。
+>
+> **未降级的相邻条目 (仍是代码类, 因为它们的被测对象确实存在)**: SC-23 (release CLI 往返) / SC-27 / SC-29 / **SC-30** / **SC-31**。
+
 ##### §2.1b carry-id 契约 — A.1 原串**即**本 cycle 的 carry-id (R2/C-C, editlist FIX-14 选项 A)
 
 **问题 (KM-C1/C2 三处宿主独立复读)**: A.1 派生的 track-id 含 `container_uuid` 段, 而 Phase B / D.2b 既有的 carry-id 占位措辞不含容器段 ⇒ 走完循环时 **B-entry 认领与 D.2b 释放都匹配不到 A.1 那条 claim** —— 这比 §5 的连坐 (C-B) **更早发作**, 且发生在 happy path 上。
@@ -214,7 +232,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 >   - **① 本 session 已跑过 `phase1_gate` ⇒ 该 claim 在 coordination ref 内可按 `(container, session)` 直接定位, 从 `claims/<container>/<session>.yaml` 的 `track_id` 字段读出** —— **机读持久化状态, 非记忆**;
 >     > **⚠️ 先例引用订正 (R3/TL-M6 —— 上一轮主控指令误引, 主控担责)**: 上一版此处引 `skills/phase-b-developer/SKILL.md:88` 的 `check: phase1_gate telemetry / 编排层记忆 (本 session 是否已跑 phase1_gate)` 作「同一个 telemetry 通道取 track_id」的逐字先例。**实读证伪**: 该行是**布尔谓词** —— 它回答「**跑没跑**」, **不携带 `track_id`**; Phase B 的 track_id 在同文件 `:92` 另取自 `--raw-track-id "<本 cycle carry-id/Spec id>"`。⇒ 该先例**不能**用来论证「telemetry 提供 track 来源」, 已撤。替代的机读来源见本行正文 (coordination ref 内本 session 自己的 claim)。
 >   - **② 回落 = handoff §6 的结构化 carry-id**, 与 B-entry 闸门取 `raw_track_id` 的**同一个来源** —— 即 §2.1b 定义的那一串 (`standards/conventions/session-handoff.md` **§2.3.8** 的 `{id, desc}` 之 `id`);
->   - **③ 两级都取不到 ⇒ 跳过 + `log()`, 不猜** (fail-soft) —— 与本节失败处置同一档; 「猜一个 track 去刷」会刷错**别人**的 claim, 是比不刷更坏的失败;
+>   - **③ 两级都取不到 ⇒ 跳过, 但**必须留下可观测的持久化痕迹** (fail-soft)。**⚠️ K7 (R4) 订正 —— 原文写「跳过 + `log()`」是个空信号**: 实读 `def log(` 在全 aria **零命中**; `scripts/phase1_gate.py:56` 只有 `logger = logging.getLogger(__name__)` 而**无 handler** (`basicConfig` 只在 `scan.py`) ⇒ 独立 subprocess 的 `logger.*` **全丢**。叠加 R3/TL-M2 禁写 production 遥测分区 + SC-28 正向断言计数不增 ⇒ **「跑了但 skip」与「根本没挂载」在任何持久化产物里逐字节相同**, 连续三天静默 skip **无一处会红**。**落版 (2026-08-27, 未经审计轮)**: `--heartbeat-only` **每次调用都向遥测 JSONL 追加一条 `_source="heartbeat"` 记录** (该分区 `coordination_probe` 不计入, 见 R3/TL-M2, 故不会把那条 enabled check 变恒绿), 记录含 `outcome ∈ {refreshed, skipped_no_track, skipped_disabled, error}` 与 `reason`。⇒ 「跑了但 skip」在磁盘上**可辨**。「猜一个 track 去刷」仍禁止 —— 会刷错**别人**的 claim。**新增 SC-32 (代码)**: 在无 carry-id 的环境下跑 `--heartbeat-only` ⇒ 遥测 JSONL **新增恰一条** `_source="heartbeat"` 且 `outcome="skipped_no_track"`; **怎么会红**: 只 `logger.debug` 不落盘的实现 ⇒ 零新增记录 ⇒ 必红。**baseline 必红** (该模式今天不存在)。
 >   - **CLI 形态**: `python3 .../phase1_gate.py --heartbeat-only --raw-track-id "<carry-id>" --phase A.1 --repo-path <主仓根>` (**`--phase` 不可省 — R3/BA-M1**: `phase1_gate.py:1191` 的 `--phase` 是 `required=True`, 主控实跑 `--raw-track-id x --heartbeat-only` → `error: the following arguments are required: --phase` ⇒ 旧版字面形态**第一次实跑即被 argparse 拒**, 到不了 heartbeat 分支。本 Spec 取「文档补 `--phase`」而**不**放开该参数: 零代码改动; `--heartbeat-only` 不写新 claim, `--phase` 仅作占位不落盘) —— 由 AI 编排层**显式传入**, CLI 侧**不做任何推断**;
 >   - **匹配**: 按 `(container, 归一 track_id)` 刷新**全部**匹配的 active claim (与本节「增并存变体」的匹配键一致), **不写新 claim、不判碰撞**;
 >   - **⛔ 遥测分区边界 (R3/TL-M2, 主控实读证实 —— 不划这条界会把一个 enabled 的 check 变成恒绿)**: `--heartbeat-only` **不得**写生产遥测分区。实读 `skills/state-scanner/scripts/coordination_probe.py:4-25`: 它是**反死代码探针**, 只数 `.aria/coordination-telemetry.jsonl` 里 `_source=="production"` 的**近期** `run_gate` 记录, 而该分区「written only by the CLI production path (`_main` → `_gated` with `_source="production"`)」(逐字)。⇒ 若 `--heartbeat-only` 复用同一条产线, **每次 `/state-scanner` 都会写一条** ⇒ 该 check **永远 OK**, 无论真正的碰撞闸门是否还被调用 —— 它要防的「机制接线了但没人调」正好被自己的心跳掩盖 (memory `feedback_false_green_dual_is_permanent_red` 的镜像)。**落版**: `--heartbeat-only` 走 `_gated(_source="heartbeat")` 或完全跳过 `_emit_telemetry`; `coordination_probe` 的计数口径**保持只认 `production`**, 不放宽。**Impact 表已补 `coordination_probe.py` 行 (仅注释/口径声明, 不改逻辑)**;
@@ -264,7 +282,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
   |---|---|---|
   | `active` (原有唯一档) | 「另起」/「**我去释放对方的 claim 后再开始 (两步人工)**」/「并轨」 | 对方在做, 三选项都指向「怎么和一个活着的轨共处」 |
   | **`done`** (§2.4 新可见) | 「**复用对方产出, 本轨不起 Spec**」(⇒ 按 §5.2 走 `release_gate.py --raw-track-id "<本轨 A.1 原串>" --status abandoned`) /「基于其产出起后续 Spec」/「另起 (说明差异)」 | **「释放对方 claim」在本档机械上不可达, 不是推理而是实读结论 (rework v3 补证)**: `release_claim_by_track` 的匹配条件含 **`and rec.status == "active"`** (`lib/claim_lifecycle.py:427`), 非 active 的 claim 一律不匹配 ⇒ 对一条 `done` claim 调 release **必然返回 `claim_not_found`** (`:430`)。「并轨」则是**协作决定**而非机械动作, 对已完成的轨无对象可并。⇒ 两项在本档列出来即误导 |
-  | **`abandoned`** (§2.4 新可见) | 「接着做 (直接认领)」/「另起」 | 对方已显式退出 ⇒ 无冲突需处置; 但仍须**显示**该信号 (它是「有人来过并放弃了」的正证据) |
+  | **`abandoned`** (§2.4 新可见) | **⚠️ 必须先分辨来源 (R4/K6)** —— 实读 `lib/gc.py:324` 逐字「Number of stale active claims **rewritten to** `status='abandoned'`」, 而 `ClaimRecord` **无 swept 标记** ⇒ `abandoned` 有**两种来源**: (1) 对方**显式** release; (2) `--sweep-stale` 的 **GC 产物** (对方可能仍在做, 只是超 24h 没刷心跳)。**本 Spec 不得把二者合并渲染**: 在两者不可分辨的前提下, `abandoned` 一律按「**可能仍在制, 按 `active` 同档请裁**」处理, 并在告警里写明「该状态可能是 GC 产物」。**代价成文**: 这会让「对方真的退出了」也被请裁一次 —— 用一次多余的请裁换「不误判对方已退出」, 方向正确 (零证据不得当正证据)。**给 `ClaimRecord` 加 swept 标记以真正分辨二者, 记 follow-up, 不在本 Spec** | 见左 |
   | **`unknown`** (§2.4 独立键) | 「**按存在处理**: 视同 `active` 请裁」 | 存在性已确认、内容未知 ⇒ 不得降格为「无碰撞」, 也不得与 `done`/`abandoned` 同档 (§2.4 四态表) |
 
   上表**不新增机制**, 只是把 §2.4 已经让其可见的 status 值, 在消费面补上对应的选项集。
@@ -287,6 +305,21 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 > - **含 `unknown`** ⇒ 它被 skip 而原文**完全没讨论**。**但旧版对 `unknown` 的定性也是错的** (rework v3 按 editlist FIX-12 订正): `unknown` 是 **reader-only sentinel**, 它一定对应一个**真实存在**的 claim 文件 ⇒ 它是「**已确认存在一条竞品 claim, 只是本读者读不懂其 schema 版本**」的**正证据**, **不是**「零证据」。把它和 fetch 降级 (真的什么都没取到) 归为同一极性, 是把正证据降格 —— 与 §2.5「零证据不得当正证据」**互为镜像**的同一类错误。四态措辞见下方表。
 
 ##### §2.4a `unknown` 走独立通道 (editlist FIX-03, ⭐ 承重) —— 经 overlap 通道**结构性不可达**
+
+> ## 🔴 K5 (R4) — `unknown_schema_claims` **必须有失败态**, 否则 R2/M-4 在它自己的修复里复发 (2026-08-27 补, 未经审计轮)
+>
+> **R4/silent-failure 实读**: 本键与 `linked_issue_overlap` 共用 `scripts/phase1_gate.py:1231-1238` 的**同一个 `try:`**, 
+> 而现有 `except` **只赋 `linked_issue_overlap`**。按本 Spec 把门控放宽为 `if args.linked_issue or args.include_terminal:` 后,
+> `read_claims` 抛异常时 `unknown_schema_claims` **静默缺席** ⇒ 而 §2.5 四态表把「键缺席」定义为「**未检测**」,
+> 消费方 `.get(k, 0)` 读成「**0 条 unknown**」—— **零证据被当成正证据**, 正是 R2/M-4 要修的病, 在 M-4 自己的修复里复发
+> (memory `feedback_fix_recurs_in_its_own_fallback_path`)。
+>
+> **落版**: `except` 分支**必须同时**赋两个键 —— `out["linked_issue_overlap"] = None` **与** `out["unknown_schema_claims"] = None`,
+> 外加 `out["linked_issue_overlap_error"] = <非空 token>`。⇒ **§2.5 四态表的第四态相应改为**:
+> 「`linked_issue_overlap == null` **且** `unknown_schema_claims == null` 且 `linked_issue_overlap_error` 非空 ⇒ 本轮未取到任何证据」。
+> **`unknown_schema_claims` 的合法取值域自此为 `int | null`, `null` ≠ `0`** —— 消费方**不得**用 `.get(k, 0)`。
+> **新增 SC-33 (代码, CLI 全链路)**: 夹具让 `read_claims` 抛异常, 带 `--include-terminal` 跑 CLI ⇒ 输出中 **两个键都是 `null`** 且 error 非空;
+> **怎么会红**: 只赋 `linked_issue_overlap` 的实现会让 `unknown_schema_claims` 缺席 ⇒ 必红。**baseline 必红**。
 
 **先说为什么不能走 overlap**: `unknown` 被**两道门**丢弃, 且第二道**与 `_TERMINAL` 无关** ——
 
@@ -414,7 +447,14 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 >
 > ⇒ **落版判定式 = 把形态显式记进 claim**: claim 增 additive 字段 **`track_form: "issue" | "slug"`**, 由**派生代码在 acquire 时按自己走的分支写入** (它当然知道自己走了哪支), 消费侧**零推断**。
 > - 与 §5.3 的 `spec_slug` 同批引入, 同为 additive、同不 bump `schema_version`;
-> - 旧 claim 无该字段 ⇒ 读作 `None` ⇒ **fail-CLOSED: 按「形态未知」处理, D.2b 退回现状 (ALL matching) 并 `log()` 披露**, 不猜。
+> - 旧 claim 无该字段 ⇒ 读作 `None`。**⚠️ K2 (R4) 订正 —— 此处原写「fail-CLOSED」是错的命名, 且与 §5.3 相反**:
+> 「退回 ALL matching」正是 §5.3 自己逐字否决过的**连坐**, 它是 **fail-OPEN** (更危险的方向), 不是 fail-CLOSED;
+> 且 §5.3 同时写着「只释放三元组匹配」⇒ **同一条 legacy claim 两个相反答案** (实跑: 释放 `[s1,s2,s3]` vs `[s2]`)。
+> **落版 (2026-08-27, 未经审计轮)**: `track_form is None` ⇒ **不释放, 报错退出并点名该 claim**,
+> 要求操作者显式传 `--spec-slug` 或 `--force-legacy-release-all` 二选一。理由: 上线当天**全部存量 claim** 都走这条路径,
+> 让它默认走「释放全部」等于**默认连坐**; 而 release 是可重试的, 报错的代价远小于误释放。
+> **新增 SC-31 (代码)**: 对一条无 `track_form` 的 legacy claim 跑 D.2b release ⇒ **非零退出 + 输出点名该 claim + 零 claim 被改写**;
+> 带 `--force-legacy-release-all` 重跑 ⇒ 释放全部匹配。**怎么会红**: 默认释放全部的实现在第一臂必红。**baseline 必红**。
 >
 > 「含 slug」保留为**人类可读的名字**, `track_form` 字段是它的**机械定义**; SC-1 / SC-15 / SC-27 三处一律按该字段判, 夹具**不得预标形态**, 而应**跑派生代码让它自己写** (R3/TL-M4 点名: 预标形态的夹具对本缺陷免疫)。
 
@@ -456,6 +496,41 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | **写入点** | A.1 acquire 时写入本 Spec 的目录名 (`openspec/changes/<slug>/`); 回落形的 track_id 本就含 slug, 该字段与其冗余但**不矛盾** |
 | **release 定位** | D.2b 传 `--spec-slug "<本 cycle 的 spec 目录名>"` ⇒ 只释放 `(container, 归一 track_id, spec_slug)` 三元组匹配的 claim; **未传该参数时行为逐字节不变** (= 现状 ALL matching), 故 **Phase B/D 既有调用零影响** |
 | **为什么不用 track_id 承载方向** | 把方向塞进 track_id 会同时破坏 C-B 的第一半 (三方向变三条 track ⇒ 同 issue 的 overlap 检测退化) 与 C-C (carry-id 一致性)。`spec_slug` 作**独立字段**让 track_id 继续只承载「哪条 issue」, release 另有维度可用 |
+
+> ## 🔴 K1/K4 (R4) — 两个新字段的**透传面**与**写入路径** (2026-08-27 补, 未经审计轮)
+>
+> **R4/type-design A-C1 实读**: `heartbeat()` 在 `lib/claim_lifecycle.py:244-256` **逐字段重建** `ClaimRecord`
+> (显式列 11 个字段, 含 `linked_issue=existing.linked_issue`), **不是** `dataclasses.replace`。
+> ⇒ 不同步改这一段, `spec_slug`/`track_form` **每次 heartbeat 都被抹掉** —— 而本 Spec 的核心正是
+> 「每次 `/state-scanner` 跑 heartbeat」⇒ **字段活不过第一次心跳, §5.3 的 release 三元组永不匹配, C-C 回归**。
+>
+> **R4/pr-test C-3 实读**: Impact 原只给 `release_gate.py` 加 `--spec-slug` (**读取端**),
+> 而 `phase1_gate.py` 无对应 flag、Spec 又明写「不碰 `run_gate`/`_run_gate_impl` 签名」⇒ **写入端缺失**,
+> SC-27(C) 的 CLI 全链路夹具**不可构造**。
+>
+> ### 透传面逐条枚举 (照 `linked_issue` 先例; **不枚举就等于没做**)
+>
+> 先例实测: `git -C aria grep -c "linked_issue=" d50f9c3 -- skills/state-scanner/` ⇒
+> `claim_lifecycle.py:4` · `claim_schema.py:1` · `gc.py:1` · `phase1_gate.py:5` · `tests/test_release_by_track.py:6`
+> = **17 处 / 5 个文件**。两个新字段**各自**需要同等覆盖:
+>
+> | # | 落点 | 动作 |
+> |---|---|---|
+> | 1 | `lib/claim_schema.py` `ClaimRecord` | 加两个 `Optional[str] = None` 字段 + `parse_claim` 读取 + `to_dict`/序列化写出 |
+> | 2 | `lib/claim_lifecycle.py::acquire_claim` | **写入**两字段 (`track_form` 由派生分支自己写) |
+> | 3 | **`lib/claim_lifecycle.py::heartbeat` `:244-256` 的逐字段重建** | **必须加两行** `spec_slug=existing.spec_slug` / `track_form=existing.track_form` —— **K1 的本体** |
+> | 4 | `lib/claim_lifecycle.py::release_claim` / `release_claim_by_track` | 同样的重建/写回路径逐一核 (凡逐字段构造 `ClaimRecord` 的地方都要加) |
+> | 5 | `lib/gc.py` (`sweep_stale_active` 改写 status 时) | 同上 |
+> | 6 | **`scripts/phase1_gate.py` 的 A.1 acquire 路径** | **新增 `--spec-slug` CLI flag** 并透传给 `acquire_claim` —— **K4 的本体**; `track_form` 由派生逻辑内部决定, 不走 CLI |
+> | 7 | `scripts/release_gate.py` | 已有 `--spec-slug` (读取端) |
+> | 8 | `tests/` | 两字段各自的往返测试 (见 SC-30) |
+>
+> **⚠️ 关于「不碰 `run_gate`/`_run_gate_impl` 签名」**: 该承诺**维持** —— `--spec-slug` 与 `--include-terminal` 同款,
+> 在 `_main()` 内解析并传给 `acquire_claim`, **不进** `run_gate` 的公开签名。若 A.2 发现无法绕开, 属**超出本 Spec 承诺**, 须上呈。
+>
+> **新增 SC-30 (代码, 往返)**: acquire (带 `--spec-slug`) → **跑一次 heartbeat** → 读回 claim ⇒ 两字段**逐字节不变**。
+> **怎么会红**: 不改 `:244-256` 逐字段重建的实现, heartbeat 后两字段变 `None` ⇒ 必红。**baseline 必红** (字段今天不存在)。
+> **这条是 K1 的验收本体, 缺它则 K1 的修复无法证伪。**
 
 > **⛔ 已考虑并否决的替代**: 「不加字段, 接受连坐 —— 幸存方向在下一次 B-entry 的 `phase1_gate` 会自动重新 acquire」。
 > **否决理由**: 从 D.2b 到下一次 B-entry 之间, 幸存方向**处于无 claim 状态** ⇒ 对其他容器不可见 —— 这正是本 Spec 存在要关闭的那个窗口。
@@ -563,10 +638,10 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 
 | SC | 钉住哪一版的失败 | 场景 → 期望 | 宿主 | 怎么会红 |
 |----|---|---|---|---|
-| **SC-1** | 原始版 (spec-slug ⇒ 改名孤儿) | track-id 为 **issue 派生形** (`<basename>-<n>-<uuid>`, **不含 slug** —— 与 §5.1 / SC-15 **逐字同一句谓词**) 的轨: slug 改名前后 track-id **不变** | 文本层 + 行为层 | 占位串写成 `<spec-slug>-…` (含 slug) 的实现必红; 当前两处 SKILL.md **根本没有** A.1 步骤块 ⇒ baseline 必红 |
-| **SC-2** | R1-fix 版 (纯 issue 派生 ⇒ 主机制死) | 两**不同容器**同 issue 各自 A.1 认领 ⇒ 双方 `linked_issue_overlap` **各含对方** | 代码 (CLI 全链路) | 去掉容器段的实现被 `lib/collision.py:278-279` 自排除 ⇒ 双方 overlap 恒空 ⇒ 必红 **⚠️ 恒绿风险已堵 (R3/QA-F2)**: QA 席实读 `tests/test_release_by_track.py:533` 的 `test_linked_issue_written_and_overlap_surfaced` —— 它传**两个手写的、不含容器段的** track 名, **今天就绿** ⇒ 若 SC-2 的夹具照它写, 本条**测不出**「容器段被丢弃」这个它声称钉住的 R1-fix 回归。 ⇒ **SC-2 的夹具硬约束**: 两条 track-id **按 §2.1 规则手写拼接**(**R4/C-1 订正 —— 主控担责**: 上一版写「必须由 §2.1a 的 compose 函数派生」, 而 §2.1a `:164` 逐字写着「**本 Spec 不新增拼接函数**」, 全文 grep `compose` 仅命中 SC-2 自身 ⇒ **SC-2 引用了一个本 Spec 明说不存在的函数**, 实现者写夹具时字面上找不到可 import 的对象 —— 正是本项目三次最重 critical 的同一形状, 这次由主控 R3 清账时引入。**订正后**: 夹具手写字面串是**允许且必要的** (拼接无代码宿主是 §2.1a 成文交付的一半); 归一仍走 `lib/track_id.py::derive_track_id`), 且断言**两层**: (i) 双方 overlap 各含对方; (ii) **把 compose 的 container 段置空重跑同一夹具 ⇒ 双方 overlap 必须变空** (负控)。缺 (ii) 的实现视为未满足本条 |
+| **SC-1** | 原始版 (spec-slug ⇒ 改名孤儿) | track-id 为 **issue 派生形** (`<basename>-<n>-<uuid>`, **不含 slug** —— 与 §5.1 / SC-15 **逐字同一句谓词**) 的轨: slug 改名前后 track-id **不变** | 文本层 + 行为层 | 占位串写成 `<spec-slug>-…` (含 slug) 的实现必红; 当前两处 SKILL.md **根本没有** A.1 步骤块 ⇒ baseline 必红 **⚠️ 类别 (R4/K3)**: **行为 (定向 fixture)** —— K3 降级 —— 派生无代码宿主 ⇒ 本条**不得**写成代码类; 它只能由 AB eval 分辨「AI 是否按 §2.1 规则拼串」, **不冒充结构化测试** |
+| **SC-2** | R1-fix 版 (纯 issue 派生 ⇒ 主机制死) | 两**不同容器**同 issue 各自 A.1 认领 ⇒ 双方 `linked_issue_overlap` **各含对方** | 代码 (CLI 全链路) | 去掉容器段的实现被 `lib/collision.py:278-279` 自排除 ⇒ 双方 overlap 恒空 ⇒ 必红 **⚠️ 恒绿风险已堵 (R3/QA-F2)**: QA 席实读 `tests/test_release_by_track.py:533` 的 `test_linked_issue_written_and_overlap_surfaced` —— 它传**两个手写的、不含容器段的** track 名, **今天就绿** ⇒ 若 SC-2 的夹具照它写, 本条**测不出**「容器段被丢弃」这个它声称钉住的 R1-fix 回归。 ⇒ **SC-2 的夹具硬约束**: 两条 track-id **按 §2.1 规则手写拼接**(**R4/C-1 订正 —— 主控担责**: 上一版写「必须由 §2.1a 的 compose 函数派生」, 而 §2.1a `:164` 逐字写着「**本 Spec 不新增拼接函数**」, 全文 grep `compose` 仅命中 SC-2 自身 ⇒ **SC-2 引用了一个本 Spec 明说不存在的函数**, 实现者写夹具时字面上找不到可 import 的对象 —— 正是本项目三次最重 critical 的同一形状, 这次由主控 R3 清账时引入。**订正后**: 夹具手写字面串是**允许且必要的** (拼接无代码宿主是 §2.1a 成文交付的一半); 归一仍走 `lib/track_id.py::derive_track_id`), 且断言**两层**: (i) 双方 overlap 各含对方; (ii) **把 compose 的 container 段置空重跑同一夹具 ⇒ 双方 overlap 必须变空** (负控)。缺 (ii) 的实现视为未满足本条 **⚠️ 类别 (R4/K3)**: **行为 (定向 fixture)** —— K3 降级 —— 派生无代码宿主 ⇒ 本条**不得**写成代码类; 它只能由 AB eval 分辨「AI 是否按 §2.1 规则拼串」, **不冒充结构化测试** |
 | **SC-3** | R2-fix 版 (`container-short` 前 8 位 ⇒ label 碰撞) | container-id 的 `label` 设为长字符串时, track-id 仍用 **`uuid` 字段** | 代码 (新 accessor 的单测) + 文本层 | 直接调 `get_container_id()` (`lib/identity.py:191`, `:222` label 优先) 的实现在设了 label 的夹具上必红 |
-| **SC-4** | R3 指出的 number 表示不一致 | `#007` 与 `#7` 派生**同一** track-id | 文本层 (占位串须字面写 `str(int(number))`) + 行为层 | 占位串写裸 `<number>` 必红; 行为臂上「照抄 `007`」与「归一成 `7`」两臂可辨 |
+| **SC-4** | R3 指出的 number 表示不一致 | `#007` 与 `#7` 派生**同一** track-id | 文本层 (占位串须字面写 `str(int(number))`) + 行为层 | 占位串写裸 `<number>` 必红; 行为臂上「照抄 `007`」与「归一成 `7`」两臂可辨 **⚠️ 类别 (R4/K3)**: **行为 (定向 fixture)** —— K3 降级 —— 派生无代码宿主 ⇒ 本条**不得**写成代码类; 它只能由 AB eval 分辨「AI 是否按 §2.1 规则拼串」, **不冒充结构化测试** |
 
 ### 主机制
 
@@ -587,7 +662,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 |----|------|------|---------|
 | **SC-13** | ⛔ **已迁至 [`linked-issue-field-availability`](../linked-issue-field-availability/proposal.md)** —— 本 Spec 不再承担「proposal 无字段 / 值不可解析 ⇒ custom check warning」 | — | — (编号保留不复用) |
 | **SC-14** — **⚠️ 已按 R2/M-16 拆两层** | (a) **代码**: 给定 A.1 原串调 `release_gate.py --raw-track-id "<原串>" --status abandoned` (`--raw-track-id` 是 `release_gate.py:236-237` 的「三选一」必需项之一, 省了会 `parser.error`) (b) **行为**: A.1 判定「不起该 Spec」时 AI 记得去调 | (a) 该 claim 状态变为 `abandoned` (b) 定向 fixture 两臂可辨 | (a) 现状 `release_gate.py` 已支持 `--status abandoned` ⇒ **该臂的红点在「传 A.1 原串能否匹配到」** (与 SC-23 同根: 不统一 carry-id 则匹配不到, 必红); (b) 「判定放弃后直接开下一个方向、不 release」的臂必红 |
-| **SC-15** (代码) | track-id 为**回落形** (`<spec-slug>-<uuid>`, **含 slug** —— 与 §5.1 / SC-1 **逐字同一句谓词**) 的轨改名 —— 含「无关联 issue 者」**与「同 issue 后起 Spec 落在回落形者」** | release 旧 + acquire 新两步后**无孤儿** (旧 track 不再 active, 新 track active) | 只 acquire 不 release 的实现留下孤儿 claim ⇒ 必红; 用「有没有关联 issue」做谓词的实现在「有 issue 却走回落形」的第三类夹具上必红 |
+| **SC-15** (代码) | track-id 为**回落形** (`<spec-slug>-<uuid>`, **含 slug** —— 与 §5.1 / SC-1 **逐字同一句谓词**) 的轨改名 —— 含「无关联 issue 者」**与「同 issue 后起 Spec 落在回落形者」** | release 旧 + acquire 新两步后**无孤儿** (旧 track 不再 active, 新 track active) | 只 acquire 不 release 的实现留下孤儿 claim ⇒ 必红; 用「有没有关联 issue」做谓词的实现在「有 issue 却走回落形」的第三类夹具上必红 **⚠️ 类别 (R4/K3)**: **行为 (定向 fixture)** —— K3 降级 —— 派生无代码宿主 ⇒ 本条**不得**写成代码类; 它只能由 AB eval 分辨「AI 是否按 §2.1 规则拼串」, **不冒充结构化测试** |
 | **SC-16** | ⛔ **已迁至 [`sibling-spec-probe`](../sibling-spec-probe/proposal.md)** (竞品在 `archive/` 下须命中) | — | — |
 | **SC-17** | ⛔ **已迁至 `sibling-spec-probe`** (远端无同 issue spec ⇒ exit 0) | — | — |
 | **SC-18** | ⛔ **已迁至 `sibling-spec-probe`** (探针 fetch 失败 ⇒ degraded + exit 非 0) | — | — |
