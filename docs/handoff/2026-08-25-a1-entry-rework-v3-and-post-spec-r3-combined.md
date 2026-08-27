@@ -2,9 +2,11 @@
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: A.1-post-spec-R4-awaiting-owner-direction
-status: active
+status: superseded
 updated-at: 2026-08-25T09:40:00Z
 ---
+
+> ⛔ **已被 [2026-08-27 会话收尾](./2026-08-27-a1-entry-r3-r4-diverging-and-code-host-root-cause.md) 取代** —— 本文件是同一对话的中途 checkpoint; 其 §0′ 记 R4 摘要, 完整账目以 08-27 那份为准。
 
 # Session Handoff (2026-08-25) — a1-entry rework v3 落版 (方向 b) + post_spec R3 五席联审 REVISE
 
