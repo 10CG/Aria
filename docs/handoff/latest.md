@@ -1,6 +1,6 @@
 # Latest Session Handoff
 
-**Latest**: [2026-08-26-sc8-gate-version-sot-and-m6-gate-recon.md](./2026-08-26-sc8-gate-version-sot-and-m6-gate-recon.md) — session-close-20260826-sc8-version-m6recon @ phase=session-close (status=done) — SC-8 闸换绝对值 / 主项目版本 SOT=1.7.5 / M6 门踩点含 Aria#147 误关发现 updated=2026-08-26
+**Latest**: [2026-08-27-m6-ledger-recon-agent-team.md](./2026-08-27-m6-ledger-recon-agent-team.md) — session-close-20260827-m6-ledger-recon @ phase=session-close (status=done) — M6 账目核实 (11-agent 动态工作流, 对抗轮推翻 5 条) → done 17 / in_progress 10 / pending 3; #177 补证据 updated=2026-08-27
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -18,6 +18,8 @@
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-27 更新 (simonfish/bfe8285d, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新)。owner 设 goal「agent team + 动态工作流」→ 11-agent 工作流核实 M6 `dispatch-input-delivery` 的 30 个 task 账目 (六组并行 + `code-reviewer` 对抗轮) → **真实进度 done 17 / in_progress 10 / pending 3**, 推翻 5 条 done (靠**撤销 fix 看测试是否仍绿**的反事实手法, 抓到两处重言式测试)。回填 yaml + 同步 tasks.md (原本只改了一份)。**四门无一待决策**, 021 与 028 无前置可并行。另: Aria#177 补上版本漂移实例证据。既有各行未动 (本 session 无 cycle)。
 >
 > **2026-08-26 更新 (simonfish/bfe8285d, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新, 覆盖 08-24→08-26 三天)。三件事: SC-8 性能闸 owner 裁 A 换**绝对 ms/call 双腿** (aria `d50f9c3`, 未发版) · 主项目版本 SOT 核实 = **1.7.5** 并修 9 点漂移 + 加机械 check (主仓 `2ae012f`) · 按 owner 指派踩点 M6 四门 —— **查出 Aria#147 (M6-blocker) 被主仓 commit `c2a5bd3` 里引述的 `Closes #147` 误关** (证据在 timeline, 技术上 Blocker 3/4 未解)。⚠️ 待 owner: #147 是否重开 / M6 四门 (前三是基建操作, 第四依赖 Luxeno 延迟且 45 天未复核)。既有各行未动 (本 session 无 cycle, 不新增 track 行)。
 >
