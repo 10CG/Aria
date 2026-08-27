@@ -25,51 +25,51 @@
 
 ## TG-1 — Container side (initial.sh + compute-assertions.sh)
 
-- [ ] 1.1 Align Step 1 ISSUE_ID regex to accept `ARIA-<repo>-<number>` (still reject bare numeric; `DEMO-`/`TEST-` preserved)
-- [ ] 1.2 Step 2 dual-mode resolution: `DEMO-`/`TEST-` + file-exists → validated file read (non-empty + YAML-parseable, no silent fallback); `ARIA-` → always-fetch (ignore existing file)
-- [ ] 1.3 Fetch title/body from `ISSUE_URL` with `FORGEJO_BOT_PAT`; read `target_repo`/`base_branch`/`files_hint` from Nomad META
-- [ ] 1.4 Fetch validation + retry classification: HTTP 2xx + legitimate JSON (reject CF-Access pseudo-success) + non-empty; retriable (timeout/5xx/429) → bounded backoff; non-retriable (404/401/pseudo-success/empty) → immediate fail (no `|| true`)
-- [ ] 1.5 Title/body sanitization pipeline: YAML-safe escape + CRLF→LF + length cap + injection isolation; route through existing envsubst whitelist (body not re-expanded)
-- [ ] 1.6 `base_branch` from META with Forgejo `default_branch` fallback (never hardcode `master`)
-- [ ] 1.7 **RED-first** at the real `initial.sh` call-site: reproduce current empty-`expected_changes` false-green; fix compute-assertions to emit `unknown`/`skip` (not `true`) on empty lists (file-mode defense-in-depth)
-- [ ] 1.8 Fetch mode **skips** the `compute-assertions.sh` call entirely; wire the skip at `initial.sh:513-515`. (Mechanism, corrected by mid_post_spec dogfood 2026-07-04: the call at `:514` has `| tail -5 || true` under `set -euo pipefail` — compute-assertions.sh's `exit 1` at `:37` is **swallowed**, container does NOT die there; real dead-end is `FILE_TOUCHED_HIT`/`DIFF_CONTAINS_HIT` defaulting `false` at `:517-518` → 5-AND fail → `ASSERTION_MISMATCH` `:534` → `exit 1` `:595` → `S_FAIL`. Skip avoids this dead-end.)
-- [ ] 1.9 Define `AUTONOMOUS_COMPLETED` outcome (fetch mode) = `claude_exit==0 AND commit AND PR` (no file/diff hits); map to `exit 0`
-- [ ] 1.10 Emit the outcome-**class** stderr marker on the channel Layer 1 reads (cf. `redo.sh` precedent, consumed via `get_alloc_logs`): on success distinguish `AUTONOMOUS_COMPLETED` vs file-mode `SUCCESS`; on fetch failure emit `INPUT_FETCH_FAILED` + `exit 1`. (Do **not** rely on `result.json` — Layer 1 never reads it and it is on cross-node-unreadable storage.)
+- [x] 1.1 Align Step 1 ISSUE_ID regex to accept `ARIA-<repo>-<number>` (still reject bare numeric; `DEMO-`/`TEST-` preserved)
+- [ ] 1.2 Step 2 dual-mode resolution: `DEMO-`/`TEST-` + file-exists → validated file read (non-empty + YAML-parseable, no silent fallback); `ARIA-` → always-fetch (ignore existing file)  <!-- ⚠️ 部分完成 TASK-002: 缺一个 file-mode 失败路径测试: issue.yaml 缺失 / 空文件 / 非法 YAML 结构三选一, 断言 die() 触发 (exit!=0, stderr 含对应 FATAL 文案), 证明 initial.sh:460/461/490 的 -->
+- [ ] 1.3 Fetch title/body from `ISSUE_URL` with `FORGEJO_BOT_PAT`; read `target_repo`/`base_branch`/`files_hint` from Nomad META  <!-- ⚠️ 部分完成 (对抗轮推翻) TASK-003: AC-3 的 body 半边零验证 + 证据含不存在的事实。反事实实证: 在副本 modes/initial.sh:567 把 `ARIA_ISSUE_DESCRIPTION=$(wrap_untrusted_content "$(sanitize_issue -->
+- [x] 1.4 Fetch validation + retry classification: HTTP 2xx + legitimate JSON (reject CF-Access pseudo-success) + non-empty; retriable (timeout/5xx/429) → bounded backoff; non-retriable (404/401/pseudo-success/empty) → immediate fail (no `|| true`)
+- [ ] 1.5 Title/body sanitization pipeline: YAML-safe escape + CRLF→LF + length cap + injection isolation; route through existing envsubst whitelist (body not re-expanded)  <!-- ⚠️ 部分完成 TASK-005: verification 第一项『YAML-safe escape』在代码里找不到对应实现: sanitize_issue_text 只做控制字符剥离，未对 YAML 特殊字符 (引号/冒号/`|`/`-` 等) 做转义；而实际数据流 (ARIA_ISSUE_ -->
+- [x] 1.6 `base_branch` from META with Forgejo `default_branch` fallback (never hardcode `master`)
+- [ ] 1.7 **RED-first** at the real `initial.sh` call-site: reproduce current empty-`expected_changes` false-green; fix compute-assertions to emit `unknown`/`skip` (not `true`) on empty lists (file-mode defense-in-depth)  <!-- ⚠️ 部分完成 TASK-007: 需要在 initial-sh-integration/test.sh 补一个 scenario: file 模式下 issue.yaml 存在但 expected_changes.expected_file_touched/expected_diff_cont -->
+- [ ] 1.8 Fetch mode **skips** the `compute-assertions.sh` call entirely; wire the skip at `initial.sh:513-515`. (Mechanism, corrected by mid_post_spec dogfood 2026-07-04: the call at `:514` has `| tail -5 || true` under `set -euo pipefail` — compute-assertions.sh's `exit 1` at `:37` is **swallowed**, container does NOT die there; real dead-end is `FILE_TOUCHED_HIT`/`DIFF_CONTAINS_HIT` defaulting `false` at `:517-518` → 5-AND fail → `ASSERTION_MISMATCH` `:534` → `exit 1` `:595` → `S_FAIL`. Skip avoids this dead-end.)  <!-- ⚠️ 部分完成 (对抗轮推翻) TASK-008: verification 硬性要求 “RED test MUST exercise the REAL initial.sh call-chain”, 但该测试对本 fix 是重言式, 撤销 fix 也全绿。反事实实证: 在副本把 modes/initial.s -->
+- [ ] 1.9 Define `AUTONOMOUS_COMPLETED` outcome (fetch mode) = `claude_exit==0 AND commit AND PR` (no file/diff hits); map to `exit 0`  <!-- ⚠️ 部分完成 TASK-009: 补一个 scenario: 设 ARIA_TEST_CLAUDE_NO_OP=1 (stub claude 不产生 commit) 走 fetch 模式真实调用链，断言 FINAL_OUTCOME=ASSERTION_MISMATCH 且 exit 1 (证明 -->
+- [x] 1.10 Emit the outcome-**class** stderr marker on the channel Layer 1 reads (cf. `redo.sh` precedent, consumed via `get_alloc_logs`): on success distinguish `AUTONOMOUS_COMPLETED` vs file-mode `SUCCESS`; on fetch failure emit `INPUT_FETCH_FAILED` + `exit 1`. (Do **not** rely on `result.json` — Layer 1 never reads it and it is on cross-node-unreadable storage.)
 
 ## TG-2 — Layer 1 side (extension.py + schema migration)
 
-- [ ] 2.1 Add additive nullable columns (`migrations/00N_schema_vN_additive.sql` pattern, M3/M4/M5 precedent): `raw_issue_number` / `target_repo` / `base_branch` / `files_hint` (+ optional `outcome_class`); seed (`_phase1_scan_and_seed`) writes them
-- [ ] 2.2 Dispatch `ISSUE_ID = ARIA-<repo>-<number>` (letter-prefixed, issue number not internal id, repo component anti-collision)
-- [ ] 2.3 Extend Nomad META builder with `target_repo` / `base_branch` / `files_hint` read from the persisted columns (2.1) via `dispatch_row` — not global env
-- [ ] 2.4 **Rebuild `ISSUE_URL`** = `{target_repo}/issues/{raw_issue_number}` from the persisted columns (do NOT parse the composite `issue_id`, do NOT use hardcoded `FORGEJO_ORG`/`FORGEJO_REPO`); fixes the current internal-id + hardcoded-repo construction (`extension.py:1176/2147-2152`)
-- [ ] 2.5 Unify `head_branch = aria/{issue_id}` with container `BRANCH` under new scheme (preserve S6_REVIEW PR binding)
-- [ ] 2.6 Add `FailReason.INPUT_FETCH_FAILED` (`interfaces.py`); in `_handle_s5_await` (`extension.py:2593-2640`) consume the container outcome-class marker via `get_alloc_logs()`: `exit_code!=0` → route `INPUT_FETCH_FAILED` distinct from `CONTAINER_CRASH`; `exit_code==0` → record `outcome_class` (`AUTONOMOUS_COMPLETED` vs `SUCCESS`) into DB (**single carrier** — additive column preferred over audit payload). **Fail-closed**: marker absent/malformed on `exit 0` → `outcome_class=UNKNOWN` (not `SUCCESS`); fixture covers absent + malformed
-- [ ] 2.7 Make Spec #2's acceptance query (`check-m6-e2e-acceptance.py`) outcome-class-aware: `AUTONOMOUS_COMPLETED` excluded from verified-SUCCESS counts / stratified (cross-Spec coordination)
+- [x] 2.1 Add additive nullable columns (`migrations/00N_schema_vN_additive.sql` pattern, M3/M4/M5 precedent): `raw_issue_number` / `target_repo` / `base_branch` / `files_hint` (+ optional `outcome_class`); seed (`_phase1_scan_and_seed`) writes them
+- [x] 2.2 Dispatch `ISSUE_ID = ARIA-<repo>-<number>` (letter-prefixed, issue number not internal id, repo component anti-collision)
+- [ ] 2.3 Extend Nomad META builder with `target_repo` / `base_branch` / `files_hint` read from the persisted columns (2.1) via `dispatch_row` — not global env  <!-- ⚠️ 部分完成 (对抗轮推翻) TASK-013: extension.py:2262/2265/2268 向 Nomad dispatch meta 新写 TARGET_REPO/BASE_BRANCH/FILES_HINT 三个键, 但生产 job HCL 从未声明它们: nomad/jobs/aria-l -->
+- [x] 2.4 **Rebuild `ISSUE_URL`** = `{target_repo}/issues/{raw_issue_number}` from the persisted columns (do NOT parse the composite `issue_id`, do NOT use hardcoded `FORGEJO_ORG`/`FORGEJO_REPO`); fixes the current internal-id + hardcoded-repo construction (`extension.py:1176/2147-2152`)
+- [x] 2.5 Unify `head_branch = aria/{issue_id}` with container `BRANCH` under new scheme (preserve S6_REVIEW PR binding)
+- [x] 2.6 Add `FailReason.INPUT_FETCH_FAILED` (`interfaces.py`); in `_handle_s5_await` (`extension.py:2593-2640`) consume the container outcome-class marker via `get_alloc_logs()`: `exit_code!=0` → route `INPUT_FETCH_FAILED` distinct from `CONTAINER_CRASH`; `exit_code==0` → record `outcome_class` (`AUTONOMOUS_COMPLETED` vs `SUCCESS`) into DB (**single carrier** — additive column preferred over audit payload). **Fail-closed**: marker absent/malformed on `exit 0` → `outcome_class=UNKNOWN` (not `SUCCESS`); fixture covers absent + malformed
+- [x] 2.7 Make Spec #2's acceptance query (`check-m6-e2e-acceptance.py`) outcome-class-aware: `AUTONOMOUS_COMPLETED` excluded from verified-SUCCESS counts / stratified (cross-Spec coordination)
 
 ## TG-3 — Key format migration + query survey
 
-- [ ] 3.1 Reformat `issue_id` **value** to `ARIA-<repo>-<number>` (value-level; the **key** is not restructured — composite embedded in TEXT, partial-unique-active invariant preserved). Distinct from the additive input columns of TG-2.1 (those are separate additive migrations, not a key change).
-- [ ] 3.2 Decide + document clean-DB vs historical-migration for existing `issue_id` rows. **DECISION (Phase B.2, 2026-07-04): forward-only reformat, NO backfill / NO historical migration.** Rationale: `issue_id` is opaque TEXT everywhere (per §3.3 survey); old-format autonomous rows are already terminal (per #147 pre-flight — all S_FAIL), so the partial-unique-active invariant is unaffected; new dispatches emit `ARIA-<repo>-<number>`, historical rows retain old format + degrade gracefully (NULL additive columns tolerated). Recorded in migration `008_schema_v5.1_additive.sql` header.
-- [ ] 3.3 Survey every acceptance/dispatch query keying on `issue_id`; confirm new-format tolerance; verify #147 issue_type_hint stratification (json_extract path) unaffected
+- [x] 3.1 Reformat `issue_id` **value** to `ARIA-<repo>-<number>` (value-level; the **key** is not restructured — composite embedded in TEXT, partial-unique-active invariant preserved). Distinct from the additive input columns of TG-2.1 (those are separate additive migrations, not a key change).
+- [x] 3.2 Decide + document clean-DB vs historical-migration for existing `issue_id` rows. **DECISION (Phase B.2, 2026-07-04): forward-only reformat, NO backfill / NO historical migration.** Rationale: `issue_id` is opaque TEXT everywhere (per §3.3 survey); old-format autonomous rows are already terminal (per #147 pre-flight — all S_FAIL), so the partial-unique-active invariant is unaffected; new dispatches emit `ARIA-<repo>-<number>`, historical rows retain old format + degrade gracefully (NULL additive columns tolerated). Recorded in migration `008_schema_v5.1_additive.sql` header.
+- [ ] 3.3 Survey every acceptance/dispatch query keying on `issue_id`; confirm new-format tolerance; verify #147 issue_type_hint stratification (json_extract path) unaffected  <!-- ⚠️ 部分完成 (对抗轮推翻) TASK-020: verification 第一条 "AC-8: every issue_id-keyed query tolerates new format" 未满足: 普查的模块枚举 (SURVEY FINDINGS #2 = db.py, #3 = comment_po -->
 
 ## TG-4 — Image rebuild + freeze
 
-- [ ] 4.1 Rebuild `aria-runner` via `aether-build-container` after **TG-1** lands (only container-side code is baked into the image; TG-2/TG-3 are Hermes/light-1 side, deployed separately); push to internal registry
+- [ ] 4.1 Rebuild `aria-runner` via `aether-build-container` after **TG-1** lands (only container-side code is baked into the image; TG-2/TG-3 are Hermes/light-1 side, deployed separately); push to internal registry  <!-- ⚠️ 部分完成 TASK-021: 需要 owner 实际触发 /aether:aether-build-container (或手工 docker build) 对 post-merge master SHA 构建镜像并 push 到 forgejo.10cg.pub/10cg/aria-ru -->
 - [ ] 4.2 Capture immutable `image_sha256`; freeze single `IMAGE_SHA` for the 168h run; record rollback (old sha)
 
 ## TG-5 — Contract + doc sync (Rule #3)
 
-- [ ] 5.1 Write **AD-M6-10** (six-section: decision/background/alternatives/rationale/risks/rollback); include single-node scope of the bind-mount input assumption
-- [ ] 5.2 **Correct the AD4 risk-table cell** (`architecture-decisions.md:384`): fix the "AD-M0-5 约定" mislabel + scope bind-mount premise to single-node + xref AD-M6-10. **Do NOT touch the AD-M0-5 body** (`:1035`, m0-handoff schema — unrelated)
-- [ ] 5.3 **Amend AD-M1-4**: scope 5-AND SUCCESS to file mode; document `AUTONOMOUS_COMPLETED` + `INPUT_FETCH_FAILED`. **Caveat (R2 km):** the AD-M1-4 body (`architecture-decisions.md:1360`) has pre-existing doc/code drift (records a 9-enum/6-AND `entrypoint-m1.sh` version vs the current 5-AND `initial.sh:524`) — verify the AD's current literal content before editing to avoid conflating the two generations.
-- [ ] 5.4 Add `layer-boundary-contract.md §5 "Task Content Delivery Mechanism"` (dual-channel field schema + file-mode lifecycle)
-- [ ] 5.5 Update CLAUDE.md M6 status section: record input-delivery ↔ telemetry dependency chain (fetch-before-edit; high-contention region)
+- [ ] 5.1 Write **AD-M6-10** (six-section: decision/background/alternatives/rationale/risks/rollback); include single-node scope of the bind-mount input assumption  <!-- ⚠️ 部分完成 (对抗轮推翻) TASK-023: AD-M6-10 六段结构 + 单节点作用域声明确已写入 architecture-decisions.md(分支版 :4041 起), 这部分推不翻; 但必需的 Alternatives 段里否 D 的载重论据是伪核实且与本仓实测证据相反: (1) AD : -->
+- [x] 5.2 **Correct the AD4 risk-table cell** (`architecture-decisions.md:384`): fix the "AD-M0-5 约定" mislabel + scope bind-mount premise to single-node + xref AD-M6-10. **Do NOT touch the AD-M0-5 body** (`:1035`, m0-handoff schema — unrelated)
+- [x] 5.3 **Amend AD-M1-4**: scope 5-AND SUCCESS to file mode; document `AUTONOMOUS_COMPLETED` + `INPUT_FETCH_FAILED`. **Caveat (R2 km):** the AD-M1-4 body (`architecture-decisions.md:1360`) has pre-existing doc/code drift (records a 9-enum/6-AND `entrypoint-m1.sh` version vs the current 5-AND `initial.sh:524`) — verify the AD's current literal content before editing to avoid conflating the two generations.
+- [x] 5.4 Add `layer-boundary-contract.md §5 "Task Content Delivery Mechanism"` (dual-channel field schema + file-mode lifecycle)
+- [x] 5.5 Update CLAUDE.md M6 status section: record input-delivery ↔ telemetry dependency chain (fetch-before-edit; high-contention region)
 
 ## TG-6 — E2E dogfood + pre-run verification
 
 - [ ] 6.1 Live-test heavy-node Forgejo egress/auth (fetch reachability) before any run
 - [ ] 6.2 E2E dogfood: real numeric-id autonomous dispatch → S9_CLOSE with merged PR (AC-1)
-- [ ] 6.3 Verify fetch-failure classes distinguishable to Layer 1 as infra-fail vs agent-fail (AC-6)
+- [x] 6.3 Verify fetch-failure classes distinguishable to Layer 1 as infra-fail vs agent-fail (AC-6)
 
 ---
 
