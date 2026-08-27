@@ -6,6 +6,13 @@
 >   - R1 (2026-07-03): **5/5 REVISE** — 3 Critical (AD-M0-5 misattribution [2-agent] / fetch-outcome↔state-machine dead-end [qa] / AC-6 fetch-fail indistinguishable [qa]) + 4 Major (ISSUE_URL not fixed [4-agent] / retry classification dropped / META "R7 64KB" factual error / compute-assertions call-site) + 1 Minor. All landed.
 >   - R2 (2026-07-03): **4 PASS + 1 REVISE** — backend-architect found 2 fix-introduced Criticals (corpus-exclusion label stranded on cross-node-unreadable `result.json` / B.3-vs-D.1 raw-number contradiction). Both landed (outcome-class stderr-marker → DB persistence → acceptance stratify; seed additive columns).
 >   - R3 (2026-07-03): **5/5 unanimous PASS** — both R2 Criticals verified CLOSED against live code; no fix-introduced regressions. Non-blocking findings (fail-closed marker default / base_branch seed-availability wording / single-carrier) folded in. **CONVERGED.**
+> **📌 账目核实 (2026-08-27, owner 指派 agent team + 动态工作流)**: 本 spec 的 30 个 task
+> 此前**全部 status: pending**, 而代码早已实现 (feature 分支 37 文件 / +4081 行) —— 账目失真。
+> 六组并行核实 + `code-reviewer` 对抗推翻后回填为 **done 17 / in_progress 10 / pending 3**
+> (对抗轮推翻 5 条 done, 理由多为反事实实证「撤销 fix 后测试仍全绿」= 重言式测试)。
+> **四道门全部是待执行的基建动作, 无一是待决策**; 互为前置 021→022, 028→029。
+> 完整报告: `.aria/notes/2026-08-27-m6-task-ledger-recon.md`
+
 > **Change ID**: `aria-2.0-m6-dispatch-input-delivery`
 > **Parent US**: [US-026](../../../docs/requirements/user-stories/US-026.md) (Aria 2.0 M6 — autonomous E2E closure umbrella)
 > **Parent PRD**: [prd-aria-v2.md §M6](../../../docs/requirements/prd-aria-v2.md) (Week 26-30, E2E testing + release)

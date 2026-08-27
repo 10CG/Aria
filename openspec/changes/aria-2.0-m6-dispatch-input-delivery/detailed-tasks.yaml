@@ -35,7 +35,7 @@ tasks:
     parent: "1.1"
     task_group: TG-1
     title: "Align Step 1 ISSUE_ID regex to accept ARIA-<repo>-<number>"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -51,7 +51,7 @@ tasks:
     parent: "1.2"
     task_group: TG-1
     title: "Step 2 dual-mode input resolution (file vs always-fetch)"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -67,7 +67,7 @@ tasks:
     parent: "1.3"
     task_group: TG-1
     title: "Fetch title/body from ISSUE_URL + read metadata from Nomad META"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -83,7 +83,7 @@ tasks:
     parent: "1.4"
     task_group: TG-1
     title: "Fetch validation + retry classification (retriable vs non-retriable)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -101,7 +101,7 @@ tasks:
     parent: "1.5"
     task_group: TG-1
     title: "Title/body sanitization pipeline"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -117,7 +117,7 @@ tasks:
     parent: "1.6"
     task_group: TG-1
     title: "base_branch from META with Forgejo default_branch fallback"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -132,7 +132,7 @@ tasks:
     parent: "1.7"
     task_group: TG-1
     title: "RED-first: reproduce empty-expected_changes false-green at real initial.sh call-site; fix compute-assertions"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: qa-engineer
@@ -149,7 +149,7 @@ tasks:
     parent: "1.8"
     task_group: TG-1
     title: "Fetch mode skips compute-assertions.sh call entirely"
-    status: pending
+    status: in_progress
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -167,7 +167,7 @@ tasks:
     parent: "1.9"
     task_group: TG-1
     title: "Define AUTONOMOUS_COMPLETED outcome (fetch mode)"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -184,7 +184,7 @@ tasks:
     parent: "1.10"
     task_group: TG-1
     title: "Emit outcome-class stderr marker on the channel Layer 1 reads"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -205,7 +205,7 @@ tasks:
     parent: "2.1"
     task_group: TG-2
     title: "Add additive nullable columns + seed writes them"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -230,7 +230,7 @@ tasks:
     parent: "2.2"
     task_group: TG-2
     title: "Dispatch ISSUE_ID = ARIA-<repo>-<number> (composite value)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -245,7 +245,7 @@ tasks:
     parent: "2.3"
     task_group: TG-2
     title: "Extend Nomad META builder with persisted target_repo/base_branch/files_hint"
-    status: pending
+    status: in_progress
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -261,7 +261,7 @@ tasks:
     parent: "2.4"
     task_group: TG-2
     title: "Rebuild ISSUE_URL from persisted raw_issue_number + target_repo columns"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -278,7 +278,7 @@ tasks:
     parent: "2.5"
     task_group: TG-2
     title: "Unify head_branch = aria/{issue_id} with container BRANCH"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -293,7 +293,7 @@ tasks:
     parent: "2.6"
     task_group: TG-2
     title: "Consume container outcome-class marker + add FailReason.INPUT_FETCH_FAILED + persist outcome_class (fail-closed)"
-    status: pending
+    status: done
     complexity: L
     est_hours: 10
     agent: backend-architect
@@ -317,7 +317,7 @@ tasks:
     parent: "2.7"
     task_group: TG-2
     title: "Make Spec #2 acceptance query outcome-class-aware (cross-Spec)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -343,7 +343,7 @@ tasks:
     parent: "3.1"
     task_group: TG-3
     title: "Reformat issue_id VALUE to ARIA-<repo>-<number> (value-level, key not restructured)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -359,7 +359,7 @@ tasks:
     parent: "3.2"
     task_group: TG-3
     title: "Decide + document clean-DB vs historical-migration for existing issue_id rows"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -373,7 +373,7 @@ tasks:
     parent: "3.3"
     task_group: TG-3
     title: "Survey every acceptance/dispatch query keying on issue_id"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -392,7 +392,7 @@ tasks:
     parent: "4.1"
     task_group: TG-4
     title: "Rebuild aria-runner via aether-build-container after TG-1 lands"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -429,7 +429,7 @@ tasks:
     parent: "5.1"
     task_group: TG-5
     title: "Write AD-M6-10 (six-section) — C' dual-channel + single-node bind-mount scope"
-    status: pending
+    status: in_progress
     complexity: M
     est_hours: 6
     agent: knowledge-manager
@@ -444,7 +444,7 @@ tasks:
     parent: "5.2"
     task_group: TG-5
     title: "Correct the AD4 risk-table cell (:384) mislabel"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -467,7 +467,7 @@ tasks:
     parent: "5.3"
     task_group: TG-5
     title: "Amend AD-M1-4 — scope 5-AND to file mode; document AUTONOMOUS_COMPLETED + INPUT_FETCH_FAILED"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: knowledge-manager
@@ -485,7 +485,7 @@ tasks:
     parent: "5.4"
     task_group: TG-5
     title: "Add layer-boundary-contract.md §5 'Task Content Delivery Mechanism'"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: knowledge-manager
@@ -501,7 +501,7 @@ tasks:
     parent: "5.5"
     task_group: TG-5
     title: "Update CLAUDE.md M6 status — input-delivery ↔ telemetry dependency chain"
-    status: pending
+    status: done
     complexity: S
     est_hours: 3
     agent: knowledge-manager
@@ -556,7 +556,7 @@ tasks:
     parent: "6.3"
     task_group: TG-6
     title: "Verify fetch-failure classes distinguishable to Layer 1 (infra-fail vs agent-fail)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: qa-engineer
