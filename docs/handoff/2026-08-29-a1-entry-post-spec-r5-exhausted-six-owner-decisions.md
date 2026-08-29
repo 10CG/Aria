@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: A.1-post-spec-R5-exhausted-awaiting-owner-decisions
 status: active
-updated-at: 2026-08-29T17:04:06Z
+updated-at: 2026-08-29T19:55:09Z
 ---
 
 # Aria — Session Handoff (2026-08-29) — post_spec R5 跑完 (max_rounds 用尽), 6 项待 owner 裁定
@@ -55,7 +55,7 @@ updated-at: 2026-08-29T17:04:06Z
   实测 `SC-30/31/32/33` 在 SC 表行数 **0/0/0/0**; 子 spec `SC-9`/`SC-19` 同样 **0/0**;
   Impact `:721` 仍写被判为错误命名的 `fail-CLOSED`; `gc.py` 与 `heartbeat:244-256` **零 Impact 行**;
   自称已删的 `compose` 在 `:642` 仍在。
-- 🔴 **11 个 commit 未推** —— owner 本对话内**三次未回应该项**。我的建议已给 (见【5】), 仍不自我授权。
+- ✅ **12 个 commit 已推, 两端核验一致** (owner 2026-08-29 授权)。**过程踩到半推**: `git push origin` 成功后, `git push github` **被工具层 2 分钟命令上限截断** —— 事后现场与「推失败」一模一样。`ls-remote` 独立核验抓到 origin 已是 `154c176` 而 **github 仍停在 `1e5a394`**; 加长超时补推后**再核一遍**才确认两端一致。⇒ 硬约束 2「不信 push 回执, 逐个 ls-remote」今天挣回了自己的成本。新 memory `partial-push` 已记该诱因。
 - 🟡 **两子 Spec 的 Status 行始终未更新** (仍写 `Draft — 待 post_spec R1`, 实际已过 R1/R2) —— 我说过三次「随裁定一并更新」, **一直没做**。
 - 🟡 **我答应立而未立的两个 issue** (内容已备好, 立 issue 是外向动作未获授权):
   1. `fetch_gate.py:21` / `:111-112` 引用 `state-scanner sync.py::_resolve_default_branch`, 实读该函数**不存在**;
@@ -77,6 +77,7 @@ updated-at: 2026-08-29T17:04:06Z
 - **`grep` 只能定位, 不能取证**: 本 session 我两次误标「逐字」(一次 grep 拼接非相邻行造出原文不存在且语义相反的句子; 一次把引文归错文件)。**factcheck 席在自己身上复现了同一条并主动留痕** ⇒ 该教训一轮内被两个独立主体各验证一次。
 - **多席并行审计期间被审文件只读**: R3 守了、R4 破了 (被当场判「移动靶」)、R5 守住了。
 - **拆 Spec 会自造接缝缺陷**: 实现无归属 / 跨文件引用悬空 (母体迁出**删掉了姊妹的证据**) / 单侧修复。
+- **harness 的命令超时上限本身是半推诱因**: push 被截断与 push 失败**事后不可分辨** (都没有成功行)。⇒ push 必须显式给足超时 (本次 8 分钟才够), 且**唯一可信判据只有 `ls-remote`**。
 - **`docs/handoff/latest.md` 是双容器唯一必冲突面**: 本 session **撞 3 次**。纪律: **一个 session 只让收尾那一个 commit 碰它**。
 - **前四轮 15 席全是「正确性」镜头, 没有一席问过「这条需要吗」** —— 而接缝数量正比于交付面 (R5 code-simplifier 席的独立观察)。
 
@@ -89,8 +90,8 @@ updated-at: 2026-08-29T17:04:06Z
 | UPM | 无 (Aria 不配置) ⇒ consistency 9 条 `active_change_not_in_upm` **恒亮**, 非缺陷 |
 | 版本 | 无变动 (纯 Spec 轮) — 插件 v1.67.1 / 主项目 v1.7.5 |
 | custom checks | 10/11 (`m6-arch-doc-stale` FAIL, 非本轨) |
-| git | 本地 `8c9ae94` 谱系领先 origin/github **11 commit, 未推** |
-| **推送建议 (owner 三次未裁)** | **建议推**: 11 个 commit 纯文档、可加性、与对方零交集 (本 session 三次 rebase 实测: 10 commit 重放**零冲突**, 唯一冲突全部来自 `latest.md`)。**不推不减少冲突, 只让对方在旧状态上盲飞。** |
+| git | `154c176` — **origin / github 两端均 `equal`, 已核验一致** (ahead=0) |
+| 推送 | ✅ **已完成** (owner 2026-08-29 授权)。12 commit `1e5a394..154c176`; **中途半推一次**, 由 `ls-remote` 核验抓出并补推 |
 
 ## 【6】Next session 入口 + 优先级
 
@@ -105,12 +106,13 @@ updated-at: 2026-08-29T17:04:06Z
 
 ```
 [main master] 1e5a394 (对方 08-27 会话收尾) ← rebase 基点
-  → 8c9ae94 谱系共 11 commit, 全部**未推**:
+  → 154c176 谱系共 **12 commit, 已推且两端核验一致** (`1e5a394..154c176`):
       rework v3 落版 · R3 五席+聚合+12 机械订正 · 08-25 中途 checkpoint handoff
       · R3 findings 清账 · R4 优先审清单 · R4 code-explorer + 两条订正
       · R4 五席交齐 + 审计中途 6 项修复 (含流程失误留痕) · R4 聚合 + handoff §0′
-      · 08-27 会话收尾 handoff · R4 九条 critical 清账 · R5 聚合
+      · 08-27 会话收尾 handoff · R4 九条 critical 清账 · R5 聚合 · 08-29 会话收尾 handoff
   ⚠️ 三次 rebase 均在 docs/handoff/latest.md 冲突 (双容器同期收尾), 手工合并
+  ⚠️ 推送时 github 那条被工具层 2 分钟上限截断 ⇒ 半推; ls-remote 核验抓出后加长超时补推, 两端复核一致
 [coord ref]   claims/023236f2/s-6389@0120 (a1-entry, phase A) → **active 保持** (track 未终结)
 [aria 子模块] 未改; 工作树 58a49e7 (= gitlink), 实读基线走 `git show d50f9c3:` 对象
 [aria-orchestrator] 停泊 (承前, 有意排除)
@@ -122,6 +124,8 @@ updated-at: 2026-08-29T17:04:06Z
 - **`user_output_readability_no_tiny_glyphs.md`** (新, type=**user**) — 禁带圈数字; 可读性优先于紧凑。
   ⚠️ 本容器此前**一个 `user_*` 文件都没有** (连 CLAUDE.md 引用的 `user_chinese_conversation_default` 也不存在于本 store),
   已在 MEMORY.md 新建「User — 偏好 / 可读性」段。
+
+- **`feedback_partial_push_creates_mirror_divergence.md`** (新) — 本容器此前**也没有这个文件** (CLAUDE.md 引用了它) —— **这是本 session 第三次遇到「CLAUDE.md 引用的 memory 在本地 store 不存在」** (前两次: `user_chinese_conversation_default` / 本条)。含 2026-08-29 追记: harness 命令超时上限是半推诱因, 截断与失败事后不可分辨
 
 **本 session 稍早已写**:
 - `feedback_splitting_a_spec_manufactures_seam_defects.md` (新) — 拆 Spec 自造接缝缺陷三形态
