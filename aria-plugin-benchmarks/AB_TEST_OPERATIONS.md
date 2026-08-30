@@ -219,6 +219,14 @@ changelog:
 验收: delta.pass_rate > 0 (Skill 确实提升了质量)
 ```
 
+#### 场景 1 运行前置: 协调 ref 推送隔离 (`ARIA_COORDINATION_NO_PUSH=1`)
+
+eval 是在**真实 Aria 仓、真实 origin** 里跑的 (subagent 无 sandbox)。凡被测 Skill 能触达 `skills/state-scanner/scripts/phase1_gate.py` / `release_gate.py` 的套件 —— 今天是 `phase-b-developer.json` / `branch-manager.json` / `state-scanner.json` (phase1_gate) + `phase-d-closer.json` (D.2b release_gate, `--sweep-stale`/`--gc` 还会改写真实 claim); spec `a1-entry-claim-duplicate-work-guard` ship 后再加 `phase-a-planner.json` / `spec-drafter.json` —— 跑起来就会把合成 claim 推到生产 `refs/aria/coordination` (实证: 2026-08-02 `postspec-r1-delete-me-a1-entry-claim-audit-test` 落到过远端)。
+
+1. **启动**: 跑这些套件的 Claude Code 会话必须带环境变量启动 —— `ARIA_COORDINATION_NO_PUSH=1 claude ...` (subagent 继承会话 env; 两个 CLI 读到它就跳过 push, claim 只写本地 ref; 等价 CLI flag `--no-push`)。
+2. **核验**: eval transcript 里 phase1_gate / release_gate 的 JSON 输出应含 `"push_skipped": true, "push_skipped_reason": "env_var"`; 看到 `push_skipped: false` 说明 env 没进会话 → 该 run 作废, 并 `git ls-remote origin refs/aria/coordination` 核查远端。
+3. **事后清理 (必做)**: 合成 claim 仍留在**本地** ref; fetch refspec 非强制 (`coordination_ref.py` `refs/aria/coordination:refs/aria/coordination`), 下次正常 session 的 fetch 被 non-FF 拒绝后 push 会把它们顺带推上远端 —— 跑完执行 `git fetch origin +refs/aria/coordination:refs/aria/coordination` 把本地 ref 强制对齐远端。
+
 ### 场景 2: 新增 Skill 首次基线
 
 ```
