@@ -2,7 +2,7 @@
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: A.1-post-spec-R5-exhausted-awaiting-owner-decisions
-status: active
+status: superseded
 updated-at: 2026-08-29T19:55:09Z
 ---
 
