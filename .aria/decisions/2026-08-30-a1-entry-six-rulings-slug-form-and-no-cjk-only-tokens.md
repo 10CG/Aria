@@ -73,11 +73,11 @@
 
 五席 (config `teams.post_spec`, 全新镜头) 判 **REVISE**: code-reviewer 3C/11M/13m · backend-architect 0C/2M/1m · tech-lead 6C/9M/7m · qa-engineer 0C/3M/2m · knowledge-manager 0C/3M/2m (PASS)。去重后 **7 个 critical 簇**, 其中 6 个已在 rework v4.1 逐条清账 (清单见 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md` §处置), 1 个属 owner 权限:
 
-| # | 待裁 | 选项 | 执笔倾向 |
-|---|---|---|---|
-| **R6-1** | 探针 Spec 对字段 Spec 纯函数 `lib/linked_issue_field.py` 的依赖方向 (接缝 C2: 「可先 ship 全走层 2」与「E0–E6 一条不复制」+「钉死 import」三者不可同时成立) | (i) 字段纯函数是探针的**硬前置**; (ii) 探针可先 ship, 模块缺席时 `verdict="not_established"` + `reason="extractor_unavailable"` | (i) —— (ii) 让先 ship 的探针恒「未能核实」, 交付价值为零。改变 08-23「均非阻塞前置」的成文前提, 故上呈 |
-| **R6-2** | 字段名 E0 谓词 1 是否做 ASCII 大小写折叠 (QA M3: GitHub 原生术语 `Linked issues` 是真实假阴性来源) | (i) 折叠 (不放宽单复数); (ii) 维持不折叠 (集合封闭) | 无强倾向; QA 席倾向 (i) 且指出它不违反本文件「拼写 ≠ 判定」的论证 |
-| **R6-3** | tech-lead 席的收敛判断: 「R5 那版设计收敛为真, 今天这版为假」(86% finding 落在 08-30 新写文本), 建议**换执笔席**清账 + 定向复核, 不加 R7 | (i) 接受主控本轮已做的清账 + 一个新席位定向复核; (ii) 换执笔席重做清账 | 主控已按 (i) 落版 (母 Spec 闸门状态表 #8 留痕请复议) |
+| # | 待裁 | 选项 | 执笔倾向 | owner 裁定 |
+|---|---|---|---|---|
+| **R6-1** | 探针 Spec 对字段 Spec 纯函数 `lib/linked_issue_field.py` 的依赖方向 (接缝 C2: 「可先 ship 全走层 2」与「E0–E6 一条不复制」+「钉死 import」三者不可同时成立) | (i) 字段纯函数是探针的**硬前置**; (ii) 探针可先 ship, 模块缺席时 `verdict="not_established"` + `reason="extractor_unavailable"` | (i) —— (ii) 让先 ship 的探针恒「未能核实」, 交付价值为零。改变 08-23「均非阻塞前置」的成文前提, 故上呈 | **✅ owner 裁 (i)** (2026-08-30, R6 后): 字段纯函数 = 探针硬前置; 探针 §1 第 3 条 / §3 两段 + 字段 O-4 已落版 |
+| **R6-2** | 字段名 E0 谓词 1 是否做 ASCII 大小写折叠 (QA M3: GitHub 原生术语 `Linked issues` 是真实假阴性来源) | (i) 折叠 (不放宽单复数); (ii) 维持不折叠 (集合封闭) | 无强倾向; QA 席倾向 (i) 且指出它不违反本文件「拼写 ≠ 判定」的论证 | **✅ owner 裁 (i)** (2026-08-30, R6 后): 字段名 ASCII 大小写折叠, 单复数不放宽; 字段 E0 谓词 1 + SC-1 (f)(g) + O-5 已落版 |
+| **R6-3** | tech-lead 席的收敛判断: 「R5 那版设计收敛为真, 今天这版为假」(86% finding 落在 08-30 新写文本), 建议**换执笔席**清账 + 定向复核, 不加 R7 | (i) 接受主控本轮已做的清账 + 一个新席位定向复核; (ii) 换执笔席重做清账 | 主控已按 (i) 落版 (母 Spec 闸门状态表 #8 留痕请复议) | **✅ owner 裁: 不换席** (2026-08-30, R6 后); 同时**授权推送** (主仓 commit + aria 修复分支按 PATCH 发版) |
 
 **R5 code-simplifier 席未呈项的台账** (R6/CR 流程 m1: 该席 13 项「去掉它会不会漏缺陷」判定与 C3 此前未进任何处置建议; 按 memory `narrow-owner-options` 逐条留痕, 采纳/拒绝理由如下, 「待裁」项由 owner 定):
 
@@ -85,16 +85,16 @@
 |---|---|---|---|
 | C1 | 双 track-id 形态是自造复杂度 | **已采纳** = 裁定 1A | — |
 | C2 | K1 修类不修实例 (`dataclasses.replace`) | **已采纳** (母 §5.3 保留纪律 + Impact heartbeat 行) | 对新代码有效 |
-| C3 | 审计对账层再次长回交付面 (editlist 对账表 / 新表面 / 未做 / 闸门状态 / ⛔ 占位节 ≈35KB) | **部分采纳**: 1A 移出的原文与两份旧「新表面」已入审计轨 §6; **未删** editlist 对账表、⛔ 占位节、闸门状态节 | 这三段是 Rule #10 与 R2/M-13「零容忍自述不实」的落点, 删除属 owner 决定; **待裁**: 是否把 editlist 对账表迁回其 SOT 文件的状态列 |
+| C3 | 审计对账层再次长回交付面 (editlist 对账表 / 新表面 / 未做 / 闸门状态 / ⛔ 占位节 ≈35KB) | **部分采纳**: 1A 移出的原文与两份旧「新表面」已入审计轨 §6; **未删** editlist 对账表、⛔ 占位节、闸门状态节 | 这三段是 Rule #10 与 R2/M-13「零容忍自述不实」的落点, 删除属 owner 决定; **owner 2026-08-30 (R6 后): 不采纳** (editlist 对账表留在交付面) |
 | §3-5 | `heartbeat_by_track` 保留 | 采纳 (保留) | 事故窗 > SWEEP_TTL |
-| §3-6 / M2 | 删 `--heartbeat-only` 全套, 改为入口重跑既有 acquire (幂等) | **待裁** | 更小的等价物成立与否取决于「同 session 覆写同一 claim 文件」是否等价于刷新 `heartbeat_at` (未实测); 删掉会连带 SC-21/28/32 与 K7 遥测分区; 执笔不自裁 |
+| §3-6 / M2 | 删 `--heartbeat-only` 全套, 改为入口重跑既有 acquire (幂等) | **owner 2026-08-30 (R6 后): 不采纳** | 更小的等价物成立与否取决于「同 session 覆写同一 claim 文件」是否等价于刷新 `heartbeat_at` (未实测); 删掉会连带 SC-21/28/32 与 K7 遥测分区; 执笔不自裁 |
 | §3-7 / M1 | 删 `get_container_uuid()` accessor + SC-3 | **未采纳** | §2.1 容器段依据 (label 优先 ⇒ 碰撞域不可控) 仍成立; 该席自己标「基本不漏」而非「不漏」 |
-| §3-8 / M3 | `unknown_schema_claims` 全套整条转 follow-up | **待裁** | 场景本仓零实例为真; 但 R2/M-4 + R4/K5 的「零证据不当正证据」修复在它身上; 转出即回到 `_TERMINAL` 静默 skip 的现状 |
+| §3-8 / M3 | `unknown_schema_claims` 全套整条转 follow-up | **owner 2026-08-30 (R6 后): 不采纳** | 场景本仓零实例为真; 但 R2/M-4 + R4/K5 的「零证据不当正证据」修复在它身上; 转出即回到 `_TERMINAL` 静默 skip 的现状 |
 | §3-9 / M4 | `unattended` 取值路径钉死或整条删 | **已采纳前者**: 钉死为 aria-runner 镜像内 `.aria/config.json` (母 §2.3), env 三腿仍 follow-up | R6/CR M8 同判 |
 | §3-10 | `lib/linked_issue_field.py` 纯函数保留 | 采纳 (保留) | 真承重 |
 | §3-11 / M8 | 探针保留但 §6 cap 四件套缩为 `degraded + reason` | **未采纳** | 决定性排序契约是为「两人独立实现得同一截断点」写的 (memory `spec-underdetermination`), 与规模余量无关 |
 | §3-12 | `ab-suite/audit-engine.json` 保留 | 采纳 (保留) | Rule #6 |
-| §3-13 / M6 | 白名单改为注册行参数 (`--exclude a,b,c`), 删数据文件 + 陈旧守卫 | **待裁** | 零新文件确实更简; 但陈旧守卫 (白名单退化成永久豁免) 是 memory `validator-repo-drift-guard` 的落点, 注册行参数同样会陈旧且更难守 |
+| §3-13 / M6 | 白名单改为注册行参数 (`--exclude a,b,c`), 删数据文件 + 陈旧守卫 | **owner 2026-08-30 (R6 后): 不采纳** | 零新文件确实更简; 但陈旧守卫 (白名单退化成永久豁免) 是 memory `validator-repo-drift-guard` 的落点, 注册行参数同样会陈旧且更难守 |
 | M5 | §2.3 四档选项表缩两档 | **部分采纳**: `abandoned` 与 `active` 共用选项集、`unknown` 视同 `active` (SC-11 已改); 四档**渲染**仍分 | 渲染差异承载 K6「可能是 GC 产物」措辞 |
 | M7 | 字段 E0 谓词 2 的论证篇幅进审计轨 | **未采纳 (本轮)** | 篇幅项, 不改设计; 留给 owner 定是否再切一刀 |
 | m1–m6 | 引用/坟头行/矛盾句 | m6 (`:519` 矛盾) **已采纳**; m1 (Impact `--spec-slug` 措辞) 随 1A 消失; m2/m3/m4/m5 (篇幅) 未动 | — |

@@ -1,6 +1,6 @@
 # Proposal: linked-issue-field-availability
 
-> **Status**: 📝 **Draft (round-3.1 — owner 2026-08-30 裁定 6i + O-2 落版 → 随母 Spec 联审 R6 (= 本文件第 4 轮) → 清账已落: 预览骨架 placeholder 取代哨兵 (TL C6) / E5 哨兵判定吃 E3 原串 (QA M2) / SC-5 六臂 / 头部代码落点补齐 / O-4·O-5 上呈) — 定向复核已 PASS; 待 owner 裁 O-4 (探针依赖方向) 与 O-5 (字段名大小写折叠)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: 📝 **Draft (round-3.2 — 2026-08-30 owner 裁 O-4 (i) 本 Spec 纯函数 = 探针硬前置 / O-5 (i) 字段名 ASCII 大小写折叠, 已落版; R6 定向复核 PASS) — 待 owner 批准进 A.2 (post_spec 已跑 R1–R6, 五席 + 复核席一致不再加轮)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: **2** (单域 — 一份跨项目模板 + 一处 SKILL.md 声明 + 一个 plugin 侧探针脚本 + 一条 check 注册; 无架构变更, 不出 `tasks.md`)
 > **Linked Issue**: `none` — 本 Spec 从母 Spec 的 post_spec R2 簇 C-A / M-10 / M-2 与 R1 editlist FIX-06/07/08 拆出, 无独立 issue 号 (dogfood, editlist **FIX-19**: 本行写法本身就是本 Spec §3 抽取规则的合规输出 —— 2026-08-30 起字段名与哨兵按英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)
@@ -163,7 +163,7 @@ $ grep -rn "关联 Issue" aria/skills/spec-drafter/ | wc -l
 
 **E0 — 宿主行的定位** (三条谓词, 全部满足才算):
 
-1. **行首锚定 (depth 恰为 1)**: 该行**逐字节**以 `> **Linked Issue**:` **或** `> **关联 Issue**:` 开头 (**两拼写集合, 读取侧归一为同一字段; 集合封闭** —— `Linked issue` (小写 i) / `Related Issue` / `关联issue` / `Linked Issues` 一律不算命中; canonical = `Linked Issue`, 与 SOT 模板其余三行同语言, owner 2026-08-30 对 O-2 的处置; 写入侧只教 canonical) —— 行首**无任何空白**; `>` 之后**恰一个** U+0020; 字段名两侧各**恰两个** ASCII 星号; 冒号为 ASCII `:` (U+003A)。`>>` / `> > ` / 前置空格 / `>` 后零个或两个空格 / 全角冒号, **一律不算命中**。
+1. **行首锚定 (depth 恰为 1)**: 该行以 `> **` 开头, 字段名为 **`Linked Issue` (ASCII 大小写折叠后逐字节相等 —— `Linked issue` / `LINKED ISSUE` / `linked Issue` 均命中; owner 2026-08-30 (R6 后) 裁定 O-5 (i), 依据 R6/QA M3: GitHub 原生术语 `Linked issues` 是真实假阴性来源, 且折叠不违反决策单「拼写 ≠ 判定」论证) 或 `关联 Issue` (逐字节)**, 后接 `**:` (**两拼写集合, 读取侧归一为同一字段; 集合封闭 —— 单复数不放宽: `Linked Issues` / `Related Issue` / `关联issue` 一律不算命中**; canonical = `Linked Issue`, 与 SOT 模板其余三行同语言, owner 2026-08-30 对 O-2 的处置; 写入侧只教 canonical) —— 行首**无任何空白**; `>` 之后**恰一个** U+0020; 字段名两侧各**恰两个** ASCII 星号; 冒号为 ASCII `:` (U+003A)。`>>` / `> > ` / 前置空格 / `>` 后零个或两个空格 / 全角冒号, **一律不算命中**。**折叠只作用于字段名的 ASCII 字母** (`Linked Issue` 那一拼写); `关联 Issue` 里的 `Issue` 亦折叠 (`关联 issue` 命中), 汉字部分逐字节。
 2. **fenced code block 排除**: 自上而下扫描时维护一个开合布尔量, 凡匹配 ````^[ ]{0,3}(?:> ?)?(?:```|~~~)```` 的行**翻转**该量且**本身不参与谓词 1 的判定**; 布尔量为真时的行一律跳过。
    > **`(?:> ?)?` 这一段不可省 (本轮实测)**: 没有它, 写在**blockquote 内的围栏**里的示例 (即 `> ` + 三个反引号 开的块, 块内一行 `> **关联 Issue**: ...`) 会被判成真字段 —— 合成夹具 `j-bq-fence` 实跑 **`OK`(假阳性) → 加上后 `NO_FIELD`(正确)**。加它的**代价为零**: 在真实语料上加与不加的判定**差异数 = 0** —— **两次逐份对跑**, 147 份 (round-1) 与 **149 份 (round-2 重跑, 终值)** 均为 0。
 3. **取文档序第一条**: 满足 1+2 的行可能有多条 (讨论该字段的 Spec 会举例), **只取第一条**, 其余一概忽略。
@@ -536,7 +536,7 @@ except Exception:
 
 | SC | 类别 | 场景 | 期望 | **它怎么会红** |
 |----|------|------|------|---------|
-| **SC-1** | 代码 | **E0 定位三谓词 + 两拼写集合封闭**。六份夹具: (a) 头部 `> **关联 Issue**: \`10CG/aria-plugin#122\``; (b) 文件**无** depth-1 字段行, 但**围栏代码块内**含一行逐字相同的字段行; (c) 文件只含 `   > > **关联 Issue**: \`10CG/aria-plugin#122\``; (d) 文件无 depth-1 字段行, 但**blockquote 内的围栏块**里含一行 `> **关联 Issue**: \`other/repo#999\``; **(e)** 头部 `> **Linked Issue**: \`10CG/aria-plugin#122\`` (canonical); **(f)** 头部 `> **Linked issue**: \`10CG/aria-plugin#122\`` (小写 i, 集合外拼写) | (a)(e) 抽到 token 串 `10CG/aria-plugin#122`; (b)(c)(d)(f) **判 `NO_FIELD`** | 用松谓词 (`grep '\*\*关联 Issue\*\*'` / 不锚行首 / 不做 fence 状态机) 的实现在 (b)(c)(d) 上抽出 token ⇒ 红; **fence 正则漏掉 `(?:> ?)?` 的实现在 (d) 上抽出 `other/repo#999` ⇒ 红**; 只认中文拼写的实现在 (e) 上 `NO_FIELD` ⇒ 红; 大小写不敏感匹配字段名的实现在 (f) 上命中 ⇒ 红 (集合封闭)。**baseline 必红** (今天无任何实现)。(c) 的形状在真实语料上有实例: 母 Spec `cc1bdef:75` |
+| **SC-1** | 代码 | **E0 定位三谓词 + 两拼写集合封闭**。七份夹具: (a) 头部 `> **关联 Issue**: \`10CG/aria-plugin#122\``; (b) 文件**无** depth-1 字段行, 但**围栏代码块内**含一行逐字相同的字段行; (c) 文件只含 `   > > **关联 Issue**: \`10CG/aria-plugin#122\``; (d) 文件无 depth-1 字段行, 但**blockquote 内的围栏块**里含一行 `> **关联 Issue**: \`other/repo#999\``; **(e)** 头部 `> **Linked Issue**: \`10CG/aria-plugin#122\`` (canonical); **(f)** 头部 `> **Linked Issues**: \`10CG/aria-plugin#122\`` (复数, 集合外拼写); **(g)** 头部 `> **Linked issue**: \`10CG/aria-plugin#122\`` 与 `> **LINKED ISSUE**: \`10CG/aria-plugin#122\`` (大小写变体, O-5 折叠) | (a)(e)(g) 抽到 token 串 `10CG/aria-plugin#122`; (b)(c)(d)(f) **判 `NO_FIELD`** | 用松谓词 (`grep '\*\*关联 Issue\*\*'` / 不锚行首 / 不做 fence 状态机) 的实现在 (b)(c)(d) 上抽出 token ⇒ 红; **fence 正则漏掉 `(?:> ?)?` 的实现在 (d) 上抽出 `other/repo#999` ⇒ 红**; 只认中文拼写的实现在 (e) 上 `NO_FIELD` ⇒ 红; 不折叠大小写的实现在 (g) 上 `NO_FIELD` ⇒ 红 (O-5); 放宽单复数的实现在 (f) 上命中 ⇒ 红 (集合封闭)。**baseline 必红** (今天无任何实现)。(c) 的形状在真实语料上有实例: 母 Spec `cc1bdef:75` |
 | **SC-2** | 代码 | **E2 token 起始位**。输入 `> **关联 Issue**: [10CG/aria-plugin #122](url) (triage \`confirmed\`)` | 判 **`NO_TOKEN`**, 且**不得**抽出 `confirmed` | 「取该行第一个 code span」的实现抽出 `confirmed` ⇒ 红。该形状在真实语料上 **6** 条 (路径见 §3 E2 引用块), 夹具须至少复用其中 1 条的**逐字原文** |
 | **SC-3** | 代码 | **E4/E5/E6 多值**。(a) token 串 `10CG/a#1, 10CG/b#2`; (b) token 串 `10CG/a#1, [b](url)` | (a) **合法**, 两元素各自解析成功, `--linked-issue` 实参逐字节 = `10CG/a#1`; (b) **`BAD_TOKEN`** 且输出点名 `[b](url)` | 把整串直喂归一的实现在 (a) 上判不可解析 ⇒ 红; 只校验第一个元素的实现在 (b) 上判合法 ⇒ 红; 对 (a) 把实参取成整串或第二元素的实现 ⇒ 红 |
 | **SC-4** | 代码 | **哨兵集合 (§2) 六分支**。(a) `> **Linked Issue**: \`无\` — 说明`; (b) `> **Linked Issue**: 无 (由 \`x\` 发现)` (裸 `无`, 无 code span); (c) `` `none` ``; (d) `` `None` `` (大小写折叠); (e) `` `N/A` ``; (f) `` `none ` `` (尾随空白) | (a)(c)(d) **合法**, 且**不产生任何 `--linked-issue` 实参** (E6 / `--emit-arg` 空输出); (b) **`NO_TOKEN`**; (e)(f) **`BAD_TOKEN`** (集合封闭; (f) 按 E3「不 strip」+ E5「两端无空白」—— **E5 的哨兵判定必须吃 E3 原始 token 串**) | 把哨兵当普通 token 传给 `--linked-issue` 的实现 ⇒ 红 (母 Spec NEW-01 实测: 两份无关 Spec 都写同一哨兵会互相命中 overlap); 接受裸 `无` 的实现在 (b) 上 ⇒ 红; 只认 `无` 的实现在 (c)(d) 上判 `BAD_TOKEN` ⇒ 红 (owner 2026-08-30 6i); 把 `N/A` 当哨兵的实现在 (e) 上 ⇒ 红 (集合封闭, 否则「不是哨兵的自然写法」会被静默当成正证据); **(f) 的坏实现** (R6/QA M2 按文实现时亲踩): E5 哨兵分支复用 E4 已 `strip()` 的元素 ⇒ `` `none ` `` 被判合法哨兵 ⇒ 红。**(b) 有真实语料实例**: `openspec/archive/2026-08-23-linked-issue-normalization/proposal.md:6` 逐字 `> **关联 Issue**: 无` (实跑 `cat -A` 见 §实读清单) |
@@ -601,7 +601,7 @@ except Exception:
 4. **对 `standards/` 子模块的写入** —— 跨仓交付面。走 aria-standards 自身 PR + 主仓 gitlink bump, 且受 CLAUDE.md 多远程硬约束 1/2 管辖 (本地合并 + 双推 + `ls-remote` 逐个核验)。本 Spec **未**估算该流程的耗时/门。**round-2 追加**: 宿主改判后本 Spec 的写入面变成**三个仓** (`standards/` 模板 + `aria/` 两处 + 主仓 `.aria/state-checks.yaml` 与 Spec), 交付顺序与 gitlink bump 次序**未排**, 属 A.2。
 5. **与母 Spec 同文件不同 hunk 地改 `spec-drafter/SKILL.md`** —— 两 Spec 若非同批 ship 会产生 merge 面接触。依赖方向已声明为「任意顺序」, 但**落地顺序的 merge 冲突面未评估**。
 6. **`.aria/state-checks.yaml` 的 minimal YAML parser 对未知键的行为未验** —— §4 骨架**只用既有 check (当日观测 11 条) 已在用的 7 个键**以规避它, 但「未知键会怎样」这一事实本轮**没有实测**, 只读了 parser 的自陈 (`:63` / `:122-123`)。⇒ 落地时**不得**为本 check 引入新键。
-7. **(2026-08-30) 哨兵集合 `{none, 无}` + 字段名两拼写集合** (§2 / E0 / E5, owner 6i + O-2) —— 跨三份 Spec 的接缝: 母 Spec §2 / §6 与探针 Spec 层 0 / 层 1.5 / `"none_sentinel"` 枚举同批改; **请 R6 核三份措辞一致** (memory `split-makes-seams`)。已知限: ASCII 大小写折叠只对 `none` 做, 字段名拼写**不**折叠 (集合封闭, SC-1(f)) —— 两个不对称是有意的 (哨兵是值, 常见 `None` 写法; 字段名是键, 松了就是第二谓词面)。
+7. **(2026-08-30) 哨兵集合 `{none, 无}` + 字段名两拼写集合** (§2 / E0 / E5, owner 6i + O-2; **O-5 (i) 后字段名与哨兵一样做 ASCII 大小写折叠**, 单复数不放宽) —— 跨三份 Spec 的接缝: 母 Spec §2 / §6 与探针 Spec 层 0 / 层 1.5 / `"none_sentinel"` 枚举同批改; R6 已核三份措辞一致。剩余不对称只有「单复数封闭」(有意: `Issues` 复数语义可能指别的东西)。
 8. **(2026-08-30) 探针第二模式 `--emit-arg`** (E6 机械宿主) —— 新的 CLI 面。**归属 (R6 接缝 C1/C5 后钉死)**: 母 Spec §2 的前置块模板一次写死两阶段取法 (脚本存在 ⇒ 用 stdout; 不存在 ⇒ 按 E6 手工判), 模板行归母 Spec Impact; 本 Spec 只负责模式存在 (SC-9), 不编辑母 Spec 的 SKILL.md hunk, 两 Spec 任意顺序 ship 自洽。
 9. **(2026-08-30) spec-drafter 预览骨架 hunk B + SC-7a** (R5/C1) —— 「不重复模板正文」的例外边界 (头部 blockquote) 是本轮新定义。
 
@@ -613,7 +613,7 @@ except Exception:
 
 1. **轮次从 R1 起算, 不继承母 Spec 的 R1/R2** —— 那两轮审的是**含旧 §1 的母文本**。本文件自 2026-08-25 起随母 Spec **联审** (memory `combined-mode-sister-spec-audit-value`): 母 R3 = 本文件 R1 (`post_spec-R3-1787652625000-…`), 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **本 Spec 不是母 Spec 的阻塞前置** (见头部依赖方向段), 也**不阻塞**母 Spec 的 R3。
-3. **AI 不预判 R6 的裁决结果。** 本 Spec 在 R6 通过并经 owner 批准前**不进 A.2/A.3**。
+3. **R6 已跑 (REVISE → 清账 → 定向复核 PASS); owner 2026-08-30 (R6 后) 裁 O-4 (i) / O-5 (i) 已落版, 并裁「不再加通用审计轮、不换执笔席」。** 本 Spec 待 owner 批准进 A.2/A.3。
 
 **待 owner 裁 (AI 不自行拍板)**:
 
@@ -622,7 +622,7 @@ except Exception:
 | **O-1** | 承 R1 editlist **U-2**: 是否授权回填 6 份 `aria-orchestrator` 轨的 M6/M7 proposal 头部 | **不回填 + `GRANDFATHERED` 具名在册** (D6) | 对**他人在制产物**的写入不能自我授权 (memory `sync≠push-auth` / `feedback_concurrent_feature_collision_claim_before_build`)。⭐ **两方案不互斥**: allowlist 就是「尚未回填清单」, 若 owner 授权回填, **回填一份删一条**, 探针逻辑零改动, 全部回填后 allowlist 为空 ⇒ 选 O-1=回填**不需要**改本 Spec 的任何设计 |
 | **O-2** → **✅ 已裁 (owner 2026-08-30, 随第 6 项)** | 字段名 canonical **`Linked Issue`** + alias `关联 Issue`; 哨兵 canonical **`none`** + alias `无`; 写入侧只教 canonical, 读取侧归一, 集合封闭 | **落版见 §2 / E0 / E5 / D9 / SC-1 / SC-4 / SC-6** | 「只认中文」被否决的四条理由 + 「D9 对在哪」见决策单; 回撤成本: E0 两拼写集合 + 模板一行 + 三份在制 Spec 头部一行 |
 | **O-3** *(round-2 已缩小)* | M-2 的**残余**已知限 —— 脚本随 plugin 分发但**注册须采用方自做** —— 是否就此接受 | **接受, 成文为已知限** (§1 的 ⛔ 段) | round-1 原写的「其他项目拿不到校验」已因 D3 改判**不再成立**, 已订正留痕。残余的「须自行注册」与既有 `issue_cache_freshness_probe` / `coordination_probe` **同形**, 不是本 Spec 独有的新缺口; 消除它 = 自动注册, 会改变「项目自主决定跑哪些 check」的既有语义 ⇒ 属范围决策, 不由 AI 拍板 |
-| **O-4** (R6 接缝 C2, **待 owner**) | 探针 Spec 对本 Spec 纯函数 `lib/linked_issue_field.py` 的依赖方向: **(i)** 声明为探针的**硬前置** (探针 ship 依赖本模块); **(ii)** 保留「探针可先 ship」, 但本模块不存在时探针 `verdict="not_established"` + `reason="extractor_unavailable"` (import 失败 fail-soft, 不定位任何字段行), 其 SC-1~15 宿主标「须在本模块存在时运行, 否则 skip」 | **本 Spec 不自裁**; 执笔倾向 (i) —— (ii) 让先 ship 的探针恒「未能核实」直到本 Spec ship, 交付价值为零 | 改变 2026-08-23 拆分时成文的「均非阻塞前置」, 属 owner 权限面 (R6/CR 接缝 C2) |
-| **O-5** (R6/QA M3, **待 owner**) | 字段名 E0 谓词 1 是否做 ASCII 大小写折叠 (`Linked issue` / `LINKED ISSUE` 归一为命中; **不**放宽单复数) | 现状: 不折叠 (集合封闭, SC-1(f)) | QA 席意见: 折叠低风险、有真实假阴性来源 (GitHub 原生术语 `Linked issues`), 且不违反决策单「拼写 ≠ 判定」的论证; 但这是「要不要多接受一种拼写」的范围决策, 不由 AI 定 |
+| **O-4** → **✅ 已裁 (owner 2026-08-30 (R6 后) 裁定, 选 (i))** | 本 Spec 纯函数 `lib/linked_issue_field.py` 是探针 Spec 的**硬前置**: 探针 ship 依赖本模块存在; 探针 §1 依赖方向 / §3「姊妹未 ship 时的行为」段已同批改 | 落版见探针 Spec | 改变 08-23「均非阻塞前置」成文前提, 由 owner 裁 |
+| **O-5** → **✅ 已裁 (owner 2026-08-30 (R6 后) 裁定, 选 (i))** | 字段名 E0 谓词 1 做 ASCII 大小写折叠 (`Linked issue` / `LINKED ISSUE` 归一为命中); **不**放宽单复数 | 落版见 E0 谓词 1 + SC-1 (f)(g) | QA M3 的假阴性来源 (GitHub `Linked issues`) 成立 |
 
 **本 Spec 的全部流程判断已写在上表, 请 owner 复议** (Rule #10: AI 任何自作主张的流程判断必须留痕请复议)。

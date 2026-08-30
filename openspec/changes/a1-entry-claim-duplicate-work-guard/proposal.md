@@ -1,6 +1,6 @@
 # Proposal: a1-entry-claim-duplicate-work-guard
 
-> **Status**: 📝 **Draft (rework v4.1 — 2026-08-30 owner 六项裁定落版 → post_spec R6 五席 REVISE → 7 个 critical 簇 + 主要 Major 已清账) — 待 owner: (a) 复议 R6 结果与 3 项新增待裁 (`.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md` §R6 结果: 探针依赖方向 / 字段名大小写折叠 / 是否换席); (b) **定向复核已 PASS** (8 簇 6 落 2 上呈, 唯一新矛盾 N-1 同日闭合); 通过并经 owner 批准前不进 A.2/A.3。R1–R6 已跑 (`max_rounds=5` 用尽后 owner 显式加 R6), 五席一致不建议 R7。R6 聚合: `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`**
+> **Status**: 📝 **Draft (rework v4.1 — 2026-08-30 owner 六项裁定落版 → post_spec R6 五席 REVISE → 7 簇清账 → 定向复核 PASS → owner (R6 后) 裁: 探针依赖方向 (i) / 字段名折叠 (i) / R5 code-simplifier 四项范围建议不采纳 / 不换执笔席 / 授权推送) — 待 owner 批准进 A.2/A.3 (post_spec 已跑 R1–R6, 五席 + 复核席一致不再加轮)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > - **裁定 (2026-08-30, 六项) 已执行** —— 决策单 [`.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`](../../../.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md): **1A** track-id 恒用 `<spec-slug>-<container_uuid>` 单一形态, issue 派生形取消 (§2.1 / §5 / D3 / D18; 两个新字段 `spec_slug`·`track_form`、§5.1 二分谓词、§5.3 三元组 release、D12、SC-1/4/27/30/31 结构性消失, 原文按字节移入审计轨 §6); **2b** 不建派生的代码宿主 (§2.1a); **3b** 收尾走 R6 通用审计 (本 Status 行); **4i** 「AB 评测推生产 ref」单独修 (不入本 Spec, 见 rule6_note 照跑档前提); **5** SC-15 回滚为代码类、SC-2 改写声称对象 (Success Criteria); **6i** 「无关联」哨兵扩为 `{none, 无}` 且字段名改英文 canonical (字段 Spec 承担, 本 Spec 只引用)。R5 五项落版实测 (SC-32/33 未入表 / Impact `fail-CLOSED` 误名 / `compose` 残留 / `gc.py`+`heartbeat` 行) 本轮逐项清账 —— 其中 K1/K2/K4 随 1A 整体消失, 不再需要「回灌」。
 > - **裁定 1 已执行**: C2 **(iii) 撤销, 只采 (ii)** —— `STALE_TTL` 维持 `1800` 不改; 四个落点 (SC-20 / Impact 表 `lib/constants.py` 行 / §2.3 残余风险段 / 闸门状态 item 3) 已逐一回撤;
 > - **裁定 2 已执行**: 本 Spec 主体**只留 A.1 入口认领 + track-id 契约**。原 §1「关联 Issue」字段可得性/抽取规则 → 拆出 [`linked-issue-field-availability`](../linked-issue-field-availability/proposal.md); 原 §4 竞品 spec 探针 → 拆出 [`sibling-spec-probe`](../sibling-spec-probe/proposal.md)。两份子 Spec 由另外的执笔席并行起草, **均非本 Spec 的阻塞前置** (依赖方向见 §1 / §4 指针段);
@@ -780,7 +780,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 3. rework v3 后 **R3 (五席联审三份, 3C/19M) → 清账 → owner 08-27 裁方向 a → R4 (五席全新镜头, ≈9C, 判定发散, 8/9 由上轮 fix 引入) → 清账 → R5 (五席第三批镜头, ≈6 簇)** 全部跑完, **`max_rounds=5` 用尽**; R5 判定「设计侧收敛, 落版侧系统性失败」;
 4. **owner 2026-08-30 六项裁定** (决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`): 1A / 2b / **3b = 加跑 R6** / 4i / 5 采纳 / 6i + 否决「只认中文的机器 token」; 本版 (rework v4) 即其落版;
 5. **post_spec R6 已跑完 (2026-08-30, owner 显式加轮)**: 五席 (config `teams.post_spec`, 全新镜头) 判 **REVISE** —— CR 3C/11M/13m · BA 0C/2M/1m · TL 6C/9M/7m · QA 0C/3M/2m · KM 0C/3M/2m (PASS); 去重后 **7 个 critical 簇** (E6 省略门与 `--emit-arg` 归属 / 探针依赖方向 / Level 1 零调用 / SC-22 ⑤ 与切片互斥 / SC-22 缺完整命令行 / SC-32 撞 argparse `required` / 预览骨架默认哨兵), **本轮 (rework v4.1) 已逐条清账** (清单见 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md` §处置; 探针依赖方向属 owner 裁, 未动)。五席一致**不建议 R7**, 建议清账后只做定向复核。**AI 不预判 owner 对 R6 结果的裁决。**
-6. **待 owner 裁 (R6 新增 2 项)**: (a) 探针 Spec 对字段 Spec 纯函数的依赖方向 (接缝 C2: 硬前置 vs 可先 ship 但恒 `not_established`; 字段 Spec O-4); (b) 字段名 E0 是否做 ASCII 大小写折叠 (QA M3; 字段 Spec O-5)。
+6. **owner 2026-08-30 (R6 后) 裁定**: (a) 探针依赖方向 → **(i) 字段纯函数是探针硬前置** (探针 §1/§3 + 字段 O-4 已落版); (b) 字段名 E0 大小写折叠 → **(i) 折叠, 单复数不放宽** (字段 E0/SC-1 已落版); (c) R5 code-simplifier 四项范围建议 (删 `--heartbeat-only` / 转出 `unknown_schema_claims` / 白名单改注册行参数 / editlist 对账表迁回 SOT) → **都不采纳**; (d) 清账执笔 → **不换席** (流程判断表 #8 复议闭合); (e) **授权推送** (主仓 6 commit + aria 修复分支按 PATCH 发版)。**下一步 = owner 批准进 A.2/A.3。**
 
 **本轮的 AI 流程判断 (Rule #10 — 请 owner 复议, 不自行落定)**:
 
@@ -793,6 +793,6 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | 5 | **O-2 (字段名) 与第 6 项 (哨兵) 同批落版为「英文 canonical + 中文 alias」** | owner 只对哨兵裁了 (i), 对字段名的 O-2 是「质疑只认中文」的延伸推定; 回撤成本见决策单 |
 | 6 | **R6 沿用 config `teams.post_spec` 五个 agent, 但各席镜头由执笔侧指派** (实现者试派生 A.2 / 「怎么会红」逐条实证 / 对抗夹具三态 / 跨 Spec 接缝 / 断言内容事实核) | 席位组成在 config 里, 镜头指派不在; 沿用 R4/R5「换新鲜眼睛」的做法, 但具体指派未经 owner 点头 |
 | 7 | **Phase B.1 前置断言: aria-plugin `--no-push` 修复须已合入 `origin/master`** (头部前置依赖新增行, R6/TL M5) | 该修复是 Level 1 独立变更, 其 ship 需 owner 授权推送 + 发版; 把它列为本 Spec 硬前置是执笔判断 |
-| 8 | **R6 清账由主控 (同一执笔) 一次落版, 未换人** —— tech-lead 席建议「换执笔席落 6C/9M」, 主控未采 (理由: 7 个簇里 6 个是条款级文本修正, 有五席给出的字面级处方; 换席的交接成本高于收益) | 与 owner 既往「换人执笔」处方 (memory `fix-writer-bottleneck`) 相左, 请复议; 定向复核由一个新席位做 (见 R6 聚合报告 §下一步) |
+| 8 | **R6 清账由主控 (同一执笔) 一次落版, 未换人** —— tech-lead 席建议「换执笔席落 6C/9M」, 主控未采 (理由: 7 个簇里 6 个是条款级文本修正, 有五席给出的字面级处方; 换席的交接成本高于收益) | 与 owner 既往「换人执笔」处方 (memory `fix-writer-bottleneck`) 相左 → **owner 2026-08-30 (R6 后) 复议: 不换席, 维持** (定向复核已由新席位做, PASS) |
 
 本 Spec 在 R6 跑完并经 owner 批准前不进 A.2/A.3。

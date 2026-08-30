@@ -1,6 +1,6 @@
 # Proposal: sibling-spec-probe
 
-> **Status**: 📝 **Draft (round-3.1 — 2026-08-30 R5 清账 (可执行插入串 / SC-19·20 入表 / 哨兵集合) → 随母 Spec 联审 R6 (= 本文件第 4 轮) → 清账已落: import 顺序钉死 + SC-21 (BA M1) / SC-17 计数域收窄 + 契约节存在断言 (TL M7/M8) / SC-20 锚定起首 / 层 1 与 E6 引述同步) — 定向复核已 PASS; 待 owner 裁依赖方向 (R6 接缝 C2, 闸门状态 #3(b))。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: 📝 **Draft (round-3.2 — 2026-08-30 owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec **硬前置**, 已落版 (§1 依赖方向第 3 条 / §3「姊妹未 ship 时」段); R6 定向复核 PASS) — 待 owner 批准进 A.2 (post_spec 已跑 R1–R6, 不再加轮)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: 2
 > **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号 (2026-08-30 起按姊妹 Spec 的英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
@@ -67,7 +67,7 @@
 1. **本 Spec 不是母 Spec 的阻塞前置。** 母 Spec 的 A.1 入口认领与 track-id 契约在本 Spec 完全缺席时照常成立; 母 Spec 对探针的唯一依赖是其 §6 缺口表里「legacy 轨 — §4 探针部分覆盖」一行, 该行在本 Spec 未 ship 时**退化为「无覆盖」, 不影响母 Spec 其余任何条款**。
 2. **母 Spec 也不是本 Spec 的阻塞前置。** 探针不消费 claim、不消费 track-id、不消费 `linked_issue_overlaps()` 的返回。
    > 母 Spec 旧 **SC-19(b)**「不得把自己的 claim (同 track_id) 计入 overlap」**不迁入本 Spec** —— 它用的是 claim / track_id 词汇, 描述的是主机制 overlap 通道的断言, 与探针语境词汇错配 (post_spec R2 · QA/F5)。该断言留在母 Spec。
-3. **姊妹 Spec `linked-issue-field-availability` 是本 Spec 的能力上限提升项, 不是阻塞前置。** 详见 §3 层 1 的消费契约。
+3. **姊妹 Spec `linked-issue-field-availability` 的纯函数 `lib/linked_issue_field.py::extract_linked_issue_field` 是本 Spec 的硬前置** (owner 2026-08-30 (R6 后) 裁定 (i), R6 接缝 C2: 「可先于姊妹 ship 全走层 2」与「E0–E6 一条不复制」+「钉死 import」三者不可同时成立 —— 层 0 定位与层 2 的字段行都只有该模块一个宿主)。**ship 顺序 = 姊妹先, 本 Spec 后**; 本 Spec 的 SC-1~15/17~21 宿主 `tests/test_sibling_spec_probe.py` 以该模块存在为前提, 缺席时整套 skip 并报「前置未 ship」。原「能力上限提升项, 非阻塞前置」(2026-08-25) 作废。
 4. **前置 Spec `linked-issue-normalization` 已 ship** (v1.67.0, 已归档 `openspec/archive/2026-08-23-linked-issue-normalization/`), 其导出的纯函数 `normalize_linked_issue()` 今天即可 import —— 本 Spec 是它的**第二个消费方**, 不复写归一。
 
 ### §2 扫描范围
@@ -134,7 +134,7 @@
 >
 > **⚠️ 该约束的实现归属 (R3/C3 订正, 主控 2026-08-25)**: R3 判定「三条约束 (逐字采纳姊妹 E0 ∧ 不得内含第二份实现 ∧ 不改 state-scanner) **不可同时满足**」—— 姊妹 round-1/2 的唯一宿主是**无导出 API 的 CLI check** (作用域还写死 `changes/`), 而本 Spec 要在**远端 ref 的 blob** 上求四态。
 > **处置**: 姊妹 Spec 已同批承诺把 E0–E6 交付为**可 import 的纯函数** `lib/linked_issue_field.py::extract_linked_issue_field(text: str) -> FieldVerdict` —— **输入是文本 blob 而非路径**, 正是为本 Spec 的调用形态定的; 本 Spec **import 它**, 一条都不复制。
-> **⇒ 依赖方向的准确措辞 (取代原「姊妹非阻塞」这一句)**: 本 Spec **可先于姊妹 ship** —— 此时层 1 恒 `NO_TOKEN`、**全部走层 2** (= 今天的状态, 见下方「姊妹 Spec 未 ship 时的行为」); 姊妹 ship 后本 Spec **必须**改为 import 该纯函数以接通层 1, **该改动是本 Spec 的 follow-up 而非前置**。原措辞「姊妹非阻塞」**在行为层为真、在实现层为假**, 现按此拆开表述。
+> **⇒ 依赖方向 (owner 2026-08-30 (R6 后) 裁定 (i), 取代 2026-08-25「可先于姊妹 ship」的旧措辞)**: 本 Spec **不可**先于姊妹 ship —— 姊妹的 `lib/linked_issue_field.py` 是硬前置 (§1 第 3 条); 本 Spec 的层 0 / 层 1 / 层 1.5 / 层 2 全部经该纯函数取四态, **不存在**「层 1 恒 `NO_TOKEN` 全走层 2」的过渡形态。旧文「可先于姊妹 ship —— 此时层 1 恒 `NO_TOKEN`、全部走层 2; 姊妹 ship 后必须改为 import 该纯函数」作废 (它在实现层为假: 没有该模块时层 0 定位无宿主, R6/CR 接缝 C2)。
 > **⚠️ 本条是 R3 之后新增的订正 (未经审计轮) —— 请审计席优先审 (R4–R6 已审)。**
 >
 > ## 🔧 跨 skill import 的可运行模式 (R4/S-1 + R4/F-1 —— **本仓有先例, 审计席的「无先例」前提经主控实读推翻**)
@@ -171,7 +171,7 @@
 > ⇒ **A.2 的一条显式约束**: `audit-engine` 内**不得**新建名为 `lib/` 或 `collectors/` 的顶层目录; 探针自己的 helper 一律放 `scripts/` 下并用模块名前缀。
 > **降级说明**: R4/S-1 原判 Critical 的依据是「无先例 ⇒ 不可行」; 前提被推翻后, 真实缺陷是「**没给 import 代码**」—— 本段即补上, 严重度按 Major 处置。
 
-> **姊妹 Spec 未 ship 时的行为 (成文, 不假装覆盖)**: 四态里只有 `NO_FIELD` / `NO_TOKEN` 会出现 (canonical 层恒无输出) ⇒ 全部依赖层 2。**这就是今天的状态** —— 实测基线 `cc1bdef` 上经层 0 定位到的 **14** 行字段中, 冒号后第一个非空白字符是反引号的 **= 0 行** (§审计轨 #14)。⇒ 姊妹 Spec 提升的是探针的**上限**, 不是它的**可用性**。
+> **姊妹 Spec 未 ship 时的行为 (owner 2026-08-30 (R6 后) 裁定 (i) 后)**: **不定义** —— 本 Spec 不在姊妹之前 ship (硬前置); 若实现者在姊妹模块缺席的环境下跑探针, import 失败按 §7 「探针自身失败」处置 (非 0 exit, stdout 不保证 JSON), 消费面按「未能核实」。历史观测保留供参考: 基线 `cc1bdef` 上经层 0 定位到的 14 行字段中冒号后首个非空白是反引号的 = 0 行 (§审计轨 #14) —— 即姊妹 ship 前 canonical 层无输出; 该事实只影响「探针上限」, 不再构成一条独立的运行形态。
 
 **层 1.5 — 哨兵 (`none` / `无`) 的归属 (承重, 勿省 — FIX-10; 集合定义在姊妹 §2, 本 Spec 引用)**
 
@@ -574,5 +574,5 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 1. **本 Spec 是一份新文件**, 母 Spec 的 R1/R2 **不为本文件背书**。自 2026-08-25 起随母 Spec **联审**: 母 R3 = 本文件 R1, 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **Rule #6 处置见 rule6_note**: 三条要件逐条落, 兜底不触发的前提是 A.2 真的建成 `ab-suite/audit-engine.json`; **若建不成, 不得自判豁免, 须显式上呈 owner**。
-3. **待 owner 裁定 (2 项)**: (a) **P11 的扫描范围复议** —— 本轮实测推翻了「只扫默认分支」的成本前提 (边际代价约 0.15s/轮, 且它正好补上盲区 B1)。**本 Spec 已按缩 scope 裁定执行, 不自行扩展**; 该项按 memory `narrow-owner-options` 留痕上呈, 由 owner 决定是否纳入; (b) **对姊妹纯函数的依赖方向 (R6 接缝 C2)** —— (i) 声明 `lib/linked_issue_field.py` 为本 Spec **硬前置**; (ii) 保留「可先 ship」但该模块不存在时 `verdict="not_established"` + `reason="extractor_unavailable"` (import 失败 fail-soft), SC-1~15 宿主标「须在该模块存在时运行, 否则 skip」。§1 依赖方向第 3 条、§3「姊妹未 ship 时的行为」段与姊妹 O-4 **待裁定后同批改**; 执笔倾向 (i)。
-4. **不预判 R6 的裁决结果。** 本 Spec 在 post_spec 通过并经 owner 批准前不进 A.2/A.3。
+3. **owner 裁定**: (a) **P11 的扫描范围复议** —— 仍待裁 (本轮实测推翻「只扫默认分支」的成本前提, 边际代价约 0.15s/轮; 本 Spec 已按缩 scope 执行, 不自行扩展; memory `narrow-owner-options` 留痕); (b) **对姊妹纯函数的依赖方向 → ✅ 已裁 (i) 硬前置** (owner 2026-08-30 (R6 后) 裁定), §1 第 3 条 / §3 两段已落版; 姊妹 O-4 同步。
+4. **R6 已跑 (REVISE → 清账 → 定向复核 PASS), owner 裁不再加轮。** 本 Spec 在 owner 批准前不进 A.2/A.3。
