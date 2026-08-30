@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: A.1-rework-v4.2-owner-rulings-landed-awaiting-A2-approval
 status: active
-updated-at: 2026-08-30T13:05:00Z
+updated-at: 2026-08-30T14:25:00Z
 ---
 
 # Aria — Session Handoff (2026-08-30) — 六项裁定落版 + R6 (owner 加轮) 清账 + 定向复核 PASS, 待 owner 5 项
@@ -65,6 +65,8 @@ updated-at: 2026-08-30T13:05:00Z
 | M4 | 生产 `refs/aria/coordination` 里的 08-02 合成 `audit-test` claim (`archive/2026-08/023236f2/s-f963@1218-…`, 已 abandoned) 与本轨重复 active claim `s-26ad@0914` (08-23) | pending | 清理需 owner 点头 (写协调 ref 是外向动作) |
 | M5 | 字段 Spec minor 未落: `custom_checks.py:122-123` → `:123-124` (锚点未命中); `GRANDFATHERED` 作机制名的旧用法 (篇幅项) | pending | CR 字段 m3 |
 | M6 | `m6-arch-doc-stale` FAIL (95d, 非本轨) | 未动 | 承前 |
+| M7 | **探针 Spec P11 扫描范围复议** (是否扩到非默认分支; 本轮实测边际代价 ~0.15s/轮且补盲区 B1) —— 探针闸门状态 #3(a) 仍待 owner | pending | 会话收尾内省补出 (机械兜底未抓) |
+| M8 | 远端分支 `origin/fix/phase1-gate-no-push` (已合并入 v1.67.2) 可删 | pending | 外向动作, 顺手 |
 
 ### 低优先级 / cleanup
 
@@ -157,7 +159,7 @@ updated-at: 2026-08-30T13:05:00Z
 
 ---
 
-## §8 Memory entries this session (4 new + 3 appended)
+## §8 Memory entries this session (4 new + 5 appended)
 
 | File | Type | Theme |
 |------|------|-------|
@@ -165,7 +167,7 @@ updated-at: 2026-08-30T13:05:00Z
 | [reference_ab_harness_runs_in_real_repo_no_sandbox.md](../../../.claude/projects/-home-dev-Aria/memory/reference_ab_harness_runs_in_real_repo_no_sandbox.md) | reference | AB 评测真仓真 origin 无沙箱; `ARIA_COORDINATION_NO_PUSH`; 残留两条 |
 | [feedback_structural_rewrite_is_a_new_deliverable_not_cleanup.md](../../../.claude/projects/-home-dev-Aria/memory/feedback_structural_rewrite_is_a_new_deliverable_not_cleanup.md) | feedback | 结构重写 ≠ 机械清账; 重写后第一双眼睛用实现者试派生 |
 | [reference_state_scanner_two_lib_packages_sys_path_order.md](../../../.claude/projects/-home-dev-Aria/memory/reference_state_scanner_two_lib_packages_sys_path_order.md) | reference | state-scanner 两个同名 `lib` 包的 sys.path 顺序 |
-| 追记 ×3 | feedback | `reporter-miscite` (审计席机制引错结论对) / `cross_doc_claim_verify_at_target` (台账先于目标写「已改」) / `check-runs-at-baseline-first` (锚点脚本落版法) |
+| 追记 ×5 | feedback / user | `reporter-miscite` (审计席机制引错结论对) / `cross_doc_claim_verify_at_target` (台账先于目标写「已改」) / `check-runs-at-baseline-first` (锚点脚本落版法) / `agent-disconnect` (断线后 SendMessage 续跑并喂入卡点输入) / `no-tiny-glyphs` (已验证有效的四段式裁定清单格式) |
 
 索引维护: MEMORY.md 24248 bytes (≤24.4KB), 本轮 8 条 orchestrator 专属/窄条移入 `MEMORY-archive.md` (仍可召回)。
 
@@ -183,5 +185,5 @@ updated-at: 2026-08-30T13:05:00Z
 ---
 
 **Created**: 2026-08-30 EOD
-**Session duration**: ~7h (04:53Z → 11:50Z)
+**Session duration**: ~9.5h (04:53Z → 14:25Z; 含 owner 两次裁定 + v1.67.2 发版)
 **Status**: Active — 下个 session 第一件事 = owner 五项裁定 (§6), 然后按裁定改探针 §1/§3 + 字段 O-4/O-5, 三份进 A.2
