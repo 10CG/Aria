@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-08-27-m6-ledger-recon-agent-team.md](./2026-08-27-m6-ledger-recon-agent-team.md) — session-close-20260827-m6-ledger-recon @ phase=session-close (status=done) — M6 账目核实 (11-agent 动态工作流, 对抗轮推翻 5 条) → done 17 / in_progress 10 / pending 3; #177 补证据 updated=2026-08-27
-**Latest**: [2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md](./2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md) — a1-entry-claim-duplicate-work-guard @ phase=A.1-rework-v4.1-R6-cleanup-verified-awaiting-owner (status=active) — owner 六项裁定全部落版 (1A / 哨兵 `{none, 无}` + 字段名英文 canonical) → R6 五席 REVISE 7 簇 → 同日清账 → 定向复核 PASS; **待 owner 5 项** (探针依赖方向 / 字段名折叠 / 推送+commit 授权 / 4 项范围决定 / 换席复议); 6 个本地 commit (`01ccc0f` 之后) 未推, aria 修复分支 007d355 未推 (simonfish/023236f2)
+**Latest**: [2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md](./2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md) — a1-entry-claim-duplicate-work-guard @ phase=A.1-rework-v4.1-R6-cleanup-verified-awaiting-owner (status=active) — owner 六项裁定全部落版 (1A / 哨兵 `{none, 无}` + 字段名英文 canonical) → R6 五席 REVISE 7 簇 → 同日清账 → 定向复核 PASS; 五项已裁并落版 (探针硬前置 / 字段名折叠 / 授权推送 / 4 项不采纳 / 不换席); 主仓 8 commit → 086ee32 + aria-plugin v1.67.2 (d69091d) 已推两端核验一致; **待 owner 批准进 A.2 + 本机插件缓存更新** (simonfish/023236f2)
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -10,7 +10,7 @@
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
-> | `a1-entry-claim-duplicate-work-guard` (Aria#174/#135) | `simonfish/023236f2` | 🟢 **active — 六项裁定 08-30 全部落版 (rework v4/v4.1) → post_spec R6 (owner 加轮, 五席 REVISE 7 簇) → 同日清账 → 定向复核 PASS; 三条机械不变量全绿; 待 owner 5 项裁定 + 推送授权** (claim s-6389@0120) | [2026-08-30 (会话收尾)](./2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md) |
+> | `a1-entry-claim-duplicate-work-guard` (Aria#174/#135) | `simonfish/023236f2` | 🟢 **active — 六项裁定 08-30 全部落版 (rework v4/v4.1) → post_spec R6 (owner 加轮, 五席 REVISE 7 簇) → 同日清账 → 定向复核 PASS; 三条机械不变量全绿; owner 五项已裁落版, v1.67.2 已发; **待 owner 批准进 A.2** (claim s-6389@0120) | [2026-08-30 (会话收尾)](./2026-08-30-a1-entry-six-rulings-landed-r6-cleanup-verified.md) |
 > | `issue-batch-149-151-155-134-state-scanner` (aria-plugin#134/#149/#151/#155) | `simonfish/023236f2` | ✅ **done (2026-08-23 ship v1.67.1 @ 58a49e7 + 4 issue closed, track 终结)** | [2026-08-23 (会话收尾)](./2026-08-23-session-close-v1.67.1-batch-and-a1-entry-r2-direction-b.md) |
 > | `linked-issue-normalization` (Aria#177 相关) | `simonfish/bfe8285d` | ✅ **done (2026-08-23 ship v1.67.0 @ ca52d1c + 归档, track 终结; R1→R5 post_planning 全 FAIL 后 owner override)** | [2026-08-23 (Phase D)](./2026-08-23-linked-issue-normalization-r5-override-ship-v1.67.0.md) |
 > | `pre-merge-gate-no-run-for-branch` (aria-plugin#152) | `simonfish/023236f2` | ✅ **done (2026-08-23 ship v1.66.5 @ a0fe720 + 归档 + #152 closed, track 终结)** | [2026-08-23 (Phase B→D)](./2026-08-23-issue152-phase-b-through-d-ship-v1.66.5.md) · [2026-08-22 (Phase A)](./2026-08-22-issue152-phase-a-twelve-rounds-and-the-check-that-checks-itself.md) |
@@ -19,6 +19,8 @@
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-08-30 补记 (simonfish/023236f2, 13:05Z)**: owner 同日下午裁五项 (探针依赖方向 (i) 硬前置 / 字段名 ASCII 大小写折叠 (i) / 授权推送 / R5 code-simplifier 四项不采纳 / 不换席) → 落版 `638459a` → 主仓推两端核验 → aria 修复分支 v1.67.2 五文件同步面 `7bd5dc1` → C.2.4 green (not_applicable) → 本地 `--no-ff` merge `d69091d` + tag → origin/github 逐个 `ls-remote` 一致 → 主仓 gitlink + 14 版本点 `086ee32` (C.2.4.5 forward PASS) → 推两端核验。**待 owner**: 批准三份 Spec 进 A.2; 本机 `/plugin` 缓存更新到 v1.67.2 (`plugin-cache-currency` STALE)。
 >
 > **2026-08-30 更新 (simonfish/023236f2, session-closer 会话收尾)**: bare pointer 改指本 session 收尾 handoff (全仓最新)。本对话: 按 08-29 要求用可读排版重出 6 项待裁 → owner 全裁 (1A / 2b / 3b / 4i / 5 采纳 / 6i + 质疑「只认中文」) → 决策单 + 三份 Spec rework v4 (1A 单一形态、哨兵集合 `{none, 无}`、字段名英文 canonical + 中文 alias、R5 七条清账、三条机械不变量建成并跑绿) → 第 4 项独立修在 aria 分支 `fix/phase1-gate-no-push` @ 007d355 (`--no-push` / `ARIA_COORDINATION_NO_PUSH`, 未推; 纠正 R5 引错的推送点) → **post_spec R6** (owner 3b 加轮; 五席全新镜头 REVISE, 去重 7 critical 簇, tech-lead 席判 86% finding 落在当轮新文本) → 同日清账 v4.1 (6 簇落 / 1 上呈) → 定向复核席 PASS (唯一新矛盾 N-1 同日闭合)。**待 owner**: 探针依赖方向 (R6-1) / 字段名大小写折叠 (R6-2) / 推送授权 (6 个本地 commit 未推) / R5 code-simplifier 4 项范围决定 / 换席复议 (R6-3)。08-29 那份 handoff 已标 superseded。
 >

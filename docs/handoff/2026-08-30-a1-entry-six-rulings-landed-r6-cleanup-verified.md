@@ -1,20 +1,20 @@
 ---
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
-phase: A.1-rework-v4.1-R6-cleanup-verified-awaiting-owner
+phase: A.1-rework-v4.2-owner-rulings-landed-awaiting-A2-approval
 status: active
-updated-at: 2026-08-30T11:50:00Z
+updated-at: 2026-08-30T13:05:00Z
 ---
 
 # Aria — Session Handoff (2026-08-30) — 六项裁定落版 + R6 (owner 加轮) 清账 + 定向复核 PASS, 待 owner 5 项
 
-> **一句话**: owner 上午裁了 6 项 (1A / 2b / 3b / 4i / 5 采纳 / 6i + 「为什么只认中文」), 本对话把它们**全部落版**: 决策单 + 三份 Spec rework v4 (1A 单一形态、哨兵集合 `{none, 无}`、字段名英文 canonical、R5 七条清账) → 独立修了「AB 评测推生产 ref」(aria 分支, 未推) → 按 3b 跑了 **post_spec R6** (五席全新镜头, REVISE, 7 个 critical 簇) → 同日清账 (v4.1) → 一个定向复核席 **PASS** (唯一新矛盾同日闭合)。**现在停在 owner 5 项待裁 + 推送/commit 授权**, 三份 Spec 的三条机械不变量全绿。
-> **本对话零推送**; 全部改动已按 Conventional Commits 落成 **6 个本地 commit** (`01ccc0f` 之后, §7), 两个远端仍在 `01ccc0f` —— 推送待 owner 授权 (memory `sync≠push-auth`)。
+> **一句话**: owner 上午裁了 6 项 (1A / 2b / 3b / 4i / 5 采纳 / 6i + 「为什么只认中文」), 本对话把它们**全部落版**: 决策单 + 三份 Spec rework v4 (1A 单一形态、哨兵集合 `{none, 无}`、字段名英文 canonical、R5 七条清账) → 独立修了「AB 评测推生产 ref」(aria 分支, 未推) → 按 3b 跑了 **post_spec R6** (五席全新镜头, REVISE, 7 个 critical 簇) → 同日清账 (v4.1) → 一个定向复核席 **PASS** (唯一新矛盾同日闭合)。**补记 (13:05Z)**: owner 同日下午裁了五项 (探针依赖方向 (i) / 字段名折叠 (i) / 授权推送 / R5 code-simplifier 四项不采纳 / 不换席), 已全部落版; 主仓 8 commit 与 aria-plugin **v1.67.2** (含 `--no-push` 修复) 已推两端并逐个 `ls-remote` 核验一致。三份 Spec 的三条机械不变量全绿, **现在停在 owner 批准进 A.2**。
+> **推送已完成 (owner 授权)**: 主仓 `01ccc0f` → `086ee32` (8 commit) 与 aria `d50f9c3` → `d69091d` (v1.67.2, tag 双端) 均 origin == github, 每次推后逐个 `ls-remote` 核验 (§7)。
 
 ## §0 入口 (新 session 优先读)
 
 1. 运行 `/aria:state-scanner`; Phase 1.15 会 surface 本 doc。
-2. **第一件事 = 拿到 owner 对 §6 五项的裁定**, 再动。它们互不阻塞, 但 (c) 推送授权决定其他一切能否离开这台容器。
+2. **五项裁定已落 + 已推送**; 下个 session 第一件事 = 请 owner **批准三份 Spec 进 A.2** (post_spec R1–R6 已跑, 五席 + 复核席一致不再加轮), 以及 owner 本机 **更新插件缓存到 v1.67.2** (`/plugin marketplace update 10CG-aria-plugin` → `/plugin update aria@10CG-aria-plugin` → 重启 session; `plugin-cache-currency` check 现为 STALE)。
 3. 排版硬约束不变: **禁用带圈数字等小字形** (memory `user_output_readability_no_tiny_glyphs`); 本对话开场那份「6 项待裁」的产品视角排版 owner 读通了并当场全裁, 照那个格式来。
 
 ---
@@ -47,11 +47,13 @@ updated-at: 2026-08-30T11:50:00Z
 
 | # | 项目 | scope | 来源 |
 |---|------|-------|------|
-| H1 | **R6-1 探针依赖方向**: 字段纯函数是探针硬前置 (i) vs 探针可先 ship 但模块缺席时恒 `not_established` (ii) | 改 08-23「均非阻塞前置」成文前提; 裁定后探针 §1 第 3 条 / §3「姊妹未 ship 时」段 / 字段 O-4 同批改 | R6 接缝 C2 |
-| H2 | **R6-2 字段名 E0 大小写折叠** (GitHub 原生术语 `Linked issues` 假阴性) | 字段 E0 谓词 1 一行 + SC-1(f) | QA M3 |
-| H3 | **推送授权**: 主仓 6 个本地 commit (`01ccc0f` 之后) 未推; aria 分支 `007d355` 未推 (它是母 Spec 硬前置, 需 PATCH 发版) | 见 §7; 推时显式给足超时 + 逐个 `ls-remote` 核验 | memory `sync≠push-auth` / `partial-push` |
-| H4 | **R5 code-simplifier 4 项范围决定** (决策单台账「待裁」): 删 `--heartbeat-only` 改入口重跑 acquire / `unknown_schema_claims` 整条转 follow-up / 白名单改注册行参数 / editlist 对账表迁回 SOT | 各自是 6–20KB 的 Spec 缩减 | CR 流程 m1 |
-| H5 | **R6-3 换席复议**: tech-lead 席建议换执笔席清账, 主控未采 (一次落版 + 定向复核) | 若 owner 要换席重做, 清单在 R6 聚合报告 | 母闸门状态表 #8 |
+| ~~H1~~ | **R6-1 已裁 (i) 硬前置** —— 探针 §1 第 3 条 / §3 两段 / 字段 O-4 已落版 (commit `638459a`) | done | R6 接缝 C2 |
+| ~~H2~~ | **R6-2 已裁 (i) 折叠** (单复数不放宽) —— 字段 E0 谓词 1 + SC-1 (f)(g) + O-5 已落版 | done | QA M3 |
+| ~~H3~~ | **已推送 + 已发版**: 主仓 8 commit → `086ee32`; aria v1.67.2 = `d69091d` + tag (C.2.4 green/not_applicable, C.2.4.5 forward PASS); 每次推后 `ls-remote` 两端一致 | done | 见 §7 |
+| ~~H4~~ | **四项都不采纳** (owner) —— 决策单台账已记 | done | CR 流程 m1 |
+| ~~H5~~ | **不换席** (owner) —— 母闸门状态表 #8 复议闭合 | done | — |
+| **H6** | **owner 批准三份 Spec 进 A.2/A.3** (唯一剩余的门) | 批准后 A.2 从三张表派生 tasks.md; 探针 ship 顺序 = 字段 Spec 先 (硬前置) | 本 handoff |
+| **H7** | **owner 本机更新插件缓存到 v1.67.2** (`plugin-cache-currency` STALE) | 两条 `/plugin` 命令 + 重启 session | custom check |
 
 ### 中优先级
 
@@ -113,7 +115,7 @@ updated-at: 2026-08-30T11:50:00Z
 | Decision memos | **是** | `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md` (含 R6 结果、3 项新待裁、R5 code-simplifier 13 项台账) | — |
 | Audit reports | **是** | R6 五席 + 聚合 + 定向复核 = 7 份新文件; 三份审计轨各追加两节 (append-only) | — |
 | Custom checks | 否 | 10/11 (`m6-arch-doc-stale` FAIL 承前) | — |
-| CHANGELOG / 版本 | 否 | 插件 v1.67.1 / 主项目 v1.7.5 / aria master `d50f9c3` 仍有 2 个未发版 commit; 修复分支若 ship = PATCH v1.67.2 | — |
+| CHANGELOG / 版本 | **是** | aria-plugin **v1.67.2** 已发 (CHANGELOG `[1.67.2]` 含 --no-push 修复 + 同版收入 d50f9c3/e1be8f3); 主项目 v1.7.5 不变; 主仓 14 版本点 + gitlink 同步 (086ee32); `plugin-cache-currency` STALE 待 owner 本机更新 | — |
 
 ---
 
@@ -125,8 +127,8 @@ updated-at: 2026-08-30T11:50:00Z
 
 **第一件事 = 拿 owner 的五项裁定** (可读排版, 一次列出):
 
-1. ⭐ **`{id: a1-entry-claim-duplicate-work-guard}`** —— **(a) R6-1 探针依赖方向** (i 硬前置 [执笔倾向] / ii 可先 ship 但恒 not_established); **(b) R6-2 字段名大小写折叠** (i 折叠 [QA 倾向] / ii 维持); **(c) 推送授权** (主仓 6 个本地 commit + aria 分支 `007d355`; aria 侧 = PATCH 发版流程, 六条 Rule #6 照跑以它为前提); **(d) R5 code-simplifier 4 项范围决定**; **(e) R6-3 是否换席重做清账** (主控已一次落版 + 定向复核 PASS)。裁完 → 按裁定改探针 §1/§3 + 字段 O-4/O-5 → 三份进 A.2 (或 owner 指定再改)。类型: owner 决策, 0.5h 落版。
-2. **`{id: carry-no-push-fix-ship}`** 修复分支 ship: 本地 merge 到 aria master (硬约束 1: 禁 Forgejo 服务端合并) → PATCH v1.67.2 五文件同步 + 主仓 gitlink/VERSION/badge → 双推 + 逐个 `ls-remote` 核验 (硬约束 2) → 更新 CLAUDE.md 项目状态版本行。前提 (c) 授权。类型: 发版, ~1h; **推送必须给足超时** (08-29 半推事故)。
+1. ⭐ **`{id: a1-entry-claim-duplicate-work-guard}`** —— **(五项已于 13:00Z 前裁完并落版, 本条保留原文供对照)** (a) R6-1 探针依赖方向 (i 硬前置 [执笔倾向] / ii 可先 ship 但恒 not_established); **(b) R6-2 字段名大小写折叠** (i 折叠 [QA 倾向] / ii 维持); **(c) 推送授权** (主仓 6 个本地 commit + aria 分支 `007d355`; aria 侧 = PATCH 发版流程, 六条 Rule #6 照跑以它为前提); **(d) R5 code-simplifier 4 项范围决定**; **(e) R6-3 是否换席重做清账** (主控已一次落版 + 定向复核 PASS)。裁完 → 按裁定改探针 §1/§3 + 字段 O-4/O-5 → 三份进 A.2 (或 owner 指定再改)。类型: owner 决策, 0.5h 落版。
+2. ~~**`{id: carry-no-push-fix-ship}`**~~ **已完成 (v1.67.2 双端核验)**; 原计划: 本地 merge 到 aria master (硬约束 1: 禁 Forgejo 服务端合并) → PATCH v1.67.2 五文件同步 + 主仓 gitlink/VERSION/badge → 双推 + 逐个 `ls-remote` 核验 (硬约束 2) → 更新 CLAUDE.md 项目状态版本行。前提 (c) 授权。类型: 发版, ~1h; **推送必须给足超时** (08-29 半推事故)。
 3. **`{id: carry-verify-spec-lint}`** 把 `verify_spec.py` 从 scratchpad 救进 `.aria/probes/` (或 aria-plugin spec lint, Level 1); 顺手把它加进 `.aria/state-checks.yaml`? —— 那会对 9 份活跃 Spec 全跑, 其中 6 份 M6/M7 未按此体例写, 会恒红 ⇒ 只作手动工具, 不注册 check。类型: 工具, 0.5h。
 4. **`{id: carry-issues-batch-0830}`** 立 issue ×5 (M1 三项 + M2 两项), 需 (c) 类授权 (外向)。
 
@@ -141,17 +143,17 @@ updated-at: 2026-08-30T11:50:00Z
 ## §7 提交清单 (commit hash + multi-remote parity)
 
 ```
-[main master]        本地 HEAD = 01ccc0f + 6 commit (decision c1b84ba / spec 73e59ba / audit d6ec890 + 8ec04a3 / benchmarks dbf2105 / handoff = 本文件所在 commit, hash 见 `git log -1`)
-                     origin = github = 01ccc0f (ls-remote 实测) ⇒ ahead 6, **未推**
-                     工作树干净, 只剩两个 gitlink 有意不入: aria (工作树在修复分支) / aria-orchestrator (停泊, 承前)
-[aria]               fix/phase1-gate-no-push = 007d355 (基于 origin/master d50f9c3, ahead 1) | 未推任何 remote
-                     主仓 gitlink 仍 = 58a49e7 (v1.67.1); aria master d50f9c3 有 2 个未发版 commit (承前)
+[main master]        01ccc0f → 086ee32 (8 commit: decision c1b84ba / spec 73e59ba / audit d6ec890+8ec04a3 / benchmarks dbf2105 / handoff / R6 后裁定 638459a / release sync 086ee32)
+                     origin = github = 086ee32 (每次推后 ls-remote 实测) ✅; 工作树只剩 aria-orchestrator gitlink 有意不入 (停泊, 承前)
+[aria]               master d50f9c3 → 007d355 (fix) → 7bd5dc1 (5 文件同步面) → d69091d (--no-ff merge, v1.67.2); tag v1.67.2 (annotated e837217)
+                     origin = github = d69091d; tag 双端 ✅; C.2.4 green (not_applicable: 无 CI workflow 覆盖变更路径 — 按 SKILL.md 义务在此披露); C.2.4.5 aria forward bump PASS
+                     主仓 gitlink 58a49e7 → d69091d (086ee32); 分支 fix/phase1-gate-no-push 已推 origin (可删)
 [standards]          detached 334c609 = gitlink = origin = github
 [aria-orchestrator]  feature/m6-cost-model-telemetry 92acce5 (停泊, 承前); gitlink 237045a
 [coord ref]          claims/023236f2/s-6389@0120 (a1-entry, phase A) active 保持; s-26ad@0914 重复 active (M4)
 ```
 
-**Tags published**: 无。**PRs merged**: 无。**推送**: 无 (待 owner (c) 授权; 推时 `git push origin && git push github` 显式给足超时并逐个 `ls-remote` 核验, 08-29 半推事故的教训)。
+**Tags published**: aria-plugin `v1.67.2` (origin + github)。**PRs merged**: 无 (子模块按硬约束 1 本地 merge)。**推送**: 主仓两次 (638459a / 086ee32) + aria master + tag, 每次单独推、显式 540s 超时、逐个 `ls-remote` 核验 —— 无半推。
 
 ---
 
