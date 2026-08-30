@@ -522,7 +522,7 @@ tasks:
     parent: "6.1"
     task_group: TG-6
     title: "Live-test heavy-node Forgejo egress/auth (fetch reachability) before any run"
-    status: pending
+    status: in_progress
     complexity: S
     est_hours: 3
     agent: qa-engineer
@@ -531,7 +531,21 @@ tasks:
       - aria-orchestrator/           # live probe (one-shot nomad docker job or heavy-node exec)
     verification:
       - "heavy-node → Forgejo egress + auth reachable; fetch returns legitimate JSON (not CF-Access pseudo-success)"
-    notes: "Risk mitigation — fetch adds a new container outbound dependency (§Risks). Secret hygiene Rule #7: probe uses metadata, not secret values."
+    notes: >
+      Risk mitigation — fetch adds a new container outbound dependency (§Risks). Secret hygiene Rule #7:
+      probe uses metadata, not secret values.
+      2026-08-29 实测 (heavy-node 真跑, 主 loop 亲验): **egress 腿 PASS** — 容器 → 内网 Forgejo
+      (http://192.168.69.200:3000, initial.sh:46 的生产路径) 返回 application/json 合法响应, 非
+      CF-Access 伪成功。**auth 腿 FAIL** — nomad/jobs/aria-layer2-runner 的 FORGEJO_BOT_PAT 已失效
+      (401 "user does not exist [uid: 0]"); 四份 PAT 矩阵里只有 nomad/jobs/aria-orchestrator 那份
+      有效 (200)。同一 PAT 内嵌于 initial.sh:602 的 git clone URL ⇒ 容器连 clone 都会失败。
+      2026-08-30 复核 (owner 要求): curl + git 两法一致, layer2 那份在 Forgejo 侧「不存在」(uid 0 /
+      Credentials are incorrect or have expired); orchestrator 那份 `git push --dry-run` 403 — 只有
+      read:repository+write:issue, **不能搬给 Layer 2**; 修法须为 10cg-ci-bot 签 write:repository+write:issue
+      的专用 token (owner 侧动作)。证据 + 复现脚本:
+      .aria/notes/2026-08-29-m6-blocker4-recheck-and-task028-egress-probe.md
+      另: 本条 dependencies 记 [TASK-021], 但 proposal.md:13 写「互为前置 021→022, 028→029」两条
+      独立链; 实测证明 028 与镜像无关 (探的是网络+凭据), 以 proposal 为准。
 
   - id: TASK-029
     parent: "6.2"
