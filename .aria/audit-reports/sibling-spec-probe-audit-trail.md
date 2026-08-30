@@ -55,3 +55,35 @@
 
 ---
 
+
+
+---
+
+## 2. 2026-08-30 round-3 落版清单 (R5/C1, M2, M3, m1; SC-19/20 入表; 哨兵集合镜像), append-only
+
+> 裁定见决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`。原文由 git 历史保留, 本节只记「改了什么、为什么」。
+
+| 落点 | 改动 | 来源 |
+|---|---|---|
+| Status 行 / 头部 `Linked Issue: none` | 轮次口径 + dogfood 英文 canonical | 决策单 3b / 6i |
+| §3 层 0 / 映射表 / 层 2 触发集 / 层 1.5 / P5 / dogfood 观察 / SC-9·10·11 / `own_layer` | 哨兵集合 `{none, 无}` 镜像姊妹 §2; `"wu_empty"` → `"none_sentinel"`; 层 0 两拼写 | 6i / O-2 (姊妹定义, 本 Spec 引用) |
+| §8 | 插入串从 9 字名词短语改为**可执行两行** (命令行 + verdict 三档消费), 首行前缀保留供 SC-17 计数; 补 SC-17 保守性说明 (m1); SKILL.md 概述 + `execution-modes.md` 权威版分工 (M3) | R5/C1, M3, m1; 母 D17 |
+| SC 表 | **SC-19** (placeholder 常量黑名单, 原只在映射表格内提及) 与 **SC-20** (SKILL.md 小节四字面量 + 完整命令行, 块边界) 入表 | R4/C-M3 + 姊妹 K8; R5/C1 |
+| Impact | 探针 CLI 入参 `--own-spec-dir` / `--repo-path`; SKILL.md 与 execution-modes.md 两行按 C1/M3 改写; `:519`「复制或 import 由 A.2 定」改为指向 §3 import 块 + `resolve_enforced_remotes` 经 `state-scanner/scripts` 路径 import (M2: 同文件两处相反指令) | R5/C1, M2, M3 |
+| 新表面 #8–#10 / 闸门状态 | 给 R6 的输入 | — |
+
+---
+
+## 3. 2026-08-30 post_spec R6 清账清单 (round-3.1), append-only
+
+> 聚合与逐条处置见 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+
+| 落点 | 改动 | 来源 |
+|---|---|---|
+| §3 import 代码块 + 已知限 | 唯一代码块钉死两条 `sys.path` 插入顺序 (`_SS_SCRIPTS` 先插、`_SS_ROOT` 后插即排前) 与三条 import; 已知限改为「同名包 `scripts/lib` 今天就存在」; Impact 段不再复述 | BA 探针 M1 |
+| SC 表 | **新增 SC-21** (import 顺序断言); SC-17 改分块计数 + 负控「其余 0 次」; SC-20 锚定标题起首 (禁 `Step 0.5:` 前缀) + (ii) 契约节存在断言; 编号说明补「旧 SC-NN 指母 Spec」 | BA M1 / TL M7 M8 m7 / CR 探针 m1 m2 |
+| §3 层 1 / 对 E6 的引述 | `:116` 写死判据改哨兵集合; `:186` 改引 E6 四态表 | CR 探针 M1 |
+| §4/§5 `read_only` | 来源钉为 `.aria/config.json` `state_scanner.multi_remote.read_only_remotes` (`multi_remote.py:1376`) | CR 探针 m3 |
+| Impact execution-modes 行 | 契约节不得出现前缀字面 (SC-17 负控); 存在由 SC-20 (ii) 钉 | TL M7 / M8 |
+| 杂项 | 「请 R4 优先审」→「请审计席优先审」; 段尾「最实的跨 Spec 风险」句标为历史; `:236-237` → `:237` | TL m6 / CR 探针 m1 |
+| 闸门状态 / 新表面 | 待裁 (2 项): P11 + 依赖方向 (接缝 C2, 执笔倾向硬前置); 新表面 #10 改为「已实测顺序敏感, 已钉死」 | CR 接缝 C2 / BA M1 |

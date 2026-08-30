@@ -1,9 +1,9 @@
 # Proposal: sibling-spec-probe
 
-> **Status**: 📝 **Draft — 待 post_spec R1** (本 Spec 是新文件, 从未进过闸门; 母 Spec 的 R1/R2 轮次**不为本文件背书**)
+> **Status**: 📝 **Draft (round-3.1 — 2026-08-30 R5 清账 (可执行插入串 / SC-19·20 入表 / 哨兵集合) → 随母 Spec 联审 R6 (= 本文件第 4 轮) → 清账已落: import 顺序钉死 + SC-21 (BA M1) / SC-17 计数域收窄 + 契约节存在断言 (TL M7/M8) / SC-20 锚定起首 / 层 1 与 E6 引述同步) — 定向复核已 PASS; 待 owner 裁依赖方向 (R6 接缝 C2, 闸门状态 #3(b))。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: 2
-> **关联 Issue**: `无` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
+> **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号 (2026-08-30 起按姊妹 Spec 的英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
 > **代码落点**: `aria/` 子模块 `skills/audit-engine/`; Spec 落主仓 (Rule #5)
 > **ship target**: 待定 (不与母 Spec 绑定, 见 §依赖方向)
 > **母 Spec**: [`a1-entry-claim-duplicate-work-guard`](../a1-entry-claim-duplicate-work-guard/proposal.md) —— 本 Spec 承接其 **§4 竞品 spec 探针**整节 + 决策记录 **D7/D11** + 旧 **SC-16/17/18/19**。
@@ -86,7 +86,7 @@
 
 **层 0 — 字段行定位 (SOT = 姊妹 §3 E0, 本 Spec 逐字采纳其三条谓词)**
 
-姊妹 E0 三条谓词**全部满足**才算命中: (1) **行首锚定, depth 恰为 1** —— 逐字节以 `> **关联 Issue**:` 开头, 行首无任何空白, `>` 后恰一个 U+0020, 禁 `> > ` / 缩进 / 全角冒号; (2) **fenced code block 排除** —— 扫描时维护开合布尔量, 围栏行的匹配式含 `(?:> ?)?` 前缀以覆盖 blockquote 内的围栏; (3) **取文档序第一条**, 其余忽略。三条全不满足 ⇒ 该 proposal 落 `NO_FIELD`。
+姊妹 E0 三条谓词**全部满足**才算命中: (1) **行首锚定, depth 恰为 1** —— 逐字节以 `> **Linked Issue**:` **或** `> **关联 Issue**:` 开头 (姊妹 E0 的两拼写集合, 2026-08-30 起; 集合封闭, 本 Spec 不另加), 行首无任何空白, `>` 后恰一个 U+0020, 禁 `> > ` / 缩进 / 全角冒号; (2) **fenced code block 排除** —— 扫描时维护开合布尔量, 围栏行的匹配式含 `(?:> ?)?` 前缀以覆盖 blockquote 内的围栏; (3) **取文档序第一条**, 其余忽略。三条全不满足 ⇒ 该 proposal 落 `NO_FIELD`。
 
 > **本席独立实测 (与姊妹各自跑, 结论一致 —— 这是收敛信号, 不是互抄)**。本轮在 `cc1bdef` 语料 147 篇上做三臂对照:
 >
@@ -108,12 +108,12 @@
 |---|---|---|---|---|
 | `NO_FIELD` | — | **层 3** (不可见) | ∅ | `"no_field"` |
 | `NO_TOKEN` | — | **层 2** (URL 回落) | 该字段行内全部 `/<org>/<repo>/issues/<n>` 片段成键; 无片段则 ∅ 并落层 3 | `"url_fallback"` (无片段时 `"no_token_no_url"`) |
-| **`BAD_TOKEN`** | — | **层 1 与层 2 都跑, 取并集** | 层 1: 逐 token 元素成键 (可解析→归一键, 不可解析→原串键) **∪** 层 2: 该行 URL 片段成键 | `"bad_token"` **⚠️ R4/C-M3 + 姊妹 K8 交叉补 (2026-08-27, 未经审计轮)**: 层 1 的**原串键** `("r", t)` 对**常量串无守卫** —— 两份都还没填 issue 号的 proposal, 其字段值都是 SOT 模板的 placeholder `` `{<org>/<repo>#<n>}` `` (判 `BAD_TOKEN`), 原串相等 ⇒ **互相命中**, 与姊妹 Spec 的 NEW-01 同形且**什么都不做就中**。**落版**: 原串键**排除一个成文的常量黑名单** —— 至少含 SOT 模板 placeholder 的逐字串与字面 `无`; 命中黑名单的 token 元素**不产生任何键**。黑名单逐字内容与姊妹 Spec §3 的模板默认值**同源**, 任一改动须同批改另一侧。**新增 SC-19**: 两份 proposal 字段值均为该 placeholder ⇒ **不命中**; 照产原串键的实现必红 |
-| `OK` | token 串**逐字节等于** `无` | **层 1.5** | **∅** (且**不进**层 2) | `"wu_empty"` |
-| `OK` | 其余 (token 串非 `无`) | **层 1** | 逐 token 元素 (姊妹 E4: 按 ASCII `,` split 后各段 `strip()`) 成键 | `"canonical"` |
+| **`BAD_TOKEN`** | — | **层 1 与层 2 都跑, 取并集** | 层 1: 逐 token 元素成键 (可解析→归一键, 不可解析→原串键) **∪** 层 2: 该行 URL 片段成键 | `"bad_token_union"` (2026-08-30 统一拼写, 与 §7 `own_layer` 一致) **⚠️ R4/C-M3 + 姊妹 K8 交叉补 (2026-08-27, 未经审计轮)**: 层 1 的**原串键** `("r", t)` 对**常量串无守卫** —— 两份都还没填 issue 号的 proposal, 其字段值都是 SOT 模板的 placeholder `` `{<org>/<repo>#<n>}` `` (判 `BAD_TOKEN`), 原串相等 ⇒ **互相命中**, 与姊妹 Spec 的 NEW-01 同形且**什么都不做就中**。**落版**: 原串键**排除一个成文的常量黑名单** —— 至少含 SOT 模板 placeholder 的逐字串与姊妹 §2 的哨兵集合 (`none` 大小写折叠后 / `无`); 命中黑名单的 token 元素**不产生任何键**。黑名单逐字内容与姊妹 Spec §3 的模板默认值**同源**, 任一改动须同批改另一侧。**新增 SC-19**: 两份 proposal 字段值均为该 placeholder ⇒ **不命中**; 照产原串键的实现必红 |
+| `OK` | token 串为**哨兵** (姊妹 §2 集合 `{none, 无}`: `none` 按 ASCII 大小写折叠 / `无` 逐字节) | **层 1.5** | **∅** (且**不进**层 2) | `"none_sentinel"` (原 `"wu_empty"`, 2026-08-30 改名) |
+| `OK` | 其余 (token 串非哨兵) | **层 1** | 逐 token 元素 (姊妹 E4: 按 ASCII `,` split 后各段 `strip()`) 成键 | `"canonical"` |
 
-- **层 2 的触发集逐字 = {`NO_TOKEN`, `BAD_TOKEN`}**, 且仅当。**不是**「canonical 集合为空」—— `OK`+`无` 的集合也是空的, 但它**不得**回落 (层 1.5 的整个存在理由);
-- **`OK` 的两分靠什么区分要写死**: 靠**姊妹 E3 的 token 串本身**逐字节比 `无` (单个 U+65E0, 无空白、无其他字符 —— 姊妹 E5 原文), **不靠**归一结果、**不靠**集合是否为空。
+- **层 2 的触发集逐字 = {`NO_TOKEN`, `BAD_TOKEN`}**, 且仅当。**不是**「canonical 集合为空」—— `OK`+哨兵 的集合也是空的, 但它**不得**回落 (层 1.5 的整个存在理由);
+- **`OK` 的两分靠什么区分要写死**: 靠**姊妹 E3 的 token 串本身** (未 strip) 判是否为哨兵: 逐字节等于 `无` (单个 U+65E0), 或 ASCII 大小写折叠后等于 `none`, 两端无空白 (姊妹 §2 集合 + E5 原文; R6/CR 探针 M1 同步旧句「只比 `无`」), **不靠**归一结果、**不靠**集合是否为空。
 
 **`BAD_TOKEN` 的归档选择与理由 (主控要求明确选一档并写出来)**
 
@@ -135,7 +135,7 @@
 > **⚠️ 该约束的实现归属 (R3/C3 订正, 主控 2026-08-25)**: R3 判定「三条约束 (逐字采纳姊妹 E0 ∧ 不得内含第二份实现 ∧ 不改 state-scanner) **不可同时满足**」—— 姊妹 round-1/2 的唯一宿主是**无导出 API 的 CLI check** (作用域还写死 `changes/`), 而本 Spec 要在**远端 ref 的 blob** 上求四态。
 > **处置**: 姊妹 Spec 已同批承诺把 E0–E6 交付为**可 import 的纯函数** `lib/linked_issue_field.py::extract_linked_issue_field(text: str) -> FieldVerdict` —— **输入是文本 blob 而非路径**, 正是为本 Spec 的调用形态定的; 本 Spec **import 它**, 一条都不复制。
 > **⇒ 依赖方向的准确措辞 (取代原「姊妹非阻塞」这一句)**: 本 Spec **可先于姊妹 ship** —— 此时层 1 恒 `NO_TOKEN`、**全部走层 2** (= 今天的状态, 见下方「姊妹 Spec 未 ship 时的行为」); 姊妹 ship 后本 Spec **必须**改为 import 该纯函数以接通层 1, **该改动是本 Spec 的 follow-up 而非前置**。原措辞「姊妹非阻塞」**在行为层为真、在实现层为假**, 现按此拆开表述。
-> **⚠️ 本条是 R3 之后新增的订正 (未经审计轮) —— 请 R4 优先审。**
+> **⚠️ 本条是 R3 之后新增的订正 (未经审计轮) —— 请审计席优先审 (R4–R6 已审)。**
 >
 > ## 🔧 跨 skill import 的可运行模式 (R4/S-1 + R4/F-1 —— **本仓有先例, 审计席的「无先例」前提经主控实读推翻**)
 >
@@ -155,27 +155,32 @@
 >
 > **⇒ 本 Spec 采用该模式, 逐字钉死** (不得指向 `.../state-scanner/lib` —— 那会因 `lib/collision.py` 的相对 import `from .claim_schema import ClaimRecord` 抛 `attempted relative import with no known parent package`, 姊妹 Spec 已实跑证实):
 > ```python
-> _SS_ROOT = str(Path(__file__).resolve().parents[2] / "state-scanner")
-> if _SS_ROOT not in sys.path:
->     sys.path.insert(0, _SS_ROOT)
-> from lib.collision import normalize_linked_issue
+> import sys
+> from pathlib import Path
+> _SS_ROOT = str(Path(__file__).resolve().parents[2] / "state-scanner")                 # 供 lib.* (Layer L)
+> _SS_SCRIPTS = str(Path(__file__).resolve().parents[2] / "state-scanner" / "scripts")  # 供 collectors.*
+> for _p in (_SS_SCRIPTS, _SS_ROOT):   # 顺序承重: 最后插入的 _SS_ROOT 排在 sys.path 最前 (R6/BA 探针 M1)
+>     if _p not in sys.path:
+>         sys.path.insert(0, _p)
+> from lib.collision import normalize_linked_issue              # 解析到 state-scanner/lib
 > from lib.linked_issue_field import extract_linked_issue_field
+> from collectors.multi_remote import resolve_enforced_remotes   # 解析到 state-scanner/scripts/collectors
 > ```
-> **已知限 (成文)**: 该写法把 `state-scanner` 的 skill root 放进 `sys.path`, 于是**顶层包名 `lib` 与 `collectors` 被占用**。
+> **已知限 (成文; R6/BA 探针 M1 订正 —— 同名碰撞的另一方**今天就存在**, 不是「将来」)**: `state-scanner/scripts/lib/` 是一个既有的、带 `__init__.py` 的包 (含 `runtime_probe.py` 等), 与 `state-scanner/lib/` (Layer L, 含 `collision.py`) **同名**; `coordination_probe.py:80-85` 为同一根因绕开过一次。上面代码块的插入顺序是**承重的**: 若 `_SS_SCRIPTS` 排在 `_SS_ROOT` 之前, `import lib.collision` 会静默绑定到 `scripts/lib` 并 `ModuleNotFoundError` (BA 席在 /tmp 按 `git archive d50f9c3` 树实跑复现: 安全顺序全过, 反序必炸)。⇒ **实现约束**: (1) 两条路径的插入与三条 import **只在这一个代码块里出现一次**, 不得拆到两处各写各的; (2) 绑定 `lib` → `state-scanner/lib` 之后**不得**再 import `scripts/lib` 下任何模块 (`lib.runtime_probe` 等); (3) `audit-engine` 内不得新建名为 `lib/` 或 `collectors/` 的顶层目录, 探针自己的 helper 一律放 `scripts/` 下并用模块名前缀; (4) **由 SC-21 (代码) 钉住**。
 > 若 `audit-engine` 将来自己长出 `lib/` 或 `collectors/`, 会与之**同名冲突** (`coordination_probe.py:80-83` 点名过同名包陷阱)。
 > ⇒ **A.2 的一条显式约束**: `audit-engine` 内**不得**新建名为 `lib/` 或 `collectors/` 的顶层目录; 探针自己的 helper 一律放 `scripts/` 下并用模块名前缀。
 > **降级说明**: R4/S-1 原判 Critical 的依据是「无先例 ⇒ 不可行」; 前提被推翻后, 真实缺陷是「**没给 import 代码**」—— 本段即补上, 严重度按 Major 处置。
 
 > **姊妹 Spec 未 ship 时的行为 (成文, 不假装覆盖)**: 四态里只有 `NO_FIELD` / `NO_TOKEN` 会出现 (canonical 层恒无输出) ⇒ 全部依赖层 2。**这就是今天的状态** —— 实测基线 `cc1bdef` 上经层 0 定位到的 **14** 行字段中, 冒号后第一个非空白字符是反引号的 **= 0 行** (§审计轨 #14)。⇒ 姊妹 Spec 提升的是探针的**上限**, 不是它的**可用性**。
 
-**层 1.5 — `无` 的归属 (承重, 勿省 — FIX-10)**
+**层 1.5 — 哨兵 (`none` / `无`) 的归属 (承重, 勿省 — FIX-10; 集合定义在姊妹 §2, 本 Spec 引用)**
 
-姊妹判 `OK` **且** token 串**逐字节等于** `无` ⇒ 该 proposal 的比较键集合为 **空集 ∅**, 且**不触发**层 2 的 URL 回落。
+姊妹判 `OK` **且** token 串为哨兵 (`无` 逐字节, 或 `none` 按 ASCII 大小写折叠) ⇒ 该 proposal 的比较键集合为 **空集 ∅**, 且**不触发**层 2 的 URL 回落。
 
-- `无` 的语义是「已核实无关联」(**正证据**), 与 `NO_TOKEN` 的「读不到」(**零证据**) 是两回事, **不得**合并处置;
-- ∅ 与任何集合无交集 ⇒ **两份 `无` 的 proposal 永不互相命中**。
+- 哨兵的语义是「已核实无关联」(**正证据**), 与 `NO_TOKEN` 的「读不到」(**零证据**) 是两回事, **不得**合并处置;
+- ∅ 与任何集合无交集 ⇒ **两份写哨兵的 proposal 永不互相命中** (不论各写 `none` 还是 `无`)。
 
-> **这一层是承重的, 有实测证据, 不是推理**: `normalize_linked_issue("无")` 返回 **`None`** (§审计轨 #15 实跑)。而该函数 docstring 逐字要求「Callers must fall back to raw-string equality on `None` — never treat `None` as "no match"」⇒ 若把 `无` 当普通 token 送进比较, 它会落到**原串相等**分支, `"无" == "无"` ⇒ **两份 `无` 互相命中**。层 1.5 缺席时的失效是必然的, 不是概率的。
+> **这一层是承重的, 有实测证据, 不是推理**: `normalize_linked_issue("无")` 返回 **`None`** (§审计轨 #15 实跑)。而该函数 docstring 逐字要求「Callers must fall back to raw-string equality on `None` — never treat `None` as "no match"」⇒ 若把 `无` 当普通 token 送进比较, 它会落到**原串相等**分支, `"无" == "无"` ⇒ **两份 `无` 互相命中**。层 1.5 缺席时的失效是必然的, 不是概率的。`none` 同理 (无 `#` ⇒ `normalize_linked_issue` 必返 `None` ⇒ 原串相等 `"none" == "none"` 命中), 且 `none` 是英文作者最自然的写法, 触发面比 `无` 更宽。
 
 **层 2 — URL 回落层 (仅探针用)**
 
@@ -183,7 +188,7 @@
 
 - **只扫字段行, 不扫全文散文** —— 扫全文会把任何提到过 issue URL 的 proposal 全部拉进匹配面;
 - **触发条件逐字是「姊妹判定 ∈ {`NO_TOKEN`, `BAD_TOKEN`}」, 不是「canonical 集合为空」** —— 两者在 `OK`+`无` 上取值相反 (集合都为空, 但一个该回落一个不该);
-- **⛔ 作用域分离是承重的**: URL 回落**只用于探针的只读比对**, **绝不**用于产生 `--linked-issue` 实参 —— 后者由姊妹 E6 单独规定 (「第一个 token 元素逐字节; token 串为 `无` 时整参省略」)。混用会把脏串喂进主机制的匹配面。姊妹 §3 与本条**互为镜像, 任一被改必须同批改另一侧**。
+- **⛔ 作用域分离是承重的**: URL 回落**只用于探针的只读比对**, **绝不**用于产生 `--linked-issue` 实参 —— 后者由姊妹 E6 单独规定 (E6 四态表: 「只有 `OK` 且非哨兵那一格产生实参, 哨兵 / `BAD_TOKEN` / `NO_TOKEN` / `NO_FIELD` 一律整参省略」—— R6/CR 探针 M1 订正旧引述)。混用会把脏串喂进主机制的匹配面。姊妹 §3 与本条**互为镜像, 任一被改必须同批改另一侧**。
 
 **层 3 — 各层都没产出键 ⇒ 该 proposal 对探针不可见**
 
@@ -211,7 +216,7 @@ k = normalize_linked_issue(t)
 
 **步骤 1 — remote 集合从哪来**
 
-复用已 ship 的纯函数 `resolve_enforced_remotes(configured, actual_remotes, read_only)` (`skills/state-scanner/scripts/collectors/multi_remote.py:255-286`, 实读见 §实读清单 #12), 其中:
+复用已 ship 的纯函数 `resolve_enforced_remotes(configured, actual_remotes, read_only)` —— **`read_only` 的来源**: `.aria/config.json` 的 `state_scanner.multi_remote.read_only_remotes` (缺省空元组; 实读 `collectors/multi_remote.py:1376` 生产调用即如此取值, R6/CR 探针 m3 钉来源) (`skills/state-scanner/scripts/collectors/multi_remote.py:255-286`, 实读见 §实读清单 #12), 其中:
 
 - `configured` = `.aria/config.json` → `state_scanner.multi_remote.enforced_remotes` (**本仓实测该段为 `null`** ⇒ 走该函数的 auto-discover 分支);
 - `actual_remotes` **必须**取自 `git remote` 的输出 (**配置面**), **禁止**取自 `refs/remotes/*` 的目录名 (**ref 面**)。
@@ -325,7 +330,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | `reason` | `str \| null` | **`status != "ok"` 或 `verdict == "not_established"` 时必非空** (二者是**或**关系 —— `own_keys` 为空时运行面一切正常 `status="ok"`, 判定面却是 `not_established`, 只写「status 非 ok 才要 reason」会让这一格恒空); 枚举 `"no_enforced_remote"` \| `"remote_unresolved"` \| `"fetch_failed"` \| `"cap_applied"` \| `"own_token_absent"` |
 | **`verdict`** | `str` | **判定面 (一等字段)**: `"sibling_found"` \| `"no_sibling_found"` \| `"not_established"` |
 | `own_spec_dir` | `str` | 本轨 spec 目录名 (自命中排除键) |
-| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"wu_empty"` \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) **⚠️ R4/C-M1 拼写统一**: 本枚举值逐字为 `"bad_token_union"`; §3 映射表若出现 `"bad_token"` 一律以本表为准 (R3/TL-P2 只修了一侧) |
+| `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"none_sentinel"` (原 `"wu_empty"`, 2026-08-30 改名 —— 拼音 hack 换成语义名, 与姊妹哨兵集合同批) \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) **⚠️ R4/C-M1 拼写统一**: 本枚举值逐字为 `"bad_token_union"`, §3 映射表 2026-08-30 已改为同一拼写 (R3/TL-P2 只修了一侧, R4 又只加批注没改表 —— 全文自此只有一种拼写) |
 | `own_keys` | `list` | 本轨比较键 (每项 `["k",<basename>,<n>]` 或 `["r",<原串>]`) |
 | `remotes` | `list[obj]` | 每 remote 一项: `name` / `default_branch` (`str\|null`) / `resolved_by` (`"ls_remote_symref"\|null`) / `error_kind` (`str\|null`) / `scanned` (`int`) / `capped` (`bool`) |
 | `hits` | `list[obj]` | **恒为 list, 永不为 `null`**; 每项 `remote` / `branch` / `corpus` (`"changes"\|"archive"`) / `spec_dir` / `path` / `field_line` (`int`) / `key` / `layer` |
@@ -367,12 +372,22 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 | 模式 | 节标题行 | 插入位置 | 插入的字面串 |
 |---|---|---|---|
-| Convergence | `## Convergence 模式` (`:84`) | 围栏块内 `Round N:` 行之后、现有 `1. 调用 agent-team-audit 单轮引擎` 之前 | `每轮入口: 竞品 spec 探针` |
-| Challenge | `## Challenge 模式` (`:113`) | 围栏块内 `Round N (一个完整周期):` 行之后、现有 `Step 1: 讨论组 spawn` 之前 | `每轮入口: 竞品 spec 探针` |
+| Convergence | `## Convergence 模式` (`:84`) | 围栏块内 `Round N:` 行之后、现有 `1. 调用 agent-team-audit 单轮引擎` 之前 | 下方「插入串 (两行, 逐字)」 |
+| Challenge | `## Challenge 模式` (`:113`) | 围栏块内 `Round N (一个完整周期):` 行之后、现有 `Step 1: 讨论组 spawn` 之前 | 同一串 (逐字相同) |
 
 - **现有编号一律不动** —— Convergence 的 `1./2./3./4.` 与 Challenge 的 `Step 1..Step 5` 都保持原值, 避免连带引用漂移;
 - **两块用逐字相同的串**, 使「只 patch 了一块」可被一条计数断言当场抓住 (SC-17);
 - **两块都要改的理由不是对称美感**: 本仓 post_spec 被 pin 死在 convergence 上不受影响, 但 aria-plugin 是跨项目分发的, `config-loader/DEFAULTS.json:124-128` 的 `adaptive_rules` 里 `"level_3": "challenge"` (实读见 §实读清单 #20) 意味着**下游项目的 Level-3 审计会走 Challenge** —— 只 patch 前者会让那些项目**静默漏掉探针**。
+
+> **插入串 (两行, 逐字; R5/C1 落版 —— 旧串 `每轮入口: 竞品 spec 探针` 是一个 9 字名词短语, 无动词、无脚本路径、无参数、无 verdict 消费, 运行时 AI 无从知道跑什么; 现按母 Spec D17 ② 改为可执行形, 首行前缀保留使 SC-17 的计数不变)**:
+>
+> ```
+>   每轮入口: 竞品 spec 探针 —— python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py" --own-spec-dir "<本轨 spec 目录名>" --repo-path "<repo root>"
+>   读 stdout JSON 的 verdict: sibling_found ⇒ 本轮 🔴 (含 N 份/归档标注) · no_sibling_found ⇒ 「已完整扫描, 未发现同 issue 竞品」 · not_established / exit≠0 / 非 JSON / schema_version 未知 ⇒ 「未能核实」(禁止渲染为无竞品); 不阻断本轮
+> ```
+>
+> - **SC-17 的「恰 2 次」是有意的保守** (R5/m1: 此前只写在「新表面」段, 实现者读 §8 落地 ⇒ 补在此): 若将来出现第三个模式块, 该断言会把「正确地插了三处」判红 —— 漏插比多插危险, 届时改断言而不是改保守方向;
+> - **SKILL.md 侧的对应小节 (Impact) 须含同一条命令行与三档消费措辞的字面** —— 由 **SC-20** 钉住 (D17 ①②③: 块边界 / 完整命令行 / fail 分支措辞 `未能核实`); stdout 契约 (§7 十二字段) 与消费措辞 (§9) 的**权威可执行版**落 `execution-modes.md` 新节 (R5/M3), SKILL.md 放概述 + 指针, 与 `audit-engine/SKILL.md:237`「权威可执行版见 references/…」(`:236` 是另一句注释, R6/TL m6)的既有体例一致。
 
 ### §9 消费面
 
@@ -405,7 +420,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 **⇒ 探针实际覆盖的是母 Spec §Why 里两类场景中的 (b)「对方已 ship 并归档」, 以及 (a)「对方没走 claim」中**其 Spec 已进默认分支**的那一部分。** 它**不是**「早期预防」机制 —— 它是「止损」机制: 在你已经投入的第 2、第 3 轮审计入口把「这件事别人做完了」摆到台面上。第 5 次事故里被浪费的三天, 正是这样被止住的那种。
 
-> **本 Spec 自身的 dogfood 观察**: 本文件的「关联 Issue」写的是 `无` ⇒ 按层 1.5, **它对本探针永不命中**。这是设计如此 (正证据), 不是缺陷; 但它也意味着**本 Spec 不能拿自己当端到端夹具**, 夹具必须取 §3 点名的真实 `#122` 簇。
+> **本 Spec 自身的 dogfood 观察**: 本文件的「Linked Issue」写的是哨兵 `none` ⇒ 按层 1.5, **它对本探针永不命中**。这是设计如此 (正证据), 不是缺陷; 但它也意味着**本 Spec 不能拿自己当端到端夹具**, 夹具必须取 §3 点名的真实 `#122` 簇。
 
 ---
 
@@ -417,7 +432,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | **P2** (承接母 Spec **D11**) | 不阻断; **exit 0 覆盖全部有定义的判定** (含 `degraded` / `skipped`); 非 0 仅探针自身失败 | 与主机制同为 advisory; 且 §Why 的 `#137` 簇实证「同 issue ≠ 重复劳动」。**旧 SC-18「无远端 ⇒ exit 非 0」与本条冲突, 按本条解** (§7) |
 | **P3** | 不复用 `remote_refresh` 缓存 (承接 D7 后半) | 缓存唯一写入点 `remote_refresh.py:691` 只在 `collect_remote_refresh():568` 内, 其唯一生产调用点是 `scan.py:312` ⇒ audit-engine 轮间无机制保证跑过 `/state-scanner` (实读 #22) |
 | **P4** | canonical 抽取规则的 SOT 在姊妹 Spec `linked-issue-field-availability`, 本 Spec **不重定义、不私搭第二份实现**; 比较用已 ship 的 `normalize_linked_issue()` | 双实现漂移 = 前置 Spec spike S5 刚揭示的病换位置复发; 该函数已公开导出 (实读 #1) |
-| **P5** | `无` 独立成层 1.5: ∅ + 不进 URL 回落; 与 `NO_TOKEN` 分档 | **实测**: `normalize_linked_issue("无")` 返回 `None` ⇒ 当普通 token 则落原串相等 ⇒ 两份 `无` 互相命中 (实读 #15) |
+| **P5** | 哨兵 (`none` / `无`, 姊妹 §2 集合) 独立成层 1.5: ∅ + 不进 URL 回落; 与 `NO_TOKEN` 分档; 枚举值 `"none_sentinel"` | **实测**: `normalize_linked_issue("无")` 返回 `None` ⇒ 当普通 token 则落原串相等 ⇒ 两份哨兵互相命中 (实读 #15); `none` 同理且触发面更宽 |
 | **P6** | 默认分支**只认** `git ls-remote --symref <R> HEAD` 的实时应答; 取不到即 fail-closed, **不猜** `master`/`main`; 不复用既有 `_resolve_default_branch` | 本仓 `github` 无本地 symbolic-ref (exit 128) 且 git 2.39.5 的 fetch 不补写 (实读 #3/#9); 既有解析器 origin 硬编码 + 名字猜测 (实读 #23) |
 | **P7** | remote 集合从 **`git remote` 配置面**取, 经 `resolve_enforced_remotes()`; **禁止**从 `refs/remotes/*` glob 取 | 本仓当场可复现: `refs/remotes/probe/*` 存在而 `remote.probe.url` 不存在 (实读 #11) |
 | **P8** | fetch 落 **私有 ref 命名空间** `refs/aria/sibling-probe/<remote>/<branch>`; 不动 `refs/remotes/*`, 不依赖全局 `FETCH_HEAD` | `FETCH_HEAD` 是全局单槽, 并发下被覆盖; `refs/aria/*` 是本仓既有私有命名空间 (实读 #27) |
@@ -463,7 +478,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 ## Success Criteria
 
-> **编号说明**: 本 Spec 从 **SC-1** 重新编号 (独立文件独立命名空间)。与母 Spec 旧编号的对应: 本 **SC-1** 承接旧 **SC-16**; 本 **SC-2** 承接旧 **SC-17**; 本 **SC-3 / SC-4** 由旧 **SC-18** 拆出 (旧条自相矛盾, 见 §7); 本 **SC-5 / SC-6** 承接旧 **SC-19** 的 (a)(c) 两项 —— 旧 (b) **不迁入**, 理由见 §1 依赖方向第 2 条。
+> **编号说明**: 本 Spec 从 **SC-1** 重新编号 (独立文件独立命名空间)。与母 Spec 旧编号的对应: 本 **SC-1** 承接旧 **SC-16**; 本 **SC-2** 承接旧 **SC-17**; 本 **SC-3 / SC-4** 由旧 **SC-18** 拆出 (旧条自相矛盾, 见 §7); 本 **SC-5 / SC-6** 承接旧 **SC-19** 的 (a)(c) 两项 —— 旧 (b) **不迁入**, 理由见 §1 依赖方向第 2 条。**本文正文里形如「旧 SC-NN」的一律指母 Spec 的编号**; 本表新增的 SC-19 / SC-20 / SC-21 与之无关 (R6/CR 探针 m1)。
 >
 > **验证面分层**: 代码类宿主 = `skills/audit-engine/tests/` (新建, 自动纳入 `run_all_tests.sh`); 行为类只能由 AB 定向 fixture 覆盖, **不冒充结构化测试**。
 
@@ -477,16 +492,19 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | **SC-6** (旧 SC-19c) | 代码 | `MAX_PROPOSALS_SCANNED` 置 1, 语料含 1 份 `changes/` + 1 份 `archive/` | 保留的是 **`changes/` 那份**; `caps_applied[]` 非空且含截断点路径与丢弃条数; `status="degraded"`, `verdict="not_established"`; stderr 有 `log()` 披露 | (i) 静默截断 (`caps_applied` 为空) 必红; (ii) 排序把 `archive/` 排前而丢掉 `changes/` 的实现必红; (iii) 截断后仍报 `no_sibling_found` 的实现必红 |
 | **SC-7** ⭐ (M-1 主条) | 代码 | 夹具 = `archive/2026-07-31-phase-c-gate-path-coverage-not-applicable/proposal.md:6` 与 `archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md:22` 两行**字段原文** | **命中**, 且命中键逐字为 `["k","aria-plugin",122]` | 只实现层 1 (canonical) 的实现在此返回空 —— 实测两行冒号后首个非空白都是 `[`, canonical 层判 `NO_TOKEN` ⇒ 必红。**这正是探针的立项案例** |
 | **SC-8** ⭐ (M-1, 提取器位置约束) | 代码 | 夹具 = 上述 `:6` 那一行原文 (它冒号后首非空白是 `[`, **但行内后段含 code span** `` `confirmed` `` / `` `major` `` / `` `next-cycle` ``) | canonical 层判 **`NO_TOKEN`**; **不得**抽出 `confirmed` | 把提取器写成「行内**第一个** code span (任意位置)」的实现会抽到 `confirmed` (**本轮实跑复现, §实读清单 #15**) ⇒ 归一得 `None` ⇒ 落原串键 `["r","confirmed"]` ⇒ 与对方不命中且键值可辨 ⇒ 必红。**与 SC-18 是两个不同的取错**: 本条是「层 1 在**行内**取错 span」, SC-18 是「层 0 取错**行**」 |
-| **SC-9** ⭐ (FIX-10 对照臂 1) | 代码 | 两份 proposal 的 canonical token 串**均逐字节等于** `无` | **不命中** | 把 `无` 当普通 token 参与求交的实现必红 —— 实测 `normalize_linked_issue("无") is None` ⇒ 回落原串相等 ⇒ `"无" == "无"` ⇒ 命中 |
-| **SC-10** ⭐ (FIX-10 对照臂 2) | 代码 | 一份 canonical token 为 `无` **且其字段行内含一个 issue URL** (如 `> **关联 Issue**: \`无\` — 讨论见 https://forgejo.10cg.pub/10CG/aria-plugin/issues/122`); 另一份 token 为 `10CG/aria-plugin#122` | **不命中**; 且 `无` 那份的 `layer` 必须是 `"wu_empty"` 而非 `"url_fallback"` | 回落触发条件写成「canonical **集合为空**」而非「canonical 层 **== `NO_TOKEN`**」的实现, 会让 `无` 那份走 URL 回落抽到 `#122` ⇒ 命中 ⇒ 必红 |
-| **SC-11** | 代码 | 一份 canonical token 为 `无`; 一份**根本没有「关联 Issue」字段行** | 两者比较键集合都为空, 但 `layer` 必须可辨: `"wu_empty"` vs `"no_field"` | 把两者折叠成同一枚举值的实现必红 —— 正证据与零证据合并, 与 §7 `verdict` 条款同一病 |
+| **SC-9** ⭐ (FIX-10 对照臂 1) | 代码 | 两份 proposal 的 canonical token 串**均为哨兵** —— 三组: (`无`,`无`) / (`none`,`none`) / (`none`,`无`) | **三组都不命中**; 两份的 `layer` 均为 `"none_sentinel"` | 把哨兵当普通 token 参与求交的实现必红 —— 实测 `normalize_linked_issue("无") is None` ⇒ 回落原串相等 ⇒ 命中; 只认 `无` 的实现在 (`none`,`none`) 组上原串相等 ⇒ 命中 ⇒ 红 (owner 2026-08-30 6i) |
+| **SC-10** ⭐ (FIX-10 对照臂 2) | 代码 | 一份 canonical token 为哨兵 **且其字段行内含一个 issue URL** (两臂: `> **关联 Issue**: \`无\` — 讨论见 https://forgejo.10cg.pub/10CG/aria-plugin/issues/122` 与 `> **Linked Issue**: \`none\` — see https://forgejo.10cg.pub/10CG/aria-plugin/issues/122`); 另一份 token 为 `10CG/aria-plugin#122` | **不命中**; 且哨兵那份的 `layer` 必须是 `"none_sentinel"` 而非 `"url_fallback"` | 回落触发条件写成「canonical **集合为空**」而非「canonical 层 **== `NO_TOKEN`**」的实现, 会让哨兵那份走 URL 回落抽到 `#122` ⇒ 命中 ⇒ 必红 |
+| **SC-11** | 代码 | 一份 canonical token 为哨兵; 一份**根本没有**字段行 | 两者比较键集合都为空, 但 `layer` 必须可辨: `"none_sentinel"` vs `"no_field"` | 把两者折叠成同一枚举值的实现必红 —— 正证据与零证据合并, 与 §7 `verdict` 条款同一病 |
 | **SC-12** ⭐ (M-5a) | 代码 | 对一个**无本地 `refs/remotes/<R>/HEAD`** 的 remote 解析默认分支 (本仓 `github` 实况: `git symbolic-ref refs/remotes/github/HEAD` exit **128**) | 仍解析出 `default_branch="master"`, `resolved_by="ls_remote_symref"` | 只读本地 symbolic-ref 的实现在 `github` 上取不到 ⇒ 该 remote 记 unresolved ⇒ 必红。**这是 R2/BA 在 `aria` 子模块独立复现过的同一故障** |
 | **SC-13** ⭐ (M-5a fail-closed) | 代码 | `ls-remote --symref` 非 0 退出 / 超时 / 输出无 `ref: ` 行 (夹具用注入式 runner, 不打真网络) | 该 remote `default_branch=null` + `error_kind` 非空; **stdout 中不得出现字面 `master` 或 `main` 作为该 remote 的 `default_branch`**; `status="degraded"` | 照抄既有 `_resolve_default_branch` 的 `_DEFAULT_BRANCH_FALLBACKS = ("master","main")` 名字猜测 (`fetch_gate.py:55,124-127`) 的实现在此必红 |
 | **SC-14** ⭐ (P7) | 代码 | 仓库中存在一个 `refs/remotes/<name>/*` 但 `git config --get remote.<name>.url` 为空的**陈旧 remote-tracking ref** (本仓 `probe` 实况) | `remotes[]` 中**不得**出现该名字 | 用 `refs/remotes/*` glob 枚举 remote 的实现会把 `probe` 纳入 ⇒ 必红 |
 | **SC-15** (M-17 stdout 契约) | 代码 | 三种终局 (`ok` / `degraded` / `skipped`) 各跑一次 | stdout 每次都是**恰一个**可 `json.loads` 的对象, 含表中全部必填键; stderr 的任何内容不出现在 stdout | 把 `log()` 写进 stdout 的实现使 `json.loads` 抛异常 ⇒ 必红 |
 | **SC-16** (M-17 消费面) | **行为** (定向 fixture) | 探针 `exit != 0`, 或 stdout 不可解析, 或 `verdict == "not_established"` | audit-engine 渲染**「未能核实」**, **不得**渲染「无竞品」, 且不阻断该轮 | 把三者任一折叠成「无竞品」的实现必红。**本条无代码宿主** —— 它断言的是 AI 是否照 SKILL.md 行事, 只能由 AB 定向 fixture 覆盖 (rule6_note 点名行为 β) |
-| **SC-17** ⭐ (§8 双落点) | 代码 | 对 `references/execution-modes.md` 全文计数字面串 `每轮入口: 竞品 spec 探针` | 出现**恰 2 次**, 且两次分别落在 `## Convergence 模式` 与 `## Challenge 模式` 两节的围栏块内 | baseline 命中 **0** ⇒ 必红; **只 patch Convergence 的实现命中 1 ⇒ 必红** —— 这正是「下游 Level-3 走 Challenge 会静默漏掉探针」那条失败模式的机械护栏。**docstring 须写明**: 若将来出现第三个模式块, 本条会把「正确地插了三处」判红 —— 这是**有意的**保守 (漏插比多插危险), 不是 bug |
+| **SC-17** ⭐ (§8 双落点; **R6/TL M7 + CR 探针 m2 收窄计数域**) | 代码 | 对 `references/execution-modes.md` 的 `## Convergence 模式` 与 `## Challenge 模式` **两节的围栏块切片**分别计数字面串 `每轮入口: 竞品 spec 探针` | **每块恰 1 次** (共 2); **负控**: 除这两处围栏外, 全文 (含新增的 `## 竞品 spec 探针 (per-round 入口)` 契约节) 该字面 **0 次** —— 契约节用「探针的 stdout 契约如下」之类措辞, 不复用该前缀 | baseline 命中 **0** ⇒ 必红; **只 patch Convergence 的实现命中 1 ⇒ 必红** —— 这正是「下游 Level-3 走 Challenge 会静默漏掉探针」那条失败模式的机械护栏。**docstring 须写明**: 若将来出现第三个模式块, 本条会把「正确地插了三处」判红 —— 这是**有意的**保守 (漏插比多插危险), 不是 bug; 由「全文恰 2 次」改为分块计数是为了不误伤同文件新增的契约节 (旧写法会把正确实现判红) |
 | **SC-18** ⭐ (§3 层 0, 假阳性拒绝) | 代码 | 三臂**同批**跑, 语料取 `cc1bdef` 全部 147 篇: (a) 行首 `> ` 规则 (本 Spec 采用); (b) 宽松「行内任意位置」规则; (c) 行首 + 「只在首条 `---` 之前找」 | (a) 得 `no_field` **133** / `url_fallback` **13** / `no_token_no_url` **1**, 簇 **3** 个且**不含** `a1-entry-claim-duplicate-work-guard`; (b) 得 `url_fallback` **14** 且 `#122` 簇**含**该目录 (**假阳性**); (c) 得 `url_fallback` **10** 且簇**只剩 1 个** | 这是一条**验拒绝能力**而非验当前取值的断言 (memory `adversarial-fixture`): 实现只要退回宽松定位, (b) 臂的假阳性就会出现在 (a) 臂上 ⇒ 必红; 实现若「顺手加固」成只扫头部区, `#122`/`#95` 两个真簇消失 ⇒ 必红。**两个坏实现都是像样的、有人会真写出来的**, 不是稻草人 **⚠️ 第四臂 (R3/TL-P3 补, 主控 2026-08-25)**: 原三臂 (宽松 / 行首 / 行首+仅头部) **无一验 E0 谓词 2 (围栏排除)**, 而姊妹实测「真实语料上加与不加围栏排除的判定差异 = 0」⇒ **漏实现围栏排除的实现在真实语料上也全绿**, 本条形同无断言 (memory `feedback_gate_tracks_reality_synthetic_fixture`: 追踪现实的 gate 不能只钉真实语料)。**补第四臂 (合成夹具, 必须造)**: 一份 proposal **只有围栏内的深度-1 字段行、没有真字段** (即 ```` ``` ```` 块内一行逐字 `> **关联 Issue**: `10CG/x#1``) ⇒ 期望判 **`no_field`**; 不做围栏排除的实现会把它当真字段并算进 `#1` 簇 ⇒ **必红**。**该形态在真实语料里有活实例**: 姊妹 Spec 自己的 proposal 有两行 (其 §Why 与模板示例块内), 可直接取作夹具原文 |
+| **SC-19** ⭐ (R4/C-M3 + 姊妹 K8 → **2026-08-30 入表**; 常量黑名单) | 代码 | 两份 proposal 的字段值均为 SOT 模板 placeholder `` `{<org>/<repo>#<n>}` `` (姊妹判 `BAD_TOKEN`) | **不命中**; 二者的原串键集合均**不含** `("r", "{<org>/<repo>#<n>}")`; `own_layer` 为 `"bad_token_union"` | 照产原串键的实现 ⇒ 两份 placeholder 原串相等 ⇒ 命中 ⇒ 必红 (与姊妹 NEW-01 同形且**什么都不做就中**)。黑名单逐字内容与姊妹 §3 的模板默认值 + §2 哨兵集合**同源**, 任一改动须同批改另一侧 |
+| **SC-20** ⭐ (R5/C1; 引母 Spec **D17**, 落 ①②③; **R6/TL M8 + m7 补**) | 代码 | (i) `skills/audit-engine/SKILL.md` 的「per-round 入口探针」小节 —— **块边界** = 从该小节标题行 (正则 `(?m)^#{2,4}[ \t]+per-round 入口探针`, **锚定标题起首, 不允许 `Step 0.5:` 之类前缀** —— R6/TL m7; **不在围栏内**) 起至下一个 `^#{1,4}[ \t]` 行止; (ii) `references/execution-modes.md` 含标题字面 `## 竞品 spec 探针 (per-round 入口)` | (i) 切片内含四个字面量 `sibling_spec_probe.py` / `verdict` / `not_established` / `未能核实`, **且**含一条以 `python3` 起首、含 `sibling_spec_probe.py` 与 `--own-spec-dir` 的完整命令行 (D17 ②); (ii) 该节切片 (至下一个 `^## ` 行) 内含 §7 的 `verdict` / `status` / `hits` 三个字面与 §9 三档措辞的字面 `未能核实` / `已完整扫描` / `检测到` | 「插两行短语 + 写一段消歧散文」的实现 (SC-17 全绿) 在 (i) 四字面量缺失 ⇒ 红; 把字面量写在小节外 (如 `## 相关文档`) 的实现因块边界 ⇒ 红; 标题写成 `Step 0.5: per-round 入口探针` 的实现因锚定起首 ⇒ 红; **跳过契约节的实现在 (ii) 上 ⇒ 红** (否则 SKILL.md 的指针悬空)。**baseline 必红** (小节与契约节今天都不存在) |
+| **SC-21** (新, R6/BA 探针 M1; import 顺序) | 代码 | 在 `tests/test_sibling_spec_probe.py` 内 import 探针模块后断言 `sys.modules["lib"].__file__` 落在 `state-scanner/lib/__init__.py`, 且 `collectors.multi_remote.resolve_enforced_remotes` 可导入 | 两者同时成立 | 把 `_SS_SCRIPTS` 插在 `_SS_ROOT` **之后** (即排在 `sys.path` 更前) 的实现 ⇒ `lib` 绑定到 `scripts/lib` ⇒ `ModuleNotFoundError: lib.collision` ⇒ 红 (BA 席 /tmp 实跑复现); 把插入拆到两处、顺序由文件位置决定的实现同样可红。**baseline 必红** (探针今天不存在) |
 
 ---
 
@@ -508,15 +526,15 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 | 文件 | 变更 | 来源 |
 |------|------|------|
-| `skills/audit-engine/scripts/sibling_spec_probe.py` | **新增** (`scripts/` 目录也新建; 实读确认 audit-engine 现零 `scripts/`)。stdlib-only。含 §3 谓词 (层 1.5 / 层 2 / 键构造) + §4 默认分支解析 + §5 fetch/重试/超时 + §6 cap + §7 输出契约 | M-1 / M-5 / M-17 |
+| `skills/audit-engine/scripts/sibling_spec_probe.py` | **新增** (`scripts/` 目录也新建; 实读确认 audit-engine 现零 `scripts/`)。stdlib-only。**CLI 入参**: `--own-spec-dir <本轨 spec 目录名>` (必需; 自命中排除键, 写入 §7 `own_spec_dir`) / `--repo-path <repo root>` (必需; 不假定 cwd, 与 plugin 侧既有两条探针同一纪律)。含 §3 谓词 (层 1.5 / 层 2 / 键构造 / SC-19 常量黑名单) + §4 默认分支解析 + §5 fetch/重试/超时 + §6 cap + §7 输出契约 | M-1 / M-5 / M-17 + R5/C1 |
 | `skills/audit-engine/tests/test_sibling_spec_probe.py` | **新增** (`tests/` 目录也新建)。承载 SC-1~15、SC-17、SC-18。经 `skills/run_all_tests.sh` 的 `find ... -type d -name tests` 自动发现 (`:48`), 无 pytest 时走 `unittest discover` (`:71`); 目录内无 `test_*.py` 会被 `:50` 跳过 | R1/C4 同族 (SC 必须有真实宿主) |
-| `skills/audit-engine/SKILL.md` | 新增「per-round 入口探针」小节; **须与 `### Step 0: Anchor 固化` (`:83`, 「Round 1 启动前一次性」`:85`) 显式消歧**, 不沿用其编号 | R3/M5 + 母 Spec §4 命名条款 |
-| `skills/audit-engine/references/execution-modes.md` | **Convergence (`:84` 起) 与 Challenge (`:113` 起) 两块各插入一行**逐字相同的 `每轮入口: 竞品 spec 探针`; 现有编号不动 | R3/M5; 跨项目分发的 `adaptive_rules.level_3 = "challenge"` (`DEFAULTS.json:124-128`) |
+| `skills/audit-engine/SKILL.md` | 新增「per-round 入口探针」小节 (**概述 + 指针**, R5/M3: 与本 skill 既有 progressive-disclosure 体例一致, `SKILL.md:237`「权威可执行版见 references/…」(`:236` 是另一句注释, R6/TL m6)); 小节**须含**四个字面量 `sibling_spec_probe.py` / `verdict` / `not_established` / `未能核实` 与一条完整命令行 (**SC-20**, 母 Spec D17); **须与 `### Step 0: Anchor 固化` (`:83`, 「Round 1 启动前一次性」`:85`) 显式消歧**, 不沿用其编号 | R3/M5 + 母 Spec §4 命名条款 + R5/C1, M3 |
+| `skills/audit-engine/references/execution-modes.md` | **Convergence (`:84` 起) 与 Challenge (`:113` 起) 两块各插入 §8 的两行插入串** (逐字相同, 首行前缀 `每轮入口: 竞品 spec 探针` 保留供 SC-17 计数); 现有编号不动。**另新增一节** `## 竞品 spec 探针 (per-round 入口)` 承载 §7 十二字段 stdout 契约 + exit code 三分 + §9 三档消费措辞的**权威可执行版** (R5/M3: 指令面原被拆到三个文件且无一处含完整契约); **该契约节不得出现前缀字面 `每轮入口: 竞品 spec 探针`** (SC-17 负控, R6/TL M7), 其存在由 SC-20 (ii) 钉住 (R6/TL M8) | R3/M5; 跨项目分发的 `adaptive_rules.level_3 = "challenge"` (`DEFAULTS.json:124-128`); R5/C1, M3 |
 | `skills/audit-engine/references/report-format.md` | `## 轮次记录` 的 `### Round N` 模板 (`:50-71`) 增一行探针结果; 措辞按 `verdict` 三档 (§9) | post_spec R1/QA「消费环节缺口」 |
 | `aria-plugin-benchmarks/ab-suite/audit-engine.json` | **新建套件** (2 个定向 eval, 钉 rule6_note 点名行为 α/β; 其一即 SC-16)。当前**不存在** (本轮实核) | rule6_note 第 2 条 |
-| **不改** `skills/state-scanner/**` | 探针**只 import** 已 ship 的 `normalize_linked_issue()` 与 `resolve_enforced_remotes()` 的**行为契约**, 不改其任何签名或实现 | P4 / §4 步骤 1 |
+| **不改** `skills/state-scanner/**` | 探针**只 import** 已 ship 的 `normalize_linked_issue()` 与 `resolve_enforced_remotes()` 的**行为契约**, 不改其任何签名或实现; 探针**永不**产生 `--linked-issue` 实参 (§3 层 2 作用域分离 —— 那是姊妹 E6 / 母 Spec 的面) | P4 / §4 步骤 1 |
 
-**跨 skill 复用的形态待 A.2 定 (本 Spec 只钉约束, 不钉手段)**: 本仓既有惯例是**复制而非跨 skill runtime import** —— `phase-d-closer/scripts/fetch_gate.py:111-112` 逐字「replicated to keep phase-d-closer self-contained — **no cross-skill runtime import**」。本 Spec 的约束是: **归一逻辑 (`normalize_linked_issue`) 一律不得复制** (P4, 双实现漂移是前置 Spec 刚治过的病); `resolve_enforced_remotes` 是 32 行 (`:255-286`) 的纯函数, 复制或 import 由 A.2 定, 但**任一选择都须配一条断言两侧行为一致的测试**。
+**跨 skill 复用的形态 —— 已在 §3「跨 skill import 的可运行模式」逐字钉死, 本段不再另说** (R5/M2 订正: 旧版此处写「复制或 import 由 A.2 定」, 与 §3 的「本 Spec 采用该模式, 逐字钉死」**同文件两处相反指令** —— 主控 R4 落 import 补丁块时未回灌本段, memory `fixes-contradict`)。补充两点: (1) `normalize_linked_issue` 与 `extract_linked_issue_field` 一律经 §3 的 `sys.path` 插 `state-scanner` skill root 后 `from lib.… import`, **不得复制**; (2) **`resolve_enforced_remotes` 亦经同一路径 import** (`from collectors.multi_remote import resolve_enforced_remotes`, 实读该函数在 `skills/state-scanner/scripts/collectors/multi_remote.py:255`; 先例 `handoff_autofill.py:48-51` 用的正是 `.../state-scanner/scripts` + `from collectors.multi_remote import …`), **不得复制** —— 复制即第二份实现, 与 P4 同病; 两条路径的插入顺序与三条 import **只见 §3 的唯一代码块** (顺序承重, R6/BA 探针 M1), 本段不复述; 已知限 (同名包 `scripts/lib` 今天就存在) 见 §3。
 
 **follow-up (不在本 Spec)**:
 1. `fetch_gate.py:21` / `:111` 的悬空函数名引用 `sync.py::_resolve_default_branch` (实读: `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中无该函数);
@@ -540,8 +558,11 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 3. **`MAX_PROPOSALS_SCANNED = 1000` 常量** (§6) —— 新的规模面。数值依据是本仓 147 篇的实测外推, **对第三方仓未验证**。刻意**不做**成 config key (避免新配置面), 代价是采用者无法调整。
 4. **新建 `ab-suite/audit-engine.json`** (rule6_note 第 2 条) —— 从零建一份 AB 套件会把 `ab-suite/` 的 `.json` 从实测的 **31** 增到 **32**, 且是 `#150` 所列无套件 skill 中的第一个被补上的。**未审**: 建套件本身是否需要单独走 `/skill-creator` 的基线流程 (`AB_TEST_OPERATIONS.md` §场景 2「新增 Skill 首次基线」说要), 以及那次基线跑是否属于本 Spec 的交付范围。**另**: `AB_TEST_OPERATIONS.md` 的资产盘点写「Skill eval suites 28 个 ✅ 全量覆盖」, 与实测 31 个 `.json` 及 `#150` 的「14/43 无套件」**三方互不一致** —— 已记 follow-up, 本 Spec 不修。
 5. **对 `execution-modes.md` 两块插入逐字相同的串** (§8) —— SC-17 用「计数恰为 2」做断言。**已知弱点**: 若将来出现第三个模式块, 该断言会把「正确地插了三处」判成红。这是**有意的**保守 (漏插比多插危险), 但须在 SC-17 的 docstring 里写明, 否则下一个人会以为它是 bug。
-6. **对姊妹 Spec `linked-issue-field-availability` 的消费契约** (§3 层 1) —— **⚠️ R3/M7 状态更新 (主控 2026-08-25)**: 本条原自陈「单方面声明、未交叉核对、本轮最实的跨 Spec 风险」。**该风险已闭环**: 姊妹 Spec 已落盘并被本 Spec 实读, §3 已补四态逐格映射 (`BAD_TOKEN` 取层1∪层2 并集), 姊妹侧亦已回灌确认其四态定义无需改动 ⇒ **不再是单方面声明**。以下为当时的原始记述 (留痕): 本 Spec 单方面声明了它的抽取器返回三态 (`TOKEN(s)` / `无` / `NO_TOKEN`)。**该 Spec 由另一执笔席同批起草, 本席未与其交叉核对** ⇒ 若其最终定稿的返回形态不是三态, §3 层 1/1.5/2 的分派条件须同批修订。**这是本轮最实的跨 Spec 风险。**
+6. **对姊妹 Spec `linked-issue-field-availability` 的消费契约** (§3 层 1) —— **⚠️ R3/M7 状态更新 (主控 2026-08-25)**: 本条原自陈「单方面声明、未交叉核对、本轮最实的跨 Spec 风险」。**该风险已闭环**: 姊妹 Spec 已落盘并被本 Spec 实读, §3 已补四态逐格映射 (`BAD_TOKEN` 取层1∪层2 并集), 姊妹侧亦已回灌确认其四态定义无需改动 ⇒ **不再是单方面声明**。以下为当时的原始记述 (留痕): 本 Spec 单方面声明了它的抽取器返回三态 (`TOKEN(s)` / `无` / `NO_TOKEN`)。**该 Spec 由另一执笔席同批起草, 本席未与其交叉核对** ⇒ 若其最终定稿的返回形态不是三态, §3 层 1/1.5/2 的分派条件须同批修订。**这是本轮最实的跨 Spec 风险。** (—— 2026-08-25 原始记述的结尾句; 该风险已闭环, 见本条段首)
 7. **§3 层 0 的字段行定位规则** —— 母 Spec §4 全文没有这一层 (它默认「字段行」是无歧义的)。本席在实跑中撞到假阳性后新增, 并用 SC-18 的三臂对照钉住。**它同时是一条跨 Spec 接缝**: 层 0 定位的是**行**, 姊妹 Spec 的抽取器定位的是**行内的 token** —— 两者若各自演化, 会出现「姊妹认这行、探针不认」或反之。**未与姊妹席对齐**, 与第 6 条同源。
+8. **(2026-08-30) §8 插入串改为可执行两行 + SC-20 + SKILL.md/execution-modes.md 的概述/权威版分工** (R5/C1, M3) —— 新的指令面形态; 请 R6 看: 两行串在围栏内是否仍能被 SC-17 的「恰 2 次」正确计数 (前缀保留), 以及 `--own-spec-dir` / `--repo-path` 两个新 CLI 入参是否与 §7 的 `own_spec_dir` 输出自洽。
+9. **(2026-08-30) 哨兵集合 `{none, 无}` + `"none_sentinel"` 改名 + 层 0 两拼写** (姊妹 6i / O-2 的镜像) —— 跨 Spec 接缝, 请 R6 核三份一致; SC-19 常量黑名单与姊妹 §2 集合**同源**这条同步义务是新的。
+10. **(2026-08-30) `resolve_enforced_remotes` 经 `state-scanner/scripts` 路径 import** —— **R6/BA 席已在 /tmp 实测: 顺序敏感** (`scripts/lib` 与 `lib` 同名, 今天就存在), 已钉死为 §3 唯一代码块 + SC-21; 不再是「未实测」。
 
 ---
 
@@ -551,7 +572,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 **已裁事实与待裁事项**:
 
-1. **本 Spec 是一份新文件, 从未进过任何闸门。** 母 Spec 的 post_spec R1/R2 审的是母文件, **不为本文件背书** —— 本 Spec 的内容虽承接自母 Spec §4, 但 §3/§4/§7 三节是本轮**新写**的 (谓词字符级定义 / 默认分支取法 / stdout 契约在母 Spec 全文都不存在, 这正是 M-1/M-5/M-17 三条 finding 的内容) ⇒ 新表面必须独立过闸门, 不得以「母 Spec 已审过 §4」为由降级。
+1. **本 Spec 是一份新文件**, 母 Spec 的 R1/R2 **不为本文件背书**。自 2026-08-25 起随母 Spec **联审**: 母 R3 = 本文件 R1, 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **Rule #6 处置见 rule6_note**: 三条要件逐条落, 兜底不触发的前提是 A.2 真的建成 `ab-suite/audit-engine.json`; **若建不成, 不得自判豁免, 须显式上呈 owner**。
-3. **待 owner 裁定 (1 项)**: **P11 的扫描范围复议** —— 本轮实测推翻了「只扫默认分支」的成本前提 (边际代价约 0.15s/轮, 且它正好补上盲区 B1)。**本 Spec 已按缩 scope 裁定执行, 不自行扩展**; 该项按 memory `narrow-owner-options` 留痕上呈, 由 owner 决定是否纳入。
-4. **不预判 R1 的裁决结果。** 本 Spec 在 post_spec 通过并经 owner 批准前不进 A.2/A.3。
+3. **待 owner 裁定 (2 项)**: (a) **P11 的扫描范围复议** —— 本轮实测推翻了「只扫默认分支」的成本前提 (边际代价约 0.15s/轮, 且它正好补上盲区 B1)。**本 Spec 已按缩 scope 裁定执行, 不自行扩展**; 该项按 memory `narrow-owner-options` 留痕上呈, 由 owner 决定是否纳入; (b) **对姊妹纯函数的依赖方向 (R6 接缝 C2)** —— (i) 声明 `lib/linked_issue_field.py` 为本 Spec **硬前置**; (ii) 保留「可先 ship」但该模块不存在时 `verdict="not_established"` + `reason="extractor_unavailable"` (import 失败 fail-soft), SC-1~15 宿主标「须在该模块存在时运行, 否则 skip」。§1 依赖方向第 3 条、§3「姊妹未 ship 时的行为」段与姊妹 O-4 **待裁定后同批改**; 执笔倾向 (i)。
+4. **不预判 R6 的裁决结果。** 本 Spec 在 post_spec 通过并经 owner 批准前不进 A.2/A.3。

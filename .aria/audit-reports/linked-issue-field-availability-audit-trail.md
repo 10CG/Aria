@@ -53,3 +53,45 @@
 
 ---
 
+
+
+---
+
+## 2. 2026-08-30 round-3 落版清单 (owner 6i + O-2; R5/C1, M1, M2, m1; K8 → SC-9), append-only
+
+> 裁定见决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`。原文由 git 历史保留 (`git log -p -- openspec/changes/linked-issue-field-availability/proposal.md`), 本节只记「改了什么、为什么」, 不复制原文。
+
+| 落点 | 改动 | 来源 |
+|---|---|---|
+| Status 行 / 头部 `Linked Issue: none` | 轮次口径 (随母联审 R3–R5 = 本文件 R1–R3; 待 R6) + dogfood 改英文 canonical | 决策单 3b / 6i |
+| §1 Usage Note / 模板行 | 字段行改 `> **Linked Issue**:`; Usage Note 教 `none`; 写入侧只教 canonical | O-2 / 6i |
+| §1 表「角色」「关系实证」+ 新 🔴 R5/C1 块 | `:429` 不构成委托 (纯链接清单); 预览骨架 `:127-162` 已与 SOT 漂移两处, 是 AI 真正照抄的对象 ⇒ Impact hunk B + SC-7a | R5/C1, M1 |
+| §2 | 哨兵集合 `{none, 无}` 定义 (canonical `none` 大小写折叠 / alias `无` 逐字节 / 集合封闭); NEW-01 措辞改「哨兵」 | 6i |
+| E0 谓词 1 | 两拼写集合 `Linked Issue` / `关联 Issue`, 封闭 | O-2 |
+| E5 | 哨兵分支改集合; `N/A`/`TBD` 落 `BAD_TOKEN` 并提示 | 6i |
+| K8 表 + 判据 + **E6 机械宿主 `--emit-arg`** | E6 由探针第二模式承载 ⇒ SC-9 成代码类 (D17 ②) | R4/K8 + 母 D17 |
+| 四态表 / 术语对齐表 / §4 骨架 description·fix / §5 表 | 措辞随哨兵与字段名同步; `"wu_empty"` → `"none_sentinel"` | 6i / O-2 |
+| D9 | 改判: canonical 英文 + alias 中文; 原论证「第二谓词面」的对错各半 | O-2 |
+| rule6_note | 新增 hunk B 行 (预览骨架, 照跑档) + eval id 2 expectations 同批更新 + 照跑前提 `ARIA_COORDINATION_NO_PUSH=1` | R5/C1, M2; 决策单 4i |
+| 验证宿主表 + SC-1 (六夹具) / SC-4 (六分支) / SC-6 / SC-7 / **SC-7a** / **SC-9** | 集合封闭的负控臂; SC-7a 引母 D17 ① (块边界 = 预览围栏); SC-9 入表 | R5/C1; R4/K8 |
+| 非目标 | 「不改 state-scanner 任何一行代码」改为「不改既有代码」(与 Impact 两个新建文件自相矛盾, `fixes-contradict`); CJK-only 条改为集合封闭条 | 2026-08-30 自查 |
+| Impact | SOT 模板行 / spec-drafter 两 hunk + 归属句 (m1) / 探针 `--emit-arg` / AB eval 2 | R5/C1, M2, m1 |
+| 新表面 #7–#9 / 闸门状态 / O-2 行 | 给 R6 的输入; O-2 标已裁 | — |
+
+---
+
+## 3. 2026-08-30 post_spec R6 清账清单 (round-3.1), append-only
+
+> 聚合与逐条处置见 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+
+| 落点 | 改动 | 来源 |
+|---|---|---|
+| 头部代码落点 | 补 `lib/linked_issue_field.py` 与 `.aria/linked-issue-field-grandfathered.txt` 两个新建文件 | CR 字段 M1 |
+| §Why | `:88` → `cc1bdef:75` (稳定锚点); `:65/:86` → 当前树 `:95/:116`; 新增「两拼写谓词」注 (单拼写今天 15/15, 两拼写 17/19 = 冻结数字) | QA M1 / CR M5 / TL M6 |
+| §1 hunk B 落版段 / Impact spec-drafter 行 / SC-7a | 预览骨架默认值由哨兵 `none` 改为 SOT 同串 placeholder `{<org>/<repo>#<n>}`; SC-7a 加负控 (值不得是哨兵) 并注明只落 D17 ① | TL C6 / TL 字段 M9 |
+| E5 | 哨兵判定对象 = E3 未加工 token 串 (非 E4 已 strip 元素); SC-4 期望/怎么会红补 (f) 的坏实现 | QA M2 |
+| §4 判据表 / SC-5 / 宿主表 | 六臂统一; 新增「`--grandfathered` 缺省或文件不存在 ⇒ 空集照常判定」行 | CR 字段 M2 |
+| Impact 探针行 / 新表面 #8 / §非目标 | `--emit-arg` 的归属: 模板行归母 Spec Impact, 本 Spec 只负责模式存在、不编辑母 hunk | CR 接缝 C1 / TL C5 |
+| §5 作用域表 | 母 Spec 行改真 token `10CG/Aria#174`; 探针行失效引文订正; 「三者均哨兵」句纠正 | KM m2 / TL m5 |
+| 杂项 | 「请 R4 优先审」×2 → 「请审计席优先审 (R4–R6 已审)」; 「共 10 条 check」加当日观测注 | CR m / TL m |
+| 闸门状态 | 新增 **O-4** (探针依赖方向, 待 owner) 与 **O-5** (字段名大小写折叠, 待 owner) | CR 接缝 C2 / QA M3 |
