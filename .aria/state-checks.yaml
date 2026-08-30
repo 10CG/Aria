@@ -314,3 +314,30 @@ checks:
       的 POINTS 清单 (清单即覆盖面)。
     timeout_seconds: 5
     enabled: true
+
+  # --- Aria 应用级 Forgejo token 活性 + 指纹漂移 (台账 .aria/pat-inventory.yaml) ---
+  - name: "forgejo-app-token-liveness"
+    description: |
+      对 `.aria/pat-inventory.yaml` 里 liveness.enabled 的每枚应用级 token (Layer 1 / Layer 2
+      的 FORGEJO_BOT_PAT): 从 Nomad 变量取值 (进程内, 不落盘不打印) → 指纹与台账比对 →
+      用它 GET Forgejo 内网端点看 http code。
+      立案 (2026-08-29/30): `nomad/jobs/aria-layer2-runner.FORGEJO_BOT_PAT` 躺着一枚 Forgejo
+      早已不认的 token (401 uid 0), 最可能是 2026-05-23 吊销 token 时没枚举 Nomad store 留下的,
+      三个月无人察觉 —— Aria 侧此前没有任何东西在问「变量里那枚 token 还能登录吗」。
+      归属: owner 2026-08-30 裁定应用级 token 归 Aria (账号/规则/集群级 token 归 Aether,
+      实例归 10cg.local), 台账头注有全文。
+      判据全分割: Nomad 不可达 / 台账缺失 → SKIP (exit 0 + SKIP 首行, 可见); 任一枚 401 /
+      缺键 / 指纹漂移 / 403 / 其他 → FAIL; 全部 200 且指纹一致 → PASS。
+      Rule #7: 输出只有 id / http code / 指纹 8 位 / 判定, 无 token 值。
+    command: |
+      python3 .aria/probes/forgejo-app-token-liveness.py
+    severity: warning
+    fix: |
+      DEAD (401): 按台账该条 reissue_plan 重签 (10cg-ci-bot 名下, scope 按 scope_required),
+      经 write_path (`aether env set --job <job> FORGEJO_BOT_PAT <new>`, CAS 单键写) 写入,
+      再更新台账 fingerprint / forgejo_token_name / issued_at / status。凭据动作归 owner。
+      指纹漂移: 有人换了变量值没改台账 (或反之) —— 先核哪边是真, 再补台账; 台账不是装饰。
+      SCOPE (403): 端点是按该 token 应有 scope 选的, 403 = scope 被收窄, 查 Forgejo 侧 token 设置。
+      NET / SKIP: 先看 Nomad (192.168.69.70:4646) / Forgejo 内网 (192.168.69.200:3000) 可达性。
+    timeout_seconds: 20
+    enabled: true
