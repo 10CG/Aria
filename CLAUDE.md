@@ -136,9 +136,9 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
   - 遥测 spec aria-2.0-m6-cost-model-telemetry — Track-1 实施完成
     (feature/m6-cost-model-telemetry, 合并 gate input-delivery); 168h AC-6 可评分须其独立 ship
   M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
-  aria-plugin 方法论轨: v1.52.0–v1.67.1 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
+  aria-plugin 方法论轨: v1.52.0–v1.67.2 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
     残余 deferred 挂 Aria #168; 并发 in-flight track 见 docs/handoff/latest.md
-版本: 插件 aria-plugin v1.67.1 | 主项目 v1.7.5 | 运行时 aria-orchestrator v2.0.0 (86bb684)
+版本: 插件 aria-plugin v1.67.2 | 主项目 v1.7.5 | 运行时 aria-orchestrator v2.0.0 (86bb684)
   Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
