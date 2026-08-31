@@ -1,0 +1,621 @@
+# Detailed Tasks — sibling-spec-probe (per-round 竞品 spec 探针)
+# Phase A.2 + A.3 output (task-planner v2.0). Datasource: tasks.md (path A, dual-layer).
+# Spec: openspec/changes/sibling-spec-probe/{proposal.md,tasks.md}
+# Scope repos (all paths verified against these HEADs on 2026-08-30):
+#   Aria (main)  @ c120f9e   — spec files, aria-plugin-benchmarks/ab-suite/
+#   aria         @ d69091d   — v1.67.2; code host skills/audit-engine/ + import targets skills/state-scanner/
+#   standards    @ 334c609   — read-only reference (proposal-minimal.md placeholder source, owned by sister Spec)
+# Line anchors in deliverables comments are from the LIVE tree (aria d69091d), not the proposal baseline (d50f9c3);
+# recheck result: every anchor cited by the proposal is byte-identical at d69091d (see metadata.line_anchor_recheck).
+
+metadata:
+  feature: sibling-spec-probe
+  title: "per-round 竞品 spec 探针 (audit-engine advisory, 不阻断)"
+  level: 2
+  datasource: "tasks.md"
+  spec: openspec/changes/sibling-spec-probe/proposal.md
+  created: 2026-08-30T14:52:00+00:00
+  updated: 2026-08-30T15:43:00+00:00
+  scope_repo: "aria (submodule) + Aria (main, ab-suite only)"
+  scope_repo_head: "aria d69091d (v1.67.2) / Aria c120f9e / standards 334c609"
+  decision_source: ".aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md"
+  total_tasks: 18
+  task_groups: 5
+  estimated_hours: "55-87"
+  status: "A.2/A.3 complete — post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; all tasks pending, ready for B.1 (硬前置: 字段 Spec 先 ship)"
+  new_agents_required: false
+  agent_roster: [tech-lead, qa-engineer, backend-architect, knowledge-manager]
+  estimation_note: >
+    Complexity S/M/L per COMPLEXITY_GUIDE (file-impact + dependency count + keyword; 不确定时高估一级).
+    estimated_hours 用 SOT 区间 (DUAL_LAYER_SPEC: S "1-2" / M "3-5" / L "6-8", 与母 Spec 一致; R1 C9);
+    canonical effort axis is token-based (ai-native-estimator, collected at phase-d-closer), not re-derived here.
+  ordering_note: >
+    硬前置断言 (1.1) → 基线三态 (1.2) → AB 套件文件 (1.3, B.1 前置 per proposal :473) → TDD RED (2.x)
+    → 实现 GREEN (3.x) → audit-engine 指令面接线 (4.x, 使 2.6 转绿) → Rule #6 双臂实跑 (5.1) → 发布同步 (5.2).
+    tasks.md 编号 ≠ 执行顺序; 执行顺序以 dependencies 拓扑为准 (见 execution_order).
+    同文件任务一律串行 (R1 C1; memory workflow-file-domain): 2.2→2.3→2.4→2.5→2.6 共写 tests/test_sibling_spec_probe.py,
+    3.1→3.2→3.3→3.4 共写 scripts/sibling_spec_probe.py, 边已落 dependencies; 不得派给独立并发 subagent.
+  phase_b1_preconditions:
+    - "TASK-001 done: aria/skills/state-scanner/lib/linked_issue_field.py 存在且导出 extract_linked_issue_field (owner O-4 (i) 硬前置; 缺席 ⇒ 本 Spec 不进 B.2, 不得自建替身)。上游边: TASK-004 / 005 / 006 / 007 / 008 / 009 的 dependencies 各含 TASK-001 (R1 C1 第 3 条)"
+    - "TASK-003 done: aria-plugin-benchmarks/ab-suite/audit-engine.json 存在, 含 α/β 两 eval (proposal :473 逐字「该任务未 done 则 Phase B.1 不得开始」; 建不成 ⇒ 上呈 owner, 不自判豁免)。上游边: TASK-004 (第 2 组起点, proposal :473 逐字, 主控 R1 追记) 与 TASK-015 / 016 (指令面接线) / TASK-017 (AB 实跑) 的 dependencies 各含 TASK-003 (R1 C1 第 3 条)"
+  ab_suite_seam_rules:
+    - "任何改 aria-plugin-benchmarks/ab-suite/*.json 的任务同批改 ab-suite/version.yaml; 计数按实际文件程序化重算 (`ls ab-suite/*.json | wc -l`; evals 数用 python 遍历各 json 的 evals 长度求和), 不写字面量 (R1 C5 / A1 6698004d)"
+    - "spec-drafter.json eval id 分配约定 (三份同族 Spec 同写): 新 eval id = 该文件当时 max(id)+1, ship 时读取, 不硬编码; 字段 Spec 先 ship 取到 3, 母 Spec 后 ship 顺延。本 Spec 不写 spec-drafter.json (只新建 audit-engine.json, id 从 1 起), 本条为接缝知会 (R1 C5 / A1 35dad35d)"
+  dependency_invariants_checked: "2026-08-30 R1 清账后程序化核验 (a) 同文件对全部有边 (b) 无环 (c) RED 不依赖 GREEN (d) 前置边到位 (e) execution_order 无同文件并行 — 脚本与输出见 tasks.md「机械核验」段"
+  external_dependencies:
+    - spec: linked-issue-field-availability
+      status: "硬前置, owner 2026-08-30 O-4 (i) / R6-1 (i); 今天 (aria d69091d) 该模块不存在 (ls 实测)"
+      module: aria/skills/state-scanner/lib/linked_issue_field.py
+      import_path: "from lib.linked_issue_field import extract_linked_issue_field   # 经 sys.path 插 state-scanner skill root (§3 唯一代码块)"
+      interface_expected:
+        signature: "extract_linked_issue_field(text: str) -> FieldVerdict   # 输入是全文文本 blob, 不是路径 (探针在远端 ref 的 blob 上调用)"
+        verdict_enum: ["NO_FIELD", "NO_TOKEN", "BAD_TOKEN", "OK"]
+        fields: ["verdict", "token_str", "token_elements", "line_no"]
+        token_str: "姊妹 E3 未 strip 的 code span 原串 (哨兵判定吃它, 不吃 token_elements)"
+        token_elements: "姊妹 E4 按 ASCII ',' split + 各段 strip 后的列表 = 全部元素 (含不可解析者); 坏元素的**点名**由字段 Spec 的 additive 字段 `bad_elements` 承担, 本探针不消费它 —— 层 1 的原串键由本探针自行对每元素跑 normalize_linked_issue 得出 (R1 A1 af9f0c47: 原句「BAD_TOKEN 时须能点名坏元素」对该字段提了姊妹未承诺的义务, 已改)"
+        line_no: "字段行行号 (探针据此定位层 2 的 URL 回落行并写入 hits[].field_line); 1-based, 与 text.splitlines() 索引 +1 对应; NO_FIELD 时 None —— 姊妹 proposal 未成文, 但姊妹轨 A.2 产物 (linked-issue-field-availability/detailed-tasks.yaml:47, 并发轨、未经 post_planning) 已钉同义; TASK-001 以实物核对"
+        token_str_nullability: "姊妹 A.2 钉 `str | None` (NO_FIELD / NO_TOKEN 时 None); token_elements 为 tuple, 无 token 时 (); 另有 additive 字段 bad_elements — 探针只消费 proposal 钉的四个字段名"
+        optional_exports: "姊妹 A.2 另导出 `is_sentinel(token_str) -> bool` (§2 哨兵集合唯一宿主) 与 `emit_arg(fv) -> str` (E6, 本探针不用); 探针优先 import is_sentinel 而非自写哨兵谓词 (a2_discretions (i))"
+        stdlib_only: true
+      seams_pinned_by_this_spec:
+        - "层 0 三谓词 (行首 depth-1 两拼写 / 围栏排除 / 文档序第一条) 全部经该函数, 本 Spec 一条不复制 (P4)"
+        - "哨兵集合 {none (ASCII 折叠), 无 (逐字节)} 定义在姊妹 §2; 探针 SC-19 常量黑名单与姊妹 §3 模板 placeholder `{<org>/<repo>#<n>}` 同源, 任一改动同批改另一侧"
+        - "本探针永不产生 --linked-issue 实参 (姊妹 E6 / --emit-arg 的面); 层 2 URL 回落只用于只读比对"
+    - spec: linked-issue-normalization
+      status: "已 ship v1.67.0 (archive/2026-08-23-linked-issue-normalization)"
+      module: aria/skills/state-scanner/lib/collision.py
+      import_path: "from lib.collision import normalize_linked_issue   # :178, 签名 (value: str) -> Optional[tuple[str, int]]; None 回落原串相等"
+    - spec: state-scanner-stale-refs-false-parity (已 ship)
+      module: aria/skills/state-scanner/scripts/collectors/multi_remote.py
+      import_path: "from collectors.multi_remote import resolve_enforced_remotes   # :255, (configured, actual_remotes, read_only) -> (enforced, no_matching); [] 或 None ⇒ auto-discover"
+  exports_for_siblings:
+    consumer: a1-entry-claim-duplicate-work-guard (母 Spec §6 缺口表「legacy 轨 / 已 ship 并归档」两行由本 Spec 覆盖; ship 前无覆盖)
+    cli: 'python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py" --own-spec-dir <spec-dir-name> --repo-path <repo-root>'
+    stdout_keys: [schema_version, probe, status, reason, verdict, own_spec_dir, own_layer, own_keys, remotes, hits, caps_applied, elapsed_ms]
+    verdict_enum: [sibling_found, no_sibling_found, not_established]
+    status_enum: [ok, degraded, skipped]
+    reason_enum: [no_enforced_remote, remote_unresolved, fetch_failed, cap_applied, own_token_absent]
+    own_layer_enum: [canonical, none_sentinel, url_fallback, no_token_no_url, no_field, bad_token_union]
+    exit_codes: "0 = 有定义的判定 (命中/不命中/degraded/skipped 均 0); 非 0 = 仅探针自身失败 (参数错 / 内部异常 / 仓库不可读), 此时 stdout 不保证 JSON"
+    consumer_obligation: "exit != 0 或 stdout 非 JSON 或 schema_version 未知 ⇒ 一律按 not_established (「未能核实」) 处置; 不阻断任何轮次"
+  line_anchor_recheck:
+    - "audit-engine/SKILL.md: `### Step 0: Anchor 固化` :83 / 「Round 1 启动前一次性」:85 / 「权威可执行版见 references/…」:237 / `## 相关文档` :412 / 最后更新 :421 — 与 proposal 一致"
+    - "audit-engine/references/execution-modes.md: `## Convergence 模式` :84 / `Round N:` :89 / `1. 调用 agent-team-audit 单轮引擎` :90 / `## Challenge 模式` :113 / `Round N (一个完整周期):` :118 / `Step 1: 讨论组 spawn` :119 / EOF :144 — 一致"
+    - "audit-engine/references/report-format.md: `## 轮次记录` :50 … `### Round N (Final)` :66-71 — 一致"
+    - "config-loader/DEFAULTS.json adaptive_rules level_3=challenge :124-128 — 一致"
+    - "state-scanner/lib/collision.py normalize_linked_issue :178 (:46 `from .claim_schema import`) — 一致; state-scanner/scripts/collectors/multi_remote.py resolve_enforced_remotes :255, 生产取 read_only_remotes :1376 — 一致"
+    - "phase-d-closer/scripts/fetch_gate.py: `_ORIGIN_HEAD_REFS` :50-54 / `_DEFAULT_BRANCH_FALLBACKS` :55 / `_classify_error` :86-101 / `_resolve_default_branch` :108-128 (docstring :111-112) — 一致"
+    - "session-closer/scripts/handoff_autofill.py :48-51 (collectors) / :403-407 (lib.identity) — 一致; state-scanner/scripts/coordination_probe.py 同名包注释 :80-85 — 一致"
+    - "state-scanner/scripts/collectors/handoff_multibranch.py cap 披露 :589-598 / remote_refresh.py :568 & :691 / scan.py :312 — 一致"
+    - "skills/run_all_tests.sh: find tests :48 / skip 无 test_*.py :50 / unittest discover :71 (pytest 缺席 SKIP :62-66) — 一致"
+    - "ab-suite/: 31 个 .json, 无 audit-engine.json; version.yaml = 1.1.0 / skills_covered 29 / total_eval_cases 58 (proposal 未提 version.yaml)"
+    - "语料: proposal 147 篇 @ 主仓 cc1bdef (git ls-tree 复核 = 147); 主仓 HEAD c120f9e = 149 (changes 9 + archive 140) — 已知漂移, SC-18 钉 cc1bdef"
+    - "git 远端状态 (非断言, 仅观测; 随环境/容器变, 不作任何 SC 的前提 — SC-12/SC-14 用注入 runner 夹具): A.2 席 2026-08-30 于主仓工作树观测 = {github, origin} + 陈旧 refs/remotes/probe + refs/aria/ 3 条 + github 无本地 symbolic-ref; R1/A2 席复测 (`git -C aria …`, 即 aria 子模块) 零命中 ⇒ 两者仓不同, 均非可迁移事实。R1 清账席 2026-08-30T15:40Z 于主仓 /home/dev/Aria 亲跑: `git remote` = github, origin; `git for-each-ref refs/remotes/probe` = 1 条 (refs/remotes/probe/master f44a324), `git config --get remote.probe.url` exit 1; `git for-each-ref refs/aria/` = 3 条 (coord-check / coordination / coordination-remote); `git ls-remote --symref origin HEAD` 与 `… github HEAD` 均首行 `ref: refs/heads/master\tHEAD`; `git symbolic-ref refs/remotes/github/HEAD` exit 128, `… origin/HEAD` = refs/remotes/origin/master。B 期 TASK-002 开工时重跑并覆写本条 (R1 C8 / A2 f3265bfe)"
+    - "forgejo: aria-plugin#150 open (套件缺口 14/43) / #157 open (同族) — 存在, 不新开"
+  a2_discretions:
+    - "(a) 本轨 proposal 从工作树 <repo>/openspec/changes/<own-spec-dir>/proposal.md 读 (Spec 未明写来源; §2「本轨工作树不参与」指的是被扫语料); 目录/文件缺失 ⇒ 参数错 ⇒ 非 0 exit (§7 非 0 三类之「参数错」), 有文件但无字段 ⇒ own_keys=[] + reason=own_token_absent"
+    - "(b) error_kind 枚举 = `_classify_error` 五值 {network, auth_403, non_ff, git_missing, other} + 本探针新增 {timeout, no_symref, bad_symref_prefix} (§4 步骤 3 的「超时 / 无 ref: 行 / 前缀不符」三态无 git stderr 可分类, 需自有值); 集合封闭, 写进 execution-modes.md 契约节"
+    - "(c) ls-remote --symref 腿不重试 (Spec §5(d) 只给 fetch 腿「最多 2 次」); 超时/失败直接 fail-closed"
+    - "(d) config 读取: state_scanner.multi_remote.{enforced_remotes,read_only_remotes}; skill 级 null/缺席 ⇒ 继承顶层 multi_remote.* (镜像 multi_remote.py:_resolve_remote_policy, phase-c-integrator §C.2.5 step 3 契约; Spec 只点名 skill 级键, 不继承会与生产路径 :1376 得出不同 remote 集合 = 第二计算点)。不 import 私有 `_load_config`, 复制的是两键继承规则 (≤10 行), 不是函数"
+    - "(e) 消费面「检测到 N 份」的 N = 去重后的 spec_dir 数; hits[] 本身按 (remote, corpus, spec_dir) 逐项列 (同一 Spec 在 origin/github 两镜像各一项, 设计如此)"
+    - "(f) 语料 blob 读取: `git -C <repo> cat-file --batch` 或逐文件 `git show <ref>:<path>`, 实现者择一; 均不读工作树; 每子进程 timeout=30"
+    - "(g) 测试文件单文件 (Impact 表只列一个); 夹具以字符串字面量内嵌 (逐字原文), 唯 SC-18 三臂读主仓 cc1bdef 树 (跨仓 ⇒ 不可达 skip)"
+    - "(h) 1.3 (套件文件) 与 5.1 (双臂实跑) 拆分 —— 见 tasks.md 待 owner #2"
+    - "(i) 哨兵谓词: 若姊妹模块导出 `is_sentinel` (其 A.2 已钉), 探针在 §3 唯一 import 块内追加 `is_sentinel` 一并 import (同模块、同块), 不自写第二份「逐字节 无 / ASCII 折叠 none」谓词 (姊妹 §2「集合由本条定义, 全仓引用本条」; 自写 = 第二定义点, 会漂); 若未导出 ⇒ 探针自写并在模块顶部注释同源义务。与 proposal §3「三条 import」字面的关系 (追加第四个符号是否违反「只在这一个代码块」) 请 post_planning 复核 —— A.2 判为不违反 (约束对象是位置唯一, 非符号数)。**R1 复核结论 (2026-08-30)**: A1 1246445b / A4 948363d3 / A5 4f76bc57 三席独立均判**不违反** (位置唯一性约束, 非符号计数); TASK-010 verification 的「三条 / 三符号」字面已改为『包含』口径 (R1 Minors)"
+
+# ---------------------------------------------------------------------------
+# Group 1 — 前置断言 + B.1 门
+# ---------------------------------------------------------------------------
+tasks:
+  - id: TASK-001
+    parent: "1.1"
+    task_group: G1
+    title: "前置断言: 姊妹纯函数 lib/linked_issue_field.py 已存在且导出所需接口 (缺席 ⇒ 阻塞, 不建替身)"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    agent: tech-lead
+    reason: "跨 Spec 接缝核验 (谁实现 / 谁导出 / 谁引用, memory split-makes-seams); 结论决定本 Spec 能否进 B.2, 属协调判断非单系统实现"
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/lib/linked_issue_field.py            # 由姊妹 Spec 交付; 本 Spec 只核验, 零改动 (今天不存在)
+      - openspec/changes/sibling-spec-probe/detailed-tasks.yaml         # 本任务 notes 回填核对结果 (line_no 语义 / BAD_TOKEN 点名字段)
+    verification:
+      - "`test -f aria/skills/state-scanner/lib/linked_issue_field.py` 为真; 否则本任务 status=blocked, 本 Spec 不进 B.2, 且不得在 audit-engine 内写任何 E0–E6 替身 (proposal §1 第 3 条 / §3 ⛔ 不得内含第二份抽取实现)"
+      - "在 aria 子模块根以 §3 唯一代码块的 sys.path 顺序 (先插 state-scanner/scripts, 后插 state-scanner ⇒ root 在最前) 执行 `from lib.linked_issue_field import extract_linked_issue_field` 成功, 且 `extract_linked_issue_field('x').verdict == 'NO_FIELD'`"
+      - "接口逐项核对并记录: verdict ∈ {NO_FIELD, NO_TOKEN, BAD_TOKEN, OK}; 返回对象有 verdict / token_str / token_elements / line_no 四字段; token_str 为未 strip 原串 (对 '> **Linked Issue**: `none `\\n' 得 token_str == 'none ' 且 verdict == BAD_TOKEN); line_no 实测为 1-based 且 NO_FIELD 时 None (姊妹 A.2 钉法), 写入 metadata.external_dependencies"
+      - "可选导出核对: `from lib.linked_issue_field import is_sentinel` 是否成功 (姊妹 A.2 承诺导出); 成功 ⇒ TASK-011 走 a2_discretions (i) 的 import 路径, 失败 ⇒ 自写 + 同源注释; 结果记入本任务 notes"
+      - "姊妹四态定义与 proposal §3 层分派表逐格一致 (无第五态); 若姊妹最终形态与 metadata.external_dependencies.interface_expected 任一项不符 ⇒ 记录差异并上呈 (§3: 姊妹改四态定义 ⇒ 本节映射表须同批改), 不自行改映射"
+    notes: >
+      owner 2026-08-30 (R6 后) 裁 (i): 字段纯函数 = 探针硬前置, ship 顺序 = 姊妹先、本 Spec 后。
+      A.2 当日 (aria d69091d) 实测该文件不存在 ⇒ 本任务在姊妹 ship 前恒 blocked。
+      「有函数产生它」才写代码类 SC (memory no-code-host-no-assertion): 层 0 定位没有该模块就没有宿主。
+
+  - id: TASK-002
+    parent: "1.2"
+    task_group: G1
+    title: "基线三态记录: audit-engine 现状 + 锚点复核 + SC-17/20/21 基线必红亲跑"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    agent: qa-engineer
+    reason: "验证面基线建立 (memory check-runs-at-baseline-first: 新机械检查先在基线亲跑三态再写进规格)"
+    dependencies: []
+    deliverables:
+      - aria/skills/audit-engine/                                        # 现状: SKILL.md (421 行) + references/ 7 文件; 无 scripts/ tests/ lib/ collectors/
+      - aria/skills/audit-engine/SKILL.md                                # 锚点 :83 Step 0 / :85 一次性 / :121 数据 Schema / :237 权威可执行版 / :412 相关文档 / :421 最后更新
+      - aria/skills/audit-engine/references/execution-modes.md          # :84 Convergence / :89-90 / :113 Challenge / :118-119; 144 行
+      - aria/skills/audit-engine/references/report-format.md            # :50 轮次记录 / :52-71 Round 模板
+      - aria/skills/config-loader/DEFAULTS.json                          # :124-128 adaptive_rules level_3=challenge
+      - aria-plugin-benchmarks/ab-suite/                                  # 31 个 .json, 无 audit-engine.json; version.yaml 1.1.0
+    verification:
+      - "`ls aria/skills/audit-engine/` 恰为 {SKILL.md, references}; `test ! -d aria/skills/audit-engine/lib && test ! -d aria/skills/audit-engine/collectors && test ! -d aria/skills/audit-engine/scripts && test ! -d aria/skills/audit-engine/tests` 全真 (基线)"
+      - "`grep -c '每轮入口: 竞品 spec 探针' aria/skills/audit-engine/references/execution-modes.md` == 0; `grep -Ec '^#{2,4}[ \\t]+per-round 入口探针' aria/skills/audit-engine/SKILL.md` == 0; `grep -c '^## 竞品 spec 探针 (per-round 入口)' aria/skills/audit-engine/references/execution-modes.md` == 0 (SC-17 / SC-20 基线红)"
+      - "`ls aria-plugin-benchmarks/ab-suite/*.json | wc -l` == 当日实测值 (记录进 notes; A.2 观测 31, 重跑以实测为准, 不钉字面) 且 `test ! -f aria-plugin-benchmarks/ab-suite/audit-engine.json` (rule6_note 结构性事实)"
+      - "上述 :83/:85/:237/:84/:89/:90/:113/:118/:119/:50-71/:124-128 逐条 `sed -n` 复核, 与 metadata.line_anchor_recheck 一致; 任一漂移 ⇒ 更新 4.x 任务 deliverables 注释 (不改 proposal)"
+      - "三态记录写入本任务 notes (基线 / 目标 / 坏实现各一行), 供 2.6 的 docstring 引用"
+    notes: >
+      A.2 已做一次完整复核 (metadata.line_anchor_recheck 全部一致); 本任务在 B 期开工时重跑一次
+      (memory feedback_concurrent_duplicate_audit_fetch_before_start: 每次实质动作前 fetch + 复核).
+
+  - id: TASK-003
+    parent: "1.3"
+    task_group: G1
+    title: "建 ab-suite/audit-engine.json (经 /skill-creator; α/β 两 eval, 其一即 SC-16) + version.yaml MINOR 升版 — B.1 前置"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: qa-engineer
+    reason: "eval case 设计 = 测试策略 (AGENT_MAPPING qa-engineer: test / quality / verify); 双臂可辨性是可证伪性设计"
+    dependencies: [TASK-002]   # 主控 R1 清账追加: TASK-002 断言「无 audit-engine.json」须先于本任务建文件 (隐性时序显式化)
+    deliverables:
+      - aria-plugin-benchmarks/ab-suite/audit-engine.json                # (新建) 格式照 ab-suite/spec-drafter.json (skill_name / version / evals[{id,name,prompt,expected_output,expectations}])
+      - aria-plugin-benchmarks/ab-suite/version.yaml                     # version 升 MINOR; skills_covered / total_eval_cases 按实际文件程序化重算后写 (当前值 + 新增数, 不写字面量; metadata.ab_suite_seam_rules); changelog 追加 (手册 :176-197「修改任何 eval case → 升 MINOR」)
+    verification:
+      - "rule6_note 第 2 条: `test -f aria-plugin-benchmarks/ab-suite/audit-engine.json` 且 `python3 -c \"import json;d=json.load(open('aria-plugin-benchmarks/ab-suite/audit-engine.json'));assert d['skill_name']=='audit-engine' and len(d['evals'])==2\"`"
+      - "eval α (点名行为 α): prompt ≥50 字, 场景 = 一次 convergence 审计的 Round 2 入口, 给定探针 stdout JSON (verdict=sibling_found, hits 含一项 corpus=archive); expectations 含「调用了 sibling_spec_probe.py 命令行 (--own-spec-dir / --repo-path)」「Round N 记录内渲染 🔴 且含『已完成的 Spec』标注」「不阻断本轮 / 不改 verdict」三条"
+      - "eval β (= SC-16, 点名行为 β): 三臂前提 (exit≠0 / stdout 非 JSON / verdict=not_established) 至少覆盖 not_established + exit≠0; expectations 字面含「渲染『未能核实』」「不得渲染『无竞品』」「不阻断该轮」"
+      - "两 eval prompt 显式声明产出形态 `descriptive` (手册 :161-174「产出形态钉死」; 探针输出作为给定前提, 不让评测 AI 实跑 fetch)"
+      - "产出经 /skill-creator 流程 (CLAUDE.md Rule #6 逐字「必须用 /skill-creator」; R4/S-2: 手工仿写 JSON 不满足) —— 留痕: commit message 或 handoff 记录 /skill-creator 调用与产出路径"
+      - "套件缺口 issue 引用: notes 引 `10CG/aria-plugin#150` (open, 实核) 与同族 `#157`; 不新开 issue"
+      - "version.yaml: version 升 MINOR, changelog 一条; skills_covered / total_eval_cases **按实际文件程序化重算**后更新 (`ls aria-plugin-benchmarks/ab-suite/*.json | wc -l` 为 skills_covered; `python3 -c` 遍历各 json 求 `len(evals)` 之和为 total_eval_cases), 不写字面量; 断言 = 落地后 `.json` 数 == 落地前实测数 + 1, 且 version.yaml 两计数 == 重算值 (R1 C5: 旧口径 29→30 / 58→60 与实测基线自相矛盾, 已废)"
+      - "Phase B.1 前置 (proposal :473): 本任务 status == done 是 B.1 分支创建的前置断言; 建不成 ⇒ 不自判豁免, 原样上呈 owner:「第 2 条缺失 ⇒ 兜底『缺一照跑』触发 ⇒ 兜底在无套件时结构上不可执行 (#150)」"
+    notes: >
+      「两 eval 在坏实现上必红」的实证只能由双臂实跑给出 (without 臂 = 基线 SKILL.md 即坏实现), 落 TASK-017;
+      本任务只钉文件建成 + 结构 + expectations 字面 (tasks.md 待 owner #2)。
+      手册 :76「28 个 ✅ 全量覆盖」/ :519「28 skills, 56 cases」与实测 31 / #150 的 14/43 三方不一致 —— 本 Spec 不修 (follow-up 并入 #150)。
+      spec-drafter.json 体例: expected_output 可为空串, expectations 为可判定断言列表。
+
+# ---------------------------------------------------------------------------
+# Group 2 — TDD (RED first): aria/skills/audit-engine/tests/test_sibling_spec_probe.py
+# ---------------------------------------------------------------------------
+  - id: TASK-004
+    parent: "2.1"
+    task_group: G2
+    title: "测试骨架 + 前置 skip 守卫 + SC-21 import 顺序断言 (含反序负控) + 结构断言 (无 lib/collectors)"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: qa-engineer
+    reason: "测试文件 (**/tests/**/*.py) + 负控设计"
+    dependencies: [TASK-001, TASK-002, TASK-003]   # 主控 R1 清账追加: proposal :473 逐字「Phase B.1 不得开始」⇒ 套件建成门落在第 2 组起点
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # (新建, 含 tests/ 目录) unittest 体例, 不 import pytest
+    verification:
+      - "文件顶部不含 `import pytest` / `from pytest` (run_all_tests.sh:44-45 会把它判成 pytest 套件, 环境无 pytest 时 :62-66 SKIP = 假绿); `bash aria/skills/run_all_tests.sh --list` (或等价 LIST_ONLY=1) 列出 `audit-engine (unittest)`"
+      - "模块级守卫: 姊妹模块不可 import ⇒ 整个 TestCase 集合 `unittest.skip('前置未 ship: lib/linked_issue_field.py 缺席')` 并打印原因 (proposal §1 第 3 条); 可 import ⇒ 不 skip"
+      - "SC-21 (正向): import 探针模块后 `Path(sys.modules['lib'].__file__).resolve()` 以 `state-scanner/lib/__init__.py` 结尾, 且 `from collectors.multi_remote import resolve_enforced_remotes` 成功, 且 `sys.modules['lib.collision'].__file__` 位于 state-scanner/lib/"
+      - "SC-21 (负控, 必有): 子进程 `python3 -c` 按反序插入 (`sys.path.insert(0, <state-scanner>)` 后再 `sys.path.insert(0, <state-scanner>/scripts)`, 使 scripts 在最前) 再 `import lib.collision` ⇒ 断言 returncode != 0 且 stderr 含 `ModuleNotFoundError` (memory ss-two-lib-pkgs: 反序静默绑到 scripts/lib)"
+      - "结构断言 (A.2 显式约束 :171): `not (AUDIT_ENGINE/'lib').exists()` 且 `not (AUDIT_ENGINE/'collectors').exists()`; `scripts/` 下除 `sibling_spec_probe.py` 与 `__init__.py` 外的每个 `.py` 文件名以 `sibling_spec_probe_` 起首"
+      - "它怎么会红: 探针今天不存在 ⇒ SC-21 正向断言 ImportError ⇒ 红 (基线红); 反序负控在任何环境都应 non-zero, 若为 0 说明同名包碰撞已消失, 负控本身失效须重审"
+    notes: >
+      测试目录被 run_all_tests.sh:48 `find -type d -name tests` 自动纳入, :50 要求目录内至少一个 test_*.py, :71 走 unittest discover。
+      不建 tests/__init__.py 也可 (discover -s . -p 'test_*.py'); 建了也无害。
+
+  - id: TASK-005
+    parent: "2.2"
+    task_group: G2
+    title: "谓词层测试 (纯函数): SC-7 / SC-8 / SC-9 / SC-10 / SC-11 / SC-19 + 键构造 + BAD_TOKEN 并集反例 A/B"
+    status: pending
+    complexity: L
+    estimated_hours: "6-8"
+    agent: qa-engineer
+    reason: "六条 SC 的对抗夹具设计 (好实现 + 坏实现), 依赖姊妹接口 + 归一函数两个外部契约"
+    dependencies: [TASK-001, TASK-004]                                  # 同文件串行链首 (R1 C1); TASK-001 = 硬前置边
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # 夹具以字符串字面量内嵌 (逐字原文)
+    verification:
+      - "SC-7: 夹具 = archive/2026-07-31-phase-c-gate-path-coverage-not-applicable/proposal.md:6 与 archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md:22 两行逐字原文 (各包成一份最小 proposal 文本) ⇒ 两者姊妹判 NO_TOKEN, 经层 2 均得键 ('k','aria-plugin',122) ⇒ 命中; 坏实现 (只实现层 1) 返回空集 ⇒ 红"
+      - "SC-8: 上述 :6 原文 (行内后段含 code span `confirmed` / `major` / `next-cycle`) ⇒ 姊妹判 NO_TOKEN, 探针键集合不含 ('r','confirmed'); 坏实现 (取行内第一个 code span) 得 ('r','confirmed') ⇒ 红"
+      - "SC-9: 三组 (无,无) / (none,none) / (none,无) 均不命中, 两份 layer == 'none_sentinel'; 坏实现 (哨兵当普通 token ⇒ 原串相等) 命中 ⇒ 红; 只认 `无` 的坏实现在 (none,none) 上命中 ⇒ 红"
+      - "SC-10: 两臂 (`> **关联 Issue**: \\`无\\` — 讨论见 https://forgejo.10cg.pub/10CG/aria-plugin/issues/122` 与 `> **Linked Issue**: \\`none\\` — see https://forgejo.10cg.pub/10CG/aria-plugin/issues/122`) 对 token `10CG/aria-plugin#122` 的另一份不命中, 哨兵那份 layer == 'none_sentinel' 而非 'url_fallback'; 坏实现 (回落条件 = 集合为空) 抽到 #122 ⇒ 命中 ⇒ 红"
+      - "SC-11: 一份哨兵 / 一份无字段行 ⇒ 集合都空但 layer 分别 'none_sentinel' / 'no_field'; 折叠成同一值的实现 ⇒ 红"
+      - "SC-19: 两份字段值均为 `{<org>/<repo>#<n>}` (姊妹判 BAD_TOKEN) ⇒ 不命中; 二者原串键集合均不含 ('r','{<org>/<repo>#<n>}'); own_layer == 'bad_token_union'; 坏实现 (照产原串键) 互相命中 ⇒ 红"
+      - "键构造: ('k',..) 与 ('r',..) 永不相等 (首元不同); normalize_linked_issue 返回 None 的 token 落原串键; 多元素各自成键 (集合含全部)"
+      - "BAD_TOKEN 并集: 反例 A `10CG/aria-plugin#122, TBD` ⇒ {('k','aria-plugin',122), ('r','TBD')}; 反例 B `TBD` + 行内 URL #122 ⇒ 同集合; 只走层 2 的实现在 A 上丢 #122 ⇒ 红; 只走层 1 的实现在 B 上丢 #122 ⇒ 红"
+      - "每条测试 docstring 写「它怎么会红」+ 被拒的坏实现名; 层分派表逐格 (NO_FIELD→no_field ∅ / NO_TOKEN→url_fallback 或 no_token_no_url / BAD_TOKEN→bad_token_union / OK+哨兵→none_sentinel ∅ / OK→canonical) 各一断言"
+    notes: >
+      测试直接调用探针的纯分类函数 (TASK-010 承诺 I/O 与分类分离), 不打网络。
+      层 0 定位本身经姊妹函数, 本任务不复测 E0–E6 (那是姊妹 tests/test_linked_issue_field.py 的面), 只测「四态 → 层 → 键」。
+
+  - id: TASK-006
+    parent: "2.3"
+    task_group: G2
+    title: "SC-18 层 0 假阳性拒绝四臂 (cc1bdef 147 篇 + 合成围栏夹具) + SC-1 archive 命中"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: qa-engineer
+    reason: "拒绝能力型断言 (memory adversarial-fixture); 含跨仓语料读取与 fail-soft skip 设计"
+    dependencies: [TASK-001, TASK-005]                                  # 同文件串行 (R1 C1): 2.2 → 2.3
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # 三臂对照 + 第四臂合成夹具
+    verification:
+      - "语料来源 = 主仓 `cc1bdef` 树 (定位: Path(__file__).resolve().parents[4] 为主仓根; 守卫 `git -C <main> cat-file -e cc1bdef^{commit}` 成功且 ls-tree 得 147 条 `openspec/(changes|archive)/*/proposal.md`), blob 经 `git -C <main> show cc1bdef:<path>` 读; 任一守卫不成立 ⇒ 三臂 skipTest 并打印原因 (跨仓已知限, tasks.md 待 owner #4), 第四臂不 skip"
+      - "SC-18 (a) 行首规则 (= 探针真实路径, 经姊妹函数): no_field 133 / url_fallback 13 / no_token_no_url 1; 同 key 簇 3 个 (#95 / #122 / #137) 且不含目录 a1-entry-claim-duplicate-work-guard"
+      - "(b) 宽松规则 (测试内实现的坏定位器: 行内任意位置匹配 `**关联 Issue**:`): url_fallback 14 且 #122 簇含 a1-entry-claim-duplicate-work-guard (假阳性) —— 证明 (a) 的断言有拒绝能力"
+      - "(c) 行首 + 只在首条 `---` 前找 (坏定位器 2): url_fallback 10 且簇只剩 1 个 (#122 / #95 被误杀)"
+      - "(d) 第四臂 (合成, 必造): 一份 proposal 只有围栏内的深度-1 字段行 (``` 块内一行 `> **关联 Issue**: `10CG/x#1``), 无真字段 ⇒ 探针判 no_field; 不做围栏排除的坏实现算进 #1 簇 ⇒ 红 (可取姊妹 proposal :118 的围栏内示例行作原文)"
+      - "SC-1: (a) 臂结果中 #122 簇两份 hits[].corpus == 'archive' (经探针 hits 组装函数); 只扫 changes/ 的实现返回空 ⇒ 红"
+      - "它怎么会红: 实现退回宽松定位 ⇒ (a) 臂出现 (b) 的假阳性 ⇒ 红; 「顺手加固」成只扫头部 ⇒ (a) 臂只剩 1 簇 ⇒ 红; 漏围栏排除 ⇒ (d) 红"
+    notes: >
+      数字 133/13/1 与 14 / 10 是 proposal SC-18 钉死的 cc1bdef 观测值; 若姊妹函数最终在 cc1bdef 上得不同分布, 记录差异并上呈 (不改数字迁就实现)。
+      主仓 HEAD 语料 149 篇不用作三臂输入 (会随并发轨漂移)。
+
+  - id: TASK-007
+    parent: "2.4"
+    task_group: G2
+    title: "远端解析 / fetch / cap 测试 (注入式 git runner): SC-12/13/14 + SC-3/4/5/6 + §5 超时预算 + §6 排序决定性"
+    status: pending
+    complexity: L
+    estimated_hours: "6-8"
+    agent: qa-engineer
+    reason: "七条 SC + 两条机械预算断言; 需设计可注入 runner 与 fail-closed 各分支负控"
+    dependencies: [TASK-001, TASK-006]                                  # 同文件串行 (R1 C1): 2.3 → 2.4
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # runner 体例仿 phase-d-closer/tests/test_fetch_gate.py:22 `_runner(seq)`: run(args, cwd, timeout) -> (rc, out, err), 记录每次调用
+    verification:
+      - "SC-12: runner 对 `symbolic-ref refs/remotes/github/HEAD` 返回 rc=128 (夹具值, 取自 2026-08-30 主仓观测, 见 metadata.line_anchor_recheck 末条), 对 `ls-remote --symref github HEAD` 返回 `ref: refs/heads/master\\tHEAD\\n<sha>\\tHEAD` ⇒ remotes[github].default_branch == 'master' 且 resolved_by == 'ls_remote_symref'; 只读本地 symbolic-ref 的实现 unresolved ⇒ 红"
+      - "SC-13 (四臂各一负控): ls-remote rc≠0 / 超时 (runner 抛 TimeoutExpired 或返回 timeout 标记) / 输出无 `ref: ` 行 / 首段前缀非 refs/heads/ ⇒ 每臂 default_branch is None 且 error_kind 非空 (分别 network|other / timeout / no_symref / bad_symref_prefix), status == 'degraded', verdict == 'not_established'; 断言 stdout JSON 中该 remote 的 default_branch 不是字面 'master' 或 'main' (照抄 fetch_gate.py:55 _DEFAULT_BRANCH_FALLBACKS 的实现 ⇒ 红)"
+      - "SC-14: runner 对 `remote` 返回 'github\\norigin\\n', 对 `for-each-ref refs/remotes` (若实现调用) 返回含 probe ⇒ remotes[] 名字集合 == {github, origin}, 不含 probe; 用 refs/remotes/* glob 枚举的实现 ⇒ 红"
+      - "SC-3: origin fetch 成功且语料含 #122 簇, github fetch 两次均失败 ⇒ status 'degraded', verdict 'not_established', remotes[github].error_kind 非空, exit 0, 且 hits[] 仍含 origin 的命中; 三个坏实现 (verdict 算成 no_sibling_found / degraded 映射非 0 / hits 整体清空) 各一负控 ⇒ 红"
+      - "SC-4: `remote` 返回空 (或全部落 read_only_remotes) ⇒ status 'skipped', reason 'no_enforced_remote', verdict 'not_established', exit 0; 写「无远端 ⇒ exit 非 0」的实现 ⇒ 红"
+      - "SC-5: 被扫默认分支语料含 openspec/changes/<own_spec_dir>/proposal.md (及 archive/<date>-<own_spec_dir>/ 变体不算同名, 只按目录名逐字节) 且其键与 own_keys 相同 ⇒ hits[] 不含 spec_dir == own_spec_dir 的项, 无论 remote / corpus; 不排除的实现自报命中 ⇒ 红"
+      - "SC-6: MAX_PROPOSALS_SCANNED 打桩为 1 (monkeypatch 模块常量), 语料 1 份 changes/ + 1 份 archive/ ⇒ 保留 changes/ 那份; caps_applied == [{remote, total: 2, kept: 1, dropped_from: <archive 路径>}]; status 'degraded'; verdict 'not_established'; stderr 含截断点路径与丢弃条数; 三负控 (caps_applied 空 / archive 排前 / 截断后仍 no_sibling_found) ⇒ 红"
+      - "§5 预算 (机械): runner 记录每次调用的 timeout 参数, 断言全部 == 30; fetch 首次失败第二次成功 ⇒ 该 remote fetch 调用恰 2 次且 error_kind 为 null; 两次都失败 ⇒ 恰 2 次 (不 3 次); 首次成功 ⇒ 恰 1 次; ls-remote 每 remote 恰 1 次 (a2_discretions (c))"
+      - "§5(f)/(e): fetch 命令逐字为 ['fetch','--no-tags',R,'+refs/heads/<default>:refs/aria/sibling-probe/R/<default>'] (断言 args), 全程不调用 `symbolic-ref refs/remotes/<R>/HEAD` 作解析、不读 FETCH_HEAD、不 import remote_refresh"
+      - "§6 排序决定性: 乱序输入路径 (archive 混在 changes 前、非字节序) ⇒ 扫描顺序 = changes/ 全部 (字节序) 后 archive/ 全部 (字节序); 1001 条合成路径 + 常量 1000 ⇒ kept 1000, dropped_from == 排序后第 1001 条, caps_applied[0].total == 1001; 用 locale 排序或 dict 序的实现 ⇒ 红"
+    notes: >
+      全部不打真网络 (fail-closed 分支各一条负控). runner 注入点由 TASK-010 提供 (函数参数或模块级可替换属性).
+      SC-13「stdout 不得出现字面 master/main 作该 remote 的 default_branch」是断言 JSON 字段值, 不是全文 grep (其他 remote 可合法为 master).
+
+  - id: TASK-008
+    parent: "2.5"
+    task_group: G2
+    title: "CLI 全链路契约测试 (subprocess): SC-15 三终局 stdout 恰一 JSON + SC-2 + exit 三分 + reason 规则 + stderr 不回显凭据"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: qa-engineer
+    reason: "§7 契约的端到端验证 (stdout/exit/stderr 三通道), 走真实子进程而非 in-process"
+    dependencies: [TASK-001, TASK-007]                                  # 同文件串行 (R1 C1): 2.4 → 2.5
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # subprocess.run([sys.executable, <script>, ...]) 体例仿 state-scanner/tests/test_coordination_no_push.py:132
+    verification:
+      - "SC-15: 三终局各跑一次子进程 (ok: 临时 git 仓 + 本地 file:// remote 含无同 key 语料; degraded: remote URL 指向不存在路径 ⇒ fetch 失败; skipped: 临时仓零 remote) ⇒ 每次 stdout `json.loads` 恰成功一次且 `stdout.strip()` 为单个 JSON 对象 (无前后杂字节), 含 schema_version/probe/status/reason/verdict/own_spec_dir/own_layer/own_keys/remotes/hits/caps_applied/elapsed_ms 十二键; 把 log() 写进 stdout 的实现 ⇒ json.loads 抛 ⇒ 红"
+      - "SC-2: ok 终局 (本轨有 token, 语料无同 key) ⇒ status 'ok', verdict 'no_sibling_found', hits == [], returncode == 0; 「无命中 ⇒ 非 0」的实现 ⇒ 红"
+      - "exit 三分: 缺 `--own-spec-dir` 或 `--repo-path` ⇒ returncode != 0 (argparse); `--repo-path` 指向非 git 目录 ⇒ != 0; own spec 目录不存在 ⇒ != 0 (a2_discretions (a)); 命中 (语料含同 key) ⇒ returncode == 0 且 verdict 'sibling_found'"
+      - "reason 规则: status == 'ok' 且 own_keys 非空且无命中 ⇒ reason is None; own proposal 无字段 (own_keys 空) 且 status 'ok' ⇒ reason == 'own_token_absent' 且 verdict 'not_established' (『或』关系, §7); degraded ⇒ reason ∈ {remote_unresolved, fetch_failed, cap_applied}; skipped ⇒ 'no_enforced_remote'"
+      - "stderr 通道: 三终局 stderr 非空 (人读 log), 且 stderr 的每一行都不出现在 stdout; hits 恒为 list (degraded/skipped 也不为 null); schema_version == '1', probe == 'sibling_spec_probe'"
+      - "Rule #7 / §7 stderr ⛔: 注入式 runner 让 git stderr 含一个测试内随机生成的哨兵串 (形态 = 内嵌 userinfo 的 remote URL `https://<user>:<sentinel>@example.invalid/x.git`, 哨兵运行时拼装, 不写死字面 — memory secret-guard-fp) ⇒ 断言探针 stdout 与 stderr 均不含该哨兵, error_kind 为稳定枚举值"
+      - "elapsed_ms 为非负 int; own_layer ∈ 六值枚举; own_keys 每项形如 ['k', basename, int] 或 ['r', str]"
+    notes: >
+      临时仓用 tempfile + `git init` + `git remote add origin <file://path>`; 语料以最小 proposal 文本提交到 bare remote 的 master.
+      注意 git 2.39.5: `ls-remote --symref` 对 file:// bare 仓可返回 `ref: refs/heads/master\tHEAD` (bare 仓 HEAD 指向 master 即可).
+
+  - id: TASK-009
+    parent: "2.6"
+    task_group: G2
+    title: "指令面结构断言 (RED): SC-17 分块计数 + 负控 / SC-20 (i) SKILL.md 小节切片 + (ii) execution-modes.md 契约节切片"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    agent: qa-engineer
+    reason: "文档面机械断言 (D17 块边界 / 完整命令行 / fail 措辞), 与代码 SC 同宿主"
+    dependencies: [TASK-001, TASK-008]                                  # 同文件串行链尾 (R1 C1): 2.5 → 2.6
+    deliverables:
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # 读同 skill 的 SKILL.md 与 references/execution-modes.md (Path(__file__).parents[1])
+    verification:
+      - "SC-17: 切出 execution-modes.md 的 `## Convergence 模式` 与 `## Challenge 模式` 两节各自围栏块 (``` 开合) 文本, 各计数字面 `每轮入口: 竞品 spec 探针` 恰 1 (共 2); 负控: 全文减去这两个围栏块后该字面 0 次 (契约节不得用该前缀); 基线 0 ⇒ 红; 只 patch Convergence ⇒ 1 ⇒ 红"
+      - "SC-17 docstring 逐字含: 若将来出现第三个模式块, 本条会把「正确地插了三处」判红 —— 这是有意的保守 (漏插比多插危险), 不是 bug; 分块计数是为不误伤契约节"
+      - "SC-20 (i): SKILL.md 切片 = 自 `(?m)^#{2,4}[ \\t]+per-round 入口探针` 匹配行 (须不在围栏内; 标题起首, `Step 0.5:` 等前缀 ⇒ 不匹配 ⇒ 红) 至下一 `^#{1,4}[ \\t]` 行; 切片含 `sibling_spec_probe.py` / `verdict` / `not_established` / `未能核实` 四字面, 且含一条以 `python3` 起首、含 `sibling_spec_probe.py` 与 `--own-spec-dir` 的行 (反斜杠续行先折叠)"
+      - "SC-20 (ii): execution-modes.md 含标题字面 `## 竞品 spec 探针 (per-round 入口)`, 该节切片 (至下一 `^## ` 行或 EOF) 含 `verdict` / `status` / `hits` 与 `未能核实` / `已完整扫描` / `检测到` 六字面"
+      - "基线 (TASK-002 亲跑) 两条必红; 字面写在小节外 (如 `## 相关文档`) ⇒ 块边界 ⇒ 红; 跳过契约节 ⇒ (ii) 红"
+    notes: >
+      本任务测试在 4.x 落地前保持 RED (TASK-014 GREEN 判定时排除本任务两条); TASK-015/016 完成后转绿。
+      切片与围栏识别逻辑自写 (stdlib re), 不 import 任何 skill 模块。
+
+# ---------------------------------------------------------------------------
+# Group 3 — 实现: aria/skills/audit-engine/scripts/sibling_spec_probe.py (stdlib-only)
+# ---------------------------------------------------------------------------
+  - id: TASK-010
+    parent: "3.1"
+    task_group: G3
+    title: "探针骨架 + I/O 边界: CLI / 唯一 import 块 / own proposal / 可注入 runner / §7 输出契约 / exit 三分 / error_kind"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: backend-architect
+    reason: "单系统 CLI 与输出 schema 设计 (AGENT_MAPPING backend-architect: **/scripts 类 Python 服务 / API schema)"
+    dependencies: [TASK-004, TASK-008]
+    deliverables:
+      - aria/skills/audit-engine/scripts/sibling_spec_probe.py          # (新建, 含 scripts/ 目录) stdlib-only; 无第三方依赖
+      - aria/skills/audit-engine/scripts/__init__.py                    # (新建, 可选空文件) 不新建 lib/ 或 collectors/
+    verification:
+      - "CLI: argparse `--own-spec-dir` (required) / `--repo-path` (required); 不假定 cwd (所有 git 调用 `git -C <repo-path>`); 参数缺失 ⇒ argparse exit 2; own spec 目录不存在 ⇒ 非 0 + stderr 说明 (a2_discretions (a))"
+      - "§3 唯一代码块逐字: `_SS_ROOT` / `_SS_SCRIPTS` 两路径; `for _p in (_SS_SCRIPTS, _SS_ROOT): if _p not in sys.path: sys.path.insert(0, _p)` (最后插入的 _SS_ROOT 排最前); 紧接 §3 代码块的三条 import 逐字存在 (`from lib.collision import normalize_linked_issue` / `from lib.linked_issue_field import extract_linked_issue_field` / `from collectors.multi_remote import resolve_enforced_remotes`); 同块允许追加第四符号 `is_sentinel` (与 `extract_linked_issue_field` 同一 import 语句, a2_discretions (i), R1 三席复核不违反) —— 断言用『包含』非『恰等』: 全文件 `sys.path.insert` 仅此一处 (grep -c == 1), 块外零 `from lib.` / `from collectors.` 语句; 三符号不复制、不 try/except 回落自写"
+      - "绑定 lib 后不 import 任何 scripts/lib 模块 (grep `lib.runtime_probe|lib.detailed_tasks|lib.carry_forward|lib.frontmatter_block|lib.spec_complete` == 0)"
+      - "import 失败 (姊妹缺席) ⇒ 按 §7 探针自身失败: 非 0 exit, stderr 说明「extract_linked_issue_field 不可导入」, 不定义过渡形态 (proposal §3「姊妹未 ship 时: 不定义」)"
+      - "I/O 分离: git runner 为可注入依赖 (签名 run(args: list[str], cwd: Path, timeout: int) -> (rc, stdout, stderr), 默认 subprocess.run(timeout=30) 实现; TimeoutExpired 映射 error_kind 'timeout'); 纯分类函数 (text -> layer, keys) 与 hits 组装函数无 I/O, 供 TASK-005/006/007 直接调用"
+      - "§7 stdout: 恰一次 `sys.stdout.write(json.dumps(obj, ensure_ascii=False) + '\\n')` 于成功路径末尾; 全部人读日志经 `log()` 写 stderr; 十二字段全部存在 (hits/caps_applied/remotes 恒 list, reason 可 null); schema_version '1'; probe 'sibling_spec_probe'"
+      - "verdict 表: hits 非空 ⇒ sibling_found; hits 空 且 全部 enforced remote 解析+fetch 成功 且 无 cap 且 own_keys 非空 ⇒ no_sibling_found; 其余 ⇒ not_established。reason 非空当 status != 'ok' 或 verdict == 'not_established'; 枚举五值 (优先级: no_enforced_remote > remote_unresolved > fetch_failed > cap_applied > own_token_absent, 取首个成立者)"
+      - "exit: 有定义判定 ⇒ 0 (含 degraded / skipped / 命中); 内部异常 ⇒ 非 0 且 traceback 只进 stderr; `git diff --stat -- skills/state-scanner` 为空"
+      - "error_kind: 复制 (不 import) fetch_gate.py:86-101 `_classify_error` 形态 + 新增 timeout / no_symref / bad_symref_prefix; 任何路径不把 git 原始 stderr 写入 stdout/stderr 输出 (Rule #7); elapsed_ms = 整数毫秒"
+      - "SC-2 / SC-15 / SC-21 (TASK-004/008) 转绿"
+    notes: >
+      先例形态: state-scanner/scripts/issue_cache_freshness_probe.py / coordination_probe.py (argv 取 project root, 不假定 cwd).
+      log() 命名承 §6/§7 措辞 (stderr 人读日志); 不用 logging 模块无 handler 的静默形态 (母 Spec K7 教训).
+
+  - id: TASK-011
+    parent: "3.2"
+    task_group: G3
+    title: "谓词层: 四态 → 层分派 / 哨兵层 1.5 / 层 2 URL 回落 / 键构造 / SC-19 常量黑名单 / 集合求交 / 自命中排除"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: backend-architect
+    reason: "字符级谓词实现 (§3 钉到两人独立实现同结果), 单模块纯逻辑"
+    dependencies: [TASK-010, TASK-005, TASK-006]
+    deliverables:
+      - aria/skills/audit-engine/scripts/sibling_spec_probe.py          # 纯分类函数 + 键构造 + 求交
+    verification:
+      - "层分派逐格 (§3 表, 顺序固定): NO_FIELD ⇒ 层 3, ∅, 'no_field'; NO_TOKEN ⇒ 层 2 (字段行 URL 片段成键, 无片段 ⇒ ∅ + 'no_token_no_url', 有 ⇒ 'url_fallback'); BAD_TOKEN ⇒ 层 1 ∪ 层 2, 'bad_token_union'; OK 且 token_str 为哨兵 ⇒ 层 1.5, ∅, 'none_sentinel', 不进层 2; OK 其余 ⇒ 层 1, 'canonical'"
+      - "哨兵判定吃 FieldVerdict.token_str (未 strip): 优先 `is_sentinel(token_str)` (姊妹导出, 见 a2_discretions (i) / TASK-001 核对结果); 语义 = 逐字节 == '无' 或 ASCII 大小写折叠 == 'none', 两端无空白; 不靠归一结果、不靠集合是否为空 (SC-9 / SC-10)"
+      - "层 2 触发集逐字 == {NO_TOKEN, BAD_TOKEN}; 只扫由 line_no 定位的字段行, 正则抽 `/([^/\\s]+)/([^/\\s]+)/issues/(\\d+)` 片段组 token `<org>/<repo>#<n>` 后按键构造成键; 不扫全文散文"
+      - "键构造: k = normalize_linked_issue(t); k 非 None ⇒ ('k', k[0], k[1]); None ⇒ ('r', t); 两类永不相等; 一份 proposal 集合去重; 多元素全部入集"
+      - "SC-19 常量黑名单 `_RAW_KEY_BLACKLIST` = {'{<org>/<repo>#<n>}'} ∪ 哨兵集合 (none 折叠 / 无); 命中者不产生任何键; 模块顶部注释写明「与姊妹 Spec §2 哨兵集合 + §3 模板 placeholder 同源, 任一改动须同批改另一侧」"
+      - "求交: 本轨集合 ∩ 每份远端 proposal 集合非空 ⇒ 每个交集键各成一条 hits 项 {remote, branch, corpus, spec_dir, path, field_line, key, layer}; spec_dir == own_spec_dir 的 proposal 跳过 (SC-5, 任一 remote / corpus)"
+      - "SC-1 / SC-5 / SC-7 / SC-8 / SC-9 / SC-10 / SC-11 / SC-18 / SC-19 (TASK-005/006/007 对应条目) 转绿"
+    notes: >
+      normalize_linked_issue 的 org 不参与键 (docstring :178-193); 原串键与归一键首元不同, 脏元素永不与归一键相等 (§3 对姊妹「反向不成立」的澄清).
+      不做标题 / slug / 模糊匹配 (层 3 = 不可见, §10 盲区).
+
+  - id: TASK-012
+    parent: "3.3"
+    task_group: G3
+    title: "remote 集合 + 默认分支 fail-closed (ls-remote --symref) + fetch 私有 ref + 30s/子进程 + fetch 2 次"
+    status: pending
+    complexity: L
+    estimated_hours: "6-8"
+    agent: backend-architect
+    reason: "多远端 git 交互 + 超时/重试/错误分类, 与 state-scanner 契约 (resolve_enforced_remotes) 对接, 分支最多"
+    dependencies: [TASK-011, TASK-010, TASK-007]                        # 同文件串行 (R1 C1): 3.2 → 3.3 (原与 TASK-011 标「并行」, 已废)
+    deliverables:
+      - aria/skills/audit-engine/scripts/sibling_spec_probe.py          # remote/default-branch/fetch 段
+    verification:
+      - "P7: actual_remotes = `git -C <repo> remote` 输出逐行 (配置面); 全文件不出现 `refs/remotes` 作枚举源 (grep 'for-each-ref refs/remotes\\|refs/remotes/\\*' == 0); SC-14 转绿"
+      - "config: 读 <repo>/.aria/config.json → state_scanner.multi_remote.{enforced_remotes, read_only_remotes}; skill 级 null/缺席 ⇒ 继承顶层 multi_remote.* (a2_discretions (d)); 文件缺失/解析失败 ⇒ 两键均 None/空; read_only 作 tuple 传入; `resolve_enforced_remotes(configured, actual, read_only)[0]` 为 enforced; [] 或 None ⇒ auto-discover (F5′ trap, 不当空集)"
+      - "enforced 空集 ⇒ status 'skipped' + reason 'no_enforced_remote' + verdict 'not_established' + exit 0, 不发起任何网络调用 (SC-4)"
+      - "P6: 逐 remote `git -C <repo> ls-remote --symref R HEAD`; 取 stdout 第一条以 `ref: ` 起首的行, 按 '\\t' 切两段, 首段去 `ref: ` 前缀须以 `refs/heads/` 起首 ⇒ default_branch = 去前缀; resolved_by 'ls_remote_symref'; 任一不成立 ⇒ default_branch None + error_kind ∈ {timeout, no_symref, bad_symref_prefix, network, ...} + status 'degraded' + verdict 'not_established'; 源码不含字面回落 ('master','main') 元组 (grep `_DEFAULT_BRANCH_FALLBACKS\\|(\"master\", \"main\")` == 0); 不调用 `symbolic-ref refs/remotes/<R>/HEAD` (SC-12 / SC-13)"
+      - "P8 / §5(f): fetch 命令逐字 `git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/<default>`; 不动 refs/remotes/*; 不读 FETCH_HEAD; 不 import / 不读 remote_refresh 缓存 (P3)"
+      - "P1 / §5(d): 每个 git 子进程 timeout=30 (常量 `GIT_TIMEOUT_S = 30`, 非整轮总预算); fetch 腿最多 2 次 (首次失败重试 1 次), ls-remote 1 次; 超时/失败 ⇒ error_kind 非空 + degraded + not_established + exit 0, 不阻断; 已成功 remote 的命中保留 (SC-3)"
+      - "stderr log(): 每 remote 的解析结果 / fetch 结果 / 各腿耗时 (毫秒), 不回显 git 原始 stderr"
+      - "SC-3 / SC-4 / SC-12 / SC-13 / SC-14 + §5 预算断言 (TASK-007) 转绿"
+    notes: >
+      环境观测 (非设计前提, 2026-08-30 主仓工作树; 详见 metadata.line_anchor_recheck 末条): github 无本地 symbolic-ref (exit 128); 存在陈旧 refs/remotes/probe; config multi_remote = null ⇒ auto-discover {github, origin}. 实现与测试均不得依赖这些观测 (SC-12/13/14 用注入 runner).
+      不复用 phase-d-closer fetch_gate.py::_resolve_default_branch (origin 硬编码 + 名字猜测, 方向相反), 不复制其函数; 只照抄 _classify_error 的枚举形态.
+
+  - id: TASK-013
+    parent: "3.4"
+    task_group: G3
+    title: "语料枚举 (ls-tree on 私有 ref, changes 先 archive 后, 字节序) + MAX_PROPOSALS_SCANNED=1000 + no-silent-caps 三件套 + blob 读取"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: backend-architect
+    reason: "决定性排序 + cap 披露契约, 单模块"
+    dependencies: [TASK-012, TASK-007]
+    deliverables:
+      - aria/skills/audit-engine/scripts/sibling_spec_probe.py          # corpus 段
+    verification:
+      - "§2: 在 refs/aria/sibling-probe/R/<default> 上 `git -C <repo> ls-tree -r --name-only <ref> -- openspec/changes openspec/archive`, 过滤正则 `^openspec/(changes|archive)/[^/]+/proposal\\.md$` (单层目录); corpus 字段 = 'changes' | 'archive'; spec_dir = 第三段目录名"
+      - "§6 排序: changes/ 全部在前、archive/ 全部在后, 各自按完整路径字节序升序 (`sorted(paths, key=lambda p: p.encode('utf-8'))`), 与 locale 无关; 超限从尾部截断"
+      - "`MAX_PROPOSALS_SCANNED = 1000` 为模块常量 (可被测试打桩), 不读 config, 不复用 state_scanner.handoff_multibranch.max_branches (P10; grep 'max_branches' == 0)"
+      - "no-silent-caps: 触发 ⇒ (i) stderr log() 逐字披露截断点路径 + 丢弃条数 (形态照 handoff_multibranch.py:589-598 的逐字消息); (ii) caps_applied 追加 {remote, total, kept, dropped_from}; (iii) status 'degraded' + verdict 'not_established' + reason 'cap_applied'; remotes[].scanned = 实扫数, capped = True (SC-6)"
+      - "blob 读取: `git cat-file --batch` 或逐文件 `git show <ref>:<path>` (a2_discretions (f)), 每子进程 timeout=30; 永不读工作树中的这些路径 (本轨工作树不参与, §2); 文本以 utf-8 errors='replace' 解码后喂 TASK-011 分类器"
+      - "SC-1 / SC-6 + §6 排序决定性断言 (TASK-006/007) 转绿"
+    notes: >
+      本仓单 ref 147-149 篇; 1000 是防失控 cap 非性能 cap (对第三方仓未验证, 刻意不做 config key — 新表面 #3).
+
+  - id: TASK-014
+    parent: "3.5"
+    task_group: G3
+    title: "GREEN + 回归: 全套测试通过 / run_all_tests.sh 自动纳入 / 三个坏实现负控亲跑 / state-scanner 零改动断言"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: backend-architect
+    reason: "实现收口: 让 2.1–2.5 全绿并证明断言对坏实现有拒绝能力 (memory adversarial-fixture / test-claims-vs-verifies)"
+    dependencies: [TASK-009, TASK-011, TASK-012, TASK-013]              # TASK-009 = 测试文件串行链尾 (本任务也写该文件, R1 C1 同文件规则)
+    deliverables:
+      - aria/skills/audit-engine/scripts/sibling_spec_probe.py
+      - aria/skills/audit-engine/tests/test_sibling_spec_probe.py
+    verification:
+      - "`cd aria/skills/audit-engine/tests && python3 -m unittest discover -s . -p 'test_*.py'` ⇒ 除 TASK-009 两条 (SC-17 / SC-20, 待 4.x) 外全部 OK; SC-18 三臂在本仓 (主仓可达) 不 skip"
+      - "`bash aria/skills/run_all_tests.sh` 输出含 `audit-engine` 行且计入 total_tests (自动发现, 无需接线); state-scanner 套件计数不变"
+      - "坏实现负控亲跑 (各改一处、跑一次、看红、还原; 记录进本任务 notes): (1) corpus 过滤只留 changes/ ⇒ SC-1 + SC-7 红; (2) 层 2 触发改为『集合为空』⇒ SC-10 红; (3) 唯一 import 块两路径反序 ⇒ SC-21 红 (memory redfix / fix-the-class)"
+      - "`git -C aria diff --stat -- skills/state-scanner` 为空; `git -C aria status --porcelain` 只含 skills/audit-engine/ 下新建/修改 (不带路径的 status 核验, memory scoped-add-splits-claim)"
+      - "`python3 -c 'import ast,sys; ast.parse(open(\"aria/skills/audit-engine/scripts/sibling_spec_probe.py\").read())'` 通过; 无第三方 import (grep -E '^(import|from) (yaml|requests|click)' == 0)"
+    notes: >
+      本任务不改 SKILL.md / execution-modes.md (那是 4.x); TASK-009 两条保持红是预期.
+
+# ---------------------------------------------------------------------------
+# Group 4 — audit-engine 指令面接线
+# ---------------------------------------------------------------------------
+  - id: TASK-015
+    parent: "4.1"
+    task_group: G4
+    title: "execution-modes.md: Convergence / Challenge 两块各插逐字相同两行插入串 + 新增 `## 竞品 spec 探针 (per-round 入口)` 权威契约节"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: knowledge-manager
+    reason: "references/*.md 指令面文档 (AGENT_MAPPING knowledge-manager: **/*.md / 架构与规范文档); 须与 §7/§9 字面逐字对齐"
+    dependencies: [TASK-003, TASK-009]                                  # TASK-003 = B.1 前置边 (proposal :473; R1 C1 第 3 条)
+    deliverables:
+      - aria/skills/audit-engine/references/execution-modes.md          # Convergence 围栏 :89 `Round N:` 之后 / :90 `1. 调用…` 之前; Challenge 围栏 :118 `Round N (一个完整周期):` 之后 / :119 `Step 1:` 之前; 文末 (:144 后) 新节
+    verification:
+      - "两块插入串逐字相同 (diff 两段 == 空): 首行 `  每轮入口: 竞品 spec 探针 —— python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"<本轨 spec 目录名>\" --repo-path \"<repo root>\"`; 次行 `  读 stdout JSON 的 verdict: sibling_found ⇒ 本轮 🔴 (含 N 份/归档标注) · no_sibling_found ⇒ 「已完整扫描, 未发现同 issue 竞品」 · not_established / exit≠0 / 非 JSON / schema_version 未知 ⇒ 「未能核实」(禁止渲染为无竞品); 不阻断本轮` (proposal §8 插入串)"
+      - "现有编号不动: Convergence `1./2./3./4.` 与 Challenge `Step 1..Step 5` 文本行在 diff 中仅位移不改内容; `## 入口逻辑` / `## Pre-merge` 两节零改动"
+      - "新节标题逐字 `## 竞品 spec 探针 (per-round 入口)`, 内容 = §7 十二字段表 (含 reason 五值 / verdict 三值 / own_layer 六值 / error_kind 封闭集合 (a2_discretions (b))) + exit 三分 + §9 三档消费措辞 (`检测到 N 份同 issue 的竞品 Spec` / `已完整扫描, 未发现同 issue 竞品` / `未能核实 —— 本轮竞品扫描未取到完整证据 (原因: <reason>)`) + 消费方 fail-closed 义务 + N = 去重 spec_dir 数; 该节不含字面 `每轮入口: 竞品 spec 探针` (SC-17 负控)"
+      - "SC-17 + SC-20 (ii) (TASK-009) 转绿; `grep -c '每轮入口: 竞品 spec 探针' execution-modes.md` == 2"
+      - "理由留痕: 两块都改因 DEFAULTS.json:124-128 `level_3: challenge` 使下游 Level-3 审计走 Challenge (只 patch 前者 ⇒ 下游静默漏探针)"
+    notes: >
+      插入串命名 = 「per-round 入口探针」, 不叫 Step 0.5 (SKILL.md :85 Step 0 是 Round 1 前一次性, §8).
+      不新增第三个模式块; 若将来有, 先改 SC-17 断言再插 (保守方向不变).
+
+  - id: TASK-016
+    parent: "4.2"
+    task_group: G4
+    title: "SKILL.md 「per-round 入口探针」小节 (概述 + 指针 + 四字面 + 命令行 + 与 Step 0 消歧 + α/β 点名) + report-format.md Round N 模板行"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: knowledge-manager
+    reason: "Skill 运行时指令面 + 报告模板 (Markdown 文档域); 是 Rule #6 处方性改动的宿主"
+    dependencies: [TASK-003, TASK-009, TASK-015]                        # TASK-003 = B.1 前置边 (proposal :473; R1 C1 第 3 条)
+    deliverables:
+      - aria/skills/audit-engine/SKILL.md                                # `## 执行流程` 内 Step 0 段 (:83-117) 之后、`---`(:119) / `## 数据 Schema`(:121) 之前插小节; `## 相关文档` :412 加指针; `最后更新` :421
+      - aria/skills/audit-engine/references/report-format.md            # `### Round 1/2/N` 模板 (:52-71) 各增一行 `- Sibling probe: {verdict 三档措辞}`
+    verification:
+      - "小节标题以 `### per-round 入口探针` 起首 (正则 `(?m)^#{2,4}[ \\t]+per-round 入口探针` 命中恰 1 处, 不在围栏内, 不带 `Step 0.5:` 等前缀); 块边界内 (至下一 `^#{1,4}[ \\t]` 行) 含 `sibling_spec_probe.py` / `verdict` / `not_established` / `未能核实` 四字面 + 一条 `python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir … --repo-path …` 完整命令行 (SC-20 (i), D17 ①②③)"
+      - "小节含「权威可执行版见 references/execution-modes.md `## 竞品 spec 探针 (per-round 入口)`」指针 (体例同 :237); 含显式消歧句: Step 0 (`:83`) 是 Round 1 启动前一次性, 本探针每轮入口跑, 不沿用 Step 编号"
+      - "点名行为 α/β 落字面 (β = SC-16 的消费面措辞宿主): (α) 每轮审计入口调用探针并把结果渲染进当轮 `### Round N` 记录; (β) verdict == not_established / exit≠0 / 非 JSON / schema_version 未知 ⇒ 渲染「未能核实」而非「无竞品」; 不阻断 / 不改 verdict 计算 / 不改收敛判定 / 不改轮次路由 (P2)"
+      - "report-format.md: `### Round 1` / `### Round 2` / `### Round N (Final)` 三个模板块各增一行 `- Sibling probe: {🔴 检测到 N 份同 issue 的竞品 Spec (含 M 份已完成的 Spec) | 已完整扫描, 未发现同 issue 竞品 | 未能核实 (原因: <reason>)}`; archive 命中须标「已完成的 Spec」(SC-1 消费面措辞); 模板其余行不动"
+      - "SC-20 (i) (TASK-009) 转绿; `## 相关文档` 增 execution-modes.md 契约节指针; `最后更新` 行更新"
+      - "SKILL.md 全文 `每轮入口: 竞品 spec 探针` 出现 0 次 (该前缀只属 execution-modes.md 两围栏)"
+    notes: >
+      本任务是 Rule #6 判据表「处方性 · 运行时指令面」的改动本体 ⇒ TASK-017 照跑 AB (rule6_note 第 1/2 条已点名 α/β, 不申请豁免).
+      Impact 表 SKILL.md 行: 概述 + 指针 (progressive disclosure), 契约权威版在 execution-modes.md (R5/M3).
+
+# ---------------------------------------------------------------------------
+# Group 5 — Rule #6 照跑 + 发布同步
+# ---------------------------------------------------------------------------
+  - id: TASK-017
+    parent: "5.1"
+    task_group: G5
+    title: "/skill-creator benchmark audit-engine 双臂实跑 (with = 4.x 后 / without = 基线) — α/β 在 without 臂必红、with 臂过; 结果归档"
+    status: pending
+    complexity: M
+    estimated_hours: "3-5"
+    agent: qa-engineer
+    reason: "Rule #6 照跑 + 结果审阅 (手册 §检查清单「Skill 优化后」四项)"
+    dependencies: [TASK-003, TASK-014, TASK-015, TASK-016]
+    deliverables:
+      - aria-plugin-benchmarks/ab-results/                                # 本次 run 结果 (summary / benchmark.json / 报告) 按手册 :320-400 体例
+      - aria-plugin-benchmarks/ab-suite/audit-engine.json                # 若三臂语义分档显示断言措辞过宽 ⇒ 拆条不删 (手册 :142-159), 并 version.yaml 再升
+      - aria-plugin-benchmarks/ab-suite/version.yaml                     # 仅当上一条触发 (拆条 = 改 eval) 时同批改; 计数程序化重算 (metadata.ab_suite_seam_rules)
+    verification:
+      - "CLAUDE.md Rule #6: 经 `/skill-creator benchmark audit-engine` 执行 (不用自研 runner); 会话以 `ARIA_COORDINATION_NO_PUSH=1 claude …` 启动 (手册 :222-228 场景 1 前置; audit-engine 不触 phase1_gate, 但 eval AI 若实跑探针会 fetch 私有 ref `refs/aria/sibling-probe/*` — 只读 fetch, 无害; 跑后 `git for-each-ref refs/aria/sibling-probe` 核查并清理)"
+      - "proposal :473「两 eval 在坏实现上必红」实证: without_skill 臂 (基线 SKILL.md, 无探针小节) 在 α、β 两 eval 的 expectations 上失败; with_skill 臂通过 ⇒ delta.pass_rate > 0 (手册检查清单)"
+      - "产出形态核对: 各臂均为 descriptive (手册 :161-174); 任一臂实跑 git 否证前提 ⇒ 该 eval 标注不计入 delta"
+      - "结果存入 ab-results/ 对应目录并在 summary 标注 eval_suite_version = version.yaml 新版本; 人类 (owner) 审阅项留给 owner, 本任务只交付报告"
+      - "跑不成 (harness 故障) 或 delta ≤ 0 ⇒ 不自判、不降级、不改 expectations 迁就; 原样上呈 owner (Rule #10; rule6_note ⚠️ 段)"
+      - "SC-16 (行为) 由本任务的 eval β 结果覆盖; SC-16 无代码宿主, 不冒充结构化测试"
+    notes: >
+      AB 跑在真仓真 origin 无沙箱 (memory ab-harness-real-repo); 探针只 fetch 不 push, 但 eval 用 descriptive 形态避免网络.
+      同批 spec-drafter.json 照跑属姊妹 Spec, 不在本任务.
+
+  - id: TASK-018
+    parent: "5.2"
+    task_group: G5
+    title: "发布同步面 (aria 子模块): CHANGELOG + plugin.json (SOT) + 派生文件一致 + 主仓 gitlink + 双推逐 remote 核验 — 档位待 owner"
+    status: pending
+    complexity: S
+    estimated_hours: "1-2"
+    agent: knowledge-manager
+    reason: "版本文档与发布一致性 (CHANGELOG / README / VERSION 文档域)"
+    dependencies: [TASK-017]
+    deliverables:
+      # --- aria 子模块 5 文件 (CLAUDE.md §版本管理; 与字段 Spec TASK-021/024 同口径, R1 C2) ---
+      - aria/.claude-plugin/plugin.json                                  # 版本 SOT (今 1.67.2) → <vNEXT>, 号段落地时算
+      - aria/.claude-plugin/marketplace.json                             # 派生, 须与 plugin.json 一致
+      - aria/VERSION                                                     # 派生
+      - aria/CHANGELOG.md                                                # 新条目: sibling_spec_probe.py + audit-engine per-round 入口 + execution-modes 契约节 + tests
+      - aria/README.md                                                   # 派生 badge
+      # --- 主仓引用面 (参照上次发布 commit 086ee32 的 7 文件 + 字段 TASK-024 的 14 点) ---
+      - aria                                                             # 主仓 gitlink → aria post-merge master SHA (index/tree 条目, 非 .gitmodules)
+      - VERSION                                                          # :24 `| aria (插件) | v<vNEXT> | …` (1 点)
+      - README.md                                                        # :8 badge + :242 `Plugin Version:` (2 点)
+      - README.zh.md                                                     # :3 `<!-- translated-from: v<vNEXT> -->` 标记 + :10 badge + :244 Plugin Version (3 点; B 档: 正文不重译, 标记必改)
+      - README.ja.md                                                     # :3 / :10 / :244 (3 点)
+      - README.ko.md                                                     # :3 / :10 / :244 (3 点)
+      - CLAUDE.md                                                        # 「项目状态」段版本行 (:139 已 ship 区间 + :141 `版本:` 行; 覆写非追加, 预算 15-20 行, 只放指针)
+    verification:
+      - "档位 (MINOR/PATCH) 与号由 owner 裁; 三份串行 ship 各占一号 (字段 → 探针 → 母); 若 owner 裁合并一版, 由最后 ship 的母 Spec 发布任务承接, 前两份的发布任务改为 no-op 并留痕。未裁 ⇒ 本任务不开工 (status 仍 `pending`, 不用 `blocked`) (R1 C3 三份统一句; tasks.md 待 owner #5)"
+      - "主仓 14 个版本引用点全部改为 <vNEXT> (CLAUDE.md:139,:141 / VERSION:24 / README.md:8,:242 / README.{zh,ja,ko}.md 各 :3,:10,:244; 行号按 c120f9e 实读, 落地时以 grep 为准): `grep -rn '<旧号>' CLAUDE.md VERSION README.md README.*.md` 零命中; CLAUDE.md :139/:141 同步 (只改版本号, 不加术语)"
+      - "i18n (#140 B 档): 正文无实质变更 ⇒ **不重译**, 但三份 `<!-- translated-from: v<vNEXT> -->` 标记与各自两处版本串**必须同批改** —— check `i18n-readme-translation-currency` 读的是标记 (.aria/state-checks.yaml:141-173), 不是「有无正文变更」; 漏改标记 ⇒ STALE ⇒ exit 1 (A1 a257ffa4 实跑证据)"
+      - "机械兜底: 在完成上述**全部**文件后才断言 custom checks `m6-version-badge-match` / `i18n-readme-translation-currency` 绿 (`/state-scanner` 或直接跑 .aria/state-checks.yaml 对应 command); 另 `m6-claude-md-version` / `main-project-version-consistency` 同批 OK"
+      - "子模块合并本地做 (`git merge` + `git push origin && git push github`), 禁 Forgejo 服务端合并 (CLAUDE.md 硬约束 1); 推后对每个 remote `git ls-remote <remote> master` 取 SHA 与本地比对, 全部一致才算成功 (硬约束 2); push 命令显式给足 timeout (memory partial-push)"
+      - "主仓 gitlink bump 到 aria post-merge master SHA (memory submodule_pointer_post_merge_bump); `git status` 不带路径核验无遗漏"
+      - "aria/CHANGELOG.md 为版本史 SOT; CLAUDE.md 项目状态段只改版本行, 不进 skill 设计术语 (#116 AB baseline 污染)"
+      - "推送共享 master 是外向不可撤销动作: 须 owner **显式授权** (memory sync≠push-auth); 未授权前停在本地合并态并在 handoff 留痕 (R3/A1 3221f943 探针侧同批补)"
+    notes: >
+      本 Spec Impact 表无版本行 (姊妹 Spec 有); A.2 按 CLAUDE.md §版本管理补本任务.
+      多远程推送由 phase-c-integrator §C.2.5 自动化; 手工路径守两条硬约束.
+      R1 C2: deliverables 原缺主仓 VERSION / root README badge / i18n ×3, 且「不重译 ⇒ 不动 i18n」会使两条 check 必红; 已按字段 TASK-024 14 点口径 (R3 同步, 含 CLAUDE.md 两点) + 086ee32 实际文件集补齐.
+
+# ---------------------------------------------------------------------------
+# Execution order (topological; 「并行」只允许出现在 deliverables 无交集的任务之间 — R1 C1;
+# 同文件任务一律串行, 且不得派给独立并发 subagent (memory workflow-file-domain))
+# ---------------------------------------------------------------------------
+execution_order:
+  - "TASK-001 (硬前置断言, 阻塞门) ‖ TASK-002 (基线三态, 只读观测) 可并行 (不同文件); TASK-003 (AB 套件文件, B.1 前置) ← 002 (主控 R1 追记: 002 断言「无 audit-engine.json」须先于 003 建文件)"
+  - "TASK-004 (测试骨架 + SC-21)  ← 001, 002, 003 (003 = B.1 前置, proposal :473 逐字, 主控 R1 追记)"
+  - "[串行 (同文件 tests/test_sibling_spec_probe.py), RED] TASK-005 ← 001, 004 → TASK-006 ← 001, 005 → TASK-007 ← 001, 006 → TASK-008 ← 001, 007 → TASK-009 ← 001, 008"
+  - "TASK-010 (探针骨架)  ← 004, 008"
+  - "[串行 (同文件 scripts/sibling_spec_probe.py)] TASK-011 (谓词)  ← 010, 005, 006 → TASK-012 (远端)  ← 011, 010, 007"
+  - "TASK-013 (语料 + cap)  ← 012, 007"
+  - "TASK-014 (GREEN + 负控)  ← 009, 011, 012, 013"
+  - "TASK-015 (execution-modes.md)  ← 003, 009"
+  - "TASK-016 (SKILL.md + report-format.md)  ← 003, 009, 015"
+  - "TASK-017 (AB 双臂实跑)  ← 003, 014, 015, 016"
+  - "TASK-018 (发布同步, 档位与号待 owner; 未裁 ⇒ 不开工)  ← 017"
+
+# ---------------------------------------------------------------------------
+# Agent allocation summary (A.3)
+# ---------------------------------------------------------------------------
+agent_allocation:
+  tech-lead:
+    count: 1
+    tasks: [TASK-001]
+    rationale: "跨 Spec 接缝断言 (姊妹模块存在 + 接口形态), 结论决定本 Spec 能否进 B.2 — 协调判断"
+  qa-engineer:
+    count: 9
+    tasks: [TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-009, TASK-017]
+    rationale: "基线三态 / AB eval 设计 / 六组 RED 测试 (对抗夹具 + 负控) / 双臂实跑"
+  backend-architect:
+    count: 5
+    tasks: [TASK-010, TASK-011, TASK-012, TASK-013, TASK-014]
+    rationale: "探针 CLI / 输出 schema / 字符级谓词 / 多远端 git 交互 / cap — 单系统 Python 实现"
+  knowledge-manager:
+    count: 3
+    tasks: [TASK-015, TASK-016, TASK-018]
+    rationale: "audit-engine 指令面文档 (execution-modes.md / SKILL.md / report-format.md) 与发布同步面"
+
+complexity_summary:
+  S: {count: 4, tasks: [TASK-001, TASK-002, TASK-009, TASK-018], estimated_hours: "4-8"}
+  M: {count: 11, tasks: [TASK-003, TASK-004, TASK-006, TASK-008, TASK-010, TASK-011, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017], estimated_hours: "33-55"}
+  L: {count: 3, tasks: [TASK-005, TASK-007, TASK-012], estimated_hours: "18-24"}
+  XL: {count: 0, tasks: [], estimated_hours: "0-0"}
+  total_estimated_hours: "55-87"   # = metadata.estimated_hours (S 1-2 ×4 + M 3-5 ×11 + L 6-8 ×3; R1 C9)

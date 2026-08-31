@@ -1,6 +1,6 @@
 # Proposal: linked-issue-field-availability
 
-> **Status**: 📝 **Draft (round-3.2 — 2026-08-30 owner 裁 O-4 (i) 本 Spec 纯函数 = 探针硬前置 / O-5 (i) 字段名 ASCII 大小写折叠, 已落版; R6 定向复核 PASS) — 待 owner 批准进 A.2 (post_spec 已跑 R1–R6, 五席 + 复核席一致不再加轮)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: ✅ **Approved (owner 2026-08-30 批准进 A.2/A.3; post_spec R1–R6 已跑, 五席 + 复核席一致不再加轮; owner 裁 O-4 (i) 本 Spec 纯函数 = 探针硬前置 / O-5 (i) 字段名 ASCII 大小写折叠已落版)** — A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` (25 tasks) 2026-08-30 派生; post_planning R1→R4 **CONVERGED** 2026-08-31 (R4 5/5 PASS), ready for B.1。决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: **2** (单域 — 一份跨项目模板 + 一处 SKILL.md 声明 + 一个 plugin 侧探针脚本 + 一条 check 注册; 无架构变更, 不出 `tasks.md`)
 > **Linked Issue**: `none` — 本 Spec 从母 Spec 的 post_spec R2 簇 C-A / M-10 / M-2 与 R1 editlist FIX-06/07/08 拆出, 无独立 issue 号 (dogfood, editlist **FIX-19**: 本行写法本身就是本 Spec §3 抽取规则的合规输出 —— 2026-08-30 起字段名与哨兵按英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)
@@ -613,7 +613,7 @@ except Exception:
 
 1. **轮次从 R1 起算, 不继承母 Spec 的 R1/R2** —— 那两轮审的是**含旧 §1 的母文本**。本文件自 2026-08-25 起随母 Spec **联审** (memory `combined-mode-sister-spec-audit-value`): 母 R3 = 本文件 R1 (`post_spec-R3-1787652625000-…`), 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **本 Spec 不是母 Spec 的阻塞前置** (见头部依赖方向段), 也**不阻塞**母 Spec 的 R3。
-3. **R6 已跑 (REVISE → 清账 → 定向复核 PASS); owner 2026-08-30 (R6 后) 裁 O-4 (i) / O-5 (i) 已落版, 并裁「不再加通用审计轮、不换执笔席」。** 本 Spec 待 owner 批准进 A.2/A.3。
+3. **R6 已跑 (REVISE → 清账 → 定向复核 PASS); owner 2026-08-30 (R6 后) 裁 O-4 (i) / O-5 (i) 已落版, 并裁「不再加通用审计轮、不换执笔席」。** ~~本 Spec 待 owner 批准进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物已派生, post_planning (combined) 按默认跑, 不豁免。
 
 **待 owner 裁 (AI 不自行拍板)**:
 

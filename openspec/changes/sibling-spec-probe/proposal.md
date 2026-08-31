@@ -1,6 +1,6 @@
 # Proposal: sibling-spec-probe
 
-> **Status**: 📝 **Draft (round-3.2 — 2026-08-30 owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec **硬前置**, 已落版 (§1 依赖方向第 3 条 / §3「姊妹未 ship 时」段); R6 定向复核 PASS) — 待 owner 批准进 A.2 (post_spec 已跑 R1–R6, 不再加轮)。** 决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: ✅ **Approved (owner 2026-08-30 批准进 A.2/A.3; post_spec R1–R6 已跑, 不再加轮; owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec 硬前置, 已落版)** — A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` (18 tasks) 2026-08-30 派生; post_planning R1→R4 **CONVERGED** 2026-08-31 (R4 5/5 PASS), ready for B.1 (硬前置: 字段 Spec 先 ship); P11 扫描范围仍待 owner 裁。决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: 2
 > **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号 (2026-08-30 起按姊妹 Spec 的英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
@@ -575,4 +575,4 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 1. **本 Spec 是一份新文件**, 母 Spec 的 R1/R2 **不为本文件背书**。自 2026-08-25 起随母 Spec **联审**: 母 R3 = 本文件 R1, 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **Rule #6 处置见 rule6_note**: 三条要件逐条落, 兜底不触发的前提是 A.2 真的建成 `ab-suite/audit-engine.json`; **若建不成, 不得自判豁免, 须显式上呈 owner**。
 3. **owner 裁定**: (a) **P11 的扫描范围复议** —— 仍待裁 (本轮实测推翻「只扫默认分支」的成本前提, 边际代价约 0.15s/轮; 本 Spec 已按缩 scope 执行, 不自行扩展; memory `narrow-owner-options` 留痕); (b) **对姊妹纯函数的依赖方向 → ✅ 已裁 (i) 硬前置** (owner 2026-08-30 (R6 后) 裁定), §1 第 3 条 / §3 两段已落版; 姊妹 O-4 同步。
-4. **R6 已跑 (REVISE → 清账 → 定向复核 PASS), owner 裁不再加轮。** 本 Spec 在 owner 批准前不进 A.2/A.3。
+4. **R6 已跑 (REVISE → 清账 → 定向复核 PASS), owner 裁不再加轮。** ~~本 Spec 在 owner 批准前不进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物已派生, post_planning (combined) 按默认跑, 不豁免; P11 扫描范围仍待裁。
