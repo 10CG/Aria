@@ -1,6 +1,6 @@
 # Proposal: sibling-spec-probe
 
-> **Status**: ✅ **Approved (owner 2026-08-30 批准进 A.2/A.3; post_spec R1–R6 已跑, 不再加轮; owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec 硬前置, 已落版)** — A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` (18 tasks) 2026-08-30 派生; post_planning R1→R4 **CONVERGED** 2026-08-31 (R4 5/5 PASS), ready for B.1 (硬前置: 字段 Spec 先 ship); P11 扫描范围仍待 owner 裁。决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: ✅ **Approved (owner 2026-08-30 批准进 A.2/A.3; post_spec R1–R6 已跑, 不再加轮; owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec 硬前置, 已落版)** — A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` (18 tasks) 2026-08-30 派生; post_planning R1→R4 **CONVERGED** 2026-08-31 (R4 5/5 PASS), ready for B.1 (硬前置: 字段 Spec 先 ship); P11 扫描范围 ✅ 2026-09-01 技术裁定 = 扩 (决策单 `2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H3)。决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
 > **Created**: 2026-08-25
 > **Spec Level**: 2
 > **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号 (2026-08-30 起按姊妹 Spec 的英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
@@ -75,6 +75,7 @@
 - **语料 glob**: `openspec/changes/*/proposal.md` 与 `openspec/archive/*/proposal.md` —— **单层目录**, 实测两者合计 147 篇 (§实读清单 #14)。
 - **必须含 `archive/`**: 实测三个同 key 簇的 **6 份 proposal 全部在 `archive/` 下**, `changes/` 下为 0 (§实读清单 #16)。⇒ 只扫 `changes/` 的实现在**本 Spec 全部真实语料上返回空集**, 即它在自己的立项理由上失效。
 - **扫描的是远端 ref, 不是工作树**: 探针比对的对象是**别人已 push 的产物**; 本轨自己的工作树内容不参与 (自己不是自己的竞品, 见 §7 的 `own_spec_dir` 排除)。
+- **ref 维度 (2026-09-01 P11 扩)**: 每个 enforced remote 的全部 `refs/heads/*` (1 条默认 ref + ≤ `MAX_REFS_SCANNED` 条非默认 ref; 取法见 §5(f), 上限 / 去重 / 陈旧过滤见 §6 / P11 / SC-22~25)。
 
 ### §3 「同 issue」匹配谓词 (字符级 — M-1)
 
@@ -288,7 +289,7 @@ git symbolic-ref refs/remotes/github/HEAD   → fatal: ... is not a symbolic ref
 **(d) 预算与重试**
 
 - **超时是「每个 git 子进程各 30s」, 不是整轮总预算 30s** —— 母 Spec 的「30s 超时预算」未指明作用域, 若当成整轮总预算, 按 (a)+(b) 本仓单轮就会必然超时;
-- 每个 remote 的 `fetch` 腿最多尝试 **2 次** (1 次重试), 每次独立计 30s。理由是 S2 观测到的瞬时 SSH 失败重试即恢复;
+- 每个 remote 的 `fetch` 腿最多尝试 **2 次** (1 次重试), 每次独立计 30s。理由是 S2 观测到的瞬时 SSH 失败重试即恢复; **P11 扩后** (2026-09-01) 单次 fetch 取全部 `refs/heads/*` (带 `--prune`), 冷仓耗时高于单分支形态 —— 仍**不加长** 30s, 超时按 `degraded` 处置 (fail-closed 极性不变);
 - 超时 / 失败 ⇒ 该 remote `error_kind` 非空 + `status="degraded"` + `verdict="not_established"`, **不阻断**, exit 0。
 
 **(e) 不复用 `remote_refresh` 缓存 (承接 D7)**
@@ -300,7 +301,7 @@ git symbolic-ref refs/remotes/github/HEAD   → fatal: ... is not a symbolic ref
 **(f) fetch 写进私有 ref 命名空间**
 
 ```
-git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/<default>
+git -C <repo> fetch --no-tags --prune R +refs/heads/*:refs/aria/sibling-probe/R/*
 ```
 
 - **不动共享的 `refs/remotes/*`** (避免与并发的 `/state-scanner` 互踩), **不依赖全局 `FETCH_HEAD`** (它是全局单槽, 并发下会被覆盖);
@@ -308,13 +309,13 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 ### §6 规模上限与 no-silent-caps
 
-- **ref 维度**: 每个 enforced remote **恰 1 条 ref** (其默认分支) ⇒ ref 数 = `|enforced_remotes|`, 无需额外 cap;
-- **语料维度**: 单 ref 上参与扫描的 proposal 数上限 = 探针自有常量 `MAX_PROPOSALS_SCANNED`, **默认 1000**。
+- **ref 维度**: 每个 enforced remote = **1 条默认 ref + ≤ `MAX_REFS_SCANNED` 条非默认 ref** (探针自有常量, **默认 100**; 2026-09-01 P11 扩; 原「恰 1 条 ref, 无需额外 cap」随之作废) ⇒ 非默认 ref 数走 SC-25 的 no-silent-caps;
+- **语料维度**: **单 remote 上跨其全部 ref 累计**参与扫描的 proposal 数上限 = 探针自有常量 `MAX_PROPOSALS_SCANNED`, **默认 1000** (2026-09-01 P11 扩后由「单 ref」改为「单 remote 累计」: 默认 ref 先计, 超限从枚举序尾部截断 ⇒ 分支语料先被截; 全轮总量 ≤ |enforced_remotes| × 1000, 防失控语义不变)。
   > 依据: 本仓实测单 ref 147 篇、抽取 12ms ⇒ 1000 仍是亚秒级。cap 的作用**不是性能, 是防失控** (第三方仓语料规模未知 / glob 误配)。
 - **排序 (决定性, 供两人独立实现得同一截断点)**: 先 `openspec/changes/*/proposal.md`, 后 `openspec/archive/*/proposal.md`; 各自按**完整路径的字节序** (`LC_ALL=C` 语义) 升序。超限**从尾部截断**。
   > 为什么 `changes/` 排前: in-flight 的竞品住在 `changes/`, cap 触发时**绝不能先丢掉它们**。
 - **no silent caps**: 触发 cap ⇒ (i) stderr `log()` 逐字披露被丢弃的范围 (截断点路径 + 丢弃条数); (ii) stdout `caps_applied[]` 非空; (iii) `status` 降 `degraded`, `verdict="not_established"`。
-- **⛔ 不复用 `state_scanner.handoff_multibranch.max_branches` 这个旋钮。** 同库 `handoff_multibranch.py` 因 440 条远端分支踩坑后做过 scan cap (承接自母 Spec 的历史记述), 其披露形态 (`soft_error` + `log.warning` + 逐字消息, 实读 `:589-598`) 值得照抄, 但**旋钮本身不可复用** —— 它的作用域是「分支数」, 与本 cap 的作用域「单 ref 上的 proposal 数」不相等。用作用域不匹配的开关会把恒红换成假绿 (memory `knob-granularity`)。
+- **⛔ 不复用 `state_scanner.handoff_multibranch.max_branches` 这个旋钮。** 同库 `handoff_multibranch.py` 因 440 条远端分支踩坑后做过 scan cap (承接自母 Spec 的历史记述), 其披露形态 (`soft_error` + `log.warning` + 逐字消息, 实读 `:589-598`) 值得照抄, 但**旋钮本身不可复用** —— 它的作用域是「分支数」, 与本 cap 的作用域「单 ref 上的 proposal 数」不相等。用作用域不匹配的开关会把恒红换成假绿 (memory `knob-granularity`)。 **⚠️ 2026-09-01 P11 后补**: 新增的 `MAX_REFS_SCANNED` 作用域确与该旋钮相同 (分支数), **仍不复用** —— 第二条理由与作用域无关: 该旋钮属 `state_scanner` 配置树, 探针不读 state-scanner 的 config key (Impact「不改 state-scanner」), 且两者降级语义不同 (那边 `soft_error`, 这边 `verdict=not_established`)。
 
 ### §7 stdout / exit code / stderr 契约 (M-17)
 
@@ -332,9 +333,9 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | `own_spec_dir` | `str` | 本轨 spec 目录名 (自命中排除键) |
 | `own_layer` | `str` | 本轨 proposal 走了哪一层: `"canonical"` \| `"none_sentinel"` (原 `"wu_empty"`, 2026-08-30 改名 —— 拼音 hack 换成语义名, 与姊妹哨兵集合同批) \| `"url_fallback"` \| `"no_token_no_url"` \| `"no_field"` \| **`"bad_token_union"`** (**R3/TL-P2 补**: §3 的 `BAD_TOKEN` 走「层 1 ∪ 层 2」并集分支, 该取值原未传导进本枚举 ⇒ 消费方按 5 值枚举做穷尽匹配时会落空; 现补为第 6 值) **⚠️ R4/C-M1 拼写统一**: 本枚举值逐字为 `"bad_token_union"`, §3 映射表 2026-08-30 已改为同一拼写 (R3/TL-P2 只修了一侧, R4 又只加批注没改表 —— 全文自此只有一种拼写) |
 | `own_keys` | `list` | 本轨比较键 (每项 `["k",<basename>,<n>]` 或 `["r",<原串>]`) |
-| `remotes` | `list[obj]` | 每 remote 一项: `name` / `default_branch` (`str\|null`) / `resolved_by` (`"ls_remote_symref"\|null`) / `error_kind` (`str\|null`) / `scanned` (`int`) / `capped` (`bool`) |
-| `hits` | `list[obj]` | **恒为 list, 永不为 `null`**; 每项 `remote` / `branch` / `corpus` (`"changes"\|"archive"`) / `spec_dir` / `path` / `field_line` (`int`) / `key` / `layer` |
-| `caps_applied` | `list[obj]` | 每项 `remote` / `total` / `kept` / `dropped_from` (截断点路径) |
+| `remotes` | `list[obj]` | 每 remote 一项: `name` / `default_branch` (`str\|null`) / `resolved_by` (`"ls_remote_symref"\|null`) / `error_kind` (`str\|null`) / `scanned` (`int`) / `capped` (`bool`) / `refs_scanned` (`int`, P11 2026-09-01) / `stale_skipped` (`int`, P11) |
+| `hits` | `list[obj]` | **恒为 list, 永不为 `null`**; 每项 `remote` / `branch` / `corpus` (`"changes"\|"archive"`) / `spec_dir` / `path` / `field_line` (`int`) / `key` / `layer` / `refs` (`list[str]`, `R/<branch>` 全部命中处, 字节序; P11 2026-09-01) |
+| `caps_applied` | `list[obj]` | 每项 `remote` / `total` / `kept` / `dropped_from` (`kind="proposals"` 时为截断点**路径**; `kind="refs"` 时为首个被丢弃的 **`R/<branch>`**) / `kind` (`"proposals"` \| `"refs"`; P11 2026-09-01) |
 | `elapsed_ms` | `int` | 探针总耗时 |
 
 **`verdict` 是一等字段, 不让消费方从 `hits == []` 推断 —— 这是本节的承重条款:**
@@ -342,8 +343,8 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | `verdict` | 何时取该值 |
 |---|---|
 | `"sibling_found"` | `hits` 非空 |
-| `"no_sibling_found"` | `hits` 为空 **且** 覆盖完整 (全部 enforced remote 均解析出默认分支、fetch 成功、未触发 cap) **且** `own_keys` 非空 |
-| `"not_established"` | 其余全部情形 —— 含 `own_keys` 为空 (本轨无可比较的输入)、任一 remote 未解析 / fetch 失败、cap 触发、enforced 集合为空 |
+| `"no_sibling_found"` | `hits` 为空 **且** 覆盖完整 (全部 enforced remote 均解析出默认分支、fetch 成功、其全部 `refs/heads/*` 均已枚举、未触发**任一 kind** 的 cap) **且** `own_keys` 非空 |
+| `"not_established"` | 其余全部情形 —— 含 `own_keys` 为空 (本轨无可比较的输入)、任一 remote 未解析 / fetch 失败、cap 触发 (任一 kind)、enforced 集合为空。**`stale_skipped > 0` 不降级** (陈旧副本是被抑制的重复项, 不是未覆盖的语料; P11 2026-09-01 逐字成文以免两人分歧) |
 
 > **它消解的是同一族的病**: `hits == []` 在「已完整扫过, 确实没有竞品」与「根本没扫到 / 本轨没有输入」两种情形下取值相同 —— 让消费方从它推断结论, 就是把**零证据当正证据**。母 Spec 的四态契约 (决策 D-F) 在 claim 通道上解同一个问题; 本节是同一纪律在探针输出面的落点, **不是新机制**。
 
@@ -407,18 +408,18 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 > **消解 R2 簇 M-5 后半**: 「只扫默认分支 ⇒ in-flight 竞品结构性不可见, 盲区声明未勘正」(KM-M6)。
 
-**⚠️ 勘正母 Spec 原盲区声明。** 母 Spec §4 原文写「只看得见**已 push** 的竞品」—— **这句话不准确, 且方向是乐观的**。竞品可以已 push 而仍然完全不可见。准确的说法是: **只看得见已进入被扫默认分支的竞品。**
+**⚠️ 勘正母 Spec 原盲区声明。** 母 Spec §4 原文写「只看得见**已 push** 的竞品」—— **这句话不准确, 且方向是乐观的**。竞品可以已 push 而仍然完全不可见。准确的说法是: **只看得见已 push 到被扫 remote 任一分支的竞品** (2026-09-01 P11 扩后; 扩前是「已进入被扫默认分支」)。
 
 | # | 盲区 | 探针为什么看不见 |
 |---|---|---|
-| **B1** | 对方 Spec 在**非默认分支** (feature branch) 上进行中, 尚未合并 | §4 只扫各 remote 的默认分支。一份仍在制的竞品 Spec **按定义几乎总是活在 feature 分支上**, 直到合并才进默认分支 —— **而那时它已经不是「来得及协调」的 in-flight, 而是既成事实**。这是母 Spec 原声明漏掉的第三类盲区, 也是**最该被看见却看不见**的那一类 |
+| **B1** | 对方 Spec 在**非默认分支** (feature branch) 上进行中, 尚未合并 | ~~§4 只扫各 remote 的默认分支~~ **✅ 2026-09-01 P11 扩后已纳入** (全部 `refs/heads/*` 均扫, SC-22; 残余 = 对方**未 push** 的本地分支, 归 B2)。扩前原文留痕: 一份仍在制的竞品 Spec **按定义几乎总是活在 feature 分支上**, 直到合并才进默认分支 —— **而那时它已经不是「来得及协调」的 in-flight, 而是既成事实**。这是母 Spec 原声明漏掉的第三类盲区, 也是**最该被看见却看不见**的那一类 |
 | **B2** | 双方都未 push | 秒级到分钟级窗口, 无任何机制覆盖 |
 | **B3** | 对方的 proposal **没有「关联 Issue」字段** (或有但不在层 0 认的位置) | 层 1/层 2 皆空 ⇒ 层 3 判不可见。**实测量级: `cc1bdef` 的 147 篇语料中 133 篇落 `no_field` (90.5%)** —— 探针今天只对 **13** 篇可见 (§实读清单 #16) |
 | **B4** | **本轨自己**没有该字段 (`own_keys` 为空) | 没有可比较的输入 ⇒ `verdict="not_established"` + `reason="own_token_absent"`。**这是量级最大的一类**: 按 B3 的同一实测, 随机一份 proposal 落入本类的概率约九成 |
 | **B5** | 同 issue 的多份 Spec 是**有意拆分**而非重复劳动 | 探针**不区分**这两者 (§Why 的 `#137` 簇即实例) ⇒ 命中是**告警不是判决**, 必须 advisory |
 | **B6** | 一份**只是在讨论**某 issue 的 Spec, 其字段行恰好写在行首且是单个 `>` | §3 层 0 只挡住了**嵌套引用**这一形态 (`> >` / 带前导空白, 即本仓实测到的那个假阳性)。若有人把示例写成合规的行首形态, 探针仍会把「谈论 X」读成「在做 X」。**残余, 成文不假装覆盖** —— 处置靠 D11 的 advisory 定位 (人一眼可辨), 不靠加更多正则 |
 
-**⇒ 探针实际覆盖的是母 Spec §Why 里两类场景中的 (b)「对方已 ship 并归档」, 以及 (a)「对方没走 claim」中**其 Spec 已进默认分支**的那一部分。** 它**不是**「早期预防」机制 —— 它是「止损」机制: 在你已经投入的第 2、第 3 轮审计入口把「这件事别人做完了」摆到台面上。第 5 次事故里被浪费的三天, 正是这样被止住的那种。
+**⇒ 探针实际覆盖的是母 Spec §Why 里两类场景中的 (b)「对方已 ship 并归档」, 以及 (a)「对方没走 claim」中**其 Spec 已 push 到任一被扫分支**的那一部分 (2026-09-01 P11 扩后; 扩前只有「已进默认分支」)。** 它**不是**「早期预防」机制 —— 它是「止损」机制: 在你已经投入的第 2、第 3 轮审计入口把「这件事别人做完了」摆到台面上。第 5 次事故里被浪费的三天, 正是这样被止住的那种。
 
 > **本 Spec 自身的 dogfood 观察**: 本文件的「Linked Issue」写的是哨兵 `none` ⇒ 按层 1.5, **它对本探针永不命中**。这是设计如此 (正证据), 不是缺陷; 但它也意味着**本 Spec 不能拿自己当端到端夹具**, 夹具必须取 §3 点名的真实 `#122` 簇。
 
@@ -437,9 +438,11 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | **P7** | remote 集合从 **`git remote` 配置面**取, 经 `resolve_enforced_remotes()`; **禁止**从 `refs/remotes/*` glob 取 | 本仓当场可复现: `refs/remotes/probe/*` 存在而 `remote.probe.url` 不存在 (实读 #11) |
 | **P8** | fetch 落 **私有 ref 命名空间** `refs/aria/sibling-probe/<remote>/<branch>`; 不动 `refs/remotes/*`, 不依赖全局 `FETCH_HEAD` | `FETCH_HEAD` 是全局单槽, 并发下被覆盖; `refs/aria/*` 是本仓既有私有命名空间 (实读 #27) |
 | **P9** | 判定结论用一等字段 `verdict` 承载, **不让消费方从 `hits == []` 推断** | `hits == []` 在「扫完没有」与「没扫到 / 本轨无输入」上取值相同 ⇒ 推断即零证据当正证据。母 Spec D-F 的同一纪律换面落点, 非新机制 |
-| **P10** | 规模上限用探针自有常量, **不复用** `state_scanner.handoff_multibranch.max_branches` | 该旋钮作用域是「分支数」, 与本 cap 的「单 ref 上 proposal 数」不等; 作用域不匹配的开关把恒红换成假绿 (memory `knob-granularity`) |
-| **P11** | 扫描范围**维持**「enforced_remotes × 各自默认分支」, **本 Spec 不扩展**到全部活跃分支 | owner 2026-08-23 方向 b 缩 scope。**⚠️ 但原成本假设经本轮实测不成立, 须上呈 owner —— 见下方复议项** |
+| **P10** | 规模上限用探针自有常量, **不复用** `state_scanner.handoff_multibranch.max_branches` | 该旋钮作用域是「分支数」, 与本 cap 的「单 ref 上 proposal 数」不等; 作用域不匹配的开关把恒红换成假绿 (memory `knob-granularity`)。**2026-09-01 P11 后补**: `MAX_REFS_SCANNED` 的作用域确与该旋钮相同, 仍不复用 —— 第二条理由: 该旋钮属 `state_scanner` 配置树, 探针不读 state-scanner config key, 且降级语义不同 (`soft_error` vs `verdict=not_established`) |
+| **P11** | 扫描范围**扩为**「enforced_remotes × 全部 `refs/heads/*`」, 配三道护栏: 按 `spec_dir` 去重 (SC-23) / 默认 ref 已归档同名 ⇒ 陈旧跳过 (SC-24) / 非默认 ref 数 cap `MAX_REFS_SCANNED` (SC-25); B1 命中由 SC-22 钉 | **✅ 2026-09-01 技术裁定** (决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H3): 产品目标 (#174 在实现前抓 in-flight 重复) 倒推 —— in-flight 竞品按定义活在非默认分支 (§10 B1), 只扫默认分支对目标场景结构性失明; owner 2026-08-23 缩 scope 的成本前提已被下方实测推翻 (~0.15s/轮); 反向成本 (重复命中 / 陈旧假阳性) 化为两条可证伪 SC, 不是「不做」的理由。落点: TASK-012/013 verification + tasks.md 3.3/3.4 + TASK-007 RED (SC-22~25) |
 
+> **✅ 2026-09-01 已裁: 扩** (技术级裁定, 判据见上行 P11 与决策单 §H3)。以下为裁定前的上呈原文, 留痕不改:
+>
 > **⚠️ 请 owner 复议 (P11 的成本前提) — 主控/执笔席不自行改 scope**
 >
 > 母 Spec 把「只扫默认分支」的理由挂在**规模代价**上 (援引 `handoff_multibranch.py` 的 440 分支 scan cap 先例)。**本轮实测该前提不成立**:
@@ -449,7 +452,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 >
 > ⇒ 「扫全部活跃分支」相对「只扫默认分支」的边际代价在本仓约 **0.15s/轮**, 而它**恰好补上盲区 B1 (in-flight 竞品)** —— 即探针最有价值却当前完全看不见的那一类。
 >
-> **本 Spec 按 owner 的缩 scope 裁定执行, 不自行扩展。** 但上述实测与母 Spec 的成本理由直接冲突, 按 Rule #10 与 memory `narrow-owner-options` 留痕上呈: 若 owner 认为该选项应纳入, 它是一个**独立的小改动**, 不需要重开本 Spec 的其余部分。反向的成本项也一并列出 (不预设结论): 分支面扫描会引入**同一份 Spec 在多个分支上的重复命中**去重问题, 以及**已废弃分支上的陈旧 Spec 造成假阳性** —— 两者都是本 Spec 当前设计不需要面对的。
+> (**裁定前原文**) **本 Spec 按 owner 的缩 scope 裁定执行, 不自行扩展。** 但上述实测与母 Spec 的成本理由直接冲突, 按 Rule #10 与 memory `narrow-owner-options` 留痕上呈: 若 owner 认为该选项应纳入, 它是一个**独立的小改动**, 不需要重开本 Spec 的其余部分。反向的成本项也一并列出 (不预设结论): 分支面扫描会引入**同一份 Spec 在多个分支上的重复命中**去重问题, 以及**已废弃分支上的陈旧 Spec 造成假阳性** —— 两者都是本 Spec 当前设计不需要面对的。
 
 ### Rule #6 (rule6_note) — 诚实处置, **不自判豁免**
 
@@ -488,7 +491,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | **SC-2** (旧 SC-17) | 代码 | 全部 enforced remote 均解析成功且 fetch 成功, 语料中无同 key proposal | `status="ok"`, `verdict="no_sibling_found"`, `hits == []`, **exit 0** | 把「无命中」映射成非 0 exit 的实现必红 |
 | **SC-3** (旧 SC-18 拆 a) | 代码 | 某 remote 的 fetch 失败 / 超时 | `status="degraded"`, `verdict="not_established"`, 该 remote 的 `error_kind` 非空, **exit 0**; 另一 remote 已找到的命中项**仍留在 `hits[]`** | (i) 把 `verdict` 算成 `no_sibling_found` 的实现必红 (零证据当正证据); (ii) 把 degraded 映射成非 0 exit 的实现必红 (违 D11); (iii) 把 `hits` 整体丢弃成空的实现必红 (丢掉真实正证据) |
 | **SC-4** (旧 SC-18 拆 b) | 代码 | `resolve_enforced_remotes()` 解析为空集 (无 remote / 全部 read_only) | `status="skipped"`, `reason="no_enforced_remote"`, `verdict="not_established"`, **exit 0** | 照旧 SC-18 字面写「无远端 ⇒ exit 非 0」的实现在本条必红 —— 该写法会让无远端的项目**每轮恒非 0** |
-| **SC-5** (旧 SC-19a) | 代码 | 本轨 spec 目录名在被扫的默认分支上**已存在** (即本 Spec 自己已合并) | 该目录**不得**出现在 `hits[]`, 无论它落在哪个 remote / 哪个 corpus | 不做自命中排除的实现在「本 Spec 合并后」每轮自报一条命中 ⇒ 必红 |
+| **SC-5** (旧 SC-19a) | 代码 | 本轨 spec 目录名在被扫的**任一 ref (默认 ref 或非默认 ref)** 上**已存在** (即本 Spec 自己已合并, 或别人分支上留有副本; P11 2026-09-01 扩维, 夹具须含一条非默认 ref 上的副本) | 该目录**不得**出现在 `hits[]`, 无论它落在哪个 remote / 哪个 corpus / 哪条 ref | 不做自命中排除的实现在「本 Spec 合并后」每轮自报一条命中 ⇒ 必红 |
 | **SC-6** (旧 SC-19c) | 代码 | `MAX_PROPOSALS_SCANNED` 置 1, 语料含 1 份 `changes/` + 1 份 `archive/` | 保留的是 **`changes/` 那份**; `caps_applied[]` 非空且含截断点路径与丢弃条数; `status="degraded"`, `verdict="not_established"`; stderr 有 `log()` 披露 | (i) 静默截断 (`caps_applied` 为空) 必红; (ii) 排序把 `archive/` 排前而丢掉 `changes/` 的实现必红; (iii) 截断后仍报 `no_sibling_found` 的实现必红 |
 | **SC-7** ⭐ (M-1 主条) | 代码 | 夹具 = `archive/2026-07-31-phase-c-gate-path-coverage-not-applicable/proposal.md:6` 与 `archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md:22` 两行**字段原文** | **命中**, 且命中键逐字为 `["k","aria-plugin",122]` | 只实现层 1 (canonical) 的实现在此返回空 —— 实测两行冒号后首个非空白都是 `[`, canonical 层判 `NO_TOKEN` ⇒ 必红。**这正是探针的立项案例** |
 | **SC-8** ⭐ (M-1, 提取器位置约束) | 代码 | 夹具 = 上述 `:6` 那一行原文 (它冒号后首非空白是 `[`, **但行内后段含 code span** `` `confirmed` `` / `` `major` `` / `` `next-cycle` ``) | canonical 层判 **`NO_TOKEN`**; **不得**抽出 `confirmed` | 把提取器写成「行内**第一个** code span (任意位置)」的实现会抽到 `confirmed` (**本轮实跑复现, §实读清单 #15**) ⇒ 归一得 `None` ⇒ 落原串键 `["r","confirmed"]` ⇒ 与对方不命中且键值可辨 ⇒ 必红。**与 SC-18 是两个不同的取错**: 本条是「层 1 在**行内**取错 span」, SC-18 是「层 0 取错**行**」 |
@@ -505,6 +508,10 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 | **SC-19** ⭐ (R4/C-M3 + 姊妹 K8 → **2026-08-30 入表**; 常量黑名单) | 代码 | 两份 proposal 的字段值均为 SOT 模板 placeholder `` `{<org>/<repo>#<n>}` `` (姊妹判 `BAD_TOKEN`) | **不命中**; 二者的原串键集合均**不含** `("r", "{<org>/<repo>#<n>}")`; `own_layer` 为 `"bad_token_union"` | 照产原串键的实现 ⇒ 两份 placeholder 原串相等 ⇒ 命中 ⇒ 必红 (与姊妹 NEW-01 同形且**什么都不做就中**)。黑名单逐字内容与姊妹 §3 的模板默认值 + §2 哨兵集合**同源**, 任一改动须同批改另一侧 |
 | **SC-20** ⭐ (R5/C1; 引母 Spec **D17**, 落 ①②③; **R6/TL M8 + m7 补**) | 代码 | (i) `skills/audit-engine/SKILL.md` 的「per-round 入口探针」小节 —— **块边界** = 从该小节标题行 (正则 `(?m)^#{2,4}[ \t]+per-round 入口探针`, **锚定标题起首, 不允许 `Step 0.5:` 之类前缀** —— R6/TL m7; **不在围栏内**) 起至下一个 `^#{1,4}[ \t]` 行止; (ii) `references/execution-modes.md` 含标题字面 `## 竞品 spec 探针 (per-round 入口)` | (i) 切片内含四个字面量 `sibling_spec_probe.py` / `verdict` / `not_established` / `未能核实`, **且**含一条以 `python3` 起首、含 `sibling_spec_probe.py` 与 `--own-spec-dir` 的完整命令行 (D17 ②); (ii) 该节切片 (至下一个 `^## ` 行) 内含 §7 的 `verdict` / `status` / `hits` 三个字面与 §9 三档措辞的字面 `未能核实` / `已完整扫描` / `检测到` | 「插两行短语 + 写一段消歧散文」的实现 (SC-17 全绿) 在 (i) 四字面量缺失 ⇒ 红; 把字面量写在小节外 (如 `## 相关文档`) 的实现因块边界 ⇒ 红; 标题写成 `Step 0.5: per-round 入口探针` 的实现因锚定起首 ⇒ 红; **跳过契约节的实现在 (ii) 上 ⇒ 红** (否则 SKILL.md 的指针悬空)。**baseline 必红** (小节与契约节今天都不存在) |
 | **SC-21** (新, R6/BA 探针 M1; import 顺序) | 代码 | 在 `tests/test_sibling_spec_probe.py` 内 import 探针模块后断言 `sys.modules["lib"].__file__` 落在 `state-scanner/lib/__init__.py`, 且 `collectors.multi_remote.resolve_enforced_remotes` 可导入 | 两者同时成立 | 把 `_SS_SCRIPTS` 插在 `_SS_ROOT` **之后** (即排在 `sys.path` 更前) 的实现 ⇒ `lib` 绑定到 `scripts/lib` ⇒ `ModuleNotFoundError: lib.collision` ⇒ 红 (BA 席 /tmp 实跑复现); 把插入拆到两处、顺序由文件位置决定的实现同样可红。**baseline 必红** (探针今天不存在) |
+| **SC-22** (新, 2026-09-01 P11 扩; B1 补盲) | 代码 | 注入 runner: remote R 的私有命名空间含默认 ref 与 `R/feature/x` 两条 ref; `feature/x` 上有 `openspec/changes/<other>/proposal.md` 且其字段与本轨同键, 默认 ref 上无该目录 | `hits[]` 恰含 `<other>` 一条, 其 `refs == ["R/feature/x"]`、`branch == "feature/x"`; `verdict == "sibling_found"` | 只枚举默认 ref 的实现 (裁定前形态) ⇒ `hits == []` ⇒ 红 |
+| **SC-23** (新, P11 去重) | 代码 | 夹具默认分支取 `master`; 同一 `<other>/proposal.md` (同键) 同时出现在 R 的默认 ref 与 `R/a`、`R/b` 三条 ref | `hits[]` 恰 1 条 `<other>`, `refs == ["R/a", "R/b", "R/master"]` (整串字节序, 与枚举序无关), `branch == "master"` (枚举序首个命中 ref); `remotes[].refs_scanned == 3` | 逐 ref 追加不去重的实现 ⇒ 3 条 ⇒ 红; 按枚举序 append 不重排的实现 ⇒ `refs == ["R/master", "R/a", "R/b"]` ⇒ 红 |
+| **SC-24** (新, P11 陈旧过滤; 过滤先于去重) | 代码 | `R/old/y` 上有 `openspec/changes/<z>/proposal.md` (同键), 而 R 默认 ref 上存在 `openspec/archive/2026-01-01-<z>/proposal.md` 且无 `changes/<z>`; 负控 (b) 另备夹具: 默认 ref 只有 `openspec/archive/2026-01-01-w-<z>/proposal.md` | `hits[]` 恰 1 条: `spec_dir == "2026-01-01-<z>"` (第三段目录名逐字, 与 `<z>` 是两个不同的去重键)、`corpus == "archive"`、`refs == ["R/<default>"]`; `hits[]` 中**不含** `spec_dir == "<z>"` 的项; `remotes[].stale_skipped == 1`。负控 (b) 下 `<z>` **入** hits 且 `stale_skipped == 0` | 不做陈旧过滤的实现 ⇒ 多出一条 `spec_dir="<z>"` / `corpus="changes"` ⇒ 红; 用 `*-<spec_dir>` 后缀 glob 的实现在负控 (b) 下误杀 `<z>` ⇒ 红 |
+| **SC-25** (新, P11 refs cap) | 代码 | `MAX_REFS_SCANNED` 打桩为 1, R 有默认 ref + 非默认 `R/a`、`R/b`、`R/c` | 扫默认 ref + 字节序首条 `R/a`; `caps_applied[]` 含 `{remote: R, kind: "refs", total: 3, kept: 1, dropped_from: "R/b"}`; `status == "degraded"`、`verdict == "not_established"`、`reason == "cap_applied"`; stderr 披露 | 静默截断 (不写 `caps_applied` / 不降级) 的实现 ⇒ 红 (与 SC-6 同形) |
 
 ---
 
@@ -515,7 +522,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 - **不定义**「关联 Issue」字段的抽取规则 (SOT 在姊妹 Spec `linked-issue-field-availability`), **不私搭第二份抽取实现** (P4);
 - **不改** `lib/collision.py` 的任何签名或返回 schema —— 本 Spec 只**调用** `normalize_linked_issue()`;
 - **不做**标题 / slug / 语义相似度的模糊匹配 (§3 层 3);
-- **不扩展**扫描范围到非默认分支 (P11 —— 按 owner 缩 scope 裁定; 成本前提的实测反证已上呈复议);
+- ~~**不扩展**扫描范围到非默认分支~~ **2026-09-01 改判: 扩到全部 `refs/heads/*`** (P11 技术裁定, 决策单 §H3; 落点 TASK-012/013 + SC-22~25); 仍**不扫**未 push 的本地分支 (B2);
 - **不回填**存量 132 篇无「关联 Issue」字段的 proposal (那是姊妹 Spec 的范围);
 - **不修**代码库既有的 `STALE_TTL` / `SWEEP_TTL` 措辞误写等与探针无关的缺陷;
 - **不修** `fetch_gate.py:21` / `:111` 对 `state-scanner sync.py::_resolve_default_branch` 的**悬空函数名引用** (**R4 行号订正**: 原引 `:23`, 实读 `:23` 是另一句「state-scanner git.py — but the original locks ``@{upstream}``」; `sync.py::_resolve_default_branch` 那句在 **`:21`**。断言内容本身独立核实为真 —— `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中确无该函数) —— 本轮实读确认 `sync.py` 在 `d50f9c3` 上**没有**该函数 (只有同族常量 `_ORIGIN_HEAD_REFS:46`), 属既有文档缺陷, **记 follow-up, 不混进本 Spec 变更面**。
@@ -539,7 +546,7 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 **follow-up (不在本 Spec)**:
 1. `fetch_gate.py:21` / `:111` 的悬空函数名引用 `sync.py::_resolve_default_branch` (实读: `sync.py` 在 `d50f9c3` 上 8 个顶层 def 中无该函数);
 2. `AB_TEST_OPERATIONS.md` §现有资产盘点写「Skill eval suites 28 个 ✅ **全量覆盖**」, 而实测 `ab-suite/` 有 **31** 个 `.json`, `10CG/aria-plugin#150` 又记「14/43 个 skill 没有套件」—— **三方互不一致**, 且「✅ 全量覆盖」是**假绿标注**。建议并入 `#150`;
-3. P11 复议项 (扫描范围是否扩到非默认分支)。
+3. ~~P11 复议项 (扫描范围是否扩到非默认分支)~~ ✅ 2026-09-01 已裁: 扩 (决策单 §H3)。
 
 ---
 
@@ -574,5 +581,5 @@ git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/
 
 1. **本 Spec 是一份新文件**, 母 Spec 的 R1/R2 **不为本文件背书**。自 2026-08-25 起随母 Spec **联审**: 母 R3 = 本文件 R1, 母 R4 = R2, 母 R5 = R3 (R5/skill-reviewer 判本文件 1C/2M/1m, 已于 2026-08-30 落版); **下一步 R6 = 本文件第 4 轮**, 由 owner 显式加 (决策单第 3 项)。
 2. **Rule #6 处置见 rule6_note**: 三条要件逐条落, 兜底不触发的前提是 A.2 真的建成 `ab-suite/audit-engine.json`; **若建不成, 不得自判豁免, 须显式上呈 owner**。
-3. **owner 裁定**: (a) **P11 的扫描范围复议** —— 仍待裁 (本轮实测推翻「只扫默认分支」的成本前提, 边际代价约 0.15s/轮; 本 Spec 已按缩 scope 执行, 不自行扩展; memory `narrow-owner-options` 留痕); (b) **对姊妹纯函数的依赖方向 → ✅ 已裁 (i) 硬前置** (owner 2026-08-30 (R6 后) 裁定), §1 第 3 条 / §3 两段已落版; 姊妹 O-4 同步。
+3. **owner 裁定**: (a) **P11 的扫描范围复议** → **✅ 2026-09-01 技术裁定 = 扩** (owner 2026-09-01 分工: 产品级 owner / 技术级 AI; 判据 = 产品目标 #174 倒推 + 成本前提已被实测推翻; 落点 P11 行 / §7 / §10 B1 / SC-22~25 / TASK-007·012·013; 决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H3 含一句话回退指引); (b) **对姊妹纯函数的依赖方向 → ✅ 已裁 (i) 硬前置** (owner 2026-08-30 (R6 后) 裁定), §1 第 3 条 / §3 两段已落版; 姊妹 O-4 同步。
 4. **R6 已跑 (REVISE → 清账 → 定向复核 PASS), owner 裁不再加轮。** ~~本 Spec 在 owner 批准前不进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物已派生, post_planning (combined) 按默认跑, 不豁免; P11 扫描范围仍待裁。

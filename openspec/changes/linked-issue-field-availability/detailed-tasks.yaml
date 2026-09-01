@@ -29,7 +29,7 @@ metadata:
       path_prefix: ""
   scope_repo_head: "Aria c120f9e / aria d69091d / standards 334c609"
 
-  ship_target: "aria-plugin <vNEXT> (档位 MINOR/PATCH 与号由 owner 裁, R1/C3 三份统一占位, 不写具体号字面; proposal §Impact 自判 MINOR; 号段落地时按当时 plugin.json 计算; 裁定规则见 TASK-021 notes)"
+  ship_target: "aria-plugin <vNEXT> (档位 = MINOR, 2026-09-01 技术裁定, 决策单 2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H1; 三份串行各占一号; R1/C3 统一占位, 不写具体号字面; proposal §Impact 自判 MINOR 与裁定一致; 号段落地时按当时 plugin.json 计算; 规则见 TASK-021 notes)"
   ship_order_note: "本 Spec 先 ship; 纯函数 lib/linked_issue_field.py 是 sibling-spec-probe 硬前置 (owner 2026-08-30 O-4 (i))"
 
   # 供姊妹 / 母 Spec 接缝核验的导出面 (消费方: sibling-spec-probe §3 import 块 / 母 Spec §2 :125 模板行)
@@ -553,15 +553,14 @@ tasks:
       - aria/VERSION                             # :3-4 头部当前版本行 + 发布注; append-only 账本 ⇒ 行数不减
       - aria/CHANGELOG.md                        # 追加 `## [<ship>] - <date>` 条目, 历史保留
     verification:
-      - "ship 号 = <vNEXT>: 档位 (MINOR/PATCH) 与号由 owner 裁 (tasks.md 待 owner #6; 规则见本任务 notes); 落地时以当时 plugin.json 计算, 不抄本文件字面量"
+      - "ship 号 = <vNEXT>: 档位 = MINOR (2026-09-01 技术裁定, 决策单 §H1; 规则见本任务 notes); 落地时以当时 plugin.json 计算, 不抄本文件字面量"
       - "plugin.json 为 SOT; marketplace.json 两个 version 字段都改; `grep -rn '<旧版本>' aria/.claude-plugin aria/README.md` 零命中 (CHANGELOG/VERSION 历史行除外)"
       - "aria/VERSION 头部当前版本行 == plugin.json; 文件行数不减"
       - "CHANGELOG 条目: 新建 lib/linked_issue_field.py (E0–E6 纯函数, sibling-spec-probe 硬前置) / scripts/linked_issue_field_probe.py (check + --emit-arg) / spec-drafter 字段义务两 hunk / SC-6·SC-8 跨仓 skip 已知限 / 采用方须自行注册 (O-3); **不**写「已覆盖所有拼写」之类过度声称"
       - "CLAUDE.md 项目状态段: 本 Spec 的 skill 设计术语 (E0–E6 / 四态 / 哨兵) **不入** CLAUDE.md (污染 AB baseline, #116); 若更新版本行只改版本号"
     notes: >
-      (R1/C3 三份统一句, A1 3221f943 / A5 af9f0c47) 档位 (MINOR/PATCH) 与号由 owner 裁; 三份串行 ship 各占一号 (字段 → 探针 → 母);
-      若 owner 裁合并一版, 由最后 ship 的母 Spec 发布任务承接, 前两份的发布任务改为 no-op 并留痕。
-      未裁 ⇒ 本任务不开工 (status 仍 `pending`, 不用 `blocked`)。同规则适用 TASK-022 的 tag `v<vNEXT>` 与 TASK-024 主仓引用面。
+      (R1/C3 三份统一句 — 2026-09-01 裁定后形态, 决策单 2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H1) 档位 = MINOR (三份各自; SOT version-management.md §2.2「功能增强 (向下兼容)」);
+      三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版; 号落地时按当时 plugin.json 计算, 不预写字面。同规则适用 TASK-022 的 tag `v<vNEXT>` 与 TASK-024 主仓引用面。
 
   - id: TASK-022
     parent: "5.3"
@@ -624,7 +623,7 @@ tasks:
       - README.ja.md        # :3 / :10 / :244 (3 点)
       - README.ko.md        # :3 / :10 / :244 (3 点)
     verification:
-      - "14 个引用点 (与 086ee32 同口径: CLAUDE.md:139/:141 + VERSION + README.md:8/:242 + i18n ×3 各 :3/:10/:244) 全部改为 ship 号 <vNEXT> (owner 裁定规则见 TASK-021 notes; 行号按 c120f9e 实读, 落地时以 grep 为准); `grep -rn '1\\.67\\.2' VERSION README.md README.*.md CLAUDE.md` 零命中"
+      - "14 个引用点 (与 086ee32 同口径: CLAUDE.md:139/:141 + VERSION + README.md:8/:242 + i18n ×3 各 :3/:10/:244) 全部改为 ship 号 <vNEXT> (档位规则见 TASK-021 notes — 2026-09-01 已裁 MINOR; 行号按 c120f9e 实读, 落地时以 grep 为准); `grep -rn '1\\.67\\.2' VERSION README.md README.*.md CLAUDE.md` 零命中"
       - "i18n: 正文无实质变更 ⇒ **不重译**, 只改三点版本串 (#140 B 档); `i18n-readme-translation-currency` check OK"
       - "custom checks `m6-version-badge-match` / `m6-claude-md-version` / `main-project-version-consistency` 全 OK (跑 `/state-scanner` 或 scan.py 读 custom_checks 段)"
       - "CLAUDE.md 项目状态「版本:」行同步 (只改版本号, 不加术语)"
@@ -643,7 +642,7 @@ tasks:
       - openspec/changes/linked-issue-field-availability/   # proposal.md Status 行更新 + tasks.md/detailed-tasks.yaml 状态回写 (progress-updater 反向同步)
     verification:
       - "主仓 feature 分支含: Spec 本体 (三文件) / .aria/state-checks.yaml / .aria/linked-issue-field-grandfathered.txt / 两 gitlink / 版本引用面 / ab-suite/spec-drafter.json / ab-results/<子目录> / 审计轨追加段 (TASK-012)"
-      - "PR 经 phase-c-integrator 创建 (或 memory forgejo-agit-pr 的 AGit 路径), body 列: 2.6 实测结论 / 待 owner 项 (O-1 回填 / 版本档 MINOR vs PATCH / #117 归并 / standards 版本化) / A.2 裁量 1–10 指针"
+      - "PR 经 phase-c-integrator 创建 (或 memory forgejo-agit-pr 的 AGit 路径), body 列: 2.6 实测结论 / 待 owner 项 (#117 归并 / standards 版本化 — 2026-09-01 归技术级, B 期由 AI 裁) + 已裁项指针 (O-1 / 版本档 → 决策单 2026-09-01) / A.2 裁量 1–10 指针"
       - "pre-merge gate (C.2.4): 本 PR CI passing + main 无 in-flight run; 无 backend 按 no_ci_fallback 显式降级, stub 抛 NotImplementedError 时 abort — 本文件不复述判据"
       - "主仓 PR 可走 Forgejo merge (CLAUDE.md 例外: 主仓无被 bump gitlink 的下游); merge 后 `git ls-remote origin master` / `github master` 一致"
       - "Phase D 由 phase-d-closer 承接 (归档门消费本文件 25 条 checkbox 状态)"
@@ -716,8 +715,8 @@ summary:
 # Out-of-scope reminders (不得静默漏掉)
 # ---------------------------------------------------------------------------
 out_of_scope:
-  - "回填 6 份 M6/M7 proposal (O-1 待 owner; 白名单即『尚未回填清单』)"
-  - "采用方侧 check 自动注册 / 可移植注册行 (O-3; TASK-012 实测后属另一交付面)"
+  - "回填 6 份 M6/M7 proposal (O-1 2026-09-01 已裁: 不回填, 由 M6/M7 轨自回填、回填一份删一条; 白名单即『尚未回填清单』)"
+  - "采用方侧 check 自动注册 / 可移植注册行 (O-3 2026-09-01 已裁: 接受为已知限; TASK-012 实测后属另一交付面)"
   - "母 Spec 的两个 SKILL.md 前置块 (含 --emit-arg 模板行) — 归母 Spec Impact (R6 接缝 C1/C5)"
   - "sibling-spec-probe 的 sibling_spec_probe.py — 它 import 本 Spec 纯函数, 本 Spec 不写它"
   - "改 normalize_linked_issue / collision.py / phase1_gate.py 任何一行 (v1.67.0 已 ship, D4 只 import)"

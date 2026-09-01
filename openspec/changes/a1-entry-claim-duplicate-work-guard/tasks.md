@@ -2,7 +2,7 @@
 
 > **Spec**: [proposal.md](./proposal.md) (rework v4.1, owner 2026-08-30 批准进 A.2)
 > **Level**: 2 → 本文件由 A.2 (task-planner) 派生, 使 Spec 具备 OpenSpec 双层架构 (tasks.md + detailed-tasks.yaml)
-> **Status**: ✅ **A.2/A.3 complete** (2026-08-30; post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**) — 全部任务 `pending`, ready for B.1 (待 owner: 版本档 / 闸门状态「AI 流程判断」#2 carry-id 选项 A)
+> **Status**: ✅ **A.2/A.3 complete** (2026-08-30; post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**) — 全部任务 `pending`, ready for B.1 (版本档 = MINOR 各占一号 + 流程判断 #2 = 选项 A 成立, 均已裁 2026-09-01, 决策单 `2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md`)
 > **Scope repo**: 代码落 `aria/` 子模块 @ **d69091d** (v1.67.2, 含 `--no-push` 修复); 一行落 `standards/` 子模块 (5.8); Spec / AB 结果落主仓
 > **行号基线**: Spec 正文写的是 aria `d50f9c3`; 本轮全部锚点按 **d69091d 实读**, 与 Spec 不一致处记在 detailed-tasks.yaml 各任务 `notes` 与末尾「行号复核」段 (**不改 proposal.md**)
 > **决策源**: `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md` (六项裁定; 第 4 项 `--no-push` 已 ship v1.67.2) · R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`
@@ -86,7 +86,7 @@
 
 ## 8. 文档 / 发版 / follow-up
 
-- [ ] 8.1 `aria/CHANGELOG.md` 条目 + 版本 SOT 5 文件同步 (`.claude-plugin/plugin.json` / `marketplace.json` / `VERSION` / `README.md` / CHANGELOG); 号 = `<vNEXT>`, **落地时按 plugin.json 计算, 本文件不锁字面量** (A.2 倾向 MINOR: 新 CLI 模式 + 2 flag + 2 lib API + 能力面扩权; **档位与号由 owner 裁**, 三份串行 ship 各占一号, 合并一版则由本 Spec 承接; 未裁 ⇒ 不开工, status 仍 `pending`)
+- [ ] 8.1 `aria/CHANGELOG.md` 条目 + 版本 SOT 5 文件同步 (`.claude-plugin/plugin.json` / `marketplace.json` / `VERSION` / `README.md` / CHANGELOG); 号 = `<vNEXT>`, **落地时按 plugin.json 计算, 本文件不锁字面量** (A.2 倾向 MINOR: 新 CLI 模式 + 2 flag + 2 lib API + 能力面扩权; **档位 = MINOR (2026-09-01 技术裁定, 决策单 §H1)**, 三份串行 ship 各占一号, 不合并一版; 号落地时按当时 plugin.json 计算)
 - [ ] 8.2 主仓发版同步面 (与 086ee32 同口径 14 处版本点, R1 C2): gitlink `aria` bump 到 post-merge master SHA (index 条目, 非 `.gitmodules`) + 主仓 `VERSION:24` + `CLAUDE.md:139/:141` + root `README.md:8/:242` + i18n ×3 (`README.zh.md` / `README.ja.md` / `README.ko.md` 各 `:3` translated-from 标记 + `:10` badge + `:244` Plugin Version; 正文按 #140 B 档判是否重译, **标记与版本串必改**) → 全部改完后才断言机械兜底 `m6-version-badge-match` / `i18n-readme-translation-currency` 绿
 - [ ] 8.3 follow-up 开单 (不在本 Spec, 各带去处): Impact follow-up 表 #1–#7 (`owner-container` 口径 / `SWEEP_TTL`→`STALE_TTL` 三处措辞 / `unknown_schema_claims` 路径 / B.0 YAML-键形态 / `unattended` Layer 1→2 env 三腿契约 / 跨容器定向 release / `ClaimRecord` swept 标记) + §2.2 已知限「audit-engine 轮间 heartbeat」
 - [ ] 8.4 aria 子模块本地 merge → master + 双推 + 逐 remote `ls-remote` 核验 + tag (CLAUDE.md 硬约束 1/2 的任务宿主; 两 remote 一致后才做 8.2 gitlink bump) — R2/A1 3221f943 残留补; **执行序 8.1 → 8.4 → 8.2** (编号不可变, 列于末不代表最后做; 见 yaml dependencies)
@@ -175,25 +175,27 @@
 
 ## 待 owner 复议 (照录 proposal.md 闸门状态「本轮 AI 流程判断」8 条, Rule #10)
 
-| # | 判断 | 为什么须复议 | 2026-08-30 状态 |
+| # | 判断 | 为什么须复议 | 状态 (08-30 → 2026-09-01 分工裁定, 决策单 `2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md`) |
 |---|---|---|---|
-| 1 | 切出审计轨 (D-J) + 1A 移出原文追加进审计轨 §6 | 仿姊妹 Spec owner 2026-08-07 先例; 搬运无损 | 未裁 |
-| 2 | carry-id 统一采 editlist 选项 A (改三处 SKILL.md 占位串取值口径, §2.1b) | R3–R5 未推翻, 但 owner 从未显式确认「这不算动 Phase B」 | **未裁 — TASK-019 落地前需一句话** |
-| 3 | §2.3 选项集按 status 分档 | 执笔综合裁断, 扩大 A.1 决策面 | 未裁 |
-| 4 | SC-27 整条撤销 (而非只撤 (C) 臂) | (A)(B) 两臂在 1A 下与 SC-14(b)/SC-23 重合; 若 owner 要保留「放弃方向 1 ⇒ 方向 2 仍 active」回归守卫, 恢复为 baseline-绿守卫行即可 | 未裁 |
-| 5 | O-2 字段名与第 6 项哨兵同批落「英文 canonical + 中文 alias」 | owner 只对哨兵裁了 (i), 字段名是延伸推定 | 未裁 (R6-2 大小写折叠已裁 (i)) |
-| 6 | R6 沿用 config 五席但镜头由执笔指派 | 镜头指派未经 owner 点头 | 未裁 |
+| 1 | 切出审计轨 (D-J) + 1A 移出原文追加进审计轨 §6 | 仿姊妹 Spec owner 2026-08-07 先例; 搬运无损 | ✅ 维持 (2026-09-01 技术级: owner 08-07 先例 + memory `audit-trail-not-in-spec`, 搬运无损可逆) |
+| 2 | carry-id 统一采 editlist 选项 A (改三处 SKILL.md 占位串取值口径, §2.1b) | R3–R5 未推翻, 但 owner 从未显式确认「这不算动 Phase B」 | **✅ 已裁 2026-09-01 (技术级): 选项 A 成立, 不算动 Phase B — 判据 = TASK-019 三条 git diff / 测试字节级约束 + TASK-034 三套件照跑 (无闸门被跳过)** |
+| 3 | §2.3 选项集按 status 分档 | 执笔综合裁断, 扩大 A.1 决策面 | ✅ 维持 (2026-09-01: 每档选项 = 机械可达动作的枚举 (`claim_lifecycle.py:427` / `gc.py:324` 实读), active 档三选项逐字保留, 无产品级选项被移除) |
+| 4 | SC-27 整条撤销 (而非只撤 (C) 臂) | (A)(B) 两臂在 1A 下与 SC-14(b)/SC-23 重合; 若 owner 要保留「放弃方向 1 ⇒ 方向 2 仍 active」回归守卫, 恢复为 baseline-绿守卫行即可 | ✅ 维持撤销 (2026-09-01: 1A 后无「N 方向共用 track_id」机制 (proposal :456), 两臂已由 SC-14(b)/SC-23 覆盖; 要回归守卫时恢复 baseline-绿行即可) |
+| 5 | O-2 字段名与第 6 项哨兵同批落「英文 canonical + 中文 alias」 | owner 只对哨兵裁了 (i), 字段名是延伸推定 | ✅ 维持 (2026-09-01: owner 08-30 对「只认中文」的反驳要求 + memory `machine-tokens-english` 同规则; R6-2 大小写折叠已裁 (i)) |
+| 6 | R6 沿用 config 五席但镜头由执笔指派 | 镜头指派未经 owner 点头 | ✅ 关闭 (2026-09-01: R6 已于 08-30 跑完且 owner 裁不再加轮, 镜头指派不在 config 管辖面, 无后续动作) |
 | 7 | Phase B.1 前置断言: `--no-push` 须已合入 `origin/master` | 执笔判断把 Level 1 独立变更列为硬前置 | **已闭环**: v1.67.2 = `d69091d` 已在 `origin/master` 与 `github/master` (本轮 `ls-remote` 实核) |
 | 8 | R6 清账未换执笔席 | 与 owner 既往「换人执笔」处方相左 | **已裁**: owner 2026-08-30 (R6 后) 不换席 |
 
 ## 待 owner 裁 (A.2 本轮新增, 不自行拍板)
+
+> **2026-09-01 分工裁定** (owner: 产品级 owner / 技术级 AI): #1 已闭合; #6 (版本号) 已裁 MINOR 各占一号 (决策单 §H1); #2–#5 与 #7 属技术级, 由 AI 在 B 期落点裁定并追记决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md`, 不再等 owner。
 
 1. ~~子 Spec 导出物「不存在 ⇒ 阻塞」(1.2) 与 Spec §1/§4 矛盾~~ **已闭合 (非 owner 事项)**: 「阻塞」来自主控 A.2 指令的误写, 2026-08-30 核实 proposal :96/:423 后撤回, 1.2 / TASK-002 / `ship_order_note` / P2-P3 已按 Spec 改为 advisory (任意顺序 ship 自洽, 字段缺席退化为零输入)。留痕供复议。
 2. **探针 Spec 的输出母 Spec 并不消费** (探针 §1 依赖方向第 2 条逐字; 母 Spec 只有 §6 缺口表两行依赖它「覆盖」) — 已按此落版: 1.2 对探针只记录「脚本存在与否」, 不写消费契约。留痕供复议。
 3. **SC-32 遥测文件**: SC-32 写 `.aria/coordination-telemetry.jsonl`, 但 `phase1_gate.py:1010-1013` `_telemetry_path` 把非 `production` 源一律路由到 `coordination-telemetry-nonprod.jsonl`。三选一: (a) `_source="heartbeat"` 走既有路由落 nonprod 文件 (SC-32 文件名随之改); (b) 新增第三分区文件; (c) 写 production 文件但 `_source="heartbeat"` (probe 已忽略非 production 记录, 但违背结构性分区设计)。A.2 倾向 (a), TASK-010 断言钉 `_telemetry_path(repo, "heartbeat")` 返回路径以对三案免疫。
 4. **SC-22 ⑤「文件内共 7 处 yaml 围栏」实读为 8 处** (`:47/:62/:103/:146/:161/:230/:249/:265`); 断言按 `A.1 - Spec 管理:` 锚点定位不受影响, 但 Spec 数字错, 是否勘正 proposal 请裁。
 5. **SC-26 的 handoff 宿主未定义**: 「handoff 待复议段出现 `awaiting_owner`」—— A.1 阶段无 handoff 产物 (handoff 由 phase-d-closer D.3 / session-closer 写), `awaiting_owner` 字面在 aria 全仓零命中。请裁 `unattended` 分支写到哪 (候选: `docs/handoff/latest.md` §待复议 追加 / `.aria/notes/` 待复议记录)。
-6. **版本号**: A.2 倾向 MINOR; 号 = `<vNEXT>` 落地时计算, 不预写 (R1 C3: 字段 Spec 与本 Spec 曾同写 v1.68.0 而串行 ship 三档必撞号)。档位 (MINOR/PATCH) 与号由 owner 裁; 三份串行 ship 各占一号 (字段 → 探针 → 母); 若 owner 裁合并一版, 由最后 ship 的本 Spec 发布任务承接, 前两份的发布任务改为 no-op 并留痕。未裁 ⇒ TASK-037 不开工 (status 仍 `pending`, 不用 `blocked`)。
+6. ~~**版本号**: 待 owner~~ **✅ 已裁 (2026-09-01, 决策单 §H1)**: 档位 = **MINOR** (SOT `version-management.md §2.2`「功能增强 (向下兼容)」字面覆盖: 新 CLI 模式 + 2 flag + 2 lib API + allowed-tools 扩权); 三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版; 号 = `<vNEXT>` 落地时按当时 plugin.json 计算, 不预写 (R1 C3 撞号教训不变)。TASK-037 可按依赖开工。
 7. **SC-10 `error` 优先级**: 同一次运行 fetch 降级且 Step 9 push 失败时 `error` 取哪个 token 未定; TASK-008 夹具以 `--no-push` 隔离, 实现者按「后发硬错覆盖先发软降级」落, 请 owner 确认或改。
 
 ---

@@ -4,7 +4,7 @@
 > **Level**: proposal 自陈 **2**; 本文件按 Level 3 双层体例出 `tasks.md` + `detailed-tasks.yaml` (理由见下「为什么出 tasks.md」)
 > **Status**: ✅ **A.2 + A.3 complete** (2026-08-30 owner 批准进 A.2; post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; 收敛后定点 minor 编辑见文末「R4 收敛后定点编辑」) — 全部任务 `pending`, ready for B.1 (待 owner: 版本档 / O-1 / O-3)
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `d69091d`, v1.67.2: 两个新建文件 + 一份 SKILL.md 两 hunk + 一个新建测试文件 + 版本 5 文件) · `standards/` 子模块 (@ `334c609`: 一份模板) · 主仓 (@ `c120f9e`: `.aria/state-checks.yaml` 注册 + 白名单数据文件 + 两个 gitlink + 版本引用面 + AB 结果 + Spec 本体)
-> **ship target**: aria-plugin **`<vNEXT>`** (R1/C3 三份统一占位, 本文件**不写** v1.68.0 / v1.67.3 字面; proposal §Impact 自判 **MINOR**, ⚠️ 两条 CLAUDE.md 判据都不字面覆盖本例; 档位 (MINOR/PATCH) 与号由 owner 裁 — 三份串行 ship 各占一号 (字段 → 探针 → 母), 若 owner 裁合并一版则由最后 ship 的母 Spec 发布任务承接、前两份发布任务改 no-op 留痕; 未裁 ⇒ 5.2 不开工 (status 仍 `pending`, 不用 `blocked`); 号段落地时按当时 `plugin.json` 计算)
+> **ship target**: aria-plugin **`<vNEXT>`** (R1/C3 三份统一占位, 本文件**不写** v1.68.0 / v1.67.3 字面; proposal §Impact 自判 **MINOR**, ⚠️ 两条 CLAUDE.md 判据都不字面覆盖本例; 档位 = **MINOR** (2026-09-01 技术裁定, 决策单 §H1: `version-management.md §2.2`「功能增强 (向下兼容)」字面覆盖), 三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版; 号段落地时按当时 `plugin.json` 计算)
 > **ship order (owner 2026-08-30 O-4 (i))**: **本 Spec 先 ship**; 纯函数 `aria/skills/state-scanner/lib/linked_issue_field.py` 是姊妹 Spec `sibling-spec-probe` 的**硬前置** (其 §1 依赖方向第 3 条 / §3 import 块逐字 `from lib.linked_issue_field import extract_linked_issue_field`)。母 Spec `a1-entry-claim-duplicate-work-guard` 与本 Spec **任意顺序** (其 §2 `:125` 模板行两阶段取法: 脚本存在 ⇒ 用 `--emit-arg` stdout, 不存在 ⇒ 手工按 E6)。
 
 > **为什么出 tasks.md** (proposal 头部写「Level 2 … 不出 `tasks.md`」): (1) rule6_note 有**四条**必须各自独立成任务的 Rule #6 处置 (照跑 / 定向 fixture / 套件缺口 issue / substitute), 先例 `linked-issue-normalization` 正是因「owner 亲裁的 Rule #6 处置无独立落地载体」被 R3′ 两席命中而从 Level 2 升 Level 3; (2) 三仓交付 + 两个 gitlink bump 的次序 proposal `:601` 明写「属 A.2」, 需要可被归档门与 handoff 机械消费的 checkbox 载体; (3) proposal `:388` 升格的显式验收项需要一个 TASK。**这是 A.2 的流程判断, 非 owner 裁定 —— 留痕请复议** (Rule #10)。proposal 的 Level 自陈本文件**不改** (A.2 不编辑 proposal.md)。
@@ -19,7 +19,7 @@
 | 组 5: 回归 + 版本面 + **两个子模块的本地合并 + 双推 + 逐 remote `ls-remote` 核验 + 主仓 gitlink bump** | **本文件** (5.3 / 5.4 本地执行, CLAUDE.md 多远程硬约束 1+2) | 子模块合并**禁**走 Forgejo 服务端 merge (硬约束 1); `phase-c-integrator` 只承接主仓 PR + pre-merge 闸门 |
 | Phase C: 主仓 PR 创建 / **pre-merge gate (Rule #8)** / merge | **`phase-c-integrator`** (5.6 交付) | 通用流程, 本文件不复述其判据 |
 | Phase D: cycle 进度 / Spec 归档 / 周期 handoff (Rule #9) | **`phase-d-closer`** | 归档门会消费本文件全部 checkbox 状态, 故每条必须真做完 |
-| 采用方侧 check 自动注册 / 回填 6 份 M6/M7 proposal / 改归一算法 / 编辑母 Spec 的 SKILL.md hunk | **不在本文件** | proposal §非目标 + O-1 / O-3 待 owner |
+| 采用方侧 check 自动注册 / 回填 6 份 M6/M7 proposal / 改归一算法 / 编辑母 Spec 的 SKILL.md hunk | **不在本文件** | proposal §非目标 + O-1 / O-3 (2026-09-01 已裁: 维持, 决策单 §H4) |
 
 ---
 
@@ -149,12 +149,14 @@
 
 ## 发现的 Spec 内部问题 / 陈旧行号 / 待 owner (A.2 不自行拍板)
 
+> **2026-09-01 分工裁定** (owner: 产品级 owner / 技术级 AI): #5 (O-1) / #6 (版本档) 已裁 (决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H4a / §H1); #7 (aria-standards 版本化) / #8 (#117 归并) 属技术级, 由 AI 在 B 期落点裁定并追记该决策单, 不再等 owner。
+
 1. **陈旧数字 (非矛盾, 照 proposal 自己的纪律「口径是规范, 数字是观测」)**: `.aria/state-checks.yaml` 今日 `grep -c '^  - name:'` = **12** (proposal 记 10 / 11; 第 12 条 `forgejo-app-token-liveness` 08-30 并发轨加入); `CLAUDE_PLUGIN_ROOT` 仍零命中。`changes/` 9 份 / 两拼写严谓词 17 文件, 与 proposal 一致。
 2. **路径写法**: proposal 写 `collectors/custom_checks.py:63 / :122-123 / :399`, 真实路径是 `aria/skills/state-scanner/scripts/collectors/custom_checks.py` (`:63` 注释 / `:121-124` docstring / `:399` `config_path`), 本文件按真实路径写。
 3. **SC-8 (a)(c) 的跨仓读取与 SC-6 同形但 proposal 未声明已知限** —— 本文件按 SC-6 的 fail-soft 处置 (主仓文件不存在 ⇒ `skipTest`); 请 post_planning 确认或 owner 裁是否回写 proposal (A.2 不改 proposal)。
 4. **§4「本探针除 stdlib 外只 import 这一个符号」写的是 `normalize_linked_issue`** (R3/C3 之前的文本); 纯函数落版后探针唯一非 stdlib import 应是 `lib.linked_issue_field.extract_linked_issue_field` (E5 在纯函数内调 `normalize_linked_issue`)。本文件按后者落, `##SKIP##` 文案仍点名「归一 SOT 不可导入」。
-5. **待 owner O-1**: 是否回填 6 份 M6/M7 proposal (本文件按「不回填 + 在册」落, 回填一份删一条, 探针零改动)。
-6. **待 owner 版本档**: MINOR vs PATCH (号一律写 `<vNEXT>` 占位, R1/C3) — proposal 自判 MINOR 且自陈两条 CLAUDE.md 判据都不字面覆盖; 三份串行各占一号 / 或合并一版由母 Spec 承接 (统一句见 yaml TASK-021 notes); 未裁 ⇒ 5.2 `pending` 不开工。
+5. ~~**待 owner O-1**~~ **✅ O-1 已裁 (2026-09-01 技术裁定, 决策单 §H4a)**: 不回填 + `GRANDFATHERED` 在册 (维持本文件落版); 6 份由 M6/M7 轨自己在下次触碰各 proposal 时回填并各删一条, 探针零改动。判据: fail-CLOSED 白名单已满足产品目标 (新 Spec 必声明), 回填对撞车检测零增益且是跨轨写入。
+6. ~~**待 owner 版本档**~~ **✅ 版本档已裁 (2026-09-01, 决策单 §H1)**: **MINOR** (SOT `version-management.md §2.2`「功能增强 (向下兼容)」字面覆盖本 Spec; CLAUDE.md 两句是缩写); 三份串行各占一号 (字段 → 探针 → 母), 不合并一版; 号一律 `<vNEXT>` 占位、落地时按当时 plugin.json 计算 (统一句见 yaml TASK-021 notes); 5.2 可按依赖开工。
 7. **待 owner**: aria-standards 是否需要版本化 (实测该子模块无 VERSION / CHANGELOG / tag; `version-management.md:254` 写「独立版本 (standards-v2.1.0)」但仓内无对应工件)。
 8. **待 owner**: #117 归并 (裁量 1) 是否改判新开。
 9. **预备观测 (不替代 2.6)**: A.2 执笔的 subagent Bash 环境里 `CLAUDE_PLUGIN_ROOT` = **UNSET** (11 个 `CLAUDE*` 变量存在); `state-scanner/SKILL.md:71` 自身也用 `${CLAUDE_PLUGIN_ROOT:-aria}` 回落 —— 即 Aria 仓内实际走的是回落值 `aria`。2.6 仍须在 Phase 1.11 真实子进程路径上实测。

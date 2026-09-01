@@ -265,26 +265,30 @@ tasks:
   - id: TASK-007
     parent: "2.4"
     task_group: G2
-    title: "远端解析 / fetch / cap 测试 (注入式 git runner): SC-12/13/14 + SC-3/4/5/6 + §5 超时预算 + §6 排序决定性"
+    title: "远端解析 / fetch / cap 测试 (注入式 git runner): SC-12/13/14 + SC-3/4/5/6 + §5 超时预算 + §6 排序决定性 + SC-22~25 (P11 分支维)"
     status: pending
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer
-    reason: "七条 SC + 两条机械预算断言; 需设计可注入 runner 与 fail-closed 各分支负控"
+    reason: "十一条 SC (含 P11 的 SC-22~25) + 两条机械预算断言; 需设计可注入 runner 与 fail-closed 各分支负控"
     dependencies: [TASK-001, TASK-006]                                  # 同文件串行 (R1 C1): 2.3 → 2.4
     deliverables:
       - aria/skills/audit-engine/tests/test_sibling_spec_probe.py       # runner 体例仿 phase-d-closer/tests/test_fetch_gate.py:22 `_runner(seq)`: run(args, cwd, timeout) -> (rc, out, err), 记录每次调用
     verification:
       - "SC-12: runner 对 `symbolic-ref refs/remotes/github/HEAD` 返回 rc=128 (夹具值, 取自 2026-08-30 主仓观测, 见 metadata.line_anchor_recheck 末条), 对 `ls-remote --symref github HEAD` 返回 `ref: refs/heads/master\\tHEAD\\n<sha>\\tHEAD` ⇒ remotes[github].default_branch == 'master' 且 resolved_by == 'ls_remote_symref'; 只读本地 symbolic-ref 的实现 unresolved ⇒ 红"
-      - "SC-13 (四臂各一负控): ls-remote rc≠0 / 超时 (runner 抛 TimeoutExpired 或返回 timeout 标记) / 输出无 `ref: ` 行 / 首段前缀非 refs/heads/ ⇒ 每臂 default_branch is None 且 error_kind 非空 (分别 network|other / timeout / no_symref / bad_symref_prefix), status == 'degraded', verdict == 'not_established'; 断言 stdout JSON 中该 remote 的 default_branch 不是字面 'master' 或 'main' (照抄 fetch_gate.py:55 _DEFAULT_BRANCH_FALLBACKS 的实现 ⇒ 红)"
-      - "SC-14: runner 对 `remote` 返回 'github\\norigin\\n', 对 `for-each-ref refs/remotes` (若实现调用) 返回含 probe ⇒ remotes[] 名字集合 == {github, origin}, 不含 probe; 用 refs/remotes/* glob 枚举的实现 ⇒ 红"
+      - "SC-13 (四臂各一负控): ls-remote rc≠0 / 超时 (runner 抛 TimeoutExpired 或返回 timeout 标记) / 输出无 `ref: ` 行 / 首段前缀非 refs/heads/ ⇒ 每臂 default_branch is None 且 error_kind 非空 (分别 network|other / timeout / no_symref / bad_symref_prefix), status == 'degraded', verdict == 'not_established'; 断言 stdout JSON 中该 remote 的 default_branch 不是字面 'master' 或 'main' (照抄 fetch_gate.py:55 _DEFAULT_BRANCH_FALLBACKS 的实现 ⇒ 红); P11 后补: 每臂该 remote 的 fetch 调用恰 0 次且 remotes[].refs_scanned == 0 (默认分支未解析 ⇒ 短路, 不扫任何 ref)"
+      - "SC-14: runner 对 `remote` 返回 'github\\norigin\\n', 对 `for-each-ref refs/remotes` (若实现调用) 返回含 probe ⇒ remotes[] 名字集合 == {github, origin}, 不含 probe; 用 refs/remotes/* glob 枚举的实现 ⇒ 红; runner 须按第二个实参 (ref pattern: `refs/remotes` vs `refs/aria/sibling-probe/R/`) 分派, 不得只匹配子命令 for-each-ref (P11 后 for-each-ref 有两个用途)"
       - "SC-3: origin fetch 成功且语料含 #122 簇, github fetch 两次均失败 ⇒ status 'degraded', verdict 'not_established', remotes[github].error_kind 非空, exit 0, 且 hits[] 仍含 origin 的命中; 三个坏实现 (verdict 算成 no_sibling_found / degraded 映射非 0 / hits 整体清空) 各一负控 ⇒ 红"
       - "SC-4: `remote` 返回空 (或全部落 read_only_remotes) ⇒ status 'skipped', reason 'no_enforced_remote', verdict 'not_established', exit 0; 写「无远端 ⇒ exit 非 0」的实现 ⇒ 红"
-      - "SC-5: 被扫默认分支语料含 openspec/changes/<own_spec_dir>/proposal.md (及 archive/<date>-<own_spec_dir>/ 变体不算同名, 只按目录名逐字节) 且其键与 own_keys 相同 ⇒ hits[] 不含 spec_dir == own_spec_dir 的项, 无论 remote / corpus; 不排除的实现自报命中 ⇒ 红"
-      - "SC-6: MAX_PROPOSALS_SCANNED 打桩为 1 (monkeypatch 模块常量), 语料 1 份 changes/ + 1 份 archive/ ⇒ 保留 changes/ 那份; caps_applied == [{remote, total: 2, kept: 1, dropped_from: <archive 路径>}]; status 'degraded'; verdict 'not_established'; stderr 含截断点路径与丢弃条数; 三负控 (caps_applied 空 / archive 排前 / 截断后仍 no_sibling_found) ⇒ 红"
+      - "SC-5: 被扫语料 (夹具须同时含默认 ref 与一条非默认 ref, 两者都放 openspec/changes/<own_spec_dir>/proposal.md; P11 扩维) (及 archive/<date>-<own_spec_dir>/ 变体不算同名, 只按目录名逐字节) 且其键与 own_keys 相同 ⇒ hits[] 不含 spec_dir == own_spec_dir 的项, 无论 remote / corpus / ref; 不排除的实现自报命中 ⇒ 红; 只在默认 ref 上排除、漏掉非默认 ref 那份的实现 ⇒ 红"
+      - "SC-6: MAX_PROPOSALS_SCANNED 打桩为 1 (monkeypatch 模块常量), 语料 1 份 changes/ + 1 份 archive/ ⇒ 保留 changes/ 那份; caps_applied == [{remote, kind: 'proposals', total: 2, kept: 1, dropped_from: <archive 路径>}]; status 'degraded'; verdict 'not_established'; stderr 含截断点路径与丢弃条数; 三负控 (caps_applied 空 / archive 排前 / 截断后仍 no_sibling_found) ⇒ 红"
       - "§5 预算 (机械): runner 记录每次调用的 timeout 参数, 断言全部 == 30; fetch 首次失败第二次成功 ⇒ 该 remote fetch 调用恰 2 次且 error_kind 为 null; 两次都失败 ⇒ 恰 2 次 (不 3 次); 首次成功 ⇒ 恰 1 次; ls-remote 每 remote 恰 1 次 (a2_discretions (c))"
-      - "§5(f)/(e): fetch 命令逐字为 ['fetch','--no-tags',R,'+refs/heads/<default>:refs/aria/sibling-probe/R/<default>'] (断言 args), 全程不调用 `symbolic-ref refs/remotes/<R>/HEAD` 作解析、不读 FETCH_HEAD、不 import remote_refresh"
+      - "§5(f)/(e): fetch 命令逐字为 ['fetch','--no-tags','--prune',R,'+refs/heads/*:refs/aria/sibling-probe/R/*'] (断言 args; P11 --prune 行为: 夹具第二轮 for-each-ref 少返回一条 ref (模拟上游删分支后被 prune) ⇒ refs_scanned 递减且该 ref 上的命中消失), 全程不调用 `symbolic-ref refs/remotes/<R>/HEAD` 作解析、不读 FETCH_HEAD、不 import remote_refresh"
       - "§6 排序决定性: 乱序输入路径 (archive 混在 changes 前、非字节序) ⇒ 扫描顺序 = changes/ 全部 (字节序) 后 archive/ 全部 (字节序); 1001 条合成路径 + 常量 1000 ⇒ kept 1000, dropped_from == 排序后第 1001 条, caps_applied[0].total == 1001; 用 locale 排序或 dict 序的实现 ⇒ 红"
+      - "SC-22 (P11 B1 补盲, 2026-09-01 裁定): runner 夹具 = R 私有命名空间两条 ref (默认 + R/feature/x), feature/x 的 ls-tree 含 openspec/changes/<other>/proposal.md (同键), 默认 ref 无该目录 ⇒ hits 恰 1 条 <other>, refs == ['R/feature/x'], verdict 'sibling_found'; 负控: 只枚举默认 ref ⇒ hits == [] ⇒ 红"
+      - "SC-23 (P11 去重): 夹具默认分支取 `master`; 同一 <other>/proposal.md 在默认 ref + R/a + R/b 三条 ref ⇒ hits 恰 1 条, refs == ['R/a','R/b','R/master'] (整串字节序; 按枚举序 append 不重排的实现得 ['R/master','R/a','R/b'] ⇒ 红), branch == 'master' (枚举序首个命中 ref), remotes[].refs_scanned == 3; 负控: 逐 ref 追加不去重 ⇒ 3 条 ⇒ 红"
+      - "SC-24 (P11 陈旧过滤, 过滤先于去重): R/old/y 有 openspec/changes/<z>/proposal.md (同键), 默认 ref 有 openspec/archive/2026-01-01-<z>/proposal.md 且无 changes/<z> ⇒ hits 恰 1 条: spec_dir == '2026-01-01-<z>' (第三段目录名逐字, 与 <z> 是两个不同的去重键), corpus 'archive', refs == ['R/<default>']; hits 中不含 spec_dir == '<z>' 的项; remotes[].stale_skipped == 1; 负控 (a): 不过滤 ⇒ 多一条 spec_dir '<z>' / corpus 'changes' ⇒ 红; 负控 (b) 后缀误配: 默认 ref 只有 archive/2026-01-01-w-<z>/proposal.md 而分支上是 changes/<z> ⇒ 不跳过, stale_skipped == 0, <z> 入 hits; 用 `*-<spec_dir>` 后缀匹配的实现在 (b) 下误杀 <z> ⇒ 红"
+      - "SC-25 (P11 refs cap): MAX_REFS_SCANNED 打桩 1, 非默认 ref R/a R/b R/c ⇒ 只扫默认 + R/a; caps_applied 含 {remote R, kind 'refs', total 3, kept 1, dropped_from 'R/b'}; status 'degraded' + verdict 'not_established' + reason 'cap_applied'; 负控: 静默截断 ⇒ 红"
     notes: >
       全部不打真网络 (fail-closed 分支各一条负控). runner 注入点由 TASK-010 提供 (函数参数或模块级可替换属性).
       SC-13「stdout 不得出现字面 master/main 作该 remote 的 default_branch」是断言 JSON 字段值, 不是全文 grep (其他 remote 可合法为 master).
@@ -384,7 +388,7 @@ tasks:
       - "层 2 触发集逐字 == {NO_TOKEN, BAD_TOKEN}; 只扫由 line_no 定位的字段行, 正则抽 `/([^/\\s]+)/([^/\\s]+)/issues/(\\d+)` 片段组 token `<org>/<repo>#<n>` 后按键构造成键; 不扫全文散文"
       - "键构造: k = normalize_linked_issue(t); k 非 None ⇒ ('k', k[0], k[1]); None ⇒ ('r', t); 两类永不相等; 一份 proposal 集合去重; 多元素全部入集"
       - "SC-19 常量黑名单 `_RAW_KEY_BLACKLIST` = {'{<org>/<repo>#<n>}'} ∪ 哨兵集合 (none 折叠 / 无); 命中者不产生任何键; 模块顶部注释写明「与姊妹 Spec §2 哨兵集合 + §3 模板 placeholder 同源, 任一改动须同批改另一侧」"
-      - "求交: 本轨集合 ∩ 每份远端 proposal 集合非空 ⇒ 每个交集键各成一条 hits 项 {remote, branch, corpus, spec_dir, path, field_line, key, layer}; spec_dir == own_spec_dir 的 proposal 跳过 (SC-5, 任一 remote / corpus)"
+      - "求交: 本轨集合 ∩ 每份远端 proposal 集合非空 ⇒ 每个交集键各成一条 hits 项 {remote, branch, corpus, spec_dir, path, field_line, key, layer, refs (P11: 同键多 ref 合并为一条, 见 TASK-013)}; spec_dir == own_spec_dir 的 proposal 跳过 (SC-5, 任一 remote / corpus)"
       - "SC-1 / SC-5 / SC-7 / SC-8 / SC-9 / SC-10 / SC-11 / SC-18 / SC-19 (TASK-005/006/007 对应条目) 转绿"
     notes: >
       normalize_linked_issue 的 org 不参与键 (docstring :178-193); 原串键与归一键首元不同, 脏元素永不与归一键相等 (§3 对姊妹「反向不成立」的澄清).
@@ -393,7 +397,7 @@ tasks:
   - id: TASK-012
     parent: "3.3"
     task_group: G3
-    title: "remote 集合 + 默认分支 fail-closed (ls-remote --symref) + fetch 私有 ref + 30s/子进程 + fetch 2 次"
+    title: "remote 集合 + 默认分支 fail-closed (ls-remote --symref) + fetch 私有 ref (P11: refspec refs/heads/*) + 30s/子进程 + fetch 2 次"
     status: pending
     complexity: L
     estimated_hours: "6-8"
@@ -407,7 +411,8 @@ tasks:
       - "config: 读 <repo>/.aria/config.json → state_scanner.multi_remote.{enforced_remotes, read_only_remotes}; skill 级 null/缺席 ⇒ 继承顶层 multi_remote.* (a2_discretions (d)); 文件缺失/解析失败 ⇒ 两键均 None/空; read_only 作 tuple 传入; `resolve_enforced_remotes(configured, actual, read_only)[0]` 为 enforced; [] 或 None ⇒ auto-discover (F5′ trap, 不当空集)"
       - "enforced 空集 ⇒ status 'skipped' + reason 'no_enforced_remote' + verdict 'not_established' + exit 0, 不发起任何网络调用 (SC-4)"
       - "P6: 逐 remote `git -C <repo> ls-remote --symref R HEAD`; 取 stdout 第一条以 `ref: ` 起首的行, 按 '\\t' 切两段, 首段去 `ref: ` 前缀须以 `refs/heads/` 起首 ⇒ default_branch = 去前缀; resolved_by 'ls_remote_symref'; 任一不成立 ⇒ default_branch None + error_kind ∈ {timeout, no_symref, bad_symref_prefix, network, ...} + status 'degraded' + verdict 'not_established'; 源码不含字面回落 ('master','main') 元组 (grep `_DEFAULT_BRANCH_FALLBACKS\\|(\"master\", \"main\")` == 0); 不调用 `symbolic-ref refs/remotes/<R>/HEAD` (SC-12 / SC-13)"
-      - "P8 / §5(f): fetch 命令逐字 `git -C <repo> fetch --no-tags R +refs/heads/<default>:refs/aria/sibling-probe/R/<default>`; 不动 refs/remotes/*; 不读 FETCH_HEAD; 不 import / 不读 remote_refresh 缓存 (P3)"
+      - "P8 / §5(f): fetch 命令逐字 `git -C <repo> fetch --no-tags --prune R +refs/heads/*:refs/aria/sibling-probe/R/*`; 不动 refs/remotes/*; 不读 FETCH_HEAD; 不 import / 不读 remote_refresh 缓存 (P3)"
+      - "P11 (2026-09-01 技术裁定, 决策单 2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H3): refspec 扩为全部分支 (上一条逐字), 一次 fetch 取全部 refs/heads/*, 网络腿数不变 (与 remote_refresh 的常规 fetch 同代价, proposal :443-452 实测); 默认分支仍经 ls-remote --symref 解析 (SC-12) 并用于标记私有命名空间内的默认 ref (SC-24 陈旧过滤的基准); default_branch is None ⇒ 短路: 该 remote 不发起 fetch (fetch 调用 0 次)、不枚举私有 ref, refs_scanned == 0 / stale_skipped == 0, 只记 error_kind + degraded (P6 fail-closed 极性不变)"
       - "P1 / §5(d): 每个 git 子进程 timeout=30 (常量 `GIT_TIMEOUT_S = 30`, 非整轮总预算); fetch 腿最多 2 次 (首次失败重试 1 次), ls-remote 1 次; 超时/失败 ⇒ error_kind 非空 + degraded + not_established + exit 0, 不阻断; 已成功 remote 的命中保留 (SC-3)"
       - "stderr log(): 每 remote 的解析结果 / fetch 结果 / 各腿耗时 (毫秒), 不回显 git 原始 stderr"
       - "SC-3 / SC-4 / SC-12 / SC-13 / SC-14 + §5 预算断言 (TASK-007) 转绿"
@@ -418,7 +423,7 @@ tasks:
   - id: TASK-013
     parent: "3.4"
     task_group: G3
-    title: "语料枚举 (ls-tree on 私有 ref, changes 先 archive 后, 字节序) + MAX_PROPOSALS_SCANNED=1000 + no-silent-caps 三件套 + blob 读取"
+    title: "语料枚举 (ls-tree on 私有 ref, changes 先 archive 后, 字节序) + MAX_PROPOSALS_SCANNED=1000 + no-silent-caps 三件套 + blob 读取 + P11 分支维 (refs/heads/* 枚举 / 陈旧过滤 / 去重 / MAX_REFS_SCANNED)"
     status: pending
     complexity: M
     estimated_hours: "3-5"
@@ -431,16 +436,20 @@ tasks:
       - "§2: 在 refs/aria/sibling-probe/R/<default> 上 `git -C <repo> ls-tree -r --name-only <ref> -- openspec/changes openspec/archive`, 过滤正则 `^openspec/(changes|archive)/[^/]+/proposal\\.md$` (单层目录); corpus 字段 = 'changes' | 'archive'; spec_dir = 第三段目录名"
       - "§6 排序: changes/ 全部在前、archive/ 全部在后, 各自按完整路径字节序升序 (`sorted(paths, key=lambda p: p.encode('utf-8'))`), 与 locale 无关; 超限从尾部截断"
       - "`MAX_PROPOSALS_SCANNED = 1000` 为模块常量 (可被测试打桩), 不读 config, 不复用 state_scanner.handoff_multibranch.max_branches (P10; grep 'max_branches' == 0)"
-      - "no-silent-caps: 触发 ⇒ (i) stderr log() 逐字披露截断点路径 + 丢弃条数 (形态照 handoff_multibranch.py:589-598 的逐字消息); (ii) caps_applied 追加 {remote, total, kept, dropped_from}; (iii) status 'degraded' + verdict 'not_established' + reason 'cap_applied'; remotes[].scanned = 实扫数, capped = True (SC-6)"
+      - "no-silent-caps: 触发 ⇒ (i) stderr log() 逐字披露截断点路径 + 丢弃条数 (形态照 handoff_multibranch.py:589-598 的逐字消息); (ii) caps_applied 追加 {remote, kind: 'proposals', total, kept, dropped_from}; (iii) status 'degraded' + verdict 'not_established' + reason 'cap_applied'; remotes[].scanned = 实扫数, capped = True (SC-6)"
       - "blob 读取: `git cat-file --batch` 或逐文件 `git show <ref>:<path>` (a2_discretions (f)), 每子进程 timeout=30; 永不读工作树中的这些路径 (本轨工作树不参与, §2); 文本以 utf-8 errors='replace' 解码后喂 TASK-011 分类器"
       - "SC-1 / SC-6 + §6 排序决定性断言 (TASK-006/007) 转绿"
+      - "P11 分支维 (SC-22~25, 2026-09-01 裁定): 枚举 `git -C <repo> for-each-ref --format=%(refname) refs/aria/sibling-probe/R/` 得该 remote 全部私有 ref (fetch 带 --prune, 上游已删分支不残留); 枚举序 = 默认 ref 先, 其余按 refname 字节序; 每 ref 独立 ls-tree; `MAX_PROPOSALS_SCANNED` 按 remote 跨其全部 ref **累计** (默认 ref 先计, 超限从枚举序尾部截断 ⇒ 分支语料先被截), **不是** per-ref (全轮总量 ≤ |enforced_remotes| × 1000, §6 防失控语义不变); remotes[].refs_scanned = 实扫 ref 数; default_branch is None ⇒ 该 remote 不 fetch、不枚举, refs_scanned == 0 且 stale_skipped == 0 (fail-closed 短路)"
+      - "P11 refs cap: 非默认 ref 数受模块常量 `MAX_REFS_SCANNED = 100` 约束 (P10 同款: 不做 config key, 不复用 handoff_multibranch.max_branches, grep 'max_branches' == 0 仍成立); 超限按字节序尾部截断, 走同一 no-silent-caps 三件套, caps_applied 项含 kind 'refs' 且 dropped_from = 首个被丢弃的 `R/<branch>` (既有 proposals cap 项 kind 'proposals', dropped_from = 截断点路径); 默认 ref 永不被 cap 掉 (SC-25)"
+      - "P11 陈旧过滤 (先于去重): 非默认 ref 上的 changes/<spec_dir> 若同 remote 默认 ref 上存在匹配正则 `^openspec/archive/[0-9]{4}-[0-9]{2}-[0-9]{2}-<spec_dir>/proposal[.]md$` 的条目 (日期前缀恰 10 字符 + 单个 '-', <spec_dir> 逐字节相等, **不做后缀/子串匹配** — `*-probe` 会误配 `2026-08-25-sibling-spec-probe`, 把真 in-flight 竞品判成陈旧 = 假阴性) ⇒ 视为已归档的陈旧副本, 不入 hits, remotes[].stale_skipped += 1; 默认 ref 自身不过滤; SC-5 自命中排除对全部被扫 ref 生效 (SC-24)"
+      - "P11 去重 (跨 ref, **不跨 remote**): 去重键 = (remote, corpus, spec_dir, key) — 即既有 hits 粒度 (a2_discretions (e) 按 remote 分列 + TASK-011 每交集键一条) 不变, 只把同一键在多条 ref 上的重复合并为一条; 每项新增 refs: list[str] (全部命中处的 `R/<branch>`, **落盘前按整串字节序重排, 与枚举序无关**); branch 与其余标量 (path / field_line / layer) 一律取**枚举序首个命中 ref** (默认 ref 先) 上的值, 不逐字段挑选; 消费面「检测到 N 份」的 N 仍 = 去重后 spec_dir 数 (SC-23); §7 顶层十二字段不变 (新键落在 hits[] / remotes[] / caps_applied[] 对象内, SC-15 断言不变)"
     notes: >
       本仓单 ref 147-149 篇; 1000 是防失控 cap 非性能 cap (对第三方仓未验证, 刻意不做 config key — 新表面 #3).
 
   - id: TASK-014
     parent: "3.5"
     task_group: G3
-    title: "GREEN + 回归: 全套测试通过 / run_all_tests.sh 自动纳入 / 三个坏实现负控亲跑 / state-scanner 零改动断言"
+    title: "GREEN + 回归: 全套测试通过 / run_all_tests.sh 自动纳入 / 四个坏实现负控亲跑 / state-scanner 零改动断言"
     status: pending
     complexity: M
     estimated_hours: "3-5"
@@ -453,7 +462,7 @@ tasks:
     verification:
       - "`cd aria/skills/audit-engine/tests && python3 -m unittest discover -s . -p 'test_*.py'` ⇒ 除 TASK-009 两条 (SC-17 / SC-20, 待 4.x) 外全部 OK; SC-18 三臂在本仓 (主仓可达) 不 skip"
       - "`bash aria/skills/run_all_tests.sh` 输出含 `audit-engine` 行且计入 total_tests (自动发现, 无需接线); state-scanner 套件计数不变"
-      - "坏实现负控亲跑 (各改一处、跑一次、看红、还原; 记录进本任务 notes): (1) corpus 过滤只留 changes/ ⇒ SC-1 + SC-7 红; (2) 层 2 触发改为『集合为空』⇒ SC-10 红; (3) 唯一 import 块两路径反序 ⇒ SC-21 红 (memory redfix / fix-the-class)"
+      - "坏实现负控亲跑 (各改一处、跑一次、看红、还原; 记录进本任务 notes): (1) corpus 过滤只留 changes/ ⇒ SC-1 + SC-7 红; (2) 私有 ref 枚举只取默认 ref ⇒ SC-22 红 (P11); (3) 层 2 触发改为『集合为空』⇒ SC-10 红; (4) 唯一 import 块两路径反序 ⇒ SC-21 红 (memory redfix / fix-the-class)"
       - "`git -C aria diff --stat -- skills/state-scanner` 为空; `git -C aria status --porcelain` 只含 skills/audit-engine/ 下新建/修改 (不带路径的 status 核验, memory scoped-add-splits-claim)"
       - "`python3 -c 'import ast,sys; ast.parse(open(\"aria/skills/audit-engine/scripts/sibling_spec_probe.py\").read())'` 通过; 无第三方 import (grep -E '^(import|from) (yaml|requests|click)' == 0)"
     notes: >
@@ -539,7 +548,7 @@ tasks:
   - id: TASK-018
     parent: "5.2"
     task_group: G5
-    title: "发布同步面 (aria 子模块): CHANGELOG + plugin.json (SOT) + 派生文件一致 + 主仓 gitlink + 双推逐 remote 核验 — 档位待 owner"
+    title: "发布同步面 (aria 子模块): CHANGELOG + plugin.json (SOT) + 派生文件一致 + 主仓 gitlink + 双推逐 remote 核验 — 档位 = MINOR (2026-09-01 裁定)"
     status: pending
     complexity: S
     estimated_hours: "1-2"
@@ -562,7 +571,7 @@ tasks:
       - README.ko.md                                                     # :3 / :10 / :244 (3 点)
       - CLAUDE.md                                                        # 「项目状态」段版本行 (:139 已 ship 区间 + :141 `版本:` 行; 覆写非追加, 预算 15-20 行, 只放指针)
     verification:
-      - "档位 (MINOR/PATCH) 与号由 owner 裁; 三份串行 ship 各占一号 (字段 → 探针 → 母); 若 owner 裁合并一版, 由最后 ship 的母 Spec 发布任务承接, 前两份的发布任务改为 no-op 并留痕。未裁 ⇒ 本任务不开工 (status 仍 `pending`, 不用 `blocked`) (R1 C3 三份统一句; tasks.md 待 owner #5)"
+      - "档位 = MINOR (2026-09-01 技术裁定, 决策单 2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H1: version-management.md §2.2「功能增强 (向下兼容)」字面覆盖); 三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版; 号落地时按当时 plugin.json 计算, 不预写字面 (R1 C3 统一句, 裁定后形态)"
       - "主仓 14 个版本引用点全部改为 <vNEXT> (CLAUDE.md:139,:141 / VERSION:24 / README.md:8,:242 / README.{zh,ja,ko}.md 各 :3,:10,:244; 行号按 c120f9e 实读, 落地时以 grep 为准): `grep -rn '<旧号>' CLAUDE.md VERSION README.md README.*.md` 零命中; CLAUDE.md :139/:141 同步 (只改版本号, 不加术语)"
       - "i18n (#140 B 档): 正文无实质变更 ⇒ **不重译**, 但三份 `<!-- translated-from: v<vNEXT> -->` 标记与各自两处版本串**必须同批改** —— check `i18n-readme-translation-currency` 读的是标记 (.aria/state-checks.yaml:141-173), 不是「有无正文变更」; 漏改标记 ⇒ STALE ⇒ exit 1 (A1 a257ffa4 实跑证据)"
       - "机械兜底: 在完成上述**全部**文件后才断言 custom checks `m6-version-badge-match` / `i18n-readme-translation-currency` 绿 (`/state-scanner` 或直接跑 .aria/state-checks.yaml 对应 command); 另 `m6-claude-md-version` / `main-project-version-consistency` 同批 OK"
@@ -590,7 +599,7 @@ execution_order:
   - "TASK-015 (execution-modes.md)  ← 003, 009"
   - "TASK-016 (SKILL.md + report-format.md)  ← 003, 009, 015"
   - "TASK-017 (AB 双臂实跑)  ← 003, 014, 015, 016"
-  - "TASK-018 (发布同步, 档位与号待 owner; 未裁 ⇒ 不开工)  ← 017"
+  - "TASK-018 (发布同步, 档位 = MINOR 已裁 2026-09-01; 号落地时算)  ← 017"
 
 # ---------------------------------------------------------------------------
 # Agent allocation summary (A.3)

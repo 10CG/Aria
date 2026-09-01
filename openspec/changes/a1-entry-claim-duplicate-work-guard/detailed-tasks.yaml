@@ -574,7 +574,7 @@ tasks:
       - "phase-b-developer B.0 块 :86-98 除占位串与注释外逐字节不变 (`git diff` 只含这三 hunk); --include-terminal **不**出现在 Phase B 模板 (默认 False 保语义)"
       - "branch-manager :146 标题行 `git diff` 不触及; 既有 test_coordination_default_lockin.py:53-56 两条裸 assertIn 仍绿"
       - "phase-d-closer :56 `git diff` 不触及 (既有缺陷不混进变更面)"
-      - "⚠️ 落地前 owner 须对「AI 流程判断 #2」给一句话 (选项 A 不算动 Phase B); 未裁前本任务不进 C.1"
+      - "✅ 「AI 流程判断 #2」已裁 (2026-09-01 技术裁定, 决策单 §H5): 选项 A 成立、不算动 Phase B — 判据即本任务上方三条 git diff / 测试字节级约束 (:86-98 除占位串与注释外不变、--include-terminal 不入 Phase B 模板、lockin 测试仍绿) + TASK-034 三套件 Rule #6 照跑 (无闸门被跳过); 落地时逐条核验, 任一不成立 ⇒ 回到选项 B 并上报"
     notes: "rule6 #7/#8/#9: 三处是处方性 · 运行时指令面 (占位串是 AI 逐字复制的字面) ⇒ TASK-034 照跑三套件。"
 
   - id: TASK-020
@@ -932,7 +932,7 @@ tasks:
   - id: TASK-037
     parent: "8.1"
     task_group: 8
-    title: "aria/CHANGELOG.md 条目 + 版本 SOT 5 文件同步 (号 = <vNEXT>, 落地时按 plugin.json 计算; 档位 MINOR/PATCH 与号由 owner 裁)"
+    title: "aria/CHANGELOG.md 条目 + 版本 SOT 5 文件同步 (号 = <vNEXT>, 落地时按 plugin.json 计算; 档位 = MINOR, 2026-09-01 技术裁定)"
     status: pending
     complexity: S
     estimated_hours: "1-2"
@@ -940,20 +940,19 @@ tasks:
     reason: "发布同步面文档; 版本 SOT = plugin.json, 派生四文件必须一致"
     dependencies: [TASK-009, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019, TASK-020, TASK-021, TASK-022, TASK-023, TASK-025, TASK-026, TASK-027, TASK-028, TASK-029, TASK-030, TASK-031, TASK-032, TASK-033, TASK-034, TASK-035]   # TASK-009 = aria/ 侧唯一汇点 (SC-23/14a 宿主), 发布链须向下可达 (R3/A1 f1fec807 · A4 1a45ef41)
     deliverables:
-      - aria/CHANGELOG.md                     # `## [<vNEXT>]` (号段由 owner 裁, 落地时计算, 不预写): Added (--include-terminal / --heartbeat-only / unknown_schema_claims / linked_issue_overlap_error / fetch_degraded / get_container_uuid / heartbeat_by_track / config unattended / A.1 双落点 / carry-id 三处) + Changed (allowed-tools 扩权两 skill, 引 owner 2026-08-22 裁定 (a)) + Rule #6 (六套件照跑 + 六条 TARGETED + issue 号) + 已知限 (§6 缺口表指针 / SC-32 文件名裁定 / 三腿契约 follow-up)
+      - aria/CHANGELOG.md                     # `## [<vNEXT>]` (档位 MINOR 已裁 2026-09-01, 号落地时计算, 不预写): Added (--include-terminal / --heartbeat-only / unknown_schema_claims / linked_issue_overlap_error / fetch_degraded / get_container_uuid / heartbeat_by_track / config unattended / A.1 双落点 / carry-id 三处) + Changed (allowed-tools 扩权两 skill, 引 owner 2026-08-22 裁定 (a)) + Rule #6 (六套件照跑 + 六条 TARGETED + issue 号) + 已知限 (§6 缺口表指针 / SC-32 文件名裁定 / 三腿契约 follow-up)
       - aria/.claude-plugin/plugin.json       # version SOT
       - aria/.claude-plugin/marketplace.json  # 派生
       - aria/VERSION                          # 派生
       - aria/README.md                        # 派生 (版本 badge / 版本字符串)
     verification:
-      - "五文件版本字符串 `grep -rn '<vNEXT 实际号>'` 一致 (号 = owner 裁定档位后按当时 plugin.json 计算, 本文件不锁字面量); CHANGELOG 条目日期 = 发版日"
+      - "五文件版本字符串 `grep -rn '<vNEXT 实际号>'` 一致 (号 = 按 MINOR 档在当时 plugin.json 上计算 — 2026-09-01 裁定, 本文件不锁字面量); CHANGELOG 条目日期 = 发版日"
       - "CHANGELOG 不复述 SC 编号表 (那是 Spec 的), 只写用户可见行为 + Rule #6 处置 + 已知限"
-      - "版本判据 (A.2 推荐, 非裁定): 新增 CLI 模式 + 两 flag + 两 lib API + 两 skill allowed-tools 扩权 ⇒ 能力面扩大 ⇒ 倾向 MINOR (CLAUDE.md「新增 Skill / 架构重构 = MINOR+; 文档/修复 = PATCH」两条均不字面覆盖) — 档位由 owner 裁 (tasks.md 待 owner 裁 #6)"
+      - "版本判据 (A.2 推荐, 非裁定): 新增 CLI 模式 + 两 flag + 两 lib API + 两 skill allowed-tools 扩权 ⇒ 能力面扩大 ⇒ 倾向 MINOR (CLAUDE.md「新增 Skill / 架构重构 = MINOR+; 文档/修复 = PATCH」两条均不字面覆盖) — ✅ 档位已裁 MINOR (2026-09-01 技术裁定, 决策单 §H1a)"
       - "`memory paper-bump`: bump commit 后 grep 真文件核验, 不信 commit message"
     notes: >
-      档位 (MINOR/PATCH) 与号由 owner 裁; 三份串行 ship 各占一号 (字段 → 探针 → 母); 若 owner 裁合并一版,
-      由最后 ship 的母 Spec 发布任务承接, 前两份的发布任务改为 no-op 并留痕。未裁 ⇒ 本任务不开工 (status 仍
-      `pending`, 不用 `blocked`)。(R1 C3 三份统一句。) 本任务在 C.1 前完成, 发版动作本身属 Phase C。
+      档位 = MINOR (2026-09-01 技术裁定, 决策单 2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H1); 三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版;
+      号落地时按当时 plugin.json 计算, 不预写字面。(R1 C3 三份统一句, 裁定后形态。) 本任务在 C.1 前完成, 发版动作本身属 Phase C。
 
   - id: TASK-038
     parent: "8.2"
@@ -1019,5 +1018,5 @@ tasks:
       - "两 remote 一致后才允许 TASK-038 bump 主仓 gitlink (`git add aria` 指向 post-merge master SHA, 非 feature SHA; `git submodule status` 无 `+`/`-`), 否则 orphaned gitlink ⇒ GitHub clone --recursive 断裂 (2026-07-14 事故形状)"
     notes: >
       R2/A1 残留 major: 字段 Spec 有 TASK-022、探针 Spec 落 TASK-018, 母 Spec 缺此宿主而 TASK-038 却断言「gitlink SHA 在两 remote 均可取到」
-      (断言了无人执行的动作的后置条件)。本任务补齐; 版本号沿 <vNEXT> 占位, 档位待 owner (TASK-037 notes 统一句)。R3/A2 d95c381a: 六条款与字段 TASK-022 逐条对齐 (新鲜度前置 / 显式合并源 / owner 授权门 / 超时 / 逐 remote 核验 / gitlink 后置)。
+      (断言了无人执行的动作的后置条件)。本任务补齐; 版本号沿 <vNEXT> 占位, 档位已裁 MINOR 2026-09-01 (TASK-037 notes)。R3/A2 d95c381a: 六条款与字段 TASK-022 逐条对齐 (新鲜度前置 / 显式合并源 / owner 授权门 / 超时 / 逐 remote 核验 / gitlink 后置)。
 

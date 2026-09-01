@@ -578,7 +578,7 @@ except Exception:
 | `openspec/changes/aria-2.0-m{6,7}-*/proposal.md` ×6 | **本 Spec 不改** —— 以 `GRANDFATHERED` 具名在册 (D6); owner 若裁 O-1 = 回填, 则逐份补一行并同步删 allowlist 条目 | D6 / U-2 |
 | AB 套件 — `aria-plugin-benchmarks/ab-suite/spec-drafter.json` | **照跑现有 2 evals** (实核实存, id 1/2), 验扩义务后既有场景行为是否漂移; **eval id 2 (英文 proposal) 的 expectations 同批更新**: 字段名 `Linked Issue`、无关联写 `none` (R5/M2 —— 旧 CJK-only 规则下该 eval 与 §3 两臂冲突)。**前提**: 会话以 `ARIA_COORDINATION_NO_PUSH=1` 启动 (rule6_note ⛔ 段) | rule6_note 第一格 + R5/M2 |
 | AB 套件 — spec-drafter **覆盖外**档 | 定向 fixture ×1 (SC-7 双臂) + 套件缺口 issue (与 `aria-plugin#117` 同族, 归并或新开由 A.2 定); 与上一行**互不替代** | rule6_note 第二格 |
-| 版本号 | aria 侧唯一指令面改动 = `spec-drafter/SKILL.md` ⇒ 按 CLAUDE.md「新增 Skill / Skill 架构重构 = MINOR+」之下、「文档更新 = PATCH」之上 —— 本 Spec **自判 MINOR** (新增运行时 authoring 义务, 行为面扩大) —— ⚠️ **但 CLAUDE.md 的两条判据都不字面覆盖本例** (既非「新增 Skill / 架构重构」, 也非「纯文档更新」), **若 owner 改判 PATCH 请裁**; **号段落地时计算, 不预写字面量**。⚠️ **standards 子模块另有自己的版本与 PR 流程**, 且按 CLAUDE.md 多远程硬约束 1: 子模块合并**一律本地做 + 双推 + 逐个 `ls-remote` 核验**, 禁 Forgejo 服务端合并 | — |
+| 版本号 | aria 侧唯一指令面改动 = `spec-drafter/SKILL.md` ⇒ 按 CLAUDE.md「新增 Skill / Skill 架构重构 = MINOR+」之下、「文档更新 = PATCH」之上 —— 本 Spec **自判 MINOR** (新增运行时 authoring 义务, 行为面扩大) —— ⚠️ **但 CLAUDE.md 的两条判据都不字面覆盖本例** (既非「新增 Skill / 架构重构」, 也非「纯文档更新」), ~~若 owner 改判 PATCH 请裁~~ **✅ 2026-09-01 裁定 MINOR** (决策单 §H1a: SOT `version-management.md §2.2`「功能增强 (向下兼容)」字面覆盖本例, CLAUDE.md 那两句是缩写); **号段落地时计算, 不预写字面量**。⚠️ **standards 子模块另有自己的版本与 PR 流程**, 且按 CLAUDE.md 多远程硬约束 1: 子模块合并**一律本地做 + 双推 + 逐个 `ls-remote` 核验**, 禁 Forgejo 服务端合并 | — |
 | 发版同步面 | 按 CLAUDE.md §版本管理 与 `standards/conventions/version-management.md` 执行, **本 Spec 不复述引用点清单** (复述即产生第二份会漂移的清单 — Aria #177 的形状) | — |
 
 ---
@@ -615,13 +615,13 @@ except Exception:
 2. **本 Spec 不是母 Spec 的阻塞前置** (见头部依赖方向段), 也**不阻塞**母 Spec 的 R3。
 3. **R6 已跑 (REVISE → 清账 → 定向复核 PASS); owner 2026-08-30 (R6 后) 裁 O-4 (i) / O-5 (i) 已落版, 并裁「不再加通用审计轮、不换执笔席」。** ~~本 Spec 待 owner 批准进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物已派生, post_planning (combined) 按默认跑, 不豁免。
 
-**待 owner 裁 (AI 不自行拍板)**:
+**待 owner 裁 (AI 不自行拍板)** — **2026-09-01 复核** (owner 分工: 产品级 owner / 技术级 AI): O-1 / O-3 归技术级, 已裁 (见各行 ✅ 与决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H4); 本表其余行为历史留痕:
 
 | # | 事项 | 本 Spec 的落版取值 | 为什么不由 AI 定 |
 |---|---|---|---|
-| **O-1** | 承 R1 editlist **U-2**: 是否授权回填 6 份 `aria-orchestrator` 轨的 M6/M7 proposal 头部 | **不回填 + `GRANDFATHERED` 具名在册** (D6) | 对**他人在制产物**的写入不能自我授权 (memory `sync≠push-auth` / `feedback_concurrent_feature_collision_claim_before_build`)。⭐ **两方案不互斥**: allowlist 就是「尚未回填清单」, 若 owner 授权回填, **回填一份删一条**, 探针逻辑零改动, 全部回填后 allowlist 为空 ⇒ 选 O-1=回填**不需要**改本 Spec 的任何设计 |
+| **O-1** → **✅ 已裁 (2026-09-01 技术裁定, 决策单 §H4a: 不回填 + 在册; M6/M7 轨自回填, 回填一份删一条)** | 承 R1 editlist **U-2**: 是否授权回填 6 份 `aria-orchestrator` 轨的 M6/M7 proposal 头部 | **不回填 + `GRANDFATHERED` 具名在册** (D6) | 对**他人在制产物**的写入不能自我授权 (memory `sync≠push-auth` / `feedback_concurrent_feature_collision_claim_before_build`)。⭐ **两方案不互斥**: allowlist 就是「尚未回填清单」, 若 owner 授权回填, **回填一份删一条**, 探针逻辑零改动, 全部回填后 allowlist 为空 ⇒ 选 O-1=回填**不需要**改本 Spec 的任何设计 |
 | **O-2** → **✅ 已裁 (owner 2026-08-30, 随第 6 项)** | 字段名 canonical **`Linked Issue`** + alias `关联 Issue`; 哨兵 canonical **`none`** + alias `无`; 写入侧只教 canonical, 读取侧归一, 集合封闭 | **落版见 §2 / E0 / E5 / D9 / SC-1 / SC-4 / SC-6** | 「只认中文」被否决的四条理由 + 「D9 对在哪」见决策单; 回撤成本: E0 两拼写集合 + 模板一行 + 三份在制 Spec 头部一行 |
-| **O-3** *(round-2 已缩小)* | M-2 的**残余**已知限 —— 脚本随 plugin 分发但**注册须采用方自做** —— 是否就此接受 | **接受, 成文为已知限** (§1 的 ⛔ 段) | round-1 原写的「其他项目拿不到校验」已因 D3 改判**不再成立**, 已订正留痕。残余的「须自行注册」与既有 `issue_cache_freshness_probe` / `coordination_probe` **同形**, 不是本 Spec 独有的新缺口; 消除它 = 自动注册, 会改变「项目自主决定跑哪些 check」的既有语义 ⇒ 属范围决策, 不由 AI 拍板 |
+| **O-3** *(round-2 已缩小)* → **✅ 已裁 (2026-09-01 技术裁定, 决策单 §H4b: 接受为已知限)** | M-2 的**残余**已知限 —— 脚本随 plugin 分发但**注册须采用方自做** —— 是否就此接受 | **接受, 成文为已知限** (§1 的 ⛔ 段) | round-1 原写的「其他项目拿不到校验」已因 D3 改判**不再成立**, 已订正留痕。残余的「须自行注册」与既有 `issue_cache_freshness_probe` / `coordination_probe` **同形**, 不是本 Spec 独有的新缺口; 消除它 = 自动注册, 会改变「项目自主决定跑哪些 check」的既有语义 ⇒ 属范围决策, 不由 AI 拍板 |
 | **O-4** → **✅ 已裁 (owner 2026-08-30 (R6 后) 裁定, 选 (i))** | 本 Spec 纯函数 `lib/linked_issue_field.py` 是探针 Spec 的**硬前置**: 探针 ship 依赖本模块存在; 探针 §1 依赖方向 / §3「姊妹未 ship 时的行为」段已同批改 | 落版见探针 Spec | 改变 08-23「均非阻塞前置」成文前提, 由 owner 裁 |
 | **O-5** → **✅ 已裁 (owner 2026-08-30 (R6 后) 裁定, 选 (i))** | 字段名 E0 谓词 1 做 ASCII 大小写折叠 (`Linked issue` / `LINKED ISSUE` 归一为命中); **不**放宽单复数 | 落版见 E0 谓词 1 + SC-1 (f)(g) | QA M3 的假阴性来源 (GitHub `Linked issues`) 成立 |
 

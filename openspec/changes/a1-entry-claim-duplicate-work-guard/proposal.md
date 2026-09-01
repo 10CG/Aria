@@ -795,4 +795,6 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py
 | 7 | **Phase B.1 前置断言: aria-plugin `--no-push` 修复须已合入 `origin/master`** (头部前置依赖新增行, R6/TL M5) | 该修复是 Level 1 独立变更, 其 ship 需 owner 授权推送 + 发版; 把它列为本 Spec 硬前置是执笔判断 |
 | 8 | **R6 清账由主控 (同一执笔) 一次落版, 未换人** —— tech-lead 席建议「换执笔席落 6C/9M」, 主控未采 (理由: 7 个簇里 6 个是条款级文本修正, 有五席给出的字面级处方; 换席的交接成本高于收益) | 与 owner 既往「换人执笔」处方 (memory `fix-writer-bottleneck`) 相左 → **owner 2026-08-30 (R6 后) 复议: 不换席, 维持** (定向复核已由新席位做, PASS) |
 
+> **2026-09-01 归类裁定** (owner 分工: 产品级 owner / 技术级 AI): 上表 #1–#6 属技术/流程级, 逐条裁定 = **全部维持** (#2 = 选项 A 成立, 不算动 Phase B; 判据见 TASK-019 verification); #7 已闭环 (v1.67.2 = `d69091d` 双远端); #8 owner 2026-08-30 已裁。全文与回退指引见决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md`。
+
 ~~本 Spec 在 R6 跑完并经 owner 批准前不进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` 已派生, `audit.checkpoints.post_planning = "convergence"` enabled ⇒ 按默认跑 post_planning (combined 三份), 不豁免。
