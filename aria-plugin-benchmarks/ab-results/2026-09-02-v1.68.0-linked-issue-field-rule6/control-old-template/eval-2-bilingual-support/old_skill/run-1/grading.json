@@ -1,0 +1,135 @@
+{
+  "eval": "eval-2-bilingual-support",
+  "arm": "old_skill",
+  "run": "run-1",
+  "group": "control-old-template",
+  "control_condition": "Baseline (old spec-drafter snapshot) re-run with the SOT template standards/openspec/templates/proposal-minimal.md temporarily rolled back to pre-change SHA 334c609 (verified: `git show 334c609:openspec/templates/proposal-minimal.md` contains 0 occurrences of 'Linked Issue'; HEAD template has the field at :6 and usage note at :55).",
+  "grading_basis": "outputs only (outputs/answer.md = executor final answer; outputs/proposal.md). Mechanical pre-check supplied by coordinator (real extractor lib/linked_issue_field.py over outputs/proposal.md): eval-2 control verdict=NO_FIELD, has_Created=True, order_L_S_C_LI=False; eval-3 control :6 `> **Linked Issue**: `none` — 起草输入已核实…` verdict=OK sentinel=True canonical_line=True md_link_on_field_line=False, order_L_S_C_LI=False (no `> **Level**` line; `> **Spec Level**: 2` used; order Status → Created → Spec Level → Linked Issue), has_Created=True, alias_or_other_name=[].",
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "answer.md:5 '输入的两半是同一需求的中英文表述, 归一为一条需求: **为项目的 UI 表面添加深色模式功能**。你明确要求 **英文 proposal**'. proposal.md:9 '> **Source requirement**: \"Add a dark mode feature / 添加深色模式功能\" (bilingual input, both halves express the same requirement; normalized to one feature; proposal written in English by explicit request)'; :94 assumption A-3 records the normalization."
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "proposal.md:1-102 (title, 8-line header, Why, What/Design 1-6, Key Deliverables, Surface Constraints, Impact, Tasks, SC-1..SC-8, Out of Scope, Decisions and Assumptions, rule6_note, Next Steps) is English prose. Chinese appears only in the verbatim source request at :9 and the literal attribute value `lang=\"zh-CN\"` at :86."
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "proposal.md:1 'Dashboard Dark Mode (Theme Toggle)'; :16 'today it ships a **single, hard-wired dark palette** ... no light counterpart, no `prefers-color-scheme` handling'; :18 '\"Add a dark mode feature\" therefore means making dark a **selectable mode** rather than the only mode: keep the current palette as *dark*, add a *light* palette ...'. Dark mode stays the subject; the re-scoping is argued explicitly (assumption A-1 at :92)."
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": false,
+      "evidence": "Mechanical: verdict=NO_FIELD. proposal.md header blockquote :3-10 is `> **Level**` / `> **Status**` / `> **Created**` / `> **Change ID**` / `> **Module**` / `> **Context**` / `> **Source requirement**` / `> **Target surface (assumption A-1)**` — no `> **Linked Issue**:` line. Independent grep for 'Linked Issue' over proposal.md and answer.md = 0 hits. Assertion text: 'omitting the line fails'."
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": false,
+      "evidence": "No Linked Issue field exists (mechanical token_str=None sentinel=None), so there is no value to be `none`. The structural precondition of the assertion is absent; burden of proof on the expectation → FAIL. (No alias / no placeholder either — the field is simply missing.)"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 2,
+    "total": 5,
+    "pass_rate": 0.6
+  },
+  "execution_metrics": {
+    "metrics_json_present": false,
+    "transcript_present": false,
+    "output_files": [
+      "answer.md",
+      "proposal.md"
+    ],
+    "output_chars_by_file": {
+      "answer.md": 17658,
+      "proposal.md": 13990
+    },
+    "output_chars": 31648,
+    "transcript_chars": null,
+    "note": "No metrics.json / transcript; graded from outputs only. Tool-call counts unavailable."
+  },
+  "timing": {
+    "executor_duration_seconds": 454.1,
+    "total_duration_seconds": 454.1,
+    "source_timing_json": {
+      "total_tokens": 118726,
+      "duration_ms": 454114,
+      "total_duration_seconds": 454.1
+    },
+    "note": "timing.json carries a single wall-clock figure; copied into both executor_duration_seconds and total_duration_seconds. No grader timing recorded."
+  },
+  "claims": [
+    {
+      "claim": "The 6 hard-coded color literals outside `:root` are at lines 88/94/100 (rgba borders), 670 (`#fff`), 681/685 (button blues) — proposal.md:27, SC-2 :74, Tasks :62",
+      "type": "factual",
+      "verified": false,
+      "evidence": "Count (6) and values (three `rgba(...,0.3)`, `#fff`, `#4a7de0`, `#3a6dd0`) are correct, but the line numbers are wrong: actual lines are 128/134/140/710/721/725. Cited lines contain `}` (88), `border-radius: var(--radius-lg);` (94), `flex-wrap: wrap;` (100), `border-radius: var(--radius-sm);` (670), `.issue-form select:focus {` (681), `.issue-form textarea {` (685). Constant offset of exactly 40 — consistent with numbering a slice that started after the `:root` block. The wrong numbers are baked into SC-2's baseline and a Task line."
+    },
+    {
+      "claim": "`:root` defines a single dark token set (`--bg-primary: #0f1117`); no `prefers-color-scheme`, no theme JS",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`:root {` at line 11 with `--bg-primary: #0f1117` at :12, 28 tokens through :39; grep for `prefers-color-scheme` / `data-theme` in the template = 0 hits."
+    },
+    {
+      "claim": "docs/decisions/ holds 21 DEC-* records, none about theme / dark mode (answer.md:9)",
+      "type": "factual",
+      "verified": false,
+      "evidence": "Current working tree: 20 files prefixed DEC- (21 entries total in docs/decisions/). Topic absence not checked."
+    },
+    {
+      "claim": "No `aria-plugin-benchmarks/ab-suite/aria-dashboard.json` exists (answer.md:35, Tasks :68)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "os.path.exists(ab-suite/aria-dashboard.json) = False."
+    },
+    {
+      "claim": "Run created no file in the repository; proposal also saved to the output directory (answer.md:164)",
+      "type": "process",
+      "verified": true,
+      "evidence": "outputs/proposal.md exists (13990 chars) and matches the fenced body in answer.md:56-158; repo-write abstention unverifiable without transcript but not contradicted."
+    }
+  ],
+  "user_notes_summary": {
+    "user_notes_present": false,
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+        "reason": "DISCRIMINATES under the control condition: with the SOT template pinned to 334c609 the baseline emitted no Linked Issue line at all (NO_FIELD), whereas iteration-1 old_skill (template at HEAD) emitted the canonical line. This confirms the iteration-1 zero-discrimination was template leakage into the baseline arm, not assertion weakness. The assertion itself is sound."
+      },
+      {
+        "assertion": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+        "reason": "DISCRIMINATES under the control condition (fails for lack of field). Wording gap unchanged: 'exactly `none`' does not say whether trailing prose after the code span is allowed; the extractor accepts it (iteration-1 old_skill outputs)."
+      },
+      {
+        "assertion": "Should correctly parse mixed Chinese/English input",
+        "reason": "Passed again in the control baseline (and in both iteration-1 arms) → still non-discriminating; the two input halves are exact synonyms."
+      },
+      {
+        "assertion": "Should preserve the feature intent from both language inputs",
+        "reason": "Passed again in the control baseline → still non-discriminating. Same observed re-scoping (dark mode → selectable theme + light palette) as every other run; no assertion covers whether that interpretation is wanted."
+      },
+      {
+        "assertion": "Should generate proposal content in English as requested",
+        "reason": "Passed again in the control baseline → non-discriminating; state whether quoted Chinese source text is acceptable."
+      },
+      {
+        "reason": "Observed but uncovered: SC-2 and a Task line carry line numbers that are wrong by a constant 40 (88/94/100/670/681/685 vs actual 128/134/140/710/721/725). Pasted baseline evidence in a Success Criterion was not regenerated from a real run; no assertion checks reproducibility of quoted evidence (same failure class as iteration-1 old_skill's false '0 hits' grep)."
+      },
+      {
+        "reason": "Header order Level → Status → Created is intact here but eval-2 has no order/Created assertion (only eval-3 does); consider adding the same header-order check so eval-2 measures the SOT header shape end to end."
+      }
+    ],
+    "overall": "3/5. The two Linked Issue assertions flip to FAIL once the template is pinned to the pre-change SHA, so they do discriminate; the three bilingual assertions still pass in the baseline and remain non-discriminating."
+  }
+}
