@@ -1,17 +1,17 @@
 ---
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
-phase: C.2 (PR #190 open, C.2.4 green; owner 指令 pre_merge 收敛审计进行中 — 轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准; 收敛后合并)
+phase: D (字段 Spec 已归档 2026-09-02, 见周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md`; 族轨下一份 = sibling-spec-probe B.1)
 status: active
-updated-at: 2026-09-02T18:10:11Z
+updated-at: 2026-09-02T23:26:36Z
 ---
 
 # Aria — Session Handoff (2026-09-02) — 字段 Spec `linked-issue-field-availability` B.2 实施完成 → H1 四处推送完成 → PR #190 pre_merge 收敛审计 (aria v1.68.0 → 清账 PATCH v1.68.1) + 架构文档 2.0.x 复审
 
 > **一句话**: owner 选「1+2」→ 【2】架构文档复审校准 (master 本地 `c423281`) + 【1】字段 Spec 全程 B: B.0 闸门放行 → 三仓 feature 分支 → 测试席 48 条 RED (baseline ImportError) → 实现席 GREEN → 模板 / spec-drafter 两 hunk / 注册 → Rule #6 AB (ship 态 12/12 vs 12/12 零判别, 对照组 基线 3/5·4/5 vs 5/5·5/5, 无 WITHOUT_BETTER) → 回归 1457 + 1889 全绿 → v1.68.0 版本面 + CHANGELOG → aria/standards **本地 --no-ff merge + tag** → 主仓 gitlink + 14 版本点 + 状态回写。**后续 (同日)**: owner 授权 H1 四处推送 → 全部推完并逐 remote 核验 (aria `fe32441`+tag v1.68.0 / standards `fad8b4b` / 主仓 feature → **PR #190** / master `c423281`) → owner 指令「审计后合并」→ pre_merge 收敛审计 (四席 fresh, 逐轮清账; 首轮 4 major 全部处置, 含 aria **v1.68.1** `d1caa66` PATCH 与 standards `ffed204`; 轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准) → 收敛后合并。
-> **B 期技术裁定 7 条** (parents[4] 勘正 / 矩阵 3 条豁免 / SC-3(a) 理据待勘正 / standards 不版本化 / #117 归并 / NO_PUSH 前置不适用 / AB 基线两泄漏通道) 已追记决策单 2026-09-01。**产品级待 owner: 一项** — H1b 收敛记录三选一 ([1] override 接受 / [2] 加轮 / [3] 降级单轮; 推送授权已于同日给出并执行; PR #190 按「审计通过后合并」指令合并, verdict PASS)。
+> **B 期技术裁定 7 条** (parents[4] 勘正 / 矩阵 3 条豁免 / SC-3(a) 理据待勘正 / standards 不版本化 / #117 归并 / NO_PUSH 前置不适用 / AB 基线两泄漏通道) 已追记决策单 2026-09-01。**产品级待 owner: 零** (H1b 收敛记录 owner 已选 [1]; 推送授权已于同日给出并执行; PR #190 已按「审计通过后合并」指令合并 `888b893`)。
 
-> **Status**: Active — H1 四处推送完成; PR #190 pre_merge 收敛审计进行中 (轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准), 收敛后按 owner 指令合并 → D 归档
+> **Status**: Active (族轨) — 字段 Spec 已完成 C.2 (PR #190 merged `888b893`, R1–R5 终局见最新 aggregated 报告, owner 选 [1]) 并归档 (周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md`); 本 doc 保留 B 期账目 + H1 推送记录; 族轨下一份 = `sibling-spec-probe` B.1
 > **Cycle period**: 2026-08-31T14:26Z → 2026-09-02T08:26Z
 > **Next session 入口**: 优先读本 doc → `/aria:state-scanner` 自动恢复 → §6 选择下一步
 
@@ -19,8 +19,8 @@ updated-at: 2026-09-02T18:10:11Z
 
 ## §0 入口 (新 session 优先读)
 
-1. 运行 `/aria:state-scanner`; Phase 1.15 会 surface 本 doc。主仓工作树停在 `feature/linked-issue-field-availability` (不是 master), aria / standards 子模块各停在**本地 master** (post-merge SHA, 与 gitlink 一致); `git status` 只应见 ` M aria-orchestrator` (有意停泊)。
-2. **H1 四处推送已完成 (owner 授权, 13:xx–14:xxZ 前)**; PR #190 open, C.2.4 green / C.2.4.5 PASS; pre_merge 收敛审计进行中 (报告 `.aria/audit-reports/pre_merge-R{1,2,…}-*-linked-issue-field-availability-*.md`)。**第一件事 = 看审计是否已收敛并合并**: 已合并 ⇒ `phase-d-closer` 归档 + release claim; 未合并 ⇒ 续 R_N。**不要再推任何子模块 commit 而无 owner 逐条授权** (决策单 B9-补)。
+1. 运行 `/aria:state-scanner`; Phase 1.15 会 surface 周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md` (全仓最新)。主仓工作树在 master (PR #190 已合并), aria v1.68.1 `d1caa66` / standards `ffed204` 与 gitlink 一致; `git status` 只应见 ` M aria-orchestrator` (有意停泊)。
+2. **H1 四处推送已完成 (owner 授权)**; PR #190 已按「审计通过后合并」合并 `888b893` (pre_merge R1–R5, owner 选 [1]); 字段 Spec 已由 phase-d-closer 归档 + claim 释放 (账目见周期 handoff)。**第一件事 = 探针 Spec B.1** (周期 handoff §6)。**不要再推任何子模块 commit 而无 owner 逐条授权** (决策单 B9-补)。
 3. 排版硬约束不变: **禁用带圈数字等小字形** (memory `no-tiny-glyphs`)。
 
 ---
@@ -54,7 +54,7 @@ updated-at: 2026-09-02T18:10:11Z
 | # | 项目 | scope | 来源 |
 |---|------|-------|------|
 | **H1** ✅ **已完成 (owner 授权后逐 remote 核验; 见 §7)** | 原文保留供追溯 — **推送授权** (四处, 全部外向): (a) aria master `fe32441` + tag `v1.68.0` 双推 + **逐个** `ls-remote origin/github master` 与 `git -C aria rev-parse master` 三者一致 (**不要** `--tags` 全量推; 只推 `refs/tags/v1.68.0`); (b) standards master `fad8b4b` 双推 + ls-remote; (c) 主仓 feature 分支推 origin → **TASK-025** PR (`phase-c-integrator`, C.2.4 gate 显式 `--main-branch master`; body 列 2.6 实测 / B1–B7 裁定指针 / SC-3(a) 理据勘正待回写); (d) 主仓 master `c423281` (架构文档) 推; push 显式给足超时 (memory `partial-push`) | 授权一句话 + ~0.5h 执行 | 硬约束 1/2, memory `sync≠push-auth` |
-| **H1b (请 owner 复议, Rule #10)** | pre_merge 收敛审计的**收敛口径**: 我在 R3 自创「可执行结论集 (C∪M) 稳定 + 全票 PASS」作为收敛判据, R4 tech-lead 判其无成文依据且与 SOT (全结论集四元组稳定 + 全票 PASS; 首轮 0-finding 守卫) 矛盾 —— 已撤回 (决策单 R4 行 3b277328)。严格口径下 fresh 席位逐轮报不同 minor, 全集稳定实际不可达; R5 = max_rounds 最后一轮, 若仍不满足 ⇒ **降级策略由 owner 选**: [1] 接受当前结论 override 合并 / [2] 加轮 / [3] 降级单轮 | 一句话 | 决策单 R4 行 |
+| **H1b** ✅ **owner 已裁: 选 [1] 接受当前结论 (R5 聚合报告 overridden_by_user: true)** — 原文: | pre_merge 收敛审计的**收敛口径**: 我在 R3 自创「可执行结论集 (C∪M) 稳定 + 全票 PASS」作为收敛判据, R4 tech-lead 判其无成文依据且与 SOT (全结论集四元组稳定 + 全票 PASS; 首轮 0-finding 守卫) 矛盾 —— 已撤回 (决策单 R4 行 3b277328)。严格口径下 fresh 席位逐轮报不同 minor, 全集稳定实际不可达; R5 = max_rounds 最后一轮, 若仍不满足 ⇒ **降级策略由 owner 选**: [1] 接受当前结论 override 合并 / [2] 加轮 / [3] 降级单轮 | 一句话 | 决策单 R4 行 |
 | **H2** | ship 顺序第二份: **`sibling-spec-probe` B.1** —— 硬前置 (aria 双远端含 `lib/linked_issue_field.py`) 在 H1(a) 之后解除; 其 TASK-001 起点 | 下一 cycle | 2026-09-01 决策单 §H1b |
 
 ### 中优先级 (技术级, AI 可自裁; 多为 Level 1)
@@ -124,7 +124,7 @@ updated-at: 2026-09-02T18:10:11Z
 /aria:state-scanner
 ```
 
-1. ⭐ **`{id: a1-entry-claim-duplicate-work-guard}`** — H1 (a)–(d) 已完成; PR #190 pre_merge 收敛审计进行中 (轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准) → **收敛后合并** (Forgejo merge, 主仓例外) → `ls-remote` 两端一致 + github 镜像 master 推 → `phase-d-closer` 归档字段 Spec + release claim (含两条旧名 claim, 决策单 C2) → owner `/plugin update` 刷到 **1.68.1**。类型: C.2 + D, ~1h。
+1. ✅ **`{id: a1-entry-claim-duplicate-work-guard}`** — 已完成 (09-02 23:2xZ): PR #190 merged `888b893` → 两端 `ls-remote` 一致 → `phase-d-closer` 归档字段 Spec + release claim (两名皆查, 决策单 C2); 剩 owner `/plugin update` 刷到 **1.68.1**。账目见周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md`。
 2. **`{id: carry-b1-entry-probe-spec}`** — `sibling-spec-probe` 进 B.1 (硬前置 = aria 双远端含 `lib/linked_issue_field.py`, **已满足** (d1caa66 ⊇ fe32441); 其 TASK-001/003 前置见其 yaml); 同族第二份, ship 号按当时 plugin.json 计算 (1.69.0 若无并发 ship)。类型: B.1, ~1h。
 3. **`{id: carry-ab-baseline-contamination-followup}`** — M2: `AB_TEST_OPERATIONS.md` §场景 1 补两类污染面 (Level 1) + 视授权追记 #116。~0.5h。
 4. **`{id: carry-spec-drafter-path-rule5-drift}`** — M4 + M1 + M3 三条 Level 1 勘正可合一批 (各自独立 hunk, Rule #6 对 A.1.4 路径 hunk 重判)。~1h。
@@ -178,4 +178,4 @@ updated-at: 2026-09-02T18:10:11Z
 
 **Created**: 2026-09-02 08:26Z
 **Session duration**: ~2h (06:31Z → 08:26Z)
-**Status**: Active — H1 四处推送已完成; PR #190 pre_merge 收敛审计进行中 (轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准), 收敛后按 owner 指令合并 → D 归档 (下个 session 第一件事 = 看 PR #190 是否已合并)
+**Status**: Active (族轨) — 字段 Spec C.2 + D 已完成 (PR #190 merged `888b893`; 归档 + claim 释放见周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md`); 下个 session 第一件事 = `sibling-spec-probe` B.1

@@ -4,7 +4,7 @@ mode: convergence
 rounds: 5
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 drift_terminated: false
 drift_check_skipped: true
@@ -19,7 +19,7 @@ agents: [code-reviewer, qa-engineer, tech-lead, knowledge-manager]
 
 > **R5 verdict**: **PASS** — Critical 0 / Major 0 / Minor 8 (去重前 10 → 8); 投票 **4/4 PASS**, 每条 finding 席位逐条判「不阻塞合并」。
 > **实物面** (代码 / 测试 / gitlink / tag / 版本 16+5 点 / merge-tree / C.2.4 / C.2.4.5 / 探针 / 接缝 / Rule #5·#6·#8·#9·#10): **连续第四轮零 finding**。R5 全部 minor 落在审计自身的记录与验证器 (扫描器 / 决策单措辞 / handoff 两行 / 既存漂移 / 既有 flaky 测试 / 镜像推送义务成文位置)。
-> **收敛判定 (SOT 字面)**: `unanimous_pass = true`; `conclusions_stable = false` (四元组全集 R5 ≠ R4: R4 含 2 major, R5 为 8 条 minor) ⇒ **`converged: false`**, **max_rounds (5) 耗尽** ⇒ audit-engine 降级策略 **交 owner 选择**: [1] 接受当前结论 (本报告改 `overridden_by_user: true`) / [2] 加轮 / [3] 降级单轮。AI 不代选 (Rule #10; handoff §2 H1b)。
+> **收敛判定 (SOT 字面)**: `unanimous_pass = true`; `conclusions_stable = false` (四元组全集 R5 ≠ R4: R4 含 2 major, R5 为 8 条 minor) ⇒ **`converged: false`**, **max_rounds (5) 耗尽** ⇒ audit-engine 降级策略 **交 owner 选择**: [1] 接受当前结论 (本报告改 `overridden_by_user: true`) / [2] 加轮 / [3] 降级单轮。AI 不代选 (Rule #10; handoff §2 H1b)。**owner 2026-09-02 裁: 选 [1] 接受当前结论** ⇒ frontmatter `overridden_by_user: true` (converged 仍 false, 如实); 本报告为终局记录。
 > **合并许可 (与 `converged` 正交, SOT `report-format.md` 阻塞表)**: pre_merge 行 PASS → 继续 / PASS_WITH_WARNINGS → 继续 (附警告) / FAIL → 阻塞。R1–R5 皆 0 Critical, R5 0 Major ⇒ **verdict PASS ⇒ 合并**, 即 owner「通过后合并」指令的「通过」。
 
 ## 结论 (去重后 8 条)

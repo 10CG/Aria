@@ -63,7 +63,7 @@ metadata:
 
   total_tasks: 25
   task_groups: 5
-  status: "B.2 implemented 2026-09-02 — 24 done (TASK-022/023 双推 2026-09-02 owner 授权后核验一致; pre_merge R1 清账 PATCH aria v1.68.1 d1caa66 + standards ffed204 同法双推, gitlink 随之) / TASK-025 in_progress (主仓 PR #190, pre_merge 收敛审计进行中; 轮次与结果以最新 aggregated 报告为准); 前史: A.2 + A.3 complete, post_planning R4 CONVERGED 2026-08-31"
+  status: "B.2 implemented 2026-09-02 — Shipped 2026-09-02 — 25/25 done; PR #190 merged 888b893 (pre_merge 收敛审计 R1–R5 四票 PASS 0C/0M, owner 选 [1]); aria v1.68.1 d1caa66 / standards ffed204 双推核验一致; 前史: A.2 + A.3 complete, post_planning R4 CONVERGED 2026-08-31"
   new_agents_required: false
   agent_roster: [qa-engineer, backend-architect, knowledge-manager, tech-lead]
   estimated_hours: "50-86"   # Σ 区间: S ×14 "1-2" + M ×10 "3-5" + L ×1 "6-8" (R1/C9, DUAL_LAYER_SPEC.md:166 字符串区间, 与母 Spec 同形)
@@ -632,7 +632,7 @@ tasks:
     parent: "5.6"
     task_group: TG-5
     title: "主仓 PR — 交付 phase-c-integrator C.2.4 pre-merge gate (Rule #8)"
-    status: in_progress
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
