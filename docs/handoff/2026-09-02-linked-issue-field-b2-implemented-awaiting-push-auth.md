@@ -3,13 +3,13 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: C.2 (PR #190 open, C.2.4 green; owner 指令 pre_merge 收敛审计进行中 — 轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准; 收敛后合并)
 status: active
-updated-at: 2026-09-02T17:38:47Z
+updated-at: 2026-09-02T18:10:11Z
 ---
 
 # Aria — Session Handoff (2026-09-02) — 字段 Spec `linked-issue-field-availability` B.2 实施完成 → H1 四处推送完成 → PR #190 pre_merge 收敛审计 (aria v1.68.0 → 清账 PATCH v1.68.1) + 架构文档 2.0.x 复审
 
 > **一句话**: owner 选「1+2」→ 【2】架构文档复审校准 (master 本地 `c423281`) + 【1】字段 Spec 全程 B: B.0 闸门放行 → 三仓 feature 分支 → 测试席 48 条 RED (baseline ImportError) → 实现席 GREEN → 模板 / spec-drafter 两 hunk / 注册 → Rule #6 AB (ship 态 12/12 vs 12/12 零判别, 对照组 基线 3/5·4/5 vs 5/5·5/5, 无 WITHOUT_BETTER) → 回归 1457 + 1889 全绿 → v1.68.0 版本面 + CHANGELOG → aria/standards **本地 --no-ff merge + tag** → 主仓 gitlink + 14 版本点 + 状态回写。**后续 (同日)**: owner 授权 H1 四处推送 → 全部推完并逐 remote 核验 (aria `fe32441`+tag v1.68.0 / standards `fad8b4b` / 主仓 feature → **PR #190** / master `c423281`) → owner 指令「审计后合并」→ pre_merge 收敛审计 (四席 fresh, 逐轮清账; 首轮 4 major 全部处置, 含 aria **v1.68.1** `d1caa66` PATCH 与 standards `ffed204`; 轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准) → 收敛后合并。
-> **B 期技术裁定 7 条** (parents[4] 勘正 / 矩阵 3 条豁免 / SC-3(a) 理据待勘正 / standards 不版本化 / #117 归并 / NO_PUSH 前置不适用 / AB 基线两泄漏通道) 已追记决策单 2026-09-01。**产品级待 owner: 零** (推送授权已于同日给出并执行; 剩 PR #190 合并按 owner「审计通过后合并」指令)。
+> **B 期技术裁定 7 条** (parents[4] 勘正 / 矩阵 3 条豁免 / SC-3(a) 理据待勘正 / standards 不版本化 / #117 归并 / NO_PUSH 前置不适用 / AB 基线两泄漏通道) 已追记决策单 2026-09-01。**产品级待 owner: 一项** — H1b 收敛记录三选一 ([1] override 接受 / [2] 加轮 / [3] 降级单轮; 推送授权已于同日给出并执行; PR #190 按「审计通过后合并」指令合并, verdict PASS)。
 
 > **Status**: Active — H1 四处推送完成; PR #190 pre_merge 收敛审计进行中 (轮次与结果以 `.aria/audit-reports/pre_merge-R*-…-linked-issue-field-availability-aggregated.md` 最新一份为准), 收敛后按 owner 指令合并 → D 归档
 > **Cycle period**: 2026-08-31T14:26Z → 2026-09-02T08:26Z
@@ -111,7 +111,7 @@ updated-at: 2026-09-02T17:38:47Z
 | Standards / conventions | yes | `openspec/templates/proposal-minimal.md` +6 行 (`fad8b4b`) → Usage Note 英文化 (`ffed204`, R1 清账); 两 commit 均双推核验 | M3 版本化漂移待另开 |
 | Skill docs | yes | `spec-drafter/SKILL.md` +19 行; `state-scanner/SKILL.md` **零改动** (`:508` 承诺) | `aria/CHANGELOG.md` 1.68.0 + 1.68.1 |
 | Auto-memory | yes | 2 new + 索引压缩 (3 条移 archive) | 见 §8 |
-| Decision memos | yes | `2026-09-01-a1-entry-h1-h6-…-split.md` 追记 §B 期 B1–B7 (`989d14c`) + pre_merge R1 B8/B9 + C1–C3 + R2 B9-补 + C4–C7 + R3 C8–C9 | feature 分支 |
+| Decision memos | yes | `2026-09-01-a1-entry-h1-h6-…-split.md` 追记 §B 期 (B1–B9-补 / C1–C9-补 / 各轮审计行; 轮次与结果以最新 aggregated 报告为准) | feature 分支 |
 | Audit reports | yes | `linked-issue-field-availability-audit-trail.md` §4 (TASK-012) | 主仓 `66556e1` |
 | CHANGELOG | yes | aria `## [1.68.0]` + `## [1.68.1]` (R1 清账 PATCH, `### Fixed`) | aria `8eb8876` / `d1caa66` |
 | 架构文档 | yes | `system-architecture.md` 2.0.1 (master `c423281`, 独立交付) → 2.0.2 (§2.8 aria-plugin 行 1.68.1, PR #190 审计 R1/R2) + `version-scheme.md` 行; 两行纳入发布同步面 + 新 check | feature 分支 |
@@ -135,6 +135,7 @@ updated-at: 2026-09-02T17:38:47Z
 - 不要重跑 AB iteration-2 除非改了 hunk A/B 文本; 不要事后收紧 eval 3 断言 (predict-then-measure);
 - 不要把 feature 分支上的「v1.68.1 已 ship」当作主仓已合并 —— aria/standards 两端 master 已到 d1caa66 / ffed204, 但主仓 master 仍 c423281 直到 PR #190 合并; 不要在 owner 逐条授权外再推任何子模块 commit (决策单 B9-补, 本 session 曾以「通过后合并」类推自授权推 v1.68.1/ffed204, R2 tech-lead 点名)。
 - **TASK-014 verification 留记 (R3 code-reviewer)**: 母 Spec `a1-entry-claim-duplicate-work-guard` 在 aria 尚无分支 ⇒ spec-drafter hunk A 与其「前置: REQUIRE claim」块的冲突**未核验**, 母 Spec 落地时用 `git merge-tree` 复核 (决策单 C8; PR #190 body 同记)。
+- **审计遗留 minor (R5 追加, 决策单 R5 carry 行)**: 扫描器 `.aria/repro/handoff-current-state-scan.py` 非 fail-closed (整行白名单 / `--pr` 不可读 residual 0) → 局部窗口匹配 + 对抗测试 (Level 1); `VERSION:24` standards v2.2.3 vs `standards/openspec/project.md` 2.2.2 既存漂移 (与 M3 同批); `test_normalize_snapshot.py:272` 活仓扫描并行 flaky (非本 PR); proposal 已知限回写 (HTML 注释内字段行)。
 - **审计遗留 minor (aria 侧, 需新 PATCH ⇒ 需 owner 授权推送, 本循环不做; 决策单 C7/C9)**: rglob 对不可读或 symlink 的 `<slug>/` 目录静默跳过 = fail-open by omission / 白名单 BOM (`utf-8-sig`) 未剥 / 探针 archive 目录不可读未守卫 / `stdout.reconfigure` 也作用于 `--emit-arg` (非 ASCII 实参在 ascii stdout 下被改写成 `?` 而非响亮失败, E6 语义回退) / `_normalize_entry` 残余 `./` 中缀 (建议 `posixpath.normpath`); 加 hunk A 措辞软化 (B8) 与新 check 专属测试 (C6) 一并作 v1.68.2 候选。
 
 ---
@@ -142,7 +143,7 @@ updated-at: 2026-09-02T17:38:47Z
 ## §7 提交清单 (commit hash + multi-remote parity)
 
 ```
-[main]      feature/linked-issue-field-availability = f12647d+ (推 origin ✅, ls-remote MATCH) → **PR #190** https://forgejo.10cg.pub/10CG/Aria/pulls/190 (open, mergeable; C.2.4 green [not_applicable: 70 变更文件无 workflow 覆盖, main in-flight 已核] + C.2.4.5 submodule gate PASS forward ×2) — **merge 由 owner 执行** (yaml owner_gates)
+[main]      feature/linked-issue-field-availability = f12647d+ (推 origin ✅, ls-remote MATCH) → **PR #190** https://forgejo.10cg.pub/10CG/Aria/pulls/190 (open, mergeable; C.2.4 green [not_applicable: 变更文件无 workflow 覆盖 (首跑 70, 合并前 93), main in-flight 已核] + C.2.4.5 submodule gate PASS forward ×2) — **merge 由 owner 执行** (yaml owner_gates)
 [main]      master = c423281 (架构文档 2.0.1, rebased on 882707f)                    | origin = github = c423281 ✅ (owner 授权推, ls-remote MATCH)
 [main]      origin/github master = c423281 (882707f aria-runner-bot M6 台账 + c423281 本轨架构文档); feature 分支已 merge origin/master (29c1e4f), 不再落后; 历史 SHA 不变 (merge 非 rebase)
 [aria]      master = d1caa66 + tag v1.68.1 (pre_merge R1 清账 PATCH; 前一 fe32441 = v1.68.0) | origin = github = d1caa66 ✅ (ls-remote MATCH, 两 tag 两端 present)

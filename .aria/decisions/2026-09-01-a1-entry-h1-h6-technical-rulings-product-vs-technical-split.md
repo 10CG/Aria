@@ -121,7 +121,7 @@
 | 口径 | R3 km/qa minor `62285020`: tasks.md `:5` `run_all_tests 1889` 为 v1.68.0 时值, v1.68.1 后实测 1894 (= 1889 + state-scanner 净增 5) | **已修** tasks.md `:5` | 两次独立重跑 1894 | tasks.md |
 | 收敛口径 | R3 C∪M = 1 (非 ∅) ⇒ 不收敛; R4 预期 ∅ | **R4 = 稳定性确认轮**: 若 R4 C∪M = ∅ 且四票 PASS ⇒ CONVERGED (可执行结论集口径, 与本仓 pre_merge PR #26 与 post_planning R4 先例一致; convergence-algorithm「首轮 0-finding 守卫」针对整体结论集为空 (agent 假阴性风险), 本轮 minor 集非空、且 R1→R4 四轮 fresh 席位独立复核, 不适用) | R4 四份报告 C∪M 计数 | R4 聚合报告 |
 
-### PR #190 pre_merge 收敛审计 R4 清账 (2026-09-02; 四席投 PASS; 一席判 major = 同形第四轮)
+### PR #190 pre_merge 收敛审计 R4 清账 (2026-09-02; 3 PASS / 1 REVISE (tech-lead); 两 major = 同形第四轮 + 收敛口径)
 
 | # | 事项 | 裁定 | 判据 | 落点 |
 |---|------|------|------|------|
@@ -129,3 +129,12 @@
 | C9-补 | R4 cr: 除不可读目录外, `rglob` 对 dangling symlink `proposal.md` / symlink slug 目录同样静默跳过 (前置可入 git); 白名单 BOM (`utf-8-sig`) 未剥 (R3 cr (ii), R3 追记漏收) | 并入 v1.68.2 候选清单 (C7/C9), 优先级仍次于 `2ed89c8a` | 构造 symlink slug ⇒ 应计入作用域 | handoff §2 carry |
 | 记录 | R3 聚合表把 C9 内容挂在 `ae4f1c9f` 行、`4a675f17` 缺行 (R4 km/cr); PR body R3 段写「5m」实为 1M+4m (km); PR body「master 已前进到 882707f」实为 c423281 (含 882707f), 「token liveness 报指纹漂移」已转 OK (tl) | R3 聚合报告 append-only 不改写, 本单勘误; PR body 三处已改 | — | 本单 / PR body |
 | **3b277328 (撤回)** | R4 tl major: R3 追记的「收敛口径」行把稳定性比较集从 SOT 的**全结论集**改成自创的「可执行结论集 (C∪M)」; `audit-engine/SKILL.md:220-223` 四元组含 severity (minor 必在集内), `convergence-algorithm.md:60` Round 1=∅ 不视为收敛; 「C∪M」在 audit-engine 与 standards 零命中; 援引的先例链无一环落到成文判据 (memory `exact-exception-condition`「N 次非正式援引 ≠ 成文 lane」); 且理据自相矛盾 (用全集非空否掉 0-finding 守卫、又用 C∪M 空宣布收敛) | **撤回 R3「收敛口径」行, 认定为对 SOT 的偏离 (AI 自创判据)**。严格口径 = 全结论集四元组 R_N == R_{N-1} **且** 全票 PASS (SOT 字面)。R5 = max_rounds 最后一轮; 若 R5 仍不满足严格口径 ⇒ 按 audit-engine「max_rounds 耗尽 → 降级策略」**交 owner 选择**: [1] 接受当前结论 (报告 `overridden_by_user: true`) / [2] 加轮 / [3] 降级单轮 —— AI 不自行判定 (Rule #10 末句: 自作主张的流程判断写进 handoff 请复议) | `grep -rn 'C∪M\|可执行结论集' aria/skills/audit-engine standards/` = 0 命中 | 本单 + handoff §2 H-new + R4 聚合报告 |
+
+### PR #190 pre_merge 收敛审计 R5 = max_rounds 最后一轮 (2026-09-02; 四席 PASS, 0C / 0M / 10m 去重 8; 实物面连续第四轮零 finding)
+
+| # | 事项 | 裁定 | 判据 | 落点 |
+|---|------|------|------|------|
+| 终局 | SOT 字面 `converged = conclusions_stable AND unanimous_pass`: R5 四票 PASS 成立, 但四元组全集 R5 ≠ R4 (R4 含 2 major; R5 为 8 条新旧 minor) ⇒ **`converged: false`, max_rounds 耗尽** ⇒ audit-engine 降级策略: [1] 接受当前结论 (`overridden_by_user: true`) / [2] 加轮 / [3] 降级单轮 — **由 owner 选, AI 不裁** (handoff §2 H1b) | 与 R4 keys 集合比较 (aggregate_round.py) | R5 聚合报告 frontmatter |
+| 合并 | verdict 阻塞表 (`audit-engine/references/report-format.md` pre_merge 行): PASS → 继续 / PASS_WITH_WARNINGS → 继续 (附警告) / FAIL → 阻塞。R1–R5 皆 0 Critical, R5 0 Major ⇒ verdict **PASS**; owner 指令「通过后合并」的「通过」= verdict 路 ⇒ **合并**; `converged` 标志与合并许可在 SOT 里是两件事 (R5 tech-lead 逐字核过), 收敛记录如何落待 owner 三选一 | report-format.md 阻塞表 | Forgejo merge PR #190 |
+| 收敛后定点 minor 编辑 (post_planning R4 先例) | R5 minor 中可一行改正的: 决策单 R4 段标题「四席投 PASS」→「3 PASS / 1 REVISE」(ebab7adc); handoff `:12`「产品级待 owner: 零」→ H1b 三选一 (82513c94); handoff §5 Decision memos 行 → 指针口径; handoff `:145`「70 变更文件」→ 93 (tl); PR body 补「服务端合并后 github 镜像推送由本 session 手工做 + ls-remote 核验」义务行 (55847e9b) | 逐处 diff | 本 commit |
+| carry (R5) | 扫描器 `.aria/repro/handoff-current-state-scan.py` 非 fail-closed (整行白名单含 `aggregated`/`已完成`/`已推` 通用词; `--pr` 不可读时 residual 0 exit 0; 正向 blocklist 对新措辞 fail-open) — d61b5fc9 / d711ce91 ⇒ 改局部窗口匹配 + 对抗测试, Level 1; `VERSION:24` standards v2.2.3 vs `standards/openspec/project.md` 2.2.2 既存漂移 (e11b8aa8, 与 M3 同批); `test_normalize_snapshot.py:272` 拿活仓当扫描目标, 并行席位落报告时 flaky (303c51a8, 非本 PR 触碰); proposal 已知限回写 (a2a4165f: 多行 HTML 注释内字段行按 Spec 字面判 OK) | — | handoff §2 carry |
