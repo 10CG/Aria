@@ -11,7 +11,7 @@ updated-at: 2026-09-02T08:26:00Z
 > **一句话**: owner 选「1+2」→ 【2】架构文档复审校准 (master 本地 `c423281`) + 【1】字段 Spec 全程 B: B.0 闸门放行 → 三仓 feature 分支 → 测试席 48 条 RED (baseline ImportError) → 实现席 GREEN → 模板 / spec-drafter 两 hunk / 注册 → Rule #6 AB (ship 态 12/12 vs 12/12 零判别, 对照组 基线 3/5·4/5 vs 5/5·5/5, 无 WITHOUT_BETTER) → 回归 1457 + 1889 全绿 → v1.68.0 版本面 + CHANGELOG → aria/standards **本地 --no-ff merge + tag** → 主仓 gitlink + 14 版本点 + 状态回写。**全部未推**: aria master `fe32441` (4 ahead, tag v1.68.0) / standards master `fad8b4b` (2 ahead) / 主仓 feature 分支 `df42891` (8 ahead) + master `c423281` (1 ahead) —— 推共享 master 与建 PR 均为外向动作, 待 owner 一句授权。
 > **B 期技术裁定 7 条** (parents[4] 勘正 / 矩阵 3 条豁免 / SC-3(a) 理据待勘正 / standards 不版本化 / #117 归并 / NO_PUSH 前置不适用 / AB 基线两泄漏通道) 已追记决策单 2026-09-01。**产品级待 owner: 零** (只剩推送授权这一动作门)。
 
-> **Status**: Active — Ready for next session
+> **Status**: Active — H1 (a)(b)(c)(d) 四处推送已完成并核验 (2026-09-02 owner 授权); 剩 PR #190 owner merge → D 归档
 > **Cycle period**: 2026-08-31T14:26Z → 2026-09-02T08:26Z
 > **Next session 入口**: 优先读本 doc → `/aria:state-scanner` 自动恢复 → §6 选择下一步
 
@@ -139,15 +139,15 @@ updated-at: 2026-09-02T08:26:00Z
 ## §7 提交清单 (commit hash + multi-remote parity)
 
 ```
-[main]      feature/linked-issue-field-availability = df42891 (8 commits: 66556e1 daac6a9 989d14c e5947fe 42f0292 df42891 + 本 handoff) | 未推 (origin/github master = e1deaf1)
-[main]      master = c423281 (1 ahead of origin/master 882707f: 架构文档 2.0.1, 已 rebase 到 882707f) | 未推
+[main]      feature/linked-issue-field-availability = f12647d+ (推 origin ✅, ls-remote MATCH) → **PR #190** https://forgejo.10cg.pub/10CG/Aria/pulls/190 (open, mergeable; C.2.4 green [not_applicable: 70 变更文件无 workflow 覆盖, main in-flight 已核] + C.2.4.5 submodule gate PASS forward ×2) — **merge 由 owner 执行** (yaml owner_gates)
+[main]      master = c423281 (架构文档 2.0.1, rebased on 882707f)                    | origin = github = c423281 ✅ (owner 授权推, ls-remote MATCH)
 [main]      ⚠️ origin/github master 已被 aria-runner-bot 推进到 882707f (07:23Z, M6 台账/TASK-028, 与本轨零文件重叠); feature 分支基 e1deaf1 落后 1, PR 合并即可 (未 rebase 以保 §1/§7 SHA 有效)
 [aria]      master = fe32441 + tag v1.68.0 | origin = github = fe32441 ✅ (owner 授权 08:3xZ 推, ls-remote 逐 remote MATCH; tag 两端 present)
 [standards] master = fad8b4b                                                          | origin = github = fad8b4b ✅ (同上核验)
 [aria-orchestrator] 未动 (feature/m6-cost-model-telemetry 92acce5 停泊; gitlink 237045a)
 ```
 
-**Tags published**: v1.68.0 (aria, origin + github)。**PRs merged**: 无 (TASK-025 待)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
+**Tags published**: v1.68.0 (aria, origin + github)。**PRs merged**: 无; **PR open**: Aria #190 (gate green, 待 owner merge → 之后 phase-d-closer 归档 + release claim)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
 
 ---
 
