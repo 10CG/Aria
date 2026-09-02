@@ -1,0 +1,20 @@
+# linked-issue-field-availability — GRANDFATHERED 白名单 (仓本地数据, 不进 aria-plugin 分发件)
+#
+# 格式: 每行一条 `openspec/changes/<slug>` (相对主仓根, 无尾斜杠); `#` 起首为注释; 空行忽略。
+# 语义: 在册条目的 proposal.md 缺「Linked Issue / 关联 Issue」字段时不计违规 (fail-CLOSED: 白名单外一律 FAIL)。
+#       这是「尚未回填清单」—— 回填一份删一条; 全部回填后本文件为空 = check 恒 OK。
+# 陈旧守卫 (探针逐条断言, 任一命中即 FAIL "allowlist 陈旧: <path> (a|b|c)"):
+#   (a) 该路径当前不存在且 openspec/archive/ 无同 slug (目录被删/改名)
+#   (b) 已移出作用域 (openspec/archive/*-<slug>/ 存在) 或路径不以 openspec/changes/ 起首
+#   (c) 仍在作用域内但已合规 (verdict OK) —— 请删除该行
+# 来源: Spec linked-issue-field-availability §5 / D6 (2026-08-25 实读 6 份均 NO_FIELD);
+#       O-1 2026-09-01 技术裁定: 不跨轨回填, 由 M6/M7 轨自己在下次触碰各 proposal 时回填并各删一条
+#       (决策单 .aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md §H4a)。
+# 探针: aria/skills/state-scanner/scripts/linked_issue_field_probe.py . --grandfathered .aria/linked-issue-field-grandfathered.txt
+#       —— 任何情况下不要改 aria/ 子模块下的探针脚本 (随 plugin 分发, 更新即被覆盖); 只改本文件。
+openspec/changes/aria-2.0-m6-cost-model-telemetry
+openspec/changes/aria-2.0-m6-dispatch-input-delivery
+openspec/changes/aria-2.0-m6-e2e-resilience
+openspec/changes/aria-2.0-m6-release-closeout
+openspec/changes/aria-2.0-m7-agent-lifecycle
+openspec/changes/aria-2.0-m7-fleet-aggregation
