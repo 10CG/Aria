@@ -215,3 +215,20 @@ Forgejo 侧要 owner 用密码登录列 token 才能对账。`aria-runner-templa
 `m6-egress-probe.hcl` / `m6-egress-probe-auth.hcl` / `m6-pat-matrix.hcl` /
 `luxeno_latency_probe.py` / `luxeno_probe2.py` / `luxeno_probe4.py`。
 三个临时 Nomad job 跑完已 `nomad job stop -purge` 清理, 集群无残留。
+
+### 2.7 闭环 (2026-09-02): 重签生效, TASK-028 → done
+
+owner 按 `.aria/decisions/2026-08-30-…` 补记流程签发 `aria-layer2-git-2026-Q3`
+(10cg-ci-bot, scope write:repository + write:issue), 经 `aether env set --from-file` 写入。复测:
+
+| 腿 | 结果 |
+|---|---|
+| heavy-node 内网 issue GET (fetch 生产路径) | **200**, `application/json`, `number` 字段在 — 合法 JSON 非伪成功 |
+| heavy-node 内网 repo GET (default_branch 回落路径) | **200**, `default_branch` 在 |
+| `git ls-remote` (读, 生产 clone URL 形式) | **rc=0, 8 refs** |
+| `git push --dry-run` 到不存在分支 (写) | **rc=0** — `write:repository` 实证; 已复核远端未落任何分支 |
+
+对照组不变: orchestrator 那份仍 push 403 (scope 如旧), aria-build 仍 403 —— 变化只来自新签值。
+台账回填 (fingerprint/名字/issued_at/status=active, rotation.policy=permanent per owner 09-02 裁定),
+`forgejo-app-token-liveness` check **转绿**; `tasks.md 6.1` 勾选 + `detailed-tasks.yaml` TASK-028 → done。
+M6 四门链现状: 028 done → **029 只剩 Blocker 4 (Luxeno) + TASK-022**; 021/022 仍待 owner build。

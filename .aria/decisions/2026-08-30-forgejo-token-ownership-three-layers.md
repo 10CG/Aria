@@ -46,6 +46,12 @@ related:
 
 ## 待办 (凭据动作, owner)
 
-1. `10cg-ci-bot` 名下签 `aria-layer2-git-<yyyymmdd>` (scope `write:repository` + `write:issue`; 不要 `write:package`) → `aether env set --job aria-layer2-runner FORGEJO_BOT_PAT <new>` → 跑 scratchpad `m6-pat-scope-probe.hcl` 验 push --dry-run → 更新台账 → check 转绿。
+1. `10cg-ci-bot` 名下签 `aria-layer2-git-2026-Q3` (**命名勘正 2026-09-02**: 初版写 `-<yyyymmdd>` 是 AI 自拟, 与现行实态不符; 现行 = `<用途>-<YYYY>-Q<n>` cohort 形式, 先例 `todo-web-ci-2026-Q3` [08-08 最新真实签发] / `org-ci-shared-2026-Q3` / `aria-build-bot-2026-Q3`, 轮换时随台账 Q 后缀改名; 登记必带 account + forgejo_token_name, per Aether #292) (scope `write:repository` + `write:issue`; 不要 `write:package`) → `aether env set --job aria-layer2-runner FORGEJO_BOT_PAT <new>` → 跑 scratchpad `m6-pat-scope-probe.hcl` 验 push --dry-run → 更新台账 → check 转绿 → #151 补一条 (账号名+token 名+指纹), 供 Aether 定期对账 bot 账号 token 时有档可查 (他们 §5 的「册外盲点」教训)。
 2. `nomad/jobs/aria-runner-template` 变量: 删 (job 已 deprecate, DEC-20260523-001)。
+
+> **补记 (2026-09-02, owner 两项裁定)**: (a) 名字定为 `aria-layer2-git-2026-Q3` (Q-cohort 勘正已入上文);
+> (b) **轮换周期 = 永久** —— Forgejo token 默认不过期, 不设强制轮换; 台账两条应用级 token 均改
+> `rotation.policy: permanent`。补偿控制 = state-check `forgejo-app-token-liveness` 每次扫描做活性 +
+> 指纹漂移检查; 若发生泄露, 按即时吊销重签处理 (先枚举全 store), 不依赖周期兜底。
+
 3. 纯卫生 (随下次碰这两处一起): `initial.sh:602` 用户名字面量 / `aria-orchestrator.FORGEJO_BOT_USER` 改 `10cg-ci-bot` (实测不影响鉴权)。
