@@ -142,12 +142,12 @@ updated-at: 2026-09-02T08:26:00Z
 [main]      feature/linked-issue-field-availability = df42891 (8 commits: 66556e1 daac6a9 989d14c e5947fe 42f0292 df42891 + 本 handoff) | 未推 (origin/github master = e1deaf1)
 [main]      master = c423281 (1 ahead of origin/master 882707f: 架构文档 2.0.1, 已 rebase 到 882707f) | 未推
 [main]      ⚠️ origin/github master 已被 aria-runner-bot 推进到 882707f (07:23Z, M6 台账/TASK-028, 与本轨零文件重叠); feature 分支基 e1deaf1 落后 1, PR 合并即可 (未 rebase 以保 §1/§7 SHA 有效)
-[aria]      master = fe32441 (4 ahead: 673ad34 b47fe11 8eb8876 + merge) + tag v1.68.0 | origin = github = d69091d, 未推
-[standards] master = fad8b4b (2 ahead: 91096f4 + merge)                             | origin = github = 334c609, 未推
+[aria]      master = fe32441 + tag v1.68.0 | origin = github = fe32441 ✅ (owner 授权 08:3xZ 推, ls-remote 逐 remote MATCH; tag 两端 present)
+[standards] master = fad8b4b                                                          | origin = github = fad8b4b ✅ (同上核验)
 [aria-orchestrator] 未动 (feature/m6-cost-model-telemetry 92acce5 停泊; gitlink 237045a)
 ```
 
-**Tags published**: 无 (v1.68.0 仅本地)。**PRs merged**: 无 (TASK-025 待)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
+**Tags published**: v1.68.0 (aria, origin + github)。**PRs merged**: 无 (TASK-025 待)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
 
 ---
 
