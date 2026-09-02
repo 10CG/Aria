@@ -1,6 +1,6 @@
 # Aria System Architecture
 
-> **Version**: 2.0.1
+> **Version**: 2.0.2
 > **Status**: Active
 > **Created**: 2026-01-18
 > **Last Updated**: 2026-09-02
@@ -964,6 +964,7 @@ C.2 Phase 包含两级完整性保证:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 2.0.2 | 2026-09-02 | §2.8 版本表 aria-plugin 行 → v1.68.1 (PR #190 pre_merge 审计: 该行与 `version-scheme.md` 同行纳入 CLAUDE.md 发布同步面, 新 state-check `plugin-version-arch-docs-match` 机械兜底) |
 | 2.0.1 | 2026-09-02 | 复审校准 (state-check `m6-arch-doc-stale` 98d 触发, 内容随之复审): §2.8 版本表 (aria-plugin v1.67.2; aria-orchestrator 无独立版本工件, 以 CLAUDE.md 版本行 + SHA 锚定); §3.1 / §4 / §6.3 / §7.1 / §8.1 路径**类级**勘正 `.claude/skills|agents` → `aria/skills|agents` (aria-plugin 子模块, 42 Skills / 11 Agents), 补 aria-orchestrator / .aria/ / docs/handoff 条目; §6.5 基准测试改为 ab-suite (31 套件) + ab-results + /skill-creator 执行 (自研 runner 已废弃); §9.2 M6 现状 + M7 行; §9.3 TG-DOCS-B 标完成 |
 | 2.0.0 | 2026-05-27 | v2.0 架构文档全面更新 (TG-DOCS-B, US-026 M6)：新增三层架构章节 (§2.5)、自主模型章节 (§2.6 状态机 S0-S9 + S_FAIL + 崩溃恢复)、层边界章节 (§2.7 cost.json schema pin)、版本方案交叉引用 (§2.8)。Executive Summary 更新至"方法论定义 + 参考实现"定位。反映 M1-M5 已交付成果 (268 tests M2 + reconciler M3 + Feishu gate M4 + 793 tests M5)。父 PRD 增加 prd-aria-v2.md 引用 |
 | 1.9.0 | 2026-04-12 | Phase C.2 Integration Quality Gate (US-012)：三层多远程 Push Enforcement 架构 (Layer 1 state-scanner 多远程扩展 + Layer 2 phase-c-integrator C.2.5 + Layer 3 git-remote-helper internal skill)。aria-plugin v1.14.0→1.15.0。2026-04-12 发版事故根因修复 |

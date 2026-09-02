@@ -360,7 +360,7 @@ checks:
     fix: |
       在被点名的 proposal.md 头部 blockquote 补一行 (行首无空白, `>` 后恰一个空格; 位置不限 —
       探针按 E0 取文档序第一条 depth-1 命中, 与行号无关; 建议紧随 `> **Created**:` 行, 与 SOT 模板顺序一致):
-        > **Linked Issue**: `<org>/<repo>#<n>`      # 多个用 ", " 分隔; 中文拼写 `关联 Issue` 亦合法 (alias), 新写请用英文
+        > **Linked Issue**: `<org>/<repo>#<n>`      # 多个用 ", " 分隔 (裸逗号亦被 E4 接受, 推荐带空格); 中文拼写 `关联 Issue` 亦合法 (alias), 新写请用英文
       无关联 (已核实) 时逐字写: > **Linked Issue**: `none`      # alias `无` 亦合法; N/A / TBD 不是哨兵
       被点名为「白名单陈旧条目」时: 删除本仓 .aria/linked-issue-field-grandfathered.txt
       里那一行 (该 proposal 已归档/改名/已合规)。注意: 白名单是**仓本地数据**,
