@@ -67,7 +67,7 @@
 
 ## TG-6 — E2E dogfood + pre-run verification
 
-- [ ] 6.1 Live-test heavy-node Forgejo egress/auth (fetch reachability) before any run  <!-- ⚠️ 部分完成 (2026-08-29 实测) TASK-028: egress 腿 PASS (heavy-node 容器 → 内网 Forgejo 返回合法 JSON, 非 CF-Access 伪成功); auth 腿 FAIL — nomad/jobs/aria-layer2-runner 的 FORGEJO_BOT_PAT 已失效 (401 user does not exist), 同一 PAT 也内嵌在 git clone URL 里。证据: .aria/notes/2026-08-29-m6-blocker4-recheck-and-task028-egress-probe.md -->
+- [x] 6.1 Live-test heavy-node Forgejo egress/auth (fetch reachability) before any run  <!-- ✅ 完成 2026-09-02 (TASK-028): heavy-node 实测双腿 PASS — 内网 issue/repo GET 200 合法 JSON (非 CF-Access 伪成功) + git ls-remote rc=0 + push --dry-run rc=0 (write:repository 实证)。新 token aria-layer2-git-2026-Q3 (owner 2026-09-02 签, 台账 .aria/pat-inventory.yaml); 08-29 首测曾 FAIL (旧 PAT 死)。证据: .aria/notes/2026-08-29-m6-blocker4-recheck-and-task028-egress-probe.md §2.7 -->
 - [ ] 6.2 E2E dogfood: real numeric-id autonomous dispatch → S9_CLOSE with merged PR (AC-1)
 - [x] 6.3 Verify fetch-failure classes distinguishable to Layer 1 as infra-fail vs agent-fail (AC-6)
 

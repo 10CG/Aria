@@ -24,7 +24,11 @@ defaults:
   account: 10cg-ci-bot                              # Forgejo user id=6; 2026-07-01 前名 aria-runner-bot
   forgejo_internal_url: http://192.168.69.200:3000  # 生产消费点走内网 (initial.sh:46), 绕过 CF Access 平面
   nomad_addr: http://192.168.69.70:4646
-  naming_convention: "aria-<consumer>-<yyyymmdd>"   # 在 Forgejo 界面里一眼分得清是 Aria 的 (旧 token 未按此命名)
+  # 命名对齐现行实态 (2026-09-02 与 Aether 台账/轮换 runbook 核实; 初版自拟的 aria-<consumer>-<yyyymmdd> 作废):
+  # <用途>-<YYYY>-Q<n> —— Q 是签发季度 cohort, 轮换时随台账改名 (先例: todo-web-ci-2026-Q3 [2026-08-08 最新真实签发] /
+  # org-ci-shared-2026-Q3 / aria-build-bot-2026-Q3 / cluster-registry-pull Q2→Q3 [commit e40dcc1])。
+  # 登记要求 (Aether #292 closed 已采纳): 新 token 必记 account + forgejo_token_name, 光有指纹在 Forgejo UI 定位不了。
+  naming_convention: "<purpose>-<YYYY>-Q<n>"
 
 tokens:
   # ── Layer 1 (Hermes light-1, aria-layer1 extension): 读 issue / 写评论 / 查 PR ──
@@ -45,17 +49,19 @@ tokens:
       endpoint: repos/10CG/Aria/issues/188
       expect: 200
     rotation:
-      cadence_days: 90                             # 拟, 对齐 Aether runtime class; owner 未定 (定了改这里)
-      due: "2026-11-28"                            # last_verified + 90d, 非签发日 (签发日 05-03 起算早已过, 首轮以核实日起算)
+      policy: permanent                            # owner 2026-09-02 裁定: 不设强制轮换周期 (Forgejo token 默认不过期)。
+                                                   # 补偿控制 = 每次 /state-scanner 的活性+指纹漂移检查;
+                                                   # 泄露时走即时吊销重签 (先枚举全 store, 对齐 Aether emergency rotation)
+      due: null
     last_verified: "2026-08-30"
     notes: "同变量里 FORGEJO_BOT_USER=aria-runner-bot 是过期用户名 (纯卫生, 不影响鉴权); 下次碰该变量时改 10cg-ci-bot"
 
   # ── Layer 2 (aria-runner 容器 @ heavy 节点): clone / push 分支 / 开 PR ──
   - id: aria-layer2-git
-    status: dead_pending_reissue                   # 2026-08-29 发现, 08-30 双法复核: Forgejo 不认 (uid 0 / Credentials are incorrect or have expired)
-    forgejo_token_name: unknown                    # 最可能 = 2026-05-23 已吊销的 "aria layer2 runner 2026 05 22" (handoff 2026-05-23 PAT lifecycle 表); Forgejo 侧需密码登录列 token 才能铁证
-    fingerprint: ed07d152                          # 当前变量值 (死); 重签后更新为新值指纹
-    issued_at: unknown
+    status: active                                 # 2026-09-02 重签生效 (旧值 fp ed07d152 自 ~05-23 死, 08-29 发现, 09-02 覆盖)
+    forgejo_token_name: aria-layer2-git-2026-Q3
+    fingerprint: 3105220d
+    issued_at: "2026-09-02"
     scope_required: [write:repository, write:issue]   # clone/push + 开 PR/评论; 不要 write:package (镜像拉取已由 Aether 的 docker_auth_* 承担)
     store:
       type: nomad-variable
@@ -68,15 +74,16 @@ tokens:
       enabled: true
       endpoint: repos/10CG/Aria
       expect: 200
-    write_path: "aether env set --job aria-layer2-runner FORGEJO_BOT_PAT <new>  (CAS 安全单键写; 等价: nomad var get -out=json → 只改此键 → put -check-index)"
-    reissue_plan: >
-      10cg-ci-bot 名下签 aria-layer2-git-<yyyymmdd> (scope 如上) → 经 write_path 写入 →
-      跑 scratchpad m6-pat-scope-probe.hcl 验 ls-remote rc=0 且 push --dry-run 非 403/401 →
-      更新本条 fingerprint/forgejo_token_name/issued_at/status → 跑 state-check 转绿。
+    write_path: "aether env set --job aria-layer2-runner FORGEJO_BOT_PAT --from-file <f>  (CAS 安全单键写; 等价: nomad var get -out=json → 只改此键 → put -check-index)"
+    history: >
+      2026-09-02 重签闭环: owner 经 write_path 写入 → heavy-node 实证 git ls-remote rc=0 (8 refs) +
+      push --dry-run rc=0 (write:repository 实证, dry-run 不落引用、已复核远端无该分支) + 内网
+      issue/repo GET 200 合法 JSON → 本条回填 → state-check 转绿。旧死值 fp ed07d152 (最可能 =
+      2026-05-23 吊销的 "aria layer2 runner 2026 05 22") 已被覆盖, Forgejo 侧无可吊销项。
     rotation:
-      cadence_days: 90
-      due: null                                    # 重签后 = issued_at + 90d
-    last_verified: "2026-08-30"                    # 结果 FAIL
+      policy: permanent                            # owner 2026-09-02 裁定 (同上条): 不设强制轮换周期
+      due: null
+    last_verified: "2026-09-02"
 
   # ── 已 deprecate 的 job 残留 ──
   - id: aria-runner-template-legacy

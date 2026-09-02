@@ -522,7 +522,7 @@ tasks:
     parent: "6.1"
     task_group: TG-6
     title: "Live-test heavy-node Forgejo egress/auth (fetch reachability) before any run"
-    status: in_progress
+    status: done
     complexity: S
     est_hours: 3
     agent: qa-engineer
@@ -546,6 +546,9 @@ tasks:
       .aria/notes/2026-08-29-m6-blocker4-recheck-and-task028-egress-probe.md
       另: 本条 dependencies 记 [TASK-021], 但 proposal.md:13 写「互为前置 021→022, 028→029」两条
       独立链; 实测证明 028 与镜像无关 (探的是网络+凭据), 以 proposal 为准。
+      ✅ 2026-09-02 闭环: owner 签 aria-layer2-git-2026-Q3 写入变量后, heavy-node 复测双腿 PASS
+      (issue/repo GET 200 合法 JSON + git ls-remote rc=0 + push --dry-run rc=0); verification
+      两个判据均满足, 转 done。台账 .aria/pat-inventory.yaml 已回填, state-check 转绿。
 
   - id: TASK-029
     parent: "6.2"

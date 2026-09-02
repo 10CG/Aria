@@ -1,9 +1,9 @@
 # Aria System Architecture
 
-> **Version**: 2.0.0
+> **Version**: 2.0.1
 > **Status**: Active
 > **Created**: 2026-01-18
-> **Last Updated**: 2026-05-27
+> **Last Updated**: 2026-09-02
 > **Project Type**: Methodology Definition + Autonomous Reference Implementation
 > **Parent PRD (v1)**: [prd-aria-v1.md](../requirements/prd-aria-v1.md)
 > **Parent PRD (v2)**: [prd-aria-v2.md](../requirements/prd-aria-v2.md)
@@ -186,8 +186,8 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 | 版本流 | 当前版本 | SoT 文件 |
 |--------|----------|----------|
 | Aria main repo | v1.7.5 | `VERSION` |
-| aria-plugin | v1.67.1 | `aria/.claude-plugin/plugin.json` |
-| aria-orchestrator | v2.x (in progress) | `aria-orchestrator/` pyproject.toml |
+| aria-plugin | v1.67.2 | `aria/.claude-plugin/plugin.json` |
+| aria-orchestrator | v2.0.0 (M6 进行中; 锚 `86bb684`) | **无独立版本工件** (仓内实测无 pyproject.toml / VERSION / tag) — 以 CLAUDE.md「项目状态」版本行 + git SHA 锚定 |
 | Aria 2.0 PRD | v2.0.0 | `docs/requirements/prd-aria-v2.md` |
 
 **关键说明**: aria-plugin **不随** Aria main repo 发布 v2.0.0 而 bump 到 v2.0。两者版本号语义独立。
@@ -199,57 +199,17 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 ### 3.1 项目结构
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Aria 项目                               │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   CLAUDE.md   │    │  README.md   │    │ .claude/     │      │
-│  │  (AI 认知)    │    │  (人类文档)   │    │  (AI 配置)   │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                     standards/ (子模块)                      │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐   │  │
-│  │  │  core   │  │openspec │  │ workflow │  │conventions│  │  │
-│  │  │方法论核心│  │需求规范 │  │工作流定义│  │格式约定  │   │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘   │  │
-│  └────────────────────────────────────────────────────────────┘  │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                    .claude/ (子模块)                        │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐                   │  │
-│  │  │ agents/ │  │ skills/ │  │ skills/ │                   │  │
-│  │  │专业代理 │  │工作流单元│  │tdd-enforcer│               │  │
-│  │  └─────────┘  └─────────┘  └─────────┘                   │  │
-│  │  ┌──────────────────────────────────────────────────────┐ │  │
-│  │  │  trigger-rules.json (自动触发配置)                   │ │  │
-│  │  └──────────────────────────────────────────────────────┘ │  │
-│  └────────────────────────────────────────────────────────────┘  │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                    openspec/ (项目工作区)                   │  │
-│  │  ┌─────────────┐  ┌──────────────────────────────────────┐│  │
-│  │  │  changes/   │  │          archive/                    ││  │
-│  │  │  活跃变更    │  │          已完成变更                  ││  │
-│  │  └─────────────┘  └──────────────────────────────────────┘│  │
-│  └────────────────────────────────────────────────────────────┘  │
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │    docs/     │    │    tests/    │    │    aria/     │      │
-│  │  研究文档     │    │   测试用例    │    │  Hooks工具   │      │
-│  │              │    │              │    │  scripts/    │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │              aria-plugin-benchmarks/ (基准测试)              │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────────────────────┐   │  │
-│  │  │ 33 Skill│  │ runner/ │  │ OVERALL_BENCHMARK_      │   │  │
-│  │  │ 评估套件│  │自动化执行│  │ SUMMARY.md 综合报告     │   │  │
-│  │  └─────────┘  └─────────┘  └─────────────────────────┘   │  │
-│  └────────────────────────────────────────────────────────────┘  │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+Aria/  (meta-repo — 三个同组织一等子模块 + 项目工作区; 子模块指针由主仓 gitlink 钉住)
+├── CLAUDE.md / README.md (+ README.{zh,ja,ko}.md)   AI 认知 / 人类文档
+├── .claude/                本仓 Claude Code 配置 (settings.json · local.md · trigger-rules.json); 非子模块
+├── standards/              [子模块 aria-standards] core/ 方法论核心 · openspec/ 规范格式 · conventions/ 约定 · autonomous/ (v2.0 自主决策规则)
+├── aria/                   [子模块 aria-plugin; 版本 SOT .claude-plugin/plugin.json] skills/ (42 Skills) · agents/ (11 Agents) · hooks/ · tests/ · CHANGELOG.md (版本史 SOT)
+├── aria-orchestrator/      [子模块; v2.0 自主运行时, 仅 10CG Lab 内部] hermes-extensions/ (Layer 1) · docker/ + nomad/ (Layer 2 aria-runner) · docs/architecture-decisions.md
+├── openspec/               项目变更工作区 (Rule #5): changes/ 活跃变更 · archive/ 已完成变更
+├── docs/                   requirements/ (PRD + User Stories) · architecture/ (本文档) · handoff/ (Rule #9 会话交接) · decisions/ · analysis/
+├── .aria/                  项目配置与机读状态: config.json · state-checks.yaml · probes/ · decisions/ · audit-reports/ · pat-inventory.yaml
+├── aria-plugin-benchmarks/ Rule #6 AB 基准: ab-suite/ (31 套件 JSON) · ab-results/ (逐版本结果存档) · AB_TEST_OPERATIONS.md (执行经 /skill-creator)
+└── tests/                  验证用例
 ```
 
 ### 3.2 概念架构
@@ -284,16 +244,17 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 | 模块 | 职责 | 拥有 | 使用 |
 |------|------|------|------|
 | **standards/** | 方法论定义 | 核心规范、OpenSpec、约定 | - |
-| **.claude/skills/** | 工作流执行单元 | 十步循环实现、composite skills | standards/ 规范 |
-| **.claude/skills/tdd-enforcer/** | TDD 强制执行 | RED-GREEN-REFACTOR 验证 (v2.0 文档驱动) | standards/ 测试规范 |
-| **.claude/skills/brainstorm/** | 协作思考引擎 | AI 辅助决策讨论、需求澄清 | standards/ 工作流 |
-| **.claude/agents/** | 专业领域代理 | 特定领域知识 | skills/ 触发 |
-| **.claude/trigger-rules.json** | 自动触发配置 | 关键词→Skill 映射 | skills/ 目录 |
+| **aria/skills/** (aria-plugin 子模块) | 工作流执行单元 | 十步循环实现、composite skills (42 Skills) | standards/ 规范 |
+| **aria/skills/tdd-enforcer/** | TDD 强制执行 | RED-GREEN-REFACTOR 验证 (v2.0 文档驱动, tdd-config-schema.json) | standards/ 测试规范 |
+| **aria/skills/brainstorm/** | 协作思考引擎 | AI 辅助决策讨论、需求澄清 | standards/ 工作流 |
+| **aria/agents/** | 专业领域代理 | 特定领域知识 (11 Agents) | skills/ 触发 |
+| **aria/hooks/** | 生命周期钩子 (plugin 分发) | hooks.json 声明的 PreToolUse 守卫: secret-guard / handoff-location-guard / host-docker-logout-guard | aria/ 插件装载 |
+| **.claude/** | 本仓 Claude Code 配置 (非子模块) | settings.json · local.md · trigger-rules.json (关键词→Skill 映射) | aria/ 插件 |
+| **aria-orchestrator/** | v2.0 自主运行时 (仅 10CG Lab 内部) | Layer 1 主管 (Hermes 扩展) + Layer 2 工程师 (aria-runner 容器 + Claude Code + aria-plugin) | aria/ (Layer 2 内嵌) + standards/autonomous/ |
 | **openspec/** | 项目变更工作区 | changes/、archive/ | standards/openspec/ 格式定义 |
 | **docs/** | 研究文档 | 分析、设计、记录 | standards/ 格式 |
 | **tests/** | 验证用例 | 集成测试、验收测试 | standards/ 测试规范 |
-| **aria/** | 辅助工具 | Hooks、scripts | .claude/ 配置 |
-| **aria-plugin-benchmarks/** | Skill 基准测试 | 33 Skill 评估套件、自动化 runner、结果数据 | .claude/skills/ 定义 |
+| **aria-plugin-benchmarks/** | Skill 基准测试 (Rule #6) | ab-suite/ 31 套件 JSON · ab-results/ 逐版本结果 · AB_TEST_OPERATIONS.md (执行一律经 /skill-creator; 自研 runner/ 已废弃) | aria/skills/ 定义 |
 
 ### 模块交互规则
 
@@ -439,8 +400,8 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 - TaskComplete: 任务完成后的归档
 
 实现:
-- .claude/skills/tdd-enforcer/validators/: 验证规则
-- aria/hooks/: Hook 脚本
+- aria/skills/tdd-enforcer/ (文档驱动; tdd-config-schema.json): TDD 规则 (validators/ Python 模块已于 v2.0 文档驱动重构时移除)
+- aria/hooks/ (hooks.json 声明, 随 aria-plugin 分发): secret-guard / handoff-location-guard / host-docker-logout-guard 等 PreToolUse 守卫脚本
 - standards/core/workflow/document-sync-mechanisms.md: 触发文档
 ```
 
@@ -461,19 +422,18 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 ```
 目的: 量化评估 Skill 效果提升 (with vs without)
 
-结构:
+结构 (2026-09-02 实读):
 aria-plugin-benchmarks/
-├── {skill-name}/           # 每个 Skill 的评估套件
-│   ├── evals/evals.json    # 评估用例定义
-│   └── iteration-1/        # 评估结果数据
-├── runner/                 # 自动化执行器
-│   ├── run_benchmarks.py   # Python 脚本
-│   ├── config.json         # 评估配置 + 断言规则
-│   └── results/            # 运行结果存档
-└── OVERALL_BENCHMARK_SUMMARY.md  # 综合报告
+├── ab-suite/{skill}.json              # 固定评估套件 (31 个 Skill 套件, /skill-creator 兼容格式)
+│   └── version.yaml                   # 套件版本 / 计数账本 (改任一 json 须同批程序化重算)
+├── ab-results/<date>-v<ver>-<topic>/  # 逐次 AB 结果存档: PREDICTION.md (先于实测) · RESULT.md · benchmark.json
+├── AB_TEST_OPERATIONS.md              # 运维手册 (场景 / ARIA_COORDINATION_NO_PUSH 前置 / 发版前清单)
+├── {skill-name}/ + runner/            # 2026-03 起源的 per-skill evals 与自研 runner (runner 已废弃, Rule #6)
+└── OVERALL_BENCHMARK_SUMMARY.md       # 历史综合报告
 
-覆盖: 33 Skills 全覆盖
-验证: 100% pass rate (9/9 automated tests)
+执行: 一律经 /skill-creator (Rule #6; 自研 runner 已废弃)
+判据: 逐 hunk 判 — 描述性 → substitute 结构化测试 / 处方性·运行时指令面 → 照跑 AB /
+      套件覆盖外 → 定向 fixture + 套件缺口 issue; SOT standards/conventions/skill-benchmark-exemption.md
 ```
 
 ---
@@ -487,7 +447,7 @@ aria-plugin-benchmarks/
 | **项目变更 (活跃)** | **OpenSpec (Markdown)** | **{project}/openspec/changes/** | **按功能** |
 | **项目变更 (归档)** | **OpenSpec (Markdown)** | **{project}/openspec/archive/** | 功能完成后 |
 | 进度状态 | UPM (Markdown) | 各模块 docs/project-planning/ | 每周期 |
-| 技能定义 | SKILL.md | .claude/skills/*/ | 按需 |
+| 技能定义 | SKILL.md | aria/skills/*/ (aria-plugin 子模块) | 按需 |
 | 触发规则 | trigger-rules.json | .claude/ | 按需 |
 | 架构文档 | System Arch (Markdown) | docs/architecture/ | 按架构变更 |
 
@@ -560,7 +520,7 @@ aria-plugin-benchmarks/
 上下文加载:
 ├── CLAUDE.md (根目录) - 项目心智模型
 ├── .claude/local.md - 工作流配置
-└── .claude/skills/*/SKILL.md - 技能定义
+└── aria/skills/*/SKILL.md - 技能定义 (aria-plugin 子模块; 仓内直调, 其他项目经 Plugin 安装用 /aria: 前缀)
 ```
 
 ### 8.2 Forgejo 集成
@@ -951,7 +911,7 @@ C.2 Phase 包含两级完整性保证:
 已完成 (v1.x):
   - 十步循环定义
   - OpenSpec 格式
-  - Skills 框架 (36 Skills, 11 Agents)
+  - Skills 框架 (42 Skills, 11 Agents — 2026-09-02 实数)
   - 文档架构
   - 强制执行机制 (branch-manager + subagent-driver)
   - 两阶段代码审查
@@ -960,7 +920,7 @@ C.2 Phase 包含两级完整性保证:
   - 单次 session 间移交 (Rule #9)
 ```
 
-### 9.2 v2.0 进行中 (M1-M6)
+### 9.2 v2.0 进行中 (M1-M7)
 
 | 里程碑 | 目标 | 状态 |
 |--------|------|------|
@@ -970,14 +930,15 @@ C.2 Phase 包含两级完整性保证:
 | M3 | Layer 1 reconciler (孤儿任务恢复) | Done 2026-05-06 (US-023, ~5.5h vs 16h) |
 | M4 | Feishu 人工关口 (S7_AWAITING_MERGE) | Done 2026-05-09 (US-024) |
 | M5 | Replay + drift + audit immutable | Done 2026-05-23 (US-025, 793 tests) |
-| M6 | E2E resilience + cost acceptance + docs | In Progress (2026-05-24 Specs Approved) |
+| M6 | E2E resilience + cost acceptance + docs | In Progress — 168h 自主跑三门未清 (Blocker 3 输入投递 B.2 完成待 C.2 / Blocker 4 Luxeno 延迟 / 遥测 Track-1 完成待独立 ship); 现状指针: CLAUDE.md「项目状态」+ `openspec/changes/aria-2.0-m6-*/proposal.md` |
+| M7 | agent-lifecycle + fleet-aggregation (aria-fleet MVP 第一刀, US-028) | Specs Approved 2026-06-18 (A.3 LOCKED 2026-06-19); Phase B 受 M6 release-closeout 时机门 |
 
 ### 9.3 v2.0 之后
 
 | 阶段 | 目标 | 备注 |
 |------|------|------|
-| v2.0.1 | TG-DOCS-B 架构文档 (如 v2.0 calendar 紧) | Q-final-1 Menu C 选项 |
-| post-M6 | aria-fleet 三层架构 (generic/workspace/instance) | Brainstorm DEC 2026-05-27 Approved |
+| ~~v2.0.1~~ | TG-DOCS-B 架构文档 | ✅ 已于本文档 2.0.0 (2026-05-27) 完成 |
+| post-M6 (M7) | aria-fleet 三层架构 (generic/workspace/instance) → MVP 第一刀 = 跨项目只读聚合 | Brainstorm DEC 2026-05-27 Approved → Spec `aria-2.0-m7-fleet-aggregation` Approved 2026-06-18 (US-028); 见 §9.2 M7 行 |
 
 ---
 
@@ -1003,6 +964,7 @@ C.2 Phase 包含两级完整性保证:
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
+| 2.0.1 | 2026-09-02 | 复审校准 (state-check `m6-arch-doc-stale` 98d 触发, 内容随之复审): §2.8 版本表 (aria-plugin v1.67.2; aria-orchestrator 无独立版本工件, 以 CLAUDE.md 版本行 + SHA 锚定); §3.1 / §4 / §6.3 / §7.1 / §8.1 路径**类级**勘正 `.claude/skills|agents` → `aria/skills|agents` (aria-plugin 子模块, 42 Skills / 11 Agents), 补 aria-orchestrator / .aria/ / docs/handoff 条目; §6.5 基准测试改为 ab-suite (31 套件) + ab-results + /skill-creator 执行 (自研 runner 已废弃); §9.2 M6 现状 + M7 行; §9.3 TG-DOCS-B 标完成 |
 | 2.0.0 | 2026-05-27 | v2.0 架构文档全面更新 (TG-DOCS-B, US-026 M6)：新增三层架构章节 (§2.5)、自主模型章节 (§2.6 状态机 S0-S9 + S_FAIL + 崩溃恢复)、层边界章节 (§2.7 cost.json schema pin)、版本方案交叉引用 (§2.8)。Executive Summary 更新至"方法论定义 + 参考实现"定位。反映 M1-M5 已交付成果 (268 tests M2 + reconciler M3 + Feishu gate M4 + 793 tests M5)。父 PRD 增加 prd-aria-v2.md 引用 |
 | 1.9.0 | 2026-04-12 | Phase C.2 Integration Quality Gate (US-012)：三层多远程 Push Enforcement 架构 (Layer 1 state-scanner 多远程扩展 + Layer 2 phase-c-integrator C.2.5 + Layer 3 git-remote-helper internal skill)。aria-plugin v1.14.0→1.15.0。2026-04-12 发版事故根因修复 |
 | 1.8.0 | 2026-04-09 | state-scanner v2.9.0 状态感知扩展：Phase 1.12 本地/远程同步检测 (submodule 四级 fallback + upstream 探测 + 浅克隆兼容) 和 Phase 1.13 Issue 感知扫描 (Forgejo/GitHub 适配 + 15min 缓存 + 启发式关联)。子阶段数量 11→13 (上限 15 规约 D8)。aria-plugin v1.10.0→1.11.0。双 OpenSpec 并行 (Level 2 + Level 3)，post_spec 审计 2 轮收敛通过 |
