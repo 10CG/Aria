@@ -1,0 +1,151 @@
+{
+  "eval": "eval-3-linked-issue-field-authoring-TARGETED",
+  "arm": "old_skill",
+  "run": "run-1",
+  "group": "control-old-template",
+  "control_condition": "Baseline (old spec-drafter snapshot) re-run with the SOT template standards/openspec/templates/proposal-minimal.md temporarily rolled back to pre-change SHA 334c609 (verified: `git show 334c609:openspec/templates/proposal-minimal.md` contains 0 occurrences of 'Linked Issue'; HEAD template has the field at :6 and usage note at :55).",
+  "grading_basis": "outputs only (outputs/answer.md = executor final answer; outputs/proposal.md). Mechanical pre-check supplied by coordinator (real extractor lib/linked_issue_field.py over outputs/proposal.md): eval-2 control verdict=NO_FIELD, has_Created=True, order_L_S_C_LI=False; eval-3 control :6 `> **Linked Issue**: `none` — 起草输入已核实…` verdict=OK sentinel=True canonical_line=True md_link_on_field_line=False, order_L_S_C_LI=False (no `> **Level**` line; `> **Spec Level**: 2` used; order Status → Created → Spec Level → Linked Issue), has_Created=True, alias_or_other_name=[].",
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "proposal.md:6 `> **Linked Issue**: `none` — 起草输入已核实本功能无关联 issue; 本 Spec 不关闭任何 issue。§Out of scope 列出的两项后续候选 issue 尚未建号, 不在此处编号。` (answer.md:42 identical inside the fenced body). Mechanical: canonical_line=True, alias_or_other_name=[]."
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "proposal.md:6 value token is the inline code span `none`, followed by an em-dash annotation. Mechanical extractor (authority for this assertion): verdict=OK token_str='none' sentinel=True — trailing annotation accepted. Not empty, not N/A / TBD, not a placeholder. PASS per mechanical result; trailing-prose tolerance flagged in eval_feedback."
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "proposal.md:6 contains no `](http` (independent grep over all Linked Issue lines in the control outputs: 0 matches; no other code span or link on the line) and is not empty. Mechanical: md_link_on_field_line=False."
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": false,
+      "evidence": "Mechanical: order_L_S_C_LI=False, has_Created=True. proposal.md header is :3 `> **Status**: Draft (A.1 起草 2026-09-02; 尚未经 post_spec 审计)`, :4 `> **Created**: 2026-09-02`, :5 `> **Spec Level**: 2 (Minimal — ...)`, :6 `> **Linked Issue**: `none` — ...`. Two deviations from the SOT template: (a) there is no `> **Level**:` line — the field is renamed `Spec Level` and its value shape is `2 (Minimal — ...)` rather than `Minimal (Level 2 Spec)`; (b) order is Status → Created → Spec Level → Linked Issue, i.e. the Level line is neither first nor canonically named. `> **Created**:` is present but the four-line order does not match."
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "Mechanical: alias_or_other_name=[]. Independent grep over proposal.md and answer.md for `Related Issue|Issue Link|关联 Issue` = 0 hits. (answer.md:11 '无关联 issue (起草输入已核实) ⇒ header 写 `Linked Issue: none`' is prose, not a header field name.) Note: the renamed `Spec Level` field is a different header field (Level), outside this assertion's scope; it is caught by assertion 4."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  },
+  "execution_metrics": {
+    "metrics_json_present": false,
+    "transcript_present": false,
+    "output_files": [
+      "answer.md",
+      "proposal.md"
+    ],
+    "output_chars_by_file": {
+      "answer.md": 12878,
+      "proposal.md": 10631
+    },
+    "output_chars": 23509,
+    "transcript_chars": null,
+    "note": "No metrics.json / transcript; graded from outputs only. Tool-call counts unavailable."
+  },
+  "timing": {
+    "executor_duration_seconds": 667.9,
+    "total_duration_seconds": 667.9,
+    "source_timing_json": {
+      "total_tokens": 173306,
+      "duration_ms": 667940,
+      "total_duration_seconds": 667.9
+    },
+    "note": "timing.json carries a single wall-clock figure; copied into both executor_duration_seconds and total_duration_seconds. No grader timing recorded."
+  },
+  "claims": [
+    {
+      "claim": "Source of the `Linked Issue: none` header: answer.md:11 attributes it to the drafting input ('无关联 issue (起草输入已核实) ⇒ header 写 `Linked Issue: none`'). Coordinator note (transcript-derived, NOT visible in outputs): the run read openspec/changes/sibling-spec-probe/proposal.md and openspec/changes/a1-entry-claim-duplicate-work-guard/proposal.md as house style.",
+      "type": "process",
+      "verified": true,
+      "evidence": "Corpus facts verified in the working tree: sibling-spec-probe/proposal.md:6 = `> **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 ... 无独立 issue 号 (...)`; a1-entry-claim-duplicate-work-guard/proposal.md:13 = `> **Linked Issue**: `10CG/Aria#174` — ...`; 3 of 9 proposals under openspec/changes/ carry the line. The SOT template at 334c609 has 0 occurrences of 'Linked Issue'. The control output's shape — `none` sentinel followed by an em-dash prose annotation — mirrors sibling-spec-probe:6. Conclusion recorded for attribution only (does not affect pass/fail): in this control run the field came from the in-repo in-flight proposal corpus, not from the old skill snapshot and not from the (rolled-back) template. Neither of the two source proposals is named anywhere in the control outputs."
+    },
+    {
+      "claim": "`aria/.claude-plugin/plugin.json` is already `1.68.0` while `aria/CHANGELOG.md` has no such entry (in-flight) — proposal.md:8",
+      "type": "factual",
+      "verified": true,
+      "evidence": "plugin.json `\"version\": \"1.68.0\"`; grep -c '1.68.0' aria/CHANGELOG.md = 0. (Iteration-1 runs reported v1.67.2 — the working tree moved between the iteration-1 and control runs.)"
+    },
+    {
+      "claim": "Existing config filter: `.aria/config.template.json:51`, implementation `collectors/issue_scan.py:533-538`, test `tests/test_issue_scan_mocked.py:290 test_label_filter_applied`",
+      "type": "factual",
+      "verified": true,
+      "evidence": "config.template.json:51 `\"label_filter\": []`; issue_scan.py:533-538 client-side `if label_filter: ... wanted.intersection(...)`; test_issue_scan_mocked.py:290 `def test_label_filter_applied(self):`."
+    },
+    {
+      "claim": "`scripts/validate_schema_doc.py` docstring :17-22 states only top-level keys are checked; `issue_status.warning` went undocumented for one PR cycle",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Lines 17-22: '**Scope limitation** ... nested field completeness is NOT checked ... Example: `issue_status.warning` was emitted but undocumented for one PR cycle before pre_merge audit caught it.'"
+    },
+    {
+      "claim": "`open_blocker_issues` rule at `RECOMMENDATION_RULES.md:27` and `:96` reads `issue_status.items[]`",
+      "type": "factual",
+      "verified": true,
+      "evidence": ":27 is the rule table row `open_blocker_issues | 1.99 | (降级提示) | 存在 blocker/critical label 的 open issue ...`; :96 is the change-history line for the same rule (跨 repo 聚合, 遍历 ...)."
+    },
+    {
+      "claim": "docs/decisions/ holds 22 决策单 (answer.md:7, proposal.md:9)",
+      "type": "factual",
+      "verified": false,
+      "evidence": "Current working tree: 20 DEC-* files, 21 entries total in docs/decisions/."
+    },
+    {
+      "claim": "The fenced proposal in answer.md is byte-identical to outputs/proposal.md (answer.md:33 '逐字节相同')",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Extracted the text between '----- BEGIN proposal.md -----' and '----- END proposal.md -----' in answer.md and compared to proposal.md after stripping outer whitespace: identical."
+    },
+    {
+      "claim": "Run asked no questions, wrote nothing to the repo, ran no scripts (answer.md:3, :177, :182)",
+      "type": "process",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "Consistent with the prompt constraint; no transcript to confirm. Unlike iteration-1 old_skill, this run makes no claim of having run git."
+    }
+  ],
+  "user_notes_summary": {
+    "user_notes_present": false,
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+        "reason": "The ONLY assertion that discriminates in this control: with the template pinned, the baseline still produced a canonical Linked Issue line (assertions 1/2/3/5 pass) but not the SOT header shape — `Level` renamed to `Spec Level`, placed third, Status first. Consider splitting it into (a) a `> **Level**:` line exists with canonical name/value shape and (b) the four lines are contiguous and ordered; here both halves fail, but the two failure modes are diagnostically different."
+      },
+      {
+        "assertion": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+        "reason": "Passed in the control baseline despite the template rollback: the canonical line was reproduced by imitating in-flight proposals under openspec/changes/ (3 of 9 carry it; see claims). In-repo in-flight proposals are a second leakage channel besides the template. A clean baseline needs that corpus neutralized too (pin openspec/changes/ to a pre-field state, or instruct the eval prompt not to read sibling proposals), otherwise assertions 1/2/3/5 can pass in old_skill by house-style imitation."
+      },
+      {
+        "assertion": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+        "reason": "Passed by imitation as above. Observation across all runs so far: with_skill arms emit the bare sentinel (`> **Linked Issue**: `none``, iteration-1 eval-2 and eval-3), while every old_skill run that produced the line (iteration-1 eval-2, iteration-1 eval-3, this control) appends an em-dash prose annotation — the exact shape of sibling-spec-probe/proposal.md:6. A stricter assertion 'the field line is exactly `> **Linked Issue**: `none`` with no trailing text' would have separated skill-driven output from corpus-imitated output in 5/5 runs observed. Small n; treat as a candidate discriminator, not proof."
+      },
+      {
+        "assertion": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+        "reason": "Passed; note it only guards the Linked Issue field name. The control renamed a different SOT header field (`Level` → `Spec Level`) and this assertion is silent on it. If canonical naming of all four header fields is the intent, say so explicitly rather than relying on assertion 4's order check to catch it indirectly."
+      },
+      {
+        "assertion": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+        "reason": "Passed; `](http` only catches absolute links — reuse the extractor's md_link check as the canonical criterion (same note as iteration-1)."
+      },
+      {
+        "reason": "The prompt forbids git/scripts; this run makes no contrary claim (improvement over iteration-1 old_skill), but compliance is still unasserted and unverifiable without a transcript."
+      }
+    ],
+    "overall": "4/5. With the SOT template rolled back, the baseline still reproduces the Linked Issue line by imitating in-repo in-flight proposals (attribution recorded in claims), so the Linked Issue assertions pass; the header-order/Level-name assertion is the one that fails and discriminates."
+  }
+}

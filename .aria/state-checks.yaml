@@ -341,3 +341,59 @@ checks:
       NET / SKIP: 先看 Nomad (192.168.69.70:4646) / Forgejo 内网 (192.168.69.200:3000) 可达性。
     timeout_seconds: 20
     enabled: true
+
+  # --- proposal.md「Linked Issue」字段可得性 (Spec linked-issue-field-availability §4; 探针随 aria-plugin 分发, 白名单为仓本地数据) ---
+  - name: "linked-issue-field-availability"
+    description: |
+      断言 openspec/changes/**/proposal.md 的「Linked Issue / 关联 Issue」字段可得且可抽取:
+      按 Spec linked-issue-field-availability §3 的 E0-E6 定位并抽 token 串,
+      token 元素经 lib/collision.normalize_linked_issue() 校验 (不自写第二份归一)。
+      作用域只含 changes/: archive/ 140 份实测 0 份合规 (126 NO_FIELD + 14 NO_TOKEN),
+      且不可改、不再被消费 -> 扫它 = 恒红 = 零信息。
+      存量不合规项经 GRANDFATHERED 具名白名单在册 (fail-CLOSED: 白名单外一律 FAIL);
+      白名单含已离开作用域的陈旧条目同样 FAIL — 防它退化成永久静默豁免。
+      判据分割 (零证据不当正证据): 作用域缺失 / 归一 SOT 不可导入 -> ##SKIP##。
+    command: |
+      python3 aria/skills/state-scanner/scripts/linked_issue_field_probe.py . \
+        --grandfathered .aria/linked-issue-field-grandfathered.txt
+    severity: warning
+    fix: |
+      在被点名的 proposal.md 头部 blockquote 补一行 (行首无空白, `>` 后恰一个空格; 位置不限 —
+      探针按 E0 取文档序第一条 depth-1 命中, 与行号无关; 建议紧随 `> **Created**:` 行, 与 SOT 模板顺序一致):
+        > **Linked Issue**: `<org>/<repo>#<n>`      # 多个用 ", " 分隔 (裸逗号亦被 E4 接受, 推荐带空格); 中文拼写 `关联 Issue` 亦合法 (alias), 新写请用英文
+      无关联 (已核实) 时逐字写: > **Linked Issue**: `none`      # alias `无` 亦合法; N/A / TBD 不是哨兵
+      被点名为「白名单陈旧条目」时: 删除本仓 .aria/linked-issue-field-grandfathered.txt
+      里那一行 (该 proposal 已归档/改名/已合规)。注意: 白名单是**仓本地数据**,
+      不在 plugin 分发件里 — 任何情况下都不要去改 aria/ 子模块下的探针脚本。
+    timeout_seconds: 10
+    enabled: true
+
+  # --- aria-plugin 版本 vs 两处架构文档版本表行 (PR #190 pre_merge R1 tech-lead major: 14 点同步面之外仅存的当前值断言点) ---
+  - name: "plugin-version-arch-docs-match"
+    description: |
+      aria-plugin 当前版本 (SOT aria/.claude-plugin/plugin.json) 与两处架构文档版本表行一致:
+      docs/architecture/system-architecture.md §2.8「| aria-plugin | vX.Y.Z |」与
+      docs/architecture/version-scheme.md「| **aria-plugin** | ... | vX.Y.Z |」。
+      来源: 2026-09-02 v1.67.2→v1.68.0 时这两行无 check 覆盖即漂 (system-architecture.md 当天刚校准到
+      1.67.2, 合并即假; version-scheme.md 已落后两版) — Aria#177 点名的类级形状: 同步面清单外的引用点必漂。
+      判据分割: SOT 不可读 → SKIP; 任一行匹配不到 → FAIL (MISSING, fail-closed); 值 != SOT → FAIL 列出漂移点;
+      全一致 → OK。
+    command: |
+      PLUGIN=$(python3 -c "import json; print(json.load(open('aria/.claude-plugin/plugin.json'))['version'])" 2>/dev/null)
+      [ -z "$PLUGIN" ] && { echo "##SKIP## aria/.claude-plugin/plugin.json 不可读"; exit 0; }
+      A=$(grep -m1 -oP '^\| aria-plugin \| v\K[0-9]+\.[0-9]+\.[0-9]+' docs/architecture/system-architecture.md)
+      B=$(grep -m1 -oP '^\| \*\*aria-plugin\*\* \|[^|]*\| v\K[0-9]+\.[0-9]+\.[0-9]+' docs/architecture/version-scheme.md)
+      [ -z "$A" ] && { echo "MISSING system-architecture.md §2.8 aria-plugin 行"; exit 1; }
+      [ -z "$B" ] && { echo "MISSING version-scheme.md aria-plugin 行"; exit 1; }
+      DRIFT=""
+      [ "$A" = "$PLUGIN" ] || DRIFT="$DRIFT system-architecture.md=$A"
+      [ "$B" = "$PLUGIN" ] || DRIFT="$DRIFT version-scheme.md=$B"
+      if [ -z "$DRIFT" ]; then echo "OK plugin=$PLUGIN (2 arch doc rows match)"; exit 0; fi
+      echo "DRIFT plugin=$PLUGIN vs$DRIFT"; exit 1
+    severity: warning
+    fix: |
+      把 docs/architecture/system-architecture.md §2.8 版本表的 aria-plugin 行与
+      docs/architecture/version-scheme.md 版本流表的 aria-plugin 行改为 plugin.json 当前值
+      (CLAUDE.md §版本管理 发布同步面已把这两行列为同步点)。
+    timeout_seconds: 5
+    enabled: true

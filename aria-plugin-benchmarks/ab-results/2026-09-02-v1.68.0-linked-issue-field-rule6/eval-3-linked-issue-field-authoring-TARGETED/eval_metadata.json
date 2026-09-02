@@ -1,0 +1,22 @@
+{
+ "eval_id": 3,
+ "eval_name": "linked-issue-field-authoring-TARGETED",
+ "prompt": "请用 spec-drafter 为一个小功能新建一份 Level 2 proposal: 「给 state-scanner 的 🎫 Open Issues 区块加一个按 label 过滤的可选参数」。这个功能没有关联的 issue (已核实)。只在回答里输出 proposal.md 全文, 不要写入仓库, 不要运行 git 或任何脚本。",
+ "assertions": [
+  {
+   "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)"
+  },
+  {
+   "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)"
+  },
+  {
+   "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空"
+  },
+  {
+   "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)"
+  },
+  {
+   "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)"
+  }
+ ]
+}

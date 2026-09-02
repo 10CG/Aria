@@ -2,7 +2,7 @@
 
 > **Spec**: [proposal.md](./proposal.md) | **审计轨**: [audit-trail](../../../.aria/audit-reports/linked-issue-field-availability-audit-trail.md) (append-only, 不维护与 Spec 一致性)
 > **Level**: proposal 自陈 **2**; 本文件按 Level 3 双层体例出 `tasks.md` + `detailed-tasks.yaml` (理由见下「为什么出 tasks.md」)
-> **Status**: ✅ **A.2 + A.3 complete** (2026-08-30 owner 批准进 A.2; post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; 收敛后定点 minor 编辑见文末「R4 收敛后定点编辑」) — 全部任务 `pending`, ready for B.1 (待 owner: 版本档 / O-1 / O-3)
+> **Status**: ✅ **B.2 实施完成 2026-09-02** (24/25 勾选; 5.3 / 5.4 双推已核验 2026-09-02 owner 授权; 5.6 主仓 PR #190 pre_merge 收敛审计中) — aria **v1.68.1 `d1caa66`** (R1 清账 PATCH; v1.68.0 `fe32441` 亦在两端, 两 tag) / standards **`ffed204`** (Usage Note 英文化; 前一 `fad8b4b`) / 主仓 feature/linked-issue-field-availability; 测试 **53/53** + state-scanner **1462** + run_all_tests **1894** (v1.68.1 后重跑) 全绿; Rule #6 AB 见 `aria-plugin-benchmarks/ab-results/2026-09-02-v1.68.0-linked-issue-field-rule6/RESULT.md` (无 WITHOUT_BETTER); B 期技术裁定 B1–B7 见决策单 2026-09-01 追记。历史: ✅ **A.2 + A.3 complete** (2026-08-30 owner 批准进 A.2; post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; 收敛后定点 minor 编辑见文末「R4 收敛后定点编辑」) — 全部任务 `pending`, ready for B.1 (待 owner: 版本档 / O-1 / O-3)
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `d69091d`, v1.67.2: 两个新建文件 + 一份 SKILL.md 两 hunk + 一个新建测试文件 + 版本 5 文件) · `standards/` 子模块 (@ `334c609`: 一份模板) · 主仓 (@ `c120f9e`: `.aria/state-checks.yaml` 注册 + 白名单数据文件 + 两个 gitlink + 版本引用面 + AB 结果 + Spec 本体)
 > **ship target**: aria-plugin **`<vNEXT>`** (R1/C3 三份统一占位, 本文件**不写** v1.68.0 / v1.67.3 字面; proposal §Impact 自判 **MINOR**, ⚠️ 两条 CLAUDE.md 判据都不字面覆盖本例; 档位 = **MINOR** (2026-09-01 技术裁定, 决策单 §H1: `version-management.md §2.2`「功能增强 (向下兼容)」字面覆盖), 三份串行 ship 各占一号 (字段 → 探针 → 母), 不合并一版; 号段落地时按当时 `plugin.json` 计算)
 > **ship order (owner 2026-08-30 O-4 (i))**: **本 Spec 先 ship**; 纯函数 `aria/skills/state-scanner/lib/linked_issue_field.py` 是姊妹 Spec `sibling-spec-probe` 的**硬前置** (其 §1 依赖方向第 3 条 / §3 import 块逐字 `from lib.linked_issue_field import extract_linked_issue_field`)。母 Spec `a1-entry-claim-duplicate-work-guard` 与本 Spec **任意顺序** (其 §2 `:125` 模板行两阶段取法: 脚本存在 ⇒ 用 `--emit-arg` stdout, 不存在 ⇒ 手工按 E6)。
@@ -44,43 +44,43 @@
 > 宿主按 proposal「验证宿主」表**逐字采用**; 目录实存 (与 `test_release_by_track.py` / `test_coordination_default_lockin.py` 同级)。sys.path 体例仿 `test_release_by_track.py:23-25` (`_SKILL_ROOT = parents[1]` + `from lib.… import`); CLI 断言仿其 `:531` `_GATE = Path(_SKILL_ROOT) / "scripts" / …` 用 `subprocess`。夹具一律**内联字符串** (aria 子模块内的测试不得依赖主仓语料; 复用真实语料的条目**逐字嵌入**并注明来源路径)。
 > **SC-6 / SC-8 (a)(c) 读的是主仓文件** (`standards/…/proposal-minimal.md` / `.aria/state-checks.yaml`) —— proposal 只对 SC-6 声明了「跨仓读取 fail-soft 为 skip」; **SC-8 (a)(c) 同形, 本文件按同一已知限处置** (`skipTest` + 打印原因), 见「发现的 Spec 内部问题」#3。
 
-- [ ] 1.1 SC-1 (E0 定位三谓词 + 两拼写集合封闭, 夹具 (a)–(g) + A.2 补 (h) 非 ASCII 折叠负控) + SC-2 (E2 起始位, 逐字复用 `openspec/archive/2026-06-11-audit-drift-guard/proposal.md:5` 原文)
-- [ ] 1.2 SC-3 (E4/E5/E6 多值 (a)(b)) + SC-4 (哨兵六分支 (a)–(f); E5 吃 E3 原始串)
-- [ ] 1.3 SC-5 (探针 check 模式六臂 (a)(b)(c)(d)(e1)(e2), CLI 全链路 `subprocess`, 临时项目根夹具; (d) 用「复制 skill 骨架去掉 `lib/collision.py`」构造真实降级)
-- [ ] 1.4 SC-9 (`--emit-arg` 四夹具 (a)–(d), CLI 全链路; 失败态 stdout 必空)
-- [ ] 1.5 SC-6 (SOT 模板恰一条 E0 命中 + canonical 拼写 + Usage Note + spec-drafter 引用路径存在; 跨仓 skip) + SC-7a (预览围栏 (i) 四行顺序 + (ii) 哨兵负控; 块边界 = 围栏) + SC-8 (三臂: 注册条目 / 路径在 `aria/skills/` 下 / 实跑首行前缀; 跨仓 skip)
-- [ ] 1.6 坏实现拒绝矩阵 — 把 proposal 各 SC「它怎么会红」列点名的坏实现写成同文件内的 `_bad_*` 抽取器, 断言每条夹具对**至少一个**坏实现产生与期望不同的结果 (memory `adversarial-fixture`: 验「拒绝能力」, 非当前取值)
+- [x] 1.1 SC-1 (E0 定位三谓词 + 两拼写集合封闭, 夹具 (a)–(g) + A.2 补 (h) 非 ASCII 折叠负控) + SC-2 (E2 起始位, 逐字复用 `openspec/archive/2026-06-11-audit-drift-guard/proposal.md:5` 原文)
+- [x] 1.2 SC-3 (E4/E5/E6 多值 (a)(b)) + SC-4 (哨兵六分支 (a)–(f); E5 吃 E3 原始串)
+- [x] 1.3 SC-5 (探针 check 模式六臂 (a)(b)(c)(d)(e1)(e2), CLI 全链路 `subprocess`, 临时项目根夹具; (d) 用「复制 skill 骨架去掉 `lib/collision.py`」构造真实降级)
+- [x] 1.4 SC-9 (`--emit-arg` 四夹具 (a)–(d), CLI 全链路; 失败态 stdout 必空)
+- [x] 1.5 SC-6 (SOT 模板恰一条 E0 命中 + canonical 拼写 + Usage Note + spec-drafter 引用路径存在; 跨仓 skip) + SC-7a (预览围栏 (i) 四行顺序 + (ii) 哨兵负控; 块边界 = 围栏) + SC-8 (三臂: 注册条目 / 路径在 `aria/skills/` 下 / 实跑首行前缀; 跨仓 skip)
+- [x] 1.6 坏实现拒绝矩阵 — 把 proposal 各 SC「它怎么会红」列点名的坏实现写成同文件内的 `_bad_*` 抽取器, 断言每条夹具对**至少一个**坏实现产生与期望不同的结果 (memory `adversarial-fixture`: 验「拒绝能力」, 非当前取值)
 
 ## 2. 实现 (GREEN)
 
-- [ ] 2.1 `aria/skills/state-scanner/lib/linked_issue_field.py` (**新建**, 纯函数, stdlib-only) — `FieldVerdict` + `extract_linked_issue_field(text: str)` 按 E0–E6 逐字节实现; 附 `is_sentinel()` / `emit_arg()` 导出 (哨兵集合与 E6 四格表的**唯一**代码宿主); `lib/collision.py` **零改动**
-- [ ] 2.2 `aria/skills/state-scanner/scripts/linked_issue_field_probe.py` (**新建**) check 模式 — `argv[0]` 项目根 + `--grandfathered <path>`; 六臂 fail-CLOSED 分区 + 陈旧守卫 (a)(b)(c); 导入 = 包父目录 + `from lib.linked_issue_field import …` (D4), **不得** import `scripts/lib`; `audit-engine/` 下**不存在**名为 `lib/` 或 `collectors/` 的顶层目录 (`:278` 逐字; 不断言目录条目总数 — 探针 Spec 新建 `scripts/` + `tests/` 合法, R1/C4)
-- [ ] 2.3 同脚本 `--emit-arg <proposal.md>` 模式 — E6 四格表的 CLI 宿主 (SC-9); 只有 `OK` 且非哨兵打印第一个 token 元素, 其余空 stdout + exit 0; 探针自身失败 exit 2 且 stdout 空
-- [ ] 2.4 `.aria/linked-issue-field-grandfathered.txt` (**新建**, 主仓, 仓本地数据) — 6 条 `openspec/changes/aria-2.0-m{6,7}-*` 路径 + 头注 (格式 / 陈旧守卫 / 「回填一份删一条」/ O-1 指针)
-- [ ] 2.5 `.aria/state-checks.yaml` 注册 `linked-issue-field-availability` — 逐字照 §4 骨架, **只用既有 7 个键**; 追加在文件末尾; 注册后实跑 command 得首行前缀 ∈ {`OK`, `FAIL`, `##SKIP##`}
-- [ ] 2.6 **A.2 显式验收项 (`:388`)**: 实测 `${CLAUDE_PLUGIN_ROOT}` 是否被导出到 Phase 1.11 的 check 子进程 — 临时注册 `command: echo "${CLAUDE_PLUGIN_ROOT:-UNSET}"` 探针, 在 **Claude Code 会话内**跑一次 `/state-scanner`, 读回显; 结论**只追加进审计轨**, 临时条目撤除 (`git diff .aria/state-checks.yaml` 为空); **不**在任何文档预写采用方可移植写法
+- [x] 2.1 `aria/skills/state-scanner/lib/linked_issue_field.py` (**新建**, 纯函数, stdlib-only) — `FieldVerdict` + `extract_linked_issue_field(text: str)` 按 E0–E6 逐字节实现; 附 `is_sentinel()` / `emit_arg()` 导出 (哨兵集合与 E6 四格表的**唯一**代码宿主); `lib/collision.py` **零改动**
+- [x] 2.2 `aria/skills/state-scanner/scripts/linked_issue_field_probe.py` (**新建**) check 模式 — `argv[0]` 项目根 + `--grandfathered <path>`; 六臂 fail-CLOSED 分区 + 陈旧守卫 (a)(b)(c); 导入 = 包父目录 + `from lib.linked_issue_field import …` (D4), **不得** import `scripts/lib`; `audit-engine/` 下**不存在**名为 `lib/` 或 `collectors/` 的顶层目录 (`:278` 逐字; 不断言目录条目总数 — 探针 Spec 新建 `scripts/` + `tests/` 合法, R1/C4)
+- [x] 2.3 同脚本 `--emit-arg <proposal.md>` 模式 — E6 四格表的 CLI 宿主 (SC-9); 只有 `OK` 且非哨兵打印第一个 token 元素, 其余空 stdout + exit 0; 探针自身失败 exit 2 且 stdout 空
+- [x] 2.4 `.aria/linked-issue-field-grandfathered.txt` (**新建**, 主仓, 仓本地数据) — 6 条 `openspec/changes/aria-2.0-m{6,7}-*` 路径 + 头注 (格式 / 陈旧守卫 / 「回填一份删一条」/ O-1 指针)
+- [x] 2.5 `.aria/state-checks.yaml` 注册 `linked-issue-field-availability` — 逐字照 §4 骨架, **只用既有 7 个键**; 追加在文件末尾; 注册后实跑 command 得首行前缀 ∈ {`OK`, `FAIL`, `##SKIP##`}
+- [x] 2.6 **A.2 显式验收项 (`:388`)**: 实测 `${CLAUDE_PLUGIN_ROOT}` 是否被导出到 Phase 1.11 的 check 子进程 — 临时注册 `command: echo "${CLAUDE_PLUGIN_ROOT:-UNSET}"` 探针, 在 **Claude Code 会话内**跑一次 `/state-scanner`, 读回显; 结论**只追加进审计轨**, 临时条目撤除 (`git diff .aria/state-checks.yaml` 为空); **不**在任何文档预写采用方可移植写法
 
 ## 3. 写入侧文档
 
-- [ ] 3.1 `standards/openspec/templates/proposal-minimal.md` (**跨仓 SOT**) — `:5` `> **Created**:` 后增一行 `` > **Linked Issue**: `{<org>/<repo>#<n>}` ``; `## Template Usage Notes` (`:40`) 增「无关联 (已核实) 时逐字写 `` `none` ``, 不留空、不删行」; **不写**中文 alias (写入侧只教 canonical)
-- [ ] 3.2 `aria/skills/spec-drafter/SKILL.md` **hunk A** — 正文声明 `Linked Issue` 字段**必填** + 写法引 proposal §3 (`<org>/<repo>#<n>` code span 形 / 多值 `, ` / 无关联 `` `none` ``); 落点在围栏外、不在 `:127-162`、不碰 `:10` frontmatter (归母 Spec)、与母 Spec「前置: REQUIRE claim (A.1, MUST)」块不同 hunk
-- [ ] 3.3 同文件 **hunk B** — `### Level 2 预览` 围栏 (`:127-162`) 头部 `:140` `> **Status**: Draft` 后插两行 `> **Created**: {YYYY-MM-DD}` 与 `` > **Linked Issue**: `{<org>/<repo>#<n>}` `` (placeholder 与 SOT 同串, **不写哨兵**; SC-7a)
+- [x] 3.1 `standards/openspec/templates/proposal-minimal.md` (**跨仓 SOT**) — `:5` `> **Created**:` 后增一行 `` > **Linked Issue**: `{<org>/<repo>#<n>}` ``; `## Template Usage Notes` (`:40`) 增「无关联 (已核实) 时逐字写 `` `none` ``, 不留空、不删行」; **不写**中文 alias (写入侧只教 canonical)
+- [x] 3.2 `aria/skills/spec-drafter/SKILL.md` **hunk A** — 正文声明 `Linked Issue` 字段**必填** + 写法引 proposal §3 (`<org>/<repo>#<n>` code span 形 / 多值 `, ` / 无关联 `` `none` ``); 落点在围栏外、不在 `:127-162`、不碰 `:10` frontmatter (归母 Spec)、与母 Spec「前置: REQUIRE claim (A.1, MUST)」块不同 hunk
+- [x] 3.3 同文件 **hunk B** — `### Level 2 预览` 围栏 (`:127-162`) 头部 `:140` `> **Status**: Draft` 后插两行 `> **Created**: {YYYY-MM-DD}` 与 `` > **Linked Issue**: `{<org>/<repo>#<n>}` `` (placeholder 与 SOT 同串, **不写哨兵**; SC-7a)
 
 ## 4. Rule #6 (逐 hunk, 四件各自独立, ⛔ 不申请豁免)
 
-- [ ] 4.1 用 `/skill-creator` 对 **3.2 + 3.3 两 hunk** 照跑 `aria-plugin-benchmarks/ab-suite/spec-drafter.json` 全部现有 eval (当前观测 2 条: id 1 / id 2; ship 时按 `len(evals)` 取, 不锁字面), **同批更新 eval id 2 expectations** (字段名 `Linked Issue` / 无关联 `none`, R5/M2); 会话以 `ARIA_COORDINATION_NO_PUSH=1` 启动 (rule6_note ⛔ 段); 结果落 `aria-plugin-benchmarks/ab-results/<date>-v<ship>-linked-issue-field-rule6/` (含 `PREDICTION.md` 先于实测)
-- [ ] 4.2 **可证伪定向 fixture ×1 (SC-7 双臂)** — `spec-drafter.json` 新增 eval (id = 该文件当时 `max(id)+1`, ship 时读取不硬编码, @ `c120f9e` 为 3; 本 Spec 先 ship 取到 3, 母 Spec 后 ship 顺延 — R1/C5 三份同写) (中文臂: 新建 Level 2 proposal, 评分锚定「头部含过 E0+E2+E5 的 `Linked Issue` 行 / 无关联逐字 `none`」); 英文臂 = 更新后的 eval id 2 (SC-7 原文「后者即 eval id 2 的场景」); 两臂各自对 baseline (v1.67.2) 与新版实跑, 须有区分力 (省略 / markdown 链接形 / 留空 / 译写成别的字段名 的臂可辨); **同批程序化重算 `ab-suite/version.yaml`** (`ls ab-suite/*.json | wc -l` + python 遍历各 json 的 `len(evals)` 求和, 不写字面计数; R1/C5); 串行于 4.1 之后 (同文件)
-- [ ] 4.3 套件缺口 issue — **A.2 裁量: 归并到 `aria-plugin#117`** (open, 「AB 测试集缺 authoring 维度」类级 issue), 以评论追加本 Spec 为第二个实例 + 4.2 的 新 eval (id = ship 时 max(id)+1, 今日观测 3) 作为该维度的首条已落地 fixture; **不新开** issue (理由见「A.2 裁量」段; owner 可改判新开)
-- [ ] 4.4 substitute 留痕 — 模板 hunk (SC-6) 与探针/注册 hunk (SC-4/5/8) 走 substitute: 在 `d69091d` 基线 worktree 上跑 1.x 测试文件证明**红** (ImportError / 断言失败逐条记), 在实现后证明**绿**; 记录进 4.1 的 `RESULT.md` 「逐 hunk 处置表」, 与 AB 结果并列, 缺一则该 hunk 回落照跑
+- [x] 4.1 用 `/skill-creator` 对 **3.2 + 3.3 两 hunk** 照跑 `aria-plugin-benchmarks/ab-suite/spec-drafter.json` 全部现有 eval (当前观测 2 条: id 1 / id 2; ship 时按 `len(evals)` 取, 不锁字面), **同批更新 eval id 2 expectations** (字段名 `Linked Issue` / 无关联 `none`, R5/M2); 会话以 `ARIA_COORDINATION_NO_PUSH=1` 启动 (rule6_note ⛔ 段); 结果落 `aria-plugin-benchmarks/ab-results/<date>-v<ship>-linked-issue-field-rule6/` (含 `PREDICTION.md` 先于实测)
+- [x] 4.2 **可证伪定向 fixture ×1 (SC-7 双臂)** — `spec-drafter.json` 新增 eval (id = 该文件当时 `max(id)+1`, ship 时读取不硬编码, @ `c120f9e` 为 3; 本 Spec 先 ship 取到 3, 母 Spec 后 ship 顺延 — R1/C5 三份同写) (中文臂: 新建 Level 2 proposal, 评分锚定「头部含过 E0+E2+E5 的 `Linked Issue` 行 / 无关联逐字 `none`」); 英文臂 = 更新后的 eval id 2 (SC-7 原文「后者即 eval id 2 的场景」); 两臂各自对 baseline (v1.67.2) 与新版实跑, 须有区分力 (省略 / markdown 链接形 / 留空 / 译写成别的字段名 的臂可辨); **同批程序化重算 `ab-suite/version.yaml`** (`ls ab-suite/*.json | wc -l` + python 遍历各 json 的 `len(evals)` 求和, 不写字面计数; R1/C5); 串行于 4.1 之后 (同文件)
+- [x] 4.3 套件缺口 issue — **A.2 裁量: 归并到 `aria-plugin#117`** (open, 「AB 测试集缺 authoring 维度」类级 issue), 以评论追加本 Spec 为第二个实例 + 4.2 的 新 eval (id = ship 时 max(id)+1, 今日观测 3) 作为该维度的首条已落地 fixture; **不新开** issue (理由见「A.2 裁量」段; owner 可改判新开)
+- [x] 4.4 substitute 留痕 — 模板 hunk (SC-6) 与探针/注册 hunk (SC-4/5/8) 走 substitute: 在 `d69091d` 基线 worktree 上跑 1.x 测试文件证明**红** (ImportError / 断言失败逐条记), 在实现后证明**绿**; 记录进 4.1 的 `RESULT.md` 「逐 hunk 处置表」, 与 AB 结果并列, 缺一则该 hunk 回落照跑
 
 ## 5. 回归 + 版本面 + 跨仓交付 + 交付 Phase C
 
-- [ ] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` OK 且 0 failures/errors (基线静态 `def test_` 计数 **1425** @ `d69091d`, 新增数 = 1.x 落盘的 test 方法数); `bash aria/skills/run_all_tests.sh` 0 FAIL; `git -C aria diff --stat -- skills/state-scanner/lib/collision.py skills/state-scanner/SKILL.md` **为空**
-- [ ] 5.2 aria 子模块版本面 bump (按引用点, 先例 `linked-issue-normalization` 5.9): `plugin.json` (SOT) / `marketplace.json` **2 点** (`:3` / `:16`) / `README.md:5` / `VERSION` (append-only 账本: 头部当前版本行 + 追加发布注, 行数不减) / `CHANGELOG.md` 追加条目 (不含 skill 设计术语外泄到 CLAUDE.md)
-- [ ] 5.3 aria 子模块 **本地** merge feature 分支 → master + `git push origin && git push github` + **逐个** `git ls-remote <remote> master` 与本地 SHA 比对全部一致 + tag `v<ship>` 双推 + 主仓 gitlink bump 到 post-merge master SHA (硬约束 1/2; push 显式给足超时, memory `partial-push`)
-- [ ] 5.4 standards 子模块 **本地** merge → master + 双推 + 逐 remote `ls-remote` 核验 + 主仓 gitlink bump (**跨仓交付面**; aria-standards 实测无 `VERSION` / `CHANGELOG.md` / tag, 只做 commit + 双推 + gitlink; 是否版本化留 owner)
-- [ ] 5.5 主仓版本引用面 14 点 (与 086ee32 同口径) — `CLAUDE.md:139/:141` / `VERSION:24` / `README.md:8` badge + `:242` Plugin Version / i18n ×3 各 3 点 (`:3` translated-from / `:10` badge / `:244` Plugin Version; **仅版本串**, 正文无实质变更不重译, #140 B 档); custom checks `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` 全 OK
-- [ ] 5.6 主仓 PR (Spec 本体 + `.aria/` 两文件 + 两 gitlink + 版本引用面 + `ab-results/` + `ab-suite/spec-drafter.json`) → 交付 `phase-c-integrator` C.2.4 pre-merge gate (Rule #8); PR body 列 2.6 实测结论 + 待 owner 项 (O-1 / 版本档 / #117 归并 / standards 版本化)
+- [x] 5.1 全量回归 — `cd aria/skills/state-scanner/tests && python3 run_tests.py` OK 且 0 failures/errors (基线静态 `def test_` 计数 **1425** @ `d69091d`, 新增数 = 1.x 落盘的 test 方法数); `bash aria/skills/run_all_tests.sh` 0 FAIL; `git -C aria diff --stat -- skills/state-scanner/lib/collision.py skills/state-scanner/SKILL.md` **为空**
+- [x] 5.2 aria 子模块版本面 bump (按引用点, 先例 `linked-issue-normalization` 5.9): `plugin.json` (SOT) / `marketplace.json` **2 点** (`:3` / `:16`) / `README.md:5` / `VERSION` (append-only 账本: 头部当前版本行 + 追加发布注, 行数不减) / `CHANGELOG.md` 追加条目 (不含 skill 设计术语外泄到 CLAUDE.md)
+- [x] 5.3 aria 子模块 **本地** merge feature 分支 → master + `git push origin && git push github` + **逐个** `git ls-remote <remote> master` 与本地 SHA 比对全部一致 + tag `v<ship>` 双推 + 主仓 gitlink bump 到 post-merge master SHA (硬约束 1/2; push 显式给足超时, memory `partial-push`) (2026-09-02 完成: 本地 --no-ff merge fe32441 + tag v1.68.0 + 主仓 gitlink; owner 授权后双推, origin/github `ls-remote master` = fe32441、`refs/tags/v1.68.0` 两端 present, 与本地逐一 MATCH。**pre_merge R1 清账 PATCH v1.68.1 `d1caa66` + tag 同法双推核验, 主仓 gitlink 随之 → d1caa66**)
+- [x] 5.4 standards 子模块 **本地** merge → master + 双推 + 逐 remote `ls-remote` 核验 + 主仓 gitlink bump (**跨仓交付面**; aria-standards 实测无 `VERSION` / `CHANGELOG.md` / tag, 只做 commit + 双推 + gitlink; 是否版本化留 owner) (2026-09-02 完成: 本地 --no-ff merge fad8b4b + 主仓 gitlink 同 commit; owner 授权后双推, origin/github `ls-remote master` = fad8b4b MATCH; 不版本化, 决策单 B4。**pre_merge R1 清账 `ffed204` (Usage Note 英文化) 同法双推核验, gitlink → ffed204**)
+- [x] 5.5 主仓版本引用面 14 点 (与 086ee32 同口径) — `CLAUDE.md:139/:141` / `VERSION:24` / `README.md:8` badge + `:242` Plugin Version / i18n ×3 各 3 点 (`:3` translated-from / `:10` badge / `:244` Plugin Version; **仅版本串**, 正文无实质变更不重译, #140 B 档); custom checks `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` 全 OK
+- [ ] 5.6 主仓 PR (Spec 本体 + `.aria/` 两文件 + 两 gitlink + 版本引用面 + `ab-results/` + `ab-suite/spec-drafter.json`) → 交付 `phase-c-integrator` C.2.4 pre-merge gate (Rule #8); PR body 列 2.6 实测结论 + 待 owner 项 (O-1 / 版本档 / #117 归并 / standards 版本化) (2026-09-02: feature 分支已推 origin, **PR #190** 已建, C.2.4 green (not_applicable, main in-flight 清) + C.2.4.5 PASS; **merge = owner 动作**, 合并后 phase-d-closer 归档)
 
 ---
 

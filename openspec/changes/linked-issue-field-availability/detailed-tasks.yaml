@@ -12,7 +12,7 @@ metadata:
   level: 2   # proposal 自陈; 本文件按 Level 3 双层体例产出 (理由见 tasks.md 头注)
   datasource: "tasks.md"
   created: "2026-08-30"
-  updated: "2026-08-30"   # R1 清账 (post_planning R1, 同日) — 对账表见 tasks.md「R1 清账对账」
+  updated: "2026-09-02"   # B.2 状态回写 (前次 2026-08-30 R1 清账 (post_planning R1, 同日) — 对账表见 tasks.md「R1 清账对账」
 
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -63,7 +63,7 @@ metadata:
 
   total_tasks: 25
   task_groups: 5
-  status: "A.2 + A.3 complete — post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; 全部 pending, ready for B.1"
+  status: "B.2 implemented 2026-09-02 — 24 done (TASK-022/023 双推 2026-09-02 owner 授权后核验一致; pre_merge R1 清账 PATCH aria v1.68.1 d1caa66 + standards ffed204 同法双推, gitlink 随之) / TASK-025 in_progress (主仓 PR #190, pre_merge 收敛审计进行中; 轮次与结果以最新 aggregated 报告为准); 前史: A.2 + A.3 complete, post_planning R4 CONVERGED 2026-08-31"
   new_agents_required: false
   agent_roster: [qa-engineer, backend-architect, knowledge-manager, tech-lead]
   estimated_hours: "50-86"   # Σ 区间: S ×14 "1-2" + M ×10 "3-5" + L ×1 "6-8" (R1/C9, DUAL_LAYER_SPEC.md:166 字符串区间, 与母 Spec 同形)
@@ -91,7 +91,7 @@ tasks:
     parent: "1.1"
     task_group: TG-1
     title: "SC-1 E0 定位夹具 (a)–(h) + SC-2 E2 起始位 (逐字复用真实语料)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -116,7 +116,7 @@ tasks:
     parent: "1.2"
     task_group: TG-1
     title: "SC-3 多值 E4/E5/E6 + SC-4 哨兵六分支 (E5 吃 E3 原始串)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -137,7 +137,7 @@ tasks:
     parent: "1.3"
     task_group: TG-1
     title: "SC-5 探针 check 模式六臂 — CLI 全链路 subprocess + 真实降级夹具"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -162,7 +162,7 @@ tasks:
     parent: "1.4"
     task_group: TG-1
     title: "SC-9 --emit-arg 四夹具 CLI 全链路 (失败态 stdout 必空)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -181,7 +181,7 @@ tasks:
     parent: "1.5"
     task_group: TG-1
     title: "SC-6 模板 SOT + SC-7a 预览围栏 + SC-8 注册/分发面/实跑 (结构断言, 跨仓 fail-soft)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -190,8 +190,8 @@ tasks:
     deliverables:
       - aria/skills/state-scanner/tests/test_linked_issue_field.py   # (新建)
     verification:
-      - "主仓根 = Path(__file__).resolve().parents[3]; 目标文件不存在 ⇒ self.skipTest('跨仓已知限: <path> 不存在 (plugin 单独分发)') — SC-6 与 SC-8 (a)(c) 同处置 (tasks.md 问题 #3)"
-      - "SC-6 (i) `standards/openspec/templates/proposal-minimal.md` 全文经 extract_linked_issue_field ⇒ verdict ∈ {BAD_TOKEN} (placeholder, D8 不断言 E5) 且**恰一条** E0 命中行 (自行扫描计数 == 1); (ii) 该行逐字以 `> **Linked Issue**:` 起首 (canonical, 不是 alias); (iii) `## Template Usage Notes` 段内含 ``none`` 与「不留空」「不删行」三个字面; (iv) `aria/skills/spec-drafter/SKILL.md` 内对 `proposal-minimal.md` 的相对路径 (`:429`) 从该文件所在目录解析到存在的文件"
+      - "主仓根 = Path(__file__).resolve().parents[4] (B.2 勘正 2026-09-02: 原写 parents[3] 差一层, 落在 aria/ 子模块根; 同目录 test_architecture.py:311 / test_spec_complete.py:94 亦用 parents[4]; 决策单 2026-09-01-…-split.md §B 期追记); 目标文件不存在 ⇒ self.skipTest('跨仓已知限: <path> 不存在 (plugin 单独分发)') — SC-6 与 SC-8 (a)(c) 同处置 (tasks.md 问题 #3)"
+      - "SC-6 (i) `standards/openspec/templates/proposal-minimal.md` 全文经 extract_linked_issue_field ⇒ verdict ∈ {BAD_TOKEN} (placeholder, D8 不断言 E5) 且**恰一条** E0 命中行 (自行扫描计数 == 1); (ii) 该行逐字以 `> **Linked Issue**:` 起首 (canonical, 不是 alias); (iii) `## Template Usage Notes` 段内含 ``none`` 与「不留空」「不删行」三个字面 (B.2 pre_merge R1 勘正: 英文 SOT 模板以英文表述 do not leave / do not delete 等价, 测试接受中英任一); (iv) `aria/skills/spec-drafter/SKILL.md` 内对 `proposal-minimal.md` 的相对路径 (`:429`) 从该文件所在目录解析到存在的文件"
       - "SC-7a: 读兄弟 skill `aria/skills/spec-drafter/SKILL.md`; 块边界 = `### Level 2 预览` 标题后的第一个 ``` 围栏 (@ d69091d 为 :127-162); 围栏内 (i) 含逐字 `> **Created**:` 与 `> **Linked Issue**:`, 且 `> **Level**` → `> **Status**` → `> **Created**` → `> **Linked Issue**` 四行相对顺序与 SOT :3-6 一致; (ii) 负控: `Linked Issue` 行的 token 串 is_sentinel == False 且逐字 == `{<org>/<repo>#<n>}`; 围栏外出现同行不计 (块边界)"
       - "SC-8 (a) 用 collectors.custom_checks._parse_state_checks_yaml 解析主仓 `.aria/state-checks.yaml` (顺带证明 minimal parser 接受本条目, 新表面 #6), 存在 name == linked-issue-field-availability 的条目, command 中 `.py` 路径存在; (b) 该路径以 `aria/skills/` 起首; (c) subprocess.run(command, shell=True, cwd=主仓根) ⇒ returncode ∈ {0,1} 且首个非空 stdout 行前缀 ∈ {OK, FAIL, ##SKIP##}; **不断言** exit 值"
       - "它怎么会红 (proposal SC-6/SC-7a/SC-8 列): 模板裸文本/markdown 链接形 / 中文 alias / 漏 Usage Note / 引用路径漂移; 只在正文声明不改预览骨架 / 字段行写在围栏外 / 骨架默认写 none; 只建脚本不注册 / 探针放回 .aria/probes/ / 探针崩溃"
@@ -201,7 +201,7 @@ tasks:
     parent: "1.6"
     task_group: TG-1
     title: "坏实现拒绝矩阵 — 「它怎么会红」列机械化为同文件内 _bad_* 抽取器"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -225,7 +225,7 @@ tasks:
     parent: "2.1"
     task_group: TG-2
     title: "lib/linked_issue_field.py — E0–E6 纯函数 + FieldVerdict + is_sentinel/emit_arg 导出"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: backend-architect
@@ -252,7 +252,7 @@ tasks:
     parent: "2.2"
     task_group: TG-2
     title: "scripts/linked_issue_field_probe.py — check 模式: 六臂 fail-CLOSED + --grandfathered + 陈旧守卫"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -279,7 +279,7 @@ tasks:
     parent: "2.3"
     task_group: TG-2
     title: "同脚本 --emit-arg <proposal.md> 模式 — E6 四格表 CLI 宿主 (SC-9)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -299,7 +299,7 @@ tasks:
     parent: "2.4"
     task_group: TG-2
     title: ".aria/linked-issue-field-grandfathered.txt — 仓本地白名单 6 条 + 头注"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -320,7 +320,7 @@ tasks:
     parent: "2.5"
     task_group: TG-2
     title: ".aria/state-checks.yaml 注册 linked-issue-field-availability (只用既有 7 键, 追加末尾)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -339,7 +339,7 @@ tasks:
     parent: "2.6"
     task_group: TG-2
     title: "A.2 显式验收项 (:388): 实测 ${CLAUDE_PLUGIN_ROOT} 是否导出到 Phase 1.11 check 子进程"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -363,7 +363,7 @@ tasks:
     parent: "3.1"
     task_group: TG-3
     title: "standards/openspec/templates/proposal-minimal.md — 头部增 Linked Issue 行 + Usage Note (跨仓 SOT)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -388,7 +388,7 @@ tasks:
     parent: "3.2"
     task_group: TG-3
     title: "spec-drafter/SKILL.md hunk A — 正文声明 Linked Issue 必填 + 写法引 §3"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -408,7 +408,7 @@ tasks:
     parent: "3.3"
     task_group: TG-3
     title: "spec-drafter/SKILL.md hunk B — Level 2 预览围栏头部补 Created + Linked Issue 两行 (SC-7a)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -431,7 +431,7 @@ tasks:
     parent: "4.1"
     task_group: TG-4
     title: "用 /skill-creator 对 hunk A + hunk B 照跑 ab-suite/spec-drafter.json 全部现有 eval (当前观测 2 条; eval id 2 expectations 同批更新)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -457,7 +457,7 @@ tasks:
     parent: "4.2"
     task_group: TG-4
     title: "可证伪定向 fixture ×1 (SC-7 双臂) — spec-drafter.json 新增 新 eval (id = ship 时 max(id)+1, 今日观测 3) (中文臂); 英文臂 = 更新后的 eval id 2"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -481,7 +481,7 @@ tasks:
     parent: "4.3"
     task_group: TG-4
     title: "套件缺口 issue — 归并 aria-plugin#117 (评论追加本 Spec 为第二实例 + 新 eval (id = ship 时 max(id)+1, 今日观测 3) 登记)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -500,7 +500,7 @@ tasks:
     parent: "4.4"
     task_group: TG-4
     title: "substitute 留痕 — 基线 worktree 红 / 实现后绿, 逐 hunk 处置表"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -521,7 +521,7 @@ tasks:
     parent: "5.1"
     task_group: TG-5
     title: "全量回归 — run_tests.py OK + run_all_tests.sh 0 FAIL + 零改动断言"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -540,7 +540,7 @@ tasks:
     parent: "5.2"
     task_group: TG-5
     title: "aria 子模块版本面 bump — 按引用点 (plugin.json SOT / marketplace ×2 / README / VERSION 账本 / CHANGELOG)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -566,7 +566,7 @@ tasks:
     parent: "5.3"
     task_group: TG-5
     title: "aria 子模块本地 merge → master + 双推 + 逐 remote ls-remote 核验 + tag + 主仓 gitlink bump"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: tech-lead
@@ -589,7 +589,7 @@ tasks:
     parent: "5.4"
     task_group: TG-5
     title: "standards 子模块本地 merge → master + 双推 + ls-remote 核验 + 主仓 gitlink bump (跨仓交付面)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: tech-lead
@@ -609,7 +609,7 @@ tasks:
     parent: "5.5"
     task_group: TG-5
     title: "主仓发版同步面 14 点 (与 086ee32 同口径): CLAUDE.md :139/:141 2 点 + VERSION:24 + README.md :8/:242 2 点 + i18n ×3 各 3 点 — 版本引用面"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -632,7 +632,7 @@ tasks:
     parent: "5.6"
     task_group: TG-5
     title: "主仓 PR — 交付 phase-c-integrator C.2.4 pre-merge gate (Rule #8)"
-    status: pending
+    status: in_progress
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead

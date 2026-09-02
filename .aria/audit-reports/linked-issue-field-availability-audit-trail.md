@@ -95,3 +95,50 @@
 | §5 作用域表 | 母 Spec 行改真 token `10CG/Aria#174`; 探针行失效引文订正; 「三者均哨兵」句纠正 | KM m2 / TL m5 |
 | 杂项 | 「请 R4 优先审」×2 → 「请审计席优先审 (R4–R6 已审)」; 「共 10 条 check」加当日观测注 | CR m / TL m |
 | 闸门状态 | 新增 **O-4** (探针依赖方向, 待 owner) 与 **O-5** (字段名大小写折叠, 待 owner) | CR 接缝 C2 / QA M3 |
+
+## 4. 2026-09-02 B.2 TASK-012 — `${CLAUDE_PLUGIN_ROOT}` 是否导出到 Phase 1.11 check 子进程 (proposal `:388` A.2 显式验收项), append-only
+
+> 结论只落本审计轨; **不**回写 proposal / SKILL.md / state-checks.yaml / tasks.md 正文 (`:388` 禁在实测前预写采用方可移植写法; 实测后可移植写法仍属另一交付面, O-3 2026-09-01 已裁接受为已知限)。执行容器 simonfish/023236f2, Claude Code 会话内 Bash 工具 → `aria/skills/state-scanner/scripts/scan.py` → `collectors/custom_checks.py` subprocess (shell=True, 未传 env ⇒ 继承进程 env)。
+
+**步骤 1 — 临时注册探针** (追加到 `.aria/state-checks.yaml` 末尾, 用后撤除):
+
+```yaml
+  - name: "tmp-cpr-probe"
+    description: |
+      TEMP (TASK-012 runtime probe, to be removed): echo CLAUDE_PLUGIN_ROOT as seen by Phase 1.11 subprocess.
+    command: |
+      echo "CPR=${CLAUDE_PLUGIN_ROOT:-UNSET}"; echo "CPR_COUNT=$(env | grep -c '^CLAUDE_PLUGIN_ROOT=')"
+    severity: warning
+    fix: "n/a"
+    timeout_seconds: 5
+    enabled: true
+```
+
+**步骤 2 — 跑一次 scan.py (Phase 1.11 真实调用路径), 读 snapshot 回显** (逐字):
+
+```
+$ python3 aria/skills/state-scanner/scripts/scan.py --output <scratch>/snap-cpr.json; echo "SCAN_EXIT=$?"
+SCAN_EXIT=0
+$ python3 -c "... print(json.dumps(r)) for r in snapshot['custom_checks']['results'] if r['name']=='tmp-cpr-probe' ..."
+{"fix": "n/a", "name": "tmp-cpr-probe", "output": "CPR=UNSET", "severity": "warning", "status": "pass"}
+total checks: 13
+```
+
+**步骤 3 — 同一 Bash 会话两法并记** (TASK-012 verification「两法一致才下结论」):
+
+```
+$ echo "outer shell: CPR=${CLAUDE_PLUGIN_ROOT:-UNSET} count=$(env | grep -c '^CLAUDE_PLUGIN_ROOT=')"
+outer shell: CPR=UNSET count=0
+$ env | grep -c '^CLAUDE'
+11
+```
+
+**步骤 4 — 撤除临时条目并核验**:
+
+```
+$ cp <scratch>/state-checks.yaml.bak .aria/state-checks.yaml
+$ git diff --quiet -- .aria/state-checks.yaml && echo EMPTY || echo NONEMPTY
+EMPTY
+```
+
+**判定 (二分): 未导出 (UNSET)。** Phase 1.11 子进程与外层 Bash 两法一致: `CLAUDE_PLUGIN_ROOT` 在本仓 Claude Code 会话的 Bash 工具环境中**不存在** (11 个 `CLAUDE*` 变量里没有它), 与 A.2 起草时 subagent 环境的预备观测 (tasks.md 问题 #9) 一致。⇒ 任何 `${CLAUDE_PLUGIN_ROOT}/skills/state-scanner/scripts/…` 形式的注册行在本仓会解析为 `/skills/state-scanner/scripts/…` 而找不到脚本; `state-scanner/SKILL.md:71` 的 `${CLAUDE_PLUGIN_ROOT:-aria}` 回落在本仓实际走的是 `aria`。本 Spec 的 Aria 仓注册行 (TASK-011) 按字面路径 `aria/skills/state-scanner/scripts/linked_issue_field_probe.py` 写, 与既有两条 plugin 侧 check 同形; 采用方可移植写法不在本 Spec 交付面。

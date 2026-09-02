@@ -1,0 +1,132 @@
+{
+  "eval": "eval-2-bilingual-support",
+  "arm": "with_skill",
+  "run": "run-1",
+  "grading_basis": "outputs only (outputs/answer.md treated as executor final answer; outputs/proposal.md where present). Mechanical pre-check source: /tmp/claude-1000/-home-dev-Aria/94994160-11fa-4759-806c-602e16b505fe/scratchpad/mechanical-grade-iteration-1.txt (extractor lib/linked_issue_field.py).",
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "answer.md:1 '收到双语输入 \"Add a dark mode feature / 添加深色模式功能\", 按要求 proposal 正文用英文起草; 以下叙述用中文' — recognises the two-language pair and the English-output instruction; :13 extracts trigger words from both halves ('触发词 add / feature / 添加 / 功能 → Level 2 词'). Resulting proposal.md:1 title 'Aria Dashboard Dark Mode' matches the request."
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "proposal.md:1-104 — title, header blockquote, Why, What/Design, Key Deliverables, Constraints, Non-Goals, Impact, Tasks, Success Criteria, Open Item, Rule #6 Note, References are all English prose. Only Chinese tokens are two quotations of project SOT text: :43 Source column `CLAUDE.md \"向后兼容\"` and :96 the Rule #6 slogan `宁跑勿豁`. Judged as citations, not proposal content."
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "Both input halves mean 'add a dark mode feature'. proposal.md:13 'Today that template ships a single, hard-coded dark palette ... \"Dark\" is therefore not a *mode* — it is the only rendering'; :15 'This change turns appearance into an explicit **theme mode** (`system` / `dark` / `light`)'; :23 'The existing `:root` block stays the dark baseline (visual output for dark mode is unchanged)'. Dark mode remains the subject throughout; the re-scoping to a selectable theme mode is stated explicitly with evidence (dashboard already dark-only) rather than silently substituted."
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": true,
+      "evidence": "proposal.md:6 `> **Linked Issue**: `none``. Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]. Independent grep over all outputs for `Related Issue|Issue Link|关联 Issue` = 0 hits."
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": true,
+      "evidence": "proposal.md:6 value is exactly the inline code span `none` with nothing else on the line. Mechanical: verdict=OK token_str='none' sentinel=True md_link_on_field_line=False. Rationale for `none` also recorded at :8 ('after a read-only Forgejo issue search ... returned only unrelated fuzzy matches')."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "metrics_json_present": false,
+    "transcript_present": false,
+    "output_files": [
+      "answer.md",
+      "proposal.md"
+    ],
+    "output_chars_by_file": {
+      "answer.md": 13670,
+      "proposal.md": 10942
+    },
+    "output_chars": 24612,
+    "transcript_chars": null,
+    "note": "No metrics.json / transcript; graded from outputs only. Tool-call counts unavailable."
+  },
+  "timing": {
+    "executor_duration_seconds": 358.0,
+    "total_duration_seconds": 358.0,
+    "source_timing_json": {
+      "total_tokens": 114940,
+      "duration_ms": 358003,
+      "total_duration_seconds": 358.0
+    },
+    "note": "timing.json carries a single wall-clock figure; copied into both executor_duration_seconds and total_duration_seconds. No grader timing recorded."
+  },
+  "claims": [
+    {
+      "claim": "templates/dashboard.html is 1184 lines; `:root` token block at lines 11–41 with `--bg-primary: #0f1117`",
+      "type": "factual",
+      "verified": true,
+      "evidence": "wc -l = 1184; `:root {` at line 11, `--bg-primary: #0f1117` at line 12, closing `}` at line 40 (line 41 is blank) — end of range off by one, substance correct."
+    },
+    {
+      "claim": "Exactly 6 color literals sit outside the token block: three rgba(...,0.3) glow variants, #fff, #4a7de0, #3a6dd0",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grep after line 41 finds exactly 6 literal lines: 128/134/140 `rgba(...,0.3)`, 710 `#fff`, 721 `#4a7de0`, 725 `#3a6dd0`."
+    },
+    {
+      "claim": "Read-only Forgejo issue search on 10CG/Aria and 10CG/aria-plugin for 'dark mode'/'dark' returned only unrelated matches (#187, aria-plugin #133)",
+      "type": "process",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "No transcript available; cannot confirm the searches were run or their results."
+    },
+    {
+      "claim": "No file was written to the repository during this run",
+      "type": "process",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "answer.md:144 '本次未向仓库写入任何文件'; no transcript to confirm. Not contradicted by outputs."
+    },
+    {
+      "claim": "Change is Level 2 (Minimal): single module, no cross-module / breaking change",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Deliverables (:32-36) all live under aria/skills/aria-dashboard/ plus one new test and release files; consistent with the stated Level-2 reasoning at answer.md:13."
+    }
+  ],
+  "user_notes_summary": {
+    "user_notes_present": false,
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+        "reason": "Passed in BOTH arms. The old_skill (baseline) arm also emitted the canonical `> **Linked Issue**: \\`none\\`` line, so this assertion cannot attribute the behavior to the skill diff. Root cause visible in the sibling eval: old_skill eval-3 answer.md:9 says it followed 'standards/openspec/templates/proposal-minimal.md 的 Usage Notes'. The shared SOT template already carries the field, so the new behavior leaks into the baseline arm through the repo, not through the skill. For a discriminating AB the baseline must be isolated from the template change (pin the template to its pre-change SHA in the old_skill arm, or assert something only the skill instruction can produce)."
+      },
+      {
+        "assertion": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+        "reason": "Passed in BOTH arms (non-discriminating). Also a wording gap: 'exactly `none`' is enforced by the extractor as 'first inline-code token == none', and it accepts trailing prose after the code span (old_skill proposal.md:6 is `\\`none\\` — verified 2026-09-02: Forgejo issue search ...`). The fail-list (placeholder / empty / N/A / link) is enumerative and does not say whether annotation on the field line is allowed. Decide and encode it; a downstream consumer that expects a bare sentinel would treat these two arms differently while the grader treats them the same."
+      },
+      {
+        "assertion": "Should correctly parse mixed Chinese/English input",
+        "reason": "Passed in BOTH arms and near-trivial: the two halves of the input are exact synonyms, so any dark-mode proposal written in English 'parses' it. A discriminating bilingual eval gives complementary information per language (e.g. English states the feature, Chinese states a constraint or target module) and asserts both facts survive into the proposal."
+      },
+      {
+        "assertion": "Should preserve the feature intent from both language inputs",
+        "reason": "Passed in BOTH arms; same triviality as assertion 1 (there is no divergent intent to preserve). Note the observed re-scoping: both arms turned 'add a dark mode feature' into 'add a system/dark/light theme mode with light palette + toggle + persistence' because the dashboard is already dark-only. Whether that is the desired interpretation or scope creep is an important outcome no assertion covers."
+      },
+      {
+        "assertion": "Should generate proposal content in English as requested",
+        "reason": "Passed in BOTH arms. Both proposals contain short quoted Chinese fragments (with_skill :43 `CLAUDE.md \"向后兼容\"`, :96 `宁跑勿豁`; old_skill :8 verbatim source request, :9 quoted precedent, :15 quoted issue title). The assertion should state whether quotation of Chinese SOT/source text is acceptable; otherwise the verdict rests on grader judgment."
+      },
+      {
+        "reason": "No assertion checks Level 2 shape (proposal.md only, no tasks.md), header order, or that the executor did not write into the repository — all observed outcomes with no coverage."
+      }
+    ],
+    "overall": "5/5 passed in both arms; zero discriminating assertions. The two linked-issue assertions (the iteration-1 target) pass in the baseline because the shared standards template already supplies the canonical field — the AB design leaks the new behavior into old_skill."
+  }
+}

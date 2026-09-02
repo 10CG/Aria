@@ -1,10 +1,13 @@
-version: "1.1.0"
+version: "1.2.0"
 created: "2026-03-18"
-last_modified: "2026-03-27"
-skills_covered: 29
-total_eval_cases: 58
+last_modified: "2026-09-02"
+skills_covered: 31
+total_eval_cases: 74
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.2.0"
+    date: "2026-09-02"
+    changes: "spec-drafter.json: eval id 2 expectations +2 (Linked Issue canonical / none sentinel, R5/M2) + new eval id 3 linked-issue-field-authoring-TARGETED (Spec linked-issue-field-availability SC-7 定向 fixture); skills_covered / total_eval_cases 程序化重算 (ls ab-suite/*.json | wc -l; sum len(evals))"
   - version: "1.1.0"
     date: "2026-03-27"
     changes: "Added aria-report skill (2 eval cases), total skills 28→29"

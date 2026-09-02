@@ -1,0 +1,136 @@
+{
+  "eval": "eval-3-linked-issue-field-authoring-TARGETED",
+  "arm": "with_skill",
+  "run": "run-1",
+  "grading_basis": "outputs only (outputs/answer.md treated as executor final answer; outputs/proposal.md where present). Mechanical pre-check source: /tmp/claude-1000/-home-dev-Aria/94994160-11fa-4759-806c-602e16b505fe/scratchpad/mechanical-grade-iteration-1.txt (extractor lib/linked_issue_field.py).",
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "proposal.md:6 `> **Linked Issue**: `none`` (answer.md:32 identical inside the fenced proposal). Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]."
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "proposal.md:6 value is exactly the inline code span `none`, nothing else on the line. Mechanical: verdict=OK token_str='none' sentinel=True. answer.md:10 records the reasoning: '任务已核实无关联 issue → 头部逐字写 `none` (不留空、不删行)'."
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "proposal.md:6 contains no `](http` (independent grep over all Linked Issue lines: 0 matches) and is not empty. Mechanical: md_link_on_field_line=False."
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": true,
+      "evidence": "proposal.md:3 `> **Level**: Minimal (Level 2 Spec)`, :4 `> **Status**: Draft`, :5 `> **Created**: 2026-09-02`, :6 `> **Linked Issue**: `none`` — four contiguous lines in SOT order. Mechanical: order_L_S_C_LI=True has_Created=True. Extra fields follow at :7-9 (Target Version / 代码落点 / 决策来源)."
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "Mechanical: alias_or_other_name=[]. Independent grep over proposal.md and answer.md for `Related Issue|Issue Link|关联 Issue` = 0 hits. (answer.md:10 '无关联 issue' is prose, not a header field name.)"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "metrics_json_present": false,
+    "transcript_present": false,
+    "output_files": [
+      "answer.md",
+      "proposal.md"
+    ],
+    "output_chars_by_file": {
+      "answer.md": 10851,
+      "proposal.md": 8252
+    },
+    "output_chars": 19103,
+    "transcript_chars": null,
+    "note": "No metrics.json / transcript; graded from outputs only. Tool-call counts unavailable."
+  },
+  "timing": {
+    "executor_duration_seconds": 504.4,
+    "total_duration_seconds": 504.4,
+    "source_timing_json": {
+      "total_tokens": 142274,
+      "duration_ms": 504359,
+      "total_duration_seconds": 504.4
+    },
+    "note": "timing.json carries a single wall-clock figure; copied into both executor_duration_seconds and total_duration_seconds. No grader timing recorded."
+  },
+  "claims": [
+    {
+      "claim": "A config-level `state_scanner.issue_scan.label_filter` already exists at collectors/issue_scan.py:533-538 and filters at fetch time",
+      "type": "factual",
+      "verified": true,
+      "evidence": "issue_scan.py:533-538 contains the 'Client-side label filter' comment and `if label_filter: wanted = set(label_filter); items = [it for it in items if wanted.intersection(...)]` inside the fetch path, returning 'live'."
+    },
+    {
+      "claim": "Run wrote nothing to the repo and ran no git / openspec / scripts",
+      "type": "process",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "answer.md:1 and :148-150 assert this and list A.0 collision check as not run '(禁 git)'; consistent with the prompt constraint; no transcript to confirm."
+    },
+    {
+      "claim": "About 11 files are touched (7 of them one-line doc/release sync)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Key Deliverables (proposal.md:69-75) enumerate scan.py, issue_scan.py, 2 tests, 3 references, SKILL.md, RECOMMENDATION_RULES.md, ab-suite json, CHANGELOG + version files — consistent with ~11."
+    },
+    {
+      "claim": "Additive fields do not bump snapshot_schema_version (scan.py:294)",
+      "type": "factual",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "Not checked against scan.py in this grading; not contradicted."
+    },
+    {
+      "claim": "spec-drafter SKILL.md A.1.4 / LEVEL_GUIDE still write `standards/openspec/changes/`, contradicting CLAUDE.md Rule #5",
+      "type": "factual",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "answer.md:9 and :152; skill files not part of graded outputs. Same drift is independently reported by the old_skill arm (answer.md:8), which raises plausibility."
+    }
+  ],
+  "user_notes_summary": {
+    "user_notes_present": false,
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+        "reason": "Passed in BOTH arms — the TARGETED eval does not discriminate in iteration-1. The baseline arm states its source explicitly: old_skill answer.md:9 '按 `standards/openspec/templates/proposal-minimal.md` 的 Usage Notes 要求, 已核实无关联 issue 时逐字写 `none` (不留空、不删行, 不用 `N/A` / `TBD`)'. The old skill reads the shared SOT template, which already carries the new field and its usage note, so the skill diff is not the only path to the behavior. Isolate the baseline from the template (pin proposal-minimal.md to its pre-change SHA for old_skill) or the AB cannot attribute the field to the skill."
+      },
+      {
+        "assertion": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+        "reason": "Passed in BOTH arms. Extractor accepts trailing annotation after the code span (old_skill proposal.md:6 `\\`none\\` — 已核实无关联 issue (...)`), while with_skill emits the bare sentinel. State whether prose after the sentinel is permitted; as written the fail-list is enumerative and silent on this variant."
+      },
+      {
+        "assertion": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+        "reason": "Passed in BOTH arms. The literal criterion '行内无 `](http`' only catches absolute http(s) links; a relative markdown link such as `[#12](../../issues/12)` or a `[text](url)` without scheme would pass. Use the extractor's md_link check (or `](` generally) as the canonical criterion."
+      },
+      {
+        "assertion": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+        "reason": "Passed in BOTH arms. Checks only the relative order of the four lines; an output inserting another `> **Field**:` line between Created and Linked Issue, or placing the four lines after other header lines, would still pass. If the SOT requires the four to be the first four contiguous lines, assert that."
+      },
+      {
+        "assertion": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+        "reason": "Passed in BOTH arms (0 alias hits). Both arms add extra header fields after the four SOT lines (with_skill: Target Version / 代码落点 / 决策来源; old_skill: 代码落点 / 版本影响). Not aliases, so correctly not failed — but if extra header fields are undesirable, no assertion covers it."
+      },
+      {
+        "reason": "The prompt forbids running git or any script ('不要运行 git 或任何脚本'), but no assertion checks compliance. old_skill proposal.md:6 claims `git log --all -i --grep=label` was run, and answer.md:1 narrows the constraint to '未运行 git 写命令'. Without a transcript this is unverifiable; with one it would be a direct constraint violation. Add an assertion or grade it from the transcript."
+      },
+      {
+        "reason": "No assertion checks the Level 2 shape the prompt asks for (proposal.md only, no tasks.md) or that the proposal was not written into the repo; both arms comply but it is uncovered."
+      }
+    ],
+    "overall": "5/5 passed in both arms; the TARGETED eval yields zero discriminating assertions in iteration-1. Mechanical format criteria are sound, but the baseline reaches the same canonical field through the shared standards template."
+  }
+}

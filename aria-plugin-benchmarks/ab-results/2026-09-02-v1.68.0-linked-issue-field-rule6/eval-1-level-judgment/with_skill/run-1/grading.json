@@ -1,0 +1,84 @@
+{
+  "eval": "eval-1-level-judgment",
+  "arm": "with_skill",
+  "run": "run-1",
+  "grading_basis": "outputs only (outputs/answer.md treated as executor final answer; outputs/proposal.md where present). Mechanical pre-check source: /tmp/claude-1000/-home-dev-Aria/94994160-11fa-4759-806c-602e16b505fe/scratchpad/mechanical-grade-iteration-1.txt (extractor lib/linked_issue_field.py).",
+  "expectations": [
+    {
+      "text": "Should judge as Level 1 (Skip) for trivial fix",
+      "passed": true,
+      "evidence": "answer.md:5 'LEVEL 1 DETECTED - SKIP SPEC'; :8 '此需求为简单修复，建议直接跳过 A.1'; :23 'score < 3 → Level 1'; :27 'Level 1 跳过的是 A.1 的 Spec 产出: 不生成 proposal.md'. Mechanical level1_words: Level 1=True, SKIP/跳过=True."
+    },
+    {
+      "text": "Should explain why Level 1 was chosen",
+      "passed": true,
+      "evidence": "answer.md:17-23 '判断依据' gives five numbered reasons: :19 decision-flow Q1 '是否简单修复/配置/文档格式? → YES' on trigger word `typo` (+ '修复', '一个' as limiter); :20 keyword-conflict check (no Level 2/3 words; '登录页面' is the change's location, not its type); :21 single-module / single-file scope, no `shared/` or API contract; :22 non-functional text fix, non-breaking; :23 composite score < 3, same shape as LEVEL_GUIDE example 'Fix typo in README → Level 1'. :28 also states re-judgment conditions (typo lands on shared i18n key / route → Level 2/3)."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "metrics_json_present": false,
+    "transcript_present": false,
+    "output_files": [
+      "answer.md"
+    ],
+    "output_chars_by_file": {
+      "answer.md": 1396
+    },
+    "output_chars": 1396,
+    "transcript_chars": null,
+    "note": "No metrics.json / transcript; graded from outputs only. Tool-call counts unavailable."
+  },
+  "timing": {
+    "executor_duration_seconds": 104.7,
+    "total_duration_seconds": 104.7,
+    "source_timing_json": {
+      "total_tokens": 75378,
+      "duration_ms": 104705,
+      "total_duration_seconds": 104.7
+    },
+    "note": "timing.json carries a single wall-clock figure; copied into both executor_duration_seconds and total_duration_seconds. No grader timing recorded."
+  },
+  "claims": [
+    {
+      "claim": "`typo` is a Level 1 high-confidence trigger word in LEVEL_GUIDE.md; 'Fix typo in README → Level 1' is LEVEL_GUIDE example 3",
+      "type": "process",
+      "verified": false,
+      "status": "unverifiable",
+      "evidence": "No transcript; skill reference files not part of the graded outputs. Not contradicted."
+    },
+    {
+      "claim": "Request contains no Level 2 / Level 3 trigger words",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Prompt text '修复登录页面一个 typo' contains none of the listed words (架构/重构/跨模块/breaking/migration/feature/add/implement/新建/组件)."
+    }
+  ],
+  "user_notes_summary": {
+    "user_notes_present": false,
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should judge as Level 1 (Skip) for trivial fix",
+        "reason": "Passed in BOTH arms (with_skill and old_skill) -> does not discriminate in iteration-1. Level judgment is baseline behavior untouched by the linked-issue change; this eval functions only as a regression guard."
+      },
+      {
+        "assertion": "Should explain why Level 1 was chosen",
+        "reason": "Passed in BOTH arms. 'Explain why' is satisfied by any rationale prose; to be discriminating it should name required elements (the decision-flow question that terminated, the explicit handling of the '登录页面' location-vs-feature keyword question, a re-judgment condition)."
+      },
+      {
+        "reason": "No assertion checks the important negative outcome for Level 1: that NO proposal.md is produced and A.1 is skipped rather than drafted. Both arms complied (with_skill answer.md:27 '不生成 proposal.md'; old_skill answer.md:63 '不生成 proposal.md, 也不生成 tasks.md'), but the eval would also pass an output that judged Level 1 and then drafted a spec anyway."
+      }
+    ],
+    "overall": "2/2 passed in both arms; zero discriminating assertions. Eval is a sound regression guard for Level-1 detection but cannot measure the iteration-1 (linked-issue field) change."
+  }
+}

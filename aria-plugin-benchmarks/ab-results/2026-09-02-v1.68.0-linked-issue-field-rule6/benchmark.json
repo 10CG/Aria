@@ -1,0 +1,293 @@
+{
+  "metadata": {
+    "skill_name": "spec-drafter",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-09-02T08:07:18Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 91.6,
+        "tokens": 2384,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should judge as Level 1 (Skip) for trivial fix",
+          "passed": true,
+          "evidence": "answer.md:5 'LEVEL 1 DETECTED - SKIP SPEC'; :17 '**\u7ed3\u8bba: Level 1 (Skip) \u2014\u2014 \u4e0d\u521b\u5efa OpenSpec proposal.md, \u76f4\u63a5\u8fdb\u5165 B.1\u3002**'; :79 '\u672c\u5224\u5b9a\u4e3a **Level 1 (Skip)**'. Mechanical level1_words: Level 1=True, SKIP/\u8df3\u8fc7=True."
+        },
+        {
+          "text": "Should explain why Level 1 was chosen",
+          "passed": true,
+          "evidence": "answer.md:21-57 '\u5224\u65ad\u4f9d\u636e (\u6309 LEVEL_GUIDE.md \u89c4\u5219\u9010\u9879)' with six sections: :23-27 decision-flow Q1 hit; :29-39 keyword table (`typo` / `\u4fee\u590d` / `\u4e00\u4e2a` \u2192 Level 1; no Level 2/3 hits; '\u767b\u5f55' is location not change type, so no keyword conflict); :41-45 file-impact scope (single UI module, no `shared/`, no API contract); :47-49 change type (pure text, non-breaking); :51-53 history pattern (LEVEL_GUIDE example 3); :55-57 composite score < 3 \u2192 Level 1. :71-77 lists override conditions."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 549.3,
+        "tokens": 29908,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should correctly parse mixed Chinese/English input",
+          "passed": true,
+          "evidence": "answer.md:5 '\u8f93\u5165\u662f\u540c\u4e49\u53cc\u8bed\u5bf9: \u82f1\u6587 \"Add a dark mode feature\" \u4e0e\u4e2d\u6587 \"\u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd\" \u8868\u8fbe\u540c\u4e00\u9700\u6c42, \u65e0\u4fe1\u606f\u5dee; \u6309\u8981\u6c42\u4ee5**\u82f1\u6587**\u4ea7\u51fa proposal, \u539f\u59cb\u53cc\u8bed\u8f93\u5165\u9010\u5b57\u4fdd\u7559\u5728 proposal \u5934\u90e8'. proposal.md:8 '> **Source request (bilingual, verbatim)**: \"Add a dark mode feature / \u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd\" \u2014 the two halves are equivalent; this proposal is written in English as requested.'"
+        },
+        {
+          "text": "Should generate proposal content in English as requested",
+          "passed": true,
+          "evidence": "proposal.md:1-104 body (header, Why with evidence table, What \u00a71-5, Key Deliverables, Out of Scope, Open decision, Impact, Tasks, SC-1..SC-9, rule6_note, References) is English prose. Chinese appears only inside quotations: :8 the verbatim source request (intentional traceability), :9 quoted precedent '\u4ee3\u7801\u843d\u70b9 aria/ \u5b50\u6a21\u5757; Spec \u843d\u4e3b\u4ed3', :15 quoted issue title '\u9759\u9ed8 pass'. Judged as citations, not proposal content."
+        },
+        {
+          "text": "Should preserve the feature intent from both language inputs",
+          "passed": true,
+          "evidence": "proposal.md:8 states the equivalence of both halves; :23 'The value of this change is to make dark mode a first-class, user-selectable theme'; :27 'Turn the dashboard's single hard-coded palette into a two-theme token system with dark mode as an explicit, persisted, user-selectable mode.' Dark mode stays the subject; the re-scoping (dashboard already dark-only) is argued explicitly at :14-23."
+        },
+        {
+          "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `\u5173\u8054 Issue` alias, `Related Issue`, or omitting the line fails)",
+          "passed": true,
+          "evidence": "proposal.md:6 begins exactly `> **Linked Issue**: ` (line: `> **Linked Issue**: `none` \u2014 verified 2026-09-02: Forgejo issue search on ...`). Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]. Independent grep over all outputs for `Related Issue|Issue Link|\u5173\u8054 Issue` = 0 hits."
+        },
+        {
+          "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+          "passed": true,
+          "evidence": "proposal.md:6 value token is the inline code span `none`, followed by an em-dash verification annotation ('\u2014 verified 2026-09-02: Forgejo issue search on `10CG/Aria` (q=dark, q=theme) ... no open or closed issue asks for dashboard theming'). Mechanical extractor (the authority for this assertion): verdict=OK token_str='none' sentinel=True md_link_on_field_line=False \u2014 trailing annotation accepted. Not a placeholder, not empty, not N/A, not a markdown link. PASS per mechanical result; the trailing-prose tolerance is flagged in eval_feedback."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 743.3,
+        "tokens": 31255,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "proposal.md \u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996 (\u82f1\u6587 canonical \u62fc\u5199; \u5199\u6210 `\u5173\u8054 Issue` / `Related Issue` / \u7701\u7565\u8be5\u884c \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "proposal.md:6 begins exactly `> **Linked Issue**: ` (full line: `> **Linked Issue**: `none` \u2014 \u5df2\u6838\u5b9e\u65e0\u5173\u8054 issue (\u4efb\u52a1\u7ed9\u5b9a; \u8d77\u8349\u65f6\u53e6\u626b aria \u5b50\u6a21\u5757 `git log --all -i --grep=label` \u4e0e\u8fdc\u7aef\u5206\u652f\u540d, \u65e0\u540c\u9898\u5728\u98de\u8f68)`). Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]."
+        },
+        {
+          "text": "\u8be5\u884c\u7684\u503c\u662f inline code span \u4e14\u9010\u5b57\u4e3a `none` (\u65e0\u5173\u8054\u5df2\u6838\u5b9e \u21d2 \u54e8\u5175; \u7559\u7a7a / `N/A` / `TBD` / \u4fdd\u7559 `{<org>/<repo>#<n>}` \u5360\u4f4d\u4e32 \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "proposal.md:6 value token is the inline code span `none`, followed by an em-dash annotation. Mechanical extractor (authority for this assertion): verdict=OK token_str='none' sentinel=True \u2014 trailing annotation accepted. Not empty, not N/A / TBD, not a placeholder. PASS per mechanical result; trailing-prose tolerance flagged in eval_feedback."
+        },
+        {
+          "text": "\u8be5\u884c\u4e0d\u662f markdown \u94fe\u63a5\u5f62 (\u884c\u5185\u65e0 `](http`), \u4e14\u4e0d\u7559\u7a7a",
+          "passed": true,
+          "evidence": "proposal.md:6 contains no `](http` (independent grep: 0 matches; the only other code span on the line is `git log --all -i --grep=label`) and is not empty. Mechanical: md_link_on_field_line=False."
+        },
+        {
+          "text": "\u5934\u90e8\u56db\u884c\u987a\u5e8f Level \u2192 Status \u2192 Created \u2192 Linked Issue \u4e0e SOT \u6a21\u677f\u4e00\u81f4 (\u542b `> **Created**:` \u884c)",
+          "passed": true,
+          "evidence": "proposal.md:3 `> **Level**: Minimal (Level 2 Spec)`, :4 `> **Status**: Draft`, :5 `> **Created**: 2026-09-02`, :6 `> **Linked Issue**: ...` \u2014 four contiguous lines in SOT order. Mechanical: order_L_S_C_LI=True has_Created=True. Extra fields follow at :7-8 (\u4ee3\u7801\u843d\u70b9 / \u7248\u672c\u5f71\u54cd)."
+        },
+        {
+          "text": "\u6ca1\u6709\u628a\u5b57\u6bb5\u8bd1\u5199\u6210\u522b\u7684\u540d\u5b57 (\u5168\u6587\u65e0 `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5934\u90e8\u5b57\u6bb5\u540d)",
+          "passed": true,
+          "evidence": "Mechanical: alias_or_other_name=[]. Independent grep over proposal.md and answer.md for `Related Issue|Issue Link|\u5173\u8054 Issue` = 0 hits. Extra header fields \u4ee3\u7801\u843d\u70b9 / \u7248\u672c\u5f71\u54cd are additional fields, not renamings of Linked Issue."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 104.7,
+        "tokens": 1396,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should judge as Level 1 (Skip) for trivial fix",
+          "passed": true,
+          "evidence": "answer.md:5 'LEVEL 1 DETECTED - SKIP SPEC'; :8 '\u6b64\u9700\u6c42\u4e3a\u7b80\u5355\u4fee\u590d\uff0c\u5efa\u8bae\u76f4\u63a5\u8df3\u8fc7 A.1'; :23 'score < 3 \u2192 Level 1'; :27 'Level 1 \u8df3\u8fc7\u7684\u662f A.1 \u7684 Spec \u4ea7\u51fa: \u4e0d\u751f\u6210 proposal.md'. Mechanical level1_words: Level 1=True, SKIP/\u8df3\u8fc7=True."
+        },
+        {
+          "text": "Should explain why Level 1 was chosen",
+          "passed": true,
+          "evidence": "answer.md:17-23 '\u5224\u65ad\u4f9d\u636e' gives five numbered reasons: :19 decision-flow Q1 '\u662f\u5426\u7b80\u5355\u4fee\u590d/\u914d\u7f6e/\u6587\u6863\u683c\u5f0f? \u2192 YES' on trigger word `typo` (+ '\u4fee\u590d', '\u4e00\u4e2a' as limiter); :20 keyword-conflict check (no Level 2/3 words; '\u767b\u5f55\u9875\u9762' is the change's location, not its type); :21 single-module / single-file scope, no `shared/` or API contract; :22 non-functional text fix, non-breaking; :23 composite score < 3, same shape as LEVEL_GUIDE example 'Fix typo in README \u2192 Level 1'. :28 also states re-judgment conditions (typo lands on shared i18n key / route \u2192 Level 2/3)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 358.0,
+        "tokens": 24612,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should correctly parse mixed Chinese/English input",
+          "passed": true,
+          "evidence": "answer.md:1 '\u6536\u5230\u53cc\u8bed\u8f93\u5165 \"Add a dark mode feature / \u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd\", \u6309\u8981\u6c42 proposal \u6b63\u6587\u7528\u82f1\u6587\u8d77\u8349; \u4ee5\u4e0b\u53d9\u8ff0\u7528\u4e2d\u6587' \u2014 recognises the two-language pair and the English-output instruction; :13 extracts trigger words from both halves ('\u89e6\u53d1\u8bcd add / feature / \u6dfb\u52a0 / \u529f\u80fd \u2192 Level 2 \u8bcd'). Resulting proposal.md:1 title 'Aria Dashboard Dark Mode' matches the request."
+        },
+        {
+          "text": "Should generate proposal content in English as requested",
+          "passed": true,
+          "evidence": "proposal.md:1-104 \u2014 title, header blockquote, Why, What/Design, Key Deliverables, Constraints, Non-Goals, Impact, Tasks, Success Criteria, Open Item, Rule #6 Note, References are all English prose. Only Chinese tokens are two quotations of project SOT text: :43 Source column `CLAUDE.md \"\u5411\u540e\u517c\u5bb9\"` and :96 the Rule #6 slogan `\u5b81\u8dd1\u52ff\u8c41`. Judged as citations, not proposal content."
+        },
+        {
+          "text": "Should preserve the feature intent from both language inputs",
+          "passed": true,
+          "evidence": "Both input halves mean 'add a dark mode feature'. proposal.md:13 'Today that template ships a single, hard-coded dark palette ... \"Dark\" is therefore not a *mode* \u2014 it is the only rendering'; :15 'This change turns appearance into an explicit **theme mode** (`system` / `dark` / `light`)'; :23 'The existing `:root` block stays the dark baseline (visual output for dark mode is unchanged)'. Dark mode remains the subject throughout; the re-scoping to a selectable theme mode is stated explicitly with evidence (dashboard already dark-only) rather than silently substituted."
+        },
+        {
+          "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `\u5173\u8054 Issue` alias, `Related Issue`, or omitting the line fails)",
+          "passed": true,
+          "evidence": "proposal.md:6 `> **Linked Issue**: `none``. Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]. Independent grep over all outputs for `Related Issue|Issue Link|\u5173\u8054 Issue` = 0 hits."
+        },
+        {
+          "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+          "passed": true,
+          "evidence": "proposal.md:6 value is exactly the inline code span `none` with nothing else on the line. Mechanical: verdict=OK token_str='none' sentinel=True md_link_on_field_line=False. Rationale for `none` also recorded at :8 ('after a read-only Forgejo issue search ... returned only unrelated fuzzy matches')."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 504.4,
+        "tokens": 19103,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "proposal.md \u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996 (\u82f1\u6587 canonical \u62fc\u5199; \u5199\u6210 `\u5173\u8054 Issue` / `Related Issue` / \u7701\u7565\u8be5\u884c \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "proposal.md:6 `> **Linked Issue**: `none`` (answer.md:32 identical inside the fenced proposal). Mechanical: canonical_line=True, case_variant_only=False, alias_or_other_name=[]."
+        },
+        {
+          "text": "\u8be5\u884c\u7684\u503c\u662f inline code span \u4e14\u9010\u5b57\u4e3a `none` (\u65e0\u5173\u8054\u5df2\u6838\u5b9e \u21d2 \u54e8\u5175; \u7559\u7a7a / `N/A` / `TBD` / \u4fdd\u7559 `{<org>/<repo>#<n>}` \u5360\u4f4d\u4e32 \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "proposal.md:6 value is exactly the inline code span `none`, nothing else on the line. Mechanical: verdict=OK token_str='none' sentinel=True. answer.md:10 records the reasoning: '\u4efb\u52a1\u5df2\u6838\u5b9e\u65e0\u5173\u8054 issue \u2192 \u5934\u90e8\u9010\u5b57\u5199 `none` (\u4e0d\u7559\u7a7a\u3001\u4e0d\u5220\u884c)'."
+        },
+        {
+          "text": "\u8be5\u884c\u4e0d\u662f markdown \u94fe\u63a5\u5f62 (\u884c\u5185\u65e0 `](http`), \u4e14\u4e0d\u7559\u7a7a",
+          "passed": true,
+          "evidence": "proposal.md:6 contains no `](http` (independent grep over all Linked Issue lines: 0 matches) and is not empty. Mechanical: md_link_on_field_line=False."
+        },
+        {
+          "text": "\u5934\u90e8\u56db\u884c\u987a\u5e8f Level \u2192 Status \u2192 Created \u2192 Linked Issue \u4e0e SOT \u6a21\u677f\u4e00\u81f4 (\u542b `> **Created**:` \u884c)",
+          "passed": true,
+          "evidence": "proposal.md:3 `> **Level**: Minimal (Level 2 Spec)`, :4 `> **Status**: Draft`, :5 `> **Created**: 2026-09-02`, :6 `> **Linked Issue**: `none`` \u2014 four contiguous lines in SOT order. Mechanical: order_L_S_C_LI=True has_Created=True. Extra fields follow at :7-9 (Target Version / \u4ee3\u7801\u843d\u70b9 / \u51b3\u7b56\u6765\u6e90)."
+        },
+        {
+          "text": "\u6ca1\u6709\u628a\u5b57\u6bb5\u8bd1\u5199\u6210\u522b\u7684\u540d\u5b57 (\u5168\u6587\u65e0 `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5934\u90e8\u5b57\u6bb5\u540d)",
+          "passed": true,
+          "evidence": "Mechanical: alias_or_other_name=[]. Independent grep over proposal.md and answer.md for `Related Issue|Issue Link|\u5173\u8054 Issue` = 0 hits. (answer.md:10 '\u65e0\u5173\u8054 issue' is prose, not a header field name.)"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "old_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 461.4,
+        "stddev": 334.6237,
+        "min": 91.6,
+        "max": 743.3
+      },
+      "tokens": {
+        "mean": 21182.3333,
+        "stddev": 16293.7597,
+        "min": 2384,
+        "max": 31255
+      }
+    },
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 322.3667,
+        "stddev": 202.2185,
+        "min": 104.7,
+        "max": 504.4
+      },
+      "tokens": {
+        "mean": 15037.0,
+        "stddev": 12130.331,
+        "min": 1396,
+        "max": 24612
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00",
+      "time_seconds": "+139.0",
+      "tokens": "+6145"
+    }
+  },
+  "notes": []
+}
