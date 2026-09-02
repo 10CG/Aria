@@ -1,9 +1,9 @@
 ---
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
-phase: C.1 (字段 Spec B 完成 + 本地合并态; C.2 推送/PR 待 owner 授权)
+phase: C.2 (PR #190 open, C.2.4 green; owner 指令 pre_merge 收敛审计进行中 — R1 0C/4M 已清账, R2 待; 收敛后合并)
 status: active
-updated-at: 2026-09-02T08:26:00Z
+updated-at: 2026-09-02T14:27:14Z
 ---
 
 # Aria — Session Handoff (2026-09-02) — 字段 Spec `linked-issue-field-availability` B.2 实施完成 (aria v1.68.0 本地合并态) + 架构文档 2.0.1 复审
@@ -84,7 +84,7 @@ updated-at: 2026-09-02T08:26:00Z
 | **本地 master 陈旧** | standards 本地 master 曾落后 origin 1 commit (faaede2), 本 session 已 ff; aria 曾 == | 每次 merge 前重跑三端 rev-parse 断言 (memory `stale-local-main`) |
 | **AB 结论已降级**: 定向 fixture 对 ship 态「只换 skill」无判别 (基线靠模板/在制 proposal 学会); 对「落地前世界」+3 | 有人引用 RESULT 说「skill hunk 有区分力」 | RESULT §2 两句并列; 不事后收紧断言 |
 | **CRLF 文件**: `standards/openspec/templates/*.md` 与 `aria/skills/spec-drafter/SKILL.md` 是 CRLF | 脚本化编辑用 text 模式 ⇒ 整文件 LF 重写 | 编辑前 `git show HEAD:<f> \| grep -c $'\r$'`; 写后看 diffstat 是否 N+/0− (memory `preserve-crlf`) |
-| **远端 master 已前进** (882707f, aria-runner-bot 07:23Z, M6 台账) | 本 session 起点 e1deaf1; feature 分支落后 1 | 零重叠已核 (`comm` 两侧文件集交集为空); master 侧已 rebase; feature 侧 PR 时由 Forgejo merge 处理, 若要 rebase 须同步改 handoff 内 SHA |
+| **远端 master 已前进** (882707f aria-runner-bot 07:23Z M6 台账 + c423281 本轨架构文档) | 本 session 起点 e1deaf1; feature 分支曾落后 **2** (PR body 首版误写 1, pre_merge R1 tech-lead 抓出) → 13:xxZ 已 `merge origin/master` 入 feature (29c1e4f, 零冲突) | 零重叠已核 (`comm` 两侧文件集交集为空); master 侧已 rebase; feature 侧 PR 时由 Forgejo merge 处理, 若要 rebase 须同步改 handoff 内 SHA |
 | 两条更早的同轨 claim (`a1-entry-claim-duplicate-work-guard` 无后缀, s-26ad / s-6389) 仍 active | 看板显示同轨三 claim | 同容器同 owner, advisory 无碍; D.2b release 时按 track_id 两种串各 release 一次 |
 
 ---
@@ -141,13 +141,13 @@ updated-at: 2026-09-02T08:26:00Z
 ```
 [main]      feature/linked-issue-field-availability = f12647d+ (推 origin ✅, ls-remote MATCH) → **PR #190** https://forgejo.10cg.pub/10CG/Aria/pulls/190 (open, mergeable; C.2.4 green [not_applicable: 70 变更文件无 workflow 覆盖, main in-flight 已核] + C.2.4.5 submodule gate PASS forward ×2) — **merge 由 owner 执行** (yaml owner_gates)
 [main]      master = c423281 (架构文档 2.0.1, rebased on 882707f)                    | origin = github = c423281 ✅ (owner 授权推, ls-remote MATCH)
-[main]      ⚠️ origin/github master 已被 aria-runner-bot 推进到 882707f (07:23Z, M6 台账/TASK-028, 与本轨零文件重叠); feature 分支基 e1deaf1 落后 1, PR 合并即可 (未 rebase 以保 §1/§7 SHA 有效)
-[aria]      master = fe32441 + tag v1.68.0 | origin = github = fe32441 ✅ (owner 授权 08:3xZ 推, ls-remote 逐 remote MATCH; tag 两端 present)
-[standards] master = fad8b4b                                                          | origin = github = fad8b4b ✅ (同上核验)
+[main]      origin/github master = c423281 (882707f aria-runner-bot M6 台账 + c423281 本轨架构文档); feature 分支已 merge origin/master (29c1e4f), 不再落后; 历史 SHA 不变 (merge 非 rebase)
+[aria]      master = d1caa66 + tag v1.68.1 (pre_merge R1 清账 PATCH; 前一 fe32441 = v1.68.0) | origin = github = d1caa66 ✅ (ls-remote MATCH, 两 tag 两端 present)
+[standards] master = ffed204 (模板 Usage Note 英文化; 前一 fad8b4b)                     | origin = github = ffed204 ✅ (ls-remote MATCH)
 [aria-orchestrator] 未动 (feature/m6-cost-model-telemetry 92acce5 停泊; gitlink 237045a)
 ```
 
-**Tags published**: v1.68.0 (aria, origin + github)。**PRs merged**: 无; **PR open**: Aria #190 (gate green, 待 owner merge → 之后 phase-d-closer 归档 + release claim)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
+**Tags published**: v1.68.0 + v1.68.1 (aria, origin + github)。**PRs merged**: 无; **PR open**: Aria #190 (gate green, 待 owner merge → 之后 phase-d-closer 归档 + release claim)。**Issue 动作**: aria-plugin#117 comment 20573 (已回读核验)。
 
 ---
 

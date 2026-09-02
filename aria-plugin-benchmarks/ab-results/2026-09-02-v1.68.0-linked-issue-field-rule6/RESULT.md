@@ -45,6 +45,8 @@
 3. **hunk B (R5/C1) 的必要性主张被削弱** (n=1): R5/C1 判「预览骨架才是 AI 真正照抄的对象, 不改它字段大概率缺失」; 实测 3 个写出字段的基线 run 都不是靠骨架, 而是靠读 SOT 模板 / 在制 proposal。hunk B 仍保留 —— 它是 SC-7a 钉住的 SOT 对齐 (骨架与模板不一致本身是缺陷), 且 AB 零负 delta; 只是「没有它 AI 就不写字段」这句在本仓语料下不成立, 记入 proposal 下次触碰时勘正。
 4. **grader 提出的候选判别特征 (n 小, 仅记录)**: 5/5 次 with_skill 都写裸哨兵 `` > **Linked Issue**: `none` ``, 而所有产出该行的 old_skill run 都带破折号尾注 (模仿 sibling-spec-probe:6 形态)。若将来要在 ship 态里也量出 skill 边际, 可把 SC-7 断言收紧为「该行逐字 = 裸哨兵行」—— 本轮**不**事后收紧 (predict-then-measure 纪律)。
 
+5. **(pre_merge R1 追注, 决策单 B8)** eval-3 / eval-2 的「头部四行顺序」断言 (A4) 是 **skill 指令跟随**断言 —— hunk A/B 教「与 SOT 模板头部逐行对齐」, 断言量的是 spec-drafter 是否照做; 它**不是**机械 check 的属性: 探针按 Spec D2 位置无关 (E0 取第一条 depth-1 命中), 作用域 9 份既有 proposal 0/9 符合该顺序也都不被判红。control eval-3 基线唯一翻红的正是这条 ⇒ 对照组 +1 的那一分来自「模板对齐」这一写入侧习惯, 不来自字段可抽取性本身。
+
 ## §3 套件覆盖缺口三件套 (判据表第三行)
 
 1. **点名行为** = SC-7: spec-drafter 新建 Level 2 proposal 时写出过 E0+E2+E5 的 `Linked Issue` 行, 无关联时逐字 `none`。
@@ -58,6 +60,7 @@
 - **运行前置 `ARIA_COORDINATION_NO_PUSH=1` 不适用但已核验**: `grep -c phase1_gate aria/skills/spec-drafter/SKILL.md` = 0 (母 Spec 前置块未 ship) ⇒ 被测 skill 不可能把评测 AI 引到闸门脚本; 会话 env 该变量 UNSET; 跑前后 `git ls-remote origin refs/aria/coordination` 与本地 `refs/aria/coordination` 均为 `ab1d3e05…`, 零推送。评测 subagent 被明令禁止 git 写 / 闸门脚本 / state-scanner / openspec CLI; 全部 run 自陈只写 outputs/ 且仓内 `git status` 无其写入。
 - **违约记录**: eval-3 任务 prompt 字面「不要运行 git 或任何脚本」, iteration-1 eval-3 基线 run 自陈跑了**只读** git 命令 (`log` / `branch -r` / `rev-parse` / `describe`) 并把约束解读为「git 写命令」; control eval-3 亦跑 `python3 -c` 只读校验。无仓内写入, 不影响判分, 记录在此。
 - **基线污染两通道** (§1): (a) 同批改的 SOT 模板 (control 已隔离); (b) 在制 proposal 语料 (未隔离, 本仓结构性存在)。AB_TEST_OPERATIONS.md 目前只记 CLAUDE.md 污染面 (#116); 本轮把「同批 co-landing 文档 + 在制 proposal」补为第二、三类, 建议归入 #116 追记 (handoff carry-forward, 外向动作待授权)。
+- **回归数字口径** (pre_merge R1 qa 追注): `run_tests.py` 的 `Ran 1457` 与静态 `def test_` 1473 差 16 = `test_collision.py` 里 16 个模块级 pytest 风格函数不被 unittest discover 收集 (本 PR 前已存在, 该文件零改动); 两数并列时以「Ran = unittest 实跑 / 静态 = 定义计数」读, 不可互换。
 - **贴文证据失真** (grader claims 侧): eval-2 基线 `proposal.md:19` 的 grep「0 hits」实跑 5 命中; control eval-2 行号引用恒差 40 (88→128 等); 均不影响本 AB 判分, 记为 memory `pasted-evidence-is-derived` 的又一实证。
 - **产物**: 按先例只提交 PREDICTION / RESULT / SUBSTITUTE / benchmark / eval_metadata / grading / timing / answer / proposal; skill 快照与 `ab-workspace/` (gitignored) 不入库。`ab-results/latest` 指针按近期惯例不动。
 - **执行者**: 执行容器 simonfish/023236f2, 2026-09-02 07:5x–08:2x UTC; 6 + 2 executor run + 1 grader (两次), 主控不亲评。

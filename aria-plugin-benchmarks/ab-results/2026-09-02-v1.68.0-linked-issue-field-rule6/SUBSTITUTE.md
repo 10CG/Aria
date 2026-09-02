@@ -45,7 +45,7 @@ Ran 1457 tests in 58.354s
 
 OK
 $ grep -rh '^\s*def test_' aria/skills/state-scanner/tests/*.py | wc -l
-1473                                                                   # = 基线 1425 + 新增 48
+1473                                                                   # = 基线 1425 + 新增 48 (静态定义计数; 与 Ran 1457 差 16 = test_collision.py 16 个 pytest 风格裸函数不被 unittest 收集, 本 PR 前已存在)
 $ python3 aria/skills/state-scanner/scripts/linked_issue_field_probe.py . --grandfathered .aria/linked-issue-field-grandfathered.txt; echo EXIT=$?
 OK (9 份在范围内, 6 条在册)
 EXIT=0
