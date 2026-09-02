@@ -110,3 +110,13 @@
 | C5 | R2 tl minor `a04601ce`: `system-architecture.md` §2.8 行改了但 Version History 未追记 | **补 2.0.2 行** (随 PR #190 把该行纳入发布同步面) | 修订史每次改动一行 | system-architecture.md |
 | C6 | R2 qa minor `d91f074e`: 新 check `plugin-version-arch-docs-match` 无专属回归测试 | **carry** (与其余 13 条 check 同现状; 三态已在 R1/R2 手工实测); 修法 = 与 `.aria/probes/` 同族的 pytest/unittest 夹具, 属 state-check 基建 Level 1 | — | handoff carry |
 | C7 | R2 cr minor ×3 (探针清账 PATCH 自身新路径: archive 目录不可读未守卫 / `stdout.reconfigure` 过度覆盖 `--emit-arg` 使非 ASCII 实参被改写成 `?` 而非 E6 要求的响亮失败 / `_normalize_entry` 残余 `./` 中缀) + `a2a4165f` (CLI 契约外扩 `UNREADABLE` / 不可读 note / root+emit-arg 互斥 未回写 proposal §4 与 TASK-008/009) | **carry 为 aria v1.68.2 候选** (三处各 1–3 行 + 3 条测试 + SOT 回写), **不在本循环做** (B9-补: 需 owner 授权推送; memory `marginal-return-negative`: 清账 PATCH 已在自己新路径产生 3/4 新 minor, 再修再生); `--emit-arg` 那条是 E6 语义回退, 在候选里标最高优先 | — | handoff §6 carry |
+
+### PR #190 pre_merge 收敛审计 R3 清账 (2026-09-02; 四席 0C / 1M / 5m, 四票 PASS)
+
+| # | 事项 | 裁定 | 判据 | 落点 |
+|---|------|------|------|------|
+| a3bfd693 ×3 | handoff 当前态陈述连续三轮残余 (R1 修 frontmatter+§7, R2 修 12 处, R3 仍剩 footer `:178` / §5 三行 / PR 行) — 每轮都在修实例 | **改类**: 本轮改完后用**机械扫描** (旧 token 正则 × 「历史记述」白名单正则) 逐行断言残余为零, 扫描结果贴进 R3 聚合报告; 以后 handoff 二次编辑一律先跑同一扫描 (memory `fix-the-class`) | 扫描残余 = 0 | 本 commit + R3 聚合报告 |
+| C8 | R3 cr minor `b66c5239`: TASK-014 verification「母 Spec 分支不存在 ⇒ PR 说明记『未核验, 母 Spec 落地时复核』」未记 | **补记** PR #190 body + handoff carry: aria 无 `a1-entry` 分支, hunk A 与母 Spec 前置块冲突未核验, 母 Spec B.1 起点用 `git merge-tree` 复核 | `git -C aria branch -a \| grep a1-entry` 为空 | PR body / handoff §2 |
+| C9 | R3 cr minor `4a675f17`-(i): `rglob` 对不可读 `openspec/changes/<slug>/` 目录静默跳过 ⇒ 该 proposal 从作用域消失, 探针 OK — fail-open by omission (前置: 手工 chmod, git 不存目录权限) | **carry 入 v1.68.2 候选**, 优先级次于 `2ed89c8a` (E6 语义回退); 修法 = 显式 `os.walk(onerror=…)` 或先枚举一层目录再判可读 | 构造 chmod 000 的 slug 目录 ⇒ 应 FAIL/UNREADABLE 而非 OK | handoff carry |
+| 口径 | R3 km/qa minor `62285020`: tasks.md `:5` `run_all_tests 1889` 为 v1.68.0 时值, v1.68.1 后实测 1894 (= 1889 + state-scanner 净增 5) | **已修** tasks.md `:5` | 两次独立重跑 1894 | tasks.md |
+| 收敛口径 | R3 C∪M = 1 (非 ∅) ⇒ 不收敛; R4 预期 ∅ | **R4 = 稳定性确认轮**: 若 R4 C∪M = ∅ 且四票 PASS ⇒ CONVERGED (可执行结论集口径, 与本仓 pre_merge PR #26 与 post_planning R4 先例一致; convergence-algorithm「首轮 0-finding 守卫」针对整体结论集为空 (agent 假阴性风险), 本轮 minor 集非空、且 R1→R4 四轮 fresh 席位独立复核, 不适用) | R4 四份报告 C∪M 计数 | R4 聚合报告 |
