@@ -310,7 +310,7 @@ git -C <repo> fetch --no-tags --prune R +refs/heads/*:refs/aria/sibling-probe/R/
 ### §6 规模上限与 no-silent-caps
 
 - **ref 维度**: 每个 enforced remote = **1 条默认 ref + ≤ `MAX_REFS_SCANNED` 条非默认 ref** (探针自有常量, **默认 100**; 2026-09-01 P11 扩; 原「恰 1 条 ref, 无需额外 cap」随之作废) ⇒ 非默认 ref 数走 SC-25 的 no-silent-caps;
-- **语料维度**: **单 remote 上跨其全部 ref 累计**参与扫描的 proposal 数上限 = 探针自有常量 `MAX_PROPOSALS_SCANNED`, **默认 1000** (2026-09-01 P11 扩后由「单 ref」改为「单 remote 累计」: 默认 ref 先计, 超限从枚举序尾部截断 ⇒ 分支语料先被截; 全轮总量 ≤ |enforced_remotes| × 1000, 防失控语义不变)。
+- **语料维度** (**⚠️ 2026-09-03 Amendment A1 修订计数单位, 见文末**): **单 remote 上跨其全部 ref 累计**参与扫描的 proposal 数上限 = 探针自有常量 `MAX_PROPOSALS_SCANNED`, **默认 1000** (2026-09-01 P11 扩后由「单 ref」改为「单 remote 累计」: 默认 ref 先计, 超限从枚举序尾部截断 ⇒ 分支语料先被截; 全轮总量 ≤ |enforced_remotes| × 1000, 防失控语义不变)。
   > 依据: 本仓实测单 ref 147 篇、抽取 12ms ⇒ 1000 仍是亚秒级。cap 的作用**不是性能, 是防失控** (第三方仓语料规模未知 / glob 误配)。
 - **排序 (决定性, 供两人独立实现得同一截断点)**: 先 `openspec/changes/*/proposal.md`, 后 `openspec/archive/*/proposal.md`; 各自按**完整路径的字节序** (`LC_ALL=C` 语义) 升序。超限**从尾部截断**。
   > 为什么 `changes/` 排前: in-flight 的竞品住在 `changes/`, cap 触发时**绝不能先丢掉它们**。
@@ -583,3 +583,17 @@ git -C <repo> fetch --no-tags --prune R +refs/heads/*:refs/aria/sibling-probe/R/
 2. **Rule #6 处置见 rule6_note**: 三条要件逐条落, 兜底不触发的前提是 A.2 真的建成 `ab-suite/audit-engine.json`; **若建不成, 不得自判豁免, 须显式上呈 owner**。
 3. **owner 裁定**: (a) **P11 的扫描范围复议** → **✅ 2026-09-01 技术裁定 = 扩** (owner 2026-09-01 分工: 产品级 owner / 技术级 AI; 判据 = 产品目标 #174 倒推 + 成本前提已被实测推翻; 落点 P11 行 / §7 / §10 B1 / SC-22~25 / TASK-007·012·013; 决策单 `.aria/decisions/2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H3 含一句话回退指引); (b) **对姊妹纯函数的依赖方向 → ✅ 已裁 (i) 硬前置** (owner 2026-08-30 (R6 后) 裁定), §1 第 3 条 / §3 两段已落版; 姊妹 O-4 同步。
 4. **R6 已跑 (REVISE → 清账 → 定向复核 PASS), owner 裁不再加轮。** ~~本 Spec 在 owner 批准前不进 A.2/A.3。~~ **owner 2026-08-30 已批准进 A.2/A.3**; A.2/A.3 产物已派生, post_planning (combined) 按默认跑, 不豁免; P11 扫描范围仍待裁。
+
+---
+
+## Amendment A1 (2026-09-03, B.2 运行实际 vs Spec 陈述 — append-only, 原文不改)
+
+**触发证据 (实现席真仓实跑, aria `feature/sibling-spec-probe`, 主仓 `/home/dev/Aria`)**: `origin` 有 9 条 `refs/heads/*`, 私有命名空间 11 条 ref; 按 §6 原计数单位「(ref, path) 逐条累计」得 origin **1097** 条 (> 1000) ⇒ `caps_applied` 触发 ⇒ 每轮 `status=degraded` / `verdict=not_established` / `reason=cap_applied`, **本仓上 `no_sibling_found` 永不可达** —— 探针在自己的宿主仓恒「未能核实」= 恒红零信息 (memory `feedback_false_green_dual_is_permanent_red`)。同一批 (ref, path) 去重到 **blob 对象**只有 **165** 个: 同一份 proposal 在 9 条分支上是同一个 blob, 逐 ref 重复计数把「防失控」cap 变成了「分支数 × 语料数」的必触发。
+
+**原陈述**: §6「语料维度 … 单 remote 上跨其全部 ref 累计参与扫描的 proposal 数上限 … 默认 ref 先计, 超限从枚举序尾部截断」+ TASK-013「`git ls-tree -r --name-only <ref>`」「`MAX_PROPOSALS_SCANNED` 按 remote 跨 ref **累计**」。
+
+**修正 (技术级裁定 D6, 决策单 2026-09-01 文件 §2026-09-03 段)**: 计数单位改为 **唯一 blob** —— `git ls-tree -r <ref> -- openspec/changes openspec/archive` (默认格式, 取 `<mode> <type> <sha>\t<path>`), 同一 remote 内按 `<sha>` 去重: 同 blob 只分类一次 (缓存), 只计一次; `remotes[].scanned` = 该 remote 实分类的**唯一 blob 数**; cap 比较对象 = 唯一 blob 数; 截断仍按枚举序 (默认 ref 先, 其余 ref 字节序; ref 内 changes 先 archive 后各自字节序) 从尾部丢弃**首次出现**的 blob, `caps_applied[].dropped_from` = 首个被丢弃 blob 的路径, `total` = 唯一 blob 总数。(ref, path) 级别的 hits 组装 / 去重 (SC-23 `refs[]`) / 陈旧过滤 (SC-24) / 自命中排除 (SC-5) **全部不变** —— 它们看的是 (ref, path) 归属, 与 blob 缓存正交。`MAX_PROPOSALS_SCANNED = 1000` 数值不变 (本仓唯一 blob 165, 余量 6×; 第三方仓语料 > 1000 份**不同**文档才触发, 才是「失控」)。
+
+**可证伪判据**: 双远端可达时本仓实跑 `status == "ok"` 且 `caps_applied == []`; `remotes[origin].scanned` ≈ 唯一 blob 数 (165 ± 并发漂移) 而非 (ref, path) 数; SC-6 (单 ref, 两份不同 blob, cap 打桩 1) / SC-23 (同一 blob 三 ref ⇒ hits 1, refs 3) / SC-25 (refs cap) 断言不变。
+
+**未做**: 不改 `MAX_PROPOSALS_SCANNED` 数值; 不引入 config key (P10 不变); 不改 §7 十二字段。`audit.checkpoints.mid_post_spec` 未配置 (默认 off) ⇒ 本 amendment 由主控按 phase-b-developer B.drift 的 append-only 体例落版, 不跑 mini-audit (Rule #10: 该闸门未启用, 不是自行豁免)。

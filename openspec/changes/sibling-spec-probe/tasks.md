@@ -29,9 +29,9 @@
 
 ## 1. 前置断言 + B.1 门
 
-- [ ] 1.1 前置断言: `aria/skills/state-scanner/lib/linked_issue_field.py` 已存在且导出 `extract_linked_issue_field(text: str) -> FieldVerdict` (四态 `NO_FIELD` / `NO_TOKEN` / `BAD_TOKEN` / `OK`; 字段 `verdict` / `token_str` / `token_elements` / `line_no`), 接口与姊妹 §3「交付形态」逐字核对; **不存在 ⇒ 阻塞 (status=blocked), 不得自建替身, 不得复制 E0–E6**
-- [ ] 1.2 基线三态记录: audit-engine 现状 (零 `scripts/` / 零 `tests/` / 零 `lib/` / 零 `collectors/`; SKILL.md `:83/:85/:237`、execution-modes.md `:84/:89/:90/:113/:118/:119`、report-format.md `:50-71`、DEFAULTS.json `:124-128` 锚点复核); `ab-suite/` `.json` 数当日实测记录 (A.2 观测 31, 不钉字面) 且无 `audit-engine.json`; SC-17 / SC-20 / SC-21 在基线上**必红**的亲跑记录 (memory `check-runs-at-baseline-first`)
-- [ ] 1.3 建 `aria-plugin-benchmarks/ab-suite/audit-engine.json` (**经 `/skill-creator` 产出**, 不手工仿写; 2 个 eval: α「每轮入口调用探针并把结果渲染进 `### Round N`」/ β「`not_established` / exit≠0 / 非 JSON ⇒ 渲染『未能核实』, 不得『无竞品』, 不阻断」= **SC-16**; 产出形态 `descriptive`) + `ab-suite/version.yaml` MINOR 升版 (skills_covered / total_eval_cases **按实际文件程序化重算**后写: `ls ab-suite/*.json | wc -l` + python 遍历各 json 求 `len(evals)` 之和; 断言 = 当前值 + 新增数, 不写字面量 — R1 C5, 见 yaml `metadata.ab_suite_seam_rules`)。**B.1 前置** (proposal :473); 建不成 ⇒ 不自判豁免, 原样上呈 owner (兜底「缺一照跑」在无套件时结构上不可执行, 即 `aria-plugin#150`)
+- [x] 1.1 前置断言: `aria/skills/state-scanner/lib/linked_issue_field.py` 已存在且导出 `extract_linked_issue_field(text: str) -> FieldVerdict` (四态 `NO_FIELD` / `NO_TOKEN` / `BAD_TOKEN` / `OK`; 字段 `verdict` / `token_str` / `token_elements` / `line_no`), 接口与姊妹 §3「交付形态」逐字核对; **不存在 ⇒ 阻塞 (status=blocked), 不得自建替身, 不得复制 E0–E6**
+- [x] 1.2 基线三态记录: audit-engine 现状 (零 `scripts/` / 零 `tests/` / 零 `lib/` / 零 `collectors/`; SKILL.md `:83/:85/:237`、execution-modes.md `:84/:89/:90/:113/:118/:119`、report-format.md `:50-71`、DEFAULTS.json `:124-128` 锚点复核); `ab-suite/` `.json` 数当日实测记录 (A.2 观测 31, 不钉字面) 且无 `audit-engine.json`; SC-17 / SC-20 / SC-21 在基线上**必红**的亲跑记录 (memory `check-runs-at-baseline-first`)
+- [x] 1.3 建 `aria-plugin-benchmarks/ab-suite/audit-engine.json` (**经 `/skill-creator` 产出**, 不手工仿写; 2 个 eval: α「每轮入口调用探针并把结果渲染进 `### Round N`」/ β「`not_established` / exit≠0 / 非 JSON ⇒ 渲染『未能核实』, 不得『无竞品』, 不阻断」= **SC-16**; 产出形态 `descriptive`) + `ab-suite/version.yaml` MINOR 升版 (skills_covered / total_eval_cases **按实际文件程序化重算**后写: `ls ab-suite/*.json | wc -l` + python 遍历各 json 求 `len(evals)` 之和; 断言 = 当前值 + 新增数, 不写字面量 — R1 C5, 见 yaml `metadata.ab_suite_seam_rules`)。**B.1 前置** (proposal :473); 建不成 ⇒ 不自判豁免, 原样上呈 owner (兜底「缺一照跑」在无套件时结构上不可执行, 即 `aria-plugin#150`)
 
 ## 2. TDD — 测试宿主 (RED first)
 

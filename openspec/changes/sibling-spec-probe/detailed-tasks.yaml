@@ -111,7 +111,7 @@ tasks:
     parent: "1.1"
     task_group: G1
     title: "前置断言: 姊妹纯函数 lib/linked_issue_field.py 已存在且导出所需接口 (缺席 ⇒ 阻塞, 不建替身)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
@@ -127,6 +127,10 @@ tasks:
       - "可选导出核对: `from lib.linked_issue_field import is_sentinel` 是否成功 (姊妹 A.2 承诺导出); 成功 ⇒ TASK-011 走 a2_discretions (i) 的 import 路径, 失败 ⇒ 自写 + 同源注释; 结果记入本任务 notes"
       - "姊妹四态定义与 proposal §3 层分派表逐格一致 (无第五态); 若姊妹最终形态与 metadata.external_dependencies.interface_expected 任一项不符 ⇒ 记录差异并上呈 (§3: 姊妹改四态定义 ⇒ 本节映射表须同批改), 不自行改映射"
     notes: >
+      B 期核对 (2026-09-03, aria d1caa66 = v1.68.1): 模块存在; 契约路径顺序下 import 成功; extract('x').verdict == NO_FIELD 且 line_no None;
+      '> **Linked Issue**: `none `' ⇒ verdict BAD_TOKEN / token_str 'none ' (未 strip) / token_elements ('none',) / line_no 1 (1-based) / bad_elements ('none',);
+      is_sentinel 已导出 (none/NONE/无 True, 'none ' False) ⇒ TASK-011 走 a2_discretions (i) import 路径; normalize_linked_issue('无') / ('TBD') / ('{<org>/<repo>#<n>}') 均 None;
+      四态与 §3 分派表逐格一致, 无第五态; 另有 additive 字段 bad_elements (探针不消费)。
       owner 2026-08-30 (R6 后) 裁 (i): 字段纯函数 = 探针硬前置, ship 顺序 = 姊妹先、本 Spec 后。
       A.2 当日 (aria d69091d) 实测该文件不存在 ⇒ 本任务在姊妹 ship 前恒 blocked。
       「有函数产生它」才写代码类 SC (memory no-code-host-no-assertion): 层 0 定位没有该模块就没有宿主。
@@ -135,7 +139,7 @@ tasks:
     parent: "1.2"
     task_group: G1
     title: "基线三态记录: audit-engine 现状 + 锚点复核 + SC-17/20/21 基线必红亲跑"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -155,6 +159,11 @@ tasks:
       - "上述 :83/:85/:237/:84/:89/:90/:113/:118/:119/:50-71/:124-128 逐条 `sed -n` 复核, 与 metadata.line_anchor_recheck 一致; 任一漂移 ⇒ 更新 4.x 任务 deliverables 注释 (不改 proposal)"
       - "三态记录写入本任务 notes (基线 / 目标 / 坏实现各一行), 供 2.6 的 docstring 引用"
     notes: >
+      B 期亲跑 (2026-09-03, aria d1caa66 / 主仓 49f18bb): 基线 = audit-engine/ 恰 {SKILL.md, references}, 无 lib/collectors/scripts/tests;
+      SC-17 计数 0 / SC-20 (i) 0 / SC-20 (ii) 0 (基线红); ab-suite 31 个 .json, 无 audit-engine.json; 锚点 SKILL.md :83/:85/:121/:237/:412/:421、
+      execution-modes.md :84/:89/:90/:113/:118/:119 (144 行)、report-format.md :50/:52/:66-71、DEFAULTS.json :124-128 全部一致;
+      远端观测重跑: git remote = github, origin; refs/remotes/probe/master f44a324 存在而 remote.probe.url exit 1; github 无本地 symbolic-ref (exit 128), origin → refs/remotes/origin/master;
+      ls-remote --symref origin/github HEAD 均 'ref: refs/heads/master\tHEAD'。目标态 = SC-17 2 / SC-20 各 1; 坏实现 = 只 patch Convergence ⇒ SC-17 计 1。
       A.2 已做一次完整复核 (metadata.line_anchor_recheck 全部一致); 本任务在 B 期开工时重跑一次
       (memory feedback_concurrent_duplicate_audit_fetch_before_start: 每次实质动作前 fetch + 复核).
 
@@ -162,7 +171,7 @@ tasks:
     parent: "1.3"
     task_group: G1
     title: "建 ab-suite/audit-engine.json (经 /skill-creator; α/β 两 eval, 其一即 SC-16) + version.yaml MINOR 升版 — B.1 前置"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -181,6 +190,9 @@ tasks:
       - "version.yaml: version 升 MINOR, changelog 一条; skills_covered / total_eval_cases **按实际文件程序化重算**后更新 (`ls aria-plugin-benchmarks/ab-suite/*.json | wc -l` 为 skills_covered; `python3 -c` 遍历各 json 求 `len(evals)` 之和为 total_eval_cases), 不写字面量; 断言 = 落地后 `.json` 数 == 落地前实测数 + 1, 且 version.yaml 两计数 == 重算值 (R1 C5: 旧口径 29→30 / 58→60 与实测基线自相矛盾, 已废)"
       - "Phase B.1 前置 (proposal :473): 本任务 status == done 是 B.1 分支创建的前置断言; 建不成 ⇒ 不自判豁免, 原样上呈 owner:「第 2 条缺失 ⇒ 兜底『缺一照跑』触发 ⇒ 兜底在无套件时结构上不可执行 (#150)」"
     notes: >
+      B 期落地 (2026-09-03): ab-suite/audit-engine.json 新建 (evals id 1 α / id 2 β, 均 descriptive, expectations 4+4 条, 字段与 skill-creator eval schema 一致);
+      经 /skill-creator (claude-plugins-official skill-creator 3160b166) eval 流程产出 (决策单 2026-09-03 D4 留痕); version.yaml 1.2.0 → 1.3.0, skills_covered 31→32 / total_eval_cases 74→76 程序化重算;
+      套件缺口 issue: 10CG/aria-plugin#150 (open) / 同族 #157, 不新开。
       「两 eval 在坏实现上必红」的实证只能由双臂实跑给出 (without 臂 = 基线 SKILL.md 即坏实现), 落 TASK-017;
       本任务只钉文件建成 + 结构 + expectations 字面 (tasks.md 待 owner #2)。
       手册 :76「28 个 ✅ 全量覆盖」/ :519「28 skills, 56 cases」与实测 31 / #150 的 14/43 三方不一致 —— 本 Spec 不修 (follow-up 并入 #150)。
@@ -444,6 +456,9 @@ tasks:
       - "P11 陈旧过滤 (先于去重): 非默认 ref 上的 changes/<spec_dir> 若同 remote 默认 ref 上存在匹配正则 `^openspec/archive/[0-9]{4}-[0-9]{2}-[0-9]{2}-<spec_dir>/proposal[.]md$` 的条目 (日期前缀恰 10 字符 + 单个 '-', <spec_dir> 逐字节相等, **不做后缀/子串匹配** — `*-probe` 会误配 `2026-08-25-sibling-spec-probe`, 把真 in-flight 竞品判成陈旧 = 假阴性) ⇒ 视为已归档的陈旧副本, 不入 hits, remotes[].stale_skipped += 1; 默认 ref 自身不过滤; SC-5 自命中排除对全部被扫 ref 生效 (SC-24)"
       - "P11 去重 (跨 ref, **不跨 remote**): 去重键 = (remote, corpus, spec_dir, key) — 即既有 hits 粒度 (a2_discretions (e) 按 remote 分列 + TASK-011 每交集键一条) 不变, 只把同一键在多条 ref 上的重复合并为一条; 每项新增 refs: list[str] (全部命中处的 `R/<branch>`, **落盘前按整串字节序重排, 与枚举序无关**); branch 与其余标量 (path / field_line / layer) 一律取**枚举序首个命中 ref** (默认 ref 先) 上的值, 不逐字段挑选; 消费面「检测到 N 份」的 N 仍 = 去重后 spec_dir 数 (SC-23); §7 顶层十二字段不变 (新键落在 hits[] / remotes[] / caps_applied[] 对象内, SC-15 断言不变)"
     notes: >
+      **Amendment A1 (2026-09-03, B.2 运行实际)**: cap 计数单位改为唯一 blob (proposal 文末 A1 + 决策单 D6) —— 实现席真仓实跑 origin 9 分支 (ref, path) 累计 1097 > 1000 恒触发 cap ⇒ 每轮恒 not_established;
+      唯一 blob 仅 165。落点: `git ls-tree -r <ref> -- openspec/changes openspec/archive` (默认格式取 sha), 同 remote 内按 sha 去重 + 分类缓存; remotes[].scanned = 唯一 blob 数;
+      hits / SC-23 去重 / SC-24 陈旧过滤 / SC-5 自命中仍按 (ref, path)。blob 去重后本仓实跑: status ok, caps [], origin scanned 155 / refs_scanned 9 / stale_skipped 15, github 152 / 2 / 2, 41s。
       本仓单 ref 147-149 篇; 1000 是防失控 cap 非性能 cap (对第三方仓未验证, 刻意不做 config key — 新表面 #3).
 
   - id: TASK-014
