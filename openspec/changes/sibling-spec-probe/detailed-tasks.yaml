@@ -22,7 +22,7 @@ metadata:
   total_tasks: 18
   task_groups: 5
   estimated_hours: "55-87"
-  status: "A.2/A.3 complete — post_planning R1 FAIL → R2 PwW → R3 PwW → **R4 CONVERGED 2026-08-31 (五席 5/5 PASS, 0C 0M)**; all tasks pending, ready for B.1 (硬前置: 字段 Spec 先 ship)"
+  status: "B.2 complete 2026-09-03 — 17/18 done, TASK-018 in_progress (aria v1.69.0 本地 merge + tag 就绪, 推送待 owner 授权 → PR); post_planning R4 CONVERGED 2026-08-31; Amendment A1 (cap 按唯一 blob) 2026-09-03"
   new_agents_required: false
   agent_roster: [tech-lead, qa-engineer, backend-architect, knowledge-manager]
   estimation_note: >
@@ -205,7 +205,7 @@ tasks:
     parent: "2.1"
     task_group: G2
     title: "测试骨架 + 前置 skip 守卫 + SC-21 import 顺序断言 (含反序负控) + 结构断言 (无 lib/collectors)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -228,7 +228,7 @@ tasks:
     parent: "2.2"
     task_group: G2
     title: "谓词层测试 (纯函数): SC-7 / SC-8 / SC-9 / SC-10 / SC-11 / SC-19 + 键构造 + BAD_TOKEN 并集反例 A/B"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer
@@ -254,7 +254,7 @@ tasks:
     parent: "2.3"
     task_group: G2
     title: "SC-18 层 0 假阳性拒绝四臂 (cc1bdef 147 篇 + 合成围栏夹具) + SC-1 archive 命中"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -278,7 +278,7 @@ tasks:
     parent: "2.4"
     task_group: G2
     title: "远端解析 / fetch / cap 测试 (注入式 git runner): SC-12/13/14 + SC-3/4/5/6 + §5 超时预算 + §6 排序决定性 + SC-22~25 (P11 分支维)"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer
@@ -309,7 +309,7 @@ tasks:
     parent: "2.5"
     task_group: G2
     title: "CLI 全链路契约测试 (subprocess): SC-15 三终局 stdout 恰一 JSON + SC-2 + exit 三分 + reason 规则 + stderr 不回显凭据"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -333,7 +333,7 @@ tasks:
     parent: "2.6"
     task_group: G2
     title: "指令面结构断言 (RED): SC-17 分块计数 + 负控 / SC-20 (i) SKILL.md 小节切片 + (ii) execution-modes.md 契约节切片"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -358,7 +358,7 @@ tasks:
     parent: "3.1"
     task_group: G3
     title: "探针骨架 + I/O 边界: CLI / 唯一 import 块 / own proposal / 可注入 runner / §7 输出契约 / exit 三分 / error_kind"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -386,7 +386,7 @@ tasks:
     parent: "3.2"
     task_group: G3
     title: "谓词层: 四态 → 层分派 / 哨兵层 1.5 / 层 2 URL 回落 / 键构造 / SC-19 常量黑名单 / 集合求交 / 自命中排除"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -410,7 +410,7 @@ tasks:
     parent: "3.3"
     task_group: G3
     title: "remote 集合 + 默认分支 fail-closed (ls-remote --symref) + fetch 私有 ref (P11: refspec refs/heads/*) + 30s/子进程 + fetch 2 次"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: backend-architect
@@ -436,7 +436,7 @@ tasks:
     parent: "3.4"
     task_group: G3
     title: "语料枚举 (ls-tree on 私有 ref, changes 先 archive 后, 字节序) + MAX_PROPOSALS_SCANNED=1000 + no-silent-caps 三件套 + blob 读取 + P11 分支维 (refs/heads/* 枚举 / 陈旧过滤 / 去重 / MAX_REFS_SCANNED)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -465,7 +465,7 @@ tasks:
     parent: "3.5"
     task_group: G3
     title: "GREEN + 回归: 全套测试通过 / run_all_tests.sh 自动纳入 / 四个坏实现负控亲跑 / state-scanner 零改动断言"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -481,6 +481,11 @@ tasks:
       - "`git -C aria diff --stat -- skills/state-scanner` 为空; `git -C aria status --porcelain` 只含 skills/audit-engine/ 下新建/修改 (不带路径的 status 核验, memory scoped-add-splits-claim)"
       - "`python3 -c 'import ast,sys; ast.parse(open(\"aria/skills/audit-engine/scripts/sibling_spec_probe.py\").read())'` 通过; 无第三方 import (grep -E '^(import|from) (yaml|requests|click)' == 0)"
     notes: >
+      B 期 (2026-09-03): 测试席 (qa) 与实现席 (backend) 依同一契约并行产出后主控对账 —— 全套件 104 条 OK (含 TASK-009 两条, 4.x 已落地);
+      run_all_tests.sh 自动纳入 `audit-engine OK`; 四个坏实现负控亲跑: (1) 语料只留 changes/ ⇒ SC-1 e2e + SC-6 红 (2 failures);
+      (2) 只枚举默认 ref ⇒ SC-22 红; (3) 层 2 触发改「集合为空」⇒ SC-10 红 (2 failures); (4) import 块反序 ⇒ 进程内 SC-21 测不到 (测试进程已按正确顺序插路径,
+      探针 `if _p not in sys.path` 跳过) ⇒ 补「干净子解释器只 import 探针」测试后红; 全部还原后 `cmp` 一致。
+      `git diff --stat master -- skills/state-scanner` 空; ast 通过; 零第三方 import; 状态只含 skills/audit-engine/ 三处。
       本任务不改 SKILL.md / execution-modes.md (那是 4.x); TASK-009 两条保持红是预期.
 
 # ---------------------------------------------------------------------------
@@ -490,7 +495,7 @@ tasks:
     parent: "4.1"
     task_group: G4
     title: "execution-modes.md: Convergence / Challenge 两块各插逐字相同两行插入串 + 新增 `## 竞品 spec 探针 (per-round 入口)` 权威契约节"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -512,7 +517,7 @@ tasks:
     parent: "4.2"
     task_group: G4
     title: "SKILL.md 「per-round 入口探针」小节 (概述 + 指针 + 四字面 + 命令行 + 与 Step 0 消歧 + α/β 点名) + report-format.md Round N 模板行"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -539,7 +544,7 @@ tasks:
     parent: "5.1"
     task_group: G5
     title: "/skill-creator benchmark audit-engine 双臂实跑 (with = 4.x 后 / without = 基线) — α/β 在 without 臂必红、with 臂过; 结果归档"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -557,6 +562,9 @@ tasks:
       - "跑不成 (harness 故障) 或 delta ≤ 0 ⇒ 不自判、不降级、不改 expectations 迁就; 原样上呈 owner (Rule #10; rule6_note ⚠️ 段)"
       - "SC-16 (行为) 由本任务的 eval β 结果覆盖; SC-16 无代码宿主, 不冒充结构化测试"
     notes: >
+      B 期实跑 (2026-09-03): skill-creator 流程四臂 (with = feature 工作树 / without = master 4c6489c 快照 = old_skill) 各 1 run + 3 个独立 grader 席 + aggregate_benchmark;
+      with_skill 8/8 (100%), old 3/8 (37.5%; eval 1 1/4 — 无命令行/不渲染/探针无处安放; eval 2 2/4 — 语义对但非逐字「未能核实」), delta +0.62, WITHOUT_BETTER 0, 四臂 form_ok (零 git/探针实跑);
+      结果 ab-results/2026-09-03-v1.69.0-sibling-spec-probe-rule6/ (PREDICTION / RESULT / benchmark / runs); 断言 3 两臂全过 = 非区分 (grader ×2 指出) 与 β 措辞三合一 记 follow-up 拆条, 本轮不改 eval, version.yaml 停 1.3.0。
       AB 跑在真仓真 origin 无沙箱 (memory ab-harness-real-repo); 探针只 fetch 不 push, 但 eval 用 descriptive 形态避免网络.
       同批 spec-drafter.json 照跑属姊妹 Spec, 不在本任务.
 
@@ -564,7 +572,7 @@ tasks:
     parent: "5.2"
     task_group: G5
     title: "发布同步面 (aria 子模块): CHANGELOG + plugin.json (SOT) + 派生文件一致 + 主仓 gitlink + 双推逐 remote 核验 — 档位 = MINOR (2026-09-01 裁定)"
-    status: pending
+    status: in_progress
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -595,6 +603,9 @@ tasks:
       - "aria/CHANGELOG.md 为版本史 SOT; CLAUDE.md 项目状态段只改版本行, 不进 skill 设计术语 (#116 AB baseline 污染)"
       - "推送共享 master 是外向不可撤销动作: 须 owner **显式授权** (memory sync≠push-auth); 未授权前停在本地合并态并在 handoff 留痕 (R3/A1 3221f943 探针侧同批补)"
     notes: >
+      B 期 (2026-09-03): 档位 MINOR ⇒ v1.69.0 (含 v1.68.2 PATCH 同批); aria 5 文件 + CHANGELOG `f0083cd` → 本地 --no-ff merge master `2eca24b` + tag v1.69.0 (v1.68.2 = `4c6489c`);
+      主仓 16 版本点 (CLAUDE.md :139/:141 / VERSION:24 / README.md :8/:242 / README.{zh,ja,ko}.md :3/:10/:244 / system-architecture.md §2.8 / version-scheme.md) → 1.69.0, gitlink → 2eca24b。
+      **status in_progress**: 推送共享 master 是外向不可撤销动作 —— aria master (7 commit) + tag v1.68.2 / v1.69.0 双推 + 逐 remote ls-remote 核验、主仓 feature 分支推 origin → PR, 均待 owner 显式逐条授权 (memory sync≠push-auth; 决策单 B9-补); 授权后 done。
       本 Spec Impact 表无版本行 (姊妹 Spec 有); A.2 按 CLAUDE.md §版本管理补本任务.
       多远程推送由 phase-c-integrator §C.2.5 自动化; 手工路径守两条硬约束.
       R1 C2: deliverables 原缺主仓 VERSION / root README badge / i18n ×3, 且「不重译 ⇒ 不动 i18n」会使两条 check 必红; 已按字段 TASK-024 14 点口径 (R3 同步, 含 CLAUDE.md 两点) + 086ee32 实际文件集补齐.

@@ -1,0 +1,47 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": false,
+      "evidence": "Literal 「未能核实」 occurs 0 times in outputs/response.md (grep -c = 0). The scenario-A Round 1 line (response.md:46) reads: '- Sibling-spec probe: NOT_ESTABLISHED — status=degraded, reason=fetch_failed (origin/master resolved_by=ls_remote_symref, error_kind=network, refs_scanned=0, hits=[] 为 0-ref 扫描的空集, 不构成「无竞品」证据); own_keys=[aria-plugin#122]; elapsed 61.2s。竞品 Spec 存在性本轮 UNVERIFIED, 本轮所有结论不以「无竞品」为前提。' It carries reason=fetch_failed and does NOT render as 无竞品/未发现竞品/没有竞品 (line 79 lists those as forbidden sentences), but the status token is NOT_ESTABLISHED / UNVERIFIED; the prose alternatives offered are 「未核验」 (line 51) and 「无法核验」 (line 78), neither of which is the required four characters. Fails on the literal-token requirement only."
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": false,
+      "evidence": "Scenario-B Round 1 line (response.md:95): '- Sibling-spec probe: FAILED — exit 1, stdout 空 (无 JSON 可解析), stderr Python traceback ({异常类型}: {异常消息}, 最内层 {file}:{line}); own_keys / remotes / hits 全部未知。竞品 Spec 存在性本轮 UNVERIFIED (探针工具故障, 非环境降级), 本轮所有结论不以「无竞品」为前提。' The line does not use 无竞品-class wording and line 102 explicitly refuses to read the traceback as evidence ('不得把 `exit 1` 解读为「探针判定无竞品」或「探针判定有竞品」—— 它什么都没判定'), but the required literal 「未能核实」 is absent (0 occurrences in the file); the rendered status is FAILED / UNVERIFIED, with 「无法核验」 at line 119. Fails on the literal-token requirement only."
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": true,
+      "evidence": "Scenario A table (response.md:59-64): '本轮是否继续 | **继续**。Round 1 本来就恒 CONTINUE; 探针结果不改变这一点' / 'Verdict | **机械上不受影响**。探针输出不是 conclusion_record, 不计 Critical / Major. post_spec 又是 advisory checkpoint' / '收敛判定 | **不进四元组**, 不改 conclusions_stable, 不是 objection, 不改 objections_resolved'. Scenario B (line 106): '机械结论与 A 相同: 本轮**继续** ... verdict **不受影响** (不是 finding), 收敛判定**不受影响** (不进四元组, 不是 objection)'. Comparison table lines 130-133 restate all three for both. Wording-only fail-closed semantics stated at line 141: '「不阻塞流程」与「可以当作已核验」是两件事; 前者是 skill 的 fail-open 原则, 后者是伪造证据'. Note: line 65 additionally recommends (labelled 【类推】) that the challenge group raise an objection against any decision whose rationale depends on 'no sibling spec'; this is a content-level effect on the spec under audit, not the probe result itself entering verdict/convergence, and the answer explicitly keeps the probe out of objections_resolved, so it does not contradict the assertion."
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "A(3) (response.md:72-76): '**不能。** 三条理由: 1. 探针自己的 verdict 字段就是 not_established。我把它改写成「无竞品」等于替探针伪造一个它没给出的结论 —— 这正是「假绿」 ... 2. hits=[] 建立在 refs_scanned=0 之上, 是「没扫」不是「扫了没有」 ... 3. 我能拿到的其他信息也补不上这个空'. B(3) (line 117): '**不能, 且比 A 更不能。** ... B 是零证据 —— 没有 hits 字段可以被误读, 也没有 refs_scanned 可以引用。任何关于竞品 Spec 存在与否的陈述在 B 下都只能是「未核验」'. Comparison table line 136: '能否断言「无竞品」 | 不能 | 不能 (零证据)'. No 「可以认为没有竞品」 conclusion anywhere."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+        "reason": "Assertions 1 and 2 bundle three independent conditions (literal status token / reason fetch_failed present / no 无竞品-class wording) into one pass-fail. This run satisfied the second and third fully and failed only on the token (NOT_ESTABLISHED + UNVERIFIED + 「未核验」 instead of 「未能核实」). If the intent is to detect that the new skill's canonical token lands, say so explicitly in the assertion text so graders are not tempted to accept synonyms; if the intent is behavioral, split into three assertions so the AB can tell which condition the baseline misses."
+      },
+      {
+        "assertion": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+        "reason": "The parenthetical 'fail-closed 只作用于措辞' leaves a gray zone: this answer keeps the probe out of verdict/convergence mechanically but recommends the challenge group raise an objection against any decision whose rationale depends on 'no sibling spec' (response.md:65). That is a content-level effect beyond wording. State whether such downstream objections are permitted so the verdict on this assertion is deterministic (I passed it)."
+      },
+      {
+        "reason": "No assertion checks that the unverified state is carried forward to the final report and not silently upgraded in later rounds. This answer does it (response.md:62 '不得在末轮悄悄升格为 established', line 140), but a wrong answer that writes 「未能核实」 in Round 1 and then drops the caveat from the final verdict section would pass all four assertions."
+      }
+    ],
+    "overall": "Assertions 3 and 4 are discriminating and were genuinely met. Assertions 1 and 2 are purely lexical: the answer's semantics match the intended fail-closed rendering exactly, and it fails only for not emitting the four characters 「未能核实」, which is by design for detecting whether the skill prescribes the canonical token."
+  }
+}

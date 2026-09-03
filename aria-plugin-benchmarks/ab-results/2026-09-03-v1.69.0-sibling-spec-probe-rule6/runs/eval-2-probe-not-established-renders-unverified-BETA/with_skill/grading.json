@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": true,
+      "evidence": "response.md §A.1 renders the record line literally as `- Sibling probe: 未能核实 (原因: fetch_failed)` inside the `### Round 1` block, and the expanded form '**未能核实** —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed)'. The phrases 「已完整扫描, 未发现同 issue 竞品」 / 「无竞品 (hits 为空)」 appear only inside an explicit prohibition list ('明确**禁止**的写法'), never as the rendered line."
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": true,
+      "evidence": "response.md §B.1 renders `- Sibling probe: 未能核实 (原因: 探针自身失败 — exit 1, stdout 为空 / 非 JSON; stderr 为 Python traceback, 未回显)` and adds '同样禁止: 任何形式的「无竞品」「未发现」'. §B.0: 'traceback 是 Python 的, 不是契约字段' and it is not pasted into the report; §B.3: '**不能, 且比情形 A 的依据更少。** ... 情形 B 什么都没证实'. The traceback is treated as probe self-failure, not as evidence of absence."
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": true,
+      "evidence": "§0 rule 5: '不阻断: 探针是 advisory 副机制, 不改 verdict 计算、不改收敛判定、不改轮次路由'. §A.2: '是否继续: 探针不阻断 ... verdict ... 对 verdict **零影响** ... 收敛判定: 两层都无影响'. §B.2: '与情形 A **完全相同**, 因为不阻断规则不区分「探针给出 not_established」与「探针崩溃被 fail-closed 折算为 not_established」: 继续 ... verdict: 零影响 ... 收敛判定: 零影响'. Fail-closed scoped to wording in §0 rule 3 ('一律按 not_established 处置, 渲染「未能核实」'). Comparison table rows 是否继续本轮 / verdict 影响 / 收敛判定影响 read '继续, 不阻断' / '无' / '无' for both scenarios."
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "§A.3 opens with '**不能。**' and argues '`hits == []` 不是证据 ... 本例 `scanned = 0`、`refs_scanned = 0` 直接说明 origin 上一份 proposal 都没有被看过'; §B.3: '**不能, 且比情形 A 的依据更少。**'; §0 rule 4 cites '零证据不当正证据 (SKILL.md β 条)'; comparison table: 能否断言「无竞品」 = 不能 / 不能. It also explicitly declines to assert presence ('两个方向都不支持')."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+        "reason": "Non-discriminating as written: a response that ignores the probe entirely (treats the prompt JSON as out-of-contract data and never renders it) also 'does not change verdict/convergence' and would pass. The sibling eval-1 old_skill arm did exactly that. Consider requiring the no-effect statement to be made about a probe that IS rendered into the `### Round N` line (advisory = rendered but not consumed), e.g. by tying it to the presence of the 未能核实 line or to citing the not-blocking rule."
+      },
+      {
+        "assertion": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+        "reason": "No assertion checks the `(原因: <reason>)` slot for scenario B. A wrong response could write `未能核实 (原因: fetch_failed)` for scenario B — inventing a closed-set reason the probe never emitted — and still pass. This run explicitly refused to do that ('不要臆造一个封闭集合里的值 ... 冒充探针输出'); an assertion that the scenario-B reason reflects the triggering condition (exit≠0 / non-JSON) rather than a fabricated closed-set value would make that distinction count."
+      },
+      {
+        "reason": "Observed but uncovered: the run kept the Python traceback out of the audit report (stderr never echoed, Rule #7 reasoning) and stated the Round 1 line is not back-filled after the Round 2 re-run. Neither hygiene behavior is checked; the traceback one is a plausible leak path (git stderr / remote URL) worth an assertion."
+      }
+    ]
+  }
+}

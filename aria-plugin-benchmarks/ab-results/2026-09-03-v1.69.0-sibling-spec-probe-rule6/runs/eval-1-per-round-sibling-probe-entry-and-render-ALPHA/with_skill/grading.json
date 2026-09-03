@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+      "passed": true,
+      "evidence": "response.md §1 步骤 2 (line 34), in a fenced bash block inside the step list: `python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\"`. Both flags present with concrete values; line 39 further explains --own-spec-dir must be the directory NAME (demo-spec) not the path, matching the script's argparse (scripts/sibling_spec_probe.py:660-661, both required=True) and execution-modes.md:90 template. Command repeated in §3.5 (line 156)."
+    },
+    {
+      "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+      "passed": true,
+      "evidence": "response.md §2 lines 90-92, under a literal `### Round 2` heading: `- Sibling probe: 🔴 检测到 1 份同 issue 的竞品 Spec (含 1 份已完成的 Spec): 2026-08-22-phase-c-integrator-ci-path-coverage [archive → 已完成的 Spec; origin/master; 同 issue 键 aria-plugin#122 (本轨 canonical / 对方 url_fallback, proposal.md:22)] ...`. Contains 🔴, the count 1, the literal 「已完成的 Spec」 (twice), and ties it to corpus=archive. Wording matches report-format.md:54/61/71 template and execution-modes.md:199 sibling_found row. Line 56 derives M=1 from `corpus == \"archive\"` explicitly."
+    },
+    {
+      "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+      "passed": true,
+      "evidence": "All four elements stated explicitly. Line 71: `**不**因命中阻断、暂停或改轮次路由`. §3.1 `对 verdict: 零影响` (line 123-125, cites verdict formula inputs = severity counts only, probe hit is not a conclusion_record). §3.2 `对收敛判定: 零影响` (line 127-134, not in comparison_keys / not a vote / not in normal_rounds / not drift-classified). §3.3 `对是否继续 Round 3: 零影响, 完全由 check_convergence(R2, R1) 决定` (line 140-144: probe has no branch in the CONVERGED→DRIFT_TERMINATED→OSCILLATION→MAX_ROUNDS priority chain). §3.4 names it `advisory 副机制` and line 92's rendered row ends with `advisory, 不改 verdict / 收敛 / 路由`. Matches SKILL.md:129 and execution-modes.md:205 不阻断 clause."
+    },
+    {
+      "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+      "passed": true,
+      "evidence": "response.md line 16-17 (前提表): Step 0 anchor `已在 Round 1 启动前一次性固化, 审计周期内不可变, Round 2 不重做`; per-round 探针 `每轮入口都跑 (Round 1, 2, …, N), 不沿用 Step 编号, 不复用上一轮结果`. §1 步骤 1 `不重做 Step 0` is separate from 步骤 2 `入口第一动作: 跑竞品 spec 探针 ... 这是 Convergence 模式块 Round N: 的首行动作`. Line 81 and line 138: Round 3 entry `再跑一次探针`. The probe is thus modeled as a per-round entry action, explicitly disambiguated from the one-shot Step 0, matching SKILL.md:121."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+        "reason": "The assertion only checks flag presence. The prompt hands the spec as a path (`openspec/changes/demo-spec/`), and the script requires the directory NAME; an answer writing `--own-spec-dir openspec/changes/demo-spec/` would pass this assertion yet produce exit 2 at runtime (script looks for repo/openspec/changes/<arg>/proposal.md). Consider requiring the value be exactly `demo-spec` (and `--repo-path` be `/work/Demo`). This run got it right (line 13, 39) but the assertion would not have caught the wrong form."
+      },
+      {
+        "assertion": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+        "reason": "execution-modes.md:199 requires the rendered row to include `<spec_dir 列表>`. An answer that writes the 🔴 count + 「已完成的 Spec」 but omits the spec_dir name `2026-08-22-phase-c-integrator-ci-path-coverage` would pass this assertion while failing the '由人一眼可辨' purpose. Consider requiring the spec_dir to appear in the rendered line."
+      },
+      {
+        "reason": "No assertion covers the fail-closed consumption contract (read first-class `verdict`, not infer from `hits`; check exit==0 / parseable JSON / schema_version==\"1\"; degraded status appends 覆盖不完整). This run did all of it (lines 46-56) unprompted. If another eval in the suite already targets the not_established/degraded branch this is fine; otherwise the 'happy path' eval lets an answer that infers from hits[] pass unnoticed."
+      },
+      {
+        "reason": "No assertion checks that the probe hit is NOT promoted into a conclusion_record / severity / `## 审计结论` section. That is the concrete mechanism behind 'does not change verdict'; an answer could assert 'advisory' in prose while also listing the hit as a Major finding, which would pass assertion 3 literally. This run explicitly excluded it (line 70, 117)."
+      }
+    ],
+    "overall": "Assertions are discriminating on the four intended axes (command line / render wording / advisory / per-round vs Step 0) and this run passes all four with citations that verify against the skill source. Gaps are in value-correctness (dir name vs path, spec_dir in the row) and in the fail-closed / non-promotion mechanics, which the run handled but the assertions do not test. No metrics.json or user_notes.md in outputs; timing.json: 314.3s, 112713 tokens."
+  }
+}
