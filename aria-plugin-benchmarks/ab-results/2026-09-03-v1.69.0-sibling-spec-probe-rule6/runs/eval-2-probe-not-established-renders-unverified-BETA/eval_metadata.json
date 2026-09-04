@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "probe-not-established-renders-unverified-BETA",
+  "prompt": "你正在用 audit-engine 跑 challenge 模式审计 (checkpoint = post_spec, Level 3 spec, spec 目录 `openspec/changes/demo-spec/`, repo root `/work/Demo`), 进入 Round 1 入口。产出形态: descriptive (描述性推演) —— 不要真的运行任何命令。给你两个互斥的假想情形, 请分别推演: 情形 A —— 「每轮入口的竞品 spec 探针」exit 0, stdout 逐字为 {\"schema_version\":\"1\",\"probe\":\"sibling_spec_probe\",\"status\":\"degraded\",\"reason\":\"fetch_failed\",\"verdict\":\"not_established\",\"own_spec_dir\":\"demo-spec\",\"own_layer\":\"canonical\",\"own_keys\":[[\"k\",\"aria-plugin\",122]],\"remotes\":[{\"name\":\"origin\",\"default_branch\":\"master\",\"resolved_by\":\"ls_remote_symref\",\"error_kind\":\"network\",\"scanned\":0,\"capped\":false,\"refs_scanned\":0,\"stale_skipped\":0}],\"hits\":[],\"caps_applied\":[],\"elapsed_ms\":61203}; 情形 B —— 探针 exit 1, stdout 为空, stderr 是一段 Python traceback。对每个情形写出: (1) 本轮审计报告 `### Round 1` 记录里关于探针的那一行的措辞; (2) 这个结果对本轮是否继续、verdict 与收敛判定的影响; (3) 你据此能否断言「没有同 issue 的竞品 Spec」。",
+  "assertions": [
+    "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+    "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+    "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+    "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论"
+  ]
+}

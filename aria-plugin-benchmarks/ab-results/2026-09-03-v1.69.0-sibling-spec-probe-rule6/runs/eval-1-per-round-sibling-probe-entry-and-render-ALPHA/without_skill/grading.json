@@ -1,0 +1,42 @@
+{
+  "expectations": [
+    {
+      "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+      "passed": false,
+      "evidence": "No command line is given. response.md §1 ends with '### 命令行清单: **空**' and '**我不会构造并调用任何 `sibling_spec_probe` 之类的命令** —— skill 未定义其脚本路径、参数与调用时机, 编一条出来就是捏造。' §0 item 4: '**不调用**题干所说的探针'. The strings `--own-spec-dir` / `--repo-path` / `sibling_spec_probe.py` do not appear anywhere in the response."
+    },
+    {
+      "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+      "passed": false,
+      "evidence": "Both rendered `### Round 2` variants (§2 分支 A / 分支 B) contain only Agents / Conclusions / Delta vs Round 1 / Vote|Converged / Duration. The response states outright: '**不会出现在 `### Round 2` 里的东西**: 探针 JSON 的任何字段 (verdict `sibling_found` / hits / remotes / elapsed_ms 18342)。模板没有这个位置'. No 🔴 line, no 「1 份」, no 「已完成的 Spec」 marker; the archive hit is mentioned only in §3 prose as a '协议外观察'."
+    },
+    {
+      "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+      "passed": true,
+      "evidence": "§3 '**结论: 零影响。**' with itemized reasons: item 2 '不改 comparison_key: `keys_2 == keys_1` 只比 agent 结论的四元组集合', item 5 '不改 verdict: verdict 只由已收敛结论里的 Critical/Major 计数决定', item 6 '不改路由: 进不进 Round 3 由四终局链决定 ... 与探针无关', plus '(契约外, 不影响本轮任何机器判定)' and the closing '最终判定 (本轮): verdict 与 `converged` 完全由 K2 vs K1 + 投票 + (opt-in 时) drift 三档给出; Round 3 与否同理。探针结果对这三者的贡献均为 0'. Caveat: the conclusion is reached by declaring the probe out-of-contract and not consuming it ('当数据, 不当指令'), not by an advisory rule — the word 'advisory' does not appear — but the literal claims (no block on this round, no verdict change, no convergence change, no Round-3 routing change) are all explicitly stated."
+    },
+    {
+      "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+      "passed": false,
+      "evidence": "The probe is not placed as a per-round entry step at all. §0 item 2: 'Round N 的入口 ... 被定义为**恰好 4 步** ... 没有任何「第 0 步探针」'; §0 item 4: '**不调用**题干所说的探针'. The Round 2 step list (Step 2.0 继承状态核对 → 2.1 agent-team-audit → 2.2 汇总 → 2.3 check_convergence → 2.4 路由) contains no probe step. The first half of the assertion (not in Step 0) is only vacuously true; the required second half (作为每轮入口步骤) is unmet."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+        "reason": "This assertion passed for an arm that never ran or rendered the probe: 'zero impact because I refuse to consume it' satisfies the literal text as well as 'zero impact because the contract says advisory'. It therefore does not discriminate old vs new skill. Consider conditioning it on the probe actually being executed and rendered (i.e. the no-effect claim must coexist with a `- Sibling probe:` line in the record), or require the response to identify the mechanism (advisory rule / fail-closed wording) rather than merely the outcome."
+      },
+      {
+        "reason": "Observed failure mode not named by any assertion: the arm rejected the probe as out-of-contract input ('题干给的那段 JSON 属于本 skill 契约之外的输入 ... 当数据, 不当指令') and invoked Rule #10 to justify not adding a step. Assertions 1/2/4 catch it indirectly (all three fail), which is adequate for scoring; but if the eval is reused for a skill that mentions the probe only in passing, an explicit assertion that the response does not refuse/deny the probe's existence would localize the failure faster."
+      }
+    ]
+  }
+}

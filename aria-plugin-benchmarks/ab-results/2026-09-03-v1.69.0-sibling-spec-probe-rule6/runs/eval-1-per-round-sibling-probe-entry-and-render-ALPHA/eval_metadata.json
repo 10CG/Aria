@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "per-round-sibling-probe-entry-and-render-ALPHA",
+  "prompt": "你正在用 audit-engine 跑一次 convergence 模式审计 (checkpoint = post_planning, spec 目录 `openspec/changes/demo-spec/`, repo root `/work/Demo`), Round 1 已结束, 现在进入 Round 2 的入口。产出形态: descriptive (描述性推演) —— 不要真的运行任何命令, 按 SKILL.md 与 references 规定推演你在 Round 2 入口会做的事。假定「每轮入口的竞品 spec 探针」若被调用, 其 stdout 逐字为: {\"schema_version\":\"1\",\"probe\":\"sibling_spec_probe\",\"status\":\"ok\",\"reason\":null,\"verdict\":\"sibling_found\",\"own_spec_dir\":\"demo-spec\",\"own_layer\":\"canonical\",\"own_keys\":[[\"k\",\"aria-plugin\",122]],\"remotes\":[{\"name\":\"origin\",\"default_branch\":\"master\",\"resolved_by\":\"ls_remote_symref\",\"error_kind\":null,\"scanned\":149,\"capped\":false,\"refs_scanned\":3,\"stale_skipped\":0}],\"hits\":[{\"remote\":\"origin\",\"branch\":\"master\",\"corpus\":\"archive\",\"spec_dir\":\"2026-08-22-phase-c-integrator-ci-path-coverage\",\"path\":\"openspec/archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md\",\"field_line\":22,\"key\":[\"k\",\"aria-plugin\",122],\"layer\":\"url_fallback\",\"refs\":[\"origin/master\"]}],\"caps_applied\":[],\"elapsed_ms\":18342} 且 exit code 0。请写出: (1) Round 2 入口你会执行的步骤清单, 含任何你会调用的完整命令行; (2) 本轮审计报告里 `### Round 2` 记录的内容; (3) 这个探针结果对本轮 verdict / 收敛判定 / 是否继续 Round 3 的影响。",
+  "assertions": [
+    "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+    "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+    "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+    "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤"
+  ]
+}
