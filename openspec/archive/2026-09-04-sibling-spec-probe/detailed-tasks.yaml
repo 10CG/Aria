@@ -22,7 +22,7 @@ metadata:
   total_tasks: 18
   task_groups: 5
   estimated_hours: "55-87"
-  status: "B.2 complete 2026-09-03 — 17/18 done, TASK-018 in_progress (aria v1.69.0 本地 merge + tag 就绪, 推送待 owner 授权 → PR); post_planning R4 CONVERGED 2026-08-31; Amendment A1 (cap 按唯一 blob) 2026-09-03"
+  status: "Shipped 2026-09-04 — 18/18 done (aria-plugin v1.69.0 2eca24b 双远端 + 两 tag; 主仓 PR #191 merged be4417b); post_planning R4 CONVERGED 2026-08-31; Amendment A1 (cap 按唯一 blob) 2026-09-03"
   new_agents_required: false
   agent_roster: [tech-lead, qa-engineer, backend-architect, knowledge-manager]
   estimation_note: >
@@ -572,7 +572,7 @@ tasks:
     parent: "5.2"
     task_group: G5
     title: "发布同步面 (aria 子模块): CHANGELOG + plugin.json (SOT) + 派生文件一致 + 主仓 gitlink + 双推逐 remote 核验 — 档位 = MINOR (2026-09-01 裁定)"
-    status: in_progress
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -605,7 +605,10 @@ tasks:
     notes: >
       B 期 (2026-09-03): 档位 MINOR ⇒ v1.69.0 (含 v1.68.2 PATCH 同批); aria 5 文件 + CHANGELOG `f0083cd` → 本地 --no-ff merge master `2eca24b` + tag v1.69.0 (v1.68.2 = `4c6489c`);
       主仓 16 版本点 (CLAUDE.md :139/:141 / VERSION:24 / README.md :8/:242 / README.{zh,ja,ko}.md :3/:10/:244 / system-architecture.md §2.8 / version-scheme.md) → 1.69.0, gitlink → 2eca24b。
-      **status in_progress**: 推送共享 master 是外向不可撤销动作 —— aria master (7 commit) + tag v1.68.2 / v1.69.0 双推 + 逐 remote ls-remote 核验、主仓 feature 分支推 origin → PR, 均待 owner 显式逐条授权 (memory sync≠push-auth; 决策单 B9-补); 授权后 done。
+      **done 2026-09-04 (owner 授权「1 授权推送」后执行)**: (a) aria master `2eca24b` + tag v1.68.2 / v1.69.0 双推 origin + github, 推前 ancestry 守卫 (两端 d1caa66 均为本地 master 祖先),
+      推后逐 remote `ls-remote` 六项 (2 remote × master + 2 tag) 全 MATCH; (b) 主仓 feature 推 origin 并 ls-remote 核验 → C.2.4 pre_merge gate `verdict=green` (`pr_ci_status=not_applicable`,
+      path coverage 3 workflow / 35 变更文件零 triggering path) → C.2.4.5 前置: gitlink 2eca24b 在两端 REACHABLE (先 ship 子模块后 bump 指针, 无 orphan) → PR #191 → Forgejo 合并 (主仓例外) `be4417b`
+      → 本地 FF + `git push github master` → 两端 ls-remote MATCH; 合并后 gitlink 两端复核仍 REACHABLE。config `audit.checkpoints.pre_merge = off` (owner 配置, 非 AI 豁免) ⇒ 本轮未跑 pre_merge 审计。
       本 Spec Impact 表无版本行 (姊妹 Spec 有); A.2 按 CLAUDE.md §版本管理补本任务.
       多远程推送由 phase-c-integrator §C.2.5 自动化; 手工路径守两条硬约束.
       R1 C2: deliverables 原缺主仓 VERSION / root README badge / i18n ×3, 且「不重译 ⇒ 不动 i18n」会使两条 check 必红; 已按字段 TASK-024 14 点口径 (R3 同步, 含 CLAUDE.md 两点) + 086ee32 实际文件集补齐.

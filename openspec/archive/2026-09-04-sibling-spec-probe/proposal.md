@@ -1,11 +1,18 @@
+---
+unverified_claims:
+  - claim: "建 `aria-plugin-benchmarks/ab-suite/audit-engine.json` (经 /skill-creator 产出; 2 个 eval: α 每轮入口调用探针并渲染进 `### Round N` / β not_established · exit≠0 · 非 JSON ⇒ 渲染「未能核实」不得「无竞品」不阻断 = SC-16; 产出形态 descriptive) + `ab-suite/version.yaml` MINOR 升版 (计数程序化重算)。B.1 前置 (proposal :473); 建不成 ⇒ 不自判豁免, 原样上呈 owner"
+    reason: "symbol 'not_established' unclassified reference form (fail-toward-warn; unclassified_files = ab-results/…/eval-2-…/eval_metadata.json, ab-suite/audit-engine.json — 两者均为 JSON, gate 的符号引用分类器不认 JSON 形态; 该 symbol 在生产代码 aria/skills/audit-engine/scripts/sibling_spec_probe.py 与 references/execution-modes.md 契约节均有真实引用)"
+    symbols: ["not_established"]
+unverified_ack: false
+---
 # Proposal: sibling-spec-probe
 
-> **Status**: 🟡 **Implemented (B.2 done 2026-09-03; aria v1.69.0 本地 merge `2eca24b` + tag, 主仓 gitlink/16 版本点已改; 推送 + PR 待 owner 授权 → C.2 → D)** — 前态: ✅ **Approved (owner 2026-08-30 批准进 A.2/A.3; post_spec R1–R6 已跑, 不再加轮; owner 裁依赖方向 (i): 姊妹纯函数 `lib/linked_issue_field.py` 是本 Spec 硬前置, 已落版)** — A.2/A.3 产物 `tasks.md` + `detailed-tasks.yaml` (18 tasks) 2026-08-30 派生; post_planning R1→R4 **CONVERGED** 2026-08-31 (R4 5/5 PASS), ready for B.1 (硬前置: 字段 Spec 先 ship); P11 扫描范围 ✅ 2026-09-01 技术裁定 = 扩 (决策单 `2026-09-01-a1-entry-h1-h6-technical-rulings-product-vs-technical-split.md` §H3)。决策单 `.aria/decisions/2026-08-30-a1-entry-six-rulings-slug-form-and-no-cjk-only-tokens.md`; R6 聚合 `.aria/audit-reports/post_spec-R6-1788084727388-a1-entry-combined-aggregated.md`。
+> **Status**: ✅ **Complete** — Shipped 2026-09-04 (aria-plugin v1.69.0 `2eca24b`, 含 v1.68.2 `4c6489c`; 双远端 master + 两 tag 核验一致; 主仓 PR #191 merged `be4417b`; Rule #6 AB with 8/8 vs old 3/8, +0.62), archived 2026-09-04 by phase-d-closer
 > **Created**: 2026-08-25
 > **Spec Level**: 2
 > **Linked Issue**: `none` — 本 Spec 由母 Spec 的 owner 裁定 (2026-08-23 方向 b「缩 scope」) 拆出, 无独立 issue 号 (2026-08-30 起按姊妹 Spec 的英文 canonical 写, `关联 Issue` / `无` 仍是合法 alias)。与之相关但**不由本 Spec 关闭**的 issue: `10CG/aria-plugin#135` (认领机制三处缺口 — 属母 Spec 主机制面) 与 `10CG/aria-plugin#150` (Rule #6 兜底对无 AB 套件的 skill 不可执行 — 见 §rule6_note)。
 > **代码落点**: `aria/` 子模块 `skills/audit-engine/`; Spec 落主仓 (Rule #5)
-> **ship target**: 待定 (不与母 Spec 绑定, 见 §依赖方向)
+> **ship target**: ✅ aria-plugin **v1.69.0** (2026-09-04; 档位 MINOR 按 2026-09-01 裁定, 三份串行各占一号)
 > **母 Spec**: [`a1-entry-claim-duplicate-work-guard`](../a1-entry-claim-duplicate-work-guard/proposal.md) —— 本 Spec 承接其 **§4 竞品 spec 探针**整节 + 决策记录 **D7/D11** + 旧 **SC-16/17/18/19**。
 > **拆分依据**: owner 2026-08-23 裁定 2 (方向 b)。母 Spec 三轮 rework 后 post_spec R2 判 REVISE 未收敛 (3C/17M, major 持平), 主控处置建议第 (2) 条「缩 scope — §4 探针 (M-1/M-5 两簇) 与 §1 抽取规则各自独立成小 Spec」经 owner 采纳。R2 聚合: `.aria/audit-reports/post_spec-R2-1787481000000-a1-entry-claim-rewrite-aggregated.md`。
 

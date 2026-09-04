@@ -1,9 +1,9 @@
 ---
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
-phase: B.2 (sibling-spec-probe 17/18 done; TASK-018 in_progress — aria v1.69.0 本地 merge + tag 就绪, 推送 + PR 外向, 待授权)
+phase: D (探针 Spec 已 ship + 归档 2026-09-04, 见周期 handoff `2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md`; 本 doc 保留 B 期账目)
 status: active
-updated-at: 2026-09-03T02:12:54Z
+updated-at: 2026-09-04T12:08:21Z
 ---
 
 # Aria — Session Handoff (2026-09-03) — 探针 Spec `sibling-spec-probe` B 期完成 + aria v1.68.2/v1.69.0 本地就绪 (推送 + PR 外向, 待授权)
@@ -12,7 +12,7 @@ updated-at: 2026-09-03T02:12:54Z
 > **运行实际推翻 Spec 一处**: §6 cap 按 (ref, path) 计数在本仓恒触发 (origin 9 分支 1097 行 > 1000; 唯一 blob 165) ⇒ 每轮恒「未能核实」= 恒红零信息 —— 改为**唯一 blob 计数** (proposal Amendment A1 append-only + 决策单 D6, 数值 1000 不变); 复跑 `status=ok / caps=[]`, 41s。另五条技术裁定 D1–D5 (SC-3 vs §7 verdict 冲突: §7 优先 / v1.68.2 范围 / 分支拓扑 / skill-creator 留痕 / own_keys 空仍扫描)。
 > **产品级待 owner: 零**。**两项外向, 待授权 (逐条)**: (a) aria master 7 commit (v1.68.2 `4c6489c` + v1.69.0 `2eca24b`) + tag v1.68.2 / v1.69.0 双推 (origin + github, 逐 remote `ls-remote` 核验, 只推两个 tag 不 `--tags`); (b) 主仓 `feature/sibling-spec-probe` 推 origin → PR (C.2, Rule #8 gate) → 合并 → D 归档。**(b) 必须在 (a) 之后** (gitlink 2eca24b 先于主仓发布, 否则 orphan gitlink = Aria #165 形状)。
 
-> **Status**: Active — B.2 完成, 停在本地合并态; 下个 session 第一件事 = 拿到授权后执行 (a) → (b) → C.2 → phase-d-closer
+> **Status**: Superseded (2026-09-04) — 本 doc 记 B 期账目; 授权后的 (a)(b) 已执行完毕并归档, 见周期 handoff `2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md`
 > **Cycle period**: 2026-09-03T01:19Z (B.0 认领) → 2026-09-03T02:12:54Z
 > **Next session 入口**: 优先读本 doc → `/aria:state-scanner` 自动恢复 → §6
 
@@ -20,9 +20,9 @@ updated-at: 2026-09-03T02:12:54Z
 
 ## §0 入口 (新 session 优先读)
 
-1. 运行 `/aria:state-scanner`; Phase 1.15 会 surface 本 doc。主仓工作树在 `feature/sibling-spec-probe` (基于 master 49f18bb, 本 session 3 commit 只在本地; 外向, 待授权), aria 在**本地 master `2eca24b`** (= gitlink; 比 origin/master d1caa66 多 7 commit, tag v1.68.2 / v1.69.0 本地), standards 未动 (`ffed204`); `git status` 只应见 ` M aria-orchestrator` (有意停泊 @ 92acce5, 不要 add)。
-2. **不要在 owner 逐条授权外推任何子模块 commit** (决策单 B9-补)。授权后顺序: aria 双推 + 两 tag → ls-remote 三处一致 → 主仓 feature 推 origin → `phase-c-integrator` C.2.4 gate → PR (body 引本 doc + 决策单 D1–D6 + AB 结果) → 合并 → `phase-d-closer` 归档 + release claim。
-3. 本机插件缓存 1.68.1, SOT 1.69.0 ⇒ `plugin-cache-currency` STALE 直到 owner `/plugin update aria@10CG-aria-plugin` (推送后才有 1.69.0 可拉)。
+1. 运行 `/aria:state-scanner`; Phase 1.15 会 surface 周期 handoff `2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md` (全仓最新)。**本段的仓库态已过时**: 09-04 授权后 aria `2eca24b` + 两 tag 已双推核验, 主仓 PR #191 已合并 `be4417b` 并推 github, 探针 Spec 已归档。
+2. **不要在 owner 逐条授权外推任何子模块 commit** (决策单 B9-补) —— 本 cycle 的授权已用完并执行完毕 (顺序: aria 双推 + 两 tag → ls-remote → 主仓 feature → C.2.4 gate green → PR #191 → 合并 `be4417b` → github 镜像 → phase-d-closer 归档 + tracker #192 + claim 释放)。
+3. 本机插件缓存 1.68.1, SOT 1.69.0 ⇒ `plugin-cache-currency` STALE 直到 owner `/plugin update aria@10CG-aria-plugin` (远端 09-04 起已有 1.69.0)。
 4. 排版硬约束不变: 禁带圈数字等小字形 (memory `no-tiny-glyphs`)。
 
 ---
@@ -116,7 +116,7 @@ updated-at: 2026-09-03T02:12:54Z
 /aria:state-scanner
 ```
 
-1. ⭐ **`{id: a1-entry-claim-duplicate-work-guard}`** — 拿到 H1 授权 → aria 双推 + 两 tag + 三处 ls-remote → H2: 主仓 feature 推 → C.2.4 gate → PR → 合并 → github 镜像 → `phase-d-closer` 归档探针 Spec + release claim → owner `/plugin update` 到 1.69.0。类型 C.2 + D, ~1h。
+1. ✅ **`{id: a1-entry-claim-duplicate-work-guard}`** — 已完成 (09-04): H1 + H2 全部执行并核验; 账目见周期 handoff `2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md`。剩 owner `/plugin update` 到 1.69.0。
 2. **`{id: carry-b1-entry-mother-spec}`** — 母 Spec B.1 (同族第三份), 起点 `git merge-tree` 复核 hunk A 冲突 (C8)。~1h 起步。
 3. **`{id: carry-ab-suite-audit-engine-split}`** — M1 拆条 (与其它 eval 改动同批, version.yaml MINOR)。~0.5h。
 4. **`{id: carry-spec-drafter-path-rule5-drift}`** — 上一 cycle Level 1 批次 (含 hunk A 措辞软化, 一次 AB)。~1h。
@@ -158,4 +158,4 @@ updated-at: 2026-09-03T02:12:54Z
 
 **Created**: 2026-09-03T02:12:54Z
 **Session duration**: ~1.5h (01:19Z → 2026-09-03T02:12:54Z)
-**Status**: Active — B.2 完成, 本地合并态; 推送 (a)(b) 外向, 待授权
+**Status**: Superseded (2026-09-04) — B 期账目留存; (a)(b) 已执行完毕, 探针 Spec 已归档
