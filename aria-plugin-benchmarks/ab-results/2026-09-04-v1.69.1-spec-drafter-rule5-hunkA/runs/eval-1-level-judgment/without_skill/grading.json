@@ -1,0 +1,32 @@
+{
+  "expectations": [
+    {
+      "text": "Should judge as Level 1 (Skip) for trivial fix",
+      "passed": true,
+      "evidence": "response.md「## 结论」内含输出块 'LEVEL 1 DETECTED - SKIP SPEC / 此需求为简单修复，建议直接跳过 A.1', 紧随一行加粗判定 '**判定: Level 1 (Skip) —— 不产出 proposal.md, 不产出 tasks.md。**'; 末尾「一句话回答」再次收束 '判为 **Level 1 (Skip)**: 不写 Spec, 直接进入 B.1 建分支修复'。(评分仅基于 outputs/response.md 与 transcript.md; 隔离的 response.INVALID-no-skill-read.md / transcript.INVALID.md 已按指示忽略。)"
+    },
+    {
+      "text": "Should explain why Level 1 was chosen",
+      "passed": true,
+      "evidence": "「## 推演过程 (按 A.1.2 三条判据)」三节 + 综合评分: 【1】'LEVEL_GUIDE.md「Level 1 触发词 (简单修复)」高置信度触发词列表中直接命中 ... `typo` / `fix typo`', 并反向核对 'Level 2 触发词 ... : 「修复」不属功能开发词或增强改进词' / 'Level 3 触发词 ... 全无命中'; 【2】YAML 块内跨模块四条件逐条 '否'; 【3】'无接口变更、无数据结构变更、无行为语义变更 ⇒ 非 breaking change'; 综合评分 'score = 0.4*低 + 0.3*低 + 0.2*低 + 0.1*低 ⇒ score < 3 / 阈值判定: score < 3 → Level 1', 并总结 '三条判据 + 综合评分四者**一致指向 Level 1**'。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should judge as Level 1 (Skip) for trivial fix",
+        "reason": "断言只要求出现 'Level 1'。旧臂与新臂都命中, 且两臂几乎逐段同构 (同样的关键词表、同样的跨模块四否、同样的 score<3), 说明本 eval 对本次改动完全饱和。若继续留在套件里, 应作为回归护栏而非区分项, 并在报告里标注为 non-discriminating。"
+      },
+      {
+        "reason": "本臂输出里出现了一个应当被抓到但无断言覆盖的行为: 「若被升级为 Level 2 时的产出位置 (仅备查)」段写 'Level 2: standards/openspec/changes/{feature}/proposal.md' —— 正是 Aria 不可协商规则 #5 禁止的落点 (项目变更写进共享子模块 standards)。这类『答案主体正确但顺带给出违规路径』的输出目前 2/2 满分通过, 属假绿。"
+      }
+    ]
+  }
+}

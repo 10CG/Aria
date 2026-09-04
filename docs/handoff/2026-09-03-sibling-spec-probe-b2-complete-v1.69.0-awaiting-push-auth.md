@@ -2,7 +2,7 @@
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: D (探针 Spec 已 ship + 归档 2026-09-04, 见周期 handoff `2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md`; 本 doc 保留 B 期账目)
-status: active
+status: done
 updated-at: 2026-09-04T12:08:21Z
 ---
 

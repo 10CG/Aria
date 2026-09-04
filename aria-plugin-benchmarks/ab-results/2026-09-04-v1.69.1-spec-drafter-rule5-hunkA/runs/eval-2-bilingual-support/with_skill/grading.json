@@ -1,0 +1,51 @@
+{
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "「## 0. 输入解析 (双语输入处理)」把输入拆成两行并标语言 ('`Add a dark mode feature` | en' / '`添加深色模式功能` | zh'), 判定 '**这是一个需求, 不是两个**。`/` 在此是「同义翻译对」分隔符而非「并列需求」分隔符 —— 两侧动词 (add / 添加)、名词 (dark mode / 深色模式)、范畴词 (feature / 功能) 逐项对齐 ... 因此**不拆成两个 Spec**, 也不把两侧当成 scope 的两半累加。'"
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "第 5 节 A.1.4 的 ```markdown 代码块内是完整英文 proposal: '# Dark Mode' / '## Why' ('The product currently ships a single light theme...') / '## What' / '### Key Deliverables' / '## Impact' / '## Framework Constraints' / '## Tasks' / '## Success Criteria', 正文无中文残句; 并在第 0 节显式声明 '交付语言 = 英文 ... proposal.md 正文、章节标题、Tasks / Success Criteria **全英文**', 目录名取 ASCII kebab-case `dark-mode`。"
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "'语义差集为空 → 无信息需要合并 ... 本例逐项核对后差集为空, 故 What 不需要从中文侧补写'; proposal 的 What 段覆盖双语两侧共同意图 (dark color theme + theme resolution + user-visible switch + persistence + component migration), Feature Name 取自 '双语对共同名词' (`dark-mode`)。无一侧信息被丢弃。"
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": true,
+      "evidence": "outputs/response.md:121 逐字为 `> **Linked Issue**: \\`none\\``。cat -A 核验行内容为 '> **Linked Issue**: `none`$' —— 行首无空白, `>` 后恰一空格, 英文 canonical 拼写 (非 `关联 Issue` / `Related Issue`), 位于头部 blockquote 内 Level→Status→Created 之后 (:118-121)。"
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": true,
+      "evidence": "同一行的值为 inline code span `none` (反引号包裹, 非 markdown 链接、非 `N/A`、非空、非 `{<org>/<repo>#<n>}` 占位)。第 6 节【2】进一步说明该哨兵语义: '草稿里按规范逐字写了 `none`。这个哨兵的正确含义是「**已核实**无关联 issue」 ... 注意 `N/A` / `TBD` / `-` / 留空 / 删行都不合规, markdown 链接形也会被判 `NO_TOKEN`。'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "没有任何断言检查 proposal 的落点路径, 而两臂恰恰只在这里分叉 —— 本臂写 'openspec/changes/dark-mode/proposal.md ... **不要**写成 `standards/openspec/changes/dark-mode/` ... (Aria 不可协商规则 #5)', 对照臂写 'Location: standards/openspec/changes/dark-mode/proposal.md'。本 eval 生成的正是 Level 2 proposal, 天然带路径落点, 加一条路径断言几乎零成本且直接命中本次被测 hunk。"
+      },
+      {
+        "assertion": "Should correctly parse mixed Chinese/English input",
+        "reason": "'correctly parse' 无可证伪判据 —— 一个只读英文侧、完全无视中文侧的回答也能被判『解析正确』。建议钉到可观测事实: 必须显式陈述两侧是同一需求的中英表述 (而非两条并列需求), 或指出两侧语义差集。"
+      },
+      {
+        "assertion": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+        "reason": "断言 4/5 (Linked Issue 字段) 在旧 skill 快照里已成文 (snapshot SKILL.md 同样要求该字段与 `none` 哨兵), 因此两臂必然同过。作为回归护栏有效, 但对本次 hunk 无区分力, 报告中宜标注 non-discriminating, 以免『5/5 满分』被读成本次改动的收益。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "expectations": [
+    {
+      "text": "Should judge as Level 1 (Skip) for trivial fix",
+      "passed": true,
+      "evidence": "response.md 「## 结论」首行逐字: '**Level 1 (Skip) —— 不创建 Spec, 跳过 A.1, 直接进入 B.1。**'; 并在「本次判定的标准输出」复用 skill 的 Level 1 输出块 'LEVEL 1 DETECTED - SKIP SPEC ... 📋 推荐操作: 直接进入 B.1 (分支创建) 开始开发'。另附「因此不产出的东西」表逐条否定 proposal.md / tasks.md / openspec validate, 与 Skip 语义自洽。"
+    },
+    {
+      "text": "Should explain why Level 1 was chosen",
+      "passed": true,
+      "evidence": "「## 判断依据 (按 A.1.2 三步推演)」给出四层理由: (1) 关键词表 —— '`typo` | LEVEL_GUIDE.md「Level 1 触发词 · 高置信度触发词」首条', 并做反向核对 'Level 2 触发词表 ... **零命中**' / 'Level 3 触发词表 ... **零命中**'; (2) 影响范围 —— 跨模块四条件逐条否定 ('涉及 2 个及以上模块 —— 否', '修改 shared/ 目录 —— 否', '需要 API 契约变更 —— 否', '影响多个子模块 —— 否'); (3) 变更类型 '文案/文档格式修复, 非行为变更 ... Breaking change: 否'; (4) 评分代入 'score = 0.4 + 0.3 + 0.2 + 0.1 = **1.0**, 远低于 3 → **Level 1**'。还辨析了常见误判: 'LEVEL_GUIDE 的示例 \"Add simple authentication feature\" 之所以升到 Level 2, 靠的是 **`feature` 这个功能开发词**, 不是 `authentication` 这个领域名词'。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should explain why Level 1 was chosen",
+        "reason": "「解释为什么」没有可证伪判据 —— 任何一句 'because it's a trivial typo' 都能通过, 两臂因此同分。建议改成点名式: 必须引用命中的 Level 1 触发词 (`typo`) **并**显式给出 Level 2/Level 3 触发词的反向零命中核对, 才算解释成立。"
+      },
+      {
+        "reason": "本 eval 对被测 hunk (Rule #5 路径落点) 零区分力, 但两臂在输出里确实分叉且无人检查: with_skill 主动写出 '一旦后续复核把等级抬到 Level 2/3, proposal 必须落到**消费方项目自己的** `openspec/changes/`, 不能写进 `standards/openspec/changes/`', 而 without_skill (旧 skill) 的「若被升级为 Level 2 时的产出位置 (仅备查)」段照抄旧路径 'Level 2: standards/openspec/changes/{feature}/proposal.md'。建议加一条断言: 若回答提及 Level 2/3 的产出路径, 该路径必须是消费方项目的 `openspec/changes/` 而非 `standards/openspec/changes/` (不提及则不适用)。"
+      }
+    ]
+  }
+}

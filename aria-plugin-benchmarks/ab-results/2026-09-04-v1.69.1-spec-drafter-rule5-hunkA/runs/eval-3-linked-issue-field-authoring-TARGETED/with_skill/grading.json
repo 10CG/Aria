@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "response.md:15-18 头部 blockquote 第 4 行逐字为 `> **Linked Issue**: `none`` (cat -A 确认 `> **Linked Issue**: \\x60none\\x60$`, 无前导空白, `>` 后恰一个空格, ASCII 冒号, 英文 canonical 拼写)。"
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "该行值为 inline code span 且逐字 `none` —— response.md:18 `> **Linked Issue**: \\x60none\\x60`; 正文另有说明 \"已核实无关联 issue ⇒ `Linked Issue` 值逐字写 `none`, 不留空、不删行 (`N/A` / `TBD` / `-` 不是哨兵)\" (response.md:7)。未留空、未用 N/A/TBD/占位串。"
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "全文 grep `](http` 零命中 (整份 response.md 无任何 markdown 链接), Linked Issue 行值非链接形且非空。"
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": true,
+      "evidence": "response.md:15-18 顺序为 `> **Level**: Minimal (Level 2 Spec)` → `> **Status**: Draft` → `> **Created**: 2026-09-04` → `> **Linked Issue**: `none``, 四行连续、含显式 `> **Created**:` 行, 与 SOT 模板 proposal-minimal.md 一致。"
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "grep -i `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名零命中。唯一含「关联」的一处是散文 \"已核实无关联 issue\" (response.md:7), 不是字段名; 头部字段名只有 Level/Status/Created/Linked Issue 四个。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+        "reason": "该断言被 #2 蕴含: 值一旦逐字为 inline code span `none`, 就不可能同时是 markdown 链接形或空值。两臂均自动满足, 零区分力。若想测链接形回避, fixture 需给一个真实 issue 号 (值非 `none` 时才有构造链接形的动机)。"
+      },
+      {
+        "reason": "本 eval 在本 iteration 两臂 5/5 全过 (OLD-SKILL 臂逐字写出 `> **Linked Issue**: `none`` 并主动排除 N/A/TBD/-), 即目标行为在旧版 SKILL.md 里已被「proposal.md 头部字段要求」段覆盖 ⇒ 该 eval 对本次 hunk 无区分力。建议把靶心移到旧版没覆盖的分支: 例如「题干给出 issue 号且给的是 URL 形」时是否被规范成 `<org>/<repo>#<n>` code span、或多 issue 是否写在同一个 code span 内。"
+      },
+      {
+        "reason": "没有任何断言检查 Level 2 判定的产出物边界 (只出 proposal.md、不出 tasks.md)。两臂都做对了, 但一个把 tasks.md 也吐出来的错误输出仍能 5/5 通过。"
+      }
+    ]
+  }
+}

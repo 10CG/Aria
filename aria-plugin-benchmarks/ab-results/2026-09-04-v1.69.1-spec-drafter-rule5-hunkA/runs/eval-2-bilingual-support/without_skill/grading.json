@@ -1,0 +1,47 @@
+{
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "「## 0. 输入解析 (双语)」表: '结构判定 | **同一需求的中英双语表述**, 不是两条独立需求 (`/` 是语言分隔符, 不是需求分隔符)'; 逐侧给出语义 ('英文侧语义 | Add a dark mode feature → 新增功能 (add / feature)' / '中文侧语义 | 添加深色模式功能 → 新增功能 (添加 / 功能)') 与一致性判定 '✅ 一致 —— 「dark mode」≡「深色模式」, 「feature」≡「功能」'。"
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "「### proposal.md (正文, English)」下的 ```markdown 块为完整英文 proposal: '# Dark Mode' / '## Why' ('Users spend long sessions in the app, including in low-light environments...') / '## What' / '### Key Deliverables' / '## Impact' / '## Constraints' / '## Tasks' / '## Success Criteria', 无中文残句; 第 0 节表格明写 '**产出语言** | **English** (用户显式要求「请生成英文 proposal」)' 与 'proposal 正文全英文, 不留中文残句'。"
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "'双侧合并意图 | 为应用增加深色主题 (dark theme), 用户可在浅色 / 深色之间切换, 并可跟随系统外观'; 并给出取值原则 '两侧语义一致时取**并集**填充 Why/What (避免只读一侧丢信息)'。proposal What 段的 6 项 scope (theme tokens / dark palette / theme resolution / persistence / settings UI / surface coverage) 与双语两侧的『添加深色模式功能』意图一致, 无一侧信息丢失。"
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": true,
+      "evidence": "outputs/response.md:112 逐字为 `> **Linked Issue**: \\`none\\``。cat -A 核验为 '> **Linked Issue**: `none`$', 处于头部 blockquote 第 4 行 (:109-112, Level→Status→Created→Linked Issue), 用英文 canonical 拼写; 「头部字段自检」表另有一行 '新写用英文 canonical (不写中文 alias `关联 Issue`) | 用 `Linked Issue` | ✅'。"
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": true,
+      "evidence": "值为 inline code span `none`, 非占位符/空值/`N/A`/链接。自检表: '无关联时逐字写 `none` (不用 `N/A` / `TBD` / `-` / 留空) | 输入未给任何 issue 号 ⇒ 取 `none` | ✅' 与 '值为 inline code span 形, 非 markdown 链接 | `none` | ✅'; 并说明 '用户的提示词里没有出现任何 tracking issue (无 `#n`、无仓库名), 所以这里**不是「先留占位符」**, 而是按「无关联 (已核实)」写死 `none`'。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "本臂以 5/5 满分通过, 却在 A.1.4 预览框里写出 'Location: standards/openspec/changes/dark-mode/proposal.md' —— 把项目自身的功能变更落到共享子模块 standards, 正是 Aria 不可协商规则 #5 禁止的行为, 也正是本次被测 hunk 要修的病。断言集完全看不见它, 是本 eval 最大的覆盖缺口: 建议追加『proposal 落点必须是消费方项目的 `openspec/changes/{feature}/proposal.md`; 出现 `standards/openspec/changes/` 即失败』。"
+      },
+      {
+        "assertion": "Should preserve the feature intent from both language inputs",
+        "reason": "'preserve the feature intent from both language inputs' 在两侧互为翻译时是恒真的 —— 只读一侧也能保住全部意图。要让它有判别力, 输入应改成两侧信息不对称的双语对 (例如中文侧多一句「跟随系统」), 再断言该单侧约束出现在英文 proposal 里。"
+      }
+    ]
+  }
+}

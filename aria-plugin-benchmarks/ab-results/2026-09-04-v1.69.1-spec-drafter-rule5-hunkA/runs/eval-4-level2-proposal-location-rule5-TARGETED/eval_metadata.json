@@ -1,0 +1,11 @@
+{
+  "eval_id": 4,
+  "eval_name": "level2-proposal-location-rule5-TARGETED",
+  "prompt": "我在一个采用了 Aria 方法论的项目 `todo-web` 里工作 (仓库根有自己的 `openspec/` 目录, 另有一个 `standards/` 子模块是从 aria-standards 引入的共享规范)。请用 spec-drafter 为「给任务列表加一个按截止日期排序的选项」起草一份 Level 2 proposal。产出形态: descriptive (描述性推演) —— 不要真的创建文件、不要运行 git 或任何脚本。请在回答里写明三件事: (1) 这份 proposal.md 应该落在哪个完整相对路径; (2) 为什么是那个路径而不是另一个候选; (3) proposal.md 全文。",
+  "assertions": [
+    "给出的落点路径是项目自己仓内的 `openspec/changes/<feature>/proposal.md` (feature 名可自拟), 且**不是** `standards/openspec/changes/...`",
+    "全文任何位置都没有把 `standards/openspec/changes/` 当作本次 proposal 的落点推荐 (作为反例点名说明「不该写那里」不算违反)",
+    "对 (2) 给出的理由点到「standards 是共享子模块 / 项目自己的变更归项目自己」这层语义 (Aria 不可协商规则 #5), 而不是只给路径不解释",
+    "proposal.md 全文头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首, 且值是 inline code span `none` (题干未给 issue 号)"
+  ]
+}
