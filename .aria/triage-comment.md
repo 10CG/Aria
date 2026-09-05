@@ -1,6 +1,6 @@
 ## Triage Report
 
-**Verdict**: `confirmed` | **Severity**: `critical` | **Recommended Action**: `next-cycle`
+**Verdict**: `partial-repro` | **Severity**: `major` | **Recommended Action**: `next-cycle`
 
 ---
 
@@ -8,47 +8,57 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | `1.65.4` |
-| Current | `1.65.5` |
-| Gap | behind 1 patch (v1.65.5 仅同步陈旧注释计数, 零行为变更) |
+| Reported | (未报, 以 Kairos dogfood 现象提出) |
+| Current | `aria-plugin 1.69.1` |
+| Gap | n/a |
+
+现象在当前版本仍在产生 (本容器 2026-09-05 的 handoff 仍写 `aria-runner-bot/bfe8285d`), 不是过期报告。
 
 ### Code Path
 
-- `hooks/secret-guard.sh` `has_filter` 计算区 (`:318-:400`) — 全部 credit 判据对**整条 `$command` 字符串**求值, 无分段。
-- `:653` `if [[ $has_filter -eq 0 ]]` — 单一全局开关控制**所有** 141 条 pattern 的拦截与否。
-- 结论: 命令任一位置出现 credit 串 ⇒ 该命令的**全部**段落免疫**全部** pattern。
+- issue 引用的 `docs/decisions/DEC-2026-09-04-git-identity-scope.md` 是 Kairos 仓文件, Aria 仓内不存在 (已按本机 Kairos checkout 读取核对, 裁定内容与 issue 描述一致)。
+- 实际涉及的 Aria 侧代码:
+  - `aria/skills/state-scanner/lib/collision.py` — `split_owner_container` / `track_to_claim_record` / `classify_claims` / `classify`
+  - `aria/skills/state-scanner/lib/identity.py` — `get_owner()` = git `user.email` local-part, `get_container_id()` = `~/.aria/container-id` 的 label-over-uuid
+  - `aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py:518` 与 `scripts/renderers/track_board.py:412` — 同样经 `split_owner_container` 分组/贴标签
+  - 规范: `standards/conventions/session-handoff.md §2.3` (`owner-container` = `<owner>/<container-id>`, 两段式) 与 §2.3.5 (cross-owner / self-multi-container 判据)
 
-### Reproduction
+### Git History
 
-**Mode**: `auto` | **Hit rate**: `5/5`
-
-| case | 形态 | 实测 |
-|------|------|------|
-| case-1 | 对照: `cat /opt/.env` 单条 | exit=2 ✅ 单命令路径无缺陷 |
-| case-2 | `cat /opt/.env; echo hi >/dev/null` | **exit=0** — `.env` 读被完全无关的一段掩护 |
-| case-3 | `nomad var put p1 @f1 >/dev/null; nomad var put p2 @f2` | **exit=0** — 第二条零保护 |
-| case-4 | `vault read secret/x; nomad var put p @f >/dev/null` | **exit=0** — 跨 pattern 家族同样泄漏 |
-| case-5 | 管道 `\| head -5 >/dev/null` 与 `&& echo done >/dev/null` | **exit=0** ×2 — 非仅分号, `\|` 与 `&&` 同受影响 |
-
-### 为什么定 `critical`
-
-1. **它使 #170 的修复在最常见形态下失效** — case-3 的第二段正是 #170 的泄漏形态本身。v1.65.4 花了四轮审计加的那条 pattern, 在「一次写多个 var」这一日常写法下等于没加。
-2. **影响面是全部 141 条 pattern, 不是某一条** — case-4 证实跨家族。`.env` / SSH key / vault / cloud secret manager 全部可被同一手法绕过。
-3. **触发门槛极低** — AI 与运维脚本天然大量使用 `a; b`、`a && b`、`a | b`。只要任一段带 `>/dev/null` / `-o /dev/null` 等 credit, 整条命令免疫。
-4. 非 `critical` 的唯一理由是 hook 自述为 speed-bump 且 PostToolUse `secret-scan.sh` 是第二道防线 —— 但后者在工具执行**之后**运行, 值已进上下文, 只能告警不能阻断。**纵深防御可, 替代不可**。
-
-### 补充: 这不是回归, 是自始存在
-
-该性质自 secret-guard 从 SilkNode cherry-pick 引入 (`e8e847c`) 即存在, 历次 audit (Round 1-4 + 后续迭代) 均未触及。它在 #170 cycle 中被连续三方独立命中, 是因为那次有两版豁免设计**建立在「判定作用于单命令」的错误假设上**, 实测才把地基暴露出来。
-
-### 已有的现状锁定
-
-`hooks/tests/secret-guard.test.sh` 有一条 `KNOWN-LIMIT` 用例锁定 case-3 形态 (`expected=0`)。**本 issue 收口后该用例会转红**, 届时须同步更新为 `expected=2` —— 这是设计好的提示信号, 不是回归。
+无 cited file 落在 Aria 仓, Step 4 跳过。相关引入点: `split_owner_container` 由 aria `83a1a45` (2026-05-30, #133 TASK-000) 引入, 自始按三段式 `owner/container/session` 解析。
 
 ### In-flight
 
-无相关 PR / 本地分支 / worktree。
+| Category | Matches |
+|----------|---------|
+| Remote PRs | none |
+| Local branches | none |
+| Worktrees | 仅主 worktree |
+
+同族已有票: **aria-plugin #135 缺口 3** (open, 2026-08-08)「容器身份字符串不稳定, 碰撞检测分组键不可靠」— 讲的是 container 段来源不稳 (主机名 vs uuid)。#193 新增两点: owner 段随 git 身份漂移; AI runner 提交身份规范询问。本 triage 又加一点: parser 格式契约错位 (见下)。三者同族, 不重复, 建议一并处置。
+
+### Reproduction
+
+**Mode**: `auto` | **Hit rate**: `2/5` (现象命中 2, 机制推断 3 条与实测偏离)
+
+| case | 输入 | issue 预期 | 实测 | match |
+|---|---|---|---|---|
+| case-1 | 全部 handoff frontmatter 按容器分组 | bfe8285d 双串 | ✅ `simonfish/bfe8285d` 34 份 (07-05..08-27) + `aria-runner-bot/bfe8285d` 2 份 (09-03..); 漂移点钉在 08-26/08-27 之间。**对方容器 023236f2 也双串** (`aria-runner-bot/…` 23 份 07-05..08-16, `simonfish/…` 17 份 07-03..09-05, 方向相反) — 类级现象 | true |
+| case-2 | `classify([simonfish/bfe8285d, aria-runner-bot/bfe8285d])` 同 track active | cross_owner | **self_multi_container 🟡** | false |
+| case-3 | `classify([alice/aaaa1111, bob/bbbb2222])` 真两人两机 | cross_owner | **self_multi_container 🟡** (真撞车被降级) | false |
+| case-4 | `classify([simonfish/bfe8285d, simonfish/023236f2])` 同人两机 | self_multi_container | **none** (漏报) | false |
+| case-5 | 同 case-3 但喂三段式 `alice/aaaa1111/s-1` | cross_owner | cross_owner | true |
+
+**Deviation note**: 现象成立, 但机制不是 issue 推断的「双串 → cross_owner」。`split_owner_container` 假定三段式 `owner/container/session`, 而 handoff frontmatter 按规范是两段式 `<owner>/<container-id>` (仓内 142 份两段, 12 份零段, 0 份三段)。两段串被解析成 `(owner='', container=<owner 段>, session=<uuid>)` → owner 恒 `unknown` → `cross_owner` 分支从 handoff 数据**永远不可达**; 于是同容器双串 → 🟡, 真两人撞车 → 也是 🟡, 同人两机 → none。即 collision 分类在 owner 漂移之前就已系统性失灵, 漂移只是让它更不可解释。当前 live snapshot 的 `collision.groups=[['dev-claude','simonfishgit/dev-claude']] kind=self_multi_container` 与此一致 (零段与两段串混判)。
+
+### Verdict Rationale
+
+1. issue 的两个具体角度, 回答如下:
+   - **看板对 owner 串漂移有无处置路径**: 目前没有, 而且比「没有」更差 — 因为格式契约错位, 看板连 cross-owner 与 self-multi-container 的基本区分都做不到 (case-3/4)。修法顺序建议: 先把 parser 对齐规范的两段式 (或规范改三段, 二选一, 有测试锁定); 再以 **container uuid 为同一性主键** (与 #135 缺口 3 的建议一致), owner 段只作显示; 同一 container 出现多个 owner 段时给出显式「同容器多 owner 串」advisory 而非静默归类。
+   - **历史文档口径**: 不 rewrite (与 Kairos 裁定一致); 分类器按 container 主键合并后, 历史双串自然归到同一容器, 不需要改文档。
+2. **身份规范询问**: Aria 现行规范只定义了 `<owner>` = git `user.email` local-part (session-handoff.md §2.3), 即语义上是「提交身份」不是「人」; **Aria 没有任何 AI runner 该用什么 git 身份提交的规范** (standards/conventions 与 CLAUDE.md grep 无命中)。与 Aether 人机两账号模型的对齐、AI runner 是第三类还是归入机账号, 属 owner 决策, 建议作为同一 Level 2 Spec 的一条决策项一起裁, 本 triage 不预设。
+3. 严重度 `major`: 多终端协调的唯一 advisory 信号两个方向都不可信 (真撞车降级、同人多机漏报), 但无数据损坏、单终端作业不受影响。`next-cycle`: 需要 Level 2 Spec (代码 + 规范 + 测试三件套), 不是 hotfix 体量; 与 aria-plugin #135 缺口 3 合并处置最省。
 
 ---
 
-*Generated by `/issue-triage` v1.65.5 — Ref: 10CG/aria-plugin#128*
+*Generated by `/issue-triage` v1.69.1 — Ref: 10CG/Aria#193 — 草稿, 未发帖*
