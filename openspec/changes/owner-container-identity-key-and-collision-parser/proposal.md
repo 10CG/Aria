@@ -1,11 +1,11 @@
 # owner-container 身份键与 collision 解析器修正 (合并处置 Aria #193 + aria-plugin #135 缺口 3)
 
-> **Level**: Minimal (Level 2 Spec) — **owner 2026-09-05 指令为 Level 2**。执笔按 SOT 判据 (`standards/core/ten-step-cycle/phase-a-spec-planning.md:126-137`, 三项性质任一为 Yes → Level 3) 逐项自评: architecture = **否** (不引入新原语, 改一个 collector 内部判定 + lib 函数的输入契约); cross-module = **是** (aria 子模块 + standards 子模块, `identity.py` 语义面被 claim 目录结构共同消费); breaking = **否** (`collision.kind` 枚举取值不变, snapshot 字段 additive, §2.3.5 判据变更经 owner 决策点显式裁定)。**按流程图 cross-module 即 Level 3** —— 执笔结论: 判据上是 Level 3。owner 维持 Level 2 即为显式 override (Rule #10), 请在批准时二选一并回填本行。
-> **Status**: Draft **v6** — **post_spec R5 (max_rounds) 五席全票 PASS, 0 Critical / 0 Major**; 严格收敛判据 (比较键集合 R5≠R4) 未满足 ⇒ 终局 MAX_ROUNDS_EXHAUSTED; **owner 2026-09-05 裁定: 接受当前结论** (`overridden_by_user=true`, verdict PASS)。post_spec 闸门关闭; 余下 Level / D-0 / D-1+D-2 / D-3 待 owner 裁定后回填。v6 = R5 后定点 minor 编辑 (五席一致的 6 条, 不动判定模型 / 决策点 / SC 集合), 2026-09-05; R1..R5 聚合见 §References。v3 起为纯输入确定性规则 (v2 等价类已撤销), 判定模型自 v3 未变 (R3/R4 三席独立复现一致)。
+> **Level**: Full (Level 3 Spec) — **owner 2026-09-05 裁定升 Level 3** (判据: cross-module 成立, aria + standards 两子模块; 决策单 `.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`)。Level 3 交付 = 本 proposal + `tasks.md` (A.2) + `detailed-tasks.yaml` (A.3) + post_planning 收敛审计。
+> **Status**: **Approved (owner 2026-09-05)** — post_spec R1–R5 (R5 五席全票 PASS 0C/0M; 严格键集合未稳定 ⇒ MAX_ROUNDS_EXHAUSTED, owner 裁定 [1] 接受, `overridden_by_user=true`); 四项决策点已裁 (Level 3 / D-0 a / D-1 a / D-2 a / D-3 a, 决策单同上), **v7 = 裁定回填** (条件任务 T9/T13 转正); 下一步 A.2/A.3。R1..R5 聚合见 §References。
 > **Created**: 2026-09-05
 > **Linked Issue**: `10CG/Aria#193, 10CG/aria-plugin#135`
 > **Track / claim**: `owner-container-identity-key-and-collision-parser` (phase A claim `s-8204@1355`, container `bfe8285d`, linked_issue `10CG/Aria#193`, overlap 告警空)
-> **代码落点**: `aria/` 子模块 (state-scanner `lib/collision.py` `lib/identity.py` `lib/constants.py` (仅 D-3(a)) `scripts/collectors/handoff_multibranch.py` `scripts/renderers/track_board.py` `scripts/phase1_gate.py` `scripts/release_gate.py` + references; phase-d-closer `tests/test_fetch_gate.py`) + `standards/` 子模块 (session-handoff.md §2.3); Spec 落主仓 (Rule #5)
+> **代码落点**: `aria/` 子模块 (state-scanner `lib/collision.py` `lib/identity.py` `lib/constants.py` `scripts/collectors/handoff_multibranch.py` `scripts/renderers/track_board.py` `scripts/phase1_gate.py` `scripts/release_gate.py` + references; phase-d-closer `tests/test_fetch_gate.py`) + `standards/` 子模块 (session-handoff.md §2.3); Spec 落主仓 (Rule #5)
 > **Triage 依据**: `.aria/triage-report.json` / [#193 comment 21431](https://forgejo.10cg.pub/10CG/Aria/issues/193#issuecomment-21431) (partial-repro / major / next-cycle)
 > **冻结语料**: `.aria/repro/handoff-tracks-frozen-2026-09-05.json` (起草日 `tracks_multibranch.tracks[]` 非 legacy 行, 996 行, 已纳入版本控制; 实验表与 SC-6 都对它跑)
 > **相邻在飞 Spec**: [`a1-entry-claim-duplicate-work-guard`](../a1-entry-claim-duplicate-work-guard/proposal.md) (对方容器 `023236f2`, 待 B.1) — 其 §3 已把「`owner-container` 与 claim container 段口径不同, 两标识关系需成文」记为 follow-up 且明示不在其内统一; 本 Spec 即该 follow-up。**两处耦合**: (1) `identity.py` flip 与其 SC-3 (§Impact 排序); (2) 其 track-id 含 `<container_uuid>` 段, 与本 Spec 的同 track 分组正面冲突 (决策点 D-0)。
@@ -38,9 +38,9 @@
 - **T3b 迁移检查 (两态, 不进 `identity.py`)**: 挂 `phase1_gate.py` (它在 `:486` 已解析 `Identity` 并显式传入 `acquire_claim` `:773`) 与 `release_gate.py` (今天零 identity 耦合, `release_claim_by_track` 内部重解析 ⇒ 需 import identity + `get_container_label()` + `read_claims` 枚举 + 传 `identity=` 覆盖)。**S1 语义** = 纯 inventory 告警: label 非空 → 告警并列出 `claims/<label>/` 下 active 数, **无抑制**。**S2 语义** = 发布门: 该检查是 flip 发布前置 (检查不过则本次发布不含 flip), 不是运行时开关 (静态语义无法按进程「拒绝」)。
 
 **D2 — 规范成文 (standards, `session-handoff.md §2.3`)** — 判据用标准自身定义的词写, 不引用 aria 代码; **不引用任何 Lab 私有文档**:
-- §2.3.1 `owner-container` 行改写为三态 + 规则: `<owner>` 语义按 D-1, 并注明取值可为 `unknown` (git 未配置 email); `<container-id>` = `~/.aria/container-id` 的 **uuid 字段** (v1.22.x+ 有该文件的机器; label 不参与); 无该文件的历史行 = 主机名; 只读 fs 兜底 = hostname。**在此定义 `identity_key`**: 8 位小写 hex 形 ⇒ 该串; 否则 ⇒ `<owner>/<container-id>`。D-0(a) 时加一句 track-id 尾段 `-<8hex>` 的族键语义, **显式限定**「仅用于 §2.3.5 Layer H collision 分组; 不改变 §2.3.8.2 carry-id 与 frontmatter `track-id` 同串的规则, 不用于 Layer L claim 匹配」。
+- §2.3.1 `owner-container` 行改写为三态 + 规则: `<owner>` 语义按 D-1, 并注明取值可为 `unknown` (git 未配置 email); `<container-id>` = `~/.aria/container-id` 的 **uuid 字段** (v1.22.x+ 有该文件的机器; label 不参与); 无该文件的历史行 = 主机名; 只读 fs 兜底 = hostname。**在此定义 `identity_key`**: 8 位小写 hex 形 ⇒ 该串; 否则 ⇒ `<owner>/<container-id>`。按 D-0(a) 裁定加一句 track-id 尾段 `-<8hex>` 的族键语义, **显式限定**「仅用于 §2.3.5 Layer H collision 分组; 不改变 §2.3.8.2 carry-id 与 frontmatter `track-id` 同串的规则, 不用于 Layer L claim 匹配」。
 - §2.3.5 判据表 (**实质变更**, 对采用方是行为变更, 在 standards 变更说明 + aria CHANGELOG 明示): `cross-owner` = 同 track ≥2 个 `identity_key` 且**非空、非 `unknown`** 的 `<owner>` 集合 ≥2 → 🔴; `self-multi-container` = ≥2 个 `identity_key` 且该集合 ≤1 → 🟡; 新增 **`same-identity-multi-owner`** = 同一 `identity_key` 在**采用方仓的 handoff 全集 (跨 track、跨分支)** 出现 ≥2 个非空非 `unknown` `<owner>` → ⚪ 信息级 advisory, 不计入 collision。
-- **新增 §2.3.9**「AI runner 提交身份」(§2.3.7/§2.3.8 已占用): 按 D-2 裁定写 Aria 侧规则; 只写「采用方的人机账号治理与容器 `git config` 供给不在本规范」。10CG Lab 内部指针 (Aether 两账号模型) 放主仓 `docs/decisions/` 决策单 (D 期), 不进 standards。
+- **新增 §2.3.9**「AI runner 提交身份」(§2.3.7/§2.3.8 已占用): 按 D-2 裁定 (a) 写: 「AI runner 会话的 git 提交身份统一为机器身份, `user.email` local-part 与采用方机器账号名一致; 操作者可追溯性由 `<container-id>` + handoff 承担」; 只写「采用方的人机账号治理与容器 `git config` 供给不在本规范」。10CG Lab 内部指针 (Aether 两账号模型) 放主仓 `docs/decisions/` 决策单 (D 期), 不进 standards。
 - 历史 handoff **不 rewrite** (与 Kairos DEC-2026-09-04 一致)。
 
 **D3 — 漂移 advisory (aria)**
@@ -65,7 +65,7 @@
 
 D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-runner-bot, simonfish]` · `bfe8285d: [aria-runner-bot, simonfish]`。**结论**: 真实语料里没有真正的两人撞车; 修后两组 🟡 都是 2026-05..07 的 stale 行 (#182 形态), SC-6 机械归因。
 
-## 决策点 (owner; 未预设; D-0 须在 B.1 前裁定, 其余裁定后回填 D2)
+## 决策点 (owner 2026-09-05 已全部裁定; 选项与后果保留为记录)
 
 **D-0 与 a1-entry 的 track-id 契约冲突 (R2 tech-lead C-1)** — a1-entry 把 A.1 派生串定为 `<spec-slug>-<container_uuid>` 并规定它就是 carry-id; `session-handoff.md §2.3.8.2` 要求 carry-id 与 frontmatter `track-id` 同串 ⇒ 两容器对同一 Spec 写出的 handoff 落**不同** `track_id`, 本 Spec 的全部判定 (在 `track_id` 内, `collision.py:367`) 对 A.1 认领的 Spec 恒 `none`。
 - (a) **本 Spec 加 Layer H track 族键**: `track_to_claim_record` 对 `track_id` 尾段 `-[0-9a-f]{8}$` 纯形状剥离 —— Aria 侧可独立落地, 行内确定, 不改 a1-entry 契约。后果: §2.3.1 多一句尾段语义; 日期形尾段会被剥 (已知限制, 语料上零合并); 两容器各自认领同一 Spec 时 Layer H 仍能报 🔴/🟡。
@@ -73,22 +73,26 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 - (c) **接受 A.1 认领的 Spec 不走 Layer H collision**, 只靠 Layer L overlap。后果: Layer H 对新 Spec 失去 🔴/🟡, 只剩接棒功能。
 - (d) **两 Spec 合并为一个 Spec 处理**。后果: 范围膨胀到 40+ 任务, 且需对方容器让渡 claim; 不建议。
 - 执笔建议: (a), 并在 Aria #174 留言征求 a1-entry 侧意见。
+- **✅ 裁定: (a)**。T9 转正式任务; #174 留言改为「告知」(不改对方契约)。
 
 **D-1 `<owner>` 段语义** (与 D-2 **耦合**, 请一起裁)
 - (a) **提交身份** (现状: git `user.email` local-part; 机械可得, 零配置)。后果: 同一人换 email 就是另一个 owner 串 ⇒ 与其他容器并存时判 🔴 (需人读 ⚪ 才知是漂移); D-2(a) 生效后新漂移停止, 历史双串靠「不 rewrite + dedupe 取最新行」淡出。
 - (b) **人** (需 `owner-map`)。后果: 不受漂移影响; 引入常驻维护面, 跨采用方不可移植。
 - 执笔建议: (a)。
+- **✅ 裁定: (a) 提交身份**。
 
 **D-2 AI runner 的 git 提交身份** (每个选项都写 `cross_owner` 可达性)
 - (a) **统一机身份**: 所有 AI 会话署同一 bot local-part。收益: owner 段稳定, 与 Aether 人机两账号对齐。**代价**: 同一 owner 的 AI 会话之间 `cross_owner` 结构性不可达 (🔴 = 另一提交身份: 另一位操作者的容器 / 人手工署名会话); 署名失去「哪位操作者在场」(靠 container 段 + handoff 追溯); bot 名要选 (Aether 现名 `10cg-ci-bot`; 沿旧名与台账不一致, 改名则一次性漂移, ⚪ 可解释)。
 - (b) **人身份**。收益: 可追溯到人; 两位操作者之间 🔴 可达。代价: 与 Layer 2 生产侧 (bot) 不一致; 操作者换 email 即漂移。
 - (c) **不规定**。收益: 零改动。代价: 漂移继续, ⚪ 常亮; `cross_owner` 可达但**不可解释** (每次身份变动都可能制造一次 🔴, 无法区分真撞车与漂移)。
 - 执笔建议: (a) 且 local-part 与 Aether 现名一致。范围: 本 Spec 只写 Aria 侧规则。
+- **✅ 裁定: (a) 统一机器身份, local-part 与采用方机器账号名一致** (10CG Lab = `10cg-ci-bot`); 本容器 git 身份的实际变更为 owner 环境动作。
 
 **D-3 Layer H 新鲜度截止 (回应 #182 依赖)**
 - (a) **本 Spec 内加截止** (条件任务 T13 / SC-11): 共享谓词 `layer_h_is_fresh(row, now, days)` (lib), `updated-at` 早于 `LAYER_H_ACTIVE_WINDOW_DAYS` (建议 30; 与 `STALE_TTL` 秒级分名分量纲) 的行在 Layer H 记录构造阶段不进 reconcile/classify (人口 = 被映射为 active 的全部行, 含 280 行非 enum), board 以「stale」列出; collector 与 renderer 调同一谓词; **不与 `:374-379` 叠成三档** (被截止的行 reconcile 看不到)。后果: 信号 ship 即可用; 多一个常量 + 一条规范句。
 - (b) **不加, 交 #182**。后果: 逻辑正确但 board 仍有 2026-05 的 🟡 组, Positive 只能写「逻辑正确」。
 - 执笔建议: (a)。
+- **✅ 裁定: (a)**。T13 转正式任务, `LAYER_H_ACTIVE_WINDOW_DAYS = 30`。
 
 ## Impact
 
@@ -100,7 +104,7 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 | **与 a1-entry 的边界与两种 ship 形态** | 耦合 1 (`identity.py`): a1-entry 新增 `get_container_uuid()` (:660), 其 SC-3 (:571) 以「`get_container_id()` label 优先 ⇒ 直接调它的实现必红」为前提; 本 Spec flip 会让它恒绿。**S1 (a1-entry 未落地时 ship)**: 只加 `get_container_label()` + T3b inventory 告警, **不 flip**。**S2 (a1-entry B.2 已落地且对方在 #174 ack 改写其 SC-3)**: flip + 发布门 + 由本 Spec 改写其 SC-3 为「`get_container_uuid()` 与 flip 后 `get_container_id()` 同值; label 只在 `get_container_label()`」。未取得 ack 不动对方文本。耦合 2: D-0。行号漂移: 后落地方在 D 期 refresh |
 | **Rule #6** | 不改任何 SKILL.md 指令面 / description (取值字面存在但不变) ⇒ 「描述性 / 机械」档 substitute = SC 级 baseline-failing 结构化测试 **SC-1 / SC-2 / SC-3 (S1 臂; flip 臂仅 S2) / SC-4 / SC-8**; SC-5/6/7/9/10/11 为文档 / 对照 / 回归 / 渲染 / 条件项。`rule6_note` 随 B.2 写入 |
 
-## Tasks (代码 6 个 .py + `lib/constants.py` (条件 T13) + 1 份规范 + 7 处文档 + 1 处代码消费方; 14 个 checkbox 含 T3b, 其中 T9 / T13 条件任务)
+## Tasks (代码 6 个 .py + `lib/constants.py` + 1 份规范 + 7 处文档 + 1 处代码消费方; 14 个 checkbox 含 T3b; **T9 / T13 经 D-0(a) / D-3(a) 裁定已转正式任务**)
 
 - [ ] T1 `split_owner_container` 两段式 (含零段 / 三段兼容); 改写 `test_split_owner_container_variants` 的 2-part 与 1-part (`"solo"`) 断言, 先红后绿两臂 → SC-1
 - [ ] T2 `classify_claims` 确定性判定 + `identity_drift_advisories(tracks)`; collector `:709` dedupe 前调用并写 `collision.identity_advisories[]` (恒存在); **改写 `test_real_collector_emits_cross_owner_collision` / `test_real_collector_no_collision_is_none` 的 `keys == {kind, groups}` 断言**; `state-snapshot-schema.md` additive bump + `test_normalize_snapshot` 锁字段 → SC-2 / SC-8
@@ -111,11 +115,11 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 - [ ] T6 冻结语料复制为 aria 测试 fixture (只保留 `track_id / owner_container / status / phase / updated_at / filename / branch / legacy` 八字段 (`phase` 被 `track_to_claim_record` 读取)); 前后对照测试机械归因 (判据见 SC-6); 「真撞车」档注入一组合成行 (显式标注) → SC-6
 - [ ] T7 消费面同步: 七处文档 (D4) + `test_fetch_gate.py` `kind="cross_owner"` 字符串夹具; rule 1.54 触发面锁定 → SC-9
 - [ ] T8 `track_board.py` ⚪ 行渲染 (dedupe 前调用 `identity_drift_advisories`) + label 并列显示; D-0(a) 时 `tracks_by_tid` 标签索引改用剥离后键 (与 `verdicts` 键域一致) → SC-10
-- [ ] T9 (条件, D-0(a)) `track_to_claim_record` 族键剥离 + §2.3.1 尾段语义 + 三条夹具 (`slug-aaaa1111`/`slug-bbbb2222` 同组; `x-20260719` 剥后与语料零碰撞; `slug-abcdefg` 不剥) → SC-2 条件用例
+- [ ] T9 (D-0(a) 已裁) `track_to_claim_record` 族键剥离 + §2.3.1 尾段语义 + 三条夹具 (`slug-aaaa1111`/`slug-bbbb2222` 同组; `x-20260719` 剥后与语料零碰撞; `slug-abcdefg` 不剥) → SC-2 条件用例
 - [ ] T10 全套回归: state-scanner 全套 pytest (起草日 1492 个 test 定义; 点名改写项全绿) + `test_fetch_gate.py` + session-closer / phase-d-closer handoff 写入测试 + 主仓 14 state-check → SC-7
 - [ ] T11 回帖 #193 / aria-plugin#135 (缺口 3) 指向本 Spec; #174 留言 D-0 与 SC-3 改写征求 ack; ship 后关 #193, #135 留缺口 1/2 (文档动作, 无 SC; 归 D 期)
 - [ ] T12 发布同步 (D5): aria-plugin 版本 bump (档位按 D5 二选一, 记入 CHANGELOG) + CLAUDE.md §版本管理同步面 + CHANGELOG 明示 §2.3.5 行为变更 + Lab 内部指针决策单 (`docs/decisions/`) → SC-7 (state-check 全绿覆盖版本面)
-- [ ] T13 (条件, D-3(a)) `layer_h_is_fresh` 共享谓词 + `LAYER_H_ACTIVE_WINDOW_DAYS` 常量 + collector/renderer 同一调用 + §2.3.5 规范句 → SC-11
+- [ ] T13 (D-3(a) 已裁) `layer_h_is_fresh` 共享谓词 + `LAYER_H_ACTIVE_WINDOW_DAYS` 常量 + collector/renderer 同一调用 + §2.3.5 规范句 → SC-11
 
 ## Success Criteria
 
@@ -129,7 +133,7 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 - [ ] SC-8 (T2) snapshot `collision.identity_advisories` 恒存在且为 list (无漂移时 `[]`); 旧 snapshot 缺该字段时 `track_board` / rule 1.54 / `fetch_gate` 不崩。**先红** (字段不存在)
 - [ ] SC-9 (T7) rule 1.54 触发面测试 (`coordination.enabled=false` + `kind=cross_owner` → 命中); 六处取值文档 (不含 `aria/templates/session-handoff.md`, 它无取值字面; 模板由反向 grep 锁「设 label 使更可读」句已删) 的取值措辞与 §2.3.5 三行一致: 每个文件 F 与 token 集 {`cross_owner`, `self_multi_container`, `identity_advisories`} 的交集**不为空**, 且 F 中出现的每个该集 token 的上下文句与 §2.3.5 对应行同义 (人工核, 机械只锁非空交集; `RECOMMENDATION_RULES.md:31` 今日无取值字面, 加 `identity_advisories` 一句后满足); `fetch_gate` advisory 文案含 `cross_owner`
 - [ ] SC-10 (T8) board 对 fixture 渲染恰 2 条 ⚪ 行 (`023236f2` / `bfe8285d`), 每行列 owners[] 与 first/last_seen; 无 advisory 时不渲染 ⚪ 段; **反事实**: 渲染器改为对 dedupe 后行算 → 0 行 (红)
-- [ ] SC-11 (T13, 条件 D-3(a)) fixture 中早于窗口的 active 行不出现在 `groups` 任一组; collector 与 renderer 对同一 fixture 得同一 `kind`/`groups`; 谓词只有一个实现 (grep 断言: `updated_at` 与天数比较的表达式在 collector / renderer 各零处, 只在 lib 一处; 同义改名绕过属 B 期 review 责任, 成文)
+- [ ] SC-11 (T13) fixture 中早于窗口的 active 行不出现在 `groups` 任一组; collector 与 renderer 对同一 fixture 得同一 `kind`/`groups`; 谓词只有一个实现 (grep 断言: `updated_at` 与天数比较的表达式在 collector / renderer 各零处, 只在 lib 一处; 同义改名绕过属 B 期 review 责任, 成文)
 
 ## 非目标
 
