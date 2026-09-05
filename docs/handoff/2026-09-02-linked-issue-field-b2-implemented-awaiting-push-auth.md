@@ -2,7 +2,7 @@
 track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: D (字段 Spec 已归档 2026-09-02, 见周期 handoff `2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md`; 族轨下一份 = sibling-spec-probe B.1)
-status: active
+status: done
 updated-at: 2026-09-02T23:26:36Z
 ---
 

@@ -1,0 +1,370 @@
+{
+  "metadata": {
+    "skill_name": "spec-drafter",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-09-04T23:40:01Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 156.8,
+        "tokens": 77355,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should judge as Level 1 (Skip) for trivial fix",
+          "passed": true,
+          "evidence": "response.md \u300c## \u7ed3\u8bba\u300d\u9996\u884c\u9010\u5b57: '**Level 1 (Skip) \u2014\u2014 \u4e0d\u521b\u5efa Spec, \u8df3\u8fc7 A.1, \u76f4\u63a5\u8fdb\u5165 B.1\u3002**'; \u5e76\u5728\u300c\u672c\u6b21\u5224\u5b9a\u7684\u6807\u51c6\u8f93\u51fa\u300d\u590d\u7528 skill \u7684 Level 1 \u8f93\u51fa\u5757 'LEVEL 1 DETECTED - SKIP SPEC ... \ud83d\udccb \u63a8\u8350\u64cd\u4f5c: \u76f4\u63a5\u8fdb\u5165 B.1 (\u5206\u652f\u521b\u5efa) \u5f00\u59cb\u5f00\u53d1'\u3002\u53e6\u9644\u300c\u56e0\u6b64\u4e0d\u4ea7\u51fa\u7684\u4e1c\u897f\u300d\u8868\u9010\u6761\u5426\u5b9a proposal.md / tasks.md / openspec validate, \u4e0e Skip \u8bed\u4e49\u81ea\u6d3d\u3002"
+        },
+        {
+          "text": "Should explain why Level 1 was chosen",
+          "passed": true,
+          "evidence": "\u300c## \u5224\u65ad\u4f9d\u636e (\u6309 A.1.2 \u4e09\u6b65\u63a8\u6f14)\u300d\u7ed9\u51fa\u56db\u5c42\u7406\u7531: (1) \u5173\u952e\u8bcd\u8868 \u2014\u2014 '`typo` | LEVEL_GUIDE.md\u300cLevel 1 \u89e6\u53d1\u8bcd \u00b7 \u9ad8\u7f6e\u4fe1\u5ea6\u89e6\u53d1\u8bcd\u300d\u9996\u6761', \u5e76\u505a\u53cd\u5411\u6838\u5bf9 'Level 2 \u89e6\u53d1\u8bcd\u8868 ... **\u96f6\u547d\u4e2d**' / 'Level 3 \u89e6\u53d1\u8bcd\u8868 ... **\u96f6\u547d\u4e2d**'; (2) \u5f71\u54cd\u8303\u56f4 \u2014\u2014 \u8de8\u6a21\u5757\u56db\u6761\u4ef6\u9010\u6761\u5426\u5b9a ('\u6d89\u53ca 2 \u4e2a\u53ca\u4ee5\u4e0a\u6a21\u5757 \u2014\u2014 \u5426', '\u4fee\u6539 shared/ \u76ee\u5f55 \u2014\u2014 \u5426', '\u9700\u8981 API \u5951\u7ea6\u53d8\u66f4 \u2014\u2014 \u5426', '\u5f71\u54cd\u591a\u4e2a\u5b50\u6a21\u5757 \u2014\u2014 \u5426'); (3) \u53d8\u66f4\u7c7b\u578b '\u6587\u6848/\u6587\u6863\u683c\u5f0f\u4fee\u590d, \u975e\u884c\u4e3a\u53d8\u66f4 ... Breaking change: \u5426'; (4) \u8bc4\u5206\u4ee3\u5165 'score = 0.4 + 0.3 + 0.2 + 0.1 = **1.0**, \u8fdc\u4f4e\u4e8e 3 \u2192 **Level 1**'\u3002\u8fd8\u8fa8\u6790\u4e86\u5e38\u89c1\u8bef\u5224: 'LEVEL_GUIDE \u7684\u793a\u4f8b \"Add simple authentication feature\" \u4e4b\u6240\u4ee5\u5347\u5230 Level 2, \u9760\u7684\u662f **`feature` \u8fd9\u4e2a\u529f\u80fd\u5f00\u53d1\u8bcd**, \u4e0d\u662f `authentication` \u8fd9\u4e2a\u9886\u57df\u540d\u8bcd'\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 284.8,
+        "tokens": 85456,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should correctly parse mixed Chinese/English input",
+          "passed": true,
+          "evidence": "\u300c## 0. \u8f93\u5165\u89e3\u6790 (\u53cc\u8bed\u8f93\u5165\u5904\u7406)\u300d\u628a\u8f93\u5165\u62c6\u6210\u4e24\u884c\u5e76\u6807\u8bed\u8a00 ('`Add a dark mode feature` | en' / '`\u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd` | zh'), \u5224\u5b9a '**\u8fd9\u662f\u4e00\u4e2a\u9700\u6c42, \u4e0d\u662f\u4e24\u4e2a**\u3002`/` \u5728\u6b64\u662f\u300c\u540c\u4e49\u7ffb\u8bd1\u5bf9\u300d\u5206\u9694\u7b26\u800c\u975e\u300c\u5e76\u5217\u9700\u6c42\u300d\u5206\u9694\u7b26 \u2014\u2014 \u4e24\u4fa7\u52a8\u8bcd (add / \u6dfb\u52a0)\u3001\u540d\u8bcd (dark mode / \u6df1\u8272\u6a21\u5f0f)\u3001\u8303\u7574\u8bcd (feature / \u529f\u80fd) \u9010\u9879\u5bf9\u9f50 ... \u56e0\u6b64**\u4e0d\u62c6\u6210\u4e24\u4e2a Spec**, \u4e5f\u4e0d\u628a\u4e24\u4fa7\u5f53\u6210 scope \u7684\u4e24\u534a\u7d2f\u52a0\u3002'"
+        },
+        {
+          "text": "Should generate proposal content in English as requested",
+          "passed": true,
+          "evidence": "\u7b2c 5 \u8282 A.1.4 \u7684 ```markdown \u4ee3\u7801\u5757\u5185\u662f\u5b8c\u6574\u82f1\u6587 proposal: '# Dark Mode' / '## Why' ('The product currently ships a single light theme...') / '## What' / '### Key Deliverables' / '## Impact' / '## Framework Constraints' / '## Tasks' / '## Success Criteria', \u6b63\u6587\u65e0\u4e2d\u6587\u6b8b\u53e5; \u5e76\u5728\u7b2c 0 \u8282\u663e\u5f0f\u58f0\u660e '\u4ea4\u4ed8\u8bed\u8a00 = \u82f1\u6587 ... proposal.md \u6b63\u6587\u3001\u7ae0\u8282\u6807\u9898\u3001Tasks / Success Criteria **\u5168\u82f1\u6587**', \u76ee\u5f55\u540d\u53d6 ASCII kebab-case `dark-mode`\u3002"
+        },
+        {
+          "text": "Should preserve the feature intent from both language inputs",
+          "passed": true,
+          "evidence": "'\u8bed\u4e49\u5dee\u96c6\u4e3a\u7a7a \u2192 \u65e0\u4fe1\u606f\u9700\u8981\u5408\u5e76 ... \u672c\u4f8b\u9010\u9879\u6838\u5bf9\u540e\u5dee\u96c6\u4e3a\u7a7a, \u6545 What \u4e0d\u9700\u8981\u4ece\u4e2d\u6587\u4fa7\u8865\u5199'; proposal \u7684 What \u6bb5\u8986\u76d6\u53cc\u8bed\u4e24\u4fa7\u5171\u540c\u610f\u56fe (dark color theme + theme resolution + user-visible switch + persistence + component migration), Feature Name \u53d6\u81ea '\u53cc\u8bed\u5bf9\u5171\u540c\u540d\u8bcd' (`dark-mode`)\u3002\u65e0\u4e00\u4fa7\u4fe1\u606f\u88ab\u4e22\u5f03\u3002"
+        },
+        {
+          "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `\u5173\u8054 Issue` alias, `Related Issue`, or omitting the line fails)",
+          "passed": true,
+          "evidence": "outputs/response.md:121 \u9010\u5b57\u4e3a `> **Linked Issue**: \\`none\\``\u3002cat -A \u6838\u9a8c\u884c\u5185\u5bb9\u4e3a '> **Linked Issue**: `none`$' \u2014\u2014 \u884c\u9996\u65e0\u7a7a\u767d, `>` \u540e\u6070\u4e00\u7a7a\u683c, \u82f1\u6587 canonical \u62fc\u5199 (\u975e `\u5173\u8054 Issue` / `Related Issue`), \u4f4d\u4e8e\u5934\u90e8 blockquote \u5185 Level\u2192Status\u2192Created \u4e4b\u540e (:118-121)\u3002"
+        },
+        {
+          "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+          "passed": true,
+          "evidence": "\u540c\u4e00\u884c\u7684\u503c\u4e3a inline code span `none` (\u53cd\u5f15\u53f7\u5305\u88f9, \u975e markdown \u94fe\u63a5\u3001\u975e `N/A`\u3001\u975e\u7a7a\u3001\u975e `{<org>/<repo>#<n>}` \u5360\u4f4d)\u3002\u7b2c 6 \u8282\u30102\u3011\u8fdb\u4e00\u6b65\u8bf4\u660e\u8be5\u54e8\u5175\u8bed\u4e49: '\u8349\u7a3f\u91cc\u6309\u89c4\u8303\u9010\u5b57\u5199\u4e86 `none`\u3002\u8fd9\u4e2a\u54e8\u5175\u7684\u6b63\u786e\u542b\u4e49\u662f\u300c**\u5df2\u6838\u5b9e**\u65e0\u5173\u8054 issue\u300d ... \u6ce8\u610f `N/A` / `TBD` / `-` / \u7559\u7a7a / \u5220\u884c\u90fd\u4e0d\u5408\u89c4, markdown \u94fe\u63a5\u5f62\u4e5f\u4f1a\u88ab\u5224 `NO_TOKEN`\u3002'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 221.6,
+        "tokens": 81612,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "proposal.md \u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996 (\u82f1\u6587 canonical \u62fc\u5199; \u5199\u6210 `\u5173\u8054 Issue` / `Related Issue` / \u7701\u7565\u8be5\u884c \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "response.md:15-18 \u5934\u90e8 blockquote \u7b2c 4 \u884c\u9010\u5b57\u4e3a `> **Linked Issue**: `none`` (cat -A \u786e\u8ba4 `> **Linked Issue**: \\x60none\\x60$`, \u65e0\u524d\u5bfc\u7a7a\u767d, `>` \u540e\u6070\u4e00\u4e2a\u7a7a\u683c, ASCII \u5192\u53f7, \u82f1\u6587 canonical \u62fc\u5199)\u3002"
+        },
+        {
+          "text": "\u8be5\u884c\u7684\u503c\u662f inline code span \u4e14\u9010\u5b57\u4e3a `none` (\u65e0\u5173\u8054\u5df2\u6838\u5b9e \u21d2 \u54e8\u5175; \u7559\u7a7a / `N/A` / `TBD` / \u4fdd\u7559 `{<org>/<repo>#<n>}` \u5360\u4f4d\u4e32 \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "\u8be5\u884c\u503c\u4e3a inline code span \u4e14\u9010\u5b57 `none` \u2014\u2014 response.md:18 `> **Linked Issue**: \\x60none\\x60`; \u6b63\u6587\u53e6\u6709\u8bf4\u660e \"\u5df2\u6838\u5b9e\u65e0\u5173\u8054 issue \u21d2 `Linked Issue` \u503c\u9010\u5b57\u5199 `none`, \u4e0d\u7559\u7a7a\u3001\u4e0d\u5220\u884c (`N/A` / `TBD` / `-` \u4e0d\u662f\u54e8\u5175)\" (response.md:7)\u3002\u672a\u7559\u7a7a\u3001\u672a\u7528 N/A/TBD/\u5360\u4f4d\u4e32\u3002"
+        },
+        {
+          "text": "\u8be5\u884c\u4e0d\u662f markdown \u94fe\u63a5\u5f62 (\u884c\u5185\u65e0 `](http`), \u4e14\u4e0d\u7559\u7a7a",
+          "passed": true,
+          "evidence": "\u5168\u6587 grep `](http` \u96f6\u547d\u4e2d (\u6574\u4efd response.md \u65e0\u4efb\u4f55 markdown \u94fe\u63a5), Linked Issue \u884c\u503c\u975e\u94fe\u63a5\u5f62\u4e14\u975e\u7a7a\u3002"
+        },
+        {
+          "text": "\u5934\u90e8\u56db\u884c\u987a\u5e8f Level \u2192 Status \u2192 Created \u2192 Linked Issue \u4e0e SOT \u6a21\u677f\u4e00\u81f4 (\u542b `> **Created**:` \u884c)",
+          "passed": true,
+          "evidence": "response.md:15-18 \u987a\u5e8f\u4e3a `> **Level**: Minimal (Level 2 Spec)` \u2192 `> **Status**: Draft` \u2192 `> **Created**: 2026-09-04` \u2192 `> **Linked Issue**: `none``, \u56db\u884c\u8fde\u7eed\u3001\u542b\u663e\u5f0f `> **Created**:` \u884c, \u4e0e SOT \u6a21\u677f proposal-minimal.md \u4e00\u81f4\u3002"
+        },
+        {
+          "text": "\u6ca1\u6709\u628a\u5b57\u6bb5\u8bd1\u5199\u6210\u522b\u7684\u540d\u5b57 (\u5168\u6587\u65e0 `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5934\u90e8\u5b57\u6bb5\u540d)",
+          "passed": true,
+          "evidence": "grep -i `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5934\u90e8\u5b57\u6bb5\u540d\u96f6\u547d\u4e2d\u3002\u552f\u4e00\u542b\u300c\u5173\u8054\u300d\u7684\u4e00\u5904\u662f\u6563\u6587 \"\u5df2\u6838\u5b9e\u65e0\u5173\u8054 issue\" (response.md:7), \u4e0d\u662f\u5b57\u6bb5\u540d; \u5934\u90e8\u5b57\u6bb5\u540d\u53ea\u6709 Level/Status/Created/Linked Issue \u56db\u4e2a\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 235.7,
+        "tokens": 84759,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u7ed9\u51fa\u7684\u843d\u70b9\u8def\u5f84\u662f\u9879\u76ee\u81ea\u5df1\u4ed3\u5185\u7684 `openspec/changes/<feature>/proposal.md` (feature \u540d\u53ef\u81ea\u62df), \u4e14**\u4e0d\u662f** `standards/openspec/changes/...`",
+          "passed": true,
+          "evidence": "response.md \u00a71 (line 22, fenced as the answer to question (1)): `openspec/changes/sort-tasks-by-due-date/proposal.md`, followed by line 25: \"\u76f8\u5bf9 **todo-web \u4ed3\u5e93\u6839**\u3002\u5c55\u5f00\u5373 `todo-web/openspec/changes/sort-tasks-by-due-date/proposal.md`\u3002\" The path is the project's own openspec/changes/<feature>/proposal.md and is explicitly anchored to the todo-web repo root; it is not standards/openspec/changes/..."
+        },
+        {
+          "text": "\u5168\u6587\u4efb\u4f55\u4f4d\u7f6e\u90fd\u6ca1\u6709\u628a `standards/openspec/changes/` \u5f53\u4f5c\u672c\u6b21 proposal \u7684\u843d\u70b9\u63a8\u8350 (\u4f5c\u4e3a\u53cd\u4f8b\u70b9\u540d\u8bf4\u660e\u300c\u4e0d\u8be5\u5199\u90a3\u91cc\u300d\u4e0d\u7b97\u8fdd\u53cd)",
+          "passed": true,
+          "evidence": "grep 'standards/openspec' over response.md returns exactly 3 hits, none of which recommends it as this proposal's landing spot: line 36 is an explicitly labelled counterexample \u2014 \"\u6700\u5bb9\u6613\u8bef\u843d\u7684\u5019\u9009\u662f\u628a\u5b83\u5199\u8fdb\u5171\u4eab\u5b50\u6a21\u5757\uff1a\" then `standards/openspec/changes/sort-tasks-by-due-date/proposal.md   \u2190 \u9519`; line 41 cites the prohibition \u2014 \u300c\u9879\u76ee\u53d8\u66f4\u653e\u672c\u9879\u76ee `openspec/changes/`\uff0c\u4e0d\u653e `standards/openspec/changes/`\u300d; line 112 references `standards/openspec/templates/proposal-minimal.md` (a template, not a changes/ landing path). Line 47 mentions \"\u843d standards \u4ed3\u81ea\u5df1\u7684 `openspec/changes/`\" only for changes whose OBJECT is the methodology itself (\u6539\u5341\u6b65\u5faa\u73af / \u6539\u6a21\u677f / \u6539 conventions), and immediately contrasts it: \"\u6309\u622a\u6b62\u65e5\u671f\u6392\u5e8f\u7684\u5bf9\u8c61\u662f todo-web \u7684\u4efb\u52a1\u5217\u8868\u529f\u80fd\uff0c\u5c5e\u4e8e\u9879\u76ee\u81ea\u8eab \u21d2 \u843d todo-web \u7684 `openspec/`\u3002\""
+        },
+        {
+          "text": "\u5bf9 (2) \u7ed9\u51fa\u7684\u7406\u7531\u70b9\u5230\u300cstandards \u662f\u5171\u4eab\u5b50\u6a21\u5757 / \u9879\u76ee\u81ea\u5df1\u7684\u53d8\u66f4\u5f52\u9879\u76ee\u81ea\u5df1\u300d\u8fd9\u5c42\u8bed\u4e49 (Aria \u4e0d\u53ef\u534f\u5546\u89c4\u5219 #5), \u800c\u4e0d\u662f\u53ea\u7ed9\u8def\u5f84\u4e0d\u89e3\u91ca",
+          "passed": true,
+          "evidence": "response.md \u00a72 gives four ranked reasons that reach exactly that semantics. \u30101\u3011 line 41: \"**Aria \u4e0d\u53ef\u534f\u5546\u89c4\u5219 #5 \u76f4\u63a5\u7981\u6b62**\uff1a\u300c\u9879\u76ee\u53d8\u66f4\u653e\u672c\u9879\u76ee `openspec/changes/`\uff0c\u4e0d\u653e `standards/openspec/changes/`\u300d\". \u30102\u3011 line 43: \"**\u6240\u6709\u6743\u5224\u636e**\uff1a`standards/` \u662f\u4ece aria-standards \u5f15\u5165\u7684**\u5171\u4eab\u5b50\u6a21\u5757**\uff0c\u662f\u6240\u6709\u91c7\u7528 Aria \u65b9\u6cd5\u8bba\u7684\u9879\u76ee\u5171\u8bfb\u7684\u89c4\u8303 SOT\u3002\u628a todo-web \u7684\u4e00\u4e2a\u4ea7\u54c1\u529f\u80fd\u5199\u8fdb\u53bb\uff0c\u8fd9\u4efd\u53d8\u66f4\u4f1a\u5bf9**\u6240\u6709\u91c7\u7528\u65b9\u53ef\u89c1\u4e14\u65e0\u4eba\u62e5\u6709**\". \u30103\u3011 adds the mechanical consequence (submodule update --remote \u51b2\u6389 / \u6c61\u67d3\u5171\u4eab repo). \u30104\u3011 states the ownership boundary criterion \"\u8fd9\u4e2a\u53d8\u66f4\u7684**\u5bf9\u8c61**\u662f\u8c01\"."
+        },
+        {
+          "text": "proposal.md \u5168\u6587\u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996, \u4e14\u503c\u662f inline code span `none` (\u9898\u5e72\u672a\u7ed9 issue \u53f7)",
+          "passed": true,
+          "evidence": "response.md line 66, inside the ```markdown fenced proposal full text (\u00a73), within the header blockquote that follows the H1 `# Sort Task List by Due Date` and the Level/Status/Created lines. cat -A confirms the exact byte sequence: \"> **Linked Issue**: `none`$\" \u2014 the line begins verbatim with `> **Linked Issue**:` and the value is the inline code span `none`, with no N/A/TBD/- substitute and no markdown link form."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 2,
+        "failed": 0,
+        "total": 2,
+        "time_seconds": 86.7,
+        "tokens": 75327,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should judge as Level 1 (Skip) for trivial fix",
+          "passed": true,
+          "evidence": "response.md\u300c## \u7ed3\u8bba\u300d\u5185\u542b\u8f93\u51fa\u5757 'LEVEL 1 DETECTED - SKIP SPEC / \u6b64\u9700\u6c42\u4e3a\u7b80\u5355\u4fee\u590d\uff0c\u5efa\u8bae\u76f4\u63a5\u8df3\u8fc7 A.1', \u7d27\u968f\u4e00\u884c\u52a0\u7c97\u5224\u5b9a '**\u5224\u5b9a: Level 1 (Skip) \u2014\u2014 \u4e0d\u4ea7\u51fa proposal.md, \u4e0d\u4ea7\u51fa tasks.md\u3002**'; \u672b\u5c3e\u300c\u4e00\u53e5\u8bdd\u56de\u7b54\u300d\u518d\u6b21\u6536\u675f '\u5224\u4e3a **Level 1 (Skip)**: \u4e0d\u5199 Spec, \u76f4\u63a5\u8fdb\u5165 B.1 \u5efa\u5206\u652f\u4fee\u590d'\u3002(\u8bc4\u5206\u4ec5\u57fa\u4e8e outputs/response.md \u4e0e transcript.md; \u9694\u79bb\u7684 response.INVALID-no-skill-read.md / transcript.INVALID.md \u5df2\u6309\u6307\u793a\u5ffd\u7565\u3002)"
+        },
+        {
+          "text": "Should explain why Level 1 was chosen",
+          "passed": true,
+          "evidence": "\u300c## \u63a8\u6f14\u8fc7\u7a0b (\u6309 A.1.2 \u4e09\u6761\u5224\u636e)\u300d\u4e09\u8282 + \u7efc\u5408\u8bc4\u5206: \u30101\u3011'LEVEL_GUIDE.md\u300cLevel 1 \u89e6\u53d1\u8bcd (\u7b80\u5355\u4fee\u590d)\u300d\u9ad8\u7f6e\u4fe1\u5ea6\u89e6\u53d1\u8bcd\u5217\u8868\u4e2d\u76f4\u63a5\u547d\u4e2d ... `typo` / `fix typo`', \u5e76\u53cd\u5411\u6838\u5bf9 'Level 2 \u89e6\u53d1\u8bcd ... : \u300c\u4fee\u590d\u300d\u4e0d\u5c5e\u529f\u80fd\u5f00\u53d1\u8bcd\u6216\u589e\u5f3a\u6539\u8fdb\u8bcd' / 'Level 3 \u89e6\u53d1\u8bcd ... \u5168\u65e0\u547d\u4e2d'; \u30102\u3011YAML \u5757\u5185\u8de8\u6a21\u5757\u56db\u6761\u4ef6\u9010\u6761 '\u5426'; \u30103\u3011'\u65e0\u63a5\u53e3\u53d8\u66f4\u3001\u65e0\u6570\u636e\u7ed3\u6784\u53d8\u66f4\u3001\u65e0\u884c\u4e3a\u8bed\u4e49\u53d8\u66f4 \u21d2 \u975e breaking change'; \u7efc\u5408\u8bc4\u5206 'score = 0.4*\u4f4e + 0.3*\u4f4e + 0.2*\u4f4e + 0.1*\u4f4e \u21d2 score < 3 / \u9608\u503c\u5224\u5b9a: score < 3 \u2192 Level 1', \u5e76\u603b\u7ed3 '\u4e09\u6761\u5224\u636e + \u7efc\u5408\u8bc4\u5206\u56db\u8005**\u4e00\u81f4\u6307\u5411 Level 1**'\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 214.2,
+        "tokens": 86089,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should correctly parse mixed Chinese/English input",
+          "passed": true,
+          "evidence": "\u300c## 0. \u8f93\u5165\u89e3\u6790 (\u53cc\u8bed)\u300d\u8868: '\u7ed3\u6784\u5224\u5b9a | **\u540c\u4e00\u9700\u6c42\u7684\u4e2d\u82f1\u53cc\u8bed\u8868\u8ff0**, \u4e0d\u662f\u4e24\u6761\u72ec\u7acb\u9700\u6c42 (`/` \u662f\u8bed\u8a00\u5206\u9694\u7b26, \u4e0d\u662f\u9700\u6c42\u5206\u9694\u7b26)'; \u9010\u4fa7\u7ed9\u51fa\u8bed\u4e49 ('\u82f1\u6587\u4fa7\u8bed\u4e49 | Add a dark mode feature \u2192 \u65b0\u589e\u529f\u80fd (add / feature)' / '\u4e2d\u6587\u4fa7\u8bed\u4e49 | \u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd \u2192 \u65b0\u589e\u529f\u80fd (\u6dfb\u52a0 / \u529f\u80fd)') \u4e0e\u4e00\u81f4\u6027\u5224\u5b9a '\u2705 \u4e00\u81f4 \u2014\u2014 \u300cdark mode\u300d\u2261\u300c\u6df1\u8272\u6a21\u5f0f\u300d, \u300cfeature\u300d\u2261\u300c\u529f\u80fd\u300d'\u3002"
+        },
+        {
+          "text": "Should generate proposal content in English as requested",
+          "passed": true,
+          "evidence": "\u300c### proposal.md (\u6b63\u6587, English)\u300d\u4e0b\u7684 ```markdown \u5757\u4e3a\u5b8c\u6574\u82f1\u6587 proposal: '# Dark Mode' / '## Why' ('Users spend long sessions in the app, including in low-light environments...') / '## What' / '### Key Deliverables' / '## Impact' / '## Constraints' / '## Tasks' / '## Success Criteria', \u65e0\u4e2d\u6587\u6b8b\u53e5; \u7b2c 0 \u8282\u8868\u683c\u660e\u5199 '**\u4ea7\u51fa\u8bed\u8a00** | **English** (\u7528\u6237\u663e\u5f0f\u8981\u6c42\u300c\u8bf7\u751f\u6210\u82f1\u6587 proposal\u300d)' \u4e0e 'proposal \u6b63\u6587\u5168\u82f1\u6587, \u4e0d\u7559\u4e2d\u6587\u6b8b\u53e5'\u3002"
+        },
+        {
+          "text": "Should preserve the feature intent from both language inputs",
+          "passed": true,
+          "evidence": "'\u53cc\u4fa7\u5408\u5e76\u610f\u56fe | \u4e3a\u5e94\u7528\u589e\u52a0\u6df1\u8272\u4e3b\u9898 (dark theme), \u7528\u6237\u53ef\u5728\u6d45\u8272 / \u6df1\u8272\u4e4b\u95f4\u5207\u6362, \u5e76\u53ef\u8ddf\u968f\u7cfb\u7edf\u5916\u89c2'; \u5e76\u7ed9\u51fa\u53d6\u503c\u539f\u5219 '\u4e24\u4fa7\u8bed\u4e49\u4e00\u81f4\u65f6\u53d6**\u5e76\u96c6**\u586b\u5145 Why/What (\u907f\u514d\u53ea\u8bfb\u4e00\u4fa7\u4e22\u4fe1\u606f)'\u3002proposal What \u6bb5\u7684 6 \u9879 scope (theme tokens / dark palette / theme resolution / persistence / settings UI / surface coverage) \u4e0e\u53cc\u8bed\u4e24\u4fa7\u7684\u300e\u6dfb\u52a0\u6df1\u8272\u6a21\u5f0f\u529f\u80fd\u300f\u610f\u56fe\u4e00\u81f4, \u65e0\u4e00\u4fa7\u4fe1\u606f\u4e22\u5931\u3002"
+        },
+        {
+          "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `\u5173\u8054 Issue` alias, `Related Issue`, or omitting the line fails)",
+          "passed": true,
+          "evidence": "outputs/response.md:112 \u9010\u5b57\u4e3a `> **Linked Issue**: \\`none\\``\u3002cat -A \u6838\u9a8c\u4e3a '> **Linked Issue**: `none`$', \u5904\u4e8e\u5934\u90e8 blockquote \u7b2c 4 \u884c (:109-112, Level\u2192Status\u2192Created\u2192Linked Issue), \u7528\u82f1\u6587 canonical \u62fc\u5199; \u300c\u5934\u90e8\u5b57\u6bb5\u81ea\u68c0\u300d\u8868\u53e6\u6709\u4e00\u884c '\u65b0\u5199\u7528\u82f1\u6587 canonical (\u4e0d\u5199\u4e2d\u6587 alias `\u5173\u8054 Issue`) | \u7528 `Linked Issue` | \u2705'\u3002"
+        },
+        {
+          "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+          "passed": true,
+          "evidence": "\u503c\u4e3a inline code span `none`, \u975e\u5360\u4f4d\u7b26/\u7a7a\u503c/`N/A`/\u94fe\u63a5\u3002\u81ea\u68c0\u8868: '\u65e0\u5173\u8054\u65f6\u9010\u5b57\u5199 `none` (\u4e0d\u7528 `N/A` / `TBD` / `-` / \u7559\u7a7a) | \u8f93\u5165\u672a\u7ed9\u4efb\u4f55 issue \u53f7 \u21d2 \u53d6 `none` | \u2705' \u4e0e '\u503c\u4e3a inline code span \u5f62, \u975e markdown \u94fe\u63a5 | `none` | \u2705'; \u5e76\u8bf4\u660e '\u7528\u6237\u7684\u63d0\u793a\u8bcd\u91cc\u6ca1\u6709\u51fa\u73b0\u4efb\u4f55 tracking issue (\u65e0 `#n`\u3001\u65e0\u4ed3\u5e93\u540d), \u6240\u4ee5\u8fd9\u91cc**\u4e0d\u662f\u300c\u5148\u7559\u5360\u4f4d\u7b26\u300d**, \u800c\u662f\u6309\u300c\u65e0\u5173\u8054 (\u5df2\u6838\u5b9e)\u300d\u5199\u6b7b `none`'\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 209.9,
+        "tokens": 80847,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "proposal.md \u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996 (\u82f1\u6587 canonical \u62fc\u5199; \u5199\u6210 `\u5173\u8054 Issue` / `Related Issue` / \u7701\u7565\u8be5\u884c \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "response.md:10-13 \u5934\u90e8 blockquote \u7b2c 4 \u884c\u9010\u5b57\u4e3a `> **Linked Issue**: `none`` (cat -A: `> **Linked Issue**: \\x60none\\x60$`), \u82f1\u6587 canonical \u62fc\u5199, \u65e0\u524d\u5bfc\u7a7a\u767d\u3002OLD-SKILL \u81c2\u540c\u6837\u547d\u4e2d\u3002"
+        },
+        {
+          "text": "\u8be5\u884c\u7684\u503c\u662f inline code span \u4e14\u9010\u5b57\u4e3a `none` (\u65e0\u5173\u8054\u5df2\u6838\u5b9e \u21d2 \u54e8\u5175; \u7559\u7a7a / `N/A` / `TBD` / \u4fdd\u7559 `{<org>/<repo>#<n>}` \u5360\u4f4d\u4e32 \u5747\u4e0d\u7b97)",
+          "passed": true,
+          "evidence": "\u503c\u4e3a inline code span \u4e14\u9010\u5b57 `none` (response.md:13); \u524d\u8a00 response.md:2 \"\u6309\u300c\u65e0\u5173\u8054 (\u5df2\u6838\u5b9e)\u300d\u5199\u6cd5\u9010\u5b57\u586b\u54e8\u5175 `none` \u2014\u2014 \u4e0d\u7559\u7a7a\u3001\u4e0d\u5220\u884c\u3001\u4e0d\u7528 `N/A` / `TBD` / `-`\"\u3002\u65e0\u5360\u4f4d\u4e32\u6b8b\u7559\u3002"
+        },
+        {
+          "text": "\u8be5\u884c\u4e0d\u662f markdown \u94fe\u63a5\u5f62 (\u884c\u5185\u65e0 `](http`), \u4e14\u4e0d\u7559\u7a7a",
+          "passed": true,
+          "evidence": "\u5168\u6587 grep `](http` \u96f6\u547d\u4e2d; Linked Issue \u884c\u503c\u4e3a code span \u975e\u94fe\u63a5\u5f62, \u4e14\u975e\u7a7a\u3002"
+        },
+        {
+          "text": "\u5934\u90e8\u56db\u884c\u987a\u5e8f Level \u2192 Status \u2192 Created \u2192 Linked Issue \u4e0e SOT \u6a21\u677f\u4e00\u81f4 (\u542b `> **Created**:` \u884c)",
+          "passed": true,
+          "evidence": "response.md:10-13 \u4f9d\u6b21\u4e3a `> **Level**: Minimal (Level 2 Spec)` / `> **Status**: Draft` / `> **Created**: 2026-09-04` / `> **Linked Issue**: `none``, \u542b\u663e\u5f0f `> **Created**:` \u884c, \u987a\u5e8f\u4e0e SOT \u6a21\u677f\u4e00\u81f4\u3002"
+        },
+        {
+          "text": "\u6ca1\u6709\u628a\u5b57\u6bb5\u8bd1\u5199\u6210\u522b\u7684\u540d\u5b57 (\u5168\u6587\u65e0 `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5934\u90e8\u5b57\u6bb5\u540d)",
+          "passed": true,
+          "evidence": "grep -i `Related Issue` / `Issue Link` / `\u5173\u8054 Issue` \u4f5c\u4e3a\u5b57\u6bb5\u540d\u96f6\u547d\u4e2d; \u552f\u4e00\u300c\u5173\u8054\u300d\u51fa\u73b0\u5728\u6563\u6587 \"\u672c\u9700\u6c42\u7ecf\u6838\u5b9e\u65e0\u5173\u8054 issue\" (response.md:2)\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 216.9,
+        "tokens": 81312,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u7ed9\u51fa\u7684\u843d\u70b9\u8def\u5f84\u662f\u9879\u76ee\u81ea\u5df1\u4ed3\u5185\u7684 `openspec/changes/<feature>/proposal.md` (feature \u540d\u53ef\u81ea\u62df), \u4e14**\u4e0d\u662f** `standards/openspec/changes/...`",
+          "passed": false,
+          "evidence": "\u5bf9 (1) \u7ed9\u51fa\u7684\u843d\u70b9\u662f `standards/openspec/changes/task-list-due-date-sort/proposal.md` (response.md:30, \u72ec\u7acb\u4ee3\u7801\u5757, \u6807\u6ce8 \"\u76f8\u5bf9 todo-web \u4ed3\u5e93\u6839\u76ee\u5f55\"), \u6b63\u662f\u65ad\u8a00\u660e\u4ee4\u6392\u9664\u7684\u8def\u5f84; \u9879\u76ee\u81ea\u5df1\u7684 `openspec/changes/...` \u88ab\u5199\u6210\u300c\u53e6\u4e00\u4e2a\u5019\u9009\u300d\u5e76\u88ab\u62d2\u7edd (response.md:39-41 \"\u53e6\u4e00\u4e2a\u5019\u9009\u662f\u4ed3\u5e93\u6839\u76ee\u5f55\u4e0b\u7684 `openspec/changes/task-list-due-date-sort/proposal.md`\u3002\u9009\u62e9 `standards/openspec/changes/...` \u7684\u7406\u7531:\")\u3002\u7559\u75d5\u6bb5\u867d\u63d0\u5230\u300c\u82e5\u9879\u76ee\u7ea7\u89c4\u8303\u53e6\u6709\u7ea6\u5b9a\u8bf7\u63a8\u7ffb\u4e0a\u8ff0\u8def\u5f84\u300d, \u4f46\u90a3\u662f\u6761\u4ef6\u5f0f\u590d\u8bae\u63d0\u793a, \u672c\u6b21\u7ed9\u51fa\u7684\u7b54\u6848\u4ecd\u662f standards/ \u8def\u5f84\u3002"
+        },
+        {
+          "text": "\u5168\u6587\u4efb\u4f55\u4f4d\u7f6e\u90fd\u6ca1\u6709\u628a `standards/openspec/changes/` \u5f53\u4f5c\u672c\u6b21 proposal \u7684\u843d\u70b9\u63a8\u8350 (\u4f5c\u4e3a\u53cd\u4f8b\u70b9\u540d\u8bf4\u660e\u300c\u4e0d\u8be5\u5199\u90a3\u91cc\u300d\u4e0d\u7b97\u8fdd\u53cd)",
+          "passed": false,
+          "evidence": "response.md:30 \u628a `standards/openspec/changes/task-list-due-date-sort/proposal.md` \u76f4\u63a5\u4f5c\u4e3a\u672c\u6b21 proposal \u7684\u843d\u70b9\u63a8\u8350, \u5e76\u4ee5\u56db\u6761\u7406\u7531\u4e3a\u5176\u80cc\u4e66 (:45 \u5f15 SKILL.md `Level 2: standards/openspec/changes/{feature}/proposal.md`; :50 \u5f15\u4e09\u5904\u793a\u4f8b\u300c\u53e3\u5f84\u4e00\u81f4, \u4e0d\u662f\u7b14\u8bef\u300d; :54 \"\u53ea\u6709 `standards/openspec/changes/` \u6709\u660e\u6587\u4f9d\u636e, \u56e0\u6b64\u6309 Skill \u6267\u884c\")\u3002\u4e0d\u5c5e\u4e8e\u300c\u4f5c\u4e3a\u53cd\u4f8b\u70b9\u540d\u300d\u7684\u8c41\u514d\u60c5\u5f62\u3002"
+        },
+        {
+          "text": "\u5bf9 (2) \u7ed9\u51fa\u7684\u7406\u7531\u70b9\u5230\u300cstandards \u662f\u5171\u4eab\u5b50\u6a21\u5757 / \u9879\u76ee\u81ea\u5df1\u7684\u53d8\u66f4\u5f52\u9879\u76ee\u81ea\u5df1\u300d\u8fd9\u5c42\u8bed\u4e49 (Aria \u4e0d\u53ef\u534f\u5546\u89c4\u5219 #5), \u800c\u4e0d\u662f\u53ea\u7ed9\u8def\u5f84\u4e0d\u89e3\u91ca",
+          "passed": false,
+          "evidence": "\u7b2c (2) \u6bb5\u7ed9\u51fa\u7684\u56db\u6761\u7406\u7531\u5168\u90e8\u6307\u5411 skill \u6587\u6863\u5b57\u9762 (A.1.4 \u660e\u6587 / Level 2 \u9884\u89c8 Location \u884c / LEVEL_GUIDE \u4e24\u4e2a\u793a\u4f8b / \u300c\u6839\u76ee\u5f55 openspec \u65e0\u51fa\u5904\u300d), \u6ca1\u6709\u4e00\u6761\u63f4\u5f15\u89c4\u5219 #5 \u6216\u300c\u9879\u76ee\u81ea\u5df1\u7684\u53d8\u66f4\u5f52\u9879\u76ee\u81ea\u5df1\u300d\u7684\u8bed\u4e49 \u2014\u2014 \u53cd\u800c\u7528\u5b83\u4eec\u8bba\u8bc1\u4e86\u76f8\u53cd\u7ed3\u8bba\u3002response.md:56 \u7684\u300c\u6267\u7b14\u8005\u7559\u75d5\u300d\u786e\u5b9e\u5199\u5230 \"`standards/` \u662f\u4ece aria-standards \u5f15\u5165\u7684**\u5171\u4eab\u5b50\u6a21\u5757**\", \u4f46\u90a3\u662f\u4e0a\u5448 owner \u7684\u4e0d\u786e\u5b9a\u6027\u7559\u75d5 (\"\u8fd9\u5c5e\u4e8e\u6d41\u7a0b\u5224\u65ad\u5206\u6b67 \u2026\u2026 \u4e0d\u7531\u6267\u7b14\u65b9\u5355\u65b9\u5b9a\u6848\"), \u4e0d\u662f\u5b83\u4e3a\u6240\u9009\u8def\u5f84\u7ed9\u51fa\u7684\u7406\u7531; \u5168\u6587 grep \u65e0\u300c\u4e0d\u53ef\u534f\u5546\u89c4\u5219 #5\u300d\u3002\u6309\u65ad\u8a00\u5b57\u9762 (\u5bf9 (2) \u7ed9\u51fa\u7684\u7406\u7531\u987b\u70b9\u5230\u8be5\u5c42\u8bed\u4e49) \u5224 FAIL\u3002"
+        },
+        {
+          "text": "proposal.md \u5168\u6587\u5934\u90e8 blockquote \u542b\u4e00\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996, \u4e14\u503c\u662f inline code span `none` (\u9898\u5e72\u672a\u7ed9 issue \u53f7)",
+          "passed": true,
+          "evidence": "proposal \u5168\u6587\u5934\u90e8 response.md:65-68 \u4f9d\u6b21\u4e3a Level / Status / Created / `> **Linked Issue**: `none``, \u8be5\u884c\u9010\u5b57\u4ee5 `> **Linked Issue**:` \u8d77\u9996\u4e14\u503c\u4e3a inline code span `none` (cat -A \u786e\u8ba4); \u6587\u672b\u53e6\u6ce8 \"`Linked Issue` \u5f53\u524d\u586b\u7684\u662f\u54e8\u5175\u503c `none`\" \u53ca\u7981 markdown \u94fe\u63a5\u5f62/N-A/TBD/- \u7684\u5199\u6cd5\u3002\u8be5\u5b57\u6bb5\u884c\u4e3a\u4e0e with_skill \u81c2\u7b49\u4ef7\u3002"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 224.725,
+        "stddev": 52.7669,
+        "min": 156.8,
+        "max": 284.8
+      },
+      "tokens": {
+        "mean": 82295.5,
+        "stddev": 3693.8374,
+        "min": 77355,
+        "max": 85456
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.8125,
+        "stddev": 0.375,
+        "min": 0.25,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 181.925,
+        "stddev": 63.5487,
+        "min": 86.7,
+        "max": 216.9
+      },
+      "tokens": {
+        "mean": 80893.75,
+        "stddev": 4402.8948,
+        "min": 75327,
+        "max": 86089
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.19",
+      "time_seconds": "+42.8",
+      "tokens": "+1402"
+    }
+  },
+  "notes": []
+}

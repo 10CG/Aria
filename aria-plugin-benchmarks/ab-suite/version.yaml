@@ -1,10 +1,13 @@
-version: "1.3.0"
+version: "1.4.0"
 created: "2026-03-18"
-last_modified: "2026-09-03"
+last_modified: "2026-09-04"
 skills_covered: 32
-total_eval_cases: 76
+total_eval_cases: 77
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.4.0"
+    date: "2026-09-04"
+    changes: "spec-drafter.json: new eval id 4 level2-proposal-location-rule5-TARGETED (A.1.4 落点路径面此前零覆盖 — Rule #6 判据表第三行的可证伪定向 fixture, 套件缺口在本批随 eval 一并闭合, 不另开 issue); skills_covered / total_eval_cases 程序化重算"
   - version: "1.3.0"
     date: "2026-09-03"
     changes: "audit-engine.json 新建 (Spec sibling-spec-probe rule6_note 点名行为 α/β 各 1 eval, β = SC-16; 经 /skill-creator eval 流程产出, 产出形态 descriptive); skills_covered / total_eval_cases 程序化重算 (ls ab-suite/*.json | wc -l; sum len(evals))"

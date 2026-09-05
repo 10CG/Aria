@@ -1,0 +1,9 @@
+{
+  "eval_id": 1,
+  "eval_name": "level-judgment",
+  "prompt": "判断规范等级: 用户请求 '修复登录页面一个 typo'",
+  "assertions": [
+    "Should judge as Level 1 (Skip) for trivial fix",
+    "Should explain why Level 1 was chosen"
+  ]
+}

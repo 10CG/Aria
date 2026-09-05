@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "bilingual-support",
+  "prompt": "双语输入处理: 'Add a dark mode feature / 添加深色模式功能' — 请生成英文 proposal",
+  "assertions": [
+    "Should correctly parse mixed Chinese/English input",
+    "Should generate proposal content in English as requested",
+    "Should preserve the feature intent from both language inputs",
+    "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+    "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)"
+  ]
+}

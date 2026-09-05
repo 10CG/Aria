@@ -1,0 +1,42 @@
+{
+  "expectations": [
+    {
+      "text": "给出的落点路径是项目自己仓内的 `openspec/changes/<feature>/proposal.md` (feature 名可自拟), 且**不是** `standards/openspec/changes/...`",
+      "passed": false,
+      "evidence": "对 (1) 给出的落点是 `standards/openspec/changes/task-list-due-date-sort/proposal.md` (response.md:30, 独立代码块, 标注 \"相对 todo-web 仓库根目录\"), 正是断言明令排除的路径; 项目自己的 `openspec/changes/...` 被写成「另一个候选」并被拒绝 (response.md:39-41 \"另一个候选是仓库根目录下的 `openspec/changes/task-list-due-date-sort/proposal.md`。选择 `standards/openspec/changes/...` 的理由:\")。留痕段虽提到「若项目级规范另有约定请推翻上述路径」, 但那是条件式复议提示, 本次给出的答案仍是 standards/ 路径。"
+    },
+    {
+      "text": "全文任何位置都没有把 `standards/openspec/changes/` 当作本次 proposal 的落点推荐 (作为反例点名说明「不该写那里」不算违反)",
+      "passed": false,
+      "evidence": "response.md:30 把 `standards/openspec/changes/task-list-due-date-sort/proposal.md` 直接作为本次 proposal 的落点推荐, 并以四条理由为其背书 (:45 引 SKILL.md `Level 2: standards/openspec/changes/{feature}/proposal.md`; :50 引三处示例「口径一致, 不是笔误」; :54 \"只有 `standards/openspec/changes/` 有明文依据, 因此按 Skill 执行\")。不属于「作为反例点名」的豁免情形。"
+    },
+    {
+      "text": "对 (2) 给出的理由点到「standards 是共享子模块 / 项目自己的变更归项目自己」这层语义 (Aria 不可协商规则 #5), 而不是只给路径不解释",
+      "passed": false,
+      "evidence": "第 (2) 段给出的四条理由全部指向 skill 文档字面 (A.1.4 明文 / Level 2 预览 Location 行 / LEVEL_GUIDE 两个示例 / 「根目录 openspec 无出处」), 没有一条援引规则 #5 或「项目自己的变更归项目自己」的语义 —— 反而用它们论证了相反结论。response.md:56 的「执笔者留痕」确实写到 \"`standards/` 是从 aria-standards 引入的**共享子模块**\", 但那是上呈 owner 的不确定性留痕 (\"这属于流程判断分歧 …… 不由执笔方单方定案\"), 不是它为所选路径给出的理由; 全文 grep 无「不可协商规则 #5」。按断言字面 (对 (2) 给出的理由须点到该层语义) 判 FAIL。"
+    },
+    {
+      "text": "proposal.md 全文头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首, 且值是 inline code span `none` (题干未给 issue 号)",
+      "passed": true,
+      "evidence": "proposal 全文头部 response.md:65-68 依次为 Level / Status / Created / `> **Linked Issue**: `none``, 该行逐字以 `> **Linked Issue**:` 起首且值为 inline code span `none` (cat -A 确认); 文末另注 \"`Linked Issue` 当前填的是哨兵值 `none`\" 及禁 markdown 链接形/N-A/TBD/- 的写法。该字段行为与 with_skill 臂等价。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "对 (2) 给出的理由点到「standards 是共享子模块 / 项目自己的变更归项目自己」这层语义 (Aria 不可协商规则 #5), 而不是只给路径不解释",
+        "reason": "本臂是该断言的边界样本: 它在「留痕」段说出了「standards 是共享子模块 / 项目自身变更该落哪一侧」这层语义, 却把它当作待 owner 复议的不确定性, 而非选路理由。若断言意图是「理由必须支撑正确落点」, 建议改写为「第 (2) 段为**所选**路径给出的理由中至少一条援引规则 #5 / 共享子模块语义」, 否则一个自相矛盾的回答可能被判 PASS。"
+      },
+      {
+        "reason": "本 eval 区分力良好 (with 4/4 vs old 1/4), 且失败模式可直接归因: OLD-SKILL 臂逐条引用旧 SKILL.md A.1.4 / Level 2 预览 Location / LEVEL_GUIDE 两处示例共四处 `standards/openspec/changes/` 字面, 明确写下 \"根目录 `openspec/` 落点在本 Skill 的执行流程里没有任何出处\" —— 即旧 skill 语料把模型主动推向错误落点。这一因果值得在 eval 说明里记为该 hunk 的靶心证据。"
+      }
+    ]
+  }
+}

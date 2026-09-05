@@ -1,0 +1,47 @@
+{
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "response.md:10-13 头部 blockquote 第 4 行逐字为 `> **Linked Issue**: `none`` (cat -A: `> **Linked Issue**: \\x60none\\x60$`), 英文 canonical 拼写, 无前导空白。OLD-SKILL 臂同样命中。"
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "值为 inline code span 且逐字 `none` (response.md:13); 前言 response.md:2 \"按「无关联 (已核实)」写法逐字填哨兵 `none` —— 不留空、不删行、不用 `N/A` / `TBD` / `-`\"。无占位串残留。"
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "全文 grep `](http` 零命中; Linked Issue 行值为 code span 非链接形, 且非空。"
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": true,
+      "evidence": "response.md:10-13 依次为 `> **Level**: Minimal (Level 2 Spec)` / `> **Status**: Draft` / `> **Created**: 2026-09-04` / `> **Linked Issue**: `none``, 含显式 `> **Created**:` 行, 顺序与 SOT 模板一致。"
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "grep -i `Related Issue` / `Issue Link` / `关联 Issue` 作为字段名零命中; 唯一「关联」出现在散文 \"本需求经核实无关联 issue\" (response.md:2)。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "OLD-SKILL 臂 5/5 全过 —— 该 eval 对本次 hunk 的区分力为 0。旧 SKILL.md 已含「proposal.md 头部字段要求」全部三条写法, 两臂输出在被断言的字段上逐字节等价。作为 TARGETED eval 它当前测不出新旧差异, 建议重新定靶或标注为 baseline-passing (仅作回归护栏)。"
+      },
+      {
+        "assertion": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+        "reason": "断言只要求四行顺序与含 Created 行, 但没有要求这四行必须是**连续**的头部 blockquote (中间插入 `> **决策来源**:` 等行仍会通过), 也没有钉 `Level` 的取值形态。若顺序/连续性是机械 check 的判定输入, 值得写死。"
+      }
+    ]
+  }
+}
