@@ -13,7 +13,7 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-05"   # v2: post_planning R1 rework (C1 组 6 移出 / C2 state-check 例外 / M1-M11)
+  updated: "2026-09-05"   # v3: post_planning R2 rework (双跑法 / TASK-020 独立路径 / 组 0 入 merge 前置 / TASK-042 tracker 承载 / 回帖措辞 / §2.3.5 注记位置 / CLAUDE.md :139)
   ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -29,7 +29,7 @@ metadata:
       surface: ".aria/repro/handoff-tracks-frozen-2026-09-05.json (已在) · 主仓同步面 (gitlink ×2 / VERSION / README ×4 / 架构文档 ×2 / CLAUDE.md 版本行) · 本 Spec 三文件"
       path_prefix: ""
   ship_target: "aria-plugin <vNEXT> (档位按 proposal D5: 判据 PATCH, owner 可升 MINOR; TASK-035 时按 plugin.json 计)"
-  test_runner: "python3 aria/skills/state-scanner/tests/run_tests.py (stdlib unittest, 正规跑法); pytest 备选 = /home/dev/.local/bin/pytest -q -p no:cacheprovider, 且 sys.path 顺序必须 scripts 后 state-scanner 在前 (双 lib 包陷阱, memory feedback_state_scanner_dual_lib_package_shadow)"
+  test_runner: "两种跑法都必跑 (unittest discover 收不到 pytest 风格裸函数; 起草日 run_tests.py Ran 1476 vs def test_ 1492, 差 16 全在 test_collision.py = SC-1/2/8 交付文件): (a) python3 aria/skills/state-scanner/tests/run_tests.py; (b) /home/dev/.local/bin/pytest -q -p no:cacheprovider aria/skills/state-scanner/tests, sys.path 顺序必须 scripts 后 state-scanner 在前 (双 lib 包陷阱, memory feedback_state_scanner_dual_lib_package_shadow); RED→GREEN 证据对 test_collision.py 用 pytest"
   hard_constraints:
     - "子模块合并一律本地 git merge + 双推; 禁 Forgejo 服务端合并 (CLAUDE.md 多远程硬约束 1)"
     - "推后逐 remote ls-remote 核验 master 与 tag 对象 SHA, 不信 push 回执 (硬约束 2)"
@@ -38,7 +38,7 @@ metadata:
     - "禁带圈数字 / 希腊字母编号 (全局规则)"
   rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 五条 baseline-failing 结构化测试, 承载任务 TASK-001 / 002 / 003 / 004 / 005 / 007 / 008, 各有改前 (aria 7dd0135) 实跑红 / 改后绿记录 (TASK-031 汇总); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑。tasks.md 不复述本条 (单一来源)"
   s2_followup:
-    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030 (接入 TASK-034 前置); 否则维持 S1, D 期 Step 7 用 tracker issue 记录 (先例 sibling-spec-probe #192)"
+    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030 (接入 TASK-034 前置); 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)"
     items:
       - id_reserved: TASK-027
         parent_reserved: "6.1"
@@ -51,16 +51,16 @@ metadata:
       - id_reserved: TASK-029
         parent_reserved: "6.3"
         title: "改写 a1-entry SC-3 判据 (仅 #174 ack 后)"
-        verification: "ack 留言 id 记录; 判据改为 get_container_uuid() 与 flip 后 get_container_id() 同值"
+        verification: "ack 留言 id 记录; 判据改为 get_container_uuid() 与 flip 后 get_container_id() 同值; label 只在 get_container_label()"
       - id_reserved: TASK-030
         parent_reserved: "6.4"
         title: "复现 #135 08-13 时间线不再 claim_not_found"
         verification: "SC-3 S2: acquire 后加 label 再 release 成功"
-  total_tasks: 38
+  total_tasks: 39
   agents:
     backend-architect: 15
     qa-engineer: 15
-    knowledge-manager: 8
+    knowledge-manager: 9
 
 tasks:
   # ---------------------------------------------------------------------------
@@ -380,9 +380,9 @@ tasks:
     complexity: S
     est_hours: 2
     agent: backend-architect
-    dependencies: [TASK-014, TASK-016, TASK-009]
+    dependencies: [TASK-014, TASK-009]
     deliverables:
-      - aria/skills/state-scanner/scripts/renderers/track_board.py   # 插入点 :459-475 (kind 分支旁) + dedupe 前调用 :744
+      - aria/skills/state-scanner/scripts/renderers/track_board.py   # 独立数据路径: render_track_board 顶层, 在 dedupe (:744) 前对原始 tracks 调 identity_drift_advisories, 输出为 collision 段 (:796 之后) 的独立段; 不进 per-track 循环 (:459-475 只有 dedupe 后数据)
     verification:
       - "TASK-009 转绿 (含反事实红)"
 
@@ -411,9 +411,9 @@ tasks:
     agent: knowledge-manager
     dependencies: [TASK-021]
     deliverables:
-      - standards/conventions/session-handoff.md   # :178-186 + 节末「变更说明 2026-09-05」
+      - standards/conventions/session-handoff.md   # :178-186 + 紧贴 §2.3.5 标题下方的 `> **Amended**: 2026-09-05 …` blockquote (与 §2.3 头部 Added/Purpose/Status 惯例同形)
     verification:
-      - "SC-5: 恰三行; 含 非空 / unknown / same-identity-multi-owner / 全集; 不含 等价类 / aria/skills / lib/; 变更说明段存在 (standards 无 CHANGELOG)"
+      - "SC-5: 恰三行; 含 非空 / unknown / same-identity-multi-owner / 全集; 不含 等价类 / aria/skills / lib/; Amended 注记存在于 §2.3.5 标题正下方 (standards 无 CHANGELOG)"
 
   - id: TASK-023
     parent: "3.3"
@@ -498,8 +498,8 @@ tasks:
     deliverables:
       - "实跑记录 (handoff §5)"
     verification:
-      - "SC-7: python3 aria/skills/state-scanner/tests/run_tests.py 零失败 (点名改写项外零新增红); pytest 备选同结论 (metadata.test_runner 顺序); test_fetch_gate.py / session-closer / phase-d-closer 测试全绿"
-    notes: "起草日全套 1492 个 test 定义 (grep def test_); 双 lib 包陷阱见 metadata.test_runner"
+      - "SC-7: (a) run_tests.py 零失败 且 Ran 数 ≥ 1476 + 本 Spec 新增 TestCase; (b) pytest 全套零失败 且收集数 ≥ 1492 + 本 Spec 新增 (含 test_collision.py 裸函数); 点名改写项外零新增红; test_fetch_gate.py / session-closer / phase-d-closer 测试全绿"
+    notes: "两跑法缺一不可: 单跑 run_tests.py 对 test_collision.py 是空判据 (post_planning R2 qa C-1); 双 lib 包陷阱见 metadata.test_runner"
 
   - id: TASK-033
     parent: "4.3"
@@ -541,7 +541,7 @@ tasks:
     complexity: S
     est_hours: 1
     agent: backend-architect
-    dependencies: [TASK-035, TASK-037]
+    dependencies: [TASK-035, TASK-037, TASK-000, TASK-040]
     deliverables:
       - "aria 子模块 master (本地) + tag v<NEXT>"
       - "standards 子模块 master (本地)"
@@ -579,9 +579,9 @@ tasks:
       - README.ko.md
       - docs/architecture/system-architecture.md   # §2.8 版本行
       - docs/architecture/version-scheme.md   # aria-plugin 版本行
-      - CLAUDE.md   # 「版本: 插件 aria-plugin vX」一行, 项目状态段其余不动 (claude-md-hygiene)
+      - CLAUDE.md   # 两行: :141 「版本: 插件 aria-plugin vX」 + :139 方法论轨区间端点 「v1.52.0–v<NEXT> 已 ship」; 项目状态段其余不动 (claude-md-hygiene)
     verification:
-      - "m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match / main-project-version-consistency / m6-claude-md-version 全绿 (TASK-033 汇总)"
+      - "m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match / main-project-version-consistency / m6-claude-md-version 全绿 (TASK-033 汇总); CLAUDE.md:139 区间端点 == plugin.json 版本 (grep 断言, 无机械 check 兜底)"
 
   - id: TASK-037
     parent: "5.4"
@@ -616,9 +616,25 @@ tasks:
     complexity: S
     est_hours: 1
     agent: knowledge-manager
-    dependencies: [TASK-039]
+    dependencies: [TASK-039, TASK-040]
     deliverables:
       - .aria/triage-comment.md   # 追加 ship 段 (草案)
       - "Forgejo comments ×3 (外向)"
     verification:
-      - "文案含: 三层根因 / 裁定 / 版本 / 采用方影响; #193 关闭; #135 留缺口 1/2; comment id 回填草案"
+      - "文案含: 三层根因 / 裁定 / 版本 / 采用方影响; #193 关闭; #135 措辞按形态: S1 = 缺口 3 部分闭合 (解析/身份键/dedupe/advisory), label 陷阱待 S2 或 tracker; S2 = 缺口 3 闭合; 缺口 1/2 均留; comment id 回填草案"
+
+  - id: TASK-042
+    parent: "5.8"
+    title: "S2 后续承载体: S1 ⇒ 手动开 tracker issue (merge 后、归档前); S2 已激活 ⇒ 勾选为已激活"
+    status: pending
+    complexity: S
+    est_hours: 0.5
+    agent: knowledge-manager
+    dependencies: [TASK-039, TASK-000, TASK-040]
+    deliverables:
+      - openspec/changes/owner-container-identity-key-and-collision-parser/tasks.md   # 「S2 后续」表回填 tracker 编号或「已激活, 见 6.x」
+      - "Forgejo 10CG/Aria issue (外向, 仅 S1)"
+    verification:
+      - "S1: tracker issue 含激活条件 + S2-1..S2-4 原文 + 本 Spec 归档路径; 编号回填 tasks.md; handoff carry 引用该 issue"
+      - "S2: 6.1-6.4 已追加且本条注明「已激活」"
+    notes: "归档 Step 7 (openspec-archive) 只在 deferred/unverified 非空时产出 d_payload, 干净归档不会自动记录 S2 后续 (post_planning R2 tech-lead M-1 / knowledge-manager A)"
