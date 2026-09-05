@@ -1149,7 +1149,7 @@ tasks:
     parent: "8.3"
     task_group: 8
     title: "follow-up 开单: Impact follow-up #1–#7 + §2.2 audit-engine 轮间 heartbeat (不在本 Spec, 各带去处)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
@@ -1162,6 +1162,18 @@ tasks:
       - "每条 issue 正文引本 Spec 的成文已知限段落 (§2.1b / §2.2 / §2.3 / §3 / §5.2 / §非目标), 不复述机制"
       - "开单前 fetch 看板核重复 (memory concurrent-duplicate-audit-fetch-before-start): #4 与 aria-plugin#135「认领机制三处缺口」可能重叠, 重叠则评论而非新开"
     notes: "这些是「不落任务的项」的唯一动作: 开单, 不实现。#5 已在 Spec 头部与 §2.3 两处成文为已知限。"
+    b2_evidence: >
+      **2026-09-05 开单 8 条, 全部经独立 GET 核验为 open 且正文非空** (不信 POST 回执):
+      #1 aria-standards#19 / #2 aria-plugin#163 / #3 aria-plugin#164 / #4 aria-plugin#165 /
+      #5 Aria#196 / #6 aria-plugin#166 / #7 aria-plugin#167 / #8 aria-plugin#168。
+      去处与 verification 第 1 条逐条一致。verification 第 3 条 (开单前 fetch 看板核重复) 已执行:
+      四仓看板实拉 (aria-plugin 34 / Aria 25 / aria-orchestrator 2 / aria-standards 4),
+      **#4 与 aria-plugin#135 逐条比对不重叠** (#135 三缺口 = 快照不解析 claim / 闸门只覆盖
+      Phase B / 容器身份键不稳, 均非 B.0 呈现强度) ⇒ 按 Spec 新开并在正文交叉引用。
+      #1 另发现 Aria#193 有容器在制 (track owner-container-identity-key-and-collision-parser),
+      已在 issue 正文点名请交叉核对 —— 二者落点不同 (standards 规范侧 vs 代码侧), 不归并。
+      verification 第 2 条 (引成文段落不复述机制) 逐条照办: 各 issue 引 proposal.md
+      :416/:640/:337+:503/:739/:270+:275/follow-up#6/:284/:205。
   - id: TASK-040
     parent: "8.4"
     task_group: 8

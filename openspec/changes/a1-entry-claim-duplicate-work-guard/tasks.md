@@ -105,7 +105,20 @@
 
 - [ ] 8.1 `aria/CHANGELOG.md` 条目 + 版本 SOT 5 文件同步 (`.claude-plugin/plugin.json` / `marketplace.json` / `VERSION` / `README.md` / CHANGELOG); 号 = `<vNEXT>`, **落地时按 plugin.json 计算, 本文件不锁字面量** (A.2 倾向 MINOR: 新 CLI 模式 + 2 flag + 2 lib API + 能力面扩权; **档位 = MINOR (2026-09-01 技术裁定, 决策单 §H1)**, 三份串行 ship 各占一号, 不合并一版; 号落地时按当时 plugin.json 计算)
 - [ ] 8.2 主仓发版同步面 (与 086ee32 同口径 14 处版本点, R1 C2): gitlink `aria` bump 到 post-merge master SHA (index 条目, 非 `.gitmodules`) + 主仓 `VERSION:24` + `CLAUDE.md:139/:141` + root `README.md:8/:242` + i18n ×3 (`README.zh.md` / `README.ja.md` / `README.ko.md` 各 `:3` translated-from 标记 + `:10` badge + `:244` Plugin Version; 正文按 #140 B 档判是否重译, **标记与版本串必改**) → 全部改完后才断言机械兜底 `m6-version-badge-match` / `i18n-readme-translation-currency` 绿
-- [ ] 8.3 follow-up 开单 (不在本 Spec, 各带去处): Impact follow-up 表 #1–#7 (`owner-container` 口径 / `SWEEP_TTL`→`STALE_TTL` 三处措辞 / `unknown_schema_claims` 路径 / B.0 YAML-键形态 / `unattended` Layer 1→2 env 三腿契约 / 跨容器定向 release / `ClaimRecord` swept 标记) + §2.2 已知限「audit-engine 轮间 heartbeat」
+- [x] 8.3 follow-up 开单 (不在本 Spec, 各带去处): Impact follow-up 表 #1–#7 (`owner-container` 口径 / `SWEEP_TTL`→`STALE_TTL` 三处措辞 / `unknown_schema_claims` 路径 / B.0 YAML-键形态 / `unattended` Layer 1→2 env 三腿契约 / 跨容器定向 release / `ClaimRecord` swept 标记) + §2.2 已知限「audit-engine 轮间 heartbeat」 — ✅ **2026-09-05 开单 8 条** (开单前已按 verification 第 3 条 fetch 四仓看板核重复; `#4` 与 aria-plugin`#135` 三缺口逐条比对**不重叠**, 按 Spec 新开并交叉引用):
+
+| follow-up | issue | 去处 |
+|---|---|---|
+| #1 `owner-container` 口径统一 | [aria-standards#19](https://forgejo.10cg.pub/10CG/aria-standards/issues/19) | standards (handoff frontmatter 规范) |
+| #2 `SWEEP_TTL`→`STALE_TTL` 三处措辞 | [aria-plugin#163](https://forgejo.10cg.pub/10CG/aria-plugin/issues/163) | aria-plugin |
+| #3 `unknown_schema_claims` 路径/身份 | [aria-plugin#164](https://forgejo.10cg.pub/10CG/aria-plugin/issues/164) | aria-plugin |
+| #4 B.0 YAML-键形态 | [aria-plugin#165](https://forgejo.10cg.pub/10CG/aria-plugin/issues/165) | aria-plugin |
+| #5 `unattended` Layer 1→2 env 三腿契约 | [Aria#196](https://forgejo.10cg.pub/10CG/Aria/issues/196) | Aria 主仓 |
+| #6 跨容器定向 release | [aria-plugin#166](https://forgejo.10cg.pub/10CG/aria-plugin/issues/166) | aria-plugin (D6 权限面) |
+| #7 `ClaimRecord` swept 标记 | [aria-plugin#167](https://forgejo.10cg.pub/10CG/aria-plugin/issues/167) | aria-plugin |
+| #8 audit-engine 轮间 heartbeat (§2.2) | [aria-plugin#168](https://forgejo.10cg.pub/10CG/aria-plugin/issues/168) | aria-plugin |
+
+> **不属本任务的额外一条**: [aria-plugin#169](https://forgejo.10cg.pub/10CG/aria-plugin/issues/169) — `resilient_push` 的 non-FF 恢复路径结构上必失败 (非强制 fetch 遇分叉必 reject, 且从不重放本地 claim 写入)。2026-09-05 dogfood `--heartbeat-only` 时生产实撞 + 离线三态负控确认, 是**本 cycle 之外的新发现**, 记此仅为溯源。
 - [ ] 8.4 aria 子模块本地 merge → master + 双推 + 逐 remote `ls-remote` 核验 + tag (CLAUDE.md 硬约束 1/2 的任务宿主; 两 remote 一致后才做 8.2 gitlink bump) — R2/A1 3221f943 残留补; **执行序 8.1 → 8.4 → 8.2** (编号不可变, 列于末不代表最后做; 见 yaml dependencies)
 
 ---
