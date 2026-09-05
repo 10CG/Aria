@@ -101,7 +101,7 @@ tasks:
     parent: "1.5"
     task_group: TG-1
     title: "Title/body sanitization pipeline"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -110,9 +110,9 @@ tasks:
       - aria-orchestrator/docker/aria-runner/modes/initial.sh   # envsubst whitelist at :286
       - aria-orchestrator/docker/aria-runner/tests/
     verification:
-      - "AC-7: YAML-safe escape + CRLF→LF + length cap (truncate marker) + injection isolation (wrap as user-content-not-instructions)"
+      - "AC-7: control-char strip (was YAML-safe escape; amended 2026-09-05 per owner ruling option A — envsubst→markdown data flow has no YAML consumer) + CRLF→LF + length cap (truncate marker) + injection isolation (wrap as user-content-not-instructions)"
       - "AC-7: body flows through existing envsubst whitelist ($ARIA_ISSUE_TITLE/$ARIA_ISSUE_DESCRIPTION) and is NOT re-expanded"
-
+    notes: "2026-09-05 owner 裁定选 A → done: 条文对齐实现 (控制字符剥离, 非 YAML 转义); unit 3 条锁定; proposal/AD 风险 5 同步。"
   - id: TASK-006
     parent: "1.6"
     task_group: TG-1
@@ -431,7 +431,7 @@ tasks:
     parent: "5.1"
     task_group: TG-5
     title: "Write AD-M6-10 (six-section) — C' dual-channel + single-node bind-mount scope"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: knowledge-manager
@@ -440,8 +440,9 @@ tasks:
       - aria-orchestrator/docs/architecture-decisions.md
     verification:
       - "AC-10: AD-M6-10 written (six-section: decision/background/alternatives/rationale/risks/rollback); includes single-node scope of bind-mount input assumption"
-    notes: "AD-M6-10 reserved (next available; AD-M6-8 Retired, AD-M6-3 skipped)."
-
+    notes: >
+      AD-M6-10 reserved (next available; AD-M6-8 Retired, AD-M6-3 skipped).
+      2026-09-05 owner 裁定选 A → done: AD-M6-10 背景 1 + Alternatives D 论据勘正 (heavy 侧实为共享 virtiofs over NFS), 决定不变; proposal §Alternatives D 同步。
   - id: TASK-024
     parent: "5.2"
     task_group: TG-5

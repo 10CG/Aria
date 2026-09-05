@@ -95,7 +95,7 @@ node-agnostic principle to the *input* side.
   `INPUT_FETCH_FAILED`. **Never `|| true`, never silent continue.** Retriable-exhausted and
   non-retriable both surface as `INPUT_FETCH_FAILED` but are logged distinctly. Rationale: over a 168h
   run, transient Forgejo blips without retry would burn dispatches and erode the AC-5 corpus.
-- **A.4** Title/body sanitization pipeline: YAML-safe escaping + CRLF→LF normalization + length cap
+- **A.4** Title/body sanitization pipeline: control-char stripping (**Amendment 2026-09-05, owner ruling TASK-005 option A**: was "YAML-safe escaping" — the sanitized text is envsubst'd into a markdown template and never YAML-parsed, so there is no consumer for escaping; wording aligned to the implementation, no code change) + CRLF→LF normalization + length cap
   (truncate marker on overflow) + injection isolation (wrap as "user-authored content, not
   instructions"). Content flows through the existing envsubst whitelist (`initial.sh:286`,
   `$ARIA_ISSUE_TITLE $ARIA_ISSUE_DESCRIPTION`) — body is **not** re-expanded.
@@ -261,7 +261,7 @@ always exist. This Spec introduces a **three-outcome model** (amends AD-M1-4, se
 | **C' dual-channel** | title/body → fetch; metadata → META; always-fetch | ✅ **Selected** |
 | C-fetch (original) | all via fetch + derive metadata from URL + file-first dual-mode | ⚠️ Upgraded to C': deriving metadata from URL removes cross-repo decoupling; file-first = stale-read hazard |
 | C-meta | full issue content in META env | ❌ Long body risks the per-field META cap (`META_VALUE_CAP_BYTES = 100 KB`, `prompt_render.py:42`; the real ceiling is Linux `MAX_ARG_STRLEN` 128 KiB — R7 in `m0-report.md` §1.2 **debunked** the old "64 KB" myth) + content double-write. (C' metadata fields are tiny, so no cap concern; C-meta rejected on double-write + unbounded-body grounds, not the debunked number.) |
-| D shared storage | make `aria-runner-inputs` an NFS/cluster volume | ❌ **Honestly rejected (recon-confirmed):** `host-volume.hcl:26` shows `path=/opt/aether-volumes/aria-runner/inputs`, `read_only`, **local, not NFS**. AD4 mentions heavy nodes mounting `nfs-fastpool-aether`, but the *writer* (`light-1`) is confirmed local `ext4` — Option D would additionally require `light-1` to mount NFS (infra change) + inverts the node-agnostic philosophy + introduces a shared-volume single point |
+| D shared storage | make `aria-runner-inputs` an NFS/cluster volume | ❌ **Rejected — rationale corrected 2026-09-05 (owner ruling TASK-023 option A; decision unchanged):** the original "local, not NFS" reading of `host-volume.hcl:26` was wrong — that file declares only path + `read_only`, no filesystem type, and the heavy-side tree `/opt/aether-volumes/` IS shared across all three heavy guests (virtiofs over NFS; `aria-orchestrator/docs/m0-report.md:79-82` R8 + `openspec/archive/2026-04-17-aria-2.0-m0-prerequisite/artifacts/t2/storage-validation-report.md` cross-node md5 parity). D still loses because (1) the *writer* `light-1` is not on that tree, so D needs an infra change on light-1 (DEC-20260702-001 §D row); (2) file delivery keeps the node-pinned / stale-read surface that C''s always-fetch exists to kill; (3) it inverts the proven node-agnostic channel philosophy + adds a shared-volume single point. (1)+(2) hold regardless of heavy-side sharing |
 | E node-pin + push | Layer 1 `scp` to target heavy node + dispatch node constraint | ❌ Most bespoke/fragile (per-dispatch scp + reschedule-to-same-node coupling) |
 
 ## Prerequisite Verification (DEC §待核实, resolved by code recon @ `daf7c79`)
@@ -323,7 +323,7 @@ META cap is `META_VALUE_CAP_BYTES = 100 KB` (`prompt_render.py:42`), and R7 (`m0
       → `_handle_s5_await` routes `FailReason.INPUT_FETCH_FAILED` (infra-fail) **distinct from**
       `CONTAINER_CRASH` (agent/exec-fail); fixture test covers both branches so infra failures do not
       pollute AC-5 corpus attribution.
-- [ ] **AC-7** Title/body sanitization: YAML-safe + CRLF→LF + length cap + injection isolation;
+- [ ] **AC-7** Title/body sanitization: control-char strip (was "YAML-safe", amended 2026-09-05 per owner ruling — see §A.4) + CRLF→LF + length cap + injection isolation;
       body not re-expanded by envsubst (whitelist-verified).
 - [ ] **AC-8** `issue_id` value reformat surveyed: every acceptance query keying on `issue_id`
       tolerates the new format; #147 issue_type_hint stratification unaffected (json_extract path).
