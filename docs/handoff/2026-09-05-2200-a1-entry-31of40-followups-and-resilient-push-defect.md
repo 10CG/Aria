@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: B.2
 status: active
-updated-at: 2026-09-05T22:02:46Z
+updated-at: 2026-09-05T22:35:22Z
 ---
 
 # Aria — Session Handoff (2026-09-05, 会话收尾 #2) — 母 Spec 31/40: 8.3 开单 8 条 + 撞出 `resilient_push` 结构缺陷
@@ -92,6 +92,19 @@ updated-at: 2026-09-05T22:02:46Z
 ## §3 关键风险 / 已知陷阱
 
 1. **⛔ AB 运行前置是会话级的, 在会话内补不上 (本 session 再次实测确认)。** `ARIA_COORDINATION_NO_PUSH` 实测 **UNSET**; 会话内 `export` 只影响那一个 Bash 子进程, 改不了 subagent 的继承环境。硬跑的后果成文且有实证 (被测 Skill 会把合成 claim 推到生产 `refs/aria/coordination`)。**这不是 Rule #6 豁免** —— 本批改了 `allowed-tools` (能力面扩权), 照跑档不变, 只是执行条件不具备。
+
+   **启动方式** (推荐 resume, 见本条末): `ARIA_COORDINATION_NO_PUSH=1 claude --resume` —— 变量设在**新起的 claude 进程**上, `--resume` 只是把旧对话读进该进程, 两者不冲突; subagent 与 Bash 子进程按 POSIX 规则继承。取值 `1`/`true`/`yes` (大小写不敏感, 前后空白忽略, `lib/failure_handlers.py:95`)。
+
+   **⚠️ AB 会话期间不要做真实 heartbeat / acquire** (本条**晚于本 doc 主体写成**, 只在 [aria-plugin#169 的评论](https://forgejo.10cg.pub/10CG/aria-plugin/issues/169#issuecomment-21711) 里有, 故补记于此):
+   - AB 会话全程 `NO_PUSH=1` ⇒ 那期间**任何** claim 写入都只落本地、都没推上去 —— 不区分合成还是真实。
+   - 手册 `AB_TEST_OPERATIONS.md:228` 强制要求跑完执行 `git fetch origin +refs/aria/coordination:refs/aria/coordination` 清理合成 claim。这是 **`+` 强制** fetch, 会把本地 ref 整个重置到远端 SHA ⇒ **本地未推的真 claim 一并消失**。
+   - 后果具体化: 该会话里做的真实 heartbeat 刷新 → 时间戳回退到 AB 之前 (更靠近 sweep 死线); 该会话里做的真实 acquire → 整条丢弃, 认领等于没发生。
+   - **正确次序**: 跑 AB → 跑清理 `+` fetch → **之后**才刷本轨 heartbeat。本轨当前 sweep 死线 `2026-09-06T21:40Z`, 时间充裕, 不要为了抢时间在 AB 中途刷。
+   - 实证依据: 2026-09-05 我在生产上手工跑同款 `+` fetch, 把刚写好的 heartbeat commit `6472f81` 冲成远端 `00ca2d3` (见 §3 第 3/4 条与 memory `fetch-then-write`)。
+
+   **验收 env 真的进了会话** (手册第 2 条): eval transcript 里 `phase1_gate` / `release_gate` 的 JSON 应含 `"push_skipped": true, "push_skipped_reason": "env_var"`; 见到 `push_skipped: false` ⇒ env 没进来, **该 run 作废**, 并 `git ls-remote origin refs/aria/coordination` 核查远端有没有被污染。
+
+   **建议 resume 而非开新会话** (2026-09-05 22:33 实测 runtime-truth: 窗口 1M, 已用 **33%**, 余 67%, `relay_cache`/`confidence=high`): 余量充足 (advisory 阈值 <70% = 继续推进), 且上面这几条约束在新会话里要从本 doc 重建 —— 而「照交接散文重建」正是本 cycle 踩过的坑 (memory `handoff≠spec`)。AB 结果不受影响: eval 由 `/skill-creator` 起独立 agent 跑, 主对话 transcript 不是它们的输入; 已知污染通道 (#116 co-landing 文档 + 仓内在制 proposal 语料) 与 resume 与否无关。
 
 2. **7.6 的不做是有依据的, 不要当成遗漏补掉。** owner 已授权「开单」, 但授权解的是「能不能做」, Spec 的 `dependencies` 解的是「**现在**能不能做」—— 两者正交。TASK-036 的 `dependencies: [TASK-035]` 明写依赖 7.5 跑评测半, 后者阻塞。已落 memory (`no-self-exempt-gates` 追记)。
 
