@@ -310,7 +310,7 @@ tasks:
     parent: "2.4"
     task_group: 2
     title: "SC-2 / SC-8 / SC-29 红测 (CLI 全链路 subprocess): 互含 / 终态可见 / 自排除两组"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -330,6 +330,13 @@ tasks:
       SC-2 与 SC-29 分开列 (baseline 红/绿分辨力, R2/M-16)。夹具全程 --no-push (d69091d 已支持) 且 tmp bare remote,
       不触生产 ref。
 
+      8 用例落地, 当前 7 红 1 绿 = 设计中的 baseline 红。红因逐字: phase1_gate: error:
+      unrecognized arguments: --include-terminal (exit 2)。该 flag 归 TASK-014, 而 TASK-014 依赖
+      [TASK-003, TASK-008, TASK-013] ⇒ 本任务完成时 CLI 层必然仍红, 由 TASK-014 关闭。
+      唯一绿的 test_default_path_still_omits_terminal_claims 是默认路径回归守卫, 证明终态今天确被 :272 丢弃。
+      **欠**: 本条 verification 列的 CLI 层坏实现负控 (删自排除两行 / 门控丢 --linked-issue /
+      flag=跳过全部 continue) 须在 TASK-014 后补跑。现已在 lib 层跑等价自排除负控:
+      删两行 ⇒ own track 出现两次 (含终态那条), 还原经 hash-object 核验。
   - id: TASK-008
     parent: "2.5"
     task_group: 2
@@ -457,7 +464,7 @@ tasks:
     parent: "3.3"
     task_group: 3
     title: "lib/collision.py::linked_issue_overlaps 增 keyword-only include_terminal: bool = False"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -471,6 +478,15 @@ tasks:
       - "现有 tests/test_release_by_track.py TestLinkedIssueOverlaps (:206) 与 TestLinkedIssueNormalizationSC (:586) 全绿 (三参数调用兼容)"
       - "归档姊妹 Spec :257/:259 已写明本形参不视为回归; 不编辑归档件"
     notes: "Spec 行号 :230-234/:268/:272-275/:278-279 在 d69091d 逐字一致 (v1.67.2 未动本文件)。"
+    b2_evidence: >
+      签名加 keyword-only 形参, 只改第一道门; 第二道门与自排除未动。lib 层五条直证全部成立
+      (默认取值不变 / True 时 done·abandoned 现身 / unknown 仍被第二道门丢弃 / yielded 不属 _TERMINAL /
+      自排除对终态同样生效); 既有 20 个三位置参数测试全绿。
+      **锚点位移 +13** (2 行签名 + 11 行 docstring): 短路 :265->:278, _TERMINAL :268->:281,
+      第二道门 :274->:287, 自排除 :278->:291 (def 本身仍 :230)。tasks.md 行号复核表已补行。
+      **verification 第 1 条在本任务时点结构上不可满足**: 'TASK-007 的 SC-8 臂绿' 是 CLI 层断言,
+      需 TASK-014 的 --include-terminal flag, 而 TASK-014 依赖本任务 ⇒ 该条实为 TASK-014 的验收项。
+      本任务只能验到 lib 层, 已如实标注, 不声称 SC-8 已绿。
 
   # -------------------------------------------------------------------------
   # Group 4 — phase1_gate.py (backend-architect; 同文件三任务串行 014 → 015 → 016, 已编码为 dependencies 边)
