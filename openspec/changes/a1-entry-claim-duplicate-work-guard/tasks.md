@@ -35,7 +35,7 @@
 
 ## 2. TDD 红测 (代码类 SC, 夹具先于实现)
 
-- [ ] 2.1 SC-3: `get_container_uuid()` 单测 — 设了 `label` 的 container-id 夹具仍取 `uuid` 字段; 坏实现 = 直接调 `get_container_id()` (baseline 必红: accessor 不存在)
+- [x] 2.1 SC-3: `get_container_uuid()` 单测 — 设了 `label` 的 container-id 夹具仍取 `uuid` 字段; 坏实现 = 直接调 `get_container_id()` (baseline 必红: accessor 不存在) — ✅ **2026-09-05**: 新建 `tests/test_identity_container_uuid.py` 5 用例 (SC-3 主断言 / 夹具区分力 / 空 label 对照 / `:244` 落盘臂 / `:242` hostname 兜底臂)。**baseline 红已亲验** (`ImportError: cannot import name 'get_container_uuid'`); **两个坏实现负控实跑**: A 委派型 (`return get_container_id`) ⇒ 主断言红 · B 不落盘型 (跳过 `_write_container_file`) ⇒ 落盘臂 + hostname 兜底臂双红; 负控后按 `git hash-object` 核验已还原
 - [ ] 2.2 SC-5 / SC-6 / SC-7: `heartbeat_by_track` 单测 — 跨 subprocess 第二次不同 session_id 仍刷新 / 一对多全部刷新 / SC-7 两臂 (超 `SWEEP_TTL` 仍被 sweep **且** 调新变体后不被 sweep)
 - [ ] 2.3 SC-15 (baseline 即绿回归守卫): 改名两步 `release_claim_by_track(旧)` + `acquire_claim(新)` 无孤儿 + 无关第三方 claim 负控 (不共享前缀/后缀、不同容器段); 坏实现 = 匹配键改按 `linked_issue` / 按 container 批量
 - [ ] 2.4 SC-2 / SC-8 / SC-29 (CLI 全链路 subprocess): 同 issue 不同 track-id 双方互含 (SC-2, baseline 即绿) / 终态 `done`·`abandoned` 带 `--include-terminal` 可见 (SC-8, baseline 必红) / 自排除两组 own=active 与 own=terminal (SC-29, baseline 即绿); 负控 = 删 `lib/collision.py:278-279` 两行验红
@@ -45,7 +45,7 @@
 
 ## 3. lib 代码
 
-- [ ] 3.1 `lib/identity.py` 新增 `get_container_uuid(home_dir=None) -> str` (直取 `uuid` 字段, 跳过 label; hostname 兜底 `:242` 成文)
+- [x] 3.1 `lib/identity.py` 新增 `get_container_uuid(home_dir=None) -> str` (直取 `uuid` 字段, 跳过 label; hostname 兜底 `:242` 成文) — ✅ **2026-09-05**: 纯插入 **+61 −0** 于 `:247` (`get_container_id` `:191-244` 逐字节不变, 硬约束满足); TASK-004 5/5 绿; 除定义与测试外**零调用点**; 全 aria 套件 10 skill OK / 2017 tests 零回归。**技术级裁定留痕**: `lib/__init__.py` 未加再导出 —— identity 公开函数由 5/5 变 5/6, 理由 = deliverables 只列 `identity.py` 一个文件 + verification 的 grep 口径在多一处出现时可争议 + 设计上该 accessor 经 `from lib.identity` 直调 (§2.1a 不建拼接宿主)。若 Group 3 复核认为应对齐导出面, 一行即可补
 - [ ] 3.2 `lib/claim_lifecycle.py` 新增 `heartbeat_by_track(raw_track_id, identity=None, repo_path=None, *, now=None) -> AcquireResult` (按 `(container, 归一 track_id)` 刷全部 active; `dataclasses.replace`; 既有 `heartbeat()` `:228` 键不动; `ClaimRecord` 11 字段零改动)
 - [ ] 3.3 `lib/collision.py::linked_issue_overlaps` 增 keyword-only `include_terminal: bool = False` (默认路径逐字节不变; `:278-279` 自排除对终态同样生效)
 

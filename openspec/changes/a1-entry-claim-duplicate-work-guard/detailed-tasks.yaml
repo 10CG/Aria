@@ -232,7 +232,7 @@ tasks:
     parent: "2.1"
     task_group: 2
     title: "SC-3 红测: get_container_uuid() 在设了 label 的 container-id 夹具上仍取 uuid 字段"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -246,6 +246,12 @@ tasks:
       - "hostname 兜底臂: home 只读且文件不存在 ⇒ 返回 `_hostname()` (:242 路径), 与 :244 `return uuid` 新生成路径可辨 (可写 home ⇒ 新 uuid 且文件被创建)"
       - "baseline (d69091d) 上 ImportError ⇒ 红 (accessor 不存在)"
     notes: "怎么会红: baseline 无该函数; 坏实现 label 优先必红。S3 spike :244 误记已按 Spec §2.1 (:242 = hostname) 取正。"
+    b2_evidence: >
+      baseline 红亲验 = ImportError (accessor 不存在, 模块级 import 即失败);
+      夹具区分力先在基线单独证过 (同夹具 get_container_id 返回 label, 非 uuid);
+      两个坏实现负控实跑均在预期用例上红 — A 委派型 (return get_container_id) => 主断言红;
+      B 不落盘型 (跳过 _write_container_file) => :244 落盘臂 + :242 hostname 兜底臂双红;
+      负控后按 git hash-object 核验已还原, 好实现复跑 5/5 绿。
 
   - id: TASK-005
     parent: "2.2"
@@ -386,7 +392,7 @@ tasks:
     parent: "3.1"
     task_group: 3
     title: "lib/identity.py: 新增 get_container_uuid(home_dir=None) -> str (直取 uuid, 跳过 label)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -399,6 +405,13 @@ tasks:
       - "docstring 写明: 与 get_container_id 的差异只在 :222 的 label 优先; hostname 兜底 (:242) 与新生成 uuid (:244) 两路径行为与既有一致"
       - "全 aria `grep -rn get_container_uuid` 除定义与测试外零调用 — 拼接无代码宿主 (§2.1a, 2b 裁定), 该 accessor 由 SKILL.md 模板经 AI 调用, 不新增拼接函数"
     notes: "S3 spike :244 误记: :242 才是 return _hostname(); :244 是 return uuid (新生成路径)。"
+    b2_evidence: >
+      纯插入 +61/-0 @ :247, get_container_id :191-244 逐字节不变 (diff 仅一个 @@ hunk, 零删除);
+      TASK-004 5/5 绿; grep 全 aria: 除定义与本测试外零调用点; 全 skill 套件 10 OK / 2017 tests 零回归。
+      技术级裁定留痕: lib/__init__.py 未加再导出 — identity 公开函数由 5/5 变 5/6。
+      判据: deliverables 只列 identity.py 一个文件; verification 的「除定义与测试外零调用」grep 口径
+      在多一处出现时可争议; 设计上该 accessor 经 `from lib.identity import` 直调 (§2.1a 不建拼接宿主)。
+      若 Group 3 复核认为应对齐包导出面, 补一行即可, 不改本任务结论。
 
   - id: TASK-012
     parent: "3.2"
