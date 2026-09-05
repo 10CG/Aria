@@ -257,7 +257,7 @@ tasks:
     parent: "2.2"
     task_group: 2
     title: "SC-5 / SC-6 / SC-7 红测: heartbeat_by_track 跨 session 刷新 / 一对多全刷 / sweep 两臂"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -273,12 +273,16 @@ tasks:
       - "负控: 刷新后 ClaimRecord 其余 10 字段逐字不变 (dataclasses.replace 只动 heartbeat_at; 逐字段重建若漏字段 ⇒ 红)"
       - "baseline (d69091d): ImportError heartbeat_by_track ⇒ 全红"
     notes: "SC-7 恒绿风险已堵: 只有臂 1 就是零新路径覆盖, 臂 2 必含 (Spec SC-7「怎么会红」列)。"
+    b2_evidence: >
+      baseline 红亲验 = ImportError heartbeat_by_track; 三条夹具前提先在基线单独证过
+      (既有 heartbeat 跨 session -> claim_not_found / derive_track_id 归一等式 / SWEEP_TTL+1s 被 abandoned)。
+      四个坏实现负控实跑: session 键(5红) / 只刷第一条(SC-6红) / 不归一(归一用例红) / 逐字段重建漏 linked_issue(保留用例红)。
 
   - id: TASK-006
     parent: "2.3"
     task_group: 2
     title: "SC-15 回归守卫 (baseline 即绿): 改名两步无孤儿 + 无关第三方 claim 负控"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -293,6 +297,14 @@ tasks:
       - "坏实现 A (亲验后还原): :425 `rec.container == resolved.container_id` 去掉 ⇒ 第三方 (容器 B) 也被 abandoned ⇒ 红"
       - "坏实现 B: 匹配键改为按 linked_issue 或按 container 批量 ⇒ 第三方被 abandoned ⇒ 红; 坏实现 C: 子串匹配 (`old-slug` in track_id) — 因负控串不共享子串, 需第二组夹具 `old-slug-x` 前缀串验红"
     notes: "AI 改名时记不记得走两步不在本条 (SC-22 ⑥ 文本 + rule6 (a) fixture)。"
+    b2_evidence: >
+      **Spec 夹具缺陷已发现并补 (不动原夹具, 只增)**: 本条原写「第三方 (容器 B, 与旧/新不共享前缀/后缀)
+      在去掉 rec.container 合取的坏实现下被 abandoned => 红」。二者不相容 —— track_id 走精确相等,
+      track 不同的 claim 无论有无 container 合取都匹配不到, 该断言结构上恒绿 (零信息)。
+      实跑 NC5 当场证实全绿。处置: 增加一条「容器 B 中同 track_id」的 claim 夹具 + 对应用例,
+      补后 NC5 在该用例上变红。原 zzz-unrelated 夹具保留未动; 按 container 批量的坏实现由同容器
+      prefix-sibling 夹具捕获; 子串型由 old-slug-extra 夹具捕获。三个坏实现现全部实跑可红。
+      baseline 即绿的四条前提亦先在基线单独实证。
 
   - id: TASK-007
     parent: "2.4"
@@ -417,7 +429,7 @@ tasks:
     parent: "3.2"
     task_group: 3
     title: "lib/claim_lifecycle.py: 新增 heartbeat_by_track (dataclasses.replace; 既有 heartbeat() 键不动; ClaimRecord 零改动)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -433,6 +445,13 @@ tasks:
       - "`grep -n 'dataclasses.replace' lib/claim_lifecycle.py` 命中新函数; 新函数体内无 `ClaimRecord(` 构造 (R5 选项 B, memory fix-the-class)"
       - "raw→normalized 走 derive_track_id (lib/track_id.py:61), 与 acquire_claim :99 同路径; fail-soft: 无匹配 ⇒ AcquireResult(success=False, error='claim_not_found') (与 :430 同款)"
     notes: "D16: 增并存变体, 不改既有 (container, session) 键。§5.3 保留纪律 (R5/code-simplifier 选项 B) 只约束本新函数。"
+    b2_evidence: >
+      dataclasses.replace 就位 (新函数体内 ClaimRecord( 出现 0 次); claim_schema.py diff 为空;
+      heartbeat() 函数体逐字节相同 (subprocess 提取比对)。
+      **本任务引入锚点位移, 已量清**: 新增一行模块级 import dataclasses => claim_lifecycle.py 全部锚点统一 +1
+      (acquire_claim :99->:100, heartbeat :178->:179, (container,session) 键 :228->:229,
+      release_claim_by_track :377->:378); 文件 471->579 行。TASK-003 锚点表已补行记录。
+      回归: state-scanner 1493 / 全 skill 10 OK 2029 tests。
 
   - id: TASK-013
     parent: "3.3"

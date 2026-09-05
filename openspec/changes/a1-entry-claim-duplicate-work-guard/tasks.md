@@ -36,8 +36,8 @@
 ## 2. TDD 红测 (代码类 SC, 夹具先于实现)
 
 - [x] 2.1 SC-3: `get_container_uuid()` 单测 — 设了 `label` 的 container-id 夹具仍取 `uuid` 字段; 坏实现 = 直接调 `get_container_id()` (baseline 必红: accessor 不存在) — ✅ **2026-09-05**: 新建 `tests/test_identity_container_uuid.py` 5 用例 (SC-3 主断言 / 夹具区分力 / 空 label 对照 / `:244` 落盘臂 / `:242` hostname 兜底臂)。**baseline 红已亲验** (`ImportError: cannot import name 'get_container_uuid'`); **两个坏实现负控实跑**: A 委派型 (`return get_container_id`) ⇒ 主断言红 · B 不落盘型 (跳过 `_write_container_file`) ⇒ 落盘臂 + hostname 兜底臂双红; 负控后按 `git hash-object` 核验已还原
-- [ ] 2.2 SC-5 / SC-6 / SC-7: `heartbeat_by_track` 单测 — 跨 subprocess 第二次不同 session_id 仍刷新 / 一对多全部刷新 / SC-7 两臂 (超 `SWEEP_TTL` 仍被 sweep **且** 调新变体后不被 sweep)
-- [ ] 2.3 SC-15 (baseline 即绿回归守卫): 改名两步 `release_claim_by_track(旧)` + `acquire_claim(新)` 无孤儿 + 无关第三方 claim 负控 (不共享前缀/后缀、不同容器段); 坏实现 = 匹配键改按 `linked_issue` / 按 container 批量
+- [x] 2.2 SC-5 / SC-6 / SC-7: `heartbeat_by_track` 单测 — 跨 subprocess 第二次不同 session_id 仍刷新 / 一对多全部刷新 / SC-7 两臂 (超 `SWEEP_TTL` 仍被 sweep **且** 调新变体后不被 sweep) — ✅ **2026-09-05**: 新建 `tests/test_heartbeat_by_track.py`, SC-5/6/7 共 8 用例 (跨 session 刷新 / 既有 heartbeat 区分力臂 / raw 串归一 / 一对多全刷 / 跨容器·跨 track 负控 / 11 字段保留 / SC-7 两臂)。baseline 红亲验 = `ImportError: heartbeat_by_track`; 三条夹具前提先在基线单独证过 (既有 heartbeat 跨 session 返回 `claim_not_found` / `derive_track_id('A1.Spec_1a2b3c4d')=='a1-spec-1a2b3c4d'` / 未刷新 claim 过 SWEEP_TTL 被 abandoned)。**四个坏实现负控实跑**: 沿用 session 键 ⇒ 5 红 · 只刷第一条 ⇒ SC-6 红 · 不归一 ⇒ 归一用例红 · 逐字段重建漏 `linked_issue` ⇒ 保留用例红
+- [x] 2.3 SC-15 (baseline 即绿回归守卫): 改名两步 `release_claim_by_track(旧)` + `acquire_claim(新)` 无孤儿 + 无关第三方 claim 负控 (不共享前缀/后缀、不同容器段); 坏实现 = 匹配键改按 `linked_issue` / 按 container 批量 — ✅ **2026-09-05**: 同文件加 `TestRenameTwoStep` 4 用例;「baseline 即绿」四条前提先在基线单独实证。**⚠️ 发现 Spec 夹具缺陷并已补**: 原文要求第三方 claim「与旧/新不共享任何前缀/后缀」(`zzz-unrelated-9f8e7d6c`, 容器 B), 同时要求它在「去掉 `rec.container` 合取」的坏实现下变红 —— 二者不相容, 因 `track_id` 走精确相等, track 不同的 claim 无论有无 container 合取都匹配不到 ⇒ **该断言结构上恒绿, 零信息**。实跑负控当场证实 (NC5 全绿)。处置 = **加**一条容器 B 中**同 track_id** 的 claim (不动原第三方夹具), 补后 NC5 红。三个坏实现负控现全部实跑变红: 去 container 合取 / 按 container 批量 (由同容器 sibling 捕获) / 子串匹配
 - [ ] 2.4 SC-2 / SC-8 / SC-29 (CLI 全链路 subprocess): 同 issue 不同 track-id 双方互含 (SC-2, baseline 即绿) / 终态 `done`·`abandoned` 带 `--include-terminal` 可见 (SC-8, baseline 必红) / 自排除两组 own=active 与 own=terminal (SC-29, baseline 即绿); 负控 = 删 `lib/collision.py:278-279` 两行验红
 - [ ] 2.5 SC-24 / SC-33 / SC-25 代码臂 / SC-10 (CLI 全链路): `unknown_schema_claims` 计数且不入 overlap[] / `read_claims` 抛异常 ⇒ 双 `null` + error 非空 / overlap 抛异常 ⇒ `null` + error / fetch 降级 ⇒ `error == "fetch_degraded"` (四条 baseline 必红)
 - [ ] 2.6 SC-23 / SC-14(a) (CLI 全链路, baseline 即绿回归守卫): A.1 原串 X acquire → `release_gate.py --raw-track-id X` ⇒ 不再 active; `--status abandoned` 臂; **补 SC-2 ↔ SC-23 相容性断言** (同一 `<slug>-<uuid>` 串既能 overlap 互见又能 release 命中; `:763-766` 待办 (3))
@@ -46,7 +46,7 @@
 ## 3. lib 代码
 
 - [x] 3.1 `lib/identity.py` 新增 `get_container_uuid(home_dir=None) -> str` (直取 `uuid` 字段, 跳过 label; hostname 兜底 `:242` 成文) — ✅ **2026-09-05**: 纯插入 **+61 −0** 于 `:247` (`get_container_id` `:191-244` 逐字节不变, 硬约束满足); TASK-004 5/5 绿; 除定义与测试外**零调用点**; 全 aria 套件 10 skill OK / 2017 tests 零回归。**技术级裁定留痕**: `lib/__init__.py` 未加再导出 —— identity 公开函数由 5/5 变 5/6, 理由 = deliverables 只列 `identity.py` 一个文件 + verification 的 grep 口径在多一处出现时可争议 + 设计上该 accessor 经 `from lib.identity` 直调 (§2.1a 不建拼接宿主)。若 Group 3 复核认为应对齐导出面, 一行即可补
-- [ ] 3.2 `lib/claim_lifecycle.py` 新增 `heartbeat_by_track(raw_track_id, identity=None, repo_path=None, *, now=None) -> AcquireResult` (按 `(container, 归一 track_id)` 刷全部 active; `dataclasses.replace`; 既有 `heartbeat()` `:228` 键不动; `ClaimRecord` 11 字段零改动)
+- [x] 3.2 `lib/claim_lifecycle.py` 新增 `heartbeat_by_track(raw_track_id, identity=None, repo_path=None, *, now=None) -> AcquireResult` (按 `(container, 归一 track_id)` 刷全部 active; `dataclasses.replace`; 既有 `heartbeat()` `:228` 键不动; `ClaimRecord` 11 字段零改动) — ✅ **2026-09-05**: `heartbeat_by_track` 落 `release_claim_by_track` 之后, 匹配用同款三合取, 刷新用 `dataclasses.replace` (函数体内 `ClaimRecord(` 出现 **0** 次); `claim_schema.py` diff 为空; `heartbeat()` 函数体**逐字节相同**。**锚点位移 (本任务引入, 已量清)**: 为 `dataclasses.replace` 加了一行模块级 `import dataclasses`, 使 `claim_lifecycle.py` 全部锚点**统一 +1** — `acquire_claim` :99→:100 · `heartbeat` :178→:179 · `(container, session)` 键 **:228→:229** · `release_claim_by_track` :377→:378; 文件 471→579 行。后续任务引用这些行号须按 +1 读
 - [ ] 3.3 `lib/collision.py::linked_issue_overlaps` 增 keyword-only `include_terminal: bool = False` (默认路径逐字节不变; `:278-279` 自排除对终态同样生效)
 
 ## 4. `phase1_gate.py`
@@ -225,6 +225,7 @@
 | `phase-a-planner/SKILL.md` ```yaml 围栏数 | 7 | **8** | Spec 计数错 (待 owner 裁 #4) |
 | `scripts/phase1_gate.py` CLI 契约注释 `args : --raw-track-id --phase [--mode …] [--linked-issue]` | — (A.2 记 `:1155-1158`) | `:1154` | R1/A4 实读, A.2 漂 1 行 (TASK-014 注释已改) |
 | `branch-manager/SKILL.md` `--raw-track-id <carry-id>` 命令行 | `:148` | `:149` | R1/A4 实读, `:148` 是前一句 (TASK-003/019 注释与 5.3 已改) |
+| **`lib/claim_lifecycle.py` 全部锚点 (本 cycle TASK-012 引入)** | `:99`/`:178`/`:228`/`:377` | **`:100`/`:179`/`:229`/`:378` (统一 +1)** | 新增一行模块级 `import dataclasses` (TASK-012 verification 要求 `dataclasses.replace` 字面命中); 函数体逐字节不变, 仅整体下移 |
 | 其余 (`claim_lifecycle` / `identity` / `collision` / `constants` / `track_id` / `claim_schema` / `coordination_ref` / `gc` / `reconcile` / `coordination_probe` / 各 SKILL.md / references / docs / tests / `session-handoff.md`) | 见 detailed-tasks.yaml | **逐条一致, 未漂** | v1.67.2 只动 `phase1_gate.py` / `release_gate.py` / `failure_handlers.py` / 新增 test + 发布面 |
 
 ---
