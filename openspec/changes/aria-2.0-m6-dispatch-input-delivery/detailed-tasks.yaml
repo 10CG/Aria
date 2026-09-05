@@ -51,7 +51,7 @@ tasks:
     parent: "1.2"
     task_group: TG-1
     title: "Step 2 dual-mode input resolution (file vs always-fetch)"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -62,12 +62,12 @@ tasks:
     verification:
       - "DEMO-/TEST- + file exists → validated file read (non-empty + YAML-parseable, NO silent fallback; parse failure = explicit error)"
       - "ARIA- prefix → always-fetch, ignores any pre-existing file (kills node-pinned stale-read)"
-
+    notes: "2026-09-05 补强 done (aria-orchestrator 9ec1fcc): integration scenario 6 file-mode 三失败路径各自 die + 反事实红。"
   - id: TASK-003
     parent: "1.3"
     task_group: TG-1
     title: "Fetch title/body from ISSUE_URL + read metadata from Nomad META"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -78,7 +78,7 @@ tasks:
     verification:
       - "AC-3: title/body fetched from ISSUE_URL with FORGEJO_BOT_PAT"
       - "AC-5: target_repo/base_branch/files_hint read from Nomad META (not global env)"
-
+    notes: "2026-09-05 补强 done (9ec1fcc): scenario 1 断 body/title/files_hint 真进 claude prompt + 反事实红 (recon 2026-08-27 缺口闭合)。"
   - id: TASK-004
     parent: "1.4"
     task_group: TG-1
@@ -132,7 +132,7 @@ tasks:
     parent: "1.7"
     task_group: TG-1
     title: "RED-first: reproduce empty-expected_changes false-green at real initial.sh call-site; fix compute-assertions"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: qa-engineer
@@ -143,13 +143,14 @@ tasks:
     verification:
       - "AC-4(a): RED test at the REAL initial.sh call-site proves pre-fix empty-expected false-green, then passes"
       - "empty expected_file_touched[]/expected_diff_contains[] → emit unknown/skip, NEVER default true"
-    notes: "OBJECTION ② (qa). File-mode defense-in-depth (upstream validator enforces non-empty in file mode). RED-first is a hard gate before fetch exercised."
-
+    notes: >
+      OBJECTION ② (qa). File-mode defense-in-depth (upstream validator enforces non-empty in file mode). RED-first is a hard gate before fetch exercised.
+      2026-09-05 补强 done (9ec1fcc): scenario 7 RED-at-real-call-site 空 expected_changes → unknown/ASSERTION_MISMATCH/exit 1; 反事实撤守卫 5 红。
   - id: TASK-008
     parent: "1.8"
     task_group: TG-1
     title: "Fetch mode skips compute-assertions.sh call entirely"
-    status: in_progress
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -162,12 +163,12 @@ tasks:
     notes: >
       R1 qa: naive empty-guard would collide with state machine → ASSERTION_MISMATCH → exit1 → S_FAIL in a new form. Skip, don't stub.
       mid_post_spec dogfood (2026-07-04): corrected "dies at :37" imprecision — the die is swallowed by `|| true`; real fail path is ASSERTION_MISMATCH downstream, NOT a crash at the call. An isolation-only RED test (compute-assertions.sh with a bad path) would pass in both pre/post-fix states → white-washes the fix (feedback_test_mock_pattern_hides_prod_bug). Same real-call-site risk as TASK-007.
-
+      2026-09-05 补强 done (9ec1fcc): 重言式断言换 SKIPPED 日志行 + 无 issue-yaml-not-found 泄漏; 反事实 __NEVER__ 2 红。
   - id: TASK-009
     parent: "1.9"
     task_group: TG-1
     title: "Define AUTONOMOUS_COMPLETED outcome (fetch mode)"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -178,8 +179,9 @@ tasks:
     verification:
       - "AC-4(b): AUTONOMOUS_COMPLETED = claude_exit==0 AND commit AND PR (three conditions, no file/diff hits)"
       - "AUTONOMOUS_COMPLETED → exit 0 → S6_REVIEW→S9 (does NOT dead-end at ASSERTION_MISMATCH/S_FAIL)"
-    notes: "Distinct explicit branch, not a byproduct of the 5-AND. Amends AD-M1-4."
-
+    notes: >
+      Distinct explicit branch, not a byproduct of the 5-AND. Amends AD-M1-4.
+      2026-09-05 补强 done (9ec1fcc): scenario 8 无 commit / scenario 9 PR 失败 → 非 AUTONOMOUS_COMPLETED + exit 1; unit compute_fetch_mode_outcome 4 例。
   - id: TASK-010
     parent: "1.10"
     task_group: TG-1
@@ -245,7 +247,7 @@ tasks:
     parent: "2.3"
     task_group: TG-2
     title: "Extend Nomad META builder with persisted target_repo/base_branch/files_hint"
-    status: in_progress
+    status: done
     complexity: S
     est_hours: 3
     agent: backend-architect
@@ -256,7 +258,7 @@ tasks:
     verification:
       - "AC-5: META fields read from persisted columns (2.1) via dispatch_row — NOT global env; each tiny (well within 100KB/field META cap, prompt_render.py:42)"
       - "AC-12 (read half): _handle_s4_launch reads the persisted columns from dispatch_row (pairs with TASK-011 write half)"
-
+    notes: "2026-09-05 补强 done (9ec1fcc): HCL meta_optional +TARGET_REPO/BASE_BRANCH/FILES_HINT (validate 过) + inventory guard M6 三键 + 结构性 fence; 反事实 2 红。"
   - id: TASK-014
     parent: "2.4"
     task_group: TG-2
@@ -373,7 +375,7 @@ tasks:
     parent: "3.3"
     task_group: TG-3
     title: "Survey every acceptance/dispatch query keying on issue_id"
-    status: in_progress
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -384,7 +386,7 @@ tasks:
     verification:
       - "AC-8: every issue_id-keyed query tolerates new format"
       - "AC-8: #147 issue_type_hint stratification UNAFFECTED — it reads json_extract('$.issue_type_hint') from dispatch_audit_log.payload_json (db.py:622), NOT an issue_id join"
-
+    notes: "2026-09-05 补强 done (9ec1fcc): extension.py _handle_s1_scan 改用 _compose_dispatch_issue_id (与 seed 共用); 6 例新测, 修前 3 FAIL+3 ERROR。"
   # -------------------------------------------------------------------------
   # TG-4 — Image rebuild + freeze (gates on TG-1 only)
   # -------------------------------------------------------------------------
