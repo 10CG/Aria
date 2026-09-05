@@ -369,7 +369,7 @@ tasks:
     parent: "2.6"
     task_group: 2
     title: "SC-23 / SC-14(a) 回归守卫 (CLI 全链路, baseline 即绿) + SC-2 ↔ SC-23 相容性断言"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -385,12 +385,19 @@ tasks:
       - "坏实现: derive_track_id 去容器段 ⇒ (1) 互相自排除为空 ⇒ SC-2 红, 且 (2) release 匹配到 B 的 claim ⇒ 红 (两条互为负控, Spec SC-23 末句)"
       - "`git -C aria diff --stat -- skills/state-scanner/scripts/release_gate.py` 为空 (Impact: 零改动)"
     notes: "release_gate 三选一在 d69091d 为 :267-268 (Spec :236-237)。--status choices = done/yielded/abandoned (:240 一带)。"
+    b2_evidence: >
+      release_gate.py diff 为空 (Impact 零改动)。**夹具保真度缺陷已发现并修**: _seed_other_container
+      原先把原始串直接喂 acquire_claim (它不归一; 生产里 run_gate 先过 derive_track_id), 于是
+      '改坏 derive_track_id' 的负控只作用在本侧, 首轮只打红 4 条, SC-2 正臂与相容性用例没红 —— 与
+      Spec '两条互为负控' 的预期不符。夹具改为先归一后, 负控两半都点着。
+      相容性第 (3) 步适配: 原文 '再跑 B 认领' 需换容器, 而 CLI 身份恒为本机容器, 改用第三条串
+      从本容器再认领 —— 被考察的性质 (终态是否随 --include-terminal 现身) 不变, 已在 docstring 注明。
 
   - id: TASK-010
     parent: "2.7"
     task_group: 2
     title: "SC-32 + SC-28 第二臂 + argparse 模式校验负控 红测 (CLI 全链路)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -409,6 +416,13 @@ tasks:
     notes: >
       Spec :1187 required=True 在 d69091d 为 :1269; --phase :1191 → :1273。SC-32 文件名歧义见 tasks.md「待 owner 裁」#3。
 
+      7 用例; 断言对象取 _telemetry_path(repo,'heartbeat') 返回值, 对文件名待裁三案免疫。
+      **memory ss-two-lib-pkgs 的新变体**: `if p not in sys.path: insert(0,p)` 写法在此不可靠 ——
+      python3 -m unittest 从 skill root 跑时 cwd 已以绝对路径在 sys.path[0], root 那次插入被守卫
+      跳过, 只有 scripts 插到最前, 顺序反转 => ModuleNotFoundError: No module named
+      'lib.coordination_ref'。改用 remove-then-insert (与 phase1_gate.py:96-108 仓内惯例一致)。
+      refreshed 臂原先靠两次调用跨秒, 秒精度下常同秒 => 假红; 改为先回拨 heartbeat_at 再观察前进。
+      三个坏实现负控实跑变红: 只加 flag 不松 required / 只 logger.debug 不落盘 / 写进 production 分区。
   # -------------------------------------------------------------------------
   # Group 3 — lib 代码 (backend-architect)
   # -------------------------------------------------------------------------
@@ -557,7 +571,7 @@ tasks:
     parent: "4.3"
     task_group: 4
     title: "phase1_gate.py 第二处变更 ⑦ + --heartbeat-only 模式 + 遥测 heartbeat 分区 + coordination_probe.py 口径注释"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: backend-architect
@@ -577,6 +591,14 @@ tasks:
       把非 production 源路由到 -nonprod.jsonl) 待 owner 裁 (tasks.md #3); TASK-010 断言已对三案免疫。
       「删 --heartbeat-only 改入口重跑 acquire」已被 owner 2026-08-30 否决 (决策单台账 §3-6/M2), 不再提。
 
+      ⑦ + --heartbeat-only 全落。verification 逐条实测: heartbeat 分支对 health_check_fetch /
+      acquire_claim / reconcile 各 0 次调用; --heartbeat-only 缺 --phase 仍拒; --phase B 缺 carry-id
+      仍 parser.error exit 2; 空串 --raw-track-id 在 derive_track_id 之前短路 (track_id=null +
+      skipped_no_track), R6 担心的 'sha256 刷错 track' 结构上不可能发生; coordination_probe.py
+      diff 仅注释行 + test_coordination_probe_cli.sh 通过; test_phase1_gate_telemetry 13 测试全绿。
+      push 复用 resilient_push 并受同一 no_push 门, 只在 outcome==refreshed 时尝试 (没刷到东西
+      不占网络往返); 三态 push_success None/False/True 由三条新测试分别钉住。
+      本任务把 phase1_gate.py 从 1408 推到 1566 行, 锚点累计位移见 tasks.md 行号复核表新增行。
   # -------------------------------------------------------------------------
   # Group 5 — 文本层 GREEN (knowledge-manager). R1 C1 翻转: 各任务依赖对应 Group 6 RED 任务
   # (017/018←025, 019←026, 020←030, 021←028+030, 022←027, 023←029), Group 6 不再依赖本组
