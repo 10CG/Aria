@@ -1,0 +1,641 @@
+# Detailed Tasks — owner-container-identity-key-and-collision-parser
+# Phase A.2 + A.3 output (task-planner v2.0). Datasource: tasks.md (path A, dual-layer).
+# Spec: openspec/changes/owner-container-identity-key-and-collision-parser/{proposal.md,tasks.md}
+# 决策单: .aria/decisions/2026-09-05-owner-container-identity-key-rulings.md
+#
+# 所有 deliverables 路径从主仓根起算; 行号锚点按 metadata.scope_repos 的 HEAD 实读 (2026-09-05)。
+# 编号不可变: parent 一经确立不改含义; S2 专属任务在 S1 形态下 status=deferred-s2 (归档门视为非未完成)。
+
+metadata:
+  feature: owner-container-identity-key-and-collision-parser
+  title: "owner-container 身份键与 collision 解析器修正 (Aria#193 + aria-plugin#135 缺口 3)"
+  level: 3
+  datasource: "tasks.md"
+  created: "2026-09-05"
+  updated: "2026-09-05"
+  ship_shape: "TBD-at-0.1"   # S1 | S2, 由 0.1 实读 a1-entry 分支实况后写入
+  scope_repos:
+    - repo: "aria (aria-plugin 子模块)"
+      head: "7dd0135"   # v1.69.1
+      surface: "skills/state-scanner/lib/{collision,identity,constants}.py · scripts/collectors/handoff_multibranch.py · scripts/renderers/track_board.py · scripts/{phase1_gate,release_gate}.py · tests/* · references 6 处 · templates/session-handoff.md · skills/phase-d-closer/tests/test_fetch_gate.py · 版本 5 文件"
+      path_prefix: "aria/"
+    - repo: "standards (aria-standards 子模块)"
+      head: "cc864ee"
+      surface: "conventions/session-handoff.md §2.3.1 / §2.3.5 / 新 §2.3.9"
+      path_prefix: "standards/"
+    - repo: "Aria (主仓)"
+      head: "abb4fd3"
+      surface: ".aria/repro/handoff-tracks-frozen-2026-09-05.json (已在) · 版本同步面 · 本 Spec 三文件"
+      path_prefix: ""
+  ship_target: "aria-plugin <vNEXT> (档位按 proposal D5: 判据 PATCH, owner 可升 MINOR; 5.2 时按 plugin.json 计)"
+  hard_constraints:
+    - "子模块合并一律本地 git merge + 双推; 禁 Forgejo 服务端合并 (CLAUDE.md 多远程硬约束 1)"
+    - "推后逐 remote ls-remote 核验, 不信 push 回执 (硬约束 2)"
+    - "子模块推送须 owner 逐条授权 (决策单 B9-补, 本 session 沿用)"
+    - "禁带圈数字 / 希腊字母编号 (全局规则)"
+  rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 / SC-3(S1 臂) / SC-4 / SC-8 五条 baseline-failing 结构化测试 (TASK-001~005/008 RED→GREEN 记录); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑"
+  total_tasks: 41
+  agents:
+    backend-architect: 15
+    qa-engineer: 16
+    knowledge-manager: 10
+
+tasks:
+  # ---------------------------------------------------------------------------
+  # 组 0 — B.1 起手
+  # ---------------------------------------------------------------------------
+  - id: TASK-000
+    parent: "0.1"
+    title: "ship 形态判定: fetch 全远程, 实读 a1-entry 分支实况, 写 metadata.ship_shape (S1|S2)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: []
+    deliverables:
+      - openspec/changes/owner-container-identity-key-and-collision-parser/detailed-tasks.yaml   # metadata.ship_shape
+    verification:
+      - "metadata.ship_shape ∈ {S1, S2} 且附实读证据 (a1-entry 分支名 / HEAD / lib/identity.py 是否含 get_container_uuid)"
+      - "S1 时 TASK-027~030 status 置 deferred-s2"
+    notes: "proposal §Impact 两种 ship 形态; 不等 a1-entry 无限期 (S1 可独立 ship)"
+
+  - id: TASK-00A
+    parent: "0.2"
+    title: "Aria #174 留言: 告知 D-0(a) 裁定 + S2 条件下需改写对方 SC-3, 征求 ack"
+    status: pending
+    complexity: S
+    est_hours: 0.5
+    agent: knowledge-manager
+    dependencies: [TASK-000]
+    deliverables:
+      - "Forgejo 10CG/Aria#174 comment (外向, 无仓内文件)"
+    verification:
+      - "留言含: 剥离只在 Layer H ClaimRecord.track_id, 不改 a1-entry 契约; S2 时 SC-3 改写文本草案; 请求 ack"
+    notes: "留言不阻塞 S1; ack 是 TASK-029 前置"
+
+  # ---------------------------------------------------------------------------
+  # 组 1 — 测试先行 (RED)
+  # ---------------------------------------------------------------------------
+  - id: TASK-001
+    parent: "1.1"
+    title: "改写 test_split_owner_container_variants 为两段式契约 (2-part / 1-part), 先红"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_collision.py   # :158-164
+    verification:
+      - "SC-1: split('simonfish/bfe8285d')==('simonfish','bfe8285d',''); split('solo')==('','solo',''); split('a/b/c')==('a','b','c')"
+      - "对 aria 7dd0135 实跑红 (现 ('','simonfish','bfe8285d') / ('','','solo')), 记录 RED 输出"
+
+  - id: TASK-002
+    parent: "1.2"
+    title: "判定臂用例 + advisory 函数级用例 (经 dedupe → classify)"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_collision.py
+    verification:
+      - "SC-2 判定臂: 同容器双 owner → none; 两人两机 → cross_owner; 同人两机 → self_multi_container; 漂移后无共现 → cross_owner; 零段 vs 两段同主机名 → self_multi_container"
+      - "SC-2 advisory: 同容器双 owner → 恰 1 条 {identity_key: bfe8285d, owners:[aria-runner-bot, simonfish]}; 三 owner 同 uuid → owners 长度 3; legacy / unknown owner 不产生"
+      - "前三条对 7dd0135 先红 (现 🟡 / 🟡 / none)"
+
+  - id: TASK-003
+    parent: "1.3"
+    title: "dedupe 测试三臂 + 隔离夹具对期望改 cross_owner + 同 owner 变体 + board 回显原串"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_handoff_multibranch_collision_dedupe.py   # :305-341, :958-971
+    verification:
+      - "SC-4: 同 track 同 uuid 容器不同 owner 两行折叠为 1 (先红); 同主机名不同 owner 不折叠; devbox01/两 owner 不折叠"
+      - "SC-4: test_both_latest_active_still_reports_self_multi_container 期望 cross_owner; 新增同 owner 串变体断 self_multi_container"
+      - "SC-4: board 对两段式串回显原串 (先红: 建表/查表键 '' vs 'unknown' 失配)"
+
+  - id: TASK-004
+    parent: "1.4"
+    title: "keys 断言改写 (含 identity_advisories) + 旧 snapshot 缺字段不崩"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_collision.py   # test_real_collector_emits_cross_owner_collision / test_real_collector_no_collision_is_none
+      - aria/skills/state-scanner/tests/test_normalize_snapshot.py
+    verification:
+      - "SC-8: collision.identity_advisories 恒存在且为 list (无漂移时 []) — 先红 (字段不存在)"
+      - "SC-8: 旧 snapshot 缺该字段时 track_board / rule 1.54 / fetch_gate 不崩"
+
+  - id: TASK-005
+    parent: "1.5"
+    title: "advisory 生产接线端到端锁 (uuid 容器、同 track_id 两份 handoff) + 真实两段式两人两机端到端"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_handoff_multibranch_collision_dedupe.py   # _build_repo 夹具
+    verification:
+      - "SC-2 端到端: 经 collect_handoff_multibranch 后 snapshot collision.identity_advisories 恰 1; 接线反事实 (:709 传 deduped_tracks) → 0 (红)"
+      - "SC-2 端到端: 真实两段式两人两机 → cross_owner"
+    notes: "R4/R5 qa 实跑证明该夹具形态能分辨接线方向; 夹具须同 track_id, 否则 dedupe 不折叠"
+
+  - id: TASK-006
+    parent: "1.6"
+    title: "冻结语料 fixture + 前后对照机械归因测试 (含注入合成真撞车组)"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/fixtures/handoff-tracks-frozen-2026-09-05.json   # (新建) 八字段裁剪自 .aria/repro/handoff-tracks-frozen-2026-09-05.json
+      - aria/skills/state-scanner/tests/test_collision_frozen_corpus.py   # (新建)
+    verification:
+      - "SC-6: 改前 A = 1 组 / 改后 = 0 组 (D-3(a)); 归因由断言计算: 组内全部 updated_at 早于 LAYER_H_ACTIVE_WINDOW_DAYS → stale(#182); 否则 cross_owner → 真撞车 / self_multi_container → 同人多机"
+      - "SC-6: 注入的合成真撞车组 (显式字段标注, updated_at = now) 必须归「真撞车」"
+    notes: "fixture 八字段无敏感项 (R3 qa 实读); github 镜像可公开"
+
+  - id: TASK-007
+    parent: "1.7"
+    title: "D-0(a) 族键夹具三条"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_collision.py
+    verification:
+      - "SC-2 族键: slug-aaaa1111 + slug-bbbb2222 (两容器各自认领同 Spec) → 可达 🟡/🔴"
+      - "x-20260719 剥后与冻结语料零碰撞; slug-abcdefg (7 位) 不剥"
+
+  - id: TASK-008
+    parent: "1.8"
+    title: "identity label 测试 (新建) + 迁移 inventory 告警测试 (phase1_gate / release_gate 两处), S1 lock-in"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_identity_label.py   # (新建)
+      - aria/skills/state-scanner/tests/test_phase1_gate_advisory.py
+    verification:
+      - "SC-3 S1: label 非空时 get_container_label() 返回 label 且 get_container_id() 仍返回 label (lock-in, S1 不得偷 flip)"
+      - "SC-3 S1/S2 共同: label 非空且 claims/<label>/ 有 active 时 phase1_gate 与 release_gate 各自输出迁移告警 (含 active 数) — 先红 (现无 accessor / 无告警)"
+
+  - id: TASK-009
+    parent: "1.9"
+    title: "track_board ⚪ 行渲染测试 + 反事实"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: [TASK-006]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_track_board_advisories.py   # (新建)
+    verification:
+      - "SC-10: fixture 渲染恰 2 条 ⚪ (023236f2 / bfe8285d) 含 owners[] 与 first/last_seen; 无 advisory 不渲染 ⚪ 段; 反事实 (对 dedupe 后行算) → 0 行"
+
+  - id: TASK-010
+    parent: "1.10"
+    title: "Layer H 新鲜度谓词测试 (截止生效 / collector-renderer 同结论 / 单一实现)"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: [TASK-006]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_collision_frozen_corpus.py
+    verification:
+      - "SC-11: 早于窗口的 active 行不出现在 groups; collector 与 renderer 对同一 fixture 同 kind/groups; updated_at 与天数比较表达式只在 lib 一处 (grep 断言)"
+
+  - id: TASK-011
+    parent: "1.11"
+    title: "rule 1.54 触发面 + fetch_gate kind 字符串夹具"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: []
+    deliverables:
+      - aria/skills/state-scanner/tests/test_recommendation_rules_collision.py   # (新建)
+      - aria/skills/phase-d-closer/tests/test_fetch_gate.py
+    verification:
+      - "SC-9: coordination.enabled=false + kind=cross_owner (真实两段式夹具) → rule 1.54 命中"
+      - "SC-9: fetch_gate 收 kind='cross_owner' 字符串 → advisory 文案含 cross_owner"
+
+  # ---------------------------------------------------------------------------
+  # 组 2 — 实现
+  # ---------------------------------------------------------------------------
+  - id: TASK-012
+    parent: "2.1"
+    title: "split_owner_container 两段式语义"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py   # :63-84
+    verification:
+      - "TASK-001 转绿; 三段式 superseded_from 契约不受影响 (claim_schema 自行 split)"
+
+  - id: TASK-013
+    parent: "2.2"
+    title: "identity_key() + classify_claims 确定性判定"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: backend-architect
+    dependencies: [TASK-012, TASK-002]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py   # classify_claims :143-168
+    verification:
+      - "TASK-002 判定臂转绿; classify_claims 签名不变 (2-tuple); 空/unknown owner 不计为独立 owner"
+
+  - id: TASK-014
+    parent: "2.3"
+    title: "identity_drift_advisories(tracks) + collector dedupe 前接线 + identity_advisories[] 恒存在"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: backend-architect
+    dependencies: [TASK-013, TASK-004, TASK-005]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py
+      - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py   # :709-716
+    verification:
+      - "TASK-004 / TASK-005 转绿; classify()/classify_claims() 签名不变; 字段无漂移时 []"
+
+  - id: TASK-015
+    parent: "2.4"
+    title: "dedupe 键 (track_id, identity_key) + track_board 键同源"
+    status: pending
+    complexity: M
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-013, TASK-003]
+    deliverables:
+      - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py   # :518-523
+      - aria/skills/state-scanner/scripts/renderers/track_board.py   # :412-417
+    verification:
+      - "TASK-003 转绿 (三臂 + board 回显)"
+
+  - id: TASK-016
+    parent: "2.5"
+    title: "Layer H 族键剥离 (track_to_claim_record 一处) + tracks_by_tid 键归一"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: backend-architect
+    dependencies: [TASK-013, TASK-007]
+    deliverables:
+      - aria/skills/state-scanner/lib/collision.py   # track_to_claim_record :86-140
+      - aria/skills/state-scanner/scripts/renderers/track_board.py   # tracks_by_tid 构造 :778-793
+    verification:
+      - "TASK-007 转绿; frontmatter 原串不变; Layer L claim 不经该函数 (grep 调用点仅 collision.py:347 / track_board.py:783)"
+
+  - id: TASK-017
+    parent: "2.6"
+    title: "LAYER_H_ACTIVE_WINDOW_DAYS + layer_h_is_fresh 共享谓词, collector/renderer 同一调用, board stale 标注"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: backend-architect
+    dependencies: [TASK-014, TASK-010, TASK-006]
+    deliverables:
+      - aria/skills/state-scanner/lib/constants.py
+      - aria/skills/state-scanner/lib/collision.py
+      - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py
+      - aria/skills/state-scanner/scripts/renderers/track_board.py   # :743-747 前
+    verification:
+      - "TASK-010 转绿; TASK-006 改后 0 组; 被截止行不进 reconcile (collision.py:379-383 捞回看不到它们)"
+
+  - id: TASK-018
+    parent: "2.7"
+    title: "get_container_label() + container-id 文件头注释改写 (S1 即落)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-008]
+    deliverables:
+      - aria/skills/state-scanner/lib/identity.py   # :126-140 模板 / 新 accessor
+    verification:
+      - "TASK-008 label accessor 子句转绿; get_container_id() 语义在 S1 不变 (lock-in 仍绿)"
+
+  - id: TASK-019
+    parent: "2.8"
+    title: "T3b 迁移 inventory: phase1_gate 与 release_gate 两处告警 (S1 无抑制)"
+    status: pending
+    complexity: M
+    est_hours: 4
+    agent: backend-architect
+    dependencies: [TASK-018]
+    deliverables:
+      - aria/skills/state-scanner/scripts/phase1_gate.py   # :486 复用 Identity
+      - aria/skills/state-scanner/scripts/release_gate.py   # import identity + get_container_label + read_claims + identity= 覆盖
+      - aria/skills/state-scanner/lib/claim_lifecycle.py   # release_claim_by_track identity= 形参 (既有)
+    verification:
+      - "TASK-008 告警子句转绿 (两处); identity.py 保持零内部依赖"
+
+  - id: TASK-020
+    parent: "2.9"
+    title: "track_board ⚪ 行渲染 + label 并列显示"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: backend-architect
+    dependencies: [TASK-014, TASK-009]
+    deliverables:
+      - aria/skills/state-scanner/scripts/renderers/track_board.py
+    verification:
+      - "TASK-009 转绿 (含反事实红)"
+
+  # ---------------------------------------------------------------------------
+  # 组 3 — 规范与文档
+  # ---------------------------------------------------------------------------
+  - id: TASK-021
+    parent: "3.1"
+    title: "session-handoff.md §2.3.1 改写 (三态 + identity_key 定义 + unknown 说明 + 族键句限定作用域)"
+    status: pending
+    complexity: M
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: []
+    deliverables:
+      - standards/conventions/session-handoff.md   # :116
+    verification:
+      - "SC-5: 含 token identity_key / uuid / 主机名 / hostname / unknown; 族键句含 仅用于 与 §2.3.8.2"
+
+  - id: TASK-022
+    parent: "3.2"
+    title: "§2.3.5 判据表三行 + 新鲜度截止句 + 实质变更说明"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: knowledge-manager
+    dependencies: [TASK-021]
+    deliverables:
+      - standards/conventions/session-handoff.md   # :178-186
+    verification:
+      - "SC-5: 恰三行; 含 非空 / unknown / same-identity-multi-owner / 全集; 不含 等价类 / aria/skills / lib/"
+
+  - id: TASK-023
+    parent: "3.3"
+    title: "新增 §2.3.9「AI runner 提交身份」(D-2(a))"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: knowledge-manager
+    dependencies: [TASK-021]
+    deliverables:
+      - standards/conventions/session-handoff.md   # §2.3.8 之后
+    verification:
+      - "SC-5: 存在; 含 D-2 裁定文本; 不含 /home/ Aether forgejo-token-map Kairos DEC-2026 10cglocal; §2.3.7/§2.3.8 diff 零"
+
+  - id: TASK-024
+    parent: "3.4"
+    title: "aria 六处取值文档 + schema 同步 (SKILL.md 不改动)"
+    status: pending
+    complexity: M
+    est_hours: 3
+    agent: knowledge-manager
+    dependencies: [TASK-014]
+    deliverables:
+      - aria/skills/state-scanner/references/layer-l-integration.md   # :25-27,73,77
+      - aria/skills/state-scanner/RECOMMENDATION_RULES.md   # :31
+      - aria/skills/state-scanner/references/rules/advanced-rules.md   # :544-572,578
+      - aria/skills/state-scanner/references/state-snapshot-schema.md   # :1085 + identity_advisories
+      - aria/skills/state-scanner/references/phase-1-collectors.md   # :75
+    verification:
+      - "SC-9 文档: 每文件与 {cross_owner, self_multi_container, identity_advisories} 交集非空且上下文与 §2.3.5 同义; SKILL.md:149-154 diff 零"
+
+  - id: TASK-025
+    parent: "3.5"
+    title: "模板 owner-container 示例改 uuid 形 + 删除「设 label 使更可读」鼓励句"
+    status: pending
+    complexity: S
+    est_hours: 0.5
+    agent: knowledge-manager
+    dependencies: []
+    deliverables:
+      - aria/templates/session-handoff.md
+    verification:
+      - "SC-9 反向 grep: 模板不含 设 label 使更可读; 示例为 <owner>/<8hex> 形"
+
+  - id: TASK-026
+    parent: "3.6"
+    title: "aria CHANGELOG 条目 (§2.3.5 实质变更 / identity_advisories / get_container_label / 档位)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: knowledge-manager
+    dependencies: [TASK-024]
+    deliverables:
+      - aria/CHANGELOG.md
+    verification:
+      - "条目明示采用方看板输出会变 + 新字段 + 新 accessor; 档位与 5.2 一致"
+
+  # ---------------------------------------------------------------------------
+  # 组 4 — Rule #6 substitute + 回归 (TASK-031..033; 组 6 占用 027..030 因 S2 条件任务先于组 5 编号)
+  # ---------------------------------------------------------------------------
+  - id: TASK-031
+    parent: "4.1"
+    title: "rule6_note 落 tasks.md + yaml, 五条 substitute 的 RED→GREEN 记录"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: qa-engineer
+    dependencies: [TASK-012, TASK-013, TASK-014, TASK-015, TASK-018, TASK-019]
+    deliverables:
+      - openspec/changes/owner-container-identity-key-and-collision-parser/tasks.md
+      - openspec/changes/owner-container-identity-key-and-collision-parser/detailed-tasks.yaml
+    verification:
+      - "SC-1/2/3(S1)/4/8 各有改前红 (7dd0135) / 改后绿的实跑记录"
+
+  - id: TASK-032
+    parent: "4.2"
+    title: "全套回归: state-scanner pytest 全套 + test_fetch_gate + session-closer / phase-d-closer 测试"
+    status: pending
+    complexity: S
+    est_hours: 2
+    agent: qa-engineer
+    dependencies: [TASK-020, TASK-017, TASK-019, TASK-011]
+    deliverables:
+      - "实跑记录 (handoff §5)"
+    verification:
+      - "SC-7: 点名改写项外零新增红; 全套 test 定义数记录 (起草日 1492)"
+
+  - id: TASK-033
+    parent: "4.3"
+    title: "主仓 14 state-check 全绿 (含版本面 check)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: qa-engineer
+    dependencies: [TASK-035]
+    deliverables:
+      - "scan.py 实跑记录"
+    verification:
+      - "SC-7: custom_checks failed=0"
+
+  # ---------------------------------------------------------------------------
+  # 组 5 — 发布同步 + 合并推送 + 外向
+  # ---------------------------------------------------------------------------
+  - id: TASK-034
+    parent: "5.1"
+    title: "aria / standards 子模块本地 merge + tag (禁服务端合并)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-032, TASK-026, TASK-023]
+    deliverables:
+      - "aria 子模块 master (本地) + tag"
+      - "standards 子模块 master (本地)"
+    verification:
+      - "两子模块 master fast-forward 含 feature; 无 Forgejo Do: merge"
+
+  - id: TASK-035
+    parent: "5.2"
+    title: "版本 5 文件 bump + 主仓同步面 (档位按 D5)"
+    status: pending
+    complexity: M
+    est_hours: 3
+    agent: backend-architect
+    dependencies: [TASK-034]
+    deliverables:
+      - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+      - CLAUDE.md   # 版本行
+      - VERSION
+      - README.md
+      - docs/architecture/system-architecture.md
+      - docs/architecture/version-scheme.md
+    verification:
+      - "m6-version-badge-match / plugin-version-arch-docs-match / i18n-readme-translation-currency 全绿"
+
+  - id: TASK-036
+    parent: "5.3"
+    title: "owner 授权后双推 aria / standards + 逐 remote ls-remote 核验 + 主仓 gitlink bump"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-035]
+    deliverables:
+      - "aria / standards 两 remote master (+tag) MATCH"
+      - "主仓 gitlink 两处"
+    verification:
+      - "每 remote ls-remote SHA == 本地; gitlink 在子模块核验后才 bump"
+
+  - id: TASK-037
+    parent: "5.4"
+    title: "fixture 公开性确认 (github 镜像)"
+    status: pending
+    complexity: S
+    est_hours: 0.5
+    agent: qa-engineer
+    dependencies: [TASK-006]
+    deliverables:
+      - "handoff 记录"
+    verification:
+      - "八字段无邮箱 / token / 内网地址"
+
+  - id: TASK-038
+    parent: "5.5"
+    title: "issue 回帖文案: #193 / aria-plugin#135 (缺口 3) / #174 ship 结果 (D 期发)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: knowledge-manager
+    dependencies: [TASK-036]
+    deliverables:
+      - .aria/triage-comment.md   # 追加 ship 段
+    verification:
+      - "文案含: 三层根因 / 裁定 / 版本 / 采用方影响; #135 留缺口 1/2"
+
+  - id: TASK-039
+    parent: "5.6"
+    title: "主仓 feature 推 origin → phase-c-integrator C.2.4 gate → PR → merge → github 镜像"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-036, TASK-033]
+    deliverables:
+      - "PR (Forgejo 10CG/Aria)"
+    verification:
+      - "Rule #8 pre-merge gate pass; merge 后两端 master MATCH"
+
+  # ---------------------------------------------------------------------------
+  # 组 6 — S2 形态专属 (条件; S1 下 status=deferred-s2)
+  # ---------------------------------------------------------------------------
+  - id: TASK-027
+    parent: "6.1"
+    title: "get_container_id() flip 为 uuid 优先 (只读 fs 兜底 hostname)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: backend-architect
+    dependencies: [TASK-000, TASK-00A, TASK-018]
+    deliverables:
+      - aria/skills/state-scanner/lib/identity.py   # :222
+    verification:
+      - "SC-3 S2: label 非空时返回 uuid; 与 a1-entry get_container_uuid() 同值"
+    notes: "仅 S2 (a1-entry B.2 已落地 且 #174 ack)"
+
+  - id: TASK-028
+    parent: "6.2"
+    title: "发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: knowledge-manager
+    dependencies: [TASK-027]
+    deliverables:
+      - openspec/changes/owner-container-identity-key-and-collision-parser/tasks.md   # 5.6 完成条件
+    verification:
+      - "SC-3 S2: 未勾选则 flip 提交不进合并集 (清单断言)"
+
+  - id: TASK-029
+    parent: "6.3"
+    title: "改写 a1-entry SC-3 判据 (仅 #174 ack 后)"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: knowledge-manager
+    dependencies: [TASK-00A, TASK-027]
+    deliverables:
+      - openspec/changes/a1-entry-claim-duplicate-work-guard/proposal.md   # :571
+    verification:
+      - "对方 ack 留言 id 记录; 判据改为 get_container_uuid() 与 flip 后 get_container_id() 同值; label 只在 get_container_label()"
+
+  - id: TASK-030
+    parent: "6.4"
+    title: "复现 #135 08-13 时间线不再 claim_not_found"
+    status: pending
+    complexity: S
+    est_hours: 1
+    agent: qa-engineer
+    dependencies: [TASK-027]
+    deliverables:
+      - aria/skills/state-scanner/tests/test_identity_label.py
+    verification:
+      - "SC-3 S2: acquire 后加 label 再 release → 成功"
