@@ -15,7 +15,7 @@ context: openspec/changes/owner-container-identity-key-and-collision-parser/prop
 drift_terminated: false
 drift_check_skipped: true
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 ---
 
@@ -41,7 +41,7 @@ degraded: false
 - `unanimous_pass` = **true** (五席 vote 全 PASS)。
 - `conclusions_stable` = **false**: R4 比较键集合含 3 条 Major (advisory 接线 / §2.3.1 作用域 / 模板鼓励句) + 12 minor; R5 集合为 0 Major + 11 minor 且 minor 集合亦不同 (R5 minor 多为 v5 新文本的措辞精度, 见下) ⇒ 严格集合相等不成立。
 - 终局 1 CONVERGED 不满足 (stable=false); 终局 2/3 不适用 (无 refocus; R3/R4/R5 键集合三者互异, 非振荡); **终局 4 MAX_ROUNDS_EXHAUSTED** (round 5 = max_rounds 5)。
-- ⇒ 按 SKILL §降级策略, **交 owner 三选一**: [1] 接受当前结论 (converged=false, overridden_by_user=true) / [2] 增加轮次 (max_rounds += 2) / [3] 降级为单轮 (converged=false, degraded=true)。执笔不代裁 (Rule #10)。
+- ⇒ 按 SKILL §降级策略交 owner 三选一。**owner 裁定 (2026-09-05): [1] 接受当前结论** ⇒ `converged=false`, `overridden_by_user=true`, verdict 保持 PASS (五席全票, 0C/0M)。post_spec 闸门就此关闭, Spec 进入 owner 决策点回填 → B.1。
 
 **各轮差异对比 (供 owner 判断)**:
 

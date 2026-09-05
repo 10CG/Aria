@@ -1,7 +1,7 @@
 # owner-container 身份键与 collision 解析器修正 (合并处置 Aria #193 + aria-plugin #135 缺口 3)
 
 > **Level**: Minimal (Level 2 Spec) — **owner 2026-09-05 指令为 Level 2**。执笔按 SOT 判据 (`standards/core/ten-step-cycle/phase-a-spec-planning.md:126-137`, 三项性质任一为 Yes → Level 3) 逐项自评: architecture = **否** (不引入新原语, 改一个 collector 内部判定 + lib 函数的输入契约); cross-module = **是** (aria 子模块 + standards 子模块, `identity.py` 语义面被 claim 目录结构共同消费); breaking = **否** (`collision.kind` 枚举取值不变, snapshot 字段 additive, §2.3.5 判据变更经 owner 决策点显式裁定)。**按流程图 cross-module 即 Level 3** —— 执笔结论: 判据上是 Level 3。owner 维持 Level 2 即为显式 override (Rule #10), 请在批准时二选一并回填本行。
-> **Status**: Draft **v6** — **post_spec R5 (max_rounds) 五席全票 PASS, 0 Critical / 0 Major**; 严格收敛判据 (比较键集合 R5≠R4) 未满足 ⇒ 终局 MAX_ROUNDS_EXHAUSTED, **待 owner 三选一** (接受 / +2 轮 / 降级单轮)。v6 = R5 后定点 minor 编辑 (五席一致的 6 条, 不动判定模型 / 决策点 / SC 集合), 2026-09-05; R1..R5 聚合见 §References。v3 起为纯输入确定性规则 (v2 等价类已撤销), 判定模型自 v3 未变 (R3/R4 三席独立复现一致)。
+> **Status**: Draft **v6** — **post_spec R5 (max_rounds) 五席全票 PASS, 0 Critical / 0 Major**; 严格收敛判据 (比较键集合 R5≠R4) 未满足 ⇒ 终局 MAX_ROUNDS_EXHAUSTED; **owner 2026-09-05 裁定: 接受当前结论** (`overridden_by_user=true`, verdict PASS)。post_spec 闸门关闭; 余下 Level / D-0 / D-1+D-2 / D-3 待 owner 裁定后回填。v6 = R5 后定点 minor 编辑 (五席一致的 6 条, 不动判定模型 / 决策点 / SC 集合), 2026-09-05; R1..R5 聚合见 §References。v3 起为纯输入确定性规则 (v2 等价类已撤销), 判定模型自 v3 未变 (R3/R4 三席独立复现一致)。
 > **Created**: 2026-09-05
 > **Linked Issue**: `10CG/Aria#193, 10CG/aria-plugin#135`
 > **Track / claim**: `owner-container-identity-key-and-collision-parser` (phase A claim `s-8204@1355`, container `bfe8285d`, linked_issue `10CG/Aria#193`, overlap 告警空)
