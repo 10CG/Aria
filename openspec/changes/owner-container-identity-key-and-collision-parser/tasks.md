@@ -1,8 +1,8 @@
 # Tasks — `owner-container-identity-key-and-collision-parser`
 
-> **Spec**: [proposal.md](./proposal.md) (v9, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R2 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
+> **Spec**: [proposal.md](./proposal.md) (v10, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R3 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
 > **Level**: 3 (owner 裁定; 判据 cross-module) — 本文件 (A.2) + `detailed-tasks.yaml` (A.3, 单一 SOT: verification / deps / 工时 / rule6_note) + post_planning 收敛审计
-> **Status**: A.2/A.3 **v3** (post_planning R2 rework 2026-09-05); post_planning R3 待跑
+> **Status**: A.2/A.3 **v4** (post_planning R3 rework 2026-09-05); post_planning R4 待跑
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `7dd0135` v1.69.1) · `standards/` 子模块 (@ `cc864ee`) · 主仓 (@ `60808b2`; 冻结语料 `.aria/repro/handoff-tracks-frozen-2026-09-05.json` 已在)
 > **ship target**: aria-plugin `<vNEXT>` — 档位按 proposal D5 (判据 PATCH; owner 可升 MINOR); **本文件不写字面版本号**, 5.2 执行时按当时 `plugin.json` 计并记入 CHANGELOG
 > **ship 形态 (proposal §Impact)**: **S1** = a1-entry 未落地时 ship: 不 flip `get_container_id()`, 只加 `get_container_label()` + 迁移 inventory 告警; **S2** = a1-entry B.2 已落地 **且** 对方在 #174 ack。**S2 项不在本文件 checkbox 内** (归档门 `spec_complete.py` 只读 checkbox, 无「条件任务」机制 — post_planning R1 C-1); 见文末「S2 后续」表与激活规则
@@ -59,7 +59,7 @@
 - [ ] 2.4 `handoff_multibranch.py:518-523` dedupe 键 `(track_id, identity_key)`; `track_board.py:412-417` 键同源 — 1.3 转绿
 - [ ] 2.5 `lib/collision.py::track_to_claim_record` (`:86-140`; 调用点 `collision.py:349` / `track_board.py:783`) 族键剥离; `track_board.py:778-793` `tracks_by_tid` 用剥离后键 — 1.7 转绿
 - [ ] 2.6 `lib/constants.py` `LAYER_H_ACTIVE_WINDOW_DAYS = 30` + `lib/collision.py::layer_h_is_fresh()`; collector `:709` 前 / renderer `:744` 前同一调用; board stale 标注 — 1.10 转绿, 1.6 改后 0 组
-- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写 — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
+- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写为**S1 实况措辞**: 「label 当前仍参与协调身份 (设了会换身份), 后续版本改为仅展示; 建议留空」— 不得把「仅展示」写成对当前行为的描述 (反向 grep 锁) — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
 - [ ] 2.8 迁移 inventory: `phase1_gate.py` (复用 `:486` Identity) 与 `release_gate.py` (import identity + `get_container_label()` + `read_claims` + `release_claim_by_track(identity=…)`) 告警, S1 无抑制 — 1.8 告警子句转绿
 - [ ] 2.9 `track_board.py` ⚪ 行渲染: **独立数据路径**, 在顶层 `render_track_board` 于 dedupe (`:744`) 前对原始 tracks 调 `identity_drift_advisories`, 输出为 collision 段 (`:796` `_render_collision_lines` 结果) 之后的独立段, **不进** per-track 循环 (`:459-475` 只有 dedupe 后数据); label 并列显示 — 1.9 转绿
 
@@ -68,15 +68,15 @@
 - [ ] 3.1 `standards/conventions/session-handoff.md:116` §2.3.1: `<owner>` = 提交身份 (可取 `unknown`); `<container-id>` 三态; 定义 `identity_key`; 族键句 (限定仅用于 §2.3.5 Layer H 分组) — SC-5
 - [ ] 3.2 §2.3.5 (`:178-186`) 三行判据 + 新鲜度截止句 + 「实质变更」说明 (standards 无 CHANGELOG; 按该文件既有惯例写成紧贴 §2.3.5 标题下方的 `> **Amended**: 2026-09-05 … / **Status**: …` blockquote, 与 §2.3 头部 Added/Purpose/Status 同形) — SC-5
 - [ ] 3.3 新增 §2.3.9 (D-2(a)); 不引用 Lab 私有文档 — SC-5
-- [ ] 3.4 aria 六处取值文档: `layer-l-integration.md:25-27,73,77` / `RECOMMENDATION_RULES.md:31` (加 `identity_advisories` 句) / `references/rules/advanced-rules.md:544-572,578` / `references/state-snapshot-schema.md:1085` **与 `:1109-1121` 旧 dedupe 语义段** / `references/phase-1-collectors.md:75` (加一句: collision 三态语义 + `identity_advisories`); `SKILL.md:149-154` 取值不变**不改动** — SC-9 文档
+- [ ] 3.4 aria 六处取值文档: `layer-l-integration.md:25-27,73,77` / `RECOMMENDATION_RULES.md:31` (该行须同时含 `cross_owner` 与 `identity_advisories` 两 token, 今日均无, 与 SC-9 首句对齐) / `references/rules/advanced-rules.md:544-572,578` / `references/state-snapshot-schema.md:1085` **与 `:1109-1121` 旧 dedupe 语义段** / `references/phase-1-collectors.md:75` (加一句: collision 三态语义 + `identity_advisories`); `SKILL.md:149-154` 取值不变**不改动** — SC-9 文档
 - [ ] 3.5 `aria/templates/session-handoff.md` 示例改 uuid 形 + 删「设 label 使更可读」句 — SC-9 反向 grep
 - [ ] 3.6 aria `CHANGELOG.md` 条目 (§2.3.5 实质变更 / `identity_advisories` / `get_container_label` / 档位) — 5.2 前置
 
 ## 4. Rule #6 substitute + 回归
 
 - [ ] 4.1 rule6_note (yaml `metadata.rule6_note` 为单一来源): substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 ⇒ TASK-001/002/003/004/005/007/008 各有改前红 (`7dd0135`) / 改后绿实跑记录
-- [ ] 4.2 全套回归 **两种跑法都必跑** (unittest discover 收不到 pytest 风格裸函数: `run_tests.py` 起草日 `Ran 1476`, 全套 `def test_` 1492, 差 16 全在 `test_collision.py` — 正是 SC-1/2/8 的交付文件): (a) `python3 aria/skills/state-scanner/tests/run_tests.py` 零失败; (b) `/home/dev/.local/bin/pytest -q -p no:cacheprovider aria/skills/state-scanner/tests` 零失败 (`sys.path` 顺序 scripts 后 state-scanner 在前, 防双 lib 包); 两者合计覆盖 1492 + 本 Spec 新增; `phase-d-closer/tests/test_fetch_gate.py`; session-closer / phase-d-closer handoff 写入测试 — SC-7
-- [ ] 4.3 主仓 state-check: **13 条全绿**; `plugin-cache-currency` 预期 STALE 直到 owner D 期更新插件 (SC-7 例外条款) — 在 5.7 主仓同步面之后跑
+- [ ] 4.2 全套回归 **两种跑法都必跑, 各管一类文件** (unittest discover 收不到 pytest 风格裸函数; 反之 pytest 吃整个 `tests/` 目录会因 `tests/__init__.py` 包语义让 12 个 `from _helpers import` 模块收集失败 — R3 实测): (a) `python3 aria/skills/state-scanner/tests/run_tests.py` 覆盖全部 TestCase 文件, 零失败, Ran ≥ 1476 + 本 Spec 新增 TestCase 数 (起草日实跑 1476); (b) `cd aria/skills/state-scanner && /home/dev/.local/bin/pytest -q -p no:cacheprovider tests/test_collision.py` 覆盖唯一 pytest 风格文件, 零失败, passed ≥ 16 + 本 Spec 在该文件新增数 (起草日实跑 16 passed, 两个 cwd 形态均可); **本 Spec 新建测试文件一律写 `unittest.TestCase`** 归 (a); `phase-d-closer/tests/test_fetch_gate.py`; session-closer / phase-d-closer handoff 写入测试 — SC-7
+- [ ] 4.3 主仓 state-check: **13 条全绿**; `plugin-cache-currency` 预期 STALE 直到 owner D 期更新插件 (SC-7 例外条款) — 在 5.7 主仓同步面之后跑; **Rule #10 留痕**: handoff 记录「该例外为 post_planning R1 rework 引入 (owner Approved 之后), 请 owner D 期复议」
 
 ## 5. 发布 (顺序: 5.2 bump → 5.1 merge+tag → 5.3 双推核验 → 5.7 主仓同步面 → 4.3 → 5.6 PR → 5.5 回帖)
 
@@ -100,7 +100,7 @@
 | S2-3 | 改写 a1-entry SC-3 判据 (仅 #174 ack 后) | ack 留言 id 记录; 判据改为「`get_container_uuid()` 与 flip 后 `get_container_id()` 同值; label 只在 `get_container_label()`」 |
 | S2-4 | 复现 #135 08-13 时间线不再 `claim_not_found` | acquire 后加 label 再 release 成功 |
 
-**激活规则**: 0.1 判 S2-candidate **且** #174 ack 已到 **且** 5.1 merge 尚未执行 (yaml 里 0.1 / 0.2 是 5.1 的前置, 保证判定与留言发生在 merge 前) ⇒ 追加 `6.1`–`6.4` checkbox + yaml TASK-027..030 (接入 5.1 前置), 并在 handoff 记录激活时点; 三条件任一不满足 ⇒ 维持 S1, 由 5.8 **手动**开 tracker issue 记录 S2 后续 (归档 Step 7 不会自动产出, 先例 sibling-spec-probe #192 是 deferred 非空时的自动路径)。
+**激活规则**: 0.1 判 S2-candidate **且** #174 ack 已到 **且** 5.1 merge 尚未执行 (yaml 里 0.1 / 0.2 是 5.1 的前置, 保证判定与留言发生在 merge 前) ⇒ 追加 `6.1`–`6.4` checkbox + yaml TASK-027..030 (接入 5.1 前置), 并在 handoff 记录激活时点; 三条件任一不满足 ⇒ 维持 S1, 由 5.8 **手动**开 tracker issue 记录 S2 后续 (归档 Step 7 不会自动产出, 先例 sibling-spec-probe #192 是 deferred 非空时的自动路径)。**回退条款**: 激活后若 S2 前提失效 (a1-entry 被 revert / ack 撤回), 回退 S1 须 owner 裁定并记入 handoff; AI 不得自行删除已追加的 6.x checkbox 或 TASK-027..030 (它们是归档门输入, Rule #10)。
 
 ## Success Criteria ↔ 任务映射
 

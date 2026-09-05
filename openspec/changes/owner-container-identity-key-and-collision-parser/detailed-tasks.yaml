@@ -1,5 +1,5 @@
 # Detailed Tasks — owner-container-identity-key-and-collision-parser
-# Phase A.2 + A.3 output (task-planner v2.0), v2 after post_planning R1. Datasource: tasks.md (path A, dual-layer).
+# Phase A.2 + A.3 output (task-planner v2.0), v4 after post_planning R3. Datasource: tasks.md (path A, dual-layer).
 # Spec: openspec/changes/owner-container-identity-key-and-collision-parser/{proposal.md,tasks.md}
 # 决策单: .aria/decisions/2026-09-05-owner-container-identity-key-rulings.md
 #
@@ -13,7 +13,7 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-05"   # v3: post_planning R2 rework (双跑法 / TASK-020 独立路径 / 组 0 入 merge 前置 / TASK-042 tracker 承载 / 回帖措辞 / §2.3.5 注记位置 / CLAUDE.md :139)
+  updated: "2026-09-05"   # v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
   ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -29,7 +29,7 @@ metadata:
       surface: ".aria/repro/handoff-tracks-frozen-2026-09-05.json (已在) · 主仓同步面 (gitlink ×2 / VERSION / README ×4 / 架构文档 ×2 / CLAUDE.md 版本行) · 本 Spec 三文件"
       path_prefix: ""
   ship_target: "aria-plugin <vNEXT> (档位按 proposal D5: 判据 PATCH, owner 可升 MINOR; TASK-035 时按 plugin.json 计)"
-  test_runner: "两种跑法都必跑 (unittest discover 收不到 pytest 风格裸函数; 起草日 run_tests.py Ran 1476 vs def test_ 1492, 差 16 全在 test_collision.py = SC-1/2/8 交付文件): (a) python3 aria/skills/state-scanner/tests/run_tests.py; (b) /home/dev/.local/bin/pytest -q -p no:cacheprovider aria/skills/state-scanner/tests, sys.path 顺序必须 scripts 后 state-scanner 在前 (双 lib 包陷阱, memory feedback_state_scanner_dual_lib_package_shadow); RED→GREEN 证据对 test_collision.py 用 pytest"
+  test_runner: "两种跑法都必跑, 各管一类文件: (a) python3 aria/skills/state-scanner/tests/run_tests.py — 全部 unittest.TestCase 文件 (起草日实跑 Ran 1476); (b) cd aria/skills/state-scanner && /home/dev/.local/bin/pytest -q -p no:cacheprovider tests/test_collision.py — 唯一 pytest 风格文件 (起草日实跑 16 passed)。禁止把整个 tests/ 目录喂 pytest: tests/__init__.py 包语义使 12 个 from _helpers import 模块收集失败 (R3 qa/backend-architect 实测 0 collected); 本 Spec 新建测试一律写 TestCase 归 (a); test_collision.py 新增沿用 pytest 风格; RED→GREEN 证据对 test_collision.py 用 (b); scratchpad 脚本 import 顺序 scripts 后 state-scanner 在前 (双 lib 包)"
   hard_constraints:
     - "子模块合并一律本地 git merge + 双推; 禁 Forgejo 服务端合并 (CLAUDE.md 多远程硬约束 1)"
     - "推后逐 remote ls-remote 核验 master 与 tag 对象 SHA, 不信 push 回执 (硬约束 2)"
@@ -38,7 +38,7 @@ metadata:
     - "禁带圈数字 / 希腊字母编号 (全局规则)"
   rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 五条 baseline-failing 结构化测试, 承载任务 TASK-001 / 002 / 003 / 004 / 005 / 007 / 008, 各有改前 (aria 7dd0135) 实跑红 / 改后绿记录 (TASK-031 汇总); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑。tasks.md 不复述本条 (单一来源)"
   s2_followup:
-    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030 (接入 TASK-034 前置); 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)"
+    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030 (接入 TASK-034 前置); 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)。回退: 激活后 S2 前提失效须 owner 裁定并记 handoff, AI 不得自行删已追加的 checkbox / TASK (归档门输入, Rule #10)"
     items:
       - id_reserved: TASK-027
         parent_reserved: "6.1"
@@ -358,6 +358,7 @@ tasks:
       - aria/skills/state-scanner/lib/identity.py   # :126-140 模板 / 新 accessor
     verification:
       - "TASK-008 label accessor 子句转绿; S1 lock-in 仍绿"
+      - "文件头注释为 S1 实况措辞 (label 当前仍参与协调身份, 后续改为仅展示, 建议留空); 反向 grep: 「仅展示」不得单独作为当前行为描述出现"
 
   - id: TASK-019
     parent: "2.8"
@@ -438,12 +439,12 @@ tasks:
     dependencies: [TASK-014]
     deliverables:
       - aria/skills/state-scanner/references/layer-l-integration.md   # :25-27,73,77
-      - aria/skills/state-scanner/RECOMMENDATION_RULES.md   # :31 加 identity_advisories 句
+      - aria/skills/state-scanner/RECOMMENDATION_RULES.md   # :31 该行须同时含 cross_owner 与 identity_advisories 两 token (今日均无)
       - aria/skills/state-scanner/references/rules/advanced-rules.md   # :544-572,578
       - aria/skills/state-scanner/references/state-snapshot-schema.md   # :1085 collision 段 + identity_advisories additive; :1109-1121 dedupe 语义段改写
       - aria/skills/state-scanner/references/phase-1-collectors.md   # :75 加一句 (三态语义 + identity_advisories)
     verification:
-      - "SC-9 文档: 五文件各与 {cross_owner, self_multi_container, identity_advisories} 交集非空且上下文与 §2.3.5 同义; rule 1.54 行含 identity_advisories; SKILL.md:149-154 diff 零"
+      - "SC-9 文档: 五文件各与 {cross_owner, self_multi_container, identity_advisories} 交集非空且上下文与 §2.3.5 同义; RECOMMENDATION_RULES.md:31 与 rules/advanced-rules.md:544-572 的 rule 1.54 行各含 cross_owner 与 identity_advisories 两 token; SKILL.md:149-154 diff 零"
 
   - id: TASK-025
     parent: "3.5"
@@ -489,7 +490,7 @@ tasks:
 
   - id: TASK-032
     parent: "4.2"
-    title: "全套回归: run_tests.py 全套 + test_fetch_gate + session-closer / phase-d-closer 测试"
+    title: "全套回归 (两跑法各管一类文件): run_tests.py 全部 TestCase + pytest test_collision.py + test_fetch_gate + session-closer / phase-d-closer 测试"
     status: pending
     complexity: S
     est_hours: 2
@@ -498,8 +499,8 @@ tasks:
     deliverables:
       - "实跑记录 (handoff §5)"
     verification:
-      - "SC-7: (a) run_tests.py 零失败 且 Ran 数 ≥ 1476 + 本 Spec 新增 TestCase; (b) pytest 全套零失败 且收集数 ≥ 1492 + 本 Spec 新增 (含 test_collision.py 裸函数); 点名改写项外零新增红; test_fetch_gate.py / session-closer / phase-d-closer 测试全绿"
-    notes: "两跑法缺一不可: 单跑 run_tests.py 对 test_collision.py 是空判据 (post_planning R2 qa C-1); 双 lib 包陷阱见 metadata.test_runner"
+      - "SC-7: (a) run_tests.py 零失败 且 Ran ≥ 1476 + 本 Spec 新增 TestCase 数; (b) cd aria/skills/state-scanner && pytest tests/test_collision.py 零失败 且 passed ≥ 16 + 本 Spec 在该文件新增数; 点名改写项外零新增红; test_fetch_gate.py / session-closer / phase-d-closer 测试全绿"
+    notes: "两跑法各管一类文件 (R2 qa C-1: 单跑 run_tests.py 对 test_collision.py 是空判据; R3 qa/BA C-1: pytest 吃整个 tests/ 目录收集失败); 命令形态见 metadata.test_runner; 不再引用静态 grep 计数 1492 作验收"
 
   - id: TASK-033
     parent: "4.3"
@@ -513,6 +514,7 @@ tasks:
       - "scan.py 实跑记录"
     verification:
       - "SC-7: custom_checks 中除 plugin-cache-currency 外 failed=0; plugin-cache-currency 输出为 STALE (installed < SOT) 且 handoff 记录 owner D 期动作 (/plugin marketplace update + /plugin update + 重启)"
+      - "Rule #10 留痕: handoff 记录「该例外为 post_planning R1 rework 引入 (owner Approved 之后), 请 owner D 期复议」"
 
   # ---------------------------------------------------------------------------
   # 组 5 — 发布 (顺序由 deps 定: 035 bump → 034 merge+tag → 036 push → 041 主仓同步面 → 033 → 039 PR → 038 回帖)
@@ -563,7 +565,7 @@ tasks:
 
   - id: TASK-041
     parent: "5.7"
-    title: "主仓同步面 (子模块推送核验后): 两 gitlink + VERSION + README ×4 + 架构文档 ×2 + CLAUDE.md 版本行"
+    title: "主仓同步面 (子模块推送核验后): 两 gitlink + VERSION + README ×4 + 架构文档 ×2 + CLAUDE.md 两行 (:141 版本 / :139 区间端点)"
     status: pending
     complexity: M
     est_hours: 2
