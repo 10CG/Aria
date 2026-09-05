@@ -341,7 +341,7 @@ tasks:
     parent: "2.5"
     task_group: 2
     title: "SC-24 / SC-33 / SC-25 代码臂 / SC-10 红测 (CLI 全链路): unknown 计数 / except 双 null / overlap 异常 / fetch_degraded"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer
@@ -360,6 +360,11 @@ tasks:
       SC-10 与 Step 9 push_failed 同跑时 error 取值未定 (tasks.md 待 owner 裁 #7), 夹具用 --no-push 隔离。
       Spec 行号 :1230/:1233-1235/:1236-1238 在 d69091d 为 :1332/:1335-1337/:1338-1340。
 
+      注入手段实测后钉 (c): Spec 的 (a) 结构上做不到 — read_claims 全程 fail-soft,
+      损坏 ref 只得 errors=['ls_tree_failed:...'] 而不抛, 触不到 except。(b) 影子化 lib 单模块
+      须重导出其余, 脆。(c) 子进程内模块边界替换, 且按调用方栈帧限定 —— read_claims 同时被
+      _run_gate_impl:512 调用, 无差别替换会把闸门一起打崩 (实跑 rc=1 + 闸门栈当场暴露)。
+      五个坏实现负控全部实跑变红, 还原经 sha256 核验。
   - id: TASK-009
     parent: "2.6"
     task_group: 2
@@ -495,7 +500,7 @@ tasks:
     parent: "4.1"
     task_group: 4
     title: "phase1_gate.py 第一处变更 ①②③④⑥: --include-terminal / 门控放宽 / unknown_schema_claims / except 双 null + error"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: backend-architect
@@ -513,11 +518,18 @@ tasks:
       Spec 行号 :1230/:1233-1235/:1236-1238 → d69091d :1332/:1335-1337/:1338-1340。R4/K5: except 必须同时赋两键,
       否则 M-4 在自己的修复里复发 (memory fix-recurs-in-fallback)。
 
+      **本条 deliverable 与 SC-33 直接矛盾, 按 proposal 实现**: deliverable 写
+      'linked_issue_overlap=None 仅当传了 --linked-issue', 而 proposal :623 的 SC-33 明写
+      '带 --include-terminal 不带 --linked-issue => 两键都 null', Impact ④⑥ (:663) 为无条件
+      '同一 except 分支须同时赋', §2.4b 四态表 (:340) 又钉死 '键缺席 = 未传 --linked-issue,
+      与是否传 --include-terminal 无关'。三处 proposal 口径一致, 那句条件式是 A.2/A.3 派生错。
+      实现 = 成功路径按各自 flag 填 / 异常路径无条件双 null。建议 Group 4 复核时订正 deliverable 文字。
+      三处 def 签名未触及; except 内字面 '= []' 零命中; 不传两 flag 时 stdout 11 键与基线逐项相同。
   - id: TASK-015
     parent: "4.2"
     task_group: 4
     title: "phase1_gate.py 第一处变更 ⑤: GateResult.error 真正携带 \"fetch_degraded\""
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: backend-architect
@@ -531,6 +543,15 @@ tasks:
       - "fetch 正常时 error 仍 null (既有 test_phase1_gate_advisory.py 全绿)"
       - "docstring 写明与 §2.4b linked_issue_overlap_error 是两条不同路径, 不可互相顶替 (§2.5 末条)"
     notes: "同一次运行 fetch 降级且 Step 9 push 失败时 error 取值 — tasks.md 待 owner 裁 #7; 实现暂按「后发硬错覆盖先发软降级」, 请 owner 确认。"
+    b2_evidence: >
+      Step 4 单点赋 soft_error; 只承接原本 error=None 的 5 个返回点 (4 裸 + 1 条件式),
+      其余 6 个返回点本就带硬错 => '后发硬错覆盖先发软降级' 天然成立, 无需额外优先级代码。
+      **爆炸半径超出 Spec 枚举 (verification 只点名 test_phase1_gate_advisory)**:
+      test_coordination_no_push.py:188 的 assertIsNone(error) 被本改动打红 —— 该类夹具刻意无
+      remote (类 docstring 明写, 用于区分 '主动跳过' 与 '推失败'), 而 Step 4 现在真降级。
+      处置: 按其真实意图收窄为 '不得是 push 侧错误' + 加注两路径正交; 负控确认收窄后仍有区分力。
+      另: SC-10 的 '不可达 remote' 夹具单独不成立 (无 remote 的仓同样降级) => 补对照臂
+      '可达 bare remote => error is None'。回归: 全 skill 10 OK / 2045 tests。
 
   - id: TASK-016
     parent: "4.3"
