@@ -1,9 +1,9 @@
 ---
 track-id: carry-spec-drafter-path-rule5-drift
 owner-container: simonfish/023236f2
-phase: B.2 (Level 1 carry 批完成; 推送 + PR 外向, 待授权)
-status: active
-updated-at: 2026-09-04T23:45:20Z
+phase: B.2 (Level 1 carry 批已 ship 并合并 2026-09-05; 会话收尾见 `2026-09-05-session-close-level1-batch-shipped-and-192-rescoped.md`)
+status: done
+updated-at: 2026-09-05T00:05:00Z
 ---
 
 # Aria — Session Handoff (2026-09-04) — Level 1 carry 批: spec-drafter 落点路径 + hunk A 措辞 + spec_complete `.json` 分支 + 扫描器 fail-closed (aria v1.69.1 本地就绪)
@@ -11,7 +11,7 @@ updated-at: 2026-09-04T23:45:20Z
 > **一句话**: owner 选「选项 2 (Level 1 小批)」+ standards 口径选 **C (只修事实错误)** → B.0 认领 (`carry-spec-drafter-path-rule5-drift`, push ok) → 三仓分支 → 四项逐项实读后落地 → Rule #6 AB 八臂 (with **16/16** vs old **13/16**, delta **+0.19**) → aria **v1.69.1** 本地 merge `7dd0135` + tag / standards 本地 merge `cc864ee` / 主仓 16 版本点 + 双 gitlink。**推送与 PR 外向, 待授权。**
 > **两件必须点名的事**: (1) **Aria#192 只修了一半** —— 修完后归档 gate 仍报 warn 且 claim 从 1 条变 2 条; 查明基线上还藏着一个**假 alive**, 摘除它是对的 (假 alive 掩盖真死代码, 比假 warn 危险), 但真根因在**符号抽取层**不在文件分类层。(2) **AB 抓到我一处类级遗漏** —— 只改了 `SKILL.md`, 同目录 `LEVEL_GUIDE.md` (三处) 与 `LEVEL3_TEMPLATE.md` (一处) 仍留旧路径, 而旧臂正引用它们背书; 补修后按「measure what you ship」重跑了唯一有区分力的 eval。
 
-> **Status**: Active — 四项已落地并自测通过, 停在本地态; 下个 session 第一件事 = 拿到授权后推三仓 → PR
+> **Status**: Superseded (2026-09-05) — 四项已 ship 并合并 (aria v1.69.1 `7dd0135`+tag / standards `cc864ee` / 主仓 PR #194 merged `a259ebf`, 三仓逐 remote 核验 MATCH); 本 doc 保留批次账目, 收尾与 carry 见 `2026-09-05-session-close-level1-batch-shipped-and-192-rescoped.md`
 > **Cycle period**: 2026-09-04T21:59Z (B.0 认领) → 2026-09-04T23:45Z
 > **Next session 入口**: 优先读本 doc → `/aria:state-scanner` → §6
 
@@ -158,4 +158,4 @@ updated-at: 2026-09-04T23:45:20Z
 
 **Created**: 2026-09-04 23:45Z
 **Session duration**: ~1.8h (21:59Z → 23:45Z)
-**Status**: Active — 四项落地并自测通过; 三仓推送 + PR 外向, 待授权
+**Status**: Superseded (2026-09-05) — 四项已 ship 并合并; 批次账目留存, 后续见会话收尾 handoff
