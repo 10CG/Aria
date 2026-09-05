@@ -3,19 +3,19 @@ track-id: aria-2-0-m6-dispatch-input-delivery
 owner-container: aria-runner-bot/bfe8285d
 phase: B.2
 status: active
-updated-at: 2026-09-05T08:05:00Z
+updated-at: 2026-09-05T08:40:00Z
 ---
 
 # Aria — Handoff (2026-09-05) — M6 输入投递 B.2 补强: 六处测试补强落地 + 两个真 bug (HCL 未声明 meta / S1_SCAN 键漂移)
 
-> **一句话**: owner 确认「与双子星不冲突, 执行推荐 [1]」→ 重新认领 M6 轨 (旧 claim 已被对方 sweep 成 abandoned) → 按 08-27 账目核实的 partial 批逐条补强, **每条都跑了反事实 (撤销 fix 看新断言红不红)**, 7 条 TASK 从 in_progress 转 done (M6 账目 18/30 → **25/30**)。补强途中抓出两个不是「测试缺」而是「生产会挂」的问题: (1) Layer 1 写的三个 Nomad meta 键 HCL 从未声明 ⇒ 每次自主 dispatch 都会被 Nomad 拒; (2) S1_SCAN 仍按内部 id 键候选而 seed 已改复合键 ⇒ 幂等守卫失效 + 复合键被覆写成裸数字。两处都修了并有反事实证据。**aria-orchestrator feature 分支 commit `9ec1fcc` 只在本地, 子模块推送待 owner 授权。**
+> **一句话**: owner 确认「与双子星不冲突, 执行推荐 [1]」→ 重新认领 M6 轨 (旧 claim 已被对方 sweep 成 abandoned) → 按 08-27 账目核实的 partial 批逐条补强, **每条都跑了反事实 (撤销 fix 看新断言红不红)**, 7 条 TASK 从 in_progress 转 done (M6 账目 18/30 → **25/30**)。补强途中抓出两个不是「测试缺」而是「生产会挂」的问题: (1) Layer 1 写的三个 Nomad meta 键 HCL 从未声明 ⇒ 每次自主 dispatch 都会被 Nomad 拒; (2) S1_SCAN 仍按内部 id 键候选而 seed 已改复合键 ⇒ 幂等守卫失效 + 复合键被覆写成裸数字。两处都修了并有反事实证据。**aria-orchestrator feature 分支 commit `9ec1fcc` 已由 owner 授权推送 (08:3x): origin + github 双推, 逐 remote `ls-remote` 均 MATCH 9ec1fcc。**
 >
 > ⭐ **最该留下的**: 08-27 recon 给 TASK-009 的补法写的是「断 FINAL_OUTCOME=ASSERTION_MISMATCH」, 实跑发现无 commit 在 Step 8 先判成 CLAUDE_NO_OP, 三条件函数只对 PENDING 生效 —— **补测试前先跑一遍真路径, 别照 recon 的预期断言写**, 否则写出来的是一条永远红的「假 RED」。
 
 ## §0 入口 (新 session 优先读)
 
 1. `/aria:state-scanner`。主仓 master 在 `a259ebf` + 本 commit; aria `7dd0135` (v1.69.1) / standards `cc864ee` / aria-orchestrator gitlink仍 `237045a` (master, **有意不 bump**: M6 代码在 feature 分支, 合并门未开)。
-2. **aria-orchestrator `feature/m6-dispatch-input-delivery` 本地 = `9ec1fcc`** (基于 `1ee225a`), origin 仍 `1ee225a`。推送需 owner 一句话授权 (子模块推送逐条授权, 决策单 B9-补); 推后逐 remote `ls-remote` 核验。
+2. **aria-orchestrator `feature/m6-dispatch-input-delivery` = `9ec1fcc`** (基于 `1ee225a`), owner 授权后已双推: origin `1ee225a..9ec1fcc`, github 新建分支; 两端 `ls-remote` MATCH。
 3. 本容器 claim `aria-2-0-m6-dispatch-input-delivery` phase B **active** (2026-09-05T07:20Z 重新认领, session `s-00ec@0720`, push_success=true)。旧 claim `s-2cea@1704` 已被对方 `--sweep-stale` 标 abandoned (心跳停在 08-29) —— 这是机制正常工作, 不是冲突。
 4. 双子星 (`simonfish/023236f2`) 在飞: `carry-spec-drafter-path-rule5-drift` (PR #194 已合, 剩 claim 释放) + 母 Spec `a1-entry-claim-duplicate-work-guard` B.1。**本容器不接**。
 
@@ -34,7 +34,7 @@ updated-at: 2026-09-05T08:05:00Z
 
 ## §2 未完成 / Carry-forward
 
-- 🔴 **owner 授权推送** aria-orchestrator `feature/m6-dispatch-input-delivery` `9ec1fcc` → origin + github (推后逐 remote ls-remote)。不推的话下次 build (TASK-021) 打不进这批修复, 尤其 HCL 三键 —— **不推 = 第一次 M6 自主 dispatch 必被 Nomad 拒**。
+- ✅ ~~owner 授权推送 9ec1fcc~~ 已完成 (08:3x, 双端 MATCH)。TASK-021 build 现在能打进这批修复 (含 HCL 三键)。
 - 🔴 M6 门链不变: TASK-021 build (owner 触发 `/aether:aether-build-container`, 顺序疑问未决: feature 先 build 供 dogfood vs 合并后 build) → TASK-022 freeze 同批 → TASK-029 = Blocker 4 + 022。
 - 🔴 Blocker 4: SilkNode #1058 已 7 天无回复 (20 tok/s 越 60s timeout)。建议 owner 内部渠道催或授权 nudge。
 - 🟡 **两条待 owner 裁定的 partial (本轮有意未动)**: TASK-005 verification「YAML-safe escape」措辞与实现 (只剥控制字符) 不符, 是改措辞还是补实现, 属历史遗留判断; TASK-023 AD-M6-10 Alternatives 段否 D 的载重论据 (「heavy 卷本地 ext4」) 与本仓 m0-report/R8 决策 (NFS→virtiofs 三节点同源) 相反 —— 改这段等于重开「单节点作用域」前提, 不是 AI 该自作主张的勘正。
@@ -60,7 +60,7 @@ updated-at: 2026-09-05T08:05:00Z
 ```
 [main]              master = a259ebf (+本 commit) | 推后 origin/github 逐 remote ls-remote 核验 (见 §7)
 [aria]              gitlink 7dd0135 (v1.69.1, 双子星 09-04 ship) | [standards] cc864ee | 均 = 远端 master
-[aria-orchestrator] gitlink 237045a (master, 不动) | feature/m6-dispatch-input-delivery 本地 9ec1fcc, origin 1ee225a — 待授权推
+[aria-orchestrator] gitlink 237045a (master, 不动) | feature/m6-dispatch-input-delivery 9ec1fcc = origin = github (owner 授权后双推, ls-remote MATCH)
 [coord ref]         claims/bfe8285d/s-00ec@0720 (aria-2-0-m6-dispatch-input-delivery, phase B) active, 已推
 [tests]             initial-sh-unit 27/27 | initial-sh-integration 9/9 | compute-assertions 8/8 | Layer 1 955/955 (skipped 4)
 ```
@@ -69,17 +69,17 @@ updated-at: 2026-09-05T08:05:00Z
 
 `/aria:state-scanner`。
 
-1. **owner 一句话**: 授权推 aria-orchestrator feature 分支 `9ec1fcc` (子模块, 双推 + ls-remote)。
+1. ~~授权推 9ec1fcc~~ 已推 (双端 MATCH)。
 2. owner 两裁定: TASK-005 措辞 vs 实现 / TASK-023 AD 论据 (§2 第 4 条)。
 3. 不等人的活已做完; 剩余 M6 任务全在门后 (021/022/029)。
 4. 承前: 催 #1058 / 插件缓存已到 1.69.1 (转绿, 不再是事)。
 
 **结构化 carry-id**:
-- `{id: aria-2-0-m6-dispatch-input-delivery, desc: "B.2 补强落地 9ec1fcc 待授权推; 账目 25/30; 剩 005/023 owner 裁定 + 021 build → 022 freeze → 029 (Blocker4 #1058)"}`
+- `{id: aria-2-0-m6-dispatch-input-delivery, desc: "B.2 补强 9ec1fcc 已双推; 账目 25/30; 剩 005/023 owner 裁定 + 021 build → 022 freeze → 029 (Blocker4 #1058)"}`
 
 ## §7 提交清单
 
-- aria-orchestrator `feature/m6-dispatch-input-delivery`: `9ec1fcc` test(m6) 六处测试补强 (6 文件, +404/-16) — **本地, 未推**
+- aria-orchestrator `feature/m6-dispatch-input-delivery`: `9ec1fcc` test(m6) 六处测试补强 (6 文件, +404/-16) — owner 授权后双推, origin MATCH / github MATCH (新建分支)
 - 主仓: 本 commit (tasks.md / detailed-tasks.yaml / 本 handoff / latest.md) — 双推 + ls-remote, 结果回填于 latest.md 更新段
 
 ## Cross-references
