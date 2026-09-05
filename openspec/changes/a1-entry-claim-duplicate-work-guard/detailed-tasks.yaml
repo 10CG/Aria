@@ -946,6 +946,11 @@ tasks:
       - "事后清理 (第 3 条): `git fetch origin +refs/aria/coordination:refs/aria/coordination` 强制对齐; 本地合成 claim 不得留到下一 session"
       - "结果目录与 PREDICTION.md 一并进主仓 commit (memory scoped-add-splits-claim: 不带路径 git status 核验)"
     notes: "rule6 #1。owner 2026-08-22 原话「Rule #6 按能力面变更申报 benchmark」= 照跑两套件。"
+    b2_status: >
+      ⛔ 阻塞 (2026-09-05 实测): AB_TEST_OPERATIONS.md 场景 1 第 1 条要求会话以
+      ARIA_COORDINATION_NO_PUSH=1 claude ... **启动** (subagent 继承会话 env); 本会话未带该变量启动,
+      会话内 export 改不了 subagent 的继承环境 ⇒ 前置无法在本会话满足。硬跑会把合成 claim 推到生产
+      refs/aria/coordination (2026-08-02 已有实证)。**非 Rule #6 豁免** —— 照跑档不变, 仅执行条件不具备。
 
   - id: TASK-032
     parent: "7.2"
@@ -965,6 +970,11 @@ tasks:
       - "eval 2 (双语输入, 英文 proposal) 与字段 Spec 的 expectations 更新 (`Linked Issue` / `none`) 若已随字段 Spec ship 则用其新版套件; 未 ship 则用 d69091d 套件原样 — 记录用的是哪版 (套件 version 字段)"
       - "新版 spec-drafter 直调路径 (user-invocable) 在 eval 中若触发前置 claim ⇒ transcript 必有 push_skipped: true"
     notes: "rule6 #2。与字段 Spec 的 spec-drafter.json 照跑互不替代 (各自 hunk 各自跑)。"
+    b2_status: >
+      ⛔ 阻塞 (2026-09-05 实测): AB_TEST_OPERATIONS.md 场景 1 第 1 条要求会话以
+      ARIA_COORDINATION_NO_PUSH=1 claude ... **启动** (subagent 继承会话 env); 本会话未带该变量启动,
+      会话内 export 改不了 subagent 的继承环境 ⇒ 前置无法在本会话满足。硬跑会把合成 claim 推到生产
+      refs/aria/coordination (2026-08-02 已有实证)。**非 Rule #6 豁免** —— 照跑档不变, 仅执行条件不具备。
 
   - id: TASK-033
     parent: "7.3"
@@ -987,6 +997,13 @@ tasks:
       - "既有全部 eval 期望不漂移 (尤其 linked_issue overlap TARGETED 那条, d69091d 时 id 12)"
       - "套件 JSON 合法 (`python3 -c 'import json;json.load(open(...))'`), selected_count/source_evals_count 同步 +1; `version.yaml` 两个计数与程序化重算结果相等 (`python3 -c \"import glob,json;fs=glob.glob('aria-plugin-benchmarks/ab-suite/*.json');print(len(fs),sum(len(json.load(open(f)).get('evals',[])) for f in fs))\"`)"
     notes: "rule6 #5 + Impact `state-scanner.json` 行。刻意不塞进 (a)(b)(c) 清单 (同一 diff 不判两档)。"
+    b2_status: >
+      **只完成套件编辑半** (state-scanner.json 1.7.0 + new eval 13; version.yaml 1.5.0 程序化重算,
+      实测 32 skills / 84 evals)。跑评测半阻塞于会话级前置 ARIA_COORDINATION_NO_PUSH (见下)。status 保持 pending。
+      ⛔ 阻塞 (2026-09-05 实测): AB_TEST_OPERATIONS.md 场景 1 第 1 条要求会话以
+      ARIA_COORDINATION_NO_PUSH=1 claude ... **启动** (subagent 继承会话 env); 本会话未带该变量启动,
+      会话内 export 改不了 subagent 的继承环境 ⇒ 前置无法在本会话满足。硬跑会把合成 claim 推到生产
+      refs/aria/coordination (2026-08-02 已有实证)。**非 Rule #6 豁免** —— 照跑档不变, 仅执行条件不具备。
 
   - id: TASK-034
     parent: "7.4"
@@ -1008,6 +1025,11 @@ tasks:
       - "三套件既有 eval 期望不漂移; 占位串措辞变更不改变 Phase B/D 闸门调用形态 (与 TASK-019 verification 呼应)"
       - "三个结果目录各自有 PREDICTION.md (跑前) 与 RESULT.md (跑后)"
     notes: "rule6 #7/#8/#9。AB_TEST_OPERATIONS.md:224 已把 phase-d-closer.json 列进射程套件。"
+    b2_status: >
+      ⛔ 阻塞 (2026-09-05 实测): AB_TEST_OPERATIONS.md 场景 1 第 1 条要求会话以
+      ARIA_COORDINATION_NO_PUSH=1 claude ... **启动** (subagent 继承会话 env); 本会话未带该变量启动,
+      会话内 export 改不了 subagent 的继承环境 ⇒ 前置无法在本会话满足。硬跑会把合成 claim 推到生产
+      refs/aria/coordination (2026-08-02 已有实证)。**非 Rule #6 豁免** —— 照跑档不变, 仅执行条件不具备。
 
   - id: TASK-035
     parent: "7.5"
@@ -1034,6 +1056,13 @@ tasks:
       - "(e) 臂的 awaiting_owner 落点按 owner 裁 (tasks.md #5) 回填 expectations; 未裁前 expectations 只写「不发问 + 留下机读待复议记录」"
       - "套件 JSON 合法; 不修改**任何**既有 eval 文本 (含字段 Spec ship 后的 spec-drafter id 3; 照跑档与覆盖外档互不替代)"
     notes: "rule6 覆盖外档第 2 条 + Impact「AB 套件 — 覆盖外档」行。行为类不冒充结构化测试。"
+    b2_status: >
+      **只完成套件编辑半** (phase-a-planner.json 1.1.0 +4 定向 fixture id 3-6; spec-drafter.json 1.2.0 +2 id 5-6;
+      每条均设可分辨坏臂)。跑评测半阻塞, status 保持 pending。
+      ⛔ 阻塞 (2026-09-05 实测): AB_TEST_OPERATIONS.md 场景 1 第 1 条要求会话以
+      ARIA_COORDINATION_NO_PUSH=1 claude ... **启动** (subagent 继承会话 env); 本会话未带该变量启动,
+      会话内 export 改不了 subagent 的继承环境 ⇒ 前置无法在本会话满足。硬跑会把合成 claim 推到生产
+      refs/aria/coordination (2026-08-02 已有实证)。**非 Rule #6 豁免** —— 照跑档不变, 仅执行条件不具备。
 
   - id: TASK-036
     parent: "7.6"
@@ -1057,6 +1086,7 @@ tasks:
       (2) 修复面不同: #117 需要新 eval 体裁, 本缺口靠在 phase-a-planner / spec-drafter / state-scanner 三套件加 case 即闭合;
       (3) #127 是 phase-c 套件的 D9 维度, 宿主不同。字段 Spec 的 SC-7 缺口 (authoring: 写不写字段) 才是 #117 的同类, 应归并进 #117 — 那是字段 Spec A.2 的裁量, 此处只点名。
 
+      ⛔ 未做: 开 issue 是外向动作待授权; 按 Spec 依赖 TASK-035 跑完。
   # -------------------------------------------------------------------------
   # Group 8 — 文档 / 发版 / follow-up (knowledge-manager / tech-lead)
   # -------------------------------------------------------------------------

@@ -77,12 +77,29 @@
 
 ## 7. Rule #6 (allowed-tools 扩权 = 能力面变更 ⇒ 照跑; 覆盖外 ⇒ 定向 fixture + issue)
 
-- [ ] 7.1 照跑 `ab-suite/phase-a-planner.json` (当时套件全部 eval, d69091d 时 2; 零裁量; 前置 `ARIA_COORDINATION_NO_PUSH=1`; 结果落 `ab-results/<date>-<vNEXT>-a1-entry-rule6/`, `<vNEXT>` = 落地时按 plugin.json 计算, 不预写)
-- [ ] 7.2 照跑 `ab-suite/spec-drafter.json` (当时套件全部 eval, d69091d 时 2 / 字段 Spec ship 后 3; 同上)
-- [ ] 7.3 `ab-suite/state-scanner.json` 新增 eval (id = 当时 max(id)+1, d69091d 时 13) 钉点名行为 (d) (`enabled == true` 且持 active claim ⇒ 每次入口触发 `--heartbeat-only`; `enabled == false` ⇒ 零触发; SC-21 / SC-28 第一臂) 后照跑全部 eval (当前值 + 1); 同批程序化重算 `ab-suite/version.yaml`
-- [ ] 7.4 照跑 `ab-suite/phase-b-developer.json` / `branch-manager.json` / `phase-d-closer.json` (占位串 hunk, 各按当时套件全部 eval, d69091d 时各 2)
-- [ ] 7.5 覆盖外档定向 fixture: `phase-a-planner.json` 增 (a) 拼串 + `--linked-issue` 省略/传递 (SC-9(A)(B) / SC-12 两臂 / SC-14(b)) · (b) overlap 非空请裁 + status 分档 (SC-11) · (c) fetch 降级/异常渲染「未能核实」(SC-25 行为臂) · (e) `unattended` 臂 (SC-26); `spec-drafter.json` 增 (a)(b) 两条 (新 eval id = 当时 max(id)+1, 不与字段 Spec 的 id 3 冲突; 不改任何既有 eval); 双臂可分辨; 同批程序化重算 `ab-suite/version.yaml` (串行于 7.3 后)
-- [ ] 7.6 套件缺口 issue: **新开** aria-plugin issue「phase-a-planner / spec-drafter 套件零覆盖 A.1 入口认领编排行为」, 正文交叉引用 `#117` (同族: 处方性 · 套件覆盖外) 与 `#127`, **不归并** (理由见 detailed-tasks.yaml TASK-036 notes)
+> ### ⛔ AB 运行前置未满足 (2026-09-05 实测, 阻塞 7.1/7.2/7.4 与 7.3·7.5 的跑评测半)
+>
+> `AB_TEST_OPERATIONS.md` §场景 1 第 1 条要求: 跑这些套件的 Claude Code 会话**必须以**
+> `ARIA_COORDINATION_NO_PUSH=1 claude ...` **启动** —— subagent 继承会话 env, 两个 CLI 读到它才跳过 push。
+> **本会话未带该变量启动** (纯 shell 判空实测: 未设置)。在会话内用 Bash `export` 只影响那一个子进程,
+> 改不了 subagent 继承的环境, 因此**无法在本会话内满足该前置**。
+>
+> 硬跑的后果是成文的: 被测 Skill 会把**合成 claim 推到生产 `refs/aria/coordination`**
+> (实证: 2026-08-02 `postspec-r1-delete-me-a1-entry-claim-audit-test` 落到过远端)。
+> 本 Spec 落地后 `phase-a-planner.json` / `spec-drafter.json` 也进入该射程 (手册已预写)。
+>
+> **这不是 Rule #6 豁免** —— 照跑档不变, 只是执行条件不具备。处置 = owner 以
+> `ARIA_COORDINATION_NO_PUSH=1 claude ...` 重启会话后跑, 跑完按手册第 3 条
+> `git fetch origin +refs/aria/coordination:refs/aria/coordination` 强制对齐本地 ref。
+> 套件编辑 (7.3 / 7.5 的前半) 不依赖该前置, 已先行落地, 使重启后可直接开跑。
+
+
+- [ ] 7.1 照跑 `ab-suite/phase-a-planner.json` (当时套件全部 eval, d69091d 时 2; 零裁量; 前置 `ARIA_COORDINATION_NO_PUSH=1`; 结果落 `ab-results/<date>-<vNEXT>-a1-entry-rule6/`, `<vNEXT>` = 落地时按 plugin.json 计算, 不预写) — ⛔ **阻塞: AB 运行前置不满足** (见下方 §AB 运行前置)
+- [ ] 7.2 照跑 `ab-suite/spec-drafter.json` (当时套件全部 eval, d69091d 时 2 / 字段 Spec ship 后 3; 同上) — ⛔ **阻塞: 同 7.1**
+- [ ] 7.3 `ab-suite/state-scanner.json` 新增 eval (id = 当时 max(id)+1, d69091d 时 13) 钉点名行为 (d) (`enabled == true` 且持 active claim ⇒ 每次入口触发 `--heartbeat-only`; `enabled == false` ⇒ 零触发; SC-21 / SC-28 第一臂) 后照跑全部 eval (当前值 + 1); 同批程序化重算 `ab-suite/version.yaml` — 🟡 **套件编辑半已做 (2026-09-05)**: `state-scanner.json` 1.6.0→1.7.0 + new eval **13** `a1-heartbeat-on-entry-TARGETED` (三臂: enabled=true 给出完整 `--heartbeat-only` 命令行 / enabled=false 零调用 / `collision.kind` 为空不改变答案); `version.yaml` 1.4.0→1.5.0 **程序化重算** (实测 32 skills / 84 evals, 与旧 77 + 新增 7 吻合)。**跑评测半阻塞**, 见下方 §AB 运行前置
+- [ ] 7.4 照跑 `ab-suite/phase-b-developer.json` / `branch-manager.json` / `phase-d-closer.json` (占位串 hunk, 各按当时套件全部 eval, d69091d 时各 2) — ⛔ **阻塞: 同 7.1**
+- [ ] 7.5 覆盖外档定向 fixture: `phase-a-planner.json` 增 (a) 拼串 + `--linked-issue` 省略/传递 (SC-9(A)(B) / SC-12 两臂 / SC-14(b)) · (b) overlap 非空请裁 + status 分档 (SC-11) · (c) fetch 降级/异常渲染「未能核实」(SC-25 行为臂) · (e) `unattended` 臂 (SC-26); `spec-drafter.json` 增 (a)(b) 两条 (新 eval id = 当时 max(id)+1, 不与字段 Spec 的 id 3 冲突; 不改任何既有 eval); 双臂可分辨; 同批程序化重算 `ab-suite/version.yaml` (串行于 7.3 后) — 🟡 **套件编辑半已做 (2026-09-05)**: `phase-a-planner.json` 1.0.0→1.1.0 +4 定向 fixture (id 3-6: 拼串与 `--linked-issue` 三态省略门含 Level1/enabled=false 子场景 / 按 status 四档请裁 / 降级「未能核实」与 unknown「已确认存在」不同句 / unattended 零 AskUserQuestion); `spec-drafter.json` 1.1.0→1.2.0 +2 (id 5-6, 直调路径同款去 Level 1 子场景)。每条都设了可分辨坏臂 (照传哨兵 ⇒ 复现 K8 / 渲染一行后自行继续 / 两者同句 / 用工具可用性做判据)。**跑评测半阻塞**
+- [ ] 7.6 套件缺口 issue: **新开** aria-plugin issue「phase-a-planner / spec-drafter 套件零覆盖 A.1 入口认领编排行为」, 正文交叉引用 `#117` (同族: 处方性 · 套件覆盖外) 与 `#127`, **不归并** (理由见 detailed-tasks.yaml TASK-036 notes) — ⛔ **未做**: 开 issue 是外向动作, 待授权; 且按 Spec 它依赖 7.5 跑完
 
 ## 8. 文档 / 发版 / follow-up
 
