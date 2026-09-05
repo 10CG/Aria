@@ -607,7 +607,7 @@ tasks:
     parent: "5.1"
     task_group: 5
     title: "phase-a-planner/SKILL.md: allowed-tools 扩权 + 独立标题级「前置: REQUIRE claim (A.1, MUST)」块 + A.1 precondition 指针 + 消费/release/skip/unattended"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: knowledge-manager
@@ -629,11 +629,12 @@ tasks:
       `A.1 - Spec 管理:` 锚点定位。SC-26 的 handoff 宿主未定义 (tasks.md 待 owner 裁 #5), 本任务先写「待复议记录 +
       awaiting_owner」措辞, 落点按 owner 裁定回填。
 
+      frontmatter 逐字; 块切片 68 行; ④ 实测无 --phase B; precondition 指针落 A.1 yaml 项首键。
   - id: TASK-018
     parent: "5.2"
     task_group: 5
     title: "spec-drafter/SKILL.md: allowed-tools 加 Bash + 第二落点「前置: REQUIRE claim (A.1, MUST)」块 (幂等谓词)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -652,12 +653,14 @@ tasks:
         在 PR 说明记「相邻性由字段 Spec TASK-014 对称分支在其 ship 时验 (母 Spec 块已落, 字段侧以 merge-tree 核)」
       - "正常委派路径 (phase-a-planner → spec-drafter) 下幂等谓词使只写一条 claim: 由 TASK-025 (SC-22 ③ 幂等谓词结构测试) 验; 行为层 (真跑两次 A.1 只写一条 claim) 当前**无宿主, 成文不冒充** (R3/A3 532e5316: TASK-035 fixture (a) 测的是 SC-9/12/14(b), 与幂等无关)"
     notes: "user-invocable: true (:9) 是本落点存在的理由 (S6/D8)。标题级取 ## 而非 ### 以免挂在 `## 输入参数` 之下语义错位; SC-22 ① 正则 `^#{2,4}` 两者都接受。"
+    b2_evidence: >
+      CRLF 文件, 用 newline='' 读写保住行尾 (diffstat 60+/1-, 非整文件重写); 无 Level 1 例外。
 
   - id: TASK-019
     parent: "5.3"
     task_group: 5
     title: "carry-id 三处占位措辞 (§2.1b 选项 A) + phase-b-developer :96-97 push 机制勘正 + skip_if 补句"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -675,12 +678,16 @@ tasks:
       - "phase-d-closer :56 `git diff` 不触及 (既有缺陷不混进变更面)"
       - "✅ 「AI 流程判断 #2」已裁 (2026-09-01 技术裁定, 决策单 §H5): 选项 A 成立、不算动 Phase B — 判据即本任务上方三条 git diff / 测试字节级约束 (:86-98 除占位串与注释外不变、--include-terminal 不入 Phase B 模板、lockin 测试仍绿) + TASK-034 三套件 Rule #6 照跑 (无闸门被跳过); 落地时逐条核验, 任一不成立 ⇒ 回到选项 B 并上报"
     notes: "rule6 #7/#8/#9: 三处是处方性 · 运行时指令面 (占位串是 AI 逐字复制的字面) ⇒ TASK-034 照跑三套件。"
+    b2_evidence: >
+      **首轮踩 memory preserve-crlf**: phase-b-developer 与 branch-manager 在 HEAD 是 CRLF,
+      Python write_text 静默转 LF => 2133/1862 行整文件 diff。回退后用 newline='' 重做, 降到 11+/2- 与 2+/1-。
+      push 机制勘正用**当前**行号 (Step 9 :880 / 7a :597), Spec 引的 :856/:573 是 d69091d 口径, 已被本 cycle 位移。
 
   - id: TASK-020
     parent: "5.4"
     task_group: 5
     title: "state-scanner/SKILL.md:「Layer L A.1 heartbeat 集成」四句小节 + :168 键集补 push_skipped + :176 四态 + constants.py 注释同步"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -696,12 +703,14 @@ tasks:
       - "`git diff` constants.py 只含注释行; `grep -n 'STALE_TTL: int = 1800' lib/constants.py` 仍命中 :36"
       - "既有 test_coordination_default_lockin.py::test_no_stale_default_false_wording (:36) 仍绿"
     notes: "rule6 #5: 处方性 · 运行时指令面 ⇒ TASK-033 照跑 + 加 eval。:176 的「超 STALE_TTL」误写不改 (follow-up #2)。"
+    b2_evidence: >
+      新小节命令行与 layer-l 设计段逐字节相同 (已实测); TTL 取值与不变量注释未动。
 
   - id: TASK-021
     parent: "5.5"
     task_group: 5
     title: "references/layer-l-integration.md 四处: :15 Design A / :45 update_heartbeat→heartbeat + caller / 新「Layer L A.1 heartbeat 集成」设计段"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: knowledge-manager
@@ -715,12 +724,16 @@ tasks:
       - "新段命令行与 state-scanner/SKILL.md 新小节命令行逐字节相同 (memory delegate-verify: 指针指向的内容真在)"
       - "代价披露句在: 违反「不自带 fetch」时 ~13.8s/次 (spike S2); 本地写 + 单次 push 耗时留 B.2 实测后回填"
     notes: "rule6 #10: (a) 描述性勘正 → substitute TASK-028; (b) 处方性 → 与 #5 同一次 state-scanner.json 照跑 (TASK-033) + 结构断言 TASK-030。"
+    b2_evidence: >
+      **verification 第 2 条结构上不可满足**: 'git grep update_heartbeat aria/ 零命中' 与
+      「存在一个断言该字面量不在文档里的守卫测试」不相容 —— 守卫自己必须含有它。现 3 处命中
+      全在 test_coordination_default_lockin.py 自身。应读作「除 guard 测试自身外零命中」。
 
   - id: TASK-022
     parent: "5.6"
     task_group: 5
     title: "config-loader/SKILL.md 登记 A.1 skip 语义 + unattended key; DEFAULTS.json 注册 coordination 三键"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -736,12 +749,14 @@ tasks:
       - "既有 test_coordination_default_lockin.py::test_config_loader_sot_default_true (:21) 仍绿; test_mainspec_phase0.py (:19 读 DEFAULTS) 仍绿"
       - "SKILL.md 新条目写明「不得以 AskUserQuestion 是否可用做运行期推断」(D15)"
     notes: "rule6 #6 描述性档 ⇒ substitute = TASK-027 (baseline 必红: coordination 段今天不存在)。"
+    b2_evidence: >
+      三键注册 + SKILL.md 登记; D15「不得以 AskUserQuestion 是否可用做运行期推断」已写入。
 
   - id: TASK-023
     parent: "5.7"
     task_group: 5
     title: "docs/coordination-ref-schema.md §3.2 追加第 6 条: unknown_schema_claims 语义"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -753,12 +768,14 @@ tasks:
       - "本任务落文本后, 对应 TASK-029 (§3.2 切片含字面 `unknown_schema_claims`; 负控写进 §4.2 ⇒ 红) 由红转绿 (基线 d69091d 上先红, 见该任务)"
       - "第 6 条编号紧接第 5 条 (soft_error 句), 不改 §3.1 / §3.3 / §4.2"
     notes: "rule6 #11 描述性 ⇒ substitute TASK-029 (baseline 必红, 清单 #28)。"
+    b2_evidence: >
+      §3.2 第 6 条; 负控实跑 (挪进 §4.2 => 红) 证明切片有效、全文 assertIn 免疫。
 
   - id: TASK-024
     parent: "5.8"
     task_group: 5
     title: "standards/conventions/session-handoff.md §2.3.8: {id, desc} 之 id = 本 cycle carry-id = A.1 原串 (standards 子模块)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
@@ -771,6 +788,8 @@ tasks:
       - "§2.3.8.3 :238 逐字节不变; frontmatter 5 字段 `grep -cE ... ==5` 不变式不受影响"
       - "standards 子模块: 本地 `git merge` + `git push origin && git push github` + 逐个 `ls-remote` 一致 (CLAUDE.md 多远程硬约束 1/2); 主仓 gitlink bump 到 post-merge SHA"
     notes: "R3/KM-1: §2.3 (:101) 是机读 frontmatter schema, 引错会把实现者引向违反 :238 硬约束。lib/track_id.py 自称该文件为 SOT。"
+    b2_evidence: >
+      命中落 :229 属 §2.3.8 区间; §2.3.8.3 与 frontmatter 5 字段不变式未受影响; diffstat 1+/1-。
 
   # -------------------------------------------------------------------------
   # Group 6 — 结构化测试 RED (qa-engineer; 全部扩 tests/test_coordination_default_lockin.py, 同文件串行 025 → 026 → 027 → 028 → 029 → 030 已编码为边)
@@ -780,7 +799,7 @@ tasks:
     parent: "6.1"
     task_group: 6
     title: "SC-22 ①–⑦: 两文件各自的「前置: REQUIRE claim (A.1, MUST)」块机械断言 (切片 / 七字面量 / 幂等 / 负控 / 续行折叠)"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer
@@ -801,11 +820,14 @@ tasks:
       断言先于 TASK-017/018 落文本, 在 d69091d 上跑一次全红并留痕 (红痕进 B.2 handoff); TASK-017/018 落文本后
       转绿由它们各自的 verification[0] 断言。
 
+      围栏状态机 + 切片边界 + 续行折叠三个 helper; 基线亲跑 13 红且红因逐条正确。
+      ⑤ 的围栏定位前提在基线即通过 (找到带锚点的那个围栏), 证明不是抓第一个。
+      三个坏实现负控实跑变红: 七字面量搬出块外 (②) / 无可执行命令行 (⑦) / 幂等谓词改逃逸口 (③)。
   - id: TASK-026
     parent: "6.2"
     task_group: 6
     title: "SC-34: 三处 SKILL.md 各含逐字 `A.1 认领时派生的那一串`"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -818,12 +840,14 @@ tasks:
       - "怎么会红: d69091d 三文件 0 命中 ⇒ 红; 只改两处 ⇒ 第三条红"
       - "附加: branch-manager :146 标题仍含 `Part A1` (不被误改, R6/CR M1) — 一条 assertIn"
     notes: "SC-23 / SC-14(a) 的代码夹具对本文本层承诺感知不到 (R6/CR M4), 故独立成条。"
+    b2_evidence: >
+      负控实跑: 只改两处 => 第三条红。
 
   - id: TASK-027
     parent: "6.3"
     task_group: 6
     title: "substitute (rule6 #6): DEFAULTS.json coordination 三键 ↔ config-loader/SKILL.md 登记值逐字一致 + 负控"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -837,12 +861,14 @@ tasks:
       - "怎么会红: d69091d 无 coordination 段 ⇒ KeyError 红 (baseline 必红)"
       - "负控 (亲验后还原): (a) JSON 注册 unattended 默认 true ⇒ 与 SKILL.md default false 不一致 ⇒ 红; (b) 漏 mode 键 ⇒ 集合不等 ⇒ 红; (c) SKILL.md 登记值改 `advisory ` (尾随空白) ⇒ 逐字比红 — 证明不是恒真"
     notes: "旧 substitute SC-9 无效 (对象是散文); 本条是「真的可机械断言且现在就是红的」测试 (memory check-runs-at-baseline-first)。"
+    b2_evidence: >
+      基线红改为 assertIn 可读失败 (原设计走 KeyError)。负控: unattended 写 true / 漏 mode 键, 均红。
 
   - id: TASK-028
     parent: "6.4"
     task_group: 6
     title: "substitute (rule6 #10a): layer-l-integration.md 不含 `update_heartbeat` 且含 `heartbeat(` + 负控"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -855,12 +881,14 @@ tasks:
       - "怎么会红: d69091d :45 含 `update_heartbeat()` ⇒ 红 (baseline 必红)"
       - "负控: (a) :45 改为 `heartbeat_by_track()` 却在别处新写一句 `update_heartbeat` ⇒ 第一条红; (b) 只删 :45 整行不补任何 `heartbeat(` ⇒ 第二条红 — 断言不是「删掉就绿」"
     notes: "清单 #33: `git grep update_heartbeat` 全 aria 只命中 :45 自身。"
+    b2_evidence: >
+      负控两条均实跑变红: 别处新写 update_heartbeat / 只删悬空名不补真 API。
 
   - id: TASK-029
     parent: "6.5"
     task_group: 6
     title: "substitute (rule6 #11): coordination-ref-schema.md §3.2 切片含 `unknown_schema_claims` + 负控"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -873,12 +901,14 @@ tasks:
       - "怎么会红: d69091d §3.2 五条 (:133-141) 无该字面 ⇒ 红 (baseline 必红)"
       - "负控: 把字面写进 §4.2 (`status=\"unknown\"` in reconcile) 而非 §3.2 ⇒ 切片外 ⇒ 红; 全文 assertIn 对此免疫, 故必须切片"
     notes: "清单 #28: 该文件实存, 断言形登记 (FIX-17)。"
+    b2_evidence: >
+      负控实跑: 字面挪进 §4.2 => 红。
 
   - id: TASK-030
     parent: "6.6"
     task_group: 6
     title: "补充 substitute (rule6 #10b + #12): layer-l 新节标题 + 切片含 `--heartbeat-only`; state-scanner SKILL :168 切片含 `push_skipped`"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: qa-engineer
@@ -891,6 +921,8 @@ tasks:
       - "state-scanner/SKILL.md: 定位 `### JSON 消费 + surface 渲染` (:166) 切片, 含字面 `push_skipped` 与 `push_skipped_reason`; 负控 = 写进 `## 相关文档` ⇒ 切片外 ⇒ 红"
       - "怎么会红: d69091d 两处均无 ⇒ 红 (R6/CR 实读 :168 键集无此二键)"
     notes: "rule6 #10(b) 与 #5 同一次 state-scanner.json 照跑覆盖处方性半; 本条只是结构断言半。"
+    b2_evidence: >
+      负控两条均实跑变红: 标题在但 flag 在别节 / push_skipped 搬进相关文档。
 
   # -------------------------------------------------------------------------
   # Group 7 — Rule #6 AB (qa-engineer / tech-lead). 前置: ARIA_COORDINATION_NO_PUSH=1 会话
