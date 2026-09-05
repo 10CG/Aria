@@ -1,8 +1,8 @@
 # Tasks — `owner-container-identity-key-and-collision-parser`
 
-> **Spec**: [proposal.md](./proposal.md) (v10, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R3 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
+> **Spec**: [proposal.md](./proposal.md) (v11, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R4 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
 > **Level**: 3 (owner 裁定; 判据 cross-module) — 本文件 (A.2) + `detailed-tasks.yaml` (A.3, 单一 SOT: verification / deps / 工时 / rule6_note) + post_planning 收敛审计
-> **Status**: A.2/A.3 **v4** (post_planning R3 rework 2026-09-05); post_planning R4 待跑
+> **Status**: A.2/A.3 **v5** (post_planning R4 rework 2026-09-05: TASK-018 机械锁 / S2-1 注释翻转; 计划结构不变); post_planning R5 待跑
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `7dd0135` v1.69.1) · `standards/` 子模块 (@ `cc864ee`) · 主仓 (@ `60808b2`; 冻结语料 `.aria/repro/handoff-tracks-frozen-2026-09-05.json` 已在)
 > **ship target**: aria-plugin `<vNEXT>` — 档位按 proposal D5 (判据 PATCH; owner 可升 MINOR); **本文件不写字面版本号**, 5.2 执行时按当时 `plugin.json` 计并记入 CHANGELOG
 > **ship 形态 (proposal §Impact)**: **S1** = a1-entry 未落地时 ship: 不 flip `get_container_id()`, 只加 `get_container_label()` + 迁移 inventory 告警; **S2** = a1-entry B.2 已落地 **且** 对方在 #174 ack。**S2 项不在本文件 checkbox 内** (归档门 `spec_complete.py` 只读 checkbox, 无「条件任务」机制 — post_planning R1 C-1); 见文末「S2 后续」表与激活规则
@@ -59,7 +59,7 @@
 - [ ] 2.4 `handoff_multibranch.py:518-523` dedupe 键 `(track_id, identity_key)`; `track_board.py:412-417` 键同源 — 1.3 转绿
 - [ ] 2.5 `lib/collision.py::track_to_claim_record` (`:86-140`; 调用点 `collision.py:349` / `track_board.py:783`) 族键剥离; `track_board.py:778-793` `tracks_by_tid` 用剥离后键 — 1.7 转绿
 - [ ] 2.6 `lib/constants.py` `LAYER_H_ACTIVE_WINDOW_DAYS = 30` + `lib/collision.py::layer_h_is_fresh()`; collector `:709` 前 / renderer `:744` 前同一调用; board stale 标注 — 1.10 转绿, 1.6 改后 0 组
-- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写为**S1 实况措辞**: 「label 当前仍参与协调身份 (设了会换身份), 后续版本改为仅展示; 建议留空」— 不得把「仅展示」写成对当前行为的描述 (反向 grep 锁) — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
+- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写为**S1 实况措辞**: 「label 当前仍参与协调身份 (设了会换身份), 后续版本改为仅展示; 建议留空」— 机械锁两条 grep (`:126-140` 区间含「当前仍参与协调身份」; 每个含「仅展示」的行同时含「后续」或「将」) — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
 - [ ] 2.8 迁移 inventory: `phase1_gate.py` (复用 `:486` Identity) 与 `release_gate.py` (import identity + `get_container_label()` + `read_claims` + `release_claim_by_track(identity=…)`) 告警, S1 无抑制 — 1.8 告警子句转绿
 - [ ] 2.9 `track_board.py` ⚪ 行渲染: **独立数据路径**, 在顶层 `render_track_board` 于 dedupe (`:744`) 前对原始 tracks 调 `identity_drift_advisories`, 输出为 collision 段 (`:796` `_render_collision_lines` 结果) 之后的独立段, **不进** per-track 循环 (`:459-475` 只有 dedupe 后数据); label 并列显示 — 1.9 转绿
 
@@ -95,7 +95,7 @@
 
 | 项 | 内容 | 验收 (proposal SC-3 S2 臂) |
 |----|------|------|
-| S2-1 | `get_container_id()` flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry `get_container_uuid()` 同值 | label 非空时返回 uuid |
+| S2-1 | `get_container_id()` flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry `get_container_uuid()` 同值; 同 PR 改写 `identity.py:126-140` 注释为「label 仅展示」(撤销 2.7 的 S1 措辞与机械锁) | label 非空时返回 uuid; 注释区间不再含「当前仍参与协调身份」 |
 | S2-2 | 发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项 | 未勾选则 flip 提交不进合并集 |
 | S2-3 | 改写 a1-entry SC-3 判据 (仅 #174 ack 后) | ack 留言 id 记录; 判据改为「`get_container_uuid()` 与 flip 后 `get_container_id()` 同值; label 只在 `get_container_label()`」 |
 | S2-4 | 复现 #135 08-13 时间线不再 `claim_not_found` | acquire 后加 label 再 release 成功 |
