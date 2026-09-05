@@ -296,6 +296,7 @@ tasks:
       - "⚠️ baseline (d69091d) 即绿 — 宿主 release_claim_by_track :377 与 acquire_claim :99 今天就这样工作; 它守的是 :425-427 三合取匹配键"
       - "坏实现 A (亲验后还原): :425 `rec.container == resolved.container_id` 去掉 ⇒ 第三方 (容器 B) 也被 abandoned ⇒ 红"
       - "坏实现 B: 匹配键改为按 linked_issue 或按 container 批量 ⇒ 第三方被 abandoned ⇒ 红; 坏实现 C: 子串匹配 (`old-slug` in track_id) — 因负控串不共享子串, 需第二组夹具 `old-slug-x` 前缀串验红"
+      - "⚠️ 订正 (B.2 实跑 NC5, 只增不改): 第 1/2 条里 `zzz-unrelated-9f8e7d6c` 那条夹具对坏实现 A (去掉 `rec.container` 合取) **恒绿** — `track_id` 走精确相等, track 不同的 claim 有没有 container 合取都匹配不到, 该断言零信息。判红能力由新增的「容器 B 中同 track_id」夹具承载; 原夹具保留 (它守的是 track_id 精确相等本身)"
     notes: "AI 改名时记不记得走两步不在本条 (SC-22 ⑥ 文本 + rule6 (a) fixture)。"
     b2_evidence: >
       **Spec 夹具缺陷已发现并补 (不动原夹具, 只增)**: 本条原写「第三方 (容器 B, 与旧/新不共享前缀/后缀)
@@ -356,6 +357,7 @@ tasks:
       - "SC-25 代码臂 (baseline 必红): 让 linked_issue_overlaps 抛 (同注入手段), 带 --linked-issue ⇒ overlap == null + error 非空; baseline :1340 写 [] ⇒ 红"
       - "SC-10 (baseline 必红): 夹具 remote 不可达 (指向不存在路径) 使 Step 4 health_check_fetch (:497) 降级, 带 --no-push 隔离 Step 9 ⇒ stdout `error == \"fetch_degraded\"` 且 proceed 仍 true (advisory); baseline error: null ⇒ 红"
       - "四态可辨断言 (§2.4b): 键缺席 / [] / unknown>0 / null+error 四种输出在夹具上两两不同"
+      - "⚠️ 订正 (B.2 实跑, 只增不改): SC-33/SC-25 的注入手段三选一中, (a)「夹具把 refs/aria/coordination 指向非 tree 对象」**结构上做不到** — read_claims 全程 fail-soft, 损坏 ref 只得 errors=['ls_tree_failed:...'] 而不抛, 触不到 except。已钉 (c), 且须**按调用方栈帧限定** (read_claims 同时被 _run_gate_impl 调用, 无差别替换会把闸门一起打崩)"
     notes: >
       SC-10 与 Step 9 push_failed 同跑时 error 取值未定 (tasks.md 待 owner 裁 #7), 夹具用 --no-push 隔离。
       Spec 行号 :1230/:1233-1235/:1236-1238 在 d69091d 为 :1332/:1335-1337/:1338-1340。
@@ -496,6 +498,7 @@ tasks:
       - "unknown 仍被 :274-275 第二道门丢弃 (sentinel linked_issue=None, claim_schema.py:130) — 本函数**不**为 unknown 放行, 计数走 TASK-014 独立键"
       - "现有 tests/test_release_by_track.py TestLinkedIssueOverlaps (:206) 与 TestLinkedIssueNormalizationSC (:586) 全绿 (三参数调用兼容)"
       - "归档姊妹 Spec :257/:259 已写明本形参不视为回归; 不编辑归档件"
+      - "⚠️ 订正 (B.2 实跑, 只增不改): 第 1 条的「TASK-007 的 SC-8 臂绿」**在本任务时点不可满足** — SC-8 是 CLI 层断言, 需 TASK-014 的 --include-terminal flag, 而 TASK-014 反过来依赖本任务。该条实为 TASK-014 的验收项 (已在其 verification 第 1 条); 本任务只验 lib 层五条直证"
     notes: "Spec 行号 :230-234/:268/:272-275/:278-279 在 d69091d 逐字一致 (v1.67.2 未动本文件)。"
     b2_evidence: >
       签名加 keyword-only 形参, 只改第一道门; 第二道门与自排除未动。lib 层五条直证全部成立
@@ -521,7 +524,7 @@ tasks:
     reason: "CLI 参数 + _main() 后处理块的局部改动, 不碰 run_gate/_run_gate_impl 签名"
     dependencies: [TASK-003, TASK-008, TASK-013]   # TASK-003 = Group 4 首任务显式挂锚点核对门 (R1 C1)
     deliverables:
-      - aria/skills/state-scanner/scripts/phase1_gate.py   # ① add_argument("--include-terminal", action="store_true") 放 --linked-issue :1281-1288 之后; ② :1335-1337 调用加 include_terminal=args.include_terminal; ③ :1332 门控改 `if args.linked_issue or args.include_terminal:`, 块内 read_claims(repo) 只调一次 (:1334), 按 args.linked_issue 填 linked_issue_overlap / 按 args.include_terminal 填 unknown_schema_claims = count(status=="unknown"); ④⑥ :1338-1340 except 改赋 out["linked_issue_overlap"]=None (仅当传了 --linked-issue) + out["unknown_schema_claims"]=None (仅当传了 --include-terminal) + out["linked_issue_overlap_error"]=<非空 token>; :1154 CLI 契约注释 (`args  : --raw-track-id --phase [--mode advisory|block] [--linked-issue]` 行, R1/A4 实读; 原记 :1155-1158 漂 1 行) 同步
+      - aria/skills/state-scanner/scripts/phase1_gate.py   # ① add_argument("--include-terminal", action="store_true") 放 --linked-issue :1281-1288 之后; ② :1335-1337 调用加 include_terminal=args.include_terminal; ③ :1332 门控改 `if args.linked_issue or args.include_terminal:`, 块内 read_claims(repo) 只调一次 (:1334), 按 args.linked_issue 填 linked_issue_overlap / 按 args.include_terminal 填 unknown_schema_claims = count(status=="unknown"); ④⑥ :1338-1340 except 改赋 out["linked_issue_overlap"]=None + out["unknown_schema_claims"]=None (⚠️ 订正 B.2: **两键无条件同时赋**; 原写的「仅当传了 --linked-issue / 仅当传了 --include-terminal」与 proposal 三处一致口径 [SC-33 :623 / Impact ④⑥ :663 / §2.4b 四态表 :340] 矛盾, 系 A.2/A.3 派生错。按各自 flag 填的是**成功路径**, 不是 except 路径) + out["linked_issue_overlap_error"]=<非空 token>; :1154 CLI 契约注释 (`args  : --raw-track-id --phase [--mode advisory|block] [--linked-issue]` 行, R1/A4 实读; 原记 :1155-1158 漂 1 行) 同步
     verification:
       - "TASK-008 的 SC-24 / SC-33 / SC-25 代码臂绿; TASK-007 全绿 (SC-2 互含两臂 / SC-8 终态可见 / SC-29 自排除两组)"
       - "不传两 flag 时 stdout JSON 键集与 d69091d 逐字节相同 (Phase B 两入口输出不变, §非目标); 用 test_release_by_track.py TestPhase1GateLinkedIssueCli (:527) 既有断言核"
@@ -723,6 +726,7 @@ tasks:
       - "`git grep -n update_heartbeat aria/` 零命中"
       - "新段命令行与 state-scanner/SKILL.md 新小节命令行逐字节相同 (memory delegate-verify: 指针指向的内容真在)"
       - "代价披露句在: 违反「不自带 fetch」时 ~13.8s/次 (spike S2); 本地写 + 单次 push 耗时留 B.2 实测后回填"
+      - "⚠️ 订正 (B.2 实跑, 只增不改): 第 2 条「`git grep -n update_heartbeat aria/` 零命中」应读作「**除 guard 测试自身外**零命中」— 断言该字面量不在文档里的守卫测试必须含有它, 字面零命中与守卫存在互斥。现 3 处命中全在 test_coordination_default_lockin.py 自身"
     notes: "rule6 #10: (a) 描述性勘正 → substitute TASK-028; (b) 处方性 → 与 #5 同一次 state-scanner.json 照跑 (TASK-033) + 结构断言 TASK-030。"
     b2_evidence: >
       **verification 第 2 条结构上不可满足**: 'git grep update_heartbeat aria/ 零命中' 与

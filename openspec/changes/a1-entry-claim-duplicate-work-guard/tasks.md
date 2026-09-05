@@ -247,6 +247,10 @@
 | **`lib/claim_lifecycle.py` 全部锚点 (本 cycle TASK-012 引入)** | `:99`/`:178`/`:228`/`:377` | **`:100`/`:179`/`:229`/`:378` (统一 +1)** | 新增一行模块级 `import dataclasses` (TASK-012 verification 要求 `dataclasses.replace` 字面命中); 函数体逐字节不变, 仅整体下移 |
 | 其余 (`claim_lifecycle` / `identity` / `collision` / `constants` / `track_id` / `claim_schema` / `coordination_ref` / `gc` / `reconcile` / `coordination_probe` / 各 SKILL.md / references / docs / tests / `session-handoff.md`) | 见 detailed-tasks.yaml | **逐条一致, 未漂** | v1.67.2 只动 `phase1_gate.py` / `release_gate.py` / `failure_handlers.py` / 新增 test + 发布面 |
 
+> **2026-09-05 归档前复核 (交接 M3)**: 上表本 cycle 三行对**当前 HEAD** 逐条实测全中 —— `phase1_gate.py` 1566 行 (`_gated:1201` · `run_gate:1246` · `_main:1407` · `--raw-track-id:1420` · `--phase:1425`); `collision.py` 四个门锚点 `:278`/`:281`/`:287`/`:291` 逐字命中 (`def linked_issue_overlaps` 仍 `:230`); `claim_lifecycle.py` `:100`/`:179`/`:229`/`:378` 命中 —— 本 cycle 新增的 `heartbeat_by_track` 落在 `:475`, 位于四锚点**之后**, 故 `+1` 齐移仍成立。**proposal.md 正文行号按上文 `:7` 既有约定不改**, 复核一律只落本表。
+>
+> **2026-09-05 验收项订正 (交接 M4)**: B.2 跑负控时撞见的四处结构上不成立的验收项 + 一处派生矛盾, 已在 `detailed-tasks.yaml` 就地**只增不改**订正 (原条款保留, 追加 `⚠️ 订正` 条): TASK-006 第三方夹具恒绿 / TASK-008 注入手段 (a) 做不到 / TASK-013 第 1 条在本任务时点不可满足 / TASK-021「零命中」与守卫测试互斥 / TASK-014 deliverable 的条件式与 proposal 三处一致口径 (SC-33 `:623` + Impact ④⑥ `:663` + §2.4b `:340`) 矛盾 —— 按 proposal 订正为「except 路径两键无条件同时赋」。**这些是判据本身的修正, 不是把实现凑合过关**; 归档审计时请复核这五处。
+
 ---
 
 ## Notes
