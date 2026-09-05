@@ -117,7 +117,7 @@ tasks:
     parent: "1.1"
     task_group: 1
     title: "断言 --no-push 修复已在 aria origin/master + github/master, 主仓 gitlink 一致"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
@@ -144,11 +144,14 @@ tasks:
       当日晚 owner 授权推送后已以 v1.67.2 合入 (aria CHANGELOG [1.67.2])。本任务是 B.1 起点的重核, 不是重复劳动 —
       memory partial-push: 推后逐个 ls-remote 才算数。
 
+      **B.1 执行 (2026-09-05)**: 四条 verification 全过 —— merge-base 双端祖先 / ls-remote+gitlink 三者同 `7dd0135` / no_push 代码在场 / 负控 16。
+      verification 第 1 条 `log --oneline -5` 的窗口已陈旧 (此后 ship v1.68.0-v1.69.1 共 5 版, 0 命中 `d69091d`);
+      实质用 `merge-base --is-ancestor` 断言成立。后续 cycle 若复用本配方, 改用 merge-base 而非固定窗口。
   - id: TASK-002
     parent: "1.2"
     task_group: 1
     title: "记录两份子 Spec 导出物存在性与 §2 两阶段模板 live 分支 (advisory, 不阻塞 — proposal :96/:423)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
@@ -179,11 +182,13 @@ tasks:
       (proposal §2「--linked-issue 实参的取值」段) 的设计目的正是「任意顺序 ship 均自洽, 不存在第二次编辑」。
       dependencies 上游 (TASK-017/018) 不变。
 
+      **B.1 执行 (2026-09-05)**: 三导出物在场, 路径与本条 deliverables 逐条一致; 两阶段模板分支 1 (`--emit-arg`) live,
+      实跑本 Spec proposal 产出 `10CG/Aria#174` (与本 cycle B.0 认领所传值一致)。另记录项 4 命中 ⇒ **TASK-018 走分支 (i)**。
   - id: TASK-003
     parent: "1.3"
     task_group: 1
     title: "B.1 起点重跑行号锚点核对 (7a/7c/7d + Step 9 + _main 门控/except + release_gate 三选一 + SKILL.md 锚点)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
@@ -216,6 +221,9 @@ tasks:
       Spec :763-766 待办 (1) 点名「未实读」的四处, 本轮补钉; 7c 分支在 --include-terminal 后行为不变
       (同名通道仍走 reconcile), 本 Spec 不改 7a-7d 任何逻辑, 只在 --heartbeat-only 模式下绕过它们 (TASK-016)。
 
+      **B.1 执行 (2026-09-05) — 零真漂移**: 用基线-对照法 (正则先在 d69091d 命中表列行才算钉对锚点) 校验 17 锚点全未漂;
+      决定性判据 = 15 个承载锚点的文件中 14 个与 d69091d 逐字节相同, 唯一变更 `spec-drafter/SKILL.md` 的三 hunk 在 :107/:131/:333 之后,
+      与本 Spec 锚点 :10/:73 区域不相交 (决策单 C8 接缝担忧证伪)。锚点表无需修订。
   # -------------------------------------------------------------------------
   # Group 2 — TDD 红测 (qa-engineer). 先写夹具, 在 d69091d 上跑出预期的红/绿, 再进 Group 3/4
   # 全组依赖 TASK-001 (B.1 硬阻断门) + TASK-003 (锚点核对); 同文件串行: 005→006 / 007→008→009 (R1 C1)

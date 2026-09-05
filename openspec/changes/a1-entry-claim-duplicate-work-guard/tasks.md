@@ -29,9 +29,9 @@
 
 ## 1. Phase B.1 前置断言
 
-- [ ] 1.1 断言 aria-plugin `--no-push` 修复已在 `origin/master` 且主仓 gitlink 指向它 (v1.67.2 = `d69091d`); 双远端 `ls-remote` 一致 (闸门状态 #7 硬前置)
-- [ ] 1.2 记录两份子 Spec 导出物存在性 (`linked_issue_field_probe.py --emit-arg` + `lib/linked_issue_field.py` / `sibling_spec_probe.py`) 与 §2 两阶段模板哪一分支 live (**advisory, 不阻塞** — proposal :96/:423「均非阻塞前置」; 缺席 ⇒ 手工 E6 / 「无覆盖」), 不自建替身
-- [ ] 1.3 B.1 起点重跑行号锚点核对 (7a/7c/7d 分支 + Step 9 推送点 + `_main()` 门控/except + `release_gate` 三选一 + 各 SKILL.md 锚点), 与 detailed-tasks.yaml 锚点表比对, 漂移则更新 `notes` (`:763-766` 待办 (1))
+- [x] 1.1 断言 aria-plugin `--no-push` 修复已在 `origin/master` 且主仓 gitlink 指向它 (v1.67.2 = `d69091d`); 双远端 `ls-remote` 一致 (闸门状态 #7 硬前置) — ✅ **2026-09-05 B.1 起点重核**: `d69091d` ∈ origin/master ∧ github/master 历史 (`merge-base --is-ancestor`); 双远端 `ls-remote` + 主仓 gitlink 三者同为 `7dd0135`; `--no-push` 代码在 origin/master 实读在场; 负控 `test_coordination_no_push.py` 16/16。**verification 第 1 条配方已陈旧** —— `log --oneline -5` 窗口此后 ship 5 版, 现 0 命中 `d69091d`, 实质改用 `merge-base` 断言 (窗口宽度问题, 非实质不成立)
+- [x] 1.2 记录两份子 Spec 导出物存在性 (`linked_issue_field_probe.py --emit-arg` + `lib/linked_issue_field.py` / `sibling_spec_probe.py`) 与 §2 两阶段模板哪一分支 live (**advisory, 不阻塞** — proposal :96/:423「均非阻塞前置」; 缺席 ⇒ 手工 E6 / 「无覆盖」), 不自建替身 — ✅ **2026-09-05**: 三导出物均在场且与 yaml deliverables 路径逐条一致 (`state-scanner/scripts/linked_issue_field_probe.py` · `state-scanner/lib/linked_issue_field.py` [Layer L 包, 非 `scripts/lib/`] · `audit-engine/scripts/sibling_spec_probe.py`); §2 两阶段模板 **分支 1 (`--emit-arg`) live** —— 对本 Spec proposal 实跑产出 `10CG/Aria#174`, 与本 cycle B.0 认领所传 `--linked-issue` 值一致; 另记录项 `grep 'Linked Issue' spec-drafter/SKILL.md` **4 命中 ⇒ TASK-018 走分支 (i)** (字段 Spec hunk A/B 已 ship); 未自建替身
+- [x] 1.3 B.1 起点重跑行号锚点核对 (7a/7c/7d 分支 + Step 9 推送点 + `_main()` 门控/except + `release_gate` 三选一 + 各 SKILL.md 锚点), 与 detailed-tasks.yaml 锚点表比对, 漂移则更新 `notes` (`:763-766` 待办 (1)) — ✅ **2026-09-05 零真漂移**。方法: 基线-对照 (正则须先在 `d69091d` 命中表列那一行才算钉对锚点, 否则判为检查器自身问题而非漂移 — memory `check-runs-at-baseline-first`); 17 个校验通过的锚点全部未漂。**决定性判据**: 15 个承载锚点的文件里 **14 个与 `d69091d` 逐字节相同** (hash-object 比对), 唯一变更 `spec-drafter/SKILL.md` (+26/−2) 的三处 hunk 全在 `:107`/`:131`/`:333` 之后, 与本 Spec 两锚点 (`:10` frontmatter / `:73` `## 执行流程`) **区域不相交** ⇒ 决策单 C8「hunk A 与前置块冲突」担忧证伪。锚点表照原样成立, `notes` 无需更新
 
 ## 2. TDD 红测 (代码类 SC, 夹具先于实现)
 
