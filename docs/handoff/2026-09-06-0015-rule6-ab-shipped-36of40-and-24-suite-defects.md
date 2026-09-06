@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: B.2
 status: active
-updated-at: 2026-09-06T08:23:06Z
+updated-at: 2026-09-06T11:40:02Z
 ---
 
 # Aria — Session Handoff (2026-09-06, 会话收尾) — Rule #6 AB 跑完 36/40, 并挖出 24 条套件/评测台缺陷
@@ -16,10 +16,10 @@ updated-at: 2026-09-06T08:23:06Z
 ## §0 入口 (新 session 优先读)
 
 1. **AB 已完成, 不必重跑。** 全部产物在 `aria-plugin-benchmarks/ab-results/2026-09-05-v1.70.0-a1-entry-rule6/` —— 先读 `RESULT.md` (137 行总账), 再按需看 `SCORES.md` (脚本汇总) / `DEFECTS.md` (24 条)。
-2. **母 Spec 36/40**, 只剩 **7.6 开单** + **8.1/8.2/8.4 发版** (`<vNEXT>` = **1.70.0**, 执行序 8.1 → 8.4 → 8.2)。
+2. **母 Spec 39/40** (2026-09-06 续跑: 8.1 → 8.4 → 8.2 全部完成)。**只剩 7.6 开单**。⚠️ **`<vNEXT>` 不是 1.70.0** —— 该号于 08:27Z 被同伴轨 `owner-container-identity-key-and-collision-parser` 抢先占用, 按 Spec「落地时按当时 `plugin.json` 计算」重算为 **1.71.0**, 已 ship (aria master `985e629` + tag `v1.71.0`, 两 remote 核验 MATCH)。
 3. **7.6 的依赖已解除** (7.5 跑完了), 且本次攒了 24 条素材 —— 但开单是**外向动作待授权**。
-4. ⚠️ **heartbeat 待刷**: 上次刷是 `2026-09-05T21:40:06Z`, **sweep 死线 2026-09-06T21:40Z**。上一会话带 `NO_PUSH=1` 故意没刷 (刷了只写本地, 下次 fetch 会冲掉)。**下一个不带该 env 的会话第一件事就刷它。**
-5. 三仓 feature 分支**都已推且两端 MATCH** (主仓 `5d9b568` / aria `ab3dbd0` / standards `bb5d375`); 三个子模块指针仍**有意** dirty (gitlink bump 归 8.2)。
+4. ✅ **heartbeat 已刷** (2026-09-06T07:44:54Z, `push_skipped:false`, 远端实读核验) —— owner 已用**不带** `NO_PUSH` 的 `claude --resume` 重启。**新 sweep 死线 `2026-09-07T07:44:54Z`**。补记两条阈值 (源码实测): `STALE_TTL`=30min 只标「可接管」(advisory 可逆), `SWEEP_TTL`=24h 才是持久改写 `abandoned` 那条 —— 原文只记了后者, 详见 §3 第 8 条。
+5. **三仓已全部收口** (2026-09-06, 逐 remote `ls-remote` 核验): 主仓 feature `e91ef24` · aria **master** `985e629` + tag `v1.71.0` · standards **master** `21748d4`。主仓 gitlink 两个都已 bump 到 post-merge master SHA; `git status` 只剩 `M aria-orchestrator` (他轨分支, 非本 Spec)。6.4MB 错位残留已清 (§3 第 9 条)。
 6. 硬约束不变: 禁带圈数字 (memory `no-tiny-glyphs`)。
 
 ---
@@ -44,10 +44,10 @@ updated-at: 2026-09-06T08:23:06Z
 
 | # | 项目 | 状态 |
 |---|---|---|
-| **H1** | **7.6 套件缺口 issue** (aria-plugin) —— 依赖已解除, 素材充足 (24 条) | **外向待授权** |
-| **H2** | **8.1** CHANGELOG + 版本 SOT 5 文件 (`<vNEXT>` = 1.70.0, MINOR) | 待做 |
-| **H3** | **8.4** aria 本地 merge → master + 双推 + 逐 remote `ls-remote` 核验 + tag (CLAUDE.md 硬约束 1/2 宿主) | 待做, **在 8.2 之前** |
-| **H4** | **8.2** 主仓 16 版本点 + gitlink bump | 待做 |
+| **H1** | **7.6 套件缺口 issue** (aria-plugin) —— 依赖已解除, 素材充足 (24 条) | **本 Spec 唯一未完成项 (39/40)** |
+| ~~H2~~ | **8.1** CHANGELOG + 版本 SOT 5 文件 | ✅ **完成 2026-09-06** (号重算 1.71.0; 五文件实 grep 核验一致) |
+| ~~H3~~ | **8.4** aria 本地 merge → master + 双推 + tag | ✅ **完成 2026-09-06** (master `985e629` + tag `v1.71.0`; 条款 1 拦下 1.70.0 撞车) |
+| ~~H4~~ | **8.2** 主仓版本点 + gitlink bump | ✅ **完成 2026-09-06** (**16** 处 = 14 + Spec 清单漏列的 2 处架构文档; gitlink → `985e629`) |
 
 ### 中优先级
 
@@ -113,11 +113,11 @@ updated-at: 2026-09-06T08:23:06Z
 
 | 维度 | 状态 |
 |---|---|
-| OpenSpec | `a1-entry-claim-duplicate-work-guard` **36/40** (7.1–7.5 本 session 回写), 仍 active |
+| OpenSpec | `a1-entry-claim-duplicate-work-guard` **39/40** (2026-09-06 续跑 8.1/8.4/8.2), 仍 active; 只剩 7.6 |
 | UPM | 未配置 ⇒ 7 条 `active_change_not_in_upm` 恒亮 advisory (Aria#188) |
-| User Story / PRD / 架构 | 本 cycle 无变更 (发版时 8.2 会动 16 版本点) |
-| 同步 | 三仓 feature 分支两端全 **equal**, 零告警 |
-| 协调 ref | `539d231` **全程纹丝未动**; 66 臂无一调 `phase1_gate` |
+| User Story / PRD / 架构 | 8.2 已动 16 处版本点 (含 `system-architecture.md` §2.8 + `version-scheme.md` 两处 Spec 未列的) |
+| 同步 | 三仓两端全 **equal** (主仓 feature `e91ef24` / aria master `985e629` / standards master `21748d4`); `gitlink_integrity` 6/6 ok |
+| 协调 ref | AB 期间 `539d231` 纹丝未动 (66 臂无一调 `phase1_gate`); 09-06 07:44Z 刷心跳后前进, 本轨 claim `active` |
 
 ---
 
@@ -127,8 +127,8 @@ updated-at: 2026-09-06T08:23:06Z
 /aria:state-scanner
 ```
 
-1. ⭐ **先刷 heartbeat** (若本会话不带 `NO_PUSH`): `git fetch origin '+refs/aria/coordination:refs/aria/coordination'` 然后 `phase1_gate.py --raw-track-id "a1-entry-claim-duplicate-work-guard" --phase B --heartbeat-only`。死线 **2026-09-06T21:40Z**。
-2. **`{id: a1-entry-claim-duplicate-work-guard}`** —— 36/40。先 7.6 开单 (依赖已解除), 再 Group 8 发版 (8.1 → 8.4 → 8.2, `<vNEXT>` = **1.70.0**)。
+1. ✅ heartbeat 已于 09-06 07:44Z 刷过, **新死线 2026-09-07T07:44Z**, 不急。注意 `--heartbeat-only` **只存在于本轨在制代码**, 已安装的 plugin 与 aria master 都没有 —— 随 v1.71.0 ship 后才普遍可用。
+2. **`{id: a1-entry-claim-duplicate-work-guard}`** —— **39/40**, Group 8 全部完成 (v1.71.0 已 ship)。**只剩 7.6 开单**, 做完即 40/40 可进 Phase D 归档。
 3. **`{id: carry-ab-suite-defects-24}`** —— `DEFECTS.md` 24 条开单, A 节四条优先。
 
 ---
@@ -137,11 +137,11 @@ updated-at: 2026-09-06T08:23:06Z
 
 | 仓 | 分支 | SHA | origin | github |
 |---|---|---|---|---|
-| Aria | `feature/a1-entry-claim-duplicate-work-guard` | `4092945` | ✅ MATCH | ✅ MATCH |
-| aria-plugin | 同名 | `ab3dbd0` (分支已推; 补丁 +16/−0 仍未提交) | ✅ MATCH | ✅ MATCH |
-| aria-standards | 同名 | `bb5d375` | ✅ MATCH | ✅ MATCH |
+| Aria | `feature/a1-entry-claim-duplicate-work-guard` | `e91ef24` | ✅ MATCH | ✅ MATCH |
+| aria-plugin | **master** (+ tag `v1.71.0`) | `985e629` | ✅ MATCH | ✅ MATCH |
+| aria-standards | **master** | `21748d4` | ✅ MATCH | ✅ MATCH |
 
-⚠️ **仍未提交 (2026-09-06 08:23Z 订正)**: 只剩 aria 的 SKILL.md 补丁 (+16/−0) —— 它属于 8.1/8.4 的落地面, 提前单独提交会让 aria feature 分支两端不一致, 故有意留在工作区。**原文记的「主仓 tasks.md/yaml 回写 + 整个 `ab-results/2026-09-05-v1.70.0-a1-entry-rule6/` 目录」已在 `7542485` 提交**, 并与 `4092945` 一并经 owner 授权双推, 逐 remote `ls-remote` 独立核验两端 MATCH。另有 `aria/aria-plugin-benchmarks/ab-workspace/…` 6.4MB 未跟踪残留待清 (§3 第 9 条)。
+✅ **全部收口 (2026-09-06 11:40Z 订正, 覆盖前两版订正)**: aria 的 SKILL.md 补丁 (+16/−0) 已随 `ffa5eeb` 提交并经 8.4 合入 aria master; 主仓 tasks.md/yaml 回写与 `ab-results/` 目录早在 `7542485`。三仓均已**合到 master 或推到 feature 并逐 remote `ls-remote` 独立核验一致** (aria 与 standards 走本地 merge + 双推, CLAUDE.md 硬约束 1; 未用 Forgejo 服务端合并)。`git status` 只剩 `M aria-orchestrator` —— 他轨 `feature/m6-cost-model-telemetry`, 非本 Spec 范围。6.4MB 错位残留 (§3 第 9 条) 已删, 删前核实其内容是 `skills/` 快照副本 (对应 aria `7dd0135`), 零唯一产物。
 
 ---
 
