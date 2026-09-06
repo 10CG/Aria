@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.70.0",
+  "issue_ref": "10CG/Aria#195",
+  "generated_at": "2026-09-06T12:12:23Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 195,
+      "title": "state-scanner: handoff_multibranch 递归枚举但只留 basename，子目录下的 handoff 文件必然 git show 失败",
+      "body": "## Bug Report\n\n**描述**: `handoff_multibranch` collector 用 `git ls-tree -r`（递归）枚举 `docs/handoff/`，但只保留 basename，调用方随后用写死的前缀 `docs/handoff/<basename>` 拼回 git object 路径。二者不自洽 —— 任何位于 `docs/handoff/` **子目录**下的 `.md`（例如归档用的 `archive/`）都会拼出不存在的路径，`git show` 必然失败。\n\n`_list_handoff_files` 的 docstring 写的是「Returns only the basename (not the full path) for each file **so callers compose the full git-object path as needed**」，但唯一调用方 `_read_file_content` 拼的是固定的 `docs/handoff/<filename>`，无法还原中间目录 ⇒ **契约与实现错配**，而非单纯笔误。\n\n**复现步骤**:\n1. 建 `docs/handoff/archive/` 子目录，`git mv` 若干旧交接文件进去\n2. 推到 origin\n3. 跑 `python3 scripts/scan.py --output .aria/state-snapshot.json`\n\n**预期行为**: 子目录下的归档交接要么被正确读取，要么被显式排除出扫描域；不产生错误。\n\n**实际行为**: 每个子目录文件产生一条 `handoff_multibranch_git_show_failed` soft_error，scan.py 以 exit 10 结束。影响不止告警噪声：\n\n1. 失败分支把这些文件当成 **`legacy` track 塞进 `tracks[]`**，污染 `tracks_multibranch` 看板（我们这边 `legacy_count` 里混进了 2 条不该存在的）\n2. 这些假 track 的 `updated_at` 走 `_get_file_commit_date` fallback，取到的是**归档那次 `git mv` 的提交日期**，而非交接本身的会话日期 —— 双重失真\n\n**错误输出**:\n```\nWARNING state-scanner.scan: collector soft error: handoff_multibranch_git_show_failed\n — [master/2026-05-09-session-end.md] git show failed:\n   git show failed for origin/master:docs/handoff/2026-05-09-session-end.md (other, rc=128)\n```\n文件真实位置是 `docs/handoff/archive/2026-05-09-session-end.md`。\n\n**涉及代码** (`skills/state-scanner/scripts/collectors/handoff_multibranch.py`):\n\n| 位置 | 代码 | 问题 |\n|---|---|---|\n| `_list_handoff_files` | `git ls-tree -r --name-only <ref> -- docs/handoff` | `-r` 递归，扫到子目录 |\n| 同函数 | `basename = Path(path).name` | 丢弃路径段 |\n| `_read_file_content` | `ref = f\"{_REMOTE}/{branch}:{_HANDOFF_TREE_PATH}/{filename}\"` | 用固定前缀拼回，中间目录已无从还原 |\n\n**建议修法**（倾向 A）:\n\n- **A. 保留完整相对路径**：`filenames` 改存 ls-tree 原样输出的 path，`_read_file_content` 直接用它拼 ref；`filename` / `track_id` 等需要 basename 的字段另行派生。可支持任意子目录布局。\n- **B. 不递归**：`ls-tree` 去掉 `-r`，明确「只扫 `docs/handoff/` 顶层」。语义最简单，但会静默忽略子目录内容（对把归档放子目录的仓库，等于那部分交接历史不进看板）。\n- **C. 递归但显式排除**：保留 `-r`，对 `Path(path).parent` 非 `docs/handoff` 的条目 `continue`。行为同 B，但意图写在代码里而非隐含在 basename 副作用中。\n\n另有一条与选型无关的建议：**「git show 失败」不宜再降级成 `legacy` track** —— 「读不到内容」与「这是一份老格式交接」是两回事，前者应只报 soft_error、不进 `tracks[]`，否则失真数据会进看板并带上误导性的 `updated_at`。\n\n## 环境信息\n- Aria Plugin: 1.69.1\n- Skills: 42\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n\n---\n*由 aria-report 自动生成*\n",
+      "state": "open",
+      "labels": [
+        "bug"
+      ],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/195",
+      "created_at": "2026-09-05T15:23:04Z",
+      "updated_at": "2026-09-05T15:23:21Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.69.1",
+      "current": "1.70.0",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "docs/handoff/archive/2026-05-09-session-end.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/state-scanner/scripts/collectors/handoff_multibranch.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "5dc9321042243a28b1b5b3bd2440d302b60816ad"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "hermetic repo: docs/handoff/2026-09-01-top.md (顶层, 正常 frontmatter) + docs/handoff/archive/2026-05-09-session-end.md (子目录, 正常 frontmatter, 从未在顶层存在), 单 commit 发布到 refs/remotes/origin/master; collect_handoff_multibranch(root) @ aria 0545f86 (v1.70.0; v1.71.0 对该文件 diff 为空)",
+        "expected_behavior": "子目录文件被正确读取或被显式排除; 不产生错误; tracks[] 无假 legacy",
+        "actual_behavior": "soft_error handoff_multibranch_git_show_failed: git show failed for origin/master:docs/handoff/2026-05-09-session-end.md (other, rc=128) — 真实路径 docs/handoff/archive/…; tracks[] 多出 {track_id: legacy:master:2026-05-09-session-end.md, status: legacy, owner_container: unknown}; legacy_count=1; updated_at='' (因 _get_file_commit_date 同样用 docs/handoff/<basename> 查 git log, 文件从未在该路径存在 → 空)",
+        "match": true,
+        "notes": "issue 三处代码定位 (_list_handoff_files 的 -r + Path(path).name / _read_file_content 固定前缀) 实读一致; 另 _get_file_commit_date 也用同一固定前缀 (issue 未点名, 同一根因)"
+      },
+      {
+        "case_id": "case-2",
+        "input": "同上, 但按 issue 复现步骤: 文件先在顶层 commit (author date 2026-05-09), 再 git mv 进 docs/handoff/archive/ 并 commit (date 2026-08-15); 发布到 origin/master; collect_handoff_multibranch(root)",
+        "expected_behavior": "同 case-1; 若产生 fallback updated_at, 应为交接自身日期 2026-05-09",
+        "actual_behavior": "同样 git_show_failed + 假 legacy track; updated_at = 2026-08-15T12:00:00+00:00 = 归档 git mv 那次提交的日期 (git log -1 -- docs/handoff/<basename> 命中的是删除旧路径的 mv 提交) — issue 所述「双重失真」逐字成立",
+        "match": true,
+        "notes": "本仓 docs/handoff/ 平铺无子目录, 故 Aria 自身 scan 不受影响; 影响面 = 把归档放子目录的采用方仓 (报告方即此形态, 1.69.1)"
+      }
+    ],
+    "hit_count": 2,
+    "total_count": 2,
+    "hit_rate": "2/2"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}

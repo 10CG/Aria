@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.70.0",
+  "issue_ref": "10CG/Aria#199",
+  "generated_at": "2026-09-06T12:15:20Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 199,
+      "title": "pre_merge Checkpoint Completeness Gate 缺 change_id 维度 —— PASS 可由其他 change 的报告满足",
+      "body": "## Bug Report\n\n**描述**: `audit-engine` 的 pre_merge **Checkpoint Report Completeness Gate**（#26 横向完整性）按 checkpoint 名前缀匹配报告文件，**不带 change_id 维度**。因此它的 PASS 可以完全由**其他 change** 的历史报告满足，对当前被审 change 零信息量 —— 这与它要防的失效（「该跑的 checkpoint 没跑」）同型：一个「零相关证据也判绿」的闸。\n\n**复现步骤**:\n\n1. 一个已积累多轮开发历史的项目，`.aria/audit-reports/` 下已有若干**其他 change** 的 `post_implementation-*.md`。\n2. `.aria/config.json` 中 `audit.checkpoints.post_implementation` 设为非 `off`（本例为 `convergence`），`audit.allow_incomplete_checkpoints` 保持默认 `false`。\n3. 对一个**全新的、尚未进入 Phase B** 的 change（因而**自身零份** `post_implementation` 报告）触发 pre_merge 审计。\n4. 按 `skills/audit-engine/references/execution-modes.md` 的 Step 1~5 机械执行该门。\n\n**预期行为**: 该门应能分辨「本 change 的 post_implementation 报告缺失」与「其他 change 有报告」。对一个 Phase B 未开工的 change，它要么正确判定 `missing_checkpoint`（若认为该 checkpoint 必需），要么提供一个「不适用」的表达通道；无论哪种，它的判定都应与**被审 change** 相关。\n\n**实际行为**: 返回 **PASS**。Step 4 的匹配模式是：\n\n```\n匹配模式:\n  - {checkpoint_name}-*.md         (无 change_id 变体)\n  - {checkpoint_name}-*-*.md       (含 change_id 变体)\n任意文件匹配 → 该 checkpoint 通过\n```\n\n`{checkpoint_name}-*.md` 这条通配会吃掉**任何** change 的同 checkpoint 报告。实例（本次遇到的真实场景）：\n\n- 被审 change：`synth-honesty-gaps`，Phase A only，15/15 任务未勾选，diff 零触 `packages/` / `tests/` / `bridge/`。\n- `.aria/audit-reports/` 下 `post_implementation-*.md` 共 **37 份**，分别属于 `add-strategy-data-foundation` / `add-data-backend` / `fix-grid-anchor-liveness-stop-loss` 等，**属于 `synth-honesty-gaps` 的 0 份**。\n- 门判定 **PASS**。\n\n**影响**: 该门对任何**真正跳过** `post_implementation` 的 change 也会返回同样的 PASS —— 只要该项目历史上任何一个 change 跑过一次。在只有单个 change 历史的新项目上它有效，项目越成熟它越失效，而成熟项目恰恰是更需要它的场景。\n\n**本次的规避方式**（供参考，非解决方案）：编排者机械跑完 Step 1~5 拿到 PASS 后，另行核实了「匹配到的报告属于哪个 change」，发现 PASS 无效；改为按「本 PR 是纯 Phase A ⇒ `post_implementation` 属**不适用**而非**缺失**」独立论证放行，并把该判断交由两个独立 lens 复核。即：**没有采信门的绿**。\n\n**建议修法**（任一，或组合）:\n\n1. **加 change_id 维度**：Step 4 的匹配收窄为 `{checkpoint_name}-*-{change_id}-*.md`（该命名 schema 在 `references/report-storage.md` 已定义为 5-field uniqueness），未命中即 `missing_checkpoint`。\n2. **区分「不适用」与「缺失」**：为 Phase A-only 的 PR / change 提供显式的 not-applicable 通道（类似 `mid_post_spec` 已有的「启用但无触发条件时合法不产出报告」豁免），而不是让它落进通配的假绿里。\n3. **给门加下界自证**：借鉴该项目内的现成范式 —— 一个部署闸脚本自陈「本脚本自身的失效形态是『正则写错 ⇒ 零命中 ⇒ 判绿』，与它要防的病同型」，故提供 `--require-scanned N` 下界。同理，该门可要求「至少匹配到 N 份**属于本 change** 的报告」才算通过。\n\n**关联**: `references/execution-modes.md` 的 Step 3 已经为 `post_closure` 与 `mid_post_spec` 各写了排除理由（后者出自 Aria #79：「启用但无漂移时合法不产出报告 → 不做前置依赖，否则启用即会误阻 pre_merge」）。本 issue 指出的是同一族问题的另一侧：**排除清单解决了「误阻」，但没有解决「误放」**。\n\n**错误输出**: 无异常抛出 —— 这正是问题所在，门静默判绿。机械执行 Step 1~5 的实际输出：\n\n```\nStep 1  allow_incomplete_checkpoints = False (默认 false)\nStep 2  未豁免 → 继续校验\nStep 3  纳入校验的 checkpoint = ['post_spec', 'post_implementation']\nStep 4  post_spec              → 69 份报告 ✅\nStep 4  post_implementation    → 37 份报告 ✅\nStep 5  ✅ 校验通过 —— 可进入 pre_merge 审计\n```\n\n而其中属于被审 change 的报告数分别是 **4 份**（post_spec，真实）与 **0 份**（post_implementation）。\n\n## 环境信息\n- Aria Plugin: 1.69.1\n- Skills: 42\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n\n---\n*由 aria-report 自动生成*\n",
+      "state": "open",
+      "labels": [
+        "bug"
+      ],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/199",
+      "created_at": "2026-09-06T11:13:51Z",
+      "updated_at": "2026-09-06T11:43:08Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.69.1",
+      "current": "1.70.0",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "post_implementation-*.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".aria/config.json",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: {\n2:  \"_comment\": \"Aria 项目级配置 — 首次启用 issue_scan 用于 Phase 1.13 dogfooding (2026-04-09)\",\n3:  \"version\": \"1.0\",\n4:  \"workflow\": {\n5:   \"auto_proceed\": false",
+          "warning": null,
+          "total_lines": 111
+        },
+        {
+          "file_path": "skills/audit-engine/references/execution-modes.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "{checkpoint_name}-*.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "{checkpoint_name}-*-{change_id}-*.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "references/report-storage.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "references/execution-modes.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "5dc9321042243a28b1b5b3bd2440d302b60816ad"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "读 SOT aria/skills/audit-engine/references/execution-modes.md:54-61 (Pre-merge Checkpoint Report Completeness Gate Step 4) @ aria 0545f86 (v1.70.0; v1.71.0 origin/master 对该文件 diff 为空); grep aria/skills/ 无任何 .py 实现该门 (纯散文规程, 由编排者机械执行)",
+        "expected_behavior": "匹配模式含被审 change 维度 (命名 schema references/report-storage.md:8 已有 {spec_id} 段), 或提供 not-applicable 通道",
+        "actual_behavior": "原文: 匹配模式 `{checkpoint_name}-*.md` / `{checkpoint_name}-*-*.md`, 「任意文件匹配 → 该 checkpoint 通过 / 无文件匹配 → missing_checkpoint」; Step 5 只看 missing_checkpoints 是否为空。全程不出现 change_id / spec_id。与 issue 引用逐字一致",
+        "match": true,
+        "notes": "Step 3 排除清单 (pre_merge / post_closure / mid_post_spec) 只处理『误阻』; 『误放』无任何条款"
+      },
+      {
+        "case_id": "case-2",
+        "input": "按 Step 4 通配在本仓 .aria/audit-reports/ 上模拟, 被审 change = 假想新 change (自身零份报告); 前提 audit.checkpoints.post_implementation 非 off (本仓实际为 off, 故本仓自身 pre_merge 不会纳入该 checkpoint; 模拟只演示通配语义)",
+        "expected_behavior": "post_implementation → 0 份属于被审 change → missing_checkpoint",
+        "actual_behavior": "post_spec-*.md 命中 499 份 / post_implementation-*.md 命中 3 份 (归属 ['aria-secret-guard-plugin-default-orchestrator', 'audit-drift-guard', 'state-scanner-mechanical-t3']), 属于被审 change 的 0 份 → 按原文两者均『通过』→ Step 5 PASS。issue 报告方仓 (37 份他人 post_implementation, 0 份自己) 同型",
+        "match": true,
+        "notes": "零份自身证据判绿 = 与它要防的失效同型 (issue 原话); 项目历史越长越必然 PASS"
+      }
+    ],
+    "hit_count": 2,
+    "total_count": 2,
+    "hit_rate": "2/2"
+  },
+  "verdict": "confirmed",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
+}
