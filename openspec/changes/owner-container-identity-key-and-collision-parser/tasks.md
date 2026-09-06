@@ -76,7 +76,7 @@
 
 - [x] 4.1 rule6_note (yaml `metadata.rule6_note` 为单一来源): substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 ⇒ TASK-001/002/003/004/005/007/008 各有改前红 (`7dd0135`) / 改后绿实跑记录
 - [x] 4.2 全套回归 **两种跑法都必跑, 各管一类文件** (unittest discover 收不到 pytest 风格裸函数; 反之 pytest 吃整个 `tests/` 目录会因 `tests/__init__.py` 包语义让 12 个 `from _helpers import` 模块收集失败 — R3 实测): (a) `python3 aria/skills/state-scanner/tests/run_tests.py` 覆盖全部 TestCase 文件, 零失败, Ran ≥ 1476 + 本 Spec 新增 TestCase 数 (起草日实跑 1476); (b) `cd aria/skills/state-scanner && /home/dev/.local/bin/pytest -q -p no:cacheprovider tests/test_collision.py` 覆盖唯一 pytest 风格文件, 零失败, passed ≥ 16 + 本 Spec 在该文件新增数 (起草日实跑 16 passed, 两个 cwd 形态均可); **本 Spec 新建测试文件一律写 `unittest.TestCase`** 归 (a); `phase-d-closer/tests/test_fetch_gate.py`; session-closer / phase-d-closer handoff 写入测试 — SC-7
-- [ ] 4.3 主仓 state-check: **13 条全绿**; `plugin-cache-currency` 预期 STALE 直到 owner D 期更新插件 (SC-7 例外条款) — 在 5.7 主仓同步面之后跑; **Rule #10 留痕**: handoff 记录「该例外为 post_planning R1 rework 引入 (owner Approved 之后), 请 owner D 期复议」
+- [x] 4.3 主仓 state-check: **13 条全绿**; `plugin-cache-currency` 预期 STALE 直到 owner D 期更新插件 (SC-7 例外条款) — 在 5.7 主仓同步面之后跑; **Rule #10 留痕**: handoff 记录「该例外为 post_planning R1 rework 引入 (owner Approved 之后), 请 owner D 期复议」
 
 ## 5. 发布 (顺序: 5.4 fixture 公开性 (5.1 前置) → 5.2 bump → 5.1 merge+tag → 5.3 双推核验 → 5.7 主仓同步面 → 4.3 → 5.6 PR → 5.5 回帖 ‖ 5.8 tracker (与 5.5 并行))
 
@@ -85,7 +85,7 @@
 - [x] 5.3 **owner 逐条授权后**双推 aria (master + tag) / standards, 推后逐 remote `ls-remote` 核验 master **与 tag 对象** SHA
 - [x] 5.4 fixture 公开性确认 (八字段无邮箱 / token / 内网地址; github 镜像可见)
 - [ ] 5.5 issue 回帖 (**5.6 merge 后、归档前由执笔容器执行**): #193 / aria-plugin#135 指向本 Spec + 版本; #174 补 ship 结果; ship 后关 #193。#135 措辞按形态: **S1** = 「缺口 3 部分闭合 (解析 / 身份键 / dedupe / 漂移 advisory); label 陷阱 (08-13 形态) 待 S2 或 tracker」; **S2** = 「缺口 3 闭合」; 缺口 1/2 均留
-- [ ] 5.6 主仓 feature 推 origin → `phase-c-integrator` C.2.4 gate → PR → merge → github 镜像
+- [~] 5.6 (PR #197 open, C.2.4 gate green/not_applicable; merge 待 owner 授权) 主仓 feature 推 origin → `phase-c-integrator` C.2.4 gate → PR → merge → github 镜像
 - [x] 5.7 主仓同步面 (子模块推送核验后): 两 gitlink + `VERSION` + `README.md` badge + `README.zh.md` / `README.ja.md` / `README.ko.md` 版本串 + `docs/architecture/system-architecture.md` §2.8 与 `docs/architecture/version-scheme.md` 版本行 + CLAUDE.md **两行** (`:141` 版本行 + `:139` 方法论轨区间端点 `v1.52.0–v<NEXT>`; 项目状态段其余不动)
 - [ ] 5.8 S2 后续的承载体 (归档 Step 7 只在 deferred/unverified 非空时产出, 干净归档不会自动记录): **S1** ⇒ 5.6 merge 后、归档前手动开 tracker issue (标题「S2 后续: flip / 发布门 / a1-entry SC-3 改写 / #135 时间线」, 含激活条件与 S2-1..S2-4 原文), 编号回填本文件「S2 后续」表; **S2 已激活** ⇒ 本条勾选为「已激活, 见 6.x」
 
