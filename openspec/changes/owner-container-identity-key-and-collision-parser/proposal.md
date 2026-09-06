@@ -106,20 +106,20 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 
 ## Tasks (代码 6 个 .py + `lib/constants.py` + 1 份规范 + 7 处文档 + 1 处代码消费方; 14 个 checkbox 含 T3b; **T9 / T13 经 D-0(a) / D-3(a) 裁定已转正式任务**)
 
-- [ ] T1 `split_owner_container` 两段式 (含零段 / 三段兼容); 改写 `test_split_owner_container_variants` 的 2-part 与 1-part (`"solo"`) 断言, 先红后绿两臂 → SC-1
-- [ ] T2 `classify_claims` 确定性判定 + `identity_drift_advisories(tracks)`; collector `:709` dedupe 前调用并写 `collision.identity_advisories[]` (恒存在); **改写 `test_real_collector_emits_cross_owner_collision` / `test_real_collector_no_collision_is_none` 的 `keys == {kind, groups}` 断言**; `state-snapshot-schema.md` additive bump; 字段集回归由上述两条 collector `keys` 断言 + 双跑全套承担 (`test_normalize_snapshot` 实读不锁 collision 段, 不引用) → SC-2 / SC-8
-- [ ] T3 `get_container_label()` (S1 即落); `get_container_id()` uuid 优先 (S2 才落); container-id 文件头注释改写 → SC-3
-- [ ] T3b 迁移检查两处: `phase1_gate.py` (复用 `:486` Identity) / `release_gate.py` (import identity + `get_container_label()` + `read_claims` + 传 `identity=`); S1 = inventory 告警; S2 = 发布门 → SC-3
-- [ ] T4 dedupe 键 `(track_id, identity_key)`; `test_owner_segment_participates_in_grouping_key` 三臂 (uuid 折叠 / 主机名不折叠 / `devbox01` 不折叠); `test_both_latest_active_still_reports_self_multi_container` 期望改 `cross_owner` + 新增同 owner 串变体断 🟡; `track_board.py:412-417` 键同源 → SC-4
-- [ ] T5 `session-handoff.md` §2.3.1 (三态 + `identity_key` 定义 + `unknown` 取值说明) / §2.3.5 (三行, 「非空非 unknown」, advisory 作用域, 实质变更说明) / 新 §2.3.9 (按 D-1/D-2 回填) → SC-5
-- [ ] T6 冻结语料复制为 aria 测试 fixture (只保留 `track_id / owner_container / status / phase / updated_at / filename / branch / legacy` 八字段 (`phase` 被 `track_to_claim_record` 读取)); 前后对照测试机械归因 (判据见 SC-6); 「真撞车」档注入一组合成行 (显式标注) → SC-6
-- [ ] T7 消费面同步: 七处文档 (D4) + `test_fetch_gate.py` `kind="cross_owner"` 字符串夹具; rule 1.54 触发面锁定 → SC-9
-- [ ] T8 `track_board.py` ⚪ 行渲染 (dedupe 前调用 `identity_drift_advisories`) + label 并列显示; D-0(a) 时 `tracks_by_tid` 标签索引改用剥离后键 (与 `verdicts` 键域一致) → SC-10
-- [ ] T9 (D-0(a) 已裁) `track_to_claim_record` 族键剥离 + §2.3.1 尾段语义 + 三条夹具 (`slug-aaaa1111`/`slug-bbbb2222` 同组; `x-20260719` 剥后与语料零碰撞; `slug-abcdefg` 不剥) → SC-2 条件用例
+- [x] T1 `split_owner_container` 两段式 (含零段 / 三段兼容); 改写 `test_split_owner_container_variants` 的 2-part 与 1-part (`"solo"`) 断言, 先红后绿两臂 → SC-1
+- [x] T2 `classify_claims` 确定性判定 + `identity_drift_advisories(tracks)`; collector `:709` dedupe 前调用并写 `collision.identity_advisories[]` (恒存在); **改写 `test_real_collector_emits_cross_owner_collision` / `test_real_collector_no_collision_is_none` 的 `keys == {kind, groups}` 断言**; `state-snapshot-schema.md` additive bump; 字段集回归由上述两条 collector `keys` 断言 + 双跑全套承担 (`test_normalize_snapshot` 实读不锁 collision 段, 不引用) → SC-2 / SC-8
+- [x] T3 `get_container_label()` (S1 即落); `get_container_id()` uuid 优先 (S2 才落); container-id 文件头注释改写 → SC-3
+- [x] T3b 迁移检查两处: `phase1_gate.py` (复用 `:486` Identity) / `release_gate.py` (import identity + `get_container_label()` + `read_claims` + 传 `identity=`); S1 = inventory 告警; S2 = 发布门 → SC-3
+- [x] T4 dedupe 键 `(track_id, identity_key)`; `test_owner_segment_participates_in_grouping_key` 三臂 (uuid 折叠 / 主机名不折叠 / `devbox01` 不折叠); `test_both_latest_active_still_reports_self_multi_container` 期望改 `cross_owner` + 新增同 owner 串变体断 🟡; `track_board.py:412-417` 键同源 → SC-4
+- [x] T5 `session-handoff.md` §2.3.1 (三态 + `identity_key` 定义 + `unknown` 取值说明) / §2.3.5 (三行, 「非空非 unknown」, advisory 作用域, 实质变更说明) / 新 §2.3.9 (按 D-1/D-2 回填) → SC-5
+- [x] T6 冻结语料复制为 aria 测试 fixture (只保留 `track_id / owner_container / status / phase / updated_at / filename / branch / legacy` 八字段 (`phase` 被 `track_to_claim_record` 读取)); 前后对照测试机械归因 (判据见 SC-6); 「真撞车」档注入一组合成行 (显式标注) → SC-6
+- [x] T7 消费面同步: 七处文档 (D4) + `test_fetch_gate.py` `kind="cross_owner"` 字符串夹具; rule 1.54 触发面锁定 → SC-9
+- [x] T8 `track_board.py` ⚪ 行渲染 (dedupe 前调用 `identity_drift_advisories`) + label 并列显示; D-0(a) 时 `tracks_by_tid` 标签索引改用剥离后键 (与 `verdicts` 键域一致) → SC-10
+- [x] T9 (D-0(a) 已裁) `track_to_claim_record` 族键剥离 + §2.3.1 尾段语义 + 三条夹具 (`slug-aaaa1111`/`slug-bbbb2222` 同组; `x-20260719` 剥后与语料零碰撞; `slug-abcdefg` 不剥) → SC-2 条件用例
 - [ ] T10 全套回归: state-scanner 两种跑法 (run_tests.py 全套 + pytest 对 test_collision.py; 点名改写项全绿) + `test_fetch_gate.py` + session-closer / phase-d-closer handoff 写入测试 + 主仓 state-check 13 条全绿 + `plugin-cache-currency` 例外 → SC-7
 - [ ] T11 issue 回帖 (文档动作, 无 SC), 两个时点: **B.1 起手** (tasks.md 0.2) #174 留言 D-0 与 SC-3 改写征求 ack (S2 激活前提之一, 见上表 :104 行); **merge 后、归档前** (tasks.md 5.5) 回帖 #193 / aria-plugin#135 指向本 Spec + 版本, #174 补 ship 结果, 关 #193; #135 措辞按形态 (S1 = 缺口 3 部分闭合, label 陷阱待 S2 或 tracker; S2 = 缺口 3 闭合), 缺口 1/2 均留
 - [ ] T12 发布同步 (D5): aria-plugin 版本 bump (档位按 D5 二选一, 记入 CHANGELOG) + CLAUDE.md §版本管理同步面 (含 i18n README ×3 版本串) + CHANGELOG 明示 §2.3.5 行为变更; Lab 内部指针已在 `.aria/decisions/` 决策单 → SC-7
-- [ ] T13 (D-3(a) 已裁) `layer_h_is_fresh` 共享谓词 + `LAYER_H_ACTIVE_WINDOW_DAYS` 常量 + collector/renderer 同一调用 + §2.3.5 规范句 → SC-11
+- [x] T13 (D-3(a) 已裁) `layer_h_is_fresh` 共享谓词 + `LAYER_H_ACTIVE_WINDOW_DAYS` 常量 + collector/renderer 同一调用 + §2.3.5 规范句 → SC-11
 
 ## Success Criteria
 
