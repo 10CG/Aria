@@ -16,8 +16,8 @@ drift_check_skipped: true
 oscillation: false
 overridden_by_user: false
 degraded: false
-max_rounds: 7
-terminal: MAX_ROUNDS_EXHAUSTED
+max_rounds: 9
+terminal: MAX_ROUNDS_EXHAUSTED_EXTENDED
 ---
 
 # post_planning R7 (max_rounds=7, owner 加轮后最后一轮) — owner-container-identity-key-and-collision-parser (proposal v11 + A.2/A.3 v7, `19d25b1`)
@@ -58,6 +58,8 @@ terminal: MAX_ROUNDS_EXHAUSTED
 2. DRIFT_TERMINATED: 不适用。
 3. OSCILLATION: 否 (R5 ≠ R7)。
 4. **MAX_ROUNDS_EXHAUSTED** (round 7 == max_rounds 7, owner 已加过 2 轮) ⇒ 再呈 owner 三选一。
+
+**Owner 裁定 (2026-09-06)**: 选 [2] 再加 2 轮 ⇒ max_rounds 7→9, R8/R9 对 v8/v11 (`ed1d168`) 续审; 收敛条件 R9 结论集 == R8 且全票 PASS。
 
 ## 七轮趋势 (供 owner 裁决)
 
