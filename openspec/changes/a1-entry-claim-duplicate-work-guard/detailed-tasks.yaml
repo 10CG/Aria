@@ -1123,7 +1123,7 @@ tasks:
     parent: "8.2"
     task_group: 8
     title: "主仓发版同步面: gitlink bump + 主仓 VERSION + CLAUDE.md 版本行 + root README badge + i18n ×3 标记/版本串 (#140 B 档)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
