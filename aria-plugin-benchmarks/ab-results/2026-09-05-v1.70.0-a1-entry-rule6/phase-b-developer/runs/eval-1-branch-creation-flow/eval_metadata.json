@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "branch-creation-flow",
+  "prompt": "Execute Phase B step B.1: Create feature branch for task TASK-001 from spec oauth2-social-login. Branch naming convention: feature/{spec-name}",
+  "assertions": [
+    {
+      "text": "Should create a branch following feature/{spec-name} convention"
+    },
+    {
+      "text": "Should branch from main or master"
+    },
+    {
+      "text": "Should confirm active branch after creation"
+    }
+  ]
+}

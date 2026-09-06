@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  (old_skill/outputs/answer.md:50, proposal.md 头部 blockquote 第 4 行; 逐字以 `> **Linked Issue**:` 起首)"
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  —— 值为 inline code span 且逐字为 `none`; 前文亦写「按头部字段要求逐字写 `` `none` `` (哨兵, 不留空、不删行; `N/A` / `TBD` / `-` 都会被机械 check 判不合规)」"
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  —— 全行无 `](http`, 非 markdown 链接形; 冒号后有值不留空"
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": true,
+      "evidence": "> **Level**: Minimal (Level 2 Spec)\n> **Status**: Draft\n> **Created**: 2026-09-05\n> **Linked Issue**: `none`  (answer.md:47-50, 四行连续同序, 含 `> **Created**: 2026-09-05` 行)"
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "全文 `Linked Issue` 两处 (answer.md:28 「- **Linked Issue**: 你已核实该功能没有对应的 issue ⇒ 按头部字段要求逐字写 `` `none` ``」 / :50 头部字段行) 均为英文 canonical; 全文零出现 `Related Issue` / `Issue Link` / `关联 Issue`"
+    }
+  ]
+}

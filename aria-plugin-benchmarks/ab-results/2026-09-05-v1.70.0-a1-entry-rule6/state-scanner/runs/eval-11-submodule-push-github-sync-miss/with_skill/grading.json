@@ -1,0 +1,49 @@
+{
+  "expectations": [
+    {
+      "text": "Should NOT report all remotes as synced when only origin was pushed",
+      "passed": true,
+      "evidence": "❓ aria-orchestrator 子模块: github 上未见该分支的 tracking ref / 当前: origin=92acce5 (equal) | github=unknown (no_local_tracking_ref, 证据 fresh) —— 未做全绿宣称, 逐 (仓, remote) 腿列出并点名了唯一不对称的一条: \"**唯一一处两端不对称**: `aria-orchestrator` 的 `feature/m6-cost-model-telemetry` 在 github 上**根本不存在**\"; 且明确拒绝把 push 回执当证据: \"v3.x 的判据链里 push 回执没有任何投票权\"。"
+    },
+    {
+      "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+      "passed": false,
+      "evidence": "全文无 `parity = behind` / `behind` 判定; 报的是 \"✅ aria 子模块: 所有远程一致 (origin, github) — ab3dbd0 两端一致, 证据 fresh\" 与 \"裁决: overall_parity = true | has_pending_push = false | has_unreachable_remote = false\" —— 本轮环境无任何 behind 腿, 断言无从满足。"
+    },
+    {
+      "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+      "passed": false,
+      "evidence": "全文 0 次出现 `hint_type`(grep 计数 0); 最接近的表述是 \"判定: benign unknown (规则 1.35 第三路) — 不阻断 overall_parity\", 既未给 hint_type 也未给 'push'/'update' 取值。"
+    },
+    {
+      "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
+      "passed": false,
+      "evidence": "全文 0 次出现 `ahead_count` / `behind_count`; 对 github 那条腿只给了 \"当前: origin=92acce5 (equal) | github=unknown (no_local_tracking_ref, 证据 fresh)\" —— 没有点名任何非零字段 (该腿 ahead_count 实际为 null)。"
+    },
+    {
+      "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+      "passed": true,
+      "evidence": "同目录产物 state-snapshot.json 保留旧字段并取自 origin 侧 head ref: \"remote_commit\": \"cc864ee3b94ab6907828b9264c3ab408ce6c461f\", \"remote_commit_source\": \"local_ref\"; 答案正文亦渲染了该值 \"⚠️ standards: 工作区 bb5d375 领先于记录的 cc864ee\"。"
+    },
+    {
+      "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+      "passed": true,
+      "evidence": "裁决: overall_parity = true | has_pending_push = false | has_unreachable_remote = false"
+    },
+    {
+      "text": "Should include git-remote-helper reference in the scan output when helper is available",
+      "passed": false,
+      "evidence": "全文 0 次出现 `git-remote-helper` / `remote-helper`; 归因给的是内联 collector 路径 \"**Phase 0.5 `remote_refresh` 是新鲜度信号的唯一生产者**, 跑在所有 collector 之前\" 与 \"parity 只看 fetch 之后的本地 tracking ref (`method: local_refs`...)\"。"
+    },
+    {
+      "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+      "passed": true,
+      "evidence": "主仓在 R 上已发布 commit 引用的子模块 commit, 若在子模块的 R 上不可达 ⇒ `orphaned` ⇒ **恒阻断** `overall_parity` —— 并在同文点明 clone 面: \"在各子模块的 origin 与 github 两侧都是 branch-reachable。也就是说, 现在从 GitHub `clone --recursive` 不会断。\""
+    },
+    {
+      "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+      "passed": true,
+      "evidence": "**第七路 gitlink 检查** (`gitlink_integrity[]`) 才是你那个事件在主仓 bump 指针之后的正面检测面: ... ⇒ `orphaned` ⇒ **恒阻断** `overall_parity`, 并给出方向正确的修法 `git -C <submodule> push <remote> <branch>`(推子模块, 不是改主仓 gitlink)。 —— 修法是作为已接线检查的输出给出的, 未标为 known gap。"
+    }
+  ]
+}

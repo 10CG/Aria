@@ -1,0 +1,1 @@
+Execute Phase B step B.1: Create feature branch for task TASK-001 from spec oauth2-social-login. Branch naming convention: feature/{spec-name}

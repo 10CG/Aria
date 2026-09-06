@@ -1,0 +1,39 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+      "passed": true,
+      "evidence": "跑 `git remote get-url origin`, 看 URL 里有没有已知 Forgejo 主机名。已知主机名的解析优先级是 `ARIA_FORGEJO_HOSTS` 环境变量 (逗号分隔) > `.aria/config.json` 的 `state_scanner.issue_scan.platform_hostnames.forgejo` > 内置默认 `forgejo.10cg.pub`。　…　`git remote -v` 的 origin 是 `ssh://forgejo@forgejo.10cg.pub/10CG/Aria.git`"
+    },
+    {
+      "text": "Should check for existence of CLAUDE.local.md file",
+      "passed": true,
+      "evidence": "命中 → 查仓库根有没有 `CLAUDE.local.md`。没有 → `config_status: missing`。　…　而 `ls CLAUDE.local.md` 报 No such file。两边一致。"
+    },
+    {
+      "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+      "passed": true,
+      "evidence": "有 → 查文件里有没有 `forgejo:` 这个 YAML 顶层键 (半角 `:` 和全角 `：` 都认, 允许 `>` 引用前缀), 或 `# forgejo` ~ `### forgejo` 这样的 Markdown 标题 (大小写不敏感)。有 → `configured`; 没有 → `incomplete`。"
+    },
+    {
+      "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+      "passed": true,
+      "evidence": "| `forgejo_remote_detected` | `true` | … | `config_status` | **`missing`** |　…　四态对应的输出行: | `missing` | ⚠️ 检测到 Forgejo 远程 (host) 但缺少 CLAUDE.local.md … | `incomplete` | ⚠️ CLAUDE.local.md 存在但缺少 forgejo 配置块 … | `configured` | ✅ Forgejo 配置: 已配置 (host) |"
+    },
+    {
+      "text": "Should suggest running /forgejo-sync to create configuration when missing",
+      "passed": true,
+      "evidence": "| `suggestion` | 运行 `/forgejo-sync` 可引导创建配置 (需确认) |　…　**推荐路径 (引导式)** `/forgejo-sync`"
+    },
+    {
+      "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+      "passed": true,
+      "evidence": "state-scanner 是只读的, **不会**替你把这个文件建出来, 只报状态 + 建议。　…　**state-scanner 全程只读, 不会自动帮你创建或修改 `CLAUDE.local.md`**。创建是 `/forgejo-sync` 的职责, 且需要你确认。"
+    },
+    {
+      "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+      "passed": true,
+      "evidence": "| 远程不是 Forgejo | 整个 🔗 区块**不显示** (非 Forgejo 项目零噪音) |　…　任何 git 错误 / 超时 / 文件系统错误都会塌缩成 \"不是 Forgejo 项目\" (整块静默跳过), 绝不中断扫描"
+    }
+  ]
+}

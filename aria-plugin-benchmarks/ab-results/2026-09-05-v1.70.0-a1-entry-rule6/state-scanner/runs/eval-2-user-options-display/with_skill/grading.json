@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Should show numbered options for user selection",
+      "passed": true,
+      "evidence": "➤ [1] 解 H1 — Rule #6 AB 六套件 (推荐, 但需你动手重启会话) … ○ [2] carry-issue-scan-open-count-truncation — 本会话可做 … ○ [3] carry-resilient-push-non-ff-recovery (aria-plugin#169) — 本会话可做 … ○ [4] 自定义组合 / 只看状态 … 🤔 选择 [1-4] 或输入自定义:"
+    },
+    {
+      "text": "Should mention custom input option",
+      "passed": true,
+      "evidence": "○ [4] 自定义组合 / 只看状态\\n        输入格式: \"B.2 + C.1\" 或 \"Phase B\" 或 \"就看看, 不动\"  ——  并在结尾: 🤔 选择 [1-4] 或输入自定义:"
+    }
+  ]
+}

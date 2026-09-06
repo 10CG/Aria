@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "answer.md 第 1 行: 「输入里的英文段和中文段是**同一条需求的翻译对**(不是两条需求), 所以只起草一份 Spec; 按你的指定, proposal 正文用英文, 目录 slug 用 ASCII (`dark-mode`), 我这边的说明仍用中文。」 且 Level 判定表里逐语言列出关键词: 「`Add` / `feature` / `添加` / `功能`」「两种语言各命中一组, 一致」"
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "outputs/proposal.md 全文英文, 首行「# Dark Mode Support」, 正文如「Introduce an explicit theme layer with three states — `dark` (current look, stays the default), `light`, and `system` (follow `prefers-color-scheme`) — plus a visible toggle in the dashboard header and per-viewer persistence. No visual change to the default rendering.」且小节标题均为英文 (`## Why` / `## What` / `## Impact` / `## Tasks` / `## Success Criteria` / `## Open Questions`)"
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "answer.md 将中文需求逐字回扣: 「「添加深色模式」落到本仓, 真正的缺口不是「把界面做暗」, 而是**把已经暗着的那套从隐式常量变成显式可切换的 mode**(dark 保持默认 + 补 light + 跟随系统)」; proposal 交付面保留 dark 为一等模式: 「Introduce an explicit theme layer with three states — `dark` (current look, stays the default), `light`, and `system`」, 且标题为「# Dark Mode Support」。两个语言输入指向同一意图, 无一侧被丢弃"
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": true,
+      "evidence": "outputs/proposal.md:6 逐字 (cat -A 验过无尾随字符): 「> **Linked Issue**: `none`」—— 位于头部 blockquote 内, 紧接「> **Created**: 2026-09-05」之后; 未出现 `关联 Issue` / `Related Issue` 变体"
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": true,
+      "evidence": "outputs/proposal.md:6 值为 inline code span 内的 `none`: 「> **Linked Issue**: `none`」(非模板占位符 `{<org>/<repo>#<n>}`, 非空, 非 N/A, 非链接); answer.md 另行说明「`Linked Issue` 值逐字写 `none` —— 已核实本需求当前没有关联 issue。**不留空、不删行**; `N/A` / `TBD` / `-` 不是哨兵, 会被机械 check 判不合规」"
+    }
+  ]
+}

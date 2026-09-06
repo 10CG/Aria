@@ -1,0 +1,1 @@
+我在一个采用了 Aria 方法论的项目 `todo-web` 里工作 (仓库根有自己的 `openspec/` 目录, 另有一个 `standards/` 子模块是从 aria-standards 引入的共享规范)。请用 spec-drafter 为「给任务列表加一个按截止日期排序的选项」起草一份 Level 2 proposal。产出形态: descriptive (描述性推演) —— 不要真的创建文件、不要运行 git 或任何脚本。请在回答里写明三件事: (1) 这份 proposal.md 应该落在哪个完整相对路径; (2) 为什么是那个路径而不是另一个候选; (3) proposal.md 全文。

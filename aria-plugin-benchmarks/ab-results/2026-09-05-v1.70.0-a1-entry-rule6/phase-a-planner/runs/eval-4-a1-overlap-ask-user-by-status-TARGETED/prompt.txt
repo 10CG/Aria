@@ -1,0 +1,11 @@
+A.1 入口认领跑完了, `phase1_gate.py` 的输出里 `linked_issue_overlap` 有四条, 都和我的 `linked_issue: 10CG/Aria#174` 同一个 issue:
+
+```json
+[
+  {"track_id":"oauth-login-aaaa1111","container":"cA","claimed_at":"2026-09-05T08:00:00Z","status":"active","linked_issue":"10CG/Aria#174"},
+  {"track_id":"social-login-bbbb2222","container":"cB","claimed_at":"2026-09-04T10:00:00Z","status":"done","linked_issue":"10CG/Aria#174"},
+  {"track_id":"oauth2-spike-cccc3333","container":"cC","claimed_at":"2026-09-03T09:00:00Z","status":"abandoned","linked_issue":"10CG/Aria#174"},
+  {"track_id":"","container":"","claimed_at":"","status":"unknown","linked_issue":null}
+]
+```
+`unknown_schema_claims` 是 1。请只回答, 不要跑命令: 接下来我该怎么办? 每一条分别怎么处理?

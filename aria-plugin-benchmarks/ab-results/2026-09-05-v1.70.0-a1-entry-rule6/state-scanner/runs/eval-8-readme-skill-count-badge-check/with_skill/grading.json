@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+      "passed": true,
+      "evidence": "| `aria/README.md` 版本头 | 1.69.1 | ✅ 与 plugin.json **match** |\n| `aria/.claude-plugin/plugin.json` | 1.69.1 | — |"
+    },
+    {
+      "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+      "passed": true,
+      "evidence": "| internal | 7 (`README.md:46` 具名列出 7 个) | **7**: agent-router / agent-team-audit / arch-common / aria-token-telemetry / audit-engine / config-loader / git-remote-helper | ✅ 名单逐个对上 | ... | user-facing | 35 (`README.md:7` + `:44`) | **35** (42 减去 7 个 `user-invocable: false`) | ✅ |"
+    },
+    {
+      "text": "Should compare Skill count with the number stated in README",
+      "passed": true,
+      "evidence": "| 总数 | 42 (`aria/README.md:44` 标题 \"Skills (35 user-facing + 7 internal = 42 total)\") | **42** 个含 `SKILL.md` 的目录 | ✅ |"
+    },
+    {
+      "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+      "passed": true,
+      "evidence": "### 问题 2: Skill 列表完整吗 → ❌ **不完整, 漏 2 个 (这是本次唯一的真问题)** ... `aria/README.md` 的 Skills 小节 (`:44`–`:114`) 共 **40 条 bullet** = 33 个 user-facing + 7 个 internal。而实际 user-facing 是 **35** 个, 漏掉: ... **`issue-triage`** ... **`session-closer`**"
+    },
+    {
+      "text": "Should output skill_list_missing items at info severity level (not warning)",
+      "passed": false,
+      "evidence": "### 问题 2: Skill 列表完整吗 → ❌ **不完整, 漏 2 个 (这是本次唯一的真问题)** —— 全文对这两个漏列项一律用 ❌ / 「真问题」/ 「唯一的真问题」的失败级措辞 (另见 「## ⚠️ 顺带发现的机械覆盖缺口 (建议开单)」), 未出现 info/ℹ️ 级标注 (该臂全文零个 ℹ️)"
+    },
+    {
+      "text": "Should check Plugin badge version in root README against plugin.json version",
+      "passed": true,
+      "evidence": "- 交叉核对: `README.md:8` = `Plugin-v1.69.1-blue`, `plugin.json.version` = `1.69.1` ✅"
+    },
+    {
+      "text": "Should report badge mismatch as warning severity",
+      "passed": false,
+      "evidence": "### 问题 3: plugin badge 版本与 plugin.json 一致吗 → ✅ **一致** —— 本仓 badge 与 plugin.json 均为 1.69.1, 该臂未产生任何 badge mismatch 输出, 也未陈述「若不一致则按 warning 级报」的映射"
+    },
+    {
+      "text": "Should gracefully handle missing aria submodule (skip, not error)",
+      "passed": false,
+      "evidence": "**📦 插件依赖**: `standards` 子模块已 initialized + registered。 —— 全文只报 standards 子模块已初始化, 对「aria 子模块缺失/未初始化时应 skip 而非 error」无任何陈述"
+    }
+  ]
+}

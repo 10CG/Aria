@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+      "passed": false,
+      "evidence": "全文 0 次出现 `AskUserQuestion`(grep -c \"AskUser\" = 0)。最接近的只有「## 我需要你确认两件事」, 且问的是「**你这次要做的具体 scope 是什么?**」与第 4 条要不要「下一轮去核实」, 不是按 status 分档的请裁。反向证据: 对 done/abandoned 两条自行判为可继续 ——「`social-login-bbbb2222` (cB, done, 2026-09-04) —— **不阻塞**」「`oauth2-spike-cccc3333` (cC, abandoned, 2026-09-03) —— **不阻塞**」, 且动作序列为自查后自行决定:「5. 以上都有结论后再决定: 撤销 claim / 收窄 scope 后重新认领 / 原样继续。」并自承「spec-drafter 目前没有关于 A.1 入口认领 / `linked_issue_overlap` / `unknown_schema_claims` 的成文判据」"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+      "passed": false,
+      "evidence": "`claimed_at` 被截断: 「## 1. `oauth-login-aaaa1111` (cA, active, 2026-09-05T08:00)」丢掉 `:00Z`(原串 `2026-09-05T08:00:00Z`, 全文 0 次出现 `08:00:00Z`); 「## 2. `social-login-bbbb2222` (cB, done, 2026-09-04)」与「## 3. `oauth2-spike-cccc3333` (cC, abandoned, 2026-09-03)」直接截成日期。`linked_issue` 原串仅在总述出现一次(「有 4 条 claim 记录和你一样挂在 `10CG/Aria#174` 上」), 未随任何一条 claim 回显双方原串。五要素在逐条告警里不完整"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+      "passed": false,
+      "evidence": "全文 0 次出现「release」或「释放」(grep -n \"release\\|释放\" 无命中), 第 2 条通篇只有「**处置: 先读它的产出** (proposal / tasks / 已 merge 的 PR)」与覆盖度三分支, 无「不要释放对方 claim / 那是对方的东西」的任何表述 —— 承重项要求可引具体文字, 「没提议释放」不构成正证据。且对第 4 条反向提议动别人的记录:「确认是空壳残留 → 清掉它, 并在 handoff 里记一笔。」"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+      "passed": false,
+      "evidence": "与断言相反:「## 3. `oauth2-spike-cccc3333` (cC, abandoned, 2026-09-03) —— 不阻塞, 但要读它「为什么被放弃」」「abandoned 对并发没有影响, 它唯一的价值是失败信息」。全文 0 次出现「GC」, 无「终态可能是 GC 产物而非真的做完/放弃」之意"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+      "passed": false,
+      "evidence": "显式拒绝了 active 档:「**关键点: 它既不能被当成「第四个 overlap」, 也不能被当成「无冲突」。** 它是不可判定的」, 并把它另置于「先核实、条件性升级」的第三条路:「确认是真 claim 的损坏副本 → 它升级成**第二个需要协调的对象**, 回到第 1 条的流程走一遍。」仅断言后半段「不因读不懂就忽略」有对应文字(「**眼前 (fail-closed)**: 在核实之前视为「可能存在未知并发」, 不要因为字段是空的就当它不存在。」), 承重前半段「视同 `active` 处理(存在性已确认…按存在处理)」无对应文字且被上引句直接否定"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同",
+      "passed": true,
+      "evidence": "四条各自成节且处置互不相同:「## 1. `oauth-login-aaaa1111` (cA, active, 2026-09-05T08:00) —— 唯一的真阻塞 … **处置: 先停, 别开分支。**」「## 2. … —— 不阻塞, 但可能让你这次 A.1 整个不必做 … **处置: 先读它的产出**」「## 3. … —— 不阻塞, 但要读它「为什么被放弃」 … **处置: 读放弃理由, 把结论写进 proposal 的 Constraints 或 Impact.Risk。**」「## 4. 空记录 … —— 脏数据, 必须 fail-closed」; 并显式反对压成一句:「同一个 issue 下的 claim 不等于同一份工作」"
+    }
+  ]
+}

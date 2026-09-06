@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "module-identifier-validation",
+  "prompt": "列出支持的模块标识符",
+  "assertions": [
+    {
+      "text": "Should list valid module identifiers"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should mention .aria/config.json or config-loader",
+      "passed": true,
+      "evidence": "## ⚙️ 配置状态 — 你问的 `.aria/config.json` / **✅ 存在**, 且被本次扫描实际消费。逐组解读 (未列出的键走 config-loader `DEFAULTS.json` 合并):"
+    },
+    {
+      "text": "Should describe config fields like auto_proceed or confidence_threshold",
+      "passed": true,
+      "evidence": "| `workflow.auto_proceed` | `false` | Phase 间**不**自动推进, 每步都要你确认 |  ……  | `state_scanner.confidence_threshold` | `90` | 置信度阈值 |"
+    },
+    {
+      "text": "Should mention default values when config is absent",
+      "passed": true,
+      "evidence": "3. **缺失字段的行为** — config-loader 对文件缺失是静默回落全默认值; 字段类型错 / 超范围则告警 + 用默认值 / clamp。本次未出现任何配置告警。"
+    }
+  ]
+}

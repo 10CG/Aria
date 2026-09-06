@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should update the spec progress to 'completed' or 'merged' status",
+      "passed": false,
+      "evidence": "回答未把 spec 置为任何状态, 全篇为前置阻塞: \"D.1 现在跑不了 —— 前置探测两项都落空, 缺的是输入不是权限\"; 收尾表 \"⏸  D.1 progress-updater   → 未执行 (UPM 未定位, 缺 module)\" 与 \"状态: 阻塞于输入缺失, 非失败。本仓零写入。\" 均无 completed/merged 状态赋值。"
+    },
+    {
+      "text": "Should record the PR number in progress tracking",
+      "passed": false,
+      "evidence": "PR 号只出现在\"补齐后会写什么\"的模板里, 且同段字段仍是占位: \"lastUpdateRef: \\\"git:<merge-sha>-oauth2 social login (PR #143)\\\"\"; 而实际动作是 \"⏸  D.1 progress-updater   → 未执行 (UPM 未定位, 缺 module)\" 且 \"本仓零写入\", 并把 merge commit SHA 列为待补输入 (\"2. **PR #143 的 merge commit SHA** (构造 `lastUpdateRef`)\") ⇒ 未产生进度记录, 无\"已记录\"证据。"
+    },
+    {
+      "text": "Should mark all 6 tasks as completed in the progress record",
+      "passed": false,
+      "evidence": "任务列表被显式留空待补: \"completedTasks: [<6 个 TASK-ID>]              # 待你/detailed-tasks.yaml 提供\"; 需求表同样记 \"你说「6 tasks complete」, 但我需要 **TASK-ID 列表** 才能写 `completedTasks[]`\" ⇒ 无任何任务被标记完成。"
+    }
+  ]
+}

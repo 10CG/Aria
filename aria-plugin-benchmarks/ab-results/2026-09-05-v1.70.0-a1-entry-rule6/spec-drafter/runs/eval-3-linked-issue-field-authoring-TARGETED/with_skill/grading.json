@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "proposal.md 头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首 (英文 canonical 拼写; 写成 `关联 Issue` / `Related Issue` / 省略该行 均不算)",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  (with_skill/outputs/answer.md:64, proposal.md 头部 blockquote 第 4 行; 逐字以 `> **Linked Issue**:` 起首)"
+    },
+    {
+      "text": "该行的值是 inline code span 且逐字为 `none` (无关联已核实 ⇒ 哨兵; 留空 / `N/A` / `TBD` / 保留 `{<org>/<repo>#<n>}` 占位串 均不算)",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  —— 值为 inline code span 且逐字为 `none`, 非空、非 `N/A`/`TBD`, 未保留 `{<org>/<repo>#<n>}` 占位串"
+    },
+    {
+      "text": "该行不是 markdown 链接形 (行内无 `](http`), 且不留空",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`  —— 全行无 `](http`, 亦非 `[repo#n](url)` 链接形; 冒号后有值不留空。答案自检亦写: 「行首无空白, `>` 后恰一个空格, 字段名两侧各两星号, ASCII 冒号, 不写 markdown 链接形 —— ✅」"
+    },
+    {
+      "text": "头部四行顺序 Level → Status → Created → Linked Issue 与 SOT 模板一致 (含 `> **Created**:` 行)",
+      "passed": true,
+      "evidence": "> **Level**: Minimal (Level 2 Spec)\n> **Status**: Draft\n> **Created**: 2026-09-05\n> **Linked Issue**: `none`  (answer.md:61-64, 四行连续同序, 含 `> **Created**: 2026-09-05` 行)"
+    },
+    {
+      "text": "没有把字段译写成别的名字 (全文无 `Related Issue` / `Issue Link` / `关联 Issue` 作为头部字段名)",
+      "passed": true,
+      "evidence": "全文 `Linked Issue` 三处 (answer.md:64 头部字段 / :157 「## Linked Issue 字段自检 (对照写法三条)」 / :165 「字段顺序按 SOT 模板 `Level` → `Status` → `Created` → `Linked Issue`」) 全部为英文 canonical; 全文零出现 `Related Issue` / `Issue Link` / `关联 Issue`"
+    }
+  ]
+}

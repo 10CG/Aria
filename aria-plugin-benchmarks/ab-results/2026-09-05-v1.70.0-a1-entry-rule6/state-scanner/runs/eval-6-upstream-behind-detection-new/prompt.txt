@@ -1,0 +1,1 @@
+我的 feature 分支已经开发几天了，怀疑主分支已经有新的改动我没拉下来。请扫描状态告诉我当前分支是否落后 upstream，并提示我是否需要 git pull。注意项目可能有 detached HEAD 或 shallow clone 场景需要处理。

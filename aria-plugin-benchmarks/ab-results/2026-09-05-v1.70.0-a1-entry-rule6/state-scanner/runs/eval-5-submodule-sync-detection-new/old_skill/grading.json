@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "🔄 同步状态  ← **你问的就是这一块** …   子模块 (主仓记录 gitlink vs 子模块远程默认分支):\n    ✅ standards: 同步 (tree=remote=`cc864ee`, behind 0 / ahead 0)\n    ✅ aria: 同步 (tree=remote=`7dd0135`, behind 0 / ahead 0)\n    ✅ aria-orchestrator: 同步 (tree=remote=`237045a`, behind 0 / ahead 0)"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "  子模块 (主仓记录 gitlink vs 子模块远程默认分支):\n    ✅ standards: 同步 (tree=remote=`cc864ee`, behind 0 / ahead 0)\n    ✅ aria: 同步 (tree=remote=`7dd0135`, behind 0 / ahead 0)\n    ✅ aria-orchestrator: 同步 (tree=remote=`237045a`, behind 0 / ahead 0)\n  ⚠️ 工作区偏离主仓记录 (`workdir_vs_tree = true`, 三个子模块都有 —— 这才是 `git status` 里那三行 ` M`):\n    - standards: 工作区 HEAD `bb5d375` (分支 `feature/a1-entry-claim-duplicate-work-guard`) ≠ 主仓记录 `cc864ee`\n    - aria: 工作区 HEAD `ab3dbd0` (分支 `feature/a1-entry-claim-duplicate-work-guard`) ≠ 主仓记录 `7dd0135`\n    - aria-orchestrator: 工作区 HEAD `92acce5` (分支 `feature/m6-cost-model-telemetry`) ≠ 主仓记录 `237045a` …   ℹ️ aria-orchestrator 子模块: `origin` equal (`92acce5`); `github` = `unknown` / `no_local_tracking_ref` —— 该 feature 分支只推了 origin, 没推 github。证据是 `fresh`, 属 benign unknown, **不触发** `multi_remote_drift` (1.35) 也不触发 `has_unpublished_branch` (1.36, 它要求 `evidence_grade != fresh`)。"
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "  规则判定: `submodule_drift` (priority 1.97) **未触发** —— 它的触发条件是 `tree_vs_remote == true`, 这里三个全是 `false`。 … - `behind_count = 0` / `ahead_count = 0` —— 无方向性偏差, 故 `hint` / `hint_type` 均为 `null`, 规则引擎不发 `update --remote` 建议;"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "  远程引用: 本轮扫描 Phase 0.5 刚刷新 —— 8 条 fetch leg (2 remote × 4 repo) **全部 `fetch_ok=true`, 0 条 skipped**, 所有 parity 结论的 `evidence_grade` 均为 `fresh` (即: 不是\"陈旧的 equal\")  [判定: 回答自陈本轮扫描 Phase 0.5 已执行 8 条 fetch leg, 未先征得用户同意; 全文无 FETCH_HEAD / remote_refs_age 年龄读数。]"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "[全文无 origin/HEAD、ls-remote、config_default、unavailable 四级链的任一字面。最接近的降级叙述只到远程 tracking ref 缺失: ]   ℹ️ aria-orchestrator 子模块: `origin` equal (`92acce5`); `github` = `unknown` / `no_local_tracking_ref` —— 该 feature 分支只推了 origin, 没推 github。证据是 `fresh`, 属 benign unknown, **不触发** `multi_remote_drift` (1.35) 也不触发 `has_unpublished_branch` (1.36, 它要求 `evidence_grade != fresh`)。"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": false,
+      "evidence": "已跑完状态扫描 (Step 0 机械采集: `scan.py` exit 0, `snapshot_schema_version = 1.0`, `errors[] = []`)。  [判定: 本轮 errors[] = [], 无 git 错误发生, 回答中亦无「某步 git 失败但扫描继续」的记述或机制陈述, 无证据支持 fail-soft。]"
+    }
+  ]
+}

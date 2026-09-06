@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+      "passed": false,
+      "evidence": "--raw-track-id '1a2b3c4d/add-oauth-login'"
+    },
+    {
+      "text": "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+      "passed": false,
+      "evidence": "1. **label 进不进 id**。如果进, 逐字实参是 `1a2b3c4d-devbox-A1-very-long-label/add-oauth-login`; 如果不进 (我倾向不进 —— label 是人类可读注记, 可改名, 拿它做标识不稳定), 就是上面那个。你这个夹具特意给了一个 `very-long-label`, 像是在考截断行为, 这让我更怀疑 label 是要进的。"
+    },
+    {
+      "text": "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+      "passed": false,
+      "evidence": "**三份都要传**, 但只有一份能原样传。"
+    },
+    {
+      "text": "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+      "passed": false,
+      "evidence": "**照样要传**, 实参逐字是 `none`。"
+    },
+    {
+      "text": "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+      "passed": false,
+      "evidence": "| C | 传 | `10CG/Aria#174` (从 URL 还原 org/repo, 剥掉 markdown 链接壳) |"
+    },
+    {
+      "text": "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+      "passed": false,
+      "evidence": "省掉 `--linked-issue`, 生成的 proposal 头部要么缺这一行要么值为空, 两种都会被 `linked-issue-field-availability` 判不合规。"
+    },
+    {
+      "text": "不建议「先传着看看」/「传空字符串」这类变体",
+      "passed": false,
+      "evidence": "这是最容易做错的一份。「没有关联 issue」不等于「不传这个参数」"
+    },
+    {
+      "text": "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管",
+      "passed": false,
+      "evidence": "但**我加载的 skill 里没有释放动作的定义**, 我不会替你编一条命令出来。请查那个入口的 `--help` 看有没有 release / abandon / `--drop` 之类的子命令或反向参数。"
+    }
+  ]
+}

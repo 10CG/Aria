@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "| aria-plugin | `aria/.claude-plugin/plugin.json` = **1.69.1** | `aria/README.md` | 1.69.1 | ✅ 一致 (`readme.version_match=true`) |  ——  以及  ——  | 主项目 Aria | root `VERSION` 头部 = **1.7.5** | 9 个引用点 (含 root README `Project Version` 行 / 对应 Tag 块等) | 1.7.5 | ✅ 9/9 一致 |"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "全文仅一处出现 CHANGELOG，且是发版步骤而非日期参照源：「Group 8 三条 (8.1 CHANGELOG + 版本 SOT 5 文件 → 8.4 aria 本地 merge + 双推 + tag → 8.2 主仓」；全文 0 次出现「日期」二字，README 日期同步维度整体缺席（表中只有『架构文档新鲜度 … Last Updated 2026-09-02』这一条与 README 无关的新鲜度行）"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "## 📝 文档版本一致性 (专项 — 你重点关注的部分)  …  「**root README 没有独立的\"版本\"行** —— `readme.root.version` 采集为 `null`」 (区块引用 readme collector 字段, 但标题不是 output-formats.md 规定的「📝 README 同步状态」)"
+    }
+  ]
+}

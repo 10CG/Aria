@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "progress-update-execution",
+  "prompt": "Execute Phase D D.1: Update progress status for completed spec oauth2-social-login. PR #143 merged to main. All 6 tasks complete.",
+  "assertions": [
+    {
+      "text": "Should update the spec progress to 'completed' or 'merged' status"
+    },
+    {
+      "text": "Should record the PR number in progress tracking"
+    },
+    {
+      "text": "Should mark all 6 tasks as completed in the progress record"
+    }
+  ]
+}

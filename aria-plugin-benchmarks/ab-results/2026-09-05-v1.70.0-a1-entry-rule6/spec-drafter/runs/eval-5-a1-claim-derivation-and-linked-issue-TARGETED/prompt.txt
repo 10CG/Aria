@@ -1,0 +1,18 @@
+我要在 Aria 仓起草一份新 Spec, 走 A.1 入口认领。
+
+夹具: `~/.aria/container-id` 内容为
+```
+uuid: 1a2b3c4d
+label: devbox-A1-very-long-label
+```
+本 Spec 目录是 `openspec/changes/add-oauth-login/`。
+
+手上有三份候选 proposal 的 `Linked Issue` 字段值:
+- A: `10CG/Aria#174`
+- B: `none`
+- C: `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)`
+
+请只回答, 不要跑命令:
+(1) `--raw-track-id` 的实参应该是什么? 逐字写出来, 并说明每一段从哪来。
+(2) 三份 proposal 各自应不应该传 `--linked-issue`? 传的话实参是什么?
+(3) 如果我起草到一半决定放弃这个方向, 该做什么?

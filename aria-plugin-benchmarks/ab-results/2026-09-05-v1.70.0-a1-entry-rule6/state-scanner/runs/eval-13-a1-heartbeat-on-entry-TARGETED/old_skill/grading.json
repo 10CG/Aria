@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] (A) 明确给出 `--heartbeat-only` 模式的调用, 且命令行含 `phase1_gate.py` 与 `--phase A.1`",
+      "passed": false,
+      "evidence": "唯一给出的 phase1_gate 命令行是完整闸门模式, 无 `--heartbeat-only`、`--phase` 为 B: 'python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py\" \\\\\\n  --raw-track-id \"<handoff §6 选定 carry-id 的原始串>\" \\\\\\n  --phase B \\\\\\n  --mode advisory \\\\\\n  --repo-path \"/home/dev/Aria\"' —— 全文无 \"--heartbeat-only\" 与 \"--phase A.1\" 字样。"
+    },
+    {
+      "text": "[承重] (A) 说明目的是刷新既有 claim 的 heartbeat_at (而非新认领一条 claim)",
+      "passed": false,
+      "evidence": "与断言矛盾: \"**4. 关于你那条 heartbeat 停在 6 小时前的 active claim —— 我必须诚实说：按当前这版 SKILL.md，state-scanner 入口对它什么都不做，成文契约里没有「入口刷新/续期 heartbeat」这个动作。**\""
+    },
+    {
+      "text": "[承重] (B) 明确 enabled == false ⇒ 零 heartbeat 调用 / 不写 claim / 不推送",
+      "passed": true,
+      "evidence": "\"**对 `phase1_gate` / `run_gate` 是零调用。** SKILL.md 明写：`enabled == false`（显式 opt-out；Part A1 起默认为 true）→ **零调用 `run_gate`**\" + \"**heartbeat 同样不做**：`enabled == false` 只是让协调机制整体不参与，它不会新增任何 claim 维护动作。\""
+    },
+    {
+      "text": "[承重] (C) 明确回答「不改变」—— 触发条件是「持 active claim 且 enabled==true 的每次入口」, 不依赖 collision.kind",
+      "passed": false,
+      "evidence": "与断言矛盾, 明确答「改变」且把触发条件挂在 collision.kind 上: \"**2. 对「后续会不会跑 `phase1_gate`」—— 决定性地改变，而且是把它彻底关掉。** 触发条件是 `enabled == true` **AND** `collision.kind` 非空 的合取。\""
+    },
+    {
+      "text": "不把 (A) 答成「先跑 phase1_gate 认领」或「跑完整闸门」—— heartbeat 模式不认领、不判碰撞、不 fetch",
+      "passed": false,
+      "evidence": "(A) 里被点名为「你要的完整命令行」的就是完整闸门 (acquire) 调用: \"**3. 只有在「本次会话继续走到用户确认进入 Phase B」且 collision 非空时**，AI 编排层才在 Phase B 启动前跑这条（这就是你要的完整命令行）：\" 后接 `--phase B --mode advisory`; 并把 claim 写入定为 \"`acquire_claim` | `phase1_gate` | Phase B 启动前\"。"
+    },
+    {
+      "text": "不声称心跳遥测会进 production 分区 (它走独立的 heartbeat 分区, coordination_probe 不计)",
+      "passed": true,
+      "evidence": "全文未出现「production 分区」「遥测分区」相关主张 —— 回答完全没有提到心跳遥测的分区归属, 故未主张被禁项 (空缺式通过)。"
+    }
+  ]
+}

@@ -935,7 +935,7 @@ tasks:
     parent: "7.1"
     task_group: 7
     title: "照跑 ab-suite/phase-a-planner.json (当时套件全部 eval; d69091d 时 2, 能力面 hunk, 零裁量)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -960,7 +960,7 @@ tasks:
     parent: "7.2"
     task_group: 7
     title: "照跑 ab-suite/spec-drafter.json (当时套件全部 eval; d69091d 时 2, 字段 Spec ship 后为 3, 能力面 hunk, 零裁量)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -984,7 +984,7 @@ tasks:
     parent: "7.3"
     task_group: 7
     title: "ab-suite/state-scanner.json 新增 eval (点名行为 (d), SC-21 / SC-28 第一臂; id = 当时 max(id)+1, d69091d 时为 13) 后照跑全部 eval (当前值 + 1)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -1013,7 +1013,7 @@ tasks:
     parent: "7.4"
     task_group: 7
     title: "照跑 ab-suite/phase-b-developer.json / branch-manager.json / phase-d-closer.json (占位串 hunk, 各按当时套件全部 eval; d69091d 时各 2)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: qa-engineer
@@ -1039,7 +1039,7 @@ tasks:
     parent: "7.5"
     task_group: 7
     title: "覆盖外档定向 fixture: phase-a-planner.json 增 (a)(b)(c)(e) 四 eval, spec-drafter.json 增 (a)(b) 两 eval; 双臂可分辨"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "6-8"
     agent: qa-engineer

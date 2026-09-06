@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Should show numbered options for user selection",
+      "passed": true,
+      "evidence": "➤ [1] feature-dev — 续做本轨 a1-entry-claim-duplicate-work-guard (推荐, 置信度 88%) … ○ [2] 处理 carry-issue-scan-open-count-truncation (handoff §6 第 2 项) … ○ [3] 修 aria-plugin#169 resilient_push non-FF 恢复路径 (handoff §6 第 3 项) … ○ [4] 自定义组合 / 只看状态 … 🤔 选择 [1]-[4] 或输入自定义:"
+    },
+    {
+      "text": "Should mention custom input option",
+      "passed": true,
+      "evidence": "○ [4] 自定义组合 / 只看状态\\n      输入格式: \"B.2 + C.1\" 或 \"Phase B\"; 也可以说\"只看状态, 不动\"就到此为止。  ——  并在结尾: 🤔 选择 [1]-[4] 或输入自定义:"
+    }
+  ]
+}

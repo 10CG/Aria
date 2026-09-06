@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Should generate correct branch name format",
+      "passed": true,
+      "evidence": "**分支名** (按 `{branch_type}/{module}/{task-id}-{desc}`):\n\n```\nfeature/backend/TASK-001-user-auth\n```  …  branch_name: \"feature/backend/TASK-001-user-auth\""
+    },
+    {
+      "text": "Should indicate Branch mode was selected",
+      "passed": true,
+      "evidence": "`score = 1 < 3` ⇒ **模式 A: Branch**(常规分支, 不开 worktree)。  …  mode: \"branch\""
+    }
+  ]
+}

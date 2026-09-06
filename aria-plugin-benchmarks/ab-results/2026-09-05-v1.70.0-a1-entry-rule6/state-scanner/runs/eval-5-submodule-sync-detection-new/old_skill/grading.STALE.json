@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "🔄 同步状态 ... 子模块 (远程方向 — 本问题的直接答案):\n    ✅ standards:          与远程同步 (tree==remote cc864ee, behind 0) — 无需 update\n    ✅ aria:               与远程同步 (tree==remote 7dd0135, behind 0) — 无需 update\n    ✅ aria-orchestrator:  与远程同步 (tree==remote 237045a, behind 0) — 无需 update"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "三个 commit 逐个给出: \"✅ standards: 与远程同步 (tree==remote cc864ee, behind 0)\" 与 \"ℹ️ standards: workdir bb5d375 ≠ gitlink cc864ee (在 feature 分支上, 有意)\"; 表头含 `tree_vs_remote` / `workdir_vs_tree` / `behind_count` / `ahead_count`; 无法解析的比较降级: \"原因: no_local_tracking_ref ... 判定: evidence_grade=fresh ⇒ 良性 unknown\""
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "推荐规则 `submodule_drift` (priority 1.97) 的触发条件是 `tree_vs_remote == true` **且** `behind_count > 0` **两者同时成立** —— 当前一条都不满足, **规则未触发**, 所以本次扫描不会给你任何 `git submodule update --remote` 的建议"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "remote_refresh 8/8 leg 本轮 fetch 成功 @ 2026-09-05T23:07 (skipped_remotes=[]; sync_status.remote_refs_age=\"1m\" 是 DEPRECATED 字段, 它只反映本次 scan 自己刚做的 fetch, 不作为陈旧度判据) —— 本轮确实执行了 fetch 且无用户确认环节, 并显式否定 FETCH_HEAD age 作判据"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "全文无 origin_HEAD / ls-remote / config_default / unavailable / remote_commit_source / 四级回退 字样 (grep 零命中); 仅有多远程 parity 的 \"原因: no_local_tracking_ref — 分支 feature/m6-cost-model-telemetry 未推 github 镜像\", 不是断言要求的四级 fallback"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": true,
+      "evidence": "❓ aria-orchestrator 子模块: origin 一致 (92acce5); github = unknown / 原因: no_local_tracking_ref ... / 判定: evidence_grade=fresh ⇒ 良性 unknown, 不触发 multi_remote_drift (1.35) / 动作: 无需处理 —— 另 \"ℹ️ root README: collector 未解出版本号 (readme.root.version=null)\" 同样不阻断, 全扫描 \"exit 0, `errors[]` 为空\" 且各区块完整输出"
+    }
+  ]
+}

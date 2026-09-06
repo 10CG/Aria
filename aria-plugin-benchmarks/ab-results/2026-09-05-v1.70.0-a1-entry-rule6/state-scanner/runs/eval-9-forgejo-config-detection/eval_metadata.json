@@ -1,0 +1,28 @@
+{
+  "eval_id": 9,
+  "eval_name": "forgejo-config-detection",
+  "prompt": "我在一个使用 Forgejo (forgejo.10cg.pub) 作为 Git 平台的项目中工作。我还没有创建 CLAUDE.local.md 来配置 Forgejo API 访问。请扫描项目状态，告诉我是否有遗漏的配置，以及如何设置 Forgejo 集成。",
+  "assertions": [
+    {
+      "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)"
+    },
+    {
+      "text": "Should check for existence of CLAUDE.local.md file"
+    },
+    {
+      "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists"
+    },
+    {
+      "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)"
+    },
+    {
+      "text": "Should suggest running /forgejo-sync to create configuration when missing"
+    },
+    {
+      "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)"
+    },
+    {
+      "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Output should include Git status information",
+      "passed": true,
+      "evidence": "分支: feature/a1-entry-claim-duplicate-work-guard (upstream origin/同名, ahead 0 / behind 0) ... 变更: 4 项 (0 staged) ├ 未暂存: aria / aria-orchestrator / standards (三个子模块 gitlink dirty) └ 未跟踪: aria-plugin-benchmarks/ab-results/2026-09-05-v1.70.0-a1-entry-rule6/ ... 最近提交: 5d9b568 docs(handoff): §3 第 1 条补 AB 会话运行守则 ... git 操作态: none (无 rebase/merge/cherry-pick 暂停)"
+    },
+    {
+      "text": "Should provide workflow recommendation",
+      "passed": true,
+      "evidence": "## 🎯 推荐工作流 —— 「命中的规则 (按优先级): `resume_in_progress_us` (1.88) · `audit_unconverged` (1.9) · `feature_with_spec` (3)。」「➤ [1] 续做本轨 a1-entry-claim-duplicate-work-guard (推荐, 31/40) 执行: B.0 (heartbeat) → Group 7 Rule #6 AB → 7.6 (TASK-036) → Group 8 发版 (8.1 → 8.4 → 8.2, vNEXT=1.70.0)」, 并给出 [2]/[3]/[4] 备选与 「🤔 选择 [1-4] 或输入自定义:」"
+    },
+    {
+      "text": "Output should use structured format with sections",
+      "passed": true,
+      "evidence": "以 ASCII 框 `║ PROJECT STATE ANALYSIS ║` 开头, 随后为二级/三级标题分区: 「## 📍 当前状态」「## 📊 变更分析」「## 📄 需求状态」「## 🏗️ 架构状态」「## 📋 OpenSpec 状态」「## 🛡️ 审计状态」「## 🔧 自定义检查」「## 🔄 同步状态」「### 🌐 多远程一致性」「### 📝 README 版本一致性」「### 📦 插件依赖」「### 🔗 Forgejo 配置检查」「## 🎫 Open Issues」「## 📜 Session Handoff」「## 🚦 多终端协调 (Layer L)」「## 🎯 推荐工作流」, 每区块内为 code fence 对齐字段"
+    }
+  ]
+}

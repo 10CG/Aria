@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should mention .aria/config.json or config-loader",
+      "passed": true,
+      "evidence": "**先直接回答**: 有。`/home/dev/Aria/.aria/config.json` 存在 (5603 bytes, 最后修改 2026-08-23), JSON 解析正常, `version: \"1.0\"`。 …… 「## ⚙️ .aria/config.json — 实际生效配置 / 扫描已按 config-loader 流程加载 (缺失字段合并默认值)。」"
+    },
+    {
+      "text": "Should describe config fields like auto_proceed or confidence_threshold",
+      "passed": true,
+      "evidence": "| `workflow.auto_proceed` | `false` | `false` | 同默认 |  ……  | `state_scanner.confidence_threshold` | `90` | `90` | 同默认 |"
+    },
+    {
+      "text": "Should mention default values when config is absent",
+      "passed": true,
+      "evidence": "扫描已按 config-loader 流程加载 (缺失字段合并默认值)。**显式设置 vs 默认值**: …… | `state_scanner.mechanical_mode` | **未设置** | `true` | 吃默认 ⇒ 本轮走 scan.py 机械路径 | …… | `state_scanner.multi_remote.*` | **未设置** | `enabled=true` | 吃默认 ⇒ enforced_remotes 自动发现 = `[github, origin]` |"
+    }
+  ]
+}
