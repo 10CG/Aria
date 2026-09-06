@@ -1098,7 +1098,7 @@ tasks:
     parent: "8.1"
     task_group: 8
     title: "aria/CHANGELOG.md 条目 + 版本 SOT 5 文件同步 (号 = <vNEXT>, 落地时按 plugin.json 计算; 档位 = MINOR, 2026-09-01 技术裁定)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: knowledge-manager
