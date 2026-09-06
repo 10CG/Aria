@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should execute the test suite for the completed task",
+      "passed": true,
+      "evidence": "定向: `python3 -B -m pytest aria/skills/state-scanner/tests/test_heartbeat_by_track.py -q -p no:cacheprovider` → 「12 passed in 1.68s」; 模块全量: `cd aria/skills/state-scanner/tests` + `python3 -B -m pytest . -q -p no:cacheprovider` → 「1 failed, 1557 passed in 216.50s (0:03:36)」"
+    },
+    {
+      "text": "Should report test counts and pass/fail status",
+      "passed": true,
+      "evidence": "| 用例总数 | **1558** | / | 通过 | **1557** | / | 失败 | **1** | / | 错误 / 跳过 | 0 / 0 | / | 耗时 | 216.50s | —— 以及上下文输出「tests_run:    1558    passed: 1557    failed: 1(环境)    real_failed: 0」"
+    },
+    {
+      "text": "Should gate Phase C entry on all tests passing",
+      "passed": true,
+      "evidence": "「**测试门: PASS。Phase C 入口: 尚不满足。** 拦住的三条都不是测试」/「ready_for_phase_c: NO」/「我**不会**把 1557/1558 直接写成「全绿」—— 在你自己的 shell 里它现在就是红的。要么先 `unset ARIA_COORDINATION_NO_PUSH` 复跑一次全量拿到干净的 1558/1558, 要么在 handoff 里把这条环境依赖写明。」"
+    }
+  ]
+}

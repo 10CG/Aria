@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "✅ aria 子模块:  README 1.69.1  ==  .claude-plugin/plugin.json 1.69.1   (version_match=true)\n✅ Plugin badge: README.md:8  Plugin-v1.69.1  ==  plugin.json 1.69.1"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "回答全文未出现「日期同步 / 日期一致性」这个维度, 也未把 CHANGELOG 日期当作期望值来源。CHANGELOG 只出现两次且均为他义: (1) 自定义检查行 `claude-md-changelog-free ..... OK (151 行 / 13316 字节, 无滚动 changelog)` —— 说的是 CLAUDE.md 里不得有滚动 changelog; (2) 发版任务 `8.1 CHANGELOG + 版本 SOT 5 文件`。README 专区只列版本项 (`✅ aria 子模块: README 1.69.1 == .claude-plugin/plugin.json 1.69.1`), 唯一的日期项是 `✅ 架构文档新鲜度: age=3d (未 stale)`, 与 README 日期/CHANGELOG 无关。"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "### 📝 README / 文档版本一致性\n\n```\n✅ aria 子模块:  README 1.69.1  ==  .claude-plugin/plugin.json 1.69.1   (version_match=true)"
+    }
+  ]
+}

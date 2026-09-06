@@ -1,0 +1,16 @@
+{
+  "eval_id": 2,
+  "eval_name": "status-summary-output",
+  "prompt": "Execute Phase D and generate closure summary report for spec: add-payment-gateway. Include all D.1 and D.2 outcomes, timeline, and next steps.",
+  "assertions": [
+    {
+      "text": "Output should have a clear closure summary heading"
+    },
+    {
+      "text": "Report should cover both D.1 and D.2 outcomes"
+    },
+    {
+      "text": "Report should indicate what happens after Phase D"
+    }
+  ]
+}

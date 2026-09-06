@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Output should have a clear closure summary heading",
+      "passed": true,
+      "evidence": "# Phase D 收尾 — `add-payment-gateway`  (另有横幅 banner “║              PHASE D - CLOSURE                               ║” 与 “🎉 工作流结论”)"
+    },
+    {
+      "text": "Report should cover both D.1 and D.2 outcomes",
+      "passed": true,
+      "evidence": "二、D.1 结果 (进度更新) ... `upm_updated` | `false` (skipped)  与  三、D.2 结果 (Spec 归档) —— 这一步的判定必须看 verdict, 不能看 exit code ... 机读输出中 `D.1: upm_updated: false` / `D.2: spec_archived: false, gate_verdict: \"pass\", complete: false`"
+    },
+    {
+      "text": "Report should indicate what happens after Phase D",
+      "passed": true,
+      "evidence": "## 九、Next steps ... 6. **下次 session 入口**: `/aria:state-scanner` —— Phase 1.15 会自动 surface 这份 handoff。 (另 `context_for_next: null       # Phase D 是最后阶段`)"
+    }
+  ]
+}

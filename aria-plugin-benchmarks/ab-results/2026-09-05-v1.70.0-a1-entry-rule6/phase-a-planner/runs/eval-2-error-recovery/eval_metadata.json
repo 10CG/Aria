@@ -1,0 +1,16 @@
+{
+  "eval_id": 2,
+  "eval_name": "error-recovery",
+  "prompt": "Execute Phase A. State-scanner reports: uncommitted changes in 3 files, working tree dirty. Feature: Add payment gateway integration.",
+  "assertions": [
+    {
+      "text": "Should detect and report unclean working tree state"
+    },
+    {
+      "text": "Should block execution or issue a clear warning"
+    },
+    {
+      "text": "Should provide steps to resolve the unclean state"
+    }
+  ]
+}

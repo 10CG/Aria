@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    {
+      "text": "Should list valid module identifiers",
+      "passed": true,
+      "evidence": "branch-manager 支持的**模块标识符** (`module` 参数) 共 6 个: … | Backend | `backend` | Python/FastAPI 服务 | / | Mobile | `mobile` | Flutter 应用 | / | Shared | `shared` | API 契约、schemas | / | Cross-module | `cross` | 多模块变更 | / | Documentation | `docs` | 仅文档变更 | / | Standards | `standards` | AI-DDD 规范 |"
+    }
+  ]
+}

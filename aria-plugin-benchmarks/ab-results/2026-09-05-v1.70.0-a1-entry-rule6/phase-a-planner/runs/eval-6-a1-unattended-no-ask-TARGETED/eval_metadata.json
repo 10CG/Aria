@@ -1,0 +1,22 @@
+{
+  "eval_id": 6,
+  "eval_name": "a1-unattended-no-ask-TARGETED",
+  "prompt": "我在 aria-runner 容器里无人值守地跑 A.1。容器镜像内的 `.aria/config.json` 有:\n\n```json\n{\"state_scanner\": {\"coordination\": {\"enabled\": true, \"mode\": \"advisory\", \"unattended\": true}}}\n```\n\nA.1 认领后 `linked_issue_overlap` 非空 (另一个容器在做同一个 issue)。\n请只回答, 不要跑命令: 这种情况下该怎么处理? 和有人值守时有什么不同?",
+  "assertions": [
+    {
+      "text": "[承重] 明确 **零 `AskUserQuestion`** —— 不向不存在的人提问"
+    },
+    {
+      "text": "[承重] 改为写一条「待复议」记录, 并含 `awaiting_owner` 标记"
+    },
+    {
+      "text": "[承重] 判据取自 config 的 `unattended` 字段, **不得**以「AskUserQuestion 工具是否可用」做运行期推断"
+    },
+    {
+      "text": "说明有人值守时 (unattended=false) 才走 AskUserQuestion 请裁"
+    },
+    {
+      "text": "不主张无人值守时就自行放行、不留任何记录"
+    }
+  ]
+}

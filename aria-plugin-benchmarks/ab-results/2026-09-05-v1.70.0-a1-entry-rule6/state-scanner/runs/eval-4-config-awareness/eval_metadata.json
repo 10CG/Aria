@@ -1,0 +1,16 @@
+{
+  "eval_id": 4,
+  "eval_name": "config-awareness",
+  "prompt": "扫描项目状态，这个项目有 .aria/config.json 配置吗？",
+  "assertions": [
+    {
+      "text": "Should mention .aria/config.json or config-loader"
+    },
+    {
+      "text": "Should describe config fields like auto_proceed or confidence_threshold"
+    },
+    {
+      "text": "Should mention default values when config is absent"
+    }
+  ]
+}

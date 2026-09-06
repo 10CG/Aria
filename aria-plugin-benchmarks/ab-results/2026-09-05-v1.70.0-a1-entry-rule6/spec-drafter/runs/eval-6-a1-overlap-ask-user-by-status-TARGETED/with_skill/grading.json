@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+      "passed": true,
+      "evidence": "「按 spec-drafter 的 A.1 入口认领约定, `linked_issue_overlap` 非空时必须**按对方 claim 的 `status` 分档上呈请裁**(经 `AskUserQuestion`), 由你裁定后我才继续写 `proposal.md`。」+ 「## 三、请裁(这是 `AskUserQuestion` 该问的四组, 我不替你选)」+ 「先说结论: **四条全部命中, 我不能自行放行, 起草在这里暂停。**」+ 「裁定为 **继续原方向** ⇒ 我才进入 A.1 起草」"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+      "passed": true,
+      "evidence": "五要素表逐字给全, 无截断/缩写: 「| 1 | `oauth-login-aaaa1111` | `cA` | `2026-09-05T08:00:00Z` | `10CG/Aria#174` | `10CG/Aria#174` | `active` |」「| 2 | `social-login-bbbb2222` | `cB` | `2026-09-04T10:00:00Z` | `10CG/Aria#174` | `10CG/Aria#174` | `done` |」「| 3 | `oauth2-spike-cccc3333` | `cC` | `2026-09-03T09:00:00Z` | `10CG/Aria#174` | `10CG/Aria#174` | `abandoned` |」, 并显式声明「`claimed_at` 不截断成日期, `linked_issue` 逐字回显原串(不缩成 `#174`)。我方 `linked_issue` 原始串 = `10CG/Aria#174`」; 表头含 `owner-container` 列"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+      "passed": true,
+      "evidence": "「**四条共同的一条禁令**: 我**不会提议去 release / 清理对方任何一条 claim**(包括看起来是 GC 残留的第 2、3、4 条)—— 那是对方容器的东西, 只有它自己能释放。」(第 2 条即 `social-login-bbbb2222` 的 `done`)"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+      "passed": true,
+      "evidence": "「**第 3 条 · `oauth2-spike-cccc3333` (`cC`, `abandoned`)** … 处置同上: **按 `active` 同档请裁**, 并同样注明 `abandoned` 也可能是 GC 产物而非真的主动放弃。」(同段第 2 条亦写「**按 `active` 同档请裁**, 不因为它是终态就自动放行。要点: `done` 这个终态**也可能是 GC 产物, 而不是真的做完**」)"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+      "passed": true,
+      "evidence": "「读不懂它的 schema ⇒ **视同 `active` 处理**(存在性已确认、内容未知)。措辞上准确的说法是「已检测到 **1** 条无法解析的 claim —— 存在性已确认、内容未知, 按存在处理」, **不能**写成「无碰撞」。处置: 按 `active` 同档请裁」"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同",
+      "passed": true,
+      "evidence": "「## 二、逐条处置」下四条各自成段且处置不同: 第 1 条 active「它是本次的主要碰撞方 … 三个方向 —— 合并方向 / 换方向 / 确认确实是两件事」; 第 2 条 done「需要你去核实 cB 的产物是否真的落地(有没有 ship / 有没有 PR)」; 第 3 条 abandoned「这条对你的价值可能是**负向情报**」; 第 4 条 unknown「选项里要多一档「先去人工核实这条 claim 到底是什么」」; 请裁段亦拆成【问 1】–【问 4】四组"
+    }
+  ]
+}

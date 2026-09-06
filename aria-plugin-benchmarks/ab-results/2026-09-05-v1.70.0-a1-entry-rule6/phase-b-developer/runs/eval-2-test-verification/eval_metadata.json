@@ -1,0 +1,16 @@
+{
+  "eval_id": 2,
+  "eval_name": "test-verification",
+  "prompt": "Phase B B.3: Verify test results for completed TASK-006 (OAuth2 integration tests). Run test suite and validate all tests pass before proceeding to Phase C.",
+  "assertions": [
+    {
+      "text": "Should execute the test suite for the completed task"
+    },
+    {
+      "text": "Should report test counts and pass/fail status"
+    },
+    {
+      "text": "Should gate Phase C entry on all tests passing"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "【1】插件 aria-plugin = 1.69.1 / ✅ SOT  aria/.claude-plugin/plugin.json         1.69.1 / ✅ aria/README.md 版本行                        1.69.1  (readme collector: version_match=true) / ✅ 根 README.md Plugin badge                    1.69.1  (m6-version-badge-match)"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "全文 CHANGELOG 仅出现两次且均与日期同步无关: '✅ claude-md-changelog-free         OK (no rolling changelog; 151 lines, 13316 bytes)' 与 'Group 8 执行序 8.1 (CHANGELOG + 版本 SOT 5 文件) → 8.4 ...'; 答卷通篇没有任何 README 日期 / 最后更新日期的核对, 也未把 CHANGELOG 日期当作参照源"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "📝 文档版本一致性 (你特别要求的重点) ... 内建 readme collector 只解析出了子模块那一路 (`readme.submodules.aria`), `readme.root.version` 为 **null** —— 注意: 该区块标题不是 output-formats.md 规定的 `📝 README 同步状态`, 按语义判 pass"
+    }
+  ]
+}

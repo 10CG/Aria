@@ -1,8 +1,8 @@
 {
   "skill_name": "spec-drafter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source_evals_count": 5,
-  "selected_count": 3,
+  "selected_count": 6,
   "evals": [
     {
       "id": 1,
@@ -50,6 +50,36 @@
         "全文任何位置都没有把 `standards/openspec/changes/` 当作本次 proposal 的落点推荐 (作为反例点名说明「不该写那里」不算违反)",
         "对 (2) 给出的理由点到「standards 是共享子模块 / 项目自己的变更归项目自己」这层语义 (Aria 不可协商规则 #5), 而不是只给路径不解释",
         "proposal.md 全文头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首, 且值是 inline code span `none` (题干未给 issue 号)"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "a1-claim-derivation-and-linked-issue-TARGETED",
+      "prompt": "我要在 Aria 仓起草一份新 Spec, 走 A.1 入口认领。\n\n夹具: `~/.aria/container-id` 内容为\n```\nuuid: 1a2b3c4d\nlabel: devbox-A1-very-long-label\n```\n本 Spec 目录是 `openspec/changes/add-oauth-login/`。\n\n手上有三份候选 proposal 的 `Linked Issue` 字段值:\n- A: `10CG/Aria#174`\n- B: `none`\n- C: `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)`\n\n请只回答, 不要跑命令:\n(1) `--raw-track-id` 的实参应该是什么? 逐字写出来, 并说明每一段从哪来。\n(2) 三份 proposal 各自应不应该传 `--linked-issue`? 传的话实参是什么?\n(3) 如果我起草到一半决定放弃这个方向, 该做什么?",
+      "expected_output": "(1) `add-oauth-login-1a2b3c4d` — slug 取目录名逐字, uuid 段取 container-id 的 uuid 字段 (非 label); (2) 只有 A 传 `--linked-issue 10CG/Aria#174`, B 与 C 整个参数省略; (3) 跑 release_gate.py --raw-track-id <同一串> --status abandoned。",
+      "expectations": [
+        "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+        "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+        "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+        "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+        "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+        "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+        "不建议「先传着看看」/「传空字符串」这类变体",
+        "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "a1-overlap-ask-user-by-status-TARGETED",
+      "prompt": "A.1 入口认领跑完了, `phase1_gate.py` 的输出里 `linked_issue_overlap` 有四条, 都和我的 `linked_issue: 10CG/Aria#174` 同一个 issue:\n\n```json\n[\n  {\"track_id\":\"oauth-login-aaaa1111\",\"container\":\"cA\",\"claimed_at\":\"2026-09-05T08:00:00Z\",\"status\":\"active\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"social-login-bbbb2222\",\"container\":\"cB\",\"claimed_at\":\"2026-09-04T10:00:00Z\",\"status\":\"done\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"oauth2-spike-cccc3333\",\"container\":\"cC\",\"claimed_at\":\"2026-09-03T09:00:00Z\",\"status\":\"abandoned\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"\",\"container\":\"\",\"claimed_at\":\"\",\"status\":\"unknown\",\"linked_issue\":null}\n]\n```\n`unknown_schema_claims` 是 1。请只回答, 不要跑命令: 接下来我该怎么办? 每一条分别怎么处理?",
+      "expected_output": "起草前先经 AskUserQuestion 请裁, 不自行放行; 告警列出对方 track_id/container/claimed_at/status 与双方 linked_issue 原串; done/abandoned 按 active 同档请裁并注明可能是 GC 产物; 不提议去释放对方的 claim。",
+      "expectations": [
+        "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+        "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+        "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+        "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+        "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+        "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同"
       ]
     }
   ]

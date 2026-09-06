@@ -1,0 +1,39 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+      "passed": true,
+      "evidence": "⚠️ 检测到 Forgejo 远程 (forgejo.10cg.pub) 但缺少 CLAUDE.local.md 　…　你的 `origin` 指向 `forgejo.10cg.pub` 上的 `10CG/Aria`, 所以 `repo` 填 `10CG/Aria`。　…　用 `ARIA_FORGEJO_HOSTS` 环境变量 (逗号分隔) 或 `.aria/config.json → state_scanner.issue_scan.platform_hostnames.forgejo` 追加主机名"
+    },
+    {
+      "text": "Should check for existence of CLAUDE.local.md file",
+      "passed": true,
+      "evidence": "| 1 | **`CLAUDE.local.md` 不存在 → 无 forgejo 配置块** | ⚠️ 主要 (就是你问的这条) | `forgejo_config.config_status = \"missing\"`, `instance = \"forgejo.10cg.pub\"` |"
+    },
+    {
+      "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+      "passed": true,
+      "evidence": "检测器 (`forgejo_config.py::_has_forgejo_block`) 会**先屏蔽所有 fenced code block** 再匹配, 目的正是防止「文档里的示例 YAML」被误判成真配置。所以要写成**顶层 `forgejo:` 键**或 **`## Forgejo ...` 标题**且位于围栏之外, 才会被认成 `configured`。(检测器同时接受全角冒号 `：` 和引用前缀 `> `。)"
+    },
+    {
+      "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+      "passed": true,
+      "evidence": "机读字段: `forgejo_config = { forgejo_remote_detected: true, instance: \"forgejo.10cg.pub\", config_status: \"missing\" }` 　…　期望: `forgejo_config.config_status` 由 `\"missing\"` → `\"configured\"`, 输出变成 `✅ Forgejo 配置: 已配置 (forgejo.10cg.pub)`。若仍报 `incomplete`, 十有八九是踩了上面第 1 条"
+    },
+    {
+      "text": "Should suggest running /forgejo-sync to create configuration when missing",
+      "passed": true,
+      "evidence": "建议: 运行 /forgejo-sync 可引导创建配置 (需确认)　…　## 方式 A (推荐): 让 `/forgejo-sync` 引导创建"
+    },
+    {
+      "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+      "passed": true,
+      "evidence": "我这一步**不会替你创建文件**, 需要你确认后才动。　…　**🤔 请选择 【1】-【4】 或输入自定义组合。** 未经你确认, 我不会创建 `CLAUDE.local.md`、不动 git　…　本次是**只读状态扫描, 未进入 Phase B, 故未调用 `phase1_gate`**"
+    },
+    {
+      "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+      "passed": false,
+      "evidence": "全文唯一涉及「非 Forgejo」情形的只有: 「补充: 若你的 Forgejo 域名**不是** `forgejo.10cg.pub`, 检测器认不出来 (会退化成 `forgejo_remote_detected: false`)。」—— 这只说未知主机名会把标志位降为 false (且是作为「认不出来」的缺陷提醒给出), 没有任何一句说明「无 Forgejo 远程时跳过检测 / 该区块不输出」。无明确证据支持本断言。"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Execute Phase A. State-scanner reports: uncommitted changes in 3 files, working tree dirty. Feature: Add payment gateway integration.

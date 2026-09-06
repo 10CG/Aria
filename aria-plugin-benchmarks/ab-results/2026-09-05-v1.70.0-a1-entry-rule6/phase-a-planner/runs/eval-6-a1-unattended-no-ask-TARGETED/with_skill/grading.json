@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确 **零 `AskUserQuestion`** —— 不向不存在的人提问",
+      "passed": true,
+      "evidence": "2. **零 `AskUserQuestion`。** 无人值守下这条是硬的: 不弹窗、不等人、也不能「等超时了就当默认同意」。"
+    },
+    {
+      "text": "[承重] 改为写一条「待复议」记录, 并含 `awaiting_owner` 标记",
+      "passed": true,
+      "evidence": "3. **改为写一条「待复议」记录, 状态置 `awaiting_owner`**, 由产品负责人事后复议。 / 「待复议」记录该带哪些字段 …「- `awaiting_owner` 状态标记本身」/ 表格「| 拿不到裁决时的状态 | 会话内阻塞等答复 | 置 `awaiting_owner` 挂起 |」"
+    },
+    {
+      "text": "[承重] 判据取自 config 的 `unattended` 字段, **不得**以「AskUserQuestion 工具是否可用」做运行期推断",
+      "passed": true,
+      "evidence": "关键陷阱: 判定依据是配置, 不是运行期能力 —— 「不要用「AskUserQuestion 这会儿能不能弹出来 / 有没有人回」去反推该走哪条路。**有没有人可问是 `state_scanner.coordination.unattended` 这个配置事实**, 读的就是你贴的这份 `.aria/config.json`。」"
+    },
+    {
+      "text": "说明有人值守时 (unattended=false) 才走 AskUserQuestion 请裁",
+      "passed": true,
+      "evidence": "| 请裁通道 | `AskUserQuestion` 同步问 | **零 `AskUserQuestion`**, 写「待复议」记录 |"
+    },
+    {
+      "text": "不主张无人值守时就自行放行、不留任何记录",
+      "passed": true,
+      "evidence": "4. **在 owner 复议前不自行放行。** 不自行判定「这大概是两件事, 我继续起草吧」, 也不自行换方向。overlap 非空那条写的是「请裁, 不自行放行」; 无人值守只是把请裁从同步问答改成异步留痕, 并没有把裁量权移交给 AI。"
+    }
+  ]
+}

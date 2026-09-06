@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "✅ 子模块版本号: 一致 (plugin.json 1.69.1 == aria/README 1.69.1)  —— 另有表格行「| aria/README ↔ plugin.json | readme collector | ✅ version_match = true (1.69.1) |」与「| root README badge ↔ plugin.json | `m6-version-badge-match` | ✅ badge = 1.69.1 |」"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "全文 CHANGELOG 只出现两处且都不带日期: 「8.1 CHANGELOG + 5 文件 / 8.4 aria merge+双推+tag / 8.2 主仓 16 版本点 + gitlink bump」与检查名「`claude-md-changelog-free`」。README 同步状态区块只列版本号/badge/i18n 三项, 无日期项, 也未把 CHANGELOG 当作日期参照源。"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "### 📝 README 同步状态 —— 内含「✅ 子模块版本号: 一致」「✅ Plugin badge: 一致」「✅ i18n README: 3 份全部 current @ 1.69.1」「ℹ️ 主项目版本号: collector 未从 root README 解析到版本行 (readme.root.version = null)」"
+    }
+  ]
+}

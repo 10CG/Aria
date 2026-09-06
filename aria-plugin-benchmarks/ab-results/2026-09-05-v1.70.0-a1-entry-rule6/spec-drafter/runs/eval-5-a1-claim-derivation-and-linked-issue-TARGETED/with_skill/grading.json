@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+      "passed": true,
+      "evidence": "```\nadd-oauth-login-1a2b3c4d\n```"
+    },
+    {
+      "text": "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+      "passed": true,
+      "evidence": "**这里唯一的坑**: 夹具里同时有 `label: devbox-A1-very-long-label`。**不能取 label**。label 是装饰性的, 改一行 label 就把整条 track-id 换掉 —— 旧 claim 立刻变僵尸, 新 claim 又跟协作方对不上, 认领机制当场失效。所以只认 `uuid` 字段。"
+    },
+    {
+      "text": "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+      "passed": true,
+      "evidence": "| **A** | `` `10CG/Aria#174` `` | **传** | `--linked-issue \"10CG/Aria#174\"` | inline code span, 首元素严格是 `<org>/<repo>#<n>`, 非哨兵 |"
+    },
+    {
+      "text": "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+      "passed": true,
+      "evidence": "| **B** | `` `none` `` | **不传 —— 省略整个参数** | 无 |"
+    },
+    {
+      "text": "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+      "passed": true,
+      "evidence": "| **C** | `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)` | **不传 —— 省略整个参数** | 无 | markdown 链接形 ⇒ 判 `NO_TOKEN` |"
+    },
+    {
+      "text": "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+      "passed": true,
+      "evidence": "任何非空字符串都 truthy —— 两份毫无关系的 Spec 只要都老实写了 `none`, 传进去就会**互相命中**, 报出一个纯属虚构的碰撞。"
+    },
+    {
+      "text": "不建议「先传着看看」/「传空字符串」这类变体",
+      "passed": true,
+      "evidence": "哨兵 / `BAD_TOKEN` / `NO_TOKEN` / `NO_FIELD` 一律省略整个参数, 没有例外。"
+    },
+    {
+      "text": "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管",
+      "passed": true,
+      "evidence": "python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/release_gate.py\" \\\n  --raw-track-id \"add-oauth-login-1a2b3c4d\" \\\n  --status abandoned"
+    }
+  ]
+}

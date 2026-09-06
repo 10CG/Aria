@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "| 子模块版本号 (aria/README ↔ plugin.json) | ✅ 一致 | `readme.submodules.aria`: readme_version **1.69.1** = plugin_version **1.69.1**, `version_match: true` |  ——  以及  ——  | 主项目版本 (root VERSION 头部 ↔ 9 个派生引用点) | ✅ 一致 | custom check `main-project-version-consistency`: OK 主项目版本 **1.7.5** — 9 个引用点全部一致 |"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": true,
+      "evidence": "按 `rules/basic-rules.md §1.3` 的 `readme_date_mismatch`，日期比对的参照源是 **CHANGELOG.md 的最新条目日期**（非 wall-clock），README 侧取「最后更新: YYYY-MM-DD」"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "### 📝 README 版本一致性（本次重点）\n\n**机械结论：已被覆盖的版本维度全部一致；日期维度当前无机械覆盖，是盲区。**  (区块逐行给出 `readme.submodules.aria` / `readme.root` 两个 collector 字段的判定; 但标题不是 output-formats.md 规定的「📝 README 同步状态」)"
+    }
+  ]
+}

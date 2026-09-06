@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+      "passed": false,
+      "evidence": "全文无 `git rev-parse @{u}`、无 `rev-list --count`(仅出现一条无关的补充测量 `git rev-list --left-right --count origin/master...HEAD  →  16   13`), 亦未描述「先探测 upstream 再算 count」的先后次序; 关于 upstream 的最强表述只有: \"diverged: false | upstream 已配置 | evidence_grade: **fresh**\""
+    },
+    {
+      "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+      "passed": true,
+      "evidence": "\"当前分支: feature/a1-entry-claim-duplicate-work-guard\\n            **超前 0 / 落后 0, 与 origin/feature/a1-entry-claim-duplicate-work-guard 同步**\\n            diverged: false | upstream 已配置 | evidence_grade: **fresh**\"; 并点名字段来源 \"`sync_status.current_branch` 的比较对象恒为**本分支的 upstream**\""
+    },
+    {
+      "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+      "passed": false,
+      "evidence": "全文 0 次出现 `no_upstream`, 也未出现任何 `reason:` 降级值的说明; 只在本仓 upstream 存在的前提下写 \"upstream 已配置\" —— 无 upstream 时如何降级(而不报错)完全未涉及"
+    },
+    {
+      "text": "Should handle detached HEAD with reason: detached_head",
+      "passed": false,
+      "evidence": "只有本仓取值判定, 无 `reason` 值: \"你担心的两个降级场景都**不适用**: `git.detached_head = false` (不是游离 HEAD, 分支名可解析)\" / \"游离 HEAD: 否 (`detached_head=false`) → 分支与 upstream 均可解析\" —— `detached_head` 在此是布尔字段名且取 false, 不是 `reason: detached_head` 这一降级理由形态"
+    },
+    {
+      "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+      "passed": false,
+      "evidence": "全文无 `--is-shallow-repository`、无 `.git/shallow`、无 `--unshallow`; 仅有取值判定 \"浅克隆: 否 (`shallow=false`) → ahead/behind 为真实计算值, 不是降级占位\" —— 检测手段与旧版 git 回退路径均未出现"
+    },
+    {
+      "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+      "passed": true,
+      "evidence": "\"➤ **是否需要 `git pull`?**\\n     对 upstream 而言 **不需要** —— behind=0 且证据新鲜。规则 `branch_behind_upstream`\\n     (触发线 behind ≥ 5) **未触发**。此刻 `git pull` 会是一次 no-op。\"; 收尾复述阈值 \"branch_behind_upstream (behind 0 < 5)\""
+    }
+  ]
+}

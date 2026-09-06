@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+      "passed": true,
+      "evidence": "这一条的裁决权不在我这里: 「你退还是它退」是产品/排期取舍, 需要你或 #174 的负责人拍板。 / 第 1 条的归属 (你退 / cA 退 / 拆成两半) 是产品级取舍, 我不替你定。你给我一个方向, 我就能把 #174 的 scope 收敛成一份 proposal 再往 A.2 走 / 「6. 以上 scope 收敛之后, 再回到 A.1 定稿 proposal」(注: 未出现 `AskUserQuestion` 字面; 且仅对第 1 条上呈 ——「第 2、3、4 条不需要你拍板, 按上面处置即可」, 见 GRADER_CRITIQUE.md §1)"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+      "passed": true,
+      "evidence": "### 1. `oauth-login-aaaa1111` (cA, status=active, 2026-09-05T08:00Z) —— 真阻塞, 动手前必须先协调 / 这是唯一一条 `active` 的认领, 时间就在今天, 和你锁的是同一个 `10CG/Aria#174`。 / 第 4 条: 「空记录 (`track_id:\"\"`, `container:\"\"`, `status:\"unknown\"`, `linked_issue:null`)」以及「`linked_issue` 是 `null`, 不等于 `10CG/Aria#174`」(注: 第 2、3 条的 claimed_at 被截成 `2026-09-04` / `2026-09-03`, 且未复述 linked_issue 原串)"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+      "passed": false,
+      "evidence": "全文 0 次出现 release / acquire / 释放 claim 的说法; `done` 一节的处置是「处置: 进 A.2 之前先看它的落地成果 (已合并的 PR / 它在 #174 上的收尾说明) …… 如果发现它其实已经完整覆盖了 #174, 那正确动作是关掉 #174, 而不是再开一轮开发。」—— 既未建议释放对方 claim, 也未给出「那是对方的东西」这条边界。承重项要求可引具体文字, 此处无可引证据。(极性问题见 GRADER_CRITIQUE.md §1)"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+      "passed": false,
+      "evidence": "`abandoned` 的认领背后没有活跃工作, 不会跟你抢东西, 所以它不该拦住你。 / 标题即「### 3. `oauth2-spike-cccc3333` (cC, status=abandoned, 2026-09-03) —— 不阻塞, 当情报读, 不当障碍」—— 与「按 active 同档」相反; 全文 0 次提及 GC / 僵尸 claim。"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+      "passed": false,
+      "evidence": "### 4. 空记录 …… —— 这不是「第四个重叠」, 它是一条坏数据 / 所以现实做法是: 不让它单独阻塞你, 但要在 proposal / handoff 里**显式留一笔** —— 虽有「按 fail-closed 对待 ——「不能证明它无关」就不能当它无关」的措辞, 但结论是不按 active 阻塞, 属表面合规、用法相反。"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同",
+      "passed": true,
+      "evidence": "先说结论: 这四条不是同一类问题, 不能一把「有 overlap 就全停」, 也不能因为「反正都是同一个 issue」就整体忽略。要按 `status` 分开处理 —— 其中只有 1 条构成真正的阻塞, 1 条是坏数据, 另外 2 条是情报。"
+    }
+  ]
+}

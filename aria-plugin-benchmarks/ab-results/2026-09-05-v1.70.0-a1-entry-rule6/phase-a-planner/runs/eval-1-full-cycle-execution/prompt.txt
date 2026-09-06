@@ -1,0 +1,1 @@
+Execute Phase A for new feature: Add OAuth2 social login support (GitHub + Google). No existing spec. Run A.1 → A.2 → A.3 in sequence.

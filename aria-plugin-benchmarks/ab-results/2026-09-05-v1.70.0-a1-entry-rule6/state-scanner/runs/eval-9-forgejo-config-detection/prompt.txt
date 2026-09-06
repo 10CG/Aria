@@ -1,0 +1,1 @@
+我在一个使用 Forgejo (forgejo.10cg.pub) 作为 Git 平台的项目中工作。我还没有创建 CLAUDE.local.md 来配置 Forgejo API 访问。请扫描项目状态，告诉我是否有遗漏的配置，以及如何设置 Forgejo 集成。

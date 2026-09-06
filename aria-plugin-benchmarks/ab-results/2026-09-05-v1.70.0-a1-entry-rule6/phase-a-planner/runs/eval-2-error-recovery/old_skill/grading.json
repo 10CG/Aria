@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect and report unclean working tree state",
+      "passed": true,
+      "evidence": "state-scanner 报的「3 个文件未提交、工作树脏」不阻塞 Phase A —— A.1-A.3 只产出 `openspec/` 下的规划文档，不碰这 3 个文件。但它会在 **B.1 建分支时**变成问题：带着无关的未提交改动切分支，这些改动会跟着进新分支，最后混进本 Spec 的提交里。"
+    },
+    {
+      "text": "Should block execution or issue a clear warning",
+      "passed": true,
+      "evidence": "state-scanner 报的「3 个文件未提交、工作树脏」不阻塞 Phase A —— A.1-A.3 只产出 `openspec/` 下的规划文档，不碰这 3 个文件。但它会在 **B.1 建分支时**变成问题：带着无关的未提交改动切分支，这些改动会跟着进新分支，最后混进本 Spec 的提交里。  /  2. **那 3 个未提交文件要处置** — 告诉我是 commit、stash 还是丢弃，我再执行 B.1 建分支。"
+    },
+    {
+      "text": "Should provide steps to resolve the unclean state",
+      "passed": true,
+      "evidence": "1. 这 3 个改动属于别的工作 → 先 commit 到当前分支，或 `git stash` 挂起  2. 这 3 个改动是废弃的试验 → 确认后 `git checkout --` 丢弃"
+    }
+  ]
+}

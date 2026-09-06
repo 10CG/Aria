@@ -1,0 +1,16 @@
+A.1 入口认领跑完, `phase1_gate.py` 输出是:
+
+```json
+{"outcome":"passed","proceed":true,"error":"fetch_degraded",
+ "linked_issue_overlap":null,"linked_issue_overlap_error":"RuntimeError: ref unreadable",
+ "unknown_schema_claims":null}
+```
+
+另一次跑的输出是:
+
+```json
+{"outcome":"passed","proceed":true,"error":null,
+ "linked_issue_overlap":[],"unknown_schema_claims":3}
+```
+
+请只回答, 不要跑命令: 这两次分别该向我怎么措辞? 它们是同一个意思吗?

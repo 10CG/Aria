@@ -1,10 +1,13 @@
-version: "1.4.0"
+version: "1.5.0"
 created: "2026-03-18"
-last_modified: "2026-09-04"
+last_modified: "2026-09-05"
 skills_covered: 32
-total_eval_cases: 77
+total_eval_cases: 84
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.5.0"
+    date: "2026-09-05"
+    changes: "Spec a1-entry-claim-duplicate-work-guard Rule #6: state-scanner.json 1.6.0→1.7.0 (new eval 13 a1-heartbeat-on-entry-TARGETED, 点名行为 (d) 两臂); phase-a-planner.json 1.0.0→1.1.0 (+4 定向 fixture: 拼串与 --linked-issue 省略门 / 按 status 分档请裁 / 降级措辞 / unattended); spec-drafter.json 1.1.0→1.2.0 (+2, 直调路径同款去 Level 1 子场景); skills_covered / total_eval_cases 程序化重算 (ls ab-suite/*.json | wc -l; sum len(evals))"
   - version: "1.4.0"
     date: "2026-09-04"
     changes: "spec-drafter.json: new eval id 4 level2-proposal-location-rule5-TARGETED (A.1.4 落点路径面此前零覆盖 — Rule #6 判据表第三行的可证伪定向 fixture, 套件缺口在本批随 eval 一并闭合, 不另开 issue); skills_covered / total_eval_cases 程序化重算"
