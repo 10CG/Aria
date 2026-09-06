@@ -1,5 +1,5 @@
 # Detailed Tasks — owner-container-identity-key-and-collision-parser
-# Phase A.2 + A.3 output (task-planner v2.0), v5 after post_planning R4. Datasource: tasks.md (path A, dual-layer).
+# Phase A.2 + A.3 output (task-planner v2.0), v6 after post_planning R5. Datasource: tasks.md (path A, dual-layer).
 # Spec: openspec/changes/owner-container-identity-key-and-collision-parser/{proposal.md,tasks.md}
 # 决策单: .aria/decisions/2026-09-05-owner-container-identity-key-rulings.md
 #
@@ -13,7 +13,7 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-05"   # v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
+  updated: "2026-09-06"   # v6: post_planning R5 后备稿 (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
   ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -38,12 +38,12 @@ metadata:
     - "禁带圈数字 / 希腊字母编号 (全局规则)"
   rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 五条 baseline-failing 结构化测试, 承载任务 TASK-001 / 002 / 003 / 004 / 005 / 007 / 008, 各有改前 (aria 7dd0135) 实跑红 / 改后绿记录 (TASK-031 汇总); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑。tasks.md 不复述本条 (单一来源)"
   s2_followup:
-    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030 (接入 TASK-034 前置); 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)。回退: 激活后 S2 前提失效须 owner 裁定并记 handoff, AI 不得自行删已追加的 checkbox / TASK (归档门输入, Rule #10)"
+    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030, 并改依赖边: TASK-032 (全套回归) deps += TASK-027..030 (flip 后强制重跑), TASK-034 (merge) 经 TASK-032 传递依赖之; 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)。回退: 激活后 S2 前提失效须 owner 裁定并记 handoff, AI 不得自行删已追加的 checkbox / TASK (归档门输入, Rule #10)"
     items:
       - id_reserved: TASK-027
         parent_reserved: "6.1"
-        title: "get_container_id() flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry get_container_uuid() 同值; 同 PR 改写 lib/identity.py:126-140 注释为「label 仅展示」(撤销 TASK-018 的 S1 措辞与机械锁)"
-        verification: "SC-3 S2: label 非空时返回 uuid; 注释区间不再含「当前仍参与协调身份」"
+        title: "get_container_id() flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry get_container_uuid() 同值; 同 PR 成对撤销全部 S1 期产物: (1) lib/identity.py:126-140 注释改为「label 仅展示」(撤销 TASK-018 的 S1 措辞与机械锁); (2) TASK-008 的 test_identity_label.py S1 lock-in 断言翻转为「label 非空时 get_container_id() 返回 uuid」; (3) TASK-018 verification「S1 lock-in 仍绿」随之改为 S2 lock-in"
+        verification: "SC-3 S2: label 非空时返回 uuid (翻转后的 lock-in 断言绿, 且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; 全仓 grep 无残留「S1 lock-in」判据文本"
       - id_reserved: TASK-028
         parent_reserved: "6.2"
         title: "发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项"
@@ -358,7 +358,7 @@ tasks:
       - aria/skills/state-scanner/lib/identity.py   # :126-140 模板 / 新 accessor
     verification:
       - "TASK-008 label accessor 子句转绿; S1 lock-in 仍绿"
-      - "文件头注释为 S1 实况措辞 (label 当前仍参与协调身份, 后续改为仅展示, 建议留空); 机械锁 (两条 grep, 对 lib/identity.py:126-140 区间): 含「当前仍参与协调身份」≥1 行; 含「仅展示」的每一行同时含「后续」或「将」(即 grep -c 仅展示 == grep -c 仅展示.*(后续|将)|(后续|将).*仅展示)"
+      - "文件头注释为 S1 实况措辞 (label 当前仍参与协调身份, 后续改为仅展示, 建议留空); 机械锁 (两条 grep, 对 lib/identity.py:126-140 区间): 含「当前仍参与协调身份」≥1 行; 含「仅展示」的每一行同时含短语「后续版本」— 可执行形态: 对该区间 grep -cE 仅展示 的计数 等于 grep -cE (后续版本.*仅展示|仅展示.*后续版本) 的计数 (用 -E; 不用单字「将」, 避免同行无关「将」字假阴性, R5 qa)"
 
   - id: TASK-019
     parent: "2.8"
@@ -517,7 +517,7 @@ tasks:
       - "Rule #10 留痕: handoff 记录「该例外为 post_planning R1 rework 引入 (owner Approved 之后), 请 owner D 期复议」"
 
   # ---------------------------------------------------------------------------
-  # 组 5 — 发布 (顺序由 deps 定: 035 bump → 034 merge+tag → 036 push → 041 主仓同步面 → 033 → 039 PR → 038 回帖)
+  # 组 5 — 发布 (顺序由 deps 定: 037 fixture 公开性 (034 前置) → 035 bump → 034 merge+tag → 036 push → 041 主仓同步面 → 033 → 039 PR → 038 回帖 ‖ 042 tracker (与 038 并行, 均在 039 后))
   # ---------------------------------------------------------------------------
   - id: TASK-035
     parent: "5.2"
