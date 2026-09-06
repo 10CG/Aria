@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: B.2
 status: active
-updated-at: 2026-09-06T04:50:36Z
+updated-at: 2026-09-06T06:43:46Z
 ---
 
 # Aria — Session Handoff (2026-09-06, 会话收尾) — Rule #6 AB 跑完 36/40, 并挖出 24 条套件/评测台缺陷
@@ -59,6 +59,8 @@ updated-at: 2026-09-06T04:50:36Z
 | M4 | root `VERSION:25` standards **v2.2.3** vs `standards/openspec/project.md:3` **2.2.2** —— `version-management.md §5.1` 记了待裁但无机械检查 |
 | M5 | `.aria/config.json` 的 `coordination` 是 `state_scanner` 下**嵌套键**, 顶层读得 `None` ⇒ 静默误判「闸门未启用」 |
 | M6 | 上轮原样: Aria#192 真修 / Aria#182 类级修 / `.aria/repro/` 测试不在 gate 路径 / aria-plugin#169 (resilient_push) 未修 |
+| M7 | `constants.py:44-52` 用现在时引用**尚未 ship** 的 A.1 heartbeat 集成 (aria `master` / plugin 1.69.1 均无该段) —— 8.1 落版时裁「改条件式 vs ship 后即真」。详见 §3 第 8 条 |
+| M8 | 清 `aria/aria-plugin-benchmarks/ab-workspace/…` **6.4MB / 424 文件**未跟踪残留 (写错 cwd, 未被 gitignore 覆盖)。详见 §3 第 9 条 |
 
 ### 机械补漏 (autofill backstop)
 
@@ -76,6 +78,9 @@ updated-at: 2026-09-06T04:50:36Z
 5. **语料泄漏第三通道**: `.aria/state-snapshot.json` 的 `openspec.raw_status` **内嵌 proposal 的 Status 行**, 而读快照是 Step 0 硬性要求 ⇒ **躲不开**。
 6. **评测台并发写竞争**: `scan.py` 用 `Path.write_text` 非原子写 630KB 到固定路径, 20+ 并发臂互相截断。本次中途加隔离条款 (改写各臂 `outputs/`), 零损害 —— **下次跑之前先确认该条款在 ARM 指令里**。
 7. **单个臂能吃光全局 subagent 配额**: `phase-a-planner` eval 1 的 with 臂真跑了 post_spec 3 轮 × 5 席, **自己撞 20 上限**; old 臂 65 分钟 / 40.6 万 token。跑这条时不要并发别的。
+8. **`SWEEP_TTL` 的 24h 理据引用了尚未 ship 的机制, 而 30min 那条阈值本 doc 从没写过。** 两个阈值语义不同 (`aria/skills/state-scanner/lib/constants.py:28-58` + `lib/gc.py:341/355` 实测): `STALE_TTL` = 1800s (30min) 只标「可接管」, advisory 且下次读即可逆; `SWEEP_TTL` = 86400s (24h) 才是 `sweep_stale_active` **持久改写** `status=abandoned` 的那条, 注释明写「受害方无恢复路径」。§0 第 4 条与 §6 第 1 条都只记了 24h ⇒ **抢占风险的实际起点比死线早 23.5 小时**: 本轨 heartbeat 停在 `2026-09-05T21:40:06Z`, 自 **22:10Z** 起在别的 session 的 track board 上就已渲染 🔴「abandoned? 可接管」。
+   更麻烦的是 `constants.py:44-52` 用**现在时**为 24h 辩护 ——「the AI orchestration layer **now** refreshes on every `/state-scanner` entry via `phase1_gate.py --heartbeat-only` (see `state-scanner/SKILL.md`「Layer L A.1 heartbeat 集成」)」, 并据此宣称「frozen heartbeat」前提已消解。**三处实测**: 该 SKILL.md 段只存在于 feature 分支 `ab3dbd0`, **aria `master` 0 命中, 已安装 plugin cache 1.69.1 也没有** (全文仅 2 处 heartbeat, 均非 A.1 入口)。⇒ 对每个跑**已发布**插件的会话 —— 含 2026-09-06 06:0x 这次 `/state-scanner` —— 那前提**依然成立**, 扫描入口不会自动刷心跳。随 v1.70.0 ship 即自动变真; **8.1 落版时需 owner 裁一句: 改成条件式措辞, 还是判「ship 后即真, 不改」**。形状同 memory `delegate-verify` (注释按未来时态写成了现在时)。
+9. **AB 臂按错 cwd 把 6.4MB 工作区产物写进了 `aria` 子模块。** `aria/aria-plugin-benchmarks/ab-workspace/2026-09-05-a1-entry-rule6/skill-snapshot/`, **424 个文件**, `git status` 里是 `??` 且**未被 `.gitignore` 覆盖** —— 正确位置是仓根的 `aria-plugin-benchmarks/`。下次在 `aria` 里 `git add -A` 会把它误提交进插件仓。清理前已核: `ab-results/` 里该留的产物确实已落在主仓 `7542485`, 删这个残留不丢东西。
 
 ---
 
