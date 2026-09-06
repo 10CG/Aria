@@ -3,7 +3,7 @@ track-id: a1-entry-claim-duplicate-work-guard
 owner-container: simonfish/023236f2
 phase: B.2
 status: active
-updated-at: 2026-09-06T06:43:46Z
+updated-at: 2026-09-06T08:23:06Z
 ---
 
 # Aria — Session Handoff (2026-09-06, 会话收尾) — Rule #6 AB 跑完 36/40, 并挖出 24 条套件/评测台缺陷
@@ -137,11 +137,11 @@ updated-at: 2026-09-06T06:43:46Z
 
 | 仓 | 分支 | SHA | origin | github |
 |---|---|---|---|---|
-| Aria | `feature/a1-entry-claim-duplicate-work-guard` | `5d9b568` + 本 session 新提交 | 待推 | 待推 |
-| aria-plugin | 同名 | `ab3dbd0` + 补丁 (+16/−0) | 待推 | 待推 |
+| Aria | `feature/a1-entry-claim-duplicate-work-guard` | `4092945` | ✅ MATCH | ✅ MATCH |
+| aria-plugin | 同名 | `ab3dbd0` (分支已推; 补丁 +16/−0 仍未提交) | ✅ MATCH | ✅ MATCH |
 | aria-standards | 同名 | `bb5d375` | ✅ MATCH | ✅ MATCH |
 
-⚠️ **本 session 的改动尚未提交**: aria 的 SKILL.md 补丁 (+16/−0) · 主仓的 tasks.md/yaml 回写 · 整个 `ab-results/2026-09-05-v1.70.0-a1-entry-rule6/` 目录。**推送是外向动作, 待 owner 授权。**
+⚠️ **仍未提交 (2026-09-06 08:23Z 订正)**: 只剩 aria 的 SKILL.md 补丁 (+16/−0) —— 它属于 8.1/8.4 的落地面, 提前单独提交会让 aria feature 分支两端不一致, 故有意留在工作区。**原文记的「主仓 tasks.md/yaml 回写 + 整个 `ab-results/2026-09-05-v1.70.0-a1-entry-rule6/` 目录」已在 `7542485` 提交**, 并与 `4092945` 一并经 owner 授权双推, 逐 remote `ls-remote` 独立核验两端 MATCH。另有 `aria/aria-plugin-benchmarks/ab-workspace/…` 6.4MB 未跟踪残留待清 (§3 第 9 条)。
 
 ---
 
