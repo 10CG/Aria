@@ -64,6 +64,8 @@ terminal: MAX_ROUNDS_EXHAUSTED
 3. OSCILLATION: 否 (R3 ≠ R5)。
 4. **MAX_ROUNDS_EXHAUSTED** (round 5 == max_rounds 5) ⇒ 呈 owner 三选一。
 
+**Owner 裁定 (2026-09-06)**: 选 [2] 增加 2 轮 ⇒ max_rounds 5→7, R6/R7 对 v6/v11 (`21d4a73`) 续审; 收敛条件 R7 结论集 == R6 且全票 PASS。R6 起执笔遵守轮内工作区冻结 (finding 先记 scratchpad, 全席齐 + 聚合落盘后再 rework)。
+
 ## 五轮趋势 (供 owner 裁决)
 
 | 轮 | 对象 | C | M | 全票 PASS | Critical 性质 |
