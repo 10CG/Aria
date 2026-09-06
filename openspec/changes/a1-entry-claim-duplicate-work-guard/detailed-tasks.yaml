@@ -1072,7 +1072,7 @@ tasks:
     parent: "7.6"
     task_group: 7
     title: "套件缺口 issue: 新开 aria-plugin issue (A.1 入口认领编排行为零 eval 覆盖), 交叉引用 #117 / #127, 不归并"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-2"
     agent: tech-lead
