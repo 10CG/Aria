@@ -1,0 +1,49 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+      "passed": false,
+      "evidence": "我的推断值:\n\n```\n1a2b3c4d-add-oauth-login\n```\n（顺序与断言相反, 且自陈不确定）「分隔符到底是 `-` / `:` / `/` 中的哪一个。... 这一条我给的置信度最低。」"
+    },
+    {
+      "text": "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+      "passed": false,
+      "evidence": "肯定面: 「`1a2b3c4d` — 取自 `~/.aria/container-id` 的 **`uuid:` 字段**, 不是 `label:`。」但同答案随后自我推翻: 「**我不确定、需要你核 `--help` 的三点**: ... 要不要带 `label`。如果 track id 是给人看的, 可能是 `uuid + label + spec_id` 三段。」以及「若真是这样, 那 label 长不长根本不重要, 甚至可能期望你把 `container-id` 里的原始行原样喂进去。」—— 未对「改 label 不该换掉 track-id」作出承诺"
+    },
+    {
+      "text": "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+      "passed": false,
+      "evidence": "| C | `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)` | **传** | `10CG/Aria#174` (归一后, 不逐字) |  —— 不是只有 A 传"
+    },
+    {
+      "text": "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+      "passed": true,
+      "evidence": "| B | `none` | **不传** | 省略整个 flag | ... **「没有值」的正确表达是不传这个 flag**, 不是传一个表示空的字符串。"
+    },
+    {
+      "text": "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+      "passed": false,
+      "evidence": "**C**: 指向的是**同一个 issue**, 但形式是 markdown 链接, 不能逐字传。... 从 URL path `/10CG/Aria/issues/174` 可以无歧义还原出 owner=`10CG`、repo=`Aria`、number=`174`, 归一成 `10CG/Aria#174` 即可"
+    },
+    {
+      "text": "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+      "passed": false,
+      "evidence": "给出的理由是「把字面量字符串 `none` 传给 `--linked-issue` 会凭空造出一个假关联 —— 认领记录里会出现一个叫 `none` 的 issue, 后续任何按 issue 去 join / 去核对的动作都会被它污染。」—— 全文无「任何非空字符串都 truthy」, 也未说两份无关 Spec 都写哨兵会在 overlap 检测里互相命中"
+    },
+    {
+      "text": "不建议「先传着看看」/「传空字符串」这类变体",
+      "passed": true,
+      "evidence": "**「没有值」的正确表达是不传这个 flag**, 不是传一个表示空的字符串。 (全文无「先传着看看」或「传空字符串」这类变体建议; 唯一的不确定处置是「落地前建议用认领脚本的 `--help` 核一遍」, 属核验而非试传)"
+    },
+    {
+      "text": "[承重] (4) Level 1 命中 或 enabled==false ⇒ **零调用**, 不写 claim 也不推送",
+      "passed": true,
+      "evidence": "既然 A.1 这一步**根本不执行**, 那\"A.1 入口认领\"这个动作就不存在, `--raw-track-id` 和 `--linked-issue` 都无从谈起 —— 不是\"该传但豁免了\", 是**要认领的那个对象整个没产生**。 ... 此时 **A.1 照常走** —— Spec 还是要起草, 跳过的只是 claim 这一个动作, 不是 Phase A。 (注: enabled==false 一支有对冲措辞「认领命令要么是 no-op, 要么根本不该调」, 但结论仍落在 claim 不执行)"
+    },
+    {
+      "text": "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管",
+      "passed": false,
+      "evidence": "**显式释放认领, 不要让它悬着** [推断] ... 具体动作应该是同一个认领命令的 release 动作 (`--release` 之类) 或删掉它写下的 claim 记录; **不要靠\"反正会过期\"** —— 行为方向对, 但机制未钉到 `release_gate.py --raw-track-id`, 且并列了「删掉 claim 记录」这一非等价替代 (不置终态)"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "✅ aria 子模块: plugin.json 1.69.1 == aria/README 1.69.1 (version_match=true) / ✅ 主仓 README badge: Plugin-v1.69.1, 与 plugin.json 一致"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": true,
+      "evidence": "我另做的实读复核 (发布同步面 aria 子模块 5 文件), 也全部 1.69.1: plugin.json / marketplace.json / VERSION / README.md (Version: 1.69.1, Released 2026-09-04) / CHANGELOG.md 首个条目 [1.69.1] - 2026-09-04 —— README 的 Released 日期与 CHANGELOG 首条目日期成对给出并核为相同, 但答卷从未把 CHANGELOG 标为日期的『来源/权威』, 判定取『两日期成对比对即算 date sync』这一标尺 (见 GRADER_CRITIQUE.md 边界说明)"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "📝 文档版本一致性 (你特别关注的部分) ... [B] 主仓 README 的\"版本\"字段, 机械上是\"没有输入\", 不是\"通过\" / snapshot `readme.root.version = null` —— 注意: 该区块标题不是 output-formats.md 规定的 `📝 README 同步状态`, 按语义 (专设区块报告 README 同步状态) 判 pass"
+    }
+  ]
+}

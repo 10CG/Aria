@@ -1,0 +1,64 @@
+{
+  "expectations": [
+    {
+      "text": "Should output multi_remote section with per-remote sync status, not a single combined status",
+      "passed": true,
+      "evidence": "| 仓 | 当前分支 | local | origin (Forgejo) | github (GitHub) | 判定 |  ...  | 主仓 `.` | `feature/a1-entry-claim-duplicate-work-guard` | `5d9b568` | `5d9b568` | `5d9b568` | 两端 equal | —— 逐 remote 分列; 另有独立区块 \"🌐 多远程一致性\" 逐仓复述"
+    },
+    {
+      "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
+      "passed": true,
+      "evidence": "| `aria` (= aria-plugin) | 同名分支 | `ab3dbd0` | `ab3dbd0` | `ab3dbd0` | 两端 equal |  /  | `aria-orchestrator` | `feature/m6-cost-model-telemetry` | `92acce5` | `92acce5` | — | origin equal; **github = unknown** | —— 主仓 + 三个子模块 × (origin, github) 全枚举"
+    },
+    {
+      "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
+      "passed": false,
+      "evidence": "**落后 (behind) 的 remote: 0 个。** `overall_parity = true`, `has_pending_push = false`, `has_unreachable_remote = false`。 —— 用 behind 口径报 0 (在本夹具下事实正确), 但未出现 `ahead_count` 字段, 也无任何漂移可量化"
+    },
+    {
+      "text": "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced",
+      "passed": true,
+      "evidence": "唯一非 equal 的一格: `aria-orchestrator` 在 **github** 上 `parity = unknown`, `reason = no_local_tracking_ref`, `evidence_grade = fresh`。 —— 未给单一 up-to-date 结论, origin 与 github 逐格分列"
+    },
+    {
+      "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire — the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
+      "passed": false,
+      "evidence": "全文 0 次出现 `multi_remote_drift` / `1.35` / drift / 漂移; 最接近的是 \"按判据这属于 benign unknown, 不阻断 `overall_parity`, 我也不会据此给你方向性的 pull/push 建议。\" —— 说明了不给方向性建议的理由, 但未就 drift 规则是否触发作出判断 (亦未错误声称触发)"
+    },
+    {
+      "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
+      "passed": true,
+      "evidence": "git -C aria push github <branch>             # 子模块补推 (aria-plugin)  以及  git -C aria-orchestrator push -u github feature/m6-cost-model-telemetry —— per-remote / per-path 补推形态齐备, 但 branch 位是占位符而非字面 master"
+    },
+    {
+      "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+      "passed": false,
+      "evidence": "全文未出现 `parity: ahead` 这一档, 也未讨论 `overall_parity: true` 与 `has_pending_push: true` 并存的判读; 最接近的只有 \"`overall_parity = true`, `has_pending_push = false`\" 的事实陈述"
+    },
+    {
+      "text": "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+      "passed": true,
+      "evidence": "按判据这属于 benign unknown, 不阻断 `overall_parity` + 像上面 aria-orchestrator 那种 benign unknown 是不会把它翻成 false 的 (schema worked example: `origin=equal, github=unknown` → `true`) —— 按 reason/evidence_grade 三元组把 unknown 分档为 benign, 而非一刀切排除; 但未点名 blocking_unknown 的 fail-CLOSED 那一半"
+    },
+    {
+      "text": "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+      "passed": false,
+      "evidence": "最接近的是 \"证据等级全是 `fresh`, 所以下面的 parity 结论是本轮验证过的, 不是陈旧缓存\" —— 只陈述本轮证据新鲜, 未提出 `overall_parity: true` 需要\"至少一个 enforced remote 同时 equal + fresh\"的正证据门槛, 全文也未出现 enforced remote 概念"
+    },
+    {
+      "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+      "passed": true,
+      "evidence": "`overall_parity = true`, `has_pending_push = false`, `has_unreachable_remote = false`。 —— 未据此发任何 drift 告警 (夹具 has_unreachable_remote=false, 该前件未成立)"
+    },
+    {
+      "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+      "passed": true,
+      "evidence": "主仓随后 bump gitlink 就会产生 orphaned gitlink, GitHub `clone --recursive` 断裂。 (另: \"主仓已发布 commit 引用的子模块 gitlink 在两个远程上都可达, 从 github `clone --recursive` 不会断\")"
+    },
+    {
+      "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) — NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion.",
+      "passed": false,
+      "evidence": "全文未提及 multi_remote_drift 及其 dispatch 路由; gitlink 因果只以 CLAUDE.md 硬约束叙事出现 (\"主仓随后 bump gitlink 就会产生 orphaned gitlink, GitHub `clone --recursive` 断裂\"), 未接到规则路由与对应 `git -C <submodule> push <remote> <branch>` 修复命令上 (亦未自述为 not yet wired 的缺口)"
+    }
+  ]
+}

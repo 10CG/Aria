@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "simple-feature-branch-creation",
+  "prompt": "创建 feature 分支: module=backend, task_id=TASK-001, description=user-auth",
+  "assertions": [
+    {
+      "text": "Should generate correct branch name format"
+    },
+    {
+      "text": "Should indicate Branch mode was selected"
+    }
+  ]
+}

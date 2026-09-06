@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "✅ 子模块版本号: 一致 — aria/.claude-plugin/plugin.json = 1.69.1, aria/README = 1.69.1 (version_match=true)\n✅ 根 README Plugin badge: 一致 — badge=1.69.1, 与 plugin.json SOT 相同\n✅ 主项目版本: VERSION = 1.7.5, 9 个引用点 (含 root README badge / 架构文档等) 全部一致"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": true,
+      "evidence": "output-formats 定义的 README 日期检查, 其**期望值来源是 CHANGELOG.md 顶部条目的日期**\n   (格式: `期望: <date> (来源: CHANGELOG.md)` vs README 的「最后更新」)。 …… 建议: 在 .aria/state-checks.yaml 加一条检查, 以 aria/CHANGELOG.md 最新条目日期为期望源,\n   比对 aria/README.md 与根 README.md 的「最后更新 / Last Updated」。"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "### 📝 README / 文档版本一致性 (你点名关心的部分)\n\n**结论: 已被机械覆盖的版本维度全部一致, 但「日期」维度目前没有任何机械覆盖。**"
+    }
+  ]
+}

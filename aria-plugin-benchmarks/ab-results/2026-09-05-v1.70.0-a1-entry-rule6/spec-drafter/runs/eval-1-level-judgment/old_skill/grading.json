@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Should judge as Level 1 (Skip) for trivial fix",
+      "passed": true,
+      "evidence": "判断结果: **Level 1 (Skip)** —— 不需要写 Spec。"
+    },
+    {
+      "text": "Should explain why Level 1 was chosen",
+      "passed": true,
+      "evidence": "## 判断依据\n\n按 LEVEL_GUIDE 的决策流程走一遍：\n\n**Q1 是否简单修复/配置/文档格式？→ YES**，直接落到 Level 1，不再进入 Q2。 […] 综合评分落在 `score < 3` 区间 → Level 1。"
+    }
+  ]
+}

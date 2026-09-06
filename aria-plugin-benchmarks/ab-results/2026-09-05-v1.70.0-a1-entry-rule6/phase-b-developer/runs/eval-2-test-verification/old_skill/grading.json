@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should execute the test suite for the completed task",
+      "passed": false,
+      "evidence": "「所以 **B.2 现在无法真正执行**。我不会拿「跑了别的测试套件、全绿」去顶 TASK-006 的验证 —— 那是假绿」/「⛔ B.2 阻塞   → 仓内找不到 TASK-006 / OAuth2 的实现与测试」—— 全文只给「B.2 — test-verifier 执行计划」, 无任何实跑命令输出。"
+    },
+    {
+      "text": "Should report test counts and pass/fail status",
+      "passed": false,
+      "evidence": "「tests: NOT RUN (未验证, 不等于通过)」/「  test_results:\n    passed: null          # 未跑; 不填 true\n    coverage: null\n    tests_run: 0」—— 无任何实测计数与 pass/fail 结果, 只有占位 null/0。"
+    },
+    {
+      "text": "Should gate Phase C entry on all tests passing",
+      "passed": true,
+      "evidence": "「三项阻塞项任一不过，不进 Phase C。」/「按 skill 的 `on_test_failure`：**stop**，不继续往 Phase C 走。」/「ready_for: ✗ 尚不可进入 Phase C」"
+    }
+  ]
+}

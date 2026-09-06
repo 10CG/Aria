@@ -1,0 +1,49 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+      "passed": true,
+      "evidence": "逐字就是:\n\n```\nadd-oauth-login-1a2b3c4d\n```\n\n拼法是 `<spec-slug>-<container_uuid>` ... | `<spec-slug>` | `add-oauth-login` | 本 Spec 目录名 `openspec/changes/add-oauth-login/` 的**逐字**目录名 ... | `<container_uuid>` | `1a2b3c4d` | `~/.aria/container-id` 里的 **`uuid` 字段** |"
+    },
+    {
+      "text": "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+      "passed": true,
+      "evidence": "关键一点: uuid 段取的是 `uuid: 1a2b3c4d`, **不是 `label: devbox-A1-very-long-label`**。label 是装饰性的, 改一行 label 不该把 track-id 换掉 —— 一旦跟着 label 走, 同一个容器同一件事在改完 label 后就变成了「另一个人在做另一件事」, 认领机制当场失效。"
+    },
+    {
+      "text": "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+      "passed": true,
+      "evidence": "| A | `10CG/Aria#174` | ✅ 传 | `--linked-issue \"10CG/Aria#174\"` | 首个 code span 的第一个元素形如 `<org>/<repo>#<n>`, 三段齐全 ... 且不是哨兵 | ... （`--linked-issue` 那行是否出现, 见【2】; 三份候选里只有 A 会让它出现。）"
+    },
+    {
+      "text": "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+      "passed": true,
+      "evidence": "| B | `none` | ❌ **整个参数省略** | 无 | `none` 是**哨兵**, 不是值 | ... **哨兵绝不能当值传。** `none` / `BAD_TOKEN` / `NO_TOKEN` / `NO_FIELD` 一律是「省略整个参数」, 不是「传个 `none` 进去」。"
+    },
+    {
+      "text": "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+      "passed": true,
+      "evidence": "| C | `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)` | ❌ **整个参数省略** | 无 | 这是 markdown 链接, 不是 code span; 就算退一步只看链接文本 `#174`, 它也缺 `<org>/<repo>` 两段, 不满足形状 | ... 正确处置是**省略参数**"
+    },
+    {
+      "text": "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+      "passed": true,
+      "evidence": "理由很硬: 任何非空字符串都 truthy, 两份**毫无关系**的 Spec 只要都在字段里写了 `none`, 就会在 overlap 检测里互相命中 —— 你会得到一个纯粹凭空造出来的碰撞, 然后为它去请裁。"
+    },
+    {
+      "text": "不建议「先传着看看」/「传空字符串」这类变体",
+      "passed": true,
+      "evidence": "`none` / `BAD_TOKEN` / `NO_TOKEN` / `NO_FIELD` 一律是「省略整个参数」, 不是「传个 `none` 进去」。 ... **省略参数 ≠ 不认领。** B 和 C 这两份照样要跑 `phase1_gate.py` 做 claim, 只是那次调用里没有 `--linked-issue` 这一行。 (全文无「先传着看看」「传空字符串」这类变体建议)"
+    },
+    {
+      "text": "[承重] (4) Level 1 命中 或 enabled==false ⇒ **零调用**, 不写 claim 也不推送",
+      "passed": true,
+      "evidence": "这两种情况都落在 skip 三条里, 处置一样: **整个 claim 块零调用**。 ... `skip_if: complexity: Level1` 命中 ⇒ 零调用。理由很实际: 否则每个 typo 修复都要写一条永不 release 的僵尸 claim, 外加一次外向 push。 ... 注意 **零调用是彻底的**: 不 acquire, 因此也**不需要** release —— 压根没有 claim 存在"
+    },
+    {
+      "text": "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管",
+      "passed": true,
+      "evidence": "跑 release, 显式置终态 `abandoned`:\n\n```bash\npython3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/release_gate.py\" \\\n  --raw-track-id \"add-oauth-login-1a2b3c4d\" \\\n  --status abandoned\n```\n ... **这是硬性退出义务, 不是可选的收尾礼貌。** 不 release 就留下一条永不释放的僵尸 claim"
+    }
+  ]
+}

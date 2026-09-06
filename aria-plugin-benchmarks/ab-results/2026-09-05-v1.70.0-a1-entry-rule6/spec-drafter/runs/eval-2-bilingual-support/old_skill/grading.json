@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Should correctly parse mixed Chinese/English input",
+      "passed": true,
+      "evidence": "answer.md 第 1 行: 「先说明我怎么读这条输入: `Add a dark mode feature / 添加深色模式功能` 是**同一个需求的中英两种表述**, 不是两件事, 所以只起一份 Spec; 按你的指示, proposal 正文全部用英文, 我这边的说明用中文。」 且 Level 表内逐语言列出: 「`add` / `feature` / `添加` / `功能` → 功能开发词」"
+    },
+    {
+      "text": "Should generate proposal content in English as requested",
+      "passed": true,
+      "evidence": "outputs/proposal.md 全文英文, 首行「# Dark Mode」, 正文如「The product currently ships a light theme only, so users who set their operating system to dark appearance get a bright, out-of-place UI.」与「Add a user-selectable dark theme with three modes — Light / Dark / Follow system — backed by a semantic color token layer so components stop hard-coding colors.」; 小节标题均为英文"
+    },
+    {
+      "text": "Should preserve the feature intent from both language inputs",
+      "passed": true,
+      "evidence": "proposal 交付面直接对应「Add a dark mode feature / 添加深色模式功能」: 「Add a user-selectable dark theme with three modes — Light / Dark / Follow system」、「Design the dark palette against the same token roles」; answer.md 并声明两种表述「不是两件事, 所以只起一份 Spec」, 无一侧意图被丢弃"
+    },
+    {
+      "text": "Generated proposal header blockquote contains a line starting exactly with `> **Linked Issue**:` (canonical English spelling; `关联 Issue` alias, `Related Issue`, or omitting the line fails)",
+      "passed": true,
+      "evidence": "outputs/proposal.md:6 逐字 (cat -A 验过无尾随字符): 「> **Linked Issue**: `none`」—— 位于头部 blockquote 内, 紧接「> **Created**: 2026-09-05」之后; 未出现 `关联 Issue` / `Related Issue` 变体"
+    },
+    {
+      "text": "Since the prompt names no tracking issue, the Linked Issue value is exactly `none` inside an inline code span (a left-in placeholder such as `{<org>/<repo>#<n>}`, an empty value, `N/A`, or a markdown link fails)",
+      "passed": true,
+      "evidence": "outputs/proposal.md:6 值为 inline code span 内的 `none`: 「> **Linked Issue**: `none`」; answer.md 「待你确认的三件事」第 1 条说明「**Linked Issue**: 我暂填哨兵 `none` (Level 2 头部必填, 不能留空也不能删行)。如果已有 issue, 给我编号, 我按 `` `<org>/<repo>#<n>` `` 形式改写」"
+    }
+  ]
+}

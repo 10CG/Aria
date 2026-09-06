@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "Should judge as Level 1 (Skip) for trivial fix",
+      "passed": true,
+      "evidence": "判定结果: **Level 1 (Skip) —— 不需要 Spec**。"
+    },
+    {
+      "text": "Should explain why Level 1 was chosen",
+      "passed": true,
+      "evidence": "## 为什么是 Level 1\n\n按 `LEVEL_GUIDE.md` 的判断链逐项过一遍:\n\n**1. 决策流程图 Q1 —— 「是否简单修复/配置/文档格式?」= YES**\n命中即落 Level 1，不再往下走 Q2 (架构/跨模块/Breaking)。 […] **5. 综合评分**\n关键词 (40%) 落最低档、影响范围 (30%) 单文件、变更类型 (20%) 非破坏性、历史模式 (10%) 与 \"Fix typo in README\" 同型 ⇒ `score < 3` ⇒ Level 1。"
+    }
+  ]
+}

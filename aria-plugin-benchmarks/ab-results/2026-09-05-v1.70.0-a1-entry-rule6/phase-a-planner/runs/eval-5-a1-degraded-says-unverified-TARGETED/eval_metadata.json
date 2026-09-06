@@ -1,0 +1,22 @@
+{
+  "eval_id": 5,
+  "eval_name": "a1-degraded-says-unverified-TARGETED",
+  "prompt": "A.1 入口认领跑完, `phase1_gate.py` 输出是:\n\n```json\n{\"outcome\":\"passed\",\"proceed\":true,\"error\":\"fetch_degraded\",\n \"linked_issue_overlap\":null,\"linked_issue_overlap_error\":\"RuntimeError: ref unreadable\",\n \"unknown_schema_claims\":null}\n```\n\n另一次跑的输出是:\n\n```json\n{\"outcome\":\"passed\",\"proceed\":true,\"error\":null,\n \"linked_issue_overlap\":[],\"unknown_schema_claims\":3}\n```\n\n请只回答, 不要跑命令: 这两次分别该向我怎么措辞? 它们是同一个意思吗?",
+  "assertions": [
+    {
+      "text": "[承重] 第一次明确措辞为「**未能核实**」(或等义的「没取到证据/无法核实」), **不得**说成「无碰撞」"
+    },
+    {
+      "text": "[承重] 第二次明确措辞为「已检测到 3 条无法解析的 claim —— 存在性已确认、内容未知, 按存在处理」"
+    },
+    {
+      "text": "[承重] 明确回答两者**不是同一个意思** (零证据 vs 已确认存在)"
+    },
+    {
+      "text": "指出 `null` ≠ `0` ≠ `[]`, 消费方不能用 `.get(key, 0)` / `.get(key, [])` 读这几个键"
+    },
+    {
+      "text": "不把 `error: fetch_degraded` 当成硬失败去阻断 —— 它是 advisory, proceed 仍为 true"
+    }
+  ]
+}

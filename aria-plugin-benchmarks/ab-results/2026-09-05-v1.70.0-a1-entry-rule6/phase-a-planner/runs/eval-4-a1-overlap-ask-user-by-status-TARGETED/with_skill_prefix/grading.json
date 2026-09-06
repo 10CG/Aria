@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+      "passed": true,
+      "evidence": "所以: overlap 非空 ⇒ 我**不能自行放行**继续起草。四条要**按对方 claim 的 `status` 分档请你裁决**, 一条都不能自己吞掉。 / 在你裁定之前我不动 Spec。 / 「## 我要请你裁的问题 …… 请你选: 1. **合并方向** …… 2. **我换方向** …… 3. **确认确实是两件事** …… 4. **先查证再定**」 (注: 全文未出现 `AskUserQuestion` 字面; 判 pass 依据的是「起草前请人裁 + 给出封闭选项集」这一行为, 见 GRADER_CRITIQUE.md §1)"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+      "passed": false,
+      "evidence": "**1. `oauth-login-aaaa1111` (容器 cA, 2026-09-05T08:00:00Z, status `active`)** —— track_id / container / claimed_at / status 四项齐全, 但 linked_issue **未给原串**: 全文 0 次出现 `10CG/Aria#174`, 只写「有人**正在做**同一个 issue #174」与「就断定它跟 #174 无关」。`#174` 是缩写形式, 属「大意接近」, 按承重标尺不算。(另: 第 2、3 条的 claimed_at 亦被截成 `2026-09-04` / `2026-09-03`。)"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+      "passed": true,
+      "evidence": "对第 2、3 条再强调一条边界: **我不会提议去 release 掉 cB / cC 的 claim** —— 那是对方容器的东西, 不归我处置, 哪怕它看起来像僵尸。"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+      "passed": true,
+      "evidence": "同样是终态, 同样按 `active` 同档请裁: 同一件事**可能已被放弃**。…… 同样提醒: `abandoned` 也可能只是 GC 扫出来的僵尸 claim, 不等于真有人主动放弃过。"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+      "passed": true,
+      "evidence": "这就是那条 schema 读不懂的 claim。规则是 **视同 `active` 处理** —— 存在性已确认、内容未知。特别注意: 不能因为它的 `linked_issue` 是 `null` 就断定它跟 #174 无关; 字段读不出来正是「内容未知」的表现, 不是「无关」的证据。所以它也进请裁, 按 `active` 那一档。"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同",
+      "passed": true,
+      "evidence": "「## 逐条处置」下四条各起一节 (`oauth-login-aaaa1111` / `social-login-bbbb2222` / `oauth2-spike-cccc3333` / 空记录), 且分档: 「针对上面四条 (第 1、4 条按「有人正在做」, 第 2、3 条按「可能已做完 / 已放弃, 但也可能是 GC 产物」)」"
+    }
+  ]
+}

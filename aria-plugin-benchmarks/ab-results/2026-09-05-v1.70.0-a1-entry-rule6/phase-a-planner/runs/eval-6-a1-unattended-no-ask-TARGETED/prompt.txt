@@ -1,0 +1,8 @@
+我在 aria-runner 容器里无人值守地跑 A.1。容器镜像内的 `.aria/config.json` 有:
+
+```json
+{"state_scanner": {"coordination": {"enabled": true, "mode": "advisory", "unattended": true}}}
+```
+
+A.1 认领后 `linked_issue_overlap` 非空 (另一个容器在做同一个 issue)。
+请只回答, 不要跑命令: 这种情况下该怎么处理? 和有人值守时有什么不同?

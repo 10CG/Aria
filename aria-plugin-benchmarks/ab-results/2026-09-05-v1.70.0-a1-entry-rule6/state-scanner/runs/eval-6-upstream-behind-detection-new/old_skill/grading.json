@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+      "passed": false,
+      "evidence": "全文 0 次出现 `git rev-parse`、`@{u}`、`rev-list`; 只给了结果字段 \"upstream_configured: true | reason: null | diverged: false\" —— 未点名探测命令, 也未说明它先于 count 计算"
+    },
+    {
+      "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+      "passed": true,
+      "evidence": "\"| `feature/a1-entry-claim-duplicate-work-guard` vs `origin/feature/a1-entry-claim-duplicate-work-guard` | ahead 0 / **behind 0** (`evidence_grade: fresh`) | snapshot `sync_status.current_branch` |\""
+    },
+    {
+      "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+      "passed": true,
+      "evidence": "\"| 无 upstream | `upstream: null`，`reason: \\\"no_upstream\\\"` | 提示 `git branch --set-upstream-to=...` |\"; 并明写不报错而是 fail-soft: \"这两个场景 state-scanner 是**显式处理**的（fail-soft，绝不假装算出了数）\" / \"这三种情况下 behind 一律置 `null` 并带 `reason`，**不会**因为算不出来就报\\\"已同步\\\"\""
+    },
+    {
+      "text": "Should handle detached HEAD with reason: detached_head",
+      "passed": true,
+      "evidence": "\"| detached HEAD | `current_branch.name: null`，`ahead/behind: null`，`reason: \\\"detached_head\\\"` | \\\"upstream 未配置，无法计算 ahead/behind\\\" |\"; 本仓取值另有 \"`git.detached_head: false`，`sync_status.current_branch.name` 有值 ⇒ 不是 detached HEAD\""
+    },
+    {
+      "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+      "passed": false,
+      "evidence": "有降级语义但**无检测手段**: \"| 浅克隆 | `shallow: true`，`ahead/behind: null`（**覆盖**已算出的值），`reason: \\\"shallow_clone\\\"` | \\\"浅克隆 — 无法计算落后数；如需完整历史 `git fetch --unshallow`\\\" |\" —— 全文 0 次出现 `--is-shallow-repository`, 0 次出现 `.git/shallow`, 断言要求的 AND 两支都缺"
+    },
+    {
+      "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+      "passed": true,
+      "evidence": "\"> `branch_behind_upstream` (1.98) **未命中** —— 它的判据是 `current_branch.behind >= 5`，而那个字段比的是同名 upstream（behind 0）\"; 对应地正面回答了是否 pull: \"**2. 需要 `git pull` 吗？→ 需要同步，但不要用 `git pull`。**\" 并解释 upstream 侧 behind=0 时 pull 是 no-op"
+    }
+  ]
+}

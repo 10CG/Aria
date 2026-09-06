@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+      "passed": true,
+      "evidence": "先给结论: **四条全部要请你裁定, 一条都不能由我自行放行**, 包括那两条已经是终态 (`done` / `abandoned`) 的。在你裁定之前, A.1 的起草我先停住 —— 认领的意义就是「早于投入」, 现在正是它该起作用的时刻。 / 章节标题: \"## 3. 请你裁定 (经 AskUserQuestion, 我不自行放行)\" / 并给出四个待裁选项 (合并方向 / 换方向 / 确认是两件事 / 先核实再定); 另注明 unattended 分支: \"若 `state_scanner.coordination.unattended == true`, 我就不发问, 改为写一条「待复议」记录并置 `awaiting_owner`\"。"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+      "passed": true,
+      "evidence": "表头 \"| # | 对方 track_id | owner-container | claimed_at | 对方 linked_issue 原串 | status |\" 下逐条回显, 例如 \"| 1 | `oauth-login-aaaa1111` | `cA` | `2026-09-05T08:00:00Z` | `10CG/Aria#174` | `active` |\"、\"| 2 | `social-login-bbbb2222` | `cB` | `2026-09-04T10:00:00Z` | `10CG/Aria#174` | `done` |\"、\"| 3 | `oauth2-spike-cccc3333` | `cC` | `2026-09-03T09:00:00Z` | `10CG/Aria#174` | `abandoned` |\"; 并显式声明 \"我方 `linked_issue` 原串: `10CG/Aria#174`\" 与 \"所以我不把它缩写成 `#174`, `claimed_at` 也保留完整时间戳不截断成日期\"。第 4 条三字段在输入里本就是空串, 答案如实标 \"(空)\" 且注 \"第 4 条的 `linked_issue` 字段是 `null`, 无从回显, 这正是它「内容未知」的表现\"。"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+      "passed": true,
+      "evidence": "- **不会去释放对方任何一条 claim**, 包括那两条终态的 —— 那是对方的东西, 哪怕它看起来像僵尸也一样。要清理只能由它的 owner-container 或你来决定。 (「那两条终态的」逐字覆盖第 2 条 `done`; 且第 5 节把 release 的适用面限定为 \"释放**我自己**这条\")"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+      "passed": true,
+      "evidence": "**第 3 条 `oauth2-spike-cccc3333` (cC, `abandoned`)** —— 同一件事**可能已被放弃**。处置同第 2 条: 按 `active` 同档请裁, 且 `abandoned` 同样可能是 GC 产物而非真的放弃。"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+      "passed": true,
+      "evidence": "**第 4 条 (空 track_id, `unknown`)** —— 读不懂它的 schema, **视同 `active` 处理**。存在性已经确认, 只是内容未知; 我不会因为字段读不出来就把它当作不存在。它对应的就是 `unknown_schema_claims == 1` 这一条。"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同",
+      "passed": true,
+      "evidence": "\"## 2. 逐条处置\" 下四条各自成段且处置不同: 第 1 条 `active` \"请裁三选一: 合并方向 (我并入 cA 的轨, 或反过来) / 我换方向 / 确认确实是两件事\"; 第 2 条 `done` \"按 `active` 同档请裁, 不因为它是终态就默认「不冲突, 继续做我的」……也不能反过来默认「已经有人做完了, 我不用做」\"; 第 3 条 `abandoned` \"它的 slug 带 `spike` 字样, 看起来像探路, 若它留下过结论, 直接影响我该不该重走一遍\"; 第 4 条 `unknown` \"视同 `active` 处理\"。"
+    }
+  ]
+}

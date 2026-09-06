@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect and report unclean working tree state",
+      "passed": true,
+      "evidence": "实测 (`git status --porcelain` + `git submodule status`): [...] git diff --stat: 3 files changed, 3 insertions(+), 3 deletions(-) / 结论: 这 3 个「文件」全是**子模块 gitlink 指针**, 与 payment gateway **无关**, 且分别是三条 in-flight track 的在制品。所以:"
+    },
+    {
+      "text": "Should block execution or issue a clear warning",
+      "passed": true,
+      "evidence": "2. C.1 提交 Spec 时若用 `git add -A`, 这 3 个无关变更会被一起扫进 Spec commit。  /  - 【2】**不要 stash / 不要 checkout 丢弃**。子模块指针的 stash/丢弃会让工作区静默指到别的 SHA, 事后极难发现; 正确处置是原地不动 + 提交时用带路径的 scoped add。"
+    },
+    {
+      "text": "Should provide steps to resolve the unclean state",
+      "passed": true,
+      "evidence": "- 【3】提交 Spec 时禁用 `git add -A`, 只 add `openspec/changes/<slug>/`; 收尾必须跑一次**不带路径**的 `git status` 核验, 确认没有把 gitlink 顺手带上去 (gitlink 误 bump 会造成主仓指针悬空)。  /  顺带一个可选项: 那 3 个 gitlink 改动是三条 in-flight track 的在制品, 要不要我先把它们的归属理一遍 (哪条该先落地、哪条该留着), 再进 payment gateway 的 Phase A? 不理也不影响 Phase A, 只影响后面提交时的干净度。"
+    }
+  ]
+}

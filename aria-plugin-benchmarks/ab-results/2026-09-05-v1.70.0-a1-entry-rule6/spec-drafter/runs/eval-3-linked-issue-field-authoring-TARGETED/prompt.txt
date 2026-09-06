@@ -1,0 +1,1 @@
+请用 spec-drafter 为一个小功能新建一份 Level 2 proposal: 「给 state-scanner 的 🎫 Open Issues 区块加一个按 label 过滤的可选参数」。这个功能没有关联的 issue (已核实)。只在回答里输出 proposal.md 全文, 不要写入仓库, 不要运行 git 或任何脚本。

@@ -1,0 +1,1 @@
+复现 2026-04-12 发版事件: aria 子模块在 Forgejo 合并 PR 成功, 本地 master 已同步 Forgejo, 但 GitHub mirror 未推送。state-scanner 扫描时应检测到 GitHub remote 落后, 而非因 'Everything up-to-date' 静默通过。请扫描并告诉我哪些 remote 需要补推。

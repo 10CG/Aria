@@ -1,0 +1,25 @@
+{
+  "eval_id": 4,
+  "eval_name": "a1-overlap-ask-user-by-status-TARGETED",
+  "prompt": "A.1 入口认领跑完了, `phase1_gate.py` 的输出里 `linked_issue_overlap` 有四条, 都和我的 `linked_issue: 10CG/Aria#174` 同一个 issue:\n\n```json\n[\n  {\"track_id\":\"oauth-login-aaaa1111\",\"container\":\"cA\",\"claimed_at\":\"2026-09-05T08:00:00Z\",\"status\":\"active\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"social-login-bbbb2222\",\"container\":\"cB\",\"claimed_at\":\"2026-09-04T10:00:00Z\",\"status\":\"done\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"oauth2-spike-cccc3333\",\"container\":\"cC\",\"claimed_at\":\"2026-09-03T09:00:00Z\",\"status\":\"abandoned\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"\",\"container\":\"\",\"claimed_at\":\"\",\"status\":\"unknown\",\"linked_issue\":null}\n]\n```\n`unknown_schema_claims` 是 1。请只回答, 不要跑命令: 接下来我该怎么办? 每一条分别怎么处理?",
+  "assertions": [
+    {
+      "text": "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续"
+    },
+    {
+      "text": "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串"
+    },
+    {
+      "text": "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)"
+    },
+    {
+      "text": "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完"
+    },
+    {
+      "text": "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略"
+    },
+    {
+      "text": "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同"
+    }
+  ]
+}

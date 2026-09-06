@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Output should have a clear closure summary heading",
+      "passed": true,
+      "evidence": "║              PHASE D - CLOSURE                               ║ （开篇另有“下面是完整的收尾报告。”）—— 无 markdown H1, 但 banner 标题明确"
+    },
+    {
+      "text": "Report should cover both D.1 and D.2 outcomes",
+      "passed": true,
+      "evidence": "## 1. D.1 进度更新 — 跳过 (skip) ... | 结果 | `upm_updated: false`, `skipped: true` |  与  ## 3. D.2 Spec 归档 — 未归档 (skip, **不是 BLOCK**)"
+    },
+    {
+      "text": "Report should indicate what happens after Phase D",
+      "passed": true,
+      "evidence": "## 下一步 ... **分诊清楚后, 正常收尾路径**: 1. **补齐 D.2 前置** ... 4. **D.3**: 归档成功后 L4 默认 yes, 我写 `docs/handoff/{date}-{slug}.md` (另 `context_for_next: null              # Phase D 是最后阶段`)"
+    }
+  ]
+}

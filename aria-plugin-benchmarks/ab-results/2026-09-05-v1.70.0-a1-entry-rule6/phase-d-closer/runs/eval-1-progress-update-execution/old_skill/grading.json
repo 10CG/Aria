@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "Should update the spec progress to 'completed' or 'merged' status",
+      "passed": true,
+      "evidence": "产出的 Story 记录写入 \"- [x] COMPLETED — OAuth2 Social Login (spec: oauth2-social-login)\" / \"  - status: completed / merged\", 校验清单同项 \"- [x] spec 状态置为 **completed / merged** (不再是 in-progress)\", 结构化回执 \"spec_status: completed        # merged\"。"
+    },
+    {
+      "text": "Should record the PR number in progress tracking",
+      "passed": true,
+      "evidence": "\"  - pr: #143 (merged to main)\" 写进 Story 行, KPI 区 \"prsMerged:      +1                 # PR #143\", 校验清单 \"- [x] **PR #143** 记入进度记录 (Story 行 `pr:` 字段 + `kpiSnapshot.prsMerged`)\", 回执 \"pr: 143\" / \"pr_merged_to: main\"。"
+    },
+    {
+      "text": "Should mark all 6 tasks as completed in the progress record",
+      "passed": true,
+      "evidence": "\"completedTasks:                      # 追加本 cycle 6 项\" 后逐条列出 \"- TASK-001\" ~ \"- TASK-006\"; Story 行 \"  - tasks: 6/6 完成 (TASK-001 ~ TASK-006 全部 [x])\"; 校验清单 \"- [x] **6 个任务全部标记完成** (Story `tasks: 6/6` + `completedTasks` 六条)\"。(ID 为自承占位: \"我用了 `TASK-001 ~ TASK-006` 占位\", 但断言只要求标记完成, 未要求真实 ID)"
+    }
+  ]
+}

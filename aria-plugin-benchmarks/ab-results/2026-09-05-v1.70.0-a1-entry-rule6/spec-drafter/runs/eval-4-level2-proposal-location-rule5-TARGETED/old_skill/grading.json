@@ -1,0 +1,24 @@
+{
+  "expectations": [
+    {
+      "text": "给出的落点路径是项目自己仓内的 `openspec/changes/<feature>/proposal.md` (feature 名可自拟), 且**不是** `standards/openspec/changes/...`",
+      "passed": true,
+      "evidence": "openspec/changes/task-list-due-date-sort/proposal.md\n\n相对 **todo-web 仓库根**。展开成完整落点即：\n\ntodo-web/\n└── openspec/\n    └── changes/\n        └── task-list-due-date-sort/\n            └── proposal.md        ← 本次唯一产出物 (Level 2)  (§1)"
+    },
+    {
+      "text": "全文任何位置都没有把 `standards/openspec/changes/` 当作本次 proposal 的落点推荐 (作为反例点名说明「不该写那里」不算违反)",
+      "passed": true,
+      "evidence": "`standards/openspec/changes/` 两处出现均为反例/规则引用: 「另一个候选是 `standards/openspec/changes/task-list-due-date-sort/proposal.md` —— 它有诱惑力 ... 但它是错的, 理由三条」;「**规则**：这正是 Aria **不可协商规则 #5**（\"项目变更放本项目 `openspec/changes/`，不放 `standards/openspec/changes/`\"）要挡的事」。边界句「**只有对共享规范本身的变更**才落 standards 仓 —— 比如改十步循环的阶段定义 ... todo-web 的排序功能不属于这一类。」亦非本次落点推荐。"
+    },
+    {
+      "text": "对 (2) 给出的理由点到「standards 是共享子模块 / 项目自己的变更归项目自己」这层语义 (Aria 不可协商规则 #5), 而不是只给路径不解释",
+      "passed": true,
+      "evidence": "1. **归属**：`standards/` 是从 aria-standards 引入的**共享子模块**，它是所有采用 Aria 方法论的项目共用的规范仓。\"给任务列表加按截止日期排序\"是 todo-web **自己的产品需求**，不是对共享方法论的修改。变更该落在哪里，判据是\"谁拥有这个需求\"，不是\"哪个目录看起来更像 OpenSpec 的家\"。\n3. **规则**：这正是 Aria **不可协商规则 #5**（\"项目变更放本项目 `openspec/changes/`，不放 `standards/openspec/changes/`\"）要挡的事，spec-drafter A.1.4 也在路径落点上明写了这条警告。"
+    },
+    {
+      "text": "proposal.md 全文头部 blockquote 含一行逐字以 `> **Linked Issue**:` 起首, 且值是 inline code span `none` (题干未给 issue 号)",
+      "passed": true,
+      "evidence": "> **Linked Issue**: `none`   (answer.md:52, 位于 proposal.md 全文头部 blockquote 第 4 行: `> **Level**: Minimal (Level 2 Spec)` / `> **Status**: Draft` / `> **Created**: 2026-09-05` / `> **Linked Issue**: `none``; 行首无空白, `>` 后恰一个空格, 值为 inline code span `none`)"
+    }
+  ]
+}

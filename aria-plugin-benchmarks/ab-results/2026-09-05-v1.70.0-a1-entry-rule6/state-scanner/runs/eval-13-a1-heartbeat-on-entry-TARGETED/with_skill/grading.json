@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] (A) 明确给出 `--heartbeat-only` 模式的调用, 且命令行含 `phase1_gate.py` 与 `--phase A.1`",
+      "passed": true,
+      "evidence": "```bash\npython3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py\" \\\n  --heartbeat-only --raw-track-id \"a1-entry-claim-duplicate-work-guard-023236f2\" --phase A.1 --repo-path \"/home/dev/Aria\"\n```"
+    },
+    {
+      "text": "[承重] (A) 说明目的是刷新既有 claim 的 heartbeat_at (而非新认领一条 claim)",
+      "passed": true,
+      "evidence": "**该做的事：在这次 `/state-scanner` 入口调一次 A.1 心跳，刷新那条属于本容器的 active claim。**  ...  **这是刷新，不是认领**。`--heartbeat-only` 不做 acquire"
+    },
+    {
+      "text": "[承重] (B) 明确 enabled == false ⇒ 零 heartbeat 调用 / 不写 claim / 不推送",
+      "passed": true,
+      "evidence": "**零触发** —— 一次 `phase1_gate` 都不调，心跳也不调。这不是「降级成别的做法」，是明确的 opt-out 语义：`enabled == false` ⇒ 不调用 `run_gate`"
+    },
+    {
+      "text": "[承重] (C) 明确回答「不改变」—— 触发条件是「持 active claim 且 enabled==true 的每次入口」, 不依赖 collision.kind",
+      "passed": true,
+      "evidence": "**不会。(A) 原样成立，心跳照跑。** ... | A.1 心跳（`--heartbeat-only --phase A.1`） | 持 active claim + `enabled == true`，**每次入口** | 刷新已有 claim，**不依赖 `collision.kind`** |"
+    },
+    {
+      "text": "不把 (A) 答成「先跑 phase1_gate 认领」或「跑完整闸门」—— heartbeat 模式不认领、不判碰撞、不 fetch",
+      "passed": true,
+      "evidence": "**这是刷新，不是认领**。`--heartbeat-only` 不做 acquire，也**不自带 fetch** —— 心跳的职责是刷新，不是把协调视图修好。"
+    },
+    {
+      "text": "不声称心跳遥测会进 production 分区 (它走独立的 heartbeat 分区, coordination_probe 不计)",
+      "passed": true,
+      "evidence": "**fail-soft**：心跳失败只记遥测（独立 `heartbeat` 分区，**不进 production**），绝不阻断本次扫描或后续阶段。同理，心跳的遥测不计进 `coordination_probe` 的计数口径"
+    }
+  ]
+}

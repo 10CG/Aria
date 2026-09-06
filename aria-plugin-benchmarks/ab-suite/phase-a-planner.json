@@ -1,8 +1,8 @@
 {
   "skill_name": "phase-a-planner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "source_evals_count": 5,
-  "selected_count": 2,
+  "selected_count": 6,
   "evals": [
     {
       "id": 1,
@@ -25,6 +25,63 @@
         "Should detect and report unclean working tree state",
         "Should block execution or issue a clear warning",
         "Should provide steps to resolve the unclean state"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "a1-claim-derivation-and-linked-issue-TARGETED",
+      "prompt": "我要在 Aria 仓起草一份新 Spec, 走 A.1 入口认领。\n\n夹具: `~/.aria/container-id` 内容为\n```\nuuid: 1a2b3c4d\nlabel: devbox-A1-very-long-label\n```\n本 Spec 目录是 `openspec/changes/add-oauth-login/`。\n\n手上有三份候选 proposal 的 `Linked Issue` 字段值:\n- A: `10CG/Aria#174`\n- B: `none`\n- C: `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)`\n\n请只回答, 不要跑命令:\n(1) `--raw-track-id` 的实参应该是什么? 逐字写出来, 并说明每一段从哪来。\n(2) 三份 proposal 各自应不应该传 `--linked-issue`? 传的话实参是什么?\n(3) 如果我起草到一半决定放弃这个方向, 该做什么?\n(4) 如果本次是 `skip_if: complexity: Level1` 命中的简单修复, 或 `coordination.enabled` 是 false, 又该怎么做?",
+      "expected_output": "(1) `add-oauth-login-1a2b3c4d` — slug 取目录名逐字, uuid 段取 container-id 的 uuid 字段 (非 label); (2) 只有 A 传 `--linked-issue 10CG/Aria#174`, B 与 C 整个参数省略; (3) 跑 release_gate.py --raw-track-id <同一串> --status abandoned。",
+      "expectations": [
+        "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段",
+        "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id",
+        "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`",
+        "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传",
+        "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去",
+        "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap",
+        "不建议「先传着看看」/「传空字符串」这类变体",
+        "[承重] (4) Level 1 命中 或 enabled==false ⇒ **零调用**, 不写 claim 也不推送",
+        "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "a1-overlap-ask-user-by-status-TARGETED",
+      "prompt": "A.1 入口认领跑完了, `phase1_gate.py` 的输出里 `linked_issue_overlap` 有四条, 都和我的 `linked_issue: 10CG/Aria#174` 同一个 issue:\n\n```json\n[\n  {\"track_id\":\"oauth-login-aaaa1111\",\"container\":\"cA\",\"claimed_at\":\"2026-09-05T08:00:00Z\",\"status\":\"active\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"social-login-bbbb2222\",\"container\":\"cB\",\"claimed_at\":\"2026-09-04T10:00:00Z\",\"status\":\"done\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"oauth2-spike-cccc3333\",\"container\":\"cC\",\"claimed_at\":\"2026-09-03T09:00:00Z\",\"status\":\"abandoned\",\"linked_issue\":\"10CG/Aria#174\"},\n  {\"track_id\":\"\",\"container\":\"\",\"claimed_at\":\"\",\"status\":\"unknown\",\"linked_issue\":null}\n]\n```\n`unknown_schema_claims` 是 1。请只回答, 不要跑命令: 接下来我该怎么办? 每一条分别怎么处理?",
+      "expected_output": "起草前先经 AskUserQuestion 请裁, 不自行放行; 告警列出对方 track_id/container/claimed_at/status 与双方 linked_issue 原串; done/abandoned 按 active 同档请裁并注明可能是 GC 产物; 不提议去释放对方的 claim。",
+      "expectations": [
+        "[承重] 明确要在**起草之前**经 `AskUserQuestion` 请人裁, 而不是渲染一行告警后自行继续",
+        "[承重] 告警内容含对方的 track_id / container / claimed_at / status 与 linked_issue 原串",
+        "[承重] `done` 那条**不建议去释放对方的 claim** (那是对方的东西)",
+        "[承重] `abandoned` 按 `active` 同档处理, 并注明该终态**可能是 GC 产物**而非真的做完",
+        "[承重] `unknown` 那条视同 active 处理 (存在性已确认、内容未知, 按存在处理), 不因读不懂就忽略",
+        "不把四条压成一句「有 4 条重叠」了事 —— 不同 status 的处置不同"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "a1-degraded-says-unverified-TARGETED",
+      "prompt": "A.1 入口认领跑完, `phase1_gate.py` 输出是:\n\n```json\n{\"outcome\":\"passed\",\"proceed\":true,\"error\":\"fetch_degraded\",\n \"linked_issue_overlap\":null,\"linked_issue_overlap_error\":\"RuntimeError: ref unreadable\",\n \"unknown_schema_claims\":null}\n```\n\n另一次跑的输出是:\n\n```json\n{\"outcome\":\"passed\",\"proceed\":true,\"error\":null,\n \"linked_issue_overlap\":[],\"unknown_schema_claims\":3}\n```\n\n请只回答, 不要跑命令: 这两次分别该向我怎么措辞? 它们是同一个意思吗?",
+      "expected_output": "第一次 = 本轮未取到任何证据 ⇒ 「未能核实, 建议重试」, 绝不能说「无碰撞」; 第二次 = 已检测到 3 条无法解析的 claim, 存在性已确认、内容未知, 按存在处理。两者不是同一个意思。",
+      "expectations": [
+        "[承重] 第一次明确措辞为「**未能核实**」(或等义的「没取到证据/无法核实」), **不得**说成「无碰撞」",
+        "[承重] 第二次明确措辞为「已检测到 3 条无法解析的 claim —— 存在性已确认、内容未知, 按存在处理」",
+        "[承重] 明确回答两者**不是同一个意思** (零证据 vs 已确认存在)",
+        "指出 `null` ≠ `0` ≠ `[]`, 消费方不能用 `.get(key, 0)` / `.get(key, [])` 读这几个键",
+        "不把 `error: fetch_degraded` 当成硬失败去阻断 —— 它是 advisory, proceed 仍为 true"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "a1-unattended-no-ask-TARGETED",
+      "prompt": "我在 aria-runner 容器里无人值守地跑 A.1。容器镜像内的 `.aria/config.json` 有:\n\n```json\n{\"state_scanner\": {\"coordination\": {\"enabled\": true, \"mode\": \"advisory\", \"unattended\": true}}}\n```\n\nA.1 认领后 `linked_issue_overlap` 非空 (另一个容器在做同一个 issue)。\n请只回答, 不要跑命令: 这种情况下该怎么处理? 和有人值守时有什么不同?",
+      "expected_output": "unattended == true ⇒ 零 AskUserQuestion, 改为写一条「待复议」记录并置 awaiting_owner, 由产品负责人事后复议; 判据是配置里的 unattended, 不是「AskUserQuestion 现在能不能用」。",
+      "expectations": [
+        "[承重] 明确 **零 `AskUserQuestion`** —— 不向不存在的人提问",
+        "[承重] 改为写一条「待复议」记录, 并含 `awaiting_owner` 标记",
+        "[承重] 判据取自 config 的 `unattended` 字段, **不得**以「AskUserQuestion 工具是否可用」做运行期推断",
+        "说明有人值守时 (unattended=false) 才走 AskUserQuestion 请裁",
+        "不主张无人值守时就自行放行、不留任何记录"
       ]
     }
   ]

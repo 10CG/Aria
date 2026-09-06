@@ -1,0 +1,49 @@
+{
+  "expectations": [
+    {
+      "text": "Should NOT report all remotes as synced when only origin was pushed",
+      "passed": true,
+      "evidence": "⚠️ has_unreachable_remote = true — 主仓 → github 本轮 fetch 失败 (error_kind = network) / \"github = —        unknown, reason = no_local_tracking_ref (github 上没有这个分支)\" —— 未做全绿宣称; 并明确 \"扫描不是靠 `git push` 的回执做的（那正是 2026-04-12 事故里骗人的那个信号）\"。"
+    },
+    {
+      "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+      "passed": false,
+      "evidence": "全文无 parity=behind 判定, 相反: \"✅ aria 子模块            @ ab3dbd0   origin equal / github equal  (均 fresh, fetch_ok=true)\" 与 \"没有任何 (仓, remote) 对落在 `behind` / `diverged`\"。"
+    },
+    {
+      "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+      "passed": false,
+      "evidence": "全文 0 次出现 `hint_type`(grep 计数 0), 也未给出 'push' / 'update' 这两个取值中的任何一个。"
+    },
+    {
+      "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
+      "passed": false,
+      "evidence": "全文 0 次出现 `ahead_count` / `behind_count`; github 腿只写 \"github = —        unknown, reason = no_local_tracking_ref (github 上没有这个分支)\", 未点名任何非零计数字段。"
+    },
+    {
+      "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+      "passed": true,
+      "evidence": "同目录产物 state-snapshot.json 保留旧字段并取自 origin 侧 head ref: \"remote_commit\": \"cc864ee3b94ab6907828b9264c3ab408ce6c461f\", \"remote_commit_source\": \"local_ref\"; 答案正文亦逐仓渲染该值 \"✅ standards        : 与远程同步 (tree == remote = cc864ee)\"。"
+    },
+    {
+      "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+      "passed": false,
+      "evidence": "裁决: overall_parity = TRUE · has_pending_push = FALSE · has_unreachable_remote = TRUE —— 该臂本轮主仓 github 腿 fetch_ok=false, 报的是 true, 与断言要求的 false 相反。"
+    },
+    {
+      "text": "Should include git-remote-helper reference in the scan output when helper is available",
+      "passed": false,
+      "evidence": "全文 0 次出现 `git-remote-helper` / `remote-helper`; 机制归因写的是 \"scan.py 先对每个 (仓, remote) 腿做 `fetch --prune`，再拿本地 HEAD 与 remote-tracking ref 逐对比较\"。"
+    },
+    {
+      "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+      "passed": true,
+      "evidence": "在各自子模块的同名 remote 上全部可达 ⇒ 不存在 orphaned gitlink, 从任一 remote `clone --recursive` 都不会断裂。 —— 并在 issue 面复述同一风险: \"→ orphaned gitlink (clone --recursive 断裂)          ← 就是你要复现的那一类\"。"
+    },
+    {
+      "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+      "passed": false,
+      "evidence": "只说机制会阻断, 未给出任何由 recommendation rule 产出的 gitlink 修法: \"这一层现在有 `gitlink_integrity[]` 逐 (remote, 子模块) 对覆盖，本轮 6/6 `ok`、`consecutive_unverified` 全 0，`orphaned` 会恒阻断 `overall_parity`\"; 全文唯一的 push 修法针对的是缺失分支 (`git -C aria-orchestrator push -u github feature/m6-cost-model-telemetry`), 不是 gitlink; 且规则层被明确描述为不出建议: \"规则层不给方向性建议\"。"
+    }
+  ]
+}

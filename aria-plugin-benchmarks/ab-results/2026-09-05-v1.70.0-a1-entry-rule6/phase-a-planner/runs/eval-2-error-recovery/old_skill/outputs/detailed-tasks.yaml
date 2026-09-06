@@ -1,0 +1,94 @@
+spec_id: add-payment-gateway-integration
+spec_level: 3
+spec_status: draft
+generated_by: phase-a-planner (A.2 + A.3)
+generated_at: "2026-09-05"
+
+tasks:
+  - id: TASK-001
+    title: 支付数据模型与状态机
+    agent: aria:backend-architect
+    estimate_hours: 5
+    depends_on: []
+    files_domain:
+      - models/payment*
+      - migrations/
+    acceptance:
+      - 非法状态迁移抛异常（含单测负控）
+      - webhook 事件表唯一索引存在
+
+  - id: TASK-002
+    title: PaymentGateway 抽象接口
+    agent: aria:backend-architect
+    estimate_hours: 4
+    depends_on: []
+    files_domain:
+      - services/payment/gateway_interface*
+    acceptance:
+      - fake 实现可被测试注入
+      - 三类异常类型可分别捕获
+
+  - id: TASK-003
+    title: 网关厂商适配实现 + 凭据配置
+    agent: aria:backend-architect
+    estimate_hours: 6
+    depends_on: [TASK-002]
+    files_domain:
+      - services/payment/gateway_vendor*
+      - config/
+    acceptance:
+      - 环境变量缺失时启动失败（fail-closed）
+      - Rule #7：凭据相关命令全部 redirect output
+
+  - id: TASK-004
+    title: 支付发起 API
+    agent: aria:backend-architect
+    estimate_hours: 5
+    depends_on: [TASK-001, TASK-002]
+    files_domain:
+      - api/payments*
+    acceptance:
+      - POST /payments 返回可用支付凭据
+      - 非法金额 / 币种被拒
+
+  - id: TASK-005
+    title: Webhook 接收与幂等处理
+    agent: aria:backend-architect
+    estimate_hours: 7
+    depends_on: [TASK-001, TASK-003]
+    files_domain:
+      - api/webhooks*
+      - workers/payment*
+    acceptance:
+      - 重复投递 3 次只落 1 条事件（AC-2）
+      - 验签失败返回 4xx 且零状态推进（AC-3）
+
+  - id: TASK-006
+    title: 对账兜底查询任务
+    agent: aria:backend-architect
+    estimate_hours: 5
+    depends_on: [TASK-003, TASK-005]
+    files_domain:
+      - workers/payment_reconcile*
+    acceptance:
+      - 回调丢失场景下状态被修正为终态（AC-4）
+
+  - id: TASK-007
+    title: 端到端验收与安全核验
+    agent: aria:qa-engineer
+    estimate_hours: 6
+    depends_on: [TASK-004, TASK-005, TASK-006]
+    files_domain:
+      - tests/payment/
+    acceptance:
+      - AC-1 ~ AC-5 全部有可执行证据
+      - 全仓 grep 无硬编码密钥
+
+parallel_tracks:
+  - track_1: [TASK-001, TASK-004]
+  - track_2: [TASK-002, TASK-003, TASK-005, TASK-006]
+  - serial_tail: [TASK-007]
+
+notes:
+  - TASK-001 与 TASK-002 文件域 disjoint，可并行
+  - TASK-007 必须串行在尾部，需要全部前置产物就位

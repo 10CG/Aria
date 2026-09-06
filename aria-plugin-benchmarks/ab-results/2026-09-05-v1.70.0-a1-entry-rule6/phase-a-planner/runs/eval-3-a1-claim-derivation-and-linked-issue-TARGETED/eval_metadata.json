@@ -1,0 +1,34 @@
+{
+  "eval_id": 3,
+  "eval_name": "a1-claim-derivation-and-linked-issue-TARGETED",
+  "prompt": "我要在 Aria 仓起草一份新 Spec, 走 A.1 入口认领。\n\n夹具: `~/.aria/container-id` 内容为\n```\nuuid: 1a2b3c4d\nlabel: devbox-A1-very-long-label\n```\n本 Spec 目录是 `openspec/changes/add-oauth-login/`。\n\n手上有三份候选 proposal 的 `Linked Issue` 字段值:\n- A: `10CG/Aria#174`\n- B: `none`\n- C: `[#174](https://forgejo.10cg.pub/10CG/Aria/issues/174)`\n\n请只回答, 不要跑命令:\n(1) `--raw-track-id` 的实参应该是什么? 逐字写出来, 并说明每一段从哪来。\n(2) 三份 proposal 各自应不应该传 `--linked-issue`? 传的话实参是什么?\n(3) 如果我起草到一半决定放弃这个方向, 该做什么?\n(4) 如果本次是 `skip_if: complexity: Level1` 命中的简单修复, 或 `coordination.enabled` 是 false, 又该怎么做?",
+  "assertions": [
+    {
+      "text": "[承重] track-id 拼成 `add-oauth-login-1a2b3c4d` —— slug 用目录名逐字, uuid 段取 `uuid` 字段"
+    },
+    {
+      "text": "[承重] 明确 **不用 label** (`devbox-A1-very-long-label`) 作 uuid 段; 改 label 不该换掉 track-id"
+    },
+    {
+      "text": "[承重] 只有 proposal A (真 token `10CG/Aria#174`) 传 `--linked-issue`"
+    },
+    {
+      "text": "[承重] proposal B (哨兵 `none`) **整个参数省略**, 不把 `none` 当值传"
+    },
+    {
+      "text": "[承重] proposal C (markdown 链接形 `NO_TOKEN`) 同样**整个参数省略**, 不把整串喂进去"
+    },
+    {
+      "text": "说明理由: 任何非空字符串都 truthy, 两份无关 Spec 都写哨兵就会互相命中 overlap"
+    },
+    {
+      "text": "不建议「先传着看看」/「传空字符串」这类变体"
+    },
+    {
+      "text": "[承重] (4) Level 1 命中 或 enabled==false ⇒ **零调用**, 不写 claim 也不推送"
+    },
+    {
+      "text": "[承重] (3) 放弃方向时要 release 掉自己的 claim (`release_gate.py --raw-track-id`), 而不是放着不管"
+    }
+  ]
+}

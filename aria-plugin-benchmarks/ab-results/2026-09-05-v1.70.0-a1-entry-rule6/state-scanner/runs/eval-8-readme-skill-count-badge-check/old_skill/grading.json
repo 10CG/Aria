@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+      "passed": true,
+      "evidence": "✅ aria/README 版本: 一致 — readme_version 1.69.1 == plugin_version 1.69.1  (并在开头点名 SOT: 「本仓 `aria/.claude-plugin/plugin.json` 当前版本是 `1.69.1`」)"
+    },
+    {
+      "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+      "passed": true,
+      "evidence": "| 内部 (`user-invocable: false`) | `aria/README.md:46` 列 7 个 | **7** 个 (agent-router / agent-team-audit / arch-common / audit-engine / config-loader / git-remote-helper / aria-token-telemetry) | ✅ 逐名吻合 | ... | user-facing | 35 | 42 − 7 = **35** | ✅ |"
+    },
+    {
+      "text": "Should compare Skill count with the number stated in README",
+      "passed": true,
+      "evidence": "| 总数 | `aria/README.md:44` \"35 user-facing + 7 internal = **42** total\" | **42** 个含 `SKILL.md` 的目录 | ✅ |"
+    },
+    {
+      "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+      "passed": true,
+      "evidence": "### [2] Skill 列表是否完整 → ❌ 不完整，漏 2 条 ... `aria/README.md` 的分组 bullet 清单实际只列了 **40** 条，缺这两个 user-facing Skill: - **`issue-triage`** ... - **`session-closer`**"
+    },
+    {
+      "text": "Should output skill_list_missing items at info severity level (not warning)",
+      "passed": false,
+      "evidence": "### [2] Skill 列表是否完整 → ❌ 不完整，漏 2 条 —— 该臂自己的输出用 ❌ 失败级呈现漏列项; 唯一出现 ℹ️ 的相关句是转引模板的 happy path 「`references/output-formats.md` 的「📝 README 同步状态」区块却写着 `✅ Skill 数量: 一致 (33)` / `ℹ️ Skill 列表: 完整` 两行」, 那是「完整」态的 info, 不是 skill_list_missing 的 info"
+    },
+    {
+      "text": "Should check Plugin badge version in root README against plugin.json version",
+      "passed": true,
+      "evidence": "✅ Plugin badge: 一致 — README.md:8 `Plugin-v1.69.1` == plugin.json `1.69.1`  (并单列 `README.md:8` → `https://img.shields.io/badge/Plugin-v1.69.1-blue` 与 `aria/.claude-plugin/plugin.json` → `\"version\": \"1.69.1\"`)"
+    },
+    {
+      "text": "Should report badge mismatch as warning severity",
+      "passed": false,
+      "evidence": "### [3] Plugin badge 版本 vs plugin.json → ✅ 一致 (1.69.1) —— 无 mismatch 发生, 该臂亦未陈述「mismatch 应报 warning 级」的严重度映射"
+    },
+    {
+      "text": "Should gracefully handle missing aria submodule (skip, not error)",
+      "passed": false,
+      "evidence": "📦 插件依赖: ✅ standards 子模块已注册且已初始化 —— 全文无「aria 子模块缺失时 skip 而非 error」的处置陈述"
+    }
+  ]
+}
