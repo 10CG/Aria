@@ -1178,7 +1178,7 @@ tasks:
     parent: "8.4"
     task_group: 8
     title: "aria 子模块本地 merge → master + 双推 + 逐 remote ls-remote 核验 + tag (硬约束 1/2 的任务宿主)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "3-5"
     agent: tech-lead
