@@ -186,7 +186,7 @@ Layer 1 / Layer 2 之间的接口契约由以下文件固化：
 | 版本流 | 当前版本 | SoT 文件 |
 |--------|----------|----------|
 | Aria main repo | v1.7.5 | `VERSION` |
-| aria-plugin | v1.69.1 | `aria/.claude-plugin/plugin.json` |
+| aria-plugin | v1.70.0 | `aria/.claude-plugin/plugin.json` |
 | aria-orchestrator | v2.0.0 (M6 进行中; 锚 `86bb684`) | **无独立版本工件** (仓内实测无 pyproject.toml / VERSION / tag) — 以 CLAUDE.md「项目状态」版本行 + git SHA 锚定 |
 | Aria 2.0 PRD | v2.0.0 | `docs/requirements/prd-aria-v2.md` |
 

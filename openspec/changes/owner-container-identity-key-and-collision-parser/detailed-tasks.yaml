@@ -13,8 +13,16 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-06"   # v9: post_planning R9 CONVERGED 后落延后 minor (预留项 *_on_activation 三键 / activation agents+est_hours 重算句); v8: post_planning R7 rework (TASK-031 承接 TASK-018 语义复核 / TASK-027 title 第四项 / S2-1 grep 仅 S2 评估 / total_tasks 39→43); v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
-  ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
+  updated: "2026-09-06"   # C 进度: aria v1.70.0 master 0545f86 (tag v1.70.0) / standards master d217ed0 双推核验 MATCH; #174 comment 21906; B.2 进度: 组 1/2/3 + 4.1/4.2/5.4 done (aria f2e4231, standards c955783); v9: post_planning R9 CONVERGED 后落延后 minor (预留项 *_on_activation 三键 / activation agents+est_hours 重算句); v8: post_planning R7 rework (TASK-031 承接 TASK-018 语义复核 / TASK-027 title 第四项 / S2-1 grep 仅 S2 评估 / total_tasks 39→43); v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
+  ship_shape: "S1"   # TASK-000 判定 2026-09-06 (证据见 ship_shape_evidence); S2 前提「a1-entry B.2 已落地 (进 master) 且 #174 ack」均不成立
+  ship_shape_evidence:
+    fetched: "git fetch --all (主仓 + aria), 2026-09-06 ~07:10 UTC"
+    a1_entry_branch: "feature/a1-entry-claim-duplicate-work-guard 存在于 aria origin 与 github, HEAD ab3dbd04e6e8d292bd1e1e316e75e354072940ba (feat(a1-entry): A.1 入口认领文本层 + 六条结构化断言); 主仓同名分支两远程均在"
+    get_container_uuid: "分支内 skills/state-scanner/lib/identity.py:247 已定义 get_container_uuid(); aria origin/master (7dd0135, v1.69.1) 无该函数"
+    merged_to_master: false
+    a1_entry_spec: "主仓 openspec/changes/a1-entry-claim-duplicate-work-guard/ 在飞 (Approved, post_spec R1–R6), 未归档"
+    ack_174: "未取得 (TASK-040 草案已落 .aria/notes/2026-09-05-174-comment-draft.md, 发帖待 owner 授权)"
+    verdict_reason: "a1-entry 未进 master ⇒ 其 SC-3 (get_container_id() label 优先, 直接调必红) 仍是活前提; 本 Spec 若 flip 会先于对方落地并使其 RED 基线失效; 且无 ack。按 proposal :104 只能 S1: 加 get_container_label() + T3b inventory 告警, 不 flip。S2 后续经 TASK-042 tracker 承载"
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
       head: "7dd0135"   # v1.69.1
@@ -85,7 +93,7 @@ tasks:
   - id: TASK-000
     parent: "0.1"
     title: "ship 形态判定: fetch 全远程, 实读 a1-entry 分支实况, 写 metadata.ship_shape"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -100,7 +108,7 @@ tasks:
   - id: TASK-040
     parent: "0.2"
     title: "Aria #174 留言 (草案落文件): 告知 D-0(a) 裁定 + S2 条件下需改写对方 SC-3, 征求 ack"
-    status: pending
+    status: done
     complexity: S
     est_hours: 0.5
     agent: knowledge-manager
@@ -118,7 +126,7 @@ tasks:
   - id: TASK-001
     parent: "1.1"
     title: "改写 test_split_owner_container_variants 为两段式契约 (2-part / 1-part), 先红"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: qa-engineer
@@ -132,7 +140,7 @@ tasks:
   - id: TASK-002
     parent: "1.2"
     title: "判定臂用例 + advisory 函数级用例 (经 dedupe → classify)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: qa-engineer
@@ -147,7 +155,7 @@ tasks:
   - id: TASK-003
     parent: "1.3"
     title: "dedupe 测试三臂 + 隔离夹具对期望改 cross_owner + 同 owner 变体 + board 回显原串"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: qa-engineer
@@ -162,7 +170,7 @@ tasks:
   - id: TASK-004
     parent: "1.4"
     title: "keys 断言改写 (含 identity_advisories) + 旧 snapshot 缺字段不崩 (新建 test_track_board_advisories.py)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: qa-engineer
@@ -177,7 +185,7 @@ tasks:
   - id: TASK-005
     parent: "1.5"
     title: "advisory 生产接线端到端锁 (uuid 容器、同 track_id 两份 handoff) + 真实两段式两人两机端到端"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: qa-engineer
@@ -192,7 +200,7 @@ tasks:
   - id: TASK-006
     parent: "1.6"
     title: "冻结语料 fixture + 裁剪脚本 + 前后对照机械归因测试 (含注入合成真撞车组)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: qa-engineer
@@ -209,7 +217,7 @@ tasks:
   - id: TASK-007
     parent: "1.7"
     title: "D-0(a) 族键夹具三条 (先红)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: qa-engineer
@@ -223,7 +231,7 @@ tasks:
   - id: TASK-008
     parent: "1.8"
     title: "新建 test_identity_label.py (label accessor + S1 lock-in) 与 test_migration_inventory.py (两处迁移告警)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: qa-engineer
@@ -238,7 +246,7 @@ tasks:
   - id: TASK-009
     parent: "1.9"
     title: "track_board ⚪ 行渲染测试 + 反事实"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: qa-engineer
@@ -251,7 +259,7 @@ tasks:
   - id: TASK-010
     parent: "1.10"
     title: "Layer H 新鲜度谓词测试 (截止生效 / collector-renderer 同结论 / 单一实现)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: qa-engineer
@@ -264,7 +272,7 @@ tasks:
   - id: TASK-011
     parent: "1.11"
     title: "SC-9 代码侧回归锁 (baseline-green): fetch_gate kind 字符串夹具"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: qa-engineer
@@ -281,7 +289,7 @@ tasks:
   - id: TASK-012
     parent: "2.1"
     title: "split_owner_container 两段式语义"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -294,7 +302,7 @@ tasks:
   - id: TASK-013
     parent: "2.2"
     title: "identity_key() + classify_claims 确定性判定"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: backend-architect
@@ -307,7 +315,7 @@ tasks:
   - id: TASK-014
     parent: "2.3"
     title: "identity_drift_advisories(tracks) + collector dedupe 前接线 + identity_advisories[] 恒存在"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: backend-architect
@@ -321,7 +329,7 @@ tasks:
   - id: TASK-015
     parent: "2.4"
     title: "dedupe 键 (track_id, identity_key) + track_board 键同源"
-    status: pending
+    status: done
     complexity: M
     est_hours: 3
     agent: backend-architect
@@ -335,7 +343,7 @@ tasks:
   - id: TASK-016
     parent: "2.5"
     title: "Layer H 族键剥离 (track_to_claim_record 一处) + tracks_by_tid 键归一"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: backend-architect
@@ -349,7 +357,7 @@ tasks:
   - id: TASK-017
     parent: "2.6"
     title: "LAYER_H_ACTIVE_WINDOW_DAYS + layer_h_is_fresh 共享谓词, collector/renderer 同一调用, board stale 标注"
-    status: pending
+    status: done
     complexity: M
     est_hours: 6
     agent: backend-architect
@@ -365,7 +373,7 @@ tasks:
   - id: TASK-018
     parent: "2.7"
     title: "get_container_label() + container-id 文件头注释改写 (S1 即落, 不动 get_container_id)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -379,7 +387,7 @@ tasks:
   - id: TASK-019
     parent: "2.8"
     title: "迁移 inventory: phase1_gate 与 release_gate 两处告警 (S1 无抑制)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 4
     agent: backend-architect
@@ -393,7 +401,7 @@ tasks:
   - id: TASK-020
     parent: "2.9"
     title: "track_board ⚪ 行渲染 + label 并列显示"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: backend-architect
@@ -409,7 +417,7 @@ tasks:
   - id: TASK-021
     parent: "3.1"
     title: "session-handoff.md §2.3.1 改写 (三态 + identity_key 定义 + unknown 说明 + 族键句限定作用域)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 3
     agent: knowledge-manager
@@ -422,7 +430,7 @@ tasks:
   - id: TASK-022
     parent: "3.2"
     title: "§2.3.5 判据表三行 + 新鲜度截止句 + 实质变更说明小段"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: knowledge-manager
@@ -435,7 +443,7 @@ tasks:
   - id: TASK-023
     parent: "3.3"
     title: "新增 §2.3.9「AI runner 提交身份」(D-2(a))"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: knowledge-manager
@@ -448,7 +456,7 @@ tasks:
   - id: TASK-024
     parent: "3.4"
     title: "aria 六处取值文档 + schema 同步 (含 :1109-1121 旧 dedupe 段; SKILL.md 不改动)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 3
     agent: knowledge-manager
@@ -465,7 +473,7 @@ tasks:
   - id: TASK-025
     parent: "3.5"
     title: "模板 owner-container 示例改 uuid 形 + 删除「设 label 使更可读」鼓励句"
-    status: pending
+    status: done
     complexity: S
     est_hours: 0.5
     agent: knowledge-manager
@@ -478,7 +486,7 @@ tasks:
   - id: TASK-026
     parent: "3.6"
     title: "aria CHANGELOG 条目 (§2.3.5 实质变更 / identity_advisories / get_container_label / 档位)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: knowledge-manager
@@ -494,7 +502,7 @@ tasks:
   - id: TASK-031
     parent: "4.1"
     title: "rule6_note 留痕: 七个承载任务的 RED→GREEN 记录汇总"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: qa-engineer
@@ -508,7 +516,7 @@ tasks:
   - id: TASK-032
     parent: "4.2"
     title: "全套回归 (两跑法各管一类文件): run_tests.py 全部 TestCase + pytest test_collision.py + test_fetch_gate + session-closer / phase-d-closer 测试"
-    status: pending
+    status: done
     complexity: S
     est_hours: 2
     agent: qa-engineer
@@ -522,7 +530,7 @@ tasks:
   - id: TASK-033
     parent: "4.3"
     title: "主仓 state-check: 13 条全绿 + plugin-cache-currency 例外 (owner 更新前预期 STALE)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: qa-engineer
@@ -539,7 +547,7 @@ tasks:
   - id: TASK-035
     parent: "5.2"
     title: "aria-plugin 版本 5 文件 bump (feature 分支上, merge 前; 档位按 D5)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 2
     agent: backend-architect
@@ -556,7 +564,7 @@ tasks:
   - id: TASK-034
     parent: "5.1"
     title: "aria / standards 子模块本地 merge 进 master + aria tag (bump 之后; 禁服务端合并)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -570,7 +578,7 @@ tasks:
   - id: TASK-036
     parent: "5.3"
     title: "owner 授权后双推 aria (master + tag) / standards + 逐 remote ls-remote 核验 master 与 tag SHA"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -583,7 +591,7 @@ tasks:
   - id: TASK-041
     parent: "5.7"
     title: "主仓同步面 (子模块推送核验后): 两 gitlink + VERSION + README ×4 + 架构文档 ×2 + CLAUDE.md 两行 (:141 版本 / :139 区间端点)"
-    status: pending
+    status: done
     complexity: M
     est_hours: 2
     agent: backend-architect
@@ -605,7 +613,7 @@ tasks:
   - id: TASK-037
     parent: "5.4"
     title: "fixture 公开性确认 (github 镜像)"
-    status: pending
+    status: done
     complexity: S
     est_hours: 0.5
     agent: qa-engineer
@@ -618,7 +626,7 @@ tasks:
   - id: TASK-039
     parent: "5.6"
     title: "主仓 feature 推 origin → phase-c-integrator C.2.4 gate → PR → merge → github 镜像"
-    status: pending
+    status: in_progress
     complexity: S
     est_hours: 1
     agent: backend-architect
