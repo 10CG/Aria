@@ -1,8 +1,8 @@
 # Tasks — `owner-container-identity-key-and-collision-parser`
 
-> **Spec**: [proposal.md](./proposal.md) (v11, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R6 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
+> **Spec**: [proposal.md](./proposal.md) (v11, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R7 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
 > **Level**: 3 (owner 裁定; 判据 cross-module) — 本文件 (A.2) + `detailed-tasks.yaml` (A.3, 单一 SOT: verification / deps / 工时 / rule6_note) + post_planning 收敛审计
-> **Status**: A.2/A.3 **v7** (post_planning R6 rework 2026-09-06: 预留项激活依赖边 / 4.1 台账 S2 臂 / 2.7 范例句 + 机械锁下限 / S2-1 grep 范围; 计划结构不变); owner 已裁定加 2 轮 (max_rounds 7), post_planning R7 待跑
+> **Status**: A.2/A.3 **v8** (post_planning R7 rework 2026-09-06: 4.1 承接 2.7 语义复核 / S2-1 第四项对齐 / S2-1 grep 仅 S2 评估 / 激活 total_tasks 39→43; 计划结构不变); post_planning 7 轮 (owner 加轮后) 已耗尽, 终局待 owner 裁定
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `7dd0135` v1.69.1) · `standards/` 子模块 (@ `cc864ee`) · 主仓 (@ `60808b2`; 冻结语料 `.aria/repro/handoff-tracks-frozen-2026-09-05.json` 已在)
 > **ship target**: aria-plugin `<vNEXT>` — 档位按 proposal D5 (判据 PATCH; owner 可升 MINOR); **本文件不写字面版本号**, 5.2 执行时按当时 `plugin.json` 计并记入 CHANGELOG
 > **ship 形态 (proposal §Impact)**: **S1** = a1-entry 未落地时 ship: 不 flip `get_container_id()`, 只加 `get_container_label()` + 迁移 inventory 告警; **S2** = a1-entry B.2 已落地 **且** 对方在 #174 ack。**S2 项不在本文件 checkbox 内** (归档门 `spec_complete.py` 只读 checkbox, 无「条件任务」机制 — post_planning R1 C-1); 见文末「S2 后续」表与激活规则
@@ -93,7 +93,7 @@
 
 ## S2 后续 (非 checkbox; 激活规则见下)
 
-| 项 | 内容 | 验收 (proposal SC-3 S2 臂) |
+| 项 | 内容 | 验收判据 |
 |----|------|------|
 | S2-1 | `get_container_id()` flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry `get_container_uuid()` 同值; 同 PR 成对撤销全部 S1 期产物: `identity.py:126-140` 注释改「label 仅展示」(撤销 2.7 机械锁) + 1.8 `test_identity_label.py` 的 S1 lock-in 断言翻转为「返回 uuid」+ 2.7 验收「S1 lock-in 仍绿」改 S2 + 4.1 Rule #6 台账加 S2 臂; 激活依赖: 排在 1.8 / 2.7 / 0.1 / 0.2 之后 | label 非空时返回 uuid (翻转后断言绿且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; state-scanner `lib/` `tests/` 内无 label 优先的 lock-in 断言 |
 | S2-2 | 发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项 | 未勾选则 flip 提交不进合并集 |
