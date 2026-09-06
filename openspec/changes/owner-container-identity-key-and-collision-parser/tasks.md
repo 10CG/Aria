@@ -34,7 +34,7 @@
 
 ## 0. B.1 起手
 
-- [ ] 0.1 `git fetch` 全远程, 实读 a1-entry 分支实况 (分支是否存在 / HEAD / `lib/identity.py` 是否已加 `get_container_uuid()` / 是否已进 master); 写 yaml `metadata.ship_shape` (S1 | S2-candidate) 并附证据
+- [x] 0.1 `git fetch` 全远程, 实读 a1-entry 分支实况 (分支是否存在 / HEAD / `lib/identity.py` 是否已加 `get_container_uuid()` / 是否已进 master); 写 yaml `metadata.ship_shape` (S1 | S2-candidate) 并附证据
 - [ ] 0.2 Aria #174 留言 (草案先落 `.aria/notes/2026-09-05-174-comment-draft.md`): 告知 D-0(a) 裁定 (Layer H 侧纯形状剥离, 不改 a1-entry 契约) + S2 条件下需改写其 SC-3 的判据草案, 征求 ack; 留言不阻塞 S1
 
 ## 1. 测试先行 (RED — 「先红」项对 aria `7dd0135` 实跑红, 组 2 落地后转绿)

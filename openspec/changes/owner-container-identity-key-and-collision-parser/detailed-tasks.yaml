@@ -14,7 +14,15 @@ metadata:
   datasource: "tasks.md"
   created: "2026-09-05"
   updated: "2026-09-06"   # v9: post_planning R9 CONVERGED 后落延后 minor (预留项 *_on_activation 三键 / activation agents+est_hours 重算句); v8: post_planning R7 rework (TASK-031 承接 TASK-018 语义复核 / TASK-027 title 第四项 / S2-1 grep 仅 S2 评估 / total_tasks 39→43); v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
-  ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
+  ship_shape: "S1"   # TASK-000 判定 2026-09-06 (证据见 ship_shape_evidence); S2 前提「a1-entry B.2 已落地 (进 master) 且 #174 ack」均不成立
+  ship_shape_evidence:
+    fetched: "git fetch --all (主仓 + aria), 2026-09-06 ~07:10 UTC"
+    a1_entry_branch: "feature/a1-entry-claim-duplicate-work-guard 存在于 aria origin 与 github, HEAD ab3dbd04e6e8d292bd1e1e316e75e354072940ba (feat(a1-entry): A.1 入口认领文本层 + 六条结构化断言); 主仓同名分支两远程均在"
+    get_container_uuid: "分支内 skills/state-scanner/lib/identity.py:247 已定义 get_container_uuid(); aria origin/master (7dd0135, v1.69.1) 无该函数"
+    merged_to_master: false
+    a1_entry_spec: "主仓 openspec/changes/a1-entry-claim-duplicate-work-guard/ 在飞 (Approved, post_spec R1–R6), 未归档"
+    ack_174: "未取得 (TASK-040 草案已落 .aria/notes/2026-09-05-174-comment-draft.md, 发帖待 owner 授权)"
+    verdict_reason: "a1-entry 未进 master ⇒ 其 SC-3 (get_container_id() label 优先, 直接调必红) 仍是活前提; 本 Spec 若 flip 会先于对方落地并使其 RED 基线失效; 且无 ack。按 proposal :104 只能 S1: 加 get_container_label() + T3b inventory 告警, 不 flip。S2 后续经 TASK-042 tracker 承载"
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
       head: "7dd0135"   # v1.69.1
@@ -85,7 +93,7 @@ tasks:
   - id: TASK-000
     parent: "0.1"
     title: "ship 形态判定: fetch 全远程, 实读 a1-entry 分支实况, 写 metadata.ship_shape"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
