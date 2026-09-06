@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-06-owner-container-identity-key-shipped-v1.70.0-archived.md](./2026-09-06-owner-container-identity-key-shipped-v1.70.0-archived.md) — owner-container-identity-key-and-collision-parser @ phase=D (status=done) — 全周期 ship: Aria #193 根因 (Layer H owner-container 两段式串被三段式解析) → Level 3 Spec (post_planning 9 轮 CONVERGED) → aria **v1.70.0** `0545f86`+tag / standards `d217ed0` / 主仓 PR #197 merge **`990318e`** / 归档 `62de051`, 三仓逐 remote MATCH; #193 closed, S2 后续 → **Aria #198**; claim 已释放, track 终结
+**Latest**: [2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md](./2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md) — owner-container-identity-key-and-collision-parser @ phase=D (status=done) — 会话收尾: v1.70.0 全周期已 ship+归档 (见周期 handoff); 之后 aria-plugin#170 fixed-in-v1.70.0 关闭 (22236) + Aria #195 / #199 triage 均 confirmed/major/next-cycle 回帖 (22287 / 22288, 产物 67444c5); 双子星已 ship aria v1.71.0 `985e629` + standards `21748d4` (线性叠加, 主仓 gitlink bump 属对方发版面); claim 已释放, 本容器另一轨 M6 仍 active (门在 owner)
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -11,7 +11,7 @@
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
 > | `aria-2-0-m6-dispatch-input-delivery` (M6 Blocker 3) | `aria-runner-bot/bfe8285d` | 🟢 **active — B.2 补强落地 (09-05, 9ec1fcc + 0227ff3 均已双推): 账目 27/30; 剩 021 owner build → 022 freeze; 029 = Blocker4 (SilkNode#1058 7 天无回复) + 022; claim 09-05 重新认领 active** | [2026-09-05 (B.2 补强)](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) · [2026-09-03 (会话收尾)](./2026-09-03-m6-pat-closure-and-token-governance.md) |
-> | `owner-container-identity-key-and-collision-parser` (Aria#193 / aria-plugin#135 缺口 3) | `aria-runner-bot/bfe8285d` | ✅ **done (2026-09-06: aria v1.70.0 @ 0545f86 + tag / standards d217ed0 / 主仓 PR #197 merge 990318e / 归档 62de051; #193 closed; S2 后续 tracker #198; claim 已释放, track 终结)** | [2026-09-06 (全周期)](./2026-09-06-owner-container-identity-key-shipped-v1.70.0-archived.md) |
+> | `owner-container-identity-key-and-collision-parser` (Aria#193 / aria-plugin#135 缺口 3) | `aria-runner-bot/bfe8285d` | ✅ **done (2026-09-06: aria v1.70.0 @ 0545f86 + tag / standards d217ed0 / 主仓 PR #197 merge 990318e / 归档 62de051; #193 closed; S2 后续 tracker #198; claim 已释放, track 终结)** | [2026-09-06 (会话收尾)](./2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md) · [2026-09-06 (全周期)](./2026-09-06-owner-container-identity-key-shipped-v1.70.0-archived.md) |
 | `a1-entry-claim-duplicate-work-guard` (Aria#174/#135) | `simonfish/023236f2` | 🟢 **active — 三份同族 Spec 已 ship 两份: 字段 Spec (09-02, v1.68.1) + 探针 Spec (09-04, v1.69.0) 均已归档; 下一份 = **母 Spec B.1** (最后一份, A.2/A.3 已 CONVERGED) | [2026-09-04 (Phase D, 探针)](./2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md) · [2026-09-03 (探针 B.2)](./2026-09-03-sibling-spec-probe-b2-complete-v1.69.0-awaiting-push-auth.md) · [2026-09-02 (Phase D, 字段)](./2026-09-02-2326-linked-issue-field-phase-d-archived-v1.68.1.md) · [2026-09-02 (会话收尾)](./2026-09-02-linked-issue-field-b2-implemented-awaiting-push-auth.md) |
 > | `carry-spec-drafter-path-rule5-drift` (Level 1 carry 批) | `simonfish/023236f2` | ✅ **done (2026-09-05: aria v1.69.1 @ 7dd0135 + standards cc864ee + 主仓 PR #194 merge a259ebf, 三仓核验 MATCH; claim 已释放, track 终结)** | [2026-09-05 (会话收尾)](./2026-09-05-session-close-level1-batch-shipped-and-192-rescoped.md) · [2026-09-04 (批次账目)](./2026-09-04-2345-level1-carry-batch-v1.69.1-awaiting-push-auth.md) |
 > | `sibling-spec-probe` (a1-entry 族第二份) | `simonfish/023236f2` | ✅ **done (2026-09-04 ship aria-plugin v1.69.0 @ 2eca24b + PR #191 merge be4417b + 归档 + claim 释放, track 终结)** | [2026-09-04 (Phase D)](./2026-09-04-sibling-spec-probe-shipped-v1.69.0-archived.md) |
@@ -95,6 +95,11 @@
 > ⇒ 详见 2026-08-11 handoff §4.4 / §9-3。
 
 ---
+
+### History (收尾条目, 倒序; 每次 handoff 写出时 prepend — handoff-mechanics 子步骤 1)
+
+- 2026-09-06 12:30 — [session-close-v1.70.0-shipped-170-closed-195-199-triaged](./2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md) (leader — 会话收尾: #170 关闭 + #195/#199 triage; v1.70.0 周期已归档)
+- 2026-09-06 08:30 — [owner-container-identity-key-shipped-v1.70.0-archived](./2026-09-06-owner-container-identity-key-shipped-v1.70.0-archived.md) (leader — 全周期 ship v1.70.0 + 归档, #193 closed, S2 → #198)
 
 ## 并发轨 (#128) — 以下为原有内容, 未改动
 
