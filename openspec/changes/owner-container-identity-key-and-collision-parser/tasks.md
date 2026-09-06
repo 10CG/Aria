@@ -1,8 +1,8 @@
 # Tasks — `owner-container-identity-key-and-collision-parser`
 
-> **Spec**: [proposal.md](./proposal.md) (v11, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R4 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
+> **Spec**: [proposal.md](./proposal.md) (v11, Approved 2026-09-05) | **决策单**: [`.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`](../../../.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md) | **审计**: post_spec R1–R5 + post_planning R1–R6 聚合 `.aria/audit-reports/post_{spec,planning}-R*-…-aggregated.md`
 > **Level**: 3 (owner 裁定; 判据 cross-module) — 本文件 (A.2) + `detailed-tasks.yaml` (A.3, 单一 SOT: verification / deps / 工时 / rule6_note) + post_planning 收敛审计
-> **Status**: A.2/A.3 **v6** (post_planning R5 后备稿 2026-09-06: S2-1 成对撤销含 1.8 lock-in / 激活时 4.2 依赖边 / 2.7 grep `-E` + 「后续版本」/ 组 5 导读补 5.4·5.8; 计划结构不变); post_planning 5 轮已耗尽, 终局待 owner 三选一
+> **Status**: A.2/A.3 **v7** (post_planning R6 rework 2026-09-06: 预留项激活依赖边 / 4.1 台账 S2 臂 / 2.7 范例句 + 机械锁下限 / S2-1 grep 范围; 计划结构不变); owner 已裁定加 2 轮 (max_rounds 7), post_planning R7 待跑
 > **Scope**: **三个仓** — `aria/` 子模块 (@ `7dd0135` v1.69.1) · `standards/` 子模块 (@ `cc864ee`) · 主仓 (@ `60808b2`; 冻结语料 `.aria/repro/handoff-tracks-frozen-2026-09-05.json` 已在)
 > **ship target**: aria-plugin `<vNEXT>` — 档位按 proposal D5 (判据 PATCH; owner 可升 MINOR); **本文件不写字面版本号**, 5.2 执行时按当时 `plugin.json` 计并记入 CHANGELOG
 > **ship 形态 (proposal §Impact)**: **S1** = a1-entry 未落地时 ship: 不 flip `get_container_id()`, 只加 `get_container_label()` + 迁移 inventory 告警; **S2** = a1-entry B.2 已落地 **且** 对方在 #174 ack。**S2 项不在本文件 checkbox 内** (归档门 `spec_complete.py` 只读 checkbox, 无「条件任务」机制 — post_planning R1 C-1); 见文末「S2 后续」表与激活规则
@@ -59,7 +59,7 @@
 - [ ] 2.4 `handoff_multibranch.py:518-523` dedupe 键 `(track_id, identity_key)`; `track_board.py:412-417` 键同源 — 1.3 转绿
 - [ ] 2.5 `lib/collision.py::track_to_claim_record` (`:86-140`; 调用点 `collision.py:349` / `track_board.py:783`) 族键剥离; `track_board.py:778-793` `tracks_by_tid` 用剥离后键 — 1.7 转绿
 - [ ] 2.6 `lib/constants.py` `LAYER_H_ACTIVE_WINDOW_DAYS = 30` + `lib/collision.py::layer_h_is_fresh()`; collector `:709` 前 / renderer `:744` 前同一调用; board stale 标注 — 1.10 转绿, 1.6 改后 0 组
-- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写为**S1 实况措辞**: 「label 当前仍参与协调身份 (设了会换身份), 后续版本改为仅展示; 建议留空」— 机械锁两条 grep (`:126-140` 区间含「当前仍参与协调身份」; 每个含「仅展示」的行同时含短语「后续版本」, `grep -cE`) — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
+- [ ] 2.7 `lib/identity.py` 新增 `get_container_label()`; container-id 文件头注释 (`:126-140`) 改写为**S1 实况措辞**: 「label 当前仍参与协调身份 (设了会换身份), 后续版本改为仅展示; 建议留空」— 机械锁两条 grep (`:126-140` 区间含「当前仍参与协调身份」; 每个含「仅展示」的行同时含短语「后续版本」, `grep -cE`; 字面下限, 语义人工核) — 1.8 accessor 子句转绿 (S1 不动 `get_container_id()`)
 - [ ] 2.8 迁移 inventory: `phase1_gate.py` (复用 `:486` Identity) 与 `release_gate.py` (import identity + `get_container_label()` + `read_claims` + `release_claim_by_track(identity=…)`) 告警, S1 无抑制 — 1.8 告警子句转绿
 - [ ] 2.9 `track_board.py` ⚪ 行渲染: **独立数据路径**, 在顶层 `render_track_board` 于 dedupe (`:744`) 前对原始 tracks 调 `identity_drift_advisories`, 输出为 collision 段 (`:796` `_render_collision_lines` 结果) 之后的独立段, **不进** per-track 循环 (`:459-475` 只有 dedupe 后数据); label 并列显示 — 1.9 转绿
 
@@ -95,12 +95,12 @@
 
 | 项 | 内容 | 验收 (proposal SC-3 S2 臂) |
 |----|------|------|
-| S2-1 | `get_container_id()` flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry `get_container_uuid()` 同值; 同 PR 成对撤销全部 S1 期产物: `identity.py:126-140` 注释改「label 仅展示」(撤销 2.7 机械锁) + 1.8 `test_identity_label.py` 的 S1 lock-in 断言翻转为「返回 uuid」+ 2.7 验收「S1 lock-in 仍绿」改 S2 | label 非空时返回 uuid (翻转后断言绿且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; 全仓无残留「S1 lock-in」判据 |
+| S2-1 | `get_container_id()` flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry `get_container_uuid()` 同值; 同 PR 成对撤销全部 S1 期产物: `identity.py:126-140` 注释改「label 仅展示」(撤销 2.7 机械锁) + 1.8 `test_identity_label.py` 的 S1 lock-in 断言翻转为「返回 uuid」+ 2.7 验收「S1 lock-in 仍绿」改 S2 + 4.1 Rule #6 台账加 S2 臂; 激活依赖: 排在 1.8 / 2.7 / 0.1 / 0.2 之后 | label 非空时返回 uuid (翻转后断言绿且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; state-scanner `lib/` `tests/` 内无 label 优先的 lock-in 断言 |
 | S2-2 | 发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项 | 未勾选则 flip 提交不进合并集 |
 | S2-3 | 改写 a1-entry SC-3 判据 (仅 #174 ack 后) | ack 留言 id 记录; 判据改为「`get_container_uuid()` 与 flip 后 `get_container_id()` 同值; label 只在 `get_container_label()`」 |
 | S2-4 | 复现 #135 08-13 时间线不再 `claim_not_found` | acquire 后加 label 再 release 成功 |
 
-**激活规则**: 0.1 判 S2-candidate **且** #174 ack 已到 **且** 5.1 merge 尚未执行 (yaml 里 0.1 / 0.2 是 5.1 的前置, 保证判定与留言发生在 merge 前) ⇒ 追加 `6.1`–`6.4` checkbox + yaml TASK-027..030 (接入 5.1 前置), 并在 handoff 记录激活时点; 三条件任一不满足 ⇒ 维持 S1, 由 5.8 **手动**开 tracker issue 记录 S2 后续 (归档 Step 7 不会自动产出, 先例 sibling-spec-probe #192 是 deferred 非空时的自动路径)。**回退条款**: 激活后若 S2 前提失效 (a1-entry 被 revert / ack 撤回), 回退 S1 须 owner 裁定并记入 handoff; AI 不得自行删除已追加的 6.x checkbox 或 TASK-027..030 (它们是归档门输入, Rule #10)。 激活时同步改依赖边: 4.2 全套回归须在 6.1-6.4 之后重跑 (yaml TASK-032 deps += TASK-027..030)。
+**激活规则**: 0.1 判 S2-candidate **且** #174 ack 已到 **且** 5.1 merge 尚未执行 (yaml 里 0.1 / 0.2 是 5.1 的前置, 保证判定与留言发生在 merge 前) ⇒ 追加 `6.1`–`6.4` checkbox + yaml TASK-027..030 (接入 5.1 前置), 并在 handoff 记录激活时点; 三条件任一不满足 ⇒ 维持 S1, 由 5.8 **手动**开 tracker issue 记录 S2 后续 (归档 Step 7 不会自动产出, 先例 sibling-spec-probe #192 是 deferred 非空时的自动路径)。**回退条款**: 激活后若 S2 前提失效 (a1-entry 被 revert / ack 撤回), 回退 S1 须 owner 裁定并记入 handoff; AI 不得自行删除已追加的 6.x checkbox 或 TASK-027..030 (它们是归档门输入, Rule #10)。 激活时同步改依赖边: 4.2 全套回归须在 6.1-6.4 之后重跑 (yaml TASK-032 deps += TASK-027..030)。 各 6.x 项按 yaml `dependencies_on_activation` 排序 (6.1 在 1.8 / 2.7 之后); 4.1 台账加 S2 臂并排在 6.1 之后。
 
 ## Success Criteria ↔ 任务映射
 

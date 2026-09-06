@@ -1,5 +1,5 @@
 # Detailed Tasks — owner-container-identity-key-and-collision-parser
-# Phase A.2 + A.3 output (task-planner v2.0), v6 after post_planning R5. Datasource: tasks.md (path A, dual-layer).
+# Phase A.2 + A.3 output (task-planner v2.0), v7 after post_planning R6. Datasource: tasks.md (path A, dual-layer).
 # Spec: openspec/changes/owner-container-identity-key-and-collision-parser/{proposal.md,tasks.md}
 # 决策单: .aria/decisions/2026-09-05-owner-container-identity-key-rulings.md
 #
@@ -13,7 +13,7 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-06"   # v6: post_planning R5 后备稿 (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
+  updated: "2026-09-06"   # v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
   ship_shape: "TBD-at-0.1"   # S1 | S2-candidate, 由 TASK-000 写入并附证据
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -36,24 +36,28 @@ metadata:
     - "子模块推送须 owner 逐条授权 (决策单 B9-补, 本 session 沿用)"
     - "先 bump 后 tag (version-management.md); 主仓 gitlink 在子模块推送核验之后 bump"
     - "禁带圈数字 / 希腊字母编号 (全局规则)"
-  rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂) / SC-4 / SC-8 五条 baseline-failing 结构化测试, 承载任务 TASK-001 / 002 / 003 / 004 / 005 / 007 / 008, 各有改前 (aria 7dd0135) 实跑红 / 改后绿记录 (TASK-031 汇总); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑。tasks.md 不复述本条 (单一来源)"
+  rule6_note: "无 SKILL.md 指令面 / description 改动 (SKILL.md:149-154 取值字面存在但不变) ⇒ skill-benchmark-exemption 第一行「描述性 / 机械」档 substitute = SC-1 / SC-2 (含族键臂) / SC-3 (S1 臂; flip 臂仅 S2 激活时纳入, 对齐 proposal §Rule #6 行) / SC-4 / SC-8 五条 baseline-failing 结构化测试, 承载任务 TASK-001 / 002 / 003 / 004 / 005 / 007 / 008 (S2 激活时 += TASK-027), 各有改前 (aria 7dd0135) 实跑红 / 改后绿记录 (TASK-031 汇总); 若 B 期必须改任何 SKILL.md 文本, 立即转照跑。tasks.md 不复述本条 (单一来源)"
   s2_followup:
-    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030, 并改依赖边: TASK-032 (全套回归) deps += TASK-027..030 (flip 后强制重跑), TASK-034 (merge) 经 TASK-032 传递依赖之; 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)。回退: 激活后 S2 前提失效须 owner 裁定并记 handoff, AI 不得自行删已追加的 checkbox / TASK (归档门输入, Rule #10)"
+    activation: "TASK-000 判 S2-candidate 且 Aria#174 ack 已到 且 TASK-034 (merge) 尚未执行 (TASK-000/040 是 TASK-034 的前置) ⇒ 追加 tasks.md 6.1-6.4 checkbox + 本文件 TASK-027..030, 并改依赖边: 各预留项 deps = 其 dependencies_on_activation; TASK-032 (全套回归) deps += TASK-027..030 (flip 后强制重跑); TASK-031 (Rule #6 台账) deps += TASK-027 且 verification += 「SC-3 S2 臂: TASK-027 lock-in 翻转改前红 / 改后绿记录」; TASK-034 (merge) 经 TASK-032 传递依赖之; 否则维持 S1, 由 TASK-042 手动开 tracker issue 记录 (归档 Step 7 干净归档不自动产出)。回退: 激活后 S2 前提失效须 owner 裁定并记 handoff, AI 不得自行删已追加的 checkbox / TASK (归档门输入, Rule #10)"
     items:
       - id_reserved: TASK-027
         parent_reserved: "6.1"
+        dependencies_on_activation: [TASK-008, TASK-018, TASK-000, TASK-040]   # flip 必在其撤销对象 (S1 lock-in / S1 注释) 落地之后
         title: "get_container_id() flip 为 uuid 优先 (只读 fs 兜底 hostname), 与 a1-entry get_container_uuid() 同值; 同 PR 成对撤销全部 S1 期产物: (1) lib/identity.py:126-140 注释改为「label 仅展示」(撤销 TASK-018 的 S1 措辞与机械锁); (2) TASK-008 的 test_identity_label.py S1 lock-in 断言翻转为「label 非空时 get_container_id() 返回 uuid」; (3) TASK-018 verification「S1 lock-in 仍绿」随之改为 S2 lock-in"
-        verification: "SC-3 S2: label 非空时返回 uuid (翻转后的 lock-in 断言绿, 且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; 全仓 grep 无残留「S1 lock-in」判据文本"
+        verification: "SC-3 S2: label 非空时返回 uuid (翻转后的 lock-in 断言绿, 且改前对 S1 实现红); 注释区间不再含「当前仍参与协调身份」; aria/skills/state-scanner/{lib,tests} 内无 label 优先的 lock-in 断言 (test_identity_label.py 中 get_container_id() 返回 label 的断言已翻转), yaml TASK-008/018 verification 文本随之改写"
       - id_reserved: TASK-028
         parent_reserved: "6.2"
+        dependencies_on_activation: [TASK-027]
         title: "发布门: C.2 前 release 清单加「T3b 迁移检查通过」勾选项"
         verification: "SC-3 S2: 未勾选则 flip 提交不进合并集"
       - id_reserved: TASK-029
         parent_reserved: "6.3"
+        dependencies_on_activation: [TASK-027]
         title: "改写 a1-entry SC-3 判据 (仅 #174 ack 后)"
         verification: "ack 留言 id 记录; 判据改为 get_container_uuid() 与 flip 后 get_container_id() 同值; label 只在 get_container_label()"
       - id_reserved: TASK-030
         parent_reserved: "6.4"
+        dependencies_on_activation: [TASK-027]   # 不依赖 TASK-038 回帖 (回帖在 merge 后, 否则经 TASK-032→034 成环; R6 rework 自查)
         title: "复现 #135 08-13 时间线不再 claim_not_found"
         verification: "SC-3 S2: acquire 后加 label 再 release 成功"
   total_tasks: 39
@@ -358,7 +362,7 @@ tasks:
       - aria/skills/state-scanner/lib/identity.py   # :126-140 模板 / 新 accessor
     verification:
       - "TASK-008 label accessor 子句转绿; S1 lock-in 仍绿"
-      - "文件头注释为 S1 实况措辞 (label 当前仍参与协调身份, 后续改为仅展示, 建议留空); 机械锁 (两条 grep, 对 lib/identity.py:126-140 区间): 含「当前仍参与协调身份」≥1 行; 含「仅展示」的每一行同时含短语「后续版本」— 可执行形态: 对该区间 grep -cE 仅展示 的计数 等于 grep -cE (后续版本.*仅展示|仅展示.*后续版本) 的计数 (用 -E; 不用单字「将」, 避免同行无关「将」字假阴性, R5 qa)"
+      - "文件头注释为 S1 实况措辞 (label 当前仍参与协调身份, 后续版本改为仅展示, 建议留空); 机械锁 (字面下限; 语义 — 如两短语共现但语义否定 — 由 code-reviewer 在 TASK-031 记录复核与 pre_merge 人工核, 与 SC-9 人工核同形) (两条 grep, 对 lib/identity.py:126-140 区间): 含「当前仍参与协调身份」≥1 行; 含「仅展示」的每一行同时含短语「后续版本」— 可执行形态: 对该区间 grep -cE 仅展示 的计数 等于 grep -cE (后续版本.*仅展示|仅展示.*后续版本) 的计数 (用 -E; 不用单字「将」, 避免同行无关「将」字假阴性, R5 qa)"
 
   - id: TASK-019
     parent: "2.8"
