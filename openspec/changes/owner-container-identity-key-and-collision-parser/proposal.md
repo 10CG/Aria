@@ -1,7 +1,7 @@
 # owner-container 身份键与 collision 解析器修正 (合并处置 Aria #193 + aria-plugin #135 缺口 3)
 
 > **Level**: Full (Level 3 Spec) — **owner 2026-09-05 裁定升 Level 3** (判据: cross-module 成立, aria + standards 两子模块; 决策单 `.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md`)。Level 3 交付 = 本 proposal + `tasks.md` (A.2) + `detailed-tasks.yaml` (A.3) + post_planning 收敛审计。
-> **Status**: **Approved (owner 2026-09-05)** — v11 = post_planning R4 后同步 (SC-9 尾句门槛 / T11 两时点拆开 / SC-7 文件级限定 + test_collision.py carve-out); v10 = post_planning R3 后同步 (SC-7 双跑法可执行形态 / T10 T11 措辞 / T2 删不成立子句 / :104 先例句 / Impact S1 限定); v9 = post_planning R2 后同步 (SC-9 rule 1.54 子句改文档断言 / SC-3 S2 宿主句改 S2 后续表 / 孤儿引文清理); v8 = post_planning R1 后同步 (S2 项改为「激活后追加」/ SC-7 plugin-cache-currency 例外 / 决策单路径勘正); post_spec R1–R5 (R5 五席全票 PASS 0C/0M; 严格键集合未稳定 ⇒ MAX_ROUNDS_EXHAUSTED, owner 裁定 [1] 接受, `overridden_by_user=true`); 四项决策点已裁 (Level 3 / D-0 a / D-1 a / D-2 a / D-3 a, 决策单同上), **v7 = 裁定回填** (条件任务 T9/T13 转正); 下一步 A.2/A.3。R1..R5 聚合见 §References。
+> **Status**: **Shipped 2026-09-06 (S1; aria-plugin v1.70.0, 主仓 PR #197 → 990318e; S2 后续 tracker Aria #198)** — 原 Approved (owner 2026-09-05) — v11 = post_planning R4 后同步 (SC-9 尾句门槛 / T11 两时点拆开 / SC-7 文件级限定 + test_collision.py carve-out); v10 = post_planning R3 后同步 (SC-7 双跑法可执行形态 / T10 T11 措辞 / T2 删不成立子句 / :104 先例句 / Impact S1 限定); v9 = post_planning R2 后同步 (SC-9 rule 1.54 子句改文档断言 / SC-3 S2 宿主句改 S2 后续表 / 孤儿引文清理); v8 = post_planning R1 后同步 (S2 项改为「激活后追加」/ SC-7 plugin-cache-currency 例外 / 决策单路径勘正); post_spec R1–R5 (R5 五席全票 PASS 0C/0M; 严格键集合未稳定 ⇒ MAX_ROUNDS_EXHAUSTED, owner 裁定 [1] 接受, `overridden_by_user=true`); 四项决策点已裁 (Level 3 / D-0 a / D-1 a / D-2 a / D-3 a, 决策单同上), **v7 = 裁定回填** (条件任务 T9/T13 转正); 下一步 A.2/A.3。R1..R5 聚合见 §References。
 > **Created**: 2026-09-05
 > **Linked Issue**: `10CG/Aria#193, 10CG/aria-plugin#135`
 > **Track / claim**: `owner-container-identity-key-and-collision-parser` (phase A claim `s-8204@1355`, container `bfe8285d`, linked_issue `10CG/Aria#193`, overlap 告警空)
@@ -116,9 +116,9 @@ D3 advisory 对象 (冻结语料, 对 dedupe 前全语料算): `023236f2: [aria-
 - [x] T7 消费面同步: 七处文档 (D4) + `test_fetch_gate.py` `kind="cross_owner"` 字符串夹具; rule 1.54 触发面锁定 → SC-9
 - [x] T8 `track_board.py` ⚪ 行渲染 (dedupe 前调用 `identity_drift_advisories`) + label 并列显示; D-0(a) 时 `tracks_by_tid` 标签索引改用剥离后键 (与 `verdicts` 键域一致) → SC-10
 - [x] T9 (D-0(a) 已裁) `track_to_claim_record` 族键剥离 + §2.3.1 尾段语义 + 三条夹具 (`slug-aaaa1111`/`slug-bbbb2222` 同组; `x-20260719` 剥后与语料零碰撞; `slug-abcdefg` 不剥) → SC-2 条件用例
-- [ ] T10 全套回归: state-scanner 两种跑法 (run_tests.py 全套 + pytest 对 test_collision.py; 点名改写项全绿) + `test_fetch_gate.py` + session-closer / phase-d-closer handoff 写入测试 + 主仓 state-check 13 条全绿 + `plugin-cache-currency` 例外 → SC-7
-- [~] T11 issue 回帖 (文档动作, 无 SC), 两个时点: **B.1 起手** (tasks.md 0.2) #174 留言 D-0 与 SC-3 改写征求 ack (S2 激活前提之一, 见上表 :104 行); **merge 后、归档前** (tasks.md 5.5) 回帖 #193 / aria-plugin#135 指向本 Spec + 版本, #174 补 ship 结果, 关 #193; #135 措辞按形态 (S1 = 缺口 3 部分闭合, label 陷阱待 S2 或 tracker; S2 = 缺口 3 闭合), 缺口 1/2 均留
-- [~] T12 发布同步 (D5): aria-plugin 版本 bump (档位按 D5 二选一, 记入 CHANGELOG) + CLAUDE.md §版本管理同步面 (含 i18n README ×3 版本串) + CHANGELOG 明示 §2.3.5 行为变更; Lab 内部指针已在 `.aria/decisions/` 决策单 → SC-7
+- [x] T10 全套回归: state-scanner 两种跑法 (run_tests.py 全套 + pytest 对 test_collision.py; 点名改写项全绿) + `test_fetch_gate.py` + session-closer / phase-d-closer handoff 写入测试 + 主仓 state-check 13 条全绿 + `plugin-cache-currency` 例外 → SC-7
+- [x] T11 issue 回帖 (文档动作, 无 SC), 两个时点: **B.1 起手** (tasks.md 0.2) #174 留言 D-0 与 SC-3 改写征求 ack (S2 激活前提之一, 见上表 :104 行); **merge 后、归档前** (tasks.md 5.5) 回帖 #193 / aria-plugin#135 指向本 Spec + 版本, #174 补 ship 结果, 关 #193; #135 措辞按形态 (S1 = 缺口 3 部分闭合, label 陷阱待 S2 或 tracker; S2 = 缺口 3 闭合), 缺口 1/2 均留
+- [x] T12 发布同步 (D5): aria-plugin 版本 bump (档位按 D5 二选一, 记入 CHANGELOG) + CLAUDE.md §版本管理同步面 (含 i18n README ×3 版本串) + CHANGELOG 明示 §2.3.5 行为变更; Lab 内部指针已在 `.aria/decisions/` 决策单 → SC-7
 - [x] T13 (D-3(a) 已裁) `layer_h_is_fresh` 共享谓词 + `LAYER_H_ACTIVE_WINDOW_DAYS` 常量 + collector/renderer 同一调用 + §2.3.5 规范句 → SC-11
 
 ## Success Criteria

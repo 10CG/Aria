@@ -43,7 +43,7 @@
 - [x] 1.2 `tests/test_collision.py` 判定臂 + advisory 函数级用例 — SC-2, 前三条先红
 - [x] 1.3 `tests/test_handoff_multibranch_collision_dedupe.py`: `test_owner_segment_participates_in_grouping_key` (`:1039`) 三臂; `test_both_latest_active_still_reports_self_multi_container` (`:305`) 期望改 `cross_owner` + 同 owner 变体; board 回显原串 — SC-4, 先红
 - [x] 1.4 `tests/test_collision.py` keys 断言改写 (`test_real_collector_emits_cross_owner_collision` / `test_real_collector_no_collision_is_none`); 新建 `tests/test_track_board_advisories.py` 承载「旧 snapshot 缺字段不崩」 — SC-8, 先红
-- [x] 1.5 端到端接线锁: uuid 容器 `aaaa1111`、**同一 `track_id`** 两份 handoff 两串 → snapshot `identity_advisories` 恰 1; 接反 → 0; 真实两段式两人两机端到端 → `cross_owner` — SC-2 端到端
+- [x] 1.5 端到端接线锁: uuid 容器 aaaa1111、**同一 `track_id`** 两份 handoff 两串 → snapshot 字段 identity_advisories 恰 1; 接反 → 0; 真实两段式两人两机端到端 → kind 为 cross_owner — SC-2 端到端
 - [x] 1.6 冻结语料 fixture (`tests/fixtures/handoff-tracks-frozen-2026-09-05.json`, 八字段) + 裁剪脚本 `tests/fixtures/freeze_corpus.py` + `tests/test_collision_frozen_corpus.py` 前后对照机械归因 (含注入合成真撞车组) — SC-6
 - [x] 1.7 D-0(a) 族键夹具三条 — SC-2 族键子句, 先红
 - [x] 1.8 新建 `tests/test_identity_label.py` (label accessor + S1 lock-in) 与 `tests/test_migration_inventory.py` (phase1_gate / release_gate 迁移告警) — SC-3 S1 臂, 先红
@@ -68,7 +68,7 @@
 - [x] 3.1 `standards/conventions/session-handoff.md:116` §2.3.1: `<owner>` = 提交身份 (可取 `unknown`); `<container-id>` 三态; 定义 `identity_key`; 族键句 (限定仅用于 §2.3.5 Layer H 分组) — SC-5
 - [x] 3.2 §2.3.5 (`:178-186`) 三行判据 + 新鲜度截止句 + 「实质变更」说明 (standards 无 CHANGELOG; 按该文件既有惯例写成紧贴 §2.3.5 标题下方的 `> **Amended**: 2026-09-05 … / **Status**: …` blockquote, 与 §2.3 头部 Added/Purpose/Status 同形) — SC-5
 - [x] 3.3 新增 §2.3.9 (D-2(a)); 不引用 Lab 私有文档 — SC-5
-- [x] 3.4 aria 六处取值文档: `layer-l-integration.md:25-27,73,77` / `RECOMMENDATION_RULES.md:31` (该行须同时含 `cross_owner` 与 `identity_advisories` 两 token, 今日均无, 与 SC-9 首句对齐) / `references/rules/advanced-rules.md:544-572,578` / `references/state-snapshot-schema.md:1085` **与 `:1109-1121` 旧 dedupe 语义段** / `references/phase-1-collectors.md:75` (加一句: collision 三态语义 + `identity_advisories`); `SKILL.md:149-154` 取值不变**不改动** — SC-9 文档
+- [x] 3.4 aria 六处取值文档: `layer-l-integration.md:25-27,73,77` / `RECOMMENDATION_RULES.md:31` (该行须同时含 cross_owner 与 identity_advisories 两 token — 已落, 与 SC-9 首句对齐) / `references/rules/advanced-rules.md:544-572,578` / `references/state-snapshot-schema.md:1085` **与 `:1109-1121` 旧 dedupe 语义段** / `references/phase-1-collectors.md:75` (加一句: collision 三态语义 + identity_advisories 字段); `SKILL.md:149-154` 取值不变**不改动** — SC-9 文档
 - [x] 3.5 `aria/templates/session-handoff.md` 示例改 uuid 形 + 删「设 label 使更可读」句 — SC-9 反向 grep
 - [x] 3.6 aria `CHANGELOG.md` 条目 (§2.3.5 实质变更 / `identity_advisories` / `get_container_label` / 档位) — 5.2 前置
 
@@ -84,14 +84,16 @@
 - [x] 5.2 aria-plugin 版本 5 文件 bump (`plugin.json` SOT + marketplace.json 两处 + VERSION + CHANGELOG + README) 按 D5 档位, 在 feature 分支上、merge 前
 - [x] 5.3 **owner 逐条授权后**双推 aria (master + tag) / standards, 推后逐 remote `ls-remote` 核验 master **与 tag 对象** SHA
 - [x] 5.4 fixture 公开性确认 (八字段无邮箱 / token / 内网地址; github 镜像可见)
-- [ ] 5.5 issue 回帖 (**5.6 merge 后、归档前由执笔容器执行**): #193 / aria-plugin#135 指向本 Spec + 版本; #174 补 ship 结果; ship 后关 #193。#135 措辞按形态: **S1** = 「缺口 3 部分闭合 (解析 / 身份键 / dedupe / 漂移 advisory); label 陷阱 (08-13 形态) 待 S2 或 tracker」; **S2** = 「缺口 3 闭合」; 缺口 1/2 均留
-- [~] 5.6 (PR #197 open, C.2.4 gate green/not_applicable; merge 待 owner 授权) 主仓 feature 推 origin → `phase-c-integrator` C.2.4 gate → PR → merge → github 镜像
+- [x] 5.5 (已发: #193 comment 21983 + closed / aria-plugin#135 comment 21988 / #174 comment 21989) issue 回帖 (**5.6 merge 后、归档前由执笔容器执行**): #193 / aria-plugin#135 指向本 Spec + 版本; #174 补 ship 结果; ship 后关 #193。#135 措辞按形态: **S1** = 「缺口 3 部分闭合 (解析 / 身份键 / dedupe / 漂移 advisory); label 陷阱 (08-13 形态) 待 S2 或 tracker」; **S2** = 「缺口 3 闭合」; 缺口 1/2 均留
+- [x] 5.6 (PR #197 merged 990318e, C.2.4 gate green/not_applicable; origin/github MATCH) 主仓 feature 推 origin → `phase-c-integrator` C.2.4 gate → PR → merge → github 镜像
 - [x] 5.7 主仓同步面 (子模块推送核验后): 两 gitlink + `VERSION` + `README.md` badge + `README.zh.md` / `README.ja.md` / `README.ko.md` 版本串 + `docs/architecture/system-architecture.md` §2.8 与 `docs/architecture/version-scheme.md` 版本行 + CLAUDE.md **两行** (`:141` 版本行 + `:139` 方法论轨区间端点 `v1.52.0–v<NEXT>`; 项目状态段其余不动)
-- [ ] 5.8 S2 后续的承载体 (归档 Step 7 只在 deferred/unverified 非空时产出, 干净归档不会自动记录): **S1** ⇒ 5.6 merge 后、归档前手动开 tracker issue (标题「S2 后续: flip / 发布门 / a1-entry SC-3 改写 / #135 时间线」, 含激活条件与 S2-1..S2-4 原文), 编号回填本文件「S2 后续」表; **S2 已激活** ⇒ 本条勾选为「已激活, 见 6.x」
+- [x] 5.8 (S1 ⇒ tracker **Aria #198** 已开, 2026-09-06) S2 后续的承载体 (归档 Step 7 只在 deferred/unverified 非空时产出, 干净归档不会自动记录): **S1** ⇒ 5.6 merge 后、归档前手动开 tracker issue (标题「S2 后续: flip / 发布门 / a1-entry SC-3 改写 / #135 时间线」, 含激活条件与 S2-1..S2-4 原文), 编号回填本文件「S2 后续」表; **S2 已激活** ⇒ 本条勾选为「已激活, 见 6.x」
 
 ---
 
 ## S2 后续 (非 checkbox; 激活规则见下)
+
+> **承载 tracker**: Aria #198 (S1 ship 后手动开, 2026-09-06; 激活条件与回退条款原文已同步至该 issue)
 
 | 项 | 内容 | 验收判据 |
 |----|------|------|

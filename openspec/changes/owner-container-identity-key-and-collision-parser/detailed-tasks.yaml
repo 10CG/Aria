@@ -13,7 +13,7 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-05"
-  updated: "2026-09-06"   # C 进度: aria v1.70.0 master 0545f86 (tag v1.70.0) / standards master d217ed0 双推核验 MATCH; #174 comment 21906; B.2 进度: 组 1/2/3 + 4.1/4.2/5.4 done (aria f2e4231, standards c955783); v9: post_planning R9 CONVERGED 后落延后 minor (预留项 *_on_activation 三键 / activation agents+est_hours 重算句); v8: post_planning R7 rework (TASK-031 承接 TASK-018 语义复核 / TASK-027 title 第四项 / S2-1 grep 仅 S2 评估 / total_tasks 39→43); v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
+  updated: "2026-09-06"   # D 期: PR #197 merged 990318e; #193 closed (21983) / #135 (21988) / #174 (21989); S2 tracker Aria #198; C 进度: aria v1.70.0 master 0545f86 (tag v1.70.0) / standards master d217ed0 双推核验 MATCH; #174 comment 21906; B.2 进度: 组 1/2/3 + 4.1/4.2/5.4 done (aria f2e4231, standards c955783); v9: post_planning R9 CONVERGED 后落延后 minor (预留项 *_on_activation 三键 / activation agents+est_hours 重算句); v8: post_planning R7 rework (TASK-031 承接 TASK-018 语义复核 / TASK-027 title 第四项 / S2-1 grep 仅 S2 评估 / total_tasks 39→43); v7: post_planning R6 rework (预留项 dependencies_on_activation / TASK-031 S2 臂 + rule6_note 限定语 / TASK-018 范例句 + 机械锁下限 / S2-1 grep 范围); v6: post_planning R5 rework (S2-1 成对撤销含 TASK-008 lock-in / 激活时 TASK-032 deps / TASK-018 括注 -E + 「后续版本」/ 组 5 导读补 037·042); v5: post_planning R4 rework (TASK-018 机械锁两条 grep / S2-1 含注释翻转); v4: post_planning R3 rework (pytest 腿可执行形态 / TASK-024 两 token / TASK-018 注释措辞锁 / TASK-033 Rule #10 留痕 / 激活回退条款); v3: R2 rework
   ship_shape: "S1"   # TASK-000 判定 2026-09-06 (证据见 ship_shape_evidence); S2 前提「a1-entry B.2 已落地 (进 master) 且 #174 ack」均不成立
   ship_shape_evidence:
     fetched: "git fetch --all (主仓 + aria), 2026-09-06 ~07:10 UTC"
@@ -626,7 +626,7 @@ tasks:
   - id: TASK-039
     parent: "5.6"
     title: "主仓 feature 推 origin → phase-c-integrator C.2.4 gate → PR → merge → github 镜像"
-    status: in_progress
+    status: done
     complexity: S
     est_hours: 1
     agent: backend-architect
@@ -639,7 +639,7 @@ tasks:
   - id: TASK-038
     parent: "5.5"
     title: "issue 回帖 (merge 后、归档前, 执笔容器执行): #193 / aria-plugin#135 (缺口 3) / #174 ship 结果"
-    status: pending
+    status: done
     complexity: S
     est_hours: 1
     agent: knowledge-manager
@@ -653,7 +653,7 @@ tasks:
   - id: TASK-042
     parent: "5.8"
     title: "S2 后续承载体: S1 ⇒ 手动开 tracker issue (merge 后、归档前); S2 已激活 ⇒ 勾选为已激活"
-    status: pending
+    status: done
     complexity: S
     est_hours: 0.5
     agent: knowledge-manager
