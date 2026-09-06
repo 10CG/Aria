@@ -20,7 +20,7 @@ Aria 项目包含四个**独立**的版本流。这四个版本号在语义上�
 |--------|------------|----------|----------|-----------|------|
 | **Aria main repo** | `/home/dev/Aria/` | v1.7.5 | `VERSION` | 里程碑 M0-M6；MAJOR on autonomous runtime 正式发布 | 方法论 + 运行时的整体版本 |
 | **Aria 2.0 runtime (aria-orchestrator)** | `aria-orchestrator/` | v2.x (M6 in progress) | `aria-orchestrator/pyproject.toml` 或 VERSION | MINOR on new Layer 1/2 capability | 10CG Lab 内部，不公开发布 |
-| **aria-plugin** | `aria/` (子模块) | v1.71.0 | `aria/.claude-plugin/plugin.json` | MINOR on new Skill/Agent; PATCH on bug fix | 独立于 Aria main repo；**不随 Aria 2.0 同 bump** |
+| **aria-plugin** | `aria/` (子模块) | v1.71.1 | `aria/.claude-plugin/plugin.json` | MINOR on new Skill/Agent; PATCH on bug fix | 独立于 Aria main repo；**不随 Aria 2.0 同 bump** |
 | **Aria 2.0 PRD** | `docs/requirements/prd-aria-v2.md` | v2.0.0 | PRD frontmatter `**Version**:` 字段 | 文档修订（需求变化时更新） | 文档版本，非代码版本 |
 
 ---
