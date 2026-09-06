@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-06-a1-entry-shipped-v1.71.0-and-gate-fix-v1.71.1-archived.md](./2026-09-06-a1-entry-shipped-v1.71.0-and-gate-fix-v1.71.1-archived.md) — a1-entry-claim-duplicate-work-guard @ phase=D (status=done) — **母 Spec 40/40 ship + 归档**: 8.1/8.4/8.2 发版三步 + 7.6 开单 (aria-plugin#171)。号原定 1.70.0 于 08:27Z 被同伴轨抢占, 按 Spec「落地时按 plugin.json 计算」重算 **v1.71.0** (aria master `985e629` + tag)。收尾 D.2 **BLOCK** —— 查明是 `.aria/state-checks.yaml` 未被认作运行时调用面的闸门盲点, owner 裁「先修再归档」⇒ **v1.71.1** (`301641b`) 修复后归档成功 (影响面 19 Spec 只动 1 条)。claim 已 release; Archive Tracker Aria#201 (14 条 unverified claims, deferred=0)。
+**Latest**: [2026-09-06-session-close-a1-entry-cycle-done-and-archive-gate-blindspot.md](./2026-09-06-session-close-a1-entry-cycle-done-and-archive-gate-blindspot.md) — a1-entry-claim-duplicate-work-guard @ phase=D (status=done) — **会话收尾**: 本对话把母 Spec 从 36/40 推到 **40/40 并归档**, 连发 aria-plugin **v1.71.0 → v1.71.1** 两版, 三仓全部合到 master 并逐 remote 核验。三个闸门各拦一次真问题 (8.4 条款 1 抓版本号撞车 / 条款 2 「本次而非既有双父」抓一次**根本没发生的合并** / D.2 C-gate 抓自己的白名单缺口)。**唯一硬待办: 主仓 feature 分支未合入 master**。周期维度另有一份 phase-d-closer 收尾。
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -24,6 +24,8 @@
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-09-06 会话收尾 (simonfish/023236f2, session-closer, leaf)**: bare pointer 改指本会话收尾 handoff (全仓最新)。内省出 7 条对话层线程 (机械 backstop 一条都看不见 —— 它对本轨零发现, `sync` 零告警、`unfinished` 132 条全属他轨 M6/M7)。**承诺未兑现一条**: 说过「无论选哪个都会把闸门缺口开成 issue」, 选了先修后没开 —— 缺口本身已消, 但「同类注册面还有没有漏网」无人跟踪, 已列 §2 H2。新增 memory ×2 (`same-value-merge-silent` / `assert-this-action`), 索引腾位移 2 条窄指针入 archive (fact 文件保留)。
 >
 > **2026-09-06 周期收尾 (simonfish/023236f2, phase-d-closer D.1–D.4)**: bare pointer 改指本周期 handoff (全仓最新)。母 Spec **40/40 → 归档**, track 终结。本轮四件外向动作均经 owner 逐项授权 + 逐 remote `ls-remote` 独立核验。**D.2 一度 BLOCK**: 闸门报 `coordination_probe` 零生产语义引用, 实测该探针由 `.aria/state-checks.yaml` 的 `coordination-gate-invocation` check 每次扫描真实执行且当日 pass ⇒ 是闸门白名单漏了这个注册面。owner 裁「先修再归档」⇒ Level 1 修复 (先例 v1.69.1 `c98646e` 同文件同分类器) ⇒ v1.71.1。**先写改前必红测试再改代码** + **19 个 Spec 改前后对跑只动 1 条**, 两项独立证据规避自证循环。D.1 skip (无 UPM) / D.post skip (config off) / D.2b claim release `push_success:true` / D.4 estimator 618 turns · work_metric 4.51M · 8.5h。
 >
