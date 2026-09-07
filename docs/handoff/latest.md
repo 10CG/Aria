@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-06-session-close-a1-entry-cycle-done-and-archive-gate-blindspot.md](./2026-09-06-session-close-a1-entry-cycle-done-and-archive-gate-blindspot.md) — a1-entry-claim-duplicate-work-guard @ phase=D (status=done) — **会话收尾**: 本对话把母 Spec 从 36/40 推到 **40/40 并归档**, 连发 aria-plugin **v1.71.0 → v1.71.1** 两版, 三仓全部合到 master 并逐 remote 核验。三个闸门各拦一次真问题 (8.4 条款 1 抓版本号撞车 / 条款 2 「本次而非既有双父」抓一次**根本没发生的合并** / D.2 C-gate 抓自己的白名单缺口)。**唯一硬待办: 主仓 feature 分支未合入 master**。周期维度另有一份 phase-d-closer 收尾。
+**Latest**: [2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md](./2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md) — archive-gate-registration-class-and-skill-drift @ phase=B (status=active) — **Phase B 51/69**: TG-B 18 个文档 hunk / TG-C 三探针 + 单测 + 冻结夹具 / TG-D 6 张单全部落地并验收 (SC-1 区段外 15→0, 全套件 2122→2128)。**TG-E 停在两个 owner 门**: SC-11 裁定 + `ARIA_COORDINATION_NO_PUSH` 会话级前置。post_planning R5 = FAIL / converged=false (max_rounds 用满) — 换新鲜眼睛后缺陷从 0C/1M 反弹到 2C/12M。`<vNEXT>` = v1.73.0 (三方抢号) updated=2026-09-07
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
