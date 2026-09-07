@@ -125,6 +125,17 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_ga
 
 > 原稿定义「以 `{checkpoint}-` 开头但不含任何 `-{c}-`」= 本仓 **238 份**, 会把上面那 62 份**真报告**吞进 legacy 计数 ⇒ R-a 依赖的「legacy 计数显影」不但不显影, 反而把归属 bug 伪装成历史包袱, 编排者读到「legacy 不计入: N」会得出相反结论。
 
+#### 1.2b 枚举范围: 两条 SOT 未定义、语料里却有实例的边界 (2026-09-07 主 loop 冻结快照实测补)
+
+SOT Step 4 只写「扫描目录: `{project_root}/.aria/audit-reports/`」, **没说递归与否, 也没说不以 checkpoint 名开头的文件怎么算**。两条都不是假想问题, 冻结快照 `3f4b379` 里各有实例:
+
+| 边界 | 语料实况 (冻结快照 `git ls-tree -r --name-only 3f4b379 -- .aria/audit-reports/`) | 本 spec 定义 |
+|---|---|---|
+| **子目录** | 存在两个子目录 `pr19-submodule-scan/` 与 `wf-r1fix/` (各含 `AGGREGATE.md` 等)。同一份 SOT 被两个实现分别读成「递归」与「不递归」时, 完整性判决会不同 | **只扫顶层, 不递归** (与现行 glob `{checkpoint}-*.md` 的语义一致, 是「不改变现状」的那一侧)。`completeness_gate.py` 用 `iterdir()` 而非 `rglob()`, 并在 stdout 契约里输出 `scanned_dir_depth: 1`; schema 文档写明「子目录内的报告不计入完整性证据」。**理由**: 递归会把历史上手工归置的一次性目录 (上述两个正是这种) 突然算成证据, 那是**放宽**门, 与本 spec 的方向相反 |
+| **无 checkpoint 前缀的形态** | `sibling-spec-probe-audit-trail.md` · `linked-issue-field-availability-audit-trail.md` · `linked-issue-normalization-audit-trail.md` · `a1-entry-claim-audit-trail.md` · `phase-b-review-179-secret-guard-manifest-precision.md` —— **含 change_id 但不以任何 checkpoint 名开头** | **不计入任何 checkpoint 的证据** (规则 1 的 `f.startswith(f"{checkpoint}-")` 已自然排除), 且**也不进** `unattributed_count` (该计数按定义只收以 checkpoint 前缀开头的)。schema 文档须显式写明这一点 |
+
+> **为什么第二条值得成文**: 它解释了一个会误导人的观测 —— `sibling-spec-probe` 这个**已 ship 并归档**的 change, 按逐字子串 `-sibling-spec-probe-` 在冻结快照里命中 **0 份**。不是它没跑过审计, 是它的记录落在 `*-audit-trail.md` 这个族里。若不成文, 采用方会把「0 份」读成「这个 change 从未审计」并据此改写侧约定, 或反过来要求把 audit-trail 计入证据 —— 后者会让**任何**带 change_id 的散记文件成为完整性凭据, 正是本 spec 要封的假绿口子。
+
 #### 1.3 per (checkpoint, change_id) 三态 (改前: 二态 通过 / missing)
 
 **Step 3 枚举 (`:46-52`) 追加一条排除: `mid_implementation`** (R1 rework)。它与已排除的 `mid_post_spec` **同因** —— `DEFAULTS.json` 里 `audit.mid_implementation = {trigger: task_progress, threshold: 50, unit: percent_tasks_completed}`, `audit-engine/SKILL.md:63` 标「条件触发」: 启用但任务进度未过 50% 阈值时**合法不产出报告**, 落 `execution-modes.md:51-52` 的「启用即会误阻」原句。原稿把它交给 1.3(b) 兜底, 但 (b) 只在「diff 全是 docs」时生效, 而最常见场景恰是「code diff + 进度未过阈值」⇒ 仍判 `missing` 假红。排除条款与 `mid_post_spec` 同构书写。另有一条候选追加 `post_brainstorm` (待 owner 复议 #1)。
@@ -220,6 +231,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_ga
 - [ ] **旧 schema 散文残留形态族清扫 (4 处)**: `phase-a-planner:267` / `phase-b-developer:204,277` / `phase-c-integrator:157`; 清扫后重跑 `grep -rn 'audit-reports/[a-z_]*-{timestamp}\.md' skills/` 应为 0 命中
 - [ ] report-storage.md §向后兼容 + pre-write-validation.md 关联行
 - [ ] AB (**两读法并集, 不取豁免**): (1) **照跑**既有相关套件验漂移 —— `audit-engine.json` (2 evals) + `phase-c-integrator.json` (3 evals) + `phase-c-integrator-pre-merge-gate.json`; (2) `audit-engine.json` 新增定向 eval id 3 + `version.yaml` bump (先查同伴撞号); (3) 经 `/skill-creator` 真跑, 结果落 `ab-results/<date>-pre-merge-completeness-gate-change-scope/`; (4) 套件缺口 issue (aria-plugin)
+- [ ] 枚举范围两条边界落地 (§1.2b): `iterdir()` 非递归 + `scanned_dir_depth` 输出 + 无 checkpoint 前缀形态三桶都不收; schema 文档写明 (SC-19)
 - [ ] 活体 dogfood: 在本仓对本 spec 自身与一个假想 id 各跑一次脚本 (SC-11), 证据抄进 handoff
 - [ ] **ship 前基线重取**: `git fetch --all` + 确认主仓 `origin/master` 的 `aria` gitlink 现值 (R1 实测已是 `301641b`, 同伴 PR #202 已合), 本地 master 与 origin/master 已分叉须先对齐 —— 防止主仓同步把 gitlink 回退到 v1.70.0
 - [ ] 版本 v1.71.2: aria 5 文件 + 主仓版本点 + gitlink (**无前置排队**, 原稿的「排在同伴 v1.71.1 主仓同步之后」是幻影); 归档门 (SC-12)
@@ -247,6 +259,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_ga
 | SC-16 | **`mid_implementation` 排除** (R1 新增): config `{mid_implementation: convergence, post_spec: convergence}`, diff 含 `src/a.py` (**非** docs-only, 即旧 (b) 通道不生效的最常见形态), 目录只有 post_spec 报告 → `checked_checkpoints` **不含** `mid_implementation`, `verdict=pass`。**反事实**: 不加排除条款 → `mid_implementation@x = missing` + fail → 红 (阈值未触发的合法不产出被当缺失) | `::test_mid_implementation_excluded` |
 | SC-17 | **跨仓执行上下文** (R1 新增): 造主仓 tmpA (含 `.aria/audit-reports/` + `openspec/changes/x/`) 与子模块 tmpB (无 `openspec/` 无 `.aria/`, diff 含 `skills/foo/SKILL.md`)。(1) `--repo-path tmpA --diff-repo-path tmpB --change-id x` → 锚点解析成功 (不报 `change_id_unanchored`)、报告在 tmpA 找、diff 取自 tmpB; (2) 缺省 `--diff-repo-path` 时等于 `--repo-path` (向后兼容); (3) 跨仓时 (b) 通道禁用 (见 SC-5 case 5)。**反事实**: 单参数实现传 tmpB → exit 2 `change_id_unanchored` → 红; 传 tmpA → diff 取错仓, (b) 误判 not_applicable → 红 | `::test_split_repo_and_diff_paths` |
 | SC-18 | **复议项可证伪化** (R1 新增, 防「owner 裁完仍无测试证伪」): 待 owner 复议 #1 (`post_brainstorm` 排除) 两个分支各配一条 case —— 采纳: config 含 `post_brainstorm: convergence` → `checked_checkpoints` 不含它; 不采纳: 含它且零报告 → `missing` + fail。Phase B 按 owner 裁决**只保留其一**并删掉另一条, 不得两条都不写 | `::test_post_brainstorm_exclusion_decision` |
+| SC-19 | **枚举范围两条边界 (2026-09-07 补, §1.2b)**: (a) tmp 仓 `.aria/audit-reports/` 顶层放一份属于本 change 的合规报告, **子目录** `sub/` 里再放一份同样合规的 → `matched_count == 1`, 结果里不含子目录那份, stdout 含 `scanned_dir_depth: 1`; (b) 顶层放 `<change_id>-audit-trail.md` (含 change_id 但**不以 checkpoint 名开头**) 且无其它报告 → 该 (checkpoint, change_id) 判 `missing`, 且该文件既不进 `matched`, 也不进 `unattributed_count`, 也不进 `excluded_legacy_count` (三个桶都不收)。**反事实**: 把 `iterdir()` 换成 `rglob()` ⇒ (a) 的 `matched_count` 变 2 ⇒ 红; 把规则 1 的 `startswith(f"{checkpoint}-")` 去掉 ⇒ (b) 判 present ⇒ 红。**语料依据**: 冻结快照 `3f4b379` 内真实存在子目录 `pr19-submodule-scan/` `wf-r1fix/` 与 5 份 `*-audit-trail.md` 形态 | `test_completeness_gate.py::test_enumeration_boundaries` |
 
 ## rule6_note (Rule #6 — 判据表第三行, SOT `standards/conventions/skill-benchmark-exemption.md` §2-§3)
 
