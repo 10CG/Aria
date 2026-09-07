@@ -129,12 +129,12 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 
 | # | 内容 | 仓 | 状态 |
 |---|---|---|---|
-| D1 | AB 固定套件缺 Step 7 / D auto-issue 维度 (`ab-suite/openspec-archive.json` 只选 2/4 eval) — Rule #6 SOT §3 第 3 条强制 | `10CG/aria-plugin` | 待开 |
-| D2 | openspec-archive evals **三个**涉「正确归档路径」的 eval 全缺 `YYYY-MM-DD-` 前缀 (含**已选进套件**的 eval 1); `cli-bug-fix` 的 `cli_wrong_path` 与 SOT 矛盾; 断言首句是次句的**真子串** ⇒ 零判别力 | `10CG/aria-plugin` | 待开 |
-| D3 | `unverified_claims` / `unverified_ack` frontmatter 只写不读 (`spec_complete.py:103` 自承) | `10CG/aria-plugin` | 待开 |
-| D4 | `standards/openspec/AGENTS.md:57` 悬空脚本 `verify-openspec-archive.sh` | `10CG/aria-standards` | 待开 |
-| D5 | `spec-drafter/SKILL.md:192 :507 :510` 三处指示运行未安装的 `openspec validate --strict` | `10CG/aria-plugin` | 待开 |
-| D6 | ⏰ **有日期**: `check-m6-e2e-acceptance` 判 dead。**引信行是 `aria-2.0-m6-e2e-resilience/tasks.md:353`** (全仓相对路径 ⇒ dead ⇒ **block**), **不是 `:380`** (裸文件名 ⇒ ambiguous ⇒ 仅 warn)。⛔ 不得改任务行措辞绕开 / 不得 AI 自行豁免 | `10CG/Aria` | 待开 |
+| D1 | AB 固定套件缺 Step 7 / D auto-issue 维度 (`ab-suite/openspec-archive.json` 只选 2/4 eval) — Rule #6 SOT §3 第 3 条强制 | `10CG/aria-plugin` | ✅ `10CG/aria-plugin#190` |
+| D2 | openspec-archive evals **三个**涉「正确归档路径」的 eval 全缺 `YYYY-MM-DD-` 前缀 (含**已选进套件**的 eval 1); `cli-bug-fix` 的 `cli_wrong_path` 与 SOT 矛盾; 断言首句是次句的**真子串** ⇒ 零判别力 | `10CG/aria-plugin` | ✅ `10CG/aria-plugin#191` |
+| D3 | `unverified_claims` / `unverified_ack` frontmatter 只写不读 (`spec_complete.py:103` 自承) | `10CG/aria-plugin` | ✅ `10CG/aria-plugin#192` |
+| D4 | `standards/openspec/AGENTS.md:57` 悬空脚本 `verify-openspec-archive.sh` | `10CG/aria-standards` | ✅ `10CG/aria-standards#21` |
+| D5 | `spec-drafter/SKILL.md:192 :507 :510` 三处指示运行未安装的 `openspec validate --strict` | `10CG/aria-plugin` | ✅ `10CG/aria-plugin#193` |
+| D6 | **Phase B 实跑订正 (原文两半皆被推翻)**: 起草时写「`:353` 全仓相对路径 ⇒ dead ⇒ block, `:380` 裸文件名 ⇒ ambiguous ⇒ warn」。**实测** (勾满 25 个 checkbox 使 `complete=True` 后跑 `spec_complete.py --gate`): `verdict=warn`, `blocking=0`, 唯一条目逐字为 `symbol 'check-m6-e2e-acceptance' reference form unclassified — fail-toward-warn (unclassified_files=["(no Python definition for 'check-m6-e2e-acceptance' — not code, cannot be dead-code → warn)"])`。⇒ **两种引用形态都落 unclassified, 都不 block**。真实缺陷改为: **C 分级死码检查对非 Python 符号结构性失明** —— 任何以路径点名 shell/yaml/配置类交付物的任务行都得「没有 Python 定义 ⇒ 判不了死码 ⇒ warn」, 该守卫对非 Python 交付物整体不适用。⛔ 不得改任务行措辞绕开 / 不得 AI 自行豁免 | `10CG/Aria` | ✅ `10CG/Aria#208` |
 | D7 | `run_all_tests.sh` 收集 0 个测试却报 OK (本 session 已最小止血: `phase-d-closer` 0 → 11 tests, 全套件 2111 → **2122**) | `10CG/aria-plugin#187` | ✅ 已开 |
 | D8 | Part A 拆出件 (谓词 V4 + 21 用例 + 零触达测量) | `10CG/aria-plugin#188` | ✅ 已开 |
 | D9 | Step 7 的 SHA 回链填充无**调用**宿主 | `10CG/aria-plugin#189` | ✅ 已开 |

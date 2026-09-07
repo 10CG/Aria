@@ -42,50 +42,68 @@
 
 ### 有完整字面目标 (照抄即验收)
 
-- [ ] **B-1** `openspec-archive/SKILL.md:317` `Step2` → `Step 7`
-- [ ] **B-4** `:17` → `> **历史**: 2026-02-08 - 初始版本，修复归档目录落点错误 (彼时经由外部工具链, 现已改为 git mv)`
-- [ ] **B-7** `:247` → `Step 3 - 执行归档 (git mv):` / `:248` → `  命令: git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}` / `:249` → `  等待: git mv 返回`
-- [ ] **B-8a** `:251-257` 整块 → Step 4 三行断言 (字面见 proposal B8)
-- [ ] **B-8b** `:259-261` 整块 → `Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`, **其下无正文**
-- [ ] **B-10** 示例 1 四行 → 字面见 proposal SC-3(c)
-- [ ] **B-15** `phase-d-closer/SKILL.md:41` → 字面见 proposal B15
-- [ ] **B-16** `aria/README.md:85` → `- openspec-archive — Archive completed OpenSpec changes to openspec/archive/ with post-move location checks`
-- [ ] **B-14** `openspec-archive/SKILL.md:622` 悬空引用 → `openspec/archive/2026-07-05-aria-archive-gate-runtime-reality/` (**R2 补回**)
-- [ ] **B-17** `aria/README.zh.md:85` → `- openspec-archive — 归档已完成的 OpenSpec 变更到 openspec/archive/ 并做落点校验`
+- [x] **B-1** `openspec-archive/SKILL.md:317` `Step2` → `Step 7`
+- [x] **B-4** `:17` → `> **历史**: 2026-02-08 - 初始版本，修复归档目录落点错误 (彼时经由外部工具链, 现已改为 git mv)`
+- [x] **B-7** `:247` → `Step 3 - 执行归档 (git mv):` / `:248` → `  命令: git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}` / `:249` → `  等待: git mv 返回`
+- [x] **B-8a** `:251-257` 整块 → Step 4 三行断言 (字面见 proposal B8)
+- [x] **B-8b** `:259-261` 整块 → `Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`, **其下无正文**
+- [x] **B-10** 示例 1 四行 → 字面见 proposal SC-3(c)
+- [x] **B-15** `phase-d-closer/SKILL.md:41` → 字面见 proposal B15
+- [x] **B-16** `aria/README.md:85` → `- openspec-archive — Archive completed OpenSpec changes to openspec/archive/ with post-move location checks`
+- [x] **B-14** `openspec-archive/SKILL.md:622` 悬空引用 → `openspec/archive/2026-07-05-aria-archive-gate-runtime-reality/` (**R2 补回**)
+- [x] **B-17** `aria/README.zh.md:85` → `- openspec-archive — 归档已完成的 OpenSpec 变更到 openspec/archive/ 并做落点校验`
 
 ### 只给方向 (落盘前逐条自测 pattern)
 
-- [ ] **B-2** `:318` **+ Step 7 段落** (作用域按 proposal B2, **不是只改 `:318` 单行**): `:318` 只留 `{sha}` 模板; 可验证约束 (必须含 7-40 位十六进制 SHA) 与 C2 调用行写进 **Step 7 段落**。**硬约束: `:318` 不得以「填入」二字结尾**
-- [ ] **B-3** `:4` frontmatter `description` 删「自动修正 CLI bug」
-- [ ] **B-5** `:40` + `:41` 核心功能表**两行的两个单元格全部重写** (`:40` 执行归档 → `git mv …`; `:41` 自动修正 → 位置校验)
-- [ ] **B-6** `:56`「本 Skill 会自动修正此问题」→ 对采用者的条件表述
-- [ ] **B-9** `:87` 退役 `keep_changes_copy`, 移入**新增小节 `## 已退役配置项`** (放在 `## 错误处理` 之前; 格式: 标题 + 一行说明 + 一行退役理由)
-- [ ] **B-11** `:588` 错误表 CLI 行 → `git mv` 失败三分支 (目标已存在 → BLOCKED-already-archived / 源未跟踪 → 先 `git add` / 其余按 stderr 原文)
-- [ ] **B-12** `:607` 流程图行 (「Step 3-6 执行归档 / 修正 CLI bug / 验证结果」→ 去掉「修正 CLI bug」)
-- [ ] **B-13** `:47-58` 已知 Bug 节保留 + 时限限定行插在**标题行之后、`**问题**:` 行之前**; 该行须含「本仓从未安装该 CLI」与「归档走 git mv」两个事实
+- [x] **B-2** `:318` **+ Step 7 段落** (作用域按 proposal B2, **不是只改 `:318` 单行**): `:318` 只留 `{sha}` 模板; 可验证约束 (必须含 7-40 位十六进制 SHA) 与 C2 调用行写进 **Step 7 段落**。**硬约束: `:318` 不得以「填入」二字结尾**
+- [x] **B-3** `:4` frontmatter `description` 删「自动修正 CLI bug」
+- [x] **B-5** `:40` + `:41` 核心功能表**两行的两个单元格全部重写** (`:40` 执行归档 → `git mv …`; `:41` 自动修正 → 位置校验)
+- [x] **B-6** `:56`「本 Skill 会自动修正此问题」→ 对采用者的条件表述
+- [x] **B-9** `:87` 退役 `keep_changes_copy`, 移入**新增小节 `## 已退役配置项`** (放在 `## 错误处理` 之前; 格式: 标题 + 一行说明 + 一行退役理由)
+- [x] **B-11** `:588` 错误表 CLI 行 → `git mv` 失败三分支 (目标已存在 → BLOCKED-already-archived / 源未跟踪 → 先 `git add` / 其余按 stderr 原文)
+- [x] **B-12** `:607` 流程图行 (「Step 3-6 执行归档 / 修正 CLI bug / 验证结果」→ 去掉「修正 CLI bug」)
+- [x] **B-13** `:47-58` 已知 Bug 节保留 + 时限限定行插在**标题行之后、`**问题**:` 行之前**; 该行须含「本仓从未安装该 CLI」与「归档走 git mv」两个事实
 
 ### TG-B 验收
 
 > 📏 **本 Spec 全部验收项的类级规则 (post_planning R5 后定向 sweep 补, memory `spec-acceptance-needs-baseline-run`)**: **每一条都必须标注基线色** —— 🔴 基线红 (真变更断言) 或 🟢 基线即绿 (不变量/回归/污染守卫, 且须写明它**证明不了**什么)。R5 后 sweep 实测: 17 条验收里 **11 条原本没标**, 其中 B-V7(a) 实为恒绿却被当作 B-2 的变更断言。新增验收项一律照此标注。
 
-- [ ] **B-V1a** SC-1 前半: 四文件**区段外命中 == 0** (基线 15) 🔴 **基线红**
-- [ ] **B-V1b** SC-1 后半 (**post_planning R1 补**): **区段内命中集合按内容钉死** —— 恰为 (a) `## ⚠️ 已知 Bug` 标题行 / (b) `**问题**: …CLI 命令有 bug…` 行 / (c) CHANGELOG 表 `1.0.0 … 初始版本，实现 CLI bug 自动修正` 行 / (d) B-13 新插的时限限定行 (若命中)。**其余一律不允许** —— 缺这半会让 B-6 的守卫消失 🔴 **基线**: 区段内除 (a)(b)(c) 外还有 `:56`「**本 Skill 会自动修正此问题**」, B-6 改写后它才离开该集合 ⇒ 基线**不满足**
-- [ ] **B-V2** SC-1b **语义复核** (非机械, 独立勾选): 对着 §Why 反转 1 重读 B-3/B-5/B-6/B-15/B-16/B-17 改后原文, 断言不再承诺自动处理 CLI 问题。**须把六条改后原文逐条抄进本文件 + 一句理由**, 不接受「已复核」四字带过 🔴 **基线**: 六条原文 (`:4` `:40-41` `:56` + phase-d-closer `:41` + 两份 README `:85`) **全部仍在承诺自动处理 CLI 问题** ⇒ 基线复核结论为「未通过」
-- [ ] **B-V3** SC-2: `grep -n 'Step2' openspec-archive/SKILL.md` 命中 **1** 处, 且该行**内容**为 `# "全部 unverified_claims" (无论 §Step2 warn_overlay 是否写了 --ack-unverified) 而来;` (**按内容不按行号** —— 前面几个 B 任务会移动行号) 🔴 **基线**: 实测命中 **2** 处 (`:275` 交叉引用 + `:317` 待改锚点), 验收要 1 ⇒ 基线**红**
-- [ ] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 正文 **3 行** / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
-- [ ] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内 🔴 **基线**: `已退役配置项` 小节命中 **0** (尚不存在), 两处 `keep_changes_copy` (`:87` `:261`) 全在小节外 ⇒ 基线**红**
-- [ ] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿) 🔴 **基线**: `[Unreleased]` 段**已有条目** (关于 `10CG/aria-plugin#95` 的 C 分级证据闸), 但**零条点名本 Spec 的 Step 3/4/5 改动或 `keep_changes_copy` 退役** ⇒ 基线**红**。⚠️ 判据必须是「点名了这几项」而**不是**「段内有条目」—— 后者基线即绿
-- [ ] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在) 🔴
-- [ ] **B-V9** (**R5 完备性批评席 Major 补**, B-13 专属 —— B-13 是 TG-B 十八条里**唯一零验收覆盖**的交付物: 唯一提到它的 B-V1b(d) 写的是「B-13 新插的时限限定行 (**若命中**)」, 而实测该行的两个事实串对 SC-1 pattern **零命中** ⇒「若命中」是恒真子句, 等于没验): `grep -n` B-13 新插的那行, 须**同时**含「本仓从未安装该 CLI」与「归档走 git mv」两个字符串, 且位置在 `## ⚠️ 已知 Bug` 标题行**之后**、`**问题**:` 行**之前**。**基线该断言为红** (该行尚不存在) 🔴
-- [ ] **B-V7** B-2 专属验收 (**post_planning R1 补**, 因通用 post-condition 对它是空检查; **R5 F2 订正: 改为按内容不按行号, 并按落点分派** —— 原文把三条断言全钉在绝对行 `:318` 上, 而 TG-B 自身会把该行上移约 5 行 ⇒ (a) 会在随机行上恒真、(b)(c) 必然误红)。**本项在 TG-B 全部落盘后跑**: (a) `grep -c '填入"' SKILL.md` == **1** (只剩 `:317` 那条锚点串) 🟢 **(a) 基线即绿 (实测命中已是 1), 它是 C-1 锚点唯一性的不变量守卫, 不是 B-2 的变更断言** —— 按 memory `assert-this-action`「验动作发生了须钉本次新产生的对象」, B-2 是否真做了由下面 (b)(c) 判定 (**R5 后 sweep 补**: 原写「不以『填入』二字结尾」基线亦已满足, 换成 (a) 只是把一个恒真换成另一个恒真); (b) **Step 7 段落内** `grep -q '7-40 位十六进制'`; (c) **Step 7 段落内** `grep -q 'archive_tracker_verify.py'`
+- [x] **B-V1a** SC-1 前半: 四文件**区段外命中 == 0** (基线 15) 🔴 **基线红**
+- [x] **B-V1b** SC-1 后半 (**post_planning R1 补**): **区段内命中集合按内容钉死** —— 恰为 (a) `## ⚠️ 已知 Bug` 标题行 / (b) `**问题**: …CLI 命令有 bug…` 行 / (c) CHANGELOG 表 `1.0.0 … 初始版本，实现 CLI bug 自动修正` 行 / (d) B-13 新插的时限限定行 (若命中)。**其余一律不允许** —— 缺这半会让 B-6 的守卫消失 🔴 **基线**: 区段内除 (a)(b)(c) 外还有 `:56`「**本 Skill 会自动修正此问题**」, B-6 改写后它才离开该集合 ⇒ 基线**不满足**
+- [x] **B-V2** SC-1b **语义复核** (非机械, 独立勾选): 对着 §Why 反转 1 重读 B-3/B-5/B-6/B-15/B-16/B-17 改后原文, 断言不再承诺自动处理 CLI 问题。**须把六条改后原文逐条抄进本文件 + 一句理由**, 不接受「已复核」四字带过 🔴 **基线**: 六条原文 (`:4` `:40-41` `:56` + phase-d-closer `:41` + 两份 README `:85`) **全部仍在承诺自动处理 CLI 问题** ⇒ 基线复核结论为「未通过」
+  > **B-V2 语义复核实录 (Phase B 执行时填, 逐条原文 + 理由)**:
+  >
+  > - **B-3** `openspec-archive/SKILL.md:4` 改后原文: `归档已完成的 OpenSpec 变更到 openspec/archive/ 目录，并做归档后落点校验。`
+  >   理由: `description` 只陈述做什么 (归档 + 落点校验), 删掉了「自动修正 CLI bug」这句现时能力承诺
+  > - **B-5a** `同 :40` 改后原文: `| **执行归档** | 'git mv openspec/changes/{name} openspec/archive/{date}-{name}' |`
+  >   理由: 把「调用 openspec archive CLI」换成实际执行的 `git mv` 命令 —— 描述的是真实路径, 不再指向未安装的工具
+  > - **B-5b** `同 :41` 改后原文: `| **位置校验** | 归档后断言目标存在 / 源已消失 / 无 'changes/archive/' 残留 |`
+  >   理由: 「自动修正」整行改为「位置校验」, 从「我替你修」降为「我检查结果对不对」, 不承诺修复
+  > - **B-6** `同 :58` 改后原文: `**本 Skill 自 v1.72.0 起改走 'git mv', 不再经由上述工具链** —— 故本仓不会产生该错位; 仍使用旧工具链归档的采用方需自行处置。`
+  >   理由: 从无条件现时承诺改为对采用者的条件表述: 本仓因改走 git mv 不会遇到; 仍用旧工具链的采用方**需自行处置**
+  > - **B-15** `phase-d-closer/SKILL.md:41` 改后原文: `| D.2 | openspec-archive | Spec 归档 (**#95 完成度 + C 分级证据闸 tri-state verdict, verdict=block 时本步 BLOCK**) | spec_archived |`
+  >   理由: 删掉括号内「自动修正 CLI bug」的跨 Skill 声称, 只留 `10CG/aria-plugin#95` 完成度与 C 分级证据闸这两个真实职责
+  > - **B-16** `aria/README.md:85` 改后原文: `- openspec-archive — Archive completed OpenSpec changes to openspec/archive/ with post-move location checks`
+  >   理由: 英文名册行从 `(auto-fixes CLI bugs)` 改为 `with post-move location checks`, 门面文档不再对外承诺自动修复
+  > - **B-17** `aria/README.zh.md:85` 改后原文: `- openspec-archive — 归档已完成的 OpenSpec 变更到 openspec/archive/ 并做落点校验`
+  >   理由: 中文名册行同步, 与 B-16 语义一致 (i18n 实质变更, 故 B16/B17 同批改)
+  >
+  > **断言**: 七条改后原文**均不再承诺自动处理 CLI 问题** —— B-6 是唯一保留条件表述的一条, 且已明写「需自行处置」而非「本 Skill 会修」。⇒ SC-1b 通过。
+- [x] **B-V3** SC-2: `grep -n 'Step2' openspec-archive/SKILL.md` 命中 **1** 处, 且该行**内容**为 `# "全部 unverified_claims" (无论 §Step2 warn_overlay 是否写了 --ack-unverified) 而来;` (**按内容不按行号** —— 前面几个 B 任务会移动行号) 🔴 **基线**: 实测命中 **2** 处 (`:275` 交叉引用 + `:317` 待改锚点), 验收要 1 ⇒ 基线**红**
+- [x] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 正文 **3 行** / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
+- [x] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内 🔴 **基线**: `已退役配置项` 小节命中 **0** (尚不存在), 两处 `keep_changes_copy` (`:87` `:261`) 全在小节外 ⇒ 基线**红**
+- [x] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿) 🔴 **基线**: `[Unreleased]` 段**已有条目** (关于 `10CG/aria-plugin#95` 的 C 分级证据闸), 但**零条点名本 Spec 的 Step 3/4/5 改动或 `keep_changes_copy` 退役** ⇒ 基线**红**。⚠️ 判据必须是「点名了这几项」而**不是**「段内有条目」—— 后者基线即绿
+- [x] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在) 🔴
+- [x] **B-V9** (**R5 完备性批评席 Major 补**, B-13 专属 —— B-13 是 TG-B 十八条里**唯一零验收覆盖**的交付物: 唯一提到它的 B-V1b(d) 写的是「B-13 新插的时限限定行 (**若命中**)」, 而实测该行的两个事实串对 SC-1 pattern **零命中** ⇒「若命中」是恒真子句, 等于没验): `grep -n` B-13 新插的那行, 须**同时**含「本仓从未安装该 CLI」与「归档走 git mv」两个字符串, 且位置在 `## ⚠️ 已知 Bug` 标题行**之后**、`**问题**:` 行**之前**。**基线该断言为红** (该行尚不存在) 🔴
+- [x] **B-V7** B-2 专属验收 (**post_planning R1 补**, 因通用 post-condition 对它是空检查; **R5 F2 订正: 改为按内容不按行号, 并按落点分派** —— 原文把三条断言全钉在绝对行 `:318` 上, 而 TG-B 自身会把该行上移约 5 行 ⇒ (a) 会在随机行上恒真、(b)(c) 必然误红)。**本项在 TG-B 全部落盘后跑**: (a) `grep -c '填入"' SKILL.md` == **1** (只剩 `:317` 那条锚点串) 🟢 **(a) 基线即绿 (实测命中已是 1), 它是 C-1 锚点唯一性的不变量守卫, 不是 B-2 的变更断言** —— 按 memory `assert-this-action`「验动作发生了须钉本次新产生的对象」, B-2 是否真做了由下面 (b)(c) 判定 (**R5 后 sweep 补**: 原写「不以『填入』二字结尾」基线亦已满足, 换成 (a) 只是把一个恒真换成另一个恒真); (b) **Step 7 段落内** `grep -q '7-40 位十六进制'`; (c) **Step 7 段落内** `grep -q 'archive_tracker_verify.py'`
 
 ---
 
 ## TG-C — 三个脚本 + 测试
 
-- [ ] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 **rc 1** (**R5 订正: 原写 `rc 2`, 与本文件 C-3、proposal 四态表、以及 A.1 实跑脚本三者均不符** —— 删掉 SKIP 态后 C1 已无「判不了」这一档, 锚点数异常是**真失败** (措辞被改动, 探针需人工对齐), 归 rc 1); (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
-- [ ] **C-2** 注册 C-1 进 `.aria/state-checks.yaml`: **`name: skill-md-sha-backlink-literal-sync`** (该 name 被 C-V3 逐字断言, **不得另拟**) / `severity: warning` (参照 `issue-cache-freshness` 体例)
-- [ ] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑** (跑真仓); **其余三态在 scratchpad 同构插件树里跑**:
+- [x] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 **rc 1** (**R5 订正: 原写 `rc 2`, 与本文件 C-3、proposal 四态表、以及 A.1 实跑脚本三者均不符** —— 删掉 SKIP 态后 C1 已无「判不了」这一档, 锚点数异常是**真失败** (措辞被改动, 探针需人工对齐), 归 rc 1); (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
+- [x] **C-2** 注册 C-1 进 `.aria/state-checks.yaml`: **`name: skill-md-sha-backlink-literal-sync`** (该 name 被 C-V3 逐字断言, **不得另拟**) / `severity: warning` (参照 `issue-cache-freshness` 体例)
+- [x] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑** (跑真仓); **其余三态在 scratchpad 同构插件树里跑**:
   > 🔧 **同构插件树怎么造** (post_planning R5 F1 Critical 订正 —— 原文写「设 `CLAUDE_PLUGIN_ROOT` 指向夹具」是**惰性指令**, C-1 明令用 `parents[3]` 不读 env, 实测设与不设逐字节相同; 照原文执行会让三个非基线态全部读真仓, 其中两态**恰好返回期望的 rc ⇒ 假绿**):
   > `mkdir -p $FX/skills/state-scanner/scripts/lib $FX/skills/openspec-archive` → 把探针**复制进** `$FX/skills/state-scanner/scripts/` → 在 `$FX/skills/openspec-archive/SKILL.md` 与 `$FX/skills/state-scanner/scripts/lib/spec_complete.py` 放该态所需内容 → **跑那份副本** (`parents[3]` 自然解析到 `$FX`)。
   > ⛔ **仓内两个目标文件全程只读**; 每态跑完核 `git status --porcelain` 与 `git -C aria status --porcelain` 均**不含** `spec_complete.py` 与 `openspec-archive/SKILL.md` (它们是本 Spec 明文非目标, 见已知风险 5)。
@@ -93,31 +111,31 @@
   - 目标 (夹具: SKILL.md 已改 `Step 7`) → PASS rc0
   - 锚点提取数≠1 (夹具: 两个空文件) → FAIL rc1
   - **坏实现「两侧同改回 Step2」** (夹具: SKILL.md 原样 + spec_complete.py 副本改成 `Step2`) → FAIL rc1
-- [ ] **C-4** ⚠️ **B-2 落地后**立即重跑 C-1 锚点唯一性 (SKILL.md 侧命中数须仍为 1)。**不是 B-1** —— B-1 只改 `:317` 内的 `Step2`, 不动 `:318`, 锚点数恒为 1 ⇒ 在 B-1 后跑是恒绿; 唯一能把锚点数推到 2 的是 B-2 对 `:318` 的改写
-- [ ] **C-5** `archive_tracker_verify.py` → **新建** `aria/skills/openspec-archive/scripts/`
-- [ ] **C-6** 单测 → **新建** `aria/skills/openspec-archive/tests/`, **必须带 `conftest.py`**。⚠️ **不是照抄 `phase-d-closer/tests/conftest.py` 的内容** (那份 docstring 逐句是 phase-d-closer 专属事实), 而是照抄它的**做法**: 写成**纯 docstring 零代码**的文件, 内容说明 (a) 它为什么存在 (触发 `is_pytest_suite()` 第一条判据); (b) 删掉它会退回 `OK (0 tests)` 的回归判据。**sys.path 由测试文件自己做** (照 `test_fetch_gate.py:17` 的 `sys.path.insert(0, parent.parent / "scripts")`)
-- [ ] **C-7** 夹具 → `tests/fixtures/`, **冻结快照**。抓取命令: `forgejo GET /repos/10CG/Aria/issues/<n> | jq -r '.body' > fixtures/issue-<n>.md`, 对 `201` / `185` / `186` 各一份; 每份**首行加注释**记来源 `10CG/Aria#<n>` 与抓取 UTC 时刻。另建合成夹具 `synth-short.md` (回链行尾部含短十六进制 `abc`) —— 真语料证不了长度下限
-- [ ] **C-8** C2 五态实跑: `10CG/Aria#201` rc0 / `10CG/Aria#185` rc1 NO_SHA / `10CG/Aria#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
-- [ ] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12)
-- [ ] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1 / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
-- [ ] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿) 🔴 **基线红**
-- [ ] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK** 🟢 **基线即绿 (2122 == 2122), 这是回归守卫** —— 它防的是「本 Spec 把别的测试跑挂」, 不证明本 Spec 做了什么; 新增测试的证明在 C-V1
-- [ ] **C-V4** (**R2 补**, 对应已知风险 5): C-3 四态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核 🟢 **基线即绿 (实测 `git -C aria status --porcelain` 为空), 这是污染守卫**
-- [ ] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项**且 `status == "pass"`** (**R5 完备性批评席 Major 订正: 原写「status 非 `error`」把红当绿** —— 实读 `custom_checks.py:373-379`, `error` 只给 rc 127, **rc 非零一律映射为 `fail`** ⇒ 原判据对一个正在报 FAIL 的闸门也放行, 而全 Spec 再无第二处要求 C-1 在真仓转绿)。⚠️ **本项须排在 TG-B 全部落盘之后** —— 在此之前 C-1 本就该是红的。🔴 **基线**:该 check **尚未注册**, snapshot 里根本没有这一项 ⇒ 基线**红** —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
+- [x] **C-4** ⚠️ **B-2 落地后**立即重跑 C-1 锚点唯一性 (SKILL.md 侧命中数须仍为 1)。**不是 B-1** —— B-1 只改 `:317` 内的 `Step2`, 不动 `:318`, 锚点数恒为 1 ⇒ 在 B-1 后跑是恒绿; 唯一能把锚点数推到 2 的是 B-2 对 `:318` 的改写
+- [x] **C-5** `archive_tracker_verify.py` → **新建** `aria/skills/openspec-archive/scripts/`
+- [x] **C-6** 单测 → **新建** `aria/skills/openspec-archive/tests/`, **必须带 `conftest.py`**。⚠️ **不是照抄 `phase-d-closer/tests/conftest.py` 的内容** (那份 docstring 逐句是 phase-d-closer 专属事实), 而是照抄它的**做法**: 写成**纯 docstring 零代码**的文件, 内容说明 (a) 它为什么存在 (触发 `is_pytest_suite()` 第一条判据); (b) 删掉它会退回 `OK (0 tests)` 的回归判据。**sys.path 由测试文件自己做** (照 `test_fetch_gate.py:17` 的 `sys.path.insert(0, parent.parent / "scripts")`)
+- [x] **C-7** 夹具 → `tests/fixtures/`, **冻结快照**。抓取命令: `forgejo GET /repos/10CG/Aria/issues/<n> | jq -r '.body' > fixtures/issue-<n>.md`, 对 `201` / `185` / `186` 各一份; 每份**首行加注释**记来源 `10CG/Aria#<n>` 与抓取 UTC 时刻。另建合成夹具 `synth-short.md` (回链行尾部含短十六进制 `abc`) —— 真语料证不了长度下限
+- [x] **C-8** C2 五态实跑: `10CG/Aria#201` rc0 / `10CG/Aria#185` rc1 NO_SHA / `10CG/Aria#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
+- [x] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12)
+- [x] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1 / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
+- [x] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿) 🔴 **基线红**
+- [x] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK** 🟢 **基线即绿 (2122 == 2122), 这是回归守卫** —— 它防的是「本 Spec 把别的测试跑挂」, 不证明本 Spec 做了什么; 新增测试的证明在 C-V1
+- [x] **C-V4** (**R2 补**, 对应已知风险 5): C-3 四态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核 🟢 **基线即绿 (实测 `git -C aria status --porcelain` 为空), 这是污染守卫**
+- [x] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项**且 `status == "pass"`** (**R5 完备性批评席 Major 订正: 原写「status 非 `error`」把红当绿** —— 实读 `custom_checks.py:373-379`, `error` 只给 rc 127, **rc 非零一律映射为 `fail`** ⇒ 原判据对一个正在报 FAIL 的闸门也放行, 而全 Spec 再无第二处要求 C-1 在真仓转绿)。⚠️ **本项须排在 TG-B 全部落盘之后** —— 在此之前 C-1 本就该是红的。🔴 **基线**:该 check **尚未注册**, snapshot 里根本没有这一项 ⇒ 基线**红** —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
 
 ---
 
 ## TG-D — 开单 (六条待开 + 三条已开)
 
-- [ ] **D-1** AB 套件缺 Step 7 / D auto-issue 维度 → `10CG/aria-plugin`
-- [ ] **D-2** openspec-archive evals 三处缺 `YYYY-MM-DD-` 前缀 + `cli_wrong_path` 与 SOT 矛盾 + 断言首句零判别力 → `10CG/aria-plugin`
-- [ ] **D-3** `unverified_claims`/`unverified_ack` frontmatter 只写不读 → `10CG/aria-plugin`
-- [ ] **D-4** `standards/openspec/AGENTS.md:57` 悬空脚本 → `10CG/aria-standards`
-- [ ] **D-5** `spec-drafter/SKILL.md:192 :507 :510` 指示运行未安装的 `openspec validate` → `10CG/aria-plugin`
-- [ ] **D-6** ⏰ `check-m6-e2e-acceptance` 判 dead, 引信行 `aria-2.0-m6-e2e-resilience/tasks.md:353` → `10CG/Aria`。⛔ 不得改任务行措辞绕开 / 不得 AI 自行豁免
+- [x] **D-1** AB 套件缺 Step 7 / D auto-issue 维度 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#190`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+- [x] **D-2** openspec-archive evals 三处缺 `YYYY-MM-DD-` 前缀 + `cli_wrong_path` 与 SOT 矛盾 + 断言首句零判别力 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#191`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+- [x] **D-3** `unverified_claims`/`unverified_ack` frontmatter 只写不读 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#192`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+- [x] **D-4** `standards/openspec/AGENTS.md:57` 悬空脚本 → `10CG/aria-standards`  ⇒ **已开 `10CG/aria-standards#21`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+- [x] **D-5** `spec-drafter/SKILL.md:192 :507 :510` 指示运行未安装的 `openspec validate` → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#193`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+- [x] **D-6** **C 分级死码检查对非 Python 符号结构性失明** (Phase B 实跑订正 —— 起草时写的「`:353` ⇒ dead ⇒ block」两半皆被推翻, 见 proposal D6 行的实测原文) → `10CG/Aria`。⛔ 不得改任务行措辞绕开 / 不得 AI 自行豁免  ⇒ **已开 `10CG/Aria#208`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
 - [x] **D-7** `10CG/aria-plugin#187` · [x] **D-8** `10CG/aria-plugin#188` · [x] **D-9** `10CG/aria-plugin#189`
-- [ ] **D-V1** 六条新单全部**回读核验** (title + 正文首行), issue 号**带仓限定**记回本文件 🔴 **基线**: 六条 (D-1..D-6) **尚未开** ⇒ 基线**红**
-- [ ] **D-V2** 跑 `check_bare_issue_refs.py` 对 proposal.md 与本文件, rc == 0 🔴 **基线**: 脚本**尚未落盘** (C-9 未做) ⇒ 基线**跑不了**; C-9 落盘当天须立刻补跑一次并记结果, 不得把「跑不了」当成绿
+- [x] **D-V1** 六条新单全部**回读核验** (title + 正文首行), issue 号**带仓限定**记回本文件 🔴 **基线**: 六条 (D-1..D-6) **尚未开** ⇒ 基线**红**
+- [x] **D-V2** 跑 `check_bare_issue_refs.py` 对 proposal.md 与本文件, rc == 0 🔴 **基线**: 脚本**尚未落盘** (C-9 未做) ⇒ 基线**跑不了**; C-9 落盘当天须立刻补跑一次并记结果, 不得把「跑不了」当成绿
 
 ---
 

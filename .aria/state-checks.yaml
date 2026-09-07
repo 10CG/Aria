@@ -25,6 +25,24 @@ checks:
     timeout_seconds: 5
     enabled: true
 
+  # --- SKILL.md 复述串 vs 生产者字面同步 (archive-gate-registration-class-and-skill-drift) ---
+  - name: "skill-md-sha-backlink-literal-sync"
+    description: |
+      断言 openspec-archive/SKILL.md 的 Step 7 里复述的「归档 SHA 回链」占位串, 与该行的
+      唯一生产者 spec_complete.py::_build_d_payload 产生的那一串**逐字相等**, 且值含
+      `Step 7` (不得改回事实错误的 `Step2`, 有 2026-07-22 成文裁定背书)。
+      这是一条跨文件靠人工保持一致的字面串 —— 两侧一漂移, Step 7 的逐字替换就落空,
+      tracker issue 里的回链占位行永远填不上。2026-09-06 实测已漂移。
+      三条断言: (a) 两侧各恰好提取 1 处锚点, 否则 FAIL (措辞被改动, 探针需人工对齐);
+      (b) 两侧逐字相等; (c) 命中串含 `Step 7` —— 只有 (b) 时「两侧同步改回 Step2」也过。
+      无 SKIP 态: 探针落盘后就在插件内, 目标文件必然可达, 缺失 = 插件损坏 = 真异常 FAIL。
+    command: |
+      python3 aria/skills/state-scanner/scripts/skill_md_literal_sync_probe.py .
+    severity: warning
+    fix: "读 FAIL 输出里打印的两侧原文, 判断哪一侧该改 —— 生产者 (spec_complete.py) 是运行时唯一真值来源, 通常改 SKILL.md 侧对齐它; 若确需改生产者文案, 两侧同改并同步更新本探针的 REQUIRED_STEP"
+    timeout_seconds: 5
+    enabled: true
+
   # --- silknode-integration-contract deferred-acceptance expiry ---
   - name: "silknode-contract-deferral-expiry"
     description: |
