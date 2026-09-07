@@ -76,12 +76,11 @@
 
 ## TG-C — 三个脚本 + 测试
 
-- [ ] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 rc 2 fail-CLOSED; (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
+- [ ] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 rc 2 fail-CLOSED; (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
 - [ ] **C-2** 注册 C-1 进 `.aria/state-checks.yaml` (`severity: warning`, 参照 `issue-cache-freshness` 体例)
-- [ ] **C-3** **五态实跑留证**。⚠️ **基线态必须在 B-1/B-2 之前跑**; 其余四态用 `CLAUDE_PLUGIN_ROOT` 指向 scratchpad 夹具, **不写仓内任何文件**:
+- [ ] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑**; 其余四态用 `CLAUDE_PLUGIN_ROOT` 指向 scratchpad 夹具, **不写仓内任何文件**:
   - 基线 (当前仓, 两侧不等) → FAIL rc1 且打印两侧原文
   - 目标 (夹具: SKILL.md 已改 `Step 7`) → PASS rc0
-  - 插件源码不可见 (`CLAUDE_PLUGIN_ROOT=/nonexistent`) → SKIP rc0 + `##SKIP##`
   - 锚点提取数≠1 (夹具: 两个空文件) → FAIL rc1
   - **坏实现「两侧同改回 Step2」** (夹具: SKILL.md 原样 + spec_complete.py 副本改成 `Step2`) → FAIL rc1
 - [ ] **C-4** ⚠️ **B-2 落地后**立即重跑 C-1 锚点唯一性 (SKILL.md 侧命中数须仍为 1)。**不是 B-1** —— B-1 只改 `:317` 内的 `Step2`, 不动 `:318`, 锚点数恒为 1 ⇒ 在 B-1 后跑是恒绿; 唯一能把锚点数推到 2 的是 B-2 对 `:318` 的改写

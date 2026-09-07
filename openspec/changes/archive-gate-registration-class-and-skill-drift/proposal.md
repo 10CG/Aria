@@ -89,18 +89,18 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 **抽取锚点成文**:
 - SKILL.md 侧 `"(> 归档 SHA 回链:[^"]*填入)"` —— **以「填入」结尾**是承重的 (把 `:317` 匹配串与 `:318` 替换串分开)。⚠️ 该唯一性依赖 `:318` 不以「填入」结尾 ⇒ **B2 已加对应硬约束**, 且 B2 落地后须**立即重跑锚点唯一性** (命中数须仍为 1)。
 - 生产者侧 `lines\.append\(\s*"(> 归档 SHA 回链:[^"]*)"\s*\)`。
-- **两个文件路径钉死** (`CLAUDE_PLUGIN_ROOT` 优先、回落 `<repo>/aria`), **禁用 glob** (仓内有 AB skill-snapshot 冻结副本, glob 会恒红)。
+- **两个文件路径钉死**, **禁用 glob** (仓内有 AB skill-snapshot 冻结副本, glob 会恒红)。
+- **路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根; 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT` 环境变量** —— 探针落盘后就在插件内, 脚本在哪插件根就在哪, 对 marketplace 安装的采用方同样正确, 且不依赖 env 传递 (post_planning R4 期主控自查)。
 
 **第三条断言**: 双边相等挡不住「两侧同步改回 `Step2`」。故追加 `REQUIRED_STEP = "Step 7"` 判断 —— 该值有 2026-07-22 成文裁定背书, 不是任选常量。
 > ⚠️ **R3 ACC 抓到并已修**: 该断言此前**只写在 proposal 里, 探针脚本中并不存在**, 五态表第五行是假的。现已写入脚本并重跑, 见下表。
 
-**五态实测 (探针含第三条断言后重跑)**:
+**四态实测 (探针含第三条断言后重跑)**。⚠️ **原设计的第五态「插件源码不可见 → SKIP」已删除**: 改用 `parents[3]` 后, 探针自己就在插件里, 它存在即说明两个目标文件是它的同级 ⇒ 该态**在健康常态下永不触发**; 保留它就得用 `CLAUDE_PLUGIN_ROOT=/nonexistent` 人为构造生产中不可能的场景 = 测量剧场。目标文件缺失现直接判 FAIL (插件损坏是真异常, 不是「不适用」) —— 判据同 memory `false_green_dual_is_permanent_red`「该信号在健康常态下应是什么值」:
 
 | 态 | 结果 |
 |---|---|
 | 基线 (本仓, 两侧不等) | **FAIL** rc 1, 打印两侧原文 |
 | 目标 (B1 落地后) | **PASS** rc 0 |
-| 插件源码不可见 (采用方场景) | **SKIP** rc 0 + `##SKIP##` |
 | 锚点提取数 ≠ 1 | **FAIL** rc 1 (fail-CLOSED) |
 | **坏实现「两侧同改回 `Step2`」** | **FAIL** rc 1 —— 修前实测 rc 0 (假绿), 修后打印「两侧一致但值错了 (缺 'Step 7')」 |
 
@@ -143,7 +143,11 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 - **⚠️ 主仓 gitlink (R3 RFV-7 补入 —— 六个版本类 custom check 无一覆盖它, 且仓内此刻就漂移)**: 主仓记录 `301641b`, aria 子模块 HEAD 已是 `3a28339` (D7 止血 commit)。C.2 合并后须 bump 到 aria master 的 post-merge SHA。
 - **i18n README 重译判据**: `README.zh.md` / `README.ja.md` / `README.ko.md` **仅正文实质变更才重译** (`10CG/Aria#140` B 档; CLAUDE.md §版本管理)。本 Spec 只改版本串 ⇒ **不触发重译**。
   ⚠️ 但 **B17 改的是 `aria/README.zh.md` 的正文** (skill 名册那行), 属实质变更 —— 故 B16/B17 两份须**同批改到语义一致**, 不适用「只改版本号不重译」那条。
-- **机械兜底须全绿**: `m6-version-badge-match` / `i18n-readme-translation-currency` / `plugin-version-arch-docs-match` / `main-project-version-consistency` / `m6-claude-md-version` / `plugin-cache-currency`。
+- **机械兜底 (post_planning R3/R4 订正 —— 上一版写「六个全绿」结构性不可满足)**:
+  - **五个仓内 check 须全绿**: `m6-version-badge-match` / `i18n-readme-translation-currency` / `plugin-version-arch-docs-match` / `main-project-version-consistency` / `m6-claude-md-version`。输入全在仓内, 版本串同步后必然可绿。
+  - **`plugin-cache-currency` 在版本 bump 后期望 `STALE`, 不是绿**: 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`; bump 后立刻转红, 且**在本 cycle 任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。**验收 = 贴出实跑输出确认红的原因是「installed 落后 SOT」**, 不得把它算进「全绿」。
+  - ⚠️ 该例外**尚未成文**: 上一周期已上呈 owner 但写就时未裁定 ⇒ 按 memory `exact-exception-condition` 现在不能援引它当豁免, 只能如实登记并在 handoff 再次点名。
+  - 📌 **为什么它不构成阻塞项** (post_planning R4 GOV 的判断, 与 SC-11 对照): 它测的是**本会话本地插件缓存的新鲜度**, 与本 Spec 代码变更本身的正确性无关 —— 拿它阻塞 C.2 不会多防住任何真实缺陷。SC-11 则直接关系「代码有没有被 AB 充分验证」, 性质不同, 故只有后者阻塞。
   ⚠️ **覆盖面诚实登记 (R4 GOV 逐个读源码所得)**: 这六个 check 合计只覆盖 **23 处版本点里的约 6 处**; 至少 17 处 (**含全部 7 处 aria 子模块点位**) 不受任何机械检测覆盖。⇒ SC-9 的「23 处全同步」**不能只靠这六个 check 判绿**, 必须逐文件 `grep -c` 实测并把 13 行计数贴进 tasks.md (与 gitlink 那条同等对待, 不留不对称缺口)。
 - **不改**: `.aria/triage-*` / `docs/handoff/*` / 本 proposal 引前序版本处 (历史记录; 六个 custom check 按显式文件+窄正则比对, 对这些文件免疫)。
 - **Rule #3 文档同步**: `aria/skills/openspec-archive/CHANGELOG.md` 的 `[Unreleased]` 段须加条目。**已核**: `docs/architecture/*.md` 对归档手法**零命中**; `aria/README.md` / `README.zh.md` 的 openspec-archive 行**在册且带同一句现时声称** ⇒ 已纳入 B16/B17 (R3 RFV-2 订正 —— 上一版的「已核: 名册在册」答的是另一个问题)。
@@ -190,11 +194,11 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
   - `  Step 5: ⏭️ (已并入 Step 3)`
   - `  📦 归档路径: openspec/archive/2026-02-08-cloudflare-access-auto-handling` (替换原 `  🐛 CLI bug 已自动修正`)
 - **SC-4** (B9, **机械判据**, R3 SCF-5): `keep_changes_copy` 在 SKILL.md 中的命中**全部落在新增小节 `## 已退役配置项` 内** (与 SC-1 同样按标题文本定位), 区段外命中 == 0。
-- **SC-5** (C1 五态): 见 Part C1 表, 五态均留实跑输出; 三个坏实现均被拒。**外加 B2 落地后重跑锚点唯一性** (SKILL.md 侧命中数须仍为 1)。
+- **SC-5** (C1 **四态**): 见 Part C1 表, 四态均留实跑输出; 三个坏实现均被拒。**外加 B2 落地后重跑锚点唯一性** (SKILL.md 侧命中数须仍为 1)。
 - **SC-6** (C2 五态): 夹具为冻结快照, 每份注明 `10CG/Aria#<n>` 与抓取时刻; 含合成 `synth-short`。**外加**: `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行的测试数 **非 0**。
 - **SC-7** (Rule #6): openspec-archive AB 跑完, 留 `ab-results/2026-09-XX-v1.72.0-archive-skill-drift/RESULT.md`; 两臂 = **v_new vs v_old**; **RESULT.md 须显式记录本次 AB 对本改动的区分力评估** (预期零, 见 R1V-6 登记)。
 - **SC-8** (D): D1-D6 开单并回读核验; D7/D8/D9 已开, 号记入 tasks.md。**全部 issue 号带仓限定**, 并跑头部的机械自检 (裸 `#<n>` 命中数 == 0)。D6 须在 handoff 单独点名。
-- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `1.72.0`; 23 处版本串全同步; 六个版本类 custom check 全绿; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
+- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `1.72.0`; 版本串同步 **21 处 / 12 文件** (23 处出现中 `aria/CHANGELOG.md:13` 与 `aria/VERSION:4` 是 append-only 历史条目, **不改**, 各自**新增**一条); **五个仓内 check 全绿 + `plugin-cache-currency` 期望 STALE 并贴实跑输出**; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
   (a) `git ls-tree HEAD aria | awk '{print $3}'` == `git -C aria rev-parse HEAD` —— 主仓记录的 gitlink 与子模块实际 checkout 一致。**基线实测 `301641b` vs `3a28339` ⇒ 红** ✅
   (b) `git -C aria rev-parse HEAD` == `git -C aria rev-parse origin/master` —— 子模块停在**已合并的 master** 而非未合并的 feature 分支。**基线实测 `3a28339` vs `301641b` ⇒ 红** ✅ (当前 aria 正停在 `feature/archive-gate-registration-class-and-skill-drift`)
   ⚠️ **两条缺一不可**: 只写 (a) 会在子模块停在未合并 feature 分支时假绿 (R5 抓到, 而那正是当前状态); 只写 (b) 则是上一版的恒绿写法 (R4 抓到)。; **两仓** (`10CG/Aria` + `10CG/aria-plugin`) 逐 remote `ls-remote` 独立核验 (硬约束 2)。
