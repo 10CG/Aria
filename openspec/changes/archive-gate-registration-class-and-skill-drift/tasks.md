@@ -28,7 +28,9 @@
 
 ---
 
-## TG-B — CLI 漂移类级收口 (17 条, 两个 SKILL.md + 两份 README)
+## TG-B — CLI 漂移类级收口 (**18 条**, 两个 SKILL.md + 两份 README)
+
+> ⚠️ **post_planning R2 Critical (F-1) 订正**: R1 修订 (`240ea4c`) **静默删除了 B-14**, 同时把标题计数从「20 行」改成「17 条」⇒ 删完自洽, **数数核不出来**。而 proposal `:67` 仍在册、`:159` 的 Rule #6 范围写的是「B1-B14」, 且 SC-1 的 pattern 对 `:622` **命中 0** ⇒ **零验收能发现**。已补回并加专属验收 B-V8。
 
 > **通用 post-condition**: 每条改写后该行**不再命中 SC-1 pattern**。
 > ⚠️ **B-2 例外**: `:317`/`:318` 本来就不命中该 pattern, 故 post-condition 对 B-2 是**空检查**, 它另有专属验收 (见 B-V7)。
@@ -44,6 +46,7 @@
 - [ ] **B-10** 示例 1 四行 → 字面见 proposal SC-3(c)
 - [ ] **B-15** `phase-d-closer/SKILL.md:41` → 字面见 proposal B15
 - [ ] **B-16** `aria/README.md:85` → `- openspec-archive — Archive completed OpenSpec changes to openspec/archive/ with post-move location checks`
+- [ ] **B-14** `openspec-archive/SKILL.md:622` 悬空引用 → `openspec/archive/2026-07-05-aria-archive-gate-runtime-reality/` (**R2 补回**)
 - [ ] **B-17** `aria/README.zh.md:85` → `- openspec-archive — 归档已完成的 OpenSpec 变更到 openspec/archive/ 并做落点校验`
 
 ### 只给方向 (落盘前逐条自测 pattern)
@@ -66,6 +69,7 @@
 - [ ] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 正文 **3 行** / 示例四行逐行等于目标文本
 - [ ] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内
 - [ ] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿)
+- [ ] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在)
 - [ ] **B-V7** B-2 专属验收 (**post_planning R1 补**, 因通用 post-condition 对它是空检查): `:318` 改后 (a) 不以「填入」二字结尾; (b) 含「7-40 位十六进制」字样; (c) 含对 C2 脚本的调用行
 
 ---
@@ -89,6 +93,7 @@
 - [ ] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1 / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
 - [ ] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿)
 - [ ] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK**
+- [ ] **C-V4** (**R2 补**, 对应已知风险 5): C-3 五态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核
 - [ ] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项且 status 非 `error` —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
 
 ---
@@ -110,13 +115,15 @@
 ## TG-E — Rule #6 AB + 发版 + 集成
 
 - [ ] **E-0** ⛔ **SC-11 阻塞项**: 把「SOT §1『整个变更』跨多 Skill 时的作用域」写进 handoff 请 owner 裁 (a) ratify v1.69.1 形状为成文 lane / (b) 另裁。**取得答复前不得进入 E-9 (主仓 PR 合并)**。
-  ⚠️ **卡住时怎么办 (post_planning R1 补)**: E-0 不阻塞 TG-B/TG-C/TG-D 与 E-2..E-8; 它只挡 E-9。若 owner 长时间不答复, **停在 E-8 之后**, 把已完成部分写进 handoff, 不合并。
+  ⚠️ **卡住时怎么办 (R1 补, **post_planning R2 Critical F-2 订正**)**: E-0 不阻塞 TG-B/TG-C/TG-D 与 **E-1..E-6**; 它挡 **E-7a 起的全部步骤**。若 owner 长时间不答复, **停在 E-6 之后**, 把已完成部分写进 handoff, **不合并也不推任何 remote**。
+  > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 v1.72.0 (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
+  > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
 - [ ] **E-1** AB 前置**已核**: `ab-suite/openspec-archive.json` 两个选中 eval 用合成路径 `/workspace/my-project`, 不触真仓、不走 Step 7 ⇒ **不需要 `ARIA_COORDINATION_NO_PUSH=1` 会话级前置**
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
 - [ ] **E-3** 结果存 `ab-results/2026-09-XX-v1.72.0-archive-skill-drift/RESULT.md`; **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
 - [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` → **1.72.0** (SOT = 该文件)
-- [ ] **E-5** 版本串同步。⚠️ **post_planning R1 订正**: 23 处出现里 **`aria/CHANGELOG.md:13` 的 `## [1.71.1] - 2026-09-06` 是历史条目, 不改** —— 它要的是在其**上方新增**一条 `## [1.72.0]`。故**要改的是 22 处 / 12 文件**, 外加 CHANGELOG 新增一条。逐文件 `grep -c` 实测并把 12 行计数贴进本文件
+- [ ] **E-5** 版本串同步。⚠️ **post_planning R1 订正**: 23 处出现里 **`aria/CHANGELOG.md:13` 的 `## [1.71.1] - 2026-09-06` 是历史条目, 不改** —— 它要的是在其**上方新增**一条 `## [1.72.0]`。故**要改的是 22 处 / 12 文件**, 外加 CHANGELOG 新增一条。逐文件 `grep -c` 实测并把 **13 行**计数**全部**贴进本文件 (含 `aria/CHANGELOG.md` 那行, 标注「历史条目, 不改」) —— proposal `:147` 要求「不留不对称缺口」, 只贴 12 行会让那处不对称隐形
 - [ ] **E-6** 六个版本类 custom check 全绿。⚠️ 它们只覆盖约 6/23, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
 - [ ] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
 - [ ] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
