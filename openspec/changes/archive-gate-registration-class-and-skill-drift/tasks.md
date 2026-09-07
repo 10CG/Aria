@@ -147,6 +147,40 @@
   > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 `<vNEXT>` (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
+> 🛑 **Phase B 执行到此停下 —— TG-E 有两个阻塞点, 均非规则豁免, 是执行条件不具备** (2026-09-07):
+>
+> **阻塞 1 (E-1, 会话级前置)**: 本会话 `ARIA_COORDINATION_NO_PUSH` **未设置**, 而它是**进程级**前置,
+> 会话内 export 改不了 subagent 继承环境 (memory `session-level-precondition`)。E-1 的两个承重事实
+> 已逐字实证: eval 1 `correct-archive-path` 带 `project_root=/workspace/my-project` (合成, 不触真仓);
+> eval 2 `already-archived-detection` **无 `project_root`**, 两个路径均为仓相对 (`openspec/changes/user-auth`
+> / `openspec/archive/user-auth`) ⇒ 真仓 cwd 下落到真仓树。⇒ **须由 owner 以
+> `ARIA_COORDINATION_NO_PUSH=1 claude ...` 重启会话后再跑 E-2**。E-2/E-3 阻塞 ⇒ 按 Rule #6
+> 「Skill 变更发版前须过 benchmark」, E-4 起全部阻塞。
+>
+> **阻塞 2 (E-0, SC-11 owner 裁定)**: 挡 E-7a 起的全部步骤 (含子模块合并双推)。
+>
+> ---
+>
+> 📐 **预备测量 (不依赖上述两个阻塞, 已实跑; 执行时须重跑取新值, 不得照抄本段)**:
+>
+> **E-4 三腿实测 (2026-09-07T14:5xZ)**:
+> - **(a) 已发布集合**: `github` 与 `origin` 两端一致, 最高 = **`v1.71.1`** (两端并集无分歧)
+> - **(b) 并发轨自报号普查**: 遍历 `origin/master:openspec/changes/` 全部子目录, 命中两条轨,
+>   **自检基线通过** (`handoff-multibranch-subdir-path-fidelity` 与 `pre-merge-completeness-gate-change-scope`
+>   均在普查结果内)。两轨各自的 proposal 都出现 **`v1.71.2`** 与 **`v1.72.0`** 两个候选号。
+> - **(c) 全 handoff 面 `vNEXT` 扫描**: 本地 6 份 + `origin/master` 6 份命中 `vNEXT`,
+>   **声明的全部是已发布的 `1.70.0`**, 无对未来号的活声明。⇒ 如实登记「扫了 12 份, 零未来号声明」。
+> - ⇒ **本时刻推得 `<vNEXT>` = `v1.73.0`** (排除已发布 ≤`v1.71.1` 与两轨已宣告的 `v1.71.2` / `v1.72.0`;
+>   级别 MINOR)。**该值随并发轨推进而变, E-4 执行时必须重跑三腿。**
+>
+> **E-5 版本串面重测 (2026-09-07)**: `1.71.1` 全仓 **23 处 / 13 文件** —
+> `aria/.claude-plugin/plugin.json` 1 · `marketplace.json` 2 · `aria/VERSION` 2 · `aria/CHANGELOG.md` 1 ·
+> `aria/README.md` 1 · 主仓 `VERSION` 1 · `CLAUDE.md` 2 · `README.md` 2 · `README.zh.md` 3 ·
+> `README.ja.md` 3 · `README.ko.md` 3 · `system-architecture.md` 1 · `version-scheme.md` 1。
+> 减去两处 append-only (`aria/CHANGELOG.md:13` 段标题 / `aria/VERSION:4` 当期发布日期) ⇒
+> **要改 21 处 / 12 文件** —— `aria/CHANGELOG.md` 唯一那处就是 append-only 段标题, 故该文件整体退出计数。
+> **⇒ 与起草时基线逐字一致, 重测未发现漂移。**
+
 - [ ] **E-1** AB 前置 (**R5 F3 订正: 原文「已核 ⇒ 不需要前置」的承重前提对第二个 eval 为假, 且结论方向搞反了**): 逐 eval 分档 —— eval 1 用合成路径 `/workspace/my-project`, 不触真仓; **eval 2 (`already-archived-detection`) 无 `project_root`, 两个路径均为仓相对 ⇒ 在真仓 cwd 下会落到真仓 `openspec/` 树**。⇒ 按 memory `ab-harness-real-repo` + `session-level-precondition`, **一律以 `ARIA_COORDINATION_NO_PUSH=1 claude ...` 启动会话再跑 E-2**。该前置是**进程级, 会话内补不上**; 未带则**停在 E-1 并上报**, 不得自行降级 (本 cycle 前身 `a1-entry` 就因漏带它整段 Rule #6 阻塞过, 见 `docs/handoff/2026-09-05-1426-a1-entry-b2-30of40-rule6-blocked.md`)
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
 - [ ] **E-3** 结果存 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md` (**R5 订正: 原写裸相对 `ab-results/`, 仓根无此目录**; 真根见 CLAUDE.md 信息地图); **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
