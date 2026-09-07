@@ -3,7 +3,7 @@
 > **Change ID**: `archive-gate-registration-class-and-skill-drift` | **Level**: 3
 > **Linked Issue**: `10CG/aria-plugin#186` | **Track ID**: `archive-gate-registration-class-and-skill-drift-023236f2`
 > **post_spec**: R1→R5 跑满 (`max_rounds=5`)。R5 = PASS_WITH_WARNINGS, **converged=false** ⇒ 该事实须原样写进 handoff 请 owner 复议, 不得自行当作已收敛。
-> **post_planning**: R1 已跑 (4 席 + 4 反驳席), 本文为 R1 修订版。
+> **post_planning**: R1→R5 已跑 (`max_rounds=5` 用满), 本文为 **R5 修订版**。各轮权威记录见 `.aria/audit-reports/post_planning-R*-*-aggregated.md` 的 frontmatter。**R5 verdict = FAIL (3 席 FAIL), `converged=false`** —— 见 E-V1 的 handoff 点名义务。
 > **rule6_note**: openspec-archive 侧**照跑 AB**; phase-d-closer 与 state-scanner 两侧 **substitute**。跨 Skill 作用域歧义 ⇒ **SC-11 阻塞 C.2**, 见 E-0。
 
 ---
@@ -13,7 +13,7 @@
 | Task Group | 主责 | 理由 |
 |---|---|---|
 | TG-B SKILL.md / README 收口 | `aria:knowledge-manager` | 文档与实现一致性、指令面措辞 |
-| TG-C 三个脚本 + 测试 | `aria:qa-engineer` | 三态/五态可证伪性是其专长 |
+| TG-C 三个脚本 + 测试 | `aria:qa-engineer` | 多态 (三/四/五) 可证伪性是其专长 |
 | TG-D 开单 | 主控 | 对外动作不外派 |
 | TG-E AB + 发版 + 集成 | 主控 | git / 发版 / 闸门不外派 (memory `workflow-file-domain`: **subagent 一律不 commit, 主控统一提交**) |
 
@@ -22,15 +22,19 @@
 **TG-B 与 TG-C 的文件域不是完全 disjoint** —— C-3 的**基线态**要**读** TG-B 正在改的 `openspec-archive/SKILL.md`。约束:
 
 - **C-3 基线态必须在 B-1/B-2 落盘之前跑**, 否则基线已被改掉, 「基线 FAIL」不可复现。
-- C-3 的**其余四态**用 `CLAUDE_PLUGIN_ROOT` 指向 scratchpad 夹具跑, **不写仓内任何文件** (Phase A.1 的五态就是这么跑的; 夹具见 C-3 说明)。
+- C-3 的**其余三态**在 scratchpad 的**同构插件树**里跑, **不写仓内任何文件**。⛔ **不是设 `CLAUDE_PLUGIN_ROOT`** —— C-1 明令探针用 `parents[3]`, 该 env **在本设计下完全惰性** (post_planning R5 F1 实测: 设与不设的 ROOT/锚点数/输出/rc 逐字节相同)。正确做法见 C-3。
 - **C-4 必须排在 B-2 之后** (不是 B-1 —— 见 C-4 说明)。
-- 其余 TG-B / TG-C 任务文件域 disjoint, 可并行。
+- **TG-C 与 TG-B 之间**文件域 disjoint, 可并行。
+- ⛔ **但 TG-B 内部**不是 —— **12 条 B 任务用绝对行号打同一个 `openspec-archive/SKILL.md`** (`:4 :17 :40 :47 :56 :87 :247 :251 :259 :318 :588 :607`), 它们**互相移动对方的行号**, 必须**严格串行**。原文写「其余 TG-B / TG-C 任务文件域 disjoint, 可并行」是**错的** (**post_planning R5 完备性批评席 Critical**; proposal 自己在「Part B 自身会移动行号」处早就知道这件事, 但该洞见此前只被用来修验收项 B-V3 / SC-1 / B-V7, **从没回头改 B 任务本身** —— memory `fix-the-class` 本 cycle 第七次)。
+- **实证照字面执行会坏**: `:251-257` 是 **7 行**, B-8a 换成 **3 行** ⇒ 下方整体上移 4 行 ⇒ 原 `:263-265` 的 **Step 6** 恰好落到 `:259-261`, 而 B-8b 正按绝对 `:259-261` 下手 ⇒ **删掉的是 Step 6, 真正的 Step 5 原封不动**。
+- ⛔ **强制护栏 (对每条 B 任务, 逐条)**: 落盘**前**先 `sed -n '<N>p' <目标文件>` 打印该行, **逐字确认内容与任务描述相符**; 不符即**停下重新定位**, 不得照行号硬改。这条护栏与执行顺序无关, 是唯一对「前面的编辑移了位」免疫的判据。
+- **推荐执行序**: 同一文件内**按行号从大到小**做 (`:622 → :607 → :588 → :318 → :317 → :259 → :251 → :247 → :87 → :56 → :47 → :40 → :17 → :4`) —— 自下而上编辑时, 每次改动只移动它**下方**的行, 而下方的都已做完, 上方待做的行号仍然有效。B-2 的 Step 7 段落部分在 `:318` **上方**, 不受 `:318` 改动影响。
 
 ---
 
 ## TG-B — CLI 漂移类级收口 (**18 条**, 两个 SKILL.md + 两份 README)
 
-> ⚠️ **post_planning R2 Critical (F-1) 订正**: R1 修订 (`240ea4c`) **静默删除了 B-14**, 同时把标题计数从「20 行」改成「17 条」⇒ 删完自洽, **数数核不出来**。而 proposal `:67` 仍在册、`:159` 的 Rule #6 范围写的是「B1-B14」, 且 SC-1 的 pattern 对 `:622` **命中 0** ⇒ **零验收能发现**。已补回并加专属验收 B-V8。
+> ⚠️ **post_planning R2 Critical (F-1) 订正**: R1 修订 (`240ea4c`) **静默删除了 B-14**, 同时把标题计数从「20 行」改成「17 条」⇒ 删完自洽, **数数核不出来**。而 proposal 的 B14 行仍在册、Rule #6 判定表 `openspec-archive` 行的范围写的是「B1-B14」(按内容引, 不锚行号), 且 SC-1 的 pattern 对 `:622` **命中 0** ⇒ **零验收能发现**。已补回并加专属验收 B-V8。
 
 > **通用 post-condition**: 每条改写后该行**不再命中 SC-1 pattern**。
 > ⚠️ **B-2 例外**: `:317`/`:318` 本来就不命中该 pattern, 故 post-condition 对 B-2 是**空检查**, 它另有专属验收 (见 B-V7)。
@@ -51,7 +55,7 @@
 
 ### 只给方向 (落盘前逐条自测 pattern)
 
-- [ ] **B-2** `:318` 替换文案 → 可验证约束 (必须含 7-40 位十六进制 SHA) + 写明调用 C2。**硬约束: 不得以「填入」二字结尾**
+- [ ] **B-2** `:318` **+ Step 7 段落** (作用域按 proposal B2, **不是只改 `:318` 单行**): `:318` 只留 `{sha}` 模板; 可验证约束 (必须含 7-40 位十六进制 SHA) 与 C2 调用行写进 **Step 7 段落**。**硬约束: `:318` 不得以「填入」二字结尾**
 - [ ] **B-3** `:4` frontmatter `description` 删「自动修正 CLI bug」
 - [ ] **B-5** `:40` + `:41` 核心功能表**两行的两个单元格全部重写** (`:40` 执行归档 → `git mv …`; `:41` 自动修正 → 位置校验)
 - [ ] **B-6** `:56`「本 Skill 会自动修正此问题」→ 对采用者的条件表述
@@ -70,15 +74,19 @@
 - [ ] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内
 - [ ] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿)
 - [ ] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在)
-- [ ] **B-V7** B-2 专属验收 (**post_planning R1 补**, 因通用 post-condition 对它是空检查): `:318` 改后 (a) 不以「填入」二字结尾; (b) 含「7-40 位十六进制」字样; (c) 含对 C2 脚本的调用行
+- [ ] **B-V9** (**R5 完备性批评席 Major 补**, B-13 专属 —— B-13 是 TG-B 十八条里**唯一零验收覆盖**的交付物: 唯一提到它的 B-V1b(d) 写的是「B-13 新插的时限限定行 (**若命中**)」, 而实测该行的两个事实串对 SC-1 pattern **零命中** ⇒「若命中」是恒真子句, 等于没验): `grep -n` B-13 新插的那行, 须**同时**含「本仓从未安装该 CLI」与「归档走 git mv」两个字符串, 且位置在 `## ⚠️ 已知 Bug` 标题行**之后**、`**问题**:` 行**之前**。**基线该断言为红** (该行尚不存在)
+- [ ] **B-V7** B-2 专属验收 (**post_planning R1 补**, 因通用 post-condition 对它是空检查; **R5 F2 订正: 改为按内容不按行号, 并按落点分派** —— 原文把三条断言全钉在绝对行 `:318` 上, 而 TG-B 自身会把该行上移约 5 行 ⇒ (a) 会在随机行上恒真、(b)(c) 必然误红)。**本项在 TG-B 全部落盘后跑**: (a) `grep -c '填入"' SKILL.md` == **1** (只剩 `:317` 那条锚点串); (b) **Step 7 段落内** `grep -q '7-40 位十六进制'`; (c) **Step 7 段落内** `grep -q 'archive_tracker_verify.py'`
 
 ---
 
 ## TG-C — 三个脚本 + 测试
 
-- [ ] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 rc 2 fail-CLOSED; (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
-- [ ] **C-2** 注册 C-1 进 `.aria/state-checks.yaml` (`severity: warning`, 参照 `issue-cache-freshness` 体例)
-- [ ] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑**; 其余四态用 `CLAUDE_PLUGIN_ROOT` 指向 scratchpad 夹具, **不写仓内任何文件**:
+- [ ] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 **rc 1** (**R5 订正: 原写 `rc 2`, 与本文件 C-3、proposal 四态表、以及 A.1 实跑脚本三者均不符** —— 删掉 SKIP 态后 C1 已无「判不了」这一档, 锚点数异常是**真失败** (措辞被改动, 探针需人工对齐), 归 rc 1); (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
+- [ ] **C-2** 注册 C-1 进 `.aria/state-checks.yaml`: **`name: skill-md-sha-backlink-literal-sync`** (该 name 被 C-V3 逐字断言, **不得另拟**) / `severity: warning` (参照 `issue-cache-freshness` 体例)
+- [ ] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑** (跑真仓); **其余三态在 scratchpad 同构插件树里跑**:
+  > 🔧 **同构插件树怎么造** (post_planning R5 F1 Critical 订正 —— 原文写「设 `CLAUDE_PLUGIN_ROOT` 指向夹具」是**惰性指令**, C-1 明令用 `parents[3]` 不读 env, 实测设与不设逐字节相同; 照原文执行会让三个非基线态全部读真仓, 其中两态**恰好返回期望的 rc ⇒ 假绿**):
+  > `mkdir -p $FX/skills/state-scanner/scripts/lib $FX/skills/openspec-archive` → 把探针**复制进** `$FX/skills/state-scanner/scripts/` → 在 `$FX/skills/openspec-archive/SKILL.md` 与 `$FX/skills/state-scanner/scripts/lib/spec_complete.py` 放该态所需内容 → **跑那份副本** (`parents[3]` 自然解析到 `$FX`)。
+  > ⛔ **仓内两个目标文件全程只读**; 每态跑完核 `git status --porcelain` 与 `git -C aria status --porcelain` 均**不含** `spec_complete.py` 与 `openspec-archive/SKILL.md` (它们是本 Spec 明文非目标, 见已知风险 5)。
   - 基线 (当前仓, 两侧不等) → FAIL rc1 且打印两侧原文
   - 目标 (夹具: SKILL.md 已改 `Step 7`) → PASS rc0
   - 锚点提取数≠1 (夹具: 两个空文件) → FAIL rc1
@@ -87,13 +95,13 @@
 - [ ] **C-5** `archive_tracker_verify.py` → **新建** `aria/skills/openspec-archive/scripts/`
 - [ ] **C-6** 单测 → **新建** `aria/skills/openspec-archive/tests/`, **必须带 `conftest.py`**。⚠️ **不是照抄 `phase-d-closer/tests/conftest.py` 的内容** (那份 docstring 逐句是 phase-d-closer 专属事实), 而是照抄它的**做法**: 写成**纯 docstring 零代码**的文件, 内容说明 (a) 它为什么存在 (触发 `is_pytest_suite()` 第一条判据); (b) 删掉它会退回 `OK (0 tests)` 的回归判据。**sys.path 由测试文件自己做** (照 `test_fetch_gate.py:17` 的 `sys.path.insert(0, parent.parent / "scripts")`)
 - [ ] **C-7** 夹具 → `tests/fixtures/`, **冻结快照**。抓取命令: `forgejo GET /repos/10CG/Aria/issues/<n> | jq -r '.body' > fixtures/issue-<n>.md`, 对 `201` / `185` / `186` 各一份; 每份**首行加注释**记来源 `10CG/Aria#<n>` 与抓取 UTC 时刻。另建合成夹具 `synth-short.md` (回链行尾部含短十六进制 `abc`) —— 真语料证不了长度下限
-- [ ] **C-8** C2 五态实跑: `#201` rc0 / `#185` rc1 NO_SHA / `#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
+- [ ] **C-8** C2 五态实跑: `10CG/Aria#201` rc0 / `10CG/Aria#185` rc1 NO_SHA / `10CG/Aria#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
 - [ ] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12)
 - [ ] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1 / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
 - [ ] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿)
 - [ ] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK**
-- [ ] **C-V4** (**R2 补**, 对应已知风险 5): C-3 五态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核
-- [ ] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项且 status 非 `error` —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
+- [ ] **C-V4** (**R2 补**, 对应已知风险 5): C-3 四态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核
+- [ ] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项**且 `status == "pass"`** (**R5 完备性批评席 Major 订正: 原写「status 非 `error`」把红当绿** —— 实读 `custom_checks.py:373-379`, `error` 只给 rc 127, **rc 非零一律映射为 `fail`** ⇒ 原判据对一个正在报 FAIL 的闸门也放行, 而全 Spec 再无第二处要求 C-1 在真仓转绿)。⚠️ **本项须排在 TG-B 全部落盘之后** —— 在此之前 C-1 本就该是红的 —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
 
 ---
 
@@ -119,24 +127,24 @@
   > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 `<vNEXT>` (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
-- [ ] **E-1** AB 前置**已核**: `ab-suite/openspec-archive.json` 两个选中 eval 用合成路径 `/workspace/my-project`, 不触真仓、不走 Step 7 ⇒ **不需要 `ARIA_COORDINATION_NO_PUSH=1` 会话级前置**
+- [ ] **E-1** AB 前置 (**R5 F3 订正: 原文「已核 ⇒ 不需要前置」的承重前提对第二个 eval 为假, 且结论方向搞反了**): 逐 eval 分档 —— eval 1 用合成路径 `/workspace/my-project`, 不触真仓; **eval 2 (`already-archived-detection`) 无 `project_root`, 两个路径均为仓相对 ⇒ 在真仓 cwd 下会落到真仓 `openspec/` 树**。⇒ 按 memory `ab-harness-real-repo` + `session-level-precondition`, **一律以 `ARIA_COORDINATION_NO_PUSH=1 claude ...` 启动会话再跑 E-2**。该前置是**进程级, 会话内补不上**; 未带则**停在 E-1 并上报**, 不得自行降级 (本 cycle 前身 `a1-entry` 就因漏带它整段 Rule #6 阻塞过, 见 `docs/handoff/2026-09-05-1426-a1-entry-b2-30of40-rule6-blocked.md`)
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
-- [ ] **E-3** 结果存 `ab-results/2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md`; **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
+- [ ] **E-3** 结果存 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md` (**R5 订正: 原写裸相对 `ab-results/`, 仓根无此目录**; 真根见 CLAUDE.md 信息地图); **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
 - [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` (SOT = 该文件)。⛔ **版本号不得从本文件照抄** —— 本 Spec 起草时写的是 `1.72.0`, 而同期有**两条并发轨在抢同一号段**且本 Spec 对它们结构性不可见 (见已知风险 7)。**执行时现算, 三条前置全过才写**:
   - **(a) 已发布集合**: `git -C aria ls-remote --tags origin 'v1.7*'` **与** `git -C aria ls-remote --tags github 'v1.7*'` —— 取**两端并集**的最高号 (单端会漏: 镜像可能半推, memory `partial-push`)
-  - **(b) 并发轨已宣告号**: `git show origin/master:openspec/changes/handoff-multibranch-subdir-path-fidelity/proposal.md` 与 `…/pre-merge-completeness-gate-change-scope/proposal.md`, 各 `grep -nE 'v1\.7[0-9]\.[0-9]'` 取它们当前自报的目标号
-  - **(c) 同伴 handoff 的 `<vNEXT>`**: 读 `docs/handoff/latest.md` 指向的两份, `grep -n 'vNEXT'`
-  ⇒ 取号 = **不在 (a) 已发布集合、且不等于 (b)(c) 任一已宣告号** 的下一个可用号。**本文件与 `proposal.md` 中一律以 `<vNEXT>` 指代这个执行时才确定的号**; 凡出现 `<vNEXT>` 处 (含 `ab-results/` 目录名与 CHANGELOG 段标题) 都要在 E-4a(i) 时一并替换为实取号。**级别仍是 MINOR** (本 Spec 新增三个探针脚本 + 退役一个声明接口)。
+  - **(b) 并发轨已宣告号 —— 普查, 不是点名** (**R5 F4 订正**: 原文写死两条路径是**正向枚举**, 对第三条轨 fail-OPEN, 与本 Spec 要治的盲区同形状, memory `fix-recurs-in-fallback`): 遍历 `git ls-tree -d --name-only origin/master openspec/changes/` 的**全部**子目录, 逐个 `git show origin/master:<d>/proposal.md 2>/dev/null | grep -oE 'v?1\.7[0-9]\.[0-9]+'`。**自检基线**: 普查结果必须**包含** `handoff-multibranch-subdir-path-fidelity` 与 `pre-merge-completeness-gate-change-scope` 两条; 不含即说明扫描写错了, 重写再跑
+  - **(c) 同伴 handoff 的 `<vNEXT>` —— 扫全面, 不锚指针** (**R5 F4 订正**: 原文「读 `latest.md` 指向的两份」实测 **vNEXT 命中恒为 0** —— 带声明的 6 份 handoff 一份都不在那两个指针上 ⇒ 该腿在健康常态下就是空的, 零信息量却占三分之一置信度, 判据同 memory `false_green_dual_is_permanent_red`): `grep -rln 'vNEXT' docs/handoff/` **并**对 `git show origin/master:docs/handoff/` 同扫, 取近 14 天内文件里的 `<vNEXT>=` 声明。**零命中时必须显式写下「扫了 N 份, 零声明」**, 不得留空 —— 留空与「没扫」不可分辨
+  ⇒ 取号 = **不在 (a) 已发布集合、且不等于 (b)(c) 任一已宣告号** 的下一个可用号。**本文件与 `proposal.md` 中一律以 `<vNEXT>` 指代这个执行时才确定的号** (**R5 F11 订正: 区分 Spec 内占位符与交付物字符串**) —— **交付物**里凡以 `<vNEXT>` 描述的字符串 (`plugin.json` / `marketplace.json` / `VERSION` / `aria/CHANGELOG.md` 段标题 / `ab-results/` 目录名 / README badge 等) 落地时写实取号; **本文件与 `proposal.md` 内的 `<vNEXT>` 一律保留占位符不替换** (否则 SC-9 会同时含字面号和「不得照抄本文任何字面号」而自相矛盾)。**级别仍是 MINOR** (本 Spec 新增三个探针脚本 + 退役一个声明接口)。
   > 📌 **为什么这条是硬约束而非建议**: 本仓 `docs/handoff/2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md:13` 开篇第一句就是「**本 session 最该记住的一件事**: 两个容器并行发版会**撞版本号**」; `:80` 记录代价是「他们的 5 文件 + 同步面**全部重做**」。同型事故发生在**本 Spec 起草前一天**。
-- [ ] **E-4a** ⛔ **取号后立刻双向登记**: (i) 把实取号写回本文件 E-4 行; (ii) 在 handoff §6 公布 `<vNEXT>=<所取号>`。
-  **(ii) 是并发轨能看见本轨的唯一通道** —— 本 Spec 的 `proposal.md` 只在**未推送的 feature 分支**上 (他们 `git show origin/master:` 取不到), 协调板上的 claim **无 `linked_issue`** 且本轨的 issue 在**另一个仓** (`10CG/aria-plugin#186` vs 他们的 `10CG/Aria#195`/`#199`) ⇒ `linked_issue_overlap` 对本轨结构性返回 `[]`。
+- [ ] **E-4a** ⛔ **取号后立刻双向登记**: (i) 把实取号**追加到本文件 E-4 行末** (`实取号 = <号>`) —— **这是 Spec 内唯一登记处, 其余 `<vNEXT>` 占位符全部保留**; (ii) 在 handoff §6 公布 `<vNEXT>=<所取号>`。
+  **(ii) 是并发轨能看见本轨的唯一通道** —— 本 Spec 的 `proposal.md` 只在**未推送的 feature 分支**上 (他们 `git show origin/master:` 取不到), 协调板上的 claim **无 `linked_issue`** 且本轨的 issue 在**另一个仓** (`10CG/aria-plugin#186` vs 他们的 `10CG/Aria#195` / `10CG/Aria#199`) ⇒ `linked_issue_overlap` 对本轨结构性返回 `[]`。
   **验收 = 对 handoff 文件 `grep -n 'vNEXT'` 有命中且号与 E-4 实取号逐字相等**。
 - [ ] **E-5** 版本串同步。⚠️ **append-only 豁免有两处, 不是一处** (post_planning R1 抓到第一处, **R3-M2 抓到我只修了实例没修类**):
   - `aria/CHANGELOG.md:13` `## [1.71.1] - 2026-09-06` —— 段标题, **不改**; 动作是在其**上方新增** `## [<vNEXT>]`
   - **`aria/VERSION:4`** `> **发布日期**: 2026-09-06  # patch: v1.71.1 …` —— **当期发布说明**, 其下已排着一串 `发布日期(旧)`; 发版时是**新增**一条并把这条降格成 `(旧)`, **不是改写它**。(同文件 `:3` 的 `> **版本**: 1.71.1` **要改**)
   ⇒ **要改的是 21 处 / 12 文件** (23 − CHANGELOG:13 − VERSION:4), 外加 CHANGELOG 与 VERSION 各**新增**一条。
   ⚠️ **「21 处 / 12 文件」是起草时的测量, 不是可照抄的常量** —— 任一并发轨先 ship 都会改变它 (CHANGELOG 多一段 / VERSION 多一行 / README badge 换号)。**执行时重测一遍**, 与本数不符时**以重测为准并在本行记下差异及原因**, 不得反过来把仓里改成 21。
-  逐文件 `grep -c` 实测并把计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal `:147` 要求「不留不对称缺口」
+  逐文件 `grep -c` 实测并把计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal §Part E「覆盖面诚实登记」段要求「不留不对称缺口」(按内容引, 不锚行号)
 - [ ] **E-6a** **五个仓内 check 全绿**: `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` / `plugin-version-arch-docs-match`。它们的输入全在仓内, E-5 落地后必然可绿
 - [ ] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 `<vNEXT>` 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
   **验收 = 贴出它的实跑输出**, 确认红的原因是「installed 落后 SOT」而非别的; **不得把它算进「全绿」**。
@@ -148,7 +156,7 @@
 - [ ] **E-9** 主仓 PR → **Rule #8 pre-merge gate** → 合并 (主仓例外可走 Forgejo merge)。⚠️ **服务端合并后 GitHub 镜像不会自动拿到** (`10CG/Aria#165` 形状) ⇒ 必须本地 FF master + `git push github master`
 - [ ] **E-10** **逐 remote `ls-remote` 独立核验**两仓, 不信 push 回执 (硬约束 2); gitlink orphan 守卫 (三个子模块 SHA 在两端均可达)
 - [ ] **E-11** D.1 进度 → D.2 归档 → D.2b release claim → D.3 handoff
-- [ ] **E-V1** handoff 须点名五项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`; **(5) `<vNEXT>` (E-4a(ii), 并发轨可见性)**。**验收 = 对 handoff 文件 grep 这五个字符串, 缺一即红** (防纯自证)
+- [ ] **E-V1** handoff 须点名六项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`; **(5) `<vNEXT>` (E-4a(ii), 并发轨可见性)**; **(6) `plugin-cache-currency` (E-0/E-6b 两次明文要求的如实登记 —— Rule #10 §5 规定「AI 任何自作主张的流程判断必须写进 handoff 请复议」, 本项是它在本 Spec 里的唯一机械兜底)**。**验收 = 对 handoff 文件 grep 这六个字符串, 缺一即红** (防纯自证)
 
 ---
 
@@ -162,7 +170,7 @@
 6. (**post_planning R1 补**) **服务端合并的 GitHub 补推**: 主仓走 Forgejo merge 后 GitHub 镜像落后一个 commit (本 session 在 PR `10CG/Aria#202` 上实测过一次), E-9 已含补推步骤。
 7. (**post_planning R5 主控 sibling-spec 交叉审计补, Critical**) **两条并发轨与本轨共享发版面, 且它们看不见本轨**:
    - `openspec/changes/handoff-multibranch-subdir-path-fidelity` (`10CG/Aria#195`) —— `proposal.md:352` 逐字「推荐默认改为 **MINOR / v1.72.0**, 但须 owner 拍板后 Task 5.1 才动手」。**这正是本 Spec 起草时硬编码的那个号**。
-   - `openspec/changes/pre-merge-completeness-gate-change-scope` (`10CG/Aria#199` / `10CG/aria-plugin#161`) —— 目标 `v1.71.2`, 并在 `:315` 逐字写「真正在飞、同抢 v1.71.2 的是 **Aria#195**」—— **它枚举并发轨时没有本轨**。
+   - `openspec/changes/pre-merge-completeness-gate-change-scope` (`10CG/Aria#199` / `10CG/aria-plugin#161`) —— 目标 `v1.71.2`, 并在 `:315` 逐字写「真正在飞、同抢 v1.71.2 的是 **`10CG/Aria#195`**」—— **它枚举并发轨时没有本轨**。
    - **共享面**: 版本 SOT `aria/.claude-plugin/plugin.json` + 派生 5 文件 + 主仓版本引用面 + `aria/CHANGELOG.md` (三方都要 append 一段)。**代码落点零交叠**, 碰撞全部在发版面 ⇒ `git` 不会报冲突 (memory `same-value-merge-silent`: 两侧改成同一个串 ⇒ 零冲突零标记静默采纳, 已有**四处静默合成已发布号**的实证)。
    - **实测 (2026-09-07T09:0xZ)**: `git -C aria ls-remote --tags origin` 最高已发布 = **`v1.71.1`**; `v1.71.2` 与 `v1.72.0` **均未被占** ⇒ 撞号**尚未发生**, 但三轨在抢两个号。处置 = E-4 三条前置 + E-4a 双向登记。
    - **为什么 R1-R5 十五个审计席位都没抳到**: 它们审的是**本地树**, 而两份同期 Spec 只存在于 `origin/master`。印证 memory `combined-mode-sister-spec-audit-value`「single-Spec 漏率 100%」。

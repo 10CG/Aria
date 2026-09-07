@@ -2,7 +2,7 @@
 
 > **Level**: 3 (Full — `openspec-archive/SKILL.md` 指令面变更 + `phase-d-closer/SKILL.md` 与两份 README 的**描述性**事实同步 + 三个新脚本 + 九条开单 + 发版同步面; 四个 task group)
 > ⚠️ 措辞承重: 只有 openspec-archive 那侧是**指令面**变更; phase-d-closer 与 README 是**描述性**事实同步 —— 这与 Rule #6 判定表把它们判进第一行是同一件事, 两处不得说法不一 (R4 `fixes-contradict` 抓到)。
-> **Status**: Draft (Phase A.1; post_spec R1→R2→R3 已跑, 本文为 R3 修订版)
+> **Status**: Draft (Phase A.1; **post_spec R1→R5 已跑 (`converged=false`), post_planning R1→R5 已跑 (`converged=false`)**, 本文为 post_planning R5 修订版)
 > **Change ID**: `archive-gate-registration-class-and-skill-drift`
 > **Linked Issue**: `10CG/aria-plugin#186` (类级排查总 tracker)
 > **Track ID**: `archive-gate-registration-class-and-skill-drift-023236f2`
@@ -12,9 +12,12 @@
 > **全文所有 issue 号一律写 `<org>/<repo>#<n>`。** 已知真实撞号: `10CG/aria-plugin#186` vs `10CG/Aria#186`; `10CG/aria-plugin#185` vs `10CG/Aria#185`。
 > **机械自检 (落地前必跑, 不再靠人工通读 —— 那正是连三轮复发的根因)**:
 > 用 `aria/skills/state-scanner/scripts/check_bare_issue_refs.py <proposal.md>` (Part C3), **exit 0 = 无裸引用**。
-> 它必须排除三类**不是** issue 引用的 `#<n>`: (a) `Rule #N` / `规则 #N` 规则编号; (b) 反引号 code span 内逐字引用的目标文件原文 (如 B15 的目标行含 `#95`); (c) 已带 `<org>/<repo>` 限定的。
+> 判据必须 **fail-CLOSED**: 先假定每个 `#<n>` 都违规, 只有落进**封闭**豁免集才放过 (**R5 F13 订正** —— 原文把 (b) 写成「反引号内逐字引用目标文件原文」但唯一可实现的读法是「任意反引号一律豁免」, 且 (c) 若实现成「`#` 前一个字符是 `/` 或字母数字」则对半限定形态 (只有仓名、无 org 前缀) 天然 fail-OPEN; 两处都是正向枚举, memory `invariant-needs-failclosed-default`)。**封闭豁免集仅三类**:
+> (a) **全限定** `<org>/<repo>#<n>` —— 必须含 `/`; 半限定 (只有仓名、无 `<org>/` 前缀) **不豁免**;
+> (b) `Rule #N` / `规则 #N` 规则编号;
+> (c) 落在**显式白名单**里的「目标行完整字面」code span —— 即 Part B 要逐字写进 SKILL.md 而本身含裸 `#<n>` 的那些行 (当前**仅 B15 一条**)。新增须显式加进白名单, **不得**放宽成「任意反引号一律豁免」。
 > **三态**: 目标态 = 本文件 rc 0; **正控** = R3 修订前版 (commit `d81873b^`) rc 1, 命中恰是 R3 审计席点名的 `:130` 两处 + `:156` 一处; **坏实现** = 不排除上述三类的裸 grep ⇒ 它把 `Rule #N` 与 code span 内的逐字引用一并算成裸 issue 引用, **在任何版本上都报非零** ⇒ 判无效。
-> ⚠️ **本处刻意不写坏实现的具体命中数** —— 那是随每次编辑变化的派生物。R4 修订时写死的「9」在 R5 已失效 (实测 12), 因为 R4 自己新增的三行又添了 `Rule #6` / `#95` / `Rule #10` 三处命中。**派生数字只由脚本产出, 不进正文** (memory `pasted-evidence-is-derived`, 本 Spec 上第三次犯)。
+> ⚠️ **本处刻意不写坏实现的具体命中数** —— 那是随每次编辑变化的派生物。R4 修订时写死的「9」在 R5 已失效 (实测 12), 因为 R4 自己新增的三行又添了两处 `Rule #N` 与一处裸号命中。**派生数字只由脚本产出, 不进正文** (memory `pasted-evidence-is-derived`, 本 Spec 上第三次犯)。
 > ⚠️ **R4 抓到的自伤**: 上一版把**那个坏实现的命令**写进了本处 (并声称负控是 3), 而 3 是正确实现的输出 —— 手抄命令而非引用实跑的那个 (memory `pasted-evidence-is-derived`)。本处现改为**只引脚本路径, 不复述命令**。
 >
 > ### 🔀 Part A 已拆出 (2026-09-07 owner 裁定) → `10CG/aria-plugin#188`
@@ -162,7 +165,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 |---|---|---|---|
 | **openspec-archive** | B1-B14 | **第二行 · 照跑 AB, 零裁量** | B3 改的 `:4` 就是 frontmatter `description`。§2 附加约束逐字: 「**`description` 或指令流程变动 ⇒ 一律第二行**」 |
 | **phase-d-closer** | B15 | 第一行 **substitute** | §2 第一行 + 附加约束: 改的是**描述另一 Skill 职责**的表格行 = 事实性同步 (术语修正), 且 phase-d-closer 自己的 `description` **零变动**。substitute 物 = SC-1 的机械判据 |
-| **state-scanner** | C1 **与 C3** 落点 | 第一行 **substitute** | **R3 RFV-6 补入, R5 补 C3**: 两者都是纯新增探针脚本, 不被 state-scanner 自身流程调用, 其 `SKILL.md` 与 `description` **零变动**。判据同 v1.69.1 对 `spec_complete.py` 的处置。substitute 物 = SC-5 (C1 五态) 与 SC-12 (C3 三态) 的实跑 |
+| **state-scanner** | C1 **与 C3** 落点 | 第一行 **substitute** | **R3 RFV-6 补入, R5 补 C3**: 两者都是纯新增探针脚本, 不被 state-scanner 自身流程调用, 其 `SKILL.md` 与 `description` **零变动**。判据同 v1.69.1 对 `spec_complete.py` 的处置。substitute 物 = SC-5 (C1 **四态**) 与 SC-12 (C3 三态) 的实跑 |
 | README ×2 | B16/B17 | 不适用 | 非 Skill 内容 (插件门面文档), 不在 Rule #6 判据表覆盖范围 |
 
 **⇒ 只跑 openspec-archive 一个套件。** 三侧的档位各自来自 §2 的**明文映射**, 无一依赖跨 Skill 推演。
@@ -196,9 +199,9 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 - **SC-4** (B9, **机械判据**, R3 SCF-5): `keep_changes_copy` 在 SKILL.md 中的命中**全部落在新增小节 `## 已退役配置项` 内** (与 SC-1 同样按标题文本定位), 区段外命中 == 0。
 - **SC-5** (C1 **四态**): 见 Part C1 表, 四态均留实跑输出; 三个坏实现均被拒。**外加 B2 落地后重跑锚点唯一性** (SKILL.md 侧命中数须仍为 1)。
 - **SC-6** (C2 五态): 夹具为冻结快照, 每份注明 `10CG/Aria#<n>` 与抓取时刻; 含合成 `synth-short`。**外加**: `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行的测试数 **非 0**。
-- **SC-7** (Rule #6): openspec-archive AB 跑完, 留 `ab-results/2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md`; 两臂 = **v_new vs v_old**; **RESULT.md 须显式记录本次 AB 对本改动的区分力评估** (预期零, 见 R1V-6 登记)。
+- **SC-7** (Rule #6): openspec-archive AB 跑完, 留 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md`; 两臂 = **v_new vs v_old**; **RESULT.md 须显式记录本次 AB 对本改动的区分力评估** (预期零, 见 R1V-6 登记)。
 - **SC-8** (D): D1-D6 开单并回读核验; D7/D8/D9 已开, 号记入 tasks.md。**全部 issue 号带仓限定**, 并跑头部的机械自检 (裸 `#<n>` 命中数 == 0)。D6 须在 handoff 单独点名。
-- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `<vNEXT>` (E-4 现算所得, **不得照抄本文任何字面号**); 版本串同步 **21 处 / 12 文件** (23 处出现中 `aria/CHANGELOG.md:13` 与 `aria/VERSION:4` 是 append-only 历史条目, **不改**, 各自**新增**一条); **五个仓内 check 全绿 + `plugin-cache-currency` 期望 STALE 并贴实跑输出**; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
+- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `<vNEXT>` (E-4 现算所得, **不得照抄本文任何字面号**); 版本串同步 = **执行时逐文件 `grep -c` 重测所得的全集**, 减去两处 append-only (`aria/CHANGELOG.md` 的旧版段标题、`aria/VERSION` 的当期 `发布日期` 行, 二者各**新增**一条而非改写), 计数表全部贴进 tasks.md E-5。**起草时基线 = 21 处 / 12 文件 (23 − 2); 与重测不符时以重测为准并记差异原因** (**R5 F5 订正**: 原文把 21/12 钉成常量, 任一并发轨先 ship 即不可满足 ⇒ 执笔者只剩「停在没有缺陷可修的地方」或「自行降级已成文验收项」两条路, 后者正是 Rule #10 点名的形状); **五个仓内 check 全绿 + `plugin-cache-currency` 期望 STALE 并贴实跑输出**; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
   (a) `git ls-tree HEAD aria | awk '{print $3}'` == `git -C aria rev-parse HEAD` —— 主仓记录的 gitlink 与子模块实际 checkout 一致。**基线实测 `301641b` vs `3a28339` ⇒ 红** ✅
   (b) `git -C aria rev-parse HEAD` == `git -C aria rev-parse origin/master` —— 子模块停在**已合并的 master** 而非未合并的 feature 分支。**基线实测 `3a28339` vs `301641b` ⇒ 红** ✅ (当前 aria 正停在 `feature/archive-gate-registration-class-and-skill-drift`)
   ⚠️ **两条缺一不可**: 只写 (a) 会在子模块停在未合并 feature 分支时假绿 (R5 抓到, 而那正是当前状态); 只写 (b) 则是上一版的恒绿写法 (R4 抓到)。; **两仓** (`10CG/Aria` + `10CG/aria-plugin`) 逐 remote `ls-remote` 独立核验 (硬约束 2)。
