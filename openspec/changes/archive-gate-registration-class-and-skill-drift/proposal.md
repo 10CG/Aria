@@ -138,7 +138,7 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 
 ### Part E — 发版同步面
 
-- **级别 MINOR** — `standards/conventions/version-management.md §2.2` 逐字「**功能增强（向下兼容）**」: C1/C2/C3 是**三个**随插件分发的新脚本 (R5 订正 —— C3 在 R4 被立为交付物后未传播到本行)。v1.71.1 → **v1.72.0**。
+- **级别 MINOR** — `standards/conventions/version-management.md §2.2` 逐字「**功能增强（向下兼容）**」: C1/C2/C3 是**三个**随插件分发的新脚本 (R5 订正 —— C3 在 R4 被立为交付物后未传播到本行)。v1.71.1 → **`<vNEXT>`** (⛔ **不是** `1.72.0` —— 起草时的硬编码值已按 post_planning R5 主控 sibling-spec 交叉审计撤销, 取号规程见 `tasks.md` E-4 三条前置; 并发轨 `10CG/Aria#195` 正在争同一号)。
 - **版本串同步面实测**: `1.71.1` 共 **23 处 / 13 文件** —— aria 子模块 7 处 (plugin.json 1 / marketplace.json 2 / VERSION 2 / CHANGELOG 1 / README 1) + 主仓 **16 处** (VERSION 1 / CLAUDE.md 2 / README.md 2 / zh 3 / ja 3 / ko 3 / system-architecture 1 / version-scheme 1)。主仓 16 与前 cycle commit `4c3c826` 精确对账。
 - **⚠️ 主仓 gitlink (R3 RFV-7 补入 —— 六个版本类 custom check 无一覆盖它, 且仓内此刻就漂移)**: 主仓记录 `301641b`, aria 子模块 HEAD 已是 `3a28339` (D7 止血 commit)。C.2 合并后须 bump 到 aria master 的 post-merge SHA。
 - **i18n README 重译判据**: `README.zh.md` / `README.ja.md` / `README.ko.md` **仅正文实质变更才重译** (`10CG/Aria#140` B 档; CLAUDE.md §版本管理)。本 Spec 只改版本串 ⇒ **不触发重译**。
@@ -196,9 +196,9 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 - **SC-4** (B9, **机械判据**, R3 SCF-5): `keep_changes_copy` 在 SKILL.md 中的命中**全部落在新增小节 `## 已退役配置项` 内** (与 SC-1 同样按标题文本定位), 区段外命中 == 0。
 - **SC-5** (C1 **四态**): 见 Part C1 表, 四态均留实跑输出; 三个坏实现均被拒。**外加 B2 落地后重跑锚点唯一性** (SKILL.md 侧命中数须仍为 1)。
 - **SC-6** (C2 五态): 夹具为冻结快照, 每份注明 `10CG/Aria#<n>` 与抓取时刻; 含合成 `synth-short`。**外加**: `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行的测试数 **非 0**。
-- **SC-7** (Rule #6): openspec-archive AB 跑完, 留 `ab-results/2026-09-XX-v1.72.0-archive-skill-drift/RESULT.md`; 两臂 = **v_new vs v_old**; **RESULT.md 须显式记录本次 AB 对本改动的区分力评估** (预期零, 见 R1V-6 登记)。
+- **SC-7** (Rule #6): openspec-archive AB 跑完, 留 `ab-results/2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md`; 两臂 = **v_new vs v_old**; **RESULT.md 须显式记录本次 AB 对本改动的区分力评估** (预期零, 见 R1V-6 登记)。
 - **SC-8** (D): D1-D6 开单并回读核验; D7/D8/D9 已开, 号记入 tasks.md。**全部 issue 号带仓限定**, 并跑头部的机械自检 (裸 `#<n>` 命中数 == 0)。D6 须在 handoff 单独点名。
-- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `1.72.0`; 版本串同步 **21 处 / 12 文件** (23 处出现中 `aria/CHANGELOG.md:13` 与 `aria/VERSION:4` 是 append-only 历史条目, **不改**, 各自**新增**一条); **五个仓内 check 全绿 + `plugin-cache-currency` 期望 STALE 并贴实跑输出**; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
+- **SC-9** (E): `aria/.claude-plugin/plugin.json` == `<vNEXT>` (E-4 现算所得, **不得照抄本文任何字面号**); 版本串同步 **21 处 / 12 文件** (23 处出现中 `aria/CHANGELOG.md:13` 与 `aria/VERSION:4` 是 append-only 历史条目, **不改**, 各自**新增**一条); **五个仓内 check 全绿 + `plugin-cache-currency` 期望 STALE 并贴实跑输出**; `openspec-archive/CHANGELOG.md` `[Unreleased]` 有条目; **主仓 gitlink 机械断言 (两条都须成立)**:
   (a) `git ls-tree HEAD aria | awk '{print $3}'` == `git -C aria rev-parse HEAD` —— 主仓记录的 gitlink 与子模块实际 checkout 一致。**基线实测 `301641b` vs `3a28339` ⇒ 红** ✅
   (b) `git -C aria rev-parse HEAD` == `git -C aria rev-parse origin/master` —— 子模块停在**已合并的 master** 而非未合并的 feature 分支。**基线实测 `3a28339` vs `301641b` ⇒ 红** ✅ (当前 aria 正停在 `feature/archive-gate-registration-class-and-skill-drift`)
   ⚠️ **两条缺一不可**: 只写 (a) 会在子模块停在未合并 feature 分支时假绿 (R5 抓到, 而那正是当前状态); 只写 (b) 则是上一版的恒绿写法 (R4 抓到)。; **两仓** (`10CG/Aria` + `10CG/aria-plugin`) 逐 remote `ls-remote` 独立核验 (硬约束 2)。
@@ -223,7 +223,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 | SC-6 | 脚本与 tests 目录均不存在 | 五态可分辨 + 测试数非 0 | ✅ |
 | SC-7 | AB 未跑 | RESULT.md 存在且含区分力评估 | ✅ (do-it) |
 | SC-8 | `check_bare_issue_refs.py` 在 R3 修订前版 **3** (rc 1) / 本版 **0** (rc 0); D1-D6 未开 | rc 0 / 六条已开 | ✅ (D 部分) |
-| SC-9 | plugin.json `1.71.1`; gitlink (a) `301641b` vs `3a28339` **不等**; (b) `3a28339` vs origin/master `301641b` **不等** (aria 停在未合并 feature 分支) | `1.72.0` / (a)(b) 均相等 | ✅ |
+| SC-9 | plugin.json `1.71.1`; gitlink (a) `301641b` vs `3a28339` **不等**; (b) `3a28339` vs origin/master `301641b` **不等** (aria 停在未合并 feature 分支) | `<vNEXT>` / (a)(b) 均相等 | ✅ |
 | SC-10 | state-scanner **1575 OK**; 全套件 **2122**, 10 OK / 0 FAIL | ≥ 同值 | 基准值 |
 | SC-11 | owner 未答复 | 已答复 (a) 或 (b) | ✅ |
 | SC-12 | `check_bare_issue_refs.py` 未落盘 (全仓 find 零命中) | 落 `state-scanner/scripts/` + 三态留证 | ✅ |

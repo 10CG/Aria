@@ -116,20 +116,29 @@
 - [ ] **E-0** ⛔ **SC-11 阻塞项**: 把「SOT §1『整个变更』跨多 Skill 时的作用域」写进 handoff 请 owner 裁 (a) ratify v1.69.1 形状为成文 lane / (b) 另裁。**取得答复前不得进入 C.2 —— 即不得执行 E-7a 起的任何步骤 (含 E-7a 的 fetch/断言前置)**。
   ⚠️ **卡住时怎么办** (**边界已并入上方主句; 本段只留 rationale** —— post_planning R3 Critical R3-C1: R2 只在此加脚注纠正范围却没回头改主句, 致同一任务两个边界, 而主句权重更高): E-0 不阻塞 TG-B/TG-C/TG-D 与 **E-1..E-6**; 它挡 **E-7a 起的全部步骤**。若 owner 长时间不答复, **停在 E-6c 之后**, 把已完成部分写进 handoff, **不合并也不推任何 remote**。
   ⚠️ **停在那里时 `plugin-cache-currency` 必然是红的** (E-6b) —— 这是**已知且已登记**的状态, **不得**为了「让它绿」而自行豁免或跳过 (那正是 R4 GOV 逐字点名过的自行豁免形状); handoff 须如实写明该 check 红及其原因。
-  > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 v1.72.0 (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
+  > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 `<vNEXT>` (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
 - [ ] **E-1** AB 前置**已核**: `ab-suite/openspec-archive.json` 两个选中 eval 用合成路径 `/workspace/my-project`, 不触真仓、不走 Step 7 ⇒ **不需要 `ARIA_COORDINATION_NO_PUSH=1` 会话级前置**
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
-- [ ] **E-3** 结果存 `ab-results/2026-09-XX-v1.72.0-archive-skill-drift/RESULT.md`; **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
-- [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` → **1.72.0** (SOT = 该文件)
+- [ ] **E-3** 结果存 `ab-results/2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md`; **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
+- [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` (SOT = 该文件)。⛔ **版本号不得从本文件照抄** —— 本 Spec 起草时写的是 `1.72.0`, 而同期有**两条并发轨在抢同一号段**且本 Spec 对它们结构性不可见 (见已知风险 7)。**执行时现算, 三条前置全过才写**:
+  - **(a) 已发布集合**: `git -C aria ls-remote --tags origin 'v1.7*'` **与** `git -C aria ls-remote --tags github 'v1.7*'` —— 取**两端并集**的最高号 (单端会漏: 镜像可能半推, memory `partial-push`)
+  - **(b) 并发轨已宣告号**: `git show origin/master:openspec/changes/handoff-multibranch-subdir-path-fidelity/proposal.md` 与 `…/pre-merge-completeness-gate-change-scope/proposal.md`, 各 `grep -nE 'v1\.7[0-9]\.[0-9]'` 取它们当前自报的目标号
+  - **(c) 同伴 handoff 的 `<vNEXT>`**: 读 `docs/handoff/latest.md` 指向的两份, `grep -n 'vNEXT'`
+  ⇒ 取号 = **不在 (a) 已发布集合、且不等于 (b)(c) 任一已宣告号** 的下一个可用号。**本文件与 `proposal.md` 中一律以 `<vNEXT>` 指代这个执行时才确定的号**; 凡出现 `<vNEXT>` 处 (含 `ab-results/` 目录名与 CHANGELOG 段标题) 都要在 E-4a(i) 时一并替换为实取号。**级别仍是 MINOR** (本 Spec 新增三个探针脚本 + 退役一个声明接口)。
+  > 📌 **为什么这条是硬约束而非建议**: 本仓 `docs/handoff/2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md:13` 开篇第一句就是「**本 session 最该记住的一件事**: 两个容器并行发版会**撞版本号**」; `:80` 记录代价是「他们的 5 文件 + 同步面**全部重做**」。同型事故发生在**本 Spec 起草前一天**。
+- [ ] **E-4a** ⛔ **取号后立刻双向登记**: (i) 把实取号写回本文件 E-4 行; (ii) 在 handoff §6 公布 `<vNEXT>=<所取号>`。
+  **(ii) 是并发轨能看见本轨的唯一通道** —— 本 Spec 的 `proposal.md` 只在**未推送的 feature 分支**上 (他们 `git show origin/master:` 取不到), 协调板上的 claim **无 `linked_issue`** 且本轨的 issue 在**另一个仓** (`10CG/aria-plugin#186` vs 他们的 `10CG/Aria#195`/`#199`) ⇒ `linked_issue_overlap` 对本轨结构性返回 `[]`。
+  **验收 = 对 handoff 文件 `grep -n 'vNEXT'` 有命中且号与 E-4 实取号逐字相等**。
 - [ ] **E-5** 版本串同步。⚠️ **append-only 豁免有两处, 不是一处** (post_planning R1 抓到第一处, **R3-M2 抓到我只修了实例没修类**):
-  - `aria/CHANGELOG.md:13` `## [1.71.1] - 2026-09-06` —— 段标题, **不改**; 动作是在其**上方新增** `## [1.72.0]`
+  - `aria/CHANGELOG.md:13` `## [1.71.1] - 2026-09-06` —— 段标题, **不改**; 动作是在其**上方新增** `## [<vNEXT>]`
   - **`aria/VERSION:4`** `> **发布日期**: 2026-09-06  # patch: v1.71.1 …` —— **当期发布说明**, 其下已排着一串 `发布日期(旧)`; 发版时是**新增**一条并把这条降格成 `(旧)`, **不是改写它**。(同文件 `:3` 的 `> **版本**: 1.71.1` **要改**)
   ⇒ **要改的是 21 处 / 12 文件** (23 − CHANGELOG:13 − VERSION:4), 外加 CHANGELOG 与 VERSION 各**新增**一条。
-  逐文件 `grep -c` 实测并把 **13 行**计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal `:147` 要求「不留不对称缺口」
+  ⚠️ **「21 处 / 12 文件」是起草时的测量, 不是可照抄的常量** —— 任一并发轨先 ship 都会改变它 (CHANGELOG 多一段 / VERSION 多一行 / README badge 换号)。**执行时重测一遍**, 与本数不符时**以重测为准并在本行记下差异及原因**, 不得反过来把仓里改成 21。
+  逐文件 `grep -c` 实测并把计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal `:147` 要求「不留不对称缺口」
 - [ ] **E-6a** **五个仓内 check 全绿**: `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` / `plugin-version-arch-docs-match`。它们的输入全在仓内, E-5 落地后必然可绿
-- [ ] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 1.72.0 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
+- [ ] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 `<vNEXT>` 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
   **验收 = 贴出它的实跑输出**, 确认红的原因是「installed 落后 SOT」而非别的; **不得把它算进「全绿」**。
   ⚠️ 该例外**尚未成文**: 上一周期 (`docs/handoff/2026-09-06-session-close-v1.70.0-...`) 已把「SC-7 十三条全绿 + plugin-cache-currency 例外」上呈 owner, **写就时尚未裁定** ⇒ 按 memory `exact-exception-condition`「N 次非正式援引 ≠ 成文 lane」, **现在不能援引它当豁免**, 只能如实登记并在 handoff 再次点名
 - [ ] **E-6c** ⚠️ 六个 check 合计只覆盖 23 处版本点里的约 6 处, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
@@ -139,7 +148,7 @@
 - [ ] **E-9** 主仓 PR → **Rule #8 pre-merge gate** → 合并 (主仓例外可走 Forgejo merge)。⚠️ **服务端合并后 GitHub 镜像不会自动拿到** (`10CG/Aria#165` 形状) ⇒ 必须本地 FF master + `git push github master`
 - [ ] **E-10** **逐 remote `ls-remote` 独立核验**两仓, 不信 push 回执 (硬约束 2); gitlink orphan 守卫 (三个子模块 SHA 在两端均可达)
 - [ ] **E-11** D.1 进度 → D.2 归档 → D.2b release claim → D.3 handoff
-- [ ] **E-V1** handoff 须点名四项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`。**验收 = 对 handoff 文件 grep 这四个字符串, 缺一即红** (防纯自证)
+- [ ] **E-V1** handoff 须点名五项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`; **(5) `<vNEXT>` (E-4a(ii), 并发轨可见性)**。**验收 = 对 handoff 文件 grep 这五个字符串, 缺一即红** (防纯自证)
 
 ---
 
@@ -151,3 +160,9 @@
 4. (**post_planning R1 补**) **并发轨在飞**: 主仓本地 master 写就时落后 origin/master **8 个 commit**, aria 子模块 `3a28339` **未推任何 remote**。每次实质 git 动作前必 fetch (memory `concurrent-duplicate-audit-fetch-before-start`)。
 5. (**post_planning R1 补**) **负控夹具必须还原**: C-3 的坏实现态改的是 scratchpad 夹具而非仓内文件; 若执笔者图省事直接改仓内 `spec_complete.py`, **必须在跑完后 `git checkout` 还原并核 `git status`** —— 该文件是本 Spec 的明文非目标。
 6. (**post_planning R1 补**) **服务端合并的 GitHub 补推**: 主仓走 Forgejo merge 后 GitHub 镜像落后一个 commit (本 session 在 PR `10CG/Aria#202` 上实测过一次), E-9 已含补推步骤。
+7. (**post_planning R5 主控 sibling-spec 交叉审计补, Critical**) **两条并发轨与本轨共享发版面, 且它们看不见本轨**:
+   - `openspec/changes/handoff-multibranch-subdir-path-fidelity` (`10CG/Aria#195`) —— `proposal.md:352` 逐字「推荐默认改为 **MINOR / v1.72.0**, 但须 owner 拍板后 Task 5.1 才动手」。**这正是本 Spec 起草时硬编码的那个号**。
+   - `openspec/changes/pre-merge-completeness-gate-change-scope` (`10CG/Aria#199` / `10CG/aria-plugin#161`) —— 目标 `v1.71.2`, 并在 `:315` 逐字写「真正在飞、同抢 v1.71.2 的是 **Aria#195**」—— **它枚举并发轨时没有本轨**。
+   - **共享面**: 版本 SOT `aria/.claude-plugin/plugin.json` + 派生 5 文件 + 主仓版本引用面 + `aria/CHANGELOG.md` (三方都要 append 一段)。**代码落点零交叠**, 碰撞全部在发版面 ⇒ `git` 不会报冲突 (memory `same-value-merge-silent`: 两侧改成同一个串 ⇒ 零冲突零标记静默采纳, 已有**四处静默合成已发布号**的实证)。
+   - **实测 (2026-09-07T09:0xZ)**: `git -C aria ls-remote --tags origin` 最高已发布 = **`v1.71.1`**; `v1.71.2` 与 `v1.72.0` **均未被占** ⇒ 撞号**尚未发生**, 但三轨在抢两个号。处置 = E-4 三条前置 + E-4a 双向登记。
+   - **为什么 R1-R5 十五个审计席位都没抳到**: 它们审的是**本地树**, 而两份同期 Spec 只存在于 `origin/master`。印证 memory `combined-mode-sister-spec-audit-value`「single-Spec 漏率 100%」。
