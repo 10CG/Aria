@@ -114,8 +114,9 @@
 
 ## TG-E — Rule #6 AB + 发版 + 集成
 
-- [ ] **E-0** ⛔ **SC-11 阻塞项**: 把「SOT §1『整个变更』跨多 Skill 时的作用域」写进 handoff 请 owner 裁 (a) ratify v1.69.1 形状为成文 lane / (b) 另裁。**取得答复前不得进入 E-9 (主仓 PR 合并)**。
-  ⚠️ **卡住时怎么办 (R1 补, **post_planning R2 Critical F-2 订正**)**: E-0 不阻塞 TG-B/TG-C/TG-D 与 **E-1..E-6**; 它挡 **E-7a 起的全部步骤**。若 owner 长时间不答复, **停在 E-6 之后**, 把已完成部分写进 handoff, **不合并也不推任何 remote**。
+- [ ] **E-0** ⛔ **SC-11 阻塞项**: 把「SOT §1『整个变更』跨多 Skill 时的作用域」写进 handoff 请 owner 裁 (a) ratify v1.69.1 形状为成文 lane / (b) 另裁。**取得答复前不得进入 C.2 —— 即不得执行 E-7a 起的任何步骤 (含 E-7a 的 fetch/断言前置)**。
+  ⚠️ **卡住时怎么办** (**边界已并入上方主句; 本段只留 rationale** —— post_planning R3 Critical R3-C1: R2 只在此加脚注纠正范围却没回头改主句, 致同一任务两个边界, 而主句权重更高): E-0 不阻塞 TG-B/TG-C/TG-D 与 **E-1..E-6**; 它挡 **E-7a 起的全部步骤**。若 owner 长时间不答复, **停在 E-6c 之后**, 把已完成部分写进 handoff, **不合并也不推任何 remote**。
+  ⚠️ **停在那里时 `plugin-cache-currency` 必然是红的** (E-6b) —— 这是**已知且已登记**的状态, **不得**为了「让它绿」而自行豁免或跳过 (那正是 R4 GOV 逐字点名过的自行豁免形状); handoff 须如实写明该 check 红及其原因。
   > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 v1.72.0 (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
@@ -123,8 +124,16 @@
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
 - [ ] **E-3** 结果存 `ab-results/2026-09-XX-v1.72.0-archive-skill-drift/RESULT.md`; **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
 - [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` → **1.72.0** (SOT = 该文件)
-- [ ] **E-5** 版本串同步。⚠️ **post_planning R1 订正**: 23 处出现里 **`aria/CHANGELOG.md:13` 的 `## [1.71.1] - 2026-09-06` 是历史条目, 不改** —— 它要的是在其**上方新增**一条 `## [1.72.0]`。故**要改的是 22 处 / 12 文件**, 外加 CHANGELOG 新增一条。逐文件 `grep -c` 实测并把 **13 行**计数**全部**贴进本文件 (含 `aria/CHANGELOG.md` 那行, 标注「历史条目, 不改」) —— proposal `:147` 要求「不留不对称缺口」, 只贴 12 行会让那处不对称隐形
-- [ ] **E-6** 六个版本类 custom check 全绿。⚠️ 它们只覆盖约 6/23, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
+- [ ] **E-5** 版本串同步。⚠️ **append-only 豁免有两处, 不是一处** (post_planning R1 抓到第一处, **R3-M2 抓到我只修了实例没修类**):
+  - `aria/CHANGELOG.md:13` `## [1.71.1] - 2026-09-06` —— 段标题, **不改**; 动作是在其**上方新增** `## [1.72.0]`
+  - **`aria/VERSION:4`** `> **发布日期**: 2026-09-06  # patch: v1.71.1 …` —— **当期发布说明**, 其下已排着一串 `发布日期(旧)`; 发版时是**新增**一条并把这条降格成 `(旧)`, **不是改写它**。(同文件 `:3` 的 `> **版本**: 1.71.1` **要改**)
+  ⇒ **要改的是 21 处 / 12 文件** (23 − CHANGELOG:13 − VERSION:4), 外加 CHANGELOG 与 VERSION 各**新增**一条。
+  逐文件 `grep -c` 实测并把 **13 行**计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal `:147` 要求「不留不对称缺口」
+- [ ] **E-6a** **五个仓内 check 全绿**: `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` / `plugin-version-arch-docs-match`。它们的输入全在仓内, E-5 落地后必然可绿
+- [ ] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 1.72.0 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
+  **验收 = 贴出它的实跑输出**, 确认红的原因是「installed 落后 SOT」而非别的; **不得把它算进「全绿」**。
+  ⚠️ 该例外**尚未成文**: 上一周期 (`docs/handoff/2026-09-06-session-close-v1.70.0-...`) 已把「SC-7 十三条全绿 + plugin-cache-currency 例外」上呈 owner, **写就时尚未裁定** ⇒ 按 memory `exact-exception-condition`「N 次非正式援引 ≠ 成文 lane」, **现在不能援引它当豁免**, 只能如实登记并在 handoff 再次点名
+- [ ] **E-6c** ⚠️ 六个 check 合计只覆盖 23 处版本点里的约 6 处, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
 - [ ] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
 - [ ] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
 - [ ] **E-8** 主仓 gitlink bump; **SC-9 两条断言**: (a) `git ls-tree HEAD aria` == `git -C aria rev-parse HEAD`; (b) 子模块 HEAD == `origin/master`
