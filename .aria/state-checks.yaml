@@ -25,6 +25,42 @@ checks:
     timeout_seconds: 5
     enabled: true
 
+  # --- 交付物里不得残留未解析的版本占位符 (发布前验证席 C5) ---
+  - name: "no-unresolved-version-placeholder"
+    description: |
+      断言 aria 子模块的**交付面**里不存在未解析的 `<vNEXT>` 占位符。
+      背景: 本仓的取号规程刻意用 `<vNEXT>` 表示「交付物落地时才现算」, 并在 Spec 里逐一
+      枚举必须回填的面。但 E-5 的同步判据是「grep 旧版本号残留」—— 它对「占位符从未被
+      解析」这一形态**天然 fail-OPEN** (占位符里根本没有旧号)。2026-09-08 实证: v1.73.0
+      发布提交里 openspec-archive/SKILL.md 的退役版本表格残留了一个 `<vNEXT>`, 五个既有
+      版本类 check 全绿也没看见它。
+      范围只覆盖 aria/ 子模块 (随插件分发的交付面); Spec 自身的 tasks.md / proposal.md
+      按成文规程**保留**占位符, 不在范围内。
+    command: |
+      ! grep -rn '<vNEXT>' aria/ --include='*.md' --include='*.json' --include='*.yaml' --include='*.py' 2>/dev/null
+    severity: warning
+    fix: "把命中处的 `<vNEXT>` 替换为本次发布的实取号 (与 aria/.claude-plugin/plugin.json 的 version 一致); 若该处本就该保留占位符, 把它移出 aria/ 或在本 check 的范围里显式排除"
+    timeout_seconds: 5
+    enabled: true
+
+  # --- SKILL.md 复述串 vs 生产者字面同步 (archive-gate-registration-class-and-skill-drift) ---
+  - name: "skill-md-sha-backlink-literal-sync"
+    description: |
+      断言 openspec-archive/SKILL.md 的 Step 7 里复述的「归档 SHA 回链」占位串, 与该行的
+      唯一生产者 spec_complete.py::_build_d_payload 产生的那一串**逐字相等**, 且值含
+      `Step 7` (不得改回事实错误的 `Step2`, 有 2026-07-22 成文裁定背书)。
+      这是一条跨文件靠人工保持一致的字面串 —— 两侧一漂移, Step 7 的逐字替换就落空,
+      tracker issue 里的回链占位行永远填不上。2026-09-06 实测已漂移。
+      三条断言: (a) 两侧各恰好提取 1 处锚点, 否则 FAIL (措辞被改动, 探针需人工对齐);
+      (b) 两侧逐字相等; (c) 命中串含 `Step 7` —— 只有 (b) 时「两侧同步改回 Step2」也过。
+      无 SKIP 态: 探针落盘后就在插件内, 目标文件必然可达, 缺失 = 插件损坏 = 真异常 FAIL。
+    command: |
+      python3 aria/skills/state-scanner/scripts/skill_md_literal_sync_probe.py .
+    severity: warning
+    fix: "读 FAIL 输出里打印的两侧原文, 判断哪一侧该改 —— 生产者 (spec_complete.py) 是运行时唯一真值来源, 通常改 SKILL.md 侧对齐它; 若确需改生产者文案, 两侧同改并同步更新本探针的 REQUIRED_STEP"
+    timeout_seconds: 5
+    enabled: true
+
   # --- silknode-integration-contract deferred-acceptance expiry ---
   - name: "silknode-contract-deferral-expiry"
     description: |

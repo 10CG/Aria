@@ -1,0 +1,1 @@
+检测已归档的 OpenSpec: spec_path=openspec/changes/user-auth, check_archive=openspec/archive/user-auth, detect_duplicates=true
