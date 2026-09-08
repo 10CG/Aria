@@ -90,7 +90,7 @@
   >
   > **断言**: 七条改后原文**均不再承诺自动处理 CLI 问题** —— B-6 是唯一保留条件表述的一条, 且已明写「需自行处置」而非「本 Skill 会修」。⇒ SC-1b 通过。
 - [x] **B-V3** SC-2: `grep -n 'Step2' openspec-archive/SKILL.md` 命中 **1** 处, 且该行**内容**为 `# "全部 unverified_claims" (无论 §Step2 warn_overlay 是否写了 --ack-unverified) 而来;` (**按内容不按行号** —— 前面几个 B 任务会移动行号) 🔴 **基线**: 实测命中 **2** 处 (`:275` 交叉引用 + `:317` 待改锚点), 验收要 1 ⇒ 基线**红**
-- [x] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 正文 **3 行** / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
+- [x] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 **恰 4 条 `断言 N:` 行** (落地复审订正, 原为 3) / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
 - [x] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内 🔴 **基线**: `已退役配置项` 小节命中 **0** (尚不存在), 两处 `keep_changes_copy` (`:87` `:261`) 全在小节外 ⇒ 基线**红**
 - [x] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿) 🔴 **基线**: `[Unreleased]` 段**已有条目** (关于 `10CG/aria-plugin#95` 的 C 分级证据闸), 但**零条点名本 Spec 的 Step 3/4/5 改动或 `keep_changes_copy` 退役** ⇒ 基线**红**。⚠️ 判据必须是「点名了这几项」而**不是**「段内有条目」—— 后者基线即绿
 - [x] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在) 🔴
@@ -104,6 +104,7 @@
 - [x] **C-1** `skill_md_literal_sync_probe.py` → `aria/skills/state-scanner/scripts/`。**路径解析用 `Path(__file__).resolve().parents[3]`** (= 插件根, 实测 `scripts → state-scanner → skills → aria`), **不用 `CLAUDE_PLUGIN_ROOT`**。**须含三条判断**: (a) 两侧锚点各提取 1 处否则 **rc 1** (**R5 订正: 原写 `rc 2`, 与本文件 C-3、proposal 四态表、以及 A.1 实跑脚本三者均不符** —— 删掉 SKIP 态后 C1 已无「判不了」这一档, 锚点数异常是**真失败** (措辞被改动, 探针需人工对齐), 归 rc 1); (b) 两侧逐字相等; (c) **命中串必须含 `Step 7`** (挡「两侧同改回 Step2」)
 - [x] **C-2** 注册 C-1 进 `.aria/state-checks.yaml`: **`name: skill-md-sha-backlink-literal-sync`** (该 name 被 C-V3 逐字断言, **不得另拟**) / `severity: warning` (参照 `issue-cache-freshness` 体例)
 - [x] **C-3** **四态实跑留证** (原五态里的「插件源码不可见 → SKIP」已删 —— 用 `parents[3]` 后该态永不触发, 保留即测量剧场)。⚠️ **基线态必须在 B-1/B-2 之前跑** (跑真仓); **其余三态在 scratchpad 同构插件树里跑**:
+  > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
   > 🔧 **同构插件树怎么造** (post_planning R5 F1 Critical 订正 —— 原文写「设 `CLAUDE_PLUGIN_ROOT` 指向夹具」是**惰性指令**, C-1 明令用 `parents[3]` 不读 env, 实测设与不设逐字节相同; 照原文执行会让三个非基线态全部读真仓, 其中两态**恰好返回期望的 rc ⇒ 假绿**):
   > `mkdir -p $FX/skills/state-scanner/scripts/lib $FX/skills/openspec-archive` → 把探针**复制进** `$FX/skills/state-scanner/scripts/` → 在 `$FX/skills/openspec-archive/SKILL.md` 与 `$FX/skills/state-scanner/scripts/lib/spec_complete.py` 放该态所需内容 → **跑那份副本** (`parents[3]` 自然解析到 `$FX`)。
   > ⛔ **仓内两个目标文件全程只读**; 每态跑完核 `git status --porcelain` 与 `git -C aria status --porcelain` 均**不含** `spec_complete.py` 与 `openspec-archive/SKILL.md` (它们是本 Spec 明文非目标, 见已知风险 5)。
@@ -116,8 +117,10 @@
 - [x] **C-6** 单测 → **新建** `aria/skills/openspec-archive/tests/`, **必须带 `conftest.py`**。⚠️ **不是照抄 `phase-d-closer/tests/conftest.py` 的内容** (那份 docstring 逐句是 phase-d-closer 专属事实), 而是照抄它的**做法**: 写成**纯 docstring 零代码**的文件, 内容说明 (a) 它为什么存在 (触发 `is_pytest_suite()` 第一条判据); (b) 删掉它会退回 `OK (0 tests)` 的回归判据。**sys.path 由测试文件自己做** (照 `test_fetch_gate.py:17` 的 `sys.path.insert(0, parent.parent / "scripts")`)
 - [x] **C-7** 夹具 → `tests/fixtures/`, **冻结快照**。抓取命令: `forgejo GET /repos/10CG/Aria/issues/<n> | jq -r '.body' > fixtures/issue-<n>.md`, 对 `201` / `185` / `186` 各一份; 每份**首行加注释**记来源 `10CG/Aria#<n>` 与抓取 UTC 时刻。另建合成夹具 `synth-short.md` (回链行尾部含短十六进制 `abc`) —— 真语料证不了长度下限
 - [x] **C-8** C2 五态实跑: `10CG/Aria#201` rc0 / `10CG/Aria#185` rc1 NO_SHA / `10CG/Aria#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
+  > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
 - [x] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12)
-- [x] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1 / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
+- [x] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1, **命中数由脚本产出不写死 —— 实跑 4 处, 原规格写「3 处」已订正** / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
+  > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
 - [x] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿) 🔴 **基线红**
 - [x] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK** 🟢 **基线即绿 (2122 == 2122), 这是回归守卫** —— 它防的是「本 Spec 把别的测试跑挂」, 不证明本 Spec 做了什么; 新增测试的证明在 C-V1
 - [x] **C-V4** (**R2 补**, 对应已知风险 5): C-3 四态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核 🟢 **基线即绿 (实测 `git -C aria status --porcelain` 为空), 这是污染守卫**
@@ -129,6 +132,7 @@
 
 - [x] **D-1** AB 套件缺 Step 7 / D auto-issue 维度 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#190`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
 - [x] **D-2** openspec-archive evals 三处缺 `YYYY-MM-DD-` 前缀 + `cli_wrong_path` 与 SOT 矛盾 + 断言首句零判别力 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#191`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
+  > ⚠️ **落地复审订正 (2026-09-08)**: 开单时只覆盖了本条列出的**一条半**子缺陷 —— 第三条「断言首句是次句的真子串 ⇒ 零增量判别力」完全没写进 `10CG/aria-plugin#191`, 且修复面漏了源文件 `openspec-archive/evals/evals.json` (4 个 eval, 派生的 ab-suite 只有 2 个)。**已在该 issue 追评论补齐**, 但本条的「已开」不等于「已覆盖全」。
 - [x] **D-3** `unverified_claims`/`unverified_ack` frontmatter 只写不读 → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#192`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
 - [x] **D-4** `standards/openspec/AGENTS.md:57` 悬空脚本 → `10CG/aria-standards`  ⇒ **已开 `10CG/aria-standards#21`** (D-V1 回读核验: state=open, title 与正文首行均已实读)
 - [x] **D-5** `spec-drafter/SKILL.md:192 :507 :510` 指示运行未安装的 `openspec validate` → `10CG/aria-plugin`  ⇒ **已开 `10CG/aria-plugin#193`** (D-V1 回读核验: state=open, title 与正文首行均已实读)

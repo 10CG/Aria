@@ -1,0 +1,3 @@
+# 允许含裸 #<n> 的完整字面 (fail-CLOSED 白名单; 每行一条, # 开头为注释)
+# 唯一来源: Part B 要逐字写进 SKILL.md 而本身含裸 #<n> 的目标行。
+| D.2 | openspec-archive | Spec 归档 (**#95 完成度 + C 分级证据闸 tri-state verdict, verdict=block 时本步 BLOCK**) | spec_archived |

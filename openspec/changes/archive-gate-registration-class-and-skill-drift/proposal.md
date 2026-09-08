@@ -61,7 +61,7 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 | B5 | 同 `:40` + `:41` | 核心功能表**两行的两个单元格全部重写** (不是只换标签): `:40` 执行归档 → `git mv …`; `:41` 自动修正 → 位置校验 |
 | B6 | 同 `:56` | 「**本 Skill 会自动修正此问题**」→ 对采用者的条件表述 (它是现时承诺, 不是历史陈述) |
 | B7 | 同 `:247` `:248` `:249` **三行各自给目标** (R3 IMPL-3): `:247` 标题 → `Step 3 - 执行归档 (git mv):`; `:248` 命令 → `git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}`; `:249` → `等待: git mv 返回` | ⚠️ 占位符用 `{change_name}` —— 全文件既有惯例, `{id}` 从未出现过 |
-| B8 | 同 `:251-257` + `:259-261` | **Step 4 目标字面** (三行断言, 替换原「检测并修正归档位置」整块):<br>`Step 4 - 归档后位置校验:`<br>`  断言 1: openspec/archive/{YYYY-MM-DD}-{change_name}/ 存在`<br>`  断言 2: openspec/changes/{change_name}/ 已不存在 (git mv 的必然结果)`<br>`  断言 3: openspec/changes/archive/ 不存在 (若存在 ⇒ 历史上有人走过 CLI 路径, 搬到 openspec/archive/ 后 rmdir)`<br>**Step 5 目标字面** (保留编号, 整块压成标题行本身, 其下无正文):<br>`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)` |
+| B8 | 同 `:251-257` + `:259-261` | **Step 4 目标字面** (三行断言, 替换原「检测并修正归档位置」整块):<br>`Step 4 - 归档后位置校验:`<br>`  断言 1: openspec/archive/{YYYY-MM-DD}-{change_name}/ 存在`<br>`  断言 2: openspec/changes/{change_name}/ 已不存在 (git mv 的必然结果)`<br>`  断言 3: openspec/changes/archive/ 不存在 (若存在 ⇒ 历史上有人走过 CLI 路径, 搬到 openspec/archive/ 后 rmdir)`<br>`  断言 4: openspec/archive/{YYYY-MM-DD}-{change_name}/proposal.md 直接存在于该层` (**落地复审补**: 挡 git mv 静默嵌套)<br>**Step 5 目标字面** (保留编号, 整块压成标题行本身, 其下无正文):<br>`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)` |
 | B9 | 同 `:87` | 退役 `keep_changes_copy`, 移入新增小节 `## 已退役配置项` (给 SC-4 第二分支一个可 grep 的锚点) |
 | B10 | 同 `:392` `:393` **`:394`** `:401` | 示例 1 四行 |
 | B11 | 同 `:588` | 错误表 CLI 行 → `git mv` 失败三分支 |
@@ -123,7 +123,7 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 **C3. `check_bare_issue_refs.py`** → `aria/skills/state-scanner/scripts/` (随插件分发)。
 守「Spec 文档里的 issue 引用必须带 `<org>/<repo>` 限定」这条纪律 —— 该纪律在本 Spec 上**连三轮复发** (R1 RF-4 → R2 R1V-8 → R3 GOV-2), 靠人工通读修不住。
 排除三类非 issue 引用: `Rule #N` / `规则 #N`; 反引号 code span 内; 已带仓限定的。
-**三态**: 目标态 = 本文件 rc 0; 正控 = R3 修订前版 (`d81873b^`) rc 1 (3 处真裸引用); 坏实现 = 裸 grep 不排除三类 ⇒ 在任何版本上都报非零 ⇒ 判无效。**具体命中数不写进正文** (派生物, 随编辑失效)。
+**三态**: 目标态 = 本文件 rc 0; 正控 = R3 修订前版 (`d81873b^`) rc 1 (**命中数只贴脚本产出, 不写死** —— 本行原写「3 处」, Phase B 实跑得 **4 处**; 写死数字与本条自己下一句「具体命中数不写进正文」自相矛盾, 落地复审抓到); 坏实现 = 裸 grep 不排除三类 ⇒ 在任何版本上都报非零 ⇒ 判无效。**具体命中数不写进正文** (派生物, 随编辑失效)。
 
 ### Part D — 开单 (九条, 全部带仓限定 + 回读核验)
 
@@ -190,7 +190,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 - **SC-2** (误伤守卫): `grep -c 'Step2' openspec-archive/SKILL.md` == **1** 且唯一命中在 `§Step2 warn_overlay` 交叉引用处。
 - **SC-3** (B8/B10 落地形态, **机械判据**, R3 SCF-4 + R4-2/`fixes-contradict` 订正):
   (a) `Step 5 -` 标题行到 `Step 6 -` 标题行之间**非空正文恰 0 行** —— B8 把内容压进标题行本身 (`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`), 故其下无正文。**上一版写「恰 1 行」与 B8 的字面目标互斥** (R4 抓到)。
-  (b) `Step 4 -` 到 `Step 5 -` 之间正文**恰 3 行**, 逐行等于 B8 给出的三条断言字面。
+  (b) `Step 4 -` 到 `Step 5 -` 之间**恰 4 条 `断言 N:` 行** (**Phase B 落地复审订正: 原写「恰 3 行」** —— 复审实测 `git mv src dst` 在 dst 已存在为目录时**返回 rc 0** 并把 src 嵌进 dst, 而原三条断言在该坏结果上**全为真** ⇒ 必须加第四条 `proposal.md 直接存在于该层`; 说明性续行不计入断言数)。
   (c) 示例 1 四行**逐行等于**下列目标文本 (基线位置 `:392` `:393` `:394` `:401`):
   - `  Step 3: ✅ git mv → openspec/archive/2026-02-08-cloudflare-access-auto-handling/`
   - `  Step 4: ✅ 位置校验通过 (目标存在 / 源已消失 / 无 changes/archive/)`
@@ -211,7 +211,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
   (b) 另裁 ⇒ 按其裁定补跑 phase-d-closer / state-scanner 套件后方可合并。
   **在取得答复前不得进入 C.2。** 判据可机械核: handoff 里该问题的 owner 答复段非空, 且若为 (b) 则对应 `ab-results/` 目录存在。
   > ⚠️ 上一版把此项写成「advisory, 不阻塞发版」—— R4 GOV 指出那是**一种新形态的自行豁免**: 它不在 `configured-gate-authority.md` 白名单四类 (config 显式 off / adaptive_rules 映射 / 已成文 lane 降级 / 结构性前提不成立) 内, 也没套用 SOT §2 末行「拿不准 ⇒ 照跑」的默认。已改为阻塞。
-- **SC-12** (C3 落盘与三态, R5 补入 —— C3 在 R4 被立为交付物后**无任何 SC 覆盖其落盘**): `check_bare_issue_refs.py` 落到 `aria/skills/state-scanner/scripts/`; 三态留实跑输出 (目标态 rc 0 / 正控 `d81873b^` rc 1 且命中恰为该版 3 处真裸引用 / 坏实现裸 grep 在任一版报非零 ⇒ 判无效)。**输出里的具体命中数只贴脚本产出, 不写进 proposal 正文。**
+- **SC-12** (C3 落盘与三态, R5 补入 —— C3 在 R4 被立为交付物后**无任何 SC 覆盖其落盘**): `check_bare_issue_refs.py` 落到 `aria/skills/state-scanner/scripts/`; 三态留实跑输出 (目标态 rc 0 / 正控 `d81873b^` rc 1 且命中数由脚本产出 (**不写死** —— 实跑 4 处; 原写「恰 3 处」已订正) / 坏实现裸 grep 在任一版报非零 ⇒ 判无效)。**输出里的具体命中数只贴脚本产出, 不写进 proposal 正文。**
 
 ### 验收项基线实跑 (memory `spec-acceptance-needs-baseline-run`)
 
