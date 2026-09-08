@@ -258,6 +258,21 @@
   ⚠️ 该例外**尚未成文**: 上一周期 (`docs/handoff/2026-09-06-session-close-v1.70.0-...`) 已把「SC-7 十三条全绿 + plugin-cache-currency 例外」上呈 owner, **写就时尚未裁定** ⇒ 按 memory `exact-exception-condition`「N 次非正式援引 ≠ 成文 lane」, **现在不能援引它当豁免**, 只能如实登记并在 handoff 再次点名
 - [x] **E-6c** ⚠️ 六个 check 合计只覆盖 23 处版本点里的约 6 处, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
   > ✅ **已按此执行**: E-5 的判据用的是**逐文件 `grep -c` 实测** (21 处 / 12 文件全部列出), 六个 check 只作为交叉验证而非主判据。
+
+  > 📡 **发布就绪度只读侦察 (2026-09-08T12:48:41Z) —— 未执行任何 E-7 起的动作, 纯 fetch + 断言**:
+  >
+  > | 项 | 实测 |
+  > |---|---|
+  > | 四条 remote 腿可达性 | 主仓 `origin`/`github` · `aria` `origin`/`github` **全部可达** ✅ |
+  > | aria 三方一致 | `master` == `origin/master` == `github/master` == **`301641b1`** ⇒ **可直接 FF merge** ✅ |
+  > | aria feature 落后 master | **0** commit; `merge-tree` 试算 **0 冲突** ✅ |
+  > | `v1.73.0` tag 占用 | `origin` 无 / `github` 无 / 本地无 ⇒ **可用** ✅ |
+  > | 主仓拓扑 | 本分支领先 `origin/master` **25**, 落后 **9** ⇒ **已分叉, E-9 前须先合并 `origin/master`** |
+  > | 主仓合并冲突 | `merge-tree` 试算 **0 冲突** ✅ |
+  > | 并发轨那 9 个 commit 的性质 | **纯审计报告 + 两份同伴 Spec 的 proposal**, 与本 Spec 交付面 (`aria` gitlink / `.aria/state-checks.yaml` / `CLAUDE.md` / `VERSION` / READMEs / `docs/architecture/`) **零交叠** ✅ |
+  >
+  > ⚠️ **主仓本地 `master` 落后 `origin/master` 9 个 commit** —— E-7a 对主仓的那条断言现在**不成立**, 须先 FF (memory `stale-local-main`: 合进陈旧基线再推会抹掉他人已 ship 的工作)。
+  > ⇒ **除该 FF 外, E-7a → E-11 的全部前置均已验证通过**, 执行时应是一次干净的顺序跑。
 - [ ] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
 - [ ] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
 - [ ] **E-8** 主仓 gitlink bump; **SC-9 两条断言**: (a) `git ls-tree HEAD aria` == `git -C aria rev-parse HEAD`; (b) 子模块 HEAD == `origin/master`
