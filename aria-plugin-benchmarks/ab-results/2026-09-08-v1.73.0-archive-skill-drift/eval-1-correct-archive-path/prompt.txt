@@ -1,0 +1,1 @@
+归档已完成的 OpenSpec: spec_path=openspec/changes/user-auth, project_root=/workspace/my-project, expected_archive=openspec/archive/user-auth

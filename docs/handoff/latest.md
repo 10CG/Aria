@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md](./2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md) — archive-gate-registration-class-and-skill-drift @ phase=B (status=active) — **Phase B 51/69**: TG-B 18 个文档 hunk / TG-C 三探针 + 单测 + 冻结夹具 / TG-D 6 张单全部落地并验收 (SC-1 区段外 15→0, 全套件 2122→2128)。**TG-E 停在两个 owner 门**: SC-11 裁定 + `ARIA_COORDINATION_NO_PUSH` 会话级前置。post_planning R5 = FAIL / converged=false (max_rounds 用满) — 换新鲜眼睛后缺陷从 0C/1M 反弹到 2C/12M。`<vNEXT>` = v1.73.0 (三方抢号) updated=2026-09-07
+**Latest**: [2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md](./2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md) — archive-gate-registration-class-and-skill-drift @ phase=B (status=active) — **61/69**: TG-B/TG-C/TG-D 全部落地 + agent team 复审 28 条处置 + **TG-E 推进到 E-6c** (Rule #6 AB 照跑 delta=0 零区分力如实登记 · 发版面 21 处/12 文件同步 · 五个 check 5/5 全绿 · plugin-cache-currency 如实登记 STALE)。**aria 已 bump 到 v1.73.0** (避开并发轨在争的 v1.71.2/v1.72.0)。剩余 8 项全部卡 `SC-11` 一道 owner 门 (E-7a 起不可逆双推)。 updated=2026-09-08
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime

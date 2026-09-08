@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "correct-archive-path",
+  "per_expectation": [
+    {
+      "expectation": "Should archive to project/openspec/archive/ not standards/",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "reason": "两臂都把落点钉在项目内 openspec/archive/ 且都不涉 standards/ — v_new「✅ openspec/archive/2026-09-08-user-auth # 正确」, v_old「正确目标: openspec/archive/2026-09-08-user-auth/」+ 目录树注「openspec/archive/ # 正确的归档位置」; 语义同档 (终点路径逐字相同), 本条只考终点不考机制, 故对 git mv↔CLI 的改动零区分力。"
+    },
+    {
+      "expectation": "Should correctly resolve project root for archive path",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "reason": "两臂都把 archive 路径解析为 project_root 相对路径并诚实报告该 root 不可达 — v_new「/workspace/my-project 在我当前的环境里不存在 (ls: cannot access '/workspace')」并给出 cd /workspace/my-project, v_old「$ ls -d /workspace/my-project / ls: cannot access ... No such file or directory」并声明「本次没有执行任何归档动作」; 差别仅在 v_new 显式写了 cd 一行, 属表述粒度而非语义分档。"
+    },
+    {
+      "expectation": "Should confirm the archive destination path",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "reason": "两臂都主动纠正用户给的 expected_archive 并回读确认同一目标 — v_new「先纠一处落点: 你给的 expected_archive 不对」+ 末尾「要我按上面的命令跑吗?」, v_old「结论先行: 你给的 expected_archive 路径是错的」+「需要你确认两件事【1】路径更正: expected_archive 改为 openspec/archive/2026-09-08-user-auth」; 同档 (都补日期前缀 + 都请用户确认), 无区分力。"
+    }
+  ],
+  "v_new_pass": 3,
+  "v_old_pass": 3,
+  "total": 3,
+  "discriminating_count": 0,
+  "verdict_on_coverage": "三条 expectation 只考『归档终点路径 / project_root 解析 / 与用户确认』, 两臂 3/3 全过且语义同档 (同一目标路径、同样补日期前缀、同样诚实报告 /workspace/my-project 不可达), 区分力实测为零。本次六条改动无一被覆盖: git mv 取代 CLI、归档后四条落点断言 (含挡 git mv 静默嵌套的第 4 条)、Step 5 并入 Step 3、Step 7 SHA 回链 + archive_tracker_verify.py、退役 keep_changes_copy、description 删「自动修正 CLI bug」——— 讽刺的是前五条在两臂答卷里肉眼可辨 (v_old 写 `openspec archive user-auth --yes` + Step 4 `mv`/`rmdir` 修正 + `rm -rf openspec/changes/user-auth # 除非 keep_changes_copy=true`; v_new 写 `git mv` + `test ! -e` 承重前置 + 四条断言并解释「断言 1-3 全为真, 只有断言 4 会红」), 但没有任何一条 expectation 去给这些差异打分, 且 archive_tracker_verify.py / SHA 回链在两臂输出里都未出现。结论支撑套件缺口单 10CG/aria-plugin#190: 需补『归档机制 (git mv vs 外部 CLI)』与『归档后断言完备性 (尤其目标已存在时的嵌套坏结果)』两类 expectation, 现有断言不得据「全过」删除 (它们仍对真实采用者有效, 只是不测本次改动)。"
+}

@@ -123,6 +123,9 @@
   > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
 - [x] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿) 🔴 **基线红**
 - [x] **C-V2** 全套件 ≥ **2122** 且 0 FAIL; state-scanner `run_tests.py` ≥ **1575 / OK** 🟢 **基线即绿 (2122 == 2122), 这是回归守卫** —— 它防的是「本 Spec 把别的测试跑挂」, 不证明本 Spec 做了什么; 新增测试的证明在 C-V1
+  > ✅ **v1.73.0 bump 后复测 (2026-09-08)**: `11 OK / 0 FAIL / 0 SKIP, 累计 2128`; state-scanner `Ran 1575 tests in 436.935s ... OK`。
+  > ⚠️ **登记一次瞬态红**: bump 后首跑 harness 报过一次 `FAIL: state-scanner`, 但**两次独立复跑均全绿** (直接跑 `run_tests.py` exit 0 / harness 独占机器重跑 11 OK)。首跑时机器上有并发活动。
+  > ⚠️ **诊断信息被我自己毁掉了**: harness 在失败分支本会打印「见下方详情」加最多 10 行失败明细 (`run_all_tests.sh:88-92`), 但我把它 `| tail -5` 了 ⇒ 只留下结论行, 失败的测试名不可考。**跑闸门时必须全量捕获输出, 不得管道截断** —— 同 memory `partial-push` 追记的「截断与失败事后不可分辨」。下个 session 若再见 state-scanner 偶发红, 请全量留证后开单。
 - [x] **C-V4** (**R2 补**, 对应已知风险 5): C-3 四态跑完后核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认 `spec_complete.py` **未被修改** (它是本 Spec 明文非目标)。若曾误改须 `git checkout` 还原并复核 🟢 **基线即绿 (实测 `git -C aria status --porcelain` 为空), 这是污染守卫**
 - [x] **C-V3** (**post_planning R1 补**) C-2 注册生效核验: 跑一次 `/state-scanner`, 确认 snapshot 的 `custom_checks.results` 里**出现** `skill-md-sha-backlink-literal-sync` 这一项**且 `status == "pass"`** (**R5 完备性批评席 Major 订正: 原写「status 非 `error`」把红当绿** —— 实读 `custom_checks.py:373-379`, `error` 只给 rc 127, **rc 非零一律映射为 `fail`** ⇒ 原判据对一个正在报 FAIL 的闸门也放行, 而全 Spec 再无第二处要求 C-1 在真仓转绿)。⚠️ **本项须排在 TG-B 全部落盘之后** —— 在此之前 C-1 本就该是红的。🔴 **基线**:该 check **尚未注册**, snapshot 里根本没有这一项 ⇒ 基线**红** —— 否则「注册了但没被扫到」与 Part A 的零触达故事同构
 
@@ -180,7 +183,7 @@
 > **要改 21 处 / 12 文件** —— `aria/CHANGELOG.md` 唯一那处就是 append-only 段标题, 故该文件整体退出计数。
 > **⇒ 与起草时基线逐字一致, 重测未发现漂移。**
 
-- [ ] **E-1** AB 前置 —— **逐条实测后的判定 (2026-09-08; 本条被订正过两次, 完整链条见下)**:
+- [x] **E-1** AB 前置 —— **逐条实测后的判定 (2026-09-08; 本条被订正过两次, 完整链条见下)**:
 
   **结论: 本套件不需要 `ARIA_COORDINATION_NO_PUSH=1` 会话级前置。** 依据两条独立证据:
 
@@ -199,28 +202,35 @@
 
   ⚠️ **仍然成立的运行纪律** (与上述无关, 出自 memory `ab-harness-real-repo`): AB 跑在**真仓 + 真 origin + 无 sandbox**, 被测臂是自主 agent, 可能做出超出 eval prompt 的动作。⇒ E-2 跑完须核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认无意外写入; 并按 SOT §场景 1 第 3 条做事后清理 (`git fetch origin +refs/aria/coordination:refs/aria/coordination` 强制对齐) —— **即便本套件不推 claim, 这条清理是无害的**。
 
-- [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
-- [ ] **E-3** 结果存 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md` (**R5 订正: 原写裸相对 `ab-results/`, 仓根无此目录**; 真根见 CLAUDE.md 信息地图); **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
-- [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` (SOT = 该文件)。⛔ **版本号不得从本文件照抄** —— 本 Spec 起草时写的是 `1.72.0`, 而同期有**两条并发轨在抢同一号段**且本 Spec 对它们结构性不可见 (见已知风险 7)。**执行时现算, 三条前置全过才写**:
+- [x] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
+  > ✅ **2026-09-08 实跑**: 4 臂 (2 eval × v_new/v_old) + 2 grader, 经动态工作流 `w1wr6ganw`。v_new 6/6 · v_old 6/6 · **delta.pass_rate = 0** · 有区分力的 expectation **0** (记分口径; eval-2 上有 1 条真实语义分档差但 pass/fail 打平)。仓内零意外写入, 协调 ref 跑前跑后逐字节相同 (`e13ef10a`) —— **独立佐证 E-1 的判定**。
+- [x] **E-3** 结果存 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md` (**R5 订正: 原写裸相对 `ab-results/`, 仓根无此目录**; 真根见 CLAUDE.md 信息地图); **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
+  > ✅ 存 `aria-plugin-benchmarks/ab-results/2026-09-08-v1.73.0-archive-skill-drift/` (RESULT.md + 逐 eval 的 prompt/grading/两臂答卷)。**区分力评估已显式记录**: 六项改动逐条对照, 无一被现有 expectation 承接; 其中 `description` 因评测台构造 (ARM 被直接喂 SKILL_MD 路径) **按构造永远测不到** —— 该结构性缺口为 grader 新发现, 已追进 `10CG/aria-plugin#190`。**不是 `WITHOUT_BETTER` 而是 v_new == v_old**, 已在 RESULT.md 逐条解释成因 (套件不覆盖被改的面), 不回退。
+- [x] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` (SOT = 该文件)。⛔ **版本号不得从本文件照抄** —— 本 Spec 起草时写的是 `1.72.0`, 而同期有**两条并发轨在抢同一号段**且本 Spec 对它们结构性不可见 (见已知风险 7)。**执行时现算, 三条前置全过才写**:  ⇒ **实取号 = `v1.73.0`** (2026-09-08 三腿实跑: (a) 两 remote 并集最高已发布 `v1.71.1`; (b) 普查 `origin/master` 全部 change, 自检基线通过, 两条并发轨都宣告 `v1.71.2` 与 `v1.72.0`; (c) 扫 本地 8 + origin 6 份 handoff, 声明的只有已发布的 `1.70.0`)
   - **(a) 已发布集合**: `for r in $(git -C aria remote); do git -C aria ls-remote --tags $r 'v1.7*'; done` —— **动态枚举 remote, 不写死名字** (R5 后 sweep: 原写死 `origin` + `github` 是正向枚举, 今天恰好完整但加第三个 remote 即 fail-OPEN, 同 memory `invariant-needs-failclosed-default`); 取**全部 remote 并集**的最高号 (单端会漏: 镜像可能半推, memory `partial-push`)。**任一 remote 的 `ls-remote` 失败即停**, 不得拿部分结果当全集
   - **(b) 并发轨已宣告号 —— 普查, 不是点名** (**R5 F4 订正**: 原文写死两条路径是**正向枚举**, 对第三条轨 fail-OPEN, 与本 Spec 要治的盲区同形状, memory `fix-recurs-in-fallback`): 遍历 `git ls-tree -d --name-only origin/master openspec/changes/` 的**全部**子目录, 逐个 `git show origin/master:<d>/proposal.md 2>/dev/null | grep -oE 'v?1\.7[0-9]\.[0-9]+'`。**自检基线**: 普查结果必须**包含** `handoff-multibranch-subdir-path-fidelity` 与 `pre-merge-completeness-gate-change-scope` 两条; 不含即说明扫描写错了, 重写再跑
   - **(c) 同伴 handoff 的 `<vNEXT>` —— 扫全面, 不锚指针** (**R5 F4 订正**: 原文「读 `latest.md` 指向的两份」实测 **vNEXT 命中恒为 0** —— 带声明的 6 份 handoff 一份都不在那两个指针上 ⇒ 该腿在健康常态下就是空的, 零信息量却占三分之一置信度, 判据同 memory `false_green_dual_is_permanent_red`): `grep -rln 'vNEXT' docs/handoff/` **并**对 `git show origin/master:docs/handoff/` 同扫, 取近 14 天内文件里的 `<vNEXT>=` 声明。**零命中时必须显式写下「扫了 N 份, 零声明」**, 不得留空 —— 留空与「没扫」不可分辨
   ⇒ 取号 = **不在 (a) 已发布集合、且不等于 (b)(c) 任一已宣告号** 的下一个可用号。**本文件与 `proposal.md` 中一律以 `<vNEXT>` 指代这个执行时才确定的号** (**R5 F11 订正: 区分 Spec 内占位符与交付物字符串**) —— **交付物**里凡以 `<vNEXT>` 描述的字符串 (`plugin.json` / `marketplace.json` / `VERSION` / `aria/CHANGELOG.md` 段标题 / `ab-results/` 目录名 / README badge 等) 落地时写实取号; **本文件与 `proposal.md` 内的 `<vNEXT>` 一律保留占位符不替换** (否则 SC-9 会同时含字面号和「不得照抄本文任何字面号」而自相矛盾)。**级别仍是 MINOR** (本 Spec 新增三个探针脚本 + 退役一个声明接口)。
   > 📌 **为什么这条是硬约束而非建议**: 本仓 `docs/handoff/2026-09-06-session-close-v1.70.0-shipped-170-closed-195-199-triaged.md:13` 开篇第一句就是「**本 session 最该记住的一件事**: 两个容器并行发版会**撞版本号**」; `:80` 记录代价是「他们的 5 文件 + 同步面**全部重做**」。同型事故发生在**本 Spec 起草前一天**。
-- [ ] **E-4a** ⛔ **取号后立刻双向登记**: (i) 把实取号**追加到本文件 E-4 行末** (`实取号 = <号>`) —— **这是 Spec 内唯一登记处, 其余 `<vNEXT>` 占位符全部保留**; (ii) 在 handoff §6 公布 `<vNEXT>=<所取号>`。
+- [x] **E-4a** ⛔ **取号后立刻双向登记**: (i) 把实取号**追加到本文件 E-4 行末** (`实取号 = <号>`) —— **这是 Spec 内唯一登记处, 其余 `<vNEXT>` 占位符全部保留**; (ii) 在 handoff §6 公布 `<vNEXT>=<所取号>`。
   **(ii) 是并发轨能看见本轨的唯一通道** —— 本 Spec 的 `proposal.md` 只在**未推送的 feature 分支**上 (他们 `git show origin/master:` 取不到), 协调板上的 claim **无 `linked_issue`** 且本轨的 issue 在**另一个仓** (`10CG/aria-plugin#186` vs 他们的 `10CG/Aria#195` / `10CG/Aria#199`) ⇒ `linked_issue_overlap` 对本轨结构性返回 `[]`。
   **验收 = 对 handoff 文件 `grep -n 'vNEXT'` 有命中且号与 E-4 实取号逐字相等**。
-- [ ] **E-5** 版本串同步。⚠️ **append-only 豁免有两处, 不是一处** (post_planning R1 抓到第一处, **R3-M2 抓到我只修了实例没修类**):
+- [x] **E-5** 版本串同步。⚠️ **append-only 豁免有两处, 不是一处** (post_planning R1 抓到第一处, **R3-M2 抓到我只修了实例没修类**):
+  > ✅ **2026-09-08 逐文件实测**: `plugin.json` 1 · `marketplace.json` 2 · `aria/VERSION` 1 (`:3`; `:4` 降格为 `(旧)` 并新增当期行) · `aria/README.md` 1 · 主仓 `VERSION` 1 · `CLAUDE.md` 2 · `README.md` 2 · `README.zh.md` 3 · `README.ja.md` 3 · `README.ko.md` 3 · `system-architecture.md` 1 · `version-scheme.md` 1 ⇒ **合计 21 处 / 12 文件, 与起草基线逐字一致**。`aria/CHANGELOG.md` 新增 `## [1.73.0]` 段 (原 `## [1.71.1]` 段标题未动)。残留 `1.71.1` 恰 2 处, 均为 append-only 历史记录 (`aria/VERSION:5` / `aria/CHANGELOG.md:38`)。
   - `aria/CHANGELOG.md:13` `## [1.71.1] - 2026-09-06` —— 段标题, **不改**; 动作是在其**上方新增** `## [<vNEXT>]`
   - **`aria/VERSION:4`** `> **发布日期**: 2026-09-06  # patch: v1.71.1 …` —— **当期发布说明**, 其下已排着一串 `发布日期(旧)`; 发版时是**新增**一条并把这条降格成 `(旧)`, **不是改写它**。(同文件 `:3` 的 `> **版本**: 1.71.1` **要改**)
   ⇒ **要改的是 21 处 / 12 文件** (23 − CHANGELOG:13 − VERSION:4), 外加 CHANGELOG 与 VERSION 各**新增**一条。
   ⚠️ **「21 处 / 12 文件」是起草时的测量, 不是可照抄的常量** —— 任一并发轨先 ship 都会改变它 (CHANGELOG 多一段 / VERSION 多一行 / README badge 换号)。**执行时重测一遍**, 与本数不符时**以重测为准并在本行记下差异及原因**, 不得反过来把仓里改成 21。
   逐文件 `grep -c` 实测并把计数**全部**贴进本文件 (含上述两处标注「append-only, 不改」) —— proposal §Part E「覆盖面诚实登记」段要求「不留不对称缺口」(按内容引, 不锚行号)
-- [ ] **E-6a** **五个仓内 check 全绿**: `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` / `plugin-version-arch-docs-match`。它们的输入全在仓内, E-5 落地后必然可绿
-- [ ] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 `<vNEXT>` 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
+- [x] **E-6a** **五个仓内 check 全绿**: `m6-version-badge-match` / `m6-claude-md-version` / `i18n-readme-translation-currency` / `main-project-version-consistency` / `plugin-version-arch-docs-match`。它们的输入全在仓内, E-5 落地后必然可绿
+  > ✅ **后 bump 树上直接实跑 (不读 snapshot)**: `m6-version-badge-match` OK badge=1.73.0 · `m6-claude-md-version` OK version=2.0.0 · `i18n-readme-translation-currency` OK (3 i18n READMEs current @ 1.73.0) · `main-project-version-consistency` OK 9 个引用点全部一致 · `plugin-version-arch-docs-match` OK plugin=1.73.0 (2 arch doc rows match) ⇒ **5/5**。
+  > ⚠️ **过程中差点记下一个陈旧的绿**: 首次读的是 10:21Z 的 snapshot, 而 bump 发生在 11:46Z —— 那份快照里所有版本串还一致是 1.71.1, 五个 check 当然全绿但**证明不了 bump 后的状态**。已改为直接实跑。
+- [x] **E-6b** ⚠️ **`plugin-cache-currency` 在 E-4 之后期望 STALE, 不是绿** (post_planning R3 R3-M1): 它比的是**运行时** `~/.claude/plugins/installed_plugins.json` 与 SOT `plugin.json`。E-4 一 bump 到 `<vNEXT>` 它立刻转红, 且**在 TG-E 的任何位置都转不绿** —— 转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session (memory `session-level-precondition`: 会话内补不上)。
+  > ✅ **实跑输出逐字**: `STALE installed=1.71.1 (scope=user) sot=1.73.0 — 运行时落后 SOT; marketplace clone 自称 1.71.1 — 第 1 层滞后, 需先刷新 marketplace (…)`, rc=1 [末尾省略的是原输出里对 `10CG/Aria#172` 的指引, 非承重; 承重的是前半 `installed=1.71.1 sot=1.73.0`]。**红的原因确认是「installed 落后 SOT」而非别的**, 符合预期; **未算进 E-6a 的「全绿」**。转绿要 owner 终端跑 `/plugin marketplace update` + `/plugin update` + 重启 session。
   **验收 = 贴出它的实跑输出**, 确认红的原因是「installed 落后 SOT」而非别的; **不得把它算进「全绿」**。
   ⚠️ 该例外**尚未成文**: 上一周期 (`docs/handoff/2026-09-06-session-close-v1.70.0-...`) 已把「SC-7 十三条全绿 + plugin-cache-currency 例外」上呈 owner, **写就时尚未裁定** ⇒ 按 memory `exact-exception-condition`「N 次非正式援引 ≠ 成文 lane」, **现在不能援引它当豁免**, 只能如实登记并在 handoff 再次点名
-- [ ] **E-6c** ⚠️ 六个 check 合计只覆盖 23 处版本点里的约 6 处, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
+- [x] **E-6c** ⚠️ 六个 check 合计只覆盖 23 处版本点里的约 6 处, **不能只靠它们判绿** (E-5 的逐文件实测是主判据)
+  > ✅ **已按此执行**: E-5 的判据用的是**逐文件 `grep -c` 实测** (21 处 / 12 文件全部列出), 六个 check 只作为交叉验证而非主判据。
 - [ ] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
 - [ ] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
 - [ ] **E-8** 主仓 gitlink bump; **SC-9 两条断言**: (a) `git ls-tree HEAD aria` == `git -C aria rev-parse HEAD`; (b) 子模块 HEAD == `origin/master`
