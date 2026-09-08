@@ -28,7 +28,7 @@
 | # | 改动 | 被覆盖? | grader 实测依据 |
 |---|---|---|---|
 | 1 | Step 3 从「调 `openspec archive` CLI」改为 `git mv` | ❌ 无断言承接 | 两臂答卷**肉眼可辨** (v_old 写 `openspec archive user-auth --yes`; v_new 写 `git mv`), 但三条 expectation 只考「终点路径 / project_root 解析 / 与用户确认」, 都不考机制 |
-| 2 | Step 4 四条断言 (第四条挡 `git mv` 静默嵌套) | ❌ 无断言承接 | eval-2 的 expectation 2 上出现**真实语义分档差** —— v_new 是双检查点且点明「`git mv` 在 dst 已存在时**返回 rc 0** 并把 src **嵌进** dst」「四条断言里只有断言 4 会红」; v_old 只有单检查点。但 pass/fail 打平, **没有任何断言去给这个差异打分** |
+| 2 | Step 4 断言 (跑 AB 时是四条; **事后被发布前验证席证伪并改成五条** —— 原第四条「proposal.md 存在」在真实坏情形下是绿的, 已换成钉嵌套形状的「`{name}/{name}/` 不存在」。本表描述的是**跑 AB 那一刻**的状态, 不追改) | ❌ 无断言承接 | eval-2 的 expectation 2 上出现**真实语义分档差** —— v_new 是双检查点且点明「`git mv` 在 dst 已存在时**返回 rc 0** 并把 src **嵌进** dst」「四条断言里只有断言 4 会红」; v_old 只有单检查点。但 pass/fail 打平, **没有任何断言去给这个差异打分** |
 | 3 | Step 5 并入 Step 3 | ❌ 结构性漏测 | 两臂答卷**零字提及** —— eval-2 是纯只读检测题, 走不到执行态 |
 | 4 | Step 7 SHA 回链 + `archive_tracker_verify.py` | ❌ 结构性漏测 | 同上, 两臂输出里 `archive_tracker_verify.py` / SHA 回链**均未出现** |
 | 5 | 退役 `keep_changes_copy` | ❌ 有可观测漂移但无断言 | v_old 逐字列出「`skip_verification` / `keep_changes_copy` / `dry_run` /…」, v_new 列「五个 options」且无它 —— **干净的可观测标记, 却无断言承接** |

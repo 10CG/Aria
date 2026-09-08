@@ -3,7 +3,7 @@ track-id: archive-gate-registration-class-and-skill-drift
 owner-container: simonfish/023236f2
 phase: B
 status: active
-updated-at: 2026-09-07T14:54:10Z
+updated-at: 2026-09-08T15:23:13Z
 ---
 
 # Aria — Session Handoff (2026-09-07) — Phase B 三个任务组落地, TG-E 停在两个 owner 门

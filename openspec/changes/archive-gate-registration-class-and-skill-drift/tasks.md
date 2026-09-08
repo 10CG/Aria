@@ -45,7 +45,7 @@
 - [x] **B-1** `openspec-archive/SKILL.md:317` `Step2` → `Step 7`
 - [x] **B-4** `:17` → `> **历史**: 2026-02-08 - 初始版本，修复归档目录落点错误 (彼时经由外部工具链, 现已改为 git mv)`
 - [x] **B-7** `:247` → `Step 3 - 执行归档 (git mv):` / `:248` → `  命令: git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}` / `:249` → `  等待: git mv 返回`
-- [x] **B-8a** `:251-257` 整块 → Step 4 **四条断言** (落地复审订正, 原为三条 —— 实测 git mv 静默嵌套时前三条全为真) (字面见 proposal B8)
+- [x] **B-8a** `:251-257` 整块 → Step 4 **五条断言** (两次订正: 落地复审从三条加到四条; **发布前验证席**实测证伪了那第四条「proposal.md 存在」—— 它在真实坏情形下是绿的, 已换成钉嵌套形状的「`{name}/{name}/` 不存在」并把存在性降为第五条) (字面见 proposal B8)
 - [x] **B-8b** `:259-261` 整块 → `Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`, **其下无正文**
 - [x] **B-10** 示例 1 四行 → 字面见 proposal SC-3(c)
 - [x] **B-15** `phase-d-closer/SKILL.md:41` → 字面见 proposal B15
@@ -90,7 +90,7 @@
   >
   > **断言**: 七条改后原文**均不再承诺自动处理 CLI 问题** —— B-6 是唯一保留条件表述的一条, 且已明写「需自行处置」而非「本 Skill 会修」。⇒ SC-1b 通过。
 - [x] **B-V3** SC-2: `grep -n 'Step2' openspec-archive/SKILL.md` 命中 **1** 处, 且该行**内容**为 `# "全部 unverified_claims" (无论 §Step2 warn_overlay 是否写了 --ack-unverified) 而来;` (**按内容不按行号** —— 前面几个 B 任务会移动行号) 🔴 **基线**: 实测命中 **2** 处 (`:275` 交叉引用 + `:317` 待改锚点), 验收要 1 ⇒ 基线**红**
-- [x] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 **恰 4 条 `断言 N:` 行** (落地复审订正, 原为 3) / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
+- [x] **B-V4** SC-3: Step 5 正文 **0 行** / Step 4 **恰 5 条 `断言 N:` 行** (两次订正: 3 → 4 → 5) / 示例四行逐行等于目标文本 🔴 **基线**: 实测 Step 5 正文 **2 行** (要 0) / Step 4 正文 **6 行** (要 3) ⇒ 基线**红**
 - [x] **B-V5** SC-4: `keep_changes_copy` 命中全落 `## 已退役配置项` 内 🔴 **基线**: `已退役配置项` 小节命中 **0** (尚不存在), 两处 `keep_changes_copy` (`:87` `:261`) 全在小节外 ⇒ 基线**红**
 - [x] **B-V6** Rule #3: `aria/skills/openspec-archive/CHANGELOG.md` `[Unreleased]` 加条目, **且该条目须点名本次改的 Step 3/4/5 与退役的 `keep_changes_copy`** (防恒绿) 🔴 **基线**: `[Unreleased]` 段**已有条目** (关于 `10CG/aria-plugin#95` 的 C 分级证据闸), 但**零条点名本 Spec 的 Step 3/4/5 改动或 `keep_changes_copy` 退役** ⇒ 基线**红**。⚠️ 判据必须是「点名了这几项」而**不是**「段内有条目」—— 后者基线即绿
 - [x] **B-V8** (**R2 补**, B-14 专属 —— SC-1 的 pattern 对 `:622` 结构上命中 0, 抓不到它): `grep -n 'aria-archive-gate-runtime-reality' aria/skills/openspec-archive/SKILL.md` 的命中行须含 `openspec/archive/2026-07-05-` 前缀; 且 `openspec/changes/aria-archive-gate-runtime-reality` 不存在。**基线该断言为红** (现文本指向 `openspec/changes/...`, 而该目录已不存在) 🔴

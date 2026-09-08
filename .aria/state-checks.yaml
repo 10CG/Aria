@@ -25,6 +25,24 @@ checks:
     timeout_seconds: 5
     enabled: true
 
+  # --- 交付物里不得残留未解析的版本占位符 (发布前验证席 C5) ---
+  - name: "no-unresolved-version-placeholder"
+    description: |
+      断言 aria 子模块的**交付面**里不存在未解析的 `<vNEXT>` 占位符。
+      背景: 本仓的取号规程刻意用 `<vNEXT>` 表示「交付物落地时才现算」, 并在 Spec 里逐一
+      枚举必须回填的面。但 E-5 的同步判据是「grep 旧版本号残留」—— 它对「占位符从未被
+      解析」这一形态**天然 fail-OPEN** (占位符里根本没有旧号)。2026-09-08 实证: v1.73.0
+      发布提交里 openspec-archive/SKILL.md 的退役版本表格残留了一个 `<vNEXT>`, 五个既有
+      版本类 check 全绿也没看见它。
+      范围只覆盖 aria/ 子模块 (随插件分发的交付面); Spec 自身的 tasks.md / proposal.md
+      按成文规程**保留**占位符, 不在范围内。
+    command: |
+      ! grep -rn '<vNEXT>' aria/ --include='*.md' --include='*.json' --include='*.yaml' --include='*.py' 2>/dev/null
+    severity: warning
+    fix: "把命中处的 `<vNEXT>` 替换为本次发布的实取号 (与 aria/.claude-plugin/plugin.json 的 version 一致); 若该处本就该保留占位符, 把它移出 aria/ 或在本 check 的范围里显式排除"
+    timeout_seconds: 5
+    enabled: true
+
   # --- SKILL.md 复述串 vs 生产者字面同步 (archive-gate-registration-class-and-skill-drift) ---
   - name: "skill-md-sha-backlink-literal-sync"
     description: |

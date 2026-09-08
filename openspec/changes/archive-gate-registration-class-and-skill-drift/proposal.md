@@ -66,7 +66,7 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
 | B5 | 同 `:40` + `:41` | 核心功能表**两行的两个单元格全部重写** (不是只换标签): `:40` 执行归档 → `git mv …`; `:41` 自动修正 → 位置校验 |
 | B6 | 同 `:56` | 「**本 Skill 会自动修正此问题**」→ 对采用者的条件表述 (它是现时承诺, 不是历史陈述) |
 | B7 | 同 `:247` `:248` `:249` **三行各自给目标** (R3 IMPL-3): `:247` 标题 → `Step 3 - 执行归档 (git mv):`; `:248` 命令 → `git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}`; `:249` → `等待: git mv 返回` | ⚠️ 占位符用 `{change_name}` —— 全文件既有惯例, `{id}` 从未出现过 |
-| B8 | 同 `:251-257` + `:259-261` | **Step 4 目标字面** (三行断言, 替换原「检测并修正归档位置」整块):<br>`Step 4 - 归档后位置校验:`<br>`  断言 1: openspec/archive/{YYYY-MM-DD}-{change_name}/ 存在`<br>`  断言 2: openspec/changes/{change_name}/ 已不存在 (git mv 的必然结果)`<br>`  断言 3: openspec/changes/archive/ 不存在 (若存在 ⇒ 历史上有人走过 CLI 路径, 搬到 openspec/archive/ 后 rmdir)`<br>`  断言 4: openspec/archive/{YYYY-MM-DD}-{change_name}/proposal.md 直接存在于该层` (**落地复审补**: 挡 git mv 静默嵌套)<br>**Step 5 目标字面** (保留编号, 整块压成标题行本身, 其下无正文):<br>`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)` |
+| B8 | 同 `:251-257` + `:259-261` | **Step 4 目标字面** (三行断言, 替换原「检测并修正归档位置」整块):<br>`Step 4 - 归档后位置校验:`<br>`  断言 1: openspec/archive/{YYYY-MM-DD}-{change_name}/ 存在`<br>`  断言 2: openspec/changes/{change_name}/ 已不存在 (git mv 的必然结果)`<br>`  断言 3: openspec/changes/archive/ 不存在 (若存在 ⇒ 历史上有人走过 CLI 路径, 搬到 openspec/archive/ 后 rmdir)`<br>`  断言 4: openspec/archive/{YYYY-MM-DD}-{change_name}/{change_name}/ 不存在` (钉嵌套的确切形状)<br>`  断言 5: openspec/archive/{YYYY-MM-DD}-{change_name}/proposal.md 存在` (正交的内容下界)<br>**Step 5 目标字面** (保留编号, 整块压成标题行本身, 其下无正文):<br>`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)` |
 | B9 | 同 `:87` | 退役 `keep_changes_copy`, 移入新增小节 `## 已退役配置项` (给 SC-4 第二分支一个可 grep 的锚点) |
 | B10 | 同 `:392` `:393` **`:394`** `:401` | 示例 1 四行 |
 | B11 | 同 `:588` | 错误表 CLI 行 → `git mv` 失败三分支 |
@@ -198,10 +198,10 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 - **SC-2** (误伤守卫): `grep -c 'Step2' openspec-archive/SKILL.md` == **1** 且唯一命中在 `§Step2 warn_overlay` 交叉引用处。
 - **SC-3** (B8/B10 落地形态, **机械判据**, R3 SCF-4 + R4-2/`fixes-contradict` 订正):
   (a) `Step 5 -` 标题行到 `Step 6 -` 标题行之间**非空正文恰 0 行** —— B8 把内容压进标题行本身 (`Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`), 故其下无正文。**上一版写「恰 1 行」与 B8 的字面目标互斥** (R4 抓到)。
-  (b) `Step 4 -` 到 `Step 5 -` 之间**恰 4 条 `断言 N:` 行** (**Phase B 落地复审订正: 原写「恰 3 行」** —— 复审实测 `git mv src dst` 在 dst 已存在为目录时**返回 rc 0** 并把 src 嵌进 dst, 而原三条断言在该坏结果上**全为真** ⇒ 必须加第四条 `proposal.md 直接存在于该层`; 说明性续行不计入断言数)。
+  (b) `Step 4 -` 到 `Step 5 -` 之间**恰 5 条 `断言 N:` 行** (**发布前验证席二次订正**: R5 加的第四条「`proposal.md` 直接存在于该层」被实跑证伪 —— dst 已存在的现实成因只有「该 spec 已归档过一次」⇒ dst 里必然已有上次留下的 `proposal.md`, 该断言在**它唯一存在理由的场景里是绿的**。已换成钉嵌套确切形状的「`{name}/{name}/` 不存在」, 并把存在性检查降为正交的第五条。**维度必须匹配错误的维度** —— memory `invariant-dimension`) (**Phase B 落地复审订正: 原写「恰 3 行」** —— 复审实测 `git mv src dst` 在 dst 已存在为目录时**返回 rc 0** 并把 src 嵌进 dst, 而原三条断言在该坏结果上**全为真** ⇒ 必须加第四条 `proposal.md 直接存在于该层`; 说明性续行不计入断言数)。
   (c) 示例 1 四行**逐行等于**下列目标文本 (基线位置 `:392` `:393` `:394` `:401`):
   - `  Step 3: ✅ git mv → openspec/archive/2026-02-08-cloudflare-access-auto-handling/`
-  - `  Step 4: ✅ 位置校验通过 (目标存在 / 源已消失 / 无 changes/archive/ / proposal.md 在该层)` (**落地复审订正**: 随 Step 4 加第四条断言同步; 三处必须一致否则 SC-3(c) 从恒绿翻恒红)
+  - `  Step 4: ✅ 位置校验通过 (目标存在 / 源已消失 / 无 changes/archive/ / 无 {name}/{name}/ 嵌套 / proposal.md 在该层)` (**落地复审订正**: 随 Step 4 加第四条断言同步; 三处必须一致否则 SC-3(c) 从恒绿翻恒红)
   - `  Step 5: ⏭️ (已并入 Step 3)`
   - `  📦 归档方式: git mv` (替换原 `  🐛 CLI bug 已自动修正`; **落地复审订正**: 原目标字面与上一行 `📍 位置:` 取值完全相同 = 零信息量的重复行, 改承载归档方式, 呼应新增的 `archive_method` 字段)
 - **SC-4** (B9, **机械判据**, R3 SCF-5): `keep_changes_copy` 在 SKILL.md 中的命中**全部落在新增小节 `## 已退役配置项` 内** (与 SC-1 同样按标题文本定位), 区段外命中 == 0。
