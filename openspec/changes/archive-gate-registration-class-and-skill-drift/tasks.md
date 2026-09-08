@@ -151,17 +151,12 @@
   > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 `<vNEXT>` (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
-> 🛑 **Phase B 执行到此停下 —— TG-E 有两个阻塞点, 均非规则豁免, 是执行条件不具备** (2026-09-07):
+> 🛑 **TG-E 的阻塞面 (2026-09-08 订正后: 从两个门减为一个)**:
 >
-> **阻塞 1 (E-1, 会话级前置)**: 本会话 `ARIA_COORDINATION_NO_PUSH` **未设置**, 而它是**进程级**前置,
-> 会话内 export 改不了 subagent 继承环境 (memory `session-level-precondition`)。E-1 的两个承重事实
-> 已逐字实证: eval 1 `correct-archive-path` 带 `project_root=/workspace/my-project` (合成, 不触真仓);
-> eval 2 `already-archived-detection` **无 `project_root`**, 两个路径均为仓相对 (`openspec/changes/user-auth`
-> / `openspec/archive/user-auth`) ⇒ 真仓 cwd 下落到真仓树。⇒ **须由 owner 以
-> `ARIA_COORDINATION_NO_PUSH=1 claude ...` 重启会话后再跑 E-2**。E-2/E-3 阻塞 ⇒ 按 Rule #6
-> 「Skill 变更发版前须过 benchmark」, E-4 起全部阻塞。
+> **阻塞 (E-0, SC-11 owner 裁定)** ⛔ 挡 **E-7a 起**的全部步骤 (含子模块本地 merge + 双推 —— 不可逆地发布到两个公共 remote)。
+> 判据可机械核: handoff 里该问题的 owner 答复段非空; 若为 (b) 裁定则对应 `ab-results/` 目录存在。
 >
-> **阻塞 2 (E-0, SC-11 owner 裁定)**: 挡 E-7a 起的全部步骤 (含子模块合并双推)。
+> ✅ **原「阻塞 1」已撤销**: 那是我在 post_planning R5 自己加的一道 SOT 不要求、机制上也够不着的前置 (详见 E-1 的订正史)。**E-1 → E-6c 现在没有前置阻塞**, 可以执行。
 >
 > ---
 >
@@ -185,7 +180,25 @@
 > **要改 21 处 / 12 文件** —— `aria/CHANGELOG.md` 唯一那处就是 append-only 段标题, 故该文件整体退出计数。
 > **⇒ 与起草时基线逐字一致, 重测未发现漂移。**
 
-- [ ] **E-1** AB 前置 (**R5 F3 订正: 原文「已核 ⇒ 不需要前置」的承重前提对第二个 eval 为假, 且结论方向搞反了**): 逐 eval 分档 —— eval 1 用合成路径 `/workspace/my-project`, 不触真仓; **eval 2 (`already-archived-detection`) 无 `project_root`, 两个路径均为仓相对 ⇒ 在真仓 cwd 下会落到真仓 `openspec/` 树**。⇒ 按 memory `ab-harness-real-repo` + `session-level-precondition`, **一律以 `ARIA_COORDINATION_NO_PUSH=1 claude ...` 启动会话再跑 E-2**。该前置是**进程级, 会话内补不上**; 未带则**停在 E-1 并上报**, 不得自行降级 (本 cycle 前身 `a1-entry` 就因漏带它整段 Rule #6 阻塞过, 见 `docs/handoff/2026-09-05-1426-a1-entry-b2-30of40-rule6-blocked.md`)
+- [ ] **E-1** AB 前置 —— **逐条实测后的判定 (2026-09-08; 本条被订正过两次, 完整链条见下)**:
+
+  **结论: 本套件不需要 `ARIA_COORDINATION_NO_PUSH=1` 会话级前置。** 依据两条独立证据:
+
+  1. **SOT 的触发条件不匹配** (memory `exact-exception-condition`: 逐字核对确切触发条件): `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` §场景 1 运行前置 的判据是「凡被测 Skill **能触达** `skills/state-scanner/scripts/phase1_gate.py` / `release_gate.py` 的套件」, 并给出封闭枚举「今天是 `phase-b-developer.json` / `branch-manager.json` / `state-scanner.json` + `phase-d-closer.json`; spec `a1-entry-claim-duplicate-work-guard` ship 后再加 `phase-a-planner.json` / `spec-drafter.json`」。**`openspec-archive.json` 不在其中**。
+  2. **判据本体实测不成立**: `grep -c 'phase1_gate\|release_gate' openspec-archive/SKILL.md` = 5, 但**五处全在示例输出块里** (`:520` `:527` `:536` `:540` `:545` 演示 `blocking_reasons` 长什么样, 用 `multi-terminal-coordination` 当例子), **零处是调用**。该 env 只被 `phase1_gate.py` / `release_gate.py` / `lib/failure_handlers.py` 读, openspec-archive 的 Step 1-7 一个都不碰。
+
+  **另一半 —— 真仓触达风险, 逐 eval 分档**:
+  - **eval 1 `correct-archive-path`**: 会**写** (归档动作), 但带 `project_root=/workspace/my-project` (合成) ⇒ 不触真仓。
+  - **eval 2 `already-archived-detection`**: **无 `project_root`**, 两个路径 (`openspec/changes/user-auth` / `openspec/archive/user-auth`) 是仓相对 —— 但动作是**检测 (只读)**, 且这两个路径在真仓**都不存在** (实测) ⇒ 读空, 无写入面。
+
+  > 🔁 **本条的订正史 (留着是因为它本身是个教训)**:
+  > - **起草版**: 「两个选中 eval 用合成路径 ⇒ 不需要该前置」—— 结论对, 但**证据不准** (「两个」只对 eval 1 成立)。
+  > - **post_planning R5**: tech-lead 席抓到「eval 2 无 `project_root`」—— **事实对**, 但它推出的结论 (要那个 env) 不成立, 而我采纳时**没有验证这条推理链**, 把「摸到真仓树」与「推协调 ref」两个不同的风险混成一条, 于是写了一个 SOT 不要求、机制上也够不着的前置, 并据此把 E-2 起全部步骤自我阻塞。
+  > - **本版**: 证据订正 + 结论按实测恢复, 两个风险分开处置。
+  > 教训: memory `exact-exception-condition` 是**双向**的 —— 既不能松引豁免, 也不能凭一个「事实正确但推理断裂」的 finding 加一道 SOT 没有的闸门。
+
+  ⚠️ **仍然成立的运行纪律** (与上述无关, 出自 memory `ab-harness-real-repo`): AB 跑在**真仓 + 真 origin + 无 sandbox**, 被测臂是自主 agent, 可能做出超出 eval prompt 的动作。⇒ E-2 跑完须核 `git status --porcelain` 与 `git -C aria status --porcelain`, 确认无意外写入; 并按 SOT §场景 1 第 3 条做事后清理 (`git fetch origin +refs/aria/coordination:refs/aria/coordination` 强制对齐) —— **即便本套件不推 claim, 这条清理是无害的**。
+
 - [ ] **E-2** 跑 openspec-archive AB (`/skill-creator`)。两臂 = **v_new vs v_old**。**隔离条款 (post_planning R1 补)**: 各臂输出写各自 `outputs/`, 不写仓内固定路径 (`10CG/aria-plugin#180`); AB 跑在真仓无沙箱 (memory `ab-harness-real-repo`)
 - [ ] **E-3** 结果存 **`aria-plugin-benchmarks/ab-results/`**`2026-09-XX-v<vNEXT>-archive-skill-drift/RESULT.md` (**R5 订正: 原写裸相对 `ab-results/`, 仓根无此目录**; 真根见 CLAUDE.md 信息地图); **须显式记录本次 AB 对本改动的区分力评估** (预期零); `WITHOUT_BETTER` 逐条解释或回退
 - [ ] **E-4** 版本 bump `aria/.claude-plugin/plugin.json` (SOT = 该文件)。⛔ **版本号不得从本文件照抄** —— 本 Spec 起草时写的是 `1.72.0`, 而同期有**两条并发轨在抢同一号段**且本 Spec 对它们结构性不可见 (见已知风险 7)。**执行时现算, 三条前置全过才写**:
