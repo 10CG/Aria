@@ -273,11 +273,17 @@
   >
   > ⚠️ **主仓本地 `master` 落后 `origin/master` 9 个 commit** —— E-7a 对主仓的那条断言现在**不成立**, 须先 FF (memory `stale-local-main`: 合进陈旧基线再推会抹掉他人已 ship 的工作)。
   > ⇒ **除该 FF 外, E-7a → E-11 的全部前置均已验证通过**, 执行时应是一次干净的顺序跑。
-- [ ] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
-- [ ] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
-- [ ] **E-8** 主仓 gitlink bump; **SC-9 两条断言**: (a) `git ls-tree HEAD aria` == `git -C aria rev-parse HEAD`; (b) 子模块 HEAD == `origin/master`
-- [ ] **E-9** 主仓 PR → **Rule #8 pre-merge gate** → 合并 (主仓例外可走 Forgejo merge)。⚠️ **服务端合并后 GitHub 镜像不会自动拿到** (`10CG/Aria#165` 形状) ⇒ 必须本地 FF master + `git push github master`
-- [ ] **E-10** **逐 remote `ls-remote` 独立核验**两仓, 不信 push 回执 (硬约束 2); gitlink orphan 守卫 (三个子模块 SHA 在两端均可达)
+- [x] **E-7a** (**post_planning R1 补, memory `stale-local-main`**) 子模块 merge **前置**: `git -C aria fetch origin --prune && git -C aria fetch github --prune`; 断言 `local master == origin/master` (不等则先 FF)。**同一断言对主仓也要做** —— 本文件写就时主仓本地 master 实测**落后 origin/master 8 个 commit** (并发轨在飞)
+  > ✅ **2026-09-08 实跑**: aria 三方一致 (`master`==`origin/master`==`github/master`==`301641b1`); **主仓本地 master 实测落后 origin/master 9 个 commit, 已按 memory `stale-local-main` 先 FF 到 `1a40579`**, FF 后三方一致。
+- [x] **E-7b** aria 子模块**本地** `git merge` feature → master + 双推 (⛔ 禁 Forgejo 服务端合并, 硬约束 1) + 逐 remote `ls-remote` 核验
+  > ✅ **本地 FF merge** (无 merge commit) 带上 6 个 commit / 813 插入 → aria master `6726df1`; 打 annotated tag **`v1.73.0`** → `fde38d0`, 指向 master 已核。**双推 origin + github** (⛔ 未走 Forgejo 服务端合并, 硬约束 1), 逐 remote `ls-remote` 独立核验: 两端 master 均 `6726df1f`、tag 均 `fde38d0d`, **无镜像分叉**。
+- [x] **E-8** 主仓 gitlink bump; **SC-9 两条断言**: (a) `git ls-tree HEAD aria` == `git -C aria rev-parse HEAD`; (b) 子模块 HEAD == `origin/master`
+  > ✅ gitlink 已一致 (feature 分支末 commit 即 `6726df1`, aria master FF 到同一 SHA)。**SC-9 两条断言**: (a) `git ls-tree HEAD aria` `6726df1f` == `git -C aria rev-parse HEAD` `6726df1f` ✅; (b) aria HEAD == `origin/master` ✅。
+- [x] **E-9** 主仓 PR → **Rule #8 pre-merge gate** → 合并 (主仓例外可走 Forgejo merge)。⚠️ **服务端合并后 GitHub 镜像不会自动拿到** (`10CG/Aria#165` 形状) ⇒ 必须本地 FF master + `git push github master`
+  > ✅ 先合并 `origin/master` 进 feature (并发轨 9 个 commit, `merge-tree` 试算 0 冲突, 实测无冲突; `aria-orchestrator` **未被卷入**, 风险 3 守住) → 推分支 → PR **`10CG/Aria#209`** → **Rule #8 pre-merge gate `verdict: green`** (真实 backend `aether-ci-cli@f29abee`; `pr_ci_status: not_applicable` —— 扫 3 个 workflow, 45 个改动文件无一触发 `no-triggering-paths`, 诚实报告而非假称 CI 通过; `in_flight_runs: []`) → Forgejo merge 得 `e99f10d`。
+  > ⚠️ **`10CG/Aria#165` 形状实测复现**: 服务端合并后 GitHub 镜像**落后 29 个 commit**, 已本地 FF master 并补推 github。
+- [x] **E-10** **逐 remote `ls-remote` 独立核验**两仓, 不信 push 回执 (硬约束 2); gitlink orphan 守卫 (三个子模块 SHA 在两端均可达)
+  > ✅ **逐 remote 独立核验** (不信 push 回执): 主仓两端均 `e99f10d9`; aria 两端 master 均 `6726df1f`、tag `v1.73.0` 均 `fde38d0d`。**gitlink orphan 守卫**: 主仓已发布 master 引用的三个子模块 SHA (`aria 6726df1f` / `standards 21748d47` / `aria-orchestrator 237045ac`) 在**各自两端全部可达**。
 - [ ] **E-11** D.1 进度 → D.2 归档 → D.2b release claim → D.3 handoff
 - [x] **E-V1** handoff 须点名六项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`; **(5) `<vNEXT>` (E-4a(ii), 并发轨可见性)**; **(6) `plugin-cache-currency` (E-0/E-6b 两次明文要求的如实登记 —— Rule #10 §5 规定「AI 任何自作主张的流程判断必须写进 handoff 请复议」, 本项是它在本 Spec 里的唯一机械兜底)**。**验收 = 对 handoff 文件 grep 这六个字符串, 缺一即红** (防纯自证) 🔴 **基线**: 本 cycle handoff **尚未写** ⇒ 基线**红**  ⇒ **已写 `docs/handoff/2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md`; 六项 grep 逐条核验全中** (SC-11 owner 裁定 1 / keep_changes_copy 声明接口移除 1 / post_spec converged=false 1 / D-6 定时风险 1 / vNEXT 3 / plugin-cache-currency 1)
 
