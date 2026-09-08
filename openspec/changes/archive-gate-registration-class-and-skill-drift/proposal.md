@@ -15,7 +15,12 @@
 > 判据必须 **fail-CLOSED**: 先假定每个 `#<n>` 都违规, 只有落进**封闭**豁免集才放过 (**R5 F13 订正** —— 原文把 (b) 写成「反引号内逐字引用目标文件原文」但唯一可实现的读法是「任意反引号一律豁免」, 且 (c) 若实现成「`#` 前一个字符是 `/` 或字母数字」则对半限定形态 (只有仓名、无 org 前缀) 天然 fail-OPEN; 两处都是正向枚举, memory `invariant-needs-failclosed-default`)。**封闭豁免集仅三类**:
 > (a) **全限定** `<org>/<repo>#<n>` —— 必须含 `/`; 半限定 (只有仓名、无 `<org>/` 前缀) **不豁免**;
 > (b) `Rule #N` / `规则 #N` 规则编号;
-> (c) 落在**显式白名单**里的「目标行完整字面」code span —— 即 Part B 要逐字写进 SKILL.md 而本身含裸 `#<n>` 的那些行 (当前**仅 B15 一条**)。新增须显式加进白名单, **不得**放宽成「任意反引号一律豁免」。
+> (c) 落在**允许清单**某条字面**覆盖的字符区间内**的 `#<n>` —— 即 Part B 要逐字写进 SKILL.md 而本身含裸 `#<n>` 的那些行 (当前**仅 B15 一条**)。**按区间豁免而非按行豁免** (落地复审: 按行会连带放行同一行后面追加的新裸引用)。新增须显式加进清单, **不得**放宽成「任意反引号一律豁免」。
+>
+> **落地实现与本节的对应 (落地复审 M4 补 —— 规格描述曾与实现不是同一套)**:
+> - (a) 的「全限定」在实现里钉到字符级: **恰一个 `/`**; repo 段**不含 `.`** (排除「多级路径 + 末段带扩展名 + `#<n>`」这类**路径伪装**); 左边界**显式枚举 ASCII** `(?<![A-Za-z0-9_./-])` 而非 `\w` (Python 的 `\w` 匹配 CJK, 会让「参见10CG/Aria#195」被误判为裸引用)。
+> - (c) 的清单**外置**到调用仓的 **`.aria/bare-issue-ref-allowlist.txt`** —— 脚本随插件分发给第三方, 硬编码本仓字面对采用方既无意义又造成不可预期的豁免。清单**从被扫文件向上找最近的 `.aria/`**, 与 cwd 无关 (显式 `--repo-root=` 优先); 文件缺失 ⇒ 空清单 = 最严格。
+> - 该清单文件是本 Spec 的**主仓新增交付物**, 由 C-9 一并落盘, SC-12 覆盖。
 > **三态**: 目标态 = 本文件 rc 0; **正控** = R3 修订前版 (commit `d81873b^`) rc 1, 命中恰是 R3 审计席点名的 `:130` 两处 + `:156` 一处; **坏实现** = 不排除上述三类的裸 grep ⇒ 它把 `Rule #N` 与 code span 内的逐字引用一并算成裸 issue 引用, **在任何版本上都报非零** ⇒ 判无效。
 > ⚠️ **本处刻意不写坏实现的具体命中数** —— 那是随每次编辑变化的派生物。R4 修订时写死的「9」在 R5 已失效 (实测 12), 因为 R4 自己新增的三行又添了两处 `Rule #N` 与一处裸号命中。**派生数字只由脚本产出, 不进正文** (memory `pasted-evidence-is-derived`, 本 Spec 上第三次犯)。
 > ⚠️ **R4 抓到的自伤**: 上一版把**那个坏实现的命令**写进了本处 (并声称负控是 3), 而 3 是正确实现的输出 —— 手抄命令而非引用实跑的那个 (memory `pasted-evidence-is-derived`)。本处现改为**只引脚本路径, 不复述命令**。
@@ -153,6 +158,9 @@ R1 枚举 5 处 → R1 修订 12 处 → R2 抓到 `SKILL.md:17` (**逃出了判
   - 📌 **为什么它不构成阻塞项** (post_planning R4 GOV 的判断, 与 SC-11 对照): 它测的是**本会话本地插件缓存的新鲜度**, 与本 Spec 代码变更本身的正确性无关 —— 拿它阻塞 C.2 不会多防住任何真实缺陷。SC-11 则直接关系「代码有没有被 AB 充分验证」, 性质不同, 故只有后者阻塞。
   ⚠️ **覆盖面诚实登记 (R4 GOV 逐个读源码所得)**: 这六个 check 合计只覆盖 **23 处版本点里的约 6 处**; 至少 17 处 (**含全部 7 处 aria 子模块点位**) 不受任何机械检测覆盖。⇒ SC-9 的「23 处全同步」**不能只靠这六个 check 判绿**, 必须逐文件 `grep -c` 实测并把 13 行计数贴进 tasks.md (与 gitlink 那条同等对待, 不留不对称缺口)。
 - **不改**: `.aria/triage-*` / `docs/handoff/*` / 本 proposal 引前序版本处 (历史记录; 六个 custom check 按显式文件+窄正则比对, 对这些文件免疫)。
+- **不改, 且显式声明为 SC-1 的非目标面 (落地复审 M6 补 —— 批评席指出「不能既不扫也不声明」)**: `aria-plugin-benchmarks/` 下含同类 CLI-bug 措辞的 **8 个文件**, 按性质分两类:
+  - **5 个是冻结历史**: `ab-workspace/2026-09-05-a1-entry-rule6/skill-snapshot/` 下三份 (openspec-archive 的 SKILL.md 12 处 / CHANGELOG.md 4 处 + phase-d-closer 1 处) 与 `ab-results/2026-03-13/openspec-archive/benchmark.json` 2 处。**它们本来就该含旧文本** —— 那是某次 AB 跑的输入快照与结果存档, 改它们等于篡改评测记录。判据同上一条对 `.aria/triage-*` 的处置。
+  - **3 个是活的 eval 定义**: `openspec-archive/evals/evals.json` (2 处) / `iteration-1/benchmark.json` (2 处) / `iteration-1/eval-2/` 下两份 (各 1 处)。这些是 Rule #6 闸门真正评的语料, **不在本 Spec 修复范围内但已开单**: `10CG/aria-plugin#191` (eval 2「自动修复 CLI 路径 Bug 并归档」的前提随本 Spec 改走 git mv 而失效; 追评论已逐字点名漏掉的源文件 `evals/evals.json`)。
 - **Rule #3 文档同步**: `aria/skills/openspec-archive/CHANGELOG.md` 的 `[Unreleased]` 段须加条目。**已核**: `docs/architecture/*.md` 对归档手法**零命中**; `aria/README.md` / `README.zh.md` 的 openspec-archive 行**在册且带同一句现时声称** ⇒ 已纳入 B16/B17 (R3 RFV-2 订正 —— 上一版的「已核: 名册在册」答的是另一个问题)。
 
 ---
@@ -193,9 +201,9 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
   (b) `Step 4 -` 到 `Step 5 -` 之间**恰 4 条 `断言 N:` 行** (**Phase B 落地复审订正: 原写「恰 3 行」** —— 复审实测 `git mv src dst` 在 dst 已存在为目录时**返回 rc 0** 并把 src 嵌进 dst, 而原三条断言在该坏结果上**全为真** ⇒ 必须加第四条 `proposal.md 直接存在于该层`; 说明性续行不计入断言数)。
   (c) 示例 1 四行**逐行等于**下列目标文本 (基线位置 `:392` `:393` `:394` `:401`):
   - `  Step 3: ✅ git mv → openspec/archive/2026-02-08-cloudflare-access-auto-handling/`
-  - `  Step 4: ✅ 位置校验通过 (目标存在 / 源已消失 / 无 changes/archive/)`
+  - `  Step 4: ✅ 位置校验通过 (目标存在 / 源已消失 / 无 changes/archive/ / proposal.md 在该层)` (**落地复审订正**: 随 Step 4 加第四条断言同步; 三处必须一致否则 SC-3(c) 从恒绿翻恒红)
   - `  Step 5: ⏭️ (已并入 Step 3)`
-  - `  📦 归档路径: openspec/archive/2026-02-08-cloudflare-access-auto-handling` (替换原 `  🐛 CLI bug 已自动修正`)
+  - `  📦 归档方式: git mv` (替换原 `  🐛 CLI bug 已自动修正`; **落地复审订正**: 原目标字面与上一行 `📍 位置:` 取值完全相同 = 零信息量的重复行, 改承载归档方式, 呼应新增的 `archive_method` 字段)
 - **SC-4** (B9, **机械判据**, R3 SCF-5): `keep_changes_copy` 在 SKILL.md 中的命中**全部落在新增小节 `## 已退役配置项` 内** (与 SC-1 同样按标题文本定位), 区段外命中 == 0。
 - **SC-5** (C1 **四态**): 见 Part C1 表, 四态均留实跑输出; 三个坏实现均被拒。**外加 B2 落地后重跑锚点唯一性** (SKILL.md 侧命中数须仍为 1)。
 - **SC-6** (C2 五态): 夹具为冻结快照, 每份注明 `10CG/Aria#<n>` 与抓取时刻; 含合成 `synth-short`。**外加**: `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行的测试数 **非 0**。
@@ -211,7 +219,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
   (b) 另裁 ⇒ 按其裁定补跑 phase-d-closer / state-scanner 套件后方可合并。
   **在取得答复前不得进入 C.2。** 判据可机械核: handoff 里该问题的 owner 答复段非空, 且若为 (b) 则对应 `ab-results/` 目录存在。
   > ⚠️ 上一版把此项写成「advisory, 不阻塞发版」—— R4 GOV 指出那是**一种新形态的自行豁免**: 它不在 `configured-gate-authority.md` 白名单四类 (config 显式 off / adaptive_rules 映射 / 已成文 lane 降级 / 结构性前提不成立) 内, 也没套用 SOT §2 末行「拿不准 ⇒ 照跑」的默认。已改为阻塞。
-- **SC-12** (C3 落盘与三态, R5 补入 —— C3 在 R4 被立为交付物后**无任何 SC 覆盖其落盘**): `check_bare_issue_refs.py` 落到 `aria/skills/state-scanner/scripts/`; 三态留实跑输出 (目标态 rc 0 / 正控 `d81873b^` rc 1 且命中数由脚本产出 (**不写死** —— 实跑 4 处; 原写「恰 3 处」已订正) / 坏实现裸 grep 在任一版报非零 ⇒ 判无效)。**输出里的具体命中数只贴脚本产出, 不写进 proposal 正文。**
+- **SC-12** (C3 落盘与三态, R5 补入 —— C3 在 R4 被立为交付物后**无任何 SC 覆盖其落盘**): `check_bare_issue_refs.py` 落到 `aria/skills/state-scanner/scripts/`, **且主仓 `.aria/bare-issue-ref-allowlist.txt` 落盘** (每条字面须注明来源 task; 本 Spec 归档时该清单条目随之复核); 三态留实跑输出 (目标态 rc 0 / 正控 `d81873b^` rc 1 且命中数由脚本产出 (**不写死** —— 实跑 4 处; 原写「恰 3 处」已订正) / 坏实现裸 grep 在任一版报非零 ⇒ 判无效)。**输出里的具体命中数只贴脚本产出, 不写进 proposal 正文。**
 
 ### 验收项基线实跑 (memory `spec-acceptance-needs-baseline-run`)
 

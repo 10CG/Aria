@@ -45,7 +45,7 @@
 - [x] **B-1** `openspec-archive/SKILL.md:317` `Step2` → `Step 7`
 - [x] **B-4** `:17` → `> **历史**: 2026-02-08 - 初始版本，修复归档目录落点错误 (彼时经由外部工具链, 现已改为 git mv)`
 - [x] **B-7** `:247` → `Step 3 - 执行归档 (git mv):` / `:248` → `  命令: git mv openspec/changes/{change_name} openspec/archive/{YYYY-MM-DD}-{change_name}` / `:249` → `  等待: git mv 返回`
-- [x] **B-8a** `:251-257` 整块 → Step 4 三行断言 (字面见 proposal B8)
+- [x] **B-8a** `:251-257` 整块 → Step 4 **四条断言** (落地复审订正, 原为三条 —— 实测 git mv 静默嵌套时前三条全为真) (字面见 proposal B8)
 - [x] **B-8b** `:259-261` 整块 → `Step 5 - (已并入 Step 3: git mv 使源目录必然消失)`, **其下无正文**
 - [x] **B-10** 示例 1 四行 → 字面见 proposal SC-3(c)
 - [x] **B-15** `phase-d-closer/SKILL.md:41` → 字面见 proposal B15
@@ -118,7 +118,7 @@
 - [x] **C-7** 夹具 → `tests/fixtures/`, **冻结快照**。抓取命令: `forgejo GET /repos/10CG/Aria/issues/<n> | jq -r '.body' > fixtures/issue-<n>.md`, 对 `201` / `185` / `186` 各一份; 每份**首行加注释**记来源 `10CG/Aria#<n>` 与抓取 UTC 时刻。另建合成夹具 `synth-short.md` (回链行尾部含短十六进制 `abc`) —— 真语料证不了长度下限
 - [x] **C-8** C2 五态实跑: `10CG/Aria#201` rc0 / `10CG/Aria#185` rc1 NO_SHA / `10CG/Aria#186` rc1 MISSING / `synth-short` rc1 / body 取不到 rc2
   > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
-- [x] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12)
+- [x] **C-9** `check_bare_issue_refs.py` → `aria/skills/state-scanner/scripts/` (SC-12); **外加主仓 `.aria/bare-issue-ref-allowlist.txt`** (允许清单外置, 脚本零项目专属字面; 落地复审 M4 补)
 - [x] **C-10** C-9 三态留证 (目标态 rc0 / 正控 `d81873b^` rc1, **命中数由脚本产出不写死 —— 实跑 4 处, 原规格写「3 处」已订正** / 坏实现裸 grep 任一版报非零 ⇒ 判无效)。**具体命中数只贴脚本产出, 不写进 proposal 正文**
   > 📄 **实跑输出留证**: [`evidence/phase-b-probe-runs.md`](./evidence/phase-b-probe-runs.md) (由脚本重新实跑生成, 非对话转抄)
 - [x] **C-V1** `bash aria/skills/run_all_tests.sh` 里 `openspec-archive` 那行测试数 **非 0** (基线该行不存在 ⇒ 真红→绿) 🔴 **基线红**
