@@ -284,7 +284,8 @@
   > ⚠️ **`10CG/Aria#165` 形状实测复现**: 服务端合并后 GitHub 镜像**落后 29 个 commit**, 已本地 FF master 并补推 github。
 - [x] **E-10** **逐 remote `ls-remote` 独立核验**两仓, 不信 push 回执 (硬约束 2); gitlink orphan 守卫 (三个子模块 SHA 在两端均可达)
   > ✅ **逐 remote 独立核验** (不信 push 回执): 主仓两端均 `e99f10d9`; aria 两端 master 均 `6726df1f`、tag `v1.73.0` 均 `fde38d0d`。**gitlink orphan 守卫**: 主仓已发布 master 引用的三个子模块 SHA (`aria 6726df1f` / `standards 21748d47` / `aria-orchestrator 237045ac`) 在**各自两端全部可达**。
-- [ ] **E-11** D.1 进度 → D.2 归档 → D.2b release claim → D.3 handoff
+- [x] **E-11** D.1 进度 → D.2 归档 → D.2b release claim → D.3 handoff
+  > ✅ **2026-09-08 实跑**: D.1 (本仓无 UPM 实例, 合法跳过) → **D.2 归档走本 Spec 自己刚定义的流程** (前置 2 断言目标不存在 → `git mv` → Step 4 **五条断言全绿**, 含新加的「无 `{name}/{name}/` 嵌套」→ Step 6 内容完整) → **Step 7 建 tracker `10CG/Aria#210`** 并填 SHA 回链 `e18a0fd`, **本 Spec 新增的回链校验实跑 rc 0**, 而当初立案的两个坏形态 (`10CG/Aria#185` NO_SHA / `10CG/Aria#186` MISSING) 仍被正确拒绝 → **D.2b** claim 释放为 `done` 并 `ls-remote` 回读核验 → **D.3** handoff 落 `docs/handoff/2026-09-08-archive-gate-drift-shipped-v1-73-0.md`, E-V1 六项 grep 逐条核验全中。
 - [x] **E-V1** handoff 须点名六项, **逐项在 handoff 里给可 grep 的锚点**: (1) `SC-11 owner 裁定`; (2) `keep_changes_copy 声明接口移除`; (3) `post_spec converged=false`; (4) `D-6 定时风险`; **(5) `<vNEXT>` (E-4a(ii), 并发轨可见性)**; **(6) `plugin-cache-currency` (E-0/E-6b 两次明文要求的如实登记 —— Rule #10 §5 规定「AI 任何自作主张的流程判断必须写进 handoff 请复议」, 本项是它在本 Spec 里的唯一机械兜底)**。**验收 = 对 handoff 文件 grep 这六个字符串, 缺一即红** (防纯自证) 🔴 **基线**: 本 cycle handoff **尚未写** ⇒ 基线**红**  ⇒ **已写 `docs/handoff/2026-09-07-archive-gate-drift-phase-b-landed-blocked-on-two-owner-gates.md`; 六项 grep 逐条核验全中** (SC-11 owner 裁定 1 / keep_changes_copy 声明接口移除 1 / post_spec converged=false 1 / D-6 定时风险 1 / vNEXT 3 / plugin-cache-currency 1)
 
 ---
