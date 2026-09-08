@@ -153,7 +153,34 @@
   ⚠️ **停在那里时 `plugin-cache-currency` 必然是红的** (E-6b) —— 这是**已知且已登记**的状态, **不得**为了「让它绿」而自行豁免或跳过 (那正是 R4 GOV 逐字点名过的自行豁免形状); handoff 须如实写明该 check 红及其原因。
   > **为什么范围要收到 E-6**: R1 版写「不阻塞 E-2..E-8」是错的 —— **E-7b 就是「子模块本地 merge + 双推」**, 它会在 owner 裁定前把 `<vNEXT>` (含 SC-11 正要问的 B-15 phase-d-closer 与 C-1/C-9 state-scanner 改动) **不可逆地发布到两个公共 remote**。proposal SC-11 明写「取得答复前不得进入 C.2」, 而**子模块合并推送就是 C.2 的一部分**, 不只是主仓 PR 合并。
   > R1 那条修复本身造了一个新的自行豁免 (memory `fix-recurs-in-fallback`: 修复类改动最易在自己新写的兜底路径重犯要治的病)。
-- [ ] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
+- [x] **E-0b** (**post_planning R1 补**) SC-11 若得 (b) 裁定: 补跑 `phase-d-closer` 与 `state-scanner` 两个 AB 套件, 结果同样存 `ab-results/`
+  > 📐 **2026-09-08 主控无条件执行了该分支里唯一能产生信息的那一半** (依据 §2 决策表第四行「拿不准 ⇒ 照跑, 宁跑勿豁」——
+  > 我对 §1「整个变更」的跨 Skill 作用域拿不准, 故按 fail-closed 默认走):
+  >
+  > | 套件 | v_old SKILL.md sha256 | v_new sha256 | `git diff --numstat` | 处置 |
+  > |---|---|---|---|---|
+  > | `openspec-archive` | `5593508c…` | `edba8c5e…` | **63+/34−** | ✅ 已跑 (E-2/E-3) |
+  > | `phase-d-closer` | `550f33b7…` | `4b432573…` | **2+/2−** | ✅ **本轮补跑** |
+  > | `state-scanner` | `cf5257599672ee04…` | `cf5257599672ee04…` | **0+/0−** | ⛔ **不跑, 且理由是结构性的** |
+  >
+  > ✅ **`phase-d-closer` 已补跑** (动态工作流 `wsx95g7gg`), 结果存
+  > `ab-results/2026-09-08-v1.73.0-archive-skill-drift/phase-d-closer-branch-b/`。
+  > **delta 为负** (v_new 4/6 vs v_old 6/6) —— 按 E-3 的「`WITHOUT_BETTER` 逐条解释或回退」判为**解释, 不回退**, 三重独立验证:
+  > (i) 四份答卷 grep `cli bug|自动修正|auto-fix` **全部 0 命中**, 包括**仍持有该声称的 v_old 臂** ⇒ 被改的 2 行对本套件结构不可见;
+  > (ii) prompt 只点名 D.1 而被改的是 D.2 行, 两臂都据此声明 D.2 不跑 ⇒ 连激发条件都不具备;
+  > (iii) 两条 discriminating 的分歧维度 (「PR 归 D.1 还是 D.2」/「未核实输入要不要采信」) 依据的是两版**逐字相同、未被 diff 触及**的 `SKILL.md L183`。
+  >
+  > **负 delta 的真实成因是已在册的 P0 断言缺陷 `10CG/aria-plugin#172`** (「断言奖励虚构 —— 拒绝编造进度的臂 0/3」):
+  > v_new 拒绝采信用户口述的 6 个任务 (`tasks_claimed: 6  # 无 tasks.md 可核, 未采信`) ⇒ fail; v_old 采信 ⇒ pass。本次实证已追进该单。
+  > ⛔ **回退 B-15 = 把一个已不成立的跨 Skill 假声称装回去**, 那是 memory `author-to-match-checker`「让内容迁就检查器」的反面形态。
+  >
+  > ⇒ **SC-11 分支 (b) 已被满足到它物理上能产生信息的极限, 分支 (a) 则是多做了。Rule #6 的完备性问题已由测量闭合, 与 owner 怎么裁无关。**
+  >
+  > **`state-scanner` 那一行是硬证据不是论证**: 两版 SKILL.md **逐字节相同**, `description` 亦零变动 ⇒ 它的 AB 会是
+  > **两个完全一样的臂**, 结构上不可能产生任何区分信号。跑它正是 SOT §3 点名的「测量剧场」, 也是 memory
+  > `false_green_dual_is_permanent_red` 的判据 (「该信号在健康常态下应是什么值」——恒等)。
+  > ⚠️ 这**不是**以成本为由的豁免 (Rule #10 明禁), 是「被测的对象整个未产生」——本 Spec 对 state-scanner 只加了两个
+  > **不被其自身流程调用**的新脚本, 没有动它任何一行运行时指令面。
 > 🛑 **TG-E 的阻塞面 (2026-09-08 订正后: 从两个门减为一个)**:
 >
 > **阻塞 (E-0, SC-11 owner 裁定)** ⛔ 挡 **E-7a 起**的全部步骤 (含子模块本地 merge + 双推 —— 不可逆地发布到两个公共 remote)。

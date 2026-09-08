@@ -173,7 +173,7 @@ SOT: `standards/conventions/skill-benchmark-exemption.md` v1.0.0。**本版按 �
 |---|---|---|---|
 | **openspec-archive** | B1-B14 | **第二行 · 照跑 AB, 零裁量** | B3 改的 `:4` 就是 frontmatter `description`。§2 附加约束逐字: 「**`description` 或指令流程变动 ⇒ 一律第二行**」 |
 | **phase-d-closer** | B15 | 第一行 **substitute** | §2 第一行 + 附加约束: 改的是**描述另一 Skill 职责**的表格行 = 事实性同步 (术语修正), 且 phase-d-closer 自己的 `description` **零变动**。substitute 物 = SC-1 的机械判据 |
-| **state-scanner** | C1 **与 C3** 落点 | 第一行 **substitute** | **R3 RFV-6 补入, R5 补 C3**: 两者都是纯新增探针脚本, 不被 state-scanner 自身流程调用, 其 `SKILL.md` 与 `description` **零变动**。判据同 v1.69.1 对 `spec_complete.py` 的处置。substitute 物 = SC-5 (C1 **四态**) 与 SC-12 (C3 三态) 的实跑 |
+| **state-scanner** | C1 **与 C3** 落点 | 第一行 **substitute** | **R3 RFV-6 补入, R5 补 C3; 2026-09-08 由测量升级为硬证据**: 两者都是纯新增探针脚本, 不被 state-scanner 自身流程调用, 其 `SKILL.md` 与 `description` **零变动**。⇒ **该侧 AB 的两臂会是逐字节相同的同一份 SKILL.md** (实测 `git -C aria show origin/master:skills/state-scanner/SKILL.md \| sha256sum` == 当前版 sha256, 均为 `cf5257599672ee04…`, `git diff --numstat` = **0+/0−**) —— 两个相同的臂**结构上不可能产生任何区分信号**, 跑它是 §3 明确警告的测量剧场, 不是「值不值得跑」的成本判断。判据同 v1.69.1 对 `spec_complete.py` 的处置, 且同 memory `false_green_dual_is_permanent_red`。substitute 物 = SC-5 (C1 **四态**) 与 SC-12 (C3 三态) 的实跑 |
 | README ×2 | B16/B17 | 不适用 | 非 Skill 内容 (插件门面文档), 不在 Rule #6 判据表覆盖范围 |
 
 **⇒ 只跑 openspec-archive 一个套件。** 三侧的档位各自来自 §2 的**明文映射**, 无一依赖跨 Skill 推演。

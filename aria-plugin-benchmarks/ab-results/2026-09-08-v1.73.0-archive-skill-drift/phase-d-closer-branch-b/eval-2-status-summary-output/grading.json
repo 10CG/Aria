@@ -1,0 +1,49 @@
+{
+  "eval_id": 2,
+  "eval_name": "status-summary-output",
+  "changed_surface_under_test": {
+    "diff": "aria/skills/phase-d-closer/SKILL.md:41 (commit 2b67ac6) — D.2 表格行去掉「自动修正 CLI bug; 」前缀",
+    "v_old_line": "| D.2 | openspec-archive | Spec 归档 (自动修正 CLI bug; **#95 完成度 + C 分级证据闸 tri-state verdict, verdict=block 时本步 BLOCK**) | spec_archived |",
+    "v_new_line": "| D.2 | openspec-archive | Spec 归档 (**#95 完成度 + C 分级证据闸 tri-state verdict, verdict=block 时本步 BLOCK**) | spec_archived |",
+    "mechanical_probe": {
+      "grep_pattern": "CLI bug|自动修正|auto-fix|autofix|git mv|归档位置",
+      "v_old_answer_hits": 0,
+      "v_new_answer_hits": 0,
+      "note": "两臂答卷对 openspec-archive 的 5-6 处提及全部围绕 tri-state verdict / Step 1 escape-hatch / Step 7 auto-issue; 唯二 'CLI' 字样是 D.2b 的 release_gate CLI, 与被改那句无关"
+    }
+  },
+  "per_expectation": [
+    {
+      "expectation": "Output should have a clear closure summary heading",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "semantic_tier_v_new": "T1 — 显式 banner 标题 + 内嵌结论行",
+      "semantic_tier_v_old": "T1 — 显式 banner 标题 + 执行计划",
+      "reason": "两臂开篇是同一形状的 ASCII banner, 逐字同串: v_old L3 `║              PHASE D - CLOSURE                               ║` 配 L4 `║              Spec: add-payment-gateway                       ║`; v_new L3 同一 banner 串, 配 L6-L9 `Spec:  add-payment-gateway` / `Repo:  /home/dev/Aria` / `时刻:  2026-09-08 12:31 UTC` / `结论:  部分完成 ——`。差别仅在结论摘要的挂载位置 (v_new 挂进 banner; v_old 挂在尾部 `### 本报告的证据分级 (免得你把推测当结论用)`), 属同档内排版变体, 不是档位差。两臂均满足「清晰的收尾摘要标题」。"
+    },
+    {
+      "expectation": "Report should cover both D.1 and D.2 outcomes",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "semantic_tier_v_new": "T1 — D.1/D.2 各有独立小节 + 结论 + 实测依据 + 结构化字段",
+      "semantic_tier_v_old": "T1 — D.1/D.2 各有独立小节 + 结论 + 实测依据 + 证据分级",
+      "reason": "v_new: `### D.1 进度更新 — SKIPPED (无 UPM)` 列三条路径全零命中, `### D.2 Spec 归档 — PENDING, 未归档 (且**不是** BLOCK)` 给四出口表 + 第五种情形「gate 没跑, 所以没有 verdict」, YAML 里 `upm_updated: false` / `gate_verdict: null       # 未运行, 不是 pass/warn/block`。v_old: `## D.1 progress-updater — ⏭️ SKIPPED (已实测)` 表格列两条 canonical 路径 `→ **missing**`, `## D.2 openspec-archive — ⛔ PENDING GATE (归档**尚未发生**)` 给同一张四路路由表并写「我这轮没有取到 `add-payment-gateway` 的 gate 真实 stdout, 所以只能把路由决策面完整交出来, 不能填一个我没测过的 verdict」。两臂都逐步覆盖 D.1 与 D.2 并拒绝伪造 verdict, 同档。"
+    },
+    {
+      "expectation": "Report should indicate what happens after Phase D",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "semantic_tier_v_new": "T1 — 有序 6 条下一步 + 显式终局声明",
+      "semantic_tier_v_old": "T1 — 有序 6 条下一步 + carry-forward 内容",
+      "reason": "v_new `## 五、下一步 (按顺序)` 6 条 (确认 spec 归属 → 跑 D.2 gate 四路路由 → D.2b → 「**写 D.3 handoff** 到 `docs/handoff/`」→ D.4 → 修 `session.started_at`), 另有 L181 `context_for_next: null       # Phase D 是最后阶段`。v_old `## ▶️ 下一步 (按顺序)` 同为 6 条 (跑 D.2 gate → 按 verdict 落子 → D.2b → D.3 → D.4 → 「归档若被 BLOCK 或走了 `--archive-design-only`, 该决定必须写进 handoff 请复议」), 另有 L94 「carry-forward 至少要带: D.1 因无 UPM 而跳过 (下个 session 别去找 UPM)」。两臂都给出等深度的后续路径与下游交接对象; v_new 多一句「Phase D 是最后阶段」、v_old 多一句 carry-forward 清单, 属同档内互有增补, 不构成档位差。"
+    }
+  ],
+  "v_new_pass": 3,
+  "v_old_pass": 3,
+  "total": 3,
+  "discriminating_count": 0,
+  "verdict_on_coverage": "零覆盖: 三条 expectation 没有任何一条触及 D.2 行对 openspec-archive 职责的描述 —— 它们只问「有没有收尾标题」「有没有覆盖 D.1/D.2」「有没有说后续」, 全部是报告骨架层的存在性判据, 与「openspec-archive 会不会自动修正 CLI bug」这个跨 Skill 能力声称正交。机械核验更强: 两臂答卷对 `CLI bug|自动修正|auto-fix|git mv|归档位置` 均 0 命中, 连仍带着那句声称的 v_old 臂都自发把 D.2 概括成「Spec 归档 (tri-state verdict 闸)」, 从未把 CLI-bug 声称传出来。因此本套件对这 2 行改动结构上不可见, 零区分力是预期结果, 它支撑本 Spec 把 phase-d-closer 侧判为「描述性 ⇒ substitute」的裁定, 而非推翻它。"
+}
