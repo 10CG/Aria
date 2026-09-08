@@ -34,6 +34,20 @@ updated-at: 2026-09-07T14:54:10Z
 - **TG-D 6 张单**: `10CG/aria-plugin#190` `10CG/aria-plugin#191` `10CG/aria-plugin#192` `10CG/aria-plugin#193` · `10CG/aria-standards#21` · `10CG/Aria#208`, 全部回读核验
 - 验收: SC-1 区段外 **15 → 0** / SC-2 命中 1 / SC-3 (a)0行 (b)3行 (c)4/4 / SC-4 全落新小节 / C-V1 `openspec-archive OK (6 tests)` (基线该行不存在) / C-V3 `status == pass` / 全套件 **2122 → 2128**, 11 OK / 0 FAIL
 
+**Phase B 落地复审 (2026-09-08, agent team)** —— 提交 `d650f8d` (子模块) / `539f875` (主仓):
+
+上面那批 TG-B/TG-C/TG-D 交付物**全部是主控单线做的, 没有第二双眼睛看过**。按本 session 自己刚沉淀的判据 (「席位都看过前几轮时 0C+PASS 不是收敛证据」), 拉了 6 席 agent team 按交付域复审 (58 agent / 6.1M subagent token), **5 席 FAIL**, 37 条原始 → 33 去重 → **28 条存活**, 全部处置。
+
+抓到的实缺陷里最要命的四条:
+- **三处硬编码 `v1.72.0`** 落在 SKILL.md 正文 —— 正是 proposal 逐字 ⛔ 禁止、并发轨 `10CG/Aria#195` 正在争的号, 且它**不在 E-5 的 13 文件同步清单里、六个版本 check 也够不着** ⇒ 会静默 ship。
+- **Step 3/4 的守卫对真实失败态失明**: 实测 `git mv src dst` 当 dst 已存在为目录时**返回 rc 0** 并把 src 嵌进去, 而我写的三条断言在该坏结果上**全为真**。已加 Step 3 两条前置 + Step 4 断言 4。
+- **Step 7 的校验行排在创建 issue 之前**, 而 `{number}` 此刻无绑定 ⇒ 逐字执行必 rc 2, 而同段自己规定 rc≠0 判 FAIL。已整段后移并绑定来源。
+- **`check_bare_issue_refs.py` 自称 fail-CLOSED 却有三个 fail-OPEN 洞** (路径伪装被当全限定 / 白名单整行豁免 / 项目专属字面硬编码进分发脚本)。已逐条封死并把白名单外置到 `.aria/bare-issue-ref-allowlist.txt`。
+
+另有一条**被反驳席杀错、我自己复核后判成立**的: C-3/C-8/C-10 三项验收逐字写「留证」, 我勾了框但**仓内零输出**。已补 `evidence/phase-b-probe-runs.md` (12 态, 由脚本重新实跑生成)。
+
+对外订正四条追评论, 其中 `10CG/Aria#208` 是**根因写错了** —— 举证物是个已交付的 Python 文件, 真因是「符号名→定义」的解析方式而非交付物语言。
+
 ---
 
 ## §2 未完成 / Carry-forward — **两个门, 都要 owner**
@@ -105,8 +119,8 @@ tasks 把它设计成「如实登记 STALE + handoff 点名」而非阻塞项。
 
 | 仓 | SHA | 说明 | 推送状态 |
 |---|---|---|---|
-| `10CG/Aria` (主仓) | `338436d` `cfa182e` `91acb1d` `567aa1e` `d2d93da` `f2e83fc` | R4/R5 审计 + 类级 sweep + Phase B | **未推** (feature 分支) |
-| `10CG/aria-plugin` (aria) | `2b67ac6` | TG-B 18 hunk + TG-C 三探针 | **未推** (feature 分支, E-7b 才双推) |
+| `10CG/Aria` (主仓) | `338436d` … `f2e83fc` `7cf81a3` **`539f875`** | R4/R5 审计 + 类级 sweep + Phase B + **落地复审修复** | **未推** (feature 分支) |
+| `10CG/aria-plugin` (aria) | `2b67ac6` **`d650f8d`** | TG-B 18 hunk + TG-C 三探针 + **复审修复** | **未推** (feature 分支, E-7b 才双推) |
 | `10CG/aria-standards` | — | 本 cycle 未改 | — |
 
 ---
