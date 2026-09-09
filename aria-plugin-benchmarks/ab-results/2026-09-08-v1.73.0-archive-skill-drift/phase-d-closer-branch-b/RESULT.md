@@ -4,7 +4,7 @@
 |---|---|
 | 跑于 | 2026-09-08 |
 | 为什么跑 | SC-11 的分支 (b) 要求「补跑 phase-d-closer / state-scanner 套件」。主控**无条件**执行了该分支里唯一能产生信息的那一半 —— 依据 SOT §2 决策表第四行「拿不准 ⇒ **照跑** (宁跑勿豁)」 |
-| 两臂 | v_new = 本 Spec 落地后 · v_old = `aria origin/master` (= v1.71.1) |
+| 两臂 | v_new = 本 Spec 落地后 · v_old = `aria` `301641b` (= v1.71.1, 跑时的 `origin/master`; `git -C aria show 301641b:skills/phase-d-closer/SKILL.md` sha256 `550f33b7dfc5d50dd441507df1b24aa6131671e45b8a888daba072ce211ab547`) — 2026-09-09 由可变 ref 勘正为不可变 SHA |
 | 两版 SKILL.md 差异 | **2+/2−** (B-15 那一行) |
 
 ## 记分

@@ -5,7 +5,7 @@
 | 跑于 | 2026-09-08 |
 | Skill | `openspec-archive` |
 | 套件 | `ab-suite/openspec-archive.json` (`source_evals_count=4`, `selected_count=2`) |
-| 两臂 | **v_new** = 本 Spec 落地后的 SKILL.md · **v_old** = `aria origin/master` 版 (= v1.71.1) |
+| 两臂 | **v_new** = 本 Spec 落地后的 SKILL.md · **v_old** = `aria` `301641b` 版 (= v1.71.1, 跑时的 `origin/master`) — 2026-09-09 由可变 ref 勘正为不可变 SHA, 同 :62 |
 | 两版差异 | `git -C aria diff --numstat origin/master HEAD -- skills/openspec-archive/SKILL.md` = **63+ / 34−** |
 | 触发理由 | Rule #6 第二行「照跑 AB, 零裁量」—— B3 改了 frontmatter `description` |
 
@@ -59,5 +59,5 @@ AB 跑在**真仓 + 真 origin + 无 sandbox**。跑完实测:
 
 ## 原始产物
 
-- 工作区: `ab-workspace/2026-09-08-archive-skill-drift/` (ARM_INSTRUCTIONS / GRADER_INSTRUCTIONS / skill-snapshot) —— ⚠️ **该目录被 `.gitignore:37` 排除, 不入库**, 本目录下已收录全部承重产物 (逐 eval 的 prompt / grading.json / 两臂 answer.md); v_old 的 SKILL.md 可由 `git -C aria show origin/master:skills/openspec-archive/SKILL.md` 复现 (跑时 aria origin/master = v1.71.1)
+- 工作区: `ab-workspace/2026-09-08-archive-skill-drift/` (ARM_INSTRUCTIONS / GRADER_INSTRUCTIONS / skill-snapshot) —— ⚠️ **该目录被 `.gitignore:37` 排除, 不入库**, 本目录下已收录全部承重产物 (逐 eval 的 prompt / grading.json / 两臂 answer.md); v_old 的 SKILL.md 可由 `git -C aria show 301641b:skills/openspec-archive/SKILL.md` 复现 (`301641b` = v1.71.1, 跑时的 `aria origin/master`; sha256 `5593508c02a1c0d39b088e901c97427248f5bb2697199282ddd04bf651825624`)。⚠️ **2026-09-09 勘正**: 原文写的是 `origin/master` —— 那是**可变 ref**。v1.73.0 合入 master 后该命令返回的是 **v_new** (实跑 rc=0, 与当时工作树逐字节相同, 静默给出错误的臂)。复现命令一律钉不可变 SHA。
 - 本目录下按 eval 收录: `prompt.txt` / `grading.json` / `v_new/answer.md` / `v_old/answer.md`
