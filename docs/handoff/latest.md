@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-08-archive-gate-drift-shipped-v1-73-0.md](./2026-09-08-archive-gate-drift-shipped-v1-73-0.md) — archive-gate-registration-class-and-skill-drift @ phase=D (status=done) — **68/69, 已归档**: aria-plugin **v1.73.0 已双推到两个公共 remote** (tag `fde38d0`, master `6726df1`), 主仓 PR `10CG/Aria#209` merged `e99f10d`, 两端 `ls-remote` 核验一致 + 三个 gitlink orphan-free。三轮 agent team 复审共 58 条 finding 全部处置 —— **发布前那一轮拦下 6 个 Critical**, 最要命的是我自己加的断言 4 在它唯一存在理由的场景里是绿的。唯一未勾的 `E-0` 是等 owner 裁 SC-11 的規范空白, **不阻塞已发布的东西**。 updated=2026-09-08
+**Latest**: [2026-09-09-session-close-three-review-rounds-and-two-self-inflicted-gates.md](./2026-09-09-session-close-three-review-rounds-and-two-self-inflicted-gates.md) — archive-gate-registration-class-and-skill-drift @ phase=D (status=done) — **会话收尾**: 本对话把 Spec 从 post_planning R4 推到 68/69 并归档, 发布 **aria-plugin v1.73.0** 到两个公共 remote。三轮 agent team 复审共 58 条 finding 全部处置, **发布前那轮拦下 6 个 Critical**。⚠️ **我造了两道 SOT 不要求的闸门并用它们阻塞了自己**, 成因同为「采纳了事实正确但推理断裂的 finding」。§2 有 **5 条我自己开的口子没闭** (只活在 handoff 文字里, 无机械物)。周期维度见 2026-09-08 那份。 updated=2026-09-09
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
