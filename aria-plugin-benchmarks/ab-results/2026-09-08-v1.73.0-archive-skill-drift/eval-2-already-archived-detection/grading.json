@@ -1,0 +1,32 @@
+{
+  "eval_id": 2,
+  "eval_name": "already-archived-detection",
+  "per_expectation": [
+    {
+      "expectation": "Should detect that spec is already archived",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "reason": "两臂都跑了同一条锚定前置并给出同向判定 —— v_new「**未检出已归档** (`already_archived = false`) —— 归档前置放行」, v_old「零命中 (exit 1)…判定: **未触发 `BLOCKED-already-archived`**, precheck 放行」; 真实仓里 user-auth 本就未归档, 两臂同为 live 形态、同档否证场景前提, 该条对本次改动零区分力。"
+    },
+    {
+      "expectation": "Should prevent creating a duplicate archive",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": true,
+      "reason": "pass/fail 打平 (两臂都给出 Step 1 命中即 abort 的防重), 但语义分档不同: v_new 是双检查点 + 失败形状已知 —— 「`git mv src dst` 在 dst **已存在为目录**时 **返回 rc 0**, 并把 src **嵌进** dst 里」故「检测点是两个… **Step 3 前置 2** —— `git mv` 之前**再查一次**…防 Step 1 到 Step 3 之间的竞态」, 且第 6 节点明「四条断言」里只有断言 4 会红; v_old 只有单检查点, 其「分两处」是 Step 1 目录去重 + 「**Step 7 tracker issue 去重**」两个不同对象, 结构上无从知道 git mv 的静默嵌套。差异逐字落在 v_new SKILL.md 新增的 Step 3 前置 2 / Step 4 断言 4 上, 属改动导致而非措辞冗长。"
+    },
+    {
+      "expectation": "Should report where the existing archive is located",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "reason": "两臂同档报出 canonical 落点 + 同一实测语料 + 同一诊断: v_new「canonical 落点形态是 `openspec/archive/YYYY-MM-DD-{change_name}/`」「当前 `openspec/archive/` 下 145 个条目里没有 `YYYY-MM-DD-user-auth`」「裸名 `openspec/archive/user-auth`: **不存在**」, v_old「归档条目带日期前缀 (`openspec/archive/YYYY-MM-DD-user-auth/`)」「共 145 个条目 = 144 个目录 + 1 个 README.md, 目录命名 100% 是 `YYYY-MM-DD-{change_name}` 形态」「你给的裸路径 `openspec/archive/user-auth` | 不存在」; v_new 多出的 UTC 取日期细节是同档内的细化, 不构成分档差。"
+    }
+  ],
+  "v_new_pass": 3,
+  "v_old_pass": 3,
+  "total": 3,
+  "discriminating_count": 1,
+  "verdict_on_coverage": "三条 expectation 的 pass/fail 打平 3-3, 本 eval 对本次改动的**记分区分力为零**; 唯一真实分档差落在 expectation 2 (v_new 双检查点 + git mv rc-0 静默嵌套 + 断言 4 承重, v_old 单检查点), 它只覆盖到六条改动里的第 1、2 条 (Step 3 改 git mv / Step 4 四条断言), 且是 v_new 臂自愿多说出来的 —— 没有任何一条断言去点它, 所以现行记分法把这两条改动也算成 0。第 3、4 条 (Step 5 并入 Step 3 / Step 7 SHA 占位串 + `archive_tracker_verify.py`) 在两臂答卷里零字提及, 结构性漏测 —— 本 eval 是纯只读检测题, 根本走不到执行与 Step 7; 第 5 条 (退役 `keep_changes_copy`) 有干净可观测的漂移标记 (v_old 逐字列出「`skip_verification` / `keep_changes_copy` / `dry_run` /…」, v_new 列「五个 options」且无它) 却无断言承接; 第 6 条 (frontmatter description 删「自动修正 CLI bug」) 因 ARM 直接被喂 SKILL_MD 路径, 触发面按构造被绕过, 本套件永远测不到。处置建议按 AB_TEST_OPERATIONS「Expectations 编写原则」是**拆条而非删条**: 把 expectation 2 细化成能钉住第二检查点 / git mv 静默嵌套 / 断言 4 的断言, 另补执行态与 Step 7 的 eval case —— 支撑已开的套件缺口单 10CG/aria-plugin#190。"
+}

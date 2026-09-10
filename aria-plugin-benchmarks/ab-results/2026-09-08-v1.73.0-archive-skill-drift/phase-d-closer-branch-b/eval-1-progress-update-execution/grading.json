@@ -1,0 +1,64 @@
+{
+  "eval_id": 1,
+  "eval_name": "progress-update-execution",
+  "graded_at": "2026-09-08",
+  "grading_standard": "两臂都因『本仓无 UPM 实例文档』合法 skip 了 D.1, 均未落盘任何文件。若按字面『是否真写入进度记录』判, 三条对两臂全 fail, 信号归零且掩盖两卷实际差异。故采用统一放宽标准: expectation 判 pass 当且仅当答卷 (a) 真执行了, 或 (b) 把该项作为『待落盘的 D.1 写入内容』具体点名了字段与取值; 若答卷明确把该项排除在 D.1 写入之外或拒绝采信, 判 fail。两臂同标准。",
+  "diff_under_test": {
+    "files": ["aria/skills/phase-d-closer/SKILL.md"],
+    "hunks": [
+      "L41 D.2 行: 删除『自动修正 CLI bug; 』(对 openspec-archive 的跨 Skill 职责声称)",
+      "L282 参考链接: #95 Spec 路径 openspec/changes/ → openspec/archive/2026-07-05-"
+    ],
+    "nature": "描述性 (跨 Skill 职责声称勘正 + 失效路径勘正), 无运行时指令面变动"
+  },
+  "per_expectation": [
+    {
+      "expectation": "Should update the spec progress to 'completed' or 'merged' status",
+      "v_new": "pass",
+      "v_old": "pass",
+      "discriminating": false,
+      "semantic_tier": {
+        "v_new": "B — 未落盘, 但具体点名了 completed 状态的写入内容",
+        "v_old": "B — 未落盘, 但具体点名了 merged 状态的写入内容"
+      },
+      "reason": "两臂同档。v_new L70: 『同时把对应 Story 标 `[x] COMPLETED` 并挂 `archive: openspec/archive/oauth2-social-login/`』—— 明确给出 COMPLETED 状态。v_old L60 表格行: 『`kpiSnapshot` | 记 spec=oauth2-social-login, PR #143 merged to main | 合并事实进快照』—— 明确把 merged 事实写进快照。两卷都先声明 D.1 skip (v_new L13 『⏭️ D.1 跳过 → 无 UPM 配置』/ v_old L35 『⏭️ D.1 跳过 → 本仓找不到 UPM 实例文档』), 都只是备好待落盘内容, 落在同一语义档。"
+    },
+    {
+      "expectation": "Should record the PR number in progress tracking",
+      "v_new": "fail",
+      "v_old": "pass",
+      "discriminating": true,
+      "semantic_tier": {
+        "v_new": "C — 显式把 PR 号排除在 D.1 写入之外 (判给 D.2)",
+        "v_old": "B — 把 PR 号列为 D.1 kpiSnapshot 的待写值"
+      },
+      "reason": "v_old L60 把 PR 号放进 D.1 的写入内容: 『`kpiSnapshot` | 记 spec=oauth2-social-login, PR #143 merged to main』⇒ pass。v_new 反向: L37 『PR #143 我也没去核 (D.1 本身不依赖它, 它是 D.2 归档时记录 commit info 用的)』, L56 结构化结果里把它放进 `inputs_unresolved`: 『pr: \"#143 merged to main\"  # 本次未核 (D.1 不消费)』, 且 L62-68 列的 5 个待写字段里 kpiSnapshot 注为『覆盖率等指标 (需你给或指明来源)』, 不含 PR ⇒ fail。⚠️ 该差异与被测 2 行无关: 分歧点是『PR/commit info 归 D.1 还是 D.2』, 而两版 SKILL.md 的 L183 同字同句 (『UPMv2-STATE 5 字段…Spec 归档 4-step (…记录 commit info)』) 未被本次 diff 触及 —— 按该行, v_new 的归属判断反而更贴 SKILL.md。属 run-to-run 方差, 非改动效应, 且方向对 v_new 不利。"
+    },
+    {
+      "expectation": "Should mark all 6 tasks as completed in the progress record",
+      "v_new": "fail",
+      "v_old": "pass",
+      "discriminating": true,
+      "semantic_tier": {
+        "v_new": "C — 点名 completedTasks 字段但显式拒绝采信那 6 项",
+        "v_old": "B — 把 +6 作为 completedTasks 的待写具体取值"
+      },
+      "reason": "v_old L59 给出具体取值: 『`completedTasks` | +6 (oauth2-social-login 全部 6 项) | 按你给的 \"All 6 tasks complete\"』⇒ pass (其 L74 『\"6 个任务全完成\" 目前只是你的口述, 不构成归档依据』只作用于 D.2 归档闸, 未撤回 D.1 的 +6)。v_new 拒绝采信: L37 『所以我**没有**编造 `TASK-001 ~ TASK-006` 填进去』, L55 『tasks_claimed: 6  # 无 tasks.md 可核, 未采信为 completedTasks』, L67 只写『`completedTasks` — 追加本 cycle 的 6 个任务 ID (需 `tasks.md` 或你直接给 ID)』, 取值悬空 ⇒ fail。⚠️ 同 E2: 分歧维度是『对未核实输入的采信严格度』, 被测 2 行 (openspec-archive 的 CLI bug 声称 / #95 路径) 与之毫无接触面, 属方差。"
+    }
+  ],
+  "v_new_pass": 1,
+  "v_old_pass": 3,
+  "total": 3,
+  "discriminating_count": 2,
+  "coverage_of_diff": {
+    "expectations_touching_the_diff": 0,
+    "answers_mentioning_the_changed_text": 0,
+    "evidence": [
+      "三条 expectation 全部指向 D.1 的进度写入 (status / PR 号 / 6 任务), 无一条提及 D.2、openspec-archive 职责, 或 CLI bug 自动修正。",
+      "prompt.txt 只点名 D.1 (『Execute Phase D D.1』), 两臂都据此声明 D.2 本次不跑 (v_old L8 / v_new L9), 被改的 D.2 表格行天然在被评范围外。",
+      "对两份答卷 grep `cli|bug|自动修正|openspec-archive|归档`: 零命中『自动修正 CLI bug』或任何 CLI 自动勘误声称。关键反证 —— v_old 的 SKILL.md 里那句声称在场, 它的答卷仍未复述它 (v_old 仅在 L74-78 谈 D.2 的 verdict 闸), 说明该文本在本 eval 的激发条件下根本不进输出。",
+      "L282 的 #95 Spec 路径勘正同样零触及: 两卷都未引用该路径。"
+    ]
+  },
+  "verdict_on_coverage": "这套 eval 没有任何一条 expectation 触及那 2 行改动。三条 expectation 全在 D.1 的进度写入面 (completed/merged 状态、PR 号、6 个任务), 而被改的是 D.2 表格行对 openspec-archive 的职责描述 (『自动修正 CLI bug』) 与一条 #95 Spec 参考路径 —— prompt 只点名 D.1, 两臂都据此声明 D.2 不跑, 被改文本连进入输出的激发条件都不具备; grep 两份答卷零命中『自动修正 CLI bug』, 且持有该声称的 v_old 也从未复述它, 是最硬的反证。实测两条 discriminating (E2/E3) 不是改动效应: 分歧维度是『PR/commit info 归 D.1 还是 D.2』与『未核实输入要不要采信』, 依据的是两版逐字相同、未被 diff 触及的 SKILL.md L183, 且方向对 v_new 不利 —— 属 run-to-run 方差。结论: 本 eval 对本次改动的区分力为零, 这支撑 Spec 把 phase-d-closer 侧判为『描述性 ⇒ substitute (SC 级 baseline-failing 结构化测试替代)』, 而非推翻它。"
+}
