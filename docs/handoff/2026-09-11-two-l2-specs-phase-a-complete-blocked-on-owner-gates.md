@@ -3,7 +3,7 @@ track-id: two-l2-specs-195-199-phase-a
 owner-container: aria-runner-bot/bfe8285d
 phase: A
 status: active
-updated-at: 2026-09-11T00:20:00Z
+updated-at: 2026-09-11T16:35:00Z
 ---
 
 # Aria — Session Handoff (2026-09-11, 会话收尾) — 两份 Level 2 Spec 的 Phase A 各跑满 5 轮 post_spec, 双双停在 owner 裁决面
@@ -102,7 +102,7 @@ updated-at: 2026-09-11T00:20:00Z
 
 ## §4 实战教训 (memory 沉淀来源)
 
-[候选 memory]
+[候选 memory] — **收尾第二轮 (16:2x) 已落 4 条新文件 + 1 条扩写, 详见 §8; 索引零新增行**
 
 - **收敛判据的分母是 Major 归零, 不是「还能不能找到问题」** —— `unanimous_pass` 要求 `vote == PASS`, 而 `vote == PASS` 要求 C 与 M 同时为 0。两份 spec 的 Critical 都已归零 (2→3→0→1→0 / 5→2→3→0→0) 而 Major 从未归零, 于是五轮 Vote 恒 `REVISE 5`。**「max_rounds 耗尽」与「审计失败」是两件事**, 报告时不可混。建议 type: `feedback`
 - **长周期 spec 必须把「触点文件集」成表** —— 否则每次基线复核的过滤面由执笔者临场重建, 必然漏检。我 09-10 只 diff 了 5 个代码落点就断言「触点零漂移」, 完整引用面实为 7 文件 / 118 增 / 27 删。建议 type: `feedback`
@@ -184,9 +184,21 @@ bf42cf4  docs(spec): #199 R5 rework v6 — 终局记录 + 全文自引锚点化
 
 ---
 
-## §8 Memory entries this session (0 new, 6 候选待写)
+## §8 Memory entries this session (4 new + 1 扩写, 索引零新增行)
 
-本 session **未写 memory 文件**。§4 列了 6 条候选 + 2 条未写下经验。建议下个 session 开头先把 §4 的前 4 条落成 memory (收敛判据 / 触点集成表 / 禁自引行号 / workflow 失败上限), 它们都是可复用且已被本 session 实证的。
+收尾第二轮 (2026-09-11 16:2x) 补齐了 §4 的候选, **4 条新 memory + 1 条扩写**, 索引条目**全部并入既有同主题行** (MEMORY.md 仍 148 行, 20483 → 21535 bytes, 硬上限 24.4KB 内):
+
+| 文件 | 一句话 | 并入索引哪一行 |
+|---|---|---|
+| `feedback_convergence_denominator_is_major_zero.md` | 收敛的分母是 Major 归零 (vote=PASS 要求 C 与 M 同时为 0) ⇒ Major 不清空则结构上不可能收敛, 与质量曲线脱钩; 「max_rounds 耗尽」≠「审计失败」 | 与 `audit_convergence_patterns` / `convergence_needs_zero_rework_round` 同行 |
+| `feedback_spec_must_enumerate_touchpoint_file_set.md` | 长周期 spec 必须把触点文件集按仓成表, 否则每次基线复核的过滤面临场重建必漏检; 「零漂移」全称句要限定到实际 diff 过的集合 | 与 `baseline_corpus_stat_must_run_against_frozen_snapshot` 同行 |
+| `feedback_long_docs_must_not_self_reference_line_numbers.md` | 长文档禁用自引行号 (每轮编辑集体腐坏, 多轮多席审计抓不到 — 469 行里 26 处自引无一正确); 改锚点式 | 与 `grep_window_truncation_breeds_false_corpus_evidence` 同行 |
+| `feedback_coordination_ref_divergence_needs_union_merge.md` | `refs/aria/coordination` 分叉须按 claim 路径做并集合并 (非重试非 force); `phase1_gate` exit 0 仍可能 `push_success=false`, 必读 JSON | 与 `partial_push_creates_mirror_divergence` 同行 |
+| `feedback_workflow_transient_api_null_guard.md` (**扩写**) | 追加第 4/5 条: 轮次「作废重试」必须配连续失败上限 (持久故障如额度耗尽会空转到 1000 agent 上限, 989 vs 47 实测); 额度有单模型与周限额两层, 表现相同处置不同 | 原行 description 补句 |
+
+**仍未写下的两条** (§4 末段): 「审计轮次的透镜应随轮次演进」(需第三份 spec 的数据才够立论) 与「同容器内多轨的 `<vNEXT>` 取号协调」(等本次 owner 定了取号顺序再看是否成规律)。这两条**有意不写** —— 证据量还不够支撑一条通则。
+
+§4 六条候选中另两条 (「AI 裁定须附可证伪反证据」) 经复核与既有 `feedback_never_write_unverified_impossibility_claims` / `feedback_ai_must_not_self_exempt_enabled_gates` 覆盖面重叠, 不另立条目。
 
 ---
 
