@@ -3,7 +3,7 @@ track-id: collision-dedupe-test-clock-asymmetry
 owner-container: simonfish/023236f2
 phase: C
 status: done
-updated-at: 2026-09-10T01:12:11Z
+updated-at: 2026-09-11T04:30:44Z
 ---
 
 # Aria — Session Handoff (2026-09-10, session-closer 会话收尾) — 五条口子全部落成机械物, 外加一个正在按日历腐烂的测试套件
@@ -18,6 +18,7 @@ updated-at: 2026-09-10T01:12:11Z
 1. **已进 master 未发版**: `aria-plugin` `f314785` (collision_dedupe 测试时钟修复) + 主仓 gitlink `c02b0ef`。owner 裁定本轮不发版 ⇒ **已发布的 v1.73.0 与采用方装的副本仍是红的**, `aria-plugin#194` 保持 open。
 2. **四张新单**: `aria-plugin#194` (时钟半冻结) · `aria-plugin#195` (协调板权威 remote 无校验) · `Aria#211` (Rule #6 description 面测不到) · 外加 6 条证据评论。
 3. **🔐 一次假警报 (已查实并撤销)**: 我一度报「secret rotation 逾期 38 天」—— **错的**。canonical record `.aria/decisions/2026-05-02-secret-rotation-deferred.md` §Resolution 写着 **Resolved 2026-05-22**, 4 key 已全部处置。根因是 memory fact 文件停在 05-20 快照、未跟进闭环。已修 memory + 索引; 教训见 §4.7。
+4. **⚠️ 并发容器已恢复并 ship** (2026-09-11 合表时发现): `aria-runner-bot/bfe8285d` 于 09-10 起推了 13 个 commit, 两份 L2 Spec (#195/#199) 各跑满 post_spec 5 轮。**我 09-09 扫掉的那两条 claim 并非死轨, 是会话被中断** —— 详见 §3.4 与 §4.8。且**版本号撞车**: 他们的 `pre-merge-completeness-gate` 目标号是 `v1.73.1`, 与我为 #194 提议的号相同 (见 §6.2)。
 
 ---
 
@@ -50,7 +51,7 @@ updated-at: 2026-09-10T01:12:11Z
 ### 高优先级 (建议下次 session 优先评估)
 
 - ~~`{id: secret-rotation-overdue}`~~ **已撤销 (假警报)** — owner 追问后实读 canonical record: `.aria/decisions/2026-05-02-secret-rotation-deferred.md` §Resolution **Resolved 2026-05-22** —— `FEISHU_APP_SECRET` / `FEISHU_VERIFICATION_TOKEN` / `FEISHU_ENCRYPT_KEY` 三个已轮换 (2026-05-22), `GLM_API_KEY` 经 Hermes→Luxeno 重定向**架构性退役** (2026-05-21); 原文逐字「2026-08-02 hard cap 已可撤销对应 calendar reminder」。**这条不是 carry-forward, 是我读错了。** 残留仅「`/root/.hermes/.env` 仍明文 dotenv 落盘」, 已成文在 2026-05-21 handoff §2 S7, 非本决议范畴。
-- **`{id: aria-plugin-194-release, desc: "#194 修复未发版, 已发布 v1.73.0 仍红"}`** — 采用方装的副本实测同样 2 红并按同一时间表恶化。发版需动整个同步面 (见下条)。
+- **`{id: aria-plugin-194-version-collision, desc: "#194 修复未发版, 且 v1.73.1 已被并发轨盯上"}`** — 修复在 aria master `f314785`, **任何后续从 master 切的发布都会自动带上它** ⇒「发不发版」不是独立问题, 而是「谁先 ship」。⚠️ 并发轨 `pre-merge-completeness-gate-change-scope` 的 proposal `:366`/`:450` 已把目标号写成 **`v1.73.1` (PATCH 候选, 级别待 owner 裁)**, 且自述「**无前置排队**」—— 那句话在我这条未发版修复存在时不成立。**两条轨必须有人先裁号。**
 - **`{id: aria-177-points-probe, desc: "Aria#177 建议 3 的 plugin-version POINTS 探针"}`** — 我已实测枚举 6 个版本点 + 3 个日期点贴进 #177, **未实现**。#177 原文写着「是否合并掉 `m6-version-badge-match` 的窄覆盖面请 maintainer 判」⇒ **待 owner 裁**。
 
 ### 中优先级
@@ -79,7 +80,7 @@ updated-at: 2026-09-10T01:12:11Z
 1. **带 deadline 的 project memory 在闭环后不会自己变绿** —— secret rotation 的 fact 文件停在 2026-05-20 amendment, 05-22 已闭环却从未回写, 索引行仍写「hard cap 2026-08-02」⇒ 本 session 据它误报逾期。已修文件 + 索引。⚠️ **同形状的还有几条?未普查** —— 没有任何机制在事情闭环时回写 memory。
 2. **已发布版本是红的** —— v1.73.0 与采用方装的 1.71.1 跑 `run_all_tests.sh` 均 exit 1, 且 09-14 / 09-18 / 09-22 逐步恶化到 7 红。不发版就修不到他们。
 3. **`issue_scan.limit=20` 会让查重判错** —— 本 session 实证: `Aria#165` 是 open 却不在清单里, 差点新开一张与它重叠的单。**任何基于 issue 清单的否定性判断都不可靠。**
-4. **心跳不是可靠的存活信号** —— `gc.py` docstring 逐字: "no production heartbeat loop exists (heartbeat_at freezes at acquire)"。实测: 对方心跳停在 09-06T16:15, 而真实提交持续到 09-07T06:43, **心跳早停 14 小时**。判「对方停工」不能只看心跳。
+4. **心跳不是可靠的存活信号 —— 本轮已被实证到底** —— `gc.py` docstring 逐字: "no production heartbeat loop exists (heartbeat_at freezes at acquire)"。我 09-09 判对方停工的依据是**两个**信号 (心跳陈旧 69h + 提交静默 55h, 都远超 24h TTL), 自认为「对口径不敏感」⇒ **结论仍是错的**: 他们只是会话被中断, 09-10 恢复后连推 13 个 commit。**两个都超阈值的独立信号, 依然不足以判定一条轨死了。** 幸而 sweep 是 advisory 且我在两张 issue 留了记录, 对方也独立预期并接受了它 —— 无实害, 但判断是错的。
 5. **`latest.md` 的 track 表已陈旧** —— 表中称 M6 轨「claim 09-05 重新认领 active」, 而协调板实测该 claim 状态为 **abandoned** (`claims/bfe8285d/s-00ec@0720.yaml`, heartbeat 2026-09-05T07:20Z)。我的 sweep **没碰它**, 它早就是 abandoned。
 
 ---
@@ -94,6 +95,8 @@ updated-at: 2026-09-10T01:12:11Z
 6. **fix-the-class 一天三次**: 修 `RESULT.md` 漏了 `:8` 那个兄弟位置 (复扫抓到) / 回归锁的 docstring 差点写进一个会被它自己扫成违规的字面量 (收尾断言抓到) / 普查器的一次性补丁守卫 (基线自检抓到)。**三次都是自己设的核验网兜住的, 没有一次是靠想起来。**
 
 7. **带 deadline 的 memory 在闭环后不会自己变绿**。我据 memory 报「secret rotation 逾期 38 天」, owner 追问后实读 canonical record —— **2026-05-22 就 Resolved 了**, 原文还逐字写着「hard cap 已可撤销对应 calendar reminder」。**判据: 任何带 deadline / status 的 project memory, 据它下结论前必须去 canonical record 核当前 status。** 这与 §4.3「截断清单」同族 —— 都是**拿一份不新鲜/不完整的东西当权威**, 而两次都发生在同一个 session 里。
+
+8. **两个都超阈值的独立信号, 仍不足以判「轨死了」**。我用心跳陈旧 69h + 提交静默 55h 两条独立证据判并发容器停工, 还特地写下「结论对口径不敏感」—— 实际他们只是**会话被中断**, 09-10 恢复后连推 13 个 commit。**「多个信号一致」增强的是对『它们测的那件事』的信心, 而它们测的都是『有没有动静』, 不是『还活不活着』** —— 同一个盲区被数了两遍。对不可逆动作 (durable rewrite), 正确做法是**先问一句**而不是加第三个同维度信号。
 
 [候选 memory]
 - 半冻结使结论不可信且方向随机, 检查器自身先过基线自检 — type: feedback ✅ 已写
@@ -123,7 +126,7 @@ updated-at: 2026-09-10T01:12:11Z
 ## §6 Next session 入口 + 优先级建议
 
 1. ⭐ **裁 `Aria#177` 建议 3 的档位** (是否合并掉 `m6-version-badge-match`) —— 它挡着 plugin-version POINTS 探针, 而那个探针是 §2 里三条版本类问题的共同处方。
-2. **决定 `aria-plugin#194` 是否发 v1.73.1** —— 不发就修不到采用方, 发则要动整个同步面 (而那个面正是 #177 说的零机械覆盖区)。**这两条是同一个结**。
+2. **裁 `v1.73.1` 归谁 / 两条轨的 ship 顺序** —— 我原写「决定 #194 是否发 v1.73.1」, 合表后发现并发轨已把同一个号写进 proposal。由于 #194 的修复已在 aria master, **它会随任何后续发布自动 ship**, 所以真问题不是「发不发」而是「**号给谁 / 谁先走**」。这条与上一条 (#177 档位) 仍是同一个结。
 3. 🔐 **普查其余带 deadline / status 的 project memory 是否也停在旧快照** —— secret rotation 这条已修, 但它暴露的是**类**: memory 记的是写下那天的事实, 闭环时无人回写它。
 4. 把 §2 中优先级那条 `scan-now-must-violation` **开成 issue** —— 否则它就是这个 session 版本的「只活在 handoff 文字里」。
 
@@ -138,7 +141,9 @@ updated-at: 2026-09-10T01:12:11Z
 | `10CG/aria-standards` | `21748d4` (未改) | ✅ equal | ✅ equal |
 | `refs/aria/coordination` | `87147af` | ✅ equal | ⚠️ `ad0287f` (2026-05-24, 落后 113) — 见 `aria-plugin#195` |
 
-`handoff_autofill` 的 sync 段: **0 warning**。gitlink 完整性 **6/6 ok** (首扫时 aria/github 曾报 `orphan_unverified` counter=1, `ls-remote` 取地面真相确认可达, 重扫翻回 ok —— 是 push 后单次 generation skew, 机制按设计 fail-closed 工作)。
+⚠️ **2026-09-11 合表后更新**: 上表是 09-10 写下时的快照。此后并发容器 `aria-runner-bot/bfe8285d` 推了 13 个 commit, 主仓 `origin/master` 已前进到 `5a73dc3`; 本地 master 因此**分叉**, 已 `git merge origin/master` 合表 (唯一冲突 `docs/handoff/latest.md`, 按 follower 规则取对方 pointer + track 表并集)。**推送前本地 master 的真实 SHA 见 git log, 非上表。** ⚠️ 本轮实证 `stale-local-main`: 若不先 `ls-remote` 核验就推, 会把合进陈旧基线的结果盖上去。
+
+`handoff_autofill` 的 sync 段 (合表后重跑): **5 warning** —— `[main] ahead 2 vs origin/github`, `has_pending_push=true`。两个 commit 是 `1a1a47d` (本会话 handoff) 与 `8cdb24f` (合表 merge)。**按 session-closer step 0「ahead>0 ⇒ 不静默收尾, 提议 push」, 本份交接在未推状态下定稿, 推送待 owner 授权。**子模块与 standards 均 equal; `aria-orchestrator` github 侧 `no_local_tracking_ref` (他轨 feature 未推 github, 预期)。gitlink 完整性 **6/6 ok** (首扫时 aria/github 曾报 `orphan_unverified` counter=1, `ls-remote` 取地面真相确认可达, 重扫翻回 ok —— 是 push 后单次 generation skew, 机制按设计 fail-closed 工作)。
 
 合并路径: aria 子模块本地 `merge --ff-only` + 双推, **未走 Forgejo 服务端合并** (CLAUDE.md 硬约束 1)。四次 `ls-remote` 逐端独立核验。
 
