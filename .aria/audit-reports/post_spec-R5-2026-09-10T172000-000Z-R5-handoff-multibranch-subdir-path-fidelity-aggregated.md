@@ -4,7 +4,7 @@ mode: convergence
 rounds: 5
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true  # owner 2026-09-12 裁三路径 [1] 接受当前结论 (决策单 .aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md)
 degraded: false
 drift_terminated: false
 drift_check_skipped: false
