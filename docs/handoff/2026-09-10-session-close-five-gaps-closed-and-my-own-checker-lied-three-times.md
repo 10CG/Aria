@@ -156,3 +156,21 @@ updated-at: 2026-09-11T04:30:44Z
 - **更新** [[feedback_ai_narrows_owner_decision_space]] — 追记形态 3 的反面: 作用域够不到 ⇒ 该新开而非并单
 
 索引压缩: MEMORY.md 24558 → 24343 B (余 233)。移 3 条窄指针入 `MEMORY-archive.md` (validate-convention-assumption / combined-mode-sister-spec / premerge-iteration-pattern), **fact 文件全部保留在 memory/**。
+
+---
+
+## §9 追记 (2026-09-12) — owner 裁定 + v1.73.1 已发版
+
+**裁定**: `v1.73.1` 归 `aria-plugin#194`, 并发的两条 L2 Spec 顺延 (号在各自 ship 时按当时 `plugin.json` 重算; 它们的**级别**仍待裁, 本裁定不触及)。决策单: [`.aria/decisions/2026-09-12-v1731-number-awarded-to-issue-194.md`](../../.aria/decisions/2026-09-12-v1731-number-awarded-to-issue-194.md)。
+
+⇒ §2 高优先级的 `aria-plugin-194-version-collision` **已闭合**。
+
+**发版执行** (aria `44f00d1` + tag `v1.73.1`; 主仓同批):
+
+- 同步面清单直接取自本 session 在 `Aria#177` comment 23105 实测枚举的 POINTS —— **那个面至今零机械覆盖** (#177 建议 3 未实施), 所以逐点抓基线 + 逐点复验: **22 处命中全部 == 1.73.1**, 旧号残留仅 `aria/VERSION` 的「发布日期(旧)」一处 (append-only 账本, 正常)
+- 分布: aria 8 (plugin.json 1 / marketplace.json 2 / VERSION 2 / 两 README 各 1 / CHANGELOG 新条目) + 主仓 15 (badge ×4 / Plugin Version ×4 / translated-from ×3 / CLAUDE.md ×2 / arch docs ×2) + 日期维 3
+- 验证: custom checks **15 OK / 1 FAIL** (仅 `plugin-cache-currency`, 需 owner 终端刷新) · harness **11 OK / 0 FAIL / 2148**
+
+**⛔ 未推送 —— github 不可达**: `ls-remote github` 三次重试均 rc=128, 代理 `192.168.69.212:7890` 报 `No route to host`。按 `CLAUDE.md` 多远程约束 2, **本轮不做任何 push**: 只推 origin 会造镜像分叉; 若同时把主仓 gitlink 抬到 github 上不存在的 aria SHA, 就是 `Aria#165` 那起 orphaned gitlink 事故的确切形状。**待 github 恢复后双推 + 逐端 `ls-remote` 核验 + 推 tag。**
+
+⚠️ 本次发版本身也是一次「同步面无机械覆盖」的实证: 我中途一条混了目录参数的 grep 报「旧号残留 0 处」, 复核才发现漏扫了 `aria/VERSION` —— **今天第三次「复验绿结果发现检查本身有问题」**。
