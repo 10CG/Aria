@@ -3,7 +3,7 @@ track-id: collision-dedupe-test-clock-asymmetry
 owner-container: simonfish/023236f2
 phase: C
 status: done
-updated-at: 2026-09-11T04:30:44Z
+updated-at: 2026-09-12T16:56:33Z
 ---
 
 # Aria — Session Handoff (2026-09-10, session-closer 会话收尾) — 五条口子全部落成机械物, 外加一个正在按日历腐烂的测试套件
@@ -51,7 +51,7 @@ updated-at: 2026-09-11T04:30:44Z
 ### 高优先级 (建议下次 session 优先评估)
 
 - ~~`{id: secret-rotation-overdue}`~~ **已撤销 (假警报)** — owner 追问后实读 canonical record: `.aria/decisions/2026-05-02-secret-rotation-deferred.md` §Resolution **Resolved 2026-05-22** —— `FEISHU_APP_SECRET` / `FEISHU_VERIFICATION_TOKEN` / `FEISHU_ENCRYPT_KEY` 三个已轮换 (2026-05-22), `GLM_API_KEY` 经 Hermes→Luxeno 重定向**架构性退役** (2026-05-21); 原文逐字「2026-08-02 hard cap 已可撤销对应 calendar reminder」。**这条不是 carry-forward, 是我读错了。** 残留仅「`/root/.hermes/.env` 仍明文 dotenv 落盘」, 已成文在 2026-05-21 handoff §2 S7, 非本决议范畴。
-- **`{id: aria-plugin-194-version-collision, desc: "#194 修复未发版, 且 v1.73.1 已被并发轨盯上"}`** — 修复在 aria master `f314785`, **任何后续从 master 切的发布都会自动带上它** ⇒「发不发版」不是独立问题, 而是「谁先 ship」。⚠️ 并发轨 `pre-merge-completeness-gate-change-scope` 的 proposal `:366`/`:450` 已把目标号写成 **`v1.73.1` (PATCH 候选, 级别待 owner 裁)**, 且自述「**无前置排队**」—— 那句话在我这条未发版修复存在时不成立。**两条轨必须有人先裁号。**
+- ~~`{id: aria-plugin-194-version-collision}`~~ **已闭合 (2026-09-12)** — owner 裁定 `v1.73.1` 归 #194, 两条 L2 Spec 顺延; **v1.73.1 已发布并双端核验** (aria `44f00d1` + tag `83c0ffd` + 主仓 `5990b85`)。⇒ 采用方 `/plugin update` 后即修到。残留: `#194` 仍 open (等采用方侧确认再关); 两条 Spec 的**级别** (PATCH vs MINOR) 仍待 owner 裁, 号在各自 ship 时按 `plugin.json`(现 1.73.1) 重算。
 - **`{id: aria-177-points-probe, desc: "Aria#177 建议 3 的 plugin-version POINTS 探针"}`** — 我已实测枚举 6 个版本点 + 3 个日期点贴进 #177, **未实现**。#177 原文写着「是否合并掉 `m6-version-badge-match` 的窄覆盖面请 maintainer 判」⇒ **待 owner 裁**。
 
 ### 中优先级
@@ -97,6 +97,8 @@ updated-at: 2026-09-11T04:30:44Z
 7. **带 deadline 的 memory 在闭环后不会自己变绿**。我据 memory 报「secret rotation 逾期 38 天」, owner 追问后实读 canonical record —— **2026-05-22 就 Resolved 了**, 原文还逐字写着「hard cap 已可撤销对应 calendar reminder」。**判据: 任何带 deadline / status 的 project memory, 据它下结论前必须去 canonical record 核当前 status。** 这与 §4.3「截断清单」同族 —— 都是**拿一份不新鲜/不完整的东西当权威**, 而两次都发生在同一个 session 里。
 
 8. **两个都超阈值的独立信号, 仍不足以判「轨死了」**。我用心跳陈旧 69h + 提交静默 55h 两条独立证据判并发容器停工, 还特地写下「结论对口径不敏感」—— 实际他们只是**会话被中断**, 09-10 恢复后连推 13 个 commit。**「多个信号一致」增强的是对『它们测的那件事』的信心, 而它们测的都是『有没有动静』, 不是『还活不活着』** —— 同一个盲区被数了两遍。对不可逆动作 (durable rewrite), 正确做法是**先问一句**而不是加第三个同维度信号。
+
+9. **「已修复」可以是真的, 而系统仍堵着** —— owner 报「mihomo 已修复, 不是 .212」完全属实 (env 已是 `.199`), 但 `~/.ssh/config` 另存了一份硬编码 `.212`。**同一个值有多个存储点, 修了活的那份 ≠ 修好**, 且症状具误导性: 其他工具全好, 只有走 ssh config 那条路的挂。**判据: 收到「X 已修」时先问「X 的地址/值在这台机器上存了几份」, 逐份核。** 这与 `Aria#177` (发布同步面派生点无枚举) 是同一个类, 只是载体从仓内文件换成了机器配置。
 
 [候选 memory]
 - 半冻结使结论不可信且方向随机, 检查器自身先过基线自检 — type: feedback ✅ 已写
@@ -171,6 +173,20 @@ updated-at: 2026-09-11T04:30:44Z
 - 分布: aria 8 (plugin.json 1 / marketplace.json 2 / VERSION 2 / 两 README 各 1 / CHANGELOG 新条目) + 主仓 15 (badge ×4 / Plugin Version ×4 / translated-from ×3 / CLAUDE.md ×2 / arch docs ×2) + 日期维 3
 - 验证: custom checks **15 OK / 1 FAIL** (仅 `plugin-cache-currency`, 需 owner 终端刷新) · harness **11 OK / 0 FAIL / 2148**
 
-**⛔ 未推送 —— github 不可达**: `ls-remote github` 三次重试均 rc=128, 代理 `192.168.69.212:7890` 报 `No route to host`。按 `CLAUDE.md` 多远程约束 2, **本轮不做任何 push**: 只推 origin 会造镜像分叉; 若同时把主仓 gitlink 抬到 github 上不存在的 aria SHA, 就是 `Aria#165` 那起 orphaned gitlink 事故的确切形状。**待 github 恢复后双推 + 逐端 `ls-remote` 核验 + 推 tag。**
+**✅ 已推送并核验** (主仓 release commit `5990b85` 提交时刻 `2026-09-12T16:07:04+00:00`) —— 原文此处写「⛔ 未推送, github 不可达」, 已不成立, 保留改写痕迹:
+
+| 对象 | SHA | origin | github |
+|---|---|---|---|
+| `10CG/Aria` | `5990b85` | ✅ | ✅ |
+| `10CG/aria-plugin` | `44f00d1` | ✅ | ✅ |
+| tag `v1.73.1` | `83c0ffd` | ✅ | ✅ |
+
+全部经独立 `ls-remote` 逐端取 SHA 核验 (不信 push 回执)。推送顺序 **先子模块后主仓** —— gitlink 抬到的 SHA 必须先在两端落地。gitlink 完整性复验: `aria 44f00d1` / `standards 21748d4` / `aria-orchestrator 237045a` 在各自两端均可达, **零 orphan**。
+
+**堵点的真因不是 github, 是一处硬编码**: owner 报「mihomo 已修复, 不是 .212」—— **属实**, `HTTP_PROXY`/`HTTPS_PROXY` 环境变量已是 `192.168.69.199:7890`。但 `~/.ssh/config:25` 的 github 段 ProxyCommand **另存了一份硬编码 `.212`**, 两者没有任何机制保持一致。⇒ 「已修复」是真的, 系统仍堵着, 且症状具误导性 (其他工具都好使, 只有 git+github 挂)。
+
+⚠️ **一项不在 git 里的变更**: 我改了 `~/.ssh/config:25` 的 `.212` → `.199` (恰 1 行, diff 已核; 备份在本 session scratchpad)。**这是机器本地状态, 任何 clone 都看不到它** —— 记在这里是它唯一的痕迹。
+
+**未根治**: 那行仍是硬编码, mihomo 下次换地址会同样复发。可选处置 (未做, 待 owner 定): 让它读环境变量; 或**直接删掉** —— 实测 `ssh.github.com:443` 直连可达 (`Hi simonfishgit!` + `ls-remote` 成功), 这台机器对 github 可能本就不需要代理。
 
 ⚠️ 本次发版本身也是一次「同步面无机械覆盖」的实证: 我中途一条混了目录参数的 grep 报「旧号残留 0 处」, 复核才发现漏扫了 `aria/VERSION` —— **今天第三次「复验绿结果发现检查本身有问题」**。
