@@ -19,7 +19,7 @@ updated-at: 2026-09-13T07:50:00Z
 ## §0 入口 (新 session 优先读)
 
 1. 运行 `/aria:state-scanner`。主仓 `5fe15b0` (+ 本 handoff 提交); aria `5a973e7` (v1.73.2, tag `d8c0450`); standards `21748d4`; aria-orchestrator `237045a`; 四仓 origin / github 两端一致。
-2. **本机插件缓存仍是 1.73.1**, `plugin-cache-currency` 会报 STALE。需 owner 在终端: `/plugin marketplace update 10CG-aria-plugin` → `/plugin update aria@10CG-aria-plugin` → 重启会话。
+2. ~~**本机插件缓存仍是 1.73.1**, `plugin-cache-currency` 会报 STALE。需 owner 在终端: `/plugin marketplace update 10CG-aria-plugin` → `/plugin update aria@10CG-aria-plugin` → 重启会话。~~ ✅ 2026-09-13 owner 已刷新并重启; 核验: installed 1.73.2, 缓存内容与 tag `v1.73.2` 逐文件一致, `plugin-cache-currency` OK。
 3. **本容器已无在飞轨**: M6 轨仍卡在 owner / 基建门 (claim 早已 abandoned); Aria#195 / #199 两条 Spec 在 `simonfish/023236f2` 手上 (claim A.2)。
 
 ---
@@ -48,8 +48,8 @@ updated-at: 2026-09-13T07:50:00Z
 
 | # | 项 | 说明 | 来源 |
 |---|---|---|---|
-| H1 | 刷新本机插件缓存到 1.73.2 | 见 §0 第 2 点 | 本 cycle |
-| H2 | 裁 `10CG/aria-plugin#196` | 检查器是否注册成闸门 + 修法 A / B | 承前 (上一份 handoff) |
+| H1 | ~~刷新本机插件缓存到 1.73.2~~ ✅ 已完成并核验 (见 §0 第 2 点) | — | 本 cycle |
+| H2 | ~~裁 `10CG/aria-plugin#196`~~ ✅ 已裁 (2026-09-13): 选 B + 暂不注册闸门; 规范写入 `standards/conventions/content-integrity.md` §4.4 (standards `f4e61b1`); #196 保持 open, 只剩检查器报错文案指向规范, 随下次插件发版 | — | 承前 (上一份 handoff) |
 | H3 | 定 github SSH 根治方式 | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
 
 ### 中优先级
@@ -113,8 +113,8 @@ updated-at: 2026-09-13T07:50:00Z
 /aria:state-scanner
 ```
 
-1. **`{id: carry-owner-plugin-cache-1-73-2}`** owner 刷新插件缓存到 1.73.2。
-2. **`{id: carry-owner-196-bare-ref-checker-gate}`** owner 裁 aria-plugin#196 (承前)。
+1. ~~**`{id: carry-owner-plugin-cache-1-73-2}`** owner 刷新插件缓存到 1.73.2。~~ → ✅ 已完成 (2026-09-13)
+2. ~~**`{id: carry-owner-196-bare-ref-checker-gate}`** owner 裁 aria-plugin#196 (承前)。~~ → ✅ 已裁 B + 不注册闸门, 规范 standards `f4e61b1` (2026-09-13)
 3. **`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (承前)。
 4. **`{id: carry-aria-plugin-198-status-paren}`** 等方案定了再修 aria-plugin#198。
 
