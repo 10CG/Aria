@@ -124,7 +124,7 @@ updated-at: 2026-09-13T04:25:00Z
 /aria:state-scanner
 ```
 
-1. ⭐ **`{id: carry-aria-plugin-197-coordination-fetch-local-ref}`** 修 aria-plugin#197, 可顺带 #198 — 本容器下一件, owner 已选; 先认领、定 Level / Rule #6 档位, 发版前与双子星约取号。
+1. ~~⭐ **`{id: carry-aria-plugin-197-coordination-fetch-local-ref}`** 修 aria-plugin#197, 可顺带 #198 — 本容器下一件, owner 已选; 先认领、定 Level / Rule #6 档位, 发版前与双子星约取号。~~ → ✅ 已完成 (v1.73.2, 见 [本 cycle handoff](./2026-09-13-aria-plugin-197-coordination-fetch-shipped-v1.73.2.md))
 2. **`{id: carry-owner-196-bare-ref-checker-gate}`** owner 裁 aria-plugin#196 (是否闸门 + 修法 A / B)。
 3. **`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (保持写死 / 删代理行直连 443)。
 
