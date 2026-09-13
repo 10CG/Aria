@@ -52,7 +52,7 @@ updated-at: 2026-09-13T04:25:00Z
 |---|---|---|---|
 | H1 | **修 `10CG/aria-plugin#197` (可顺带 #198)** | 本容器下一件, owner 已选。开工前: A.1 入口认领 (`phase1_gate --phase A.1 --linked-issue 10CG/aria-plugin#197`); 定 Level 与 Rule #6 档位; **发版前与双子星约取号** —— 它的 Aria#195 是 MINOR, 谁先发谁拿 v1.74.0, 或本修复走 PATCH v1.73.2 | 本会话 |
 | H2 | **owner 裁 `10CG/aria-plugin#196`** | 检查器要不要注册成闸门 + 修法 A (豁免集加「文内编号」) / B (写法约定: 文内编号不用 `#`) | issue 正文 |
-| H3 | **owner 定 github SSH 根治方式** | 仍是写死的代理地址, 代理再换址会复发; 可选: 保持现状 / 删掉代理行改走 `ssh.github.com:443` 直连 (双子星实测可达) | 本会话 + 双子星 09-10 handoff §9 |
+| H3 | ~~owner 定 github SSH 根治方式~~ ✅ 已转交 10cg.local (2026-09-13): `10CG/10cg.local#40` —— owner 定 VIP 永久为 `.199`, 统一 10cg.local 与 Aether 文档, 并建议删掉冗余 ProxyCommand | 仍是写死的代理地址, 代理再换址会复发; 可选: 保持现状 / 删掉代理行改走 `ssh.github.com:443` 直连 (双子星实测可达) | 本会话 + 双子星 09-10 handoff §9 |
 
 ### 中优先级
 
@@ -126,7 +126,7 @@ updated-at: 2026-09-13T04:25:00Z
 
 1. ~~⭐ **`{id: carry-aria-plugin-197-coordination-fetch-local-ref}`** 修 aria-plugin#197, 可顺带 #198 — 本容器下一件, owner 已选; 先认领、定 Level / Rule #6 档位, 发版前与双子星约取号。~~ → ✅ 已完成 (v1.73.2, 见 [本 cycle handoff](./2026-09-13-aria-plugin-197-coordination-fetch-shipped-v1.73.2.md))
 2. **`{id: carry-owner-196-bare-ref-checker-gate}`** owner 裁 aria-plugin#196 (是否闸门 + 修法 A / B)。
-3. **`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (保持写死 / 删代理行直连 443)。
+3. ~~**`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (保持写死 / 删代理行直连 443)。~~ → ✅ 已转 `10CG/10cg.local#40`
 
 **不应该做的**:
 - 不碰 Aria#195 / #199 两条 Spec (claim 在 `simonfish/023236f2`)。

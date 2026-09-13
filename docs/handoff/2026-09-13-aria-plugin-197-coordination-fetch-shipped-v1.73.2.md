@@ -50,7 +50,7 @@ updated-at: 2026-09-13T07:50:00Z
 |---|---|---|---|
 | H1 | ~~刷新本机插件缓存到 1.73.2~~ ✅ 已完成并核验 (见 §0 第 2 点) | — | 本 cycle |
 | H2 | ~~裁 `10CG/aria-plugin#196`~~ ✅ 已裁 (2026-09-13): 选 B + 暂不注册闸门; 规范写入 `standards/conventions/content-integrity.md` §4.4 (standards `f4e61b1`); #196 保持 open, 只剩检查器报错文案指向规范, 随下次插件发版 | — | 承前 (上一份 handoff) |
-| H3 | 定 github SSH 根治方式 | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
+| H3 | ~~定 github SSH 根治方式~~ ✅ 已转交 10cg.local (2026-09-13): `10CG/10cg.local#40` —— owner 定 VIP 永久为 `.199`, 统一 10cg.local 与 Aether 文档, 并建议删掉冗余 ProxyCommand | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
 
 ### 中优先级
 
@@ -115,7 +115,7 @@ updated-at: 2026-09-13T07:50:00Z
 
 1. ~~**`{id: carry-owner-plugin-cache-1-73-2}`** owner 刷新插件缓存到 1.73.2。~~ → ✅ 已完成 (2026-09-13)
 2. ~~**`{id: carry-owner-196-bare-ref-checker-gate}`** owner 裁 aria-plugin#196 (承前)。~~ → ✅ 已裁 B + 不注册闸门, 规范 standards `f4e61b1` (2026-09-13)
-3. **`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (承前)。
+3. ~~**`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (承前)。~~ → ✅ 已转 `10CG/10cg.local#40`
 4. **`{id: carry-aria-plugin-198-status-paren}`** 等方案定了再修 aria-plugin#198。
 
 **不应该做的**:

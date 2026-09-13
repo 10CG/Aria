@@ -48,12 +48,13 @@ updated-at: 2026-09-13T11:20:00Z
 
 | # | 项 | 说明 | 来源 |
 |---|---|---|---|
-| H1 | 定 github SSH 根治方式 | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
+| H1 | ~~定 github SSH 根治方式~~ ✅ 已转交 10cg.local (2026-09-13): `10CG/10cg.local#40` —— owner 定 VIP 永久为 `.199`, 统一 10cg.local 与 Aether 文档, 并建议删掉冗余 ProxyCommand | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
 | H2 | 复议两处 AI 流程判断 (Rule #10) | (a) aria-plugin#197 按 Level 1 处理 + 选修法 A (见 #197 handoff §2); (b) 本次两处 standards 规范改动没有起 OpenSpec, 按「owner 直接指示的文档规则 = Level 1」处理 | 本会话 |
 
 ### 中优先级
 
 - **下次插件发版**: CHANGELOG 带上 `308ccce` / `fcbc8ac` 两批注释改动; 顺带做 aria-plugin#196 剩余的「检查器报错文案指向 §4.4」, 然后关 #196。
+- **`check_bare_issue_refs.py` 另一类误报** (2026-09-13 发 10cg.local#40 时撞到): 仓名带 `.` 的全限定引用 (如 `10CG/10cg.local` 加 `#40`) 不被认作全限定 —— 其正则要求 repo 段不含 `.` (本意排除文件路径伪装)。并入 aria-plugin#196 的剩余工作, 下次插件发版一起修。
 - **其余带圈字形** (按 §4.5 口径不批量回改, 改到哪段顺手改哪段): aria 测试 5 个文件、参考文档 4 份、session-closer `SKILL.md` (运行时指令面, 改前先按 Rule #6 判断是否要跑 AB)、CHANGELOG / VERSION 历史条目、测试夹具 `issue-201.md` (照抄的 issue 原文, 不应改); 主仓 743 行大多在历史审计报告、归档 spec、handoff 里。
 - aria-plugin#198 待定方案; aria-plugin#182 截断证据未回帖 —— 均承前。
 
@@ -116,7 +117,7 @@ updated-at: 2026-09-13T11:20:00Z
 /aria:state-scanner
 ```
 
-1. **`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (承前)。
+1. ~~**`{id: carry-github-ssh-proxy-root-fix}`** owner 定 github SSH 根治方式 (承前)。~~ → ✅ 已转 `10CG/10cg.local#40`
 2. **`{id: carry-next-plugin-release-notes}`** 下次插件发版时 CHANGELOG 带上 `308ccce` / `fcbc8ac`, 并做完 aria-plugin#196 的报错文案后关单。
 3. **`{id: carry-aria-plugin-198-status-paren}`** 等方案定了再修 aria-plugin#198 (承前)。
 4. **`{id: carry-owner-review-level1-judgments}`** owner 复议 §2 H2 的两处 AI 流程判断。
