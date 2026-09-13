@@ -1,7 +1,7 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-09-13-aria-plugin-197-coordination-fetch-shipped-v1.73.2.md](./2026-09-13-aria-plugin-197-coordination-fetch-shipped-v1.73.2.md) — aria-plugin-197-coordination-fetch-local-ref @ phase=D (status=done) — **aria-plugin v1.73.2 已发布**: 扫描的协调 ref fetch 加目标 refspec (不加 `+`), 本地 `refs/aria/coordination` 随扫描快进, 本地领先 / 分叉时如实报未核实; 改前必红测试 4 红 → 全绿, 真实仓库 dogfood 通过; aria `5a973e7` + tag `d8c0450` / 主仓 `5fe15b0` 两端 MATCH; #197 closed, claim 已释放。#198 普查后只回帖数据。剩余均为 owner 项。 updated=2026-09-13
+**Latest**: [2026-09-13-session-close-issue-ref-and-plain-numbering-conventions.md](./2026-09-13-session-close-issue-ref-and-plain-numbering-conventions.md) — aria-plugin-196-issue-ref-and-numbering-conventions @ phase=D (status=done) — **会话收尾 (第二次)**: 插件缓存 1.73.2 核验通过; aria-plugin#196 owner 裁 B + 暂不注册闸门 → standards content-integrity §4.4; 追加 §4.5「文内编号用普通数字」并清掉 aria 代码注释里全部 7 行带圈编号 (aria `308ccce` / `fcbc8ac`, **纯注释、未发版, 下次发版须写进 CHANGELOG**); standards `8b49562`, 主仓 `c9fe08f`, 两端 MATCH。 updated=2026-09-13
 
 > ⚠️ **当前是多 track 场景, 单指针无法准确表达。** 上面这行是给 state-scanner 的
 > `collectors/handoff.py` 用的机读锚 (H5 pointer-first; 缺它会**静默退回 mtime**, 而 mtime
@@ -10,6 +10,7 @@
 >
 > | track-id | owner-container | phase | 最新 handoff |
 > |---|---|---|---|
+> | `aria-plugin-196-issue-ref-and-numbering-conventions` (aria-plugin#196) | `simonfish/bfe8285d` | ✅ **done (2026-09-13: standards content-integrity §4.4 + §4.5 → `8b49562`; aria 注释清理 `308ccce` / `fcbc8ac` 未发版; 主仓 `c9fe08f`; #196 open 只剩检查器报错文案, 随下次发版)** | [2026-09-13 (会话收尾第二次)](./2026-09-13-session-close-issue-ref-and-plain-numbering-conventions.md) |
 > | `aria-plugin-197-coordination-fetch-local-ref` (aria-plugin#197) | `aria-runner-bot/bfe8285d` | ✅ **done (2026-09-13: v1.73.2 — aria `5a973e7` + tag `d8c0450` / 主仓 `5fe15b0`, 两端 MATCH; #197 closed; claim 已释放, track 终结)** | [2026-09-13 (发版)](./2026-09-13-aria-plugin-197-coordination-fetch-shipped-v1.73.2.md) |
 > | `two-l2-specs-195-199-phase-a` (Aria#195 + Aria#199) | `aria-runner-bot/bfe8285d` | ⛔ **移交终结 (2026-09-13)** — owner 门全部裁完 (与双子星同题裁定对照, 两处分歧按双子星终裁), 两条 Spec 由 `simonfish/023236f2` 以新 track-id 推进, 见下两行 | [2026-09-13 (会话收尾)](./2026-09-13-session-close-l2-rulings-reconciled-tracks-handed-over.md) · [2026-09-11](./2026-09-11-two-l2-specs-phase-a-complete-blocked-on-owner-gates.md) |
 > | `handoff-multibranch-subdir-path-fidelity` (Aria#195) | `simonfish/023236f2` | 🟢 **active — A.2 (claim 09-12 18:33Z)**: Level 3 不拆 / MINOR / 执行顺序第一; 本行由 bfe8285d 代记, 以对方 handoff 为准 | [决策单](../../.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md) |
@@ -29,6 +30,8 @@
 > | `issue-batch-181-147-145-triage-fixes` | `simonfish/023236f2` | ✅ **done (2026-08-20, v1.66.2 三 ship + #138 spike + #152 立案, track 终结)** | [2026-08-20](./2026-08-20-issue-batch-181-147-145-ship-and-gate-blindspot.md) |
 > | `secret-guard-manifest-precision` (#179) | `simonfish/bfe8285d` | ✅ **done (2026-08-22 ship v1.66.4 + 归档, track 终结)** | [2026-08-22 (Phase D)](./2026-08-22-issue179-secret-guard-manifest-precision-ship-v1.66.4.md) |
 > | `credential-echo-defense-three-layers` | `simonfish/023236f2` | ✅ **done (08-22 session closeout; L1 v1.66.3 / L2 Aether#317 / L3 #154 待排期; 事故闭环)** | [2026-08-22 (session close)](./2026-08-22-session-close-credential-defense-and-mirror-collisions.md) |
+>
+> **2026-09-13 会话收尾第二次 (simonfish/bfe8285d, session-closer, leaf)**: bare pointer 改指本会话收尾 handoff (全仓最新)。插件缓存 1.73.2 核验通过 (与 tag 逐文件一致); owner 裁 aria-plugin#196 选 B + 暂不注册闸门 → standards `content-integrity.md` §4.4 (Issue / PR 一律 `<org>/<repo>#<n>`, 文内编号不用 `#`); owner 追加 §4.5 (编号只用普通数字, 不用带圈 / 带框单字符编号与希腊字母标签) 并清掉 aria 代码注释里全部 7 行带圈编号。**⚠️ 下一个发插件版的人 (很可能是 Aria#195 的 MINOR)**: aria master 在 `v1.73.2` 之后有 2 个未发版的纯注释合并 `308ccce` / `fcbc8ac`, CHANGELOG 要带上; #196 剩余的检查器报错文案可顺带。另: 本机 git 身份 09-13 04:28Z–07:44Z 间由 aria-runner-bot 变为 simonfishgit (容器 uuid 不变, 同一身份)。memory 1 新 + 2 追记, 索引零新增行。
 >
 > **2026-09-13 发版 (aria-runner-bot/bfe8285d, aria-plugin#197, Level 1)**: bare pointer 改指本 cycle handoff (全仓最新)。扫描的协调 ref fetch 原来只写 `FETCH_HEAD`, 本地 ref 不动却报「已刷新」→ refspec 加目标、不加 `+`, 发 **v1.73.2** (aria `5a973e7` + tag `d8c0450`, 主仓 `5fe15b0`, C.2.4 green `not_applicable` / C.2.4.5 forward PASS, 两仓两端逐一 MATCH)。新测试真 git 6 例旧代码 4 红 → 全绿, harness 2003 全绿, 真实仓库 dogfood 通过; #197 closed (comment 23629), claim `done`。#198 普查 (31 条归类会变) 后按 owner 裁定只回帖 (23605)。track 表新增本轨 done 行。**Level 1 定级与修法 A 的选择是 AI 判断, 已写进该 handoff §2 请复议。**
 >
