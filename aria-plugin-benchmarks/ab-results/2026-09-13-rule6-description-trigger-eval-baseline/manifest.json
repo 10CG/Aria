@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-13",
+  "issue": "10CG/Aria#211",
+  "purpose": "场景 4 基线实跑: 验证 description 触发率评测对真实 description 变动是否有非零区分力 + 负控是否显著下降",
+  "harness": {
+    "tool": "skill-creator scripts/run_eval.py",
+    "plugin_cache": "claude-plugins-official/skill-creator/bb335391eb83",
+    "claude_code": "2.1.269",
+    "isolation": "claude 垫片追加 --setting-sources project; 临时项目根 (空 .claude/), 用户级插件不加载 (技能数 97→13, 真 aria:openspec-archive 不在列)",
+    "model": "claude-fable-5-1 (与本 session 相同, skill-creator 指引)",
+    "runs_per_query": 3,
+    "num_workers": 4,
+    "timeout_s": 120,
+    "trigger_threshold": 0.5
+  },
+  "eval_set": "trigger-eval-openspec-archive.json (20 query: 10 should / 10 should-not, 近似误触为主)",
+  "arms": {
+    "new": "v1.73.0 = master: 归档已完成的 OpenSpec 变更到 openspec/archive/ 目录，并做归档后落点校验。使用场景…",
+    "old": "v1.71.1: 归档已完成的 OpenSpec 变更到正确的 archive/ 目录，自动修正 CLI bug。使用场景…",
+    "negctrl": "删光触发词: 对一个已完成的事项做收尾处理，并核对处理结果。"
+  },
+  "smoke": "1 query × 1 run (new 臂) trigger_rate=1.0, 管线可用",
+  "caveat": "run_eval 测的是合成 command 列表 + claude -p 下是否去读该技能, 与真实 Claude Code 激活路径不完全等价; 默认模式下 (不隔离) 真 openspec-archive 与合成技能竞争, 会系统性压低所有臂的触发率"
+}
