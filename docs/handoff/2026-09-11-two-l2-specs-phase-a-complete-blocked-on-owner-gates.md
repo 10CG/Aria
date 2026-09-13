@@ -2,12 +2,14 @@
 track-id: two-l2-specs-195-199-phase-a
 owner-container: aria-runner-bot/bfe8285d
 phase: A
-status: active
-updated-at: 2026-09-11T16:35:00Z
+status: done
+updated-at: 2026-09-13T03:20:00Z
 ---
 
 # Aria — Session Handoff (2026-09-11, 会话收尾) — 两份 Level 2 Spec 的 Phase A 各跑满 5 轮 post_spec, 双双停在 owner 裁决面
 
+> **⇒ 本轨终结 (2026-09-13, simonfish/023236f2)**: §2 的 H1–H4 已全部裁决 —— owner 对两份 Spec 的 max_rounds 终局均取路径 [1], 22 条待复议项按「产品级 owner / 技术级 AI」分工归类裁定 (决策单 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md`), 两份 Spec 升 Level 3 转 Approved, 由本容器以各自 change-id 重新认领 (`handoff-multibranch-subdir-path-fidelity` 先 / `pre-merge-completeness-gate-change-scope` 后)。后续见 `docs/handoff/2026-09-13-owner-gates-cleared-195-199-approved-level3.md`。本文件其余内容保持原样。
+>
 > **一句话**: 本对话 (2026-09-06 14:20Z → 2026-09-11 00:20Z, 容器 `aria-runner-bot/bfe8285d`) 从 `/aria:state-scanner` 入口起, 按 owner 的 `/goal`「创建 agent team + 动态工作流, 一口气完成当前推荐的所有工作流」执行: **Aria#200 triage 全闭环交付**; **Aria#195 与 Aria#199 两份 Level 2 Spec 各自走完 A.1 起草 + post_spec convergence 五轮五席审计 + 五次换人 rework**。两份**同时**在 R5 到达「Critical 0 / 五席自报一致 / 骨架无人推翻」, 也**同时**因 `max_rounds = 5` 耗尽而 `converged = false`。**Phase B 目前一条合法动作都没有** —— 两份的下游全部卡在 owner 裁决面, 按 Rule #10 不得由 AI 自行降格。
 >
 > **本 session 最该记住的一件事**: **收敛判据的分母不是「审计还能不能找到问题」, 而是「Major 能不能归零」**。`unanimous_pass` 要求 `vote == PASS`, 而 `vote == PASS` 要求 Critical **与 Major 同时**为 0。两份 spec 的 Major 序列分别是 15/10/19/10/9 与 9/9/12/14/15 —— 从未归零, 所以五轮 Vote 恒为 `REVISE 5 / PASS 0`, 与「质量是否在改善」完全脱钩 (#195 的 Critical 已经 2→3→0→1→0)。**把 max_rounds 用完 ≠ 审计失败**, 但现行判据下它也**不可能**自然收敛, 除非有人把 Major 清到 0。这条已入 memory。
