@@ -48,7 +48,7 @@ updated-at: 2026-09-13T11:20:00Z
 
 | # | 项 | 说明 | 来源 |
 |---|---|---|---|
-| H1 | ~~定 github SSH 根治方式~~ ✅ 已转交 10cg.local (2026-09-13): `10CG/10cg.local#40` —— owner 定 VIP 永久为 `.199`, 统一 10cg.local 与 Aether 文档, 并建议删掉冗余 ProxyCommand | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
+| H1 | ~~定 github SSH 根治方式~~ ✅ 已转交 10cg.local (2026-09-13): `10CG/10cg.local#40` —— owner 定 VIP 永久为 `.199`, 统一 10cg.local 与 Aether 文档, 并建议删掉冗余 ProxyCommand。Aether 侧另开 `10CG/Aether#404` (Aether 与 aether-plugin 共 5 个生效文件、20 行; 已在 `10CG/10cg.local#40` 评论更正数量) | 写死代理地址 vs 删掉改走 `ssh.github.com:443` | 承前 |
 | H2 | 复议两处 AI 流程判断 (Rule #10) | (a) aria-plugin#197 按 Level 1 处理 + 选修法 A (见 #197 handoff §2); (b) 本次两处 standards 规范改动没有起 OpenSpec, 按「owner 直接指示的文档规则 = Level 1」处理 | 本会话 |
 
 ### 中优先级
