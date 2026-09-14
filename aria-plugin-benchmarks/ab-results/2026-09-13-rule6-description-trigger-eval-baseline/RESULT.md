@@ -1,10 +1,10 @@
 # 场景 4 基线实跑 — description 触发率评测对 openspec-archive 两版 description 的区分力 (10CG/Aria#211)
 
-> **本文件版本**: 3 (2026-09-14, post_spec R2 rework: 删除一处失实的「同批提交」声明 / 技能数口径说明 / 地板守卫的已验证范围收窄为两类破坏 / query 级独立性局限 / 时长区间补 v2 / 成本差拆成两部分)。v2 (2026-09-13) 并入 v4 反事实两臂与 query 级统计。**引用方请写「RESULT.md v3 @ <提交 SHA>」**; 本文件修订时版本号递增, 引用了旧版本数字的文本须重核。
+> **本文件版本**: 4 (2026-09-14, post_spec R3 rework: 并入 v5 自然措辞扩张三臂 / 首句嵌的是 description 不是技能名 / 结论 1 残留全称句)。v3 (2026-09-14, post_spec R2 rework: 删除一处失实的「同批提交」声明 / 技能数口径说明 / 地板守卫的已验证范围收窄为两类破坏 / query 级独立性局限 / 时长区间补 v2 / 成本差拆成两部分)。v2 (2026-09-13) 并入 v4 反事实两臂与 query 级统计。**引用方请写「RESULT.md v4 @ <提交 SHA>」**; 本文件修订时版本号递增, 引用了旧版本数字的文本须重核。
 
 | 字段 | 值 |
 |---|---|
-| 跑于 | 2026-09-13 (四轮: v1 / v2 / v3 / v4, 见下) |
+| 跑于 | 2026-09-13 (v1–v4) 与 2026-09-14 (v5), 见下 |
 | 目的 | `10CG/Aria#211` 验收第 1–3 条: 在把「description 变动 ⇒ 跑场景 4」写进 Rule #6 之前, 先实跑证明场景 4 (a) 对真实 description 变动区分力非零, (b) 负控 (删光触发词) 显著下降 |
 | 工具 | skill-creator `scripts/run_eval.py` (插件缓存 `claude-plugins-official/skill-creator/bb335391eb83`; 该 hash 随插件更新漂移, 重跑时按 `find ~/.claude/plugins -path '*skill-creator*' -name run_eval.py` 重新定位), Claude Code 2.1.269 |
 | 模型 | `claude-fable-5-1` (显式传 `--model`, 与跑时的 session 一致; skill-creator 指引) |
@@ -44,16 +44,30 @@ query 级单元的独立性也是相对的: 同一臂的 10 条 query 共享同�
 
 过宽臂 should-not 22/30 的分布: 3/3 六条 (handoff 归档 / 起新 proposal / Archive Tracker 单 / 改 Status / 状态扫描 / archive 分层脚本), 2/3 一条 (sprint changelog 归档), 1/3 两条 (openspec CLI 口径 / tar 归档审计报告), 0/3 一条 (git 分支归档 —— 它同时含词表里的「分支」与「归档」, 却一次都没触发)。⇒ 触发与词表相关但不是逐词线性的。
 
+## v5: 自然措辞扩张敏感度 (2026-09-14, 预登记见 `v5-mildcreep-opus5/PREREGISTRATION.md`)
+
+为回应 post_spec R3 qa 席 major (地板守卫对「自然措辞扩张」零证据), 跑前写定判读规则后补跑三臂。模型换成 `claude-opus-5` (Fable 额度耗尽), 三臂同批, 只做臂间比较, 不与 v1–v4 数字直接比。其余配置同 v3 / v4 (中性名壳 / 每臂独立项目根 / 单 worker / 3 runs / 阈值 0.5 / `--setting-sources project`)。
+
+| 臂 | description | should (query 级) | should-not 命中 (≥ 0.5 的条数) | 判读 |
+|---|---|---|---|---|
+| new (参照) | v1.73.0 原文 | 30/30 (10/10) | 0/30 (0) | 门通过 ⇒ opus-5 上套件与环境可用 |
+| negctrl (同批负控) | 「对一个事项做处理。」(按 Spec §D2 新构造规则) | 0/30 (0/10) | 0/30 (0) | ≤ 5/10 ⇒ 本轮有效 |
+| mildcreep (被评) | 原文 + 「与相关文档」「整理项目收尾材料」「整理归档文档」「收尾整理」 | 30/30 (10/10) | 0/30 (0) | 门通过 ⇒ 本套件上该幅度的自然扩张**不被判为改坏** |
+
+- 按预登记: mildcreep 门通过 ⇒ 这是对「守卫只判得出两类破坏」这条局限的实证确认, 不是守卫失效。四条最可能被误触的近似误触 (handoff 归档 / 审计报告 tar 归档 / archive 分层脚本 / sprint changelog 归档) 全部 0/3。
+- 附带: 按新构造规则的负控 (删去领域名词与特有动作词) 在 opus-5 上 0/10; 基线负控 (保留「收尾 / 核对」) 在 fable 上 3/10。模型不同不直接比, 但方向与「旧负控没删净动作词」一致。
+- 时长 (run.log): 三臂并行, 单臂 15m18s–19m41s (opus-5 比 fable 慢)。
+
 ## 结论
 
-1. **对本次真实 description 变动 (v1.71.1 → v1.73.0) 区分力为零**: new / old / poscontrol 三臂 should-trigger 全部 30/30 (query 级 10/10), p = 1.0。这是**饱和** (三臂都撞天花板, 测不出差异), 不是「无差异」的证明。在饱和处, 「新版 ≥ 旧版」类比较判据对任意两个真 description 都打平, 只在对照物是坏 description 时判红 (如负控 8/30 对旧版 30/30) —— 它不是恒绿门, 但作为 A/B 尺子失效。⇒ 按 `10CG/Aria#211` 验收第 2 条, **场景 4 不能作为「description 措辞改动有没有变好」的 A/B 工具**。
+1. **对本次真实 description 变动 (v1.71.1 → v1.73.0) 区分力为零**: new / old / poscontrol 三臂 should-trigger 全部 30/30 (query 级 10/10), p = 1.0。这是**饱和** (三臂都撞天花板, 测不出差异), 不是「无差异」的证明。在饱和套件上, 两个都能让 should-trigger 饱和的 description 必然打平 (本次这一对即如此); 比较判据只在其中一方掉出饱和时才判出差别 (如负控 8/30 对旧版 30/30) —— 它不是恒绿门, 但对「措辞改得更好」这个问题, 在饱和套件上答不出来。⇒ 按 `10CG/Aria#211` 验收第 2 条, **场景 4 不能作为「description 措辞改动有没有变好」的 A/B 工具**。
 2. **场景 4 能当地板守卫, 已验证的破坏类型恰两类**:
    - 删领域词 (负控): should-trigger 掉到 8/30 (query 级 3/10, 对 10/10 双侧 p = 0.0031);
    - 显式强制过宽 (过宽臂: 触发词表 + 「都必须先使用本技能」): should-not 涨到 22/30 (7/10 条判红)。
-   ⇒ 「每条 should ≥ 0.5 且每条 should-not < 0.5」这条门两侧都有真实 FAIL 样本, 不是恒绿门。**未验证**: 自然措辞扩张 (多加两三个泛化词、没有强制指令) 能否让某条 should-not 越过 0.5。这类改动算不算「改坏了触发面」, 取决于套件的近似误触覆盖 —— 套件里没有被它误触的 query, 守卫就判它没改坏。
+   ⇒ 「每条 should ≥ 0.5 且每条 should-not < 0.5」这条门两侧都有真实 FAIL 样本, 不是恒绿门。**自然措辞扩张**: 一次实测不判红 (v5, 见下节): 多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」后, 10 条 should-not 全部 0/3。守卫的灵敏度由套件里的近似误触决定: 套件里没有被这类扩张误触的 query, 守卫就判它没改坏。
 3. **skill-creator `run_eval.py` 两处结构性缺陷 + 一处配置建议**, 不按前置运行数字不可解读:
    - (a) **并发 worker 互见**: `--num-workers N > 1` 时 N 个 `claude -p` 共用同一 `.claude/commands/`, 各自看到 N 个同 description、不同 `<id>` 的合成技能; 检测只认本 run 自己的 `<id>`。实证: v1 (共用根 + 4 worker) 4–7/30 vs v2 (独立根 + 1 worker) 27–30/30 —— **v1→v2 同批改了两个变量**, 记分表本身分不开; 机制证据是 `v1-shared-root-4workers/diag02-sibling-command-collision.jsonl`: 手动跑的 query 调用了兄弟 run 的 `openspec-archive-skill-2478f407` / `…-e136a6c3` 而不是自己的。压低幅度**定性为「显著」, 不定量**为 1/N (v1 负控 0/30 与 1/4 期望不符)。
-   - (b) **合成技能泄漏意图**: 命令文件名 `<skill_name>-skill-<id>`、正文标题 `# <skill_name>`、正文首句 `This skill handles: <description>` 都嵌入技能名; 技能名 `openspec-archive` 本身就回答了 query ⇒ description 被架空。实证: v2 负控 (零领域词) 27/30; v3 只把 `name` 改成 `helper` (run_arms_v2.sh 与 run_arms_v3.sh 仅差 `--skill-path` 与目录名), 负控掉到 8/30。
+   - (b) **合成技能泄漏意图**: 命令文件名 `<skill_name>-skill-<id>` 与正文标题 `# <skill_name>` 两处嵌入技能名 (正文首句 `This skill handles: <description>` 嵌的是 description, 不是技能名); 技能名 `openspec-archive` 本身就回答了 query ⇒ description 被架空。实证: v2 负控 (零领域词) 27/30; v3 只把 `name` 改成 `helper` (run_arms_v2.sh 与 run_arms_v3.sh 仅差 `--skill-path` 与目录名), 负控掉到 8/30。
    - (c) 配置建议: 默认设置源下 `claude -p` 加载全部用户级插件, 真 `aria:openspec-archive` 与合成技能竞争; 加 `--setting-sources project` 后不再加载, 单次成本 0.60 → 0.08 美元 (探针 json; 差价含输出长度差, 见隔离行)。该开关会连带换掉默认模型 (见上方附带观察), 所以必须**显式 `--model`**。
 
 ## 对 Rule #6 处方的含义 (供 spec `rule6-description-change-trigger-eval-lane` 引用)
@@ -65,22 +79,22 @@ query 级单元的独立性也是相对的: 同一臂的 10 条 query 共享同�
 ## 原始产物
 
 - `trigger-eval-openspec-archive.json` — 20 条 query (should / should-not 各 10)
-- `v1-shared-root-4workers/` · `v2-isolated-root-1worker/` · `v3-isolated-root-1worker-neutral-name/` · `v4-counterfactuals/` — 各臂 `*.json` (run_eval 原始输出, 每 query 的 `trigger_rate` / `triggers` / `runs` / `pass`) + `run.log` (各臂起止时间)
-- `run_arms.sh` / `run_arms_v2.sh` / `run_arms_v3.sh` / `run_arms_v4.sh` — 四轮运行脚本 (变量 `S=` 指向当时的 scratchpad, 重跑时改它; 各臂 description 原文在脚本里)
+- `v1-shared-root-4workers/` · `v2-isolated-root-1worker/` · `v3-isolated-root-1worker-neutral-name/` · `v4-counterfactuals/` · `v5-mildcreep-opus5/` (含跑前写定的 `PREREGISTRATION.md`) — 各臂 `*.json` (run_eval 原始输出, 每 query 的 `trigger_rate` / `triggers` / `runs` / `pass`) + `run.log` (各臂起止时间)
+- `run_arms.sh` / `run_arms_v2.sh` / `run_arms_v3.sh` / `run_arms_v4.sh` / `run_arms_v5.sh` — 五轮运行脚本 (变量 `S=` 指向当时的 scratchpad, 重跑时改它; 各臂 description 原文在脚本里)
 - `claude-shim.sh` — 注入 `--setting-sources project` 的垫片; `neutral-skill-SKILL.md` — v3/v4 的中性名 skill 壳
 - `probe-setting-sources-default.json` / `probe-setting-sources-project.json` — 设置源隔离的机读证据
 - `manifest.json` — v1 时写的运行清单, 保留原样作历史 (其中「97→13」的来历见上方「技能数口径」)
 
 ## 时长与成本
 
-- 时长 (run.log): 单 worker 一臂 60 次调用 10m39s–17m39s (v2 四臂 11m26s–17m39s, v3 四臂 10m39s–12m03s, v4 两臂 13m38s–13m54s); 两臂 (被评 + 负控) 并行约 11–18 分钟, 串行约 22–34 分钟。
+- 时长 (run.log): 单 worker 一臂 60 次调用, `claude-fable-5-1` 上 10m39s–17m39s (v2 四臂 11m26s–17m39s, v3 四臂 10m39s–12m03s, v4 两臂 13m38s–13m54s), `claude-opus-5` 上 15m18s–19m41s (v5 三臂); 两臂 (被评 + 负控) 在 fable 上并行约 11–18 分钟、串行约 22–34 分钟, 在 opus 上并行约 16–20 分钟、串行约 34–38 分钟。
 - 成本: `run_eval.py` 不记录成本; 按探针单次 0.08 美元估, 两臂 120 次约 10 美元 (估算, 非实测)。
 
 ## 已知局限
 
 - 20 条 query 未经 owner 审阅; should-trigger 整体偏「清楚」是天花板的一个可能来源。负控与过宽两臂仍能显著变化, 说明套件对「触发词有没有」敏感。
 - 只测了一对真实 description; 结论 1 是「这一对零区分力 + 机制上小措辞改动很难在饱和套件上显形」, 不是「任何 description 改动都测不出」。
-- 地板守卫只验证了两类破坏 (结论 2); 自然措辞扩张未验证。
+- 地板守卫判红的只有两类破坏 (结论 2); 一次自然措辞扩张实测不判红 (v5)。要守住某类扩张, 须在套件的 should-not 里放被它误触的 query。
 - 负控没删净通用动作词 (见统计段); 更干净的负控应删到只剩「处理一件事项」级。
 - `run_eval.py` 判「触发」= 第一个 tool_use 就是本合成技能 (Skill 或 Read)。v4 realroot 在约 25 个合成文件的项目根下 30/30, 但该根没有 CLAUDE.md、没有竞争技能、没有深层目录, 比 Aria 主仓小一到两个量级; 真实大仓下未验证。
 - 跑时 owner 不在线; 「套件未经审阅」「基线先于 spec 起草」两项 AI 流程判断写在 Spec 的 OQ-3 与 rule6_note 段, 由 owner 复议。
