@@ -1,6 +1,6 @@
 ## Triage Report
 
-**Verdict**: `partial-repro` | **Severity**: `major` | **Recommended Action**: `next-cycle`
+**Verdict**: `confirmed` | **Severity**: `major` | **Recommended Action**: `next-cycle`
 
 ---
 
@@ -8,24 +8,22 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | (未报, 以 Kairos dogfood 现象提出) |
-| Current | `aria-plugin 1.69.1` |
-| Gap | n/a |
+| Reported | `1.73.0` |
+| Current | `1.73.3` |
+| Gap | behind (3 个 PATCH) |
 
-现象在当前版本仍在产生 (本容器 2026-09-05 的 handoff 仍写 `aria-runner-bot/bfe8285d`), 不是过期报告。
+v1.73.1–v1.73.3 三个 PATCH 都是 state-scanner 脚本修复, 没有触碰 Rule #6 判据、AB 手册或 skill-benchmark-exemption SOT。版本差与本单无关, 现状与报告时一致。
 
 ### Code Path
 
-- issue 引用的 `docs/decisions/DEC-2026-09-04-git-identity-scope.md` 是 Kairos 仓文件, Aria 仓内不存在 (已按本机 Kairos checkout 读取核对, 裁定内容与 issue 描述一致)。
-- 实际涉及的 Aria 侧代码:
-  - `aria/skills/state-scanner/lib/collision.py` — `split_owner_container` / `track_to_claim_record` / `classify_claims` / `classify`
-  - `aria/skills/state-scanner/lib/identity.py` — `get_owner()` = git `user.email` local-part, `get_container_id()` = `~/.aria/container-id` 的 label-over-uuid
-  - `aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py:518` 与 `scripts/renderers/track_board.py:412` — 同样经 `split_owner_container` 分组/贴标签
-  - 规范: `standards/conventions/session-handoff.md §2.3` (`owner-container` = `<owner>/<container-id>`, 两段式) 与 §2.3.5 (cross-owner / self-multi-container 判据)
+- `CLAUDE.md` Rule #6 判据表 + 紧随其后的「`description` 或指令流程变动一律照跑」: 存在, 逐字一致。
+- `standards/conventions/skill-benchmark-exemption.md` 第 33 行「`description` 或指令流程变动 ⇒ 一律第二行」: 存在, 与 CLAUDE.md 同口径。
+- `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md:208`「with_skill: 加载 SKILL.md 后执行任务」: 存在; `:263` §场景 4 + `:273`「触发时机: 修改 Skill 的 description/frontmatter 后」: 存在。
+- `skill-creator/scripts/run_eval.py`: 在 skill-creator 插件内 (非 Aria 仓), 五个参数 `--eval-set` / `--skill-path` / `--description` / `--trigger-threshold`(0.5) / `--runs-per-query`(3) 与 issue 所列逐字一致。Step 3 collector 报 file not found 是路径解析问题, 不是断言错误。
 
 ### Git History
 
-无 cited file 落在 Aria 仓, Step 4 跳过。相关引入点: `split_owner_container` 由 aria `83a1a45` (2026-05-30, #133 TASK-000) 引入, 自始按三段式 `owner/container/session` 解析。
+No recent commits matched on cited files (collector 命中的 4 条均为版本点同步提交, 与本单无关)。
 
 ### In-flight
 
@@ -33,32 +31,28 @@
 |----------|---------|
 | Remote PRs | none |
 | Local branches | none |
-| Worktrees | 仅主 worktree |
+| Worktrees | none (仅主工作树 master) |
 
-同族已有票: **aria-plugin #135 缺口 3** (open, 2026-08-08)「容器身份字符串不稳定, 碰撞检测分组键不可靠」— 讲的是 container 段来源不稳 (主机名 vs uuid)。#193 新增两点: owner 段随 git 身份漂移; AI runner 提交身份规范询问。本 triage 又加一点: parser 格式契约错位 (见下)。三者同族, 不重复, 建议一并处置。
+关联单 `10CG/aria-plugin#150` / `10CG/aria-plugin#190` / `10CG/aria-standards#17` 均仍 open, 无人认领本条。
 
 ### Reproduction
 
-**Mode**: `auto` | **Hit rate**: `2/5` (现象命中 2, 机制推断 3 条与实测偏离)
+**Mode**: `auto` | **Hit rate**: `5/5`
 
-| case | 输入 | issue 预期 | 实测 | match |
-|---|---|---|---|---|
-| case-1 | 全部 handoff frontmatter 按容器分组 | bfe8285d 双串 | ✅ `simonfish/bfe8285d` 34 份 (07-05..08-27) + `aria-runner-bot/bfe8285d` 2 份 (09-03..); 漂移点钉在 08-26/08-27 之间。**对方容器 023236f2 也双串** (`aria-runner-bot/…` 23 份 07-05..08-16, `simonfish/…` 17 份 07-03..09-05, 方向相反) — 类级现象 | true |
-| case-2 | `classify([simonfish/bfe8285d, aria-runner-bot/bfe8285d])` 同 track active | cross_owner | **self_multi_container 🟡** | false |
-| case-3 | `classify([alice/aaaa1111, bob/bbbb2222])` 真两人两机 | cross_owner | **self_multi_container 🟡** (真撞车被降级) | false |
-| case-4 | `classify([simonfish/bfe8285d, simonfish/023236f2])` 同人两机 | self_multi_container | **none** (漏报) | false |
-| case-5 | 同 case-3 但喂三段式 `alice/aaaa1111/s-1` | cross_owner | cross_owner | true |
-
-**Deviation note**: 现象成立, 但机制不是 issue 推断的「双串 → cross_owner」。`split_owner_container` 假定三段式 `owner/container/session`, 而 handoff frontmatter 按规范是两段式 `<owner>/<container-id>` (仓内 142 份两段, 12 份零段, 0 份三段)。两段串被解析成 `(owner='', container=<owner 段>, session=<uuid>)` → owner 恒 `unknown` → `cross_owner` 分支从 handoff 数据**永远不可达**; 于是同容器双串 → 🟡, 真两人撞车 → 也是 🟡, 同人两机 → none。即 collision 分类在 owner 漂移之前就已系统性失灵, 漂移只是让它更不可解释。当前 live snapshot 的 `collision.groups=[['dev-claude','simonfishgit/dev-claude']] kind=self_multi_container` 与此一致 (零段与两段串混判)。
+| case | 核对项 | 结果 |
+|---|---|---|
+| case-1 | Rule #6 第二行零裁量条款 | 命中: CLAUDE.md 与 SOT 两处逐字存在 |
+| case-2 | 两臂被直接喂 SKILL.md, 绕过触发面 | 命中: 手册 :208 + skill-creator SKILL.md Step 1 with-skill 提示逐字「Skill path: <path-to-skill>」, baseline 指快照目录; description 在两臂输入里无作用面 |
+| case-3 | comment 22921 首次记录 + v1.73.0 description 确有变动 | 命中: 该评论属 `10CG/aria-plugin#190` (2026-09-08), 原文含「delta.pass_rate = 0」与第 6 行「本套件按构造永远测不到」; `git diff v1.71.1..v1.73.0` 显示 openspec-archive description 由「自动修正 CLI bug」改为「并做归档后落点校验」 |
+| case-4 | 场景 4 工具与手册条目存在 | 命中: run_eval.py 五参数 + 手册 §场景 4 触发时机原文 |
+| case-5 | 场景 4 从未跑过 | 命中: `aria-plugin-benchmarks/` 内 `trigger_rate` / `trigger-eval` / `should_trigger` / `run_eval.py` 唯一命中是手册自身; ab-results 全部目录零触发率产物。历次因 description 变动触发的「照跑」(含 v1.73.0) 均只跑了场景 1 |
 
 ### Verdict Rationale
 
-1. issue 的两个具体角度, 回答如下:
-   - **看板对 owner 串漂移有无处置路径**: 目前没有, 而且比「没有」更差 — 因为格式契约错位, 看板连 cross-owner 与 self-multi-container 的基本区分都做不到 (case-3/4)。修法顺序建议: 先把 parser 对齐规范的两段式 (或规范改三段, 二选一, 有测试锁定); 再以 **container uuid 为同一性主键** (与 #135 缺口 3 的建议一致), owner 段只作显示; 同一 container 出现多个 owner 段时给出显式「同容器多 owner 串」advisory 而非静默归类。
-   - **历史文档口径**: 不 rewrite (与 Kairos 裁定一致); 分类器按 container 主键合并后, 历史双串自然归到同一容器, 不需要改文档。
-2. **身份规范询问**: Aria 现行规范只定义了 `<owner>` = git `user.email` local-part (session-handoff.md §2.3), 即语义上是「提交身份」不是「人」; **Aria 没有任何 AI runner 该用什么 git 身份提交的规范** (standards/conventions 与 CLAUDE.md grep 无命中)。与 Aether 人机两账号模型的对齐、AI runner 是第三类还是归入机账号, 属 owner 决策, 建议作为同一 Level 2 Spec 的一条决策项一起裁, 本 triage 不预设。
-3. 严重度 `major`: 多终端协调的唯一 advisory 信号两个方向都不可信 (真撞车降级、同人多机漏报), 但无数据损坏、单终端作业不受影响。`next-cycle`: 需要 Level 2 Spec (代码 + 规范 + 测试三件套), 不是 hotfix 体量; 与 aria-plugin #135 缺口 3 合并处置最省。
+四项证据逐条实读全部成立, 且缺口是**结构性**的: 场景 1 的两臂由子代理提示直接给 skill 路径, description 在整条评测链路里没有作用面, 所以「照跑 AB」在构造上不可能产出关于 description 的信息; 而 Rule #6 第二行把 description 变动列为零裁量照跑, 执行者按规则走完只会得到一份空证据。定 `major` 而非 `critical`: 它不阻断任何主流程, 但让 Rule #6 对 description 维度的合规记录系统性为空 (SOT §3 所称「测量剧场」同形)。定 `next-cycle`: 修法涉及 CLAUDE.md Rule #6 / SOT / 手册三处同批改 + rule6_note 模板, 属 Level 2 规范变更; 且 issue 验收第 1-2 条要求**先做场景 4 基线实跑证明区分力非零**再写进规则 —— 这一步本 triage 未做 (需要 `claude -p` 批量跑 20 query × 3 runs, 是实验不是核对), 应作为该 cycle 的 A.0 前置。
+
+一处补充观察 (不改 verdict): run_eval.py 测的是「合成 skill 列表 + description」下 `claude -p` 是否去读 skill, 与真实 Claude Code 的 skill 激活路径不完全等价; 基线实跑时应把这点写进区分力判读。
 
 ---
 
-*Generated by `/issue-triage` v1.69.1 — Ref: 10CG/Aria#193 — 已发帖 2026-09-05 (comment 21431, owner 授权)*
+*Generated by `/issue-triage` v1.73.3 — Ref: 10CG/Aria#211*
