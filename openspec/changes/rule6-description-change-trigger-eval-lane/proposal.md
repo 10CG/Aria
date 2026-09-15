@@ -1,10 +1,10 @@
 # Proposal: rule6-description-change-trigger-eval-lane
 
 > **Level**: Minimal (Level 2 Spec) — owner 2026-09-13 指示「开 Level 2 cycle」; 与 LEVEL_GUIDE「跨模块 → 自动提升为 Level 3」的关系请 owner 确认, 见 OQ-4
-> **Status**: Draft — post_spec R1 (2026-09-13) FAIL → v2; R2 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 10M / 26m → v3; R3 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 5M / 6m → v4; R4 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 3M / 4m → v5; R5 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 6M / 4m, max_rounds 耗尽未收敛 → rework v6 (本版); 降级策略待 owner 裁
+> **Status**: Draft — post_spec R1 (2026-09-13) FAIL → v2; R2 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 10M / 26m → v3; R3 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 5M / 6m → v4; R4 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 3M / 4m → v5; R5 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 6M / 4m, max_rounds 耗尽未收敛 → v6; owner 2026-09-15 裁定增加 2 轮 (max_rounds 5 → 7) 并先收窄范围 → v7 (本版), 待 R6
 > **Created**: 2026-09-13
 > **Linked Issue**: `10CG/Aria#211`
-> **代码落点**: 无代码。三份规范性文本 (Aria `CLAUDE.md` Rule #6 / `standards/conventions/skill-benchmark-exemption.md` / `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`) + 一个套件文件 (受 OQ-3 约束) + 四张新 issue + 一条上游反馈。**aria-plugin 子模块不动** (spec-drafter / task-planner 模板落地另开 issue, 见 D5.3)
+> **代码落点**: 无代码。三份规范性文本 (Aria `CLAUDE.md` Rule #6 / `standards/conventions/skill-benchmark-exemption.md` / `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`) + 一个套件文件 (受 OQ-3 约束) + 三张新 issue + 一条上游反馈。**aria-plugin 子模块不动** (spec-drafter / task-planner 模板落地另开 issue, 见 D5.3)
 > **ship target**: standards 子模块 (SOT 文件头 Version 1.0.0 → 1.1.0, MINOR — 新增强制义务。这是**单份规范文档自己的版本行**, 与 `version-management.md` §5.1 待裁的「standards 仓级版本自称」正交, 不新增仓级自称面; standards 仓无 tag, 主仓只动 gitlink) + Aria 主仓 (CLAUDE.md / 手册 / 套件)
 > **基线数据**: `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/RESULT.md` **v6** (与本版同批提交; 本文引用的数字以该版本为准, RESULT 再修订须同步重核本文 §Why 与 §D2 §D3)
 > **溯源**: 洞的首次记录 = `10CG/aria-plugin#190` comment 22921 (2026-09-08); 独立成单 = `10CG/Aria#211` (2026-09-09); triage 五项核对全命中 = `10CG/Aria#211` comment 23915 (2026-09-13)
@@ -27,7 +27,7 @@ Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要�
 
 **落在决策表哪一格**: 这是 SOT §2 **第二行的细化**, 不新增行。description 是「处方性 · 运行时指令面」(它决定 skill 何时被激活), 属第二行「照跑, 零裁量」; 本 Spec 只把「照跑什么」说清: 指令流程 hunk ⇒ 场景 1; description hunk ⇒ 场景 1 **另加**场景 4b (D2), 两者不互相替代 (issue 原建议 1)。它**不是**第三行 (§3 三件套) 的实例: 第三行要求每个 spec 自建定向 fixture 并开套件缺口 issue, 而 description 维度的 fixture 已标准化为场景 4b、套件缺口由 D5.2 的 issue 承接, 不必每个 cycle 再走一遍三件套。SOT §3 末尾加一句边界注: 「description hunk 不走本节, 走 §2 第二行: 照跑场景 1, 另须跑场景 4b」。
 
-**SOT 新句里的自主模式条款**按 OQ-7 推荐 (C) 与 OQ-9 推荐起草; owner 裁定不同, 则在 T1 落地前改写这一句 (新句只写裁定后的做法, 不带 OQ 编号, 因为 OQ 编号出了本 proposal 就无法定位)。
+**自主运行时只写一句禁令** (owner 2026-09-15 确认收窄范围): 自主模式下 description 变动的完整处理 —— 遇到时不自动重试、改为等 owner 裁; 告警带上是哪个 skill、为什么要改; 由 Layer 1 把不涉及 description 的部分拆成新 issue 继续派发; 场景 4b 在 Layer 2 所用模型上的验证 —— 全部放进 D5.6 的跟进 spec, 本 Spec 不展开; 该跟进 spec 须在这类任务派给 runner 之前落地。禁令写成「放弃整个任务、不提交任何改动」, 不写「跳过这一部分」, 依据 (已读代码): runner (`aria-orchestrator/docker/aria-runner/modes/initial.sh`) 只有结果为 SUCCESS 时以 0 退出, 编排器 `_handle_s5_await` 只看退出码、非零即进 S_FAIL ⇒ 整单不提交必进 S_FAIL, 部分跳过则可能按 SUCCESS 推进、无人察觉。禁令以 `state_scanner.coordination.unattended` 为准; 该键从 Layer 1 传到 Layer 2 的契约未定义、缺失时静默回落 `false` (`10CG/Aria#196`), 已列入 D5.6 的已知缺口。
 
 **本条只管深度, 不管广度**: 本条定「跑哪个场景」; 「场景 1 覆盖哪些套件 (单 skill 全套件还是 Tier 1)」是 `10CG/aria-standards#17` 在定的另一条轴, 两者正交 (见 D5.5)。
 
@@ -38,7 +38,7 @@ Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要�
 | 落点 | 旧句 (逐字) | 新句 |
 |---|---|---|
 | Aria `CLAUDE.md` 规则 #6 表后 | `description` 或指令流程变动一律照跑; 豁免须在 spec/tasks 留 `rule6_note`。 | 指令流程或 `description` 变动一律照跑场景 1; `description` 变动另须跑场景 4b 地板守卫, 它只验证触发面没被改坏, 不验证 description 改得更好; 豁免与结果都写进 `rule6_note` (字段见 SOT §4.1); 自主运行时的处置见 SOT §2。 |
-| SOT §2「SKILL.md 有变动时的附加约束」末句 | `description` 或指令流程变动 ⇒ 一律第二行。 | `description` 或指令流程变动 ⇒ 一律第二行, 照跑场景 1; `description` 变动另须跑场景 4b 地板守卫 (它只验证触发面没被改坏, 不验证 description 改得更好; 判据与前置见 Aria 主仓 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` §场景 4b), 两者不互相替代。自主运行时 (`state_scanner.coordination.unattended == true`): 该 skill 没有经 owner 审阅的 trigger 套件, 或场景 4b 尚未在自主运行时所用模型上验证 ⇒ 不做 description 改动; 任务需要改 description 时放弃整个任务、不提交任何改动 (runner 因此以非 SUCCESS 结束, 编排器据此进 S_FAIL)。本条只定「跑哪个场景」, 「场景 1 覆盖哪些套件」不在本条范围。 |
+| SOT §2「SKILL.md 有变动时的附加约束」末句 | `description` 或指令流程变动 ⇒ 一律第二行。 | `description` 或指令流程变动 ⇒ 一律第二行, 照跑场景 1; `description` 变动另须跑场景 4b 地板守卫 (它只验证触发面没被改坏, 不验证 description 改得更好; 判据与前置见 Aria 主仓 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` §场景 4b), 两者不互相替代。自主运行时 (`state_scanner.coordination.unattended == true`) 不做 description 改动: 任务需要改 description 时放弃整个任务、不提交任何改动, 并在最终消息里写明是哪个 skill、为什么要改。本条只定「跑哪个场景」, 「场景 1 覆盖哪些套件」不在本条范围。 |
 | 手册 §「确定性代码层变更 — deterministic substitute 豁免」的「边界与留痕」段首行 | `**边界与留痕**: 完整 fail-closed 边界三条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑 /` | `**边界与留痕**: 完整 fail-closed 边界四条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑场景 1 / description 变动另须跑场景 4b 地板守卫, 它只验证触发面没被改坏, 不验证 description 改得更好 /` |
 
 核心句 = 「**只验证触发面没被改坏, 不验证 description 改得更好**」, 三处逐字相同 (SC-1)。手册那一行的计数语同步由「三条」改「四条」(SC-7)。CLAUDE.md 新句自带「字段见 SOT §4.1」指向, **不在 CLAUDE.md 另加句子**。
@@ -55,7 +55,7 @@ Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要�
   - 被评 description 退化 ⇒ 门先判 **fail** (有 should-trigger 掉到 0.5 以下), 不会落到作废。
   - **作废**在以下任一情形发生: 同批参照臂过不了门 (环境、套件或现行 description 本身有问题); 门通过而负控 ≥ 6/10 (套件分不开「有没有触发词」); `run_eval.py` 的 stderr 出现 `Warning: query failed` (有 query 抛了异常)。作废时不判被评 description。作废 = 本 cycle 的 Rule #6 义务未完成, **不得 ship**; 修套件或环境后重跑; rule6_note 记 `scenario4b: <结果目录> void`; **连续 2 轮作废 ⇒ 升级 owner** (AI 不得自行豁免, Rule #10)。
 - **fail 的后果**: 同批参照臂过门、而被评 description 的门判 fail ⇒ 该 description 改动**不得 ship** (与 void 同为义务未完成)。处置二选一: (1) 修正 description 直到门通过; (2) 若 fail 来自**有意**收窄或拓宽触发面 (套件原来的 should / should-not 划分已不符合新意图), 则先改套件 (升 `ab-suite/version.yaml`, 新套件经 owner 审阅) 再重跑; 两条都不走 ⇒ 升级 owner。rule6_note 记 `scenario4b: <结果目录> fail` 与所走的处置。
-- **不设比较判据** (如新版触发率不低于旧版): 在饱和处退化 (Why 第 1 条); 如需比较, 只作 rule6_note 观察, 不作门。
+- **不设比较判据** (如新版触发率不低于旧版): 在饱和处退化 (见基线目录 RESULT.md 结论 1); 如需比较, 只作 rule6_note 观察, 不作门。
 - **套件**: 每个被评 skill 一份 `aria-plugin-benchmarks/ab-suite/trigger/<skill>.json` (20 条, should / should-not 各 10, should-not 以近似误触为主), **沿用 `ab-suite/` 版本化规则** (改套件须升 `ab-suite/version.yaml`, 旧数据不可比)。should-not 的近似误触须覆盖该 skill 最可能被扩到的相邻任务 (v5: 本套件对「整理收尾材料」这一幅度的扩张不敏感)。新套件须经 owner 审阅后才能作门。
 
 ### D3. 场景 4b 运行前置 (手册 §场景 4b 小节内的表, 恰六行; 前五条缺一数字不可解读, 第六条是产物形状)
@@ -86,10 +86,11 @@ rule6_note:
 
 - `scenario4b` 所用套件未经 owner 审阅 ⇒ 不合规 (该结果不能作门)。
 - `description_changed: yes` 而 `scenario1` 或 `scenario4b` 为空、`not_required` 或 `n/a` ⇒ 不合规 (见 §2: description 变动照跑场景 1, 另须跑场景 4b); `scenario4b` 为 `fail` 或 `void` ⇒ 义务未完成, 不得 ship (处置见 Aria 主仓 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` §场景 4b)。
-- 两套编号不同轴: `decision_table_row` 取 SOT §2 决策表行号; `scenario1` / `scenario4b` 是手册的场景编号。§4.1 写一句说明。
+- 两套编号不同轴: `decision_table_row` 取 SOT §2 决策表行号; `scenario1` / `scenario4b` 是手册的场景编号。
+
 **转录范围**: T3 只把上面的 YAML 模板、紧随其后的合规条款与「两套编号不同轴」一句写进 SOT §4.1; 本节其余要点是本 proposal 的说明, 不转录。
 
-**随 OQ-7 裁定变化的部分 (不转录)**: 以上模板按 OQ-7 的推荐 (交互模式 A、自主模式 C) 起草。若 owner 在交互模式裁 (B) 暂定运行, T3 前在 `scenario4b` 值域加 ` provisional` 后缀 (如 `<结果目录> pass provisional`), 并把「所用套件未经 owner 审阅 ⇒ 不合规」改为「provisional 结果须经 owner 事后审阅, 审阅改动套件则重跑」。
+**随 OQ-7 裁定变化的部分 (不转录)**: 以上模板按 OQ-7 的推荐 (交互模式 A) 起草。若 owner 在交互模式裁 (B) 暂定运行, T3 前在 `scenario4b` 值域加 ` provisional` 后缀 (如 `<结果目录> pass provisional`), 并把「所用套件未经 owner 审阅 ⇒ 不合规」改为「provisional 结果须经 owner 事后审阅, 审阅改动套件则重跑」。
 
 - **无机械 enforcement** (本 Spec 不加 custom check): 合规靠审阅; 列入 SOT §6 局限 (D6)。
 - **authoring 路径与过渡期**: spec-drafter / task-planner 模板同步由 D5.3 的新 issue 承接 (改它们是 SKILL.md 指令面, 会触发 Rule #6, 不并入本 Spec)。过渡期内起草者从 CLAUDE.md 规则 #6 新句的「字段见 SOT §4.1」获知模板 (CLAUDE.md 每 session 自动加载); 过渡期结束 = D5.3 那张 issue 关闭。
@@ -101,7 +102,7 @@ rule6_note:
 3. 开 `10CG/aria-plugin` issue「spec-drafter / task-planner 模板加 rule6_note 五字段」(D4 的 authoring 路径)。
 4. 上游反馈 (skill-creator, Anthropic 官方插件; 渠道由 owner 定: 官方插件仓 issue 或 Claude Code 反馈) **须含**: 复现步骤、`diag02-sibling-command-collision.jsonl`、v1 / v2 / v3 记分表、两条修复方向 —— (i) 每个 worker 用独立 project root (或每次 run 用独立临时 cwd); (ii) 合成技能不嵌入真技能名, **文件名与 `# <skill_name>` 标题两处都要改** (`This skill handles:` 首句嵌的是 description, 不是技能名, 不在修复范围; 检测串仍保留 uuid, `clean_name in accumulated_json` 照常工作)。发出证据 (标题 + 时间 + 链接或反馈 ID) 记入 `10CG/Aria#211`。
 5. 与 `10CG/aria-standards#17` 分工: 10CG/aria-standards#17 在同一 SOT 拟加「AB 范围」节, 定**广度** (场景 1 跑单 skill 全套件 + 定向 fixture, 还是 Tier 1 全量); 本 Spec 定**深度** (按 hunk 类型跑场景 1 还是 4b)。交叉点: 凡跑场景 1 (包括只改 description 时), 场景 1 的范围按 `10CG/aria-standards#17` 定; 场景 4b 按本 Spec。T7 合并前查 10CG/aria-standards#17 有无并行编辑, 并在 10CG/aria-standards#17 留言写明这条分工。
-6. 开 `10CG/Aria` issue「场景 4b 在 Layer 2 (GLM via Luxeno) 上的验证」(OQ-9 的跟进; 让「只在 Claude 上实测过」这条局限在本 proposal 归档后仍有追踪处)。
+6. 开 `10CG/Aria` issue「自主模式下 description 变动的处理 (跟进 spec)」, 写入 owner 2026-09-15 给出的目标设计: 遇到需要改 description 的任务, 编排器用一种新的失败类型 (如「需要 owner 裁决」), 不自动重试, 改为等 owner 裁; 告警原样带上 Layer 2 写明的原因 (哪个 skill、为什么要改); 由 Layer 1 把不涉及 description 的部分拆成新 issue 继续派发。同时列入已知缺口: 编排器目前不读 runner 的结果枚举 (`CLAUDE_NO_OP` 等) 与 Claude 的说明, 放弃后的失败类型记为 `container_crash` 且默认自动重试; `unattended` 键从 Layer 1 到 Layer 2 的传递未定义 (`10CG/Aria#196`); runner 镜像没有场景 4b 依赖的 skill-creator; 场景 4b 只在 Claude 模型上实测过, Layer 2 所用 GLM 未验证; 自主模式下新套件由谁审 (可选做法: 并入 S7 签字 / 离线批量预审 / 走 AD10 回滚路径 Level 2 加 gate)。**硬前提**: 该跟进 spec 须在要改 skill description 的任务派给 runner 之前落地。
 7. 开 `10CG/Aria` issue「编排器不消费 runner 结果枚举: 部分跳过的改动会按 SUCCESS 推进」(`CLAUDE_NO_OP` 等在 Layer 1 零消费, `_handle_s5_await` 只看退出码); 属 aria-orchestrator 改动, 不在本 Spec 范围, 只成单追踪。
 
 ### D6. SOT §6 已知局限追加第三条 + 计数语
@@ -114,7 +115,7 @@ rule6_note:
 - `standards/conventions/skill-benchmark-exemption.md`: §2 末句 (D1) / §3 边界注 (D1) / 新 §4.1 模板 (D4) / §6 第三条 + 计数语 (D6) / 文件头 Version 1.0.0 → 1.1.0
 - `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`: §场景 4 拆 4a / 4b (D5.1), 4b 含 D2 判据 + D3 前置表 + 两套编号说明 (D4); 「边界与留痕」段首行 (D1); §固定测试集 vs 临时测试 表加 `ab-suite/trigger/` 行 (D2)
 - `aria-plugin-benchmarks/ab-suite/trigger/openspec-archive.json` + `ab-suite/version.yaml` 升版 (D2; **仅在 OQ-3 裁为「接受」后执行**)
-- 四张新 issue (D5.2, D5.3, D5.6, D5.7) + 上游反馈发出证据 (D5.4) + `10CG/aria-standards#17` 分工留言 (D5.5)
+- 三张新 issue (D5.2, D5.3, D5.6) + 上游反馈发出证据 (D5.4) + `10CG/aria-standards#17` 分工留言 (D5.5)
 
 ## Impact
 
@@ -122,7 +123,7 @@ rule6_note:
 - 不影响任何 skill 运行时行为; aria-plugin 零改动 ⇒ 本 Spec 自身不触发 Rule #6。
 - 破坏性: 无; 已 ship 的 rule6_note 不回溯。
 - 场景 4b 成本 (估算, 来源 RESULT.md v6 §时长与成本): 被评 + 参照 + 负控三臂约 180 次 `claude -p`, 并行约 11–20 分钟 / 串行约 32–59 分钟 (单 worker 一臂: `claude-fable-5-1` 上 10m39s–17m39s, `claude-opus-5` 上 15m18s–19m41s; v2–v5 共 13 臂的 run.log), 约 15 美元 (按探针单次 0.08 美元估, `run_eval.py` 不记录成本)。首次为某 skill 建 20 条套件另加约 1 小时, 若须 owner 审阅另加 owner 时间 (OQ-7)。
-- 自主运行时 (v2.0 Layer 2) 的适用性未验证: 场景 4b 的前置、阈值、时长、成本全部来自 Claude 模型实测 (v1–v4 `claude-fable-5-1`, v5 `claude-opus-5`); Layer 2 底层 LLM 是经 Luxeno 路由的 GLM, 其技能激活行为没有数据。见 OQ-7 自主模式一栏与 OQ-9。按推荐 (OQ-7 自主模式 C + OQ-9 先验证), 自主模式在 GLM 验证完成前遇到 description 改动一律停在 S_FAIL, 且按 layer-boundary-contract 默认会自动重试并飞书告警 owner, 这是推荐项的代价。该规则在自主模式里只是给 Layer 2 的指令: 放弃整个任务才必进 S_FAIL, 部分跳过可能按成功推进 (见 OQ-7 (C) 与 D5.7)。
+- 自主运行时 (v2.0 Layer 2): 本 Spec 只写一句禁令 (D1)。跟进 spec (D5.6) 落地之前, 自主 runner 不改任何 skill 的 description, 需要时整单放弃。影响面: aria-plugin 历史 577 次提交里, 改了已有 skill description 的只有 6 次, 约 1% (逐提交比对 frontmatter); 一般开发任务不受影响。代价: runner 开跑后碰到这类任务, 会被打进 S_FAIL (失败类型记为 `container_crash`) 并默认自动重试、反复告警, 直到 owner 手动阻止该 issue 自动派发 (`aria-orchestrator/docs/layer-boundary-contract.md` §S_FAIL handling); 所以跟进 spec 须在这类任务派给 runner 之前落地。
 - 对无套件 skill 的即时影响: 其余 41 个 skill 的下一次 description 变动都要先建套件; 这是有意的 (Rule #6 零裁量), 由 OQ-7 确认。
 
 ## Tasks
@@ -133,7 +134,7 @@ rule6_note:
 - [ ] T3 SOT 新增 §4.1 rule6_note 五字段模板 (D4) —— 只改 SOT
 - [ ] T4 `ab-suite/trigger/openspec-archive.json` 搬入 (逐字节同基线) + `ab-suite/version.yaml` 升版 —— **OQ-3 裁定前不执行**; 若本 Spec ship 时 OQ-3 仍未裁, 本任务标 deferred 并记入 D5.2 的 issue
 - [ ] T5 SOT §6 第三条 + 计数语 (D6); SOT 文件头 Version 1.1.0
-- [ ] T6 开四张 issue (D5.2 / D5.3 / D5.6 / D5.7); 上游反馈发出 (渠道经 owner 确认) 并把证据记入 `10CG/Aria#211` (D5.4)
+- [ ] T6 开三张 issue (D5.2 / D5.3 / D5.6); 上游反馈发出 (渠道经 owner 确认) 并把证据记入 `10CG/Aria#211` (D5.4)
 - [ ] T7 查 `10CG/aria-standards#17` 并行编辑并留分工言 (D5.5); standards 本地 `--no-ff` merge → 双推 → **对 origin 与 github 各自 `git ls-remote` 比对 SHA, 全部一致才算推成功** → 主仓 gitlink bump → 主仓双推同样逐 remote 核验
 - [ ] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v6) + 落地位置; 关单归 owner
 
@@ -144,12 +145,12 @@ rule6_note:
 - SC-3: SOT §4.1 含五个字段名 (`decision_table_row` / `description_changed` / `scenario1` / `scenario4b` / `negctrl`) 各 ≥ 1 次, 且值域含 `void` 与 `n/a`, 且 §4.1 含说明两套编号不同轴的一句 (`grep -cF "两套编号"` ≥ 1); 反事实: 2026-09-14 对现行 SOT grep 五个名均为 0 (已实跑)。
 - SC-4: `diff aria-plugin-benchmarks/ab-suite/trigger/openspec-archive.json <基线目录>/trigger-eval-openspec-archive.json` 为空, 且 `ab-suite/version.yaml` 的 `version` 按 semver 元组比较大于改前 `1.5.0`。T4 标 deferred 时本条改判「deferred 已记入 D5.2 的 issue」。
 - SC-5: 用 python `re` 判 (不用 grep: Claude Code shell 里 `grep` 是 ugrep 包装, 带有界重复的多字节正则会报「exceeds complexity limits」, 与 owner 终端的 GNU grep 行为不同)。取手册 §场景 4b 小节正文 (从 `### 场景 4b` 到下一个 `###` 或 `##` 标题), 去掉含「不设比较判据」的行, 对剩余文本用正则 `(新版|新 description|被评)[^。;\n]{0,20}(≥|>=|不低于|高于|优于|不差于)[^。;\n]{0,10}(旧版|旧 description)` 计数 = 0; 且「不设比较判据」在该小节 ≥ 1 次。三处 D1 落点行 (含核心句的行) 用同一正则计数 = 0。正则的正反样本已自测 (2026-09-14: 两条比较句各命中 1, 「不设比较判据」行与负控门槛行均为 0)。
-- SC-6: D5.2 / D5.3 / D5.6 / D5.7 四张 issue 存在 (`forgejo GET` 返回 200, 不限状态); `10CG/Aria#211` 有一条含「上游反馈」与发出时间的评论; `10CG/aria-standards#17` 有一条含本 Spec 目录名的评论。
+- SC-6: D5.2 / D5.3 / D5.6 三张 issue 存在 (`forgejo GET` 返回 200, 不限状态); `10CG/Aria#211` 有一条含「上游反馈」与发出时间的评论; `10CG/aria-standards#17` 有一条含本 Spec 目录名的评论。
 - SC-7: SOT `grep -c "三个已知缺陷"` = 1 且 `grep -c "两个已知缺陷"` = 0; SOT `grep -cF '**Version**: 1.1.0'` = 1; 手册 `grep -c "边界四条"` = 1 且 `grep -c "边界三条"` = 0。
 - SC-8: 手册含 `### 场景 4a` 与 `### 场景 4b` 两个标题各恰 1 次。
-- SC-9: 手册 §场景 4b 小节含负控门槛「≤ 5/10」与升级条款「连续 2 轮」各 ≥ 1 次; 且同时含「fail」与「不得 ship」的行 ≥ 1、同时含「作废」与「不得 ship」的行 ≥ 1 (两条后果分别断言: 只删其中一条, 本条转红); 且含「参照臂」≥ 1。
-- SC-11 (转录纪律): 转录进规范的文字 —— `CLAUDE.md` 与 SOT §2 含核心句的那一行、SOT §3 边界注、SOT §4.1、SOT §6 第三条、手册 §场景 4a 与 §场景 4b 小节 —— 用 python `re` 统计 `OQ-\d` 与 `\bD\d(?:\.\d)?\b` 均为 0: 本 proposal 的内部编号 (OQ-n / Dn) 出了本文件无法定位, 转录时必须改写成确定的文字 (如「见下方前置表第 1 条」)。
-- SC-12: SOT 含核心句的那一行同时含「unattended == true」「经 owner 审阅」与「S_FAIL」; `CLAUDE.md` `grep -cF "自主运行时的处置见 SOT §2"` = 1; SOT `grep -cF "只在 Claude 模型上实测过"` = 1 (三处都是 v5 为 R4 两条 major 新加的文字, 转录时漏掉任一处本条转红)。
+- SC-9: 手册 §场景 4b 小节含负控门槛「≤ 5/10」与升级条款「连续 2 轮」各 ≥ 1 次; 且同时含「fail 的后果」与「不得 ship」的行 ≥ 1、同时含「作废」与「不得 ship」的行 ≥ 1 (两条后果各用本条款的标题词定位、分别断言: 只删其中一条, 本条转红; 不用单独的「fail」定位, 因为作废条款里的 `Warning: query failed` 也含 fail, v7 自检实测); 且含「参照臂」≥ 1。
+- SC-11 (转录纪律): 转录进规范的文字 —— `CLAUDE.md` 与 SOT §2 含核心句的那一行、SOT §3 边界注、SOT §4.1、SOT §6 第三条、手册 §场景 4a 与 §场景 4b 小节 —— 用 python `re` 统计 `OQ-\d`、`\bD\d(?:\.\d)?\b`、`\bT\d\b`、`\bSC-\d` 与「Why 第」均为 0: 本 proposal 的内部编号 (OQ-n / Dn / Tn / SC-n 与章节指代) 出了本文件无法定位, 转录时必须改写成确定的文字 (如「见下方前置表第 1 条」)。
+- SC-12: SOT 含核心句的那一行同时含「unattended == true」「不做 description 改动」「放弃整个任务」与「写明」; `CLAUDE.md` `grep -cF "自主运行时的处置见 SOT §2"` = 1; SOT `grep -cF "只在 Claude 模型上实测过"` = 1 (三处都是给自主模式划的边界, 转录时漏掉任一处本条转红)。
 - SC-10: 手册 §场景 4b 小节里含「参数钉死」的那一行 (D2 判据正文) 须同时含 `--runs-per-query 3` / `--trigger-threshold 0.5` / `--timeout 120` / `--num-workers 1` 与「20 条」。**按行判, 不按小节判**: 前置表第 1 行也有 `--num-workers 1`, 按小节判会漏掉判据正文里的删除 (R3 qa 席反事实实测)。SOT `grep -cF "description hunk 不走本节"` = 1, 且该行同时含「照跑场景 1」与「另须跑场景 4b」(§3 边界注; 只查「不走本节」的话, 写回 v3 / v4 的旧边界注也能命中, R5 qa 席反事实实测)。
 
 ## Open Questions (owner 裁; 每项给推荐与代价)
@@ -160,17 +161,8 @@ rule6_note:
 - OQ-4 Level: owner 2026-09-13 指示「开 Level 2 cycle」, 本 Spec 按 Level 2 执行。相关成文规则: LEVEL_GUIDE §跨模块判断「跨模块 → 自动提升为 Level 3」, 条件之一「涉及 2 个及以上模块」。按该指南的模块映射, 本 Spec 只落在 standards 一个模块 (`standards/**`; `CLAUDE.md` 与 `aria-plugin-benchmarks/` 不在映射里); 按 meta-repo 口径则是主仓与 standards 子模块两处。请 owner 在知道这条规则的前提下确认 Level 2, 或改为 Level 3。维持 2 的代价: 不产 tasks.md、不跑 post_planning 审计, T1–T8 的验收只写在本 proposal。改 3 的代价: 补 tasks.md 并跑 post_planning 五席审计 (本 Spec 的 post_spec 每轮约半小时, R1 / R2 实测)。
 - OQ-5 **偏离 issue 验收第 2 条**: issue 原文 (逐字): 「**区分力必须非零** —— 若两个 description 的触发率在统计上无差别, 说明场景 4 在本仓语料下同样测不到, 那就是**又一个测量剧场**, 应改开「触发率评测本身不可用」的单而不是把它写进 Rule #6;」。基线正命中 (p = 1.0)。本 Spec 的选择: **仍写进 Rule #6, 但只写成地板守卫** (理由: 负控与过宽两侧都有真实 FAIL 样本, 评测「不可用」的是 A/B 用途, 不是守卫用途)。所选项的代价: Rule #6 多一条义务 (每次 description 改动多一次场景 4b, 约 15 美元与半小时 (被评、参照、负控三臂), 首次还要建套件), 而它只挡两类已验证的破坏。**备选 (issue 字面)**: 不写进 Rule #6, 只开「评测不可用」单 + SOT §6 局限; 代价: description 维度继续零证据, 每次 description 改动照旧跑场景 1 生成空记录。请 owner 二选一。
 - OQ-6 **是否允许放宽** (只跑 4b, 不跑场景 1): 本 Spec 默认不放宽 (D1)。可选的放宽口径: description 改动经逐行点名, 确认只增删「使用场景 / 触发短语列表」、不动「做什么」陈述时, 只跑 4b。放宽的收益: 每次省一次场景 1 (历史实测: `aria-plugin-benchmarks/ab-results/2026-09-04-v1.69.1-spec-drafter-rule5-hunkA/` 下 8 个 `timing.json` 求和, 子代理累计 27.1 分钟、约 65 万 token, 成本未记录)。放宽的代价: 依赖执行者正确点名; 点错了, 执行面的变化无人观测。**推荐暂不放宽**, 等积累几次场景 4b 的真实使用数据再议; 该推荐的代价是每次 description 改动都多跑一次场景 1。
-- OQ-7 其余 41 个 skill 的首次建套件, 与「新套件要不要 owner 审阅」合并裁, 按运行模式分:
-  - **交互模式** (v1.x, 人 + Claude Code): (A) owner 审阅是前置, 套件审过才能作门; 代价: 每个 skill 首次改 description 时要等 owner 审 20 条 query (约 15 分钟 owner 时间), owner 不在线即阻塞。(B) 暂定运行, cycle 作者建套件并跑, 结果带 ` provisional` 后缀 (D4), owner 事后审; 审阅改动套件则重跑 (并行约 11–20 分钟 / 约 15 美元); 代价: 审阅前的门可能由弱套件判出假绿。
-  - **自主模式** (v2.0 Layer 2, aria-runner): AD10 规定整条流水线只有 S7_AWAITING_MERGE 一个人工 gate (`aria-orchestrator/docs/architecture-decisions.md` §AD10); (A) 会在 S7 之外再加一个, 与 AD10 冲突。可选做法如下。事实依据 (v4 曾把 aria-runner-bot 的提交误作自主流水线的产物, 已更正): aria-runner-bot 是 AI 会话共用的机器提交身份 (standards `session-handoff.md` §2.3.9); handoff 里它只与两个开发容器配对出现 (023236f2 23 份、bfe8285d 7 份), 抽查两次发版提交 (v1.64.0 / v1.70.0) 都对应开发容器里的交互会话。更直接的证据: 流水线的改动须经 PR 在 S7 合并, 而 aria-plugin 的 87 个 PR 全部由 simonfish 发起 (Forgejo API, 2026-09-14) ⇒ 没有证据表明 AD10 流水线改过 aria-plugin。
-    - (B) 暂定运行, 并把「新套件审阅」并进 S7 的签字材料 (PR 里带套件与 4b 结果, owner 在 S7 一并审)。代价: S7 的审阅负担变重; S7 之前的门可能由弱套件判出假绿; 且**当前跑不起来**: aria-runner 镜像 (`aria-orchestrator/docker/aria-runner/Dockerfile`) 只预装 aria-plugin, 没有场景 4b 依赖的 skill-creator。
-    - (C) fail-closed: 自主模式不改「没有已审 trigger 套件」的 skill 的 description; 需要改时放弃整个任务、不提交任何改动, 交给交互模式处理。机械通路 (已读代码核实): runner (`aria-orchestrator/docker/aria-runner/modes/initial.sh`) 只有在最终结果为 SUCCESS 时以 0 退出 —— SUCCESS 须同时满足 claude 退出 0、有提交、有 PR、issue YAML 声明的 file_touched / diff_contains 断言命中 —— 其余一律退出 1; 编排器 `_handle_s5_await` 只看容器退出码, 非零即进 S_FAIL(CONTAINER_CRASH)。所以「整个任务不提交」必进 S_FAIL; 但「只跳过 description 改动、交付其余部分」只有在 issue YAML 断言点名了该 SKILL.md 时才会失败, 否则整单按 SUCCESS 推进, 被跳过的部分无人察觉 (runner 写的 `CLAUDE_NO_OP` 等结果枚举在 Layer 1 零消费)。这条规则在自主模式里靠 Layer 2 的 Claude 遵守指令, 不是机械保障。代价: S_FAIL 由 Layer 1 负责, 会飞书告警 owner 并默认自动重试 (`aria-orchestrator/docs/layer-boundary-contract.md`), 重试会反复失败、反复告警, 直到交互模式补齐套件或 owner 手动处理。
-    - (D) 离线批量预审: owner 一次性审完其余 41 个 skill 的套件, 之后自主模式照常按 4b 判门。代价: 先要建 41 份套件 (每份约 1 小时) 并占用 owner 约 10 小时审阅。
-    - (E) 走 AD10 回滚路径 Level 2 (「在 S5_REVIEWING 中间插入一个 optional human gate, 只对高风险 issue 触发」), 把 description 改动归为高风险。代价: 改的是运行时架构决策 AD10 本身, 超出本 Spec 范围, 须另起 spec。
-  - **推荐: 交互模式 (A); 自主模式 (C)**。理由: (C) 不改运行时架构、不增加人工 gate; 没有证据表明 AD10 流水线改过 aria-plugin (见上), (C) 不会阻断任何已发生的工作; (B) 在 runner 镜像装上 skill-creator 之前跑不起来; 自主模式改 description 变得常见时再升级为 (B) 或 (D)。该推荐的代价: 自主模式遇到 description 改动一律停在 S_FAIL, 并按默认策略反复重试、告警。两种模式都不设「套件补齐前免跑」的过渡 lane。
-  - **运行模式怎么判**: 以 `.aria/config.json` 的 `state_scanner.coordination.unattended` 为准 (默认 `false` = 交互模式), 不得由运行期推断 —— 同 phase-a-planner 对该键的既有约定 (「有没有人可问是**配置事实**」)。已知缺口: 该键从 Layer 1 传到 Layer 2 的契约未定义, 缺失时静默回落 `false` (`10CG/Aria#196`), runner 可能误按交互模式走 (A) 并请人审; `10CG/Aria#196` 修好前, 自主模式的这条规则无法保证生效。
+- OQ-7 其余 41 个 skill 的首次建套件, 与「新套件要不要 owner 审阅」合并裁 (本 Spec 只管交互模式; 自主模式见 D1 的禁令与 D5.6 跟进 spec): (A) owner 审阅是前置, 套件审过才能作门; 代价: 每个 skill 首次改 description 时要等 owner 审 20 条 query (约 15 分钟 owner 时间), owner 不在线即阻塞。(B) 暂定运行, cycle 作者建套件并跑, 结果带 ` provisional` 后缀 (D4), owner 事后审; 审阅改动套件则重跑 (并行约 11–20 分钟 / 约 15 美元); 代价: 审阅前的门可能由弱套件判出假绿。**推荐 (A)** (改的是不可协商规则的执行面, 门的质量由 owner 把关), 其代价即 (A) 所列。两种做法都不设「套件补齐前免跑」的过渡 lane。
 - OQ-8 **自然措辞扩张 (已补跑, v5)**: 跑前写定判读规则, 在 `claude-opus-5` 上同批三臂: 参照 description 过门、按新规则构造的负控 0/10、轻微过宽 description 过门 (10 条 should-not 全 0/3)。⇒ 守卫对这一幅度的扩张不判红; 这是局限的实证确认, 不是守卫失效。**推荐**: 判据不改; D2 套件要求写明「should-not 的近似误触须覆盖最可能被扩到的相邻任务」(v4 已写入); 局限写进 SOT §6 (D6)。该推荐的代价: 套件没覆盖到的扩张, 守卫仍判不出。备选: 现在就给 openspec-archive 套件补「整理收尾材料」类近似误触并重跑; 代价是套件改版 (升 `ab-suite/version.yaml`)、一次两臂重跑, 且受 OQ-3 审阅约束。
-- OQ-9 **Layer 2 (GLM) 上的 4b 是否先验证再启用**: **推荐先验证** —— 在 GLM 上跑一次与 v3 同构的三臂基线 (正确 description + 负控 + 一个坏 description, 约 180 次调用), 确认门两侧都判得出差别, 再让自主模式按 4b 判门; 该基线须在 Layer 2 实际使用的 Luxeno 路由环境里跑 (本机 v1–v5 的环境直连 Anthropic, 不代表 Layer 2)。代价: 一次基线的调用成本与时长 (GLM 单价未测; 按 CLAUDE.md 项目状态 Blocker 4 的 Luxeno 延迟 45–54 秒 / 次估, 三臂并行约 50 分钟)。不验证的代价: 自主模式下 4b 的阈值与负控门槛是否适用没有依据。
 
 ## rule6_note
 
