@@ -1,0 +1,19 @@
+=== B2_timeout3 start 2026-09-15T13:52:45Z
+=== B1_bad_model start 2026-09-15T13:52:45Z
+=== B2_timeout3 rc=0 end 2026-09-15T13:52:52Z
+=== B2_timeout3 classify rc=1 {"role": "evaluated", "expected_calls": 2, "logged_calls": 2, "unhealthy_calls": 2, "unhealthy_reasons": {"耗时达到超时阈值": 2, "无判定事件": 2}, "unmapped_calls": 0, "count_mismatch_queries": 0, "gate_recorded": false, "verdict": "void"}
+=== 重跑探针 2026-09-15T13:58:14Z
+=== B1_bad_model start 2026-09-15T13:58:14Z
+=== B2_timeout3 start 2026-09-15T13:58:14Z
+=== B2_timeout3 rc=0 end 2026-09-15T13:58:21Z
+=== B2_timeout3 classify rc=1 {"role": "evaluated", "expected_calls": 2, "logged_calls": 2, "unhealthy_calls": 2, "unhealthy_reasons": {"耗时达到超时阈值": 2, "无判定事件": 2}, "unmapped_calls": 0, "count_mismatch_queries": 0, "gate_recorded": false, "verdict": "void"}
+=== B1_bad_model rc=0 end 2026-09-15T13:58:25Z
+=== B1_bad_model classify rc=1 {"role": "evaluated", "expected_calls": 2, "logged_calls": 2, "unhealthy_calls": 2, "unhealthy_reasons": {"result 帧报错": 2}, "unmapped_calls": 0, "count_mismatch_queries": 0, "gate_recorded": false, "verdict": "void"}
+ALL_DONE probes 2026-09-15T13:58:25Z
+=== C1_new start 2026-09-15T14:00:42Z
+=== C2_negctrl start 2026-09-15T14:00:42Z
+=== C1_new rc=0 end 2026-09-15T14:12:15Z
+=== C1_new classify rc=0 {"role": "evaluated", "expected_calls": 60, "logged_calls": 60, "unhealthy_calls": 0, "unhealthy_reasons": {}, "unmapped_calls": 0, "count_mismatch_queries": 0, "gate_recorded": true, "verdict": "pass"}
+=== C2_negctrl rc=0 end 2026-09-15T14:12:55Z
+=== C2_negctrl classify rc=0 {"role": "negctrl", "expected_calls": 60, "logged_calls": 60, "unhealthy_calls": 0, "unhealthy_reasons": {}, "unmapped_calls": 0, "count_mismatch_queries": 0, "hits_recorded": 0, "hits_min": 0, "hits_max": 0, "verdict": "valid"}
+ALL_DONE full 2026-09-15T14:12:55Z
