@@ -1,0 +1,59 @@
+{
+ "summary": {
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
+  "healthy": true
+ },
+ "calls": [
+  {
+   "file": "1789478602625239200-1140688.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478602734265747-1140728.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.21,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478602952781291-1140802.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.26,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603228642175-1140846.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.28,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603522328618-1140910.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603595553281-1140925.jsonl",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

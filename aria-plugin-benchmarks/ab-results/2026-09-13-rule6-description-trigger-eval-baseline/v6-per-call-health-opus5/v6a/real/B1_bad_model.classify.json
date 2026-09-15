@@ -1,0 +1,33 @@
+{
+ "summary": {
+  "expected_calls": 2,
+  "logged_calls": 2,
+  "unhealthy_calls": 2,
+  "unhealthy_reasons": {
+   "result 帧报错": 2
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478105251594386-1135958.jsonl",
+   "frames": 5,
+   "first_decisive": "result",
+   "duration_s": 5.3,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478110561739269-1136203.jsonl",
+   "frames": 5,
+   "first_decisive": "result",
+   "duration_s": 3.48,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  }
+ ]
+}

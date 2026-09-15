@@ -1,0 +1,80 @@
+{
+ "summary": {
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 6,
+  "unhealthy_reasons": {
+   "耗时达到超时阈值": 6,
+   "无判定事件": 6
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478605196233244-1141129.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.23,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478608461744415-1141682.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.36,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478611840853756-1142272.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.68,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478615576705109-1142986.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.12,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478618719897348-1143260.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.06,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478621787728698-1143287.jsonl",
+   "frames": 2,
+   "first_decisive": null,
+   "duration_s": 3.11,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  }
+ ]
+}

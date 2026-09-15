@@ -1,0 +1,73 @@
+{
+ "summary": {
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 6,
+  "unhealthy_reasons": {
+   "result 帧报错": 6
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478602727965752-1140726.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.08,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478602813634659-1140764.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.18,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478603014996949-1140817.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.28,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478603326922108-1140865.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.07,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478603435965151-1140896.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.14,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478603620717556-1140929.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.16,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  }
+ ]
+}

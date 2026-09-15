@@ -1,0 +1,36 @@
+{
+ "summary": {
+  "expected_calls": 2,
+  "logged_calls": 2,
+  "unhealthy_calls": 2,
+  "unhealthy_reasons": {
+   "耗时达到超时阈值": 2,
+   "无判定事件": 2
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478105226701843-1135950.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 3.03,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478108261236340-1136105.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 3.01,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  }
+ ]
+}

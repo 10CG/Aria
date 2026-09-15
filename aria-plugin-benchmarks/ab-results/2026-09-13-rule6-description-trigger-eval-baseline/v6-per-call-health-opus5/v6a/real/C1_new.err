@@ -1,0 +1,22 @@
+Evaluating: 归档已完成的 OpenSpec 变更到 openspec/archive/ 目录，并做归档后落点校验。 使用场景："归档 Spec"、"Phase D.2"、"完成变更归档"
+Results: 20/20 passed
+  [PASS] rate=3/3 expected=True: openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 ta
+  [PASS] rate=3/3 expected=True: 归档 Spec aria-2.0-m6-release-closeout
+  [PASS] rate=3/3 expected=True: 我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-c
+  [PASS] rate=3/3 expected=True: phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity
+  [PASS] rate=3/3 expected=True: 这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 ope
+  [PASS] rate=3/3 expected=True: 周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 o
+  [PASS] rate=3/3 expected=True: 帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个
+  [PASS] rate=3/3 expected=True: 我想把 openspec/changes/aria-secret-guard-manifest-precision 标记为已完成并放到归档目
+  [PASS] rate=3/3 expected=True: archive the finished openspec change `forgejo-hosts-parameterization` 
+  [PASS] rate=3/3 expected=True: D.2 归档 + 落点校验, change = aria-124-submodule-pointer-regression-gate
+  [PASS] rate=0/3 expected=False: 把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支
+  [PASS] rate=0/3 expected=False: docs/handoff/ 里 2026-05 月份的 handoff 文档太多了, 帮我挪进 docs/handoff/archive/2
+  [PASS] rate=0/3 expected=False: 帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 
+  [PASS] rate=0/3 expected=False: openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 
+  [PASS] rate=0/3 expected=False: 10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了
+  [PASS] rate=0/3 expected=False: 把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清
+  [PASS] rate=0/3 expected=False: openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写
+  [PASS] rate=0/3 expected=False: 查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段
+  [PASS] rate=0/3 expected=False: openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markd
+  [PASS] rate=0/3 expected=False: 本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 

@@ -1,0 +1,40 @@
+{
+ "summary": {
+  "role": "evaluated",
+  "expected_calls": 1,
+  "logged_calls": 1,
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
+  "unmapped_calls": 1,
+  "count_mismatch_queries": 1,
+  "gate_recorded": true,
+  "verdict": "void"
+ },
+ "queries": [
+  {
+   "query": "输出里的 query",
+   "should_trigger": false,
+   "runs": 1,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": true,
+   "pass_best": true
+  }
+ ],
+ "calls": [
+  {
+   "file": "1-1.jsonl",
+   "query": "不在输出里的 query",
+   "frames": 1,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 1.0,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

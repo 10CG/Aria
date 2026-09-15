@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+# 假 `claude -p`: 按调用序号注入故障, 不调用任何 API。用来验证 classify_calls.py 的判定。
+import glob
+import json
+import os
+import sys
+import time
+
+args = sys.argv[1:]
+q = args[args.index("-p") + 1] if "-p" in args else ""
+with open(os.environ["FAKE_SUITE"], encoding="utf-8") as fh:
+    should = {x["query"]: x["should_trigger"] for x in json.load(fh)}
+mode = os.environ.get("FAKE_MODE", "correct")   # correct | all | never | other_tool
+kind = os.environ.get("FAKE_KIND", "")          # 故障形态, 只在 FAKE_OUTAGE 覆盖的调用上生效
+outage = os.environ.get("FAKE_OUTAGE", "")      # 调用序号区间 "a-b" 或 "a-" (从 0 起)
+counter = os.environ["FAKE_COUNTER"]
+try:
+    with open(counter) as fh:
+        idx = int(fh.read().strip() or 0)
+except FileNotFoundError:
+    idx = 0
+with open(counter, "w") as fh:
+    fh.write(str(idx + 1))
+
+
+def emit(o):
+    sys.stdout.write(json.dumps(o, ensure_ascii=False) + "\n")
+    sys.stdout.flush()
+
+
+def in_outage(i):
+    if not outage:
+        return False
+    a, b = outage.split("-")
+    return int(a) <= i <= (int(b) if b else 10 ** 9)
+
+
+if in_outage(idx):
+    if kind == "silent_exit":
+        sys.exit(1)
+    emit({"type": "system", "subtype": "init"})
+    if kind == "result_error":
+        emit({"type": "result", "subtype": "success", "is_error": True, "result": "API Error: 529 overloaded_error"})
+        sys.exit(1)
+    if kind == "exit_after_init":
+        sys.exit(1)
+    if kind == "partial_then_exit":
+        emit({"type": "stream_event", "event": {"type": "message_start"}})
+        sys.exit(1)
+    if kind == "hang":
+        time.sleep(float(os.environ.get("FAKE_HANG", "6")))
+        sys.exit(0)
+    if kind == "slow_decisive":
+        emit({"type": "stream_event", "event": {"type": "message_start"}})
+        time.sleep(float(os.environ.get("FAKE_HANG", "6")))
+        emit({"type": "stream_event", "event": {"type": "message_stop"}})
+        sys.exit(0)
+
+emit({"type": "system", "subtype": "init"})
+if os.environ.get("FAKE_RETRY_FRAMES"):
+    emit({"type": "system", "subtype": "api_retry", "attempt": 1})
+emit({"type": "stream_event", "event": {"type": "message_start"}})
+if mode == "other_tool":
+    emit({"type": "stream_event", "event": {"type": "content_block_start", "index": 0,
+                                            "content_block": {"type": "tool_use", "name": "Bash", "input": {}}}})
+elif mode == "all" or (mode == "correct" and should.get(q, False)):
+    files = glob.glob(".claude/commands/*.md")
+    name = os.path.basename(files[0])[:-3] if files else "none"
+    emit({"type": "stream_event", "event": {"type": "content_block_start", "index": 0,
+                                            "content_block": {"type": "tool_use", "name": "Skill", "input": {}}}})
+    emit({"type": "stream_event", "event": {"type": "content_block_delta", "index": 0,
+                                            "delta": {"type": "input_json_delta", "partial_json": json.dumps({"skill": name})}}})
+else:
+    emit({"type": "stream_event", "event": {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}}})
+    emit({"type": "stream_event", "event": {"type": "content_block_stop", "index": 0}})
+    emit({"type": "stream_event", "event": {"type": "message_stop"}})
+time.sleep(2)
+emit({"type": "result", "subtype": "success", "is_error": False, "result": "ok"})

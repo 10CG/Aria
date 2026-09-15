@@ -1,0 +1,27 @@
+{
+  "skill_name": "helper",
+  "description": "\u5f52\u6863\u5df2\u5b8c\u6210\u7684 OpenSpec \u53d8\u66f4\u5230 openspec/archive/ \u76ee\u5f55\uff0c\u5e76\u505a\u5f52\u6863\u540e\u843d\u70b9\u6821\u9a8c\u3002 \u4f7f\u7528\u573a\u666f\uff1a\"\u5f52\u6863 Spec\"\u3001\"Phase D.2\"\u3001\"\u5b8c\u6210\u53d8\u66f4\u5f52\u6863\"",
+  "results": [
+    {
+      "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity \u8fd9\u4e2a spec \u7684 tasks.md \u5168\u52fe\u5b8c\u4e86, PR \u4e5f merge \u4e86, \u5e2e\u6211\u628a\u5b83\u5f52\u6863\u6389, \u8d70 Phase D.2",
+      "should_trigger": true,
+      "trigger_rate": 0.0,
+      "triggers": 0,
+      "runs": 1,
+      "pass": false
+    },
+    {
+      "query": "\u628a feature/state-scanner-v2.9 \u8fd9\u4e2a\u5df2\u7ecf\u5408\u5e76\u7684 git \u5206\u652f\u5f52\u6863\u4e00\u4e0b, \u6253\u4e2a tag \u7559\u6863\u7136\u540e\u5220\u6389\u8fdc\u7aef\u5206\u652f",
+      "should_trigger": false,
+      "trigger_rate": 0.0,
+      "triggers": 0,
+      "runs": 1,
+      "pass": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1
+  }
+}

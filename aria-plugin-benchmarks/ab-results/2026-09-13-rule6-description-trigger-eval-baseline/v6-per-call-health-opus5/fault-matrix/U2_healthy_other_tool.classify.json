@@ -1,0 +1,103 @@
+{
+ "summary": {
+  "role": "evaluated",
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
+  "unmapped_calls": 0,
+  "count_mismatch_queries": 0,
+  "gate_recorded": false,
+  "verdict": "fail"
+ },
+ "queries": [
+  {
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "should_trigger": true,
+   "runs": 3,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": false,
+   "pass_best": false
+  },
+  {
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "should_trigger": false,
+   "runs": 3,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": true,
+   "pass_best": true
+  }
+ ],
+ "calls": [
+  {
+   "file": "1789480314545604369-1165652.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.17,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789480314770586940-1165710.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.3,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789480315115014931-1165768.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.32,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789480315476102371-1165814.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.27,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789480315787407375-1165866.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.39,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789480316147687913-1165886.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 3,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

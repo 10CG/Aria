@@ -1,0 +1,390 @@
+[
+ {
+  "tag": "U1_healthy_correct",
+  "run_eval_rc": 0,
+  "gate": true,
+  "should_hits": 1,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U2_healthy_other_tool",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U3_healthy_retry_frames",
+  "run_eval_rc": 0,
+  "gate": true,
+  "should_hits": 1,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U4_healthy_never",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F1_result_error",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": false
+ },
+ {
+  "tag": "F2_exit_after_init",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F3_silent_exit",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F4_partial_then_exit",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F5_hang_timeout",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "耗时达到超时阈值": 6,
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F6_decisive_after_timeout",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "耗时达到超时阈值": 6,
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F7_real_claude_missing",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F8_shim_not_on_path",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 6,
+  "classify_rc": 1,
+  "classify": {
+   "expected_calls": 6,
+   "logged_calls": 0,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": false
+  },
+  "expected": {
+   "healthy": false,
+   "warning": true,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S1_overbroad_fault_in_shouldnot_half",
+  "run_eval_rc": 0,
+  "gate": true,
+  "should_hits": 10,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": false
+ },
+ {
+  "tag": "S2_correct_fault_on_one_should_query",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 9,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": false,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": false
+ },
+ {
+  "tag": "S3_healthy_correct",
+  "run_eval_rc": 0,
+  "gate": true,
+  "should_hits": 10,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S4_healthy_overbroad",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 10,
+  "shouldnot_hits": 10,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S5_healthy_negctrl",
+  "run_eval_rc": 0,
+  "gate": false,
+  "should_hits": 0,
+  "shouldnot_hits": 0,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "healthy": true
+  },
+  "expected": {
+   "healthy": true,
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ }
+]

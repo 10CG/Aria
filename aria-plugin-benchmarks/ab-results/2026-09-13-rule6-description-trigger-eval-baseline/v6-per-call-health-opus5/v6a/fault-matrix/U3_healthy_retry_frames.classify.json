@@ -1,0 +1,59 @@
+{
+ "summary": {
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
+  "healthy": true
+ },
+ "calls": [
+  {
+   "file": "1789478602795041429-1140748.jsonl",
+   "frames": 5,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.2,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603018048508-1140819.jsonl",
+   "frames": 5,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.29,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603327516281-1140864.jsonl",
+   "frames": 5,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.23,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603579969749-1140923.jsonl",
+   "frames": 6,
+   "first_decisive": "message_stop",
+   "duration_s": 0.17,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478603786718702-1140974.jsonl",
+   "frames": 6,
+   "first_decisive": "message_stop",
+   "duration_s": 0.22,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478604019674848-1141007.jsonl",
+   "frames": 6,
+   "first_decisive": "message_stop",
+   "duration_s": 0.18,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

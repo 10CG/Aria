@@ -1,0 +1,73 @@
+{
+ "summary": {
+  "expected_calls": 6,
+  "logged_calls": 6,
+  "unhealthy_calls": 6,
+  "unhealthy_reasons": {
+   "无判定事件": 6
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478602791169350-1140755.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.12,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478602950605503-1140801.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.25,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478603215491860-1140845.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.32,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478603571005004-1140921.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.21,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478603821524627-1140984.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.2,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478604045282193-1141015.jsonl",
+   "frames": 0,
+   "first_decisive": null,
+   "duration_s": 0.28,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  }
+ ]
+}

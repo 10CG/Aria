@@ -1,0 +1,42 @@
+{
+ "summary": {
+  "role": "evaluated",
+  "expected_calls": 6,
+  "logged_calls": 0,
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
+  "unmapped_calls": 0,
+  "count_mismatch_queries": 2,
+  "gate_recorded": false,
+  "verdict": "void"
+ },
+ "queries": [
+  {
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "should_trigger": true,
+   "runs": 3,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": false,
+   "pass_best": false
+  },
+  {
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "should_trigger": false,
+   "runs": 3,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": true,
+   "pass_best": true
+  }
+ ],
+ "calls": []
+}

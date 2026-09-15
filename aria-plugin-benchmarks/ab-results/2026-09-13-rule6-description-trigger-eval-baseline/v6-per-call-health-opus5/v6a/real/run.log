@@ -1,0 +1,14 @@
+=== B2_timeout3 start 2026-09-15T13:15:05Z
+=== B1_bad_model start 2026-09-15T13:15:05Z
+=== B2_timeout3 rc=0 end 2026-09-15T13:15:11Z
+=== B2_timeout3 classify rc=1 {"expected_calls": 2, "logged_calls": 2, "unhealthy_calls": 2, "unhealthy_reasons": {"耗时达到超时阈值": 2, "无判定事件": 2}, "healthy": false}
+=== B1_bad_model rc=0 end 2026-09-15T13:15:14Z
+=== B1_bad_model classify rc=1 {"expected_calls": 2, "logged_calls": 2, "unhealthy_calls": 2, "unhealthy_reasons": {"result 帧报错": 2}, "healthy": false}
+ALL_DONE probes 2026-09-15T13:15:14Z
+=== C2_negctrl start 2026-09-15T13:16:48Z
+=== C1_new start 2026-09-15T13:16:48Z
+=== C1_new rc=0 end 2026-09-15T13:35:25Z
+=== C1_new classify rc=0 {"expected_calls": 60, "logged_calls": 60, "unhealthy_calls": 0, "unhealthy_reasons": {}, "healthy": true}
+=== C2_negctrl rc=0 end 2026-09-15T13:39:53Z
+=== C2_negctrl classify rc=1 {"expected_calls": 60, "logged_calls": 60, "unhealthy_calls": 2, "unhealthy_reasons": {"耗时达到超时阈值": 2, "无判定事件": 2}, "healthy": false}
+ALL_DONE full 2026-09-15T13:39:53Z

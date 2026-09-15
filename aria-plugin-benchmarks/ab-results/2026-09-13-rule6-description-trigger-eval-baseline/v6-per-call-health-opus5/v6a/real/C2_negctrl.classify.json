@@ -1,0 +1,500 @@
+{
+ "summary": {
+  "expected_calls": 60,
+  "logged_calls": 60,
+  "unhealthy_calls": 2,
+  "unhealthy_reasons": {
+   "耗时达到超时阈值": 2,
+   "无判定事件": 2
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478208779834923-1137303.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 9.88,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478218667561771-1137738.jsonl",
+   "frames": 17,
+   "first_decisive": "tool_use_start",
+   "duration_s": 83.03,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478301711052511-1138437.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.41,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478308127730407-1138498.jsonl",
+   "frames": 17,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.98,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478315092232056-1138568.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 44.91,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478360008579784-1138850.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 9.49,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478369500965112-1138976.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 8.77,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478378282536585-1139050.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 9.27,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478387557744911-1139128.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 43.78,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478431343885704-1139425.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 23.73,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478455084161200-1139609.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 44.28,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478499368262812-1139928.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 8.57,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478507939131064-1139985.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.89,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478514836959145-1140035.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 62.11,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478576950254604-1140409.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 61.36,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478638320873725-1145554.jsonl",
+   "frames": 8,
+   "first_decisive": null,
+   "duration_s": 120.37,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789478758695107342-1147287.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.62,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478765317940090-1147351.jsonl",
+   "frames": 11,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.95,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478773276598780-1147434.jsonl",
+   "frames": 26,
+   "first_decisive": "tool_use_start",
+   "duration_s": 25.87,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478799148056223-1147606.jsonl",
+   "frames": 26,
+   "first_decisive": "tool_use_start",
+   "duration_s": 44.62,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478843768548822-1147952.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 10.29,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478854060818783-1148109.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 4.96,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478859025011855-1148202.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 42.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478901168461349-1151598.jsonl",
+   "frames": 9,
+   "first_decisive": "tool_use_start",
+   "duration_s": 8.77,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478909943242565-1151708.jsonl",
+   "frames": 9,
+   "first_decisive": "tool_use_start",
+   "duration_s": 8.53,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478918482131558-1151822.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.72,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478925212924178-1151924.jsonl",
+   "frames": 9,
+   "first_decisive": "tool_use_start",
+   "duration_s": 4.69,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478929910813989-1151996.jsonl",
+   "frames": 16,
+   "first_decisive": "tool_use_start",
+   "duration_s": 65.44,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478995359855341-1152482.jsonl",
+   "frames": 16,
+   "first_decisive": "tool_use_start",
+   "duration_s": 9.99,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479005088710850-1152570.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.17,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479012265287465-1152681.jsonl",
+   "frames": 14,
+   "first_decisive": "tool_use_start",
+   "duration_s": 12.01,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479024287247955-1152766.jsonl",
+   "frames": 14,
+   "first_decisive": "tool_use_start",
+   "duration_s": 28.72,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479053018754015-1153550.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 9.64,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479062670566633-1153667.jsonl",
+   "frames": 8,
+   "first_decisive": null,
+   "duration_s": 120.22,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789479182898923398-1154803.jsonl",
+   "frames": 11,
+   "first_decisive": "tool_use_start",
+   "duration_s": 24.88,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479207782167419-1154997.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 8.24,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479216030418818-1155060.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 24.13,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479240163041595-1156115.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.88,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479248047138853-1156217.jsonl",
+   "frames": 21,
+   "first_decisive": "tool_use_start",
+   "duration_s": 43.63,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479291686410187-1156446.jsonl",
+   "frames": 17,
+   "first_decisive": "tool_use_start",
+   "duration_s": 42.26,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479333954881617-1156605.jsonl",
+   "frames": 16,
+   "first_decisive": "tool_use_start",
+   "duration_s": 64.34,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479398304698699-1156835.jsonl",
+   "frames": 12,
+   "first_decisive": "tool_use_start",
+   "duration_s": 10.52,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479408833459087-1156915.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.5,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479416342251290-1156976.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.72,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479423068412096-1157049.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.16,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479429238327757-1157109.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 4.6,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479433842387937-1157175.jsonl",
+   "frames": 16,
+   "first_decisive": "tool_use_start",
+   "duration_s": 4.65,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479438500836357-1157221.jsonl",
+   "frames": 18,
+   "first_decisive": "tool_use_start",
+   "duration_s": 5.34,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479443848573065-1157282.jsonl",
+   "frames": 29,
+   "first_decisive": "tool_use_start",
+   "duration_s": 39.67,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479483523217853-1157472.jsonl",
+   "frames": 24,
+   "first_decisive": "tool_use_start",
+   "duration_s": 44.25,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479527775001547-1157958.jsonl",
+   "frames": 22,
+   "first_decisive": "tool_use_start",
+   "duration_s": 5.68,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479533462249274-1158305.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.73,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479541201188538-1158456.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.86,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479548065213792-1158507.jsonl",
+   "frames": 24,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.81,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479554882270100-1158568.jsonl",
+   "frames": 10,
+   "first_decisive": "tool_use_start",
+   "duration_s": 4.79,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479559681098033-1158617.jsonl",
+   "frames": 22,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.37,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479566058856955-1158674.jsonl",
+   "frames": 21,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479572202125074-1158727.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 6.48,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479578692999239-1158780.jsonl",
+   "frames": 15,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.22,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789479585922529444-1158841.jsonl",
+   "frames": 13,
+   "first_decisive": "tool_use_start",
+   "duration_s": 7.89,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

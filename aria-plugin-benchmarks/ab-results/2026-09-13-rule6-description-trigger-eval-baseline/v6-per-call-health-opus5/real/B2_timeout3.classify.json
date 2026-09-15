@@ -1,0 +1,72 @@
+{
+ "summary": {
+  "role": "evaluated",
+  "expected_calls": 2,
+  "logged_calls": 2,
+  "unhealthy_calls": 2,
+  "unhealthy_reasons": {
+   "耗时达到超时阈值": 2,
+   "无判定事件": 2
+  },
+  "unmapped_calls": 0,
+  "count_mismatch_queries": 0,
+  "gate_recorded": false,
+  "verdict": "void"
+ },
+ "queries": [
+  {
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "should_trigger": true,
+   "runs": 1,
+   "triggers": 0,
+   "unhealthy": 1,
+   "triggers_range": [
+    0,
+    1
+   ],
+   "pass_worst": false,
+   "pass_best": true
+  },
+  {
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "should_trigger": false,
+   "runs": 1,
+   "triggers": 0,
+   "unhealthy": 1,
+   "triggers_range": [
+    0,
+    1
+   ],
+   "pass_worst": false,
+   "pass_best": true
+  }
+ ],
+ "calls": [
+  {
+   "file": "1789480694576189370-1176861.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "frames": 2,
+   "first_decisive": null,
+   "may_be_recorded_true": false,
+   "duration_s": 3.99,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789480698575957438-1177041.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 3,
+   "first_decisive": null,
+   "may_be_recorded_true": false,
+   "duration_s": 3.24,
+   "healthy": false,
+   "reasons": [
+    "耗时达到超时阈值",
+    "无判定事件"
+   ]
+  }
+ ]
+}

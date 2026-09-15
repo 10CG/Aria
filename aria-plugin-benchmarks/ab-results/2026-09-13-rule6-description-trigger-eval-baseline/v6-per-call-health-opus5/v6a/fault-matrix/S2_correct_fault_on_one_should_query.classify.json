@@ -1,0 +1,499 @@
+{
+ "summary": {
+  "expected_calls": 60,
+  "logged_calls": 60,
+  "unhealthy_calls": 3,
+  "unhealthy_reasons": {
+   "result 帧报错": 3
+  },
+  "healthy": false
+ },
+ "calls": [
+  {
+   "file": "1789478604494315270-1141099.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.54,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478605047795573-1141127.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.44,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478605573665054-1141185.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.23,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478605859463471-1141230.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478606208541811-1141269.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.09,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478606413870187-1141312.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478606578851887-1141346.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.05,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478606638250901-1141356.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.14,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478606790082531-1141376.jsonl",
+   "frames": 2,
+   "first_decisive": "result",
+   "duration_s": 0.15,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789478606949831822-1141404.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607112745172-1141436.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.18,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607306767913-1141462.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.22,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607559719960-1141501.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607776644934-1141514.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607869358113-1141555.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478607959139406-1141576.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478608107975013-1141616.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.11,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478608295361625-1141639.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.12,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478608436306756-1141675.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.42,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478608866207878-1141744.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.12,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609034821154-1141772.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609141805593-1141816.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609196020608-1141825.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.05,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609249265919-1141831.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.04,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609299832402-1141837.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.04,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609350847394-1141843.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609464318167-1141865.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.08,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609557647824-1141889.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.05,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478609925935994-1141895.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.21,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478610137695244-1141985.jsonl",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "duration_s": 0.18,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478610329519255-1142019.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.28,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478610519773628-1142048.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.22,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478610735839767-1142085.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.05,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478610824299382-1142102.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478611111287093-1142149.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.21,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478611368818774-1142194.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.23,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478611623019090-1142235.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.25,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478611913105120-1142282.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.12,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478611989308307-1142301.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.52,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478612564412367-1142379.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.26,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478612843295356-1142429.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.18,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613038594393-1142477.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613107280854-1142492.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.11,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613227414534-1142518.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613319571543-1142541.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613469893083-1142577.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613582650722-1142613.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.07,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613659029576-1142634.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.04,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613706041464-1142645.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.05,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613760791440-1142658.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.04,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613815255958-1142669.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.13,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478613958006719-1142702.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614112497837-1142740.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614255755391-1142777.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.21,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614484254744-1142819.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614597810734-1142840.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614758138374-1142885.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478614867370519-1142911.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.16,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478615034833501-1142943.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.2,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789478615260861361-1142973.jsonl",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "duration_s": 0.62,
+   "healthy": true,
+   "reasons": []
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+Evaluating: 归档已完成的 OpenSpec 变更到 openspec/archive/ 目录，并做归档后落点校验。 使用场景："归档 Spec"、"Phase D.2"、"完成变更归档"
+Results: 1/2 passed
+  [FAIL] rate=0/1 expected=True: openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 ta
+  [PASS] rate=0/1 expected=False: 把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支

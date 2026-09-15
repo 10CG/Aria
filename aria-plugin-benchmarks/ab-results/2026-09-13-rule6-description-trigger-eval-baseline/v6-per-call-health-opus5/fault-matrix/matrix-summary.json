@@ -1,0 +1,616 @@
+[
+ {
+  "tag": "U1_healthy_correct",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "pass"
+  },
+  "expected": {
+   "verdict": "pass",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U2_healthy_other_tool",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "fail"
+  },
+  "expected": {
+   "verdict": "fail",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U3_healthy_retry_frames",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "pass"
+  },
+  "expected": {
+   "verdict": "pass",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "U4_healthy_never",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "fail"
+  },
+  "expected": {
+   "verdict": "fail",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F1_result_error",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "result 帧报错": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F2_exit_after_init",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F3_silent_exit",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F4_partial_then_exit",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F5_hang_timeout",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "耗时达到超时阈值": 6,
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F6_decisive_after_timeout",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "耗时达到超时阈值": 6,
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F7_real_claude_missing",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "无判定事件": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F8_shim_not_on_path",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 6,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 0,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 2,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": true,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "F9_decisive_in_timeout_margin",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 6,
+   "logged_calls": 6,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "耗时达到超时阈值": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": null
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S1_overbroad_fault_in_shouldnot_half",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 30,
+   "unhealthy_reasons": {
+    "result 帧报错": 30
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S2_correct_fault_on_one_should_query",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 3,
+   "unhealthy_reasons": {
+    "result 帧报错": 3
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S3_healthy_correct",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "pass"
+  },
+  "expected": {
+   "verdict": "pass",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S4_healthy_overbroad",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "fail"
+  },
+  "expected": {
+   "verdict": "fail",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S5_healthy_negctrl",
+  "role": "negctrl",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "negctrl",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "hits_recorded": 0,
+   "hits_min": 0,
+   "hits_max": 0,
+   "verdict": "valid"
+  },
+  "expected": {
+   "verdict": "valid",
+   "warning": false,
+   "gate": null
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S6_one_run_fault_should",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 1,
+   "unhealthy_reasons": {
+    "result 帧报错": 1
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "pass"
+  },
+  "expected": {
+   "verdict": "pass",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S7_one_run_fault_shouldnot",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 1,
+   "unhealthy_reasons": {
+    "result 帧报错": 1
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": true,
+   "verdict": "pass"
+  },
+  "expected": {
+   "verdict": "pass",
+   "warning": false,
+   "gate": true
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S8_two_run_fault_should",
+  "role": "evaluated",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 2,
+   "unhealthy_reasons": {
+    "result 帧报错": 2
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "gate_recorded": false,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": false
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S9_negctrl_one_run_fault_x6",
+  "role": "negctrl",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 0,
+  "classify": {
+   "role": "negctrl",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 6,
+   "unhealthy_reasons": {
+    "result 帧报错": 6
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "hits_recorded": 0,
+   "hits_min": 0,
+   "hits_max": 0,
+   "verdict": "valid"
+  },
+  "expected": {
+   "verdict": "valid",
+   "warning": false,
+   "gate": null
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "S10_negctrl_two_run_fault_x6",
+  "role": "negctrl",
+  "gate": false,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "negctrl",
+   "expected_calls": 60,
+   "logged_calls": 60,
+   "unhealthy_calls": 12,
+   "unhealthy_reasons": {
+    "result 帧报错": 12
+   },
+   "unmapped_calls": 0,
+   "count_mismatch_queries": 0,
+   "hits_recorded": 0,
+   "hits_min": 0,
+   "hits_max": 6,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": null
+  },
+  "matches_expectation": true
+ },
+ {
+  "tag": "M1_unmapped_query",
+  "role": "evaluated",
+  "gate": true,
+  "warning_lines": 0,
+  "classify_rc": 1,
+  "classify": {
+   "role": "evaluated",
+   "expected_calls": 1,
+   "logged_calls": 1,
+   "unhealthy_calls": 0,
+   "unhealthy_reasons": {},
+   "unmapped_calls": 1,
+   "count_mismatch_queries": 1,
+   "gate_recorded": true,
+   "verdict": "void"
+  },
+  "expected": {
+   "verdict": "void",
+   "warning": false,
+   "gate": null
+  },
+  "matches_expectation": true
+ }
+]
