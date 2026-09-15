@@ -2,20 +2,20 @@
 track-id: two-l2-specs-195-199-phase-a
 owner-container: aria-runner-bot/bfe8285d
 phase: A
-status: done
-updated-at: 2026-09-13T03:20:00Z
+status: abandoned
+updated-at: 2026-09-11T16:35:00Z
 ---
 
 # Aria — Session Handoff (2026-09-11, 会话收尾) — 两份 Level 2 Spec 的 Phase A 各跑满 5 轮 post_spec, 双双停在 owner 裁决面
 
-> **⇒ 本轨终结 (2026-09-13, simonfish/023236f2)**: §2 的 H1–H4 已全部裁决 —— owner 对两份 Spec 的 max_rounds 终局均取路径 [1], 22 条待复议项按「产品级 owner / 技术级 AI」分工归类裁定 (决策单 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md`), 两份 Spec 升 Level 3 转 Approved, 由本容器以各自 change-id 重新认领 (`handoff-multibranch-subdir-path-fidelity` 先 / `pre-merge-completeness-gate-change-scope` 后)。后续见 `docs/handoff/2026-09-13-owner-gates-cleared-195-199-approved-level3.md`。本文件其余内容保持原样。
->
+> ⛔ **已移交终结 (2026-09-13)**: 本轨两份 Spec 的 owner 门已全部裁完 (唯一记录 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md`), 两条 Spec 由 `simonfish/023236f2` 重新认领推进。**不应从本 doc 取 next-step** —— 改读 [2026-09-13 handoff](./2026-09-13-session-close-l2-rulings-reconciled-tracks-handed-over.md)。
+
 > **一句话**: 本对话 (2026-09-06 14:20Z → 2026-09-11 00:20Z, 容器 `aria-runner-bot/bfe8285d`) 从 `/aria:state-scanner` 入口起, 按 owner 的 `/goal`「创建 agent team + 动态工作流, 一口气完成当前推荐的所有工作流」执行: **Aria#200 triage 全闭环交付**; **Aria#195 与 Aria#199 两份 Level 2 Spec 各自走完 A.1 起草 + post_spec convergence 五轮五席审计 + 五次换人 rework**。两份**同时**在 R5 到达「Critical 0 / 五席自报一致 / 骨架无人推翻」, 也**同时**因 `max_rounds = 5` 耗尽而 `converged = false`。**Phase B 目前一条合法动作都没有** —— 两份的下游全部卡在 owner 裁决面, 按 Rule #10 不得由 AI 自行降格。
 >
 > **本 session 最该记住的一件事**: **收敛判据的分母不是「审计还能不能找到问题」, 而是「Major 能不能归零」**。`unanimous_pass` 要求 `vote == PASS`, 而 `vote == PASS` 要求 Critical **与 Major 同时**为 0。两份 spec 的 Major 序列分别是 15/10/19/10/9 与 9/9/12/14/15 —— 从未归零, 所以五轮 Vote 恒为 `REVISE 5 / PASS 0`, 与「质量是否在改善」完全脱钩 (#195 的 Critical 已经 2→3→0→1→0)。**把 max_rounds 用完 ≠ 审计失败**, 但现行判据下它也**不可能**自然收敛, 除非有人把 Major 清到 0。这条已入 memory。
 
 > **Session period**: 2026-09-06 14:20Z → 2026-09-11 00:20Z (跨 5 天, 中间被**周限额**中断约 62 小时)
-> **Next session 入口**: 优先读本 doc → `/aria:state-scanner` → §6
+> **Next session 入口**: ~~优先读本 doc → `/aria:state-scanner` → §6~~ ⛔ 已移交, 改读 [2026-09-13 handoff](./2026-09-13-session-close-l2-rulings-reconciled-tracks-handed-over.md)
 
 ---
 
@@ -139,15 +139,17 @@ updated-at: 2026-09-13T03:20:00Z
 
 ## §6 Next session 入口 + 优先级建议
 
+> ⛔ **本节已失效 (2026-09-13)**: 下列优先项已全部闭合或移交, 仅留作历史。
+
 ```
 /aria:state-scanner
 ```
 
-1. **先把 H1 摆给 owner**: 两份 spec 的 `max_rounds` 三路径, **建议一并裁** (同期同终局 + 同抢版本号)。裁完才谈别的 —— 在此之前两份 spec 连 A.2 都进不去。
-2. **H4 追认 / 推翻 DEC-20260907-001** (#195 的 `filename` 语义)。不追认的成本是一个 commit, 拖着的成本是 Phase B 的所有测试都建在一个未追认的前提上。
-3. **H2 / H3 的其余门**按 proposal 里的编号逐条过。#199 的 rework 席已明写: 这些门未裁前 **Phase B 一条合法动作都没有**。
+1. ~~**先把 H1 摆给 owner**: 两份 spec 的 `max_rounds` 三路径, **建议一并裁** (同期同终局 + 同抢版本号)。裁完才谈别的 —— 在此之前两份 spec 连 A.2 都进不去。~~ → ✅ 已裁: 两份都走路径 [1] 接受当前结论 (2026-09-12)
+2. ~~**H4 追认 / 推翻 DEC-20260907-001** (#195 的 `filename` 语义)。不追认的成本是一个 commit, 拖着的成本是 Phase B 的所有测试都建在一个未追认的前提上。~~ → ✅ 已追认 (2026-09-12)
+3. ~~**H2 / H3 的其余门**按 proposal 里的编号逐条过。#199 的 rework 席已明写: 这些门未裁前 **Phase B 一条合法动作都没有**。~~ → ✅ 已裁 (决策单 2026-09-12 + §5 2026-09-13)
 4. **不要碰**: M6/M7 六份 spec 的 132 条 tasks (属其各自轨); 同伴容器在飞面。
-5. 若 owner 短期不可达, **可做的独立小事**: 给 `check_bare_issue_refs.py` 的假阳性开 issue (§2 中优先级第 2 条) —— 它 fail-CLOSED 且会卡住任何带编号表格的 spec, 与本 session 两份 spec 的裁决面无耦合。
+5. ~~若 owner 短期不可达, **可做的独立小事**: 给 `check_bare_issue_refs.py` 的假阳性开 issue (§2 中优先级第 2 条) —— 它 fail-CLOSED 且会卡住任何带编号表格的 spec, 与本 session 两份 spec 的裁决面无耦合。~~ → ✅ 已开 10CG/aria-plugin#196 (2026-09-12)
 
 ---
 

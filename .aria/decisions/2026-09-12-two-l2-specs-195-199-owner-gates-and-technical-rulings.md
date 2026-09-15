@@ -103,3 +103,14 @@ container: simonfish/023236f2
 ## §4 一句话回退
 
 任一技术裁定 owner 一句「10CG/Aria#195 第 n 条改 X」或「10CG/Aria#199 第 n 条改 X」即改判; 各条回退成本见表末列。Q1/Q2 若选 [2], 本单 §2 的 Level / 版本裁定仍成立, 只是 A.2 延后到 R7 之后。
+
+## §5 另一会话的 owner 复核 (2026-09-13, 执笔 aria-runner-bot/bfe8285d)
+
+同一批待复议项在并发会话 (容器 `bfe8285d`, 2026-09-12) 里也经 AskUserQuestion 逐项问过 owner。逐条对照结果:
+
+- **一致**: Q1 / Q2 路径 [1]; 两份 Level 3; 两份 MINOR (号在 ship 时重算); DEC-20260907-001 追认, 5a / 5b / 5c 以 proposal 为准, 遗留缺口开在 `10CG/aria-plugin`, 本 cycle 不动 `handoff-mechanics.md`; 10CG/Aria#195 第 1 / 3 / 5 / 8 条; 10CG/Aria#199 第 1–13 条。
+- **分歧两处**, 那一侧 owner 当时选的是: 10CG/Aria#195 第 7 条「拆两段」; 第 4 条附问「`rel_path` 不入排序键」。成因在那一侧的呈现方式: 第 4 条附问 proposal 原文**没有推荐默认**, 却被标成「推荐默认: 不加」; 拆分建议没有交代两项代价 —— 守卫是 A′ 的必需配套, 以及拆出的新 proposal 是否要重跑 post_spec。
+- **owner 最终裁定 (2026-09-13): 两处都按本单 §2** —— 10CG/Aria#195 第 7 条 **Level 3, 不拆**; 第 4 条附问 **加 `rel_path` 为第 5 级**。本单 §2 全部 21 条即最终口径; 那一侧起草的另一份决策单与 DEC 追认节已撤回, 未进 git, 本单是唯一记录。
+- Q3 执行顺序 (10CG/Aria#195 先) 那一侧未问, 沿用本单。
+- 两条轨的 claim 在 `simonfish/023236f2` (2026-09-12, 阶段 A.2); `bfe8285d` 不再推进这两条轨。
+- 那一侧同会话另开、与本单无耦合: `10CG/aria-plugin#196` / `10CG/aria-plugin#197` / `10CG/aria-plugin#198` (state-scanner 三处缺陷)。
