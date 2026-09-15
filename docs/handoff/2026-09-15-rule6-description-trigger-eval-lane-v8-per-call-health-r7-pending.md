@@ -3,12 +3,12 @@ track-id: rule6-description-change-trigger-eval-lane
 owner-container: simonfish/bfe8285d
 phase: A.1
 status: active
-updated-at: 2026-09-15T14:24:46Z
+updated-at: 2026-09-15T14:36:44Z
 ---
 
 # Aria — Session Handoff (2026-09-15) — `10CG/Aria#211` Rule #6 description 维度: spec v8 + 场景 4b 逐调用健康检查实验 (v6a / v6b), post_spec R7 待跑
 
-> **一句话**: `10CG/Aria#211` triage (confirmed / major / next-cycle, comment 23915) → 场景 4 基线实跑 → Level 2 spec `rule6-description-change-trigger-eval-lane` 过 post_spec R1–R6 未收敛; owner 09-15 两次裁定 (max_rounds 5→7 并收窄范围; R6 后「修 v8、跑 R7 当最后一次检查」+「D2 故障识别先做实验再重新设计」); 实验 v6a 暴露「任一调用不健康即作废」太严, 按重跑前锁定的修订预登记改为 v6b 并三组全部重跑; v8 已本地提交 (`15ab323`), **R7 未跑** —— 账号七日用量窗口 99% (21:00Z 重置), 跑 R7 前等 owner 定时机。
+> **一句话**: `10CG/Aria#211` triage (confirmed / major / next-cycle, comment 23915) → 场景 4 基线实跑 → Level 2 spec `rule6-description-change-trigger-eval-lane` 过 post_spec R1–R6 未收敛; owner 09-15 两次裁定 (max_rounds 5→7 并收窄范围; R6 后「修 v8、跑 R7 当最后一次检查」+「D2 故障识别先做实验再重新设计」); 实验 v6a 暴露「任一调用不健康即作废」太严, 按重跑前锁定的修订预登记改为 v6b 并三组全部重跑; v8 已本地提交 (`15ab323`), **R7 未跑** —— 账号七日用量窗口 99%; owner 09-15 裁定: 21:00Z 重置后在本会话接着跑 R7, 推送等 R7 之后一起。
 >
 > **本段最该记住的**: (1) 编排器运行时行为一律以代码为准 —— v7 照搬 `layer-boundary-contract.md` 的「默认自动重试、反复告警」, R6 三席读代码判 major, 实际是不重试、默认不告警的静默终态 (已并入 memory `feedback_never_write_unverified_impossibility_claims`)。(2) 看到数据后改判定规则要可审计: v6b 写明修订理由、重跑前锁定 (hash + 时间)、A / B / C 全部重跑、并声明此后不再改。
 >
@@ -73,6 +73,6 @@ updated-at: 2026-09-15T14:24:46Z
 
 ## §6 Next
 
-1. owner 定 R7 时机: 现在跑 (可能撞七日上限, 撞上则本账号所有调用停到 21:00Z) 或 21:00Z 重置后跑。
+1. owner 09-15 已裁定: 21:00Z 七日用量重置后跑 R7 (本会话接着派五席); 推送等 R7 之后一起, 其间不推送。
 2. 跑 R7 → 聚合 → 如实报 owner。
 3. 按 owner 裁定进 OQ 裁定与 Phase B。
