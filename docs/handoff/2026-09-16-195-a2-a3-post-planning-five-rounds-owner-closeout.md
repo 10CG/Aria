@@ -3,7 +3,7 @@ track-id: handoff-multibranch-subdir-path-fidelity
 owner-container: simonfish/023236f2
 phase: A
 status: in_progress
-updated-at: 2026-09-16T15:20:00Z
+updated-at: 2026-09-16T23:55:00Z
 ---
 
 # Aria — Session Handoff (2026-09-15/16) — 10CG/Aria#195 的 A.2/A.3 落地 + post_planning 五轮跑满后由 owner 裁定收口
@@ -18,10 +18,10 @@ updated-at: 2026-09-16T15:20:00Z
 
 ## §0 入口 (新 session 优先读)
 
-> **本 doc 于 2026-09-16T15:20Z 由 `/aria:session-closer` 复核修订** (机械兜底 + 内省补漏): §2 增 C6–C8 与机械补漏行, §5 增四维与一致性 advisory, §7 增第 8/9 个提交, §8 改为「本 session 已写 memory」(原「待写」已全部落盘), §9 为 AI 流程判断 (段号按共享模板对齐, 与修订前的 §8/§9 互换)。
+> **本 doc 于 2026-09-16T15:20Z 起由 `/aria:session-closer` 复核修订, 23:55Z 回填收尾结果** (机械兜底 + 内省补漏): §2 增 C6–C8 与机械补漏行, §5 增四维与一致性 advisory, §7 增第 8-10 个提交, §8 改为「本 session 已写 memory」(原「待写」已全部落盘), §9 为 AI 流程判断 (段号按共享模板对齐, 与修订前的 §8/§9 互换)。
 
-1. 跑 `/aria:state-scanner`。主仓 `992b608` + 本收尾修订提交 (origin 与 github 两端 `ls-remote` 一致); aria `1cb3872` (v1.73.3); standards `8b49562`; aria-orchestrator `237045a`; `refs/aria/coordination` = `4fd07f9`。
-2. 本 track 的 claim (`s-13ce@1833`, phase A.2) 仍 active, 但**心跳停在 2026-09-15T13:04:15Z, 到收尾时已 26.1h —— 越过 `SWEEP_TTL` (24h)**。它现在随时可被任一容器的 `release_gate.py --sweep-stale` **持久改写为 `abandoned`** (`lib/gc.py` 用 SWEEP_TTL 而非 STALE_TTL, 且受害方无恢复路径), 也早已越过 `STALE_TTL` (30min) 的 reconcile 接管线。**下次入口先看它还在不在**: 若已被扫走, 那是 GC 产物**不是**有人放弃本轨 —— 按 B.1 入口重新 acquire 即可。⚠️ **`--raw-track-id` 要逐字传 `handoff-multibranch-subdir-path-fidelity` (本轨活 claim 里记的原串), 不要按 phase-a-planner 的 `<slug>-<container_uuid>` 写法补 `-023236f2`** —— `derive_track_id` 只做小写/分隔符归一与 64 字符截断, **不剥容器后缀** (`aria/skills/state-scanner/lib/track_id.py:61`), 补了后缀就是另一个 track_id, 会写出第二条 claim 并对自己报 occupied。处置见 §2 C8。
+1. 跑 `/aria:state-scanner`。主仓 `5789414` (origin 与 github 两端 `ls-remote` 核验一致, `ahead=0`); aria `1cb3872` (v1.73.3); standards `8b49562`; aria-orchestrator `237045a` (detached HEAD); `refs/aria/coordination` = `56cdfa8` (origin 一致; github 侧是化石, 见 §3.8)。
+2. 本 track 的 claim (`s-13ce@1833`, phase A.2) active, **心跳已于 2026-09-16T23:50:59Z 刷新** (owner 授权后跑 `phase1_gate.py --heartbeat-only`, `outcome: refreshed`, 协调 ref `4fd07f9` → `56cdfa8`)。收尾前它曾停在 09-15T13:04:15Z 达 34h, 越过 `SWEEP_TTL` (24h) —— 当时随时可被任一容器的 `release_gate.py --sweep-stale` **持久改写为 `abandoned`** (`lib/gc.py` 用 SWEEP_TTL 而非 STALE_TTL, 受害方无恢复路径)。**下次入口仍先看它还在不在**: 若已被扫走, 那是 GC 产物**不是**有人放弃本轨 —— 按 B.1 入口重新 acquire 即可。⚠️ **`--raw-track-id` 要逐字传 `handoff-multibranch-subdir-path-fidelity` (本轨活 claim 里记的原串), 不要按 phase-a-planner 的 `<slug>-<container_uuid>` 写法补 `-023236f2`** —— `derive_track_id` 只做小写/分隔符归一与 64 字符截断, **不剥容器后缀** (`aria/skills/state-scanner/lib/track_id.py:61`), 补了后缀就是另一个 track_id, 会写出第二条 claim 并对自己报 occupied。处置见 §2 C8。
 3. 计划三份文件已是 v6 并双推: `openspec/changes/handoff-multibranch-subdir-path-fidelity/{tasks.md,detailed-tasks.yaml,sc11-predicate-validation.py}`。B.1 的前置 (规划提交已经 owner 授权推到两端) **已满足**, 主仓 feature 分支可以直接从 `origin/master` 起。
 4. post_planning 的收口状态写在 `detailed-tasks.yaml` 的 `metadata.post_planning_closeout`; 五轮报告在 `.aria/audit-reports/post_planning-R{1..5}-*-handoff-multibranch-subdir-path-fidelity-*.md` (含每轮的 `-aggregated.md`)。
 
@@ -55,7 +55,7 @@ updated-at: 2026-09-16T15:20:00Z
 | C5 | 未修的 5 条 Minor | 已登记 | `detailed-tasks.yaml` 的已知边界清单: (c1)(c2) 拦不住「换说法保留旧语义」· (l1) 的结局行门限可被装饰性箭头行绕过 · (l1) 第四条结局内容自相矛盾仍判过 · 验证脚本模拟夹具的文案暗示 · 演化注释是否移入归档 |
 | C6 | **`VERSION:24` 停更开单** | **提了未做** | §3.5 判断「三次漏改且无人发现值得单独开单」, 本 session 没开。外向动作, 待授权; 开单前先查重 (issue 清单会截断, 用定向查询) |
 | C7 | **phase1_gate self-resume 缺口开单** | **提了未做** | §3.6 的 `get_session_id` 每次 CLI 调用重新生成 ⇒ `_self_resume` 永不命中。本 session 未找到现成 issue 也未开单; 同属外向动作 |
-| C8 | **本轨 claim 已越过 `SWEEP_TTL`** | **待 owner 裁** | 心跳 09-15T13:04:15Z, 收尾时 26.1h > 24h。两条路: (a) 现在跑 `phase1_gate.py --heartbeat-only` 刷新 —— 它会**推协调 ref**, 属外向动作须授权; (b) 不刷新, 下次 B.1 入口重新 acquire (按 §0.2 的原串)。主控**不自行选择** (见 §9 第 5 条) |
+| C8 | ~~本轨 claim 越过 `SWEEP_TTL`~~ | **✅ 已闭环** | owner 2026-09-16 授权刷新, `phase1_gate.py --heartbeat-only` 跑通 (`outcome: refreshed`), 心跳 → 23:50:59Z, 协调 ref `56cdfa8` 已推 origin 并 `ls-remote` 核验一致 |
 | C9 | memory 索引余量仅剩 137 字节 | 已量 | `MEMORY.md` 24439 / 24576 bytes。下次再加指针前必须先压缩 (把已闭环/窄条目移入 `MEMORY-archive.md`), 否则超 read-limit 会静默截断整份索引 |
 
 **机械补漏 (session-closer step 0/3 交叉核验, AI 内省未单独提及的项)**:
@@ -72,6 +72,7 @@ updated-at: 2026-09-16T15:20:00Z
 5. **`VERSION:24` 自 v1.73.0 起停更**: v1.73.1 / v1.73.2 / v1.73.3 三次发版均漏改, 该点无机械兜底 (custom checks 不覆盖)。本 cycle 的 5.1 会直接写新号; 但「三次漏改且无人发现」这件事本身值得单独开单。
 6. **phase1_gate 跨调用 self-resume 缺口**: `get_session_id` 每次 CLI 调用都重新生成, `_self_resume` 永远匹配不到 ⇒ 同容器对同一 track 会写出第二条 claim 并自报 `occupied`。本 session 未找到现成 issue, 也未开单。
 7. **本轨 claim 的 track_id 是裸 slug, 与 phase-a-planner 的 `<slug>-<container_uuid>` 写法不一致**: 活 claim 记的是 `handoff-multibranch-subdir-path-fidelity`, 而同容器另有 claim 用的是带后缀形式 (`a1-entry-claim-duplicate-work-guard-023236f2`)。`derive_track_id` 不剥后缀 ⇒ **照约定补后缀会创出第二条 claim**。重新认领前**先读活 claim 的 `track_id` 原串**, 不要照 SKILL 的拼法现推 (本次收尾起草 §0 时差点就这么写, 核 `track_id.py:61` 才发现)。
+8. **`refs/aria/coordination` 是单远程 (origin) 通道, github 那份是化石**: `lib/coordination_ref.py` 的三处 push 入口默认值都是 `remote: str = "origin"` (`:321` / `:1255` / `:1335`), 心跳/认领/释放都只推 origin。收尾时核验实测: 本地与 origin 同为 `56cdfa8`, 而 **github 停在 `ad0287f` (2026-05-24), 落后 124 个提交** —— 这**不是**半推事故, 是通道设计, 但任何从 GitHub 镜像读协调状态的人会拿到三个多月前的 claim 快照 (那份里本轨根本不存在)。判 claim 一律以 origin 为准; CLAUDE.md 的「双推 + 逐 remote 核验」硬约束管的是 master 与 gitlink, 不覆盖本 ref。
 
 ## §4 实战教训 (memory 沉淀来源)
 
@@ -96,8 +97,8 @@ updated-at: 2026-09-16T15:20:00Z
 | aria 子模块 | `1cb3872` (v1.73.3), 工作树干净, 本 cycle 未动 |
 | standards 子模块 | `8b49562`, 工作树干净, 本 cycle 未动 |
 | aria-orchestrator | `237045a`, detached HEAD, 本 cycle 未动 (但它进入了 C.2.5 的枚举面, 见 §3.3) |
-| `refs/aria/coordination` | `4fd07f9` (本 session 全程未变; 五轮审计与六次返工均未触碰) |
-| 本 track claim | `s-13ce@1833` active, phase A.2, 心跳 2026-09-15T13:04:15Z —— **已 26.1h, 越过 SWEEP_TTL**, 见 §0.2 / §2 C8 |
+| `refs/aria/coordination` | `56cdfa8` (五轮审计与六次返工全程停在 `4fd07f9`; 收尾时因心跳刷新前进一格) |
+| 本 track claim | `s-13ce@1833` active, phase A.2, 心跳 **2026-09-16T23:50:59Z** (收尾时刷新, 见 §0.2 / §2 C8) |
 | 审计报告 | 本 Spec 累计 59 份 (post_spec R1–R5 + post_planning R1–R5, 含聚合), 全部已提交并双推 |
 
 **四维状态 (session-closer step 3 机械汇编, 2026-09-16T15:09Z 的 snapshot)**:
@@ -131,9 +132,10 @@ updated-at: 2026-09-16T15:20:00Z
 | 6 | `d5c1920` | R5 六份报告 (max_rounds 耗尽, 待 owner 裁定) |
 | 7 | `c839fc6` | v6 收口定点修 (owner 裁定后) |
 | 8 | `992b608` | 本 handoff 初版 + `latest.md` 指针与 track 表 |
-| 9 | (本次收尾修订) | `/aria:session-closer` 复核: 本 doc 的 §0/§2/§3/§5/§7/§8/§9 修订 + `latest.md` 同步 + memory 第 4 条 |
+| 9 | `5789414` | `/aria:session-closer` 复核: 本 doc 的 §0/§2/§3/§5/§7/§8/§9 修订 + `latest.md` 同步 (memory 第 4 条在容器本地, 不入仓) |
+| 10 | (收尾结果回填) | C8 闭环 + §3.8 协调 ref 单远程发现 + §0/§5/§7 与 `latest.md` 的 SHA 同步 |
 
-**parity**: 7 个规划/审计提交 (`07e0a6e` … `c839fc6`) 与 handoff 提交 `992b608` 均在推后对 origin 与 github 各自 `git ls-remote <remote> refs/heads/master` 取 SHA 比对, 两端与本地一致 (`992b608`, `ahead=0`)。**第 9 行的收尾修订提交在本 doc 落盘时尚未推送 —— 推送授权见会话末尾的 owner 询问。**
+**parity**: 9 个提交 (`07e0a6e` … `5789414`) 均在推后对 origin 与 github 各自 `git ls-remote <remote> refs/heads/master` 取 SHA 比对, 两端与本地一致; 推 `5789414` 后实测 `origin = github = 5789414`, `ahead=0`。另: 协调 ref `refs/aria/coordination` 随心跳前进到 `56cdfa8`, 只推 origin (单远程通道, §3.8)。
 
 ## §8 Memory entries this session (4 条: 扩 2 + 新增 2)
 
