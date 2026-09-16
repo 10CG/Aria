@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SC-11 定位谓词的多状态验证 (10CG/Aria#195; v5 = post_planning R4 rework, 2026-09-16).
+"""SC-11 定位谓词的多状态验证 (10CG/Aria#195; v6 = post_planning R5 定点修与收口, 2026-09-16).
 
 用法 (仓库根目录执行, 只读; 副本建在 tempfile 临时目录, 结束时在 finally 中删除):
     python3 -B openspec/changes/handoff-multibranch-subdir-path-fidelity/sc11-predicate-validation.py [aria_state_scanner_dir] [--emit-json]
@@ -28,6 +28,8 @@
   bad_j2_same_line          schema 键序句元组留四元, 同一行末尾补 plus rel_path (应仅 (j2) FAIL)
   bad_l1_title_paren        三处补充都只写进标题行括注 / 旁白, 块内与 Scenarios 结局行未改 (应仅 (l1) FAIL)
   bad_c2_module_only        契约句只写进模块 docstring, _list_handoff_files 自己的 docstring 未写 (应仅 (c2) FAIL)
+  bad_tuples_inner_paren    三处元组留四元, 但元组内嵌一个提到 rel_path 的括注 (应 (j1)(j2)(j3) FAIL)
+  bad_tuples_denial_clause  三处元组第 5 元写成 note: rel_path NOT used (语义否认, 非规范字面; 应 (j1)(j2)(j3) FAIL)
   alt_j3_anchor             target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized; 语义正确, 应全 PASS)
   alt_j4_numeric            target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数; 应全 PASS)
   alt_tuple_wrapped         target 基础上 docstring 与注释块的五元元组各跨两行书写 (合法写法, 应全 PASS)
@@ -261,6 +263,28 @@ def build_c2_module_only(r):
         '        "filename": str,          # basename of the handoff file\n        "rel_path": str,          # path relative to docs/handoff/ (flat repo: == filename)\n')
 
 
+def build_tuples_inner_paren(r):
+    # 元组留四元, 内嵌一个自身平衡的括注并在其中提到 rel_path (R5 code-reviewer 席 adv_*_inner_paren)
+    build_target(r, skip=("j1t", "j3t", "j2"))
+    rep(r, C, "    fully deterministic — ``(parse_ok, updated_at, filename, branch)``.",
+        "    fully deterministic — ``(parse_ok, updated_at, filename (basename, never ``rel_path``), branch)``.")
+    rep(r, C, "# ``(parse_ok, parsed_updated_at, filename, branch)``.",
+        "# ``(parse_ok, parsed_updated_at, filename (basename, never ``rel_path``), branch)``.")
+    rep(r, S, "the **four-level** compound key `(parse_ok, parsed updated_at, filename, branch)`",
+        "the **five-level** compound key `(parse_ok, parsed updated_at, filename (basename, never `rel_path`), branch)`")
+
+
+def build_tuples_denial_clause(r):
+    # 元组凑满五元, 但第 5 元是语义上否认 rel_path 的逗号子句 (R5 qa-engineer 席构造)
+    build_target(r, skip=("j1t", "j3t", "j2"))
+    rep(r, C, "    fully deterministic — ``(parse_ok, updated_at, filename, branch)``.",
+        "    fully deterministic — ``(parse_ok, updated_at, filename, branch, note: rel_path NOT used)``.")
+    rep(r, C, "# ``(parse_ok, parsed_updated_at, filename, branch)``.",
+        "# ``(parse_ok, parsed_updated_at, filename, branch, note: rel_path NOT used)``.")
+    rep(r, S, "the **four-level** compound key `(parse_ok, parsed updated_at, filename, branch)`",
+        "the **five-level** compound key `(parse_ok, parsed updated_at, filename, branch, note: rel_path NOT used)`")
+
+
 def build_tuple_wrapped(r):
     # 合法写法: 五元元组跨两行书写 (docstring 与注释块各一处), 不得假红
     build_target(r)
@@ -293,6 +317,8 @@ STATES = {
     "bad_j2_same_line": ("target 基础上 schema 键序句元组留四元, 同一行末尾补 plus rel_path", build_j2_same_line),
     "bad_l1_title_paren": ("target 基础上三处补充都只写进标题行括注 / 旁白, 字典字面量与键清单与第四种结局都没改", build_l1_title_paren),
     "bad_c2_module_only": ("target 基础上契约句只写进模块 docstring 的 TrackEntry 块, _list_handoff_files 自己的 docstring 未写", build_c2_module_only),
+    "bad_tuples_inner_paren": ("target 基础上三处元组留四元, 但元组内嵌一个提到 rel_path 的括注", build_tuples_inner_paren),
+    "bad_tuples_denial_clause": ("target 基础上三处元组第 5 元写成语义否认 rel_path 的逗号子句 (note: rel_path NOT used)", build_tuples_denial_clause),
     "alt_j3_anchor": ("target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized), 语义正确", build_alt_j3),
     "alt_j4_numeric": ("target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数)", build_j4_numeric),
     "alt_tuple_wrapped": ("target 基础上 docstring 与注释块的五元元组各跨两行书写 (合法写法)", build_tuple_wrapped),
@@ -309,9 +335,9 @@ PRED = {
  "g":  r"sed -n '/^## Change history/,$p' references/state-snapshot-schema.md | grep '^|' | grep -q rel_path",
  "i1": r"! grep -q -F 'legacy:<branch>:<filename>' scripts/collectors/handoff_multibranch.py",
  "i2": r"sed -n '/^TrackEntry:$/,/^```$/p' references/state-snapshot-schema.md | grep '^  track_id:' | grep -q -F 'legacy:<branch>:<rel_path>'",
- "j1": r'''python3 -B -c "import ast,itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and ok(p[i:]) else 1)"''',
- "j2": r'''python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all(ok(l[l.find('(parse_ok'):]) for l in L) else 1)"''',
- "j3": r'''python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; pre=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if pre else 0; p=chr(10).join(L[t[0]:e]) if pre else ''; i=p.find('(parse_ok'); sys.exit(0 if pre and i>=0 and ok(p[i:]) else 1)"''',
+ "j1": r'''python3 -B -c "import ast,itertools,sys; g=lambda s: next((s[:k+1] for k,d in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if d==0), ''); el=lambda b: ''.join((chr(1) if (c==',' and d==0) else c) for c,d in zip(b, itertools.accumulate((x=='(')-(x==')') for x in b))).split(chr(1)); ok=lambda s: (lambda G: bool(G) and len(el(G[1:-1]))==5 and '(rel_path == filename, rel_path)' in ' '.join(el(G[1:-1])[4].split()))(g(s)); t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and ok(p[i:]) else 1)"''',
+ "j2": r'''python3 -B -c "import itertools,sys; g=lambda s: next((s[:k+1] for k,d in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if d==0), ''); el=lambda b: ''.join((chr(1) if (c==',' and d==0) else c) for c,d in zip(b, itertools.accumulate((x=='(')-(x==')') for x in b))).split(chr(1)); ok=lambda s: (lambda G: bool(G) and len(el(G[1:-1]))==5 and '(rel_path == filename, rel_path)' in ' '.join(el(G[1:-1])[4].split()))(g(s)); L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all(ok(l[l.find('(parse_ok'):]) for l in L) else 1)"''',
+ "j3": r'''python3 -B -c "import itertools,sys; g=lambda s: next((s[:k+1] for k,d in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if d==0), ''); el=lambda b: ''.join((chr(1) if (c==',' and d==0) else c) for c,d in zip(b, itertools.accumulate((x=='(')-(x==')') for x in b))).split(chr(1)); ok=lambda s: (lambda G: bool(G) and len(el(G[1:-1]))==5 and '(rel_path == filename, rel_path)' in ' '.join(el(G[1:-1])[4].split()))(g(s)); L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; pre=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if pre else 0; p=chr(10).join(L[t[0]:e]) if pre else ''; i=p.find('(parse_ok'); sys.exit(0 if pre and i>=0 and ok(p[i:]) else 1)"''',
  "j4": r"! { grep -v '^|' references/state-snapshot-schema.md; cat scripts/collectors/handoff_multibranch.py tests/test_handoff_multibranch_collision_dedupe.py; } | grep -qiE '(^|[^0-9A-Za-z])(four|4)[- ]levels?|四级|四层'",
  "j5": r'''python3 -B -c "import sys; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); hits=[i for i,l in enumerate(L) if 'dictionary-max' in l.lower()]; sys.exit(0 if hits and all(any('rel_path' in L[j] for j in range(i,min(len(L),i+2))) for i in hits) else 1)"''',
  "k":  r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); d={n.name:(ast.get_docstring(n) or '') for n in ast.walk(t) if isinstance(n,ast.FunctionDef)}; sys.exit(0 if all('target_in_subdir' in d.get(f,'') for f in ('_render_pointer','_render_pointer_unavailable')) else 1)"''',
@@ -345,6 +371,8 @@ EXPECTED_FAILS = {
     "bad_j2_same_line": ("j2",),
     "bad_l1_title_paren": ("l1",),
     "bad_c2_module_only": ("c2",),
+    "bad_tuples_inner_paren": ("j1", "j2", "j3"),
+    "bad_tuples_denial_clause": ("j1", "j2", "j3"),
     "alt_j3_anchor": (),
     "alt_j4_numeric": (),
     "alt_tuple_wrapped": (),
