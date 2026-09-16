@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SC-11 定位谓词的多状态验证 (10CG/Aria#195; v4 = post_planning R3 rework, 2026-09-15).
+"""SC-11 定位谓词的多状态验证 (10CG/Aria#195; v5 = post_planning R4 rework, 2026-09-16).
 
 用法 (仓库根目录执行, 只读; 副本建在 tempfile 临时目录, 结束时在 finally 中删除):
     python3 -B openspec/changes/handoff-multibranch-subdir-path-fidelity/sc11-predicate-validation.py [aria_state_scanner_dir] [--emit-json]
@@ -23,15 +23,23 @@
   bad_j2_tuple_stale_para   schema 键序句只改层数词、元组仍四元, 另加一条含 compound key 与 rel_path 的 bullet (应仅 (j2) FAIL)
   bad_l1_module_scenarios   模块 docstring 的 Return dict schema 块漏补, 顶部场景列表写了 degraded_reason (应仅 (l1) FAIL)
   bad_l1_neverraises        write_latest_md 的 Returns 段漏补, Never raises 段写了 degraded_reason (应仅 (l1) FAIL)
+  bad_j1_same_para          docstring 元组留四元, 同一段内元组之后补一句讲 rel_path (应仅 (j1) FAIL)
+  bad_j3_same_block         注释块元组留四元, 同一块内元组之后续写 rel_path (应仅 (j3) FAIL)
+  bad_j2_same_line          schema 键序句元组留四元, 同一行末尾补 plus rel_path (应仅 (j2) FAIL)
+  bad_l1_title_paren        三处补充都只写进标题行括注 / 旁白, 块内与 Scenarios 结局行未改 (应仅 (l1) FAIL)
+  bad_c2_module_only        契约句只写进模块 docstring, _list_handoff_files 自己的 docstring 未写 (应仅 (c2) FAIL)
   alt_j3_anchor             target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized; 语义正确, 应全 PASS)
   alt_j4_numeric            target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数; 应全 PASS)
+  alt_tuple_wrapped         target 基础上 docstring 与注释块的五元元组各跨两行书写 (合法写法, 应全 PASS)
 行号均指 1cb3872 (v1.73.3) 原文。模拟改动按原文逐字替换: count=1 的锚点必须恰出现一次, 否则 rep() 抛出
 AnchorDrift, 脚本以退出码 3 结束, stderr 以 anchor drift: 开头并点名文件、出现次数与锚点前 60 字符 ——
 表示基线已漂移, 先重写模拟改动, 再判谓词。全部检查用显式判断, 不依赖 assert, python3 -O / -OO 下行为不变。
 
-期望矩阵 EXPECTED 内嵌于本文件 (全部状态 x 全部谓词)。退出码: 0 = 实测与 EXPECTED 逐格一致, 且没有任何谓词
-写 stderr; 1 = 任一格不符或任一谓词写 stderr (差异格与 stderr 打印到 stderr); 2 = 参数错误或源目录缺 FILES 所列文件
-(打印 usage); 3 = 模拟改动的锚点漂移 (见上); 4 = 脚本自身定义不一致 (EXPECTED 的表头 / 行序 / 列数 / 单元格取值,
+期望以 EXPECTED_FAILS 内嵌于本文件: 每个状态只声明期望 FAIL 的谓词集, 其余谓词一律期望 PASS, 由
+expand_expected() 展开成全矩阵再逐格比对 (断言强度与 v4 的定值矩阵相同, 加一个状态从写 19 格降到写一行)。
+退出码: 0 = 实测与展开后的期望逐格一致, 且没有任何谓词写 stderr; 1 = 任一格不符或任一谓词写 stderr (差异格与
+stderr 打印到 stderr); 2 = 参数错误或源目录缺 FILES 所列文件 (打印 usage); 3 = 模拟改动的锚点漂移 (见上);
+4 = 脚本自身定义不一致 (EXPECTED_FAILS 的状态集或顺序与 STATES 不符 / 含未知或重复的谓词标签,
 或本 docstring 的状态列表漏列某状态); 5 = 其余未预期异常 (打印异常类型与首行)。
 stdout: 默认只打印实测矩阵 (与 detailed-tasks.yaml metadata.sc11_predicate_validation 的实测块逐字节一致);
 --emit-json 改为打印 states / expected / predicates / matrix 四字段的 JSON, 供由脚本输出重生成 yaml 用 (不手改);
@@ -215,6 +223,53 @@ def build_j3_later_tiebreak(r):
     rep(r, C, "\ndef dedupe_latest_per_track_container(", "\n# Tie-break note: rel_path participates via _dedupe_sort_key.\ndef dedupe_latest_per_track_container(")
 
 
+def build_j1_same_para(r):
+    # 元组留四元, 同一段内紧跟其后补一句讲 rel_path (R4 code-reviewer 席 ADV-1 / qa-engineer 席 A)
+    build_target(r, skip=("j1t",))
+    rep(r, C, "    fully deterministic — ``(parse_ok, updated_at, filename, branch)``.",
+        "    fully deterministic — ``(parse_ok, updated_at, filename, branch)``.\n    The 5th level compares ``rel_path`` when the first four tie.")
+
+
+def build_j3_same_block(r):
+    # 元组留四元, 同一注释块内元组之后续写 rel_path (R4 code-reviewer 席 ADV-2 / qa-engineer 席 C)
+    build_target(r, skip=("j3t",))
+    rep(r, C, "# ``(parse_ok, parsed_updated_at, filename, branch)``.",
+        "# ``(parse_ok, parsed_updated_at, filename, branch)``, with ``rel_path``\n# appended as the 5th level.")
+
+
+def build_j2_same_line(r):
+    # 元组留四元, 同一行末尾补 plus rel_path (R4 code-reviewer 席 ADV-3 / qa-engineer 席 B)
+    build_target(r, skip=("j2",))
+    rep(r, S, "the **four-level** compound key `(parse_ok, parsed updated_at, filename, branch)`",
+        "the **five-level** compound key `(parse_ok, parsed updated_at, filename, branch)` plus `rel_path`")
+
+
+def build_l1_title_paren(r):
+    # 三处补充都只写进标题行括注 / 旁白: 字典字面量、键清单、第四种结局都没改 (R4 code-reviewer 席 ADV-4/5/6)
+    build_target(r, skip=("l1a", "l1b", "l1s"))
+    rep(r, W, "Return dict schema:", "Return dict schema: (10CG/Aria#195 起另含 ``degraded_reason``)")
+    rep(r, W, "    Returns:\n        dict with keys:", "    Returns: (另含 ``degraded_reason``)\n        dict with keys:")
+    rep(r, W, "    Scenarios:\n", "    Scenarios: (每支都返回 ``degraded_reason``)\n")
+
+
+def build_c2_module_only(r):
+    # 契约句只写进模块 docstring 的 TrackEntry 块, _list_handoff_files 自己的 docstring 改成不含契约句的说法
+    build_target(r, skip=("c",))
+    rep(r, C, "Returns only the basename (not the full path) for each file so callers",
+        "Returns the enumerated handoff entries for each file so callers")
+    rep(r, C, '        "filename": str,          # basename of the handoff file\n',
+        '        "filename": str,          # basename of the handoff file\n        "rel_path": str,          # path relative to docs/handoff/ (flat repo: == filename)\n')
+
+
+def build_tuple_wrapped(r):
+    # 合法写法: 五元元组跨两行书写 (docstring 与注释块各一处), 不得假红
+    build_target(r)
+    rep(r, C, "    fully deterministic — ``(parse_ok, updated_at, filename, branch, (rel_path == filename, rel_path))``.",
+        "    fully deterministic —\n    ``(parse_ok, updated_at, filename, branch,\n    (rel_path == filename, rel_path))``.")
+    rep(r, C, "# ``(parse_ok, parsed_updated_at, filename, branch, (rel_path == filename, rel_path))``.",
+        "# ``(parse_ok, parsed_updated_at, filename, branch,\n#   (rel_path == filename, rel_path))``.")
+
+
 STATES = {
     "base": ("原样, 不改", lambda r: None),
     "target": ("模拟正确实现 (代码 + 全部文档面)", build_target),
@@ -233,8 +288,14 @@ STATES = {
     "bad_j2_tuple_stale_para": ("target 基础上 schema 键序句只改层数词、元组仍四元, 另加一条同时含 compound key 与 rel_path 的 bullet", build_j2_tuple_stale_para),
     "bad_l1_module_scenarios": ("target 基础上模块 docstring 的 Return dict schema 块漏补, 顶部场景列表写了 degraded_reason", build_l1_module_scenarios),
     "bad_l1_neverraises": ("target 基础上 write_latest_md 的 Returns 段漏补, Never raises 段写了 degraded_reason", build_l1_neverraises),
+    "bad_j1_same_para": ("target 基础上 docstring 元组留四元, 同一段内元组之后补一句讲 rel_path", build_j1_same_para),
+    "bad_j3_same_block": ("target 基础上注释块元组留四元, 同一块内元组之后续写 rel_path", build_j3_same_block),
+    "bad_j2_same_line": ("target 基础上 schema 键序句元组留四元, 同一行末尾补 plus rel_path", build_j2_same_line),
+    "bad_l1_title_paren": ("target 基础上三处补充都只写进标题行括注 / 旁白, 字典字面量与键清单与第四种结局都没改", build_l1_title_paren),
+    "bad_c2_module_only": ("target 基础上契约句只写进模块 docstring 的 TrackEntry 块, _list_handoff_files 自己的 docstring 未写", build_c2_module_only),
     "alt_j3_anchor": ("target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized), 语义正确", build_alt_j3),
     "alt_j4_numeric": ("target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数)", build_j4_numeric),
+    "alt_tuple_wrapped": ("target 基础上 docstring 与注释块的五元元组各跨两行书写 (合法写法)", build_tuple_wrapped),
 }
 
 PRED = {
@@ -242,61 +303,65 @@ PRED = {
  "a2": r"""grep '^\*\*Fail-soft\*\*: branch-list' references/state-snapshot-schema.md | grep -oE '→ `\{[^`]*\}`' | grep -q '"unreadable_count": 0'""",
  "b":  r"sed -n '/^TrackEntry:$/,/^```$/p' references/state-snapshot-schema.md | grep -qE '^  rel_path: '",
  "c1": r"! grep -q 'Returns only the basename' scripts/collectors/handoff_multibranch.py",
- "c2": r"grep -q 'path relative to' scripts/collectors/handoff_multibranch.py",
+ "c2": r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_list_handoff_files']; sys.exit(0 if f and 'path relative to' in (ast.get_docstring(f[0]) or '') else 1)"''',
  "f1": r"grep -v '^|' references/state-snapshot-schema.md | grep -q handoff_multibranch_unexpected_path_prefix",
  "f2": r"grep -v '^|' references/state-snapshot-schema.md | grep -q handoff_multibranch_undecodable_path",
  "g":  r"sed -n '/^## Change history/,$p' references/state-snapshot-schema.md | grep '^|' | grep -q rel_path",
  "i1": r"! grep -q -F 'legacy:<branch>:<filename>' scripts/collectors/handoff_multibranch.py",
  "i2": r"sed -n '/^TrackEntry:$/,/^```$/p' references/state-snapshot-schema.md | grep '^  track_id:' | grep -q -F 'legacy:<branch>:<rel_path>'",
- "j1": r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and 'rel_path' in p[i:] else 1)"''',
- "j2": r'''python3 -B -c "import sys; L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all('rel_path' in l[l.find('(parse_ok'):] for l in L) else 1)"''',
- "j3": r'''python3 -B -c "import sys; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; ok=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if ok else 0; p=chr(10).join(L[t[0]:e]) if ok else ''; i=p.find('(parse_ok'); sys.exit(0 if ok and i>=0 and 'rel_path' in p[i:] else 1)"''',
- "j4": r"! { grep -v '^|' references/state-snapshot-schema.md; cat scripts/collectors/handoff_multibranch.py tests/test_handoff_multibranch_collision_dedupe.py; } | grep -qiE '(^|[^0-9a-z])(four|4)[- ]levels?|四级|四层'",
+ "j1": r'''python3 -B -c "import ast,itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and ok(p[i:]) else 1)"''',
+ "j2": r'''python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all(ok(l[l.find('(parse_ok'):]) for l in L) else 1)"''',
+ "j3": r'''python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; pre=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if pre else 0; p=chr(10).join(L[t[0]:e]) if pre else ''; i=p.find('(parse_ok'); sys.exit(0 if pre and i>=0 and ok(p[i:]) else 1)"''',
+ "j4": r"! { grep -v '^|' references/state-snapshot-schema.md; cat scripts/collectors/handoff_multibranch.py tests/test_handoff_multibranch_collision_dedupe.py; } | grep -qiE '(^|[^0-9A-Za-z])(four|4)[- ]levels?|四级|四层'",
  "j5": r'''python3 -B -c "import sys; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); hits=[i for i,l in enumerate(L) if 'dictionary-max' in l.lower()]; sys.exit(0 if hits and all(any('rel_path' in L[j] for j in range(i,min(len(L),i+2))) for i in hits) else 1)"''',
  "k":  r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); d={n.name:(ast.get_docstring(n) or '') for n in ast.walk(t) if isinstance(n,ast.FunctionDef)}; sys.exit(0 if all('target_in_subdir' in d.get(f,'') for f in ('_render_pointer','_render_pointer_unavailable')) else 1)"''',
- "l1": r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); w=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='write_latest_md'][0]; d=ast.get_docstring(w) or ''; m=ast.get_docstring(t) or ''; blk=lambda s,h: s.partition(h)[2].split(chr(10)*2)[0]; pre,_,scen=d.partition('Scenarios:'); sys.exit(0 if 'degraded_reason' in blk(m,'Return dict schema:') and 'degraded_reason' in blk(pre,'Returns:') and ('degraded_reason' in scen or 'target_in_subdir' in scen) else 1)"''',
+ "l1": r'''python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); w=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='write_latest_md'][0]; d=ast.get_docstring(w) or ''; m=ast.get_docstring(t) or ''; blk=lambda s,h: s.partition(h)[2].partition(chr(10))[2].split(chr(10)*2)[0]; a=[x for x in blk(d,'Scenarios:').split(chr(10)) if chr(8594) in x]; sys.exit(0 if 'degraded_reason' in blk(m,'Return dict schema:') and 'degraded_reason' in blk(d,'Returns:') and len(a)>=4 and any('target_in_subdir' in x for x in a) else 1)"''',
  "l2": r"grep 'Return dict' references/phase-1-collectors.md | grep -q degraded_reason",
  "l3": r"grep '单 track' references/layer-l-integration.md | grep -q '子目录\|subdir'",
 }
 
-# 全部状态 x 全部谓词的期望 (R3 执笔席实跑前写定; 修改须先写明依据再改, 不得照实测结果回填)
-EXPECTED = """\
-state                     a1   a2   b    c1   c2   f1   f2   g    i1   i2   j1   j2   j3   j4   j5   k    l1   l2   l3
-base                      FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL
-target                    PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
-bad_codeonly              FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL
-bad_changelog_only        FAIL FAIL FAIL FAIL FAIL FAIL FAIL PASS FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL
-bad_partial               PASS FAIL PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS FAIL FAIL FAIL FAIL PASS PASS
-bad_a2_prose_only         PASS FAIL PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
-bad_scenarios_missing     PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
-bad_stale_synonym         PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS
-bad_stale_header          PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS
-bad_test_docstring_stale  PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS
-bad_k_paraphrase          PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS
-bad_j3_later_tiebreak     PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS
-bad_tuples_stale_para     PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS FAIL PASS PASS PASS PASS PASS PASS
-bad_j2_tuple_stale_para   PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS PASS
-bad_l1_module_scenarios   PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
-bad_l1_neverraises        PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
-alt_j3_anchor             PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
-alt_j4_numeric            PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
-"""
+# 每个状态期望 FAIL 的谓词集 (未列出的谓词一律期望 PASS); 实跑前写定, 修改须先写明依据, 不得照实测结果回填。
+# 全矩阵由 expand_expected() 展开, 断言强度与逐格定值表相同。
+ALL = tuple(PRED)
+EXPECTED_FAILS = {
+    "base": ALL,
+    "target": (),
+    "bad_codeonly": ALL,
+    "bad_changelog_only": tuple(k for k in PRED if k != "g"),
+    "bad_partial": ("a2", "i2", "j4", "j5", "k", "l1"),
+    "bad_a2_prose_only": ("a2",),
+    "bad_scenarios_missing": ("l1",),
+    "bad_stale_synonym": ("j4",),
+    "bad_stale_header": ("j4",),
+    "bad_test_docstring_stale": ("j4",),
+    "bad_k_paraphrase": ("k",),
+    "bad_j3_later_tiebreak": ("j3",),
+    "bad_tuples_stale_para": ("j1", "j3"),
+    "bad_j2_tuple_stale_para": ("j2",),
+    "bad_l1_module_scenarios": ("l1",),
+    "bad_l1_neverraises": ("l1",),
+    "bad_j1_same_para": ("j1",),
+    "bad_j3_same_block": ("j3",),
+    "bad_j2_same_line": ("j2",),
+    "bad_l1_title_paren": ("l1",),
+    "bad_c2_module_only": ("c2",),
+    "alt_j3_anchor": (),
+    "alt_j4_numeric": (),
+    "alt_tuple_wrapped": (),
+}
 
 
-def parse_expected(text):
-    lines = [ln.split() for ln in text.strip("\n").split("\n")]
-    labels = lines[0][1:]
-    if labels != list(PRED):
-        raise ScriptDefinitionError(f"EXPECTED 表头与 PRED 键序不一致: {labels}")
+def expand_expected(fails):
+    if list(fails) != list(STATES):
+        raise ScriptDefinitionError(f"EXPECTED_FAILS 的状态集或顺序与 STATES 不一致: {list(fails)}")
     exp = {}
-    for cells in lines[1:]:
-        if len(cells) != len(labels) + 1:
-            raise ScriptDefinitionError(f"EXPECTED 行列数不符: {cells[:1]}")
-        if any(c not in ("PASS", "FAIL") for c in cells[1:]):
-            raise ScriptDefinitionError(f"EXPECTED 单元格只能是 PASS / FAIL: {cells[0]}")
-        exp[cells[0]] = dict(zip(labels, cells[1:]))
-    if list(exp) != list(STATES):
-        raise ScriptDefinitionError(f"EXPECTED 行序与 STATES 不一致: {list(exp)}")
+    for st, ks in fails.items():
+        unknown = [k for k in ks if k not in PRED]
+        if unknown:
+            raise ScriptDefinitionError(f"EXPECTED_FAILS[{st}] 含未知谓词标签: {unknown}")
+        if len(set(ks)) != len(ks):
+            raise ScriptDefinitionError(f"EXPECTED_FAILS[{st}] 有重复的谓词标签")
+        exp[st] = {k: ("FAIL" if k in ks else "PASS") for k in PRED}
     return exp
 
 
@@ -351,7 +416,7 @@ def main(argv):
         return 2
     try:
         check_doc_lists_states()
-        expected = parse_expected(EXPECTED)
+        expected = expand_expected(EXPECTED_FAILS)
     except ScriptDefinitionError as e:
         print(f"script definition error: {e}", file=sys.stderr)
         return 4

@@ -1,11 +1,13 @@
 # Detailed Tasks — handoff-multibranch-subdir-path-fidelity
-# Phase A.2 + A.3 output (task-planner v2.0), v4 (2026-09-15, post_planning R3 rework). Datasource: tasks.md (path A, dual-layer).
+# Phase A.2 + A.3 output (task-planner v2.0), v5 (2026-09-16, post_planning R4 rework). Datasource: tasks.md (path A, dual-layer).
 # Spec: openspec/changes/handoff-multibranch-subdir-path-fidelity/{proposal.md,tasks.md}
 # 决策单: .aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md (§2 的 10CG/Aria#195 表 + §5)
 # post_planning R1 聚合: .aria/audit-reports/post_planning-R1-2026-09-15T151749-638Z-handoff-multibranch-subdir-path-fidelity-aggregated.md
 # post_planning R2 聚合: .aria/audit-reports/post_planning-R2-2026-09-15T180659-081Z-handoff-multibranch-subdir-path-fidelity-aggregated.md
 # post_planning R3 聚合: .aria/audit-reports/post_planning-R3-2026-09-15T212707-499Z-handoff-multibranch-subdir-path-fidelity-aggregated.md
-#   (v4 按 R3 聚合的处置与其「R4 处置原则」三条落笔: 罕见并发路径 fail-closed / 能删则删能合则合 / 新机械检查须写出自然红态)
+# post_planning R4 聚合: .aria/audit-reports/post_planning-R4-2026-09-15T232954-303Z-handoff-multibranch-subdir-path-fidelity-aggregated.md
+#   (v5 按 R4 聚合的 7 簇 Major / 16 条 Minor / 5 条跨簇落笔, 处置以删 / 换结构 / 交给已有 Skill 为主, 不新增流程层;
+#    R4 分布事实: 组 1-4 的 24 个任务零 Major, 缺陷集中在组 5 发布段与 SC-11 谓词族)
 #
 # 所有 deliverables 路径从主仓根起算。行号锚点: 代码文件按 proposal 冻结 (aria f314785, 与 1cb3872 零 diff);
 # references 与 CHANGELOG 按 metadata.baseline_rebase 的 A.2 偏移表。编号不可变: parent 一经确立不改含义。
@@ -17,14 +19,14 @@ metadata:
   level: 3
   datasource: "tasks.md"
   created: "2026-09-15"
-  updated: "2026-09-15"   # v4: post_planning R3 rework (聚合 0C/9M/17m; 勾选并到 TASK-032 / TASK-029 步序与并发路径 fail-closed / TASK-034 原子推送 / AB delta 取法写死并删 WITHOUT_BETTER / (j1)(j2)(j3)(l1) 钉现状键元组与分块); v3.1: 主控核验返修; v3: post_planning R2 rework; v2: post_planning R1 rework
+  updated: "2026-09-16"   # v5: post_planning R4 rework (聚合 0C/7M/16m; TASK-029 取号基准改台账最近一次记录、两仓合并视为整体、删第 7 步的 --emit-json 核验 / 主仓多远程推送交 phase-c-integrator C.2.5 / 半推后不得 bump gitlink / (j1)(j2)(j3) 换量为平衡括号内、(l1) 丢标题行余部并结构化 Scenarios、(c2) 收紧到函数 docstring / EXPECTED 改为每态只声明 FAIL 集); v4: post_planning R3 rework (聚合 0C/9M/17m; 勾选并到 TASK-032 / TASK-029 步序与并发路径 fail-closed / TASK-034 原子推送 / AB delta 取法写死并删 WITHOUT_BETTER / (j1)(j2)(j3)(l1) 钉现状键元组与分块); v3.1: 主控核验返修; v3: post_planning R2 rework; v2: post_planning R1 rework
   linked_issue: "10CG/Aria#195"
   container: "simonfish/023236f2"
   claim: "track_id handoff-multibranch-subdir-path-fidelity, session s-13ce@1833, phase A.2, heartbeat 2026-09-15T13:04:15Z (refs/aria/coordination 4fd07f9, ls-remote MATCH)"
   verification_ledger:
     path: "openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md"
     writer: "主控唯一执笔; subagent 只把证据 (命令 + 原样输出) 交回主控, 不直接写该文件"
-    skeleton: "TASK-001 新建, 二级标题固定为: 基线 / 前置核验 / RED / 组 2 收口 / GREEN 与反事实 / 回归 / dogfood / 复核结论 / AB / 写法自检 / 外向动作与授权; 后续只在对应标题下追加, 不改标题"
+    skeleton: "TASK-001 新建, 二级标题固定为: 基线 / 前置核验 / RED / 组 2 收口 / GREEN 与反事实 / 回归 / dogfood / 复核结论 / AB / 写法自检 / 外向动作与授权 / 停下与上报; 后续只在对应标题下追加, 不改标题。「停下与上报」收全部 fail-closed 与止损停摆的记录 (判据、当时取值、上报与 owner 处置、重走起止)"
     path_after_archive: "openspec/archive/<YYYY-MM-DD>-handoff-multibranch-subdir-path-fidelity/verification-ledger.md —— TASK-032 归档 (git mv 整个 change 目录) 之后的写入路径, 不在 openspec/changes/ 下重建; 归档后的追加纳入 Phase D 提交"
   scope_repos:
     - repo: "aria (aria-plugin 子模块)"
@@ -69,10 +71,12 @@ metadata:
     # (l1) Returns 段与 Scenarios 段分开检查;
     # v3.1 (主控核验返修): (j3) 由 sed 区段改为 python 单行, 以 # Tie-break 开头的行须恰一行、位于 def _dedupe_sort_key( 行之前
     # (sed 区段在结束后遇到后续 # Tie-break 行会重开到文件尾, 可被骗过);
-    # v4 (post_planning R3 rework): (j1)(j3)(j2) 改为钉现状键元组 —— 取 docstring 首段 / 注释块 # Tie-break 至第一个仅含 # 的行 /
-    # 同时含 compound key 与 (parse_ok 的非表格行, 要求 (parse_ok 之后含 rel_path (只判「块内出现 rel_path」会被
-    # 「首行写五级、另起一段讲 rel_path、元组仍四元」骗过) · (j4) 正则加左边界 (讲目录深度的 14-level 不再假红) ·
-    # (l1) 模块 docstring 与 Returns 两处都只取「标题到第一个空行」的块;
+    # v4 (post_planning R3 rework): (j1)(j3)(j2) 取「块 / 行内 (parse_ok 之后含 rel_path」(块 = docstring 首段 / 注释块 # Tie-break
+    # 至第一个仅含 # 的行 / 同时含 compound key 与 (parse_ok 的非表格行) · (l1) 两处只取标题到第一个空行的块 · (j4) 正则加左边界;
+    # v5 (post_planning R4 rework): (j1)(j3)(j2) 换量 —— 只看 (parse_ok 起的那一对平衡括号之内是否含 rel_path
+    # (v4 的「其后」是块 / 行的全部剩余文本, 元组留四元、紧跟其后补一句 rel_path 就能骗过; R4 code-reviewer 与 qa-engineer 两席各自构造实证) ·
+    # (l1) 丢掉标题行余部 (标题行括注不算), Scenarios 改判结局行 (含 → 的行) 至少四条且其中一条含 target_in_subdir ·
+    # (c2) 收紧到 _list_handoff_files 自己的 docstring (只写进模块 docstring 不算) · (j4) 左边界写全大小写字母;
     # 与脚本 PRED 逐字一致 (--emit-json 的 predicates 字段可机械比对), 多状态验证见 metadata.sc11_predicate_validation。
     # 归属: (c1)(c2) TASK-009 · (i1) TASK-010 · (k)(l1) TASK-013 · (a1)(a2)(b)(f1)(f2)(g)(i2)(j2) TASK-019 ·
     #       (j1)(j3)(j5)(l2) TASK-020 · (j4) TASK-019 (schema 侧) 与 TASK-020 (collector 与 dedupe 测试文件侧) ·
@@ -81,26 +85,26 @@ metadata:
     (a2) grep '^\*\*Fail-soft\*\*: branch-list' references/state-snapshot-schema.md | grep -oE '→ `\{[^`]*\}`' | grep -q '"unreadable_count": 0'
     (b) sed -n '/^TrackEntry:$/,/^```$/p' references/state-snapshot-schema.md | grep -qE '^  rel_path: '
     (c1) ! grep -q 'Returns only the basename' scripts/collectors/handoff_multibranch.py
-    (c2) grep -q 'path relative to' scripts/collectors/handoff_multibranch.py
+    (c2) python3 -B -c "import ast,sys; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_list_handoff_files']; sys.exit(0 if f and 'path relative to' in (ast.get_docstring(f[0]) or '') else 1)"
     (f1) grep -v '^|' references/state-snapshot-schema.md | grep -q handoff_multibranch_unexpected_path_prefix
     (f2) grep -v '^|' references/state-snapshot-schema.md | grep -q handoff_multibranch_undecodable_path
     (g) sed -n '/^## Change history/,$p' references/state-snapshot-schema.md | grep '^|' | grep -q rel_path
     (i1) ! grep -q -F 'legacy:<branch>:<filename>' scripts/collectors/handoff_multibranch.py
     (i2) sed -n '/^TrackEntry:$/,/^```$/p' references/state-snapshot-schema.md | grep '^  track_id:' | grep -q -F 'legacy:<branch>:<rel_path>'
-    (j1) python3 -B -c "import ast,sys; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and 'rel_path' in p[i:] else 1)"
-    (j2) python3 -B -c "import sys; L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all('rel_path' in l[l.find('(parse_ok'):] for l in L) else 1)"
-    (j3) python3 -B -c "import sys; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; ok=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if ok else 0; p=chr(10).join(L[t[0]:e]) if ok else ''; i=p.find('(parse_ok'); sys.exit(0 if ok and i>=0 and 'rel_path' in p[i:] else 1)"
-    (j4) ! { grep -v '^|' references/state-snapshot-schema.md; cat scripts/collectors/handoff_multibranch.py tests/test_handoff_multibranch_collision_dedupe.py; } | grep -qiE '(^|[^0-9a-z])(four|4)[- ]levels?|四级|四层'
+    (j1) python3 -B -c "import ast,itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; t=ast.parse(open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read()); f=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='_dedupe_sort_key'][0]; p=(ast.get_docstring(f) or '').split(chr(10)*2)[0]; i=p.find('(parse_ok'); sys.exit(0 if i>=0 and ok(p[i:]) else 1)"
+    (j2) python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=[l for l in open('references/state-snapshot-schema.md',encoding='utf-8').read().split(chr(10)) if not l.startswith('|') and 'compound key' in l and '(parse_ok' in l]; sys.exit(0 if L and all(ok(l[l.find('(parse_ok'):]) for l in L) else 1)"
+    (j3) python3 -B -c "import itertools,sys; g=lambda s: next((k+1 for k,x in enumerate(itertools.accumulate((c=='(')-(c==')') for c in s)) if x==0), 0); ok=lambda s: g(s)>0 and 'rel_path' in s[:g(s)]; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); t=[i for i,l in enumerate(L) if l.startswith('# Tie-break')]; d=[i for i,l in enumerate(L) if l.startswith('def _dedupe_sort_key(')]; pre=len(t)==1 and len(d)==1 and t[0]<d[0]; e=next((j for j in range(t[0]+1,d[0]) if L[j].strip()=='#'), d[0]) if pre else 0; p=chr(10).join(L[t[0]:e]) if pre else ''; i=p.find('(parse_ok'); sys.exit(0 if pre and i>=0 and ok(p[i:]) else 1)"
+    (j4) ! { grep -v '^|' references/state-snapshot-schema.md; cat scripts/collectors/handoff_multibranch.py tests/test_handoff_multibranch_collision_dedupe.py; } | grep -qiE '(^|[^0-9A-Za-z])(four|4)[- ]levels?|四级|四层'
     (j5) python3 -B -c "import sys; L=open('scripts/collectors/handoff_multibranch.py',encoding='utf-8').read().split(chr(10)); hits=[i for i,l in enumerate(L) if 'dictionary-max' in l.lower()]; sys.exit(0 if hits and all(any('rel_path' in L[j] for j in range(i,min(len(L),i+2))) for i in hits) else 1)"
     (k) python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); d={n.name:(ast.get_docstring(n) or '') for n in ast.walk(t) if isinstance(n,ast.FunctionDef)}; sys.exit(0 if all('target_in_subdir' in d.get(f,'') for f in ('_render_pointer','_render_pointer_unavailable')) else 1)"
-    (l1) python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); w=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='write_latest_md'][0]; d=ast.get_docstring(w) or ''; m=ast.get_docstring(t) or ''; blk=lambda s,h: s.partition(h)[2].split(chr(10)*2)[0]; pre,_,scen=d.partition('Scenarios:'); sys.exit(0 if 'degraded_reason' in blk(m,'Return dict schema:') and 'degraded_reason' in blk(pre,'Returns:') and ('degraded_reason' in scen or 'target_in_subdir' in scen) else 1)"
+    (l1) python3 -B -c "import ast,sys; t=ast.parse(open('scripts/writers/latest_md_writer.py',encoding='utf-8').read()); w=[n for n in ast.walk(t) if isinstance(n,ast.FunctionDef) and n.name=='write_latest_md'][0]; d=ast.get_docstring(w) or ''; m=ast.get_docstring(t) or ''; blk=lambda s,h: s.partition(h)[2].partition(chr(10))[2].split(chr(10)*2)[0]; a=[x for x in blk(d,'Scenarios:').split(chr(10)) if chr(8594) in x]; sys.exit(0 if 'degraded_reason' in blk(m,'Return dict schema:') and 'degraded_reason' in blk(d,'Returns:') and len(a)>=4 and any('target_in_subdir' in x for x in a) else 1)"
     (l2) grep 'Return dict' references/phase-1-collectors.md | grep -q degraded_reason
     (l3) grep '单 track' references/layer-l-integration.md | grep -q '子目录\|subdir'
   sc11_predicate_validation:
-    script: "openspec/changes/handoff-multibranch-subdir-path-fidelity/sc11-predicate-validation.py (仓库根执行, 只读; 副本建在 tempfile 临时目录, finally 中删除; 模拟改动按 1cb3872 原文逐字替换, count=1 的锚点须恰出现一次; 内嵌全部状态 x 全部谓词的期望矩阵 EXPECTED; 退出码 0 = 逐格一致且无谓词写 stderr / 1 = 有差异格或谓词写 stderr (差异格打印到 stderr) / 2 = 参数错误或源目录缺文件 / 3 = 模拟改动的锚点漂移 (anchor drift:) / 4 = 脚本自身定义不一致 (script definition error:) / 5 = 未预期异常; 全部检查用显式判断, 不依赖 assert, python3 -O / -OO 下行为不变; stdout 默认只打印实测矩阵, --emit-json 输出 states / expected / predicates / matrix 四字段供重生成本节与核验两份谓词原文)"
-    states: "base = 原样, 不改 · target = 模拟正确实现 (代码 + 全部文档面) · bad_codeonly = 只改代码, 文档一处不改 · bad_changelog_only = 只在 schema Change history 表加一行 · bad_partial = 正确实现但漏改 Fail-soft 形状 dict / TrackEntry 公式 / collector :355 与 schema :1134 的 four-level / dedupe_latest_per_track_container docstring 的 dictionary-max 句 / write_latest_md 的 Returns 段 / _render_pointer_unavailable docstring · bad_a2_prose_only = target 基础上撤回 Fail-soft 形状 dict 的编辑, unreadable_count 只写进同行散文 · bad_scenarios_missing = target 基础上撤回 write_latest_md docstring Scenarios 段的第四种结局 · bad_stale_synonym = target 基础上 collector :355 的现状句写成 4-level · bad_stale_header = target 基础上只改 :370 元组, :368 仍写 FOUR levels · bad_test_docstring_stale = target 基础上 dedupe 测试文件 :885 的 docstring 漏改, 仍写 4-level · bad_k_paraphrase = target 基础上 _render_pointer docstring 只写 subdirectory 意译, 不含字面 target_in_subdir · bad_j3_later_tiebreak = target 基础上 :370 元组不补 rel_path, 另在 dedupe_latest_per_track_container 定义前多出一行含 rel_path 的 # Tie-break 注释 · bad_tuples_stale_para = target 基础上注释块与 docstring 的现状键元组都留四元, 首行写五级并另起一段讲 rel_path · bad_j2_tuple_stale_para = target 基础上 schema 键序句只改层数词、元组仍四元, 另加一条同时含 compound key 与 rel_path 的 bullet · bad_l1_module_scenarios = target 基础上模块 docstring 的 Return dict schema 块漏补, 顶部场景列表写了 degraded_reason · bad_l1_neverraises = target 基础上 write_latest_md 的 Returns 段漏补, Never raises 段写了 degraded_reason · alt_j3_anchor = target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized), 语义正确 · alt_j4_numeric = target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数)"
-    expected: "base 全 FAIL; target 全 PASS; bad_codeonly 全 FAIL; bad_changelog_only 除 (g) 外全 FAIL; bad_partial 中 (a2)(i2)(j4)(j5)(k)(l1) 为 FAIL, 其余 PASS; bad_a2_prose_only 中 (a2) 为 FAIL, 其余 PASS; bad_scenarios_missing 中 (l1) 为 FAIL, 其余 PASS; bad_stale_synonym 中 (j4) 为 FAIL, 其余 PASS; bad_stale_header 中 (j4) 为 FAIL, 其余 PASS; bad_test_docstring_stale 中 (j4) 为 FAIL, 其余 PASS; bad_k_paraphrase 中 (k) 为 FAIL, 其余 PASS; bad_j3_later_tiebreak 中 (j3) 为 FAIL, 其余 PASS; bad_tuples_stale_para 中 (j1)(j3) 为 FAIL, 其余 PASS; bad_j2_tuple_stale_para 中 (j2) 为 FAIL, 其余 PASS; bad_l1_module_scenarios 中 (l1) 为 FAIL, 其余 PASS; bad_l1_neverraises 中 (l1) 为 FAIL, 其余 PASS; alt_j3_anchor 全 PASS; alt_j4_numeric 全 PASS"
-    measured_2026_09_15_at_1cb3872_v4: |
+    script: "openspec/changes/handoff-multibranch-subdir-path-fidelity/sc11-predicate-validation.py (仓库根执行, 只读; 副本建在 tempfile 临时目录, finally 中删除; 模拟改动按 1cb3872 原文逐字替换, count=1 的锚点须恰出现一次; 内嵌 EXPECTED_FAILS (每态只声明期望 FAIL 的谓词集, 其余期望 PASS, 由 expand_expected() 展开成全矩阵后逐格比对); 退出码 0 = 逐格一致且无谓词写 stderr / 1 = 有差异格或谓词写 stderr (差异格打印到 stderr) / 2 = 参数错误或源目录缺文件 / 3 = 模拟改动的锚点漂移 (anchor drift:) / 4 = 脚本自身定义不一致 (script definition error: EXPECTED_FAILS 的状态集或顺序 / 未知或重复标签 / docstring 漏列状态) / 5 = 未预期异常; 全部检查用显式判断, 不依赖 assert, python3 -O / -OO 下行为不变; stdout 默认只打印实测矩阵, --emit-json 输出 states / expected / predicates / matrix 四字段供重生成本节与核验两份谓词原文)"
+    states: "base = 原样, 不改 · target = 模拟正确实现 (代码 + 全部文档面) · bad_codeonly = 只改代码, 文档一处不改 · bad_changelog_only = 只在 schema Change history 表加一行 · bad_partial = 正确实现但漏改 Fail-soft 形状 dict / TrackEntry 公式 / collector :355 与 schema :1134 的 four-level / dedupe_latest_per_track_container docstring 的 dictionary-max 句 / write_latest_md 的 Returns 段 / _render_pointer_unavailable docstring · bad_a2_prose_only = target 基础上撤回 Fail-soft 形状 dict 的编辑, unreadable_count 只写进同行散文 · bad_scenarios_missing = target 基础上撤回 write_latest_md docstring Scenarios 段的第四种结局 · bad_stale_synonym = target 基础上 collector :355 的现状句写成 4-level · bad_stale_header = target 基础上只改 :370 元组, :368 仍写 FOUR levels · bad_test_docstring_stale = target 基础上 dedupe 测试文件 :885 的 docstring 漏改, 仍写 4-level · bad_k_paraphrase = target 基础上 _render_pointer docstring 只写 subdirectory 意译, 不含字面 target_in_subdir · bad_j3_later_tiebreak = target 基础上 :370 元组不补 rel_path, 另在 dedupe_latest_per_track_container 定义前多出一行含 rel_path 的 # Tie-break 注释 · bad_tuples_stale_para = target 基础上注释块与 docstring 的现状键元组都留四元, 首行写五级并另起一段讲 rel_path · bad_j2_tuple_stale_para = target 基础上 schema 键序句只改层数词、元组仍四元, 另加一条同时含 compound key 与 rel_path 的 bullet · bad_l1_module_scenarios = target 基础上模块 docstring 的 Return dict schema 块漏补, 顶部场景列表写了 degraded_reason · bad_l1_neverraises = target 基础上 write_latest_md 的 Returns 段漏补, Never raises 段写了 degraded_reason · bad_j1_same_para = target 基础上 docstring 元组留四元, 同一段内元组之后补一句讲 rel_path · bad_j3_same_block = target 基础上注释块元组留四元, 同一块内元组之后续写 rel_path · bad_j2_same_line = target 基础上 schema 键序句元组留四元, 同一行末尾补 plus rel_path · bad_l1_title_paren = target 基础上三处补充都只写进标题行括注 / 旁白, 字典字面量与键清单与第四种结局都没改 · bad_c2_module_only = target 基础上契约句只写进模块 docstring 的 TrackEntry 块, _list_handoff_files 自己的 docstring 未写 · alt_j3_anchor = target 基础上注释块首行改写为 round 4 措辞 (去掉 finalized), 语义正确 · alt_j4_numeric = target 基础上枚举层 docstring 出现 14-level (讲目录深度, 非排序键层数) · alt_tuple_wrapped = target 基础上 docstring 与注释块的五元元组各跨两行书写 (合法写法)"
+    expected: "base 全 FAIL; target 全 PASS; bad_codeonly 全 FAIL; bad_changelog_only 除 (g) 外全 FAIL; bad_partial 中 (a2)(i2)(j4)(j5)(k)(l1) 为 FAIL, 其余 PASS; bad_a2_prose_only 中 (a2) 为 FAIL, 其余 PASS; bad_scenarios_missing 中 (l1) 为 FAIL, 其余 PASS; bad_stale_synonym 中 (j4) 为 FAIL, 其余 PASS; bad_stale_header 中 (j4) 为 FAIL, 其余 PASS; bad_test_docstring_stale 中 (j4) 为 FAIL, 其余 PASS; bad_k_paraphrase 中 (k) 为 FAIL, 其余 PASS; bad_j3_later_tiebreak 中 (j3) 为 FAIL, 其余 PASS; bad_tuples_stale_para 中 (j1)(j3) 为 FAIL, 其余 PASS; bad_j2_tuple_stale_para 中 (j2) 为 FAIL, 其余 PASS; bad_l1_module_scenarios 中 (l1) 为 FAIL, 其余 PASS; bad_l1_neverraises 中 (l1) 为 FAIL, 其余 PASS; bad_j1_same_para 中 (j1) 为 FAIL, 其余 PASS; bad_j3_same_block 中 (j3) 为 FAIL, 其余 PASS; bad_j2_same_line 中 (j2) 为 FAIL, 其余 PASS; bad_l1_title_paren 中 (l1) 为 FAIL, 其余 PASS; bad_c2_module_only 中 (c2) 为 FAIL, 其余 PASS; alt_j3_anchor 全 PASS; alt_j4_numeric 全 PASS; alt_tuple_wrapped 全 PASS"
+    measured_2026_09_16_at_1cb3872_v5: |
       state                     a1   a2   b    c1   c2   f1   f2   g    i1   i2   j1   j2   j3   j4   j5   k    l1   l2   l3
       base                      FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL FAIL
       target                    PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
@@ -118,9 +122,15 @@ metadata:
       bad_j2_tuple_stale_para   PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS PASS
       bad_l1_module_scenarios   PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
       bad_l1_neverraises        PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
+      bad_j1_same_para          PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS PASS PASS
+      bad_j3_same_block         PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS
+      bad_j2_same_line          PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS PASS
+      bad_l1_title_paren        PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS FAIL PASS PASS
+      bad_c2_module_only        PASS PASS PASS PASS FAIL PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
       alt_j3_anchor             PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
       alt_j4_numeric            PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
-    authoring_rules: "(a2) Fail-soft 行保留 **Fail-soft**: branch-list 前缀, 形状 dict 以 → 加单反引号写在同一行, 键值写成 \"unreadable_count\": 0 (改用围栏代码块即假红); (j1)(j3)(j2) 现状键元组写全五元并留在首段: collector 注释块写在 # Tie-break 至第一个仅含 # 的行之间, _dedupe_sort_key docstring 写在第一个空行之前, schema 写在同时含 compound key 与 (parse_ok 的那一行, 新增说明另起一段不算; (j2) schema 键序句保留 compound key 字样; (j3) 改写注释块首行时保留 # Tie-break 行首前缀 (finalized 一词不再是锚点), 且 collector 中以 # Tie-break 开头的行保持唯一 (多出一行即 (j3) FAIL, 属事先告知的可见假红); (j4) 扫描面 = schema 非表格行 + collector 全文 + tests/test_handoff_multibranch_collision_dedupe.py 全文, 生效后扫描面内任何语境都不用这些字样 (谓词不看语境; four-level / four levels / 4-level / 4 levels / 四级 / 四层, 左边界为行首或非字母数字字符, 故 14-level 这类讲目录深度的写法不触发), 现状句写五级键并点名 rel_path, 历史轮次的键用元组表述, 不靠行内 round 标记豁免; 扫描面外的已发布记录 (aria/CHANGELOG.md 中 10CG/aria-plugin#155 的旧版本条目「四级确定键」) 按 content-integrity 执行口径不回改, 其余同义词命中 (issue_scan 平台检测 / sync-detection fallback 链 / phase-d-closer D.3 触发 fallback / skill_md_literal_sync_probe / aria-token-telemetry 测试) 语义与排序键无关; (j5) 要求每处 dictionary-max 键序句在同一行或下一行点名 rel_path; (k) 两处 writer docstring 逐字含 target_in_subdir (degraded_reason 的机读枚举值; subdir / 子目录 等意译不算); (l1) 模块 docstring 的 Return dict schema 块与 write_latest_md docstring 的 Returns 段 (各取标题到第一个空行) 都含 degraded_reason, Scenarios 段含第四种结局并写出 degraded_reason 或 target_in_subdir"
+      alt_tuple_wrapped         PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS PASS
+    authoring_rules: "(a2) Fail-soft 行保留 **Fail-soft**: branch-list 前缀, 形状 dict 以 → 加单反引号写在同一行, 键值写成 \"unreadable_count\": 0 (改用围栏代码块即假红); (j1)(j3)(j2) 现状键元组写全五元并留在首段: collector 注释块写在 # Tie-break 至第一个仅含 # 的行之间, _dedupe_sort_key docstring 写在第一个空行之前, schema 写在同时含 compound key 与 (parse_ok 的那一行 (元组不跨行, 谓词按行取); 第 5 元必须写在元组的括号之内 —— 谓词只看 (parse_ok 起的那一对平衡括号之内, 写在元组之后的说明句 (另起一段 / 同段 / 同一行续写) 一律不算 (docstring 与注释块内元组跨两行书写不受影响, 有 alt_tuple_wrapped 守卫); (j2) schema 键序句保留 compound key 字样; (c2) 枚举层的契约句 (含 path relative to) 写在 _list_handoff_files 自己的 docstring 里, 只写进模块 docstring 不算; (j3) 改写注释块首行时保留 # Tie-break 行首前缀 (finalized 一词不再是锚点), 且 collector 中以 # Tie-break 开头的行保持唯一 (多出一行即 (j3) FAIL, 属事先告知的可见假红); (j4) 扫描面 = schema 非表格行 + collector 全文 + tests/test_handoff_multibranch_collision_dedupe.py 全文, 生效后扫描面内任何语境都不用这些字样 (谓词不看语境; four-level / four levels / 4-level / 4 levels / 四级 / 四层, 左边界为行首或非字母数字字符, 故 14-level 这类讲目录深度的写法不触发), 现状句写五级键并点名 rel_path, 历史轮次的键用元组表述, 不靠行内 round 标记豁免; 扫描面外的已发布记录 (aria/CHANGELOG.md 中 10CG/aria-plugin#155 的旧版本条目「四级确定键」) 按 content-integrity 执行口径不回改, 其余同义词命中 (issue_scan 平台检测 / sync-detection fallback 链 / phase-d-closer D.3 触发 fallback / skill_md_literal_sync_probe / aria-token-telemetry 测试) 语义与排序键无关; (j5) 要求每处 dictionary-max 键序句在同一行或下一行点名 rel_path; (k) 两处 writer docstring 逐字含 target_in_subdir (degraded_reason 的机读枚举值; subdir / 子目录 等意译不算); (l1) 模块 docstring 的 Return dict schema 块与 write_latest_md docstring 的 Returns 段 (各取标题行的下一行到第一个空行; 标题行本身的括注在块外, 不算) 都含 degraded_reason; Scenarios 段的第四种结局另起一条结局行 (与既有三条同形, 含 →) 并在该行写出 target_in_subdir (谓词判该段含 → 的行至少四条且其中一条含 target_in_subdir; 基线三条, 把 degraded_reason 只写进旁白或标题括注即 FAIL)"
   hard_constraints:
     - "子模块合并一律本地 git merge + 双推; 禁 Forgejo 服务端合并 (CLAUDE.md 多远程硬约束 1)"
     - "推后逐 remote ls-remote 核验 master 与 tag 对象 SHA, 不信 push 回执; push 显式给足超时 (硬约束 2 + memory partial-push)"
@@ -133,7 +143,8 @@ metadata:
     - "反事实一律三步, 适用于本 Spec 的全部反事实 (TASK-015..018 与 TASK-035; 基线 RED 记录只作 RED 证据, 不充当反事实): 从 TASK-033 记录的实现 SHA 检出一次性 git worktree 副本 → 未打补丁时对应用例 GREEN (留输出) → 只回退该组件后 RED (留输出并记失败断言文本) → 记副本 HEAD SHA 与补丁 diff (diff 以副本路径为根); 副本的创建与移除 (git -C aria worktree add / git -C aria worktree remove) 记台账, 任务结束时 git -C aria worktree list 不含本任务副本; 用 python3 -B 跑 (memory stale-pyc-nc), 不在 feature 分支工作树上改"
     - "本 cycle 新写或改动的文字: issue / PR 引用写 <org>/<repo>#<n>, 文内编号不用 # 与带圈字符 (standards content-integrity.md §4.4 / §4.5); 判据里不放字面 U+FFFD, 写成 chr(0xFFFD)"
   owner_gates:
-    # 全部外向动作与 owner 等待点 (单一来源; tasks.md 不复述)。按执行序排列, 每项写: 承载任务 · 性质 · 内容与未获授权 / 裁定时的处置
+    # 全部外向动作与 owner 等待点 (单一来源; tasks.md 不复述)。按执行序排列, 每项写: 承载任务 · 性质 · 内容与未获授权 / 裁定时的处置。
+    # 需 owner 动作的点逐项单列; 不需要 owner 动作、只需知情的止损停摆合并为一项 (第 9 项), 其判据与处置写在各任务里
     - "TASK-001 (B.1 前) · 外向推送 · 主仓规划提交 (A.2/A.3 各版与 post_planning 各轮报告) 推到 origin 与 github, 逐 remote ls-remote 核验; B.0 phase1_gate 认领推协调 ref (phase1_gate 第 9 步 resilient_push) 与本项同批请授权, 不另设等待点; 未授权或未推送 ⇒ 主仓 feature 分支回落为从包含规划提交的本地 master 起, 推送并入 TASK-031"
     - "TASK-025 · 外向发帖 · 10CG/aria-plugin 遗留缺口 issue; owner 不授权开单 ⇒ TASK-023 的 standards 措辞走回落形态 (见 TASK-025), 裁定原文记台账"
     - "TASK-026 · owner 启动动作 · 以 ARIA_COORDINATION_NO_PUSH=1 启动 AB 会话 (进程启动时设, 会话内补不上); 未获 ⇒ 停在本步不开跑, 记台账"
@@ -142,16 +153,17 @@ metadata:
     - "TASK-026 · owner 裁定 (按 PREDICTION 预期会触发) · delta.pass_rate ≤ 0 或回归面判为无效度 ⇒ TASK-027 之前经 AskUserQuestion 请 owner 裁, 附 PREDICTION 对照与套件缺口 issue; 未获裁定不进 TASK-027"
     - "TASK-026 · 止损上报 · 逐 eval 判回归 ⇒ 阻断 TASK-027 / TASK-029, 结果与现象上报 owner"
     - "TASK-029 · 停下上报 (罕见并发路径一律 fail-closed) · 取号被占 (第 4 步) / 合并冲突 (第 5 步) / 取号终核不符 (第 6 步) ⇒ 停在本步, 原样记台账并上报 owner, 附先例指针 aria ec72175; 未获处置前不进 TASK-034"
-    - "TASK-034 · 外向推送 · 每个远端 git push --atomic (aria: master + tag v<vNEXT>; standards: master), 先 origin 后 github; 未获授权 ⇒ 本地合并与 tag 保持未推送, 停在本步, 记台账"
-    - "TASK-034 · 停下上报 (fail-closed) · 任一远端被拒 (non-fast-forward) 或只推成一个远端 ⇒ 不 force、不重打 tag, 原样记台账并上报 owner (半推按 memory partial-push 记为镜像分叉)"
-    - "TASK-031 · 外向推送 + 外向发帖 · 主仓 feature 分支推送、Forgejo PR、合并 (TASK-001 走回落支时同时携带规划提交); 未获授权 ⇒ 停在本步, 不进 TASK-032, 记台账"
+    - "TASK-029 / TASK-034 / TASK-032 · 止损停摆 (owner 知情, 无需 owner 动作即可自查) · TASK-029 第 2 步工作树不干净或 standards 占位未清 (本地可修复分支见该步) / 第 3 步本地 master 不能快进或 ff-only 后仍不等 / 第 7 步前提不成立 / 第 8 步回归不通过 · TASK-034 推送前发现同名 v<vNEXT> tag (删本地 tag + 按回退条回退两仓) · TASK-032 开头本地 master 不能快进到 origin/master ⇒ 一律停在本步, 原样记台账并上报, 不进下游任务"
+    - "TASK-034 · 外向推送 · 每个远端 git push --atomic (aria: master + tag v<vNEXT>; standards: master), 先 origin 后 github; 未获授权 ⇒ 本地合并与 tag 保持未推送, 停在本步, 不进 TASK-030, 记台账"
+    - "TASK-034 · 停下上报 (fail-closed) · 任一远端被拒 (non-fast-forward) 或只推成一个远端 ⇒ 不 force、不重打 tag, 原样记台账并上报 owner (半推按 memory partial-push 记为镜像分叉); 两个远端未都核验一致前不进 TASK-030 (不得 bump gitlink)"
+    - "TASK-031 · 外向推送 + 外向发帖 · 主仓 feature 分支推送、Forgejo PR、合并 (TASK-001 走回落支时同时携带规划提交), 含合并后经 phase-c-integrator C.2.5 把主仓 master 推到全部 enforced remote 并做 post-push parity; 未获授权 ⇒ 停在本步, 不进 TASK-032, 记台账; 推送被拒或只推成一个远端 (C.2.5 的 fail_on_partial_push 默认阻断) ⇒ 不 force、不改写历史, 原样记台账并停下上报 (同 TASK-034)"
     - "TASK-032 · owner 裁定 · 归档 Step 7 建或不建 [Archive Tracker] issue (D.2 之前询问); 裁不建 ⇒ 只跳过 Step 7, 裁定原文与未建原因记台账与周期 handoff"
     - "TASK-032 · 外向发帖 · 三类归档门检查器假阳性另报 10CG/aria-plugin; 未获授权 ⇒ 不报, 记台账并写入周期 handoff"
     - "TASK-032 · 外向发帖 · 10CG/Aria#195 回帖并关闭; 未获授权 ⇒ 停在本步, 记台账"
-    - "TASK-032 · 外向推送 · Phase D 主仓提交 (归档目录 / handoff / checkbox 勾选 / 归档后台账) 双推, 与 release_gate 释放 claim 的协调 ref 推送同批请授权 (不另设等待点); 未获授权 ⇒ 归档与 handoff 留在本地, 停在本步, 记台账"
+    - "TASK-032 · 外向推送 · Phase D 主仓提交 (归档目录 / handoff / checkbox 勾选 / 归档后台账) 双推, 与 release_gate 释放 claim 的协调 ref 推送同批请授权 (不另设等待点); 未获授权 ⇒ 归档与 handoff 留在本地, 停在本步, 记台账; 推送被拒或只推成一个远端 ⇒ 不 force、不改写历史, 原样记台账并停下上报 (同 TASK-034)"
   rule6_note: "判据表落行 = 第四行「拿不准 ⇒ 照跑」(proposal rule6_note, R2 改判); 若 TASK-024 对 references/rules/advanced-rules.md 或 RECOMMENDATION_RULES.md 落下编辑, 升第二行「处方性 · 运行时指令面 ⇒ 照跑 AB, 零裁量」—— 两行同去处 = 照跑; 若对 phase-d-closer/SKILL.md 落编辑, AB 范围追加 phase-d-closer (proposal rule6_note「不豁免的部分」)。执行 (TASK-026): (1) /skill-creator 跑 state-scanner AB, 结果落 aria-plugin-benchmarks/ab-results/YYYY-MM-DD-handoff-multibranch-rule6/; (2) 开跑前在结果目录写 PREDICTION.md (逐 eval 预测 with / old 分数与整体 delta.pass_rate; 依据 = 本条已预判套件结构上测不到 collector 输出变化, 预期 delta ≈ 0); 两臂口径写死为「代码 + 文档整体」(with = TASK-021 回归前记录的 aria feature 分支 HEAD, old = B.1 基线 SHA 的一次性 worktree; 区分力不归因到文档); 「无回归」在本次运行内逐 eval 判 (with vs old, 同一 grader, 不与存档分数比): 任一 eval with < old ⇒ 该 eval 复跑两次, 三个样本中 ≥2 个仍 with < old ⇒ 判回归; 判回归 ⇒ 阻断 TASK-027 / TASK-029 并上报 owner, 不得自行降级为「记录在案」 (WITHOUT_BETTER 是 with vs without 的判定, 不适用于本次的 with vs old, 已删去; 其对应物就是这条逐 eval 回归判据); delta.pass_rate 写死为 mean(with 臂 pass_rate) − mean(old 臂 pass_rate), 由脚本从两臂 grading.json 直接汇总 (先例 ab-results/2026-09-05-v1.70.0-a1-entry-rule6/SCORES.md); RESULT.md 设「与 SOT 验收判据的关系 (如实登记)」一节 (先例 ab-results/2026-09-08-v1.73.0-archive-skill-drift/RESULT.md), 登记 AB_TEST_OPERATIONS.md 场景 1 验收 delta.pass_rate > 0 是否达成; delta ≤ 0 或回归面判为无效度 (先例 ab-results/2026-09-05-v1.70.0-a1-entry-rule6/RESULT.md §1.2) ⇒ 结论写「未被有效测试」, 不单独构成通过, TASK-027 之前经 AskUserQuestion 请 owner 裁 (按预测这是预期会触发的等待点), AI 不自行判「按先例放行」; (3) 开 AB 套件缺口 issue (ab-suite/state-scanner.json :214 唯一命中且把 collision.kind 值写死在题面, 结构上测不到 collector 输出变化); (4) substitute 实体全部保留。baseline-failing 实体 = SC-1 / SC-3 / SC-4 后半 / SC-5 / SC-6 (a)(b) / SC-8 后半 / SC-9 / SC-13 / SC-14 / SC-16 / SC-17 / SC-18 (实体资格由 (b) 独撑) / SC-15 布局 2 (d) 后半与 (h)、布局 1 (i)、布局 3 (j)、布局 4、布局 5、布局 6, 另加决策单 §2 第 4 行排序键用例; 回归锁 = SC-2 / SC-7 / SC-4 前半 / SC-8 前半 / SC-6 (c) / SC-18 (a)(c) / SC-15 布局 1 (a)(b)(c)、布局 3 (g)、布局 2 (e)。证据来源: RED = TASK-007 (只作 RED 证据, 不充当反事实); 反事实全部在组 3 按三步法实跑 —— proposal SC 表所列的 SC-1 / SC-3 / SC-4 后半 / SC-5 / SC-8 后半 / SC-14 / SC-17 由 TASK-035 在 TASK-033 SHA 上只回退该组件实跑并逐 SC 记失败断言文本, 其余 GREEN 与反事实 = TASK-015..018; 全绿 = TASK-021。AB 前置与协调 ref 安全按 AB_TEST_OPERATIONS.md 场景 1 三步 (见 TASK-026)。按 Rule #10 不得以「代码面 / 成本 / 套件测不到」降回豁免。tasks.md 不复述本条"
   total_tasks: 35
-  est_hours_total: 105
+  est_hours_total: 107
   agents:
     qa-engineer: 15
     backend-architect: 10
@@ -176,7 +188,8 @@ tasks:
       - 'B.1 前置 (主仓规划提交, metadata.owner_gates 第一项): 规划提交 (A.2/A.3 各版与 post_planning 各轮报告) 已经 owner 授权推到主仓 origin 与 github; 核验 = 对 origin 与 github 各自 git ls-remote <remote> master 取 SHA (先 git fetch <remote>), 用 git merge-base --is-ancestor <本地 master 上触及本 change 目录或本 Spec post_planning 报告的最新提交> <该 SHA> 逐 remote 判定, 授权与原样输出记台账'
       - '回落支: B.1 时规划提交仍未推送 ⇒ 主仓 feature 分支改从包含规划提交的本地 master 起, 起点 SHA 与「规划提交未推送」事实记台账并追加进 AI 流程判断清单 (tasks.md 清单第 13 条的回落支); 推送随 TASK-031 的 PR 发生 (metadata.owner_gates); aria / standards 不受影响'
       - '三处 origin/master 实测: 取值前先 git fetch (或直接 git ls-remote origin master), 不读陈旧的远端跟踪 ref (memory freshness-must-be-fetched); 台账记录 git -C aria / git -C standards / 主仓各自 origin/master 的实测 SHA, 以及 git ls-tree HEAD aria standards; aria / standards feature 分支从该实测值起, 主仓按上两条 (不从 proposal 头部的 f314785 起)'
-      - 'touchpoints-aria.txt 由 proposal §触点文件清单表机械导出, 41 行且类别计数为 改写 12 / 改写待定 2 / 新增 1 / 引用 26; 导出脚本与输出落台账'
+      - 'B.0 若调用 phase1_gate (owner_gates 第一项同批授权): 获授权即照常跑; 未获授权时以 --no-push 或 ARIA_COORDINATION_NO_PUSH=1 跑 (两者等价, 实测 phase1_gate.py:1472-1488 与 lib/failure_handlers.py:91-96), 认领只落本地、第 9 步 resilient_push 记 SKIPPED; 实际用了哪一种与 B.0 输出记台账'
+      - 'touchpoints-aria.txt 由 proposal §触点文件清单表机械导出, 41 行且类别计数为 改写 12 / 改写待定 2 / 新增 1 / 引用 26; 导出脚本与输出落台账。该文件与组 3 / TASK-026 的一次性副本一样落 scratchpad, 不落仓内 —— 落仓内会成为 TASK-031 有范围核验里一个本 cycle 产生却不在交付物清单上的未跟踪文件, 那条「判定与本 cycle 无关」将不可满足'
       - 'git -C aria diff --stat f314785 <B.1 基线> 与 1cb3872 <B.1 基线> 两份输出 (均限定 41 触点) 落台账; 若代码落点出现 diff, 被 proposal 引用的行号逐处实读重测并更新偏移表 (A.2 偏移表见 metadata.baseline_rebase.shifts)'
       - 'aria feature 分支自 B.1 基线建好并检出后, 断言 git -C aria rev-parse HEAD 等于 B.1 基线 SHA 且 git -C aria status --porcelain 为空, 输出记台账 —— 下两条跑的是这份工作树 (fetch 只移动远端跟踪 ref, 不检出就仍在 1cb3872 上, memory stale-local-main / partial-freeze)'
       - '在仓库根重跑 python3 -B openspec/changes/handoff-multibranch-subdir-path-fidelity/sc11-predicate-validation.py: 退出码 0, 且 stdout 打印的矩阵与 metadata.sc11_predicate_validation 的实测块逐字节一致; --emit-json 输出的 states / expected / matrix 与 yaml 对应字段一致, predicates 与 yaml 谓词块中 (label) 开头的行逐字节一致 (两份谓词原文的唯一机械核验点)'
@@ -331,10 +344,10 @@ tasks:
       - aria/skills/state-scanner/scripts/collectors/handoff_multibranch.py   # :177-178, :240-290, 主循环 :619-626 的 reporter 传入
     verification:
       - 'ls-tree 加 -z, 按 NUL 切分并丢弃空段 (proposal §What.1; SC-9 (c) 平铺仓 unexpected_path_prefix 计数为 0)'
-      - '前缀剥离从 _HANDOFF_TREE_PATH 派生: 取 PurePosixPath(path).relative_to(_HANDOFF_TREE_PATH) (不匹配抛 ValueError 走守卫), 或先判 path.startswith(_HANDOFF_TREE_PATH + "/") 不成立即走 reporter、成立才切片 rel = path[len(_HANDOFF_TREE_PATH) + 1:]; 不得只切不判; 源码中不新增 "docs/handoff/" 字面量'
+      - '前缀剥离从 _HANDOFF_TREE_PATH 派生: 取 PurePosixPath(path).relative_to(_HANDOFF_TREE_PATH) (不匹配抛 ValueError 走守卫), 或先判 path.startswith(_HANDOFF_TREE_PATH + "/") 不成立即走 reporter、成立才切片 rel = path[len(_HANDOFF_TREE_PATH) + 1:]; 不得只切不判; 源码的路径拼接与前缀剥离逻辑里不新增 "docs/handoff/" 字面量, 一律从 _HANDOFF_TREE_PATH 派生 (docstring / 注释里引用该路径说明契约不受此限, 契约句本身就要写出它)'
       - '签名保持 tuple[list[str], str | None], 新增带默认值的 reporter 入参; 主循环传入一个同时写 r.soft_error 与 data["errors"] 的闭包 (proposal Task 2.1 推荐默认); tests/test_max_branches_resolver.py:286,300,316,332 四处 2-tuple mock 不改且保持绿'
       - '.md 过滤作用于 rel 的 basename; latest.md 排除逻辑不改代码'
-      - 'docstring :246-247 旧句「Returns only the basename」删除, 新增含 path relative to 的契约句; :177 注释与 :178 无斜杠的值一致; SC-11 (c1)(c2) 为真'
+      - 'docstring :246-247 旧句「Returns only the basename」删除, 新增含 path relative to 的契约句, 且该句写在 _list_handoff_files 自己的 docstring 里 —— (c2) 只看这个函数的 docstring, 只写进模块 docstring 不算 (坏态 bad_c2_module_only); :177 注释与 :178 无斜杠的值一致; SC-11 (c1)(c2) 为真'
       - 'SC-3 / SC-9 转绿; SC-2 仍绿'
 
   - id: TASK-010
@@ -408,7 +421,7 @@ tasks:
       - '_render_pointer 与 _render_pointer_unavailable 返回 (content, reason); write_latest_md 在三分派之前初始化 degraded_reason = None, 仅 n_active == 1 支由解包覆写, 返回 dict 无条件带该键; write_latest_md 内不重算 rel == filename'
       - 'reason 取值集合恰为 None / "missing_filename" / "target_in_subdir"; action 三值不变'
       - '降级正文写明目标在子目录及原因 (handoff.py 候选集非递归); 「仅在单 active track 场景下写真实指针」这句在 :140 与 :159 逐字重复, 两处同批补子目录限定 (只改一处会让同一规则在同文件里两种说法)'
-      - '本文件全部契约面由本任务一并改, TASK-020 不再碰该文件: 模块 docstring 的 Return dict schema (:30-35) 与 write_latest_md docstring 的 Returns (:277-281) 补 degraded_reason, Scenarios (:287-290) 补第四种结局并写出 `degraded_reason` 或 `target_in_subdir` (SC-11 (l1) 分别检查 Returns 段与 Scenarios: 之后的文本); _render_pointer (:111-114) 与 _render_pointer_unavailable (:152) 两处 docstring 须逐字含 `target_in_subdir` —— 它是 degraded_reason 的机读枚举值, 不是给执行者的括注, subdir / 子目录 等意译不算 (SC-11 (k) 只认该字面); SC-11 (k)(l1) 为真'
+      - '本文件全部契约面由本任务一并改, TASK-020 不再碰该文件: 模块 docstring 的 Return dict schema (:30-35) 与 write_latest_md docstring 的 Returns (:277-281) 补 degraded_reason, Scenarios (:287-290) 另起一条含 → 的结局行并在该行写出 `target_in_subdir` (SC-11 (l1) 分别检查: Return dict schema 块与 Returns 段各取标题行的下一行到第一个空行 —— 写在标题行括注里不算; Scenarios 段判含 → 的结局行至少四条且其中一条含 `target_in_subdir`, 基线三条); _render_pointer (:111-114) 与 _render_pointer_unavailable (:152) 两处 docstring 须逐字含 `target_in_subdir` —— 它是 degraded_reason 的机读枚举值, 不是给执行者的括注, subdir / 子目录 等意译不算 (SC-11 (k) 只认该字面); SC-11 (k)(l1) 为真'
       - 'SC-15 六个布局转绿; tests/test_p1_layer_h.py 保持 Ran 24 … OK'
 
   - id: TASK-014
@@ -506,10 +519,10 @@ tasks:
     reason: "坏实现须像真实坏情形 (memory adversarial-fixture)"
     dependencies: [TASK-033]
     deliverables:
-      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §GREEN 与反事实
+      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §GREEN 与反事实 (证据交主控写入)
     verification:
       - '每条反事实都按 metadata.hard_constraints 的三步法执行并留三段输出 (未打补丁绿 / 打补丁后红 / 副本 HEAD SHA + 补丁 diff)'
-      - 'SC-15: (1) 去掉守卫 ⇒ 布局 2 (d)(e) 红; (2) 判据换成 "/" in filename ⇒ (d)(e) 红; (3) 缺键兜底写成 track.get("rel_path") != filename ⇒ 布局 3 (g)(j) 红; (4) 在 write_latest_md 内重算谓词并写反 ⇒ 布局 1 (i) 与布局 3 (j) 红而布局 2 (d) 仍绿'
+      - 'SC-15: (1) 去掉守卫 ⇒ 布局 2 (d)(e) 红; (2) 判据换成 "/" in filename ⇒ (d)(e) 红; (3) 缺键兜底写成 track.get("rel_path") != filename ⇒ 布局 3 (g)(j) 红; (4) 在 write_latest_md 内重算谓词并写反 ⇒ 布局 1 (i) 与布局 3 (j) 红而布局 2 (d) 仍绿。补丁 4 的最小实现: 在 n_active == 1 分支解包 _render_pointer 之后插入三行 —— t = active_tracks[0]; rel = t.get("rel_path") or t.get("filename"); if rel == t.get("filename"): degraded_reason = "target_in_subdir" (只改 reason 不改 content, 故顶层与缺键两个布局翻红而子目录布局的 (d)(e) 不动); 实跑红绿模式与此不符时改补丁、不改测试断言, 偏离与原样输出记台账'
       - 'SC-18: (1) 判据改为 rel.encode("utf-8") + except UnicodeError ⇒ (b)(c) 双红; (2) 把不可解码名计入 unreadable_count ⇒ (b) 红'
       - 'SC-9: 沿用分支级错误通道 (收到非 None 即 continue 整支) ⇒ (b) 红; 不丢空段 ⇒ (c) 红'
       - 'SC-16: 前缀剥离少剥斜杠 ⇒ rel_path 带前导 / ⇒ 红; 忘记剥前缀 ⇒ 红'
@@ -559,7 +572,7 @@ tasks:
       - '字段块 (:1081-1103) 新增 unreadable_count 行并写三类外延; :1138 fail-soft 形状同时补 unreadable_count 与既有漏写的 identity_advisories —— SC-11 (a2) 检查的是该行反引号内的形状 dict 本身, 同行散文里写 unreadable_count 不算'
       - 'TrackEntry 块 (:1105-1113) 新增 rel_path 行; filename 行保持 basename; track_id 行的 legacy 公式改 legacy:<branch>:<rel_path>; :1110 committer 改 author date'
       - ':1116 latest.md 排除句改写为任意深度 (改原句, 不另加一句)'
-      - '改键支: :1124 的现状键元组本身改成五元 ((parse_ok, parsed updated_at, filename, branch, (rel_path == filename, rel_path))), 保留 compound key 字样 ((j2) 判该行 (parse_ok 之后含 rel_path, 另起一段讲第 5 级不算); :1128 之后补第 5 级说明; :1128 的 build-order 不变量句保持无条件 (不写「同 rel_path 前提下」); :1134 Renderer parity 句的 four-level 同改; :1127 日期前缀 tie-break 论据句不动'
+      - '改键支: :1124 的现状键元组本身改成五元 ((parse_ok, parsed updated_at, filename, branch, (rel_path == filename, rel_path))), 保留 compound key 字样 ((j2) 只看该行 (parse_ok 起的那一对平衡括号之内是否含 rel_path —— 元组留四元而在其后补一句 rel_path, 无论另起一段、同段还是同一行续写, 一律 FAIL; 元组写在同一行, 不跨行); :1128 之后补第 5 级说明; :1128 的 build-order 不变量句保持无条件 (不写「同 rel_path 前提下」); :1134 Renderer parity 句的 four-level 同改; :1127 日期前缀 tie-break 论据句不动'
       - '两个新 kind (handoff_multibranch_unexpected_path_prefix / handoff_multibranch_undecodable_path) 在正文 (非表格行) 登记并写明双通道; 写明 git show 失败不再产生 legacy 行; F2 边界写成条件式 (不再依赖 core.quotePath)'
       - '## Change history 表新增一行 (日期 = 落笔当日), 含 rel_path / unreadable_count, 写明 snapshot_schema_version 保持 1.0'
       - 'metadata.sc11_baseline_predicates 的 (a1)(a2)(b)(f1)(f2)(g)(i2)(j2) 为真, 且 schema 非表格行零 (j4) 层数词 (four-level / four levels / 4-level / 4 levels / 四级 / 四层 等, 见 authoring_rules)'
@@ -582,7 +595,7 @@ tasks:
     verification:
       - '模块 docstring 顶层返回键表只补 unreadable_count; TrackEntry 块补 rel_path; :42 # basename of the handoff file 保持不变'
       - ':243 命令行补 -z; :298 / :315 的 <filename> 改 <rel_path>; :20 legacy_count 注释与改后行为一致; :313 / :40 committer 改 author date'
-      - '改键支, 键层级描述整类改写 (build-order 不变量保持无条件): :58-61 / :93-96 / :355 / :368-399 模块注释 / _dedupe_sort_key docstring / :490-492 / :716-717 均描述五级键并点名 rel_path; 现状键元组本身写全五元并留在首段 —— 注释块 :370 与 docstring :430 的 (parse_ok, …) 元组各加第 5 元 (另起一段讲 rel_path 而元组仍四元, 正是 (j1)(j3) 要抓的坏实现); 注释块 :368 改写后保留 # Tie-break 行首前缀 ((j3) 的锚点), 且 collector 中以 # Tie-break 开头的行保持唯一 (不另起 # Tie-break 开头的段落或注释); 历史轮次的键用元组表述, 不用层数词 (见 authoring_rules)'
+      - '改键支, 键层级描述整类改写 (build-order 不变量保持无条件): :58-61 / :93-96 / :355 / :368-399 模块注释 / _dedupe_sort_key docstring / :490-492 / :716-717 均描述五级键并点名 rel_path; 现状键元组本身写全五元并留在首段 —— 注释块 :370 与 docstring :430 的 (parse_ok, …) 元组各加第 5 元, 且第 5 元写在元组的括号之内 ((j1)(j3) 只看 (parse_ok 起的那一对平衡括号之内; 元组留四元而在其后补一句 rel_path —— 另起一段 / 同段 / 同一行续写 —— 正是它们要抓的坏实现; 元组跨两行书写不受影响); 注释块 :368 改写后保留 # Tie-break 行首前缀 ((j3) 的锚点), 且 collector 中以 # Tie-break 开头的行保持唯一 (不另起 # Tie-break 开头的段落或注释); 历史轮次的键用元组表述, 不用层数词 (见 authoring_rules); docstring :438 的 `round-3 4th level` 这类序数是轮次标记, 保留不改 —— 把它改写成 four-level 反而触发 (j4) (实测该序数不命中 (j4) 正则)'
       - 'test_handoff_multibranch_collision_dedupe.py :885 (The fixed 4-level key) 与 :1162 (The 4-level key) 两处 docstring 按 authoring_rules 改写; git -C aria diff 该文件只触及这两处 docstring 所在行, 断言零改动, 该模块仍 Ran 23 … OK'
       - 'phase-1-collectors.md:102 Return dict 补 degraded_reason'
       - ':36 / :332 / :494 由 TASK-010 落, 本任务只核 (i1); latest_md_writer.py 归 TASK-013, 本任务不碰'
@@ -639,7 +652,7 @@ tasks:
     deliverables:
       - standards/conventions/session-handoff.md   # :97 与 :171-173 (Amended 标注先例 :180)
       - aria/skills/state-scanner/references/layer-l-integration.md   # :105 (A.2 偏移: 原 :103)
-      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §复核结论 (证据交主控写入)
+      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §复核结论 (提交 SHA 等证据交主控写入)
     verification:
       - ':171-173 前两态判据不动, 补第三态从句并限定「经机械 latest_md_writer 写入时」; 手改路径写成「经 AI 手改路径 (handoff-mechanics.md) 写入时尚未同步该态, 跟踪见 10CG/aria-plugin#<TASK-025 开出的号>」, 不写「本 cycle」「待 owner 裁」「owner 2026-09-12 裁定」'
       - ':97 补同一限定从句; 「自动」一词不在本任务改 (登记进 TASK-025)'
@@ -660,7 +673,7 @@ tasks:
     reason: "处方面落编辑即改 Rule #6 落行或 AB 范围"
     dependencies: [TASK-013, TASK-014, TASK-017]
     deliverables:
-      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §复核结论 (证据交主控写入)
+      - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §复核结论 (提交 SHA 等证据交主控写入)
     verification:
       - 'aria/skills/state-scanner/references/rules/advanced-rules.md :443-444 / :511-512 / :544, aria/skills/state-scanner/RECOMMENDATION_RULES.md :28 / :30 / :31, aria/skills/phase-d-closer/SKILL.md :218 逐处读, 每处一行结论 (无需改 / 已订正 + 原因); 「leader pointer 仍在 latest.md」按 TASK-013 落地后的写侧守卫行为判断'
       - '若对 advanced-rules.md 或 RECOMMENDATION_RULES.md 落编辑: metadata.rule6_note 落行改写为判据表第二行并在台账留痕'
@@ -710,8 +723,8 @@ tasks:
       - '第 2 步, eval transcript 中每条 phase1_gate / release_gate 输出含 "push_skipped": true 与 "push_skipped_reason": "env_var"; 出现 push_skipped: false 即该 run 作废并 ls-remote 核查远端; 全部臂零调用时记「未触达」(该步空真, 不算核验通过), 以第 1 步与第 3 步两次 git ls-remote origin refs/aria/coordination 的前后比对兜底'
       - '第 3 步, 结束后执行 git fetch origin +refs/aria/coordination:refs/aria/coordination 强制对齐本地 ref (清掉合成 claim), 执行前后本地与远端 SHA 记台账; 远端 ref 若在 AB 期间变化, 逐 commit 核对作者容器不属 AB 会话'
       - '预测: 开跑前在结果目录写 PREDICTION.md, 先于任何臂运行; 内容 = 逐 eval 预测 with / old 分数与整体 delta.pass_rate, 并写依据 (proposal rule6_note 已预判 ab-suite 结构上测不到 collector 输出变化, 预期 delta ≈ 0); 写入时刻记台账'
-      - '两臂口径写死为「代码 + 文档整体」(memory ab-input-baseline 的第二种情况): with 臂 = TASK-021 回归前记录的 aria feature 分支 HEAD SHA 的 skill 目录及其代码; old 臂 = B.1 基线 SHA 的一次性 worktree 的 skill 目录及其代码 (worktree 创建与移除记台账); RESULT.md 标明整体口径, 区分力不归因到文档; 基线臂可读到仓内本 change 目录与台账, 区分力结论按「落地前已证 / ship 态边际」分写 (memory ab-baseline-leaks-via-repo-corpus); 用 /skill-creator 执行'
-      - '臂的代码路径核验: 本环境 CLAUDE_PLUGIN_ROOT 未设, SKILL.md 中 ${CLAUDE_PLUGIN_ROOT:-aria} 在仓库根会解析到 feature 分支工作树 ⇒ 两臂提示写明各自 SKILL.md 与 scan.py 的绝对路径; 从 transcript 核对各臂实际执行的 scan.py 路径并记台账; 两臂跑到同一份代码 ⇒ 该 run 作废; with 臂开跑前断言 git -C aria rev-parse HEAD 等于上述 SHA 且 git -C aria status --porcelain 为空, 否则 with 臂同样改用该 SHA 的一次性 worktree'
+      - '两臂口径写死为「代码 + 文档整体」(memory ab-input-baseline 的第二种情况): with 臂 = TASK-021 回归前记录的 aria feature 分支 HEAD SHA 的 skill 目录及其代码; old 臂 = B.1 基线 SHA 的一次性 worktree 的 skill 目录及其代码 (worktree 建在 scratchpad, 创建与移除记台账); RESULT.md 标明整体口径, 区分力不归因到文档; 基线臂可读到仓内本 change 目录与台账, 区分力结论按「落地前已证 / ship 态边际」分写 (memory ab-baseline-leaks-via-repo-corpus); 用 /skill-creator 执行'
+      - '臂的代码路径核验: 本环境 CLAUDE_PLUGIN_ROOT 未设, SKILL.md 中 ${CLAUDE_PLUGIN_ROOT:-aria} 在仓库根会解析到 feature 分支工作树 ⇒ 两臂提示写明各自 SKILL.md 与 scan.py 的绝对路径; 从 transcript 核对各臂实际执行的 scan.py 路径并记台账; 两臂跑到同一份代码 ⇒ 该 run 作废, 修正两臂路径后补跑该 eval 一次 (与逐 eval 复跑同口径, 作废样本不进无回归判据), 作废原因与补跑输出记台账; with 臂开跑前断言 git -C aria rev-parse HEAD 等于上述 SHA 且 git -C aria status --porcelain 为空, 否则 with 臂同样改用该 SHA 的一次性 worktree'
       - '「无回归」判据: 在本次运行内逐 eval 判 (with vs old, 同一 grader), 不与存档分数比; 任一 eval 出现 with < old ⇒ 该 eval 复跑两次 (先例 ab-results/2026-09-05-v1.70.0-a1-entry-rule6 的 eval-3 rep2 / rep3); 三个样本中 ≥2 个仍 with < old ⇒ 判回归'
       - '止损: 判回归 ⇒ TASK-027 / TASK-029 阻断, 结果与现象上报 owner, 不得自行降级为「记录在案」 (WITHOUT_BETTER 是 AB_TEST_OPERATIONS.md:372 对 with vs without 的判定, 与本次 with vs old 的两臂不同源, 已删去; 其对应物就是上一条逐 eval 回归判据)'
       - 'delta.pass_rate 写死为 mean(with 臂 pass_rate) − mean(old 臂 pass_rate), 由脚本从两臂 grading.json 直接汇总 (先例 ab-results/2026-09-05-v1.70.0-a1-entry-rule6/SCORES.md「脚本从各臂 grading.json 直接汇总」); 若改用 skill-creator 的 aggregate_benchmark.py, 配置目录命名 new_skill / old_skill (它按 sorted() 发现配置并取 configs[0] − configs[1], with 臂须排在前), 读 delta 前断言 run_summary 的首个配置是 with 臂, 断言输出记台账 —— 直接用 with_skill / old_skill 目录名会得到 old − with, 符号相反'
@@ -722,7 +735,7 @@ tasks:
       - 'AB 结束后记台账「退出 NO_PUSH 会话」, TASK-027 起在不带该变量的新会话执行'
       - 'metadata.rule6_note 的 substitute 证据 (TASK-007 RED / TASK-015..018 与 TASK-035 三步法反事实 / TASK-021 全绿) 完整保留, 不因跑了 AB 削减'
       - '结果目录 (含 PREDICTION.md / RESULT.md) 与台账由主控在主仓 feature 分支提交, 只 add 本任务 deliverables, 提交 SHA 记台账'
-      - '扩面即拆任务: TASK-024 对 phase-d-closer/SKILL.md 落编辑 (AB 范围追加该套件), 或需复跑的 eval ≥ 3 条 ⇒ 拆出独立 TASK (新编号自 TASK-036 起, 工时另估, 依赖与本任务相同), 不把扩面塞进本任务的 8h'
+      - '扩面即拆任务: TASK-024 对 phase-d-closer/SKILL.md 落编辑 (AB 范围追加该套件), 或需复跑的 eval ≥ 3 条 ⇒ 拆出独立 TASK (新编号自 TASK-036 起, 工时另估, 依赖与本任务相同), 不把扩面塞进本任务的 8h; 新任务 parent 沿用 5.5 (不新增 checkbox, 27 parent 对 27 checkbox 的结构不变量不动), metadata.total_tasks 与 est_hours_total 同批更新, 该拆分本身记入 tasks.md 的 AI 流程判断清单 (post_planning 之后改 A.3)'
 
   - id: TASK-027
     parent: "5.1"
@@ -776,8 +789,8 @@ tasks:
     parent: "5.2"
     title: "aria 与 standards: 本地 merge + aria tag + 合并树回归 (不推送)"
     status: pending
-    complexity: S
-    est_hours: 2
+    complexity: M
+    est_hours: 4
     agent: backend-architect
     reason: "多远程硬约束 1; 推送前在合并树上重验"
     dependencies: [TASK-028]
@@ -786,15 +799,15 @@ tasks:
       - "standards master 本地合并提交 (未推送)"
       - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §回归 (合并树, 证据交主控写入)
     verification:
-      - '内部顺序固定为 1 至 8 步, 每步输出原样记台账; 任一步的 fail-closed 分支 (第 4 / 5 / 6 步) 一律停在本步并上报 owner, 不在计划外自行恢复 (metadata.owner_gates); 经 owner 确认的恢复动作执行完毕后, 三支一律从第 1 步重走本任务 —— 恢复动作都落在 feature 分支上, 而第 5 / 6 步已把本地 master 复位、owner 等待期间远端还可能再前进, 故必须重新 fetch 与重新断言; 重走的起止时刻与每步输出另记台账'
+      - '内部顺序固定为 1 至 8 步, 每步输出原样记台账; 任一步停下都停在本步、原样记台账并上报 owner (第 4 / 5 / 6 步的 fail-closed 与第 2 / 3 / 7 / 8 步的止损停摆在 metadata.owner_gates 里都有对应项), 不在计划外自行恢复; 经 owner 确认的恢复动作执行完毕后一律从第 1 步重走本任务 —— 恢复动作都落在 feature 分支上, 而第 5 / 6 步把两个子模块的本地 master 一并复位、owner 等待期间远端还可能再前进, 故必须重新 fetch 与重新断言; 唯一例外是第 2 步工作树不干净的本地可修复分支 (见该步); 重走的起止时刻与每步输出另记台账'
       - '第 1 步 fetch: git -C aria fetch origin 与 git -C standards fetch origin'
-      - '第 2 步 前置断言 (两个子模块仍在各自 feature 分支上做, 早于任何 checkout): git -C aria status --porcelain 与 git -C standards status --porcelain 输出均为空; 不成立 ⇒ 停下, 查明归属后在对应 feature 分支提交 (只 add 被改文件) 或上报, 不 stash、不带着改动切分支; 另核 standards 的占位已清 —— git -C standards show <standards feature 分支>:conventions/session-handoff.md | grep -c ''#<'' 为 0, 且同一输出正向含第三态从句与 10CG/aria-plugin#<n> (或 TASK-025 的回落形态)。该检查查的是提交内容, 不是工作树; 自然负控 = TASK-025 回填前同一命令输出 1, 回填前后两次输出都记台账'
-      - '第 3 步 检出并对齐 master 记 SHA: git -C aria checkout master 后断言 git -C aria rev-parse master 等于 git -C aria rev-parse origin/master; 不相等时先 git -C aria merge --ff-only origin/master, 不能快进则停下上报 (memory stale-local-main); standards 同形; 断言成立后记下两个子模块此刻的 origin/master SHA 与 aria CHANGELOG 的 grep -c ''^## \['' 计数 —— 第 6 步与 TASK-034 只用这些已记录的值'
-      - '第 4 步 取号复核 (fail-closed): aria origin/master 相对 TASK-027 记录的取号时 SHA 已前进 ⇒ 停下上报, 不自行改号重走。台账记三项 (取号时 SHA / 当前 SHA / 其间提交列表), 按 metadata.owner_gates 上报 owner; 恢复方式是指针而非流程: 参照 aria ec72175 (版本重算 1.70.0→1.71.0, 号被同伴轨占用) —— 在 feature 分支 git merge origin/master, 版本 5 文件取重算号, CHANGELOG 保留对方小节并把本方小节置顶, 重跑 TASK-021 两腿回归与 SC-11 谓词, 补跑 TASK-028 写法自检 —— 经 owner 确认后执行'
-      - '第 5 步 本地合并 (aria 与 standards 各自, 在第 3 步检出的 master 上): git -C aria merge --no-ff <aria feature 分支>, standards 同形 (先例: 子模块一律本地 --no-ff 合并), 不用服务端合并 (CLAUDE.md 多远程硬约束 1); 合并 SHA 记台账。退出码非 0 (冲突) ⇒ git -C aria merge --abort, 断言 HEAD 等于第 3 步记下的 SHA 且 porcelain 为空, 输出记台账后停下上报; 不在 master 上解冲突'
-      - '第 6 步 取号终核 (fail-closed): 合并后逐处核版本 5 文件取值 == TASK-027 的取号值, 且合并树 aria CHANGELOG 的 grep -c ''^## \['' 不少于第 3 步所记计数 (防解冲突时丢掉对方发版小节), 且 git -C aria ls-remote --tags origin 与 git -C aria ls-remote --tags github 均无 v<vNEXT>; 任一不符 ⇒ 按下一条回退后停下上报'
-      - '第 6 步的回退 (只丢未推送的本地合并提交): 前置 = 该子模块 HEAD 是第 5 步产生的合并提交 (git -C aria rev-parse HEAD^1 等于第 3 步记下的 SHA, 且 git -C aria rev-parse HEAD^2 等于 aria feature 分支 HEAD) 且 git -C aria status --porcelain 为空; 前置不成立 (例如第 5 步冲突中止, 此时根本没有合并提交) ⇒ 不执行回退, 直接停下上报; 命令 = git -C aria checkout master 之后 git -C aria reset --hard <第 3 步记下的 aria origin/master SHA> (用已记录的 SHA, 不用可能已被 fetch 移动的 origin/master ref); standards 同形; 回退前后 SHA 原样记台账'
-      - '第 7 步 合并树回归: 仅当 git -C aria status --porcelain 为空且 git -C aria rev-parse HEAD 等于合并 SHA 时, 在该工作树原位重跑 run_tests.py 全量 + pytest 两腿 + metadata.sc11_baseline_predicates 全部谓词 (工作树干净即等于提交内容); 前提不成立不得跑; 另核 sc11-predicate-validation.py --emit-json 的 predicates 与 yaml 谓词块中 (label) 开头的行逐字节一致 (谓词块另含 # 注释行, 整块比对必不等; 口径同 TASK-001); Ran 数与 TASK-021 的差值逐条归因 (fetch 带进的并发提交须说明)'
+      - '第 2 步 前置断言 (两个子模块仍在各自 feature 分支上做, 早于任何 checkout): git -C aria status --porcelain 与 git -C standards status --porcelain 输出均为空; 不成立 ⇒ 停下, 查明归属后在对应 feature 分支提交 (只 add 被改文件) 或上报, 不 stash、不带着改动切分支; 本地提交后重新执行本步断言, 通过后才进入第 3 步 (这一支本地可修复, 不必从第 1 步重走)。另核 standards 的占位已清 —— 对 git -C standards show <standards feature 分支>:conventions/session-handoff.md 的同一份输出三条都要成立: grep -c ''#<'' 为 0 · grep -qE ''10CG/aria-plugin#[0-9]+'' 成立 (TASK-025 走回落形态时改判该输出含「已知缺口, 尚未开跟踪 issue」) · 含第三态从句。该检查查的是提交内容, 不是工作树; 自然负控 = TASK-025 回填前同一命令的 grep -c ''#<'' 输出非 0 (值 = 当时的占位处数), 回填前后两次输出都记台账'
+      - '第 3 步 检出并对齐 master 记 SHA: git -C aria checkout master 后断言 git -C aria rev-parse master 等于 git -C aria rev-parse origin/master; 不相等时先 git -C aria merge --ff-only origin/master, 不能快进则停下上报 (memory stale-local-main); ff-only 之后再断言一次两者相等 —— 仍不等即本地 master 领先 (有未推送的遗留合并; 实测这一支 merge --ff-only 返回 Already up to date. 且退出码 0, 不复核就会静默放行), 停下上报; standards 同形; 断言成立后记下两个子模块此刻的 origin/master SHA 与 aria CHANGELOG 的 grep -c ''^## \['' 计数 —— 第 6 步与 TASK-034 只用这些已记录的值'
+      - '第 4 步 取号复核 (fail-closed): aria origin/master 相对台账中最近一次记录的取号时 SHA (首次 = TASK-027 的记录) 已前进 ⇒ 停下上报, 不自行改号重走。台账记三项 (该次取号时 SHA / 当前 SHA / 其间提交列表), 按 metadata.owner_gates 上报 owner; 恢复方式是指针而非流程: 参照 aria ec72175 (版本重算 1.70.0→1.71.0, 号被同伴轨占用) —— 在 feature 分支 git merge origin/master, 版本 5 文件取重算号, CHANGELOG 保留对方小节并把本方小节置顶, 重跑 TASK-021 两腿回归与 SC-11 谓词, 补跑 TASK-028 写法自检 —— 经 owner 确认后执行; 恢复动作做完后按 TASK-027 的记录格式在台账追加新的取号时 SHA 与取号值, 重走时第 4 / 6 步以这条新记录为准 (否则重走必在同一处再停)'
+      - '第 5 步 本地合并 (两个子模块视为一个整体, 各自在第 3 步检出的 master 上): git -C aria merge --no-ff <aria feature 分支>, standards 同形 (先例: 子模块一律本地 --no-ff 合并), 不用服务端合并 (CLAUDE.md 多远程硬约束 1); 两仓的合并 SHA 记台账。任一仓退出码非 0 ⇒ 对两个仓都走下一条的回退条 (已产生合并提交的那仓按前置回退, 未产生的那仓按其兜底分支), 使两仓 HEAD 都回到第 3 步记下的 SHA, 输出记台账后停下上报; 不在 master 上解冲突。理由: 一仓合成功另一仓冲突时, 成功那仓的合并提交留在 master 上无人处理, 重走时 --no-ff 会返回 Already up to date. 而不产生本轮的合并提交'
+      - '第 6 步 取号终核 (fail-closed): 合并后逐处核版本 5 文件取值 == 台账最近一次记录的取号值, 且合并树 aria CHANGELOG 的 grep -c ''^## \['' 不少于第 3 步所记计数 (防第 4 步 fail-closed 后经 owner 确认的手工解冲突丢掉对方发版小节 —— 本任务内第 5 步已排除在 master 上解冲突, 故这条断言只在重走时可红), 且 git -C aria ls-remote --tags origin 与 git -C aria ls-remote --tags github 均无 v<vNEXT>; 任一不符 ⇒ 按下一条对两个仓回退后停下上报'
+      - '回退条 (第 5 / 6 步与 TASK-034 同名 tag 支共用; 只丢未推送的本地合并提交): 前置 = 该子模块 HEAD 是本轮第 5 步产生的合并提交 (git -C aria rev-parse HEAD^1 等于第 3 步记下的 SHA, 且 git -C aria rev-parse HEAD^2 等于 aria feature 分支 HEAD) 且 git -C aria status --porcelain 为空 ⇒ git -C aria checkout master 之后 git -C aria reset --hard <第 3 步记下的该仓 origin/master SHA> (用已记录的 SHA, 不用可能已被 fetch 移动的 origin/master ref); 前置不成立 ⇒ 不 reset, 改判该仓是否停在冲突中 (git -C <仓> rev-parse -q --verify MERGE_HEAD 成功即是): 是则 git -C <仓> merge --abort, 否则什么都不执行 (无 MERGE_HEAD 时 merge --abort 自身报错); standards 同形; 两种分支都以「断言该仓 HEAD 等于第 3 步记下的 SHA 且 porcelain 为空」收尾, 断言不成立即原样记台账停下上报; 回退前后 SHA 原样记台账'
+      - '第 7 步 合并树回归: 仅当 git -C aria status --porcelain 为空且 git -C aria rev-parse HEAD 等于合并 SHA 时, 在该工作树原位重跑 run_tests.py 全量 + pytest 两腿 + metadata.sc11_baseline_predicates 全部谓词 (工作树干净即等于提交内容); 前提不成立不得跑; Ran 数与 TASK-021 的差值逐条归因 (fetch 带进的并发提交须说明)'
       - '第 8 步 合并树回归通过后才打 aria tag v<vNEXT> (先 bump 后 tag); 回归不通过 ⇒ 不打 tag、不进 TASK-034'
     notes: "合并与打 tag 由主控执行 (subagent 不 commit)。合并树回归选原位跑而非 git worktree add 副本: run_tests.py 会在所在仓跑 scan.py, 放到主仓布局之外的 aria 副本里依赖主仓布局的用例可能假红; 第 7 步的干净工作树前提达到同一目的 (post_planning R2 PP2-M3 主控调整)"
 
@@ -812,7 +825,7 @@ tasks:
       - "standards master (origin / github)"
       - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §外向动作与授权
     verification:
-      - '推 master 之前: 对 origin 与 github 各自 git -C aria ls-remote --tags <remote> 确认没有 v<vNEXT> 同名 tag, 输出记台账; 出现同名 tag ⇒ 不推送: 先 git -C aria tag -d v<vNEXT> 删除本地 tag, 再按 TASK-029「第 6 步的回退」的前置、命令与记录要求回退两个子模块的本地合并提交 (SHA 用 TASK-029 第 3 步记下的值), 停下上报'
+      - '推 master 之前: 对 origin 与 github 各自 git -C aria ls-remote --tags <remote> 确认没有 v<vNEXT> 同名 tag, 输出记台账; 出现同名 tag ⇒ 不推送: 先 git -C aria tag -d v<vNEXT> 删除本地 tag, 再按 TASK-029 的「回退条」对两个子模块执行 (SHA 用 TASK-029 第 3 步记下的值), 停下上报 (metadata.owner_gates)'
       - '推送写法写死 (每个远端一条原子命令, 先 origin 后 github): git -C aria push --atomic <remote> master refs/tags/v<vNEXT>; standards 只推 master。禁用 --follow-tags 与非原子的多 ref 推送 —— 实测 git push <remote> master v<vNEXT> 与 --follow-tags 在 master 被拒时 tag 照样发布, 留下指向未合并提交的孤儿 tag; --atomic 下两者同拒'
       - 'owner 逐条授权后推送 (授权记台账), push 给足超时'
       - '任一远端被拒 (non-fast-forward 等) ⇒ 停下上报, 不 force、不重打 tag、不改写历史: origin 被拒 ⇒ 本地合并与 tag 保持未推送, 原样记台账; origin 成功而 github 被拒 ⇒ 按 memory partial-push 记为镜像分叉, 原样记台账并上报 (metadata.owner_gates)'
@@ -841,6 +854,7 @@ tasks:
       - docs/architecture/version-scheme.md   # :23
       - openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md   # §复核结论 (提交 SHA 等证据交主控写入)
     verification:
+      - '前置 (缺一不得 bump gitlink): TASK-034 已对 origin 与 github 双方各自 ls-remote 核验一致 (两个子模块的 master, aria 另含 tag); 任一方未核验一致 (被拒 / 只推成一个远端 / ls-remote 失败) ⇒ 停在本步上报, 不 bump —— 半推后 bump 出的 gitlink 在 github 侧指向不存在的对象, GitHub 的 clone --recursive 即断 (CLAUDE.md 多远程硬约束 1 · memory mirror_sync_needs_mechanical_backstop)'
       - 'gitlink 取 TASK-034 推送核验后的 master SHA, 从动手当时 git ls-tree HEAD aria standards 的实测值前进, 不回退'
       - '16 个版本点逐处 grep -n 实测并改为新号 (proposal Task 5.1 表); VERSION:24 直接写新号, 不按「上一版 +1」核对'
       - '改后逐处复验取值 == plugin.json; scan.py 复跑 custom checks: m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match / main-project-version-consistency 通过, plugin-cache-currency 预期 STALE 直到 owner 更新插件'
@@ -862,10 +876,11 @@ tasks:
       - '开 PR 前 (提交面, 有范围的检查; 健康常态下主仓本就可能有他轨或其它审计的未跟踪文件, 故不要求整体为空): 主控先把台账截至此刻的追加提交到主仓 feature 分支 (只 add verification-ledger.md); 其后不带路径的主仓 git status --porcelain 原样记台账, 其中不得有任何一行触及本 cycle 交付物路径 —— 本 Spec 目录 openspec/changes/handoff-multibranch-subdir-path-fidelity/ · 本 Spec 的 post_planning 审计报告 (.aria/audit-reports/ 下文件名含 handoff-multibranch-subdir-path-fidelity 者) · 本次 aria-plugin-benchmarks/ab-results/<结果目录>/ · TASK-030 的 10 个 deliverables (gitlink aria 与 standards、VERSION、README.md、README.zh.md、README.ja.md、README.ko.md、CLAUDE.md、docs/architecture/system-architecture.md、docs/architecture/version-scheme.md) · 若 AB 的 aria-plugin-benchmarks/state-scanner/state-scanner-workspace/iteration-N/ 被选为结果的一部分, 同样列入; 其余每一行逐条在台账写明归属并判定与本 cycle 无关, 不 stash、不删除、不顺带提交他人文件'
       - '开 PR 前 (已跟踪核验): git ls-files 列出本次 aria-plugin-benchmarks/ab-results/<结果目录>/ 下的文件与 verification-ledger.md, 输出原样记台账'
       - '开 PR 前 (写法自检): PR 正文与主仓 PR diff 新增行 (覆盖 TASK-030 的同步面文字; diff 基线 = TASK-001 记录的主仓起点 SHA) 按 standards content-integrity.md §4.4 / §4.5 自检, 输出记台账, 自检通过后再发布 PR'
-      - 'TASK-001 走了回落支 (规划提交 B.1 时未推送) 时, 本 PR 同时携带规划提交; 推送 feature 分支、开 PR 与合并三项均属 metadata.owner_gates 所列外向动作, owner 授权记台账'
+      - 'TASK-001 走了回落支 (规划提交 B.1 时未推送) 时, 本 PR 同时携带规划提交; 推送 feature 分支、开 PR 与合并三项均属 metadata.owner_gates 所列外向动作, owner 授权记台账; 任一推送被拒或只推成一个远端 ⇒ 不 force、不改写历史, 原样记台账并停下上报 (同 TASK-034)'
       - '合并方式写死 (否则台账与审计报告引用的主仓 SHA 不在远端 master 上): 需要同步 origin/master 时在 feature 分支 git merge (不 rebase, 覆盖 phase-c-integrator C.2.1 的 sync rebase 默认); PR 以 merge commit 合并 (不 squash, 覆盖 branch-manager 的 squash 默认, 与本仓 PR 先例一致); 合并后核台账所记各主仓提交 SHA 均为 origin/master 的祖先 (git merge-base --is-ancestor), 输出记台账'
       - '经 phase-c-integrator: C.2.4 pre-merge gate 结论记入台账 (无可用 backend 时按 no_ci_fallback 显式降级, 不静默跳过)'
-      - '合并后主仓 master 在 origin 与 github 的 ls-remote SHA 一致; sync_status.multi_remote.gitlink_integrity 全部 ok'
+      - '主仓 master 的多远程推送交 phase-c-integrator C.2.5 (Multi-Remote Push Enforcement), 本计划不另写手工推送 —— PR 以 Forgejo 服务端 merge commit 合并, 服务端合并只发生在 origin, 主仓到 github 的通道就是它。执行前先核对并记台账三项配置事实: .aria/config.json 未覆盖 phase_c_integrator.multi_remote_push ⇒ enabled 默认 true · enforced_remotes 为空 ⇒ 自动发现主仓全部 remote (本仓实测 origin 与 github) · fail_on_partial_push 默认 true ⇒ 半推阻断并输出修复命令。断言 = C.2.5 的 per-remote 矩阵对 origin 与 github 两个 remote 均推送成功且 verify_parity_post_push 的 match 为 true, 矩阵原样记台账; 任一 remote 未 match ⇒ 停下上报 (metadata.owner_gates), 不自行 force。C.2.5 第 4 步 a 会先遍历子模块推同一 remote: 此时两个子模块的 master 已由 TASK-034 推完, 该步应为幂等无新对象, 若它报出子模块有待推内容即与 TASK-034 的核验矛盾, 停下查明'
+      - '合并后 sync_status.multi_remote.gitlink_integrity 全部 ok (C.2.5 是事前门, 这条是事后核)'
 
   - id: TASK-032
     parent: "5.4"
@@ -889,7 +904,7 @@ tasks:
       - '归档门 (spec_complete.py) 判 complete: tasks.md 全部勾选且无方括号形态的 carry-forward / defer 标注'
       - '归档 git mv 之后, release_gate / 回帖 / handoff 三个子步骤与第二次写法自检的证据写入归档后台账 (metadata.verification_ledger.path_after_archive), 不在 openspec/changes/ 下重建目录'
       - 'release_gate.py 按 track_id handoff-multibranch-subdir-path-fidelity 释放本容器 claim (含 B.0 可能新写的那条), 在不带 ARIA_COORDINATION_NO_PUSH 的会话执行; 推送协调 ref 属外向动作, 与 Phase D 主仓提交双推同批请授权 (metadata.owner_gates), push 后 ls-remote 核验协调 ref'
-      - '周期 handoff 含: reference-snapshot-aria.json 未随本次 schema 变更重采样 (附 TASK-025 issue 引用); standards session-handoff.md 已改 (Amended) —— 对应 SC-11 (d)(h); 以及 tasks.md「AI 流程判断清单」全文照录并追加 Phase B / C / D 新增项, 每项写「做了什么 + 理由 + 请 owner 复议」(Rule #10 §5)'
+      - '周期 handoff 含: reference-snapshot-aria.json 未随本次 schema 变更重采样 (附 TASK-025 issue 引用); standards session-handoff.md 已改 (Amended) —— 对应 SC-11 (d)(h); 以及 tasks.md「AI 流程判断清单」全文照录并追加 Phase B / C / D 新增项, 每项写「做了什么 + 理由 + 请 owner 复议」(Rule #10 §5); 另记 SC-11 矩阵的已知边界 (post_planning R4 m13 登记, 本 Spec 不再收窄): 19 条谓词里 (a1)(b)(c1)(f1)(f2)(i1)(i2)(j5)(l2)(l3) 十条没有单点隔离态, 只在全 FAIL 的三个态与 target 之间取值 ((g) 由 bad_changelog_only 反向隔离); (j4) 的三个坏态验的是同一条正则在三个文件上的行为'
       - '写法自检第二次: 周期 handoff、10CG/Aria#195 回帖与归档后台账追加按 content-integrity §4.4 / §4.5 自检后再落笔 / 发帖 (主仓同步面文字已由 TASK-031 开 PR 前自检覆盖, 不在本次范围)'
-      - 'Phase D 产生的主仓提交 (归档目录 / handoff / checkbox 勾选 / 归档后台账) 经 owner 授权后双推, 逐 remote ls-remote 核验'
+      - 'Phase D 产生的主仓提交 (归档目录 / handoff / checkbox 勾选 / 归档后台账) 经 owner 授权后双推, 逐 remote ls-remote 核验 (这批不经 C.2.5 —— 它只在 PR 合并后触发); 被拒或只推成一个远端 ⇒ 不 force、不改写历史, 原样记台账并停下上报 (同 TASK-034)'
       - '10CG/Aria#195 回帖写明版本号与 SC 验收摘要, 发帖后 GET 核验 closed'
