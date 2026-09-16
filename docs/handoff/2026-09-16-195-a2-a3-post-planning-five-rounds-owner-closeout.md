@@ -3,7 +3,7 @@ track-id: handoff-multibranch-subdir-path-fidelity
 owner-container: simonfish/023236f2
 phase: A
 status: in_progress
-updated-at: 2026-09-16T02:25:00Z
+updated-at: 2026-09-16T15:20:00Z
 ---
 
 # Aria — Session Handoff (2026-09-15/16) — 10CG/Aria#195 的 A.2/A.3 落地 + post_planning 五轮跑满后由 owner 裁定收口
@@ -18,8 +18,10 @@ updated-at: 2026-09-16T02:25:00Z
 
 ## §0 入口 (新 session 优先读)
 
-1. 跑 `/aria:state-scanner`。主仓 `c839fc6` (origin 与 github 两端 `ls-remote` 一致); aria `1cb3872` (v1.73.3); standards `8b49562`; aria-orchestrator `237045a`; `refs/aria/coordination` = `4fd07f9`。
-2. 本 track 的 claim (`s-13ce@1833`, phase A.2) 仍 active, **心跳停在 2026-09-15T13:04:15Z** —— `SWEEP_TTL` 24h, 下次 `/state-scanner` 入口会自动刷新; 若隔天才回来, 先确认它没被扫成 abandoned。
+> **本 doc 于 2026-09-16T15:20Z 由 `/aria:session-closer` 复核修订** (机械兜底 + 内省补漏): §2 增 C6–C8 与机械补漏行, §5 增四维与一致性 advisory, §7 增第 8/9 个提交, §8 改为「本 session 已写 memory」(原「待写」已全部落盘), §9 为 AI 流程判断 (段号按共享模板对齐, 与修订前的 §8/§9 互换)。
+
+1. 跑 `/aria:state-scanner`。主仓 `992b608` + 本收尾修订提交 (origin 与 github 两端 `ls-remote` 一致); aria `1cb3872` (v1.73.3); standards `8b49562`; aria-orchestrator `237045a`; `refs/aria/coordination` = `4fd07f9`。
+2. 本 track 的 claim (`s-13ce@1833`, phase A.2) 仍 active, 但**心跳停在 2026-09-15T13:04:15Z, 到收尾时已 26.1h —— 越过 `SWEEP_TTL` (24h)**。它现在随时可被任一容器的 `release_gate.py --sweep-stale` **持久改写为 `abandoned`** (`lib/gc.py` 用 SWEEP_TTL 而非 STALE_TTL, 且受害方无恢复路径), 也早已越过 `STALE_TTL` (30min) 的 reconcile 接管线。**下次入口先看它还在不在**: 若已被扫走, 那是 GC 产物**不是**有人放弃本轨 —— 按 B.1 入口重新 acquire 即可。⚠️ **`--raw-track-id` 要逐字传 `handoff-multibranch-subdir-path-fidelity` (本轨活 claim 里记的原串), 不要按 phase-a-planner 的 `<slug>-<container_uuid>` 写法补 `-023236f2`** —— `derive_track_id` 只做小写/分隔符归一与 64 字符截断, **不剥容器后缀** (`aria/skills/state-scanner/lib/track_id.py:61`), 补了后缀就是另一个 track_id, 会写出第二条 claim 并对自己报 occupied。处置见 §2 C8。
 3. 计划三份文件已是 v6 并双推: `openspec/changes/handoff-multibranch-subdir-path-fidelity/{tasks.md,detailed-tasks.yaml,sc11-predicate-validation.py}`。B.1 的前置 (规划提交已经 owner 授权推到两端) **已满足**, 主仓 feature 分支可以直接从 `origin/master` 起。
 4. post_planning 的收口状态写在 `detailed-tasks.yaml` 的 `metadata.post_planning_closeout`; 五轮报告在 `.aria/audit-reports/post_planning-R{1..5}-*-handoff-multibranch-subdir-path-fidelity-*.md` (含每轮的 `-aggregated.md`)。
 
@@ -51,6 +53,15 @@ updated-at: 2026-09-16T02:25:00Z
 | C3 | Rule #6 AB (5.5) | 未跑 | 前置需 owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动会话; 按 PREDICTION 预期 `delta.pass_rate` ≈ 0, 计划已写明这是**预期会触发的 owner 裁决点** |
 | C4 | 并发轨 `pre-merge-completeness-gate-change-scope` (10CG/Aria#199) | 排在 10CG/Aria#195 之后 | 其 claim (`s-86f7@1836`) 心跳已陈旧约 66h+, 未处置 |
 | C5 | 未修的 5 条 Minor | 已登记 | `detailed-tasks.yaml` 的已知边界清单: (c1)(c2) 拦不住「换说法保留旧语义」· (l1) 的结局行门限可被装饰性箭头行绕过 · (l1) 第四条结局内容自相矛盾仍判过 · 验证脚本模拟夹具的文案暗示 · 演化注释是否移入归档 |
+| C6 | **`VERSION:24` 停更开单** | **提了未做** | §3.5 判断「三次漏改且无人发现值得单独开单」, 本 session 没开。外向动作, 待授权; 开单前先查重 (issue 清单会截断, 用定向查询) |
+| C7 | **phase1_gate self-resume 缺口开单** | **提了未做** | §3.6 的 `get_session_id` 每次 CLI 调用重新生成 ⇒ `_self_resume` 永不命中。本 session 未找到现成 issue 也未开单; 同属外向动作 |
+| C8 | **本轨 claim 已越过 `SWEEP_TTL`** | **待 owner 裁** | 心跳 09-15T13:04:15Z, 收尾时 26.1h > 24h。两条路: (a) 现在跑 `phase1_gate.py --heartbeat-only` 刷新 —— 它会**推协调 ref**, 属外向动作须授权; (b) 不刷新, 下次 B.1 入口重新 acquire (按 §0.2 的原串)。主控**不自行选择** (见 §9 第 5 条) |
+| C9 | memory 索引余量仅剩 137 字节 | 已量 | `MEMORY.md` 24439 / 24576 bytes。下次再加指针前必须先压缩 (把已闭环/窄条目移入 `MEMORY-archive.md`), 否则超 read-limit 会静默截断整份索引 |
+
+**机械补漏 (session-closer step 0/3 交叉核验, AI 内省未单独提及的项)**:
+
+- `handoff_autofill.py` 在本 Spec 的 `tasks.md` 数出 **26 个未勾选条目** (27 checkbox 中仅 2.0 已勾) —— 与 C1「Phase B 整段未起」同一件事, 不是新增遗漏, 数字登记于此备查。
+- 同一次扫描另报出**他轨 132 个未完成条目** (m6-release-closeout 41 / m6-cost-model-telemetry 25 / m6-e2e-resilience 25 / m7-fleet-aggregation 20 / m7-agent-lifecycle 18 / m6-dispatch-input-delivery 3)。**本 session 全程未触碰这些轨**, 故不纳入本 doc 的 carry-forward; 其状态见 `docs/handoff/latest.md` 的 track 表与各自 proposal。
 
 ## §3 关键风险 / 已知陷阱
 
@@ -60,6 +71,7 @@ updated-at: 2026-09-16T02:25:00Z
 4. **TASK-029 的重走没有次数上限**: 远端高频前进时可反复触发第 4 步 fail-closed; 现靠「每次停下上报」兜底, 处置属产品级裁决。
 5. **`VERSION:24` 自 v1.73.0 起停更**: v1.73.1 / v1.73.2 / v1.73.3 三次发版均漏改, 该点无机械兜底 (custom checks 不覆盖)。本 cycle 的 5.1 会直接写新号; 但「三次漏改且无人发现」这件事本身值得单独开单。
 6. **phase1_gate 跨调用 self-resume 缺口**: `get_session_id` 每次 CLI 调用都重新生成, `_self_resume` 永远匹配不到 ⇒ 同容器对同一 track 会写出第二条 claim 并自报 `occupied`。本 session 未找到现成 issue, 也未开单。
+7. **本轨 claim 的 track_id 是裸 slug, 与 phase-a-planner 的 `<slug>-<container_uuid>` 写法不一致**: 活 claim 记的是 `handoff-multibranch-subdir-path-fidelity`, 而同容器另有 claim 用的是带后缀形式 (`a1-entry-claim-duplicate-work-guard-023236f2`)。`derive_track_id` 不剥后缀 ⇒ **照约定补后缀会创出第二条 claim**。重新认领前**先读活 claim 的 `track_id` 原串**, 不要照 SKILL 的拼法现推 (本次收尾起草 §0 时差点就这么写, 核 `track_id.py:61` 才发现)。
 
 ## §4 实战教训 (memory 沉淀来源)
 
@@ -80,13 +92,25 @@ updated-at: 2026-09-16T02:25:00Z
 
 | 维度 | 状态 |
 |---|---|
-| 主仓 Aria | `c839fc6`; origin / github `ls-remote` 均一致 (推后逐 remote 核验, 不信 push 回执) |
+| 主仓 Aria | `992b608` (收尾修订提交见 §7 第 9 行); origin / github `ls-remote` 均一致, `ahead=0` (推后逐 remote 核验, 不信 push 回执) |
 | aria 子模块 | `1cb3872` (v1.73.3), 工作树干净, 本 cycle 未动 |
 | standards 子模块 | `8b49562`, 工作树干净, 本 cycle 未动 |
 | aria-orchestrator | `237045a`, detached HEAD, 本 cycle 未动 (但它进入了 C.2.5 的枚举面, 见 §3.3) |
 | `refs/aria/coordination` | `4fd07f9` (本 session 全程未变; 五轮审计与六次返工均未触碰) |
-| 本 track claim | `s-13ce@1833` active, phase A.2, 心跳 2026-09-15T13:04:15Z |
+| 本 track claim | `s-13ce@1833` active, phase A.2, 心跳 2026-09-15T13:04:15Z —— **已 26.1h, 越过 SWEEP_TTL**, 见 §0.2 / §2 C8 |
 | 审计报告 | 本 Spec 累计 59 份 (post_spec R1–R5 + post_planning R1–R5, 含聚合), 全部已提交并双推 |
+
+**四维状态 (session-closer step 3 机械汇编, 2026-09-16T15:09Z 的 snapshot)**:
+
+| 维度 | 机械读数 |
+|---|---|
+| UPM | present; `cycle: null` (本仓 UPM 不按 cycle 记 OpenSpec change) |
+| OpenSpec | 活跃 change **8** 个; **待归档 0** —— 无「已 ship 未归档」的 cycle, 本次收尾不产生归档 advisory |
+| User Story | 21 条: done 17 / in_progress 2 / approved 1 / pending 1 |
+| PRD | present |
+| 多远程 parity | 主仓 / standards / aria 三仓 `github=equal origin=equal`; `sync.warnings: []`。aria-orchestrator 为 detached HEAD, parity 报 `unknown` (无分支可比, 非告警) |
+
+**一致性 advisory (`consistency_check.py`, 全部非阻断)**: 8 条, **同一种** —— `openspec_vs_upm / active_change_not_in_upm`, 即「活跃 change 未列入 UPM in-progress」, 其中包含本轨 `handoff-multibranch-subdir-path-fidelity`。**8 个活跃 change 全部命中 ⇒ 这是本仓口径 (OpenSpec change 不进 UPM 的 in-progress 列), 不是本 session 的遗漏**。要么接受口径、要么改 `consistency_check` 的判据, 属产品级裁决, 本次不自行处置。
 
 ## §6 Next session 入口 + 优先级建议
 
@@ -106,10 +130,32 @@ updated-at: 2026-09-16T02:25:00Z
 | 5 | `0e60b08` | v5 (R4 rework, 删与换结构) + R4 六份报告 |
 | 6 | `d5c1920` | R5 六份报告 (max_rounds 耗尽, 待 owner 裁定) |
 | 7 | `c839fc6` | v6 收口定点修 (owner 裁定后) |
+| 8 | `992b608` | 本 handoff 初版 + `latest.md` 指针与 track 表 |
+| 9 | (本次收尾修订) | `/aria:session-closer` 复核: 本 doc 的 §0/§2/§3/§5/§7/§8/§9 修订 + `latest.md` 同步 + memory 第 4 条 |
 
-**parity**: 推后对 origin 与 github 各自 `git ls-remote <remote> refs/heads/master`, 两端与本地同为 `c839fc6`。
+**parity**: 7 个规划/审计提交 (`07e0a6e` … `c839fc6`) 与 handoff 提交 `992b608` 均在推后对 origin 与 github 各自 `git ls-remote <remote> refs/heads/master` 取 SHA 比对, 两端与本地一致 (`992b608`, `ahead=0`)。**第 9 行的收尾修订提交在本 doc 落盘时尚未推送 —— 推送授权见会话末尾的 owner 询问。**
 
-## §8 AI 流程判断 (Rule #10 §5, 请 owner 复议)
+## §8 Memory entries this session (4 条: 扩 2 + 新增 2)
+
+**已落盘** (`/home/dev/.claude/projects/-home-dev-Aria/memory/`, 均已在 `MEMORY.md` 建指针):
+
+1. **扩** `feedback_delegation_must_verify_target_actually_does_it.md` (`delegate-verify`): 三问 → **五问** (补「何时触发」「枚举哪些对象」), 附 C.2.5 的两处实证。
+2. **扩** `feedback_perpetual_red_fix_must_change_the_quantity_not_the_threshold.md` (`redfix-change-quantity`): `X in 某段文本` 形态四轮只在收窄窗口; 换结构量仍不够, **规范字面比对是承重的一半**。
+3. **新增** `feedback_audit_aggregation_is_lossy_and_count_hides_distribution.md`: 聚合是有损重写 (处置必须回链席位报告编号) + **缺陷分布比 Major 计数更能判收敛** (集中到某段 ⇒ 换结构而非加轮)。
+4. **扩** `feedback_verify_assertions_reject_bad_implementations.md` (`adversarial-fixture`) —— **本次收尾新写**: 坏态**必须由非作者独立构造**; 四轮实证中执笔人自带夹具**零命中**, 每次抓到绕过的都是另一方; 两个独立来源造出同一种绕过 = 结构缺口而非巧合。
+
+> `MEMORY.md` 现为 24439 / 24576 bytes, **余量 137 字节** —— 下次加指针前必须先压缩 (见 §2 C9)。
+
+**[候选 memory]** (识别出但本次**未**写, 留给下次判定):
+
+- 席位会提出**不在编排引擎选项集里**的结构性选项 (本次: tech-lead 两轮提议「5.2 整段降级为按 phase-c-integrator 执行」, 而 audit-engine 的降级策略只有三路径)。呈递 owner 时把它作为第 4 项是对的; 建议**并入 `narrow-owner-options` 追记**而非新开一条 (同族: 选项集完整性), type: feedback。
+
+**[未写下经验]** (本次判定不值得单独立条, 但记在此处备查):
+
+- **claim 心跳是入口钩子不是定时器**: 本 session 多次直接跑 `scan.py` 而非走 `/state-scanner` 完整入口 ⇒ 心跳一次都没刷新过, 跨天后越过 `SWEEP_TTL`。`constants.py` 的 docstring 已写明这个前提 ("a refresh happens only when the orchestration layer actually runs"), 所以是**仓内已记录的机制**, 只是执行侧没照做。
+- **给下一个 session 写的命令要按活状态核, 不按 SKILL 的拼法推** (§3.7 的 track_id 后缀陷阱, 起草时差点写错, 核源码才拦住) —— 这是 `cite≠apply` 与 `delegate-verify` 的又一次同形复现, 已被现有两条 memory 覆盖, 不另立。
+
+## §9 AI 流程判断 (Rule #10 §5, 请 owner 复议)
 
 计划内的 32 条判断写在 `tasks.md` 的「AI 流程判断清单」, Phase D 的周期 handoff 会全文照录。**本 session 层面另有四条**:
 
@@ -117,9 +163,8 @@ updated-at: 2026-09-16T02:25:00Z
 2. **主控核验返修不计审计轮次**: v3 → v3.1、v5 → v6 都是审计轮之间的返修 (主控核验发现问题直接交回执笔人), 不算新一轮。这不是跳过闸门, 但属流程安排。
 3. **席位派发按 agent-team-audit 默认并发 2** (滑动窗口), 每轮五席; 每轮入口跑 sibling probe。R1–R5 一致。
 4. **R2 / R3 的两处 conflicted 由主控裁决** (基线 RED 是否等价于反事实 / TASK-029 步序的严重度), 理由写在对应聚合报告。
+5. **claim 心跳越过 `SWEEP_TTL` 后, 主控不自行刷新** (2026-09-16 收尾): 刷新会把协调 ref 推到远端 = 外向动作, 按既有约束须 owner 逐次授权, 而「保持同步」不构成授权。故只上报 (§2 C8) 不执行。若 owner 认为心跳属例行维护、可免逐次授权, 请在此处裁定。
 
-## §9 待写 memory (本 session)
+---
 
-1. 扩 `feedback_delegation_must_verify_target_actually_does_it.md`: 三问 → 五问 (补「何时触发」「枚举哪些对象」), 附本次 C.2.5 的两处实证。
-2. 扩 `feedback_perpetual_red_fix_must_change_the_quantity_not_the_threshold.md`: 补「`X in 某段文本` 形态的判据要换成结构量 (解析结构 + 比对规范字面); 四轮实证, 且只换结构量不够, 规范字面比对是承重的一半」。
-3. 新增: 多轮审计的**聚合转述会丢项**, 处置必须回链席位报告编号; 以及**缺陷分布比 Major 计数更能判断收敛**。
+**Cross-references**: 计划三件套 `openspec/changes/handoff-multibranch-subdir-path-fidelity/{proposal.md,tasks.md,detailed-tasks.yaml}` · 五轮审计报告 `.aria/audit-reports/post_planning-R{1..5}-*` · 决策单 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md` · 上一份会话 handoff `docs/handoff/2026-09-13-owner-gates-cleared-195-199-approved-level3.md`
