@@ -1,0 +1,779 @@
+#!/usr/bin/env python3
+"""Generate detailed-tasks.yaml for pre-merge-completeness-gate-change-scope (A.3 v1).
+
+usage: python3 gen_yaml.py <out.yaml> <a2_state_runs.py> <state-runs output file or '-'>
+Lists are always indented (the archive gate's line parser drops indentless `- ` items).
+"""
+import sys
+import yaml
+
+OUT, SCRIPT, RUNOUT, SCRIPT2, RUNOUT2 = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+SID = "pre-merge-completeness-gate-change-scope"
+SPEC = f"openspec/changes/{SID}"
+LEDGER = f"{SPEC}/verification-ledger.md"
+AE = "aria/skills/audit-engine"
+PC = "aria/skills/phase-c-integrator"
+
+
+class Dumper(yaml.SafeDumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super().increase_indent(flow, False)
+
+
+def _str(dumper, data):
+    if "\n" in data:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+Dumper.add_representer(str, _str)
+
+script_text = open(SCRIPT, encoding="utf-8").read()
+run_output = "(pending)\n" if RUNOUT == "-" else open(RUNOUT, encoding="utf-8").read()
+script2_text = open(SCRIPT2, encoding="utf-8").read()
+run_output2 = "(pending)\n" if RUNOUT2 == "-" else open(RUNOUT2, encoding="utf-8").read()
+
+SC12_CODE = r'''# 在主仓根执行: python3 -B sc12_liveness.py [--force-checked]
+# --force-checked: 4.3 用 (tasks.md 尚未勾选时把副本文本临时视为全勾选, 只影响 L3; L1 须在全勾选的 scratch 副本里跑)
+import json, re, subprocess, sys
+from pathlib import Path
+root = Path.cwd()
+sys.path.insert(0, str(root / "aria/skills/state-scanner/scripts"))  # 包上下文; 直接 import spec_complete 会循环导入
+from lib import spec_complete as sc
+spec = root / "openspec/changes/pre-merge-completeness-gate-change-scope"
+text = (spec / "tasks.md").read_text(encoding="utf-8")
+if "--force-checked" in sys.argv:
+    text = re.sub(r"^(\s*[-*]\s*)\[ \]", r"\1[x]", text, flags=re.M)
+item = next(i for i in sc._iter_task_items(text) if i["parent_id"] == "3.2")
+L3 = (item["checked"] and sc._line_has_integration_keyword(item["line"])
+      and "completeness_gate" in sc.extract_claim_symbols(spec, item)["symbols"])
+lv = sc.classify_symbol_liveness("completeness_gate", root, {"aria/skills/audit-engine/scripts/completeness_gate.py"})
+L2 = lv["status"] == "alive" and "aria_plugin_integration" in lv["alive_categories"]
+p = subprocess.run([sys.executable, "-B", str(root / "aria/skills/state-scanner/scripts/lib/spec_complete.py"),
+                    "--gate", str(spec)], capture_output=True, text=True)
+g = json.loads(p.stdout)
+L1 = g["verdict"] != "block" and not any("completeness_gate" in b for b in g["blocking_reasons"])
+print(json.dumps({"L1": L1, "L2": L2, "L3": L3, "status": lv["status"],
+                  "alive_categories": lv["alive_categories"], "gate_verdict": g["verdict"],
+                  "unverified_claims": [u["reason"] for u in g["unverified_claims"]]}, ensure_ascii=False))
+'''
+
+NEW_CHECKS = r'''# N1 / N2 的输入 = execution-modes.md 全文; N3 的输入 = completeness_gate.py 路径
+import ast, re, sys
+def slice_lines(text, a, b):
+    L = text.split("\n")
+    s = next(i for i, l in enumerate(L) if re.match(a, l))
+    e = next(i for i in range(s + 1, len(L)) if re.match(b, L[i]))
+    return L[s:e]
+def n1(text):  # Step 3 行区间内两条同构排除行各恰 1 行
+    try:
+        sl = slice_lines(text, r"\s*Step 3:", r"\s*Step 4:")
+    except StopIteration:
+        return False
+    return all(sum(bool(re.match(rf'\s*- key != "{k}"', l)) for l in sl) == 1
+               for k in ("post_brainstorm", "mid_implementation"))
+def n2(text):  # Step 2 行区间内唯一的改写句: 分号前含 no_spec_unverifiable, 分号后不含它且含 no_spec_contradicted 与 不被本键豁免
+    try:
+        sl = slice_lines(text, r"\s*Step 2:", r"\s*Step 3:")
+    except StopIteration:
+        return False
+    hits = [l for l in sl if "仍逐对评估三态并全部留痕" in l]
+    if len(hits) != 1:
+        return False
+    head, sep, tail = hits[0].partition(";")
+    return (bool(sep) and "no_spec_unverifiable" in head and "no_spec_unverifiable" not in tail
+            and "no_spec_contradicted" in tail and "不被本键豁免" in tail)
+def n3(path):  # 顶层 import 全属 stdlib; 相对导入算不合格
+    from pathlib import Path
+    path = Path(path)
+    if not path.is_file():
+        return False
+    mods = set()
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            mods |= {a.name.split(".")[0] for a in node.names}
+        elif isinstance(node, ast.ImportFrom):
+            mods.add("<relative>" if node.level else (node.module or "").split(".")[0])
+    return bool(mods) and mods <= set(sys.stdlib_module_names)
+def _call_lines(lines):  # 恰一行含脚本路径; 从该行起连续取以 \\ 结尾的续行, 到第一行不以 \\ 结尾为止, 逐行 strip()
+    idx = [i for i, l in enumerate(lines) if "scripts/completeness_gate.py" in l]
+    if len(idx) != 1:
+        return None
+    out, i = [], idx[0]
+    while i < len(lines):
+        out.append(lines[i].strip())
+        if not lines[i].rstrip().endswith("\\"):
+            break
+        i += 1
+    return out
+def n4(skill_text, em_text, canonical_lines):  # SKILL.md 全部 ```bash/```sh 块 与 execution-modes.md 的 Step 4: 至 Step 5: 行区间, 各自抽出的调用串都等于 canonical
+    blocks = [l for b in re.findall(r"```(?:bash|sh)\s*\n([\s\S]*?)```", skill_text) for l in b.split("\n")]
+    try:
+        em = slice_lines(em_text, r"\s*Step 4:", r"\s*Step 5:")
+    except StopIteration:
+        return False
+    want = [l.strip() for l in canonical_lines]
+    return _call_lines(blocks) == want and _call_lines(em) == want
+P8 = "pre_merge 按 C.2 pre_hook 步骤 3 的优先级链判为启用"
+def _anchored(text, anchor):
+    hits = [l for l in text.split("\n") if anchor in l]
+    return len(hits) == 1 and P8 in hits[0] and '!= "off"' not in hits[0] and "!= off" not in hits[0]
+def n8(pc_text, ae_text):  # pc = phase-c-integrator/SKILL.md 全文, ae = audit-engine/SKILL.md 全文
+    return ('audit.checkpoints.pre_merge != "off"' not in pc_text
+            and _anchored(pc_text, "C.2 合并前触发 audit-engine")
+            and _anchored(pc_text, "C.2 的 pre_merge audit 调用点")
+            and _anchored(ae_text, "与 file-scope 过滤双降级时幂等"))
+'''
+
+CANONICAL_CALL = '''python3 "${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_gate.py" \\
+  --repo-path "<主仓 root>" --diff-repo-path "<C.2 合并目标仓 root>" \\
+  --base "<diff 仓主干的远程跟踪 ref>" [--anchor-base "<主仓主干的远程跟踪 ref>"] \\
+  [--change-id <id> ...] [--no-spec]
+'''
+
+CELL_STATUS_CODE = r'''# 用法: cd aria/skills/audit-engine/tests && python3 -B <scratch>/cell_status.py test_completeness_gate <cell>...
+# 列出的每个 cell 恰被执行一次且通过 ⇒ 退出 0; 未执行 / 失败 / 执行多次 ⇒ 退出 1。本文件放 scratch, 不进仓
+import json, sys, unittest
+module, cells = sys.argv[1], sys.argv[2:]
+sys.path.insert(0, ".")
+seen = {}
+class Result(unittest.TestResult):
+    def addSubTest(self, test, subtest, outcome):
+        super().addSubTest(test, subtest, outcome)
+        cell = subtest.params.get("cell") if hasattr(subtest, "params") else None
+        if cell is not None:
+            seen.setdefault(cell, []).append("pass" if outcome is None else "fail")
+unittest.defaultTestLoader.loadTestsFromName(module).run(Result())
+status = {c: seen.get(c, ["not-run"]) for c in cells}
+ok = bool(cells) and all(v == ["pass"] for v in status.values())
+print(json.dumps(status, ensure_ascii=False, sort_keys=True))
+sys.exit(0 if ok else 1)
+'''
+
+COORD_PRECHECK_CODE = r'''# 用法 (在主仓根): python3 -B <scratch>/coord_precheck.py <本轨 claim 文件>...   例: claims/023236f2/s-86f7@1836.yaml
+# 退出 0 = 本地协调 ref 相对 origin 只领先本轨心跳 (可推送 / 可强制对齐); 1 = 含其它写入 (停下请授权); 2 = 取不到远端值 (按 1 处置)
+import json, subprocess, sys
+own = set(sys.argv[1:])
+def git(*a):
+    return subprocess.run(["git", *a], capture_output=True, text=True)
+if git("fetch", "origin", "refs/aria/coordination").returncode != 0:  # 只写 FETCH_HEAD
+    print(json.dumps({"verdict": "error", "reason": "fetch failed"})); sys.exit(2)
+remote = git("rev-parse", "FETCH_HEAD").stdout.strip()
+local = git("rev-parse", "--verify", "-q", "refs/aria/coordination").stdout.strip()
+ahead = []
+for c in (git("rev-list", "--reverse", f"{remote}..{local}").stdout.split() if local else []):
+    files = git("diff-tree", "--no-commit-id", "--name-only", "-r", c).stdout.split()
+    body = git("diff", "-U0", f"{c}^", c, "--", *files).stdout.splitlines() if files else []
+    changed = [l for l in body if l[:1] in "+-" and not l.startswith(("+++", "---"))]
+    hb = (bool(files) and set(files) <= own and len(changed) == 2 * len(files)
+          and all(l[1:].startswith("heartbeat_at:") for l in changed))
+    ahead.append({"files": files, "kind": "own-heartbeat" if hb else "other"})
+ok = all(a["kind"] == "own-heartbeat" for a in ahead)
+print(json.dumps({"verdict": "ok" if ok else "stop", "local_ahead": len(ahead), "ahead": ahead}, ensure_ascii=False))
+sys.exit(0 if ok else 1)
+'''
+
+CRLF_GUARD_CODE = r'''import subprocess
+def crlf_guard(repo, rel):  # 在改动未暂存时跑: 工作树仍全为 CRLF, 且忽略行尾 CR 与否的 numstat 相同
+    def run(*a):
+        return subprocess.run(["git", "-C", repo, *a], capture_output=True, text=True).stdout
+    eol = run("ls-files", "--eol", "--", rel).split()
+    return eol[:2] == ["i/crlf", "w/crlf"] and run("diff", "--numstat", "--", rel) == run("diff", "--ignore-cr-at-eol", "--numstat", "--", rel)
+'''
+
+ATTRIB_CODE = r'''# 用法 (在主仓根): python3 -B <scratch>/commit_attribution.py <基准 ref> <目标 ref> [<本次 ab-results 目录>]
+# 退出 0 = 基准..目标 之间只有本轨提交与同步合并; 1 = 含非本轨提交 (停下请裁)
+import json, re, subprocess, sys
+SID = "pre-merge-completeness-gate-change-scope"
+base, tip, extra = sys.argv[1], sys.argv[2], [d.rstrip("/") + "/" for d in sys.argv[3:]]
+FIXED = {"aria", "VERSION", "README.md", "README.zh.md", "README.ja.md", "README.ko.md", "CLAUDE.md",
+         "docs/architecture/system-architecture.md", "docs/architecture/version-scheme.md",
+         "aria-plugin-benchmarks/ab-suite/audit-engine.json", "aria-plugin-benchmarks/ab-suite/version.yaml"}
+def git(*a):
+    return subprocess.run(["git", *a], capture_output=True, text=True)
+def own_path(c, p):
+    if p in FIXED or p.startswith(f"openspec/changes/{SID}/") or p.startswith(tuple(extra)):
+        return True
+    if p.startswith("openspec/archive/") and p.split("/")[2].endswith(f"-{SID}"):
+        return True
+    if p.startswith(".aria/audit-reports/") and SID in p:
+        return True
+    if p.startswith("docs/handoff/") and p.endswith(".md"):  # 本轨周期 / 会话 handoff: frontmatter track-id 为本轨
+        head = git("show", f"{c}:{p}").stdout[:2000]
+        return re.search(rf"^track-id:\s*{re.escape(SID)}\s*$", head, re.M) is not None
+    return False
+kinds = []
+for line in git("log", "--format=%H %P", f"{base}..{tip}").stdout.splitlines():
+    c, *parents = line.split()
+    if len(parents) > 1:
+        sync = all(git("merge-base", "--is-ancestor", p, base).returncode == 0 for p in parents[1:])
+        kinds.append("sync-merge" if sync else "foreign-merge")
+        continue
+    files = git("diff-tree", "--no-commit-id", "--name-only", "-r", c).stdout.split()
+    kinds.append("own" if files and all(own_path(c, p) for p in files) else "foreign")
+ok = all(k in ("own", "sync-merge") for k in kinds)
+print(json.dumps({"verdict": "ok" if ok else "stop", "commits": len(kinds), "kinds": kinds}))
+sys.exit(0 if ok else 1)
+'''
+
+SC17_5 = ("SC-17(5) 改写后全文 (裁定 11; 替换 proposal :473 的 (5) 格): --repo-path tmpA --diff-repo-path tmpB --no-spec, "
+          "tmpA 的 feature 分支相对 --anchor-base 无提交 (锚点面零 diff), config {audit: {enabled: true, mode: manual, "
+          "checkpoints: {post_spec: convergence}}}。(a) 不加豁免键 ⇒ verdict error, error_kind no_spec_unverifiable, exit 2; "
+          "(b) 只加 allow_dangling_change_ids: true ⇒ 同 (a); (c) 加 allow_incomplete_checkpoints: true ⇒ verdict bypassed, "
+          "exit 0, error_kind 为 None, scope_source 为 None, change_ids == [], results == [], bypassed 为 True, "
+          "checked_checkpoints == ['post_spec'], stderr 逐字含 scope_unresolved=1 与 [WARN] bypassed: no_spec_unverifiable; "
+          "(d) 对照: 沿用 (c) 的旗标, 把 tmpA 的锚点面 diff 改为触 openspec/changes/x/ ⇒ error_kind no_spec_contradicted, exit 2。"
+          "反事实: 不给该 error 挂豁免 ⇒ (c) exit 2 ⇒ 红; 豁免误挂到 allow_dangling_change_ids ⇒ (b) exit 0 ⇒ 红; "
+          "no_spec_contradicted 也被豁免 ⇒ (d) exit 0 ⇒ 红")
+
+
+def T(id_, parent, title, complexity, hours, deps, deliverables, agent, reason, verification, notes=None):
+    t = {"id": id_, "parent": parent, "title": title, "status": "pending", "complexity": complexity,
+         "estimated_hours": hours, "dependencies": deps, "deliverables": deliverables,
+         "agent": agent, "reason": reason, "verification": verification}
+    if notes:
+        t["notes"] = notes
+    return t
+
+
+COUNTERFACTUAL_METHOD = (
+    "做法 (TASK-019 / 020 / 022 共用): git -C aria worktree add <scratch>/cf-<SC> <TASK-013 SHA> → 未打补丁跑对应用例, 绿 (留输出) "
+    "→ 只回退该组件后再跑, 红 (留输出, 记首个失败断言文本) → 记副本 HEAD 与补丁 diff (以副本路径为根) → 在副本里 git checkout -- . 撤掉补丁 → git -C aria worktree remove <副本> (带补丁直接 remove 会 rc=128); "
+    "一律 python3 -B; 不在 feature 分支工作树上改; 副本创建与移除记台账")
+
+tasks = [
+    # ---------------- 组 1 ----------------
+    T("TASK-001", "1.1", "B.1 入口: owner 等待点、读 claim 并心跳、fetch 定分支起点、基线复核、台账骨架", "S", "2-3", [],
+      [LEDGER], "qa-engineer", "核验与记录; git 与 claim 动作由主控执行",
+      [
+          "入口前置 (owner_gates 第 1 项): 10CG/Aria#195 已完成 C.2 —— 判据 = 该轨台账或周期 handoff 记下的主仓 PR 合并提交 M, 与 git fetch origin 后 git ls-remote origin master 取得的 R 满足 git merge-base --is-ancestor M R 退出 0; 或 owner 在会话里明示改序 (原话记台账)。两者都没有 ⇒ 不进 B.1",
+          "claim: 读 git show refs/aria/coordination:claims/023236f2/ 下 track_id 逐字为 pre-merge-completeness-gate-change-scope 的 active 条目 (A.2 时: s-86f7@1836.yaml, heartbeat 2026-09-17T08:47:15Z), 记为本轨 claim 文件; 再跑 metadata.coord_ref_precheck (参数 = 本轨 claim 文件) 并记输出: 退出非 0 ⇒ 停在本任务 (owner_gates 第 15 项), 不调 /state-scanner、不心跳推送、不强制对齐。本地落后 origin 不影响判定 (检查只看本地领先的提交)",
+          "心跳 (precheck 退出 0 之后): python3 -B aria/skills/state-scanner/scripts/phase1_gate.py --heartbeat-only --raw-track-id pre-merge-completeness-gate-change-scope --phase B --repo-path <主仓根>, 期望 outcome refreshed; 心跳只推 origin 的 refs/aria/coordination, owner 2026-09-17 裁定免逐次授权, 不加 --no-push。心跳只写 heartbeat_at, 不改 claim 的 phase (track board 在 B–D 期间仍显示 A.2), 台账注明。claim 已被扫成 abandoned ⇒ 获授权 (owner_gates 第 14 项) 后再跑一次 precheck, 退出 0 才用同一原串重新认领: phase1_gate.py --raw-track-id pre-merge-completeness-gate-change-scope --phase B --mode advisory --linked-issue 10CG/Aria#199 --include-terminal --repo-path <主仓根>, 新 claim 文件替换本轨 claim 文件; 未获授权 ⇒ 不认领, 停在本任务。不补容器后缀; claim 仍 active 时不重跑认领 (tasks.md 判断清单第 11 条)。输出原样记台账",
+          "会话环境: [ -n \"${ARIA_COORDINATION_NO_PUSH+x}\" ] 的结果记台账; 组 1–4 的会话应不带该变量 (tasks.md 读前必看第 12 条), 带则换会话",
+          "分支起点: git fetch origin 与 git -C aria fetch origin 后, 记 git rev-parse origin/master、git -C aria rev-parse origin/master、git ls-tree HEAD aria, 另对 github 各跑 git ls-remote github master 比对; aria feature 分支从 aria origin/master 起。主仓: 本目录规划文件与 post_planning 报告所在的最新提交 P 满足 git merge-base --is-ancestor P <origin 与 github 各自 ls-remote SHA> 均退出 0 ⇒ 从 origin/master 起; 否则按 owner_gates 第 2 项的步骤请授权推送规划提交; 未获授权则从含 P 的本地 master 起, 起点 SHA 与未推送事实记台账, 推送随 TASK-030 的 PR 发生。回落前对 origin/master..<起点> 跑 metadata.commit_attribution, 退出非 0 ⇒ 停 (第 16 项), 输出原样记台账",
+          "建分支并检出后断言 git -C aria rev-parse HEAD 等于 aria origin/master 实测值, 且 git -C aria status --porcelain 为空",
+          "基线复核: 对 metadata.baseline_rebase.aria_zero_diff 的每个文件与 aria_shifted 各条冒号前的文件跑 git -C aria diff --shortstat 301641b <aria 起点> -- <文件>, 对 main_repo 的文件跑 git diff --shortstat a563192 <主仓起点> -- <文件>; 与 A.2 记录比对, 新出现 diff 的文件逐处实读 proposal 所引行号并在台账写偏移表; aria 若有新发布, tasks.md 读前必看第 3 条的取号前提同步更新",
+          "台账骨架: 二级标题固定为 基线 / 语料冻结 / fixture 矩阵 / RED / 组 2 收口 / 文档机检 / 反事实 / 回归 / 活体运行 / AB / 发布 / 写法自检 / 外向动作与授权 / 停下与上报; 此后只在对应标题下追加",
+      ]),
+    T("TASK-002", "1.2", "语料冻结 corpus-freeze.md: 六族样本、双列标注与机械仲裁", "L", "5-7", ["TASK-001"],
+      [f"{SPEC}/corpus-freeze.md"], "qa-engineer", "标注者须与实现者不同 (proposal 内联 Tasks B.0); 由非实现席完成",
+      [
+          "取样: 记主仓提交 F 与 UTC 时刻; 文件集 = git ls-tree --name-only F -- .aria/audit-reports/ 中的顶层 .md (由命令重生成, 不手抄); 同时记 C = F 上 openspec/changes/* 与 openspec/archive/* (去 YYYY-MM-DD- 前缀) 的目录名集合及大小 (A.2 时在 a563192 上为 154, 口径 = 两处目录名去日期前缀后的集合, 含本 spec 自身)",
+          "六族 (proposal SC-2): F-a 末段族 / F-b role 后缀族 / F-c aggregated 族 / F-d 无 -R<n>- 族 / F-e 真 2-field legacy / F-f unattributed; 同一 id 须同时有 F-a 与 F-b, 下界 F-a ≥ 2 且 F-b ≥ 3, 候选 state-scanner-inter-cycle-surfacing (以冻结时实测为准); 其余四族各 ≥ 3",
+          "第一列算法 (proposal :416-419): 来源定序 change_id > spec_id > context, 取第一个存在且非空的字段; 归一化 = strip 并去首尾反引号或引号, 匹配 ^openspec/changes/([^/\\s]+) 或 ^openspec/archive/(?:\\d{4}-\\d{2}-\\d{2}-)?([^/\\s]+) 取捕获组, 否则取第一个空白分隔 token; 空串即取不到。第一列只读 frontmatter, 不读文件名",
+          "仲裁 (proposal :414-426): F-a~F-d 两列不一致或第一列取不到 ⇒ 当场剔出样本池, 进争议表并逐份记两列取值与理由; F-e / F-f 不做双列, 独立源归一化值属于 C 的 F-f 候选改归 F-a~F-d 按上句处理, F-e 按文件名形态照留并记名; 剔除后不足下界 ⇒ 换 id 重采, 换不到则按实测上限记名降下界; 不得把争议条目放回, 不得用 --change-id 自造样本",
+          "标注列就是 SC-2 / SC-4 的期望值来源: TASK-004 以字面量写进测试, 测试里不调用被测谓词求期望值",
+          "可复现: 由未参与标注的另一实例 (台账记两个实例的标识) 从 F 重跑取样与第一列算法, 文件集与第一列取值逐字相同, 输出记台账; 同一实例复算不算",
+      ]),
+    T("TASK-003", "1.3", "fixture 前提矩阵与测试风格约束", "S", "2-3", ["TASK-001"], [LEDGER], "qa-engineer",
+      "把四条硬约束与裁定派生的期望值先落成表, 防实现者按自己的实现重算期望",
+      [
+          "矩阵每个 SC 格一行, 列 = audit.mode 取值 / 锚点 Level 行 / audit.enabled / 两个路径参数 / 作用域来源 / carve-out / 期望值出处; 规则取自 proposal §1.0 末段四条硬约束与 :140-149 对照表",
+          "mode 取值: SC 正文逐字给出 mode 的格按正文 (SC-9(2) 第二跑与 SC-15(8)(9) 为 adaptive, SC-15(5)(7) 为 convergence —— §1.0 :122 的例外清单漏列这几格, tasks.md 读前必看第 9 条), 其余按硬约束 (1) 钉 manual; carve-out 三格 SC-15(1) / SC-15(4) / SC-21(2) 照 :130-136",
+          "子格约定: 每个 SC 的每一格包在 self.subTest(cell='<SC>.<子格>') 里, 断言 (含脚本存在断言) 一律写在 subTest 内; metadata.stage_cells.cells 所列格名逐字照用并进矩阵",
+          "正文没给 checkpoint 配置、而断言需要纳入集非空的格 (如 SC-22(1) 的 other 那对判 missing), 矩阵钉最小配置 checkpoints: {post_spec: convergence} 并注明期望值不变 (tasks.md 读前必看第 23 条); 发现某格期望值确须变化 ⇒ 停下记台账并上报, 走 spec 修订, 不当场改断言",
+          "tasks.md 读前必看第 6、7 条的期望值 (SC-15(5) 三个 checkpoint / SC-17(5) 改写全文见 TASK-006 / SC-18 只留排除分支) 逐字进矩阵",
+          "测试风格: 新文件只含 unittest.TestCase 子类, 用例名沿用 SC 核验列 (test_completeness_gate.CompletenessGateTests.test_*); 不 import pytest, 不建 conftest.py —— run_all_tests.sh:41-46 按整个 tests/ 目录判 pytest 套件, 无 pytest 时整套 SKIP",
+      ]),
+    T("TASK-004", "1.4", "RED 第一批: 新建 tests/test_completeness_gate.py, 写 SC-1~SC-6", "L", "6-8", ["TASK-002", "TASK-003"],
+      [f"{AE}/tests/test_completeness_gate.py"], "qa-engineer", "hermetic git 夹具与反事实设计; 测试与实现分由不同 agent 执笔",
+      [
+          "用例名与 proposal SC-1~SC-6 核验列一致: test_issue_case1_other_change_reports_do_not_count / test_real_corpus_shapes_token_bounded_match / test_bounded_containment_excludes_all_three_shapes / test_legacy_vs_unattributed_counts_split / test_phase_a_only_not_applicable / test_md_and_docs_diff_still_missing / test_empty_diff_is_missing / test_post_planning_a2_artifact_includes_inline_tasks",
+          "夹具: tmp 仓一律 git init -b master; config 按 TASK-003 矩阵; 每次调用显式传 --repo-path 与 --diff-repo-path; 脚本经 subprocess 以 sys.executable -B 调用, stdout 用 json.loads 解析, 人读行只从 stderr 断言",
+          "helper 内先 self.assertTrue(脚本路径.is_file()); helper 只在 subTest 内调用, 脚本缺失时每个格以 AssertionError 失败",
+          "SC-2 期望值取 corpus-freeze.md 标注列的字面量; F-e / F-f 只断言三桶两两不交 (proposal SC-2 (ii))",
+          "SC-4 的 WARN 行按 §1.2 模板与连接符「逗号加一个空格」逐字拼出期望串, 整行相等比对",
+          "SC-6 只写 hermetic 四格 (1)-(4); tasks.md 重写 c 的快照格不进单测 (快照 295KB, 不随插件分发), 由 TASK-022 活体执行",
+      ], notes="TASK-004 / 005 / 006 串行编写同一文件"),
+    T("TASK-005", "1.5", "RED 第二批: SC-7~SC-10 与 SC-18 (排除分支)", "L", "6-8", ["TASK-003", "TASK-004"],
+      [f"{AE}/tests/test_completeness_gate.py"], "qa-engineer", "同上",
+      [
+          "用例名: test_scope_resolution_matrix / test_rename_and_anchor_semantics / test_allow_dangling_inherited / test_step3_enumeration / test_bypass_semantics / test_stdout_contract / test_post_brainstorm_exclusion_decision",
+          "SC-7 的 --no-spec 合法格先断言 len(results) >= 1 与 checked_checkpoints == ['post_spec'], 再断言 not_applicable 与 change_id is None (防空集上的全称谓词)",
+          "SC-9(2) 两跑与短路断言照 proposal 原文; SC-9(4) 另断言 stderr 含 [WARN] bypassed: spec_level_undetermined (tasks.md 读前必看第 8 条, 只增)",
+          "SC-10: 四种 verdict 下 stdout 可 json.loads 且顶层键集逐字等于 §1.4 的 16 项; --base / --repo-path / --diff-repo-path 各自缺失 ⇒ exit 2; --change-id 与 --no-spec 同传 ⇒ exit 2 且 stderr 逐字含互斥文案; 坏 JSON ⇒ config_unreadable exit 2; 报告目录存在时 scan_status == 'ok'",
+          "SC-18 只写排除分支 (裁定 1): config 含 post_brainstorm: convergence ⇒ checked_checkpoints 不含它; 不写不采纳分支",
+      ]),
+    T("TASK-006", "1.6", "RED 第三批: SC-15~SC-17 与 SC-19~SC-22", "L", "6-8", ["TASK-003", "TASK-005"],
+      [f"{AE}/tests/test_completeness_gate.py"], "qa-engineer", "同上",
+      [
+          "用例名: test_empty_checkpoint_set_three_buckets / test_legacy_config_mapping_inlined / test_dangling_skip_bucket_e / test_multi_change_axis_reduction / test_mid_implementation_excluded / test_split_repo_and_diff_paths / test_cross_repo_no_spec_and_anchor_scope / test_cross_repo_missing_diff_repo_path_is_argparse_error / test_enumeration_boundaries / test_step3_priority_chain / test_pairwise_not_cross_product / test_inlined_defaults_equal_upstream / test_inlined_legacy_mapping_equal_upstream / test_env_boundaries",
+          "SC-15(5) 按 tasks.md 读前必看第 6 条: checked_checkpoints == ['post_implementation', 'post_planning', 'post_spec'], len(results) == 3, 三对 missing, verdict fail, exit 1; fixture 的内联 ## Tasks 与零 diff 照原文",
+          SC17_5,
+          "SC-21 在测试期读插件树的 config-loader/DEFAULTS.json 与 config-loader/SKILL.md §旧配置兼容层, 用 importlib 按文件路径载入脚本取常量比对",
+          "SC-22(1) 的 WARN 断言逐字含「作用域解析 (S2/S3, 锚点面) 与 not_applicable (b) 通道的路径集判据 (diff 面) 会被弱化」; (iii) 跨仓格断言文案点名 anchor-base",
+      ]),
+    T("TASK-007", "1.7", "RED 台账与提交", "S", "1-2", ["TASK-004", "TASK-005", "TASK-006"], [LEDGER], "qa-engineer", "机械核验",
+      [
+          "cd aria/skills/audit-engine/tests && python3 -B -m unittest test_completeness_gate -v: 全部用例失败且失败形态为 AssertionError; 出现 ImportError 或夹具建仓异常 ⇒ 先修夹具再记; 原样输出记台账",
+          "在同目录跑 metadata.stage_cells.code, 参数 = stage_cells.cells 的全部格: 退出 1, 且输出里每个格都是 [\"fail\"] (出现 not-run 说明格名没按约定写进测试, 先修测试)",
+          "同目录既有测试 python3 -B -m unittest test_sibling_spec_probe 仍 OK (A.2 实测整个目录 Ran 104 OK)",
+          "在 aria 根执行 bash skills/run_all_tests.sh --list, audit-engine 行含 (unittest)",
+          "grep -nE '^(import|from)[[:space:]]+pytest' aria/skills/audit-engine/tests/test_completeness_gate.py 的退出码恰为 1 (0 = 命中 import pytest; 2 = 文件缺失, 不能按「无输出」放行; A.2 在 scratch 三态实跑: unittest 文件 1 / 含 import pytest 0 / 缺文件 2), 且 aria/skills/audit-engine/tests/conftest.py 不存在",
+          "主控只 add 测试文件 (aria feature 分支) 与 corpus-freeze.md (主仓 feature 分支) 并分别提交, SHA 记台账",
+      ]),
+    # ---------------- 组 2 ----------------
+    T("TASK-008", "2.1", "CLI 与 P0 / P1: 参数契约、config 直读与内联映射、格 A、同仓判定、输出通道与短路框架", "M", "4-6", ["TASK-007"],
+      [f"{AE}/scripts/completeness_gate.py"], "backend-architect", "stdlib CLI 与契约设计",
+      [
+          "argparse: --repo-path / --diff-repo-path / --base 为 required=True; --anchor-base 缺省取 --base; --change-id 可重复; --change-id 与 --no-spec 互斥, 文案逐字为「--change-id 与 --no-spec 互斥 —— 前者声明本 cycle 有 spec, 后者声明没有」",
+          "config: 直读 <repo-path>/.aria/config.json; 文件缺失 ⇒ 全套内联缺省; 坏 JSON ⇒ config_unreadable exit 2; 内联常量 = DEFAULTS.json 的 audit 子集 (enabled / mode / adaptive_rules / 八个 checkpoint) 与旧配置兼容映射 (触发 = experiments.agent_team_audit 为 true 且无 audit 块); 两个 allow_* 缺省 false",
+          "P1: audit.enabled 不为 true ⇒ audit_not_enabled exit 2, 早于任何 git 调用",
+          "同仓判定: 在 P1 之后求值; 两面各自 git -C <路径> rev-parse --show-toplevel 的输出逐字相等; 任一失败 ⇒ git_failed exit 2",
+          "stdout 恰一个 JSON (schema_version \"1\", gate \"completeness_gate\", 16 键); 全部 [OK] / [INFO] / [WARN] / ERROR 行走 stderr; exit 映射 fail=1, pass 与 bypassed=0, error=2; 在 P6 之前终止的运行按 tasks.md 读前必看第 8 条填非判定键",
+          "stdlib only: metadata.new_checks 的 n3 对脚本为真",
+          "验收: 在 aria/skills/audit-engine/tests 下跑 metadata.stage_cells.code, 参数 = TASK-008 所列格, 退出 0; 其余格失败属预期",
+      ]),
+    T("TASK-009", "2.2", "P2a 与 P2: --no-spec 前置核验、S1–S4、两个 base 轴的陈旧告警", "L", "5-7", ["TASK-008"],
+      [f"{AE}/scripts/completeness_gate.py"], "backend-architect", "git 子进程与作用域解析",
+      [
+          "P2a 只在给出 --no-spec 时执行, 求值面 = --repo-path 与 --anchor-base: 锚点面 diff 为 0 行 ⇒ no_spec_unverifiable; 触 openspec/changes/** ⇒ no_spec_contradicted; 两者都在 P2 之前",
+          "S1: 锚点 = openspec/changes/<id>/proposal.md, 或 openspec/archive/ 下去掉 ^\\d{4}-\\d{2}-\\d{2}- 前缀后逐字等于 <id> 的目录里的 proposal.md (不用 glob); 无锚 ⇒ change_id_unanchored exit 2; allow_dangling_change_ids 为 true 时降为 [WARN] dangling change_id: <id> 并按零报告继续",
+          "S2: git -C <repo-path> diff --name-only --no-renames $(git -C <repo-path> merge-base HEAD <anchor-base>) 取 openspec/changes/<id>/ 前缀去重, scope_source=diff; S3: 通过 P2a 后 scope_source=no_spec, change_ids=[], Level 视为 1; S4: change_scope_unresolved exit 2, 三个 fix 文案照 §1.1 (第二个为「在锚点仓 (主仓) 的分支里带上 openspec/changes/<id>/ 变更」)",
+          "ref 解析与陈旧比对在同仓判定之后、P2a 之前无条件执行。陈旧告警: --base 与 --anchor-base 各比一次 (不含 / 且同名远程跟踪 ref 存在且 SHA 不同), 文案逐字照 proposal §1 的 --base 条款并点名是哪根轴; 同仓且 --anchor-base 缺省时只出一条; ref 或 merge-base 解析失败 ⇒ git_failed exit 2",
+          "验收: stage_cells 命令, 参数 = TASK-008 与 TASK-009 所列格, 退出 0",
+      ]),
+    T("TASK-010", "2.3", "P3 与 P4: Level 三条判据、五档优先级链、五项排除、逐对纳入、dangling-skip", "L", "5-7", ["TASK-009"],
+      [f"{AE}/scripts/completeness_gate.py"], "backend-architect", "配置语义与解析规则",
+      [
+          "Level: 全文件扫描取文档序第一条命中行; 行首去掉 > - # 空白 * 后以 Level 或 Spec Level 开头, 可选 **, 再接半角或全角冒号; 取值前剥 ~~…~~ 片段; 取冒号后第一个 1 / 2 / 3; 解析不到 ⇒ spec_level_undetermined exit 2; --no-spec ⇒ 1",
+          "优先级链 (§1.3 表): 级 1 = 原始 config 的 audit.checkpoints 自身含该键; 2a adaptive ⇒ adaptive_rules.level_<N>; 2b convergence; 2c challenge; 2d manual ⇒ off; mode 键存在但不属四值 ⇒ config_unreadable exit 2; enabled_by 为六值封闭集",
+          "排除五项: pre_merge / post_closure / mid_post_spec / mid_implementation / post_brainstorm (裁定 1)",
+          "Level 按需: 只在某对落到级 2a 时才对该 change 求 Level",
+          "dangling-skip: allow_dangling_change_ids 为 true 且锚点缺失或 Level 不可解析 ⇒ 该 id 的非 explicit 对取 resolved_mode off 与 enabled_by dangling-skip, 并记 [WARN] dangling change_id: <id> — Level 不可解析, 跳过 adaptive 推导",
+          "checked_checkpoints = 各 change 纳入集的并集并 sorted(); results 只含真正纳入的对 (不叉乘)",
+          "验收: stage_cells 命令, 参数 = TASK-008~010 所列格, 退出 0",
+      ]),
+    T("TASK-011", "2.4", "P5 与早退型豁免: 格 B / C / D / E、归约 R-1 / R-2、S4 / spec_level_undetermined / no_spec_unverifiable 的豁免与短路", "M", "4-6", ["TASK-010"],
+      [f"{AE}/scripts/completeness_gate.py"], "backend-architect", "判定表实现",
+      [
+          "P5 只在纳入集为空且未短路时求值: 格 B (归约后 resolved(pre_merge) 非 off) ⇒ pass 与 no_prior_checkpoints; 格 C (off 且各 change 的 enabled_by 全属 explicit / manual-default) ⇒ pre_merge_not_enabled exit 2; 格 D (存在 adaptive:level_N) ⇒ pass, 逐 change 一行 [INFO]; 格 E (存在 dangling-skip 且无 adaptive) ⇒ pass 与双留痕; 各格文案逐字照 §1.4 表, 归约照 R-1 / R-2",
+          "allow_incomplete_checkpoints 为 true: S4 / spec_level_undetermined / no_spec_unverifiable 降为 bypassed exit 0 并短路 (missing 的降级在 TASK-012); no_spec_contradicted 与 change_id_unanchored 不降 (裁定 11)",
+          "统一 WARN 行 [WARN] incomplete checkpoint gate bypassed: missing=<cp>@<id>,... ; scope_unresolved=<0|1> (本任务的三类早退 missing= 后为空), S4 与 no_spec_unverifiable 取 1; no_spec_unverifiable 与 spec_level_undetermined 另各加一行 [WARN] bypassed: <error_kind>",
+          "S4 与 no_spec_unverifiable 被豁免时, checked_checkpoints 只收原始 config 显式写出且非 off 的非排除键, 其余非判定键照 tasks.md 读前必看第 8 条",
+          "验收: stage_cells 命令, 参数 = TASK-008~011 所列格, 退出 0",
+      ]),
+    T("TASK-012", "2.5", "P6: 归属规则、非递归枚举、两个排除计数、三态与 trail 行", "L", "6-8", ["TASK-011"],
+      [f"{AE}/scripts/completeness_gate.py"], "backend-architect", "核心匹配逻辑",
+      [
+          "规则 1: 文件名以 <checkpoint>- 开头且以 .md 结尾; 规则 2: 含 -<id>- 或去 .md 后以 -<id> 结尾, 逐字且大小写敏感; 规则 3: 有界包含排除按前缀 / 后缀 / 中缀三型对称实现, C = openspec/changes/* 并上去日期前缀的 openspec/archive/*",
+          "枚举: <repo-path>/.aria/audit-reports 用 iterdir() 只取顶层文件; 目录不存在 ⇒ 按零报告, scan_status dir_missing, stderr 记 [WARN] completeness gate: .aria/audit-reports/ 不存在, 按零报告评估",
+          "计数: excluded_legacy_count 只收匹配 ^<cp>-[0-9TZ:.\\-]+\\.md$ 且不含 C 中任何 id 的文件; unattributed 收以纳入 checkpoint 前缀开头、对 C 中任何 id 规则 2 都不命中且不属 legacy 的文件; 统计面 = 纳入 checkpoint 的并集; 三个 list 一律 sorted()",
+          "三态 first-match: present / not_applicable ((a) scope_source=no_spec; (b) post_implementation 且同仓且 diff 非空且全部路径在 openspec/changes/<作用域 id>/** 或 .aria/audit-reports/** 下; (c) post_planning 且无 tasks.md、无 detailed-tasks.yaml、proposal 无 ^#{2,}\\s*Tasks 小节, 归档态同理) / missing (含 diff 为空)",
+          "trail 行 (stderr): missing 的 ERROR 与四项 Fix; unattributed 的 WARN 全局一行、前 20 个文件名、连接符为逗号加一个空格; not_applicable 的 [INFO] (S3 渲染为 (无 change_id)); present 的 [OK] 逐行",
+          "S3 态 results 每条的 change_id 为 None (JSON null, 不是占位串), 与 stderr 的 (无 change_id) 渲染分别核验",
+          "missing 的豁免: allow_incomplete_checkpoints 为 true 且有 missing ⇒ 仍逐对评估并全部留痕, 走完 P6 后 verdict 降为 bypassed exit 0, results 照常输出, 统一 WARN 行的 missing= 列出全部 <cp>@<id>, scope_unresolved=0",
+          "验收: python3 -B -m unittest test_completeness_gate 全绿 (SC 方法级); stage_cells 命令对全部所列格退出 0",
+      ]),
+    T("TASK-013", "2.6", "组 2 收口: 全绿后提交并记 SHA", "S", "1-2", ["TASK-012"], [LEDGER], "qa-engineer", "收口核验; 提交由主控执行",
+      [
+          "cd aria/skills/audit-engine/tests && python3 -B -m unittest discover -s . -p 'test_*.py' 零失败, Ran 数 = 104 + 新文件用例数",
+          "metadata.new_checks 的 n3 对 aria/skills/audit-engine/scripts/completeness_gate.py 为真",
+          "主控在 aria feature 分支只 add scripts/completeness_gate.py 与 tests/test_completeness_gate.py 并提交; 提交后不带路径的 git -C aria status --porcelain 为空; SHA 记台账 (组 4 的副本从它检出)",
+      ]),
+    # ---------------- 组 3 ----------------
+    T("TASK-014", "3.1", "execution-modes.md: 入口守卫、Step 1–5、三态模板、豁免文案", "M", "4-6", ["TASK-013"],
+      [f"{AE}/references/execution-modes.md"], "knowledge-manager", "运行时处方文档",
+      [
+          "§入口逻辑: :9 保留; :10 改为按 :15 的优先级链判是否启用, adaptive 档取上界 (任一档非 off 即照常进入), 逐字含「checkpoints 显式值 > adaptive_rules 推导值」与「入口层不解析」",
+          "Step 2: :43 改为 tasks.md 读前必看第 7 条的逐字句; :44 的 WARN 与 :82 统一为 §1.1 的同一句",
+          "Step 3: 在 mid_post_spec 条款之后追加 - key != \"mid_implementation\"(…) 与 - key != \"post_brainstorm\"(…) 两行, 与既有条款同构; 枚举源改为过优先级链 (与 :15 同句)",
+          "Step 4-5: 删除两个通配行; 改为经 scripts/completeness_gate.py 的调用串 (逐行照抄 metadata.canonical_call, 行首缩进随所在围栏; N4 逐行去首尾空白后比较; 该区间内脚本路径只出现在调用行) + §1.2 规则 + §1.3 三态 + §1.4 契约; Step 5 路由段逐字写入消费方 fail-closed 义务 (含「stdout 非 JSON」与「不得按 PASS」)",
+          "保留: Step 1: 到 Step 5: 五个行首标记原样保留 (N1 / N2 按标记切片), :34 开 / :66 闭的围栏不拆不增",
+          "校验失败输出改三态模板, missing 的 Fix 四项 (第二项逐字附 adaptive 推导的理由)",
+          "互补说明 (:25-30) 补一句「完整性门自本 spec 起带 change 维度」(新写文字不用裸 issue 编号, 以小节名指代); Step 1 补脚本侧等价实现注",
+          "机检由 TASK-018 统一跑",
+      ]),
+    T("TASK-015", "3.2", "audit-engine SKILL.md: 输入参数五项、fenced bash 调用块、两个 allow_* 注释、:423、相关文档", "S", "2-3", ["TASK-014"],
+      [f"{AE}/SKILL.md"], "knowledge-manager", "Skill 入口文档",
+      [
+          "## 输入参数 表补 change_id / repo_path / diff_repo_path / base / anchor_base 五行, 必填列照 proposal §2 表 (repo_path 与 diff_repo_path 为「必传」)",
+          "## 执行流程 第 (2) 阶段描述改为经 completeness_gate.py 机械执行; 在 sibling_spec_probe 调用块之后新增 ```bash 围栏块, 块内顶格照抄 metadata.canonical_call (N4)",
+          ":423 (emergency hotfix lane) 的条件改为「仅 `audit.enabled=true` 且 pre_merge 按 C.2 pre_hook 步骤 3 的优先级链判为启用时」, 与 TASK-016 的 :754 同一短语 (N8)",
+          ":381-384 与 :385-388 两个注释块各补一句: allow_dangling_change_ids —— completeness gate 的 S1 锚点校验继承本键; allow_incomplete_checkpoints —— 豁免 missing / scope_unresolved / spec_level_undetermined / no_spec_unverifiable, 不豁免 no_spec_contradicted 与 change_id_unanchored",
+          ":427-433 相关文档加 completeness gate 契约指针 (块外提及不计数)",
+          "frontmatter (含 description) 零改动: 以 awk 'NR==1&&$0==\"---\"{f=1;next} f&&$0==\"---\"{exit} f' 切出首个 --- 与下一个 --- 之间的块, 对 git -C aria show <aria 起点>:skills/audit-engine/SKILL.md 与工作树文件各切一次, sha256 相等 (A.2 在 scratch 三态实跑: 1cb3872 对当前文件相等, 改 description 后不等)",
+      ]),
+    T("TASK-016", "3.3", "phase-c-integrator SKILL.md (CRLF): 步骤 3 五档链与同形两处、pre_hook 五参数、4.5、:157", "M", "3-4", ["TASK-015"],
+      [f"{PC}/SKILL.md"], "knowledge-manager", "调用方处方文档",
+      [
+          "步骤 3 (:132) 改为 proposal §3 的逐档写法: 级 1 显式值非 off 即调用门; 2a adaptive 取上界; mode == \"convergence\" 与 mode == \"challenge\" 视为启用、照常调用门; manual 视为 off 早退; 其余 mode 照常调用门、由门判 config_unreadable; 逐字含「checkpoints 显式值 > adaptive_rules 推导值」「mode == \"convergence\"」「mode == \"challenge\"」「照常调用门」",
+          ":57 的触发条件摘要与 :754 的 hotfix 降级条件改为「pre_merge 按 C.2 pre_hook 步骤 3 的优先级链判为启用时」, 两处不再单独写 audit.checkpoints.pre_merge != \"off\" (tasks.md 读前必看第 19 条); 该短语只用于这两处与 audit-engine/SKILL.md:423 (N8 按锚点行判定); :42 配置表的缺省值行不动",
+          "pre_hook 步骤 4 追加 change_id / repo_path / diff_repo_path / base / anchor_base (两个路径参数必传、base 为远程跟踪 ref), 文字照 proposal §3; 步骤 5 前插「4.5 completeness gate 三态处置」, 逐字含「not_applicable → workflow report 必带」与「unattributed_count > 0」",
+          ":157 的 pre_merge-{timestamp}.md 改为 report-storage.md 的 5-field 形态; 步骤 2 (:131) 不动",
+          "CRLF: 编辑前 git -C aria ls-files --eol -- skills/phase-c-integrator/SKILL.md 为 i/crlf w/crlf; 用保留行尾的方式编辑; 编辑后、暂存前 metadata.crlf_guard 为真; frontmatter 去 CR 后与 aria 起点逐字相同 (metadata.crlf_guard.frontmatter_rule)",
+      ]),
+    T("TASK-017", "3.4", "旧 schema 散文残留三处、report-storage 四句、pre-write-validation 关联行", "S", "1-2", ["TASK-016"],
+      ["aria/skills/phase-a-planner/SKILL.md", "aria/skills/phase-b-developer/SKILL.md",
+       f"{AE}/references/report-storage.md", f"{AE}/references/pre-write-validation.md"],
+      "knowledge-manager", "文档勘正",
+      [
+          "phase-a-planner/SKILL.md:267 与 phase-b-developer/SKILL.md:204、:277 的 {timestamp} 形态改为 report-storage.md:8 的 5-field 形态; report-storage.md:37,43 与 report-format.md:5 的向后兼容描述不动",
+          "report-storage.md §向后兼容追加 proposal §4 表所列四句; 第 (3) 句逐字含「子目录内的报告不计入完整性证据」, 第 (4) 句逐字含「三个桶都不收」",
+          "CRLF: phase-b-developer/SKILL.md 按 TASK-016 的 CRLF 条款处理 (编辑前 i/crlf w/crlf, 编辑后暂存前 crlf_guard 为真, frontmatter 去 CR 后不变); phase-a-planner/SKILL.md 是 LF",
+          "pre-write-validation.md:3 关联行补「完整性门自本 spec 起带 change 维度」的等义句 (新写文字不用裸 #n)",
+      ]),
+    T("TASK-018", "3.5", "文档机检 (SC-13 + N1 / N2) 与组 3 提交", "S", "1-2",
+      ["TASK-017"], [LEDGER], "qa-engineer", "机械核验",
+      [
+          "SC-13 逐条 (proposal :469) 在组 3 改动后全真; A.2 在 1cb3872 的基线值见 metadata.sc13_baseline (全部为红态), 组 3 后应为: 通配模式计数 0 (基线 2); timestamp 残留 0 (基线 4); report-storage 三条逐字计数 ≥1 / =1 / =1 (基线 0); phase-c-integrator 的 change_id 计数较基线 3 至少 +1; execution-modes 的 adaptive_rules 计数较基线 3 至少 +1; 两处 bypassed 文案逐字相同 (基线两种拼法); audit-engine/SKILL.md 的 ```bash 块切片内 scripts/completeness_gate.py 恰 1、execution-modes.md 的 Step 4: 至 Step 5: 行区间内恰 1, 两段调用串由 N4 比较; 调用方接缝与 R5 五条 grep 全真 (基线全 0; 旧句「跳过校验, 继续执行 pre_merge 审计」基线 1 → 0)",
+          "metadata.new_checks: n1 与 n2 对 execution-modes.md 为真, n3 对 completeness_gate.py 为真, n4 (canonical = metadata.canonical_call 按行切分) 与 n8 为真 (三态见 metadata.a2_state_runs 与 metadata.v2_state_runs); metadata.crlf_guard 对两个 CRLF 文件为真 (暂存前跑); audit-engine / phase-c-integrator / phase-b-developer 三份 SKILL.md 的 frontmatter 与 aria 起点逐字相同 (CRLF 文件先去 CR); 这三条与 SC-13 守的是文本落点, 拦不住语义写错, 语义由组 2 单测与组 4 反事实守",
+          "grep -rn 'audit-reports/[a-z_]*-{timestamp}\\.md' aria/skills/ 零命中",
+          "主控只 add TASK-014~017 的七个文件并提交 (提交前完成上两条); 提交后 git -C aria status --porcelain 为空; SHA 记台账",
+      ]),
+    # ---------------- 组 4 ----------------
+    T("TASK-019", "4.1", "反事实第一批: SC-1~SC-10 与 SC-18", "L", "5-7", ["TASK-018"], [LEDGER], "qa-engineer",
+      "补丁由既非实现者也非测试作者的实例构造",
+      [
+          COUNTERFACTUAL_METHOD,
+          "补丁由 qa-engineer 的新实例构造, 该实例未参与 TASK-004~006 与组 2 (台账记实例标识); 首个失败断言不是 SC 原句所指的那条 ⇒ 原样记台账并上报, 不为凑结果改补丁",
+          "SC-1: 归属退回 {checkpoint}-*.md 通配 ⇒ post_implementation@x 判 present",
+          "SC-2: 规则 2 退回纯中缀 ⇒ F-a 少计; 按第 4 段取 spec_id ⇒ A1- 与 R5.5 形态少计",
+          "SC-3: 有界排除退回 c.startswith(id + '-') 单向写法 ⇒ 后缀与中缀两格判 present",
+          "SC-4: 两个计数合并定义 ⇒ excluded_legacy_count 变 4; 不截断、缺尾巴或换连接符 ⇒ WARN 整行比对红",
+          "SC-5: proposal SC-5 的八条反事实逐条, 其中 (8) = S3 不做非空短路",
+          "SC-6: (c) 退回只看两个文件 ⇒ case (3) 判 not_applicable (该补丁 diff 供 TASK-022 复用)",
+          "SC-7: 去掉 --no-renames ⇒ rename 格落 S4; 锚点用裸 glob ⇒ 判有锚; 不继承 allow_dangling_change_ids ⇒ exit 2; Level 失败不走同一降级 ⇒ exit 2; 不实现 not_applicable 通道 ⇒ missing; adaptive Level 1 落格 C ⇒ exit 2",
+          "SC-8: 去掉 mid_implementation 排除 ⇒ checked_checkpoints 多出该键; 按 config 键序输出 ⇒ 顺序不等",
+          "SC-9: 不短路 ⇒ 第一跑落格 C exit 2; adaptive 跑照常枚举 ⇒ checked_checkpoints 非空; spec_level_undetermined 不降级 ⇒ (4) exit 2",
+          "SC-10: --repo-path 取 cwd 缺省或 --diff-repo-path 取 --repo-path 缺省 ⇒ 缺参不 exit 2; 不设互斥 ⇒ 同传不 exit 2; 经「坏 JSON 返默认值」读 config ⇒ 非 config_unreadable",
+          "SC-18: 去掉 post_brainstorm 排除 ⇒ checked_checkpoints 含它",
+      ]),
+    T("TASK-020", "4.2", "反事实第二批: SC-15~SC-17 与 SC-19~SC-22", "L", "5-7", ["TASK-019"], [LEDGER], "qa-engineer", "同上",
+      [
+          "做法与实例要求同 TASK-019",
+          "SC-15: 空集一律 error ⇒ (3) 红; 级 2 只处理 adaptive ⇒ (5) 落格 B; mode 拼错静默 off ⇒ 非 config_unreadable; 不拆格 D ⇒ (6) 落格 C; 保留 enabled_by 全称前置 ⇒ (7) 未落格 B; 格 E 落格 C 或 enabled_by 留空 ⇒ (8) 红; enabled_by 当标量 ⇒ (9) 的 [INFO] 只 1 条; 归约量化到全体 checkpoint ⇒ (9)(ii) 误落格 D; 不内联映射 ⇒ (4) 空集",
+          "SC-16: 不排除 mid_implementation ⇒ missing 与 fail",
+          "SC-17: 核验面绑 --diff-repo-path ⇒ (4) 判 not_applicable; S2 绑 diff 面 ⇒ (6) 落 S4; --diff-repo-path 有缺省 ⇒ (7) 不 exit 2; 字符串比同仓 ⇒ (2) 误判跨仓; (5) 按 TASK-006 改写后的三条反事实",
+          "SC-19: iterdir 换 rglob ⇒ matched_count 2; unattributed 不要求 checkpoint 前缀 ⇒ (b) 计数 1; 去掉规则 1 ⇒ (c) matched_count 1",
+          "SC-20: 字面枚举合并视图 ⇒ (1)(2) 缺项或空集; 不剥删除线 ⇒ (4) 取 2; 任何 head-window ⇒ (5) 落 undetermined; 窄正则 ⇒ (6) 三格落 undetermined; 叉乘 ⇒ (7) fail",
+          "SC-21: 改脚本常量任一缺省或删映射一条 ⇒ (1)(2) 红",
+          "SC-22: 不做陈旧比对 ⇒ 无 WARN; 只比 --base ⇒ (iii) 无 WARN; 不判目录直接 iterdir ⇒ crash; 保留旧 WARN 文案 ⇒ 逐字断言红",
+      ]),
+    T("TASK-021", "4.3", "回归: SC-12 三套、SC-12 liveness (重写 a)、catalog 5/8 单测", "S", "2-3", ["TASK-018", "TASK-019", "TASK-020"],
+      [LEDGER], "qa-engineer", "回归与接线核验",
+      [
+          "会话不带 ARIA_COORDINATION_NO_PUSH (判法同 TASK-001)",
+          "SC-12 三条: cd aria/skills/audit-engine/tests && python3 -B -m unittest discover -s . -p 'test_*.py'; state-scanner/tests 与 phase-c-integrator/tests 同命令; 三者零失败 (A.2 在副本的基线: Ran 104 OK / Ran 1605 OK (skipped=1) / Ran 148 OK); Ran 数变化逐条归因",
+          "重写 a: 先跑 metadata.sc12_liveness.guard_config_hooks, 须无输出; 再在主仓根 (aria 工作树为 feature 分支 HEAD, 含组 2 与组 3 提交) 执行 metadata.sc12_liveness 的代码并加 --force-checked, 要求 L2 与 L3 为真; L1 在一次性副本 (主仓 feature 分支 clone, aria 为 feature 分支 HEAD 的嵌套 clone 并 git submodule init, 做法同 metadata.a2_state_runs) 里把本目录 tasks.md 全部勾选后跑, 要求为真; 三项输出原样记台账 (A.2 预演见 metadata.a2_state_runs 的 C 态)",
+          "catalog 5/8: cd aria/skills/phase-c-integrator/tests 后 python3 -B -m unittest test_pre_merge_gate.GateCheckTests -v 与 test_pre_merge_gate.NotFoundVerdictTests.test_sc2_trigger_matched_message -v 与 test_path_coverage.InternalErrorReasonTests.test_internal_error_has_own_reason -v 全 OK (A.2 实测 GateCheckTests 7 条 OK); catalog 字面 node id test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_routes_fail 报 AttributeError 属已知缺口 (真实方法 test_case_e_malformed_aether_main_leg_routes_fail, test_pre_merge_gate.py:266), 记台账",
+      ]),
+    T("TASK-022", "4.4", "活体运行 (SC-11) 与 SC-6 自证 (重写 c)", "S", "1-2", ["TASK-021"], [LEDGER], "qa-engineer", "活体证据",
+      [
+          "在主仓根 (aria 为 feature 分支 HEAD, 一分钟内 fetch 过 origin) 跑 proposal SC-11 的命令 (两个路径参数都是主仓根, --base origin/master --anchor-base origin/master, --change-id pre-merge-completeness-gate-change-scope): stderr 不含 [WARN] base ref 陈旧 (传远程跟踪 ref 时该告警结构上不会出现, 这一条只防命令被改回裸 master); post_spec 为 present 且 matched_count ≥ 6; post_planning 为 present (tasks.md 读前必看第 16 条; 实跑为 missing 属新发现: 记台账并上报, 本任务不判失败, 也不改断言); unattributed_count > 0 且 unattributed 非空 (不写死数值)",
+          "同命令改 --change-id zz-not-a-change ⇒ change_id_unanchored exit 2",
+          "重写 c (i): 在 scratch 建 hermetic 仓 (git init -b master, 一次提交), 写入 git show a563192:openspec/changes/pre-merge-completeness-gate-change-scope/proposal.md 的原样字节并核 sha256 = d3c9b4f2089031bd1adcc95aeba964a3991d99f16c50026b07795119607d6f34, 按重写 c 的配置以 TASK-013 SHA 的脚本跑 ⇒ post_planning 该对恰为 missing; 再在按 TASK-019 记下的 SC-6 补丁重建的副本上跑 ⇒ not_applicable 且 reason no-a2-artifact",
+          "重写 c (ii): 对当前目录同命令的 post_planning 行为 present 或 missing, 且 reason 不是 no-a2-artifact",
+          "输出原样记台账, 周期 handoff 摘录",
+      ]),
+    # ---------------- 组 5 ----------------
+    T("TASK-023", "5.1", "AB 套件编辑: eval id 3、audit-engine.json 文件版本、version.yaml", "S", "2-3", ["TASK-022"],
+      ["aria-plugin-benchmarks/ab-suite/audit-engine.json", "aria-plugin-benchmarks/ab-suite/version.yaml"],
+      "qa-engineer", "定向 fixture 设计",
+      [
+          "eval id 3 (descriptive, 与 id 1 / 2 同结构: id / name / prompt / expected_output / expectations): prompt 给定目录清单 (含他人 change 的同 checkpoint 报告、本 change 的末段形态报告、一份 Phase A-only 的 diff)、config 与 change_id, 要求写出调用命令行、逐对三态结果与 [INFO] / [WARN] / ERROR 措辞; expectations 至少三条: 不得把其它 change 的报告当证据 / 末段形态 …-<id>.md 必须计入 / not_applicable 必须以 [INFO] 行 surface",
+          "audit-engine.json 文件内 version 由 1.0.0 改为 1.1.0",
+          "version.yaml: git fetch origin 后读 git show origin/master:aria-plugin-benchmarks/ab-suite/version.yaml 的 version 与 changelog 顶条, 新值 = 该值的下一个 MINOR (A.2 时 1.5.0 → 1.6.0), 已被占 ⇒ 顺延; 在飞轨 (如 10CG/Aria#211 的 T4) 未合并前看不到, 以 TASK-030 合并时的冲突或合并后复读为准; changelog 顶部加本 spec 条目; skills_covered = ls aria-plugin-benchmarks/ab-suite/*.json | wc -l, total_eval_cases = 各 json 的 len(evals) 之和 (A.2 实测 32 / 84, 加 eval 后应为 32 / 85), 由命令重生成",
+          "两文件 json / yaml 均可解析; 主仓 PR 合并后再读一次 version.yaml, 核「这个值现在该是什么」",
+          "开 AB 会话之前 (本会话不带 ARIA_COORDINATION_NO_PUSH): 按 TASK-025 第一条的做法把 aria origin/master 并入 feature 并重跑 TASK-018 与 TASK-021, 使 TASK-024 开跑时 feature 已含上游",
+          "主控在主仓 feature 分支提交",
+      ]),
+    T("TASK-024", "5.2", "Rule #6 照跑 (两读法并集): audit-engine 与 phase-c-integrator 两个套件", "L", "5-8", ["TASK-023"],
+      ["aria-plugin-benchmarks/ab-results/<YYYY-MM-DD>-pre-merge-completeness-gate-rule6/", LEDGER],
+      "qa-engineer", "AB 编排与区分力判读",
+      [
+          "前置 (owner_gates 第 4 项): 会话以 ARIA_COORDINATION_NO_PUSH=1 启动; 用与 CLI 同一判据在子进程核: cd aria/skills/state-scanner && python3 -B -c 'import sys; sys.path.insert(0, \".\"); from lib.failure_handlers import no_push_requested_by_env as f; sys.exit(0 if f() else 1)' 退出 0 (取值须为 1 / true / yes, 仅已设置不算); 不满足 ⇒ 停在本步 (会话内补不上)",
+          "本会话从第一次快照到第二次快照之间不调 /state-scanner、不执行任何 fetch (否则他人推送的对象会进本地, 使远端比较误判为本机推出)",
+          "AB 基线 (第一次快照之前): git -C aria fetch origin; git -C aria merge-base --is-ancestor origin/master <feature 分支 HEAD> 退出 0 (TASK-023 末条已并入); 不成立 (其间上游又前进) ⇒ 停下上报, 由 owner 决定是否回到不带该变量的会话再并入; 记 A = aria origin/master SHA、W = feature 分支 HEAD (TASK-027 第 4 步用)",
+          "臂: with_skill = W 的工作树 (skills/audit-engine 与 skills/phase-c-integrator); without_skill = git -C aria worktree add <scratch> A 的快照 (old_skill 语义, 先例 aria-plugin-benchmarks/ab-results/2026-09-03-v1.69.0-sibling-spec-probe-rule6)",
+          "形态: 两个套件的全部 eval 按 descriptive 下发 (AB_TEST_OPERATIONS.md 规则 1: 未声明即 descriptive); 执行器提示逐字附「只做描述性推演: 不得执行 git fetch / pull 与任何 git 写命令 (commit / merge / push / tag / reset / checkout 等), 不得调用 forgejo 的写接口」; 不改任何 remote 配置",
+          "快照 (开跑前与结束后各一次): 主仓与 aria 的 git rev-parse HEAD、不带路径的 git status --porcelain、git branch --list; 主仓与三个子模块各自 git ls-remote origin 与 github 的 refs/heads/master; git -C aria ls-remote --tags origin 与 github; refs/aria/coordination 的本地值与 origin 的 ls-remote 值; forgejo GET /repos/10CG/Aria/pulls?state=open 与 /repos/10CG/aria-plugin/pulls?state=open 的编号与 head 分支",
+          "快照比较: 本地面 (HEAD / porcelain / 分支) 除结果目录与 skill-creator 工作区外有变化 ⇒ 停下上报; 远端值有变化 ⇒ 对每个新值在对应仓跑 git cat-file -e <新 SHA>: 本地已有该对象 ⇒ 视为本机推出, 停下上报; 本地没有 ⇒ 他人推送, 记台账继续; 新增 PR 的 head 分支在本地存在且 SHA 相同 ⇒ 停下上报",
+          "开跑前在结果目录写 PREDICTION.md: 逐套件、逐 eval 预测两臂分数; audit-engine 套件另预测 delta",
+          "套件: audit-engine.json (eval 1 / 2 / 3) 与 phase-c-integrator.json (eval 1 / 2 / 3) 两臂各跑, 经 /skill-creator; phase-c-integrator-pre-merge-gate.json 不进 AB 臂 (裁定 9), 其 5/8 可执行单测已在 TASK-021",
+          "判据 (逐套件): 两个套件都逐 eval 判回归 —— with < without 的 eval 复跑两次, 三个样本中两个以上仍劣即回归; audit-engine 套件另要求 delta.pass_rate = mean(with) − mean(without) > 0 (三条 eval 的均值, 由脚本从两臂 grading 汇总并与 benchmark.json 核对符号) 且 eval id 3 的 without 分数低于 with; phase-c-integrator 套件不看 delta。任一不满足 ⇒ 阻断 TASK-025, 请 owner 裁 (owner_gates 第 5 项)",
+          "README / RESULT: catalog 三条命令与 TASK-021 的输出、三条缺口 (wait_then_green 与 NEG-2-timeout 无 node id; NEG-1-malformed 的 node id 过期)、rule6_note 的并集说明、A 与 W; RESULT.md 分套件登记 AB_TEST_OPERATIONS.md 场景 1 验收 delta.pass_rate > 0 的达成情况 (phase-c-integrator 套件预期约 0, 如实登记, 不作阻断); 按场景 1 第 2 步核 transcript 的 push_skipped",
+          "结束后先取第二次快照并完成上条比较, 然后才跑 metadata.coord_ref_precheck (它会 fetch); 退出 0 才按场景 1 第 3 步强制对齐 (被丢弃的只有本轨 --no-push 心跳, 下个会话重新刷新); 退出非 0 ⇒ 不对齐, 停下请授权 (owner_gates 第 15 项); 对齐前后的值记台账; 换不带该变量的会话继续",
+          "结果目录与台账由主控在主仓 feature 分支提交",
+      ]),
+    T("TASK-025", "5.3", "版本 MINOR 与 CHANGELOG 十三条迁移文案", "S", "2-3", ["TASK-024"],
+      ["aria/.claude-plugin/plugin.json", "aria/.claude-plugin/marketplace.json", "aria/VERSION", "aria/CHANGELOG.md", "aria/README.md"],
+      "knowledge-manager", "发布文档",
+      [
+          "并入上游 (改任何版本文件之前): git -C aria fetch origin; git -C aria merge-base --is-ancestor origin/master HEAD 不成立 ⇒ git -C aria merge origin/master (不 rebase); 冲突 ⇒ git -C aria merge --abort, 停下上报 (owner_gates 第 6 项, 恢复指针 aria ec72175); 合并后在不带 ARIA_COORDINATION_NO_PUSH 的会话重跑 TASK-018 与 TASK-021, 全部通过才继续; 合并提交与重跑输出记台账",
+          "取号: 记此刻 aria origin/master SHA (即刚并入的值, 供 TASK-027 复核); 读 plugin.json 现值、git -C aria ls-remote --tags origin 与 github 的最高 tag、10CG/Aria#195 的发布号; 新号 = 三者最高者的下一个 MINOR (patch 归 0); 依据记台账",
+          "五文件改为新号 (逐处 grep -n 实测后改), 改后复验五处取值一致",
+          "CHANGELOG 新节: ### Added (completeness_gate.py、五个输入参数、16 键 stdout 契约) / ### Changed (Step 3-5 改为按 change 匹配与三态) / 迁移文案十三条 = proposal §5 第 1–12 条 (第 2 条的豁免列表补 no_spec_unverifiable; 第 10 条按裁定 11 改写为可由 allow_incomplete_checkpoints 豁免; 两条都以 tasks.md 读前必看第 7 条为准; 第 11 条写明另有跟踪 issue, 号在 Phase D 开出后记周期 handoff) 加「post_brainstorm 不再作为前置依赖」; 用 grep -n '^## \\[' 定位插入点",
+          "description 零改动, rule6_note 的 substitute 集不变; 主控在 aria feature 分支提交",
+      ]),
+    T("TASK-026", "5.4", "引用与编号写法自检 (两次)", "S", "1-2", ["TASK-025"], [LEDGER], "knowledge-manager", "写法规范",
+      [
+          "第一次 (TASK-027 之前): 把本 cycle 的新增行导出到 scratch 文件 (aria: git -C aria diff <aria 起点>..HEAD 的 + 行; 主仓: git diff <主仓起点>..HEAD 的 + 行), 以 python3 -B aria/skills/state-scanner/scripts/check_bare_issue_refs.py --repo-root=<该仓根> <导出文件> 自检, 命中逐条改为全限定写法或注明属 Rule #N 例外; 带圈与带框编号用 standards/conventions/content-integrity.md §4.5 的自查命令查",
+          "第二次 (在 TASK-031 内, 周期 handoff、回帖与 issue 正文落笔前): 对这些正文做同样两项自检",
+          "不以整份文件 rc 0 为门槛 (tasks.md 读前必看第 11 条); A.2 时本目录 tasks.md 与本文件两项自检均零命中; 结果记台账",
+      ]),
+    T("TASK-027", "5.5", "aria 本地合并、取号复核与终核、合并树回归、打 tag (不推送)", "M", "2-4", ["TASK-026"],
+      ["aria master 本地合并提交与 tag v<vNEXT> (未推送)", LEDGER], "backend-architect",
+      "多远程硬约束 1: 子模块一律本地合并; 推送前在合并树上重验",
+      [
+          "步骤固定 1–8, 每步输出记台账; 任一步不成立 ⇒ 停在本步上报 (owner_gates 第 6 项); 恢复只给先例指针 aria ec72175 (owner 确认后在 feature 分支 merge origin/master、重新取号、重跑 TASK-018 / TASK-021 / TASK-026, 台账追加新的取号记录), 做完从 TASK-025 开头重走 (第 2 步的本地可修复分支除外)",
+          "第 1 步: git -C aria fetch origin",
+          "第 2 步: 仍在 feature 分支, git -C aria status --porcelain 为空; 不为空 ⇒ 查明归属后在 feature 分支只 add 被改文件提交, 或上报; 不 stash",
+          "第 3 步: git -C aria checkout master, 断言 rev-parse master 等于 rev-parse origin/master; 不等 ⇒ git -C aria merge --ff-only origin/master 后再断言一次, 仍不等 (本地领先) ⇒ 停; 记下此刻 SHA S3 与 git -C aria show master:CHANGELOG.md | grep -oE '^## \\[[0-9]+\\.[0-9]+\\.[0-9]+\\]' | sort -u 的集合 (写入 scratch 文件)",
+          "第 4 步 取号与 AB 复核: (a) S3 不等于 TASK-025 记下的取号时 SHA ⇒ 停下上报; (b) git -C aria diff --stat <TASK-024 记下的 A> S3 -- skills/audit-engine skills/phase-c-integrator 有输出 ⇒ AB 实测的处方文本与将要合并的不同, 停下, 按 owner_gates 第 4 项重跑 TASK-024 后从 TASK-025 重走",
+          "第 5 步: git -C aria merge --no-ff <feature 分支>, 断言 rev-parse HEAD 不等于 S3 且 rev-parse HEAD^2 等于 feature 分支 HEAD (防「Already up to date」退出 0); 冲突或断言不成立 ⇒ 有 MERGE_HEAD 则 merge --abort, 已产生本轮合并提交则 reset --hard S3 (只丢未推送的本地合并), 以「HEAD 等于 S3 且 porcelain 为空」收尾后停 (恢复指针同上)",
+          "第 6 步 取号终核: 五文件取值等于台账记录的新号; 在 bash 下 comm -23 <第 3 步集合文件> <(git -C aria show master:CHANGELOG.md | grep -oE '^## \\[[0-9]+\\.[0-9]+\\.[0-9]+\\]' | sort -u) 输出为空 (对方发版小节没丢); git -C aria ls-remote --tags origin 与 github 均无 v<vNEXT>; 不成立 ⇒ 按第 5 步回退后停",
+          "第 7 步 合并树原位回归: 仅当 porcelain 为空且 HEAD 等于合并 SHA 时, 在该工作树跑 TASK-021 第 2 条的三条命令 (会话不带 ARIA_COORDINATION_NO_PUSH)、TASK-018 的全部文档机检、metadata.sc12_liveness 的 L2, 以及在主仓根跑已启用检查 no-unresolved-version-placeholder 的 command (.aria/state-checks.yaml:29-46, 通过 = 无输出); Ran 数与 TASK-021 的差逐条归因",
+          "第 8 步: 回归通过后打附注 tag: git -C aria tag -a v<vNEXT> -m '<一行摘要>'; 回归不通过 ⇒ 不打 tag, 不进 TASK-028",
+      ], notes="合并与打 tag 由主控执行 (subagent 不 commit)"),
+    T("TASK-028", "5.6", "aria 双推与逐 remote 核验", "S", "1", ["TASK-027"], ["aria master 与 tag v<vNEXT> (origin 与 github)", LEDGER],
+      "backend-architect", "多远程硬约束 2; 授权是等待点, 与合并拆开",
+      [
+          "推送前对 origin 与 github 各跑 git -C aria ls-remote --tags <remote>, 确认无 v<vNEXT>; 有 ⇒ git -C aria tag -d v<vNEXT> 后按 TASK-027 第 5 步回退, 停下上报",
+          "owner 逐项授权后 (owner_gates 第 7 项) 每个远端一条原子推送, 先 origin 后 github: git -C aria push --atomic <remote> master refs/tags/v<vNEXT>; 禁 --follow-tags 与非原子的多 ref 推送 (master 被拒时 tag 会照样发布成孤儿); 命令超时不少于 300 秒",
+          "推后对每个 remote 各跑 git -C aria ls-remote <remote> refs/heads/master 'refs/tags/v<vNEXT>*', 逐行核名字: master 等于本地合并 SHA, tag 行等于 git -C aria rev-parse v<vNEXT>, ^{} 行等于合并 SHA; ls-remote 失败先重试再下结论; 不信 push 回执",
+          "被拒或只推成一个远端 ⇒ 不 force、不重打 tag、不改写历史, 原样记台账并停下上报 (owner_gates 第 8 项); 两个远端未都核验一致前不进 TASK-029",
+      ], notes="由主控执行"),
+    T("TASK-029", "5.7", "主仓发布同步面: aria gitlink、16 个版本点、custom checks", "S", "2-3", ["TASK-028"],
+      ["aria", "VERSION", "README.md", "README.zh.md", "README.ja.md", "README.ko.md", "CLAUDE.md",
+       "docs/architecture/system-architecture.md", "docs/architecture/version-scheme.md", LEDGER],
+      "knowledge-manager", "主仓同步面多处无机械兜底",
+      [
+          "前置: TASK-028 已对 origin 与 github 双方核验一致; 否则不 bump (半推后 bump 出的 gitlink 在 github 侧指向不存在的对象, clone --recursive 即断)",
+          "gitlink: aria 工作树 HEAD 等于合并 SHA 时 git add aria; 断言 git -C aria merge-base --is-ancestor <动手时 git ls-tree HEAD aria 的值> <合并 SHA> 退出 0 (只前进)",
+          "16 个版本点逐处 grep -n 实测后改为新号: README.md 两处 (A.2 时 :8 / :242); README.zh.md / README.ja.md / README.ko.md 各三处 (:3 translated-from / :10 / :244); CLAUDE.md 两处 (:139 / :141); VERSION:24 (A.2 时仍为 v1.73.0, 直接写新号); docs/architecture/system-architecture.md:189; docs/architecture/version-scheme.md:23; 行号以执行时 grep 为准",
+          "i18n README 只改版本处 (正文无实质变更, 不重译)",
+          "复跑 custom checks: m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match / main-project-version-consistency / no-unresolved-version-placeholder 为 OK; plugin-cache-currency 在 owner 更新插件缓存前预期 STALE",
+          "主控在主仓 feature 分支只 add 本任务交付物提交, SHA 记台账",
+      ]),
+    T("TASK-030", "5.8", "主仓 PR、pre-merge gate (Rule #8)、合并、C.2.5 双推与核验", "S", "2-3", ["TASK-029"],
+      ["主仓 PR (Forgejo) 与 master 合并提交", LEDGER], "backend-architect", "主仓集成; C.2.5 委派前核五问",
+      [
+          "开 PR 前: 主控把台账截至此刻的追加提交到主仓 feature 分支; 不带路径的 git status --porcelain 原样记台账, 其中不得有行触及本 cycle 交付物 (本目录; .aria/audit-reports/ 下文件名含 pre-merge-completeness-gate-change-scope 的 post_planning 报告; 本次 ab-results 目录; TASK-023 与 TASK-029 的交付物), 其余行逐条记归属; 不 stash, 不顺带提交他人文件",
+          "提交范围: git fetch origin 后对 origin/master..<主仓 feature 分支> 跑 metadata.commit_attribution (第三个及之后的参数 = 本次 ab-results 目录, 以及被选作结果一部分的 skill-creator 工作区目录), 退出非 0 ⇒ 停 (owner_gates 第 16 项); 输出与 git log --oneline origin/master..<feature 分支> 随第 9 项的授权请求一并呈上",
+          "PR 正文与主仓 PR diff 新增行先过 TASK-026 的自检",
+          "合并方式: 同步 origin/master 用 git merge (不 rebase); PR 以 merge commit 合并 (不 squash); 经 phase-c-integrator 过 C.2.4 pre-merge gate, 结论记台账, 无可用 backend 时按 no_ci_fallback 显式降级; 本仓 audit.checkpoints.pre_merge 为 off, pre_hook 早退属配置决定 (Rule #10 白名单第一类)",
+          "合并后: git fetch origin → git checkout master → git merge --ff-only origin/master, 断言 Forgejo 回执里的合并提交 M 是 HEAD 的祖先 (git merge-base --is-ancestor M HEAD) 且 git rev-parse M^2 等于 feature 分支 HEAD; 不能快进或断言不成立 ⇒ 停 (C.2.5 以合并后本地 HEAD 为 expected_sha)",
+          "调 C.2.5 前逐条核 metadata.c25_five_questions 的事实并记台账",
+          "C.2.5 会对 git submodule status --recursive 的每个子模块执行 git push <remote> master 并以子模块 HEAD 判成功: 调用前对 aria / aria-orchestrator / standards 各自 fetch origin 与 github, 断言本地 master 等于 HEAD 等于 origin/master 等于 github/master (A.2 实测 aria-orchestrator 为 detached 的 237045a、其 master 与两端相同, standards 为 8b49562); 任一不成立 ⇒ 停下上报, 不让 C.2.5 顺带推他轨内容",
+          "C.2.5 的 per-remote 矩阵对 origin 与 github 均成功且 verify_parity_post_push 为 match, 矩阵原样记台账; 之后再独立 git ls-remote origin master 与 git ls-remote github master 与本地 HEAD 比对; 任一不符 ⇒ 停下上报, 不 force",
+          "台账所记主仓提交 SHA 均为 origin/master 的祖先 (git merge-base --is-ancestor)",
+          "合并后复核「这个值现在该是什么」: 在合并后的 master 上复跑 TASK-029 的 custom checks; 按 TASK-023 的命令重算 ab-suite 的 skills_covered / total_eval_cases 并与 version.yaml 比对, 再读 version.yaml 的 version 与 changelog 顶条; 任一不一致 ⇒ 停下上报 (他轨同期改动在此显形)",
+      ]),
+    T("TASK-031", "5.9", "Phase D: 开 issue、勾选、归档预演与 liveness 复跑、归档、释放 claim、回帖关单、周期 handoff、双推", "M", "3-5", ["TASK-030"],
+      [f"{SPEC}/tasks.md", f"{SPEC}/detailed-tasks.yaml",
+       f"openspec/archive/<YYYY-MM-DD>-{SID}/verification-ledger.md", "docs/handoff/<周期 handoff>.md"],
+      "tech-lead", "跨仓收尾与外向动作协调",
+      [
+          "先 git fetch origin, 本地 master 快进到含 TASK-030 合并提交的 origin/master; 不能快进 ⇒ 停",
+          "不调 phase-d-closer, 逐步对应: D.1 跳过 (本仓无运行时 UPM, 记台账) / D.2 = 下方归档预演与 openspec-archive / D.2b = release_gate, 不带 --sweep-stale 与 --gc (sweep / gc 须另行授权) / D.3 = 周期 handoff / D.4 = estimator capture 照跑: python3 -B aria/skills/ai-native-estimator/scripts/estimator.py --project-root . capture --spec-slug pre-merge-completeness-gate-change-scope --spec-level 3 --n-tasks 31 (非阻塞, 数据在已忽略的 .aria/estimator/, 失败记台账)",
+          "issue (owner_gates 第 10 项, 逐张授权; 开前按关键词定向查重, 不依赖截断清单): (1) 10CG/aria-plugin: --no-spec 声明与 refs/aria/coordination 的 active claim 交叉核验 (裁定 2); (2) 10CG/aria-plugin: 产出侧四个 checkpoint 调用方 (phase-a-planner:246 / task-planner:123 / phase-b-developer:255 / brainstorm:141) 按字面键早退, 对 adaptive 推导失明 (裁定 13); (3) 10CG/aria-plugin: F8 config 注册面缺口 (两个 allow_* 未进 DEFAULTS.json, config.template.json 无 audit 块); (4) 10CG/aria-plugin: 写侧报告命名约定无强制 (附 corpus-freeze.md 争议表与 unattributed 计数); (5) 10CG/aria-plugin: config-loader 无程序化入口 (内联第二副本); (6) 10CG/aria-plugin: audit-engine AB 套件对 pre_merge completeness gate 的覆盖缺口 (rule6_note 义务之三), 附 phase-c-integrator 与 audit-engine 两个套件都不覆盖 hotfix lane; (7) 10CG/Aria: ab-suite/phase-c-integrator-pre-merge-gate.json 的三条 node id 缺口。正文先过 TASK-026 第二次自检; 号回填台账与 ab-results README",
+          "勾选: 主控一次把 tasks.md 全部 31 行改为 [x], 同时把 5.2 行的 aria-plugin-benchmarks/ab-results/ 换成本次结果目录全路径 (git ls-files 有输出); 本文件各任务 status 改为 completed",
+          "归档预演 (只读): python3 -B aria/skills/state-scanner/scripts/lib/spec_complete.py --gate openspec/changes/pre-merge-completeness-gate-change-scope, 记 complete / verdict / blocking_reasons / unverified_claims; verdict 为 block ⇒ 停下上报; 预期 unverified_claims 含 4.4 行 dogfood 无可链接产物一条 (A.2 预演见 metadata.a2_state_runs 的 C 态)",
+          "SC-12 liveness: 先确认 metadata.sc12_liveness.guard_config_hooks 无输出, 再不加 --force-checked 复跑 sc12_liveness 的代码, L2 与 L3 为真才算 SC-12 通过, L1 为真",
+          "D.2 之前请 owner 裁归档 Step 7 建不建 tracker issue (owner_gates 第 11 项), 裁不建则只跳过 Step 7; 其余按 openspec-archive 执行 (git mv 整个目录与归档后落点断言); 归档后的台账写 openspec/archive/<日期>-pre-merge-completeness-gate-change-scope/verification-ledger.md",
+          "claim: 获授权 (owner_gates 第 13 项) 后先跑 metadata.coord_ref_precheck, 退出 0 才跑 python3 -B aria/skills/state-scanner/scripts/release_gate.py --raw-track-id pre-merge-completeness-gate-change-scope --status done --repo-path <主仓根>; 未获授权或检查不过 ⇒ 不 release (不写仅本地的 release), 记周期 handoff",
+          "10CG/Aria#199 与 10CG/aria-plugin#161 回帖 (版本号、合并 SHA、按 change 匹配与三态的行为变更要点) 后关闭 (owner_gates 第 12 项)",
+          "周期 handoff 写 docs/handoff/ (Rule #9), 照录 tasks.md 的 AI 流程判断清单并追加 Phase B–D 新增项, 摘录 TASK-022 的活体输出与各 issue 号",
+          "Phase D 提交经授权双推 (owner_gates 第 13 项), 推后逐 remote ls-remote 核 master; 被拒或只推成一个 ⇒ 停下上报",
+      ]),
+]
+
+hours_low = sum(float(str(t["estimated_hours"]).split("-")[0]) for t in tasks)
+hours_high = sum(float(str(t["estimated_hours"]).split("-")[-1]) for t in tasks)
+agents = {}
+for t in tasks:
+    agents[t["agent"]] = agents.get(t["agent"], 0) + 1
+
+metadata = {
+    "feature": SID,
+    "title": "pre_merge Completeness Gate 加 change 维度 (A.2 / A.3 v2)",
+    "level": 3,
+    "spec": f"{SPEC}/proposal.md",
+    "datasource": "tasks.md",
+    "created": "2026-09-17",
+    "updated": "2026-09-17",
+    "linked_issue": ["10CG/Aria#199", "10CG/aria-plugin#161"],
+    "container": "simonfish/023236f2",
+    "claim": "A.2 实读: refs/aria/coordination (be2ba7e, 与 origin ls-remote 相同) 的 claims/023236f2/s-86f7@1836.yaml, track_id pre-merge-completeness-gate-change-scope (无容器后缀), status active, phase A.2, heartbeat 2026-09-17T08:47:15Z",
+    "total_tasks": len(tasks),
+    "estimated_hours": f"{hours_low:g}-{hours_high:g}",
+    "agents": agents,
+    "verification_ledger": {
+        "path": LEDGER,
+        "path_after_archive": f"openspec/archive/<YYYY-MM-DD>-{SID}/verification-ledger.md (TASK-031 归档后)",
+        "writer": "主控唯一执笔; subagent 只交回命令与原样输出",
+    },
+    "scope_repos": [
+        {"repo": "aria (10CG/aria-plugin 子模块)", "head_at_a2": "1cb3872 (v1.73.3, 与 origin / github 的 master 相同)",
+         "proposal_freeze": "301641b", "branch_base": "B.1 实测 origin/master (TASK-001)",
+         "surface": "skills/audit-engine/{scripts/completeness_gate.py 新增, tests/test_completeness_gate.py 新增, SKILL.md, references/execution-modes.md, references/report-storage.md, references/pre-write-validation.md} · skills/phase-c-integrator/SKILL.md · skills/phase-a-planner/SKILL.md · skills/phase-b-developer/SKILL.md · 版本 5 文件"},
+        {"repo": "Aria (主仓)", "head_at_a2": "a563192 (origin 与 github 两端 ls-remote 相同)",
+         "branch_base": "B.1 实测 origin/master; 规划提交未推送时回落为含规划提交的本地 master (TASK-001)",
+         "surface": f"{SPEC}/ (tasks.md / detailed-tasks.yaml / corpus-freeze.md / verification-ledger.md) · aria-plugin-benchmarks/ab-suite/{{audit-engine.json, version.yaml}} · aria-plugin-benchmarks/ab-results/<本次目录> · aria gitlink 与 16 个版本点"},
+        {"repo": "standards", "head_at_a2": "8b49562", "surface": "不改"},
+    ],
+    "baseline_rebase": {
+        "measured": "2026-09-17, git -C aria diff --shortstat 301641b 1cb3872 -- <文件>",
+        "aria_zero_diff": [
+            "skills/audit-engine/references/execution-modes.md", "skills/audit-engine/SKILL.md",
+            "skills/audit-engine/references/report-storage.md", "skills/audit-engine/references/pre-write-validation.md",
+            "skills/audit-engine/references/report-format.md", "skills/audit-engine/references/convergence-algorithm.md",
+            "skills/audit-engine/scripts/sibling_spec_probe.py", "skills/audit-engine/tests/test_sibling_spec_probe.py",
+            "skills/phase-c-integrator/SKILL.md", "skills/phase-c-integrator/scripts/path_coverage.py",
+            "skills/phase-c-integrator/scripts/pre_merge_gate.py", "skills/phase-c-integrator/tests/test_pre_merge_gate.py",
+            "skills/phase-c-integrator/tests/test_path_coverage.py", "skills/phase-a-planner/SKILL.md",
+            "skills/phase-b-developer/SKILL.md", "skills/task-planner/SKILL.md", "skills/brainstorm/SKILL.md",
+            "skills/config-loader/SKILL.md", "skills/config-loader/DEFAULTS.json", "skills/config-loader/config-example.md",
+            "skills/agent-team-audit/references/audit-points.md", "skills/state-scanner/scripts/collectors/audit.py",
+            "skills/aria-dashboard/references/parse-rules.md", "skills/spec-drafter/LEVEL_GUIDE.md",
+            "skills/spec-drafter/SKILL.md", "skills/run_all_tests.sh", "skills/git-remote-helper/SKILL.md",
+        ],
+        "aria_shifted": [
+            "skills/state-scanner/scripts/lib/spec_complete.py: 1 insertion / 1 deletion, 原位改 :1636 注释; 被引的 :924 (if name == \"SKILL.md\") 与 :1642 (两文件皆缺早退) 不移",
+            "skills/state-scanner/scripts/collectors/multi_remote.py: 3 / 3, 原位改 :674-675 与 :1158 注释; 被引的 :107-113 不移",
+            "skills/state-scanner/scripts/check_bare_issue_refs.py: 301641b 上不存在 (v1.73.0 新增)",
+            "CHANGELOG.md: +116; [1.73.0] 现 :104 (proposal 写的 :36 是 f314785 上的号), [1.70.0] 现 :200, 完整性门条目 (301641b :3020) 现 :3136",
+            "VERSION: +7 / -3; v1.73.0 的 minor 行现 :7, v1.71.1 的 patch 行现 :8",
+            ".claude-plugin/plugin.json / .claude-plugin/marketplace.json / README.md: 版本号; skills/openspec-archive/SKILL.md 与 skills/phase-d-closer/SKILL.md 有改动但 proposal 未按行号引用",
+        ],
+        "standards": "openspec/project.md / openspec/templates/proposal-minimal.md / conventions/configured-gate-authority.md / conventions/skill-benchmark-exemption.md / conventions/version-management.md 对 proposal 定稿时的 gitlink 21748d4 零 diff; conventions/content-integrity.md +56 / -2 (新增 §4.4 / §4.5)",
+        "main_repo": [
+            "aria-plugin-benchmarks/ab-suite/audit-engine.json", "aria-plugin-benchmarks/ab-suite/phase-c-integrator.json",
+            "aria-plugin-benchmarks/ab-suite/phase-c-integrator-pre-merge-gate.json", "aria-plugin-benchmarks/ab-suite/version.yaml",
+            "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md", ".aria/config.json", ".aria/state-checks.yaml",
+        ],
+        "main_repo_note": "上列文件 git diff --shortstat bf42cf4 a563192 均为空; proposal.md 自 0a2ae53 起未变 (a563192 上 sha256 d3c9b4f2…6f34)",
+    },
+    "rulings_applied": [
+        "1 追加排除 post_brainstorm ⇒ TASK-010 / 014; SC-18 只留排除分支 (TASK-005); SC-15(5) 期望改为三个 checkpoint (TASK-006); CHANGELOG 加一条 (TASK-025)",
+        "2 --no-spec 残余弱点接受 ⇒ 不加固; TASK-031 开 issue 到 10CG/aria-plugin",
+        "3 可配置下界不做 ⇒ 无任务",
+        "4 MINOR, 号 ship 时重算 ⇒ TASK-025; version.yaml 顺延 ⇒ TASK-023 (复核方式改读 origin/master 上的文件)",
+        "5 Rule #6 第三行标签 + 并集执行 ⇒ metadata.rule6_note, TASK-021 / 023 / 024 / 031; AB 判据按套件分 (TASK-024)",
+        "6 §1.3(c) 维持 fail-closed ⇒ TASK-012",
+        "7 保留收窄后的 (b) ⇒ TASK-012; SC-5 八条反事实 (TASK-019)",
+        "8 格 B pass, 格 D 成立 ⇒ TASK-011; SC-15 只留 pass 分支",
+        "9 catalog 不进 AB 臂, 跑 5/8 单测, 三条缺口开 issue ⇒ TASK-021 / 024; issue 开在 10CG/Aria (决策单写的仓不存在)",
+        "10 两键各自覆盖 spec_level_undetermined; 格 E pass ⇒ TASK-010 / 011; SC-7(d) / SC-9(4) / SC-15(8) 保留",
+        "11 allow_incomplete_checkpoints 覆盖 no_spec_unverifiable, no_spec_contradicted 不豁免 ⇒ TASK-011 / 014 / 015; SC-17(5) 改写 (TASK-006); CHANGELOG 的 §5 第 2 条与第 10 条同步改 (TASK-025); proposal 受影响位置全表见 tasks.md 读前必看第 7 条",
+        "12 Level 3 ⇒ 本文件与 tasks.md; 三处重写见 tasks.md「读前必看」",
+        "13 产出侧调用方不对齐 ⇒ TASK-031 开 issue 到 10CG/aria-plugin; CHANGELOG 第 11 条 (TASK-025)",
+    ],
+    "test_runner": "新测试一律 unittest.TestCase, 由 skills/run_all_tests.sh 按 unittest 分类。A.2 在 scratch 主仓副本 (aria = 1cb3872) 的基线: audit-engine/tests unittest discover Ran 104 OK; phase-c-integrator/tests Ran 148 OK; state-scanner/tests 不带 ARIA_COORDINATION_NO_PUSH 时 Ran 1605 OK (skipped=1), 带该变量时 FAILED (failures=1, test_heartbeat_only_cli.TestHeartbeatPush.test_refresh_without_no_push_publishes_to_remote) —— 该条断言推送未被跳过, 与环境变量互斥。phase-c-integrator catalog 的五个可执行 node id 与更正后的 NEG-1 方法共 6 条 OK, catalog 字面 NEG-1 node id 报 FAILED (errors=1)",
+    "hard_constraints": [
+        "子模块合并一律本地 git merge 并双推, 禁 Forgejo 服务端合并 (CLAUDE.md 多远程硬约束 1); 本 cycle 只合并 aria",
+        "推后逐 remote ls-remote 核 master 与 tag, 不信 push 回执; push 显式给足超时 (硬约束 2)",
+        "外向动作逐项请 owner 授权, 授权与结果记台账; 全部外向动作与等待点列于 metadata.owner_gates, 各任务里的条目与之一致。唯一例外 = 本容器已有 claim 的心跳刷新 (phase1_gate.py --heartbeat-only, 只推 origin 的 refs/aria/coordination), owner 2026-09-17 裁定免逐次授权; 适用前提 = 推送前 metadata.coord_ref_precheck 退出 0 (本地协调 ref 领先 origin 的只有本轨心跳), 不满足 ⇒ 心跳加 --no-push 并停下请授权 (第 15 项)。新写 claim、release_gate 的 release / sweep / gc、推 master / tag / gitlink 仍逐项授权",
+        "任何会推送协调 ref 的动作 (心跳、获授权的认领与 release) 与任何强制对齐之前, 先跑 metadata.coord_ref_precheck; Phase B–D 的每个会话在调用 /state-scanner 之前也先跑 (其入口心跳会推送, aria/skills/state-scanner/SKILL.md:182), 不通过则本会话不调 /state-scanner",
+        "执行序 = metadata.execution_order (编号序串行)",
+        "CRLF 文件 aria/skills/phase-b-developer/SKILL.md 与 aria/skills/phase-c-integrator/SKILL.md 保持 CRLF: 编辑后、暂存前 metadata.crlf_guard 为真; 对它们比较 frontmatter 前先去掉 CR",
+        "主仓 gitlink 只前进, 任何情况下不回退",
+        "subagent 不 commit、不写台账; 提交与台账由主控执行",
+        "反事实一律三步法 (TASK-019 做法), 补丁由非实现席构造; 基线 RED 只作 RED 证据",
+        "期望值不由实现者现算: SC-2 / SC-4 取 corpus-freeze.md 字面量, 其余取 proposal 与 tasks.md 读前必看的字面值; 发现期望值须变 ⇒ 停下走 spec 修订",
+        "组 1–4、TASK-023 / TASK-025 的回归重跑与合并树回归在不带 ARIA_COORDINATION_NO_PUSH 的会话里跑; AB (TASK-024) 在带该变量的会话里跑",
+        "新写或改动的文字: issue / PR 引用写 <org>/<repo>#<n>, 文内编号不用 # 与带圈字符 (standards content-integrity.md §4.4 / §4.5)",
+        "B.2 出现 spec 漂移信号 ⇒ 停在该任务请 owner 裁 (tasks.md 读前必看第 17 条)",
+    ],
+    "owner_gates": [
+        "1 · TASK-001 · owner 裁定 · 10CG/Aria#195 已完成 C.2 合并或 owner 明示改序; 未满足 ⇒ 不进 B.1",
+        "2 · TASK-001 · 外向推送 · 主仓规划提交推 origin 与 github。步骤: git fetch origin 与 git fetch github → 两端 master 相同 (不同 ⇒ 停) → 本地 master 落后或分叉 ⇒ 在本地 master 上 git merge origin/master (不 rebase), 冲突 ⇒ 停 → metadata.commit_attribution origin/master master 退出 0 (否则第 16 项), 其提交清单随授权请求呈上 → 授权后 git push origin master 与 git push github master → 逐 remote git ls-remote <remote> refs/heads/master 等于本地 master。未授权 ⇒ 主仓 feature 分支回落为含规划提交的本地 master, 规划提交随 TASK-030 的 PR 推送 (本容器已有 claim 的心跳刷新免逐次授权, owner 2026-09-17, 不在本项)",
+        "3 · 组 1–4 (条件) · owner 裁定 · B.2 出现 spec 漂移信号: 跑单轮 mid_post_spec 还是按 off 处置; 未裁 ⇒ 停在该任务",
+        "4 · TASK-024 · owner 启动动作 · 以 ARIA_COORDINATION_NO_PUSH=1 启动 AB 会话, AB 结束后换不带该变量的会话; 未满足 ⇒ 不开跑 / 不进 TASK-025",
+        "5 · TASK-024 · owner 裁定 · 任一套件有 eval 判回归 (逐 eval, 三取二); 或 audit-engine 套件的 delta.pass_rate ≤ 0; 或 eval id 3 的 without 臂未低于 with 臂; 未裁 ⇒ 不进 TASK-025。phase-c-integrator 套件只判回归, 不看 delta",
+        "6 · TASK-023 / TASK-025 / TASK-027 · 停下上报 · feature 并入 aria origin/master 时冲突 (TASK-023 末条 / TASK-025) / 取号被占 / 合并冲突 / 取号终核不符 / 合并树回归不通过 / 第 2–3 步前提不成立 / AB 之后上游改了 skills/audit-engine 或 skills/phase-c-integrator (须按第 4 项重跑 TASK-024); 恢复只给先例指针 aria ec72175, owner 确认后执行, 做完从出问题的任务开头重走",
+        "7 · TASK-028 · 外向推送 · aria master 与 tag 双推; 未授权 ⇒ 本地合并与 tag 保持未推送, 不进 TASK-029",
+        "8 · TASK-028 / 030 / 031 · 停下上报 · 推送被拒或只推成一个远端; 不 force、不改写历史、不 bump gitlink",
+        "9 · TASK-030 · 外向推送与发帖 · 主仓 feature 分支推送、PR、合并、C.2.5 双推; 未授权 ⇒ 不进 TASK-031",
+        "10 · TASK-031 · 外向发帖 · 七张 issue 逐张授权; 未授权的不开, 记周期 handoff",
+        "11 · TASK-031 · owner 裁定 · 归档 Step 7 建不建 tracker issue; 裁不建 ⇒ 只跳过 Step 7",
+        "12 · TASK-031 · 外向发帖 · 10CG/Aria#199 与 10CG/aria-plugin#161 回帖并关闭; 未授权 ⇒ 记周期 handoff",
+        "13 · TASK-031 · 外向推送 · Phase D 提交双推与 release_gate 的协调 ref 推送 (同批); 未授权 ⇒ 归档与 handoff 留本地",
+        "14 · TASK-001 (条件: 本容器 claim 已被扫成 abandoned) · 外向推送 · 用原串 pre-merge-completeness-gate-change-scope 重新认领, 认领前 metadata.coord_ref_precheck 退出 0; 未授权 ⇒ 不重新认领 (不写仅本地的 claim), 停在 TASK-001 等授权",
+        "15 · TASK-001 / TASK-024 / TASK-031 与 Phase B–D 各会话调用 /state-scanner 之前 · 停下请授权 · metadata.coord_ref_precheck 退出非 0 (本地协调 ref 领先 origin 的提交含本轨心跳以外的写入, 或取不到远端值): 心跳加 --no-push 或本会话不调 /state-scanner, 不强制对齐, 不认领、不 release; 领先提交涉及的文件列表随请求呈上",
+        "16 · TASK-001 / TASK-030 · owner 裁定 · metadata.commit_attribution 退出非 0 (待推送的主仓提交含非本轨提交): 清单呈 owner; 未裁 ⇒ 不推送、不开 PR",
+    ],
+    "rule6_note": "档位标签 = 判据表第三行 (裁定 5), 执行两读法的并集, 不取任何豁免。tasks.md 读前必看第 19 条新增的同形改写 (phase-c-integrator/SKILL.md:57 与 :754、audit-engine/SKILL.md:423) 属处方性 · 运行时指令面, 与步骤 3 同批随两个照跑套件跑; 两个套件都不覆盖 hotfix lane, 该缺口写进 TASK-031 第 6 张 issue, 文本落点由 N8 守。照跑面: ab-suite/audit-engine.json (加 eval id 3 后 3 evals) 与 ab-suite/phase-c-integrator.json (3 evals) 两臂照跑 (TASK-024)。phase-c-integrator-pre-merge-gate.json 不进 AB 臂 (裁定 9: 无 evals 键, total_eval_cases 计 0), 改跑其 5/8 可执行 fixture 单测 (TASK-021), 三条缺口开 issue 到 10CG/Aria (TASK-031)。第三行三义务: 点名行为 = proposal rule6_note 的 A / B / C; 定向 fixture = eval id 3, 可证伪判据 = without 臂 (AB 开跑时 aria origin/master 的快照) 分数低于 with 臂; 套件缺口 issue 开到 10CG/aria-plugin (TASK-031)。substitute 实体 = SC-1~SC-10 + SC-13 + SC-15~SC-17 + SC-19~SC-22, 另加本文件的 N1–N4 / N7 / N8。description 字段零改动 (TASK-015 / 016 / 017 的 frontmatter 比较)。",
+    "new_checks": {
+        "why": "裁定 1 / 11、stdlib-only、调用串逐字相等与同形改写在 proposal 的 SC-13 里没有可执行的落点; 只增不改。n1–n3 的三态见 metadata.a2_state_runs, n4 / n8 的见 metadata.v2_state_runs",
+        "code": NEW_CHECKS,
+        "cannot_catch": "N1 / N2 / N8 只看文本落点, 拦不住条款语义写错或同义改写 (由 SC-16 / SC-18 / SC-17(5) 的运行时断言守); N3 拦不住 importlib 或 __import__ 的动态导入; N4 只比两处调用串与 canonical, 不看调用串周围的说明文字",
+    },
+    "sc13_baseline": "A.2 在 aria 1cb3872 实测: execution-modes.md 中 {checkpoint_name}-*.md 计数 2; audit-reports/[a-z_]*-{timestamp}.md 残留 4 处 (phase-a-planner:267 / phase-b-developer:204,277 / phase-c-integrator:157); audit-engine/SKILL.md 中 completeness_gate.py 0; phase-c-integrator/SKILL.md 中 change_id 3、「checkpoints 显式值 > adaptive_rules 推导值」0、anchor_base 0、「4.5 completeness gate 三态处置」0、「not_applicable → workflow report 必带」0、「unattributed_count > 0」0、mode == \"convergence\" 0、mode == \"challenge\" 0、「照常调用门」0; report-storage.md 中「不计入」0、「子目录内的报告不计入完整性证据」0、「三个桶都不收」0; execution-modes.md 中 adaptive_rules 3、「stdout 非 JSON」0、「跳过校验, 继续执行 pre_merge 审计」1、「仍逐对评估三态并全部留痕」0, §入口逻辑内两条逐字串 0, bypassed 文案两种拼法 (:44 by config / :82 missing=)。另: phase-c-integrator/SKILL.md 按字面键判 pre_merge 的还有 :57 与 :754, audit-engine/SKILL.md:423 同一条件另一写法 (见 TASK-015 / 016, N8 基线为假)",
+    "sc12_liveness": {
+        "acceptance": "L2 与 L3 同真; L1 只作归档门不拦的确认 (tasks.md 重写 a)",
+        "code": SC12_CODE,
+        "blind_spots": "L1 在脚本缺失 (ambiguous) 与「散文 + ab-suite json 字面路径」(generic_path_call) 两态下为真; L2 对「phase-c-integrator/SKILL.md 的 bash 块调用」同样为真, audit-engine/SKILL.md 这一处由 SC-13 的分块计数单独守。另: 分类器把任何 */.aria/config.json 与 hooks.json 中出现的符号名判为 aria_plugin_integration (spec_complete.py:733-744); A.2 时仓内这类文件都不含该符号, 本计划也不改 config, 故 TASK-021 与 TASK-031 复跑 L2 前先确认 guard_config_hooks 命令无输出 (三态见 metadata.v2_state_runs 的 N10)",
+        "guard_config_hooks": "git grep --recurse-submodules -l -F completeness_gate | grep -E '(^|/)(hooks\\.json|\\.aria/config\\.json)$' —— 有输出即 L2 可能被配置文件带绿, 停下查明",
+    },
+    "a2_state_runs": {
+        "what": "tasks.md 重写 a 的三态 (另加两个对照态) 与 N1 / N2 / N3 的三态, 在 scratch 主仓副本 (主仓 a563192 + aria 1cb3872 嵌套 clone) 上实跑; 副本外零写入",
+        "command": "python3 -B a2_state_runs.py <scratch 主仓副本根> <本目录 tasks.md> <本文件>  (脚本全文见 script; 下方 output 由该命令重生成, 未手改)",
+        "script": script_text,
+        "output": run_output,
+    },
+    "c25_five_questions": [
+        "做不做: 对每个 enforced remote 先推子模块 (git push <remote> master) 再推主仓 master, 然后仅对主仓调 verify_parity_post_push (phase-c-integrator/SKILL.md:612-623)",
+        "怎么做: git-remote-helper/scripts/push_all_remotes.sh 推的是本地分支 master, 成功判据 = 退出码 0 且本地 refs/remotes/<remote>/master 等于 HEAD (:103-119), 子模块不做 ls-remote 核验 ⇒ aria 的硬约束 2 由 TASK-028 承担",
+        "失败会不会红: 本仓 .aria/config.json 没有 multi_remote 段, phase_c_integrator 下也没有 multi_remote_push, 取 config-loader/DEFAULTS.json:6-15 的缺省 —— fail_on_partial_push 为 true, read_only_remotes 为 [] ⇒ 阻断并给修复命令 (SKILL.md:625-630)",
+        "何时触发: 「Phase C.2 合并成功 (master 已 fast-forward)」, expected_sha = 合并后本地 master HEAD (SKILL.md:603, :613) ⇒ 服务端合并后本地未快进会拿陈旧 SHA, 故 TASK-030 先快进",
+        "枚举哪些对象: git submodule status --recursive (SKILL.md:614) ⇒ 本仓三个 (aria / aria-orchestrator / standards, A.2 实测); 子模块 detached 时比 HEAD (:638) ⇒ aria-orchestrator 属他轨, TASK-030 事前断言其无待推内容",
+    ],
+    "execution_order": "编号序串行: tasks 列表顺序即 tasks.md 编号序 1.1 → 5.9, 单执行席依次执行 (决策单 Q3)。dependencies 只标数据依赖, 不表示可以并行。唯一例外 = TASK-026 分两次, 第二次在 TASK-031 内",
+    "canonical_call": CANONICAL_CALL,
+    "stage_cells": {
+        "rule": "组 2 的中间任务 (TASK-008~011) 只验收本段完成后即可在命令行观测到的子格; 这些子格的运行都在 P6 之前以终局结束 (error / bypassed / 格 A–E) 或只依赖参数与常量。每个 SC 的每一格都包在 self.subTest(cell=<名字>) 里, 断言一律写在 subTest 内 (含脚本存在断言), 格名形如 <SC>.<子格>; 下表所列格名逐字照用。验收 = code 的命令对本任务及之前各任务所列的格退出 0; 其余格失败属预期。SC 方法级全绿只在 TASK-012",
+        "cells": {
+            "TASK-008": ["SC-10.argparse-missing-base", "SC-10.argparse-missing-repo-path", "SC-10.argparse-missing-diff-repo-path", "SC-10.argparse-mutex", "SC-10.config-unreadable", "SC-10.error-verdict-keyset", "SC-15.1-empty-config", "SC-15.1-no-audit-block", "SC-15.1-no-config-file", "SC-17.7-missing-diff-repo-path", "SC-21.1-defaults-equal", "SC-21.2-mapping-table-equal", "SC-21.3-bad-json"],
+            "TASK-009": ["SC-5.8-no-spec-empty-diff", "SC-7.S4-unresolved", "SC-7.no-spec-contradicted", "SC-7.typo-unanchored", "SC-7.b-anchor-literal", "SC-17.4-cross-no-spec-contradicted", "SC-17.5a-no-flag", "SC-22.3-base-unresolvable"],
+            "TASK-010": ["SC-15.5-typo-mode", "SC-20.3-level-undetermined"],
+            "TASK-011": ["SC-7.e-adaptive-level1", "SC-9.2-S4-bypassed-manual", "SC-9.2-S4-bypassed-adaptive", "SC-9.3-unanchored-not-exempt", "SC-9.4-level-undetermined-bypassed", "SC-15.2-cell-C", "SC-15.3-cell-B", "SC-15.4-legacy-pre-merge-only", "SC-15.6-cell-D", "SC-15.7-cell-B-convergence", "SC-15.8-cell-E", "SC-15.9-two-changes-cell-D", "SC-15.9-explicit-pre-merge-cell-C", "SC-17.5b-dangling-only", "SC-17.5c-bypassed", "SC-17.5d-contradicted-with-flag"],
+        },
+        "code": CELL_STATUS_CODE,
+        "cannot_catch": "只证明所列格按其断言通过, 不证明断言写对 (由 TASK-019 / 020 的反事实守); 格名是约定, 改名会显示为 not-run 而判红",
+    },
+    "coord_ref_precheck": {
+        "code": COORD_PRECHECK_CODE,
+        "own_claim_files": "TASK-001 读到的本容器同 track 的 active claim 文件 (A.2 时: claims/023236f2/s-86f7@1836.yaml); 重新认领后换成新文件",
+        "cannot_catch": "只看本地领先 origin 的提交; 远端已有而本地没有的内容不在检查面 (那是 fetch 的事); 心跳 commit 若由其它工具改写了格式 (不止 heartbeat_at 一行) 会判 other 而停下, 方向是 fail-closed",
+    },
+    "crlf_guard": {
+        "code": CRLF_GUARD_CODE,
+        "files": ["aria/skills/phase-b-developer/SKILL.md", "aria/skills/phase-c-integrator/SKILL.md"],
+        "frontmatter_rule": "awk 'NR==1&&$0==\"---\"{f=1;next} f&&$0==\"---\"{exit} f' 对 CRLF 文件直接跑输出为空 (两侧同为空串, 比较恒真); 先 tr -d '\\r' 再切",
+    },
+    "commit_attribution": {
+        "code": ATTRIB_CODE,
+        "cannot_catch": "只按路径与 handoff 的 track-id 判归属, 不看改动内容; 本轨路径集内的他轨改动会判 own; docs/handoff/latest.md 这类共享指针一律判 foreign (由 owner 裁)",
+    },
+    "revision_log": [
+        "v1 (2026-09-17): 首版, 31 项 / 5 组",
+        "v1.1 (2026-09-17): 主控核验返修 —— 本容器已有 claim 的心跳刷新免逐次授权 (owner 2026-09-17), 条件性重新认领单列为等待点第 14 项",
+        "v2 PP1-M1 (聚合表 PP1-M1): TASK-008~011 改为按 stage_cells 验收, SC 级全绿与 missing 的豁免降级移到 TASK-012, SC-7(e) 归到 TASK-011。自检: 格表由 P 阶段终局推出, 每格的运行在 P6 前结束或只依赖常量; cell_status 三态 (含未执行与执行两次) 已跑, 不会因格名缺失而假绿",
+        "v2 PP1-M2: TASK-014~018 串成链且以 TASK-013 为起点, TASK-019 / 020 依赖 TASK-018, 新增 execution_order。自检: 所有依赖指向更小编号, 与 tasks.md 编号序一致; TASK-013 的 porcelain 断言此时不再受组 3 影响",
+        "v2 PP1-M3: AB 判据按套件分, delta > 0 只要求 audit-engine 套件; owner_gates 5 / TASK-024 / tasks.md 等待点表同步。自检: phase-c-integrator 套件健康态 delta≈0 不再触发等待点; 两套件的回归仍逐 eval 判, 未放宽",
+        "v2 PP1-M4: 按「降为 / 不被豁免 / 豁免 / 逃生口 / no_spec_unverifiable」检索 proposal 全文, 受裁定 11 影响的 9 处与 1 处论证句列进读前必看第 7 条; TASK-025 写明 §5 第 2 条同步。自检: 第 7 条的逐字改写句未变, 只加位置; 未新增措辞",
+        "v2 PP1-M5: TASK-024 两套件按 descriptive 下发并在提示中逐字禁止 fetch / pull、git 写命令与 forgejo 写接口; 快照面扩到三个子模块两端、aria tag 与两仓 open PR; 远端变化按「新值对象是否已在本地」判是否本机推出; 两次快照之间本会话不调 /state-scanner、不 fetch, precheck 在第二次快照之后才跑; 上游并入挪到开 AB 会话之前 (TASK-023 末条); 不改 remote 配置。自检: 他人推送的新对象在两次快照之间不会进本地, 不会假停; 本机推出的对象本地必有, 不会漏判; 初稿把 precheck 放在快照之间、把并入放进 AB 会话, 自检时发现会误判或多一次换会话, 已改",
+        "v2 PP1-M6: 新增 coord_ref_precheck, 心跳 / 认领 / release 推送与强制对齐前必跑, 写进 hard_constraints 的心跳例外; 第 14 项未授权改为停在 TASK-001; 新增等待点第 15 项。自检: 三态 (相等 / 只领先本轨心跳 / 分叉但本地只领先心跳 / 领先新 claim / 领先本轨 release / 对齐后) 已跑; 获授权的 release 在推送前单独跑 precheck, 不会被自身 release commit 挡住",
+        "v2 PP1-M7: 新增 commit_attribution, TASK-001 回落与推送前、TASK-030 开 PR 前各跑一次, 清单随授权请求呈上; 新增等待点第 16 项。自检: 三态 (只有本轨 / 本轨加同步合并 / 合并了基准外分支 / 改共享指针 / 他轨 handoff) 已跑; latest.md 判 foreign 会让共享指针改动每次都请裁, 属有意的 fail-closed",
+        "v2 PP1-M8: 开 AB 会话前 (TASK-023 末条) 与 TASK-025 取号前各把 aria origin/master 并入 feature (后者只在上游又前进时发生) 并重跑回归; TASK-024 开跑前断言 origin/master 是 feature 的祖先并记 AB 基线 SHA; TASK-027 第 4 步增加两个 skill 目录的 diff 判断, 非空则重跑 AB; 冲突恢复统一为 ec72175 先例; 判断清单第 19 条改写。自检: TASK-025 的 merge 在改版本文件之前, 不会与自己的版本改动冲突; TASK-027 第 5 步在 feature 已含 S3 时是无冲突合并",
+        "v2 PP1-M9: 新增 crlf_guard, TASK-016 / 017 改前改后必跑, TASK-018 复核; CRLF 文件的 frontmatter 比较先去 CR。自检: 四态 (原样 / 保 CRLF 的编辑 / 插入一行 LF / 整文件转 LF) 与 description 改动态已跑; guard 须在暂存前跑, 已写明",
+        "v2 PP1-M10: 新增 canonical_call 与 N4, TASK-014 / 015 照抄 canonical, 缩进不限。自检: N4 七态已跑, 缩进 4 与 6 都为真, 参数换序 (单侧或双侧)、放错区间、只写散文、少一行都为假",
+        "v2 minor m1–m20 与顺带三项: 按聚合表逐条落在对应 TASK (m1 TASK-012; m2 TASK-002; m3 TASK-022; m4 TASK-015 / 016 / 018 与 N8; m5 c25; m6 读前必看第 8 条; m7 TASK-031; m8 判断清单与读前必看第 23 条; m9 TASK-019 / 020; m10 rule6_note; m11 TASK-023; m12 TASK-002; m13 TASK-019; m14 TASK-024; m15 TASK-024; m16 TASK-027 / 029; m17 TASK-030; m18 TASK-001; m19 owner_gates 2 与 TASK-001; m20 头注释与 title; 顺带: sc12_liveness 的 guard_config_hooks 与 N10、TASK-030 合并后复核计数与版本点)。自检: N8 与 N10 三态已跑; 其余为措辞或步骤补全, 未新增判据",
+    ],
+    "v2_state_runs": {
+        "what": "v2 新增的 N4 / C1 (cell_status) / N6 (coord_ref_precheck) / N7 (crlf_guard) / N8 / N9 (commit_attribution) / N10 (guard_config_hooks) 在同一 scratch 主仓副本与临时仓上实跑; 代码取自本文件对应键, 副本外零写入 (N6 的远端是临时裸仓)",
+        "command": "python3 -B a2_v2_checks.py <scratch 主仓副本根> <scratch 工作目录> <本文件>  (脚本全文见 script; 下方 output 由该命令重生成, 未手改)",
+        "script": script2_text,
+        "output": run_output2,
+    },
+}
+
+header = ("# Generated by task-planner (A.3) — pre-merge-completeness-gate-change-scope, v2 (2026-09-17, post_planning R1 rework)\n"
+          "# Dual-layer: tasks.md (coarse, 31 checkboxes) + this file (fine, 31 tasks). `tasks:` stays the LAST\n"
+          "# top-level key: the archive gate's line parser lets the last task block run to EOF.\n")
+doc = yaml.dump({"metadata": metadata}, Dumper=Dumper, allow_unicode=True, sort_keys=False, width=100000)
+doc += yaml.dump({"tasks": tasks}, Dumper=Dumper, allow_unicode=True, sort_keys=False, width=100000)
+open(OUT, "w", encoding="utf-8").write(header + doc)
+print(f"tasks={len(tasks)} hours={hours_low:g}-{hours_high:g} agents={agents}")
