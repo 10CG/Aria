@@ -99,9 +99,12 @@ updated-at: 2026-09-17T12:10:00Z
 |---|---|---|
 | 1 | `cdc8837` | 10CG/Aria#199 A.2/A.3 v1.1 (tasks.md + detailed-tasks.yaml) |
 | 2 | `caa40c8` | 10CG/Aria#199 v2 (R1 rework) + R1 六份审计报告 (注明主控核验未做) |
-| 3 | (本 handoff 提交) | 本 doc + `latest.md` 指针 / track 表 + `.aria/notes/2026-09-17-199-a2-a3-tooling/` |
+| 3 | `1ab72cc` | 本 doc + `latest.md` 指针 / track 表 + `.aria/notes/2026-09-17-199-a2-a3-tooling/` |
+| 4 | (本回填提交) | §7 parity 实测回填 |
 
 **parity**: 三个提交基于 `e4874d4` (rebase 后), 推送后对 origin 与 github 各自 `git ls-remote <remote> refs/heads/master` 取 SHA 与本地比对, 结果回填于本节下方。协调 ref 两次写入 (两条 yielded) 只推 origin, `ls-remote` = `06284a9` 与本地一致。
+
+**推送实测 (2026-09-17T12:1xZ)**: `git push origin master` 与 `git push github master` 均 `e4874d4..1ab72cc`; 之后逐 remote `git ls-remote <remote> refs/heads/master` —— `origin=1ab72cc` / `github=1ab72cc`, 与本地 HEAD 一致 (MATCH ×2)。本回填提交按同一流程再推一次, 结果以两端 `ls-remote` 为准。
 
 ## §8 Memory entries this session (0 新文件, 3 条追记; MEMORY.md 索引改 1 行)
 
