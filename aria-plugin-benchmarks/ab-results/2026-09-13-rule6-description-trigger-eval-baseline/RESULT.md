@@ -1,6 +1,6 @@
 # 场景 4 基线实跑 — description 触发率评测对 openspec-archive 两版 description 的区分力 (10CG/Aria#211)
 
-> **本文件版本**: 8 (2026-09-17, post_spec R7 后按 code-reviewer 的 minor 加固 `fault_matrix.py`: 输出目录已存在且非空时报错退出, 不再无条件删除; 用加固后的脚本重跑矩阵与反事实, 结论不变)。v7 (2026-09-15, post_spec R6 rework: 新增 §v6 逐调用健康检查 —— v6a 原预登记与 v6b 修订预登记两批, 各含故障矩阵、真实报错探针、真实两臂; 结论 3 补第三处结构性缺陷; 「对 Rule #6 处方的含义」把同批参照臂换成逐调用健康检查, v6 所说「环境故障只能靠参照臂识别」不再成立)。v6 (2026-09-14, post_spec R5 rework: 「对 Rule #6 处方的含义」补同批参照臂 —— `run_eval.py` 把异常、超时、claude 报错都记成「未触发」, 环境故障只能靠参照臂识别)。v5 (2026-09-14, post_spec R4 rework: §v5 改为逐字引用预登记原文; 已知局限改为「已验证判红的破坏有两类 (未穷举)」, 去掉无依据的能力上限说法)。v4 (2026-09-14, post_spec R3 rework: 并入 v5 自然措辞扩张三臂 / 首句嵌的是 description 不是技能名 / 结论 1 残留全称句)。v3 (2026-09-14, post_spec R2 rework: 删除一处失实的「同批提交」声明 / 技能数口径说明 / 地板守卫的已验证范围收窄为两类破坏 / query 级独立性局限 / 时长区间补 v2 / 成本差拆成两部分)。v2 (2026-09-13) 并入 v4 反事实两臂与 query 级统计。**引用方请写「RESULT.md v8 @ <提交 SHA>」**; 本文件修订时版本号递增, 引用了旧版本数字的文本须重核。
+> **本文件版本**: 9 (2026-09-17, post_spec R8 后按 backend-architect 的 major 改正 §v6 加固记录的溯源措辞: 重跑输出与归档逐字节相同, 因此摘要文件在那次提交里没有变化; 数值结论未变)。v8 (2026-09-17, post_spec R7 后按 code-reviewer 的 minor 加固 `fault_matrix.py`: 输出目录已存在且非空时报错退出, 不再无条件删除; 用加固后的脚本重跑矩阵与反事实, 结论不变)。v7 (2026-09-15, post_spec R6 rework: 新增 §v6 逐调用健康检查 —— v6a 原预登记与 v6b 修订预登记两批, 各含故障矩阵、真实报错探针、真实两臂; 结论 3 补第三处结构性缺陷; 「对 Rule #6 处方的含义」把同批参照臂换成逐调用健康检查, v6 所说「环境故障只能靠参照臂识别」不再成立)。v6 (2026-09-14, post_spec R5 rework: 「对 Rule #6 处方的含义」补同批参照臂 —— `run_eval.py` 把异常、超时、claude 报错都记成「未触发」, 环境故障只能靠参照臂识别)。v5 (2026-09-14, post_spec R4 rework: §v5 改为逐字引用预登记原文; 已知局限改为「已验证判红的破坏有两类 (未穷举)」, 去掉无依据的能力上限说法)。v4 (2026-09-14, post_spec R3 rework: 并入 v5 自然措辞扩张三臂 / 首句嵌的是 description 不是技能名 / 结论 1 残留全称句)。v3 (2026-09-14, post_spec R2 rework: 删除一处失实的「同批提交」声明 / 技能数口径说明 / 地板守卫的已验证范围收窄为两类破坏 / query 级独立性局限 / 时长区间补 v2 / 成本差拆成两部分)。v2 (2026-09-13) 并入 v4 反事实两臂与 query 级统计。**引用方请写「RESULT.md v9 @ <提交 SHA>」**; 本文件修订时版本号递增, 引用了旧版本数字的文本须重核。
 
 | 字段 | 值 |
 |---|---|
@@ -94,7 +94,7 @@ post_spec R6 判同批参照臂有两处漏洞 (故障只落一臂或落在 shou
 | 负控臂: 无故障 / 6 条 should-trigger 各坏一次 / 各坏两次 | — | valid / valid / void |
 | 日志的 query 对不上 run_eval 输出 (直接调检查脚本) | — | void |
 
-反事实: 删掉 `classify_calls.py` 里对报错结果帧的判定, 5 例转为不符 (F1_result_error、S1_overbroad_fault_in_shouldnot_half、S2_correct_fault_on_one_should_query、S8_two_run_fault_should、S10_negctrl_two_run_fault_x6), 退出码 1 (`fault-matrix-counterfactual/matrix-summary.json`)。R7 后按 code-reviewer 的 minor 加固了 `fault_matrix.py` (输出目录已存在且非空时报错退出, 不再删除), 并用加固后的脚本把矩阵与反事实各重跑一次: 24 个用例仍全部符合、反事实仍 5 例转为不符; 归档在 `fault-matrix/` 与 `fault-matrix-counterfactual/` 的就是加固后重跑的产物。
+反事实: 删掉 `classify_calls.py` 里对报错结果帧的判定, 5 例转为不符 (F1_result_error、S1_overbroad_fault_in_shouldnot_half、S2_correct_fault_on_one_should_query、S8_two_run_fault_should、S10_negctrl_two_run_fault_x6), 退出码 1 (`fault-matrix-counterfactual/matrix-summary.json`)。R7 后按 code-reviewer 的 minor 加固了 `fault_matrix.py` (输出目录已存在且非空时报错退出, 不再删除), 并用加固后的脚本把矩阵与反事实各重跑一次: 24 个用例仍全部符合、反事实仍 5 例转为不符; 重跑输出与归档副本逐字节相同 (两份 `matrix-summary.json` 各自 `cmp` 无差异), 所以这两个摘要文件在加固那次提交里没有变化, 其内容的最后一次改动仍是 `76959c8`; 同目录下 23 份逐用例检查报告有变化, 差异只在日志文件名与耗时两个字段, 判定字段零差异。
 
 **B. 真实报错探针重跑** (新垫片): 两组都判 void (`real/B1_*`、`real/B2_*`)。第一次重跑时 API 正处在重试风暴里, 不存在的模型名那组两次调用各耗满 120 秒, 被外层超时截断, 未计入; 第二次 12 秒内拿到报错的结果帧。
 

@@ -4,7 +4,7 @@ mode: convergence
 rounds: 8
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 drift_terminated: false
 drift_check_skipped: true
@@ -85,3 +85,5 @@ R7 三条 major 的归宿: 「T2b / T4 措辞」完全闭合; 「SC-9 锚点」�
 ## 下一步 (待 owner 裁定)
 
 max_rounds 8 再次耗尽且未收敛, 按 audit-engine 降级策略三选一: 接受当前结论 / 增加轮次 / 降级为单轮。主控的建议与各选项代价写在给 owner 的汇报里; 裁定后在本节追记。
+
+**owner 裁定 (2026-09-17)**: 选「接受当前结论, 改完收工」—— 不再增加审计轮, 按主控已验证的修法把三条 major 改完收口 (降级策略第 1 条: `converged: false` + `overridden_by_user: true`; `degraded` 保持 false, 那是第 3 条的标记)。落地为 v10: SC-9 写回存在性断言「含 `classify_calls.py` 的行 ≥ 1」; SC-12 加锚手册侧「新增 skill 的首个 description」那句 (同时含「同样要过」与「首个套件」); RESULT §v6 的溯源句改成可核验的说法, RESULT 随之升 v9 并按其抬头规矩同步 proposal 里 7 处版本引用。**已知代价**: 这三处改动没有再经席位复核 —— 主控对每条都做了反事实自检 (见上节), 但自检是主控自己写的实现, 不等于独立复核。**Rule #10 转述的归宿**: tech-lead 要求报出的那点 (owner 上一次裁定只点名 SC-12、未就手册这半边表态) 已如实报给 owner, 本次裁定把手册那半边一并纳入, 关闭该转述。
