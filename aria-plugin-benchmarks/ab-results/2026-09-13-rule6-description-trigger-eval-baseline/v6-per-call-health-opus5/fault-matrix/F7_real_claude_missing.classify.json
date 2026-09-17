@@ -42,31 +42,7 @@
  ],
  "calls": [
   {
-   "file": "1789480316442148496-1165936.jsonl",
-   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
-   "frames": 0,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 0.02,
-   "healthy": false,
-   "reasons": [
-    "无判定事件"
-   ]
-  },
-  {
-   "file": "1789480316492754216-1165948.jsonl",
-   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
-   "frames": 0,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 0.02,
-   "healthy": false,
-   "reasons": [
-    "无判定事件"
-   ]
-  },
-  {
-   "file": "1789480316592804961-1165961.jsonl",
+   "file": "1789633794886249567-1697266.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 0,
    "first_decisive": null,
@@ -78,8 +54,20 @@
    ]
   },
   {
-   "file": "1789480316659007401-1165973.jsonl",
-   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "file": "1789633794992488355-1697278.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
+   "frames": 0,
+   "first_decisive": null,
+   "may_be_recorded_true": false,
+   "duration_s": 0.11,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789633795213373975-1697325.jsonl",
+   "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 0,
    "first_decisive": null,
    "may_be_recorded_true": false,
@@ -90,24 +78,36 @@
    ]
   },
   {
-   "file": "1789480316726914111-1165983.jsonl",
+   "file": "1789633795274695545-1697349.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 0,
    "first_decisive": null,
    "may_be_recorded_true": false,
-   "duration_s": 0.02,
+   "duration_s": 0.01,
    "healthy": false,
    "reasons": [
     "无判定事件"
    ]
   },
   {
-   "file": "1789480316790720894-1165999.jsonl",
+   "file": "1789633795294486286-1697358.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 0,
    "first_decisive": null,
    "may_be_recorded_true": false,
-   "duration_s": 0.02,
+   "duration_s": 0.01,
+   "healthy": false,
+   "reasons": [
+    "无判定事件"
+   ]
+  },
+  {
+   "file": "1789633795326033393-1697368.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 0,
+   "first_decisive": null,
+   "may_be_recorded_true": false,
+   "duration_s": 0.01,
    "healthy": false,
    "reasons": [
     "无判定事件"

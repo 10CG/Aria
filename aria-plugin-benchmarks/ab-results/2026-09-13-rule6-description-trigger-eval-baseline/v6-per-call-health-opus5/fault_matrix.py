@@ -108,7 +108,12 @@ def main(argv=None):
         return 2
     out = Path(a.out) if a.out else Path(tempfile.mkdtemp(prefix="trigger-eval-fault-matrix-"))
     if out.exists():
-        shutil.rmtree(out)
+        # 不删已有内容: --out 传错 (例如指到当前目录) 会毁掉整个目录 (R7 code-reviewer minor)
+        if any(out.iterdir()):
+            print("输出目录已存在且非空, 请换一个 --out: %s" % out, file=sys.stderr)
+            return 2
+    else:
+        out.mkdir(parents=True)
     for sub in ("roots", "logs", "shimbin", "emptybin", "neutral-skill"):
         (out / sub).mkdir(parents=True)
     shutil.copy(HERE / "claude-shim.sh", out / "shimbin" / "claude")

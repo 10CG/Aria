@@ -42,72 +42,72 @@
  ],
  "calls": [
   {
-   "file": "1789480316295690716-1165903.jsonl",
+   "file": "1789633795211270887-1697321.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 2.11,
+   "duration_s": 2.21,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"
    ]
   },
   {
-   "file": "1789480318417203079-1166296.jsonl",
+   "file": "1789633797452639491-1697846.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 2.53,
+   "duration_s": 2.07,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"
    ]
   },
   {
-   "file": "1789480320982209520-1166666.jsonl",
+   "file": "1789633799526424212-1698274.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 2.32,
+   "duration_s": 2.22,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"
    ]
   },
   {
-   "file": "1789480323352694685-1167074.jsonl",
+   "file": "1789633801740484402-1698689.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 2.06,
+   "duration_s": 2.17,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"
    ]
   },
   {
-   "file": "1789480325428814689-1167495.jsonl",
+   "file": "1789633803910208998-1698960.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 2.19,
+   "duration_s": 2.17,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"
    ]
   },
   {
-   "file": "1789480327639936129-1167980.jsonl",
+   "file": "1789633806093407620-1699336.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 2.23,
+   "duration_s": 2.2,
    "healthy": false,
    "reasons": [
     "耗时达到超时阈值"

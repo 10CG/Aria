@@ -84,3 +84,5 @@ closed 10 / partially 0 / open 0 —— tech-lead 4 / code-reviewer 3 / knowledg
 ## 下一步 (待 owner 裁定)
 
 max_rounds 耗尽且未收敛, 按 audit-engine 降级策略三选一: 接受当前结论 / 增加轮次 / 降级为单轮。主控的建议与各选项代价写在给 owner 的汇报里; 裁定后在本节追记。
+
+**owner 裁定 (2026-09-17)**: 选「增加轮次」—— max_rounds 7 → 8 (本次审计实例内, 不改 `.aria/config.json` 的全局配置); 并裁定三条 major 与一条 minor **现在就改**: 按主控已验证的修法改出 v9 (SC-9 补两个实质锚点、SC-12 加「含新增 skill」、T2b 与 T4 的「搬」改「复制并保留基线原件」、`fault_matrix.py` 非空输出目录改为报错退出), 自检后提交, 再跑 R8 复核。

@@ -1,19 +1,19 @@
 # Proposal: rule6-description-change-trigger-eval-lane
 
 > **Level**: Minimal (Level 2 Spec) — owner 2026-09-13 指示「开 Level 2 cycle」; 与 LEVEL_GUIDE「跨模块 → 自动提升为 Level 3」的关系请 owner 确认, 见 OQ-4
-> **Status**: Draft — post_spec R1 (2026-09-13) FAIL → v2; R2 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 10M / 26m → v3; R3 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 5M / 6m → v4; R4 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 3M / 4m → v5; R5 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 6M / 4m, max_rounds 耗尽未收敛 → v6; owner 2026-09-15 裁定增加 2 轮 (max_rounds 5 → 7) 并先收窄范围 → v7; R6 (2026-09-15, 5 席) PASS_WITH_WARNINGS 0C / 6M; owner 2026-09-15 裁定修 v8 后跑 R7 当最后一次检查, 且 D2 的故障识别先做实验再重新设计 → v8 (本版), 待 R7
+> **Status**: Draft — post_spec R1 (2026-09-13) FAIL → v2; R2 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 10M / 26m → v3; R3 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 5M / 6m → v4; R4 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 3M / 4m → v5; R5 (2026-09-14, 5 席) PASS_WITH_WARNINGS 0C / 6M / 4m, max_rounds 耗尽未收敛 → v6; owner 2026-09-15 裁定增加 2 轮 (max_rounds 5 → 7) 并先收窄范围 → v7; R6 (2026-09-15, 5 席) PASS_WITH_WARNINGS 0C / 6M; owner 2026-09-15 裁定修 v8 后跑 R7 当最后一次检查, 且 D2 的故障识别先做实验再重新设计 → v8; R7 (2026-09-16 / 17, 5 席) PASS_WITH_WARNINGS 0C / 3M / 1m, max_rounds 耗尽未收敛, owner 2026-09-17 裁定增加轮次 (7 → 8) 并先改四条 → v9 (本版), 待 R8
 > **Created**: 2026-09-13
 > **Linked Issue**: `10CG/Aria#211`
 > **代码落点**: 无代码。三份规范性文本 (Aria `CLAUDE.md` Rule #6 / `standards/conventions/skill-benchmark-exemption.md` / `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`) + 一个套件文件 (受 OQ-3 约束) + `aria-plugin-benchmarks/tools/trigger-eval/` 下四个小工具文件 (claude 垫片、逐调用健康检查脚本、故障矩阵与其假 claude; 逐字节同基线目录) + 三张新 issue + 一条上游反馈。**aria-plugin 子模块不动** (spec-drafter / task-planner 模板落地另开 issue, 见 D5.3)
 > **ship target**: standards 子模块 (SOT 文件头 Version 1.0.0 → 1.1.0, MINOR — 新增强制义务。这是**单份规范文档自己的版本行**, 与 `version-management.md` §5.1 待裁的「standards 仓级版本自称」正交, 不新增仓级自称面; standards 仓无 tag, 主仓只动 gitlink) + Aria 主仓 (CLAUDE.md / 手册 / 套件)
-> **基线数据**: `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/RESULT.md` **v7** (与本版同批提交; 本文引用的数字以该版本为准; RESULT 再修订须同步重核本文每一处引用 RESULT 的位置, 以 `grep -n RESULT` 逐处列出, 不只看某几节)
+> **基线数据**: `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/RESULT.md` **v8** (与本版同批提交; 本文引用的数字以该版本为准; RESULT 再修订须同步重核本文每一处引用 RESULT 的位置, 以 `grep -n RESULT` 逐处列出, 不只看某几节)
 > **溯源**: 洞的首次记录 = `10CG/aria-plugin#190` comment 22921 (2026-09-08); 独立成单 = `10CG/Aria#211` (2026-09-09); triage 五项核对全命中 = `10CG/Aria#211` comment 23915 (2026-09-13)
 
 ## Why
 
 Rule #6 判据表第二行逐字要求「`description` 或指令流程变动一律照跑」AB。但场景 1 的两臂由子代理提示**直接给 skill 路径** (`skill-creator` SKILL.md Step 1: `Skill path: <path-to-skill>`), description 在整条评测链路里没有作用面 ⇒ 对 description 维度, 「照跑了 AB」产出的是**空证据**。
 
-Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要求**先做基线实跑再写进规则**。基线跑完 (RESULT.md v7), 三个事实改变了补法的形状:
+Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要求**先做基线实跑再写进规则**。基线跑完 (RESULT.md v8), 三个事实改变了补法的形状:
 
 1. **对真实 description 变动零区分力**: openspec-archive v1.71.1 → v1.73.0 两版与「pushy」正控全部 30/30 (query 级 10/10), Fisher p = 1.0。这是**饱和**: 三臂都撞天花板, 测不出差异。在饱和套件上, 两个都能让 should-trigger 饱和的 description 必然打平 (本次这一对即如此); 比较判据只在其中一方掉出饱和时才判出差别 (例如新版被改坏, 掉到负控那样的 8/30) —— 它不是恒绿门, 但对「措辞改得更好」这个问题, 在饱和套件上答不出来。
 2. **场景 4 能当地板守卫, 已验证恰两类破坏**: 删领域词的负控 should-trigger 8/30 (query 级 3/10, 双侧 p = 0.0031); 显式强制过宽 (触发词表 + 「都必须先使用本技能」) 让 should-not 22/30 (7/10 条判红)。一次自然措辞扩张实测不判红 (v5, `claude-opus-5`): 守卫判得出什么, 由套件里的近似误触决定 (OQ-8)。
@@ -47,10 +47,10 @@ Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要�
 
 - **通过** = `run_eval.py` 输出的每条 `pass` 为真: 每条 should-trigger `trigger_rate ≥ 0.5` **且** 每条 should-not `trigger_rate < 0.5` (`run_eval()` 的 `did_pass` 语义, 已读源码核对)。
 - **参数钉死** (阈值语义依赖 runs): `--runs-per-query 3` (0.5 门 = 2/3), `--trigger-threshold 0.5`, `--timeout 120`, `--num-workers 1` (见前置表第 1 条), 显式 `--model` (见前置表第 4 条), 套件 20 条 (10/10)。改任一参数 = 换判据, 须 owner 裁 (例: 阈值 0.8 在 3 runs 下等于 3/3)。
-- **只承诺已验证的两类破坏**: 删领域词 (should-trigger 掉) 与显式强制过宽 (should-not 涨)。一次自然措辞扩张 (多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」四处, 其中「整理归档文档」直接带被测 skill 的领域词) 实测不判红 (RESULT v7 §v5): 守卫判得出什么, 由套件里的近似误触决定。
+- **只承诺已验证的两类破坏**: 删领域词 (should-trigger 掉) 与显式强制过宽 (should-not 涨)。一次自然措辞扩张 (多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」四处, 其中「整理归档文档」直接带被测 skill 的领域词) 实测不判红 (RESULT v8 §v5): 守卫判得出什么, 由套件里的近似误触决定。
 - **逐调用健康检查** (识别环境故障): `run_eval.py` 把 `claude -p` 的报错、超时、非零退出都记成一次「未触发」, `runs` 恒为 3, 输出 json 里与「真没触发」分不开 (源码: `run_single_query` 超时或进程提前退出时返回「未触发」, 遇报错的结果帧照常返回此前的判定; 只有工作进程抛异常才进 `run_eval()` 的 `except Exception` 分支并打印 `Warning: query failed`)。所以每臂都经 claude 垫片 (`aria-plugin-benchmarks/tools/trigger-eval/claude-shim.sh`, 见前置表第 3 条) 跑, 垫片把每次调用的输出流与 query 原文各另存一份 (每臂一个新建的空日志目录)。跑完用 `aria-plugin-benchmarks/tools/trigger-eval/classify_calls.py` 检查, 被评臂加 `--role evaluated`, 负控臂加 `--role negctrl`: 单次调用须走到 `run_eval.py` 据以下判定的事件 (tool_use 开始、`message_stop`、含 tool_use 的 assistant 消息、结果帧 四者之一), 结果帧不得报错, 耗时须小于超时阈值减 1 秒, 否则算不健康; 每条 query 的日志数须等于它的 runs。不健康的调用按「触发」「没触发」两种可能都算: 被评臂的门判定、负控的命中数判定在两种极端下都不变, 检查结论为 pass / fail (被评臂) 或 valid (负控臂); 会变, 结论为 void, 本轮作废 (见下)。实证见基线目录 RESULT.md「v6: 逐调用健康检查」一节。
 - **同批负控** (验证本轮数字可用, 不评 description):
-  - 构造: 删去全部领域名词与该 skill 特有动作词, 只留「处理一件事项」级的泛化句 (基线负控保留了「收尾 / 核对」, 仍命中 3 条带这类动作语义的 query; 按本规则构造的「对一个事项做处理。」在 v5 为 0/10, 见 RESULT v7)。
+  - 构造: 删去全部领域名词与该 skill 特有动作词, 只留「处理一件事项」级的泛化句 (基线负控保留了「收尾 / 核对」, 仍命中 3 条带这类动作语义的 query; 按本规则构造的「对一个事项做处理。」在 v5 为 0/10, 见 RESULT v8)。
   - 判据 (绝对门槛, 不以被评 description 为参照): 负控 query 级命中 (每 query 命中 := `trigger_rate ≥ 0.5`) 须 **≤ 5/10**。门通过时被评 description 必为 10/10, 此时 10 对 5 的 Fisher 单侧 p = 0.016 (10 对 6 为 0.043, 不取)。基线 v3 负控 3/10。
   - **作废**在以下任一情形发生: 任一臂逐调用健康检查不通过 (检查结论为 void, 即不健康的调用足以改变判定; 或检查脚本无法判定); 负控 ≥ 6/10, 不论被评 description 过没过门 (套件分不开「有没有触发词」, 本轮数字不可用); `run_eval.py` 非零退出、没有输出 json, 或 stderr 出现 `Warning: query failed`。作废时不判被评 description。作废 = 本 cycle 的 Rule #6 义务未完成, **不得 ship**; 修套件或环境后重跑; rule6_note 记 `scenario4b: <结果目录> void`; **连续 2 轮作废 ⇒ 升级 owner** (AI 不得自行豁免, Rule #10)。
 - **fail 的后果**: 本轮不作废 (各臂逐调用健康检查都通过、负控 ≤ 5/10、`run_eval.py` 正常退出且无 Warning) 而被评臂的检查结论为 fail (门判 fail, 且不健康的调用改变不了这一点) ⇒ 该 description 改动**不得 ship** (与 void 同为义务未完成)。处置二选一: (1) 修正 description 直到门通过; (2) 若 fail 来自**有意**收窄或拓宽触发面 (套件原来的 should / should-not 划分已不符合新意图), 则先改套件 (升 `ab-suite/version.yaml`, 新套件经 owner 审阅) 再重跑; 两条都不走 ⇒ 升级 owner。rule6_note 记 `scenario4b: <结果目录> fail` 与所走的处置。
@@ -66,7 +66,7 @@ Issue 提出「description 变动 ⇒ 另跑场景 4 触发率评测」, 并要�
 | 1 | `--num-workers 1` (消除同一项目根内的兄弟命令文件); 多臂并行时每臂一个独立项目根 (含空 `.claude/`)。两者正交。上游修好 `run_eval.py` 的并发互见缺陷后可放宽 | `v1-shared-root-4workers/new.json` · `v2-isolated-root-1worker/new.json` · `v1-shared-root-4workers/diag02-sibling-command-collision.jsonl` |
 | 2 | 合成技能**中性化**: `name: helper` 的临时 SKILL.md 壳 + `--description` 显式传入 | `v2-isolated-root-1worker/negctrl.json` · `v3-isolated-root-1worker-neutral-name/negctrl.json` · `neutral-skill-SKILL.md` |
 | 3 | `claude -p` 经 claude 垫片 (`aria-plugin-benchmarks/tools/trigger-eval/claude-shim.sh`) 调起: 追加 `--setting-sources project` (不加载用户级插件), 并把每次调用的输出流与 query 原文各另存一份供逐调用健康检查。设置源的实证看两份探针 json 的 `result` 字段: 默认设置源的列表含真 `openspec-archive`, project-only 不含; 其中的技能数是模型自报, 不作证据 | `probe-setting-sources-default.json` · `probe-setting-sources-project.json` · `v6-per-call-health-opus5/claude-shim.sh` |
-| 4 | 显式 `--model <本 session 模型>` (第 3 条会连带换掉默认模型) | [配置推导] RESULT.md v7「同一首次探针的附带观察」段, 未落机读文件 |
+| 4 | 显式 `--model <本 session 模型>` (第 3 条会连带换掉默认模型) | [配置推导] RESULT.md v8「同一首次探针的附带观察」段, 未落机读文件 |
 | 5 | 同批负控与逐调用健康检查 (判据见本小节上文) | `v5-mildcreep-opus5/negctrl.json` · `v6-per-call-health-opus5/fault-matrix/matrix-summary.json` · `v6-per-call-health-opus5/real/C1_new.classify.json` · `v6-per-call-health-opus5/real/C2_negctrl.classify.json` |
 | 6 | 产物落 `aria-plugin-benchmarks/ab-results/<date>-<skill>-trigger/` + RESULT.md (对齐基线目录形状), 各臂的 `run_eval.py` 输出 json、stderr 与逐调用检查报告一并留存; 工具版本 (插件缓存 hash / Claude Code 版本 / 模型) 写进 RESULT | `RESULT.md` |
 
@@ -121,7 +121,7 @@ rule6_note:
 - 影响的 AI 行为: Rule #6 执行者在 description 变动时的义务判断: 从「照跑场景 1 即合规」变为「照跑场景 1 + 场景 4b 地板守卫 + rule6_note 五字段」。
 - 不影响任何 skill 运行时行为; aria-plugin 零改动 ⇒ 本 Spec 自身不触发 Rule #6。
 - 破坏性: 无; 已 ship 的 rule6_note 不回溯。
-- 场景 4b 成本 (估算, 来源 RESULT.md v7 §时长与成本): 被评 + 负控两臂约 120 次 `claude -p`, 并行约 11–23 分钟 / 串行约 21–46 分钟 (单 worker 一臂: `claude-fable-5-1` 上 10m39s–17m39s, `claude-opus-5` 上 11m33s–23m05s, 上沿来自一轮撞上 API 重试风暴的负控臂; v2–v6 共 17 臂的 run.log), 约 10 美元 (按探针单次 0.08 美元估, `run_eval.py` 不记录成本); 逐调用健康检查不调用 API, 每臂几秒。首次为某 skill 建 20 条套件另加约 1 小时, 若须 owner 审阅另加 owner 时间 (OQ-7)。
+- 场景 4b 成本 (估算, 来源 RESULT.md v8 §时长与成本): 被评 + 负控两臂约 120 次 `claude -p`, 并行约 11–23 分钟 / 串行约 21–46 分钟 (单 worker 一臂: `claude-fable-5-1` 上 10m39s–17m39s, `claude-opus-5` 上 11m33s–23m05s, 上沿来自一轮撞上 API 重试风暴的负控臂; v2–v6 共 17 臂的 run.log), 约 10 美元 (按探针单次 0.08 美元估, `run_eval.py` 不记录成本); 逐调用健康检查不调用 API, 每臂几秒。首次为某 skill 建 20 条套件另加约 1 小时, 若须 owner 审阅另加 owner 时间 (OQ-7)。
 - 自主运行时 (v2.0 Layer 2): 本 Spec 只写一句禁令 (D1); 禁令要在 runner 里生效, 还要等 `unattended` 键能传到 Layer 2 (`10CG/Aria#196`, 未修)。影响面 (2026-09-15 对 aria 子模块 master `1cb3872` 逐提交比对 frontmatter): 456 个非合并提交里, 改了已有 skill description 的 7 个 (brainstorm 一次删掉 frontmatter、一次恢复并换措辞, 按两次计), 约 1.5%; 另有 15 个提交新增 skill (不含首版), 按 OQ-9 的推荐同样受禁令约束; 一般开发任务不受影响。代价 (按现行代码): 放弃后该派发进 S_FAIL, 失败类型记为 `container_crash`, 这是终态 —— 不自动重试, 默认也不告警, Claude 在最终消息里写的原因编排器不读 ⇒ 这类任务会停在那里无人察觉。所以跟进 spec 须在这类任务派给 runner 之前落地。
 - 对无套件 skill 的即时影响: 其余 41 个 skill 的下一次 description 变动都要先建套件; 这是有意的 (Rule #6 零裁量), 由 OQ-7 确认。
 
@@ -130,13 +130,13 @@ rule6_note:
 - [ ] T0 转录纪律 (T1–T5 通用): 写进规范的文字去掉本 proposal 的内部编号 (OQ-n / Dn / Tn / SC-n), 按 owner 对 OQ 的裁定写成确定的文字 (SC-11)
 - [ ] T1 三处 D1 新句落地 (逐字), 旧句删除; 手册「边界三条」改「四条」; SOT §3 边界注。CLAUDE.md 只改这一句 (含 §4.1 指向), 不另加句
 - [ ] T2 手册 §场景 4 拆 4a / 4b; 4b 写 D2 判据 (参数照抄为以「参数钉死」开头的一行; 含「不设比较判据」固定措辞与负控 ≤ 5/10、连续 2 轮升级、逐调用健康检查) + D3 六行前置表 (机读实证写相对基线目录的完整相对路径, 不写省略号或通配) + 两套编号说明; §固定测试集 vs 临时测试 表加 trigger 行
-- [ ] T2b 把基线目录 `v6-per-call-health-opus5/` 下的 `claude-shim.sh`、`classify_calls.py`、`fake-claude`、`fault_matrix.py` 原样搬到 `aria-plugin-benchmarks/tools/trigger-eval/`, 在新位置重跑故障矩阵 (SC-13); 手册 §场景 4b 引用两个工具的新路径
+- [ ] T2b 把基线目录 `v6-per-call-health-opus5/` 下的 `claude-shim.sh`、`classify_calls.py`、`fake-claude`、`fault_matrix.py` 原样复制到 `aria-plugin-benchmarks/tools/trigger-eval/` (基线目录的原件保留不动 —— 前置表第 3 行的机读实证与 SC-13 的逐字节比对都要求它还在), 在新位置重跑故障矩阵 (SC-13); 手册 §场景 4b 引用两个工具的新路径
 - [ ] T3 SOT 新增 §4.1 rule6_note 五字段模板 (D4) —— 只改 SOT
-- [ ] T4 `ab-suite/trigger/openspec-archive.json` 搬入 (逐字节同基线) + `ab-suite/version.yaml` 升版 —— **OQ-3 裁定前不执行**; 若本 Spec ship 时 OQ-3 仍未裁, 本任务标 deferred 并记入 D5.2 的 issue
+- [ ] T4 `ab-suite/trigger/openspec-archive.json` 复制入 (逐字节同基线, 基线目录原件保留 —— SC-4 的 diff 要求它还在) + `ab-suite/version.yaml` 升版 —— **OQ-3 裁定前不执行**; 若本 Spec ship 时 OQ-3 仍未裁, 本任务标 deferred 并记入 D5.2 的 issue
 - [ ] T5 SOT §6 第三条 + 计数语 (D6); 转录第三条时在基线路径后补写当时 RESULT.md 的版本号与主仓提交 SHA (这是给执行者的指令, 本身不转录); SOT 文件头 Version 1.1.0
 - [ ] T6 开三张 issue (D5.2 / D5.3 / D5.6); 上游反馈发出 (渠道经 owner 确认) 并把证据记入 `10CG/Aria#211` (D5.4)
 - [ ] T7 查 `10CG/aria-standards#17` 并行编辑并留分工言 (D5.5); standards 本地 `--no-ff` merge → 双推 → **对 origin 与 github 各自 `git ls-remote` 比对 SHA, 全部一致才算推成功** → 主仓 gitlink bump → 主仓双推同样逐 remote 核验
-- [ ] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v7) + 落地位置; 关单归 owner
+- [ ] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v8) + 落地位置; 关单归 owner
 
 ## Success Criteria
 
@@ -148,9 +148,9 @@ rule6_note:
 - SC-6: D5.2 / D5.3 / D5.6 三张 issue 存在 (`forgejo GET` 返回 200, 不限状态); `10CG/Aria#211` 有一条含「上游反馈」与发出时间的评论; `10CG/aria-standards#17` 有一条含本 Spec 目录名的评论。
 - SC-7: SOT `grep -c "三个已知缺陷"` = 1 且 `grep -c "两个已知缺陷"` = 0; SOT `grep -cF '**Version**: 1.1.0'` = 1; 手册 `grep -c "边界四条"` = 1 且 `grep -c "边界三条"` = 0。
 - SC-8: 手册含 `### 场景 4a` 与 `### 场景 4b` 两个标题各恰 1 次。
-- SC-9: 手册 §场景 4b 小节含负控门槛「≤ 5/10」与升级条款「连续 2 轮」各 ≥ 1 次; 且同时含「fail 的后果」与「不得 ship」的行 ≥ 1、同时含「作废」与「不得 ship」的行 ≥ 1 (两条后果各用本条款的标题词定位、分别断言: 只删其中一条, 本条转红; 不用单独的「fail」定位, 因为作废条款里的 `Warning: query failed` 也含 fail, v7 自检实测); 且含 `classify_calls.py` 的行 ≥ 1 (逐调用健康检查的定义), 且含「**作废**在以下任一情形发生」的那一行同时含「逐调用健康检查不通过」「≥ 6/10」与「不得 ship」(只删作废条件里的逐调用检查一项, 本条也转红)。
+- SC-9: 手册 §场景 4b 小节含负控门槛「≤ 5/10」与升级条款「连续 2 轮」各 ≥ 1 次; 且同时含「fail 的后果」与「不得 ship」的行 ≥ 1、同时含「作废」与「不得 ship」的行 ≥ 1 (两条后果各用本条款的标题词定位、分别断言: 只删其中一条, 本条转红; 不用单独的「fail」定位, 因为作废条款里的 `Warning: query failed` 也含 fail, v7 自检实测); 且含 `classify_calls.py` 的那一行同时含「两种可能」(逐调用健康检查的定义连同它的判定口径), 且含「**作废**在以下任一情形发生」的那一行同时含「逐调用健康检查不通过」「足以改变判定」「≥ 6/10」与「不得 ship」(只删作废条件里的逐调用检查一项, 或把括号里的实质判定悄悄改回「存在任一次不健康的调用」, 本条都转红; R7 qa 席反事实实测)。
 - SC-11 (转录纪律): 转录进规范的文字 —— `CLAUDE.md` 与 SOT §2 含核心句的那一行、SOT §3 边界注、SOT §4.1、SOT §6 第三条、手册 §场景 4a 与 §场景 4b 小节 —— 用 python `re` 统计 `OQ-\d`、`\bD\d(?:\.\d)?\b`、`\bT\d\b`、`\bSC-\d` 与「Why 第」均为 0: 本 proposal 的内部编号 (OQ-n / Dn / Tn / SC-n 与章节指代) 出了本文件无法定位, 转录时必须改写成确定的文字 (如「见下方前置表第 1 条」)。
-- SC-12: SOT 含核心句的那一行同时含「unattended == true」「不做 description 改动」「放弃整个任务」「撤销本任务已做的全部改动」与「写明」; `CLAUDE.md` `grep -cF "自主运行时的处置见 SOT §2"` = 1; SOT `grep -cF "只在 Claude 模型上实测过"` = 1 (三处都是给自主模式划的边界, 转录时漏掉任一处本条转红)。
+- SC-12: SOT 含核心句的那一行同时含「unattended == true」「不做 description 改动」「含新增 skill」「放弃整个任务」「撤销本任务已做的全部改动」与「写明」; `CLAUDE.md` `grep -cF "自主运行时的处置见 SOT §2"` = 1; SOT `grep -cF "只在 Claude 模型上实测过"` = 1 (三处都是给自主模式划的边界, 转录时漏掉任一处本条转红)。
 - SC-10: 手册 §场景 4b 小节里含「参数钉死」的那一行 (D2 判据正文) 须同时含 `--runs-per-query 3` / `--trigger-threshold 0.5` / `--timeout 120` / `--num-workers 1` 与「20 条」。**按行判, 不按小节判**: 前置表第 1 行也有 `--num-workers 1`, 按小节判会漏掉判据正文里的删除 (R3 qa 席反事实实测)。SOT `grep -cF "description hunk 不走本节"` = 1, 且该行同时含「照跑场景 1」与「另须跑场景 4b」(§3 边界注; 只查「不走本节」的话, 写回 v3 / v4 的旧边界注也能命中, R5 qa 席反事实实测)。
 - SC-13: `aria-plugin-benchmarks/tools/trigger-eval/` 下 `claude-shim.sh`、`classify_calls.py`、`fake-claude`、`fault_matrix.py` 四个文件与基线目录 `v6-per-call-health-opus5/` 下同名文件逐字节相同 (`cmp` 无输出); 在新位置跑 `python3 fault_matrix.py` (skill-creator 的插件缓存路径变了就设 `SKILL_CREATOR_ROOT`), 退出码 0 且末行报「与预期不符 0」。反事实 (2026-09-15 已实跑): 删掉 `classify_calls.py` 里对报错结果帧的判定, 故障矩阵 5 个用例转为不符, 退出码 1。
 

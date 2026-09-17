@@ -40,62 +40,62 @@
  ],
  "calls": [
   {
-   "file": "1789480314155464083-1165570.jsonl",
+   "file": "1789633792430370631-1696925.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.07,
+   "duration_s": 0.32,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480314233227604-1165582.jsonl",
+   "file": "1789633792799860664-1697003.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.11,
+   "duration_s": 0.41,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480314380090259-1165595.jsonl",
+   "file": "1789633793235515929-1697080.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.07,
+   "duration_s": 0.32,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480314463919972-1165624.jsonl",
+   "file": "1789633793573478690-1697129.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.11,
+   "duration_s": 0.19,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480314606323156-1165663.jsonl",
+   "file": "1789633793793918481-1697188.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.34,
+   "duration_s": 0.13,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480314950368146-1165740.jsonl",
+   "file": "1789633793948944601-1697203.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.31,
+   "duration_s": 0.05,
    "healthy": true,
    "reasons": []
   }

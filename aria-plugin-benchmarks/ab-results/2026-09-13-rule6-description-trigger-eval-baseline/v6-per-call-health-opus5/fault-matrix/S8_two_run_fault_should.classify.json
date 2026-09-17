@@ -276,37 +276,37 @@
  ],
  "calls": [
   {
-   "file": "1789480330512868824-1168451.jsonl",
+   "file": "1789633807298367112-1699617.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.22,
+   "duration_s": 0.18,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480330749705198-1168486.jsonl",
+   "file": "1789633807500807605-1699648.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.24,
+   "duration_s": 0.1,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480331017840753-1168519.jsonl",
+   "file": "1789633807624518949-1699658.jsonl",
    "query": "openspec/changes/handoff-multibranch-subdir-path-fidelity 这个 spec 的 tasks.md 全勾完了, PR 也 merge 了, 帮我把它归档掉, 走 Phase D.2",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.25,
+   "duration_s": 0.15,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480331284498357-1168562.jsonl",
+   "file": "1789633807777410017-1699685.jsonl",
    "query": "归档 Spec aria-2.0-m6-release-closeout",
    "frames": 4,
    "first_decisive": "tool_use_start",
@@ -316,132 +316,8 @@
    "reasons": []
   },
   {
-   "file": "1789480331475307505-1168572.jsonl",
+   "file": "1789633807986432976-1699729.jsonl",
    "query": "归档 Spec aria-2.0-m6-release-closeout",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.2,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480331693373467-1168609.jsonl",
-   "query": "归档 Spec aria-2.0-m6-release-closeout",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480331769335188-1168629.jsonl",
-   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
-   "frames": 2,
-   "first_decisive": "result",
-   "may_be_recorded_true": false,
-   "duration_s": 0.12,
-   "healthy": false,
-   "reasons": [
-    "result 帧报错"
-   ]
-  },
-  {
-   "file": "1789480331893709309-1168655.jsonl",
-   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
-   "frames": 2,
-   "first_decisive": "result",
-   "may_be_recorded_true": false,
-   "duration_s": 0.06,
-   "healthy": false,
-   "reasons": [
-    "result 帧报错"
-   ]
-  },
-  {
-   "file": "1789480331956274226-1168671.jsonl",
-   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.05,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332010845635-1168684.jsonl",
-   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.05,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332065797927-1168699.jsonl",
-   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.11,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332181796587-1168722.jsonl",
-   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332275612023-1168750.jsonl",
-   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.11,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332394972954-1168775.jsonl",
-   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332491418150-1168799.jsonl",
-   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332560749085-1168826.jsonl",
-   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.11,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332683421321-1168847.jsonl",
-   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
@@ -450,18 +326,8 @@
    "reasons": []
   },
   {
-   "file": "1789480332838434518-1168876.jsonl",
-   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
-   "frames": 4,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480332935314405-1168902.jsonl",
-   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
+   "file": "1789633808186505638-1699753.jsonl",
+   "query": "归档 Spec aria-2.0-m6-release-closeout",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
@@ -470,18 +336,82 @@
    "reasons": []
   },
   {
-   "file": "1789480333019199227-1168921.jsonl",
-   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
+   "file": "1789633808253413818-1699779.jsonl",
+   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
+   "frames": 2,
+   "first_decisive": "result",
+   "may_be_recorded_true": false,
+   "duration_s": 0.12,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789633808382694023-1699808.jsonl",
+   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
+   "frames": 2,
+   "first_decisive": "result",
+   "may_be_recorded_true": false,
+   "duration_s": 0.12,
+   "healthy": false,
+   "reasons": [
+    "result 帧报错"
+   ]
+  },
+  {
+   "file": "1789633808517616964-1699833.jsonl",
+   "query": "我们 Aria 仓的 openspec/changes/ 下面还有 3 个 status 已经是 done 的变更 (pre-merge-completeness-gate-change-scope、linked-issue-normalization、a1-entry-claim-duplicate-work-guard), 都 ship 过了, 一起收进 archive 吧",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.05,
+   "duration_s": 0.12,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333078075311-1168932.jsonl",
-   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
+   "file": "1789633808647279268-1699850.jsonl",
+   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.12,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633808800885569-1699881.jsonl",
+   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.14,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633808954181838-1699905.jsonl",
+   "query": "phase d.2 该做的事帮我做一下, change 名叫 state-scanner-stale-refs-false-parity",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809031637209-1699929.jsonl",
+   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.09,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809133673120-1699944.jsonl",
+   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
@@ -490,8 +420,68 @@
    "reasons": []
   },
   {
-   "file": "1789480333219407577-1168969.jsonl",
-   "query": "我想把 openspec/changes/aria-secret-guard-manifest-precision 标记为已完成并放到归档目录, 记得归档后要检查 proposal.md 是不是真的到了目标目录, 别只看 rc",
+   "file": "1789633809276984916-1699971.jsonl",
+   "query": "这个 OpenSpec 变更已经完成了，需要把它从 changes/ 移到 archive/ 并确认落点没放错目录 (上次有人放进了 openspec/changes/archive/ 这种错位置)",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.09,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809380215086-1699989.jsonl",
+   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809556253129-1700000.jsonl",
+   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.08,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809650372412-1700027.jsonl",
+   "query": "周期收尾: spec `aria-ci-backend-abstraction` 的代码合了、版本发了, 只剩把 proposal 挪进 openspec/archive/2026-09-13-aria-ci-backend-abstraction/ 并核对一下归档后的路径",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.07,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809731723213-1700045.jsonl",
+   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633809817660902-1700061.jsonl",
+   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.18,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633810016832707-1700090.jsonl",
+   "query": "帮我完成变更归档 —— 就是 Aria 十步循环最后那一步, 把做完的 spec 收起来那个",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
@@ -500,158 +490,148 @@
    "reasons": []
   },
   {
-   "file": "1789480333273581629-1168981.jsonl",
+   "file": "1789633810076551439-1700103.jsonl",
    "query": "我想把 openspec/changes/aria-secret-guard-manifest-precision 标记为已完成并放到归档目录, 记得归档后要检查 proposal.md 是不是真的到了目标目录, 别只看 rc",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.12,
+   "duration_s": 0.22,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333397418468-1169013.jsonl",
+   "file": "1789633810332211113-1700124.jsonl",
    "query": "我想把 openspec/changes/aria-secret-guard-manifest-precision 标记为已完成并放到归档目录, 记得归档后要检查 proposal.md 是不是真的到了目标目录, 别只看 rc",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.05,
+   "duration_s": 0.19,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333464876435-1169032.jsonl",
+   "file": "1789633810528304654-1700136.jsonl",
+   "query": "我想把 openspec/changes/aria-secret-guard-manifest-precision 标记为已完成并放到归档目录, 记得归档后要检查 proposal.md 是不是真的到了目标目录, 别只看 rc",
+   "frames": 4,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 0.31,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633810894790442-1700168.jsonl",
    "query": "archive the finished openspec change `forgejo-hosts-parameterization` into openspec/archive/ with the date prefix, and verify the landing path afterwards",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.08,
+   "duration_s": 0.17,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333556374714-1169043.jsonl",
+   "file": "1789633811145199024-1700190.jsonl",
    "query": "archive the finished openspec change `forgejo-hosts-parameterization` into openspec/archive/ with the date prefix, and verify the landing path afterwards",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.12,
+   "duration_s": 0.1,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333686276291-1169083.jsonl",
+   "file": "1789633811274670980-1700220.jsonl",
    "query": "archive the finished openspec change `forgejo-hosts-parameterization` into openspec/archive/ with the date prefix, and verify the landing path afterwards",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.09,
+   "duration_s": 0.2,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333792136568-1169107.jsonl",
+   "file": "1789633811506287968-1700243.jsonl",
    "query": "D.2 归档 + 落点校验, change = aria-124-submodule-pointer-regression-gate",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.06,
+   "duration_s": 0.14,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333864401704-1169126.jsonl",
+   "file": "1789633811671970740-1700266.jsonl",
    "query": "D.2 归档 + 落点校验, change = aria-124-submodule-pointer-regression-gate",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.06,
+   "duration_s": 0.16,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480333929585654-1169147.jsonl",
+   "file": "1789633811796260635-1700278.jsonl",
    "query": "D.2 归档 + 落点校验, change = aria-124-submodule-pointer-regression-gate",
    "frames": 4,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480334033041338-1169171.jsonl",
-   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
    "duration_s": 0.12,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480334163810368-1169198.jsonl",
+   "file": "1789633811932046889-1700289.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.08,
+   "duration_s": 0.21,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480334255998496-1169221.jsonl",
+   "file": "1789633812162191267-1700311.jsonl",
    "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.12,
+   "duration_s": 0.28,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480334387315809-1169254.jsonl",
+   "file": "1789633812534387884-1700352.jsonl",
+   "query": "把 feature/state-scanner-v2.9 这个已经合并的 git 分支归档一下, 打个 tag 留档然后删掉远端分支",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.32,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633812857388891-1700375.jsonl",
    "query": "docs/handoff/ 里 2026-05 月份的 handoff 文档太多了, 帮我挪进 docs/handoff/archive/2026-05/ 归个档, latest.md 的链接别断",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.12,
+   "duration_s": 0.26,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480334526184123-1169287.jsonl",
+   "file": "1789633813140528793-1700426.jsonl",
    "query": "docs/handoff/ 里 2026-05 月份的 handoff 文档太多了, 帮我挪进 docs/handoff/archive/2026-05/ 归个档, latest.md 的链接别断",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.11,
+   "duration_s": 0.18,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480334642133817-1169313.jsonl",
+   "file": "1789633813341171832-1700456.jsonl",
    "query": "docs/handoff/ 里 2026-05 月份的 handoff 文档太多了, 帮我挪进 docs/handoff/archive/2026-05/ 归个档, latest.md 的链接别断",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480334712968687-1169331.jsonl",
-   "query": "帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 就行, 放到 openspec/changes/ 下",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480334781012013-1169348.jsonl",
-   "query": "帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 就行, 放到 openspec/changes/ 下",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
@@ -660,78 +640,8 @@
    "reasons": []
   },
   {
-   "file": "1789480334874653801-1169368.jsonl",
+   "file": "1789633813440440584-1700474.jsonl",
    "query": "帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 就行, 放到 openspec/changes/ 下",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480334970248055-1169387.jsonl",
-   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.1,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335082399880-1169419.jsonl",
-   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.1,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335196618097-1169439.jsonl",
-   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.12,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335319735233-1169469.jsonl",
-   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.1,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335438408722-1169498.jsonl",
-   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.11,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335569944817-1169528.jsonl",
-   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480335671632663-1169550.jsonl",
-   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
@@ -740,68 +650,8 @@
    "reasons": []
   },
   {
-   "file": "1789480335859598952-1169573.jsonl",
-   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.19,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336088030511-1169584.jsonl",
-   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.08,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336175424748-1169612.jsonl",
-   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336240854653-1169618.jsonl",
-   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.05,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336295579371-1169636.jsonl",
-   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.08,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336374073237-1169659.jsonl",
-   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
-   "frames": 5,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 0.09,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1789480336475892341-1169684.jsonl",
-   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
+   "file": "1789633813628814624-1700496.jsonl",
+   "query": "帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 就行, 放到 openspec/changes/ 下",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
@@ -810,28 +660,28 @@
    "reasons": []
   },
   {
-   "file": "1789480336604932098-1169714.jsonl",
-   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
+   "file": "1789633813757390211-1700528.jsonl",
+   "query": "帮我给「Rule #6 description 触发率评测」这个需求起一份新的 OpenSpec proposal.md, Level 2 就行, 放到 openspec/changes/ 下",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.11,
+   "duration_s": 0.05,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480336717893917-1169747.jsonl",
-   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "file": "1789633813814516378-1700548.jsonl",
+   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.09,
+   "duration_s": 0.04,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480336826396876-1169771.jsonl",
-   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "file": "1789633813864692345-1700557.jsonl",
+   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
@@ -840,8 +690,108 @@
    "reasons": []
   },
   {
-   "file": "1789480336984775623-1169811.jsonl",
-   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "file": "1789633814015588803-1700576.jsonl",
+   "query": "openspec 这个 CLI 到底该不该装? 装了会不会把归档目录建到 openspec/changes/archive/ 这种错地方? 版本怎么钉住?",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.04,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814067872798-1700590.jsonl",
+   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814135307749-1700608.jsonl",
+   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814255391801-1700629.jsonl",
+   "query": "10CG/Aria#210 那个 Archive Tracker issue 里列的归档残留待办, 帮我逐条核对哪些已经做完可以关了",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.17,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814443604182-1700664.jsonl",
+   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.25,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814719444694-1700696.jsonl",
+   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.17,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633814927241908-1700722.jsonl",
+   "query": "把 .aria/audit-reports/ 里 2026-07 之前的审计报告压成一个 tar.gz 归档到 /backup/, 原目录清掉",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.1,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633815027659647-1700745.jsonl",
+   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633815209351989-1700783.jsonl",
+   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633815282004273-1700793.jsonl",
+   "query": "openspec/changes/aria-2.0-m6-e2e-resilience/proposal.md 顶部的 Status 现在写的是 Approved, 帮我改成 In Progress 并补一行 2026-09-13 的备注",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.13,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633815420010485-1700817.jsonl",
+   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
@@ -850,32 +800,82 @@
    "reasons": []
   },
   {
-   "file": "1789480337158492007-1169843.jsonl",
-   "query": "本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 归档到 docs/ 下",
+   "file": "1789633815592480778-1700853.jsonl",
+   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.08,
+   "duration_s": 0.06,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480337245121072-1169858.jsonl",
-   "query": "本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 归档到 docs/ 下",
+   "file": "1789633815675727050-1700872.jsonl",
+   "query": "查一下项目现在整体状态, 有几个 spec 还活跃、几个待归档、分支干不干净, 然后推荐我下一步该跑哪个阶段",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.08,
+   "duration_s": 0.06,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1789480337347641223-1169885.jsonl",
+   "file": "1789633815745701491-1700887.jsonl",
+   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.32,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633816075997993-1700917.jsonl",
+   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633816351969116-1700939.jsonl",
+   "query": "openspec/archive/ 里现在有 145 个目录了, 帮我写个脚本按年份再分一层子目录, 并更新所有引用到这些路径的 markdown 链接",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.23,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633816598684499-1700964.jsonl",
    "query": "本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 归档到 docs/ 下",
    "frames": 5,
    "first_decisive": "message_stop",
    "may_be_recorded_true": false,
-   "duration_s": 0.13,
+   "duration_s": 0.15,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633816771796221-1700988.jsonl",
+   "query": "本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 归档到 docs/ 下",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.11,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1789633816916831257-1701000.jsonl",
+   "query": "本周 sprint 结束了, 帮我把 Forgejo 上 10CG/Aria 已关闭的 issue 汇总成一份 changelog 段落, 归档到 docs/ 下",
+   "frames": 5,
+   "first_decisive": "message_stop",
+   "may_be_recorded_true": false,
+   "duration_s": 0.2,
    "healthy": true,
    "reasons": []
   }
