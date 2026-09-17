@@ -632,8 +632,10 @@ metadata:
       1cb3872 nested clone). Check code is taken from the yaml (metadata.*.code), so the yaml
       text is what gets exercised. The clone is restored at the end; <work dir> is wiped first.
       Output carries no paths, times or SHAs.
+      N6 的本轨 claim 由脚本在临时仓自造 (raw id 每跑唯一, 容器身份由 phase1_gate 自解析), 不依赖
+      执笔容器是谁, 也不依赖真仓此刻的认领状态; N9 的提交时间钉死并单调递增, git log 顺序唯一。
       """
-      import json, re, shutil, subprocess, sys
+      import json, os, re, shutil, subprocess, sys, time, uuid
       from pathlib import Path
       import yaml
 
@@ -645,8 +647,9 @@ metadata:
       WORK.mkdir(parents=True)
 
 
-      def run(cmd, cwd=None, check=True):
-          p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+      def run(cmd, cwd=None, check=True, env=None):
+          p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                             env=({**os.environ, **env} if env else None))
           if check and p.returncode != 0:
               raise RuntimeError(f"{cmd[:3]} rc={p.returncode}: {p.stderr[-300:]}")
           return p
@@ -730,11 +733,12 @@ metadata:
               run(["git", "clone", "-q", str(bare), str(c)])
               run(["git", "-C", str(c), "fetch", "-q", "origin", "refs/aria/coordination:refs/aria/coordination"])
           (d / "precheck.py").write_text(M["coord_ref_precheck"]["code"], encoding="utf-8")
-          own = "claims/023236f2/s-86f7@1836.yaml"
-          raw = "pre-merge-completeness-gate-change-scope"
+          # 本轨 claim 由 fixture 在临时仓自造, 等价于 TASK-001 在真仓读到的那一条: raw id 每跑唯一
+          # (不与 seed 进来的真仓 claim 同 track), 容器身份由 phase1_gate 自解析后回填 own_claim。
+          raw = "zz-precheck-own-" + uuid.uuid4().hex[:8]
 
           def pre(name):
-              p = run([sys.executable, "-B", str(d / "precheck.py"), own], cwd=local, check=False)
+              p = run([sys.executable, "-B", str(d / "precheck.py"), *sorted(own)], cwd=local, check=False)
               o = json.loads(p.stdout)
               kinds = [a["kind"] for a in o.get("ahead", [])]
               print(f"[{name}] exit={p.returncode} verdict={o['verdict']} local_ahead={o.get('local_ahead')} kinds={kinds}")
@@ -742,6 +746,16 @@ metadata:
           def gate(repo, *args):
               return run([sys.executable, "-B", *args, "--repo-path", str(repo)], cwd=repo, check=False)
 
+          acq = json.loads(gate(local, str(SS / "phase1_gate.py"), "--raw-track-id", raw,
+                                "--phase", "B", "--mode", "advisory", "--no-push").stdout)
+          oc = acq["own_claim"]
+          own = {f"claims/{oc['container']}/{oc['session']}.yaml"}  # write_claim 的 file-per-writer 布局
+          run(["git", "-C", str(local), "push", "-q", "origin", "refs/aria/coordination:refs/aria/coordination"])
+          run(["git", "-C", str(other), "fetch", "-q", "origin", "+refs/aria/coordination:refs/aria/coordination"])
+          print(f"    fixture own claim: acquire outcome={acq.get('outcome')} own_files={len(own)}")
+          t0 = int(time.time())
+          while int(time.time()) <= t0:  # heartbeat_at 精度到秒: 同秒刷新写出的是空 diff commit, 会判 other
+              time.sleep(0.05)
           pre("equal")
           h = gate(local, str(SS / "phase1_gate.py"), "--heartbeat-only", "--raw-track-id", raw, "--phase", "B", "--no-push")
           print(f"    heartbeat outcome={json.loads(h.stdout).get('outcome')}")
@@ -827,13 +841,18 @@ metadata:
           run(["git", "init", "-q", "-b", "master", str(repo)])
           (d / "attrib.py").write_text(M["commit_attribution"]["code"], encoding="utf-8")
           g = ["git", "-C", str(repo), "-c", "user.email=a@b", "-c", "user.name=a"]
+          clock = [1789660000]  # 钉死并单调递增: 同秒提交的 git log 顺序不稳定 (实测 6 个提交里 4 个同秒)
+
+          def at():
+              clock[0] += 60
+              return {"GIT_AUTHOR_DATE": f"{clock[0]} +0000", "GIT_COMMITTER_DATE": f"{clock[0]} +0000"}
 
           def commit(path, text, msg):
               f = repo / path
               f.parent.mkdir(parents=True, exist_ok=True)
               f.write_text(text, encoding="utf-8")
               run(g + ["add", path])
-              run(g + ["commit", "-q", "-m", msg])
+              run(g + ["commit", "-q", "-m", msg], env=at())
 
           def check(name):
               p = run([sys.executable, "-B", str(d / "attrib.py"), "base", "HEAD"], cwd=repo, check=False)
@@ -849,12 +868,12 @@ metadata:
           run(g + ["checkout", "-q", "base"])
           commit("docs/handoff/latest.md", "other\n", "other track on base")
           run(g + ["checkout", "-q", "feat"])
-          run(g + ["merge", "-q", "--no-ff", "-m", "sync", "base"])
+          run(g + ["merge", "-q", "--no-ff", "-m", "sync", "base"], env=at())
           check("own + sync merge of base")
           run(g + ["checkout", "-q", "-b", "side", "base~1"])
           commit("docs/other.md", "o\n", "unpushed side work")
           run(g + ["checkout", "-q", "feat"])
-          run(g + ["merge", "-q", "--no-ff", "-m", "merge side", "side"])
+          run(g + ["merge", "-q", "--no-ff", "-m", "merge side", "side"], env=at())
           check("bad: merge of a branch not in base")
           run(g + ["reset", "-q", "--hard", "HEAD~1"])
           commit("docs/handoff/latest.md", "mine\n", "pointer edit")
@@ -921,6 +940,7 @@ metadata:
       [bad_cell_runs_twice] exit=1 {"X.1": ["pass", "pass"]}
       [bad_cell_renamed] exit=1 {"X.1": ["not-run"]}
       == N6 (coordination ref precheck before heartbeat push / forced alignment) ==
+          fixture own claim: acquire outcome=passed own_files=1
       [equal] exit=0 verdict=ok local_ahead=0 kinds=[]
           heartbeat outcome=refreshed
       [local ahead: own heartbeat only] exit=0 verdict=ok local_ahead=1 kinds=['own-heartbeat']
@@ -946,7 +966,7 @@ metadata:
       == N9 (commit attribution between base and tip) ==
       [own commits only] exit=0 {"verdict": "ok", "commits": 3, "kinds": ["own", "own", "own"]}
       [own + sync merge of base] exit=0 {"verdict": "ok", "commits": 4, "kinds": ["sync-merge", "own", "own", "own"]}
-      [bad: merge of a branch not in base] exit=1 {"verdict": "stop", "commits": 6, "kinds": ["foreign-merge", "sync-merge", "foreign", "own", "own", "own"]}
+      [bad: merge of a branch not in base] exit=1 {"verdict": "stop", "commits": 6, "kinds": ["foreign-merge", "foreign", "sync-merge", "own", "own", "own"]}
       [bad: shared pointer edited] exit=1 {"verdict": "stop", "commits": 5, "kinds": ["foreign", "sync-merge", "own", "own", "own"]}
       [bad: other track handoff] exit=1 {"verdict": "stop", "commits": 5, "kinds": ["foreign", "sync-merge", "own", "own", "own"]}
       == N10 (guard_config_hooks: config.json / hooks.json must not mention the symbol) ==
