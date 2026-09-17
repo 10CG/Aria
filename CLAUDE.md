@@ -130,16 +130,17 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
 
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)。168h 自主跑三门未清:
-  - Blocker 3 输入投递: spec aria-2.0-m6-dispatch-input-delivery — B.2 实现完成
-    (aria-orchestrator feature/m6-dispatch-input-delivery), 卡 C.2 合并于 4 owner/infra 门
-  - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门)
-  - 遥测 spec aria-2.0-m6-cost-model-telemetry — Track-1 实施完成
-    (feature/m6-cost-model-telemetry, 合并 gate input-delivery); 168h AC-6 可评分须其独立 ship
+  - Blocker 3 输入投递 spec aria-2.0-m6-dispatch-input-delivery: B.2 完成
+    (aria-orchestrator feature/m6-dispatch-input-delivery), 卡 C.2 于 4 owner/infra 门
+  - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门); 遥测 spec aria-2.0-m6-cost-model-telemetry
+    Track-1 完成 (feature/m6-cost-model-telemetry, 合并 gate input-delivery), 168h AC-6 须其独立 ship
   M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
   aria-plugin 方法论轨: v1.52.0–v1.73.3 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
     残余 deferred 挂 Aria #168; 并发 in-flight track 见 docs/handoff/latest.md
-版本: 插件 aria-plugin v1.73.3 | 主项目 v1.7.5 | 运行时 aria-orchestrator v2.0.0 (86bb684)
-  Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
+  Rule #6 description 维度: 场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 +
+    standards 940cb5b / SOT 1.1.0); 跟进 Aria#213 · Aria#214 · aria-plugin#200
+版本: aria-plugin v1.73.3 | 主项目 v1.7.5 | aria-orchestrator v2.0.0 (86bb684); Layer 2 主力
+  LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
 进展查询: `/state-scanner` (live) | session 史 → `docs/handoff/` (Rule #9 canonical) | 版本史 → `aria/CHANGELOG.md` (SOT) | 活跃 spec 详情 → `openspec/changes/*/proposal.md`
