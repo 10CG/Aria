@@ -85,6 +85,7 @@ aria-plugin-benchmarks/
 | 固定测试集 | `ab-suite/` | 常态化比对 | 修改需升版本号，旧数据不可比 |
 | 现有 evals | `{skill}/evals/evals.json` | 首轮基线 | 可迁移到 ab-suite |
 | 临时测试 | `{skill}/{skill}-workspace/` | 开发中验证 | 随时可改，不计入基线 |
+| trigger 套件 | `ab-suite/trigger/` | description 地板守卫 (场景 4b) | 同固定测试集: 修改需升 `ab-suite/version.yaml`，旧数据不可比 |
 
 ---
 
@@ -260,7 +261,7 @@ eval 是在**真实 Aria 仓、真实 origin** 里跑的 (subagent 无 sandbox)�
 预估: 28 Skills × ~$0.50/Skill ≈ $14, ~6-8 hours
 ```
 
-### 场景 4: Description 触发准确率优化
+### 场景 4a: Description 优化 (可选)
 
 ```
 /skill-creator (description 优化流程)
@@ -272,6 +273,39 @@ eval 是在**真实 Aria 仓、真实 origin** 里跑的 (subagent 无 sandbox)�
 
 触发时机: 修改 Skill 的 description/frontmatter 后
 ```
+
+
+### 场景 4b: Description 地板守卫 (Rule #6 义务)
+
+判据:
+
+- **通过** = 两个条件同时成立: (1) `run_eval.py` 输出的每条 `pass` 为真, 即每条 should-trigger `trigger_rate ≥ 0.5` **且** 每条 should-not `trigger_rate < 0.5` (`run_eval()` 的 `did_pass` 语义, 已读源码核对); (2) **调用级地板**: 被评臂 should-trigger 半程的触发次数 ≥ 28/30 (runs = 3、should-trigger 10 条时最多允许 2 次未触发; 改 runs 或套件条数须按比例重算, 那是换判据, 须 owner 裁)。地板只判被评臂, 不判负控臂。
+- **参数钉死** (阈值语义依赖 runs): `--runs-per-query 3` (0.5 门 = 2/3), `--trigger-threshold 0.5`, `--timeout 120`, `--num-workers 1` (见前置表第 1 条), 显式 `--model` (见前置表第 4 条), 套件 20 条 (10/10)。改任一参数 = 换判据, 须 owner 裁 (例: 阈值 0.8 在 3 runs 下等于 3/3)。
+- **阈值与地板的依据** (owner 2026-09-17 裁定; 依据 = 基线目录里跑满 20 条 query 的 21 个臂, 另有 4 次单 query 的报错探针不计): 这 21 个臂里真 description 的 14 个, 其中健康配置 (独立根 + 单 worker, v2 起) 的 11 个; 这 11 个里 10 个是调用级 30/30 (每条 should-trigger query 都 3/3), 唯一的例外是 v2 的被评臂 27/30 —— 它有一条 query 三次全没触发, 按 query 门就已经是 9/10 的 fail。所以 0.5 与 0.8 在这些臂上从未改变过任何一臂的门判定 (只改变过两处 query 命中计数: v1 的一臂 1/10 对 0/10, 10/10 门下都是 fail; v3 的负控 3/10 对 2/10, 不超过 5/10 门下都是 valid), 单挑阈值定不出优劣。地板补的是 0.5 唯一的理论缺口 (每条 query 都恰好 2/3、合计 20/30 时, 只按 query 判仍算全过); 取 28/30 而不取 30/30, 是为了不让一两次健康的未触发把好 description 判红。按已有数据, 这条地板从来不是约束 (10 个臂 30/30, 那个 27/30 本来就过不了 query 门)。不健康的调用不走这条地板, 由逐调用健康检查处理。
+- **只承诺已验证的两类破坏**: 删领域词 (should-trigger 掉) 与显式强制过宽 (should-not 涨)。一次自然措辞扩张 (多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」四处, 其中「整理归档文档」直接带被测 skill 的领域词) 实测不判红 (RESULT v9 §v5): 守卫判得出什么, 由套件里的近似误触决定。
+- **逐调用健康检查** (识别环境故障): `run_eval.py` 把 `claude -p` 的报错、超时、非零退出都记成一次「未触发」, `runs` 恒为 3, 输出 json 里与「真没触发」分不开 (源码: `run_single_query` 超时或进程提前退出时返回「未触发」, 遇报错的结果帧照常返回此前的判定; 只有工作进程抛异常才进 `run_eval()` 的 `except Exception` 分支并打印 `Warning: query failed`)。所以每臂都经 claude 垫片 (`aria-plugin-benchmarks/tools/trigger-eval/claude-shim.sh`, 见前置表第 3 条) 跑, 垫片把每次调用的输出流与 query 原文各另存一份 (每臂一个新建的空日志目录)。跑完用 `aria-plugin-benchmarks/tools/trigger-eval/classify_calls.py` 检查, 被评臂加 `--role evaluated`, 负控臂加 `--role negctrl`: 单次调用须走到 `run_eval.py` 据以下判定的事件 (tool_use 开始、`message_stop`、含 tool_use 的 assistant 消息、结果帧 四者之一), 结果帧不得报错, 耗时须小于超时阈值减 1 秒, 否则算不健康; 每条 query 的日志数须等于它的 runs。不健康的调用按「触发」「没触发」两种可能都算: 被评臂的门判定、负控的命中数判定在两种极端下都不变, 检查结论为 pass / fail (被评臂) 或 valid (负控臂); 会变, 结论为 void, 本轮作废 (见下)。实证见基线目录 RESULT.md「v6: 逐调用健康检查」一节。
+- **同批负控** (验证本轮数字可用, 不评 description):
+  - 构造: 删去全部领域名词与该 skill 特有动作词, 只留「处理一件事项」级的泛化句 (基线负控保留了「收尾 / 核对」, 仍命中 3 条带这类动作语义的 query; 按本规则构造的「对一个事项做处理。」在 v5 为 0/10, 见 RESULT v9)。
+  - 判据 (绝对门槛, 不以被评 description 为参照): 负控 query 级命中 (每 query 命中 := `trigger_rate ≥ 0.5`) 须 **≤ 5/10**。门通过时被评 description 必为 10/10, 此时 10 对 5 的 Fisher 单侧 p = 0.016 (10 对 6 为 0.043, 不取)。基线 v3 负控 3/10。
+  - **作废**在以下任一情形发生: 任一臂逐调用健康检查不通过 (检查结论为 void, 即不健康的调用足以改变判定; 或检查脚本无法判定); 负控 ≥ 6/10, 不论被评 description 过没过门 (套件分不开「有没有触发词」, 本轮数字不可用); `run_eval.py` 非零退出、没有输出 json, 或 stderr 出现 `Warning: query failed`。作废时不判被评 description。作废 = 本 cycle 的 Rule #6 义务未完成, **不得 ship**; 修套件或环境后重跑; rule6_note 记 `scenario4b: <结果目录> void`; **连续 2 轮作废 ⇒ 升级 owner** (AI 不得自行豁免, Rule #10)。
+- **fail 的后果**: 本轮不作废 (各臂逐调用健康检查都通过、负控 ≤ 5/10、`run_eval.py` 正常退出且无 Warning) 而被评臂的检查结论为 fail (门判 fail, 且不健康的调用改变不了这一点) ⇒ 该 description 改动**不得 ship** (与 void 同为义务未完成)。处置二选一: (1) 修正 description 直到门通过; (2) 若 fail 来自**有意**收窄或拓宽触发面 (套件原来的 should / should-not 划分已不符合新意图), 则先改套件 (升 `ab-suite/version.yaml`, 新套件经 owner 审阅) 再重跑; 两条都不走 ⇒ 升级 owner。rule6_note 记 `scenario4b: <结果目录> fail` 与所走的处置。
+- **不设比较判据** (如新版触发率不低于旧版): 在饱和处退化 (见基线目录 RESULT.md 结论 1); 如需比较, 只作 rule6_note 观察, 不作门。
+- **套件**: 每个被评 skill 一份 `aria-plugin-benchmarks/ab-suite/trigger/<skill>.json` (20 条, should / should-not 各 10, should-not 以近似误触为主), **沿用 `ab-suite/` 版本化规则** (改套件须升 `ab-suite/version.yaml`, 旧数据不可比)。should-not 的近似误触须覆盖该 skill 最可能被扩到的相邻任务 (v5: 本套件对「整理收尾材料」这一幅度的扩张不敏感)。新套件须经 owner 审阅后才能作门。新增 skill 的首个 description 同样要过本场景, 其首个套件随之建立。
+
+运行前置:
+
+「机读实证」列的路径均相对 `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/`; 带 `[配置推导]` 标记的行没有机读文件。
+
+| # | 前置 | 机读实证 |
+|---|---|---|
+| 1 | `--num-workers 1` (消除同一项目根内的兄弟命令文件); 多臂并行时每臂一个独立项目根 (含空 `.claude/`)。两者正交。上游修好 `run_eval.py` 的并发互见缺陷后可放宽 | `v1-shared-root-4workers/new.json` · `v2-isolated-root-1worker/new.json` · `v1-shared-root-4workers/diag02-sibling-command-collision.jsonl` |
+| 2 | 合成技能**中性化**: `name: helper` 的临时 SKILL.md 壳 + `--description` 显式传入 | `v2-isolated-root-1worker/negctrl.json` · `v3-isolated-root-1worker-neutral-name/negctrl.json` · `neutral-skill-SKILL.md` |
+| 3 | `claude -p` 经 claude 垫片 (`aria-plugin-benchmarks/tools/trigger-eval/claude-shim.sh`) 调起: 追加 `--setting-sources project` (不加载用户级插件), 并把每次调用的输出流与 query 原文各另存一份供逐调用健康检查。设置源的实证看两份探针 json 的 `result` 字段: 默认设置源的列表含真 `openspec-archive`, project-only 不含; 其中的技能数是模型自报, 不作证据 | `probe-setting-sources-default.json` · `probe-setting-sources-project.json` · `v6-per-call-health-opus5/claude-shim.sh` |
+| 4 | 显式 `--model <本 session 模型>` (第 3 条会连带换掉默认模型) | [配置推导] RESULT.md v9「同一首次探针的附带观察」段, 未落机读文件 |
+| 5 | 同批负控与逐调用健康检查 (判据见本小节上文) | `v5-mildcreep-opus5/negctrl.json` · `v6-per-call-health-opus5/fault-matrix/matrix-summary.json` · `v6-per-call-health-opus5/real/C1_new.classify.json` · `v6-per-call-health-opus5/real/C2_negctrl.classify.json` |
+| 6 | 产物落 `aria-plugin-benchmarks/ab-results/<date>-<skill>-trigger/` + RESULT.md (对齐基线目录形状), 各臂的 `run_eval.py` 输出 json、stderr 与逐调用检查报告一并留存; 工具版本 (插件缓存 hash / Claude Code 版本 / 模型) 写进 RESULT | `RESULT.md` |
+
+两套编号不同轴: `decision_table_row` 取 SOT 决策表行号; `scenario1` / `scenario4b` 是本手册的场景编号。
 
 ---
 
@@ -477,7 +511,7 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 **理由**: AB 测试回答的是「AI 读了新指令后表现变好了吗」; 确定性 Python 层的行为与 AI 无关
 (同输入必同输出), 其质检对口的是机械测试 — 对它跑 LLM AB 等于测不到点、贵且噪。
 
-**边界与留痕**: 完整 fail-closed 边界三条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑 /
+**边界与留痕**: 完整 fail-closed 边界四条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑场景 1 / description 变动另须跑场景 4b 地板守卫, 它只验证触发面没被改坏, 不验证 description 改得更好 /
 拿不准照跑) 见 CLAUDE.md 规则 #6 豁免机制段 (SOT)。使用豁免的 spec 须留 `rule6_note` 引用该机制。
 先例: `state-scanner-stale-refs-false-parity` (v1.59-1.62) + `state-scanner-gate-yaml-datasource` (#113, 机制化触发点)。
 
