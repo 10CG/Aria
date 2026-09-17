@@ -128,13 +128,13 @@ rule6_note:
 
 ## Tasks
 
-- [ ] T0 转录纪律 (T1–T5 通用): 写进规范的文字去掉本 proposal 的内部编号 (OQ-n / Dn / Tn / SC-n), 按 owner 对 OQ 的裁定写成确定的文字 (SC-11)
+- [x] T0 转录纪律 (T1–T5 通用): 写进规范的文字去掉本 proposal 的内部编号 (OQ-n / Dn / Tn / SC-n), 按 owner 对 OQ 的裁定写成确定的文字 (SC-11)
 - [x] T1 三处 D1 新句落地 (逐字), 旧句删除; 手册「边界三条」改「四条」; SOT §3 边界注。CLAUDE.md 只改这一句 (含 §4.1 指向), 不另加句
-- [ ] T2 手册 §场景 4 拆 4a / 4b; 4b 写 D2 判据 (参数照抄为以「参数钉死」开头的一行; 含「不设比较判据」固定措辞与负控 ≤ 5/10、连续 2 轮升级、逐调用健康检查) + D3 六行前置表 (机读实证写相对基线目录的完整相对路径, 不写省略号或通配) + 两套编号说明; §固定测试集 vs 临时测试 表加 trigger 行
-- [ ] T2b 把基线目录 `v6-per-call-health-opus5/` 下的 `claude-shim.sh`、`classify_calls.py`、`fake-claude`、`fault_matrix.py` 原样复制到 `aria-plugin-benchmarks/tools/trigger-eval/` (基线目录的原件保留不动 —— 前置表第 3 行的机读实证与 SC-13 的逐字节比对都要求它还在), 在新位置重跑故障矩阵 (SC-13); 手册 §场景 4b 引用两个工具的新路径
-- [ ] T3 SOT 新增 §4.1 rule6_note 五字段模板 (D4) —— 只改 SOT
-- [ ] T4 `ab-suite/trigger/openspec-archive.json` 复制入 (逐字节同基线, 基线目录原件保留 —— SC-4 的 diff 要求它还在) + `ab-suite/version.yaml` 升版 —— **OQ-3 裁定前不执行**; 若本 Spec ship 时 OQ-3 仍未裁, 本任务标 deferred 并记入 D5.2 的 issue
-- [ ] T5 SOT §6 第三条 + 计数语 (D6); 转录第三条时在基线路径后补写当时 RESULT.md 的版本号与主仓提交 SHA (这是给执行者的指令, 本身不转录); SOT 文件头 Version 1.1.0
+- [x] T2 手册 §场景 4 拆 4a / 4b; 4b 写 D2 判据 (参数照抄为以「参数钉死」开头的一行; 含「不设比较判据」固定措辞与负控 ≤ 5/10、连续 2 轮升级、逐调用健康检查) + D3 六行前置表 (机读实证写相对基线目录的完整相对路径, 不写省略号或通配) + 两套编号说明; §固定测试集 vs 临时测试 表加 trigger 行
+- [x] T2b 把基线目录 `v6-per-call-health-opus5/` 下的 `claude-shim.sh`、`classify_calls.py`、`fake-claude`、`fault_matrix.py` 原样复制到 `aria-plugin-benchmarks/tools/trigger-eval/` (基线目录的原件保留不动 —— 前置表第 3 行的机读实证与 SC-13 的逐字节比对都要求它还在), 在新位置重跑故障矩阵 (SC-13); 手册 §场景 4b 引用两个工具的新路径
+- [x] T3 SOT 新增 §4.1 rule6_note 五字段模板 (D4) —— 只改 SOT
+- [~] T4 (**deferred**, owner 2026-09-17 裁定 20 条 query 须先经 owner 审阅) `ab-suite/trigger/openspec-archive.json` 复制入 (逐字节同基线, 基线目录原件保留 —— SC-4 的 diff 要求它还在) + `ab-suite/version.yaml` 升版 —— **OQ-3 裁定前不执行**; 若本 Spec ship 时 OQ-3 仍未裁, 本任务标 deferred 并记入 D5.2 的 issue
+- [x] T5 SOT §6 第三条 + 计数语 (D6); 转录第三条时在基线路径后补写当时 RESULT.md 的版本号与主仓提交 SHA (这是给执行者的指令, 本身不转录); SOT 文件头 Version 1.1.0
 - [ ] T6 开三张 issue (D5.2 / D5.3 / D5.6); 上游反馈发出 (渠道经 owner 确认) 并把证据记入 `10CG/Aria#211` (D5.4)
 - [ ] T7 查 `10CG/aria-standards#17` 并行编辑并留分工言 (D5.5); standards 本地 `--no-ff` merge → 双推 → **对 origin 与 github 各自 `git ls-remote` 比对 SHA, 全部一致才算推成功** → 主仓 gitlink bump → 主仓双推同样逐 remote 核验
 - [ ] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v9) + 落地位置; 关单归 owner
