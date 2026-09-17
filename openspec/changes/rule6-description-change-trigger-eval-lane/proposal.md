@@ -138,8 +138,8 @@ rule6_note:
 - [x] T6 (前半) 三张 issue 已开: `10CG/Aria#213` (D5.2) / `10CG/aria-plugin#200` (D5.3) / `10CG/Aria#214` (D5.6)
 - [~] T6 (后半, **deferred**) 上游 skill-creator 反馈: owner 2026-09-17 裁定先查上游是否已有新版并尝试自行升级, 之后本 cycle 暂缓发出, 记入跟进单; 发出后再把证据 (标题 + 时间 + 链接或反馈 ID) 记入 `10CG/Aria#211` (D5.4)
 - [x] T7 (前半) 查 `10CG/aria-standards#17` 并行编辑并留分工言 (D5.5): 2026-09-17 查得该单最后更新为 2026-09-06, 无并行编辑; 分工言已发 (comment 24640, 2026-09-17T13:42:08Z), 写明本 Spec 定深度、该单定广度、交叉点与 SOT 已落地的五处改动
-- [ ] T7 (后半) standards 本地 `--no-ff` merge → 双推 → **对 origin 与 github 各自 `git ls-remote` 比对 SHA, 全部一致才算推成功** → 主仓 gitlink bump → 主仓双推同样逐 remote 核验
-- [ ] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v9) + 落地位置; 关单归 owner
+- [x] T7 (后半) standards 本地 `--no-ff` merge → master `940cb5b`, 双推后 origin 与 github 各自 `git ls-remote` 均 MATCH; 主仓 gitlink bump 到 `940cb5b` 并双推核验 (本提交)
+- [x] T8 `10CG/Aria#211` 回帖: 基线结论 (RESULT.md v9) + 落地位置 —— 已发 (comment 24646, 2026-09-17T13:44:52Z; 含三个结论、四处落地位置、判据要点、三张跟进单、两项 deferred 及其实测依据); 关单归 owner
 
 ## Success Criteria
 
