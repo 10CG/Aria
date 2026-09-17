@@ -107,7 +107,7 @@ forgejo POST /repos/10CG/Aria/pulls -d '{"title":"...","head":"branch","base":"m
 | 处方性 · 套件覆盖外 (典型: authoring 向导) | 不能 | 点名行为 + 建可证伪定向 fixture + 套件缺口开 issue (缺一照跑) |
 | 拿不准 | — | 照跑 (宁跑勿豁) |
 
-   `description` 或指令流程变动一律照跑; 豁免须在 spec/tasks 留 `rule6_note`。跑 benchmark 本身不需要 OpenSpec。SOT: `standards/conventions/skill-benchmark-exemption.md` + 手册 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`。
+   指令流程或 `description` 变动一律照跑场景 1; `description` 变动另须跑场景 4b 地板守卫, 它只验证触发面没被改坏, 不验证 description 改得更好; 豁免与结果都写进 `rule6_note` (字段见 SOT §4.1); 自主运行时的处置见 SOT §2。跑 benchmark 本身不需要 OpenSpec。SOT: `standards/conventions/skill-benchmark-exemption.md` + 手册 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`。
 
 7. **Secret 写入/读取命令必须 redirect output** — stdout/stderr 不得流入 chat-visible 通道 (Bash 强制 `>/dev/null 2>&1`; Python subprocess 强制 `capture_output=True` 且不 print)。验证用 metadata (status code / key 名 / 长度), 不读 secret value 字面。Exception 须 `# secret-leak-ok-explicit` + 理由 + owner sign-off。SOT: `standards/conventions/secret-hygiene.md`。
 8. **PR merge 前必跑 pre-merge gate** — phase-c-integrator C.2.4 验证 (a) 本 PR CI passing; (b) main 无 in-flight CI run; 经 CI backend 抽象层调用 (Aether 默认)。无可用 backend 按 `no_ci_fallback` 显式降级; stub backend 抛 NotImplementedError 时 gate 必须 abort, 不得静默降级。SOT: `aria/skills/phase-c-integrator/SKILL.md §C.2.4`。

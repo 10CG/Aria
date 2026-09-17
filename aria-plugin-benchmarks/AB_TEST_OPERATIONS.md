@@ -477,7 +477,7 @@ AB 测试的 "with/without skill 执行任务" 方法需要适配：
 **理由**: AB 测试回答的是「AI 读了新指令后表现变好了吗」; 确定性 Python 层的行为与 AI 无关
 (同输入必同输出), 其质检对口的是机械测试 — 对它跑 LLM AB 等于测不到点、贵且噪。
 
-**边界与留痕**: 完整 fail-closed 边界三条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑 /
+**边界与留痕**: 完整 fail-closed 边界四条 (SKILL.md 事实性同步例外 / description 与指令面变动零裁量照跑场景 1 / description 变动另须跑场景 4b 地板守卫, 它只验证触发面没被改坏, 不验证 description 改得更好 /
 拿不准照跑) 见 CLAUDE.md 规则 #6 豁免机制段 (SOT)。使用豁免的 spec 须留 `rule6_note` 引用该机制。
 先例: `state-scanner-stale-refs-false-parity` (v1.59-1.62) + `state-scanner-gate-yaml-datasource` (#113, 机制化触发点)。
 
