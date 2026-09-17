@@ -34,7 +34,7 @@ v9 的四处改动是否触及本席 R7 核实过的运行时结论 (S_FAIL 终�
 
 ## Findings
 
-- [major] documentation/proposal.md §D2+SC-12 (issue): SC-12 新增的锚点只覆盖 SOT §2 侧「不做 description 改动 (含新增 skill)」句 (第 41 行); R7 major#3 同时点名的手册侧对应句 (D2 第 58 行「新增 skill 的首个 description 同样要过本场景, 其首个套件随之建立」) 仍无任何 SC 锚定 —— 通读 SC-1 到 SC-13 全文, 无一条引用该句或「首个套件」; 转录 D2 到手册时若漏写或改写掉这句, 没有 SC 会转红。owner 裁定「三条 major...现在就改」, 但本条只改了一半。
+- [major] documentation/proposal.md §D2+SC-12 (issue): SC-12 新增的锚点只覆盖 SOT §2 侧「不做 description 改动 (含新增 skill)」句 (第 41 行); R7 major 第 3 条 同时点名的手册侧对应句 (D2 第 58 行「新增 skill 的首个 description 同样要过本场景, 其首个套件随之建立」) 仍无任何 SC 锚定 —— 通读 SC-1 到 SC-13 全文, 无一条引用该句或「首个套件」; 转录 D2 到手册时若漏写或改写掉这句, 没有 SC 会转红。owner 裁定「三条 major...现在就改」, 但本条只改了一半。
 - [major] testing/RESULT.md §v6 加固记录 (issue): RESULT v8 新增一句「归档在 `fault-matrix/` 与 `fault-matrix-counterfactual/` 的就是加固后重跑的产物」, 但 `git log -1 -- <path>` 显示两个目录下的 `matrix-summary.json` 最后改动都是 R7 之前 (2026-09-15 `76959c8`), a563192 未触碰; `fault-matrix-counterfactual/` 目录里唯一的文件就是这个 `matrix-summary.json`, 即该目录没有任何文件被 a563192 改过。`fault-matrix/` 下只有 22 个 `<tag>.classify.json` 报告文件被 a563192 改过 (内嵌新的日志文件名/耗时, 证实确有一次真实重跑), 但同目录的 `.json`/`.err` 原始输出与 `matrix-summary.json` 本身未变。数值本身 (0/24 与 5/24 不符、5 个用例名) 经本席独立重跑复核仍正确 (见机制核实记录), 但「就是加固后重跑的产物」这句对 `matrix-summary.json` 不成立, 对 `fault-matrix-counterfactual/` 整体不成立。
 
 ## 观察
@@ -57,7 +57,7 @@ REVISE
 ## 机制核实记录
 
 - `git diff 15ab323 a563192 -- openspec/changes/rule6-description-change-trigger-eval-lane/proposal.md`(全文, 非片段) 与 `... -- aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/RESULT.md` 全文核对四处改动的确切文本。
-- `git diff 15ab323 a563192 --stat`(整个仓库) 核对本次 v9 commit 实际触碰的文件集合 (68 个文件, 含大量并发容器合并进来的 `handoff-multibranch-subdir-path-fidelity` 审计报告与 `#195 A.2/A.3` 材料, 与本 Spec 无关, 已排除)。
+- `git diff 15ab323 a563192 --stat`(整个仓库) 核对本次 v9 commit 实际触碰的文件集合 (68 个文件, 含大量并发容器合并进来的 `handoff-multibranch-subdir-path-fidelity` 审计报告与 `10CG/Aria#195 A.2/A.3` 材料, 与本 Spec 无关, 已排除)。
 - `git diff 15ab323 a563192 --stat -- aria-orchestrator/`、`.../claude-shim.sh`、`.../classify_calls.py`、`.../fake-claude` 均零输出, 逐一确认 (支持「R7 对账」结论)。
 - 完整读 `fault_matrix.py` 加固后的 diff (7 行) 与全文 (176 行), 确认新逻辑: `out` 存在且非空 → 打印错误、返回 2; 不存在 → `mkdir(parents=True)`; 存在且为空 → 直接进入子目录创建 (安全, 因为空目录意味着子目录必然不存在, 不会撞 `FileExistsError`)。
 - **独立重跑 A (加固后脚本, 正常)**: 复制四工具到 `/tmp/.../scratchpad/r8-backend-architect/tool-copy/`, `python3 fault_matrix.py --suite <基线套件> --out <scratch>/fm-normal` → 24 用例、0 不符、退出码 0; 逐字段比对 `matrix-summary.json` 与归档版本一致 (含 `F1_result_error` 行的 `classify` 子对象完全相等); `.json`/`.err` 原始输出与归档版本 `diff` 零输出 (证实 `fake-claude` 行为确定性, 与是否重跑无关)。
