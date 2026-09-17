@@ -1,14 +1,16 @@
 ---
 track-id: rule6-description-change-trigger-eval-lane
 owner-container: simonfish/bfe8285d
-phase: A.1
-status: active
-updated-at: 2026-09-17T10:45:43Z
+phase: D.2
+status: done
+updated-at: 2026-09-17T14:09:19Z
 ---
 
-# Aria — Session Handoff (2026-09-17) — `10CG/Aria#211` Rule #6 description 维度: post_spec R7 + R8 跑完, owner 裁定接受当前结论 (v10) + 九条待裁项同日裁完 (v11)
+# Aria — Session Handoff (2026-09-17) — `10CG/Aria#211` Rule #6 description 维度: post_spec R7 + R8 跑完, owner 裁定接受当前结论 (v10) + 九条待裁项裁完 (v11) + Phase B/C/D 全部完成, Spec 已归档
 
-> **一句话**: 接上一份 handoff (v8 待跑 R7) —— 周用量窗口重置后跑完 R7 (0C / 3M / 1m, 2 REVISE / 3 PASS) → owner 2026-09-17 裁定「增加轮次 (7 → 8) + 四条现在就改」→ v9 (`a563192`) → R8 (0C / 3M / 0m, 4 REVISE / 1 PASS) → owner 2026-09-17 裁定「接受当前结论, 改完收工」(audit-engine 降级策略第 1 条, `overridden_by_user: true`) → **v10 (`9de3074`) 与 RESULT v9 已双推, 两端 `ls-remote` 核验一致**。post_spec 到此结束。同日 owner 裁完九条待裁项 → **v11 (`a7e852e`)**, 与双子星四个提交合并后为 `85d680b`, 两端核验一致。九条里只有 OQ-1 带实质改动 (0.5 门加一道调用级地板 28/30), 余八条取推荐或现稿。下一步是 Phase B。
+> **一句话**: 接上一份 handoff (v8 待跑 R7) —— 周用量窗口重置后跑完 R7 (0C / 3M / 1m, 2 REVISE / 3 PASS) → owner 2026-09-17 裁定「增加轮次 (7 → 8) + 四条现在就改」→ v9 (`a563192`) → R8 (0C / 3M / 0m, 4 REVISE / 1 PASS) → owner 2026-09-17 裁定「接受当前结论, 改完收工」(audit-engine 降级策略第 1 条, `overridden_by_user: true`) → **v10 (`9de3074`) 与 RESULT v9 已双推, 两端 `ls-remote` 核验一致**。post_spec 到此结束。同日 owner 裁完九条待裁项 → **v11 (`a7e852e`)**, 与双子星四个提交合并后为 `85d680b`, 两端核验一致。九条里只有 OQ-1 带实质改动 (0.5 门加一道调用级地板 28/30), 余八条取推荐或现稿。
+>
+> **Phase B/C/D 同日走完**: T0–T8 全部落地或如实 deferred (T4 等 owner 审 20 条 query; T6 后半上游反馈暂缓) → 两道 pre-merge 闸实跑通过 (C.2.4 verdict=green / C.2.4.5 submodule PASS) → PR `10CG/Aria#215` 合并 (`df3c274`) → 多远程推送与三个子模块 gitlink 逐 remote 核验 → Spec 归档到 `openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/` (五条断言全绿) → claim 已释放为 done。**本轨终结。**
 >
 > **本段最该记住的**: (1) **加固动作自身会带出同类缺口** —— R8 三条 major 里有两条是 v9 的修复动作造成的: SC-9 的存在性断言被我换成定指写法 (「含 `classify_calls.py` 的那一行同时含…」), 定义 bullet 漏转录时该子句在空集上真空成立, SC-9 反而全绿; RESULT 的加固记录溯源过头。改 SC 文字时「存在性 + 实质口径」两半必须同时断言。(2) **同一条文本上两席给出相反结论可以都不错**: qa 席按带存在性断言的**实现**测三类反事实, 全红, 判 closed; code-reviewer 与 tech-lead 按**文字**字面读, 判 major。差别在读法, 修法是让文字与实现对齐。
 >
@@ -18,10 +20,10 @@ updated-at: 2026-09-17T10:45:43Z
 
 ## §0 入口 (新 session 优先读)
 
-1. 本轨 claim `rule6-description-change-trigger-eval-lane-bfe8285d` (`claims/bfe8285d/s-b741@1657.yaml`, status=active, 本容器)。**心跳停在 2026-09-13T16:57:29Z**, 已远超 sweep 阈值; 未刷新 —— 刷新要写共享协调 ref, 按 09-16 双子星那次的先例须 owner 授权 (见 §2 第 4 条)。
-2. spec v10 @ `9de3074`: `openspec/changes/rule6-description-change-trigger-eval-lane/proposal.md`。基线与实验: `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/` (RESULT.md **v9**; `v6-per-call-health-opus5/` 根下是 v6b 的工具与结果, `v6a/` 是原预登记那一批)。
+1. 本轨 claim `rule6-description-change-trigger-eval-lane-bfe8285d` **已释放为 done** (`release_gate.py --status done`, `released.success=true` / `push_success=true`)。本轨无待接手事项。
+2. Spec 已归档: `openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/proposal.md` (Status: Complete)。基线与实验: `aria-plugin-benchmarks/ab-results/2026-09-13-rule6-description-trigger-eval-baseline/` (RESULT.md **v9**; `v6-per-call-health-opus5/` 根下是 v6b 的工具与结果, `v6a/` 是原预登记那一批)。
 3. 审计报告: R1–R8 各五席 + 每轮聚合在 `.aria/audit-reports/`。R7 聚合与 R8 聚合末尾各记着对应的 owner 裁定。
-4. 主仓 master 本地与两端一致 (`9de3074`), 无未推送提交、工作区干净。
+4. 主仓 master 本地与两端一致 (`96da7bb`), standards master `940cb5b` 两端一致, 无未推送提交。
 5. 双子星 `simonfish/023236f2` 手上的 `10CG/Aria#195` / `10CG/Aria#199` 本容器不碰。
 
 ---
@@ -38,6 +40,14 @@ updated-at: 2026-09-17T10:45:43Z
 | 09-17 10:45Z | 本轨 handoff + `latest.md` 指针与表行 | `e4874d4` (双推 MATCH) |
 | 09-17 | 本轨 claim 心跳按 owner 裁定刷新 (`heartbeat-only`, `outcome: refreshed`, `push_success: true`) | 协调 ref `9e668fb` (只推 origin) |
 | 09-17 | owner 裁完九条待裁项 → v11: D2 加调用级地板 + 依据条, 新增 SC-14, 九条裁定逐条追记 | `a7e852e`; 与双子星合并后 `85d680b` (双推 MATCH) |
+| 09-17 | **Phase B** T1 三处新句 + SOT §3 边界注 | 主仓 `8e93697` / standards `643bdf3` |
+| 09-17 | T2 手册拆 4a/4b + D2 判据 + D3 六行前置表; T2b 四工具入库并在新位置重跑矩阵 (24 用例 / 不符 0) ; T0 转录纪律 | `413685e` |
+| 09-17 | T3 SOT §4.1 rule6_note 模板 + T5 §6 局限第三条 + Version 1.1.0 | standards `42261a1` |
+| 09-17 | T6 前半三张单 (`10CG/Aria#213` / `10CG/aria-plugin#200` / `10CG/Aria#214`) + T7 前半分工言 (comment 24640) | `678d1e4` |
+| 09-17 | T7 后半 standards `--no-ff` merge → master `940cb5b` 双推核验; 主仓 gitlink bump; T8 回帖 (comment 24646) | `de16d5a` |
+| 09-17 | **Phase C** 两道闸实跑 (C.2.4 green / C.2.4.5 PASS) → PR `10CG/Aria#215` 合并 | `df3c274` (两端 MATCH) |
+| 09-17 | **Phase D** D.1 CLAUDE.md 项目状态 + D.2 归档 (五条断言全绿) | `96da7bb` (两端 MATCH) |
+| 09-17 | D.2b claim 释放为 done; 补开 `10CG/Aria#216` (上游反馈归档残留) 与 `10CG/aria-plugin#201` (归档闸 Level 2 盲点) | release_gate JSON |
 
 ---
 
@@ -47,7 +57,9 @@ updated-at: 2026-09-17T10:45:43Z
 2. **席位报告的引用写法由我代改**: R7 / R8 两轮共三处 (文内以井号加数字做的条目编号, 以及一处没带仓名的 issue 引用) 不合 standards content-integrity §4.4, 我机械订正并在提交信息里写明「只改写法, 不动结论」。
 3. **v10 的三处改动没有再经席位复核** —— 这是 owner 选「接受当前结论」的已知代价。我对每条都做了反事实自检 (10 条可模拟 SC 全绿 / 18 条扰动全部转红), 但自检是我自己写的实现, 不等于独立复核。
 4. **claim 心跳**: 曾落后四天未刷新 (status 仍 active)。已如实报 owner, owner 2026-09-17 裁定刷新并保持占用 —— 已执行 (`phase1_gate.py --heartbeat-only`, 协调 ref `9e668fb`, 只推 origin)。**首次调用踩了一个坑**: `--raw-track-id` 传不带容器后缀的 `rule6-description-change-trigger-eval-lane` 会报 `claim_not_found`, 要传 claim 里存的那个带后缀的 id。
-5. **沿用未决**: 20 条 query 未经 owner 审阅 (OQ-3); Level 2 与 LEVEL_GUIDE 跨模块规则的关系 (OQ-4)。
+5. **九条待裁项已全部裁定** (2026-09-17), 逐条记在归档后的 proposal 的 Open Questions 各项末尾。
+6. **为改 claim 的 phase 而新建了第二条 active claim**: `heartbeat_by_track` 只写 `heartbeat_at` 不写 phase, 而完整闸按 (container, session) 判 self-resume, 本 session 的 id 与原 claim 不同 ⇒ 走 acquire 新建了 `s-2166@1236` (phase B.1)。代码注释说同容器跨 session 重复认领是 NORMAL case, 释放走 by-track 全匹配会一并释放 —— 已验证释放成功。记此供复议。
+7. **执行了 `claude plugin update skill-creator`** (owner 授权「看看是否可以自己升级」): unknown → `ea0a38e1d671`, 但 `run_eval.py` 逐字节无变化。这会改变本机插件缓存状态, 记此备查。
 
 ---
 
@@ -73,8 +85,14 @@ updated-at: 2026-09-17T10:45:43Z
 
 ---
 
-## §6 Next
+## §6 本轨已终结 (无 Next)
 
-1. Phase B: B.1 起分支 (本轨尚未起分支) → T0–T8。
-2. 进 T4 之前先把那 20 条 query 交 owner 审 (OQ-3 裁定); 新套件同样是审过才作门 (OQ-7 裁定)。
-3. T6 开三张 issue + 上游反馈; T8 回帖 `10CG/Aria#211`。
+十步循环全程走完, Spec 已归档, claim 已释放为 done。**本 doc 不留待办指令** —— 未完成的两项各有承接单, 由它们驱动:
+
+- `10CG/Aria#213` —— 41 个 skill 无 trigger 套件; 内含 T4 的解冻条件 (owner 审过那 20 条 query 后入库并升 `ab-suite/version.yaml`)
+- `10CG/Aria#216` —— 上游 skill-creator 反馈未发出 (归档残留); 解冻条件 = owner 定渠道后发出并把证据补进 `10CG/Aria#211`
+- `10CG/Aria#214` —— 自主运行时 description 变动的跟进 spec (**硬前提**: 要在这类任务派给 runner 之前落地)
+- `10CG/aria-plugin#200` —— spec-drafter / task-planner 模板加 rule6_note 五字段
+- `10CG/aria-plugin#201` —— 归档闸对 Level 2 spec 的 deferred 项结构性失明 (本次归档实证)
+
+`10CG/Aria#211` 的关单归 owner。
