@@ -10,13 +10,13 @@ updated-at: 2026-09-18T18:45:38Z
 
 > **一句话**: 本对话 (容器 `simonfish/bfe8285d`) 走了两条互不相干的轨。第一条 `10CG/Aria#211` rule6 从 post_spec R8 的未收敛裁定一路走到归档与 claim 释放, **十步循环全程完结**; 第二条 `10CG/Aria#199` 从 `/aria:state-scanner` 入口接手双子星交棒, 做完 C1 证据核验 → v2.1 返修 → post_planning R2 五席, 停在**待 owner 裁定**。两条轨各自已有轨级 handoff, 本份是**会话单元**入口 (Rule #9 两个正交入口中的 session-closer 侧)。
 >
-> **本会话没有推送任何提交**: 本地领先 2 个提交 (`1b6f9ad` / `d75e61b`), 按 `owner_gates` 第 2 项须逐项授权, 未擅自推。
+> **推送**: owner 2026-09-19 授权后, 三个提交 (`1b6f9ad` / `d75e61b` / 本 handoff 提交) 已双推, 逐 remote `ls-remote` 独立核验 origin 与 github 均与本地 MATCH (`8919305`); 三个子模块 gitlink 在两端均可达。
 
 ---
 
 ## §0 入口 (新 session 优先读)
 
-1. 运行 `/aria:state-scanner`。主仓 `master` = 本 handoff 这个提交, **origin 与 github 都还停在 `5d435e9`** —— 这不是分叉, 是三个提交等授权。子模块 `aria` = `1cb3872` (v1.73.3) / `standards` = `940cb5b` / `aria-orchestrator` = `237045a`, 三者两端一致。
+1. 运行 `/aria:state-scanner`。主仓 `master` = `8919305`, origin 与 github 两端一致 (本 handoff 之后的回填提交会再前进一格)。子模块 `aria` = `1cb3872` (v1.73.3) / `standards` = `940cb5b` / `aria-orchestrator` = `237045a`, 三者两端一致。
 2. **两条轨各有自己的轨级 handoff, 细节别在本份里找**:
    - `10CG/Aria#211` rule6 → [2026-09-17 (终结态)](./2026-09-17-rule6-description-trigger-eval-lane-v10-r8-accepted.md) —— 已 done, 不要再开工。
    - `10CG/Aria#199` → [2026-09-18 (本轨)](./2026-09-18-199-a2-a3-c1-verify-v21-rework-r2.md) —— 待办与待裁项的权威清单在那份的「待办」「待 owner 裁定」两段。
@@ -82,7 +82,7 @@ updated-at: 2026-09-18T18:45:38Z
 
 ## §3 关键风险 / 已知陷阱
 
-1. **两个未推提交不是分叉**。`origin` 与 `github` 都在 `5d435e9` 且彼此一致; 下次 session 看到 ahead=2/3 不要当成事故去 force 什么。授权后走本地双推 + 逐 remote `ls-remote` 核验 (多远程约束 2)。
+1. ~~两个未推提交不是分叉~~ → **已解决 (2026-09-19)**: owner 授权后本地双推, 逐 remote `ls-remote` 核验两端 MATCH, 子模块 gitlink 两端可达。
 2. **R2 的五条 Major 里有三条是被本容器自己的并发工作触发的**: rule6 轨把 `standards` 升到 1.1.0、改了 CLAUDE.md 的行、把 claim 状态动到 `yielded` —— 而 199 的计划在更早的时间点对这些对象写了冻结断言。这不是执笔实例做错, 是计划对「别的轨会改的对象」写了全称句。返修时要把断言限定到它实际 diff 过的集合。
 3. **`derive_track_id` 不加容器后缀**: `phase1_gate --heartbeat-only` 传原串会 `claim_not_found` —— rule6 轨存的是 `rule6-description-change-trigger-eval-lane-bfe8285d` (A.1 认领时派生的串), 而 199 轨存的就是裸串 `pre-merge-completeness-gate-change-scope`。两种形态并存, 传之前先看 claim 里的 `track_id` 字面。
 4. **`check_bare_issue_refs.py` 会把描述裸引用的文字判成裸引用**。本会话为此重写了三轮才扫到零命中; 写这类文字用非 `#` 的散文形式 (「规则 第 N 条」而不是带井号的写法)。缺陷已在 `10CG/aria-plugin#199` 记录新证据面。
@@ -144,15 +144,14 @@ updated-at: 2026-09-18T18:45:38Z
 本会话 19 个提交 (`cdc8837` … `d75e61b`), 其中 17 个已随 rule6 轨与 v2.1 推出并核验, 2 个待授权:
 
 ```
-[main]              本地 master = 本 handoff 提交
-                    origin      = 5d435e9   github = 5d435e9   (两端彼此一致, 落后本地 3)
+[main]              master = 8919305   origin = github = 8919305  (逐个 ls-remote 核验 MATCH)
 [aria]              1cb3872 (v1.73.3)       | origin = github 一致
 [standards]         940cb5b                 | origin = github 一致
 [aria-orchestrator] 237045a                 | origin = github 一致
 ```
 
 - 已推并逐 remote `ls-remote` 核验过的关键点: `df3c274` (PR `10CG/Aria#215` 合并) · `3e4af28` (rule6 D.3) · `5d435e9` (v2.1)。
-- **待授权推送**: 共 3 个 —— `1b6f9ad` (R2 六份产物) · `d75e61b` (199 轨 handoff) · 本 handoff 提交 (SHA 见 `git log`, 本文不自引以免 amend 后失效)。
+- **已推送 (2026-09-19, owner 授权)**: 3 个 —— `1b6f9ad` (R2 六份产物) · `d75e61b` (199 轨 handoff) · `8919305` (本 handoff)。双推后逐 remote 独立核验: origin `8919305` MATCH / github `8919305` MATCH; 子模块 gitlink `1cb3872` / `940cb5b` / `237045a` 在两端均可达。
 - **Tags published**: 无 (本会话零发版)。
 - **Issues opened**: `10CG/Aria#216` · `10CG/aria-plugin#201` · `10CG/aria-plugin#202`。
 - **不在 git 里的变更**: `refs/aria/coordination` 在 `6ddf089` (本地 = origin); 本机 `skill-creator` 插件缓存升到 `ea0a38e1d671`。
