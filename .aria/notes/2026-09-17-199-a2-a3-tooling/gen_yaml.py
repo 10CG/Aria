@@ -238,6 +238,81 @@ print(json.dumps({"verdict": "ok" if ok else "stop", "commits": len(kinds), "kin
 sys.exit(0 if ok else 1)
 """
 
+DERIV_SCRIPT = r'''# 用法 (在主仓根): python3 -B standards_files_derivation.py
+# 输入只取冻结快照 (standards 940cb5b, 主仓 71c500e), 与工作树当前内容无关; 输出无路径、无时间
+import collections, re, subprocess
+STD_REV, PLAN_REV = "940cb5b", "71c500e"
+PLAN = ["openspec/changes/pre-merge-completeness-gate-change-scope/proposal.md",
+        "openspec/changes/pre-merge-completeness-gate-change-scope/tasks.md",
+        ".aria/notes/2026-09-17-199-a2-a3-tooling/gen_yaml.py"]
+EXCLUDE = {  # 封闭清单: 命中处都不指 standards 内的同名文件 (理由逐族写在 standards_files_basis)
+    "README.md": "主仓 README.md / aria/README.md / archive 目录的 README.md, 另有本排除说明自身的点名",
+    "README.zh.md": "主仓 i18n README (TASK-029 的版本同步面)",
+    "tasks.md": "本目录 tasks.md, 另有本排除说明自身的点名",
+}
+def git(*a):
+    return subprocess.run(["git", *a], capture_output=True, text=True, check=True).stdout
+md = [f for f in git("-C", "standards", "ls-tree", "-r", "--name-only", STD_REV).split() if f.endswith(".md")]
+fam = collections.defaultdict(list)
+for f in md:
+    fam[f.rsplit("/", 1)[-1]].append(f)
+texts = [git("show", f"{PLAN_REV}:{p}") for p in PLAN]
+print(f"step 1 (literal): standards {STD_REV} .md = {len(md)} files / {len(fam)} basename families; plan files @ {PLAN_REV} = {len(PLAN)}")
+hit = {}
+for b in sorted(fam):
+    c = [t.count(b) for t in texts]
+    if sum(c):
+        hit[b] = c
+        print(f"  hit {b}: members={len(fam[b])} counts(proposal, tasks, generator)={c} excluded={'yes' if b in EXCLUDE else 'no'}")
+literal = sorted(fam[b][0] for b in hit if b not in EXCLUDE)
+print(f"  families hit = {len(hit)}; excluded = {len([b for b in hit if b in EXCLUDE])} (closed list); kept = {len(literal)}")
+print(f"  kept: {literal}")
+claude = git("show", f"{PLAN_REV}:CLAUDE.md").split("## 不可协商规则", 1)[1].split("\n## ", 1)[0]
+sot = {}
+for chunk in re.split(r"(?m)^(?=\d+\. \*\*)", claude):
+    m = re.match(r"(\d+)\. \*\*", chunk)
+    if m:
+        s = re.search(r"SOT: `([^`\s]+)", chunk)
+        sot[int(m.group(1))] = s.group(1) if s else None
+cited = sorted({int(n) for t in texts for n in re.findall(r"Rule #(\d+)", t)})
+print(f"step 2 (Rule #N -> SOT, CLAUDE.md @ {PLAN_REV}): cited = {cited}")
+extra = []
+for n in cited:
+    s = sot.get(n)
+    where = "none" if s is None else ("standards" if s.startswith("standards/") else "outside standards")
+    rel = s[len("standards/"):] if where == "standards" else None
+    new = rel is not None and rel not in literal
+    print(f"  Rule #{n} -> {s} [{where}]" + (" [not found by step 1]" if new else ""))
+    if new:
+        extra.append(rel)
+print(f"  standards-resident SOT not found by step 1: {extra}")
+print(f"result (step 1 kept + step 2 candidates judged dependent): {len(literal) + len(extra)} files")
+'''
+
+DERIV_OUTPUT = r'''step 1 (literal): standards 940cb5b .md = 102 files / 88 basename families; plan files @ 71c500e = 3
+  hit README.md: members=7 counts(proposal, tasks, generator)=[3, 0, 8] excluded=yes
+  hit README.zh.md: members=1 counts(proposal, tasks, generator)=[0, 0, 3] excluded=yes
+  hit configured-gate-authority.md: members=1 counts(proposal, tasks, generator)=[8, 1, 2] excluded=no
+  hit content-integrity.md: members=1 counts(proposal, tasks, generator)=[0, 2, 5] excluded=no
+  hit git-commit.md: members=1 counts(proposal, tasks, generator)=[0, 2, 6] excluded=no
+  hit project.md: members=1 counts(proposal, tasks, generator)=[3, 2, 2] excluded=no
+  hit proposal-minimal.md: members=1 counts(proposal, tasks, generator)=[3, 2, 2] excluded=no
+  hit skill-benchmark-exemption.md: members=1 counts(proposal, tasks, generator)=[2, 1, 5] excluded=no
+  hit tasks.md: members=1 counts(proposal, tasks, generator)=[21, 6, 52] excluded=yes
+  hit version-management.md: members=1 counts(proposal, tasks, generator)=[1, 1, 2] excluded=no
+  families hit = 10; excluded = 3 (closed list); kept = 7
+  kept: ['conventions/configured-gate-authority.md', 'conventions/content-integrity.md', 'conventions/git-commit.md', 'conventions/skill-benchmark-exemption.md', 'conventions/version-management.md', 'openspec/project.md', 'openspec/templates/proposal-minimal.md']
+step 2 (Rule #N -> SOT, CLAUDE.md @ 71c500e): cited = [3, 5, 6, 8, 9, 10]
+  Rule #3 -> None [none]
+  Rule #5 -> None [none]
+  Rule #6 -> standards/conventions/skill-benchmark-exemption.md [standards]
+  Rule #8 -> aria/skills/phase-c-integrator/SKILL.md [outside standards]
+  Rule #9 -> standards/conventions/session-handoff.md [standards] [not found by step 1]
+  Rule #10 -> standards/conventions/configured-gate-authority.md [standards]
+  standards-resident SOT not found by step 1: ['conventions/session-handoff.md']
+result (step 1 kept + step 2 candidates judged dependent): 8 files
+'''
+
 SC17_5 = ("SC-17(5) 改写后全文 (裁定 11; 替换 proposal :473 的 (5) 格): --repo-path tmpA --diff-repo-path tmpB --no-spec, "
           "tmpA 的 feature 分支相对 --anchor-base 无提交 (锚点面零 diff), config {audit: {enabled: true, mode: manual, "
           "checkpoints: {post_spec: convergence}}}。(a) 不加豁免键 ⇒ verdict error, error_kind no_spec_unverifiable, exit 2; "
@@ -276,7 +351,7 @@ tasks = [
           "会话环境: [ -n \"${ARIA_COORDINATION_NO_PUSH+x}\" ] 的结果记台账; 组 1–4 的会话应不带该变量 (tasks.md 读前必看第 12 条), 带则换会话",
           "分支起点: git fetch origin 与 git -C aria fetch origin 后, 记 git rev-parse origin/master、git -C aria rev-parse origin/master、git ls-tree HEAD aria, 另对 github 各跑 git ls-remote github master 比对; aria feature 分支从 aria origin/master 起。主仓: 本目录规划文件与 post_planning 报告所在的最新提交 P 满足 git merge-base --is-ancestor P <origin 与 github 各自 ls-remote SHA> 均退出 0 ⇒ 从 origin/master 起; 否则按 owner_gates 第 2 项的步骤请授权推送规划提交; 未获授权则从含 P 的本地 master 起, 起点 SHA 与未推送事实记台账, 推送随 TASK-030 的 PR 发生。回落前对 origin/master..<起点> 跑 metadata.commit_attribution, 退出非 0 ⇒ 停 (第 16 项), 输出原样记台账",
           "建分支并检出后断言 git -C aria rev-parse HEAD 等于 aria origin/master 实测值, 且 git -C aria status --porcelain 为空",
-          "基线复核: 对 metadata.baseline_rebase.aria_zero_diff 的每个文件与 aria_shifted 各条冒号前的文件跑 git -C aria diff --shortstat 301641b <aria 起点> -- <文件>, 对 main_repo 的文件跑 git diff --shortstat a563192 <主仓起点> -- <文件>, 对 metadata.baseline_rebase.standards_files 各条冒号前的文件跑 git -C standards diff --shortstat 21748d4 <B.1 当时的 standards gitlink, 由 git ls-tree HEAD standards 取> -- <文件>; 与 A.2 记录比对, 新出现 diff 的文件逐处实读被引位置并在台账写偏移表 (aria 与主仓侧 = proposal 所引行号; standards 侧 = standards_files 各条冒号后点名的节与用途); standards 组必须对 B.1 当时的 gitlink 重测, 不得沿用 metadata.baseline_rebase.standards 记下的 940cb5b 数值 —— 它是并发轨随时会动的共享子模块; aria 若有新发布, tasks.md 读前必看第 3 条的取号前提同步更新",
+          "基线复核 (aria / 主仓 / standards 三组同口径; post_planning R4 R4-M1): 先定两端点 —— aria 组 = 301641b 与 <aria 起点> (分支起点条在 git -C aria fetch origin 之后记下的值); 主仓组 = a563192 与 <主仓起点>; standards 组先跑 git -C standards fetch origin (本任务别处没有显式 fetch standards 的步骤; 主仓 git fetch 在默认的 on-demand 递归下会顺带拉取 gitlink 有变且已检出的子模块, 但关掉递归、子模块未检出或递归拉取失败时就不会 —— 取决于本机配置与子模块状态, 不作前提, 2026-09-21 临时仓三态实测), 端点 = 21748d4 与 B.1 当时的 standards gitlink —— git ls-tree HEAD standards 的输出是整行 160000 commit <sha><TAB>standards, gitlink 取第三字段 (git ls-tree HEAD standards | awk '{print $3}'), 整行照抄进 diff 会得到下述同一种假绿。每组跑 diff 之前对两个端点各跑 git cat-file -e <端点>^{commit} (aria 组与 standards 组分别带 -C aria / -C standards, 主仓组在主仓根), 任一退出非 0 ⇒ 停下上报, 不得当作零 diff。然后对 metadata.baseline_rebase.aria_zero_diff 的每个文件与 aria_shifted 各条冒号前的文件跑 git -C aria diff --shortstat 301641b <aria 起点> -- <文件>, 对 main_repo 的文件跑 git diff --shortstat a563192 <主仓起点> -- <文件>, 对 metadata.baseline_rebase.standards_files 各条冒号前的文件跑 git -C standards diff --shortstat 21748d4 <gitlink> -- <文件>; 零 diff 的判据 = 退出码为 0 且输出为空, 退出非 0 一律停下上报 —— 端点对象不在本地 (或 SHA 抄错、整行误喂、子模块未检出时 git -C standards 落到主仓上) 时 git diff 的 stdout 同样是空串、退出 128, 只看输出为空会把「没比成」读成「零 diff」; standards 组要抓的正是并发轨推进 standards 并 bump 主仓 gitlink 的那一次, 对象此时若不在本地, 旧判据恰在该红时判过 (2026-09-21 临时仓实测: 两态 stdout 都是空串, 只有退出码分得开)。aria 组与主仓组的端点按构造已在本地 (起点刚 fetch, 旧端点是它的祖先; 2026-09-21 实测 cat-file 与 merge-base --is-ancestor 均退出 0), 同口径在正常路径上不会误停, 另拦 SHA 抄错一类同形失败。与 A.2 记录比对, 新出现 diff 的文件逐处实读被引位置并在台账写偏移表 (aria 与主仓侧 = proposal 所引行号; standards 侧 = standards_files 各条冒号后点名的节与用途); standards 组必须对 B.1 当时的 gitlink 重测, 不得沿用 metadata.baseline_rebase.standards 记下的 940cb5b 数值 —— 它是并发轨随时会动的共享子模块; aria 若有新发布, tasks.md 读前必看第 3 条的取号前提同步更新",
           "台账骨架: 二级标题固定为 基线 / 语料冻结 / fixture 矩阵 / RED / 组 2 收口 / 文档机检 / 反事实 / 回归 / 活体运行 / AB / 发布 / 写法自检 / 外向动作与授权 / 停下与上报; 此后只在对应标题下追加",
       ]),
     T("TASK-002", "1.2", "语料冻结 corpus-freeze.md: 六族样本、双列标注与机械仲裁", "L", "5-7", ["TASK-001"],
@@ -516,7 +591,7 @@ tasks = [
           "臂: with_skill = W 的工作树 (skills/audit-engine 与 skills/phase-c-integrator); without_skill = git -C aria worktree add <scratch> A 的快照 (old_skill 语义, 先例 aria-plugin-benchmarks/ab-results/2026-09-03-v1.69.0-sibling-spec-probe-rule6)",
           "形态: 两个套件的全部 eval 按 descriptive 下发 (AB_TEST_OPERATIONS.md 规则 1: 未声明即 descriptive); 执行器提示逐字附「只做描述性推演: 不得执行 git fetch / pull 与任何 git 写命令 (commit / merge / push / tag / reset / checkout 等), 不得调用 forgejo 的写接口」; 不改任何 remote 配置",
           "快照 (开跑前与结束后各一次): 主仓与 aria 的 git rev-parse HEAD、不带路径的 git status --porcelain、git branch --list; 主仓与三个子模块各自 git ls-remote origin 与 github 的 refs/heads/master; git -C aria ls-remote --tags origin 与 github; refs/aria/coordination 的本地值与 origin 的 ls-remote 值; forgejo GET /repos/10CG/Aria/pulls?state=open 与 /repos/10CG/aria-plugin/pulls?state=open 的编号与 head 分支",
-          "快照比较: 本地面 (HEAD / porcelain / 分支) 除结果目录与 skill-creator 工作区外有变化 ⇒ 停下上报; 远端值有变化 ⇒ 对每个新值在对应仓跑 git cat-file -e <新 SHA>: 本地已有该对象 ⇒ 视为本机推出, 停下上报; 本地没有 ⇒ 他人推送, 记台账继续; 新增 PR 的 head 分支在本地存在且 SHA 相同 ⇒ 停下上报",
+          "快照比较: 本地面 (HEAD / porcelain / 分支) 除结果目录外有变化 ⇒ 停下上报。skill-creator 工作区不入库、不单列例外 (post_planning R4 R4-M3 按 (b) 裁, 证据见 metadata.revision_log 的 v2.4 R4-M3 条与 tasks.md 判断清单第 35 条): 工作区放在已被忽略的位置 —— aria 子模块的 skills/*-workspace/ (即 skill-creator SKILL.md 所写「as a sibling to the skill directory」的默认落点; aria/.gitignore 该条注释为 kept locally, archived in aria-plugin-benchmarks/ab-results/) 或主仓 aria-plugin-benchmarks/ab-workspace/ (主仓 .gitignore 该条注释为「结果已落 ab-results/, 无需入库」, 先例 3d3c820) —— 两处都不进 porcelain; 作为结果依据的产物 (逐 eval 的 eval_metadata.json 与两臂的 grading.json / response.md / timing.json, 以及 benchmark.json / benchmark.md) 复制进结果目录, 形状对齐先例 2a46d08 (该提交零 workspace 路径); porcelain 出现 *-workspace/ 行 ⇒ 工作区放在了未忽略的位置 (如手册示例的 aria-plugin-benchmarks/<skill>/<skill>-workspace/, 主仓未忽略该模式), 按本条停下。远端值有变化 ⇒ 对每个新值在对应仓跑 git cat-file -e <新 SHA>: 本地已有该对象 ⇒ 视为本机推出, 停下上报; 本地没有 ⇒ 他人推送, 记台账继续; 新增 PR 的 head 分支在本地存在且 SHA 相同 ⇒ 停下上报",
           "开跑前在结果目录写 PREDICTION.md: 逐套件、逐 eval 预测两臂分数; audit-engine 套件另预测 delta",
           "套件: audit-engine.json (eval 1 / 2 / 3) 与 phase-c-integrator.json (eval 1 / 2 / 3) 两臂各跑, 经 /skill-creator; phase-c-integrator-pre-merge-gate.json 不进 AB 臂 (裁定 9), 其 5/8 可执行单测已在 TASK-021",
           "判据 (逐套件): 两个套件都逐 eval 判回归 —— with < without 的 eval 复跑两次, 三个样本中两个以上仍劣即回归; audit-engine 套件另要求 delta.pass_rate = mean(with) − mean(without) > 0 (三条 eval 的均值, 由脚本从两臂 grading 汇总并与 benchmark.json 核对符号) 且 eval id 3 的 without 分数低于 with; phase-c-integrator 套件不看 delta。任一不满足 ⇒ 阻断 TASK-025, 请 owner 裁 (owner_gates 第 5 项)",
@@ -564,14 +639,14 @@ tasks = [
       ], notes="由主控执行"),
     T("TASK-029", "5.7", "主仓发布同步面: aria gitlink、16 个版本点、custom checks", "S", "2-3", ["TASK-028"],
       ["aria", "VERSION", "README.md", "README.zh.md", "README.ja.md", "README.ko.md", "CLAUDE.md",
-       "docs/architecture/system-architecture.md", "docs/architecture/version-scheme.md", LEDGER],
+       "docs/architecture/system-architecture.md", "docs/architecture/version-scheme.md"],
       "knowledge-manager", "主仓同步面多处无机械兜底",
       [
           "前置: TASK-028 已对 origin 与 github 双方核验一致; 否则不 bump (半推后 bump 出的 gitlink 在 github 侧指向不存在的对象, clone --recursive 即断)",
           "gitlink: aria 工作树 HEAD 等于合并 SHA 时 git add aria; 断言 git -C aria merge-base --is-ancestor <动手时 git ls-tree HEAD aria 的值> <合并 SHA> 退出 0 (只前进)",
           "16 个版本点逐处 grep -n 实测后改为新号: README.md 两处 (A.2 时 :8 / :242); README.zh.md / README.ja.md / README.ko.md 各三处 (:3 translated-from / :10 / :244); CLAUDE.md 两处 (:139 / :141); VERSION:24 (A.2 时仍为 v1.73.0, 直接写新号); docs/architecture/system-architecture.md:189; docs/architecture/version-scheme.md:23; 行号以执行时 grep 为准",
           "i18n README 只改版本处 (正文无实质变更, 不重译)",
-          "提交信息必须带本轨 trailer: 单起一行 Spec: openspec/changes/pre-merge-completeness-gate-change-scope (10CG/Aria#199) (git-commit.md §6.2 的既有写法)。本任务的**九个版本同步面交付物** (aria gitlink / VERSION / 四份 README / CLAUDE.md / 两份 architecture 文档) 整条落在 metadata.commit_attribution 的 shared 集里, 按下一条主控只 add 这九个文件 ⇒ 该提交就是纯 shared 集, 不带 trailer 会在 TASK-030 的提交范围核验里判 shared-only 而停在 owner_gates 第 16 项。trailer 无条件必带, 不得因为「台账 (exclusive 路径) 可能同提交捎上去而自动判 own」就省掉 (post_planning R3 minor 638d2a0f: deliverables 含台账与本条「整条落 shared 集」的表述自相矛盾, 此处按「本提交只含九个版本同步面文件」的执行口径消解); 提交后当场 git log -1 --format=%B 回读确认 trailer 在位",
+          "提交信息必须带本轨 trailer: 单起一行 Spec: openspec/changes/pre-merge-completeness-gate-change-scope (10CG/Aria#199) (git-commit.md §6.2 的既有写法)。本任务的**九个版本同步面交付物** (aria gitlink / VERSION / 四份 README / CLAUDE.md / 两份 architecture 文档) 整条落在 metadata.commit_attribution 的 shared 集里, 按下一条主控只 add 这九个文件 ⇒ 该提交就是纯 shared 集, 不带 trailer 会在 TASK-030 的提交范围核验里判 shared-only 而停在 owner_gates 第 16 项。trailer 无条件必带, 不得因为「台账 (exclusive 路径) 可能同提交捎上去而自动判 own」就省掉 (post_planning R3 minor 638d2a0f: deliverables 含台账与本条「整条落 shared 集」的表述自相矛盾, 此处按「本提交只含九个版本同步面文件」的执行口径消解; v2.4 起 deliverables 也不再列台账, 与姊妹任务 TASK-025 同口径, 矛盾在 deliverables 一侧同样消解); 提交后当场 git log -1 --format=%B 回读确认 trailer 在位",
           "复跑 custom checks: m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match / main-project-version-consistency / no-unresolved-version-placeholder 为 OK; plugin-cache-currency 在 owner 更新插件缓存前预期 STALE",
           "主控在主仓 feature 分支只 add 上述九个版本同步面文件提交; 台账的本任务追加不进这一提交 (它随 TASK-030 第 1 条一并提交), 使本提交的归属判定不依赖台账是否捎带, 与上一条的 trailer 要求自洽。SHA 记台账",
       ]),
@@ -579,7 +654,7 @@ tasks = [
       ["主仓 PR (Forgejo) 与 master 合并提交", LEDGER], "backend-architect", "主仓集成; C.2.5 委派前核五问",
       [
           "开 PR 前: 主控把台账截至此刻的追加提交到主仓 feature 分支; 不带路径的 git status --porcelain 原样记台账, 其中不得有行触及本 cycle 交付物 (本目录; .aria/audit-reports/ 下文件名含 pre-merge-completeness-gate-change-scope 的 post_planning 报告; 本次 ab-results 目录; TASK-023 与 TASK-029 的交付物), 其余行逐条记归属; 不 stash, 不顺带提交他人文件",
-          "提交范围: git fetch origin 后对 origin/master..<主仓 feature 分支> 跑 metadata.commit_attribution (第三个及之后的参数 = 本次 ab-results 目录, 以及被选作结果一部分的 skill-creator 工作区目录), 退出非 0 ⇒ 停 (owner_gates 第 16 项); 输出与 git log --oneline origin/master..<feature 分支> 随第 9 项的授权请求一并呈上",
+          "提交范围: git fetch origin 后对 origin/master..<主仓 feature 分支> 跑 metadata.commit_attribution (第三个及之后的参数 = 本次 ab-results 目录; skill-creator 工作区不入库、不作参数 —— 见 TASK-024 快照比较条, post_planning R4 R4-M3), 退出非 0 ⇒ 停 (owner_gates 第 16 项); 输出与 git log --oneline origin/master..<feature 分支> 随第 9 项的授权请求一并呈上",
           "PR 正文与主仓 PR diff 新增行先过 TASK-026 的自检",
           "合并方式: 同步 origin/master 用 git merge (不 rebase); PR 以 merge commit 合并 (不 squash); 经 phase-c-integrator 过 C.2.4 pre-merge gate, 结论记台账, 无可用 backend 时按 no_ci_fallback 显式降级; 本仓 audit.checkpoints.pre_merge 为 off, pre_hook 早退属配置决定 (Rule #10 白名单第一类)",
           "合并后: git fetch origin → git checkout master → git merge --ff-only origin/master, 断言 Forgejo 回执里的合并提交 M 是 HEAD 的祖先 (git merge-base --is-ancestor M HEAD) 且 git rev-parse M^2 等于 feature 分支 HEAD; 不能快进或断言不成立 ⇒ 停 (C.2.5 以合并后本地 HEAD 为 expected_sha)",
@@ -595,7 +670,7 @@ tasks = [
       "tech-lead", "跨仓收尾与外向动作协调",
       [
           "先 git fetch origin, 本地 master 快进到含 TASK-030 合并提交的 origin/master; 不能快进 ⇒ 停",
-          "不调 phase-d-closer, 逐步对应: D.1 跳过 (本仓无运行时 UPM, 记台账) / D.2 = 下方归档预演与 openspec-archive / D.2b = release_gate, 不带 --sweep-stale 与 --gc (sweep / gc 须另行授权) / D.3 = 周期 handoff / D.4 = estimator capture 照跑: python3 -B aria/skills/ai-native-estimator/scripts/estimator.py --project-root . capture --spec-slug pre-merge-completeness-gate-change-scope --spec-level 3 --n-tasks 31 (非阻塞, 数据在已忽略的 .aria/estimator/, 失败记台账)",
+          "不调 phase-d-closer, 逐步对应 (它的全部子步与各自的落点见 tasks.md 判断清单第 25 条): D.1 跳过 (本仓无运行时 UPM, 记台账) / D.post = 按 phase-d-closer 的触发条件 (audit.enabled == true 且 audit.checkpoints.post_closure != off) 执行时读 .aria/config.json 判定: 不成立 ⇒ 按配置跳过 (Rule #10 白名单第一类; 2026-09-21 实读 post_closure 为 off), 成立 ⇒ 照跑 (convergence, max_rounds=1, 不阻断), 读到的值原样记台账 / D.2 = 下方归档预演与 openspec-archive / D.2b = release_gate, 不带 --sweep-stale 与 --gc (sweep / gc 须另行授权) / D.3 = 下方周期 handoff 五条 (子步 2 按模板起稿、2b 写后五字段自校验、3 latest.md 两子步; 子步 1 的触发评估不做 —— 本计划无条件写周期 handoff; 子步 4 的提示提交 = 末条 Phase D 提交) / D.4 = estimator capture 照跑: python3 -B aria/skills/ai-native-estimator/scripts/estimator.py --project-root . capture --spec-slug pre-merge-completeness-gate-change-scope --spec-level 3 --n-tasks 31 (非阻塞, 数据在已忽略的 .aria/estimator/, 失败记台账)",
           "issue (owner_gates 第 10 项, 逐张授权; 开前按关键词定向查重, 不依赖截断清单): (1) 10CG/aria-plugin: --no-spec 声明与 refs/aria/coordination 的 active claim 交叉核验 (裁定 2); (2) 10CG/aria-plugin: 产出侧四个 checkpoint 调用方 (phase-a-planner:246 / task-planner:123 / phase-b-developer:255 / brainstorm:141) 按字面键早退, 对 adaptive 推导失明 (裁定 13); (3) 10CG/aria-plugin: F8 config 注册面缺口 (两个 allow_* 未进 DEFAULTS.json, config.template.json 无 audit 块); (4) 10CG/aria-plugin: 写侧报告命名约定无强制 (附 corpus-freeze.md 争议表与 unattributed 计数); (5) 10CG/aria-plugin: config-loader 无程序化入口 (内联第二副本); (6) 10CG/aria-plugin: audit-engine AB 套件对 pre_merge completeness gate 的覆盖缺口 (rule6_note 义务之三), 附 phase-c-integrator 与 audit-engine 两个套件都不覆盖 hotfix lane; (7) 10CG/Aria: ab-suite/phase-c-integrator-pre-merge-gate.json 的三条 node id 缺口。正文先过 TASK-026 第二次自检; 号回填台账与 ab-results README",
           "勾选: 主控一次把 tasks.md 全部 31 行改为 [x], 同时把 5.2 行的 aria-plugin-benchmarks/ab-results/ 换成本次结果目录全路径 (git ls-files 有输出); 本文件各任务 status 改为 completed; metadata.rule6_note.scenario1 的占位换成该结果目录全路径, 并断言五字段 (decision_table_row / description_changed / scenario1 / scenario4b / negctrl) 齐备、无占位尖括号残留 —— SOT §4.1 无机械 enforcement, 这一条是本 cycle 唯一的合规检查点",
           "归档预演 (只读): python3 -B aria/skills/state-scanner/scripts/lib/spec_complete.py --gate openspec/changes/pre-merge-completeness-gate-change-scope, 记 complete / verdict / blocking_reasons / unverified_claims; verdict 为 block ⇒ 停下上报; 预期 unverified_claims 含 4.4 行 dogfood 无可链接产物一条 (A.2 预演见 metadata.a2_state_runs 的 C 态)",
@@ -603,7 +678,11 @@ tasks = [
           "D.2 之前请 owner 裁归档 Step 7 建不建 tracker issue (owner_gates 第 11 项), 裁不建则只跳过 Step 7; 其余按 openspec-archive 执行 (git mv 整个目录与归档后落点断言); 归档后的台账写 openspec/archive/<日期>-pre-merge-completeness-gate-change-scope/verification-ledger.md",
           "claim: 获授权 (owner_gates 第 13 项) 后先跑 metadata.coord_ref_precheck, 退出 0 才跑 python3 -B aria/skills/state-scanner/scripts/release_gate.py --raw-track-id pre-merge-completeness-gate-change-scope --status done --repo-path <主仓根>; release 的推送按 metadata.coord_push_verify 核验 (released.success 为 true 且 push_success == true 且 push_skipped == false, 再 ls-remote 比对), 任一不成立 ⇒ 停下上报 owner_gates 第 15 项, 不重试、不 force; 未获授权或检查不过 ⇒ 不 release (不写仅本地的 release), 记周期 handoff",
           "10CG/Aria#199 与 10CG/aria-plugin#161 回帖 (版本号、合并 SHA、按 change 匹配与三态的行为变更要点) 后关闭 (owner_gates 第 12 项)",
-          "周期 handoff 写 docs/handoff/ (Rule #9), frontmatter 的 track-id 逐字写 pre-merge-completeness-gate-change-scope —— 它同时是 metadata.commit_attribution 判该提交为 exclusive 的唯一依据 (写成别的或漏写 ⇒ 判 foreign, 停在 owner_gates 第 16 项); 照录 tasks.md 的 AI 流程判断清单并追加 Phase B–D 新增项, 摘录 TASK-022 的活体输出与各 issue 号",
+          "周期 handoff 写 docs/handoff/ (Rule #9), 按模板 aria/templates/session-handoff.md 起稿 (phase-d-closer D.3 子步 2); frontmatter 放在文件最顶部, 五字段 track-id / owner-container / phase / status / updated-at 全写 (Rule #9 SOT standards/conventions/session-handoff.md §2.3.1, 取值域照该节), frontmatter 内不插注释行: track-id 逐字写 pre-merge-completeness-gate-change-scope —— 它同时是 metadata.commit_attribution 判该提交为 exclusive 的唯一依据 (写成别的或漏写 ⇒ 判 foreign, 停在 owner_gates 第 16 项); owner-container 逐字粘贴 python3 aria/skills/session-closer/scripts/handoff_autofill.py --owner-container 的输出 (handoff-mechanics.md: 机械填, 勿手动组装); 照录 tasks.md 的 AI 流程判断清单并追加 Phase B–D 新增项, 摘录 TASK-022 的活体输出与各 issue 号",
+          "写后五字段自校验 (phase-d-closer D.3 子步 2b, 即 session-handoff.md §2.3.7 的 E1; 命令逐字照抄 aria/skills/phase-d-closer/references/execution-steps.md, 含 head -8 窗口): head -8 <handoff> | grep -cE '^(track-id|owner-container|phase|status|updated-at):' 须 ==5; 不足 → 按模板派生规则补齐后重验。不得带缺字段 handoff 进子步 3 (即下面两条的 latest.md 维护)。(口径注: 勿在 frontmatter 内插注释行, 可能把字段推出 head -8 窗口致误报。) 不得改写成对整份文件检索 —— 正文里的同名行会被计入而假绿 (2026-09-21 实测: frontmatter 只有 track-id、正文另有四个同名行时, 整份文件检索得 5, head -8 得 1)。输出原样记台账",
+          "docs/handoff/latest.md 子步骤 1 (always, 不可跳过; aria/skills/phase-d-closer/references/handoff-mechanics.md「latest.md 维护」, 同文件 Forbidden patterns 逐字「任何 cycle 都不可跳过」): History 表格 prepend 新条目, 格式 - {YYYY-MM-DD HH:MM} — [{name}](./{filename}) ({scope-note} — {summary}); {scope-note} 标 leader / follower:{track-id} / 单轨留空, {summary} 一句 ≤ 80 字符, 时间用 UTC (date -u)。本仓 latest.md 没有字面名为 History 的表 (2026-09-21 实读): 起 History 作用的是 track 表的本轨行与表下按日倒序的说明段 (71c500e 那次维护即改 track 表并在说明段顶部加一段) —— 按执行时实读的版式落这一条, 落点记台账。做完断言 grep -cF '<新 handoff 文件名>' docs/handoff/latest.md 非 0",
+          "latest.md 子步骤 2 (conditional): pointer 行 (**Latest**: 字段) 按 handoff-mechanics.md 的三行判定表 —— single-track (tracks_multibranch.exists == false 或 len(tracks) <= 1) ⇒ 更新到新 doc; multi-track 且本 cycle 是项目主线 (其他 container 在 tracks_multibranch 里没有 status==active 的 track) ⇒ 更新到新 doc; multi-track 且本 cycle 是 follower (其他 container 有 status==active 的 track, 且当前 pointer 指向该 leader doc) ⇒ 不更新 pointer (follower 不抢主线; 没有 leader doc 的 follower 退化为 single-track, 照更新)。snapshot.tracks_multibranch 取自本会话过了 metadata.coord_ref_precheck 之后跑的 /state-scanner (hard_constraints 第 4 条; precheck 不通过即按 owner_gates 第 15 项停下, 本子步不做判定), 判定结论与所据字段原样记台账。判为更新 ⇒ **Latest**: 行含新文件名, 前一 Latest 改为 Active (parallel predecessor) 或 superseded (由 owner 判断); 判为 follower ⇒ **Latest**: 行改前改后逐字相同",
+          "latest.md 的改动单独成一个提交, 不与周期 handoff、归档同提交: latest.md 是 tasks.md 判断清单第 28 条所称的共享指针 —— 不在 metadata.commit_attribution 的任何静态集, 前 2000 字符里也没有行首的 track-id 行 (2026-09-21 实读全文零处), 含它的提交按该判据判 foreign (v2_state_runs 的 N9 有改共享指针一态, 实测 foreign), 这是维护共享指针的预期结果, 不是执行出错; 单独成提交使周期 handoff 与归档的归属仍由 track-id 与归档路径判定。该提交按第 28 条「一律请裁」呈 owner: 在 owner_gates 第 13 项的授权请求里单独点明它的 diff; 未获授权 ⇒ 与归档、handoff 一样留本地 (第 13 项的未授权分支), 记台账",
           "Phase D 提交经授权双推 (owner_gates 第 13 项), 推后逐 remote ls-remote 核 master; 被拒或只推成一个 ⇒ 停下上报",
       ]),
 ]
@@ -616,14 +695,14 @@ for t in tasks:
 
 metadata = {
     "feature": SID,
-    "title": "pre_merge Completeness Gate 加 change 维度 (A.2 / A.3 v2.3)",
+    "title": "pre_merge Completeness Gate 加 change 维度 (A.2 / A.3 v2.4)",
     "level": 3,
     "spec": f"{SPEC}/proposal.md",
     "datasource": "tasks.md",
     "created": "2026-09-17",
-    "updated": "2026-09-19",
+    "updated": "2026-09-21",
     "linked_issue": ["10CG/Aria#199", "10CG/aria-plugin#161"],
-    "container": "执笔容器 (非执行期身份): v1 / v1.1 / v2 在 simonfish/023236f2; v2.1 / v2.2 / v2.3 返修在 simonfish/bfe8285d (v2.3 的执笔实例与 v2.2 同, 按 R1 判据: R3 四题 Major 中仅 1 题由 v2.2 返修自身引入, 未过半)。Phase B–D 的执行容器由 TASK-001 在运行时解析, 不由本字段决定",
+    "container": "执笔容器 (非执行期身份): v1 / v1.1 / v2 在 simonfish/023236f2; v2.1 / v2.2 / v2.3 返修在 simonfish/bfe8285d (v2.3 的执笔实例与 v2.2 同, 按 R1 判据: R3 四题 Major 中仅 1 题由 v2.2 返修自身引入, 未过半); v2.4 返修在 simonfish/bfe8285d (v2.4 的执笔实例是 2026-09-21 新会话新派的实例, 与 v2.2 / v2.3 不是同一实例, 跨会话必然换人; 按 R1 判据: R4 四题 Major 中 R4-M1 与 R4-M4 两题由 v2.3 返修自身引入, 2/4 恰一半、未过半, 本不触发换人)。Phase B–D 的执行容器由 TASK-001 在运行时解析, 不由本字段决定",
     "claim": "记录时事实, 不是执行期身份: A.2 2026-09-17 在容器 023236f2 上解析到 claims/023236f2/s-86f7@1836.yaml (track_id pre-merge-completeness-gate-change-scope, 无容器后缀, status active, phase A.2); 该条已于 2026-09-17 转 yielded。2026-09-19 在容器 bfe8285d 上同一三元组解析到 claims/bfe8285d/s-73b9@1606.yaml (status active, phase A.2, linked_issue 10CG/Aria#199)。执行期一律按 TASK-001 第 1 条重新解析, 不引用本行的文件名",
     "total_tasks": len(tasks),
     "estimated_hours": f"{hours_low:g}-{hours_high:g}",
@@ -640,7 +719,7 @@ metadata = {
         {"repo": "Aria (主仓)", "head_at_a2": "a563192 (origin 与 github 两端 ls-remote 相同)",
          "branch_base": "B.1 实测 origin/master; 规划提交未推送时回落为含规划提交的本地 master (TASK-001)",
          "surface": f"{SPEC}/ (tasks.md / detailed-tasks.yaml / corpus-freeze.md / verification-ledger.md) · aria-plugin-benchmarks/ab-suite/{{audit-engine.json, version.yaml}} · aria-plugin-benchmarks/ab-results/<本次目录> · aria gitlink 与 16 个版本点"},
-        {"repo": "standards", "head_at_a2": "8b49562 (A.2 2026-09-17 实测); 2026-09-19 复测已前进到 940cb5b (并发轨 10CG/Aria#211 合并所致) —— 本轨不改 standards, 但基线复核与 TASK-030 的子模块断言都以执行当时实测为准; 基线复核的可执行落点 = metadata.baseline_rebase.standards_files (七个被引文件, TASK-001 逐个对 B.1 当时 gitlink 重测)",
+        {"repo": "standards", "head_at_a2": "8b49562 (A.2 2026-09-17 实测); 2026-09-19 复测已前进到 940cb5b (并发轨 10CG/Aria#211 合并所致) —— 本轨不改 standards, 但基线复核与 TASK-030 的子模块断言都以执行当时实测为准; 基线复核的可执行落点 = metadata.baseline_rebase.standards_files (八个被引文件, TASK-001 逐个对 B.1 当时 gitlink 重测)",
          "surface": "不改"},
     ],
     "baseline_rebase": {
@@ -671,13 +750,19 @@ metadata = {
             "conventions/content-integrity.md: §4.4 (check_bare_issue_refs.py 是手动自检工具不是门, tasks.md 读前必看第 11 条) 与 §4.5 (带圈 / 带框编号自查命令, TASK-026 与 hard_constraints 第 12 条) —— 21748d4..940cb5b 实测 +56 / -2",
             "conventions/skill-benchmark-exemption.md: SOT 1.1.0 §4.1 的 rule6_note 五字段模板与 §2 的场景 4b 触发条件; metadata.rule6_note 与 fields_basis 整体建立在它上面 —— 21748d4..940cb5b 实测 +21 / -3",
             "conventions/git-commit.md: §6.2 的 Spec: trailer 写法; metadata.commit_attribution 的 TRAILER 正则与 TASK-023 / TASK-029 的 trailer 要求都引它 —— 2026-09-19 实测该区间零 diff。本条是 v2.3 新补进集合的第七个文件 (v2.2 漏列); 该引用本身措辞是否准确属 post_planning R3 minor 31b4c0f1, 本轮未处置",
+            "conventions/session-handoff.md: Rule #9 的 SOT —— §2.3.1 机读 frontmatter 五字段 (track-id / owner-container / phase / status / updated-at) 与 track-id 的字段名和语义 (与该 handoff 所属的 OpenSpec change 1:1 绑定); metadata.commit_attribution 的 exclusive() 判周期 / 会话 handoff 是否本轨完全依赖这个字段名 (按 frontmatter 的 track-id 行逐字比对本 spec id), 其 cannot_catch 与 TASK-031 的周期 handoff 条都逐字引用它, TASK-031 的写后五字段自校验 (§2.3.7 的 E1) 也以这五个字段为准 —— 21748d4..940cb5b 实测零 diff (2026-09-21, 退出码 0 且输出为空)。本条是 v2.4 补进集合的第八个文件: v2.3 的三份计划文件只写 Rule #9 与字段名、零处写该文件名 (冻结快照 71c500e 上三份合计计数为 0), 字面求法因此看不见它, 由 standards_files_basis 的第二步补入 (post_planning R4 R4-M4)",
             "conventions/configured-gate-authority.md: Rule #10 的豁免白名单与「已启用闸门不得 AI 自行豁免」判据 (proposal :510 与 TASK-030 的 pre_hook 早退理由) —— 零 diff",
             "conventions/version-management.md: 版本与 tag 规则 (裁定 4 的 MINOR, TASK-025 取号与 TASK-027 终核) —— 零 diff",
             "openspec/project.md: Level 2 的 A.2 产物形态 (:117), tasks.md 重写 b 的论证前提 —— 零 diff",
             "openspec/templates/proposal-minimal.md: 模板自带 ## Tasks (:28-32), 同上 —— 零 diff",
         ],
-        "standards_files_basis": "集合判据 = 本计划实际依赖其内容的 standards 文件 (不是「当初被记过的文件」)。2026-09-19 机械求法: 枚举 standards 全仓 102 份 .md 的 basename, 在 proposal.md / tasks.md / 生成器三份计划文件里逐个计数, 命中后逐条读上下文剔除同名误命中 (standards/README.md 与 core/*/README.md 撞主仓 README.md; standards/openspec/templates/tasks.md 撞本目录 tasks.md) ⇒ 余七份即上表。TASK-001 对这七份逐个重测",
-        "standards": "2026-09-19 实测 git -C standards diff --shortstat 21748d4 940cb5b -- <文件> (21748d4 = proposal 定稿时的 gitlink, 940cb5b = 当前 gitlink): 该区间 standards 全仓只有两个文件变动 —— conventions/content-integrity.md +56 / -2 (新增 §4.4 / §4.5, 须遵守) 与 conventions/skill-benchmark-exemption.md +21 / -3 (本容器 2026-09-17 合并 10CG/Aria#211 所致, SOT 升 1.1.0, 新增 §4.1 rule6_note 五字段最小模板 —— 本文件 metadata.rule6_note 已按其重写)。零 diff 的断言限定在其余五个被引文件 {openspec/project.md, openspec/templates/proposal-minimal.md, conventions/configured-gate-authority.md, conventions/version-management.md, conventions/git-commit.md}, 各自 shortstat 输出为空 (git-commit.md 是 v2.3 新补进被引集合的第七个文件, v2.2 漏列; 2026-09-19 实测同区间同样零 diff)。**这是对上述四个文件、在 21748d4..940cb5b 之间的断言, 不是对 standards 全仓、也不是对任意时点的全称句** —— v1 / v2 / v2.1 写的「standards 被引文件零 diff」在 940cb5b 落地后即已为假 (post_planning R2 的 PP2-M4)。standards 是并发轨随时会动的共享子模块, TASK-001 必须对 B.1 当时的 gitlink 重测, 不得沿用本行数值; 可执行落点 = 上方 standards_files (post_planning R3 R3-M1: v2.2 只有本句指令, 而 TASK-001 的基线复核条里 standards 零出现, 指令有、落点无)",
+        "standards_files_basis": "集合判据 = 本计划实际依赖其内容的 standards 文件 (语义判据, 不是「当初被记过的文件」)。求法分两步, 输入只取冻结快照 (standards 940cb5b 与主仓 71c500e, 与工作树当前内容无关), 脚本与实跑输出见下方 standards_files_derivation, 独立复跑应逐字节得到同一输出。第一步字面计数: 枚举 standards 全仓 102 份 .md (88 个 basename 族), 对三份计划文件 (proposal.md / tasks.md / 生成器) 逐族做区分大小写的子串计数, 三份合计非零即命中 —— 命中 10 族; 排除清单封闭为三族, 各族命中处都不指 standards 内的同名文件: README.md 族 (主仓 README.md、aria/README.md 与归档目录的 README.md, 另有本条排除说明自身对 standards/README.md 与 core/*/README.md 的点名)、README.zh.md 族 (主仓 i18n README, 即 TASK-029 的版本同步面; v2.3 的排除清单漏列此族, post_planning R4 f5b3afad)、tasks.md 族 (本目录 tasks.md, 另有本条排除说明自身对 standards/openspec/templates/tasks.md 的点名) ⇒ 余 7 份。v2.3 只写了「逐条读上下文剔除同名误命中」并点名两族, 剔除步骤是开放判断, 不同复跑者因此得出 7 与 8 两种结果 (post_planning R4 0f027861); 现排除清单封闭, 命中新族即须先判断, 并入上表或入排除清单, 理由记在本条。第二步语义补足: 字面计数只找得到被点名的文件, 以规则号间接引用的 SOT 不写文件名, 它看不见 —— 取三份计划文件引用的 Rule #N (实跑为 Rule #3 / Rule #5 / Rule #6 / Rule #8 / Rule #9 / Rule #10), 按 CLAUDE.md「不可协商规则」各条的 SOT 指针映射, 落在 standards 内的是 Rule #6 / Rule #9 / Rule #10 三份, 其中第一步没有的只有 conventions/session-handoff.md (Rule #3 与 Rule #5 没有 SOT 指针, Rule #8 的 SOT 在 aria 子模块、已在 aria_zero_diff); 它的内容是否被依赖属判断 —— 是 (依赖点见上表该条) ⇒ 补入。两步合计 8 份即上表, TASK-001 对这 8 份逐个重测。两步都覆盖不到的形态 (以概念名间接引用、既不写文件名也不经规则号) 仍靠人读, 不在本求法的保证范围内",
+        "standards_files_derivation": {
+            "command": "python3 -B standards_files_derivation.py  (在主仓根执行; 脚本全文见 script; 下方 output 由该命令生成, 未手改; 输入只取冻结快照, 工作树改动不影响结果)",
+            "script": DERIV_SCRIPT,
+            "output": DERIV_OUTPUT,
+        },
+        "standards": "2026-09-19 实测 git -C standards diff --shortstat 21748d4 940cb5b -- <文件> (21748d4 = proposal 定稿时的 gitlink, 940cb5b = 当前 gitlink): 该区间 standards 全仓只有两个文件变动 —— conventions/content-integrity.md +56 / -2 (新增 §4.4 / §4.5, 须遵守) 与 conventions/skill-benchmark-exemption.md +21 / -3 (本容器 2026-09-17 合并 10CG/Aria#211 所致, SOT 升 1.1.0, 新增 §4.1 rule6_note 五字段最小模板 —— 本文件 metadata.rule6_note 已按其重写)。零 diff 的断言限定在其余六个被引文件 {openspec/project.md, openspec/templates/proposal-minimal.md, conventions/configured-gate-authority.md, conventions/version-management.md, conventions/git-commit.md, conventions/session-handoff.md}, 各自 shortstat 输出为空 (git-commit.md 是 v2.3 新补进被引集合的第七个文件, v2.2 漏列; 2026-09-19 实测同区间同样零 diff; session-handoff.md 是 v2.4 补进的第八个文件, v2.3 漏列, 2026-09-21 实测同区间同样零 diff。2026-09-21 对这六个文件复测, 退出码都是 0 —— 空串是真零 diff、不是没比成, 见 TASK-001 基线复核条的退出码判据, post_planning R4 R4-M1)。**这是对上述六个文件、在 21748d4..940cb5b 之间的断言, 不是对 standards 全仓、也不是对任意时点的全称句** —— v1 / v2 / v2.1 写的「standards 被引文件零 diff」在 940cb5b 落地后即已为假 (post_planning R2 的 PP2-M4)。standards 是并发轨随时会动的共享子模块, TASK-001 必须对 B.1 当时的 gitlink 重测, 不得沿用本行数值; 可执行落点 = 上方 standards_files (post_planning R3 R3-M1: v2.2 只有本句指令, 而 TASK-001 的基线复核条里 standards 零出现, 指令有、落点无)",
         "main_repo": [
             "aria-plugin-benchmarks/ab-suite/audit-engine.json", "aria-plugin-benchmarks/ab-suite/phase-c-integrator.json",
             "aria-plugin-benchmarks/ab-suite/phase-c-integrator-pre-merge-gate.json", "aria-plugin-benchmarks/ab-suite/version.yaml",
@@ -827,6 +912,11 @@ metadata = {
         "v2.3 R3-M3 (两席同题): rule6_note.description_changed 取 no 的机械证据面由三份 SKILL.md 补到四份 —— TASK-018 的 frontmatter 复核条与 fields_basis 逐字列名 audit-engine / phase-c-integrator / phase-b-developer / phase-a-planner, 并写明四份即本 cycle 被改 SKILL.md 的全集; TASK-017 新增一条与 TASK-015 同款的 frontmatter 比对断言 (phase-a-planner 是 LF, 实测 i/lf w/lf, 不需去 CR; phase-b-developer 是 CRLF, 先去 CR); tasks.md 的 3.5 行同步改四份。自检: 反事实 = B.2 若真改了 phase-a-planner 的 description, 改前 31 个任务无一会红 (scenario4b: not_required 与 negctrl: n/a 照常成立), 改后 TASK-017 的 sha256 比对与 TASK-018 的四份复核同时红 ⇒ Rule #6 合规链有了可证伪落点",
         "v2.3 R3-M4 (一席, 与 CLAUDE.md 多远程约束 2 冲突): 协调 ref 的推送补推后核验 —— 新增 metadata.coord_push_verify (assert / no_push_branch / measured / cannot_catch 四段), TASK-001 的心跳与重认领、TASK-031 的 release 三处改为断言 push_success == true 且 push_skipped == false 并逐个 ls-remote 与本地 rev-parse 比对 (不等时先 fetch 判本地是否为远端祖先, 多容器共写属正常); hard_constraints 第 2 条把协调 ref 纳入「推后逐 remote 核验」口径, 心跳例外句补上「免授权只覆盖发起推送, 不覆盖推成了没有」; owner_gates 第 15 项增加「推后核验不过」这一触发条件; tasks.md 判断清单第 27 条、外向动作引言、等待点第 15 行、1.1 与 5.9 checkbox 同步。自检: 2026-09-19 临时仓实测四态 —— 正常 push_success=true/push_skipped=false; 带 ARIA_COORDINATION_NO_PUSH 或 --no-push 时 false/true (reason env_var|cli_flag, 属预期不判红, 单列 no_push_branch); origin 指向不存在路径时 false/false 而 outcome 仍 refreshed、exit 仍 0 —— 正是 v2.2 只断言 outcome refreshed 会假绿的那一态; release_gate.py 三态同形。反事实 = 心跳 push 全失败时, 改前唯一断言 (期望 outcome refreshed) 照常通过, 改后 push_success 断言红",
         "v2.3 minor (只做与四题同处、不改就自相矛盾的两条, 其余 5 条 R3 minor 与 R2 未动的 8 条一律未动、等 owner 裁): 638d2a0f 随 R3-M2 一并理顺 (TASK-029 的 deliverables 与 verification 表述); revision_log 补本轮条目, 版本标识四处 (yaml 头注释 / metadata.title / metadata.container / tasks.md Status 行) 由 v2.2 更新为 v2.3, metadata.updated 仍为 2026-09-19 (同日)",
+        "v2.4 R4-M1 (post_planning R4 聚合表, cr 一席; 由 v2.3 返修自身引入): TASK-001 的基线复核条改为 aria / 主仓 / standards 三组同口径 —— standards 组先 git -C standards fetch origin (本任务别处没有显式 fetch standards 的步骤; 主仓 fetch 会不会顺带递归拉到子模块对象取决于本机配置与子模块状态, 见本条末的另测), gitlink 写明取 git ls-tree HEAD standards 的第三字段; 三组各自两个端点先 git cat-file -e <端点>^{commit}, 不成立即停; 零 diff 判据由「输出为空」改为「退出码为 0 且输出为空」, 非 0 一律停。aria 组与主仓组按同口径一并改, 而不是只论证它们不受影响 (两组端点按构造已在本地, 同口径在正常路径上不误停, 另拦 SHA 抄错一类同形失败)。baseline_rebase.standards 的零 diff 记录补注 2026-09-21 复测退出码均为 0。自检: 2026-09-21 在执笔草稿目录的临时仓实跑四态 —— 真零 diff (gitlink 在本地) 两版都判零 diff, 新判据不误停; R4-M1 场景 (上游 standards 另有一提交改 git-commit.md, 本机 clone 未 fetch, 主仓 gitlink 已指向它) v2.3 做法 stdout 空串、退出 128, 按「输出为空」判零 diff (假绿), v2.4 做法 fetch 后 cat-file 通过、diff 给出 1 file changed ⇒ 红; gitlink 指向 origin 也没有的对象 ⇒ fetch 后 cat-file 仍退出 128 ⇒ 停; 把 ls-tree 整行喂给 diff ⇒ v2.3 假绿、v2.4 停。aria / 主仓两组: 真实端点 cat-file 与 merge-base --is-ancestor 均退出 0; 端点抄错一位 ⇒ diff 退出 128、stdout 空串, 与 standards 组同形。另测 (勘正审计席的一句前提): 默认的 fetch.recurseSubmodules=on-demand 下, 主仓 git fetch 会顺带把新 gitlink 对象拉进已检出的 standards 子模块; 关掉递归时不会; 子模块从未检出时 git -C standards 落到主仓上, diff 同样 stdout 空串、退出 128 —— 对象缺失态取决于本机配置与子模块状态, 故本条不以该递归为前提, 显式 fetch 并以 cat-file 与退出码判",
+        "v2.4 R4-M2 (tl / cr 两席同键; v1 遗留): TASK-031 的周期 handoff 条展开为五条 —— 按模板 aria/templates/session-handoff.md 起稿, Rule #9 五字段写全 (owner-container 取 handoff_autofill.py --owner-container 的机械值, track-id 那句原文保留); 写后五字段自校验逐字照抄 phase-d-closer D.3 子步 2b 的命令 (head -8 <handoff> | grep -cE ... 须 ==5, 连同 frontmatter 内勿插注释行的口径注, 并写明不得改写成整份文件检索); latest.md 子步骤 1 (History prepend, 恒做) 与子步骤 2 (pointer 按三行判定表, 多轨 follower 不改) 各附一条可机械核对的完成断言; latest.md 的改动单独成提交, 在 owner_gates 第 13 项的授权请求里点明 (判断清单第 28 条「共享指针 `docs/handoff/latest.md` 的改动一律请裁」在 5.9 的落点)。TASK-031 的逐步对应条补 D.post (按 phase-d-closer 的触发条件执行时读配置判定, 不成立才跳过) 并把 D.3 拆到子步; tasks.md 判断清单第 25 条按 phase-d-closer 全部子步 (D.1 / D.post / D.2 三路 / D.2b / D.3 子步 1-4 / D.4) 逐一写明落点或不做的理由; 5.9 checkbox 同步。自检: 2026-09-21 在草稿目录对四份样例跑该命令 —— 只写 track-id 得 1, 五字段齐全得 5, frontmatter 内插三行注释把 updated-at 挤出窗口得 4, frontmatter 只有 track-id 而正文另有四个同名行时整份文件检索得 5 (假绿)、head -8 得 1; latest.md 两条完成断言在它的拷贝上两态实跑 (未做 prepend 时 grep -cF 新文件名得 0, 做了得 1; 判 follower 时 pointer 行改前改后相同)。改前 TASK-031 没有任何断言看得见这些形态",
+        "v2.4 R4-M3 (ba 一席; v1 遗留): 二选一按代码级证据裁为 (b) —— 工作区会产生, 但按仓内 SOT 不入库。证据: 生效 skill-creator 的 SKILL.md 以散文规定工作区为与 skill 目录同级的 <skill-name>-workspace/, aggregate_benchmark.py 与 generate_review.py 只收调用方传入的目录, 不自定路径; aria/.gitignore 忽略 skills/*-workspace/ 并注明 kept locally, archived in aria-plugin-benchmarks/ab-results/ (e83be99, 2026-05-13); 主仓 .gitignore 忽略 aria-plugin-benchmarks/ab-workspace/ 并注明「结果已落 ab-results/, 无需入库」(3d3c820, 本身是一次 Rule #6 AB 结果提交); AB_TEST_OPERATIONS.md 目录用途表把 {skill}/{skill}-workspace/ 定为「随时可改，不计入基线」; 2026-04-10 之后触及 ab-results/ 的 51 个提交零 workspace 路径, 仓内 23 个被追踪的 state-scanner-workspace/ 文件全部出自 2026-04-09 的 2892c6f (提交说明自称工作区副本), 早于上述三条忽略规则; 先例 2a46d08 同样零 workspace 路径。改动: TASK-030 删掉「以及被选作结果一部分的 skill-creator 工作区目录」那半句; TASK-024 快照比较条去掉工作区例外, 改写为工作区放在已忽略位置、结果依据的逐 eval 产物复制进结果目录 (形状对齐 2a46d08)、porcelain 出现 *-workspace/ 行即停。自检: TASK-030 的参数只剩本次结果目录, 与 commit_attribution 用法注释 (只收一个结果目录) 一致; 上列证据均为 2026-09-21 在返修副本实跑 (git log --diff-filter=A、git log -S 与逐提交的路径计数), 未跑整轮 AB",
+        "v2.4 R4-M4 (km 判 major、tl 判 minor, 聚合取 major; 由 v2.3 返修自身引入): standards_files 补第八条 conventions/session-handoff.md, 依赖点写 Rule #9 五字段与 track-id 的字段名和语义 (commit_attribution 的 exclusive()、TASK-031 的周期 handoff 条与写后自校验都建立在它上面); 21748d4..940cb5b 的实测值亲跑: 退出码 0 且输出为空 (零 diff) ⇒ 进零 diff 组, 零 diff 集合由五个变六个, 所有数到这组文件的地方同步改 (见 v2.4 minor 条的 cb1529a3)。自检: 同一命令对八个文件逐个复跑 —— content-integrity.md 与 skill-benchmark-exemption.md 分别为 +56 / -2 与 +21 / -3, 其余六个退出码 0 且输出为空; git diff --name-only 全仓仍只这两个文件。集合为什么漏它、今后怎么不漏, 见 standards_files_basis 的第二步",
+        "v2.4 minor (只做与四题同处的四条; R4 的另四条独立 minor 与前轮待 owner 裁的 minor 一律未动 —— 唯一触及的前轮条目是 R3 minor 638d2a0f, 因 f0e78a1e 要求实证判定它的原意, 见下): f5b3afad 与 0f027861 —— standards_files_basis 改写为可独立复跑的两步求法, 新增 baseline_rebase.standards_files_derivation (command / script / output): 第一步字面计数, 输入钉在冻结快照 (standards 940cb5b、主仓 71c500e), 排除清单封闭为三族 (补上 v2.3 漏列的 README.zh.md 族); 第二步把三份计划文件引用的 Rule #N 按 CLAUDE.md 的 SOT 指针映射, 补足字面计数看不见的间接引用 (本轮据此补入 session-handoff.md)。cb1529a3 —— baseline_rebase.standards 那句粗体范围句随新集合改为「六个文件」, 前句、scope_repos 的 standards 行与 tasks.md 读前必看第 5 条的计数同步 (零 diff 组六个 / 被引全集八份)。f0e78a1e —— v2.3 条所称「638d2a0f 随 R3-M2 一并理顺 (TASK-029 的 deliverables 与 verification 表述)」不实: 当时 deliverables 十项一项未动, 只改了 verification 两条; 该条原文保留不改, 此处勘正。本轮实证判定 deliverables 该改: 去掉台账 —— 姊妹任务 TASK-025 (aria 侧版本 5 文件) 同样写台账而不列台账, TASK-029 自己的 verification 已把台账追加移到 TASK-030 第 1 条提交, owner_gates 第 16 项与 commit_attribution.cannot_catch 都把 TASK-029 的交付物当作结构上不含 exclusive 路径 —— 改后这些字面都成立; 同任务 trailer 条的 638d2a0f 括注补一句。版本标识四处 (yaml 头注释 / metadata.title / metadata.updated / tasks.md Status 行) 更新为 v2.4 / 2026-09-21; metadata.container 于 2026-09-22 补记 v2.4 的执笔记录 (owner 裁定; 主控初版派单只列了上述四处而漏列该字段, v2.3 先例维护过它), 四处的日期仍取 v2.4 主体返修完成的 2026-09-21, 未因补记改动; 判断清单补第 35–39 条 (v2.4)。自检: 派生脚本在返修副本与另一份独立克隆里各跑一次, 输出逐字节相同 (字面 10 族 → 排除 3 族 → 7 份; Rule #N 映射补出 1 份 → 8 份); 用 commit_attribution 自带的 SHARED 集按 deliverables 字面分类, 主仓侧交付物全落 SHARED 的任务由 v2.3 的一个 (TASK-023) 变为 v2.4 的两个 (TASK-023 / TASK-029), 与 cannot_catch 的「共两组」及 owner_gates 第 16 项的措辞一致",
     ],
     "v2_state_runs": {
         "what": "v2 新增的 N4 / C1 (cell_status) / N6 (coord_ref_precheck) / N7 (crlf_guard) / N8 / N9 (commit_attribution) / N10 (guard_config_hooks) 在同一 scratch 主仓副本与临时仓上实跑; 代码取自本文件对应键, 副本外零写入 (N6 的远端是临时裸仓)",
@@ -836,7 +926,7 @@ metadata = {
     },
 }
 
-header = ("# Generated by task-planner (A.3) — pre-merge-completeness-gate-change-scope, v2.3 (2026-09-19, post_planning R3 rework)\n"
+header = ("# Generated by task-planner (A.3) — pre-merge-completeness-gate-change-scope, v2.4 (2026-09-21, post_planning R4 rework)\n"
           "# Dual-layer: tasks.md (coarse, 31 checkboxes) + this file (fine, 31 tasks). `tasks:` stays the LAST\n"
           "# top-level key: the archive gate's line parser lets the last task block run to EOF.\n")
 doc = yaml.dump({"metadata": metadata}, Dumper=Dumper, allow_unicode=True, sort_keys=False, width=100000)
