@@ -143,9 +143,11 @@ R2–R4 均未过半 (0/5、1/4、2/4)。**R5 判定**: 五题中 **2 题由 v2.
 | [2] 增加轮次 | `max_rounds += 2` (→ 7), 继续审计循环 |
 | [3] 降级为单轮 | 取 R5 结论为最终结果, `converged: false`, `degraded: true` |
 
+**owner 裁定 (2026-09-22)**: 选 **[2] 增加轮次** —— 本审计周期 `max_rounds` 5 → 7 (只作用于本轨 post_planning 这一审计周期; `.aria/config.json` 的全局缺省 `audit.max_rounds: 5` 不改)。下一步: v2.5 返修 → R6。按 audit-engine 路径 [2] 的定义, frontmatter 的 `converged` / `overridden_by_user` / `degraded` 维持原值。
+
 ## 下一步 (待 owner 裁定)
 
-1. **降级策略三选一** (上表)。
+1. ~~降级策略三选一~~ → ✅ owner 2026-09-22 裁 **[2] 增加轮次** (`max_rounds` 5 → 7)。
 2. **R5 五簇 Major 的返修 (v2.5)**: 修法各席已给且主控已复核其可行性, 均为定点修订, 不涉任务结构重排或 proposal 取舍。
 3. **七条 minor**、R4 另四条独立 minor 与前轮未动 minor、执笔实例 v2.4 九条请裁、三条 `gen_yaml.py` 待裁项 —— 状态不变, 待 owner 处置。
 4. **入口门提醒 (事实未变)**: `owner_gates` 第 1 项要求「10CG/Aria#195 已完成 C.2 合并或 owner 明示改序」, 该轨仍 `yielded`、B.1 未起 ⇒ 无论选哪条路径, 下一步都不是直接进 Phase B。
