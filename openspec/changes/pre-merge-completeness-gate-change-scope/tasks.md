@@ -3,7 +3,7 @@
 > **Spec**: [proposal.md](./proposal.md) (v6, Level 3, Approved 2026-09-12)。本文件所引 proposal 行号指主仓 `a563192` 上的该文件 (sha256 `d3c9b4f2…6f34`, 自 `0a2ae53` 起未变); proposal 所引 aria 行号冻结于 `301641b`, 复核见「读前必看」第 5 条
 > **决策单**: `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md` §1 与 §2 的 10CG/Aria#199 表 13 行 (连同 §5, 即最终执行口径)
 > **Level**: 3 — 本文件 (A.2) + `detailed-tasks.yaml` (A.3, 单一 SOT: verification / 依赖 / 工时 / 外向动作明细 / A.2 实跑记录)
-> **Status**: A.2/A.3 v2.4 (2026-09-21, 执笔容器 simonfish/bfe8285d, 执笔人不是派单主控; v2.4 = post_planning R4 四题 Major 返修: 1.1 基线复核三组同口径 (standards 组先 fetch, 两端点先 `cat-file -e`, 零 diff = 退出码 0 且输出为空)、5.9 手写 Phase D 补写后五字段自校验与 `docs/handoff/latest.md` 两子步 (判断清单第 25 条列全 phase-d-closer 的全部子步)、skill-creator 工作区按证据裁为不入库 (5.8 删去第二个 `extra`, 5.2 快照比较不再单列例外)、standards 被引文件集补 `session-handoff.md` (八份, yaml `metadata.baseline_rebase.standards_files`; 求法改为可复跑的两步), 另理顺四条同处 minor; v2 / v2.1 / v2.2 / v2.3 的返修与逐条追溯见 yaml `metadata.revision_log`) — 待主控核验
+> **Status**: A.2/A.3 v2.5 (2026-09-22, 执笔容器 simonfish/bfe8285d, 执笔人不是派单主控, 沿用 v2.4 的执笔实例; v2.5 = post_planning R5 五题 Major 返修: 5.9 的原等待点 13 拆为 13a / 13b、Phase B–D 每个会话入口核一次 claim (含强制对齐)、5.8 显式跑 C.2.4.5 子模块指针闸 (新等待点 17)、5.5 的 AB 复核补 feature 一侧并按退出码判零 diff、配置文件守卫钉在主仓根、skill-creator 工作区只放主仓 `ab-workspace/`, 另理顺两条同处 minor 并做「空输出即通过」全计划同族扫描 (yaml `hard_constraints` 第 14 条; 判断清单第 40–45 条); v2 至 v2.4 的返修与逐条追溯见 yaml `metadata.revision_log`) — 待主控核验
 > **Scope**: aria 子模块 (A.2 实测 `origin/master` = `1cb3872` = v1.73.3) + 主仓 (A.2 实测 origin 与 github 的 master 均为 `a563192`); standards 不改
 > **ship target**: aria-plugin `<vNEXT>`, MINOR (决策单 §2 第 4 行); 本文件不写字面版本号
 > **执行台账**: 1.1 新建本目录 `verification-ledger.md`, 主控唯一执笔; 下文「台账」均指它
@@ -62,7 +62,7 @@
 8. 裁定 11 派生的字段取值与 WARN 行、短路运行的非判定键 (读前必看第 7、8 条) 由执笔人钉定; fixture 的 mode 例外按正文补全 (第 9 条)。
 9. 新增文档机检 N1 / N2 与 stdlib 检查 N3 (只增不改, 三态实跑见 yaml), 并要求 execution-modes.md 的 `Step 1:`–`Step 5:` 五个标记全部保留 (proposal 只要求 4 / 5)。
 10. `phase-c-integrator/SKILL.md:57` 与 `:754` 纳入 3.3, `audit-engine/SKILL.md:423` 纳入 3.2 (同形, 多三处触点)。
-11. B.0 认领不照 phase-b-developer「本 session 没有 claim 就跑 phase1_gate」的字面: 先按 (本容器, 归一 track_id, `active`) 三元组**运行时解析**本轨 claim (不钉文件名), 解析到就 `--heartbeat-only` 刷新; 解析不到 `active` (`done` / `yielded` / `abandoned`, 或本容器该轨无 claim) 才在获授权后用原串重认领, 未获授权则停在 1.1; 解析到多条 `active` 不假设唯一, 按 `10CG/aria-plugin#202` 的形态全部纳入并上报 (CLI 每次新生成 session id, 照字面会写出第二条 claim)。
+11. B.0 认领不照 phase-b-developer「本 session 没有 claim 就跑 phase1_gate」的字面: 先按 (本容器, 归一 track_id, `active`) 三元组**运行时解析**本轨 claim (不钉文件名), 解析到就 `--heartbeat-only` 刷新; 解析不到 `active` (`done` / `yielded` / `abandoned`, 或本容器该轨无 claim) 才在获授权后用原串重认领, 未获授权则停在 1.1; 解析到多条 `active` 不假设唯一, 按 `10CG/aria-plugin#202` 的形态全部纳入并上报 (CLI 每次新生成 session id, 照字面会写出第二条 claim)。v2.5 起这一解析连同前置检查、强制对齐与心跳核验在 Phase B–D 每个会话入口重做 (第 41 条)。
 12. `mid_post_spec` 在 B.2 的两读法按「停下请裁」处置。
 13. 反事实补丁由既非实现者也非测试作者的新实例构造, 语料复现核对由未参与标注的实例做; 反事实在 2.6 SHA 的副本上三步法跑; 基线 RED 不充当反事实。
 14. 脚本不存在时, 测试 helper 先断言脚本文件存在, RED 以 AssertionError 呈现。
@@ -70,13 +70,13 @@
 16. catalog 缺口开在 10CG/Aria; `version.yaml` 取号改读 `origin/master` 上的文件。
 17. aria 推送与逐 remote 核验由 5.6 承担; 主仓 master 双推交 C.2.5, 事前核五问 (yaml `metadata.c25_five_questions`)。
 18. 同步 `origin/master` 用 merge 不 rebase, 主仓 PR 以 merge commit 合并 (覆盖 C.2.1 与 branch-manager 的默认), 使台账引用的 SHA 留在远端 master 上。
-19. Phase B 期间 aria 发版属常规情形: 5.3 先把 aria `origin/master` 并入 feature 并重跑回归, 5.5 按 AB 基线与合并基线之间两个 skill 目录的 diff 决定是否重跑 5.2。其余罕见路径 (并入冲突 / 取号被占 / 合并冲突 / 推送被拒 / 半推) 停下上报, 只给先例指针 aria `ec72175`, owner 确认后执行, 不写自动恢复流程。
+19. Phase B 期间 aria 发版属常规情形: 5.3 先把 aria `origin/master` 并入 feature 并重跑回归, 5.5 按 AB 基线与合并基线之间两个 skill 目录的 diff 决定是否重跑 5.2 (v2.5 起另比 feature 一侧 W 之后的改动, 两侧都按退出码判零 diff, 见第 43 条)。其余罕见路径 (并入冲突 / 取号被占 / 合并冲突 / 推送被拒 / 半推) 停下上报, 只给先例指针 aria `ec72175`, owner 确认后执行, 不写自动恢复流程。
 20. 全部 checkbox 由主控在 5.9 归档预演前一次勾选。
 21. 含集成关键词的行只点名它接线的脚本; 归档门预演的其余 warn (4.4 行 dogfood 无可链接产物) 照记, 不为躲检查器改措辞。
 22. AB 判据按套件分: 两个套件都逐 eval 判回归 (复跑两次、三取二); `delta > 0` 只要求 audit-engine 套件; without 臂用 AB 开跑时 aria `origin/master` 的快照 (old_skill 语义)。
 23. 1.3 给未写 checkpoint 配置的格补钉 `checkpoints: {post_spec: convergence}` (读前必看第 23 条)。
 24. 5.7 与 5.8 把 `plugin-cache-currency` 的 STALE 视为预期 (owner 更新插件缓存前)。
-25. 5.9 手写 Phase D, 不调 phase-d-closer。phase-d-closer 的全部子步 (依据 `aria/skills/phase-d-closer/SKILL.md` 与同目录 `references/execution-steps.md`、`references/handoff-mechanics.md`) 在手写路径里逐一落点如下 (v2.4 按 post_planning R4 R4-M2 列全; 此前只写了 D.1 / D.2b / D.4 三项偏离): D.1 进度更新 —— 跳过并留痕, 本仓无运行时 UPM (phase-d-closer 自身的跳过规则同此); D.post post_closure 审计 —— 5.9 执行时按 phase-d-closer 的触发条件 (`audit.enabled == true` 且 `audit.checkpoints.post_closure != off`) 读配置判定, 不成立才按配置跳过 (Rule #10 白名单第一类; 2026-09-21 实读 `post_closure` 为 `off`), 成立则照跑; D.2 归档 —— 归档预演的 `spec_complete.py --gate` 与 openspec-archive 兜住三路 (`verdict=block` 停下上报; `complete=false` 由 openspec-archive Step 1 自身拦下; 放行才归档, Step 7 由 owner 裁); D.2b claim 释放 —— yaml TASK-031 的 release 条, 不带 `--sweep-stale` / `--gc` (须另行授权), 推后按 `coord_push_verify` 核 `push_success` (phase-d-closer SKILL.md 的「除 exit code 外还须看 `push_success`」落在这里); D.3 子步 1 触发评估 —— 不做, 本计划无条件写周期 handoff, 比触发条件更严; D.3 子步 2 按模板起稿 —— yaml TASK-031 的周期 handoff 起稿条 (`owner-container` 取 `handoff_autofill.py --owner-container` 的机械值); D.3 子步 2b 写后五字段自校验 (E1) —— 同任务的五字段自校验条, 命令逐字照抄 (含 `head -8` 窗口); D.3 子步 3 `latest.md` 两子步 —— 同任务的子步骤 1 条 (History prepend 恒做、不可跳过) 与子步骤 2 条 (pointer 按三行判定表, 多轨 follower 不改), 改动单独成提交并在等待点 13 的授权请求里点明 (见第 38 条); D.3 子步 4 提示提交 —— 5.9 末条 Phase D 提交经授权双推; D.4 estimator 采集 —— 照跑, 非阻塞 (phase-d-closer 的触发条件 `ai_native_estimator.enabled != false`: 2026-09-21 实读 `.aria/config.json` 无该键, 即成立)。
+25. 5.9 手写 Phase D, 不调 phase-d-closer。phase-d-closer 的全部子步 (依据 `aria/skills/phase-d-closer/SKILL.md` 与同目录 `references/execution-steps.md`、`references/handoff-mechanics.md`) 在手写路径里逐一落点如下 (v2.4 按 post_planning R4 R4-M2 列全; 此前只写了 D.1 / D.2b / D.4 三项偏离): D.1 进度更新 —— 跳过并留痕, 本仓无运行时 UPM (phase-d-closer 自身的跳过规则同此); D.post post_closure 审计 —— 5.9 执行时按 phase-d-closer 的触发条件 (`audit.enabled == true` 且 `audit.checkpoints.post_closure != off`) 读配置判定, 不成立才按配置跳过 (Rule #10 白名单第一类; 2026-09-21 实读 `post_closure` 为 `off`), 成立则照跑; D.2 归档 —— 归档预演的 `spec_complete.py --gate` 与 openspec-archive 兜住三路 (`verdict=block` 停下上报; `complete=false` 由 openspec-archive Step 1 自身拦下; 放行才归档, Step 7 由 owner 裁); D.2b claim 释放 —— yaml TASK-031 的 release 条 (release 之前单独请等待点 13a, v2.5), 不带 `--sweep-stale` / `--gc` (须另行授权), 推后按 `coord_push_verify` 核 `push_success` (phase-d-closer SKILL.md 的「除 exit code 外还须看 `push_success`」落在这里); D.3 子步 1 触发评估 —— 不做, 本计划无条件写周期 handoff, 比触发条件更严; D.3 子步 2 按模板起稿 —— yaml TASK-031 的周期 handoff 起稿条 (`owner-container` 取 `handoff_autofill.py --owner-container` 的机械值); D.3 子步 2b 写后五字段自校验 (E1) —— 同任务的五字段自校验条, 命令逐字照抄 (含 `head -8` 窗口); D.3 子步 3 `latest.md` 两子步 —— 同任务的子步骤 1 条 (History prepend 恒做、不可跳过) 与子步骤 2 条 (pointer 按三行判定表, 多轨 follower 不改), 改动单独成提交, 该提交产生之后请等待点 13b 并附其 diff (见第 38 条与第 40 条); D.3 子步 4 提示提交 —— 5.9 末条 Phase D 提交经授权双推; D.4 estimator 采集 —— 照跑, 非阻塞 (phase-d-closer 的触发条件 `ai_native_estimator.enabled != false`: 2026-09-21 实读 `.aria/config.json` 无该键, 即成立)。
 26. 组 2 的中间任务只验收本段完成后即可观测的子格 (yaml `metadata.stage_cells`), 测试的每个格包在 `subTest` 里; SC 方法级全绿只在 2.5。
 27. 协调 ref 的推送 (心跳、获授权的认领与 release) 与强制对齐之前先跑 yaml `metadata.coord_ref_precheck`, 本地领先的只有本轨心跳才继续; 这是心跳免授权的适用前提, Phase B–D 各会话调用 `/state-scanner` 之前也跑。**推送之后**再按 yaml `metadata.coord_push_verify` 核验推成了没有 (`push_success` 为真、`push_skipped` 为假, 再 `ls-remote` 与本地比对) —— 免授权只覆盖「发起这次推送」, 不覆盖「推成了没有」(v2.3)。
 28. 待推送的主仓提交按 yaml `metadata.commit_attribution` 判归属: 路径分本轨专属 (本目录、本轨审计报告、本轨 handoff、以及本轨 A.2/A.3 工具目录 `.aria/notes/2026-09-17-199-a2-a3-tooling/` —— 末项 v2.3 补入) / 发布同步面 / 他轨三类, **整条只落发布同步面的提交不再单独算本轨** —— 需同一提交另有本轨专属路径, 或提交信息带本轨 `Spec:` trailer (`git-commit.md` §6.2 既有写法); 共享指针 `docs/handoff/latest.md` 的改动一律请裁。
@@ -86,17 +86,23 @@
 32. (v2.2) 读前必看第 8 条的 explicit-only 收窄扩到 `spec_level_undetermined`, 并给 SC-9(4) 的 fixture 补钉 `checkpoints: {post_spec: 'convergence'}` 使两种读法可区分 —— 补钉 fixture 参数沿用第 23 条的先例 (期望值不变), 新增的是一条逐字断言, 不是改既有期望值。
 33. (v2.2) 提交归属收紧: 整条只落发布同步面的提交不再单独构成本轨, 判据是「同一提交另有本轨专属路径」或「提交信息带本轨 `Spec:` trailer」; 代价面在 v2.3 按 31 个 TASK 的交付物全量重跑路径分类后改写: 结构上不含本轨专属路径的交付物有**两组** —— 5.7 的九个版本同步面文件与 5.1 的两个 `ab-suite` 文件, 两组都必须带 trailer, 任一漏写即停在等待点 16 (fail-closed, 多一次请裁); 另三类不靠 trailer —— 本轨工具目录改由专属前缀集兜住 (v2.2 漏列, 真提交 `12c870d` 曾因此被判他轨), 本次 `ab-results` 目录靠 5.8 调用判据时把它作 `extra` 传入兜住 (与台账同提交并不改判 —— `foreign` 短路优先于本轨专属, 实测), 5.9 周期 handoff 靠 frontmatter `track-id` 逐字相符兜住。
 34. (v2.2) claim 身份一律运行时按 (本容器, 归一 track_id, `active`) 三元组解析并覆盖四态; 多条 `active` 不自行删除或释放, 全部纳入并上报。
-35. (v2.4) post_planning R4 R4-M3 按 (b) 裁: skill-creator 工作区会产生, 但按仓内 SOT 不入库 —— 5.8 的提交归属判据不再收它作 `extra`, 5.2 的快照比较不再单列它为例外; 它放在已被忽略的位置 (aria 子模块 `skills/*-workspace/` 或主仓 `aria-plugin-benchmarks/ab-workspace/`), 结果依据的逐 eval 产物复制进结果目录 (形状对齐先例 `2a46d08`)。依据: 生效 skill-creator 的 SKILL.md 只用散文规定工作区位置 (「as a sibling to the skill directory」), 两个脚本只收调用方传入的目录; aria 与主仓两处 `.gitignore` 的对应条目及其注释; 2026-04-10 之后触及 `ab-results/` 的 51 个提交零 workspace 路径, 仓内 23 个被追踪的 `state-scanner-workspace/` 文件全部出自 2026-04-09 的 `2892c6f`, 早于三条忽略规则。
+35. (v2.4) post_planning R4 R4-M3 按 (b) 裁: skill-creator 工作区会产生, 但按仓内 SOT 不入库 —— 5.8 的提交归属判据不再收它作 `extra`, 5.2 的快照比较不再单列它为例外; 它放在已被忽略的位置 (aria 子模块 `skills/*-workspace/` 或主仓 `aria-plugin-benchmarks/ab-workspace/`; v2.5 改为只放后者, 见第 44 条), 结果依据的逐 eval 产物复制进结果目录 (形状对齐先例 `2a46d08`)。依据: 生效 skill-creator 的 SKILL.md 只用散文规定工作区位置 (「as a sibling to the skill directory」), 两个脚本只收调用方传入的目录; aria 与主仓两处 `.gitignore` 的对应条目及其注释; 2026-04-10 之后触及 `ab-results/` 的 51 个提交零 workspace 路径, 仓内 23 个被追踪的 `state-scanner-workspace/` 文件全部出自 2026-04-09 的 `2892c6f`, 早于三条忽略规则。
 36. (v2.4) 1.1 基线复核的 aria 组与主仓组按 standards 组同口径一并改 (两端点先 `cat-file -e`, 零 diff = 退出码 0 且输出为空), 而不是只论证它们不受影响: 两组端点按构造已在本地, 同口径在正常路径上不会误停, 另拦 SHA 抄错一类同形失败 (2026-09-21 实测抄错一位时 stdout 同为空串、退出 128)。
 37. (v2.4) standards 被引文件集的求法定为两步: 字面计数 (输入钉在冻结快照 standards `940cb5b` 与主仓 `71c500e`, 排除清单封闭为三族) 加 Rule #N 映射 (按 CLAUDE.md 各条 SOT 指针); 第二步里「内容是否被依赖」仍是判断, 本轮只据此补入 `session-handoff.md`; 以概念名间接引用、不经规则号的依赖不在求法保证范围内。
-38. (v2.4) 5.9 的 D.3 补齐起稿 / 五字段自校验 / `latest.md` 两子步, D.post 改为执行时按配置判断; `latest.md` 的改动单独成提交, 在等待点 13 的授权请求里点明 —— 这是第 28 条「共享指针 `docs/handoff/latest.md` 的改动一律请裁」在 5.9 的落点, 不另立等待点; 本仓 `latest.md` 没有字面名为 History 的表, History prepend 按执行时实读的版式落 (track 表本轨行与说明段), 落点记台账。
+38. (v2.4) 5.9 的 D.3 补齐起稿 / 五字段自校验 / `latest.md` 两子步, D.post 改为执行时按配置判断; `latest.md` 的改动单独成提交, 该提交产生之后请等待点 13b 并附其 diff —— 这是第 28 条「共享指针 `docs/handoff/latest.md` 的改动一律请裁」在 5.9 的落点 (v2.4 原写在原等待点 13 的授权请求里点明、不另立等待点, 与原第 13 项「同批」的时序冲突, v2.5 拆为 13a / 13b, 见第 40 条); 本仓 `latest.md` 当前没有字面名为 History 的表 (该节曾由 `16b5bf1` 按 SOT 加入、在合并提交 `ecb6296` 中丢失; 13b 的请求里注明来历, 恢复与否由 owner 裁), History prepend 按执行时实读的版式落 (track 表本轨行与说明段), 落点记台账。
 39. (v2.4) 5.7 的 deliverables 去掉台账, 与姊妹任务 5.3 同口径 (只列本任务提交的文件); 台账的本任务追加仍随 5.8 第一条提交。post_planning R3 minor `638d2a0f` 的原意由此在 deliverables 一侧也闭合; R4 minor `f0e78a1e` 指出的 v2.3 revision_log 那句不实, 原文不改, 勘正写在 v2.4 条目里。
+40. (v2.5) 原等待点 13 拆为 13a / 13b (post_planning R5 R5-M1): v1 起原第 13 项把 `release_gate` 的协调 ref 推送与 Phase D 提交双推捆成「同批」, v2.4 又要求在原第 13 项的请求里点明 `latest.md` 的 diff —— 原第 13 项须在 D.2b 用掉, 那时该 diff 还不存在, 照字面无合法下一步。owner 2026-09-17 的原意是 release 逐项授权 (yaml `hard_constraints` 第 3 条「新写 claim、`release_gate` 的 release / sweep / gc、推 master / tag / gitlink 仍逐项授权」), 「同批」捆绑本身就与它不符, 且从未登记为流程判断; 拆分后 13a 只含 release 的协调 ref 推送 (恢复逐项), 13b 在 `latest.md` 的单独提交产生之后才请、请求附其 diff, 第 28 条「共享指针一律请裁」由此可执行。代价: Phase D 多一次授权往返; 多出一个中间态 —— 13a 已批并已 release、13b 未批时, 协调 ref 上本轨已是 `done` 而归档与周期 handoff 只在本地, 原样记台账。`latest.md` 的 History 节曾由 `16b5bf1` 按 SOT 加入、在合并提交 `ecb6296` 中丢失, 13b 的请求里注明来历, 恢复与否由 owner 裁; `latest.md` 单独成提交的理由改写为「给 owner 一份可单独否决的共享指针 diff」, 不再以 5.9 不跑的 `commit_attribution` 为据。
+41. (v2.5) claim 存活从「只在 1.1 核一次」改为「Phase B–D 每个会话入口核一次」(post_planning R5 R5-M2; yaml `hard_constraints` 第 4 条): 三元组解析 → 协调 ref 前置检查 → 把本地协调 ref 强制对齐到 origin 后重跑解析 → `--heartbeat-only` 并按 `coord_push_verify` 核验; 对齐后解析不到 `active` 或心跳返回 `claim_not_found` ⇒ 等待点 14 (挂载从 1.1 扩到任意会话), 前置检查或推后核验不过 ⇒ 等待点 15。强制对齐是本轮新加的一步 (交互检查查出): 心跳不自己 fetch, 本地协调 ref 落后 origin 时心跳叠在旧值上、推送非快进必失败 (resilient_push 的重取用非强制 refspec, 分叉即被拒), 被 sweep 成 `abandoned` 的 claim 在落后的本地值上也仍显示 `active` —— 两者都有 yaml `v2_state_runs` 的 N11 实测; 对齐只在前置检查退出 0 (本地领先的只有本轨心跳) 之后做, 丢的也只是它们。会话间隔超过 `SWEEP_TTL` (24h) 时 claim 可能已被 sweep, 入口核验只能事后发现、由等待点 14 补认领, 防不住这段时间里他容器把本轨看作无人认领。例外: 5.2 的 AB 会话不做入口核验 (推不出心跳, 两次快照之间不得 fetch), 由其前一个普通会话补一次核验过的心跳、其后第一个普通会话先做入口核验; 5.9 的 release 之后本轨已无 `active` claim, 不再做入口核验。5.9 的 release 遇 `claim_not_found` (`release_gate` 记为 benign、退出 0、什么都不推) 不按推送失败落等待点 15, 呈 owner 裁是否先补认领再 release。
+42. (v2.5) C.2.4.5 子模块指针闸 (post_planning R5 R5-M3): 本仓未配置 `phase_c_integrator.submodule_gate` ⇒ 缺省 `block`, 已启用; 它的自动触发挂在 branch-manager merge action 上, 主仓 PR 按约束 1 的主仓例外走 Forgejo 合并, 不会触发 ⇒ 5.8 由主控在 C.2.4 green 之后、Forgejo 合并之前在主仓根显式跑 `submodule_gate.sh` (mode 取执行时配置)。放行除退出 0 外还要看到逐子模块结论行 —— 脚本在没有 `.gitmodules` 的目录里会打印「trivially passes」并退出 0; block 与闸没跑成都停在新立的等待点 17, override 只由 owner 决定。闸拿 HEAD 与 `origin/master` 的 gitlink 直接比, 同步合并之后 `origin/master` 若又前进 (他轨 bump 了某子模块) 也会判 block, 是否重新同步后重跑由 owner 裁。
+43. (v2.5) 5.5 的 AB 复核补 feature 一侧并与 1.1 同口径 (post_planning R5 R5-M4 与 `1453c41f`): 上游一侧 (A..S3) 两端点先 `cat-file -e`、`diff` 看退出码 —— A 是全计划唯一隔会话从台账抄回的 SHA, 抄错时旧判据 (有输出才停) 按空输出放行, 静默跳过 Rule #6 重跑; feature 一侧比 W 之后两个 skill 目录与主仓 `ab-suite/audit-engine.json` 的改动 (5.4 第一次自检在 5.2 之后, 按设计会改本 cycle 的新增行), 非空时逐 hunk 按 Rule #6 判据表分类: 描述性 ⇒ substitute 记入 `rule6_note`, 处方性或拿不准 ⇒ 重跑 5.2。为此 5.2 的结果提交 SHA 记台账。
+44. (v2.5) skill-creator 工作区只放主仓 `aria-plugin-benchmarks/ab-workspace/` (post_planning R5 R5-M5, 两个修法里按「新增交互更少」选 (a)): aria 侧 `skills/*-workspace/` 虽被 `aria/.gitignore` 忽略、躲过 porcelain, 却在 3.5 的 `grep -rn … aria/skills/` (SC-13) 与 `no-unresolved-version-placeholder` 的 `grep -rn … aria/` 两个递归检索面上 (`grep -r` 不认 `.gitignore`), 5.3 / 5.5 在 AB 之后重跑它们时会被工作区里的旧版快照误红。选址可由调用方指定: 生效 skill-creator 的 SKILL.md 只以散文给默认「as a sibling to the skill directory」(`:167`), 快照写法 `cp -r <skill-path> <workspace>/skill-snapshot/` 相对于工作区 (`:186`), `aggregate_benchmark.py` 与 `generate_review.py` 都只收调用方传入的目录; 先例 `3d3c820` 把 `ab-workspace/` 加进主仓 `.gitignore`, v1.69.0 那次 AB 的旧版快照即放在 `ab-workspace/…/skill-snapshot`。(b) (AB 后删 aria 侧工作区并在重跑前断言) 要多一个删除动作和至少两处断言, 且本机主仓已有一个早年 AB 留在 aria 侧的被忽略工作区 (`aria/skills/issue-triage-workspace/`, 2026-09-22 实测), 「断言无 `*-workspace` 目录」会误停, 故不选。(a) 只加一处断言: 5.2 两次快照的 `find aria/skills -maxdepth 1 -name '*-workspace'` 之差须为空。
+45. (v2.5)「空输出即通过」全计划同族扫描 (owner 2026-09-22 点名): yaml `hard_constraints` 新增第 14 条判据命令的通用口径 (退出码先于输出、管道逐段看、比较两侧都看退出码、运行目录钉死、子模块先确认已检出), 另把退出 0 仍可能没比成的已知形态逐处写进条目 —— 1.1 基线复核的路径须至少在一端存在 (`aria_shifted` 原第 6 条三个文件名连写, 已拆开)、5.9 的 `owner-container` 粘贴前看退出码并加值非空检查、5.5 与 5.7 的 `no-unresolved-version-placeholder` 先确认当前目录、4.3 与 5.5 的 unittest 看 Ran 数、5.4 的检查器与 §4.5 命令看退出码; 各处 porcelain、`ls-remote --tags`、SC-13 计数、frontmatter 比较补退出码或正向断言; `coord_ref_precheck` / `commit_attribution` / `crlf_guard` 三段代码补退出码 (前两者新增退出 2)。dispatch 点名的两处之外, 交互检查另找出一处: 5.5 第 7 步复跑 L2 前原本不跑配置文件守卫, 已补。
 
 ---
 
 ## 外向动作与 owner 等待点
 
-明细以 yaml `metadata.owner_gates` 为准; 本计划不预设任何一项已获授权。本容器已有 claim 的心跳刷新 (`--heartbeat-only`) 免逐次授权 (owner 2026-09-17), 前提是推送前协调 ref 前置检查通过、且推送后按 yaml `metadata.coord_push_verify` 核验通过 (两者都落在第 15 行), 不在本表; 新写 claim 与 `release_gate` 仍逐项授权。
+明细以 yaml `metadata.owner_gates` 为准; 本计划不预设任何一项已获授权。本容器已有 claim 的心跳刷新 (`--heartbeat-only`) 免逐次授权 (owner 2026-09-17), 前提是推送前协调 ref 前置检查通过、且推送后按 yaml `metadata.coord_push_verify` 核验通过 (两者都落在第 15 行), 不在本表; v2.5 起 Phase B–D 每个会话入口都做一次这类心跳 (yaml `hard_constraints` 第 4 条, 判断清单第 41 条); 新写 claim 与 `release_gate` 仍逐项授权。
 
 | 编号 | 任务 | 性质 | 方式 |
 |---|---|---|---|
@@ -105,17 +111,19 @@
 | 3 | 组 1–4 (条件) | owner 裁定: B.2 出现 spec 漂移信号 | AskUserQuestion |
 | 4 | 5.2 | owner 启动: 以 `ARIA_COORDINATION_NO_PUSH=1` 启动 AB 会话, 结束后换会话 | 会话级前置, 会话内补不上 |
 | 5 | 5.2 | owner 裁定: 任一套件判回归, 或 audit-engine 套件 delta ≤ 0, 或 eval id 3 未转差 | AskUserQuestion |
-| 6 | 5.1 / 5.3 / 5.5 | 停下上报: 并入上游冲突 / 取号被占 / 合并冲突 / 终核不符 / 合并树回归不过 / AB 后上游改了两个 skill 目录 | 先例指针 aria `ec72175`, owner 确认后重走 |
+| 6 | 5.1 / 5.3 / 5.5 | 停下上报: 并入上游冲突 / 取号被占 / 合并冲突 / 终核不符 / 合并树回归不过 / AB 后上游改了两个 skill 目录 / AB 后 feature 一侧含处方性或拿不准的改动 / AB 复核没比成 (cat-file 或 diff 退出非 0) | 先例指针 aria `ec72175`, owner 确认后重走 |
 | 7 | 5.6 | 推送: aria master 与 tag 双推 | 逐项授权 |
 | 8 | 5.6 / 5.8 / 5.9 | 停下上报: 推送被拒 / 只推成一个 | 不 force, 不 bump gitlink |
 | 9 | 5.8 | 推送与发帖: 主仓分支、PR、合并、C.2.5 双推 | 逐项授权 |
 | 10 | 5.9 | 发帖: 七张 issue | 逐张授权 |
 | 11 | 5.9 | owner 裁定: 归档 Step 7 建不建 tracker | AskUserQuestion |
 | 12 | 5.9 | 发帖: 10CG/Aria#199 与 10CG/aria-plugin#161 回帖关闭 | 逐项授权 |
-| 13 | 5.9 | 推送: Phase D 提交与 `release_gate` 协调 ref | 同批授权 |
-| 14 | 1.1 (条件: 三元组解析不到本容器同轨的 `active` claim —— `done` / `yielded` / `abandoned` 任一终态, 或本容器该轨无 claim) | 推送: 用原串重新认领 | 逐项授权; 未授权 ⇒ 不认领, 停在 1.1 |
-| 15 | 1.1 / 5.2 / 5.9 与各会话调用 `/state-scanner` 前 | 停下请授权: 本地协调 ref 领先的提交含本轨心跳以外的写入; 或协调 ref **推后核验不过** (`push_success` 非真 / 不带 `--no-push` 却 `push_skipped` 为真 / `ls-remote` 与本地不一致且本地不是远端祖先) | 心跳不推、不对齐, 不重试不 force, 请 owner 裁 |
+| 13a | 5.9 (D.2b, release 之前) | 推送: `release_gate` 释放本轨 claim 的协调 ref 推送 (只此一项) | 逐项授权 (v2.5 起不与 Phase D 提交同批); 未授权 ⇒ 不 release, 记周期 handoff |
+| 13b | 5.9 (`latest.md` 的单独提交产生之后) | 推送: Phase D 提交双推 (归档、周期 handoff、单独成提交的 `latest.md`), 请求附 `latest.md` 提交的 diff | 逐项授权; 未授权 ⇒ 留本地 |
+| 14 | 1.1 与任一会话的入口 claim 核验、5.9 的 release (条件: 三元组解析不到本容器同轨的 `active` claim —— `done` / `yielded` / `abandoned` 任一终态, 或本容器该轨无 claim; 或心跳 / release 返回 `claim_not_found`) | 推送: 用原串重新认领 | 逐项授权; 未授权 ⇒ 不认领, 停在当前任务 (5.9 的 release 可由 owner 裁为不补认领) |
+| 15 | 1.1 / 5.2 / 5.9 与各会话的入口 claim 核验 (调用 `/state-scanner` 之前) | 停下请授权: 本地协调 ref 领先的提交含本轨心跳以外的写入; 或协调 ref **推后核验不过** (`push_success` 非真 / 不带 `--no-push` 却 `push_skipped` 为真 / `ls-remote` 与本地不一致且本地不是远端祖先) | 心跳不推、不对齐, 不重试不 force, 请 owner 裁 |
 | 16 | 1.1 / 5.8 | owner 裁定: 待推送的主仓提交含非本轨提交, 或含只落发布同步面又无本轨 `Spec:` trailer 的提交 (可能是他轨 `chore(release)`, 也可能是本轨 5.7 或 5.1 漏写) | 清单与 kinds 呈 owner, 未裁不推送 |
+| 17 | 5.8 | 停下上报: C.2.4.5 子模块指针闸没放行 (block、闸没跑成, 或缺逐子模块结论行) | 不合并; override 只由 owner 决定 |
 
 ## 范围边界
 
@@ -123,7 +131,7 @@
 |---|---|
 | 组 1–5 | 本文件 |
 | Phase B 入口认领 | 判断清单第 11 条; raw track-id 逐字为 `pre-merge-completeness-gate-change-scope`, 不补容器后缀 |
-| C.2.4 pre-merge gate (Rule #8) / C.2.5 | `phase-c-integrator`, 由 5.8 调用 |
+| C.2.4 pre-merge gate (Rule #8) / C.2.4.5 子模块指针闸 / C.2.5 | `phase-c-integrator`, 由 5.8 调用; C.2.4.5 的自动触发挂在 branch-manager merge action 上, 主仓 PR 走 Forgejo 合并不经过它, 由主控在 Forgejo 合并前显式跑其脚本 (yaml TASK-030) |
 | 产出侧四个调用方对齐 / `--no-spec` 加固 / F8 注册面 / 写侧命名强制 / config-loader 程序化入口 / catalog node id 修正 | **不在本文件**, 只在 5.9 开 issue |
 | 可配置下界 N; 本仓 `pre_merge` 配置 | 不做 (裁定 3); 保持 `off` (proposal F1) |
 
@@ -162,7 +170,7 @@
 
 - [ ] 4.1 反事实第一批 (SC-1~SC-10、SC-18): 既非实现者也非测试作者的新实例在 2.6 SHA 的一次性副本上三步法实跑, 一律 `python3 -B` — 台账
 - [ ] 4.2 反事实第二批 (SC-15~SC-17、SC-19~SC-22), 做法同 4.1 — 台账
-- [ ] 4.3 回归: SC-12 三条命令零失败 (state-scanner 那条不带 `ARIA_COORDINATION_NO_PUSH`); 配置文件守卫无输出后, 重写 a 的 L2 / L3 为真、L1 在全勾选副本上为真; catalog 5/8 可执行 fixture 的三条命令 OK — 台账
+- [ ] 4.3 回归: SC-12 三条命令零失败且 Ran 数不少于基线 (state-scanner 那条不带 `ARIA_COORDINATION_NO_PUSH`); 配置文件守卫 (钉在主仓根, 退出码为 0 或 1 且无命中行) 通过后, 重写 a 的 L2 / L3 为真、L1 在全勾选副本上为真; catalog 5/8 可执行 fixture 的三条命令 OK — 台账
 - [ ] 4.4 活体 dogfood (SC-11) 与 SC-6 自证 (重写 c 的快照格与对照) — 台账与周期 handoff
 
 ## 5. Rule #6 AB、发布与收尾 (5.4 第二次在 5.9 内)
@@ -171,11 +179,11 @@
 - [ ] 5.2 Rule #6 照跑 (两读法并集, 经 `/skill-creator`): 前置 = owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动会话, aria `origin/master` 已在 feature 里; 写 PREDICTION.md 并取副作用快照; `audit-engine.json` 与 `phase-c-integrator.json` 按描述性推演两臂照跑, 两套件逐 eval 无回归, audit-engine 套件 delta > 0 且 eval id 3 的 without 臂低于 with 臂; 结束后过协调 ref 前置检查才对齐; catalog 三条命令与三条缺口写进 README; 结果落 `aria-plugin-benchmarks/ab-results/` (5.9 勾选时换成本次结果目录全路径) — SC-14
 - [ ] 5.3 版本与 CHANGELOG: 上游在 5.1 之后又前进时先并入 feature (merge, 不 rebase) 并重跑 3.5 与 4.3; 再取 MINOR 号改版本 SOT 5 文件 (记取号时 SHA); CHANGELOG 写十三条迁移文案 (§5 第 2、10 条按读前必看第 7 条) — 台账
 - [ ] 5.4 引用与编号写法自检, 两次 (5.5 前; 周期 handoff 与回帖落笔前): 本 cycle 新增行的 issue 引用全限定、文内编号不用 `#` 与带圈字符 — 台账
-- [ ] 5.5 aria 本地合并: fetch → 断言 feature 分支干净 → master 对齐 `origin/master` 并记 SHA → 取号与 AB 基线复核 → `git merge --no-ff` 并断言本轮双父合并提交 → 取号终核 → 合并树原位回归 → 打 tag; 任一步不成立即停下上报 — 台账
+- [ ] 5.5 aria 本地合并: fetch → 断言 feature 分支干净 → master 对齐 `origin/master` 并记 SHA → 取号与 AB 基线复核 (上游与 feature 两侧) → `git merge --no-ff` 并断言本轮双父合并提交 → 取号终核 → 合并树原位回归 → 打 tag; 任一步不成立即停下上报 — 台账
 - [ ] 5.6 aria 双推: owner 授权后每个远端一条原子推送 (master 与 tag, 先 origin 后 github), 推后逐 remote `ls-remote` 核 master 与 tag; 被拒或只推成一个即停下上报 — 台账
 - [ ] 5.7 主仓同步面: aria gitlink 取 5.6 核验后的 SHA (只前进), 16 个版本点 (含 `VERSION:24`), custom checks 复跑; 主控在主仓 feature 分支只提交上述九个版本同步面文件 (台账追加随 5.8 一并提交), 提交信息带本轨 `Spec:` trailer 并回读确认 (这九个文件整条落在发布同步面, 漏写会在 5.8 的提交归属核验里判 `shared-only` 而停) — 台账
-- [ ] 5.8 主仓 PR: 工作树与提交范围核验 (提交清单随授权请求呈上), merge 不 rebase, PR 以 merge commit 合并并过 C.2.4 pre-merge gate; 合并后本地 master 快进并核对合并提交, 断言三个子模块无待推内容后交 C.2.5 双推与 parity, 再复核版本点与 ab-suite 计数 — 台账
-- [ ] 5.9 Phase D (手写, 与 phase-d-closer 逐步对应): 开七张 issue 并回填台账; 主控一次勾选全部 checkbox; post_closure 审计按执行时配置处置 (`off` 则跳过); 归档预演并复跑重写 a 的 L1–L3; Step 7 由 owner 裁; 过协调 ref 前置检查后 `release_gate` 释放 claim 并按 `metadata.coord_push_verify` 核验推成了没有 (不带 sweep / gc); estimator 采集; 10CG/Aria#199 与 10CG/aria-plugin#161 回帖关闭; 周期 handoff 按模板起稿并照录判断清单 (frontmatter 五字段写全, `track-id` 逐字写本 spec id, 否则该提交判他轨), 写后跑五字段自校验 (`head -8` 窗口, 须为 5), 再做 `docs/handoff/latest.md` 两子步 (History prepend 恒做; pointer 按判定表, follower 不改; 单独成提交, 在等待点 13 的授权请求里点明); Phase D 提交经授权双推并逐 remote 核验 — 台账
+- [ ] 5.8 主仓 PR: 工作树与提交范围核验 (提交清单随授权请求呈上), merge 不 rebase, PR 过 C.2.4 pre-merge gate 与 C.2.4.5 子模块指针闸 (主控在 Forgejo 合并前显式跑, 没放行即停) 后以 merge commit 合并; 合并后本地 master 快进并核对合并提交, 断言三个子模块无待推内容后交 C.2.5 双推与 parity, 再复核版本点与 ab-suite 计数 — 台账
+- [ ] 5.9 Phase D (手写, 与 phase-d-closer 逐步对应): 开七张 issue 并回填台账; 主控一次勾选全部 checkbox; post_closure 审计按执行时配置处置 (`off` 则跳过); 归档预演并复跑重写 a 的 L1–L3; Step 7 由 owner 裁; release 之前单独请等待点 13a, 过协调 ref 前置检查后 `release_gate` 释放 claim 并按 `metadata.coord_push_verify` 核验推成了没有 (不带 sweep / gc; 遇 `claim_not_found` 呈 owner, 不按推送失败处置); estimator 采集; 10CG/Aria#199 与 10CG/aria-plugin#161 回帖关闭; 周期 handoff 按模板起稿并照录判断清单 (frontmatter 五字段写全, `track-id` 逐字写本 spec id, 否则该提交判他轨), 写后跑五字段自校验 (`head -8` 窗口, 须为 5), 再做 `docs/handoff/latest.md` 两子步 (History prepend 恒做; pointer 按判定表, follower 不改; 单独成提交); `latest.md` 提交产生之后请等待点 13b (请求附其 diff), 获授权后 Phase D 提交双推并逐 remote 核验 — 台账
 
 ---
 
