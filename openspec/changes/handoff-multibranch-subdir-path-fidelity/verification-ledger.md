@@ -553,6 +553,66 @@ TASK-007 verification 第 4 条把 **SC-6 (c)** 与 **SC-18 (c)** 与 **SC-15 �
 
 **可选处置 (供 owner 裁, 本轮未做)**: (A) 把这四条的观测推给 TASK-035 的三步法反事实 (它按组件逐个回退, 每次只有一个断言红, 结构上能分开观测); (B) 允许把布局 2 拆成「正文面」与「机读面」两个用例并同批修 verification 第 1 条的用例清单; (C) 接受现状, 在 GREEN 阶段一次性观测 (改后全部转绿时这四条自然被执行到, 但那证明不了它们在基线上的取值)。
 
+---
+
+## 组 2 实现 (TASK-009 ~ TASK-014) + TASK-033 收口
+
+**RED → GREEN 达成**: 组 1 的 19 条基线红**全部转绿**, 既有 1605 **零回归**。
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1627 tests in 242.900s
+OK                                    ← EXIT 0, 零 FAIL 零 ERROR
+$ cd aria/skills/state-scanner/tests && python3 -B -m unittest test_handoff_multibranch_path_fidelity
+Ran 22 tests in 0.942s
+OK
+```
+
+### 既有套件计数逐个持平 (与 A.2 基线一致)
+
+| 套件 | A.2 基线 | 本次 | 出处 |
+|---|---|---|---|
+| `test_p1_layer_h` | 24 | **24 OK** | TASK-013 verification 第 6 条 |
+| `test_handoff_multibranch_collision_dedupe` | 23 | **23 OK** | TASK-014 verification 第 3 条 |
+| `test_track_board_advisories` | 5 | **5 OK** | TASK-016 verification |
+| `test_scan_integration` | 19 | **19 OK** | TASK-010 verification 第 4 条 |
+| pytest 腿 `tests/test_collision.py` | 28 passed | **28 passed** | `metadata.test_runner` (b) |
+| pytest 腿 `phase-d-closer/tests/` | 11 passed | **11 passed** | 同上 |
+
+### 逐任务落地要点
+
+- **TASK-009** 枚举层: `-z` + NUL 切分 + 丢尾随空段 · 返回相对路径 · 前缀剥离从 `_HANDOFF_TREE_PATH` 派生且**先判后切** · 新增带默认值的 reporter 入参 (签名仍 2-tuple, 四处既有 mock 不受影响) · 主循环传双通道闭包 · `.md` 过滤与 pointer 排除作用于 `rel` 的 basename · docstring 删旧句加契约句。**顺带订正一处自相矛盾**: `_HANDOFF_TREE_PATH` 的注释原写「trailing slash required by git ls-tree」而值无斜杠, 已改。
+- **TASK-010** 调用方与身份: 两个构造点写 `rel_path` · 读取与取日期均传 `rel` · `filename` 仍 basename · legacy id 改 `legacy:<branch>:<rel_path>` 且三处格式声明同批改 · `scan.py` 另取 `rel_path` 只用于拼串、`filename` 留给上报、早退**无 `or filename` 兜底** · `HEALTHY_TRACKS` 补键。
+- **TASK-011/012** unreadable 会计: 读不到只报 kind + 计数, **不再追加伪 legacy 行** · 不可解码名判据写 `chr(0xFFFD) in rel` (未用 `encode`+`except UnicodeError` —— 上游已替换, 那种写法是死代码) · 前缀守卫丢弃的行不计入 · 删去已无消费者的 `fallback_date` 调用 · 正常路径与早退 dict 均恒含该键。
+- **TASK-013** 写侧守卫: 判据 `rel = track.get("rel_path") or track.get("filename")`, **无 `"/" in filename` 嗅探** · 两 renderer 返回 `(content, reason)` · `write_latest_md` 分派前初始化、仅单 track 支解包覆写、**自身不重算** · 降级正文写明子目录原因 · 那句逐字重复的规则句**两处同批**补顶层限定 · 契约面五处一并改。
+- **TASK-014** 排序键第 5 级 `(rel_path == filename, rel_path)`: 前四级不动, 缺键回落 `filename` 读作顶层不抛异常。
+
+### SC-11 谓词状态
+
+组 2 范围内的五条已为真: **(c1)(c2)(i1)(k)(l1)**（逐条机械跑过）。余下谓词按计划归组 4 的 TASK-019 / TASK-020 / TASK-021 / TASK-023。
+
+**矩阵脚本 `sc11-predicate-validation.py` 在组 2 落地后报 `anchor drift` (退出码 3), 属设计内不属缺陷**: 它的模拟改动以基线源码逐字锚定 (`count=1` 的锚点须恰出现一次), 而 TASK-014 改掉了其中一个锚点所在的 `return` 行。计划把该脚本的唯一机械核验点定在 **TASK-001 (基线)**, GREEN 阶段的 SC-11 由组 4 逐条谓词承担 —— 故本阶段**不重跑矩阵脚本、不重写其锚点**。
+
+### 本阶段两处自查发现
+
+1. **SC-9 (d) 的判据对象写错, 已单独提交修正 (`3c0407c`)**: 原断言要求 `data["errors"]` 的消息串含 kind 字面量, 但本仓既有四个 kind 的双通道形态是**同一条 msg 进两个通道**且 msg 从不嵌 kind 名; proposal SC-9 (d) 原文是「含该 kind **语义**的消息串」。改为断言消息串含那条违规路径 —— 两种写法都能抓单通道实现 (那时 `data["errors"]` 为空), 新写法更贴合立意与既有约定, **不是削弱**。属组 1 文件, 故与组 2 收口**分开提交**以守住 TASK-033 第 1 条的「只 add 四个路径」。
+2. **`hard_constraints` 第 10 条违规 11 处, 已修**: 本 cycle 新写的源码注释里 issue 引用写成了 `Aria #195` (带空格) 而非 `<org>/<repo>#<n>`。四个源码文件共 11 处全部改为 `10CG/Aria#195`, 改后复扫新增行裸引用 **0**。
+3. **一处既有希腊字母, 未改**: `scan.py` 含一个 U+0394 (大写 Delta 字形, 此处只写码位以免本台账自身成为含禁用字形的文件)。经 diff 核实**不在本 cycle 新增行内**, 基线 `1cb3872` 即已存在 1 次, 且语境是数学差值 (注释原文为 `negative <U+0394> = healthiest signal`, 码位替写) 而非标签/编号 ⇒ 不在 `hard_constraints` 第 10 条「本 cycle 新写或改动的文字」范围, 未动。此处记录以免后续扫描误判为本轮引入。
+
+### TASK-033 收口
+
+| 核验项 | 结果 |
+|---|---|
+| 只 add 组 2 四个路径 | `handoff_multibranch.py` · `scan.py` · `latest_md_writer.py` · `test_scan_integration.py` |
+| 提交后不带路径的 `git -C aria status --porcelain` | **空** (无组 2 之外改动混入) |
+| 组 2 收口 SHA | **`9625999c734119aba56185edd2b258f215d3da57`** |
+| 该 SHA 上新测试文件 | `Ran 22 tests … OK` |
+| 提交前 aria 工作树无组 4 文档改动 | 成立 (组 4 未开工) |
+
+**该 SHA 是组 3 反事实一次性副本的检出源** (TASK-015..018 与 TASK-035 一律 `git -C aria worktree add <scratchpad 路径> 9625999`)。
+
+---
+
 ### 1.2 收口小结
 
 | 批 | 用例数 | 基线红 | 基线绿 (独立用例) |
@@ -579,3 +639,5 @@ TASK-007 verification 第 4 条把 **SC-6 (c)** 与 **SC-18 (c)** 与 **SC-15 �
 | 2026-09-25 | TASK-004 落地: 追加 4 用例 (SC-4 / 5 / 13 / 14), 夹具扩展逐 commit 钉日期; 全套 1616 tests 既有 1605 仍零回归。 |
 | 2026-09-25 | TASK-005 落地: 追加 5 用例 + 冻结 fixture; verification 第 7 条红绿预言全部命中; 全套 1621 tests 既有 1605 仍零回归。 |
 | 2026-09-25 | TASK-006 落地 + **1.2 收口**: 追加 6 用例 (SC-15 六布局); 四批合计 22 用例 / 19 红 / 3 回归锁, 预言逐条命中; 全套 1627 tests 既有 1605 仍零回归。 |
+| 2026-09-25 | TASK-007 汇总层 + 四条断言不可观测的复议项落台账。 |
+| 2026-09-25 | **组 2 实现 (TASK-009~014) + TASK-033 收口**: RED → GREEN, 19 条基线红全绿, 全套 `Ran 1627 OK` 零回归; 收口 SHA `9625999`。 |
