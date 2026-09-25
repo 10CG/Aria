@@ -3,10 +3,10 @@ track-id: session-close-20260924-199-post-planning-converged
 owner-container: simonfish/bfe8285d
 phase: D.3
 status: done
-updated-at: 2026-09-24T14:58:55Z
+updated-at: 2026-09-25T04:49:52Z
 ---
 
-# Aria — Session Handoff (2026-09-21 ~ 24, 会话收尾) — `10CG/Aria#199` A.2/A.3: v2.4 → v2.6 三轮返修 + R5/R6/R7 三轮五席审计 → **post_planning 收敛**
+# Aria — Session Handoff (2026-09-21 ~ 25, 会话收尾) — `10CG/Aria#199` A.2/A.3: v2.4 → v2.6 三轮返修 + R5/R6/R7 三轮五席审计 → **post_planning 收敛**
 
 > **一句话**: 接 09-20 那份往下, 全程一条轨 (`pre-merge-completeness-gate-change-scope`)。owner 六次裁定驱动**三版返修 (v2.4 / v2.5 / v2.6) 与三轮五席审计 (R5 / R6 / R7)**; R5 未收敛且 `max_rounds` 耗尽 → owner 选降级策略 [2] 增加轮次 (5 → 7) → R6 零 Major → v2.6 只修 minor → **R7 五席全票 PASS, `converged: true`**。16 个提交分九批双推。
 >
@@ -16,8 +16,8 @@ updated-at: 2026-09-24T14:58:55Z
 
 ## §0 入口 (新 session 优先读)
 
-1. 跑 `/aria:state-scanner`。主仓 master = `43e2326` (**本地领先两端 1 个提交** —— 第九批推送事实的回填提交, 待授权推); origin 与 github 均为 `3db3d23`。子模块 `aria` = `1cb3872` (v1.73.3) / `standards` = `940cb5b` / `aria-orchestrator` = `237045a`。
-2. **开工第一件事: 查 claim 心跳年龄**。本轨 claim `claims/bfe8285d/s-73b9@1606.yaml` (phase A.2) 仍 `active`, 本次收尾前刷新于 `2026-09-24T01:09:38Z`。本 session 实测它曾停 **35.2h** (超 SWEEP_TTL 11 小时) 仍未被扫 —— 那是运气, 不是安全边界。
+1. 跑 `/aria:state-scanner`。主仓 master = **`969189a` = origin = github** (第十批已双推, **零未推提交**; 收尾刷新提交随第十一批推送)。子模块 `aria` = `1cb3872` (v1.73.3) / `standards` = `940cb5b` / `aria-orchestrator` = `237045a`。
+2. **开工第一件事: 查 claim 心跳年龄**。本轨 claim `claims/bfe8285d/s-73b9@1606.yaml` (phase A.2) 仍 `active`, 最后刷新于 **`2026-09-25T04:46:40Z`**。本 session **两次**撞上超 TTL 仍未被扫 (35.2h 与 27.6h) —— 那是运气, 不是安全边界。
 3. **本轨最新态在轨级 handoff**: [2026-09-18-199-a2-a3-c1-verify-v21-rework-r2.md](./2026-09-18-199-a2-a3-c1-verify-v21-rework-r2.md) —— 它已累积记到 R7 收敛, 待裁项与入口门以那份为权威; 本份只记会话层经过。
 4. **收敛不等于可以开工**: `owner_gates` 第 1 项仍要求 `10CG/Aria#195` 已完成 C.2 合并或 owner 明示改序; 该轨仍 `yielded`、B.1 未起 ⇒ 下一步是 owner 门, 不是 Phase B。
 5. 双子星 `simonfish/023236f2` 手上的 `10CG/Aria#195` 本容器不碰 (除非 owner 明示)。
@@ -46,7 +46,7 @@ updated-at: 2026-09-24T14:58:55Z
 
 | # | 项 | 说明 |
 |---|---|---|
-| H1 | **第十批推送** | `43e2326` (回填第九批推送事实) 仍在本地, 领先两端 1 个提交, 待 owner 授权双推 |
+| H1 | ~~第十批推送~~ → ✅ **已完成 (2026-09-25)** | `43e2326` (第九批回填) + `969189a` (本会话收尾) 双推, 两端首次尝试即 `ls-remote` MATCH `969189a`; 推前心跳已刷新。**本次收尾刷新提交本身随第十一批推送** |
 | H2 | **R7 六条 minor 与各轮未处置 minor 的处置时点** | 进 Phase B 之前一并做, 还是随 Phase B 首个返修一起做 |
 | H3 | **三批执笔实例请裁** | v2.4 九条 / v2.5 十条 / v2.6 两条; 其中 v2.6 第 1 条 (C.2.4.5 的 override 走 trailer 还是 PR 标签) 与 R7 minor `3de4b245` 直接相关 —— 标签路不按子模块分, 一旦打上对本 PR 每个受影响子模块生效, 该代价计划里尚未写 |
 
@@ -64,13 +64,13 @@ updated-at: 2026-09-24T14:58:55Z
 
 - `unfinished` **189 条**, 分布与前两段一致 (八份 spec 的任务条目; 本轨 31 条是 A.2 计划自身的任务条目, **不是漏做**)。
 - `consistency_check`: **8 条** `active_change_not_in_upm` advisory (本仓无运行时 UPM, 已知恒出)。
-- `sync` 段告警两条: `[main] ahead 1 vs 两端`(= H1); **`[standards] parity=equal 但 evidence_grade=stale_unverified`** —— 本轮 `standards` 的 origin fetch 失败, 那个 `equal` 未经本轮验证, 不可当已同步。
+- `sync` 段告警: 推送前有两条 (`[main] ahead 1 vs 两端` = H1; `[standards] parity=equal 但 evidence_grade=stale_unverified`, 因当时 origin fetch 失败); **第十批推送后重跑 autofill, 告警清零** —— 四个仓在两端均 `equal` 且经本轮验证。
 
 ---
 
 ## §3 关键风险 / 已知陷阱
 
-1. **claim 心跳跨会话老化**: 实测停 35.2h 仍 `active` —— 未被扫只是那段时间没有容器跑 `--sweep-stale`。每个会话开工先查心跳年龄, 按「前置检查退出 0 → 强制对齐 → 重解析 → 心跳 → 推后核验」刷新 (v2.5/v2.6 已把该顺序写进计划)。
+1. **claim 心跳跨会话老化**: 本 session **两次**实测超 TTL 仍 `active` (停 35.2h 与 27.6h) —— 未被扫只是那两段时间没有容器跑 `--sweep-stale`。每个会话开工先查心跳年龄, 按「前置检查退出 0 → 强制对齐 → 重解析 → 心跳 → 推后核验」刷新 (v2.5/v2.6 已把该顺序写进计划)。
 2. **origin (forgejo) 连接间歇失败**: 第六批推送出现**半推** (github 成功、origin `websocket: bad handshake`), 用普通快进补推修复、**未 force**; `ls-remote` 本身也会间歇取不到值 —— 重试几次再下结论, 不要据单次失败判「策略层阻断」。
 3. **建隔离副本的两个陷阱**: `cp -a` 撞上瞬时 `.git/index.lock` 会非零退出, 挂在 `&&` 后的 gitdir 修正与禁推被**静默跳过**; 子模块 `standards` 的 `.git` 是**绝对** gitdir 指针, 不修则副本里的 git 操作写回真仓。修正后须在副本目录内逐个 `rev-parse --absolute-git-dir` 核验。
 4. **本机 shell 的 `grep` 是 ugrep 包装**: CRLF 行尾下 `-x` 仍匹配, 与 GNU grep 相反 (R7 minor 之一; 计划里那句 CR 注解只在 GNU grep 下成立)。
@@ -95,7 +95,7 @@ updated-at: 2026-09-24T14:58:55Z
 | **OpenSpec** | 8 个活跃变更 (全 approved), 0 待归档; 本轨 `pre-merge-completeness-gate-change-scope` 停在 **A.2**, 计划 **v2.6**, post_planning **已收敛** |
 | **User Story** | 21 份 (done 17 / in_progress 2 / approved 1 / pending 1) —— 本 session 未动 |
 | **PRD / 架构** | 未动 |
-| **Standards** | 未动 (`940cb5b`); 本轮 origin fetch 失败, 其 `equal` 未经验证 |
+| **Standards** | 未动 (`940cb5b`); 两端 `equal` (推送后重跑已验证, 先前一次 origin fetch 失败已排除) |
 | **Skill / Plugin** | 未动 (aria `1cb3872`, v1.73.3) |
 | **Memory** | 2 个新文件 + 4 处追记/修正 (见 §8) |
 | **一致性 flag** | 8 条 `active_change_not_in_upm` (advisory, 本仓无运行时 UPM) |
@@ -136,7 +136,9 @@ updated-at: 2026-09-24T14:58:55Z
 | 八 | `320d523` v2.6 · `9a3ac24` handoff | 两端首次即 MATCH `9a3ac24` |
 | 九 | `765b73b` R7 产物 · `8b596fc` handoff · `3db3d23` 补正 | 两端首次即 MATCH `3db3d23` |
 
-**当前**: 两端 `3db3d23`; 本地 `43e2326` 领先 1 (第十批待推, 见 §2 H1)。三个子模块 gitlink 全程未动。
+| 十 | `43e2326` 第九批回填 · `969189a` 本会话收尾 handoff + `latest.md` | 两端首次即 MATCH `969189a` |
+
+**当前**: 两端与本地均为 `969189a` (零未推); 本次收尾刷新提交随第十一批推送, 其核验结果记于会话回复。三个子模块 gitlink 全程未动。
 
 ---
 
