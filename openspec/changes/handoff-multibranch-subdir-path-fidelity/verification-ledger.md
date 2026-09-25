@@ -469,9 +469,93 @@ FAILED (failures=10, errors=9)
 
 ---
 
-## 1.2 收口小结 (TASK-003 ~ TASK-006 四批)
+## TASK-007 — RED 台账 (parent 1.2, 四批的汇总层)
 
-| 批 | 用例数 | 基线红 | 基线绿 (回归锁) |
+### 基线与命令
+
+基线 SHA: aria **`1cb3872`** (= B.1 基线, 三仓 feature 分支已检出, 工作树干净)。
+
+```
+$ cd aria/skills/state-scanner/tests && python3 -B -m unittest test_handoff_multibranch_path_fidelity -v
+Ran 22 tests in 1.218s
+FAILED (failures=10, errors=9)
+```
+
+原样输出由命令重生成, 未手改。下方两条记录的异常类型与断言文本均由 traceback 机械提取。
+
+### ⚠️ 本记录的性质限定 (TASK-007 verification 第 3 条, post_planning R2 PP2-M9)
+
+**下面的 RED 记录只作 RED 证据, 不得标注为任何 proposal 反事实的实跑。** 基线是全部组件**同时**回退的状态, 一个用例的首个失败断言取决于书写顺序, 因此它证明不了反事实所指那条断言自身的鉴别力。SC-1 / SC-3 / SC-4 后半 / SC-5 / SC-8 后半 / SC-14 / SC-17 的反事实由 **TASK-035** 按三步法实跑, 本任务不代劳。
+
+### 记录 1 — 五族 (SC-1 / SC-3 / SC-5 / SC-13 / SC-17)
+
+| SC | 用例 | 异常类型 | 失败断言文本 (traceback 原样) |
+|---|---|---|---|
+| SC-1 | `test_subdir_file_read_as_real_track` | `AssertionError` | `True is not false : must be a first-class track, not a legacy stub` |
+| SC-3 | `test_non_ascii_filename_not_escaped` | `AssertionError` | `0 != 1 : the CJK-named file must be collected` |
+| SC-5 | `test_unreadable_not_downgraded_to_legacy` | `AssertionError` | `Lists differ: [{'track_id': 'legacy:master:unreadable.md…rue}] != []` |
+| SC-13 | `test_legacy_track_id_uses_rel_path` | `AssertionError` | `Items in the second set but not the first:` (两 track_id 集合不等) |
+| SC-17 | `test_subdir_track_opens_cross_owner_collision` | `AssertionError` | `1 != 0 : both handoffs must be read as first-class tracks` |
+
+### 记录 2 — 其余 baseline-failing 实体 (14 条)
+
+| SC / 项 | 用例 | 异常类型 | 失败断言文本 |
+|---|---|---|---|
+| SC-4 后半 | `test_moved_file_dates` | `AssertionError` | `False is not true : a file that never existed at the top level must still get its own real commit date, got ''` |
+| SC-6 (a) | `test_scan_ancestry_consumer_uses_relative_path` | `AssertionError` | `'docs/handoff/archive/2026-05-09-session-end.md' not found in ['docs/handoff/2026-05-09-session-end.md', 'docs/handoff/2026-05-09-session-end.md']` |
+| SC-8 后半 | `test_pointer_excluded_at_any_depth` | `KeyError` | `'rel_path'` |
+| SC-9 | `test_unexpected_prefix_soft_errors` | `AssertionError` | `0 != 1 : exactly one prefix violation must be reported` |
+| SC-14 | `test_unreadable_count_present_on_failsoft_early_return` | `KeyError` | `'unreadable_count'` |
+| SC-16 | `test_flat_repo_rel_path_equals_filename` | `KeyError` | `'rel_path'` |
+| SC-18 (b) | `test_undecodable_filename_skipped_with_signal` | `KeyError` | `'unreadable_count'` |
+| SC-15 (d) 后半 | `test_pointer_roundtrip_subdir_guarded` | `AssertionError` | `'子目录' not found in '# Aria Handoff — (no active tracks)\n\n_state-scanner: 0 active tracks 当前 (scanned @ …)。_…'` |
+| SC-15 (i) | `test_pointer_roundtrip_toplevel` | `KeyError` | `'degraded_reason'` |
+| SC-15 (j) | `test_pointer_written_when_rel_path_key_absent` | `KeyError` | `'degraded_reason'` |
+| SC-15 布局 4 | `test_degraded_reason_present_when_no_active_track` | `KeyError` | `'degraded_reason'` |
+| SC-15 布局 5 | `test_degraded_reason_present_on_multi_track_banner` | `KeyError` | `'degraded_reason'` |
+| SC-15 布局 6 | `test_degraded_reason_missing_filename_when_filename_absent` | `KeyError` | `'degraded_reason'` |
+| 排序键第 5 级 | `test_dedupe_fifth_level_prefers_toplevel_rel_path` | `AssertionError` | `'archive/x.md' != 'x.md'` |
+
+**记录 1 + 记录 2 = 19 条, 与本次实跑的 19 条 FAIL/ERROR 逐条对应, 无遗漏无多余。** 全部形态为 `AssertionError` 或 SC 明示的直接索引 `KeyError`, **无一条**环境红 (ImportError / 夹具建仓失败)。
+
+### 记录 3 — 回归锁在基线上为绿
+
+判定方法: 用 traceback 给出的**首个失败行号**与各断言的源码行号逐条比对, 只有行号**严格小于**首失败行的断言才算「本次实测执行过且通过」。
+
+**实测执行过且通过 (真绿)**:
+
+| 回归锁 | 所在用例 | 断言行 | 首失败行 |
+|---|---|---|---|
+| SC-2 (整条) | `test_flat_repo_matches_frozen_baseline_projection` | 用例整体 PASS | — |
+| SC-7 (整条) | `test_dedupe_tiebreak_prefers_lexicographic_max_path` | 用例整体 PASS | — |
+| SC-9 (c) | `test_flat_enumeration_reports_no_prefix_violation` | 用例整体 PASS | — |
+| SC-4 前半 | `test_moved_file_dates` | 514 / 515 | 522 |
+| SC-8 前半 | `test_pointer_excluded_at_any_depth` | 247 | 252 |
+| SC-18 (a) | `test_undecodable_filename_skipped_with_signal` | 311 / 313 / 315 | 317 |
+| SC-15 布局 1 (a)(b)(c) | `test_pointer_roundtrip_toplevel` | 969 / 973 / 974 / 975 | 976 |
+| SC-15 布局 3 (g) | `test_pointer_written_when_rel_path_key_absent` | 1040 | 1042 |
+| SC-15 布局 2 (d) 前半 | `test_pointer_roundtrip_subdir_guarded` | 1008 / 1010 | 1013 |
+
+### ⚠️ 四条断言在 RED 批次结构上不可观测 (TASK-007 verification 第 4 条的缺口, 请 owner 复议)
+
+TASK-007 verification 第 4 条把 **SC-6 (c)** 与 **SC-18 (c)** 与 **SC-15 布局 2 (e)** 列进「在基线上为绿」的回归锁记录, 记录 2 又要求 **SC-15 布局 2 的 (h)** 逐条红。**但这四条在本批次结构上无法观测** —— 它们与同一用例里排在前面的 baseline-failing 断言共处一个测试函数, 而首个失败即中止该函数:
+
+| 断言 | 所在用例 | 断言行 | 首失败行 | 状态 |
+|---|---|---|---|---|
+| SC-6 (c) `inconclusive[0]["filename"]` 仍为 basename | `test_scan_ancestry_consumer_uses_relative_path` | 761 / 763 | **748** (SC-6 (a)) | 未执行到 |
+| SC-18 (c) kind 存在性 | `test_undecodable_filename_skipped_with_signal` | 320 / 321 | **317** (SC-18 (b)) | 未执行到 |
+| SC-15 布局 2 (e) 无 `handoff_pointer_target_missing` | `test_pointer_roundtrip_subdir_guarded` | 1015 | **1013** ((d) 后半) | 未执行到 |
+| SC-15 布局 2 (h) `degraded_reason == "target_in_subdir"` | 同上 | 1017 | **1013** ((d) 后半) | 未执行到 |
+
+**故本台账不声称这四条「实测为绿 / 实测为红」** —— 未执行到不是正证据, 写成实测即是假记录。
+
+**这是 A.2/A.3 计划的一个结构性限制, 不是实施偏差**: verification 第 1 条钉死了用例名与用例数 (一布局一用例), 而同一用例内只可能有一个首失败点 ⇒ 「(d) 后半与 (h) 同时逐条红」在单用例内**不可兼得**。前四条已按 Rule #10 记入本节请 owner 复议, **未自行拆用例**(拆会改变 verification 第 1 条钉的用例名与数量)。
+
+**可选处置 (供 owner 裁, 本轮未做)**: (A) 把这四条的观测推给 TASK-035 的三步法反事实 (它按组件逐个回退, 每次只有一个断言红, 结构上能分开观测); (B) 允许把布局 2 拆成「正文面」与「机读面」两个用例并同批修 verification 第 1 条的用例清单; (C) 接受现状, 在 GREEN 阶段一次性观测 (改后全部转绿时这四条自然被执行到, 但那证明不了它们在基线上的取值)。
+
+### 1.2 收口小结
+
+| 批 | 用例数 | 基线红 | 基线绿 (独立用例) |
 |---|---|---|---|
 | TASK-003 第一批 (SC-1 / 3 / 8 / 9 / 16 / 18) | 7 | 6 | 1 (SC-9 (c)) |
 | TASK-004 第二批 (SC-4 / 5 / 13 / 14) | 4 | 4 | 0 |
@@ -479,11 +563,10 @@ FAILED (failures=10, errors=9)
 | TASK-006 第四批 (SC-15 六布局) | 6 | 6 | 0 |
 | **合计** | **22** | **19** | **3** |
 
-- 全部 19 条红的形态均为 `AssertionError` 或 SC 明示的直接索引 `KeyError`, **无一条**环境红 (ImportError / 夹具建仓失败)。
-- 四批的 verification 红绿预言**逐条命中**, 无一处需要改判。
-- 既有 1605 个测试在四批之后仍**零回归**。
-- 交付物两件: `aria/skills/state-scanner/tests/test_handoff_multibranch_path_fidelity.py` · `aria/skills/state-scanner/tests/fixtures/handoff-multibranch-flat-baseline-2026-09-25.json` (后者按 `hard_constraints` 第 5 条**禁止重生成**)。
-- **下一步 = 组 2 实现 (TASK-007 起)**, 按 RED → GREEN 推进; 组 2 收口提交见 tasks.md 2.7。
+- 四批的 verification 红绿**预言逐条命中**, 无一处需要改判。
+- 既有 1605 个测试在四批之后仍**零回归** (全套 `Ran 1627 tests`, 19 条 FAIL/ERROR 全数归属本新文件)。
+- 交付物三件: 测试文件 · 冻结 fixture (`hard_constraints` 第 5 条**禁止重生成**) · 本台账。
+- **下一步 = 组 2 实现 (TASK-009 起; TASK-008 前置门 `status: done` 已解除)**, 按 RED → GREEN 推进; 组 2 收口提交见 tasks.md 2.7 / TASK-033。
 
 ---
 
