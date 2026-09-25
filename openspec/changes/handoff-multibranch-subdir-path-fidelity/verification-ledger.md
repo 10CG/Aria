@@ -368,9 +368,61 @@ FAILED (failures=6, errors=4)
 
 1616 = 基线 1605 + 两批 11; 10 条 FAIL/ERROR **全数归属** `test_handoff_multibranch_path_fidelity`, 属其它文件 **0** ⇒ 既有 1605 零回归。第一批的六条 RED 形态与 TASK-003 记录逐条一致, 未因夹具重构漂移。
 
+---
+
+## TASK-005 — 测试先行第三批: 跨文件与判定面 (parent 1.2)
+
+追加 5 个用例 + 1 个冻结 fixture。交付物两件: 测试文件 · `aria/skills/state-scanner/tests/fixtures/handoff-multibranch-flat-baseline-2026-09-25.json`。
+
+### 实施前 recon
+
+| 核实项 | 实测结论 |
+|---|---|
+| `scan.py::_same_branch_head_unreachable_tracks` 签名 | `(project_root, git_data, tracks_data, enforced_remotes, timeout=5)`; 四道前置逐条实读确认 (非空 `current_branch` / `detached_head` 假 / `tracks` 是 list / `enforced_remotes` 非空), 任一不满足即返回两个空列表 |
+| 拼串点与上报点的分离 | 探测命令 `["git","log","-1","--format=%H", f"{remote}/{branch}", "--", f"docs/handoff/{filename}"]` 是待改的拼串点; `inconclusive.append({"filename": str(filename), …})` 是须**逐字节不变**的上报点 —— 两值同源一 track, 正是本 spec 要钉的分离 |
+| `freeze_corpus.FIELDS` | 八字段 `(track_id, owner_container, status, phase, updated_at, filename, branch, legacy)`, **不含 `rel_path`** ⇒ 比对必须走投影, 整字典比对在 A′ 下恒红 |
+| dedupe 分组键 | `(track_id, identity_key(owner, container))`, 且 `status == "legacy"` 的行在分组**之前**被 `continue` 透传 ⇒ 手搓排序键用例的行必须**非 legacy**, 否则根本不进分组 |
+| `_dedupe_sort_key` 现状 | 返回 4 元 `(parse_ok, updated_at, filename, branch)` ⇒ 同 basename 异目录的两行四级全并列, 赢家回退 `max()` 的迭代顺序 |
+
+### 冻结 fixture 的可复现性
+
+夹具 = 单 `master` 分支 hermetic 临时仓, 固定两件、逐 commit 钉日期:
+
+| 文件 | frontmatter | commit 日期 | 投影后 `updated_at` |
+|---|---|---|---|
+| `2026-09-01-alpha.md` | 有 | `2026-09-01T10:00:00+00:00` | `2026-09-01T00:00:00Z` (取自 frontmatter) |
+| `2026-09-02-beta.md` | 无 | `2026-09-02T10:00:00+00:00` | `2026-09-02T10:00:00+00:00` (取自 `git log -1 --format=%aI`) |
+
+两行的 `updated_at` 都落在钉死值上 ⇒ 第二次运行必然相等, 不会产生「不可复现的红」(SC-2 点名的失败模式: 若夹具含无 frontmatter 件而不钉日期, 其 `updated_at` = 建仓时刻, 冻结 JSON 与复跑必不等, 而恒红的下场是实施者顺手削断言)。
+夹具建造函数 `build_flat_baseline_repo` 写在测试模块内并被生成脚本 import ⇒ 「冻结的形状」与「测试重建的形状」结构上不可能漂移。
+`freeze_corpus` 按路径 importlib 载入, `FIELDS` 不重抄字面; 测试另断 `frozen["fields"] == fc.FIELDS`, 使 schema 变动当场可见。
+
+### RED 记录 (对 B.1 基线实跑)
+
+| 用例 | SC | 基线结果 | 首个失败断言 / 绿的理由 |
+|---|---|---|---|
+| `test_scan_ancestry_consumer_uses_relative_path` | SC-6 | **红** `AssertionError` | 探测命令实得 `['docs/handoff/2026-05-09-session-end.md', 'docs/handoff/2026-05-09-session-end.md']` —— 两个 remote 都用 basename 拼串, 真实路径从未被查询 |
+| `test_subdir_track_opens_cross_owner_collision` | SC-17 | **红** `AssertionError: 1 != 0` | `legacy_count` 为 1 (归档件被降级), 故 collidable 过滤后只剩一个容器, `kind` 停在 `none` |
+| `test_dedupe_fifth_level_prefers_toplevel_rel_path` | 排序键第 5 级 | **红** `AssertionError: 'archive/x.md' != 'x.md'` | 4 级键下两行全并列, 反序输入换赢家 |
+| `test_flat_repo_matches_frozen_baseline_projection` | SC-2 | **绿** | 回归锁: 基线生成、基线比对, 相等即预期 |
+| `test_dedupe_tiebreak_prefers_lexicographic_max_path` | SC-7 | **绿** | characterization test, 记录 dedupe 对假想输入的现状, 非本 spec 的行为改动 |
+
+**TASK-005 verification 第 7 条的红绿预言全部命中** (SC-6 (a)(b) / SC-17 / 排序键红; SC-6 (c) / SC-2 / SC-7 绿)。其中排序键那条**独立复现**了 R1 审计席在 `1cb3872` 上的实测结论 (4 级键下反序输入换赢家), 非沿用其转述。
+SC-6 (c) 的性质按 proposal 归类为**回归锁**: 它在基线上必绿 (基线的 `inconclusive[0]["filename"]` 同样是 basename), 鉴别力全部来自反事实 —— 实施者若把拼串处的局部变量整体重指 `rel_path`, 该值会变成 `archive/…` 而红。用例 docstring 已写明「不得因它在基线上不红而当假绿删掉, 锁的对象是不许变」。
+
+### 回归锁
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1621 tests in 179.365s
+FAILED (failures=9, errors=4)
+```
+
+1621 = 基线 1605 + 三批 16; 13 条 FAIL/ERROR **全数归属**本新文件, 属其它文件 **0** ⇒ 既有 1605 零回归。
+
 ### 未完成 (1.2 尚未收口)
 
-TASK-005 (第三批 SC-6 / 17 / 2 / 7 + 排序键第 5 级) · TASK-006 (第四批 SC-15 六布局) 尚未开工。四批写同一文件, 串行编写, 不并行。
+TASK-006 (第四批, SC-15 writer 往返六布局) 尚未开工。四批写同一文件, 串行编写, 不并行。
 
 ---
 
@@ -381,3 +433,4 @@ TASK-005 (第三批 SC-6 / 17 / 2 / 7 + 排序键第 5 级) · TASK-006 (第四�
 | 2026-09-25 | 本台账建立。TASK-001 十条 verification 全部通过 (第 2 条不适用), TASK-002 五条全部通过。B.1 基线三处实测并建三仓 feature 分支。 |
 | 2026-09-25 | TASK-003 落地: 测试文件新建 7 用例, 六条 RED 形态全部合规, 全套 1612 tests 中既有 1605 零回归。 |
 | 2026-09-25 | TASK-004 落地: 追加 4 用例 (SC-4 / 5 / 13 / 14), 夹具扩展逐 commit 钉日期; 全套 1616 tests 既有 1605 仍零回归。 |
+| 2026-09-25 | TASK-005 落地: 追加 5 用例 + 冻结 fixture; verification 第 7 条红绿预言全部命中; 全套 1621 tests 既有 1605 仍零回归。 |
