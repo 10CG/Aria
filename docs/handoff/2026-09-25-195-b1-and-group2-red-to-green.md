@@ -1,0 +1,133 @@
+---
+track-id: handoff-multibranch-subdir-path-fidelity
+owner-container: simonfish/bfe8285d
+phase: B
+status: active
+updated-at: 2026-09-25T07:56:10Z
+---
+
+# Aria — Session Handoff (2026-09-25) — `10CG/Aria#195` B.1 + 1.2 测试先行 + 组 2 实现: **RED → GREEN**
+
+> **一句话**: owner 裁「本容器接手 `10CG/Aria#195`, 走 B.1 → C.2」→ 认领 (`s-48ca@0612`) → B.1 十条核验全过 → 1.2 四批测试 (22 用例 / 19 基线红) → 组 2 六个实现任务 → **19 条红全绿, 全套 `Ran 1627 OK`, 既有 1605 零回归**。aria 6 提交 / 主仓 7 提交, **全部未推送** (owner 裁「按计划不推, 留到 TASK-031」)。
+>
+> **本段最该记住的一件事**: `#195` 一直被读成「A.2 还没做完」, 实际是 **owner 2026-09-16 就裁了「接受当前结论」并落了 v6 (`c839fc6`), 五席一致判「已足以开始 Phase B」** —— 误读的来源是 post_planning R5 聚合报告的 `overridden_by_user` 字段**没有回写** (仍 `false`)。只看报告字段会把「owner 已裁」读成「owner 未裁」;结论要以提交为准。
+
+---
+
+## §0 入口 (新 session 优先读)
+
+1. 跑 `/aria:state-scanner`。**注意工作区状态**: 主仓在 `master` —— **本份 handoff 自身是 master 上的一个提交, 故 master 领先两端 1 个** (两端仍 `a52b5eb`); 而 **aria 子模块仍在 `feature/handoff-multibranch-subdir-path-fidelity` @ `9625999`**, 故主仓 porcelain 恒显示 `M aria` —— 这是**正常的中间态**, 不是脏工作区。gitlink 前进归 TASK-030 / TASK-031, 按 `hard_constraints` 第 4 条只从动手当时实测值前进。
+2. **本轨 claim**: `claims/bfe8285d/s-48ca@0612.yaml`, `phase: B`, `status: active`, `claimed_at: 2026-09-25T06:12:29Z`。开工第一件事查心跳年龄 (本仓两次撞上超 TTL 未被扫的先例, 那是运气不是安全边界)。
+3. **下一步 = 组 3 (TASK-015~018 + TASK-035 反事实)**, 一次性副本一律 `git -C aria worktree add <scratchpad 路径> 9625999` —— 该 SHA 是组 2 收口提交, 已核验 porcelain 空。
+4. **实测台账是本轨的权威**: [`openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md`](../../openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md) (在 **feature 分支**上, 主仓 master 看不到 —— 切到 feature 分支或用 `git show feature/handoff-multibranch-subdir-path-fidelity:openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md` 读)。
+5. 并发轨 `pre-merge-completeness-gate-change-scope` (`10CG/Aria#199`) 仍持 active claim (`s-73b9@1606`, A.2), 其 B.1 入口门就是本轨完成 C.2 —— 本轨推进即在解它的锁。
+
+---
+
+## §1 已完成 (UTC)
+
+| 时间 | 事件 | 证据 |
+|---|---|---|
+| 07:04 前 | 入口心跳刷新 + 旧 claim 保活 | 协调 ref `826f7ba`, 两端 MATCH |
+| 06:12 | 本轨认领 (`--phase B --mode advisory --linked-issue`) | `outcome=passed` / `push_success=true` / `surface=null`; 协调 ref `07c8091` 两端 MATCH |
+| — | **B.1 (TASK-001 十条 + TASK-002 五条)** | 台账「TASK-001 / TASK-002」段; 三仓 feature 分支建好 |
+| — | **1.2 四批测试 (TASK-003~006) + TASK-007 汇总** | 22 用例 / 19 基线红 / 3 回归锁; 四批 verification 红绿预言**逐条命中** |
+| — | **组 2 实现 (TASK-009~014) + TASK-033 收口** | `Ran 1627 OK`; 收口 SHA `9625999`, porcelain 空 |
+
+**19 条 RED → 19 条 GREEN**, 既有 1605 零回归。既有套件计数逐个持平: `test_p1_layer_h` 24 / `collision_dedupe` 23 / `track_board` 5 / `scan_integration` 19 / pytest 两腿 28 + 11 —— 与 A.2 基线逐个一致。
+
+### 三条对计划事实断言的独立实证 (未沿用转述)
+
+1. **`git mv` 两条路径都返回移动日** ⇒ SC-4 Case 1 确为无鉴别力的记录性断言, 其「让后来人当场看见 `--follow` 救不了」的用途成立。机制: mv 提交同时触及旧路径的删除与新路径的新增。
+2. **排序键 4 级下反序输入换赢家** (`'archive/x.md' != 'x.md'`) ⇒ 独立复现了 R1 审计席在 `1cb3872` 的实测。
+3. **布局 2 基线走 `skipped` 支写零 track 占位页** (失败输出带出整页文本 `# Aria Handoff — (no active tracks)`) ⇒ 证实 R3 `120e1171` 对 (d) 前后半鉴别力的重定为真。
+
+---
+
+## §2 未完成 / Carry-forward
+
+### 高优先级
+
+| # | 项 | 说明 |
+|---|---|---|
+| H1 | **组 3 (TASK-015~018 + TASK-035)** | 三步法反事实, 一次性副本从 `9625999` 检出。TASK-035 另承接 §3 第 1 项那四条断言的观测 (若 owner 选路径 A) |
+| H2 | **四条断言在 RED 批次不可观测 — 待 owner 裁** | 见 §3 第 1 项。已把三条处置及其代价写入台账, **未自行拆用例** |
+| H3 | **组 4 (TASK-019~024) 承接余下 SC-11 谓词** | 组 2 只做到 (c1)(c2)(i1)(k)(l1) 五条为真; (a1)(a2)(b)(f1)(f2)(g)(i2)(j1)(j2)(j3)(j4)(j5)(l2)(l3) 归组 4 |
+
+### 中优先级
+
+- **矩阵脚本 `sc11-predicate-validation.py` 在组 2 后报 `anchor drift` (退出码 3)** —— **属设计内**: 它的模拟改动以基线源码逐字锚定, TASK-014 改掉了其中一个锚点所在的 `return` 行。计划把其唯一机械核验点定在 TASK-001 (基线), GREEN 阶段由组 4 的逐条谓词承担 ⇒ **不要在 GREEN 阶段重跑它, 也不要为让它绿而重写锚点**。
+- **`docs/handoff/` 当前零子目录** ⇒ 本 bug 在本机不复现 (issue 评论记 10cg.local 主仓有 `docs/handoff/archive/`, 每次扫描 34 条 `git show` 失败)。全部验证靠 hermetic 临时仓, 这是**设计选择**而非取巧: 对活仓跑会因枚举全部 `origin/*` 而每推一个分支就多约 200 行。
+
+### 低优先级 / 记录
+
+- `scan.py` 含一处既有希腊字母 (U+0394, 数学差值语境)。经 diff 核实**非本 cycle 引入**, 基线即有 ⇒ 不在 `hard_constraints` 第 10 条范围, 未改。记此以免后续扫描误判为本轮引入。
+
+---
+
+## §3 待 owner 裁定
+
+1. **四条断言在 RED 批次结构上不可观测** (`SC-6 (c)` / `SC-18 (c)` / `SC-15 布局 2 的 (e) 与 (h)`): 它们与同用例内排在前面的 baseline-failing 断言共处一个测试函数, 首个失败即中止该函数。台账**不声称**它们实测为绿或为红。根因是 A.2/A.3 的结构性限制 —— verification 第 1 条钉死了用例名与用例数 (一布局一用例), 而单用例只有一个首失败点 ⇒「(d) 后半与 (h) 同时逐条红」不可兼得。三条处置及代价已并列写入台账 (推给 TASK-035 / 拆布局 2 并同批修 verification / 接受现状在 GREEN 阶段观测)。**owner 2026-09-25 要求先解释上下文, 裁定未下。**
+2. **推送时点**: owner 2026-09-25 已裁「按计划不推, 留到 TASK-031」。当前 aria 6 + 主仓 7 个提交只在本机, 本机出问题即丢。
+3. **`post_planning` R5 聚合报告的 `overridden_by_user` 未回写** (仍 `false`, 而 owner 2026-09-16 实际已裁 [1] 并落 v6): 是否顺手修该字段, 或开单。它已经造成过一次误读 (本 session 开头)。
+
+---
+
+## §4 提交清单 (全部未推送)
+
+**aria** (`feature/handoff-multibranch-subdir-path-fidelity`, 基线 `1cb3872` → `9625999`, 6 个):
+
+| SHA | 内容 |
+|---|---|
+| `6a1aee9` | TASK-003 第一批测试 (SC-1/3/8/9/16/18, 7 用例) |
+| `c6728fb` | TASK-004 第二批 (SC-4/5/13/14) + 夹具支持逐 commit 钉日期 |
+| `a7b5fe5` | TASK-005 第三批 (SC-6/17/2/7 + 排序键) + 冻结 fixture |
+| `3d459f3` | TASK-006 第四批 (SC-15 六布局) |
+| `3c0407c` | 修正 SC-9 (d) 判据对象 (断路径不断 kind 字面) |
+| **`9625999`** | **组 2 实现收口** (四个路径, porcelain 空) ← 组 3 副本检出源 |
+
+**主仓** (`feature/handoff-multibranch-subdir-path-fidelity`, 基线 `a52b5eb` → `7ba96cb`, 7 个): 台账建立 + TASK-003/004/005/006/007 与组 2 五次追记。
+
+**standards**: feature 分支已建 (`940cb5b`), **零提交** (触点面 `conventions/session-handoff.md` 归组 4 的 TASK-023)。
+
+**本份 handoff 与 latest.md 落 master**, 与 feature 分支的实施提交分开 —— handoff 不在本 spec 交付物清单上, 混进 feature 分支会给 TASK-031 的有范围核验多出一个「本 cycle 产生却不在清单上」的文件。
+
+---
+
+## §5 本 session 的 AI 流程判断 (Rule #10, 请 owner 复议)
+
+1. **把 owner 的「接手, 走 B.1 → C.2」当作 `owner_gates` 第 1 项的同批授权** (规划提交推送 + B.0 认领推协调 ref)。理由: 该裁定明确含 B.1, 而 B.1 入口必须认领, 认领必然推协调 ref。已记台账。
+2. **组 2 六个任务连续改、只在末尾一次提交** (TASK-033 收口), 中间态不落提交。理由: 计划只给组 2 设了一个收口提交点; 中间态 (如 `filename` 暂时装相对路径) 不该留在历史里。
+3. **SC-9 (d) 改的是测试不是实现**, 并单独成一个提交与组 2 收口分开。理由见台账「本阶段三处自查发现」第 1 条 —— 判据对象写错在我这边, 且它属组 1 文件。
+4. **未自行拆布局 2 用例** 以观测那四条断言 (§3 第 1 项)。理由: 拆会改 verification 第 1 条钉的用例名与数量, 即动已过 post_planning 的 A.3 产物。
+5. **未在 GREEN 阶段重跑矩阵脚本**, 也未重写其锚点。理由: 其唯一机械核验点按计划在 TASK-001。
+6. **handoff 落 master 而非 feature 分支** (理由见 §4 末)。
+
+---
+
+## §6 Next session 入口 + carry-id
+
+```
+/aria:state-scanner
+```
+
+1. **先查 claim 心跳年龄** (`claims/bfe8285d/s-48ca@0612.yaml`), 接近或超 24h 按会话入口顺序刷新。
+2. `{id: handoff-multibranch-subdir-path-fidelity, desc: "10CG/Aria#195 组 3 反事实 (副本自 9625999) → 组 4 文档与 SC-11 余下谓词"}` —— 本轨下一步。
+3. **等 owner 裁的三件**: 四条断言不可观测的处置 / 推送时点 / R5 报告 `overridden_by_user` 未回写是否顺手修。
+4. `{id: pre-merge-completeness-gate-change-scope, desc: "10CG/Aria#199 A.2 已收敛, B.1 入口门 = 本轨完成 C.2"}` —— 本轨推进即在解它的锁。
+
+**不应该做的**:
+
+- 不要把「组 2 全绿」读成「可以进 Phase C」—— 组 3/4/5 共 21 个任务未动, 且 TASK-026 (AB) 要 owner 以 `ARIA_COORDINATION_NO_PUSH=1` **启动新会话** (进程启动时设, 会话内补不上), C.2 的传递依赖含它。
+- 不要重跑 `sc11-predicate-validation.py` 或为让它绿而改锚点 (见 §2 中优先级第 1 条)。
+- 不要重生成两份冻结语料与平铺基线 JSON (`hard_constraints` 第 5 条)。
+- 不要擅自推送; 不要 bump 主仓 gitlink (归 TASK-030/031, 且 aria 侧未推时 bump 会造出不可达 gitlink)。
+
+---
+
+## Cross-references
+
+- 实测台账 (本轨权威, 在 feature 分支): `openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md`
+- 上一段会话收尾: [2026-09-24-session-close-199-post-planning-converged.md](./2026-09-24-session-close-199-post-planning-converged.md)
+- 本轨 A.2 收口: [2026-09-16-195-a2-a3-post-planning-five-rounds-owner-closeout.md](./2026-09-16-195-a2-a3-post-planning-five-rounds-owner-closeout.md)
+- 并发轨 (`10CG/Aria#199`) 轨级 handoff: [2026-09-18-199-a2-a3-c1-verify-v21-rework-r2.md](./2026-09-18-199-a2-a3-c1-verify-v21-rework-r2.md)
