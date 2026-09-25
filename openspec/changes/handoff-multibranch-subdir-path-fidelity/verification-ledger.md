@@ -657,6 +657,47 @@ OK
 
 ---
 
+## feature 分支备份推送 (owner 2026-09-25 授权)
+
+**授权**: owner 2026-09-25 裁「推 feature 分支备份」。**性质 = 备份推送, 不是 TASK-031 的 PR 推送** —— 只把 feature 分支发布到两个 remote, master 与 gitlink 均不动, `owner_gates` 第 12 项 (主仓 PR + 合并) 与第 10 项 (aria master + tag 双推) 都还没到。
+
+### 推送前置
+
+目标分支 `feature/handoff-multibranch-subdir-path-fidelity` 在四处 (aria origin/github · 主仓 origin/github) 均**不存在** ⇒ 首推, 无非快进风险。四次 push 分开执行 (不用 `&&` 连推, 以免半推时后续不跑), 各自 `exit 0`。
+
+### 推后逐 remote 独立核验 (不信 push 回执, 硬约束 2)
+
+```
+本地 aria feature = 9625999c734119aba56185edd2b258f215d3da57
+本地 主仓 feature = 617d769b4b93a77219c64638fed5108db04249e0
+
+aria/origin    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
+aria/github    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
+主仓/origin    617d769b4b93a77219c64638fed5108db04249e0  -> MATCH
+主仓/github    617d769b4b93a77219c64638fed5108db04249e0  -> MATCH
+```
+
+**四处全部 MATCH**, 无半推、无镜像分叉。
+
+### gitlink 可达性核验 (防孤立 gitlink, CLAUDE.md 多远程硬约束 1 的事故形态)
+
+主仓 feature 分支上两个 gitlink 及其可达性:
+
+| 子模块 | gitlink | aria/standards origin | github |
+|---|---|---|---|
+| `aria` | `1cb3872` | 可达 (= 该 remote 的 master tip) | 可达 (同) |
+| `standards` | `940cb5b` | 可达 (= master tip) | 可达 (同) |
+
+两个 gitlink 指向的都是**各 remote master 上已发布的 commit** ⇒ 即使有人此刻 `clone --recursive` 主仓 feature 分支也不会断裂。**本轮未 bump 任何 gitlink** (aria 的新提交 `9625999` 只在 feature 分支上, 主仓 gitlink 仍指 `1cb3872`) —— 符合 `hard_constraints` 第 4 条与 `owner_gates` 第 11 项「两个远端未都核验一致前不得 bump gitlink」的更强前提。
+
+### 未推的部分
+
+**主仓 `master` 侧的提交未推** (owner 的授权原文是「推 feature 分支备份」): 本份台账所属的 spec 目录在 feature 分支, 而 session handoff 与 post_planning R5 的 `overridden_by_user` 回写落在 master。master 侧提交数与推送授权另请 owner。
+
+**本节记录自身的提交随同批第二次推送**, 其核验结果记于会话回复。
+
+---
+
 ## 变更记录
 
 | 时间 (UTC) | 事件 |
