@@ -4,7 +4,7 @@ mode: convergence
 rounds: 5
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true  # owner 2026-09-16 裁三路径 [1] 接受当前结论 + 定点修后收口 (v6 c839fc6; 裁定原文与五轮 Major 数 13/9/9/7/8 记于 detailed-tasks.yaml metadata.post_planning_closeout)
 degraded: false
 drift_terminated: false
 drift_check_skipped: true
