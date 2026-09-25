@@ -420,9 +420,70 @@ FAILED (failures=9, errors=4)
 
 1621 = 基线 1605 + 三批 16; 13 条 FAIL/ERROR **全数归属**本新文件, 属其它文件 **0** ⇒ 既有 1605 零回归。
 
-### 未完成 (1.2 尚未收口)
+---
 
-TASK-006 (第四批, SC-15 writer 往返六布局) 尚未开工。四批写同一文件, 串行编写, 不并行。
+## TASK-006 — 测试先行第四批: SC-15 writer 往返六布局 (parent 1.2)
+
+追加 6 个用例, 一布局一用例。
+
+### 实施前 recon
+
+| 核实项 | 实测结论 |
+|---|---|
+| `write_latest_md` 签名 | `(snapshot, output_path, now=None) -> dict`, 读 `snapshot["tracks_multibranch"]["tracks"]` |
+| `action` 分支判定 | `n_active == 0` → `skipped` · `== 1` → `pointer` · `>= 2` → `banner`; 返回 dict **无** `degraded_reason` 键 ⇒ 五条直接索引在基线上必 `KeyError` |
+| 真指针字面 | `**Latest**: [{filename}](./{filename})` —— 布局 2 的 (d) 按此写「无守卫时写出的是不含目录段的 basename 链接」 |
+| 现有降级文案 | `**Latest**: (pointer 不可用) — track=… @ …` (只覆盖无 filename 一种原因, 未区分子目录) |
+| `_active_track` 工厂 | `test_p1_layer_h.py` 的八字段工厂**恒带** `filename`、**从不带** `rel_path` ⇒ 正是布局 3 需要的老快照形状; 布局 6 的缺键 dict 由它 `del` 出来 |
+| `handoff_pointer_target_missing` | kind 字面存在于 `collectors/handoff.py` |
+| `collect_handoff` 签名 | `(project_root) -> CollectorResult`; 其 `data` 无 `errors` 键 ⇒ SC-15 的 kind 断言一律落 `CollectorResult.errors` |
+
+### RED 记录 (对 B.1 基线实跑)
+
+| 用例 | 布局 | 基线失败形态 |
+|---|---|---|
+| `test_pointer_roundtrip_toplevel` | 1 | `KeyError: 'degraded_reason'` — (i) |
+| `test_pointer_roundtrip_subdir_guarded` | 2 | `AssertionError: '子目录' not found in '# Aria Handoff — (no active tracks)…'` — (d) 后半 |
+| `test_pointer_written_when_rel_path_key_absent` | 3 | `KeyError: 'degraded_reason'` — (j) |
+| `test_degraded_reason_present_when_no_active_track` | 4 | `KeyError: 'degraded_reason'` |
+| `test_degraded_reason_present_on_multi_track_banner` | 5 | `KeyError: 'degraded_reason'` |
+| `test_degraded_reason_missing_filename_when_filename_absent` | 6 | `KeyError: 'degraded_reason'` |
+
+**TASK-006 verification 第 5 条的红绿预言全部命中。**
+
+**一条对 proposal baseline-failing 资格判定的独立实证**: 布局 2 的失败输出把基线实际写出的整页文本带了出来 —— `# Aria Handoff — (no active tracks)` + `0 active tracks 当前`。这证实 proposal R3 `120e1171` 的重定是对的: 基线上归档件被降级 legacy ⇒ `n_active == 0` ⇒ writer 走 `skipped` 支写零 track 占位页 ⇒ **(d) 前半「不含真指针」在基线上照样成立、无鉴别力**, 只有后半「文案含具体原因」是 baseline-failing 实体。本轮未沿用该转述, 是由实跑输出直接取到的。
+
+### 夹具组成按判据照写, 未取最小夹具
+
+布局 2 除 `archive/` 那份 active 外, 顶层另留一份 `status: done` 的 `.md`。**这是判据的一部分**: 按字面取最小夹具 (归档-only) 时 `handoff.py` 的 `canonical_files` 为空 ⇒ `collect_handoff` 提前返回 ⇒ `handoff_pointer_target_missing` 结构上不可能产生 ⇒ 断言 (e) 恒绿且其反事实为假。用例 docstring 已写明这一点。
+
+### 回归锁
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1627 tests in 177.948s
+FAILED (failures=10, errors=9)
+```
+
+1627 = 基线 1605 + 四批 22; 19 条 FAIL/ERROR **全数归属**本新文件, 属其它文件 **0** ⇒ 既有 1605 零回归。
+
+---
+
+## 1.2 收口小结 (TASK-003 ~ TASK-006 四批)
+
+| 批 | 用例数 | 基线红 | 基线绿 (回归锁) |
+|---|---|---|---|
+| TASK-003 第一批 (SC-1 / 3 / 8 / 9 / 16 / 18) | 7 | 6 | 1 (SC-9 (c)) |
+| TASK-004 第二批 (SC-4 / 5 / 13 / 14) | 4 | 4 | 0 |
+| TASK-005 第三批 (SC-6 / 17 / 2 / 7 + 排序键) | 5 | 3 | 2 (SC-2 / SC-7) |
+| TASK-006 第四批 (SC-15 六布局) | 6 | 6 | 0 |
+| **合计** | **22** | **19** | **3** |
+
+- 全部 19 条红的形态均为 `AssertionError` 或 SC 明示的直接索引 `KeyError`, **无一条**环境红 (ImportError / 夹具建仓失败)。
+- 四批的 verification 红绿预言**逐条命中**, 无一处需要改判。
+- 既有 1605 个测试在四批之后仍**零回归**。
+- 交付物两件: `aria/skills/state-scanner/tests/test_handoff_multibranch_path_fidelity.py` · `aria/skills/state-scanner/tests/fixtures/handoff-multibranch-flat-baseline-2026-09-25.json` (后者按 `hard_constraints` 第 5 条**禁止重生成**)。
+- **下一步 = 组 2 实现 (TASK-007 起)**, 按 RED → GREEN 推进; 组 2 收口提交见 tasks.md 2.7。
 
 ---
 
@@ -434,3 +495,4 @@ TASK-006 (第四批, SC-15 writer 往返六布局) 尚未开工。四批写同�
 | 2026-09-25 | TASK-003 落地: 测试文件新建 7 用例, 六条 RED 形态全部合规, 全套 1612 tests 中既有 1605 零回归。 |
 | 2026-09-25 | TASK-004 落地: 追加 4 用例 (SC-4 / 5 / 13 / 14), 夹具扩展逐 commit 钉日期; 全套 1616 tests 既有 1605 仍零回归。 |
 | 2026-09-25 | TASK-005 落地: 追加 5 用例 + 冻结 fixture; verification 第 7 条红绿预言全部命中; 全套 1621 tests 既有 1605 仍零回归。 |
+| 2026-09-25 | TASK-006 落地 + **1.2 收口**: 追加 6 用例 (SC-15 六布局); 四批合计 22 用例 / 19 红 / 3 回归锁, 预言逐条命中; 全套 1627 tests 既有 1605 仍零回归。 |
