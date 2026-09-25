@@ -8,7 +8,7 @@ updated-at: 2026-09-25T07:56:10Z
 
 # Aria — Session Handoff (2026-09-25) — `10CG/Aria#195` B.1 + 1.2 测试先行 + 组 2 实现: **RED → GREEN**
 
-> **一句话**: owner 裁「本容器接手 `10CG/Aria#195`, 走 B.1 → C.2」→ 认领 (`s-48ca@0612`) → B.1 十条核验全过 → 1.2 四批测试 (22 用例 / 19 基线红) → 组 2 六个实现任务 → **19 条红全绿, 全套 `Ran 1627 OK`, 既有 1605 零回归**。aria 6 提交 / 主仓 7 提交, **全部未推送** (owner 裁「按计划不推, 留到 TASK-031」)。
+> **一句话**: owner 裁「本容器接手 `10CG/Aria#195`, 走 B.1 → C.2」→ 认领 (`s-48ca@0612`) → B.1 十条核验全过 → 1.2 四批测试 (22 用例 / 19 基线红) → 组 2 六个实现任务 → **19 条红全绿, 全套 `Ran 1627 OK`, 既有 1605 零回归**。aria 6 提交 / 主仓 feature 9 提交 —— owner 随后裁「推 feature 分支备份」, **两仓 feature 分支已双推, 四处 `ls-remote` 全部 MATCH**; master 侧 4 个提交 (本份 handoff 与 R5 回写) 不在该授权原文范围内, 仍只在本机。
 >
 > **本段最该记住的一件事**: `#195` 一直被读成「A.2 还没做完」, 实际是 **owner 2026-09-16 就裁了「接受当前结论」并落了 v6 (`c839fc6`), 五席一致判「已足以开始 Phase B」** —— 误读的来源是 post_planning R5 聚合报告的 `overridden_by_user` 字段**没有回写** (仍 `false`)。只看报告字段会把「owner 已裁」读成「owner 未裁」;结论要以提交为准。
 
@@ -71,12 +71,13 @@ updated-at: 2026-09-25T07:56:10Z
 1. ~~四条断言在 RED 批次结构上不可观测~~ → ✅ **已裁 (owner 2026-09-25: 路径 A, 推给三步法反事实)**。落地时两处订正:
    - **归属订正**: 我给选项时写的是「推给 TASK-035」, 核实后那三条 SC 的反事实**不归它** —— `SC-6 (c)` 归 **TASK-015**, `SC-18 (c)` 与 `SC-15 布局 2 的 (e)(h)` 归 **TASK-018**; TASK-035 只覆盖 SC-1/3/4后半/5/8后半/14/17, 六个补丁无一对应。裁定的实质是走三步法那条路, 故落到正确任务, 未硬塞进 TASK-035。
    - **路径 A 对三条有效、对一条无效** (探查副本实测, 详见台账): SC-6 (c) 天然可单独观测; SC-18 (c) 与 SC-15 (h) 各有一个已预先实测的定向补丁形态; **SC-15 布局 2 的 (e) 与 (d) 前半结构互斥** —— (e) 要红须让 `handoff.py` 解析出 pointer, 而 `_LATEST_POINTER_RE` 要求行首 `**Latest**: [`, 而 (d) 前半恰断言该串不出现在文本任何位置。(e) 按「记录未执行到、不声称实测」处置, 鉴别力由同补丁下 (d) 的红 + 一条逐环节实读确认的机制链间接支撑。
-2. **推送时点**: owner 2026-09-25 已裁「按计划不推, 留到 TASK-031」。当前 aria 6 + 主仓 7 个提交只在本机, 本机出问题即丢。
+2. ~~推送时点~~ → ✅ **已裁并已执行 (owner 2026-09-25「推 feature 分支备份」)**。两仓 feature 分支分两批双推, 每批推后逐 remote 独立 `ls-remote` 核验: aria `9625999` (两处 MATCH) / 主仓 `f449378` (两处 MATCH), 无半推无镜像分叉。gitlink 可达性另核: 主仓 feature 上 `aria 1cb3872` 与 `standards 940cb5b` 在各自 remote 均等于 master tip ⇒ 零孤立 gitlink, 本轮未 bump 任何 gitlink。**性质是备份推送, 不是 TASK-031 的 PR 推送** —— `owner_gates` 第 10 / 12 项都还没到。
+   **仍未推**: master 侧 4 个提交 (本份 handoff × 3 次更新 + post_planning R5 的 `overridden_by_user` 回写)。owner 的授权原文是「推 feature 分支备份」, 未含 master ⇒ 未擅自扩大范围。handoff 的可发现性依赖它被推上去 (下个 session 若在别的机器或别的 checkout 上就读不到), 值得另请授权。
 3. ~~R5 聚合报告的 `overridden_by_user` 未回写~~ → ✅ **已裁并已修 (owner 2026-09-25「顺手修」; master `ff8d5c2`)**。形态照 `10CG/Aria#199` post_spec R5 的回写先例逐字同形 (值改 `true` + 行内注释写明何时谁裁了什么 + 证据指针, 正文不动), 两份报告该行现形态一致可机械对账。
 
 ---
 
-## §4 提交清单 (全部未推送)
+## §4 提交清单 (feature 已双推备份, master 未推)
 
 **aria** (`feature/handoff-multibranch-subdir-path-fidelity`, 基线 `1cb3872` → `9625999`, 6 个):
 
@@ -94,6 +95,17 @@ updated-at: 2026-09-25T07:56:10Z
 **主仓 master** (`a52b5eb` → `ff8d5c2` 之后再加本份 handoff 的更新, **3 个**): 本份 handoff 与 `latest.md` · post_planning R5 的 `overridden_by_user` 回写 (`ff8d5c2`) · 本份 handoff 的裁定落地追记。
 
 **standards**: feature 分支已建 (`940cb5b`), **零提交** (触点面 `conventions/session-handoff.md` 归组 4 的 TASK-023)。
+
+### 备份推送核验 (owner 2026-09-25 授权「推 feature 分支备份」)
+
+分两批双推, 每批推后逐 remote 独立 `ls-remote` (不信 push 回执):
+
+| 批 | 推送对象 | 核验 |
+|---|---|---|
+| 一 | aria feature `9625999` + 主仓 feature `617d769` (四处首推) | 四处全部 MATCH |
+| 二 | 主仓 feature `f449378` (记录推送事实的提交, 快进) | 主仓两处 MATCH; aria 两处仍 MATCH `9625999` |
+
+gitlink 可达性: 主仓 feature 上 `aria 1cb3872` / `standards 940cb5b` 在各自 remote 均等于 master tip ⇒ **零孤立 gitlink**, `clone --recursive` 不会断裂; **本轮未 bump 任何 gitlink**。
 
 **本份 handoff 与 latest.md 落 master**, 与 feature 分支的实施提交分开 —— handoff 不在本 spec 交付物清单上, 混进 feature 分支会给 TASK-031 的有范围核验多出一个「本 cycle 产生却不在清单上」的文件。
 
@@ -120,7 +132,7 @@ updated-at: 2026-09-25T07:56:10Z
 
 1. **先查 claim 心跳年龄** (`claims/bfe8285d/s-48ca@0612.yaml`), 接近或超 24h 按会话入口顺序刷新。
 2. `{id: handoff-multibranch-subdir-path-fidelity, desc: "10CG/Aria#195 组 3 反事实 (副本自 9625999) → 组 4 文档与 SC-11 余下谓词"}` —— 本轨下一步。
-3. **等 owner 的只剩一件**: 推送时点 (owner 2026-09-25 已裁「按计划不推, 留到 TASK-031」, 故严格说无待裁项 —— 但 aria 6 + 主仓 feature 8 + master 3 个提交只在本机, 本机出问题即丢, 值得在组 3 开工前再问一次)。另两件已裁并落地: 四条断言取路径 A (落 TASK-015 / TASK-018) · R5 字段已回写 (`ff8d5c2`)。
+3. **等 owner 的只剩一件**: **master 侧 4 个提交是否推** (feature 分支已按授权双推备份并四处 MATCH; master 上是本份 handoff 与 R5 回写, 不在「推 feature 分支备份」的授权原文里)。其余三件均已裁并落地: 四条断言取路径 A (落 TASK-015 / TASK-018) · R5 字段已回写 (`ff8d5c2`) · feature 备份推送已完成。
 4. `{id: pre-merge-completeness-gate-change-scope, desc: "10CG/Aria#199 A.2 已收敛, B.1 入口门 = 本轨完成 C.2"}` —— 本轨推进即在解它的锁。
 
 **不应该做的**:
