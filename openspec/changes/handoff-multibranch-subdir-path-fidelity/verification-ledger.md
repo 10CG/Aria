@@ -328,9 +328,49 @@ FAILED (failures=3, errors=3)
 - 全部 6 条 FAIL/ERROR **逐条归属 `test_handoff_multibranch_path_fidelity`**, 属其它文件的为 **0** ⇒ 既有 1605 个测试**零回归**。
 - 本批自带的回归锁 `test_flat_enumeration_reports_no_prefix_violation` (SC-9 (c)) 在基线上**为绿**, 符合预期: 基线无前缀守卫, 该 kind 计数本就为 0, 该用例的作用是防实现把 `-z` 的尾随空段送进守卫。
 
-### 未完成 (本批范围外)
+---
 
-TASK-004 (第二批 SC-4 / 5 / 13 / 14) · TASK-005 (第三批 SC-6 / 17 / 2 / 7 + 排序键) · TASK-006 (第四批 SC-15 六布局) 尚未开工。四批写同一文件, 串行编写, 不并行。
+## TASK-004 — 测试先行第二批: 失败 / 日期 / legacy 族 (parent 1.2)
+
+同一文件追加 4 个用例, 用例名与 proposal SC 表「核验」列逐条对应。
+
+### 实施前 recon
+
+| 核实项 | 实测结论 |
+|---|---|
+| fail-soft 早退 dict 键集 | `exists` / `tracks` / `branches_scanned` / `legacy_count` / `collision` / `errors` —— 六键, **无 `unreadable_count`** ⇒ SC-14 的直接索引在基线上必 `KeyError` |
+| `handoff_multibranch_branch_list_failed` kind 字面 | 存在 (collector `_list_origin_branches` 返回错误时的 `r.soft_error`), 非 spec 凭空假设 |
+
+### 夹具扩展 (SC-4 / SC-13 的前提)
+
+新增 `_commit(tmp, msg, *, date=None)` 与 `_publish_ref(tmp)`, 原 `_publish` 改为两者的组合 (第一批用例行为不变, 实跑形态已复核未漂移)。`date` 同时设 `GIT_AUTHOR_DATE` 与 `GIT_COMMITTER_DATE`。**这是判据的一部分**: `%aI` 是秒级, 同一测试内先后两次 commit 若不钉日期会拿到同一秒的同一值, 而 `_GIT_ENV` 钉身份**不钉日期** —— 与 proposal SC-4 / SC-13 点名的前提一致, helper docstring 已写明。
+
+### RED 记录 (对 B.1 基线实跑)
+
+| 用例 | SC | 基线失败形态 | 首个失败断言 |
+|---|---|---|---|
+| `test_moved_file_dates` | SC-4 | `AssertionError: ... got ''` | Case 2 (从未在顶层存在的件) `updated_at` 为空串 |
+| `test_legacy_track_id_uses_rel_path` | SC-13 | `AssertionError: Items in the second set but not the first` | (a) 两个 track_id 集合不等 (基线两行同 id) |
+| `test_unreadable_not_downgraded_to_legacy` | SC-5 | `AssertionError: Lists differ: [{'track_id': 'legacy:master:unreadable.md…}] != []` | 读不到的件被伪造成 legacy 行进了 `tracks[]` |
+| `test_unreadable_count_present_on_failsoft_early_return` | SC-14 | `KeyError: 'unreadable_count'` | 早退 dict 缺键 |
+
+**一条对 proposal 事实断言的独立验证**: SC-4 的 Case 1 (记录性断言, 期望 `updated_at` 为移动日 `2026-08-15`) 在 B.1 基线上**通过** —— 证实 proposal 所记「旧 basename 路径与新相对路径的 `git log -1 --format=%aI` 都返回 mv 日」属实 (机制: `git mv` 的提交同时触及旧路径的删除与新路径的新增, `git log -- <旧路径>` 因此命中该提交)。⇒ 该半确为无鉴别力的记录性断言, 其「让后来人当场看见 `--follow` 救不了」的用途成立。
+
+**按任务口径未写的断言**: SC-13 的「dedupe 不折叠」**未**写成断言 (TASK-004 verification 第 3 条)。已在用例 docstring 记明理由: `status == "legacy"` 的行在分组前就被 `continue` 透传, 两条同 id 的 legacy 行今天也不会折叠 ⇒ 该断言恒绿。
+
+### 回归锁
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1616 tests in 249.381s
+FAILED (failures=6, errors=4)
+```
+
+1616 = 基线 1605 + 两批 11; 10 条 FAIL/ERROR **全数归属** `test_handoff_multibranch_path_fidelity`, 属其它文件 **0** ⇒ 既有 1605 零回归。第一批的六条 RED 形态与 TASK-003 记录逐条一致, 未因夹具重构漂移。
+
+### 未完成 (1.2 尚未收口)
+
+TASK-005 (第三批 SC-6 / 17 / 2 / 7 + 排序键第 5 级) · TASK-006 (第四批 SC-15 六布局) 尚未开工。四批写同一文件, 串行编写, 不并行。
 
 ---
 
@@ -340,3 +380,4 @@ TASK-004 (第二批 SC-4 / 5 / 13 / 14) · TASK-005 (第三批 SC-6 / 17 / 2 / 7
 |---|---|
 | 2026-09-25 | 本台账建立。TASK-001 十条 verification 全部通过 (第 2 条不适用), TASK-002 五条全部通过。B.1 基线三处实测并建三仓 feature 分支。 |
 | 2026-09-25 | TASK-003 落地: 测试文件新建 7 用例, 六条 RED 形态全部合规, 全套 1612 tests 中既有 1605 零回归。 |
+| 2026-09-25 | TASK-004 落地: 追加 4 用例 (SC-4 / 5 / 13 / 14), 夹具扩展逐 commit 钉日期; 全套 1616 tests 既有 1605 仍零回归。 |
