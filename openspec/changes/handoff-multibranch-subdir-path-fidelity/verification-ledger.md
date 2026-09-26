@@ -657,6 +657,141 @@ OK
 
 ---
 
+## 组 3 反事实 (TASK-015 / TASK-016 / TASK-017)
+
+三步法一律按 `hard_constraints` 第 9 条: 副本自 TASK-033 SHA `9625999` 检出 → 未打补丁绿 → 只回退该组件后红 → 记副本 HEAD SHA 与补丁 diff (以副本路径为根) → 复位 → `worktree remove`。**每任务一个独立副本**, 不复用 (TASK-035 verification 第 5 条: 复用会与对方的复位动作互相覆盖)。全部用 `python3 -B` 跑, 未在 feature 分支工作树上改动。
+
+### 副本生命周期
+
+| 任务 | 副本路径 (scratchpad) | 副本 HEAD | 移除后 `worktree list` |
+|---|---|---|---|
+| TASK-015 | `wt-task015` | `9625999` | 不含本任务副本 |
+| TASK-016 | `wt-task016` | `9625999` | 不含本任务副本 |
+| TASK-017 | `wt-task017` | `9625999` | 不含本任务副本 |
+
+三次移除后真仓均核验 `porcelain` 0 行、`HEAD` 仍 `9625999` (补丁未泄漏到 feature 分支)。
+
+### TASK-015 — SC-6 GREEN + 两条反事实
+
+未打补丁: `test_scan_ancestry_consumer_uses_relative_path` **OK** (命令行断言含 `docs/handoff/archive/…` 且 origin 探针取到非空 SHA)。
+
+| 反事实 | 补丁 (1 行) | 打补丁后首失败 | 落在 |
+|---|---|---|---|
+| 1 | 枚举层 `rel_paths.append(rel)` → `append(basename)` | 行 755 `AssertionError: 'docs/handoff/archive/2026-05-09-session-end.md' not found in [] : the probe must query the real path, got []` | **(a)** |
+| 2 | `scan.py` 的 `filename = t.get("filename")` → `t.get("rel_path")` (局部变量整体重指) | 行 768 `AssertionError: 'archive/2026-05-09-session-end.md' != '2026-05-09-session-end.md'` | **(c)** |
+
+**反事实 1 下 (b) 未执行到**: verification 第 2 条写「(a)(b) 红」, 实测首失败落在 (a) (行 755), (b) 在其后故未执行。如实记录, 不声称 (b) 实测为红 —— 机制上它必然也不成立 (补丁使该行根本不进 `tracks[]`, `log_paths` 为空 ⇒ 无探针可取 SHA), 但那是推论不是观测。
+**反事实 2 下 (a) 绿、(c) 红**: 该补丁只改上报面、不改拼串面, 故 (a) 仍通过 —— 这正是本 spec 要钉的「拼串用 `rel_path` / 上报用 basename」两面分离, 也是 SC-6 (c) 作为回归锁能被单独观测的原因。
+
+### TASK-016 — SC-7 与排序键第 5 级 GREEN + 删第 5 级的反事实
+
+- `test_dedupe_tiebreak_prefers_lexicographic_max_path` docstring 首行实测为 `characterization test — hypothetical input: dictionary-max filename wins.` ⇒ 符合 verification 第 1 条的字面要求。
+- 两个用例未打补丁 **Ran 2 tests OK**。
+- **反事实 (三步)**: 补丁 = 删去排序键第 5 级 (`return (bucket, dt, filename, branch, (rel == filename, rel))` → 去掉末元组, 1 行) ⇒ 行 897 `AssertionError: 'archive/x.md' != 'x.md'` (反序输入换赢家)。**同一次运行里 SC-7 那条仍绿** ⇒ 实证 TASK-014 verification 第 3 条所述「第 3 级 `filename` 已分出胜负, 第 5 级不介入」。
+- 既有套件计数 (复位后在副本上跑): `test_handoff_multibranch_collision_dedupe` **Ran 23 OK** · `test_track_board_advisories` **Ran 5 OK** —— 与 A.2 基线 23 / 5 一致, 断言未动。
+
+### TASK-017 — SC-13 GREEN + 三条反事实
+
+未打补丁 (每条补丁前均复位并重新确认): `test_legacy_track_id_uses_rel_path` **绿**, 三次确认均绿。
+
+| 反事实 | 补丁 (1 行) | 打补丁后首失败 | 落在 |
+|---|---|---|---|
+| 1 | `_make_legacy_track_id(branch, rel)` → `(branch, filename)` | 行 568 `AssertionError: Items in the second set but not the first:` | **(a)** 两 track_id 集合不等 |
+| 2 | legacy 分支 `_get_file_commit_date(…, rel)` → `(…, filename)` | 行 579 `AssertionError: False is not true : archived row must take its own commit date, got '2026-03-01T10:00:00+00:00'` | **(b)** |
+| 3 | 删去 legacy 构造点的 `"rel_path": rel,` (只留 frontmatter 分支那处) | 行 584 `KeyError: 'rel_path'` | **(c)** |
+
+**三条各自单独观测到, 无互相遮挡** —— 每条的首失败都正好落在其点名的断言上。反事实 2 的实测值尤其说明问题: 归档行拿到的是 `2026-03-01T10:00:00+00:00`, 即**顶层那份**的提交日, 而非自己的 `2026-04-01` —— 正是「仍拼顶层路径」的直接后果。
+
+### TASK-018 — 其余实体反事实 (15 条)
+
+副本 `wt-task018` 自 `9625999`, 每条补丁前复位并重新确认目标用例绿, 结束复位后 `worktree remove`; `worktree list` 不含本任务副本, 真仓 `porcelain` 0 行、`HEAD` 仍 `9625999`。
+
+#### SC-15 六条 (verification 第 2 条)
+
+| 补丁 | 形态 | 目标 | 首失败 |
+|---|---|---|---|
+| 1 | 去掉 §2.5 守卫 | 布局 2 | 行 1015 `AssertionError: '**Latest**: [' unexpectedly found in …` = (d) 前半 |
+| 2 | 判据换成 `"/" in filename` | 布局 2 | 行 1015 同上 —— `filename` 恒 basename 故守卫恒不触发 (专防字符串嗅探) |
+| 3 | 缺键兜底写成 `track.get("rel_path")` (去掉 `or filename`) | 布局 3 | 行 1047 `'[x.md](./x.md)' not found in …` = (g) |
+| 4 | 在 `write_latest_md` 内重算谓词并写反 (按 verification 给的三行最小实现) | 布局 1 / 3 / 2 | **L1 行 983 `'target_in_subdir' is not None : (i)`** + **L3 行 1049 同 `(j)`** + **L2 绿** —— 与 verification 预期逐项吻合 |
+| 5 | 见下「偏离 1」 | 布局 4 / 5 | 行 1065 / 1081 `KeyError: 'degraded_reason'` |
+| 6 | `_render_pointer_unavailable` 的 `reason="missing_filename"` 改为复用 `"target_in_subdir"` | 布局 6 | 行 1100 `'target_in_subdir' != 'missing_filename'` |
+
+#### SC-18 两条 · SC-9 两条 · SC-16 两条 · SC-2 一条 (verification 第 3 至 6 条)
+
+| SC | 补丁 | 首失败 |
+|---|---|---|
+| SC-18 (1) | 见下「owner 推来的定向补丁」 | 行 320 `'handoff_multibranch_undecodable_path' not found in []` = (c) |
+| SC-18 (2) | 把不可解码名计入 `unreadable_count` | 行 317 `1 != 0 : an undecodable NAME is not an unreadable file` = (b) |
+| SC-9 (b) | 见下「偏离 2」 | 行 440 `0 != 1 : the other file on the same branch must still be collected` |
+| SC-9 (c) | 不丢空段 (删去 `if not path: continue`) | 行 472 `1 != 0 : a well-formed enumeration must report no violation` |
+| SC-16 | 见下「偏离 3」 | 行 279 `'/2026-05-01-with-fm.md' != '2026-05-01-with-fm.md'` |
+| SC-2 | `-z` 输出按换行切分 | 行 832 `Lists differ: [] != [{'track_id': 'flat-2026-09-01-alpha', …}]` (枚举塌成畸形单段, 行不进 `tracks[]`) |
+
+#### owner 推来的两条定向补丁 (2026-09-25 裁路径 A)
+
+| 断言 | 补丁形态 | 首失败 |
+|---|---|---|
+| SC-15 布局 2 **(h)** | renderer 正文不动, `return …, reason` 改为写死 `"missing_filename"` | 行 1024 `'missing_filename' != 'target_in_subdir'`; (d) 前后半与 (e) 全绿 |
+| SC-18 **(c)** | 跳过但不报 kind (删 `error_messages.append` 与 `r.soft_error`, 只留 `continue`) | 行 320 (同 SC-18 (1)); (a)(b) 绿 |
+
+**SC-15 布局 2 的 (e) 仍未获观测** —— 与 (d) 前半结构互斥 (依据见上文「可观测性实测」段)。按 owner 裁定不拆用例, 故记录「在补丁 1 / 2 下未执行到」, 不声称实测。
+
+#### 三处补丁形态偏离 (按 verification 第 2 条「改补丁、不改测试断言」的纪律, 偏离与原样输出照记)
+
+**偏离 1 — 补丁 5**: 按字面「把 `degraded_reason = None` 的初始化挪进 `elif n_active == 1:` 分支内部」实跑得 `UnboundLocalError: cannot access local variable 'degraded_reason' where it is not associated with a value` (L4 / L5 均行 945), **不是** verification 预期的 `KeyError` —— 因为返回 dict 无条件引用该变量, 删掉分派前的初始化会先在构造 dict 时炸。按纪律改补丁: 保留初始化, 改为**只在 `action == "pointer"` 时给返回 dict 加该键**。这才是「只在一支加键」的真实形态, 也正是 §2.5 择定「恒存在」口径要排除的那种实现。改后 L4 行 1065 / L5 行 1081 双 `KeyError: 'degraded_reason'`, 与预期一致。
+
+**偏离 2 — SC-9 反事实 1**: 按字面「沿用分支级错误通道 (收到非 None 即 `continue` 整支)」把 reporter 调用一并去掉, 实跑首失败落在**(a)** (行 434 `0 != 1 : exactly one prefix violation must be reported`) 而非 verification 点名的 (b)。按纪律改补丁: **保留 reporter 调用, 但随后 `return [], msg` 作废整支**。改后首失败落 (b) (行 440)。**这个形态才是 proposal 立 (b) 的理由本身** —— 它说「缺了 (b), 吞掉整分支的天真实现同样满足 (a) 而假绿, 且那种实现比原 bug 更坏」, 而「报了 kind 又吞整支」恰是该实现。
+
+**偏离 3 — SC-16 两条**: 按字面「前缀剥离少剥斜杠」/「忘记剥前缀」实跑, 两者首失败均落在**行存在性**上 (行 275 `0 != 2 : both files must produce a row`) 而非所指的 `rel_path == filename` —— 因为剥离写错会让 `_read_file_content` 拼出不存在的路径, `git show` 失败, 行根本不进 `tracks[]` (与 TASK-035 notes 记的补丁 3 / 5 同型问题)。按纪律缩小补丁: **只让上报的 `rel_path` 带前导斜杠 (两个 TrackEntry 构造点各改一处), 读取路径仍用 `rel`**。改后行能进 `tracks[]`, 首失败落在 rel_path 断言 (行 279)。按字面的两个形态的原样输出一并留档于上。
+
+### TASK-035 — proposal SC 表所列反事实 (六个补丁 / 七条 SC)
+
+副本 `wt-task035` 自 `9625999`, 每条补丁前复位并重新确认目标用例绿; 结束复位后 `worktree remove`, `worktree list` 不含本任务副本。
+
+| 补丁 | 形态 (只回退该组件) | SC | 首失败 |
+|---|---|---|---|
+| 1 | 枚举层 `rel_paths.append(rel)` → `append(basename)` | SC-1 | 行 210 `AssertionError: 0 != 1 : the subdir file must yield exactly one row` |
+| 1 (共用) | 同上 | SC-17 | 行 802 `AssertionError: 'handoff_multibranch_git_show_failed' unexpectedly found in ['handoff_multibranch_git_show_failed']` |
+| 2 | 去掉 `ls-tree` 的 `-z` 并改回 `splitlines()` | SC-3 | 行 365 `AssertionError: 0 != 1 : the CJK-named file must be collected` |
+| 3 | 无 frontmatter 分支的 `_get_file_commit_date(…, rel)` → `(…, filename)` | SC-4 后半 | 行 529 `AssertionError: False is not true : a file that never existed at the top level must still get its own real commit date, got ''` |
+| 4 | git show 失败路径恢复旧降级分支 (追加 legacy 行 + `legacy_count += 1`; kind 与 `unreadable_count` 保持新实现) | SC-5 | 行 619 `AssertionError: Lists differ: [{'track_id': 'legacy:master:archive/unrea…rue}] != []` |
+| 5 | frontmatter 构造点 `"rel_path": rel` → `"rel_path": filename` | SC-8 后半 | 行 252 `AssertionError: 'latest-notes.md' != 'archive/latest-notes.md'` |
+| 6 | fail-soft 早退 dict 删去 `"unreadable_count": 0` | SC-14 | 行 654 `KeyError: 'unreadable_count'` |
+
+**每条首失败均落在 verification 写明的「现表现形态」所指断言内**, 无一条落到补丁带出的无关异常上 (第 10 条的缩小补丁条款未被触发)。
+
+两处值得单记:
+
+- **SC-17 的首失败落在「无 `handoff_multibranch_git_show_failed`」而非 `legacy_count == 0`** —— 因为 TASK-011 之后 git show 失败不再追加 legacy 行, `legacy_count` 仍为 0 而该 kind 出现。这正是 verification 第 3 条预告的「原句『归档件恒降级 legacy 且 owner_container unknown』现表现为『归档件行消失』」, 所指断言集不变, 首个失败落在其中任一条即算。
+- **补丁 3 与 TASK-017 反事实 2 的 diff 相同但各自独立实跑** (verification 第 5 条: 两任务若并行, 复用副本会与对方的复位动作互相覆盖)。本轮串行执行, 仍按要求在各自副本上跑。
+
+### 组 3 收口小结
+
+| 任务 | 内容 | 结果 |
+|---|---|---|
+| TASK-015 | SC-6 GREEN + 2 条反事实 | 全部达成; 反事实 1 下 (b) 未执行到, 如实记录 |
+| TASK-016 | SC-7 与排序键第 5 级 GREEN + 1 条反事实 + 既有套件计数 | 全部达成 (23 / 5 与基线一致) |
+| TASK-017 | SC-13 GREEN + 3 条反事实 | 全部达成, 三条各自单独观测无遮挡 |
+| TASK-018 | 13 条 verification 反事实 + 2 条 owner 推来的定向补丁 | 全部达成; **3 处补丁形态按「改补丁不改断言」纪律偏离并记录** |
+| TASK-035 | 6 个补丁 / 7 条 SC | 全部达成, 首失败均落在所指断言内 |
+
+**副本生命周期全部闭合**: 五个任务各建一个一次性副本 (`wt-task015` / `016` / `017` / `018` / `035`), 全部自 `9625999` 检出、结束复位后 `worktree remove`; 每次移除后 `git -C aria worktree list` 均只剩主工作树, 真仓 `porcelain` 0 行、`HEAD` 仍 `9625999`。
+
+**组 3 后全量回归 (确认补丁未泄漏)**:
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1627 tests in 225.680s
+OK                                    ← EXIT 0, FAIL/ERROR 计数 0
+```
+
+**唯一未获观测的断言**: SC-15 布局 2 的 **(e)** —— 与 (d) 前半结构互斥 (`_LATEST_POINTER_RE` 要求行首 `**Latest**: [`, 而 (d) 前半断言该串不出现在文本任何位置)。owner 2026-09-25 已否决拆用例 (路径 B), 故按「记录未执行到、不声称实测」处置, 其鉴别力由同补丁下 (d) 的红 + 一条逐环节实读确认的机制链间接支撑。
+
+**下一步 = 组 4 (TASK-019~024)**: schema 文档 / collector docstring / standards 第三态 / SC-11 余下谓词 / 全量回归两腿。组 4 与组 3 在 TASK-033 之后本可并发, 本轮串行完成组 3, 故组 4 开工时 aria 工作树仍是 `9625999` 的干净态。
+
+---
+
 ## feature 分支备份推送 (owner 2026-09-25 授权)
 
 **授权**: owner 2026-09-25 裁「推 feature 分支备份」。**性质 = 备份推送, 不是 TASK-031 的 PR 推送** —— 只把 feature 分支发布到两个 remote, master 与 gitlink 均不动, `owner_gates` 第 12 项 (主仓 PR + 合并) 与第 10 项 (aria master + tag 双推) 都还没到。
@@ -709,3 +844,4 @@ aria/github    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
 | 2026-09-25 | TASK-006 落地 + **1.2 收口**: 追加 6 用例 (SC-15 六布局); 四批合计 22 用例 / 19 红 / 3 回归锁, 预言逐条命中; 全套 1627 tests 既有 1605 仍零回归。 |
 | 2026-09-25 | TASK-007 汇总层 + 四条断言不可观测的复议项落台账。 |
 | 2026-09-25 | **组 2 实现 (TASK-009~014) + TASK-033 收口**: RED → GREEN, 19 条基线红全绿, 全套 `Ran 1627 OK` 零回归; 收口 SHA `9625999`。 |
+| 2026-09-26 | **组 3 反事实 (TASK-015 / 016 / 017 / 018 / 035) 全部完成**: 五个一次性副本生命周期闭合; 三处补丁形态按纪律偏离并记录; 组 3 后全量回归 `Ran 1627 OK` 零泄漏。 |
