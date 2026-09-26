@@ -792,6 +792,144 @@ OK                                    ← EXIT 0, FAIL/ERROR 计数 0
 
 ---
 
+## 组 4 文档同步 (TASK-019 / 020 / 023 / 024)
+
+### TASK-019 — state-snapshot-schema.md §tracks_multibranch 同步
+
+提交 **`4d21e46`** (aria feature; 只 add 本任务 deliverable)。
+
+- 字段块新增 `unreadable_count` 并写明**三类外延边界**: git show 失败计入且不产行 / 前缀守卫丢弃的行不计入 / 名字非 UTF-8 的路径不计入 (读都没读就跳过)。
+- TrackEntry 块新增 `rel_path`; `filename` 行补「NEVER carries a directory segment」; `track_id` 的 legacy 公式改 `legacy:<branch>:<rel_path>`。
+- `latest.md` 排除句**改原句**为任意深度 (未另加一句), 并举出近似名 `archive/latest-notes.md` 仍保留的对照。
+- dedupe 现状键元组改五元, 补「相对路径 tie-break」说明项; `compound key` 行与 Renderer parity 句的层数词去除。
+- 新增三段正文: 两个新 kind 的登记与双通道说明 / `git show` 失败不再伪造 legacy 行及其危害 / 非 ASCII 名边界改写成条件式 (`-z` 使结果不再依赖 `core.quotePath`)。
+- fail-soft 早退形状补 `unreadable_count` 与**既有漏写的** `identity_advisories`。
+- Change history 新增一行, 写明 `snapshot_schema_version` 保持 **1.0** (全部 additive)。
+
+**SC-11 实跑**: (a1)(a2)(b)(f1)(f2)(g)(i2)(j2) 八条逐条 PASS。(j4) schema 侧清零 —— 过程中**写第 5 级说明时自己写出了一个层数词**, 复扫发现后改掉 (与台账早先那次「描述违规物自成违规物」同型)。
+
+### TASK-020 — collector 契约面与键层级描述整类
+
+提交 **`9f3b05b`** (aria feature; 只 add 三个 deliverable)。
+
+- 键层级整类改写: `# Tie-break` 注释块的现状键元组写全五元并**保留行首前缀** ((j3) 的锚点, 全文保持唯一); 四处 `dictionary-max` 描述各自点名 `rel_path` ((j5)); 历史轮次改用元组表述; docstring 里 `round-3 4th level` 这类**轮次序数按 verification 保留不改**。
+- 层数词清零 ((j4)): collector 三处 + dedupe 测试两处。测试文件 diff 严格只触及那两处 docstring 所在行 (2 insertions / 2 deletions), **断言零改动**, 该模块仍 `Ran 23 OK`。
+- 契约面订正: `legacy_count` 注释改为与新行为一致 (读到了但无 frontmatter 才算 legacy); 两处 docstring 的路径占位符 `<filename>` 改 `<rel_path>`。
+- **顺带订正一处既有事实错误**: `updated_at` 来源在模块 docstring 与 `_get_file_commit_date` docstring 里一直写作 "committer date", 而实现用的是 `--format=%aI` (**author date**)。三处统一订正。该错误早于本 spec, 非本轮引入。
+- `phase-1-collectors.md` 的 `Return dict` 补 `degraded_reason` ((l2)), 并写明三支恒存在、取值枚举、由 renderer 回传而非 `write_latest_md` 自行重算。
+
+**SC-11 实跑**: (j1)(j3)(j5)(l2) PASS; (j4) 三文件合计零命中; (c1)(c2)(i1) 保持为真。
+
+### TASK-023 — standards 第三态 + layer-l-integration 同步
+
+提交 **`11b0a14`** (standards feature — 该子模块在本 cycle 的**第一个**提交) 与 **`b181678`** (aria feature)。
+
+- `session-handoff.md` §2.3: 两态判据不动, 新增「目标不在顶层」第三态并限定**经机械 `latest_md_writer` 写入时**; §2.3.1 写入后那句同批补限定从句; 被改小节按 §2.3.5 先例加 `Amended` 标注 (标明 additive)。
+- `layer-l-integration.md` 的「单 track: 更新 latest.md pointer」一行补子目录限定 ⇒ **(l3) PASS**。
+- **Version 头保持 1.3.0 未 bump (判断与理由)**: 该文件的版本头已由 `10CG/aria-standards#20` 专门跟踪 (它指出前两次实质增量未 bump、建议 1.4.0)。本次是第三次 additive 增量; 在此自行 bump 会把三次合并进一个号、掩盖 `#20` 记录的事实, 且 standards 版本治理不在本 spec 范围。**请 owner 复议**。
+- **手改路径措辞取 TASK-025 的回落形态**: verification 第 1 条要求写「跟踪见 `10CG/aria-plugin#<TASK-025 开出的号>`」, 但 TASK-025 依赖 TASK-021 且是 owner gate, 号此刻不存在。为不在仓库里留 `#<` 占位符 (TASK-025 verification 第 5 条要求回填后该 grep 零命中), 本轮直接落**回落措辞**「(已知缺口, 尚未开跟踪 issue)」, 待 TASK-025 开单后按其第 5 条回填。落笔后实跑 `grep -n '#<' conventions/session-handoff.md` **零命中**。**这是 AI 流程判断, 请 owner 复议**。
+- **五处扁平布局描述复核** (verification 第 5 条): `:15` 目录级 canonical 声明 · `:88` / `:94` 文件名模板 · `:304` `docs/handoff/*.md` 非递归 glob · `:339` 输出路径硬编码不接受 dir 参数。五处**均隐含扁平布局**, 但本 spec 只修「读到子目录文件时不伪造 legacy 行」、不对子目录布局表态 ⇒ 不改, 交遗留 issue。
+
+### TASK-024 — 处方面措辞复核: **六处全部无需改, 无编辑、无提交**
+
+| 位置 | 结论与依据 |
+|---|---|
+| `advanced-rules.md:443-444` | **无需改** —— 判据读 `tracks_multibranch.exists` 与 `len(tracks) >= 2`; 本 spec 改的是这些字段的**取值** (不再有伪 legacy 行), 判据语义不变 |
+| `advanced-rules.md:511-512` | **无需改** —— 同上 |
+| `advanced-rules.md:544` | **无需改** —— 判据是 `collision.kind != none`; 本 spec 会让该值从 `none` 翻到 `cross_owner` (SC-17), 但判据文本与括注里的两种 kind 定义均仍准确 |
+| `RECOMMENDATION_RULES.md:28` | **无需改** —— 「本 container 无 active owned track」不涉及路径面 |
+| `RECOMMENDATION_RULES.md:30` | **无需改** —— 「leader pointer 仍在 `latest.md`」描述的是**事实状态**而非「上次一定写了 pointer」。TASK-013 之后该状态的成立面**变窄**了 (单 track 但目标在子目录时本就不写真指针), 但这句文本仍准确。变窄一事记此备查 |
+| `RECOMMENDATION_RULES.md:31` | **无需改** —— 同 `:544` |
+| `phase-d-closer/SKILL.md:218` | **无需改** —— 该行说 Pointer 更新「conditional by multi-track detection」, 即 **action 三值由 `n_active` 决定**; 子目录降级**不改变 action** (仍走 `pointer` 支), 只改写该支的内容与 `degraded_reason` ⇒ 摘要行仍准确。完整决策表在 `handoff-mechanics.md`, 其未同步第三态一事已由 TASK-025 的 (g) 条登记, 不在本任务候选文件内 |
+
+**连带结论**: 未对 `advanced-rules.md` / `RECOMMENDATION_RULES.md` 落编辑 ⇒ `metadata.rule6_note` **不改写为判据表第二行** (verification 第 2 条); 未对 `phase-d-closer/SKILL.md` 落编辑 ⇒ TASK-026 **不追加 phase-d-closer AB** (第 3 条) ⇒ **AB 范围不扩大**。此结论建立在上表逐处依据上, 不是为省成本而作的裁量。
+
+### TASK-021 — 全量回归两腿 + SC-10 + SC-11 全谓词 + 冻结产物未重生成
+
+**[1] 回归前置**: `git -C aria status --porcelain` 与 `git -C standards status --porcelain` **输出均为空**。
+feature 分支 HEAD: aria **`b181678619023910bb4eed7266afc765ce937322`** · standards **`11b0a149f0ff39691c3571b766c49ec45a3bcb7e`**。
+**该 aria HEAD SHA 即 TASK-026 的 with 臂 SHA。**
+
+**[2] (a) 全量 unittest**:
+
+```
+$ python3 -B aria/skills/state-scanner/tests/run_tests.py
+Ran 1627 tests in 202.120s
+OK                                    ← EXIT 0, FAIL/ERROR 计数 0
+```
+
+1627 = A.2 基线 **1605** + 本 Spec 新增 **22** 个 TestCase 用例, 与 TASK-001 实测的基线口径一致。
+
+**[3] (b) pytest 腿**: `state-scanner tests/test_collision.py` **28 passed** · `phase-d-closer tests/` **11 passed** —— 与 B.1 实测数目逐个相同, 零失败。
+
+**[4] SC-10 点名集**: 8 个 unittest 模块一次跑 `Ran 169 tests … OK` —— 与 `metadata.test_runner` 记的 A.2 实测 **169** 一致; `test_collision.py` 走 (b) 已零失败。
+
+**[5] SC-11 全部 19 条谓词**: 机械解析 `metadata.sc11_baseline_predicates` 后逐条执行 —— **解析 19 条 / PASS 19 / FAIL 0**。标签: `a1 a2 b c1 c2 f1 f2 g i1 i2 j1 j2 j3 j4 j5 k l1 l2 l3`。
+> **解析器空集防护**: 首次解析因切分方式错误得 0 条, 而脚本仍打印「全部为真」—— 典型的真空成立假绿。已在脚本里加 `assert len(preds)==19`, 解析不到 19 条即判解析器失效、不得据此下结论。
+**后半条件判断**: `git log` 实查本 session 触及本 change 目录的 10 个提交中, 触及 `detailed-tasks.yaml` 或 `sc11-predicate-validation.py` 的为 **0 个** ⇒ 谓词与验证脚本自 TASK-001 起未被改动, 无需重跑 `--emit-json` 比对。
+
+**[6] 冻结语料未重生成** (分仓各跑, 未用超级仓 revision):
+
+```
+$ git -C aria diff 1cb3872 -- skills/state-scanner/tests/fixtures/handoff-tracks-frozen-2026-09-05.json   → 0 行
+$ git diff a52b5eb -- .aria/repro/handoff-tracks-frozen-2026-09-05.json                                    → 0 行
+```
+
+**[7] 平铺基线 JSON 未重生成**: `git -C aria log` 对该文件只列出 **一个**提交 (`a7b5fe5`, RED 批次第三批), 且 `git -C aria diff a7b5fe5 -- <该文件>` 为 **0 行**。
+
+**[8]**: 无任何失败, 无需归因。
+
+### TASK-022 — 活体 dogfood (SC-12a / SC-12b)
+
+#### SC-12a — 本仓平铺, 背靠背
+
+改前 = `git -C aria worktree add` 检出 **B.1 基线 `1cb3872`** 的旧代码; 改后 = feature 分支代码。两次**都在主仓根目录**执行, 背靠背进行, `--output` 写 scratchpad (未碰 `.aria/state-snapshot.json`)。两次 `scan.py` 退出码**均为 0**。
+
+**冻结核验 (比 proposal 多比 SHA)**: 每次扫描后各存一份 `git for-each-ref --format="%(refname) %(objectname)" refs/remotes/`, 两份各 21 行且 **逐行相同** ⇒ 本次背靠背有效 (两次之间远端跟踪 ref 的分支集与 SHA 均未变)。
+
+**判据结果**:
+
+| 项 | 改前 | 改后 |
+|---|---|---|
+| `tracks_multibranch` 顶层键 | 6 个 | 7 个 (**只多 `unreadable_count`**) |
+| `tracks` 行数 | 2038 | 2038 |
+| `legacy_count` | 336 | 336 |
+| `unreadable_count` | (无该键) | **0** |
+
+**剔除 `unreadable_count` 与每行 `rel_path` 后逐字段相等 ⇒ PASS**。另: 改后每行都带 `rel_path`, 且本仓平铺状态下 **2038 / 2038 行满足 `rel_path == filename`** —— SC-16 的活体印证。
+
+#### SC-12b — 子目录临时仓 (带 bare 仓作 origin)
+
+按 verification 要求建**真 remote** (`git init --bare` + `git push`), 未用 `update-ref` 手法 —— `scan.py` 的 sync collector 以 `git remote` 有无输出为判据。夹具: 一个子目录件 `docs/handoff/archive/2026-09-20-subdir-track.md` (带 frontmatter, `status: active`) + 一个顶层对照件。
+
+```
+exit=0
+tracks 行数: 2 | legacy_count: 0 | unreadable_count: 0
+tracks_multibranch.errors: []   顶层 errors kinds: []
+
+track_id=toplevel-dogfood-track  legacy=False  filename=2026-09-19-toplevel.md      rel_path=2026-09-19-toplevel.md
+track_id=subdir-dogfood-track    legacy=False  filename=2026-09-20-subdir-track.md  rel_path=archive/2026-09-20-subdir-track.md
+```
+
+**三条判据全中**: 无 `handoff_multibranch_git_show_failed` · `legacy_count == 0` · 子目录件以**真 track** 出现 (`legacy=False`, frontmatter 的 `track_id` 被正确读出, `filename` 仍是 basename 而 `rel_path` 带目录段)。**这是本 spec 修复的活体端到端证明** —— 同一份夹具在 B.1 基线上会产出一条 `owner_container="unknown"` 的伪 legacy 行加一条 `git_show_failed`。
+
+**清理**: dogfood 副本 `worktree remove`, 临时仓删除; `worktree list` 只剩主工作树; 三仓 `porcelain` 复核 —— aria 空 / standards 空 / 主仓仅两个 gitlink 与本台账 ⇒ `scan.py` 未污染工作树。
+
+### 组 4 收口小结
+
+| 任务 | 结果 | 提交 |
+|---|---|---|
+| TASK-019 | schema 同步, 8 条谓词 PASS | aria `4d21e46` |
+| TASK-020 | collector 契约面 + 层数词清零, 4 条谓词 PASS | aria `9f3b05b` |
+| TASK-023 | standards 第三态 + layer-l 限定, (l3) PASS | standards `11b0a14` · aria `b181678` |
+| TASK-024 | 六处复核**全部无需改**, 无编辑无提交 ⇒ AB 范围不扩大 | — |
+| TASK-021 | 两腿回归 1627 + 28 + 11 全绿; SC-10 169; **SC-11 19/19**; 冻结产物三项 diff 均空 | — (台账) |
+| TASK-022 | SC-12a 逐字段相等 + SC-12b 子目录件真 track | — (台账) |
+
+**下一步 = 组 5 (TASK-025~032 + 034)**: 遗留 issue (owner gate) → Rule #6 AB (owner 启动门) → 版本 bump 与 CHANGELOG → 子模块合并与双推 → 主仓同步面与 PR → Phase D。**其中 TASK-026 的 AB 需 owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动新会话, 本会话内无法进行。**
+
+---
+
 ## feature 分支备份推送 (owner 2026-09-25 授权)
 
 **授权**: owner 2026-09-25 裁「推 feature 分支备份」。**性质 = 备份推送, 不是 TASK-031 的 PR 推送** —— 只把 feature 分支发布到两个 remote, master 与 gitlink 均不动, `owner_gates` 第 12 项 (主仓 PR + 合并) 与第 10 项 (aria master + tag 双推) 都还没到。
@@ -845,3 +983,4 @@ aria/github    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
 | 2026-09-25 | TASK-007 汇总层 + 四条断言不可观测的复议项落台账。 |
 | 2026-09-25 | **组 2 实现 (TASK-009~014) + TASK-033 收口**: RED → GREEN, 19 条基线红全绿, 全套 `Ran 1627 OK` 零回归; 收口 SHA `9625999`。 |
 | 2026-09-26 | **组 3 反事实 (TASK-015 / 016 / 017 / 018 / 035) 全部完成**: 五个一次性副本生命周期闭合; 三处补丁形态按纪律偏离并记录; 组 3 后全量回归 `Ran 1627 OK` 零泄漏。 |
+| 2026-09-26 | **组 4 文档同步与回归 (TASK-019 / 020 / 021 / 022 / 023 / 024) 全部完成**: SC-11 **19/19** 谓词为真; 两腿回归 1627 + 28 + 11 全绿; SC-12a 逐字段相等、SC-12b 子目录件以真 track 出现 (活体证明); TASK-024 六处复核全部无需改 ⇒ AB 范围不扩大。 |
