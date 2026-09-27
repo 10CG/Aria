@@ -1201,6 +1201,86 @@ RESULT.md 回填单号与裁定后复跑 `check_bare_issue_refs.py` → rc=0。�
 
 结果目录与本台账在主仓 feature 分支提交 (只 add 本任务交付物); 提交 SHA 见本会话回复 (自指排除)。**未推送** —— 本会话无推送授权, 随本轨下一次推送一并发出。
 
+## 会话入口 (2026-09-27 第二段, 普通会话)
+
+> 同一对话在 TASK-026 之后由 owner 以**不带** `ARIA_COORDINATION_NO_PUSH` 的新进程续上。
+
+- **变量核验 (18:11:41Z)**: `ARIA_COORDINATION_NO_PUSH` 未设; 子进程 `no_push_requested_by_env()` → `False`。
+- **远端现状**: 主仓 master 三处 (本地 / origin / github) 均 `c454e35`; 主仓 feature 远端 `4f91772` (本地多一个未推的 `be91134`, 即 TASK-026 提交); 协调 ref 上 active claim 只有本容器这两条。
+- **心跳** (owner 2026-09-17 免逐次授权, 前提 = 本地协调 ref 与 origin 一致): 前置检查 `coord_ref_precheck` (代码取自 `pre-merge-completeness-gate-change-scope` 计划 metadata) → `{"verdict": "ok", "local_ahead": 0}` 退出 0 → 强制对齐退出 0 → `phase1_gate.py --heartbeat-only` 两次 (`--phase` 在该模式下不被读取, `heartbeat_by_track` 只写 `heartbeat_at`) → 推后独立核验。
+
+| claim | track | 刷新前 `heartbeat_at` | 刷新后 | outcome / push_success | 推后 `ls-remote origin` 与本地 |
+|---|---|---|---|---|---|
+| `s-48ca@0612` | 本轨 (phase B) | `2026-09-27T12:35:55Z` (约 5.6h) | `2026-09-27T18:14:01Z` | refreshed / true | `4ae229e` MATCH |
+| `s-73b9@1606` | `pre-merge-completeness-gate-change-scope` (phase A.2) | `2026-09-27T12:36:25Z` (约 5.6h) | `2026-09-27T18:14:11Z` | refreshed / true | `4ae229e` MATCH |
+
+刷新后两条 claim 的 `phase` / `status` 未变 (B / A.2, active)。下一次最晚 2026-09-28T18:14Z 前刷新。
+
+## TASK-027 — aria 侧版本 bump + CHANGELOG 三段 (parent 5.1), 并入 standards `session-handoff.md` 升 1.4.0
+
+### 第 1 条 — 取号 (18:15:14Z)
+
+| 输入 | 实测 |
+|---|---|
+| `aria/.claude-plugin/plugin.json` | `1.73.3` |
+| `git -C aria ls-remote --tags origin` | 最高 `v1.73.3`, `v1.74.*` 0 条 |
+| `git -C aria ls-remote --tags github` | 最高 `v1.73.3`, `v1.74.*` 0 条 |
+| 并发轨 `10CG/Aria#199` 最新 handoff (`2026-09-24-session-close-199-post-planning-converged.md`) 与其计划 | 无具体 `<vNEXT>`, 计划全程用占位 `v<vNEXT>` 执行时现取, 且该轨 B.1 排在本轨 C.2 之后 ⇒ 无预留号冲突 |
+
+⇒ minor + 1、patch 归 0 ⇒ **vNEXT = `1.74.0`**。级别 MINOR 依据: `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md` §2 第 6 行。
+
+### 第 2 条 — 取号时 aria `origin/master`
+
+`git -C aria ls-remote origin refs/heads/master` = `1cb387218935433312fde4067c276754b77686a8` (github 同值)。TASK-029 据此判断取号之后远端是否前进。
+
+### 第 3 条 — 写法先例定位
+
+`grep -n "^## \[1.70.0\]" aria/CHANGELOG.md` → `:200`; `### Fixed` `:202` / `### Added` `:209` / `### Changed` `:215` —— 与 A.2 实测一致, 未移位。另参照最近一次 MINOR `[1.73.0]` 的 `### Notes` 节写法 (Rule #6 结论落在 Notes)。
+
+### 第 4 ~ 7 条 — CHANGELOG `[1.74.0]` 三段 (逐条对 `b181678` 真代码核过)
+
+- **Fixed 三条**: 子目录 (四个拼路径点, 含 `scan.py` 的 `_same_branch_head_unreachable_tracks`) / 非 ASCII (**条件式**: 「枚举不再依赖 `core.quotePath`; 默认 true 时此前被转义并在 `.md` 过滤处丢弃; 设为 false 的采用方此前不受影响」) / 假 legacy (`git show` 失败不再追加伪造行, 改计 `unreadable_count`)。
+- **Added**: `tracks[].rel_path` (恒存在; 真 track 与 legacy 两处 `tracks.append` 都写入, 已核) / `unreadable_count` (恒存在, 默认 0; 分支枚举失败早退 dict 含该键, 已核) / `write_latest_md` 的 `degraded_reason` (三支恒存在, 取值 `None` / `"missing_filename"` / `"target_in_subdir"`, 已核) / 两个新 kind `handoff_multibranch_unexpected_path_prefix` 与 `handoff_multibranch_undecodable_path` (两处都是 `error_messages.append` + `r.soft_error` 双通道, 已核) / 新测试文件 22 条 (`grep -c '    def test_'` 实测 22) + 平铺基线夹具。
+- **Changed 七条**: `legacy_count` 收窄 / `collision.kind` 可由 `none` 翻 `cross_owner` (含 `identity_advisories` 只增不减) / 顶层 `errors[]` 可新增 `snapshot_self_contradiction` 与 `snapshot_consistency_inconclusive` (两个 kind 名在 `scan.py:271` / `:285` 实读核过) / 排序键第 5 级 `(rel_path == filename, rel_path)` 与 legacy track_id 公式改用 `rel_path` / 子目录目标写降级页 (`action` 仍为 `pointer`) / 触碰文档面逐个点名 (standards `session-handoff.md` 标 **Amended**, 与 standards `11b0a14` 实际写法一致) / 已知边界**五条** (非 ASCII 只覆盖可解码 UTF-8 且为条件式 / 不可解码名跳过并报 kind、不计入 `unreadable_count` / `reference-snapshot-aria.json` 未重采样 —— 实读该夹具最后改动于 2026-07-19 `50bbf64`, 本 cycle 零 diff, 其 `tracks_multibranch` 无 `rel_path` 与 `unreadable_count` / `n_active` 可由 1 翻到 ≥2 / mv 过的无 frontmatter 件仍取 mv 提交日且不加 `--follow` —— `_get_file_commit_date` 实读确为 `git log -1 --format=%aI` 不带 `--follow`)。
+- **Notes**: 读侧遗留缺口 `10CG/aria-plugin#204` / 平铺仓零行为变化 / Rule #6 AB 结论与 `10CG/aria-plugin#205` / 测试数 (1627 = 1605 + 22; pytest 腿 28 + 11, 取自本台账 TASK-021)。
+- **写法自检** (只抽本次新增文字: CHANGELOG `[1.74.0]` 整段 + VERSION 新发布日期行 + standards 新 Version 行): `check_bare_issue_refs.py` 三份均 `裸 issue 引用: 0`; §4.5 自查命令无输出; 六个 aria 文件与 standards 文件 NUL 与 U+FFFD 计数均 0。整文件不跑 —— 存量文字会让它恒红 (content-integrity §4.4 执行口径)。
+
+### 第 8 条 — aria 提交 (**六个文件, owner 当场裁定**)
+
+执行时实读发现 `aria/README.zh.md` 第 5 行同样带版本号, 且 v1.73.1 / .2 / .3 三次发版提交 (`44f00d1` / `189240f` / `9003a82`) 都同改了它。经 AskUserQuestion 呈 owner, 原文 (选项): **「带上, 6 个文件一次提交 (推荐)」** ⇒ verification 末条字面「恰含这五个文件」**不成立**, 记入 `tasks.md` AI 流程判断清单第 34 条。另: `aria/VERSION` 的「## 版本号」代码块在 v1.73.3 发版时漏改、停在 `1.73.2`, 本次一并订正为 `1.74.0` (清单第 35 条, AI 判断请复议)。
+
+```
+$ git -C aria show --stat HEAD
+1ad31fa981175d8afe8cebb378235b4cab615d58
+chore(release): v1.73.3 → v1.74.0 — handoff_multibranch 路径保真 (10CG/Aria#195)
+ .claude-plugin/marketplace.json |  4 ++--
+ .claude-plugin/plugin.json      |  2 +-
+ CHANGELOG.md                    | 34 ++++++++++++++++++++++++++++++++++
+ README.md                       |  2 +-
+ README.zh.md                    |  2 +-
+ VERSION                         |  7 ++++---
+ 6 files changed, 43 insertions(+), 8 deletions(-)
+```
+
+版本取值一致: `plugin.json` `1.74.0` · `marketplace.json` 两处 `1.74.0` · `VERSION` 头部与代码块 `1.74.0` · `README.md` 与 `README.zh.md` 第 5 行 `1.74.0` · CHANGELOG 标题 `[1.74.0]`。发布日期写 2026-09-27; 若 TASK-029 打 tag 时已跨日, 届时照实改日期并记台账。提交不加 `Co-Authored-By` (owner 2026-09-27 裁定)。
+
+### 并入项 — standards `session-handoff.md` 升 1.4.0 (决策单第 1 项)
+
+头部 Version 行改为 1.4.0, 括号内逐条列出三次增量: `d217ed0` (§2.3.1 / §2.3.5 / §2.3.9, `10CG/Aria#193`) · `21748d4` (§2.3.8.1) · `11b0a14` + `d86fc91` (§2.3 第三态, `10CG/Aria#195`)。引用前核过 SHA: `d217ed0` 与 `21748d4` 是这两次改动落到 standards master 首父链上的提交 (分支内原提交 `c955783` / `bb5d375` 分别是它们的祖先), 与 `10CG/aria-standards#20` 的引用一致; §2.3.9 与 §2.3.8.1 两个标题在文件中实读存在。
+
+```
+$ git -C standards show --stat HEAD
+56306d107f094d37d8f79d3311c962cebf8afcc8
+docs(conventions): session-handoff Version 1.3.0 → 1.4.0 — 补齐三次增量 (10CG/aria-standards#20)
+ conventions/session-handoff.md | 2 +-
+```
+
+记入 `tasks.md` AI 流程判断清单第 33 条。合并后回帖关闭 `10CG/aria-standards#20` —— 届时另请授权。
+
+### 未推的部分
+
+aria `1ad31fa`、standards `56306d1`、主仓 feature 上的 `be91134` 与本节所在提交均**只在本地**。子模块的推送按计划在 TASK-034 (owner 授权后); 主仓 feature 随 TASK-031 或另获授权的备份推送发出。
+
 ---
 
 ## 变更记录
@@ -1220,3 +1300,5 @@ RESULT.md 回填单号与裁定后复跑 `check_bare_issue_refs.py` → rc=0。�
 | 2026-09-27 | **TASK-025 完成**: 查重无重复 → 正文逐处实读核对 (两处行号较计划下移) → owner 授权开单 **`10CG/aria-plugin#204`** (GET 核验 open, 标题正文逐字一致) → standards 回填 `d86fc91` (`#<` 零命中)。 |
 | 2026-09-27 | owner 裁「全部推」: standards `d86fc91` 与主仓 feature `c5f494f` 双推, 四处 MATCH; owner 裁「照建议」(决策单 `4c968ca`): standards `session-handoff.md` 升 1.4.0 并入 TASK-027 (更正 TASK-023 节「不 bump」的理由) / 四条断言归属订正追认 / 剩余提交不加 `Co-Authored-By`。 |
 | 2026-09-27 | **TASK-026 完成** (NO_PUSH 专用会话): /skill-creator 照跑 state-scanner AB, 13 eval 两臂同为 50/78, delta.pass_rate = +0.0000 (与 PREDICTION 相符); eval 5 复跑两次 1/3 不判回归; 协调 ref 全程 `e911132`; 结论「未被有效测试」→ owner 裁「放行进 TASK-027」; 套件缺口单 **`10CG/aria-plugin#205`** (GET 核验)。 |
+| 2026-09-27 | 普通会话续上 (变量已不在, 实测 `False`): 两条 claim 心跳经前置检查刷新到 `18:14:01Z` / `18:14:11Z`, 推后 origin 与本地均 `4ae229e`。 |
+| 2026-09-27 | **TASK-027 完成**: 取号 `1.74.0` (两个 remote 无 `v1.74.*`, `10CG/Aria#199` 无预留号; 取号时 aria `origin/master` = `1cb3872`); CHANGELOG `[1.74.0]` 三段 + Notes 逐条对真代码核过; aria `1ad31fa` (六个文件, `README.zh.md` 经 owner 当场裁定纳入) · standards `56306d1` (`session-handoff.md` 升 1.4.0, 决策单第 1 项); 均未推送。 |
