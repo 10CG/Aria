@@ -971,6 +971,106 @@ aria/github    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
 
 ---
 
+## 会话入口与 master 推送 (2026-09-26 ~ 27 会话)
+
+### claim 心跳 (owner 2026-09-17 免逐次授权, 前提 = 本地协调 ref 与 origin 一致)
+
+会话开头 `/aria:state-scanner` 后按三元组 (本容器 `bfe8285d` / 归一 track_id / active) 解析, 本容器恰有两条 active claim, 各轨恰 1 条。顺序: 前置检查 (`coord_ref_precheck`, 代码取自 `pre-merge-completeness-gate-change-scope` 计划 metadata) → 强制对齐 `git fetch origin +refs/aria/coordination:refs/aria/coordination` → 重解析 → `phase1_gate.py --heartbeat-only` → 推后核验。两次前置检查均 `{"verdict": "ok", "local_ahead": 0}` 退出 0, 两次对齐均退出 0, 会话未带 `ARIA_COORDINATION_NO_PUSH`。
+
+| claim | track | 刷新前 `heartbeat_at` (距扫描时) | 刷新后 | push_success / push_skipped | 推后 `ls-remote origin` 与本地 |
+|---|---|---|---|---|---|
+| `s-48ca@0612` | 本轨 (phase B) | `2026-09-26T05:00:16Z` (约 10.7h) | `2026-09-26T15:48:50Z` | true / false | `82adeb0` MATCH |
+| `s-73b9@1606` | `pre-merge-completeness-gate-change-scope` (phase A.2) | `2026-09-25T05:04:03Z` (约 34.7h, **已超 SWEEP_TTL 24h**) | `2026-09-26T15:49:43Z` | true / false | `ae24f81` MATCH |
+
+### 主仓 master 推送 (owner 2026-09-26 授权)
+
+**授权**: owner 对 state-scanner 推荐答「1+2」, 其中 [2] = 推送 `d33d233` (上一会话收尾 handoff) 到两个 remote 并逐个 `ls-remote` 核验。推前 fetch 两端, `origin/master` 与 `github/master` 均为 `7e7c1a4` 且是本地 master 的祖先 (快进)。两次 push 分开执行, 各自退出 0。
+
+```
+local  = d33d23364a2c78b0a80c673267f77cc301bd2a5b
+origin = d33d23364a2c78b0a80c673267f77cc301bd2a5b MATCH
+github = d33d23364a2c78b0a80c673267f77cc301bd2a5b MATCH
+```
+
+之后主仓切回 feature 分支 (`cc4005e`, 本地与两个 remote 一致); master 与 feature 两侧的 gitlink 同为 aria `1cb3872` / standards `940cb5b`, 切换不动子模块检出。
+
+---
+
+## TASK-025 — 遗留缺口 issue (parent 5.3)
+
+**授权**: owner 2026-09-27 经 AskUserQuestion 裁「开单，按此正文发」(选项原文)。发帖前正文全文与下文五处 AI 判断一并呈 owner 过目。**结果: `10CG/aria-plugin#204`** (https://forgejo.10cg.pub/10CG/aria-plugin/issues/204)。
+
+### 第 1 条 — 查重 (q= 定向查询 + limit=50 分页至不满页, state=all)
+
+`10CG/aria-plugin`, 14 个检索词:
+
+| 检索词 | 命中 | 检索词 | 命中 |
+|---|---|---|---|
+| `_parse_latest_pointer` | 0 | `degraded_reason` | 0 |
+| `_scan_md_files` | 0 | `target_in_subdir` | 0 |
+| `handoff_worktrees` | 0 | `_render_banner` | 0 |
+| `_resolve_latest` | 0 | `snapshot_consistency` | 0 |
+| `reference-snapshot-aria` | 1 | `subdir` | 3 |
+| `handoff-mechanics` | 0 | `latest.md` | 3 |
+| `子目录` | 116 (3 页) | `递归` | 116 (3 页) |
+
+- 标识符类检索词的 6 条命中 (`10CG/aria-plugin#199` / `10CG/aria-plugin#196` / `10CG/aria-plugin#195` / `10CG/aria-plugin#136` / `10CG/aria-plugin#67` / `10CG/aria-plugin#56`) 主题均不同。
+- CJK 两词为模糊匹配、无区分度: 对并集 116 条**只按标题**复筛 handoff / latest / pointer / 指针 / 交接 / 扁平 / worktree / 子目录 / 递归, 得 6 条 (`10CG/aria-plugin#155` / `10CG/aria-plugin#149` / `10CG/aria-plugin#123` / `10CG/aria-plugin#121` / `10CG/aria-plugin#71` / `10CG/aria-plugin#67`), 主题分别为 collision 误报 / audit 取最新 / autofill 盲区 / 分支上限 / History 检查, 无一涉及 `handoff.py` 扁平布局。
+- 主仓 `10CG/Aria` 同批检索 (去掉 CJK 两词), 并集 10 条: 无重复; 相邻三条 `10CG/Aria#218` (无指针时的回落链) / `10CG/Aria#168` (AC-5 条已含 `errors[].kind` 的 schema 登记) / `10CG/Aria#169` (AC-5 搬成独立 collector) 写进正文交叉引用。
+
+**判定: 无重复单**。
+
+### 第 2 / 3 条 — 正文逐处实读核对 (aria `b181678` / standards `11b0a14`)
+
+| 条目 | 位置 | 核对 |
+|---|---|---|
+| 主缺口 | `handoff.py:288` `Path(target).name`; `_scan_md_files` `:300`, 循环 `:318` `iterdir()` | 与计划一致 |
+| 现成复现 | `test_handoff_multibranch_path_fidelity.py:985` `test_pointer_roundtrip_subdir_guarded` | 存在, 断言写侧降级 |
+| (a) | `handoff_worktrees.py:82-83` 导入, `:285` / `:291` 调用 | 与计划一致 |
+| (b) | 降级页行 `**Latest**: (pointer 不可用)` 不匹配 `_LATEST_POINTER_RE`; `_resolve_latest` 只在目标文件不存在时发信号 | 机制成立 |
+| (c) | `tests/fixtures/reference-snapshot-aria.json` 末次改动 `50bbf64` (2026-07-18), `unreadable_count` / `rel_path` 均 0 命中 | 成立 |
+| (d) | `_render_banner` 在 `latest_md_writer.py:219` | **行号与计划不同** (计划 `:172-224` 为 `f314785` 基线, 本 spec 改动后下移) |
+| (e) | schema §`errors` 只列三键; `tracks` 子键写在 `scan.py:278` / `:292`; `scan.py:403` 以 `**err` 并入, `err` 带 `kind` 而非 `error` | **行号与计划不同** (计划 `:269,283`); `kind` 一事已由 `10CG/Aria#168` 跟踪 |
+| (f) | `scan.py:195` 用 `rel_path` 拼路径, `:202` / `:218` 上报 `filename` | 成立 |
+| (g) | `handoff-mechanics.md:114-124` 判定表三种场景; standards `session-handoff.md:176` 已限定第三态 | 与计划一致 |
+| 另记 | `session-handoff.md:97`「自动」; 布局锚点 `:15` / `:88` / `:94` / `:304` / `:339`; 两个 collector `exists` 矛盾 (proposal §SC-15 细则 (f) 的处置) | 成立; `write_latest_md` 非测试调用点仍为零 (只在 `writers/__init__.py` 再导出) |
+
+「mv 日」语义按第 3 条**完全不写入**正文。
+
+### 起草时的 AI 判断 (发帖前已呈 owner, owner 按原文授权)
+
+1. 行号按当前代码重新核对, 两处与计划不同 (见上表 (d)(e))。
+2. (e) 注明 `kind` 键名已由 `10CG/Aria#168` 跟踪, 本单只补 `tracks` 这一半 —— 核实时一度判为新发现, 查重后更正, 未当新问题写。
+3. (b)(d) 补与 `10CG/Aria#218` 的互补关系。
+4. 增加计划外的「若将来要修（参考，未裁）」一节 (owner 选项里「删掉该节」未被选)。
+5. 「mv 日」语义不写。
+
+### 第 4 条 — 写法自检 (发帖前) 与发帖核验
+
+| 检查 | 正文 + 标题 | 阳性对照 (用 `chr()` 拼出违规字符的临时文件) |
+|---|---|---|
+| `check_bare_issue_refs.py` | `裸 issue 引用: 0`, 退出 0 | 报出 1 处, 退出 1 |
+| §4.5 自查命令 | 无输出 | 命中 1 行 |
+| `chr(0xFFFD)` 计数 / 希腊字母 (U+0370–U+03FF) | 0 / 0 | — |
+
+- `POST /repos/10CG/aria-plugin/issues` (请求体 `--data-binary @` JSON 文件) 退出 0 ⇒ `number=204`, `state=open`, `created_at=2026-09-27T03:13:37Z`。
+- 独立 `GET /repos/10CG/aria-plugin/issues/204`: `state=open`, 仓 `10CG/aria-plugin`, **标题与正文与发出的逐字相等** (正文 4525 = 4525 字符), 正文 `chr(0xFFFD)` 计数 0。
+
+### 第 5 条 — standards 回填提交
+
+提交 **`d86fc91`** (standards feature; 只 add `conventions/session-handoff.md`, 1 insertion / 1 deletion): `:176` 的回落措辞「(已知缺口, 尚未开跟踪 issue)」→「跟踪见 `10CG/aria-plugin#204`」, 与 TASK-023 第 1 条规定的形态一致; 反引号全限定写法与同节 `Amended` 注一致。
+
+- `grep -n '#<' conventions/session-handoff.md` 退出 1 (零命中); 提交后对 `git show HEAD:` 复核计数 0。
+- 裸 issue 引用检查改前改后同为 10 处存量 (行 6 / 66 / 183 / 213 / 251 / 261 / 359 / 361 / 437), 第 176 行零新增。
+- 行尾 `i/lf w/lf`, 未变。
+- **提交未带 `Co-Authored-By` 行 (AI 流程判断, 请 owner 复议)**: `standards/conventions/git-commit.md` §8.1 明令禁止 `Co-Authored-By: Claude...`, 而 CLAUDE.md Rule #4 以该文件为提交规范 SOT; 本 cycle 此前各提交带了该行。二者谁优先的问题由 `10CG/aria-standards#18` 跟踪, 未裁。
+
+### 未推的部分
+
+standards `d86fc91` 与本台账提交 (主仓 feature) 均**未推**; 备份推送属外向动作, 另请授权 (`hard_constraints` 第 3 条)。
+
+---
+
 ## 变更记录
 
 | 时间 (UTC) | 事件 |
@@ -984,3 +1084,5 @@ aria/github    9625999c734119aba56185edd2b258f215d3da57  -> MATCH
 | 2026-09-25 | **组 2 实现 (TASK-009~014) + TASK-033 收口**: RED → GREEN, 19 条基线红全绿, 全套 `Ran 1627 OK` 零回归; 收口 SHA `9625999`。 |
 | 2026-09-26 | **组 3 反事实 (TASK-015 / 016 / 017 / 018 / 035) 全部完成**: 五个一次性副本生命周期闭合; 三处补丁形态按纪律偏离并记录; 组 3 后全量回归 `Ran 1627 OK` 零泄漏。 |
 | 2026-09-26 | **组 4 文档同步与回归 (TASK-019 / 020 / 021 / 022 / 023 / 024) 全部完成**: SC-11 **19/19** 谓词为真; 两腿回归 1627 + 28 + 11 全绿; SC-12a 逐字段相等、SC-12b 子目录件以真 track 出现 (活体证明); TASK-024 六处复核全部无需改 ⇒ AB 范围不扩大。 |
+| 2026-09-26 | 新会话入口: 两条 active claim 心跳刷新并推后核验 (本轨约 10.7h; `pre-merge-completeness-gate-change-scope` 约 34.7h, 已超 SWEEP_TTL); owner 授权后主仓 master `d33d233` 双推, 两端 `ls-remote` MATCH。 |
+| 2026-09-27 | **TASK-025 完成**: 查重无重复 → 正文逐处实读核对 (两处行号较计划下移) → owner 授权开单 **`10CG/aria-plugin#204`** (GET 核验 open, 标题正文逐字一致) → standards 回填 `d86fc91` (`#<` 零命中)。 |
