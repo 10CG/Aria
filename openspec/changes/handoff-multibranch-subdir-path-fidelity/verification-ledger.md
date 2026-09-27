@@ -623,7 +623,7 @@ OK
 ### 本阶段两处自查发现
 
 1. **SC-9 (d) 的判据对象写错, 已单独提交修正 (`3c0407c`)**: 原断言要求 `data["errors"]` 的消息串含 kind 字面量, 但本仓既有四个 kind 的双通道形态是**同一条 msg 进两个通道**且 msg 从不嵌 kind 名; proposal SC-9 (d) 原文是「含该 kind **语义**的消息串」。改为断言消息串含那条违规路径 —— 两种写法都能抓单通道实现 (那时 `data["errors"]` 为空), 新写法更贴合立意与既有约定, **不是削弱**。属组 1 文件, 故与组 2 收口**分开提交**以守住 TASK-033 第 1 条的「只 add 四个路径」。
-2. **`hard_constraints` 第 10 条违规 11 处, 已修**: 本 cycle 新写的源码注释里 issue 引用写成了 `Aria #195` (带空格) 而非 `<org>/<repo>#<n>`。四个源码文件共 11 处全部改为 `10CG/Aria#195`, 改后复扫新增行裸引用 **0**。
+2. **`hard_constraints` 第 10 条违规 11 处, 已修**: 本 cycle 新写的源码注释里 issue 引用写成了仓名与 `#` 之间带空格、缺 org 段的形态, 而非 `<org>/<repo>#<n>`。四个源码文件共 11 处全部改为 `10CG/Aria#195`, 改后复扫新增行裸引用 **0**。
 3. **一处既有希腊字母, 未改**: `scan.py` 含一个 U+0394 (大写 Delta 字形, 此处只写码位以免本台账自身成为含禁用字形的文件)。经 diff 核实**不在本 cycle 新增行内**, 基线 `1cb3872` 即已存在 1 次, 且语境是数学差值 (注释原文为 `negative <U+0394> = healthiest signal`, 码位替写) 而非标签/编号 ⇒ 不在 `hard_constraints` 第 10 条「本 cycle 新写或改动的文字」范围, 未动。此处记录以免后续扫描误判为本轮引入。
 
 ### TASK-033 收口
@@ -826,7 +826,7 @@ OK                                    ← EXIT 0, FAIL/ERROR 计数 0
 
 - `session-handoff.md` §2.3: 两态判据不动, 新增「目标不在顶层」第三态并限定**经机械 `latest_md_writer` 写入时**; §2.3.1 写入后那句同批补限定从句; 被改小节按 §2.3.5 先例加 `Amended` 标注 (标明 additive)。
 - `layer-l-integration.md` 的「单 track: 更新 latest.md pointer」一行补子目录限定 ⇒ **(l3) PASS**。
-- **Version 头保持 1.3.0 未 bump (判断与理由)**: 该文件的版本头已由 `10CG/aria-standards#20` 专门跟踪 (它指出前两次实质增量未 bump、建议 1.4.0)。本次是第三次 additive 增量; 在此自行 bump 会把三次合并进一个号、掩盖 `#20` 记录的事实, 且 standards 版本治理不在本 spec 范围。**请 owner 复议**。
+- **Version 头保持 1.3.0 未 bump (判断与理由)**: 该文件的版本头已由 `10CG/aria-standards#20` 专门跟踪 (它指出前两次实质增量未 bump、建议 1.4.0)。本次是第三次 additive 增量; 在此自行 bump 会把三次合并进一个号、掩盖 `10CG/aria-standards#20` 记录的事实, 且 standards 版本治理不在本 spec 范围。**请 owner 复议**。
 - **手改路径措辞取 TASK-025 的回落形态**: verification 第 1 条要求写「跟踪见 `10CG/aria-plugin#<TASK-025 开出的号>`」, 但 TASK-025 依赖 TASK-021 且是 owner gate, 号此刻不存在。为不在仓库里留 `#<` 占位符 (TASK-025 verification 第 5 条要求回填后该 grep 零命中), 本轮直接落**回落措辞**「(已知缺口, 尚未开跟踪 issue)」, 待 TASK-025 开单后按其第 5 条回填。落笔后实跑 `grep -n '#<' conventions/session-handoff.md` **零命中**。**这是 AI 流程判断, 请 owner 复议**。
 - **五处扁平布局描述复核** (verification 第 5 条): `:15` 目录级 canonical 声明 · `:88` / `:94` 文件名模板 · `:304` `docs/handoff/*.md` 非递归 glob · `:339` 输出路径硬编码不接受 dir 参数。五处**均隐含扁平布局**, 但本 spec 只修「读到子目录文件时不伪造 legacy 行」、不对子目录布局表态 ⇒ 不改, 交遗留 issue。
 
@@ -1183,7 +1183,7 @@ check_bare_issue_refs.py  RESULT.md / PREDICTION.md / SCORES.md / issue 草稿  
 chr(0xFFFD) 计数                                                             → 四个文件均 0
 ```
 
-RESULT.md 回填单号与裁定后复跑 `check_bare_issue_refs.py` → rc=0。评分员写的 15 份 `GRADER_CRITIQUE.md` (13 个主样本 + eval 5 两次复跑) 同样是新文字, 自检发现 5 份共 8 处裸引用 (`#195` / `#199` / `#206`, 均指本仓) → 主控机械补成 `10CG/Aria#N`, 评分判断一字未改 → 复跑 `裸 issue 引用: 0`; §4.5 扫结果目录全部 78 份 md 零命中。另对结果目录 283 个文件做凭据形态扫描 (只报键名与长度, 不读值): 零命中, `FORGEJO_TOKEN` 等出现处全部是变量名。
+RESULT.md 回填单号与裁定后复跑 `check_bare_issue_refs.py` → rc=0。评分员写的 15 份 `GRADER_CRITIQUE.md` (13 个主样本 + eval 5 两次复跑) 同样是新文字, 自检发现 5 份共 8 处裸引用 (号 195 / 199 / 206, 均指本仓, 原文缺 `10CG/Aria` 前缀) → 主控机械补成 `10CG/Aria#N`, 评分判断一字未改 → 复跑 `裸 issue 引用: 0`; §4.5 扫结果目录全部 78 份 md 零命中。另对结果目录 283 个文件做凭据形态扫描 (只报键名与长度, 不读值): 零命中, `FORGEJO_TOKEN` 等出现处全部是变量名。
 
 ### substitute 证据保留
 
@@ -1281,6 +1281,29 @@ docs(conventions): session-handoff Version 1.3.0 → 1.4.0 — 补齐三次增�
 
 aria `1ad31fa`、standards `56306d1`、主仓 feature 上的 `be91134` 与本节所在提交均**只在本地**。子模块的推送按计划在 TASK-034 (owner 授权后); 主仓 feature 随 TASK-031 或另获授权的备份推送发出。
 
+## TASK-028 — 引用与编号写法自检 第一次 (parent 5.6, 子模块合并前)
+
+**范围** = 截至本任务的本 cycle diff 新增行; 基线取自 TASK-001 第 7 条: aria `1cb3872` · standards `940cb5b` · 主仓 `a52b5eb` (只限本 Spec 目录, 不含 proposal.md 存量文字 —— 本 cycle 未改 proposal.md)。**导出方式**: scratchpad 脚本解析 `git diff <基线> <终点> -U0` 的新增行, 原样写出, 同时生成「导出行号 → 源文件:行号」索引, 命中据此回溯。检查器以各仓根调用 (`--repo-root=<该仓根>`): aria 与 standards 没有允许清单, 按最严执行; 主仓读 `.aria/bare-issue-ref-allowlist.txt`。本节全部判定只针对导出的新增行, 不以「整份文件 rc 0」为门槛 (§4.4 执行口径)。
+
+| 仓 | 新增行 / 文件数 | 裸引用 (首跑) | 处置 | 复跑 |
+|---|---|---|---|---|
+| aria | 1481 / 16 | 2 (同在 `VERSION:5`) | 订正, aria 提交 `820ea57` | 0 (对 `820ea57` 重新导出) |
+| standards | 5 / 1 | 0 | — | — |
+| 主仓 Spec 目录 | 1307 / 2 | 5 (台账 3 行) | 订正, 随本节同一提交 | 0 (对含本节的暂存区重新导出; 本节初稿自身命中 2 处, 见第 1 条) |
+
+**命中明细与处置**:
+
+1. aria `VERSION:5` —— v1.73.3 的说明行, 因 v1.74.0 改号时改标「(旧)」而进入本 cycle diff。其中一处跨仓引用缺 org 段 (所指为 `10CG/aria-plugin#196`); 另一处是描述「单级路径伪装」时用的字面例子 (以 `.md` 结尾的两级路径后接井号与数字, 检查器按设计就会拒它)。按 §4.4「改到哪段顺手改哪段」: 前者补全, 后者改为文字描述。**本节初稿又在这一条里逐字引用了这两个坏形态, 复跑当场命中 2 处, 同样改为文字描述** (与第 4 条同一个坑)。
+2. 台账组 2 收口节 (`:626`, 本 cycle 早先写) —— 为说明违规形态而逐字引用了「仓名与号之间带空格、缺 org 段」的写法, 改为文字描述。
+3. 台账 TASK-023 节 (`:829`) —— 只写了井号与号、缺 org 与仓名 (所指为 `10CG/aria-standards#20`), 补全。
+4. 台账 TASK-026 节 (`:1186`) —— **主控本会话自己写的**: 为说明「补全前的形态」而字面列出三个裸号, 改为文字描述。说明写这类记录时自己同样会踩, 本条是本任务存在的理由的一个实例。
+
+序数假阳性 (`10CG/aria-plugin#199` 那一类) 本次零命中, 没有需要按「不改写措辞规避」保留原样的条目。
+
+**另两项**: §4.5 带圈 / 带框字符 (U+2460–U+24FF / U+2776–U+2793 / U+3251–U+325F / U+32B1–U+32BF) 三份导出均 0; 字面 U+FFFD 三份导出均 0 行。
+
+**工作树**: 订正提交后 aria / standards 的 `status --porcelain` 均为 0 行 (TASK-029 第 4 步前提)。**勾选**: 本任务完成即满足 `tasks.md` 5.6 的勾选条件, 勾选动作按计划留到 TASK-032 一次完成。
+
 ---
 
 ## 变更记录
@@ -1302,3 +1325,4 @@ aria `1ad31fa`、standards `56306d1`、主仓 feature 上的 `be91134` 与本节
 | 2026-09-27 | **TASK-026 完成** (NO_PUSH 专用会话): /skill-creator 照跑 state-scanner AB, 13 eval 两臂同为 50/78, delta.pass_rate = +0.0000 (与 PREDICTION 相符); eval 5 复跑两次 1/3 不判回归; 协调 ref 全程 `e911132`; 结论「未被有效测试」→ owner 裁「放行进 TASK-027」; 套件缺口单 **`10CG/aria-plugin#205`** (GET 核验)。 |
 | 2026-09-27 | 普通会话续上 (变量已不在, 实测 `False`): 两条 claim 心跳经前置检查刷新到 `18:14:01Z` / `18:14:11Z`, 推后 origin 与本地均 `4ae229e`。 |
 | 2026-09-27 | **TASK-027 完成**: 取号 `1.74.0` (两个 remote 无 `v1.74.*`, `10CG/Aria#199` 无预留号; 取号时 aria `origin/master` = `1cb3872`); CHANGELOG `[1.74.0]` 三段 + Notes 逐条对真代码核过; aria `1ad31fa` (六个文件, `README.zh.md` 经 owner 当场裁定纳入) · standards `56306d1` (`session-handoff.md` 升 1.4.0, 决策单第 1 项); 均未推送。 |
+| 2026-09-27 | **TASK-028 完成** (写法自检第一次): 三仓新增行 1481 + 5 + 1307; 裸引用首跑 aria 2 / standards 0 / 主仓 5, 全部订正 (aria `820ea57`, 主仓台账三行随本节提交), 复跑归零; §4.5 字符与字面 U+FFFD 均 0。 |
