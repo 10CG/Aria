@@ -1071,6 +1071,41 @@ standards `d86fc91` 与本台账提交 (主仓 feature) 均**未推**; 备份推
 
 ---
 
+## owner 裁定与后续推送 (2026-09-27)
+
+> 本节承接上一节末尾的两处待办, 上一节原文不改。裁定的权威记录是主仓 master 的决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md` (`4c968ca`)。
+
+### 推送 (owner 裁「全部推」)
+
+上一节「未推的部分」已被取代: standards `d86fc91` 与主仓 feature `c5f494f` 均已双推。推前两端均为本地的祖先 (快进), 四次 push 分开执行、各自退出 0, 推后逐 remote 独立 `ls-remote`:
+
+```
+standards feature  origin = d86fc91adb966881d987eb7be9d72dce6fe22d0d  MATCH
+standards feature  github = d86fc91adb966881d987eb7be9d72dce6fe22d0d  MATCH
+主仓 feature       origin = c5f494f9ea5a21ba791db6306fc1bac6f16847d4  MATCH
+主仓 feature       github = c5f494f9ea5a21ba791db6306fc1bac6f16847d4  MATCH
+```
+
+主仓 feature 的两个 gitlink 仍为 aria `1cb3872` / standards `940cb5b` (未动)。
+
+### 提交署名 (上一节「请 owner 复议」一条)
+
+owner 裁「本 cycle 剩余提交不加 `Co-Authored-By: Claude` 行, 按 `git-commit.md` §8.1」。TASK-027 起的提交一律不加。
+
+### standards `session-handoff.md` 的 Version (决策单第 1 项)
+
+owner 裁**本 cycle 升到 1.4.0** (MINOR), 一次补齐 `d217ed0` / `21748d4` / 本 cycle `11b0a14` + `d86fc91` 三次增量, 头部括号逐条列出; **并入 TASK-027 执行**, 在 TASK-029 合并 standards 之前提交到 standards feature 分支; 合并后回帖关闭 `10CG/aria-standards#20` (该回帖到时再请授权)。**本条更正组 4 TASK-023 节「Version 头保持 1.3.0 未 bump」的理由** —— 「会把三次合并进一个号、掩盖记录的事实」不成立: `10CG/aria-standards#20` 自己建议的就是用一个 1.4.0 补齐, 逐条列出不掩盖任何一次。执行时记进 `tasks.md` 的 AI 流程判断清单 (计划外改动)。
+
+### 四条断言的归属订正 (决策单第 2 项)
+
+owner **追认**: 2026-09-25「路径 A」裁定的实质是走三步法反事实, 按计划分工落在 TASK-015 (SC-6 (c)) 与 TASK-018 (SC-18 (c) / SC-15 (e)(h)), 见上文「owner 裁定 (2026-09-25): 取路径 A」一节的逐条对照。
+
+### 本节提交自身
+
+本节所在的台账提交只在本地 feature 分支, **写作时未推** —— 本轮 owner 授权的外向动作只含决策单第 3c 项的落仓推送与第 4 项的两条评论; 它随本轨下一次推送 (TASK-031 或另获授权的备份推送) 一并发出。
+
+---
+
 ## 变更记录
 
 | 时间 (UTC) | 事件 |
@@ -1086,3 +1121,4 @@ standards `d86fc91` 与本台账提交 (主仓 feature) 均**未推**; 备份推
 | 2026-09-26 | **组 4 文档同步与回归 (TASK-019 / 020 / 021 / 022 / 023 / 024) 全部完成**: SC-11 **19/19** 谓词为真; 两腿回归 1627 + 28 + 11 全绿; SC-12a 逐字段相等、SC-12b 子目录件以真 track 出现 (活体证明); TASK-024 六处复核全部无需改 ⇒ AB 范围不扩大。 |
 | 2026-09-26 | 新会话入口: 两条 active claim 心跳刷新并推后核验 (本轨约 10.7h; `pre-merge-completeness-gate-change-scope` 约 34.7h, 已超 SWEEP_TTL); owner 授权后主仓 master `d33d233` 双推, 两端 `ls-remote` MATCH。 |
 | 2026-09-27 | **TASK-025 完成**: 查重无重复 → 正文逐处实读核对 (两处行号较计划下移) → owner 授权开单 **`10CG/aria-plugin#204`** (GET 核验 open, 标题正文逐字一致) → standards 回填 `d86fc91` (`#<` 零命中)。 |
+| 2026-09-27 | owner 裁「全部推」: standards `d86fc91` 与主仓 feature `c5f494f` 双推, 四处 MATCH; owner 裁「照建议」(决策单 `4c968ca`): standards `session-handoff.md` 升 1.4.0 并入 TASK-027 (更正 TASK-023 节「不 bump」的理由) / 四条断言归属订正追认 / 剩余提交不加 `Co-Authored-By`。 |
