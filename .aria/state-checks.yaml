@@ -36,8 +36,19 @@ checks:
       版本类 check 全绿也没看见它。
       范围只覆盖 aria/ 子模块 (随插件分发的交付面); Spec 自身的 tasks.md / proposal.md
       按成文规程**保留**占位符, 不在范围内。
+      2026-09-27 修 (owner 裁定, 决策单 .aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md
+      第 3b 项): 旧写法 `! grep … 2>/dev/null` 把 grep 的出错码 (2, 如 aria/ 未检出或文件不可读)
+      也反转成 0 ⇒ 假绿。现按 grep 退出码三分: 1 = 无命中 (pass) / 0 = 有命中 (fail) /
+      其他 = 没跑成 (fail, UNVERIFIED)。
     command: |
-      ! grep -rn '<vNEXT>' aria/ --include='*.md' --include='*.json' --include='*.yaml' --include='*.py' 2>/dev/null
+      [ -d aria/skills ] || { echo "UNVERIFIED — aria/skills 不存在 (子模块未检出?), 无法判定"; exit 1; }
+      HITS=$(grep -rn '<vNEXT>' aria/ --include='*.md' --include='*.json' --include='*.yaml' --include='*.py')
+      RC=$?
+      case $RC in
+        1) echo "OK (aria/ 交付面无 <vNEXT> 占位符)"; exit 0 ;;
+        0) echo "UNRESOLVED — $(printf '%s\n' "$HITS" | wc -l) 处 <vNEXT>, 首处: $(printf '%s\n' "$HITS" | head -1)"; exit 1 ;;
+        *) echo "UNVERIFIED — grep 退出码 $RC, 扫描没跑成"; exit 1 ;;
+      esac
     severity: warning
     fix: "把命中处的 `<vNEXT>` 替换为本次发布的实取号 (与 aria/.claude-plugin/plugin.json 的 version 一致); 若该处本就该保留占位符, 把它移出 aria/ 或在本 check 的范围里显式排除"
     timeout_seconds: 5
@@ -230,7 +241,11 @@ checks:
       时效内容归 docs/handoff/ (Rule #9) + CHANGELOG.md (SOT)。双预算 (行 200 + 字节 24000,
       2026-07-22): 行数对齐官方 memory 指南, 字节堵长行钻空。写入时刻纪律见规范 §2.4。
       本 check = 防"砍完又长回来"的根因兜底 (2026-07-03 首瘦 + 2026-07-22 二瘦)。
+      2026-09-27 补守卫 (与 no-unresolved-version-placeholder 同族扫描所得): 旧写法在 CLAUDE.md
+      不可读时, grep 吞错得空值按 0 计、wc 失败后整数比较报错被当「不满足」, 最后照样打印 OK
+      并退出 0 ⇒ 假绿。现先断言文件可读, 否则 fail (UNVERIFIED)。
     command: |
+      [ -r CLAUDE.md ] || { echo "UNVERIFIED — CLAUDE.md 不可读, 无法判定"; exit 1; }
       ROLL=$(grep -cE '^> 前次|^\*\*更新\*\*:|^\*\*最近更新\*\*:' CLAUDE.md 2>/dev/null)
       LINES=$(wc -l < CLAUDE.md)
       BYTES=$(wc -c < CLAUDE.md)
