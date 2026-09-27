@@ -3,7 +3,7 @@ track-id: session-close-20260927-195-task025-legacy-issue-204
 owner-container: simonfish/bfe8285d
 phase: D.3
 status: done
-updated-at: 2026-09-27T06:43:34Z
+updated-at: 2026-09-27T12:38:08Z
 ---
 
 # Aria — Session Handoff (2026-09-26 ~ 27, 会话收尾) — `10CG/Aria#195` TASK-025 完成: 遗留缺口单 `10CG/aria-plugin#204`
@@ -16,10 +16,13 @@ updated-at: 2026-09-27T06:43:34Z
 
 ## §0 入口 (新 session 优先读)
 
-1. **工作区状态 (本收尾提交落地之后)**: 主仓在 **`master`**, tip = 本收尾提交 —— **写作时尚未推送**, 推送与 `ls-remote` 核验结果见本会话回复 (自指排除)。`M aria` / `M standards` 是正常中间态: aria 在 feature `b181678`, standards 在 feature `d86fc91`, 两个 gitlink 仍指 master (`1cb3872` / `940cb5b`), bump 归 TASK-030 / 031, **不要 `git add` 它们**。
-2. **TASK-026 的提交落在主仓 feature 分支**: 动手提交前先 `git checkout feature/handoff-multibranch-subdir-path-fidelity` (`c5f494f`, 两端已推)。master 与 feature 两侧 gitlink 相同, 切换不动子模块检出。
-3. **claim**: 两条 active —— `claims/bfe8285d/s-48ca@0612.yaml` (本轨, phase B) 与 `claims/bfe8285d/s-73b9@1606.yaml` (`10CG/Aria#199`, phase A.2); 心跳 `2026-09-27T06:39:24Z` / `06:39:50Z`; 协调 ref 本地 = origin = `ab83304`。**AB 会话里心跳推不出去 ⇒ AB 之后的第一个普通会话最晚 2026-09-28 06:39Z 前刷心跳。**
-4. **本轨权威台账**: `openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md` (feature 分支; 本会话新增「会话入口与 master 推送」与「TASK-025」两节)。
+> **§0 已按收尾后的追记更新 (2026-09-27 12:36Z)**; 收尾后做了什么见文末「追记」一节。
+
+1. **工作区状态 (追记提交落地之后)**: 主仓在 **`master`**, tip = 本追记提交 —— **写作时尚未推送**, 推送与 `ls-remote` 核验结果见本会话回复 (自指排除)。`M aria` / `M standards` 是正常中间态: aria 在 feature `b181678`, standards 在 feature `d86fc91`, 两个 gitlink 仍指 master (`1cb3872` / `940cb5b`), bump 归 TASK-030 / 031, **不要 `git add` 它们**。
+2. **TASK-026 的提交落在主仓 feature 分支**: 动手提交前先 `git checkout feature/handoff-multibranch-subdir-path-fidelity`。本地 feature = `4f91772`, **比两个 remote (`c5f494f`) 多 1 个提交且未推** (台账记 owner 裁定, 不在本轮推送授权内, 随本轨下一次推送发出)。master 与 feature 两侧 gitlink 相同, 切换不动子模块检出。
+3. **claim**: 两条 active —— `claims/bfe8285d/s-48ca@0612.yaml` (本轨, phase B) 与 `claims/bfe8285d/s-73b9@1606.yaml` (`10CG/Aria#199`, phase A.2); 心跳 `2026-09-27T12:35:55Z` / `12:36:25Z`; 协调 ref 本地 = origin = `e911132`。**AB 会话里心跳推不出去 ⇒ AB 之后的第一个普通会话最晚 2026-09-28 12:35Z 前刷心跳。**
+4. **本轨权威台账**: `openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md` (feature 分支; 本会话新增「会话入口与 master 推送」「TASK-025」「owner 裁定与后续推送 (2026-09-27)」三节)。
+5. **owner 2026-09-27 裁「照建议」**: 权威记录是决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md`。与本轨下一步直接相关的一条: **TASK-027 并入 standards `session-handoff.md` 升 1.4.0**。
 
 ---
 
@@ -45,9 +48,9 @@ updated-at: 2026-09-27T06:43:34Z
 
 | # | 项 | 说明 |
 |---|---|---|
-| H1 | **TASK-026 Rule #6 AB —— owner 启动门** | owner 以 `ARIA_COORDINATION_NO_PUSH=1` 新起进程 (进程启动时设, 会话内补不上)。开跑按 `detailed-tasks.yaml` TASK-026 的 verification 逐条走; 最先两条: 核 `git ls-remote origin refs/aria/coordination` 等于 `git rev-parse refs/aria/coordination` (本收尾后两者均为 `ab83304`; 不等则不开跑, 先在普通会话对齐), 再在子进程实测 `no_push_requested_by_env()` 为 True。with 臂 = aria `b181678` (本会话未动 aria, 工作树干净); old 臂 = B.1 基线 `1cb3872` 的一次性 worktree, 建在 scratchpad |
+| H1 | **TASK-026 Rule #6 AB —— owner 启动门** | owner 以 `ARIA_COORDINATION_NO_PUSH=1` 新起进程 (进程启动时设, 会话内补不上)。开跑按 `detailed-tasks.yaml` TASK-026 的 verification 逐条走; 最先两条: 核 `git ls-remote origin refs/aria/coordination` 等于 `git rev-parse refs/aria/coordination` (追记后两者均为 `e911132`; 不等则不开跑, 先在普通会话对齐), 再在子进程实测 `no_push_requested_by_env()` 为 True。with 臂 = aria `b181678` (本会话未动 aria, 工作树干净); old 臂 = B.1 基线 `1cb3872` 的一次性 worktree, 建在 scratchpad |
 | H2 | **TASK-026 内的两个 owner 点** | AB 套件缺口 issue 发帖授权 (`owner_gates` 第 5 项); delta ≤ 0 或回归面判无效度 ⇒ TASK-027 之前经 AskUserQuestion 请 owner 裁 (第 6 项; 按 PREDICTION 预期会触发) |
-| H3 | **TASK-027 起的链** | TASK-027 (MINOR bump + CHANGELOG) → 028 → 029 → 034 → 030 → 031 (C.2) → 032 (Phase D), 全部在 AB 之后、**不带该变量的新会话**里做; 提交**不加** `Co-Authored-By` |
+| H3 | **TASK-027 起的链** | TASK-027 (MINOR bump + CHANGELOG; **并入 standards `session-handoff.md` 升 1.4.0**, 头部括号逐条列三次增量, 记进 AI 流程判断清单) → 028 → 029 → 034 → 030 → 031 (C.2) → 032 (Phase D), 全部在 AB 之后、**不带该变量的新会话**里做; 提交**不加** `Co-Authored-By` |
 
 ### 中优先级
 
@@ -64,12 +67,12 @@ updated-at: 2026-09-27T06:43:34Z
 
 ## §3 待 owner 裁定 / 关键风险
 
-### 待 owner 裁定 (承接自前序会话, 本会话未动)
+### ~~待 owner 裁定~~ → 已裁 (2026-09-27, owner「照建议」, 决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md`)
 
-1. standards `session-handoff.md` 的 Version 保持 1.3.0 不 bump —— 请复议 (理由见 09-26 handoff §3 第 3 条)。
-2. 四条断言归属订正 (TASK-035 → TASK-015 / TASK-018) —— 请追认 (09-26 handoff §3 第 4 条)。
-3. `10CG/Aria#199` 三项: R7 六条 minor 与各轮未处置 minor 的处置时点 / 三批执笔请裁 (v2.4 九条、v2.5 十条、v2.6 两条) / 执笔报告与机器清单是否落仓。
-4. 09-24 提出的两条插件侧 issue 候选是否开单: 入口心跳只认「本会话持有」的 claim / 落后的本地协调 ref 上心跳静默失败。本会话是**第 4 次**实测跨会话超 TTL (`10CG/Aria#199` 那条 34.7h); 按关键词查两仓, 仍无人开单。
+1. standards `session-handoff.md` 的 Version → **升 1.4.0, 并入 TASK-027** (原「保持 1.3.0」的理由不成立, 已更正)。
+2. 四条断言归属订正 → **追认**。
+3. `10CG/Aria#199` 三项 → minor **进 Phase B 前与基线平移合成 v2.7 返修**; 21 条执笔请裁 **5 条已失效 / 12 条追认 / 3 个决定** (override 默认走 PR 标签并补写粒度代价 / History 节交 `10CG/Aria#220` / 占位符检查漏洞另开 Level 1, 未排期); 执笔报告**已落仓** (`5f48b08`)。
+4. 心跳两条候选 → **不开新单**, 已评论 `10CG/aria-plugin#107` (id 26263) 与 `10CG/aria-plugin#169` (id 26265)。
 
 ### 本会话已裁 / 不再需要复议
 
@@ -80,7 +83,7 @@ updated-at: 2026-09-27T06:43:34Z
 
 1. **AB 会话里不要刷心跳, 也不要跑 `phase1_gate`**: 带 `ARIA_COORDINATION_NO_PUSH` 时写进协调 ref 的提交推不出去, 本地会领先 origin, 直接破坏 TASK-026 第 1 条的一致性前提。state-scanner 的入口心跳 (以及 memory 里「新会话先刷心跳」的做法) 在 AB 会话一律跳过 —— 两条 claim 已在收尾前刷到 06:39Z。scan.py 本身只 fetch 不写, 可以跑。
 2. **AB 开跑前协调 ref 可能已被他容器推进**: 双子星或 aria-runner-bot 若在 AB 会话开始前推了协调 ref, 先让 scan.py 的 fetch 快进本地, 再做第 1 条比较; 仍不等 ⇒ 不开跑。
-3. **跨会话心跳老化**: AB 之后的普通会话若晚于 2026-09-28 06:39Z 才开, 两条 claim 都会超 24h。
+3. **跨会话心跳老化**: AB 之后的普通会话若晚于 2026-09-28 12:35Z 才开, 两条 claim 都会超 24h。
 4. **查重的检索面**: Forgejo `q=` 对中文词是模糊匹配 (`子目录` 命中 116 条, 近全量)。TASK-026 的套件缺口 issue 查重用标识符类检索词 (`handoff_multibranch` / `legacy` / `basename` / `tracks_multibranch` 等)。
 
 ---
@@ -119,7 +122,7 @@ ARIA_COORDINATION_NO_PUSH=1 claude
 ```
 
 1. **AB 会话**: 跑 scan.py (只 fetch), **跳过心跳** (§3 关键风险第 1 条) → TASK-026 第 1 / 2 条 (协调 ref 一致 + 变量生效) → 主仓切 feature 分支 → 按 verification 走完 → 第 3 步 `git fetch origin +refs/aria/coordination:refs/aria/coordination` 强制对齐 → 退出该进程。
-2. **AB 之后的普通会话** (不带该变量, 最晚 2026-09-28 06:39Z 前开): 先刷两条 claim 心跳 → 若触发 owner 点则先裁 → TASK-027 起。
+2. **AB 之后的普通会话** (不带该变量, 最晚 2026-09-28 12:35Z 前开): 先刷两条 claim 心跳 → 若触发 owner 点则先裁 → TASK-027 起。
 3. `{id: handoff-multibranch-subdir-path-fidelity, desc: "10CG/Aria#195 组 5 剩 TASK-026~032 + 034; 下一步 TASK-026 AB (owner 以 ARIA_COORDINATION_NO_PUSH=1 启动新进程)"}`
 4. `{id: pre-merge-completeness-gate-change-scope, desc: "10CG/Aria#199 A.2 已收敛, B.1 入口门 = 10CG/Aria#195 完成 C.2"}`
 
@@ -140,8 +143,11 @@ ARIA_COORDINATION_NO_PUSH=1 claude
 | 主仓 `master` | 本收尾提交 (本文件 + `latest.md`) | 写作时未推, 见会话回复 |
 | 主仓 feature | `c5f494f` (台账: 会话入口 + TASK-025) | origin / github MATCH |
 | standards feature | `d86fc91` (回填 `10CG/aria-plugin#204`) | origin / github MATCH |
-| `refs/aria/coordination` | `ae24f81` (09-26 心跳) → `ab83304` (09-27 心跳) | origin MATCH |
+| `refs/aria/coordination` | `ae24f81` (09-26 心跳) → `ab83304` (09-27 06:39 心跳) → `e911132` (09-27 12:36 心跳) | origin MATCH |
 | 外向 | issue `10CG/aria-plugin#204` | GET 核验 open |
+| 主仓 `master` (追记) | `5f48b08` (执笔报告落仓) · `4c968ca` (决策单) · 本追记提交 | 写作时未推, 见会话回复 |
+| 主仓 feature (追记) | `4f91772` (台账记 owner 裁定) | **本地, 未推** (不在本轮推送授权内) |
+| 外向 (追记) | 评论 `10CG/aria-plugin#107` id 26263 · `10CG/aria-plugin#169` id 26265 | GET 核验在且正文逐字一致 |
 
 每次推送前都核实两端是本地的祖先 (快进), 推后逐 remote 独立 `ls-remote`; 本会话零 force、零半推。
 
@@ -153,6 +159,27 @@ ARIA_COORDINATION_NO_PUSH=1 claude
 - **追记** `feedback_premature_completion_claims_need_ls_before_write` —— 自指形态: 收尾文档的状态描述被收尾提交自身证伪。
 - **追记** `feedback_check_concurrent_track_shipped_before_starting_spec` —— 查重粒度到每条子项 + Forgejo `q=` 对中文词模糊匹配。
 - `MEMORY.md`: 149 行 / 24035 字节 (新增 1 行; 维护行的旧流水压成摘要腾出字节, 知识都在被链接文件里)。
+
+---
+
+## 追记 (2026-09-27 12:36Z) — 收尾之后: owner 裁「照建议」及落地
+
+收尾提交 `0cae00f` 双推之后, owner 要求 AI 对 §3 的四项待裁给建议。AI 逐项核实后给出建议与代价, owner 答「照建议」(同时授权 3c 的落仓推送与第 4 项的两条评论)。
+
+| 项 | 落地 |
+|---|---|
+| 权威记录 | 决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md` (`4c968ca`) |
+| 3c 执笔报告落仓 | `5f48b08`: v2.4 / v2.5 / v2.6 的派单与执笔报告 6 个文件逐字节原样落到 `.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/` (sha256 逐一一致; 落仓前凭据形态扫描零命中), 另附来源说明; `writer-work/` 等约 790MB 不落仓 |
+| 4 心跳候选 | 评论 `10CG/aria-plugin#107` (id 26263: 触发条件按会话写的残余缺口 + 四次实测 + 最小修法) 与 `10CG/aria-plugin#169` (id 26265: 调用方一侧的规避做法); 独立 GET 核验两条在且正文逐字一致 |
+| 1 / 2 | 记入本轨台账 `4f91772` (feature 分支, **本地未推**) |
+| 心跳 | 追记前再刷新: `12:35:55Z` / `12:36:25Z`, 协调 ref 两端 `e911132` |
+
+**核实过程中的两处更正** (建议前按事实核, 不凭印象):
+
+- 09-26 台账里「standards Version 保持 1.3.0」的理由不成立 —— `10CG/aria-standards#20` 自己建议用一个 1.4.0 补齐, 逐条列出不掩盖任何一次。
+- 心跳两条候选在建议「开单」前先按标识符查重, 发现已被 `10CG/aria-plugin#107` / `10CG/aria-plugin#169` 覆盖 (本会话刚记下的「子项定性前先查重」教训的第一次应用)。
+
+**新增 carry**: (1) TASK-027 并入 standards 升 1.4.0; (2) `10CG/Aria#199` 的 v2.7 返修 (本轨 C.2 之后、`10CG/Aria#199` B.1 之前), 输入 = 决策单第 3a / 3b 项; (3) 主仓 `.aria/state-checks.yaml` 的 `no-unresolved-version-placeholder` 假绿修复 (Level 1, 已批准、未排期); (4) standards 合并后回帖关闭 `10CG/aria-standards#20` (届时再请授权)。
 
 ---
 
