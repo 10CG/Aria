@@ -3,7 +3,7 @@ track-id: session-close-20260927-195-task025-legacy-issue-204
 owner-container: simonfish/bfe8285d
 phase: D.3
 status: done
-updated-at: 2026-09-27T12:38:08Z
+updated-at: 2026-09-27T13:07:05Z
 ---
 
 # Aria — Session Handoff (2026-09-26 ~ 27, 会话收尾) — `10CG/Aria#195` TASK-025 完成: 遗留缺口单 `10CG/aria-plugin#204`
@@ -16,13 +16,13 @@ updated-at: 2026-09-27T12:38:08Z
 
 ## §0 入口 (新 session 优先读)
 
-> **§0 已按收尾后的追记更新 (2026-09-27 12:36Z)**; 收尾后做了什么见文末「追记」一节。
+> **§0 已按收尾后的两次追记更新 (最后一次 2026-09-27 13:07Z)**; 收尾后做了什么见文末「追记」「追记二」两节。
 
 1. **工作区状态 (追记提交落地之后)**: 主仓在 **`master`**, tip = 本追记提交 —— **写作时尚未推送**, 推送与 `ls-remote` 核验结果见本会话回复 (自指排除)。`M aria` / `M standards` 是正常中间态: aria 在 feature `b181678`, standards 在 feature `d86fc91`, 两个 gitlink 仍指 master (`1cb3872` / `940cb5b`), bump 归 TASK-030 / 031, **不要 `git add` 它们**。
-2. **TASK-026 的提交落在主仓 feature 分支**: 动手提交前先 `git checkout feature/handoff-multibranch-subdir-path-fidelity`。本地 feature = `4f91772`, **比两个 remote (`c5f494f`) 多 1 个提交且未推** (台账记 owner 裁定, 不在本轮推送授权内, 随本轨下一次推送发出)。master 与 feature 两侧 gitlink 相同, 切换不动子模块检出。
+2. **TASK-026 的提交落在主仓 feature 分支**: 动手提交前先 `git checkout feature/handoff-multibranch-subdir-path-fidelity`。feature = `4f91772` (台账记 owner 裁定), owner 追加授权后已双推, 两端 MATCH。master 与 feature 两侧 gitlink 相同, 切换不动子模块检出。
 3. **claim**: 两条 active —— `claims/bfe8285d/s-48ca@0612.yaml` (本轨, phase B) 与 `claims/bfe8285d/s-73b9@1606.yaml` (`10CG/Aria#199`, phase A.2); 心跳 `2026-09-27T12:35:55Z` / `12:36:25Z`; 协调 ref 本地 = origin = `e911132`。**AB 会话里心跳推不出去 ⇒ AB 之后的第一个普通会话最晚 2026-09-28 12:35Z 前刷心跳。**
 4. **本轨权威台账**: `openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md` (feature 分支; 本会话新增「会话入口与 master 推送」「TASK-025」「owner 裁定与后续推送 (2026-09-27)」三节)。
-5. **owner 2026-09-27 裁「照建议」**: 权威记录是决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md`。与本轨下一步直接相关的一条: **TASK-027 并入 standards `session-handoff.md` 升 1.4.0**。
+5. **owner 2026-09-27 裁「照建议」**: 权威记录是决策单 `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md`。与本轨下一步直接相关的一条: **TASK-027 并入 standards `session-handoff.md` 升 1.4.0**。另: 两条 state-check 的出错假绿已作为 Level 1 修掉 (`0ed4a31`), `no-unresolved-version-placeholder` 通过时首行现为 `OK (…)`, 没跑成则 `UNVERIFIED` 并失败 —— 本轨 TASK-030 的 custom checks 复跑照常看退出码即可。
 
 ---
 
@@ -145,8 +145,9 @@ ARIA_COORDINATION_NO_PUSH=1 claude
 | standards feature | `d86fc91` (回填 `10CG/aria-plugin#204`) | origin / github MATCH |
 | `refs/aria/coordination` | `ae24f81` (09-26 心跳) → `ab83304` (09-27 06:39 心跳) → `e911132` (09-27 12:36 心跳) | origin MATCH |
 | 外向 | issue `10CG/aria-plugin#204` | GET 核验 open |
-| 主仓 `master` (追记) | `5f48b08` (执笔报告落仓) · `4c968ca` (决策单) · 本追记提交 | 写作时未推, 见会话回复 |
-| 主仓 feature (追记) | `4f91772` (台账记 owner 裁定) | **本地, 未推** (不在本轮推送授权内) |
+| 主仓 `master` (追记) | `5f48b08` (执笔报告落仓) · `4c968ca` (决策单) · `1ee0165` (追记一) | origin / github MATCH |
+| 主仓 `master` (追记二) | `0ed4a31` (Level 1: 两条 state-check 假绿修复) · 本追记二提交 | 写作时未推, 见会话回复 |
+| 主仓 feature (追记) | `4f91772` (台账记 owner 裁定) | owner 追加授权后双推, origin / github MATCH |
 | 外向 (追记) | 评论 `10CG/aria-plugin#107` id 26263 · `10CG/aria-plugin#169` id 26265 | GET 核验在且正文逐字一致 |
 
 每次推送前都核实两端是本地的祖先 (快进), 推后逐 remote 独立 `ls-remote`; 本会话零 force、零半推。
@@ -179,7 +180,18 @@ ARIA_COORDINATION_NO_PUSH=1 claude
 - 09-26 台账里「standards Version 保持 1.3.0」的理由不成立 —— `10CG/aria-standards#20` 自己建议用一个 1.4.0 补齐, 逐条列出不掩盖任何一次。
 - 心跳两条候选在建议「开单」前先按标识符查重, 发现已被 `10CG/aria-plugin#107` / `10CG/aria-plugin#169` 覆盖 (本会话刚记下的「子项定性前先查重」教训的第一次应用)。
 
-**新增 carry**: (1) TASK-027 并入 standards 升 1.4.0; (2) `10CG/Aria#199` 的 v2.7 返修 (本轨 C.2 之后、`10CG/Aria#199` B.1 之前), 输入 = 决策单第 3a / 3b 项; (3) 主仓 `.aria/state-checks.yaml` 的 `no-unresolved-version-placeholder` 假绿修复 (Level 1, 已批准、未排期); (4) standards 合并后回帖关闭 `10CG/aria-standards#20` (届时再请授权)。
+**新增 carry**: (1) TASK-027 并入 standards 升 1.4.0; (2) `10CG/Aria#199` 的 v2.7 返修 (本轨 C.2 之后、`10CG/Aria#199` B.1 之前), 输入 = 决策单第 3a / 3b 项; (3) ~~主仓 `.aria/state-checks.yaml` 的 `no-unresolved-version-placeholder` 假绿修复 (Level 1, 已批准、未排期)~~ → 已完成, 见下节「追记二」; (4) standards 合并后回帖关闭 `10CG/aria-standards#20` (届时再请授权)。
+
+---
+
+## 追记二 — owner「都推, Level 1 也顺手做掉」
+
+1. **feature 台账提交双推**: `4f91772` 推前两端为 `c5f494f` 且是祖先 (快进), 推后 origin / github 均 MATCH。
+2. **Level 1 修复 `0ed4a31`** (直接提交 master, 与该文件历次改动的惯例一致):
+   - `no-unresolved-version-placeholder`: 旧写法 `! grep … 2>/dev/null` 把 grep 出错码也反转成 0。改为先断言 `aria/skills` 存在, 再按 grep 退出码三分 (1 = pass, 首行 `OK (…)` / 0 = fail, 列处数与首处 / 其他 = fail, `UNVERIFIED`)。
+   - **同族扫描** 16 条 check: 另有 `claude-md-changelog-free` 同类假绿 (CLAUDE.md 不可读时照样打印 OK 并退出 0), 一并补可读断言; `silknode-contract-deferral-expiry` (扫描命中的 `!` 是文件测试) 与 `plugin-version-arch-docs-match` (读不到即显式 `##SKIP##`) 经逐条阅读判为不同类, 未动。
+   - **验证**: 按运行器同一方式 (`shell=True` + 指定 cwd) 在夹具上跑 7 个情形 —— 三处假绿 (aria/ 缺失 / 文件不可读 / CLAUDE.md 缺失) 改前均 pass、改后均 fail; 其余四个情形判定不变。真仓 `scan.py` 的 custom checks 16/16 pass。
+3. **给 `10CG/Aria#199` v2.7 的新输入**: 该计划对这条检查的 10 处描述 (`tasks.md` 3 / `detailed-tasks.yaml` 7) 按旧行为写成「以 `!` 反转、通过时无输出、换目录起跑仍退出 0」; 须随 v2.7 改, 细节见决策单「落地记录」下的说明。本轨 (`10CG/Aria#195`) 计划没有引用该检查, 不受影响。
 
 ---
 

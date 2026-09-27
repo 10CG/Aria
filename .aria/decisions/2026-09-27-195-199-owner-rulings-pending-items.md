@@ -75,5 +75,8 @@ container: simonfish/bfe8285d
 |---|---|---|
 | 3c | 主仓 master `5f48b08` (6 个文件 + 两处 README) | 6 个文件 sha256 与源文件逐一一致; 落仓前凭据形态扫描零命中 |
 | 4 | `10CG/aria-plugin#107` 评论 id 26263 · `10CG/aria-plugin#169` 评论 id 26265 (均 2026-09-27T12:33:03Z) | 独立 GET 两条均在且正文与发出的逐字相等; 评论数 0 → 1 / 2 → 3 |
-| 1 / 2 | 记入 `10CG/Aria#195` 台账 (feature 分支); 第 1 项的升版随 TASK-027 执行 | — |
+| 1 / 2 | 记入 `10CG/Aria#195` 台账 `4f91772` (feature 分支; owner 同日追加授权后双推, 两端 MATCH); 第 1 项的升版随 TASK-027 执行 | — |
 | 3a / 3b | 作为 v2.7 返修的输入 (本轨 B.1 之前) | — |
+| 3b 第 3 个决定 | owner 同日追加「Level 1 也顺手做掉」→ 主仓 master `0ed4a31`: 占位符检查按 grep 退出码三分并先断言 `aria/skills` 存在; 同族扫描 16 条 check 另发现 `claude-md-changelog-free` 同类假绿 (CLAUDE.md 不可读仍打印 OK 并退出 0), 一并补可读断言 | 按运行器同一方式在夹具上实测 7 个情形: 三处假绿改前均 pass、改后均 fail, 其余四个情形判定不变; 真仓 custom checks 16/16 pass |
+
+**v2.7 返修须一并处理的新输入 (由上一行引起)**: 本轨计划对 `no-unresolved-version-placeholder` 的描述 (`tasks.md` 3 处 / `detailed-tasks.yaml` 7 处) 按旧行为写成 —— 「以 `!` 反转 grep 退出码并丢弃 stderr」「通过时无输出」「换到别的目录起跑仍无输出且退出 0」, 以及据此加的 `test -d aria/skills` 前置。`0ed4a31` 之后: 通过时首行为 `OK (…)`; `aria/skills` 不存在或 grep 出错一律退出 1 且首行 `UNVERIFIED — …`。TASK-029 custom checks 条的期望首行须改 (该检查从「无输出」变为以 `OK` 开头, 与 R7 `6be9db6a`「首行须为 OK 按字面全等」那条 minor 同批按「以 OK 开头」处理); `test -d` 前置变为冗余但无害, 去留由 v2.7 定。
