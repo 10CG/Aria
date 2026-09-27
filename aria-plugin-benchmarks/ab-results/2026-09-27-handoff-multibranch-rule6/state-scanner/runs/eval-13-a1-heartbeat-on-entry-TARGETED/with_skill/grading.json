@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "[承重] (A) 明确给出 `--heartbeat-only` 模式的调用, 且命令行含 `phase1_gate.py` 与 `--phase A.1`",
+      "passed": true,
+      "evidence": "(A) 给出 `python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/phase1_gate.py\" --heartbeat-only --raw-track-id \"a1-entry-claim-duplicate-work-guard-023236f2\" --phase A.1 --repo-path \"/home/dev/Aria\"` 及展开路径版本, 三要素齐全。"
+    },
+    {
+      "text": "[承重] (A) 说明目的是刷新既有 claim 的 heartbeat_at (而非新认领一条 claim)",
+      "passed": true,
+      "evidence": "(A) 说明 2:「heartbeat_by_track 按 (本容器, 归一后的 track_id, active) 找到这条 claim, 只改写 heartbeat_at, 然后推送一次。它不做 reconcile, 不自己 fetch, 也不新建 claim」—— 与 phase1_gate.py 1135-1137 行 docstring「no reconcile ... no fetch of its own, no new claim」一致。"
+    },
+    {
+      "text": "[承重] (B) 明确 enabled == false ⇒ 零 heartbeat 调用 / 不写 claim / 不推送",
+      "passed": true,
+      "evidence": "(B)「不调用 `--heartbeat-only`（零触发），也不调用 Phase B 的 run_gate/phase1_gate 认领闸门（零调用）」。未逐字写「不写 claim / 不推送」, 但写/推只能经 phase1_gate 发生, 两条入口都零调用即等价; 另写「AI 不应自己改配置去绕开」。按实质判过 (与 X 断言 2 同口径)。"
+    },
+    {
+      "text": "[承重] (C) 明确回答「不改变」—— 触发条件是「持 active claim 且 enabled==true 的每次入口」, 不依赖 collision.kind",
+      "passed": true,
+      "evidence": "(C) 标题直接「collision.kind 为空：不改变 (A) 的答案」, 正文「A.1 心跳的触发条件只有『持 active claim 且 enabled == true』。SKILL.md 明确写了『不依赖 collision.kind』」。"
+    },
+    {
+      "text": "不把 (A) 答成「先跑 phase1_gate 认领」或「跑完整闸门」—— heartbeat 模式不认领、不判碰撞、不 fetch",
+      "passed": true,
+      "evidence": "(A) 明确「不做 reconcile，不自己 fetch，也不新建 claim」, 并把 Phase B 认领闸门列为另一个触点; 心跳后才跑 scan.py 的顺序表述不涉及认领/闸门。"
+    },
+    {
+      "text": "不声称心跳遥测会进 production 分区 (它走独立的 heartbeat 分区, coordination_probe 不计)",
+      "passed": true,
+      "evidence": "(A) 说明 4:「失败时为 error，只记进 heartbeat 遥测分区（不进 production）」。"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "executor_duration_seconds": 134.0,
+    "total_tokens": 80040
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "user-options-display",
+  "prompt": "查看项目状态，给我可选操作",
+  "assertions": [
+    {
+      "text": "Should show numbered options for user selection"
+    },
+    {
+      "text": "Should mention custom input option"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "eval_id": 3,
+  "eval_name": "readme-sync-detection",
+  "prompt": "检查项目状态，特别注意文档版本是否一致",
+  "assertions": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync"
+    },
+    {
+      "text": "Should output readme_status section"
+    }
+  ]
+}

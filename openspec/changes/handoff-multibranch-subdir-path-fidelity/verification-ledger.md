@@ -1104,6 +1104,103 @@ owner **追认**: 2026-09-25「路径 A」裁定的实质是走三步法反事�
 
 本节所在的台账提交只在本地 feature 分支, **写作时未推** —— 本轮 owner 授权的外向动作只含决策单第 3c 项的落仓推送与第 4 项的两条评论; 它随本轨下一次推送 (TASK-031 或另获授权的备份推送) 一并发出。
 
+## TASK-026 — Rule #6 照跑 AB (parent 5.5)
+
+> 会话: owner 以 `ARIA_COORDINATION_NO_PUSH=1` 新起的专用进程 (2026-09-27); 按 09-27 handoff §3 关键风险第 1 条, **本会话未刷心跳、未跑 `phase1_gate`**。结果目录 `aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/` (结论全文见其 `RESULT.md`, 本节只记核验事实)。执行方式: `/skill-creator` (benchmark 流程), 臂与评分员均为子 agent。
+
+### 第 1 条 — 协调 ref 一致 (开跑前, 16:52Z)
+
+```
+git ls-remote origin refs/aria/coordination  = e91113242a3d087b718ab08608f55a92041c2658
+git rev-parse refs/aria/coordination         = e91113242a3d087b718ab08608f55a92041c2658   ⇒ 一致
+```
+
+另记: `github` 远端的 `refs/aria/coordination` 为 `ad0287f` (2026-05-24, 是 `e911132` 的祖先) —— 协调 ref 只在 origin 维护, 本条判据只比 origin, 不影响开跑。
+
+### 第 1 条补测 — 变量生效
+
+```
+$ python3 -B -c "import sys; sys.path.insert(0, 'aria/skills/state-scanner'); from lib.failure_handlers import no_push_requested_by_env; print(no_push_requested_by_env())"
+True
+```
+
+### 第 2 条 — push_skipped 核验: **未触达**
+
+30 个 run 的 transcript 逐个审计 (`dispatch/transcript_audit.txt`): phase1_gate / release_gate **零执行**; regex 命中的 12 处逐条核过, 全部是写进 answer.md 的 heredoc 命令文本; 无任何 `push_skipped` 输出。该步空真, 不算核验通过, 由第 1 / 第 3 步前后比对兜底。
+
+### 第 3 步 — 强制对齐 (17:32:24Z)
+
+```
+执行前  本地 = e911132…   origin = e911132…
+git fetch origin +refs/aria/coordination:refs/aria/coordination
+执行后  本地 = e911132…   origin = e911132…
+```
+
+AB 期间远端 ref 未变化 (运行中另抽查两次, 两端均 `e911132`) ⇒ 无需逐 commit 核作者。
+
+### 预测 — PREDICTION.md
+
+写入时刻 **2026-09-27T16:56:51Z**, 先于任何臂 (首批臂 16:57:32Z 派出); sha256 `3aab0a78d923d09b23d63abb126d8796d0e47e416e0105b68943215f4e8c765d`, 全程未改。预测: 两臂逐 eval 相等, delta ≈ 0。
+
+### 两臂口径与路径核验
+
+- 口径「代码 + 文档整体」。with = aria `b181678619023910bb4eed7266afc765ce937322`; 开跑前断言 `git -C aria rev-parse HEAD` = 该 SHA, `git -C aria status --porcelain` 0 行 ⇒ 直接用 `aria/skills/state-scanner`。
+- old = `1cb387218935433312fde4067c276754b77686a8` 的一次性 worktree: 16:54:09Z `git -C aria worktree add --detach <scratchpad>/old-arm-1cb3872 1cb3872` (HEAD 实测 = 该 SHA, 工作树 0 行改动); 17:32:57Z `git -C aria worktree remove` (之后 `worktree list` 只剩主工作树)。
+- 两臂提示均写明各自 `SKILL.md` 与 `scan.py` 的绝对路径。transcript 审计: 26 个 run 跑了 scan.py, 全部是本臂那一份; eval 12 / 13 的 4 个 run 按题面未跑。**零作废、零补跑**。
+- 派臂前实测两臂差异 (写进 PREDICTION): `SKILL.md` 逐字节相同; 本仓 snapshot 只差 `tracks_multibranch.unreadable_count` 与每条 track 的 `rel_path` 两个新增键。
+
+### 结果与无回归判据
+
+`tools/score.py` 从两臂 `grading.json` 直算 (`SCORES.md`):
+
+```
+主样本 13 eval / 78 断言: with 50/78 · old 50/78
+mean(with pass_rate) = 0.7141; mean(old pass_rate) = 0.7141
+delta.pass_rate = +0.0000
+主样本 with < old: eval-5 (3/6 vs 4/6) ⇒ 复跑两次: rep2 3/6 = 3/6, rep3 3/6 = 3/6 ⇒ 1/3 ⇒ 不判回归
+```
+
+评分口径: 每个 eval 由同一评分员一次评两臂, 两臂以随机 X / Y 匿名。需复跑的 eval 仅 1 条 (< 3) ⇒ 不拆任务。未判回归 ⇒ 止损未触发。
+
+### 与 SOT 验收判据的关系
+
+场景 1 验收 `delta.pass_rate > 0` **未达成**; 回归面判为无效度 (两臂 AI 可见输入几乎相同 + 套件对改动面零覆盖 + 大面积恒真 / 恒假断言) ⇒ 结论「**未被有效测试**」, 不单独构成通过。
+
+### owner 裁定 (2026-09-27, AskUserQuestion, 附 PREDICTION 对照与套件缺口单草稿)
+
+原文 (选项): **「放行进 TASK-027 (推荐)」** —— 选项说明: 「认定 Rule #6 义务已照跑履行; 这组改动的鉴别力由已有替代证据承担 (TASK-007 RED / TASK-015~018+035 反事实 / TASK-021 全绿 / TASK-022 活体), 套件测不到的面靠缺口单跟踪。代价: 本 cycle 的 ship 态边际增益没有任何 AB 数字支撑, 只能写「未被有效测试」。」
+
+### 套件缺口 issue — `10CG/aria-plugin#205`
+
+- 查重 (`state=all`, 检索词 `handoff_multibranch` / `tracks_multibranch` / `ab-suite` / `state-scanner.json` / `basename` / `legacy`): 相关 `10CG/aria-plugin#157` / `10CG/aria-plugin#177` / `10CG/aria-plugin#204` 逐条读正文, 均不覆盖本缺口 ⇒ 无重复。
+- owner 同一次 AskUserQuestion 授权「按草稿发帖」→ POST 返回 205 → 独立 GET: `state=open`, 标题逐字一致, 正文逐字一致 (1967 字符)。
+
+### 写法自检 (落盘 / 发帖前)
+
+```
+check_bare_issue_refs.py  RESULT.md / PREDICTION.md / SCORES.md / issue 草稿  → 裸 issue 引用: 0, rc=0
+§4.5 自查命令                                                                → 无输出
+chr(0xFFFD) 计数                                                             → 四个文件均 0
+```
+
+RESULT.md 回填单号与裁定后复跑 `check_bare_issue_refs.py` → rc=0。评分员写的 15 份 `GRADER_CRITIQUE.md` (13 个主样本 + eval 5 两次复跑) 同样是新文字, 自检发现 5 份共 8 处裸引用 (`#195` / `#199` / `#206`, 均指本仓) → 主控机械补成 `10CG/Aria#N`, 评分判断一字未改 → 复跑 `裸 issue 引用: 0`; §4.5 扫结果目录全部 78 份 md 零命中。另对结果目录 283 个文件做凭据形态扫描 (只报键名与长度, 不读值): 零命中, `FORGEJO_TOKEN` 等出现处全部是变量名。
+
+### substitute 证据保留
+
+`metadata.rule6_note` 所列 TASK-007 RED / TASK-015..018 与 TASK-035 三步法反事实 / TASK-021 全绿**原样保留**, 未因跑了 AB 削减。
+
+### 附带发现 (未开单, 见 RESULT.md §6)
+
+主仓 `VERSION` 子模块表 aria 行仍为 `v1.73.0` (实际 1.73.3, 自 `6a7ab16` 起未同步, 无 check 覆盖); `aria/README*.md` Skill 列表漏 `issue-triage` / `session-closer`。与本 spec 无关, 是否开单请 owner 另定。
+
+### 退出 NO_PUSH 会话
+
+本节提交后本进程退出。**TASK-027 起在不带 `ARIA_COORDINATION_NO_PUSH` 的新会话执行**, 该会话须在 2026-09-28T12:35Z 之前先刷两条 claim 心跳 (`--heartbeat-only`)。
+
+### 本节提交自身
+
+结果目录与本台账在主仓 feature 分支提交 (只 add 本任务交付物); 提交 SHA 见本会话回复 (自指排除)。**未推送** —— 本会话无推送授权, 随本轨下一次推送一并发出。
+
 ---
 
 ## 变更记录
@@ -1122,3 +1219,4 @@ owner **追认**: 2026-09-25「路径 A」裁定的实质是走三步法反事�
 | 2026-09-26 | 新会话入口: 两条 active claim 心跳刷新并推后核验 (本轨约 10.7h; `pre-merge-completeness-gate-change-scope` 约 34.7h, 已超 SWEEP_TTL); owner 授权后主仓 master `d33d233` 双推, 两端 `ls-remote` MATCH。 |
 | 2026-09-27 | **TASK-025 完成**: 查重无重复 → 正文逐处实读核对 (两处行号较计划下移) → owner 授权开单 **`10CG/aria-plugin#204`** (GET 核验 open, 标题正文逐字一致) → standards 回填 `d86fc91` (`#<` 零命中)。 |
 | 2026-09-27 | owner 裁「全部推」: standards `d86fc91` 与主仓 feature `c5f494f` 双推, 四处 MATCH; owner 裁「照建议」(决策单 `4c968ca`): standards `session-handoff.md` 升 1.4.0 并入 TASK-027 (更正 TASK-023 节「不 bump」的理由) / 四条断言归属订正追认 / 剩余提交不加 `Co-Authored-By`。 |
+| 2026-09-27 | **TASK-026 完成** (NO_PUSH 专用会话): /skill-creator 照跑 state-scanner AB, 13 eval 两臂同为 50/78, delta.pass_rate = +0.0000 (与 PREDICTION 相符); eval 5 复跑两次 1/3 不判回归; 协调 ref 全程 `e911132`; 结论「未被有效测试」→ owner 裁「放行进 TASK-027」; 套件缺口单 **`10CG/aria-plugin#205`** (GET 核验)。 |

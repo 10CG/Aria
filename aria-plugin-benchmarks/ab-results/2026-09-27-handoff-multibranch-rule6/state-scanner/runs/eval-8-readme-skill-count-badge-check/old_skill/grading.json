@@ -1,0 +1,50 @@
+{
+ "expectations": [
+  {
+   "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+   "passed": true,
+   "evidence": "answer §8: '`aria/README.md` 第 5 行: **Version**: 1.73.3 ... 与 plugin.json 和 CHANGELOG 一致'; 另引 snapshot readme.submodules.aria version_match=true (1.73.3=1.73.3, 与仓库实况一致)"
+  },
+  {
+   "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+   "passed": true,
+   "evidence": "answer: '42 个里 user-invocable: false 的正好 7 个: agent-router / agent-team-audit / arch-common / aria-token-telemetry / audit-engine / config-loader / git-remote-helper -> 35 + 7 = 42'; 排除了无 SKILL.md 的 issue-triage-workspace 与 run_all_tests.sh。经核实正确"
+  },
+  {
+   "text": "Should compare Skill count with the number stated in README",
+   "passed": true,
+   "evidence": "answer 数量声明表: 'aria/README.md 第 7 行 + ### Skills 标题 | 35 + 7 = 42 | 对', 并比对了主项目 README 与 i18n 计数。缺陷: 没核对 aria/README.zh.md 的计数 (实际写 '34 + 7 = 41', 是真错漏), 但断言要求的比对本身做了"
+  },
+  {
+   "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+   "passed": true,
+   "evidence": "answer 列表完整性表: aria/README.md 列 40 个, 漏 issue-triage、session-closer; 主项目 README.md Skills 表漏 session-closer。经 grep 核实: 两文件 session-closer 计数均为 0, 主项目表含 issue-triage, 全部正确"
+  },
+  {
+   "text": "Should output skill_list_missing items at info severity level (not warning)",
+   "passed": false,
+   "evidence": "answer 未给漏项标任何严重级 (只写 '**不完整**: 漏 2 个'), 没有 info/warning 字样; 无证据表明按 info 级输出"
+  },
+  {
+   "text": "Should check Plugin badge version in root README against plugin.json version",
+   "passed": true,
+   "evidence": "answer §8: '主项目 README.md 第 8 行 badge: Plugin-v1.73.3 = plugin.json 1.73.3, 一致', 并引 custom check m6-version-badge-match OK"
+  },
+  {
+   "text": "Should report badge mismatch as warning severity",
+   "passed": false,
+   "evidence": "本次 badge 与 plugin.json 一致, 未出现不匹配, 回答里无任何「不匹配时报 warning」的表述; 无法从产出核验, 按举证责任判 FAIL"
+  },
+  {
+   "text": "Should gracefully handle missing aria submodule (skip, not error)",
+   "passed": false,
+   "evidence": "aria 子模块存在 (snapshot readme.submodules.aria.exists=true), 缺失场景未发生, 回答未涉及; 无法核验, 判 FAIL"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 3,
+  "total": 8,
+  "pass_rate": 0.625
+ }
+}

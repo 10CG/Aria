@@ -1,0 +1,87 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+      "passed": false,
+      "evidence": "answer.md 全文无 'rev-parse' / '@{u}' 字样；只给结果 'upstream_configured: false, reason: \"no_upstream\", ahead/behind: null'。检测手段未体现，无法从产出核验 -> FAIL (与 X 同口径)。"
+    },
+    {
+      "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+      "passed": false,
+      "evidence": "upstream 不存在，条件未触发。回答写 'ahead/behind 按规范置为 null (不是 0, 是「算不出来」)'；另外手工补做的 'HEAD...origin/master -> 13 12' 是 feature vs master，不是 current_branch.ahead/behind 字段。'upstream 存在时报告' 无从观察 -> FAIL (与 X 同口径)。"
+    },
+    {
+      "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+      "passed": true,
+      "evidence": "answer.md: 'scan.py 退出码 0 (全部采集成功, errors[] 为空)' + 'sync_status.current_branch = upstream_configured: false, reason: \"no_upstream\", ahead/behind: null'。与快照一致。"
+    },
+    {
+      "text": "Should handle detached HEAD with reason: detached_head",
+      "passed": true,
+      "evidence": "answer.md 场景表: 'detached HEAD | current_branch.name=null, reason=\"detached_head\", ahead/behind 为 null, 多远程 parity=\"unknown\" | ... | 先 git switch <你的分支> 回到分支再扫; 不要在 detached 状态下 pull'，并确认本次 git.detached_head=false。已对照 collectors/sync.py:170/191 与 multi_remote.py:358/377，描述属实。注意: 这是对未发生场景的说明性回答，并非 skill 在 detached 环境下的实测行为。"
+    },
+    {
+      "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+      "passed": false,
+      "evidence": "回答写了浅克隆场景 'shallow=true, reason=\"shallow_clone\", behind 为 null ... git fetch --unshallow'，但没有提及检测手段 --is-shallow-repository，更没有 .git/shallow 老版本 git 回退。断言要求两者 (AND) -> FAIL。"
+    },
+    {
+      "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+      "passed": false,
+      "evidence": "behind 为 null，条件未触发。回答写 'branch_behind_upstream 规则 (落后 >= 5 才触发) 因此不触发'，阈值描述正确；另外 master 落后 12 但明确不推荐 git pull (理由正确: 无 upstream 且 pull 拉不到 master)，推荐 git merge origin/master。断言要求的'behind>=5 时推荐 pull'未被观察到 -> FAIL (与 X 同口径)。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 4,
+    "total": 6,
+    "pass_rate": 0.33
+  },
+  "timing": {
+    "total_tokens": 104419,
+    "duration_ms": 245944,
+    "total_duration_seconds": 245.9,
+    "agent_output": "/tmp/claude-1000/-home-dev-Aria/3e535147-7280-4ed1-90c7-c92dbc9f2ca5/tasks/af8d257f251edde7d.output"
+  },
+  "claims": [
+    {
+      "claim": "HEAD...origin/master = 13 12",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grader 只读复核 git rev-list --left-right --count HEAD...origin/master 输出 13 12"
+    },
+    {
+      "claim": "两边无重叠文件",
+      "type": "factual",
+      "verified": true,
+      "evidence": "f.txt 仅 verification-ledger.md，m.txt 15 个文件不含它"
+    },
+    {
+      "claim": "执行了额外 git 只读命令 (rev-list/log/diff/merge-base)",
+      "type": "process",
+      "verified": true,
+      "evidence": "exec_notes 第 6-7 步；未写仓，符合评测约束"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+        "reason": "机制断言 (rev-parse @{u}) 属于 scan.py 实现细节，回答里通常不会写出，两臂在同一份 sync.py 上恒假；应改为对快照字段断言或删去"
+      },
+      {
+        "assertion": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+        "reason": "同上，检测手段断言在回答层恒假"
+      },
+      {
+        "assertion": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+        "reason": "环境无 upstream，条件型断言结构上不可核验；需造有 upstream 且 behind>=5 的 fixture 仓"
+      },
+      {
+        "assertion": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+        "reason": "同上；且本环境真实风险是 feature 落后 master 12 提交，无任何断言覆盖'是否发现并告知 master 落后'"
+      }
+    ],
+    "overall": "6 条中 4 条在本环境恒假或不可核验，只有 no_upstream 与 detached_head 说明两条有区分度；两臂差异来自回答详略，不来自 sync 采集代码 (两臂 collectors/sync.py、git.py 相同)。"
+  }
+}

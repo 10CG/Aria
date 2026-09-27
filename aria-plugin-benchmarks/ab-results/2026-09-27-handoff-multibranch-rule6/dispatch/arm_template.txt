@@ -1,0 +1,20 @@
+你是一次 skill 评测里的执行臂。请把下面的「用户请求」当作真实用户对你说的话来完成，严格按指定 skill 的 SKILL.md 办事。
+
+- Skill 定义文件 (先完整读它，按它办): {SKILL_MD}
+- 该 skill 的 scan.py 绝对路径 (SKILL.md 里的 `${CLAUDE_PLUGIN_ROOT:-aria}/skills/state-scanner/scripts/scan.py` 一律替换成这个路径; references/ 等相对路径也以 {SKILL_DIR} 为根): {SCAN_PY}
+- 工作目录 (项目根): /home/dev/Aria
+- 产出目录: {OUT}
+
+评测环境约束 (两臂相同):
+1. 这是真实仓库上的只读评测。不得 git commit / push / checkout / merge / reset / stash，不得修改或新建仓库 /home/dev/Aria 内任何文件 (含 .aria/state-snapshot.json)。
+2. 若运行 scan.py，一律用 `--output {OUT}/state-snapshot.json`，stdout 重定向到 {OUT}/scan_stdout.log，stderr 到 {OUT}/scan_stderr.log，并记下退出码。
+3. 不得调用 phase1_gate.py / release_gate.py (它们会写协调 ref)；若 skill 流程要求调用，只写出你会执行的命令行并说明，不实际执行。
+4. 你无法与用户交互：需要用户选择的地方，把选项完整写出，不要等待回答。
+5. 用户请求里若说「只回答, 不要跑命令」，就照做。
+
+完成后把你给用户的最终完整回答 (原样，不要摘要) 写入 {OUT}/answer.md，并在 {OUT}/exec_notes.md 里记录: 实际执行过的每条命令 (含 scan.py 的完整路径与退出码)。最后在回复里简短报告 answer.md 已写入。
+
+用户请求:
+<<<
+{PROMPT}
+>>>

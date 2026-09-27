@@ -1,0 +1,61 @@
+{
+  "expectations": [
+    {
+      "text": "Should NOT report all remotes as synced when only origin was pushed",
+      "passed": true,
+      "evidence": "前提『只推了 origin』在真实仓库不成立 (snapshot: overall_parity=true, 8 腿 fetch_ok='true', 全部 equal)。answer 报全部一致与 snapshot 相符, 并说明 Phase 0.5 对 github 腿真 fetch, '不会像 git push 回执 Everything up-to-date 那样只看自己推的那个 remote 就算通过'; 另补查 master 三方一致。"
+    },
+    {
+      "text": "Should detect github remote divergence via multi_remote.submodules[*].remotes[name=github].parity = behind",
+      "passed": false,
+      "evidence": "answer 实际报告 github 腿全部『相同』, 未检测到任何分歧; 假设段写 parity=ahead 而非 behind。真实仓库无此分歧, 断言无法被满足。"
+    },
+    {
+      "text": "Should output hint_type: 'push' (not 'update') for github remote since local HEAD leads remote",
+      "passed": false,
+      "evidence": "answer 全文未出现 hint_type; snapshot 中 hint_type 均为 null。"
+    },
+    {
+      "text": "Should report the exact missing remote name and the field that is actually non-zero for this shape (ahead_count from the local HEAD's view — behind_count is 0 when the mirror simply never received the push).",
+      "passed": false,
+      "evidence": "answer 结论『没有需要补推的 remote』, 未报告缺失 remote 名与 ahead_count 非零值 (真实全 0)。假设段写『parity = ahead (本地比 github 多出合并提交)』, 未点 ahead_count 字段, 也不是实际报告。"
+    },
+    {
+      "text": "Should preserve backwards-compatible submodules[].remote_commit field pointing to origin's remote_head",
+      "passed": false,
+      "evidence": "answer 未提 submodules[].remote_commit 字段。snapshot 里该字段存在, 但回答没有体现。"
+    },
+    {
+      "text": "Should show has_unreachable_remote: false when both remotes reachable but github behind",
+      "passed": true,
+      "evidence": "answer: '`overall_parity = true` / `has_pending_push = false` / `has_unreachable_remote = false`', 与 snapshot 一致。注意『github behind』前提不成立。"
+    },
+    {
+      "text": "Should include git-remote-helper reference in the scan output when helper is available",
+      "passed": false,
+      "evidence": "answer 未提 git-remote-helper; snapshot 中也无 helper 字样, 无法核验。"
+    },
+    {
+      "text": "Should point out the gitlink risk: if the submodule commit referenced by the main repo's gitlink is unreachable on github, `clone --recursive` from github breaks.",
+      "passed": true,
+      "evidence": "answer: 'gitlink_integrity 6 组全部 ok, 不存在 orphaned gitlink (即 GitHub 上 clone --recursive 不会断)'; 假设段第 4 点描述主仓 bump 到 GitHub 不存在的 aria 提交时报 orphaned。点明了风险。"
+    },
+    {
+      "text": "DISCRIMINATOR (v1.62.0+): should give the gitlink fix as a wired recommendation-rule output, not as a known-gap note.",
+      "passed": true,
+      "evidence": "answer 第 4 点: 'gitlink_integrity 会对 (github, aria) 报 orphaned, 这一项会让 overall_parity = false, 并给出 `git -C aria push github <branch>` 的补推建议', 结合第 3 点说明 overall_parity=false 才触发 multi_remote_drift, 即作为规则产出而非已知缺口。(本次状态干净, 规则未真实触发, 属描述性通过; 未点名规则第几路, 比 X 略弱但满足断言。)"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 5,
+    "total": 9,
+    "pass_rate": 0.4444
+  },
+  "timing": {
+    "executor_duration_seconds": 293.9
+  },
+  "eval_feedback": {
+    "overall": "真实仓库不处于事故状态 (所有 remote equal), 9 条断言中 5 条以『github 落后』为前提, 在本环境下两臂均无法满足或只能空真通过; 本 eval 需在隔离沙箱构造事故状态才有区分力。详见 GRADER_CRITIQUE.md。"
+  }
+}

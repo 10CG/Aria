@@ -1,0 +1,1 @@
+我在一个有 3 个 git 子模块的项目中工作 (aria, standards, aria-orchestrator)。最近其他协作者推送了 submodule 更新到远程。我想运行状态扫描了解当前本地代码是否和远程同步，特别是子模块是否落后远程。请扫描并告诉我是否需要 git submodule update。

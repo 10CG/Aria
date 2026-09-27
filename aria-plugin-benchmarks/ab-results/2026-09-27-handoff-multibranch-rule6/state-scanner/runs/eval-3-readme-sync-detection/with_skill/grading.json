@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "answer.md 表格以 `aria/.claude-plugin/plugin.json` (SOT) 1.73.3 为基准, 逐行比对 `aria/README.md` 1.73.3 (snapshot version_match=true)、主仓 README Plugin badge v1.73.3、README.zh/ja/ko badge; 并说明 readme.root.version=null 由 main-project-version-consistency 覆盖。exec_notes 有 `head -20 README.md | grep badge` 等实读命令。事实经核对正确 (VERSION 第 24 行确为 v1.73.0)。"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "answer.md 只在版本表里列出 `aria/CHANGELOG.md` 顶部条目 `[1.73.3] - 2026-09-13` 作为版本引用点, 没有把 CHANGELOG 日期作为 README『最后更新』日期同步的参照源, 全文无 README 日期比对内容 (output-formats.md 模板为『期望: <日期> (来源: CHANGELOG.md)』)。"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "同步状态下有独立小节『📝 README / 文档版本一致性 (本次重点 …)』, 含 14 行引用点表格及结论, 对应 output-formats.md 的『📝 README 同步状态』区块 (标题措辞不同, 实质内容齐备)。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.6667
+  }
+}

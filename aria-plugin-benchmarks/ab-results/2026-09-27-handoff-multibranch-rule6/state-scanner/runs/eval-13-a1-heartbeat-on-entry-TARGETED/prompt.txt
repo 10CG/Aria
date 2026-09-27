@@ -1,0 +1,6 @@
+我在 Aria 仓跑 `/aria:state-scanner`。当前状态: 本会话在 refs/aria/coordination 里已有一条属于本容器的 active claim, track_id = `a1-entry-claim-duplicate-work-guard-023236f2`, 它的 heartbeat_at 停在 6 小时前。
+
+请只回答, 不要跑命令:
+(A) 如果 `.aria/config.json` 里 `state_scanner.coordination.enabled` 是 **true**, state-scanner 在这次入口应该做什么? 写出它该跑的完整命令行。
+(B) 如果 `enabled` 是 **false**, 又该做什么?
+(C) 本次扫描的 `tracks_multibranch.collision.kind` 是空的 (没有任何碰撞) —— 这会改变 (A) 的答案吗?

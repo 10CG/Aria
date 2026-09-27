@@ -1,0 +1,59 @@
+{
+  "expectations": [
+    {
+      "text": "Output should include Git status information",
+      "passed": true,
+      "evidence": "answer.md「📍 当前状态」段: 分支 feature/handoff-multibranch-subdir-path-fidelity (HEAD 4f91772, 未设 upstream), 变更 3 项: M aria / M standards / ?? aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/; 另有「🔄 同步状态」多远程 parity。与 state-snapshot.json git 段 (current_branch / unstaged_files / untracked_files / upstream.reason=no_upstream) 一致。"
+    },
+    {
+      "text": "Should provide workflow recommendation",
+      "passed": true,
+      "evidence": "answer.md「🎯 推荐工作流」段: 命中 feature_with_spec, 推荐 [1] 继续 10CG/Aria#195 TASK-026 Rule #6 AB, 含执行步骤、跳过项、理由、置信度 88%, 另给 [2][3][4] 备选并以「选择 [1-4]」收尾。"
+    },
+    {
+      "text": "Output should use structured format with sections",
+      "passed": true,
+      "evidence": "answer.md 以 PROJECT STATE ANALYSIS 框头开始, 分 📍当前状态 / 📊变更分析 / 📄需求状态 / 🏗️架构状态 / 📋OpenSpec / 🛡️审计 / 🔧自定义检查 / 🔄同步 / 🎫Issues / 🧭多终端协调 / 🎯推荐工作流 共 11 个带分隔线的小节。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_tokens": 146427,
+    "duration_ms": 366852,
+    "total_duration_seconds": 366.9,
+    "agent_output": "/tmp/claude-1000/-home-dev-Aria/3e535147-7280-4ed1-90c7-c92dbc9f2ca5/tasks/a944e356e60e32852.output"
+  },
+  "claims": [
+    {
+      "claim": "scan.py 退出码 0, errors[] 为空, snapshot_schema_version=1.0",
+      "type": "factual",
+      "verified": true,
+      "evidence": "state-snapshot.json errors=[] schema 1.0; scan_stderr.log 为空"
+    },
+    {
+      "claim": "scan 经 pointer 读到的 handoff 为 2026-09-24-session-close-199-post-planning-converged.md (60.1h), 但已过时, master 上有 09-27 更新",
+      "type": "factual",
+      "verified": true,
+      "evidence": "snapshot handoff.latest_source=pointer, age_hours=60.14; exec_notes 记录 git show origin/master:docs/handoff/2026-09-27-... 已读"
+    },
+    {
+      "claim": "未执行 phase1_gate / 任何写仓操作",
+      "type": "process",
+      "verified": true,
+      "evidence": "exec_notes.md 列出全部只读命令, phase1_gate 仅写出命令未执行"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "三条断言对任何像样的状态报告都恒真, 两臂 3/3 无区分度; 本次改动 (handoff 多分支/子目录路径保真) 相关的行为 (识别 feature 分支 pointer 过时并找到 master 上更新的 handoff) 无断言覆盖"
+      }
+    ],
+    "overall": "断言只查存在性, 不查正确性, 无法区分两臂。详见 GRADER_CRITIQUE.md"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Should check README.md version against VERSION file or plugin.json",
+      "passed": true,
+      "evidence": "answer.md『扫描器结果 (readme collector)』: 『子模块版本号: 一致 (aria plugin.json 1.73.3 = aria/README 1.73.3)』; 并补读 README.md 第 241 行『Project Version: 1.7.5』与 VERSION 1.7.5 比对, 指出 readme.root.version=null 是『没验证』不是『一致』。exec_notes 有 `grep -n -i \"version|版本\" README.md`、`head -30 VERSION`。事实经核对正确。"
+    },
+    {
+      "text": "Should mention CHANGELOG date as reference source for date sync",
+      "passed": false,
+      "evidence": "answer.md 只写『ℹ️ README 日期: 本次 snapshot 未输出日期比对项』以及『VERSION 头部「最后更新: 2026-08-16」早于 09-08 的改动』, 全文未提 CHANGELOG, 也未把 CHANGELOG 日期作为日期同步的参照源。"
+    },
+    {
+      "text": "Should output readme_status section",
+      "passed": true,
+      "evidence": "同步状态下有独立小节『📝 README / 文档版本一致性 ← 本次重点』, 分『扫描器结果 (readme collector)』与『补读原文后发现的漂移』两部分, 覆盖子模块版本号 / 主项目 README 版本 / README 日期三项, 对应 output-formats.md 的『📝 README 同步状态』区块。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.6667
+  }
+}

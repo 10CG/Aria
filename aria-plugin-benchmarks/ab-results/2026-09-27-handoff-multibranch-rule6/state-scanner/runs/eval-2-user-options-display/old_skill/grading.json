@@ -1,0 +1,54 @@
+{
+  "expectations": [
+    {
+      "text": "Should show numbered options for user selection",
+      "passed": true,
+      "evidence": "answer.md「可选操作」下列出 ➤ **[1] feature-dev: 继续 #195 Phase B...** / ○ **[2] AB 之后的普通会话...** / ○ **[3] 续做 in-progress User Story...** / ○ **[4] 自定义组合**, 结尾「🤔 选择 [1-4] 或输入自定义:」。四个编号选项, 每项有执行/理由。"
+    },
+    {
+      "text": "Should mention custom input option",
+      "passed": true,
+      "evidence": "answer.md 有 ○ **[4] 自定义组合**, 给出输入格式 `\"B.2 + C.1\"` 或 `\"Phase B\"`, 并在提示行写「选择 [1-4] 或输入自定义」。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0,
+    "total": 2,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "executor_duration_seconds": 413.2,
+    "total_tokens": 133399
+  },
+  "claims": [
+    {
+      "claim": "origin/master 上 latest.md 指向 2026-09-27-session-close-195-task025-legacy-issue-204.md, 工作树 latest.md 已落后",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git show origin/master:docs/handoff/latest.md 首条 **Latest** 即该文件; snapshot handoff.latest_path=2026-09-24-...-converged.md (60.17h)"
+    },
+    {
+      "claim": "scan.py 退出码 0, errors 为空",
+      "type": "process",
+      "verified": true,
+      "evidence": "exec_notes 第 2 步; scan_stderr.log 0 字节"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should show numbered options for user selection",
+        "reason": "只要出现 [1]..[N] 编号就过; 选项内容与 snapshot / handoff 实际状态是否吻合不检查, 两臂推荐内容差异很大却同分。"
+      },
+      {
+        "assertion": "Should mention custom input option",
+        "reason": "output-formats 模板固定含「自定义组合」行, 照模板输出即恒真, 区分度为零。"
+      },
+      {
+        "reason": "没有断言检查推荐项的事实正确性 (例如 handoff 是否落后、推荐的下一任务是否对)、是否提示入口心跳命令、是否只读。"
+      }
+    ],
+    "overall": "两条断言都是格式级恒真断言, 无法区分两臂。"
+  }
+}

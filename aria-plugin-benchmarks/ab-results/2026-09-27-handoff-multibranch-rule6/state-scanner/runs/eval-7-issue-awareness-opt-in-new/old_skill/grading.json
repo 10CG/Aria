@@ -1,0 +1,57 @@
+{
+  "expectations": [
+    {
+      "text": "Should show an Open Issues section only when issue_scan.enabled is true",
+      "passed": true,
+      "evidence": "answer.md 有「🎫 Open Issues」区块, 开头写「你的 issue_scan 配置已生效: enabled=true、platform=forgejo、scan_submodules=true、limit=20」。enabled=true 分支正确展示; false 分支无法观察。"
+    },
+    {
+      "text": "Should detect platform using 4-tier priority (config.platform -> hostname map -> URL inference -> fallback)",
+      "passed": false,
+      "evidence": "answer 只说 platform=forgejo 来自配置, 未提及或体现 4 级优先级平台探测。"
+    },
+    {
+      "text": "Should call forgejo CLI wrapper (not raw curl) and handle 10 fetch_error enum values (network_unavailable, cli_missing, auth_missing, auth_failed, rate_limited, not_found_or_no_access, timeout, platform_unknown, parse_error, unknown)",
+      "passed": false,
+      "evidence": "answer 未提 forgejo CLI wrapper, 也未涉及 fetch_error 枚举 (连「无 fetch_error」都未明说)。exec_notes 仅记录跑 scan.py。"
+    },
+    {
+      "text": "Should use cache with 15-minute TTL at .aria/cache/issues.json",
+      "passed": false,
+      "evidence": "answer 写「数据来源: 本次扫描期间获取 (fetched_at 2026-09-27T17:09:50Z, 字段标 cache) | ttl: 15m」, TTL 与 cache 来源有证据; 但回答与 exec_notes 都没有出现 .aria/cache/issues.json 路径, 断言中的缓存位置无证据 (举证责任在断言侧)。"
+    },
+    {
+      "text": "Should NOT manage API tokens inside the skill (rely on existing CLI wrapper auth)",
+      "passed": true,
+      "evidence": "exec_notes 声明全程只读, 无 token 相关操作; answer 未要求用户提供 token。负向断言成立 (恒真类)。"
+    },
+    {
+      "text": "Should attempt heuristic linking of issues to US-NNN patterns and OpenSpec change names (with word boundary protection against URL paths)",
+      "passed": true,
+      "evidence": "answer 表格有「关联」列: aria-plugin#204 -> OpenSpec handoff-multibranch-subdir-path-fidelity (启发式)、#195 -> pre-merge-completeness-gate-change-scope (标注「可能是误关联」), 并明说「所有 issue 都没有关联 User Story (linked_us 全为空)」—— US 与 OpenSpec 两类关联的尝试和结果都呈现, 与 snapshot 一致。词边界保护无法从产出观察, 按核心行为判。"
+    },
+    {
+      "text": "Should recommend triage when blocker/critical labeled issues exist (open_blocker_issues rule)",
+      "passed": true,
+      "evidence": "前提不成立; answer 明确「open_blocker_issues: 未触发 (0 个 blocker/critical)」, 并在规则匹配列表中逐条列出, 与 snapshot 一致; 另给出 /issue-triage 作为 [2] 选项。规则判定正确。"
+    },
+    {
+      "text": "Should fail-soft and gracefully degrade when offline (network_unavailable) or CLI missing",
+      "passed": false,
+      "evidence": "网络与 CLI 均可用, 未发生降级; answer 未描述 fail-soft 行为。无法从产出核验。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 4,
+    "total": 8,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "executor_duration_seconds": 458.1,
+    "total_duration_seconds": 458.1
+  },
+  "eval_feedback": {
+    "overall": "8 条断言中 A2/A3/A8 描述的是 scan.py 内部实现, 在正常联网环境下的最终回答里观察不到, 恒假; A5 恒真; A1/A7 的条件分支本 eval 只能观察一侧。详见 GRADER_CRITIQUE.md。"
+  }
+}

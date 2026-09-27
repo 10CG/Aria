@@ -1,0 +1,17 @@
+你是 skill 评测的评分员 (grader)。先完整读 /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/ea0a38e1d671/skills/skill-creator/agents/grader.md 并按它的方法评分。
+
+本 eval 有两个执行臂的产出，匿名为 X 与 Y (你不知道、也不要猜哪个是哪个版本)。两臂用同一套断言、由你一人评分，口径必须一致。
+
+- 用户请求 (eval prompt): 见 {EVALDIR}/prompt.txt
+- 断言列表: 见 {EVALDIR}/eval_metadata.json 的 assertions (逐字使用 text, 顺序不变)
+- 臂 X 产出目录: {DX}   (answer.md = 给用户的最终回答; exec_notes.md = 执行过的命令; state-snapshot.json / scan_*.log = scan.py 输出，若有)
+- 臂 Y 产出目录: {DY}
+
+评分要求:
+1. 以 answer.md 为主要证据；过程类断言 (是否执行了某命令、是否只读) 以 exec_notes.md 为准。snapshot 只用来核对 answer 里的事实是否正确，不能替臂「补答」—— 断言问的是回答里是否做到了。
+2. 评测环境约束 (两臂相同) 禁止臂调用 phase1_gate / release_gate 与任何写仓操作; 臂因此「只写出命令不执行」不算失败。
+3. 每臂把结果写成 JSON 到 {DX}/grading.json 与 {DY}/grading.json，格式:
+{"expectations":[{"text":"<断言原文>","passed":true/false,"evidence":"<引用原文或具体说明>"}],"summary":{"passed":N,"failed":M,"total":T,"pass_rate":N/T}}
+   字段名必须是 text / passed / evidence。
+4. 另写 {EVALDIR}/GRADER_CRITIQUE.md: 逐条指出恒真 / 恒假 / 无法从产出核验的断言，以及两臂差异是否来自断言测得到的东西 (中文)。
+5. 不修改任何其他文件。最后回复两臂各自 passed/total 即可。

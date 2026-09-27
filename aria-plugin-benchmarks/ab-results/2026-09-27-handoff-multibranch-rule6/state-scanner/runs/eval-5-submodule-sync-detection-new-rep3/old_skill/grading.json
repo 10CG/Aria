@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "answer.md 有「### 🔄 同步状态 (本次重点)」区块, 其下「子模块 (三层对比)」表逐行列出 aria / standards / aria-orchestrator。"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "子模块表列出「工作目录 HEAD」「主仓 gitlink」「远程默认分支」三列, 并引用 tree_vs_remote / workdir_vs_tree 字段, 与 snapshot 一致。fallback 部分本次未触发 (remote_commit_source 全为 local_ref), 产出里无从核验, 仅按前半句判通过。"
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "前提不成立 (tree_vs_remote 三个全为 false)。回答写明「tree_vs_remote 三个子模块全部为 false ... 因此 submodule_drift 规则不触发」, 并说明「git submodule update --remote ... 也不要跑」。属真空通过, 未测到正向检出能力。"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "answer.md:「本次扫描在 1 分钟前 fetch 了全部 8 条 ... 远程, 均成功」; exec_notes 第 2 步运行的 scan.py 即执行了 remote_refresh fetch。未经用户同意执行了 fetch, 未改读 FETCH_HEAD age, 与断言相反 (skill 设计本身决定)。"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "本环境 origin/HEAD 未缺失, remote_commit_source 均为 local_ref, 四级 fallback 链从未走到; answer.md 未提及任何 fallback。无证据。"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": false,
+      "evidence": "scan.py 退出码 0, errors[] 为空, 8 路 fetch 全部 fetch_ok=true, 扫描期间没有出现任何 git 错误, 无法证明 fail-soft 行为。举证责任在断言, 判不通过。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "executor_duration_seconds": 194.4
+  },
+  "eval_feedback": {
+    "overall": "断言 3 真空成立, 断言 4 恒假 (与 remote_refresh 自动 fetch 设计矛盾), 断言 5 本环境无法核验, 断言 6 依赖网络偶发; 本场景核心难点 (本地领先 gitlink 时不应 submodule update) 无断言覆盖。详见 GRADER_CRITIQUE-rep3.md。"
+  }
+}
