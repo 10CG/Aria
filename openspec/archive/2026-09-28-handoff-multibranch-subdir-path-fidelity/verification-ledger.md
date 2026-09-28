@@ -1593,6 +1593,10 @@ sweep: null · gc: null · fetch_success: true · push_success: true · push_ski
 - **第 11 步 `10CG/Aria#195` 回帖并关闭**: 发帖前确认归档路径已在 `origin/master` 上可见; POST 评论 → id **`26527`**; 单独 PATCH `state: closed` → `closed_at` `2026-09-28T10:54:07Z`; 独立 GET: issue `state: closed`, 评论 26527 存在且正文与草稿逐字一致。回帖含版本号 (aria-plugin v1.74.0)、SC 验收摘要与已知边界; 发帖前自检裸引用 0 · §4.5 字符 0 · U+FFFD 0。
 - 本追记所在提交的推送结果见本会话回复 (自指排除)。至此 TASK-032 全部子步骤完成, 本轨终结。
 
+### 追记二 — 10CG/aria-standards#20 回帖关闭 (2026-09-28)
+
+owner 2026-09-28 授权「回帖关闭 10CG/aria-standards#20」。发帖前核实: 该 issue 仍 open、零评论; standards master 在 origin 与 github 均为 `2bc1c4c`, 头部 Version 已是 1.4.0; 回帖列出的五个提交 (`d217ed0` / `21748d4` / `11b0a14` / `d86fc91` / `56306d1`) 均为 `2bc1c4c` 的祖先。回帖 (评论 **26547**) 写明三次增量逐条列出、§2.3.5 判 MINOR 的依据 (aria-plugin v1.70.0 D5 先例 + Aria 仓决策单第 1 项; 「没有删字段 / 没有破坏 5 字段不变式」注明为该 issue 自己的分析) 与落地提交; 随后单独 PATCH 关闭, `closed_at` 2026-09-28T12:29:30Z; 独立 GET 核验 state 为 closed, 评论正文与草稿逐字一致。发帖前自检: 裸引用 0 · §4.5 字符 0 · 希腊字母 0 · U+FFFD 0。⇒ §4 中优先级第 2 项已完成。
+
 ---
 
 ## 变更记录
@@ -1621,3 +1625,4 @@ sweep: null · gc: null · fetch_success: true · push_success: true · push_ski
 | 2026-09-28 | **TASK-031 完成** (owner 授权五项): feature 双推 `6fdff9f` → PR `10CG/Aria#222` → C.2.4 green (not_applicable, 已 surface) + C.2.4.5 PASS → merge commit `03f97ac` → 本地快进 → C.2.5 两个 remote 全部成功、parity match → gitlink_integrity 六组 ok。TASK-032 第 1 步对齐通过。 |
 | 2026-09-28 | **TASK-032 Phase D**: 27 行勾选; 归档门预演 warn (三条已知假阳性); owner 裁 Step 7 不建; 归档 `c8238c3` (Step 1-6 五条断言全绿); release_gate 释放 claim (协调 ref `4d40f84`); 另开 `10CG/aria-plugin#206`; 周期 handoff 与 latest.md 更新; 写法自检第二次归零。推送与回帖见追记。 |
 | 2026-09-28 | Phase D 双推 `bd074cd` 两端 MATCH; `10CG/Aria#195` 回帖 (评论 26527) 并关闭, GET 核验 closed。**本轨终结**。 |
+| 2026-09-28 | owner 授权后回帖关闭 `10CG/aria-standards#20` (评论 26547, GET 核验 closed)。 |
