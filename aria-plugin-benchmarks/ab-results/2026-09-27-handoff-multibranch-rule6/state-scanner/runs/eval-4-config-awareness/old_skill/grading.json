@@ -1,0 +1,62 @@
+{
+  "expectations": [
+    {
+      "text": "Should mention .aria/config.json or config-loader",
+      "passed": true,
+      "evidence": "answer.md 首节'直接回答: 有, `.aria/config.json` 存在且已被使用', 路径 `/home/dev/Aria/.aria/config.json` (5603 字节, 已纳入 git 跟踪); exec_notes 第 5 条显示实际 ls/json.load 该文件。"
+    },
+    {
+      "text": "Should describe config fields like auto_proceed or confidence_threshold",
+      "passed": true,
+      "evidence": "配置表列出 `state_scanner.confidence_threshold` = 90 与 `workflow.auto_proceed` = false, 以及 auto_execute_rules / coordination / audit 等; 与实际配置核对一致。"
+    },
+    {
+      "text": "Should mention default values when config is absent",
+      "passed": true,
+      "evidence": "配置表专设'与默认值比'一列: confidence_threshold '同默认', auto_execute_enabled / auto_execute_rules / coordination / auto_proceed '同默认', `mechanical_mode` '未设置 → 默认 true (走 scan.py)'; 与 config-loader/SKILL.md 默认值核对一致。弱通过: 没有一句明说'整份文件缺失时全部退默认'。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "executor_duration_seconds": 286.6
+  },
+  "claims": [
+    {
+      "claim": "origin/master latest.md 指向 2026-09-27-session-close-195-task025-legacy-issue-204.md",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git show origin/master:docs/handoff/latest.md 核实一致"
+    },
+    {
+      "claim": "coordination.enabled 默认 true",
+      "type": "factual",
+      "verified": true,
+      "evidence": "config-loader/SKILL.md: state_scanner.coordination.enabled default: true"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should mention .aria/config.json or config-loader",
+        "reason": "用户 prompt 本身就含 .aria/config.json 字面, 任何回答复述问题即可通过, 恒真, 无区分力。"
+      },
+      {
+        "assertion": "Should describe config fields like auto_proceed or confidence_threshold",
+        "reason": "只要求提到字段名, 不核对值是否与真实配置一致; 编造值的回答同样通过。建议改为'正确报出 confidence_threshold=90 且 auto_proceed=false'。"
+      },
+      {
+        "assertion": "Should mention default values when config is absent",
+        "reason": "本仓 .aria/config.json 存在, '配置缺失时的默认值'这一场景在当前 fixture 下不会自然出现, 只能以'按字段对比默认值/未设字段退默认'的弱形式判; 要测真行为须造一个无 config 的 fixture 仓。"
+      },
+      {
+        "reason": "没有断言覆盖'回答是否先直接回答有/无', 以及配置值是否与文件一致; 两臂此处均正确, 但断言测不到。"
+      }
+    ],
+    "overall": "三条断言对两臂都通过, 均偏'提及类', 不能区分新旧 skill; 两臂真实差异 (handoff 陈旧识别、推荐路径) 不在断言覆盖面内。"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "answer.md 有 '🔄 同步状态 (本次重点)' 区块, 逐个列出 'aria b181678、standards d86fc91、aria-orchestrator 237045a' 的多远程 parity 与 gitlink_integrity '3 个子模块 × 2 个远程'; 结论段另有三子模块逐行表。"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "结论表逐子模块给出本地 HEAD (head_commit) 与 '主仓记录的版本 (= 远程 master)' (tree_commit 与 remote_commit, 二者相等时合并成一列), 并写明 'tree_vs_remote=false'、'behind_count 都是 0'。与 snapshot 一致 (remote_commit_source=local_ref)。fallback 本次未被触发, 回答未涉及; 按三方比较已完成判通过。"
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "前提 tree_vs_remote=true 本次不成立 (snapshot 三子模块均为 false)。臂正确判定 '3 个子模块都没有落后远程 ... submodule_drift 规则没有触发', 并明确 'git submodule update --remote 也没有意义, 因为远程 master 并没有比 gitlink 更新的内容', 规则方向用对。属条件未触发下的一致行为, 非正向命中。"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "answer.md: '扫描前已对 8 个远程分支 ... 做了新鲜 fetch, 全部成功'; exec_notes: 'scan.py 自带的 remote_refresh 阶段会对各远程执行 git fetch'。未征得用户同意即执行了 fetch (由 skill 的 Phase 0.5 remote_refresh 驱动), 与断言要求相反。"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "snapshot 三子模块 remote_commit_source 均为 'local_ref', origin/HEAD 缺失场景没有出现; answer.md 未提及任何 fallback 链或 remote_commit_source。产出中无证据可核验该行为。"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": false,
+      "evidence": "本次 remote_refresh 8 个 leg 全部 fetch_ok=true, errors[] 为空, 未发生任何 git 错误, 回答中也无降级处理描述。fail-soft 行为在本臂产出里无从体现 (不是做错, 是无证据)。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "executor_duration_seconds": 198.6
+  },
+  "claims": [
+    {
+      "claim": "主仓 feature 分支比 origin/master 落后 12、领先 13, 且 master 上 3 个 gitlink 与本分支相同",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grader 复核 git rev-list --count 得 12/13; git ls-tree origin/master 与 HEAD 三个 gitlink 完全相同"
+    },
+    {
+      "claim": "aria 领先 9、standards 领先 2, 落后 0",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grader 复核 rev-list --count 1cb3872..b181678=9, 940cb5b..d86fc91=2"
+    },
+    {
+      "claim": "8 个远程 leg fetch 全部成功",
+      "type": "factual",
+      "verified": true,
+      "evidence": "本臂 snapshot remote_refresh 8 leg 均 fetch_ok=true"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+        "reason": "与当前 skill 设计冲突: SKILL.md Phase 0.5 remote_refresh 每次 scan 都自动 fetch (sync-detection.md 也注明 FETCH_HEAD age 因此恒约 1m)。两臂都恒假, 无区分度; 应改写为检验 evidence_grade/新鲜度是否如实报告。"
+      },
+      {
+        "assertion": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+        "reason": "本环境 origin/HEAD 不缺失 (remote_commit_source=local_ref), fallback 从未触发, 恒假/不可核验。需构造缺 origin/HEAD 的 fixture 才测得到。"
+      },
+      {
+        "assertion": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+        "reason": "本环境无 tree_vs_remote=true 的子模块, 断言只能真空成立; 需构造子模块远程领先 gitlink 的 fixture。"
+      },
+      {
+        "assertion": "Should fail-soft on any git error, never blocking the rest of the scan",
+        "reason": "是否通过取决于该次运行碰没碰上网络错误, 与 skill 版本无关; 两臂在此的差异是环境噪声。"
+      },
+      {
+        "reason": "本场景真正的难点 (workdir_vs_tree=true 且本地领先 → 不应 submodule update, 否则 detach 工作分支) 没有任何断言覆盖; 两臂都答对了, 但套件测不到。"
+      }
+    ],
+    "overall": "6 条断言中 3 条在本环境下恒假或条件不触发, 1 条受网络偶发影响; 能真正区分质量的只有前两条且两臂都过。"
+  }
+}

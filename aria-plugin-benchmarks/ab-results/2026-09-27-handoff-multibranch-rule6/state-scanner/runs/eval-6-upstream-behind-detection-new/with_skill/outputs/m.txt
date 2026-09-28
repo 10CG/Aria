@@ -1,0 +1,15 @@
+.aria/audit-reports/post_planning-R5-2026-09-16T010200-774Z-handoff-multibranch-subdir-path-fidelity-aggregated.md
+.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/README.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/README.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.4-dispatch.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.4-writer-report.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.5-dispatch.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.5-writer-report.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.6-dispatch.md
+.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/v2.6-writer-report.md
+.aria/state-checks.yaml
+docs/handoff/2026-09-25-195-b1-and-group2-red-to-green.md
+docs/handoff/2026-09-26-session-close-195-group3-group4-complete.md
+docs/handoff/2026-09-27-session-close-195-task025-legacy-issue-204.md
+docs/handoff/latest.md

@@ -1,0 +1,87 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+      "passed": false,
+      "evidence": "answer.md 全文无 'rev-parse' / '@{u}' 字样。只报告了结果 'upstream.configured=false, reason=no_upstream, 所以 scan.py 按规范不计算 ahead/behind'，未说明检测手段。机制在 scan.py 的 collectors/sync.py:200 (rev-parse --abbrev-ref --symbolic-full-name @{u})，但断言问的是回答里是否做到/体现，快照不能替臂补答；无法从产出核验 -> FAIL。"
+    },
+    {
+      "text": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+      "passed": false,
+      "evidence": "本次环境 upstream 不存在 (snapshot sync_status.current_branch.upstream_configured=false)，条件未触发。回答给出的是 '这两个字段是 null'，以及 multi_remote 的 feature 分支 vs 远程同名分支 ahead=0/behind=0 (那是 multi_remote.main_repo.remotes[].ahead_count/behind_count，不是 current_branch.ahead/behind)。'upstream 存在时报告' 这一行为无从观察 -> FAIL (举证责任在断言)。"
+    },
+    {
+      "text": "Should handle missing upstream with reason: no_upstream, not exit with error",
+      "passed": true,
+      "evidence": "answer.md: 'scan.py（退出码 0，errors[] 为空）' + '你的分支没有配置 upstream（upstream.configured=false，reason=no_upstream），所以 scan.py 按规范不计算 ahead/behind ... 这不等于\"不落后\"，而是\"没法算\"'。exec_notes 记录退出码 0。与快照 reason=no_upstream 一致。"
+    },
+    {
+      "text": "Should handle detached HEAD with reason: detached_head",
+      "passed": false,
+      "evidence": "回答只写 'detached HEAD：没有。git.detached_head=false'，正确确认了当前不是 detached，但未提及 detached 场景下的处理方式或 reason=detached_head。用户明确要求'注意项目可能有 detached HEAD ... 场景需要处理'，回答没说明该场景如何处理 -> FAIL。"
+    },
+    {
+      "text": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+      "passed": false,
+      "evidence": "回答只写 'shallow clone：不是。git.shallow=false / sync_status.shallow=false'，无 '--is-shallow-repository' 或 '.git/shallow' 回退的任何描述。(另注: git.py:_is_shallow 只用 --is-shallow-repository；sync.py 另有 .git dir 解析，是否有 .git/shallow 回退需看代码，回答未涉及) -> FAIL。"
+    },
+    {
+      "text": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+      "passed": false,
+      "evidence": "behind 为 null (no_upstream)，behind>=5 条件未出现，无法观察'推荐 git pull'行为。回答正确地不推荐 pull，并说明 'branch_behind_upstream 规则因 reason != null 被跳过'，但这是'不触发时不推荐'，不是断言要求的'>=5 时推荐' -> FAIL (条件型断言在本环境不可核验)。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 5,
+    "total": 6,
+    "pass_rate": 0.17
+  },
+  "timing": {
+    "total_tokens": 109450,
+    "duration_ms": 227931,
+    "total_duration_seconds": 227.9,
+    "agent_output": "/tmp/claude-1000/-home-dev-Aria/3e535147-7280-4ed1-90c7-c92dbc9f2ca5/tasks/a3da238f8b3345a9e.output"
+  },
+  "claims": [
+    {
+      "claim": "scan.py 退出码 0, errors[] 为空",
+      "type": "process",
+      "verified": true,
+      "evidence": "exec_notes + scan_stderr.log 为空"
+    },
+    {
+      "claim": "feature 分支 origin/github 同名分支均为 4f91772, ahead=0/behind=0",
+      "type": "factual",
+      "verified": true,
+      "evidence": "snapshot multi_remote.main_repo.remotes parity=equal"
+    },
+    {
+      "claim": "本次扫描没有测 feature vs master",
+      "type": "factual",
+      "verified": true,
+      "evidence": "snapshot 无该字段；实际 master 比 HEAD 多 12 提交 (grader 复核 git rev-list 13 12)，X 未给出该数，只给用户命令"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should detect upstream configuration via git rev-parse @{u} before calling rev-list --count",
+        "reason": "机制断言 (rev-parse @{u}) 属于 scan.py 实现细节，回答里通常不会写出，两臂在同一份 sync.py 上恒假；应改为对快照字段断言或删去"
+      },
+      {
+        "assertion": "Should handle shallow clone via --is-shallow-repository AND fallback .git/shallow for older git",
+        "reason": "同上，检测手段断言在回答层恒假"
+      },
+      {
+        "assertion": "Should report current_branch.ahead and current_branch.behind when upstream exists",
+        "reason": "环境无 upstream，条件型断言结构上不可核验；需造有 upstream 且 behind>=5 的 fixture 仓"
+      },
+      {
+        "assertion": "Should recommend git pull when behind >= 5 commits (branch_behind_upstream rule)",
+        "reason": "同上；且本环境真实风险是 feature 落后 master 12 提交，无任何断言覆盖'是否发现并告知 master 落后'"
+      }
+    ],
+    "overall": "6 条中 4 条在本环境恒假或不可核验，只有 no_upstream 与 detached_head 说明两条有区分度；两臂差异来自回答详略，不来自 sync 采集代码 (两臂 collectors/sync.py、git.py 相同)。"
+  }
+}

@@ -1,0 +1,126 @@
+{
+ "r01y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-1-basic-state-collection"
+ },
+ "r01x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-1-basic-state-collection"
+ },
+ "r10x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-10-multi-remote-parity-drift"
+ },
+ "r10y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-10-multi-remote-parity-drift"
+ },
+ "r11x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-11-submodule-push-github-sync-miss"
+ },
+ "r11y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-11-submodule-push-github-sync-miss"
+ },
+ "r12y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-12-unnamed-12"
+ },
+ "r12x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-12-unnamed-12"
+ },
+ "r13y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-13-a1-heartbeat-on-entry-TARGETED"
+ },
+ "r13x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-13-a1-heartbeat-on-entry-TARGETED"
+ },
+ "r02y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-2-user-options-display"
+ },
+ "r02x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-2-user-options-display"
+ },
+ "r03x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-3-readme-sync-detection"
+ },
+ "r03y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-3-readme-sync-detection"
+ },
+ "r04x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-4-config-awareness"
+ },
+ "r04y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-4-config-awareness"
+ },
+ "r05x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new"
+ },
+ "r05y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new"
+ },
+ "r06y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-6-upstream-behind-detection-new"
+ },
+ "r06x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-6-upstream-behind-detection-new"
+ },
+ "r07x": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-7-issue-awareness-opt-in-new"
+ },
+ "r07y": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-7-issue-awareness-opt-in-new"
+ },
+ "r08y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-8-readme-skill-count-badge-check"
+ },
+ "r08x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-8-readme-skill-count-badge-check"
+ },
+ "r09y": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-9-forgejo-config-detection"
+ },
+ "r09x": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-9-forgejo-config-detection"
+ },
+ "r05xrep2": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new",
+  "rep": "rep2"
+ },
+ "r05yrep2": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new",
+  "rep": "rep2"
+ },
+ "r05xrep3": {
+  "arm": "with_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new",
+  "rep": "rep3"
+ },
+ "r05yrep3": {
+  "arm": "old_skill",
+  "eval_dir": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/state-scanner/runs/eval-5-submodule-sync-detection-new",
+  "rep": "rep3"
+ }
+}

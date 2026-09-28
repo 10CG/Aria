@@ -1,0 +1,1 @@
+我的项目配置了两个 remote: origin (Forgejo) 和 github (GitHub mirror)。我刚发布了 aria-plugin v1.15.0 子模块更新, 用 git push origin 推送到了 Forgejo, 但忘记推送到 github。请扫描项目状态, 告诉我哪些 remote 已同步哪些落后, 以及对应的修复命令。

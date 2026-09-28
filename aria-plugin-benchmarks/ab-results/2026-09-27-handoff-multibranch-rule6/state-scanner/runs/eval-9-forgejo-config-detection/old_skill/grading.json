@@ -1,0 +1,59 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect Forgejo remote by checking git remote URLs for known instances (forgejo.10cg.pub)",
+      "passed": true,
+      "evidence": "answer.md: '扫描识别到 `origin` 指向 `forgejo.10cg.pub`' 与 '⚠️ 检测到 Forgejo 远程 (forgejo.10cg.pub)'; exec_notes 第 7 项另执行了 git remote -v。snapshot forgejo_config.forgejo_remote_detected=true, instance=forgejo.10cg.pub, 与回答一致。"
+    },
+    {
+      "text": "Should check for existence of CLAUDE.local.md file",
+      "passed": true,
+      "evidence": "answer.md: '项目根目录没有 `CLAUDE.local.md`'; exec_notes 第 7 项执行 ls -la CLAUDE.local.md, 第 8 项还查了 ~/.claude/CLAUDE.local.md。"
+    },
+    {
+      "text": "Should check if CLAUDE.local.md contains forgejo: configuration block when file exists",
+      "passed": false,
+      "evidence": "本环境 CLAUDE.local.md 不存在, 'when file exists' 分支未被执行, 回答里没有对一个存在的文件做内容检查。answer 虽说明了'扫描器会忽略围栏里的 `forgejo:`…仍会报 incomplete' (与 collector 源码一致), 但那是对逻辑的描述, 不是实际执行了该检查; 按举证责任判 FAIL。"
+    },
+    {
+      "text": "Should output forgejo_config section with config_status (missing/incomplete/configured)",
+      "passed": true,
+      "evidence": "answer.md 有独立的 '🔗 Forgejo 配置检查' 小节, 并写明 'Forgejo 配置状态判为 **missing**'、推荐项 [1] 理由 'config_status = missing'; 与 snapshot forgejo_config.config_status='missing' 一致。"
+    },
+    {
+      "text": "Should suggest running /forgejo-sync to create configuration when missing",
+      "passed": true,
+      "evidence": "answer.md: '建议: 运行 /forgejo-sync 可引导创建配置 (需确认)', 并在'方式 A (推荐)'与推荐项 [1] 再次给出 /forgejo-sync。"
+    },
+    {
+      "text": "Should NOT auto-create CLAUDE.local.md during state-scanner scan (read-only)",
+      "passed": true,
+      "evidence": "exec_notes: '未对仓库做任何写操作', 第 9 项 git status --porcelain 核对与开始一致; 评分时 ls /home/dev/Aria/CLAUDE.local.md 确认不存在。回答把创建动作交给用户确认 ([y/N])。"
+    },
+    {
+      "text": "Should skip Forgejo detection when no Forgejo remote is configured (non-Forgejo projects)",
+      "passed": false,
+      "evidence": "本项目有 Forgejo 远程, 非 Forgejo 项目的跳过分支未被执行, 产出中无法观察到跳过行为; 按'无法从产出核验'判 FAIL。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7,
+    "pass_rate": 0.7143
+  },
+  "timing": {
+    "total_tokens": 122551,
+    "duration_ms": 681202,
+    "total_duration_seconds": 681.2,
+    "agent_output": "/tmp/claude-1000/-home-dev-Aria/3e535147-7280-4ed1-90c7-c92dbc9f2ca5/tasks/a6b782963968c8ef3.output"
+  },
+  "claims": [
+    {
+      "claim": "Open Issues 数据来源: live",
+      "type": "factual",
+      "verified": false,
+      "evidence": "snapshot issue_status.source='cache'; 回答写成 live, 属事实小错 (不在断言覆盖范围)"
+    }
+  ]
+}

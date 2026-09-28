@@ -135,11 +135,11 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
   - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门); 遥测 spec aria-2.0-m6-cost-model-telemetry
     Track-1 完成 (feature/m6-cost-model-telemetry, 合并 gate input-delivery), 168h AC-6 须其独立 ship
   M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
-  aria-plugin 方法论轨: v1.52.0–v1.73.3 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
+  aria-plugin 方法论轨: v1.52.0–v1.74.0 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
     残余 deferred 挂 Aria #168; 并发 in-flight track 见 docs/handoff/latest.md
   Rule #6 description 维度: 场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 +
     standards 940cb5b / SOT 1.1.0); 跟进 Aria#213 · Aria#214 · aria-plugin#200
-版本: aria-plugin v1.73.3 | 主项目 v1.7.5 | aria-orchestrator v2.0.0 (86bb684); Layer 2 主力
+版本: aria-plugin v1.74.0 | 主项目 v1.7.5 | aria-orchestrator v2.0.0 (86bb684); Layer 2 主力
   LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 

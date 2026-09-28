@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "basic-state-collection",
+  "prompt": "查看项目当前状态",
+  "assertions": [
+    {
+      "text": "Output should include Git status information"
+    },
+    {
+      "text": "Should provide workflow recommendation"
+    },
+    {
+      "text": "Output should use structured format with sections"
+    }
+  ]
+}

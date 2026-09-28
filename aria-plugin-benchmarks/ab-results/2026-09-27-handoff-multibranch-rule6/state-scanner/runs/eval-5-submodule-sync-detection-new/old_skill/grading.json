@@ -1,0 +1,87 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "answer.md 有 '## 🔄 同步状态 (本次重点)' 及 '### 子模块逐个判定' 表, 三个子模块各一行, 列出 HEAD / gitlink / 远程默认分支 / 落后数 / 判定。"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "逐子模块表分三列给出 '本地 checkout (HEAD)' 'gitlink' '远程默认分支', 并写 'drift.tree_vs_remote 都是 false, behind_count 都是 0, hint 为空'、'workdir_vs_tree = true'。与 snapshot 一致。fallback 本次未被触发, 回答未涉及; 按三方比较已完成判通过。"
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "前提 tree_vs_remote=true 本次不成立。臂正确判定 '远程没有比你更新的子模块提交', 把 'git submodule update --remote aria standards' 仅列为 [4] 并标 '不推荐'。规则方向用对, 属条件未触发下的一致行为。"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "answer.md: '本轮对 github / origin 两个远程都做了 fetch'; exec_notes 注明 scan.py 的 remote_refresh fetch 被执行。未征得用户同意即 fetch (skill Phase 0.5 行为), 与断言要求相反。回答里给出的 'git fetch origin master' 虽标注 '我没有替你跑', 不改变 scan 阶段已 fetch 的事实。"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "snapshot 三子模块 remote_commit_source 均为 'local_ref', 未出现 origin/HEAD 缺失; answer.md 未提及 fallback 链。无证据可核验。"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": true,
+      "evidence": "本臂遇到真实 git 错误: snapshot remote_refresh 中 origin 对主仓与 standards 的 leg fetch_ok=false, error_kind=other; scan.py 仍退出码 0、errors[] 为空、其余区块全部产出。answer.md 如实报告 '⚠️ has_unreachable_remote = true ... 目前靠 6 分钟前的成功 fetch 仍算新鲜证据'、'coordination_fetch.degraded = true', 并建议稍后重跑 (推荐 [3])。fail-soft 有实证。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "total": 6,
+    "pass_rate": 0.6667
+  },
+  "timing": {
+    "executor_duration_seconds": 206.9
+  },
+  "claims": [
+    {
+      "claim": "aria 超前 9、standards 超前 2, 纯超前无分叉",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grader 复核 rev-list 同上"
+    },
+    {
+      "claim": "origin 对主仓与 standards 本轮 fetch 失败, 用 16:59 数据",
+      "type": "factual",
+      "verified": true,
+      "evidence": "本臂 snapshot 对应 leg fetch_ok=false, fetched_at 16:59:32 / 16:59:37"
+    },
+    {
+      "claim": "本次扫描不比较主仓 master",
+      "type": "factual",
+      "verified": true,
+      "evidence": "sync_status 无主仓 master 比较字段; 臂给出只读补查命令但未执行"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+        "reason": "与当前 skill 设计冲突: SKILL.md Phase 0.5 remote_refresh 每次 scan 都自动 fetch (sync-detection.md 也注明 FETCH_HEAD age 因此恒约 1m)。两臂都恒假, 无区分度; 应改写为检验 evidence_grade/新鲜度是否如实报告。"
+      },
+      {
+        "assertion": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+        "reason": "本环境 origin/HEAD 不缺失 (remote_commit_source=local_ref), fallback 从未触发, 恒假/不可核验。需构造缺 origin/HEAD 的 fixture 才测得到。"
+      },
+      {
+        "assertion": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+        "reason": "本环境无 tree_vs_remote=true 的子模块, 断言只能真空成立; 需构造子模块远程领先 gitlink 的 fixture。"
+      },
+      {
+        "assertion": "Should fail-soft on any git error, never blocking the rest of the scan",
+        "reason": "是否通过取决于该次运行碰没碰上网络错误, 与 skill 版本无关; 两臂在此的差异是环境噪声。"
+      },
+      {
+        "reason": "本场景真正的难点 (workdir_vs_tree=true 且本地领先 → 不应 submodule update, 否则 detach 工作分支) 没有任何断言覆盖; 两臂都答对了, 但套件测不到。"
+      }
+    ],
+    "overall": "6 条断言中 3 条在本环境下恒假或条件不触发, 1 条受网络偶发影响; 能真正区分质量的只有前两条且两臂都过。"
+  }
+}

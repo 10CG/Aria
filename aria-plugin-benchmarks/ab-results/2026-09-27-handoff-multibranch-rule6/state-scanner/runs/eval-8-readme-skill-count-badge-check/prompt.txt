@@ -1,0 +1,1 @@
+我刚发布了 aria-plugin v1.14.0，新增了 3 个 Skill。我怀疑 aria/README.md 中的 Skill 数量和列表没更新，主项目 README 的 badge 版本也可能还是旧的。请扫描项目状态，特别检查 README 中的 Skill 数量是否与实际目录一致、Skill 列表是否完整、plugin badge 版本是否与 plugin.json 一致。

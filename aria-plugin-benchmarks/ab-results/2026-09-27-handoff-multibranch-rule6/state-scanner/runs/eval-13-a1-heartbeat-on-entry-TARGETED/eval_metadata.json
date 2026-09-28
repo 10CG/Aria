@@ -1,0 +1,25 @@
+{
+  "eval_id": 13,
+  "eval_name": "a1-heartbeat-on-entry-TARGETED",
+  "prompt": "我在 Aria 仓跑 `/aria:state-scanner`。当前状态: 本会话在 refs/aria/coordination 里已有一条属于本容器的 active claim, track_id = `a1-entry-claim-duplicate-work-guard-023236f2`, 它的 heartbeat_at 停在 6 小时前。\n\n请只回答, 不要跑命令:\n(A) 如果 `.aria/config.json` 里 `state_scanner.coordination.enabled` 是 **true**, state-scanner 在这次入口应该做什么? 写出它该跑的完整命令行。\n(B) 如果 `enabled` 是 **false**, 又该做什么?\n(C) 本次扫描的 `tracks_multibranch.collision.kind` 是空的 (没有任何碰撞) —— 这会改变 (A) 的答案吗?",
+  "assertions": [
+    {
+      "text": "[承重] (A) 明确给出 `--heartbeat-only` 模式的调用, 且命令行含 `phase1_gate.py` 与 `--phase A.1`"
+    },
+    {
+      "text": "[承重] (A) 说明目的是刷新既有 claim 的 heartbeat_at (而非新认领一条 claim)"
+    },
+    {
+      "text": "[承重] (B) 明确 enabled == false ⇒ 零 heartbeat 调用 / 不写 claim / 不推送"
+    },
+    {
+      "text": "[承重] (C) 明确回答「不改变」—— 触发条件是「持 active claim 且 enabled==true 的每次入口」, 不依赖 collision.kind"
+    },
+    {
+      "text": "不把 (A) 答成「先跑 phase1_gate 认领」或「跑完整闸门」—— heartbeat 模式不认领、不判碰撞、不 fetch"
+    },
+    {
+      "text": "不声称心跳遥测会进 production 分区 (它走独立的 heartbeat 分区, coordination_probe 不计)"
+    }
+  ]
+}

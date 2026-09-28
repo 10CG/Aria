@@ -1,0 +1,70 @@
+{
+  "expectations": [
+    {
+      "text": "Should output multi_remote section with per-remote sync status, not a single combined status",
+      "passed": true,
+      "evidence": "answer.md「当前分支逐个 remote 比对」表分列 origin (Forgejo) 与 github (GitHub)，含领先/落后数；另有 master 补充表与 gitlink 按 remote 分列表。"
+    },
+    {
+      "text": "Should enumerate all configured remotes (origin + github) for both main repo and submodules",
+      "passed": true,
+      "evidence": "主仓 + aria/standards/aria-orchestrator 均分列 origin 与 github；与 snapshot 一致。"
+    },
+    {
+      "text": "Should quantify the divergence with the field that is actually non-zero for this shape: a mirror that never received the push reads as ahead_count>0 from the local HEAD's view (behind_count is 0). Naming behind_count here is a field-truth error.",
+      "passed": false,
+      "evidence": "answer 仅写主仓\"领先 0 / 落后 0\"，真实状态无分歧；未用 ahead_count>0 量化，也未点明漏推镜像应读作 ahead_count 而非 behind_count。无证据满足。"
+    },
+    {
+      "text": "Should NOT output 'Everything up-to-date' ambiguously — must distinguish origin-synced from github-not-synced",
+      "passed": true,
+      "evidence": "未笼统说 up-to-date：逐 remote 列 SHA，并用只读 ls-remote 直接问两个 remote 的 master。注：真实状态 github 未落后，断言后半句在本环境无法出现，按「不含糊、逐 remote 区分」判过 (与 X 同口径)。"
+    },
+    {
+      "text": "Should reason correctly about whether multi_remote_drift (priority 1.35) fires HERE: in this scenario the missed mirror computes as parity=ahead, which clause 4 excludes and the dispatch table marks triggers_rule:false, so overall_parity stays true and 1.35 does NOT fire — the honest signal is has_pending_push plus the per-remote block. An answer that claims 1.35 fires is WRONG; an answer that explains why it does not (and what would make it fire, e.g. a gitlink orphan or an expired leg) is right.",
+      "passed": false,
+      "evidence": "answer 未提 multi_remote_drift / 1.35 / clause 4 / triggers_rule (exec_notes 显示 grep 过 RECOMMENDATION_RULES，但回答未体现)。"
+    },
+    {
+      "text": "Should provide per-remote fix hint: 'git -C <path> push github master' for the lagging remote",
+      "passed": true,
+      "evidence": "修复命令含 `git -C aria push github master`、`git -C standards push github master`、主仓 `git push github master`。"
+    },
+    {
+      "text": "Should treat parity: ahead as neither blocking nor positive evidence (it is carried by has_pending_push alone, so overall_parity: true together with has_pending_push: true is correct, not contradictory)",
+      "passed": false,
+      "evidence": "answer 未讨论 parity: ahead 语义及其与 has_pending_push 的关系。"
+    },
+    {
+      "text": "Should BISECT parity: unknown rather than blanket-excluding it — benign reasons (detached_head / shallow_clone / remote_branch_missing / no_local_tracking_ref with fresh evidence) do not block, while blocking_unknown (not_refreshed / network / auth / unrecognized reason) does force overall_parity: false (fail-CLOSED)",
+      "passed": false,
+      "evidence": "answer 未涉及 parity: unknown 的良性/阻塞性二分。"
+    },
+    {
+      "text": "Should require positive evidence for overall_parity: true — at least one enforced remote with BOTH parity: equal AND evidence_grade: fresh (a stale equal is not evidence)",
+      "passed": false,
+      "evidence": "answer 说\"证据等级 fresh ... 同步结论是基于最新远程状态，不是陈旧缓存\"，是对本次数据新鲜度的说明，但未表述「overall_parity=true 需至少一个 equal+fresh、stale equal 不算证据」的判据。与 X 同口径判不过 (Y 的措辞略近，但不构成规则表述)。"
+    },
+    {
+      "text": "Should NOT trigger the six-route drift dispatch when has_unreachable_remote is true — degrade to an offline banner instead (OQ-C); has_pending_push alone likewise does not warrant a drift warning",
+      "passed": true,
+      "evidence": "has_unreachable_remote=false、has_pending_push=false，answer 未发漂移告警或六路分派 (\"没有需要修复的 remote\")。属真空成立。"
+    },
+    {
+      "text": "Should describe the gitlink orphan causal chain: a submodule commit referenced by the main repo's gitlink but absent on that remote makes `clone --recursive` from that remote break.",
+      "passed": true,
+      "evidence": "\"先推子模块，再推主仓，否则 GitHub 上主仓会引用一个 GitHub 子模块里还不存在的提交 (悬空指针，clone --recursive 失败)\"，并在 gitlink integrity 段重述该风险。"
+    },
+    {
+      "text": "DISCRIMINATOR (v1.62.0+): should surface the gitlink cause as a WIRED dispatch route of multi_remote_drift with an actionable fix command (git -C <submodule> push <remote> <branch>) — NOT as a documented gap / design intent that is 'not yet wired'. Pre-v1.62.0 skill versions self-describe it as a known gap; that distinction is the point of this assertion.",
+      "passed": false,
+      "evidence": "answer 未把 gitlink 孤立作为 multi_remote_drift 已接线路由呈现 (未提路由名)；只报 gitlink_integrity 全 ok 并给补推命令。也未称其为缺口。"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 6,
+    "total": 12,
+    "pass_rate": 0.5
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "Should output a sync_status section (🔄 同步状态 or equivalent) listing each submodule",
+      "passed": true,
+      "evidence": "answer.md 框内有「🔄 同步状态」区块, 子模块逐个列出: '✅ standards: 同步 (主仓记录 940cb5b = 远程 master, 落后 0)' / '✅ aria: 同步 (...1cb3872...)' / '✅ aria-orchestrator: 同步 (...237045a)', 与 snapshot 一致。"
+    },
+    {
+      "text": "Should check submodule tree_commit vs head_commit vs remote_commit with graceful fallback",
+      "passed": true,
+      "evidence": "'子模块逐个解读' 表格列: 工作目录 / 主仓库记录 / 远程 master (origin) / 落后远程, 明确 '扫描对每个子模块比较三个位置', SHA 与 snapshot 一致。exec_notes 记录读过 sync.py 确认 origin/HEAD→master→main 回落链, 但回答未提及 fallback, 本次也未触发; 与 X 同口径只按三方比较判通过。"
+    },
+    {
+      "text": "Should detect submodule drift when tree_vs_remote is true and recommend git submodule update --remote",
+      "passed": true,
+      "evidence": "回答: 'tree_vs_remote 三个都是 false ... 推荐规则 submodule_drift (子模块落后远程时触发) 本次没有命中', 并说明 --remote 只会切到同一提交。前提不成立, 真空通过。"
+    },
+    {
+      "text": "Should NOT execute git fetch without user consent (read FETCH_HEAD age instead)",
+      "passed": false,
+      "evidence": "answer.md: '本次扫描在开头就对 3 个子模块、2 个远程 ... 实际 fetch 了一轮 (8 条 fetch 全部成功)'。未经同意执行了 fetch, 未读 FETCH_HEAD age。skill 设计所致, 两臂同样。"
+    },
+    {
+      "text": "Should gracefully handle missing origin/HEAD via four-tier fallback (origin_HEAD -> ls-remote -> config_default -> unavailable)",
+      "passed": false,
+      "evidence": "origin/HEAD 未缺失 (remote_commit_source=local_ref), 回答没有涉及四级 fallback。exec_notes 读 sync.py 看到的是三级回落链 (origin/HEAD→master→main), 也不是断言写的四级。无证据。"
+    },
+    {
+      "text": "Should fail-soft on any git error, never blocking the rest of the scan",
+      "passed": false,
+      "evidence": "本次无 git 错误: 8 个 fetch leg 全部成功, errors[] 为空, 回答写 '8/8 条成功'。没有 fail-soft 行为可评, 判不通过。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  },
+  "timing": {
+    "total_tokens": 137623,
+    "duration_ms": 253316,
+    "total_duration_seconds": 253.3,
+    "agent_output": "/tmp/claude-1000/-home-dev-Aria/3e535147-7280-4ed1-90c7-c92dbc9f2ca5/tasks/ada4afb02c99402ee.output"
+  }
+}

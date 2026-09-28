@@ -1,0 +1,50 @@
+{
+ "expectations": [
+  {
+   "text": "Should check aria/README.md version against aria/.claude-plugin/plugin.json",
+   "passed": true,
+   "evidence": "answer README 版本一致性表: '`aria/README.md` 版本行 | 1.73.3 (plugin.json) | 1.73.3 | ✅', 并另查 marketplace.json / VERSION"
+  },
+  {
+   "text": "Should count Skills in aria/skills/ directory excluding user-invocable: false (internal Skills like config-loader, agent-router, agent-team-audit, arch-common, audit-engine)",
+   "passed": true,
+   "evidence": "answer: '42 个含 SKILL.md 的目录 (另有 issue-triage-workspace/ 没有 SKILL.md ... 不算 Skill)。其中 7 个是 user-invocable: false (agent-router、agent-team-audit、arch-common、aria-token-telemetry、audit-engine、config-loader、git-remote-helper), 所以 35 个面向用户'。经核实正确"
+  },
+  {
+   "text": "Should compare Skill count with the number stated in README",
+   "passed": true,
+   "evidence": "answer 表: 'aria/README.md | 35 + 7 = 42 | ✅ 对' 且 'aria/README.zh.md | 34 + 7 = 41 | ❌ 少 1' —— 后者经核实为真 (aria/README.zh.md 第 44 行), 比对更完整"
+  },
+  {
+   "text": "Should check Skill list completeness by comparing directory names with README Skills listing",
+   "passed": true,
+   "evidence": "answer 表: aria/README.md 列表 40 条, 漏 issue-triage、session-closer (核实正确), 并声明无多余条目。缺陷: 称主项目 README '没有逐项列表 | 不适用' 是错的 —— README.md 第 133 行起有 Skills 分类表, 且漏 session-closer; 断言针对的 aria/README.md 部分做对了, 故 PASS"
+  },
+  {
+   "text": "Should output skill_list_missing items at info severity level (not warning)",
+   "passed": false,
+   "evidence": "answer 用 '❌ issue-triage、session-closer' 标漏项, 没有 info 级字样; ❌ 标记更接近错误/警告语义, 无证据表明按 info 级输出"
+  },
+  {
+   "text": "Should check Plugin badge version in root README against plugin.json version",
+   "passed": true,
+   "evidence": "answer 表: '主项目 README.md Plugin badge | v1.73.3 | v1.73.3 | ✅', 另查了三份 i18n badge"
+  },
+  {
+   "text": "Should report badge mismatch as warning severity",
+   "passed": false,
+   "evidence": "badge 一致, 未出现不匹配, 回答里无「不匹配时报 warning」表述; 无法核验, 判 FAIL"
+  },
+  {
+   "text": "Should gracefully handle missing aria submodule (skip, not error)",
+   "passed": false,
+   "evidence": "aria 子模块存在, 缺失场景未发生, 回答未涉及; 无法核验, 判 FAIL"
+  }
+ ],
+ "summary": {
+  "passed": 5,
+  "failed": 3,
+  "total": 8,
+  "pass_rate": 0.625
+ }
+}
