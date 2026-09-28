@@ -180,3 +180,12 @@ updated-at: 2026-09-28T10:51:13Z
 - 主仓 PR: `10CG/Aria#222`
 - owner 决策单: `.aria/decisions/2026-09-27-195-199-owner-rulings-pending-items.md`
 - 并发轨最新会话层 handoff: [2026-09-24-session-close-199-post-planning-converged.md](./2026-09-24-session-close-199-post-planning-converged.md)
+
+---
+
+## 追记 (2026-09-28, 本文所在提交推送之后)
+
+
+- **第 10 步 Phase D 提交双推** (owner 第 4 步授权): 推前 origin 与 github 的 master 均为 `03f97ac` 且为本地祖先; `git push origin master` / `git push github master` 分开执行、均退出 0 (`03f97ac..bd074cd`); 推后逐 remote `ls-remote`: origin 与 github 均 **`bd074cdbdeff2dacd3e3c607fc8a4c59bbdde415` MATCH**; 该 tip 上的 gitlink 为 aria `5215cf2` / standards `2bc1c4c` (两端均可达)。
+- **第 11 步 `10CG/Aria#195` 回帖并关闭**: 发帖前确认归档路径已在 `origin/master` 上可见; POST 评论 → id **`26527`**; 单独 PATCH `state: closed` → `closed_at` `2026-09-28T10:54:07Z`; 独立 GET: issue `state: closed`, 评论 26527 存在且正文与草稿逐字一致。回帖含版本号 (aria-plugin v1.74.0)、SC 验收摘要与已知边界; 发帖前自检裸引用 0 · §4.5 字符 0 · U+FFFD 0。
+- 本追记所在提交的推送结果见本会话回复 (自指排除)。至此 TASK-032 全部子步骤完成, 本轨终结。

@@ -1587,6 +1587,12 @@ sweep: null · gc: null · fetch_success: true · push_success: true · push_ski
 - **第 10 步 Phase D 提交双推**: 本节所在提交与 `06e2e95` / `c8238c3` 一起推送 (owner 第 4 步已授权), 推送与逐 remote 核验结果见下一条追记。
 - **第 11 步 `10CG/Aria#195` 回帖并关闭**: 在上一条推送核验一致之后执行 (清单第 48 条), 结果见追记。
 
+### 追记 — 第 10 / 11 步 (Phase D 推送与关闭回帖)
+
+- **第 10 步 Phase D 提交双推** (owner 第 4 步授权): 推前 origin 与 github 的 master 均为 `03f97ac` 且为本地祖先; `git push origin master` / `git push github master` 分开执行、均退出 0 (`03f97ac..bd074cd`); 推后逐 remote `ls-remote`: origin 与 github 均 **`bd074cdbdeff2dacd3e3c607fc8a4c59bbdde415` MATCH**; 该 tip 上的 gitlink 为 aria `5215cf2` / standards `2bc1c4c` (两端均可达)。
+- **第 11 步 `10CG/Aria#195` 回帖并关闭**: 发帖前确认归档路径已在 `origin/master` 上可见; POST 评论 → id **`26527`**; 单独 PATCH `state: closed` → `closed_at` `2026-09-28T10:54:07Z`; 独立 GET: issue `state: closed`, 评论 26527 存在且正文与草稿逐字一致。回帖含版本号 (aria-plugin v1.74.0)、SC 验收摘要与已知边界; 发帖前自检裸引用 0 · §4.5 字符 0 · U+FFFD 0。
+- 本追记所在提交的推送结果见本会话回复 (自指排除)。至此 TASK-032 全部子步骤完成, 本轨终结。
+
 ---
 
 ## 变更记录
@@ -1614,3 +1620,4 @@ sweep: null · gc: null · fetch_success: true · push_success: true · push_ski
 | 2026-09-28 | **TASK-030 完成**: 主仓 gitlink 前进 (aria `5215cf2` / standards `2bc1c4c`), 16 个版本点改 `1.74.0` (含补上 `VERSION:24`), custom checks 15 pass + `plugin-cache-currency` 预期 STALE; 提交 `a99dd8d` (未推送)。 |
 | 2026-09-28 | **TASK-031 完成** (owner 授权五项): feature 双推 `6fdff9f` → PR `10CG/Aria#222` → C.2.4 green (not_applicable, 已 surface) + C.2.4.5 PASS → merge commit `03f97ac` → 本地快进 → C.2.5 两个 remote 全部成功、parity match → gitlink_integrity 六组 ok。TASK-032 第 1 步对齐通过。 |
 | 2026-09-28 | **TASK-032 Phase D**: 27 行勾选; 归档门预演 warn (三条已知假阳性); owner 裁 Step 7 不建; 归档 `c8238c3` (Step 1-6 五条断言全绿); release_gate 释放 claim (协调 ref `4d40f84`); 另开 `10CG/aria-plugin#206`; 周期 handoff 与 latest.md 更新; 写法自检第二次归零。推送与回帖见追记。 |
+| 2026-09-28 | Phase D 双推 `bd074cd` 两端 MATCH; `10CG/Aria#195` 回帖 (评论 26527) 并关闭, GET 核验 closed。**本轨终结**。 |
