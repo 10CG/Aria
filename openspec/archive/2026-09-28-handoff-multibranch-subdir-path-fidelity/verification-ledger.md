@@ -1540,6 +1540,53 @@ d_payload: spec_id = handoff-multibranch-subdir-path-fidelity · deferred_items 
 
 ⇒ openspec-archive 执行 Step 1-6, 停在 Step 7 之前; D.2b / D.3 照常。未建 tracker 的原因: 预演的三条 unverified 全部是已知类别的检查器假阳性, `deferred_items` 为空, 没有真正的遗留待办。
 
+### 第 5 步 — D.2 归档 (openspec-archive Step 1-6; 自本节起写在归档后台账)
+
+- **Step 1**: 已归档前置检查 `ls openspec/archive/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}-handoff-multibranch-subdir-path-fidelity$'` 零命中; 正式 `--gate` 输出与第 3 步预演**逐字段相同** (complete=True / verdict=warn / 三条 unverified / 无 `runtime_probe` 键) ⇒ 路由「complete=true ∧ verdict=warn」= 路径 (a) 正常归档 + warn 覆盖层。
+- **Step 2**: `proposal.md` 的 Status 改为「Complete (2026-09-28 ship: …)」并保留其后的 Approved 历史 (照 `2026-09-17-rule6-…` 归档先例); 在文件起始插入 frontmatter: `unverified_claims` 三条 (逐条取自 gate 输出, 回读与 gate 输出逐条一致) + `unverified_ack: false` (清单第 46 条); 仓内 `lib/frontmatter_block.py` 的 `_FRONTMATTER_RE` 能取到该块 (11 行), 改后重跑 gate 无 soft_error。
+- **Step 3**: 取日期 `TZ=UTC date -u +%Y-%m-%d` = **2026-09-28**; 先 `git add` Step 2 的改动再 `git mv` (防「git mv 带未暂存编辑时提交的是 index 旧内容」); `mkdir -p openspec/archive`; 断言目标不存在后 `git mv openspec/changes/handoff-multibranch-subdir-path-fidelity openspec/archive/2026-09-28-handoff-multibranch-subdir-path-fidelity`, 退出 0。
+- **Step 4 五条断言全绿**: 目标存在 · 源已消失 · 无 `openspec/changes/archive/` · 无 `{name}/{name}/` 嵌套 · `proposal.md` 在该层。**Step 6**: 含 `proposal.md` / `tasks.md` / `detailed-tasks.yaml` (另有 `verification-ledger.md` / `sc11-predicate-validation.py`); 暂存区里的 `proposal.md` 以 frontmatter 开头。
+- **Step 7 未执行** (owner 2026-09-28 裁「不建」, 原文见第 4 步); 输出字段照实记: `d_issue_created: false` · `d_issue_number: null` · 跳过原因 = owner 裁定 (skill 枚举无此项, 未套用现成值; 清单第 49 条)。
+- 归档提交: 主仓 master **`c8238c3`** (5 个文件 rename, 其中 `proposal.md` 带 Step 2 改动)。
+
+### 第 7 步 — D.2b `release_gate` 释放本轨 claim (10:44:33Z)
+
+前置检查 `coord_ref_precheck` → `{"verdict": "ok", "local_ahead": 0}` 退出 0; 强制对齐退出 0 (本地 `07933e5`); 会话未带 `ARIA_COORDINATION_NO_PUSH`。`release_gate.py --raw-track-id handoff-multibranch-subdir-path-fidelity --status done --repo-path /home/dev/Aria` (**不带** `--sweep-stale` / `--gc`, 清单第 47 条) 退出 0:
+
+```
+released: success=true · track_id=handoff-multibranch-subdir-path-fidelity · status=done · benign=false
+sweep: null · gc: null · fetch_success: true · push_success: true · push_skipped: false · hard_error: null
+```
+
+推后独立核验: 本地 = origin = `4d40f8416415faf63ebe5f6eb8bcea9cf0895210` MATCH; `claims/bfe8285d/s-48ca@0612.yaml` 现为 `status: done` (phase B); 全局 active claim 只剩 `claims/bfe8285d/s-73b9@1606.yaml` (`10CG/Aria#199`, 心跳 `2026-09-28T07:52:48Z`)。本步推送属 owner 第 4 步授权的「Phase D 两类推送」。
+
+### 检查器假阳性另报 (owner 第 4 步授权)
+
+查重结论见第 3 步: 第 1 类属 `10CG/Aria#192`, 第 3 类即 `10CG/aria-plugin#114`, 只为第 2 类开单。POST 返回 **`10CG/aria-plugin#206`** (open); 独立 GET 核验标题与正文逐字一致。正文顺带登记另两类的这次新实例并指向那两张单, 未在那两张单上另发评论。发帖前自检: 裸引用 0 · §4.5 字符 0 · U+FFFD 0。
+
+### 第 8 步 — D.3 周期 handoff
+
+- 文件 `docs/handoff/2026-09-28-195-handoff-multibranch-shipped-v1.74.0-archived.md` (同日无重名); `owner-container` 取自 `handoff_autofill.py --owner-container` 的机械值 `simonfish/bfe8285d`; `head -8 | grep -cE '^(track-id|owner-container|phase|status|updated-at):'` = **5**。
+- 按本步要求含: `reference-snapshot-aria.json` 未重采样 (附 `10CG/aria-plugin#204`) · standards `session-handoff.md` 已改 (Amended + 1.4.0) —— 对应 SC-11 (d)(h); `tasks.md`「AI 流程判断清单」第 1 ~ 36 条**全文照录** (脚本从归档后的 `tasks.md` 截取原文嵌入, 非手抄) 并追加 Phase B / C / D 新增第 37 ~ 49 条, 每条写「做了什么 + 理由 + 请 owner 复议」; SC-11 矩阵已知边界 (R4 m13) 与三处「文本存在不等于语义正确」(R5) 照录。
+- `docs/handoff/latest.md`: 裸 `**Latest**:` 与「Done (this cycle)」改指本周期 handoff (全文裸 `**Latest**:` 仍恰 1 个); banner 的在飞轨描述更新 (本轨终结; `10CG/Aria#199` B.1 入口门第 1 项已满足); track 表本轨一行改为 done 并前插本周期链接 (旧链接保留); 顶部新增一段周期收尾说明。
+
+### 第 9 步 — 写法自检第二次
+
+| 对象 | 裸 issue 引用 | §4.5 字符 | U+FFFD | 其它 |
+|---|---|---|---|---|
+| 周期 handoff 全文 | 0 | 0 | 0 | NUL 0; 希腊字母 0 (照录的清单原文单独再扫一次: 裸引用 0) |
+| `latest.md` 本次新增行 | 0 | — | — | 裸 `**Latest**:` 恰 1 个 |
+| `10CG/aria-plugin#206` 正文 | 0 | 0 | 0 | 发帖前 |
+| `10CG/Aria#195` 关闭回帖草稿 | 0 | 0 | 0 | 归档日期占位已填, 占位残留 0 |
+| 本节 (归档后台账追加) | 见下 | | | 随本提交对新增行复跑 |
+
+主仓同步面文字已由 TASK-031 开 PR 前自检覆盖, 不在本次范围。
+
+### 未完成的两步 (写作时, 自指排除)
+
+- **第 10 步 Phase D 提交双推**: 本节所在提交与 `06e2e95` / `c8238c3` 一起推送 (owner 第 4 步已授权), 推送与逐 remote 核验结果见下一条追记。
+- **第 11 步 `10CG/Aria#195` 回帖并关闭**: 在上一条推送核验一致之后执行 (清单第 48 条), 结果见追记。
+
 ---
 
 ## 变更记录
@@ -1566,3 +1613,4 @@ d_payload: spec_id = handoff-multibranch-subdir-path-fidelity · deferred_items 
 | 2026-09-28 | **TASK-034 完成** (owner 授权): aria master `5215cf2` + tag `v1.74.0` 与 standards master `2bc1c4c` 原子双推, origin / github 逐 remote `ls-remote` 全部 MATCH; 同批授权的主仓 feature 备份双推 `877ed17` 两端 MATCH。 |
 | 2026-09-28 | **TASK-030 完成**: 主仓 gitlink 前进 (aria `5215cf2` / standards `2bc1c4c`), 16 个版本点改 `1.74.0` (含补上 `VERSION:24`), custom checks 15 pass + `plugin-cache-currency` 预期 STALE; 提交 `a99dd8d` (未推送)。 |
 | 2026-09-28 | **TASK-031 完成** (owner 授权五项): feature 双推 `6fdff9f` → PR `10CG/Aria#222` → C.2.4 green (not_applicable, 已 surface) + C.2.4.5 PASS → merge commit `03f97ac` → 本地快进 → C.2.5 两个 remote 全部成功、parity match → gitlink_integrity 六组 ok。TASK-032 第 1 步对齐通过。 |
+| 2026-09-28 | **TASK-032 Phase D**: 27 行勾选; 归档门预演 warn (三条已知假阳性); owner 裁 Step 7 不建; 归档 `c8238c3` (Step 1-6 五条断言全绿); release_gate 释放 claim (协调 ref `4d40f84`); 另开 `10CG/aria-plugin#206`; 周期 handoff 与 latest.md 更新; 写法自检第二次归零。推送与回帖见追记。 |
