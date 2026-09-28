@@ -1304,6 +1304,64 @@ aria `1ad31fa`、standards `56306d1`、主仓 feature 上的 `be91134` 与本节
 
 **工作树**: 订正提交后 aria / standards 的 `status --porcelain` 均为 0 行 (TASK-029 第 4 步前提)。**勾选**: 本任务完成即满足 `tasks.md` 5.6 的勾选条件, 勾选动作按计划留到 TASK-032 一次完成。
 
+## TASK-029 — aria 与 standards: 本地 merge + aria tag + 合并树回归 (parent 5.2, 不推送)
+
+### 首次执行 (2026-09-27T18:33Z) —— 停在第 2 步
+
+- **第 1 步**: `git -C aria fetch origin` / `git -C standards fetch origin` 均退出 0。
+- **第 2 步 (前半)**: 两仓 `status --porcelain` 均 0 行 (aria feature `820ea57`, standards feature `56306d1`)。
+- **第 2 步 (后半, standards 占位核验) 按字面不成立**, 原样输出 (内容取自 `git -C standards show <feature>:conventions/session-handoff.md`, 同时对回填前的 `11b0a14` 跑一遍作自然负控):
+
+```
+[56306d1] 定位串按判据字面 (不带反引号)            : 窗口数 = 0
+[56306d1] 定位串按文件实际写法 (带反引号)          : 窗口数 = 2 (行 97, 176)
+    窗口@97 : #< 计数 = 0 · 含 10CG/aria-plugin#<n> = False
+    窗口@176: #< 计数 = 0 · 含 10CG/aria-plugin#<n> = True
+[11b0a14] 定位串按文件实际写法                      : 窗口数 = 2 (行 97, 176)
+    窗口@97 : #< 计数 = 0 · 含 10CG/aria-plugin#<n> = False
+    窗口@176: #< 计数 = 0 · 含 10CG/aria-plugin#<n> = False · 含「已知缺口, 尚未开跟踪 issue」= True
+```
+
+  **不成立的原因在判据本身, 两处**: (1) 定位串写成不带反引号, 文件里是带反引号的写法, 字面命中 0 处; (2) 判据要求两个窗口都含 `10CG/aria-plugin#<n>`, 而 TASK-023 自己的 verification 只要求在 `:171-173` 那节写跟踪指针、`:97` 只补限定从句 (本台账 TASK-023 节同样只记了一处指针) ⇒ `:97` 窗口在任何版本都不会含。另: 计划设想的自然负控「回填前 `#<` 计数非 0」也不存在 —— TASK-023 落笔时用的是回落措辞而非 `#<` 占位 (该节已记为 AI 流程判断)。**实质**: 两窗口 `#<` 均为 0; 指针所在窗口在当前提交含 `10CG/aria-plugin#204`、在回填前 `11b0a14` 不含, 该条件的自然负控有效。
+- 按 `metadata.owner_gates` 第 9 项停在本步上报。**owner 裁定 (2026-09-28, AskUserQuestion)** 原文 (选项): **「按实质判通过, 重走后继续 (推荐)」** —— 选项说明: 「认定占位已清; 从第 1 步 fetch 重走, 一路做到第 8 步 (本地合并 + 合并树回归 + 打 tag, 不推送)。代价: 第 2 步字面不成立, 原样记台账, 并把『判据与 TASK-023 规定矛盾』写进 AI 流程判断清单请复议; 计划文件 detailed-tasks.yaml 不改。」 ⇒ 记入 `tasks.md` 清单第 36 条。
+
+### 两次执行之间: 跨 UTC 日, 发布日期订正
+
+owner 裁定到达时已是 2026-09-28T01:47Z (距首次执行约 7 小时)。按 TASK-027 节预设的「打 tag 时已跨日则照实改日期」: aria feature 提交 **`651ff6e`** —— CHANGELOG `[1.74.0]` 标题 / VERSION 发布日期行 / `README.md` / `README.zh.md` 四处发布日期 2026-09-27 → 2026-09-28 (事实性日期如「owner 2026-09-27 裁放行」与结果目录名不动); 新增 4 行裸引用自检 0。重走前并发核查: 主仓 master 本地 / origin / github 均 `c454e35`, 协调 ref 本地 = origin = `4ae229e`, 无他方推进。
+
+### 重走 (2026-09-28T01:48:22Z 起, 从第 1 步)
+
+- **第 1 步**: 两仓 fetch 均退出 0。
+- **第 2 步**: porcelain 两仓 0 行 (aria feature `651ff6e07d14498474f6a19068883a495e902433`, standards feature `56306d107f094d37d8f79d3311c962cebf8afcc8`); 占位核验输出与首次一致 (按 owner 裁定判通过)。
+- **第 3 步**: 两仓 `checkout master` 后 `master == origin/master`, 均 **EQUAL**, 无需 ff-only —— aria `1cb387218935433312fde4067c276754b77686a8` · standards `940cb5b4b8672ea56606c4c3ed6157e84949fa4a`; porcelain 均 0。aria CHANGELOG 版本号集合 (`git -C aria show master:CHANGELOG.md | grep -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' | sort -u`) = **138 条**, 集合文件 sha256 `988bda63af410461a130eb1eb0472866dc7c81d0b19fc1e6117cf81dabf1085e` (由 `1cb3872` 的 CHANGELOG 确定性导出, 可复算)。
+- **第 4 步 取号复核**: aria `origin/master` = `1cb3872` = TASK-027 取号时记录值 ⇒ 未前进, 通过。
+- **第 5 步 本地合并** (`--no-ff`, 不在服务端合并): 两仓退出码 0, 正向断言全部成立 ——
+
+```
+[aria]      HEAD = 5215cf20c467535ca9cdcea2b1ecf34f94887732
+            HEAD != 第 3 步 SHA: yes · HEAD^1 == 1cb3872: yes · HEAD^2 == feature 651ff6e: yes · porcelain = 0
+[standards] HEAD = 2bc1c4c619c5125a1bb2963864c1683fd9a87739
+            HEAD != 第 3 步 SHA: yes · HEAD^1 == 940cb5b: yes · HEAD^2 == feature 56306d1: yes · porcelain = 0
+```
+
+- **第 6 步 取号终核**: 合并树七处取值均 `1.74.0` (`plugin.json` · `marketplace.json` 两处 · VERSION 头部与「## 版本号」代码块 · `README.md` · `README.zh.md`), CHANGELOG 标题 `## [1.74.0] - 2026-09-28`; 集合判据 `comm -23 <第 3 步集合> <合并树集合>` 输出 **0 行** (合并树集合 139 条 = 138 + 1); `git -C aria ls-remote --tags origin` 与 `github` 均退出 0, `v1.74.0` 命中均 0。
+- **第 7 步 合并树回归** (前提: aria porcelain 0 且 HEAD = `5215cf2`, 执行前后各核一次; 01:50:29Z – 01:54:17Z):
+
+```
+(a) python3 -B aria/skills/state-scanner/tests/run_tests.py      → Ran 1627 tests in 225.285s · OK · rc 0
+(b) pytest -q -p no:cacheprovider tests/test_collision.py        → 28 passed
+    pytest -q -p no:cacheprovider tests/   (phase-d-closer)      → 11 passed
+(c) metadata.sc11_baseline_predicates 全部谓词                    → parsed 19 / PASS 19 / FAIL 0
+```
+
+  Ran 数与 TASK-021 的 1627 相同, 差值 0 —— B.1 以来 aria `origin/master` 无新提交, fetch 没有带进并发提交。谓词执行器是本会话重写的 (TASK-021 当时的脚本在旧会话 scratchpad, 已不存在): 按「`(标签) <谓词>`」逐行解析, 以声明的执行形态 `if <谓词>; then echo PASS; else echo FAIL; fi` 在 `aria/skills/state-scanner` 下执行, 并断言恰好解析出 19 条且标签序列与 TASK-021 记录一致, 否则中止 (防 TASK-021 记过的「解析 0 条仍报全真」)。**执行器负控**: 在 scratchpad 建 `1cb3872` 的临时 worktree 跑同一执行器 → **PASS 0 / FAIL 19** (与 TASK-001 第 10 条的基线全 FAIL 一致), 该 worktree 随即 `worktree remove`, `worktree list` 只剩主工作树。
+- **第 8 步 打 tag**: 回归通过后在 `5215cf2` 上打附注 tag —— `v1.74.0` (tag 对象 `f951d1ec87aa1c57de1964b8673c1afa9862b281` → `5215cf20c467535ca9cdcea2b1ecf34f94887732`)。
+- 重走结束 01:54:54Z。合并提交与 tag 均未带 `Co-Authored-By`。
+
+### 未推的部分
+
+aria master `5215cf2` + tag `v1.74.0`、standards master `2bc1c4c`、两仓 feature 分支上的本 cycle 提交、主仓 feature 上的本节所在提交及其前三个, 全部**只在本地**。子模块双推属 TASK-034 (`metadata.owner_gates` 第 10 项, 需 owner 授权); 主仓 gitlink 在 TASK-034 两个远端都核验一致之前不得 bump (清单第 32 条)。
+
 ---
 
 ## 变更记录
@@ -1326,3 +1384,4 @@ aria `1ad31fa`、standards `56306d1`、主仓 feature 上的 `be91134` 与本节
 | 2026-09-27 | 普通会话续上 (变量已不在, 实测 `False`): 两条 claim 心跳经前置检查刷新到 `18:14:01Z` / `18:14:11Z`, 推后 origin 与本地均 `4ae229e`。 |
 | 2026-09-27 | **TASK-027 完成**: 取号 `1.74.0` (两个 remote 无 `v1.74.*`, `10CG/Aria#199` 无预留号; 取号时 aria `origin/master` = `1cb3872`); CHANGELOG `[1.74.0]` 三段 + Notes 逐条对真代码核过; aria `1ad31fa` (六个文件, `README.zh.md` 经 owner 当场裁定纳入) · standards `56306d1` (`session-handoff.md` 升 1.4.0, 决策单第 1 项); 均未推送。 |
 | 2026-09-27 | **TASK-028 完成** (写法自检第一次): 三仓新增行 1481 + 5 + 1307; 裸引用首跑 aria 2 / standards 0 / 主仓 5, 全部订正 (aria `820ea57`, 主仓台账三行随本节提交), 复跑归零; §4.5 字符与字面 U+FFFD 均 0。 |
+| 2026-09-27 ~ 28 | **TASK-029 完成** (本地, 未推送): 首次执行停在第 2 步 (standards 占位核验判据与 TASK-023 规定不一致) → owner 裁按实质判通过 → 跨 UTC 日订正发布日期 (aria `651ff6e`) → 从第 1 步重走: aria master `5215cf2` / standards master `2bc1c4c` 双父合并正向断言成立; 取号终核七处 `1.74.0`、CHANGELOG 零丢失、两个 remote 无 `v1.74.0`; 合并树回归 `Ran 1627 OK` + 28 + 11 + 谓词 19/19 (执行器负控 0/19); tag `v1.74.0` → `5215cf2`。 |
