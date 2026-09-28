@@ -1408,6 +1408,47 @@ git -C standards push github master                          → 940cb5b..2bc1c4
 
 所推 tip 上的 gitlink 仍为 aria `1cb3872` / standards `940cb5b` (两端均可达), 无孤立 gitlink。**本节所在的台账提交不在该授权范围内, 写作时未推送**, 随下一次授权的推送发出。
 
+## TASK-030 — 主仓发布同步面: 两个 gitlink + 16 个版本点 + custom checks 复跑 (parent 5.1)
+
+**前置**: TASK-034 已对 origin 与 github 各自 `ls-remote` 核验一致 (两个子模块的 master, aria 另含 tag 对象与其指向) ⇒ 满足清单第 32 条, 可以 bump。
+
+**gitlink** (动手时实测 `git ls-tree HEAD aria standards` 起步, 只前进不回退):
+
+```
+aria:      1cb387218935433312fde4067c276754b77686a8 → 5215cf20c467535ca9cdcea2b1ecf34f94887732 · 祖先关系成立 · = 本地 master = origin/master = github/master
+standards: 940cb5b4b8672ea56606c4c3ed6157e84949fa4a → 2bc1c4c619c5125a1bb2963864c1683fd9a87739 · 祖先关系成立 · = 本地 master = origin/master = github/master
+```
+
+**16 个版本点** (动手前逐处 `grep -n` 实测, 按行精确替换, 每行断言恰含一处旧号):
+
+| 点 | 位置 (实测) | 改前 → 改后 |
+|---|---|---|
+| 1 | `README.md:8` badge | 1.73.3 → 1.74.0 |
+| 2 | `README.md:242` Plugin Version 行 | 1.73.3 → 1.74.0 |
+| 3-5 | `README.zh.md` / `README.ja.md` / `README.ko.md` `:3` translated-from 标记 | v1.73.3 → v1.74.0 |
+| 6-8 | 同三份 `:10` badge | 1.73.3 → 1.74.0 |
+| 9-11 | 同三份 `:244` Plugin Version 行 | 1.73.3 → 1.74.0 |
+| 12 | `VERSION:24` 子模块表 aria 行 | **v1.73.0** → v1.74.0 (直接写新号; 该行自 v1.73.0 起三次发版漏改, 本 cycle AB 的两个臂也各自独立发现过) |
+| 13-14 | `CLAUDE.md:138` 方法论轨版本区间尾 / `CLAUDE.md:142`「版本:」行 | 1.73.3 → 1.74.0 (计划写 `:139` / `:141`, 实测已漂到 `:138` / `:142`) |
+| 15 | `docs/architecture/system-architecture.md:189` | 1.73.3 → 1.74.0 |
+| 16 | `docs/architecture/version-scheme.md:23` | 1.73.3 → 1.74.0 |
+
+改后复验: 八个文件中 `1.73.3` 残留 0 处, `1.74.0` 恰 16 处, 均等于 `aria/.claude-plugin/plugin.json` 的 `1.74.0`。模板对照: 上次发版的主仓同步提交 `1b9734a` 改的是同样 15 处 (不含 `VERSION:24`)。
+
+**custom checks 复跑** (`scan.py` 输出写 scratchpad, 退出 0):
+
+```
+m6-version-badge-match             pass  OK badge=1.74.0
+i18n-readme-translation-currency   pass  OK (3 i18n READMEs current @ 1.74.0)
+plugin-version-arch-docs-match     pass  OK plugin=1.74.0 (2 arch doc rows match)
+main-project-version-consistency   pass  OK 主项目版本 1.7.5 — 9 个引用点全部一致
+plugin-cache-currency              fail  STALE installed=1.73.3 (scope=user) sot=1.74.0   ← 预期, 待 owner 更新本机插件
+```
+
+其余 11 条 custom check 均 pass (共 16 条, 15 pass / 1 预期 STALE)。
+
+**提交**: 主仓 feature **`a99dd8d`** —— 只 add 本任务 deliverables (`aria` / `standards` 两个 gitlink + `VERSION` / `README.md` / 三份 i18n README / `CLAUDE.md` / 两份架构文档), `git diff --cached --stat` 恰 10 个路径; 提交后主仓工作树干净。本节所在的台账提交与 `a99dd8d` 均**未推送**, 随 TASK-031 的推送发出。
+
 ---
 
 ## 变更记录
@@ -1432,3 +1473,4 @@ git -C standards push github master                          → 940cb5b..2bc1c4
 | 2026-09-27 | **TASK-028 完成** (写法自检第一次): 三仓新增行 1481 + 5 + 1307; 裸引用首跑 aria 2 / standards 0 / 主仓 5, 全部订正 (aria `820ea57`, 主仓台账三行随本节提交), 复跑归零; §4.5 字符与字面 U+FFFD 均 0。 |
 | 2026-09-27 ~ 28 | **TASK-029 完成** (本地, 未推送): 首次执行停在第 2 步 (standards 占位核验判据与 TASK-023 规定不一致) → owner 裁按实质判通过 → 跨 UTC 日订正发布日期 (aria `651ff6e`) → 从第 1 步重走: aria master `5215cf2` / standards master `2bc1c4c` 双父合并正向断言成立; 取号终核七处 `1.74.0`、CHANGELOG 零丢失、两个 remote 无 `v1.74.0`; 合并树回归 `Ran 1627 OK` + 28 + 11 + 谓词 19/19 (执行器负控 0/19); tag `v1.74.0` → `5215cf2`。 |
 | 2026-09-28 | **TASK-034 完成** (owner 授权): aria master `5215cf2` + tag `v1.74.0` 与 standards master `2bc1c4c` 原子双推, origin / github 逐 remote `ls-remote` 全部 MATCH; 同批授权的主仓 feature 备份双推 `877ed17` 两端 MATCH。 |
+| 2026-09-28 | **TASK-030 完成**: 主仓 gitlink 前进 (aria `5215cf2` / standards `2bc1c4c`), 16 个版本点改 `1.74.0` (含补上 `VERSION:24`), custom checks 15 pass + `plugin-cache-currency` 预期 STALE; 提交 `a99dd8d` (未推送)。 |
