@@ -1,7 +1,20 @@
+---
+unverified_claims:
+  - claim: "三个仓内调用方与 legacy track_id 改用 `rel_path`; 两个 TrackEntry 构造点都写 `rel_path` (含无 frontmatter 分支 `:686` 的 `_get_file_commit_date` 调用); `scan.py:186` 只拼串改读 `rel_path` (无兜底, 同形早退), `:193` / `:209` 上报的 `filename` 不变; 同批给 `test_scan_integration.py` 的 `HEALTHY_TRACKS` 补键; `:36` / `:332` / `:494` 格式声明同改 — SC-1 / 4 / 6 / 8 / 13 / 17 转绿, SC-11 (i1)"
+    reason: "symbol 'HEALTHY_TRACKS' unclassified reference form"
+    symbols: ["HEALTHY_TRACKS"]
+  - claim: "`standards/conventions/session-handoff.md:97` 与 `:171-173` 补第三态 (限定机械 writer 路径, 措辞按「读前必看」第 3 条), 按 `:180` 先例加 Amended 标注, 版本头是否 bump 记台账 (参见 10CG/aria-standards#20); `references/layer-l-integration.md:105` 同步; 记一行「已复核, 本 spec 不对子目录布局表态」; 措辞中的 issue 号先以占位落笔, 5.3 开单后回填; 两侧改动由主控分别在 standards 与 aria 的 feature 分支提交 — SC-11 (h)(l3)"
+    reason: "no extractable symbol (fail-soft)"
+    symbols: []
+  - claim: "回归 (在 3.1–3.5 与 4.1 / 4.2 / 4.4 / 4.5 之后): 回归前 aria 与 standards 两个 feature 分支的工作树干净并记 HEAD SHA (该 aria SHA 即 5.5 的 with 臂); `run_tests.py` 全量 + pytest 腿 (`test_collision.py` / phase-d-closer `test_fetch_gate.py`) 零失败; SC-10 点名集按两腿执行; 两份冻结语料 (分仓各自对 B.1 基线 diff) 与 1.2 新建的平铺基线 JSON 均未被重生成; SC-11 全部谓词为真; SC-12a (本仓平铺, 背靠背 + ref→SHA 映射比对) 与 SC-12b (子目录临时仓) 活体 dogfood — 台账"
+    reason: "dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在"
+    symbols: []
+unverified_ack: false
+---
 # handoff_multibranch 路径保真: ls-tree 相对路径贯穿全部四个调用方 + 读不到不再伪造 legacy track (Aria #195)
 
 > **Level**: Full (**Level 3 Spec**) — ✅ **2026-09-12 裁定升 Level 3** (决策单 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md` §2 行 7: `spec-drafter/LEVEL_GUIDE.md:156-162` 两条跨模块判据字面命中 —— 「影响多个子模块」aria + standards 与 「需要 API 契约变更」`rel_path` / `unreadable_count` / `degraded_reason`; 与 owner 2026-09-05 对同 collector 家族相邻 spec 的同判据裁定一致; **不拆分** (守卫是 A′ 必需配套)) ⇒ 须补 `tasks.md` (A.2) + `detailed-tasks.yaml` (A.3) + post_planning。原 Level 2 声明及其复议记录见 §待 owner 复议 7。
-> **Status**: Approved (owner 2026-09-12 — post_spec `max_rounds = 5` 终局取 `audit-engine §降级策略` 路径 **[1] 接受当前结论**, R5 聚合报告 `overridden_by_user: true` 已回写; 22 条待复议项按「产品级 owner / 技术级 AI」分工归类裁定, 全部结论见 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md`) — 进 A.2
+> **Status**: Complete (2026-09-28 ship: aria-plugin v1.74.0 — aria `5215cf2` + tag `v1.74.0` / standards `2bc1c4c` / 主仓 PR `10CG/Aria#222` merge `03f97ac`, origin 与 github 逐 remote `ls-remote` 核验一致) — Approved (owner 2026-09-12 — post_spec `max_rounds = 5` 终局取 `audit-engine §降级策略` 路径 **[1] 接受当前结论**, R5 聚合报告 `overridden_by_user: true` 已回写; 22 条待复议项按「产品级 owner / 技术级 AI」分工归类裁定, 全部结论见 `.aria/decisions/2026-09-12-two-l2-specs-195-199-owner-gates-and-technical-rulings.md`) — 进 A.2
 > **Created**: 2026-09-06
 > **Linked Issue**: `10CG/Aria#195`
 > **Issue**: [Aria#195](https://forgejo.10cg.pub/10CG/Aria/issues/195) (2026-09-05 立案, aria-report 自动生成; triage 22287: confirmed / major / next-cycle, 2/2 复现)
