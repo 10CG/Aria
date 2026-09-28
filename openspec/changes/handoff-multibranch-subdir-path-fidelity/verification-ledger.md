@@ -1458,6 +1458,88 @@ plugin-cache-currency              fail  STALE installed=1.73.3 (scope=user) sot
 - **同步 `origin/master`** (merge 不 rebase, 覆盖 phase-c-integrator C.2.1 的 sync rebase 默认): feature 落后 master 12 个提交 (`35700fc` … `c454e35`, 全是 handoff / 决策单 / 执笔报告落仓 / `.aria/state-checks.yaml` 的 Level 1 修复), 其改动路径与本 cycle 交付物**零交集**。`git fetch origin` 后 `git merge --no-ff --no-edit origin/master` 退出 0 → 合并提交 **`0d24604`** (父 `9b4a291` + `c454e35`), 工作树干净, 两个 gitlink 仍为 `5215cf2` / `2bc1c4c`。
 - **写法自检 (PR diff 新增行)**: PR diff 取 `c454e35..HEAD` 的净变化 (同步合并后与 PR 的实际 diff 一致; 覆盖 TASK-030 同步面文字与 TASK-001 起点 `a52b5eb` 以来本 cycle 的全部主仓新增行) = **652636 行 / 244 个文件**。`check_bare_issue_refs.py --repo-root=.` 命中 **1403** 处, **全部**位于 AB 结果目录的 `state-scanner/runs/` 下: `state-snapshot.json` 1144 (scan.py 机器输出里的 issue 标题等) · `answer.md` 240 (被评的臂回答) · `grading.json` 14 (评分证据引文) · `exec_notes.md` 3 · `prompt.txt` 1 与 `eval_metadata.json` 1 (从固定套件原样复制的题面)。作者手写文字 (台账 / `tasks.md` / `RESULT.md` / `PREDICTION.md` / `SCORES.md` / `dispatch/` / TASK-030 同步面 / 评分员写的 `GRADER_CRITIQUE.md`) **零命中**。评测原始产出是证据, 改写即篡改证据, 按 §4.4 / §4.5 执行口径 (存量与夹具不做回改) 不动。§4.5 字符与字面 U+FFFD 在全部新增行中均为 0。**PR 正文** (scratchpad 草稿) 单独自检: 裸引用 0 · §4.5 字符 0 · U+FFFD 0; 按 `standards/conventions/git-commit.md` §8.1 不加 AI 署名行。
 
+### 授权与推送 feature
+
+owner 2026-09-28 经 AskUserQuestion 答「授权全部五项 (推荐)」—— 问题原文列明: (1) feature 快进双推 (`877ed17` → `6fdff9f`); (2) Forgejo 开 PR; (3) 跑 C.2.4 与 C.2.4.5, 只有 green / PASS 才合并; (4) 以 merge commit 合并, 不 squash; (5) 本地 master 快进后先核 aria-orchestrator 无待推内容, 再由 C.2.5 推 github 并做 parity。任一推送被拒、闸门非 green、或只推成一端即停下上报, 不 force。
+
+- feature 推前两端均为 `877ed17` 且为本地祖先; `git push origin` / `git push github` 分开执行、均退出 0; 推后 `ls-remote` 两端均 `6fdff9f27f3bee8e34d6af59e041f078d5676f93` MATCH。
+
+### PR 与两道闸
+
+- 开 PR 前按 head 分支查重: 该分支无任何既有 PR。POST 返回 **`10CG/Aria#222`** (open, base `master`, head `6fdff9f`, mergeable); 独立 GET 核验标题与正文逐字一致。正文不加 AI 署名行 (`git-commit.md` §8.1)。
+- **C.2.4 pre-merge gate** (07:41:29Z, `pre_merge_gate.py --pr-branch feature/handoff-multibranch-subdir-path-fidelity --main-branch master --remote origin`, 退出 0):
+
+```
+verdict: green · pr_ci_status: not_applicable · in_flight_runs: [] · primitive_used: aether-ci-cli · gate_error: None
+path_coverage: decision=not_applicable · workflows_scanned=3 · matched_workflows=[] · changed_files_count=296 · reason=no-triggering-paths
+```
+
+  green 来源为 `not_applicable`, 按 SKILL 的 surface 义务已在会话中原样呈报警告行:「C.2.4: 变更路径无 CI workflow 覆盖, PR CI wait 已跳过 (not_applicable), main in-flight 已核」。
+- **C.2.4.5 子模块指针闸** (`ARIA_PR_NUMBER=222 submodule_gate.sh`, 退出 0, mode=block): `standards forward bump` PASS · `aria forward bump` PASS · `aria-orchestrator unchanged (237045a)`。
+
+### 合并与本地快进
+
+- 合并前复核: `origin/master` 仍为 `c454e35` (与同步基点相同), PR `mergeable: true`。POST `pulls/222/merge` (`Do: merge`, 合并标题照 `10CG/Aria#215` 的格式显式给出, 消息体留空) → GET: `merged: true`, **`merge_commit_sha` = `03f97ac531b23d468ad468223a8bc0f818fdb79f`**, `merged_at` 2026-09-28T07:43:06Z。
+- `git fetch origin` → `git checkout master` → `git merge --ff-only origin/master`: 本地 master `c454e35` → `03f97ac`, 断言 HEAD 等于合并回执 SHA 成立; 父为 `c454e35` + `6fdff9f`; 工作树干净; master 上的 gitlink 为 aria `5215cf2` / standards `2bc1c4c`。
+- **台账所记主仓 SHA 的祖先核验** (`merge-base --is-ancestor <sha> origin/master`): 台账中反引号包裹的 63 个十六进制串里, 能在主仓解析为提交的 22 个中 **17 个是 `origin/master` 的祖先** (本 cycle 全部主仓分支提交); 其余 5 个 (`e911132` / `4ae229e` / `82adeb0` / `ae24f81` / `ad0287f`) 是协调 ref 上的 claim 提交, 本就不在 master 上; 另 35 个是子模块对象, 6 个不是提交 (审计 finding 号、容器 id、哈希摘要)。
+
+### C.2.5 多远程推送
+
+**五项事实** (执行前核对): (1) `.aria/config.json` 无 `phase_c_integrator.multi_remote_push` 覆盖, 也无顶层 `multi_remote` ⇒ 取 `config-loader/DEFAULTS.json` 默认 `enabled: true`; (2) 技能级 `enforced_remotes: null` 继承顶层 `[]` ⇒ 自动发现主仓全部 remote (`github` / `origin`); (3) `fail_on_partial_push: true` (默认); (4) `read_only_remotes: []` (默认); (5) `test -f aria/skills/git-remote-helper/SKILL.md` 成立 ⇒ 不走内联降级。
+
+**aria-orchestrator 前置断言**: fetch origin 与 github 后, 在 `master` 分支上 (本次实测非 detached), HEAD = 本地 master = `origin/master` = `github/master` = `237045ac2cfed9849c201e18434e9f6cb9036ab5`, `rev-list --left-right --count origin/master...HEAD` = `0 0`, 工作树干净 ⇒ 无待推内容, 可以调 C.2.5。
+
+**per-remote 矩阵** (07:45:10Z 起; `expected_sha` = 本地 master `03f97ac`; 子模块与主仓均经 `push_all_remotes.sh`, 主仓推后经 `verify_post_push.py --max-retries=3 --initial-backoff=2 --timeout=15`):
+
+```
+origin: aria ✅ (5215cf2, 已同步) · standards ✅ (2bc1c4c) · aria-orchestrator ✅ (237045a) · main ✅ (03f97ac → 03f97ac, 服务端合并已在) · verify match=true (attempts 1)
+github: aria ✅ (5215cf2, 已同步) · standards ✅ (2bc1c4c) · aria-orchestrator ✅ (237045a) · main ✅ (c454e35 → 03f97ac)                     · verify match=true (attempts 1)
+```
+
+两个 remote 均全部成功且 parity `match: true`。
+
+### 事后核
+
+`scan.py` (输出写 scratchpad, 退出 0): `sync_status.multi_remote.overall_parity: true` · `has_pending_push: false` · `has_unreachable_remote: false` · `gitlink_integrity` 六组 (三个子模块 × 两个 remote) 全部 `ok`。
+
+## TASK-032 — Phase D (parent 5.4)
+
+### 第 1 步 — 本地 master 对齐 (07:48:57Z)
+
+`git fetch origin` → `git checkout master` → `git merge --ff-only origin/master` 输出 `Already up to date.`, 退出 0; HEAD = `origin/master` = `03f97ac`; `git merge-base --is-ancestor 03f97ac HEAD` 成立; 工作树干净。
+
+### 第 2 步 — `tasks.md` 一次性勾选
+
+27 行 checkbox 由主控在本步一次勾完 (勾前 26 行未勾 + 2.0 行已勾; 勾后 27 / 27)。5.4 与 5.6 按清单第 15 条在其子步骤完成前勾选。5.5 行的父目录 token `aria-plugin-benchmarks/ab-results/` 已整个替换为本次结果目录全路径 `aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6/` (目录实测存在); 该行此后只剩这一个含 `ab-results` 的路径, 无 `ab-suite` 路径。
+
+### 第 3 步 — 归档门只读预演
+
+`python3 -B aria/skills/state-scanner/scripts/lib/spec_complete.py --gate openspec/changes/handoff-multibranch-subdir-path-fidelity` 退出 0:
+
+```
+complete = True  (tasks.md 全 [x] (27 task(s), 无 carry-forward/defer 注释))
+verdict  = warn · blocking_reasons = [] · soft_errors = []
+unverified_claims = 3:
+  2.2 行  reason: symbol 'HEALTHY_TRACKS' unclassified reference form
+          (warnings: no Python definition for 'HEALTHY_TRACKS' — not code, cannot be dead-code → warn)
+  4.4 行  reason: no extractable symbol (fail-soft)
+  4.3 行  reason: dogfood/benchmark/deploy claim 无可链接产物路径或路径不存在
+d_payload: spec_id = handoff-multibranch-subdir-path-fidelity · deferred_items = [] · unverified_claims = 上面三条
+```
+
+与计划预判完全一致 (三类均属检查器假阳性; 未为过检查器改写 `tasks.md` 措辞)。查重 (标识符类检索词, `state=all`): 第 1 类落在 `10CG/Aria#192` (open) 重定范围后写明的「抽取层把非生产代码词当候选符号」同一条 fail-toward-warn 分支上; 第 3 类即 `10CG/aria-plugin#114` (open); 第 2 类未见覆盖。
+
+### 第 4 步 — owner 裁定 (2026-09-28, 同一次 AskUserQuestion 的四个问题)
+
+| 问题 | owner 所选 (原文) |
+|---|---|
+| Step 7 建不建 [Archive Tracker] issue | **「不建 (推荐)」** —— 选项说明: 归档只执行 Step 1-6; 三条都不是真待办, 建单只会多一张没有可做之事、还得有人去关的 issue; 代价是这三条只留在归档后台账与 handoff 里 |
+| 三类检查器假阳性是否另报 `10CG/aria-plugin` | **「只为第 2 类开一张新单 (推荐)」** —— 正文顺带登记另两类的这次新实例并指向 `10CG/Aria#192` / `10CG/aria-plugin#114`, 不在那两张单上另发评论 |
+| `10CG/Aria#195` 关闭回帖 | **「授权发帖并关闭 (推荐)」** |
+| Phase D 推送 (主仓 master 上的 Phase D 提交双推 + `release_gate` 释放本轨 claim 并推协调 ref) | **「授权两类推送 (推荐)」** |
+
+⇒ openspec-archive 执行 Step 1-6, 停在 Step 7 之前; D.2b / D.3 照常。未建 tracker 的原因: 预演的三条 unverified 全部是已知类别的检查器假阳性, `deferred_items` 为空, 没有真正的遗留待办。
+
 ---
 
 ## 变更记录
@@ -1483,3 +1565,4 @@ plugin-cache-currency              fail  STALE installed=1.73.3 (scope=user) sot
 | 2026-09-27 ~ 28 | **TASK-029 完成** (本地, 未推送): 首次执行停在第 2 步 (standards 占位核验判据与 TASK-023 规定不一致) → owner 裁按实质判通过 → 跨 UTC 日订正发布日期 (aria `651ff6e`) → 从第 1 步重走: aria master `5215cf2` / standards master `2bc1c4c` 双父合并正向断言成立; 取号终核七处 `1.74.0`、CHANGELOG 零丢失、两个 remote 无 `v1.74.0`; 合并树回归 `Ran 1627 OK` + 28 + 11 + 谓词 19/19 (执行器负控 0/19); tag `v1.74.0` → `5215cf2`。 |
 | 2026-09-28 | **TASK-034 完成** (owner 授权): aria master `5215cf2` + tag `v1.74.0` 与 standards master `2bc1c4c` 原子双推, origin / github 逐 remote `ls-remote` 全部 MATCH; 同批授权的主仓 feature 备份双推 `877ed17` 两端 MATCH。 |
 | 2026-09-28 | **TASK-030 完成**: 主仓 gitlink 前进 (aria `5215cf2` / standards `2bc1c4c`), 16 个版本点改 `1.74.0` (含补上 `VERSION:24`), custom checks 15 pass + `plugin-cache-currency` 预期 STALE; 提交 `a99dd8d` (未推送)。 |
+| 2026-09-28 | **TASK-031 完成** (owner 授权五项): feature 双推 `6fdff9f` → PR `10CG/Aria#222` → C.2.4 green (not_applicable, 已 surface) + C.2.4.5 PASS → merge commit `03f97ac` → 本地快进 → C.2.5 两个 remote 全部成功、parity match → gitlink_integrity 六组 ok。TASK-032 第 1 步对齐通过。 |
