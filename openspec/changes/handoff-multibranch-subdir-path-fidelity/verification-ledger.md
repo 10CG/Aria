@@ -1449,6 +1449,15 @@ plugin-cache-currency              fail  STALE installed=1.73.3 (scope=user) sot
 
 **提交**: 主仓 feature **`a99dd8d`** —— 只 add 本任务 deliverables (`aria` / `standards` 两个 gitlink + `VERSION` / `README.md` / 三份 i18n README / `CLAUDE.md` / 两份架构文档), `git diff --cached --stat` 恰 10 个路径; 提交后主仓工作树干净。本节所在的台账提交与 `a99dd8d` 均**未推送**, 随 TASK-031 的推送发出。
 
+## TASK-031 — 主仓 PR + pre-merge gate + 合并 + 双端核验 (parent 5.2)
+
+### 开 PR 前 (2026-09-28T02:10Z)
+
+- **提交面 (有范围的检查)**: TASK-034 / 030 两节台账已先行提交 (`ab200c6` / `9b4a291`), 其后不带路径的 `git status --porcelain` 原样输出为**空 (0 行)** —— 主仓此刻没有任何未跟踪或未提交文件, 自然不存在触及本 cycle 交付物路径的行, 也没有需要逐条判归属的他轨文件。
+- **已跟踪核验**: `git ls-files aria-plugin-benchmarks/ab-results/2026-09-27-handoff-multibranch-rule6` → **284 个文件** (结果目录顶层 `PREDICTION.md` / `RESULT.md` / `SCORES.md`, `dispatch/` 5 个, `tools/score.py`, 其余在 `state-scanner/runs/` 下); `git ls-files openspec/changes/handoff-multibranch-subdir-path-fidelity/verification-ledger.md` → 在册。
+- **同步 `origin/master`** (merge 不 rebase, 覆盖 phase-c-integrator C.2.1 的 sync rebase 默认): feature 落后 master 12 个提交 (`35700fc` … `c454e35`, 全是 handoff / 决策单 / 执笔报告落仓 / `.aria/state-checks.yaml` 的 Level 1 修复), 其改动路径与本 cycle 交付物**零交集**。`git fetch origin` 后 `git merge --no-ff --no-edit origin/master` 退出 0 → 合并提交 **`0d24604`** (父 `9b4a291` + `c454e35`), 工作树干净, 两个 gitlink 仍为 `5215cf2` / `2bc1c4c`。
+- **写法自检 (PR diff 新增行)**: PR diff 取 `c454e35..HEAD` 的净变化 (同步合并后与 PR 的实际 diff 一致; 覆盖 TASK-030 同步面文字与 TASK-001 起点 `a52b5eb` 以来本 cycle 的全部主仓新增行) = **652636 行 / 244 个文件**。`check_bare_issue_refs.py --repo-root=.` 命中 **1403** 处, **全部**位于 AB 结果目录的 `state-scanner/runs/` 下: `state-snapshot.json` 1144 (scan.py 机器输出里的 issue 标题等) · `answer.md` 240 (被评的臂回答) · `grading.json` 14 (评分证据引文) · `exec_notes.md` 3 · `prompt.txt` 1 与 `eval_metadata.json` 1 (从固定套件原样复制的题面)。作者手写文字 (台账 / `tasks.md` / `RESULT.md` / `PREDICTION.md` / `SCORES.md` / `dispatch/` / TASK-030 同步面 / 评分员写的 `GRADER_CRITIQUE.md`) **零命中**。评测原始产出是证据, 改写即篡改证据, 按 §4.4 / §4.5 执行口径 (存量与夹具不做回改) 不动。§4.5 字符与字面 U+FFFD 在全部新增行中均为 0。**PR 正文** (scratchpad 草稿) 单独自检: 裸引用 0 · §4.5 字符 0 · U+FFFD 0; 按 `standards/conventions/git-commit.md` §8.1 不加 AI 署名行。
+
 ---
 
 ## 变更记录
