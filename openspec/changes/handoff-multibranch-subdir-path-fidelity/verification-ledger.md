@@ -1362,6 +1362,52 @@ owner 裁定到达时已是 2026-09-28T01:47Z (距首次执行约 7 小时)。�
 
 aria master `5215cf2` + tag `v1.74.0`、standards master `2bc1c4c`、两仓 feature 分支上的本 cycle 提交、主仓 feature 上的本节所在提交及其前三个, 全部**只在本地**。子模块双推属 TASK-034 (`metadata.owner_gates` 第 10 项, 需 owner 授权); 主仓 gitlink 在 TASK-034 两个远端都核验一致之前不得 bump (清单第 32 条)。
 
+## TASK-034 — aria 与 standards 双推 + 逐 remote 核验 (parent 5.2)
+
+**授权**: owner 2026-09-28 经 AskUserQuestion 答「授权按计划双推 (推荐)」—— 问题原文列明了四条推送的写法与方向 (aria `git push --atomic <remote> master refs/tags/v1.74.0`, master `1cb3872` → `5215cf2`; standards `git push <remote> master`, `940cb5b` → `2bc1c4c`; 各对 origin 与 github 先后推一次, 被拒或只推成一端即停下上报、不 force)。
+
+**推前核验 (02:00:17Z)**:
+
+```
+aria      origin: ls-remote --tags rc=0, v1.74.0 命中 0 · master = 1cb387218935433312fde4067c276754b77686a8
+aria      github: ls-remote --tags rc=0, v1.74.0 命中 0 · master = 1cb387218935433312fde4067c276754b77686a8
+standards origin: master = 940cb5b4b8672ea56606c4c3ed6157e84949fa4a
+standards github: master = 940cb5b4b8672ea56606c4c3ed6157e84949fa4a
+```
+
+两仓远端 master 均等于 TASK-029 第 3 步记下的值 ⇒ 四条推送都是快进。
+
+**推送** (每条单独执行, 超时 360 秒, 先 origin 后 github; 禁 `--follow-tags` 与非原子多 ref 推送):
+
+```
+git -C aria push --atomic origin master refs/tags/v1.74.0   → 1cb3872..5215cf2 master -> master · [new tag] v1.74.0 · rc 0
+git -C aria push --atomic github master refs/tags/v1.74.0   → 1cb3872..5215cf2 master -> master · [new tag] v1.74.0 · rc 0
+git -C standards push origin master                          → 940cb5b..2bc1c4c master -> master · rc 0
+git -C standards push github master                          → 940cb5b..2bc1c4c master -> master · rc 0
+```
+
+**推后逐 remote 独立核验** (不信回执, 硬约束 2; `ls-remote` 带三次重试):
+
+```
+本地: aria master 5215cf20c467535ca9cdcea2b1ecf34f94887732 · tag v1.74.0 f951d1ec87aa1c57de1964b8673c1afa9862b281 · tag^{} 5215cf20c467535ca9cdcea2b1ecf34f94887732
+      standards master 2bc1c4c619c5125a1bb2963864c1683fd9a87739
+[origin] aria master MATCH · tag MATCH · tag^{} MATCH · standards master MATCH
+[github] aria master MATCH · tag MATCH · tag^{} MATCH · standards master MATCH
+```
+
+⇒ 两个远端都核验一致, 满足 TASK-030 bump 主仓 gitlink 的前置 (清单第 32 条)。
+
+### 主仓 feature 分支备份双推 (owner 同一次 AskUserQuestion 授权)
+
+原文 (选项): **「现在备份双推」** —— 范围: 只推主仓 feature 分支, 快进 `4f91772` → `877ed17` (含 TASK-026 AB 结果提交 `be91134` 与 TASK-027 / 028 / 029 三个台账提交)。推前两端均为 `4f91772` 且是本地祖先; 两条推送分开执行、均退出 0; 推后逐 remote `ls-remote`:
+
+```
+[origin] 877ed17d0227a95442118f8afd9df0bf5d700ce5 MATCH
+[github] 877ed17d0227a95442118f8afd9df0bf5d700ce5 MATCH
+```
+
+所推 tip 上的 gitlink 仍为 aria `1cb3872` / standards `940cb5b` (两端均可达), 无孤立 gitlink。**本节所在的台账提交不在该授权范围内, 写作时未推送**, 随下一次授权的推送发出。
+
 ---
 
 ## 变更记录
@@ -1385,3 +1431,4 @@ aria master `5215cf2` + tag `v1.74.0`、standards master `2bc1c4c`、两仓 feat
 | 2026-09-27 | **TASK-027 完成**: 取号 `1.74.0` (两个 remote 无 `v1.74.*`, `10CG/Aria#199` 无预留号; 取号时 aria `origin/master` = `1cb3872`); CHANGELOG `[1.74.0]` 三段 + Notes 逐条对真代码核过; aria `1ad31fa` (六个文件, `README.zh.md` 经 owner 当场裁定纳入) · standards `56306d1` (`session-handoff.md` 升 1.4.0, 决策单第 1 项); 均未推送。 |
 | 2026-09-27 | **TASK-028 完成** (写法自检第一次): 三仓新增行 1481 + 5 + 1307; 裸引用首跑 aria 2 / standards 0 / 主仓 5, 全部订正 (aria `820ea57`, 主仓台账三行随本节提交), 复跑归零; §4.5 字符与字面 U+FFFD 均 0。 |
 | 2026-09-27 ~ 28 | **TASK-029 完成** (本地, 未推送): 首次执行停在第 2 步 (standards 占位核验判据与 TASK-023 规定不一致) → owner 裁按实质判通过 → 跨 UTC 日订正发布日期 (aria `651ff6e`) → 从第 1 步重走: aria master `5215cf2` / standards master `2bc1c4c` 双父合并正向断言成立; 取号终核七处 `1.74.0`、CHANGELOG 零丢失、两个 remote 无 `v1.74.0`; 合并树回归 `Ran 1627 OK` + 28 + 11 + 谓词 19/19 (执行器负控 0/19); tag `v1.74.0` → `5215cf2`。 |
+| 2026-09-28 | **TASK-034 完成** (owner 授权): aria master `5215cf2` + tag `v1.74.0` 与 standards master `2bc1c4c` 原子双推, origin / github 逐 remote `ls-remote` 全部 MATCH; 同批授权的主仓 feature 备份双推 `877ed17` 两端 MATCH。 |
