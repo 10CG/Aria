@@ -1,0 +1,278 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/aria-plugin#194",
+  "generated_at": "2026-09-30T18:34:52Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 194,
+      "title": "[缺陷][state-scanner/test] collision_dedupe 测试只冻结了 renderer 的时钟没冻结 collector — 21 条测试用绝对日期, 今日 2 红并按日历恶化至 7 红",
+      "body": "## TL;DR\n\n`skills/state-scanner/tests/test_handoff_multibranch_collision_dedupe.py` 给 **renderer** 传了冻结时钟 `_FIXED_NOW = 2026-08-23T12:00:00Z`, 但给 **collector** 没传 —— collector 走的是真实墙钟。文件内 21 条测试的夹具全部是**硬编码绝对日期** (2026-05 ~ 2026-08, 零 `timedelta` / 零 `now()`), 而分类器有一个 `LAYER_H_ACTIVE_WINDOW_DAYS = 30` 的活跃窗口。\n\n⇒ 夹具随真实时间流逝逐条掉出活跃窗口, 测试**按日历逐条变红**。**2026-09-09 起已有 2 条红**, 实测到 2026-09-22 稳定在 **7/21 红**。\n\n`bash skills/run_all_tests.sh` 因此 exit 1, 汇总行报 `FAIL: state-scanner`。\n\n## 复现 (全量输出, 不截断)\n\n```\nbash skills/run_all_tests.sh\n```\n\n```\nstate-scanner                                  FAIL (1591 tests) — 见下方详情\n    FAIL: test_real_collision_produces_matching_board_collision_line_count (…TestBoardAndCollectorAgreeOnCollisionCount…)\n    FAIL: test_both_latest_active_different_owners_still_reports_cross_owner (…TestCrossOwnerRealCollisionSurvivesDedupe…)\n    FAILED (failures=2)\n──────────────────────────────────────────────\nskill 套件: 10 OK / 1 FAIL / 0 SKIP   (累计 2146 个测试)\nFAIL: state-scanner\n```\n\n断言明细:\n\n```\nAssertionError: 'none' != 'cross_owner'\n : two DIFFERENT owners' latest handoff are both active — must stay cross_owner;\n   got {'kind': 'none', 'groups': [], 'dedupe': {'input_tracks': 3, 'after_dedupe': 2, …}}\n\nAssertionError: 0 != 1\n : expected exactly 1 colliding track_id;\n   got {'kind': 'none', 'groups': [], 'dedupe': {'input_tracks': 4, 'after_dedupe': 2, …}}\n```\n\n⚠️ 已排除 stale `.pyc`: 清空全部 `__pycache__` 后用 `python3 -B` 重跑, 结果不变 (memory `stale-pyc-nc` 的形状不适用)。\n\n## 根因 (实测, 非推论)\n\n`lib/collision.py`:\n\n```python\nLAYER_H_ACTIVE_WINDOW_DAYS: int = 30            # lib/constants.py:88\n\ndef layer_h_is_fresh(updated_at, *, now=None):  # lib/collision.py:225\n    ref = now if now is not None else datetime.now(timezone.utc)   # ← 缺省走真实墙钟\n    ...\n    return ts >= ref - timedelta(days=LAYER_H_ACTIVE_WINDOW_DAYS)\n```\n\n测试侧:\n\n```python\n_FIXED_NOW = datetime(2026, 8, 23, 12, 0, 0, tzinfo=timezone.utc)   # :171\n\nboard = render_track_board(snapshot, now=_FIXED_NOW)   # ← renderer 冻结\ncoll  = collect_handoff_multibranch(root)              # ← collector 不冻结, 无 now 形参\n```\n\n**冻结面不对称**是缺陷本体: 夹具日期是对着 `_FIXED_NOW` 写的, 但真正裁决新鲜度的那一侧读真实时间。\n\n逐值实测 (`now = 2026-09-09T11:01Z`, cutoff = `2026-08-10T11:01Z`):\n\n| 夹具行 | 时间戳 | 对真实 now | 对 `_FIXED_NOW` |\n|---|---|---|---|\n| T1 alice latest | `2026-08-15T09:00:00Z` | fresh ✅ | fresh ✅ |\n| T1 bob latest | `2026-08-10T09:00:00Z` | **stale ❌** | fresh ✅ |\n| T2 `023236f2` latest | `2026-08-10T09:00:00Z` | **stale ❌** | fresh ✅ |\n| T2 `bfe8285d` latest | `2026-08-12T09:00:00Z` | fresh ✅ | fresh ✅ |\n\n两条测试各自掉了一个 owner/container 的承重行 ⇒ 只剩一方 ⇒ `cross_owner` / `self_multi_container` 的「≥2 方」前件不成立 ⇒ `kind` 落 `none`。\n\n## 引信表 (实测, 非按时间戳推算)\n\n方法: 逐个候选日期 monkeypatch `lib.collision.datetime.now`, 整份文件跑一遍, 记录当日红集。\n\n| 冻结日期 | 累计红 | 当日新增变红 |\n|---|---|---|\n| 2026-09-08 | **0** | — (全绿) |\n| **2026-09-09** | **2** | `both_latest_active_different_owners_still_reports_cross_owner`, `real_collision_produces_matching_board_collision_line_count` |\n| 2026-09-14 | 3 | `two_containers_each_multi_session_latest_active_still_collides` |\n| 2026-09-18 | 5 | `both_latest_active_same_owner_is_self_multi_container`, `both_latest_active_still_reports_self_multi_container` |\n| 2026-09-19 | 6 | `real_two_part_two_people_two_machines_is_cross_owner` |\n| 2026-09-22 | 7 | `stale_takeover_winner_is_recovered_for_board_classification` |\n| ≥2026-09-23 | 7 | 稳定 |\n\n⚠️ 只用时间戳「首行到期日」推算会**高估**红集 (15 条) —— 过期的行未必是承重行。上表是实跑测量, 不是推算。\n\n## 这为什么是缺陷而不是「夹具该更新」\n\n变红的 6 条里有 5 条自称是 **negative control / over-fix guard** —— 它们存在的唯一理由就是「确保消除 stale-history 假阳性的修复没有连真碰撞一起杀掉」。它们现在返回 `none`, 即**这些护栏本身已失效**: 真把 `cross_owner` 分类彻底改坏, 这几条测试**照样是红的**, 分不出「坏了」与「过期了」。\n\n判据同 memory `false_green_dual_is_permanent_red` —— 恒红与假绿同为零信息量。\n\n## 与既有单的关系 (已逐一核对, 无重复)\n\n- `#187` (run_all_tests.sh 对 pytest 裸函数套件收 0 个测试报 OK) —— 同一 harness, **不同缺陷**: 那条是假绿, 本条是恒红。\n- `#160` (state-scanner 两个同名 `lib` 包在同一 pytest 进程只能绑一个) —— 同一测试目录, 与时钟无关。\n- `#182` (handoff frontmatter status 从不收口) —— 提及同一个 30 天窗口的下游影响, 但对象是**生产语料**不是测试夹具。\n\n## 修复方向 (不预设结论)\n\n三条路, 各有代价, 请 maintainer 定:\n\n1. **给 collector 加 `now` 注入** (对齐 `render_track_board` 已有的 `now=` 形参), 测试全程传 `_FIXED_NOW`。最贴合缺陷维度 (冻结面不对称), 但改生产签名。\n2. **夹具改相对日期** (`_FIXED_NOW - timedelta(days=N)` 或 `datetime.now() - …`)。不改生产码, 但 `_FIXED_NOW` 与真实 now 仍是两个时钟, 只是把不对称推后。\n3. **`layer_h_is_fresh` 读一个可被测试覆写的时钟源**。\n\n⚠️ 无论选哪条, 验收必须做**三态负控** (memory `check-runs-at-baseline-first`):\n- 基线态 (今天的代码 + 今天的日期): 2 红 —— 已实测 ✅\n- 修复态: 21 绿\n- **时间旅行态**: 把时钟拨到 +90 天 / +1 年, 仍须 21 绿 —— 这一态才真正验「不再随日历腐烂」。只跑修复态会让「把夹具日期整体后移」这种**治标改法**误判为通过。\n\n## 来源\n\n`10CG/Aria` 2026-09-09 session, 兑现 2026-09-08 handoff 里「下个 session 再见就全量留证后开单」的承诺。\n\n⚠️ **注意**: 2026-09-08 那次 `FAIL: state-scanner` 的诊断明细被 `| tail -5` 截掉、两次复跑均绿, 而本缺陷在 2026-09-08 冻结态下实测**全绿** (见引信表首行) ⇒ **本单不是那次 transient 的根因**, 那次的证据已不可恢复。本单是兑现留证承诺时新发现的、确定性的另一个缺陷。\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 23108,
+          "body": "## ⚠️ 勘正: 正文「修复方向 1」把生产侧说错了 —— `now` 形参**本来就有**\n\n开单当天 (2026-09-09) 动手修时实读源码, 发现正文的修复方向 1 写着「给 collector 加 `now` 注入 …… **但改生产签名**」是**错的**。生产签名不需要改, 因为它已经有了:\n\n`skills/state-scanner/scripts/collectors/handoff_multibranch.py:556-560` 逐字:\n\n```python\ndef collect_handoff_multibranch(\n    project_root: Path,\n    remote: str = _REMOTE,\n    now: Optional[datetime] = None,  # owner-container-identity-key: Layer H window reference (tests pin it)\n) -> CollectorResult:\n```\n\n注释末尾逐字写着 **「tests pin it」** —— 这个注入点就是为测试冻结时钟设计的。`:726` 也确实把它透传下去:\n\n```python\nfresh_tracks = _filter_layer_h_fresh(deduped_tracks, now=now)\n```\n\n⇒ **缺陷完全在测试侧**: `test_handoff_multibranch_collision_dedupe.py` 有 **16 个** `collect_handoff_multibranch(...)` 调用点, **0 个**传 `now=`。\n\n```\ngrep -c 'collect_handoff_multibranch('              → 16\ngrep -c 'collect_handoff_multibranch([^)]*now='     → 0\n```\n\n而同目录 `test_collision.py:439` / `:460` 是**正确先例**:\n\n```python\nresult = collect_handoff_multibranch(Path(tmp), now=datetime(2026, 5, 31, tzinfo=timezone.utc))\n```\n\n⇒ 同一个仓里两种写法并存, 正确的那种早就存在。这不是「设计缺了注入点」, 是「16 个调用点漏用了已有的注入点」。\n\n### 对正文的影响\n\n- **症状 / 复现 / 根因机制 / 引信表 全部不变** —— 冻结面不对称这个诊断是对的, 只是不对称的成因不是「生产侧没有 `now`」而是「测试侧没传」。\n- **修复方向 1 应改为**: 16 个调用点补 `now=_FIXED_NOW`, **零生产改动**。方向 2 (夹具改相对日期) 与方向 3 (可覆写时钟源) 相应降为不必要。\n- **Rule #6 判定随之变化**: 纯测试文件改动, SKILL.md 与 `description` 零变动 ⇒ 落判据表第一行 (描述性 / 不适用) ⇒ **substitute**, 而非照跑 AB。\n- **Level 随之变化**: 无生产码、无接口、无文档语义变更 ⇒ 倾向 Level 1。\n\n### 这条勘正本身的教训\n\n正文的症状与测量都是实测的, 但**修复方向那一段是没读源码就写的推论** —— 「测试冻结不了 collector」被我直接推成「collector 没有可冻结的入口」。这正是 memory `reporter-miscite` 记的形状: **复现步骤可全对而根因 file:line 仍错**。开单时若先 `sed -n '556,560p'` 一眼, 就不会写错。\n\n### 扩面 (进行中)\n\n`test_max_branches_resolver.py` (4 处) 与 `test_p1_layer_h.py` (3 处) 同样不传 `now=`。是否也在腐烂正在做全套件普查 (冻结全部生产模块墙钟 → 跑全套件 → 逐日期差分), 结果回帖。**不先扫完不动手**, 否则又是「修了实例没做类」。\n",
+          "user": "simonfish",
+          "created_at": "2026-09-09T11:42:18Z"
+        },
+        {
+          "id": 23170,
+          "body": "## 已修复并进 master — ⚠️ **但未发版, 已发布的 v1.73.0 仍是红的**\n\n`aria-plugin` master **`f314785`** (双端 `ls-remote` 核验一致) · 主仓 gitlink bump **`c02b0ef`** (同样双端核验, f314785 在 aria 两端各 2 ref 可达, 非 orphaned)。\n\n**本单保持 open** —— 修复只在 master, `plugin.json` 仍 1.73.0。owner 2026-09-09 裁定本轮不发版 (发布同步面 aria/ 内侧 9 个点当前零机械覆盖, 见 `10CG/Aria#177` comment 23105, 发版另开一轮)。⇒ **任何采用方装的仍是红的副本** (实测: 本机 `~/.claude/plugins/cache/.../1.71.1/` 跑该文件同样 2 红)。发版后再关本单。\n\n### 改动\n\n```\n16 处 collect_handoff_multibranch(root) → (root, now=_FIXED_NOW)\n+import re / timedelta / LAYER_H_ACTIVE_WINDOW_DAYS\n+TestCollectorClockIsPinnedInThisFile (2 条回归锁)\n```\n\n回归锁守的是**第 17 个调用点**, 不是这 16 处对不对 (后者由那 7 条 negative control 自己守) —— 「修实例不做类」正是本缺陷的成因。锁 1 另带一条「扫到 <16 个调用点即红」的自守卫, 防正则与代码形态脱节后恒绿。\n\n### 验证 (三态负控 + 时间旅行)\n\n| 项 | 结果 |\n|---|---|\n| 该文件 | 23 绿 (21 + 2 锁) |\n| 时间旅行 09-14 / 09-22 / 2027 / **2040** | 全绿 —— 真防腐, 非「把夹具日期往后挪」的治标改法 |\n| 负控 A: 退回 1 个调用点 | 锁 1 红 ✅ |\n| 负控 B: 钉成 `now=None` | 锁 1 红 ✅ (与不传同语义, 不得放行) |\n| 锁 2 对抗态 (`_FIXED_NOW` +60d) | 红 ✅ 非恒真 |\n| 全量 harness | 11 OK / 0 FAIL / 0 SKIP, **2146 → 2148** |\n\n### 类级普查结论 (修正正文「扩面」段)\n\n49 个含绝对日期的测试文件 × 9 个日期, 冻结全部生产模块 `datetime`, 1168 条测试。\n\n**真腐烂只在本文件, 7 条。** 普查一度报「5 文件 13 条」, 逐个核实后另 4 文件 6 条全部是**普查器假红**: 它们用 `datetime.now() - timedelta(...)` 相对夹具 (`test_openspec_design_deferred:29` / `test_spec_complete:1277` / `test_phase1_gate_telemetry:53`) —— 那本来就是防腐的正确写法, 而普查器只冻生产侧不冻测试侧, 恰好惩罚了写对的那些。`test_phase1_gate_advisory` 的 `_NOW=2026-07-04` 虽是绝对值, 但已 67 天且今日为绿, 09-09→09-14 之间不存在任何 TTL 边界, 那个翻转同样是假的。\n\n⚠️ 普查器本身被基线自检抓出撒谎**三次**才可信 (memory `check_runs_at_baseline_first`):\n1. `is REAL_DT` 守卫使补丁只生效一次 ⇒ 后续日期全冻在第一个日期上 ⇒ 恒 0 红;\n2. 连 `time.time` 一起冻, 与真实文件 mtime 不自洽 ⇒ `test_handoff::test_age_hours_is_epoch_based` 假红;\n3. 只冻生产侧不冻测试侧 ⇒ 冤枉了 6 条写对的测试。\n\n前两次都是自检 (「09-08 须 0 红 ∧ 09-09 须恰为已知那 2 条」) 当场拦下的。**没有这个自检, 第 1 版会给出「全套件零腐烂」的结论并被我采信。**\n\n### 相邻观察 (未处置, 供后续)\n\n`scripts/collectors/_common.py::scan_now()` 的 docstring 逐字写着:\n\n> Every freshness / generation-age / priority-ordering computation **MUST** read the current time through this single injection point (never a bare `datetime.now()` / `time.time()`)\n\n而 `lib/collision.py:232` / `lib/claim_lifecycle.py:76` / `lib/gc.py:94` / `lib/identity.py:102` / `lib/reconcile.py:194,367` / `scripts/lib/spec_complete.py:1500` 等**都是裸 `datetime.now()`**。本次修复走的是「调用方钉 `now=`」这条既有路径, **没有动这个更大的口径问题** —— `lib/` 是否该反向依赖 `scripts/collectors/_common` 是个分层设计问题, 不由本单裁。若认为该收口, 建议另开单。\n",
+          "user": "simonfish",
+          "created_at": "2026-09-09T13:13:09Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/194",
+      "created_at": "2026-09-09T11:06:23Z",
+      "updated_at": "2026-09-12T16:33:50Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.73.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "skills/state-scanner/tests/test_handoff_multibranch_collision_dedupe.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/collision.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "test_handoff_multibranch_collision_dedupe.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "test_collision.py",
+          "line": 439,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "test_max_branches_resolver.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "test_p1_layer_h.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "plugin.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/collision.py",
+          "line": 232,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/claim_lifecycle.py",
+          "line": 76,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/gc.py",
+          "line": 94,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/identity.py",
+          "line": 102,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "scripts/lib/spec_complete.py",
+          "line": 1500,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/constants.py",
+          "line": 88,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/collision.py",
+          "line": 225,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "skills/state-scanner/scripts/collectors/handoff_multibranch.py",
+          "line": 556,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/reconcile.py",
+          "line": 194,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [
+        "remotes/origin/feature/owner-container-identity-key-and-collision-parser"
+      ],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "v1.73.0 (git archive 6726df1, 与 tag v1.73.0 及 f314785^ 同一提交, 即 issue 所报版本) 的副本: cd skills/state-scanner/tests && python3 run_tests.py -v handoff_multibranch_collision_dedupe; 真实时钟 (2026-09-30), HOME 指向实验目录 (exp/plugin-194/run_file.sh v1.73.0 real)",
+        "expected_behavior": "issue 引信表: 2026-09-23 起稳定 7/21 红 (今日 2026-09-30 应为 7 红), 红的是 TestBoardAndCollectorAgreeOnCollisionCount x2 / TestCrossOwnerRealCollisionSurvivesDedupe / TestDedupeFoldsAcrossSessionsWithinSameContainer / TestSelfMultiContainerRealCollisionSurvivesDedupe x2 / TestTwoPartBoardEchoAndAdvisoryWiring",
+        "actual_behavior": "Ran 21 tests, FAILED (failures=7), rc=1; 红的 7 条与引信表点名集合逐条一致",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "同一 v1.73.0 副本, 用 sitecustomize 冻结 datetime.now()/utcnow()/today() (每个日期一个新进程, time.time 不冻, 冻在该日 T12:00:00Z; exp/plugin-194/matrix.py v1.73.0 handoff_multibranch_collision_dedupe <日期...>): 2026-09-08 / 09-09 / 09-14 / 09-18 / 09-19 / 09-22 / 09-23 / 10-31 / 2027-09-30 / 2040-01-01 / real",
+        "expected_behavior": "issue 引信表: 09-08 为 0 红; 09-09 为 2 红 (点名的两条); 09-14 为 3; 09-18 为 5; 09-19 为 6; 09-22 为 7; 之后稳定 7",
+        "actual_behavior": "逐行吻合: 0 / 2 (恰为点名的 cross_owner 与 board_collision_line_count 两条) / 3 (+two_containers_each_multi_session) / 5 (+两条 self_multi_container) / 6 (+real_two_part_two_people_two_machines) / 7 (+stale_takeover_winner) / 之后 7 (含 2027-09-30、2040-01-01 与真实今日); 每个日期新增变红的用例名与引信表一致。这同时是冻结器的基线自检: 先在修前树复现 issue 独立测得的数字, 才用于修后树",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "issue 原命令 bash skills/run_all_tests.sh, 在 v1.73.0 的忠实布局副本 (exp/plugin-194/monoA-v1.73.0/aria: 同级 aria-plugin-benchmarks fixtures + 全新本地 git init 无 remote; HOME 隔离; PYTHONUSERBASE 只读指向本机用户 site 以启用 pytest); 真实时钟 2026-09-30 (run_harness2.sh monoA-v1.73.0)",
+        "expected_behavior": "issue 正文: harness exit 1, 汇总行 FAIL: state-scanner, 10 OK / 1 FAIL / 0 SKIP",
+        "actual_behavior": "10 OK / 1 FAIL / 0 SKIP (累计 2142 个测试), FAIL: state-scanner (1591 tests), exit 1; 失败集恰为那 7 条 collision_dedupe (开单当日 2 条, 今日 7 条, 即按日历恶化)",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "修后四份副本: v1.73.1 (git archive 44f00d1)、HEAD (aria 工作树 268da8f, 即 v1.74.1)、本机已安装 plugin 缓存 1.73.3 与 1.74.1 (cp -a 到实验目录); 各自 cd skills/state-scanner/tests && python3 run_tests.py -v handoff_multibranch_collision_dedupe; 真实时钟 2026-09-30",
+        "expected_behavior": "若缺陷仍在: 今日应出现日历腐烂红 (issue: 稳定 7 条红, rc=1)",
+        "actual_behavior": "四份均 Ran 23 tests, OK, rc=0 (21 条原有 + 2 条回归锁 TestCollectorClockIsPinnedInThisFile); 测试文件字节核验: v1.73.1 = v1.73.3 = 缓存 1.73.3, sha256 前缀 da5606ec; HEAD = v1.74.1 = 缓存 1.74.1 = 真仓工作树, sha256 前缀 e6830b98 (两者差异仅 9f3b05b 的 2 处 docstring 措辞)",
+        "match": false
+      },
+      {
+        "case_id": "case-5",
+        "input": "修后四份 x 11 个时间点 (冻结 datetime, 每点新进程): 2025-01-01 / 2026-09-08 / 09-09 / 09-14 / 09-22 / 09-23 / real / 2026-12-29 (+90 天) / 2027-09-30 (+1 年) / 2030-01-01 / 2040-01-01 (exp/plugin-194/matrix.py <tree> handoff_multibranch_collision_dedupe ...)",
+        "expected_behavior": "issue 验收「时间旅行态」: +90 天 / +1 年仍须全绿 (若只是把夹具日期整体后移的治标改法, 未来日期会再红); 缺陷仍在时红数应随日期单调上升至 7",
+        "actual_behavior": "44 个 (树 x 时间点) 组合全部 Ran 23 tests, 0 红, rc=0; 含向前回拨到 2025-01-01, 即不依赖真实时钟, 双向稳定",
+        "match": false
+      },
+      {
+        "case_id": "case-6",
+        "input": "issue 原命令 bash skills/run_all_tests.sh, 在 HEAD (v1.74.1 @ 268da8f) 的忠实布局副本 (exp/plugin-194/monoB-head/aria), 真实时钟 2026-09-30 (run_harness2.sh monoB-head)",
+        "expected_behavior": "若缺陷仍在: exit 1, 汇总行 FAIL: state-scanner",
+        "actual_behavior": "11 OK / 0 FAIL / 0 SKIP (累计 2201 个测试), exit 0; state-scanner OK (1650 tests)",
+        "match": false
+      },
+      {
+        "case_id": "case-7",
+        "input": "同 case-6 的命令, 对象换成本机已安装 plugin 缓存 1.74.1 的副本 (exp/plugin-194/monoC-cache1.74.1/aria), 作为「采用方装到的副本」的代理 (run_harness2.sh monoC-cache1.74.1)",
+        "expected_behavior": "若采用方副本仍是红的 (评论 23170: 发版前 1.71.1 缓存副本实测 2 红): exit 1, FAIL: state-scanner",
+        "actual_behavior": "11 OK / 0 FAIL / 0 SKIP (2201 条), exit 0; 另 1.73.3 缓存副本该测试文件在 11 个时间点均 23/23 绿",
+        "match": false
+      },
+      {
+        "case_id": "case-8",
+        "input": "类级复验: (a) 评论 23108 点名的 test_max_branches_resolver.py (4 处不钉 now=) 与 test_p1_layer_h.py (3 处不钉) 在 HEAD 上于 9 个时间点 (2026-09-08 / 09-09 / 09-14 / 09-22 / real / 2026-10-31 / 2026-12-29 / 2027-09-30 / 2040-01-01) 冻结 datetime 运行; (b) 整套 harness 在 HEAD 忠实布局上把 datetime 与 time.time 同步平移到 2026-12-29 与 2027-09-30 (run_harness4.sh); (c) 同一台平移机器在修前树上作基线自检 (run_harness4.sh monoA-v1.73.0 2026-12-29)",
+        "expected_behavior": "评论 23108 的疑问: 这两个文件同样不钉 now=, 是否也在腐烂; 评论 23170 的普查结论: 真腐烂只在本文件",
+        "actual_behavior": "(a) 39 条与 24 条在 9 个时间点全部 0 红; (b) 11 OK / 0 FAIL / 0 SKIP (2201 条), 两个时间点 exit 0; (c) 修前树 +90 天 10 OK / 1 FAIL, 失败集恰为那 7 条 collision_dedupe, 无其他红, 证明该机器有能力报红。普查结论成立, 无其他日历腐烂",
+        "match": false,
+        "notes": "只冻 datetime、不同步移动 time.time 时, test_sync_mocked.TestFetchHeadAgeBuckets 的 3 条会假红 (测试用真实 time.time() 设 mtime, _fetch_head_age 用被冻结的 scan_now()); 同步平移后消失, 是冻结器的半冻结假红, 非日历腐烂。那 7 处不钉 now= 的调用点仍未钉, 但未见腐烂, 且不在本单回归锁的覆盖范围内。"
+      }
+    ],
+    "hit_count": 3,
+    "total_count": 8,
+    "hit_rate": "3/8"
+  },
+  "verdict": "fixed-in-X",
+  "severity": "major",
+  "recommended_action": "close",
+  "deviation_note": null,
+  "errors": []
+}

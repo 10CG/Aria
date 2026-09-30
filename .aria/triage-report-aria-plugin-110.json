@@ -1,0 +1,242 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/aria-plugin#110",
+  "generated_at": "2026-09-30T18:39:02Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 110,
+      "title": "[state-scanner] sync_status 撒谎: 陈旧 remote-tracking ref 下报 parity=equal / overall_parity=true (十步循环统一入口的假绿)",
+      "body": "## 摘要\n\n`state-scanner` 是十步循环的**统一入口** (Rule #2: 不能跳过 Phase A)。它的 `sync_status` **会报假的「已同步」** —— 本地 remote-tracking ref 陈旧时报 `parity: equal` / `overall_parity: true`, 而工作树实际落后远程。\n\n**后果**: AI 基于落后工作树开工 → **重复劳动**。state-scanner 本该是这类事故的防线, 现在反而是**假绿的来源**。\n\n这是 memory `feedback_concurrent_duplicate_audit_fetch_before_start` 记录的那类事故的 **工具层成因**。\n\n## 活体证据 (2026-07-12, 发现本缺陷的 session 自身即受害者)\n\n开局跑 `/state-scanner`:\n\n```\nsync_status.multi_remote.overall_parity : true\n  main_repo.remotes[origin].parity       : \"equal\"   remote_head: 8a4ef5e\n  main_repo.remotes[github].parity       : \"equal\"\n```\n\n实测 (新鲜 fetch):\n\n```\norigin/master 真值 = fc7c372   → 本地落后 4 commit (并发 session 已 ship v1.56.0 / v1.56.1)\naria-orchestrator 的 github 镜像落后 origin 32 commit  → scan 完全没报\n```\n\n> **同一份 snapshot 内部自相矛盾**: `sync_status` 说「已同步」, 而 `tracks_multibranch` (Phase 1.17, 基于 1.16 的**新鲜** fetch) 却看到了并发 session 当天 ship 的 handoff。**这个内部矛盾就是 collector 编排缺陷的指纹。**\n\n## 根因 (code-grounded)\n\n1. **编排顺序倒置**: Phase 1.12 (sync/multi_remote, `scan.py:106`) 跑在 Phase 1.16 (`coordination_fetch`, **真 fetch**, `scan.py:119`) **之前** —— **消费者早于生产者**。\n2. **陈旧度算了但不参与裁决**: `_aggregate_flags` (`multi_remote.py:371-418`) 只读 `parity`; `local_refs_stale` (L494-507) 是纯咨询 boolean。\n3. **子模块零覆盖**: `_fetch_head_age_hours` 在 FETCH_HEAD 缺失时返回 `None`, 而 L497 `if age is not None and age > warn` ⇒ **`None` 判为「不陈旧」**。实测三个子模块 `.git/modules/*/FETCH_HEAD` **全不存在** ⇒ **「从未 fetch」被当成「最新鲜」**, 且照样提供 `equal` 正证据。\n4. 🔴 **本地根本不存在 per-remote 新鲜度信号** (逐一实测排除):\n\n| 候选 | 为什么不行 |\n|------|-----------|\n| `FETCH_HEAD` mtime | **repo 全局单值** — 任一 remote 的任一 fetch 都整体覆写 |\n| `.git/refs/remotes/<r>/<b>` 文件 mtime | **只在 ref 值变化时更新** → 「刚 fetch 但没变」与「3 天没 fetch」不可区分 |\n| 同上, packed 之后 | `git pack-refs` (gc 自动跑) 后 loose 文件**直接消失** |\n\n## 核心洞察\n\n> **新鲜度不能「测量」, 只能「获取」。** 要知道远端状态, 只能去问远端。\n\n最初的「显而易见」修法 (调 collector 顺序让 fetch 先跑 + 降低陈旧度阈值) **自我拆台**: fetch 会把 `FETCH_HEAD` 刷新到 age≈0 ⇒ 陈旧检测对**所有** remote 结构性恒不触发。实测: **阈值降到 3.6 秒都救不回来**。\n\n## 解决方案\n\n**让 state-scanner 在报告之前, 自己并行 fetch 它即将报告的每一个 enforced remote (主仓 + 全部子模块), 记录 per-remote `{fetched_at, fetch_ok, error_kind}`。** 新鲜度因此**构造性可知**。\n\n**承重性能实测** (10CG 内网, origin 走 CF Access):\n\n```\n当前 scan 全程                     = 16.9s  (其中它本来就在 fetch origin ≈ 7.0s)\n串行 fetch 全部 8 个 (repo,remote) = 42.7s  ← 不可接受\n并行 fetch 全部 8 个               =  7.6s  ← 等于最慢单腿\n⇒ 边际成本 ≈ +0.6s (+4%)\n```\n\n(`ls-remote` 与 `fetch` **同价** —— 均被 SSH 握手主导 —— 而 fetch 顺便真刷新了 ref ⇒ fetch 严格更优。)\n\n## Spec (Phase A.1 完成, post_spec 4 轮审计后拆为 3 个)\n\n| Spec | Level | 内容 |\n|------|-------|------|\n| `state-scanner-stale-refs-false-parity` | L3 | **核心机制** (不可再拆: fetch 无降级 = 白烧网络; 降级无 fetch = 恒红) |\n| `state-scanner-snapshot-stderr-secret-leak` | L2 | **Rule #7** 裸 git stderr → 分类枚举。**应先落地** (核心机制会把该暴露面放大 N×M 倍) |\n| `state-scanner-issue-cache-freshness-assertion` | L2 | 正交: `issue-cache-freshness` 恒红修复 + 新增 `generated_at` 字段 |\n\n## post_spec 收敛审计: 4 轮 × 5 agent, **全部 FAIL** (收敛单调)\n\n| 轮 | 抓到什么 |\n|----|---------|\n| **R1** | v1 药方**机制自拆台** (见上) |\n| **R2** | `overall_parity` 语义致恒红 / TTL 谓词与 AC **数学不可同时成立** / 配置事实写反 / Rule #7 新暴露面 |\n| **R3** | ∀ 公式**两端都错**: 太严 (结构性 `unknown` 阻断 ⇒ **本仓恒 false**, 因 detached HEAD 是每个子模块的规范常态) + 太松 (`all([]) == True` vacuous true ⇒ **复活 QA-C1 假绿**) |\n| **R4** | `blocking_unknown` 写成**正向枚举** ⇒ 未列举值 **fail-OPEN** (四方独立收敛; 有 agent 用**真实 git 连接失败**复现: 其 stderr 一个已知分类 pattern 都没中 ⇒ 落 catch-all ⇒ 静默不阻断) |\n\n**状态**: v5 公式已按 R4 五方发现合成修正, **待 post_spec R5** (五位一致: 不需第五次换轴)。\n\n## 元教训\n\n> **「把一个不变量写进文档」≠「把它写进兜底默认值」。** 没有为「集合的补集」定义行为, 就是给了它一个隐式的、通常是错的默认。\n\nQA-C1 的不变量 (「零证据不得当正证据」) 在本 Spec 起草过程中**复发五次**: 零证据 → 陈旧证据 → 从未获取的证据 → 只豁免 `ahead` 没问补集 → 枚举方向 fail-open。\n\n**已把「逐格填」从纪律变成机制**: pin 测试构造一个**代码里不存在的** reason 值 ⇒ 必须落到保守侧。\n\n> **对偶不变量**: **假绿的反面是恒红, 两者同样零信息量。** 判据 = **该信号在健康常态下应该是什么值?** (本 Spec 在修假绿时**三次过冲成恒红**, 全被审计抓回。)\n\n## 影响面\n\n- **所有 Aria 采用者** (aria-plugin 跨项目分发)\n- 行为变更: scan 从 fetch 1 个 remote → fetch 所有 enforced remote (并行, per-host 限流, 全局 deadline)\n- 惰性配置变承重: `enforced_remotes` 今天是**死配置 + 假文档** (声明在 `DEFAULTS.json`, 代码零消费, 而 `sync-detection.md:515` 记它「已实现」) —— 本 Spec 让它生效 ⇒ 直接改变已配置采用者的网络行为\n- 下游: `aria-2.0-m7-fleet-aggregation` (Approved) 消费 `overall_parity` 作 fleet 健康信号\n\n## 关联\n\n- Spec: `openspec/changes/state-scanner-{stale-refs-false-parity,snapshot-stderr-secret-leak,issue-cache-freshness-assertion}/`\n- DEC: `docs/decisions/DEC-20260712-001-state-scanner-stale-refs-false-parity.md`\n- Handoff: `docs/handoff/2026-07-12-state-scanner-false-parity-spec-r4.md`\n- 审计: `.aria/audit-reports/post_spec-*-state-scanner-stale-refs-false-parity-*.md`\n- 承重先例: 归档 Spec #141 (`coordination_fetch` two-fetch 语义) / AD-SSME-6 (schema doc 才是 SOT)\n- **aria-plugin #109** (协调层维度): 同一失败模式「开工前没看到真相 → 重复劳动」的**协调层**面; 本票是**扫描层**面。**真 disjoint, 互补** —— 即使认领点前移, 若 `sync_status` 撒谎说「已同步」, AI 照样在落后树上开工。\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 15789,
+          "body": "**交叉引用**: 预防侧姊妹 issue [10CG/Aria#165](https://forgejo.10cg.pub/10CG/Aria/issues/165) — 「GitHub 镜像漏推第三次复发 (子模块服务端合并 + gitlink bump 无序 → orphaned gitlink)」。\n\n两条正交,合起来才闭环:\n\n- **本 issue (#110, 检测侧)**: `sync_status` / `overall_parity` 在陈旧 remote-tracking ref 下**撒谎报 parity=equal** ⇒ 让谎言变回实话。\n- **#165 (预防侧)**: gitlink bump 与子模块镜像推送**无强制顺序** + 四仓 Forgejo `push_mirrors` 全为 0 ⇒ 让实话恒为真。\n\n即使 #110 把检测修准,任何时刻的 parity 核验仍可能在 ~60s 后被子模块仓的一次服务端合并作废 (2026-07-14 实测时间线: 服务端合并 → 65s 后主仓 bump gitlink → 推 GitHub, 见 #165)。#165 提议的方案 B 复用了本 Spec 已验证的 **F10″ orphaned-gitlink 谓词**。",
+          "user": "simonfish",
+          "created_at": "2026-07-15T01:16:25Z"
+        },
+        {
+          "id": 16240,
+          "body": "## 又一受害实例 (2026-07-19, nexus follower 容器, 已知本 issue 存在的情况下仍中招 — 量化代价佐证优先级)\n\n**场景**: nexus follower 容器 (`simonfish/dev-claude`) 7 天未活跃 (上次 07-12), 07-19 14:07Z 起 session 跑 `/state-scanner`:\n\n```\nsync_status.current_branch: ahead 0 / behind 0, upstream=origin/main\nsync_status.multi_remote.overall_parity: true\n  main_repo parity=equal, remote_head=195b69c   ← 实为 07-12 的旧值\n  local_refs_stale: true                        ← 唯一提示, 纯咨询无裁决力\ncoordination_fetch: success=true, 14:09:17Z     ← 真 fetch 在 sync 之后跑 (顺序倒置指纹)\n```\n\n**真值**: origin/main = `157c709`, 本地落后 **~40 commits / 7 天** (期间: zh-retrieval-eval-gate 全周期归档 + US-045 终局 + prod 首部署 v4.2.0 + migration 028 + 新 in-flight change)。\n\n**代价**: AI 信任 `parity=equal`, 按 07-12 handoff carry 选定 TASK-302 中文评测集 mini-spec, 投入**完整 Phase A** (proposal 三件套 + post_spec 3 轮 × 3 agent 收敛审计, ~2h / 9 个 subagent) — 而该任务 leader 已于 **07-13** 以 `zh-retrieval-eval-gate` 之名做完并**归档**。commit 在 push 时才被 non-fast-forward 拒绝暴露真相, 全部产物丢弃。\n\n**与 body 根因的对应**: 顺序倒置 (1.12 早于 1.16) + `local_refs_stale` 不参与裁决, 两条都精确复现。本例新增数据点: **falsely-green 的窗口可以长达 7 天** (follower 容器低频活跃场景), 不止并发 session 的分钟级 race — 陈旧度与容器活跃频率成正比, follower/observer 容器是最大受害面。\n\n**AI 侧已同步加固** (repo memory): `parity=equal` + `local_refs_stale=true` 一律读作 parity-unknown; handoff age > 24h 时, 选定任务后投入前无条件 `git fetch && git log HEAD..origin/main`。但工具层修复 (fetch 前置或 stale 参与裁决) 仍是治本。",
+          "user": "simonfish",
+          "created_at": "2026-07-19T15:10:51Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/110",
+      "created_at": "2026-07-12T21:36:35Z",
+      "updated_at": "2026-09-06T15:34:36Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.56.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "scan.py",
+          "line": 106,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "scan.py",
+          "line": 119,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "DEFAULTS.json",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "sync-detection.md",
+          "line": 515,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "docs/decisions/DEC-20260712-001-state-scanner-stale-refs-false-parity.md",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: # DEC-20260712-001 — state-scanner 陈旧 ref 假同步 (parity false-green)\n2: \n3: > **状态**: **✅ Approved — owner 终审通过 2026-07-15 (D15′-D20 五条代裁全部签字生效)**。v10 (2026-07-14) — v10 新增 **D20** (§3e: 8C-1 三档全分割, E 优先)。v9 新增 **D15′/D18/D19** (§3d: R7 三 C 合并解 + RC-8 + Spec C 基底; D15 由 D15′ 取代)。v8 新增 **D15/D16/D17** (§3c: R6 的 3 条 owner 待裁, 代裁 [owner /goal 授权] 待 R7 复核 + owner 终审)。前史: post_spec **R1→R6 全 FAIL** (6 轮; R5 5-agent + R6 3-agent)。**D10 (F10′) 已被 R6 证伪并由 D14 取代**。post_spec **R1→R5 全 FAIL** (收敛单调, 5 轮 × 5 agent)。v1 药方被推翻 (R1); 公式两端皆错 (R3); fail-open 枚举 (R4); **公式的上游数据不存在 (R5)**。owner 裁定**扩本 Spec 加 F10′**。v1 决策 D1/D2/D3 已作废 (见 §3); **v6 新增 D7-D13 (见 §3b)**。\n4: > **创建**: 2026-07-12 | **v2 修订**: 2026-07-12 (折入 R1 的 3C + 12M/m) | **v6 修订**: 2026-07-12 (折入 R2-R5; **R5 的 5 Critical + F10′ 裁定**)\n5: > **审计轨迹**: [R1+R2](../../.aria/audit-reports/post_spec-R1-R2-2026-07-12T1850Z-state-scanner-stale-refs-false-parity-aggregated.md) → [R3+R4](../../.aria/audit-reports/post_spec-R3-R4-2026-07-12T2000Z-state-scanner-stale-refs-false-parity-aggregated.md) → [**R5**](../../.aria/audit-reports/post_spec-R5-2026-07-12T2230Z-state-scanner-stale-refs-false-parity-aggregated.md)",
+          "warning": null,
+          "total_lines": 248
+        },
+        {
+          "file_path": "docs/handoff/2026-07-12-state-scanner-false-parity-spec-r4.md",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: ---\n2: track-id: state-scanner-stale-refs-false-parity\n3: linked-issue: 10CG/aria-plugin#110\n4: owner-container: aria-runner-bot/023236f2\n5: phase: A.1-postspec-R4",
+          "warning": null,
+          "total_lines": 161
+        },
+        {
+          "file_path": ".aria/audit-reports/post_spec-*-state-scanner-stale-refs-false-parity-*.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "multi_remote.py",
+          "line": 371,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": [
+        {
+          "sha": "8cc43ab",
+          "message": "docs(audit): 补落盘 post_spec R3+R4 聚合报告 + 开票 aria-plugin #110",
+          "file": "docs/handoff/2026-07-12-state-scanner-false-parity-spec-r4.md",
+          "match_reason": [
+            "issue_ref_#110"
+          ]
+        }
+      ]
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_a.py 场景 A14h: 合成 fixture (本地裸仓 origin+github, 无网络无凭据): 另一 clone 向两 remote 各推 4 个新 commit, 工作仓 refs/remotes/{origin,github}/master 陈旧 4 commit, FETCH_HEAD mtime 回拨到 14h 前 (小于 24h 阈值, 即 issue 的事故形态)。分别用 baseline v1.56.1 (aria-plugin 0964496, git archive 解包) 与 current v1.74.1 (aria-plugin 268da8f, 实验副本) 的 scan.py --project-root <fixture> 扫描 (env -i, HOME 隔离)。",
+        "expected_behavior": "issue 要求: 陈旧 ref 下 sync_status 不得报 parity=equal / overall_parity=true; 应反映真实落后 4 commit。",
+        "actual_behavior": "基线: overall_parity=True, 两 remote 均 parity=equal, current_branch.behind=0 (真值落后 4) —— 缺陷在基线复现, 说明 fixture 有判别力。当前: overall_parity=False, 两 remote 均 parity=behind (evidence_grade=fresh, fetch_ok=true), current_branch.behind=4 (与 multi_remote 同向, 同快照不再自相矛盾), 快照新增顶层 generated_at, local_refs_stale 字段已不存在。",
+        "match": false
+      },
+      {
+        "case_id": "case-2",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_a.py 场景 B7d: 同 case-1 但 FETCH_HEAD 回拨 7 天 (评论 16240 follower 容器 7 天未活跃的形态, 基线下 local_refs_stale 会置位但仅咨询)。",
+        "expected_behavior": "issue 评论 16240 要求: 工具层必须让 7 天陈旧窗口不再假绿 (fetch 前置 或 陈旧参与裁决)。",
+        "actual_behavior": "基线: overall_parity=True + 两 remote equal + local_refs_stale=True (唯一提示、无裁决力), 与评论贴出的快照同形 —— 复现。当前: overall_parity=False, 两 remote behind (fetch_ok=true, evidence_grade=fresh), current_branch.behind=4, local_refs_stale 不再产出。",
+        "match": false
+      },
+      {
+        "case_id": "case-3",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_b2.py 场景 B2a: 先用冻结时钟 ARIA_SCAN_NOW=7 天又 2 小时前 扫描一次 (真实 fetch 成功, 缓存 fetched_at 定格在那时), 随后把两个裸仓目录改名使 remote 不可达, 再用基线与当前各扫一次 (真实现在时刻)。",
+        "expected_behavior": "issue: remote 无法询问时, 陈旧 equal 不得当正证据 (fail-CLOSED): overall_parity 必须 false, 且 has_unreachable_remote 应置位。",
+        "actual_behavior": "基线: rc=10, overall_parity=True, has_unreachable_remote=False (尽管同快照 coordination_fetch.success=False 且 errors[] 已记 coordination_fetch_failed) —— 复现自相矛盾。当前: rc=0, overall_parity=False, has_unreachable_remote=True; 两 remote evidence_grade=expired, parity=unknown, reason=not_refreshed, fetch_ok=false, error_kind=other (catch-all 值仍置位 unreachable, 符合 AC-14 零枚举); 缓存 fetched_at 停留在 7 天前未被推进; coordination_fetch 标 degraded=true / fetch_failed_using_stale_cache。",
+        "match": false
+      },
+      {
+        "case_id": "case-4",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_b2.py 场景 B2b: 从未被 scanner fetch 过 (无缓存) + 远端不可达, 本地 tracking ref 与 HEAD 相等、FETCH_HEAD 新鲜 (根因3『从未获取 被判 不陈旧』的形态)。",
+        "expected_behavior": "issue 根因3: 零证据/从未获取 不得当正证据; overall_parity 应为 false。",
+        "actual_behavior": "基线: rc=10, overall_parity=True, 两 remote equal, has_unreachable_remote=False。当前: overall_parity=False, has_unreachable_remote=True, 两腿 fetched_at=null -> evidence_grade=expired -> parity=unknown/not_refreshed。",
+        "match": false
+      },
+      {
+        "case_id": "case-5",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_cd.py 场景 C: 主仓含一个挂在分支上的子模块 sub (.git/modules/sub/FETCH_HEAD 不存在 = 从未 fetch), 子模块上游已前进 3 commit, 本地 tracking ref 陈旧。",
+        "expected_behavior": "issue 根因3 / Spec AC-6: 子模块从未 fetch 不得提供 equal 正证据; scanner 应真去 fetch 子模块并据实报 behind。",
+        "actual_behavior": "基线: overall_parity=True, sub remote parity=equal (真值落后 3) —— 复现。当前: remote_refresh 对主仓与 sub 各一条腿 fetch_ok=true, sub parity=behind (evidence_grade=fresh), overall_parity=False。",
+        "match": false
+      },
+      {
+        "case_id": "case-6",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_cd.py 场景 D + 健康对照: 主仓在 origin 与 github 均已发布引用子模块 commit G 的 gitlink, G 存在于 sub 的 origin 但不存在于 sub 的 github 镜像 (2026-07-12 standards@79b7cd6 orphaned on github 的事故形态, clone --recursive 自 github 会断)。对照组 Dctl: 同拓扑但镜像同步。",
+        "expected_behavior": "Spec AC-16: 已发布 gitlink 在某 remote 上不可达 => overall_parity 必须 false; AC-17: 健康常态 (可达) 必须 true, 不得过冲成恒红。",
+        "actual_behavior": "基线: overall_parity=True, 无 gitlink_integrity 字段 (事故不可见)。当前: gitlink_integrity 中 github/sub=orphaned、origin/sub=ok, overall_parity=False。对照组 Dctl: github/sub=ok、origin/sub=ok, overall_parity=True。(真仓 dogfood 时该 AC-16 正向腿曾为 vacuous, 此处为端到端实证。)",
+        "match": false
+      },
+      {
+        "case_id": "case-7",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_f.py (Spec B / Rule #7 可判别探针): 工作仓 core.quotepath 设为运行时拼装的假哨兵字符串 (非真实凭据), 使 git log / git status / git worktree list / git for-each-ref 失败且 stderr 回显该串; 基线与当前各扫一次, 检查快照 JSON 与 scanner stderr 是否含哨兵。另做一个带 userinfo 的 remote URL 探针 (case_e.py), 但现代 git 自行抹掉 userinfo, 该探针对两边均无判别力, 仅作记录。",
+        "expected_behavior": "Spec B: 裸 git stderr 不得进入 snapshot errors[].detail 与日志, 只能落有界分类标签。",
+        "actual_behavior": "基线: 快照 errors[].detail 与 scanner stderr 均含哨兵 (例如 worktree_enumeration_failed 的 detail 带 fatal: bad boolean config value '<哨兵>' ...) —— 泄漏类复现。当前: 快照与 stderr 均不含哨兵, detail 只剩 'git worktree list other (rc=128)' 'git for-each-ref other (rc=128)' 这类有界标签。",
+        "match": false
+      },
+      {
+        "case_id": "case-8",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_g.py: 工作仓 github 镜像真实领先 4 commit、origin 相等。三种配置: G0 无配置; G1 顶层 multi_remote.read_only_remotes=[github] (skill 级缺席, 走继承); G2 multi_remote.enforced_remotes=[origin]。",
+        "expected_behavior": "issue: enforced_remotes / read_only_remotes 不得再是『代码零消费的死配置』, 配了必须改变裁决参与集与 fetch 范围。",
+        "actual_behavior": "G0: enforced_remotes_resolved=[github, origin], github behind, overall_parity=False。G1/G2: enforced_remotes_resolved=[origin], excluded_read_only=[github], remote_refresh 只剩 origin 一腿, overall_parity=True —— 配置承重。另: 基线非测试 .py 对 enforced_remotes 引用 0 处 (grep), 当前 32 处。",
+        "match": false
+      },
+      {
+        "case_id": "case-9",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_perf.py T1: 用 git shim 使每次 git fetch 人为睡 2s; 主仓 8 个 remote (8 条腿, 同一 host 桶), per_host_fetch_limit=4, refresh_deadline_seconds=15; 另 T2 把 limit 设为 2。",
+        "expected_behavior": "issue 解决方案: 并行 fetch + per-host 限流 (串行 8 腿需约 18s)。",
+        "actual_behavior": "T1 (limit=4): 整次扫描 wall 7.5s, 8/8 fetch_ok=true (串行估算 18s) —— 并行成立。T2 (limit=2): 11.4s —— 限流生效 (腿数/limit 决定轮数)。",
+        "match": false
+      },
+      {
+        "case_id": "case-10",
+        "input": "/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_perf.py T2 与 /tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/case_perf2.py P3/P4: 同一 git shim (每次 fetch 睡 2s)。T2: 8 腿, limit=2, refresh_deadline_seconds=1。P3: 4 腿, limit=1 (worker 串行), refresh_deadline_seconds=1。P4: 同 P3 但设测试 seam ARIA_SCAN_FETCH_BUDGET=2。",
+        "expected_behavior": "issue 解决方案『全局 deadline』与 Spec F3' / tasks 3.5a': 网络成本须有硬上界; 到点尚未起跑的腿 => fetch_ok=not_attempted 并计入 skipped_count / skipped_remotes[reason=deadline]。",
+        "actual_behavior": "T2: wall 11.4s, 8/8 fetch_ok=true, skipped_count=0 (deadline=1s 形同虚设)。P3: wall 10.6s, 4/4 fetch_ok=true, skipped_count=0。P4 (仅测试 seam): 2 腿被切 (skipped_remotes 两条 reason=deadline), wall 7.4s —— 说明切腿分支存在, 但生产路径 (未设 seam) 不可达。对照 (case_perf3.py, 排除配置未被读取): deadline=1e-6s 时 4 腿全部 not_attempted (skipped_count=4, wall 1.6s), 证明配置被读取且在准入处比较; deadline=0.05s 时 4/4 腿仍全部 fetch (skipped_count=0, wall 12.3s), 即准入循环耗时在微秒量级, 任何实际取值都触发不了。根因: remote_refresh.py:508-518 _run_schedule 的准入循环在 submit() (:515) 之前顺序调用 _should_stop_admitting (:450), 而 ThreadPoolExecutor.submit 不阻塞, 全部腿在 t 约等于 0 即被准入, 生产分支 elapsed>=deadline 结构性不可达; test_remote_refresh.py:460-495 (test_monotonic_deadline_path_converges_to_same_shape) 用 mock 的 time.monotonic 序列 [100,100,100,100,200] 阶跃驱动该分支所以全绿。",
+        "match": true
+      },
+      {
+        "case_id": "case-11",
+        "input": "Spec C 核验: (a) 在 case-1 的当前版本快照里读顶层 generated_at; (b) 对真仓最近一份真实快照 (.aria/state-snapshot.json, generated_at=2026-09-30T17:40:14Z) 只读运行 python3 aria/skills/state-scanner/scripts/issue_cache_freshness_probe.py /home/dev/Aria, 并读该快照 custom_checks 中 issue-cache-freshness 的状态; (c) 跑 test_issue_cache_freshness。",
+        "expected_behavior": "Spec C: 快照含 generated_at; issue-cache-freshness 检查不再因跨 scan 文件 mtime 比较而恒红。",
+        "actual_behavior": "当前快照含 generated_at (基线无); 探针对真仓快照输出 'OK' exit 0, 快照内该 check status=pass; test_issue_cache_freshness 22 测 OK。",
+        "match": false
+      },
+      {
+        "case_id": "case-12",
+        "input": "pin 测试判别力变异验证 (实验副本 /tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/aria-plugin-110/mut2, 不碰真仓): M1 把 _blocking_unknown 改回正向枚举; M2 把 _overall_parity 的 ∃ 子句去掉 evidence_grade==fresh 门; M3 破坏 _has_unreachable_remote 判据; 每个变异跑 test_mainspec_phase1_f1_f4 / test_multi_remote_mocked / test_remote_refresh。",
+        "expected_behavior": "issue 元教训: 『逐格填』须从纪律变机制 —— pin 测试必须能抓住 fail-OPEN 的已知复发形态。",
+        "actual_behavior": "M1: f1_f4 FAILED (failures=3); M2: f1_f4 FAILED (failures=1); M3: f1_f4 FAILED (failures=1) 且 multi_remote_mocked FAILED (failures=1); 三个变异均被抓。未变异的完整 state-scanner 套件在隔离副本 1650 tests OK (skipped=13)。",
+        "match": false
+      }
+    ],
+    "hit_count": 1,
+    "total_count": 12,
+    "hit_rate": "1/12"
+  },
+  "verdict": "fixed-in-X",
+  "severity": "minor",
+  "recommended_action": "backlog",
+  "deviation_note": null,
+  "errors": []
+}
