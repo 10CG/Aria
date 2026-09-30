@@ -10,7 +10,7 @@
 | `gen_yaml.py` | `detailed-tasks.yaml` 的生成器 (v2)。**改 yaml 一律改这个脚本再重新生成**, 不手改产物 |
 | `audit-seat-prompt-template.md` | post_planning 席位提示词的公共模板 (占位符 `{ROUND}` `{ROLE}` `{VERSION}` `{SHA}` `{FOCUS}` `{ROUND_CONTEXT}` `{REPORT_PATH}`) |
 | `r1-seat-prompts/*.md` | R1 实际下发的五份完整提示词; 各席的「你的视角」段 (`{FOCUS}`) 从这里取 |
-| `writer-reports/` | v2.4 – v2.7 各次返修的主控派单与执笔报告 (含机器清单), v2.4 – v2.6 由 owner 2026-09-27 裁定落仓, v2.7 按同一理由随该版落仓; 逐字节原样, 说明见该目录 `README.md` |
+| `writer-reports/` | v2.4 – v2.10 各次返修的主控派单与执笔报告 (含机器清单), v2.4 – v2.6 由 owner 2026-09-27 裁定落仓, v2.7 起按同一理由随各版落仓; 逐字节原样, 说明见该目录 `README.md` |
 
 三态实跑脚本 **不在本目录**: 它们的全文已嵌在 yaml 的 `metadata.a2_state_runs.script` 与 `metadata.v2_state_runs.script`, 输出在同节 `output`。
 
