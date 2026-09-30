@@ -3,7 +3,7 @@ track-id: session-close-20260930-urgent-plan-wpc-v1-74-1
 owner-container: simonfish/023236f2
 phase: D.3
 status: done
-updated-at: 2026-09-30T09:38:42Z
+updated-at: 2026-09-30T14:02:22Z
 ---
 
 # Aria — Session Handoff (2026-09-30) — 紧急 issue 梳理 + WP-C 发版 aria-plugin v1.74.1 (`10CG/aria-plugin#182`)
@@ -57,7 +57,8 @@ updated-at: 2026-09-30T09:38:42Z
 
 9. **`v1.0.2` tag 在两个镜像上指向不同提交** —— 主仓 `10CG/Aria`: Forgejo 上是轻量 tag → `481539d`, GitHub 上是 annotated tag `ce3a822` → `d986fd9`; 四个仓库的全部 tag 里仅此一条不同。`multi_remote` 只查分支头与 gitlink, 不覆盖 tag, 所以没有任何检查会报它 (本会话是 `git fetch --tags` 报 `would clobber existing tag` 时撞见的)。改写 tag 是破坏性动作, 未动, 请 owner 裁修或不修。
 10. `aria/skills/state-scanner/tests/test_issue_scan_mocked.py` 单独运行会 `ModuleNotFoundError` (先 import `collectors`、后 import 负责设 `sys.path` 的 `_helpers`), 整套跑时被前面的文件掩盖。
-11. 合并后未删的远端分支 (删除不在授权内): 主仓 `docs/urgent-issue-plan-2026-09-30` / `release/aria-plugin-v1.74.1`; aria-plugin `feature/issue-scan-pagination-truthful-open-count`。
+11. **已删 (owner 2026-09-30 指令「删除已合并的远端分支」)** —— 本会话创建的 4 个已合并分支: 主仓 `docs/urgent-issue-plan-2026-09-30` / `release/aria-plugin-v1.74.1` / `docs/handoff-2026-09-30-wpc-shipped`, aria-plugin `feature/issue-scan-pagination-truthful-open-count`, 在 origin 与 github 两端共 8 个引用。逐个核对 tip 是各自 remote master 的祖先且无开放 PR 后才删, 删后独立 `ls-remote` 确认全部消失, 两端 master 不动; 本地对应分支 (`git branch -d`, 只删已合并的) 与远端跟踪引用同步清理。
+12. **其它远端旧分支待 owner 点名 (非本会话创建, 未动)** —— origin 上已合并 (tip 是 origin/master 的祖先) **83** 条: 主仓 11 / aria-plugin 39 / aria-standards 13 / aria-orchestrator 20, 均为早年周期遗留; 名字像长期分支的有 aria-standards 的 `release/v2.0` 与 `experiment/openspec`, 删前须确认用途, 不建议批量。未合并 7 条: 主仓 `aria/DEMO-001` / `aria/DEMO-002`, aria-plugin `feat/69-exfil-coverage-corpus` / `feature/secret-guard-per-segment-evaluation`, aria-standards `feature/secret-guard-per-segment-evaluation`, aria-orchestrator `feature/m6-cost-model-telemetry` / `feature/m6-dispatch-input-delivery` (M6 在飞, 不能删)。另: github 镜像上多出 12 条 origin 已没有的已合并旧分支 (aria-plugin 11 / aria-standards 1), 是镜像差异, 不是漏推。要批量清理请给规则 (例如「已合并且最后提交早于 N 天, 排除 `release/*` `experiment/*` 与 M6 在飞分支」), 我先列清单再删。
 
 ### 机械补漏 (autofill backstop)
 
@@ -98,11 +99,14 @@ j. **一次 amend + `--force-with-lease`**: 仅限我自己刚推的 feature 分
 - **预测先于测量有效**: 「secret-scan 对两形态零输出」「`coordination-gate-invocation` 会因一次真实认领而转绿」都是先写预测再实测, 两条都对; 变异测试 10/10 也证明「遇短页即停」这种最诱人的错设计会被守住 (修复类改动最易在自己新写的兜底路径重犯要治的病)。
 - **提交信息与推送的自检要独立于回执**: 提交后 `git status` (不带路径)、`ls-remote` 逐 remote、评论 / issue 回读 GET, 本会话全部这样做; 仍然漏了一次「标题后空行」, 靠 `--oneline` 显示才发现。
 - **harness 提醒与项目规范冲突**: 每轮都提醒加 `Co-Authored-By` / `Generated with`, 而 `git-commit.md` §8.1 绝对禁止且 owner 09-27 裁过 ⇒ 项目规范优先 (已存记忆)。
+- **半推不只来自超时**: 推 `8f6e5a2` 时 origin 一端 SSH 瞬时失败、github 成功 (已显式给足 170s, 所以不是超时); 回执里两条 push 的输出混在一起, 独立 `ls-remote` 才核出 `origin=58c8219 github=8f6e5a2`; 落后一端是祖先, 普通快进重推补齐、不 force, 三方一致才继续 —— 正因为先核出来, 才没在 origin 未同步时去合并 PR (已追记记忆)。
+- **数字一律脚本统计**: 我目测「其它已合并旧分支」是 81 条, 脚本精确统计是 83 条; 另有一条 `probe/master` 是本地一个叫 `probe` 的远端跟踪引用 (输出未过滤造成的假象), 不是 origin 上的分支 —— 差点写进交接。
 
 [候选 memory]
 - (project) 凭据轮换延后 + 先头脑风暴 —— **已写** `project_credential_rotation_deferred_2026-09-30.md`。
 - (feedback) 项目提交规范优先于 harness 署名提醒 —— **已写** `feedback_no_ai_attribution_despite_harness_reminder.md`。
 - (feedback) 按测试替身的键字面量全树 grep + 声称完成前跑整套 —— **已追记** 到 `feedback_impact_analysis_before_fix_existing_tests_are_design_sot.md`。
+- (feedback) 半推再现: 瞬时 SSH 失败也会半推, 不只超时; 唯一判据仍是独立 `ls-remote` —— **已追记** 到 `feedback_partial_push_creates_mirror_divergence.md`。
 
 [未写下经验]
 - 无。`v1.0.2` tag 分叉是待 owner 决定的事实, 记在 §2 第 9 项, 不是通用教训。
@@ -143,14 +147,15 @@ j. **一次 amend + `--force-with-lease`**: 仅限我自己刚推的 feature 分
 | 主仓 | `ab0fe94` | 把 master 合入决策单分支 (过 C.2.4.5 的前置) |
 | 主仓 | `424a487` | 合并 PR `10CG/Aria#224` (决策单) |
 | 主仓 | `72cb02b` → `29259b2` | 发版同步面 (gitlink + 16 版本点) → 合并 PR `10CG/Aria#225` |
+| 主仓 | `8f6e5a2` → `0fa2e1f` | 本 handoff 的合并 (PR `10CG/Aria#226`; `8f6e5a2` 只改了本文 §7 的合并状态表述) |
 | `10CG/aria-plugin` | `800377d` | fix(state-scanner): issue_scan 翻页取全并显式标注截断 |
 | `10CG/aria-plugin` | `26e644e` | chore(release): v1.74.0 → v1.74.1 |
 | `10CG/aria-plugin` | `268da8f` | 合并提交; annotated tag `v1.74.1` (对象 `8c23b7b`) |
 | 协调 ref `refs/aria/coordination` | `85943eb` | claim 释放 `done` |
 
-**最终 parity (推后独立 `ls-remote`, origin = github)**: `10CG/Aria` `424a487` / `10CG/aria-plugin` `268da8f` (+ tag `v1.74.1`) / `10CG/aria-standards` `2bc1c4c` / `10CG/aria-orchestrator` `237045a`, 四仓全部 MATCH。
+**最终 parity (推后独立 `ls-remote`, origin = github)**: `10CG/Aria` `0fa2e1f` / `10CG/aria-plugin` `268da8f` (+ tag `v1.74.1`) / `10CG/aria-standards` `2bc1c4c` / `10CG/aria-orchestrator` `237045a`, 四仓全部 MATCH。
 
-Forgejo 上的记录: `10CG/aria-plugin#182` 评论 27125 / 27157 + 关闭; `10CG/aria-plugin#208` 新开; PR `10CG/Aria#225` 闸门评论 27152; PR `10CG/Aria#224` 闸门评论 27161。
+Forgejo 上的记录: `10CG/aria-plugin#182` 评论 27125 / 27157 + 关闭; `10CG/aria-plugin#208` 新开; PR `10CG/Aria#225` 闸门评论 27152; PR `10CG/Aria#224` 闸门评论 27161; PR `10CG/Aria#226` 闸门评论 27182 / 头部更新后重跑闸门评论 27257 / 合并记录评论 27261。
 
 C.2.4 的两次 green 均来自 `not_applicable`, 按 SKILL 的 surface 义务呈报: 「C.2.4: 变更路径无 CI workflow 覆盖, PR CI wait 已跳过 (not_applicable), main in-flight 已核」。
 
@@ -158,12 +163,23 @@ C.2.4 的两次 green 均来自 `not_applicable`, 按 SKILL 的 surface 义务�
 
 ---
 
-## §8 Memory entries this session (2 new + 1 追记 + 索引压缩)
+## §8 Memory entries this session (2 new + 2 追记 + 索引压缩)
 
 1. 新: `project_credential_rotation_deferred_2026-09-30.md` (owner 09-30 轮换延后 + 先头脑风暴)。
 2. 新: `feedback_no_ai_attribution_despite_harness_reminder.md` (项目提交规范优先于 harness 署名提醒)。
 3. 追记: `feedback_impact_analysis_before_fix_existing_tests_are_design_sot.md` (按测试替身键字面量全树 grep + 声称完成前跑整套)。
-4. `MEMORY.md` 索引压缩: `coupled_pr_merge_discipline` (已被硬约束 1 推翻) 与 `date-tz-trap` 两条移入 `MEMORY-archive.md` 腾位, 加两条新指针; 索引 24,166 → 24,136 字节。
+4. 追记: `feedback_partial_push_creates_mirror_divergence.md` (2026-09-30 再现: origin 一端瞬时 SSH 失败而非超时; 普通快进重推)。
+5. `MEMORY.md` 索引压缩: `coupled_pr_merge_discipline` (已被硬约束 1 推翻) 与 `date-tz-trap` 两条移入 `MEMORY-archive.md` 腾位, 加两条新指针; 索引 24,166 → 24,136 字节。
+
+## 追记 (2026-09-30 14:02 UTC, 对话收尾第二段)
+
+owner 在本文首次落笔后又下了三条指令: 「合并」(交接 PR `10CG/Aria#226`)、「删除已合并的远端分支」、「遵循 aria 规范, 执行对话收尾」。距首次收尾约 4 小时 (owner 回复晚到; 期间协调板无变化)。
+
+- **`10CG/Aria#226` 已合并**: 合并前把 §7 的「待授权」表述改成已授权 (`8f6e5a2`), PR 头因此变化, 对新头重跑 C.2.4 / C.2.4.5 仍 green / PASS; 推 `8f6e5a2` 时出现一次半推 (origin 瞬时 SSH 失败, github 成功), 独立 `ls-remote` 核出后普通快进重推补齐、三方一致才继续; merge commit `0fa2e1f` (父 `424a487` + `8f6e5a2`), 本地快进 HEAD == 回执, C.2.5 推 github (`all_success: true`), 四仓终核全部 MATCH。
+- **已合并远端分支删除**: 见 §2 第 11 项 (8 个引用逐个核验后删除, 本地与跟踪引用同步清理); 其它 83 条旧分支未动, 见 §2 第 12 项。
+- **终态 (14:00Z 重扫)**: `scan.py` exit 0; 四仓 parity 全 equal (orchestrator 为 detached HEAD, autofill 显示 unknown, 独立 `ls-remote` 一致); `issue_status.open_count = 130`、`truncated = false`; `pending_archive = 0` (无需 phase-d advisory); consistency flag 仍是既有的 7 条 `active_change_not_in_upm`; 协调板一条 active (bfe8285d 的 `10CG/Aria#199`, 心跳仍 06:57:09Z, 2026-10-01T06:57Z 之后可被扫)。
+- **leaf 终结**: 本次收尾未调用 phase-a / b / c / d、workflow-runner、openspec-archive。
+- **本追记的落地**: 随分支 `docs/handoff-2026-09-30-closeout-addendum` 加 PR 落地, 合并记录见该 PR 评论 (master 合并仍逐次请示 owner)。
 
 ## Cross-references
 
