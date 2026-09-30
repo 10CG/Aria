@@ -154,7 +154,7 @@ Forgejo 上的记录: `10CG/aria-plugin#182` 评论 27125 / 27157 + 关闭; `10C
 
 C.2.4 的两次 green 均来自 `not_applicable`, 按 SKILL 的 surface 义务呈报: 「C.2.4: 变更路径无 CI workflow 覆盖, PR CI wait 已跳过 (not_applicable), main in-flight 已核」。
 
-**本 handoff 自身的提交** (docs/handoff + `latest.md`) 走分支 `docs/handoff-2026-09-30-wpc-shipped` 加 PR 待 owner 授权合并 (master 合并不在一次性授权内); 分支与 PR 号见 `10CG/Aria` 的开放 PR 列表。
+**本 handoff 自身的提交** (docs/handoff + `latest.md`) 走分支 `docs/handoff-2026-09-30-wpc-shipped` 加 PR `10CG/Aria#226`; master 合并不在一次性授权内, 故单独请示, owner 在会话内以「合并」明示授权; 两道闸 green / PASS 后以 merge commit 合并, 再由 C.2.5 双推并逐个 `ls-remote` 核验, 合并回执与 parity 记录见该 PR 评论。
 
 ---
 
