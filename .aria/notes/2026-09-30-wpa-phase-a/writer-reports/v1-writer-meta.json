@@ -1,0 +1,289 @@
+{
+ "self_reported_weak_points": [
+  "交付物逐字节母本 (请落盘后 cmp): /tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v1/spec/proposal.md (sha256 前 16 位 713e8aab65a0f925)、.../spec/baseline_probe.py (dd71154840683e98)、.../spec/baseline-evidence.md (160eec8425531084); 结构化输出里的三段文本是从这三个文件抄出的, 若有任何字节差异以母本为准。探针 stdout 母本 .../evidence-run-C.out (sha256 前 16 位 1ab63a323da13f45, 41873 字节)。",
+  "SC-30 (带 git 历史的真 checkout 全量跑, 含测试内 SC-9a / SC-8 延迟闸) 没有探针基线: 为逐字节复现刻意排除计时闸与 af87cae 依赖; 研究笔记的 593/593 不是本探针产出, 这条违背了「基线值只能来自探针」的字面, 已在 proposal 里如实标注。",
+  "目标态的 Spec 自扫描 (SC-15 15e/15f) 只在基线 hook 与研究原型 (设计不同) 上验证过静默, 真正的新 tag 上线后是否静默要到 B.2。",
+  "W2 的最终设计 (17 名字干 + Pascal 拼写、统一 16 字符门槛、cli-secret-flag) 没有在研究 505 文件语料上复跑普查; 研究原型的普查数字不能直接套用。",
+  "W11 里 sh -c '…' / watch '…' / pct exec / sudo pgrep -af 这几类外壳与 launcher 形态, 研究原型全部漏 (我在原型上实跑确认), 本 Spec 的可行性是推断, 未做原型。",
+  "W9 的「超限整体忽略」与研究原型的截断语义不同, 未原型验证; hook 进程里 CLAUDE_PROJECT_DIR 是否总存在在本环境不可观测; stdin cwd 随 cd 漂移。",
+  "SC 钉得很紧 (L3 行要求 tag breakdown 与计数恰好相等; additionalContext 插入串逐字写死; SC-26a 要求条款在同一行; SC-28 用字面子串判断陈旧表述消失), 实现几乎无自由度, 措辞类改动都会变成 Spec 变更。",
+  "放行守卫 (allow-guard 88 行) 在基线上天然成立; 我用研究原型 (ALL2 guard + cand-aria scan) 当「另一实现」实跑探针, 守卫转红 12 行 (24h 宽松词表放行 $ENV、25a/25b heredoc 被改、31b/31c census 硬编码未同步与变量整行, 以及 3a/3b/10c/10d/23r 这类有意的设计差异), 但 88 行放行守卫在该原型上一行都没转红 —— 它们的鉴别力只来自与正例成对的推理, 没有被坏实现实证过。该原型实跑未写入证据 (原型文件在 scratch, 不可复现给他人)。",
+  "探针依赖 C.UTF-8 locale 与 /usr/local/bin:/usr/bin:/bin 下的工具; 在缺 C.UTF-8 的机器上多字节占位 (11f) 的字符计数语义可能不同。",
+  "证据文件第 4 条写「对真 checkout 跑时套件同样在去 .git 私有副本里执行」, 这是按代码推断, 我没有对真实 /home/dev/Aria/aria 实跑探针 (遵守只在 exp/writer-v1 下实跑的纪律)。",
+  "头部 linked_issue_overlap == [] 取自派单; 我只在本地协调 ref 核到 claims/023236f2/s-3e77@1757.yaml (status active / phase A.1 / linked_issue 10CG/aria-plugin#154), 未见 gate 输出原文。",
+  "proposal 体量 (365 行, 326 个用例行在证据里) 偏大; 已按 SC 级摘要写, 但仍可能被判「Level 2 规格膨胀」。"
+ ],
+ "owner_review_items": [
+  "[产品级·请裁] L3 是否从「检测+告警」升级为「检测+脱敏」(updatedToolOutput): 选项 A 维持 (默认, DEC-20260703-001 有效) / 选项 B 先做端到端 spike, 通过后新 DEC + 独立 Spec (推荐) / 选项 C 本 Spec 内直接做 (不推荐: 未验证、推翻 DEC、误报会让模型看不到被误脱敏的正文)。",
+  "[产品级·请裁] BLOCKED 拒绝文案是否加「凭据不要放命令行参数, 改用 env / --config / stdin」: 选项 A 文案零改动只落 SOT (推荐, 默认) / 选项 B 全局共享 heredoc 加一句 (污染 145 条拦截, 首改处方性文案须 SOT §3 三件套, 失去 08-02 锚点) / 选项 C 先解 10CG/aria-plugin#132 再给进程表族定向提示。",
+  "[产品级·请裁] ship 后 10CG/aria-plugin#203 与 10CG/Aria#221 的收尾: 决策单第 2 项「相关 issue 保持 open、本项之下不评论」—— 理解 A (默认): 保持 open, 只评论代码侧进展、不涉轮换; 理解 B: 整张 issue 都不评论, 等轮换统一处理。10CG/aria-plugin#154 按一次性授权评论并关闭。",
+  "[产品级·请裁] Level: 维持 Level 2 (决策单第 3 项已裁, 四份同型先例) 还是按 2026-07-11 bash3 先例的 blast radius 理由改 Level 3 (补 tasks.md)。LEVEL_GUIDE「影响多个子模块自动 L3」字面命中。",
+  "[产品级·请裁] 进程表拦截会改变日常习惯: ps aux | grep X 被拦 (改用 pgrep -f X / ps -eo pid,comm), systemctl status 刻意放行交给 L3。是否接受这个误拦代价。",
+  "[产品级·请裁] 版本定级 MINOR (建议: 新检测能力 + 新输入面 + 新拦截族, 同 v1.47.0) 还是 PATCH; 取号时刻与 10CG/Aria#199 协商, 号归 owner。",
+  "[产品级·请裁] 建议开单清单 16 条 (开单不在一次性授权内, 逐条请示), 证据位置见 proposal「待 owner 复议」第 7 条: 超时即放行与延迟悬崖、引号内 | 失明、credit 整段计、读取器无左边界、两面名单不对齐、PEM 预扫超线性与临时文件遗留、matcher 缺 Grep/PowerShell、未覆盖形状 (飞书 webhook / SecretID / AWS PascalCase)、服务端配置候选名单、docker inspect / journalctl / nomad job inspect、log_ack 写日志缺换行 (本次新发现)、host-docker-logout-guard 测试污染外层 HOME (本次新发现)、aria-doctor 校验扩展文件、jq 词表既有洞、census criteria.site_count 漂移、/proc/N/status 轻度误报。",
+  "[技术级·已裁待复议] rule6_note 分两块: 块 A (hook 代码/测试/文档/SOT) decision_table_row n/a + 2026-08-02 substitute 框定; 块 B (additionalContext 插入 tags+source) 判 SOT 决策表第 1 行 (描述性) 而非第 3 行; W13 的 SOT 处方性条款按非 Skill 变更归块 A。",
+  "[技术级·已裁待复议] W2: JSON 封闭名表 17 个名字干 + snake/camel/Pascal 拼写; 不纳入小写 YAML 键、CLI 空格分隔、封闭表外 PascalCase (AWS SecretAccessKey); 新 tag 值长门槛统一 16; 熵下限「至少两类 + 非路径形」。",
+  "[技术级·已裁待复议] W3: 白名单按值前缀、大小写敏感, 作用于 6 个新 tag + 既有 json-secret-field (两面测试), 不含 env-line-secret-keyword 与 provider 前缀类; 必含 [REDACTED 前缀 (L2 wrapper)。",
+  "[技术级·已裁待复议] W4: 值长 ≥16 记 sha256 前 8 位 (同 pat-inventory 算法), <16 只记 L<长度>, 缺 sha256sum/shasum 记 -; 追加第 9 字段 fp= 而不另起日志文件。",
+  "[技术级·已裁待复议] W6: 测试卫生扩到两个 secret-* 套件 (探针实测 secret-guard 套件也写 12 条 ack 事件)。",
+  "[技术级·已裁待复议] W7: 夹具源头改运行时拼装, hook 不加按路径的「只记日志」豁免。",
+  "[技术级·已裁待复议] W8: 只做 Forgejo/Gitea app.ini 族 (研究 2700 条语料仅 1 条触及其它候选名字, 不足以作零误报实证), 其它推迟。",
+  "[技术级·已裁待复议] W9: .aria/secret-guard.paths 纯文本字面子串; 文件级异常 (缺失/非普通文件/不可读/>32 KiB/含 NUL/>200 条) 整体忽略扩展、内建照常; CLAUDE_PROJECT_DIR 优先, 回落 stdin cwd (单独 jq 取值, 不改 4 字段抽取)。",
+  "[技术级·已裁待复议] W11: 处置选拒绝 (不选 updatedInput 改写与 ask); tight credit; 纳入 sh -c / watch '…' / pct exec 外壳与 launcher 包裹的 pgrep/pstree/top; /proc 行放宽; 不纳入 docker inspect / journalctl。",
+  "[技术级·已裁待复议] W12: \\.env 只改 python3/node/lua 三行并写 \\.env(rc)?([^A-Za-z0-9_]|$) (fail 方向 .env_prod 经解释器由拦变放, 与 cat 行 \\b 同语义); jq 的 keys_unsorted 与 map_values(length) 都走锚定语法, 不进 :427 宽松词表 (实测研究原型 F1 放行 keys_unsorted | $ENV)。",
+  "[技术级·已裁待复议] W14: 结构预算 risky_patterns ≤150 行 (确定性代理), 测试内 SC-8 天花板不动; secret-scan.test.sh 补头注释计数与自检。",
+  "[流程判断·待复议] 探针在去 .git 副本上跑套件以保证逐字节可复现, git 腿列为 SC-30 在 B.1/B.2 真 checkout 上跑 —— SC-30 因此没有探针基线。",
+  "[流程判断·待复议] 实验布局除 cp -a aria 外还 cp -a 了 standards (派单只写 aria), 以便探针判定 standards 侧 SC; 早期几次探索脚本与探针运行的私有临时目录落在 /tmp (探针自删; 我自己探索脚本可识别的 xh-*/xs-*/dbg-* 已清理), 最终证据运行 TMPDIR 在 exp/writer-v1 内。",
+  "[流程判断·待复议] 为检验探针鉴别力, 对研究原型 (exp/secret-guard/var/ALL2 + exp/secret-scan/cand-aria) 组装的副本实跑了一次探针 (结果只写在自报与设计取舍里, 未入证据)。"
+ ],
+ "design_decisions": [
+  {
+   "topic": "L3 读取提取修复范围 (W1)",
+   "candidates": [
+    "只在提取链加 .tool_response.file.content",
+    "研究原型: 主体 + stderr + structuredPatch/newString + 字符串形全量拼接",
+    "按 tool_name 分派提取"
+   ],
+   "choice": "只加 .tool_response.file.content, 其余分支与顺序不动",
+   "rationale": "最小改动即可修好生产中 Read 永不被扫描的缺口; 真实 Bash 形状的 stderr 只装 harness 提示; 字符串形 tool_response 是否到达 PostToolUse 未证实; jq 的 // 已天然区分形状",
+   "falsifiable_criterion": "回退该分支则 SC-1 1a/1b 转红; 若实现顺带扫描 Edit 或字符串形, SC-3 3a/3b 转红 (对研究原型实跑即转红)"
+  },
+  {
+   "topic": "JSON 凭据键表 (W2 json-credential-field)",
+   "candidates": [
+    "只加 10CG/aria-plugin#154 原文 token/sha1",
+    "任意含 token 的键 (子串/后缀)",
+    "封闭 17 名字干 + snake/camel/Pascal/连写拼写",
+    "全大小写不敏感或预归一化"
+   ],
+   "choice": "封闭名表 + 拼写变体",
+   "rationale": "覆盖事故形与研究矩阵 JX1-JX4; next_page_token 这类分页游标由封闭性挡住; ERE 可直接实现, 不需要归一化",
+   "falsifiable_criterion": "SC-4 13 行转绿且 SC-9 9j (next_page_token 静默)、SC-10 10f (封闭表外 PascalCase 静默) 保持; B.2 在研究同一 505 文件语料复跑普查, 新增告警文件若超过研究原型的 9 个则回到复议"
+  },
+  {
+   "topic": "值长门槛与熵下限 (W2)",
+   "candidates": [
+    "值长 8 (同既有 json-secret-field)",
+    "值长 12 (研究原型赋值族)",
+    "统一 16",
+    "熵下限: 必须含数字",
+    "熵下限: 小写/大写/数字至少两类 + 非路径形",
+    "Shannon 熵阈值"
+   ],
+   "choice": "统一 16 + 至少两类且非路径形",
+   "rationale": "研究矩阵正例全部 ≥20 字符; 研究实测「必须含数字」约 3% 漏报; Shannon 熵在 bash 3.2 下昂贵且对短值不稳",
+   "falsifiable_criterion": "SC-9 9o/9p/9q (路径形与单类名字值静默) 与 SC-10 10a-10c (单类、短值静默) 钉住; 若出现真实事故值短于 16 或单字符类, 回到复议"
+  },
+  {
+   "topic": "小写 YAML 键与 CLI 空格分隔形 (W2)",
+   "candidates": [
+    "纳入 kv-secret-assign-lc (研究原型)",
+    "不纳入, 成文 KNOWN-LIMIT",
+    "纳入并提高熵下限"
+   ],
+   "choice": "不纳入, KNOWN-LIMIT",
+   "rationale": "研究普查最大误报源正是小写赋值族 (原始命中 24 文件), 语义性误报正则不可消; 无事故证据",
+   "falsifiable_criterion": "SC-10 10d/10e 钉住静默; 若出现以小写 YAML 键或空格分隔参数形式泄露的真实事件, 另立 Spec"
+  },
+  {
+   "topic": "FP 白名单判定方式与作用范围 (W3)",
+   "candidates": [
+    "按值前缀判定",
+    "span 含标记即跳",
+    "只作用于新 tag",
+    "延伸到既有 json-secret-field",
+    "再延伸到 env-line-secret-keyword",
+    "provider 前缀类也套"
+   ],
+   "choice": "按值前缀; 作用于 6 个新 tag + 既有 json-secret-field",
+   "rationale": "「含即跳」会翻红既有 provider 夹具且放过中段含 FAKE 的真值; L2 wrapper 占位在既有键上已恒红; env-line 值字符类已排除占位符号, 无实测误报",
+   "falsifiable_criterion": "SC-11 11m-11r (既有键误报消除) + 11s (中段 FAKE 仍告警) + 11t/11u (真阳性与 provider 不受影响) + SC-8 (哨兵只计一次) 全部成立"
+  },
+  {
+   "topic": "日志值指纹 (W4)",
+   "candidates": [
+    "所有值记 sha256 前 8 位 (研究原型)",
+    "≥16 记前 8 位, <16 只记长度",
+    "加盐 / HMAC",
+    "另起 credential-tripwire.log"
+   ],
+   "choice": "≥16 记 sha256 前 8 位, <16 记 L<长度>, 缺工具记 -, 追加第 9 字段 fp=",
+   "rationale": "8 位无盐前缀对短口令构成确认预言机; 与 .aria/pat-inventory.yaml 的 sha256-hex-prefix-8 同算法可直接比对; 该日志仓内无读取方, 追加字段零兼容负担",
+   "falsifiable_criterion": "SC-12 12a-12c 恰为 8hex / L12 / - 且 12d-12f 无明文无 8 字符片段"
+  },
+  {
+   "topic": "告警文案改动面 (W5)",
+   "candidates": [
+    "只插入 (tags: …; source: …) 描述性信息",
+    "按 10CG/aria-plugin#154 原稿改处方句 (疑似 / 轮换放最前)",
+    "Bash 也附命令摘要"
+   ],
+   "choice": "只插入 tags + source",
+   "rationale": "处方句零改动, Rule #6 可按描述性判; #154 评论已确认处方部分现行满足; 命令文本可能含值",
+   "falsifiable_criterion": "SC-13 13a-13c 转绿且 13d (处方句逐字节不变)、13e/13f 保持"
+  },
+  {
+   "topic": "夹具静默 (W7)",
+   "candidates": [
+    "源头把字面夹具改运行时拼装",
+    "hook 侧按路径「只记日志不注入」清单",
+    "不处理"
+   ],
+   "choice": "源头拼装, hook 不加路径豁免",
+   "rationale": "hook 零新增逻辑, 不存在「真实泄露只进日志」的盲区; 路径清单在采用方项目无意义",
+   "falsifiable_criterion": "SC-15 15a 转静默, 同时 SC-29 既有 49 条断言照过"
+  },
+  {
+   "topic": "服务端配置名单范围 (W8)",
+   "candidates": [
+    "只做 Forgejo/Gitea app.ini 族",
+    "同批纳入 grafana.ini / nomad.d / consul.d / vault.d / pve priv / shadow / 凭据点文件",
+    "裸名 app.ini"
+   ],
+   "choice": "只做 app.ini 族, 其它进建议开单",
+   "rationale": "有事故证据; 研究 2700 条 docs 语料只有 1 条触及其它候选名字, 不足以作零误报实证; 裸名误伤任何应用",
+   "falsifiable_criterion": "SC-16/SC-18 转绿且 SC-17 10 行放行保持; 若 B.2 前补出覆盖候选名字的语料且零误报, 可经 Amendment 纳入"
+  },
+  {
+   "topic": "项目级扩展入口宿主与失败语义 (W9)",
+   "candidates": [
+    ".aria/secret-guard.paths 纯文本字面子串",
+    ".aria/config.json 新键",
+    ".claude/settings.json env 注入",
+    "条目用 ERE",
+    "超限截断 (研究原型)",
+    "超限整体忽略",
+    "项目根回落 $PWD",
+    "项目根回落 stdin cwd"
+   ],
+   "choice": "纯文本字面子串 + 文件级异常整体忽略 + CLAUDE_PROJECT_DIR 优先、回落 stdin cwd",
+   "rationale": "避开 10CG/Aria#199 守卫面与 Skill 登记; 字面子串杜绝正则静默失配; 整体忽略可预测; cwd 是 hook 契约字段",
+   "falsifiable_criterion": "SC-19 (两面生效、回落与优先级、字面、CRLF、只增不减) 转绿; SC-20 六种坏文件两面各 6 行保持; SC-31 31d hooks.json 零改动"
+  },
+  {
+   "topic": "变量间接处理深度 (W10)",
+   "candidates": [
+    "整条命令收集字面赋值并判替换副本 (部分修复)",
+    "给敏感路径赋值即拦",
+    "整串共现规则",
+    "不做, 全交 L3"
+   ],
+   "choice": "字面赋值展开 + KNOWN-LIMIT, 不宣称根治",
+   "rationale": "研究原型 24/24 泄露形态拦、22 条正常用法 0 误报、2700 条语料 0 新增拦截; 残余交 L3 (事故泄露行即 SC-5 5a 形态)",
+   "falsifiable_criterion": "SC-21 8 行 baseline-failing 转绿, 5 行放行与 8 行 KNOWN-LIMIT 保持; 测试内 SC-8 延迟闸 (SC-30) 不超天花板"
+  },
+  {
+   "topic": "进程表列举的处置方式 (W11)",
+   "candidates": [
+    "拒绝 exit 2",
+    "PreToolUse updatedInput 改写命令",
+    "permissionDecision: ask",
+    "只交 L3"
+   ],
+   "choice": "拒绝, 复用同一份 BLOCKED 文案",
+   "rationale": "多 hook 改写时最后完成者生效且静默改写用户命令; 现 hook 无 JSON 输出通道; ask 把判断转嫁给用户; L3 今天对该形态零告警",
+   "falsifiable_criterion": "SC-22 35 行 baseline-failing 转绿、19 行放行保持; SC-25 25d 拦截文本等于基线常量"
+  },
+  {
+   "topic": "进程表 credit 口径 (W11)",
+   "candidates": [
+    "tight (行级过滤不算)",
+    "普通 credit"
+   ],
+   "choice": "tight",
+   "rationale": "ps -ef | grep -v grep、ps aux | grep '^dev' 打印的仍是整行命令 (研究实测)",
+   "falsifiable_criterion": "SC-22 22q-22s 拦截且 22aa/22ab (wc -l、>/dev/null) 放行"
+  },
+  {
+   "topic": "\\.env 右边界 (W12)",
+   "candidates": [
+    "全局 39 行加边界 (issue 建议)",
+    "只改 python3/node/lua 三行",
+    "边界字符类 [^A-Za-z0-9_]",
+    "边界字符类 [^A-Za-z0-9] (下划线算边界)",
+    "加 process.env 预归一化"
+   ],
+   "choice": "只改三行, 写成 \\.env(rc)?([^A-Za-z0-9_]|$), 不做归一化",
+   "rationale": "研究实测全局化 108 条由拦变放且含 .envrc 与空白吞并类真漏; [^A-Za-z0-9_] 与 cat 行 \\b 同语义 (基线 cat .env_prod 即放行)",
+   "falsifiable_criterion": "SC-23 23a-23f 放行、23g-23q 仍拦、23r/23s KNOWN-LIMIT 保持"
+  },
+  {
+   "topic": "jq 只出元数据形态 (W12)",
+   "candidates": [
+    "keys_unsorted 加进 :427 宽松词表 (研究原型 F1)",
+    "keys_unsorted 与 map_values(length) 都走锚定语法",
+    "纳入 map(.name)/map(.key)"
+   ],
+   "choice": "两个新形态都走锚定语法, 不纳入 map(.name)",
+   "rationale": "实测研究原型 F1 放行 jq 'keys_unsorted | $ENV' (打印 jq 进程环境); map(.name) 依赖数据假设",
+   "falsifiable_criterion": "SC-24 24a-24e 放行且 24h 仍拦 (对研究原型实跑 24h 即转红), 24f/24g/24k 仍拦"
+  },
+  {
+   "topic": "拒绝文案 (W13)",
+   "candidates": [
+    "选项 A 文案零改动, 条款落 SOT",
+    "选项 B 全局共享 heredoc 加一句",
+    "选项 C 先解 10CG/aria-plugin#132 再定向提示"
+   ],
+   "choice": "选项 A (推荐, 待 owner 裁)",
+   "rationale": "B 污染全部 145 条拦截且首改处方性文案会失去 2026-08-02 的零改动锚点; C 多一个前置 issue",
+   "falsifiable_criterion": "SC-25 三种既有文本归一化哈希不变 (研究原型改了 heredoc, 实跑 25a/25b 即转红) 且 SC-26 SOT 条款落地"
+  },
+  {
+   "topic": "rule6_note 归类",
+   "candidates": [
+    "整体 n/a + 2026-08-02 substitute",
+    "代码块 n/a + 文案块决策表第 1 行 (描述性)",
+    "文案块第 3 行 (三件套)",
+    "第 4 行照跑"
+   ],
+   "choice": "块 A n/a + 块 B 第 1 行",
+   "rationale": "插入的是事实陈述不含指示; AB 套件对 hook 零覆盖, 照跑是测量剧场",
+   "falsifiable_criterion": "SC-13 13d 处方句逐字节不变; 若实现改动处方句, 该归类失效须改判并补 SOT §3 三件套"
+  },
+  {
+   "topic": "探针确定性与 git 腿",
+   "candidates": [
+    "在去 .git 副本跑套件, git 腿列为探针外 SC-30",
+    "探针内跑 git 模式 (含 SC-8 计时)",
+    "只探 hook 不跑套件"
+   ],
+   "choice": "去 .git 副本 + GIT_CEILING_DIRECTORIES + 隐去 zsh; SC-30 探针外",
+   "rationale": "逐字节可复现要求排除计时闸与 af87cae 历史依赖, 同时保留全量非 git 用例的零回归信号",
+   "falsifiable_criterion": "两次实跑 stdout 逐字节相同 (sha256 前 16 位 1ab63a323da13f45); 主控复跑比对"
+  },
+  {
+   "topic": "测试卫生范围 (W6)",
+   "candidates": [
+    "只隔离 secret-scan 套件",
+    "两个 secret-* 套件都隔离",
+    "hook 侧识别测试环境不写日志"
+   ],
+   "choice": "两个套件都隔离 HOME",
+   "rationale": "探针实测 secret-guard 套件也向外层 HOME 写 12 条 ack 事件 (修类不修例); hook 侧开后门不可取",
+   "falsifiable_criterion": "SC-14 14a/14b 外层日志新增 0 行 / 0 条"
+  },
+  {
+   "topic": "性能预算 (W14)",
+   "candidates": [
+    "只靠测试内 SC-8 计时闸",
+    "SC-8 不改 + risky_patterns 静态行 ≤150 结构预算",
+    "相对百分比预算"
+   ],
+   "choice": "SC-8 天花板不改 + 静态行 ≤150; L3 稠密输入 ≤2.5s 作 B.2 实测记录",
+   "rationale": "owner 2026-08-24 已否定相对口径且禁止改阈值; 行数是确定性代理, 可进探针",
+   "falsifiable_criterion": "SC-31 31a (census patterns ≤150) 与 SC-30 五档 ≤100ms/call"
+  }
+ ],
+ "conflicts_with_research": [
+  "cc-hooks 笔记称「PostToolUse 无法改写内置工具输出 (确认), 不存在 updatedToolOutput」; 主控已核实本机 CC 2.1.285 二进制 schema 含 updatedToolOutput, secret-scan 笔记 §0 第 3 条、§1.9 亦同。我按二进制事实写 (标注端到端未验证), 不采纳 cc-hooks 笔记该结论。",
+  "cc-hooks 笔记建议 `\\.env` 统一改 `\\.env([^A-Za-z0-9_]|$)` 并给 jq 白名单补 `length` / `... | length`; secret-guard 笔记实测全局加边界 108 条由拦变放, 我的探针也实测 `jq 'length'` 与 `jq '.Items | length'` 基线即放行 (SC-24 24l/24m)。采纳实测, 只改三行、只加 keys_unsorted / map_values(length)。",
+  "secret-guard 笔记推荐 F1 (把 keys_unsorted 加进 :427 词表) 并称新形态「没有扩大洞」; 我对其原型 ALL2 实跑: `curl …/v1/var/… | jq 'keys_unsorted | $ENV'` 返回 exit 0 (放行, 会打印 jq 进程环境)。F2 确实没扩大洞, 但 F1 扩大了; 本 Spec 改为两个新形态都走锚定语法 (SC-24 24h 钉住)。",
+  "secret-guard 笔记称进程表原型 D2 在 58 条暴露形态里「唯一漏」是 `pct exec 101 -- ps aux`; 我对 ALL2 实跑还发现漏 `sh -c 'ps aux'`、`bash -c \"ps -ef\"`、`watch -n1 'ps aux'`、`sudo pgrep -af curl` (均 exit 0)。",
+  "secret-scan 笔记只指出 secret-scan 套件污染真实日志 (33 行); 探针实测 secret-guard 套件也向外层 HOME 的 guard-bypass.log 追加 12 条 ack 事件, 且这些事件之间没有换行 (log_ack 用 `$(printf '…\\n')` 构造 entry, 命令替换吃掉了尾换行), 属新发现, 已列入建议开单。",
+  "派单写「笔记关键发现 11」(Read 修好后读夹具文件会持续告警), 但 secret-scan 笔记 §0 只有 10 条; 对应内容在 §5.3「修好 Read 提取会制造新的红」, proposal 按 §5.3 引用。",
+  "secret-guard 笔记 §2(a) 称扩展候选 (grafana.ini、/etc/{nomad,consul,vault}.d/ 等) 与 app.ini 一起在 2700 条 docs 语料上 0 新增误报; 我查该语料只有 1 条命令触及这些名字 (`find /etc/nomad.d …`), 零误报对它们不构成实证, 因此只做 app.ini 族。",
+  "cc-hooks 笔记引 hooks-guide「line 958: PostToolUse hooks can't undo actions」, secret-scan 笔记与 secret-scan.sh 引 line 891, 且 secret-scan 笔记称当前文档里未找到该原句; 文档引用互相不一致, 我没有去抓取官方文档, 未裁决, 只以二进制 schema 为准。",
+  "cc-hooks 笔记 §5 写 command hook 默认超时 10 分钟; 与本仓无关的默认值, hooks.json 对两个 hook 都显式设了 timeout: 5, secret-guard 笔记的「超时即放行」活体结论以 5 秒为准。"
+ ]
+}
