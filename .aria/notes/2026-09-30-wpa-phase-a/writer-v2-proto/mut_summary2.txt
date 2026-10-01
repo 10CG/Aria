@@ -1,0 +1,17 @@
+== path_firstlower (l3 variant path_firstlower; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-9 9w | allow-guard | actual: macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-sec
+   (rows not yet 'yes': 1)
+== fp_span (l3 variant fp_span; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-12 12g | baseline-failing | actual: fp=2 items differ
+   SC-12 12h | baseline-failing | actual: fp=5 items differ
+   SC-12 12i | baseline-failing | actual: fp=10 items differ
+   SC-12 12j | baseline-failing | actual: fp=6 items differ
+   (rows not yet 'yes': 4)
+== ext_regex (l1 variant ext_regex; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-19 19j | baseline-failing | actual: exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   SC-20 20h | baseline-failing | actual: exit=0,0
+   (rows not yet 'yes': 2)
+== vx_interleave (l1 variant vx_interleave; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-21 21v | reverse-guard | actual: exit=2 calls=_sg_vx_pass
+   (rows not yet 'yes': 1)
+DONE

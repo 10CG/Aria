@@ -1,0 +1,78 @@
+== noident (l3 variant noident; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-9 9v | allow-guard | actual: js-const=alert m=1 {kv-secret-assign=1}; py-settings=alert m=1 {kv-secret-assign=1}; camel-chain=alert m=1 {kv
+   SC-15 15e | allow-guard | actual: alert m=1 {kv-secret-assign=1}
+   (rows not yes: 2)
+== nopath (l3 variant nopath; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-9 9o | allow-guard | actual: alert m=1 {kv-secret-assign=1}
+   SC-9 9w | allow-guard | actual: macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-sec
+   SC-15 15f | allow-guard | actual: alert m=2 {kv-secret-assign=2}
+   (rows not yes: 3)
+== loosepath (l3 variant loosepath; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-4 4n | baseline-failing | actual: silent
+   SC-5 5l | baseline-failing | actual: silent
+   SC-9 9w | allow-guard | actual: macos-abs=silent; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=silent
+   (rows not yes: 3)
+== wl_prefix (l3 variant wl_prefix; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-7 7h | reverse-guard | actual: crypt60=silent; dollar20=silent; lt16-unclosed=silent; lower12=alert m=1 {json-secret-field=1}; marker-mid=ale
+   SC-7 7i | reverse-guard | actual: silent
+   (rows not yes: 2)
+== wl_contains (l3 variant wl_contains; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-7 7h | reverse-guard | actual: crypt60=alert m=1 {json-secret-field=1}; dollar20=alert m=1 {json-secret-field=1}; lt16-unclosed=alert m=1 {js
+   SC-11 11s | baseline-failing | actual: silent
+   (rows not yes: 2)
+== wl_nocase (l3 variant wl_nocase; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-7 7h | reverse-guard | actual: crypt60=alert m=1 {json-secret-field=1}; dollar20=alert m=1 {json-secret-field=1}; lt16-unclosed=alert m=1 {js
+   (rows not yes: 1)
+== ent_digit (l3 variant ent_digit; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-4 4o | baseline-failing | actual: silent
+   SC-10 10b | known-limit | actual: alert m=1 {kv-secret-assign=1}
+   (rows not yes: 2)
+== ent_on_old (l3 variant ent_on_old; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-7 7h | reverse-guard | actual: crypt60=alert m=1 {json-secret-field=1}; dollar20=alert m=1 {json-secret-field=1}; lt16-unclosed=alert m=1 {js
+   (rows not yes: 1)
+== wl_envline (l3 variant wl_envline; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-7 7h | reverse-guard | actual: crypt60=alert m=1 {json-secret-field=1}; dollar20=alert m=1 {json-secret-field=1}; lt16-unclosed=alert m=1 {js
+   (rows not yes: 1)
+== w5_append (l3 variant w5_append; WPA_ONLY=SC-1,SC-2,SC-3,SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-15)
+   SC-13 13d | reverse-guard | actual: additionalContext differs beyond the inserted segment
+   (rows not yes: 1)
+== census_noentropy (l3 variant noentropy; WPA_ONLY=SC-33)
+   SC-33 33a | allow-guard | actual: flagged=6: aria/skills/aria-dashboard/references/issue-storage.md, aria/skills/forgejo-sync/API_CALL_PATTERN.m
+   (rows not yes: 1)
+== census_noident (l3 variant noident; WPA_ONLY=SC-33)
+   (rows not yes: 0)
+== census_nopath (l3 variant nopath; WPA_ONLY=SC-33)
+   (rows not yes: 0)
+== ext_bare (l1 variant ext_bare; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-20 20i | reverse-guard | actual: exit=2,2,2,1,2
+   SC-20 20j | reverse-guard | actual: exit=2,2,2,1,2
+   (rows not yes: 2)
+== ext_first (l1 variant ext_first; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-19 19i | baseline-failing | actual: exit=0
+   SC-20 20l | reverse-guard | actual: exit=2,2 calls=_sg_ext_pass
+   (rows not yes: 2)
+== vx_interleave (l1 variant vx_interleave; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-21 21v | reverse-guard | actual: exit=2 calls=_sg_vx_pass
+   (rows not yes: 1)
+== env_boundary (l1 variant env_boundary; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-23 23c | reverse-guard | actual: exit=0,0,0,0,0,0,0,0,0,2
+   SC-23 23d | reverse-guard | actual: exit=2,2,2,0,0,0,0,2,2
+   SC-23 23h | known-limit | actual: exit=0,0,0
+   (rows not yes: 3)
+== proc_status (l1 variant proc_status; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-22 22as | allow-guard | actual: exit=2,2,2
+   (rows not yes: 1)
+== ext_regex (l1 variant ext_regex; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-19 19j | baseline-failing | actual: exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   SC-20 20h | baseline-failing | actual: exit=0,0
+   (rows not yes: 2)
+== ext_trunc (l1 variant ext_trunc; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-20 20f | reverse-guard | actual: exit=2,2,2,2
+   (rows not yes: 1)
+== notight (l1 variant notight; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-16 16f | baseline-failing | actual: exit=0
+   (rows not yes: 1)
+== jq_loose (l1 variant jq_loose; WPA_ONLY=SC-16,SC-17,SC-18,SC-19,SC-20,SC-21,SC-22,SC-23,SC-24,SC-25)
+   SC-24 24f | reverse-guard | actual: exit=2,2,0,2,2,2
+   (rows not yes: 1)
+DONE
