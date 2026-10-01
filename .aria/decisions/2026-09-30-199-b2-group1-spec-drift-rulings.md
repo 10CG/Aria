@@ -1,6 +1,6 @@
 ---
 type: owner_decision_sheet
-subject: 10CG/Aria#199 Phase B 组 1 (1.3 fixture 矩阵审查) 的 spec 漂移裁定 (SC-2 的 F-b 样本 / SC-7(b) 的集合 C / SC-22(2) 的 WARN 文案) 与三处执行口径
+subject: 10CG/Aria#199 Phase B 组 1–2 的 spec 漂移裁定 (SC-2 的 F-b 样本 / SC-7(b) 的集合 C / SC-22(2) 的 WARN 文案 / resolved(pre_merge) 的求值时机 / 结构约束冲突回 Phase A) 与三处执行口径
 spec_ids: [pre-merge-completeness-gate-change-scope]
 status: decided
 decided_by: owner
@@ -49,6 +49,18 @@ container: simonfish/bfe8285d
 - **裁定**: 测试断言 stderr 含 §1.4 的整行 WARN (`[WARN] completeness gate: .aria/audit-reports/ 不存在, 按零报告评估`)。SC 原文那段读作 §1.4 那一行的简写 —— 它的括注本就指向 §1.4 全文; 期望值仍取 spec 字面, 只是取 SC 自己点名的那份全文。
 - **代价**: SC-22(2) 原文那段简写不按字面使用。
 
+## 6. 组 2: `resolved(pre_merge)` 的求值时机 —— 保持 lazy, 补一格测试锁定 (2026-10-01)
+
+- **事实 (主控核实)**: 组 2 实现经三视角审查后, 修正实例 (`ba-fix-review`) 把一条判为 spec 漂移: proposal §1.0 P4 行写「`resolved(pre_merge)` 在此步一并算出」(eager), 而 §1.4 五格分割证第 (3) 条写「纳入集非空 ⇒ 五格全不求值 (P5 的前置), 直接进 P6」、格 C 行写「本格只在纳入集为空时求值」(lazy, 现实现); `resolved(pre_merge)` 唯一的消费方是五格判定, P6 不用它。两种读法只在「四个非排除 checkpoint 全显式、`pre_merge` 未显式、`audit.mode` 写错或 adaptive 档 Level 解析不出」时判决不同: eager 报 `config_unreadable` / `spec_level_undetermined` 拦下, lazy 照常评估; 现有测试两种都不拦。
+- **裁定**: 保持 lazy (现实现不动): `resolved(pre_merge)` 只在纳入集为空 (P5) 时求值; P4 行那句读作「Level 先于 resolve、循环依赖在此拆开」的次序说明。另由测试作者实例 (非实现者) 在 SC-15 补一格锁定这条读法。
+- **代价**: 上述配置下的配置错误 (mode 写错 / Level 解析不出) 不由本门暴露。
+
+## 7. 组 2 收口时的结构约束冲突 —— 停下, 回 Phase A 出计划 v2.11 (2026-10-01)
+
+- **事实 (主控核实)**: 组 2 最终验收在 `(cd aria/skills/audit-engine/tests && python3 -B -m unittest discover -s . -p 'test_*.py')` 得 `Ran 133 tests` / `FAILED (failures=1)` —— 失败的是既有测试 `test_sibling_spec_probe.TestStructuralConstraints.test_scripts_helper_files_are_namespaced` (aria `19bd5a5`, sibling-spec-probe 那份 spec 的结构约束: `audit-engine/scripts/` 下只允许 `sibling_spec_probe.py`、`__init__.py` 与 `sibling_spec_probe_` 前缀文件, 防辅助模块跨 skill 撞名), 实得 offenders `['completeness_gate.py']`。本 spec 指定的入口脚本就是这个文件名 (proposal §1 与 `metadata.canonical_call`), 全仓各 skill 的 `scripts/` 里唯一。TASK-013 第 1 条要求整个目录零失败, 计划未预见这条约束。另两套回归同时实测: phase-c-integrator `Ran 148` / `OK`, state-scanner `Ran 1627` / `OK` (A.2 基线 1605, 差额待 4.3 归因)。
+- **裁定 (AskUserQuestion, 2026-10-01)**: 不在 Phase B 临场改既有测试, **停下, 回 Phase A 修计划**, 出 v2.11; 范围三项 —— (1) 结构约束冲突的处置 (执笔实例比较「白名单加入口脚本名」与「改为通用不重名规则」并推荐, 落进 TASK-013 的交付物与验收、基线清单、TASK-021 回归口径等处); (2) 把本决策单第 1–6 项并入 `tasks.md` 读前必看; (3) 登记 Phase B 已发现的计划缺口 (SC-15.10 新格、TASK-006 摘要漏写 `enabled_by`、TASK-013 的 Ran 数口径、矩阵作为台账附录、测试里推导值的标注、测试经 importlib 读取的模块常量名等)。v2.11 之后开 **post_planning R11, 只审 v2.11 的改动**。Phase B 未提交成果在两个 feature 分支各做一次 **WIP 提交 (只在本地, 不推送)**, 台账仍按计划随 5.8 提交。本会话接着做 v2.11 与 R11, 拿到裁定后续跑 Phase B。
+- **代价**: 组 2 的 2.6 收口与组 3、组 4、5.1 推迟到 v2.11 与 R11 之后; 多一轮五席审计。
+
 ## 落地记录 (2026-09-30)
 
 | 项 | 落地 | 核验 |
@@ -58,3 +70,5 @@ container: simonfish/bfe8285d
 | 3 | 矩阵相应三行按上文改写 | 同上 |
 | 4 | 本单 + 台账「停下与上报」 | — |
 | 5 | 矩阵 SC-22.2 行按 §1.4 全文改写; 1.6 测试按此断言 | RED 审查 |
+| 6 | 实现保持 lazy; 测试作者实例在 SC-15 补一格 `SC-15.10-pre-merge-lazy-when-inclusion-nonempty` 锁定, 反事实 (eager 补丁) 只此格变红 | 独立验收: `test_completeness_gate` 29 用例全绿、39 格退出 0、n3 真 |
+| 7 | 两个 feature 分支 WIP 提交 (见台账); 计划 v2.11 与 post_planning R11 | — |
