@@ -23,10 +23,14 @@ out = Path(out_dir)
 out.mkdir(parents=True, exist_ok=True)
 
 KEYS = ["ROUND", "VERSION", "SHA", "PRIMARY_GOAL", "SIBLING", "WRITER_NOTE", "ROUND_CONTEXT", "SP"]
+OPTIONAL_KEYS = ["PREV_ROUND", "WRITER_REPORT"]  # R2+ template only
 for role, focus in cfg["roles"].items():
     text = tpl
     for k in KEYS:
         text = text.replace("{" + k + "}", str(cfg[k]))
+    for k in OPTIONAL_KEYS:
+        if k in cfg:
+            text = text.replace("{" + k + "}", str(cfg[k]))
     text = text.replace("{ROLE}", role).replace("{FOCUS}", focus)
     # the finding-id recipe legitimately contains {category} etc.; only flag our upper-case placeholders
     left = sorted(set(re.findall(r"\{[A-Z_]{3,}\}", text)))

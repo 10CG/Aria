@@ -25,15 +25,18 @@ out = Path(out_dir)
 out.mkdir(parents=True, exist_ok=True)
 
 labels, seats = {}, {}
-for line in Path(journal).read_text(encoding="utf-8").splitlines():
-    e = json.loads(line)
-    if e.get("type") == "started":
-        labels[e["agentId"]] = e["label"]
-    elif e.get("type") == "result":
-        lab = labels.get(e["agentId"], "")
-        role = lab.split(":", 1)[1] if ":" in lab else lab
-        if isinstance(e.get("result"), dict) and "report_markdown" in e["result"]:
-            seats[role] = e["result"]
+for jpath in journal.split(","):  # one round may be split across several workflow runs
+    for line in Path(jpath).read_text(encoding="utf-8").splitlines():
+        e = json.loads(line)
+        if e.get("type") == "started":
+            labels[e["agentId"]] = e["label"]
+        elif e.get("type") == "result":
+            lab = labels.get(e["agentId"], "")
+            role = lab.split(":", 1)[1] if ":" in lab else lab
+            if isinstance(e.get("result"), dict) and "report_markdown" in e["result"]:
+                if role in seats:
+                    sys.exit(f"duplicate seat result for {role}")
+                seats[role] = e["result"]
 
 ORDER = ["tech-lead", "backend-architect", "qa-engineer", "code-reviewer", "knowledge-manager"]
 roles = [r for r in ORDER if r in seats] + sorted(r for r in seats if r not in ORDER)
@@ -63,8 +66,13 @@ for role in roles:
         "frontmatter_ok": s["report_markdown"].lstrip().startswith("---"),
     }
 
-cm = sorted({f["id"] for r in summary["seats"].values() for f in r["findings"] if f["severity"] in ("critical", "major")})
-allk = sorted({f["id"] for r in summary["seats"].values() for f in r["findings"]})
+# optional controller canonical-key map (same issue reported under different 4-tuples):
+# env AGG_CANON=<json file {raw_key: canonical_key}>; listed verbatim in the report for traceability
+import os
+canon = json.loads(Path(os.environ["AGG_CANON"]).read_text(encoding="utf-8")) if os.environ.get("AGG_CANON") else {}
+summary["canon_map"] = canon
+cm = sorted({canon.get(f["id"], f["id"]) for r in summary["seats"].values() for f in r["findings"] if f["severity"] in ("critical", "major")})
+allk = sorted({canon.get(f["id"], f["id"]) for r in summary["seats"].values() for f in r["findings"]})
 summary["cm_keys"], summary["all_keys"] = cm, allk
 prev = json.loads(Path(prev_path).read_text(encoding="utf-8")) if prev_path != "-" else None
 unanimous = all(v["vote"] == "PASS" for v in summary["seats"].values()) and len(summary["seats"]) == 5
@@ -101,6 +109,8 @@ for role in roles:
         esc = lambda t: str(t).replace("|", "\\|").replace("\n", " ")
         L.append(f"| {role} | {f['label']} | `{f['id']}` | `{f['seat_id']}` | {f['severity']} | {f['type']} | {f['category']} | {esc(f['scope'])} | {esc(f['summary'])} |")
 L += ["", "## 收敛计算 (本仓先例口径: 相邻两轮 Critical+Major 键集相等 且 全票 PASS)", ""]
+if canon:
+    L.append("- 主控定稿键映射 (同一问题不同四元组, 比较前先映射): " + "; ".join(f"`{a}` → `{b}`" for a, b in sorted(canon.items())))
 L.append(f"- 本轮 Critical+Major 键集 ({len(cm)}): {', '.join('`'+k+'`' for k in cm) or '∅'}")
 if prev:
     L.append(f"- 上一轮 Critical+Major 键集 ({len(prev['cm_keys'])}): {', '.join('`'+k+'`' for k in prev['cm_keys']) or '∅'}")
