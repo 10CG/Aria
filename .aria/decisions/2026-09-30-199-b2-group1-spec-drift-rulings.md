@@ -61,6 +61,20 @@ container: simonfish/bfe8285d
 - **裁定 (AskUserQuestion, 2026-10-01)**: 不在 Phase B 临场改既有测试, **停下, 回 Phase A 修计划**, 出 v2.11; 范围三项 —— (1) 结构约束冲突的处置 (执笔实例比较「白名单加入口脚本名」与「改为通用不重名规则」并推荐, 落进 TASK-013 的交付物与验收、基线清单、TASK-021 回归口径等处); (2) 把本决策单第 1–6 项并入 `tasks.md` 读前必看; (3) 登记 Phase B 已发现的计划缺口 (SC-15.10 新格、TASK-006 摘要漏写 `enabled_by`、TASK-013 的 Ran 数口径、矩阵作为台账附录、测试里推导值的标注、测试经 importlib 读取的模块常量名等)。v2.11 之后开 **post_planning R11, 只审 v2.11 的改动**。Phase B 未提交成果在两个 feature 分支各做一次 **WIP 提交 (只在本地, 不推送)**, 台账仍按计划随 5.8 提交。本会话接着做 v2.11 与 R11, 拿到裁定后续跑 Phase B。
 - **代价**: 组 2 的 2.6 收口与组 3、组 4、5.1 推迟到 v2.11 与 R11 之后; 多一轮五席审计。
 
+## 8. R11 之后的裁定 —— 请裁 1 批 (a) / 请裁 2–7 追认 / 请裁 8 补格 (主控建议) / v2.12 只修 minor、不重审 (2026-10-01)
+
+- **事实 (主控核实)**: post_planning R11 (聚合 `.aria/audit-reports/post_planning-R11-2026-10-01T165056-000Z-pre-merge-completeness-gate-change-scope-aggregated.md`, 主仓 feature `ff83d86`) 五席全票 PASS、0C/0M, raw 10 条 minor 去重为 8 键, 维持收敛。8 键中 `6c7e3a62` / `63a8700c` / `09d6a438` / `f89a8d20` 落在 TASK-013 的判据上; `4a37c9ec` 指出 v2.11 判断清单第 73 条把 R11 列为授权来源, 而改另一份已归档 spec 的测试守卫须 owner 明示。请裁第 8 条 (lazy / eager 分歧里「mode 写错」那一半要不要补格) 执笔没给默认: tl 赞成补, cr 倾向补, ba / qa / km 无意见; tl 实测三个非排除键显式、`pre_merge` 不写、`audit.mode` 写成非法值时现实现 exit 1、`error_kind` 为 None, 没有任何格锁住。
+- **裁定 (AskUserQuestion, 2026-10-01)**:
+  1. 请裁第 1 条: **批准 (a)** —— `test_sibling_spec_probe` 的 `scripts/` 允许集逐字加入 `completeness_gate.py`, 前缀规则不变。本条是该改动的授权来源。
+  2. 请裁第 2–7 条: **全部追认**执笔取舍。第 6 条附带: 2.6 的提交正文注明 WIP `88689aa` 已被接续 (WIP 正文「只在本地, 不推送」到 5.6 推送后不再成立)。
+  3. 请裁第 8 条: owner 答「你给建议」; 主控建议**补格**并按此执行 —— 在 SC-15 补一个 subTest 锁定「mode 写错」那一半 (三个非排除 checkpoint 显式、`pre_merge` 不写、`audit.mode` 写成非法值 ⇒ exit 1、`error_kind` 为 None), 由非实现者的测试实例在 2.6 提交前补, Ran 不变; 4.2 加一个反事实 (配置加载时就校验 `audit.mode` ⇒ 只此格变红)。属主控代为取舍, 记 handoff 请 owner 复议。
+  4. R11 的 8 键 minor: **出 v2.12** (新执笔实例, 经生成器), 修 8 键并落上述三项; 按 2026-09-27 第 3a 项不重开 post_planning, 主控核验后提交, 随即从 2.6 续跑。
+- **代价**: 续跑再推迟约 1–1.5h; v2.12 含改变执行者动作的改动 (TASK-013 判据拆分、多一跑正向对照, SC-15 多一格、4.2 多一个反事实), 不经五席审计, 只经主控核验。
+
+## 勘误 (2026-10-01)
+
+- 第 6 项「事实」段的「四个非排除 checkpoint 全显式」误数: 裁定 1 之后非排除的 checkpoint 只有三个 (`post_spec` / `post_planning` / `post_implementation`); 该配置写四个显式键, 第四个 `post_brainstorm` 属第 5 项排除 (R11 `f5aadec7`, 由 backend-architect 席指出)。第 6 项原文不改, 以本勘误为准。
+
 ## 落地记录 (2026-09-30)
 
 | 项 | 落地 | 核验 |
@@ -72,3 +86,4 @@ container: simonfish/bfe8285d
 | 5 | 矩阵 SC-22.2 行按 §1.4 全文改写; 1.6 测试按此断言 | RED 审查 |
 | 6 | 实现保持 lazy; 测试作者实例在 SC-15 补一格 `SC-15.10-pre-merge-lazy-when-inclusion-nonempty` 锁定, 反事实 (eager 补丁) 只此格变红 | 独立验收: `test_completeness_gate` 29 用例全绿、39 格退出 0、n3 真 |
 | 7 | 两个 feature 分支 WIP 提交 (见台账); 计划 v2.11 与 post_planning R11 | — |
+| 8 | 计划 v2.12 (只修 R11 minor, 落本项三条裁定); 台账「停下与上报」 | 主控核验 (不重审) |
