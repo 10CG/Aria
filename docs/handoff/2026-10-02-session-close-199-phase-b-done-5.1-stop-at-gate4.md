@@ -19,7 +19,7 @@ updated-at: 2026-10-02T11:58:00Z
 1. **下一步 = 5.2 (TASK-024) Rule #6 AB, 须 owner 另开会话**: 以环境变量 `ARIA_COORDINATION_NO_PUSH=1` 启动 Claude Code 会话 (等待点 4; 本会话补不上)。开跑前在子进程核: `cd aria/skills/state-scanner && python3 -B -c 'import sys; sys.path.insert(0, "."); from lib.failure_handlers import no_push_requested_by_env as f; sys.exit(0 if f() else 1)'` 退出 0。之后照 yaml TASK-024 原文逐条执行 (第一次快照到第二次快照之间不调 `/state-scanner`、不 fetch)。
 2. **心跳期限**: 本会话末次核验心跳 `2026-10-02T11:53:52Z` (协调 ref `5deca0b`, 两端一致) ⇒ SWEEP_TTL 24h 截止 **2026-10-03T11:53Z**。AB 会话推不出心跳 —— 须在截止前开跑; 来不及就先开一个不带该变量的普通会话续一次 (前置检查 → 强制对齐 → 三元组解析 → `--heartbeat-only` → 推后核验), 再开 AB 会话。
 3. **AB 基线前提** (TASK-024 第 3 条): AB 会话开跑前 `git -C aria fetch origin` 后要求 `merge-base --is-ancestor origin/master <feature HEAD>` 退出 0。本会话末 aria feature `d9097cf` 已并入 aria `origin/master` `268da8f` (v1.74.1); 若开 AB 会话前 aria 上游又前进, 照该条停下, 回普通会话再并入并重跑 TASK-018 与 TASK-021。
-4. **分支状态**: 两个 feature 分支都只在本地 (计划规定组 1 – 4 与 5.1 期间不推, 5.6 才推): 主仓 `feature/pre-merge-completeness-gate-change-scope` = 本文所在提交 (前一个 `728a800`); aria 同名分支 `d9097cf`。台账未跟踪。standards `2bc1c4c` / aria-orchestrator `237045a` 未动, 两端 equal。
+4. **分支状态**: 两个 feature 分支都只在本地 (计划规定组 1 – 4 与 5.1 期间不推, 5.6 才推): 主仓 `feature/pre-merge-completeness-gate-change-scope` 末端是本会话的收尾提交 (本文与 `docs/handoff/latest.md` 分开提交, 本文另有一次措辞勘正), 最后一个工作提交是 `728a800`; aria 同名分支 `d9097cf`。台账未跟踪。standards `2bc1c4c` / aria-orchestrator `237045a` 未动, 两端 equal。
 5. **待 owner 复议的 AI 判断** 见 §2 中优先级第 1 条; 不阻塞 5.2。
 
 ---
@@ -147,7 +147,7 @@ AB 会话 (owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动):
 
 | 仓 | 提交 | 推送 |
 |---|---|---|
-| 主仓 feature | `4005384` · `b575aa5` · `fde9c1f` · `09c5130` · `ff83d86` · `493ba0e` · `a179188` · `a0d03d1` · `728a800` + 本文所在提交 | 未推 (计划: 5.6) |
+| 主仓 feature | `4005384` · `b575aa5` · `fde9c1f` · `09c5130` · `ff83d86` · `493ba0e` · `a179188` · `a0d03d1` · `728a800` + 会话收尾提交 (本文、`docs/handoff/latest.md`、本文的措辞勘正) | 未推 (计划: 5.6) |
 | aria feature | `04100b5` · `88689aa` (WIP) · `bdf56d2` · `97d4d0e` · `d9097cf` (并入上游) | 未推 (计划: 5.6) |
 | 协调 ref | 心跳 6 次: `81d9fd6` · `9805ebe` · `c91fab6` · `14be9f6` · `e72f82a` · `5deca0b` | 每次推后核验与 origin 一致 |
 
