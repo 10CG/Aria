@@ -71,6 +71,14 @@ container: simonfish/bfe8285d
   4. R11 的 8 键 minor: **出 v2.12** (新执笔实例, 经生成器), 修 8 键并落上述三项; 按 2026-09-27 第 3a 项不重开 post_planning, 主控核验后提交, 随即从 2.6 续跑。
 - **代价**: 续跑再推迟约 1–1.5h; v2.12 含改变执行者动作的改动 (TASK-013 判据拆分、多一跑正向对照, SC-15 多一格、4.2 多一个反事实), 不经五席审计, 只经主控核验。
 
+## 9. 组 3 复核发现的计划层缺口 —— 组 3 内补两句澄清; proposal 原文缺口一并补文档 (2026-10-02)
+
+- **事实 (主控核实)**: 组 3 (TASK-014~017) 经两轮修正后, 复核审查实例 (`aacad9038068e7a27`) 报一条计划层缺口: 入口守卫与调用方在 adaptive 档按**上界**放行 (proposal §3 与 §5 第 12 条的明文设计), 门对「按 Level 精确推导 pre_merge 为 off」的格 D / 格 E 判 `pass` (proposal §1.4 明文); 但**门 pass 之后、pre_merge 的精确 mode 为 off 时 pre_merge 审计跑不跑, proposal 与计划都没有规定**, 而 execution-modes.md Pre-merge 节 Step 5 写「pass 或 bypassed → 放行, 进入正常 pre_merge 审计流程」, 审计执行只有 Convergence / Challenge 两个分支; phase-c-integrator 的触发条件句与两处 emergency hotfix lane (按读前必看第 19 条, N8 短语) 指向步骤 3 的上界判定, 照字面会把精确为 off 的 pre_merge「降级」到 convergence 去跑。受影响面 = 默认 adaptive 档采用方的每个 Level 1 周期。另: 修正实例判为 proposal 原文缺口而未改的一项 —— audit-engine/SKILL.md 参数表缺 `no_spec` 行、phase-c-integrator 4.5 未写 `verdict=error` 的处置 (proposal §2 参数表只有五行、4.5 原文只到三态)。
+- **裁定 (AskUserQuestion, 2026-10-02)**:
+  1. **组 3 内补两句澄清**: execution-modes.md 写明「pre_merge 按该 change 的 Level 精确推导为 off ⇒ 不执行 pre_merge 审计, 门已判 pass 亦同」; 两处 emergency hotfix lane 保留 N8 短语 (机检仍成立) 并加注「降级只作用于精确 mode 非 off 的情形, 不把 off 抬成 convergence」。计划不出新版, 本单与台账为权威记录 (主控建议, owner 采纳)。
+  2. **一并补上**: audit-engine/SKILL.md 参数表加 `no_spec` 行 (对应 `--no-spec`, 与 `change_id` 互斥); phase-c-integrator 4.5 加「`error` (exit 2) 按 `fail` 阻塞」。
+- **代价**: 组 3 文档超出计划逐条文字 (TASK-015 写「五行」), 由本项授权; 「精确 mode 为 off 即不审计」这一运行时口径由 owner 拍板, 不是 AI 临场判断。组 3 多一轮修正与复核。
+
 ## 勘误 (2026-10-01)
 
 - 第 6 项「事实」段的「四个非排除 checkpoint 全显式」误数: 裁定 1 之后非排除的 checkpoint 只有三个 (`post_spec` / `post_planning` / `post_implementation`); 该配置写四个显式键, 第四个 `post_brainstorm` 属第 5 项排除 (R11 `f5aadec7`, 由 backend-architect 席指出)。第 6 项原文不改, 以本勘误为准。
@@ -87,3 +95,4 @@ container: simonfish/bfe8285d
 | 6 | 实现保持 lazy; 测试作者实例在 SC-15 补一格 `SC-15.10-pre-merge-lazy-when-inclusion-nonempty` 锁定, 反事实 (eager 补丁) 只此格变红 | 独立验收: `test_completeness_gate` 29 用例全绿、39 格退出 0、n3 真 |
 | 7 | 两个 feature 分支 WIP 提交 (见台账); 计划 v2.11 与 post_planning R11 | — |
 | 8 | 计划 v2.12 (只修 R11 minor, 落本项三条裁定); 台账「停下与上报」 | 主控核验 (不重审) |
+| 9 | 组 3 第三轮修正 (两句澄清 + `no_spec` 行与 4.5 error 处置) 随组 3 提交; 台账「停下与上报」 | 组 3 复核与 3.5 机检 |
