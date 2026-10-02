@@ -1,8 +1,8 @@
 {
   "skill_name": "audit-engine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "source_evals_count": 2,
-  "selected_count": 2,
+  "selected_count": 3,
   "evals": [
     {
       "id": 1,
@@ -26,6 +26,19 @@
         "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
         "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
         "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "completeness-gate-change-scope-and-phase-a-only-TARGETED",
+      "prompt": "你正在用 audit-engine 的 completeness gate (pre_merge 专属, 在调用任何审计 Agent 之前运行) 为一次 PR 做前置 checkpoint 完整性核验。产出形态: descriptive (描述性推演) —— 不要真的执行任何命令, 按 SKILL.md 与 references/execution-modes.md 的 Pre-merge 节推演。场景: `--repo-path` 与 `--diff-repo-path` 指向同一个仓 (同仓形态); 本次 PR 相对 base 分支, git diff --name-only 恰为以下 3 个文件, 没有任何其它改动 (尤其没有任何实现代码): `openspec/changes/widget-export-pipeline/proposal.md`、`openspec/changes/widget-export-pipeline/tasks.md`、`.aria/audit-reports/post_spec-R2-widget-export-pipeline.md`。被审 change_id = `widget-export-pipeline` (其 `openspec/changes/widget-export-pipeline/` 目录含 `proposal.md` 与 `tasks.md`)。仓里另有一个无关的既有 change `catalog-sync-retry` (`openspec/changes/catalog-sync-retry/proposal.md` 早于本次 PR 就已存在, 与本次 PR 无关)。`.aria/config.json` 的 `audit` 块逐字为 `{\"enabled\": true, \"mode\": \"manual\", \"checkpoints\": {\"post_spec\": \"convergence\", \"post_planning\": \"convergence\", \"post_implementation\": \"convergence\", \"pre_merge\": \"convergence\"}}` (其余 checkpoint 未显式出现, 取缺省 off)。`.aria/audit-reports/` 目录清单 (顶层, 无子目录, 只有这两份) 为: `post_planning-R1-catalog-sync-retry.md` (catalog-sync-retry 的既有 post_planning 报告) 与 `post_spec-R2-widget-export-pipeline.md` (本次 PR 新增, widget-export-pipeline 自己的 post_spec 报告)。请给出: (1) 你会执行的 completeness gate 调用命令行 (完整参数); (2) 对 post_spec / post_planning / post_implementation 三个 checkpoint, 各自对 (checkpoint, change_id=widget-export-pipeline) 给出三态判定结论; (3) 对应每一对你会在人读行里输出的 [OK] / [INFO] / ERROR 逐句措辞; (4) 本次 pre_merge 审计的最终 verdict 与 exit code, 以及这个结果是否允许放行进入正常 pre_merge 审计流程。",
+      "expected_output": "",
+      "expectations": [
+        "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+        "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+        "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+        "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+        "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail"
       ]
     }
   ]

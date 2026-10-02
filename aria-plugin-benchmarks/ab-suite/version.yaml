@@ -1,10 +1,13 @@
-version: "1.5.0"
+version: "1.6.0"
 created: "2026-03-18"
-last_modified: "2026-09-05"
+last_modified: "2026-10-02"
 skills_covered: 32
-total_eval_cases: 84
+total_eval_cases: 85
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.6.0"
+    date: "2026-10-02"
+    changes: "audit-engine.json 1.0.0→1.1.0 (Spec pre-merge-completeness-gate-change-scope Rule #6 判据表第三行定向 fixture: new eval id 3 completeness-gate-change-scope-and-phase-a-only-TARGETED, 点名三条行为 —— 不得把其它 change 的报告当证据 / 末段形态 …-<change_id>.md 必须计入 / not_applicable 必须以 [INFO] 行 surface; 由 qa-engineer 实例按 TASK-023 规格编写, 期望值经 completeness_gate.py 在 hermetic 仓实跑核定, 产出形态 descriptive); skills_covered / total_eval_cases 程序化重算 (ls ab-suite/*.json | wc -l; sum len(evals))"
   - version: "1.5.0"
     date: "2026-09-05"
     changes: "Spec a1-entry-claim-duplicate-work-guard Rule #6: state-scanner.json 1.6.0→1.7.0 (new eval 13 a1-heartbeat-on-entry-TARGETED, 点名行为 (d) 两臂); phase-a-planner.json 1.0.0→1.1.0 (+4 定向 fixture: 拼串与 --linked-issue 省略门 / 按 status 分档请裁 / 降级措辞 / unattended); spec-drafter.json 1.1.0→1.2.0 (+2, 直调路径同款去 Level 1 子场景); skills_covered / total_eval_cases 程序化重算 (ls ab-suite/*.json | wc -l; sum len(evals))"
