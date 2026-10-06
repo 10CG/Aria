@@ -22,8 +22,10 @@ Optional environment (all unset = the default, deterministic table)
                                                     without it those rows print `not-run` (match `n/a`).
     WPA_ONLY=SC-4,SC-5,...                          debugging aid: run only the listed SC groups.
     WPA_ROWS=4p,5n,...                              debugging aid: run only the listed rows (case ids; combine with WPA_ONLY for speed).
+    WPA_LOCALE_B=<locale name>                      second locale of the SC-32 32d differential (default en_US.UTF-8).  When it is not installed the
+                                                    probe tries once to build it with `localedef` into a private LOCPATH; if that fails 32d prints `not-run`.
     WPA_REQUIRE_ALL=1                               acceptance mode: exit 3 when any row that should have run is `n/a`
-                                                    (a missing leg, or the unreadable-file case under root).
+                                                    (a missing leg, the unreadable-file case under root, a missing hash tool, an unavailable second locale).
     The two shape lines at the end name every `n/a` row; a target shape is only `holds` when every row ran and is `yes`.
 
 Rule #7 hygiene
@@ -105,14 +107,23 @@ def _shadow_bin(name, exclude):
 NOZSH_BIN = _shadow_bin("bin-nozsh", {"zsh"})
 NOSHA_BIN = _shadow_bin("bin-nosha", {"sha256sum", "shasum", "zsh"})
 NOPERL_BIN = _shadow_bin("bin-noperl", {"perl", "zsh"})
+NOSHA256_BIN = _shadow_bin("bin-nosha256sum", {"sha256sum", "zsh"})
+NOSHASUM_BIN = _shadow_bin("bin-noshasum", {"shasum", "zsh"})
+HAVE_BOTH_HASH_TOOLS = all(any(os.path.isfile(os.path.join(d, t)) for d in SYS_PATH.split(":")) for t in ("sha256sum", "shasum"))
 BIN32 = None
 if BASH32:
     BIN32 = _shadow_bin("bin-b32", {"zsh", "bash"})            # `bash` and `#!/usr/bin/env bash` both resolve to the real bash 3.2
     os.symlink(BASH32, os.path.join(BIN32, "bash"))
 
+LOCALE = "C.UTF-8"                                  # the locale of every hook run; the SC-32 32d legs switch it
+LOCPATH_EXTRA = None                                # set when the second locale had to be built into a private directory
+
+
 def base_env(home, tmpd, path=SYS_PATH):
-    return {"PATH": path, "HOME": home, "TMPDIR": tmpd, "USER": "probe", "LOGNAME": "probe",
-            "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8"}
+    e = {"PATH": path, "HOME": home, "TMPDIR": tmpd, "USER": "probe", "LOGNAME": "probe", "LANG": LOCALE, "LC_ALL": LOCALE}
+    if LOCPATH_EXTRA:
+        e["LOCPATH"] = LOCPATH_EXTRA
+    return e
 
 def fresh_dirs():
     return tempfile.mkdtemp(prefix="h-", dir=WORK), tempfile.mkdtemp(prefix="t-", dir=WORK)
@@ -281,6 +292,35 @@ G.update({
     "upper40": lambda: _gen(UP, 40, [UP]),
 })
 
+def path23():
+    """a path-form value: lead `/`, two more `/`, only [A-Za-z0-9/] (23 characters, all three letter / digit classes inside each part)"""
+    return "/" + alnum(6) + "/" + alnum(6) + "/" + alnum(8)
+
+
+_DOT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+")
+
+
+def jwt_dotted():
+    """a JWT-shaped value (`eyJ...` . `eyJ...` . 43 letters) whose three segments are all `[A-Za-z_][A-Za-z0-9_]*`: it is a dotted identifier chain by shape
+    (a random JWT has a dotted-chain shape about 40% of the time: every `-` in it, or a digit-led signature, breaks the shape)"""
+    hdr = _u(json.dumps({"alg": "HS256", "typ": "JWT"}).encode())
+    while True:
+        pay = _u(json.dumps({"nbf": 1700000000 + secrets.randbelow(10 ** 6)}).encode())
+        v = hdr + "." + pay + "." + "".join(secrets.choice(LOW + UP) for _ in range(43))
+        if _DOT_RE.fullmatch(v):
+            return v
+
+
+G.update({"low24": lambda: lowers(24), "path23": path23, "jwt_dotted": jwt_dotted, "fake28": lambda: M_FAKE + alnum(24)})
+
+
+def environ_nul():
+    """a NUL-separated process environment (the shape of /proc/<pid>/environ and of `env -0`): non-credential records first, three credential records among them"""
+    pw, jw, tk = alnum(24), b64std44(), alnum(32)
+    recs = ["HOME=/root", "PATH=/usr/local/bin:/usr/bin:/bin", "DB_" + "PASSWORD=" + pw, "LANG=C.UTF-8", "JWT_" + "SECRET=" + jw, "API_" + "TOKEN=" + tk]
+    return "\x00".join(recs) + "\x00", [pw, jw, tk]
+
+
 def T(tpl, *gens):
     """Template with @V0@.. placeholders; value positions in this source stay short."""
     def build():
@@ -339,6 +379,10 @@ def envelope(shape, c, path=None):
         return {"tool_name": "Edit", "tool_input": {"file_path": "/x/f.txt", "old_string": "a", "new_string": c},
                 "tool_response": {"filePath": "/x/f.txt", "oldString": "a", "newString": c, "originalFile": "a\n", "replaceAll": False, "userModified": False,
                                   "structuredPatch": [{"oldStart": 1, "oldLines": 1, "newStart": 1, "newLines": n, "lines": ["-a"] + ["+" + l for l in c.split("\n")]}]}}
+    if shape == "toolres_content":
+        return {"tool_name": "Bash", "tool_input": {}, "tool_result": {"content": c}}
+    if shape == "toolres_output":
+        return {"tool_name": "Bash", "tool_input": {}, "tool_result": {"output": c}}
     raise ValueError(shape)
 
 SYS_RE = re.compile(r"Detected (\d+) secret-shape match\(es\) \(([^)]*)\)")
@@ -494,10 +538,16 @@ AWS1 = {"aws-access-key-id": 1}
 # SC-1 / SC-2 / SC-3 -- W1 extraction
 l3("SC-1", "1a", "baseline-failing", "Read real envelope file.content: AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, "read_real", AWS1)
 l3("SC-1", "1b", "baseline-failing", "Read real envelope file.content: json:client_secret=<32 alnum>", T('{"client_secret":"@V0@"}', "alnum32"), "read_real", {T_JSON_OLD: 1})
+l3("SC-1", "1c", "baseline-failing", "Read real envelope file.content = a NUL-separated process environment (the /proc/<pid>/environ shape): HOME / PATH / DB_PASSWORD / LANG / JWT_SECRET / API_TOKEN records, NUL after each",
+   environ_nul, "read_real", {T_ENVLINE: 3})
+l3("SC-1", "1d", "baseline-failing", "Bash real envelope stdout = the same NUL-separated records (the `env -0` shape): bash command substitution would drop the NULs and glue the records into one line",
+   environ_nul, BR, {T_ENVLINE: 3})
 l3("SC-2", "2a", "reverse-guard", "Read legacy envelope {content}: AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, "read_legacy", AWS1)
 l3("SC-2", "2b", "reverse-guard", "Bash real envelope {stdout,...}: AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, BR, AWS1)
 l3("SC-2", "2c", "reverse-guard", "Bash legacy envelope {output}: AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, "bash_legacy", AWS1)
 l3("SC-2", "2d", "reverse-guard", "Write real envelope {content,...}: AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, "write_real", AWS1)
+l3("SC-2", "2e", "reverse-guard", "legacy envelope {tool_result:{content}}: AWS_ACCESS_KEY_ID=<AKIA+16> (the 4th branch of the extraction chain)", AWS_LINE, "toolres_content", AWS1)
+l3("SC-2", "2f", "reverse-guard", "legacy envelope {tool_result:{output}}: AWS_ACCESS_KEY_ID=<AKIA+16> (the 5th branch of the extraction chain)", AWS_LINE, "toolres_output", AWS1)
 l3("SC-3", "3a", "known-limit", "Edit real envelope (newString/structuredPatch): AWS_ACCESS_KEY_ID=<AKIA+16>", AWS_LINE, "edit_real", None)
 l3("SC-3", "3b", "known-limit", "Bash tool_response as bare string: error: AWS_ACCESS_KEY_ID=<AKIA+16>", T("error: AWS_ACCESS_KEY_ID=@V0@", "akia"), "bash_string", None)
 
@@ -645,6 +695,38 @@ l3e("SC-7", "7j", "reverse-guard", "boundaries of every RETAINED whitelist branc
      ("ellipsis-lead", T('{"password":"@V0@"}', "ell_lead"), {T_JSON_OLD: 1}),
      ("marker-truncated", T('{"password":"@V0@"}', "marker_partial"), {T_JSON_OLD: 1})])
 l3("SC-7", "7i", "reverse-guard", "json:token=<crypt-hash shape, 60 chars>: some alert must remain (baseline bcrypt-hash; the new json tag must not swallow it silently)", T('{"token":"@V0@"}', "crypt60"), BR, "any")
+OLD10 = ["password", "passwd", "secret", "api_key", "access_token", "refresh_token", "private_key", "client_secret", "webhook_secret", "encryption_key"]   # the table of the EXISTING json-secret-field
+l3e("SC-7", "7k", "reverse-guard", "the 10 key names of the existing json-secret-field table, each with a 24-char value: json-secret-field=1 (4p pins the 8 names that the new table shares; webhook_secret and encryption_key are pinned only here)",
+    [(n, T('{"%s":"@V0@"}' % n, "alnum24"), {T_JSON_OLD: 1}) for n in OLD10])
+# Scope of the classifier steps (W2 / W3): step 2 (whitelist) reaches the 6 new tags and json-secret-field; steps 3-5 (entropy floor, path form, dotted chain) reach the 6 new tags
+# only; every other existing tag passes NO step.  A value that a wrongly applied step would drop is fed to every (existing tag, step) pair where the step could drop it.
+_EX_TEMPLATES = [("env-line-secret-keyword", "DB_" + "PASSWORD=@V0@", T_ENVLINE), ("bearer-token", "Authorization: Bearer @V0@", "bearer-token"),
+                 ("x-api-key-header", "X-API-Key: @V0@", "x-api-key-header"), ("postgres-url", "postgresql://svc:@V0@@db.example:5432/app", "postgres-url"),
+                 ("redis-url", "redis://default:@V0@@redis.example:6379", "redis-url"), ("mongodb-url", "mongodb://admin:@V0@@cluster0.example.net/db", "mongodb-url"),
+                 ("basic-auth-url", "https://admin:@V0@@internal.example.com/api", "basic-auth-url")]
+_STEP_BAIT = [("entropy", "low24"), ("path-form", "path23"), ("dotted-chain", "dot3")]      # a single-class value / a path-form value / a dotted identifier chain
+l3e("SC-7", "7l", "reverse-guard", "scope of the classifier steps 3-5: a single-class value (entropy floor), a path-form value, a dotted identifier chain each stay detected on every EXISTING tag they could silence (env-line, bearer, x-api-key, 4 URL tags: 3 each; json-secret-field: path-form and dotted chain, its single-class case is 7h; jwt: a JWT whose three segments are a dotted identifier chain)",
+    [(f"{tag}:{step}", T(tpl, gen), {want: 1}) for tag, tpl, want in _EX_TEMPLATES for step, gen in _STEP_BAIT]
+    + [(f"json-secret-field:{step}", T('{"password":"@V0@"}', gen), {T_JSON_OLD: 1}) for step, gen in _STEP_BAIT[1:]]
+    + [("jwt:dotted-chain", T("session: @V0@", "jwt_dotted"), {"jwt": 1})])
+l3e("SC-7", "7m", "reverse-guard", "scope of the whitelist (step 2): a marker-led value (FAKE_...) stays detected on the existing bearer, x-api-key and 4 URL tags, and a mask value (8 `*`) on the 3 URL tags whose password class admits it -- the whitelist reaches json-secret-field and the 6 new tags only",
+    [(f"{tag}:marker", T(tpl, "fake28"), {want: 1}) for tag, tpl, want in _EX_TEMPLATES[1:]]
+    + [(f"{tag}:mask", T(tpl, "mask8"), {want: 1}) for tag, tpl, want in _EX_TEMPLATES[3:6]])
+
+def _l3_noexec():
+    """No-execution invariant of the L3 value / classification / fingerprint code: the scanned text is untrusted; a JSON-form credential value that holds a command substitution,
+    back quotes or an arithmetic expansion is only text.  Each payload `touch`es a private decoy path; none may exist after the hook has run (Bash and Read envelopes)."""
+    forms = [("token", "$(touch {c})"), ("password", "`touch {c}`"), ("api_key", "$((1+$(touch {c})))"), ("SVC_API_TOKEN", "$(touch {c})"), ("client_secret", "x$(touch {c})")]
+    res = []
+    for shape in ("bash_real", "read_real"):
+        for i, (key, inj) in enumerate(forms):
+            c = os.path.join(WORK, "canary-l3-%s-%d" % (shape[:4], i))
+            content = '{"' + key + '":"' + inj.format(c=c) + alnum(24) + '"}'
+            run_scan(envelope(shape, content))
+            res.append(("%s-%s" % (shape[:4], key), not os.path.exists(c)))
+    return _compact(res)
+row("SC-7", "7n", "reverse-guard", "no-execution invariant of the L3 value / classification / fingerprint code: credential-key values that hold a command substitution, back quotes or an arithmetic expansion (5 payloads x Bash and Read envelopes, each `touch`es a private decoy path) are only text for the hook: none of the 10 decoy files exists after the hook has run",
+    "10/10 as expected", _l3_noexec, hook=True)
 
 # SC-8 -- sentinel re-count removed
 l3("SC-8", "8a", "baseline-failing", "json:api_key=<anthropic-prefixed key> (one credential, counted once)", T('{"api_key":"@V0@"}', "ant"), BR, {"anthropic-api-key": 1})
@@ -965,6 +1047,30 @@ def _w4_pem_first():
 l3_custom("SC-12", "12m", "baseline-failing", "traversal order and the PEM items: a PEM block -- and, with perl missing from PATH, the header-only fallback that counts it -- that sits AFTER a kv credential in the text still records its `-` item FIRST (the PEM pre-scan runs before the pattern list), so the fp field is `-,<sha256-8 of the kv value>`",
           "block and header-only: fp=- then the kv item", _w4_pem_first)
 
+def _w4_threshold():
+    res = []
+    for n in (15, 16):
+        v = alnum(n)
+        r = run_scan(envelope(BR, '{"password":"%s"}' % v))
+        fp = _fp_field(r)
+        ok = r["tags"] == {T_JSON_OLD: 1} and fp == ("L%d" % n if n < 16 else _sha8(v)) and (n == 16 or _sha8(v) not in (r["log"] or ""))
+        res.append((f"{n}-chars", ok))
+    return _compact(res)
+l3_custom("SC-12", "12n", "baseline-failing", "the 16-character threshold from both sides (json:password): a 15-char value is recorded as `L15` and its hash is not in the log, a 16-char value as sha256-8 of the value",
+          "2/2 as expected", _w4_threshold)
+
+
+def _w4_hash_tools():
+    if not HAVE_BOTH_HASH_TOOLS:
+        return "sha256sum or shasum absent on this host: the single-tool legs cannot be built", None
+    res = []
+    for lab, path in (("sha256sum-hidden", NOSHA256_BIN), ("shasum-hidden", NOSHASUM_BIN)):
+        v = alnum(32)
+        res.append((lab, _fp_field(run_scan(envelope(BR, '{"client_secret":"%s"}' % v), path)) == _sha8(v)))
+    return _compact(res)
+l3_custom("SC-12", "12o", "baseline-failing", "each hash tool alone is enough: with `sha256sum` hidden from PATH (only `shasum -a 256` left) and with `shasum` hidden (only `sha256sum` left) the fp item is still sha256-8 of the value (12c: both hidden -> `-`)",
+          "2/2 as expected", _w4_hash_tools)
+
 l3_custom("SC-12", "12d", "reverse-guard", "json:client_secret=<32 alnum>: log/stdout/stderr hold no value nor 8-char fragment",
           "log=1-line no-plaintext", _no_plain(T('{"client_secret":"@V0@"}', "alnum32"), BR))
 l3_custom("SC-12", "12e", "reverse-guard", "json:password=<12 alnum>: same check",
@@ -1088,6 +1194,11 @@ l1x("SC-16", "16p", "reverse-guard", "tight credit of the claude-config source (
      ("Bash", f"cat {_CC} | wc -l", 0), ("Bash", f"cat {_CC} | sha256sum", 0), ("Bash", f"cat {_CC} >/dev/null", 0), ("Bash", f"cat {_CC} | jq keys", 0)])
 l1e("SC-16", "16q", "baseline-failing", "every reader of the shared print-reader table (13 of the claude-config row + 16 added = 29) reads app.ini: `<reader> /etc/forgejo/app.ini`",
     [(r, f"{r} {APPINI}") for r in READERS29], 2)
+SRV_FORMS = ["/etc/forgejo/app.ini", "/etc/gitea/app.ini", "custom/conf/app.ini", "/data/gitea/conf/app.ini", "/var/lib/forgejo/custom/conf/app.ini", "/srv/git-forgejo/app.ini",
+             "/etc/forgejo/app.ini.bak"]
+l1e("SC-16", "16r", "baseline-failing", "tight credit of the app.ini family, form by form: each of the 7 name forms with an anchored `| grep '^JWT_SECRET'`, and the other row-level filters on one form (grep -v / sed / cut / awk): none of them counts as credit",
+    [(f, f"cat {f} | grep '^JWT_SECRET'") for f in SRV_FORMS] + [("grep-v", f"cat {APPINI} | grep -v '^#'"), ("sed", f"cat {APPINI} | sed 's/a/b/'"),
+     ("cut", f"cat {APPINI} | cut -d= -f1"), ("awk", f"cat {APPINI} | awk '{{print $1}}'")], 2)
 l1m("SC-17", "17a", "allow-guard",
     ["chmod 600 /etc/forgejo/app.ini", "ls -l /etc/forgejo/app.ini", "systemctl restart forgejo", "grep -rn 'app.ini' docs/",
      "cat /opt/myapp/app.ini", "cat /etc/php/8.2/fpm/php.ini", "git log --oneline -- custom/conf/app.ini",
@@ -1191,9 +1302,28 @@ def mkproj(name, kind):
         assert os.path.getsize(f) == want
     elif kind == "bound_bad":
         open(f, "w").write("\n".join([P, E201, "abc", "////"]) + "\n")     # valid entry + 201-char entry + 3-char entry + symbol-only entry
+    elif kind == "ws":
+        open(f, "w").write("  " + P + " \t\n")                             # leading blanks, trailing blank and tab: the entry is still P
+    elif kind == "cjk":
+        # byte semantics: a pure non-ASCII entry (4 characters, 12 bytes, no ASCII letter or digit) is skipped; entries that hold an ASCII letter or digit count BYTES
+        open(f, "wb").write("\n".join(["\u914d\u7f6e\u5bc6\u94a5", "a\u914d\u7f6e", "/srv/\u914d\u7f6e/prod"]).encode("utf-8") + b"\n")
+    elif kind == "canary":
+        # entries are LITERAL text: a command substitution, back quotes and a file-name glob inside an entry must never run or expand
+        # (the paths are RELATIVE to the hook's cwd = WORK and all lower case: the hook lower-cases entries, and a canary that an evaluating implementation would create must survive that)
+        open(f, "w").write("$(touch canary-ext-1)\n`touch canary-ext-2`\ngl/st*ar.conf\n")
+    elif kind == "comment_only":
+        open(f, "w").write("# project-local sensitive paths\n# one literal substring per line\n")
+    elif kind == "blank_only":
+        open(f, "w").write("\n\n   \n\t\n")
+    elif kind == "all_skipped":
+        open(f, "w").write("\n".join(["abc", "////", E201, "#" + P]) + "\n")            # every line is skipped: too short / only symbols / too long / a comment
     return d
 
-PROJ = {k: mkproj(k, k) for k in ("ok", "meta", "junk", "crlf", "missing", "dir", "dangling", "nul", "big", "many", "unreadable", "bound_ok", "size32769", "bound_bad")}
+CANARY_EXT = [os.path.join(WORK, "canary-ext-%d" % (i + 1)) for i in range(3)]
+os.makedirs(os.path.join(WORK, "gl"))
+open(os.path.join(WORK, "gl", "stxxar.conf"), "w").close()                       # the decoy a file-name glob of the entry `gl/st*ar.conf` would pick up (the hook runs with cwd=WORK)
+PROJ = {k: mkproj(k, k) for k in ("ok", "meta", "junk", "crlf", "missing", "dir", "dangling", "nul", "big", "many", "unreadable", "bound_ok", "size32769", "bound_bad",
+                                  "ws", "cjk", "canary", "comment_only", "blank_only", "all_skipped")}
 def env_proj(k): return {"CLAUDE_PROJECT_DIR": PROJ[k]}
 
 l1("SC-19", "19a", "baseline-failing", "cat " + P, 2, desc="[CLAUDE_PROJECT_DIR=proj(ok)] cat " + P, env_extra=env_proj("ok"))
@@ -1236,6 +1366,37 @@ l1("SC-19", "19y", "known-limit", "; ".join(["echo " + P] * 64) + "; cat " + P, 
    desc="[CLAUDE_PROJECT_DIR=proj(ok)] KNOWN-LIMIT: occurrences past the 64th are not checked (64 x `echo P`, then `cat P`: padding passes)", env_extra=env_proj("ok"))
 l1("SC-19", "19t", "allow-guard", P, 0, tool="Read", desc="[CLAUDE_PROJECT_DIR=proj(ok)] Read P with a valid one-shot ACK (same escape hatch as the built-in names)",
    env_extra=lambda: dict(env_proj("ok"), **nonce_env(P, True)))
+# 19z: the reader / entry co-occurrence is judged per STAGE, and a separator inside quotes does not end a stage (`; & |` and newline).  The built-in app.ini row is the
+# yardstick: for the same command shape the extension entry must be blocked exactly where the built-in row blocks the app.ini path (6 shapes); for the 2 shapes whose quoted `|`
+# blinds the built-in `[^|]*` rows (a known limit of the built-in rows, W8) the extension is stricter and still blocks.
+STAGE_SHAPES = [("py-semicolon", 'python3 -c "import os; print(open(\'%s\').read())"'), ("py-two-semicolons", 'python3 -c "x=1; y=2; print(open(\'%s\').read())"'),
+                ("py-ampersand", 'python3 -c "a=1 & 2; print(open(\'%s\').read())"'), ("py-newline", 'python3 -c "import os\nprint(open(\'%s\').read())"'),
+                ("node-semicolon", 'node -e "const fs=require(\'fs\'); console.log(fs.readFileSync(\'%s\',\'utf8\'))"'),
+                ("awk-semicolon", "awk 'BEGIN{x=1; while ((getline l < \"%s\") > 0) print l}'")]
+STAGE_PIPE_SHAPES = [("py-quoted-pipe", 'python3 -c "print(1|2); print(open(\'%s\').read())"'), ("grep-quoted-pipe", "grep -E 'A|B' %s")]
+l1x("SC-19", "19z", "baseline-failing", "[CLAUDE_PROJECT_DIR=proj(ok)] separators inside quotes do not cut a stage: python3 -c / node -e / awk programs holding `;` / `&` / a newline, and quoted `|`: the listed path is blocked (exit 2) wherever the built-in app.ini row blocks the same command shape with the app.ini path (6 shapes x built-in and extension), and in the 2 quoted-pipe shapes (extension only)",
+    [("Bash", t % APPINI, 2) for _l, t in STAGE_SHAPES] + [("Bash", t % P, 2) for _l, t in STAGE_SHAPES + STAGE_PIPE_SHAPES], env_extra=env_proj("ok"))
+l1m("SC-19", "19aa", "allow-guard", ["cat x; echo " + P, "ls | grep y; echo " + P, 'echo "see ' + P + '"; cat y', "cat x\necho " + P, "cat x & echo " + P, "cat x | echo " + P, "echo " + P, "cat " + P + ' ";" | wc -l'], 0,
+    "[CLAUDE_PROJECT_DIR=proj(ok)] separators OUTSIDE quotes still cut a stage: a reader in an earlier stage (`;` / `|` / `&` / newline) or after the quoted mention does not make a later mention of the path a read; a bare mention is no read; and a real count pipe that follows a QUOTED separator is still a credit (`cat <path> \";\" | wc -l`, as the built-in rows judge it)", env_extra=env_proj("ok"))
+
+
+def _ext_noexec():
+    """the extension never executes or expands what it reads: entries holding a command substitution / back quotes / a file-name glob, and command text holding a command substitution"""
+    for c in CANARY_EXT:
+        if os.path.exists(c):
+            os.remove(c)
+    items = [("Bash", "ls -la", 0), ("Bash", "cat gl/stxxar.conf", 0), ("Bash", 'echo "$(touch canary-ext-3)"', 0), ("Read", "/x/README.md", 0), ("Edit", "/x/notes.txt", 0)]
+    rcs = [run_guard(t, c, env_proj("canary"))[0] for t, c, _w in items]
+    ran = [i + 1 for i, c in enumerate(CANARY_EXT) if os.path.exists(c)]
+    ok = all(rc == w for rc, (_t, _c, w) in zip(rcs, items)) and not ran
+    return "exit=" + ",".join(str(x) for x in rcs) + (" canaries-absent" if not ran else " CANARY-EXECUTED(" + ",".join(str(i) for i in ran) + ")"), ok
+row("SC-19", "19ab", "reverse-guard", "[CLAUDE_PROJECT_DIR=proj(canary): entries `$(touch canary-ext-1)`, back-quoted `touch canary-ext-2`, and the glob `gl/st*ar.conf` next to a decoy file, all relative to the hook's cwd] no-execution invariant: the extension only slices and fixed-string-compares, it never evaluates an entry or the command text: ls -la (0) ; cat gl/stxxar.conf (0, the glob is not expanded) ; echo \"$(touch canary-ext-3)\" (0) ; Read (0) ; Edit (0) and none of the 3 canary files exists afterwards",
+    "exit=0,0,0,0,0 canaries-absent", _ext_noexec, hook=True)
+l1x("SC-19", "19ac", "baseline-failing", "[CLAUDE_PROJECT_DIR=proj(ws): the entry line is P with leading blanks and a trailing blank + tab] leading / trailing white space of an entry is stripped: cat P (2) ; Read P (2)",
+    [("Bash", "cat " + P, 2), ("Read", P, 2)], env_extra=env_proj("ws"))
+l1x("SC-19", "19ad", "baseline-failing", "[CLAUDE_PROJECT_DIR=proj(cjk): `a<2 CJK chars>` (7 bytes) and `/srv/<2 CJK chars>/prod`] length counts BYTES and the letter rule counts ASCII letters / digits: an entry holding an ASCII letter or digit is effective: cat /srv/a<2 CJK chars>/x (2) ; cat /srv/<2 CJK chars>/prod (2)",
+    [("Bash", "cat /srv/a\u914d\u7f6e/x", 2), ("Bash", "cat /srv/\u914d\u7f6e/prod", 2)], env_extra=env_proj("cjk"))
+l1("SC-19", "19ae", "known-limit", "cat /srv/\u914d\u7f6e\u5bc6\u94a5/x", 0, desc="[CLAUDE_PROJECT_DIR=proj(cjk)] KNOWN-LIMIT: an entry without any ASCII letter or digit (here 4 CJK characters) is skipped silently: cat /srv/<4 CJK chars>/x (0)", env_extra=env_proj("cjk"))
 
 # SC-20 -- extension failure only drops the extension (bad files, bad entries, faulty extension code, evaluation order)
 for cid, k, note in [("20a", "missing", "file absent"), ("20b", "dir", "path is a directory"), ("20c", "dangling", "dangling symlink"),
@@ -1243,6 +1404,13 @@ for cid, k, note in [("20a", "missing", "file absent"), ("20b", "dir", "path is 
                      ("20n", "size32769", "file is 32769 bytes, one over the limit")]:
     l1x("SC-20", cid, "reverse-guard", f"[CLAUDE_PROJECT_DIR=proj({k}): {note}] extension ignored on both faces, built-ins intact: cat P (0) ; cat .env (2) ; Read P (0) ; Read /x/.env (2)",
         [("Bash", "cat " + P, 0), ("Bash", "cat .env", 2), ("Read", P, 0), ("Read", "/x/.env", 2)], env_extra=env_proj(k))
+
+CANARY0 = [("Bash", "ls -la", 0), ("Bash", "cat README.md", 0), ("Read", "/x/README.md", 0), ("Edit", "/x/notes.txt", 0), ("Bash", "cat .env", 2), ("Read", "/x/.env", 2)]
+for cid, k, note in [("20o", "comment_only", "only comment lines"), ("20p", "blank_only", "only blank / white-space lines"),
+                     ("20q", "all_skipped", "every line skipped: a 3-char entry, a symbol-only entry, a 201-char entry, a commented-out entry")]:
+    l1x("SC-20", cid, "reverse-guard", f"[CLAUDE_PROJECT_DIR=proj({k}): {note} -- zero valid entries] the extension is simply not in effect, and nothing is ever blocked because of it: ls -la (0) ; cat README.md (0) ; Read /x/README.md (0) ; Edit /x/notes.txt (0) ; built-ins intact: cat .env (2) ; Read /x/.env (2)",
+        CANARY0, env_extra=env_proj(k))
+
 
 def _unreadable():
     if os.geteuid() == 0:
@@ -1327,6 +1495,19 @@ l1x("SC-21", "21x", "baseline-failing", "bounds, last accepted: the 16th assignm
     [("Bash", "; ".join(f"a{i}=x" for i in range(15)) + f"; f={_F}; cat \"$f\"", 2), ("Bash", f"f={_F}; echo " + " ".join(["$f"] * 7) + " | cat $f", 2)])
 l1x("SC-21", "21y", "known-limit", "KNOWN-LIMIT, bounds exceeded pass (padding): the sensitive assignment is the 17th -> exit 0 ; the reader's reference is the 9th of the variable (8 x `$f` first) -> exit 0",
     [("Bash", "; ".join(f"a{i}=x" for i in range(16)) + f"; f={_F}; cat \"$f\"", 0), ("Bash", f"f={_F}; echo " + " ".join(["$f"] * 8) + " | cat $f", 0)])
+VX_PAYLOADS = ['f=$(touch @C@); cat "$f"', 'f="$(touch @C@)"; cat "$f"', 'f=`touch @C@`; cat "$f"', 'd=/etc/forgejo; f="$d/app.ini$(touch @C@)"; cat "$f"',
+               'f=$((1+$(touch @C@ >/dev/null; echo 1))); echo $f']
+
+
+def _vx_noexec():
+    res = []
+    for i, tpl in enumerate(VX_PAYLOADS):
+        c = os.path.join(WORK, "canary-vx-%d" % i)
+        run_guard("Bash", tpl.replace("@C@", c))
+        res.append((f"payload-{i + 1}", not os.path.exists(c)))
+    return _compact(res)
+row("SC-21", "21z", "reverse-guard", "no-execution invariant of the variable expansion: assigned values holding a command substitution, back quotes or an arithmetic expansion around a command substitution (5 payloads, each `touch`es a private canary path) are only ever text for the hook: none of the 5 canary files exists after the hook has run",
+    "5/5 as expected", _vx_noexec, hook=True)
 marker_row("21v", "reverse-guard", "evaluation order: all segments are judged by the built-in rules BEFORE any substituted copy: `f=/etc/hosts; cat \"$f\"; cat .env` -> exit 2, the second pass never runs",
            [("Bash", "f=/etc/hosts; cat \"$f\"; cat .env", 2)], None, [])
 marker_row("21w", "baseline-failing", "... and when every built-in verdict is `allow`, the second pass runs: `f=/etc/hosts; cat \"$f\"` -> exit 0, _sg_vx_pass called",
@@ -1359,29 +1540,65 @@ l1e("SC-22", "22be", "baseline-failing", "pid positions of the widened /proc row
 l1e("SC-22", "22bg", "baseline-failing", "inline interpreters read /proc/<pid>/environ|cmdline (python3 -c and node -e source groups)",
     [("python3-environ", "python3 -c \"print(open('/proc/1/environ').read())\""), ("python3-cmdline", "python3 -c \"print(open('/proc/self/cmdline').read())\""),
      ("python3-var-pid", "python3 -c \"print(open('/proc/$pid/environ').read())\""), ("node-environ", "node -e \"console.log(require('fs').readFileSync('/proc/1/environ','utf8'))\"")], 2)
+# The member sets of the process-table family, each listed ONCE: 22av / 22ax / 22ay / 22bb / 22bk / 22bl enumerate them, and 22bm / 22bn (tight / count credit) and
+# 22bq (launcher / wrapper x non-ps programs) loop over the same lists.
+PS_SPELL = ["ps -aux", "ps -ax", "ps -x", "ps -ux", "ps -au", "ps -axu", "ps -auxww", "ps -w -x", "ps -eO rss", "ps -O rss", "ps -eu", "ps -u", "ps -ex", "ps -xw"]
+LAUNCH_ARGS = ["sudo -u forgejo ps -ef", "sudo -u svc -g grp ps aux", "doas -u root ps aux", "timeout -s KILL 5 ps aux", "timeout 5 ps aux", "timeout 5s ps aux", "nice -n 5 ps aux",
+               "ionice -c 2 -n 7 ps aux", "env -i LANG=C ps aux", "env LANG=C ps aux", "stdbuf -oL ps aux", "xargs -r ps -o pid,args -p",
+               "pgrep -f x | xargs -I{} ps -fp {}", "pgrep -f curl | xargs ps -fp"]
+ABS_FORMS = ["/bin/ps aux", "/usr/bin/ps -ef", "/usr/bin/pgrep -af curl", "/usr/bin/pstree -ap", "/usr/bin/top -b -n1 -c", "/usr/bin/sudo ps aux", "sudo /bin/ps aux", "ssh host /bin/ps aux"]
+PODMAN_FORMS = [("podman-top", "podman top abc"), ("podman-ps", "podman ps --no-trunc")]
+WRAP_T = [("ssh", "ssh host 'CMD'"), ("docker", "docker exec c CMD"), ("docker-compose", "docker compose exec web CMD"), ("podman", "podman exec c CMD"),
+          ("kubectl", "kubectl exec pod -- CMD"), ("lxc", "lxc exec c -- CMD"), ("nomad", "nomad alloc exec abc CMD"), ("pct", "pct exec 101 -- CMD"),
+          ("sh-c", "sh -c 'CMD'"), ("bash-c", 'bash -c "CMD"'), ("watch", "watch 'CMD'")]       # the 11 remote / shell wrappers; CMD is the wrapped command
+WRAP_T_ENV = [(w, "ssh host CMD") if w == "ssh" else (w, t) for w, t in WRAP_T]       # env dumps: ssh UNQUOTED (the quoted form is blocked by an older baseline row)
+PS_CLASSES = ["ps aux", "ps 123", "ps -ef", "ps -eo pid,args", "ps -o pid,command -p 123", "ps -ww -fp 123", "ps eww -p 123", "ps e", "ps -C curl -o args=", "ps --format pid,cmd"]
+WRAP_PS = [("ssh", "ssh host 'ps aux'"), ("docker", "docker exec c ps aux"), ("docker-compose", "docker compose exec web ps aux"), ("podman", "podman exec c ps -ef"),
+           ("kubectl", "kubectl exec pod -- ps aux"), ("lxc", "lxc exec c -- ps aux"), ("nomad", "nomad alloc exec abc ps aux"), ("pct", "pct exec 101 -- ps aux"),
+           ("sh-c", "sh -c 'ps aux'"), ("bash-c", 'bash -c "ps -ef"'), ("watch-quoted", "watch 'ps aux'")]
+NONPS_FORMS = [("pgrep-a", "pgrep -a curl"), ("pgrep-af", "pgrep -af curl"), ("pgrep-list-full", "pgrep --list-full curl"), ("pstree-a", "pstree -a"), ("pstree-ap", "pstree -ap"),
+               ("pstree-arguments", "pstree --arguments"), ("top-c-separate", "top -b -n1 -c"), ("top-c-clustered", "top -bc -n1"), ("docker-top", "docker top abc"),
+               ("docker-compose-top", "docker compose top"), ("docker-container-top", "docker container top abc"), ("docker-ps-no-trunc", "docker ps --no-trunc"),
+               ("docker-container-ls-no-trunc", "docker container ls --no-trunc")]
+NONPS_PROGS = ["pgrep -af x", "pstree -a", "top -b -n1 -c"]                  # the non-ps programs of the family, in the form used behind launchers / wrappers
 l1e("SC-22", "22av", "baseline-failing", "ps spellings that print the full argv with a leading dash (procps-ng BSD compatibility) or `-O`: -aux -ax -x -ux -au -axu -auxww -w -x -eO -O -eu -u -ex -xw, and the incident-class `ps -aux | grep curl`",
-    [(c, c) for c in ("ps -aux", "ps -ax", "ps -x", "ps -ux", "ps -au", "ps -axu", "ps -auxww", "ps -w -x", "ps -eO rss", "ps -O rss", "ps -eu", "ps -u", "ps -ex", "ps -xw", "ps -aux | grep curl")], 2)
+    [(c, c) for c in PS_SPELL + ["ps -aux | grep curl"]], 2)
 l1e("SC-22", "22aw", "baseline-failing", "every launcher of the launcher set (the 13 words of the env / printenv launcher row + command exec = 15; `watch` is a shell wrapper, see 22bk) in front of `ps aux`",
     [(w, f"{w} ps aux") for w in LAUNCH15], 2)
 l1e("SC-22", "22ax", "baseline-failing", "launchers whose options take arguments, a duration operand, assignments, and the xargs pipelines of the incident class",
-    [(c, c) for c in ("sudo -u forgejo ps -ef", "sudo -u svc -g grp ps aux", "doas -u root ps aux", "timeout -s KILL 5 ps aux", "timeout 5 ps aux", "timeout 5s ps aux", "nice -n 5 ps aux",
-                      "ionice -c 2 -n 7 ps aux", "env -i LANG=C ps aux", "env LANG=C ps aux", "stdbuf -oL ps aux", "xargs -r ps -o pid,args -p",
-                      "pgrep -f x | xargs -I{} ps -fp {}", "pgrep -f curl | xargs ps -fp")], 2)
+    [(c, c) for c in LAUNCH_ARGS], 2)
 l1e("SC-22", "22ay", "baseline-failing", "absolute-path program names: /bin/ps, /usr/bin/ps, pgrep, pstree, top, an absolute launcher, an absolute target behind a launcher and behind ssh",
-    [(c, c) for c in ("/bin/ps aux", "/usr/bin/ps -ef", "/usr/bin/pgrep -af curl", "/usr/bin/pstree -ap", "/usr/bin/top -b -n1 -c", "/usr/bin/sudo ps aux", "sudo /bin/ps aux", "ssh host /bin/ps aux")], 2)
+    [(c, c) for c in ABS_FORMS], 2)
 l1e("SC-22", "22az", "baseline-failing", "shell keyword command positions: then / do / else / elif before a process-table command",
     [("then", "if true; then ps aux; fi"), ("do", "for i in 1 2; do ps aux; done"), ("else", "if false; then true; else ps aux; fi"),
      ("elif", "if false; then true; elif ps aux; then true; fi"), ("do-pgrep", "while true; do pgrep -af x; sleep 5; done")], 2)
 l1e("SC-22", "22bb", "baseline-failing", "podman is docker's sibling: podman top, podman ps --no-trunc",
-    [("podman-top", "podman top abc"), ("podman-ps", "podman ps --no-trunc")], 2)
-l1e("SC-22", "22bl", "baseline-failing", "every spelling of the non-ps process-table forms: pgrep -a / -af / --list-full, pstree -a / -ap / --arguments, top -c (separate and clustered), docker top / docker compose top, docker ps --no-trunc / docker container ls --no-trunc",
-    [("pgrep-a", "pgrep -a curl"), ("pgrep-af", "pgrep -af curl"), ("pgrep-list-full", "pgrep --list-full curl"), ("pstree-a", "pstree -a"), ("pstree-ap", "pstree -ap"),
-     ("pstree-arguments", "pstree --arguments"), ("top-c-separate", "top -b -n1 -c"), ("top-c-clustered", "top -bc -n1"), ("docker-top", "docker top abc"),
-     ("docker-compose-top", "docker compose top"), ("docker-ps-no-trunc", "docker ps --no-trunc"), ("docker-container-ls-no-trunc", "docker container ls --no-trunc")], 2)
+    PODMAN_FORMS, 2)
+l1e("SC-22", "22bl", "baseline-failing", "every spelling of the non-ps process-table forms: pgrep -a / -af / --list-full, pstree -a / -ap / --arguments, top -c (separate and clustered), docker top / docker compose top / docker container top, docker ps --no-trunc / docker container ls --no-trunc",
+    NONPS_FORMS, 2)
 l1e("SC-22", "22bk", "baseline-failing", "every remote / shell wrapper of the wrapper set around `ps aux`: ssh, docker exec, docker compose exec, podman exec, kubectl exec, lxc exec, nomad alloc exec, pct exec, sh -c, bash -c, watch '...'",
-    [("ssh", "ssh host 'ps aux'"), ("docker", "docker exec c ps aux"), ("docker-compose", "docker compose exec web ps aux"), ("podman", "podman exec c ps -ef"),
-     ("kubectl", "kubectl exec pod -- ps aux"), ("lxc", "lxc exec c -- ps aux"), ("nomad", "nomad alloc exec abc ps aux"), ("pct", "pct exec 101 -- ps aux"),
-     ("sh-c", "sh -c 'ps aux'"), ("bash-c", 'bash -c "ps -ef"'), ("watch-quoted", "watch 'ps aux'")], 2)
+    WRAP_PS, 2)
+
+# 22bm / 22bn: credit of the whole family, member by member.  The process-table rows use TIGHT credit: a row-level filter (`grep -v`, an anchored grep, sed, cut, awk) prints
+# the whole command line and does not count; a count / hash / discard does.  The rule rows and the tight predicate are two copies of one definition (SC-31 31c forbids a
+# row made only of a variable), so a member that is missing from one copy only would go unnoticed without a row per member.
+TIGHT_MEMBERS = ([(c, c) for c in PS_CLASSES + PS_SPELL] + [(f"launcher-{w}", f"{w} ps aux") for w in LAUNCH15] + [(c, c) for c in LAUNCH_ARGS] + [(c, c) for c in ABS_FORMS]
+                 + PODMAN_FORMS + WRAP_PS + NONPS_FORMS)
+l1e("SC-22", "22bm", "baseline-failing", "tight credit, member by member: every member of the process-table family (the 10 ps argument classes, the 14 dash spellings, the 15 launchers, the 14 launcher-with-arguments forms, the 8 absolute-path forms, podman, the 11 wrappers, the 13 non-ps spellings) followed by `| grep -v x` stays blocked, and the other row-level filters on `ps aux` (anchored grep, sed, cut, awk) do not count either",
+    [(lab, cmd + " | grep -v x") for lab, cmd in TIGHT_MEMBERS]
+    + [("filter-grep-anchored", "ps aux | grep '^dev'"), ("filter-sed", "ps aux | sed 's/a/b/'"), ("filter-cut", "ps aux | cut -d' ' -f1"), ("filter-awk", "ps aux | awk '{print $2}'")], 2)
+l1e("SC-22", "22bn", "allow-guard", "count / hash / discard credit, member by member: the same members followed by `| wc -l` stay allowed, and `ps aux` with a hash or a stdout discard",
+    [(lab, cmd + " | wc -l") for lab, cmd in TIGHT_MEMBERS] + [("discard", "ps aux >/dev/null"), ("hash", "ps aux | sha256sum")], 0)
+l1e("SC-22", "22bo", "baseline-failing", "env / printenv dumps under every remote / shell wrapper of the wrapper set (ssh, docker exec, docker compose exec, podman exec, kubectl exec, lxc exec, nomad alloc exec, pct exec, sh -c, bash -c, watch) x {env, printenv}: 22 members, each blocked",
+    [(f"{w}:{d}", t.replace("CMD", d)) for w, t in WRAP_T_ENV for d in ("env", "printenv")], 2)
+l1e("SC-22", "22bq", "baseline-failing", "the launcher and wrapper sets are not specific to `ps`: each of the 15 launchers and each of the 11 wrappers in front of / around each non-ps program (pgrep -af, pstree -a, top -b -n1 -c): 78 members, each blocked",
+    [(f"{w}:{pg}", f"{w} {pg}") for w in LAUNCH15 for pg in NONPS_PROGS] + [(f"{w}:{pg}", t.replace("CMD", pg)) for w, t in WRAP_T for pg in NONPS_PROGS], 2)
+# 22bp: the pid positions added in v4 -- `$$` / `$!` and `thread-self` (aliases of `self`), and any glob token that holds `*` or `?` (`*`, `[0-9]*`, `1*`, `1?`)
+l1e("SC-22", "22bp", "baseline-failing", "pid positions of the /proc rows, v4 additions: `$$`, `$!`, `thread-self`, and glob tokens holding `*` or `?` (`[0-9]*`, `1*`, `1?`), for baseline readers, added readers, a `<` redirect, an xargs file operand and an inline interpreter",
+    [("dollar-dollar", "cat /proc/$$/environ"), ("dollar-bang", "cat /proc/$!/environ"), ("thread-self", "cat /proc/thread-self/environ"), ("glob-bracket-star", "cat /proc/[0-9]*/cmdline"),
+     ("glob-prefix-star", "cat /proc/1*/cmdline"), ("glob-question", "cat /proc/1?/environ"), ("redirect-dollar", "tr '\\0' '\\n' < /proc/$$/environ"),
+     ("xargs-dollar", "xargs -0 -a /proc/$$/environ echo"), ("python-dollar", "python3 -c \"print(open('/proc/$$/environ').read())\""),
+     ("task-thread-self", "grep -a x /proc/thread-self/task/1/cmdline")], 2)
 l1m("SC-22", "22O", "allow-guard", ["ps -e", "ps -eo pid,comm", "ps -p 123", "ps -o pid,stat,comm -p 123", "ps -u dev -o pid,comm", "ps -U dev", "ps -A", "ps -C curl",
                                      "ps -ejH", "ps -ely", "ps --forest -eo pid,comm", "/bin/ps -e", "sudo -u svc ps -e", "for i in 1; do ps -eo pid,comm; done",
                                      "pgrep -f curl | xargs ps -o pid,comm -p"], 0, "ps forms that print only pid / state / process NAME stay allowed (also with a launcher, an absolute path, a keyword position, an xargs pipeline)")
@@ -1389,8 +1606,8 @@ l1m("SC-22", "22bi", "allow-guard", ["sudo -u svc ls", "timeout 5 ls", "nice -n 
     "launchers, absolute paths and keyword positions around commands that are not process-table commands stay allowed")
 l1m("SC-22", "22S", "allow-guard", ["pgrep curl", "pgrep -f curl", "pgrep -l curl", "pstree -p", "top -b -n1"], 0, "pgrep / pstree / top forms that print pids or names only stay allowed (Linux procps)")
 l1m("SC-22", "22Y", "allow-guard", ["grep -rn 'ps aux' docs/", "echo 'use ps -ef to list'", "ps aux | wc -l", "ps aux >/dev/null", "man ps"], 0, "text that merely mentions ps, and ps with a counting / discarding credit, stay allowed")
-l1m("SC-22", "22bf", "allow-guard", ["cat /proc/N/cmdline", "cat /proc/<pid>/cmdline", "grep -a x /proc/<pid>/environ"], 0,
-    "a /proc path whose pid position is a placeholder word (N, <pid>) is text, not a read: the pid token accepts digits, self, `*`, `$name`, `${...}`, `$(...)` only")
+l1m("SC-22", "22bf", "allow-guard", ["cat /proc/N/cmdline", "cat /proc/<pid>/cmdline", "grep -a x /proc/<pid>/environ", "cat /proc/[pid]/environ", "cat /proc/{pid}/cmdline"], 0,
+    "a /proc path whose pid position is a placeholder word (N, <pid>, [pid], {pid}) is text, not a read: the pid token accepts digits, self, thread-self, `$$`, `$!`, a glob token holding `*` or `?`, `$name`, `${...}`, `$(...)` only")
 l1m("SC-22", "22ad", "allow-guard", ["docker ps", "docker ps -a", "cat /proc/123/comm", "cat /proc/cpuinfo"], 0, "docker ps (truncated), /proc comm and cpuinfo stay allowed")
 l1m("SC-22", "22as", "allow-guard", ["grep VmRSS /proc/123/status", "awk '/VmRSS/{print $2}' /proc/$pid/status", "grep -i threads /proc/self/status"], 0,
     "read-only metadata files stay allowed when the /proc reader / pid positions are widened (status is NOT widened)")
@@ -1400,14 +1617,19 @@ l1m("SC-22", "22ah", "known-limit", ["systemctl status foo", "systemctl show -p 
     "KNOWN-LIMIT: argv / environ exposure through systemctl status / show, docker inspect, journalctl is not blocked")
 l1e("SC-22", "22aj", "known-limit", "KNOWN-LIMIT (baseline over-block kept): the 13 baseline readers still block /proc/123/status",
     [(r, f"{r} /proc/123/status") for r in PROC_OLD13], 2)
-l1e("SC-22", "22bh", "known-limit", "KNOWN-LIMIT: find -exec and lua -e read /proc, a launcher nested in a launcher, a BSD cluster that is not the first operand, ps -e o <format>, a command after `if` / `while` / `until` (the baseline env / printenv rows list only then / do / else / elif), macOS pgrep -fl, and a bare ps / pgrep inside a container (BusyBox prints the full command line) are not blocked",
+l1e("SC-22", "22bh", "known-limit", "KNOWN-LIMIT: find -exec and lua -e read /proc, a launcher nested in a launcher, a BSD cluster that is not the first operand, ps -e o <format>, a command after `if` / `while` / `until` (the baseline env / printenv rows list only then / do / else / elif), macOS pgrep -fl, a bare ps / pgrep inside a container (BusyBox prints the full command line), other process listings that print full command lines (systemd-cgls, pidstat -l, w, busybox ps, the AIX format `-o '%p %a'`), pid positions outside the closed set (brace expansion, a bracket class without `*` / `?`, a back-quote substitution, path normalisation `/proc/./self` and `/proc//self`), and the /proc rows being no tight family (a row-level filter counts as credit there) are not blocked",
     [("find-exec", "find /proc -maxdepth 2 -name environ -exec cat {} +"), ("lua", "lua -e \"print(io.open('/proc/1/environ'):read('a'))\""),
      ("nested-launcher", "sudo nice ps aux"), ("bsd-cluster-not-first", "ps -U dev -u dev u"), ("bsd-format-after-e", "ps -e o pid,args"),
      ("if-position", "if ps aux | grep -q curl; then echo up; fi"), ("while-position", "while ps aux | grep -q x; do sleep 1; done"),
      ("until-position", "until ps aux | grep -q x; do sleep 1; done"),
-     ("pgrep-fl-macos", "pgrep -fl curl"), ("bare-ps-docker", "docker exec abc ps"), ("bare-ps-kubectl", "kubectl exec pod -- ps")], 0)
-l1e("SC-22", "22bj", "baseline-failing", "ACCEPTED OVER-BLOCK (documented in W11, same newline anchor as the baseline env / printenv rows): a line that merely STARTS with a process-table command inside a heredoc or multi-line string is blocked, because the newline is a command-position anchor; the row turns red when someone narrows the anchor (update W11 and this row then)",
-    [("heredoc-ps", "cat <<'EOF'\nps aux\nEOF"), ("heredoc-after-text", "cat <<'EOF'\nlist the processes with\nps -ef\nEOF")], 2)
+     ("pgrep-fl-macos", "pgrep -fl curl"), ("bare-ps-docker", "docker exec abc ps"), ("bare-ps-kubectl", "kubectl exec pod -- ps"),
+     ("systemd-cgls", "systemd-cgls"), ("pidstat-l", "pidstat -l 1 1"), ("w", "w"), ("busybox-ps", "busybox ps"), ("ps-aix-format", "ps -eo '%p %a'"),
+     ("brace-pid", "cat /proc/{1,2}/environ"), ("bracket-class", "cat /proc/[0-9]/environ"), ("backtick-pid", "cat /proc/`pgrep -o x`/cmdline"),
+     ("dot-self", "cat /proc/./self/environ"), ("double-slash", "cat /proc//self/environ"), ("proc-rows-not-tight", "cat /proc/123/environ | grep '^PATH='")], 0)
+l1e("SC-22", "22bj", "baseline-failing", "ACCEPTED OVER-BLOCK (documented in W11, same newline anchor and same unanchored wrapper words as the baseline env / printenv rows): a line that merely STARTS with a process-table command inside a heredoc or multi-line string is blocked, because the newline is a command-position anchor; so is text in which a wrapper word (`ssh`, `watch`, also inside `sshd` / `stopwatch`) comes before a process-table form -- a commit message, an echo, a documentation search; the row turns red when someone narrows either (update W11 and this row then)",
+    [("heredoc-ps", "cat <<'EOF'\nps aux\nEOF"), ("heredoc-after-text", "cat <<'EOF'\nlist the processes with\nps -ef\nEOF"),
+     ("commit-message-watch", 'git commit -m "docs: explain why watch ps aux is blocked"'), ("sshd-substring", 'echo "the sshd log shows ps aux output"'),
+     ("grep-doc-search", 'grep -n "ssh host ps aux" README.md'), ("stopwatch-substring", "echo 'stopwatch: ps -ef'")], 2)
 l1m("SC-22", "22au", "known-limit", ["/proc/4242/cmdline", "/proc/4242/environ", "/proc/self/environ"], 0, "KNOWN-LIMIT: the Read tool face has no /proc rule", tool="Read")
 
 # SC-23 -- W12 `.env` mis-block on os.environ (python3 -c / node -e / lua -e rows): single-key reads only
@@ -1434,6 +1656,15 @@ l1m("SC-23", "23d", "reverse-guard",
 l1m("SC-23", "23e", "reverse-guard",
     ["head .envrc", "tail -n 5 .envrc", "cp .env /dev/stdout", "scp .env user@host:/tmp/", "rsync -a .env user@host:/tmp/", "strings .envrc"], 2,
     "non-interpreter readers keep blocking .env / .envrc (a global right boundary on the `.env` rows would have let these through)")
+def _w12_noexec():
+    res = []
+    for i, tpl in enumerate(['python3 -c "import os; print(os.environ.get(\'$(touch @C@)\'))"', 'python3 -c "import os; print(os.environ[\'`touch @C@`\'])"']):
+        c = os.path.join(WORK, "canary-w12-%d" % i)
+        run_guard("Bash", tpl.replace("@C@", c))
+        res.append((f"payload-{i + 1}", not os.path.exists(c)))
+    return _compact(res)
+row("SC-23", "23i", "reverse-guard", "no-execution invariant of the single-key normalisation: single-key reads whose key text holds a command substitution / back quotes (2 payloads, each `touch`es a private canary path) are only text for the hook: none of the 2 canary files exists after the hook has run",
+    "2/2 as expected", _w12_noexec, hook=True)
 l1("SC-23", "23f", "known-limit", "node -e \"console.log(process.env.HOME)\"", 2)
 l1("SC-23", "23g", "known-limit", "cat .env_prod", 0)
 l1m("SC-23", "23h", "known-limit", ["node -e \"console.log(cfg.environment)\"", "lua -e \"print(os.getenv('HOME'), cfg.environment)\"", "python3 -c \"print(cfg.env_file)\""], 2,
@@ -1604,6 +1835,29 @@ def doc_present(path, needle):
             return "file-absent", False
         return ("present" if needle in t else "absent"), needle in t
     return f
+
+def doc_in_comment_block(path, needle, after=None):
+    """needle must sit in a COMMENT BLOCK: the comment lines (blank lines allowed) that start at line 1, or at the first line that starts with `after`"""
+    def f():
+        t = rd(path)
+        if t is None:
+            return "file-absent", False
+        lines = t.split("\n")
+        i0 = 0
+        if after is not None:
+            idx = [k for k, l in enumerate(lines) if l.startswith(after)]
+            if not idx:
+                return "marker-absent", False
+            i0 = idx[0]
+        block = []
+        for l in lines[i0:]:
+            if l.strip() and not l.startswith("#"):
+                break
+            block.append(l)
+        ok = needle in "\n".join(block)
+        return ("present" if ok else "absent"), ok
+    return f
+
 
 def section(text, prefix, last=False):
     """Markdown section whose heading line starts with `prefix`, up to the next heading of the same or a higher level.
@@ -1779,31 +2033,34 @@ row("SC-27", "27d", "doc-sync", "secret-scan.test.sh: a NON-comment line reads t
 
 # SC-28 -- every stale / dangling statement: the OLD text is gone AND the replacement is in place (deleting the sentence is not enough)
 def doc_replaced(path, old, new_check, scope_lines=None):
+    """old = one needle or a tuple of needles: EVERY one must be gone (a half-rewritten sentence keeps one of them)"""
+    olds = (old,) if isinstance(old, str) else tuple(old)
     def f():
         t = rd(path)
         if t is None:
             return "file-absent", False
         scope = t if scope_lines is None else "\n".join(t.split("\n")[:scope_lines])
-        gone = old not in t
+        gone = all(o not in t for o in olds)
         have = bool(new_check(scope))
         return f"old {'gone' if gone else 'still-present'}; new {'present' if have else 'absent'}", gone and have
     return f
 
-NO_COUNT = re.compile(r"~?\d+ (known bypass classes|secret-shape patterns)")
+# a pattern / class / tag COUNT literal in prose: a number (optionally `~` / `+`) followed by up to two words and patterns / tags / classes / forms
+NO_COUNT = re.compile(r"~?\d+\+?[ \t]+(?:[A-Za-z-]+[ \t]+){0,2}(?:patterns|tags|classes|forms)\b")
 for cid, path, old, check, lines, desc in [
-    ("28a", GUARD, "Phase 2 would add PostToolUse hook", lambda s: "secret-scan.sh" in s, 70, "secret-guard.sh header: stale 'Phase 2 ... + redacts' sentence replaced by a pointer to secret-scan.sh"),
-    ("28b", GUARD, "docs/operations/secret-rotation-runbook.md", lambda s: "secret-hygiene.md" in s, 100, "secret-guard.sh header: dangling runbook reference re-pointed to secret-hygiene.md"),
+    ("28a", GUARD, ("Phase 2 would add PostToolUse hook", "style env lines + redacts"), lambda s: "secret-scan.sh" in s, 70, "secret-guard.sh header: BOTH halves of the stale three-line sentence 'Phase 2 would add PostToolUse hook ... style env lines + redacts' are gone and a pointer to secret-scan.sh is in"),
+    ("28b", GUARD, "docs/operations/secret-rotation-runbook.md", lambda s: "secret-hygiene.md" in s and "\u00a71.3" not in s, 100, "secret-guard.sh header: dangling runbook reference re-pointed to secret-hygiene.md, and not to a section of it that does not exist (the SOT section 1 holds 1.1 / 1.2 only: no `\u00a71.3`)"),
     ("28c", SCAN, "~15 secret-shape patterns", lambda s: not NO_COUNT.search(s), 100, "secret-scan.sh header: stale '~15 secret-shape patterns' removed and no new pattern-count literal written"),
     ("28d", SCAN, "49 known bypass classes", lambda s: not NO_COUNT.search(s), 100, "secret-scan.sh header: stale '49 known bypass classes' removed and no new class-count literal written"),
-    ("28e", SCAN, "bcrypt / argon2", lambda s: "bcrypt" in s, 100, "secret-scan.sh header: the non-existent argon2 claim removed (bcrypt stays)"),
-    ("28f", SCAN, "// Read file content", lambda s: "file.content" in s, 100, "secret-scan.sh hook contract: old Read shape line replaced by the real file.content shape"),
+    ("28e", SCAN, ("bcrypt / argon2", "argon2"), lambda s: "bcrypt" in s, 100, "secret-scan.sh header: the non-existent argon2 claim is gone (the word `argon2` appears nowhere in the file; bcrypt stays)"),
+    ("28f", SCAN, "// Read file content", lambda s: "file.content" in s and not re.search(r'(?m)^#\s*"content"\s*:', s), 100, "secret-scan.sh hook contract: the old Read shape line is replaced by the real file.content shape and no contract line starts with a top-level `\"content\":` key"),
     ("28g", SCAN, "- Secrets encoded base64 / hex / etc (without telltale prefix)", lambda s: "credential key name" in s, 100, "secret-scan.sh 'does NOT catch' list: the base64/hex line re-scoped to values with no prefix AND no credential key name"),
     ("28h", HYG, "PreToolUse Bash + Read/Edit/Write/MultiEdit blocker", lambda s: "PreToolUse Bash + Read/Edit blocker" in s, None, "secret-hygiene.md 5.1: secret-guard no longer called a Write/MultiEdit blocker"),
     ("28i", os.path.join(ARIA, "VERSION"), "output REDACT", lambda s: any("secret-scan.sh (v1.24.0" in l and "detect" in l.lower() for l in s.split("\n")), None, "aria/VERSION: stale 'output REDACT' description of secret-scan replaced by detect + warn"),
-    ("28l", SCAN, "version-dependent behaviour", lambda s: "updatedToolOutput" in s, 100, "secret-scan.sh header: the claim 'no field to replace tool_response, not version dependent' replaced by the schema fact (updatedToolOutput exists, unverified, unused)")]:
+    ("28l", SCAN, ("version-dependent behaviour", "exposes no field to"), lambda s: "updatedToolOutput" in s, 100, "secret-scan.sh header: BOTH halves of the claim 'Claude Code exposes no field to replace tool_response ... not a version-dependent behaviour' are gone and the schema fact (updatedToolOutput exists, unverified, unused) is in")]:
     row("SC-28", cid, "doc-sync", desc, "old gone; new present", doc_replaced(path, old, check, lines))
-row("SC-28", "28j", "doc-sync", "secret-guard.sh History names change-id secret-net-l3-and-bypass-paths", "present", doc_present(GUARD, "secret-net-l3-and-bypass-paths"))
-row("SC-28", "28k", "doc-sync", "secret-scan.sh header names change-id secret-net-l3-and-bypass-paths", "present", doc_present(SCAN, "secret-net-l3-and-bypass-paths"))
+row("SC-28", "28j", "doc-sync", "secret-guard.sh History block (the comment block that starts at `# === History ===`) names change-id secret-net-l3-and-bypass-paths; a mention only in code comments does not count", "present", doc_in_comment_block(GUARD, "secret-net-l3-and-bypass-paths", "# === History ==="))
+row("SC-28", "28k", "doc-sync", "secret-scan.sh header block (the leading comment block of the file) names change-id secret-net-l3-and-bypass-paths; a mention only in code comments does not count", "present", doc_in_comment_block(SCAN, "secret-net-l3-and-bypass-paths"))
 def _updated_tool_output_everywhere():
     outs, ok_all = [], True
     for name, path, head, last in (("SOT-5.2", HYG, "### 5.2 ", False), ("README.md", README, "### Hooks (Auto-triggered)", True), ("README.zh.md", README_ZH, "### Hooks 自动触发", True)):
@@ -1913,6 +2170,9 @@ def _lf_only():
 row("SC-32", "32a", "reverse-guard", "hooks/secret-guard.sh + secret-scan.sh code lines: none of 13 bash 4+ constructs (declare -A, mapfile/readarray, ${x,,}/${x^^}, [[ -v ]], nameref, negative subscript, ${x@Q}, |&, &>>, ;;&, coproc, shopt globstar/lastpipe, wait -n) -- a HEURISTIC, not a proof of 3.2-runnability (see 32c); each of the 13 detectors is first checked against a sample line of its own construct", "0 bash 4+ constructs; detectors self-tested 13/13", _bash4_free)
 row("SC-32", "32b", "reverse-guard", "hooks/secret-*.sh and tests/secret-*.test.sh keep LF line endings", "LF-only", _lf_only)
 row("SC-32", "32c", "reverse-guard", "every hook-direct row above, run once by the default bash and once by a real bash 3.2 (WPA_BASH32): the two result strings are identical row by row", "identical over all hook-direct rows", lambda: ("not-run", None))
+LOCALE_B = os.environ.get("WPA_LOCALE_B", "en_US.UTF-8")
+row("SC-32", "32d", "reverse-guard", "the same differential in a SECOND locale (WPA_LOCALE_B, default en_US.UTF-8; a non-C collation order): every hook-direct row, run by the default bash and by a real bash 3.2 with LC_ALL set to that locale, gives the same result string as the run in the first locale (C.UTF-8), row by row -- a character class that bash < 5 expands by collation order (`[a-z]` counting upper case) would differ here and nowhere else",
+    "identical over all hook-direct rows in a second locale", lambda: ("not-run", None))
 
 # SC-33 -- L3 false-positive census over a frozen corpus (the 6 new tags only)
 NEW_TAGS6 = {T_JSON_NEW, T_JSON_ENV, T_KV, T_AUTH, T_CF, T_FLAG}
@@ -1965,10 +2225,39 @@ row("SC-33", "33a", "allow-guard", "L3 false-positive census: every text file <=
 
 # ================================================================ run + print
 DEFERRED_SC = ("SC-14", "SC-27", "SC-29", "SC-31")      # read suite / census results -> evaluated after the pool
-DEFERRED_ROWS = {("SC-32", "32c")}                      # bash-3.2 differential: needs every hook-direct row's first result
+DEFERRED_ROWS = {("SC-32", "32c"), ("SC-32", "32d")}                      # bash-3.2 differential: needs every hook-direct row's first result
+
+def _locale_usable(name, locpath=None):
+    """a locale is usable when a bash started with LC_ALL=<name> can set it (bash warns on stderr when it cannot)"""
+    env = {"PATH": SYS_PATH, "LC_ALL": name, "LANG": name}
+    if locpath:
+        env["LOCPATH"] = locpath
+    try:
+        p = subprocess.run(["bash", "-c", "printf ok"], capture_output=True, env=env, timeout=60)
+    except Exception:
+        return False
+    return p.returncode == 0 and p.stdout == b"ok" and b"locale" not in p.stderr.lower()
+
+
+def prepare_locale_b():
+    """-> (usable, locpath or None).  An installed locale is used as it is; otherwise one `localedef` build into a private directory is tried."""
+    if _locale_usable(LOCALE_B):
+        return True, None
+    base, _, cs = LOCALE_B.partition(".")
+    if not base or not cs:
+        return False, None
+    d = os.path.join(WORK, "locale")
+    os.makedirs(d, exist_ok=True)
+    try:
+        subprocess.run(["localedef", "-i", base, "-f", cs.upper(), os.path.join(d, base + "." + cs.lower().replace("-", ""))],
+                       capture_output=True, env={"PATH": SYS_PATH + ":/usr/sbin:/sbin"}, timeout=600)
+    except Exception:
+        return False, None
+    return (True, d) if _locale_usable(LOCALE_B, d) else (False, None)
+
 
 def main():
-    global BASH_BIN
+    global BASH_BIN, LOCALE, LOCPATH_EXTRA
     results = {}
     want = lambda sc: (not ONLY) or sc in ONLY
     wantrow = lambda cid: (not ROWS_ONLY) or cid in ROWS_ONLY
@@ -2012,6 +2301,36 @@ def main():
                 results[diff_i[0]] = (f"{len(differ)} of {n} rows differ: {' '.join(differ)}", False)
             else:
                 results[diff_i[0]] = (f"identical over {n} hook-direct rows", True)
+
+    # SC-32 32d: the same hook-direct rows, default bash and real bash 3.2, in the second locale; both must equal the first-locale result string.
+    d32_i = [i for i, r in enumerate(ROWS) if (r[0], r[1]) == ("SC-32", "32d")]
+    if d32_i and want("SC-32"):
+        if not BASH32:
+            results[d32_i[0]] = ("not-run (WPA_BASH32 unset)", None)
+        else:
+            usable, locpath = prepare_locale_b()
+            if not usable:
+                results[d32_i[0]] = (f"not-run (locale {LOCALE_B} is not installed and could not be built)", None)
+            else:
+                LOCALE, LOCPATH_EXTRA = LOCALE_B, locpath
+                legs = {}
+                for leg, binary in (("default", "bash"), ("b32", BASH32)):
+                    BASH_BIN = binary
+                    leg_res = {}
+                    with cf.ThreadPoolExecutor(max_workers=6) as ex:
+                        futs = {ex.submit(r[5]): i for i, r in enumerate(ROWS)
+                                if r[6] and i in results and results[i][1] is not None and want(r[0])}
+                        for f in cf.as_completed(futs):
+                            leg_res[futs[f]] = f.result()
+                    legs[leg] = leg_res
+                BASH_BIN, LOCALE, LOCPATH_EXTRA = "bash", "C.UTF-8", None
+                differ = sorted({f"{ROWS[i][0]}:{ROWS[i][1]}" for leg in legs.values() for i in leg if leg[i][0] != results[i][0]},
+                                key=lambda x: (int(re.match(r"SC-(\d+)", x).group(1)), x))
+                n = len(legs["default"])
+                if differ:
+                    results[d32_i[0]] = (f"{len(differ)} of {n} rows differ: {' '.join(differ)}", False)
+                else:
+                    results[d32_i[0]] = (f"identical over {n} hook-direct rows (locale {LOCALE_B})", True)
 
     order = {}
     for i, r in enumerate(ROWS):

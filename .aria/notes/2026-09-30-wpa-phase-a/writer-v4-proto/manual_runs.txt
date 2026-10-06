@@ -1,0 +1,60 @@
+manual_runs -- bad implementations and controls that cannot be expressed as a mutbatch plan entry, with their results (written by work/run_manual_runs.py)
+
+Why these are manual: proto/mutbatch.py builds each bad implementation as a tree that holds only aria/hooks (the replaced hook next to the unchanged target hooks) and
+symlinks standards; rows that read documents, test suites or the whole aria tree (SC-26 / 27 / 28 / 33) need a full tree, rows that need a repeat count need a loop.
+All commands: HOME / TMPDIR = private directories; `python3 baseline_probe.py <tree>/aria` run from the spec directory with WPA_ONLY / WPA_ROWS narrowing.
+
+1. Documentation bad implementations (SC-26 / SC-28, proto/patch_docs.py flags on a full prototype tree; hooks and suites are the v4 prototype)
+   target tree (reference): not-yes rows = none   [25 SC-26 / SC-28 rows]
+   --bad-sot        (facts only in the SOT version-history row; README / CHANGELOG / hook headers / VERSION patched normally)
+       red: 26a, 26b, 26c, 26d, 26j, 26k, 28h, 28m ;  every other SC-26 / SC-28 row yes
+   --bad            (facts only in the SOT version-history row; no other document patched)
+       red: 26a, 26b, 26c, 26d, 26e, 26f, 26g, 26j, 26k, 28a, 28b, 28c, 28d, 28e, 28f, 28g, 28h, 28i, 28j, 28k, 28l, 28m, 28n ;  every other SC-26 / SC-28 row yes
+   --bad-layer      (everything patched normally, but the new SOT clause says `L1 / L3`)
+       red: 26i ;  every other SC-26 / SC-28 row yes
+   --no-scope       (everything patched normally, but the secret-scan.sh header Scope list does not name the 6 new tags)
+       red: 28n ;  every other SC-26 / SC-28 row yes
+   --hdr-count      (everything patched normally, but the secret-scan.sh header gains a NEW count literal (`37 patterns, ~12 key-shape forms, 6 new tags`))
+       red: 28c, 28d ;  every other SC-26 / SC-28 row yes
+   --hdr-half-l     (everything patched normally, but the secret-scan.sh header keeps the first half of the stale sentence (`Claude Code exposes no field to replace tool_response`))
+       red: 28l ;  every other SC-26 / SC-28 row yes
+   --hdr-dangling   (everything patched normally, but the secret-guard.sh header re-points the dangling runbook reference at the non-existent `§1.3` of secret-hygiene.md)
+       red: 28b ;  every other SC-26 / SC-28 row yes
+   --hdr-half-a     (everything patched normally, but the secret-guard.sh header only rewrites the FIRST line of the stale three-line sentence (keeps `style env lines + redacts`))
+       red: 28a ;  every other SC-26 / SC-28 row yes
+   --hdr-argon      (everything patched normally, but the secret-scan.sh header still claims argon2 in other words (`bcrypt password hashes, argon2 too`))
+       red: 28e ;  every other SC-26 / SC-28 row yes
+   --hdr-topcontent (everything patched normally, but the secret-scan.sh contract keeps a top-level `"content"` key line and only names file.content in its comment)
+       red: 28f ;  every other SC-26 / SC-28 row yes
+   --hdr-nohist     (everything patched normally, but the secret-guard.sh History block gets no entry (the change-id appears only in a code comment of the prototype))
+       red: 26f, 28j ;  every other SC-26 / SC-28 row yes
+
+2. SC-27 27d, secret-scan suite with the header comment but WITHOUT the self-check assertion (proto/patch_tests.py --no-selfcheck)
+   target tree:           27a yes (3/3 spots equal test header)  27b yes (header=50 run-total=50)  27c yes (SOT equals run total)  27d yes (1 non-comment line(s) read the header count)
+   header-only variant:   27a yes (3/3 spots equal test header)  27b yes (header=49 run-total=49)  27c no (SOT differs from run total)  27d no (0 non-comment line(s) read the header count)
+
+3. Path-form character class, the three bad implementations of rows 4n / 5l, 10 probe runs each (the padded generator excludes '+', the unpadded one excludes '=')
+   path_eq    (class admits '='): 4n red 10/10, 5l red 10/10
+   path_plus  (class admits '+'): 4n red 10/10, 5l red 10/10
+   loosepath  (any '/'-led value): 4n red 10/10, 5l red 10/10
+   target prototype:           4n red 0/10, 5l red 0/10
+
+4. SC-33 census, noentropy bad implementation (entropy floor removed) on a FULL copy of the target tree
+   target tree:    33a yes  flagged=2: aria/skills/api-doc-generator/MARKDOWN_TEMPLATE.md, aria/skills/requesting-code-review/examples/no-plan-fallback.md; prefilter passes 77/77 names
+   noentropy:      33a no  flagged=7: aria/skills/api-doc-generator/MARKDOWN_TEMPLATE.md, aria/skills/aria-dashboard/references/issue-storage.md, aria/skills/forgejo-sync/API_CALL_PATTERN.md, aria/skills/forgejo-sync/CONFIG.md, aria/skills/forgejo-sync/PRE_CHECK.md, aria/skills/forgejo-sync/SKILL.md, aria/skills/requesting-co
+
+5. Negative controls of the probe
+   a. shape lines (target tree, WPA_ONLY=SC-32, no WPA_BASH32): rc 0
+      rows not run (n/a): by design 0 (-); leg missing or not constructible 2 (32c 32d)
+      baseline shape (baseline-failing + doc-sync all 'no', every other category all 'yes'): holds [2 leg row(s) not run]
+      target shape (every row 'yes' and no leg row left unrun): not established (2 leg row(s) not run)
+      same with WPA_REQUIRE_ALL=1: rc 3
+      rows not run (n/a): by design 0 (-); leg missing or not constructible 2 (32c 32d)
+      baseline shape (baseline-failing + doc-sync all 'no', every other category all 'yes'): holds [2 leg row(s) not run]
+      target shape (every row 'yes' and no leg row left unrun): not established (2 leg row(s) not run)
+   WPA_ONLY=SC-1 (no leg rows) with WPA_REQUIRE_ALL=1: rc 0; target shape (every row 'yes' and no leg row left unrun): holds
+   b. SC-15 (work/nc15.py: one runtime-assembled credential-shaped line appended to private copies of proposal.md, baseline_probe.py, baseline-evidence.md)
+      target hooks:   15e allow-guard | alert m=1 {tags} | no; 15f allow-guard | alert m=1 {tags} | no; 15g allow-guard | alert m=1 {tags} | no
+      baseline hooks: 15e allow-guard | silent | yes; 15f allow-guard | silent | yes; 15g allow-guard | silent | yes   (the baseline L3 cannot see that key form -- the 2026-08-20 hole itself)
+   c. Impact keyword check (work/refs_check.py): see logs/refs_check.out (regex samples, 3-state scenarios, v3 criterion for contrast)
+
