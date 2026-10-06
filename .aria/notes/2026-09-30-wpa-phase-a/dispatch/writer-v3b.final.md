@@ -1,0 +1,38 @@
+你是 WP-A Spec `secret-net-l3-and-bypass-paths` 的**返修执笔实例** (backend-architect, 新派实例, 与上一版执笔不是同一个), 任务是把 proposal **v2** (主仓分支 `docs/secret-net-l3-and-bypass-paths-phase-a` 提交 `b3e3123`) 返修为 **v3**, 处置 post_spec 第 2 轮审计的 finding。全程中文叙述, 代码 / 命令 / 路径 / SHA 保留英文。主控会独立核验你的每一处改动并复跑证据脚本; 之后是第 3 轮五席审计 (只审 v2 → v3 的改动及其与未改文字的接缝, 并逐条对账本轮 finding)。
+
+## 输入 (全部先读)
+
+1. 当前三份文件 (主仓工作树即 `b3e3123`): `openspec/changes/secret-net-l3-and-bypass-paths/proposal.md`、`baseline_probe.py`、`baseline-evidence.md`。
+2. 本轮聚合报告与五席报告原文: `/home/dev/Aria/.aria/audit-reports` 下 `post_spec-R2-*` 六个文件 (聚合报告的「全部 finding」表按席位原编号列出每一条; 「主控记录」节是主控的核验与处置意见 —— 其中标为「主控裁定」的条目按裁定执行, 你若有反证须写进报告而不是自行改向)。
+3. 背景: 三个 issue (`/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/issues/aria-plugin-154.md`、`aria-plugin-203.md`、`Aria-221.md`)、决策单 `.aria/decisions/2026-09-30-urgent-issue-plan-owner-rulings.md`、四份研究笔记 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/research/*.md`、上一版执笔派单 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/dispatch/writer-v1.final.md` (其中「主控范围裁定」仍有效, 除非本轮聚合报告的主控记录另有裁定)。
+4. 源码: `aria/hooks/`、`standards/conventions/` 等 (基线 aria `268da8f`、standards `2bc1c4c`)。
+
+## 要求
+
+1. **逐条处置**: 聚合报告「全部 finding」表里的**每一条** (含 minor) 都要有处置: `fixed` (写明改了哪里) / `rejected` (必须附你亲自核验的证据: file:line 原文或实跑命令与输出) / `deferred` (只允许用于超出本 Spec 范围、且已在「待 owner 复议」或 Out of scope 记录的事项)。多席指向同一问题的可以合并处置, 但每个席位编号都要出现在处置表里。
+2. **修类不修例**: 每修一处, 问「这个形状在 proposal / 探针里还有几个兄弟位置」, 一并修掉并在报告里列出。
+3. **证据只经脚本生成**: 改了 SC 就改 `baseline_probe.py`, 然后在你的实验目录新副本上实跑, 把 stdout **原样**放进 `baseline-evidence.md` 的代码块 (不手改一个字符); 基线形态 (baseline-failing 与 doc-sync 全 `no`、其余类别全 `yes`) 必须 holds; 报告里写明 stdout 的 sha256 前 16 位与字节数。新增或改写的 SC 必须先在基线上跑出预期状态再写进 proposal (「它怎么会红」三态)。
+4. **不引入新的问题**: 改动越小越好; 不要借返修扩大范围。任何「改变实现者动作」的改动单列一节 (主控会重点核)。
+5. **纪律延续**: Rule #7 (不出现可被现行或拟议 L1 / L3 规则命中的凭据形状字面, 一律占位写法; 夹具运行时拼装); issue 引用全限定; 编号只用 `1.` `2.` 或「第 1 类」, **不用带圈数字**; 不写 AI 署名行; 机读 token 英文 canonical; 审计叙事**不写进** proposal 正文 (Status 行只写一句当前状态, 例如「Draft — post_spec 审计中」); 头部 Level / Status / Created / Linked Issue 四行中只允许按需改 Status 一行。
+6. **硬性纪律**: 你不写仓内文件、不 commit、不 push、不 fetch, 不开 issue、不发评论, 不使用 Agent 工具; 实跑只在 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v3/` 下 (cp -a aria 与 standards 到那里再跑; HOME 指向该目录下的 `home/`)。三份文件与返修报告放在结构化输出里返回, 由主控落盘。
+
+## 交付 (结构化输出)
+
+- `proposal_markdown` / `probe_script` / `evidence_markdown`: 三份文件全文 (v3)。
+- `writer_report_markdown`: 返修报告 (将落为 `.aria/notes/` 下的独立文件, 不进 Spec), 含: 处置表 (席位 · 编号 · 键 · 处置 · 改动位置或拒绝证据) / 同族扫描清单 / 改变实现者动作的改动 / 证据复跑记录 (命令、sha256 前 16 位、字节数、基线形态结论) / 执笔自报薄弱点 / 请裁项 (需要主控或 owner 裁的取舍)。
+- `dispositions`: 与处置表一致的结构化列表。
+
+## 本轮补充说明 (主控)
+
+- **交付形态 (覆盖上文「交付」节的前三项)**: 三份文件写到你实验目录的 `deliver/` 下 (`proposal.md` / `baseline_probe.py` / `baseline-evidence.md`), 连同返修报告 `report.md` 与 `dispositions.json`, 并生成 `MANIFEST.sha256` (含这五个文件与证据所用的探针 stdout 文件)。结构化输出里 `proposal_markdown` / `probe_script` / `evidence_markdown` 三项只放一句指向母本路径的说明 (主控按 MANIFEST 校验后从母本落盘); `writer_report_markdown` 与 `dispositions` 放全文。
+- **方针 (R2 主控记录)**: 收紧优先, 不新增机制。本轮七簇里约一半由上一版返修或主控举例引入; 每一个新写或改写的判据、白名单分支、枚举集合, 都要配一个「像真实坏情形」的缺项类或越界类坏实现, 并证明它会让至少一行转红。
+- **可复用的基础设施** (只读, 要改先 cp -a): 真 bash 3.2.57 二进制 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v2/bash32/bash-3.2/bash`; v2 的原型补丁与坏实现复跑脚本 (仓内归档 `.aria/notes/2026-09-30-wpa-phase-a/writer-v2-proto/`, 会话内原件在 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v2/proto/` 与 `.../writer-v2/final/`)。
+- 主控裁定 8 条见 R2 聚合报告 (`.aria/audit-reports/post_spec-R2-2026-10-01T043547-000Z-secret-net-l3-and-bypass-paths-aggregated.md`) 的「主控记录」节。R1 的处置表 (`.aria/notes/2026-09-30-wpa-phase-a/writer-reports/v2-disposition-table.md`) 仍有效, 不要把 R1 已关闭的问题改回去。
+- 写含敏感形状讨论的文件内容时, 用 Write 工具或脚本文件, 不要把这类文字放进 `python3 -c` / heredoc 命令行 (现行 secret-guard 会拦)。
+
+## 接续说明 (主控, 2026-10-06; 覆盖上文中的实验目录名)
+
+- 上一个 v3 返修实例在 2026-10-01 约 09:14Z 因用量额度耗尽中断, **没有交付**。它的半成品在 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v3/` 下: `spec/` (proposal.md 相对 v2 已改约 224 行、baseline_probe.py 约 565 行, baseline-evidence.md 尚未重生成)、`work/` (补丁与用例脚本)、`proto/` (原型补丁)、`mut/` (按簇的坏实现复跑计划与日志)、`logs/` (时档对比等)。你的实验目录改为 `/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v3b/` (先把需要的半成品 cp -a 过去再改, 不要在 writer-v3/ 原地改)。
+- **半成品是未经核验的草稿**: 你对最终三份文件负全责。先用 `diff` 看清它相对 v2 (主仓 `b3e3123`) 改了什么、对照 R2 聚合报告逐簇判断哪些已做完、哪些做了一半、哪些没做, 再补完; 有疑问的改动按你自己的判断重写, 不要因为「上一个实例已经写了」就保留。
+- **控制规模**: 本轮只处置 R2 的七簇与全部 minor, 不要开新的全量普查; 坏实现复跑只做每个新写或改写判据所需的那几个。证据只在最后用定稿探针重生成一次 (带 `WPA_BASH32` 与不带各一次, 确认可复现)。
+- 交付形态同上文「本轮补充说明」: 母本写在 `writer-v3b/deliver/` 并附 `MANIFEST.sha256`。
