@@ -1,0 +1,33 @@
+hdr_case_sensitive__r2	l3	hdr_case_sensitive	SC-6	6h,6j
+ent_digit__r2	l3	ent_digit	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+ent_on_old__r2	l3	ent_on_old	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+noentropy__r2	l3	noentropy	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+noident__r2	l3	noident	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+nopath__r2	l3	nopath	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+loosepath__r2	l3	loosepath	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+path_firstlower__r2	l3	path_firstlower	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+floor15__r2	l3	floor15	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+floor17__r2	l3	floor17	SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11
+ent_drop_lower__r2	l3	ent_drop:lower	SC-4,SC-10	4a,4o,4t,10a,10b,10k
+ent_drop_upper__r2	l3	ent_drop:upper	SC-4,SC-10	4a,4o,4t,10a,10b,10k
+ent_drop_digit__r2	l3	ent_drop:digit	SC-4,SC-10	4a,4o,4t,10a,10b,10k
+drop_lead_/__r2	l3	drop_lead:/	SC-9	9w,9y
+drop_lead_~/__r2	l3	drop_lead:~/	SC-9	9w,9y
+drop_lead_./__r2	l3	drop_lead:./	SC-9	9w,9y
+drop_lead_../__r2	l3	drop_lead:../	SC-9	9w,9y
+path_plus__r2	l3	path_plus	SC-4,SC-5	4n,5l
+path_eq__r2	l3	path_eq	SC-4,SC-5	4n,5l
+cli_dash2__r2	l3	cli_dash2	SC-6	6i
+drop_vsym_kv_+__r2	l3	drop_vsym:kv:+	SC-6	6k
+drop_vsym_kv_/__r2	l3	drop_vsym:kv:/	SC-6	6k
+drop_vsym_kv_=__r2	l3	drop_vsym:kv:=	SC-6	6k
+drop_vsym_kv_.__r2	l3	drop_vsym:kv:.	SC-6	6k
+drop_vsym_kv____r2	l3	drop_vsym:kv:_	SC-6	6k
+drop_vsym_kv_~__r2	l3	drop_vsym:kv:~	SC-6	6k
+drop_vsym_kv_-__r2	l3	drop_vsym:kv:-	SC-6	6k
+drop_vsym_hdr_.__r2	l3	drop_vsym:hdr:.	SC-6	6k
+drop_vsym_hdr____r2	l3	drop_vsym:hdr:_	SC-6	6k
+drop_vsym_hdr_/__r2	l3	drop_vsym:hdr:/	SC-6	6k
+drop_vsym_hdr_+__r2	l3	drop_vsym:hdr:+	SC-6	6k
+drop_vsym_hdr_=__r2	l3	drop_vsym:hdr:=	SC-6	6k
+drop_vsym_hdr_-__r2	l3	drop_vsym:hdr:-	SC-6	6k

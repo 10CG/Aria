@@ -1,0 +1,53 @@
+manual_runs -- bad implementations and controls that cannot be expressed as a mutbatch plan entry, with their results (copied from the runs)
+
+Why these are manual: proto/mutbatch.py builds each bad implementation as a tree that holds only aria/hooks (the replaced hook next to the unchanged target hooks) and
+symlinks standards; rows that read documents, test suites or the whole aria tree (SC-26 / 27 / 28 / 33) need a full tree, rows that need a repeat count need a loop.
+All commands: HOME / TMPDIR = private directories; `python3 baseline_probe.py <tree>/aria` run from the spec directory with WPA_ONLY / WPA_ROWS narrowing.
+
+1. Documentation bad implementations (SC-26 / SC-28, `proto/patch_docs.py` on a copy of the baseline trees)
+   --bad-sot  (facts only in the SOT version-history row; README / CHANGELOG / hook headers / VERSION patched normally)
+       red: 26a 26b 26c 26d 26j 26k 28h 28m ;  yes: 26e 26f 26g 26h 26i, every other SC-28 row
+   --bad      (facts only in the SOT version-history row; no other document patched)
+       red: 26a 26b 26c 26d 26e 26f 26g 26j 26k (all 9 doc-sync rows of SC-26) and 28a-28n (all 14 of SC-28) ;  yes: 26h 26i (the two reverse-guard rows)
+
+   --bad-layer  (everything patched normally, but the new SOT clause says `L1 / L3`)
+       red: 26i only (`2 occurrences of L1 / L3`) ;  every other SC-26 / SC-28 row yes
+   --no-scope   (everything patched normally, but the secret-scan.sh header Scope list does not name the 6 new tags)
+       red: 28n only (`scope-misses` all six tags) ;  every other SC-26 / SC-28 row yes
+
+2. SC-27 27d, secret-scan suite with the header comment but WITHOUT the self-check assertion (`proto/patch_tests.py --no-selfcheck`)
+   target tree:           27a yes  27b yes (header=50 run-total=50)  27c yes  27d yes (1 non-comment line reads the header count)
+   header-only variant:   27a yes  27b yes (header=49 run-total=49)  27c no (SOT says 50, suite runs 49)  27d no (0 non-comment lines read the header count)
+
+3. Path-form character class, the three bad implementations of rows 4n / 5l, 10 probe runs each (the padded generator excludes '+', the unpadded one excludes '=')
+   path_eq  (class admits '='):        4n red 10/10, 5l red 10/10
+   path_plus (class admits '+'):       4n red 10/10, 5l red 10/10
+   loosepath (any '/'-led value):      4n red 10/10, 5l red 10/10
+   target prototype:                   4n red 0/10,  5l red 0/10
+   (before the generator fix path_eq turned no row red in the first pass: a random '+' in the padded value rescued the loose class)
+
+4. SC-33 census, noentropy bad implementation (entropy floor removed) on a FULL copy of the target tree
+   target tree:    33a yes  flagged=2 (api-doc-generator/MARKDOWN_TEMPLATE.md, requesting-code-review/examples/no-plan-fallback.md); prefilter passes 77/77 names
+   noentropy:      33a no   flagged=7: the two above + aria-dashboard/references/issue-storage.md + forgejo-sync/{API_CALL_PATTERN,CONFIG,PRE_CHECK}.md + forgejo-sync/SKILL.md
+                   (5 files NOT in the attribution list)
+
+5. Negative controls of the probe
+   a. shape lines (target tree, WPA_ONLY=SC-32, no WPA_BASH32): rc 0; `rows not run (n/a): by design 0 (-); leg missing or not constructible 1 (32c)`;
+      `baseline shape ... holds [1 leg row(s) not run]`; `target shape ... not established (1 leg row(s) not run)`
+      same with WPA_REQUIRE_ALL=1: rc 3
+      WPA_ONLY=SC-1 (no leg rows) with WPA_REQUIRE_ALL=1: rc 0, `target shape ... holds`
+   b. SC-15 (work/nc15.py: one runtime-assembled credential-shaped line appended to private copies of proposal.md, baseline_probe.py, baseline-evidence.md)
+      target hooks:   15e no, 15f no, 15g no   (alert)
+      baseline hooks: 15e yes, 15f yes, 15g yes (the baseline L3 cannot see that key form -- the 2026-08-20 hole itself)
+   c. Impact keyword regex (work/refs_check.py): 11 positive texts all match, 12 negative texts none match; the regex in proposal.md equals the tested regex character by character
+
+6. Accepted false positives of the new key-shape tags (work/l3try.py, key names assembled at run time): five forms alert on the target prototype
+   (json-env-secret-key=1 for URL / resource-name / policy-name values of upper-case keys; kv-secret-assign=1 for a relative-path / resource-path value), silent on the baseline.
+   They are pinned by row 10l; the closing bad implementations fp_relpath (10l 1/5 as expected) and fp_kebab (10l 4/5 as expected) are in plan_extra.
+
+7. Whole-environment / process-environment bypasses outside this change (work/cases_m5.py, baseline vs target secret-guard.sh exit codes)
+   export -p, declare -x, declare -p, typeset -x, set, env -0, env -u X, env --null, nomad alloc exec .. env -0, docker exec .. env -0, systemctl show -p Environment, systemctl cat,
+   kubectl get pod -o yaml / -o json:  0 / 0 (both allow)
+   kubectl exec pod -- env -0, kubectl exec pod -- env, printenv:  2 / 2 (both block)
+
+8. procps-ng 4.0.2 (this host): `ps` with a leading dash prints the BSD-format COMMAND column (full command line) for -u, -au, -eu, -ux, -aux, -ax, -x, -xw, -ex, -O <spec>, -eO <spec>.

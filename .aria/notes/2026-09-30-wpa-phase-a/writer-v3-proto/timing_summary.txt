@@ -1,0 +1,86 @@
+timing_summary -- W14 time tiers on the v3 target prototype and on the bad implementations of the tiers (proposal W14 item 5, SC-30)
+
+Method (proto/timing.py): baseline hook (aria 268da8f) and target hook run INTERLEAVED (A/B/A/B...) on the same input on the same host; per run the CPU time (user+sys, via RUSAGE_CHILDREN
+deltas, i.e. the whole process tree of the hook) and the wall time are recorded; the statistic per hook is the minimum over N interleaved runs (N = 5 pairs for the target, 3 for the bad
+implementations), the verdict statistic is the CPU ratio target / baseline.  Wall time and load average are recorded, never judged.  f / f0 / g / h / i are the W14 tiers; w1 (a Read result
+through the L3 hook; the baseline hook does not extract file.content and exits early) is informational for W1's performance sentence.  The `live` / `live-calls` columns are the liveness
+assertions: `live-calls=ok(...)` = the set of instrumented functions called in one untimed run of the instrumented target equals the expected set (f: the extension entry is called;
+g / h1: the variable-expansion pass is called; h2: nothing is called because a built-in blocks first); `live=(a, b)` = the L3 hook alerted on the dense input in the baseline / target run.
+Host: Linux 6.17.9-1-pve, 4 cores, shared (other tenants); the timing runs started when the 1-minute load average had fallen below 1.5.  Numbers move with the host; only ratios are judged.
+Thresholds (W14 item 2): (f) / (f0) <= 1.5 x max(baseline, 100 ms); (h) <= 1.5; (i) <= 2.0; (g) <= 2.5.
+
+################ target prototype (good) ################
+== final_good (good) pairs=5 load=1.45 3.88 11.87 12:43:58
+f  200 entries, Bash benign                  CPU min base  0.049s target  0.076s ratio  1.55 | wall min base  0.047s target  0.065s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.043s target  0.070s ratio  1.65 | wall min base  0.041s target  0.059s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+f0 no extension, Bash benign                 CPU min base  0.052s target  0.061s ratio  1.18 | wall min base  0.050s target  0.057s | rc [('A', 0), ('B', 0)]
+f0 no extension, Read benign                 CPU min base  0.043s target  0.049s ratio  1.13 | wall min base  0.041s target  0.045s | rc [('A', 0), ('B', 0)]
+i1 ~900 KB dense bearer lines                CPU min base  0.637s target  0.791s ratio  1.24 | wall min base  0.502s target  0.619s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.785s target  0.904s ratio  1.15 | wall min base  0.656s target  0.749s | rc [('A', 0), ('B', 0)] live=(True, True)
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base  0.881s target  0.891s ratio  1.01 | wall min base  0.885s target  0.885s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+g  4000 B string, 16 assign(len 100), 128 refs CPU min base  0.691s target  1.444s ratio  2.09 | wall min base  0.689s target  1.441s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+h1 150 ref-bearing segments, all allowed     CPU min base  1.008s target  2.282s ratio  2.26 | wall min base  1.012s target  2.274s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.006s target  1.187s ratio  1.18 | wall min base  1.004s target  1.194s | rc [('A', 2), ('B', 2)] live-calls=ok()
+w1 Read 4 KB clean prose                     CPU min base  0.108s target  0.313s ratio  2.89 | wall min base  0.106s target  0.217s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 60 KB clean prose                    CPU min base  0.117s target  0.330s ratio  2.81 | wall min base  0.111s target  0.227s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 180 KB dense INI assignments         CPU min base  0.134s target  0.655s ratio  4.89 | wall min base  0.119s target  0.517s | rc [('A', 0), ('B', 0)] live=(False, True)
+== done 12:45:25 load=2.84 3.72 11.08
+
+################ bad implementations, each on the tier meant to catch it ################
+== variants final_var pairs=3 load=2.84 3.72 11.08 12:45:25
+-- vx_quadratic (remainder after a hit taken with ${s#*"$pat"}) on g
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base  0.623s target  3.162s ratio  5.07 | wall min base  0.623s target  3.181s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+g  4000 B string, 16 assign(len 100), 128 refs CPU min base  0.686s target  9.312s ratio 13.57 | wall min base  0.686s target  9.331s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+-- ext_perentry (one grep process per extension entry) on f
+f  200 entries, Bash benign                  CPU min base  0.054s target  0.684s ratio 12.58 | wall min base  0.052s target  0.601s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.057s target  0.601s ratio 10.50 | wall min base  0.055s target  0.523s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+-- no_cap (every span iterated) on i
+i1 ~900 KB dense bearer lines                CPU min base  0.708s target  9.120s ratio 12.89 | wall min base  0.553s target  8.903s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.797s target  3.214s ratio  4.03 | wall min base  0.674s target  2.841s | rc [('A', 0), ('B', 0)] live=(True, True)
+-- vx_interleave (substituted copy judged right after each segment) on h
+h1 150 ref-bearing segments, all allowed     CPU min base  0.997s target  2.345s ratio  2.35 | wall min base  0.995s target  2.336s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  0.995s target  2.310s ratio  2.32 | wall min base  0.996s target  2.329s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_vx_pass)
+-- ext_first (extension before the built-ins) on f / h
+h1 150 ref-bearing segments, all allowed     CPU min base  0.997s target  2.266s ratio  2.27 | wall min base  1.002s target  2.262s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.004s target  1.245s ratio  1.24 | wall min base  1.007s target  1.241s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_ext_pass)
+f  200 entries, Bash benign                  CPU min base  0.049s target  0.074s ratio  1.51 | wall min base  0.047s target  0.065s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.047s target  0.079s ratio  1.67 | wall min base  0.045s target  0.066s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+== done 12:48:12 load=2.29 3.18 9.67
+
+################ repeat of tier g (8 assignments x 300 bytes, 40 references), three more runs of 5 pairs (one of the first batch showed a slow baseline minimum 0.881 s) ################
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base 0.621s target 0.871s ratio 1.40
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base 0.619s target 0.881s ratio 1.42
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base 0.616s target 0.881s ratio 1.43
+
+################ earlier runs of the same tiers (load 1.0-2.6 at the start; kept for the spread) ################
+== good1 (good) pairs=5 load=1.02 5.20 8.02 10:41:56
+f  200 entries, Bash benign                  CPU min base  0.050s target  0.075s ratio  1.48 | wall min base  0.048s target  0.065s | rc [('A', 0), ('B', 0)]
+f  200 entries, Read benign                  CPU min base  0.042s target  0.080s ratio  1.91 | wall min base  0.040s target  0.067s | rc [('A', 0), ('B', 0)]
+f0 no extension, Bash benign                 CPU min base  0.050s target  0.058s ratio  1.16 | wall min base  0.048s target  0.054s | rc [('A', 0), ('B', 0)]
+f0 no extension, Read benign                 CPU min base  0.042s target  0.049s ratio  1.16 | wall min base  0.040s target  0.045s | rc [('A', 0), ('B', 0)]
+i1 ~900 KB dense bearer lines                CPU min base  0.630s target  0.828s ratio  1.31 | wall min base  0.499s target  0.654s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.742s target  0.860s ratio  1.16 | wall min base  0.614s target  0.707s | rc [('A', 0), ('B', 0)] live=(True, True)
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base  0.620s target  0.882s ratio  1.42 | wall min base  0.620s target  0.879s | rc [('A', 0), ('B', 0)]
+g  4000 B string, 16 assign(len 100), 128 refs CPU min base  0.699s target  1.481s ratio  2.12 | wall min base  0.702s target  1.487s | rc [('A', 0), ('B', 0)]
+h1 150 ref-bearing segments, all allowed     CPU min base  1.003s target  2.414s ratio  2.41 | wall min base  1.006s target  2.411s | rc [('A', 0), ('B', 0)]
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.034s target  1.243s ratio  1.20 | wall min base  1.033s target  1.245s | rc [('A', 2), ('B', 2)]
+== done 10:43:05 load=2.62 4.83 7.69
+== variants var1 pairs=3 load=1.48 4.15 7.29 10:44:02
+-- vx_quadratic (remainder after a hit taken with ${s#*"$pat"}) on g
+g  4000 B string, 8 assign(len 300), 40 refs CPU min base  0.622s target  3.202s ratio  5.14 | wall min base  0.624s target  3.209s | rc [('A', 0), ('B', 0)]
+g  4000 B string, 16 assign(len 100), 128 refs CPU min base  0.707s target  9.361s ratio 13.23 | wall min base  0.710s target  9.439s | rc [('A', 0), ('B', 0)]
+-- ext_perentry (one grep process per extension entry) on f
+f  200 entries, Bash benign                  CPU min base  0.059s target  0.744s ratio 12.64 | wall min base  0.057s target  0.655s | rc [('A', 0), ('B', 0)]
+f  200 entries, Read benign                  CPU min base  0.047s target  0.511s ratio 10.86 | wall min base  0.045s target  0.433s | rc [('A', 0), ('B', 0)]
+-- no_cap (every span iterated) on i
+i1 ~900 KB dense bearer lines                CPU min base  0.659s target  9.162s ratio 13.91 | wall min base  0.527s target  8.996s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.835s target  3.236s ratio  3.87 | wall min base  0.698s target  2.852s | rc [('A', 0), ('B', 0)] live=(True, True)
+-- vx_interleave (substituted copy judged right after each segment) on h
+h1 150 ref-bearing segments, all allowed     CPU min base  1.025s target  2.489s ratio  2.43 | wall min base  1.026s target  2.481s | rc [('A', 0), ('B', 0)]
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.054s target  2.360s ratio  2.24 | wall min base  1.055s target  2.388s | rc [('A', 2), ('B', 2)]
+-- ext_first (extension before the built-ins) on f / h
+h1 150 ref-bearing segments, all allowed     CPU min base  1.024s target  2.474s ratio  2.42 | wall min base  1.029s target  2.484s | rc [('A', 0), ('B', 0)]
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.049s target  1.365s ratio  1.30 | wall min base  1.055s target  1.365s | rc [('A', 2), ('B', 2)]
+f  200 entries, Bash benign                  CPU min base  0.054s target  0.092s ratio  1.72 | wall min base  0.052s target  0.090s | rc [('A', 0), ('B', 0)]
+f  200 entries, Read benign                  CPU min base  0.054s target  0.083s ratio  1.53 | wall min base  0.054s target  0.071s | rc [('A', 0), ('B', 0)]
+== done 10:46:16 load=2.11 3.40 6.58
