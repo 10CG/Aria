@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/Aria#180",
+  "generated_at": "2026-09-30T19:20:56Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 180,
+      "title": "coordination claim 的 collision surface 在 30 分钟后静默失效 — heartbeat() 零生产调用点",
+      "body": "## Bug Report\n\n**描述**: aria Layer L 的 coordination claim 用于防止多会话重复劳动，但它的 advisory collision surface 在 claim 建立 30 分钟后就静默失效。之后任何新会话跑 `phase1_gate` 都会看到「无人占用」，直接开工。长任务（agent team 跑数小时）几乎全程处于无保护状态。\n\n**复现步骤**:\n1. 会话 A 对 track X 跑 `phase1_gate` acquire claim（status=active）\n2. 等待 > 30 分钟（STALE_TTL），期间 A 仍在正常工作\n3. 会话 B 对同一个 track X 跑 `phase1_gate`（advisory 模式）\n\n**预期行为**: B 收到 `outcome=occupied` 或 `surface.kind=\"occupied\"`，提示 A 已认领该 track。\n\n**实际行为**: B 得到 `outcome=passed` / `competing_winner=null` / `surface=null`，毫无告警地成为新 winner。\n\n**根因**:\n\n1. `lib/claim_lifecycle.py:178` 的 `heartbeat()` 实现正确，但**全插件零生产调用点**（grep 排除 `tests/` 后只剩注释与 docstring）。所以每个 claim 的 `heartbeat_at` 永久冻结在 acquire 时刻。\n2. `reconcile()` 的 `_is_stale()` 用 `STALE_TTL = 1800`（30 分钟）判定，于是任何存活超过 30 分钟的 claim 都被判为 stale → Rule 6 stale-takeover → 不计入竞争者。\n3. `lib/constants.py:40-50` 显示维护者**已经意识到这个问题**，并为此把 `SWEEP_TTL` 从 30 分钟提到 24 小时（避免 durable abandon 误伤）。但 `STALE_TTL` 没有同步缓解，而 advisory collision 判定用的正是它 —— **durable 层打了补丁，advisory 层没打，而防重复劳动靠的恰恰是 advisory 层**。\n4. 接 heartbeat loop 有个额外障碍（`claim_lifecycle.py:196-205` docstring）：`heartbeat()` 必须收到 `acquire_claim()` 时的同一个 Identity 实例，因为 `get_identity()` 每次生成新 session_id。调用方需要跨调用持有 Identity。\n\n**真实后果**（2026-08-09 SilkNode 实际发生，非构造）:\n\n两个会话对同一个 spec `customer-data-controls-cache-transparency` 的同三个任务（T14/T15/T16）做了完整的重复实现：\n\n| | 会话 A (aria-runner-bot/023236f2) | 会话 B (simonfish/bfe8285d) |\n|---|---|---|\n| claim | 3 个 active，还 link 了 issue | **无**（B 未跑 B.0） |\n| 产出 | 3 个 PR，5+20+42 文件 | 1 个 PR，74 文件 |\n| T16 迁移 | `20260808000000_training_annotation_backfill`（已合入 main） | `20260808210000_backfill_trains_on_data` |\n| T15 迁移 | `20260809000000_account_level_data_controls` | `20260808211000_account_level_data_controls` |\n\n同一个 schema 变更产生两套迁移目录、两套实现，另有 3 个文件双向冲突。\n\n关键点：**即使 B 当初正确跑了 B.0 claim，也不会收到任何告警** —— A 最早那个 claim（08-08 03:21）到 B 开工（08-09 03:14）时已 stale 24 小时。我们事后补跑 `phase1_gate` 实测复现了这一点：3 个 active claim 在场，仍返回 `surface=null`。\n\n**建议修法**（按成本递增）:\n\n- **(a)** 把 `reconcile()` 的 takeover 判定改用 `SWEEP_TTL`，或引入独立的 `COLLISION_TTL`（与 SWEEP_TTL 同量级）。只改一个常量，与既有「SWEEP_TTL 已放宽」的处置一致，且不影响 durable abandon 语义。\n- **(b)** 真正接上 heartbeat loop（根治）。需先解决 Identity 跨调用持有的问题。\n- **(c)** 在 collision surface 里对 stale claim 单独降级提示（例如「该 track 有 3 个已 stale 的 claim，可能有会话仍在进行」），而不是完全静默。\n\n个人倾向 (a) 作为立即缓解 —— 现状是「有机制但对主要使用场景不生效」，而 (a) 只需一行常量改动就能恢复它的保护力。\n\n## 环境信息\n- Aria Plugin: 1.65.5（1.63.0 亦同，两版常量与调用点完全一致）\n- Skills: 42\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n\n---\n*由 aria-report 自动生成*\n",
+      "state": "open",
+      "labels": [],
+      "comments": [],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/180",
+      "created_at": "2026-08-09T15:39:47Z",
+      "updated_at": "2026-08-29T18:03:32Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.65.5（1.63.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "lib/claim_lifecycle.py",
+          "line": 178,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/constants.py",
+          "line": 40,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "claim_lifecycle.py",
+          "line": 196,
+          "format": "prose_l",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "issue 复现步骤 1-3, 真 CLI (实验目录: 真仓 aria/ 副本 @ 268da8f, 临时 git 仓 + 本地 bare origin, 独立 HOME, 未触碰真仓): 会话 A (容器 cA) 对 track X 认领, claim 的 heartbeat_at 停在 35 分钟前, 之后无任何心跳; 会话 B (另一容器) 跑 `python3 aria/skills/state-scanner/scripts/phase1_gate.py --raw-track-id customer-data-controls-cache-transparency --phase B --mode advisory --repo-path <repo> --no-push`",
+        "expected_behavior": "issue 预期: B 收到 outcome=occupied 或 surface.kind=\"occupied\", 提示 A 已认领该 track",
+        "actual_behavior": "rc=0, outcome=passed, proceed=true, competing_winner=null, surface=null, error=null —— 与 issue『实际行为』(outcome=passed / competing_winner=null / surface=null) 逐字一致。对照组 (A 闲置 5 分钟) 同命令: outcome=advisory_proceed, surface.kind=occupied ('alice/cA 5.1m ago 已认领 customer-data-controls-cache-transparency')",
+        "match": true
+      },
+      {
+        "case_id": "case-2",
+        "input": "同 case-1 但走 library 调用 run_gate(mode=advisory, no_push=True), 扫描 A 的闲置时长 1 / 10 / 29 / 31 / 120 / 1439 / 1500 分钟 (A 只在 acquire 时写过 heartbeat_at); 脚本 /tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/dup180-107/repro_180_107.py 的 case-1@NNmin",
+        "expected_behavior": "issue 预期: 任意闲置时长下 B 都收到 occupied surface (A 仍在正常工作)",
+        "actual_behavior": "1 / 10 / 29 分钟: outcome=advisory_proceed + surface.kind=occupied; 31 / 120 / 1439 / 1500 分钟: outcome=passed, competing_winner=null, surface=null (reconcile Rule 6 把 A 判为 stale-takeover-eligible, 闸门走 7d 直接放行); 分界恰在 STALE_TTL=1800s (reconcile.py:163 `age_seconds > STALE_TTL`), 1500 分钟时 A 已超 SWEEP_TTL 仍是 active",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "对照 (生产心跳路径): A 的 claim 闲置 120 分钟后, 同容器的另一个全新 session 经真 CLI `phase1_gate.py --heartbeat-only --raw-track-id <X> --phase A.1 --repo-path <repo> --no-push` 刷新; 随后 B (另一容器) 跑 advisory 闸门",
+        "expected_behavior": "issue 根因 1: heartbeat 零生产调用点, 无人能刷新 ⇒ B 仍然静默",
+        "actual_behavior": "CLI rc=0, mode=heartbeat-only, outcome=refreshed, claim 数仍为 1, A 的心跳年龄 120 → 0 分钟; 随后 B: outcome=advisory_proceed, surface.kind=occupied ('t/9ef7041b 0.0m ago 已认领 customer-data-controls-cache-transparency') —— 刷新路径有效, 该子缺陷已修",
+        "match": false
+      },
+      {
+        "case_id": "case-4",
+        "input": "接 case-3: 上述刷新之后 31 分钟、期间没有再次 `/state-scanner` 入口 (心跳是入口钩子不是定时器), B 再跑 advisory 闸门",
+        "expected_behavior": "issue 诉求: 长任务 (agent team 跑数小时) 期间 collision surface 持续有效",
+        "actual_behavior": "outcome=passed, competing_winner=null, surface=null (A 心跳年龄 31.0 分钟 > STALE_TTL) —— 保护只延续到下一次入口刷新为止, 之后静默复现",
+        "match": true
+      },
+      {
+        "case_id": "case-5",
+        "input": "根因 4: 容器 cC3 的一条 26 小时前的 active claim, 由同容器『全新 session_id』分别调 `heartbeat(track, identity=<fresh>)` 与 `heartbeat_by_track(track, identity=<fresh>)`",
+        "expected_behavior": "issue 根因 4: heartbeat() 必须拿到 acquire 时的同一个 Identity 实例, 新 session 刷不动 ⇒ 接 heartbeat loop 有额外障碍",
+        "actual_behavior": "heartbeat(): success=false, error=claim_not_found (旧函数行为未变, 仍无生产调用方); heartbeat_by_track(): success=true, claim 数仍为 1, 心跳年龄 1560 → 0 分钟 —— 该障碍已被 by-track 变体绕开 (lib/claim_lifecycle.py:475-579, docstring :515-516『the session_id is irrelevant here』)",
+        "match": false
+      },
+      {
+        "case_id": "case-6",
+        "input": "静态核对根因 1: `git grep 'heartbeat(\\|heartbeat_by_track(' <rev> -- 'skills/*' ':!skills/*/tests/*' ':!skills/*/docs/*' ':!skills/*/references/*' ':!skills/*/SKILL.md'` 于 af87cae (v1.65.5, issue 所报版本) 与 268da8f (HEAD, v1.74.1)",
+        "expected_behavior": "issue 根因 1: 全插件零生产调用点 (排除 tests/ 后只剩注释与 docstring)",
+        "actual_behavior": "af87cae: 只有 def (claim_lifecycle.py:178) 与注释/docstring, 零调用 (issue 所述属实); 268da8f: 多出 1 处真实调用 scripts/phase1_gate.py:1160 `heartbeat_by_track(raw_track_id, repo_path=repo, now=ts)` (--heartbeat-only 生产路径, v1.71.0); heartbeat() 本身 (claim_lifecycle.py:179) 仍零调用",
+        "match": false
+      },
+      {
+        "case_id": "case-7",
+        "input": "静态核对修法 (c): 读 scripts/phase1_gate.py 7d 分支 (:791-793) 与 AdvisorySurface.kind 取值 (:187-191); 并检查 case-1 的 CLI 输出键集 (outcome / proceed / track_id / error / own_claim / competing_winner / surface / push_*)",
+        "expected_behavior": "issue 建议 (c): 对 stale claim 单独降级提示 (如『该 track 有 N 个已 stale 的 claim, 可能有会话仍在进行』), 而不是完全静默",
+        "actual_behavior": "7d 注释仍为『No prompt needed: stale / terminal tracks are safe to acquire.』; AdvisorySurface.kind 只有 occupied / clock_skew / push_failed 三种; CLI 输出里没有任何 stale 相关字段或文案 (case-1 的 31 分钟以上各档 surface=null) —— (c) 未实现",
+        "match": true
+      },
+      {
+        "case_id": "case-8",
+        "input": "缓解通道核对 (issue 未提, 用来判断『同类事故今天还会不会发生』): 两容器用 A.1 形态 track-id (`<spec-slug>-<container_uuid>`, 容器段不同) 并带同一 `--linked-issue` (实验占位值, 非真实 issue); A 的 active claim 闲置 48 小时; B 经真 CLI `phase1_gate.py --raw-track-id <slug>-<uuid> --phase A.1 --linked-issue <占位值> --mode advisory --no-push`",
+        "expected_behavior": "issue 关切: B 被告知『A 已在做同一件事』",
+        "actual_behavior": "outcome=passed, surface=null, competing_winner=null (同名通道静默), 但 linked_issue_overlap=[A 的 48h-stale active claim] —— freshness-immune 的 overlap 通道命中 (lib/collision.py:365-440 的 linked_issue_overlaps 不做心跳新鲜度过滤)",
+        "match": false
+      },
+      {
+        "case_id": "case-9",
+        "input": "case-8 的对偶: A 与 B 用**同一个** track-id (无容器段, 如 Phase B 按 carry-id 认领或旧形态), 同一 `--linked-issue`; A 闲置 48 小时 vs 对照组 A 闲置约 5 分钟",
+        "expected_behavior": "issue 预期: B 收到 occupied",
+        "actual_behavior": "A 闲置 48h: outcome=passed, competing_winner=null, surface=null, linked_issue_overlap=[] (同 track-id 被 overlap 通道显式排除, lib/collision.py:426-427『same-name collision — reconcile's job』, 而 reconcile 已判 stale) —— 双通道皆静默; 对照组 5 分钟: outcome=advisory_proceed + surface.kind=occupied。即 issue 所述缺陷在『同名 track-id』路径上仍完整存在",
+        "match": true
+      }
+    ],
+    "hit_count": 5,
+    "total_count": 9,
+    "hit_rate": "5/9"
+  },
+  "verdict": "partial-repro",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": "原 triage 判 duplicate-of-#107 (10CG/aria-plugin#107), 对抗核验推翻: 两单同根因但范围不同, 10CG/aria-plugin#107 只跟踪心跳挂载点, 本单是症状总单 (对方心跳停摆超过 30 分钟后同名通道的 advisory 碰撞面静默, 以及修法 (a) / (c)); 症状在 aria-plugin v1.74.1 仍复现, 但「heartbeat 零生产调用」这一前提已由 v1.71.0 的 heartbeat_by_track 部分修复, 故取 partial-repro; 详见 10CG/Aria#180 评论 27460",
+  "errors": []
+}
