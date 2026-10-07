@@ -1,6 +1,6 @@
 # WP-A Phase A 进度 (会话中途记录, 供中断后续接)
 
-> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-07 (owner 裁定接受当前结论; v6 定点修补已落盘, 待非作者核验)。
+> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-07 19:5x UTC (**owner 叫停**: 投入产出失衡; v6 已落盘 `596102f`, 非作者核验被停, A.2 / post_planning 未开始; 方向待 owner 定, 见 `docs/handoff/2026-10-07-session-close-wpa-phase-a-stopped-by-owner.md`)。
 
 ## 目标 (owner 2026-09-30 指令)
 
