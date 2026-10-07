@@ -1,6 +1,6 @@
 # WP-A Phase A 进度 (会话中途记录, 供中断后续接)
 
-> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-07 (R4 完成, v5 返修中)。
+> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-07 (R5 完成, 未收敛, 待 owner 降级裁定)。
 
 ## 目标 (owner 2026-09-30 指令)
 
@@ -12,14 +12,14 @@
 ## 已完成
 
 - 冲突确认 (2026-09-30 与 2026-10-06 各一次): 四仓 master 两端未变、双子星无新分支 / 提交, 10CG/Aria#199 计划不改 hooks 文件 (只断言 `aria/hooks/hooks.json` 不含 `completeness_gate` 字面)。
-- A.1 认领: `secret-net-l3-and-bypass-paths-023236f2` (协调 ref `claims/023236f2/s-3e77@1757.yaml`), 心跳最近 2026-10-06T10:02:46Z。
+- A.1 认领: `secret-net-l3-and-bypass-paths-023236f2` (协调 ref `claims/023236f2/s-3e77@1757.yaml`), 心跳最近 2026-10-07T10:24:05Z (origin `ls-remote` 核验一致)。
 - issue 卫生清扫: 六单 triage + 对抗核验 + 改稿 + 发布 (评论 27446 / 27450 / 27451 / 27460 / 27468 / 27471), 只关闭 10CG/aria-plugin#194; 留痕在分支 `docs/issue-hygiene-2026-09-30`, PR 10CG/Aria#228 **待 owner 合并**。
-- post_spec R1 (v1 `47aa15f`): 8C/25M/42m → v2 (`b3e3123`) → R2: 1C/15M/34m (定稿 7 簇) → v3 (`c0a6654`) → R3: 0C/12M/23m (去重 10 键) → v4 (`b07f69a`) → R4: 1C/9M/15m (定稿 6 键), 均未收敛。报告与主控记录在 `.aria/audit-reports/post_spec-R{1..4}-*`。Critical 6→1→0→1 (R4 的由 v4 引入), Major (定稿去重) 24→11→10→5。**R4 有 C/M ⇒ 第 5 轮按收敛口径不可能收敛**; 依流程仍跑第 5 轮, 之后 MAX_ROUNDS_EXHAUSTED ⇒ owner 降级裁定。
+- post_spec R1 (v1 `47aa15f`): 8C/25M/42m → v2 (`b3e3123`) → R2: 1C/15M/34m (定稿 7 簇) → v3 (`c0a6654`) → R3: 0C/12M/23m (去重 10 键) → v4 (`b07f69a`) → R4: 1C/9M/15m (定稿 6 键) → v5 (`6efb9b2`) → R5: 0C/7M/14m (去重 6 键, 4 席 REVISE / km PASS), 均未收敛。报告与主控记录在 `.aria/audit-reports/post_spec-R{1..5}-*`。Critical 6→1→0→1→0, Major (定稿去重) 24→11→10→5→6。R4 六簇五席复核全部关闭 (W 有残余); R5 六个 major 键里 v5 引入 2 个、R4 残余 1 个、既有缺口首次发现 3 个。五席一致表态「定点修补后足以进入 A.2」。**`max_rounds` 5 用尽未收敛 ⇒ MAX_ROUNDS_EXHAUSTED, 待 owner 降级裁定**。
 
 ## 进行中 / 下一步
 
-1. v5 返修 (2026-10-07 派出, 交付到会话 scratchpad `exp/writer-v5/deliver/` + `MANIFEST.sha256`; `max_rounds` 内最后一次返修)。
-2. 主控核验 v5 (母本校验、新副本上带 / 不带 `WPA_BASH32` 复跑探针、机械检查) → 提交 → post_spec R5 → 未收敛则按 audit-engine 降级策略问 owner (三选一 + 换执笔人 / 缩小被审对象) (派单模板 `dispatch/post_spec-seat-template-r2.md`, 生成器 `tooling/gen_dispatch.py` + `dispatch/mk_round_cfg.py`, 聚合 `tooling/aggregate.py`)。
+1. **owner 降级裁定** (audit-engine 三选一: 接受当前结论 / 增加轮次 / 降级为单轮, 另加「缩小被审对象」; 同时问簇 X 失败调用盲区的处置方向)。选项与代价见 R5 聚合报告「主控记录」末节。
+2. 按裁定执行: 定点修补 (新执笔实例) / 加轮 (派单模板 `dispatch/post_spec-seat-template-r2.md`, 生成器 `tooling/gen_dispatch.py` + `dispatch/mk_round_cfg.py`, 聚合 `tooling/aggregate.py`) / 缩小范围。
 3. 收敛判据 (本仓先例口径): 相邻两轮 Critical+Major 键集相等且全票 PASS —— 实际等于连续两轮零 C/M。`max_rounds` 5; 用尽未收敛 ⇒ audit-engine 降级策略三选一由 owner 裁。
 4. post_spec 收敛后: task-planner (Level 2 走路径 B, 只出 `detailed-tasks.yaml`) → post_planning 收敛审计。
 5. 会话收尾: Rule #9 handoff (`docs/handoff/`, follower 只 prepend `latest.md` History 与 track 表, 不改 bare pointer)。
