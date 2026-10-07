@@ -1,9 +1,9 @@
 ---
 track-id: session-close-20261007-wpa-phase-a-stopped-by-owner
 owner-container: simonfish/023236f2
-phase: A.1
+phase: A.3
 status: active
-updated-at: 2026-10-07T19:50:00Z
+updated-at: 2026-10-07T20:40:00Z
 ---
 
 # Aria — Session Handoff (2026-09-30 ~ 2026-10-07) — WP-A Phase A 被 owner 叫停 (投入产出失衡) + issue 卫生清扫完成
@@ -167,3 +167,23 @@ updated-at: 2026-10-07T19:50:00Z
 - 新增 `feedback_shared_host_cpu_throttle_experiments`: 宿主机共享, 重实验先降压 (nice 19、2 核), 派单写资源纪律, 审计并发不超过 2。
 - 更新 `feedback_no_ruling_shortens_the_distance_signal`: 第二次实证 (本次) 与三条新根因、追加做法 (每轮报成本、Major 两轮不降即上报、选项含「实现优先」)。
 - 索引压缩: `reference_statusline_stdin_context_telemetry` 移入 `MEMORY-archive.md`。
+
+## 追记 (2026-10-07 20:xx UTC): owner 重新确认待决事项后的裁定与执行
+
+裁定全文见 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`, 均经 AskUserQuestion 作答。
+
+| 事项 | 裁定 | 执行结果 |
+|---|---|---|
+| §2 H1 WP-A 方向 | 实现优先 | Spec Status 改为 Approved; `detailed-tasks.yaml` 精简版 (14 条任务, 35 条 SC 全覆盖, 依赖无环); 下一步 TASK-001 (B.1) |
+| 本 Spec 的 `post_planning` | 跳过 (`overridden_by_user`), 只对本 Spec 生效 | 记在 `detailed-tasks.yaml` 的 `metadata.a2_entry`; 全局 config 未改 |
+| Tasks 1.2 | 探针作验收 + 关键子集 (每个 W 至少一组) | Spec Tasks 1.2 已改写 |
+| §2 H2 GitHub 分支 | 删除 | 已删除, `ls-remote github` 查无; origin 保留完整历史。研究笔记的前向去量化 (7.20) 仍待裁, 合并 master 前必须定 |
+| §2 H3 PR `10CG/Aria#228` | 授权合并 | C.2.4 green (not_applicable: 变更路径无 CI workflow 覆盖, main 上无进行中的运行); C.2.4.5 PASS; 合并提交 `6675291`, 已同步 GitHub, 两端一致 |
+| §2 M1 机制 issue | 开, 看稿后按稿发布 | `10CG/aria-plugin#209` |
+
+**更新后的 carry-forward**:
+
+1. `{id: wpa-impl-task-001, desc: "按 detailed-tasks.yaml 从 TASK-001 (B.1) 开始实现; 每条任务向 owner 报成本"}`
+2. `{id: wpa-public-mirror-7-20, desc: "研究笔记前向去量化 (7.20) 待 owner 裁; 本分支合并 master 前必须定"}`
+3. `{id: wpa-claim-heartbeat, desc: "认领 secret-net-l3-and-bypass-paths-023236f2 进入 B 时以 phase1_gate --phase B 刷新"}`
+

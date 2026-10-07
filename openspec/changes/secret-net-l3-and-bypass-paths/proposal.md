@@ -1,7 +1,7 @@
 # Secret 防护网补洞: L3 读取失明与键形缺口 + L1 服务端配置 / 变量间接 / 进程表旁路
 
 > **Level**: Minimal (Level 2 Spec)
-> **Status**: Draft — post_spec 定点修补中
+> **Status**: Approved — owner 2026-10-07 裁定 (post_spec 接受当前结论; 实现优先, 本 Spec 跳过 post_planning)
 > **Created**: 2026-09-30
 > **Linked Issue**: `10CG/aria-plugin#154, 10CG/aria-plugin#203, 10CG/Aria#221`
 > **认领**: track `secret-net-l3-and-bypass-paths-023236f2` @ simonfish/023236f2 (session `s-3e77@1757`), phase1_gate A.1 advisory, 2026-09-30T17:57:13Z, `linked_issue_overlap == []`。`--linked-issue` 只接受单值, 认领传的是 `10CG/aria-plugin#154`; 另两张对其它容器的碰撞检测不可见, 以本头部与决策单声明
@@ -369,12 +369,12 @@ AI 自作主张、待 owner 复议: 块 B 判第 1 行而非第 3 行 —— 若
     判据 (第 2、3 步): 末行恰为 `rc=0,1` 且其前无任何输出 = 通过; 末行 `rc=0,0` 或其前有输出 = 违规; 其它 `rc=` 值 (如 `rc=128,1`) = 没跑成, 停下上报, 不得当作通过。三态 (干净 / 违规 / 跑坏: 错起点、空起点、非仓路径、空文本) 在临时仓里的实跑, 以及只看 grep 退出码的写法会真空通过的对照, 见 `writer-v6-proto/refs_check.py`。
 - **覆盖关系**: 10CG/aria-plugin#154 全覆盖 (三处有意偏离见上; 另含 Read 提取修复与头部 / 参数形); 10CG/aria-plugin#203 部分覆盖 (第 1 类服务端配置: `app.ini` 族 + 扩展入口; 第 2 类变量间接: 部分修复 + KNOWN-LIMIT, 输出侧由 L3 兜底, 成功与失败的调用都经 L3); 10CG/Aria#221 部分覆盖 (进程表列举已做; 两处误拦的 `os.environ` 单键读取与 `keys_unsorted` / `map_values(length)` 已做, `map(.name)` 与 `process.env` 不做; 「拒绝文案加一句」改落 SOT)。
 
-## Tasks (A.2 骨架; 细粒度由 task-planner 产 `detailed-tasks.yaml`, 经 post_planning 审计)
+## Tasks (A.2 骨架; 细粒度见 `detailed-tasks.yaml`。owner 2026-10-07 裁定本 Spec 跳过 post_planning, 见 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)
 
 > **贯穿全部任务**: 提交页脚 / PR 描述对三张 issue 只写 `Refs`, 不写 `Closes` / `Fixes` / `Resolves` (Impact「提交页脚 / PR 描述的关键字」), 每次推送前跑一次其机械检查。
 
 - [ ] 1.1 B.1 入场: 重取行号 (对 `268da8f` 核差异); 在带 git 历史的真 checkout 实跑 `secret-guard.test.sh` 记录 SC-30 基线 (含测试内 SC-8 五档, 同时记下 loadavg: 负载高时基线自己的 (e) 档就可能越过天花板, 须在空闲主机复跑); **取得真 bash 3.2** (从 `ftp.gnu.org` 源码构建 bash 3.2 + 官方补丁 001–057, 需要 bison; 配方见 `baseline-evidence.md`) 并记下路径作 `WPA_BASH32` (取不到 —— 无网络或无编译器 —— 则按 Rule #10 上报 owner, 不得以静态检查代之); **准备第二个 locale** (SC-32 32d 的 `WPA_LOCALE_B`, 默认 `en_US.UTF-8`: `locale -a` 列出即可; 32e 用 `LC_ALL=C`, 无需准备; 没有则探针用 `localedef -i en_US -f UTF-8 <私有目录>/en_US.utf8` 构造一次并设私有 `LOCPATH`, 需要 `/usr/share/i18n/locales/en_US` 源文件, 即 `locales` 包; 构造不了则 32d 为 `n/a`, 按 Rule #10 上报 owner, 不得省略该行); **探针须由非 root 用户运行** (SC-20 20g 在 root 下不可构造; aria-runner 容器默认 root, 须先降权, 如 `setpriv --reuid=<uid> --regid=<gid> --clear-groups …`; 降不了权同样上报, 不得把 20g 的 `n/a` 当通过); 复跑 `baseline_probe.py` (带 `WPA_BASH32`), 输出与 `baseline-evidence.md` 逐字节一致
-- [ ] 1.2 测试先行: 按 SC 把探针用例落为两个套件的用例 (运行时拼装), 先在基线上跑出「baseline-failing 全红、守卫全绿」
+- [ ] 1.2 测试先行 (范围按 owner 2026-10-07 裁定收窄): 探针 `baseline_probe.py` 作为验收工具 (Tasks 1.10); 两个套件只移植回归关键子集 —— 每个 W 至少一组, 优先取 baseline-failing 行 (运行时拼装), 先在基线上跑出「baseline-failing 全红、守卫全绿」
 - [ ] 1.3 W1 提取 + W6 套件隔离 HOME + W7 既有夹具拼装 (`secret-scan.test.sh`)
 - [ ] 1.4 W2 + W3 + W4 + W5 (`secret-scan.sh`; 分类路径零 fork, 正则放进变量)
 - [ ] 1.5 W8 + W11 (新行、tight 并入、`/proc` 放宽; 内联成字面行以过 SC-31 31c)
