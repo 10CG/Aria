@@ -4,7 +4,7 @@ mode: convergence
 rounds: 5
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 drift_terminated: false
 drift_check_skipped: true
@@ -146,3 +146,67 @@ R1-R4 已用过 A-W 各字母, 本轮新簇从 X 起编; 沿用 R4 的键 (`755a
 - 每轮五席审计 2.1-2.5 h (R1-R5 实测)。
 
 簇 X 的处置方向 (本 Spec 内补齐失败事件注册, 或列为已知限制) 涉及保护边界, 同时呈 owner。裁定结果在本节之后追加。
+
+### owner 裁定 (2026-10-07, 经 AskUserQuestion)
+
+1. **降级策略**: 选「接受当前结论 + 定点修补」(audit-engine 选项 1)。本检查点记 `converged: false` / `overridden_by_user: true` (frontmatter 已同步)。执行方式:
+   - 新执笔实例按下列裁定定点修补 (v6), 不动设计;
+   - 再派 1 个非作者席只核修补处及其与未改文字的接缝, 不算第 6 轮;
+   - 然后进入 A.2;
+   - `post_planning` 五席收敛审计照开 (配置未改)。
+2. **簇 X**: 选「本 Spec 内补齐」—— secret-scan 增加 `PostToolUseFailure` 注册并读取 `error` 字段, 补行并加 post-ship 腿。这是本次定点修补里唯一由 owner 批准的范围扩大。
+
+### 主控裁定 (v6 定点修补据此执行; 技术级, 列入 handoff 请 owner 复议)
+
+1. **簇 X**:
+   - 注册: `hooks.json` 给 secret-scan 加一条 `PostToolUseFailure` 注册, matcher 与现有 `PostToolUse` 条目相同。
+   - 扫描: 失败信封的 `error` 文本与成功信封走同一条「提取 → 分类 → 告警」路径; 成功路径的任何既有检出不得减少。
+   - 输出: 输出 JSON 里与事件名相关的字段 (如 `hookSpecificOutput.hookEventName`) 必须与实际触发的事件一致, 以 2.1.285 二进制 schema 为准核实。
+   - 补行:
+     - 一条 baseline-failing 行: 失败信封里带凭据行, 基线静默、目标告警;
+     - 一条结构行: `hooks.json` 只多这一条注册, 且全文不出现 `completeness_gate` 字面 (10CG/Aria#199 的守卫);
+     - 一条 post-ship 惰性腿: 打印合成值后非零退出。
+   - 同步改写: SC-3、W1 已知限制、W8 / W10 / W11 中「交给 L3」的各处、Impact、rule6_note (`hooks.json` 不再零改动)、Out of scope、7.x。
+   - 披露: 失败事件上 additionalContext 能否端到端送达, 写为「post-ship 验证」, 并在关单评论里写明。
+2. **簇 W**:
+   - 规则: 取值代码里的任何 `#` / `##` / `%` / `%%` 删除, 都必须在常数次尝试内命中 (分隔符必然存在且位置靠前)。可能不命中的单字符剥离 (引号、空白) 改用 `${V:0:1}` 判断后切片, 或用 `[[ =~ ]]`。
+   - W4 表 kv 行补一句实现注意。
+   - 34b 与 (i3) 补「长且不带引号的 kv 值」成员, 覆盖三形: `KEY = v`、`export KEY=v`、YAML `  KEY: v`。
+   - 原型与 Spec 里所有同形的删除写法一并按此规则检查 (修类不修例)。
+3. **簇 Y**:
+   - W14「其它耦合」加一条: SC-8 / SC-9a 的抽取装配要求 `_sg_judge_one` 与 `_sg_per_segment_eval` 直接或间接调用的全部函数 (含 `_sg_core_eval`) 都定义在 source 闸门之上。
+   - SC-8 的抽取方式、阈值、口径、档位一律不改 (owner 2026-08-24 决策, Rule #10)。
+   - 探针加一条 reverse-guard 行, 复刻 SC-8 的装配: 必拦命令 rc=2、良性命令 rc=0, 不得是 127。
+   - 在带 `af87cae` 历史的副本上, 对基线与原型各实跑一次既有套件的 SC-8 / SC-9a, 结果写进返修报告。
+   - 「两个套件在原型上全部照过」一类陈述写明运行条件。
+4. **簇 Z**:
+   - `:196`: 改为准确的基线覆盖面, 引 `secret-guard.sh:858` / `:862-863` / `:938` / `:940`; 写明新的转储备选覆盖全部包裹, 含这四个。
+   - `:291`: 删去「等价变异」论证。
+   - 22bo 或新行: 四个基线包裹各放一个基线不拦的写法 (引号形、`$(…)`、重定向、无 `--` 的 lxc); 原来的基线写法改作 reverse-guard。
+   - **包裹下的 `printenv <NAME>`**: 与直接执行面保持一致。依据:
+     - 基线 `:867` 对命令位置的 `printenv <NAME>` 是拦的;
+     - 10CG/Aria#221 评论 25898 列的正当核对只有「读长度、读 env 变量名」。
+   - 因此包裹下同样拦。`:196` 的「只拦裸」改为准确表述: `env` 只拦裸, `printenv` 与基线一致, 带参也拦。用一行钉住并在 Impact 申报; 「放行」作为备选写进待 owner 复议, 附 ack 疲劳的论证。
+   - 订正原型汇总里四个包裹的等价论证。
+5. **簇 AA**:
+   - W11 把语义写进正文:
+     - 任意位置含 `a` 的短横簇, 以及任意操作数位置;
+     - 列表任一位置;
+     - `--no-trunc` 出现在 `ps` / `ls` 之后的任一位置;
+     - 时长后缀 `s` `m` `h` `d`;
+     - 命令位置字符集逐成员列出。
+   - SC-22 增加三个 baseline-failing 枚举行 (每个成员一次独立运行), 覆盖 qa/M1 列出的成员。
+   - Tasks 1.8 的缺项类清单加四类窄化: 命令位置字符集缺成员、簇内字母只认首位、列表关键字只认末位、操作数只认首个。
+6. **簇 AB**: 加 19an / 19ao / 19ap 三行。W9 格式段补一句: 末行无换行同样算一行; 对清单与项目根路径的所有展开一律加引号。
+7. **minor 与席位的非 finding 建议**: 13 件 minor 逐条处置。另把下列建议作为定点勘误一并处理:
+   - (f) 档判据改为纯比值上界或增量上界 (tl);
+   - 探针在验收模式 (`WPA_REQUIRE_ALL=1`) 下, 目标形态不成立时非零退出; 单行超时只记该行失败, 不让整个探针崩溃 (qa 风险 2 / 3、km/m3);
+   - 写明 `_sg_core_eval` 在调用方 locale 下运行 (tl 风险 4);
+   - Tasks 1.13 写明归档门对 rule6_note dogfood 声称的处置; 若归档会自动开 issue, 须先经 owner 授权 (cr 风险 2);
+   - 17d 补 `expand` / `unexpand` / `shuf` / `split` / `csplit` (qa 风险 7);
+   - NUL post-ship 腿加为 Tasks 1.12 的第 5 腿, 不作关单门 (ba/m2, 另三席同意)。
+8. **方针**: 这是定点修补, 不是新一轮返修。
+   - 只改上面点名的位置及其同族兄弟位置; 不重写未点名的段落, 不新增机制 (簇 X 是唯一例外)。
+   - 每处修改都配一个会转红的坏实现; 基线形态必须 holds。
+   - Spec 净增长尽量小。
+   - 留给 owner、执笔不处理: 研究笔记的前向去量化 (属 7.20 的产品级披露决定, km 风险 1); 「删除 W5」选项 (km 风险 2)。
