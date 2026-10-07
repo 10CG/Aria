@@ -6,11 +6,11 @@
 
 - 基线: aria `268da8f39d8bc33967e7cdaa5681e3a221fb9e4b` (= v1.74.1); standards `2bc1c4c619c5125a1bb2963864c1683fd9a87739`; 主仓 `0748dbc` (起草时)。
 - 被测文件指纹见输出第 2–6 行 (sha256 前 16 位): `hooks/secret-guard.sh` `448b1f71a2af06d7`、`hooks/secret-scan.sh` `c5f53f7a164fa72e`、`hooks/tests/secret-guard.test.sh` `72f8e7d5d58a4b80`、`hooks/tests/secret-scan.test.sh` `78e0e4ca15078177`、`standards/conventions/secret-hygiene.md` `dcf203f1f25ef0c0`。
-- 环境: Linux 6.17.9-1-pve, Python 3.11.2, GNU bash 5.2.15 (默认 bash), jq 1.6, GNU grep 3.8, GNU sed 4.9, perl 5.36.0; 本机无 zsh; `C.UTF-8` locale 可用; 真 GNU bash 3.2.57(2) 见下节。第二个 locale `en_US.UTF-8` (本机 `locale -a` 列出 `en_US.utf8`; SC-32 32d 用)。实跑日期 2026-10-06。
+- 环境: Linux 6.17.9-1-pve, Python 3.11.2, GNU bash 5.2.15 (默认 bash), jq 1.6, GNU grep 3.8, GNU sed 4.9, perl 5.36.0; 本机无 zsh; `C.UTF-8` locale 可用; 真 GNU bash 3.2.57(2) 见下节。第二个 locale `en_US.UTF-8` (本机 `locale -a` 列出 `en_US.utf8`; SC-32 32d 用)。实跑日期 2026-10-07; `awk` 是 mawk 1.3.4 (W9 的条目过滤不用 awk); 默认 bash 与 hook 里的 `grep` / `sed` 都取自 `PATH=/usr/local/bin:/usr/bin:/bin`。
 
 ## 取得真 bash 3.2 (`WPA_BASH32`)
 
-SC-29 29h / 29i 与 SC-32 32c / 32d 需要一个真 bash 3.2 (Debian / Ubuntu 的 `bash` 包是 5.x, macOS 自带的 3.2.57 不可在 Linux 容器里取得)。无 root、可联网时从源码构建, 约 4 分钟:
+SC-29 29h / 29i 与 SC-32 32c / 32d 需要一个真 bash 3.2 (32e 不需要: 它用默认 bash 在 `LC_ALL=C` 下运行; Debian / Ubuntu 的 `bash` 包是 5.x, macOS 自带的 3.2.57 不可在 Linux 容器里取得)。无 root、可联网时从源码构建, 约 4 分钟:
 
 ```bash
 curl -fLO https://ftp.gnu.org/gnu/bash/bash-3.2.tar.gz     # sha256 26c99025b59e30779300b68adb764f824974d267a4d7cc1b347d14a2393f9fb4
@@ -28,15 +28,15 @@ export WPA_BASH32=$PWD/bash                                  # 探针只需要�
 ## 怎么跑
 
 1. 布局: 探针按 `<aria>/../standards` 找 standards, 按自身所在目录找 `proposal.md` 与 `baseline-evidence.md`。本次把 `/home/dev/Aria/aria` 与 `/home/dev/Aria/standards` 用 `cp -a` 复制到实验目录 `<X>/base/` 下并删去两处 `.git` 文件 (子模块 gitfile), 探针、`proposal.md` 与本文件放在同一目录 (即落盘后的 `openspec/changes/secret-net-l3-and-bypass-paths/`)。
-2. 命令 (本输出): `WPA_BASH32=<bash 3.2 路径> TMPDIR=<X>/tmp python3 baseline_probe.py <X>/base/aria`。`TMPDIR` 只决定探针私有临时目录的位置 (结束时删除), 不进输出。不带 `WPA_BASH32` 时 29h / 29i / 32c / 32d 四行打印 `not-run` (match 为 `n/a`), 末尾「rows not run」与两条形态行点名这四行 (基线形态仍是 `holds`, 带 `[4 leg row(s) not run]` 注记; 目标形态在有未运行行时只会是 `not established`); 除这四行与末尾三行外, 输出与本输出逐字节相同。验收模式 `WPA_REQUIRE_ALL=1`: 任何本应运行的行是 `n/a` 即 exit 3 (含: 缺真 bash 3.2、root 下的 20g、缺 `sha256sum` 或 `shasum` 的 12o、第二个 locale 装不上也构造不了的 32d)。第二个 locale 由 `WPA_LOCALE_B` 指定 (默认 `en_US.UTF-8`); 系统没装时探针用 `localedef -i en_US -f UTF-8 <私有目录>/en_US.utf8` 构造一次并设私有 `LOCPATH` (本机实测可行: 构造出的 locale 同样使真 bash 3.2.57 的 `[[ QWERTY == *[a-z]* ]]` 为真)。
-3. 带 `WPA_BASH32` 连跑两次, stdout 逐字节相同 (sha256 前 16 位 `e588f9e8a57ed720`, 86047 字节), stderr 为空; 不带 `WPA_BASH32` 跑一次: sha256 前 16 位 `bd8327a7e971cc4e`, 86021 字节, stderr 为空, 基线形态同样 `holds`。空闲主机上单次约 10–12 分钟 (两个测试套件各在默认 bash 与 3.2 下跑一遍, 占大头; 32c / 32d 各把 hook 直调行再跑两遍; 两个探针运行并发或主机负载高时可到 25 分钟以上)。
+2. 命令 (本输出): `WPA_BASH32=<bash 3.2 路径> TMPDIR=<X>/tmp python3 baseline_probe.py <X>/base/aria`。`TMPDIR` 只决定探针私有临时目录的位置 (结束时删除), 不进输出。不带 `WPA_BASH32` 时 29h / 29i / 32c / 32d 四行打印 `not-run` (match 为 `n/a`), 末尾「rows not run」与两条形态行点名这四行 (基线形态仍是 `holds`, 带 `[4 leg row(s) not run]` 注记; 目标形态在有未运行行时只会是 `not established`); 除这四行与末尾三行外, 输出与本输出逐字节相同 (32e 用默认 bash 在 `LC_ALL=C` 下运行, 两种运行都有它)。验收模式 `WPA_REQUIRE_ALL=1`: 任何本应运行的行是 `n/a` 即 exit 3 (含: 缺真 bash 3.2、root 下的 20g、缺 `sha256sum` 或 `shasum` 的 12o、第二个 locale 装不上也构造不了的 32d)。第二个 locale 由 `WPA_LOCALE_B` 指定 (默认 `en_US.UTF-8`); 系统没装时探针用 `localedef -i en_US -f UTF-8 <私有目录>/en_US.utf8` 构造一次并设私有 `LOCPATH` (本机实测可行: 构造出的 locale 同样使真 bash 3.2.57 的 `[[ QWERTY == *[a-z]* ]]` 为真)。
+3. 带 `WPA_BASH32` 连跑两次, stdout 逐字节相同 (sha256 前 16 位 `526efaa2b5a9d52e`, 97972 字节), stderr 为空; 不带 `WPA_BASH32` 跑一次: sha256 前 16 位 `da4c5c185abea1ec`, 97946 字节, stderr 为空, 基线形态同样 `holds`。单次的耗时随负载变化很大 (两个测试套件各在默认 bash 与 3.2 下跑一遍, 占大头; 32c / 32d / 32e 各把 hook 直调行再跑一到两遍): 本次三个运行并发, 全部跑完约 36 分钟; 主机空闲时单次约 6–10 分钟, 负载高时可到 25 分钟以上。
 4. 比对注意: 若 standards 不在 `<aria>/../standards`, SC-26 / SC-27 / SC-28 中读 standards 的行会打印 `standards-absent`; 若探针旁没有 `proposal.md` 或本文件, SC-15 15e / 15g 打印 `…-absent`。本输出只在复制出的副本上实测过; 对真 checkout 的 `aria/` 跑时, 套件同样在去掉 `.git` 的私有副本里执行。SC-20 20g (不可读文件) 在 root 下不可构造, 本输出由非 root 用户产生。
 
 ## 读法
 
-- 列: SC │ 用例 │ 类别 │ 输入形态 (占位描述) │ 期望 (目标态) │ 实得 │ 符合 (`yes` / `no`; `n/a` = 本探针不执行或在本环境不可构造)。共 411 行 (类别计数见输出末尾)。
+- 列: SC │ 用例 │ 类别 │ 输入形态 (占位描述) │ 期望 (目标态) │ 实得 │ 符合 (`yes` / `no`; `n/a` = 本探针不执行或在本环境不可构造)。共 437 行 (类别计数见输出末尾)。
 - **基线形态**: `baseline-failing` 与 `doc-sync` 行应全部 `no`, 其余类别 (`reverse-guard` / `allow-guard` / `known-limit` / `zero-regression`) 应全部 `yes`; 输出末尾的形态行由探针机算该不变量 —— 本次 `holds`。实现完成后同一探针应输出「target shape … holds」。
-- SC-30 一行不执行 (`n/a`), 理由见 `proposal.md` SC-30。SC-32 32c 一行在基线上比对 361 个 hook-direct 行, 32d 对同一批行在第二个 locale 下再跑默认 bash 与真 bash 3.2 各一遍并逐行比对。
+- SC-30 一行不执行 (`n/a`), 理由见 `proposal.md` SC-30。SC-32 32c 一行在基线上比对 382 个 hook-direct 行, 32d 对同一批行在第二个 locale 下再跑默认 bash 与真 bash 3.2 各一遍并逐行比对。
 - **多用例行** (`l3m` / `l1m` 一类) 是同一类别下若干独立 hook 运行的 AND, `actual` 列逐个列出, 红了仍能指出是哪一个; **枚举行** (`actual` 为 `N/N as expected`, 红了点名前 6 个出错的成员) 是同一类的一个枚举集合, 每个成员一次独立 hook 运行。
 - 确定性措施: 像凭据的值在进程内由 `secrets` 生成, 生成时保证字符类与首字符 / 形态性质 (判定不随随机值变化); hook 的环境变量从零构造 (不继承调用方的 `CLAUDE_PROJECT_DIR` 等); 测试套件在去掉 `.git` 的私有副本里跑、设 `GIT_CEILING_DIRECTORIES`、PATH 中隐去 zsh, 因此 `secret-guard.test.sh` 里依赖 git 历史的测试内 SC-9a / SC-8 与 zsh 用例被跳过 (实得里的 `581/582` 与唯一 FAIL 即此伪影, 见 `proposal.md` SC-29)。
 - Rule #7: 输出只有退出码、是否告警、tag 名与计数, 没有任何值; 输入形态一律用占位描述。
@@ -55,8 +55,11 @@ columns: SC │ case │ category │ input shape (placeholders) │ expected (t
 
 SC-1 │ 1a │ baseline-failing │ Read real envelope file.content: AWS_ACCESS_KEY_ID=<AKIA+16> │ alert m=1 {aws-access-key-id=1} │ silent │ no
 SC-1 │ 1b │ baseline-failing │ Read real envelope file.content: json:client_secret=<32 alnum> │ alert m=1 {json-secret-field=1} │ silent │ no
-SC-1 │ 1c │ baseline-failing │ Read real envelope file.content = a NUL-separated process environment (the /proc/<pid>/environ shape): HOME / PATH / DB_PASSWORD / LANG / JWT_SECRET / API_TOKEN records, NUL after each │ alert m=3 {env-line-secret-keyword=3} │ silent │ no
-SC-1 │ 1d │ baseline-failing │ Bash real envelope stdout = the same NUL-separated records (the `env -0` shape): bash command substitution would drop the NULs and glue the records into one line │ alert m=3 {env-line-secret-keyword=3} │ silent │ no
+SC-1 │ 1c │ baseline-failing │ Read real envelope file.content = a NUL-separated process environment (the /proc/<pid>/environ shape): HOME / PATH / DB_PASSWORD / LANG / JWT_SECRET / API_TOKEN records, NUL after each; the baseline view (NUL dropped) glues the records into one line, the second view (NUL -> newline) restores one record per line: `env-line-secret-keyword=3`; the glued baseline view may add ONE `kv-secret-assign` hit for the last record (the same credential seen twice: counts may be higher, never lower) │ alert m=3 {env-line-secret-keyword=3} (+ optionally kv-secret-assign<=1) │ silent │ no
+SC-1 │ 1d │ baseline-failing │ Bash real envelope stdout = the same NUL-separated records (the `env -0` shape): bash command substitution drops the NULs and glues the records into one line; same expectation as 1c │ alert m=3 {env-line-secret-keyword=3} (+ optionally kv-secret-assign<=1) │ silent │ no
+SC-1 │ 1e │ reverse-guard │ UTF-16LE-shaped text (a NUL after every ASCII character) through the Bash real envelope still scans as the ASCII it spells -- the baseline view drops the NULs: an AWS key line, an env line, a `token <PAT>` line and a JSON client_secret each keep the detection they have at baseline (the NUL view must ADD a view, never replace the baseline one) │ aws-key-line=alert m=1 {aws-access-key-id=1}; env-line=alert m=1 {env-line-secret-keyword=1}; github-pat=alert m=1 {github-pat=1}; json-client-secret=alert m=1 {json-secret-field=1} │ aws-key-line=alert m=1 {aws-access-key-id=1}; env-line=alert m=1 {env-line-secret-keyword=1}; github-pat=alert m=1 {github-pat=1}; json-client-secret=alert m=1 {json-secret-field=1} │ yes
+SC-1 │ 1f │ baseline-failing │ the same four UTF-16LE-shaped texts through the Read real envelope (file.content): the Read result is scanned (1a) and its NUL-shaped text keeps the detection the Bash view has (baseline: Read is not scanned at all) │ aws-key-line=alert m=1 {aws-access-key-id=1}; env-line=alert m=1 {env-line-secret-keyword=1}; github-pat=alert m=1 {github-pat=1}; json-client-secret=alert m=1 {json-secret-field=1} │ aws-key-line=silent; env-line=silent; github-pat=silent; json-client-secret=silent │ no
+SC-1 │ 1g │ reverse-guard │ text that merely MENTIONS the six characters `\u0000` (no NUL byte at all) next to a credential: the second view equals the first, so it is not appended and the count stays 1 (not 2) │ alert m=1 {aws-access-key-id=1} │ alert m=1 {aws-access-key-id=1} │ yes
 SC-2 │ 2a │ reverse-guard │ Read legacy envelope {content}: AWS_ACCESS_KEY_ID=<AKIA+16> │ alert m=1 {aws-access-key-id=1} │ alert m=1 {aws-access-key-id=1} │ yes
 SC-2 │ 2b │ reverse-guard │ Bash real envelope {stdout,...}: AWS_ACCESS_KEY_ID=<AKIA+16> │ alert m=1 {aws-access-key-id=1} │ alert m=1 {aws-access-key-id=1} │ yes
 SC-2 │ 2c │ reverse-guard │ Bash legacy envelope {output}: AWS_ACCESS_KEY_ID=<AKIA+16> │ alert m=1 {aws-access-key-id=1} │ alert m=1 {aws-access-key-id=1} │ yes
@@ -149,6 +152,7 @@ SC-9 │ 9v │ allow-guard │ code that READS a credential from the environmen
 SC-9 │ 9w │ allow-guard │ assignments whose value is a FILE PATH (three char classes, 22-47 chars, upper-case first segment too): `/Users/...`, `~/Library/...`, `/run/secrets/...` │ macos-abs=silent; macos-home=silent; dotfile=silent │ macos-abs=silent; macos-home=silent; dotfile=silent │ yes
 SC-9 │ 9x │ allow-guard │ closedness of the JSON key table: keys that merely CONTAIN a table stem (tokens / tokenizer / mytoken / auth_tokens / secret_name / password_hint) with a 40-char value stay silent │ 6/6 as expected │ 6/6 as expected │ yes
 SC-9 │ 9y │ allow-guard │ path-form lead markers, member by member: a value that starts with `/`, `~/`, `./` or `../`, holds only path characters and at least two `/` (three letter / digit classes, so only the path rule can silence it) is not counted │ 4/4 as expected │ 4/4 as expected │ yes
+SC-9 │ 9z │ allow-guard │ left boundary of kv-secret-assign: a credential key GLUED to a preceding word character is not a key start (a lower-case letter in front of an upper-case key; a lower-case prefix joined to the key by an underscore) -- an implementation without the boundary reads the key out of the middle of the word │ lower-glued=silent; prefix-glued=silent │ lower-glued=silent; prefix-glued=silent │ yes
 SC-10 │ 10a │ known-limit │ json:token=<40 lowercase letters> (single char class) │ silent │ silent │ yes
 SC-10 │ 10b │ known-limit │ JWT_SECRET = <24 digits> (single char class) │ silent │ silent │ yes
 SC-10 │ 10c │ known-limit │ json:token=<12 alnum> (shorter than 16) │ silent │ silent │ yes
@@ -160,6 +164,9 @@ SC-10 │ 10h │ known-limit │ value-length floor, silent side: 15 characters
 SC-10 │ 10i │ known-limit │ dot-structured credentials are silent in the 5 new key-shape forms (three dot-separated segments, each starting with a letter, as in Discord-bot-token / signed-cookie shapes): the dotted-identifier-chain exclusion cannot tell them from `process.env.X` │ 5/5 as expected │ 5/5 as expected │ yes
 SC-10 │ 10j │ known-limit │ other forms the 6 new tags do not see: JSON-rendered header, python-repr header, URL query parameter, lower-case INI key with / without quotes, Kubernetes `name:` / `value:` pair │ 6/6 as expected │ 6/6 as expected │ yes
 SC-10 │ 10k │ known-limit │ json:token=<40 uppercase letters> (single char class) │ silent │ silent │ yes
+SC-10 │ 10m │ known-limit │ KNOWN-LIMIT: the Forgejo / Gitea container environment overrides `FORGEJO__<section>__<KEY>` / `GITEA__<section>__<KEY>` (the section name is lower case: the same credentials as app.ini, another carrier) are silent in both layers: a compose env list, a compose env map, a docker inspect Env array │ 6/6 as expected │ 6/6 as expected │ yes
+SC-10 │ 10n │ known-limit │ KNOWN-LIMIT: a kv key longer than the bounds (64 key characters before and after the keyword) is not read -- 70 upper-case letters + `_TOKEN` in the middle of a line (the bounds are what keeps the pattern linear on long runs, W2) │ long-key=silent │ long-key=silent │ yes
+SC-10 │ 10o │ known-limit │ KNOWN-LIMIT: the flag-name forms the left boundary / prefix bound of cli-secret-flag do not read: a flag glued to a preceding letter (`abc--token=<value>`) and a flag name with more than 40 characters before the keyword (`--` + 45 letters + `token=<value>`) │ glued=silent; long-name=silent │ glued=silent; long-name=silent │ yes
 SC-10 │ 10l │ baseline-failing │ accepted false positives of the new key-shape tags (documented in W2): an upper-case key whose NAME contains a credential keyword but whose VALUE is not a credential, with a value that passes the classifier (two character classes, 16 or more characters, not path-form, not a dotted identifier) -- a URL, a resource name and a policy name as JSON values, a relative path and a resource path as assignment values; red = somebody closed that class, update W2 and this row │ 5/5 as expected │ 0/5 as expected; wrong: json-url, json-resource-name, json-policy-name, kv-relative-path, kv-yaml-resource-path │ no
 SC-11 │ 11a │ allow-guard │ json:token=<FAKE_ + 24 alnum> │ silent │ silent │ yes
 SC-11 │ 11b │ allow-guard │ json:token=<PLACEHOLDER_FOR_DOCS_ONLY> │ silent │ silent │ yes
@@ -245,6 +252,8 @@ SC-18 │ 18b │ baseline-failing │ Read /var/lib/gitea/custom/conf/app.ini �
 SC-18 │ 18c │ baseline-failing │ Edit /etc/gitea/app.ini │ exit=2 │ exit=0 │ no
 SC-18 │ 18d │ baseline-failing │ Read /data/gitea/conf/app.ini │ exit=2 │ exit=0 │ no
 SC-18 │ 18e │ allow-guard │ Read of other applications' app.ini / php.ini stays allowed │ exit=0,0 │ exit=0,0 │ yes
+SC-18 │ 18j │ reverse-guard │ the rewritten Read / Edit path regex keeps every one of its 32 baseline alternatives: one Read of a path that only that alternative matches, for each of the 32 (`.env`, `.envrc`, secrets / credentials directories, id_rsa / id_ed25519 / id_ecdsa / .ssh/id_*, .pem .key .gpg .age .p12 .pfx .jks, .tfstate and its backup, .aws credentials / config, .kube/config, kubeconfig, .docker/config.json, service-account / gcp-key / firebase json, known_hosts, secret-token / master-key / encryption-key, the three claude-config names) │ 32/32 as expected (exit=2) │ 32/32 as expected │ yes
+SC-18 │ 18k │ reverse-guard │ the same 32 paths through the Edit tool (the same regex line serves both) │ 32/32 as expected (exit=2) │ 32/32 as expected │ yes
 SC-18 │ 18f │ baseline-failing │ Read /etc/forgejo/app.ini with SECRET_GUARD_ACK_PATH set but NO nonce marker (the ACK alone is not enough) │ exit=2 │ exit=0 │ no
 SC-18 │ 18g │ allow-guard │ Read /etc/forgejo/app.ini with a valid one-shot ACK (path + nonce marker): the escape hatch works for the new block │ exit=0 │ exit=0 │ yes
 SC-18 │ 18h │ baseline-failing │ Read / Edit face of the same name group: a capitalised directory (Read), a backup file (Read), the `custom/conf/app.ini` relative form (Read), a Windows backslash path (Read), Edit of app.ini -> exit 2 x5 (the path is lower-cased first) │ exit=2,2,2,2,2 │ exit=0,0,0,0,0 │ no
@@ -272,12 +281,20 @@ SC-19 │ 19w │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(bound_bad): P + 
 SC-19 │ 19x │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] the 64th occurrence of a listed path (63 x `echo P`, then `cat P`) is still checked │ exit=2 │ exit=0 │ no
 SC-19 │ 19y │ known-limit │ [CLAUDE_PROJECT_DIR=proj(ok)] KNOWN-LIMIT: occurrences past the 64th are not checked (64 x `echo P`, then `cat P`: padding passes) │ exit=0 │ exit=0 │ yes
 SC-19 │ 19t │ allow-guard │ [CLAUDE_PROJECT_DIR=proj(ok)] Read P with a valid one-shot ACK (same escape hatch as the built-in names) │ exit=0 │ exit=0 │ yes
-SC-19 │ 19z │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] separators inside quotes do not cut a stage: python3 -c / node -e / awk programs holding `;` / `&` / a newline, and quoted `|`: the listed path is blocked (exit 2) wherever the built-in app.ini row blocks the same command shape with the app.ini path (6 shapes x built-in and extension), and in the 2 quoted-pipe shapes (extension only) │ exit=2,2,2,2,2,2,2,2,2,2,2,2,2,2 │ exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0 │ no
-SC-19 │ 19aa │ allow-guard │ [CLAUDE_PROJECT_DIR=proj(ok)] separators OUTSIDE quotes still cut a stage: a reader in an earlier stage (`;` / `|` / `&` / newline) or after the quoted mention does not make a later mention of the path a read; a bare mention is no read; and a real count pipe that follows a QUOTED separator is still a credit (`cat <path> ";" | wc -l`, as the built-in rows judge it) │ exit=0,0,0,0,0,0,0,0 │ exit=0,0,0,0,0,0,0,0 │ yes
+SC-19 │ 19z │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] separators inside quotes do not cut a stage: python3 -c / node -e / awk programs holding `;` / `&` / a newline: the listed path is blocked (exit 2) exactly where the built-in app.ini row blocks the same command shape with the app.ini name (6 shapes x built-in and extension = 12 runs) │ exit=2,2,2,2,2,2,2,2,2,2,2,2 │ exit=0,0,0,0,0,0,0,0,0,0,0,0 │ no
+SC-19 │ 19aa │ allow-guard │ [CLAUDE_PROJECT_DIR=proj(ok)] separators OUTSIDE quotes still cut where the built-in rows cut: a reader in an earlier segment (`;`) or in an earlier pipeline stage (`|`), or after the quoted mention, does not make a later mention of the path a read; a bare mention is no read; and a real count pipe that follows a QUOTED separator is still a credit (`cat <path> ";" | wc -l`, as the built-in rows judge it) │ exit=0,0,0,0,0,0 │ exit=0,0,0,0,0,0 │ yes
 SC-19 │ 19ab │ reverse-guard │ [CLAUDE_PROJECT_DIR=proj(canary): entries `$(touch canary-ext-1)`, back-quoted `touch canary-ext-2`, and the glob `gl/st*ar.conf` next to a decoy file, all relative to the hook's cwd] no-execution invariant: the extension only slices and fixed-string-compares, it never evaluates an entry or the command text: ls -la (0) ; cat gl/stxxar.conf (0, the glob is not expanded) ; echo "$(touch canary-ext-3)" (0) ; Read (0) ; Edit (0) and none of the 3 canary files exists afterwards │ exit=0,0,0,0,0 canaries-absent │ exit=0,0,0,0,0 canaries-absent │ yes
 SC-19 │ 19ac │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ws): the entry line is P with leading blanks and a trailing blank + tab] leading / trailing white space of an entry is stripped: cat P (2) ; Read P (2) │ exit=2,2 │ exit=0,0 │ no
 SC-19 │ 19ad │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(cjk): `a<2 CJK chars>` (7 bytes) and `/srv/<2 CJK chars>/prod`] length counts BYTES and the letter rule counts ASCII letters / digits: an entry holding an ASCII letter or digit is effective: cat /srv/a<2 CJK chars>/x (2) ; cat /srv/<2 CJK chars>/prod (2) │ exit=2,2 │ exit=0,0 │ no
-SC-19 │ 19ae │ known-limit │ [CLAUDE_PROJECT_DIR=proj(cjk)] KNOWN-LIMIT: an entry without any ASCII letter or digit (here 4 CJK characters) is skipped silently: cat /srv/<4 CJK chars>/x (0) │ exit=0 │ exit=0 │ yes
+SC-19 │ 19ae │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(cjk)] an entry that holds a non-ASCII byte is effective even without any ASCII letter or digit (here 4 CJK characters, 12 bytes): cat /srv/<4 CJK chars>/x (2); only an entry of ASCII symbols alone is skipped (19w) │ exit=2 │ exit=0 │ no
+SC-19 │ 19af │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] differential against the built-in app.ini row over 73 command shapes (escapes, $'...', continuation lines, `||`, `&` redirections, quoted pipes, heredocs, the whole-command mode, wrappers, variable indirection): the exit code with the listed path equals the exit code with the built-in name for EVERY shape; 10 anchor shapes (6 blocked, 4 allowed) also pin the built-in answer itself │ 73/73 shapes equal; anchors ok │ 73/73 shapes equal; anchor shapes the built-in row does not answer as pinned: cat, semi-before, or-or, cont-cat, py-escaped-dq-semi, py-ansi-c │ no
+SC-19 │ 19ag │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] byte offsets and slices: 20 CJK characters (60 bytes) in front of the listed path must not shift the stage: `echo <C>; cat P; ls` / `echo <C> && cat P && ls` / `echo <C>; sed -n '1,80p' P; ls` / a script whose first line is a CJK comment / a CJK text inside quotes before the read -> exit 2 each │ exit=2,2,2,2,2 │ exit=0,0,0,0,0 │ no
+SC-19 │ 19ah │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(cjk); the hook's environment holds only LANG=C.UTF-8 -- no LC_ALL] entry length counts BYTES and the letter rule counts ASCII even when the caller does not export LC_ALL: `a<2 CJK>` (7 bytes) and `/srv/<2 CJK>/prod` are effective, a pure non-ASCII entry is effective too -> exit 2 x3 │ exit=2,2,2 │ exit=0,0,0 │ no
+SC-19 │ 19ai │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(bom): the file starts with a UTF-8 byte-order mark and has CRLF line ends, the first entry is P] the BOM is not part of the first entry: cat P (2) ; the second entry works too (2) │ exit=2,2 │ exit=0,0 │ no
+SC-19 │ 19aj │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] an entry is a literal substring: the listed path followed by a word character or a dot suffix is still a hit: cat P.bak (2) ; cat Px (2) ; cat P_old (2) │ exit=2,2,2 │ exit=0,0,0 │ no
+SC-19 │ 19ak │ allow-guard │ [CLAUDE_PROJECT_DIR=proj(ok)] a mention of the listed path is no read, and the name it is judged under does not drag other built-in rows in (the registration-token and PAT-creation rows match the word `forgejo`: the substituted name must not hold it) │ exit=0,0 │ exit=0,0 │ yes
+SC-19 │ 19al │ known-limit │ [CLAUDE_PROJECT_DIR=proj(ok)] KNOWN-LIMIT, inherited: a quoted `|` blinds the built-in `[^|]*` rows (W8, suggested issue 7.2) and the extension is judged by those same rows: `python3 -c "print(1|2); print(open('<path>').read())"` and `grep -E 'A|B' <path>` -> exit 0 for the app.ini name and for the listed path │ exit=0,0,0,0 │ exit=0,0,0,0 │ yes
+SC-19 │ 19am │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(fold): entry `/srv/caf<e-acute>/menu`; only LANG=C.UTF-8 in the environment] case-insensitivity is ASCII-only on the Read face too: Read /SRV/CAF<E-acute upper>/MENU (0: the non-ASCII letter is not folded) ; Read /SRV/CAF<e-acute>/MENU (2: the ASCII letters are) │ exit=0,2 │ exit=0,0 │ no
 SC-20 │ 20a │ reverse-guard │ [CLAUDE_PROJECT_DIR=proj(missing): file absent] extension ignored on both faces, built-ins intact: cat P (0) ; cat .env (2) ; Read P (0) ; Read /x/.env (2) │ exit=0,2,0,2 │ exit=0,2,0,2 │ yes
 SC-20 │ 20b │ reverse-guard │ [CLAUDE_PROJECT_DIR=proj(dir): path is a directory] extension ignored on both faces, built-ins intact: cat P (0) ; cat .env (2) ; Read P (0) ; Read /x/.env (2) │ exit=0,2,0,2 │ exit=0,2,0,2 │ yes
 SC-20 │ 20c │ reverse-guard │ [CLAUDE_PROJECT_DIR=proj(dangling): dangling symlink] extension ignored on both faces, built-ins intact: cat P (0) ; cat .env (2) ; Read P (0) ; Read /x/.env (2) │ exit=0,2,0,2 │ exit=0,2,0,2 │ yes
@@ -375,6 +392,8 @@ SC-22 │ 22bk │ baseline-failing │ every remote / shell wrapper of the wrap
 SC-22 │ 22bm │ baseline-failing │ tight credit, member by member: every member of the process-table family (the 10 ps argument classes, the 14 dash spellings, the 15 launchers, the 14 launcher-with-arguments forms, the 8 absolute-path forms, podman, the 11 wrappers, the 13 non-ps spellings) followed by `| grep -v x` stays blocked, and the other row-level filters on `ps aux` (anchored grep, sed, cut, awk) do not count either │ 91/91 as expected (exit=2) │ 0/91 as expected; wrong: ps aux, ps 123, ps -ef, ps -eo pid,args, ps -o pid,command -p 123, ps -ww -fp 123, ... │ no
 SC-22 │ 22bn │ allow-guard │ count / hash / discard credit, member by member: the same members followed by `| wc -l` stay allowed, and `ps aux` with a hash or a stdout discard │ 89/89 as expected (exit=0) │ 89/89 as expected │ yes
 SC-22 │ 22bo │ baseline-failing │ env / printenv dumps under every remote / shell wrapper of the wrapper set (ssh, docker exec, docker compose exec, podman exec, kubectl exec, lxc exec, nomad alloc exec, pct exec, sh -c, bash -c, watch) x {env, printenv}: 22 members, each blocked │ 22/22 as expected (exit=2) │ 10/22 as expected; wrong: ssh:env, ssh:printenv, nomad:env, nomad:printenv, pct:env, pct:printenv, ... │ no
+SC-22 │ 22br │ allow-guard │ wrapped dumps with the legitimate checks: each of the 22 dump members followed by an anchored `| grep '^PATH='` (read ONE variable) and by `| cut -d= -f1` (list the variable NAMES) stays allowed -- the same credit the baseline gives `docker|kubectl|podman|lxc exec ... env` (44 runs) │ 44/44 as expected (exit=0) │ 44/44 as expected │ yes
+SC-22 │ 22bs │ known-limit │ KNOWN-LIMIT (the baseline's own limit, now shared by the wrappers added in W11): a wrapped dump followed by `| grep -v x` is allowed (the filter prints the whole environment minus one line, but a row-level filter is credit for these rows) -- 22 members; red = somebody made the dump family tight, update W11 and Impact then │ 22/22 as expected (exit=0) │ 22/22 as expected │ yes
 SC-22 │ 22bq │ baseline-failing │ the launcher and wrapper sets are not specific to `ps`: each of the 15 launchers and each of the 11 wrappers in front of / around each non-ps program (pgrep -af, pstree -a, top -b -n1 -c): 78 members, each blocked │ 78/78 as expected (exit=2) │ 0/78 as expected; wrong: sudo:pgrep -af x, sudo:pstree -a, sudo:top -b -n1 -c, doas:pgrep -af x, doas:pstree -a, doas:top -b -n1 -c, ... │ no
 SC-22 │ 22bp │ baseline-failing │ pid positions of the /proc rows, v4 additions: `$$`, `$!`, `thread-self`, and glob tokens holding `*` or `?` (`[0-9]*`, `1*`, `1?`), for baseline readers, added readers, a `<` redirect, an xargs file operand and an inline interpreter │ 10/10 as expected (exit=2) │ 0/10 as expected; wrong: dollar-dollar, dollar-bang, thread-self, glob-bracket-star, glob-prefix-star, glob-question, ... │ no
 SC-22 │ 22O │ allow-guard │ ps forms that print only pid / state / process NAME stay allowed (also with a launcher, an absolute path, a keyword position, an xargs pipeline) │ exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 │ exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 │ yes
@@ -388,13 +407,14 @@ SC-22 │ 22at │ allow-guard │ exec wrappers around commands that do not dum
 SC-22 │ 22ah │ known-limit │ KNOWN-LIMIT: argv / environ exposure through systemctl status / show, docker inspect, journalctl is not blocked │ exit=0,0,0,0 │ exit=0,0,0,0 │ yes
 SC-22 │ 22aj │ known-limit │ KNOWN-LIMIT (baseline over-block kept): the 13 baseline readers still block /proc/123/status │ 13/13 as expected (exit=2) │ 13/13 as expected │ yes
 SC-22 │ 22bh │ known-limit │ KNOWN-LIMIT: find -exec and lua -e read /proc, a launcher nested in a launcher, a BSD cluster that is not the first operand, ps -e o <format>, a command after `if` / `while` / `until` (the baseline env / printenv rows list only then / do / else / elif), macOS pgrep -fl, a bare ps / pgrep inside a container (BusyBox prints the full command line), other process listings that print full command lines (systemd-cgls, pidstat -l, w, busybox ps, the AIX format `-o '%p %a'`), pid positions outside the closed set (brace expansion, a bracket class without `*` / `?`, a back-quote substitution, path normalisation `/proc/./self` and `/proc//self`), and the /proc rows being no tight family (a row-level filter counts as credit there) are not blocked │ 22/22 as expected (exit=0) │ 22/22 as expected │ yes
-SC-22 │ 22bj │ baseline-failing │ ACCEPTED OVER-BLOCK (documented in W11, same newline anchor and same unanchored wrapper words as the baseline env / printenv rows): a line that merely STARTS with a process-table command inside a heredoc or multi-line string is blocked, because the newline is a command-position anchor; so is text in which a wrapper word (`ssh`, `watch`, also inside `sshd` / `stopwatch`) comes before a process-table form -- a commit message, an echo, a documentation search; the row turns red when someone narrows either (update W11 and this row then) │ 6/6 as expected (exit=2) │ 0/6 as expected; wrong: heredoc-ps, heredoc-after-text, commit-message-watch, sshd-substring, grep-doc-search, stopwatch-substring │ no
+SC-22 │ 22bj │ baseline-failing │ ACCEPTED OVER-BLOCK (documented in W11, same newline anchor and same unanchored wrapper words as the baseline env / printenv rows): a line that merely STARTS with a process-table command inside a heredoc or multi-line string is blocked, because the newline is a command-position anchor; so is text in which a wrapper word (`ssh`, `watch`, also inside `sshd` / `stopwatch`) comes before a process-table form -- a commit message, an echo, a documentation search; so is text in which a wrapper word comes before the word `env` / `printenv` (a venv directory named env after `bash -c` / `sh -c` / `watch`, a commit message that ends in the word env after `ssh`), and a grep / rg / sed over text that holds a /proc/<pid>/environ|cmdline path whose pid position is a real pid token (`self`, `$$`, a digit string); the row turns red when someone narrows any of these (update W11 and this row then) │ 14/14 as expected (exit=2) │ 0/14 as expected; wrong: heredoc-ps, heredoc-after-text, commit-message-watch, sshd-substring, grep-doc-search, stopwatch-substring, ... │ no
 SC-22 │ 22au │ known-limit │ KNOWN-LIMIT: the Read tool face has no /proc rule │ exit=0,0,0 │ exit=0,0,0 │ yes
 SC-23 │ 23a │ baseline-failing │ 10CG/Aria#221 original (multi-line `nomad alloc exec ... python -c` reading os.environ.get('DATABASE_URL')) │ exit=0 │ exit=2 │ no
 SC-23 │ 23b │ baseline-failing │ single-key reads (all four substrings `.environ.get(` / `.environ[` / `.environb.get(` / `.environb[`, several in one command) are allowed: the same information as the allowed os.getenv( │ exit=0,0,0,0,0 │ exit=2,2,2,2,2 │ no
 SC-23 │ 23c │ reverse-guard │ whole-table dumps and iteration over os.environ / os.environb stay blocked (and a single-key read next to a dump does not unblock it); printenv as control │ exit=2,2,2,2,2,2,2,2,2,2 │ exit=2,2,2,2,2,2,2,2,2,2 │ yes
 SC-23 │ 23d │ reverse-guard │ dotfile reads through the interpreter rows stay blocked, including names with a letter / digit / underscore suffix (.env_prod .env2 .envprod .envs/) │ exit=2,2,2,2,2,2,2,2,2 │ exit=2,2,2,2,2,2,2,2,2 │ yes
 SC-23 │ 23e │ reverse-guard │ non-interpreter readers keep blocking .env / .envrc (a global right boundary on the `.env` rows would have let these through) │ exit=2,2,2,2,2,2 │ exit=2,2,2,2,2,2 │ yes
+SC-23 │ 23j │ baseline-failing │ the same single-key substring TWICE in one command: every occurrence is normalised, not only the first (host / user / password each read once is the usual shape) │ exit=0,0,0,0 │ exit=2,2,2,2 │ no
 SC-23 │ 23i │ reverse-guard │ no-execution invariant of the single-key normalisation: single-key reads whose key text holds a command substitution / back quotes (2 payloads, each `touch`es a private canary path) are only text for the hook: none of the 2 canary files exists after the hook has run │ 2/2 as expected │ 2/2 as expected │ yes
 SC-23 │ 23f │ known-limit │ node -e "console.log(process.env.HOME)" │ exit=2 │ exit=2 │ yes
 SC-23 │ 23g │ known-limit │ cat .env_prod │ exit=0 │ exit=0 │ yes
@@ -415,13 +435,14 @@ SC-25 │ 25d │ baseline-failing │ ps aux: new block reuses the unchanged BL
 SC-25 │ 25e │ baseline-failing │ cat /etc/forgejo/app.ini: new block reuses the unchanged BLOCKED text │ text=baseline-identical │ exit=0 (no BLOCKED text) │ no
 SC-25 │ 25f │ baseline-failing │ [CLAUDE_PROJECT_DIR=proj(ok)] cat /srv/billing/conf/prod.toml: extension block reuses the unchanged BLOCKED text │ text=baseline-identical │ exit=0 (no BLOCKED text) │ no
 SC-25 │ 25g │ baseline-failing │ Read /etc/forgejo/app.ini: new Read block reuses the unchanged Read/Edit BLOCKED text │ text=baseline-identical │ exit=0 (no BLOCKED text) │ no
+SC-25 │ 25h │ reverse-guard │ a command that holds a single-key read AND a real `.env` read is blocked, and its `Command was:` line echoes the original text (`.environ.get(` is still there), not the normalised copy the rows were matched against │ blocked; `Command was:` shows the original text │ blocked; `Command was:` shows the original text │ yes
 SC-26 │ 26a │ doc-sync │ standards secret-hygiene.md section 3.8: a line naming 命令行参数 + env + --config + stdin, scoped to long-running processes (words 长时 / 存活期), with the boundary to short commands written down (`60 秒`) │ clause-present-in-3.8 │ section-absent │ no
 SC-26 │ 26b │ doc-sync │ standards secret-hygiene.md section 2.5: a line with `pgrep -a` (the process-table family) and the note that the shared BLOCKED text's `Acceptable filters` do not apply to the tight families │ ps-family-row-in-2.5 │ ps-family-row-absent-in-2.5 │ no
 SC-26 │ 26c │ doc-sync │ standards secret-hygiene.md section 5.6: `.aria/secret-guard.paths` documented (location and project root, literal-substring syntax, case-insensitive, only-adds semantics, 32 KiB / 200 limits, ignore-the-whole-file on failure and that this is SILENT) │ ext-section-complete │ section-absent │ no
 SC-26 │ 26d │ doc-sync │ standards secret-hygiene.md section 2.2: a line naming the server-side config family (`app.ini`) │ app.ini-in-2.2 │ app.ini-absent-in-2.2 │ no
 SC-26 │ 26e │ doc-sync │ aria README.md and README.zh.md, Hooks usage section: the `.aria/secret-guard.paths` entry point is described, including its literal-substring syntax (`literal substring` / `字面子串`) │ README.md=has-extension-entry; README.zh.md=has-extension-entry │ README.md=missing; README.zh.md=missing │ no
 SC-26 │ 26f │ doc-sync │ secret-guard.sh header (first 140 lines): the extension file, two representative residual gaps (systemctl status, docker inspect), the tight-family / `Acceptable filters` mismatch and the partial coverage of variable indirection are written down │ header-complete │ header-missing .aria/secret-guard.paths,systemctl status,docker inspect,Acceptable filters,variable indirection │ no
-SC-26 │ 26g │ doc-sync │ aria CHANGELOG.md, topmost version section: names rule6_note, the new `.aria/secret-guard.paths` input, the `ps aux` behaviour change, the loosening side (`os.environ` single-key reads, `keys_unsorted`), the `fp=` log field and the `partial` coverage of variable indirection │ top-section-complete │ top-section-missing rule6_note,.aria/secret-guard.paths,ps aux,os.environ,keys_unsorted,fp=,partial │ no
+SC-26 │ 26g │ doc-sync │ aria CHANGELOG.md, topmost version section: names rule6_note and one marker word of each disclosure of the Impact section -- the new input (`.aria/secret-guard.paths`), the new blocks (`ps aux`, `/proc`, `app.ini`), the new alerts (Read results scanned: `file.content`; the new tag `kv-secret-assign`), the new silence (`placeholder`), the loosening (`os.environ` single-key reads, `keys_unsorted`), the log field (`fp=`), the performance note (`CPU`) and the `partial` coverage of variable indirection │ top-section-complete │ top-section-missing rule6_note,.aria/secret-guard.paths,ps aux,/proc,app.ini,file.content,kv-secret-assign,placeholder,os.environ,keys_unsorted,fp=,CPU,partial │ no
 SC-26 │ 26h │ reverse-guard │ standards secret-hygiene.md sections 3.1-3.7 and 4.1-4.4 (the argv `KEY=...` examples) are byte-identical to the baseline: the new 3.8 clause narrows its scope instead of contradicting them │ examples byte-identical to baseline │ examples byte-identical to baseline │ yes
 SC-26 │ 26i │ reverse-guard │ standards secret-hygiene.md never uses this Spec's layer numbers L1 / L3 (the SOT's own terms are Path 1-3 / Layer 0 / Layer 2; its section 0 explains why there is no Layer 1) │ 0 occurrences of L1 / L3 │ 0 occurrences of L1 / L3 │ yes
 SC-26 │ 26j │ doc-sync │ standards secret-hygiene.md: version line 1.2.0 and a history row `| 1.2.0 |` naming secret-net-l3-and-bypass-paths │ version-line=1.2.0; history-row=present │ version-line=other; history-row=absent │ no
@@ -439,6 +460,7 @@ SC-28 │ 28f │ doc-sync │ secret-scan.sh hook contract: the old Read shape 
 SC-28 │ 28g │ doc-sync │ secret-scan.sh 'does NOT catch' list: the base64/hex line re-scoped to values with no prefix AND no credential key name │ old gone; new present │ old still-present; new absent │ no
 SC-28 │ 28h │ doc-sync │ secret-hygiene.md 5.1: secret-guard no longer called a Write/MultiEdit blocker │ old gone; new present │ old still-present; new absent │ no
 SC-28 │ 28i │ doc-sync │ aria/VERSION: stale 'output REDACT' description of secret-scan replaced by detect + warn │ old gone; new present │ old still-present; new absent │ no
+SC-28 │ 28o │ doc-sync │ secret-guard.sh header: the stale count `~100 most common patterns` is gone (the rule table is 145 rows at baseline, 149 after this change) and no new count literal is written in its place (the header sentence is joined across its comment line breaks before the check) │ old gone; new present │ old still-present; new absent │ no
 SC-28 │ 28l │ doc-sync │ secret-scan.sh header: BOTH halves of the claim 'Claude Code exposes no field to replace tool_response ... not a version-dependent behaviour' are gone and the schema fact (updatedToolOutput exists, unverified, unused) is in │ old gone; new present │ old still-present; new absent │ no
 SC-28 │ 28j │ doc-sync │ secret-guard.sh History block (the comment block that starts at `# === History ===`) names change-id secret-net-l3-and-bypass-paths; a mention only in code comments does not count │ present │ absent │ no
 SC-28 │ 28k │ doc-sync │ secret-scan.sh header block (the leading comment block of the file) names change-id secret-net-l3-and-bypass-paths; a mention only in code comments does not count │ present │ absent │ no
@@ -461,12 +483,16 @@ SC-31 │ 31d │ reverse-guard │ hooks/hooks.json byte-identical to baseline 
 SC-31 │ 31e │ reverse-guard │ hooks/hooks.json holds no literal completeness_gate (10CG/Aria#199 seam) │ gone │ gone │ yes
 SC-32 │ 32a │ reverse-guard │ hooks/secret-guard.sh + secret-scan.sh code lines: none of 13 bash 4+ constructs (declare -A, mapfile/readarray, ${x,,}/${x^^}, [[ -v ]], nameref, negative subscript, ${x@Q}, |&, &>>, ;;&, coproc, shopt globstar/lastpipe, wait -n) -- a HEURISTIC, not a proof of 3.2-runnability (see 32c); each of the 13 detectors is first checked against a sample line of its own construct │ 0 bash 4+ constructs; detectors self-tested 13/13 │ 0 bash 4+ constructs; detectors self-tested 13/13 │ yes
 SC-32 │ 32b │ reverse-guard │ hooks/secret-*.sh and tests/secret-*.test.sh keep LF line endings │ LF-only │ LF-only │ yes
-SC-32 │ 32c │ reverse-guard │ every hook-direct row above, run once by the default bash and once by a real bash 3.2 (WPA_BASH32): the two result strings are identical row by row │ identical over all hook-direct rows │ identical over 361 hook-direct rows │ yes
-SC-32 │ 32d │ reverse-guard │ the same differential in a SECOND locale (WPA_LOCALE_B, default en_US.UTF-8; a non-C collation order): every hook-direct row, run by the default bash and by a real bash 3.2 with LC_ALL set to that locale, gives the same result string as the run in the first locale (C.UTF-8), row by row -- a character class that bash < 5 expands by collation order (`[a-z]` counting upper case) would differ here and nowhere else │ identical over all hook-direct rows in a second locale │ identical over 361 hook-direct rows (locale en_US.UTF-8) │ yes
+SC-32 │ 32c │ reverse-guard │ every hook-direct row above, run once by the default bash and once by a real bash 3.2 (WPA_BASH32): the two result strings are identical row by row │ identical over all hook-direct rows │ identical over 382 hook-direct rows │ yes
+SC-32 │ 32d │ reverse-guard │ the same differential in a SECOND locale (WPA_LOCALE_B, default en_US.UTF-8; a non-C collation order): every hook-direct row, run by the default bash and by a real bash 3.2 with LC_ALL set to that locale, gives the same result string as the run in the first locale (C.UTF-8), row by row -- a character class that bash < 5 expands by collation order (`[a-z]` counting upper case) would differ here and nowhere else │ identical over all hook-direct rows in a second locale │ identical over 382 hook-direct rows (locale en_US.UTF-8) │ yes
+SC-32 │ 32e │ reverse-guard │ the same differential in the POSIX locale (LC_ALL=C: bytes, no multi-byte characters; the locale of a container image without LANG, e.g. the aria-runner image), default bash: every hook-direct row gives the same result string as in the first locale (C.UTF-8) -- code that counts characters where it must count bytes (or the reverse) differs here and nowhere else │ identical over all hook-direct rows in the POSIX locale │ identical over 382 hook-direct rows (locale C) │ yes
 SC-33 │ 33a │ allow-guard │ L3 false-positive census: every text file <=200 KB under <aria> and <standards> (keyword prefilter) fed as a Read result; every file where one of the 6 new tags fires is on the attribution list, and the prefilter passes every key / keyword / flag name of the enumerated sets (a prefilter that missed one would skip files silently) │ every flagged file is on the attribution list; prefilter covers every name │ flagged=0: none; prefilter passes 77/77 names │ yes
+SC-34 │ 34a │ reverse-guard │ linear time, baseline tags: a long single line (8 KB values or keys) through the Bash real envelope under a 4 s CPU cap per process still gives the baseline detection -- bearer / X-API-Key header, env-line (long value and long key), postgres URL (long password and long user), json password: 7 shapes │ 7/7 as expected │ 7/7 as expected │ yes
+SC-34 │ 34b │ baseline-failing │ linear time, new tags: shapes that make a pattern or the value extraction quadratic -- a 300 KB run of `-` and a 20 KB run of `a-` in front of a flag, a long flag value, a 300 KB upper-case run in front of a key, 8 KB blank runs in the export / header / JSON forms, 8 KB header and flag values -- under a 4 s CPU cap per process: the tag is still counted (9 shapes) │ 9/9 as expected │ 0/9 as expected; wrong: cli-dash-run, cli-letter-dash-run, cli-long-value, kv-upper-run, kv-export-blank-run, auth-long-value, ... │ no
+SC-34 │ 34c │ baseline-failing │ linear time, the extension's hit path: a 4 KB single line with the listed path 64 times (the last one behind `cat`), and the same with one occurrence: the read is found (exit 2) under a 4 s CPU cap per process, and the TOTAL CPU of the run with the extension in effect stays within 3.5x of the same command with no extension file (a hit costs one more built-in judgement of the same command, about 2x; a loop over the occurrences or a per-occurrence stage computation costs tens of times) │ 2/2 as expected │ 0/2 as expected; wrong: 64-occurrences-after-4KB[exit!=2], one-occurrence-after-4KB[exit!=2] │ no
 
 == per-SC match (yes/total) ==
-SC-1: 0/4
+SC-1: 2/7
 SC-2: 6/6
 SC-3: 2/2
 SC-4: 0/19
@@ -474,8 +500,8 @@ SC-5: 0/14
 SC-6: 0/11
 SC-7: 14/14
 SC-8: 0/1
-SC-9: 25/25
-SC-10: 11/12
+SC-9: 26/26
+SC-10: 14/15
 SC-11: 15/26
 SC-12: 3/15
 SC-13: 3/7
@@ -483,29 +509,30 @@ SC-14: 0/2
 SC-15: 6/7
 SC-16: 2/18
 SC-17: 4/4
-SC-18: 3/9
-SC-19: 10/29
+SC-18: 5/11
+SC-19: 11/37
 SC-20: 15/17
 SC-21: 12/23
-SC-22: 15/72
-SC-23: 7/9
+SC-22: 17/74
+SC-23: 7/10
 SC-24: 4/9
-SC-25: 3/7
+SC-25: 4/8
 SC-26: 2/11
 SC-27: 2/4
-SC-28: 0/14
+SC-28: 0/15
 SC-29: 9/9
 SC-30: not run by this probe
 SC-31: 5/5
-SC-32: 4/4
+SC-32: 5/5
 SC-33: 1/1
+SC-34: 1/3
 
 == per-category match (yes/total) ==
-baseline-failing: 0/202
-doc-sync: 0/25
-reverse-guard: 72/72
-allow-guard: 67/67
-known-limit: 35/35
+baseline-failing: 0/213
+doc-sync: 0/26
+reverse-guard: 79/79
+allow-guard: 70/70
+known-limit: 39/39
 zero-regression: 9/9
 rows not run (n/a): by design 1 (30a); leg missing or not constructible 0 (-)
 baseline shape (baseline-failing + doc-sync all 'no', every other category all 'yes'): holds

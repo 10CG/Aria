@@ -1,0 +1,1018 @@
+mut_summary_v5 -- the bad implementations of this round and the regression runs of the earlier rounds' bad implementations, on the final prototype
+
+Method: each bad implementation = the full final target prototype tree (work/t5f) with ONE hook replaced by a variant produced by patch_l3.py / patch_l1.py (--variant), or with the DOCUMENTS patched
+by a patch_docs.py flag; only the SC groups / rows named for it are run (proto/mutbatch.py, proto/docvariants5.py); a listed row is a row whose match is not `yes`.  The prototype is a text-substituted
+copy of the baseline, not the implementation (see README.md).
+
+PART A  -- this round: 117 bad implementations; 112 turn at least one row red; 5 turn no row red (equivalent mutants / timing-class: reasons below).
+PART B1 -- regression of the previous round's bad implementations: 108 re-run; 104 keep every row that was red before; 0 lose a row (regressions); 4 were equivalent before; 7 superseded (below).
+PART B2 -- regression of the rounds before: 391 re-run; 377 keep every row that was red in v3; 0 lose a row (regressions); 14 were equivalent in v3; 29 superseded (below).
+
+Bad implementations that turned NO row red:
+  plan_v5_l1 / ext_perentry: A TIMING-class bad implementation: one grep process per extension entry computes exactly the same verdicts as the single `grep -f` pass, so no functional row can be red; it is caught by the time tier (f) (see out/timing_bad.txt: the ratio is about ten times the bound) and by nothing else.
+  plan_v5_l1b / remote_env_split_docker: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v5_l1b / remote_env_split_kubectl: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v5_l1b / remote_env_split_lxc: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v5_l1b / remote_env_split_podman: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v4_l1_w11w8 / remote_env_split_docker: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v4_l1_w11w8 / remote_env_split_kubectl: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v4_l1_w11w8 / remote_env_split_lxc: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  plan_v4_l1_w11w8 / remote_env_split_podman: The mutated program behaves exactly like the correct one: the baseline already has its own, older rules that block `<this wrapper> ... env` / `... printenv` (docker / kubectl / podman / lxc exec) WITH the default credit (an anchored `grep` / `cut` / `wc` after the dump is a filter), and the wrapped-dump alternative of this change uses the same credit, so removing the wrapper from the NEW alternation changes the verdict of no input -- not on the plain dump (22bo), not with the legitimate filters (22br) and not with `grep -v` (22bs).  The wrappers whose removal IS observable (ssh, sh -c / bash -c, watch, nomad alloc exec, pct exec) are the ones the baseline misses, and each turns 22bo red.
+  v3r_plan_extra4 / interp_name_v1var: The Nomad-variable path name in the rewritten python3 -c / node -e rows duplicates an earlier GENERAL row of the baseline list that blocks any command mentioning that path: the target, the variant without the copy and the baseline all exit 2 for the python3 -c, node -e and cat forms (work/cases_v1var.py), so dropping the copy changes no verdict (16o still carries both cases; the other six names are not duplicated and each turns 16o red).
+  v3r_plan_l3_enum / drop_name_access_token: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_api_key: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_client_secret: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_passwd: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_password: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_private_key: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_refresh_token: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l3_enum / drop_name_secret: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  v3r_plan_l1_w8w9w10 / drop_assign_export: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  v3r_plan_l1_w8w9w10 / drop_assign_declare: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  v3r_plan_l1_w8w9w10 / drop_assign_local: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  v3r_plan_l1_w8w9w10 / drop_assign_readonly: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  v3r_plan_l1_w8w9w10 / drop_assign_typeset: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+
+Superseded (the bad implementation of the previous design has no counterpart in this design; removed from the regression run, replacement named):
+  ext_mask_all: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_mask_noamp: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_mask_nonl: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_mask_nopipe: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_mask_nosemi: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_nomask: The previous design put a hand-written quote mask in front of a hand-written stage cut; this design has neither (the extension substitutes the built-in app.ini name and calls the built-in `_sg_core_eval`), so a bad implementation OF THE MASK has no counterpart.  The class stays alive as `ext_v4stage` and its five sub-variants (:noesc_q :noesc_all :noansi :nopipe :nonl): each turns 19af red (19z too for :nonl), see Part A.
+  ext_uniclass: The previous entry rule needed a letter or digit of the caller's locale class; the entry rule now is 'an ASCII letter or digit, or any non-ASCII byte' under an exported LC_ALL=C.  The locale-dependent classes are covered by `ext_noc`, `ext_charlen`, `ext_ascii_only` and `ext_localnoexp` (19ad 19ae 19ag 19ah 19am), see Part A.
+  drop_extreader_* (29 bad implementations): The previous design gave the extension a reader table of its own (29 print readers + python3 -c + node -e), so 'a member is missing from the extension's reader table' was a bad implementation of its own.  This design has no such table: the extension judges the substituted copy with the BUILT-IN app.ini rows, so there is nothing to drop.  The same drop in the built-in reader set is `drop_reader:*` (same plan), which turns 16q AND 19u red for every member (19u runs the 31 readers through the extension).
+
+====================================================================================================
+
+PART A -- blocks
+
+##### plan_v5_l3  (13 bad implementations, 13 turn at least one row red, 0 turn none)
+== nul_off (variant nul_off; WPA_ONLY=SC-1; WPA_ROWS=1c,1d,1e,1f,1g)
+   SC-1 1c | alert m=1 {kv-secret-assign=1}
+   SC-1 1d | alert m=1 {kv-secret-assign=1}
+   (rows not yes: 2)
+== nul_replace (previous design) (variant nul_replace; WPA_ONLY=SC-1; WPA_ROWS=1c,1d,1e,1f,1g)
+   SC-1 1e | aws-key-line=silent; env-line=silent; github-pat=silent; json-client-secret=silent
+   SC-1 1f | aws-key-line=silent; env-line=silent; github-pat=silent; json-client-secret=silent
+   (rows not yes: 2)
+== nul_always_append (variant nul_always_append; WPA_ONLY=SC-1,SC-2; WPA_ROWS=1c,1d,1e,1f,1g,2a,2b,2c,2d)
+   SC-1 1g | alert m=2 {aws-access-key-id=2}
+   (rows not yes: 1)
+== nul_always_view (variant nul_always_view; WPA_ONLY=SC-1,SC-2; WPA_ROWS=1c,1d,1e,1f,1g,2a,2b,2c,2d)
+   SC-1 1g | alert m=2 {aws-access-key-id=2}
+   SC-2 2a | alert m=2 {aws-access-key-id=2}
+   SC-2 2b | alert m=2 {aws-access-key-id=2}
+   SC-2 2c | alert m=2 {aws-access-key-id=2}
+   SC-2 2d | alert m=2 {aws-access-key-id=2}
+   (rows not yes: 5)
+== nul_space (variant nul_space; WPA_ONLY=SC-1; WPA_ROWS=1c,1d,1e,1f,1g)
+   SC-1 1c | alert m=4 {kv-secret-assign=4}
+   SC-1 1d | alert m=4 {kv-secret-assign=4}
+   (rows not yes: 2)
+== cli_unbounded (variant cli_unbounded; WPA_ONLY=SC-34,SC-6,SC-10; WPA_ROWS=34a,34b,6f,6i,6k,10o)
+   SC-10 10o | glued=silent; long-name=alert m=1 {cli-secret-flag=1}
+   SC-34 34b | 8/9 as expected; wrong: cli-dash-run
+   (rows not yes: 2)
+== cli_v4 (variant cli_v4; WPA_ONLY=SC-34,SC-10; WPA_ROWS=34a,34b,10o)
+   SC-10 10o | glued=alert m=1 {cli-secret-flag=1}; long-name=alert m=1 {cli-secret-flag=1}
+   SC-34 34b | 7/9 as expected; wrong: cli-dash-run, cli-letter-dash-run
+   (rows not yes: 2)
+== cli_noleft (variant cli_noleft; WPA_ONLY=SC-34,SC-10; WPA_ROWS=34a,34b,10o)
+   SC-10 10o | glued=alert m=1 {cli-secret-flag=1}; long-name=silent
+   SC-34 34b | 8/9 as expected; wrong: cli-dash-run
+   (rows not yes: 2)
+== kv_unbounded (variant kv_unbounded; WPA_ONLY=SC-34,SC-5,SC-10; WPA_ROWS=34a,34b,5a,5n,10n)
+   SC-10 10n | long-key=alert m=1 {kv-secret-assign=1}
+   SC-34 34b | 8/9 as expected; wrong: kv-upper-run
+   (rows not yes: 2)
+== kv_left_boundary_off (variant kv_left_boundary_off; WPA_ONLY=SC-9,SC-5,SC-34; WPA_ROWS=9z,5a,5n,34b)
+   SC-9 9z | lower-glued=alert m=1 {kv-secret-assign=1}; prefix-glued=alert m=1 {kv-secret-assign=1}
+   SC-34 34b | 8/9 as expected; wrong: kv-upper-run
+   (rows not yes: 2)
+== val_quadratic (variant val_quadratic; WPA_ONLY=SC-34; WPA_ROWS=34a,34b)
+   SC-34 34a | 6/7 as expected; wrong: bearer-long-value
+   SC-34 34b | 8/9 as expected; wrong: auth-long-value
+   (rows not yes: 2)
+== kv_lowercase_10m (variant kv_lowercase; WPA_ONLY=SC-10; WPA_ROWS=10d,10j,10m)
+   SC-10 10d | alert m=1 {kv-secret-assign=1}
+   SC-10 10j | 3/6 as expected; wrong: url-query, ini-lower, ini-quoted
+   SC-10 10m | 0/6 as expected; wrong: compose-list/bash, compose-list/read, compose-map/bash, compose-map/read, inspect-env-array/bash, inspect-env-array/read
+   (rows not yes: 3)
+== ell_lastchar (variant ell_lastchar; WPA_ONLY=SC-11,SC-32; WPA_ROWS=11v,11x,11y,32e)
+   SC-32 32e | 3 of 3 rows differ: SC-11:11v SC-11:11x SC-11:11y
+   (rows not yes: 1)
+##### plan_v5_l1  (61 bad implementations, 60 turn at least one row red, 1 turn none)
+== ext_v4stage (previous design) (variant ext_v4stage; WPA_ONLY=SC-19,SC-34; WPA_ROWS=19af,19aa,19z,19ag,19al,34c)
+   SC-19 19af | 54/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   SC-19 19al | exit=0,0,2,2
+   SC-34 34c | 1/2 as expected; wrong: 64-occurrences-after-4KB[exit!=2]
+   (rows not yes: 3)
+== ext_v4stage:noesc_q (variant ext_v4stage:noesc_q; WPA_ONLY=SC-19; WPA_ROWS=19af,19z,19aa)
+   SC-19 19af | 50/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   (rows not yes: 1)
+== ext_v4stage:noesc_all (variant ext_v4stage:noesc_all; WPA_ONLY=SC-19; WPA_ROWS=19af,19z,19aa)
+   SC-19 19af | 53/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   (rows not yes: 1)
+== ext_v4stage:noansi (variant ext_v4stage:noansi; WPA_ONLY=SC-19; WPA_ROWS=19af,19z,19aa)
+   SC-19 19af | 52/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   (rows not yes: 1)
+== ext_v4stage:nopipe (variant ext_v4stage:nopipe; WPA_ONLY=SC-19; WPA_ROWS=19af,19z,19aa)
+   SC-19 19af | 57/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   (rows not yes: 1)
+== ext_v4stage:nonl (variant ext_v4stage:nonl; WPA_ONLY=SC-19; WPA_ROWS=19af,19z,19aa)
+   SC-19 19z | exit=2,2,2,2,2,2,2,2,2,0,2,2
+   SC-19 19af | 53/73 shapes equal; DIVERGE: or-or-pipe, newline-sep, background-amp, cont-cat, cont-sed, cont-after-pipe, ...; anchors ok
+   (rows not yes: 2)
+== ext_perocc_judge (variant ext_perocc_judge; WPA_ONLY=SC-34,SC-19; WPA_ROWS=34c,19x,19y,19r)
+   SC-34 34c | 1/2 as expected; wrong: 64-occurrences-after-4KB[cost>3.5x]
+   (rows not yes: 1)
+== ext_charslice (variant ext_charslice; WPA_ONLY=SC-19; WPA_ROWS=19ag,19ad,19ah)
+   SC-19 19ag | exit=0,0,0,2,2
+   (rows not yes: 1)
+== ext_localnoexp (variant ext_localnoexp; WPA_ONLY=SC-19; WPA_ROWS=19ah,19am,19ad)
+   SC-19 19ah | exit=0,2,0
+   SC-19 19am | exit=2,2
+   (rows not yes: 2)
+== ext_noc (variant ext_noc; WPA_ONLY=SC-19; WPA_ROWS=19ad,19ae,19ag,19ah,19am)
+   SC-19 19ad | exit=0,2
+   SC-19 19ae | exit=0
+   SC-19 19ag | exit=0,0,0,2,2
+   SC-19 19ah | exit=0,2,0
+   SC-19 19am | exit=2,2
+   (rows not yes: 5)
+== ext_charlen (alias of ext_noc) (variant ext_charlen; WPA_ONLY=SC-19; WPA_ROWS=19ad,19ah)
+   SC-19 19ad | exit=0,2
+   SC-19 19ah | exit=0,2,0
+   (rows not yes: 2)
+== ext_nobom (variant ext_nobom; WPA_ONLY=SC-19; WPA_ROWS=19ai,19m)
+   SC-19 19ai | exit=0,2
+   (rows not yes: 1)
+== ext_ascii_only (variant ext_ascii_only; WPA_ONLY=SC-19; WPA_ROWS=19ae,19ah)
+   SC-19 19ae | exit=0
+   SC-19 19ah | exit=2,2,0
+   (rows not yes: 2)
+== ext_subst_first (variant ext_subst_first; WPA_ONLY=SC-19; WPA_ROWS=19r,19x,19af)
+   SC-19 19r | exit=0
+   SC-19 19x | exit=0
+   SC-19 19af | 69/73 shapes equal; DIVERGE: mention-then-reader, dbl-bracket, var-indirect, cat-then-ls-occurrence; anchors ok
+   (rows not yes: 3)
+== ext_subst_nosep (variant ext_subst_nosep; WPA_ONLY=SC-19; WPA_ROWS=19aj,19a,19af)
+   SC-19 19aj | exit=2,0,0
+   (rows not yes: 1)
+== ext_subst_forgejo (variant ext_subst_forgejo; WPA_ONLY=SC-19; WPA_ROWS=19ak,19af)
+   SC-19 19ak | exit=2,2
+   (rows not yes: 1)
+== ext_nostrip (variant ext_nostrip; WPA_ONLY=SC-19; WPA_ROWS=19ac)
+   SC-19 19ac | exit=0,0
+   (rows not yes: 1)
+== ext_emptypat (variant ext_emptypat; WPA_ONLY=SC-20; WPA_ROWS=20o,20p,20q)
+   SC-20 20o | exit=0,0,2,2,2,2
+   SC-20 20p | exit=0,0,2,2,2,2
+   SC-20 20q | exit=0,0,2,2,2,2
+   (rows not yes: 3)
+== ext_nosym (variant ext_nosym; WPA_ONLY=SC-19; WPA_ROWS=19w)
+   SC-19 19w | exit=2,0,0,2
+   (rows not yes: 1)
+== ext_eval (variant ext_eval; WPA_ONLY=SC-19; WPA_ROWS=19ab)
+   SC-19 19ab | exit=0,0,0,2,2 CANARY-EXECUTED(1,2)
+   (rows not yes: 1)
+== ext_glob (variant ext_glob; WPA_ONLY=SC-19; WPA_ROWS=19ab,19a)
+   SC-19 19ab | exit=0,2,0,0,0 canaries-absent
+   (rows not yes: 1)
+== ext_regex (variant ext_regex; WPA_ONLY=SC-19,SC-20; WPA_ROWS=19j,20h)
+   SC-19 19j | exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   SC-20 20h | exit=0,0
+   (rows not yes: 2)
+== ext_first (variant ext_first; WPA_ONLY=SC-20; WPA_ROWS=20l)
+   SC-20 20l | exit=2,2 calls=_sg_ext_pass
+   (rows not yes: 1)
+== ext_bare (variant ext_bare; WPA_ONLY=SC-20; WPA_ROWS=20i,20j,20k)
+   SC-20 20i | exit=2,2,2,1,2
+   SC-20 20j | exit=2,2,2,1,2
+   (rows not yes: 2)
+== vx_interleave (variant vx_interleave; WPA_ONLY=SC-21; WPA_ROWS=21v)
+   SC-21 21v | exit=2 calls=_sg_vx_pass
+   (rows not yes: 1)
+== ext_perentry (timing class) (variant ext_perentry; WPA_ONLY=SC-19,SC-20; WPA_ROWS=19a,19b,19u,19v,20a,20f)
+   (rows not yes: 0)
+== env_tight (variant env_tight; WPA_ONLY=SC-22; WPA_ROWS=22br,22bs,22bo,22bm)
+   SC-22 22br | 0/44 as expected; wrong: ssh:env|grep, ssh:printenv|grep, docker:env|grep, docker:printenv|grep, docker-compose:env|grep, docker-compose:printenv|grep
+   SC-22 22bs | 0/22 as expected; wrong: ssh:env|grep-v, ssh:printenv|grep-v, docker:env|grep-v, docker:printenv|grep-v, docker-compose:env|grep-v, docker-compose:pri
+   (rows not yes: 2)
+== w12_once (variant w12_once; WPA_ONLY=SC-23; WPA_ROWS=23b,23j)
+   SC-23 23j | exit=2,2,2,2
+   (rows not yes: 1)
+== readface16 (variant readface16; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 16/32 as expected; wrong: credentials-dir, id_rsa, id_ed25519, id_ecdsa, gpg, age, ...
+   SC-18 18k | 16/32 as expected; wrong: credentials-dir, id_rsa, id_ed25519, id_ecdsa, gpg, age, ...
+   (rows not yes: 2)
+== readface_drop:1 (variant readface_drop:1; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: env
+   SC-18 18k | 31/32 as expected; wrong: env
+   (rows not yes: 2)
+== readface_drop:2 (variant readface_drop:2; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: envrc
+   SC-18 18k | 31/32 as expected; wrong: envrc
+   (rows not yes: 2)
+== readface_drop:3 (variant readface_drop:3; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: secrets-dir
+   SC-18 18k | 31/32 as expected; wrong: secrets-dir
+   (rows not yes: 2)
+== readface_drop:4 (variant readface_drop:4; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: credentials-dir
+   SC-18 18k | 31/32 as expected; wrong: credentials-dir
+   (rows not yes: 2)
+== readface_drop:5 (variant readface_drop:5; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: id_rsa
+   SC-18 18k | 31/32 as expected; wrong: id_rsa
+   (rows not yes: 2)
+== readface_drop:6 (variant readface_drop:6; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: id_ed25519
+   SC-18 18k | 31/32 as expected; wrong: id_ed25519
+   (rows not yes: 2)
+== readface_drop:7 (variant readface_drop:7; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: id_ecdsa
+   SC-18 18k | 31/32 as expected; wrong: id_ecdsa
+   (rows not yes: 2)
+== readface_drop:8 (variant readface_drop:8; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: ssh-id
+   SC-18 18k | 31/32 as expected; wrong: ssh-id
+   (rows not yes: 2)
+== readface_drop:9 (variant readface_drop:9; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: pem
+   SC-18 18k | 31/32 as expected; wrong: pem
+   (rows not yes: 2)
+== readface_drop:10 (variant readface_drop:10; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: key
+   SC-18 18k | 31/32 as expected; wrong: key
+   (rows not yes: 2)
+== readface_drop:11 (variant readface_drop:11; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: gpg
+   SC-18 18k | 31/32 as expected; wrong: gpg
+   (rows not yes: 2)
+== readface_drop:12 (variant readface_drop:12; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: age
+   SC-18 18k | 31/32 as expected; wrong: age
+   (rows not yes: 2)
+== readface_drop:13 (variant readface_drop:13; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: p12
+   SC-18 18k | 31/32 as expected; wrong: p12
+   (rows not yes: 2)
+== readface_drop:14 (variant readface_drop:14; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: pfx
+   SC-18 18k | 31/32 as expected; wrong: pfx
+   (rows not yes: 2)
+== readface_drop:15 (variant readface_drop:15; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: jks
+   SC-18 18k | 31/32 as expected; wrong: jks
+   (rows not yes: 2)
+== readface_drop:16 (variant readface_drop:16; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: tfstate
+   SC-18 18k | 31/32 as expected; wrong: tfstate
+   (rows not yes: 2)
+== readface_drop:17 (variant readface_drop:17; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: tfstate-backup
+   SC-18 18k | 31/32 as expected; wrong: tfstate-backup
+   (rows not yes: 2)
+== readface_drop:18 (variant readface_drop:18; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: aws-credentials
+   SC-18 18k | 31/32 as expected; wrong: aws-credentials
+   (rows not yes: 2)
+== readface_drop:19 (variant readface_drop:19; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: aws-config
+   SC-18 18k | 31/32 as expected; wrong: aws-config
+   (rows not yes: 2)
+== readface_drop:20 (variant readface_drop:20; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: kube-config
+   SC-18 18k | 31/32 as expected; wrong: kube-config
+   (rows not yes: 2)
+== readface_drop:21 (variant readface_drop:21; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: kubeconfig
+   SC-18 18k | 31/32 as expected; wrong: kubeconfig
+   (rows not yes: 2)
+== readface_drop:22 (variant readface_drop:22; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: docker-config
+   SC-18 18k | 31/32 as expected; wrong: docker-config
+   (rows not yes: 2)
+== readface_drop:23 (variant readface_drop:23; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: service-account
+   SC-18 18k | 31/32 as expected; wrong: service-account
+   (rows not yes: 2)
+== readface_drop:24 (variant readface_drop:24; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: gcp-key
+   SC-18 18k | 31/32 as expected; wrong: gcp-key
+   (rows not yes: 2)
+== readface_drop:25 (variant readface_drop:25; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: firebase
+   SC-18 18k | 31/32 as expected; wrong: firebase
+   (rows not yes: 2)
+== readface_drop:26 (variant readface_drop:26; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: known-hosts
+   SC-18 18k | 31/32 as expected; wrong: known-hosts
+   (rows not yes: 2)
+== readface_drop:27 (variant readface_drop:27; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: secret-token
+   SC-18 18k | 31/32 as expected; wrong: secret-token
+   (rows not yes: 2)
+== readface_drop:28 (variant readface_drop:28; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: master-key
+   SC-18 18k | 31/32 as expected; wrong: master-key
+   (rows not yes: 2)
+== readface_drop:29 (variant readface_drop:29; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: encryption-key
+   SC-18 18k | 31/32 as expected; wrong: encryption-key
+   (rows not yes: 2)
+== readface_drop:30 (variant readface_drop:30; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: claude-settings
+   SC-18 18k | 31/32 as expected; wrong: claude-settings
+   (rows not yes: 2)
+== readface_drop:31 (variant readface_drop:31; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: claude-settings-local
+   SC-18 18k | 31/32 as expected; wrong: claude-settings-local
+   (rows not yes: 2)
+== readface_drop:32 (variant readface_drop:32; WPA_ONLY=SC-18; WPA_ROWS=18j,18k)
+   SC-18 18j | 31/32 as expected; wrong: claude-json
+   SC-18 18k | 31/32 as expected; wrong: claude-json
+   (rows not yes: 2)
+##### plan_v5_l1b  (10 bad implementations, 6 turn at least one row red, 4 turn none)
+== w12_echo_norm (variant w12_echo_norm; WPA_ONLY=SC-23,SC-25; WPA_ROWS=25h,23a,23b,23c,23d,23j,25a,25b,25c)
+   SC-25 25h | rc=2; echo=normalised or absent
+   (rows not yes: 1)
+== remote_env_split_ssh (variant remote_env_split:ssh; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   SC-22 22bo | 20/22 as expected; wrong: ssh:env, ssh:printenv
+   (rows not yes: 1)
+== remote_env_split_docker (variant remote_env_split:docker; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   (rows not yes: 0)
+== remote_env_split_kubectl (variant remote_env_split:kubectl; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   (rows not yes: 0)
+== remote_env_split_nomad (variant remote_env_split:nomad; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   SC-22 22bo | 20/22 as expected; wrong: nomad:env, nomad:printenv
+   (rows not yes: 1)
+== remote_env_split_pct (variant remote_env_split:pct; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   SC-22 22bo | 20/22 as expected; wrong: pct:env, pct:printenv
+   (rows not yes: 1)
+== remote_env_split_lxc (variant remote_env_split:lxc; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   (rows not yes: 0)
+== remote_env_split_podman (variant remote_env_split:podman; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   (rows not yes: 0)
+== remote_env_split_sh (variant remote_env_split:sh; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   SC-22 22bo | 18/22 as expected; wrong: sh-c:env, sh-c:printenv, bash-c:env, bash-c:printenv
+   (rows not yes: 1)
+== remote_env_split_watch (variant remote_env_split:watch; WPA_ONLY=SC-22; WPA_ROWS=22bo,22br,22bs)
+   SC-22 22bo | 20/22 as expected; wrong: watch:env, watch:printenv
+   (rows not yes: 1)
+##### plan_v5_l1c  (7 bad implementations, 7 turn at least one row red, 0 turn none)
+== bj_remote_env_split_ssh (variant remote_env_split:ssh; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bo)
+   SC-22 22bo | 20/22 as expected; wrong: ssh:env, ssh:printenv
+   SC-22 22bj | 12/14 as expected; wrong: env-word-commit, env-word-echo
+   (rows not yes: 2)
+== bj_remote_env_split_sh (variant remote_env_split:sh; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bo)
+   SC-22 22bo | 18/22 as expected; wrong: sh-c:env, sh-c:printenv, bash-c:env, bash-c:printenv
+   SC-22 22bj | 12/14 as expected; wrong: venv-bash-c, venv-sh-c
+   (rows not yes: 2)
+== bj_remote_env_split_watch (variant remote_env_split:watch; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bo)
+   SC-22 22bo | 20/22 as expected; wrong: watch:env, watch:printenv
+   SC-22 22bj | 13/14 as expected; wrong: du-watch
+   (rows not yes: 2)
+== bj_drop_procreader_grep (variant drop_procreader:grep; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bd)
+   SC-22 22bd | 10/13 as expected; wrong: grep, egrep, fgrep
+   SC-22 22bj | 13/14 as expected; wrong: proc-text-grep
+   (rows not yes: 2)
+== bj_drop_procreader_rg (variant drop_procreader:rg; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bd)
+   SC-22 22bd | 12/13 as expected; wrong: rg
+   SC-22 22bj | 13/14 as expected; wrong: proc-text-rg
+   (rows not yes: 2)
+== bj_drop_procreader_sed (variant drop_procreader:sed; WPA_ONLY=SC-22; WPA_ROWS=22bj,22bd)
+   SC-22 22bd | 12/13 as expected; wrong: sed
+   SC-22 22bj | 13/14 as expected; wrong: proc-text-sed
+   (rows not yes: 2)
+== ext_nocut (variant ext_nocut; WPA_ONLY=SC-19,SC-20; WPA_ROWS=19aa,19a,19b,19z,19af,19ak,19ab,20l,20m)
+   SC-19 19aa | exit=2,2,2,2,0,2
+   SC-19 19af | 53/73 shapes equal; DIVERGE: cat-wc, cat-sha, cat-devnull, pipe-first, reader-then-mention, pipe-reader-later, ...; anchors ok
+   (rows not yes: 2)
+##### plan_v5_b32  (1 bad implementations, 1 turn at least one row red, 0 turn none)
+== ell_lastchar_b32 (variant ell_lastchar; WPA_ONLY=SC-11,SC-32; WPA_ROWS=11v,11x,11y,32c,32d,32e)
+   SC-32 32e | 3 of 3 rows differ: SC-11:11v SC-11:11x SC-11:11y
+   (rows not yes: 1)
+##### doc  (25 bad implementations, 25 turn at least one row red, 0 turn none)
+== doc_bad (patch_docs.py --bad; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26a | section-absent
+   SC-26 26b | ps-family-row-absent-in-2.5
+   SC-26 26c | section-absent
+   SC-26 26d | app.ini-absent-in-2.2
+   SC-26 26e | README.md=missing; README.zh.md=missing
+   SC-26 26f | header-missing .aria/secret-guard.paths,systemctl status,docker inspect,Acceptable filters,variable indirection
+   SC-26 26g | top-section-missing rule6_note,.aria/secret-guard.paths,ps aux,/proc,app.ini,file.content,kv-secret-assign,placeholder,o
+   SC-26 26j | version-line=other; history-row=absent
+   SC-26 26k | app.ini-absent-in-5.1
+   SC-27 27c | SOT differs from run total
+   SC-28 28a | old still-present; new absent
+   SC-28 28b | old still-present; new absent
+   SC-28 28c | old still-present; new absent
+   SC-28 28d | old still-present; new absent
+   SC-28 28e | old still-present; new present
+   SC-28 28f | old still-present; new absent
+   SC-28 28g | old still-present; new absent
+   SC-28 28h | old still-present; new absent
+   SC-28 28i | old still-present; new absent
+   SC-28 28o | old still-present; new absent
+   SC-28 28l | old still-present; new absent
+   SC-28 28j | absent
+   SC-28 28k | absent
+   SC-28 28m | SOT-5.2=silent-on-it; README.md=silent-on-it; README.zh.md=silent-on-it
+   SC-28 28n | scope-misses auth-header-token,cf-access-client-secret,cli-secret-flag,json-credential-field,json-env-secret-key,kv-secr
+   (rows not yes: 25)
+== doc_bad-sot (patch_docs.py --bad-sot; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26a | section-absent
+   SC-26 26b | ps-family-row-absent-in-2.5
+   SC-26 26c | section-absent
+   SC-26 26d | app.ini-absent-in-2.2
+   SC-26 26j | version-line=other; history-row=absent
+   SC-26 26k | app.ini-absent-in-5.1
+   SC-27 27c | SOT differs from run total
+   SC-28 28h | old still-present; new absent
+   SC-28 28m | SOT-5.2=silent-on-it; README.md=names-updatedToolOutput; README.zh.md=names-updatedToolOutput
+   (rows not yes: 9)
+== doc_bad-layer (patch_docs.py --bad-layer; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26i | 2 occurrences of L1 / L3
+   (rows not yes: 1)
+== doc_no-scope (patch_docs.py --no-scope; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28n | scope-misses auth-header-token,cf-access-client-secret,cli-secret-flag,json-credential-field,json-env-secret-key,kv-secr
+   (rows not yes: 1)
+== doc_hdr-count (patch_docs.py --hdr-count; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28c | old gone; new absent
+   SC-28 28d | old gone; new absent
+   SC-28 28o | old gone; new absent
+   (rows not yes: 3)
+== doc_hdr-half-l (patch_docs.py --hdr-half-l; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28l | old still-present; new present
+   (rows not yes: 1)
+== doc_hdr-dangling (patch_docs.py --hdr-dangling; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28b | old gone; new absent
+   (rows not yes: 1)
+== doc_hdr-half-a (patch_docs.py --hdr-half-a; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28a | old still-present; new present
+   (rows not yes: 1)
+== doc_hdr-argon (patch_docs.py --hdr-argon; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28e | old still-present; new present
+   (rows not yes: 1)
+== doc_hdr-topcontent (patch_docs.py --hdr-topcontent; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-28 28f | old gone; new absent
+   (rows not yes: 1)
+== doc_hdr-nohist (patch_docs.py --hdr-nohist; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26f | header-missing .aria/secret-guard.paths,systemctl status,docker inspect,Acceptable filters,variable indirection
+   SC-28 28j | absent
+   (rows not yes: 2)
+== doc_cl-drop:rule6_note (patch_docs.py --cl-drop=rule6_note; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing rule6_note
+   (rows not yes: 1)
+== doc_cl-drop:.aria/secret-guard.paths (patch_docs.py --cl-drop=.aria/secret-guard.paths; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing .aria/secret-guard.paths
+   (rows not yes: 1)
+== doc_cl-drop:ps aux (patch_docs.py --cl-drop=ps aux; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing ps aux
+   (rows not yes: 1)
+== doc_cl-drop:/proc (patch_docs.py --cl-drop=/proc; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing /proc
+   (rows not yes: 1)
+== doc_cl-drop:app.ini (patch_docs.py --cl-drop=app.ini; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing app.ini
+   (rows not yes: 1)
+== doc_cl-drop:file.content (patch_docs.py --cl-drop=file.content; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing file.content
+   (rows not yes: 1)
+== doc_cl-drop:kv-secret-assign (patch_docs.py --cl-drop=kv-secret-assign; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing kv-secret-assign
+   (rows not yes: 1)
+== doc_cl-drop:placeholder (patch_docs.py --cl-drop=placeholder; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing placeholder
+   (rows not yes: 1)
+== doc_cl-drop:os.environ (patch_docs.py --cl-drop=os.environ; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing os.environ
+   (rows not yes: 1)
+== doc_cl-drop:keys_unsorted (patch_docs.py --cl-drop=keys_unsorted; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing keys_unsorted
+   (rows not yes: 1)
+== doc_cl-drop:fp: (patch_docs.py --cl-drop=fp=; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing fp=
+   (rows not yes: 1)
+== doc_cl-drop:CPU (patch_docs.py --cl-drop=CPU; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing CPU
+   (rows not yes: 1)
+== doc_cl-drop:partial (patch_docs.py --cl-drop=partial; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-26 26g | top-section-missing partial
+   (rows not yes: 1)
+== doc_no-selfcheck (patch_docs.py --no-selfcheck; WPA_ONLY=SC-26,SC-27,SC-28)
+   SC-27 27c | SOT differs from run total
+   SC-27 27d | 0 non-comment line(s) read the header count
+   (rows not yes: 2)
+
+====================================================================================================
+
+PART B1 -- one line per bad implementation of the previous round (rows are `SC-number:row`)
+
+  plan_v4_l3             nul_off                              red now: 1:1c 1:1d                                                                                            | red before: 1:1c 1:1d  [preserved]
+  plan_v4_l3             drop_extract_content                 red now: 2:2e                                                                                                 | red before: 2:2e  [preserved]
+  plan_v4_l3             drop_extract_output                  red now: 2:2f                                                                                                 | red before: 2:2f  [preserved]
+  plan_v4_l3             oldkey_webhook_secret                red now: 7:7k                                                                                                 | red before: 7:7k  [preserved]
+  plan_v4_l3             oldkey_encryption_key                red now: 7:7k                                                                                                 | red before: 7:7k  [preserved]
+  plan_v4_l3             step_ent_on_env-line-secret-keyword  red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_env-line-secret-keyword red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_env-line-secret-keyword  red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_bearer-token             red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_bearer-token            red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_bearer-token             red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_x-api-key-header         red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_x-api-key-header        red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_x-api-key-header         red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_postgres-url             red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_postgres-url            red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_postgres-url             red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_redis-url                red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_redis-url               red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_redis-url                red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_mongodb-url              red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_mongodb-url             red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_mongodb-url              red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_ent_on_basic-auth-url           red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_basic-auth-url          red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_basic-auth-url           red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_path_on_json-secret-field       red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_json-secret-field        red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_dot_on_jwt                      red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             step_wl_on_bearer-token              red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             step_wl_on_x-api-key-header          red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             step_wl_on_postgres-url              red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             step_wl_on_redis-url                 red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             step_wl_on_mongodb-url               red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             step_wl_on_basic-auth-url            red now: 7:7m                                                                                                 | red before: 7:7m  [preserved]
+  plan_v4_l3             cls_all                              red now: 7:7h 7:7l 7:7m                                                                                       | red before: 7:7h 7:7l 7:7m  [preserved]
+  plan_v4_l3             pd_on_old                            red now: 7:7l                                                                                                 | red before: 7:7l  [preserved]
+  plan_v4_l3             fp_le16                              red now: 12:12n                                                                                               | red before: 12:12n  [preserved]
+  plan_v4_l3             fp_lt20                              red now: 12:12n                                                                                               | red before: 12:12n  [preserved]
+  plan_v4_l3             fp_lt13                              red now: 12:12n                                                                                               | red before: 12:12n  [preserved]
+  plan_v4_l3             hash_nosha256sum                     red now: 12:12o                                                                                               | red before: 12:12o  [preserved]
+  plan_v4_l3             hash_noshasum                        red now: 12:12o                                                                                               | red before: 12:12o  [preserved]
+  plan_v4_l3             val_eval                             red now: 7:7n                                                                                                 | red before: 7:7n  [preserved]
+  plan_v4_l1_w9w10w12    ext_nostrip                          red now: 19:19ac                                                                                              | red before: 19:19ac  [preserved]
+  plan_v4_l1_w9w10w12    ext_emptypat                         red now: 20:20o 20:20p 20:20q                                                                                 | red before: 20:20o 20:20p 20:20q  [preserved]
+  plan_v4_l1_w9w10w12    ext_eval                             red now: 19:19ab 19:19j                                                                                       | red before: 19:19ab 19:19j  [preserved]
+  plan_v4_l1_w9w10w12    ext_glob                             red now: 19:19ab                                                                                              | red before: 19:19ab  [preserved]
+  plan_v4_l1_w9w10w12    vx_eval                              red now: 21:21z                                                                                               | red before: 21:21z  [preserved]
+  plan_v4_l1_w9w10w12    w12_eval                             red now: 23:23i                                                                                               | red before: 23:23i  [preserved]
+  plan_v4_l1_charsem     ext_charlen                          red now: 19:19ad 19:19ae                                                                                      | red before: 19:19ad  [preserved (+ more rows)]
+  plan_v4_l1_w11w8       tight_without_PROCTAB                red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tight_without_REMOTE                 red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tight_without_DOCKER                 red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_sudo                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_doas                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_nice                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_timeout                 red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_xargs                   red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_nohup                   red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_stdbuf                  red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_env                     red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_time                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_eval                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_setsid                  red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_ionice                  red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_unbuffer                red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_command                 red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_launch_exec                    red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_ssh                     red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_docker                  red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_kubectl                 red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_nomad                   red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_pct                     red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_lxc                     red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_podman                  red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_sh                      red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_remote_watch                   red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_1                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_2                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_3                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_4                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_5                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_6                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tdrop_psalt_7                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       tight_plainps                        red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       notight_proc                         red now: 22:22bm                                                                                              | red before: 22:22bm  [preserved]
+  plan_v4_l1_w11w8       proc_nocredit                        red now: 22:22Y 22:22bn                                                                                       | red before: 22:22Y 22:22bn  [preserved]
+  plan_v4_l1_w11w8       tight_ini_literal                    red now: 16:16r                                                                                               | red before: 16:16r  [preserved]
+  plan_v4_l1_w11w8       notight_ini                          red now: 16:16f 16:16r                                                                                        | red before: 16:16f 16:16r  [preserved]
+  plan_v4_l1_w11w8       launcher_ps_only                     red now: 22:22bq                                                                                              | red before: 22:22bq  [preserved]
+  plan_v4_l1_w11w8       remote_env_split_ssh                 red now: 22:22bo                                                                                              | red before: 22:22bo  [preserved]
+  plan_v4_l1_w11w8       remote_env_split_docker              red now: -                                                                                                    | red before: -  [equivalent before; still no row red]
+  plan_v4_l1_w11w8       remote_env_split_kubectl             red now: -                                                                                                    | red before: -  [equivalent before; still no row red]
+  plan_v4_l1_w11w8       remote_env_split_nomad               red now: 22:22bo                                                                                              | red before: 22:22bo  [preserved]
+  plan_v4_l1_w11w8       remote_env_split_pct                 red now: 22:22bo                                                                                              | red before: 22:22bo  [preserved]
+  plan_v4_l1_w11w8       remote_env_split_lxc                 red now: -                                                                                                    | red before: -  [equivalent before; still no row red]
+  plan_v4_l1_w11w8       remote_env_split_podman              red now: -                                                                                                    | red before: -  [equivalent before; still no row red]
+  plan_v4_l1_w11w8       remote_env_split_sh                  red now: 22:22bo                                                                                              | red before: 22:22bo  [preserved]
+  plan_v4_l1_w11w8       remote_env_split_watch               red now: 22:22bo                                                                                              | red before: 22:22bo  [preserved]
+  plan_v4_l1_w11w8       drop_pid_2                           red now: 22:22be 22:22bp                                                                                      | red before: 22:22be 22:22bp  [preserved]
+  plan_v4_l1_w11w8       drop_pid_6                           red now: 22:22bp                                                                                              | red before: 22:22bp  [preserved]
+  plan_v4_l1_w11w8       drop_pid_7                           red now: 22:22bp                                                                                              | red before: 22:22bp  [preserved]
+  plan_v4_l1_w11w8       pidtok_placeholders                  red now: 22:22bf                                                                                              | red before: 22:22bf  [preserved]
+  plan_v4_l1_w11w8       drop_dockerform_ctop                 red now: 22:22bl                                                                                              | red before: 22:22bl  [preserved]
+  plan_v4_l1_w11w8       proc_tight                           red now: 22:22bh                                                                                              | red before: 22:22bh  [preserved]
+  plan_v4_l1_w11w8       remote_anchored                      red now: 22:22bj                                                                                              | red before: 22:22bj  [preserved]
+  plan_v4_l1_w11w8       anchor_nocntrl_bj                    red now: 22:22bj                                                                                              | red before: 22:22bj  [preserved]
+  plan_v4_b32            ent_range_32d                        red now: 32:32d                                                                                               | red before: 32:32d  [preserved]
+
+====================================================================================================
+
+PART B2 -- one line per bad implementation of the rounds before (rows are `SC-number:row`)
+
+  plan_extra       wl_cmdsub                                  red now: 7:7h 11:11z                                                                                          | red in v3: 7:7h 11:11z  [preserved]
+  plan_extra       fp_relpath                                 red now: 10:10l                                                                                               | red in v3: 10:10l  [preserved]
+  plan_extra       fp_kebab                                   red now: 10:10l                                                                                               | red in v3: 10:10l  [preserved]
+  plan_extra4      name_loose                                 red now: 9:9x                                                                                                 | red in v3: 9:9x  [preserved]
+  plan_extra4      kv_lowercase                               red now: 10:10d 10:10j                                                                                        | red in v3: 10:10d 10:10j  [preserved]
+  plan_extra4      add_dollar_hdr                             red now: 9:9l                                                                                                 | red in v3: 9:9l  [preserved]
+  plan_extra4      add_dollar_kv                              red now: 9:9m                                                                                                 | red in v3: 9:9m  [preserved]
+  plan_extra4      bash_boundary_wide                         red now: 17:17c                                                                                               | red in v3: 17:17c  [preserved]
+  plan_extra4      appini_anywhere                            red now: 17:17a 17:17d                                                                                        | red in v3: 17:17a 17:17d  [preserved]
+  plan_extra4      read_case_sensitive                        red now: 18:18h                                                                                               | red in v3: 18:18h  [preserved]
+  plan_extra4      claude_notight                             red now: 16:16p                                                                                               | red in v3: 16:16p  [preserved]
+  plan_extra4      interp_name_v1var                          red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_extra4      interp_name_secretsmanager                 red now: 16:16o                                                                                               | red in v3: 16:16o  [preserved]
+  plan_extra4      interp_name_secrets                        red now: 16:16o                                                                                               | red in v3: 16:16o  [preserved]
+  plan_extra4      interp_name_env                            red now: 16:16o                                                                                               | red in v3: 16:16o  [preserved]
+  plan_extra4      interp_name_provider_key                   red now: 16:16o                                                                                               | red in v3: 16:16o  [preserved]
+  plan_extra4      interp_name_claudecfg                      red now: 16:16o                                                                                               | red in v3: 16:16o  [preserved]
+  plan_extra4      pgrep_wide                                 red now: 22:22O 22:22S                                                                                        | red in v3: 22:22O 22:22S  [preserved]
+  plan_extra4      pemfp_nofp                                 red now: 12:12m                                                                                               | red in v3: 12:12m  [preserved]
+  plan_extra4      pemfp_hash                                 red now: 12:12k 12:12m                                                                                        | red in v3: 12:12k 12:12m  [preserved]
+  plan_extra4      pemfp_last                                 red now: 12:12m                                                                                               | red in v3: 12:12m  [preserved]
+  plan_extra4      pemfp_hdr_hash                             red now: 12:12l 12:12m                                                                                        | red in v3: 12:12l 12:12m  [preserved]
+  plan_extra4      pemfp_hdr_noitem                           red now: 12:12m                                                                                               | red in v3: 12:12m  [preserved]
+  plan_repeat      hdr_case_sensitive__r2                     red now: 6:6h 6:6j                                                                                            | red in v3: 6:6h 6:6j  [preserved]
+  plan_repeat      ent_digit__r2                              red now: 4:4o 4:4t 10:10b                                                                                     | red in v3: 4:4o 4:4t 10:10b  [preserved]
+  plan_repeat      ent_on_old__r2                             red now: 7:7h 7:7j                                                                                            | red in v3: 7:7h 7:7j  [preserved]
+  plan_repeat      noentropy__r2                              red now: 9:9p 10:10a 10:10b 10:10k                                                                            | red in v3: 9:9p 10:10a 10:10b 10:10k  [preserved]
+  plan_repeat      noident__r2                                red now: 9:9v 10:10i                                                                                          | red in v3: 9:9v 10:10i  [preserved]
+  plan_repeat      nopath__r2                                 red now: 9:9o 9:9w 9:9y                                                                                       | red in v3: 9:9o 9:9w 9:9y  [preserved]
+  plan_repeat      loosepath__r2                              red now: 4:4n 5:5l 9:9w 9:9y                                                                                  | red in v3: 4:4n 5:5l 9:9w 9:9y  [preserved]
+  plan_repeat      path_firstlower__r2                        red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_repeat      floor15__r2                                red now: 10:10h                                                                                               | red in v3: 10:10h  [preserved]
+  plan_repeat      floor17__r2                                red now: 4:4r 11:11w 11:11z                                                                                   | red in v3: 4:4r 11:11w 11:11z  [preserved]
+  plan_repeat      ent_drop_lower__r2                         red now: 4:4a 4:4o 4:4t                                                                                       | red in v3: 4:4a 4:4o 4:4t  [preserved]
+  plan_repeat      ent_drop_upper__r2                         red now: 4:4o 4:4t                                                                                            | red in v3: 4:4o 4:4t  [preserved]
+  plan_repeat      ent_drop_digit__r2                         red now: 4:4a 4:4t                                                                                            | red in v3: 4:4a 4:4t  [preserved]
+  plan_repeat      drop_lead_/__r2                            red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_repeat      drop_lead_~/__r2                           red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_repeat      drop_lead_./__r2                           red now: 9:9y                                                                                                 | red in v3: 9:9y  [preserved]
+  plan_repeat      drop_lead_../__r2                          red now: 9:9y                                                                                                 | red in v3: 9:9y  [preserved]
+  plan_repeat      path_plus__r2                              red now: 4:4n 5:5l                                                                                            | red in v3: 4:4n 5:5l  [preserved]
+  plan_repeat      path_eq__r2                                red now: 4:4n 5:5l                                                                                            | red in v3: 4:4n 5:5l  [preserved]
+  plan_repeat      cli_dash2__r2                              red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_vsym        vsym_kv_plus                               red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_slash                              red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_eq                                 red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_dot                                red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_us                                 red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_tilde                              red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_kv_dash                               red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_plus                              red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_slash                             red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_eq                                red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_dot                               red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_us                                red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_vsym        vsym_hdr_dash                              red now: 6:6k                                                                                                 | red in v3: 6:6k  [preserved]
+  plan_l3_wl       wl_varname_lc                              red now: 7:7h 11:11z                                                                                          | red in v3: 7:7h 11:11z  [preserved]
+  plan_l3_wl       wl_varname_uc                              red now: 7:7h                                                                                                 | red in v3: 7:7h  [preserved]
+  plan_l3_wl       wl_varname_any                             red now: 7:7h 11:11z                                                                                          | red in v3: 7:7h 11:11z  [preserved]
+  plan_l3_wl       wl_dots_ascii                              red now: 7:7h 11:11z                                                                                          | red in v3: 7:7h 11:11z  [preserved]
+  plan_l3_wl       wl_angle_prefix                            red now: 7:7h 7:7j 11:11z                                                                                     | red in v3: 7:7h 7:7j 11:11z  [preserved]
+  plan_l3_wl       wl_angle_suffix                            red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_angle_loose                             red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_angle_noend                             red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_brace_prefix                            red now: 7:7j 11:11z                                                                                          | red in v3: 7:7j 11:11z  [preserved]
+  plan_l3_wl       wl_brace_noend                             red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_tmpl_prefix                             red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_tmpl_suffix                             red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_tmpl_noend                              red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_red_prefix                              red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_red_anybracket                          red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_mask_prefix                             red now: 7:7j 11:11x                                                                                          | red in v3: 7:7j 11:11x  [preserved]
+  plan_l3_wl       wl_mask_mixed                              red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_ell_contains                            red now: 7:7j                                                                                                 | red in v3: 7:7j  [preserved]
+  plan_l3_wl       wl_ell_prefix                              red now: 7:7j 11:11v 11:11x 11:11y                                                                            | red in v3: 7:7j 11:11v 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_prefix                                  red now: 7:7h 7:7i 7:7j 11:11z                                                                                | red in v3: 7:7h 7:7i 7:7j 11:11z  [preserved]
+  plan_l3_wl       wl_contains                                red now: 7:7h 7:7j 11:11s                                                                                     | red in v3: 7:7h 7:7j 11:11s  [preserved]
+  plan_l3_wl       wl_nocase                                  red now: 7:7h                                                                                                 | red in v3: 7:7h  [preserved]
+  plan_l3_wl       wl_envline                                 red now: 7:7h                                                                                                 | red in v3: 7:7h  [preserved]
+  plan_l3_wl       wl_drop_angle                              red now: 11:11f 11:11v 11:11x 11:11y                                                                          | red in v3: 11:11f 11:11v 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_brace                              red now: 11:11g 11:11v 11:11x 11:11y                                                                          | red in v3: 11:11g 11:11v 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_tmpl                               red now: 11:11h 11:11v 11:11x 11:11y                                                                          | red in v3: 11:11h 11:11v 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_tmpl_dollar                        red now: 11:11x                                                                                               | red in v3: 11:11x  [preserved]
+  plan_l3_wl       wl_drop_red                                red now: 11:11d 11:11e 11:11p 11:11r 11:11x 11:11y                                                            | red in v3: 11:11d 11:11e 11:11p 11:11r 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_mask_star                          red now: 11:11q                                                                                               | red in v3: 11:11q  [preserved]
+  plan_l3_wl       wl_drop_mask_x                             red now: 11:11x                                                                                               | red in v3: 11:11x  [preserved]
+  plan_l3_wl       wl_drop_mask_X                             red now: 11:11x                                                                                               | red in v3: 11:11x  [preserved]
+  plan_l3_wl       wl_drop_ellipsis                           red now: 11:11v 11:11x 11:11y                                                                                 | red in v3: 11:11v 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_FAKE                        red now: 11:11a 11:11j 11:11k 11:11m 11:11y                                                                   | red in v3: 11:11a 11:11j 11:11k 11:11m 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_PLACEHOLDER                 red now: 11:11l 11:11n 11:11y                                                                                 | red in v3: 11:11l 11:11n 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_NOT-REAL                    red now: 11:11c 11:11o 11:11y                                                                                 | red in v3: 11:11c 11:11o 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_NOT_REAL                    red now: 11:11x 11:11y                                                                                        | red in v3: 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_NOTREAL                     red now: 11:11x 11:11y                                                                                        | red in v3: 11:11x 11:11y  [preserved]
+  plan_l3_wl       wl_drop_marker_REDACTED                    red now: 11:11x 11:11y                                                                                        | red in v3: 11:11x 11:11y  [preserved]
+  plan_l3_w4w5     fp_span                                    red now: 12:12g 12:12h 12:12i 12:12j 12:12k                                                                   | red in v3: 12:12g 12:12h 12:12i 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     hdronly_fp                                 red now: 12:12l                                                                                               | red in v3: 12:12l  [preserved]
+  plan_l3_w4w5     fp_wrong_jwt                               red now: 12:12h 12:12k                                                                                        | red in v3: 12:12h 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_silknode-api-key                  red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_anthropic-api-key                 red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_openrouter-api-key                red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_openai-api-key                    red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_openai-legacy-key                 red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_stripe-live-secret                red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_stripe-test-secret                red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_stripe-publishable                red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_stripe-webhook                    red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_stripe-restricted                 red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_github-pat                        red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_github-oauth                      red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_github-user                       red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_github-fine-grained               red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_gitlab-pat                        red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_aws-access-key-id                 red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_aws-session-token                 red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_aliyun-access-key-id              red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_gcp-private-key-id                red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_discord-webhook                   red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_slack-webhook                     red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_postgres-url                      red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_redis-url                         red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_mongodb-url                       red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_basic-auth-url                    red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_bearer-token                      red now: 12:12g 12:12k                                                                                        | red in v3: 12:12g 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_x-api-key-header                  red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_env-line-secret-keyword           red now: 12:12g 12:12i 12:12k                                                                                 | red in v3: 12:12g 12:12i 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_json-secret-field                 red now: 12:12a 12:12k                                                                                        | red in v3: 12:12a 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_bcrypt-hash                       red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_json-credential-field             red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_json-env-secret-key               red now: 12:12k                                                                                               | red in v3: 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_kv-secret-assign                  red now: 12:12h 12:12k                                                                                        | red in v3: 12:12h 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_auth-header-token                 red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_cf-access-client-secret           red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     fp_wrong_cli-secret-flag                   red now: 12:12j 12:12k                                                                                        | red in v3: 12:12j 12:12k  [preserved]
+  plan_l3_w4w5     w5_append                                  red now: 13:13d 13:13g                                                                                        | red in v3: 13:13d 13:13g  [preserved]
+  plan_l3_w4w5     w5_path                                    red now: 13:13a 13:13c 13:13g                                                                                 | red in v3: 13:13a 13:13c 13:13g  [preserved]
+  plan_l3_enum     drop_name_AccessToken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_ApiKey                           red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_ApiToken                         red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_AuthToken                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_BearerToken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_ClientSecret                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_JwtSecret                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_Passwd                           red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_Password                         red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_PrivateKey                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_RefreshToken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_RegistrationToken                red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_Secret                           red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_SecretKey                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_SessionToken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_Sha1                             red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_Token                            red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_accessToken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_access_token                     red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_accesstoken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_apiKey                           red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_apiToken                         red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_api_key                          red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_api_token                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_apikey                           red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_apitoken                         red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_authToken                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_auth_token                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_authtoken                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_bearerToken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_bearer_token                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_bearertoken                      red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_clientSecret                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_client_secret                    red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_clientsecret                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_jwtSecret                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_jwt_secret                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_jwtsecret                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_passwd                           red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_password                         red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_privateKey                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_private_key                      red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_privatekey                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_refreshToken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_refresh_token                    red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_refreshtoken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_registrationToken                red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_registration_token               red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_registrationtoken                red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_secret                           red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l3_enum     drop_name_secretKey                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_secret_key                       red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_secretkey                        red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_sessionToken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_session_token                    red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_sessiontoken                     red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_sha1                             red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_name_token                            red now: 4:4p                                                                                                 | red in v3: 4:4p  [preserved]
+  plan_l3_enum     drop_kwjson_SECRET                         red now: 4:4l 4:4s                                                                                            | red in v3: 4:4l 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_PASSWORD                       red now: 4:4m 4:4s                                                                                            | red in v3: 4:4m 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_PASSWD                         red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_TOKEN                          red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_API_KEY                        red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_APIKEY                         red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_PRIVATE_KEY                    red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_WEBHOOK                        red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_ENCRYPTION_KEY                 red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwjson_ACCESS_KEY                     red now: 4:4s                                                                                                 | red in v3: 4:4s  [preserved]
+  plan_l3_enum     drop_kwkv_SECRET                           red now: 5:5a 5:5c 5:5e 5:5n                                                                                  | red in v3: 5:5a 5:5c 5:5e 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_PASSWORD                         red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_PASSWD                           red now: 5:5d 5:5n                                                                                            | red in v3: 5:5d 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_TOKEN                            red now: 5:5f 5:5n                                                                                            | red in v3: 5:5f 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_API_KEY                          red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_APIKEY                           red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_PRIVATE_KEY                      red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_WEBHOOK                          red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_ENCRYPTION_KEY                   red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_kwkv_ACCESS_KEY                       red now: 5:5n                                                                                                 | red in v3: 5:5n  [preserved]
+  plan_l3_enum     drop_flag_token                            red now: 6:6f 6:6i                                                                                            | red in v3: 6:6f 6:6i  [preserved]
+  plan_l3_enum     drop_flag_password                         red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_flag_passwd                           red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_flag_secret                           red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_flag_api-key                          red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_flag_apikey                           red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_flag_access-key                       red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l3_enum     drop_scheme_token                          red now: 6:6a 6:6b 6:6j                                                                                       | red in v3: 6:6a 6:6b 6:6j  [preserved]
+  plan_l3_enum     drop_scheme_Token                          red now: 6:6j                                                                                                 | red in v3: 6:6j  [preserved]
+  plan_l3_enum     drop_scheme_basic                          red now: 6:6j                                                                                                 | red in v3: 6:6j  [preserved]
+  plan_l3_enum     drop_scheme_Basic                          red now: 6:6e 6:6j                                                                                            | red in v3: 6:6e 6:6j  [preserved]
+  plan_l3_enum     hdr_case_sensitive                         red now: 6:6h 6:6j                                                                                            | red in v3: 6:6h 6:6j  [preserved]
+  plan_l3_enum     ent_digit                                  red now: 4:4o 4:4t 10:10b                                                                                     | red in v3: 4:4o 4:4t 10:10b  [preserved]
+  plan_l3_enum     ent_on_old                                 red now: 7:7h 7:7j                                                                                            | red in v3: 7:7h 7:7j  [preserved]
+  plan_l3_enum     noentropy                                  red now: 9:9p 10:10a 10:10b 10:10k                                                                            | red in v3: 9:9p 10:10a 10:10b 10:10k  [preserved]
+  plan_l3_enum     noident                                    red now: 9:9v 10:10i                                                                                          | red in v3: 9:9v 10:10i  [preserved]
+  plan_l3_enum     nopath                                     red now: 9:9o 9:9w 9:9y                                                                                       | red in v3: 9:9o 9:9w 9:9y  [preserved]
+  plan_l3_enum     path_firstlower                            red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_l3_enum     floor15                                    red now: 10:10h                                                                                               | red in v3: 10:10h  [preserved]
+  plan_l3_enum     floor17                                    red now: 4:4r 11:11w 11:11z                                                                                   | red in v3: 4:4r 11:11w 11:11z  [preserved]
+  plan_l3_enum     ent_drop_lower                             red now: 4:4a 4:4o 4:4t                                                                                       | red in v3: 4:4a 4:4o 4:4t  [preserved]
+  plan_l3_enum     ent_drop_upper                             red now: 4:4o 4:4t                                                                                            | red in v3: 4:4o 4:4t  [preserved]
+  plan_l3_enum     ent_drop_digit                             red now: 4:4a 4:4t                                                                                            | red in v3: 4:4a 4:4t  [preserved]
+  plan_l3_enum     drop_lead_/                                red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_l3_enum     drop_lead_~/                               red now: 9:9w 9:9y                                                                                            | red in v3: 9:9w 9:9y  [preserved]
+  plan_l3_enum     drop_lead_./                               red now: 9:9y                                                                                                 | red in v3: 9:9y  [preserved]
+  plan_l3_enum     drop_lead_../                              red now: 9:9y                                                                                                 | red in v3: 9:9y  [preserved]
+  plan_l3_enum     cli_dash2                                  red now: 6:6i                                                                                                 | red in v3: 6:6i  [preserved]
+  plan_l1_w8w9w10  drop_reader_cat                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_grep                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_egrep                          red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_fgrep                          red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_rg                             red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_head                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_tail                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_less                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_more                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_strings                        red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_awk                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_sed                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_jq                             red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_nl                             red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_tac                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_rev                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_sort                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_uniq                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_cut                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_paste                          red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_diff                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_cmp                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_comm                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_xxd                            red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_od                             red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_hexdump                        red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_base64                         red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_column                         red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_reader_fold                           red now: 16:16q 19:19u                                                                                        | red in v3: 16:16q 19:19u  [preserved]
+  plan_l1_w8w9w10  drop_interp_python3                        red now: 16:16h 19:19o 19:19u 22:22bg                                                                         | red in v3: 16:16h 19:19o 19:19u 22:22bg  [preserved]
+  plan_l1_w8w9w10  drop_interp_node                           red now: 16:16n 19:19u 22:22bg                                                                                | red in v3: 16:16n 19:19u 22:22bg  [preserved]
+  plan_l1_w8w9w10  ext_max199                                 red now: 19:19v                                                                                               | red in v3: 19:19v  [preserved]
+  plan_l1_w8w9w10  ext_max201                                 red now: 20:20f                                                                                               | red in v3: 20:20f  [preserved]
+  plan_l1_w8w9w10  ext_size32767                              red now: 19:19v                                                                                               | red in v3: 19:19v  [preserved]
+  plan_l1_w8w9w10  ext_size32769                              red now: 20:20n                                                                                               | red in v3: 20:20n  [preserved]
+  plan_l1_w8w9w10  ext_minlen3                                red now: 19:19l 19:19w                                                                                        | red in v3: 19:19l 19:19w  [preserved]
+  plan_l1_w8w9w10  ext_minlen5                                red now: 19:19v                                                                                               | red in v3: 19:19v  [preserved]
+  plan_l1_w8w9w10  ext_maxlen199                              red now: 19:19v                                                                                               | red in v3: 19:19v  [preserved]
+  plan_l1_w8w9w10  ext_maxlen201                              red now: 19:19w                                                                                               | red in v3: 19:19w  [preserved]
+  plan_l1_w8w9w10  ext_nosym                                  red now: 19:19w                                                                                               | red in v3: 19:19w  [preserved]
+  plan_l1_w8w9w10  ext_occ63                                  red now: 19:19x                                                                                               | red in v3: 19:19x  [preserved]
+  plan_l1_w8w9w10  ext_occ65                                  red now: 19:19y                                                                                               | red in v3: 19:19y  [preserved]
+  plan_l1_w8w9w10  ext_bare                                   red now: 20:20i 20:20j                                                                                        | red in v3: 20:20i 20:20j  [preserved]
+  plan_l1_w8w9w10  ext_first                                  red now: 19:19i 20:20l                                                                                        | red in v3: 19:19i 20:20l  [preserved]
+  plan_l1_w8w9w10  ext_regex                                  red now: 19:19j 20:20h                                                                                        | red in v3: 19:19j 20:20h  [preserved]
+  plan_l1_w8w9w10  ext_trunc                                  red now: 20:20f                                                                                               | red in v3: 20:20f  [preserved]
+  plan_l1_w8w9w10  vx_assign15                                red now: 21:21x                                                                                               | red in v3: 21:21x  [preserved]
+  plan_l1_w8w9w10  vx_assign17                                red now: 21:21y                                                                                               | red in v3: 21:21y  [preserved]
+  plan_l1_w8w9w10  vx_repl7                                   red now: 21:21x                                                                                               | red in v3: 21:21x  [preserved]
+  plan_l1_w8w9w10  vx_repl9                                   red now: 21:21y                                                                                               | red in v3: 21:21y  [preserved]
+  plan_l1_w8w9w10  vx_noquote                                 red now: 21:21j                                                                                               | red in v3: 21:21j  [preserved]
+  plan_l1_w8w9w10  vx_interleave                              red now: 21:21v                                                                                               | red in v3: 21:21v  [preserved]
+  plan_l1_w8w9w10  vx_start_only                              red now: 21:21f 21:21j 21:21x                                                                                 | red in v3: 21:21f 21:21j 21:21x  [preserved]
+  plan_l1_w8w9w10  drop_assign_export                         red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l1_w8w9w10  drop_assign_declare                        red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l1_w8w9w10  drop_assign_local                          red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l1_w8w9w10  drop_assign_readonly                       red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l1_w8w9w10  drop_assign_typeset                        red now: -                                                                                                    | red in v3: -  [equivalent in v3; still no row red]
+  plan_l1_w8w9w10  read_noboundary                            red now: 18:18i                                                                                               | red in v3: 18:18i  [preserved]
+  plan_l1_w8w9w10  notight                                    red now: 16:16f                                                                                               | red in v3: 16:16f  [preserved]
+  plan_l1_w8w9w10  jq_loose                                   red now: 24:24f                                                                                               | red in v3: 24:24f  [preserved]
+  plan_l1_w8w9w10  env_boundary                               red now: 23:23c 23:23d 23:23h                                                                                 | red in v3: 23:23c 23:23d 23:23h  [preserved]
+  plan_l1_w8w9w10  drop_w12_0                                 red now: 23:23a 23:23b                                                                                        | red in v3: 23:23a 23:23b  [preserved]
+  plan_l1_w8w9w10  drop_w12_1                                 red now: 23:23b                                                                                               | red in v3: 23:23b  [preserved]
+  plan_l1_w8w9w10  drop_w12_2                                 red now: 23:23b                                                                                               | red in v3: 23:23b  [preserved]
+  plan_l1_w8w9w10  drop_w12_3                                 red now: 23:23b                                                                                               | red in v3: 23:23b  [preserved]
+  plan_l1_w11      drop_launch_sudo                           red now: 22:22aw 22:22ax 22:22n 22:22x                                                                        | red in v3: 22:22aw 22:22ax 22:22n 22:22x  [preserved]
+  plan_l1_w11      drop_launch_doas                           red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_nice                           red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_timeout                        red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_xargs                          red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_nohup                          red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_stdbuf                         red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_env                            red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_time                           red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_eval                           red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_setsid                         red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_ionice                         red now: 22:22aw 22:22ax                                                                                      | red in v3: 22:22aw 22:22ax  [preserved]
+  plan_l1_w11      drop_launch_unbuffer                       red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_command                        red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_launch_exec                           red now: 22:22aw                                                                                              | red in v3: 22:22aw  [preserved]
+  plan_l1_w11      drop_procreader_cat                        red now: 22:22F 22:22G 22:22I 22:22J 22:22aj 22:22an 22:22bc 22:22be                                          | red in v3: 22:22F 22:22G 22:22I 22:22J 22:22aj 22:22an 22:22bc 22:22be  [preserved]
+  plan_l1_w11      drop_procreader_head                       red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_tail                       red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_less                       red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_more                       red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_strings                    red now: 22:22J 22:22aj 22:22bc                                                                               | red in v3: 22:22J 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_hexdump                    red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_od                         red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_xxd                        red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_tr                         red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_awk                        red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_perl                       red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_rev                        red now: 22:22aj 22:22bc                                                                                      | red in v3: 22:22aj 22:22bc  [preserved]
+  plan_l1_w11      drop_procreader_xargs                      red now: 22:22H 22:22bd                                                                                       | red in v3: 22:22H 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_sed                        red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_grep                       red now: 22:22bd 22:22be                                                                                      | red in v3: 22:22bd 22:22be  [preserved]
+  plan_l1_w11      drop_procreader_rg                         red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_cut                        red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_paste                      red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_nl                         red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_sort                       red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_base64                     red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_cp                         red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_procreader_dd                         red now: 22:22bd                                                                                              | red in v3: 22:22bd  [preserved]
+  plan_l1_w11      drop_remote_ssh                            red now: 22:22bk 22:22v                                                                                       | red in v3: 22:22bk 22:22v  [preserved]
+  plan_l1_w11      drop_remote_docker                         red now: 22:22bk                                                                                              | red in v3: 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_kubectl                        red now: 22:22D 22:22bk                                                                                       | red in v3: 22:22D 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_nomad                          red now: 22:22E 22:22ao 22:22ar 22:22bk                                                                       | red in v3: 22:22E 22:22ao 22:22ar 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_pct                            red now: 22:22C 22:22ap 22:22bk                                                                               | red in v3: 22:22C 22:22ap 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_lxc                            red now: 22:22bk                                                                                              | red in v3: 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_podman                         red now: 22:22bk                                                                                              | red in v3: 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_sh                             red now: 22:22A 22:22B 22:22bk                                                                                | red in v3: 22:22A 22:22B 22:22bk  [preserved]
+  plan_l1_w11      drop_remote_watch                          red now: 22:22bk 22:22z                                                                                       | red in v3: 22:22bk 22:22z  [preserved]
+  plan_l1_w11      drop_psalt_1                               red now: 22:22A 22:22C 22:22D 22:22E 22:22a 22:22aw 22:22ax 22:22ay 22:22az 22:22bj 22:22bk 22:22c 22:22g 22: | red in v3: 22:22A 22:22C 22:22D 22:22E 22:22a 22:22aw 22:22ax 22:22ay 22:22az 22:22bj 22:22bk 22:22c 22:22g 22:  [preserved]
+  plan_l1_w11      drop_psalt_2                               red now: 22:22am                                                                                              | red in v3: 22:22am  [preserved]
+  plan_l1_w11      drop_psalt_3                               red now: 22:22B 22:22ax 22:22ay 22:22b 22:22bj 22:22bk 22:22f 22:22r 22:22x                                   | red in v3: 22:22B 22:22ax 22:22ay 22:22b 22:22bj 22:22bk 22:22f 22:22r 22:22x  [preserved]
+  plan_l1_w11      drop_psalt_4                               red now: 22:22ax 22:22d 22:22e 22:22i 22:22j                                                                  | red in v3: 22:22ax 22:22d 22:22e 22:22i 22:22j  [preserved]
+  plan_l1_w11      drop_psalt_5                               red now: 22:22av                                                                                              | red in v3: 22:22av  [preserved]
+  plan_l1_w11      drop_psalt_6                               red now: 22:22av                                                                                              | red in v3: 22:22av  [preserved]
+  plan_l1_w11      drop_psalt_7                               red now: 22:22av                                                                                              | red in v3: 22:22av  [preserved]
+  plan_l1_w11      drop_pid_0                                 red now: 22:22be 22:22bg                                                                                      | red in v3: 22:22be 22:22bg  [preserved]
+  plan_l1_w11      drop_pid_1                                 red now: 22:22H 22:22an 22:22bd 22:22be 22:22bg                                                               | red in v3: 22:22H 22:22an 22:22bd 22:22be 22:22bg  [preserved]
+  plan_l1_w11      drop_pid_2                                 red now: 22:22F 22:22I 22:22be                                                                                | red in v3: 22:22F 22:22I 22:22be  [preserved]
+  plan_l1_w11      drop_pid_3                                 red now: 22:22be                                                                                              | red in v3: 22:22be  [preserved]
+  plan_l1_w11      drop_pid_4                                 red now: 22:22G 22:22be 22:22bg                                                                               | red in v3: 22:22G 22:22be 22:22bg  [preserved]
+  plan_l1_w11      drop_pid_5                                 red now: 22:22be                                                                                              | red in v3: 22:22be  [preserved]
+  plan_l1_w11      drop_kwpos_then                            red now: 22:22az                                                                                              | red in v3: 22:22az  [preserved]
+  plan_l1_w11      drop_kwpos_do                              red now: 22:22az                                                                                              | red in v3: 22:22az  [preserved]
+  plan_l1_w11      drop_kwpos_else                            red now: 22:22az                                                                                              | red in v3: 22:22az  [preserved]
+  plan_l1_w11      drop_kwpos_elif                            red now: 22:22az                                                                                              | red in v3: 22:22az  [preserved]
+  plan_l1_w11      drop_pgrep_0                               red now: 22:22bl 22:22k 22:22l                                                                                | red in v3: 22:22bl 22:22k 22:22l  [preserved]
+  plan_l1_w11      drop_pgrep_1                               red now: 22:22bl 22:22m                                                                                       | red in v3: 22:22bl 22:22m  [preserved]
+  plan_l1_w11      drop_pstree_0                              red now: 22:22bl                                                                                              | red in v3: 22:22bl  [preserved]
+  plan_l1_w11      drop_pstree_1                              red now: 22:22bl                                                                                              | red in v3: 22:22bl  [preserved]
+  plan_l1_w11      drop_dockerform_top                        red now: 22:22bb 22:22bl                                                                                      | red in v3: 22:22bb 22:22bl  [preserved]
+  plan_l1_w11      drop_dockerform_notrunc                    red now: 22:22bb 22:22bl                                                                                      | red in v3: 22:22bb 22:22bl  [preserved]
+  plan_l1_w11      drop_dockerform_compose                    red now: 22:22bl                                                                                              | red in v3: 22:22bl  [preserved]
+  plan_l1_w11      drop_dockerform_container                  red now: 22:22bl                                                                                              | red in v3: 22:22bl  [preserved]
+  plan_l1_w11      drop_dockerform_ls                         red now: 22:22bl                                                                                              | red in v3: 22:22bl  [preserved]
+  plan_l1_w11      drop_bin                                   red now: 22:22ay                                                                                              | red in v3: 22:22ay  [preserved]
+  plan_l1_w11      drop_larg                                  red now: 22:22ax                                                                                              | red in v3: 22:22ax  [preserved]
+  plan_l1_w11      drop_procinterp                            red now: 22:22bg                                                                                              | red in v3: 22:22bg  [preserved]
+  plan_l1_w11      nodocker_podman                            red now: 22:22bb                                                                                              | red in v3: 22:22bb  [preserved]
+  plan_l1_w11      pidtok_any                                 red now: 22:22bf                                                                                              | red in v3: 22:22bf  [preserved]
+  plan_l1_w11      proc_status                                red now: 22:22as                                                                                              | red in v3: 22:22as  [preserved]
+  plan_l1_w11      anchor_nocntrl                             red now: 22:22bj                                                                                              | red in v3: 22:22bj  [preserved]
+  plan_l1_w11      launcher_any                               red now: 22:22O 22:22a 22:22am 22:22av 22:22ay 22:22az 22:22b 22:22bh 22:22bi 22:22bj 22:22bl 22:22c 22:22d 2 | red in v3: 22:22O 22:22a 22:22am 22:22av 22:22ay 22:22az 22:22b 22:22bh 22:22bi 22:22bj 22:22bl 22:22c 22:22d 2  [preserved]
+  plan_extra2_b32  b4_32c                                     red now: 32:32a 32:32c 32:32d                                                                                 | red in v3: 32:32a 32:32c  [preserved (+ more rows)]
+  plan_extra2_b32  vx_patsub_32c                              red now: 32:32c 32:32d                                                                                        | red in v3: 32:32c  [preserved (+ more rows)]
