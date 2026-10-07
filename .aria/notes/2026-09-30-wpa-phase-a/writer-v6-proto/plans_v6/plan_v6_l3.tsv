@@ -1,0 +1,15 @@
+fail_noextract	l3	fail_noextract	SC-35	35a,35b,35c,35e
+fail_noclassify	l3	fail_noclassify	SC-35	35a,35b,35c,35e
+string_response	l3	string_response	SC-3	3a,3b
+fail_event_name	l3	fail_event_name	SC-35	35a,35b,35c,35e
+fail_event_always	l3	fail_event_always	SC-35	35a,35b,35c,35e
+fail_event_substr	l3	fail_event_substr	SC-35	35a,35b,35c,35e
+fp_all_spans	l3	fp_all_spans	SC-12	12a,12b,12c,12g,12h,12i,12j,12p
+kv_left_boundary_off	l3	kv_left_boundary_off	SC-9	9z
+val_quadratic	l3	val_quadratic	SC-34	34a,34b
+val_far_delim	l3	val_far_delim	SC-34	34a,34b
+val_quote_strip	l3	val_quote_strip	SC-34	34a,34b
+val_kv_blank	l3	val_kv_blank	SC-34	34a,34b
+val_json_colon	l3	val_json_colon	SC-34	34a,34b
+val_url_at	l3	val_url_at	SC-34	34a,34b
+val_envline_eq	l3	val_envline_eq	SC-34	34a,34b

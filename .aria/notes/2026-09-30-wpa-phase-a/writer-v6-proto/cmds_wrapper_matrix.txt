@@ -1,0 +1,35 @@
+ssh host env
+ssh host 'env'
+ssh host "env"
+ssh host printenv
+ssh host 'printenv'
+ssh host "printenv"
+ssh root@pve 'pct exec 101 -- env'
+ssh root@pve pct exec 101 -- env
+docker exec c env
+docker exec c 'env'
+docker exec c "env"
+docker exec c printenv
+docker exec c printenv HOME
+docker exec c 'printenv'
+docker compose exec web env
+docker compose exec web "env"
+kubectl exec pod -- env
+kubectl exec pod env
+kubectl exec pod 'env'
+kubectl exec pod -- printenv HOME
+podman exec c env
+podman exec c "env"
+podman exec c printenv HOME
+lxc exec c -- env
+lxc exec c env
+nomad alloc exec abc env
+pct exec 101 -- env
+sh -c env
+bash -c 'printenv'
+watch env
+x=$(kubectl exec pod env)
+kubectl exec pod env > /tmp/x
+env
+printenv
+printenv HOME

@@ -1,0 +1,11 @@
+bat /etc/forgejo/app.ini
+expand /etc/forgejo/app.ini
+unexpand /etc/forgejo/app.ini
+shuf /etc/forgejo/app.ini
+split -l 1 /etc/forgejo/app.ini /tmp/x_
+csplit /etc/forgejo/app.ini 1
+expand /srv/app/.env
+unexpand /srv/app/.env
+shuf /srv/app/.env
+split -l 1 /srv/app/.env /tmp/x_
+csplit /srv/app/.env 1

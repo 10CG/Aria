@@ -1,0 +1,40 @@
+top -c
+top -bc
+top -cb
+top -b -n1 -c
+top -bn1c
+top -b -c -n1
+top -n1 -c
+top -c -n1
+top -bcn1
+top -b -n1
+top -b
+sudo top -bc
+docker exec c top -bc
+docker exec c python3 -m venv env
+bash -c "python3 -m venv env && true"
+git commit -m "docs: read the token from env"
+ssh host true
+watch -n 5 "du -sh env"
+pstree -a
+pstree -ap
+pstree -p
+pgrep -af curl
+pgrep -f curl
+pgrep -l curl
+ps -ef
+ps -eF
+ps -efw
+ps axu
+ps aux
+ps -p 123 -f
+ps -e
+ps -eo pid,args
+ps -eo pid,comm
+ps -o pid,cmd -p 1
+docker ps --no-trunc
+docker ps -a --no-trunc
+docker ps -a
+docker container ls --no-trunc
+docker top c
+podman top c
