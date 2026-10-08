@@ -2,6 +2,8 @@
 
 > 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-08 (owner 先因投入产出失衡叫停, 后裁定「实现优先」; A.2 / A.3 精简版已完成; 下一会话从 `detailed-tasks.yaml` 的 TASK-001 开始, 见 handoff `docs/handoff/2026-10-07-session-close-wpa-phase-a-stopped-by-owner.md` 的两段追记)。
 
+> **Phase B 已开始 (2026-10-08)**: 进度锚改到 [`../2026-10-08-wpa-phase-b/PROGRESS.md`](../2026-10-08-wpa-phase-b/PROGRESS.md); 本文件只记 Phase A, 不再更新。
+
 ## 目标 (owner 2026-09-30 指令)
 
 按 Aria 规范, 用 agent team + 动态工作流一次做完两件事, 执行前先确认与双子星 (simonfish/bfe8285d, 在做 10CG/Aria#199) 不冲突:

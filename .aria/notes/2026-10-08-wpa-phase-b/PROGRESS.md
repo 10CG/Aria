@@ -1,0 +1,81 @@
+# WP-A Phase B 进度 (会话中途记录, 供中断后续接)
+
+> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是 Phase B 的进度锚 (Phase A 的进度锚见 `../2026-09-30-wpa-phase-a/PROGRESS.md`)。任务定义见 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 每完成一条任务向 owner 报一行成本 (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)。
+
+## 成本账 (每条任务一行)
+
+| 任务 | 墙钟 (UTC) | 子代理 token | 产出 |
+|---|---|---|---|
+| TASK-001 | 09:43Z – 10:15Z 约 32 分钟 (探针复跑占 24 分钟) | 0 (主控独做; 主控上下文 10:14Z 为 23.6 万 / 100 万) | B.0 认领、两个特性分支、行号核验、SC-30 基线、环境核验、探针复跑逐字节一致; 代码 0 行 (本任务不改代码) |
+
+## TASK-001 (B.1 入场) — 2026-10-08
+
+### 认领与分支
+
+- B.0 认领: `phase1_gate.py --raw-track-id secret-net-l3-and-bypass-paths-023236f2 --phase B --mode advisory --linked-issue 10CG/aria-plugin#154` → `outcome=passed`, 新 session `s-d2f7@0945` (phase B, active), `linked_issue_overlap=[]`; 协调 ref 推后 `ls-remote origin` 与本地一致 (`6b75e07`)。
+  - 注意: carry-id 必须用全称 `secret-net-l3-and-bypass-paths-023236f2`; 只传 Spec 名时心跳返回 `claim_not_found`。
+- 分支 (只在本地, 尚无提交, 未推送):
+  - aria `feature/secret-net-l3-and-bypass-paths` @ `268da8f39d8bc33967e7cdaa5681e3a221fb9e4b`
+  - standards `feature/secret-net-l3-and-bypass-paths` @ `2bc1c4c619c5125a1bb2963864c1683fd9a87739`
+  - 建分支前核验: 两个子模块 master 的本地、origin、github 三处一致, 远端无同名分支。
+
+### 行号 (对 `268da8f` 核差异)
+
+被测文件 sha256 前 16 位与 `baseline-evidence.md` 逐个一致, aria 相对 `268da8f` 无差异 ⇒ Spec 内行号全部有效, 无需重取:
+
+| 文件 | sha256[:16] |
+|---|---|
+| `aria/hooks/secret-guard.sh` | `448b1f71a2af06d7` |
+| `aria/hooks/secret-scan.sh` | `c5f53f7a164fa72e` |
+| `aria/hooks/tests/secret-guard.test.sh` | `72f8e7d5d58a4b80` |
+| `aria/hooks/tests/secret-scan.test.sh` | `78e0e4ca15078177` |
+| `standards/conventions/secret-hygiene.md` | `dcf203f1f25ef0c0` |
+
+### SC-30 基线 (真 checkout, 带 git 历史)
+
+- 对象: `/home/dev/Aria/aria` (子模块真 checkout, `af87cae` 可达), 命令 `HOME=<scratchpad 私有目录> bash aria/hooks/tests/secret-guard.test.sh`。HOME 指向私有目录是 INV-5 的要求 (W6: 套件本身不隔离 HOME)。
+- 结果: **`PASS: 593 / 593`, `FAIL: 0 / 593`**, 退出码 0, stderr 为空, 墙钟 140 s。
+  - zsh 未安装, zsh 用例按设计跳过; 593 等于头注释的「593 without zsh」(测试内 SC-13 一致)。
+  - 测试内 SC-9a 的 `af87cae` 对拍实际执行 (输出里没有 SC-9a 的 SKIP 行)。
+- 测试内 SC-8 五档 (N=10, rounds=20, min-of-rounds, `BASH_VERSION=5.2.15(1)-release`, 测时 loadavg `2.32 1.54 1.14`), 全部低于天花板 100 ms (absolute 腿):
+
+  | 档 | old (ms/call) | new (ms/call) | 天花板 |
+  |---|---|---|---|
+  | (a) | 29.6 | 6.9 | 100.0 |
+  | (b) | 29.2 | 12.8 | 100.0 |
+  | (c) | 29.1 | 7.8 | 100.0 |
+  | (d) | 28.8 | 12.0 | 100.0 |
+  | (e) | 29.9 | 47.1 | 100.0 |
+
+- loadavg: 开跑前 `1.27 1.23 1.01`, 跑完 `3.69 2.25 1.42`。本会话进程树 nice 19、ionice best-effort 7、只用 0–1 号核。
+- 外溢核验: 真实 `~/.claude/logs/guard-bypass.log` 跑前跑后大小与 mtime 不变; 私有 HOME 下的 `guard-bypass.log` 写入 1571 字节, 记录之间没有换行 (`wc -l` 为 0, 即 10CG/Aria#229 描述的形态); aria 工作区跑后干净。
+
+### 环境 (SC-32 / SC-29 的腿)
+
+- 非 root: uid 1000 (SC-20 20g 可构造)。
+- `WPA_BASH32=/home/dev/.aria/tools/bash-3.2.57/bash`: sha256 前 16 位 `5997a028c645039d` (与上一会话记录一致), `GNU bash, version 3.2.57(2)-release (x86_64-unknown-linux-gnu)`。
+- 第二个 locale: `locale -a` 列出 `en_US.utf8` (`WPA_LOCALE_B` 用默认值 `en_US.UTF-8`); `C.utf8` 也在。`localedef` 与 `/usr/share/i18n/locales/en_US` 都在 (本次用不到)。
+
+### 探针复跑 (带 `WPA_BASH32`)
+
+- 布局与 `baseline-evidence.md`「怎么跑」第 1 条相同: 把 `aria` 与 `standards` 用 `cp -a` 复制到 scratchpad 的 `<X>/base/`, 删去两处 `.git` gitfile; 探针原地运行 (`openspec/changes/secret-net-l3-and-bypass-paths/baseline_probe.py`, 旁边是当前分支上的 `proposal.md` 与 `baseline-evidence.md`)。
+- 命令: `WPA_BASH32=/home/dev/.aria/tools/bash-3.2.57/bash TMPDIR=<X>/tmp HOME=<X>/home python3 <spec 目录>/baseline_probe.py <X>/base/aria`。与文档命令相比只多了 `HOME=<私有目录>` (INV-5); 探针本身也给 hook 自建私有 HOME (`baseline_probe.py:37/126`)。
+- 运行前写下的预测: stdout 等于证据内嵌块, 即 sha256 前 16 位 `a3603d2ee85cd552`、106384 字节、stderr 为空; 唯一的风险点是 15e (它扫描 `proposal.md` 全文, 而 `proposal.md` 在证据生成后又被 `3b6c5c9` 改过)。
+- 结果: **stdout 与证据内嵌块 (`baseline-evidence.md` 第 47–557 行) `cmp` 逐字节相同**, sha256 前 16 位 `a3603d2ee85cd552`, 106384 字节; stderr 0 字节; 退出码 0。预测全部成立, 15e 没有变化。
+  - 末尾形态行: `rows not run (n/a): by design 1 (30a); leg missing or not constructible 0 (-)`; 基线形态 `holds`; 目标形态 `does not hold` (基线上本应如此)。
+  - 墙钟 1431 s (约 24 分钟; 2 核限流, 跑完时 loadavg `9.20 11.03 10.48`, 主要是探针自身的进程)。上一会话同样限流下约 17 分钟。
+  - 私有 `TMPDIR` 已被探针清理, 私有 HOME 下没有留下文件。
+
+### TASK-001 验收 (`detailed-tasks.yaml` 的三条 verification)
+
+1. 两个特性分支存在且基于 `268da8f` / `2bc1c4c`: ✅ (`merge-base --is-ancestor` 两个都成立, HEAD 即基线 SHA)。
+2. 带 `af87cae` 历史的真 checkout 上 `secret-guard.test.sh` 基线结果与 loadavg 记入 `.aria/notes`: ✅ (本文件「SC-30 基线」节)。
+3. `WPA_BASH32` 指向可执行的 bash 3.2.57; `locale -a` 含 `WPA_LOCALE_B`: ✅。
+
+另: Tasks 1.1 要求的「复跑 `baseline_probe.py` (带 `WPA_BASH32`), 输出与 `baseline-evidence.md` 逐字节一致」: ✅ (上节)。
+
+### 运行要点 (供后续任务)
+
+- 真 bash 3.2 已在持久位置 (见上), 不必再按 Phase A 进度锚第 64 行的说法重建。
+- 探针全量 (带 bash 3.2) 在 2 核限流下约 17–24 分钟, 按资源纪律每席最多两次全量; 实现期的单项验证用 `WPA_ONLY=SC-…` 子集。
+- 时档类测量 (W14 的 (f) / (f0) / (f-hit) / (g) / (h) / (i) / (i3) 与测试内 SC-8) 只在一分钟负载低于 2 时串行跑, 判据只看比值。
