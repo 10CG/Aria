@@ -93,7 +93,7 @@ tasks:
   - id: TASK-004
     parent: "1.4"
     title: "W2 键形模式 + W3 白名单 + W4 值指纹 + W5 告警文案 (secret-scan.sh; 分类路径零 fork, 取值删除常数次命中)"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "2-3"
     dependencies: [TASK-003]
@@ -102,7 +102,7 @@ tasks:
     carries_sc: [SC-4, SC-5, SC-6, SC-7, SC-8, SC-9, SC-10, SC-11, SC-12, SC-13, SC-33, SC-34]
     deliverables: [aria/hooks/secret-scan.sh, aria/hooks/tests/secret-scan.test.sh]
     verification:
-      - "探针 WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-33,SC-34 在实现上全部 yes"
+      - "探针 WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-33,SC-34 在实现上全部 yes, 但 SC-34 只验 34a / 34b (34c 测 secret-guard 的 W9 扩展命中路径, baseline_probe.py:2622, 归 TASK-007; 2026-10-08 主控裁定, 执笔 TASK-004 报告第 5 节第 1 条)"
       - "补验 (2026-10-08 主控裁定, 见 TASK-003 notes): 探针 WPA_ONLY=SC-15,SC-35 全部 yes (35a / 35b 在 W2 落地后转 yes; 15a 在目标态 pattern 下仍静默)"
 
   - id: TASK-005
@@ -118,6 +118,8 @@ tasks:
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     verification:
       - "探针 WPA_ONLY=SC-16,SC-17,SC-18,SC-22 在实现上全部 yes"
+      - "探针 WPA_ONLY=SC-31 的 31a / 31b / 31c / 31d / 31e 全部 yes (census 族数随本任务同步, 见 notes)"
+    notes: "2026-10-08 主控裁定 (待 owner 复议): W14 的 census 族数同步与 family 探针 (secret-guard.test.sh 的 family_count 硬编码) 随引起族变化的任务一起做, 从本任务起; 否则本任务之后套件会多出一条既有用例的红, 违反每条任务「新增失败集合为空」的验收。TASK-008 负责其余元耦合与最终核对"
 
   - id: TASK-006
     parent: "1.6"
