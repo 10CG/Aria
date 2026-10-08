@@ -108,7 +108,7 @@ tasks:
   - id: TASK-005
     parent: "1.5"
     title: "W8 服务端配置文件 + W11 进程表列举 (新行、tight 并入、/proc 放宽; 内联成字面行)"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "1-2"
     dependencies: [TASK-002]
@@ -130,6 +130,7 @@ tasks:
     dependencies: [TASK-005]
     agent: aria:backend-architect
     reason: "hook 实现; 与 TASK-005 同文件, 串行"
+    notes: "2026-10-08 主控裁定 (待 owner 复议): 从本任务起换第二位实现执笔实例 (TASK-006 / 007 / 008), 交接说明 .aria/notes/2026-10-08-wpa-phase-b/dispatch/impl-handover.md; 理由是成本 —— 第一位执笔的上下文累积到约 48 万 token, 每次工具调用都重读一遍"
     carries_sc: [SC-23, SC-24]
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     verification:
@@ -172,8 +173,8 @@ tasks:
     complexity: M
     estimated_hours: "1-2"
     dependencies: [TASK-004, TASK-007]
-    agent: aria:backend-architect
-    reason: "与实现同一执笔实例 (原型已有 patch_docs.py)"
+    agent: aria:knowledge-manager
+    reason: "Spec Tasks 1.9 写明「勘正执笔人 ≠ 实现执笔人」; 原先写的「与实现同一执笔实例」与 Spec 冲突, 2026-10-08 主控订正 (原型 patch_docs.py 仍可作起点)"
     carries_sc: [SC-25, SC-26, SC-28]
     deliverables: [standards/conventions/secret-hygiene.md, aria/README.md, aria/README.zh.md, aria/hooks/secret-scan.sh, aria/hooks/secret-guard.sh]
     verification:
