@@ -62,7 +62,7 @@ tasks:
   - id: TASK-002
     parent: "1.2"
     title: "测试先行 (关键子集): 每个 W 至少一组用例移植进两个套件, 先在基线上跑出 baseline-failing 全红、守卫全绿"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "1-2"
     dependencies: [TASK-001]
@@ -84,10 +84,11 @@ tasks:
     agent: aria:backend-architect
     reason: "hook 实现"
     carries_sc: [SC-1, SC-2, SC-3, SC-14, SC-15, SC-35]
-    deliverables: [aria/hooks/secret-scan.sh, aria/hooks/hooks.json, aria/hooks/tests/secret-scan.test.sh]
+    deliverables: [aria/hooks/secret-scan.sh, aria/hooks/hooks.json, aria/hooks/tests/secret-scan.test.sh, aria/hooks/tests/secret-guard.test.sh]
     verification:
-      - "探针 WPA_ONLY=SC-1,SC-2,SC-3,SC-14,SC-15,SC-35 在实现上全部 yes"
+      - "探针 WPA_ONLY=SC-1,SC-2,SC-3,SC-14,SC-15,SC-35 在实现上: SC-1 / SC-2 / SC-3 / SC-14 / SC-15 全部 yes, SC-35 的 35c / 35d / 35e yes; 35a / 35b 每行三个成员里有两个依赖 W2 的新 tag, 归 TASK-004 验"
       - "hooks.json 相对基线只多一条 PostToolUseFailure 注册, 全文不含 completeness_gate 字面 (SC-31 31d / 31e)"
+    notes: "2026-10-08 主控裁定 (执笔 TASK-002 报告第 5 节第 1、2 条, 待 owner 复议): (1) SC-35 35a / 35b 的 kv / auth 成员 (baseline_probe.py:2634) 需要 W2, 移到 TASK-004 验; (2) W6 原文是两个套件都隔离 HOME, SC-14b (secret-guard 套件) 原先无任务承载, 并入本任务, 交付物加 secret-guard.test.sh (只加 HOME 隔离块, 须在 _wpa_orig_home 一行之后); (3) W7 夹具按目标态 pattern (含 W2 新 tag) 拆, 使 SC-15 15a 在 TASK-004 之后仍静默"
 
   - id: TASK-004
     parent: "1.4"
@@ -102,6 +103,7 @@ tasks:
     deliverables: [aria/hooks/secret-scan.sh, aria/hooks/tests/secret-scan.test.sh]
     verification:
       - "探针 WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-8,SC-9,SC-10,SC-11,SC-12,SC-13,SC-33,SC-34 在实现上全部 yes"
+      - "补验 (2026-10-08 主控裁定, 见 TASK-003 notes): 探针 WPA_ONLY=SC-15,SC-35 全部 yes (35a / 35b 在 W2 落地后转 yes; 15a 在目标态 pattern 下仍静默)"
 
   - id: TASK-005
     parent: "1.5"
