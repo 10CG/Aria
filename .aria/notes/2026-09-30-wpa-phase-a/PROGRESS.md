@@ -1,6 +1,6 @@
 # WP-A Phase A 进度 (会话中途记录, 供中断后续接)
 
-> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-07 19:5x UTC (**owner 叫停**: 投入产出失衡; v6 已落盘 `596102f`, 非作者核验被停, A.2 / post_planning 未开始; 方向待 owner 定, 见 `docs/handoff/2026-10-07-session-close-wpa-phase-a-stopped-by-owner.md`)。
+> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是会话中途的进度锚, 防止长会话被额度或其它原因打断后无从续接。最近更新: 2026-10-08 (owner 先因投入产出失衡叫停, 后裁定「实现优先」; A.2 / A.3 精简版已完成; 下一会话从 `detailed-tasks.yaml` 的 TASK-001 开始, 见 handoff `docs/handoff/2026-10-07-session-close-wpa-phase-a-stopped-by-owner.md` 的两段追记)。
 
 ## 目标 (owner 2026-09-30 指令)
 
@@ -28,11 +28,12 @@
 
 ## 进行中 / 下一步
 
-1. **非作者核验席** (qa-engineer, 1 席, 新实例) 只核 v6 修补处与接缝 (派单模板 `dispatch/fixcheck-template.md`; 坏实现由它独立构造)。
-   - 发现 major ⇒ 定点再修, 只复核那几处; 不再开全轮。
-2. 核验通过 ⇒ A.2 (task-planner, Level 2 路径 B, 只出 `detailed-tasks.yaml`)。
+1. **owner 2026-10-07 转「实现优先」** (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`):
+   - 修补核验席不再单独补跑, 由 TASK-014 的非作者对抗审查承担;
+   - 本 Spec 跳过 post_planning。
+2. 下一会话按 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml` 从 TASK-001 开始, 每条任务向 owner 报成本。
 3. 收敛判据 (本仓先例口径): 相邻两轮 Critical+Major 键集相等且全票 PASS —— 实际等于连续两轮零 C/M。`max_rounds` 5; 用尽未收敛 ⇒ audit-engine 降级策略三选一由 owner 裁。
-4. post_spec 收敛后: task-planner (Level 2 走路径 B, 只出 `detailed-tasks.yaml`) → post_planning 收敛审计。
+4. (已按 owner 裁定改变) A.2 / A.3 由主控精简完成; post_planning 对本 Spec 跳过。
 5. 会话收尾: Rule #9 handoff (`docs/handoff/`, follower 只 prepend `latest.md` History 与 track 表, 不改 bare pointer)。
 
 ## 待 owner 裁定 / 复议 (汇总, 详见各处原文)

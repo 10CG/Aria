@@ -3,7 +3,7 @@ track-id: session-close-20261007-wpa-phase-a-stopped-by-owner
 owner-container: simonfish/023236f2
 phase: A.3
 status: active
-updated-at: 2026-10-07T20:40:00Z
+updated-at: 2026-10-08T08:50:00Z
 ---
 
 # Aria — Session Handoff (2026-09-30 ~ 2026-10-07) — WP-A Phase A 被 owner 叫停 (投入产出失衡) + issue 卫生清扫完成
@@ -186,4 +186,37 @@ updated-at: 2026-10-07T20:40:00Z
 1. `{id: wpa-impl-task-001, desc: "按 detailed-tasks.yaml 从 TASK-001 (B.1) 开始实现; 每条任务向 owner 报成本"}`
 2. `{id: wpa-public-mirror-7-20, desc: "研究笔记前向去量化 (7.20) 待 owner 裁; 本分支合并 master 前必须定"}`
 3. `{id: wpa-claim-heartbeat, desc: "认领 secret-net-l3-and-bypass-paths-023236f2 进入 B 时以 phase1_gate --phase B 刷新"}`
+
+## 追记 2 (2026-10-08 08:5x UTC): 会话收尾 (session-closer)
+
+**为什么换会话**:
+
+- 上下文占用 62% (615,775 / 1,000,000 token; 数据取自 `.aria/cache/context-window.json`, 08:44Z 采集)。
+- 本会话里主控每次工具调用都要重读约 61.5 万 token 的缓存上下文。实现阶段放到新会话, 主控侧成本约降一个数量级, 也避免中途自动压缩。
+
+**本次收尾动作**:
+
+1. 真 bash 3.2.57 已复制到持久位置 `/home/dev/.aria/tools/bash-3.2.57/bash` (sha256 前 16 位 `5997a028c645039d`, 已验证可运行)。下一会话用 `WPA_BASH32=/home/dev/.aria/tools/bash-3.2.57/bash`, 不必重建。原件在本会话 scratchpad, 会话结束即失效。
+2. 可复用的派单模板 (含资源纪律) 已归档到 `.aria/notes/2026-09-30-wpa-phase-a/dispatch/fixcheck-template.md`, 供 TASK-014 改写。
+3. 认领心跳续到 2026-10-08T08:45:16Z, origin 核验一致。**下一会话须在 2026-10-09T08:45Z 之前用 `phase1_gate.py --phase B` 进入 B (TASK-001)**, 否则会被扫成 abandoned。
+4. v6 的修补核验席不再单独补跑: owner 改选实现优先后, 由 TASK-014 (非作者对抗审查) 承担。
+
+**机械兜底** (session-closer step 0 / 3):
+
+- **同步**: 本分支 origin 与本地一致; GitHub 端本分支已按 owner 裁定删除 (显示 unknown 属预期); aria `268da8f` / standards `2bc1c4c` 两端一致。
+- **四维一致性**: 8 条 advisory「活跃变更未列入 UPM in-progress」, 涉及本 Spec 与 M6 / M7 等 7 个他轨 Spec。这是全仓共性, 本次不处理, 留给 owner 或下一次周期收尾。
+- **未完成项清单**: 条目都属其它在飞 Spec (M6 遥测等), 本会话未触及。
+
+**下一会话入口**:
+
+1. 开场先跑 `/aria:state-scanner`; 再按 memory `feedback_shared_host_cpu_throttle_experiments` 给会话进程树降压 (nice 19、只用 0–1 号核)。
+2. 读决策单与 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 从 TASK-001 开始: 建 aria / standards 特性分支, 并运行 `phase1_gate --phase B`。
+3. 每完成一条任务, 向 owner 报一行成本: 墙钟、子代理 token 量、产出。
+4. 以下动作仍须 owner 授权: 合并、打 tag、发版 (TASK-011); 研究笔记去量化 (7.20)。
+
+**§8 补充** (memory 追记三条):
+
+- `reference_statusline_stdin_context_telemetry`: relay 缓存的位置; 不要去读 `settings.json`。
+- `reference_forgejo_agit_pr_fallback`: wrapper 的参数限制; 写操作之后用 GET 核验。
+- `feedback_subagent_asked_for_diff_will_apply_it`: 子代理在仓根留下文件的第二个形态。
 
