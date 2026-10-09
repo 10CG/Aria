@@ -1,6 +1,6 @@
 # WP-A Phase B 进度 (会话中途记录, 供中断后续接)
 
-> 正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是 Phase B 的进度锚 (Phase A 的进度锚见 `../2026-09-30-wpa-phase-a/PROGRESS.md`)。任务定义见 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 每完成一条任务向 owner 报一行成本 (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)。
+> 最近更新: 2026-10-09 02:2xZ (TASK-001 – 009 完成; 会话收尾, 下一会话从 TASK-014 开始)。正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是 Phase B 的进度锚 (Phase A 的进度锚见 `../2026-09-30-wpa-phase-a/PROGRESS.md`)。任务定义见 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 每完成一条任务向 owner 报一行成本 (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)。
 
 ## 成本账 (每条任务一行)
 
@@ -15,7 +15,7 @@
 | TASK-007 | 10-09 00:27Z – 01:25Z 约 1 小时 (执笔约 40 分钟 + 主控复核) | 第二位执笔 65 次调用: 缓存读 20,608,851 / 缓存写 1,119,921 / 输出 3,120 (段末上下文约 40 万) | aria `db4f8b8`: secret-guard.sh +258 / −42 (W9 + W10 + `_sg_emit_blocked`); **两个套件全绿** (783 / 783、122 / 122) |
 | TASK-008 | 10-09 01:25Z 结项 (主控核对, 不派执笔) | 0 | W14 元耦合已随各任务同步, 以 TASK-007 的复核结项; SC-27 / SC-28 移入 TASK-009 (见 TASK-008 节) |
 | TASK-009 | 10-09 01:27Z – 02:20Z 约 53 分钟 (执笔约 40 分钟 + 主控复核与两处补正) | knowledge-manager 144 次调用: 缓存读 42,550,367 / 缓存写 874,811 / 输出 5,360 (段末上下文约 44 万; 本轮最「碎」的一位) | aria `69af7cd` (README 两语种、两个 hook 只改注释、VERSION 描述、hooks.json description) + standards `be842ce` (secret-hygiene 1.2.0) + changelog 草稿; 探针 SC-25/27/28 全 yes, SC-26 10/11 (26g 移 TASK-010) |
-| TASK-014 | (待派, 非作者 qa-engineer) | — | — |
+| TASK-014 | (下一会话; 非作者 qa-engineer) | — | 本会话于 10-09 02:2xZ 收尾 (主控上下文 60%), 交接 `docs/handoff/2026-10-09-session-close-wpa-phase-b-task001-009-done.md` |
 
 ### 计量口径更正 (2026-10-08 13:1xZ)
 
