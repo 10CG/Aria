@@ -14,7 +14,8 @@
 | TASK-006 | 10-08 14:43Z 派出 → 10-09 00:2xZ 提交; 实际工作约 30 分钟 + 主控复核 (中间整个会话停了约 9 小时, 见下) | 第二位执笔 69 次调用: 缓存读 10,582,994 / 缓存写 584,966 / 输出 6,461 (段末上下文约 23 万) | secret-guard.sh +19 / −2 (W12); guard 转绿 4 条, 新增失败 0 |
 | TASK-007 | 10-09 00:27Z – 01:25Z 约 1 小时 (执笔约 40 分钟 + 主控复核) | 第二位执笔 65 次调用: 缓存读 20,608,851 / 缓存写 1,119,921 / 输出 3,120 (段末上下文约 40 万) | aria `db4f8b8`: secret-guard.sh +258 / −42 (W9 + W10 + `_sg_emit_blocked`); **两个套件全绿** (783 / 783、122 / 122) |
 | TASK-008 | 10-09 01:25Z 结项 (主控核对, 不派执笔) | 0 | W14 元耦合已随各任务同步, 以 TASK-007 的复核结项; SC-27 / SC-28 移入 TASK-009 (见 TASK-008 节) |
-| TASK-009 | (待派, 换执笔: knowledge-manager) | — | 派单 `dispatch/impl-task009.md` |
+| TASK-009 | 10-09 01:27Z – 02:20Z 约 53 分钟 (执笔约 40 分钟 + 主控复核与两处补正) | knowledge-manager 144 次调用: 缓存读 42,550,367 / 缓存写 874,811 / 输出 5,360 (段末上下文约 44 万; 本轮最「碎」的一位) | aria `69af7cd` (README 两语种、两个 hook 只改注释、VERSION 描述、hooks.json description) + standards `be842ce` (secret-hygiene 1.2.0) + changelog 草稿; 探针 SC-25/27/28 全 yes, SC-26 10/11 (26g 移 TASK-010) |
+| TASK-014 | (待派, 非作者 qa-engineer) | — | — |
 
 ### 计量口径更正 (2026-10-08 13:1xZ)
 
@@ -208,6 +209,26 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **主控裁定 (待 owner 复议)**: 不再派执笔。W14 的元耦合已按 TASK-005 起的裁定在各任务里随改随同步 —— census 64 与 3 条 family 探针、头注释计数 789 / 783 与 122、闸门之上的函数 (探针 30b)、未绑定变量注入自测 (TASK-007 执笔 92 项)。
 - 结项证据 (即 TASK-007 的主控复核): 带 af87cae 历史的真 checkout 上两个套件全绿 (含套件内 SC-13 / SC-16 / SC-17 / SC-19 / SC-20 自检), 测试内 SC-8 五档为真测; 探针 30b `yes`、SC-31 5 / 5。
 - 原先挂在本任务下的 SC-27 (SOT 计数) 与 SC-28 (陈旧表述勘正) 移入 TASK-009: 它们的交付物 (`secret-hygiene.md`、README、hook 头注释、`aria/VERSION`) 本就在 TASK-009, 且 Spec Tasks 1.9 要求「勘正执笔人 ≠ 实现执笔人」。原计划 SC-28 同时挂在两条任务下、TASK-008 标题写着同步「SOT 三处」却不交付 SOT 文件 —— 精简计划时引入的接缝缺陷, 至此消除。
+
+## TASK-009 (文档同步与勘正) — 2026-10-09
+
+- 派单 `dispatch/impl-task009.md` (01:27Z), 执笔为新派的 aria:knowledge-manager (Spec Tasks 1.9「勘正执笔人 ≠ 实现执笔人」); 报告 02:08Z。
+- 主控派单的疏漏: 派单写「没过的只有 27a / 27c 与 SC-28」, 漏了 SC-26 (主控此前那次探针复跑没带 SC-26)。执笔起点实测 SC-26 2/11, 照样处理到 10/11。
+- **主控独立复核**:
+  - 范围: aria 6 个文件 (两份 README、VERSION、hooks.json、两个 hook), standards 只有 `secret-hygiene.md`, 主仓多 `changelog-draft.md`, 全在交付物内。
+  - 两个 hook 去掉整行注释后与 `db4f8b8` 逐字节相同 (只改注释); 新增行无 `(?:`; `hooks.json` 的 `hooks` 对象与原来相等, 只改 `description`。
+  - 8 个改动文件经当前 `secret-scan.sh` 扫描零命中, 拼上运行时生成的 AWS key 形状后都告警 (正控有效)。
+  - 探针子集 `WPA_ONLY=SC-25,SC-26,SC-27,SC-28` (243 s, stderr 空): SC-25 9/9、SC-26 10/11、SC-27 4/4、SC-28 15/15; 唯一 `no` 是 26g。
+- **主控补正两处** (执笔按派单「只加 SC 点名的句子」未改, 属 Rule #3 文档与代码同步的事实遗漏; 几个词, 主控直接改, TASK-014 一并复核):
+  1. 两份 README 第 33 行注册表, secret-scan 一行的事件改为 `PostToolUse` + `PostToolUseFailure` (同一行的 cannot redact 原句不动);
+  2. SOT §5 引言补「secret-scan.sh 另注册 PostToolUseFailure, 扫描失败工具调用的错误文本」(标题不动, 免得改锚点)。
+  - 补正后重跑 `WPA_ONLY=SC-25,SC-26,SC-28`: 结果不变 (9/9、10/11、15/15); 三个文件扫描零命中 (带正控)。
+- **26g 的处理 (主控裁定, 待 owner 复议)**: 26g 要求 `aria/CHANGELOG.md` 最上一节含 14 个标记词, CHANGELOG 是发版文件。执笔已把草稿拼进 CHANGELOG 副本、用 26g 判据实测 `yes`。移到 TASK-010: 验收前先把草稿作为最上一节落入, 版本号用 `<vNEXT>` 占位, TASK-011 取号后替换。
+- 执笔请裁 / 备注 (记录, 待 owner 或 TASK-014):
+  - 28f 的写法: Write 响应形状写成 `"filePath": …, "content": …` 一行 (真实键序), 以免契约行以顶层 `"content":` 起头。主控判断: 内容如实, 不算迁就检查器 —— 该判据针对的是旧的错误 Read 形状, 对 Write 形状过宽; 交 TASK-014 复核。
+  - 「cannot redact」表述按 Spec 保留, 等「待 owner 复议」第 1 条统一订正。
+  - SOT 版本历史行日期写 2026-10-09, 发版日不同时 TASK-011 顺手改。
+- 提交: aria `69af7cd`、standards `be842ce` (均已推 origin, `ls-remote` 一致; standards 特性分支首次推送, 未推 GitHub)。
 
 ### 运行要点 (供后续任务)
 

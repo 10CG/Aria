@@ -170,7 +170,7 @@ tasks:
   - id: TASK-009
     parent: "1.9"
     title: "文档同步: W13 SOT 条款与示例逐工具实跑、§5.6、README 两语种、hook 头注释、CHANGELOG 草稿"
-    status: pending
+    status: done
     complexity: M
     estimated_hours: "1-2"
     dependencies: [TASK-004, TASK-007]
@@ -180,6 +180,7 @@ tasks:
     deliverables: [standards/conventions/secret-hygiene.md, aria/README.md, aria/README.zh.md, aria/hooks/secret-scan.sh, aria/hooks/secret-guard.sh, aria/VERSION]
     verification:
       - "探针 WPA_ONLY=SC-25,SC-26,SC-27,SC-28 在实现上全部 yes (SC-27 / SC-28 与 aria/VERSION 由 TASK-008 移入, 2026-10-09 主控裁定; 28i 测 aria/VERSION 里对 secret-scan 的陈旧描述)"
+    notes: "2026-10-09 结项时 SC-25 9/9、SC-27 4/4、SC-28 15/15、SC-26 10/11: 唯一 no 是 26g, 它要求 aria/CHANGELOG.md 最上一节含 14 个标记词, 而 CHANGELOG 是发版文件 (TASK-011); 草稿已备 (.aria/notes/2026-10-08-wpa-phase-b/changelog-draft.md, 执笔把它拼进 CHANGELOG 副本后用 26g 判据实测 yes)。26g 移到 TASK-010: 验收前先把草稿作为最上一节落入 aria/CHANGELOG.md (版本号仍为 <vNEXT> 占位, TASK-011 取号后替换)"
 
   - id: TASK-014
     parent: "1.8"
@@ -211,6 +212,7 @@ tasks:
     verification:
       - "WPA_BASH32 + WPA_REQUIRE_ALL=1 运行: 退出码 0, 目标形态 holds, 32c / 32d / 32e / 29h / 29i / 12o / 20g 不是 n/a"
       - "timing.py --judge 全部 PASS (空闲主机, 一分钟负载低于 2)"
+    notes: "2026-10-09 主控裁定 (待 owner 复议): 验收前先把 changelog-draft.md 作为最上一节落入 aria/CHANGELOG.md (版本号用 <vNEXT> 占位), 否则 SC-26 26g 恒 no、目标形态不成立; 占位符由 TASK-011 取号后替换 (custom check no-unresolved-version-placeholder 在此期间会在特性分支上告警, 属预期)"
 
   - id: TASK-011
     parent: "1.11"
