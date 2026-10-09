@@ -139,7 +139,7 @@ tasks:
   - id: TASK-007
     parent: "1.7"
     title: "W10 变量展开 + W9 扩展入口 (_sg_ext_pass 复用 _sg_core_eval; _sg_ext_path_pass 走字面子串)"
-    status: pending
+    status: done
     complexity: L
     estimated_hours: "2-3"
     dependencies: [TASK-006]
@@ -154,17 +154,18 @@ tasks:
   - id: TASK-008
     parent: "1.8"
     title: "W14 元耦合同步 (测试内 SC-13 / SC-19 / SC-20 注入自测 / census / 头注释计数与 SOT 三处)"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1"
     dependencies: [TASK-004, TASK-007]
-    agent: aria:backend-architect
-    reason: "与实现同一执笔实例"
-    carries_sc: [SC-27, SC-28, SC-30, SC-31]
-    deliverables: [aria/hooks/tests/secret-guard.test.sh, aria/hooks/tests/secret-scan.test.sh, aria/hooks/secret-guard.sh]
+    agent: main-loop
+    reason: "2026-10-09 改为主控核对 (原: 与实现同一执笔实例), 见 notes"
+    carries_sc: [SC-30, SC-31]
+    deliverables: []
     verification:
-      - "探针 WPA_ONLY=SC-27,SC-28,SC-30,SC-31 在实现上全部 yes (含 30b)"
+      - "探针 WPA_ONLY=SC-30,SC-31 在实现上全部 yes (含 30b; 30a 按设计 n/a)"
       - "带 af87cae 历史的副本上两个套件全绿, 测试内 SC-8 五档为真测 (非 rc=127 空转)"
+    notes: "2026-10-09 主控裁定 (待 owner 复议): W14 的元耦合已按 TASK-005 起的裁定随各任务同步 (census 64 与 family 探针、头注释计数 789 / 783 与 122、闸门之上的函数、未绑定变量注入自测), 本任务不再派执笔, 由主控以 TASK-007 提交后的复核结项: 真 checkout 上 guard 783 / 783、scan 122 / 122, 测试内 SC-8 五档为真测, 探针 30b yes、SC-31 5 / 5。原 carries 的 SC-27 (SOT 计数) 与 SC-28 (陈旧表述勘正) 的交付物是 secret-hygiene.md / README / hook 头注释 / aria/VERSION, 且 Spec Tasks 1.9 要求勘正执笔人 ≠ 实现执笔人, 移入 TASK-009"
 
   - id: TASK-009
     parent: "1.9"
@@ -175,10 +176,10 @@ tasks:
     dependencies: [TASK-004, TASK-007]
     agent: aria:knowledge-manager
     reason: "Spec Tasks 1.9 写明「勘正执笔人 ≠ 实现执笔人」; 原先写的「与实现同一执笔实例」与 Spec 冲突, 2026-10-08 主控订正 (原型 patch_docs.py 仍可作起点)"
-    carries_sc: [SC-25, SC-26, SC-28]
-    deliverables: [standards/conventions/secret-hygiene.md, aria/README.md, aria/README.zh.md, aria/hooks/secret-scan.sh, aria/hooks/secret-guard.sh]
+    carries_sc: [SC-25, SC-26, SC-27, SC-28]
+    deliverables: [standards/conventions/secret-hygiene.md, aria/README.md, aria/README.zh.md, aria/hooks/secret-scan.sh, aria/hooks/secret-guard.sh, aria/VERSION]
     verification:
-      - "探针 WPA_ONLY=SC-25,SC-26,SC-28 在实现上全部 yes"
+      - "探针 WPA_ONLY=SC-25,SC-26,SC-27,SC-28 在实现上全部 yes (SC-27 / SC-28 与 aria/VERSION 由 TASK-008 移入, 2026-10-09 主控裁定; 28i 测 aria/VERSION 里对 secret-scan 的陈旧描述)"
 
   - id: TASK-014
     parent: "1.8"
