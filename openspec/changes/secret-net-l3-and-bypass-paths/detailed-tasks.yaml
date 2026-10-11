@@ -185,7 +185,7 @@ tasks:
   - id: TASK-014
     parent: "1.8"
     title: "非作者对抗审查 (owner 所说的「单轮审查」): 按 Tasks 1.8 列的坏实现类独立构造, 并审查代码质量"
-    status: pending
+    status: in_progress
     complexity: M
     estimated_hours: "1.5-3"
     dependencies: [TASK-008, TASK-009]

@@ -1,6 +1,6 @@
 # WP-A Phase B 进度 (会话中途记录, 供中断后续接)
 
-> 最近更新: 2026-10-09 02:2xZ (TASK-001 – 009 完成; 会话收尾, 下一会话从 TASK-014 开始)。正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是 Phase B 的进度锚 (Phase A 的进度锚见 `../2026-09-30-wpa-phase-a/PROGRESS.md`)。任务定义见 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 每完成一条任务向 owner 报一行成本 (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)。
+> 最近更新: 2026-10-11 15:xxZ (TASK-001 – 009 完成; TASK-014 审查完成 —— 0 critical / 8 major / 5 minor, 主控独立复核 6 条成立, 修补进行中; 期间停掉第一位执笔遗留 70 小时的自匹配等待循环, 认领心跳过期 31 小时后续上)。正式的会话交接按 Rule #9 写在 `docs/handoff/`; 本文件只是 Phase B 的进度锚 (Phase A 的进度锚见 `../2026-09-30-wpa-phase-a/PROGRESS.md`)。任务定义见 `openspec/changes/secret-net-l3-and-bypass-paths/detailed-tasks.yaml`, 每完成一条任务向 owner 报一行成本 (决策单 `.aria/decisions/2026-10-07-wpa-implementation-first-owner-rulings.md`)。
 
 ## 成本账 (每条任务一行)
 
@@ -15,7 +15,7 @@
 | TASK-007 | 10-09 00:27Z – 01:25Z 约 1 小时 (执笔约 40 分钟 + 主控复核) | 第二位执笔 65 次调用: 缓存读 20,608,851 / 缓存写 1,119,921 / 输出 3,120 (段末上下文约 40 万) | aria `db4f8b8`: secret-guard.sh +258 / −42 (W9 + W10 + `_sg_emit_blocked`); **两个套件全绿** (783 / 783、122 / 122) |
 | TASK-008 | 10-09 01:25Z 结项 (主控核对, 不派执笔) | 0 | W14 元耦合已随各任务同步, 以 TASK-007 的复核结项; SC-27 / SC-28 移入 TASK-009 (见 TASK-008 节) |
 | TASK-009 | 10-09 01:27Z – 02:20Z 约 53 分钟 (执笔约 40 分钟 + 主控复核与两处补正) | knowledge-manager 144 次调用: 缓存读 42,550,367 / 缓存写 874,811 / 输出 5,360 (段末上下文约 44 万; 本轮最「碎」的一位) | aria `69af7cd` (README 两语种、两个 hook 只改注释、VERSION 描述、hooks.json description) + standards `be842ce` (secret-hygiene 1.2.0) + changelog 草稿; 探针 SC-25/27/28 全 yes, SC-26 10/11 (26g 移 TASK-010) |
-| TASK-014 | (下一会话; 非作者 qa-engineer) | — | 本会话于 10-09 02:2xZ 收尾 (主控上下文 60%), 交接 `docs/handoff/2026-10-09-session-close-wpa-phase-b-task001-009-done.md` |
+| TASK-014 | 10-11 10:08Z – 14:28Z 审查约 4 小时 20 分 (新 qa-engineer 实例, 派单 `dispatch/review-task014.md`); 修补进行中 | 审查席 280 次调用: 缓存读 148,784,301 / 缓存写 10,945,111 / 输出 558,452 (上下文峰值 91.5 万; 缓存写的 92% 来自 13 次「单次调用超过 5 分钟 → 整份重写」; 折算约等于 TASK-002 – 009 全部执笔之和); 另记一笔非任务开销: 10-11 停遗留 shell 唤醒第一位执笔 1 次调用, 缓存写 499,584 (缓存已过期) | 审查报告 `.aria/audit-reports/post_implementation-R1-2026-10-11T142603-595Z-…-qa-engineer.md`: 0 critical / 8 major / 5 minor, 667 个坏实现; 修补见 TASK-014 节 |
 
 ### 计量口径更正 (2026-10-08 13:1xZ)
 
@@ -235,3 +235,34 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - 真 bash 3.2 已在持久位置 (见上), 不必再按 Phase A 进度锚第 64 行的说法重建。
 - 探针全量 (带 bash 3.2) 在 2 核限流下约 17–24 分钟, 按资源纪律每席最多两次全量; 实现期的单项验证用 `WPA_ONLY=SC-…` 子集。
 - 时档类测量 (W14 的 (f) / (f0) / (f-hit) / (g) / (h) / (i) / (i3) 与测试内 SC-8) 只在一分钟负载低于 2 时串行跑, 判据只看比值。
+
+## TASK-014 (非作者对抗审查, owner 所说的单轮审查) — 2026-10-11
+
+- 派单 `dispatch/review-task014.md` (09:5xZ), 席位是新派的 aria:qa-engineer 实例; 工作 10:08Z – 14:28Z。
+- **报告落地**: harness 拒绝子代理写报告文件 (Write 返回 "Subagents should return findings as text, not write report files"), 全文在最终消息里。主控用脚本从 transcript 抽出 (不经对话转抄), 去掉开头的摘要段, 存为 `.aria/audit-reports/post_implementation-R1-2026-10-11T142603-595Z-secret-net-l3-and-bypass-paths-qa-engineer.md` (sha256[:16] `15ab8e5d95d1b2a3`)。当前 `secret-scan.sh` 扫描零命中, 拼一行运行时生成的 AWS key 形状后告警 (正控有效)。
+- **结论: PASS_WITH_WARNINGS, critical 0 / major 8 / minor 5。** 667 个独立构造的坏实现; `proposal.md:383` 点名的各类每类至少一个让对应行转红 (TASK-014 第一条 verification 成立)。120 个全绿, 其中 70 个是真缺口, 归并为 8 条 major:
+  - M1: 30b 只能发现 `_sg_core_eval`、`_sg_vx_pass` 落在 source 闸门之下, 另 9 个辅助函数 / 初始化发现不了 (用例名声称的比它验证的多)。
+  - M2: tight 拷贝的命令位置字符、关键字、launcher 时长后缀漂移 (14 个), 以及 `ps -O`、末位 `-u` 的「操作数只认首个」(2 个), 都不转红。
+  - M3: `/proc` 加宽组删掉任一个基线读取器 (12 个) 不转红。
+  - M4: 上下界差一约 16 个不转红 (200-span 帽、kv 键 `{0,64}`、cli 旗标 `{0,40}`、路径形斜杠数、W10 `for` 帽与 `${}` 替换帽、PEM 指纹循环)。
+  - M5: 「不执行」不变量两处覆盖洞: 命中扩展条目之后对命令文本求值 (19ab 只测未命中); `_value_of` 的 URL 分支求值 (7n 不含 URL 类)。
+  - M6: W10 第二遍判定串长无上界, 5.45 KB 命令 1.15 → 5.48 s, 越过 5 s 超时; 是唯一要改 hook 代码的一条。
+  - M7: L3 逐 tag 分类范围 (`json-env-secret-key`、`cf-access-client-secret`)、jq `paths` / `leaf_paths`、W8 左边界 `_ . -` 缺项不转红 (都是误报方向)。
+  - M8: Read/Edit 面扩展条目的「字面子串」性没有任何行。
+  - minor: m1 28f 判据对写法敏感 (内容如实, 不是迁就检查器); m2 顺序行按函数名插桩; m3 W10 声明前缀组多余 (Spec 已注); m4 W12 归一化循环可改成一次 `sed`; m5 `app.ini.example` 与 `git diff -- …/app.ini` 被拦。
+  - 派单点名的三处: 28f 如实 (即 m1); W12 循环比值 1.03 – 1.19, 只在基线自身 5 s 悬崖下方约 3% 宽的带内越线, 不升级; `(( ${#_SGV_N[@]} ))` 在正式代码里不会遇到未赋值, 人为去掉初始化时 fail-closed (3.2.57 与 5.2.15 一致), 无 finding。
+  - 风险 (审查席未能验证): `hooks.json` 新增的 `PostToolUseFailure` 键, 在不认该事件的旧版 Claude Code 上可能让整份 hooks 不加载 (含 secret-guard)。发版前须核 aria-runner 容器里的 Claude Code 版本。
+- **主控独立复核** (参考树 = 自建的 `git archive 69af7cd`; 坏实现由主控自己构造, 每处改动断言恰好生效一次):
+  - M6: 16 个 300 B 赋值、每个变量引用 8 次 (命令 5459 B), 负载 1.55: 基线 1.24 s, 被审 5.30 s (4.28×), 越过 5 s; 与报告的 1.15 → 5.48 s 一致。
+  - M2 (tight 拷贝去掉 `;`)、M3 (加宽组去掉 `tail`)、M5 (命中后对替换副本 eval)、M8 (Read 面改成 `grep -E`): 直接调用 hook 都复现了行为差异 (M5 的金丝雀文件被建出); 对应探针整组在坏实现上与参考树逐行相同 (SC-22 80/80, SC-19 40/40, SC-20 17/17), 确实不转红。
+  - M1: 静态核对成立。套件 30b (`secret-guard.test.sh:2757-2764`) 只断言退出码; `_sg_ext_*` 只在 `$( … )` 里调用且丢弃 stderr; `_sg_emit_blocked` 的返回值不参与判定。
+  - M4、M7 与 M5 的 7n 一侧没有单独复现; 修补执笔须先在审查席的坏实现上逐条转红, 等于逐条复现。
+  - 审查席收尾后核进程树: 没有残留 (只有会话自身的 MCP 与 pyright)。
+- **成本**: 见成本账。审查席上下文从 5.2 万累积到 91.5 万 (未压缩)。缓存写的 92% (约 1006 万) 来自 13 次整份重写: 每次都是一次工具调用 (前台长命令或等后台) 超过 5 分钟 (间隔 359 – 612 s), 子代理的缓存 TTL 只有 5 分钟, 下一次调用把 61.5 – 86.6 万的上下文整份重写一遍。后续派单: 单次工具调用不超过 4 分钟 (长任务拆段), 修补按文件域拆给几个新实例。
+- **主控裁定 (待 owner 复议)**:
+  1. 修补落在两个套件里 (随 hook 一起发布, 防的正是报告里「以后有人改漏」的那类漂移), 不加探针行。探针是本 Spec 一次性的验收物; 加行还得在基线上整份重跑 (约 24 分钟)、重新生成 `baseline-evidence.md` 并改 SC 正文。TASK-014 第二条写的是「探针行或套件用例」, 两者都可以。
+  2. M6 改 hook: W10 第二遍设串长预算, 并改成线性替换。`timing.py` 只增加一档 (g-c), 已有各档不动; 实测后由主控以修订记录的方式订正 `proposal.md` 的 Impact 与 W14 时档表 (只增不改原句)。
+  3. 复核席换新实例。审查席上下文 91.5 万、缓存早已过期, 唤醒一次至少整份重写, 再干活就会触发压缩; 新实例凭 `$W` 下的坏实现与 `out/res_*.jsonl` 只复核修补处。TASK-014 原文「审查者只复核修补处」指的是角色, 不是同一实例。
+  4. 5 条 minor 本轮不修, 记作待办 (m1 / m2 涉及探针行, m5 是行为取舍)。
+  5. SOT 里的测试计数 (三处 789 / 783、一处 122, 以及 1.2.0 版本历史行) 等修补全部落地后由主控一次同步, 免得并行的执笔同改一个文件。
+- **修补安排**: 执笔 A (新 backend-architect 实例) 先修 M6 (改 hook; 测时档时主机上只跑它一个)。之后执笔 B1 (guard 套件: M1、M2、M3、M4 的 W10 两界、M5 的 19ab、M7 的 jq 与 W8、M8) 与 B2 (scan 套件: M4 其余、M5 的 7n、M7 的 tag) 并行。最后新派一个 qa-engineer 只复核修补处。
