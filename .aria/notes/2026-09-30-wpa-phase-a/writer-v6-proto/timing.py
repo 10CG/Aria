@@ -2,13 +2,15 @@
 """timing.py BASE_HOOK_DIR TARGET_HOOK_DIR [tiers] [--pairs N] [--gsize B] [--nrefs N] [--vlen N] [--hsegs N] [--nvars N] [--judge]
 
 Interleaved A/B timing of the baseline hook (A) and a target hook (B) on the W14 time-budget inputs.
-With --judge every bounded tier also prints `verdict=PASS|FAIL` (the W14 bounds: f <= 3.0 as a pure ratio; f0 target <= 1.5 x max(base, 100 ms); fh-a / fh-b <= 3.0; g-a / g-b <= 2.5; h2 <= 1.5; i1 / i2 <= 2.0;
+With --judge every bounded tier also prints `verdict=PASS|FAIL` (the W14 bounds: f <= 3.0 as a pure ratio; f0 target <= 1.5 x max(base, 100 ms); fh-a / fh-b <= 3.0; g-a / g-b / g-c <= 2.5; h2 <= 1.5; i1 / i2 <= 2.0;
 i3-a..e <= 2.5; i3-f / g / h (300 KB unquoted kv value) <= 5.0; a failed liveness assertion fails the tier) and the exit code is 1 if any bounded tier fails (the unbounded ones -- h1, fh-0, w1 -- are informational).  Per run it records the CPU time
 (user+sys, via RUSAGE_CHILDREN deltas -- all descendants of the hook process) and the wall time; the statistic per hook is the MINIMUM over
 N interleaved runs, the verdict statistic is the CPU ratio B/A.  Values are generated at run time, nothing is printed except numbers.
 tiers: f (200-entry extension, one benign segment, Bash and Read faces) / f0 (no extension file, Bash and Read faces) /
        g (W14 tier (g-a): one string of --gsize bytes [4000], --nvars assignments [8] of --vlen bytes [300], --nrefs references [40]) /
        gmax (W14 tier (g-b), the W10 caps: --gsize [4000], --nvars [16] assignments of --vlen [100] bytes, --nrefs [128] references = 16 assignments x 8 references) /
+       gc (W14 tier (g-c), review M6 -- the DENSE shape: G_C = 16 assignments of 400 bytes, 8 references to each (128) in ONE segment, the command is NOT cut to --gsize (about 7 KB);
+           the options above do not apply.  The copy of a hook without the length budget is about 52 KB: ratio 3.7 - 5.0 = FAIL; a hook that refuses the copy stays near 1.2) /
        h (16 assignments, then --hsegs ref-bearing benign segments [150], with a 200-entry extension: h1 all allowed, h2 + a last dotenv read, must stay exit 2) /
        i (dense L3 inputs: ~900 KB of bearer lines; ~600 KB of JSON password lines)
        w1 (a Read result through the L3 hook: 4 KB and 60 KB of clean prose, 180 KB of dense INI-style assignment lines; the baseline hook does not extract file.content, so A is the process-start floor)
@@ -43,11 +45,12 @@ for k, a in enumerate(sys.argv[3:], start=3):
     if sys.argv[k - 1].startswith("--") and a in skip_vals:
         continue
     args.append(a)
-tiers = args[0].split(",") if args else ["f", "f0", "g", "gmax", "h", "i"]
+tiers = args[0].split(",") if args else ["f", "f0", "g", "gmax", "gc", "h", "i"]
 pairs = opt("--pairs", 5)
 gsize, hsegs = opt("--gsize", 4000), opt("--hsegs", 150)
 G_A = (opt("--nvars", 8), opt("--vlen", 300), opt("--nrefs", 40))          # W14 (g-a)
 G_B = (opt("--nvars", 16), opt("--vlen", 100), opt("--nrefs", 128))        # W14 (g-b): the W10 caps
+G_C = (16, 400, 128)                                                         # W14 (g-c), review M6: 16 assignments x 400 B x 8 references each (fixed: no option, no cut to --gsize)
 hrefs = "--hrefs" in sys.argv
 ALNUM = string.ascii_letters + string.digits
 home = tempfile.mkdtemp(prefix="tm-")
@@ -97,7 +100,7 @@ def live_check(hook_name, payload, env_extra, funcs, expect):
 JUDGE = "--judge" in sys.argv
 JUDGED = []          # (name, passed)
 BOUNDS = [("f  200", lambda b, t, r: r <= 3.0), ("f0 ", lambda b, t, r: t <= 1.5 * max(b, 0.100)), ("fh-a", lambda b, t, r: r <= 3.0), ("fh-b", lambda b, t, r: r <= 3.0),
-          ("g-a", lambda b, t, r: r <= 2.5), ("g-b", lambda b, t, r: r <= 2.5), ("h2", lambda b, t, r: r <= 1.5), ("i1", lambda b, t, r: r <= 2.0), ("i2", lambda b, t, r: r <= 2.0),
+          ("g-a", lambda b, t, r: r <= 2.5), ("g-b", lambda b, t, r: r <= 2.5), ("g-c", lambda b, t, r: r <= 2.5), ("h2", lambda b, t, r: r <= 1.5), ("i1", lambda b, t, r: r <= 2.0), ("i2", lambda b, t, r: r <= 2.0),
           ("i3-f", lambda b, t, r: r <= 5.0), ("i3-g", lambda b, t, r: r <= 5.0), ("i3-h", lambda b, t, r: r <= 5.0), ("i3-", lambda b, t, r: r <= 2.5)]
 
 
@@ -160,6 +163,14 @@ for _t, (nvars, vlen, nrefs) in (("g", G_A), ("gmax", G_B)):
     cmd = assigns + "; echo " + refs + " " + "pad " * (gsize // 4)
     cmd = cmd[:gsize]
     ab(f"{'g-a' if _t == 'g' else 'g-b'} {gsize} B string, {nvars} assign(len {vlen}), {nrefs} refs", G, bash_payload(cmd), live=(["_sg_vx_pass"], ["_sg_vx_pass"]))
+if "gc" in tiers:
+    # W14 (g-c), review M6: the dense shape.  Liveness: the second pass is entered AND the substitution function runs (a hook that dropped W10 altogether calls neither).
+    nvars, vlen, nrefs = G_C
+    names = [f"v{i}" for i in range(nvars)]
+    assigns = "; ".join(f"{n}=/srv/data/{alnum(vlen)}" for n in names)
+    refs = " ".join("$" + names[i % nvars] for i in range(nrefs))
+    cmd = assigns + "; echo " + refs
+    ab(f"g-c {len(cmd)} B string, {nvars} assign(len {vlen}), {nrefs} refs", G, bash_payload(cmd), live=(["_sg_vx_pass", "_sg_vx_apply"], ["_sg_vx_pass", "_sg_vx_apply"]))
 if "f" in tiers or "f0" in tiers:
     proj = tempfile.mkdtemp(prefix="pj-")
     os.makedirs(os.path.join(proj, ".aria"))

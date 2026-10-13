@@ -272,3 +272,22 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **M6 比报告更尖**: 主控复核时额外确认, 单层链式赋值在 W10 上限内会让值**成倍放大** —— 一条一百多字节的命令可把第二遍拖到十几秒 (depth-6 链实测约 16.5 s, 基线约 0.08 s)。含义: M6 的修法必须是「对**展开后串长**设预算」, 只卡赋值个数/引用次数挡不住这条。派单 `dispatch/fix-task014-m6.md` 已据此写明 (串长预算 + 值长帽 + 线性替换)。
 - **超时 fail-open (Spec:410) = owner 决定**: 钩子被拖过 5 s 后按现状放行; 这不是相对基线的回退 (基线无 W10/W9), 是既有缺口被新能力拉近。owner 2026-10-13 裁定:**维持 WP-A 范围** (M6 只做串长预算, 不碰超时策略), **另开 issue 提优先级**。已开 **10CG/aria-plugin#216** ([安全][secret-guard] hook 5 s 超时后 fail-open, Refs #154/#203/#221)。fail-closed 化 (误拦长命令的代价) 留 #216 由 owner 定优先级, 不入本次。
 - **进展**: 执笔 A (M6) 已于 2026-10-13 派出, 后台运行中。brief 要求三态 CPU 比值表 + `timing.py` 新 g-c 档 (修补前参考树 FAIL / 修补后 PASS) + 套件转红。
+
+### M6 落地 + 主控抽检 + 技术裁定 (2026-10-13)
+
+- **执笔 A 回**: `secret-guard.sh` (+68/−21 实际)、`secret-guard.test.sh` (+129)、`timing.py` (+14/−3), 三文件未提交交主控落地; aria 子模块保持 69af7cd 无 git 写、无游离文件。guard 799/799, scan 122/122。
+- **改动**: 三道长度预算 `_SGV_VMAX=4096` (单值) / `_SGV_SMAX=8192` (单替换副本) / `_SGV_TMAX=65536` (同命令合计), 超出即放行 (同 21y known-limit, BLOCKED 文案不变); `$NAME` 循环改累加前缀 + 剩余后缀续找。新增 16 用例 W10 SC-21aa–21ap。`timing.py` 加 g-c 档。
+- **主控独立抽检 (非全量; 全量复核留给新 qa)**:
+  - INV-4 静态成立: `_SGV_*` (586-588)、`_sg_vx_replace/collect/apply/pass` (591-687)、`_sg_ext_pass` (743)、`_sg_core_eval` (799) 全在 source 闸门 (:819 `[[ BASH_SOURCE != $0 ]]; return 0`) 之上; `_sg_judge_one` (1390)/`_sg_per_segment_eval` (1428) 只在 run-as-main 路径调用 (全文件已载入), 白盒单测只直调闸门上的 collect/apply。564 行注释即契约本体。
+  - `bash -n` 两文件在 3.2.57 + system 过; 亲跑 guard 799/799 (含新预算用例)、scan 122/122, rc=0。
+  - **有界返回亲测** (修补版工作树 hook): 几何链 depth6 (206B, 参考树挂死 >150s) → 0.18s 放行; 密集 16×300×8 (5459B, 参考树 ~5.0s 越超时) → 1.28s。与执笔报告逐点吻合。M6 安全目的 (不撞 5s 超时悬崖) 独立成立。
+- **技术级裁定** (owner-product/ai-technical: 可证伪判据 + 决策单, 非产品级; 下列待 owner 复议时一并看):
+  1. 预算取 **8192** (执笔建议 16-32KB): 接受。credit 判定对单长行是 O(len²) (8KB≈0.9s / 16KB≈3s / 32KB≈13s), 32KB 的被拦副本必越 5s → 拦截丢; 8192 使最坏真阳性拦截 (W9 扩展整串一眼 3.45s) <5s。代价: g-a/g-b 形态 (副本 14/16KB) 现放行, 与修补前超时 fail-open **等效** (无检测回退), 同 21y known-limit 口径。
+  2. 第三道预算 `_SGV_TMAX` (派单未要求): 接受。治同类兄弟形态 (shape c: 多小段各在单副本预算内但合计大, 无此帽约 115 段越 5s), fix-the-class; 透明 / 可整体撤 / 带 4 用例。
+  3. 名字契约扩展 (collect/apply/`_SG_SUB` 被套件 21ak/21an 按名用): 接受, 头注释已载; 记给 qa。
+  4. 环状赋值不再重复展开 (旧版 8 次): 接受, 环状无字面基底, 判定等价 (文本不再逐字节一致)。
+  5. `timing.py` 默认档表 +gc: 接受 (只增不改, 阈值未动)。
+  6. load1 1.71-2.23 非严格 <2: 记录非阻塞。judge 用 A/B 交错取最小比值 (共享机设计缓解); 主控有界返回亲测在 load 1.45; 新 qa 可按需在 load<2 严格重跑时档。
+  7. 残余 (未改, 不在 M6 范围): W9 扩展整串一眼在副本=8192 命中时拦截 3.45s (<5s, 既有形态); `_sg_per_segment_eval` 无扩展文件时整串 apply 纯浪费。记为后续。
+- **doc 计数同步推迟**: 执笔列出 `secret-hygiene.md` :23/:316/:352 + `changelog-draft.md:52` 的 789/783 应改 805/799, 及 `proposal.md` Impact (1.45-2.50×) 订正。但 **B 还会加用例, 计数再变** ⇒ A+B 全落地后由主控一次同步 (批 standards/ + proposal.md, 数字定稿), 免 standards 子模块两次改。[裁定 5 的执行细化]
+- **落地**: aria 子模块提交 secret-guard.sh + test.sh (feature 分支), 推 origin + ls-remote 核; 主仓 bump gitlink + timing.py + 本记录。**next = 派执笔 B** (其余 7 条 major 补用例, 两套件不拆)。
