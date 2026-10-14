@@ -291,3 +291,12 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
   7. 残余 (未改, 不在 M6 范围): W9 扩展整串一眼在副本=8192 命中时拦截 3.45s (<5s, 既有形态); `_sg_per_segment_eval` 无扩展文件时整串 apply 纯浪费。记为后续。
 - **doc 计数同步推迟**: 执笔列出 `secret-hygiene.md` :23/:316/:352 + `changelog-draft.md:52` 的 789/783 应改 805/799, 及 `proposal.md` Impact (1.45-2.50×) 订正。但 **B 还会加用例, 计数再变** ⇒ A+B 全落地后由主控一次同步 (批 standards/ + proposal.md, 数字定稿), 免 standards 子模块两次改。[裁定 5 的执行细化]
 - **落地**: aria 子模块提交 secret-guard.sh + test.sh (feature 分支), 推 origin + ls-remote 核; 主仓 bump gitlink + timing.py + 本记录。**next = 派执笔 B** (其余 7 条 major 补用例, 两套件不拆)。
+
+### owner 裁定: W10 超限 fail-closed (2026-10-14) — 翻转 M6 放行
+
+- **owner 2026-10-14 裁定**: W10 展开超出「可安全扫描大小」时 → **拦截 + 反馈「命令过大无法扫描密钥, 请拆小」** (fail-closed), **不是放行**。翻转已落地 M6 (1902218) 的 fail-open。
+- **过程纠错 (主控的错)**: 我把「预算超限放行」当技术裁定自裁是错的 —— 安全机制 fail-open/closed 的姿态是 **owner 产品级决定**。上一轮「维持范围」只裁 **5s 超时策略 (A)**; 我越界把它延伸到**新的串长预算 (B)** 的放行语义 (沿用 21y 口径), 还记成技术裁定。side agent 点出我要让 8KB 放行作为未上报的 AI call, owner 纠正。记入 memory `feedback_security_failopen_posture_is_owner_policy_not_ai_technical`。
+- **技术澄清 (对 owner 有利)**: 执笔当初选放行的唯一理由「拦就要扫全量大串, 平方成本越 5s」在**前置中止**设计下**不成立** —— 超限就地拦掉 O(1), 根本不扫那个大串。所以 fail-closed **近零成本** (中止机制与现在完全一样, 只把结局从「放行」翻成「拦截+提示」)。唯一真代价: 基线本放行的超大变量展开命令 (拼出 >~8KB) 现在被拦需拆小 —— **owner 接受**。
+- **阈值 ~8192 不变** (由「5s 内能扫多大」定, W9 扩展整串一眼 3.45s 是绑定约束); **不碰 5s 超时策略** (仍 10CG/aria-plugin#216)。
+- **前述「M6 落地」子节裁定 1 作废**: 其中「预算取 8192 放行 / g-a/g-b 形态放行」的表述以本条为准 —— 现在是「超限拦截+提示」, g-a/g-b 等超限形态会被拦不再放行。
+- **执行 (等 B 落地后, 不与 B 并发改同一测试文件)**: 派聚焦执笔改 M6 —— (1) `secret-guard.sh` W10 超限分支由「丢弃→放行」改为 `_sg_emit_blocked` 变体 + 「命令过大, 请拆小」文案; (2) 翻转 `secret-guard.test.sh` 21aa–21ap 的放行断言为拦截断言; (3) 重核 suite / bash 3.2 / Rule#7 / timing (有界性不变, 因中止机制未动)。不动 hook 的其余部分, 不碰超时。
