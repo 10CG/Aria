@@ -185,7 +185,7 @@ tasks:
   - id: TASK-014
     parent: "1.8"
     title: "非作者对抗审查 (owner 所说的「单轮审查」): 按 Tasks 1.8 列的坏实现类独立构造, 并审查代码质量"
-    status: in_progress
+    status: done
     complexity: M
     estimated_hours: "1.5-3"
     dependencies: [TASK-008, TASK-009]
@@ -196,7 +196,7 @@ tasks:
     verification:
       - "Tasks 1.8 列出的每一类坏实现都至少构造一个, 并让对应探针行或套件用例转红"
       - "发现的 major 由实现者修完、审查者只复核修补处; 不开新一轮全审"
-    notes: "这是本 Spec 唯一的审查轮; post_planning 已由 owner 裁定跳过"
+    notes: "这是本 Spec 唯一的审查轮; post_planning 已由 owner 裁定跳过。完成 2026-10-14: 0 critical / 8 major / 5 minor。8 major 全修 —— M6 (W10 第二遍无上界→串长预算) 改 hook, owner 2026-10-13 fail-open → 10-14 fail-closed 两次裁定 (超限拦截+提示拆小; aria 1902218→52d0964), 其余 7 补对抗用例 (626e567)。新 qa 复核 8 major 全 PASS (独立构造 224 坏实现; 裁决: M7 B 对/报告 L442 错, 等价 mutant 非缺口, M2f 真守卫, M6 误拦面如实); qa 点的 3 同类覆盖洞主控补齐 (83d8f30, red-proof 过, 计数不变 822/816)。5 minor 延后 (m1/m2 涉探针行, m5 行为取舍)。follow-up 10CG/aria-plugin#216 (超时 fail-open) / #217 (fail-closed 误拦面收窄)。doc 同步 (proposal Impact+W10 尺寸限, secret-hygiene 计数 822/816·129, changelog W10 行) 归 TASK-010。"
 
   - id: TASK-010
     parent: "1.10"

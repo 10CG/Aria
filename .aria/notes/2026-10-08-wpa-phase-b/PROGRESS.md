@@ -325,4 +325,18 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - 顺手修 B 区 `secret-guard.test.sh:2944` 失真注释 (`_sg_vx_collect` 状态现被消费, 非 ignored)。
 - **逃生口**: oversize 文案提示「拆小」; `# guard:ack` 逐次豁免对本拦截仍生效。
 - **落地**: aria gitlink → 52d0964; 主仓 bump + 本记录。**next = 派新 qa-engineer 只复核修补处** (fail-closed M6 + B 的 7 条 major), 并专门裁决 M7 方向 (误报 vs 漏报) 分歧。
-- **SOT 同步 (全部落地 + qa 通过后一次做)**: ① `secret-hygiene.md:316-317` 789/783 → **822/816**, scan 122 → **129** (M6-rework 不改计数, 822/816 即最终); ② `proposal.md:192` W10 known-limit 段补「尺寸预算 fail-closed」(现只写 21y count 类); ③ `changelog-draft.md` 补 W10 行。涉 standards/ 子模块。
+- **SOT 同步**: 见下「TASK-014 结项」—— 归入 TASK-010 一次做。
+
+### TASK-014 结项 + qa 复核 PASS (2026-10-14)
+
+- **新 qa 复核结论: 8 条 major 全 PASS** (7 条无保留)。独立重建 **224 个**坏实现 (非复用执笔/原审查席), 两套件 816/816 · 129/129, `failset_diff` 洁净。墙钟约 3h20m。
+- **四条裁决**:
+  1. **M7**: B 对。审查报告 L442「`auth-header-token`/`cli-secret-flag` 缺项由 10i 抓」**错** —— qa 复跑确认 10i 只抓 kv/json 两 tag (删这两个 tag 旧套件 122/122 全绿)。方向是**误报** (报告 L430/445 本身也写误报; 我 brief 的「漏报」是转述偏差)。B 的六 tag 矩阵覆盖了真缺口。
+  2. **等价 mutant** (scan `count>199` / `FP_N<11` / tight 三拷贝之一删括号) 确系行为等价、不可杀, **非测试缺口** (qa 逻辑 + 差分双证)。
+  3. **M2f** 一致性断言是**真守卫** (拷贝漂移/空态转红, 协同改时由 M2a-d 接手), 非恒真。
+  4. **M6 fail-closed 误拦面**与记录一致、无扩展时更窄 (只单段超限才拦)。
+- **qa 点的 3 同类覆盖洞, 主控补齐** (aria `83d8f30`, 只加既有 case 内子断言, 计数不变 822/816): M6「命令过大」中文行钉 (owner 点名的拆小反馈此前只钉英文) + M6 collector 入口闸门放行侧钉 (21ad, 无 `$` 命令不拦) + M8 条目作更长绝对路径字面子串钉 (SC-R1M8a, 防 starts-with/whole-line 退化)。主控 red-proof 均过 (移除中文行 / 移除闸门后 4097 值被拦 / `grep -qFxi` 前缀路径放行), 正确 hook guard 816/816。M8 词边界/后缀 exotic mutant 不在此法内, 归 #217。
+- **TASK-014 → done**。5 条 review minor 延后待办 (m1/m2 涉探针行, m5 行为取舍)。
+- **commit 链** (aria): 审查落地 662dd5a(主仓) → M6 fail-open 1902218 → B 626e567 → M6-rework fail-closed 52d0964 → 3 覆盖补 83d8f30; 主仓 gitlink 跟到 83d8f30。follow-up **#216** (超时 fail-open) / **#217** (fail-closed 误拦面收窄: 按膨胀量判 / for 列表跨行 bug / 只拦被引用值)。
+- **doc 同步归 TASK-010** (acceptance 本就是 doc 定稿家; `changelog-draft` Documentation 行已含「计数同步」): ① `proposal.md` Impact (1.45-2.50× 订正) + W10 已知限制补「尺寸预算 fail-closed」; ② `secret-hygiene.md` 计数 789/783→**822/816** (:23/:316/:352) + scan 122→**129** (:317) + 1.2.0 版本行; ③ `changelog-draft` 补 W10 行。涉 standards/ 子模块。
+- **qa 观察留 TASK-010 留意**: SC-8 tier(e) 在高负载 (load 12) 逼近 100ms 上限 (M6-rework 本身没加热路径延迟); 扩展在效 + 副本恰 8192 时 5.4s CPU (owner 接受的 SMAX 约束, 落 #216 超时区间)。
