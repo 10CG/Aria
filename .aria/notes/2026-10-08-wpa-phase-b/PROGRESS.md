@@ -299,4 +299,19 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **技术澄清 (对 owner 有利)**: 执笔当初选放行的唯一理由「拦就要扫全量大串, 平方成本越 5s」在**前置中止**设计下**不成立** —— 超限就地拦掉 O(1), 根本不扫那个大串。所以 fail-closed **近零成本** (中止机制与现在完全一样, 只把结局从「放行」翻成「拦截+提示」)。唯一真代价: 基线本放行的超大变量展开命令 (拼出 >~8KB) 现在被拦需拆小 —— **owner 接受**。
 - **阈值 ~8192 不变** (由「5s 内能扫多大」定, W9 扩展整串一眼 3.45s 是绑定约束); **不碰 5s 超时策略** (仍 10CG/aria-plugin#216)。
 - **前述「M6 落地」子节裁定 1 作废**: 其中「预算取 8192 放行 / g-a/g-b 形态放行」的表述以本条为准 —— 现在是「超限拦截+提示」, g-a/g-b 等超限形态会被拦不再放行。
-- **执行 (等 B 落地后, 不与 B 并发改同一测试文件)**: 派聚焦执笔改 M6 —— (1) `secret-guard.sh` W10 超限分支由「丢弃→放行」改为 `_sg_emit_blocked` 变体 + 「命令过大, 请拆小」文案; (2) 翻转 `secret-guard.test.sh` 21aa–21ap 的放行断言为拦截断言; (3) 重核 suite / bash 3.2 / Rule#7 / timing (有界性不变, 因中止机制未动)。不动 hook 的其余部分, 不碰超时。
+- **执行 (等 B 落地后, 不与 B 并发改同一测试文件)**: 派聚焦执笔改 M6 —— (1) `secret-guard.sh` W10 超限分支由「丢弃→放行」改为 `_sg_emit_blocked` 变体 + 「命令过大, 请拆小」文案; (2) 翻转 `secret-guard.test.sh` 21aa–21ap 的放行断言为拦截断言; (3) 重核 suite / bash 3.2 / Rule#7 / timing (有界性不变, 因中止机制未动)。不动 hook 的其余部分, 不碰超时。brief 已预写 `dispatch/fix-task014-m6-failclosed.md`。
+
+### 执笔 B 落地 + 主控抽检 (2026-10-14)
+
+- **执笔 B 回**: 两测试文件 `secret-guard.test.sh` (+191/−1)、`secret-scan.test.sh` (+92/−1), **hook 源零改动** (secret-guard.sh/secret-scan.sh/hooks.json/corpus_census.py)。7 条 major **全是覆盖缺口, 无活代码 bug**, 都只靠测试转红。guard 新增 17 + 强化既有 30b (+2 检查), scan 新增 7, id 一律 `SC-R1M<n><x>` (避开探针行)。492 个独立重建 mutant (每处改动断言恰好生效一次)。
+- **主控独立抽检 (非全量对抗复核, 那是新 qa 的活)**: aria @ 1902218 工作树只两 test 文件变、hook 逐字节未动 (`git diff --name-only` 无 hook); `bash -n` 两文件在 3.2.57 + system 过; 亲跑 **guard 816/816, scan 129/129** rc=0; `failset_diff` 0 新失败/0 转绿; 头计数 guard 822 (816 无 zsh)、scan 129。
+- **技术级裁定 (待 owner 复议)**:
+  1. **M2f 超出 brief 的一致性断言**: 保留。治 tight 拷贝 362 个成员删除里枚举不完的那类 (≥229 对全套件不可见), 断言 hook 自写契约「规则行==拷贝文本」(fix-the-class; 审查席也建议过); 可整体撤 (`sc22_drift.sh` + M2f)。
+  2. **M7 方向与覆盖**: B 实测是**误报**方向 (非 brief/报告写的漏报), 且 jq `paths`/`leaf_paths`·W8 左边界属 guard 非 scan, 做成六 tag 全矩阵更广 —— B 纠正了审查报告可能的 mis-citation。B 用例基线绿 + mutant 红成立, **此条标给新 qa 专门裁决** (B 与审查席分歧处, 须复跑两方)。
+  3. 等价 mutant (scan `count>199`、`FP_N<11`、tight 三拷贝之一删括号/反引号) 行为不可区分 → 不可杀, 诚实记录 (无测试缺口)。
+  4. `basic-auth-url` 口令字符类无 `$()` 反引号 → `M5b` 只覆盖另外 3 个 URL tag (限制真实)。
+  5. **M3 被整套 SC-19 附带抓红** = census family key 文本耦合的既有特性 (任何读取器列表改动, 合法与否都红), 非行为守卫、非 B 引入; `M3a` 才是逐读取器行为守卫。
+  6. 30b 命名耦合: 以后新增符合 `^_SG[A-Z0-9_]*$` 的下闸门变量会触发红 = 有意 fail-closed。
+- **下游 doc 待同步 (SOT 一次做, M6-rework 后, 届时计数定稿)**: `standards/conventions/secret-hygiene.md:316-317` 的 `789/783 无 zsh` (已落后 A 的 805/799) → `822/816`, scan `122` → `129`; `baseline_probe.py` 无新用例探针行 (B 未碰)。M6-rework 只翻断言不增减用例, 故 822/816 预计即最终计数。
+- **census 退出码 1** (`criteria.site_count==7 expected 13`) 是改动前就有的诊断, 与本次无关, 归 **TASK-010** (28 分支/site 覆盖)。
+- **落地**: aria gitlink → 626e567; 主仓 bump + 本记录 + 两份 dispatch brief。**next = 派 M6-rework (fail-closed)**。
