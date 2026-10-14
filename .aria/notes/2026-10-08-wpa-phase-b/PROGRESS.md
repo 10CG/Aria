@@ -315,3 +315,14 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **下游 doc 待同步 (SOT 一次做, M6-rework 后, 届时计数定稿)**: `standards/conventions/secret-hygiene.md:316-317` 的 `789/783 无 zsh` (已落后 A 的 805/799) → `822/816`, scan `122` → `129`; `baseline_probe.py` 无新用例探针行 (B 未碰)。M6-rework 只翻断言不增减用例, 故 822/816 预计即最终计数。
 - **census 退出码 1** (`criteria.site_count==7 expected 13`) 是改动前就有的诊断, 与本次无关, 归 **TASK-010** (28 分支/site 覆盖)。
 - **落地**: aria gitlink → 626e567; 主仓 bump + 本记录 + 两份 dispatch brief。**next = 派 M6-rework (fail-closed)**。
+
+### M6-rework (fail-closed) 落地 + #217 收窄 (2026-10-14)
+
+- **M6-rework 回**: 只改 `secret-guard.sh` (+88/−29) + 其 test (+93/−34), hook 其余/scan/census 零改动; 用例数不变 (822/816 无 zsh), census/头计数未动。三超限点 (值 VMAX :622/636/644 / 单副本 SMAX :689-706 / 合计 TMAX :707-711) 由「丢弃→放行」改为就地停止、emit oversize BLOCK (rc=2); 越界串不建不扫。`_sg_emit_blocked` (:792) 加 `oversize` 分支 + 拆小提示文案 (真阳性文案逐字节不变)。翻转 21aa-21ap 放行断言为拦截/真阳性。
+- **主控独立抽检 (亲测)**: aria @ 626e567 工作树只两文件变、其他 hook 未动; INV-4 (改动函数 610/653/680/792 全在闸门 869 上); `bash -n` 3.2.57+system; 亲跑 guard 816/816, scan 129/129; red-proof —— 几何链 depth6 → rc=2 0.12s、密集 16×300×8 → rc=2 1.21s、**9.7KB whole-mode 命令 (展开仅 ~6KB) 旧 fail-open 放行 / 新 fail-closed 拦 (误拦确认)**、clean → rc=0; 真阳性 W13 SC-25 hash 全绿。
+- **owner 2026-10-14 第二次裁定**: 执笔在报告顶部标出 fail-closed 误拦面比我上次描述的广 —— **任何 >8192 字符且引用变量的命令都拦** (SMAX 数被判串长度非膨胀量), 含多行 for 循环 (collector 正则 `[^;&|)]*` 跨换行的既有 bug) 与未被引用的超大值。主控亲测 9.7KB 命令印证后如实上呈; **owner 选「现在落地 + 另开 issue 收窄」**。
+- **开 10CG/aria-plugin#217** (收窄: 按膨胀量判 / 修 for 列表跨行 bug / 只拦被引用值 + 清理一行死 `continue`; count 轴 21y 维持 fail-open —— fail-closed 化会拦常见 >16 赋值脚本)。
+- 顺手修 B 区 `secret-guard.test.sh:2944` 失真注释 (`_sg_vx_collect` 状态现被消费, 非 ignored)。
+- **逃生口**: oversize 文案提示「拆小」; `# guard:ack` 逐次豁免对本拦截仍生效。
+- **落地**: aria gitlink → 52d0964; 主仓 bump + 本记录。**next = 派新 qa-engineer 只复核修补处** (fail-closed M6 + B 的 7 条 major), 并专门裁决 M7 方向 (误报 vs 漏报) 分歧。
+- **SOT 同步 (全部落地 + qa 通过后一次做)**: ① `secret-hygiene.md:316-317` 789/783 → **822/816**, scan 122 → **129** (M6-rework 不改计数, 822/816 即最终); ② `proposal.md:192` W10 known-limit 段补「尺寸预算 fail-closed」(现只写 21y count 类); ③ `changelog-draft.md` 补 W10 行。涉 standards/ 子模块。
