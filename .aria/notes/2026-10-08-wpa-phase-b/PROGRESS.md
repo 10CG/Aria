@@ -340,3 +340,12 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **commit 链** (aria): 审查落地 662dd5a(主仓) → M6 fail-open 1902218 → B 626e567 → M6-rework fail-closed 52d0964 → 3 覆盖补 83d8f30; 主仓 gitlink 跟到 83d8f30。follow-up **#216** (超时 fail-open) / **#217** (fail-closed 误拦面收窄: 按膨胀量判 / for 列表跨行 bug / 只拦被引用值)。
 - **doc 同步归 TASK-010** (acceptance 本就是 doc 定稿家; `changelog-draft` Documentation 行已含「计数同步」): ① `proposal.md` Impact (1.45-2.50× 订正) + W10 已知限制补「尺寸预算 fail-closed」; ② `secret-hygiene.md` 计数 789/783→**822/816** (:23/:316/:352) + scan 122→**129** (:317) + 1.2.0 版本行; ③ `changelog-draft` 补 W10 行。涉 standards/ 子模块。
 - **qa 观察留 TASK-010 留意**: SC-8 tier(e) 在高负载 (load 12) 逼近 100ms 上限 (M6-rework 本身没加热路径延迟); 扩展在效 + 副本恰 8192 时 5.4s CPU (owner 接受的 SMAX 约束, 落 #216 超时区间)。
+
+### W1 `PostToolUseFailure` 前向兼容核查 (侧席提醒 → 主控实测, 2026-10-14)
+- **缘起**: 侧席提醒 W1 给 hooks.json 加的顶层 `PostToolUseFailure` 键, 旧版 CC 不认识时**理论上**可能拒整份 hooks → secret-guard 静默缺席。owner:「同意, 加验证过的 CC 支持版本」。
+- **前提属实**: WP-A TASK-003 (aria `7567fe5`) 确加顶层 `PostToolUseFailure`; memory `postooluse-facts`「secret-scan 只注册 PostToolUse」已过时, 待修。
+- **辅助席编造证据 (记一笔)**: claude-code-guide 席**结论对** (fail-safe) 但**引的「Backward Compatibility: Unknown event names: Silently ignored」官方原文系编造** —— 主控把 `hooks.md` 全页三段 (0-100K / 100K-200K / 200K-270K) 扫完, 无该段。决策改以实测为据, 未采信引文。
+- **实测 (真二进制, 非引文)**: CC 2.1.292 `claude plugin validate` 对伪造事件报 `unknown hook event; entry ignored at runtime` + 整份 `Validation passed` (exit 0) = **fail-safe**。故 `secret-guard` (PreToolUse) + 成功路径 `secret-scan` (PostToolUse) 与该事件识别无关; 旧版最坏只丢失败路径扫描这一腿, 核心守卫在。
+- **诚实边界 (隔离装 2.1.0 实测)**: 该 `unknown hook event` 校验是 CC **2.1.0 之后**才加的 (2.1.0 的 `validate` 不校验事件名、对伪造事件也不报警) → `validate` **不能**回溯证明旧世代运行时是否整份拒绝, 需无头实跑; 实际风险低 (容器 Dockerfile `@latest` = 现世代 2.1.x, fail-safe 适用)。本机**无 docker**, 制品级实测无法在此做。
+- **清单无版本字段**: plugin.json / marketplace schema 无最低 CC 版本字段 (`manifest-reference` 全字段表核过) → 不能靠清单强制。
+- **落地 (owner 两点均「可以」)**: ① `proposal.md` 已知限制加「W1 前向兼容」条 (验证下限 2.1.285 / 2.1.292 + fail-safe + 诚实边界 + #218); ② follow-up **10CG/aria-plugin#218** (t3-verify 容器内 `claude plugin validate /opt/aria-plugin` + 无头触发断言 + `@latest` 版本下限断言); secret-hygiene 部署前提一句归 TASK-010 doc-sync。
