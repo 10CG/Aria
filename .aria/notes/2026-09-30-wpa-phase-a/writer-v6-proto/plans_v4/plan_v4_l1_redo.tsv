@@ -1,0 +1,5 @@
+tdrop_psalt_2	l1	tdrop_psalt:2	SC-22	22bm
+remote_env_split_ssh	l1	remote_env_split:ssh	SC-22	22bo
+remote_env_split_sh	l1	remote_env_split:sh	SC-22	22bo
+remote_env_split_watch	l1	remote_env_split:watch	SC-22	22bo
+remote_env_split_docker	l1	remote_env_split:docker	SC-22	22bo

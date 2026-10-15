@@ -1,0 +1,2029 @@
+mut_summary_v3 -- every bad implementation of the v3 mutation campaign and the probe rows it turns red
+
+Method: each bad implementation = the full v3 target prototype with ONE hook replaced by a variant produced by patch_l3.py / patch_l1.py (--variant);
+only the SC groups / rows named for it are run (proto/mutbatch.py, plans in plans/*.tsv); a listed row is a row whose match is not `yes`.
+Variant families: boundary (prefix / suffix / loose / no end anchor), missing-member (drop one member of an enumeration), over-reach (a removed or wider class re-added),
+off-by-one (every upper bound with N-1 / N+1).  The prototype is a text-substituted copy of the baseline, not the implementation (see README.md).
+
+Totals (superseded first-pass blocks excluded): 420 bad implementations; 406 turn at least one row red; 14 turn no row red (equivalent mutants, listed below).
+  plan_l3_wl           38 run,   38 red,   0 no row red
+  plan_l3_w4w5         41 run,   41 red,   0 no row red
+  plan_l3_enum        106 run,   98 red,   8 no row red
+  plan_l1_w8w9w10      95 run,   90 red,   5 no row red
+  plan_l1_w11          82 run,   82 red,   0 no row red
+  plan_extra            3 run,    3 red,   0 no row red
+  plan_extra_b32        0 run,    0 red,   0 no row red
+  plan_repeat          20 run,   20 red,   0 no row red
+  plan_extra2_b32       2 run,    2 red,   0 no row red
+  plan_vsym            13 run,   13 red,   0 no row red
+  plan_extra4          20 run,   19 red,   1 no row red
+
+Superseded first-pass results (36 blocks left out of the totals and of the text below; the replacing run is named):
+
+  - first pass ran a broken draft of the variant (the hook failed to parse, 15 unrelated rows red); re-run in plan_extra with the fixed variant: 7h dollar-cmd and 11z dollar-cmd red.
+    labels (1): plan_l3_wl/wl_cmdsub
+  - the variant edited an unreachable case-table entry (the PEM block's fp item `-` does not go through the value-body table), i.e. it was a no-op; replaced by the real PEM bad implementations pem_nofp and pem_hash in plan_extra.
+    labels (1): plan_l3_w4w5/fp_wrong_pem-private-key-block
+  - re-run after the generator fix, see loosepath__r2 in plan_repeat (4n and 5l red 10/10 by hand).
+    labels (1): plan_l3_enum/loosepath
+  - re-run after the generator fix, see path_plus__r2 in plan_repeat (4n and 5l red 10/10 by hand).
+    labels (1): plan_l3_enum/path_plus
+  - first pass ran before the padded-value generator of rows 4n / 5l was made to exclude '+' (a random '+' rescued the loose class about half of the time, so the row was only probabilistic); re-run as path_eq__r2 in plan_repeat and 10 times by hand: 4n and 5l red 10/10.
+    labels (1): plan_l3_enum/path_eq
+  - work-directory name collision in the first pass and in the repeat pass: the sanitised labels of the symbols `+ / = _ ~` (kv) and `+ / = _` (hdr) coincide, so concurrent jobs clobbered each other's tree; re-run as vsym_<group>_<symbol> in plan_vsym with unique names (mutbatch.py now appends a hash to every sanitised name).
+    labels (26): plan_l3_enum/drop_vsym_kv_+, plan_l3_enum/drop_vsym_kv_/, plan_l3_enum/drop_vsym_kv_=, plan_l3_enum/drop_vsym_kv_., plan_l3_enum/drop_vsym_kv__, plan_l3_enum/drop_vsym_kv_~, plan_l3_enum/drop_vsym_kv_-, plan_l3_enum/drop_vsym_hdr_., plan_l3_enum/drop_vsym_hdr__, plan_l3_enum/drop_vsym_hdr_/, plan_l3_enum/drop_vsym_hdr_+, plan_l3_enum/drop_vsym_hdr_=, plan_l3_enum/drop_vsym_hdr_-, plan_repeat/drop_vsym_kv_+__r2, plan_repeat/drop_vsym_kv_/__r2, plan_repeat/drop_vsym_kv_=__r2, plan_repeat/drop_vsym_kv_.__r2, plan_repeat/drop_vsym_kv____r2, plan_repeat/drop_vsym_kv_~__r2, plan_repeat/drop_vsym_kv_-__r2, plan_repeat/drop_vsym_hdr_.__r2, plan_repeat/drop_vsym_hdr____r2, plan_repeat/drop_vsym_hdr_/__r2, plan_repeat/drop_vsym_hdr_+__r2, plan_repeat/drop_vsym_hdr_=__r2, plan_repeat/drop_vsym_hdr_-__r2
+  - run against row 12k only: a PEM block alone prints `fp=-` both with the item and with no item at all (the log writes `${FP_ITEMS:--}`), so 12k cannot see the difference; replaced by pem_nofp_12m in plan_extra2 after row 12m (PEM block after a kv credential) was added.
+    labels (1): plan_extra/pem_nofp
+  - run against row 12k only; replaced by pem_hash_12m in plan_extra2 (12k and 12m).
+    labels (1): plan_extra/pem_hash
+  - mutbatch builds each bad implementation as a tree that holds only aria/hooks (no skills/ documents), so the SC-33 census had no corpus and the row could not turn red; re-run by hand on a FULL copy of the target tree with the noentropy hook (see manual_runs.txt): 33a red, flagged=7, 5 files outside the attribution list.
+    labels (1): plan_extra/noentropy_sc33
+  - run with WPA_ONLY=SC-32 only: 32c compares the hook-direct rows that ran in the same process, and none had run; replaced by b4_32c in plan_extra2_b32 (SC-16 + SC-32).
+    labels (1): plan_extra_b32/b4
+  - run with WPA_ONLY=SC-32 only (no hook-direct rows to compare); replaced by vx_patsub_32c in plan_extra2_b32 (SC-21 + SC-32).
+    labels (1): plan_extra_b32/vx_patsub
+
+Bad implementations that turned NO row red (equivalent mutants: the mutated program behaves exactly like the correct one on every input the rows can build, so there is nothing to catch):
+
+  plan_l3_enum / drop_name_access_token: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_api_key: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_client_secret: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_passwd: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_password: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_private_key: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_refresh_token: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l3_enum / drop_name_secret: The mutated program behaves exactly like the correct one: this lower-case snake spelling is also a key of the EXISTING tag json-secret-field, which sits earlier in PATTERNS and consumes the span first, so its membership in the NEW json-credential-field name table is not observable (W2 says so; row 4p expects json-secret-field=1 for these 8 spellings). The table keeps the 8 names only so that a later narrowing of the existing tag does not lose the detection.
+  plan_l1_w8w9w10 / drop_assign_export: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  plan_l1_w8w9w10 / drop_assign_declare: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  plan_l1_w8w9w10 / drop_assign_local: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  plan_l1_w8w9w10 / drop_assign_readonly: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  plan_l1_w8w9w10 / drop_assign_typeset: Declaration prefix word (export / declare / local / readonly / typeset): the prototype recognises `NAME=value` after any whitespace or separator, so the prefix word is redundant and dropping it from the list changes the verdict of no input (W10 says so; 21j checks that every declaration form is still collected).
+  plan_extra4 / interp_name_v1var: The Nomad-variable path name in the rewritten python3 -c / node -e rows duplicates an earlier GENERAL row of the baseline list that blocks any command mentioning that path: the target, the variant without the copy and the baseline all exit 2 for the python3 -c, node -e and cat forms (work/cases_v1var.py), so dropping the copy changes no verdict (16o still carries both cases; the other six names are not duplicated and each turns 16o red).
+
+====================================================================================================
+##### plan_l3_wl  (38 bad implementations, 38 turn at least one row red, 0 turn none)
+
+== wl_varname_lc (variant wl_varname_lc; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: dollar-lower
+   SC-11 11z | 4/5 as expected; wrong: dollar-lower
+   (rows not yes: 2)
+
+== wl_varname_uc (variant wl_varname_uc; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: dollar-upper
+   (rows not yes: 1)
+
+== wl_varname_any (variant wl_varname_any; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 8/11 as expected; wrong: dollar-mixed, dollar-lower, dollar-upper
+   SC-11 11z | 4/5 as expected; wrong: dollar-lower
+   (rows not yes: 2)
+
+== wl_dots_ascii (variant wl_dots_ascii; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: dots-ascii
+   SC-11 11z | 4/5 as expected; wrong: dots-ascii
+   (rows not yes: 2)
+
+== wl_angle_prefix (variant wl_angle_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: lt16-unclosed
+   SC-7 7j | 13/15 as expected; wrong: angle-trailing, angle-inner
+   SC-11 11z | 4/5 as expected; wrong: lt16-unclosed
+   (rows not yes: 3)
+
+== wl_angle_suffix (variant wl_angle_suffix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 13/15 as expected; wrong: angle-suffix-only, angle-inner
+   (rows not yes: 1)
+
+== wl_angle_loose (variant wl_angle_loose; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: angle-inner
+   (rows not yes: 1)
+
+== wl_angle_noend (variant wl_angle_noend; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: angle-trailing
+   (rows not yes: 1)
+
+== wl_brace_prefix (variant wl_brace_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 13/15 as expected; wrong: brace-unclosed, brace-trailing
+   SC-11 11z | 4/5 as expected; wrong: brace-unclosed
+   (rows not yes: 2)
+
+== wl_brace_noend (variant wl_brace_noend; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: brace-trailing
+   (rows not yes: 1)
+
+== wl_tmpl_prefix (variant wl_tmpl_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 13/15 as expected; wrong: tmpl-unclosed, tmpl-trailing
+   (rows not yes: 1)
+
+== wl_tmpl_suffix (variant wl_tmpl_suffix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: tmpl-suffix-only
+   (rows not yes: 1)
+
+== wl_tmpl_noend (variant wl_tmpl_noend; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: tmpl-trailing
+   (rows not yes: 1)
+
+== wl_red_prefix (variant wl_red_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: red-unclosed
+   (rows not yes: 1)
+
+== wl_red_anybracket (variant wl_red_anybracket; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: red-anybracket
+   (rows not yes: 1)
+
+== wl_mask_prefix (variant wl_mask_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 13/15 as expected; wrong: mask-tail, mask-mixed
+   SC-11 11x | 9/11 as expected; wrong: mask-x, mask-X
+   (rows not yes: 2)
+
+== wl_mask_mixed (variant wl_mask_mixed; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: mask-mixed
+   (rows not yes: 1)
+
+== wl_ell_contains (variant wl_ell_contains; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 13/15 as expected; wrong: ellipsis-mid, ellipsis-lead
+   (rows not yes: 1)
+
+== wl_ell_prefix (variant wl_ell_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7j | 14/15 as expected; wrong: ellipsis-lead
+   SC-11 11v | angle-prose=silent; crypt-ellipsis=alert m=1 {json-secret-field=1}; shell-var=silent; template=silent
+   SC-11 11x | 10/11 as expected; wrong: ellipsis
+   SC-11 11y | 10/11 as expected; wrong: ellipsis
+   (rows not yes: 4)
+
+== wl_prefix (variant wl_prefix; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 5/11 as expected; wrong: crypt60, dollar-mixed, dollar-lower, dollar-upper, dollar-cmd, lt16-unclosed
+   SC-7 7j | 8/15 as expected; wrong: angle-trailing, angle-inner, brace-unclosed, brace-trailing, tmpl-unclosed, tmpl-trailing, ...
+   SC-7 7i | silent
+   SC-11 11z | 1/5 as expected; wrong: lt16-unclosed, brace-unclosed, dollar-lower, dollar-cmd
+   (rows not yes: 4)
+
+== wl_contains (variant wl_contains; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: marker-mid
+   SC-7 7j | 14/15 as expected; wrong: red-unclosed
+   SC-11 11s | silent
+   (rows not yes: 3)
+
+== wl_nocase (variant wl_nocase; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: marker-lowercase
+   (rows not yes: 1)
+
+== wl_envline (variant wl_envline; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: envline-marker
+   (rows not yes: 1)
+
+== wl_drop_angle (variant wl_drop:angle; WPA_ONLY=SC-7,SC-11)
+   SC-11 11f | alert m=1 {json-credential-field=1}
+   SC-11 11v | angle-prose=alert m=1 {json-secret-field=1}; crypt-ellipsis=silent; shell-var=silent; template=silent
+   SC-11 11x | 10/11 as expected; wrong: angle
+   SC-11 11y | 10/11 as expected; wrong: angle
+   (rows not yes: 4)
+
+== wl_drop_brace (variant wl_drop:brace; WPA_ONLY=SC-7,SC-11)
+   SC-11 11g | alert m=1 {json-credential-field=1}
+   SC-11 11v | angle-prose=silent; crypt-ellipsis=silent; shell-var=alert m=1 {json-secret-field=1}; template=silent
+   SC-11 11x | 10/11 as expected; wrong: brace
+   SC-11 11y | 10/11 as expected; wrong: brace
+   (rows not yes: 4)
+
+== wl_drop_tmpl (variant wl_drop:tmpl; WPA_ONLY=SC-7,SC-11)
+   SC-11 11h | alert m=1 {json-credential-field=1}
+   SC-11 11v | angle-prose=silent; crypt-ellipsis=silent; shell-var=silent; template=alert m=1 {json-secret-field=1}
+   SC-11 11x | 9/11 as expected; wrong: tmpl, tmpl-dollar
+   SC-11 11y | 10/11 as expected; wrong: tmpl
+   (rows not yes: 4)
+
+== wl_drop_tmpl_dollar (variant wl_drop:tmpl_dollar; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: tmpl-dollar
+   (rows not yes: 1)
+
+== wl_drop_red (variant wl_drop:red; WPA_ONLY=SC-7,SC-11)
+   SC-11 11d | alert m=1 {json-credential-field=1}
+   SC-11 11e | alert m=1 {json-credential-field=1}
+   SC-11 11p | alert m=1 {json-secret-field=1}
+   SC-11 11r | alert m=1 {json-secret-field=1}
+   SC-11 11x | 10/11 as expected; wrong: red-bracket
+   SC-11 11y | 10/11 as expected; wrong: red-bracket
+   (rows not yes: 6)
+
+== wl_drop_mask_star (variant wl_drop:mask_star; WPA_ONLY=SC-7,SC-11)
+   SC-11 11q | alert m=1 {json-secret-field=1}
+   (rows not yes: 1)
+
+== wl_drop_mask_x (variant wl_drop:mask_x; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: mask-x
+   (rows not yes: 1)
+
+== wl_drop_mask_X (variant wl_drop:mask_X; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: mask-X
+   (rows not yes: 1)
+
+== wl_drop_ellipsis (variant wl_drop:ellipsis; WPA_ONLY=SC-7,SC-11)
+   SC-11 11v | angle-prose=silent; crypt-ellipsis=alert m=1 {json-secret-field=1}; shell-var=silent; template=silent
+   SC-11 11x | 10/11 as expected; wrong: ellipsis
+   SC-11 11y | 10/11 as expected; wrong: ellipsis
+   (rows not yes: 3)
+
+== wl_drop_marker_FAKE (variant wl_drop:marker_FAKE; WPA_ONLY=SC-7,SC-11)
+   SC-11 11a | alert m=1 {json-credential-field=1}
+   SC-11 11j | alert m=1 {kv-secret-assign=1}
+   SC-11 11k | alert m=1 {auth-header-token=1}
+   SC-11 11m | alert m=1 {json-secret-field=1}
+   SC-11 11y | 10/11 as expected; wrong: marker-FAKE
+   (rows not yes: 5)
+
+== wl_drop_marker_PLACEHOLDER (variant wl_drop:marker_PLACEHOLDER; WPA_ONLY=SC-7,SC-11)
+   SC-11 11l | alert m=1 {cli-secret-flag=1}
+   SC-11 11n | alert m=1 {json-secret-field=1}
+   SC-11 11y | 10/11 as expected; wrong: marker-PLACEHOLDER
+   (rows not yes: 3)
+
+== wl_drop_marker_NOT-REAL (variant wl_drop:marker_NOT-REAL; WPA_ONLY=SC-7,SC-11)
+   SC-11 11c | alert m=1 {json-credential-field=1}
+   SC-11 11o | alert m=1 {json-secret-field=1}
+   SC-11 11y | 10/11 as expected; wrong: marker-NOT-REAL
+   (rows not yes: 3)
+
+== wl_drop_marker_NOT_REAL (variant wl_drop:marker_NOT_REAL; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: marker-NOT_REAL
+   SC-11 11y | 10/11 as expected; wrong: marker-NOT_REAL
+   (rows not yes: 2)
+
+== wl_drop_marker_NOTREAL (variant wl_drop:marker_NOTREAL; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: marker-NOTREAL
+   SC-11 11y | 10/11 as expected; wrong: marker-NOTREAL
+   (rows not yes: 2)
+
+== wl_drop_marker_REDACTED (variant wl_drop:marker_REDACTED; WPA_ONLY=SC-7,SC-11)
+   SC-11 11x | 10/11 as expected; wrong: marker-REDACTED
+   SC-11 11y | 10/11 as expected; wrong: marker-REDACTED
+   (rows not yes: 2)
+
+##### plan_l3_w4w5  (41 bad implementations, 41 turn at least one row red, 0 turn none)
+
+== fp_span (variant fp_span; WPA_ONLY=SC-12; WPA_ROWS=12g,12h,12i,12j,12k)
+   SC-12 12g | fp=2 items differ
+   SC-12 12h | fp=5 items differ
+   SC-12 12i | fp=10 items differ
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 26/38 as expected; wrong: gcp-private-key-id, postgres-url, redis-url, mongodb-url, basic-auth-url, bearer-token, ...
+   (rows not yes: 5)
+
+== hdronly_fp (variant hdronly_fp; WPA_ONLY=SC-12; WPA_ROWS=12l)
+   SC-12 12l | tag / fp item differ
+   (rows not yes: 1)
+
+== fp_wrong_jwt (variant fp_wrong:jwt; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12h | fp=5 items differ
+   SC-12 12k | 37/38 as expected; wrong: jwt
+   (rows not yes: 2)
+
+== fp_wrong_silknode-api-key (variant fp_wrong:silknode-api-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: silknode-api-key
+   (rows not yes: 1)
+
+== fp_wrong_anthropic-api-key (variant fp_wrong:anthropic-api-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: anthropic-api-key
+   (rows not yes: 1)
+
+== fp_wrong_openrouter-api-key (variant fp_wrong:openrouter-api-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: openrouter-api-key
+   (rows not yes: 1)
+
+== fp_wrong_openai-api-key (variant fp_wrong:openai-api-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: openai-api-key
+   (rows not yes: 1)
+
+== fp_wrong_openai-legacy-key (variant fp_wrong:openai-legacy-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: openai-legacy-key
+   (rows not yes: 1)
+
+== fp_wrong_stripe-live-secret (variant fp_wrong:stripe-live-secret; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: stripe-live-secret
+   (rows not yes: 1)
+
+== fp_wrong_stripe-test-secret (variant fp_wrong:stripe-test-secret; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: stripe-test-secret
+   (rows not yes: 1)
+
+== fp_wrong_stripe-publishable (variant fp_wrong:stripe-publishable; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: stripe-publishable
+   (rows not yes: 1)
+
+== fp_wrong_stripe-webhook (variant fp_wrong:stripe-webhook; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: stripe-webhook
+   (rows not yes: 1)
+
+== fp_wrong_stripe-restricted (variant fp_wrong:stripe-restricted; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: stripe-restricted
+   (rows not yes: 1)
+
+== fp_wrong_github-pat (variant fp_wrong:github-pat; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: github-pat
+   (rows not yes: 1)
+
+== fp_wrong_github-oauth (variant fp_wrong:github-oauth; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: github-oauth
+   (rows not yes: 1)
+
+== fp_wrong_github-user (variant fp_wrong:github-user; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: github-user
+   (rows not yes: 1)
+
+== fp_wrong_github-fine-grained (variant fp_wrong:github-fine-grained; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: github-fine-grained
+   (rows not yes: 1)
+
+== fp_wrong_gitlab-pat (variant fp_wrong:gitlab-pat; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: gitlab-pat
+   (rows not yes: 1)
+
+== fp_wrong_aws-access-key-id (variant fp_wrong:aws-access-key-id; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: aws-access-key-id
+   (rows not yes: 1)
+
+== fp_wrong_aws-session-token (variant fp_wrong:aws-session-token; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: aws-session-token
+   (rows not yes: 1)
+
+== fp_wrong_aliyun-access-key-id (variant fp_wrong:aliyun-access-key-id; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: aliyun-access-key-id
+   (rows not yes: 1)
+
+== fp_wrong_gcp-private-key-id (variant fp_wrong:gcp-private-key-id; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: gcp-private-key-id
+   (rows not yes: 2)
+
+== fp_wrong_discord-webhook (variant fp_wrong:discord-webhook; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: discord-webhook
+   (rows not yes: 1)
+
+== fp_wrong_slack-webhook (variant fp_wrong:slack-webhook; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: slack-webhook
+   (rows not yes: 1)
+
+== fp_wrong_postgres-url (variant fp_wrong:postgres-url; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: postgres-url
+   (rows not yes: 2)
+
+== fp_wrong_redis-url (variant fp_wrong:redis-url; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: redis-url
+   (rows not yes: 1)
+
+== fp_wrong_mongodb-url (variant fp_wrong:mongodb-url; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: mongodb-url
+   (rows not yes: 1)
+
+== fp_wrong_basic-auth-url (variant fp_wrong:basic-auth-url; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: basic-auth-url
+   (rows not yes: 1)
+
+== fp_wrong_bearer-token (variant fp_wrong:bearer-token; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12g | fp=2 items differ
+   SC-12 12k | 37/38 as expected; wrong: bearer-token
+   (rows not yes: 2)
+
+== fp_wrong_x-api-key-header (variant fp_wrong:x-api-key-header; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: x-api-key-header
+   (rows not yes: 2)
+
+== fp_wrong_env-line-secret-keyword (variant fp_wrong:env-line-secret-keyword; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12g | fp=2 items differ
+   SC-12 12i | fp=10 items differ
+   SC-12 12k | 37/38 as expected; wrong: env-line-secret-keyword
+   (rows not yes: 3)
+
+== fp_wrong_json-secret-field (variant fp_wrong:json-secret-field; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12a | fp-present-but-other
+   SC-12 12k | 37/38 as expected; wrong: json-secret-field
+   (rows not yes: 2)
+
+== fp_wrong_bcrypt-hash (variant fp_wrong:bcrypt-hash; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: bcrypt-hash
+   (rows not yes: 1)
+
+== fp_wrong_json-credential-field (variant fp_wrong:json-credential-field; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: json-credential-field
+   (rows not yes: 1)
+
+== fp_wrong_json-env-secret-key (variant fp_wrong:json-env-secret-key; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12k | 37/38 as expected; wrong: json-env-secret-key
+   (rows not yes: 1)
+
+== fp_wrong_kv-secret-assign (variant fp_wrong:kv-secret-assign; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12h | fp=5 items differ
+   SC-12 12k | 37/38 as expected; wrong: kv-secret-assign
+   (rows not yes: 2)
+
+== fp_wrong_auth-header-token (variant fp_wrong:auth-header-token; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: auth-header-token
+   (rows not yes: 2)
+
+== fp_wrong_cf-access-client-secret (variant fp_wrong:cf-access-client-secret; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: cf-access-client-secret
+   (rows not yes: 2)
+
+== fp_wrong_cli-secret-flag (variant fp_wrong:cli-secret-flag; WPA_ONLY=SC-12; WPA_ROWS=12a,12g,12h,12i,12j,12k)
+   SC-12 12j | fp=6 items differ
+   SC-12 12k | 37/38 as expected; wrong: cli-secret-flag
+   (rows not yes: 2)
+
+== w5_append (variant w5_append; WPA_ONLY=SC-13)
+   SC-13 13d | additionalContext differs beyond the inserted segment
+   SC-13 13g | 0/14 as expected; wrong: Read:benign, Read:paren-then-imperative, Read:newline-forged-line, Read:quotes, Read:non-ascii, Read:overlong, ...
+   (rows not yes: 2)
+
+== w5_path (variant w5_path; WPA_ONLY=SC-13)
+   SC-13 13a | addl-lacks-needle
+   SC-13 13c | addl-lacks-needle
+   SC-13 13g | 0/14 as expected; wrong: Read:benign, Read:paren-then-imperative, Read:newline-forged-line, Read:quotes, Read:non-ascii, Read:overlong, ...
+   (rows not yes: 3)
+
+##### plan_l3_enum  (106 bad implementations, 98 turn at least one row red, 8 turn none)
+
+== drop_name_AccessToken (variant drop_name:AccessToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: AccessToken
+   (rows not yes: 1)
+
+== drop_name_ApiKey (variant drop_name:ApiKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: ApiKey
+   (rows not yes: 1)
+
+== drop_name_ApiToken (variant drop_name:ApiToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: ApiToken
+   (rows not yes: 1)
+
+== drop_name_AuthToken (variant drop_name:AuthToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: AuthToken
+   (rows not yes: 1)
+
+== drop_name_BearerToken (variant drop_name:BearerToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: BearerToken
+   (rows not yes: 1)
+
+== drop_name_ClientSecret (variant drop_name:ClientSecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: ClientSecret
+   (rows not yes: 1)
+
+== drop_name_JwtSecret (variant drop_name:JwtSecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: JwtSecret
+   (rows not yes: 1)
+
+== drop_name_Passwd (variant drop_name:Passwd; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: Passwd
+   (rows not yes: 1)
+
+== drop_name_Password (variant drop_name:Password; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: Password
+   (rows not yes: 1)
+
+== drop_name_PrivateKey (variant drop_name:PrivateKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: PrivateKey
+   (rows not yes: 1)
+
+== drop_name_RefreshToken (variant drop_name:RefreshToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: RefreshToken
+   (rows not yes: 1)
+
+== drop_name_RegistrationToken (variant drop_name:RegistrationToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: RegistrationToken
+   (rows not yes: 1)
+
+== drop_name_Secret (variant drop_name:Secret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: Secret
+   (rows not yes: 1)
+
+== drop_name_SecretKey (variant drop_name:SecretKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: SecretKey
+   (rows not yes: 1)
+
+== drop_name_SessionToken (variant drop_name:SessionToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: SessionToken
+   (rows not yes: 1)
+
+== drop_name_Sha1 (variant drop_name:Sha1; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: Sha1
+   (rows not yes: 1)
+
+== drop_name_Token (variant drop_name:Token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: Token
+   (rows not yes: 1)
+
+== drop_name_accessToken (variant drop_name:accessToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: accessToken
+   (rows not yes: 1)
+
+== drop_name_access_token (variant drop_name:access_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_accesstoken (variant drop_name:accesstoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: accesstoken
+   (rows not yes: 1)
+
+== drop_name_apiKey (variant drop_name:apiKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: apiKey
+   (rows not yes: 1)
+
+== drop_name_apiToken (variant drop_name:apiToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: apiToken
+   (rows not yes: 1)
+
+== drop_name_api_key (variant drop_name:api_key; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_api_token (variant drop_name:api_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: api_token
+   (rows not yes: 1)
+
+== drop_name_apikey (variant drop_name:apikey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: apikey
+   (rows not yes: 1)
+
+== drop_name_apitoken (variant drop_name:apitoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: apitoken
+   (rows not yes: 1)
+
+== drop_name_authToken (variant drop_name:authToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: authToken
+   (rows not yes: 1)
+
+== drop_name_auth_token (variant drop_name:auth_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: auth_token
+   (rows not yes: 1)
+
+== drop_name_authtoken (variant drop_name:authtoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: authtoken
+   (rows not yes: 1)
+
+== drop_name_bearerToken (variant drop_name:bearerToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: bearerToken
+   (rows not yes: 1)
+
+== drop_name_bearer_token (variant drop_name:bearer_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: bearer_token
+   (rows not yes: 1)
+
+== drop_name_bearertoken (variant drop_name:bearertoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: bearertoken
+   (rows not yes: 1)
+
+== drop_name_clientSecret (variant drop_name:clientSecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: clientSecret
+   (rows not yes: 1)
+
+== drop_name_client_secret (variant drop_name:client_secret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_clientsecret (variant drop_name:clientsecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: clientsecret
+   (rows not yes: 1)
+
+== drop_name_jwtSecret (variant drop_name:jwtSecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: jwtSecret
+   (rows not yes: 1)
+
+== drop_name_jwt_secret (variant drop_name:jwt_secret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: jwt_secret
+   (rows not yes: 1)
+
+== drop_name_jwtsecret (variant drop_name:jwtsecret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: jwtsecret
+   (rows not yes: 1)
+
+== drop_name_passwd (variant drop_name:passwd; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_password (variant drop_name:password; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_privateKey (variant drop_name:privateKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: privateKey
+   (rows not yes: 1)
+
+== drop_name_private_key (variant drop_name:private_key; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_privatekey (variant drop_name:privatekey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: privatekey
+   (rows not yes: 1)
+
+== drop_name_refreshToken (variant drop_name:refreshToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: refreshToken
+   (rows not yes: 1)
+
+== drop_name_refresh_token (variant drop_name:refresh_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_refreshtoken (variant drop_name:refreshtoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: refreshtoken
+   (rows not yes: 1)
+
+== drop_name_registrationToken (variant drop_name:registrationToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: registrationToken
+   (rows not yes: 1)
+
+== drop_name_registration_token (variant drop_name:registration_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: registration_token
+   (rows not yes: 1)
+
+== drop_name_registrationtoken (variant drop_name:registrationtoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: registrationtoken
+   (rows not yes: 1)
+
+== drop_name_secret (variant drop_name:secret; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   (rows not yes: 0)
+
+== drop_name_secretKey (variant drop_name:secretKey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: secretKey
+   (rows not yes: 1)
+
+== drop_name_secret_key (variant drop_name:secret_key; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: secret_key
+   (rows not yes: 1)
+
+== drop_name_secretkey (variant drop_name:secretkey; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: secretkey
+   (rows not yes: 1)
+
+== drop_name_sessionToken (variant drop_name:sessionToken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: sessionToken
+   (rows not yes: 1)
+
+== drop_name_session_token (variant drop_name:session_token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: session_token
+   (rows not yes: 1)
+
+== drop_name_sessiontoken (variant drop_name:sessiontoken; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: sessiontoken
+   (rows not yes: 1)
+
+== drop_name_sha1 (variant drop_name:sha1; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: sha1
+   (rows not yes: 1)
+
+== drop_name_token (variant drop_name:token; WPA_ONLY=SC-4; WPA_ROWS=4p)
+   SC-4 4p | 57/58 as expected; wrong: token
+   (rows not yes: 1)
+
+== drop_kwjson_SECRET (variant drop_kwjson:SECRET; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4l | silent
+   SC-4 4s | 18/20 as expected; wrong: SECRET, SECRET-embedded
+   (rows not yes: 2)
+
+== drop_kwjson_PASSWORD (variant drop_kwjson:PASSWORD; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4m | silent
+   SC-4 4s | 18/20 as expected; wrong: PASSWORD, PASSWORD-embedded
+   (rows not yes: 2)
+
+== drop_kwjson_PASSWD (variant drop_kwjson:PASSWD; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: PASSWD, PASSWD-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_TOKEN (variant drop_kwjson:TOKEN; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: TOKEN, TOKEN-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_API_KEY (variant drop_kwjson:API_KEY; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: API_KEY, API_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_APIKEY (variant drop_kwjson:APIKEY; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: APIKEY, APIKEY-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_PRIVATE_KEY (variant drop_kwjson:PRIVATE_KEY; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: PRIVATE_KEY, PRIVATE_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_WEBHOOK (variant drop_kwjson:WEBHOOK; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: WEBHOOK, WEBHOOK-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_ENCRYPTION_KEY (variant drop_kwjson:ENCRYPTION_KEY; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: ENCRYPTION_KEY, ENCRYPTION_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwjson_ACCESS_KEY (variant drop_kwjson:ACCESS_KEY; WPA_ONLY=SC-4; WPA_ROWS=4l,4m,4s)
+   SC-4 4s | 18/20 as expected; wrong: ACCESS_KEY, ACCESS_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_SECRET (variant drop_kwkv:SECRET; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5a | silent
+   SC-5 5c | silent
+   SC-5 5e | silent
+   SC-5 5n | 18/20 as expected; wrong: SECRET, SECRET-embedded
+   (rows not yes: 4)
+
+== drop_kwkv_PASSWORD (variant drop_kwkv:PASSWORD; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: PASSWORD, PASSWORD-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_PASSWD (variant drop_kwkv:PASSWD; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5d | silent
+   SC-5 5n | 18/20 as expected; wrong: PASSWD, PASSWD-embedded
+   (rows not yes: 2)
+
+== drop_kwkv_TOKEN (variant drop_kwkv:TOKEN; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5f | silent
+   SC-5 5n | 18/20 as expected; wrong: TOKEN, TOKEN-embedded
+   (rows not yes: 2)
+
+== drop_kwkv_API_KEY (variant drop_kwkv:API_KEY; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: API_KEY, API_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_APIKEY (variant drop_kwkv:APIKEY; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: APIKEY, APIKEY-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_PRIVATE_KEY (variant drop_kwkv:PRIVATE_KEY; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: PRIVATE_KEY, PRIVATE_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_WEBHOOK (variant drop_kwkv:WEBHOOK; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: WEBHOOK, WEBHOOK-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_ENCRYPTION_KEY (variant drop_kwkv:ENCRYPTION_KEY; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: ENCRYPTION_KEY, ENCRYPTION_KEY-embedded
+   (rows not yes: 1)
+
+== drop_kwkv_ACCESS_KEY (variant drop_kwkv:ACCESS_KEY; WPA_ONLY=SC-5; WPA_ROWS=5a,5c,5d,5e,5f,5n)
+   SC-5 5n | 18/20 as expected; wrong: ACCESS_KEY, ACCESS_KEY-embedded
+   (rows not yes: 1)
+
+== drop_flag_token (variant drop_flag:token; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6f | silent
+   SC-6 6i | 12/15 as expected; wrong: token, token-prefixed, single-dash
+   (rows not yes: 2)
+
+== drop_flag_password (variant drop_flag:password; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: password, password-prefixed
+   (rows not yes: 1)
+
+== drop_flag_passwd (variant drop_flag:passwd; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: passwd, passwd-prefixed
+   (rows not yes: 1)
+
+== drop_flag_secret (variant drop_flag:secret; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: secret, secret-prefixed
+   (rows not yes: 1)
+
+== drop_flag_api-key (variant drop_flag:api-key; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: api-key, api-key-prefixed
+   (rows not yes: 1)
+
+== drop_flag_apikey (variant drop_flag:apikey; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: apikey, apikey-prefixed
+   (rows not yes: 1)
+
+== drop_flag_access-key (variant drop_flag:access-key; WPA_ONLY=SC-6; WPA_ROWS=6f,6g,6i)
+   SC-6 6i | 13/15 as expected; wrong: access-key, access-key-prefixed
+   (rows not yes: 1)
+
+== drop_scheme_token (variant drop_scheme:token; WPA_ONLY=SC-6; WPA_ROWS=6a,6b,6e,6j)
+   SC-6 6a | silent
+   SC-6 6b | silent
+   SC-6 6j | 7/10 as expected; wrong: scheme-token, auth-AUTHORIZATION, auth-authorization
+   (rows not yes: 3)
+
+== drop_scheme_Token (variant drop_scheme:Token; WPA_ONLY=SC-6; WPA_ROWS=6a,6b,6e,6j)
+   SC-6 6j | 9/10 as expected; wrong: scheme-Token
+   (rows not yes: 1)
+
+== drop_scheme_basic (variant drop_scheme:basic; WPA_ONLY=SC-6; WPA_ROWS=6a,6b,6e,6j)
+   SC-6 6j | 9/10 as expected; wrong: scheme-basic
+   (rows not yes: 1)
+
+== drop_scheme_Basic (variant drop_scheme:Basic; WPA_ONLY=SC-6; WPA_ROWS=6a,6b,6e,6j)
+   SC-6 6e | silent
+   SC-6 6j | 9/10 as expected; wrong: scheme-Basic
+   (rows not yes: 2)
+
+== hdr_case_sensitive (variant hdr_case_sensitive; WPA_ONLY=SC-6; WPA_ROWS=6h,6j)
+   SC-6 6h | authorization=silent; cf=silent
+   SC-6 6j | 6/10 as expected; wrong: auth-AUTHORIZATION, auth-authorization, cf-cf-access-client-secret, cf-Cf-Access-Client-Secret
+   (rows not yes: 2)
+
+== ent_digit (variant ent_digit; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-4 4o | silent
+   SC-4 4t | 2/3 as expected; wrong: lower+upper
+   SC-10 10b | alert m=1 {kv-secret-assign=1}
+   (rows not yes: 3)
+
+== ent_on_old (variant ent_on_old; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: lower12
+   SC-7 7j | 14/15 as expected; wrong: mask-mixed
+   (rows not yes: 2)
+
+== noentropy (variant noentropy; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9p | alert m=1 {kv-secret-assign=1}
+   SC-10 10a | alert m=1 {json-credential-field=1}
+   SC-10 10b | alert m=1 {kv-secret-assign=1}
+   SC-10 10k | alert m=1 {json-credential-field=1}
+   (rows not yes: 4)
+
+== noident (variant noident; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9v | js-const=alert m=1 {kv-secret-assign=1}; py-settings=alert m=1 {kv-secret-assign=1}; camel-chain=alert m=1 {kv-secret-assign=1}
+   SC-10 10i | 0/5 as expected; wrong: kv, kv-export, json, auth-header, cli-flag
+   (rows not yes: 2)
+
+== nopath (variant nopath; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9o | alert m=1 {kv-secret-assign=1}
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 0/4 as expected; wrong: abs, home, dot, dotdot
+   (rows not yes: 3)
+
+== path_firstlower (variant path_firstlower; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 1/4 as expected; wrong: home, dot, dotdot
+   (rows not yes: 2)
+
+== floor15 (variant floor15; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-10 10h | 0/6 as expected; wrong: json, json-env, kv, auth-header, cf-header, cli-flag
+   (rows not yes: 1)
+
+== floor17 (variant floor17; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-4 4r | 0/6 as expected; wrong: json, json-env, kv, auth-header, cf-header, cli-flag
+   SC-11 11w | silent
+   SC-11 11z | 3/5 as expected; wrong: lt16-unclosed, dollar-lower
+   (rows not yes: 3)
+
+== ent_drop_lower (variant ent_drop:lower; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4a | silent
+   SC-4 4o | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+upper, lower+digit
+   (rows not yes: 3)
+
+== ent_drop_upper (variant ent_drop:upper; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4o | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+upper, upper+digit
+   (rows not yes: 2)
+
+== ent_drop_digit (variant ent_drop:digit; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4a | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+digit, upper+digit
+   (rows not yes: 2)
+
+== drop_lead_/ (variant drop_lead:/; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=silent; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 3/4 as expected; wrong: abs
+   (rows not yes: 2)
+
+== drop_lead_~/ (variant drop_lead:~/; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9w | macos-abs=silent; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=silent
+   SC-9 9y | 3/4 as expected; wrong: home
+   (rows not yes: 2)
+
+== drop_lead_./ (variant drop_lead:./; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9y | 3/4 as expected; wrong: dot
+   (rows not yes: 1)
+
+== drop_lead_../ (variant drop_lead:../; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9y | 3/4 as expected; wrong: dotdot
+   (rows not yes: 1)
+
+== cli_dash2 (variant cli_dash2; WPA_ONLY=SC-6; WPA_ROWS=6i)
+   SC-6 6i | 14/15 as expected; wrong: single-dash
+   (rows not yes: 1)
+
+##### plan_l1_w8w9w10  (95 bad implementations, 90 turn at least one row red, 5 turn none)
+
+== drop_reader_cat (variant drop_reader:cat; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: cat
+   SC-19 19u | 30/31 as expected; wrong: cat
+   (rows not yes: 2)
+
+== drop_reader_grep (variant drop_reader:grep; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: grep
+   SC-19 19u | 30/31 as expected; wrong: grep
+   (rows not yes: 2)
+
+== drop_reader_egrep (variant drop_reader:egrep; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: egrep
+   SC-19 19u | 30/31 as expected; wrong: egrep
+   (rows not yes: 2)
+
+== drop_reader_fgrep (variant drop_reader:fgrep; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: fgrep
+   SC-19 19u | 30/31 as expected; wrong: fgrep
+   (rows not yes: 2)
+
+== drop_reader_rg (variant drop_reader:rg; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: rg
+   SC-19 19u | 30/31 as expected; wrong: rg
+   (rows not yes: 2)
+
+== drop_reader_head (variant drop_reader:head; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: head
+   SC-19 19u | 30/31 as expected; wrong: head
+   (rows not yes: 2)
+
+== drop_reader_tail (variant drop_reader:tail; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: tail
+   SC-19 19u | 30/31 as expected; wrong: tail
+   (rows not yes: 2)
+
+== drop_reader_less (variant drop_reader:less; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: less
+   SC-19 19u | 30/31 as expected; wrong: less
+   (rows not yes: 2)
+
+== drop_reader_more (variant drop_reader:more; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: more
+   SC-19 19u | 30/31 as expected; wrong: more
+   (rows not yes: 2)
+
+== drop_reader_strings (variant drop_reader:strings; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: strings
+   SC-19 19u | 30/31 as expected; wrong: strings
+   (rows not yes: 2)
+
+== drop_reader_awk (variant drop_reader:awk; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: awk
+   SC-19 19u | 30/31 as expected; wrong: awk
+   (rows not yes: 2)
+
+== drop_reader_sed (variant drop_reader:sed; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: sed
+   SC-19 19u | 30/31 as expected; wrong: sed
+   (rows not yes: 2)
+
+== drop_reader_jq (variant drop_reader:jq; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: jq
+   SC-19 19u | 30/31 as expected; wrong: jq
+   (rows not yes: 2)
+
+== drop_reader_nl (variant drop_reader:nl; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: nl
+   SC-19 19u | 30/31 as expected; wrong: nl
+   (rows not yes: 2)
+
+== drop_reader_tac (variant drop_reader:tac; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: tac
+   SC-19 19u | 30/31 as expected; wrong: tac
+   (rows not yes: 2)
+
+== drop_reader_rev (variant drop_reader:rev; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: rev
+   SC-19 19u | 30/31 as expected; wrong: rev
+   (rows not yes: 2)
+
+== drop_reader_sort (variant drop_reader:sort; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: sort
+   SC-19 19u | 30/31 as expected; wrong: sort
+   (rows not yes: 2)
+
+== drop_reader_uniq (variant drop_reader:uniq; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: uniq
+   SC-19 19u | 30/31 as expected; wrong: uniq
+   (rows not yes: 2)
+
+== drop_reader_cut (variant drop_reader:cut; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: cut
+   SC-19 19u | 30/31 as expected; wrong: cut
+   (rows not yes: 2)
+
+== drop_reader_paste (variant drop_reader:paste; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: paste
+   SC-19 19u | 30/31 as expected; wrong: paste
+   (rows not yes: 2)
+
+== drop_reader_diff (variant drop_reader:diff; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: diff
+   SC-19 19u | 30/31 as expected; wrong: diff
+   (rows not yes: 2)
+
+== drop_reader_cmp (variant drop_reader:cmp; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: cmp
+   SC-19 19u | 30/31 as expected; wrong: cmp
+   (rows not yes: 2)
+
+== drop_reader_comm (variant drop_reader:comm; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: comm
+   SC-19 19u | 30/31 as expected; wrong: comm
+   (rows not yes: 2)
+
+== drop_reader_xxd (variant drop_reader:xxd; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: xxd
+   SC-19 19u | 30/31 as expected; wrong: xxd
+   (rows not yes: 2)
+
+== drop_reader_od (variant drop_reader:od; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: od
+   SC-19 19u | 30/31 as expected; wrong: od
+   (rows not yes: 2)
+
+== drop_reader_hexdump (variant drop_reader:hexdump; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: hexdump
+   SC-19 19u | 30/31 as expected; wrong: hexdump
+   (rows not yes: 2)
+
+== drop_reader_base64 (variant drop_reader:base64; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: base64
+   SC-19 19u | 30/31 as expected; wrong: base64
+   (rows not yes: 2)
+
+== drop_reader_column (variant drop_reader:column; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: column
+   SC-19 19u | 30/31 as expected; wrong: column
+   (rows not yes: 2)
+
+== drop_reader_fold (variant drop_reader:fold; WPA_ONLY=SC-16,SC-19; WPA_ROWS=16q,19u)
+   SC-16 16q | 28/29 as expected; wrong: fold
+   SC-19 19u | 30/31 as expected; wrong: fold
+   (rows not yes: 2)
+
+== drop_extreader_cat (variant drop_extreader:cat; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: cat
+   (rows not yes: 1)
+
+== drop_extreader_grep (variant drop_extreader:grep; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: grep
+   (rows not yes: 1)
+
+== drop_extreader_egrep (variant drop_extreader:egrep; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: egrep
+   (rows not yes: 1)
+
+== drop_extreader_fgrep (variant drop_extreader:fgrep; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: fgrep
+   (rows not yes: 1)
+
+== drop_extreader_rg (variant drop_extreader:rg; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: rg
+   (rows not yes: 1)
+
+== drop_extreader_head (variant drop_extreader:head; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: head
+   (rows not yes: 1)
+
+== drop_extreader_tail (variant drop_extreader:tail; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: tail
+   (rows not yes: 1)
+
+== drop_extreader_less (variant drop_extreader:less; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: less
+   (rows not yes: 1)
+
+== drop_extreader_more (variant drop_extreader:more; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: more
+   (rows not yes: 1)
+
+== drop_extreader_strings (variant drop_extreader:strings; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: strings
+   (rows not yes: 1)
+
+== drop_extreader_awk (variant drop_extreader:awk; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: awk
+   (rows not yes: 1)
+
+== drop_extreader_sed (variant drop_extreader:sed; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: sed
+   (rows not yes: 1)
+
+== drop_extreader_jq (variant drop_extreader:jq; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: jq
+   (rows not yes: 1)
+
+== drop_extreader_nl (variant drop_extreader:nl; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: nl
+   (rows not yes: 1)
+
+== drop_extreader_tac (variant drop_extreader:tac; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: tac
+   (rows not yes: 1)
+
+== drop_extreader_rev (variant drop_extreader:rev; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: rev
+   (rows not yes: 1)
+
+== drop_extreader_sort (variant drop_extreader:sort; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: sort
+   (rows not yes: 1)
+
+== drop_extreader_uniq (variant drop_extreader:uniq; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: uniq
+   (rows not yes: 1)
+
+== drop_extreader_cut (variant drop_extreader:cut; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: cut
+   (rows not yes: 1)
+
+== drop_extreader_paste (variant drop_extreader:paste; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: paste
+   (rows not yes: 1)
+
+== drop_extreader_diff (variant drop_extreader:diff; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: diff
+   (rows not yes: 1)
+
+== drop_extreader_cmp (variant drop_extreader:cmp; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: cmp
+   (rows not yes: 1)
+
+== drop_extreader_comm (variant drop_extreader:comm; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: comm
+   (rows not yes: 1)
+
+== drop_extreader_xxd (variant drop_extreader:xxd; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: xxd
+   (rows not yes: 1)
+
+== drop_extreader_od (variant drop_extreader:od; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: od
+   (rows not yes: 1)
+
+== drop_extreader_hexdump (variant drop_extreader:hexdump; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: hexdump
+   (rows not yes: 1)
+
+== drop_extreader_base64 (variant drop_extreader:base64; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: base64
+   (rows not yes: 1)
+
+== drop_extreader_column (variant drop_extreader:column; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: column
+   (rows not yes: 1)
+
+== drop_extreader_fold (variant drop_extreader:fold; WPA_ONLY=SC-19; WPA_ROWS=19u)
+   SC-19 19u | 30/31 as expected; wrong: fold
+   (rows not yes: 1)
+
+== drop_interp_python3 (variant drop_interp:python3; WPA_ONLY=SC-16,SC-19,SC-22; WPA_ROWS=16h,16n,16o,19o,19u,22bg)
+   SC-16 16h | exit=0
+   SC-19 19o | exit=0
+   SC-19 19u | 30/31 as expected; wrong: python3 -c
+   SC-22 22bg | 1/4 as expected; wrong: python3-environ, python3-cmdline, python3-var-pid
+   (rows not yes: 4)
+
+== drop_interp_node (variant drop_interp:node; WPA_ONLY=SC-16,SC-19,SC-22; WPA_ROWS=16h,16n,16o,19o,19u,22bg)
+   SC-16 16n | exit=0
+   SC-19 19u | 30/31 as expected; wrong: node -e
+   SC-22 22bg | 3/4 as expected; wrong: node-environ
+   (rows not yes: 3)
+
+== ext_max199 (variant ext_max199; WPA_ONLY=SC-19,SC-20)
+   SC-19 19v | exit=0,0,0
+   (rows not yes: 1)
+
+== ext_max201 (variant ext_max201; WPA_ONLY=SC-19,SC-20)
+   SC-20 20f | exit=2,2,2,2
+   (rows not yes: 1)
+
+== ext_size32767 (variant ext_size32767; WPA_ONLY=SC-19,SC-20)
+   SC-19 19v | exit=0,0,0
+   (rows not yes: 1)
+
+== ext_size32769 (variant ext_size32769; WPA_ONLY=SC-19,SC-20)
+   SC-20 20n | exit=2,2,2,2
+   (rows not yes: 1)
+
+== ext_minlen3 (variant ext_minlen3; WPA_ONLY=SC-19,SC-20)
+   SC-19 19l | exit=2
+   SC-19 19w | exit=2,0,2,0
+   (rows not yes: 2)
+
+== ext_minlen5 (variant ext_minlen5; WPA_ONLY=SC-19,SC-20)
+   SC-19 19v | exit=2,0,2
+   (rows not yes: 1)
+
+== ext_maxlen199 (variant ext_maxlen199; WPA_ONLY=SC-19,SC-20)
+   SC-19 19v | exit=2,2,0
+   (rows not yes: 1)
+
+== ext_maxlen201 (variant ext_maxlen201; WPA_ONLY=SC-19,SC-20)
+   SC-19 19w | exit=2,2,0,0
+   (rows not yes: 1)
+
+== ext_nosym (variant ext_nosym; WPA_ONLY=SC-19,SC-20)
+   SC-19 19w | exit=2,0,0,2
+   (rows not yes: 1)
+
+== ext_occ63 (variant ext_occ63; WPA_ONLY=SC-19,SC-20)
+   SC-19 19x | exit=0
+   (rows not yes: 1)
+
+== ext_occ65 (variant ext_occ65; WPA_ONLY=SC-19,SC-20)
+   SC-19 19y | exit=2
+   (rows not yes: 1)
+
+== ext_bare (variant ext_bare; WPA_ONLY=SC-19,SC-20)
+   SC-20 20i | exit=2,2,2,1,2
+   SC-20 20j | exit=2,2,2,1,2
+   (rows not yes: 2)
+
+== ext_first (variant ext_first; WPA_ONLY=SC-19,SC-20)
+   SC-19 19i | exit=0
+   SC-20 20l | exit=2,2 calls=_sg_ext_pass
+   (rows not yes: 2)
+
+== ext_regex (variant ext_regex; WPA_ONLY=SC-19,SC-20)
+   SC-19 19j | exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   SC-20 20h | exit=0,0
+   (rows not yes: 2)
+
+== ext_trunc (variant ext_trunc; WPA_ONLY=SC-19,SC-20)
+   SC-20 20f | exit=2,2,2,2
+   (rows not yes: 1)
+
+== vx_assign15 (variant vx_assign15; WPA_ONLY=SC-21)
+   SC-21 21x | exit=0,2
+   (rows not yes: 1)
+
+== vx_assign17 (variant vx_assign17; WPA_ONLY=SC-21)
+   SC-21 21y | exit=2,0
+   (rows not yes: 1)
+
+== vx_repl7 (variant vx_repl7; WPA_ONLY=SC-21)
+   SC-21 21x | exit=2,0
+   (rows not yes: 1)
+
+== vx_repl9 (variant vx_repl9; WPA_ONLY=SC-21)
+   SC-21 21y | exit=0,2
+   (rows not yes: 1)
+
+== vx_noquote (variant vx_noquote; WPA_ONLY=SC-21)
+   SC-21 21j | 6/9 as expected; wrong: double-quoted, single-quoted, export-quoted
+   (rows not yes: 1)
+
+== vx_interleave (variant vx_interleave; WPA_ONLY=SC-21)
+   SC-21 21v | exit=2 calls=_sg_vx_pass
+   (rows not yes: 1)
+
+== vx_start_only (variant vx_start_only; WPA_ONLY=SC-21)
+   SC-21 21f | exit=0
+   SC-21 21j | 0/9 as expected; wrong: export, declare, local, readonly, typeset, declare-x, ...
+   SC-21 21x | exit=0,2
+   (rows not yes: 3)
+
+== drop_assign_export (variant drop_assign:export; WPA_ONLY=SC-21; WPA_ROWS=21j)
+   (rows not yes: 0)
+
+== drop_assign_declare (variant drop_assign:declare; WPA_ONLY=SC-21; WPA_ROWS=21j)
+   (rows not yes: 0)
+
+== drop_assign_local (variant drop_assign:local; WPA_ONLY=SC-21; WPA_ROWS=21j)
+   (rows not yes: 0)
+
+== drop_assign_readonly (variant drop_assign:readonly; WPA_ONLY=SC-21; WPA_ROWS=21j)
+   (rows not yes: 0)
+
+== drop_assign_typeset (variant drop_assign:typeset; WPA_ONLY=SC-21; WPA_ROWS=21j)
+   (rows not yes: 0)
+
+== read_noboundary (variant read_noboundary; WPA_ONLY=SC-18; WPA_ROWS=18a,18b,18d,18h,18i)
+   SC-18 18i | exit=2,2,2
+   (rows not yes: 1)
+
+== notight (variant notight; WPA_ONLY=SC-16; WPA_ROWS=16f,16p)
+   SC-16 16f | exit=0
+   (rows not yes: 1)
+
+== jq_loose (variant jq_loose; WPA_ONLY=SC-24)
+   SC-24 24f | exit=2,2,0,2,2,2
+   (rows not yes: 1)
+
+== env_boundary (variant env_boundary; WPA_ONLY=SC-23)
+   SC-23 23c | exit=0,0,0,0,0,0,0,0,0,2
+   SC-23 23d | exit=2,2,2,0,0,0,0,2,2
+   SC-23 23h | exit=0,0,0
+   (rows not yes: 3)
+
+== drop_w12_0 (variant drop_w12:0; WPA_ONLY=SC-23; WPA_ROWS=23a,23b)
+   SC-23 23a | exit=2
+   SC-23 23b | exit=2,0,0,2,0
+   (rows not yes: 2)
+
+== drop_w12_1 (variant drop_w12:1; WPA_ONLY=SC-23; WPA_ROWS=23a,23b)
+   SC-23 23b | exit=0,0,2,0,0
+   (rows not yes: 1)
+
+== drop_w12_2 (variant drop_w12:2; WPA_ONLY=SC-23; WPA_ROWS=23a,23b)
+   SC-23 23b | exit=0,2,0,2,0
+   (rows not yes: 1)
+
+== drop_w12_3 (variant drop_w12:3; WPA_ONLY=SC-23; WPA_ROWS=23a,23b)
+   SC-23 23b | exit=0,0,0,0,2
+   (rows not yes: 1)
+
+##### plan_l1_w11  (82 bad implementations, 82 turn at least one row red, 0 turn none)
+
+== drop_launch_sudo (variant drop_launch:sudo; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22n | exit=0
+   SC-22 22x | exit=0
+   SC-22 22aw | 14/15 as expected; wrong: sudo
+   SC-22 22ax | 12/14 as expected; wrong: sudo -u forgejo ps -ef, sudo -u svc -g grp ps aux
+   (rows not yes: 4)
+
+== drop_launch_doas (variant drop_launch:doas; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: doas
+   SC-22 22ax | 13/14 as expected; wrong: doas -u root ps aux
+   (rows not yes: 2)
+
+== drop_launch_nice (variant drop_launch:nice; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: nice
+   SC-22 22ax | 13/14 as expected; wrong: nice -n 5 ps aux
+   (rows not yes: 2)
+
+== drop_launch_timeout (variant drop_launch:timeout; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: timeout
+   SC-22 22ax | 11/14 as expected; wrong: timeout -s KILL 5 ps aux, timeout 5 ps aux, timeout 5s ps aux
+   (rows not yes: 2)
+
+== drop_launch_xargs (variant drop_launch:xargs; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: xargs
+   SC-22 22ax | 11/14 as expected; wrong: xargs -r ps -o pid,args -p, pgrep -f x | xargs -I{} ps -fp {}, pgrep -f curl | xargs ps -fp
+   (rows not yes: 2)
+
+== drop_launch_nohup (variant drop_launch:nohup; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: nohup
+   (rows not yes: 1)
+
+== drop_launch_stdbuf (variant drop_launch:stdbuf; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: stdbuf
+   SC-22 22ax | 13/14 as expected; wrong: stdbuf -oL ps aux
+   (rows not yes: 2)
+
+== drop_launch_env (variant drop_launch:env; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: env
+   SC-22 22ax | 12/14 as expected; wrong: env -i LANG=C ps aux, env LANG=C ps aux
+   (rows not yes: 2)
+
+== drop_launch_time (variant drop_launch:time; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: time
+   (rows not yes: 1)
+
+== drop_launch_eval (variant drop_launch:eval; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: eval
+   (rows not yes: 1)
+
+== drop_launch_setsid (variant drop_launch:setsid; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: setsid
+   (rows not yes: 1)
+
+== drop_launch_ionice (variant drop_launch:ionice; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: ionice
+   SC-22 22ax | 13/14 as expected; wrong: ionice -c 2 -n 7 ps aux
+   (rows not yes: 2)
+
+== drop_launch_unbuffer (variant drop_launch:unbuffer; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: unbuffer
+   (rows not yes: 1)
+
+== drop_launch_command (variant drop_launch:command; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: command
+   (rows not yes: 1)
+
+== drop_launch_exec (variant drop_launch:exec; WPA_ONLY=SC-22; WPA_ROWS=22n,22x,22y,22z,22aw,22ax)
+   SC-22 22aw | 14/15 as expected; wrong: exec
+   (rows not yes: 1)
+
+== drop_procreader_cat (variant drop_procreader:cat; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22F | exit=0
+   SC-22 22G | exit=0
+   SC-22 22I | exit=0
+   SC-22 22an | exit=0
+   SC-22 22J | exit=0,2,2,2,2
+   SC-22 22bc | 27/28 as expected; wrong: cat:cmdline
+   SC-22 22be | 1/6 as expected; wrong: star, dollar-name, dollar-brace, cmd-subst, task-environ
+   SC-22 22aj | 12/13 as expected; wrong: cat
+   (rows not yes: 8)
+
+== drop_procreader_head (variant drop_procreader:head; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: head:environ, head:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: head
+   (rows not yes: 2)
+
+== drop_procreader_tail (variant drop_procreader:tail; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: tail:environ, tail:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: tail
+   (rows not yes: 2)
+
+== drop_procreader_less (variant drop_procreader:less; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: less:environ, less:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: less
+   (rows not yes: 2)
+
+== drop_procreader_more (variant drop_procreader:more; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: more:environ, more:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: more
+   (rows not yes: 2)
+
+== drop_procreader_strings (variant drop_procreader:strings; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22J | exit=2,2,2,2,0
+   SC-22 22bc | 26/28 as expected; wrong: strings:environ, strings:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: strings
+   (rows not yes: 3)
+
+== drop_procreader_hexdump (variant drop_procreader:hexdump; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: hexdump:environ, hexdump:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: hexdump
+   (rows not yes: 2)
+
+== drop_procreader_od (variant drop_procreader:od; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: od:environ, od:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: od
+   (rows not yes: 2)
+
+== drop_procreader_xxd (variant drop_procreader:xxd; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: xxd:environ, xxd:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: xxd
+   (rows not yes: 2)
+
+== drop_procreader_tr (variant drop_procreader:tr; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: tr:environ, tr:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: tr
+   (rows not yes: 2)
+
+== drop_procreader_awk (variant drop_procreader:awk; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: awk:environ, awk:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: awk
+   (rows not yes: 2)
+
+== drop_procreader_perl (variant drop_procreader:perl; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: perl:environ, perl:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: perl
+   (rows not yes: 2)
+
+== drop_procreader_rev (variant drop_procreader:rev; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bc | 26/28 as expected; wrong: rev:environ, rev:cmdline
+   SC-22 22aj | 12/13 as expected; wrong: rev
+   (rows not yes: 2)
+
+== drop_procreader_xargs (variant drop_procreader:xargs; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22H | exit=0
+   SC-22 22bd | 12/13 as expected; wrong: xargs
+   (rows not yes: 2)
+
+== drop_procreader_sed (variant drop_procreader:sed; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: sed
+   (rows not yes: 1)
+
+== drop_procreader_grep (variant drop_procreader:grep; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 10/13 as expected; wrong: grep, egrep, fgrep
+   SC-22 22be | 5/6 as expected; wrong: task-added-reader
+   (rows not yes: 2)
+
+== drop_procreader_rg (variant drop_procreader:rg; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: rg
+   (rows not yes: 1)
+
+== drop_procreader_cut (variant drop_procreader:cut; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: cut
+   (rows not yes: 1)
+
+== drop_procreader_paste (variant drop_procreader:paste; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: paste
+   (rows not yes: 1)
+
+== drop_procreader_nl (variant drop_procreader:nl; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: nl
+   (rows not yes: 1)
+
+== drop_procreader_sort (variant drop_procreader:sort; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: sort
+   (rows not yes: 1)
+
+== drop_procreader_base64 (variant drop_procreader:base64; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: base64
+   (rows not yes: 1)
+
+== drop_procreader_cp (variant drop_procreader:cp; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: cp
+   (rows not yes: 1)
+
+== drop_procreader_dd (variant drop_procreader:dd; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be)
+   SC-22 22bd | 12/13 as expected; wrong: dd
+   (rows not yes: 1)
+
+== drop_remote_ssh (variant drop_remote:ssh; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22v | exit=0
+   SC-22 22bk | 10/11 as expected; wrong: ssh
+   (rows not yes: 2)
+
+== drop_remote_docker (variant drop_remote:docker; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22bk | 9/11 as expected; wrong: docker, docker-compose
+   (rows not yes: 1)
+
+== drop_remote_kubectl (variant drop_remote:kubectl; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22D | exit=0
+   SC-22 22bk | 10/11 as expected; wrong: kubectl
+   (rows not yes: 2)
+
+== drop_remote_nomad (variant drop_remote:nomad; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22E | exit=0
+   SC-22 22ao | exit=0
+   SC-22 22ar | exit=0
+   SC-22 22bk | 10/11 as expected; wrong: nomad
+   (rows not yes: 4)
+
+== drop_remote_pct (variant drop_remote:pct; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22C | exit=0
+   SC-22 22ap | exit=0
+   SC-22 22bk | 10/11 as expected; wrong: pct
+   (rows not yes: 3)
+
+== drop_remote_lxc (variant drop_remote:lxc; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22bk | 10/11 as expected; wrong: lxc
+   (rows not yes: 1)
+
+== drop_remote_podman (variant drop_remote:podman; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22bk | 10/11 as expected; wrong: podman
+   (rows not yes: 1)
+
+== drop_remote_sh (variant drop_remote:sh; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22A | exit=0
+   SC-22 22B | exit=0
+   SC-22 22bk | 9/11 as expected; wrong: sh-c, bash-c
+   (rows not yes: 3)
+
+== drop_remote_watch (variant drop_remote:watch; WPA_ONLY=SC-22; WPA_ROWS=22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk)
+   SC-22 22z | exit=0
+   SC-22 22bk | 10/11 as expected; wrong: watch-quoted
+   (rows not yes: 2)
+
+== drop_psalt_1 (variant drop_psalt:1; WPA_ONLY=SC-22)
+   SC-22 22a | exit=0
+   SC-22 22c | exit=0
+   SC-22 22g | exit=0
+   SC-22 22h | exit=0
+   SC-22 22q | exit=0
+   SC-22 22s | exit=0
+   SC-22 22v | exit=0
+   SC-22 22w | exit=0
+   SC-22 22y | exit=0
+   SC-22 22z | exit=0
+   SC-22 22A | exit=0
+   SC-22 22C | exit=0
+   SC-22 22D | exit=0
+   SC-22 22E | exit=0
+   SC-22 22aw | 0/15 as expected; wrong: sudo, doas, nice, timeout, xargs, nohup, ...
+   SC-22 22ax | 4/14 as expected; wrong: sudo -u svc -g grp ps aux, doas -u root ps aux, timeout -s KILL 5 ps aux, timeout 5 ps aux, timeout 5s ps aux, nice -n 5 ps a
+   SC-22 22ay | 4/8 as expected; wrong: /bin/ps aux, /usr/bin/sudo ps aux, sudo /bin/ps aux, ssh host /bin/ps aux
+   SC-22 22az | 1/5 as expected; wrong: then, do, else, elif
+   SC-22 22bk | 2/11 as expected; wrong: ssh, docker, docker-compose, kubectl, lxc, nomad, ...
+   SC-22 22bj | 1/2 as expected; wrong: heredoc-ps
+   (rows not yes: 20)
+
+== drop_psalt_2 (variant drop_psalt:2; WPA_ONLY=SC-22)
+   SC-22 22am | exit=0
+   (rows not yes: 1)
+
+== drop_psalt_3 (variant drop_psalt:3; WPA_ONLY=SC-22)
+   SC-22 22b | exit=0
+   SC-22 22f | exit=0
+   SC-22 22r | exit=0
+   SC-22 22x | exit=0
+   SC-22 22B | exit=0
+   SC-22 22ax | 11/14 as expected; wrong: sudo -u forgejo ps -ef, pgrep -f x | xargs -I{} ps -fp {}, pgrep -f curl | xargs ps -fp
+   SC-22 22ay | 7/8 as expected; wrong: /usr/bin/ps -ef
+   SC-22 22bk | 9/11 as expected; wrong: podman, bash-c
+   SC-22 22bj | 1/2 as expected; wrong: heredoc-after-text
+   (rows not yes: 9)
+
+== drop_psalt_4 (variant drop_psalt:4; WPA_ONLY=SC-22)
+   SC-22 22d | exit=0
+   SC-22 22e | exit=0
+   SC-22 22i | exit=0
+   SC-22 22j | exit=0
+   SC-22 22ax | 13/14 as expected; wrong: xargs -r ps -o pid,args -p
+   (rows not yes: 5)
+
+== drop_psalt_5 (variant drop_psalt:5; WPA_ONLY=SC-22)
+   SC-22 22av | 13/15 as expected; wrong: ps -eO rss, ps -O rss
+   (rows not yes: 1)
+
+== drop_psalt_6 (variant drop_psalt:6; WPA_ONLY=SC-22)
+   SC-22 22av | 6/15 as expected; wrong: ps -aux, ps -ax, ps -x, ps -ux, ps -auxww, ps -w -x, ...
+   (rows not yes: 1)
+
+== drop_psalt_7 (variant drop_psalt:7; WPA_ONLY=SC-22)
+   SC-22 22av | 12/15 as expected; wrong: ps -au, ps -eu, ps -u
+   (rows not yes: 1)
+
+== drop_pid_0 (variant drop_pid:0; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22be | 5/6 as expected; wrong: task-added-reader
+   SC-22 22bg | 3/4 as expected; wrong: python3-cmdline
+   (rows not yes: 2)
+
+== drop_pid_1 (variant drop_pid:1; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22H | exit=0
+   SC-22 22an | exit=0
+   SC-22 22bd | 0/13 as expected; wrong: xargs, sed, grep, rg, cut, paste, ...
+   SC-22 22be | 5/6 as expected; wrong: task-environ
+   SC-22 22bg | 2/4 as expected; wrong: python3-environ, node-environ
+   (rows not yes: 5)
+
+== drop_pid_2 (variant drop_pid:2; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22F | exit=0
+   SC-22 22I | exit=0
+   SC-22 22be | 5/6 as expected; wrong: star
+   (rows not yes: 3)
+
+== drop_pid_3 (variant drop_pid:3; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22be | 5/6 as expected; wrong: dollar-brace
+   (rows not yes: 1)
+
+== drop_pid_4 (variant drop_pid:4; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22G | exit=0
+   SC-22 22be | 5/6 as expected; wrong: dollar-name
+   SC-22 22bg | 3/4 as expected; wrong: python3-var-pid
+   (rows not yes: 3)
+
+== drop_pid_5 (variant drop_pid:5; WPA_ONLY=SC-22; WPA_ROWS=22F,22G,22H,22I,22an,22bd,22be,22bg,22bf)
+   SC-22 22be | 5/6 as expected; wrong: cmd-subst
+   (rows not yes: 1)
+
+== drop_kwpos_then (variant drop_kwpos:then; WPA_ONLY=SC-22; WPA_ROWS=22az)
+   SC-22 22az | 4/5 as expected; wrong: then
+   (rows not yes: 1)
+
+== drop_kwpos_do (variant drop_kwpos:do; WPA_ONLY=SC-22; WPA_ROWS=22az)
+   SC-22 22az | 3/5 as expected; wrong: do, do-pgrep
+   (rows not yes: 1)
+
+== drop_kwpos_else (variant drop_kwpos:else; WPA_ONLY=SC-22; WPA_ROWS=22az)
+   SC-22 22az | 4/5 as expected; wrong: else
+   (rows not yes: 1)
+
+== drop_kwpos_elif (variant drop_kwpos:elif; WPA_ONLY=SC-22; WPA_ROWS=22az)
+   SC-22 22az | 4/5 as expected; wrong: elif
+   (rows not yes: 1)
+
+== drop_pgrep_0 (variant drop_pgrep:0; WPA_ONLY=SC-22; WPA_ROWS=22bl,22k,22l,22m)
+   SC-22 22k | exit=0
+   SC-22 22l | exit=0
+   SC-22 22bl | 10/12 as expected; wrong: pgrep-a, pgrep-af
+   (rows not yes: 3)
+
+== drop_pgrep_1 (variant drop_pgrep:1; WPA_ONLY=SC-22; WPA_ROWS=22bl,22k,22l,22m)
+   SC-22 22m | exit=0
+   SC-22 22bl | 11/12 as expected; wrong: pgrep-list-full
+   (rows not yes: 2)
+
+== drop_pstree_0 (variant drop_pstree:0; WPA_ONLY=SC-22; WPA_ROWS=22bl)
+   SC-22 22bl | 10/12 as expected; wrong: pstree-a, pstree-ap
+   (rows not yes: 1)
+
+== drop_pstree_1 (variant drop_pstree:1; WPA_ONLY=SC-22; WPA_ROWS=22bl)
+   SC-22 22bl | 11/12 as expected; wrong: pstree-arguments
+   (rows not yes: 1)
+
+== drop_dockerform_top (variant drop_dockerform:top; WPA_ONLY=SC-22; WPA_ROWS=22bl,22bb)
+   SC-22 22bb | 1/2 as expected; wrong: podman-top
+   SC-22 22bl | 10/12 as expected; wrong: docker-top, docker-compose-top
+   (rows not yes: 2)
+
+== drop_dockerform_notrunc (variant drop_dockerform:notrunc; WPA_ONLY=SC-22; WPA_ROWS=22bl,22bb)
+   SC-22 22bb | 1/2 as expected; wrong: podman-ps
+   SC-22 22bl | 10/12 as expected; wrong: docker-ps-no-trunc, docker-container-ls-no-trunc
+   (rows not yes: 2)
+
+== drop_dockerform_compose (variant drop_dockerform:compose; WPA_ONLY=SC-22; WPA_ROWS=22bl,22bb)
+   SC-22 22bl | 11/12 as expected; wrong: docker-compose-top
+   (rows not yes: 1)
+
+== drop_dockerform_container (variant drop_dockerform:container; WPA_ONLY=SC-22; WPA_ROWS=22bl,22bb)
+   SC-22 22bl | 11/12 as expected; wrong: docker-container-ls-no-trunc
+   (rows not yes: 1)
+
+== drop_dockerform_ls (variant drop_dockerform:ls; WPA_ONLY=SC-22; WPA_ROWS=22bl,22bb)
+   SC-22 22bl | 11/12 as expected; wrong: docker-container-ls-no-trunc
+   (rows not yes: 1)
+
+== drop_bin (variant drop_bin; WPA_ONLY=SC-22)
+   SC-22 22ay | 0/8 as expected; wrong: /bin/ps aux, /usr/bin/ps -ef, /usr/bin/pgrep -af curl, /usr/bin/pstree -ap, /usr/bin/top -b -n1 -c, /usr/bin/sudo ps aux, ...
+   (rows not yes: 1)
+
+== drop_larg (variant drop_larg; WPA_ONLY=SC-22)
+   SC-22 22ax | 7/14 as expected; wrong: sudo -u forgejo ps -ef, sudo -u svc -g grp ps aux, doas -u root ps aux, timeout -s KILL 5 ps aux, timeout 5s ps aux, env -i L
+   (rows not yes: 1)
+
+== drop_procinterp (variant drop_procinterp; WPA_ONLY=SC-22)
+   SC-22 22bg | 0/4 as expected; wrong: python3-environ, python3-cmdline, python3-var-pid, node-environ
+   (rows not yes: 1)
+
+== nodocker_podman (variant nodocker_podman; WPA_ONLY=SC-22)
+   SC-22 22bb | 0/2 as expected; wrong: podman-top, podman-ps
+   (rows not yes: 1)
+
+== pidtok_any (variant pidtok_any; WPA_ONLY=SC-22)
+   SC-22 22bf | exit=2,2,2
+   (rows not yes: 1)
+
+== proc_status (variant proc_status; WPA_ONLY=SC-22)
+   SC-22 22as | exit=2,2,2
+   (rows not yes: 1)
+
+== anchor_nocntrl (variant anchor_nocntrl; WPA_ONLY=SC-22)
+   SC-22 22bj | 0/2 as expected; wrong: heredoc-ps, heredoc-after-text
+   (rows not yes: 1)
+
+== launcher_any (variant launcher_any; WPA_ONLY=SC-22)
+   SC-22 22a | exit=0
+   SC-22 22b | exit=0
+   SC-22 22c | exit=0
+   SC-22 22d | exit=0
+   SC-22 22e | exit=0
+   SC-22 22f | exit=0
+   SC-22 22g | exit=0
+   SC-22 22h | exit=0
+   SC-22 22i | exit=0
+   SC-22 22j | exit=0
+   SC-22 22k | exit=0
+   SC-22 22l | exit=0
+   SC-22 22m | exit=0
+   SC-22 22o | exit=0
+   SC-22 22p | exit=0
+   SC-22 22q | exit=0
+   SC-22 22r | exit=0
+   SC-22 22s | exit=0
+   SC-22 22w | exit=0
+   SC-22 22am | exit=0
+   SC-22 22av | 0/15 as expected; wrong: ps -aux, ps -ax, ps -x, ps -ux, ps -au, ps -axu, ...
+   SC-22 22ay | 2/8 as expected; wrong: /bin/ps aux, /usr/bin/ps -ef, /usr/bin/pgrep -af curl, /usr/bin/pstree -ap, /usr/bin/top -b -n1 -c, sudo /bin/ps aux
+   SC-22 22az | 0/5 as expected; wrong: then, do, else, elif, do-pgrep
+   SC-22 22bl | 4/12 as expected; wrong: pgrep-a, pgrep-af, pgrep-list-full, pstree-a, pstree-ap, pstree-arguments, ...
+   SC-22 22O | exit=0,0,0,0,0,0,0,0,0,0,0,0,2,0,2
+   SC-22 22bi | exit=2,2,2,2,2,0,0,0
+   SC-22 22bh | 10/11 as expected; wrong: nested-launcher
+   SC-22 22bj | 0/2 as expected; wrong: heredoc-ps, heredoc-after-text
+   (rows not yes: 28)
+
+##### plan_extra  (3 bad implementations, 3 turn at least one row red, 0 turn none)
+
+== wl_cmdsub (variant wl_cmdsub; WPA_ONLY=SC-7,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: dollar-cmd
+   SC-11 11z | 4/5 as expected; wrong: dollar-cmd
+   (rows not yes: 2)
+
+== fp_relpath (variant fp_relpath; WPA_ONLY=SC-10; WPA_ROWS=10l)
+   SC-10 10l | 1/5 as expected; wrong: json-url, json-resource-name, kv-relative-path, kv-yaml-resource-path
+   (rows not yes: 1)
+
+== fp_kebab (variant fp_kebab; WPA_ONLY=SC-10; WPA_ROWS=10l)
+   SC-10 10l | 4/5 as expected; wrong: json-policy-name
+   (rows not yes: 1)
+
+##### plan_extra_b32  (0 bad implementations, 0 turn at least one row red, 0 turn none)
+
+##### plan_repeat  (20 bad implementations, 20 turn at least one row red, 0 turn none)
+
+== hdr_case_sensitive__r2 (variant hdr_case_sensitive; WPA_ONLY=SC-6; WPA_ROWS=6h,6j)
+   SC-6 6h | authorization=silent; cf=silent
+   SC-6 6j | 6/10 as expected; wrong: auth-AUTHORIZATION, auth-authorization, cf-cf-access-client-secret, cf-Cf-Access-Client-Secret
+   (rows not yes: 2)
+
+== ent_digit__r2 (variant ent_digit; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-4 4o | silent
+   SC-4 4t | 2/3 as expected; wrong: lower+upper
+   SC-10 10b | alert m=1 {kv-secret-assign=1}
+   (rows not yes: 3)
+
+== ent_on_old__r2 (variant ent_on_old; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-7 7h | 10/11 as expected; wrong: lower12
+   SC-7 7j | 14/15 as expected; wrong: mask-mixed
+   (rows not yes: 2)
+
+== noentropy__r2 (variant noentropy; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9p | alert m=1 {kv-secret-assign=1}
+   SC-10 10a | alert m=1 {json-credential-field=1}
+   SC-10 10b | alert m=1 {kv-secret-assign=1}
+   SC-10 10k | alert m=1 {json-credential-field=1}
+   (rows not yes: 4)
+
+== noident__r2 (variant noident; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9v | js-const=alert m=1 {kv-secret-assign=1}; py-settings=alert m=1 {kv-secret-assign=1}; camel-chain=alert m=1 {kv-secret-assign=1}
+   SC-10 10i | 0/5 as expected; wrong: kv, kv-export, json, auth-header, cli-flag
+   (rows not yes: 2)
+
+== nopath__r2 (variant nopath; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9o | alert m=1 {kv-secret-assign=1}
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 0/4 as expected; wrong: abs, home, dot, dotdot
+   (rows not yes: 3)
+
+== loosepath__r2 (variant loosepath; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-4 4n | padded=silent; unpadded-plus=silent
+   SC-5 5l | padded=silent; unpadded-plus=silent
+   SC-9 9w | macos-abs=silent; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=silent
+   SC-9 9y | 1/4 as expected; wrong: home, dot, dotdot
+   (rows not yes: 4)
+
+== path_firstlower__r2 (variant path_firstlower; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 1/4 as expected; wrong: home, dot, dotdot
+   (rows not yes: 2)
+
+== floor15__r2 (variant floor15; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-10 10h | 0/6 as expected; wrong: json, json-env, kv, auth-header, cf-header, cli-flag
+   (rows not yes: 1)
+
+== floor17__r2 (variant floor17; WPA_ONLY=SC-4,SC-5,SC-6,SC-7,SC-9,SC-10,SC-11)
+   SC-4 4r | 0/6 as expected; wrong: json, json-env, kv, auth-header, cf-header, cli-flag
+   SC-11 11w | silent
+   SC-11 11z | 3/5 as expected; wrong: lt16-unclosed, dollar-lower
+   (rows not yes: 3)
+
+== ent_drop_lower__r2 (variant ent_drop:lower; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4a | silent
+   SC-4 4o | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+upper, lower+digit
+   (rows not yes: 3)
+
+== ent_drop_upper__r2 (variant ent_drop:upper; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4o | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+upper, upper+digit
+   (rows not yes: 2)
+
+== ent_drop_digit__r2 (variant ent_drop:digit; WPA_ONLY=SC-4,SC-10; WPA_ROWS=4a,4o,4t,10a,10b,10k)
+   SC-4 4a | silent
+   SC-4 4t | 1/3 as expected; wrong: lower+digit, upper+digit
+   (rows not yes: 2)
+
+== drop_lead_/__r2 (variant drop_lead:/; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9w | macos-abs=alert m=1 {kv-secret-assign=1}; macos-home=silent; dotfile=alert m=1 {kv-secret-assign=1}
+   SC-9 9y | 3/4 as expected; wrong: abs
+   (rows not yes: 2)
+
+== drop_lead_~/__r2 (variant drop_lead:~/; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9w | macos-abs=silent; macos-home=alert m=1 {kv-secret-assign=1}; dotfile=silent
+   SC-9 9y | 3/4 as expected; wrong: home
+   (rows not yes: 2)
+
+== drop_lead_./__r2 (variant drop_lead:./; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9y | 3/4 as expected; wrong: dot
+   (rows not yes: 1)
+
+== drop_lead_../__r2 (variant drop_lead:../; WPA_ONLY=SC-9; WPA_ROWS=9w,9y)
+   SC-9 9y | 3/4 as expected; wrong: dotdot
+   (rows not yes: 1)
+
+== path_plus__r2 (variant path_plus; WPA_ONLY=SC-4,SC-5; WPA_ROWS=4n,5l)
+   SC-4 4n | padded=alert m=1 {json-credential-field=1}; unpadded-plus=silent
+   SC-5 5l | padded=alert m=1 {kv-secret-assign=1}; unpadded-plus=silent
+   (rows not yes: 2)
+
+== path_eq__r2 (variant path_eq; WPA_ONLY=SC-4,SC-5; WPA_ROWS=4n,5l)
+   SC-4 4n | padded=silent; unpadded-plus=alert m=1 {json-credential-field=1}
+   SC-5 5l | padded=silent; unpadded-plus=alert m=1 {kv-secret-assign=1}
+   (rows not yes: 2)
+
+== cli_dash2__r2 (variant cli_dash2; WPA_ONLY=SC-6; WPA_ROWS=6i)
+   SC-6 6i | 14/15 as expected; wrong: single-dash
+   (rows not yes: 1)
+
+##### plan_extra2_b32  (2 bad implementations, 2 turn at least one row red, 0 turn none)
+
+== b4_32c (variant b4; WPA_ONLY=SC-16,SC-32)
+   SC-32 32a | 1 bash 4+ constructs ([[ -v ]]); detectors self-tested 13/13
+   SC-32 32c | 1 of 17 rows differ: SC-16:16p
+   (rows not yes: 2)
+
+== vx_patsub_32c (variant vx_patsub; WPA_ONLY=SC-21,SC-32)
+   SC-32 32c | 1 of 22 rows differ: SC-21:21f
+   (rows not yes: 1)
+
+##### plan_vsym  (13 bad implementations, 13 turn at least one row red, 0 turn none)
+
+== vsym_kv_plus (variant drop_vsym:kv:+; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:+, cli:+
+   (rows not yes: 1)
+
+== vsym_kv_slash (variant drop_vsym:kv:/; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:/, cli:/
+   (rows not yes: 1)
+
+== vsym_kv_eq (variant drop_vsym:kv:=; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:=, cli:=
+   (rows not yes: 1)
+
+== vsym_kv_dot (variant drop_vsym:kv:.; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:., cli:.
+   (rows not yes: 1)
+
+== vsym_kv_us (variant drop_vsym:kv:_; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:_, cli:_
+   (rows not yes: 1)
+
+== vsym_kv_tilde (variant drop_vsym:kv:~; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:~, cli:~
+   (rows not yes: 1)
+
+== vsym_kv_dash (variant drop_vsym:kv:-; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: kv:-, cli:-
+   (rows not yes: 1)
+
+== vsym_hdr_plus (variant drop_vsym:hdr:+; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:+, cf:+
+   (rows not yes: 1)
+
+== vsym_hdr_slash (variant drop_vsym:hdr:/; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:/, cf:/
+   (rows not yes: 1)
+
+== vsym_hdr_eq (variant drop_vsym:hdr:=; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:=, cf:=
+   (rows not yes: 1)
+
+== vsym_hdr_dot (variant drop_vsym:hdr:.; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:., cf:.
+   (rows not yes: 1)
+
+== vsym_hdr_us (variant drop_vsym:hdr:_; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:_, cf:_
+   (rows not yes: 1)
+
+== vsym_hdr_dash (variant drop_vsym:hdr:-; WPA_ONLY=SC-6; WPA_ROWS=6k)
+   SC-6 6k | 24/26 as expected; wrong: auth:-, cf:-
+   (rows not yes: 1)
+
+##### plan_extra4  (20 bad implementations, 19 turn at least one row red, 1 turn none)
+
+== name_loose (variant name_loose; WPA_ONLY=SC-9; WPA_ROWS=9x)
+   SC-9 9x | 0/6 as expected; wrong: tokens, tokenizer, mytoken, auth_tokens, secret_name, password_hint
+   (rows not yes: 1)
+
+== kv_lowercase (variant kv_lowercase; WPA_ONLY=SC-10; WPA_ROWS=10d,10j)
+   SC-10 10d | alert m=1 {kv-secret-assign=1}
+   SC-10 10j | 3/6 as expected; wrong: url-query, ini-lower, ini-quoted
+   (rows not yes: 2)
+
+== add_dollar_hdr (variant add_dollar:hdr; WPA_ONLY=SC-9; WPA_ROWS=9l)
+   SC-9 9l | alert m=1 {auth-header-token=1}
+   (rows not yes: 1)
+
+== add_dollar_kv (variant add_dollar:kv; WPA_ONLY=SC-9; WPA_ROWS=9m)
+   SC-9 9m | alert m=1 {cli-secret-flag=1}
+   (rows not yes: 1)
+
+== bash_boundary_wide (variant bash_boundary_wide; WPA_ONLY=SC-17; WPA_ROWS=17a,17c,17d)
+   SC-17 17c | exit=2,2,2
+   (rows not yes: 1)
+
+== appini_anywhere (variant appini_anywhere; WPA_ONLY=SC-17; WPA_ROWS=17a,17c,17d)
+   SC-17 17a | exit=2,2,0,0,0,0,2,0,2,2
+   SC-17 17d | 5/21 as expected; wrong: while-read-redirect, mapfile-redirect, redirect-first, tr-redirect, tee-redirect, cmd-subst-read, ...
+   (rows not yes: 2)
+
+== read_case_sensitive (variant read_case_sensitive; WPA_ONLY=SC-18; WPA_ROWS=18e,18g,18h,18i)
+   SC-18 18h | exit=0,2,2,0,2
+   (rows not yes: 1)
+
+== claude_notight (variant claude_notight; WPA_ONLY=SC-16; WPA_ROWS=16f,16o,16p)
+   SC-16 16p | exit=0,0,0,2,0,0,0,0
+   (rows not yes: 1)
+
+== interp_name_v1var (variant drop_interp_name:v1var; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   (rows not yes: 0)
+
+== interp_name_secretsmanager (variant drop_interp_name:secretsmanager; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   SC-16 16o | 12/14 as expected; wrong: python3:secretsmanager, node:secretsmanager
+   (rows not yes: 1)
+
+== interp_name_secrets (variant drop_interp_name:secrets; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   SC-16 16o | 12/14 as expected; wrong: python3:secrets-dir, node:secrets-dir
+   (rows not yes: 1)
+
+== interp_name_env (variant drop_interp_name:env; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   SC-16 16o | 12/14 as expected; wrong: python3:dotenv, node:dotenv
+   (rows not yes: 1)
+
+== interp_name_provider_key (variant drop_interp_name:provider_key; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   SC-16 16o | 12/14 as expected; wrong: python3:provider_key, node:provider_key
+   (rows not yes: 1)
+
+== interp_name_claudecfg (variant drop_interp_name:claudecfg; WPA_ONLY=SC-16; WPA_ROWS=16o)
+   SC-16 16o | 10/14 as expected; wrong: python3:claude-settings, python3:claude-json, node:claude-settings, node:claude-json
+   (rows not yes: 1)
+
+== pgrep_wide (variant pgrep_wide; WPA_ONLY=SC-22; WPA_ROWS=22O,22S)
+   SC-22 22O | exit=0,0,0,0,0,0,0,0,0,0,0,0,0,0,2
+   SC-22 22S | exit=0,2,0,0,0
+   (rows not yes: 2)
+
+== pemfp_nofp (variant pem_nofp; WPA_ONLY=SC-12; WPA_ROWS=12k,12l,12m)
+   SC-12 12m | block differs; header-only ok
+   (rows not yes: 1)
+
+== pemfp_hash (variant pem_hash; WPA_ONLY=SC-12; WPA_ROWS=12k,12l,12m)
+   SC-12 12k | 37/38 as expected; wrong: pem-private-key-block
+   SC-12 12m | block differs; header-only ok
+   (rows not yes: 2)
+
+== pemfp_last (variant pem_last; WPA_ONLY=SC-12; WPA_ROWS=12k,12l,12m)
+   SC-12 12m | block differs; header-only ok
+   (rows not yes: 1)
+
+== pemfp_hdr_hash (variant hdronly_fp; WPA_ONLY=SC-12; WPA_ROWS=12k,12l,12m)
+   SC-12 12l | tag / fp item differ
+   SC-12 12m | block ok; header-only differs
+   (rows not yes: 2)
+
+== pemfp_hdr_noitem (variant hdronly_noitem; WPA_ONLY=SC-12; WPA_ROWS=12k,12l,12m)
+   SC-12 12m | block ok; header-only differs
+   (rows not yes: 1)

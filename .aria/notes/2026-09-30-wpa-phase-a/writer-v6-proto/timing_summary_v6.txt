@@ -1,0 +1,226 @@
+timing_summary_v6 -- W14 time tiers on the target prototype and on the bad implementations of the tiers; the SC-34 per-process CPU caps (proposal W14 item 5, SC-30, SC-34)
+
+Method (proto/timing.py): the baseline hook (aria 268da8f) and the target hook run INTERLEAVED (A/B/A/B...) on the same input on the same host; per run the CPU time (user+sys, via RUSAGE_CHILDREN
+deltas, i.e. the whole process tree of the hook) and the wall time are recorded; the statistic per hook is the MINIMUM over N interleaved runs, the verdict statistic is the CPU ratio
+target / baseline.  Wall time and load average are recorded, never judged.  `--judge` prints verdict=PASS|FAIL per bounded tier against the W14 bounds:
+(f) <= 3.0 as a pure ratio; (f0) target <= 1.5 x max(baseline, 100 ms); (f-hit) <= 3.0; (g-a) / (g-b) <= 2.5; (h2) <= 1.5; (i1) / (i2) <= 2.0; (i3-a..e) <= 2.5; (i3-f / g / h) <= 5.0.
+A failed liveness assertion fails the tier.  w1 (a Read result through the L3 hook; the baseline hook does not extract file.content and exits early) and h1 / fh-0 are informational.
+Host: Linux 6.17.9-1-pve, 4 cores, shared (other tenants); the 1-minute load average is printed in the headers of the runs below.  Numbers move with the host; only ratios are judged.
+Bad implementations: every one exceeds its bound or fails its liveness check (rows below).  The quadratic value-extraction idioms are also measured on the 500 KB SC-34 members (bad_cost500) and the
+linear members under the probe's own cap (cap_lin: the smallest whole-second `ulimit -t` under which each member is still detected; member_matrix: which members each bad implementation fails).
+
+
+################ target prototype (good): all tiers, 5 pairs, --judge ################
+$ proto/run_timing_good6.sh  (python3 proto/timing.py base/aria/hooks work/t6/aria/hooks f,f0,g,gmax,h,i,w1,fhit,i3 --pairs 5 --judge)
+== good-prototype timing main: tree=/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v6/work/t6 load(start)=0.94 1.38 2.73 12:19:18
+h1 150 ref-bearing segments, all allowed     CPU min base  0.973s target  2.433s ratio  2.50 | wall min base  0.977s target  2.448s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.000s target  1.208s ratio  1.21 | wall min base  1.000s target  1.213s | rc [('A', 2), ('B', 2)] live-calls=ok() verdict=PASS
+g-a 4000 B string, 8 assign(len 300), 40 refs CPU min base  0.619s target  0.896s ratio  1.45 | wall min base  0.620s target  0.894s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass) verdict=PASS
+g-b 4000 B string, 16 assign(len 100), 128 refs CPU min base  0.683s target  1.439s ratio  2.11 | wall min base  0.681s target  1.443s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass) verdict=PASS
+f  200 entries, Bash benign                  CPU min base  0.050s target  0.080s ratio  1.60 | wall min base  0.048s target  0.070s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass) verdict=PASS
+f  200 entries, Read benign                  CPU min base  0.048s target  0.074s ratio  1.55 | wall min base  0.046s target  0.065s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass) verdict=PASS
+f0 no extension, Bash benign                 CPU min base  0.050s target  0.062s ratio  1.25 | wall min base  0.048s target  0.059s | rc [('A', 0), ('B', 0)] verdict=PASS
+f0 no extension, Read benign                 CPU min base  0.045s target  0.048s ratio  1.09 | wall min base  0.043s target  0.045s | rc [('A', 0), ('B', 0)] verdict=PASS
+fh-a 4 KB single line, one occurrence at the end CPU min base  0.616s target  1.240s ratio  2.01 | wall min base  0.615s target  1.240s | rc [('A', 0), ('B', 0)] verdict=PASS
+   liveness: ok(_sg_core_eval x2)
+fh-b 4 KB single line, 64 occurrences after the padding CPU min base  0.930s target  1.898s ratio  2.04 | wall min base  0.931s target  1.896s | rc [('A', 0), ('B', 0)] verdict=PASS
+   liveness: ok(_sg_core_eval x2)
+fh-0 4 KB single line, no occurrence (control) CPU min base  0.622s target  0.656s ratio  1.05 | wall min base  0.624s target  0.649s | rc [('A', 0), ('B', 0)]
+   liveness: ok(_sg_core_eval x1)
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.273s target  0.374s ratio  1.37 | wall min base  0.188s target  0.271s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.285s target  0.419s ratio  1.47 | wall min base  0.196s target  0.306s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.734s target  0.909s ratio  1.24 | wall min base  0.652s target  0.798s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.275s target  0.481s ratio  1.75 | wall min base  0.188s target  0.377s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.325s target  0.388s ratio  1.19 | wall min base  0.241s target  0.277s | rc [('A', 0), ('B', 0)] live=(True, True) verdict=PASS
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.369s target  1.185s ratio  3.21 | wall min base  0.266s target  1.056s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.374s target  1.159s ratio  3.10 | wall min base  0.270s target  1.033s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.353s target  1.169s ratio  3.31 | wall min base  0.250s target  1.037s | rc [('A', 0), ('B', 0)] live=(False, True) verdict=PASS
+i1 ~900 KB dense bearer lines                CPU min base  0.622s target  0.785s ratio  1.26 | wall min base  0.489s target  0.610s | rc [('A', 0), ('B', 0)] live=(True, True) verdict=PASS
+i2 ~600 KB dense json password lines         CPU min base  0.781s target  0.923s ratio  1.18 | wall min base  0.647s target  0.768s | rc [('A', 0), ('B', 0)] live=(True, True) verdict=PASS
+w1 Read 4 KB clean prose                     CPU min base  0.104s target  0.299s ratio  2.86 | wall min base  0.102s target  0.199s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 60 KB clean prose                    CPU min base  0.120s target  0.345s ratio  2.87 | wall min base  0.114s target  0.236s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 180 KB dense INI assignments         CPU min base  0.129s target  0.944s ratio  7.34 | wall min base  0.116s target  0.785s | rc [('A', 0), ('B', 0)] live=(False, True)
+judge: 19 bounded tiers, 0 failed
+rc=0
+== done load(end)=2.05 1.64 2.61 12:21:56
+
+################ target prototype (good): tiers f f0, 15 pairs (the 5-pair run above shows the spread: f / f0 minima move by +-10 ms with the host) ################
+== good-prototype timing f/f0 15 pairs: tree=/tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/writer-v6/work/t6 load(start)=2.05 1.64 2.61 12:21:56
+f  200 entries, Bash benign                  CPU min base  0.049s target  0.080s ratio  1.64 | wall min base  0.047s target  0.070s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass) verdict=PASS
+f  200 entries, Read benign                  CPU min base  0.043s target  0.069s ratio  1.61 | wall min base  0.041s target  0.060s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass) verdict=PASS
+f0 no extension, Bash benign                 CPU min base  0.055s target  0.063s ratio  1.16 | wall min base  0.053s target  0.059s | rc [('A', 0), ('B', 0)] verdict=PASS
+f0 no extension, Read benign                 CPU min base  0.044s target  0.049s ratio  1.12 | wall min base  0.041s target  0.045s | rc [('A', 0), ('B', 0)] verdict=PASS
+judge: 4 bounded tiers, 0 failed
+rc=0
+== done load(end)=2.05 1.65 2.61 12:22:03
+
+################ bad implementations, each on the tier meant to catch it (3 pairs; the slow ones 1 pair) ################
+$ proto/run_timing_variants6.sh 3 1
+== variants pairs=3 slow=1 load=1.30 1.49 2.49 12:23:07
+-- vx_quadratic (remainder after a hit taken with ${s#*"$pat"}) on g / gmax
+g-a 4000 B string, 8 assign(len 300), 40 refs CPU min base  0.618s target  3.131s ratio  5.07 | wall min base  0.618s target  3.139s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+g-b 4000 B string, 16 assign(len 100), 128 refs CPU min base  0.684s target  9.260s ratio 13.54 | wall min base  0.687s target  9.290s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+-- ext_perentry (one grep process per extension entry) on f
+f  200 entries, Bash benign                  CPU min base  0.054s target  0.718s ratio 13.24 | wall min base  0.053s target  0.633s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.045s target  0.421s ratio  9.37 | wall min base  0.043s target  0.343s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+-- no_cap (every span iterated) on i
+i1 ~900 KB dense bearer lines                CPU min base  0.640s target  3.099s ratio  4.84 | wall min base  0.512s target  2.850s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.788s target  5.439s ratio  6.90 | wall min base  0.656s target  5.045s | rc [('A', 0), ('B', 0)] live=(True, True)
+-- vx_interleave (substituted copy judged right after each segment) on h
+h1 150 ref-bearing segments, all allowed     CPU min base  1.011s target  2.350s ratio  2.33 | wall min base  1.015s target  2.350s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  0.983s target  2.206s ratio  2.24 | wall min base  0.989s target  2.222s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_vx_pass)
+-- ext_first (extension before the built-ins) on f / h
+h1 150 ref-bearing segments, all allowed     CPU min base  0.996s target  2.238s ratio  2.25 | wall min base  1.003s target  2.249s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  0.996s target  1.220s ratio  1.23 | wall min base  1.001s target  1.221s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_ext_pass)
+f  200 entries, Bash benign                  CPU min base  0.050s target  0.079s ratio  1.58 | wall min base  0.048s target  0.070s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.042s target  0.070s ratio  1.67 | wall min base  0.040s target  0.061s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+-- ext_v4stage (hand-written quote mask + stage cut per occurrence) on fhit
+fh-a 4 KB single line, one occurrence at the end CPU min base  0.663s target  0.805s ratio  1.21 | wall min base  0.663s target  0.803s | rc [('A', 0), ('B', 0)]
+   liveness: FAIL(_sg_core_eval x1)
+fh-b 4 KB single line, 64 occurrences after the padding CPU min base  1.017s target 21.029s ratio 20.68 | wall min base  1.024s target 21.145s | rc [('A', 0), ('B', 0)]
+   liveness: FAIL(_sg_core_eval x1)
+fh-0 4 KB single line, no occurrence (control) CPU min base  0.651s target  0.665s ratio  1.02 | wall min base  0.654s target  0.661s | rc [('A', 0), ('B', 0)]
+   liveness: ok(_sg_core_eval x1)
+-- ext_perocc_judge (one built-in judgement per occurrence) on fhit
+fh-a 4 KB single line, one occurrence at the end CPU min base  0.624s target  1.242s ratio  1.99 | wall min base  0.626s target  1.237s | rc [('A', 0), ('B', 0)]
+   liveness: ok(_sg_core_eval x2)
+fh-b 4 KB single line, 64 occurrences after the padding CPU min base  0.924s target 60.527s ratio 65.49 | wall min base  0.927s target 60.887s | rc [('A', 0), ('B', 0)]
+   liveness: FAIL(_sg_core_eval x65)
+fh-0 4 KB single line, no occurrence (control) CPU min base  0.609s target  0.678s ratio  1.11 | wall min base  0.608s target  0.672s | rc [('A', 0), ('B', 0)]
+   liveness: ok(_sg_core_eval x1)
+-- val_quadratic (value extraction with the prefix-removal idiom) on i3 / i
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.272s target  9.923s ratio 36.53 | wall min base  0.195s target  9.848s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.280s target  0.407s ratio  1.45 | wall min base  0.192s target  0.298s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.796s target  0.956s ratio  1.20 | wall min base  0.759s target  0.847s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.327s target  0.628s ratio  1.92 | wall min base  0.239s target  0.514s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.318s target 10.369s ratio 32.57 | wall min base  0.231s target 10.313s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.442s target  4.331s ratio  9.80 | wall min base  0.342s target  4.212s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.370s target  4.397s ratio 11.88 | wall min base  0.268s target  4.308s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.369s target  4.240s ratio 11.49 | wall min base  0.265s target  4.125s | rc [('A', 0), ('B', 0)] live=(False, True)
+i1 ~900 KB dense bearer lines                CPU min base  0.640s target  0.871s ratio  1.36 | wall min base  0.503s target  0.702s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.786s target  1.380s ratio  1.76 | wall min base  0.656s target  1.337s | rc [('A', 0), ('B', 0)] live=(True, True)
+-- val_quote_strip (kv value: quote strip with the prefix-removal idiom on a 300 KB unquoted value) on i3
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.379s target  0.595s ratio  1.57 | wall min base  0.369s target  0.751s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.407s target  0.549s ratio  1.35 | wall min base  0.360s target  0.432s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.963s target  1.148s ratio  1.19 | wall min base  0.862s target  1.069s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.301s target  0.492s ratio  1.64 | wall min base  0.212s target  0.384s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.325s target  0.384s ratio  1.18 | wall min base  0.238s target  0.278s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.385s target  4.243s ratio 11.03 | wall min base  0.278s target  4.130s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.394s target  4.376s ratio 11.10 | wall min base  0.293s target  4.260s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.365s target  4.410s ratio 12.09 | wall min base  0.261s target  4.302s | rc [('A', 0), ('B', 0)] live=(False, True)
+-- cli_unbounded / kv_unbounded / cli_v4 / cli_noleft (patterns with unbounded name affixes or no left boundary) on i3
+   [cli_unbounded]
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.276s target  0.387s ratio  1.40 | wall min base  0.195s target  0.279s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.293s target  1.120s ratio  3.82 | wall min base  0.201s target  1.010s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.832s target  0.913s ratio  1.10 | wall min base  0.750s target  0.803s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.297s target  0.487s ratio  1.64 | wall min base  0.211s target  0.375s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.324s target  0.379s ratio  1.17 | wall min base  0.238s target  0.271s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.401s target  1.384s ratio  3.45 | wall min base  0.300s target  1.304s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.380s target  1.210s ratio  3.19 | wall min base  0.279s target  1.078s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.362s target  1.173s ratio  3.24 | wall min base  0.259s target  1.047s | rc [('A', 0), ('B', 0)] live=(False, True)
+   [kv_unbounded]
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.286s target  0.394s ratio  1.38 | wall min base  0.204s target  0.288s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.287s target  0.422s ratio  1.47 | wall min base  0.197s target  0.311s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.730s target  3.141s ratio  4.30 | wall min base  0.638s target  3.047s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.269s target  0.422s ratio  1.57 | wall min base  0.184s target  0.332s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.326s target  0.421s ratio  1.29 | wall min base  0.236s target  0.312s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.395s target  1.222s ratio  3.09 | wall min base  0.286s target  1.095s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.367s target  1.179s ratio  3.22 | wall min base  0.264s target  1.056s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.354s target  1.230s ratio  3.47 | wall min base  0.253s target  1.112s | rc [('A', 0), ('B', 0)] live=(False, True)
+   [cli_v4]
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.302s target  0.430s ratio  1.43 | wall min base  0.212s target  0.332s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.312s target 305.087s ratio 977.57 | wall min base  0.220s target 308.049s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.741s target  0.947s ratio  1.28 | wall min base  0.652s target  0.840s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.280s target  0.541s ratio  1.93 | wall min base  0.196s target  0.499s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.379s target  0.420s ratio  1.11 | wall min base  0.293s target  0.307s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.392s target  1.265s ratio  3.22 | wall min base  0.287s target  1.141s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.469s target  1.264s ratio  2.70 | wall min base  0.366s target  1.122s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.358s target  1.237s ratio  3.46 | wall min base  0.255s target  1.112s | rc [('A', 0), ('B', 0)] live=(False, True)
+   [cli_noleft]
+i3-a 8 KB header value (auth-header-token)   CPU min base  0.282s target  0.396s ratio  1.40 | wall min base  0.195s target  0.290s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-b 60 KB `-` run + flag (cli-secret-flag)  CPU min base  0.301s target  3.290s ratio 10.92 | wall min base  0.215s target  3.192s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-c 100 KB upper-case run + key (kv-secret-assign) CPU min base  0.805s target  1.071s ratio  1.33 | wall min base  0.716s target  0.958s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-d 8 KB blank run, export form (kv-secret-assign) CPU min base  0.308s target  0.596s ratio  1.93 | wall min base  0.243s target  0.517s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-e 8 KB bearer value (baseline tag)        CPU min base  0.488s target  0.609s ratio  1.25 | wall min base  0.631s target  0.873s | rc [('A', 0), ('B', 0)] live=(True, True)
+i3-f 300 KB unquoted value, `KEY = v` (kv-secret-assign) CPU min base  0.619s target  1.925s ratio  3.11 | wall min base  0.841s target  2.318s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-g 300 KB unquoted value, `export KEY=v` (kv-secret-assign) CPU min base  0.540s target  1.435s ratio  2.66 | wall min base  0.542s target  1.297s | rc [('A', 0), ('B', 0)] live=(False, True)
+i3-h 300 KB unquoted value, YAML `  KEY: v` (kv-secret-assign) CPU min base  0.393s target  1.193s ratio  3.03 | wall min base  0.282s target  1.064s | rc [('A', 0), ('B', 0)] live=(False, True)
+== done 12:35:08 load=2.82 2.17 2.28
+
+################ the 500 KB SC-34 members: TOTAL cpu of the quadratic value-extraction variants vs the target ################
+== bad value-extraction variants, one 500 KB member each, TOTAL cpu (hook + children), load 1.79 3.16 2.75 13:12:24
+-- val_quote_strip
+kv-eq                          500 KB  cpu  10.30 s  tag=yes
+-- val_quote_strip
+kv-export                      500 KB  cpu  10.30 s  tag=yes
+-- val_quote_strip
+kv-yaml                        500 KB  cpu  10.35 s  tag=yes
+-- val_kv_blank
+kv-blank-before-eq             500 KB  cpu  10.74 s  tag=yes
+-- val_json_colon
+json-blank-before-colon        500 KB  cpu  10.08 s  tag=yes
+-- val_url_at
+pg-long-password               500 KB  cpu  10.46 s  tag=yes
+-- val_url_at
+pg-long-user                   500 KB  cpu  19.36 s  tag=yes
+-- val_url_at
+basicauth-long                 500 KB  cpu   9.99 s  tag=yes
+-- val_envline_eq
+envline-long-key               500 KB  cpu  10.97 s  tag=yes
+-- target (for comparison)
+kv-eq                          500 KB  cpu   1.84 s  tag=yes
+kv-export                      500 KB  cpu   1.74 s  tag=yes
+kv-yaml                        500 KB  cpu   1.90 s  tag=yes
+kv-blank-before-eq             500 KB  cpu   1.49 s  tag=yes
+json-blank-before-colon        500 KB  cpu   1.48 s  tag=yes
+pg-long-password               500 KB  cpu   1.52 s  tag=yes
+pg-long-user                   500 KB  cpu   1.47 s  tag=yes
+basicauth-long                 500 KB  cpu   1.18 s  tag=yes
+envline-long-key               500 KB  cpu   1.65 s  tag=yes
+== done 13:14:20
+
+################ the linear members under the probe's own cap: smallest whole-second per-process CPU cap that still detects (cap_lin.py) ################
+LIN_BASE  bearer-long-value                    1
+LIN_BASE  x-api-key-long-value                 1
+LIN_BASE  env-line-long-value                  1
+LIN_BASE  env-line-long-key                    1
+LIN_BASE  postgres-long-password               1
+LIN_BASE  postgres-long-user                   1
+LIN_BASE  basic-auth-long-password             1
+LIN_BASE  json-secret-long-value               1
+LIN_BASE  json-secret-blank-before-colon       1
+LIN_NEW   cli-dash-run                         1
+LIN_NEW   cli-letter-dash-run                  1
+LIN_NEW   cli-long-value                       1
+LIN_NEW   kv-upper-run                         1
+LIN_NEW   kv-export-blank-run                  1
+LIN_NEW   kv-blank-before-delimiter            1
+LIN_NEW   kv-long-unquoted-value-eq            1
+LIN_NEW   kv-long-unquoted-value-export        1
+LIN_NEW   kv-long-unquoted-value-yaml          1
+LIN_NEW   auth-long-value                      1
+LIN_NEW   auth-blank-run                       1
+LIN_NEW   cf-blank-run                         1
+LIN_NEW   json-blank-run                       1
+LIN_NEW   json-blank-before-colon              1
+# members: 23 detected under the 4 s cap: 23 max minimal cap: 1
+
+################ which SC-34 members each bad implementation fails under the 4 s cap (member_matrix.py, final probe members) ################
+target: 0 not detected under 4 s: -
+val_quote_strip: 3 not detected under 4 s: kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml
+val_kv_blank: 1 not detected under 4 s: kv-blank-before-delimiter
+val_json_colon: 2 not detected under 4 s: json-secret-blank-before-colon, json-blank-before-colon
+val_url_at: 3 not detected under 4 s: postgres-long-password, postgres-long-user, basic-auth-long-password
+val_envline_eq: 1 not detected under 4 s: env-line-long-key
+val_far_delim: 10 not detected under 4 s: env-line-long-key, postgres-long-password, postgres-long-user, basic-auth-long-password, json-secret-blank-before-colon, kv-blank-before-delimiter, kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml, json-blank-before-colon
+val_quadratic: 13 not detected under 4 s: bearer-long-value, env-line-long-key, postgres-long-password, postgres-long-user, basic-auth-long-password, json-secret-blank-before-colon, kv-export-blank-run, kv-blank-before-delimiter, kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml, auth-long-value, json-blank-before-colon
+
+################ the same matrix with the export-blank member at 400 KB, three jobs on a busy host: the TARGET itself fails that member (why it is 100 KB) ################
+target: 1 not detected under 4 s: kv-export-blank-run
+val_quote_strip: 4 not detected under 4 s: kv-export-blank-run, kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml
+val_kv_blank: 2 not detected under 4 s: kv-export-blank-run, kv-blank-before-delimiter
+val_json_colon: 2 not detected under 4 s: json-secret-blank-before-colon, json-blank-before-colon
+val_url_at: 4 not detected under 4 s: postgres-long-password, postgres-long-user, basic-auth-long-password, kv-export-blank-run
+val_envline_eq: 2 not detected under 4 s: env-line-long-key, kv-export-blank-run
+val_far_delim: 11 not detected under 4 s: env-line-long-key, postgres-long-password, postgres-long-user, basic-auth-long-password, json-secret-blank-before-colon, kv-export-blank-run, kv-blank-before-delimiter, kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml, json-blank-before-colon
+val_quadratic: 13 not detected under 4 s: bearer-long-value, env-line-long-key, postgres-long-password, postgres-long-user, basic-auth-long-password, json-secret-blank-before-colon, kv-export-blank-run, kv-blank-before-delimiter, kv-long-unquoted-value-eq, kv-long-unquoted-value-export, kv-long-unquoted-value-yaml, auth-long-value, json-blank-before-colon

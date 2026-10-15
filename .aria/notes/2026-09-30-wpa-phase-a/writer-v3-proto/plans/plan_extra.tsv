@@ -1,0 +1,6 @@
+wl_cmdsub	l3	wl_cmdsub	SC-7,SC-11
+pem_nofp	l3	pem_nofp	SC-12	12k
+pem_hash	l3	pem_hash	SC-12	12k
+noentropy_sc33	l3	noentropy	SC-33
+fp_relpath	l3	fp_relpath	SC-10	10l
+fp_kebab	l3	fp_kebab	SC-10	10l

@@ -1,0 +1,55 @@
+# --- Z: the four baseline wrappers, plain forms (baseline already blocks) and non-baseline spellings
+docker exec c env
+docker exec c "env"
+docker exec c 'env'
+docker exec c 'printenv'
+docker exec c printenv
+docker exec c printenv HOME
+docker exec c printenv NODE_ENV
+x=$(docker exec c env)
+docker exec c env > /tmp/x
+docker compose exec web env
+docker compose exec web 'env'
+docker compose exec web printenv NODE_ENV
+podman exec c env
+podman exec c "env"
+podman exec c 'printenv'
+podman exec c printenv HOME
+x=$(podman exec c env)
+kubectl exec pod -- env
+kubectl exec pod -- printenv HOSTNAME
+kubectl exec pod env
+kubectl exec pod 'env'
+kubectl exec pod "env"
+kubectl exec pod printenv
+kubectl exec pod env > /tmp/x
+x=$(kubectl exec pod env)
+x=$(kubectl exec pod -- env)
+lxc exec c -- env
+lxc exec c -- printenv HOME
+lxc exec c env
+lxc exec c 'printenv'
+lxc exec c printenv
+lxc exec c printenv HOME
+lxc exec c -- sh -c 'env'
+# --- the other seven wrappers with printenv NAME
+ssh host printenv PATH
+ssh host 'printenv PATH'
+nomad alloc exec abc printenv HOME
+pct exec 101 -- printenv HOME
+sh -c 'printenv HOME'
+bash -c "printenv LANG"
+watch printenv X
+# --- direct execution
+printenv HOME
+printenv
+env
+env | sort
+env FOO=1 ls
+sudo printenv HOME
+# --- must stay allowed
+docker exec c env FOO=1 ls
+docker exec c ls
+kubectl exec pod -- ls
+nomad alloc exec abc env FOO=1 true
+docker exec c printenv | wc -c

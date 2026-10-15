@@ -1,0 +1,51 @@
+# --- AA row 1: command-position members of the process-table row
+true & ps aux
+{ ps aux; }
+echo `ps aux`
+true; ps aux
+true | ps aux
+true | xargs ps aux
+(ps aux)
+x=$(true) ps aux
+true) ps aux
+echo x\tps aux
+# --- AA row 2: cluster letters anywhere / operand positions / spelling positions
+pgrep -fa curl
+pgrep -la curl
+pgrep -ifa curl
+pgrep -u root -a curl
+pgrep -x -af nginx
+pstree -pa
+pstree -ua
+pstree -p -a
+ps -eF
+ps -F -p 123
+ps -p 123 -f
+ps -e -f
+ps -p 1 -F
+ps -p 1 -o args
+docker ps -a --no-trunc
+docker container ls -a --no-trunc
+docker ps -q --no-trunc
+timeout 5m ps aux
+timeout 2h ps -ef
+timeout 1d ps aux
+timeout 30s ps aux
+timeout 5 ps aux
+# --- AA row 3: -o list keyword positions
+ps -eo args,pid
+ps -o cmd,%mem -p 1
+ps -eo pid,args,etime
+ps -o comm,args -p 1
+ps --format cmd,pid
+ps --format pid,args,etime
+ps -p 1 -o pid,command
+# --- negatives that must stay allowed
+ps -eo pid,comm
+ps -p 123 -o pid,comm
+pgrep -f curl
+pgrep -u root curl
+pstree -p
+docker ps -a
+docker ps --filter name=x
+timeout 5m ls

@@ -1,0 +1,95 @@
+drop_reader_cat	l1	drop_reader:cat	SC-16,SC-19	16q,19u
+drop_reader_grep	l1	drop_reader:grep	SC-16,SC-19	16q,19u
+drop_reader_egrep	l1	drop_reader:egrep	SC-16,SC-19	16q,19u
+drop_reader_fgrep	l1	drop_reader:fgrep	SC-16,SC-19	16q,19u
+drop_reader_rg	l1	drop_reader:rg	SC-16,SC-19	16q,19u
+drop_reader_head	l1	drop_reader:head	SC-16,SC-19	16q,19u
+drop_reader_tail	l1	drop_reader:tail	SC-16,SC-19	16q,19u
+drop_reader_less	l1	drop_reader:less	SC-16,SC-19	16q,19u
+drop_reader_more	l1	drop_reader:more	SC-16,SC-19	16q,19u
+drop_reader_strings	l1	drop_reader:strings	SC-16,SC-19	16q,19u
+drop_reader_awk	l1	drop_reader:awk	SC-16,SC-19	16q,19u
+drop_reader_sed	l1	drop_reader:sed	SC-16,SC-19	16q,19u
+drop_reader_jq	l1	drop_reader:jq	SC-16,SC-19	16q,19u
+drop_reader_nl	l1	drop_reader:nl	SC-16,SC-19	16q,19u
+drop_reader_tac	l1	drop_reader:tac	SC-16,SC-19	16q,19u
+drop_reader_rev	l1	drop_reader:rev	SC-16,SC-19	16q,19u
+drop_reader_sort	l1	drop_reader:sort	SC-16,SC-19	16q,19u
+drop_reader_uniq	l1	drop_reader:uniq	SC-16,SC-19	16q,19u
+drop_reader_cut	l1	drop_reader:cut	SC-16,SC-19	16q,19u
+drop_reader_paste	l1	drop_reader:paste	SC-16,SC-19	16q,19u
+drop_reader_diff	l1	drop_reader:diff	SC-16,SC-19	16q,19u
+drop_reader_cmp	l1	drop_reader:cmp	SC-16,SC-19	16q,19u
+drop_reader_comm	l1	drop_reader:comm	SC-16,SC-19	16q,19u
+drop_reader_xxd	l1	drop_reader:xxd	SC-16,SC-19	16q,19u
+drop_reader_od	l1	drop_reader:od	SC-16,SC-19	16q,19u
+drop_reader_hexdump	l1	drop_reader:hexdump	SC-16,SC-19	16q,19u
+drop_reader_base64	l1	drop_reader:base64	SC-16,SC-19	16q,19u
+drop_reader_column	l1	drop_reader:column	SC-16,SC-19	16q,19u
+drop_reader_fold	l1	drop_reader:fold	SC-16,SC-19	16q,19u
+drop_extreader_cat	l1	drop_extreader:cat	SC-19	19u
+drop_extreader_grep	l1	drop_extreader:grep	SC-19	19u
+drop_extreader_egrep	l1	drop_extreader:egrep	SC-19	19u
+drop_extreader_fgrep	l1	drop_extreader:fgrep	SC-19	19u
+drop_extreader_rg	l1	drop_extreader:rg	SC-19	19u
+drop_extreader_head	l1	drop_extreader:head	SC-19	19u
+drop_extreader_tail	l1	drop_extreader:tail	SC-19	19u
+drop_extreader_less	l1	drop_extreader:less	SC-19	19u
+drop_extreader_more	l1	drop_extreader:more	SC-19	19u
+drop_extreader_strings	l1	drop_extreader:strings	SC-19	19u
+drop_extreader_awk	l1	drop_extreader:awk	SC-19	19u
+drop_extreader_sed	l1	drop_extreader:sed	SC-19	19u
+drop_extreader_jq	l1	drop_extreader:jq	SC-19	19u
+drop_extreader_nl	l1	drop_extreader:nl	SC-19	19u
+drop_extreader_tac	l1	drop_extreader:tac	SC-19	19u
+drop_extreader_rev	l1	drop_extreader:rev	SC-19	19u
+drop_extreader_sort	l1	drop_extreader:sort	SC-19	19u
+drop_extreader_uniq	l1	drop_extreader:uniq	SC-19	19u
+drop_extreader_cut	l1	drop_extreader:cut	SC-19	19u
+drop_extreader_paste	l1	drop_extreader:paste	SC-19	19u
+drop_extreader_diff	l1	drop_extreader:diff	SC-19	19u
+drop_extreader_cmp	l1	drop_extreader:cmp	SC-19	19u
+drop_extreader_comm	l1	drop_extreader:comm	SC-19	19u
+drop_extreader_xxd	l1	drop_extreader:xxd	SC-19	19u
+drop_extreader_od	l1	drop_extreader:od	SC-19	19u
+drop_extreader_hexdump	l1	drop_extreader:hexdump	SC-19	19u
+drop_extreader_base64	l1	drop_extreader:base64	SC-19	19u
+drop_extreader_column	l1	drop_extreader:column	SC-19	19u
+drop_extreader_fold	l1	drop_extreader:fold	SC-19	19u
+drop_interp_python3	l1	drop_interp:python3	SC-16,SC-19,SC-22	16h,16n,16o,19o,19u,22bg
+drop_interp_node	l1	drop_interp:node	SC-16,SC-19,SC-22	16h,16n,16o,19o,19u,22bg
+ext_max199	l1	ext_max199	SC-19,SC-20
+ext_max201	l1	ext_max201	SC-19,SC-20
+ext_size32767	l1	ext_size32767	SC-19,SC-20
+ext_size32769	l1	ext_size32769	SC-19,SC-20
+ext_minlen3	l1	ext_minlen3	SC-19,SC-20
+ext_minlen5	l1	ext_minlen5	SC-19,SC-20
+ext_maxlen199	l1	ext_maxlen199	SC-19,SC-20
+ext_maxlen201	l1	ext_maxlen201	SC-19,SC-20
+ext_nosym	l1	ext_nosym	SC-19,SC-20
+ext_occ63	l1	ext_occ63	SC-19,SC-20
+ext_occ65	l1	ext_occ65	SC-19,SC-20
+ext_bare	l1	ext_bare	SC-19,SC-20
+ext_first	l1	ext_first	SC-19,SC-20
+ext_regex	l1	ext_regex	SC-19,SC-20
+ext_trunc	l1	ext_trunc	SC-19,SC-20
+vx_assign15	l1	vx_assign15	SC-21
+vx_assign17	l1	vx_assign17	SC-21
+vx_repl7	l1	vx_repl7	SC-21
+vx_repl9	l1	vx_repl9	SC-21
+vx_noquote	l1	vx_noquote	SC-21
+vx_interleave	l1	vx_interleave	SC-21
+vx_start_only	l1	vx_start_only	SC-21
+drop_assign_export	l1	drop_assign:export	SC-21	21j
+drop_assign_declare	l1	drop_assign:declare	SC-21	21j
+drop_assign_local	l1	drop_assign:local	SC-21	21j
+drop_assign_readonly	l1	drop_assign:readonly	SC-21	21j
+drop_assign_typeset	l1	drop_assign:typeset	SC-21	21j
+read_noboundary	l1	read_noboundary	SC-18	18a,18b,18d,18h,18i
+notight	l1	notight	SC-16	16f,16p
+jq_loose	l1	jq_loose	SC-24
+env_boundary	l1	env_boundary	SC-23
+drop_w12_0	l1	drop_w12:0	SC-23	23a,23b
+drop_w12_1	l1	drop_w12:1	SC-23	23a,23b
+drop_w12_2	l1	drop_w12:2	SC-23	23a,23b
+drop_w12_3	l1	drop_w12:3	SC-23	23a,23b

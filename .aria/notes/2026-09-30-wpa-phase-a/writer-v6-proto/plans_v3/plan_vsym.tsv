@@ -1,0 +1,13 @@
+vsym_kv_plus	l3	drop_vsym:kv:+	SC-6	6k
+vsym_kv_slash	l3	drop_vsym:kv:/	SC-6	6k
+vsym_kv_eq	l3	drop_vsym:kv:=	SC-6	6k
+vsym_kv_dot	l3	drop_vsym:kv:.	SC-6	6k
+vsym_kv_us	l3	drop_vsym:kv:_	SC-6	6k
+vsym_kv_tilde	l3	drop_vsym:kv:~	SC-6	6k
+vsym_kv_dash	l3	drop_vsym:kv:-	SC-6	6k
+vsym_hdr_plus	l3	drop_vsym:hdr:+	SC-6	6k
+vsym_hdr_slash	l3	drop_vsym:hdr:/	SC-6	6k
+vsym_hdr_eq	l3	drop_vsym:hdr:=	SC-6	6k
+vsym_hdr_dot	l3	drop_vsym:hdr:.	SC-6	6k
+vsym_hdr_us	l3	drop_vsym:hdr:_	SC-6	6k
+vsym_hdr_dash	l3	drop_vsym:hdr:-	SC-6	6k
