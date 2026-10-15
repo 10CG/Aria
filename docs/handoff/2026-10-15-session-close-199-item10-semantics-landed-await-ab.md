@@ -27,7 +27,7 @@ updated-at: 2026-10-15T04:26:00Z
 | 时间 | 事项 |
 |---|---|
 | 10-08 08:59 – 09:07 | `/aria:state-scanner` (scan.py exit 0) + 会话入口 claim 核验: 上次心跳已超 SWEEP_TTL 约 141 h, 期间无容器 sweep, claim 仍恰 1 条 active; 前置检查退出 0 → 强制对齐 → 心跳 `84dd85a` 推后核验 MATCH; 台账补行 (含 scan 先于核验的顺序偏离, 如实记录); **顺手处理**: 3 项 custom check FAIL 核实为 feature 落后 master 所致 (master 侧均已是 1.74.1), 无需动作 |
-| 10-08 09:0x – 11:0x | 两项新语义 (Q1 Level 取不到 / Q2 步骤 5 缺支) 调研: 临时仓四配置实跑 (adaptive+`--no-spec` 落格 D / undetermined-bypassed / convergence+dangling 落格 E / 多 change 混合 Level), 从上一会话运行记录提取第三轮复核的 StructuredOutput 原始报告, 读 proposal §1.4 五格与 R-1/R-2 归约、门脚本 `resolve_pre_merge_axes` / `resolve_checkpoint_mode`、决策单 #8 / #9 / #10 先例; AB 套件 6 题与 TASK-027 第 4 步 (c) 的重跑触发面核对 |
+| 10-08 09:0x – 11:0x | 两项新语义 (Q1 Level 取不到 / Q2 步骤 5 缺支) 调研: 临时仓四配置实跑 (adaptive+`--no-spec` 落格 D / undetermined-bypassed / convergence+dangling 落格 E / 多 change 混合 Level), 从上一会话运行记录提取第三轮复核的 StructuredOutput 原始报告, 读 proposal §1.4 五格与 R-1/R-2 归约、门脚本 `resolve_pre_merge_axes` / `resolve_checkpoint_mode`、决策单第 8 / 9 / 10 项先例; AB 套件 6 题与 TASK-027 第 4 步 (c) 的重跑触发面核对 |
 | 10-08 | AskUserQuestion 两问两答: **Q1 按上界跑** (adaptive 三档最严非 off / convergence、challenge 档位值 / manual off; 多 change 任一非 off 即执行、取最严归约); **Q2 补上** (门 pass/bypassed 而精确 off ⇒ 不执行审计, on_skip 继续合并 + [INFO] 留痕 + audit_verdict 无值不新增取值) |
 | 10-15 00:04 – 00:05 | 新会话入口 claim 核验 (距上次心跳 6.7 d, 仍恰 1 条 active; 期间他轨把协调 ref 推到 `1d196da`, 对齐丢弃零本轨提交) + 心跳 `cb50da2` 推后核验 MATCH; 核实 aria 上游未动、WP-A 已进 Phase B (与两 Skill 零重叠) |
 | 10-15 00:0x – 02:xx | 裁定落地: 决策单第 10 项 (主仓 `8b68563`) → 执笔新实例 `adc0d29909bba7c80` (`aria:knowledge-manager`, 非组 3 前几轮作者) 按规格改两文件 → 主控机检 26/26 (SC-13 计数 / n1–n4 / n8 / 四份 frontmatter 对 `bdf56d2` 逐字 / 禁用字形·NUL·行尾) → 只读复核新实例 `af212af73e2aaf71c` (`aria:code-reviewer`) **pass, 0 major / 4 minor** → 4 条 minor 全采纳 (bullet 换序、段首补例外半句、来源枚举镜像裁定、例注补 `/bypassed`), 主控执笔微调并记录 → 三套回归在最终文本上全绿 (`Ran 133` / `1650` / `148` 全 OK) → aria 提交 `53b8e5c` → 台账「组 3 追加」节 + 决策单落地表第 10 行 (主仓 `cdea732`) |
@@ -63,7 +63,7 @@ updated-at: 2026-10-15T04:26:00Z
 
 1. **心跳截止 2026-10-16T04:21Z**, AB 会话推不出心跳 (§0 第 2 条)。
 2. **aria 上游再前进** (最可能来自 WP-A 发版) 会让 TASK-024 第 3 条基线前提不成立 —— 照条停下, 不在 AB 会话里补并入; 5.5 取号前也要读对方 handoff + `ls-remote --tags` (并发发版抢号)。
-3. **standards 本地落后 origin 3 个提交** (`9656500`, 他轨在 Forgejo 合并的 #21 / #23 文档变更, github 镜像未同步): 本轨不碰 standards, 无需动作; 但恢复涉及 standards 基线的任务前先 `git -C standards fetch origin`。该分叉属他轨的双推纪律问题, 记录在案。
+3. **standards 本地落后 origin 3 个提交** (`9656500`, 他轨在 Forgejo 合并的 10CG/aria-standards#21 / 10CG/aria-standards#23 文档变更, github 镜像未同步): 本轨不碰 standards, 无需动作; 但恢复涉及 standards 基线的任务前先 `git -C standards fetch origin`。该分叉属他轨的双推纪律问题, 记录在案。
 4. **5.8 等待点 16 预期会停一次**: 决策单提交 (`8b68563` / `cdea732`) 判 `foreign` (预期内, 读前必看第 30 条); 本 handoff 的 `latest.md` 更新提交 (无 track-id) 同判 `foreign`。
 5. **两个 feature 分支只在本地**, 直到 5.6; 本机以外没有副本。
 
@@ -84,7 +84,7 @@ updated-at: 2026-10-15T04:26:00Z
 |---|---|
 | 主仓 | feature 本地 `cdea732` (领先分叉点 `8d2ff8b`), 未推 (计划内); master 两端 `6675291` 未动 |
 | aria | feature 本地 `53b8e5c` (含上游 `268da8f`), 未推 (计划内); master `5215cf2` 落后 origin/master 3 提交 (v1.74.1, 他轨) |
-| standards | 本地 `2bc1c4c`; github equal / **origin `9656500` 领先 3 提交** (他轨 #21/#23, 见 §3 第 3 条) |
+| standards | 本地 `2bc1c4c`; github equal / **origin `9656500` 领先 3 提交** (他轨 10CG/aria-standards#21 / 10CG/aria-standards#23, 见 §3 第 3 条) |
 | aria-orchestrator | `237045a`, 两端 equal |
 | 协调 ref | `ad08b18`, 与 origin 一致; 本轨唯一 active claim `claims/bfe8285d/s-73b9@1606.yaml`, 心跳 `2026-10-15T04:21:37Z` |
 | 台账 | 未跟踪, 记到收尾心跳为止 (含本会话三行心跳与「组 3 追加」节) |

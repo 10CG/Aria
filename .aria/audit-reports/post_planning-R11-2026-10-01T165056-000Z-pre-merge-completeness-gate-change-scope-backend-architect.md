@@ -31,7 +31,7 @@ is_refocus: false
 - `test_completeness_gate.py`:1356-1565(`test_empty_checkpoint_set_three_buckets`,含 SC-15.10 格);`grep -c '^    def test_'` 两份测试文件各自计数(104、29)
 - `config-loader/DEFAULTS.json`(`audit` 块)、`config-loader/SKILL.md`:305-344(§旧配置兼容层)
 - `ls aria/skills/audit-engine/scripts/` 实况
-- CLAUDE.md 多远程推送两条硬约束与不可协商规则 #3/#6/#8/#10:已随 system prompt 提供全文,未重复 Read
+- CLAUDE.md 多远程推送两条硬约束与不可协商规则 Rule #3 / Rule #6 / Rule #8 / Rule #10:已随 system prompt 提供全文,未重复 Read
 
 **自我纪律说明**:会话早期在共享副本内跑过一次 `git diff fde9c1f 09c5130 -- tasks.md detailed-tasks.yaml`(只读、未留缓存、未改内容)取 v2.10→v2.11 diff;之后已停止在共享副本内运行任何 git 命令,改用 Read/grep/wc/python3 读当前工作树(工作树本就是 `09c5130`/`88689aa`,查现状不需要 git)。按派单纪律本不应在共享副本内跑 git 命令(即使只读),如实记录。
 

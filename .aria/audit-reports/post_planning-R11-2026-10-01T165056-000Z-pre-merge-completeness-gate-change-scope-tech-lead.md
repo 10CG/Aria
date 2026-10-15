@@ -35,7 +35,7 @@ is_refocus: false
   - `tests/test_completeness_gate.py`：SC-15.10 格（`:1515-1560`）、常量引用（`:2212-2302`）
   - `scripts/completeness_gate.py:76`、`:92`、`:104`、`:1006-1012`、`:1505-1580`
 - sibling-spec-probe 归档 `proposal.md:179`。
-- `standards/conventions/git-commit.md` §2 / §8.1；CLAUDE.md 的两条多远程硬约束，以及 Rule #3 / #6 / #8 / #10。
+- `standards/conventions/git-commit.md` §2 / §8.1；CLAUDE.md 的两条多远程硬约束，以及 Rule #3 / Rule #6 / Rule #8 / Rule #10。
 
 实跑（都在我的副本里）：
 

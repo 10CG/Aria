@@ -43,7 +43,7 @@ WITHOUT_BETTER: **0** (无任何 eval 的 without 优于 with; 回归判据的�
 - **pc-1 断言 3 是 phase-c 套件唯一有 A/B 区分度的格** (grader 两席独立指出): 但 prompt 未给 change_id, 会奖励虚构引用 —— without 臂「不虚构→省略」判 FAIL 字面成立, 该红是诚实代价不是能力差; follow-up: prompt 补 change_id 或断言改两可。
 - **pc-2 三断言偏泛** (grader: 对任何合格冲突处置散文都偏松, 真正区分 skill 价值的分支选择与重过闸纪律未覆盖) —— 已知限制, follow-up 记入套件缺口 (与本轮三条 fixture 缺口同归 TASK-031 issue 面)。
 - **pc-3 断言 1 字面读法与 SKILL 自身 per-remote 设计冲突** (grader 建议); 另有「判分集缺 fidelity 维度 — 编造机制细节同样能拿 9/9」的普遍观察, 双臂 9/9 下无区分 (预期回归面)。
-- **without 臂独立性**: pc-3 without grader 注意到 response 的脚本内部细节与快照源码逐字吻合 —— 该臂实读工作树内 skill 源码是其合法输入 (skill 目录), 非污染; 但建议 (套件层面) 记录文件访问面或隔离, 与 #116 污染面观察同向。
+- **without 臂独立性**: pc-3 without grader 注意到 response 的脚本内部细节与快照源码逐字吻合 —— 该臂实读工作树内 skill 源码是其合法输入 (skill 目录), 非污染; 但建议 (套件层面) 记录文件访问面或隔离, 与 10CG/aria-plugin#116 污染面观察同向。
 
 ## §4 污染面 / 已知限
 
