@@ -366,3 +366,7 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **v1.75.0 的 guard/scan 仅 Linux 验证**, 而 #154 泄露报告环境是 **Windows MINGW64 (Git-Bash)**、owner 主力机也是 Windows。风险: ① MINGW64 grep/sed 行为可能异于 GNU (正确性); ② 进程派生 ~10× 慢 (proposal:58 未实测) 叠加 hook 5s 超时 → fail-open (#216), v1.75.0 更重扫描在慢 Windows 上更易踩线 → 守卫在最需要它的机器上**静默失效**, 最坏旧版能拦的重命令新版超时放行 (平台限定潜在回归)。
 - **处置**: 发布不回滚 (加法式 + 已带 Linux-only 披露); 开 follow-up **10CG/aria-plugin#219** (含 Windows Git-Bash 验证 recipe: `cat ~/.aws/credentials` 喂 hook, 期望 exit 2 + real<<5s)。TASK-012 post-ship 复验增 **Windows 平台腿**; **#154 关单 (TASK-013) 以 Windows 实测结果为前提**, 不只凭 Linux。
 - **我 (Linux 容器) 跑不了 Windows 腿** —— 须 owner 在 Windows 主力机、插件更新到 v1.75.0 后执行 #219 recipe。
+
+### Windows/MINGW64 实测 PASS (owner 主力机 qqq-PC, 2026-10-15)
+- owner 在 Windows 跑 #219 recipe: 插件确认 v1.75.0; 一条典型 AWS 凭据读取命令 → **BLOCKED exit=2**, 命中正确路径规则族, **real 0.472s (远 < 5s, 不 fail-open)**; MINGW64 bash 无解析/兼容崩溃。→ 侧席「守卫在 Windows 静默失效」担忧**就典型命令而言被否证**。结果记 10CG/aria-plugin#219 (comment 28755)。
+- 残余 (续 #219): ① 重命令超时尾 (W10 第二遍 / 大文件全扫在慢平台是否 <5s, 备有可选 heavy recipe); ② grep/sed 广度正确性 (6 新 tag + 分类器在 MINGW64 未逐一验)。#154 关单仍以完整 post-ship (含这些 + 其余 6 腿) 为前提。
