@@ -349,3 +349,10 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **诚实边界 (隔离装 2.1.0 实测)**: 该 `unknown hook event` 校验是 CC **2.1.0 之后**才加的 (2.1.0 的 `validate` 不校验事件名、对伪造事件也不报警) → `validate` **不能**回溯证明旧世代运行时是否整份拒绝, 需无头实跑; 实际风险低 (容器 Dockerfile `@latest` = 现世代 2.1.x, fail-safe 适用)。本机**无 docker**, 制品级实测无法在此做。
 - **清单无版本字段**: plugin.json / marketplace schema 无最低 CC 版本字段 (`manifest-reference` 全字段表核过) → 不能靠清单强制。
 - **落地 (owner 两点均「可以」)**: ① `proposal.md` 已知限制加「W1 前向兼容」条 (验证下限 2.1.285 / 2.1.292 + fail-safe + 诚实边界 + #218); ② follow-up **10CG/aria-plugin#218** (t3-verify 容器内 `claude plugin validate /opt/aria-plugin` + 无头触发断言 + `@latest` 版本下限断言); secret-hygiene 部署前提一句归 TASK-010 doc-sync。
+
+### TASK-010 验收结项 (2026-10-15)
+- **全部验收腿 PASS** (主控独立复跑, 记录 `task010-acceptance.md`): 探针 `WPA_REQUIRE_ALL=1` exit 0 · target shape holds (32c/32d/32e/29h/29i/12o/20g 全 ran·yes; 30a git-history 腿另跑); SC-30 真 checkout guard **816/816** (load 1.37, SC-9a + SC-8 五档绿) + scan **129/129**; W14 `timing.py` **20/20 有界档 PASS**; SC-33 归因探针内绿。
+- **g-c 1.04 验证 M6 fail-closed 预算**: 无预算实现在稠密档 3.7–5.0 FAIL, 1.04 = 预算拒绝超限副本。i3 300KB kv 3.04–3.41 (≤5.0), fh 1.99 (≤3.0), i 1.15–1.23 (≤2.0), 均吻合 proposal 原型。
+- **负载透明 (Rule #10)**: SC-8 五档 (真负载敏感腿) 在 load 1.37 (<2) 跑; timing load@start 3.39, 但 W14 §241 判据为负载稳健 CPU 比值 min-over-N、过载兜底 (基线 CPU≥5s) 未触发 (max 1.79s)、比值与原型吻合 ⇒ 有效。严格 <2 复跑 timing 另开窗口即可, 不改判。
+- **doc-sync 落地 SYNCED**: standards 191560e (计数 822/816·129 + §5.7 CC 前向兼容) · aria bae5c10 (CHANGELOG 顶节, 性能/探针结果行实测已填) · 主仓 06c08db。detailed-tasks TASK-010 → done。
+- **下一步**: TASK-011 发版 (取号两端 `ls-remote` + aria 6 发版文件 + 主仓 16 版本点 + 两 gitlink) **需 owner 授权**; TASK-012/013 续。5 条 review minor 延后。

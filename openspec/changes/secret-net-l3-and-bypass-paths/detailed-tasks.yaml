@@ -201,7 +201,7 @@ tasks:
   - id: TASK-010
     parent: "1.10"
     title: "验收 (发版前): 探针目标态全部 yes + SC-30 全绿 (含 W14 时档) + SC-33 归因清单复核"
-    status: pending
+    status: done
     complexity: S
     estimated_hours: "1-1.5"
     dependencies: [TASK-014]
@@ -212,7 +212,7 @@ tasks:
     verification:
       - "WPA_BASH32 + WPA_REQUIRE_ALL=1 运行: 退出码 0, 目标形态 holds, 32c / 32d / 32e / 29h / 29i / 12o / 20g 不是 n/a"
       - "timing.py --judge 全部 PASS (空闲主机, 一分钟负载低于 2)"
-    notes: "2026-10-09 主控裁定 (待 owner 复议): 验收前先把 changelog-draft.md 作为最上一节落入 aria/CHANGELOG.md (版本号用 <vNEXT> 占位), 否则 SC-26 26g 恒 no、目标形态不成立; 占位符由 TASK-011 取号后替换 (custom check no-unresolved-version-placeholder 在此期间会在特性分支上告警, 属预期)。2026-10-14 追加 doc-sync (W1 前向兼容, owner 2026-10-14 批): secret-hygiene.md 加一条部署前提 —— W1 的 `PostToolUseFailure` 扫描需 CC 识别该事件 (验证过的加载下限 2.1.285 / 2.1.292); CC 对未知 hook 事件为 fail-safe (本机 `claude plugin validate` 实测 `unknown hook event; entry ignored at runtime`), 故 secret-guard 与成功路径 secret-scan 与 CC 是否识别该事件无关、始终加载; 详见 proposal 已知限制 W1 条 + follow-up 10CG/aria-plugin#218 (容器制品级实测)。只增不改, 编辑前核该文件 HEAD 行尾 (preserve-crlf), 随发版同步面在 TASK-011 一并落"
+    notes: "2026-10-09 主控裁定 (待 owner 复议): 验收前先把 changelog-draft.md 作为最上一节落入 aria/CHANGELOG.md (版本号用 <vNEXT> 占位), 否则 SC-26 26g 恒 no、目标形态不成立; 占位符由 TASK-011 取号后替换 (custom check no-unresolved-version-placeholder 在此期间会在特性分支上告警, 属预期)。2026-10-14 追加 doc-sync (W1 前向兼容, owner 2026-10-14 批): secret-hygiene.md 加一条部署前提 —— W1 的 `PostToolUseFailure` 扫描需 CC 识别该事件 (验证过的加载下限 2.1.285 / 2.1.292); CC 对未知 hook 事件为 fail-safe (本机 `claude plugin validate` 实测 `unknown hook event; entry ignored at runtime`), 故 secret-guard 与成功路径 secret-scan 与 CC 是否识别该事件无关、始终加载; 详见 proposal 已知限制 W1 条 + follow-up 10CG/aria-plugin#218 (容器制品级实测)。只增不改, 编辑前核该文件 HEAD 行尾 (preserve-crlf), 随发版同步面在 TASK-011 一并落。2026-10-15 验收 PASS (主控独立复跑, 记录 .aria/notes/2026-10-08-wpa-phase-b/task010-acceptance.md): 探针 WPA_REQUIRE_ALL=1 exit 0 · target shape holds (32c/32d/32e/29h/29i/12o/20g 全 ran·yes; 30a git-history 腿另跑); SC-30 真 checkout guard 816/816 (load 1.37, SC-9a + SC-8 五档绿) + scan 129/129; W14 timing.py 20/20 有界档 PASS (g-c 1.04 验证 M6 fail-closed 预算; timing load@start 3.39 但判据为负载稳健的 CPU 比值、过载兜底未触发、与原型吻合, SC-8 已在 <2 窗口); SC-33 归因探针内绿; doc-sync SYNCED (standards 191560e · aria bae5c10 · 主仓 06c08db); CHANGELOG 性能与探针结果行实测值已填。5 条 review minor 仍延后。TASK-011 发版 (取号 + 同步面) 需 owner 授权"
 
   - id: TASK-011
     parent: "1.11"
