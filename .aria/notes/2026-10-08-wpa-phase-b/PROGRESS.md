@@ -370,3 +370,8 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 ### Windows/MINGW64 实测 PASS (owner 主力机 qqq-PC, 2026-10-15)
 - owner 在 Windows 跑 #219 recipe: 插件确认 v1.75.0; 一条典型 AWS 凭据读取命令 → **BLOCKED exit=2**, 命中正确路径规则族, **real 0.472s (远 < 5s, 不 fail-open)**; MINGW64 bash 无解析/兼容崩溃。→ 侧席「守卫在 Windows 静默失效」担忧**就典型命令而言被否证**。结果记 10CG/aria-plugin#219 (comment 28755)。
 - 残余 (续 #219): ① 重命令超时尾 (W10 第二遍 / 大文件全扫在慢平台是否 <5s, 备有可选 heavy recipe); ② grep/sed 广度正确性 (6 新 tag + 分类器在 MINGW64 未逐一验)。#154 关单仍以完整 post-ship (含这些 + 其余 6 腿) 为前提。
+
+### Windows heavy 压测: 超时尾**确认** (owner 主力机, 2026-10-15)
+- g-c tier 重命令 (16 赋值×400B+128 引用, 良性) 直跑 secret-guard.sh = **real 5.037s / user 4.668s** (CPU, 非负载; MINGW64 比 Linux ~1.8s 慢约 2.6×) → **越 5s 超时悬崖**; 真 CC hook 链会在 5s kill → **fail-open** (#216 在 Windows 兑现)。直跑 exit=0 仅因 recipe 未包 timeout。
+- 分级: **#154 核心 (直接读取, 内建先判 ~0.47s) 不受影响**; 受影响 = W10 变量间接 (#203 partial) + 一般重命令 (越 5s → fail-open → 判定未跑完, 最坏变量间接 secret-read 被噪声撑过 5s 绕过)。**非回滚项** (v1.75.0 加法式、核心已验); 属 #216/#203 慢平台放大。
+- 记 #219 (28759) + #216 (28763)。处置选项 A(known-limit)/B(降 W10 成本)/C(复杂度/时间预算前置 fail-closed, 契合 M6)/D(提超时); **待 owner 定** (倾向 C 或 B+C)。#154 关单披露须点此 Windows 重命令超时尾。
