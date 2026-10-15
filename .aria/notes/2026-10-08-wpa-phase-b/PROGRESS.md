@@ -361,3 +361,8 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **aria-plugin v1.75.0 已发布**: aria master `08db1c0` + tag `v1.75.0`; standards master `a611136`; 主仓 master `5ca430a` (16 版本点 + gitlink aria 08db1c0 / standards a611136)。三仓 local/origin/github 三方 ls-remote 一致; aria tag 双远程; gitlink 在 github 可达 (clone --recursive 安全); 4 版本一致性 check 全绿; 子模块本地 merge + 双推 (禁 Forgejo 服务端), INV-6 全 Refs-only (#154 未关)。
 - **发版前意外**: 本地 master 陈旧 (主仓 triage PR#228 / standards AGENTS.md PR#22·23 已落 origin), 与 WP-A 文件不相交; 已对齐 origin/master 再本地 merge, 他人工作无损 (standards github 本来落后 2bc1c4c, 双推一并修复镜像分叉)。
 - **下一步 (均 owner 门, 本会话内无法推进)**: TASK-012 post-ship 复验 6 腿须 **owner 更新插件缓存并重启会话** (plugin-cache-currency 探针首行 OK) 后在新会话执行; 之后 TASK-013 关 #154 (逐条披露三处有意偏离 + 验证范围 + 失败事件送达) + release_gate 释放认领 + 归档。#203/#221 保持 open 不评论。5 条 review minor 延后。
+
+### Windows/MINGW64 验证缺口 (侧席提醒 → owner 同意, 2026-10-15)
+- **v1.75.0 的 guard/scan 仅 Linux 验证**, 而 #154 泄露报告环境是 **Windows MINGW64 (Git-Bash)**、owner 主力机也是 Windows。风险: ① MINGW64 grep/sed 行为可能异于 GNU (正确性); ② 进程派生 ~10× 慢 (proposal:58 未实测) 叠加 hook 5s 超时 → fail-open (#216), v1.75.0 更重扫描在慢 Windows 上更易踩线 → 守卫在最需要它的机器上**静默失效**, 最坏旧版能拦的重命令新版超时放行 (平台限定潜在回归)。
+- **处置**: 发布不回滚 (加法式 + 已带 Linux-only 披露); 开 follow-up **10CG/aria-plugin#219** (含 Windows Git-Bash 验证 recipe: `cat ~/.aws/credentials` 喂 hook, 期望 exit 2 + real<<5s)。TASK-012 post-ship 复验增 **Windows 平台腿**; **#154 关单 (TASK-013) 以 Windows 实测结果为前提**, 不只凭 Linux。
+- **我 (Linux 容器) 跑不了 Windows 腿** —— 须 owner 在 Windows 主力机、插件更新到 v1.75.0 后执行 #219 recipe。

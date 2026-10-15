@@ -236,6 +236,7 @@ tasks:
     parent: "1.12"
     title: "post-ship 复验 6 条腿 (惰性诱饵; 第 5、6 腿不作关单门)"
     status: pending
+    notes: "2026-10-15 追加 (owner 同意, 侧席提醒): post-ship 复验须含 **Windows/MINGW64 平台腿** —— v1.75.0 的 guard/scan 仅 Linux (GNU grep/sed, bash 5.2+3.2.57) 验证, 而 #154 报告环境即 MINGW64、owner 主力机也是 Windows; 慢平台 (进程派生 ~10× 慢) 叠加 5s 超时 fail-open (#216) 可能让守卫在 Windows 静默失效, 甚至旧版能拦的重命令新版超时放行 (平台限定潜在回归)。owner 在 Windows 主力机 (插件更新到 v1.75.0 后) 跑 10CG/aria-plugin#219 的 recipe (典型凭据读取命令: 期望 exit 2 + real<<5s, 无超时), 结果写进 #154 关单披露。#154 关单 (TASK-013) **以此 Windows 实测为前提**, 不只凭 Linux。本会话在 Linux 容器内无法跑 Windows 腿。"
     complexity: S
     estimated_hours: "0.5"
     dependencies: [TASK-011]
