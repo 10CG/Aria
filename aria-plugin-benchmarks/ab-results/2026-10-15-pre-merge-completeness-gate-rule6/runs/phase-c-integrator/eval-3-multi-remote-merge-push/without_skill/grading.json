@@ -1,0 +1,131 @@
+{
+  "expectations": [
+    {
+      "text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+      "passed": true,
+      "evidence": "response.md L70 确定 ENFORCED_REMOTES = {origin, github}; L91-96 (步骤 4c) 主仓腿调用 `bash aria/skills/git-remote-helper/scripts/push_all_remotes.sh --repo=/home/dev/Aria/aria --branch=master --remotes=<REMOTE>`, 配合 L48-56 流程图对 origin 与 github 各跑一腿。这是 SKILL.md L617-619 规定的 per-remote 单 remote 白名单形态 (helper.push_all_remotes(main_repo, branch, [REMOTE])), 两腿并集即 [origin, github], 符合断言实质。子模块腿同款调用见 L77-79。"
+    },
+    {
+      "text": "Should snapshot expected_sha = local HEAD before any push",
+      "passed": true,
+      "evidence": "response.md L58-62: '**步骤 1 — 快照期望 SHA** (必须在任何 push 之前取, 之后所有比较都用这个冻结值): expected_sha=$(git -C /home/dev/Aria/aria rev-parse HEAD)', 且流程图 L49 显示快照先于一切枚举/推送。与 SKILL.md L613 流程第 1 步一致。"
+    },
+    {
+      "text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+      "passed": true,
+      "evidence": "response.md L72 (步骤 4 标题): 'Per-Remote Matrix Gating (对每个 REMOTE ∈ {origin, github} 各跑一腿; ...同一腿内必须子模块先于主仓 —— 主仓 gitlink 若先推...clone --recursive 即断链'), a=先推子模块 (L74-79), b=子模块失败阻断则跳过主仓 (L89), c=子模块全成功才推主仓 (L91-96)。与 SKILL.md L616-619 的 a/b/c 结构逐条对应。"
+    },
+    {
+      "text": "Should call verify_parity_post_push with expected_sha after main repo push",
+      "passed": true,
+      "evidence": "response.md L98-105 (步骤 4d): '主仓推送成功 → post-push SHA 权威核验' 调用 `python3 aria/skills/git-remote-helper/scripts/verify_post_push.py --repo=/home/dev/Aria/aria --branch=master --expected-sha=<expected_sha> --remotes=<REMOTE>`。verify_parity_post_push 即 verify_post_push.py 的 helper 名 (脚本头注释引用 references/schema.md 的 verify_parity_post_push schema)。时序上明确在主仓 push 之后。"
+    },
+    {
+      "text": "Should NOT rely on 'Everything up-to-date' as success signal — require SHA comparison",
+      "passed": true,
+      "evidence": "response.md L86: '严格 success 判定 (不 parse 输出文本): success = (exit_code == 0) AND (post_remote_head == pre_local_head)。\"Everything up-to-date\" 的 no-op 场景天然兼容 (此时 post == pre_local 仍成立)'; L112: 'push 退出码与本地 tracking ref 都可能是假象 —— 唯独立 ls-remote 读数作数'。已对快照源码复核: push_all_remotes.sh L114-127 实现完全一致 ('We do NOT parse the message text'), references/api.md L180-181 亦明文。"
+    },
+    {
+      "text": "Should block when any remote fails (fail_on_partial_push: true default)",
+      "passed": true,
+      "evidence": "response.md L165-169 失败优先级决策表完整复现 SKILL.md L625-630, 且 L169 判定本场景: '两 remote 均非 read_only、fail_on_partial_push=true → 任何腿失败即阻断'; §5.2 L179 演示半失败形态的终态: '最终 C.2.5 return failure, 输出失败 leg (github/SUB) + 修复命令'。L29 亦标出 fail_on_partial_push=true 为默认值。"
+    },
+    {
+      "text": "Should handle read_only_remotes exception: push failure → warning downgrade, not block",
+      "passed": true,
+      "evidence": "response.md L165 (§5.1 决策表首行, 标注'最高优先级'): 'remote ∈ read_only_remotes | warning 降级, 继续'。与 SKILL.md L628 原表逐字对应。L36 同时注明本场景 read_only_remotes 为空 (默认路径), 但降级规则本身被显式表述。"
+    },
+    {
+      "text": "Should output per-remote status report for all enforced remotes",
+      "passed": true,
+      "evidence": "response.md §4 L128-157 给出 canonical JSON: push_all_remotes 的 results[] 含 per-remote 条目 (remote/exit_code/success/pre_remote_head/post_remote_head), verify_parity_post_push 的 results[] L152-153 同时覆盖 origin 与 github 两个 enforced remote ('实际按腿各调一次, 此处合并示意'); §5.2 L174-175 半失败示例亦逐 remote 报状态 (origin 腿完成 / github SUB 失败); 步骤 6 L118-123 要求阻断时输出具体失败 remote + 修复命令。"
+    },
+    {
+      "text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X",
+      "passed": true,
+      "evidence": "response.md L89 (步骤 4b): '子模块腿任一失败 → 查 §5.1 失败优先级决策表; 阻断 → 跳过本 REMOTE 的主仓推送'; L175 (§5.2): 'github: SUB ❌ (network timeout) → 跳过 aria main@github; verify@github 不执行'。L72 并给出机制理由 (gitlink 先推会造成 orphaned gitlink)。与 SKILL.md L618 一致。"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "execution_metrics": {
+    "output_chars": 12277,
+    "transcript_chars": 12277,
+    "note": "descriptive 推演 run, 无 metrics.json; transcript 与 outputs 同为 response.md"
+  },
+  "timing": {
+    "executor_duration_seconds": 347.6,
+    "total_duration_seconds": 347.6,
+    "total_tokens": 106281
+  },
+  "claims": [
+    {
+      "claim": "push_all_remotes.sh 的严格 success 判定为 exit_code==0 AND post_remote_head==pre_local_head, 不 parse 输出文本, no-op 天然兼容",
+      "type": "factual",
+      "verified": true,
+      "evidence": "快照 push_all_remotes.sh L114-127 与注释 L10-11 逐条吻合; references/api.md L180-181 佐证"
+    },
+    {
+      "claim": "verify_post_push.py 重试 schedule=[0,2,4,8] 共 4 attempts, timeout 15s/次, per-remote 上界 74s (4x15+14), expected-sha 接受 ≥7-char prefix startswith 匹配, match 早退, exit 0=all_match",
+      "type": "factual",
+      "verified": true,
+      "evidence": "快照 verify_post_push.py L15-18 (头注释 74s), L118/L138 (_MIN_SHA_PREFIX=7 + startswith), L158 (schedule 构造), L174-183 (early exit), L238 (exit code)"
+    },
+    {
+      "claim": "verify 失败 reason 枚举 sha_mismatch/network_timeout/auth_failed/error; 远端分支不存在归 sha_mismatch",
+      "type": "factual",
+      "verified": true,
+      "evidence": "verify_post_push.py L96-112 (128→auth_failed, 其他非零→error, TimeoutExpired→network_timeout, 空输出→(None,None)), L187 (last_reason or 'sha_mismatch' ⇒ 分支不存在落 sha_mismatch)"
+    },
+    {
+      "claim": "推送失败信息截断 512 字符; Unknown remote → 该腿 exit_code=1/success=false; --branch 本地不存在 → 脚本 exit 1",
+      "type": "factual",
+      "verified": true,
+      "evidence": "push_all_remotes.sh L130 (head -c 512), L85-99 (Unknown remote 条目), L43-46 (branch 校验 exit 1)"
+    },
+    {
+      "claim": "子模块 detached HEAD: detached_head:true + HEAD SHA 比较, 警告但不阻断, 分支取 .gitmodules branch 字段",
+      "type": "factual",
+      "verified": true,
+      "evidence": "phase-c-integrator SKILL.md L638 '沿用 helper canonical (detached_head: true + HEAD SHA 比较), 警告但不阻断'; git-remote-helper SKILL.md L64; schema.md L44/L54"
+    },
+    {
+      "claim": "'network_timeout (exit 124 语义)'",
+      "type": "factual",
+      "verified": false,
+      "evidence": "verify_post_push.py 用 subprocess.TimeoutExpired 异常 (L107-108), 进程被 kill, 并无 exit 124 读数; response L187 的 'exit 124 语义' 是类比措辞而非脚本行为, 轻微不准但不影响任何断言"
+    },
+    {
+      "claim": "本次 eval 未实际执行任何 git 读网络/写操作、未调用任何脚本 (descriptive 推演)",
+      "type": "process",
+      "verified": true,
+      "evidence": "response.md L3 显式声明; 全文命令均为'将执行什么'的描述框架, 无执行回执/输出引用; run 目录仅有 response.md + timing.json, 无任何脚本产物"
+    },
+    {
+      "claim": "脚本内部行为 '(读源码确认)' — 即 without_skill 执行臂读过 helper 源码",
+      "type": "process",
+      "verified": false,
+      "evidence": "response 引用的机制细节 (74s 上界/[0,2,4,8]/512 截断/≥7 prefix/严格判定公式) 与快照源码精确吻合, 声称读源码可信; 但本 run 唯一产物是 response.md, 无 transcript 可证访问路径, 无法区分'实读了 aria 工作树里的 skill 源码'与'模型记忆'—— 这正是 without_skill 臂的独立性隐患 (见 eval_feedback)"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+        "reason": "字面读法 (单次调用带 [origin, github]) 与 SKILL 自身的 per-remote 单 remote 白名单设计 (SKILL.md L617-619) 冲突——照字面严格执行会把完全合规的 per-leg 调用误判 FAIL。建议改写为 'for each enforced REMOTE, invoke push_all_remotes per-remote (submodules then main)', 与断言 3 的口径统一。"
+      },
+      {
+        "reason": "without_skill 臂的独立性未被断言集覆盖, 也不可由 grading.json 判定: response 中 helper 脚本内部机制 (74s 上界、[0,2,4,8] schedule、512 截断、≥7-char prefix、严格判定公式) 与快照源码逐字吻合, 执行臂要么读了同一工作树里的 aria plugin 源码 (skill 文件就在 /home/dev/Aria/aria 下, 'without skill' 只是不加载不等于看不见), 要么依赖记忆。前者会让 AB 差异低估 skill 的真实贡献。建议 eval 记录执行臂的文件访问面, 或把执行仓与 plugin 源物理隔离。"
+      },
+      {
+        "reason": "descriptive 推演体裁下, 9 条断言全部考'流程是否被正确描述', 没有一条考'描述的机制是否忠实于真实实现'。我手工对快照源码逐条复核全部吻合 (仅 'exit 124 语义' 一处类比措辞不准), 但这个维度目前不在判分集内——一段听起来合理实则编造的重试/判定细节同样能拿 9/9。建议补一条 fidelity 断言 (如 'strict success 判定公式与 retry schedule 与 helper canonical 一致')。"
+      }
+    ],
+    "overall": "9/9 全过, form_ok=true: response 开篇即声明 descriptive 推演且全文守住该体裁, 9 条断言均可在文中找到明确、结构化的证据, 引用的全部机制经快照源码复核吻合 (仅 'exit 124 语义' 一处类比措辞与 subprocess 超时实现有轻微出入, 不落任何断言)。timing.json: executor 347.6s / 106,281 tokens, 对一个纯推演产出 (12,277 chars) 属偏重, 主要成本应在源码级细节的还原上——这同时是上面的独立性隐患信号。无 user_notes.md / metrics.json。"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "expectations": [
+    {
+      "text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+      "passed": true,
+      "evidence": "response.md L64 确定 ENFORCED_REMOTES={origin, github}; L100-105 (§5c) 对每个 REMOTE 调用 `bash aria/skills/git-remote-helper/scripts/push_all_remotes.sh --repo=/home/dev/Aria/aria --branch=master --remotes=<REMOTE>`; L233-247 (§9) JSON 覆盖两 remote。与 SKILL.md:628-631 步骤 4a/4c 一致 (per-REMOTE 调用, 两个 enforced remote 均覆盖) — 断言的字面单调用读法反而与断言 3 的 per-remote 矩阵冲突, 按 skill 权威流程判 PASS"
+    },
+    {
+      "text": "Should snapshot expected_sha = local HEAD before any push",
+      "passed": true,
+      "evidence": "response.md L42 `expected_sha=$(git -C /home/dev/Aria/aria rev-parse HEAD)`, L45 「取合并后本地 master HEAD…作为后续所有 post-push 验证的唯一期望值」; 该 Step 1 (§2) 位于 Step 4 推送 (§5) 之前。与 SKILL.md:625 步骤 1 逐字对应"
+    },
+    {
+      "text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+      "passed": true,
+      "evidence": "response.md L68 「对每个 REMOTE ∈ {origin, github} 独立执行 a→e」; §5a (L70-92) 先推子模块, §5c (L100-105) 「子模块全部成功 → 主仓 (aria) 推送」, §5b 给出 gitlink 顺序不变量理由。与 SKILL.md:628-631 Per-Remote Matrix Gating 4a→4c 一致"
+    },
+    {
+      "text": "Should call verify_parity_post_push with expected_sha after main repo push",
+      "passed": true,
+      "evidence": "response.md §5d (L111-115) 主仓推送成功后调用 `python3 aria/skills/git-remote-helper/scripts/verify_post_push.py --repo=/home/dev/Aria/aria --branch=master --expected-sha=<expected_sha> --remotes=<REMOTE>`。verify_post_push.py 即 api.md:186 的 verify_parity_post_push API; 源码核对 --expected-sha 语义/retry/退出码均与 response L116-123 描述吻合 (verify_post_push.py:40-58, 238)"
+    },
+    {
+      "text": "Should NOT rely on 'Everything up-to-date' as success signal — require SHA comparison",
+      "passed": true,
+      "evidence": "response.md L85-89 「严格 success 判定 (不信文本回执): success = (exit_code == 0) AND (post_remote_head == pre_local_head)」; L91 「不解析 Everything up-to-date 文本 — 已同步 no-op 场景经 SHA 比较自然通过」。源码佐证: push_all_remotes.sh:114-127 (注释 'We do NOT parse the message text')"
+    },
+    {
+      "text": "Should block when any remote fails (fail_on_partial_push: true default)",
+      "passed": true,
+      "evidence": "response.md §6.1 决策表 L140 「fail_on_partial_push: true (默认) + 非 read_only | 阻断, 输出修复命令」; §7 L195-197 部分失败例 (github SUB ❌ → 阻断)。与 SKILL.md:642 一致"
+    },
+    {
+      "text": "Should handle read_only_remotes exception: push failure → warning downgrade, not block",
+      "passed": true,
+      "evidence": "response.md §6.1 决策表首行 L138 「remote ∈ read_only_remotes | warning 降级, 继续 (最高优先级)」。与 SKILL.md:640 逐字一致"
+    },
+    {
+      "text": "Should output per-remote status report for all enforced remotes",
+      "passed": true,
+      "evidence": "response.md §7 (L186-198) per-remote 全景矩阵 (origin/github 各自 SUB/aria/verify 状态); §9 (L233-247) verify JSON results 数组含 origin 与 github 两条目 (remote/match/attempts/total_seconds), push JSON 同构 (L214-231)。descriptive 体裁下产出契约即为 output 规格描述"
+    },
+    {
+      "text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X",
+      "passed": true,
+      "evidence": "response.md §5b L96 「任一子模块对 REMOTE 推送 success=false → …判阻断时, 跳过本 REMOTE 的主仓 (aria) 推送」, L98 给出 gitlink 断链理由; §7 L197 实例 「github: SUB ❌ → 跳过 aria 的 github 推送」。与 SKILL.md:630 步骤 4b 一致"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.00
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+        "reason": "字面读法 (单次调用 remotes=[origin,github]) 与 skill 实际规定的 per-REMOTE 调用 (SKILL.md:629-631, 断言 3 的矩阵门控) 冲突: 一次单调用 --remotes=origin,github 的 response 满足本断言字面却违反矩阵; 忠实按 per-remote 执行的 response 又可被超字面读法误伤。建议改为 'invoke push_all_remotes for main_repo+branch for each enforced remote (origin and github), per the per-remote matrix'"
+      },
+      {
+        "assertion": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]; Should snapshot expected_sha = local HEAD before any push",
+        "reason": "本 run 为 descriptive 推演 (无真实执行), 'Should call/snapshot' 类断言只能评「描述的意图」而非实际行为 — 只要点名正确函数与参数即可通过, 区分度弱于真实执行 run。descriptive 场景下建议断言措辞改为 'response 的推演流程必须包含…' 或补充对描述与 skill 源码一致性的核查维度 (本 grader 已做: response 对 push_all_remotes.sh 严格 SHA 判定 / verify_post_push.py retry schedule [0,2,4,8] 与 74s 上界 / reason 枚举的描述与源码逐条吻合, 无一失实)"
+      },
+      {
+        "assertion": "Should output per-remote status report for all enforced remotes",
+        "reason": "断言可由任何列出两个 remote 名字的 JSON 示例满足, 未要求覆盖失败态字段 (success=false / reason)。response 实际远超此线 (§6.2/§6.3 错误枚举表 + §7 部分失败形态), 但断言本身在弱 response 上也会假绿"
+      }
+    ],
+    "overall": "9/9 全过。response.md 在 descriptive 体裁内做到了源码级忠实: 9 条断言的流程描述全部与 phase-c-integrator SKILL.md §C.2.5、git-remote-helper api.md 及两份脚本源码逐条对得上, 且其自报的只读核对 (config 无 multi_remote 覆写、aria 子模块 origin=Forgejo/github=GitHub 双 remote) 经 grader 独立复核属实 (aria/.aria/config.json 无 multi_remote* 键; .git/modules/aria/config 双 remote URL 与 response §0 表一致)。体裁守住: 开篇显式声明未实际执行任何 push/fetch/forgejo 调用, 全文命令均为规格化「将要执行」描述, form_ok=true。timing: executor 203.5s / 94,613 tokens (timing.json), 与该深度推演相称, 无异常。主要保留意见是断言集在 descriptive run 上的区分度天然受限 (见 suggestions)。"
+  }
+}

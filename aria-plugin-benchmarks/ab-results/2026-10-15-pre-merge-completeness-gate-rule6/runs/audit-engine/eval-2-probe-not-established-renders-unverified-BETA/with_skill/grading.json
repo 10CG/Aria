@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": true,
+      "evidence": "response.md L33 给出情形 A 的 Round 1 记录行: '- Sibling probe: 未能核实 —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed)' —— 逐字含「未能核实」且原因带 fetch_failed。L37 明确禁止项: 「不得渲染为「无竞品」/「未发现同 issue 竞品」」。L95 表格行再确认渲染终点。源码佐证: 此措辞与 references/execution-modes.md L321 权威三档措辞表 not_established 档「**未能核实** —— 本轮竞品扫描未取到完整证据 (原因: <reason>)」逐字一致; 走 (α) 正门 (exit 0 + 合法 JSON + schema_version=1) 读一等字段 verdict=\"not_established\" 落 (β) 渲染分支, 与 SKILL.md L135-136 (α)/(β) 消费规则吻合。response.md L37 还正确指出「(覆盖不完整: <reason>)」追注仅属 sibling_found 档 (execution-modes.md L319 确认该追注只出现在 sibling_found 行), 本档缺口已由 (原因: fetch_failed) 表达 —— 未虚构第四档措辞。"
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": true,
+      "evidence": "response.md L70 给出情形 B 的 Round 1 记录行: '- Sibling probe: 未能核实 —— 本轮竞品扫描未取到完整证据 (原因: 探针自身失败 — exit 1, stdout 无 JSON)' —— 逐字含「未能核实」; L74: 「同样**禁止**渲染为「无竞品」」。traceback 处置正确: L65 「不把 stderr traceback 原文贴进报告」, L82 traceback 仅是「人工诊断面」的后续信号 (值得人工看 stderr 定位), L86 引用 fail-closed 义务原文 「never as \"no sibling\"」。源码佐证: 走 (β) fail-closed 侧通道与 execution-modes.md L323 「exit != 0 或 stdout 无法解析为 JSON 或 schema_version 未知 ⇒ 一律按 not_established 处置」吻合; reason 的封闭枚举 (no_enforced_remote | remote_unresolved | fetch_failed | cap_applied | own_token_absent) 确实只存在于 stdout JSON (execution-modes.md L293), exit≠0 时无结构化 reason 可读, response 以 fail-closed 触发事实 (exit code + stdout 形态) 填原因栏是对契约空白的忠实推演。exit code 语义核对 scripts/sibling_spec_probe.py main(): run_probe 内部异常 → traceback.print_exc(file=sys.stderr); return 1 (L680-682), stdout 只在 run_probe 成功后写 (L684), 故 exit 1 + stdout 空 + stderr traceback 的源码映射 (L61) 成立。"
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": true,
+      "evidence": "情形 A: response.md L41-43 加粗小标题「本轮照常继续」「审计 verdict 不受影响」「收敛判定不受影响」, 并给出理由 (verdict 由 Critical/Major/Minor 计数决定, SOT 在 report-storage.md; challenge 收敛 = 四元组集合无变化 AND objections 全 resolved, 探针结构性不参与)。情形 B: L78-81 「与情形 A 完全同构」「本轮照常继续」「审计 verdict / 收敛判定零影响」。汇总表 L97: 「本轮继续 / verdict / 收敛 | 三者均不受影响 (advisory 不阻断)」两情形同列。「fail-closed 只作用于措辞」的语义被精确表达且额外做了消歧: L9 明确 pre-merge completeness gate 的 fail-closed 是「拒绝执行审计」、与探针的 fail-closed「按 not_established 渲染」后果完全不同不得混淆 (SKILL.md L142-153 确认这一显式消歧存在)。源码佐证: SKILL.md L137 「不阻断: 不改 verdict 计算、不改收敛判定、不改轮次路由 (advisory)」+ execution-modes.md L211/L242 两模式块入口行均带「不阻断本轮」。"
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "情形 A §(3) L49 起句即「**不能。**」, 给三层理由: not_established 字面语义是「判定未成立」非「不存在」; 证据面为零 (scanned=0/refs_scanned=0, 「没扫到」与「扫完没有」不可区分); 契约明文「消费方不得从 hits == [] 推断结论」+ SKILL.md (β) 零证据不当正证据。情形 B L86 「**不能, 且本情形证据面比 A 更空。**」并区分两情形的知识面差距。全文无任何「可以认为没有竞品」表述; L101 反向划界: 渲染「未发现同 issue 竞品」的唯一合法前提是 verdict == \"no_sibling_found\" (覆盖完整 + own_keys 非空 + hits 空), 两情形均不满足。源码佐证: execution-modes.md L305 「消费方不得从 hits == [] 推断结论 —— 「扫完没有」与「没扫到 / 本轨无输入」在 hits 上取值相同」+ verdict 取值表 L310-311 与 response 引用一致; 脚本 run_probe L640-645 确认 hits=[] 且 status!=\"ok\" → verdict=\"not_established\"。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+        "reason": "断言不检查情形 B 原因栏的内容。契约对 exit≠0 时的 reason 来源无规定 (封闭枚举只在 stdout JSON 里), 本 run 的「探针自身失败 — exit 1, stdout 无 JSON」是忠实推演, 但一个把 stderr traceback 原文整段贴进报告 (违反 Rule #7 精神且噪音大) 或原因栏留空的 response 同样会过。可加一条「原因栏以 fail-closed 触发事实描述而非贴 traceback 原文」。"
+      },
+      {
+        "reason": "response 正确覆盖了「Round 2 入口会重新跑探针 (每轮重跑、不复用缓存), 网络恢复即有机会得出确定 verdict」这一契约点 (SKILL.md L129 / execution-modes.md L274), 但没有断言覆盖。这是 not_established 不阻断语义的自然推论, 也是消费方容易答漏的区分点, 值得一条独立断言。"
+      },
+      {
+        "reason": "response 额外做了 stdout 与源码的自洽性核对 (十二字段、_scan_remote fetch-failed 返回形态逐字段吻合、run_probe 聚合 → degraded/fetch_failed/not_established、exit 三分、elapsed_ms=61203 与 fetch 腿 2×30s 预算自洽) —— 我对 scripts/sibling_spec_probe.py 与 references/execution-modes.md 逐项复核全部属实。当前断言集测不到这层深度 (只测消费措辞), 若想区分「背措辞」与「真读了契约」, 可加一条要求 response 指出情形 A 输入中 own_keys 非空/own_layer=canonical (即非 own_token_absent 路径) 之类的结构事实。"
+      }
+    ],
+    "overall": "4/4 全过, 无部分分争议。四条断言直接测本 eval 的目标行为 (fail-closed 渲染、advisory 不阻断、零证据不当正证据), response.md 不仅逐字给出两情形的正确记录行措辞, 还正确消歧了 pre-merge gate 的另一种 fail-closed、给出了源码级自洽核对 (经我对 sibling_spec_probe.py / execution-modes.md / report-format.md 复核全部属实)。form_ok=true: 全文守住 descriptive 推演体裁, 开篇 L3 显式声明未实际执行任何命令/git 读写/forgejo 接口, 所有 bash 代码块均为指示性调用串或推演的措辞示例, 无任何「声称已执行」的表述。timing: executor 188.9s / 89729 tokens (timing.json), 单次推演成本合理。eval 本身区分度良好, 三条 suggestions 均为可选加固非缺陷。"
+  }
+}

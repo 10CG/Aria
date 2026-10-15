@@ -1,0 +1,66 @@
+{
+  "expectations": [
+    {
+      "text": "Should detect and report the merge conflict",
+      "passed": true,
+      "evidence": "response.md L1 标题即定性冲突场景 ('Phase C C.2 merge 冲突处置 — feature/oauth2-social-login → main, 冲突文件 backend/config/settings.py'); §1 (L5-10) 给出根因类别 ('确定性、可恢复的集成失败... main 又前进了... 不是 gate 失败'); Step 0 (L14-31) 规定检测面 — L19 'git status --porcelain # 确认 both-modified 只有 backend/config/settings.py' + L20 'git log --merge' 取两侧意图, L31 规定报告内容 ('冲突文件与 hunk 数、两侧意图各是什么...处置计划...预计影响'); §5 (L120) 进一步报告执行状态影响 ('success 维持 false, steps_executed 中 C.2 未完成... 整条下游暂停')。检测与报告两面均有实质内容, 非表面合规。"
+    },
+    {
+      "text": "Should identify which files have conflicts",
+      "passed": true,
+      "evidence": "冲突文件被点名并贯穿全文: L1 '冲突文件 backend/config/settings.py'; L19-20 诊断命令显式以该文件为目标且 L19 要求核实它是唯一 both-modified ('确认 both-modified 只有 backend/config/settings.py'); L69 提交 trailer 'Conflict-File: backend/config/settings.py'; L116 反模式条款同样锚定该文件。注: prompt 本身已给出文件名, 此断言区分度弱 (见 eval_feedback)。"
+    },
+    {
+      "text": "Should guide the developer through conflict resolution",
+      "passed": true,
+      "evidence": "§2 (L12-100) 给出 Step 0-Step 9 完整可跟随流程: 先诊断不动手 (Step 0) → 不在 main 上解冲突, 'git merge --abort' 恢复干净 (Step 1, L33-39) → 回 feature 分支 merge origin/main (Step 2, L41-50, 含 merge vs rebase 取舍) → 语义解冲突专项指引 (Step 3, L52-57: 目标态=两侧意图并集, 禁止 '-X ours/-X theirs', 逐 hunk, 同 key 不兼容转升级) → 合并结果验证 (Step 4) → Conventional Commit 模板 (Step 5, L65-70) → 仅推 origin (Step 6) → 全链重过闸 (Step 7, L78-88) → merge 与 C.2.5/C.2.6 后续链 (Step 8) → 记录与 handoff (Step 9)。§3 (L102-106) 补升级条件 (同 key 不兼容值 → owner 裁定 + OpenSpec), §4 (L108-116) 给 7 条 anti-pattern。指导完整且含取舍判据, 非模板套话。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.00
+  },
+  "form_ok": true,
+  "claims": [
+    {
+      "claim": "产出为描述性推演, 未实际执行任何 git/forgejo 操作",
+      "type": "process",
+      "verified": true,
+      "evidence": "response.md L3 显式声明 '以下全部命令为推演示例, 本次未实际执行任何 git / forgejo 操作'; 全文所有命令均以推演示例 code block 呈现, 无 '已执行/输出为' 式执行回执叙述。体裁守住 descriptive 推演。"
+    },
+    {
+      "claim": "依据索引 (§6, L123-128) 引用的 skill 源码事实准确",
+      "type": "factual",
+      "verified": true,
+      "evidence": "对 skill-snapshot 逐项复核: SKILL.md L228 命名 namespace 澄清段 ✓; L332 race 注记 '窗口最小化...不消除 race' ✓; L50-51 wait intervals [30,60,120,300,300] + timeout 1800s ✓; L266 gate_error.kind=no-run-for-branch 须 surface message 原文 ✓; L47/191 submodule gate 默认 mode=block ✓; §C.2.5 (L600-623) expected_sha 快照 + 逐 remote 校验 ✓; L213-219 C.2.6 upm.milestone_driven 触发条件 ✓; L919 错误处理表行 '推送失败|远程冲突|提示拉取最新代码' ✓; references/pre-merge-gate-empirical-traps.md §一 (L7, 含 L13 '参数被当 glob') 与 §五 (L44 '#137 根本形状') ✓; scripts/pre_merge_gate.py L540 'def gate_check(' 存在且 grep 无 mergeability/conflict 逻辑 ✓ (印证 'gate 查 CI 状态, 不担保文本可合性')。"
+    },
+    {
+      "claim": "主干名须用项目真实主干 (本 workspace 主仓是 master), 场景字面 main 要先核实",
+      "type": "factual",
+      "verified": true,
+      "evidence": "response.md L83; 与 SKILL.md L169-170/L253 ('本项目是 master, 不是 main', #137) 及 references §五一致。"
+    }
+  ],
+  "timing": {
+    "total_tokens": 85894,
+    "duration_ms": 236588,
+    "total_duration_seconds": 236.6
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Should identify which files have conflicts",
+        "reason": "prompt 字面已给出冲突文件名 (backend/config/settings.py), 只要把 prompt 复述一遍即可通过 — 区分度弱。本 run 碰巧额外给了机械识别命令 (git status --porcelain 核实唯一 both-modified), 但断言本身不要求。可改为要求 response 给出机械识别手段 (如 git status --porcelain / diff --name-only --diff-filter=U) 而非复述场景。"
+      },
+      {
+        "reason": "缺一条真正区分性的断言: 本场景的 skill 特异行为是 '解冲突必须回 feature 分支、不在 main 上就地撮合' 与 'resolution push 后 pre-merge gate 作废须全链重跑'。本次 response 两点都做对了 (Step 1/Step 7), 但没有任何 assertion 覆盖 — 一个直接在 main 上 git checkout --theirs + commit 的错误解法也能 3/3 通过。"
+      },
+      {
+        "reason": "AB 有效性观察: 这是 without_skill 臂, 但 response §6 依据索引以高保真引用 skill 内部细节 (§C.2.4 三态、wait intervals 精确数值、references §一/§五 编号、#137), 且经快照复核全部属实 — 说明执行臂当时可读到 skill 源码 (或 workspace 污染)。若 with/without 两臂对 skill 源可达性不对称, AB 差异会被低估; 建议在 eval 元数据里记录两臂的文件可达面, 或在 without_skill 臂隔离 skill 目录。"
+      }
+    ],
+    "overall": "3/3 通过, 三条断言在 response.md 中均有实质证据 (非表面合规), descriptive 推演体裁守住 (form_ok=true, L3 显式声明未执行任何命令)。断言集偏泛: detect/report/identify/guide 四个动词对任何一篇合格的冲突处置散文都偏松, 真正区分 skill 价值的分支选择与重过闸纪律未被覆盖; 且 without_skill 臂疑似可达 skill 源码 (引用全部属实), AB 对比解释时需注意。timing: 236.6s / 85894 tokens。"
+  }
+}
