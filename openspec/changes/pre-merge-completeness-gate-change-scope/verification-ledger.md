@@ -381,7 +381,7 @@ bucket counts: {'legacy_shaped': 6, 'matched': 800, 'no_checkpoint_prefix': 11, 
 - **第二次快照与比较** (快照后才 fetch): 21 段全 exit 0 + 2 个 json_array_parse=0。**本地面 (HEAD/porcelain/branch/find) 逐字一致, 零变化**; 远端 4 处变动 —— 主仓 master `6675291`→`42e3c77` (origin+github 同值), standards master→`a611136` (两 remote 归一), aria master `268da8f`→`08db1c0` + 新 tag `v1.75.0` (tag obj `6626730`, 两 remote 同步) —— 逐 SHA 在所属仓 `git cat-file -e` 全部 **exit 1 (本地没有) ⇒ 他人推送, 记台账继续**; PR 两列表仍空; `find aria/skills … *-workspace` 两次之差为空。变动主体 = WP-A `secret-net-l3-and-bypass-paths` 于窗口期内 ship v1.75.0 (他轨)。
 - **等待点 6 判定**: `git -C aria diff --stat 268da8f..08db1c0 -- skills/audit-engine skills/phase-c-integrator` = **0 行** (v1.75.0 全部变动在 hooks/ + 发版文件) ⇒ 「AB 之后上游改了两个被测 skill 目录」不成立, **TASK-024 无须重跑**; aria master 前进由 TASK-025 的并入上游条届时处理。
 - **协调 ref 收尾**: `coord_ref_precheck` 退出 0 (`{"verdict": "ok", "local_ahead": 0}` — 本会话零本地心跳, 无领先写入); 强制对齐 `git fetch origin +refs/aria/coordination:refs/aria/coordination` 退出 0, 对齐前后本地与 origin 均 `ad08b18` (零丢弃)。
-- **提交**: 结果目录 + 本台账由主控在主仓 feature 分支提交, SHA 见下 (TASK-027 第 4 步 (c) 用); 归属口径: ab-results 不在 commit_attribution 静态集, 本提交只在 TASK-030 传 extra 的调用面上评判 (行 2088)。
+- **提交**: 结果目录 + 本台账由主控在主仓 feature 分支提交 = **`98746cd`** (51 files, +4381; TASK-027 第 4 步 (c) 用); 归属口径: ab-results 不在 commit_attribution 静态集, 本提交只在 TASK-030 传 extra 的调用面上评判 (行 2088)。本行 SHA 回填是后续小提交 (回填动作本身不改变 98746cd 的内容)。**5.2 (TASK-024) 完成**; 下一步 = 换不带 `ARIA_COORDINATION_NO_PUSH` 的普通会话, 第一步做 hard_constraints 第 4 条的会话入口 claim 核验 (距末次心跳 04:21Z 已超 8h, 须尽快), 再进 5.3 (TASK-025)。
 
 ## 发布
 
