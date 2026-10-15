@@ -356,3 +356,8 @@ harness 在子代理完成通知里给的 `subagent_tokens` **不是消耗量**,
 - **负载透明 (Rule #10)**: SC-8 五档 (真负载敏感腿) 在 load 1.37 (<2) 跑; timing load@start 3.39, 但 W14 §241 判据为负载稳健 CPU 比值 min-over-N、过载兜底 (基线 CPU≥5s) 未触发 (max 1.79s)、比值与原型吻合 ⇒ 有效。严格 <2 复跑 timing 另开窗口即可, 不改判。
 - **doc-sync 落地 SYNCED**: standards 191560e (计数 822/816·129 + §5.7 CC 前向兼容) · aria bae5c10 (CHANGELOG 顶节, 性能/探针结果行实测已填) · 主仓 06c08db。detailed-tasks TASK-010 → done。
 - **下一步**: TASK-011 发版 (取号两端 `ls-remote` + aria 6 发版文件 + 主仓 16 版本点 + 两 gitlink) **需 owner 授权**; TASK-012/013 续。5 条 review minor 延后。
+
+### TASK-011 发版结项 (2026-10-15, owner 授权)
+- **aria-plugin v1.75.0 已发布**: aria master `08db1c0` + tag `v1.75.0`; standards master `a611136`; 主仓 master `5ca430a` (16 版本点 + gitlink aria 08db1c0 / standards a611136)。三仓 local/origin/github 三方 ls-remote 一致; aria tag 双远程; gitlink 在 github 可达 (clone --recursive 安全); 4 版本一致性 check 全绿; 子模块本地 merge + 双推 (禁 Forgejo 服务端), INV-6 全 Refs-only (#154 未关)。
+- **发版前意外**: 本地 master 陈旧 (主仓 triage PR#228 / standards AGENTS.md PR#22·23 已落 origin), 与 WP-A 文件不相交; 已对齐 origin/master 再本地 merge, 他人工作无损 (standards github 本来落后 2bc1c4c, 双推一并修复镜像分叉)。
+- **下一步 (均 owner 门, 本会话内无法推进)**: TASK-012 post-ship 复验 6 腿须 **owner 更新插件缓存并重启会话** (plugin-cache-currency 探针首行 OK) 后在新会话执行; 之后 TASK-013 关 #154 (逐条披露三处有意偏离 + 验证范围 + 失败事件送达) + release_gate 释放认领 + 归档。#203/#221 保持 open 不评论。5 条 review minor 延后。

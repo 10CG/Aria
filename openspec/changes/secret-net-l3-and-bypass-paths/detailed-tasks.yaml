@@ -217,7 +217,8 @@ tasks:
   - id: TASK-011
     parent: "1.11"
     title: "发版: 取号 (与 10CG/Aria#199 协商) + aria 6 个发版文件 + 主仓 16 个版本点 + standards 版本行"
-    status: pending
+    status: done
+    notes: "2026-10-15 发版 PASS (owner 2026-10-15 授权): aria-plugin v1.75.0 (MINOR)。aria master 08db1c0 + tag v1.75.0; standards master a611136 (secret-hygiene 1.2.0, 并入既有 AGENTS.md 工作); 主仓 master 5ca430a (16 版本点 + gitlink aria 08db1c0 / standards a611136)。发版前本地 master 陈旧 (主仓 triage PR#228 / standards AGENTS.md PR#22·23), 已对齐 origin/master 再本地 merge, 无关工作无损。三仓 local/origin/github 三方 ls-remote 一致; aria tag 双远程 deref 08db1c0; gitlink 在 github 可达 (clone --recursive 安全, 无 orphan); 4 版本一致性 check 全绿 (badge / i18n / arch / main-consistency, 主仓自身 1.7.5 未动); INV-6 全提交 Refs-only (#154 未关); 子模块本地 merge 双推 (禁 Forgejo 服务端)。下一步 owner 门: TASK-012 post-ship 复验须 owner 更新插件缓存并重启会话 (plugin-cache-currency 首行 OK) 后在新会话执行; TASK-013 (关 #154 逐条披露 + 释放认领 + 归档) 在其后"
     complexity: M
     estimated_hours: "1-2"
     dependencies: [TASK-010]
