@@ -49,7 +49,7 @@ CHANGELOG 草稿 — Spec secret-net-l3-and-bypass-paths (WP-A) — TASK-009 产
 
 ### Tests
 
-- `secret-guard.test.sh` 599 (593 无 zsh) → **789 (783 无 zsh)**, 含 census `family_count` 61 → 64 与新族探针、未绑定变量注入自测、测试内 SC-8 五档延迟闸 (阈值与口径不改); `risky_patterns` 静态行数 <TASK-010 实测> (预算 ≤ 150)。`secret-scan.test.sh` 49 → **122**, 头注释 `Coverage: K cases` 与一条读取它的自检断言 (K 与实跑总数一致)。standards `secret-hygiene.md` 的计数与二者同步。
+- `secret-guard.test.sh` 599 (593 无 zsh) → **822 (816 无 zsh)**, 含 census `family_count` 61 → 64 与新族探针、未绑定变量注入自测、测试内 SC-8 五档延迟闸 (阈值与口径不改); `risky_patterns` 静态行数 149 (预算 ≤ 150)。`secret-scan.test.sh` 49 → **129**, 头注释 `Coverage: K cases` 与一条读取它的自检断言 (K 与实跑总数一致)。standards `secret-hygiene.md` 的计数与二者同步。
 - 验收探针 `baseline_probe.py` 目标态全部 `yes` <TASK-010 填: 命令与结果行>。
 
 ### Notes
