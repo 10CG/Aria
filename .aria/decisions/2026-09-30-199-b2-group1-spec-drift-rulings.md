@@ -79,6 +79,12 @@ container: simonfish/bfe8285d
   2. **一并补上**: audit-engine/SKILL.md 参数表加 `no_spec` 行 (对应 `--no-spec`, 与 `change_id` 互斥); phase-c-integrator 4.5 加「`error` (exit 2) 按 `fail` 阻塞」。
 - **代价**: 组 3 文档超出计划逐条文字 (TASK-015 写「五行」), 由本项授权; 「精确 mode 为 off 即不审计」这一运行时口径由 owner 拍板, 不是 AI 临场判断。组 3 多一轮修正与复核。
 
+## 10. 组 3 复核留下的两项新语义 —— Level 取不到按上界跑; 步骤 5 补「门 pass 而精确 off ⇒ 跳过审计继续合并」 (2026-10-15)
+
+- **事实 (主控核实, 临时仓四配置实跑, aria `d9097cf`)**: (Q1) `execution-modes.md` 入口逻辑「2. 确定模式」只写「按该 change 的 Level 精确推导」, 三种 Level 取不到的形态无取值规则 —— `spec_level_undetermined` 被 `allow_incomplete_checkpoints` 豁免为 bypassed 后 Level 恰解析不出 (实跑 exit 0 / bypassed); `allow_dangling_change_ids` 的 dangling-skip 在 convergence 档也出现 (实跑落格 E, 门 INFO 行写「pre_merge 取 "off"」与档位值冲突); 多 change 混合 Level 无归约规则。(Q2) `phase-c-integrator` 步骤 5 只处理 PASS / PASS_WITH_WARNINGS / FAIL, 门 pass 而精确推导为 off 时无审计 verdict, 只能从 on_skip「继续合并 (审计未启用)」推断 —— 默认 adaptive 档采用方的每个 Level 1 周期都走到这里 (实跑 `--no-spec` 落格 D pass)。
+- **裁定 (AskUserQuestion 两问两答, 2026-10-15 记录)**: (Q1) **按上界跑** —— Level 取不到不当 off: adaptive 档取 `adaptive_rules` 三档中最严的非 "off" 值 (默认配置 = challenge; 三档全 "off" 时上界即 "off", 不执行); convergence / challenge 档取档位值本身 (dangling 的 change_id 不影响); manual 档取 "off"; 多 change 逐个推导后归约: 任一非 "off" 即执行, 归约 mode 取最严的非 "off" 值 (严格度序 off < convergence < challenge, 与门侧 §1.4 R-1 / R-2 同口径)。依据: 两个宽松开关原意是放宽检查不是关掉动作 (SKILL.md 配置注释「开启后 pre_merge 仍执行」「开启后写盘仍执行」); Level 不知道不等于 owner 配了 off。(Q2) **补上** —— 步骤 5 加一支: 不执行 pre_merge 审计, 按 on_skip 路径继续推送和创建 PR; workflow report 必带 [INFO] 行 (completeness gate verdict + pre_merge 精确推导为 "off" + 依据 enabled_by / Level / 档位); audit_verdict 留空, 与「审计未启用」同形, 不新增取值 (该字段全仓只有文档输出示例提及, 无程序消费方)。
+- **代价 / 落点**: `execution-modes.md`「确定模式」段加两条 (多 change 归约 + Level 取不到取值) 并在两处「格 D / 格 E」括注后补归约注 (原句不动, SC-13 锁定串零改); `phase-c-integrator` 步骤 5 加一支 + 输出示例 audit_verdict 注释补半句。改动避开 N8 锚行、Pre-merge 节 Step 2 / Step 3 区间、bypassed 文案、四份 frontmatter; hotfix lane 注不动 (其引用的「确定模式」结果随新取值规则自动一致)。改后重跑 TASK-018 机检与 TASK-021 回归; 本改动在 TASK-024 记 W 之前完成, 不触发 TASK-027 第 4 步 (c) 的 AB 重跑。
+
 ## 勘误 (2026-10-01)
 
 - 第 6 项「事实」段的「四个非排除 checkpoint 全显式」误数: 裁定 1 之后非排除的 checkpoint 只有三个 (`post_spec` / `post_planning` / `post_implementation`); 该配置写四个显式键, 第四个 `post_brainstorm` 属第 5 项排除 (R11 `f5aadec7`, 由 backend-architect 席指出)。第 6 项原文不改, 以本勘误为准。
