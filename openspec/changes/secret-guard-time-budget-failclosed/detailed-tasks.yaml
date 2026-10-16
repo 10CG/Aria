@@ -1,0 +1,81 @@
+meta:
+  change: secret-guard-time-budget-failclosed
+  level: 2
+  linked_issue: "10CG/aria-plugin#216 (resolve), #219 (Windows 放大), #203 (assoc), #154 (报告环境)"
+  owner_ruling: "2026-10-16 先按推荐: c1 纯 bash SECONDS + N=3s + PATCH + C 兜底/B 降误拦"
+  rule6_note: "改 aria/hooks/secret-guard.sh + 其测试 + 头注释 + CHANGELOG, 零 SKILL.md / 零 description / 零 references → 不属 Skill 变更, 验证走 substitute (baseline-failing SC + 套件回归 + 直调探针)。非 AI 可见行为文本改动 (BLOCKED 文案只增一句时限 fail-closed)。"
+  baseline_freeze: "aria v1.75.0 (master 08db1c0); 行号与成本以此为准"
+
+tasks:
+  - id: TASK-001
+    parent: "B.1"
+    title: "入场 + 基线: 建分支, 重锚行号, 测 g-c/W9/W1 重腿的基线时间 (Linux [+Windows 若 owner 跑]), 定 N 余量与 SC-B1 阈值, 核 timeout 跨平台 (c2 兜底备注)"
+    status: pending
+    agent: main-loop
+    reason: "设计承重 + 基线测量, 主控亲做"
+    deliverables: [".aria/notes 下的基线记录"]
+    verification:
+      - "重腿 (g-c 16×400B+128refs / W9 整串 / W1 180KB Read) 的交错 CPU/墙钟基线记下; N=3s 的余量在最慢可及平台成立 (CC 5s - N ≥ hook 收尾+粒度误差)"
+      - "SECONDS 1s 粒度对 N=3 足够 (收尾 < 2s 实测)"
+
+  - id: TASK-002
+    parent: "B.2-C"
+    title: "C 实现: 时间预算 fail-closed (SECONDS 检查点, SECRET_GUARD_TIME_BUDGET_S 默认 3) + SC-T1/T2/T3"
+    status: pending
+    agent: implementer
+    reason: "执笔席 (fix-writer-bottleneck: 换人执笔); 主控不亲写 hook 码"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "在各昂贵腿边界读 SECONDS (bash 内建, 3.2 兼容), 累计 ≥ 预算即中止当前腿 → fail-closed: _sg_emit_blocked 时限变体 (复用 M6 oversize 路径, 文案加「时限内无法扫描, 请拆小」) + return 2"
+      - "覆盖腿: _sg_vx_pass 的 per-segment 循环 / _sg_vx_collect 的 i×j 链式 / W9 _sg_ext 整串一眼 / W1 大文件全扫 (scan 侧若适用)"
+      - "SECRET_GUARD_TIME_BUDGET_S: 默认 3; 环境变量覆盖 (供确定性测试设低值 + 运维调参); 非法/缺省走默认"
+      - "从不 fail-open; # guard:ack 逃生口不变; 内建直接判定 (#154 核心) 在预算内不受影响; 入口闸门先于计时"
+    verification:
+      - "SC-T1 (baseline-failing): 低预算下重命令 → exit 2 + 时限文案; 基线 v1.75.0 同输入不因时间 BLOCK"
+      - "SC-T2: 时限 BLOCK 文案含拆小 + rc=2; 加 # guard:ack 放行"
+      - "SC-T3: 典型直接读取命令仍 exit 2, 时间预算不改变它 (预算内)"
+
+  - id: TASK-003
+    parent: "B.2-B"
+    title: "B 实现: 收敛 _sg_vx_collect O(vars²) 链式 + _sg_compute_credit O(copy²) + SC-B1"
+    status: pending
+    agent: implementer
+    reason: "执笔席; 承重算法, 钉到字符级 (spec-underdetermination)"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    verification:
+      - "SC-B1: g-c tier 整进程 CPU 较 v1.75.0 降 ≥ 阈值 (TASK-001 定; 交错 min/5 比值); 慢平台外推 < N"
+      - "正确性零回归: 既有检出集合不变 (SC-R 覆盖)"
+
+  - id: TASK-004
+    parent: "B.2-review"
+    title: "回归 + 非作者对抗复核: SC-R (822/816 套件 + SC-30 + W14 时档) + SC-32 (bash-3.2) + 坏实现对抗 (非作者构造)"
+    status: pending
+    agent: qa-engineer
+    reason: "adversarial-fixture: 坏态由非作者独立构造; 换新鲜眼睛"
+    verification:
+      - "既有套件无回归 (计数随新测试更新, 头计数断言同步); SC-30 + 时档全绿; bash-3.2 + (若可) MINGW64 下 hook 加载 + 典型拦截 + 重命令 fail-closed"
+      - "SC-T/SC-B 的坏实现 (fail-open 回退 / 预算失效 / B 破坏检出) 均转红"
+
+  - id: TASK-005
+    parent: "B.2-accept"
+    title: "验收: 主控独立复跑探针/套件/时档 + SC 全绿 + 重命令 fail-closed 实证"
+    status: pending
+    agent: main-loop
+    reason: "不信执笔回执, 主控亲跑"
+    deliverables: [".aria/notes 验收记录"]
+
+  - id: TASK-006
+    parent: "C-release"
+    title: "发版 (PATCH) + #216 收口 + 头注释 :582 改「#216 已收口」"
+    status: pending
+    agent: main-loop
+    owner_gate: true
+    owner_gate_detail: "版本号、合并 master、打 tag、多远程双推均需 owner 授权; #216 关单逐条披露 (含 Windows 实测前后对比)"
+
+execution_order:
+  - [TASK-001]
+  - [TASK-002]
+  - [TASK-003]
+  - [TASK-004]
+  - [TASK-005]
+  - [TASK-006]
