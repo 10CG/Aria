@@ -21,7 +21,8 @@ tasks:
   - id: TASK-002
     parent: "B.2-C"
     title: "C 实现: 时间预算 fail-closed (SECONDS 检查点, SECRET_GUARD_TIME_BUDGET_S 默认 3) + SC-T1/T2/T3"
-    status: pending
+    status: done
+    notes: "2026-10-16 done (aria feature 9a6ce0e): 执笔席实现 + 主控复核修 2 处 (_SG_MODE==none 时钟陈旧 bug / 逐检查点 env 重解析)。套件 824/824; SC-T1/T1b/T2a baseline-failing + SC-T2b/T3a-c 核心不受影响 + SC-T4 结构守卫; bash 3.2.57+5.2 过; red-proof SC-T1 基线 exit0/本版 exit2。W1 大文件腿不存在 (Read/Edit 只匹配 file_path)。"
     agent: implementer
     reason: "执笔席 (fix-writer-bottleneck: 换人执笔); 主控不亲写 hook 码"
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
