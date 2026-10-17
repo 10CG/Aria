@@ -442,6 +442,20 @@ bucket counts: {'legacy_shaped': 6, 'matched': 800, 'no_checkpoint_prefix': 11, 
 
 
 
+### 5.9 (TASK-031) — 2026-10-17 (owner 全批: 第 10/11/13a/12 项)
+
+- **前置**: fetch + master 快进 (`6b9aee5` 含 TASK-030 全部); **SOT 比对** (phase_d_sot 六文件 `1cb3872..500e6c2` 零 diff ×6) ⇒ 手写 Phase D 映射沿用 (第 18 项不触发); D.1 跳过 (本仓无运行时 UPM); D.post: `post_closure=off` ⇒ 按配置跳过 (Rule #10 白名单第一类)。
+- **勾选**: tasks.md 31 行 `[x]` + TASK-024 deliverables 路径回填 (`<YYYY-MM-DD>` 1 处; tasks.md 本身无占位路径 — 5.2 行为散文, 0 处即如实); yaml 31 个 `status: pending→completed`; `rule6_note.scenario1` 回填结果目录全路径, 五字段 (row 3 / no / 已回填 / not_required / n/a) 齐备、`<vNEXT>` 残留 0; `git ls-files <结果目录>` = 50 行非空。
+- **归档预演** (spec_complete --gate): `complete=true, verdict=warn, blocking_reasons=[]`, unverified_claims 恰 1 条 (4.4 行 dogfood 无可链接产物 — A.2 C 态预告形态) ⇒ 非 block 可归档。**SC-12 liveness**: guard `rc=0` 无输出; 主仓根不加 `--force-checked`: L1/L2/L3 全真, `gate_verdict=warn` (判据 L2/L3 真 ⇒ 过)。**D.4 estimator capture**: 退出 0 (`wall_clock_seconds: 169291` ≈ 47h 全周期)。
+- **issue ×7 (第 10 项, owner 全批)**: 正文两项自检零命中后开出 —— 10CG/aria-plugin **#220** (--no-spec × 协调层交叉核验, 裁定 2) / **#221** (产出侧四调用点字面键早退, 裁定 13 = 迁移第 11 条跟踪单) / **#222** (F8 config 注册面) / **#223** (写侧命名无强制) / **#224** (config-loader 无程序化入口) / **#225** (AB 套件覆盖缺口, rule6_note 义务三 + hotfix lane) + 10CG/Aria **#235** (pre-merge-gate.json 三条 node id 缺口); 号回填 RESULT.md §5.6 与本台账。**归档 Step 7 tracker (第 11 项, owner 裁建)**: marker 字面查重无命中 (q= 模糊命中 5 张均不含 marker) 后开 **10CG/Aria#236** (deferred/未验证聚合)。
+- **D.2 归档**: git mv → `openspec/archive/2026-10-17-pre-merge-completeness-gate-change-scope/` (5 文件 100% rename, 源目录消失, Step 6 断言过); 提交 `41e4f5f` (含 RESULT.md issue 号回填)。
+- **D.2b release (第 13a 项)**: precheck 退出 0 → 强制对齐 → 解析 active → `release_gate --status done`: released.success=true / push_success=true / push_skipped=false; ls-remote 两端 `8cd7100` MATCH; claim status=**done**。
+- **回帖关单 (第 12 项)**: 10CG/Aria#199 (评论 29044) 与 10CG/aria-plugin#161 (评论 29049) 回帖 (版本/合并 SHA/行为变更要点) 后 closed (PATCH state; 首次评论 POST 因多行 JSON 编码失败, python 重发成功)。
+- **D.3 周期 handoff**: `docs/handoff/2026-10-17-199-cycle-done-pre-merge-completeness-gate-v1.76.0-archived.md`, owner-container 取 autofill 输出 (`simonfish/bfe8285d`), 五字段三重校验 (E1=5 / 非空=5 / track-id 逐字=1) 全过; 提交 `b803caf` (裸引用/字形 0, 一处范围简写 `#220-#225` 改「220 至 225 号」后 amend)。
+- **latest.md (子步 1+2)**: 判定输入 = 本会话 precheck 过并对齐后跑的 /state-scanner (tracks_multibranch.exists=true, 他轨有 active) ⇒ 非 single-track 且非主线, 但当前 pointer 指向本轨旧 doc (非 leader doc) ⇒ 判定表三行均不落 keep 分支 ⇒ **更新 pointer**; 维护 = pointer→新周期 handoff + 旧 Latest 转 Superseded (本轨前一收尾, 同轨顺序非 parallel) + 说明段收尾注 + 本轨 track 行改 done; 新文件名命中断言 2; **单独提交 `57cf080`** (含该 diff 的 13b 请求已呈)。
+- **13b 双推 (owner 批准)**: `git push origin master` + `git push github master` (`6b9aee5..57cf080`) 均退出 0; 逐 remote ls-remote: origin 与 github 均 = `57cf080` MATCH。
+- **⇒ 5.9 (TASK-031) 完成, 本轨 31 任务全部 completed, 周期终结** (10CG/Aria#199 closed; v1.76.0 双端; claim done)。
+
 ## 发布
 
 ## 写法自检
