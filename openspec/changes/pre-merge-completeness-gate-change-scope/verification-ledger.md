@@ -421,7 +421,26 @@ bucket counts: {'legacy_shaped': 6, 'matched': 800, 'no_checkpoint_prefix': 11, 
 - **gitlink**: aria 工作树 master @ `500e6c2`; HEAD (a3b187a) 的 aria gitlink `08db1c0`, `merge-base --is-ancestor 08db1c0 500e6c2` 退出 0 (只前进 ✓) ⇒ `git add aria`。
 - **16 版本点**: 逐处 grep 实测 (一处工具口径注意: ugrep 包装下 BRE 交替 `pat1\|pat2` 吞了 CLAUDE.md:138 一行, 单文件重 grep 补齐) —— README.md ×2 (:8 badge / :242)、README.zh/ja/ko ×3 各 (:3 translated-from / :10 / :244)、CLAUDE.md ×2 (:138 版本史范围端 / :142 版本行)、VERSION:24、system-architecture.md:189、version-scheme.md:23 —— 全部 `1.75.0`→`1.76.0` (逐文件计数断言 16/16), 改后九文件 grep `1.75.0` 零残留。i18n 仅版本处不重译 (10CG/Aria#140 B 档)。
 - **提交**: **`2436a1b`** (恰 9 文件 +17/-17, `Spec:` trailer 回读在位; 台账不入此提交, 随 TASK-030 一并)。
-- **custom checks 六条 (主仓根, 判首行)**: m6-version-badge-match `OK badge=1.76.0` / i18n-readme-translation-currency `OK (3 i18n @ 1.76.0)` / plugin-version-arch-docs-match `OK (2 arch rows)` / main-project-version-consistency `OK 主项目 1.7.5 九点一致 (无误伤)` / no-unresolved-version-placeholder `OK` —— 五条过; plugin-cache-currency `STALE installed=1.75.0 sot=1.76.0` 属预期 (owner 更新插件缓存前), 可继续。⇒ **5.7 (TASK-029) 完成**; 下一步 5.8 (TASK-030 提交范围核验与台账提交)。
+- **custom checks 六条 (主仓根, 判首行)**: m6-version-badge-match `OK badge=1.76.0` / i18n-readme-translation-currency `OK (3 i18n @ 1.76.0)` / plugin-version-arch-docs-match `OK (2 arch rows)` / main-project-version-consistency `OK 主项目 1.7.5 九点一致 (无误伤)` / no-unresolved-version-placeholder `OK` —— 五条过; plugin-cache-currency `STALE installed=1.75.0 sot=1.76.0` 属预期 (owner 更新插件缓存前), 可继续。⇒ **5.7 (TASK-029) 完成**。
+
+### 5.8 (TASK-030) — 2026-10-17 (进行中: 停在 owner_gates 第 9+16 项打包呈报)
+
+- **台账提交**: `e99f628` (5.2–5.7 全记录); 后补 `6cca2d4` (PR 面自检发现的 `#140` 全限定)。开 PR 前 porcelain 仅 `?? scratchpad/` (未跟踪工作目录, 不触及任何交付物; 其余行无)。
+- **提交范围核验 (commit_attribution, extra=ab-results 目录)**: 退出 1 `verdict=stop`, 23 提交 kinds = 13 own + 2 own-release-sync + 1 sync-merge + **7 foreign**。foreign 逐个归属 (与读前必看第 30 条预告一致): 决策单提交 5 个 (`fde9c1f` / `b575aa5` / `493ba0e` / `a0d03d1` / `8b68563`+`cdea732` 系列 — `.aria/decisions/` 属静态集里的他轨路径) + `latest.md` 指针提交 2 个 (`9dd2670` / `b207ca1`, 无 track-id)。**全部为本轨会话按 owner 裁定/收尾要求写入的文件, 属判据形态而非内容异常** ⇒ 按第 16 项呈 owner 确认一次。
+- **PR 面自检 (TASK-026 两项)**: `origin/master..feature` 新增行 7885; 裸引用带归属分诊 52 = ab-results 存档 31 (5.4 已记例外类, 不改) + 台账 21, 其中 20 处为**引述被修/被豁免 token 原形的审计记录** (改动即失真, 记例外), 1 处真实引用 (`#140 B 档`) 已修 = `6cca2d4`; 带圈编号零命中。
+- **owner 批准 (2026-10-17, ①16 项确认 + ②第 9 项一批) 后执行**:
+  - feature 推 origin (`6cca2d4`, 推后核验 MATCH); Forgejo 开 **PR #234** (merge commit 方式)。
+  - C.2.4 事实: `audit.enabled=true, mode=convergence, checkpoints.pre_merge=off` ⇒ pre_hook 早退属配置决定 (Rule #10 白名单第一类)。
+  - C.2.4.5 子模块闸 (主控显式跑, `ARIA_SUBMODULE_GATE_MODE=block ARIA_PR_NUMBER=234`): **exit 0** —— `OK: standards unchanged (a611136)` / `GATE: aria … PASS: aria forward bump (08db1c0→500e6c2)` / `OK: aria-orchestrator unchanged (237045a)`; 放行条件齐。
+  - PR #234 经 Forgejo API 合并 (`Do: merge`), 回执 merged=True, **M = `293456c`**。
+  - **操作失误与恢复 (如实记录)**: `checkout master` 被 5.8 台账未提交改动阻断 ("Aborting" 只见尾行未察觉), 随后的 `merge --ff-only origin/master` 落在 **feature 分支**上 (本地 feature 被快进到 `293456c`, 远端仍 `6cca2d4`); 断言脚本的变量展开又写错一处 (`git rev-parse M^2` 未展开)。恢复: 台账备份 → `checkout -- 台账` → feature `reset --hard 6cca2d4` (复位至远端一致) → `checkout master` + ff (`293456c`) → 台账改动恢复回 master 工作树。恢复后双断言成立: M 是 HEAD 祖先 ✓, M^2 = `6cca2d4` = feature HEAD ✓。
+  - C.2.5 前置: 五问事实逐条核 (enforced = origin+github; 脚本推本地 master 分支; fail_on_partial_push 缺省 true; expected_sha = 合并后本地 HEAD; 枚举三子模块)。**三子模块断言 (执行时实测)**: aria 四值 `500e6c2` ✓ / aria-orchestrator 四值 `237045a` ✓ / standards HEAD=origin=github=`a611136` 但**本地 master 分支 ref 落后 `2bc1c4c`** ⇒ `fetch origin master:master` 快进后四值齐 (a611136)。
+  - **C.2.5 矩阵**: push_all_remotes 顺序 子模块 (aria / standards / aria-orchestrator) → 主仓, 每 remote 成功 —— 三子模块均 up-to-date (远端已同值), 主仓 origin up-to-date (`293456c`), github 前进 `2e4d138`→`293456c`; `verify_post_push` (expected=293456c): origin match=True / github match=True; 独立 `ls-remote` 双端 master = 本地 HEAD `293456c` ✓。
+  - 台账所记主仓 SHA (98746cd/7854b85/fdc9a88/2436a1b/a3b187a/e99f628/6cca2d4) 全为 origin/master 祖先 ✓。
+  - **合并后复核**: version.yaml 重算 = skills_covered 32 (= json 数) / total_eval_cases 85 (= Σlen(evals), pre-merge-gate.json 无 evals 键计 0, 裁定 9) 与 version.yaml (32/85/version 1.6.0, changelog 顶条 = 本轨 5.1 条目) 全符; 合并后 master 五条 custom checks 全 OK (badge/i18n/arch/主项目 9 点/占位符)。
+  - 本段台账提交于 master 并随 C.2.5 同口径双推 (见下)。⇒ **5.8 (TASK-030) 完成**; 下一步 5.9 (TASK-031 收尾)。
+
+
 
 ## 发布
 
