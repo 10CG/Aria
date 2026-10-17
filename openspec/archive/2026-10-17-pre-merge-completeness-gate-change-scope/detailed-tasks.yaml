@@ -237,7 +237,7 @@ metadata:
   rule6_note:
     decision_table_row: 3
     description_changed: 'no'
-    scenario1: aria-plugin-benchmarks/ab-results/<TASK-024 本次结果目录> (TASK-024 跑完记目录名, TASK-031 勾选时回填全路径; 两个套件 ab-suite/audit-engine.json 与 ab-suite/phase-c-integrator.json 各两臂)
+    scenario1: aria-plugin-benchmarks/ab-results/2026-10-15-pre-merge-completeness-gate-rule6 (两个套件 ab-suite/audit-engine.json 与 ab-suite/phase-c-integrator.json 各两臂; TASK-024 已跑, delta +0.27 / 定向 eval 3 0.2<1.0 / phase-c 零回归)
     scenario4b: not_required
     negctrl: n/a
     fields_basis: '逐字段依据 (SOT standards/conventions/skill-benchmark-exemption.md 1.1.0 §4.1): decision_table_row 取第三行 = 裁定 5 的档位标签 (套件覆盖外), 但执行上取两读法并集、不取任何豁免 ⇒ scenario1 照跑并填结果目录而非 n/a; description_changed 为 no 的判据 = TASK-015 / 016 / 017 改前改后比**四份**被改 SKILL.md 的 frontmatter, 逐字相同 (逐字列名: audit-engine / phase-c-integrator / phase-b-developer / phase-a-planner; TASK-018 复核, 四份即本 cycle 被改 SKILL.md 的全集); 据 §2 只有 description 变动才须跑场景 4b ⇒ scenario4b 记 not_required, 据 §4.1 的合规判据 (description_changed 为 yes 时 scenario1 / scenario4b 不得为空或 not_required) 本组合合规; negctrl 是场景 4b 触发率评测的被评/负控命中数, 无 4b 即无该数 ⇒ n/a。第三行的三条义务另行满足, 见 note'
@@ -1598,7 +1598,7 @@ tasks:
   - id: TASK-001
     parent: '1.1'
     title: 'B.1 入口: owner 等待点、读 claim 并心跳、fetch 定分支起点、基线复核、台账骨架'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies: []
@@ -1620,7 +1620,7 @@ tasks:
   - id: TASK-002
     parent: '1.2'
     title: '语料冻结 corpus-freeze.md: 六族样本、双列标注与机械仲裁'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-7
     dependencies:
@@ -1639,7 +1639,7 @@ tasks:
   - id: TASK-003
     parent: '1.3'
     title: fixture 前提矩阵与测试风格约束
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -1659,7 +1659,7 @@ tasks:
   - id: TASK-004
     parent: '1.4'
     title: 'RED 第一批: 新建 tests/test_completeness_gate.py, 写 SC-1~SC-6'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 6-8
     dependencies:
@@ -1680,7 +1680,7 @@ tasks:
   - id: TASK-005
     parent: '1.5'
     title: 'RED 第二批: SC-7~SC-10 与 SC-18 (排除分支)'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 6-8
     dependencies:
@@ -1699,7 +1699,7 @@ tasks:
   - id: TASK-006
     parent: '1.6'
     title: 'RED 第三批: SC-15~SC-17 与 SC-19~SC-22'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 6-8
     dependencies:
@@ -1720,7 +1720,7 @@ tasks:
   - id: TASK-007
     parent: '1.7'
     title: RED 台账与提交
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 1-2
     dependencies:
@@ -1741,7 +1741,7 @@ tasks:
   - id: TASK-008
     parent: '2.1'
     title: 'CLI 与 P0 / P1: 参数契约、config 直读与内联映射、格 A、同仓判定、输出通道与短路框架'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 4-6
     dependencies:
@@ -1761,7 +1761,7 @@ tasks:
   - id: TASK-009
     parent: '2.2'
     title: 'P2a 与 P2: --no-spec 前置核验、S1–S4、两个 base 轴的陈旧告警'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-7
     dependencies:
@@ -1779,7 +1779,7 @@ tasks:
   - id: TASK-010
     parent: '2.3'
     title: 'P3 与 P4: Level 三条判据、五档优先级链、五项排除、逐对纳入、dangling-skip'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-7
     dependencies:
@@ -1799,7 +1799,7 @@ tasks:
   - id: TASK-011
     parent: '2.4'
     title: 'P5 与早退型豁免: 格 B / C / D / E、归约 R-1 / R-2、S4 / spec_level_undetermined / no_spec_unverifiable 的豁免与短路'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 4-6
     dependencies:
@@ -1818,7 +1818,7 @@ tasks:
   - id: TASK-012
     parent: '2.5'
     title: 'P6: 归属规则、非递归枚举、两个排除计数、三态与 trail 行'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 6-8
     dependencies:
@@ -1839,7 +1839,7 @@ tasks:
   - id: TASK-013
     parent: '2.6'
     title: '组 2 收口: 既有结构约束用例的允许集、SC-15 补「mode 写错」一格、全绿后提交并记 SHA'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 3-4
     dependencies:
@@ -1861,7 +1861,7 @@ tasks:
   - id: TASK-014
     parent: '3.1'
     title: 'execution-modes.md: 入口守卫、Step 1–5、三态模板、豁免文案'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 4-6
     dependencies:
@@ -1882,7 +1882,7 @@ tasks:
   - id: TASK-015
     parent: '3.2'
     title: 'audit-engine SKILL.md: 输入参数五项、fenced bash 调用块、两个 allow_* 注释、:423、相关文档'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -1901,7 +1901,7 @@ tasks:
   - id: TASK-016
     parent: '3.3'
     title: 'phase-c-integrator SKILL.md (CRLF): 步骤 3 五档链与同形两处、pre_hook 五参数、4.5、:157'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 3-4
     dependencies:
@@ -1919,7 +1919,7 @@ tasks:
   - id: TASK-017
     parent: '3.4'
     title: 旧 schema 散文残留三处、report-storage 四句、pre-write-validation 关联行
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 1-2
     dependencies:
@@ -1940,7 +1940,7 @@ tasks:
   - id: TASK-018
     parent: '3.5'
     title: 文档机检 (SC-13、N1–N4 / N7 / N8 与四份 frontmatter) 与组 3 提交
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 1-2
     dependencies:
@@ -1957,7 +1957,7 @@ tasks:
   - id: TASK-019
     parent: '4.1'
     title: '反事实第一批: SC-1~SC-10 与 SC-18'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-7
     dependencies:
@@ -1983,7 +1983,7 @@ tasks:
   - id: TASK-020
     parent: '4.2'
     title: '反事实第二批: SC-15~SC-17 与 SC-19~SC-22'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-7
     dependencies:
@@ -2004,7 +2004,7 @@ tasks:
   - id: TASK-021
     parent: '4.3'
     title: '回归: SC-12 三套、SC-12 liveness (重写 a)、catalog 5/8 单测'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -2023,7 +2023,7 @@ tasks:
   - id: TASK-022
     parent: '4.4'
     title: 活体运行 (SC-11) 与 SC-6 自证 (重写 c)
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 1-2
     dependencies:
@@ -2041,7 +2041,7 @@ tasks:
   - id: TASK-023
     parent: '5.1'
     title: 'AB 套件编辑: eval id 3、audit-engine.json 文件版本、version.yaml'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -2062,13 +2062,13 @@ tasks:
   - id: TASK-024
     parent: '5.2'
     title: 'Rule #6 照跑 (两读法并集): audit-engine 与 phase-c-integrator 两个套件'
-    status: pending
+    status: completed
     complexity: L
     estimated_hours: 5-8
     dependencies:
       - TASK-023
     deliverables:
-      - aria-plugin-benchmarks/ab-results/<YYYY-MM-DD>-pre-merge-completeness-gate-rule6/
+      - aria-plugin-benchmarks/ab-results/2026-10-15-pre-merge-completeness-gate-rule6/
       - openspec/changes/pre-merge-completeness-gate-change-scope/verification-ledger.md
     agent: qa-engineer
     reason: AB 编排与区分力判读
@@ -2089,7 +2089,7 @@ tasks:
   - id: TASK-025
     parent: '5.3'
     title: 版本 MINOR 与 CHANGELOG 十三条迁移文案
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -2112,7 +2112,7 @@ tasks:
   - id: TASK-026
     parent: '5.4'
     title: 引用与编号写法自检 (两次)
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 1-2
     dependencies:
@@ -2128,7 +2128,7 @@ tasks:
   - id: TASK-027
     parent: '5.5'
     title: aria 本地合并、取号复核与终核、合并树回归、打 tag (不推送)
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 2-4
     dependencies:
@@ -2152,7 +2152,7 @@ tasks:
   - id: TASK-028
     parent: '5.6'
     title: aria 双推与逐 remote 核验
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: '1'
     dependencies:
@@ -2171,7 +2171,7 @@ tasks:
   - id: TASK-029
     parent: '5.7'
     title: '主仓发布同步面: aria gitlink、16 个版本点、custom checks'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -2199,7 +2199,7 @@ tasks:
   - id: TASK-030
     parent: '5.8'
     title: '主仓 PR、pre-merge gate (Rule #8)、合并、C.2.5 双推与核验'
-    status: pending
+    status: completed
     complexity: S
     estimated_hours: 2-3
     dependencies:
@@ -2224,7 +2224,7 @@ tasks:
   - id: TASK-031
     parent: '5.9'
     title: 'Phase D: 开 issue、勾选、归档预演与 liveness 复跑、归档、释放 claim、回帖关单、周期 handoff、双推'
-    status: pending
+    status: completed
     complexity: M
     estimated_hours: 3-5
     dependencies:

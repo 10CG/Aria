@@ -190,49 +190,49 @@
 
 ## 1. B.1 入口、基线复核与测试先行
 
-- [ ] 1.1 B.1 入口: owner 等待点 → 按 (本容器, 归一 track_id, `active`) 三元组解析本轨 claim, 过协调 ref 前置检查并强制对齐到 origin 后以 `--heartbeat-only` 刷新、并按 yaml `metadata.coord_push_verify` 核验推成了没有 (解析不到 `active` 且未获重认领授权则停) → fetch 后实测 aria 与主仓 `origin/master`, 定分支起点 (回落时核提交归属) → 按 yaml 触点清单重跑基线 diff (**aria / 主仓 / standards 三组**, 另加 phase-d-closer 等六个 SOT 对 `1cb3872` 一组; standards 组对 B.1 当时 gitlink 重测; 冻结点起的输出记台账, 有无新 diff 另从 v2.7 复测端点到起点再比一次判定, v2.8) → 建台账骨架 — 台账
-- [ ] 1.2 语料冻结 `corpus-freeze.md` (本目录): 取样命令与时刻、六族样本、双列标注 (frontmatter 定序与归一化 / 名匹配)、按族分流的机械仲裁与争议表; 标注由非实现者完成, 复现由另一实例核对 — SC-2 / SC-4 前置
-- [ ] 1.3 fixture 前提矩阵: SC-1~SC-22 逐格列 mode、Level 行、`audit.enabled`、两个路径参数、作用域来源与 carve-out, 写入读前必看第 6、7、9、23 条的口径; 每个格包在 `subTest(cell=...)` 里并照用阶段子格名; 测试一律 `unittest.TestCase`, 不 import pytest、不建 conftest.py — 台账
-- [ ] 1.4 新建 `tests/test_completeness_gate.py` 第一批: SC-1~SC-6 — RED
-- [ ] 1.5 第二批: SC-7~SC-10 与 SC-18 (排除分支) — RED
-- [ ] 1.6 第三批: SC-15~SC-17 与 SC-19~SC-22 (SC-15(5) 与 SC-17(5) 按读前必看第 6、7 条) — RED
-- [ ] 1.7 RED 台账: 全文件对基线逐条实跑, 失败形态为 AssertionError, 阶段子格全部被执行且失败; `run_all_tests.sh --list` 仍列 audit-engine 为 `(unittest)`; 主控提交测试文件与 `corpus-freeze.md` — 台账
+- [x] 1.1 B.1 入口: owner 等待点 → 按 (本容器, 归一 track_id, `active`) 三元组解析本轨 claim, 过协调 ref 前置检查并强制对齐到 origin 后以 `--heartbeat-only` 刷新、并按 yaml `metadata.coord_push_verify` 核验推成了没有 (解析不到 `active` 且未获重认领授权则停) → fetch 后实测 aria 与主仓 `origin/master`, 定分支起点 (回落时核提交归属) → 按 yaml 触点清单重跑基线 diff (**aria / 主仓 / standards 三组**, 另加 phase-d-closer 等六个 SOT 对 `1cb3872` 一组; standards 组对 B.1 当时 gitlink 重测; 冻结点起的输出记台账, 有无新 diff 另从 v2.7 复测端点到起点再比一次判定, v2.8) → 建台账骨架 — 台账
+- [x] 1.2 语料冻结 `corpus-freeze.md` (本目录): 取样命令与时刻、六族样本、双列标注 (frontmatter 定序与归一化 / 名匹配)、按族分流的机械仲裁与争议表; 标注由非实现者完成, 复现由另一实例核对 — SC-2 / SC-4 前置
+- [x] 1.3 fixture 前提矩阵: SC-1~SC-22 逐格列 mode、Level 行、`audit.enabled`、两个路径参数、作用域来源与 carve-out, 写入读前必看第 6、7、9、23 条的口径; 每个格包在 `subTest(cell=...)` 里并照用阶段子格名; 测试一律 `unittest.TestCase`, 不 import pytest、不建 conftest.py — 台账
+- [x] 1.4 新建 `tests/test_completeness_gate.py` 第一批: SC-1~SC-6 — RED
+- [x] 1.5 第二批: SC-7~SC-10 与 SC-18 (排除分支) — RED
+- [x] 1.6 第三批: SC-15~SC-17 与 SC-19~SC-22 (SC-15(5) 与 SC-17(5) 按读前必看第 6、7 条) — RED
+- [x] 1.7 RED 台账: 全文件对基线逐条实跑, 失败形态为 AssertionError, 阶段子格全部被执行且失败; `run_all_tests.sh --list` 仍列 audit-engine 为 `(unittest)`; 主控提交测试文件与 `corpus-freeze.md` — 台账
 
 ## 2. 实现 `scripts/completeness_gate.py` (按 §1.0 求值总序, stdlib only; 2.1–2.4 只验收各自的阶段子格, SC 方法级全绿在 2.5)
 
-- [ ] 2.1 CLI 与 P0 / P1: 必填与可选参数及互斥, config 直读加内联缺省与旧配置兼容映射, 格 A, 两面 toplevel 判同仓, stdout 只出 16 键 JSON、人读行走 stderr, exit code 与短路框架 — 阶段子格 (SC-10 / SC-15(1) / SC-17(7) / SC-21)
-- [ ] 2.2 P2a 与 P2: `--no-spec` 锚点面前置核验, S1 锚点逐字比对与 `allow_dangling_change_ids` 继承, S2 锚点面 `--no-renames` diff, S3 / S4, 两个 base 轴的陈旧告警, `git_failed` — 阶段子格 (SC-5(8) / SC-7 / SC-17(4)(5) / SC-22(3))
-- [ ] 2.3 P3 与 P4: Level 三条判据, 五档优先级链, 五项排除, 逐对纳入与按需求 Level, `dangling-skip` — 阶段子格 (SC-15(5) / SC-20(3))
-- [ ] 2.4 P5 与早退型豁免: 格 B / C / D / E 与归约 R-1 / R-2, S4 / `spec_level_undetermined` / `no_spec_unverifiable` 的豁免 (含裁定 11) 与短路, 读前必看第 8 条的取值 — 阶段子格 (SC-7(e) / SC-9 / SC-15 / SC-17(5))
-- [ ] 2.5 P6: 归属规则 1–3, 顶层 `iterdir()` 与目录缺失, 两个排除计数与 `unattributed`, 三态与 (b)(c) 通道, trail 行与前 20 截断, missing 的豁免降级 — SC-1~SC-22 的单测方法全绿
-- [ ] 2.6 组 2 收口: 测试侧新实例改既有结构约束用例 `test_sibling_spec_probe` 的 scripts/ 允许集 (逐字加入口脚本名, v2.11), 并在 SC-15 补「mode 写错」一格 (subTest, v2.12); 两条 diff 机检通过、audit-engine 测试目录全量零失败且 Ran 133 后, 主控在 WIP 提交之上提交并记 SHA, 另一新实例跑反事实 (记台账) — 台账
+- [x] 2.1 CLI 与 P0 / P1: 必填与可选参数及互斥, config 直读加内联缺省与旧配置兼容映射, 格 A, 两面 toplevel 判同仓, stdout 只出 16 键 JSON、人读行走 stderr, exit code 与短路框架 — 阶段子格 (SC-10 / SC-15(1) / SC-17(7) / SC-21)
+- [x] 2.2 P2a 与 P2: `--no-spec` 锚点面前置核验, S1 锚点逐字比对与 `allow_dangling_change_ids` 继承, S2 锚点面 `--no-renames` diff, S3 / S4, 两个 base 轴的陈旧告警, `git_failed` — 阶段子格 (SC-5(8) / SC-7 / SC-17(4)(5) / SC-22(3))
+- [x] 2.3 P3 与 P4: Level 三条判据, 五档优先级链, 五项排除, 逐对纳入与按需求 Level, `dangling-skip` — 阶段子格 (SC-15(5) / SC-20(3))
+- [x] 2.4 P5 与早退型豁免: 格 B / C / D / E 与归约 R-1 / R-2, S4 / `spec_level_undetermined` / `no_spec_unverifiable` 的豁免 (含裁定 11) 与短路, 读前必看第 8 条的取值 — 阶段子格 (SC-7(e) / SC-9 / SC-15 / SC-17(5))
+- [x] 2.5 P6: 归属规则 1–3, 顶层 `iterdir()` 与目录缺失, 两个排除计数与 `unattributed`, 三态与 (b)(c) 通道, trail 行与前 20 截断, missing 的豁免降级 — SC-1~SC-22 的单测方法全绿
+- [x] 2.6 组 2 收口: 测试侧新实例改既有结构约束用例 `test_sibling_spec_probe` 的 scripts/ 允许集 (逐字加入口脚本名, v2.11), 并在 SC-15 补「mode 写错」一格 (subTest, v2.12); 两条 diff 机检通过、audit-engine 测试目录全量零失败且 Ran 133 后, 主控在 WIP 提交之上提交并记 SHA, 另一新实例跑反事实 (记台账) — 台账
 
 ## 3. 规程与文档同步 (Rule #3)
 
-- [ ] 3.1 `execution-modes.md`: §入口逻辑 `:10` 改读优先级链并取上界; §Pre-merge 互补说明、Step 1 注、Step 2 改写、Step 3 五项排除与枚举源、Step 4-5 改为调用 `scripts/completeness_gate.py` 的命令行与三态路由并逐字写入消费方 fail-closed 义务 (五个 Step 标记与围栏保留); 三态失败模板 (Fix 四项); `:44` 与 `:82` 豁免文案统一 — SC-13 / N1 / N2
-- [ ] 3.2 `audit-engine/SKILL.md`: 输入参数表补五项; 在 fenced bash 块内调用 `aria/skills/audit-engine/scripts/completeness_gate.py` (调用串照抄 yaml 的 canonical, 与 3.1 相同); `:381-384` 与 `:385-388` 两个注释块各补一句; `:423` 同形改写; 相关文档加契约指针 — SC-13 / SC-12 liveness / N4 / N8
-- [ ] 3.3 `phase-c-integrator/SKILL.md` (CRLF, 保持行尾): 步骤 3 改为五档优先级链 (convergence / challenge 照常调用门), `:57` 与 `:754` 同形改写, pre_hook 向 `scripts/completeness_gate.py` 传五个参数, 步骤 4.5 三态处置, `:157` 勘正 — SC-13 / N7 / N8
-- [ ] 3.4 旧 schema 散文残留清零 (`phase-a-planner:267`、`phase-b-developer:204,277`, 后者为 CRLF; 第四处 `phase-c-integrator:157` 由 3.3 落); `report-storage.md` §向后兼容补四句; `pre-write-validation.md:3` 补 change 维度 — SC-13
-- [ ] 3.5 文档机检: SC-13 全部条目与 N1–N4 / N7 / N8 在组 3 改动后全真, **四份**被改 SKILL.md (`audit-engine` / `phase-c-integrator` / `phase-b-developer` / `phase-a-planner`) 的 frontmatter 不变; 主控提交组 3 改动 — 台账
+- [x] 3.1 `execution-modes.md`: §入口逻辑 `:10` 改读优先级链并取上界; §Pre-merge 互补说明、Step 1 注、Step 2 改写、Step 3 五项排除与枚举源、Step 4-5 改为调用 `scripts/completeness_gate.py` 的命令行与三态路由并逐字写入消费方 fail-closed 义务 (五个 Step 标记与围栏保留); 三态失败模板 (Fix 四项); `:44` 与 `:82` 豁免文案统一 — SC-13 / N1 / N2
+- [x] 3.2 `audit-engine/SKILL.md`: 输入参数表补五项; 在 fenced bash 块内调用 `aria/skills/audit-engine/scripts/completeness_gate.py` (调用串照抄 yaml 的 canonical, 与 3.1 相同); `:381-384` 与 `:385-388` 两个注释块各补一句; `:423` 同形改写; 相关文档加契约指针 — SC-13 / SC-12 liveness / N4 / N8
+- [x] 3.3 `phase-c-integrator/SKILL.md` (CRLF, 保持行尾): 步骤 3 改为五档优先级链 (convergence / challenge 照常调用门), `:57` 与 `:754` 同形改写, pre_hook 向 `scripts/completeness_gate.py` 传五个参数, 步骤 4.5 三态处置, `:157` 勘正 — SC-13 / N7 / N8
+- [x] 3.4 旧 schema 散文残留清零 (`phase-a-planner:267`、`phase-b-developer:204,277`, 后者为 CRLF; 第四处 `phase-c-integrator:157` 由 3.3 落); `report-storage.md` §向后兼容补四句; `pre-write-validation.md:3` 补 change 维度 — SC-13
+- [x] 3.5 文档机检: SC-13 全部条目与 N1–N4 / N7 / N8 在组 3 改动后全真, **四份**被改 SKILL.md (`audit-engine` / `phase-c-integrator` / `phase-b-developer` / `phase-a-planner`) 的 frontmatter 不变; 主控提交组 3 改动 — 台账
 
 ## 4. 反事实、回归与活体运行
 
-- [ ] 4.1 反事实第一批 (SC-1~SC-10、SC-18): 既非实现者也非测试作者的新实例在 2.6 SHA 的一次性副本上三步法实跑, 一律 `python3 -B` — 台账
-- [ ] 4.2 反事实第二批 (SC-15~SC-17、SC-19~SC-22), 做法同 4.1 — 台账
-- [ ] 4.3 回归: SC-12 三条命令零失败且 Ran 数不少于基线 (state-scanner 那条不带 `ARIA_COORDINATION_NO_PUSH`); 配置文件守卫 (钉在主仓根, 退出码为 0 或 1 且无命中行) 通过后, 重写 a 的 L2 / L3 为真、L1 在全勾选副本上为真; catalog 5/8 可执行 fixture 的三条命令 OK — 台账
-- [ ] 4.4 活体 dogfood (SC-11) 与 SC-6 自证 (重写 c 的快照格与对照) — 台账与周期 handoff
+- [x] 4.1 反事实第一批 (SC-1~SC-10、SC-18): 既非实现者也非测试作者的新实例在 2.6 SHA 的一次性副本上三步法实跑, 一律 `python3 -B` — 台账
+- [x] 4.2 反事实第二批 (SC-15~SC-17、SC-19~SC-22), 做法同 4.1 — 台账
+- [x] 4.3 回归: SC-12 三条命令零失败且 Ran 数不少于基线 (state-scanner 那条不带 `ARIA_COORDINATION_NO_PUSH`); 配置文件守卫 (钉在主仓根, 退出码为 0 或 1 且无命中行) 通过后, 重写 a 的 L2 / L3 为真、L1 在全勾选副本上为真; catalog 5/8 可执行 fixture 的三条命令 OK — 台账
+- [x] 4.4 活体 dogfood (SC-11) 与 SC-6 自证 (重写 c 的快照格与对照) — 台账与周期 handoff
 
 ## 5. Rule #6 AB、发布与收尾 (5.4 第二次在 5.9 内)
 
-- [ ] 5.1 AB 套件编辑: `audit-engine.json` 新增定向 eval id 3 并把文件内 `version` 改为 1.1.0; `version.yaml` 升到当时现值的下一个 MINOR, 两个计数程序化重算; 开 AB 会话前把 aria `origin/master` 并入 feature 并重跑 3.5 与 4.3; 主控提交时必须带本轨 `Spec:` trailer 并回读确认 (两个交付物都在发布同步面, 结构上不含本轨专属路径, 漏写会在 5.8 判 `shared-only` 而停) — rule6_note
-- [ ] 5.2 Rule #6 照跑 (两读法并集, 经 `/skill-creator`): 前置 = owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动会话, aria `origin/master` 已在 feature 里; 写 PREDICTION.md 并取副作用快照; `audit-engine.json` 与 `phase-c-integrator.json` 按描述性推演两臂照跑, 两套件逐 eval 无回归, audit-engine 套件 delta > 0 且 eval id 3 的 without 臂低于 with 臂; 结束后过协调 ref 前置检查才对齐; catalog 三条命令与三条缺口写进 README; 结果落 `aria-plugin-benchmarks/ab-results/` (5.9 勾选时换成本次结果目录全路径) — SC-14
-- [ ] 5.3 版本与 CHANGELOG: 上游在 5.1 之后又前进时先并入 feature (merge, 不 rebase) 并重跑 3.5 与 4.3; 再取 MINOR 号改版本 SOT 6 文件 (含 `README.zh.md`, v2.8; 记取号时 SHA); CHANGELOG 写十三条迁移文案 (§5 第 2、10 条按读前必看第 7 条) — 台账
-- [ ] 5.4 引用与编号写法自检, 两次 (5.5 前; 周期 handoff 与回帖落笔前): 本 cycle 新增行的 issue 引用全限定、文内编号不用 `#` 与带圈字符 — 台账
-- [ ] 5.5 aria 本地合并: fetch → 断言 feature 分支干净 → master 对齐 `origin/master` 并记 SHA → 取号与 AB 基线复核 (上游与 feature 两侧) → `git merge --no-ff` 并断言本轮双父合并提交 → 取号终核 → 合并树原位回归 → 打 tag; 任一步不成立即停下上报 — 台账
-- [ ] 5.6 aria 双推: owner 授权后每个远端一条原子推送 (master 与 tag, 先 origin 后 github), 推后逐 remote `ls-remote` 核 master 与 tag; 被拒或只推成一个即停下上报 — 台账
-- [ ] 5.7 主仓同步面: 先把主仓 `origin/master` 并入主仓 feature 分支 (merge, 不 rebase; 冲突即停), 再 aria gitlink 取 5.6 核验后的 SHA (只前进), 16 个版本点 (含 `VERSION:24`), custom checks 复跑 (判通过看输出首行: 以 `OK` 开头, `plugin-cache-currency` 为 `STALE` 属预期, `##SKIP##` 算没跑成); 主控在主仓 feature 分支只提交上述九个版本同步面文件 (台账追加随 5.8 一并提交), 提交信息带本轨 `Spec:` trailer 并回读确认 (这九个文件整条落在发布同步面, 漏写会在 5.8 的提交归属核验里判 `shared-only` 而停) — 台账
-- [ ] 5.8 主仓 PR: 工作树与提交范围核验 (提交清单随授权请求呈上), merge 不 rebase, PR 过 C.2.4 pre-merge gate 与 C.2.4.5 子模块指针闸 (主控在 Forgejo 合并前显式跑, 没放行即停; override 由 owner 裁, 默认走 PR 标签, owner 逐个点名放行的子模块; 请授权前先核标签有无定义, 打上后先核它确已挂上再重跑闸; 这两处 GET 本身失败另作一支, 不当作未定义, 也不当作挂上或没挂上, v2.9) 后以 merge commit 合并; 合并后本地 master 快进并核对合并提交, 断言三个子模块无待推内容后交 C.2.5 双推与 parity, 再复核版本点与 ab-suite 计数 — 台账
-- [ ] 5.9 Phase D (手写, 与 phase-d-closer 逐步对应; 沿用映射前先比对它所据的 SOT, 与手写路径根本冲突即停在等待点 18): 开七张 issue 并回填台账; 主控一次勾选全部 checkbox; post_closure 审计按执行时配置处置 (`off` 则跳过); 归档预演并复跑重写 a 的 L1–L3; Step 7 由 owner 裁; release 之前单独请等待点 13a, 过协调 ref 前置检查并强制对齐后 `release_gate` 释放 claim 并按 `metadata.coord_push_verify` 核验推成了没有 (不带 sweep / gc; 遇 `claim_not_found` 呈 owner, 不按推送失败处置); estimator 采集; 10CG/Aria#199 与 10CG/aria-plugin#161 回帖关闭; 周期 handoff 按模板起稿并照录判断清单 (frontmatter 五字段写全, `track-id` 逐字写本 spec id 并先去 CR 再用 `grep -cxF` 断言取值为 1), 写后跑五字段自校验 (`head -8` 窗口, 须为 5), 再做 `docs/handoff/latest.md` 两子步 (History prepend 恒做, 按现行版式, History 节恢复与否交 10CG/Aria#220; pointer 按判定表, follower 不改; 单独成提交); `latest.md` 提交产生之后请等待点 13b (请求附其 diff), 获授权后 Phase D 提交双推并逐 remote 核验 — 台账
+- [x] 5.1 AB 套件编辑: `audit-engine.json` 新增定向 eval id 3 并把文件内 `version` 改为 1.1.0; `version.yaml` 升到当时现值的下一个 MINOR, 两个计数程序化重算; 开 AB 会话前把 aria `origin/master` 并入 feature 并重跑 3.5 与 4.3; 主控提交时必须带本轨 `Spec:` trailer 并回读确认 (两个交付物都在发布同步面, 结构上不含本轨专属路径, 漏写会在 5.8 判 `shared-only` 而停) — rule6_note
+- [x] 5.2 Rule #6 照跑 (两读法并集, 经 `/skill-creator`): 前置 = owner 以 `ARIA_COORDINATION_NO_PUSH=1` 启动会话, aria `origin/master` 已在 feature 里; 写 PREDICTION.md 并取副作用快照; `audit-engine.json` 与 `phase-c-integrator.json` 按描述性推演两臂照跑, 两套件逐 eval 无回归, audit-engine 套件 delta > 0 且 eval id 3 的 without 臂低于 with 臂; 结束后过协调 ref 前置检查才对齐; catalog 三条命令与三条缺口写进 README; 结果落 `aria-plugin-benchmarks/ab-results/` (5.9 勾选时换成本次结果目录全路径) — SC-14
+- [x] 5.3 版本与 CHANGELOG: 上游在 5.1 之后又前进时先并入 feature (merge, 不 rebase) 并重跑 3.5 与 4.3; 再取 MINOR 号改版本 SOT 6 文件 (含 `README.zh.md`, v2.8; 记取号时 SHA); CHANGELOG 写十三条迁移文案 (§5 第 2、10 条按读前必看第 7 条) — 台账
+- [x] 5.4 引用与编号写法自检, 两次 (5.5 前; 周期 handoff 与回帖落笔前): 本 cycle 新增行的 issue 引用全限定、文内编号不用 `#` 与带圈字符 — 台账
+- [x] 5.5 aria 本地合并: fetch → 断言 feature 分支干净 → master 对齐 `origin/master` 并记 SHA → 取号与 AB 基线复核 (上游与 feature 两侧) → `git merge --no-ff` 并断言本轮双父合并提交 → 取号终核 → 合并树原位回归 → 打 tag; 任一步不成立即停下上报 — 台账
+- [x] 5.6 aria 双推: owner 授权后每个远端一条原子推送 (master 与 tag, 先 origin 后 github), 推后逐 remote `ls-remote` 核 master 与 tag; 被拒或只推成一个即停下上报 — 台账
+- [x] 5.7 主仓同步面: 先把主仓 `origin/master` 并入主仓 feature 分支 (merge, 不 rebase; 冲突即停), 再 aria gitlink 取 5.6 核验后的 SHA (只前进), 16 个版本点 (含 `VERSION:24`), custom checks 复跑 (判通过看输出首行: 以 `OK` 开头, `plugin-cache-currency` 为 `STALE` 属预期, `##SKIP##` 算没跑成); 主控在主仓 feature 分支只提交上述九个版本同步面文件 (台账追加随 5.8 一并提交), 提交信息带本轨 `Spec:` trailer 并回读确认 (这九个文件整条落在发布同步面, 漏写会在 5.8 的提交归属核验里判 `shared-only` 而停) — 台账
+- [x] 5.8 主仓 PR: 工作树与提交范围核验 (提交清单随授权请求呈上), merge 不 rebase, PR 过 C.2.4 pre-merge gate 与 C.2.4.5 子模块指针闸 (主控在 Forgejo 合并前显式跑, 没放行即停; override 由 owner 裁, 默认走 PR 标签, owner 逐个点名放行的子模块; 请授权前先核标签有无定义, 打上后先核它确已挂上再重跑闸; 这两处 GET 本身失败另作一支, 不当作未定义, 也不当作挂上或没挂上, v2.9) 后以 merge commit 合并; 合并后本地 master 快进并核对合并提交, 断言三个子模块无待推内容后交 C.2.5 双推与 parity, 再复核版本点与 ab-suite 计数 — 台账
+- [x] 5.9 Phase D (手写, 与 phase-d-closer 逐步对应; 沿用映射前先比对它所据的 SOT, 与手写路径根本冲突即停在等待点 18): 开七张 issue 并回填台账; 主控一次勾选全部 checkbox; post_closure 审计按执行时配置处置 (`off` 则跳过); 归档预演并复跑重写 a 的 L1–L3; Step 7 由 owner 裁; release 之前单独请等待点 13a, 过协调 ref 前置检查并强制对齐后 `release_gate` 释放 claim 并按 `metadata.coord_push_verify` 核验推成了没有 (不带 sweep / gc; 遇 `claim_not_found` 呈 owner, 不按推送失败处置); estimator 采集; 10CG/Aria#199 与 10CG/aria-plugin#161 回帖关闭; 周期 handoff 按模板起稿并照录判断清单 (frontmatter 五字段写全, `track-id` 逐字写本 spec id 并先去 CR 再用 `grep -cxF` 断言取值为 1), 写后跑五字段自校验 (`head -8` 窗口, 须为 5), 再做 `docs/handoff/latest.md` 两子步 (History prepend 恒做, 按现行版式, History 节恢复与否交 10CG/Aria#220; pointer 按判定表, follower 不改; 单独成提交); `latest.md` 提交产生之后请等待点 13b (请求附其 diff), 获授权后 Phase D 提交双推并逐 remote 核验 — 台账
 
 ---
 
