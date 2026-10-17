@@ -63,4 +63,4 @@ WITHOUT_BETTER: **0** (无任何 eval 的 without 优于 with; 回归判据的�
    (2026-10-02 TASK-021 与合并后重跑两次一致, 台账 §4.3 [3] 与 §5.1)
 4. **三条 fixture 缺口** (TASK-031 第 6 张 issue 素材, 开到 10CG/Aria): `wait_then_green` 与 `NEG-2-timeout` 的 catalog 条目无 `test_case_in_unit_tests` node id (不可执行); `NEG-1-malformed` 的 node id 过期 (catalog 写 `test_case_e_malformed_aether_routes_fail`, 真实方法 `test_case_e_malformed_aether_main_leg_routes_fail`, 跑字面 id 报 AttributeError)。
 5. **A 与 W**: A = `268da8f` (aria origin/master, v1.74.1), W = `53b8e5c` (aria feature HEAD); 快照 `snapshot-before.txt` (21 段 exit 0) / `snapshot-after.txt` (见台账)。
-6. 套件缺口 issue 开到 10CG/aria-plugin (rule6_note 第三义务) 随 TASK-031 执行; 本 RESULT 不重复开单。
+6. 套件缺口 issue 已开: 10CG/aria-plugin#225 (rule6_note 第三义务; 附 hotfix lane 缺口); 三条 fixture node id 缺口: 10CG/Aria#235。同批缺口单: 10CG/aria-plugin#220-#224。
