@@ -1,0 +1,41 @@
+{
+  "expectations": [
+    {
+      "text": "Commit message must start with conventional type (feat/fix/refactor/test)",
+      "passed": true,
+      "evidence": "response.md L154 (§4.1 最终产物) 首行即 `feat(auth): 添加 GitHub OAuth2 社交登录 / Add GitHub OAuth2 social login` — 以枚举内的 `feat` 开头; §5 合规清单 L220 亦勾选 \"Type 正确: feat (新功能)\"。类型裁定过程见 L105-108 (§3.3: 全部变更是新功能交付 → feat)。skill 源码佐证: git-commit.md §2 定义 feat=新功能; commit-msg-generator 执行流程步骤 3 即 '分析变更类型，确定 type 和 scope'。"
+    },
+    {
+      "text": "Commit should include a scope in parentheses",
+      "passed": true,
+      "evidence": "response.md L154 同一行: `feat(auth): ...` — type 后紧跟括号 scope `auth`。裁定理由见 L110-114 (§3.3): 变更横跨 api/models/tests 三目录, 共同主题是认证, 取功能级 scope。skill 源码佐证: standards/conventions/git-commit.md §3.2 功能级 scope 表原文 `auth | 认证相关`, §9.1 同类场景先例 `feat(auth): 添加OAuth登录支持 / Add OAuth login support` — response 引用与源文件逐字一致 (git-commit.md L73/L393 实核)。"
+    },
+    {
+      "text": "Commit body or footer should reference the OpenSpec",
+      "passed": true,
+      "evidence": "response.md L162 (§4.1 commit message footer) 与 L179 (§4.2 git commit heredoc 命令内) 均含 `Spec: openspec/changes/oauth2-social-login/proposal.md`; §5 清单 L226 勾选 \"关联 Spec\"。且路径取的是 Rule #5 当前形态 (`openspec/changes/<change_id>/proposal.md`), 正确避开了 git-commit.md §6.2 仍残留的旧示例路径 `standards/openspec/changes/{feature}/spec.md` (源文件 L195 实核) — 脚注 L123-124 明示了这一新旧布局差异及 '真实执行时以仓内实际文件名校正' 的保留。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.00
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Commit body or footer should reference the OpenSpec",
+        "reason": "断言只查 '提到 OpenSpec', 判别力弱: 写成 git-commit.md §6.2 自身残留的旧路径 `standards/openspec/changes/{feature}/spec.md` (违反 Rule #5) 或裸写 'Spec: oauth2-social-login' 也能过。本次 response 主动取了 Rule #5 新形态, 但这是超额而非断言所迫。建议断言钉死路径形态 `openspec/changes/<change-id>/`, 让旧形态 FAIL。"
+      },
+      {
+        "reason": "三条断言全部只覆盖 type/scope/spec 三点, 而 SOT (git-commit.md §1.1/§1.2/§8.1) 强制的 subject 双语格式、≤72 字符上限、禁 AI 签名 (Co-Authored-By: Claude / Generated with Claude Code) 均无断言 — 本次 response 三项都做对了 (66 字符双语 subject, §5 清单显式排除 AI 签名), 但一个 type/scope/spec 正确、却带 AI 署名或不合规 subject 的输出能全绿通过。建议至少补一条 'message 不含 Co-Authored-By/Generated with'。"
+      },
+      {
+        "reason": "断言集无一条锚定 C.1 的 output schema 面 (commit_sha/commit_message 结构化输出) 或 '不虚构' 面 (无 issue 号不写 Closes、参数缺席不造增强标记)。在 descriptive 推演体裁下这些恰好是可判的 (response §3.4/§3.5/§4.3 分别做了不虚构裁定与 SHA 占位), 现有断言对 '编造一个假 SHA 或假 issue 关联' 的失败模式零覆盖。"
+      }
+    ],
+    "overall": "3/3 全过: 三条断言均直接对 response.md §4.1 生成的 commit message 判定, 证据充分。response 守住了 descriptive 推演体裁 — 开篇 L3 显式声明未执行任何 git 写/fetch/forgejo 调用, §4.2 命令标注 '本次推演未执行', §4.3 的 commit_sha 诚实留为占位而非编造, 无任何冒充实际执行的声明 (form_ok=true)。抽查的全部源码引文 (phase-c-integrator SKILL.md C.1 委托链与 params/skip 规则/output schema、commit-msg-generator 5 步流程与 ≤50 字符冲突、git-commit.md §1.2 ≤72/§3.2 auth/§5.1 单模块免增强标记/§8.1 禁 AI 签名/§8.2 50+ 拆分/§9.1 OAuth 先例/§10.2 heredoc、ENHANCED_MARKERS_SPEC phase_cycle 取 UPMv2-STATE 真值) 与实际文件逐条一致, 无失实引用。断言本身偏浅 (见 suggestions)。timing: executor 246.0s / 103,015 tokens — 对单条 commit message 生成属重量级, 成本花在规则溯源而非产物本身, with_skill 臂的特征符合预期。"
+  }
+}

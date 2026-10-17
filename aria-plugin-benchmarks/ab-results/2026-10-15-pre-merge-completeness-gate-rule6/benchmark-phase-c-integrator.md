@@ -1,0 +1,13 @@
+# Skill Benchmark: phase-c-integrator
+
+**Model**: <model-name>
+**Date**: 2026-10-15T12:03:01Z
+**Evals**: 1, 2, 3 (3 runs each per configuration)
+
+## Summary
+
+| Metric | With Skill | Without Skill | Delta |
+|--------|------------|---------------|-------|
+| Pass Rate | 100% ± 0% | 89% ± 19% | +0.11 |
+| Time | 219.4s ± 23.2s | 253.2s ± 87.3s | -33.7s |
+| Tokens | 98461 ± 4245 | 32400 ± 45899 | +66061 |

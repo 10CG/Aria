@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": true,
+      "evidence": "response.md L33 (情形 A 的 Round 1 模板块): `- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed)` — 「未能核实」四字逐字出现, reason 取 stdout 一等字段值 fetch_failed (L39 说明 `<reason>` 字面取 JSON reason 字段)。全文「无竞品」仅出现在禁止性表述中 (L17 「不得渲染为『无竞品』」, L39 「更不得改写成『无竞品』」, L53 「明文禁止渲染为『无竞品』」), 未被用作 A 的渲染结论。佐证: skill 源码 execution-modes.md L201 not_established 档措辞逐字相同 (「**未能核实** —— 本轮竞品扫描未取到完整证据 (原因: <reason>)」; **禁止**渲染为「无竞品」), response 的渲染与 SOT 一致而非碰巧形似。"
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": true,
+      "evidence": "response.md L70 (情形 B 的 Round 1 模板块): `- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: 探针自身失败 exit=1, stdout 无 JSON)` — 同样落「未能核实」档。L65 明确触发 fail-closed (exit≠0 ⇒ 按 not_established 处置, 本例同时满足 stdout 非 JSON); L76 「契约只钉死档位与 <reason> 槽位, 不要求把 stderr traceback 原文搬进报告行。禁止渲染为『无竞品』同样适用」; L89 「fail-closed 义务的存在意义正在于此: 探针自身失败时, 禁止把『没有输出』当『没有竞品』」— traceback/空 stdout 被明确排除出「无竞品」证据。佐证: execution-modes.md L203 fail-closed 义务逐字对应 (exit != 0 或 stdout 无法解析为 JSON 或 schema_version 未知 ⇒ 一律按 not_established 处置)。"
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": true,
+      "evidence": "情形 A: response.md L43 「**本轮继续, 零阻断**」+ L44 「**verdict 照常计算**: PASS (0C+0M) / PASS_WITH_WARNINGS / FAIL, 只数审计 Agent 的 findings, 与探针结果零关联」+ L45 「**收敛判定照常**: challenge 收敛 = 提案结论四元组集合无变化 AND objections 全部 resolved; 探针结果既不进 comparison_key 也不进 objections」。情形 B: L80 「与情形 A 完全同构: **不阻断**。fail-closed 把 B 折叠到与 A 相同的消费终点 (按 not_established 渲染「未能核实」), 而 not_established 本身就是 advisory」+ L83 「探针崩溃不产生 finding、不进 severity 统计、不改 verdict」+ L84 「收敛判定与轮次路由照常」。「fail-closed 只作用于措辞」由 L80 显式表达 (折叠到同一渲染终点, 无 gate 效应; L46 另证 elapsed_ms 仅是记录在案的入口成本, 无 gate 效应)。佐证: execution-modes.md 「**不阻断**」段 (探针是 advisory 副机制 —— 不改 verdict 计算、不改收敛判定、不改轮次路由)。"
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "情形 A: response.md L51 「**不能。** 三层依据:」, 其中第 1 层 (L53) 即「零证据不当正证据」; L57 给出最强可说命题 (覆盖为零, 存在性未知) 而非「无竞品」结论。情形 B: L89 「**不能, 且证据面比 A 更弱。** … 连 verdict 都读不到, 十二字段一个都没有 —— 不存在任何证据面 … 禁止把『没有输出』当『没有竞品』」。「零证据不当正证据」另见共用消费规则 L17。全文无「可以认为没有竞品」类结论。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+        "reason": "三合一断言一票通过: 只答对「不阻断」而漏掉/答错 verdict 或收敛判定的 response 也整条 PASS。建议拆成独立断言, 或至少加一条反向锚 —— 出现「fail-closed 中止本轮 / 探针失败降级 verdict / 探针进收敛条件」任一措辞即 FAIL; 现在括号补语「fail-closed 只作用于措辞」没有独立判分点。"
+      },
+      {
+        "reason": "四条断言全部钉在措辞地板上, 深度机制归因零覆盖。本 response 做对了但无断言要求的两处: (a) 情形 B 的 <reason> 来自可观测失败形态 (「探针自身失败 exit=1, stdout 无 JSON」) 而非照抄 A 的 fetch_failed —— 照抄 fetch_failed 的偷懒答法同样 4/4 通过, 建议加断言「B 的 reason 不得为 fetch_failed」; (b) A 的覆盖缺口归因 (origin fetch 网络失败 ⇒ scanned=0/refs_scanned=0 ⇒ 结构上到不了 no_sibling_found 档, response L54-55)。若该 eval 定位是地板守卫 (BETA 命名暗示) 则现状可接受, 但它区分不出深浅两臂。"
+      },
+      {
+        "reason": "臂间污染观察 (供 AB 汇总参考, 非断言问题): 本 run 是 without_skill 臂, 但 response 逐字复现了 execution-modes.md 的三档措辞、fail-closed 义务、advisory 段落以及 sibling_spec_probe.py 的 exit 1/2/3 语义与 fetch 失败 remote_entry 字段形态 —— 这些均无法从 eval prompt 推出, 只能来自对仓内 skill 源码的实际阅读 (已对照 snapshot 逐一核实为真)。若 AB 设计意图是「无 skill 上下文但允许文件访问」, 这是合法且被测的行为; 若意图是完全隔离, 需在沙箱屏蔽 skill 目录, 否则两臂差异被源码阅读稀释。"
+      }
+    ],
+    "overall": "4/4 全过, form_ok = true: response 开篇显式声明「以下全部为描述性推演, 未执行任何命令」(L3), 唯一 bash 块 (L9-12) 是入口调用形态的推演呈现而非执行记录, 全文无任何「已运行/输出为」的执行声称; 其对脚本行为的陈述 (L26, L61) 均为源码阅读型断言且经 snapshot 复核属实。事实声明逐条对上 skill 源码: 三档措辞与「禁止渲染为无竞品」(execution-modes.md L195-201)、fail-closed (L203)、advisory 不阻断段、reason 非空保证 (L173)、no_sibling_found 三前提与「不得从 hits==[] 推断」(L188-190)、exit 1 仅内部异常路径且 stdout 只在成功路径写入 / exit 2 参数与仓库不可读 / exit 3 导入失败 (sibling_spec_probe.py main() L663-685)、fetch 失败 remote_entry 保留 default_branch+resolved_by 且 scanned=0/refs_scanned=0 (L446-452)、degraded+fetch_failed (L629-638)。唯一小瑕: (α)/(β) 是 response 自造的路径标签, 源码无此记号 (但所指两条消费规则真实存在), 不影响任何断言。timing: executor 204.5s / 84963 tokens (timing.json), 单 run 成本正常。"
+  }
+}

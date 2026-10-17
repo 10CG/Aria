@@ -1,0 +1,16 @@
+{
+  "eval_id": 3,
+  "eval_name": "multi-remote-merge-push",
+  "prompt": "Phase C C.2.5: PR 刚合并到 master (aria 子模块)。项目配置了 origin (Forgejo) + github (GitHub mirror) 双 remote, 还有 1 个子模块。请执行 Multi-Remote Push Enforcement: 主动推送所有 enforced remote 并做 post-push SHA 验证。描述执行流程和任何失败处理。",
+  "assertions": [
+    "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+    "Should snapshot expected_sha = local HEAD before any push",
+    "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+    "Should call verify_parity_post_push with expected_sha after main repo push",
+    "Should NOT rely on 'Everything up-to-date' as success signal — require SHA comparison",
+    "Should block when any remote fails (fail_on_partial_push: true default)",
+    "Should handle read_only_remotes exception: push failure → warning downgrade, not block",
+    "Should output per-remote status report for all enforced remotes",
+    "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X"
+  ]
+}

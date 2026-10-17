@@ -1,0 +1,48 @@
+{
+  "expectations": [
+    {
+      "text": "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+      "passed": true,
+      "evidence": "response.md L84 判定表: 「post_planning@widget-export-pipeline | missing | 零归属文件。三态 first-match 逐支排除: (a) 非 --no-spec; (b) 专属 post_implementation, 此对不适用; (c) 要求『不存在任何 A.2 产物』—— 但 openspec/changes/widget-export-pipeline/tasks.md 存在 (本次 PR 带来), _has_a2_artifact 返回 True ⇒ (c) 不触发 ⇒ 落 missing。目录里唯一的 post_planning-R1-catalog-sync-retry.md 属 catalog-sync-retry, 按 §1.2 规则 2 不归属本对」; L70-72 进一步给出排除理由: 「对 widget-export-pipeline 规则 2 双侧/末段均不命中 (不含 -widget-export-pipeline-, stem 也不以 -widget-export-pipeline 结尾) ⇒ 不归属本 change 的任何对 (它是 catalog-sync-retry 的报告 —— change 维度正是本门的语义: 他人 change 的报告不能为本 change 充数)」; L100 以不带方括号的 ERROR 行报告该对, L161 JSON results 中 status=\"missing\"。源码复核: completeness_gate.py:1103 `_hits_id` = `f\"-{change_id}-\" in name or stem.endswith(f\"-{change_id}\")`, 对 post_planning-R1-catalog-sync-retry.md 两支均不命中 ⇒ 不归属; :1287 (c) 通道因 _has_a2_artifact==True (tasks.md 存在, :1258) 不触发 ⇒ :1289 落 missing。断言的每一要素 (结论 missing、点名列出干扰文件、两条排除判据、不得计入) 均逐字覆盖。"
+    },
+    {
+      "text": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+      "passed": true,
+      "evidence": "response.md L83: 「post_spec@widget-export-pipeline | present (1 份) | 归属匹配命中 post_spec-R2-widget-export-pipeline.md」; L67-69 逐规则给出计入理由: 「规则 1 (post_spec- 前缀 + .md) ✓; 规则 2 末段界定 (stem post_spec-R2-widget-export-pipeline 以 -widget-export-pipeline 结尾) ✓; 规则 3 有界包含排除不命中 ⇒ 归属 (post_spec, widget-export-pipeline)」—— 计入理由被明确锚定在末段界定 (stem 后缀) 这一支, 而非中缀形态; L100 的 ERROR 模板引文亦并列写出「含 \\\"-widget-export-pipeline-\\\" 或以 \\\"-widget-export-pipeline.md\\\" 结尾」的双侧/末段析取。L104 人读行「[OK] post_spec@widget-export-pipeline: 1 份」、L167 JSON matched=[\"post_spec-R2-widget-export-pipeline.md\"]。源码复核: completeness_gate.py:1103 规则 2 是 or 析取 (中缀 OR stem 后缀), 后缀一支单独即命中 —— response 的归因与实现一致, 隐含『不要求中缀』并显式选对了命中的规则支。"
+    },
+    {
+      "text": "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+      "passed": true,
+      "evidence": "response.md L85: 「post_implementation@widget-export-pipeline | not_applicable (reason=phase-a-only-no-implementation) | …(b) 通道三合取全满足: 同仓 (toplevel 相等) ∧ diff 非空 (3 文件) ∧ 全部路径在 openspec/changes/{作用域 id}/** ∪ .aria/audit-reports/** 之下 (Phase A-only PR…)」; L96 人读行逐字给出: 「[INFO] completeness gate: post_implementation@widget-export-pipeline not_applicable (phase-a-only-no-implementation); 依据 = diff 3 文件全部在 openspec/changes/widget-export-pipeline/ 或 .aria/audit-reports/ 下 (Phase A-only)」—— 以 [INFO] 开头显式 surface, 排在 pairs 顺序首位 (L91: sorted 字典序 post_implementation → post_planning → post_spec), 既未略去也未用 ERROR 行报告; L147-152 JSON status=\"not_applicable\"。源码复核: completeness_gate.py:1329-1358 `_not_applicable_trail_line` 的 phase-a-only 分支渲染模板与 L96 逐字同形 (diff {N} 文件 + 具体 id 运行时渲染); :1285-1286 (b) 通道条件与三合取一致; :1221-1228 `_is_phase_a_only_diff` 的 scope_prefixes/audit-reports 前缀判据覆盖本场景 3 文件。"
+    },
+    {
+      "text": "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+      "passed": true,
+      "evidence": "response.md L20-26 完整命令行: `python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_gate.py\" --repo-path \"<主仓 root>\" --diff-repo-path \"<主仓 root>\" --base origin/master --change-id widget-export-pipeline` —— 调用对象为 completeness_gate.py, 四参数齐全; L32-36 参数表逐项说明: --repo-path 必填无缺省; --diff-repo-path「与 --repo-path 同值 | 同仓形态显式传相同值 (SKILL.md 参数表); 两面 git rev-parse --show-toplevel 逐字相等 ⇒ same_repo=True」; --base origin/master「必传无缺省」; --change-id widget-export-pipeline「pre_merge 必传 change_id / --no-spec 二者其一…(与 --no-spec argparse 互斥, 同时给出 exit 2)」。源码复核: completeness_gate.py:159-164 --repo-path/--diff-repo-path/--base 均 required=True, :162 help 文本即「同仓形态显式传与 --repo-path 相同的值」; :191-192 互斥 exit 2; :367-379 resolve_same_repo 用 toplevel 相等。与 SKILL.md L146-151 及 execution-modes.md L124-128 调用串模板一致。"
+    },
+    {
+      "text": "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail",
+      "passed": true,
+      "evidence": "response.md L120-122: 「verdict = fail, exit code = 1 (§1.4: 任一 missing → fail, exit 1)。本场景恰有一对 missing (post_planning@widget-export-pipeline); post_spec 的 present 与 post_implementation 的 not_applicable 不能抵消它 —— 多 change / 多对下全部非 missing 才 pass」「是否允许放行进入正常 pre_merge 审计流程: 不允许。Step 5 路由: verdict == \\\"fail\\\" → 拒绝执行 pre_merge 审计, 输出 ERROR, 中止; 消费方负 fail-closed 义务」—— 显式驳斥了『两对合格可放行』的谬误; L129-130 修复路径列全断言点名的三类 (补跑 post_planning 审计 / 显式写 checkpoint·改 off / 临时开 allow_incomplete_checkpoints) 且注明 Rule #10 下配置面处置归 owner; L179 JSON \"verdict\": \"fail\"。源码复核: completeness_gate.py:104 EXIT_CODES[\"fail\"]=1, :1556 `verdict = \"fail\" if has_missing else \"pass\"`; execution-modes.md L160-167 Step 5 fail → 拒绝执行 + fail-closed 义务。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+        "reason": "断言后半句 (『不要求中缀形态』) 是负向命题, 只能靠 response 选对并命名命中的规则支来间接验证; 一个只写『按规则 2 命中』而不点出末段/双侧区分的 response 也会勉强过。可考虑加一个更硬的探针: 若目录里存在 post_spec-R1-widget-export-pipeline-extra.md 之类的更长 id 干扰文件 (规则 3 有界包含排除的正向用例), 断言其不计入 —— 本次 run 的 response 对规则 3 只写了『不命中』的空集侧。"
+      },
+      {
+        "reason": "response 超出断言集产出了完整 stdout JSON 信封 (16 键、sort_keys、results 逐对 enabled_by/matched/reason) 与 stderr 行序 (sorted 字典序 pairs、无第四行 WARN 的四类排除理由), 我已逐项对 completeness_gate.py 源码核验全部正确 (含 enabled_by=\"explicit\" 因三 checkpoint 均有显式键、级 2d manual 档不可达、excluded_legacy_count=0/unattributed=0 的分类理由) —— 这些深度无断言覆盖。若后续迭代想提高区分度, 可加一条断言锁定 JSON 的 checked_checkpoints 恰为三 checkpoint 且 enabled_by=explicit, 它能区分『真推演了 P4 五档链』与『只抄了模板』。"
+      }
+    ],
+    "overall": "5/5 全过。两条核心陷阱 (他人 change 的 post_planning 报告误计入、『三对里两对通过即放行』) 均被 response 正确避开且给出与 completeness_gate.py 源码逐字一致的机制归因 (归属规则 :1103/:1106-1125、三态 first-match :1272-1289、[INFO]/ERROR/[OK] 行模板 :1329-1358/:1313-1326/:1422、verdict/exit :104/:1556) —— 不是表面合规而是真做了推演。form_ok=true: 全文自始至终为 descriptive 推演体裁 (L3-5『未实际执行任何命令』, L183 明示 elapsed_ms 为示意值), 无任何实际执行的声称。timing.json: executor 293.5s / 136,418 tokens, 对该推演深度合理。"
+  }
+}
