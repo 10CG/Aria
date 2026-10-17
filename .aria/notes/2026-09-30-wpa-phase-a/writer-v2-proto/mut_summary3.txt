@@ -1,0 +1,15 @@
+== b4 (l1 variant b4; WPA_ONLY=SC-21,SC-32; bash3.2 leg=1)
+   SC-32 32a | reverse-guard | actual: 1 bash 4+ constructs ([[ -v ]])
+   SC-32 32c | reverse-guard | actual: 10 of 19 rows differ: SC-21:21i SC-21:21n SC-21:21o SC-21:21p SC-21:21q SC-21:21r SC-21:21s SC-21:21t SC-21:21u SC-21:21w
+   (rows not yet 'yes': 2)
+== vx_patsub (l1 variant vx_patsub; WPA_ONLY=SC-21,SC-32; bash3.2 leg=1)
+   SC-32 32c | reverse-guard | actual: 1 of 19 rows differ: SC-21:21f
+   (rows not yet 'yes': 1)
+== docs_bad2 (docs: SOT = baseline + one stuffed line in the version history; WPA_ONLY=SC-26,SC-28)
+   SC-26 26a | doc-sync | actual: section-absent
+   SC-26 26b | doc-sync | actual: ps-family-row-absent-in-2.5
+   SC-26 26c | doc-sync | actual: section-absent
+   SC-26 26d | doc-sync | actual: app.ini-absent-in-2.2
+   SC-28 28h | doc-sync | actual: old still-present; new absent
+   (rows not yet 'yes': 5)
+DONE

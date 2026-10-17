@@ -1,0 +1,12 @@
+ext_nomask	l1	ext_nomask	SC-19	19z,19aa
+ext_mask_nosemi	l1	ext_mask_nosemi	SC-19	19z,19aa
+ext_mask_noamp	l1	ext_mask_noamp	SC-19	19z,19aa
+ext_mask_nopipe	l1	ext_mask_nopipe	SC-19	19z,19aa
+ext_mask_nonl	l1	ext_mask_nonl	SC-19	19z,19aa
+ext_mask_all	l1	ext_mask_all	SC-19	19z,19aa
+ext_nostrip	l1	ext_nostrip	SC-19	19ac
+ext_emptypat	l1	ext_emptypat	SC-19,SC-20	20o,20p,20q,19l,19w
+ext_eval	l1	ext_eval	SC-19	19ab,19j,19k
+ext_glob	l1	ext_glob	SC-19	19ab,19j,19k
+vx_eval	l1	vx_eval	SC-21	21z
+w12_eval	l1	w12_eval	SC-23	23i

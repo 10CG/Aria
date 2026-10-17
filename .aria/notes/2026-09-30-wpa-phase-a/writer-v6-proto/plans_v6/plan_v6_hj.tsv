@@ -1,0 +1,6 @@
+hooks_nofail	hj	hooks_nofail	SC-35,SC-31	35d,31d,31e
+hooks_wrong_matcher	hj	hooks_wrong_matcher	SC-35,SC-31	35d,31d,31e
+hooks_two_entries	hj	hooks_two_entries	SC-35,SC-31	35d,31d,31e
+hooks_other_hook	hj	hooks_other_hook	SC-35,SC-31	35d,31d,31e
+hooks_touch_other	hj	hooks_touch_other	SC-35,SC-31	35d,31d,31e
+hooks_gate_literal	hj	hooks_gate_literal	SC-35,SC-31	35d,31d,31e

@@ -1,0 +1,13 @@
+nul_off	l3	nul_off	SC-1	1c,1d,1e,1f,1g
+nul_replace (previous design)	l3	nul_replace	SC-1	1c,1d,1e,1f,1g
+nul_always_append	l3	nul_always_append	SC-1,SC-2	1c,1d,1e,1f,1g,2a,2b,2c,2d
+nul_always_view	l3	nul_always_view	SC-1,SC-2	1c,1d,1e,1f,1g,2a,2b,2c,2d
+nul_space	l3	nul_space	SC-1	1c,1d,1e,1f,1g
+cli_unbounded	l3	cli_unbounded	SC-34,SC-6,SC-10	34a,34b,6f,6i,6k,10o
+cli_v4	l3	cli_v4	SC-34,SC-10	34a,34b,10o
+cli_noleft	l3	cli_noleft	SC-34,SC-10	34a,34b,10o
+kv_unbounded	l3	kv_unbounded	SC-34,SC-5,SC-10	34a,34b,5a,5n,10n
+kv_left_boundary_off	l3	kv_left_boundary_off	SC-9,SC-5,SC-34	9z,5a,5n,34b
+val_quadratic	l3	val_quadratic	SC-34	34a,34b
+kv_lowercase_10m	l3	kv_lowercase	SC-10	10d,10j,10m
+ell_lastchar	l3	ell_lastchar	SC-11,SC-32	11v,11x,11y,32e

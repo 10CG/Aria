@@ -1,0 +1,183 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/aria-plugin#135",
+  "generated_at": "2026-09-30T18:04:53Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 135,
+      "title": "[state-scanner/coordination] 认领机制三处缺口致跨容器重复劳动 4 次: 快照不解析 claim / 闸门只覆盖 Phase B / 容器身份键不稳",
+      "body": "## 一句话\n\n`refs/aria/coordination` 的认领机制**写入侧能用、读取侧几乎不存在** —— state-scanner 取了这个 ref 却从不解析它, 认领闸门又只挂在十步循环 Phase B 入口, 加上容器身份字符串不稳定, 三者叠加让 nexus 仓在 3 周内发生 **4 次跨容器重复劳动 (2 次整轮全废)**。\n\n**环境**: aria-plugin 1.63.0 / 10CG/nexus / 两个交互式容器 (leader `bfe8285d`, follower `023236f2`) 并行。\n\n---\n\n## 缺口 1 (最关键): 快照取了 coordination ref, 但不解析里面的 claim\n\n`scan.py` 的 `coordination_fetch` collector 确实 fetch 了 `refs/aria/coordination` —— 但产出只有 fetch 成没成:\n\n```json\n\"coordination_fetch\": {\n  \"success\": true, \"refs_fetched\": [\"+refs/heads/*:refs/remotes/origin/*\", \"refs/aria/coordination\"],\n  \"coordination_ref_present\": true, \"age_seconds\": 10, \"degraded\": false, ...\n}\n```\n\n**snapshot 顶层没有任何 claims 字段** (实测: 全文 \"claim\" 只出现 2 次, 都在 `coordination_fetch` 的 ref 名里)。于是:\n\n- 阶段 2 推荐区**无从展示\"别的容器正在做 X\"** —— 唯一的碰撞信号 `tracks_multibranch.collision` 是从 **handoff 的 track-id frontmatter** 推导的, 跟 claims 完全是两套数据源;\n- 一个遵纪守法写了 claim 的容器, 它的 claim 对走 state-scanner 入口的另一方**不可见**;\n- 结果就是 advisory 协议**单向**: 写的人以为占住了, 读的人根本没有读的入口。\n\nnexus 侧 follower 容器 (`023236f2`) 2026-07-26 的会话交接把这条列为**系统性风险**, 原文照录:\n\n> **advisory coordination claim 对 leader 容器无效 (系统性, 本 session 双实证)**: 我 16:05 获取 Phase B claim, leader 18:57 仍另起分支 (`us-036-wiring-phase-b`, 不同名) 一次性实施全 17 任务。leader 不读 claim → claim 拦不住重复。**follower 投入任何实施前, 除 fetch 真值外, 应主动 grep leader 是否已有 in-flight 分支 / 已归档产物**。\n\n同一份交接的 §0 入口:\n\n> 核心教训是**一条系统性协调失效**: **advisory coordination claim 对 leader 容器 (`bfe8285d` 系) 无效 —— 它不读 claim**。结果同一 session 发生**两次完整重复劳动**。\n\n这不是 leader 不守规矩 —— 是**入口不给它读**: 走 `/aria:state-scanner` 进来的容器, 拿到的 snapshot 里根本没有 claim 数据。\n\n**建议**: snapshot 增加顶层 `coordination_claims[]` (至少 `track_id / container / owner / status / claimed_at / heartbeat_at`), 并在推荐区对\"他人 `active` 且与候选工作重叠\"的 claim 渲染 advisory 告警行 —— 与现有 `surface.kind == \"occupied\"` 的渲染约定复用即可。fetch 已经做了, 只差解析和展示。\n\n## 缺口 2: 认领闸门只覆盖 Phase B 入口, ops leaf 任务天然不认领\n\nSKILL.md 的 Layer L 集成写得很明确 (Design A): 闸门\"仅在用户确认进 Phase B 时调用, 不在只读 collector 内自动跑\"。问题是**大量真实工作不进 Phase B**:\n\n- 观察窗巡检 / 部署记档 / standards 子模块 bump / 跨仓 issue 跟进 …\n\n这些是 leaf 型 ops 任务, 从 state-scanner 推荐直接执行、终结于一次 commit, 永远不经过 phase-b-developer。**于是双方都不写 claim, 闸门形同虚设。**\n\n2026-08-06 两个容器同时做了同一次观察窗巡检 (各自查 Nomad/vmalert/VictoriaMetrics/prod DB, 各自写记档), 后推的一方被 git 拒绝才发现 —— **双方都没有 claim, 因为都没进 Phase B**。\n\n**建议**: 让 `phase1_gate.py` 的调用点覆盖\"用户在阶段 3 确认了任一执行项\"这个更早、更通用的时刻, 而不只是 Phase B 入口; 或在 SKILL.md 明确给出 ops leaf 任务的手动认领指引 (CLI 本身已经支持任意 `--raw-track-id`, 我们目前是手动调, 能用)。\n\n## 缺口 3: 容器身份字符串不稳定, 碰撞检测的分组键不可靠\n\n`tracks_multibranch.collision` 按 `owner_container` 分组, 但这个值历史上有三种格式且**时间上重叠** (nexus 仓 63 份 handoff 实测):\n\n| 取值 | 份数 | 时间跨度 |\n|------|------|----------|\n| `simonfish/dev-claude` | 25 | 2026-05-17 → 07-12 |\n| `simonfish/dev-claude2` | 16 | 2026-05-24 → 07-16 |\n| `simonfish/bfe8285d` | 18 | 2026-05-27 → 08-05 |\n| `aria-runner-bot/023236f2` | 3 | 2026-07-26 → 08-04 |\n| `creationhikari/dev-claude2` | 1 | 2026-07-01 |\n\n两个方向都会误判:\n\n- **同一容器两个名字**: `simonfish/dev-claude2` (主机名) 与 `simonfish/bfe8285d` (uuid, `~/.aria/container-id` 自 2026-05-24 引入) 是同一台机器 → 分组时被当成两个 owner;\n- **不同容器同一个名字**: `simonfish/dev-claude2` vs `creationhikari/dev-claude2` —— **主机名跨机器不唯一**。\n\n**建议**: 身份取值收敛到单一稳定来源 (`~/.aria/container-id` 的 uuid), 由插件在写 handoff frontmatter / claim 时统一生成, 不要让主机名进入这个键; 并在 `derive_track_id` 同源的地方提供一个 `derive_container_id` 公开 helper, 避免各 skill 各自拼字符串。\n\n---\n\n## 复发台账 (nexus 仓实测)\n\n两个容器: **leader = `bfe8285d`** (git `simonfishgit`) / **follower = `023236f2`** (git `aria-runner-bot`)。两者都是人在回路的交互式 Claude Code 会话, 都走 `/aria:state-scanner` 入口。\n\n| 时间 | 事件 | 结果 |\n|------|------|------|\n| 2026-07-19→26 | `023236f2` 做 TASK-302 中文评测集 Phase A + 三轮收敛审计 | **全废** —— `bfe8285d` 六天前已完成并归档同名产物 |\n| 2026-07-21→26 | `023236f2` 做 conflict-resolver Phase B, **已按规矩 `phase1_gate.py` 认领** (claim `92cb062` active → `760b517` done) | **全废** —— `bfe8285d` 未读 claim, 并行一次性做完全 17 任务 |\n| 2026-08-02 / 08-04 | `023236f2` 在动手前重新 fetch + 重读最新 handoff | **成功避开 2 次** (说明\"动手前再同步\"有效, 但靠的是人的纪律不是机制) |\n| 2026-08-06 | 两容器同时做观察窗巡检 #4 (各自查 Nomad/vmalert/VictoriaMetrics/prod DB 并写记档) | 撞车, `bfe8285d` 丢弃 61 行重复记档 (**双方均无 claim** —— ops leaf 任务不进 Phase B) |\n| 2026-08-08 | `bfe8285d` 手动调 `phase1_gate.py` 认领一个 ops 型 track 并 `release_gate.py` 释放 | 闭环可用 —— CLI 接受任意 `--raw-track-id`, 缺的只是\"何时调\"的接线 |\n\n单次损失量级 20 分钟 ~ 一个完整周期。**代价最大的那次, 恰恰是遵守了规矩的一方吃亏** —— 它认领了, 但对方读不到。\n\n---\n\n## 优先级建议\n\n按修复价值排: **缺口 1 > 缺口 2 > 缺口 3**。\n\n缺口 1 单独修就能让现有机制真正闭环 (写入侧本来就能用), 而且改动集中在 snapshot schema + 推荐区渲染, 不动 claim 存储与仲裁语义。缺口 3 是长期正确性问题, 但在缺口 1 修好前它不是瓶颈。\n\n## 关联\n\n- #110 (state-scanner sync_status 假绿) —— 同属\"入口给出的同步类信号不可信\"这一族, 但根因不同, 不重复\n- nexus 侧已落地的临时纪律 (可作为参考实现): `docs/operations/multi-container-coordination.md` —— 我们目前靠手动调 `phase1_gate.py` / `release_gate.py` + 开工前手动 `git ls-tree refs/aria/coordination` 兜住, 能用但不该由每个消费方仓库各自重造\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 18823,
+          "body": "## 身份键不稳的新实例: `label` 字段静默覆盖协调身份\n\n实测撞上 (nexus 仓, 2026-08-12/13), 补充本票\"身份键不稳\"缺口的一个具体形态:\n\n**机制**: `lib/identity.py::get_container_id()` 返回 `label if label else uuid`。而 `~/.aria/container-id` 文件头注释邀请用户\"Edit the `label` line to add a human-readable tag\" —— **没有任何提示说填了 label 协调身份就换了**。\n\n**事故时间线**:\n\n| 时刻 (UTC+0) | 事件 |\n|---|---|\n| 16:18 | `phase1_gate` 认领 track, claim 写 `container: bfe8285d` (uuid) |\n| 17:52 | `container-id` 文件被加 `label: dev-claude2` (按文件注释的邀请, 加个可读名) |\n| 18:2x | `release_gate` 释放同一 track → **`claim_not_found`** — 匹配条件 `rec.container == resolved.container_id`, 此刻 resolved 已变 `dev-claude2` |\n\n后果: 同一台机器同一会话, 认领和释放解析出两个身份; claim 变成没人能释放的孤儿 (与 19 天 stale claim 同型, 但根因不同)。恢复手段是绕开 CLI 直接调 `release_claim_by_track` 传显式 `Identity(container_id='bfe8285d')`。\n\n**建议** (任选其一即可闭合此形态):\n1. `get_container_id()` 恒返回 `uuid`, label 仅作展示字段 (board/telemetry 渲染时并列显示) —— 推荐, 语义最干净;\n2. 或保留 label-as-identity, 但 release/heartbeat 匹配时**同时接受 uuid 与 label** (按文件双键匹配);\n3. 最低限度: 文件注释加红字警告 + `get_container_id()` 在 label 生效时打一行 stderr 提示。\n\n临时缓解 (本机已做): label 置空 + 文件注释写明\"此机 label 必须留空\"。\n",
+          "user": "simonfish",
+          "created_at": "2026-08-13T01:14:05Z"
+        },
+        {
+          "id": 21988,
+          "body": "## 缺口 3 (容器身份键不稳) — S1 部分闭合: aria-plugin **v1.70.0** (OpenSpec `owner-container-identity-key-and-collision-parser`, 主仓 PR #197)\n\n已落地 (解析 / 身份键 / dedupe / 漂移 advisory):\n- Layer H `owner-container` 两段式解析修复 + `identity_key` (uuid 容器 = 一个身份; 主机名保留 owner 段) 作为 dedupe 键与 §2.3.5 判定依据。\n- `identity_advisories[]` ⚪ 恒存在字段 + track_board ⚪ 段: 同一 uuid 容器多个 git 身份被解释而非误判。\n- `lib/identity.py::get_container_label()` 只读 accessor + `phase1_gate` / `release_gate` 的 `label_migration` inventory (label 非空即告警, 列 `claims/<label>/` 下 active 数)。\n\n**未闭合 (S1 形态刻意不动)**: `get_container_id()` 仍 label 优先 —— 08-13 时间线 (设 label 后 `claim_not_found`) 的 label 陷阱要等 S2 flip (uuid 优先) 才结构性消除; S2 依赖 a1-entry (Aria #174) 进 master 并 ack 改写其 SC-3, 由 Aria 侧 tracker issue 承载。缺口 1 (快照不解析 claim) / 缺口 2 (闸门只覆盖 Phase B) 本 Spec 不处理, 均留。\n\nstandards `session-handoff.md` §2.3.1 三态 + `identity_key` 定义 / §2.3.5 三行判据 (实质变更) / §2.3.9 AI runner 提交身份 同步。",
+          "user": "simonfish",
+          "created_at": "2026-09-06T08:55:39Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/135",
+      "created_at": "2026-08-08T12:08:47Z",
+      "updated_at": "2026-09-06T11:51:22Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.63.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "scan.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "phase1_gate.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "release_gate.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "docs/operations/multi-container-coordination.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "session-handoff.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "实验目录 (真仓 aria/ 副本, v1.74.1 @ 268da8f; 本地 bare origin; 独立 HOME): 容器 A (container-id uuid=aaaaaaaa) 运行 `phase1_gate.py --raw-track-id ops-window-patrol-4 --phase B --mode advisory --repo-path projA` 写 active claim 并推到 origin (origin 的 refs/aria/coordination 下出现 claims/aaaaaaaa/s-0350@1812.yaml); 容器 B (uuid=bbbbbbbb, 另一个 clone) 运行 `python3 aria/skills/state-scanner/scripts/scan.py --project-root projB --output snapshot.json`",
+        "expected_behavior": "issue 缺口 1: snapshot 顶层没有任何 claims 字段 (coordination_fetch 只报 fetch 成没成), 他人的 active claim 对走 state-scanner 入口的一方不可见; 建议增加顶层 coordination_claims[] (track_id/container/owner/status/claimed_at/heartbeat_at)",
+        "actual_behavior": "scan.py exit 0; coordination_fetch={success:true, coordination_ref_present:true, refs_fetched:[...,'refs/aria/coordination']}; 快照 23 个顶层键 (architecture/audit/changes/coordination_fetch/custom_checks/errors/forgejo_config/generated_at/generated_by/git/handoff/handoff_worktrees/interrupt/openspec/project_root/readme/remote_refresh/requirements/snapshot_schema_version/standards/sync_status/tracks_multibranch/upm), 无 coordination_claims; 整份 JSON 中子串 'claim' 出现 0 次 (大小写不敏感), track id 'ops-window-patrol-4' 出现 0 次, 对方 uuid 'aaaaaaaa' 出现 0 次; tracks_multibranch.collision={kind:'none',groups:[],identity_advisories:[]}; errors=[]。代码侧: scan.py:405-428 的 snapshot 键集不含 claims; scan.py / collectors / renderers / writers 对 read_claims 零调用 (read_claims 仅被 phase1_gate.py:542,1544,1568 / release_gate.py:133 与 lib/ 内部调用)",
+        "match": true,
+        "notes": "该 issue 引用的 v1.63.0 行为在 v1.74.1 逐字不变; 缺口 1 零进展"
+      },
+      {
+        "case_id": "case-2",
+        "input": "接 case-1: 容器 B 运行 `phase1_gate.py --raw-track-id ops-window-patrol-4 --phase B --mode advisory --repo-path projB --no-push`; 另 grep state-scanner 的 references/*.md、RECOMMENDATION_RULES.md、docs/ 中『已认领 / occupied / 他人.*认领』",
+        "expected_behavior": "issue 缺口 1: 读取入口不存在, advisory 协议单向; 建议推荐区对『他人 active 且与候选工作重叠』的 claim 渲染 advisory 告警行, 复用现有 surface.kind=='occupied' 渲染约定",
+        "actual_behavior": "gate 输出 outcome='advisory_proceed', surface={kind:'occupied', message:'contA/aaaaaaaa 0.4m ago 已认领 ops-window-patrol-4', winner_owner_container:'contA/aaaaaaaa'} —— 即 claim 只有在 B 主动以同名 track-id 调用 gate 时才可见; grep 三处 (references/*.md / RECOMMENDATION_RULES.md / docs/) 对『已认领』『occupied』零命中, occupied 渲染约定只存在于 SKILL.md:171 对 gate JSON 的消费段; 阶段 2 推荐区没有由快照驱动的『别的容器正在做 X』告警行",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "代码与文档审计 + 实验: (a) grep `phase1_gate.py` 于 aria/skills/*/SKILL.md 列 acquire 调用点; (b) 读 phase-a-planner/SKILL.md:125-128 与 spec-drafter/SKILL.md:29 的 skip 条款; (c) grep workflow-runner/SKILL.md 与 RECOMMENDATION_RULES.md 的 coordination/claim/phase1_gate; (d) grep 全 aria/ + standards/conventions + aria/docs 中『手动认领 / ops leaf / 任意 --raw-track-id』; (e) 实验 `phase1_gate.py --raw-track-id obs-window-patrol-4 --phase ops --mode advisory`",
+        "expected_behavior": "issue 缺口 2: 闸门只挂在 Phase B 入口; 观察窗巡检 / 部署记档 / standards 子模块 bump / 跨仓 issue 跟进这类 leaf ops 任务不经 phase-b-developer, 双方都不写 claim; 建议把 phase1_gate 调用点前移到『用户在阶段 3 确认任一执行项』, 或在 SKILL.md 给出 ops leaf 任务的手动认领指引",
+        "actual_behavior": "acquire 调用点: phase-a-planner/SKILL.md:65 与 spec-drafter/SKILL.md:83 (A.1, v1.71.0 起新增) / phase-b-developer/SKILL.md:91 (B.0) / state-scanner/SKILL.md:157 (Phase B 入口) / branch-manager/SKILL.md:149; state-scanner/SKILL.md:187 是 --heartbeat-only (只刷新, 非认领)。A.1 触点有成文 skip: phase-a-planner/SKILL.md:127 『skip_if: complexity: Level1 命中 ⇒ 零调用』(理由: 避免 typo 修复写僵尸 claim), spec-drafter/SKILL.md:29 『typo/格式修复 → Level 1, 直接跳过 A.1』 —— Level 1 / 无 Spec 的 leaf 任务被刻意排除。state-scanner/SKILL.md:149 仍写『闸门仅在用户确认进 Phase B 时调用』。workflow-runner/SKILL.md 对 coordination/claim/phase1_gate 零命中; RECOMMENDATION_RULES.md 仅 rule 1.54 (collision advisory); 全仓对手动认领 / ops leaf 指引零命中。能力面存在: CLI 接受任意 track 与 phase (实验 outcome='passed', own_claim.phase='ops')",
+        "match": true,
+        "notes": "v1.71.0 的 A.1 入口认领把触点提前到起草 Spec 前, 缓解的是 Spec 驱动的工作 (issue 评论 21988 也写明缺口 2 不在该 Spec 内); ops leaf 场景未覆盖"
+      },
+      {
+        "case_id": "case-4",
+        "input": "实验副本内调用 lib.collision.classify() (v1.74.1), 合成 tracks: 同一 track_id, owner_container 分别为 'simonfish/dev-claude2' 与 'creationhikari/dev-claude2' (主机名跨机不唯一), 均 active, updated_at 同刻; 附验同 uuid 多 git owner ('simonfish/bfe8285d' vs 'aria-runner-bot/bfe8285d') 与两台真实 uuid 机 ('simonfish/bfe8285d' vs 'aria-runner-bot/023236f2')",
+        "expected_behavior": "issue 缺口 3 方向 2: 『不同容器同一个名字』—— 主机名跨机器不唯一, 分组键把两台机器当成同一个 owner-container, 碰撞误判",
+        "actual_behavior": "classify -> kind='cross_owner', groups=[['creationhikari/dev-claude2','simonfish/dev-claude2']]: 主机名型容器的 identity_key 保留 owner 段 (lib/collision.py:96-113), 两台机器被区分为两个身份并判 cross_owner。附验: 同 uuid 容器 git owner 漂移 -> kind='none' 且 identity_drift_advisories 恰 1 条 (owners=['aria-runner-bot','simonfish']); 两台真实 uuid 机 -> kind='cross_owner'。相关测试模块 test_collision / test_collision_frozen_corpus / test_handoff_multibranch_collision_dedupe / test_track_board_advisories / test_p1_layer_h 共 59 用例全绿",
+        "match": false,
+        "notes": "由 aria-plugin v1.70.0 (aria 5fbb974, merge 0545f86) 修复; 该修复同时也处理了 10CG/Aria#193 的 owner 漂移形态"
+      },
+      {
+        "case_id": "case-5",
+        "input": "同 case-4 的 classify() 调用: 'simonfish/dev-claude2' (主机名) 与 'simonfish/bfe8285d' (uuid), 按 issue 所述视为同一台机器的两个名字",
+        "expected_behavior": "issue 缺口 3 方向 1: 『同一容器两个名字』—— 主机名串与 uuid 串被当成两个 owner/身份分组",
+        "actual_behavior": "classify -> kind='self_multi_container' (soft hint 级), groups=[['simonfish/bfe8285d','simonfish/dev-claude2']]: 两个串仍是两个 identity_key ('simonfish/dev-claude2' 与 'bfe8285d'), 因 owner 相同只降为 soft hint, 未升为 cross_owner; 机制上无法把主机名串与 uuid 串合并 (无映射; 归档 Spec owner-container-identity-key-and-collision-parser 的非目标明写『不推断、不引入映射表』)。历史行经 LAYER_H_ACTIVE_WINDOW_DAYS=30 窗口自然退场, 但只要操作者按 container-id 文件头邀请填 label, 新写出的 owner-container 串就会再次与 uuid 串形成别名对 (见 case-6)",
+        "match": true,
+        "notes": "严重度已被压低 (soft hint, 不再误报硬碰撞), 但『一机两名被当成两个身份』仍成立"
+      },
+      {
+        "case_id": "case-6",
+        "input": "评论 18823 的 08-13 时间线在 v1.74.1 上重放 (全新 bare origin + clone, 推送开启, release 时 fetch_success=true): (1) `HOME=homeC phase1_gate.py --raw-track-id label-trap-demo-2 --phase B --mode advisory` (container-id: uuid=cccccccc, label 空) -> claim 落在 claims/cccccccc/; (2) 把 container-id 的 label 行改为 `label: dev-claude2` (文件头旧邀请语); (3) 同一机器 `release_gate.py --raw-track-id label-trap-demo-2 --status done`; (4) 对照: 清空 label 后再跑 (3)",
+        "expected_behavior": "评论 18823: 加 label 后 release 解析出另一个身份, 得 claim_not_found, claim 成为没人能释放的孤儿; 建议 (1) get_container_id() 恒返回 uuid, 或 (2) release/heartbeat 同时接受 uuid 与 label, 或 (3) 至少加警告",
+        "actual_behavior": "(3) released={success:false, error:'claim_not_found', benign:true}, exit 0, fetch_success=true; get_container_id()='dev-claude2' 而 get_container_uuid()='cccccccc'; 输出含 label_migration={label:'dev-claude2', active_claims:0, message:'container-id label ... 仍参与协调身份: claims/dev-claude2/ 下 active=0; S2 (uuid 优先) 前请留空 label 或迁移这些 claim'}, stderr 有同句告警 —— 告警存在, 但它只数 claims/<label>/ 目录, 看不见被孤立在 claims/<uuid>/ 的那条 (active=0), release 仍以 benign 通过。(4) 对照: label 清空后同一 release -> {success:true, status:'done'}, 证明因果在 label。S1 lock-in 测试 tests/test_identity_label.py:65 (test_get_container_id_still_prefers_label) 与 test_migration_inventory / test_identity_container_uuid 共 18 用例全绿, 即 label 优先是被刻意保留的",
+        "match": true,
+        "notes": "S1 (v1.70.0) 只加告警与 inventory, 刻意不改匹配语义; flip 由 10CG/Aria#198 (open) 承载"
+      },
+      {
+        "case_id": "case-7",
+        "input": "接 case-6 步骤 (2) 的状态 (label=dev-claude2 且 claim 在 claims/cccccccc/): `HOME=homeC phase1_gate.py --heartbeat-only --raw-track-id label-trap-demo-2 --phase A.1 --repo-path projC --no-push`",
+        "expected_behavior": "评论 18823 建议 2: release / heartbeat 匹配时同时接受 uuid 与 label (按文件双键匹配)",
+        "actual_behavior": "输出 outcome='error', error='claim_not_found'; stderr: 'claim_lifecycle.heartbeat_by_track: no active claim for container=dev-claude2 track=label-trap-demo-2'。release_claim_by_track 与 heartbeat_by_track 都只按单键 `rec.container == resolved.container_id` 匹配 (lib/claim_lifecycle.py:426, :541), 未做双键; heartbeat-only 输出没有 label_migration 告警键。即长会话里 label 一旦生效, 心跳也刷不到原 claim",
+        "match": true,
+        "notes": "这是评论 18823 未写到的同一陷阱的第二个受害路径 (heartbeat)"
+      },
+      {
+        "case_id": "case-8",
+        "input": "`grep -rn derive_container_id aria standards`; 读 aria/skills/state-scanner/lib/__init__.py 导出; 读 session-closer/scripts/handoff_autofill.py:391-411; 读 phase-a-planner/SKILL.md:79-81; 读 lib/identity.py:192-245 / :248-306",
+        "expected_behavior": "issue 缺口 3 建议: 身份取值收敛到单一稳定来源 (~/.aria/container-id 的 uuid), 由插件在写 handoff frontmatter / claim 时统一生成, 主机名不进入该键; 并在 derive_track_id 同源处提供公开 derive_container_id helper, 避免各 skill 各自拼字符串",
+        "actual_behavior": "derive_container_id 在 aria/ 与 standards/ 零命中; lib/__init__.py 导出 get_container_id (:75,:155) 与 derive_track_id (:100,:178), 未导出 get_container_uuid / get_container_label; 单一来源仅局部成立: handoff frontmatter 的 owner-container 经 handoff_autofill.owner_container() (handoff_autofill.py:391-411) -> get_identity().owner_container -> get_container_id() (label 优先, identity.py:223) 生成; A.1 认领的 track-id 仍由 prose 要求 AI 手工拼接 `<spec-slug>-<container_uuid>` (phase-a-planner/SKILL.md:79-81); 主机名仍是『读写 container-id 文件失败』时的兜底返回值 (identity.py:243, :304)",
+        "match": true,
+        "notes": "get_container_uuid() (aria 4b75921, v1.71.0) 提供了恒取 uuid 的 accessor, 但不是 issue 所建议的统一生成点"
+      }
+    ],
+    "hit_count": 7,
+    "total_count": 8,
+    "hit_rate": "7/8"
+  },
+  "verdict": "partial-repro",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": "本单写于 v1.63.0, 与 v1.74.1 现状相比: (1) 缺口 3 的读取侧 (collision 分组键) 已由 aria-plugin v1.70.0 (aria 5fbb974, merge 0545f86) 修复 —— 同名异机不再误并 (case-4), 同 uuid 多 git 身份判 none 并附信息级 advisory, 仅『一机两名』降为 soft hint 级仍成立 (case-5); (2) 缺口 2 的『闸门仅 Phase B』前提已变为 A.1 + Phase B 两个触点 (aria 985e629, v1.71.0 a1-entry), 但 Level 1 / 无 Spec 的 leaf 任务被成文排除, issue 点名的 ops leaf 场景仍无认领路径 (case-3); (3) 缺口 1 (快照不解析 claim) 与原描述逐字一致, 零进展 (case-1/2); (4) 评论 18823 的 label 陷阱在 S1 只加了告警与 inventory、刻意未改匹配语义, 仍复现 (case-6/7), S2 flip 由 10CG/Aria#198 (open, 0 评论) 承载; (5) 缺口 3 的 derive_container_id / 单一来源建议未做 (case-8)。",
+  "errors": []
+}

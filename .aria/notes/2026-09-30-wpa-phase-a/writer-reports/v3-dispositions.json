@@ -1,0 +1,352 @@
+[
+ {
+  "seat": "tech-lead",
+  "label": "C1",
+  "key": "e8d39a8a",
+  "disposition": "fixed",
+  "where_or_evidence": "W3 按主控裁定 1 重写: 白名单只保留与真实凭据确定不重合的整值形态 (<…> / ${…} / {{…}} / [REDACTED…] 与整值掩码 / Unicode `…` 结尾 / 6 个标记词), 删除裸 `$NAME`、`$(…)`、ASCII `...` 三类 (W3 改动第 2 / 5 类、『保留判据』段、『不是白名单的』段、设计取舍 + 已知限制; Impact『新静默』改为列出『不在内』; 待复议 10)。决定性两面 SC 行: 7h (11 个强制出形的独立运行, 含 `$` 加单一小写 / 单一大写字母数字、`$(…)`、ASCII `...` 结尾, 基线 yes)、7j (15 个边界运行)、11z (新 tag 同形真值仍检出)、11m–11r / 11v / 11x / 11y (放行侧)。变异实测 (mut_summary_v3 plan_l3_wl): 重新加入任一类都在 7h 的对应用例转红 (wl_varname_lc / uc / any → dollar-lower / dollar-upper / 三者; wl_cmdsub → dollar-cmd; wl_dots_ascii → dots-ascii), 除大写类外另在 11z 转红。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "M1",
+  "key": "ac42f607",
+  "disposition": "fixed",
+  "where_or_evidence": "W11 改写 (现状 / 改动 / 已知限制三处): launcher 集 = secret-guard.sh:873 既有 13 词 + `command` + `exec` (共 15, 引 file:line, `watch` 属外壳包裹集); 带参数选项 (`sudo -u svc`、`timeout -s KILL 5`)、绝对路径 (`/bin/ps`)、then / do / else / elif 关键字位置、带 `-` 的 BSD 拼写与 `-O`、podman、`/proc` 行纳入 python3 -c / node -e (22bg)。SC-22 新增逐成员枚举行 22av / 22aw / 22ax / 22ay / 22az / 22bb / 22bd / 22be / 22bg / 22bk / 22bl 与 allow-guard 22bi / 22bf; 未纳入的写进已知限制并由 22bh (known-limit) 钉现状 (嵌套 launcher、if / while / until 条件位置、非首位 BSD 簇、find -exec 读 /proc、macOS pgrep -fl 等)。缺项类变异 (plan_l1_w11) 逐成员删除均转红。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "M2",
+  "key": "ce6fc59c",
+  "disposition": "fixed",
+  "where_or_evidence": "Tasks 重排: 1.10 改为发版前验收; 新增 1.12 post-ship 复验 (发版之后; 执行条件 `.aria/probes/plugin-cache-currency.py` 报 PASS 且会话已重启, 其它结果一律记『未生效』停下、不得关单), 只用惰性诱饵: L3 Bash 腿用运行时合成值, L3 Read 腿经 harness 读运行时生成的诱饵文件 (备选: Read SC-33 归因清单里的公开示例文件), L1 腿 `ps aux | head -c 0` 与不存在目录下的 app.ini 路径 (Bash + Read)。Impact 的 10CG/aria-plugin#154 关单前提改指 Tasks 1.12 (Read 腿即该前提); 头部 Rule #7 声明与 rule6_note 同步; 新增 1.13 issue 收尾。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m1",
+  "key": "c9357eb5",
+  "disposition": "fixed",
+  "where_or_evidence": "W14『性能预算』与 SC-30 改写: 同一次运行内交错 A/B (基线 hook 与目标 hook) 的整进程 CPU 时间 (user+sys, 含子进程), 每侧 N≥5 取最小, 判据量 = 目标/基线之比, 墙钟与 loadavg 只记录; 上界 (f)/(f0) ≤1.5×max(基线,100 ms)、(h) ≤1.5、(i) ≤2.0、(g) ≤2.5, 各档配活性断言; 宽松墙钟兜底 < 20 s; 基线自身 CPU ≥5 s 判『环境不合格』重测、不判红。参考实现 writer-v3-proto/timing.py (含 f / g / h 的注入标记活性检查); 低负载实测 (1 分钟负载 1.5–2.9) 与坏实现: vx_quadratic 在 (g) 上 5.1× / 13.6×、ext_perentry 在 (f) 上 10.5–12.6×、no_cap 在 (i) 上 12.9× / 4.0×、vx_interleave 在 (h) 上 2.3× 且活性断言失败、ext_first 比值仅 1.24 但活性断言失败 (见报告 §5)。待复议 20。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m2",
+  "key": "d65a895f",
+  "disposition": "fixed",
+  "where_or_evidence": "W9: 删去『无扩展文件时不 fork 任何子进程』, 改为明文承认每次调用多一次命令替换 (原型实测整进程 CPU 约 +6–9 ms: Bash 面 0.052 → 0.061 s、Read 面 0.043 → 0.049 s, 在测试内 SC-8 五档的 ×1.5 之内; Read/Edit 面无扩展档 (f0) 入 W14 时档); 隔离条款保持『全部扩展代码只经 `$( )`』, 故障注入 20i–20k 不受影响; 待复议 14 记取舍。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m3",
+  "key": "684e9a24",
+  "disposition": "fixed",
+  "where_or_evidence": "W9『语义 (只增不减)』Bash 面改写为『对其每一处出现分别判断: 任一处满足「同一管道阶段内位于它前面有一个读取器」且该阶段按 tight credit 不被放行即拦』, 与 SC-19 19r (第一处在非读取器之后、第二处在读取器之后 → 拦) 同向; 64 处上界两侧由 19x / 19y 钉住。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m4",
+  "key": "c941e4e1",
+  "disposition": "fixed",
+  "where_or_evidence": "W8 已知限制新增『读取器组之外的 Bash 读取写法放行』一段 (重定向读 / source / dd if= / cp … /dev/stdout / docker cp / perl -ne / xargs cat / find -exec / 目录递归与文件名 glob / git show / 表外读取器), 并由 SC-17 17d (known-limit, 21 个独立运行) 逐类钉现状, 转红即有人收口了某类。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m5",
+  "key": "0033f2f4",
+  "disposition": "fixed",
+  "where_or_evidence": "待 owner 复议 7.10 追加: export -p / declare -x / declare -p / typeset -x / 裸 set / env -0 / env -u / env --null (含 nomad alloc exec 与 docker exec 包裹) / systemctl show -p Environment / systemctl cat / kubectl get pod -o yaml|json, 注明基线与目标均放行。纯文本订正、不改代码; 已用 work/cases_m5.py 在基线与目标 secret-guard.sh 上逐条复跑: 前 14 条两侧 exit 0, 对照 `kubectl exec pod -- env -0` / `env` / `printenv` 两侧 exit 2。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m6",
+  "key": "5d032f7a",
+  "disposition": "fixed",
+  "where_or_evidence": "头部新增『术语』行: L1 / L2 / L3 只用于本 Spec; 落入 standards secret-hygiene.md 的条款一律用该 SOT 自己的 Path 3 / Layer 2 (PreToolUse / PostToolUse 两半) 术语, 不写 L1 / L3 (§0 明文『Why no Layer 1』); W13 条款第 1 条同。SC-26 26i (reverse-guard) 钉住 SOT 全文不含 L1 / L3 层号。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M1",
+  "key": "e7e041c6",
+  "disposition": "fixed",
+  "where_or_evidence": "W2 每个枚举集合逐成员出行: SC-4 4p (名表 58 个键名 = 17 名干 × 允许的拼写; 与既有键重叠的 8 个小写拼写期望 json-secret-field=1) / 4s (10 个关键字 × 整键与嵌入) / 4t (熵下限三个两两组合) / 4r (值长 16 的计数侧); SC-5 5n (kv 关键字 10 × 2); SC-6 6i (7 个旗标后缀 + 单破折号) / 6j (scheme 词 4 个与头名拼写) / 6k (值字符类 26 个符号用例); SC-9 9x (名表封闭性) / 9y (路径起头 4 个标记)。缺项类坏实现 (plan_l3_enum: 删名 / 删关键字 / 删旗标 / 删 scheme / 删符号 / 删起头 / 删熵类) 逐成员转红; 等价变异 (被排在前面的 json-secret-field 先消费的 8 个小写拼写) 在 W2 与 mut_summary_v3 点名论证。主控定稿键 eb350937。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M2",
+  "key": "51e90cab",
+  "disposition": "fixed",
+  "where_or_evidence": "L1 枚举同法逐成员出行: SC-16 16q (29 个读取器逐个) + 16n (node -e) + 16h / 16o / 16p; SC-21 21j (声明形态与引号值 9 个独立运行) + 21x (上界内最后一个) / 21y (超出); SC-22 22aw (15 个 launcher 逐个) / 22ax / 22ay / 22az / 22bc / 22bd / 22bk / 22bl; SC-19 19u (读取器集 31 个成员) / 19v–19y (上界边界)。plan_l1_w8w9w10 与 plan_l1_w11 的缺项类 / 差一坏实现逐个转红, 等价变异逐个点名。主控定稿键 eb350937。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M3",
+  "key": "ac42f607",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/M1: W11 改写与 SC-22 22av (14 个带 `-` 或 `-O` 的 ps 拼写, 含事故类 `ps -aux | grep curl`) / 22aw / 22ax / 22ay / 22az; 带用户名的 UNIX 写法 `ps -u dev` 仍放行 (allow-guard 22O); 『与同文件 env / printenv 行既有约定一致』以 secret-guard.sh:873 / :877 为据写进 W11。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M4",
+  "key": "ce6fc59c",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/M2: post-ship 复验从 1.10 拆到发版 (1.11) 之后的 1.12, 失败路径无害 (惰性诱饵: `ps aux | head -c 0`、`cat /nonexistent-wpa-probe/forgejo/app.ini` 与同路径 Read), 执行条件 (plugin-cache-currency PASS + 会话重启) 显式写明。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m1",
+  "key": "cffa7c09",
+  "disposition": "fixed",
+  "where_or_evidence": "决定性化: 7h 对 `$` 加单一小写 / 单一大写字母数字、`$(…)`、ASCII `...` 各一个强制出形的独立运行 (规则所认的字符位置固定, 只有填充随机); 4n / 5l 的 44 位 b64 强制含第二个 `/`, 带 `=` 填充的那个强制不含 `+`、无填充的含 `+` 且不含 `=` (确定地命中 path_eq / path_plus; 复跑中发现原先带填充的值里随机的 `+` 会让 path_eq 约半数运行全绿, 已修); 变异 wl_varname_any 在 7h 恒红 (3 个 wrong 用例), path_plus / path_eq / loosepath 在 4n 与 5l 各 10 次运行 10 次全红 (目标原型 0/10); 另对 20 个分类器类坏实现整体复跑一遍 (plan_repeat): 19 个红行集合与首轮逐个相同, 唯一不同的 path_eq 正是上述生成器修复前只概率性转红的那一个; 没有只能概率性转红的行。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m2",
+  "key": "b4230080",
+  "disposition": "fixed",
+  "where_or_evidence": "W3 第 5 类收窄为 Unicode `…` 结尾 (ASCII `...` 与单一大小写 `$NAME` 一并删除, 见 cluster A); 文档里 ASCII `...` 截短的示例值作为已知误报类成文 (W2 已知限制、Impact『新告警』); 11v 只用 `…`, 11z 钉同形真值 (ASCII `...` 结尾) 仍检出, 7h 钉既有键。变异 wl_dots_ascii → 7h dots-ascii + 11z 红。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m3",
+  "key": "984b1c3d",
+  "disposition": "fixed",
+  "where_or_evidence": "W2 设计取舍『点分标识符链』去掉『漏报面≈0』并写明代价 (三段式点分 token、SendGrid 形约 1/4), 可选收紧列待复议 9; 已知限制补 JSON 渲染头 / Python repr 头 / URL 查询 / 小写 INI·TOML / K8s name-value 对, 由 SC-10 10i / 10j 钉; 已知误报类补 TOKEN_URL / SECRET_NAME / PASSWORD_POLICY / 相对路径类, 由 SC-10 10l 钉五个代表形态 (类别 baseline-failing, 与 22bj 同体例)。变异 fp_relpath → 10l 4/5 红, fp_kebab → 10l 1/5 红。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m4",
+  "key": "cfb24732",
+  "disposition": "fixed",
+  "where_or_evidence": "W2『改动 (分类器)』: 每个 tag 只迭代前 200 个 span, 超出只把 grep -o 命中数减 200 加进计数 (不分类、不取值、不记指纹; 分类路径零 fork), SC-11 11w 钉住; W14 时档 (i) 稠密 L3 输入 (约 900 KB bearer 行 + 约 600 KB JSON 口令行) 比值 ≤2.0 并配活性断言 (仍告警且各 tag 计数与基线相等); N ≥ 5、交错、取最小的口径写明且不属测试内 SC-8 的口径改动。变异 no_cap → (i) 12.9× / 4.0×。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m5",
+  "key": "467c8b54",
+  "disposition": "fixed",
+  "where_or_evidence": "W11 `/proc` pid 位置收窄为 self / 数字 / `*` / `$name` / `${…}` / `$(…)` (占位词 N / <pid> 不拦, allow-guard 22bf); 命令位置锚点含换行导致的 heredoc 文本提及误拦写进 W11 已知限制 (『讨论文本请用 Write 工具落文件』), 由 22bj 钉现状 (转红 = 有人收窄了锚点, 须同步更新 W11)。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m6",
+  "key": "15da802b",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/m4: W8 已知限制成文 15 类放行形态 (SC-17 17d 逐类钉); `node -e` 读 app.ini 补 16n, 右边界补 17c (Bash 面 `app.inix` / `app.ini2` / `app.ini_old` 放行) 与 18i (Read/Edit 面同); 『.env 族对其中多数各有专行、app.ini 族没有』写进已知限制并指出输出侧由 W2 kv-secret-assign 兜底。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m7",
+  "key": "a305732c",
+  "disposition": "fixed",
+  "where_or_evidence": "探针汇总段新增『rows not run (n/a): by design … ; leg missing or not constructible … (行名)』, baseline / target 形态行带 `[N leg row(s) not run]`; 目标形态在有未运行行时只会是 `not established`, 只有『每行 yes 且没有缺腿』才是 `holds`; `WPA_REQUIRE_ALL=1` 验收模式下任何本应运行的 n/a 行 exit 3 (SC『判定命令』段、Tasks 1.10、待复议 17)。负控已实跑: 目标树 + SC-32 无 WPA_BASH32 → rc=0 且 `not established (1 leg row(s) not run)`, 加 WPA_REQUIRE_ALL=1 → rc=3; 无缺腿的 SC-1 → `holds`。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M1",
+  "key": "5ce95ecf",
+  "disposition": "fixed",
+  "where_or_evidence": "W14 新增『原位改写通则』(被原位改写的既有规则行与条件, 其基线拦截集必须在 SC 里逐条重放); SC-22 22bc (被改写的 `/proc` 行保留基线 13 个读取器 × {environ, cmdline} 与两个 `<` 重定向, 共 28 个独立运行, reverse-guard) 与 22aj (13 个读取器 × /proc/N/status, known-limit); SC-16 16o / 16p 重放被改写的 python3 -c / node -e 两行与 tight credit。变异: 合并读取器表时丢成员的实现 (plan_l1_w11 的 drop_procreader_* 系列) 在 22bc 转红。主控定稿键 eb350937。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M2",
+  "key": "eb350937",
+  "disposition": "fixed",
+  "where_or_evidence": "每个枚举集合逐成员出行 (见 backend-architect/M1、M2 的行清单, 另有 W4 取值表的 12k (38 个 tag) / 12l (`pem-header-only`) / 12m (PEM 块与 perl 缺席时的 header-only 兜底, 其 `-` 项都排在最前); 多用例行与枚举行『红了点名前 6 个出错成员』), 每个上界做差一边界 (W9: 200 / 201 条、32768 / 32769 字节、4 / 3 与 200 / 201 字符条目、纯符号条目、64 / 65 处 → 19v / 19w / 19x / 19y / 20f / 20n; W10: 16 / 17 个赋值、8 / 9 次替换 → 21x / 21y)。『基线形态自检』段新增缺项类 / 差一坏实现的要求, Tasks 1.8 同步。本轮为每个枚举跑缺项类 / 差一坏实现 (mut_summary_v3: 420 个坏实现, 406 个至少让一行转红, 14 个转红 0 行 = 8 个与既有 json-secret-field 重叠的小写键名 + 5 个声明前缀词 + 1 个与更靠前通用行重复的 Nomad 变量路径名解释器副本, 逐个写明等价理由; 另有 36 个因变体 / 探针 / 脚本事后修正而作废的首轮结果, 单列不计); 相对 v2 新增或改写的 83 条行全部被至少一个坏实现转红 (69 条由计划内坏实现, 14 条由手工运行, 0 条未覆盖)。过程中发现并修正了三处探针自身的缺陷: 4n / 5l 带填充值里随机的 `+` 让『路径字符类误含 `=`』只概率性转红; 12k 看不见『PEM 块不记 `-` 项』(补 12m, 并发现原型的 header-only 兜底也没记项, 一并补齐); 9l / 9m 的纯大写变量名会被熵下限单独静默, 放过『值字符类误含 `$`』的坏实现 (改成大写加数字的名字)。另有一处复跑脚本缺陷 (9 个符号变体的工作目录重名, 已改并重跑)。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M3",
+  "key": "ac42f607",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/M1 与 backend-architect/M3 (带 `-` 的 BSD 簇 `ps -aux` / `-ax` / `-x` / `-w -x` 与 `-O` 由 22av 逐个出行; procps 4.0.2 实跑表头核对过; 已知限制补首位之外的 BSD 簇)。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M4",
+  "key": "60f3173a",
+  "disposition": "fixed",
+  "where_or_evidence": "W5 改为插入 ` (tags: <tag>=<n> …; source: <tool_name>)`, 不含 tool_input 的任何文本 (file_path 与命令都不进); SC-13 13g 敌意 file_path 14 个独立运行 (良性路径、`)` 加祈使句、换行加伪造 hook 行、引号、非 ASCII 含 U+202E、5000 字符、控制字符; Read 与 Write 各一遍), 要求整个 additionalContext 恰等于基线文本加严格形状的插入段; 13d 全串等值; rule6_note 块 B 理由改写; 待复议 19 列选项 B' (净化基名); 同类既有位置 L1 BLOCKED 文案回显 file_path 列建议开单 7.19、本 Spec 冻结不动。变异 w5_path → 13a / 13c / 13g 红, w5_append → 13d / 13g 红。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m1",
+  "key": "a4af42ab",
+  "disposition": "fixed",
+  "where_or_evidence": "按主控裁定 1 处置: 不是把两类收窄写成已知限制, 而是删除对应白名单分支 (裸 `$NAME` / `$(…)` / ASCII `...`), 使既有键上这两类真值继续检出, 由 7h / 11z 钉住; Unicode `…` 结尾作为保留分支成文 (W3 已知限制)。详见 tech-lead/C1。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m2",
+  "key": "6114c254",
+  "disposition": "fixed",
+  "where_or_evidence": "W2 设计取舍订正理由 (去掉『漏报面≈0』), 已知限制补点分结构凭据 (Discord bot token / 签名 cookie / SendGrid 形), SC-10 10i 钉 (kv / export / json / 头 / 旗标五形, 三段各以字母起头); 可选收紧 (首段小写开头或小词表) 列待复议 9。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m3",
+  "key": "c941e4e1",
+  "disposition": "fixed",
+  "where_or_evidence": "W8 已知限制成文『Bash 面名字组大小写敏感且不认反斜杠路径分隔符 (大写目录名、C:\\gitea\\… 经 Bash 读取放行), 而 Read/Edit 面对小写化后的路径匹配且 `[^ ]*` 吃反斜杠, 两面不一致』, 点名 10CG/aria-plugin#203 的 MINGW64 环境并指向 `.aria/secret-guard.paths` (大小写不敏感) 补写法; SC-17 17d 钉 Bash 面两形现状放行, SC-18 18h 钉 Read 面拦截。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m4",
+  "key": "684e9a24",
+  "disposition": "fixed",
+  "where_or_evidence": "W9 与 W10 已知限制成文『上界触顶后 fail-open (padding 即绕过)』, known-limit 行 19y (第 65 处出现点)、21y (第 17 个赋值 / 第 9 次替换), 合法边界内最后一个仍拦 19x / 21x; 『无扩展不 fork 与只经 $( ) 互斥』同 tech-lead/m2。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m5",
+  "key": "335996c0",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-33 的关键词预筛补 `private[_-]?key`, 并新增自检: 预筛对枚举集合里每个键名 / 关键字 / 旗标名 (58 + 10 + 7 + 2) 都放行, 漏一个即红 (33a 输出 `prefilter passes N/N names`)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "M1",
+  "key": "fc97f926",
+  "disposition": "fixed",
+  "where_or_evidence": "W3 按主控裁定 1 重写: 白名单只保留与真实凭据确定不重合的整值形态 (<…> / ${…} / {{…}} / [REDACTED…] 与整值掩码 / Unicode `…` 结尾 / 6 个标记词), 删除裸 `$NAME`、`$(…)`、ASCII `...` 三类 (W3 改动第 2 / 5 类、『保留判据』段、『不是白名单的』段、设计取舍 + 已知限制; Impact『新静默』改为列出『不在内』; 待复议 10)。决定性两面 SC 行: 7h (11 个强制出形的独立运行, 含 `$` 加单一小写 / 单一大写字母数字、`$(…)`、ASCII `...` 结尾, 基线 yes)、7j (15 个边界运行)、11z (新 tag 同形真值仍检出)、11m–11r / 11v / 11x / 11y (放行侧)。变异实测 (mut_summary_v3 plan_l3_wl): 重新加入任一类都在 7h 的对应用例转红 (wl_varname_lc / uc / any → dollar-lower / dollar-upper / 三者; wl_cmdsub → dollar-cmd; wl_dots_ascii → dots-ascii), 除大写类外另在 11z 转红。 cr 点名的 9l / 9m 也已改为决定性: 变量引用换成大写加数字两类字符的名字 (过得了熵下限), 只有头 / 旗标值字符类 (不含 `$`) 能让它们静默; 变异 add_dollar:hdr / add_dollar:kv (值字符类误含 `$`) 分别使 9l / 9m 转红, 原先的纯大写名会被熵下限单独静默而放过该变异。(主控定稿键 e8d39a8a。)"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "M2",
+  "key": "6bd285b1",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/m1: W14 时档与 SC-30 改为同次运行交错的整进程 CPU 时间比值 (绝对墙钟只作 20 s 宽松兜底、不作判据); 『内建先判』由 20l / 21v 确定性钉住, (h) 档配活性断言 (仍 exit 2 且第二遍与扩展入口一次都不被调用); 基线自身 CPU ≥5 s 判环境不合格。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m1",
+  "key": "cfb24732",
+  "disposition": "fixed",
+  "where_or_evidence": "同 backend-architect/m4 (W2 每 tag 200 个 span 的迭代上界 + 11w; W14 时档 (i) 相对预算 + 活性断言; Tasks 1.10 引用)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m2",
+  "key": "6114c254",
+  "disposition": "fixed",
+  "where_or_evidence": "同 qa-engineer/m2 (SendGrid 形 SG.<22>.<43> 约 1/4 取值被点分链排除, 已写进 W2 设计取舍的『代价』与已知限制, SC-10 10i 钉; 收紧选项待复议 9)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m3",
+  "key": "15da802b",
+  "disposition": "fixed",
+  "where_or_evidence": "W8 已知限制 + SC-17 17d: 目录递归 (`grep -rn KEY /etc/forgejo/`)、文件名 glob (`cat /etc/forgejo/*.ini`、`app.*`) 钉现状放行, 注明输出侧由 W2 的 kv-secret-assign 兜底 (输出行形 `<路径>:<行号>:KEY = <值>`)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m4",
+  "key": "467c8b54",
+  "disposition": "fixed",
+  "where_or_evidence": "podman top / podman ps --no-trunc 纳入 (22bb 与 22bl), 绝对路径 /bin/ps 纳入 (22ay), 非首位 BSD 选项簇列已知限制并由 22bh 钉现状; W11 明文 BSD 簇的判定 = 紧随 ps 的第一个操作数 (不是任意位置)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m5",
+  "key": "29a5d0bd",
+  "disposition": "fixed",
+  "where_or_evidence": "`pgrep -fl` 从 allow-guard 移出, 并入 22bh (known-limit, macOS 语义: 输出完整命令行, 本 Spec 按 Linux 语义放行); 22S 只留 Linux 下只出 pid 与名字的形态。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m6",
+  "key": "335996c0",
+  "disposition": "fixed",
+  "where_or_evidence": "同 qa-engineer/m5 (KEYWORD_RE 补 private[_-]?key + 预筛对全部枚举名放行的自检, 33a)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m7",
+  "key": "d65a895f",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/m2; 命中超过 64 处后的语义定为『第 65 处起不检查 (fail-open)』并成文, 19x (第 64 处仍拦) / 19y (第 65 处放行, known-limit) 各一行。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m8",
+  "key": "51dded0b",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-15 新增 15g (baseline-evidence.md 当 Bash 输出扫, 期望静默); 头部 Rule #7 声明改为『15e / 15f / 15g 钉住 proposal.md、探针、证据文件各扫一次』。负控已跑 (在三份文件副本里各追加一行运行时拼装的凭据形状 → 目标 hook 下 15e / 15f / 15g 全红)。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "M1",
+  "key": "fc97f926",
+  "disposition": "fixed",
+  "where_or_evidence": "W3 按主控裁定 1 重写: 白名单只保留与真实凭据确定不重合的整值形态 (<…> / ${…} / {{…}} / [REDACTED…] 与整值掩码 / Unicode `…` 结尾 / 6 个标记词), 删除裸 `$NAME`、`$(…)`、ASCII `...` 三类 (W3 改动第 2 / 5 类、『保留判据』段、『不是白名单的』段、设计取舍 + 已知限制; Impact『新静默』改为列出『不在内』; 待复议 10)。决定性两面 SC 行: 7h (11 个强制出形的独立运行, 含 `$` 加单一小写 / 单一大写字母数字、`$(…)`、ASCII `...` 结尾, 基线 yes)、7j (15 个边界运行)、11z (新 tag 同形真值仍检出)、11m–11r / 11v / 11x / 11y (放行侧)。变异实测 (mut_summary_v3 plan_l3_wl): 重新加入任一类都在 7h 的对应用例转红 (wl_varname_lc / uc / any → dollar-lower / dollar-upper / 三者; wl_cmdsub → dollar-cmd; wl_dots_ascii → dots-ascii), 除大写类外另在 11z 转红。 (主控定稿键 e8d39a8a。)"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "M2",
+  "key": "5fd1f356",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/M2: 头部 Rule #7 声明改写为『post-ship 腿只用运行时生成的合成值与惰性诱饵 (输出被截成零字节的命令、指向不存在路径的命令、自写的合成诱饵文件), 即使 hook 未生效命令输出也不含真实 argv / 配置值 / 环境值』; Tasks 1.12 的 L1 腿换成 `ps aux | head -c 0` 与不存在路径的 app.ini; W13 第 3 点的 `nomad var put` 实跑限定为不可达地址 (`NOMAD_ADDR=http://127.0.0.1:9`) 或只引 `-h` 原文。主控定稿键 ce6fc59c。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "M3",
+  "key": "05982c10",
+  "disposition": "fixed",
+  "where_or_evidence": "Impact 新增『提交页脚 / PR 描述的关键字』条: 本 Spec 全部提交 (页脚与正文)、PR 标题与描述、合并提交信息对三张 issue 一律只写 `Refs <org>/<repo>#<n>`, 不写 Closes / Fixes / Resolves 及时态变体 (10CG/aria-plugin#154 在 Tasks 1.12 通过之前也只用 Refs, 关闭是 1.13 的独立显式动作); 机械检查 = `git -C <仓根> log --format=%B <起点>..HEAD | grep -niE '…'; echo \"rc=${PIPESTATUS[1]}\"` (aria / standards / 主仓各跑一次, PR 标题与描述草稿同查, rc 判据照 10CG/Aria#199), 正则已用 work/refs_check.py 对正反例实测; Tasks 增『贯穿全部任务』行与 1.11 引用。提交页脚 Refs 是否算『评论』并入待复议 3。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m1",
+  "key": "eff49510",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-26 判据加强且仍限定在小节内: 26c 增 `CLAUDE_PROJECT_DIR`、『静默』、『大小写不敏感』; 26e 改为 README 两语种 Hooks 用法小节各含 `.aria/secret-guard.paths` 与字面子串语法 (`literal substring` / `字面子串`); 26g 增放行侧 (`os.environ`、`keys_unsorted`)、`fp=`、`partial`。变异: SOT 里只往版本历史表追加含全部关键词的行 (README / CHANGELOG / 头注释照常) → 26a–26d、26j、26k 与 28h、28m 红; 连其余文档也不落地的变体 → SC-26 的 9 条与 SC-28 的 14 条 doc-sync 全红。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m2",
+  "key": "5e342bfd",
+  "disposition": "fixed",
+  "where_or_evidence": "W14『陈旧 / 悬空表述』清单补齐并各配 SC: secret-scan.sh 头注释 Scope 清单点名 6 个新 tag (28n)、SOT §5.1 测试清单括号列新族 (26k)、SOT 版本行与历史表 (26j)、tight 族与 Acceptable filters 不一致落 SOT §2.5 注与 hook 头注释 (26b / 26f)、W10 部分覆盖的外部落点 (26f `variable indirection`)。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m3",
+  "key": "51dded0b",
+  "disposition": "fixed",
+  "where_or_evidence": "同 code-reviewer/m8: SC-15 15g 钉 baseline-evidence.md; 头部 Rule #7 声明覆盖范围与 SC-15 一致。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m4",
+  "key": "4900bccc",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-27 27d (doc-sync): secret-scan.test.sh 里须有非注释行读取头注释计数并与实跑总数比较的自检断言 (参照 secret-guard.test.sh 的测试内 SC-13), 只加头注释不加自检的实现不满足 (27b 仍绿、27d 转红); 基线缺席; W14『secret-scan 计数』段写明目标态 K = 50。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m5",
+  "key": "5d032f7a",
+  "disposition": "fixed",
+  "where_or_evidence": "§3.8 分界写死: 长时进程 = 无超时上界, 或预期存活期不少于 60 秒; §3.1 示例的 timeout=30 属短命令, SC-26 26h 逐字节钉住 §3.1–§3.7 与 §4.1–§4.4 等于基线; 末句『能用 `@<文件>` 或 stdin 时同一凭据优先用它』只对长时进程成立、写在 §3.8 内、不改 §3.4 推荐示例; 26a 要求 §3.8 内写明 `60 秒`。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m6",
+  "key": "0033f2f4",
+  "disposition": "fixed",
+  "where_or_evidence": "SOT §5.2 与 aria README 两语种 Hooks 小节各追加一句 updatedToolOutput 事实订正 (『Claude Code 2.1.285 的 schema 含 updatedToolOutput, 端到端未验证, 本 hook 不使用』, 只增不改既有句子), 并入 W14 清单与 SC-28 28m; Out of scope 写明该订正不依赖待复议 1 的结论; hook 头注释那句由 28l 钉。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m7",
+  "key": "5d12116d",
+  "disposition": "fixed",
+  "where_or_evidence": "头部『证据位置』段与 Tasks 1.8 指向 `.aria/notes/2026-09-30-wpa-phase-a/writer-v3-proto/` (README 说明用法, 脚本内绝对路径须按本机改写; 含坏实现构造脚本、复跑计划、mut_summary_v3 与时档汇总), 上一轮同类材料在 writer-v2-proto/; 该目录随交付物 deliver/writer-v3-proto/ 提供, 由主控落盘。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m8",
+  "key": "84a82267",
+  "disposition": "fixed",
+  "where_or_evidence": "W14『陈旧 / 悬空表述』段内逐行列出替换文本的英文字面 (实现者按此写, 不必读探针): 28a 头注释前 70 行含 `secret-scan.sh`; 28b 前 100 行含 `secret-hygiene.md`; 28e `bcrypt`; 28f `file.content`; 28g `credential key name`; 28h `PreToolUse Bash + Read/Edit blocker`; 28i `secret-scan.sh (v1.24.0` 且含 `detect`; 28l `updatedToolOutput`。"
+ }
+]

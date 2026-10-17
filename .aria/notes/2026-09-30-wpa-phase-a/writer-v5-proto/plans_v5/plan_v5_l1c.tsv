@@ -1,0 +1,7 @@
+bj_remote_env_split_ssh	l1	remote_env_split:ssh	SC-22	22bj,22bo
+bj_remote_env_split_sh	l1	remote_env_split:sh	SC-22	22bj,22bo
+bj_remote_env_split_watch	l1	remote_env_split:watch	SC-22	22bj,22bo
+bj_drop_procreader_grep	l1	drop_procreader:grep	SC-22	22bj,22bd
+bj_drop_procreader_rg	l1	drop_procreader:rg	SC-22	22bj,22bd
+bj_drop_procreader_sed	l1	drop_procreader:sed	SC-22	22bj,22bd
+ext_nocut	l1	ext_nocut	SC-19,SC-20	19aa,19a,19b,19z,19af,19ak,19ab,20l,20m

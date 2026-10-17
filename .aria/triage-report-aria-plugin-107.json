@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/aria-plugin#107",
+  "generated_at": "2026-09-30T19:20:56Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 107,
+      "title": "[coordination follow-up] heartbeat 生产接线 — heartbeat_at 冻结在 acquire, SWEEP_TTL 被迫 24h",
+      "body": "## 背景 (v1.56.0 pre-merge review C1 的根)\n\n`lib/claim_lifecycle.heartbeat()` 自 multi-terminal-coordination P2 ship 以来**零生产调用点**; phase1_gate self-resume 路径也不刷新 (且 fresh session_id 使 self-resume 跨 CLI 调用根本不触发)。后果: 所有 claim 的 heartbeat_at 冻结在 acquire 时刻。\n\nv1.56.0 的 `sweep_stale_active` 因此被迫用 SWEEP_TTL=24h (而非 STALE_TTL=30min) 防误杀并行活 session — 见 `lib/constants.py` SWEEP_TTL 注释与锁定测试 `test_sweep_default_ttl_spares_live_sessions`。代价: 真死 claim 也要 24h 才被 durable abandon; reconcile 的 30min stale-takeover-eligible 判定对「活着但超 30min 的 session」持续误报。\n\n## 要做什么 (任选/组合, 设计时再定)\n\n1. phase1_gate self-resume 真刷新 heartbeat (同 container 匹配即刷, 放宽 session 精确匹配)\n2. phase 转换点 (B→C→D) 由编排层调一次 heartbeat CLI\n3. heartbeat 接线后把 SWEEP_TTL 收回 3×heartbeat 窗口, 更新锁定测试\n\n## 参考\n\n- spec 归档: 主仓 `openspec/archive/2026-07-11-coordination-claim-lifecycle-and-overlap`\n- review C1 全文: PR#106 描述 + CHANGELOG v1.56.0\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 26263,
+          "body": "## 现状更新 (2026-09-27)：心跳已有生产路径，但触发条件按「会话」写，新会话漏刷\n\n本单写于 08-08，当时 `heartbeat()` 零生产调用点。之后已接上一条生产路径：`phase1_gate.py --heartbeat-only`（内部走 `lib/claim_lifecycle.py::heartbeat_by_track`），由 state-scanner SKILL.md 的「Layer L A.1 heartbeat 集成」段要求在每次 `/state-scanner` 入口调用。\n\n**残余缺口**：SKILL.md 把触发条件写成「本会话**持 active claim**」。新会话还没认领，不算「持有」，于是不刷；但本容器从上一个会话继承的 active claim 仍在老化。隔夜的会话间隔本身就能超过 `SWEEP_TTL`（24h）。\n\n**实测**（主仓 `10CG/Aria`，容器 `bfe8285d`）：新会话开场时 claim 心跳年龄四次超过 24h —— 2026-09-21 26.4h；09-24 35.2h 与 27.6h；09-26 34.7h。四次都没被扫掉，只是那段时间恰好没有容器跑 `release_gate --sweep-stale`，这不构成安全边界；一旦被扫成 `abandoned`，在飞的轨会从所有碰撞面上消失。\n\n**现行规避**：会话开场手动补刷 —— 前置检查 → 强制对齐协调 ref → 按 (容器, track, active) 解析 → `--heartbeat-only` → 推后 `ls-remote` 核验。\n\n**最小修法建议**：把 SKILL.md 的触发条件从「本会话持 active claim」改成「本容器持 active claim」。`heartbeat_by_track` 本来就按 (容器, 归一 track_id, active) 匹配，docstring 原话是「the `session_id` is irrelevant here: any session of the owning container may refresh」；上面四次补刷都是新会话刷上一个会话的 claim，全部成功，也不会新建第二条 claim（与 `10CG/aria-plugin#202` 的认领路径不同）。这是处方性运行时指令改动，按 Rule #6 要照跑 AB。\n\n相关：`10CG/Aria#180`（同一问题在主仓的报告）· `10CG/aria-plugin#169`（刷了但推不上去）\n",
+          "user": "simonfish",
+          "created_at": "2026-09-27T12:33:03Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/aria-plugin/issues/107",
+      "created_at": "2026-07-11T23:46:39Z",
+      "updated_at": "2026-09-27T12:39:34Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.56.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "lib/constants.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "正文前提核对: (a) `git grep` 非测试代码对 heartbeat 的调用点, af87cae (v1.65.5) vs 268da8f (HEAD); (b) 真 CLI `phase1_gate.py --heartbeat-only --raw-track-id <X> --phase A.1 --no-push` 对 120 分钟前的 claim (实验目录: 真仓 aria/ 副本 @ 268da8f, 临时 git 仓 + 本地 bare origin, 独立 HOME, 未触碰真仓)",
+        "expected_behavior": "正文: heartbeat() 自 P2 ship 以来零生产调用点, 所有 claim 的 heartbeat_at 冻结在 acquire 时刻",
+        "actual_behavior": "af87cae: 零调用 (属实, 写作当时成立); 268da8f: scripts/phase1_gate.py:1160 调用 heartbeat_by_track (v1.71.0 起的 --heartbeat-only 生产路径); 真 CLI rc=0 outcome=refreshed, 120 分钟旧的 claim 刷到 0 分钟, claim 数不变 —— 正文前提已部分失效 (heartbeat() 本身仍零调用)",
+        "match": false
+      },
+      {
+        "case_id": "case-2",
+        "input": "to-do 1 (a): 同容器的**新 session** 对已有 5 分钟 claim 的 track 跑完整 phase1_gate (run_gate, advisory, identity=Identity('t','cSAME','sNEW'), 旧 claim 为 sOLD)",
+        "expected_behavior": "to-do 1: self-resume 应『同 container 匹配即刷』(放宽 session 精确匹配), 复用并刷新 heartbeat, 不新建 claim",
+        "actual_behavior": "outcome=advisory_proceed, surface.kind=occupied ('t/cSAME 5.0m ago 已认领 customer-data-controls-cache-transparency' —— 把自己容器的旧 session 当竞争者), 新增第二条 active claim (cSAME/sNEW + cSAME/sOLD, claim 数 2), 旧 claim 心跳仍 5.0 分钟未刷新 —— 即 10CG/aria-plugin#202 所述缺陷",
+        "match": true
+      },
+      {
+        "case_id": "case-3",
+        "input": "to-do 1 (b): 同一 session 自我 resume: 20 分钟前认领的 claim, 同一 Identity 再跑 phase1_gate (advisory)",
+        "expected_behavior": "to-do 1: self-resume 路径真刷新 heartbeat_at",
+        "actual_behavior": "outcome=passed (命中 self-resume, 不新建 claim, claim 数 1), 但 heartbeat 年龄前后 20.0 → 20.0 分钟, 未刷新; scripts/phase1_gate.py:577-581 注释仍写『heartbeat_at is NOT refreshed on this path … tracked follow-up』",
+        "match": true
+      },
+      {
+        "case_id": "case-4",
+        "input": "to-do 2: `grep -n heartbeat` 于 aria/skills/{phase-a-planner,phase-b-developer,phase-c-integrator,phase-d-closer,audit-engine}/SKILL.md; 并读 state-scanner/SKILL.md:180-192 与 references/layer-l-integration.md:35",
+        "expected_behavior": "to-do 2: phase 转换点 (B→C→D) 由编排层调一次 heartbeat CLI",
+        "actual_behavior": "phase-a / phase-b / phase-c / audit-engine 的 SKILL.md 零命中; phase-d-closer/SKILL.md:56 仅在讲 --sweep-stale (用 STALE_TTL 字样, 另见 10CG/aria-plugin#163); --heartbeat-only 只规定在 /state-scanner 入口 (SKILL.md:180-192); layer-l-integration.md:35 仍写『heartbeat 周期设置 (10min, 由 phase-b-developer mid-cycle 调用)』—— 文档声称与实现不符",
+        "match": true
+      },
+      {
+        "case_id": "case-5",
+        "input": "to-do 3: 读 lib/constants.py (HEARTBEAT_INTERVAL / STALE_TTL / SWEEP_TTL 与 :38-58 注释); 复跑锁定测试模块 tests/test_release_by_track.py (实验目录副本)",
+        "expected_behavior": "to-do 3: 心跳接线后 SWEEP_TTL 收回到 3×心跳窗口 (=1800s), 并更新锁定测试",
+        "actual_behavior": "HEARTBEAT_INTERVAL=600, STALE_TTL=1800, SWEEP_TTL=86400 未动; constants.py:43-57 明写『The threshold below is NOT relaxed on that account … Revisit if the heartbeat ever becomes unconditional (a timer rather than an entry hook)』; 锁定测试现名 test_sweep_default_ttl_spares_live_long_sessions (test_release_by_track.py:398, 正文写作旧名 …_live_sessions) 仍断言 SWEEP_TTL >= 86400, 该模块 53 tests OK —— 未做, 且被成文推迟",
+        "match": true
+      },
+      {
+        "case_id": "case-6",
+        "input": "正文『背景后果』: A 认领后不再有心跳, B (另一容器) 在 A 闲置 1 / 10 / 29 / 31 / 120 / 1439 / 1500 分钟时跑 advisory 闸门 (库调用), 并用真 CLI 复核 35 分钟档; 脚本 /tmp/claude-1000/-home-dev-Aria/261f53cc-4e83-410e-bb33-9a99debc3b55/scratchpad/exp/dup180-107/repro_180_107.py",
+        "expected_behavior": "正文: reconcile 的 30min stale-takeover-eligible 判定对『活着但超 30min 的 session』持续误报 (应仍被视为占用)",
+        "actual_behavior": "≤29 分钟: advisory_proceed + occupied; ≥31 分钟: outcome=passed, competing_winner=null, surface=null (真 CLI 35 分钟档同); 误报持续存在, 分界恰为 STALE_TTL=1800s",
+        "match": true
+      },
+      {
+        "case_id": "case-7",
+        "input": "2026-09-27 评论的残余缺口: 读 aria/skills/state-scanner/SKILL.md:182 触发条件原文; `git log -S'本会话**持 active claim**'` 查该措辞来源; 并对『同容器全新 session』调 heartbeat_by_track (case-3 同款夹具)",
+        "expected_behavior": "评论诉求: SKILL.md 触发条件应按『本容器持 active claim』写, 使新会话也刷继承的 claim (heartbeat_by_track 本就按容器匹配)",
+        "actual_behavior": "SKILL.md:182 原文仍是『本会话**持 active claim** 且 coordination.enabled == true 的每次 /state-scanner 入口都调用一次』, 措辞仅由 ab3dbd0 引入、此后未改; 代码层 heartbeat_by_track 换 session 照刷 (success=true, claim 数仍 1, 心跳 1560 → 0 分钟) —— 缺口纯在文本触发条件, 评论所述属实",
+        "match": true
+      },
+      {
+        "case_id": "case-8",
+        "input": "评论『新会话开场时 claim 心跳年龄四次超过 24h』的旁证 (只读, 不复核历史): 读本机 /home/dev/Aria 的本地 refs/aria/coordination (git ls-tree / git show, 未 fetch), 统计 claims/ 下 active claim 的 heartbeat_at 年龄, 时点 2026-09-30T19:37Z",
+        "expected_behavior": "评论: 容器继承的 active claim 在新会话开场时心跳已远超 24h (SWEEP_TTL), 同名通道 30 分钟窗口形同虚设",
+        "actual_behavior": "本地视图共 27 个 claim 文件, 其中 active 2 条 (phase A.1 与 A.2 各一), 心跳年龄 1.7h 与 12.7h: 无一在 30 分钟内 (与『30 分钟窗形同虚设』同向), 但也无一超过 24h, 评论的『>24h』数字在今天的数据里复现不出, 历史观测本身无法复核 —— 结论未定。注意: 本地 ref (bf05ee9) 与 origin (9805ebe) / github (ad0287f) 的 ref SHA 三端各异, 本地视图未必权威, 仅作旁证",
+        "match": null
+      }
+    ],
+    "hit_count": 6,
+    "total_count": 8,
+    "hit_rate": "6/8"
+  },
+  "verdict": "partial-repro",
+  "severity": "major",
+  "recommended_action": "next-cycle",
+  "deviation_note": "正文 (写于 v1.56.0 时代) 的核心前提『heartbeat() 零生产调用点 / 所有 claim 的 heartbeat_at 冻结在 acquire』在 v1.74.1 已部分失效: v1.71.0 (0ae207f / 9c00aa5 / ab3dbd0) 起 `phase1_gate.py --heartbeat-only` → heartbeat_by_track 是生产路径, 真 CLI 实测 refreshed。仍然成立的是: (1) to-do 1 未做 —— self-resume 仍按 (container, session) 且不刷心跳 (同容器新 session 会新建第二条 active claim, 见 10CG/aria-plugin#202); (2) to-do 2 未做 —— 只有 /state-scanner 入口一个挂载点; (3) to-do 3 被成文推迟 —— SWEEP_TTL 仍 24h; (4) 2026-09-27 评论的残余缺口属实 —— SKILL.md:182 触发条件仍按『会话』写; (5) 同名 advisory 通道在心跳停摆 30 分钟后静默的后果在 v1.74.1 仍完整复现 (case-6)。所以不是『已修』也不是原样复现, 而是缺陷收窄为心跳覆盖不连续",
+  "errors": []
+}

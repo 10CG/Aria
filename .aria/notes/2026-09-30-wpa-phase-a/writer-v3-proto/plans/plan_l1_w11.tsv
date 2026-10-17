@@ -1,0 +1,82 @@
+drop_launch_sudo	l1	drop_launch:sudo	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_doas	l1	drop_launch:doas	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_nice	l1	drop_launch:nice	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_timeout	l1	drop_launch:timeout	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_xargs	l1	drop_launch:xargs	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_nohup	l1	drop_launch:nohup	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_stdbuf	l1	drop_launch:stdbuf	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_env	l1	drop_launch:env	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_time	l1	drop_launch:time	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_eval	l1	drop_launch:eval	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_setsid	l1	drop_launch:setsid	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_ionice	l1	drop_launch:ionice	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_unbuffer	l1	drop_launch:unbuffer	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_command	l1	drop_launch:command	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_launch_exec	l1	drop_launch:exec	SC-22	22n,22x,22y,22z,22aw,22ax
+drop_procreader_cat	l1	drop_procreader:cat	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_head	l1	drop_procreader:head	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_tail	l1	drop_procreader:tail	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_less	l1	drop_procreader:less	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_more	l1	drop_procreader:more	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_strings	l1	drop_procreader:strings	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_hexdump	l1	drop_procreader:hexdump	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_od	l1	drop_procreader:od	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_xxd	l1	drop_procreader:xxd	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_tr	l1	drop_procreader:tr	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_awk	l1	drop_procreader:awk	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_perl	l1	drop_procreader:perl	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_rev	l1	drop_procreader:rev	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_xargs	l1	drop_procreader:xargs	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_sed	l1	drop_procreader:sed	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_grep	l1	drop_procreader:grep	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_rg	l1	drop_procreader:rg	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_cut	l1	drop_procreader:cut	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_paste	l1	drop_procreader:paste	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_nl	l1	drop_procreader:nl	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_sort	l1	drop_procreader:sort	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_base64	l1	drop_procreader:base64	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_cp	l1	drop_procreader:cp	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_procreader_dd	l1	drop_procreader:dd	SC-22	22F,22G,22H,22I,22J,22aj,22an,22bc,22bd,22be
+drop_remote_ssh	l1	drop_remote:ssh	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_docker	l1	drop_remote:docker	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_kubectl	l1	drop_remote:kubectl	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_nomad	l1	drop_remote:nomad	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_pct	l1	drop_remote:pct	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_lxc	l1	drop_remote:lxc	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_podman	l1	drop_remote:podman	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_sh	l1	drop_remote:sh	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_remote_watch	l1	drop_remote:watch	SC-22	22v,22z,22A,22B,22C,22D,22E,22ao,22ap,22aq,22ar,22bk
+drop_psalt_1	l1	drop_psalt:1	SC-22
+drop_psalt_2	l1	drop_psalt:2	SC-22
+drop_psalt_3	l1	drop_psalt:3	SC-22
+drop_psalt_4	l1	drop_psalt:4	SC-22
+drop_psalt_5	l1	drop_psalt:5	SC-22
+drop_psalt_6	l1	drop_psalt:6	SC-22
+drop_psalt_7	l1	drop_psalt:7	SC-22
+drop_pid_0	l1	drop_pid:0	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_pid_1	l1	drop_pid:1	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_pid_2	l1	drop_pid:2	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_pid_3	l1	drop_pid:3	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_pid_4	l1	drop_pid:4	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_pid_5	l1	drop_pid:5	SC-22	22F,22G,22H,22I,22an,22bd,22be,22bg,22bf
+drop_kwpos_then	l1	drop_kwpos:then	SC-22	22az
+drop_kwpos_do	l1	drop_kwpos:do	SC-22	22az
+drop_kwpos_else	l1	drop_kwpos:else	SC-22	22az
+drop_kwpos_elif	l1	drop_kwpos:elif	SC-22	22az
+drop_pgrep_0	l1	drop_pgrep:0	SC-22	22bl,22k,22l,22m
+drop_pgrep_1	l1	drop_pgrep:1	SC-22	22bl,22k,22l,22m
+drop_pstree_0	l1	drop_pstree:0	SC-22	22bl
+drop_pstree_1	l1	drop_pstree:1	SC-22	22bl
+drop_dockerform_top	l1	drop_dockerform:top	SC-22	22bl,22bb
+drop_dockerform_notrunc	l1	drop_dockerform:notrunc	SC-22	22bl,22bb
+drop_dockerform_compose	l1	drop_dockerform:compose	SC-22	22bl,22bb
+drop_dockerform_container	l1	drop_dockerform:container	SC-22	22bl,22bb
+drop_dockerform_ls	l1	drop_dockerform:ls	SC-22	22bl,22bb
+drop_bin	l1	drop_bin	SC-22
+drop_larg	l1	drop_larg	SC-22
+drop_procinterp	l1	drop_procinterp	SC-22
+nodocker_podman	l1	nodocker_podman	SC-22
+pidtok_any	l1	pidtok_any	SC-22
+proc_status	l1	proc_status	SC-22
+anchor_nocntrl	l1	anchor_nocntrl	SC-22
+launcher_any	l1	launcher_any	SC-22

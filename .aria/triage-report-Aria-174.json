@@ -1,0 +1,308 @@
+{
+  "schema_version": "1.0",
+  "triage_tool_version": "1.74.1",
+  "issue_ref": "10CG/Aria#174",
+  "generated_at": "2026-09-30T18:05:05Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 174,
+      "title": "Layer L claim 无法检测跨 track-id 的同源重叠 — 两容器对同一 deferral 档各起 change，双方 gate 均 passed，导致完整重复实现",
+      "body": "## Feature Request\n\n**描述**: Layer L 的 claim 机制按 `track_id` 判重，两个容器对**同一个 deferral 档**各自起 change 且 track-id 不同名时，双方 `phase1_gate` 均返回 `outcome: passed / surface: null`，撞车完全不可见 —— 直到其中一方 `git fetch` 偶然看到对方分支。\n\n**真实案例（ShenQuant, 2026-08-05）**:\n- 共同强制输入: `openspec/changes/archive/2026-08-04-add-replay-derived-ladder/tasks.md` 的 TASK-006 deferral 档（明写「绑定 synth 接线的那个 change 同 PR 闭环」）\n- 容器 A: track `add-synth-today-bar-wiring`，分支 `feat/synth-today-bar-wiring`\n- 容器 B: track `wire-synth-quote-bars`，分支 `feat/wire-synth-quote-bars`\n- 两者同从 `8e44082` 分叉、同期开工、**做同一件事**（F4 分桶修复 / F2 守门 / bar_source 必填 / quote_l1 合成接线 / SC2 保真度重跑）\n- 双方各自跑完 Phase A（含多轮 post_spec 收敛审计）+ Phase B 实现\n- 浪费: 一方 9 文件、另一方 28 文件/+3574 行，两套判据体系（`SC1-7` vs `WSQ-SC1~15`）、两份 SC2 证据（数字完全相同：636/672, 94.6%）\n- **两次 `phase1_gate --mode advisory` 都是 passed / surface: null**\n\n**使用场景**: 多容器并行开发同一仓库时，「同一件事两个名字」是最贵的撞车形态 —— 不同于同名 track 的 claim 冲突（现有机制能拦），它在机制上完全隐形，且往往到 Phase B 末尾才被发现，此时双方都已投入完整的审计与实现成本。\n\n**建议方案**:\n\n1. **让 `--linked-issue` 真正被用起来**。`phase1_gate` 已有该参数与 `linked_issue_overlap[]` 输出（coordination-claim-lifecycle Part B1），设计意图正是「同 issue 不同 track-id 的同一件事」告警 —— 但**当前没有任何编排层传它**（state-scanner SKILL.md 的 Layer L 集成契约里，`--linked-issue` 是「可选」且无人传）。建议把它从可选提升为: **proposal 若声明「强制输入/决策来源 = 某档案路径」，编排层 SHALL 将该路径作为 `--linked-issue` 传入**。\n2. **deferral 档需要稳定 id**。当前 deferral 只是 archive 里 tasks.md 的一个 `[日期]` 段落，没有可传的稳定标识。建议 openspec 侧给 deferral 段加机读 id（如 `deferral-id: ARDL-TASK006-20260802`），归档时保留，后继 change 在 proposal frontmatter 引用它 → 天然成为 overlap 键。\n3. **兜底: 分支名相似度 advisory**。即使 track-id 与 linked-issue 都缺失，`phase1_gate` 可对活跃 claim 的分支名做 token 级相似度检查（本例 `synth-today-bar-wiring` vs `wire-synth-quote-bars` 共享 `synth`/`wire`/`bars` 三个 token），命中即 advisory surface。宁可误报也别静默。\n4. （文档）在 state-scanner SKILL.md 的 Layer L 集成契约里，把「同源不同名」列为 claim 机制的**已知盲区**，提示编排层在 Phase B-entry 额外做一次 `git fetch` + 活跃分支扫视。\n\n**附**: 我方已就该撞车落盘跨容器对齐文档（`docs/handoff/2026-08-05-CROSS-CONTAINER-synth-collision-alignment.md`），含双向差异审查与让位提议，可作为该失败模式的完整案例。\n\n## 环境信息\n- Aria Plugin: 1.63.0\n- Skills: 42\n- OS: Linux x86_64\n- 项目配置 (.aria/config.json): yes\n\n---\n*由 aria-report 自动生成*",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 18965,
+          "body": "## 补充：第三个隐形层 —— `self_multi_container` 分类把并发重复劳动当成\"正常接力\"\n\n会话收尾时用 `state-scanner` 机械扫描复盘，发现撞车能一路隐形到 Phase B 末尾，**不只是 track-id 不同名一个原因**，还有一层：\n\n**两个容器的 git 身份是同一个**（实测 `git config user.name` 两边都是 `simonfishgit`），因此\n`tracks_multibranch.collision.kind` 恒被判为 **`self_multi_container`**。而该分类在现行文档/纪律里\n的语义是「**同 owner 接力，属正常**」→ 不产生任何 surface。\n\n也就是说，即便撞车被 collision 检测**看见了**，它也会被归类为良性。这个分类的隐含前提是\n「同 owner = 串行接力」；owner 同时开两个容器做**不同**工作时，前提破裂：**并发重复劳动**被\n当成正常接力放行。\n\n**建议（补在原 #174 三条之后）**：\n4. `self_multi_container` 不应等同于良性。建议该分类下**仍做一次内容重叠检查**（两条 track 的\n   proposal 强制输入档是否同源 / 两分支改动文件集是否重叠），重叠即 advisory surface。\n   现状是「同 owner」直接吃掉了告警。\n5. 另注意：handoff frontmatter 的 `owner-container` 是**手写标签**，与 `handoff_autofill` 从 git\n   身份派生的值可能不一致（本例：手写 `aria-runner-bot/023236f2` vs 派生 `simonfish/023236f2`）。\n   若 collision 判定依赖手写标签，判定本身就不可靠——建议二者不一致时 fail-loud 或至少 warn。\n\n**本次实证**：两容器各自跑完 Phase A（多轮 post_spec 收敛审计）+ Phase B 实现（9 文件 vs 28 文件\n/+3574 行）才由一方偶然 `git fetch` 发现。三层防线（claim 按 id 判重 / collision 按 owner 归类 /\nfrontmatter 手写标签）**同时失效**。\n",
+          "user": "simonfish",
+          "created_at": "2026-08-16T06:06:46Z"
+        },
+        {
+          "id": 19366,
+          "body": "**第 5 次实证 (2026-08-20/21, 双向各一次, 成本不对称)**:\n\n- 方向 A (08-18): 本容器为 #128 Phase D 重复执行归档, 对方容器 10 分钟前已完成 — 代价小 (本地未推即撤)。\n- **方向 B (08-20/21, 本条重点)**: 容器 A (本) 以 track `issue-batch-181-147-145-triage-fixes` 认领, aria-plugin#147 判 Level 1 直修, v1.66.2 当日 ship。容器 B 同期以 track `subprocess-decode-hardening` 为**同一个 #147** 起 Level 2 spec + 跑满 post_spec 收敛审计 (2 轮 × 3-4 席, 8 份报告 1032 行), push 时才发现被 ship 覆盖, 自标 SUPERSEDED (主仓 `c2a5bd3`)。\n\n两个 track-id 都合法、双方 phase1_gate 都 passed — 正是本 issue 的缺陷形状。本例的放大点: (a) 双方都带了 `--linked-issue` 吗? 若容器 B 认领时带了 `aria-plugin#147` 而本容器的批次 claim 只 link 了 `Aria#181`, 则 Part B1 的 linked_issue_overlap 也探测不到 — **批次型 track 一个 claim 挂多个 issue 的场景, 单 linked-issue 字段结构性不够**; (b) 成本不对称提示优先级: 撞掉的是一整条 L2 spec + 收敛审计, 不是几分钟的机械归档。\n\n残留处置: `openspec/changes/subprocess-decode-hardening/` 现为 active-but-SUPERSEDED, 待 owner 裁 (预期路径: `--archive-design-only` + superseded reason, 同 phase-c-integrator-ci-path-coverage 先例)。",
+          "user": "simonfish",
+          "created_at": "2026-08-21T15:11:10Z"
+        },
+        {
+          "id": 21906,
+          "body": "来自并行轨 **owner-container-identity-key-and-collision-parser** (Aria #193 + aria-plugin#135 缺口 3) 的一条通知 + 一条征求 ack, 都与本轨 `lib/identity.py` 有耦合, 先说结论: **本轨 S1 形态 ship 不动 a1-entry 的任何契约与文本**。\n\n### 1. 通知: D-0(a) 裁定 — Layer H 侧纯形状剥离\n\nowner 裁定 (2026-09-05, 决策单 `.aria/decisions/2026-09-05-owner-container-identity-key-rulings.md` D-0 选 a): Layer H (handoff frontmatter) 的 `<owner>/<container-id>` 解析改为两段式 + `identity_key`, 族键剥离 (`-[0-9a-f]{8}$`) **只在** `track_to_claim_record` 内做, 不触碰 a1-entry 的 claim 契约、`get_container_uuid()` 与 SC-3。本轨新增 `get_container_label()` 只读 accessor, **不 flip** `get_container_id()` 的 label 优先语义。\n\n### 2. 征求 ack: S2 条件下需改写贵轨 SC-3 的判据草案\n\n本轨有一个**条件分支 S2** (激活条件三项同时成立: a1-entry B.2 进 master + 本条 ack + 本轨尚未 merge), 才会 flip `get_container_id()` 为 uuid 优先。flip 后贵轨 SC-3 现文「`get_container_id()` label 优先 ⇒ 直接调它必红」的前提消失, 需改写为:\n\n> `get_container_uuid()` 与 flip 后 `get_container_id()` 同值; label 只经 `get_container_label()` 取得。\n\n请求: 对上述改写措辞给一个 ack / 修改意见。**未取得 ack 本轨不动贵轨任何文本**; 今日 (2026-09-06) 实读 a1-entry 分支 `ab3dbd0` 未进 master, 本轨已判 **S1** ship, S2 后续将在本轨 merge 后、归档前由 tracker issue 承载 (tasks.md 5.8), 届时再回到这条线程。\n\n### 3. 行号漂移\n\n两轨都碰 `lib/identity.py`; 后落地方在 D 期 refresh 对方 proposal 里引用的行号 (本轨 proposal :104 已约定)。",
+          "user": "simonfish",
+          "created_at": "2026-09-06T08:25:13Z"
+        },
+        {
+          "id": 21989,
+          "body": "补 ship 结果 (接上条 D-0(a) 通知): `owner-container-identity-key-and-collision-parser` 已以 **S1** 形态 ship —— aria-plugin **v1.70.0** (aria master `0545f86`, tag v1.70.0), standards master `d217ed0`, 主仓 PR #197 → `990318e`。\n\n对 a1-entry 轨的实际影响: **零契约改动**。`lib/identity.py` 只新增 `get_container_label()` 只读 accessor 并改了 `container-id` 文件头注释 (S1 实况措辞); `get_container_id()` 的 label 优先语义原样保留, 贵轨 SC-3「直接调它必红」的前提仍成立。`lib/collision.py::track_to_claim_record` 对 `<slug>-<8hex>` 形 track-id 只在 Layer H collision 分组时剥尾段, 不动 frontmatter / carry-id / Layer L claim 匹配。\n\n两轨都碰 `identity.py`: 后落地方在 D 期 refresh 对方 proposal 引用的行号 (本轨 proposal :104 约定; a1-entry 分支 `ab3dbd0` 的 `get_container_uuid()` 现位于 `lib/identity.py:247`, 本次 ship 后该行号会漂移, 请合并时以函数名定位)。\n\n上条征求的 SC-3 改写 ack 仍开放; S2 激活条件与后续项已记入 Aria 侧 tracker issue (本轨归档前开), 届时再回到这条线程。",
+          "user": "simonfish",
+          "created_at": "2026-09-06T08:55:40Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/174",
+      "created_at": "2026-08-05T20:36:59Z",
+      "updated_at": "2026-09-06T08:58:54Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": "1.63.0",
+      "current": "1.74.1",
+      "gap": "behind"
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "openspec/changes/archive/2026-08-04-add-replay-derived-ladder/tasks.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "docs/handoff/2026-08-05-CROSS-CONTAINER-synth-collision-alignment.md",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/identity.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": ".aria/decisions/2026-09-05-owner-container-identity-key-rulings.md",
+          "line": null,
+          "format": "backtick",
+          "exists": true,
+          "line_in_range": null,
+          "snippet": "1: # 决策单 — owner-container-identity-key-and-collision-parser (owner 裁定 2026-09-05)\n2: \n3: > **Spec**: `openspec/changes/owner-container-identity-key-and-collision-parser/proposal.md` (v6 → v7 回填)\n4: > **裁定人**: owner (simonfish) · **执笔**: aria-runner-bot/bfe8285d (本容器) · **依据**: post_spec R1–R5 聚合 (`.aria/audit-reports/post_spec-R*-…-aggregated.md`) + proposal §决策点各选项后果\n5: > **owner 原话**: 「审计可以接受当前结论」「Level 3，D-0 a，D-1 a，D-2 a，D-3 a 同意你的建议」",
+          "warning": null,
+          "total_lines": 22
+        },
+        {
+          "file_path": "identity.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "lib/identity.py",
+          "line": 247,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "ok",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [
+        "remotes/origin/feature/owner-container-identity-key-and-collision-parser"
+      ],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "docs/secret-net-l3-and-bypass-paths-phase-a",
+          "is_main": true,
+          "head": "0748dbcabd35011e4453453668af141c11aaab21"
+        }
+      ]
+    }
+  },
+  "repro": {
+    "exit_mode": "auto",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "隔离副本 (aria 268da8f 的 cp -a, HOME=exp/home, 夹具仓无 remote, --no-push): 容器 cPEER 以 track `add-synth-today-bar-wiring` 认领 (claim 无 linked_issue); 本容器按 A.1 模板 (proposal 的 Linked Issue 无合法 token => 整个 --linked-issue 省略) 对另一个名字 `wire-synth-quote-bars` 跑: python3 aria/skills/state-scanner/scripts/phase1_gate.py --raw-track-id wire-synth-quote-bars --phase A.1 --mode advisory --include-terminal --repo-path <fixture> --no-push。脚本 exp/aria-174/repro_174.py case-1",
+        "expected_behavior": "issue 声称 (症状): 双方 phase1_gate 均 outcome=passed / surface=null, 同源重叠完全不可见",
+        "actual_behavior": "rc=0, outcome=passed, proceed=true, surface=null, 输出里没有 linked_issue_overlap 键 (phase1_gate.py:1529 注释 + :1542 门控: 只有传了 --linked-issue 才跑重叠检测)。症状在 v1.74.1 原样复现",
+        "match": true,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-2",
+        "input": "同 case-1, 但 cPEER 的 claim 带 linked_issue=10CG/ShenQuant#7, 本容器传 --linked-issue 10CG/ShenQuant#7 --include-terminal (A.1 模板在 proposal 字段含合法 canonical token 时的调用形态)",
+        "expected_behavior": "issue 声称 (症状): 重叠不可见 (passed / surface=null, 无 overlap 条目)",
+        "actual_behavior": "rc=0, linked_issue_overlap 含 1 条 {track_id: add-synth-today-bar-wiring, container: cPEER, status: active, linked_issue: 10CG/ShenQuant#7}。同 issue 不同 track-id 的形态已可检出, 症状不复现",
+        "match": false,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-3",
+        "input": "同 case-2, 但 cPEER claim 的 linked_issue 与本容器的 --linked-issue 实参都取 deferral 档路径 `openspec/changes/archive/2026-08-04-add-replay-derived-ladder/tasks.md` (issue 建议 1 的字面做法, 直接喂闸门)",
+        "expected_behavior": "issue 声称 (症状): 重叠不可见",
+        "actual_behavior": "linked_issue_overlap 命中 1 条 (lib/collision.py:354-362 _linked_issue_matches 对不可解析值回落原串精确比较)。闸门原语本身能承载『档案路径』键, 缺口在撰写 + 编排侧 (见 case-4), 症状不复现",
+        "match": false,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-4",
+        "input": "proposal.md 头部写 `> **Linked Issue**: \\`openspec/changes/archive/2026-08-04-add-replay-derived-ladder/tasks.md\\``, 跑 A.1 模板的取参命令: python3 aria/skills/state-scanner/scripts/linked_issue_field_probe.py --emit-arg <proposal.md>",
+        "expected_behavior": "issue 建议 1: 编排层应把强制输入档路径作为 --linked-issue 传入",
+        "actual_behavior": "stdout 为空 (rc=0); extract_linked_issue_field 判 BAD_TOKEN, A.1 模板 (phase-a-planner/SKILL.md:82-88) 规定此时整个 --linked-issue 参数省略 => 落回 case-1。编排层不会传档案路径, 诉求未实现",
+        "match": true,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-5",
+        "input": "本地 bare 仓夹具: 本容器工作树里的 `wire-synth-quote-bars` 与远端分支 `feat/add-synth-today-bar-wiring` 上的 `add-synth-today-bar-wiring`, 两份 proposal 的 Linked Issue 都是哨兵 `none`, 正文都引用同一份 deferral 档; 跑: python3 aria/skills/audit-engine/scripts/sibling_spec_probe.py --own-spec-dir wire-synth-quote-bars --repo-path <work>",
+        "expected_behavior": "issue 声称 (症状): 同源竞品不可见",
+        "actual_behavior": "rc=0, status=ok, verdict=not_established, reason=own_token_absent, own_layer=none_sentinel, hits=[]; 远端分支上的同源竞品没有被摆上台面",
+        "match": true,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-6",
+        "input": "同 case-5 夹具, 两份 proposal 的 Linked Issue 都改成 `10CG/ShenQuant#7` 后重跑探针 (阳性对照)",
+        "expected_behavior": "issue 声称 (症状): 同源竞品不可见",
+        "actual_behavior": "verdict=sibling_found, own_layer=canonical, hits=[{spec_dir: add-synth-today-bar-wiring, refs: [origin/feat/add-synth-today-bar-wiring]}]。夹具有效, case-5 的空结果不是夹具假象; 同 token 形态症状不复现",
+        "match": false,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-7",
+        "input": "批次型 track (复刻评论 19366 方向 B 的形态): proposal A 的 Linked Issue = `10CG/Aria#181, 10CG/aria-plugin#147`, proposal B = `10CG/aria-plugin#147`; 用 --emit-arg 取两侧实参, 以 A 的实参作 cPEER claim 的 linked_issue, 本容器以 B 的实参 + --include-terminal 跑 phase1_gate",
+        "expected_behavior": "评论 19366 声称 (症状): 批次型 track 一个 claim 挂多个 issue, 单 linked-issue 字段结构性探测不到",
+        "actual_behavior": "A 的 --emit-arg 输出 `10CG/Aria#181` (仅首个元素, lib/linked_issue_field.py:94-104), B 输出 `10CG/aria-plugin#147`; phase1_gate 得 linked_issue_overlap=[]。两份 proposal 都含 10CG/aria-plugin#147, 却漏检",
+        "match": true,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-8",
+        "input": "Layer H: lib.collision.classify([row('add-synth-today-bar-wiring','simonfish/aaaa1111'), row('wire-synth-quote-bars','simonfish/bbbb2222')]) —— 同 owner、两个 uuid 容器、不同 track 名 (评论 18965 的场景)",
+        "expected_behavior": "评论 18965 声称 (症状): 同 owner 双容器做不同名的同一件事, 碰撞分类给不出任何信号",
+        "actual_behavior": "{kind: none, groups: []}。即便同名给出 self_multi_container, references/layer-l-integration.md:27 仍规定为 『soft hint (不阻塞)』, lib/collision.py:186-217 的分类不含任何内容/文件集重叠维度",
+        "match": true,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-9",
+        "input": "Layer H: classify([row('synth-aaaa1111','simonfish/aaaa1111'), row('synth-bbbb2222','simonfish/bbbb2222')]) —— a1-entry 风格 <slug>-<uuid8> track-id、同 slug 双容器",
+        "expected_behavior": "评论 18965 声称 (症状): 分类不产生 surface",
+        "actual_behavior": "{kind: self_multi_container, groups: [[simonfish/aaaa1111, simonfish/bbbb2222]]}: v1.70.0 D-0(a) 族键 (lib/collision.py:116 family_track_id) 已让同 slug 双容器可被 Layer H 分组; 仅限同 slug, 症状在该形态不复现",
+        "match": false,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      },
+      {
+        "case_id": "case-10",
+        "input": "rows = [carry-x @ aria-runner-bot/023236f2, carry-y @ simonfish/023236f2] (评论 18965 第 5 点的手写标签 vs 派生值形态), 调 collision.classify 与 collision.identity_drift_advisories",
+        "expected_behavior": "评论 18965 声称 (症状): 两种 owner 串并存时分类不可靠且没有任何告警",
+        "actual_behavior": "classify => {kind: none, groups: []} (identity_key 对 uuid 容器只认 uuid); identity_drift_advisories => 1 条 {identity_key: 023236f2, owners: [aria-runner-bot, simonfish]} (信息级)。告警是语料级的, 写 handoff 时并不逐字比对 handoff_autofill 的派生值",
+        "match": false,
+        "notes": "复现脚本: scratchpad/exp/aria-174/repro_174.py (case-5/6 另用 scratchpad/exp/aria-174/out/probe-fixture); 输出: scratchpad/exp/aria-174/out/results.json"
+      }
+    ],
+    "hit_count": 5,
+    "total_count": 10,
+    "hit_rate": "5/10"
+  },
+  "verdict": "partial-repro",
+  "severity": "minor",
+  "recommended_action": "backlog",
+  "deviation_note": "issue 写于 v1.63.0, 正文称『当前没有任何编排层传 --linked-issue』。此后 v1.67.0 到 v1.71.0 已 ship linked_issue 归一、Linked Issue 字段可得性、竞品 spec 探针与 A.1 入口认领 (本 issue 是其立项 issue), 同一 issue 不同 track-id 的形态在 v1.74.1 已可检出 (case-2)。但 issue 自己举的原场景 (两 track 名不同、无共享 issue token、只共享一份 deferral 档) 在 v1.74.1 仍完全不可见 (case-1 passed / surface=null / overlap 键缺席; case-5 探针 not_established), 且 issue 与评论共 10 项具体诉求里只有 3 项已修, 7 项未实现或未答复。因此既不是『已修』, 也不是『原样复现』。",
+  "errors": [],
+  "sub_items": [
+    {
+      "item": "症状级总项: 原场景 (不同 track 名 + 无共享 issue token + 仅共享一份 deferral 档) 两容器 gate 均 passed / surface null, 撞车不可见",
+      "status": "open",
+      "evidence": "v1.74.1 (aria 268da8f) 副本实跑: case-1 => rc=0 outcome=passed surface=null, linked_issue_overlap 键缺席 (aria/skills/state-scanner/scripts/phase1_gate.py:1529 注释 + :1542 门控)。case-5 (两份 proposal Linked Issue 均为哨兵 none, 同引一份 deferral 档) 跑 aria/skills/audit-engine/scripts/sibling_spec_probe.py => verdict=not_established reason=own_token_absent hits=[]; 阳性对照 case-6 (同 canonical token) => sibling_found, 证明夹具有效。该缺口已在归档 Spec 内成文: openspec/archive/2026-09-06-a1-entry-claim-duplicate-work-guard/proposal.md:509 (§6 首行, 『最大的单项缺口』, 无覆盖机制)。"
+    },
+    {
+      "item": "正文建议 1 (意图): 让 --linked-issue 真正被编排层用起来 —— Phase A 入口传 proposal 声明的 Linked Issue token",
+      "status": "fixed",
+      "evidence": "aria-plugin v1.71.0 = aria 985e629 (2026-09-06T09:36:58Z), 立项 issue 即本 issue (aria/CHANGELOG.md:224-226; a1-entry proposal.md:59 Linked Issue = 10CG/Aria#174)。985e629 是 origin/master 与 github/master 的祖先 (git merge-base --is-ancestor 均 yes; git branch -r --contains 含 origin/master 与 github/master), 两端 master 头均 268da8f, 与 git ls-remote 一致。落点: aria/skills/phase-a-planner/SKILL.md:60-88 与 aria/skills/spec-drafter/SKILL.md:73-105 的『前置: REQUIRE claim (A.1, MUST)』块 (含 --linked-issue / --include-terminal); allowed-tools 扩权 phase-a-planner/SKILL.md:9、spec-drafter/SKILL.md:10。副本实跑: test_a1_entry_gate_cli 20 OK, test_coordination_default_lockin 26 OK (SC-22 文本层), test_heartbeat_by_track 12 OK; case-2 (双方同 canonical token) => linked_issue_overlap 命中 1 条。限定: 仅当 proposal 的 Linked Issue 是合法 <org>/<repo>#<n> token 时才传。"
+    },
+    {
+      "item": "正文建议 1 (字面): proposal 声明『强制输入/决策来源 = 某档案路径』时, 编排层把该路径作为 --linked-issue 传入",
+      "status": "open",
+      "evidence": "未实现且被设计排除: Linked Issue 字段值为档案路径时 extract_linked_issue_field 判 BAD_TOKEN, --emit-arg 输出为空 (case-4 实跑: stdout='' verdict=BAD_TOKEN), A.1 模板规定此时整个 --linked-issue 省略 (phase-a-planner/SKILL.md:82-88)。闸门原语本身可承载路径键 (case-3: 两侧同一路径 => overlap 命中 1 条; aria/skills/state-scanner/lib/collision.py:354-362 对不可解析值回落原串精确比较), 所以缺口在撰写 + 编排侧, 不在 phase1_gate。未见任何 Spec 或决策单评估 / 否决过该项。"
+    },
+    {
+      "item": "正文建议 2: deferral 档稳定机读 id (如 deferral-id), 归档保留, 后继 change 在 proposal frontmatter 引用作 overlap 键",
+      "status": "open",
+      "evidence": "零实现: grep -rniE 'deferral[-_ ]id|ARDL-' 对 aria (268da8f) 0 命中; 对主仓 openspec/ docs/ .aria/ 与 standards 子模块 (2bc1c4c) 同模式 0 命中; grep -rniI deferral standards => 0。未见任何 a1-entry / sibling-spec-probe / linked-issue 系列 Spec 或决策单评估过此项。"
+    },
+    {
+      "item": "正文建议 3: phase1_gate 对活跃 claim 的分支名做 token 级相似度 advisory 兜底",
+      "status": "open",
+      "evidence": "零实现: 对 aria 非测试 .py 搜 jaccard|levenshtein|fuzzy|difflib|SequenceMatcher|branch name sim|token overlap => 0 命中。aria/skills/audit-engine/scripts/sibling_spec_probe.py 虽用 for-each-ref 枚举远端全部分支 (:458), 但只为读各分支上的 proposal.md, 并按 Linked Issue token 求交 (classify_proposal :218-246), 不看分支名。case-5 已示其对哨兵 none 给 not_established。"
+    },
+    {
+      "item": "正文建议 4 (文档): state-scanner SKILL.md Layer L 集成契约把『同源不同名』列为已知盲区, 并提示 Phase B 入口额外 git fetch + 活跃分支扫视",
+      "status": "open",
+      "evidence": "aria/skills/state-scanner/SKILL.md:143-178 (Layer L 集成契约) 与 references/layer-l-integration.md 均无该盲区成文 (grep '盲区' 限 claim/overlap/Layer L/同源/collision/linked => 0 命中; SKILL.md:175 只写三态『缺席 = 本轮未检测』); phase-b-developer/SKILL.md:86-98 (B.0) 与 branch-manager/SKILL.md 无额外 fetch + 活跃分支扫视步骤。缺口只成文在归档 Spec 内 (a1-entry proposal.md:505-512 §6), 采用方读不到。近似机制: audit-engine 每轮入口的 sibling_spec_probe 会 fetch 远端全部分支 (v1.69.0 = aria 2eca24b, 两端 master 均含), 但触发点是审计轮入口而非 Phase B 入口, 且按 issue token 求交。"
+    },
+    {
+      "item": "评论 18965 第 4 点: self_multi_container 不应等同良性, 该分类下仍做内容重叠检查 (proposal 强制输入档同源 / 两分支改动文件集重叠)",
+      "status": "open",
+      "evidence": "aria/skills/state-scanner/references/layer-l-integration.md:27 仍写『self_multi_container -> soft hint (不阻塞)』; lib/collision.py:186-217 classify_claims 只按 (identity_key, 可归属 owner 数) 分类, 无任何内容/文件集重叠输入。case-8: 同 owner 两个 uuid 容器 + 不同 track 名 => classify={kind: none, groups: []}。部分改善: v1.70.0 (aria 0545f86, 两端 master 均含) 的 D-0(a) 族键 lib/collision.py:116 使 a1-entry 风格 <slug>-<uuid8> 同 slug 双容器可被 Layer H 分组 (case-9: self_multi_container), 仅限同 slug。"
+    },
+    {
+      "item": "评论 18965 第 5 点: handoff 手写 owner-container 与 handoff_autofill 派生值不一致时 fail-loud 或至少 warn",
+      "status": "fixed",
+      "evidence": "10CG/Aria#193 (2026-09-06T08:55:39Z 已关) => aria-plugin v1.70.0 = aria 0545f86 (2026-09-06T08:27:19Z; origin/master 与 github/master 均含): lib/collision.py:96-113 identity_key 对 uuid 容器只认 uuid, 判定不再依赖手写 owner 段; :263-303 identity_drift_advisories + scripts/renderers/track_board.py:826 渲染 same-identity-multi-owner 信息级提示。case-10: aria-runner-bot/023236f2 与 simonfish/023236f2 并存 => classify=none + 1 条 advisory (owners=[aria-runner-bot, simonfish])。副本实跑 test_collision 28 通过, test_track_board_advisories 5 OK, test_collision_frozen_corpus 7 OK。限定: 提示是语料级且信息级, 并未在写 handoff 时逐字比对手写值与 handoff_autofill.owner_container() (aria/skills/session-closer/scripts/handoff_autofill.py:391-410, best-effort, 失败返回 None 后仍保留手填); 若要求严格 fail-loud 则不满足, 但『至少 warn』已满足。"
+    },
+    {
+      "item": "评论 19366 (a): 批次型 track 一个 claim 挂多个 issue, 单 linked-issue 字段结构性不够",
+      "status": "open",
+      "evidence": "aria/skills/state-scanner/lib/linked_issue_field.py:94-104 emit_arg 只取首个 token 元素 (fv.token_elements[0]); claim 的 linked_issue 与 linked_issue_overlaps(own_linked_issue) 均为单个字符串 (lib/collision.py:365-415); a1-entry proposal.md:683 非目标明写『不新增任何 claim 字段』。case-7 复刻 10CG/aria-plugin#147 形态: A=`10CG/Aria#181, 10CG/aria-plugin#147` 只登记 10CG/Aria#181, B=`10CG/aria-plugin#147` => linked_issue_overlap=[] 漏检。"
+    },
+    {
+      "item": "评论 19366 (b): 成本不对称 (撞掉的是一整条 L2 spec + 收敛审计) 提示优先级",
+      "status": "not-applicable",
+      "evidence": "优先级说明, 非交付物。a1-entry 以此为立项依据: 认领前移到 A.1 『必须早于投入』 (a1-entry proposal.md §Why; aria/skills/phase-a-planner/SKILL.md:73 『为什么在这里』)。"
+    },
+    {
+      "item": "评论 19366 残留处置: openspec/changes/subprocess-decode-hardening 为 active-but-SUPERSEDED, 待 owner 裁 (预期 --archive-design-only)",
+      "status": "fixed",
+      "evidence": "主仓 909d771 (2026-08-21) 『subprocess-decode-hardening 归档 design-only (SUPERSEDED-BY-SHIP)』: 目录已在 openspec/archive/2026-08-21-subprocess-decode-hardening/, proposal.md frontmatter archive_type: implementation-deferred + archived_reason: SUPERSEDED-BY-SHIP (aria v1.66.2 / de1eba5, Closes 10CG/aria-plugin#147); openspec/changes/ 下已无该目录 (ls 核验)。909d771 是 origin/master 与 github/master 的祖先 (两端 master 头均 0748dbc)。"
+    },
+    {
+      "item": "评论 21906 / 21989 的通告项 (D-0(a) 裁定 / S1 形态 ship 结果 / lib/identity.py 行号漂移)",
+      "status": "not-applicable",
+      "evidence": "信息通告, 无待办。核实其『a1-entry 零契约改动』声称: aria/skills/state-scanner/lib/identity.py:223 get_container_id() 仍 return label if label else uuid, :248 get_container_uuid() 与之并存; 副本实跑 test_identity_label 6 OK, test_identity_container_uuid 5 OK。"
+    },
+    {
+      "item": "评论 21906 第 2 点: 征求 a1-entry 对 SC-3 改写 (S2 条件) 的 ack / 修改意见",
+      "status": "open",
+      "evidence": "live GET 10CG/Aria#174 (2026-09-30): state=open, 4 条评论, 最后一条 21989 (2026-09-06T08:55:40Z), 之后无任何回复, 也从未发过 a1-entry ship 通告。S2 从未激活: v1.70.0 (0545f86, 2026-09-06T08:27:19Z) 先于 v1.71.0 (985e629, 09:36:58Z) 进 master (git merge-base --is-ancestor 0545f86 985e629 = yes), 第三个激活条件『本轨尚未 merge』在 a1-entry 落地时已不可能成立。S2 后续 (get_container_id flip / 发布门 / SC-3 改写 / 10CG/aria-plugin#135 08-13 时间线) 由 10CG/Aria#198 承载: open, 0 评论, 正文仍写『Aria #174 (a1-entry 轨, SC-3 改写 ack 征求中)』。a1-entry 已归档 (主仓 3dd7f1d), SC-3 原文冻结在归档件 proposal.md:617。若关闭 10CG/Aria#174, 10CG/Aria#198 的前置引用会指向已关闭讨论串, 须先把 ack 请求迁到 10CG/Aria#198。"
+    }
+  ],
+  "repro_environment": {
+    "experiment_dir": "scratchpad/exp/aria-174",
+    "copy_of": "/home/dev/Aria/aria @ 268da8f (cp -a, 已删副本的 .git 指针文件; HOME=<exp>/home; 夹具仓无 remote; 一律 --no-push)",
+    "real_repo_writes": "none (git status 与 HEAD 前后一致; 无 fetch/push/checkout)",
+    "tests_run_in_copy": {
+      "test_a1_entry_gate_cli": "20 OK",
+      "test_coordination_default_lockin": "26 OK",
+      "test_heartbeat_by_track": "12 OK",
+      "test_linked_issue_field": "59 OK (skipped=2)",
+      "test_identity_container_uuid": "5 OK",
+      "test_identity_label": "6 OK",
+      "test_collision (plain-assert fallback)": "28 passed",
+      "test_collision_frozen_corpus": "7 OK",
+      "test_track_board_advisories": "5 OK",
+      "audit-engine test_sibling_spec_probe": "100 OK (skipped=1)"
+    }
+  }
+}

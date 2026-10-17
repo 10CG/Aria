@@ -1,0 +1,226 @@
+[
+ {
+  "seat": "tech-lead",
+  "label": "M1",
+  "key": "e2459206",
+  "disposition": "fixed",
+  "where_or_evidence": "W11 「同一批包裹下的整环境转储」条重写: credit 沿用默认、不属 tight 族 (转储后的锚定 grep / cut / wc / >/dev/null 放行, `| grep -v x` 同样放行 = 基线 docker / kubectl / podman / lxc exec … env 行的既有行为与既有限制); 「tight 拷贝只含 ps 家族」条; 待复议 23 (备选 B 并入 tight、备选 C 收窄) 与 28; Impact 新拦截条写明。SC-22 22br (allow-guard, 22 个转储成员 x {`| grep '^PATH='`, `| cut -d= -f1`} = 44 个运行) 与 22bs (known-limit, `| grep -v x` x 22) 两个方向钉住。坏实现 env_tight (把包裹下的转储并进 tight 拷贝): 22br 44/44 与 22bs 22/22 转红; remote_env_split:docker/kubectl/podman/lxc 在 22bo+22br+22bs 上 0 行红 (等价变异, 现对带过滤的转储同样成立; 理由见 mut_summary_v5), ssh/nomad/pct/sh/watch 仍各自在 22bo 转红 (mut/final5/plan_v5_l1b)。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "M2",
+  "key": "22bdd143",
+  "disposition": "fixed",
+  "where_or_evidence": "整个机制换掉而不是修补: W9「匹配实现」条与「语义」条 —— 全部出现点只做一次固定字符串比对 (grep -oFib -f), 前 64 处出现各换成内建 app.ini 名 + 一个空白, 整条命令交内建同一个 _sg_core_eval 判一遍 (成本线性, 约 2 倍); 明文禁止对每个出现点重判或扫前缀 (`${before##*[;&|]}` 一类在无分隔符前缀上是 O(前缀长^2))。W14 新时档 (f-hit) <= 3.0 (200 条扩展条目 x 4 KB 单行: 出现一次 / 64 次 / 无出现对照档, 活性断言 _sg_core_eval 命中档两次、对照档一次) 与 (i3); SC-34 34c (每进程 4 s CPU 上限 + 整进程 CPU 总量 <= 3.5 倍, 64 处与 1 处两档)。实测 (out/occ_2k.txt, out/occ_8k.txt, 64 处出现): 目标 1.7x (2 KB) / 1.9x (8 KB), 手写阶段切分的参考坏实现 ext_v4stage 7.6x / 24.7x, 每个出现点各判一遍内建判定 ext_perocc_judge 55x / 64.8x; (f-hit) 上 ext_v4stage 30.7x、ext_perocc_judge 63.4x 且活性断言失败 (out/timing_bad.txt)。两个坏实现都使 34c 转红 (mut/final5/plan_v5_l1)。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m1",
+  "key": "6ff1d962",
+  "disposition": "fixed",
+  "where_or_evidence": "不改规则、成文并钉住 (沿用基线 env / printenv 行的写法不锚命令位置, 改锚是新取舍, 列为备选): W11 已知限制与 Impact 新拦截条列入「包裹词 (含 bash -c / sh -c / watch / ssh) 之后出现 env / printenv 这个词的文本被拦」(bash -c \"python3 -m venv env && …\"、watch -n 5 \"du -sh env\"、提交信息里 ssh 之后的 env 一词); SC-22 22bj 由 9 个扩为 14 个独立运行 (新增 5 个 env 词成员 + 3 个对含真实 pid 记号的 /proc 路径文本做 grep / rg / sed 的成员, 同时覆盖 cr/m1 的第二类); 14 个成员各有会转红的坏实现: 命令位置锚 / 换行锚 (remote_anchored、anchor_nocntrl、drop_psalt)、env 词成员 (remote_env_split:ssh / sh / watch 使 env-word-* / venv-* / du-watch 转红)、/proc 文本成员 (drop_procreader:grep / rg / sed 使 proc-text-* 转红; mut/final5/plan_v5_l1c); 待复议 27 (备选: 把包裹词与 env 词锚在命令位置)。"
+ },
+ {
+  "seat": "tech-lead",
+  "label": "m2",
+  "key": "984b1c3d",
+  "disposition": "fixed",
+  "where_or_evidence": "W2 已知限制新增一类: Forgejo / Gitea 容器环境变量覆写 `FORGEJO__<section>__<KEY>` / `GITEA__<section>__<KEY>` (section 小写; 与 app.ini 同一批凭据的另一种承载, 两层都不覆盖; 要覆盖须让 kv 的键段接受 `__` 与小写段, 是新取舍, 并入建议开单 7.8 / 7.9); W8 已知限制 (MINGW64 一句之后) 同步; SC-10 10m (known-limit, compose 环境列表 / compose 环境映射 / docker inspect Env 数组三形 x Bash 与 Read 两种信封 = 6 个独立运行) 钉现状。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "C1",
+  "key": "1038b8da",
+  "disposition": "fixed",
+  "where_or_evidence": "W1 改为两个视图取并集: 基线视图 D (命令替换丢弃 NUL) 照扫, 仅当原始信封含 JSON 的 `\\u0000` 转义且换行视图 N 与 D 不同时才把 N 接在 D 之后 (同一个 jq 程序单一定义, 两次提取共用); 设计取舍重写 (选 A'': 并集; 不选替换 D、不选换空格、不选列已知限制); 对输入的任何变换须相对既有检出是超集, 成文。SC-1 新增 1e (UTF-16LE 经 Bash, reverse-guard: AWS 密钥行 / env 行 / token PAT 行 / JSON client_secret 四形仍检出) / 1f (经 Read) / 1g (字面 `\\u0000` 六字符不翻倍), 1c / 1d 容许至多一个 kv-secret-assign。坏实现: nul_replace (上一版设计) 使 1e / 1f 转红 (四形全静默); nul_always_append 使 1g 转红; nul_always_view 使 1g 与 SC-2 2a-2d 转红; nul_off 与 nul_space 使 1c / 1d 转红 (mut/final5/plan_v5_l3)。待复议 21。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M1",
+  "key": "755aab21",
+  "disposition": "fixed",
+  "where_or_evidence": "W2 新增「线性」段并改写两个 pattern: kv 的键名前后缀各 <= 64 个字符、cli 的参数名前缀 <= 40 个字符, 且都带左边界; 值抽取与去空白改用 `%%` 找分隔符 + `${s:N}` 按长度取余量 + `[[ =~ ]]` 捕获, 禁用前导 `*` 的 `#` / `##` (逐个前缀试, 每次 O(长度): 16 KB 的值 36 s, 线性写法 0.39 s, out/val_quadratic_16k.txt)。SC-34 34a (基线 tag 的 8 KB 长单行 7 形, reverse-guard) / 34b (新 tag 的 9 形: 300 KB `-` 串、20 KB `a-` 串、300 KB 大写连续段、8 KB 空白串与长值, baseline-failing) 在每进程 4 s CPU 上限下逐形态跑; SC-9 9z、SC-10 10n / 10o 钉左边界与上界语义; W14 (i3) <= 2.5。取值等价性: fuzz_value_of.py 对 17 个 tag 的真实 span 差分 0 分歧 (bash 5.2 与 3.2); ere_battery.py 给出缩放对照。坏实现 cli_unbounded / cli_v4 / cli_noleft / kv_unbounded / kv_left_boundary_off / val_quadratic 在 34a / 34b / 9z / 10n / 10o 转红, (i3) 时档上 cli_unbounded 3.4x、cli_v4 105x、cli_noleft 10.7x、kv_unbounded 4.3x、val_quadratic 28.8x (kv_left_boundary_off 不是时间类坏实现, 由 9z 抓; out/timing_i3_bad.txt、out/timing_bad.txt)。待复议 31 / 32。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "M2",
+  "key": "0a8380fd",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 T 按主控裁定 2 重做: W9「语义」条 —— 扩展的 Bash 面不另写判定: 把条目的出现换成内建 `/etc/gitea/app.ini ` (名字里不含 forgejo 一词, 后接一个空白) 再把整条命令交内建同一个 _sg_core_eval (基线 _sg_per_segment_eval 的函数体原样提出, 用 _SG_MODE 记录判定模式), 从构造上与内建一致; 不再有第二份阶段 / 引号 / 转义 / 续行 / 重定向状态机。SC-19 19af (73 个命令形态逐一对拍 + 10 个锚点形态: 6 拦 / 4 放, 要求退出码处处相等; 材料 diff_ext_builtin.py: 上一版设计 54/73, 本设计 73/73; 独立 93 形态电池本设计 0 分歧、旧设计 19 分歧; fuzz_ext_builtin.py 随机 2500 条命令 (内建拦 1873 条) 本设计 0 分歧、旧设计 600 条里 98 条分歧) / 19z (12 个运行) / 19aa (6 个运行) / 19ak / 19al; 待复议 24。坏实现 ext_v4stage 与 :noesc_q / :noesc_all / :noansi / :nopipe / :nonl 在 19af 转红 (:nonl 另在 19z 转红)。"
+ },
+ {
+  "seat": "backend-architect",
+  "label": "m1",
+  "key": "6f503728",
+  "disposition": "fixed",
+  "where_or_evidence": "采纳「含任一非 ASCII 字节即有效」(技术级默认已裁, 待复议 24 列备选): W9 格式条改为 4-200 字节且含至少一个 ASCII 字母数字或任一非 ASCII 字节; 过滤用一次 `sed -E` (字节语义规则, 不用 awk); SC-19 19ae 由 known-limit 改为 baseline-failing (`cat /srv/<4 个汉字>/x` 现为 exit 2), 另有 19ah (hook 环境只有 LANG=C.UTF-8) 钉混合与纯非 ASCII 条目都有效; 只有纯 ASCII 符号条目仍被跳过 (19w)。坏实现 ext_ascii_only (必须含 ASCII 字母数字) 使 19ae 与 19ah 转红。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M1",
+  "key": "0a8380fd",
+  "disposition": "fixed",
+  "where_or_evidence": "同 backend-architect/M2: 引号掩码这个机制已不存在 (没有第二份状态机), 反斜杠转义与 `$'…'` 的实现缺陷类由构造消除; 19af 的 73 个形态含转义引号 (py-escaped-dq / py-escaped-dq-semi)、`$'…'` (py-ansi-c / node-ansi-c)、续行、`||`、含 `&` 的重定向、引号内管道、heredoc、整串降级、包裹、变量间接。坏实现 ext_v4stage:noesc_q / :noesc_all / :noansi / :nopipe / :nonl 各在 19af 转红 (50/73、53/73、52/73、57/73、53/73 个形态一致, 其余分歧); 就是 qa 点名的三个自然坏实现 (mask_noesc_q / mask_noesc_all / mask_noansi) 的对应物。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "M2",
+  "key": "eb350937",
+  "disposition": "fixed",
+  "where_or_evidence": "W8 改动第 3 条补「`:641` 是被原位改写的既有规则, 32 个基线备选各一条只命中它的路径逐个重放」; W14「原位改写通则」清单与 SC 导言「缺项类坏实现」列入 `:641`; SC-18 18j (Read) / 18k (Edit), reverse-guard, 各 32 个独立运行, 基线 32/32; readface_check.py 机械证明表里每条路径恰好命中 32 个备选之一且是它被列的那一个 (表从探针源读取, 正则从基线 hook 读取)。坏实现 readface16 (丢 16 个备选) 使 18j / 18k 各 16/32 转红; readface_drop:1-32 (逐个丢备选) 各使 18j / 18k 转红对应成员 (mut/final5/plan_v5_l1)。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m1",
+  "key": "65fb3fcf",
+  "disposition": "fixed",
+  "where_or_evidence": "W12 改动条补「同一子串多处出现全部替换」(只替换第一处的实现使含两处单键读取的命令仍被拦); SC-23 新增 23j (四个单键子串各一条命令、每条里该子串出现两次 -> exit 0, 基线 3/3 exit 2); SC-25 新增 25h (含单键读取与真实 `.env` 读取的命令被拦, 且 `Command was:` 一行回显原命令文本; 归一化把该行换成占位, 钉不住这一点所以单列)。坏实现 w12_once (只替换第一处) 使 23j 的 4 个命令全部转红; w12_echo_norm (在 hook 开头对整条命令做一次归一化, 回显的是归一化副本) 只使 25h 转红、其余 SC-23 / SC-25 行全绿 (mut/final5/plan_v5_l1, plan_v5_l1b)。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m2",
+  "key": "684e9a24",
+  "disposition": "fixed",
+  "where_or_evidence": "W9 格式条: 剥文件首行的 UTF-8 BOM (EF BB BF) 与行尾 CR、首尾空白; 过滤的第一条 sed 规则 `1s/^\\xef\\xbb\\xbf//`; SC-19 19ai (首行带 BOM 且 CRLF 行尾的清单: 首条目与第二条目都有效)。坏实现 ext_nobom 使 19ai 转红。"
+ },
+ {
+  "seat": "qa-engineer",
+  "label": "m3",
+  "key": "aa08f71d",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-32 新增 32e (POSIX locale 腿): 全部 hook-direct 行 (382 行) 用默认 bash 在 `LC_ALL=C` 下再比一遍, 须与第一个 locale (C.UTF-8) 的结果字符串逐行相同, 不需要环境变量; 待复议 26。坏实现 ell_lastchar (按最后一个字符判 `…` 后缀: UTF-8 locale 下对、POSIX locale 下错) 使 32e 转红并点名 11v / 11x / 11y; 带 WPA_BASH32 跑同一个坏实现, 默认的 32d (第二个 locale 也是 UTF-8 系) 仍是 yes (mut/final5/plan_v5_l3, plan_v5_b32)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "M1",
+  "key": "0a8380fd",
+  "disposition": "fixed",
+  "where_or_evidence": "W9「匹配实现」条补「偏移与切片同一单位」: 偏移是 `grep -b` 的字节偏移, 切片 `${text:pos:len}` 也按字节 (导出的 LC_ALL=C), 出现点之前的中文提示 / 注释不得使切片错位; 并写明 `local -x LC_ALL=C` (只写 `local LC_ALL=C` 在调用方环境没有 LC_ALL 时不传给子进程, 而 hook 的环境常常只有 LANG)。SC-19 19ag (出现点前 20 个汉字 = 60 字节, 5 个独立运行, 含多行脚本的中文注释与引号内中文文本) / 19ah (只设 LANG=C.UTF-8 的环境里条目长度按字节、字母规则按 ASCII) / 19am (Read / Edit 面的大小写折叠只限 ASCII)。坏实现 ext_charslice 使 19ag 转红 (cr 点名的「照字面实现」), ext_localnoexp 使 19ah 与 19am 转红, ext_noc 使 19ad / 19ae / 19ag / 19ah / 19am 转红。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "M2",
+  "key": "8fbbee80",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/M1 (簇 F): credit 沿用默认并两个方向钉住 (22br 放行 44 个运行 / 22bs 限制 22 个运行 / 22bm 与 22bn 仍钉 ps 族的 tight), 基线 docker / kubectl exec 转储接锚定 grep / cut 不再由放变拦。cr 点名的「4 个 remote_env_split 等价变异在带过滤的转储上不成立」: 在 22bo+22br+22bs 上重新跑 remote_env_split:docker / kubectl / podman / lxc, 0 行红, 即现在对带过滤的转储同样不可观察 (两条规则对过滤给同一个 credit); 把转储拆成不进 tight 的独立行 = 现在的目标形态, 把转储并进 tight = env_tight, 由 22br / 22bs 抓。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m1",
+  "key": "6ff1d962",
+  "disposition": "fixed",
+  "where_or_evidence": "同 tech-lead/m1: 两类 (包裹词之后的 env / printenv 词; 新增 /proc 读取器 grep / rg / sed 对含真实 pid 记号的 /proc 路径文本的检索与编辑) 都已成文 (W11 已知限制、Impact 新拦截条) 并由 22bj 的 14 个独立运行钉住 (含 `grep -rn /proc/self/environ docs/`、`rg '/proc/$$/environ' notes/`、`sed -i 's#/proc/1/cmdline#x#' notes.md` 三个 /proc 文本成员)。"
+ },
+ {
+  "seat": "code-reviewer",
+  "label": "m2",
+  "key": "684e9a24",
+  "disposition": "fixed",
+  "where_or_evidence": "W9「匹配实现」条与 Impact 性能条不再各抄一份旧时档数字: W9 只指向 W14 的 (f-hit) 与 SC-34 34c; Impact「性能」条与 W14 第 5 项全部由 proto/mk_numbers.py 从原始输出 (out/timing_main.txt、timing_bad.txt、timing_i3*.txt、occ_*.txt) 解析、由 apply_edits.py 写入 (part7_perf.py), 与同一次度量一致; 待复议 7.1 的「+20-25% / 1.4-2.3 倍」量化也删去, 改为指向 W14 与 Impact「性能」。兄弟位置扫描: 进程时档数字 (ms / 倍 / CPU 秒) 现在只在 W14 第 5 项、Impact 性能条与 W1 的 Read 耗时三处 (均由脚本写入); W2 的 ERE 秒数与 W9 的手写阶段切分倍数是一次性实测, 各自来自 ere_claims.py / occ_cost.py 的输出, 不是旧数字的复述。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "M1",
+  "key": "0a8380fd",
+  "disposition": "fixed",
+  "where_or_evidence": "同簇 T: 引号掩码与 `$'…'` / 转义状态机已删除, 判定复用内建 _sg_core_eval (W9 语义条与设计取舍 A); SC-19 19af / 19z / 19aa / 19ak / 19al; SC-19 + SC-20 现为 26 + 7 + 2 + 2 个 SC-19 行与 17 个 SC-20 行, 其中不认转义 / `$'…'` 的实现 (ext_v4stage:noesc_q / :noesc_all / :noansi) 在 19af 转红。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m1",
+  "key": "a8f5db8c",
+  "disposition": "fixed",
+  "where_or_evidence": "W1 设计取舍两句理由按实测重写: 不带第二视图的实现并非两层皆静默 (nul_off: kv-secret-assign=1 仍告警, 但 env-line-secret-keyword 的 3 条检不出), NUL 换空格也不是修不了 (nul_space: kv-secret-assign=4, 但既有 tag 的行首锚语义与 8 位门槛丢失、期望 tag 改变); 选并集的理由改为「检出不得回退 + 既有 tag 语义」。SC-1 1c / 1d 的期望写为 env-line-secret-keyword=3 + 至多一个 kv-secret-assign, 与实测 (m=4 {env-line-secret-keyword=3 kv-secret-assign=1}) 一致。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m2",
+  "key": "13e1f258",
+  "disposition": "fixed",
+  "where_or_evidence": "删除 Spec 正文里的版本 / 审计叙事: 头部「证据位置」(只指 writer-v5-proto, 去掉「本版」「上两轮」「三者」), W2 的 `ent_range` 句 (去掉「v3 的范围写法」), W9 三处 (阶段切分 / 过拦 / 成本句), W11 launcher 条与待复议 23 (去掉「v3 的已知限制曾写」「与 v3 原型相反」), W14 度量脚本句, SC 导言「汇总见 …」(去掉「v4 另把…」), Tasks 1.8 (去掉「v4 另加七类」), 待复议 27 (去掉「本版成文」), Impact refs_check 句 (去掉「v3 写法」); 机械检查: 全文 grep -E 'writer-v[0-9]|v3 |v4 |上两轮|本版|曾写|曾全绿|曾在' 只剩 `writer-v5-proto` 归档路径 (5 处), format_lint.py 对正文的叙事检查为 0。兄弟位置: 同一类叙事只出现在这些位置 (逐处列在报告的同族扫描)。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m3",
+  "key": "7b20c975",
+  "disposition": "fixed",
+  "where_or_evidence": "同 code-reviewer/m2: W9 无扩展开销句与 Impact 扩展开销句都不再自带数字, 数字只在 W14 第 5 项与 Impact 性能条, 且由脚本从同一份原始度量输出生成 (终测见 out/timing_main.txt)。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m4",
+  "key": "60eea71e",
+  "disposition": "fixed",
+  "where_or_evidence": "SC-26 26g 的标记词扩为 Impact「行为变更双向申报」每条各一 (新输入 `.aria/secret-guard.paths`; 新拦截 `ps aux` / `/proc` / `app.ini`; 新告警 `file.content` / `kv-secret-assign`; 新静默 `placeholder`; 新放行 `os.environ` / `keys_unsorted`; 日志 `fp=`; 性能 `CPU`) + `partial` + `rule6_note` 共 13 个, Impact 同步面的 CHANGELOG 条同口径 (六条逐条披露 = 这六类各至少一个标记词); 逐标记词的坏实现 (patch_docs.py --cl-drop=<标记词> x 13) 各使 26g 转红 (mut/final5/doc)。W9 文档落点指明 README 里是每个文件的**第二个** Hooks 小节 (README.md 两个同名 `### Hooks (Auto-triggered)`, README.zh.md 是 `### Hooks 系统（自动触发）` 与 `### Hooks 自动触发`), SC-28 28m 同步。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m5",
+  "key": "cfd9ca0b",
+  "disposition": "fixed",
+  "where_or_evidence": "以消除依赖代替加腿: W9 格式条写明条目过滤只用 `sed` (+ `tr`), 不依赖 awk 实现 (原句「LC_ALL=C 使结果与 awk 实现无关」不再成立也不再需要); 去掉 LC_ALL=C 的坏实现 ext_noc 在本机 (awk 是 mawk 1.3.4, sed 在 UTF-8 locale 下按字符计数) 使 19ad / 19ae / 19ag / 19ah / 19am 转红, 即在 mawk 主机上也可证伪; 不需要 gawk 腿。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m6",
+  "key": "91a89f9b",
+  "disposition": "fixed",
+  "where_or_evidence": "Spec 一侧: 待复议 7.1 / 7.2 去掉量化与可复制命令, 改为类别 + 证据位置 (`guard §0` 第 7 / 6 条, SC-19 19al); 新增产品级 7.20「未修复旁路的披露范围」(选项 A 默认现状保留 / B 先修后披露 / C 披露规范成文), 与第 7 条同批请裁。**未做的部分 (已记 7.20 与报告请裁项)**: 研究笔记里对应两处的同样编辑 (本轮不写仓内文件) 与已推送分支的清理 (改写历史 / 删除远端分支: 破坏性, 不在一次性授权内, 只能 owner 决定); 主控「暂停推 GitHub」的流程判断照主控记录列入 handoff 请复议。"
+ },
+ {
+  "seat": "knowledge-manager",
+  "label": "m7",
+  "key": "8936aa07",
+  "disposition": "fixed",
+  "where_or_evidence": "四处各改: (a) W14 陈旧表述清单加 `secret-guard.sh:8` 的「~100 most common patterns」(基线 145 行规则、目标 149 行; 数字删去且不得换成新的数量字面; 句子跨两行注释, 判据先拼成一句) 与 SC-28 28o (patch_docs.py --hdr-count 在该句写 ~110 使 28o 转红); (b) 22av 清单逐个写全 (`ps -w -x` 是一个拼写, 另有 `ps -eO rss` / `ps -O rss`: 14 个); (c) W11 launcher 条的 22bk 清单补上 `docker compose exec` (11 个); (d) Impact 改为 COMMIT_FOOTER_GUIDE.md:199-200 要求修复 Bug / 完成功能类写 Closes (:201-202 部分实现与只是引用写 Refs), git-commit.md §6.1 只并列三种写法不作要求。兄弟位置: refs_check 句同步改名。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定1",
+  "key": "master-1",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 U: W1 两视图并集, 基线视图照扫、仅含 NUL 时追加; 补 UTF-16LE 反向守卫 (SC-1 1e / 1f) 与进程环境形检出行 (1c / 1d), 另有 1g 与 SC-2 钉计数不翻倍。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定2",
+  "key": "master-2",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 T: 扩展的共现判定复用内建同一个分段 / 判定函数 (_sg_core_eval), 从构造上一致; 差分表 19af 73 个形态 (转义 / `$'…'` / 续行 / `||` / 重定向 / 引号内管道 / heredoc / 整串降级 / 包裹 / 变量间接) 零分歧, 钉进 SC-19。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定3",
+  "key": "master-3",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 V / W: W2「线性」段写明为什么线性 (有界前后缀 + 左边界 + 长度取余量); 时档行 (i3) 与 (f-hit) 在 W14, 探针内 SC-34 34a / 34b / 34c (8 KB 单行、64 处出现点等, 每进程 CPU 上限判线性)。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定4",
+  "key": "master-4",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 F: W11 明确规定包裹下整环境转储的 credit 制度 (默认, 不属 tight); SC-22 22br / 22bs 两个方向钉住; Impact 新拦截条申报; 待复议 23 列备选。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定5",
+  "key": "master-5",
+  "disposition": "fixed",
+  "where_or_evidence": "簇 M: W8.3 改写的 Read / Edit 面正则行逐备选钉住 (SC-18 18j / 18k 各 32 个独立运行) 并列入 W14 原位改写通则。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定6",
+  "key": "master-6",
+  "disposition": "fixed",
+  "where_or_evidence": "全部 minor 逐条处置: 见上面各行 (tl m1 m2; ba m1; qa m1 m2 m3; cr m1 m2; km m1-m7)。"
+ },
+ {
+  "seat": "主控",
+  "label": "裁定7",
+  "key": "master-7",
+  "disposition": "fixed",
+  "where_or_evidence": "方针: 复用已有机制 (簇 T 复用 _sg_core_eval, 不新写分段; 簇 F 沿用默认 credit; 簇 M 只加成员行), 每改一处都配会转红的坏实现 (mut_summary_v5.txt), 既有检出不降低 (NUL 视图是并集; 前几版转红过的坏实现回归运行: Part B1 / B2)。只能靠新机制才能修的没有; 收窄 / 列已知限制并论证的项目: 键名 / 参数名上界 (待复议 31)、包裹转储不属 tight (23)、文本提及误拦 (27)、条目含 shell 元字符以替换副本为准 (W9 已知限制)。"
+ }
+]

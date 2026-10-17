@@ -1,0 +1,96 @@
+gitcopy_summary_v6 -- the existing hook suites on a git copy of the aria repository (history present: the suite's SC-8 latency benchmark and SC-9a pre-change comparison reach their reference commit af87cae)
+
+Method (proto/run_gitcopy_suite.sh): `git clone` of /home/dev/Aria/.git/modules/aria (read-only source) into the experiment directory; `git checkout 268da8f` (the baseline); `baseline` = that working tree untouched,
+`proto` = the same working tree with the prototype's hooks / hooks.json / suites copied over (uncommitted, like an implementer's tree before the commit).  Then `bash hooks/tests/secret-guard.test.sh` and
+`bash hooks/tests/secret-scan.test.sh` with HOME redirected to a private directory.  The five SC-8 tiers are measured INSIDE the suite (EPOCHREALTIME, 20 rounds of 10 calls, min of rounds); the ceiling per tier is
+max(100 ms, old x 1.5) per call and is not changed.  The load average printed at the start of the SC-8 block is the host state for the tier numbers.
+
+
+################ baseline ################
+which=baseline head=268da8f bash=5.2.15(1)-release kernel=6.17.9-1-pve cores=4
+files: guard=448b1f71a2af06d7 scan=c5f53f7a164fa72e hooks.json=b2618dbfa3f71496
+tests: guard=72f8e7d5d58a4b80 scan=78e0e4ca15078177
+git status: 
+load(start)=0.94 1.66 2.06 12:37:54
+guard rc=0 load=1.80 1.71 2.04 12:39:31
+scan rc=0 load=1.77 1.70 2.03 12:39:47
+-- secret-guard.test.sh (selected lines)
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=1.14 1.61 2.03 1/1155 3240942
+  [SC-8] tier (a): old=24.2ms/call new=5.5ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-77.3%, median old=254912us new=60793us]
+  [SC-8] tier (b): old=24.7ms/call new=11.2ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-54.5%, median old=266834us new=117863us]
+  [SC-8] tier (c): old=24.3ms/call new=6.4ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-73.9%, median old=258890us new=72571us]
+  [SC-8] tier (d): old=24.9ms/call new=9.5ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-62.0%, median old=279076us new=107138us]
+  [SC-8] tier (e): old=25.8ms/call new=38.1ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=48.0%, median old=277162us new=396745us]
+PASS: 593 / 593
+FAIL: 0 / 593
+-- secret-scan.test.sh (selected lines)
+PASS: 49 / 49
+FAIL: 0 / 49
+
+################ proto ################
+label=proto which=proto tree=work/t6 head=268da8f bash=5.2.15(1)-release kernel=6.17.9-1-pve cores=4
+files: guard=dba6d5e600e8ccb9 scan=03511371e1219ed3 hooks.json=bd0b2f734114d3d1
+tests: guard=c68d9b2b160af2fb scan=8e23336691624136
+git status:  M hooks/hooks.json  M hooks/secret-guard.sh  M hooks/secret-scan.sh  M hooks/tests/secret-guard.test.sh  M hooks/tests/secret-scan.test.sh 
+load(start)=2.70 6.15 8.31 15:54:04
+guard rc=0 load=2.28 4.98 7.63 15:56:03
+scan rc=0 load=2.49 4.85 7.53 15:56:21
+-- secret-guard.test.sh (selected lines)
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=2.98 5.74 8.05 1/1160 849068
+  [SC-8] tier (a): old=25.2ms/call new=13.4ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-46.7%, median old=302033us new=139303us]
+  [SC-8] tier (b): old=26.1ms/call new=20.5ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-21.2%, median old=272137us new=215752us]
+  [SC-8] tier (c): old=27.3ms/call new=16.6ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-39.1%, median old=322417us new=196313us]
+  [SC-8] tier (d): old=27.3ms/call new=20.0ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-26.8%, median old=317212us new=213999us]
+  [SC-8] tier (e): old=26.4ms/call new=55.1ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=108.4%, median old=292294us new=591378us]
+PASS: 596 / 596
+FAIL: 0 / 596
+-- secret-scan.test.sh (selected lines)
+PASS: 50 / 50
+FAIL: 0 / 50
+
+################ proto_header_unsynced ################
+label=proto_header_unsynced which=proto tree=work/t6_hdr head=268da8f bash=5.2.15(1)-release kernel=6.17.9-1-pve cores=4
+files: guard=dba6d5e600e8ccb9 scan=03511371e1219ed3 hooks.json=9977397a3908d052
+tests: guard=5268207d9738ecb4 scan=8e23336691624136
+git status:  M hooks/hooks.json  M hooks/secret-guard.sh  M hooks/secret-scan.sh  M hooks/tests/secret-guard.test.sh  M hooks/tests/secret-scan.test.sh 
+load(start)=2.37 4.59 7.82 14:37:42
+guard rc=1 load=1.82 3.69 7.13 14:39:33
+scan rc=0 load=2.04 3.63 7.04 14:39:50
+-- secret-guard.test.sh (selected lines)
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=1.81 4.06 7.45 1/1153 2381165
+  [SC-8] tier (a): old=24.1ms/call new=12.9ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-46.5%, median old=269643us new=144348us]
+  [SC-8] tier (b): old=25.2ms/call new=19.4ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-23.1%, median old=272352us new=208850us]
+  [SC-8] tier (c): old=25.6ms/call new=14.8ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-42.1%, median old=264867us new=168646us]
+  [SC-8] tier (d): old=24.8ms/call new=19.5ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-21.2%, median old=277519us new=205076us]
+  [SC-8] tier (e): old=26.0ms/call new=54.3ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=109.1%, median old=280891us new=574805us]
+PASS: 595 / 596
+FAIL: 1 / 596
+  FAIL [SC-13: 头注释计数同步]: 顶部 'Coverage: 599 cases' != 本次实跑总数 596 -- 回填 secret-guard.test.sh 顶部 Coverage 数 (+ secret-hygiene.md 三处 + proposal SC-11 正文, 权威值=实跑 N)。
+-- secret-scan.test.sh (selected lines)
+PASS: 50 / 50
+FAIL: 0 / 50
+
+################ core_below_gate ################
+label=core_below_gate which=proto tree=work/t6_cbg head=268da8f bash=5.2.15(1)-release kernel=6.17.9-1-pve cores=4
+files: guard=293804b744129ad9 scan=03511371e1219ed3 hooks.json=9977397a3908d052
+tests: guard=c68d9b2b160af2fb scan=8e23336691624136
+git status:  M hooks/hooks.json  M hooks/secret-guard.sh  M hooks/secret-scan.sh  M hooks/tests/secret-guard.test.sh  M hooks/tests/secret-scan.test.sh 
+load(start)=2.13 5.46 8.45 14:35:59
+guard rc=0 load=2.58 4.74 7.93 14:37:26
+scan rc=0 load=2.37 4.59 7.82 14:37:42
+-- secret-guard.test.sh (selected lines)
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=2.01 4.91 8.10 2/1164 2329235
+  [SC-8] tier (a): old=25.4ms/call new=0.7ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-97.1%, median old=265903us new=7804us]
+  [SC-8] tier (b): old=25.4ms/call new=0.8ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-96.8%, median old=342105us new=8729us]
+  [SC-8] tier (c): old=25.8ms/call new=0.8ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-97.1%, median old=273565us new=7893us]
+  [SC-8] tier (d): old=26.2ms/call new=0.7ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-97.2%, median old=280673us new=7959us]
+  [SC-8] tier (e): old=26.6ms/call new=0.8ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-97.1%, median old=277911us new=8228us]
+PASS: 596 / 596
+FAIL: 0 / 596
+-- secret-scan.test.sh (selected lines)
+PASS: 50 / 50
+FAIL: 0 / 50

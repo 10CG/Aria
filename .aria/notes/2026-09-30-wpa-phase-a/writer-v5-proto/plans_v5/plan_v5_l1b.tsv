@@ -1,0 +1,10 @@
+w12_echo_norm	l1	w12_echo_norm	SC-23,SC-25	25h,23a,23b,23c,23d,23j,25a,25b,25c
+remote_env_split_ssh	l1	remote_env_split:ssh	SC-22	22bo,22br,22bs
+remote_env_split_docker	l1	remote_env_split:docker	SC-22	22bo,22br,22bs
+remote_env_split_kubectl	l1	remote_env_split:kubectl	SC-22	22bo,22br,22bs
+remote_env_split_nomad	l1	remote_env_split:nomad	SC-22	22bo,22br,22bs
+remote_env_split_pct	l1	remote_env_split:pct	SC-22	22bo,22br,22bs
+remote_env_split_lxc	l1	remote_env_split:lxc	SC-22	22bo,22br,22bs
+remote_env_split_podman	l1	remote_env_split:podman	SC-22	22bo,22br,22bs
+remote_env_split_sh	l1	remote_env_split:sh	SC-22	22bo,22br,22bs
+remote_env_split_watch	l1	remote_env_split:watch	SC-22	22bo,22br,22bs

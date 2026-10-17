@@ -1,0 +1,66 @@
+timing_summary -- W14 time tiers on the v4 target prototype and on the bad implementations of the tiers (proposal W14 item 5, SC-30)
+
+Method (proto/timing.py): baseline hook (aria 268da8f) and target hook run INTERLEAVED (A/B/A/B...) on the same input on the same host; per run the CPU time (user+sys, via RUSAGE_CHILDREN
+deltas, i.e. the whole process tree of the hook) and the wall time are recorded; the statistic per hook is the MINIMUM over N interleaved runs, the verdict statistic is the CPU ratio
+target / baseline.  Wall time and load average are recorded, never judged.  f / f0 / g (= W14 (g-a)) / gmax (= (g-b)) / h / i are the W14 tiers; w1 (a Read result through the L3 hook; the baseline hook
+does not extract file.content and exits early) is informational for W1's performance sentence.  The `live` / `live-calls` columns are the liveness assertions: `live-calls=ok(...)` = the set of
+instrumented functions called in one untimed run of the instrumented target equals the expected set (f: the extension entry is called; g / h1: the variable-expansion pass is called; h2: nothing is
+called because a built-in blocks first); `live=(a, b)` = the L3 hook alerted on the dense input in the baseline / target run.  timing.py prints ratios and liveness only: the verdict is read against the bounds.
+Host: Linux 6.17.9-1-pve, 4 cores, shared (other tenants); 1-minute load average 1.5-5 during these runs.  Numbers move with the host; only ratios are judged.
+Thresholds (W14 item 2): (f) / (f0) <= 1.5 x max(baseline, 100 ms); (h) <= 1.5; (i) <= 2.0; (g) <= 2.5.
+Reading of the good-prototype rows below (15-pair run for f / f0, 5-pair run for the rest): (f) Bash 0.072 s and Read 0.067 s <= 0.15 s; (f0) 1.23 / 1.15 (0.058 s / 0.048 s <= 0.15 s); (g-a) 1.39 and (g-b) 2.03 <= 2.5; (h2) 1.25 <= 1.5 with live-calls=ok();
+(i) 1.31 and 1.16 <= 2.0.  h1 (all allowed, 2.33) is not a judged tier (see W14 / Impact: 'the denser the references the closer to 2x').  Bad implementations: every one exceeds its bound or fails its liveness check.
+
+################ target prototype (good): tiers f f0 g gmax h i w1, 5 pairs ################
+$ python3 proto/timing.py base/aria/hooks work/t4f/aria/hooks f,f0,g,gmax,h,i,w1 --pairs 5
+h1 150 ref-bearing segments, all allowed     CPU min base  0.992s target  2.309s ratio  2.33 | wall min base  0.995s target  2.298s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  0.972s target  1.217s ratio  1.25 | wall min base  0.972s target  1.219s | rc [('A', 2), ('B', 2)] live-calls=ok()
+g-a 4000 B string, 8 assign(len 300), 40 refs CPU min base  0.627s target  0.871s ratio  1.39 | wall min base  0.629s target  0.866s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+g-b 4000 B string, 16 assign(len 100), 128 refs CPU min base  0.687s target  1.392s ratio  2.03 | wall min base  0.686s target  1.385s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+f  200 entries, Bash benign                  CPU min base  0.065s target  0.092s ratio  1.41 | wall min base  0.067s target  0.084s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.051s target  0.086s ratio  1.69 | wall min base  0.049s target  0.076s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+f0 no extension, Bash benign                 CPU min base  0.056s target  0.076s ratio  1.36 | wall min base  0.054s target  0.071s | rc [('A', 0), ('B', 0)]
+f0 no extension, Read benign                 CPU min base  0.054s target  0.059s ratio  1.10 | wall min base  0.052s target  0.055s | rc [('A', 0), ('B', 0)]
+i1 ~900 KB dense bearer lines                CPU min base  0.840s target  1.104s ratio  1.31 | wall min base  0.679s target  0.889s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.765s target  0.890s ratio  1.16 | wall min base  0.634s target  0.729s | rc [('A', 0), ('B', 0)] live=(True, True)
+w1 Read 4 KB clean prose                     CPU min base  0.103s target  0.309s ratio  2.99 | wall min base  0.101s target  0.204s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 60 KB clean prose                    CPU min base  0.114s target  0.329s ratio  2.90 | wall min base  0.107s target  0.223s | rc [('A', 0), ('B', 0)] live=(False, False)
+w1 Read 180 KB dense INI assignments         CPU min base  0.129s target  0.656s ratio  5.08 | wall min base  0.116s target  0.510s | rc [('A', 0), ('B', 0)] live=(False, True)
+
+################ target prototype (good): tiers f f0, 15 pairs (the 5-pair run shows the spread: f / f0 minima move by +-10 ms with the host) ################
+$ python3 proto/timing.py base/aria/hooks work/t4f/aria/hooks f,f0 --pairs 15
+f  200 entries, Bash benign                  CPU min base  0.049s target  0.072s ratio  1.46 | wall min base  0.047s target  0.061s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.042s target  0.067s ratio  1.61 | wall min base  0.040s target  0.057s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+f0 no extension, Bash benign                 CPU min base  0.048s target  0.058s ratio  1.23 | wall min base  0.046s target  0.054s | rc [('A', 0), ('B', 0)]
+f0 no extension, Read benign                 CPU min base  0.041s target  0.048s ratio  1.15 | wall min base  0.039s target  0.044s | rc [('A', 0), ('B', 0)]
+
+################ bad implementations, each on the tier meant to catch it (3 pairs) ################
+== variants pairs=3 load=1.48 3.53 5.34 19:41:31
+-- vx_quadratic (remainder after a hit taken with ${s#*"$pat"}) on g / gmax
+g-a 4000 B string, 8 assign(len 300), 40 refs CPU min base  0.653s target  3.200s ratio  4.90 | wall min base  0.658s target  3.205s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+g-b 4000 B string, 16 assign(len 100), 128 refs CPU min base  0.708s target  9.078s ratio 12.83 | wall min base  0.711s target  9.081s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_vx_pass)
+-- ext_perentry (one grep process per extension entry) on f
+f  200 entries, Bash benign                  CPU min base  0.048s target  0.655s ratio 13.64 | wall min base  0.046s target  0.576s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.045s target  0.490s ratio 10.91 | wall min base  0.043s target  0.409s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+-- no_cap (every span iterated) on i
+i1 ~900 KB dense bearer lines                CPU min base  0.699s target  8.406s ratio 12.02 | wall min base  0.558s target  8.213s | rc [('A', 0), ('B', 0)] live=(True, True)
+i2 ~600 KB dense json password lines         CPU min base  0.783s target  3.195s ratio  4.08 | wall min base  0.654s target  2.837s | rc [('A', 0), ('B', 0)] live=(True, True)
+-- vx_interleave (substituted copy judged right after each segment) on h
+h1 150 ref-bearing segments, all allowed     CPU min base  1.011s target  2.371s ratio  2.34 | wall min base  1.017s target  2.370s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  1.035s target  2.254s ratio  2.18 | wall min base  1.032s target  2.261s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_vx_pass)
+-- ext_first (extension before the built-ins) on f / h
+h1 150 ref-bearing segments, all allowed     CPU min base  0.987s target  2.237s ratio  2.27 | wall min base  0.993s target  2.228s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass,_sg_vx_pass)
+h2 150 ref-bearing segments + dotenv read    CPU min base  0.996s target  1.243s ratio  1.25 | wall min base  1.000s target  1.235s | rc [('A', 2), ('B', 2)] live-calls=FAIL(_sg_ext_pass)
+f  200 entries, Bash benign                  CPU min base  0.064s target  0.086s ratio  1.34 | wall min base  0.063s target  0.076s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_pass)
+f  200 entries, Read benign                  CPU min base  0.044s target  0.075s ratio  1.70 | wall min base  0.042s target  0.064s | rc [('A', 0), ('B', 0)] live-calls=ok(_sg_ext_path_pass)
+== done 19:43:57 load=1.84 2.93 4.85
+
+################ W9 quote mask (_sg_ext_mask) CPU cost: hook with the mask vs the v3 behaviour (variant ext_nomask), 5 interleaved pairs, minimum CPU ################
+$ python3 work/mask_cost.py work/mc/guard_mask.sh work/mc/guard_nomask.sh work/tailtest/proj
+command   297 B with a listed path: CPU min  with mask 0.147s  without 0.138s  delta +0.009s
+command   282 B WITHOUT a listed path: CPU min  with mask 0.122s  without 0.122s  delta +0.001s
+command   997 B with a listed path: CPU min  with mask 0.323s  without 0.301s  delta +0.022s
+command   982 B WITHOUT a listed path: CPU min  with mask 0.279s  without 0.281s  delta -0.002s
+command  3997 B with a listed path: CPU min  with mask 1.393s  without 1.298s  delta +0.095s
+command  3982 B WITHOUT a listed path: CPU min  with mask 1.241s  without 1.260s  delta -0.019s
+
