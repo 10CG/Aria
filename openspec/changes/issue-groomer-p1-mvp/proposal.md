@@ -93,3 +93,8 @@ P2 (label apply CLI + reply 模板族两档) · P3 (Layer 1/fleet 自主驱动) 
 ## Tasks
 
 见 [tasks.md](./tasks.md) (双层架构; detailed-tasks.yaml 由 A.2 task-planner 生成)。
+
+## Validation Note
+
+`openspec validate issue-groomer-p1-mvp --strict` (2026-10-18, CLI 本机已装 `~/.local/bin/openspec`) 报: 缺 `specs/` delta 目录 (## ADDED Requirements + Scenario 块)。**处置**: 与近期全部归档先例同形态 (pre-merge-completeness-gate / rule6-description-change / handoff-multibranch 等均无 specs/); openspec CLI 统一口径 (是否应装/归档目录兼容/版本钉法) 是 Aria#212 owner 待裁项 — 本 Spec 不单方面引入 delta 格式, 遵循现行房规, 待 #212 裁定后全仓统一。
+
