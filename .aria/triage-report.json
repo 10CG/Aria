@@ -1,189 +1,89 @@
 {
-  "schema_version": "1.0",
-  "triage_tool_version": "1.73.3",
-  "issue_ref": "10CG/Aria#211",
-  "generated_at": "2026-09-13T15:56:17Z",
-  "steps": {
-    "step1_issue": {
-      "collection_status": "ok",
-      "number": 211,
-      "title": "[AB评测台] Rule #6 第二行要求 description 变动零裁量照跑 AB, 而 AB 臂被直接喂 SKILL.md — 触发面按构造绕过, 「照跑了」不含任何 description 信息",
-      "body": "## TL;DR\n\nRule #6 判据表第二行逐字要求「**`description` 或指令流程变动一律照跑**」AB。但**照跑的那个套件在构造上测不到 `description`** —— 两臂是被**直接喂 SKILL.md** 的, 从不需要被 `description` 触发。\n\n⇒ 「照跑了 AB」与「`description` 被验证了」之间有一个洞。目前这个洞只活在 `10CG/aria-plugin#190` 的一条评论里 (comment 22921), 没有独立单, 也从没跑过。\n\n## 证据 (逐条实读, 非转述)\n\n**1. Rule #6 第二行确实把 `description` 变动列为零裁量照跑**\n\n`CLAUDE.md` 不可协商规则 #6 判据表:\n\n| 内容性质 | AB 测得到吗 | 处置 |\n|---|---|---|\n| 处方性 · 运行时指令面 | **能** | **照跑 AB, 零裁量** |\n\n紧随其后逐字: 「`description` 或指令流程变动一律照跑」。\n\n**2. 而 AB 评测台的臂定义结构性绕过触发面**\n\n`aria-plugin-benchmarks/AB_TEST_OPERATIONS.md:208` 逐字:\n\n```\n- with_skill: 加载 SKILL.md 后执行任务\n- without_skill: 不加载任何 skill 直接执行\n```\n\n臂是**被指示去加载**技能, 不是**被 `description` 匹配上**才拿到技能。`description` 的唯一作用面 (Claude Code 依 frontmatter `description` 决定要不要激活这个 Skill) **在这个评测台里不存在**。\n\n⇒ 改 `description` 的措辞, 两臂的输入与行为**结构上不受影响** (除非该措辞恰好也出现在 SKILL.md 正文并影响执行)。\n\n**3. 实测佐证 (v1.73.0 openspec-archive AB)**\n\n`10CG/aria-plugin#190` comment 22921 记录的实跑: 六项实质改动逐条对照, 第 6 项「frontmatter `description` 改动」的覆盖结论是「**本套件按构造永远测不到**」; 全轮 `delta.pass_rate = 0`, 有区分力的 expectation = 0。\n\n**4. 能测触发率的工具是有的, 只是没接进 Rule #6**\n\n`skill-creator/scripts/run_eval.py` 实读参数:\n\n```\n--eval-set          (required)  eval set JSON\n--skill-path        (required)\n--description       覆写待测 description\n--trigger-threshold (default 0.5)  触发率阈值\n--runs-per-query    (default 3)\n```\n\n`AB_TEST_OPERATIONS.md:263` §场景 4「Description 触发准确率优化」已成文, 触发时机逐字写着「**修改 Skill 的 description/frontmatter 后**」, 用 20 条 should / should-not 混合 query 测触发率。\n\n⇒ **场景 4 就是第二行判据缺的那一半**, 但 Rule #6 的处方里只写「照跑 AB」(= 场景 1), 从没把场景 4 接进去。\n\n## 危害\n\n1. **Rule #6 对 `description` 变动的合规证据是空的**: 走完流程会得到一份「AB 照跑, 无回归」的记录, 而那份记录**不含任何关于 description 的信息**。这与 SOT §3 警告的「测量剧场」同形。\n2. 判据表第二行是**零裁量**的 —— 即执行者没有裁量空间去补跑场景 4, 反而因为「已照跑」而认为义务已尽。\n3. 与 `aria-plugin#150` 叠加后更糟: 那条记录 14/43 个 skill 根本没有 AB 套件; 本条记录的是**有套件的那 29 个**在 description 维度上同样测不到。\n\n## 建议 (不预设结论)\n\n1. **Rule #6 判据表第二行拆成两个义务**: 指令流程变动 ⇒ 照跑场景 1; **`description` 变动 ⇒ 另须跑场景 4 触发率评测**。两者不互相替代。\n2. SOT `standards/conventions/skill-benchmark-exemption.md` 与 `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md` 同批改, 否则两份口径分叉。\n3. rule6_note 的模板加一栏「description 是否变动 / 场景 4 结果」, 空着即不合规。\n\n## 验收 (可证伪)\n\n⚠️ 无论采纳哪种改法, 都必须先做**基线实跑**再写进规格 (memory `check-runs-at-baseline-first` / `spec-acceptance-needs-baseline-run`):\n\n1. 取一个 `description` 有实质变动的历史版本对 (例如 v1.73.0 的 openspec-archive), 用场景 4 跑两个 description 的触发率;\n2. **区分力必须非零** —— 若两个 description 的触发率在统计上无差别, 说明场景 4 在本仓语料下同样测不到, 那就是**又一个测量剧场**, 应改开「触发率评测本身不可用」的单而不是把它写进 Rule #6;\n3. 负控: 造一个**明显更差**的 description (例如删光触发词), 触发率必须显著下降 —— 验的是拒绝能力, 不是当前取值 (memory `adversarial-fixture`)。\n\n## 关联\n\n- `10CG/aria-plugin#190` comment 22921 —— 本洞的首次记录 (埋在一张标题讲别的事的单里)\n- `10CG/aria-plugin#150` —— 判据表**第三行**兜底对 14/43 skill 不可执行 (不同行, 同一张表)\n- `10CG/aria-standards#17` —— skill-benchmark-exemption 单 Skill 局部变更 lane 缺成文 (同一份 SOT)\n- SOT: `standards/conventions/skill-benchmark-exemption.md` · 手册: `aria-plugin-benchmarks/AB_TEST_OPERATIONS.md`\n\n## 来源\n\n2026-09-09 session 兑现 2026-09-08 handoff §2 第 2 条「只写在评论里, 没跑, 也没开成独立单」。本单只做「开成独立单」, **场景 4 仍未跑** —— 见上方验收第 1 条。\n",
-      "state": "open",
-      "labels": [],
-      "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/211",
-      "created_at": "2026-09-09T11:08:12Z",
-      "updated_at": "2026-09-09T11:08:12Z"
-    },
-    "step2_version": {
-      "collection_status": "ok",
-      "reported": "1.73.0",
-      "current": "1.73.3",
-      "gap": "behind"
-    },
-    "step3_code": {
-      "collection_status": "ok",
-      "cited_paths": [
-        {
-          "file_path": "CLAUDE.md",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: # Aria - AI-DDD Methodology\n2: \n3: > **项目本质**: AI-DDD 方法论的定义与端到端参考实现 (v1.x 方法论 + v2.0 自主运行时)\n4: > **核心假设**: AI 不仅是协作者 (v1.x), 更是 SDLC 的自主执行者 (v2.0)\n5: > **版本**: 2.0.0",
-          "warning": null,
-          "total_lines": 151
-        },
-        {
-          "file_path": "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md",
-          "line": 208,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": true,
-          "snippet": "205: 流程:\n206:   1. 读取 {skill}/evals/evals.json (或 ab-suite/{skill}.json)\n207:   2. 并行 spawn 2 个 subagent:\n208:      - with_skill: 加载 SKILL.md 后执行任务\n209:      - without_skill: 不加载任何 skill 直接执行\n210:        (注意: 并非零 context — 项目 CLAUDE.md 仍会自动加载进 subagent，这是仓内\n211:        baseline 的已知污染面。解读 baseline 通过率、应用「Expectations 编写原则」",
-          "warning": null,
-          "total_lines": 678
-        },
-        {
-          "file_path": "skill-creator/scripts/run_eval.py",
-          "line": null,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "AB_TEST_OPERATIONS.md",
-          "line": 263,
-          "format": "backtick",
-          "exists": false,
-          "line_in_range": null,
-          "snippet": null,
-          "warning": "file not found"
-        },
-        {
-          "file_path": "standards/conventions/skill-benchmark-exemption.md",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: # Skill Benchmark Exemption 规范 — AB 豁免判据: 内容是否影响 AI 行为\n2: \n3: > **Version**: 1.0.0\n4: > **Status**: Active\n5: > **Source incidents**: 2026-07-20 两起同日发生的边界误判 —— (1) `state-scanner-stale-refs-false-parity` Phase 4 以「未改 SKILL.md 指令面」自我豁免, 而它改了 `references/rules/basic-rules.md` 的 dispatch 表 77 行; (2) `state-scanner-gate-yaml-datasource` (#113) 改了 `references/runtime-probe-declaration.md` 这份 **authoring 向导**, 按目录判据无法归类, 按规则 #10 纪律不自行裁定而提请 owner",
-          "warning": null,
-          "total_lines": 76
-        },
-        {
-          "file_path": "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md",
-          "line": null,
-          "format": "backtick",
-          "exists": true,
-          "line_in_range": null,
-          "snippet": "1: # Aria Skill AB 测试运维手册\n2: \n3: > **版本**: 1.0.0 | **状态**: Active | **生效日期**: 2026-03-18\n4: \n5: ---",
-          "warning": null,
-          "total_lines": 678
-        }
-      ],
-      "matches_description": false
-    },
-    "step4_history": {
-      "collection_status": "ok",
-      "likely_fix_candidates": [
-        {
-          "sha": "6b840f5",
-          "message": "fix(level1-batch): spec-drafter 落点路径 (Rule #5) + hunk A 措辞 (B8) + spec_complete .json 分支 + 扫描器 fail-closed — aria v1.69.1 / standards / 主仓 16 版本点 (推送 + PR 外向, 待授权)",
-          "file": "CLAUDE.md",
-          "match_reason": [
-            "fix"
-          ]
-        },
-        {
-          "sha": "17ae85e",
-          "message": "fix(pr190): pre_merge 收敛审计 R1 清账 — gitlink aria v1.68.1 (d1caa66) + standards ffed204; 14 版本点 → 1.68.1; arch 两处版本行 + CLAUDE.md 同步面 + 新 check plugin-version-arch-docs-match; 白名单/fix 位置说明; handoff frontmatter; 决策单 B8/B9 + C1–C3; R1 四席报告 + 聚合",
-          "file": "CLAUDE.md",
-          "match_reason": [
-            "fix"
-          ]
-        },
-        {
-          "sha": "2ae012f",
-          "message": "fix(version): 主项目版本 SOT 核实 = 1.7.5, 修 9 个引用点漂移 + 加机械检查防复发",
-          "file": "CLAUDE.md",
-          "match_reason": [
-            "fix"
-          ]
-        },
-        {
-          "sha": "eadaf7b",
-          "message": "fix: resolve all review issues before merge",
-          "file": "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md",
-          "match_reason": [
-            "fix",
-            "resolve"
-          ]
-        }
-      ]
-    },
-    "step5_inflight": {
-      "collection_status": "ok",
-      "remote_prs": [],
-      "local_branches": [],
-      "worktrees": [
-        {
-          "path": "/home/dev/Aria",
-          "branch": "master",
-          "is_main": true,
-          "head": "ca0d8988bb0a77ac8e739b2360896725e1c0aaf8"
-        }
-      ]
+ "schema_version": "1.0",
+ "triage_tool_version": "1.76.0",
+ "issue_ref": "10CG/Aria#235",
+ "generated_at": "2026-10-18T02:26:12Z",
+ "steps": {
+  "step1_issue": {
+   "collection_status": "ok",
+   "number": 235,
+   "title": "ab-suite/phase-c-integrator-pre-merge-gate.json: 三条 node id 缺口 (两条无 node id, 一条过期)",
+   "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) TASK-024/031。\n\ncatalog 8 条 fixture 中 3 条不可执行: `wait_then_green` 与 `NEG-2-timeout` 的条目无 `test_case_in_unit_tests` node id; `NEG-1-malformed` 的 node id 过期 (catalog 写 `test_case_e_malformed_aether_routes_fail`, 真实方法 `test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_main_leg_routes_fail`, 跑字面 id 报 AttributeError)。可执行 5/8 三条命令与输出见同仓结果目录 RESULT.md §5.3。修法: 补/改 node id 或给这两条建单测宿主。",
+   "state": "open",
+   "labels": [],
+   "comments": [],
+   "url": "https://forgejo.10cg.pub/10CG/Aria/issues/235",
+   "created_at": "2026-10-17T04:14:54Z",
+   "updated_at": "2026-10-17T04:19:21Z"
+  },
+  "step2_version": {
+   "collection_status": "ok",
+   "reported": null,
+   "current": "1.76.0",
+   "gap": null
+  },
+  "step3_code": {
+   "collection_status": "skipped",
+   "cited_paths": [],
+   "matches_description": null
+  },
+  "step4_history": {
+   "collection_status": "skipped",
+   "likely_fix_candidates": []
+  },
+  "step5_inflight": {
+   "collection_status": "ok",
+   "remote_prs": [],
+   "local_branches": [],
+   "worktrees": [
+    {
+     "path": "/home/dev/Aria",
+     "branch": "master",
+     "is_main": true,
+     "head": "d17cf874a6972087e494973761f134eb771abec8"
     }
-  },
-  "repro": {
-    "exit_mode": "auto",
-    "cases": [
-      {
-        "case_id": "case-1",
-        "input": "实读 CLAUDE.md Rule #6 判据表 + standards/conventions/skill-benchmark-exemption.md 第 33 行",
-        "expected_behavior": "存在逐字「description 或指令流程变动一律照跑」的零裁量条款",
-        "actual_behavior": "CLAUDE.md Rule #6 第二行紧随判据表逐字「`description` 或指令流程变动一律照跑」; SOT 第 33 行「`description` 或指令流程变动 ⇒ 一律第二行」。两处一致",
-        "match": true
-      },
-      {
-        "case_id": "case-2",
-        "input": "实读 aria-plugin-benchmarks/AB_TEST_OPERATIONS.md:208 + skill-creator SKILL.md Step 1 with-skill 子代理提示",
-        "expected_behavior": "两臂被直接喂 SKILL.md 路径, 不经 description 触发",
-        "actual_behavior": "手册 :208 逐字「with_skill: 加载 SKILL.md 后执行任务」; skill-creator SKILL.md Step 1 with-skill 提示逐字「Skill path: <path-to-skill>」, baseline 指向快照目录。description 在两臂输入里没有作用面",
-        "match": true
-      },
-      {
-        "case_id": "case-3",
-        "input": "forgejo GET aria-plugin issue comment 22921; git diff v1.71.1..v1.73.0 -- skills/openspec-archive/SKILL.md",
-        "expected_behavior": "comment 22921 属 aria-plugin#190, 记录第 6 项「frontmatter description 改动 — 本套件按构造永远测不到」, delta.pass_rate=0; v1.73.0 该 skill 的 description 确有实质变动",
-        "actual_behavior": "comment 22921 issue_url=…/aria-plugin/issues/190 (2026-09-08), 原文含「delta.pass_rate = 0, 有区分力的 expectation = 0」与第 6 行「本套件按构造永远测不到」; diff 显示 description 由「…自动修正 CLI bug」改为「…并做归档后落点校验」",
-        "match": true
-      },
-      {
-        "case_id": "case-4",
-        "input": "grep argparse in skill-creator scripts/run_eval.py (插件缓存 bb335391eb83); sed AB_TEST_OPERATIONS.md 263-275",
-        "expected_behavior": "run_eval.py 有 --eval-set/--skill-path/--description/--trigger-threshold(0.5)/--runs-per-query(3); 手册 §场景 4 触发时机「修改 Skill 的 description/frontmatter 后」",
-        "actual_behavior": "五个参数与默认值逐字一致 (行 261-267); 手册 :263「### 场景 4: Description 触发准确率优化」, :273「触发时机: 修改 Skill 的 description/frontmatter 后」。注: issue 引用路径 `skill-creator/scripts/run_eval.py` 相对的是 skill-creator 插件, 不在 Aria 仓内 (Step 3 报 file not found 是路径解析, 非断言错误)",
-        "match": true
-      },
-      {
-        "case_id": "case-5",
-        "input": "grep -rl 'trigger_rate|trigger-eval|should_trigger|run_eval.py' aria-plugin-benchmarks/; find trigger*eval*.json",
-        "expected_behavior": "场景 4 从未跑过 (issue 自述)",
-        "actual_behavior": "aria-plugin-benchmarks/ 内唯一命中是 AB_TEST_OPERATIONS.md 自身; ab-results/ 全部 20+ 个目录无任何触发率产物。Rule #6 因 description 触发的历次「照跑」(含 v1.73.0) 均只跑了场景 1",
-        "match": true
-      }
-    ],
-    "hit_count": 5,
-    "total_count": 5,
-    "hit_rate": "5/5"
-  },
-  "verdict": "confirmed",
-  "severity": "major",
-  "recommended_action": "next-cycle",
-  "deviation_note": null,
-  "errors": []
+   ]
+  }
+ },
+ "repro": {
+  "exit_mode": "auto",
+  "cases": [
+   {
+    "case_id": "case-1",
+    "input": "cd aria/skills/phase-c-integrator/tests && python3 -m unittest 'test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_routes_fail'",
+    "expected_behavior": "issue 声称: 跑 catalog 字面 node id 报 AttributeError (方法名过期)",
+    "actual_behavior": "FAILED (errors=1): AttributeError: type object 'GateCheckTests' has no attribute 'test_case_e_malformed_aether_routes_fail'",
+    "match": true
+   },
+   {
+    "case_id": "case-2",
+    "input": "pytest test_pre_merge_gate.py::GateCheckTests::test_case_e_malformed_aether_main_leg_routes_fail",
+    "expected_behavior": "issue 声称的真实方法应存在且可通过 (修法锚点)",
+    "actual_behavior": "1 passed in 0.04s",
+    "match": true
+   },
+   {
+    "case_id": "case-3",
+    "input": "pytest 'test_pre_merge_gate.py::GateCheckTests::test_gate_state_helper polling tests + integration'",
+    "expected_behavior": "wait_then_green 条目无有效 node id, 不可执行",
+    "actual_behavior": "no tests ran in 0.05s (prose 描述非合法 node id; 真实宿主在 aria/skills/workflow-runner/tests/test_gate_state_helper.py GateStateLifecycleTests)",
+    "match": true
+   },
+   {
+    "case_id": "case-4",
+    "input": "pytest 'test_pre_merge_gate.py::GateCheckTests::test_pre_merge_gate (timeout path; integration scenario)'",
+    "expected_behavior": "NEG-2-timeout 条目无有效 node id, 不可执行",
+    "actual_behavior": "no tests ran in 0.00s; test_pre_merge_gate.py 内无 subprocess timeout+3-retry 路径单测 (grep timeout 仅命中 _verify_branch_exists 形参) — 缺单测宿主",
+    "match": true
+   }
+  ],
+  "hit_count": 4,
+  "total_count": 4,
+  "hit_rate": "4/4"
+ },
+ "verdict": "confirmed",
+ "severity": "minor",
+ "recommended_action": "next-cycle",
+ "deviation_note": null,
+ "errors": []
 }
