@@ -1,25 +1,29 @@
 # issue-groomer P1 MVP — Tasks
 
 > 双层架构: 本文件粗粒度 (功能层); detailed-tasks.yaml 由 A.2 task-planner 生成 (含 Agent 分配/文件路径/验证映射)。
+> v2: 新增 Phase 0 裁定门 (R1 依赖倒置修正); 1.3 重写为逐 SC 映射; 2.2 并入 0.1。
+
+## Phase 0 — 裁定门 (owner, interactive, 前置于 Phase 1)
+
+- [ ] 0.1 六项待裁裁定: ① labels.yaml 落点 (含 title 前缀→分类键映射表并入) / ② 契约面资产落点 (groom.py 最终路径 + schema 文档位置) / ③ provenance 取值源 / ④ 第 11 态二选一 (含 Tier B assessment 存储面与第二写者合并语义) / ⑤ 两缺口单合并与否 / ⑥ #239 未解冻时 ship 语义; ④ 选 last-writer-wins 时补挂并发 fixture 实施任务
 
 ## Phase 1 — 机械核 (groom.py + 测试)
 
-- [ ] 1.1 groom.py 基础层: 全分页 fetch (多仓配置复用 issue_scan 形态) + Tier A 规则引擎 (逐信号 confidence / unknown 不猜) + groom-report JSON schema v1 (additive-only 契约文档化)
-- [ ] 1.2 增量引擎: 三面指纹 (issue/上下文/provenance, 显式排除集) + 复用规则 (Tier A 判据输入快照 / Tier B provenance 门 + stale-assessment) + diff 段 (集合差/漂移 top-N/baseline no-diff) + 状态文件原子写
-- [ ] 1.3 SC 结构化测试: 10 态 fixture 矩阵 (逐态反事实) + Tier A 每判据反事实 + 负面 fixture + taxonomy 一致性自检 + 语料接入 (三份快照)
+- [ ] 1.1 groom.py 基础层: 双端点全分页 fetch (issue-list + comments, 排序语义钉死) + Tier A 规则引擎 (逐信号 confidence / unknown 不猜 / 时钟 seam / 前缀表读 labels.yaml) + comments 分量三态 (值/null/unknown) + groom-report JSON schema v1
+- [ ] 1.2 增量引擎: 三面指纹 (显式排除集) + 复用规则 (Tier A 判据输入快照 / Tier B provenance 门 + stale-assessment + assessment 保留约定) + diff 段 + 状态文件原子写
+- [ ] 1.3 SC 结构化测试 (逐 SC 映射): SC-1 10 态矩阵 + 分量级 mandate (③ 四分量变体 / ⑨ 两分量变体 / ⑩ comment-edit 判别 + 合成 updated_at>created_at 样本) / SC-2 双端点分页 + >50 截断反例 / SC-3 每判据反事实 + 负面 fixture / SC-4 baseline-run + top-N fixture + 三态 fixture / SC-5 差集断言 + 幂等 (mock 不编码 no-op) / SC-9 taxonomy 自检 / 语料接入 (三路径) + forgejo add no-op live 实测 (10cg.local, 结果落 references) + 语料再生成命令
 
-## Phase 2 — 适配层与裁定
+## Phase 2 — 适配层
 
-- [ ] 2.1 SKILL.md (CC 适配层): Tier B 语义评估流程 (assessment 面 + provenance) + MD 渲染层 + 多 harness 诚实主张声明
-- [ ] 2.2 五项待裁裁定 (owner): labels.yaml 落点 / 契约面资产落点 (含 groom.py 最终路径) / provenance 取值源 / 第 11 态 (last-writer-wins) 二选一 / 两缺口单是否合并
-- [ ] 2.3 Tier B 定向 fixture (判据表第三行, #240): 点名行为 + 可证伪 + 移交附注三条 (既有评论编辑用例 / ③ 态四分量变体 / ⑩ 先例沿用)
+- [ ] 2.1 SKILL.md (CC 适配层): Tier B 语义评估流程 (assessment 面 + provenance + 持久化回路) + MD 渲染层 + 多 harness 诚实主张声明 + 双源同步义务预告承载
+- [ ] 2.2 Tier B 定向 fixture (判据表第三行, #240 勘正后范围: 仅 Tier B 语义行为 — 疑似已修判断/优先级 vs 在制轨/决策面抽取的可证伪用例)
 
-## Phase 3 — Rule #6 与发版
+## Phase 3 — Rule #6 与发版准备
 
-- [ ] 3.1 Rule #6 执行: 场景 1 AB 照跑 + 场景 4b 处置留痕 (#239, trigger 套件缺口单) + rule6_note 成文 (档位矩阵四行)
-- [ ] 3.2 发版面: MINOR bump + 版本 SOT 五文件同步 (plugin.json/CHANGELOG/README/…) + trigger 套件如已解冻则入库
+- [ ] 3.1 Rule #6 执行: 场景 1 AB 照跑 + rule6_note 按 SOT §4.1 五字段×四变更面成条 (含 negctrl 口径) + 4b 按 SC-6 两分支处置 (#239)
+- [ ] 3.2 发版准备: MINOR bump 草案 + 版本 SOT 五文件同步准备; trigger 套件如已解冻则入库
 
-## Phase 4 — Dogfood 与收尾
+## Phase 4 — Dogfood、Ship 与收尾 (ship 在 dogfood 后)
 
-- [ ] 4.1 dogfood: Aria 仓实跑 (150 条语料, 与手工梳理结果对照) + 外项目试点 (Aether 97 或 SilkNode 63)
-- [ ] 4.2 归档 + 关单 (#238 / #239 / #240) + handoff
+- [ ] 4.1 dogfood: Aria 仓实跑 (判绿 = SC-7 全量对账 + 手工梳理差异逐条归因) + 外项目试点 (Aether 97 或 SilkNode 63)
+- [ ] 4.2 ship (dual-push, 前置 = 4.1 通过 + SC-6 两分支裁定门⑥满足) + 归档 + 关单 (#238; #239 按裁定门⑥处置 — 未解冻且裁定为阻塞则不关; #240 随 Tier B fixture 完成关) + handoff
