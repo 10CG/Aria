@@ -1,6 +1,6 @@
 {
   "skill_name": "phase-c-integrator-pre-merge-gate",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "workflow_skill_subextension",
   "parent_skill": "phase-c-integrator",
   "spec": "openspec/changes/phase-c-integrator-pre-merge-gate/proposal.md",
@@ -17,6 +17,11 @@
       "version": "1.2.0",
       "date": "2026-08-22",
       "changes": "aria-plugin #152 (spec pre-merge-gate-no-run-for-branch): +NEG-4-no-run-for-branch (pr_ci_status=not_found + gate_error.kind=no-run-for-branch + 处方 (a) dispatch 行; Rule #6 第三行定向 fixture, 首次登记即真跑 → ab-results/2026-08-22-pre-merge-gate-no-run-for-branch/)。注: 1.1.0 (NEG-3, v1.65.3) 当时未补 changelog 行, 亦无执行记录 (R3 A3 实核), 本条不追补。"
+    },
+    {
+      "version": "1.2.1",
+      "date": "2026-10-18",
+      "changes": "Aria#235 ①档: 修三条 test_case_in_unit_tests 缺口 — NEG-1-malformed node id 过期改真实方法 (test_case_e_malformed_aether_main_leg_routes_fail, 实测 1 passed); wait_then_green prose 改绑 workflow-runner 既有宿主 GateStateLifecycleTests; NEG-2-timeout 无宿主, 显式 null known-gap (建宿主 → aria-plugin#226)。机械核验: 改后全部非 null 条目 node id 实跑通过。"
     }
   ],
   "fixtures": [
@@ -38,8 +43,8 @@
       "id": "wait_then_green",
       "file": "phase-c-integrator-pre-merge-gate-fixtures/wait_then_green.json",
       "expected_verdict": "wait then green (sequence)",
-      "test_case_in_unit_tests": "test_gate_state_helper polling tests + integration",
-      "purpose": "verify workflow-runner wait_recoverable polling loop convergence"
+      "test_case_in_unit_tests": "test_gate_state_helper.GateStateLifecycleTests.test_wait_to_green_preserves_retry_count",
+      "purpose": "verify workflow-runner wait_recoverable polling loop convergence; 宿主: aria/skills/workflow-runner/tests/test_gate_state_helper.py (cross-skill 绑定, 须在该 tests/ 目录下执行) — Aria#235 ①档: 原 prose 值不可执行, 改绑既有宿主"
     },
     {
       "id": "fail",
@@ -52,15 +57,15 @@
       "id": "NEG-1-malformed",
       "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-1-malformed.json",
       "expected_verdict": "fail (not crash)",
-      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_routes_fail",
+      "test_case_in_unit_tests": "test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_main_leg_routes_fail",
       "purpose": "Spec QA-2 R2 patch — verify helper does not crash on unknown enum"
     },
     {
       "id": "NEG-2-timeout",
       "file": "phase-c-integrator-pre-merge-gate-fixtures/NEG-2-timeout.json",
       "expected_verdict": "fail (after retry exhaustion)",
-      "test_case_in_unit_tests": "test_pre_merge_gate (timeout path; integration scenario)",
-      "purpose": "Spec QA-2 R2 patch — verify subprocess timeout + 3-retry behavior"
+      "test_case_in_unit_tests": null,
+      "purpose": "Spec QA-2 R2 patch — verify subprocess timeout + 3-retry behavior。known-gap (Aria#235 ①档): 该路径无单测宿主, 原值为不可执行 prose; 建宿主见 10CG/aria-plugin#226, 回填前本字段显式 null"
     },
     {
       "id": "NEG-3-internal-error-surface",
