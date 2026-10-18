@@ -1,7 +1,7 @@
 # issue-groomer P1 MVP — issue 组合面梳理 skill
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft (v3) — post_spec R1-R4 **CONVERGED / verdict PASS** (2026-10-18; R1 6M+12m → v2 → R2 1M 回归 → v3 → R3+R4 干净轮集合相等 5/5 全票; 聚合报告 `.aria/audit-reports/post_spec-R4-1792325635892-issue-groomer-p1-mvp-aggregated.md`) — **待 owner Approve → A.2**
+> **Status**: **Approved (owner 2026-10-18)** — post_spec R1-R4 CONVERGED / verdict PASS (聚合报告 `.aria/audit-reports/post_spec-R4-1792325635892-issue-groomer-p1-mvp-aggregated.md`); **Phase 0 六项裁定已裁 (owner 2026-10-18, 见 §0)** → A.2 ready
 > **Created**: 2026-10-18
 > **Linked Issue**: `10CG/Aria#238`
 > **决策来源**: [DEC-20261018-001](../../../.aria/decisions/DEC-20261018-001-issue-ops-family-and-issue-groomer-design.md) (裁定-1~13; post_brainstorm R1-R5 CONVERGED/PASS, 聚合报告 `.aria/audit-reports/post_brainstorm-R5-1792301620523-DEC-20261018-001-aggregated.md`) + [DEC-20261018-002](../../../.aria/decisions/DEC-20261018-002-layer1-substrate-evaluation-track.md) (底座评估轨, 与本轨解耦)
@@ -13,9 +13,16 @@
 
 ## What Changed (P1 MVP 范围, 裁定-6/7/8/9)
 
-### 0. 裁定门 (task 0.1, **前置于 Phase 1** — R1 双席命中的依赖倒置修正)
+### 0. 裁定门 (task 0.1 — **六项已裁, owner 2026-10-18**)
 
-六项 owner 待裁, 其消费方在 Phase 1 及发版面: ① labels.yaml 落点 (**含 title 前缀→分类键映射表并入** — 避免 hardcode 在 groom.py 成为指纹盲区); ② 契约面资产落点 (groom.py 最终路径 + groom-report schema 文档位置, 暂定 SKILL.md references); ③ provenance 取值源 (API 回报 vs 自报 / 版本化粒度); ④ 第 11 态二选一 (per-terminal 后缀 vs 显式 last-writer-wins + 并发 fixture — **含 Tier B assessment 存储面考量**, 见 §1); ⑤ 两缺口单 (#239/#240) 是否合并; ⑥ **#239 未解冻时 ship 语义** (见 SC-6 两分支)。裁定 ④ 选 last-writer-wins 时补挂并发 fixture 实施任务。
+| # | 裁定 | 内容 |
+|---|---|---|
+| ① | labels.yaml 落点 | **项目级 `.aria/labels.yaml` 优先 + 插件内置保守默认 fallback; 覆盖非合并** (项目文件存在则整体覆盖默认层; 默认层仅通用分类键 bug/feature/security/tracker)。前缀→分类键映射表随 yaml 走 |
+| ② | 契约面资产落点 | groom.py 于 `scripts/`; **schema = `scripts/groom-report.schema.json`** (机器可校验 JSON Schema 文件; SKILL.md references 留指针) |
+| ③ | provenance 取值源 | **分层采集**: groom.py 记 harness (调用参数自报); model id 由适配层写 assessment 时补全; 复用门比对完整拼接串 |
+| ④ | 第 11 态 + assessment 存储 | **两文件各自 last-writer-wins**: 状态文件 `.aria/cache/groom-state.json` 单一固定路径; assessment 独立文件 `groom-assessments.json` (物理隔离, 无跨文件合并语义); **并发 fixture 态升为正式 SC 矩阵成员** (非候选) |
+| ⑤ | 两缺口单 | **保持两张** (#239 trigger 面 / #240 Tier B 面; 解锁路径与验收面不同) |
+| ⑥ | #239 未解冻 ship 语义 | **恒阻塞至解冻 (fail-closed, 无逐案放行; 唯一出路 = #213 的 owner 审阅解冻)** — 比 SC-6 草案更严, owner 2026-10-18 选定 |
 
 ### 1. 机械核 `groom.py` (harness-agnostic, stdlib-only; 允许 scripts/ 模块拆分, 契约面可及性不变)
 
@@ -91,12 +98,12 @@ rule6_note 成文形式 (task 3.1): 按 SOT §4.1 **五字段逐变更面成条 
 
 ## Success Criteria
 
-- [ ] SC-1 10 态矩阵全绿且逐态反事实成立 + **分量级 mandate 全绿** (③ 四分量 / ⑨ 两分量 / ⑩ comment-edit 判别 + 合成样本)
+- [ ] SC-1 10 态矩阵 + **第 11 态 (并发: 两文件各自 last-writer-wins, 裁定④)** 全绿且逐态反事实成立 + **分量级 mandate 全绿** (③ 四分量 / ⑨ 两分量 / ⑩ comment-edit 判别 + 合成样本)
 - [ ] SC-2 **双端点** (issue-list + comments) 全分页零丢失: 多页 mock + 终止条件 + **>50-comment 截断反例** + comments 排序语义钉死
 - [ ] SC-3 Tier A 每分类判据有独立反事实 fixture; 无显式信号 → unknown (负面 fixture); 时钟 seam 可注入
 - [ ] SC-4 增量语义: baseline no-diff (专属 fixture) / 复用规则 / provenance 门 / diff top-N 上限 fixture; comments 分量三态 (值/null/unknown)
 - [ ] SC-5 apply_payload = suggested−existing 差集 (harness 无关断言); no-op 前提经 live 实测记录 (mock 不编码)
-- [ ] SC-6 Rule #6 **义务全集判绿 (四 facet)**: ① 场景 1 AB 照跑且 pass (矩阵第二行); ② 4b 两分支 — **套件已解冻 ⇒ 4b 照跑且 pass; 未解冻 ⇒ Rule #6 义务未完成, ship 阻塞 + owner 显式裁定** (比照 Rule #8 stub abort 不得静默降级语义; ship 语义 = 裁定门 ⑥); ③ Tier B 定向 fixture 三条件齐备 (判据表第三行, task 2.2, #240); ④ rule6_note 五字段×四变更面成文且合规 (task 3.1)
+- [ ] SC-6 Rule #6 **义务全集判绿 (四 facet)**: ① 场景 1 AB 照跑且 pass (矩阵第二行); ② 4b 两分支 — **套件已解冻 ⇒ 4b 照跑且 pass; 未解冻 ⇒ ship 恒阻塞至解冻 (裁定⑥ fail-closed, 无逐案放行; 唯一出路 = #213 owner 审阅解冻)**; ③ Tier B 定向 fixture 三条件齐备 (判据表第三行, task 2.2, #240); ④ rule6_note 五字段×四变更面成文且合规 (task 3.1)
 - [ ] SC-7 dogfood 判绿标准: 全量条数对账 (fetch 计数 vs 快照计数) + 与 2026-10-18 手工梳理**差异逐条归因清单**; Aria 仓 + ≥1 外项目试点
 - [ ] SC-8 groom-report JSON schema v1 文档化 + additive-only 契约
 - [ ] SC-9 labels.yaml taxonomy 一致性自检 (前缀表 + 分类键 + label 名三层)
