@@ -1,7 +1,7 @@
 # issue-groomer P1 MVP — issue 组合面梳理 skill
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: Draft (v2 — post_spec R1 REVISE 轮间修订: TL 0C/2M · BA 0C/3M · QA 0C/2M(FAIL) · KM 0C/1M · CR PASS 0C/0M; 全 6 Major + 12 minor 处置)
+> **Status**: Draft (v3 — post_spec R1 (席位命中去重后独立 finding 6 Major + 12 minor) + R2 (1 Major 修复回归 + 5 minor) 全处置; 见 tasks 头部修订注)
 > **Created**: 2026-10-18
 > **Linked Issue**: `10CG/Aria#238`
 > **决策来源**: [DEC-20261018-001](../../../.aria/decisions/DEC-20261018-001-issue-ops-family-and-issue-groomer-design.md) (裁定-1~13; post_brainstorm R1-R5 CONVERGED/PASS, 聚合报告 `.aria/audit-reports/post_brainstorm-R5-1792301620523-DEC-20261018-001-aggregated.md`) + [DEC-20261018-002](../../../.aria/decisions/DEC-20261018-002-layer1-substrate-evaluation-track.md) (底座评估轨, 与本轨解耦)
@@ -41,7 +41,7 @@
 ### 4. 测试面 (task 1.3 逐 SC 映射枚举 — R1 QA 席修正: 分量级 mandate 归 Tier A lane)
 
 - **SC 结构化测试**: 10 态 fixture 矩阵 (裁定-9 枚举 ①-⑩, 内联表见 DEC; **分量级反事实 mandate 在 1.3 执行**: ③ 态按上下文面四分量各设独立变体 / ⑨ 态按 harness 与 model id 各设变体 / ⑩ 补 comment-edit 判别 fixture — 合成 updated_at>created_at 样本, 区分 max(updated_at) vs max(created_at)/count 错误代理)
-- **Tier B 定向 fixture** (判据表第三行, #240 — 仅 Tier B 语义行为; 三条移交附注中 ①② 属 Tier A 机械项已归 1.3, #240 body 已勘正)
+- **Tier B 定向 fixture** (判据表第三行, #240 — 仅 Tier B 语义行为; 三条移交附注中 ①② 属 Tier A 机械项已归 1.3; #240 勘正评论已发 (comment 29237), body 未改动)
 - **语料**: 三份快照 (scratchpad/issues-open-full-18repos-2026-10-18.json 378 条 / scratchpad/issues-open-2026-10-18.json 150 条 / scratchpad/issues-sample-body-comments-2026-10-18.json body+comments 形态) — 不复制入库; **再生成命令** (live API 重取脚本) 附 SKILL.md references; scratchpad 单点落点风险显式接受 (清理即失, 靠再生成恢复)。
 
 ### 非范围 (P1 明确排除)
@@ -96,7 +96,7 @@ rule6_note 成文形式 (task 3.1): 按 SOT §4.1 **五字段逐变更面成条 
 - [ ] SC-3 Tier A 每分类判据有独立反事实 fixture; 无显式信号 → unknown (负面 fixture); 时钟 seam 可注入
 - [ ] SC-4 增量语义: baseline no-diff (专属 fixture) / 复用规则 / provenance 门 / diff top-N 上限 fixture; comments 分量三态 (值/null/unknown)
 - [ ] SC-5 apply_payload = suggested−existing 差集 (harness 无关断言); no-op 前提经 live 实测记录 (mock 不编码)
-- [ ] SC-6 Rule #6 两分支: **套件已解冻 ⇒ 4b 照跑且 pass 才绿; 未解冻 ⇒ Rule #6 义务未完成, ship 阻塞 + owner 显式裁定** (比照 Rule #8 stub abort 不得静默降级语义; ship 语义 = 裁定门 ⑥)
+- [ ] SC-6 Rule #6 **义务全集判绿 (四 facet)**: ① 场景 1 AB 照跑且 pass (矩阵第二行); ② 4b 两分支 — **套件已解冻 ⇒ 4b 照跑且 pass; 未解冻 ⇒ Rule #6 义务未完成, ship 阻塞 + owner 显式裁定** (比照 Rule #8 stub abort 不得静默降级语义; ship 语义 = 裁定门 ⑥); ③ Tier B 定向 fixture 三条件齐备 (判据表第三行, task 2.2, #240); ④ rule6_note 五字段×四变更面成文且合规 (task 3.1)
 - [ ] SC-7 dogfood 判绿标准: 全量条数对账 (fetch 计数 vs 快照计数) + 与 2026-10-18 手工梳理**差异逐条归因清单**; Aria 仓 + ≥1 外项目试点
 - [ ] SC-8 groom-report JSON schema v1 文档化 + additive-only 契约
 - [ ] SC-9 labels.yaml taxonomy 一致性自检 (前缀表 + 分类键 + label 名三层)
