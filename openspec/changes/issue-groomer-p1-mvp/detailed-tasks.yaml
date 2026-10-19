@@ -1,0 +1,234 @@
+metadata:
+  feature: issue-groomer-p1-mvp
+  datasource: "tasks.md (v3 + Phase 0 裁定 2026-10-18)"
+  spec_status: "Approved (owner 2026-10-18); post_spec R1-R4 CONVERGED/PASS"
+  total_tasks: 16
+  execution_track: "interactive (SOT §2; 禁 Layer 2 自主轨)"
+  phase0_rulings: "proposal §0 六项已裁: ①项目级 labels.yaml 优先+内置 fallback (覆盖非合并) / ②schema=scripts/groom-report.schema.json / ③provenance 分层采集 / ④两文件各自 last-writer-wins (assessment 独立文件; 并发态转正) / ⑤#239#240 保持两张 / ⑥未解冻恒阻塞 fail-closed"
+  deliverable_root: "aria/skills/issue-groomer/ (子模块; scripts/ 允许模块拆分, 契约面可及性不变)"
+
+tasks:
+  # ─── Phase 1: 机械核 (groom.py + 测试) ───
+  - id: TASK-001
+    parent: "1.1"
+    title: "forgejo 双端点全分页 fetch 层 (issue-list + comments)"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/lib/fetch.py"
+    agent: backend-architect
+    verification:
+      - "SC-2: 双端点全分页零丢失 (多页 mock + 终止条件测试)"
+      - "comments 排序语义钉死 (取最新页或全分页取 max(updated_at)); >50-comment 截断反例 fixture 通过"
+      - "fetch 失败三态 (值/null/unknown) 枚举落地, 失败不冒充零评论"
+
+  - id: TASK-002
+    parent: "1.1"
+    title: "Tier A 规则引擎 (labels.yaml 双层 + 前缀归类 + 时钟 seam)"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/lib/tier_a.py"
+      - "aria/skills/issue-groomer/config/labels-default.yaml (内置保守默认层)"
+    agent: backend-architect
+    verification:
+      - "裁定①: 项目级 .aria/labels.yaml 存在则整体覆盖默认层 (覆盖非合并); 缺省回落内置层"
+      - "SC-3: 逐信号 confidence (命中信号集枚举); 无显式信号 → category=unknown + 溯源空集 (负面 fixture)"
+      - "staleness/活跃度判据支持时钟注入 seam (fixture 可注入 now)"
+      - "SC-9: taxonomy 一致性自检 (前缀表+分类键+label 名三层)"
+
+  - id: TASK-003
+    parent: "1.1"
+    title: "groom-report schema v1 (.schema.json 机器可校验)"
+    status: pending
+    complexity: S
+    dependencies: []
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/groom-report.schema.json"
+    agent: backend-architect
+    verification:
+      - "SC-8: schema 文档化 + additive-only 版本契约 (snapshot_schema_version 同款演进)"
+      - "裁定②: 落点 scripts/ 旁; SKILL.md references 留指针"
+      - "schema 可被标准 JSON Schema 验证器加载校验"
+
+  - id: TASK-004
+    parent: "1.2"
+    title: "三面指纹引擎"
+    status: pending
+    complexity: L
+    dependencies: ["TASK-001"]
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/lib/fingerprint.py"
+    agent: backend-architect
+    verification:
+      - "issue 面: title/body/labels hash + comments 最新 updated_at (三态); 显式排除 assignee/milestone/due_date"
+      - "上下文面: openspec/changes/ 全树内容级 hash + 主/卫星仓 git HEAD + handoff=latest.md pointer (非 mtime) + labels.yaml taxonomy hash; archive/ 显式排除"
+      - "provenance 面: 裁定③ 分层采集 (脚本 harness 自报 + 适配层 model id 拼接)"
+
+  - id: TASK-005
+    parent: "1.2"
+    title: "增量状态与复用引擎 (两文件 last-writer-wins)"
+    status: pending
+    complexity: L
+    dependencies: ["TASK-004"]
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/lib/incremental.py"
+    agent: backend-architect
+    verification:
+      - "Tier A 复用 = 分类输出 + 判据输入快照; 时间敏感字段跨档触发重分类 (复用规则 fixture)"
+      - "Tier B provenance 门: provenance 变 ⇒ stale-assessment (provenance 门 fixture)"
+      - "裁定④: groom-state.json 单一固定路径原子写 (temp+rename); assessment 独立文件 groom-assessments.json; groom.py 重写状态保留非自有 assessment 键"
+
+  - id: TASK-006
+    parent: "1.2"
+    title: "diff 段引擎 (集合差/漂移 top-N/baseline)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-005"]
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/lib/diffseg.py"
+    agent: backend-architect
+    verification:
+      - "SC-4: baseline run = no-diff (专属 fixture); 新增/已关闭=集合差; 漂移仅有新评估条目报告 + top-N 上限 fixture"
+
+  - id: TASK-007
+    parent: "1.3"
+    title: "10+1 态 fixture 矩阵 + 分量级 mandate fixtures"
+    status: pending
+    complexity: L
+    dependencies: ["TASK-005"]
+    deliverables:
+      - "aria/skills/issue-groomer/tests/test_state_matrix.py"
+    agent: qa-engineer
+    verification:
+      - "SC-1: DEC 裁定-9 十态 ①-⑩ 逐态反事实 (任一分量退化成常量 ⇒ 对应态必红) + 第 11 态并发 (两文件各自 last-writer-wins, 裁定④)"
+      - "分量级 mandate: ③ 四分量独立变体 / ⑨ 两分量变体 / ⑩ comment-edit 判别 (合成 updated_at>created_at 样本, 区分 max(updated_at) vs max(created_at)/count 错误代理)"
+
+  - id: TASK-008
+    parent: "1.3"
+    title: "SC-2/4/5/9 fixtures + 反假绿全家桶"
+    status: pending
+    complexity: L
+    dependencies: ["TASK-001", "TASK-006"]
+    deliverables:
+      - "aria/skills/issue-groomer/tests/test_fetch_and_diff.py"
+    agent: qa-engineer
+    verification:
+      - "SC-2: 双端点多页 mock + 终止条件 + >50-comment 截断反例"
+      - "SC-4: baseline/top-N/三态/复用规则/provenance 门五类 fixture"
+      - "SC-5: apply_payload = suggested−existing 差集 (harness 无关断言); 幂等 fixture (mock 不编码 no-op)"
+      - "负面 fixture: unknown 不猜 (SC-3 面)"
+
+  - id: TASK-009
+    parent: "1.3"
+    title: "语料接入 + no-op live 实测 + 再生成命令"
+    status: pending
+    complexity: M
+    dependencies: []
+    deliverables:
+      - "aria/skills/issue-groomer/tests/fixtures/corpus_loader.py"
+      - "aria/skills/issue-groomer/scripts/regen_corpus.py"
+      - "aria/skills/issue-groomer/references/forgejo-behavior-notes.md (no-op 实测记录)"
+    agent: qa-engineer
+    verification:
+      - "三份语料 fixture 加载 (scratchpad 三路径; 不复制入库)"
+      - "Phase 1 前对 10cg.local live 实测 duplicate label add 一次, 结果落 references (语料含 Aether/SilkNode 跨仓形态)"
+      - "再生成命令可重取语料 (live API)"
+
+  # ─── Phase 2: 适配层 ───
+  - id: TASK-010
+    parent: "2.1"
+    title: "SKILL.md CC 适配层 (Tier B 语义评估流程 + 渲染层)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-003"]
+    deliverables:
+      - "aria/skills/issue-groomer/SKILL.md"
+    agent: knowledge-manager
+    verification:
+      - "Tier B 语义评估流程 (疑似已修/优先级 vs 在制轨/owner 决策面) 产 assessment 面带 provenance; 写回 groom-assessments.json (model id 补全)"
+      - "MD 渲染层 (分类汇总/优先级分档/决策面/diff 段)"
+      - "多 harness 诚实主张声明 (可移植=事实面+Tier A) + 双源同步义务预告 (裁定-13) + schema/references 指针"
+
+  - id: TASK-011
+    parent: "2.2"
+    title: "Tier B 定向 fixture (判据表第三行, #240)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-010"]
+    deliverables:
+      - "aria-plugin-benchmarks/ab-suite/issue-groomer/tier-b-fixtures/"
+    agent: qa-engineer
+    verification:
+      - "点名行为 + 可证伪 fixture (疑似已修判断/优先级 vs 在制轨/决策面抽取); 范围=勘正后 #240 (comment 29237)"
+      - "三条件齐备 → SC-6③"
+
+  # ─── Phase 3: Rule #6 与发版准备 ───
+  - id: TASK-012
+    parent: "3.1"
+    title: "Rule #6 执行 (场景 1 AB + 4b 处置 + rule6_note 四条成文)"
+    status: pending
+    complexity: L
+    dependencies: ["TASK-010", "TASK-011"]
+    deliverables:
+      - "ab-results/2026-MM-DD-issue-groomer-rule6/ (场景 1 AB 记录)"
+      - "rule6_note (五字段 × 四变更面, SOT §4.1 格式)"
+    agent: qa-engineer
+    verification:
+      - "SC-6①: 场景 1 AB 照跑且 pass"
+      - "SC-6②: #239 解冻状态核查 — 未解冻 ⇒ 恒阻塞记录 (裁定⑥); 解冻 ⇒ 4b 照跑且 pass"
+      - "SC-6④: rule6_note 五字段 (含 negctrl) × 四条成文且合规"
+
+  - id: TASK-013
+    parent: "3.2"
+    title: "发版准备 (MINOR bump 草案 + 五文件同步面)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-012"]
+    deliverables:
+      - "版本 bump 草案 (aria/.claude-plugin/plugin.json MINOR + CHANGELOG + README + marketplace)"
+    agent: knowledge-manager
+    verification:
+      - "版本 SOT = plugin.json; 派生文件一致性预案 (五文件)"
+      - "trigger 套件若 #239 已解冻则随版入库; 未解冻 ⇒ 发版面标注恒阻塞 (裁定⑥)"
+
+  # ─── Phase 4: Dogfood、Ship 与收尾 ───
+  - id: TASK-014
+    parent: "4.1"
+    title: "dogfood: Aria 仓实跑 (全量对账 + 手工梳理差异归因)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-008", "TASK-010"]
+    deliverables:
+      - "dogfood 报告 (fetch 计数 vs 快照对账 + 与 2026-10-18 手工梳理差异逐条归因清单)"
+    agent: qa-engineer
+    verification:
+      - "SC-7: 全量条数对账 (378/150 计数一致) + 差异逐条归因 (供 owner/下轮审计复核)"
+
+  - id: TASK-015
+    parent: "4.1"
+    title: "dogfood: 外项目试点 (Aether 97 或 SilkNode 63)"
+    status: pending
+    complexity: S
+    dependencies: ["TASK-014"]
+    deliverables:
+      - "外项目试点记录 (≥1 仓实跑)"
+    agent: backend-architect
+    verification:
+      - "SC-7: ≥1 外项目实跑通过 (跨仓配置形态验证)"
+
+  - id: TASK-016
+    parent: "4.2"
+    title: "ship + 归档 + 关单 + handoff"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-013", "TASK-014", "TASK-015"]
+    deliverables:
+      - "dual-push ship / openspec 归档 / #238 关单 / handoff"
+    agent: knowledge-manager
+    verification:
+      - "4.2 前置全满足: 4.1 通过 + task 3.1/2.2 完成 + SC-6 四 facet 全绿 (⑥=未解冻恒阻塞, 无逐案放行)"
+      - "#239 恒随解冻状态 (未解冻不关); #240 随 Tier B fixture 完成关"
+      - "Rule #8 pre-merge gate + 双推 ls-remote 核验 + 归档台账"
