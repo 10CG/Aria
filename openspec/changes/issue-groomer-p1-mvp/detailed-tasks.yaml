@@ -103,7 +103,7 @@ tasks:
     title: "10+1 态 fixture 矩阵 + 分量级 mandate fixtures"
     status: pending
     complexity: L
-    dependencies: ["TASK-005", "TASK-002"]
+    dependencies: ["TASK-005", "TASK-002", "TASK-009"]
     deliverables:
       - "aria/skills/issue-groomer/tests/test_state_matrix.py"
     agent: qa-engineer
@@ -117,7 +117,7 @@ tasks:
     title: "SC-2/3/4/5/9 fixtures + 反假绿全家桶"
     status: pending
     complexity: L
-    dependencies: ["TASK-001", "TASK-006", "TASK-002", "TASK-009"]
+    dependencies: ["TASK-001", "TASK-006", "TASK-002", "TASK-009", "TASK-017"]
     deliverables:
       - "aria/skills/issue-groomer/tests/test_fetch_and_diff.py"
     agent: qa-engineer
