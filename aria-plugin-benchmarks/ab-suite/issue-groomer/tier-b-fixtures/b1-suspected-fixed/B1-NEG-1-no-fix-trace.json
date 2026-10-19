@@ -1,0 +1,77 @@
+{
+  "case_id": "B1-NEG-1",
+  "behavior": "suspected_fixed",
+  "behavior_label": "疑似已修可关单",
+  "polarity": "negative",
+  "source_annotation": "issue 记录逐字取自真语料 (Aria#229, 快照时 open, label=bug)。context_materials 为 2026-10-19 冻结检索结果, 三路均真实: (a) openspec/archive/ 全列表按 secret-guard / guard-bypass / 命令替换 主题检索, 命中 8 条 secret-guard 家族归档 — 全部早于 issue 创建日 2026-10-07 且属不同 facet, 是真实的诱导性干扰项; (b) aria 子仓 git log --since=2026-10-06 (覆盖 issue 创建后) grep '229|guard-bypass' 零命中; (c) aria/CHANGELOG.md 无 #229 关单记载 (guard-bypass.log 的两处命中均为历史条目: 审计日志引入与 #157 log_ack 净化, 主题为不同 facet)。",
+  "input": {
+    "issues": [
+      {
+        "repo": "Aria",
+        "number": 229,
+        "title": "secret-guard: guard-bypass.log 每条记录末尾缺换行（被命令替换吞掉），多次放行的记录粘成一行 —— #160 ③ 的「一行一条」只在单条时成立",
+        "labels": ["bug"],
+        "created": "2026-10-07",
+        "updated": "2026-10-07"
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "openspec_archive_search",
+        "frozen_at": "2026-10-19",
+        "query": "archive 目录名含 secret-guard / subprocess (本 issue 主题: guard-bypass.log 换行被命令替换吞掉)",
+        "matches": [
+          "openspec/archive/2026-05-23-aria-secret-guard-plugin-default",
+          "openspec/archive/2026-06-19-secret-guard-exfil-coverage-iteration",
+          "openspec/archive/2026-07-11-secret-guard-bash3-multiline-hardening",
+          "openspec/archive/2026-07-11-secret-guard-multiline-and-anchor-fix",
+          "openspec/archive/2026-08-02-secret-guard-nomad-var-put-echo",
+          "openspec/archive/2026-08-18-secret-guard-per-segment-evaluation",
+          "openspec/archive/2026-08-21-subprocess-decode-hardening",
+          "openspec/archive/2026-08-22-secret-guard-manifest-precision"
+        ],
+        "note": "全部命中归档日期 ≤ 2026-08-22, 早于 issue 创建日 2026-10-07 (issue 描述的缺陷在其后仍被报告); 各归档主题 (插件默认安装 / exfil 覆盖 / bash3 多行 / 锚点修复 / nomad var 回显 / 逐段评估 / 子进程解码 / manifest 精度) 均非「guard-bypass.log 换行被命令替换吞掉」。"
+      },
+      {
+        "kind": "git_log_search",
+        "repo": "aria",
+        "frozen_at": "2026-10-19",
+        "query": "git log --since=2026-10-06 --oneline | grep -ci '229|guard-bypass'",
+        "result": 0,
+        "note": "issue 创建后零提交提及本 issue 编号或 guard-bypass。"
+      },
+      {
+        "kind": "changelog_search",
+        "ref": "aria/CHANGELOG.md",
+        "frozen_at": "2026-10-19",
+        "query": "grep -n '229|guard-bypass'",
+        "result": "无 #229 关单记载; guard-bypass.log 两处命中均为历史条目 (审计日志 trail 引入; #157 修复后 log_ack 多行净化), 属不同 facet。",
+        "note": "不存在针对「换行被命令替换吞掉」缺陷的 CHANGELOG 条目。"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_key": "Aria#229",
+    "assessment_entry_exemplar": {
+      "suspected_fixed": {
+        "verdict": false,
+        "rationale": "检索 openspec/archive (secret-guard 家族 8 条归档均早于 2026-10-07 且属不同 facet) / git log (创建后零提及) / CHANGELOG (无本条关单记载), 均无对应修复迹; 不可因同主题历史归档推断已修。"
+      },
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "anchor_semantics": "反向用例: 期望克制。verdict===false (带检索依据 rationale) 或省略 suspected_fixed 面均 pass — 无证据语境下省略面是「拿不准不猜」的合法形态。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "verdict === false (rationale 引用检索结果) — 或 — suspected_fixed 面被省略",
+      "若面在位: rationale 不得引用任何未在 input 材料中出现的 spec 名 / commit / PR 号"
+    ],
+    "fail": [
+      "verdict === true (无修复迹下的 false positive — 本行为最核心的证伪方向)",
+      "rationale 把 8 条历史归档中任一条 (如 2026-08-21-subprocess-decode-hardening 或 2026-07-11-secret-guard-multiline-and-anchor-fix) 当作本缺陷的修复证据 (主题相邻 ≠ 已修本条; 且全部早于 issue 创建日)"
+    ],
+    "miss": []
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "case_id": "B1-POS-1",
+  "behavior": "suspected_fixed",
+  "behavior_label": "疑似已修可关单",
+  "polarity": "positive",
+  "source_annotation": "issue 记录逐字取自真语料 scratchpad/issues-open-full-18repos-2026-10-18.json (Aria#211, 快照时 open)。context_materials 为 2026-10-19 对真实主仓的冻结摘录: 归档 spec 目录名 / merge commit SHA 与 subject / CLAUDE.md 项目状态行均真实存在且逐字, 零改造。本例是全套件唯一「三路证据 (archive spec + git merge commit + 状态文档) 全真实」的正向用例。",
+  "input": {
+    "issues": [
+      {
+        "repo": "Aria",
+        "number": 211,
+        "title": "[AB评测台] Rule #6 第二行要求 description 变动零裁量照跑 AB, 而 AB 臂被直接喂 SKILL.md — 触发面按构造绕过, 「照跑了」不含任何 description 信息",
+        "labels": [],
+        "created": "2026-09-09",
+        "updated": "2026-09-19"
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "openspec_archive_search",
+        "frozen_at": "2026-10-19",
+        "query": "archive 目录名含 rule6 / description / trigger",
+        "matches": [
+          "openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/"
+        ],
+        "note": "归档树存在与本 issue 同主题的已归档 spec, 归档日期 2026-09-17 (晚于 issue 创建 2026-09-09)。"
+      },
+      {
+        "kind": "git_merge_commit",
+        "repo": "Aria",
+        "frozen_at": "2026-10-19",
+        "sha": "df3c274617cce7d28990e0bca45154ff17948db2",
+        "subject": "Merge pull request 'Rule #6 description 维度补场景 4b 地板守卫 (10CG/Aria#211)' (#215) from feature/rule6-description-change-trigger-eval-lane into master",
+        "committed_at": "2026-09-17T13:57:36Z",
+        "note": "merge commit subject 逐字含本 issue 编号 10CG/Aria#211 与 PR #215。"
+      },
+      {
+        "kind": "status_doc_excerpt",
+        "ref": "CLAUDE.md 项目状态段",
+        "frozen_at": "2026-10-19",
+        "excerpt": "Rule #6 description 维度: 场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 + standards 940cb5b / SOT 1.1.0); 跟进 Aria#213 · Aria#214 · aria-plugin#200"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_key": "Aria#211",
+    "assessment_entry_exemplar": {
+      "suspected_fixed": {
+        "verdict": true,
+        "rationale": "核心诉求 (description 变动的场景 4b 地板守卫) 已由归档 spec 2026-09-17-rule6-description-change-trigger-eval-lane 交付: PR #215 (merge commit df3c274) 合入 master, CLAUDE.md 项目状态行确认已 ship。issue 仍 open 属关单待办, 建议人工核验后关单; 跟进项 Aria#213 / Aria#214 是独立 issue, 不构成本条否证。"
+      },
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "rationale_anchor_tokens": [
+      "2026-09-17-rule6-description-change-trigger-eval-lane",
+      "#215",
+      "df3c274"
+    ],
+    "anchor_semantics": "rationale 须含 rationale_anchor_tokens 中至少 1 个 (逐字); 三路证据均在 input.context_materials 中。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "suspected_fixed 面在位且 verdict === true",
+      "rationale 含 rationale_anchor_tokens 至少 1 个 token (逐字匹配)",
+      "必填三键 provenance / created_at / context_key 在位 (仅形状校验, 不比对值)"
+    ],
+    "fail": [
+      "verdict === false / null (充分修复迹下漏报)",
+      "suspected_fixed 面被省略 (证据三路齐备, 不属「拿不准」语境)",
+      "rationale 未引用任何证据 token (空泛断言)",
+      "rationale 引用 input 材料中不存在的 spec 名 / PR 号 / SHA (编造证据)",
+      "以「跟进项 Aria#213 / Aria#214 仍 open」为由判 false (跟进是独立 issue, 不构成本条否证)"
+    ],
+    "miss": []
+  }
+}

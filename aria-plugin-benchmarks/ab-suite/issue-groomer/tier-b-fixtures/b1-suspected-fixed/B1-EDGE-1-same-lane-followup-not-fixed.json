@@ -1,0 +1,78 @@
+{
+  "case_id": "B1-EDGE-1",
+  "behavior": "suspected_fixed",
+  "behavior_label": "疑似已修可关单",
+  "polarity": "edge",
+  "source_annotation": "issue 记录与 body_head 逐字取自真语料 (Aria#213: 条目取 issues-open-full-18repos-2026-10-18.json; body_head 取 issues-sample-body-comments-2026-10-18.json, 该快照存 head 截断形态, body_len=1283, comments=0)。context_materials 为 2026-10-19 冻结摘录, 全真实。干扰结构: 同车道已 ship 证据 (归档 spec / PR) 与显式「跟进 open」标记并存 — 考核判断能否区分「车道机制已交付」与「本条诉求未做」。",
+  "input": {
+    "issues": [
+      {
+        "repo": "Aria",
+        "number": 213,
+        "title": "[benchmark] 41 个 skill 没有 trigger 套件 — 场景 4b 成为 Rule #6 义务后, 它们的下一次 description 变动会被挡住",
+        "labels": [],
+        "created": "2026-09-17",
+        "updated": "2026-09-17",
+        "body_head": "## 背景\n\nSpec `rule6-description-change-trigger-eval-lane` (`10CG/Aria#211`) 把**场景 4b「description 地板守卫」**写成 Rule #6 的义务 (standards `conventions/skill-benchmark-exemption.md` §2, Version 1.1.0)。场景 4b 需要每",
+        "body_len": 1283,
+        "comments_count_field": 0
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "openspec_archive_search",
+        "frozen_at": "2026-10-19",
+        "query": "archive 目录名含 rule6 / description / trigger",
+        "matches": [
+          "openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/"
+        ],
+        "note": "诱导面: 本 issue body 自己引用的同车道 spec 已归档 (车道机制已交付)。"
+      },
+      {
+        "kind": "status_doc_excerpt",
+        "ref": "CLAUDE.md 项目状态段",
+        "frozen_at": "2026-10-19",
+        "excerpt": "Rule #6 description 维度: 场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 + standards 940cb5b / SOT 1.1.0); 跟进 Aria#213 · Aria#214 · aria-plugin#200",
+        "note": "显式标记: Aria#213 列于「跟进」= 已知未完成的后续项, 与已 ship 的车道交付并存。"
+      },
+      {
+        "kind": "suite_listing_check",
+        "ref": "aria-plugin-benchmarks/ab-suite/",
+        "frozen_at": "2026-10-19",
+        "query": "ls ab-suite/ | grep -c trigger",
+        "result": 0,
+        "note": "本 issue 诉求 (为 41 个 skill 建 trigger 套件) 的产物目录 trigger/ 不存在 — 诉求本体未做。在制 spec issue-groomer-p1-mvp 的 proposal 亦记载「现状 ab-suite/trigger/ 0 套件 (实测, 锚 #213)」。"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_key": "Aria#213",
+    "assessment_entry_exemplar": {
+      "suspected_fixed": {
+        "verdict": false,
+        "rationale": "同车道 spec 2026-09-17-rule6-description-change-trigger-eval-lane 已归档交付的是「场景 4b 义务 + 评测车道机制」; 本条诉求 = 为 41 个 skill 回填 trigger 套件, 该产物 (ab-suite/trigger/) 不存在, CLAUDE.md 状态行把 Aria#213 明确列为跟进未完成项。车道已 ship 不等于本条已修。"
+      },
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "rationale_anchor_tokens": [
+      "跟进",
+      "trigger"
+    ],
+    "anchor_semantics": "rationale 应体现区分: 车道机制已交付 (可提及归档 spec) 与本条诉求 (trigger 套件回填) 未做。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "verdict === false",
+      "rationale 体现「车道已 ship / 本条诉求未做」的区分 (含 rationale_anchor_tokens 至少 1 个, 或语义等价表述)"
+    ],
+    "fail": [
+      "verdict === true (把同车道相邻交付误当本条已修 — 本边界例的核心证伪方向)",
+      "rationale 引用 input 材料外的证据"
+    ],
+    "miss": [
+      "suspected_fixed 面被省略: 材料足以判定 (状态行显式列跟进 + 产物目录缺失), 省略记漏报 MISS, 不计 pass 也不计 fail; MISS 须按判读协议记录处置"
+    ]
+  }
+}
