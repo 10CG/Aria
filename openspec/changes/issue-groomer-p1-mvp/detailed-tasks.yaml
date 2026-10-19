@@ -1,8 +1,11 @@
 metadata:
   feature: issue-groomer-p1-mvp
-  datasource: "tasks.md (v3 + Phase 0 裁定 2026-10-18)"
+  datasource: "tasks.md (v3 + Phase 0 裁定 2026-10-18); detailed-tasks v2 (post_planning R1 REVISE 修订 2026-10-19)"
   spec_status: "Approved (owner 2026-10-18); post_spec R1-R4 CONVERGED/PASS"
-  total_tasks: 16
+  linked_issue: "10CG/Aria#238"
+  created: "2026-10-19"
+  total_tasks: 17
+  agents_summary: {backend-architect: 7, qa-engineer: 7, knowledge-manager: 3}
   execution_track: "interactive (SOT §2; 禁 Layer 2 自主轨)"
   phase0_rulings: "proposal §0 六项已裁: ①项目级 labels.yaml 优先+内置 fallback (覆盖非合并) / ②schema=scripts/groom-report.schema.json / ③provenance 分层采集 / ④两文件各自 last-writer-wins (assessment 独立文件; 并发态转正) / ⑤#239#240 保持两张 / ⑥未解冻恒阻塞 fail-closed"
   deliverable_root: "aria/skills/issue-groomer/ (子模块; scripts/ 允许模块拆分, 契约面可及性不变)"
@@ -14,7 +17,7 @@ tasks:
     title: "forgejo 双端点全分页 fetch 层 (issue-list + comments)"
     status: pending
     complexity: M
-    dependencies: []
+    dependencies: ["TASK-009"]
     deliverables:
       - "aria/skills/issue-groomer/scripts/lib/fetch.py"
     agent: backend-architect
@@ -35,9 +38,9 @@ tasks:
     agent: backend-architect
     verification:
       - "裁定①: 项目级 .aria/labels.yaml 存在则整体覆盖默认层 (覆盖非合并); 缺省回落内置层"
-      - "SC-3: 逐信号 confidence (命中信号集枚举); 无显式信号 → category=unknown + 溯源空集 (负面 fixture)"
+      - "逐信号 confidence (命中信号集枚举); 无显式信号 → category=unknown + 溯源空集 (实现行为; fixture 面在 TASK-008)"
       - "staleness/活跃度判据支持时钟注入 seam (fixture 可注入 now)"
-      - "SC-9: taxonomy 一致性自检 (前缀表+分类键+label 名三层)"
+      - "SC-9 taxonomy 一致性自检实现面 (三层); fixture 反事实面在 TASK-008"
 
   - id: TASK-003
     parent: "1.1"
@@ -75,11 +78,13 @@ tasks:
     dependencies: ["TASK-004"]
     deliverables:
       - "aria/skills/issue-groomer/scripts/lib/incremental.py"
+      - "groom-assessments.json 键结构契约定义 (由本任务拥有; TASK-010 消费)"
     agent: backend-architect
     verification:
-      - "Tier A 复用 = 分类输出 + 判据输入快照; 时间敏感字段跨档触发重分类 (复用规则 fixture)"
-      - "Tier B provenance 门: provenance 变 ⇒ stale-assessment (provenance 门 fixture)"
-      - "裁定④: groom-state.json 单一固定路径原子写 (temp+rename); assessment 独立文件 groom-assessments.json; groom.py 重写状态保留非自有 assessment 键"
+      - "Tier A 复用 = 分类输出 + 判据输入快照; 时间敏感字段跨档触发重分类 (复用规则 fixture 在 TASK-008)"
+      - "Tier B provenance 门: provenance 变 ⇒ stale-assessment (provenance 门 fixture 在 TASK-008)"
+      - "裁定④ 判定形态: groom.py 全程不写 groom-assessments.json; 重写 groom-state.json 后 groom-assessments.json 内容不变 (fixture 断言)"
+      - "groom-state.json 单一固定路径原子写 (temp+rename)"
 
   - id: TASK-006
     parent: "1.2"
@@ -98,32 +103,35 @@ tasks:
     title: "10+1 态 fixture 矩阵 + 分量级 mandate fixtures"
     status: pending
     complexity: L
-    dependencies: ["TASK-005"]
+    dependencies: ["TASK-005", "TASK-002"]
     deliverables:
       - "aria/skills/issue-groomer/tests/test_state_matrix.py"
     agent: qa-engineer
     verification:
       - "SC-1: DEC 裁定-9 十态 ①-⑩ 逐态反事实 (任一分量退化成常量 ⇒ 对应态必红) + 第 11 态并发 (两文件各自 last-writer-wins, 裁定④)"
       - "分量级 mandate: ③ 四分量独立变体 / ⑨ 两分量变体 / ⑩ comment-edit 判别 (合成 updated_at>created_at 样本, 区分 max(updated_at) vs max(created_at)/count 错误代理)"
+      - "fixture 形态取自 TASK-009 语料 (裁定-7 防形态脱节)"
 
   - id: TASK-008
     parent: "1.3"
-    title: "SC-2/4/5/9 fixtures + 反假绿全家桶"
+    title: "SC-2/3/4/5/9 fixtures + 反假绿全家桶"
     status: pending
     complexity: L
-    dependencies: ["TASK-001", "TASK-006"]
+    dependencies: ["TASK-001", "TASK-006", "TASK-002", "TASK-009"]
     deliverables:
       - "aria/skills/issue-groomer/tests/test_fetch_and_diff.py"
     agent: qa-engineer
     verification:
       - "SC-2: 双端点多页 mock + 终止条件 + >50-comment 截断反例"
+      - "SC-3: 负面 fixture (unknown 不猜) + **每分类判据 (title 前缀/label/staleness 档/活跃度) 各设独立反事实 fixture — 单判据退化 ⇒ 对应分类判定必红**"
       - "SC-4: baseline/top-N/三态/复用规则/provenance 门五类 fixture"
-      - "SC-5: apply_payload = suggested−existing 差集 (harness 无关断言); 幂等 fixture (mock 不编码 no-op)"
-      - "负面 fixture: unknown 不猜 (SC-3 面)"
+      - "SC-5: apply_payload = suggested−existing 差集 (harness 无关断言); 幂等 fixture (mock 不编码 no-op — 前提记录来自 TASK-009 live 实测)"
+      - "SC-9: taxonomy 三层 (前缀表/分类键/label 名) 各注错一份 ⇒ 自检必红"
+      - "fixture 形态取自 TASK-009 语料 (裁定-7 防形态脱节)"
 
   - id: TASK-009
     parent: "1.3"
-    title: "语料接入 + no-op live 实测 + 再生成命令"
+    title: "语料接入 + no-op live 实测 + 再生成命令 (Phase 1 前置)"
     status: pending
     complexity: M
     dependencies: []
@@ -133,9 +141,24 @@ tasks:
       - "aria/skills/issue-groomer/references/forgejo-behavior-notes.md (no-op 实测记录)"
     agent: qa-engineer
     verification:
-      - "三份语料 fixture 加载 (scratchpad 三路径; 不复制入库)"
-      - "Phase 1 前对 10cg.local live 实测 duplicate label add 一次, 结果落 references (语料含 Aether/SilkNode 跨仓形态)"
+      - "三份语料 fixture 加载 (scratchpad 三路径; 不复制入库; 含 Aether/SilkNode 跨仓形态)"
+      - "live 实测 duplicate label add 一次 (10cg.local), 结果落 references — 时序前置于编码 (dependencies 已入图: TASK-001/008 依赖本任务)"
       - "再生成命令可重取语料 (live API)"
+
+  - id: TASK-017
+    parent: "1.1"
+    title: "groom.py CLI 主入口组装 (编排 + 报告组装 + apply_payload 实现面)"
+    status: pending
+    complexity: M
+    dependencies: ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005", "TASK-006"]
+    deliverables:
+      - "aria/skills/issue-groomer/scripts/groom.py"
+    agent: backend-architect
+    verification:
+      - "CLI 全链路 smoke: fetch (mock) → tier_a → fingerprint → incremental → diffseg → groom-report 产出经 schema 校验通过"
+      - "SC-5 实现面: apply_payload 差集 + idempotent 字段计算在此组装"
+      - "harness 自报参数落 provenance 面 (裁定③ 第一层)"
+      - "两文件写回与裁定④ 一致 (state 原子写 / 不触 assessment 文件)"
 
   # ─── Phase 2: 适配层 ───
   - id: TASK-010
@@ -143,12 +166,12 @@ tasks:
     title: "SKILL.md CC 适配层 (Tier B 语义评估流程 + 渲染层)"
     status: pending
     complexity: M
-    dependencies: ["TASK-003"]
+    dependencies: ["TASK-003", "TASK-005", "TASK-017"]
     deliverables:
       - "aria/skills/issue-groomer/SKILL.md"
     agent: knowledge-manager
     verification:
-      - "Tier B 语义评估流程 (疑似已修/优先级 vs 在制轨/owner 决策面) 产 assessment 面带 provenance; 写回 groom-assessments.json (model id 补全)"
+      - "Tier B 语义评估流程 (疑似已修/优先级 vs 在制轨/owner 决策面) 产 assessment 面带 provenance; 写回 groom-assessments.json (键结构按 TASK-005 契约; model id 补全)"
       - "MD 渲染层 (分类汇总/优先级分档/决策面/diff 段)"
       - "多 harness 诚实主张声明 (可移植=事实面+Tier A) + 双源同步义务预告 (裁定-13) + schema/references 指针"
 
@@ -171,15 +194,15 @@ tasks:
     title: "Rule #6 执行 (场景 1 AB + 4b 处置 + rule6_note 四条成文)"
     status: pending
     complexity: L
-    dependencies: ["TASK-010", "TASK-011"]
+    dependencies: ["TASK-010", "TASK-011", "TASK-007", "TASK-008"]
     deliverables:
-      - "ab-results/2026-MM-DD-issue-groomer-rule6/ (场景 1 AB 记录)"
+      - "aria-plugin-benchmarks/ab-results/2026-MM-DD-issue-groomer-rule6/ (场景 1 AB 记录)"
       - "rule6_note (五字段 × 四变更面, SOT §4.1 格式)"
     agent: qa-engineer
     verification:
       - "SC-6①: 场景 1 AB 照跑且 pass"
       - "SC-6②: #239 解冻状态核查 — 未解冻 ⇒ 恒阻塞记录 (裁定⑥); 解冻 ⇒ 4b 照跑且 pass"
-      - "SC-6④: rule6_note 五字段 (含 negctrl) × 四条成文且合规"
+      - "SC-6④: rule6_note 五字段 (含 negctrl) × 四条成文且合规 (第一行 substitute 的成文证据 = TASK-007/008 结构化测试存在且 pass — 依赖已入图)"
 
   - id: TASK-013
     parent: "3.2"
@@ -197,15 +220,16 @@ tasks:
   # ─── Phase 4: Dogfood、Ship 与收尾 ───
   - id: TASK-014
     parent: "4.1"
-    title: "dogfood: Aria 仓实跑 (全量对账 + 手工梳理差异归因)"
+    title: "dogfood: Aria 仓实跑 (全量对账 + 分类比对 + 手工梳理差异归因)"
     status: pending
     complexity: M
-    dependencies: ["TASK-008", "TASK-010"]
+    dependencies: ["TASK-008", "TASK-010", "TASK-002", "TASK-017"]
     deliverables:
-      - "dogfood 报告 (fetch 计数 vs 快照对账 + 与 2026-10-18 手工梳理差异逐条归因清单)"
+      - "aria/skills/issue-groomer/references/dogfood-aria.md"
     agent: qa-engineer
     verification:
-      - "SC-7: 全量条数对账 (378/150 计数一致) + 差异逐条归因 (供 owner/下轮审计复核)"
+      - "SC-7 (Aria 系作用域, 裁定-2): fetch 计数 = 150 快照对账 — 计数差经差异归因清单逐条吸收后判绿 (不硬钉死执行日 live 数)"
+      - "Tier A 分类输出 vs 2026-10-18 手工梳理分类逐条比对 + 差异逐条归因清单 (供 owner/下轮审计复核)"
 
   - id: TASK-015
     parent: "4.1"
@@ -214,21 +238,24 @@ tasks:
     complexity: S
     dependencies: ["TASK-014"]
     deliverables:
-      - "外项目试点记录 (≥1 仓实跑)"
-    agent: backend-architect
+      - "aria/skills/issue-groomer/references/dogfood-external.md"
+    agent: qa-engineer
     verification:
-      - "SC-7: ≥1 外项目实跑通过 (跨仓配置形态验证)"
+      - "SC-7: ≥1 外项目实跑 — 外仓 issue 计数 vs 直查 API 对账一致"
+      - "裁定① 实证: 项目级 .aria/labels.yaml 存在时默认层被整体覆盖 (行为断言)"
+      - "裁定-2 实证: 卫星仓扫描范围与配置一致"
 
   - id: TASK-016
     parent: "4.2"
     title: "ship + 归档 + 关单 + handoff"
     status: pending
     complexity: M
-    dependencies: ["TASK-013", "TASK-014", "TASK-015"]
+    dependencies: ["TASK-013", "TASK-014", "TASK-015", "TASK-007", "TASK-009", "TASK-017"]
     deliverables:
       - "dual-push ship / openspec 归档 / #238 关单 / handoff"
     agent: knowledge-manager
     verification:
-      - "4.2 前置全满足: 4.1 通过 + task 3.1/2.2 完成 + SC-6 四 facet 全绿 (⑥=未解冻恒阻塞, 无逐案放行)"
+      - "4.2 前置全满足: 4.1 通过 + task 3.1/2.2 完成 + SC-6 四 facet 全绿 — **⑥ 判读钉死: 未解冻分支下 facet② 绿 = TASK-012 恒阻塞记录在案; ship 整体仍由 ⑥ 恒阻塞 (fail-closed, 无逐案放行)**"
+      - "SC-1 (经 TASK-007) 与 SC-5 live 半边 (经 TASK-009) 在 ship 闭包内 (依赖已入图)"
       - "#239 恒随解冻状态 (未解冻不关); #240 随 Tier B fixture 完成关"
       - "Rule #8 pre-merge gate + 双推 ls-remote 核验 + 归档台账"
