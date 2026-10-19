@@ -1,0 +1,26 @@
+# rule6_note (SOT §4.1 五字段 × 四变更面) — issue-groomer v1.77.0 候选
+# 终态待 4b owner 裁定后定稿; 本草稿场景4b = fail + 升级记录
+
+- decision_table_row: 判据表第二行 (SKILL.md 适配层指令逻辑)
+  description_changed: true
+  scenario1: "PASS — ab-results/2026-10-19-issue-groomer-rule6/RESULT.md (with_skill 26/26 全绿, without 21/26, delta +5; 污染面如实申报, delta 保守下界)"
+  scenario4b: "fail — ab-results/2026-10-19-issue-groomer-trigger/ (被评臂 should-trigger query 门 4/10 [门=10/10], 地板 13/30 [≥28], should-not 误触 3/10 [≤5 ✓]; 逐调用健康检查 verdict=fail [3 不健康调用双极端下门判定不变, 非 void]; 负控臂结果见目录)。根因定性: glm-5.3 via Luxeno 随机 narrate-不发 tool_use (同查询 3 run 内 0-3 触发不等, 总体 per-run 43%), description 语义匹配面无恙 (narrate 文本逐字声明将调用本技能) — #214 已知缺口(6)「4b 仅 Claude 模型实测, GLM 未验证」实证坐实; 本环境 claude CLI 全部别名路由 GLM, 无真 Claude 通道。处置: SOT fail 二选一均不适配 (非 description 匹配问题 / 非有意收窄拓宽) ⇒ 升级 owner (Rule #10)。"
+  negctrl: "见 trigger/ 目录 (运行完成后回填)"
+
+- decision_table_row: 判据表第一行 (groom.py 纯代码)
+  description_changed: false
+  scenario1: substitute (SC 级结构化测试替代): 525 tests + 57 subtests 全绿 (63b7772; 11态矩阵/分量级 mandate/每判据反事实/mutation 34 处全灭)
+  scenario4b: n/a (description 未变; 本面非 4b 对象)
+  negctrl: n/a
+
+- decision_table_row: 判据表第二行 (description 面 — 与上面指令面同 SKILL.md, 场景1 已由行为面覆盖, 4b 为本面专务)
+  description_changed: true
+  scenario1: 同上 (行为套件含触发边界 evals 1/2)
+  scenario4b: fail (同上, 4b 专测本面)
+  negctrl: 同上
+
+- decision_table_row: 判据表第三行 (Tier B 语义行为 prose)
+  description_changed: false
+  scenario1: 定向 fixture 就位: ab-suite/issue-groomer/tier-b-fixtures/ 7 用例 (TASK-011, f3555f9); 判读协议 = 独立评估席, pass/fail/miss 三档
+  scenario4b: n/a
+  negctrl: n/a

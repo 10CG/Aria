@@ -20,7 +20,9 @@
 
 - 被评臂: 真 description (SKILL.md @ 8b1e920); 负控臂: 「对一个事项做处理。」(SOT 泛化句构造, 基线 v5 实测 0/10 形态)
 - 参数 (SOT 钉死): runs-per-query 3 / threshold 0.5 / timeout 120 / workers 1 / model glm-5.3 (本 session 模型; CLI 静态表外警告为环境已知形态, 调用 exit 0) / claude-shim + --setting-sources project / 独立 project root (v2 形态)
-- 结果: 见 trigger/ 目录 (运行完成后回填)
+- **结果: 被评臂 FAIL** (should-trigger query 门 4/10 [门=10/10], 地板 13/30 [≥28], should-not 误触 3/10 [≤5 ✓]); 逐调用健康检查 verdict=**fail** (3 不健康调用, 门判定双极端不变, 非 void); **负控臂 valid** (误命中 1/10 ≤5 ✓, 套件区分力成立 — 泛化句几乎不触发, 真 description 部分触发)
+- 根因定性: **glm-5.3 via Luxeno 随机 narrate-不发 tool_use** (失败 run 流内仅 thinking+text「我先调用…技能」后结束, 零 tool_use 块; 同查询 3 run 触发 0-3 不等, per-run 总体 43%) — description 语义匹配无恙; **#214 已知缺口(6) 实证坐实** (4b 此前仅 Claude 模型实测; 本环境 claude CLI 全别名路由 GLM, 无真 Claude 通道, opus/fable 探针 stderr 均显示 luxeno-an,glm-5.3)
+- 处置: SOT fail 二选一 (修 description / 改套件) 均不适配根因 ⇒ **升级 owner** (Rule #10; AI 不得自行豁免)
 - 套件审阅: owner 2026-10-19 裁决 a (基于 AI 建议 + owner 确认; description 补只读边界句使 #16 在触发面诚实可判) — **首个入库 trigger 套件, #213 T4 解冻先例**
 
 ## 判据表第一行 substitute (groom.py 纯代码)
@@ -33,4 +35,4 @@
 
 ## rule6_note (SOT §4.1 五字段 × 四变更面, 成文待 4b 完成后终填)
 
-(占位 — 4b 门结果出来后四条全填)
+(草稿 rule6_note-draft.yaml; 终态待 owner 裁定)
