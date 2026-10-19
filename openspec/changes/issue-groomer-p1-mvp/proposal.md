@@ -115,3 +115,11 @@ rule6_note 成文形式 (task 3.1): 按 SOT §4.1 **五字段逐变更面成条 
 ## Validation Note
 
 `openspec validate issue-groomer-p1-mvp --strict` (2026-10-18, CLI 本机已装 `~/.local/bin/openspec`) 报: 缺 `specs/` delta 目录 (## ADDED Requirements + Scenario 块)。**处置**: 与近期全部归档先例同形态 (pre-merge-completeness-gate / rule6-description-change / handoff-multibranch 等均无 specs/); openspec CLI 统一口径 (是否应装/归档目录兼容/版本钉法) 是 Aria#212 owner 待裁项 — 本 Spec 不单方面引入 delta 格式, 遵循现行房规, 待 #212 裁定后全仓统一。
+
+## Runtime Amendment (mid_post_spec, append-only, 2026-10-19 B.2 实施期发现)
+
+> Phase B 实施期 (TASK-009) 实测发现 spec 陈述与运行实际不符, 按 Aria #79 mid_post_spec 机制 append-only 修订 (advisory, 不回改正文, 采纳后以本节为准):
+
+1. **comments 端点分页前提修正**: §1 原文「comments 端点默认按创建序返回 (首页 = 最旧 50 条)…>50-comment issue 的最新评论结构性不可见」在本 Forgejo 实例 (11.0.16+gitea-1.22.0) **不成立** — 实测 (TASK-009 三组实验 + 主 loop 独立复验): comments 端点**忽略 limit/page 参数, 恒全量返回** (升序最旧在前; 越界页回吐同页非空)。**修正后的 fetch 契约**: comments 取回不做分页游走, 单次全量响应 + 用 issue 的 `comments` 计数字段对账, `collected ≠ count ⇒ fail-closed` 报错; SC-2 的「>50-comment 截断反例」fixture 真实形态 = **服务端忽略分页参数** (mock 层钉此形态)。
+2. **no-op 前提落定 (SC-5 附注)**: live 实测 duplicate label add = 彻底 no-op (2xx + 无 updated_at 变化); fresh add 会 bump `updated_at` ⇒ `add = suggested−existing` 差集保留的实证理由 = **写放大最小化** (非 API 幂等的必要条件)。mock 不编码 no-op 纪律不变。记录: `references/forgejo-behavior-notes.md` (版本钉死)。
+3. **残留披露**: 探测动作使 #238 `updated_at` 前移 (title/body/labels/comments 零变化 — 非指纹分量)。
