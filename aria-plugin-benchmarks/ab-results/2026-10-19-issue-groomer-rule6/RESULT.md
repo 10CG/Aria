@@ -22,7 +22,8 @@
 - 参数 (SOT 钉死): runs-per-query 3 / threshold 0.5 / timeout 120 / workers 1 / model glm-5.3 (本 session 模型; CLI 静态表外警告为环境已知形态, 调用 exit 0) / claude-shim + --setting-sources project / 独立 project root (v2 形态)
 - **结果: 被评臂 FAIL** (should-trigger query 门 4/10 [门=10/10], 地板 13/30 [≥28], should-not 误触 3/10 [≤5 ✓]); 逐调用健康检查 verdict=**fail** (3 不健康调用, 门判定双极端不变, 非 void); **负控臂 valid** (误命中 1/10 ≤5 ✓, 套件区分力成立 — 泛化句几乎不触发, 真 description 部分触发)
 - 根因定性: **glm-5.3 via Luxeno 随机 narrate-不发 tool_use** (失败 run 流内仅 thinking+text「我先调用…技能」后结束, 零 tool_use 块; 同查询 3 run 触发 0-3 不等, per-run 总体 43%) — description 语义匹配无恙; **#214 已知缺口(6) 实证坐实** (4b 此前仅 Claude 模型实测; 本环境 claude CLI 全别名路由 GLM, 无真 Claude 通道, opus/fable 探针 stderr 均显示 luxeno-an,glm-5.3)
-- 处置: SOT fail 二选一 (修 description / 改套件) 均不适配根因 ⇒ **升级 owner** (Rule #10; AI 不得自行豁免)
+- 处置: SOT fail 二选一 (修 description / 改套件) 均不适配根因 ⇒ 升级 owner (Rule #10)
+- **owner 裁定 (2026-10-19)**: 该现象其他场景亦遇到 ⇒ **先反馈 SilkNode 找实际根因, 再回来推进** — 已开 **10CG/SilkNode#1270** (60 调用实证 + 全量流日志 + 复读退化样本); v1.77.0 ship 暂缓至根因回填
 - 套件审阅: owner 2026-10-19 裁决 a (基于 AI 建议 + owner 确认; description 补只读边界句使 #16 在触发面诚实可判) — **首个入库 trigger 套件, #213 T4 解冻先例**
 
 ## 判据表第一行 substitute (groom.py 纯代码)
