@@ -1,0 +1,22 @@
+[
+  {"query": "帮我把三个卫星仓的 open issue 梳理一下: aria、standards、aria-orchestrator 都过一遍, 分好类排个序, 出一份汇总给我", "should_trigger": true},
+  {"query": "每周例行的 backlog grooming 又到点了, 上次已经跑过一轮, 这次增量来: 重点看新增的和状态有变的, 汇总表还是要全量的", "should_trigger": true},
+  {"query": "Run a backlog grooming pass across the satellite repos — pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close", "should_trigger": true},
+  {"query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的", "should_trigger": true},
+  {"query": "open issue 快一百条了, 按轻重缓急给我排个队, 跟在制的 spec 逐条对一遍, 已被覆盖的单独标出来", "should_trigger": true},
+  {"query": "Forgejo 里攒了两百多条工单, 好多八成代码早就改完了单子还挂着, 全面过一遍把能收的挑出来列给我, 先别真去动它们", "should_trigger": true},
+  {"query": "下周要跟 owner 对方向, 把各卫星仓的 open issue 汇成一张总表, 需要他拍板的那类单独抽一栏", "should_trigger": true},
+  {"query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底", "should_trigger": true},
+  {"query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍", "should_trigger": true},
+  {"query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单", "should_trigger": true},
+  {"query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复", "should_trigger": false},
+  {"query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce", "should_trigger": false},
+  {"query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段", "should_trigger": false},
+  {"query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage", "should_trigger": false},
+  {"query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签", "should_trigger": false},
+  {"query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给", "should_trigger": false},
+  {"query": "openspec/changes/ 下面三个 status=done 的 spec 该收了, 归档到 openspec/archive/ 并做落点校验", "should_trigger": false},
+  {"query": "scratchpad/ 目录太乱了, 帮我整理一下: 按月份建子目录归置, 超过一个月没动的挪进 archive/", "should_trigger": false},
+  {"query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件", "should_trigger": false},
+  {"query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候", "should_trigger": false}
+]
