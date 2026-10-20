@@ -1,7 +1,7 @@
 # secret-guard 时间预算 fail-closed + W10/W9 成本收敛（收口 #216）
 
 > **Level**: 2（proposal only）
-> **Status**: **Approved（方向）** — owner 2026-10-16「先按你推荐的来」：机制 **c1（纯 bash `SECONDS`）+ N=3s + 版本 PATCH + C 作兜底 / B 降误拦**。进 B.1 实现（实现仍走执笔席 + 主控独立复核）。
+> **Status**: **Implemented & Archived** — 发布 v1.76.1 (2026-10-20, aria 59e333c + tag; 主仓 878f8d9); #216 已关闭; B（成本收敛）+ built-in 首遍 raw 命令超时缺口 → follow-up #228。原方向裁定: Approved（方向）— owner 2026-10-16「先按你推荐的来」：机制 **c1（纯 bash `SECONDS`）+ N=3s + 版本 PATCH + C 作兜底 / B 降误拦**。进 B.1 实现（实现仍走执笔席 + 主控独立复核）。
 > **Linked Issue**: `10CG/aria-plugin#216`（hook 5s 超时后 fail-open）；放大场景 `10CG/aria-plugin#219`（Windows/MINGW64）；关联 `10CG/aria-plugin#203`（变量间接 partial）、`10CG/aria-plugin#154`（报告环境即 MINGW64）
 > **动机证据**: owner Windows 主力机实测（2026-10-15，记于 #219 comment 28759）：g-c tier 重命令（6.4 KB；16 赋值×400B + 128 引用）直跑 `secret-guard.sh` = **real 5.037s / user 4.668s（纯 CPU，非负载）**，恰越 5s。典型直接读取命令仅 0.47s（#154 核心不受影响）。
 
