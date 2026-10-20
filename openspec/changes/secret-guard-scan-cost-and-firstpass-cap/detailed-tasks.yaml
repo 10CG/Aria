@@ -1,0 +1,92 @@
+meta:
+  change: secret-guard-scan-cost-and-firstpass-cap
+  level: 2
+  linked_issue: "10CG/aria-plugin#228 (resolve); 上游 C = secret-guard-time-budget-failclosed v1.76.1; 关联 #216 #219 #203 #154"
+  owner_ruling: "2026-10-20「按你的设计来」: Part 2 = compute_credit 入口密钥形命中后尺寸 cap (fail-closed, 阈值 B 后实测定) + 首遍多段补点; B = vx_collect O(vars²) + compute_credit O(len²) 成本收敛; 二者互补合一个 change。姿态 (核心路径新设 fail-closed) 归 owner, 已拍板关洞。"
+  rule6_note: "改 aria/hooks/secret-guard.sh + 其测试 + 头注释 + CHANGELOG, 零 SKILL.md / 零 description / 零 references → 非 Skill 变更, 验证走 substitute (baseline-failing SC + 套件回归 + 直调探针 + 非作者对抗)。Part 2 的 BLOCKED 文案复用 M6 oversize (无新 AI 可见文本)。"
+  baseline_freeze: "aria v1.76.1 (master 59e333c); 行号、O(len²) 曲线、g-c 成本以此为准"
+
+tasks:
+  - id: TASK-001
+    parent: "B.1"
+    title: "入场 + 基线: 建分支, 重锚行号, 测 g-c / 首遍单段 O(len²) 基线曲线 (Linux [+Windows 若 owner 跑]), 审 risky_patterns 长输入回溯, 定 cap 阈值公式 + SC-B1 阈值"
+    status: pending
+    agent: main-loop
+    reason: "设计承重 + 基线测量 + 阈值公式, 主控亲做 (owner 把判断理由 delegating 给主控)"
+    deliverables: [".aria/notes 下的基线记录 (曲线 + cap 阈值推导 + risky_pattern 回溯审计表)"]
+    verification:
+      - "首遍单段 compute_credit 的 len→CPU 曲线记下 (≥3 点, 复核头注释 0.9/3/13s@8/16/32KB); 据此与 Windows 2.6× 推出「最慢平台 <~4s」对应的 cap 上限 (基线 ≈8KB)"
+      - "g-c tier (16×400B+128refs) 整进程 CPU 基线 (交错 min/5); SC-B1 的降幅阈值由此定 (目标 Linux ~1.8s→≲1.1s)"
+      - "risky_patterns 逐条在长输入 (如 32KB 单行) 上的耗时: 标出哪些回溯 (>线性), 决定 b2 是否需 bound/改写以保 for-pat 检测循环在 cap 检查前不超时"
+
+  - id: TASK-002
+    parent: "B.2-B"
+    title: "B 实现: 收敛 _sg_vx_collect O(vars²) 链式 (b1) + _sg_compute_credit O(len²) 常数/次平方 (b2) + SC-B1"
+    status: pending
+    agent: implementer
+    reason: "执笔席 (fix-writer-bottleneck: 换人执笔); 承重算法钉到字符级 (spec-underdetermination); 主控不亲写 hook 码。先于 Part 2 (TASK-003), 因 cap 阈值依赖 B 后的新曲线"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "b1: _sg_vx_collect 的 i×j 链式只展开实际被引用的变量 (或更紧上界), 砍无谓展开; 不改 _SGV_* 尺寸语义"
+      - "b2: _sg_compute_credit 单行只切一次行并复用 (现 ~20 次 _sg_line_match 各重切 <<<); 审 TASK-001 标出的回溯正则, 必要处改无回溯写法或短路; bash-3.2 兼容"
+      - "correctness-critical: 既有检出集合逐条不变 (非 refactor-drift); 每处改动问「它会不会改变某条命令的 allow/block 判定」"
+    verification:
+      - "SC-B1: g-c tier 整进程 CPU 较 v1.76.1 降 ≥ TASK-001 阈值 (交错 min/5); 慢平台外推 < C 时间预算 N"
+      - "SC-R 覆盖的检出集合不变 (见 TASK-004)"
+
+  - id: TASK-003
+    parent: "B.2-Part2"
+    title: "Part 2 实现: _sg_judge_one compute_credit 入口的密钥形命中后尺寸 cap (fail-closed) + built-in 首遍 _sg_core_eval per-segment 时间检查点 + SC-P1/P2/P3"
+    status: pending
+    agent: implementer
+    reason: "执笔席; cap 位置 (compute_credit 入口 vs 段入口) 是承重决定, 钉死"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "cap 放 _sg_judge_one 里 risky 命中之后、_sg_compute_credit 调用之前: 命中 + ${#seg} > cap → _sg_emit_blocked 复用 M6 oversize 文案 + return 2。cap 阈值取 TASK-001 推导值 (B 后曲线)"
+      - "关键不变量: 良性命令 (无 risky 命中) 永不触达 cap → 永不被此门拦 (SC-P2 守卫位置)"
+      - "首遍多段补点: _sg_core_eval 的 per-segment 循环加 _sg_over_budget 检查点 (复用 C 的 _SG_T0/_sg_over_budget; C 只在 _sg_vx_pass 第二遍设点), 关多段慢命令首遍缺口"
+      - "防御纵深: 若 TASK-001 发现 risky_pattern 回溯致 for-pat 检测循环本身可能在 cap 检查前超时, 依赖 TASK-002 b2 已 bound 之"
+    verification:
+      - "SC-P1 (baseline-failing, 判据=文案变体+耗时, 非 exit): 巨大单段+命中密钥形+>cap → 新版 compute_credit 前短路 oversize BLOCK (oversize 文案 + 耗时≪全扫); 基线走完 O(len²) 才 BLOCK (普通 risky 文案+全扫耗时)。两版 exit 同为 2 → exit 不作判据 (避恒绿)"
+      - "SC-P2 (防位置回归, 非 baseline-failing): 巨大单段+无密钥形+>cap → 不被 cap 拦 (exit 0); 坏实现 (cap 放段入口) 会拦它 → 红。证明 cap 在 compute_credit 入口非段入口"
+      - "SC-P3 (baseline-failing, 判据=exit 0→2): 无变量+良性但慢的多段命令(基线 ALLOW)+低预算 → 新版首遍 per-segment 检查点 fail-closed exit 2; 基线首遍无点→跑完→exit 0。须无变量以命中首遍非 C 的第二遍"
+
+  - id: TASK-004
+    parent: "B.2-review"
+    title: "回归 + 非作者对抗复核: SC-R (套件全绿 + SC-30 + W14 时档 + 检出集合逐条不变) + SC-32 (bash-3.2) + 坏实现对抗 (非作者构造)"
+    status: pending
+    agent: qa-engineer
+    reason: "adversarial-fixture: 坏态由非作者独立构造; 换新鲜眼睛。B 是 correctness-critical 改写, 检出回归是首要风险"
+    deliverables: [".aria/notes 对抗复核记录"]
+    verification:
+      - "既有 secret-guard.test.sh 全绿 (计数随新 SC 更新, 头计数断言同步); SC-30 + W14 时档全绿; C 的 SC-T 系列仍全绿 (时间预算未被 B/Part2 破坏)"
+      - "既有检出集合逐条不变: 对既有 BLOCK/ALLOW 语料逐条跑, B 前后 verdict 一致 (零检出 drift)"
+      - "坏实现转红: (a) cap 放段入口 (SC-P2 红) / (b) cap 放 compute_credit 之后 (SC-P1 红, 超时已发生) / (c) B 改动漏某条回溯正则致恶意大命令 for-pat 超时 / (d) B 改动改变某条检出 verdict; 坏态非作者构造"
+      - "bash-3.2.57 + 5.2 bash -n 过; C/POSIX + 第二 locale 一致; 若可 MINGW64 实测"
+
+  - id: TASK-005
+    parent: "B.2-accept"
+    title: "验收: 主控独立复跑探针/套件/时档 + SC 全绿 + 良性大命令放行 & 密钥形大命令拦 实证"
+    status: pending
+    agent: main-loop
+    reason: "不信执笔回执, 主控亲跑 (feedback: completion-signals ≠ runtime invocation)"
+    deliverables: [".aria/notes 验收记录 (含 red-proof: 基线 vs 本版对 SC-P1/P3 的 exit 差)"]
+    verification:
+      - "主控亲跑套件 + W14 时档 + SC-P/B 全绿; SC-B1 降幅达标"
+      - "实证双向: 良性 32KB 单段命令放行 (exit 0) + 同尺寸密钥形命令 BLOCK (exit 2); 多段慢命令首遍 fail-closed"
+
+  - id: TASK-006
+    parent: "release"
+    title: "发版 (PATCH) + #228 收口 + 头注释 :586 (O(len²)) 与 :582 (#216 措辞) 厘清"
+    status: pending
+    agent: main-loop
+    owner_gate: true
+    owner_gate_detail: "版本号、合并 master、打 tag、多远程双推均需 owner 授权; #228 关单披露 (Part 2 关洞实证 + B 降幅 + 误拦面双向申报); 子模块本地 merge 双推 + 逐 remote ls-remote 核验 + gitlink orphan 守卫"
+
+execution_order:
+  - [TASK-001]
+  - [TASK-002]
+  - [TASK-003]
+  - [TASK-004]
+  - [TASK-005]
+  - [TASK-006]
