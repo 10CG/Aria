@@ -51,7 +51,8 @@ tasks:
   - id: TASK-004
     parent: "B.2-review"
     title: "回归 + 非作者对抗复核: SC-R (822/816 套件 + SC-30 + W14 时档) + SC-32 (bash-3.2) + 坏实现对抗 (非作者构造)"
-    status: pending
+    status: done
+    notes: "2026-10-20 done (主控对抗复核): 套件 825/825 (真 checkout, 含 SC-30 SC-9a/SC-8) + W14 timing 20/20 有界档 + bash 3.2.57 过; 对抗发现并处置 4 项 (clock-freshness bug / per-checkpoint perf / 预算无上界→封顶 / built-in 首遍 raw 命令缺口→#228); red-proof SC-T 系列。注: 对抗由主控 (非 C 执笔者) 复核, 非另立 qa 席; 需额外保险可加新鲜眼睛一轮。"
     agent: qa-engineer
     reason: "adversarial-fixture: 坏态由非作者独立构造; 换新鲜眼睛"
     verification:
@@ -61,7 +62,8 @@ tasks:
   - id: TASK-005
     parent: "B.2-accept"
     title: "验收: 主控独立复跑探针/套件/时档 + SC 全绿 + 重命令 fail-closed 实证"
-    status: pending
+    status: done
+    notes: "2026-10-20 done: 记录 .aria/notes/2026-10-16-secret-guard-time-budget-failclosed/C-acceptance.md; 全绿 (825/825 + W14 20/20 + red-proof)。"
     agent: main-loop
     reason: "不信执笔回执, 主控亲跑"
     deliverables: [".aria/notes 验收记录"]
