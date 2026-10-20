@@ -1,0 +1,2 @@
+# E6 g-c tier (timing.py gc --pairs 3) | 2026-10-20T23:37:22Z | load 1.59, 1.03, 0.85 | hook 59e333c
+g-c 7210 B string, 16 assign(len 400), 128 refs CPU min base  1.865s target  1.820s ratio  0.98 | wall min base  1.878s target  1.831s | rc [('A', 2), ('B', 2)] live-calls=ok(_sg_vx_apply,_sg_vx_pass)

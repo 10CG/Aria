@@ -1,0 +1,6 @@
+# E4 bash-3.2.57 whole process (b1_curve.py --bash) | 2026-10-20T23:36:35Z | load 1.45, 0.91, 0.80 | hook 59e333c
+kind	shape	KB	bytes	cpu_min_s	wall_min_s	exit_codes	liveness
+floor	-	0	7	0.076	0.116	0	ok
+benign	C	2	2052	2.137	2.169	0	ok
+benign	C	4	4098	8.432	8.593	0	ok
+benign	C	8	8196	34.165	34.734	0	ok

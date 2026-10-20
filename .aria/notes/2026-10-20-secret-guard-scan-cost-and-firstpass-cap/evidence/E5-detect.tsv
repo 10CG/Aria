@@ -1,0 +1,9 @@
+# E5 detection loop (b1_detect.sh) | 2026-10-20T23:37:21Z | load 1.59, 1.03, 0.85 | hook 59e333c
+bash-3.2.57(2)-release	benign_C_08.txt	bytes=8196	detect_cpu=0.192+0.002s	hit=-
+bash-3.2.57(2)-release	benign_C_16.txt	bytes=16386	detect_cpu=0.286+0.001s	hit=-
+bash-3.2.57(2)-release	benign_C_32.txt	bytes=32772	detect_cpu=0.530+0.002s	hit=-
+bash-3.2.57(2)-release	secret_C_32.txt	bytes=32770	detect_cpu=0.131+0.004s	hit=28
+bash-5.2.15(1)-release	benign_C_08.txt	bytes=8196	detect_cpu=0.043+0.000s	hit=-
+bash-5.2.15(1)-release	benign_C_16.txt	bytes=16386	detect_cpu=0.069+0.001s	hit=-
+bash-5.2.15(1)-release	benign_C_32.txt	bytes=32772	detect_cpu=0.140+0.001s	hit=-
+bash-5.2.15(1)-release	secret_C_32.txt	bytes=32770	detect_cpu=0.022+0.000s	hit=28

@@ -1,0 +1,7 @@
+# E2 stage timing (b1_stage.sh), benign shape C | 2026-10-20T23:35:59Z | load 0.86, 0.75, 0.75 | hook 59e333c
+C.UTF-8	benign_C_04	bytes=4098	safe_to_split=412980us(rc0)	split_top=230719us(segs=1)	detect=24249us(hit=-)
+C.UTF-8	benign_C_08	bytes=8196	safe_to_split=1423776us(rc0)	split_top=800062us(segs=1)	detect=36515us(hit=-)
+C.UTF-8	benign_C_16	bytes=16386	safe_to_split=4990092us(rc0)	split_top=2890865us(segs=1)	detect=65028us(hit=-)
+C	benign_C_04	bytes=4098	safe_to_split=172069us(rc0)	split_top=97056us(segs=1)	detect=12995us(hit=-)
+C	benign_C_08	bytes=8196	safe_to_split=534002us(rc0)	split_top=278169us(segs=1)	detect=16733us(hit=-)
+C	benign_C_16	bytes=16386	safe_to_split=1716785us(rc0)	split_top=964250us(segs=1)	detect=29493us(hit=-)

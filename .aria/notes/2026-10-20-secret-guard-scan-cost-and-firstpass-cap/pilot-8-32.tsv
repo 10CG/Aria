@@ -1,0 +1,28 @@
+# pilot 2026-10-20T16:31:13Z load: 1.41, 2.24, 2.25
+kind	shape	KB	bytes	cpu_min_s	wall_min_s	exit_codes	liveness
+floor	-	0	7	0.090	0.218	0	ok
+secret	A	8	8198	2.874	2.925	2	ok
+secret	A	32	32774	0.079	40.001	TMO	TIMEOUT
+secret	B	8	8193	2.074	2.118	2	ok
+secret	B	32	32769	30.746	32.148	2	ok
+secret	C	8	8194	2.193	2.218	2	ok
+secret	C	32	32770	29.910	30.088	2	ok
+secret	D	8	8207	2.053	2.069	2	ok
+secret	D	32	32783	27.997	28.183	2	ok
+secret	E	8	8202	2.011	2.018	2	ok
+secret	E	32	32778	27.777	27.935	2	ok
+secret	F	8	8443	2.249	2.269	2	ok
+secret	F	32	32904	28.328	28.531	2	ok
+benign	A	8	8198	1.975	2.018	0	ok
+benign	A	32	32774	29.482	29.658	0	ok
+benign	B	8	8193	2.017	2.069	0	ok
+benign	B	32	32769	27.813	28.083	0	ok
+benign	C	8	8196	2.109	2.170	0	ok
+benign	C	32	32772	29.863	30.146	0	ok
+benign	D	8	8207	2.080	2.119	0	ok
+benign	D	32	32783	27.364	27.428	0	ok
+benign	E	8	8202	2.782	4.224	0	ok
+benign	E	32	32778	27.904	28.175	0	ok
+benign	F	8	8439	2.124	2.169	0	ok
+benign	F	32	32900	27.919	28.082	0	ok
+# end 2026-10-20T16:37:40Z load: 1.76, 1.95, 2.10

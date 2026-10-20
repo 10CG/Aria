@@ -1,0 +1,12 @@
+# E7 gate completeness (b1_gate_complete.sh) | 2026-10-20T23:41:44Z | load 1.45, 1.14, 0.93 | hook 59e333c
+form1  whole_hit=28  per_segment_hits=[28,-]
+form2  whole_hit=28  per_segment_hits=[-,28]
+form3  whole_hit=28  per_segment_hits=[-,28]
+form4  whole_hit=28  per_segment_hits=[-,28]
+form5  whole_hit=28  per_segment_hits=[28]
+form6  whole_hit=28  per_segment_hits=[28]
+form7  whole_hit=28  per_segment_hits=[28]
+form8  whole_hit=28  per_segment_hits=[-,28,-]
+form9  whole_hit=28  per_segment_hits=[28]
+form10 whole_hit=28  per_segment_hits=[-,28,-]
+form11 whole_hit=28  per_segment_hits=[-,28]

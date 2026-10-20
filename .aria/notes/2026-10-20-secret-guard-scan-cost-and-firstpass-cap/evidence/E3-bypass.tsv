@@ -1,0 +1,7 @@
+# E3 bypass (b1_curve.py), production default budget | 2026-10-20T23:36:14Z | load 0.96, 0.78, 0.76 | hook 59e333c
+kind	shape	KB	bytes	cpu_min_s	wall_min_s	exit_codes	liveness
+floor	-	0	7	0.061	0.064	0	ok
+secret	C	12	12292	4.610	4.680	2	ok
+secret	C	14	14338	6.210	6.279	2	ok
+secret	S	12	12292	4.429	4.475	2	ok
+secret	S	14	14338	5.983	6.033	2	ok
