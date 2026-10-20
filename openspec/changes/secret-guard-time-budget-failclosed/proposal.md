@@ -40,6 +40,7 @@ hook 自设一个**时间上界 N（< CC 的 5s）**；一旦自身昂贵扫描�
 - **不改** L3 `secret-scan`（PostToolUse，设计上 fail-open：工具已执行，拦无意义）。
 - **不改** 既有尺寸预算 `_SGV_*` 的语义（M6 保留）；时间维是**叠加**，不替换。
 - **不改** 既有 BLOCKED 文案归一化（除新增/复用「时限内无法扫描」一句）。
+- **built-in 首遍对巨大无变量 raw 命令的 O(copy²) 慢路径**：C 的时间检查点只在 W10 第二遍 + W9 扩展；built-in 首遍（`_sg_compute_credit` 对命令本身）无检查点，故一条巨大 raw 命令仍可能越 CC 5s → fail-open。这是**先于 WP-A 的旧慢路径**（非 #216 的 W10/W9 新能力），C 不覆盖、如实披露为已知限制，归 follow-up **#228**。
 
 ## Success Criteria（可证伪；baseline-failing 优先）
 
@@ -71,3 +72,4 @@ hook 自设一个**时间上界 N（< CC 的 5s）**；一旦自身昂贵扫描�
 3. **版本 = PATCH**（fail-open 修复，向下兼容）。
 4. **分工 = C 作兜底（永不 fail-open）+ B 把误拦降到罕见**（owner 选的 B+C）。
    —— 以上为「先按推荐」的起点裁定，实现中若实测推翻可带数据复议。
+5. **（2026-10-16）发布划分**：本 change **只发 C**（v1.75.1 PATCH，安全兜底、低风险、已验证）。**B（成本收敛）** 与复核发现的 **built-in 首遍 raw 命令超时缺口** → 另立 follow-up **10CG/aria-plugin#228**（同属 compute 成本域）；C 发布时如实披露该 built-in 边界为已知限制。

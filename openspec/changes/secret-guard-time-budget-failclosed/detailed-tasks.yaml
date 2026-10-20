@@ -39,7 +39,8 @@ tasks:
   - id: TASK-003
     parent: "B.2-B"
     title: "B 实现: 收敛 _sg_vx_collect O(vars²) 链式 + _sg_compute_credit O(copy²) + SC-B1"
-    status: pending
+    status: deferred
+    notes: "2026-10-16 owner 裁定「先发 C, B 另做」→ B 移出本 change, 连同复核发现的 built-in 首遍 raw 命令超时缺口归 follow-up 10CG/aria-plugin#228。本 change 发 C only (v1.75.1)。"
     agent: implementer
     reason: "执笔席; 承重算法, 钉到字符级 (spec-underdetermination)"
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
