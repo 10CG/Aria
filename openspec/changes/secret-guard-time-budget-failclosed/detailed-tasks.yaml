@@ -71,7 +71,8 @@ tasks:
   - id: TASK-006
     parent: "C-release"
     title: "发版 (PATCH) + #216 收口 + 头注释 :582 改「#216 已收口」"
-    status: pending
+    status: done
+    notes: "2026-10-20 发版 PASS (owner 授权; 因 #199 已发 v1.76.0, 版号由 v1.75.1 校正为 **v1.76.1** PATCH, owner 2026-10-20 确认)。aria master 59e333c + tag v1.76.1; 主仓 master 878f8d9 (16 版本点 1.76.0→1.76.1 + gitlink aria 59e333c; standards a611136 不变)。发版前两 master 陈旧 (aria +#199/v1.76.0, main +v1.76.0 同步+issue-groomer), 已对齐 origin 再本地 merge, C 与 #199 disjoint (secret-guard.sh 逐字节同), 无冲突。三仓 local/origin/github 三方 ls-remote 一致; aria tag 双远程; gitlink github 可达 (clone --recursive 安全); 4 版本一致性 check 全绿; INV-6 全 Refs-only; 子模块本地 merge 双推。#216 (W10/W9 超时悬崖) 已 closed (comment 29729) + 披露 Windows 实测; built-in 首遍缺口 + B 续 #228。Rule #10 流程判断 (请复议): pre-merge completeness gate = audit.checkpoints.pre_merge 配置 off → N/A (config-off 豁免, 非价值判断); C.2.4 CI 前置门 ci_backends=null 本地 merge 无 CI → skip_with_warning (Rule #8 成文降级)。遗留 trivial: secret-guard.sh 头注释 :582「#216 not touched」在 M6 语境内仍准 (M6 尺寸预算不碰超时; C 时间预算另碰, 见其 :594 注释块), 下次动 secret-guard.sh (#228 B) 时顺手厘清措辞。"
     agent: main-loop
     owner_gate: true
     owner_gate_detail: "版本号、合并 master、打 tag、多远程双推均需 owner 授权; #216 关单逐条披露 (含 Windows 实测前后对比)"
