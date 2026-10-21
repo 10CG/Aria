@@ -1,13 +1,13 @@
 [English](README.md) | [中文](README.zh.md) | **日本語** | [한국어](README.ko.md)
 
-<!-- translated-from: v1.76.1 -->
+<!-- translated-from: v1.77.0 -->
 
 # Aria
 
 > AIをソフトウェアプロジェクトの真のコラボレーターに
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/Plugin-v1.76.1-blue)](https://github.com/10CG/aria-plugin)
+[![Plugin Version](https://img.shields.io/badge/Plugin-v1.77.0-blue)](https://github.com/10CG/aria-plugin)
 
 ---
 
@@ -132,7 +132,7 @@ flowchart LR
 
 ## 得られるもの
 
-### Skills（ユーザー向け 35 + 内部 7 = 合計 42）
+### Skills（ユーザー向け 36 + 内部 7 = 合計 43）
 
 | カテゴリ | Skills | 目的 |
 |----------|--------|---------|
@@ -221,7 +221,7 @@ Aria/
 │   ├── openspec/               # 要件仕様フォーマット
 │   └── conventions/            # 慣習 (git commit など)
 ├── aria/                       # Aria Plugin (サブモジュール)
-│   ├── skills/                 # 42 Skills (ユーザー向け 35 + 内部 7)
+│   ├── skills/                 # 43 Skills (ユーザー向け 35 + 内部 7)
 │   ├── agents/                 # 11 Agents (STCO 記述 + capabilities 付き)
 │   └── .claude-plugin/         # プラグイン設定
 ├── aria-plugin-benchmarks/     # Skill ベンチマークスイート
@@ -241,7 +241,7 @@ Aria/
 
 ```
 Project Version:  1.7.5
-Plugin Version:   1.76.1 (aria-plugin, 42 Skills + 11 Agents)
+Plugin Version:   1.77.0 (aria-plugin, 43 Skills + 11 Agents)
 Maturity:         Core workflows verified + project adaptation
 PRD v2.0:        Approved (AI autonomous development)
 Research Focus:   Reproducibility of AI collaboration patterns
