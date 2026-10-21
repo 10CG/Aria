@@ -1,0 +1,12 @@
+# W7 the one real-traffic VMAX case (n=666, the only command D would have relaxed), structure only: booleans and counts, no text (2026-10-21T14:06:47Z)
+# regenerate: python3 -I traffic/dprobe.py $TRAFFIC_DIR/cmds/666.txt  (corpus restored by traffic/refreeze.py from W0)
+value_len=4594 kw=False heredoc_before_assignment=True heredocs=1 follow=other
+bare_name_elsewhere=True dollar_ref=False brace_ref=False
+  eval: 1
+  bang_indirect: 0
+  declare/typeset/local: 0
+  export: 0
+  source/dot: 0
+  set -a/allexport: 0
+  trap: 0
+  python/node: 1

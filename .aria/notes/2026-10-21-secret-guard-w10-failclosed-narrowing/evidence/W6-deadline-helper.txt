@@ -1,0 +1,21 @@
+# W6 pinned deadline helper x REAL judgement (2026-10-21T13:55:25Z), host Linux, taskset 0,1 nice 19; hook = aria v1.76.1 59e333c
+# regenerate, under each bash: <bash> traffic/deadline-probe.sh <hook> traffic/deadline-helper.sh ; env SECONDS=100000 <bash> traffic/deadline-probe.sh <hook> traffic/deadline-helper.sh envcase
+bash 5.2.15(1)-release
+  read k=5 (40 KB; judgement alone > 5 s), budget 3 -> killed: rc=3 wall=3.01s stderr_lines=0 first=[]
+  benign k=5 (no row hit), budget 3: rc=0 wall=0.19s stderr_lines=0 first=[]
+  read k=1 (8 KB; judged in time), budget 3 -> block text passed through: rc=2 wall=1.02s stderr_lines=27 first=[[secret-guard] BLOCKED: command reads a secret-bearing source without a]
+  read k=5, budget 0 -> no time left, nothing forked: rc=3 wall=0.00s stderr_lines=0 first=[]
+  read k=5, budget 3, sleep fails -> timer kills at once (fail-closed): rc=3 wall=0.00s stderr_lines=0 first=[]
+bash 5.2.15(1)-release
+  (started with SECONDS imported from the environment: SECONDS=100000 at probe start)
+  benign k=5 under an imported SECONDS, budget 3 (an absolute-SECONDS deadline would have left=-99997): rc=0 wall=0.15s stderr_lines=0 first=[]
+bash 3.2.57(2)-release
+  read k=5 (40 KB; judgement alone > 5 s), budget 3 -> killed: rc=3 wall=3.01s stderr_lines=0 first=[]
+  benign k=5 (no row hit), budget 3: rc=0 wall=0.64s stderr_lines=0 first=[]
+  read k=1 (8 KB; judged in time), budget 3 -> block text passed through: rc=2 wall=0.91s stderr_lines=27 first=[[secret-guard] BLOCKED: command reads a secret-bearing source without a]
+  read k=5, budget 0 -> no time left, nothing forked: rc=3 wall=0.01s stderr_lines=0 first=[]
+  read k=5, budget 3, sleep fails -> timer kills at once (fail-closed): rc=3 wall=0.01s stderr_lines=0 first=[]
+bash 3.2.57(2)-release
+  (started with SECONDS imported from the environment: SECONDS=100000 at probe start)
+  benign k=5 under an imported SECONDS, budget 3 (an absolute-SECONDS deadline would have left=-99997): rc=0 wall=0.77s stderr_lines=0 first=[]
+# not verified: Windows MINGW64, real macOS (BSD libc regex, /bin/sleep)
