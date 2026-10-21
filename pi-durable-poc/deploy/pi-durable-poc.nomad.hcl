@@ -47,7 +47,10 @@ job "pi-durable-poc" {
         POC_INTERVAL_MS = "45000"
         CHUNK_MS        = "3000"
         POC_CHUNKS      = "3"
-        DATA_DIR        = "/data"
+        # NOMAD_ALLOC_DIR 是宿主盘上 Nomad 托管的 alloc 目录 (docker 可写层之外):
+        # 同 alloc 内容器重启保留; 写容器内路径 (如 /data) 则每次重启冷启动 —
+        # 集群演练实测发现 (README 已知锐边 #6)。
+        DATA_DIR        = "${NOMAD_ALLOC_DIR}/data"
         TZ              = "UTC"
       }
 
