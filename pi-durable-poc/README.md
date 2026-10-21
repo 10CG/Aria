@@ -33,12 +33,12 @@ wait ──sleep(nextAt)──▶ gather (3 chunks, 每块 work + memo 提交) �
 
 | # | 判据 | 本地(进程级 kill -9) | 集群(docker kill) |
 |---|------|----------------------|-------------------|
-| A1 | 镜像经 aether-build-container 构建, digest 钉进 HCL | — | 待测 |
-| A2 | job 跑通 ≥1 完整 cycle (gather→report 日志) | ✅ 2026-10-21 | 待测 |
-| A3 | gather 中途 SIGKILL → 重启后已完成 chunk `MEMO-HIT skip` 且值与崩溃前逐字同, cycle 补完 | ✅ (run2 首行 MEMO-HIT, value 与 run1 chunk1 相同) | 待测 |
-| A4 | wait 中途 SIGKILL → 重启后续睡, 醒在原 deadline (±1s), 不提前 | ✅ (醒在 deadline+26ms) | 待测 |
-| A5 | 重启后 `live-tasks=1 (resume)`, 不重复建 task | ✅ | 待测 |
-| A6 | build 后 push 凭据 var 无残留 (`/v1/vars?prefix=nomad/jobs/build-container-`) | — | 待测 |
+| A1 | 镜像经 aether-build-container 构建, digest 钉进 HCL | — | ✅ sha256:e9d790c4…, 48s, build 6982ebb |
+| A2 | job 跑通 ≥1 完整 cycle (gather→report 日志) | ✅ 2026-10-21 | ✅ 17:17 cycle 0 完整 |
+| A3 | gather 中途 SIGKILL → 重启后已完成 chunk `MEMO-HIT skip` 且值与崩溃前逐字同, cycle 补完 | ✅ (run2 首行 MEMO-HIT, value 与 run1 chunk1 相同) | ✅ 17:27:36 kill → 17:27:43 resume, chunk1 MEMO-HIT (value=…3654 逐字同), 2/3 补算, report 复用旧值 |
+| A4 | wait 中途 SIGKILL → 重启后续睡, 醒在原 deadline (±1s), 不提前 | ✅ (醒在 deadline+26ms) | ✅ 17:27:02 kill → resume 续睡 remaining 22.0s, 醒在 deadline+14ms |
+| A5 | 重启后 `live-tasks=1 (resume)`, 不重复建 task | ✅ | ✅ 两次重启均 `live-tasks=1 (resume: ready)` |
+| A6 | build 后 push 凭据 var 无残留 (`/v1/vars?prefix=nomad/jobs/build-container-`) | — | ✅ 0 残留 (trap finally purge) |
 
 ## 演练方法 (集群)
 
@@ -61,6 +61,17 @@ ssh root@192.168.69.81 "docker ps --filter name=pi-durable --format '{{.ID}}' | 
    响应 `runtime.signal` 提前退出。
 5. **memo 是 at-least-once 语义** — work 完成到 memo 提交之间 crash, 重启重做该块。
    有外部副作用的块需要自带幂等键。
+6. **容器内任意路径 ≠ 持久存储** — 集群演练实测: storage 写容器可写层 (`/data`) 时,
+   Nomad 容器重启 = 冷启动 (live-tasks=0, cycle 归零)。必须指 `NOMAD_ALLOC_DIR` 下的
+   路径 (宿主盘, 同 alloc 重启保留)。reschedule 到别的节点仍会丢 — 单 owner 模型的
+   已知边界, 继任架构上 Postgres/Redis backend 才能根除。
+
+## 结论 (2026-10-21 集群演练后)
+
+耐久语义三承诺 (checkpoint 续跑 / durable timer / task 身份稳定) 在 Nomad docker
+task + SIGKILL 下全部成立, 判据 A1-A6 全绿。生产化前要消化: 锐边 1/2 (静默 fault)、
+锐边 4 (graceful stop 语义)、锐边 6 的 reschedule 边界。**验证的是耐久执行模型,
+不是 cost-sentinel 的业务逻辑** — 真实接入 (Forgejo API 用量采集) 是下一步评估。
 
 ## 布局
 
