@@ -1,0 +1,22 @@
+# 2026-10-21T02:07:29+00:00 load=1.35 2.22 2.45 LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+v2         gate-only c14        chars=14005  rc=2  0.013s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+v2         gate-only cjk4000    chars=4020   rc=2  0.030s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+v2         gate-only benign60c  chars=60007  rc=0  0.561s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+v2         gate-only benign60s  chars=60032  rc=0  6.581s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+v2         gate-only adv60curl  chars=60015  rc=2  9.633s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+v2         gate-only adv32env   chars=32111  rc=2  16.434s   (bash 5.2.15, LANG=en_US.UTF-8, LC_ALL=en_US.UTF-8)
+realistic bytes=4704   gate-only rc=2 0.011s | hook rc=2 0.116s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=8057   gate-only rc=2 0.013s | hook rc=2 0.122s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=14096  gate-only rc=2 0.017s | hook rc=2 0.117s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=24161  gate-only rc=2 0.031s | hook rc=2 0.144s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=32213  gate-only rc=2 0.030s | hook rc=2 0.142s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=48317  gate-only rc=2 0.057s | hook rc=2 0.170s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic bytes=64421  gate-only rc=2 0.053s | hook rc=2 0.201s [secret-guard] BLOCKED: command too long to scan in time (longer than 
+realistic-benign bytes=4689   gate-only rc=0 0.072s | hook rc=- -s 
+realistic-benign bytes=8042   gate-only rc=0 0.131s | hook rc=- -s 
+realistic-benign bytes=14081  gate-only rc=0 0.174s | hook rc=- -s 
+realistic-benign bytes=24146  gate-only rc=0 0.283s | hook rc=- -s 
+realistic-benign bytes=32198  gate-only rc=0 0.372s | hook rc=- -s 
+realistic-benign bytes=48302  gate-only rc=0 0.700s | hook rc=- -s 
+realistic-benign bytes=64406  gate-only rc=0 0.865s | hook rc=- -s 
+# done load=1.50 2.15 2.41

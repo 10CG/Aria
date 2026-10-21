@@ -1,0 +1,42 @@
+# E10 pre-existing detection gaps (not introduced by R1): built-in judgement on short commands, base 59e333c vs R1 v2 (hook sha256 63f2251c6e9b1709)
+# regenerate: bash r1rev_rbound.sh <hook>; bash r1rev_ext64.sh <hook>   (2026-10-21T02:09:02+00:00)
+== base.sh (sha256 e83c5e30f2ccb58f)
+rc=2  PAT: bare
+rc=2  PAT: | cat (blank)
+rc=0  PAT: |cat (no blank)
+rc=0  PAT: double-quoted path
+rc=0  PAT: single-quoted path
+rc=0  PAT: $U in quotes (split quote)
+rc=0  PAT: in ( )
+rc=0  PAT: in back quotes
+rc=0  PAT: in $( )
+rc=0  PAT: >file (no blank)
+rc=0  PAT: & (no blank)
+rc=2  cp key: bare
+rc=0  cp key: quoted
+rc=0  cp key: |cat
+rc=2  nomad var put: bare
+rc=0  nomad var put: |cat
+rc=2 bytes=38    read alone
+rc=2 bytes=2249  63 mentions, then the read
+rc=0 bytes=2284  64 mentions, then the read
+== secret-guard.r1v2.sh (sha256 63f2251c6e9b1709)
+rc=2  PAT: bare
+rc=2  PAT: | cat (blank)
+rc=0  PAT: |cat (no blank)
+rc=0  PAT: double-quoted path
+rc=0  PAT: single-quoted path
+rc=0  PAT: $U in quotes (split quote)
+rc=0  PAT: in ( )
+rc=0  PAT: in back quotes
+rc=0  PAT: in $( )
+rc=0  PAT: >file (no blank)
+rc=0  PAT: & (no blank)
+rc=2  cp key: bare
+rc=0  cp key: quoted
+rc=0  cp key: |cat
+rc=2  nomad var put: bare
+rc=0  nomad var put: |cat
+rc=2 bytes=38    read alone
+rc=2 bytes=2249  63 mentions, then the read
+rc=0 bytes=2284  64 mentions, then the read
