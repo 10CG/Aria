@@ -5,7 +5,7 @@
 #     no cross-process locking" → pin 到单节点, count=1。storage 落容器本地盘
 #     (= heavy 节点本地 SSD; docker data-root 不在 NFS 上, Aether #67)。
 #   - restart mode=delay: 默认 mode=fail 在宿主重启后永久停摆 (Aether 已知陷阱)。
-#   - 镜像 digest 钉死 (immutable); LATEST-BUILD-SHA 是占位, build 后替换。
+#   - 镜像 digest 钉死 (immutable); e9d790c40a5b2d5014648af51118cbbf9bb67a7d09674a524226f0359eb054a3 是占位, build 后替换。
 #   - registry pull 走 nomadVar (48/48 job-level auth 模式), 读 aria-orchestrator
 #     的 registry-scope token — 与 aria-layer1-* 相同来源, 不新造凭据。
 #
@@ -36,7 +36,7 @@ job "pi-durable-poc" {
       driver = "docker"
 
       config {
-        image = "forgejo.10cg.pub/10cg/pi-durable-poc@sha256:LATEST-BUILD-SHA"
+        image = "forgejo.10cg.pub/10cg/pi-durable-poc@sha256:e9d790c40a5b2d5014648af51118cbbf9bb67a7d09674a524226f0359eb054a3"
         auth {
           username = "${docker_auth_user}"
           password = "${docker_auth_password}"
