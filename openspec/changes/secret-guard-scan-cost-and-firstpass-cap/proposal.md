@@ -1,7 +1,7 @@
 # secret-guard 首遍扫描器 O(n²) 根治 + 扫描前风险闸门（收口 #228）
 
 > **Level**: 2（proposal + detailed-tasks.yaml）
-> **Status**: **Deferred（v3，owner 2026-10-21）** —— R1 搁置、不发版，R2 未启动，#228 转入积压，下一步改做 `#217`；依据见 §v3 真实流量。此前的状态：**Approved（方向 v2，设计 v2.2）** — owner 2026-10-20（B.1 实测后改向）：**先发临时闸门（R1，PATCH）再根治（R2）**；在 #228 贴更正。v1 的「`_sg_compute_credit` 入口 cap」经 B.1 实测**无效、已作废**（见 §Decision record）。fail-closed 关洞的姿态（owner 2026-10-20 拍板）不变，只换机制。
+> **Status**: **Pending（v3：R1 搁置不发版、#228 转入积压，owner 2026-10-21）** —— R1 搁置、不发版，R2 未启动，#228 转入积压，下一步改做 `#217`；依据见 §v3 真实流量。此前的状态：**Approved（方向 v2，设计 v2.2）** — owner 2026-10-20（B.1 实测后改向）：**先发临时闸门（R1，PATCH）再根治（R2）**；在 #228 贴更正。v1 的「`_sg_compute_credit` 入口 cap」经 B.1 实测**无效、已作废**（见 §Decision record）。fail-closed 关洞的姿态（owner 2026-10-20 拍板）不变，只换机制。
 > **版本史**: v1（2026-10-20，B.1 前，按头注释归因设计）→ v2（2026-10-20，B.1 实测改写）→ v2.1（2026-10-21，TASK-002 实现复核后定案：按字节计长 / 双副本匹配 / 覆盖项目扩展 / pregate 文案 / 删 `_SG_RAW_MAX` / 跨段误拦作临时期子类接受）→ v2.2（2026-10-21，修正轮复核：闸门自身的检测在对抗形状上超线性（F7）→ R1 照发、如实申报残余；R2 前提改正为「检测也须线性」（r2f）；清理 `_SG_RAW_MAX` / oversize 文案残留；既有缺口另立 #229 / #230）→ **v3（2026-10-21，真实流量推翻「先发临时闸门」的前提：R1 搁置不发版，#228 转入积压）**。v1 → v2 的更正细节在 B.1 记录，不在本文（审计叙事不与交付面同居）。
 > **Linked Issue**: `10CG/aria-plugin#228`（resolve）；上游 C = `secret-guard-time-budget-failclosed`（v1.76.1，已归档）；关联 `#216` `#219` `#203` `#154`。
 > **证据**: `.aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/`（`b1-baseline.md` 记录 + `evidence/E2–E6` + `pilot-8-32.tsv`，均由同目录脚本 `b1_run_all.sh` / `b1_curve.py` 重生成）。基线 aria v1.76.1（`59e333c`），分支 `feature/secret-guard-scan-cost-and-firstpass-cap`。

@@ -1,0 +1,16 @@
+# #217 A.1 real-traffic evidence (2026-10-21T08:03:35+00:00); aggregates only, no command text
+# corpus: the 138 real commands (> 4096 bytes) that base v1.76.1 (59e333c) blocks with the W10 size text, from .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E12-base-all.tsv (kind=oversize);
+#   command text is produced by ../2026-10-20-secret-guard-scan-cost-and-firstpass-cap/traffic/extract.py into TRAFFIC_DIR (outside the repo); scripts here read TRAFFIC_DIR/cmds and TRAFFIC_DIR/base-all.tsv
+# regenerate: traffic/w10-traffic.sh <base hook> -> W1; NEUT_SRC=<hook with _sg_environ_neutral> traffic/rowhit-traffic.sh <base hook> -> W2; traffic/expline-traffic.sh <base hook> -> W3
+
+W1 (n bytes mode crc why longval_kind spans_nl referenced subj_len exp_len growth judge_s judge_rc):
+  size mode=whole=137
+  value mode=whole=1
+  size overruns, growth (expanded - subject): <=0:2 1-256:60 257-1K:64 1K-4K:10 >4K:1 max=6200
+  full judgement (_sg_judge_one, with credit) of the expanded copies: mean=0.194s max=0.97s; verdicts: rc0=138 
+  the one value overrun: a quoted assignment of 4594 characters, NOT referenced anywhere else in the command (traffic/assign-probe.py)
+
+W2 rows only (no credit) on the neutralized expanded copies: 31 of 138 hit a row; match time mean=0.163s max=0.46s
+
+W3 longest line of the expanded copies: p50=566 p90=1734 max=4457; lines > 8192: 0
+   the 31 row-hit copies: longest line max=2139
