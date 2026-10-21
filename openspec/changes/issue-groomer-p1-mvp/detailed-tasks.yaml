@@ -15,7 +15,7 @@ tasks:
   - id: TASK-001
     parent: "1.1"
     title: "forgejo 双端点全分页 fetch 层 (issue-list + comments)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-009"]
     deliverables:
@@ -29,7 +29,7 @@ tasks:
   - id: TASK-002
     parent: "1.1"
     title: "Tier A 规则引擎 (labels.yaml 双层 + 前缀归类 + 时钟 seam)"
-    status: pending
+    status: done
     complexity: M
     dependencies: []
     deliverables:
@@ -45,7 +45,7 @@ tasks:
   - id: TASK-003
     parent: "1.1"
     title: "groom-report schema v1 (.schema.json 机器可校验)"
-    status: pending
+    status: done
     complexity: S
     dependencies: []
     deliverables:
@@ -59,7 +59,7 @@ tasks:
   - id: TASK-004
     parent: "1.2"
     title: "三面指纹引擎"
-    status: pending
+    status: done
     complexity: L
     dependencies: ["TASK-001"]
     deliverables:
@@ -73,7 +73,7 @@ tasks:
   - id: TASK-005
     parent: "1.2"
     title: "增量状态与复用引擎 (两文件 last-writer-wins)"
-    status: pending
+    status: done
     complexity: L
     dependencies: ["TASK-004"]
     deliverables:
@@ -89,7 +89,7 @@ tasks:
   - id: TASK-006
     parent: "1.2"
     title: "diff 段引擎 (集合差/漂移 top-N/baseline)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-005"]
     deliverables:
@@ -101,7 +101,7 @@ tasks:
   - id: TASK-007
     parent: "1.3"
     title: "10+1 态 fixture 矩阵 + 分量级 mandate fixtures"
-    status: pending
+    status: done
     complexity: L
     dependencies: ["TASK-005", "TASK-002", "TASK-009"]
     deliverables:
@@ -115,7 +115,7 @@ tasks:
   - id: TASK-008
     parent: "1.3"
     title: "SC-2/3/4/5/9 fixtures + 反假绿全家桶"
-    status: pending
+    status: done
     complexity: L
     dependencies: ["TASK-001", "TASK-006", "TASK-002", "TASK-009", "TASK-017"]
     deliverables:
@@ -132,7 +132,7 @@ tasks:
   - id: TASK-009
     parent: "1.3"
     title: "语料接入 + no-op live 实测 + 再生成命令 (Phase 1 前置)"
-    status: pending
+    status: done
     complexity: M
     dependencies: []
     deliverables:
@@ -148,7 +148,7 @@ tasks:
   - id: TASK-017
     parent: "1.1"
     title: "groom.py CLI 主入口组装 (编排 + 报告组装 + apply_payload 实现面)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005", "TASK-006"]
     deliverables:
@@ -164,7 +164,7 @@ tasks:
   - id: TASK-010
     parent: "2.1"
     title: "SKILL.md CC 适配层 (Tier B 语义评估流程 + 渲染层)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-003", "TASK-005", "TASK-017"]
     deliverables:
@@ -178,7 +178,7 @@ tasks:
   - id: TASK-011
     parent: "2.2"
     title: "Tier B 定向 fixture (判据表第三行, #240)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-010"]
     deliverables:
@@ -192,7 +192,7 @@ tasks:
   - id: TASK-012
     parent: "3.1"
     title: "Rule #6 执行 (场景 1 AB + 4b 处置 + rule6_note 四条成文)"
-    status: pending
+    status: done
     complexity: L
     dependencies: ["TASK-010", "TASK-011", "TASK-007", "TASK-008"]
     deliverables:
@@ -207,7 +207,7 @@ tasks:
   - id: TASK-013
     parent: "3.2"
     title: "发版准备 (MINOR bump 草案 + 五文件同步面)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-012"]
     deliverables:
@@ -221,7 +221,7 @@ tasks:
   - id: TASK-014
     parent: "4.1"
     title: "dogfood: Aria 仓实跑 (全量对账 + 分类比对 + 手工梳理差异归因)"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-008", "TASK-010", "TASK-002", "TASK-017"]
     deliverables:
@@ -234,7 +234,7 @@ tasks:
   - id: TASK-015
     parent: "4.1"
     title: "dogfood: 外项目试点 (Aether 97 或 SilkNode 63)"
-    status: pending
+    status: done
     complexity: S
     dependencies: ["TASK-014"]
     deliverables:
@@ -248,7 +248,7 @@ tasks:
   - id: TASK-016
     parent: "4.2"
     title: "ship + 归档 + 关单 + handoff"
-    status: pending
+    status: done
     complexity: M
     dependencies: ["TASK-013", "TASK-014", "TASK-015", "TASK-007", "TASK-009", "TASK-017"]
     deliverables:

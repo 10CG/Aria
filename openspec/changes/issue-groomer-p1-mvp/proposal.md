@@ -1,7 +1,7 @@
 # issue-groomer P1 MVP — issue 组合面梳理 skill
 
 > **Level**: Full (Level 3 Spec)
-> **Status**: **Approved (owner 2026-10-18)** — post_spec R1-R4 CONVERGED / verdict PASS (聚合报告 `.aria/audit-reports/post_spec-R4-1792325635892-issue-groomer-p1-mvp-aggregated.md`); **Phase 0 六项裁定已裁 (owner 2026-10-18, 见 §0)** → A.2 ready
+> **Status**: **Done (shipped v1.77.0, PR #244 `7143f3c`, 2026-10-21; 原 Approved owner 2026-10-18)** — post_spec R1-R4 CONVERGED / verdict PASS (聚合报告 `.aria/audit-reports/post_spec-R4-1792325635892-issue-groomer-p1-mvp-aggregated.md`); **Phase 0 六项裁定已裁 (owner 2026-10-18, 见 §0)** → A.2 ready
 > **Created**: 2026-10-18
 > **Linked Issue**: `10CG/Aria#238`
 > **决策来源**: [DEC-20261018-001](../../../.aria/decisions/DEC-20261018-001-issue-ops-family-and-issue-groomer-design.md) (裁定-1~13; post_brainstorm R1-R5 CONVERGED/PASS, 聚合报告 `.aria/audit-reports/post_brainstorm-R5-1792301620523-DEC-20261018-001-aggregated.md`) + [DEC-20261018-002](../../../.aria/decisions/DEC-20261018-002-layer1-substrate-evaluation-track.md) (底座评估轨, 与本轨解耦)
