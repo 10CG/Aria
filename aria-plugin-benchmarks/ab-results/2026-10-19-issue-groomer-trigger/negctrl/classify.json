@@ -3,16 +3,13 @@
   "role": "negctrl",
   "expected_calls": 60,
   "logged_calls": 60,
-  "unhealthy_calls": 4,
-  "unhealthy_reasons": {
-   "耗时达到超时阈值": 4,
-   "无判定事件": 4
-  },
+  "unhealthy_calls": 0,
+  "unhealthy_reasons": {},
   "unmapped_calls": 0,
   "count_mismatch_queries": 0,
-  "hits_recorded": 1,
-  "hits_min": 1,
-  "hits_max": 1,
+  "hits_recorded": 4,
+  "hits_min": 4,
+  "hits_max": 4,
   "verdict": "valid"
  },
  "queries": [
@@ -47,19 +44,6 @@
    "should_trigger": true,
    "runs": 3,
    "triggers": 0,
-   "unhealthy": 1,
-   "triggers_range": [
-    0,
-    1
-   ],
-   "pass_worst": false,
-   "pass_best": false
-  },
-  {
-   "query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的",
-   "should_trigger": true,
-   "runs": 3,
-   "triggers": 0,
    "unhealthy": 0,
    "triggers_range": [
     0,
@@ -69,17 +53,30 @@
    "pass_best": false
   },
   {
+   "query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的",
+   "should_trigger": true,
+   "runs": 3,
+   "triggers": 2,
+   "unhealthy": 0,
+   "triggers_range": [
+    2,
+    2
+   ],
+   "pass_worst": true,
+   "pass_best": true
+  },
+  {
    "query": "open issue 快一百条了, 按轻重缓急给我排个队, 跟在制的 spec 逐条对一遍, 已被覆盖的单独标出来",
    "should_trigger": true,
    "runs": 3,
-   "triggers": 1,
+   "triggers": 2,
    "unhealthy": 0,
    "triggers_range": [
-    1,
-    1
+    2,
+    2
    ],
-   "pass_worst": false,
-   "pass_best": false
+   "pass_worst": true,
+   "pass_best": true
   },
   {
    "query": "Forgejo 里攒了两百多条工单, 好多八成代码早就改完了单子还挂着, 全面过一遍把能收的挑出来列给我, 先别真去动它们",
@@ -98,43 +95,17 @@
    "query": "下周要跟 owner 对方向, 把各卫星仓的 open issue 汇成一张总表, 需要他拍板的那类单独抽一栏",
    "should_trigger": true,
    "runs": 3,
-   "triggers": 0,
+   "triggers": 1,
    "unhealthy": 0,
    "triggers_range": [
-    0,
-    0
-   ],
-   "pass_worst": false,
-   "pass_best": false
-  },
-  {
-   "query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底",
-   "should_trigger": true,
-   "runs": 3,
-   "triggers": 0,
-   "unhealthy": 0,
-   "triggers_range": [
-    0,
-    0
-   ],
-   "pass_worst": false,
-   "pass_best": false
-  },
-  {
-   "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
-   "should_trigger": true,
-   "runs": 3,
-   "triggers": 0,
-   "unhealthy": 1,
-   "triggers_range": [
-    0,
+    1,
     1
    ],
    "pass_worst": false,
    "pass_best": false
   },
   {
-   "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
+   "query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底",
    "should_trigger": true,
    "runs": 3,
    "triggers": 1,
@@ -147,14 +118,40 @@
    "pass_best": false
   },
   {
-   "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
-   "should_trigger": false,
+   "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
+   "should_trigger": true,
+   "runs": 3,
+   "triggers": 0,
+   "unhealthy": 0,
+   "triggers_range": [
+    0,
+    0
+   ],
+   "pass_worst": false,
+   "pass_best": false
+  },
+  {
+   "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
+   "should_trigger": true,
    "runs": 3,
    "triggers": 2,
    "unhealthy": 0,
    "triggers_range": [
     2,
     2
+   ],
+   "pass_worst": true,
+   "pass_best": true
+  },
+  {
+   "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
+   "should_trigger": false,
+   "runs": 3,
+   "triggers": 3,
+   "unhealthy": 0,
+   "triggers_range": [
+    3,
+    3
    ],
    "pass_worst": false,
    "pass_best": false
@@ -163,43 +160,17 @@
    "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
    "should_trigger": false,
    "runs": 3,
-   "triggers": 2,
+   "triggers": 3,
    "unhealthy": 0,
    "triggers_range": [
-    2,
-    2
+    3,
+    3
    ],
    "pass_worst": false,
    "pass_best": false
   },
   {
    "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
-   "should_trigger": false,
-   "runs": 3,
-   "triggers": 0,
-   "unhealthy": 1,
-   "triggers_range": [
-    0,
-    1
-   ],
-   "pass_worst": true,
-   "pass_best": true
-  },
-  {
-   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
-   "should_trigger": false,
-   "runs": 3,
-   "triggers": 2,
-   "unhealthy": 0,
-   "triggers_range": [
-    2,
-    2
-   ],
-   "pass_worst": false,
-   "pass_best": false
-  },
-  {
-   "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
    "should_trigger": false,
    "runs": 3,
    "triggers": 0,
@@ -212,17 +183,43 @@
    "pass_best": true
   },
   {
-   "query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给",
+   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
    "should_trigger": false,
    "runs": 3,
    "triggers": 0,
-   "unhealthy": 1,
+   "unhealthy": 0,
    "triggers_range": [
     0,
-    1
+    0
    ],
    "pass_worst": true,
    "pass_best": true
+  },
+  {
+   "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
+   "should_trigger": false,
+   "runs": 3,
+   "triggers": 2,
+   "unhealthy": 0,
+   "triggers_range": [
+    2,
+    2
+   ],
+   "pass_worst": false,
+   "pass_best": false
+  },
+  {
+   "query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给",
+   "should_trigger": false,
+   "runs": 3,
+   "triggers": 2,
+   "unhealthy": 0,
+   "triggers_range": [
+    2,
+    2
+   ],
+   "pass_worst": false,
+   "pass_best": false
   },
   {
    "query": "openspec/changes/ 下面三个 status=done 的 spec 该收了, 归档到 openspec/archive/ 并做落点校验",
@@ -279,614 +276,602 @@
  ],
  "calls": [
   {
-   "file": "1792434888827272547-300977.jsonl",
+   "file": "1792593614662562207-32582.jsonl",
    "query": "帮我把三个卫星仓的 open issue 梳理一下: aria、standards、aria-orchestrator 都过一遍, 分好类排个序, 出一份汇总给我",
-   "frames": 1052,
+   "frames": 1093,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 11.89,
+   "duration_s": 12.47,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434900721624244-301094.jsonl",
+   "file": "1792593627142154432-33034.jsonl",
    "query": "帮我把三个卫星仓的 open issue 梳理一下: aria、standards、aria-orchestrator 都过一遍, 分好类排个序, 出一份汇总给我",
-   "frames": 327,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 6.89,
+   "frames": 2324,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 21.76,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434907620588442-301168.jsonl",
+   "file": "1792593648930609879-33369.jsonl",
    "query": "帮我把三个卫星仓的 open issue 梳理一下: aria、standards、aria-orchestrator 都过一遍, 分好类排个序, 出一份汇总给我",
-   "frames": 598,
+   "frames": 240,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 11.49,
+   "duration_s": 6.14,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434919116224801-301302.jsonl",
+   "file": "1792593655081731173-33445.jsonl",
    "query": "每周例行的 backlog grooming 又到点了, 上次已经跑过一轮, 这次增量来: 重点看新增的和状态有变的, 汇总表还是要全量的",
-   "frames": 540,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 8.07,
+   "frames": 566,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 7.81,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434927196931942-301429.jsonl",
+   "file": "1792593662901329918-33526.jsonl",
    "query": "每周例行的 backlog grooming 又到点了, 上次已经跑过一轮, 这次增量来: 重点看新增的和状态有变的, 汇总表还是要全量的",
-   "frames": 600,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 7.23,
+   "frames": 526,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 8.59,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434934436126769-301517.jsonl",
+   "file": "1792593671499581973-33736.jsonl",
    "query": "每周例行的 backlog grooming 又到点了, 上次已经跑过一轮, 这次增量来: 重点看新增的和状态有变的, 汇总表还是要全量的",
-   "frames": 405,
+   "frames": 580,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 9.9,
+   "duration_s": 8.84,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434944344369397-301614.jsonl",
+   "file": "1792593680349736453-33831.jsonl",
    "query": "Run a backlog grooming pass across the satellite repos — pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close",
-   "frames": 1000,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 9.43,
+   "frames": 804,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 13.1,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434953782128302-301716.jsonl",
+   "file": "1792593693456524311-34060.jsonl",
    "query": "Run a backlog grooming pass across the satellite repos — pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close",
-   "frames": 652,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 10.28,
+   "frames": 984,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 15.39,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792434964072593297-301793.jsonl",
+   "file": "1792593708850043183-34300.jsonl",
    "query": "Run a backlog grooming pass across the satellite repos — pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close",
-   "frames": 9047,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 120.03,
-   "healthy": false,
-   "reasons": [
-    "耗时达到超时阈值",
-    "无判定事件"
-   ]
+   "frames": 638,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 10.43,
+   "healthy": true,
+   "reasons": []
   },
   {
-   "file": "1792435084112324225-302644.jsonl",
+   "file": "1792593719282257983-34420.jsonl",
    "query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的",
-   "frames": 1981,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 18.04,
+   "frames": 1546,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 17.39,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435102158596960-302819.jsonl",
+   "file": "1792593736685579157-34732.jsonl",
    "query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的",
-   "frames": 985,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 11.31,
+   "frames": 347,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 7.13,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435113476846001-302930.jsonl",
+   "file": "1792593743819599941-34812.jsonl",
    "query": "手上的活清完了, 帮我「找下一个该处理的 issue」, 顺带给一句为什么先做它而不是别的",
-   "frames": 143,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 5.44,
+   "frames": 859,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 12.09,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435118924803717-303021.jsonl",
+   "file": "1792593755919944806-35030.jsonl",
    "query": "open issue 快一百条了, 按轻重缓急给我排个队, 跟在制的 spec 逐条对一遍, 已被覆盖的单独标出来",
-   "frames": 857,
+   "frames": 310,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 10.71,
+   "duration_s": 7.87,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435129646766605-303117.jsonl",
+   "file": "1792593763801631985-35244.jsonl",
    "query": "open issue 快一百条了, 按轻重缓急给我排个队, 跟在制的 spec 逐条对一遍, 已被覆盖的单独标出来",
-   "frames": 1600,
+   "frames": 1642,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 16.49,
+   "duration_s": 18.79,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435146143985976-303260.jsonl",
+   "file": "1792593782600896211-35416.jsonl",
    "query": "open issue 快一百条了, 按轻重缓急给我排个队, 跟在制的 spec 逐条对一遍, 已被覆盖的单独标出来",
-   "frames": 1313,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 13.36,
+   "frames": 1713,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 18.84,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435159520671717-303395.jsonl",
+   "file": "1792593801452193573-35681.jsonl",
    "query": "Forgejo 里攒了两百多条工单, 好多八成代码早就改完了单子还挂着, 全面过一遍把能收的挑出来列给我, 先别真去动它们",
-   "frames": 1739,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 16.12,
+   "frames": 2706,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 25.39,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435175653442434-303555.jsonl",
+   "file": "1792593826851662307-36085.jsonl",
    "query": "Forgejo 里攒了两百多条工单, 好多八成代码早就改完了单子还挂着, 全面过一遍把能收的挑出来列给我, 先别真去动它们",
-   "frames": 7334,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 76.71,
+   "frames": 390,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 9.45,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435252365553062-304103.jsonl",
+   "file": "1792593836313362029-36202.jsonl",
    "query": "Forgejo 里攒了两百多条工单, 好多八成代码早就改完了单子还挂着, 全面过一遍把能收的挑出来列给我, 先别真去动它们",
-   "frames": 1047,
+   "frames": 960,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 14.82,
+   "duration_s": 14.38,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435267198532001-304265.jsonl",
+   "file": "1792593850699104357-36342.jsonl",
    "query": "下周要跟 owner 对方向, 把各卫星仓的 open issue 汇成一张总表, 需要他拍板的那类单独抽一栏",
-   "frames": 2618,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 26.88,
+   "frames": 1180,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 17.46,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435294086192591-304717.jsonl",
+   "file": "1792593868167779468-36703.jsonl",
    "query": "下周要跟 owner 对方向, 把各卫星仓的 open issue 汇成一张总表, 需要他拍板的那类单独抽一栏",
-   "frames": 1171,
+   "frames": 1704,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 15.36,
+   "duration_s": 23.16,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435309451650711-305839.jsonl",
+   "file": "1792593891360847428-37002.jsonl",
    "query": "下周要跟 owner 对方向, 把各卫星仓的 open issue 汇成一张总表, 需要他拍板的那类单独抽一栏",
-   "frames": 1598,
+   "frames": 1318,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 26.68,
+   "duration_s": 15.09,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435336144738789-306521.jsonl",
+   "file": "1792593906458146697-37148.jsonl",
    "query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底",
-   "frames": 2321,
+   "frames": 738,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 19.53,
+   "duration_s": 14.61,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435355684386830-307780.jsonl",
+   "file": "1792593921076380979-37402.jsonl",
    "query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底",
-   "frames": 512,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 7.51,
+   "frames": 2874,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 30.81,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435363202486848-308640.jsonl",
+   "file": "1792593951893181691-37863.jsonl",
    "query": "issue 多到没法看了, 先按标题前缀和 label 粗分成几堆, 再把最近仨月没动静的挑出来沉底",
-   "frames": 860,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 9.74,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435372954689321-309630.jsonl",
-   "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
-   "frames": 616,
+   "frames": 1098,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 8.67,
+   "duration_s": 14.95,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435381634257126-310099.jsonl",
+   "file": "1792593966850550895-38012.jsonl",
    "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
-   "frames": 857,
+   "frames": 438,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 12.05,
+   "duration_s": 7.95,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435393689935179-310572.jsonl",
+   "file": "1792593974808674172-38100.jsonl",
    "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
-   "frames": 8413,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 120.04,
-   "healthy": false,
-   "reasons": [
-    "耗时达到超时阈值",
-    "无判定事件"
-   ]
-  },
-  {
-   "file": "1792435513737548197-318297.jsonl",
-   "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
-   "frames": 1262,
+   "frames": 682,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 15.6,
+   "duration_s": 8.43,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435529352253802-319286.jsonl",
+   "file": "1792593983250481271-38318.jsonl",
+   "query": "新一周开工, 三个仓里还开着的条目哪几条最值得先投入? 挑前三给我, 顺手讲下取舍",
+   "frames": 778,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 10.87,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792593994129975745-38522.jsonl",
    "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
-   "frames": 1650,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 17.62,
+   "frames": 601,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 8.4,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435546988024111-319904.jsonl",
+   "file": "1792594002536602945-38621.jsonl",
    "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
-   "frames": 3394,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 27.74,
+   "frames": 1028,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 13.78,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435574734915026-321457.jsonl",
+   "file": "1792594016320896437-38868.jsonl",
+   "query": "把 aria-plugin 仓挂着的那些单子和 Aria 主仓的合在一起过一遍, 哪些该提级哪些该降级, 出一份建议清单",
+   "frames": 470,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 9.68,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594026005271907-38961.jsonl",
    "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
-   "frames": 321,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 6.67,
+   "frames": 348,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 9.52,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435581418735221-321593.jsonl",
+   "file": "1792594035530359883-39070.jsonl",
    "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
+   "frames": 421,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 13.06,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594048597201881-39310.jsonl",
+   "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
+   "frames": 273,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 6.9,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594055507461868-39482.jsonl",
+   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
+   "frames": 286,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 8.28,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594063800895427-39591.jsonl",
+   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
+   "frames": 254,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 7.02,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594070831846357-39772.jsonl",
+   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
+   "frames": 289,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 8.56,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594079400743130-39886.jsonl",
+   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
+   "frames": 186,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 6.88,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594086289025604-39956.jsonl",
+   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
+   "frames": 1305,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 16.63,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594102935410277-40207.jsonl",
+   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
+   "frames": 592,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 9.6,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594112540973869-40426.jsonl",
+   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
+   "frames": 1992,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 24.51,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594137055954322-40716.jsonl",
+   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
+   "frames": 2546,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 28.85,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594165919542188-41066.jsonl",
+   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
+   "frames": 3488,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 36.44,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594202370759575-41532.jsonl",
+   "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
    "frames": 312,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 19.47,
+   "duration_s": 7.44,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435600900045623-322324.jsonl",
-   "query": "核对一下 10CG/Aria#235 这个 issue 是不是真修好了: 报告里说的版本先核对, 再到 master 上试试能不能复现, 最后看看有没有 in-flight 分支已经带上了修复",
-   "frames": 274,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 9.78,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435610692274833-322510.jsonl",
-   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
-   "frames": 492,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 13.82,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435624518690034-322718.jsonl",
-   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
-   "frames": 260,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 9.15,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435633682835775-323051.jsonl",
-   "query": "刚进来一个新 bug report, 10CG/Aria#242, 帮我 triage 一下: 先验证版本和代码路径, 复现不出来的话在回复草稿里标 cannot-reproduce",
-   "frames": 328,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 9.59,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435643276856852-323410.jsonl",
-   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
-   "frames": 647,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 10.06,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435653347909541-323754.jsonl",
-   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
-   "frames": 18700,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 120.04,
-   "healthy": false,
-   "reasons": [
-    "耗时达到超时阈值",
-    "无判定事件"
-   ]
-  },
-  {
-   "file": "1792435773396274014-326566.jsonl",
-   "query": "看下项目当前状态: 活跃 spec 有几个、分支干净不干净、上次 cycle 收尾到哪了, 然后推荐我下一步跑哪个阶段",
-   "frames": 445,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 10.47,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435783876570537-326715.jsonl",
-   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
-   "frames": 1388,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 16.01,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435799899455407-327582.jsonl",
-   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
-   "frames": 2015,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 18.7,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435818626052024-328222.jsonl",
-   "query": "在 Forgejo 上给今天发现的 secret-guard 误报建个 issue: 标题按惯例起好, label 打上 kind/bug 和 needs-triage",
-   "frames": 908,
-   "first_decisive": "tool_use_start",
-   "may_be_recorded_true": true,
-   "duration_s": 11.22,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435829853345481-328793.jsonl",
+   "file": "1792594209824056282-41651.jsonl",
    "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
-   "frames": 665,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 8.11,
+   "frames": 911,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 10.99,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435837969978155-329117.jsonl",
+   "file": "1792594220823715845-41747.jsonl",
    "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
-   "frames": 1089,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 11.34,
+   "frames": 586,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 9.65,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435849315375946-329510.jsonl",
-   "query": "把 Forgejo 项目板 In Progress 列里的那 5 条 issue 挪到 Done, 顺带给 backlog 列剩下的统一打上 P2 标签",
-   "frames": 666,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 7.73,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792435857056015957-330002.jsonl",
+   "file": "1792594230482362359-41953.jsonl",
    "query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给",
-   "frames": 5799,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 43.31,
+   "frames": 2546,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 23.63,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435900394035112-333032.jsonl",
+   "file": "1792594254126574847-42245.jsonl",
    "query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给",
-   "frames": 3943,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 32.01,
+   "frames": 2141,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 26.56,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792435932426836659-335395.jsonl",
+   "file": "1792594280695330767-42592.jsonl",
    "query": "就按上一轮梳理报告里那 7 条疑似已修的, 直接到 Forgejo 上把它们全关掉, 关单备注我来给",
-   "frames": 15433,
-   "first_decisive": null,
-   "may_be_recorded_true": false,
-   "duration_s": 120.11,
-   "healthy": false,
-   "reasons": [
-    "耗时达到超时阈值",
-    "无判定事件"
-   ]
+   "frames": 2458,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 30.79,
+   "healthy": true,
+   "reasons": []
   },
   {
-   "file": "1792436052553519678-342530.jsonl",
+   "file": "1792594311491589056-43029.jsonl",
    "query": "openspec/changes/ 下面三个 status=done 的 spec 该收了, 归档到 openspec/archive/ 并做落点校验",
-   "frames": 680,
+   "frames": 114,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 12.55,
+   "duration_s": 13.85,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436065111308977-343444.jsonl",
+   "file": "1792594325345550129-43275.jsonl",
    "query": "openspec/changes/ 下面三个 status=done 的 spec 该收了, 归档到 openspec/archive/ 并做落点校验",
-   "frames": 2070,
+   "frames": 967,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 22.5,
+   "duration_s": 11.17,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436087625369987-345072.jsonl",
+   "file": "1792594336524410742-43370.jsonl",
    "query": "openspec/changes/ 下面三个 status=done 的 spec 该收了, 归档到 openspec/archive/ 并做落点校验",
-   "frames": 1071,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 11.7,
+   "frames": 525,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 13.19,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436099340193678-345429.jsonl",
+   "file": "1792594349726631401-43609.jsonl",
    "query": "scratchpad/ 目录太乱了, 帮我整理一下: 按月份建子目录归置, 超过一个月没动的挪进 archive/",
-   "frames": 4557,
+   "frames": 286,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 38.85,
+   "duration_s": 6.83,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436138200486433-347236.jsonl",
+   "file": "1792594356565321720-43790.jsonl",
    "query": "scratchpad/ 目录太乱了, 帮我整理一下: 按月份建子目录归置, 超过一个月没动的挪进 archive/",
-   "frames": 163,
+   "frames": 1680,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 6.37,
+   "duration_s": 16.62,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436144581036905-348762.jsonl",
+   "file": "1792594373200030294-43950.jsonl",
    "query": "scratchpad/ 目录太乱了, 帮我整理一下: 按月份建子目录归置, 超过一个月没动的挪进 archive/",
-   "frames": 163,
+   "frames": 170,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 6.46,
+   "duration_s": 6.19,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436151068410841-350974.jsonl",
+   "file": "1792594379410667827-44132.jsonl",
    "query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件",
-   "frames": 2229,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 36.15,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792436187232136843-367995.jsonl",
-   "query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件",
-   "frames": 238,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 7.05,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792436194297505788-370927.jsonl",
-   "query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件",
-   "frames": 656,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 8.36,
-   "healthy": true,
-   "reasons": []
-  },
-  {
-   "file": "1792436202670965177-374449.jsonl",
-   "query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候",
-   "frames": 102,
+   "frames": 886,
    "first_decisive": "tool_use_start",
    "may_be_recorded_true": true,
-   "duration_s": 8.08,
+   "duration_s": 12.31,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436210804029079-377871.jsonl",
-   "query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候",
-   "frames": 1061,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
-   "duration_s": 13.18,
+   "file": "1792594391736401162-44276.jsonl",
+   "query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件",
+   "frames": 1272,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 13.71,
    "healthy": true,
    "reasons": []
   },
   {
-   "file": "1792436223996478983-382759.jsonl",
+   "file": "1792594405455388394-44405.jsonl",
+   "query": "把上个月关掉的 issue 汇总成一段 changelog, 按功能分组, 写进 docs/ 下对应文件",
+   "frames": 572,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 11.18,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594416648000096-44711.jsonl",
    "query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候",
-   "frames": 198,
-   "first_decisive": "message_stop",
-   "may_be_recorded_true": false,
+   "frames": 140,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
    "duration_s": 6.43,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594423091338330-44815.jsonl",
+   "query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候",
+   "frames": 216,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 8.89,
+   "healthy": true,
+   "reasons": []
+  },
+  {
+   "file": "1792594431994619879-44918.jsonl",
+   "query": "帮我看下 10CG/aria-plugin#200 这条 issue 目前的状态和 label, 顺便说下最后一条评论是什么时候",
+   "frames": 250,
+   "first_decisive": "tool_use_start",
+   "may_be_recorded_true": true,
+   "duration_s": 5.92,
    "healthy": true,
    "reasons": []
   }

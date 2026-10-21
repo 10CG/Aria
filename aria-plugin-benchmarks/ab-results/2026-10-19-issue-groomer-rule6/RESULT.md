@@ -37,3 +37,15 @@
 ## rule6_note (SOT §4.1 五字段 × 四变更面, 成文待 4b 完成后终填)
 
 (草稿 rule6_note-draft.yaml; 终态待 owner 裁定)
+
+
+## 4b 第三轮 (description v2 @ 25be385, SilkNode 修复后, 2026-10-21)
+
+- **被评臂**: should-trigger **10/10 + 地板 30/30** (Portkey 修复完全兑现, v1 轮 4/10+13/30 → 修复后两轮均满) / should-not 误触 **9/10** (v2 收窄无效 — description 负面边界前移零效果)
+- **负控臂**: 误命中 4/10 ≤5 ✓ valid; 双臂健康检查 0 不健康调用
+- **根因定性 (升级)**: **4b 单技能沙箱结构性无法评估兄弟路由边界** — #13 纯状态查询 (state-scanner 域, 与 groomer 能力无交集) 零 narrate 直接调 Skill: 唯一在场的技能承接一切路由, description 的「单条→issue-triage / 快照→state-scanner」边界在 issue-triage/state-scanner 不在场的沙箱里无从生效。基线 openspec-archive 的 should-not 有效系其近邻为**能力外**任务 (changelog/目录整理), 不需兄弟路由 — 两种 should-not 设计前提不同
+- **SOT 处置轨迹**: 处置(1) 修正 description — 已走 (v2) 且实证无效; 处置(2) 改套件 — 需 owner 审且会把沙箱伪影固化为规范, 不推荐 ⇒ **升级 owner**
+
+## 场景 1 重跑轮 (description v2, 2026-10-21)
+
+with_skill 臂 **真跑形态** (沙箱全执行): **26/26 全绿** (E1 exit1 真跑复现+四分类逐字 / E3 三情境真跑含 state md5 比对+context_key 变化真值 / E4 entry 机读常量自检); without 臂沿用 21/26 (不受 description 影响)。**双轮 26/26 稳定**。
