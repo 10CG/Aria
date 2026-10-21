@@ -1,0 +1,18 @@
+# W4 watchdog feasibility (2026-10-21T13:18:07Z), host Linux, taskset 0,1 nice 19; regenerate: traffic/watchdog-probe.sh <hook> under each bash (hook = aria v1.76.1 59e333c)
+bash 5.2.15(1)-release
+  baseline: one regexec on a 16000-char token, no watchdog: 3.100s
+  deadline 2s, endless loop of small builtins: rc=137 wall=2.004s
+  deadline 2s, the single slow regexec: rc=137 wall=2.005s
+  deadline 3s, fast judge: rc=0 wall=0.002s
+  deadline 3s, judge blocks itself, read through a pipe: rc=2 stderr=[inner-block-reason] pipe EOF after 0.002s (a timer holding the pipe would make this ~3s)
+  stderr of a killed judge (must be empty, no job notice): []
+  overhead per wd_run (fork judge + timer): 0.0011s
+bash 3.2.57(2)-release
+  baseline: one regexec on a 16000-char token, no watchdog: 3.179s
+  deadline 2s, endless loop of small builtins: rc=137 wall=2.003s
+  deadline 2s, the single slow regexec: rc=137 wall=2.003s
+  deadline 3s, fast judge: rc=0 wall=0.002s
+  deadline 3s, judge blocks itself, read through a pipe: rc=2 stderr=[inner-block-reason] pipe EOF after 0.004s (a timer holding the pipe would make this ~3s)
+  stderr of a killed judge (must be empty, no job notice): []
+  overhead per wd_run (fork judge + timer): 0.0014s
+# not verified: Windows MINGW64, real macOS (BSD libc regex, /bin/sleep)
