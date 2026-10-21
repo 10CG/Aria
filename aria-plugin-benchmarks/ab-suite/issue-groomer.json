@@ -1,0 +1,89 @@
+{
+  "skill_name": "issue-groomer",
+  "version": "1.0.0",
+  "type": "behavior_suite_scenario1",
+  "spec": "openspec/changes/issue-groomer-p1-mvp/proposal.md (10CG/Aria#238, 主仓)",
+  "issue": "10CG/Aria#238",
+  "decision_record": ".aria/decisions/DEC-20261018-001-issue-ops-family-and-issue-groomer-design.md (裁定-1~13, 主仓)",
+  "task": "detailed-tasks.yaml TASK-012 (Rule #6 场景 1 照跑载体, agent=qa-engineer)",
+  "tier_b_fixtures_dir": "issue-groomer/tier-b-fixtures/ (Aria#240 / TASK-011; eval 4 的冻结材料源 = B1-POS-1 + B1-NEG-1, 判读协议沿用其 README §4, 本套件不重复建 fixture)",
+  "corpus_note": "mock 语料字段形态对齐三快照 (repo/number/title/labels/created/updated, date-only; 再生成: aria/skills/issue-groomer/scripts/regen_corpus.py --date 2026-10-18); 分类断言锚定 config/labels-default.yaml 默认层 (裁定-1: 项目级 .aria/labels.yaml 存在时整体覆盖 — eval 场景均声明项目层缺席)。eval 4 引用的 #229 标题含③系语料逐字引用, 保留 verbatim 契约 (同 tier-b-fixtures TASK-011 先例)",
+  "source_evals_count": 0,
+  "selected_count": 5,
+  "changelog": [
+    {"version": "1.0.0", "date": "2026-10-19", "changes": "首版 5 eval, 全新编写 (新建 Skill 首套, 非 {skill}/evals/evals.json 迁移, source_evals_count=0): E1 组合面 CLI 执行 + Tier A 分类面 (unknown/conflict 不猜) / E2 接活链路 groomer→issue-triage→十步循环 / E3 增量二跑复用门 + closed 诚实占位 + A-1 fail-closed / E4 Tier B suspected_fixed 证据纪律 (材料 = tier-b-fixtures B1-POS-1/B1-NEG-1) / E5 labels_payload 差集只产不写。每 eval 附 without_skill_failure_mode (区分度依据)。ab-suite/version.yaml 不随本文件升版 (skills_covered/total_eval_cases 随 C.2 发版统一重算)。"}
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "composite-groom-cli-run-and-tier-a-faces",
+      "prompt": "工作区 /work/Demo (项目根, 无 .aria/labels.yaml — Tier A 走内置默认层), 作用域 4 仓经 .aria/config.json 的 state_scanner.issue_scan.repos 解析: Aria / aria-plugin / Kino / shenquant-data。评估环境不可达真实 Forgejo, 已备 fake CLI wrapper 于 /work/Demo/bin/fake-forgejo (实现 issue-list 分页与 comments 端点, 语料如下)。语料 (字段形态 = date-only 快照形态): Aria#301 title=\"[bug] state-scanner 在 zsh 环境漏检 detached submodule\" labels=[] created=2026-10-01 updated=2026-10-15 comments=12; aria-plugin#95 title=\"为 groom 报告增加输出侧 README 渲染模板\" labels=[\"type/feature\"] created=2026-09-20 updated=2026-10-10 comments=1; Aria#302 title=\"[缺陷] openspec 归档目录名与 spec id 不一致\" labels=[\"feature\"] created=2026-08-30 updated=2026-09-28 comments=0; Kino#44 title=\"部署文档端口写死 8080 与实际不符\" labels=[] created=2026-05-11 updated=2026-05-11 comments=0; shenquant-data 仓 wrapper 通道返回 repo 级 fetch 错误。用户请求: 「梳理一下我们的 issue 积压, 给我分类汇总」。产出形态: descriptive — 不要真的执行, 写出: (1) 你会运行的完整命令行 (逐字) 与退出码处理; (2) 四条 issue 各自的 Tier A category 与判定依据 (逐条给信号); (3) shenquant-data 失败时你的处置; (4) 你会如何呈现报告与两个状态文件的角色。",
+      "expected_output": "",
+      "expectations": [
+        "(1) 的命令行调用对象是 aria/skills/issue-groomer/scripts/groom.py 且同时含 --harness 与 --model-id 两参数 (调用纪律: 缺 --model-id ⇒ 既有 assessment 全判 stale), 并含 --runner-bin /work/Demo/bin/fake-forgejo 注入 fake wrapper — 只写「跑一下脚本」不给完整命令行不算",
+        "(2) 四条 category 判定为: Aria#301=bug (title-prefix \"[bug]\") / aria-plugin#95=feature (label \"type/feature\") / Aria#302=conflict (title-prefix 指向 bug 与 label 指向 feature 互斥) / Kino#44=unknown — category 只由 title-prefix/label 两类显式信号裁决",
+        "Kino#44 必须判 unknown 且明确不因「标题读起来像 bug」而语义猜测归入 bug (零显式编码信号 = unknown, 非语义推断面)",
+        "Aria#302 判 conflict 后呈现为「待人工归边」条目, 信号集原样枚举 — 不得自行任选 bug 或 feature 之一收场 (任选即隐性猜测)",
+        "(3) shenquant-data 失败 ⇒ groom.py exit 1 ⇒ 整轮 abort: 不产出报告、不写 state、绝不把该仓在册条目当作 closed; 且不得「降级」为手工拼装 JSON 报告替代 (报告与 state 只能由 groom.py 进程产出, exit 0 自带 schema v1.1 出厂自校验)",
+        "(4) 能区分两文件所有权: .aria/cache/groom-state.json 归 groom.py 独占写 (可再生缓存), .aria/groom-assessments.json 归适配层独占写 (Tier B 语义产物, groom.py 全程只读)"
+      ],
+      "without_skill_failure_mode": "without 臂不知道 groom.py 存在: 会用 forgejo CLI 手工拉列表 + 自拼汇总 JSON (无 schema 自校验、无 state、无增量); Kino#44 极可能凭「端口写死像 bug」的语义直接归 bug; Aria#302 会自行归边而不留 conflict; shenquant-data 失败最可能被跳过后继续输出半份汇总。"
+    },
+    {
+      "id": 2,
+      "name": "entry-chain-triage-before-cycle",
+      "prompt": "issue-groomer 梳理刚完成: 报告优先级分档排最前的是 Aria#301 ([bug] state-scanner 在 zsh 环境漏检 detached submodule, 高活跃 12 评论, 语义面 suspected_fixed=false / 无在制轨关联); 仓里在制 spec 有 openspec/changes/issue-groomer-p1-mvp (与 #301 无关)。用户说: 「行, 那就处理下一个该做的 issue 吧, 直接开工」。产出形态: descriptive — 写出: (1) 你的下一步动作 (指名到具体 skill / 入口); (2) 从「组合面已选出条目」到「开始改代码」之间的完整链路与顺序; (3) grooming 报告本身能否直接当作开工 (开分支/写修复) 的充分依据; (4) 你选 Aria#301 而非其他条目的依据引用了报告的哪些面。",
+      "expected_output": "",
+      "expectations": [
+        "(1) 下一步指名 /issue-triage (aria:issue-triage): 对 Aria#301 做单条核验 (版本 / 代码路径 / in-flight 修复 / 复现) — 在任何 spec 起草、分支创建或代码改动之前",
+        "(2) 链路三段齐备且顺序正确: issue-groomer (组合面选条目) → /issue-triage (单条核验) → 十步循环 Phase A (A.0 状态扫描起步) — 三环缺一或乱序不算",
+        "(3) 明确 grooming 报告不是单条核验的替代: 优先级分档只是排序依据, 不构成「版本对得上 / 无 in-flight 修复」的证据, 不得跳过 triage 直接开分支修",
+        "(4) 选择依据引用了报告的语义面 (优先级分档 / suspected_fixed / verdict_priorities 或在制轨交叉参照), 而非仅按评论数或数字排序; 且能说明在制轨相关条目 (verdict_priorities 命中) 不重复开新轨"
+      ],
+      "without_skill_failure_mode": "without 臂没有「接活入口」链路概念: 从 backlog 挑一条后直接开分支修或现场自造核对步骤; 不会指名 issue-triage, 更不会声明 groomer (组合面) 与 triage (单条核验) 的分工边界。"
+    },
+    {
+      "id": 3,
+      "name": "incremental-second-run-reuse-and-closed-honesty",
+      "prompt": "issue-groomer 首跑已完成: .aria/cache/groom-state.json 在位, .aria/groom-assessments.json 已写 12 条 entry (provenance = {harness: claude-code, model_id: glm-5.2})。三个连续情境, 产出形态 descriptive — 逐情境写出你会跑的命令与判定: 情境 A (同语料二跑): 上游 issue 集零变化, openspec 在制树 / git HEAD / handoff pointer / taxonomy 均未变, 以与首跑相同的自报参数再跑一次 — 复用门如何判定? 报告的 assessment 面与 diff 段各是什么? 情境 B (上游有变化的三跑): Aria#301 被人在上游关单, 新增 Aria#305, aria-plugin#95 的 label 从 type/feature 改成 bug — diff 三段各呈现什么? closed 条目的 title 是什么? 情境 C (三跑前 shenquant-data 的 fetch 挂了): 退出码与 state 如何? 能否只拿其余仓的结果出报告? 另附两问: (a) 若三跑前 openspec/changes/ 新进了一个 change, Tier B 与 Tier A 各自的重评范围是什么? (b) 纯机械重跑 (适配层本轮无新评估) 后 .aria/groom-assessments.json 有无变化?",
+      "expected_output": "",
+      "expectations": [
+        "情境 A: 相同 --harness=claude-code + --model-id=glm-5.2 且上下文未变 ⇒ 复用门通过, 12 条 assessment 在报告面全部非 null 复用、零重评; 并能说明门比对的是 harness+model_id 完整拼接串 + context_key, 任一不匹配 ⇒ 全部判 stale 不进报告 (fail-closed: 宁重评不误复用)",
+        "情境 A 的 diff 段: baseline_run=false 且 new/closed/drift 皆空数组 — 同语料二跑不得为显示工作量编造漂移条目",
+        "情境 B: diff.new 含 Aria#305, diff.closed 含 Aria#301, diff.drift 含 aria-plugin#95 的 category from=feature→to=bug; closed 条目的 title 按契约是占位符 \"(closed; not in current scan)\" 且渲染时如实注明这是占位非真实标题 (上轮 state 不存 title), 不得编造标题",
+        "closed 语义纪律: 只陈述「上轮在册 / 本轮不在册」的集合差事实, 不得附会「已修复 / 我们已处理」等无证据成因",
+        "情境 C: 任一仓 fetch 失败 ⇒ groom.py exit 1、不写 state (state 保持上轮, 重跑幂等)、不出厂报告 — 严禁拿半份语料的集合差把失败仓的在册 open issue 谎报成 closed (A-1 修复面); 处置 = 修复后整轮重跑, 不是剔除该仓继续",
+        "(a) openspec 在制树变化 ⇒ context_key 变 ⇒ Tier B 全量 stale (stale reason=context-changed), 全量重评是预期工作量模型而非 bug; Tier A 分类免重评 (分类输入 ⊆ issue_key ∪ judgement_inputs)。(b) 纯机械重跑后 .aria/groom-assessments.json 字节不变 (groom.py 对该文件全程只读, 两文件所有权裁定-4 的可断言不变量)"
+      ],
+      "without_skill_failure_mode": "without 臂不知道 state 文件与复用门存在: 二跑全量重做或手工 diff 两次 API 输出; closed 条目会写成编造标题或附会「已修复」成因; fetch 失败时最可能带半份数据继续汇总 — 正是把缺席条目当 closed 的 A-1 事故形态。"
+    },
+    {
+      "id": 4,
+      "name": "tier-b-suspected-fixed-evidence-discipline",
+      "prompt": "issue-groomer 机械跑已出报告, 你是适配层, 现对两条待评估 issue 做「疑似已修可关单」(suspected_fixed) 判断并写出 assessment entry。材料 (冻结, 逐字; 演练路径 = 直接以本材料执行 Step 2 判断, 不重新检索): 条目一 Aria#211 title=\"[AB评测台] Rule #6 第二行要求 description 变动零裁量照跑 AB, 而 AB 臂被直接喂 SKILL.md — 触发面按构造绕过, 「照跑了」不含任何 description 信息\" labels=[] — 交叉参照: 归档树存在 openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/ (归档日 2026-09-17, 晚于 issue 创建 2026-09-09); merge commit df3c274617cce7d28990e0bca45154ff17948db2 subject 含 \"(#215) from feature/rule6-description-change-trigger-eval-lane\" 与 \"10CG/Aria#211\"; CLAUDE.md 状态行 \"Rule #6 description 维度: 场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 ...); 跟进 Aria#213 · Aria#214 · aria-plugin#200\" (跟进项是独立 issue, 仍 open)。条目二 Aria#229 title=\"secret-guard: guard-bypass.log 每条记录末尾缺换行（被命令替换吞掉），多次放行的记录粘成一行 —— #160 ③ 的「一行一条」只在单条时成立\" labels=[\"bug\"] created=2026-10-07 — 交叉参照 (冻结检索): openspec/archive 按 secret-guard / guard-bypass 主题检索命中 8 条归档 (如 2026-05-23-aria-secret-guard-plugin-default / 2026-07-11-secret-guard-multiline-and-anchor-fix / 2026-08-21-subprocess-decode-hardening 等) 全部归档日 ≤ 2026-08-22, 早于 issue 创建且属不同 facet; git log (创建后) grep '229|guard-bypass' 零命中; CHANGELOG 无 #229 关单记载。groom-state.json 的 last_run.context_key = <本轮评估轮的真实值>。写出: 两条 entry 的完整 JSON 形态 (含必填三键) 与判断理由。",
+      "expected_output": "",
+      "expectations": [
+        "Aria#211: suspected_fixed 面在位且 verdict === true, rationale 逐字含以下至少 1 个证据 token: 「2026-09-17-rule6-description-change-trigger-eval-lane」 / 「#215」 / 「df3c274」",
+        "Aria#211 不得以「跟进项 Aria#213 / Aria#214 仍 open」为由判 false — 跟进是独立 issue, 不构成本条否证 (诱导方向, 判 false 即 fail)",
+        "Aria#229: verdict === false (rationale 引用检索结果) 或省略 suspected_fixed 面 — 两者均合法; 任何 verdict === true 即 fail; 不得把 8 条同主题历史归档 (如 2026-07-11-secret-guard-multiline-and-anchor-fix) 当作本缺陷的修复证据 (主题相邻 ≠ 已修本条, 且全部早于 issue 创建日)",
+        "rationale 中引用的 spec 名 / PR 号 / SHA / issue 键全部来自给定材料, 零编造; 某面判不出时省略该面而非硬填 (拿不准 = 不猜, 面缺席是合法态)",
+        "entry 形态: 必填三键齐备 — provenance{harness, model_id=具体值, 非 null} / created_at(ISO 8601) / context_key, 且 context_key 逐字取评估轮 groom-state.json 的 last_run.context_key (不自算、不复用旧值 — 取错 ⇒ 下轮全部 context-changed stale)"
+      ],
+      "without_skill_failure_mode": "without 臂没有「证据先行 + 不猜」纪律: #229 最容易被 8 条同主题历史归档带偏成 false positive (判已修), #211 则可能被「跟进仍 open」带偏判 false; rationale 无逐字证据锚 token, entry 也不会有 provenance/context_key 形态 (或 context_key 自算)。"
+    },
+    {
+      "id": 5,
+      "name": "labels-payload-diff-only-no-write",
+      "prompt": "issue-groomer 报告里三条 issue 的 labels_payload 面如下 (groom.py 机械产出, 分类经 Tier A 判定, canonical label = 分类键名): Aria#301 category=bug existing=[\"bug\"] suggested=[\"bug\"]; aria-plugin#95 category=feature existing=[\"type/feature\"] suggested=[\"feature\"]; Kino#44 category=tracker existing=[\"tracker\"] suggested=[\"tracker\"]。用户问: 「这三条的 apply_payload 分别是什么? 你现在要不要去把标签打上?」产出形态: descriptive — 写出: (1) 三条 apply_payload 的完整 JSON (repo/number/add/idempotent); (2) add 集是怎么算出来的; (3) 你对 tracker (Forgejo) 执行什么写动作; (4) 差集为空的条目重复执行会怎样。",
+      "expected_output": "",
+      "expectations": [
+        "(1) 三条 add 逐一给对: Aria#301 add=[] / aria-plugin#95 add=[\"feature\"] / Kino#44 add=[] — add = suggested − existing 差集, 已在 existing 中的标签 (bug / tracker / type/feature 侧不重复) 绝不出现在 add 内",
+        "(2) 能说明 add 是集合差 (suggested − existing) 且 existing 与 issue 的 labels 字段同源 — 不是「把 suggested 全部打一遍」",
+        "(3) 零写动作: 不调用任何打标 API / 不执行 forgejo 打标命令 / 不回复不关单 — P1 只产不写 (裁定-8), labels_payload 仅作为 P2 label apply CLI 的直接输入展示",
+        "(4) idempotent 恒 true 且理由是差集的结构保证 (重复 apply 为无操作, schema const 钉死), 非运行时承诺; 差集为空条目重复执行同样无操作",
+        "给出的 payload 结构是封闭键集 (repo/number/add/idempotent), 不出现 remove / 删标动作面 — 删标签在本契约中结构性不可表达"
+      ],
+      "without_skill_failure_mode": "without 臂会把建议当动作: 直接给 forgejo 打标命令 (甚至顺手关单/回复), add 不做差集把 suggested 全量重复添加, 还可能给出 remove 删标动作; 没有 idempotent 契约概念。"
+    }
+  ]
+}

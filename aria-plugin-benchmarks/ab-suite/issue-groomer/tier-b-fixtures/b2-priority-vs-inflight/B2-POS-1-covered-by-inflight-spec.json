@@ -1,0 +1,84 @@
+{
+  "case_id": "B2-POS-1",
+  "behavior": "verdict_priorities",
+  "behavior_label": "优先级 vs 在制轨道",
+  "polarity": "positive",
+  "source_annotation": "issue 记录逐字取自真语料 (aria-plugin#208, 快照时 open)。context_materials 为 2026-10-19 冻结摘录, 全真实: 在制 spec 清单 (openspec/changes/ 实测 8 条) / issue-groomer-p1-mvp proposal.md §1 逐字摘录 / spec 状态与活跃分支 (proposal 头部 Status + 主仓 feature 分支实测)。",
+  "input": {
+    "issues": [
+      {
+        "repo": "aria-plugin",
+        "number": 208,
+        "title": "[缺陷][issue-triage] 开放 PR 与评论列表都是单次 limit=50 请求 —— 超过 50 条静默丢数据 (同 10CG/aria-plugin#182 形态)",
+        "labels": [],
+        "created": "2026-09-30",
+        "updated": "2026-09-30"
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "openspec_inflight_listing",
+        "ref": "openspec/changes/",
+        "frozen_at": "2026-10-19",
+        "entries": [
+          "aria-2.0-m6-cost-model-telemetry",
+          "aria-2.0-m6-dispatch-input-delivery",
+          "aria-2.0-m6-e2e-resilience",
+          "aria-2.0-m6-release-closeout",
+          "aria-2.0-m7-agent-lifecycle",
+          "aria-2.0-m7-fleet-aggregation",
+          "issue-groomer-p1-mvp",
+          "secret-net-l3-and-bypass-paths"
+        ]
+      },
+      {
+        "kind": "proposal_excerpt",
+        "ref": "openspec/changes/issue-groomer-p1-mvp/proposal.md §1",
+        "frozen_at": "2026-10-19",
+        "excerpt": "- **双端点全分页 fetch**: issue-list **与 comments 端点**均全分页 + 终止条件 (修 plugin#208 limit=50 静默丢数据; …",
+        "note": "摘录截节 (…)。在制 spec 明文宣称修复 plugin#208 — 覆盖关系直接可核。"
+      },
+      {
+        "kind": "inflight_status",
+        "frozen_at": "2026-10-19",
+        "spec": "issue-groomer-p1-mvp",
+        "status": "Approved (owner 2026-10-18); Phase B 执行中",
+        "active_branch": "feature/issue-groomer-p1-mvp",
+        "note": "handoff 权威 = docs/handoff/latest.md pointer (机读锚在位); 本 spec 在在制清单内。"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_key": "aria-plugin#208",
+    "assessment_entry_exemplar": {
+      "verdict_priorities": [
+        {
+          "from": "独立缺陷修复 (数据丢失类, 隐含高优)",
+          "to": "已被在制轨覆盖 — 随 issue-groomer-p1-mvp ship 后按 AC 核验关单, 不另排期",
+          "rationale": "在制 spec issue-groomer-p1-mvp proposal §1 明文「修 plugin#208 limit=50 静默丢数据」(双端点全分页 fetch); 本 issue 的修复已在该轨范围内, 独立排期将重复。"
+        }
+      ],
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "rationale_anchor_tokens": [
+      "issue-groomer-p1-mvp"
+    ],
+    "anchor_semantics": "from/to 为自由文字 (语义方向 = 已被在制轨覆盖, 随轨处置); 可证伪锚点钉在 rationale 对在制 spec 标识的逐字引用与方向正确性上。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "verdict_priorities 面在位且为非空列表",
+      "至少一项的 rationale 含 token「issue-groomer-p1-mvp」(逐字)",
+      "判断方向 = 已被在制轨覆盖 / 随轨处置 (from/to 表述自由, 语义须为覆盖而非冲突)"
+    ],
+    "fail": [
+      "verdict_priorities 面被省略 (输入明示覆盖关系, 不属「拿不准」语境 — 漏报)",
+      "rationale 引用在制清单中与本 issue 无关的 spec (如 secret-net-l3-and-bypass-paths) 作为覆盖轨 (编造关联)",
+      "判断方向颠倒: 主张本 issue 与在制轨「冲突」或「被推迟」(输入材料无此证据)",
+      "rationale 引用 input 材料外的 spec 名 / 分支名"
+    ],
+    "miss": []
+  }
+}

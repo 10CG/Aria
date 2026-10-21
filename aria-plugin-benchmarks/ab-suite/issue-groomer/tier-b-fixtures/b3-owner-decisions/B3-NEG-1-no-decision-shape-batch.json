@@ -1,0 +1,49 @@
+{
+  "case_id": "B3-NEG-1",
+  "behavior": "owner_decisions",
+  "behavior_label": "owner 决策面抽取",
+  "polarity": "negative",
+  "source_annotation": "两条 issue 记录逐字取自真语料 (shenquant-data#3 / SilkNode#1207, 快照时均 open)。零构造: 两条均为机械修复形态 (代码缺陷 / 文档命令失效), 无「待裁定 / 请确认 / 选项拍板」形态。",
+  "input": {
+    "issues": [
+      {
+        "repo": "shenquant-data",
+        "number": 3,
+        "title": "ingest._call_hooks 位置实参把 pg/symbol 传两遍（包装层 + 转发），缺「两侧同对象」常驻断言",
+        "labels": [],
+        "created": "2026-10-17",
+        "updated": "2026-10-17"
+      },
+      {
+        "repo": "SilkNode",
+        "number": 1207,
+        "title": "迁移回滚脚本 down.sql 头注释里「照抄」的命令在生产会失败（8 份旧迁移同款）",
+        "labels": [],
+        "created": "2026-10-01",
+        "updated": "2026-10-01"
+      }
+    ],
+    "context_materials": [],
+    "context_note": "无附带决策语境: 两条的处置路径均为直接的工程修复 (修参数传递 / 修注释命令), 不存在需要人在多个选项间定夺的事项。"
+  },
+  "expected": {
+    "assessment_keys": ["shenquant-data#3", "SilkNode#1207"],
+    "assessment_entry_exemplar": {
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "exemplar_note": "规范形态 = 两条 entry 均仅含必填三键, owner_decisions 面省略 (无决策形态 → 空, 不造)。显式空列表 ([]) 亦接受 — 关键是不产出决策条目。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "两条 entry 的 owner_decisions 面均被省略 — 或 — 均为显式空列表 []",
+      "必填三键在位 (仅形状校验)"
+    ],
+    "fail": [
+      "任一 entry 产出非空 owner_decisions (把机械修复事项升格为 owner 决策 = 过度抽取 — 本行为最核心的证伪方向)",
+      "决策条目引用 input.issues 之外的 issue 键 (编造)"
+    ],
+    "miss": []
+  }
+}

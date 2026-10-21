@@ -1,0 +1,1 @@
+Run a backlog grooming pass across the satellite repos — pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close

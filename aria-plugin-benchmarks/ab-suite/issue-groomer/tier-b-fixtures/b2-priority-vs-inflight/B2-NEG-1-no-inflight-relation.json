@@ -1,0 +1,67 @@
+{
+  "case_id": "B2-NEG-1",
+  "behavior": "verdict_priorities",
+  "behavior_label": "优先级 vs 在制轨道",
+  "polarity": "negative",
+  "source_annotation": "issue 记录逐字取自真语料 (truffle-hound#10, 快照时 open; 卫星仓基础设施改进类)。context_materials 为 2026-10-19 冻结摘录: 与 B2-POS-1 同一份在制清单 (8 条, 主题经核对无一涉及 SMTP / Consul 服务名 / mailpit)。",
+  "input": {
+    "issues": [
+      {
+        "repo": "truffle-hound",
+        "number": 10,
+        "title": "硬编码 SMTP_HOST=192.168.69.80 建议改 Consul DNS 名(mailpit-smtp.service.consul)",
+        "labels": [],
+        "created": "2026-07-06",
+        "updated": "2026-07-06"
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "openspec_inflight_listing",
+        "ref": "openspec/changes/",
+        "frozen_at": "2026-10-19",
+        "entries": [
+          "aria-2.0-m6-cost-model-telemetry",
+          "aria-2.0-m6-dispatch-input-delivery",
+          "aria-2.0-m6-e2e-resilience",
+          "aria-2.0-m6-release-closeout",
+          "aria-2.0-m7-agent-lifecycle",
+          "aria-2.0-m7-fleet-aggregation",
+          "issue-groomer-p1-mvp",
+          "secret-net-l3-and-bypass-paths"
+        ],
+        "topic_scan_note": "逐条核对 8 个在制 spec 主题: 无一涉及 SMTP_HOST / Consul 服务名 / mailpit / 邮件链路。"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_key": "truffle-hound#10",
+    "assessment_entry_exemplar": {
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "exemplar_note": "规范形态 = entry 仅含必填三键, verdict_priorities 面省略 (无在制关联, 拿不准不猜 / 无关联不造)。允许的次形态 = 面在位但 rationale 与方向均不含任何在制 spec 引用 (基于其他正当理由的优先级判读)。",
+    "inflight_id_tokens": [
+      "aria-2.0-m6-cost-model-telemetry",
+      "aria-2.0-m6-dispatch-input-delivery",
+      "aria-2.0-m6-e2e-resilience",
+      "aria-2.0-m6-release-closeout",
+      "aria-2.0-m7-agent-lifecycle",
+      "aria-2.0-m7-fleet-aggregation",
+      "issue-groomer-p1-mvp",
+      "secret-net-l3-and-bypass-paths"
+    ]
+  },
+  "verdict_rules": {
+    "pass": [
+      "verdict_priorities 面被省略 — 或 — 面在位但整条 entry (rationale + from/to) 不含 inflight_id_tokens 中任何 token (逐字)",
+      "必填三键在位 (仅形状校验)"
+    ],
+    "fail": [
+      "rationale / from / to 中出现任一 inflight_id_tokens token, 且语义为主张本 issue 与该在制轨存在覆盖 / 冲突 / 推迟关系 (编造在制关联 — 本行为最核心的证伪方向)",
+      "引用 input 材料外的 spec 名 / 分支名作为在制轨"
+    ],
+    "miss": []
+  }
+}

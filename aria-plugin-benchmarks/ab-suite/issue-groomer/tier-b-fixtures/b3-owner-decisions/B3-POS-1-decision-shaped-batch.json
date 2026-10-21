@@ -1,0 +1,77 @@
+{
+  "case_id": "B3-POS-1",
+  "behavior": "owner_decisions",
+  "behavior_label": "owner 决策面抽取",
+  "polarity": "positive",
+  "source_annotation": "三条 issue 的 title / labels / created / updated 逐字取自真语料 (Aria#212 / Kairos#66 / 10cg.local#33, 快照时均 open)。body_head 为构造示意 — 仅展开各 title 已含的决策形态 (待裁定 / 请确认 / 处置选项), 不引入新事实: Aria#212 的「owner 待裁」地位另有真实锚 (issue-groomer-p1-mvp proposal.md Validation Note 原文「openspec CLI 统一口径 … 是 Aria#212 owner 待裁项」, 2026-10-19 冻结, 见 context_materials)。",
+  "input": {
+    "issues": [
+      {
+        "repo": "Aria",
+        "number": 212,
+        "title": "[规范缺口] openspec CLI 的统一口径：是否应装、怎么装不违反归档目录等规范、版本钉法 —— 请 Aria 验证测试后给出",
+        "labels": [],
+        "created": "2026-09-13",
+        "updated": "2026-10-11",
+        "body_head": "## 待裁事项 (构造示意, 展开 title)\n\nopenspec CLI 在本仓的统一口径需裁定: (a) 是否应装; (b) 装法如何不违反归档目录规范 (近期归档 spec 均无 specs/ delta 目录); (c) 版本钉法。多份 spec 的 Validation Note 已各自记「待 #212 裁定」。"
+      },
+      {
+        "repo": "Kairos",
+        "number": 66,
+        "title": "[询问] Nexus dev 库 kairos 租户自 2026-04-15 起零数据、07-05 起零 API 调用 — 请确认 Kairos dev 的 Nexus 调用路径是否真的在触发",
+        "labels": [],
+        "created": "2026-09-03",
+        "updated": "2026-09-15",
+        "body_head": "## 请确认 (构造示意, 展开 title)\n\n请 Kairos 侧确认 dev 的 Nexus 调用路径是否真的在触发; 若 dev 已弃用, 请拍板是否回收租户。"
+      },
+      {
+        "repo": "10cg.local",
+        "number": 33,
+        "title": "[security] Nomad ACL 全局未启用 — Variables 端点匿名可读，含 Forgejo / CF Access / PVE 三套凭据",
+        "labels": [],
+        "created": "2026-09-04",
+        "updated": "2026-09-04",
+        "body_head": "## 安全处置待裁 (构造示意)\n\n处置选项: (a) 全局启用 ACL — 所有 job 需适配 token, 一次性迁移成本; (b) 先收口 Variables 端点网络面, 不动 job。需在迁移成本与暴露面之间拍板。"
+      }
+    ],
+    "context_materials": [
+      {
+        "kind": "spec_validation_note_excerpt",
+        "ref": "openspec/changes/issue-groomer-p1-mvp/proposal.md Validation Note",
+        "frozen_at": "2026-10-19",
+        "excerpt": "openspec CLI 统一口径 (是否应装/归档目录兼容/版本钉法) 是 Aria#212 owner 待裁项",
+        "note": "真实锚: #212 的 owner 待裁地位被在制 spec 显式引用。"
+      }
+    ]
+  },
+  "expected": {
+    "assessment_keys": ["Aria#212", "Kairos#66", "10cg.local#33"],
+    "assessment_entry_exemplar": {
+      "owner_decisions": [
+        "Aria#212: openspec CLI 统一口径三问 (应否装 / 装法不违反归档目录规范 / 版本钉法) 待 owner 裁定 — 多份 spec Validation Note 已挂待裁",
+        "Kairos#66: Kairos dev 的 Nexus 调用路径是否仍在触发需 Kairos 侧确认; 若弃用是否回收租户待拍板",
+        "10cg.local#33: Nomad ACL 处置路线待裁 — 全局启用 ACL (全部 job 适配迁移) vs 先收口 Variables 端点网络面"
+      ],
+      "provenance": { "harness": "claude-code", "model_id": "glm-5.2" },
+      "created_at": "<ISO 8601 UTC Z — 运行轮次取值, 仅验形状>",
+      "context_key": "<64-hex — 逐字取评估轮 groom-state.json last_run.context_key, 仅验形状>"
+    },
+    "source_key_tokens": ["Aria#212", "Kairos#66", "10cg.local#33"],
+    "anchor_semantics": "决策条目文字自由, 但每条须含来源 issue 键 (SKILL.md Step 4 纪律「每条注来源 issue 键」)。owner_decisions 文件面 = string 列表 (报告面投影判据 isinstance list 且全 str)。"
+  },
+  "verdict_rules": {
+    "pass": [
+      "owner_decisions 面在位且为非空 string 列表 (≥2 条)",
+      "每条含至少一个 source_key_tokens 中的来源 issue 键 (逐字)",
+      "token「Aria#212」必出现在至少一条中 (显式 owner 待裁项不得漏)",
+      "被抽取覆盖的来源 issue 键 ≥2 个 (三选二以上)"
+    ],
+    "fail": [
+      "面被省略或空列表 (决策形态齐备时漏抽取)",
+      "存在不含任何来源 issue 键的决策条目 (违反来源锚定纪律)",
+      "条目引用 input.issues 之外的 issue 键 (编造)",
+      "必填三键在位性不满足"
+    ],
+    "miss": []
+  }
+}

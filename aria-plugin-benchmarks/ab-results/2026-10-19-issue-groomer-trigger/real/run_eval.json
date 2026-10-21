@@ -1,0 +1,171 @@
+{
+  "skill_name": "issue-groomer",
+  "description": "\u9879\u76ee\u5185\u5168\u90e8\u536b\u661f\u4ed3 open issue \u7684\u6279\u91cf\u68b3\u7406\u4e0e\u4f18\u5148\u7ea7\u6392\u5e8f (\u7ec4\u5408\u9762: \u4e00\u6b21\u8dd1\u5168\u91cf\u6761\u76ee, \u4ea7\u51fa\u6574\u4f53\u62a5\u544a): \u5168\u5206\u9875 fetch \u2192 Tier A \u673a\u68b0\u7c97\u5206 (title \u524d\u7f00 / label / staleness / \u6d3b\u8dc3\u5ea6) \u2192 \u589e\u91cf\u4e09\u9762\u6307\u7eb9 + diff \u2192 Tier B \u8bed\u4e49\u8bc4\u4f30 (\u7591\u4f3c\u5df2\u4fee\u53ef\u5173\u5355 / \u4f18\u5148\u7ea7 vs \u5728\u5236\u8f68\u9053 / owner \u51b3\u7b56\u9762\u62bd\u53d6) \u2192 MD \u6e32\u67d3\u3002\u4ea7\u51fa groom-report.json (schema v1.1) \u4e0e .aria/groom-assessments.json\u3002\u53ea\u8bfb\u68b3\u7406: \u4ea7\u51fa\u6b62\u4e8e\u62a5\u544a\u4e0e\u5efa\u8bae\u6e05\u5355, \u4e0d\u5199\u56de tracker (\u5efa\u5355/\u5173\u5355/\u6253\u6807/\u632a\u5217\u5747\u4e0d\u505a)\u3002",
+  "results": [
+    {
+      "query": "\u5e2e\u6211\u628a\u4e09\u4e2a\u536b\u661f\u4ed3\u7684 open issue \u68b3\u7406\u4e00\u4e0b: aria\u3001standards\u3001aria-orchestrator \u90fd\u8fc7\u4e00\u904d, \u5206\u597d\u7c7b\u6392\u4e2a\u5e8f, \u51fa\u4e00\u4efd\u6c47\u603b\u7ed9\u6211",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u6bcf\u5468\u4f8b\u884c\u7684 backlog grooming \u53c8\u5230\u70b9\u4e86, \u4e0a\u6b21\u5df2\u7ecf\u8dd1\u8fc7\u4e00\u8f6e, \u8fd9\u6b21\u589e\u91cf\u6765: \u91cd\u70b9\u770b\u65b0\u589e\u7684\u548c\u72b6\u6001\u6709\u53d8\u7684, \u6c47\u603b\u8868\u8fd8\u662f\u8981\u5168\u91cf\u7684",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "Run a backlog grooming pass across the satellite repos \u2014 pull all open issues, bucket them by label and title prefix, and flag the ones that look stale enough to close",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u624b\u4e0a\u7684\u6d3b\u6e05\u5b8c\u4e86, \u5e2e\u6211\u300c\u627e\u4e0b\u4e00\u4e2a\u8be5\u5904\u7406\u7684 issue\u300d, \u987a\u5e26\u7ed9\u4e00\u53e5\u4e3a\u4ec0\u4e48\u5148\u505a\u5b83\u800c\u4e0d\u662f\u522b\u7684",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "open issue \u5feb\u4e00\u767e\u6761\u4e86, \u6309\u8f7b\u91cd\u7f13\u6025\u7ed9\u6211\u6392\u4e2a\u961f, \u8ddf\u5728\u5236\u7684 spec \u9010\u6761\u5bf9\u4e00\u904d, \u5df2\u88ab\u8986\u76d6\u7684\u5355\u72ec\u6807\u51fa\u6765",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "Forgejo \u91cc\u6512\u4e86\u4e24\u767e\u591a\u6761\u5de5\u5355, \u597d\u591a\u516b\u6210\u4ee3\u7801\u65e9\u5c31\u6539\u5b8c\u4e86\u5355\u5b50\u8fd8\u6302\u7740, \u5168\u9762\u8fc7\u4e00\u904d\u628a\u80fd\u6536\u7684\u6311\u51fa\u6765\u5217\u7ed9\u6211, \u5148\u522b\u771f\u53bb\u52a8\u5b83\u4eec",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u4e0b\u5468\u8981\u8ddf owner \u5bf9\u65b9\u5411, \u628a\u5404\u536b\u661f\u4ed3\u7684 open issue \u6c47\u6210\u4e00\u5f20\u603b\u8868, \u9700\u8981\u4ed6\u62cd\u677f\u7684\u90a3\u7c7b\u5355\u72ec\u62bd\u4e00\u680f",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "issue \u591a\u5230\u6ca1\u6cd5\u770b\u4e86, \u5148\u6309\u6807\u9898\u524d\u7f00\u548c label \u7c97\u5206\u6210\u51e0\u5806, \u518d\u628a\u6700\u8fd1\u4ee8\u6708\u6ca1\u52a8\u9759\u7684\u6311\u51fa\u6765\u6c89\u5e95",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u65b0\u4e00\u5468\u5f00\u5de5, \u4e09\u4e2a\u4ed3\u91cc\u8fd8\u5f00\u7740\u7684\u6761\u76ee\u54ea\u51e0\u6761\u6700\u503c\u5f97\u5148\u6295\u5165? \u6311\u524d\u4e09\u7ed9\u6211, \u987a\u624b\u8bb2\u4e0b\u53d6\u820d",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u628a aria-plugin \u4ed3\u6302\u7740\u7684\u90a3\u4e9b\u5355\u5b50\u548c Aria \u4e3b\u4ed3\u7684\u5408\u5728\u4e00\u8d77\u8fc7\u4e00\u904d, \u54ea\u4e9b\u8be5\u63d0\u7ea7\u54ea\u4e9b\u8be5\u964d\u7ea7, \u51fa\u4e00\u4efd\u5efa\u8bae\u6e05\u5355",
+      "should_trigger": true,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u6838\u5bf9\u4e00\u4e0b 10CG/Aria#235 \u8fd9\u4e2a issue \u662f\u4e0d\u662f\u771f\u4fee\u597d\u4e86: \u62a5\u544a\u91cc\u8bf4\u7684\u7248\u672c\u5148\u6838\u5bf9, \u518d\u5230 master \u4e0a\u8bd5\u8bd5\u80fd\u4e0d\u80fd\u590d\u73b0, \u6700\u540e\u770b\u770b\u6709\u6ca1\u6709 in-flight \u5206\u652f\u5df2\u7ecf\u5e26\u4e0a\u4e86\u4fee\u590d",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u521a\u8fdb\u6765\u4e00\u4e2a\u65b0 bug report, 10CG/Aria#242, \u5e2e\u6211 triage \u4e00\u4e0b: \u5148\u9a8c\u8bc1\u7248\u672c\u548c\u4ee3\u7801\u8def\u5f84, \u590d\u73b0\u4e0d\u51fa\u6765\u7684\u8bdd\u5728\u56de\u590d\u8349\u7a3f\u91cc\u6807 cannot-reproduce",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u770b\u4e0b\u9879\u76ee\u5f53\u524d\u72b6\u6001: \u6d3b\u8dc3 spec \u6709\u51e0\u4e2a\u3001\u5206\u652f\u5e72\u51c0\u4e0d\u5e72\u51c0\u3001\u4e0a\u6b21 cycle \u6536\u5c3e\u5230\u54ea\u4e86, \u7136\u540e\u63a8\u8350\u6211\u4e0b\u4e00\u6b65\u8dd1\u54ea\u4e2a\u9636\u6bb5",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u5728 Forgejo \u4e0a\u7ed9\u4eca\u5929\u53d1\u73b0\u7684 secret-guard \u8bef\u62a5\u5efa\u4e2a issue: \u6807\u9898\u6309\u60ef\u4f8b\u8d77\u597d, label \u6253\u4e0a kind/bug \u548c needs-triage",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u628a Forgejo \u9879\u76ee\u677f In Progress \u5217\u91cc\u7684\u90a3 5 \u6761 issue \u632a\u5230 Done, \u987a\u5e26\u7ed9 backlog \u5217\u5269\u4e0b\u7684\u7edf\u4e00\u6253\u4e0a P2 \u6807\u7b7e",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u5c31\u6309\u4e0a\u4e00\u8f6e\u68b3\u7406\u62a5\u544a\u91cc\u90a3 7 \u6761\u7591\u4f3c\u5df2\u4fee\u7684, \u76f4\u63a5\u5230 Forgejo \u4e0a\u628a\u5b83\u4eec\u5168\u5173\u6389, \u5173\u5355\u5907\u6ce8\u6211\u6765\u7ed9",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "openspec/changes/ \u4e0b\u9762\u4e09\u4e2a status=done \u7684 spec \u8be5\u6536\u4e86, \u5f52\u6863\u5230 openspec/archive/ \u5e76\u505a\u843d\u70b9\u6821\u9a8c",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "scratchpad/ \u76ee\u5f55\u592a\u4e71\u4e86, \u5e2e\u6211\u6574\u7406\u4e00\u4e0b: \u6309\u6708\u4efd\u5efa\u5b50\u76ee\u5f55\u5f52\u7f6e, \u8d85\u8fc7\u4e00\u4e2a\u6708\u6ca1\u52a8\u7684\u632a\u8fdb archive/",
+      "should_trigger": false,
+      "trigger_rate": 0.0,
+      "triggers": 0,
+      "runs": 3,
+      "pass": true
+    },
+    {
+      "query": "\u628a\u4e0a\u4e2a\u6708\u5173\u6389\u7684 issue \u6c47\u603b\u6210\u4e00\u6bb5 changelog, \u6309\u529f\u80fd\u5206\u7ec4, \u5199\u8fdb docs/ \u4e0b\u5bf9\u5e94\u6587\u4ef6",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    },
+    {
+      "query": "\u5e2e\u6211\u770b\u4e0b 10CG/aria-plugin#200 \u8fd9\u6761 issue \u76ee\u524d\u7684\u72b6\u6001\u548c label, \u987a\u4fbf\u8bf4\u4e0b\u6700\u540e\u4e00\u6761\u8bc4\u8bba\u662f\u4ec0\u4e48\u65f6\u5019",
+      "should_trigger": false,
+      "trigger_rate": 1.0,
+      "triggers": 3,
+      "runs": 3,
+      "pass": false
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 11,
+    "failed": 9
+  }
+}

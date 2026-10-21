@@ -1,0 +1,15 @@
+[18:19:21] arm=real start
+[18:34:48] arm=real exit=0
+[18:34:48] arm=negctrl start
+[18:57:10] arm=negctrl exit=0
+[18:57:10] ALL DONE
+[14:01:42] arm=real start
+[14:12:39] arm=real exit=0
+[14:12:39] arm=negctrl start
+[14:28:47] arm=negctrl exit=0
+[14:28:47] ALL DONE
+[14:30:37] arm=real start
+[14:40:14] arm=real exit=0
+[14:40:14] arm=negctrl start
+[14:53:57] arm=negctrl exit=0
+[14:53:57] ALL DONE
