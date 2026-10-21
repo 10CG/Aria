@@ -1,0 +1,11 @@
+# E12 real traffic: base hook v1.76.1 (59e333c, e83c5e30f2ccb58f) on every unique NUL-free Bash command > 4096 bytes from this host's transcripts (2026-10-21T07:30:00+00:00); aggregates only
+# bash 5.2, en_US.UTF-8, taskset 0,1 nice 19, timeout 60; regenerate: traffic/extract.py then traffic/base-all.sh <base hook> (TRAFFIC_DIR outside the repo); per-command rows: E12-base-all.tsv (n rc seconds bytes kind)
+
+commands=2412 verdicts: oversize=138 finding=106 allow=2168 
+seconds: total=551 mean=0.23 max=14.1 | >0.5s=119 >1s=18 >1.25s (bash 3.2 ~x4 reaches 5s)=10 >1.9s (Windows ~x2.6 reaches 5s)=3 >5s (Linux, CC kills -> fail-open)=1
+slow (>1.25s) by verdict:
+  finding=1
+  allow=9
+the only >5s: n=630 (finding, 14.1s) = the segment-dense secret-guard probe of E11, not an accidental read
+
+commands >8192 bytes: 739; W10 oversize-blocked ("Nothing was matched", >8192 characters after variable expansion)=130 (17.6%), finding=52, allow=557  -> 10CG/aria-plugin#217

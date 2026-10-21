@@ -1,9 +1,9 @@
 meta:
   change: secret-guard-scan-cost-and-firstpass-cap
   level: 2
-  revision: "v2 (2026-10-20, after B.1): v1 mechanism (cap at _sg_compute_credit entry) invalidated by measurement; re-sequenced R1 (pre-scan gate, PATCH) -> R2 (linear scanners + cumulative clock, PATCH); v2.1 (2026-10-21): TASK-002 rulings (bytes / spaced copy / extension / pregate text / no RAW_MAX); v2.2 (2026-10-21): F7 gate detection superlinear on adversarial shapes -> R1 disclosed residual, R2 r2f"
+  revision: "v2 (2026-10-20, after B.1): v1 mechanism (cap at _sg_compute_credit entry) invalidated by measurement; re-sequenced R1 (pre-scan gate, PATCH) -> R2 (linear scanners + cumulative clock, PATCH); v2.1 (2026-10-21): TASK-002 rulings (bytes / spaced copy / extension / pregate text / no RAW_MAX); v2.2 (2026-10-21): F7 gate detection superlinear on adversarial shapes -> R1 disclosed residual, R2 r2f; v3 (2026-10-21): real traffic (E11/E12) -> R1 shelved (not released), R2 not started, #228 to backlog, next = #217 (owner)"
   linked_issue: "10CG/aria-plugin#228 (resolve at R2); upstream C = secret-guard-time-budget-failclosed v1.76.1; assoc #216 #219 #203 #154"
-  owner_ruling: "2026-10-20 (v1)「按你的设计来」: close the first-pass gap fail-closed (posture = owner). 2026-10-20 (v2, after B.1): 「先发临时闸门再根治」+「贴更正」。"
+  owner_ruling: "2026-10-20 (v1)「按你的设计来」: close the first-pass gap fail-closed (posture = owner). 2026-10-20 (v2, after B.1): 「先发临时闸门再根治」+「贴更正」。2026-10-21 (v3, after real traffic): 「搁置 R1，不发版」+「先量 R2 的真实收益再定」→「#228 转积压，下一步做 #217」。"
   rule6_note: "改 aria/hooks/secret-guard.sh + 其测试 + 头注释 + CHANGELOG, 零 SKILL.md / 零 description / 零 references → 非 Skill 变更, 验证走 substitute (baseline-failing SC + 套件回归 + 直调探针 + 非作者对抗 + 差分)。R1 的 BLOCKED 文案为新增 kind=pregate (v2.1 起, 不复用 oversize)。"
   baseline_freeze: "aria v1.76.1 (master 59e333c); 行号、曲线、g-c 成本以此为准 (证据 .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/)"
 
@@ -39,7 +39,8 @@ tasks:
   - id: TASK-003
     parent: "B.2-R1-review"
     title: "R1 回归 + 非作者对抗: SC-G9 (既有每条 BLOCK 用例补填充 > 阈值、多种分隔符写法 → 闸门必拦) + 坏实现转红 + bash 3.2 / 5.2"
-    status: pending
+    status: done
+    notes: "2026-10-21 done (非作者 qa 席; 摘要 .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/r1-task003-qa-summary.md)。无回归 (836/836; 回放 1411 条逐字节同; 3.2 回放 1404 条同); SC-G9 0 真缺口 (877 条 × 26 放法)。M-1 段密集命令在阈值下让核心超时 (2.4KB / 3.2 下 1.4KB, 基线同); M-2 闸门自身成本比 F7 申报坏 4-8 倍 (R1 对构造填充只把门槛抬 2-4KB); M-3 SC-G 测试偏弱 (o/p/q/r3/s 全绿)。主控核验 M-1 / M-2 / #229 新成员。补测试轮于 owner 搁置 R1 后停止 (半成品留 scratchpad)。"
     agent: qa-engineer
     reason: "adversarial-fixture: 坏态由非作者构造; 换新鲜眼睛"
     verification:
@@ -50,10 +51,19 @@ tasks:
       - "误拦面刻画: >=30 条现实良性大命令 (多行脚本 / 写文档的 heredoc / 大 python -c / 长 commit message / JSON 载荷), 闸门判定 vs 基线核心判定, 报 (a)(b)(c) 之外新拦的类"
       - "F7 独立确认 + 找更坏形状 (更小的命令使闸门单独 >5s)"
 
+  - id: TASK-012
+    parent: "A-recheck"
+    title: "真实流量测量: R1 闸门与基线在本机会话记录的真实 Bash 命令上的收益 / 误拦 / 耗时 (R1 去留与 R2 范围的依据)"
+    status: done
+    agent: main-loop
+    notes: "2026-10-21 done。>4096 字节去重 2,412 条: R1 拦 226 (基线本拦 140, 新拦 86 全为误拦: credit 71 / 反引号讨论文本 15), 挡住的基线超时放行 1 条且为开发探针; 基线均值 0.23s, >5s 仅该探针, 慢平台折算 Windows 3 / bash 3.2 10 条卡满 5s (良性)。顺带: W10 尺寸预算在 739 条 >8KB 命令里拦 130 (17.6%) -> #217; #229 命令位置漏检 1-3 次 / 12.6 万。owner 据此裁定 R1 搁置、#228 转积压、下一步 #217。"
+    deliverables: [".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E11-real-traffic.txt + E11-*.tsv", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E12-base-real-traffic.txt + E12-base-all.tsv", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E13-229-frequency.txt", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/traffic/ (脚本; 命令原文写在 TRAFFIC_DIR, 不入库)"]
+
   - id: TASK-004
     parent: "B.2-R1-accept"
     title: "R1 验收: 主控独立复跑套件 / SC-G / E3 时延佐证 (14KB 新版 < 1s) + red-proof 记录"
-    status: pending
+    status: cancelled
+    notes: "R1 搁置 (owner 2026-10-21, 依据 E11: 真实流量 R1 挡住的真实意外读取 0、新拦 86 全为误拦)"
     agent: main-loop
     reason: "不信执笔回执 (completion-signals ≠ runtime invocation)"
     deliverables: [".aria/notes 验收记录 R1-acceptance.md"]
@@ -63,7 +73,8 @@ tasks:
   - id: TASK-005
     parent: "C-release-R1"
     title: "R1 发版 (PATCH): 合并 aria master (本地 merge 双推) + tag + 主仓同步面 + CHANGELOG 误拦面双向申报 + #228 进度 comment"
-    status: pending
+    status: cancelled
+    notes: "R1 搁置, 不发版 (owner 2026-10-21); 代码留分支 feature/secret-guard-scan-cost-and-firstpass-cap @ b2ed608 作参考"
     agent: main-loop
     owner_gate: true
     owner_gate_detail: "版本号、合并 master、tag、双推均需 owner 授权; 子模块本地 merge + 逐 remote ls-remote + gitlink orphan 守卫; #228 不关 (R2 收口), 只贴进度; CHANGELOG 申报误拦面 (a)(b)(c) + 残余 (变量间接 / F7 对抗形状 / 放行尺寸下推约 3%); owner 可选「先加尺寸硬上限再发」(proposal Decision record 7)"
@@ -71,7 +82,7 @@ tasks:
   - id: TASK-006
     parent: "B.2-R2"
     title: "R2 扫描器 + 检测线性化 (r2a + r2f): spike 择手法 (bash 5.2 与 3.2 实测) → 实现 → SC-L1 (含对抗输入族) + SC-L2 差分 (现有输入 + ≥10k 随机生成)"
-    status: pending
+    status: deferred
     agent: implementer
     reason: "correctness-critical 状态机改写, 钉到字符级; 差分是主证据"
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh, ".aria/notes 差分 / spike 记录"]
@@ -79,7 +90,7 @@ tasks:
   - id: TASK-007
     parent: "B.2-R2"
     title: "R2 按命令累计时钟 + 首遍逐段检查点 + SC-C1 / SC-C2"
-    status: pending
+    status: deferred
     agent: implementer
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     design:
@@ -88,26 +99,26 @@ tasks:
   - id: TASK-008
     parent: "B.2-R2"
     title: "R2 残余与重设: compute_credit 长 token 平方项 (修或据其设阈值) / vx_collect 占比 (不显著则不做) / 重测并重设 _SG_RAW_GATE + SC-B1"
-    status: pending
+    status: deferred
     agent: main-loop
     reason: "测量与阈值推导主控做; 若需改码交执笔席"
 
   - id: TASK-009
     parent: "B.2-R2-review"
     title: "R2 回归 + 非作者对抗: SC-R2 (检出集合逐条不变) + 坏实现转红 + bash 3.2 / 5.2"
-    status: pending
+    status: deferred
     agent: qa-engineer
 
   - id: TASK-010
     parent: "B.2-R2-accept"
     title: "R2 验收: 主控独立复跑 + 良性大命令快速放行 / 密钥形大命令拦 / g-c 降幅实证"
-    status: pending
+    status: deferred
     agent: main-loop
 
   - id: TASK-011
     parent: "C-release-R2"
     title: "R2 发版 (PATCH) + #228 收口 + 头注释 :587 归因 / :582 / C 时钟注释厘清 + #154/#219 披露更新 (owner 定) + 主体 64KB 上限按字符计而文案写 bytes (D3)"
-    status: pending
+    status: deferred
     agent: main-loop
     owner_gate: true
 
@@ -115,6 +126,7 @@ execution_order:
   - [TASK-001]
   - [TASK-002]
   - [TASK-003]
+  - [TASK-012]
   - [TASK-004]
   - [TASK-005]
   - [TASK-006]

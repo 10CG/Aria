@@ -1,0 +1,26 @@
+# E13 #229 frequency in real traffic: all Bash tool_use commands on this host; regenerate: python3 -I traffic/rbound-traffic.py (2026-10-21T07:40:19+00:00)
+# 'command' = not inside a heredoc body or a backtick span (crude heuristic); missed[c] = token followed by c (not a blank / ? / / / end); letters after cp-key's .key are correct non-matches (.keys etc.)
+bash commands scanned: 126082
+  cp-key      command    caught         1
+  cp-key      command    missed['A']    2
+  cp-key      command    missed['E']    1
+  cp-key      command    missed['I']    1
+  cp-key      command    missed['s']    5
+  cp-key      command    missed['}']    1
+  cp-key      discussion missed[')']    1
+  cp-key      discussion missed['s']    2
+  nomad-put   command    caught         27
+  nomad-put   command    missed["'"]    1
+  nomad-put   command    missed[':']    1
+  nomad-put   discussion caught         15
+  nomad-put   discussion missed[':']    2
+  nomad-put   discussion missed['`']    3
+  nomad-put   discussion missed['|']    1
+  pat-tokens  command    caught         3
+  pat-tokens  command    missed['`']    1
+  pat-tokens  discussion caught         9
+  pat-tokens  discussion missed['"']    3
+  pat-tokens  discussion missed[')']    1
+  pat-tokens  discussion missed['`']    7
+  pat-tokens  discussion missed['m']    2
+  pat-tokens  discussion missed['）']    1
