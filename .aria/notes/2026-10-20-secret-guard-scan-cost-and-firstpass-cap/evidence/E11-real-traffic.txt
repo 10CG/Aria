@@ -1,0 +1,39 @@
+# E11 real traffic: R1 gate vs base on this host's Claude Code transcripts (2026-10-21T04:08:08+00:00); aggregates only, no command text
+# hooks: base 59e333c (e83c5e30f2ccb58f) / R1 v2 b2ed608 (63f2251c6e9b1709); bash 5.2, en_US.UTF-8, taskset 0,1 nice 19
+# regenerate: traffic/count.py; traffic/extract.py (writes cmds/ to scratch, NOT committed); traffic/gate-all.sh <R1 hook>; traffic/base-cmp.sh <base hook>; traffic/classify.sh <base> <R1>; traffic/rows.sh <R1>; traffic/flags.py
+
+transcript files=3571 with-bash=2477 bash-commands=125983 over-4096-bytes=2416 (1.92%) in 659 files
+over-4096 sizes: min=4097 p50=6068 p90=16534 max=61705; >14KB=324 >32KB=31
+  -home-dev-Aria                                               bash= 37148 over4096=700
+  -home-dev-SilkNode                                           bash= 25712 over4096=429
+  -home-dev-Aether                                             bash= 19865 over4096=371
+  -home-dev-nexus                                              bash= 17277 over4096=418
+  -home-dev-ShenQuant                                          bash= 15908 over4096=257
+  -home-dev-10cg-local                                         bash=  5210 over4096=114
+  -home-dev-10cg-ops-console                                   bash=  3332 over4096=100
+  -home-dev-Mercury                                            bash=   721 over4096=27
+unique over-4096 commands (NUL-free, deduplicated): 2412
+R1 gate (in-process, default 4096): pregate-block=226 allow=2186; gate seconds total=340 max=0.99
+base hook on the 226 gate-blocked: finding=106 oversize=34 allow=86 | base >5s=1, >1.9s=2
+  slow base: n=630 rc=2 t=15.88s bytes=4364 kind=finding
+  slow base: n=680 rc=0 t=1.94s bytes=61705 kind=allow
+classes of the base-allowed (R1 newly blocks):
+  a-credit mode=whole=71
+  c-spaced mode=whole=15
+c-spaced flags:
+  n=   68 row= 129 bytes= 11391 project=-home-dev-10cg-local   flags=heredoc,git-commit,backticks
+  n=  329 row=  54 bytes=  4366 project=-home-dev-Aether       flags=heredoc,body,api-post,backticks
+  n=  392 row=  24 bytes=  5631 project=-home-dev-Aether       flags=heredoc,backticks
+  n=  397 row=  24 bytes= 10034 project=-home-dev-Aether       flags=heredoc,backticks
+  n=  406 row=  24 bytes= 17327 project=-home-dev-Aether       flags=heredoc,backticks
+  n=  411 row=  29 bytes= 22684 project=-home-dev-Aether       flags=heredoc,git-commit,backticks
+  n=  422 row=  24 bytes=  9153 project=-home-dev-Aether       flags=heredoc,backticks
+  n=  430 row= 148 bytes=  6573 project=-home-dev-Aether       flags=heredoc,body,api-post,backticks
+  n=  433 row= 148 bytes=  4689 project=-home-dev-Aether       flags=heredoc,body,api-post,backticks
+  n=  838 row=   4 bytes= 16960 project=-home-dev-Aria         flags=heredoc,backticks
+  n=  934 row=   4 bytes=  6124 project=-home-dev-Aria         flags=heredoc,backticks
+  n= 1201 row=   4 bytes=  6812 project=-home-dev-Aria         flags=heredoc,backticks
+  n= 1668 row=  42 bytes= 11420 project=-home-dev-SilkNode     flags=heredoc,backticks
+  n= 1847 row=  92 bytes= 11445 project=-home-dev-SilkNode     flags=heredoc,backticks
+  n= 1931 row=  92 bytes= 13821 project=-home-dev-SilkNode     flags=heredoc,backticks
+n=630 (the only base >5s with a finding): project=-home-dev-Aria, 4364 bytes, 1 line, 2162 semicolons, 0 pipes, first row 112 (\bpg_dump\b) -> a segment-dense probe (M-1 shape) from secret-guard work, not an accidental read

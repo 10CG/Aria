@@ -1,0 +1,86 @@
+meta:
+  change: secret-guard-time-budget-failclosed
+  level: 2
+  linked_issue: "10CG/aria-plugin#216 (resolve), #219 (Windows 放大), #203 (assoc), #154 (报告环境)"
+  owner_ruling: "2026-10-16 先按推荐: c1 纯 bash SECONDS + N=3s + PATCH + C 兜底/B 降误拦"
+  rule6_note: "改 aria/hooks/secret-guard.sh + 其测试 + 头注释 + CHANGELOG, 零 SKILL.md / 零 description / 零 references → 不属 Skill 变更, 验证走 substitute (baseline-failing SC + 套件回归 + 直调探针)。非 AI 可见行为文本改动 (BLOCKED 文案只增一句时限 fail-closed)。"
+  baseline_freeze: "aria v1.75.0 (master 08db1c0); 行号与成本以此为准"
+
+tasks:
+  - id: TASK-001
+    parent: "B.1"
+    title: "入场 + 基线: 建分支, 重锚行号, 测 g-c/W9/W1 重腿的基线时间 (Linux [+Windows 若 owner 跑]), 定 N 余量与 SC-B1 阈值, 核 timeout 跨平台 (c2 兜底备注)"
+    status: pending
+    agent: main-loop
+    reason: "设计承重 + 基线测量, 主控亲做"
+    deliverables: [".aria/notes 下的基线记录"]
+    verification:
+      - "重腿 (g-c 16×400B+128refs / W9 整串 / W1 180KB Read) 的交错 CPU/墙钟基线记下; N=3s 的余量在最慢可及平台成立 (CC 5s - N ≥ hook 收尾+粒度误差)"
+      - "SECONDS 1s 粒度对 N=3 足够 (收尾 < 2s 实测)"
+
+  - id: TASK-002
+    parent: "B.2-C"
+    title: "C 实现: 时间预算 fail-closed (SECONDS 检查点, SECRET_GUARD_TIME_BUDGET_S 默认 3) + SC-T1/T2/T3"
+    status: done
+    notes: "2026-10-16 done (aria feature 9a6ce0e): 执笔席实现 + 主控复核修 2 处 (_SG_MODE==none 时钟陈旧 bug / 逐检查点 env 重解析)。套件 824/824; SC-T1/T1b/T2a baseline-failing + SC-T2b/T3a-c 核心不受影响 + SC-T4 结构守卫; bash 3.2.57+5.2 过; red-proof SC-T1 基线 exit0/本版 exit2。W1 大文件腿不存在 (Read/Edit 只匹配 file_path)。"
+    agent: implementer
+    reason: "执笔席 (fix-writer-bottleneck: 换人执笔); 主控不亲写 hook 码"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "在各昂贵腿边界读 SECONDS (bash 内建, 3.2 兼容), 累计 ≥ 预算即中止当前腿 → fail-closed: _sg_emit_blocked 时限变体 (复用 M6 oversize 路径, 文案加「时限内无法扫描, 请拆小」) + return 2"
+      - "覆盖腿: _sg_vx_pass 的 per-segment 循环 / _sg_vx_collect 的 i×j 链式 / W9 _sg_ext 整串一眼 / W1 大文件全扫 (scan 侧若适用)"
+      - "SECRET_GUARD_TIME_BUDGET_S: 默认 3; 环境变量覆盖 (供确定性测试设低值 + 运维调参); 非法/缺省走默认"
+      - "从不 fail-open; # guard:ack 逃生口不变; 内建直接判定 (#154 核心) 在预算内不受影响; 入口闸门先于计时"
+    verification:
+      - "SC-T1 (baseline-failing): 低预算下重命令 → exit 2 + 时限文案; 基线 v1.75.0 同输入不因时间 BLOCK"
+      - "SC-T2: 时限 BLOCK 文案含拆小 + rc=2; 加 # guard:ack 放行"
+      - "SC-T3: 典型直接读取命令仍 exit 2, 时间预算不改变它 (预算内)"
+
+  - id: TASK-003
+    parent: "B.2-B"
+    title: "B 实现: 收敛 _sg_vx_collect O(vars²) 链式 + _sg_compute_credit O(copy²) + SC-B1"
+    status: deferred
+    notes: "2026-10-16 owner 裁定「先发 C, B 另做」→ B 移出本 change, 连同复核发现的 built-in 首遍 raw 命令超时缺口归 follow-up 10CG/aria-plugin#228。本 change 发 C only (v1.75.1)。"
+    agent: implementer
+    reason: "执笔席; 承重算法, 钉到字符级 (spec-underdetermination)"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    verification:
+      - "SC-B1: g-c tier 整进程 CPU 较 v1.75.0 降 ≥ 阈值 (TASK-001 定; 交错 min/5 比值); 慢平台外推 < N"
+      - "正确性零回归: 既有检出集合不变 (SC-R 覆盖)"
+
+  - id: TASK-004
+    parent: "B.2-review"
+    title: "回归 + 非作者对抗复核: SC-R (822/816 套件 + SC-30 + W14 时档) + SC-32 (bash-3.2) + 坏实现对抗 (非作者构造)"
+    status: done
+    notes: "2026-10-20 done (主控对抗复核): 套件 825/825 (真 checkout, 含 SC-30 SC-9a/SC-8) + W14 timing 20/20 有界档 + bash 3.2.57 过; 对抗发现并处置 4 项 (clock-freshness bug / per-checkpoint perf / 预算无上界→封顶 / built-in 首遍 raw 命令缺口→#228); red-proof SC-T 系列。注: 对抗由主控 (非 C 执笔者) 复核, 非另立 qa 席; 需额外保险可加新鲜眼睛一轮。"
+    agent: qa-engineer
+    reason: "adversarial-fixture: 坏态由非作者独立构造; 换新鲜眼睛"
+    verification:
+      - "既有套件无回归 (计数随新测试更新, 头计数断言同步); SC-30 + 时档全绿; bash-3.2 + (若可) MINGW64 下 hook 加载 + 典型拦截 + 重命令 fail-closed"
+      - "SC-T/SC-B 的坏实现 (fail-open 回退 / 预算失效 / B 破坏检出) 均转红"
+
+  - id: TASK-005
+    parent: "B.2-accept"
+    title: "验收: 主控独立复跑探针/套件/时档 + SC 全绿 + 重命令 fail-closed 实证"
+    status: done
+    notes: "2026-10-20 done: 记录 .aria/notes/2026-10-16-secret-guard-time-budget-failclosed/C-acceptance.md; 全绿 (825/825 + W14 20/20 + red-proof)。"
+    agent: main-loop
+    reason: "不信执笔回执, 主控亲跑"
+    deliverables: [".aria/notes 验收记录"]
+
+  - id: TASK-006
+    parent: "C-release"
+    title: "发版 (PATCH) + #216 收口 + 头注释 :582 改「#216 已收口」"
+    status: done
+    notes: "2026-10-20 发版 PASS (owner 授权; 因 #199 已发 v1.76.0, 版号由 v1.75.1 校正为 **v1.76.1** PATCH, owner 2026-10-20 确认)。aria master 59e333c + tag v1.76.1; 主仓 master 878f8d9 (16 版本点 1.76.0→1.76.1 + gitlink aria 59e333c; standards a611136 不变)。发版前两 master 陈旧 (aria +#199/v1.76.0, main +v1.76.0 同步+issue-groomer), 已对齐 origin 再本地 merge, C 与 #199 disjoint (secret-guard.sh 逐字节同), 无冲突。三仓 local/origin/github 三方 ls-remote 一致; aria tag 双远程; gitlink github 可达 (clone --recursive 安全); 4 版本一致性 check 全绿; INV-6 全 Refs-only; 子模块本地 merge 双推。#216 (W10/W9 超时悬崖) 已 closed (comment 29729) + 披露 Windows 实测; built-in 首遍缺口 + B 续 #228。Rule #10 流程判断 (请复议): pre-merge completeness gate = audit.checkpoints.pre_merge 配置 off → N/A (config-off 豁免, 非价值判断); C.2.4 CI 前置门 ci_backends=null 本地 merge 无 CI → skip_with_warning (Rule #8 成文降级)。遗留 trivial: secret-guard.sh 头注释 :582「#216 not touched」在 M6 语境内仍准 (M6 尺寸预算不碰超时; C 时间预算另碰, 见其 :594 注释块), 下次动 secret-guard.sh (#228 B) 时顺手厘清措辞。"
+    agent: main-loop
+    owner_gate: true
+    owner_gate_detail: "版本号、合并 master、打 tag、多远程双推均需 owner 授权; #216 关单逐条披露 (含 Windows 实测前后对比)"
+
+execution_order:
+  - [TASK-001]
+  - [TASK-002]
+  - [TASK-003]
+  - [TASK-004]
+  - [TASK-005]
+  - [TASK-006]

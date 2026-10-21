@@ -1,0 +1,8 @@
+# W5 hard-deadline cost on real traffic (2026-10-21T13:17:42Z); regenerate: traffic/deadline-estimate.sh
+joined=138 (expected 138) max total on Linux=1.93s
+  linux, deadline 3s: 0 of 138 would be time-blocked
+  linux, deadline 4s: 0 of 138 would be time-blocked
+  windows-x2.6, deadline 3s: 8 of 138 would be time-blocked
+  windows-x2.6, deadline 4s: 3 of 138 would be time-blocked
+  bash3.2-x4, deadline 3s: 35 of 138 would be time-blocked
+  bash3.2-x4, deadline 4s: 17 of 138 would be time-blocked

@@ -1,0 +1,137 @@
+meta:
+  change: secret-guard-scan-cost-and-firstpass-cap
+  level: 2
+  revision: "v2 (2026-10-20, after B.1): v1 mechanism (cap at _sg_compute_credit entry) invalidated by measurement; re-sequenced R1 (pre-scan gate, PATCH) -> R2 (linear scanners + cumulative clock, PATCH); v2.1 (2026-10-21): TASK-002 rulings (bytes / spaced copy / extension / pregate text / no RAW_MAX); v2.2 (2026-10-21): F7 gate detection superlinear on adversarial shapes -> R1 disclosed residual, R2 r2f; v3 (2026-10-21): real traffic (E11/E12) -> R1 shelved (not released), R2 not started, #228 to backlog, next = #217 (owner)"
+  linked_issue: "10CG/aria-plugin#228 (resolve at R2); upstream C = secret-guard-time-budget-failclosed v1.76.1; assoc #216 #219 #203 #154"
+  owner_ruling: "2026-10-20 (v1)「按你的设计来」: close the first-pass gap fail-closed (posture = owner). 2026-10-20 (v2, after B.1): 「先发临时闸门再根治」+「贴更正」。2026-10-21 (v3, after real traffic): 「搁置 R1，不发版」+「先量 R2 的真实收益再定」→「#228 转积压，下一步做 #217」。"
+  rule6_note: "改 aria/hooks/secret-guard.sh + 其测试 + 头注释 + CHANGELOG, 零 SKILL.md / 零 description / 零 references → 非 Skill 变更, 验证走 substitute (baseline-failing SC + 套件回归 + 直调探针 + 非作者对抗 + 差分)。R1 的 BLOCKED 文案为新增 kind=pregate (v2.1 起, 不复用 oversize)。"
+  baseline_freeze: "aria v1.76.1 (master 59e333c); 行号、曲线、g-c 成本以此为准 (证据 .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/)"
+
+tasks:
+  - id: TASK-001
+    parent: "B.1"
+    title: "入场 + 基线: claim, 建分支, 重锚行号, 首遍曲线 / 分阶段 / 检测循环 / bash 3.2 / g-c 实测, 根因定位, 阈值推导"
+    status: done
+    agent: main-loop
+    notes: "2026-10-20 done. claim claims/023236f2/s-9fd6@1625 (协调 ref 310361f→a7c698d, ls-remote 核验, 他人 claim 完好); 分支 aria feature/secret-guard-scan-cost-and-firstpass-cap @59e333c。实测推翻 v1 归因: 主成本 = _sg_safe_to_split / _sg_split_top 逐字符 ${_cmd:_i:1} 的 O(n²) (切分前、预算外、每条命令), compute_credit 仅次要; v1.76.1 Linux 生产默认下 14KB 填充即 fail-open (含独立成段); bash 3.2 ~3KB 越线; 检测循环线性; g-c 1.87s 几乎全是扫描器。owner 2026-10-20 据此改向 v2。流程判断请复议: (1) A.1 起草时未走 state-scanner/phase1_gate 认领 (brainstorming 直起草), 于 B 入口按 phase-b-developer B.0 补认领; (2) 分支名沿用 aria 近 6 条先例 feature/<change-name>, 未用 branch-manager 文档的 feature/{module}/{task-id}-{desc}。"
+    deliverables: [".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/ (b1-baseline.md + evidence/E2-E6 + pilot-8-32.tsv + 重生成脚本)"]
+
+  - id: TASK-002
+    parent: "B.2-R1"
+    title: "R1 实现: _sg_raw_limits / _sg_bytelen / _sg_environ_neutral (从 _sg_judge_one 原样抽出) / _sg_pregate (源码闸门之上) + pregate 文案 + _sg_per_segment_eval 首句调用 + SC-G1..G13 (无 G3)"
+    status: done
+    notes: "2026-10-20 执笔席 1 交第一版 (833/833; 基线红 G1/G3/G4/G6/G8; environ 抽出差分 0/3031; 整 hook 差分 386 条逐字节同; 14KB 读取+填充 0.075s vs 基线 5.88s), 并实测报出闸门设计 6 处问题: (1) 按字符计长 → 多字节填充 12KB 藏在 4096 下首遍 6s; (2) 整串匹配漏「右边界紧贴 ;」(cp…key / Forgejo PAT tokens 端点 / nomad var put; 预检 4032 种漏 2); (3) 项目扩展路径不进闸门 (12.4s); (4) 复用 oversize 文案写 Nothing was matched 与原因矛盾; (5) 整串跨段误拦; (6) _SG_RAW_MAX 死代码 (既有 64KB 检查先拦, 主控已核基线 :1156)。主控 2026-10-21 裁定: 1/2/3/4/6 修, 5 作 R1 临时期误拦子类接受 (proposal v2.1)。第一版快照留 scratchpad r1/r1-gate-v1.patch 作回退点与「新测试在第一版上转红」的红证明对象。修正轮由新实例执笔 (执笔席 1 上下文已 ~45 万, 按 subagent-cost 换实例)。主控起草 v2.1 时自身会话的 guard (1.74.1) 当场拦下含跨段误拦示例的编辑命令 —— 子类 (5) 的现场复现。 2026-10-21 修正轮 (执笔席 2) 交付: 836/836; 红证明 基线 828/836 (红 = 8 条 bf) / 第一版 829/836 (G1 G4 G6 仅文案 + G10-G13)。主控独立复核全部复跑通过 (记录 .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/r1-task002-review.md + evidence/E8-E10), done。新发现 F7: 闸门自身检测在对抗形状上超线性 (60KB curl 重复填充 9.6s / 32KB 密集 .environ.get( 16.4s / 60KB ; 密集良性 6.6s, 主控复现) —— 主控裁定 R1 照发、如实申报, R2 新增 r2f; 现实形状不受影响 (多行脚本 4.7-64KB 闸门 ≤0.06s 拦)。既有缺口另立 aria-plugin #229 (右边界类) / #230 (W9 前 64 处命中)。SC-8 各档在闸门以下, 只测到 _sg_raw_limits / _sg_bytelen; 超阈值时延由 E8 + TASK-004 佐证。"
+    agent: implementer
+    reason: "执笔席 (fix-writer-bottleneck); 主控不亲写 hook 码, 独立复核"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "按 proposal §R1 (v2.1) 逐字实现: helper 定义在源码闸门之上 (SC-8 harness 只 source 闸门以上); _sg_per_segment_eval 第一条语句 `_sg_pregate \"$cmd\" || return $?`"
+      - "_sg_raw_limits [MAJOR]: _SG_RAW_GATE=4096 (MAJOR<4 → 1536; MAJOR 缺省 BASH_VERSINFO[0]); SECRET_GUARD_RAW_GATE 只能调低 (case 判整数, 10#, 非法/空 → 默认), 风格同 _sg_time_budget。无 _SG_RAW_MAX (既有 64KB 检查覆盖)"
+      - "_sg_bytelen: local -x LC_ALL=C 下取字节长度 → _SG_BLEN; 闸门比较用字节, 模式匹配仍在调用者 locale"
+      - "_sg_environ_neutral: 把 _sg_judge_one 里 W12 的 4 个 while 循环原样移入 (输入 → _SG_NEUT), _sg_judge_one 改为 `_sg_environ_neutral \"$subj\"; subj=$_SG_NEUT`; 语义逐字节同 (差分验证)"
+      - "_sg_pregate: ①字节长 ≤ 闸门 → return 0 ②中和 + 一次 sed 生成分隔副本 (; & | ) 反引号 前插空格), 原串或副本任一命中 → pregate 拦 ③扩展生效时对 _sg_ext_subst 结果同样检测 (不调 _sg_core_eval) ④return 0; mode=whole"
+      - "_sg_emit_blocked 新增 kind=pregate (中英文案如实说明原因与拆小 / Write 工具), 不复用 oversize 文案"
+      - "核 SC-8 latency harness 是否定义 risky_patterns; 若未定义, 闸门在 harness 中为空循环 —— 记录, 不得让 harness 因此恒绿掩盖时延"
+    verification:
+      - "SC-G1..G13 (见 proposal, 无 G3), 基线必红的先在 59e333c 上跑出红; G10..G13 另须在第一版快照上转红"
+      - "SC-R1 部分: 全套件绿 (计数同步) + C 的 SC-T 绿; _sg_environ_neutral 抽出前后对既有全部 _sg_judge_one 用例差分一致"
+
+  - id: TASK-003
+    parent: "B.2-R1-review"
+    title: "R1 回归 + 非作者对抗: SC-G9 (既有每条 BLOCK 用例补填充 > 阈值、多种分隔符写法 → 闸门必拦) + 坏实现转红 + bash 3.2 / 5.2"
+    status: done
+    notes: "2026-10-21 done (非作者 qa 席; 摘要 .aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/r1-task003-qa-summary.md)。无回归 (836/836; 回放 1411 条逐字节同; 3.2 回放 1404 条同); SC-G9 0 真缺口 (877 条 × 26 放法)。M-1 段密集命令在阈值下让核心超时 (2.4KB / 3.2 下 1.4KB, 基线同); M-2 闸门自身成本比 F7 申报坏 4-8 倍 (R1 对构造填充只把门槛抬 2-4KB); M-3 SC-G 测试偏弱 (o/p/q/r3/s 全绿)。主控核验 M-1 / M-2 / #229 新成员。补测试轮于 owner 搁置 R1 后停止 (半成品留 scratchpad)。"
+    agent: qa-engineer
+    reason: "adversarial-fixture: 坏态由非作者构造; 换新鲜眼睛"
+    verification:
+      - "SC-G9: 从 secret-guard.test.sh 抽出所有期望 exit 2 的 Bash 用例, 各补前后填充到 > 阈值 (`;` / `;`无空格 / `&&` / `||` / `|` / 子 shell / $( )), 闸门全拦; 漏一条即红并上报 (不得改用例迁就实现)"
+      - "坏实现转红: (a) 闸门放在 _sg_core_eval 之后 (G1 时延红) (b) 不看命中超长即拦 (G2 红) (c) 不中和 (G5 红) (d) env 可调高 (G6 红) (e) helper 放在源码闸门以下 (SC-8 harness rc127) (f) 按字符计长 (G10 红) (g) 只测原串 (G11 红) (h) 忽略扩展 (G12 红)"
+      - "bash-3.2.57 + 5.2 bash -n; 3.2 档阈值行为 (G8) 实跑"
+      - "SC-G9 漏项逐条分类: 文档已申报残余 (变量间接, 只能靠变量解析拦的) 单列, 其余为真缺口"
+      - "误拦面刻画: >=30 条现实良性大命令 (多行脚本 / 写文档的 heredoc / 大 python -c / 长 commit message / JSON 载荷), 闸门判定 vs 基线核心判定, 报 (a)(b)(c) 之外新拦的类"
+      - "F7 独立确认 + 找更坏形状 (更小的命令使闸门单独 >5s)"
+
+  - id: TASK-012
+    parent: "A-recheck"
+    title: "真实流量测量: R1 闸门与基线在本机会话记录的真实 Bash 命令上的收益 / 误拦 / 耗时 (R1 去留与 R2 范围的依据)"
+    status: done
+    agent: main-loop
+    notes: "2026-10-21 done。>4096 字节去重 2,412 条: R1 拦 226 (基线本拦 140, 新拦 86 全为误拦: credit 71 / 反引号讨论文本 15), 挡住的基线超时放行 1 条且为开发探针; 基线均值 0.23s, >5s 仅该探针, 慢平台折算 Windows 3 / bash 3.2 10 条卡满 5s (良性)。顺带: W10 尺寸预算在 739 条 >8KB 命令里拦 130 (17.6%) -> #217; #229 命令位置漏检 1-3 次 / 12.6 万。owner 据此裁定 R1 搁置、#228 转积压、下一步 #217。"
+    deliverables: [".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E11-real-traffic.txt + E11-*.tsv", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E12-base-real-traffic.txt + E12-base-all.tsv", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E13-229-frequency.txt", ".aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/traffic/ (脚本; 命令原文写在 TRAFFIC_DIR, 不入库)"]
+
+  - id: TASK-004
+    parent: "B.2-R1-accept"
+    title: "R1 验收: 主控独立复跑套件 / SC-G / E3 时延佐证 (14KB 新版 < 1s) + red-proof 记录"
+    status: cancelled
+    notes: "R1 搁置 (owner 2026-10-21, 依据 E11: 真实流量 R1 挡住的真实意外读取 0、新拦 86 全为误拦)"
+    agent: main-loop
+    reason: "不信执笔回执 (completion-signals ≠ runtime invocation)"
+    deliverables: [".aria/notes 验收记录 R1-acceptance.md"]
+    verification:
+      - "E3 的 14KB 输入新版 < 1s; 真 bash 3.2 实跑 SC-G8 (~2KB 读取 -> pregate 1536); 现实形状上限复跑 (E8)"
+
+  - id: TASK-005
+    parent: "C-release-R1"
+    title: "R1 发版 (PATCH): 合并 aria master (本地 merge 双推) + tag + 主仓同步面 + CHANGELOG 误拦面双向申报 + #228 进度 comment"
+    status: cancelled
+    notes: "R1 搁置, 不发版 (owner 2026-10-21); 代码留分支 feature/secret-guard-scan-cost-and-firstpass-cap @ b2ed608 作参考"
+    agent: main-loop
+    owner_gate: true
+    owner_gate_detail: "版本号、合并 master、tag、双推均需 owner 授权; 子模块本地 merge + 逐 remote ls-remote + gitlink orphan 守卫; #228 不关 (R2 收口), 只贴进度; CHANGELOG 申报误拦面 (a)(b)(c) + 残余 (变量间接 / F7 对抗形状 / 放行尺寸下推约 3%); owner 可选「先加尺寸硬上限再发」(proposal Decision record 7)"
+
+  - id: TASK-006
+    parent: "B.2-R2"
+    title: "R2 扫描器 + 检测线性化 (r2a + r2f): spike 择手法 (bash 5.2 与 3.2 实测) → 实现 → SC-L1 (含对抗输入族) + SC-L2 差分 (现有输入 + ≥10k 随机生成)"
+    status: deferred
+    agent: implementer
+    reason: "correctness-critical 状态机改写, 钉到字符级; 差分是主证据"
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh, ".aria/notes 差分 / spike 记录"]
+
+  - id: TASK-007
+    parent: "B.2-R2"
+    title: "R2 按命令累计时钟 + 首遍逐段检查点 + SC-C1 / SC-C2"
+    status: deferred
+    agent: implementer
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "_SG_T0 重置移到 _sg_per_segment_eval 入口 (闸门前); 删 :1542 首遍后重置; _sg_vx_collect 的重置仅在非命令求值内的直接调用时生效; _sg_core_eval 每段 _sg_judge_one 前 _sg_over_budget 检查点"
+
+  - id: TASK-008
+    parent: "B.2-R2"
+    title: "R2 残余与重设: compute_credit 长 token 平方项 (修或据其设阈值) / vx_collect 占比 (不显著则不做) / 重测并重设 _SG_RAW_GATE + SC-B1"
+    status: deferred
+    agent: main-loop
+    reason: "测量与阈值推导主控做; 若需改码交执笔席"
+
+  - id: TASK-009
+    parent: "B.2-R2-review"
+    title: "R2 回归 + 非作者对抗: SC-R2 (检出集合逐条不变) + 坏实现转红 + bash 3.2 / 5.2"
+    status: deferred
+    agent: qa-engineer
+
+  - id: TASK-010
+    parent: "B.2-R2-accept"
+    title: "R2 验收: 主控独立复跑 + 良性大命令快速放行 / 密钥形大命令拦 / g-c 降幅实证"
+    status: deferred
+    agent: main-loop
+
+  - id: TASK-011
+    parent: "C-release-R2"
+    title: "R2 发版 (PATCH) + #228 收口 + 头注释 :587 归因 / :582 / C 时钟注释厘清 + #154/#219 披露更新 (owner 定) + 主体 64KB 上限按字符计而文案写 bytes (D3)"
+    status: deferred
+    agent: main-loop
+    owner_gate: true
+
+execution_order:
+  - [TASK-001]
+  - [TASK-002]
+  - [TASK-003]
+  - [TASK-012]
+  - [TASK-004]
+  - [TASK-005]
+  - [TASK-006]
+  - [TASK-007]
+  - [TASK-008]
+  - [TASK-009]
+  - [TASK-010]
+  - [TASK-011]

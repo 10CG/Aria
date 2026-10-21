@@ -1,0 +1,30 @@
+# E9 TASK-002 fix-round: main-loop independent suite + red-proofs (2026-10-21T02:09:07+00:00); tests sha256 13ca0df36e7c6a9e
+## new hook (63f2251c6e9b1709) + new tests
+PASS: 836 / 836
+FAIL: 0 / 836
+EXIT=0
+## base 59e333c hook (e83c5e30f2ccb58f) + new tests
+PASS: 828 / 836
+FAIL: 8 / 836
+EXIT=1
+FAIL [SC-G10 bf
+FAIL [SC-G11 bf
+FAIL [SC-G12 bf
+FAIL [SC-G13 bf
+FAIL [SC-G1 bf
+FAIL [SC-G4 bf
+FAIL [SC-G6 bf
+FAIL [SC-G8 bf
+## first R1 version (0e01c4f712be33a5) + new tests
+PASS: 829 / 836
+FAIL: 7 / 836
+EXIT=1
+FAIL [SC-G10 bf
+FAIL [SC-G11 bf
+FAIL [SC-G12 bf
+FAIL [SC-G13 bf
+FAIL [SC-G1 bf
+FAIL [SC-G4 bf
+FAIL [SC-G6 bf
+  SC-G6 detail: 1 check(s) off: {end to end: gate 999999, padded read | wc -l: want '2|4096|no', got '2|-|no'}
+## SC-8 tier (e) (pre-existing level, same on base): [SC-8] tier (e): old=28.5ms/call new=57.2ms/call ceiling=100.0ms (absolute)  [
