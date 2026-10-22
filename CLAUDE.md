@@ -142,7 +142,8 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
   2026-10-22 双子星分界: 双子星轨 = #217 secret-guard (owner 裁「钉设计后实现优先」, R2 五席 FAIL
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
 版本: aria-plugin v1.77.2 (双 PATCH 合发 Aria#223 gate 基线 ref 解析 fail-loud / #218 handoff
-  frontmatter 仲裁键; #246 发布收尾三步入 standards §6.4 v1.2.0) | 主项目 v1.7.5 |
+  frontmatter 仲裁键; #246 发布收尾三步入 standards §6.4 v1.2.0; 对抗 review 债务 → #257 v1.77.3
+  待办) | 主项目 v1.7.5 |
   aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
