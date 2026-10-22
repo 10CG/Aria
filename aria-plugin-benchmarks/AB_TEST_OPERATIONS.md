@@ -85,7 +85,7 @@ aria-plugin-benchmarks/
 | 固定测试集 | `ab-suite/` | 常态化比对 | 修改需升版本号，旧数据不可比 |
 | 现有 evals | `{skill}/evals/evals.json` | 首轮基线 | 可迁移到 ab-suite |
 | 临时测试 | `{skill}/{skill}-workspace/` | 开发中验证 | 随时可改，不计入基线 |
-| trigger 套件 | `ab-suite/trigger/` | description 地板守卫 (场景 4b) | 同固定测试集: 修改需升 `ab-suite/version.yaml`，旧数据不可比 |
+| trigger 套件 | `ab-suite/trigger/` | description 地板守卫 (场景 4b; should-not 条目须标 `type`, 门只计 capability 类) | 同固定测试集: 修改需升 `ab-suite/version.yaml`，旧数据不可比 |
 
 ---
 
@@ -279,10 +279,10 @@ eval 是在**真实 Aria 仓、真实 origin** 里跑的 (subagent 无 sandbox)�
 
 判据:
 
-- **通过** = 两个条件同时成立: (1) `run_eval.py` 输出的每条 `pass` 为真, 即每条 should-trigger `trigger_rate ≥ 0.5` **且** 每条 should-not `trigger_rate < 0.5` (`run_eval()` 的 `did_pass` 语义, 已读源码核对); (2) **调用级地板**: 被评臂 should-trigger 半程的触发次数 ≥ 28/30 (runs = 3、should-trigger 10 条时最多允许 2 次未触发; 改 runs 或套件条数须按比例重算, 那是换判据, 须 owner 裁)。地板只判被评臂, 不判负控臂。
+- **通过** = 两个条件同时成立: (1) 每条 should-trigger `trigger_rate ≥ 0.5` **且** 每条 `type: capability` 类 should-not `trigger_rate < 0.5` —— **门判据只计 capability 类** (见下方 should-not 二分表; `routing` 类不计门)。`run_eval()` 的 `did_pass` 语义是 runner 侧逐条判定 (已读源码核对: runner 只读 `query`/`should_trigger`, 对 `type` 零感知), 其 `pass` 字段在手册门语义下仅对 capability 类有效, routing 类误触不据此判 fail。**未标注防整面空转 (硬规则)**: 套件存在未标注 `type` 的 should-not 条目时, **不得按本判据判定** —— 视同判据未满足 (fail-CLOSED; 空的 capability 集不得当「零 fail」用), 先补标注 + 升 `ab-suite/version.yaml` 再判; (2) **调用级地板**: 被评臂 should-trigger 半程的触发次数 ≥ 28/30 (runs = 3、should-trigger 10 条时最多允许 2 次未触发; 改 runs 或套件条数须按比例重算, 那是换判据, 须 owner 裁)。地板只判被评臂, 不判负控臂。
 - **参数钉死** (阈值语义依赖 runs): `--runs-per-query 3` (0.5 门 = 2/3), `--trigger-threshold 0.5`, `--timeout 120`, `--num-workers 1` (见前置表第 1 条), 显式 `--model` (见前置表第 4 条), 套件 20 条 (10/10)。改任一参数 = 换判据, 须 owner 裁 (例: 阈值 0.8 在 3 runs 下等于 3/3)。
 - **阈值与地板的依据** (owner 2026-09-17 裁定; 依据 = 基线目录里跑满 20 条 query 的 21 个臂, 另有 4 次单 query 的报错探针不计): 这 21 个臂里真 description 的 14 个, 其中健康配置 (独立根 + 单 worker, v2 起) 的 11 个; 这 11 个里 10 个是调用级 30/30 (每条 should-trigger query 都 3/3), 唯一的例外是 v2 的被评臂 27/30 —— 它有一条 query 三次全没触发, 按 query 门就已经是 9/10 的 fail。所以 0.5 与 0.8 在这些臂上从未改变过任何一臂的门判定 (只改变过两处 query 命中计数: v1 的一臂 1/10 对 0/10, 10/10 门下都是 fail; v3 的负控 3/10 对 2/10, 不超过 5/10 门下都是 valid), 单挑阈值定不出优劣。地板补的是 0.5 唯一的理论缺口 (每条 query 都恰好 2/3、合计 20/30 时, 只按 query 判仍算全过); 取 28/30 而不取 30/30, 是为了不让一两次健康的未触发把好 description 判红。按已有数据, 这条地板从来不是约束 (10 个臂 30/30, 那个 27/30 本来就过不了 query 门)。不健康的调用不走这条地板, 由逐调用健康检查处理。
-- **只承诺已验证的两类破坏**: 删领域词 (should-trigger 掉) 与显式强制过宽 (should-not 涨)。一次自然措辞扩张 (多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」四处, 其中「整理归档文档」直接带被测 skill 的领域词) 实测不判红 (RESULT v9 §v5): 守卫判得出什么, 由套件里的近似误触决定。
+- **只承诺已验证的两类破坏**: 删领域词 (should-trigger 掉) 与显式强制过宽 (should-not 涨, 限 `type: capability` 类; routing 类涨走观察面)。一次自然措辞扩张 (多加「与相关文档 / 整理项目收尾材料 / 整理归档文档 / 收尾整理」四处, 其中「整理归档文档」直接带被测 skill 的领域词) 实测不判红 (RESULT v9 §v5): 守卫判得出什么, 由套件里的近似误触决定。
 - **逐调用健康检查** (识别环境故障): `run_eval.py` 把 `claude -p` 的报错、超时、非零退出都记成一次「未触发」, `runs` 恒为 3, 输出 json 里与「真没触发」分不开 (源码: `run_single_query` 超时或进程提前退出时返回「未触发」, 遇报错的结果帧照常返回此前的判定; 只有工作进程抛异常才进 `run_eval()` 的 `except Exception` 分支并打印 `Warning: query failed`)。所以每臂都经 claude 垫片 (`aria-plugin-benchmarks/tools/trigger-eval/claude-shim.sh`, 见前置表第 3 条) 跑, 垫片把每次调用的输出流与 query 原文各另存一份 (每臂一个新建的空日志目录)。跑完用 `aria-plugin-benchmarks/tools/trigger-eval/classify_calls.py` 检查, 被评臂加 `--role evaluated`, 负控臂加 `--role negctrl`: 单次调用须走到 `run_eval.py` 据以下判定的事件 (tool_use 开始、`message_stop`、含 tool_use 的 assistant 消息、结果帧 四者之一), 结果帧不得报错, 耗时须小于超时阈值减 1 秒, 否则算不健康; 每条 query 的日志数须等于它的 runs。不健康的调用按「触发」「没触发」两种可能都算: 被评臂的门判定、负控的命中数判定在两种极端下都不变, 检查结论为 pass / fail (被评臂) 或 valid (负控臂); 会变, 结论为 void, 本轮作废 (见下)。实证见基线目录 RESULT.md「v6: 逐调用健康检查」一节。
 - **同批负控** (验证本轮数字可用, 不评 description):
   - 构造: 删去全部领域名词与该 skill 特有动作词, 只留「处理一件事项」级的泛化句 (基线负控保留了「收尾 / 核对」, 仍命中 3 条带这类动作语义的 query; 按本规则构造的「对一个事项做处理。」在 v5 为 0/10, 见 RESULT v9)。
@@ -290,7 +290,15 @@ eval 是在**真实 Aria 仓、真实 origin** 里跑的 (subagent 无 sandbox)�
   - **作废**在以下任一情形发生: 任一臂逐调用健康检查不通过 (检查结论为 void, 即不健康的调用足以改变判定; 或检查脚本无法判定); 负控 ≥ 6/10, 不论被评 description 过没过门 (套件分不开「有没有触发词」, 本轮数字不可用); `run_eval.py` 非零退出、没有输出 json, 或 stderr 出现 `Warning: query failed`。作废时不判被评 description。作废 = 本 cycle 的 Rule #6 义务未完成, **不得 ship**; 修套件或环境后重跑; rule6_note 记 `scenario4b: <结果目录> void`; **连续 2 轮作废 ⇒ 升级 owner** (AI 不得自行豁免, Rule #10)。
 - **fail 的后果**: 本轮不作废 (各臂逐调用健康检查都通过、负控 ≤ 5/10、`run_eval.py` 正常退出且无 Warning) 而被评臂的检查结论为 fail (门判 fail, 且不健康的调用改变不了这一点) ⇒ 该 description 改动**不得 ship** (与 void 同为义务未完成)。处置二选一: (1) 修正 description 直到门通过; (2) 若 fail 来自**有意**收窄或拓宽触发面 (套件原来的 should / should-not 划分已不符合新意图), 则先改套件 (升 `ab-suite/version.yaml`, 新套件经 owner 审阅) 再重跑; 两条都不走 ⇒ 升级 owner。rule6_note 记 `scenario4b: <结果目录> fail` 与所走的处置。
 - **不设比较判据** (如新版触发率不低于旧版): 在饱和处退化 (见基线目录 RESULT.md 结论 1); 如需比较, 只作 rule6_note 观察, 不作门。
-- **套件**: 每个被评 skill 一份 `aria-plugin-benchmarks/ab-suite/trigger/<skill>.json` (20 条, should / should-not 各 10, should-not 以近似误触为主), **沿用 `ab-suite/` 版本化规则** (改套件须升 `ab-suite/version.yaml`, 旧数据不可比)。should-not 的近似误触须覆盖该 skill 最可能被扩到的相邻任务 (v5: 本套件对「整理收尾材料」这一幅度的扩张不敏感)。新套件须经 owner 审阅后才能作门。新增 skill 的首个 description 同样要过本场景, 其首个套件随之建立。
+- **should-not 二分 (`type` 字段)** (Aria#243, owner 2026-10-22 裁方向 C; 同族 #214 自主运行时 description 处理): 每条 should-not 条目须标 `"type": "capability" | "routing"`:
+
+  | type | 语义 | 单技能沙箱可评? | 门 |
+  |------|------|----------------|-----|
+  | `capability` (能力外) | 「这不是该 skill 做的事, 且没有别的 skill 接」——被评 skill 独立可拒 | ✅ | **计入** (trigger_rate ≥ 0.5 判 fail) |
+  | `routing` (路由边界) | 「这是兄弟 skill 的活, 该让位」 | ❌ 结构性不可评: 项目根仅含被评技能、兄弟不在场, 唯一在场的技能承接一切路由, 误触是沙箱伪影 (误触率虚高 ≠ description 差; 实证: issue-groomer description 负面边界前移仍 9/10 误触, 修 description 已证无效) | 不计门, **观察面** |
+
+  routing 类误触不判 fail 也不作 void 依据; run_eval 输出照常呈现, RESULT/报告须**单列 routing 类误触计数** (供人工判断与跟进轨数据), 不计入门。routing 类恢复设门 = P2 跟进轨 (`run_eval.py --sibling-placeholders` 兄弟占位增强, 10CG/Aria#253); 既有已 ship 套件不回溯标注, 下次触碰该套件时标 (owner 裁定项 3)。套件格式上游 (skill-creator SKILL.md 的 trigger-eval 示例) 只定义 `query`/`should_trigger`, `type` 是 Aria 侧套件标注字段。
+- **套件**: 每个被评 skill 一份 `aria-plugin-benchmarks/ab-suite/trigger/<skill>.json` (20 条, should / should-not 各 10, should-not 以近似误触为主且每条标注 `type`, 见上表), **沿用 `ab-suite/` 版本化规则** (改套件须升 `ab-suite/version.yaml`, 旧数据不可比)。should-not 的近似误触须覆盖该 skill 最可能被扩到的相邻任务 (v5: 本套件对「整理收尾材料」这一幅度的扩张不敏感)。新套件 (含首次加标 `type`) 须经 owner 审阅后才能作门。新增 skill 的首个 description 同样要过本场景, 其首个套件随之建立。
 
 运行前置:
 
