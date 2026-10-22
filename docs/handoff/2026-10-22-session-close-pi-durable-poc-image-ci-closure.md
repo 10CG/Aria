@@ -21,8 +21,9 @@ updated-at: 2026-10-22T10:10:00Z
 2. **PoC 两 job 去留** — `pi-durable-poc` (heavy-2 docker) / `pi-durable-poc-light`
    (light-4 exec) 持续在跑 (~40MB 工作集 ×2); 转真实业务 (M6 cost snapshot 的
    pi-durable 版) / 保持观察 / 下线, 均可
-3. **PoC-L 分发通道生产化** — 现为 light-4 本机 systemd-run http.server (transient,
-   重启即失); 候选 Forgejo generic + token 不落明文方案, 未解前 light 轨不扩
+3. ~~**PoC-L 分发通道生产化**~~ **已落地收编** (2026-10-22 当日, PR #252): transient
+   systemd-run → 永久 `/etc/systemd/system/aether-dist.service` (enabled, 重启存活);
+   剩余手工面 = 内容 scp staging, 生产化候选 (Forgejo generic + token 不落明文) 仍开放
 4. (Aether 侧) #453 PAT 轮换 — 等 owner 铸 Q4 token
 5. (Aether 侧) npm token 轮换 — owner 裁定先记录暂不动 (memory 有步骤)
 
