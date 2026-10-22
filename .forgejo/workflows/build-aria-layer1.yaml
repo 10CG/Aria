@@ -100,14 +100,9 @@ jobs:
           docker image inspect $IMG >/dev/null
           echo "--- image size ---"
           docker image ls $IMG --format "{{.Size}}"
-          docker run --rm --entrypoint python $IMG -c '
-            import os, aria_layer1
-            assert os.path.getsize("/opt/aria-orchestrator/acceptance/m6-cost-snapshot.py") > 0, "m6 snapshot missing"
-            assert os.path.getsize("/opt/aria-orchestrator/.aria/config.json") > 0, "config.json missing"
-            ca = "/etc/ssl/certs/ca-certificates.crt"
-            assert os.path.getsize(ca) > 100000, f"system CA bundle too small: {ca}"
-            print("VERIFY-OK: aria_layer1 importable, layout + system CA intact")
-          '
+          # NOTE: python -c 必须单行分号式 — YAML block 内多行脚本的字面缩进会
+          # 原样进 python, 首行缩进 = IndentationError (run 52301 实测)
+          docker run --rm --entrypoint python $IMG -c "import os, aria_layer1; assert os.path.getsize('/opt/aria-orchestrator/acceptance/m6-cost-snapshot.py') > 0, 'm6 snapshot missing'; assert os.path.getsize('/opt/aria-orchestrator/.aria/config.json') > 0, 'config.json missing'; ca='/etc/ssl/certs/ca-certificates.crt'; assert os.path.getsize(ca) > 100000, 'system CA bundle too small'; print('VERIFY-OK: aria_layer1 importable, layout + system CA intact')"
 
       - name: Push image
         run: |
