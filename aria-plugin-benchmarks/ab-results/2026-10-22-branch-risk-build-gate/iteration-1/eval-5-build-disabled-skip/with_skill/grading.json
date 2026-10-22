@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "must match: build_verdict:\\s*跳过",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must match: overall:\\s*可继续",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

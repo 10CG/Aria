@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "api-change-real",
+  "skill": "branch-manager",
+  "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「API 接口变更: 重写鉴权 endpoint 契约」; 文件 6 个 (backend+frontend 跨目录); 任务数 4; 无并行需求。",
+  "assertions": [
+    {
+      "text": "决策符合 expected_new: risk=high, score≥3, Worktree",
+      "arm": "with_skill"
+    },
+    {
+      "text": "旧行为符合 expected_old: risk=high, Worktree",
+      "arm": "old_skill"
+    }
+  ]
+}

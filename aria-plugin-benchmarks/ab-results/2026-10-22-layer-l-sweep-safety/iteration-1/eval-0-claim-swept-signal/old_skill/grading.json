@@ -1,0 +1,9 @@
+{
+  "expectations": [
+    {
+      "text": "must: benign|claim_not_found|等价",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

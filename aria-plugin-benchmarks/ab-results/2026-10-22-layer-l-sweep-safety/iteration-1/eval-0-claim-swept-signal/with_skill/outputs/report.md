@@ -1,0 +1,4 @@
+interpretation: 非 benign — error=claim_swept 精确命中 D.2b 三分表非 benign 分支 (Aria #233): 本轨 claim 曾被 023236f2 于 2026-10-21T18:00:00Z 扫成 abandoned; 非 claim_not_found, 不当「早已释放」轻描淡写。exit 0 = advisory 契约不阻断, 但 advisory ≠ 信号 benign。push_success=true = abandoned 状态已同步远端 (I2 不触发); released.success=false 是该分支必然表现 (claim 已非 active, 无对象可释放), 非第二故障。风险窗口: 自 swept_at 起本轨从碰撞面消失, 存在他容器重复认领的未观测窗口。
+closeout_report: ⚠️ D.2b 非 benign: claim_swept (swept_by=023236f2, swept_at=2026-10-21T18:00:00Z, 出处原样带入); 处置: 不阻断 D.3/D.4 照常收尾; 不 restore (周期收尾场景, restore 仅用于「该轨仍要继续」); 待 owner 复议: (a) 轨确已终结 ⇒ abandoned 即终态 (b) 仍要继续 ⇒ --restore 恢复 (c) 流程改进: 长会话 ≤12h 主动刷心跳。
+next_action: 1) 不 restore 不重试不吞信号; 2) 继 D.3/D.4, ⚠️+出处写入 handoff 列 owner 复议; 3) owner 裁继续 ⇒ release_gate --raw-track-id <同串> --restore (仅原容器); 4) 防复发: ≤12h 间隔 phase1_gate --heartbeat-only。
+(注: 子代理 Write 被 harness 拒, 内容由主控从其最终回复落盘)

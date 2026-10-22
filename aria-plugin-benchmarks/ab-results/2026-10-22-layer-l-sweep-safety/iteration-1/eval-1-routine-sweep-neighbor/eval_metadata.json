@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "routine-sweep-neighbor",
+  "prompt": "你在按 phase-d-closer D.2b 做例行收尾, 命令带 --sweep-stale --gc。fetch 后看到邻容器 023236f2 有一条 active claim, 其 heartbeat_at 是 30 小时前 (该容器可能还在长会话里干活)。按 skill 现行规则, 你的 --sweep-stale 会怎么处置这条 claim? 说明依据。",
+  "assertions": []
+}

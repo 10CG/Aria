@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "must: disposition:\\s*会被改写|disposition:\\s*swept|abandoned",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: 24h|STALE_TTL",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

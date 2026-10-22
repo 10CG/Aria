@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "must: 仅入口刷|入口.{0,6}唯一|唯一.{0,12}入口",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must NOT: 12h",
+      "passed": true,
+      "evidence": "absent"
+    }
+  ]
+}

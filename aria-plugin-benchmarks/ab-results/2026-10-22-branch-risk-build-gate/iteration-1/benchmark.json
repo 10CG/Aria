@@ -1,0 +1,23 @@
+{
+  "skill_name": "branch-manager + branch-finisher (branch-risk-build-gate-alignment, Aria#231)",
+  "iteration": 1,
+  "configurations": [
+    {
+      "configuration": "with_skill",
+      "num_evals": 8,
+      "num_passed": 8,
+      "pass_rate": 1.0,
+      "tokens_mean": 67666.2,
+      "duration_seconds_mean": 137.3
+    },
+    {
+      "configuration": "old_skill",
+      "num_evals": 8,
+      "num_passed": 8,
+      "pass_rate": 1.0,
+      "tokens_mean": 65307.5,
+      "duration_seconds_mean": 196.0
+    }
+  ],
+  "delta_pass_rate": 0.0
+}

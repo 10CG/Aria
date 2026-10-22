@@ -1,0 +1,79 @@
+{
+  "skill_name": "branch-manager + branch-finisher (branch-risk-build-gate-alignment)",
+  "rule6": "场景 1 (指令流程变更, 10CG/Aria#231); description 未动 → 4b 不触发",
+  "contamination_caveat": "AB baseline 在 aria 仓内结构上不可能完全干净 (CLAUDE.md/MEMORY.md 自动加载面, aria-plugin #116 / memory feedback_ab_baseline_contaminated_by_auto_loaded_context); 两臂同条件受染, 差分仍有效",
+  "evals": [
+    {
+      "id": 0,
+      "name": "api-mention-small-fix",
+      "skill": "branch-manager",
+      "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策 (risk_level / 逐维评分 / 总分 / 模式): 任务描述「修 API key 列表分页」; 涉及文件 2 个 (src/api/keys.py, tests/test_keys.py, 同目录); 任务数 1; 无并行需求。",
+      "expected_new": "risk=medium, score=0, Branch",
+      "expected_old": "risk=high (裸 api), score≥3, Worktree",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "api-change-real",
+      "skill": "branch-manager",
+      "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「API 接口变更: 重写鉴权 endpoint 契约」; 文件 6 个 (backend+frontend 跨目录); 任务数 4; 无并行需求。",
+      "expected_new": "risk=high, score≥3, Worktree",
+      "expected_old": "risk=high, Worktree",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "refactor-core-module",
+      "skill": "branch-manager",
+      "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「重构核心认证模块」; 文件 4 个; 任务数 3; 无并行需求。",
+      "expected_new": "risk=high (refactor/重构 flat 表), Worktree",
+      "expected_old": "risk=high, Worktree",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "keyword-override-empty",
+      "skill": "branch-manager",
+      "prompt": "项目 .aria/config.json 有 \"branch_manager\": {\"high_risk_keywords\": []}。按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「重构登录流程」; 文件 4 个; 任务数 3; 无并行需求。",
+      "expected_new": "覆盖生效: 不判 high → medium, Branch",
+      "expected_old": "不读该配置 → high, Worktree",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "typo-low-regression",
+      "skill": "branch-manager",
+      "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「修复 README 里的 typo」; 文件 1 个; 任务数 1; 无并行需求。",
+      "expected_new": "risk=low, score=0, Branch",
+      "expected_old": "risk=low, Branch",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "build-disabled-skip",
+      "skill": "branch-finisher",
+      "prompt": "按 branch-finisher skill 的测试前置验证, 对以下情境产出验证报告 (逐验证项给出 通过/警告/阻塞/跳过 与结论能否继续): .aria/config.json 无任何 framework_build_check 配置 (全部默认); 单元测试 42/42 通过; 类型检查通过; lint 零警告; 本机从未配置构建命令, 构建交 CI。",
+      "expected_new": "构建验证=跳过 (framework_build_check disabled), 非阻塞, 可继续",
+      "expected_old": "构建验证=阻塞 (项目无法证明本地构建成功)",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "build-blocking-fail",
+      "skill": "branch-finisher",
+      "prompt": "按 branch-finisher skill 的测试前置验证, 对以下情境产出验证报告: .aria/config.json 配置 phase_b_developer.framework_build_check = {enabled: true, command: \"npm run build\", mode: \"blocking\"}; 单元测试全过; 本机 npm run build 失败 (exit 1)。",
+      "expected_new": "构建验证=阻塞",
+      "expected_old": "构建验证=阻塞",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "build-advisory-fail",
+      "skill": "branch-finisher",
+      "prompt": "按 branch-finisher skill 的测试前置验证, 对以下情境产出验证报告: .aria/config.json 配置 phase_b_developer.framework_build_check = {enabled: true, command: \"npm run build\", mode: \"advisory\"}; 单元测试全过; 本机 npm run build 失败 (exit 1)。",
+      "expected_new": "构建验证=警告, 可继续 (注明 advisory)",
+      "expected_old": "构建验证=阻塞",
+      "files": []
+    }
+  ]
+}
