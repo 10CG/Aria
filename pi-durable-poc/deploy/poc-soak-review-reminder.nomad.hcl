@@ -32,7 +32,10 @@ job "poc-soak-review-reminder" {
       config {
         image   = "forgejo.10cg.pub/10cg/aria-layer1@sha256:c3290150e3ef035801e5ee7ff52ca7c33606c047fdcd8fd7a3499c59952dc874"
         command = "python"
-        args    = ["-c", "import os,json,urllib.request;t='PoC soak 复查到期 (7天前基线 2026-10-22T16:52Z):\\nPoC-H heavy-2: cycle 1562 / RSS 55.6MiB (较晨间 +40% 漂移, 主观察项)\\nPoC-L light-4: cycle 1031 / cgroup 61.8MB / SQLite 主库 643KB+WAL 4.4MB\\n\\n复查动作: nomad alloc logs 对照 cycle 数与漂移; cgroup/docker stats 看 RSS; 决定去留 (转真实业务/继续观察/下线)。\\n详见 Aria handoff 2026-10-22 会话收尾 §0-2 (含基线数字)。';urllib.request.urlopen(urllib.request.Request(os.environ['ARIA_FEISHU_WEBHOOK_URL'],data=json.dumps({'msg_type':'text','content':{'text':t}}).encode(),headers={'Content-Type':'application/json'})).read();print('FEISHU-SENT')"]
+        # 签名必带 (bot 开了校验; 首版无 sign → HTTP 200 + body code 19021 静默拒收)。
+        # 复用 aria_layer1.feishu_webhook 的已验证签名函数 (05-09 修过 key/msg 装反),
+        # 并断言 body code==0 — client.send 只回 HTTP 码不查 body, 不能裸用。
+        args    = ["-c", "import os,json,time,urllib.request;from aria_layer1.feishu_webhook import _compute_feishu_signature as sig;ts=str(int(time.time()));t='PoC soak 复查到期 (基线 2026-10-22T16:52Z)\\nPoC-H heavy-2: cycle 1562 / RSS 55.6MiB (+40% 漂移, 主观察项)\\nPoC-L light-4: cycle 1031 / cgroup 61.8MB\\n复查: logs 对照 cycle/漂移 → 决定去留; 详见 handoff 10-22 §0-2';b={'timestamp':ts,'sign':sig(ts,os.environ['ARIA_FEISHU_SIGNING_SECRET']),'msg_type':'text','content':{'text':t}};r=json.loads(urllib.request.urlopen(urllib.request.Request(os.environ['ARIA_FEISHU_WEBHOOK_URL'],data=json.dumps(b).encode(),headers={'Content-Type':'application/json'}),timeout=30).read());assert r.get('code')==0,f'FEISHU-REJECT {r}';print('FEISHU-OK',r.get('msg'))"]
 
         auth {
           username = "${docker_auth_user}"
@@ -48,6 +51,7 @@ job "poc-soak-review-reminder" {
         data        = <<EOH
 {{- with nomadVar "nomad/jobs/aria-orchestrator" }}
 ARIA_FEISHU_WEBHOOK_URL={{ .ARIA_FEISHU_WEBHOOK_URL }}
+ARIA_FEISHU_SIGNING_SECRET={{ .ARIA_FEISHU_SIGNING_SECRET }}
 docker_auth_user={{ .docker_auth_user }}
 docker_auth_password={{ .docker_auth_password }}
 {{- end }}
