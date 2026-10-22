@@ -1,10 +1,13 @@
-version: "1.7.0"
+version: "1.8.0"
 created: "2026-03-18"
-last_modified: "2026-10-19"
+last_modified: "2026-10-22"
 skills_covered: 33
 total_eval_cases: 90
 source: "从 {skill}/evals/evals.json 中每个 Skill 选取 2 个核心 case"
 changelog:
+  - version: "1.8.0"
+    date: "2026-10-22"
+    changes: "trigger/issue-groomer.json 10 条 should-not 标注 type (4 routing: 10/11/12/16 → issue-triage×2/state-scanner/openspec-archive; 6 capability: 13-15/17-19 建单挪列关单/目录整理/changelog/单条查询, 两可从严计门) — Spec rule6-4b-routing-should-not-sot-revision (Aria#243 方向 C): 门判据只计 capability 类, routing 转观察面; 标注经 owner 审阅后作门 (本轮为 T5 重判 dogfood)"
   - version: "1.7.0"
     date: "2026-10-19"
     changes: "+issue-groomer 双套件: ab-suite/issue-groomer.json (场景1 行为套件 5 evals) + trigger/issue-groomer.json (20条 trigger 套件, owner 审阅通过裁决a, 首个入库 trigger 套件 = #213 T4 解冻先例)"
