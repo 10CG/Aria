@@ -38,12 +38,12 @@ job "pi-durable-poc-light" {
       driver = "exec"
 
       artifact {
-        source      = "file:///opt/aether-dist/node-22.23.3.tar.xz"
+        source      = "http://127.0.0.1:8000/node-22.23.3.tar.xz"
         destination = "local/node"
       }
 
       artifact {
-        source      = "file:///opt/aether-dist/pi-durable-bundle.tgz"
+        source      = "http://127.0.0.1:8000/pi-durable-bundle.tgz"
         destination = "local/app"
       }
 

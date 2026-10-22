@@ -90,7 +90,7 @@ task + SIGKILL 下全部成立, 判据 A1-A6 全绿。生产化前要消化: 锐
 | L4 | mid-wait kill -9 → 醒在原 deadline (同 A4) | 待测 |
 | L5 | 全程零 Docker (driver=exec, 无 image/auth) | 待测 |
 
-**PoC-L 局限**: artifact 走 `file:///opt/aether-dist/` 本机手工 staging — 生产化
+**PoC-L 局限**: artifact 走 light-4 本机 http.server (systemd-run, PoC 边界; 这版 Nomad getter 不支持 file://) — 生产化
 分发候选是 Forgejo generic packages (内网 HTTP) + artifact `header` 带 package-read
 token (token 不落 job spec 明文的问题要单独解, e.g. agent 侧 mirror)。
 
