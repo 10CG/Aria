@@ -1,0 +1,35 @@
+# 2026-10-22T17:08:03Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 9f61db0e7b8b | load 3.59 3.94 3.27
+# the suite of aria 59e333c run on a copy with the baseline hook and on a copy with the hook under test (not git checkouts: the cases that read an old hook through git show do not run in either)
+## base
+PASS: 813 / 814
+FAIL: 1 / 814
+  FAIL SC-13: 头注释计数同步
+      顶部 'Coverage: 831 cases' != 本次实跑总数 814 -- 回填 secret-guard.test.sh 顶部 Coverage 数 (+ secret-hygiene.md 三处 + proposal SC-11 正文, 权威值=实跑 N)。
+## impl
+PASS: 807 / 814
+FAIL: 7 / 814
+  FAIL W10 SC-21ab bf: copy limit exceeded is refused — 8193 characters: the copy is not judged, the command is block
+      refused [...]: names the limit that was hit: want 'a command segment is longer than 8192 characters after variable expansion', got ''
+      refused [...]: Chinese split line (命令过大): want 'yes', got 'no'
+      refused [...]: not the finding text: want 'no', got 'yes'
+  FAIL W10 SC-21ac bf: value limit, last accepted — a collected value of exactly 4096 characters is expanded and its 
+      refused [...]: names the limit that was hit: want 'the command is longer than 8192 characters after variable expansion', got ''
+      refused [...]: Chinese split line (命令过大): want 'yes', got 'no'
+      refused [...]: not the finding text: want 'no', got 'yes'
+  FAIL W10 SC-21ag bf: the dense shape of the review (15 assignments of 300 B, 8 references each: a 36 KB copy; 16 x 
+      refused [...]: names the limit that was hit: want 'a command segment is longer than 8192 characters after variable expansion', got 'a command segment grows by more than 8192 characters after variable expansion'
+  FAIL W10 SC-21aj bf: a segment over the copy limit ends the pass — with one, seven or eight of them in front of the
+      refused [...]: names the limit that was hit: want 'a command segment is longer than 8192 characters after variable expansion', got 'a command segment grows by more than 8192 characters after variable expansion'
+      refused [...]: names the limit that was hit: want 'a command segment is longer than 8192 characters after variable expansion', got 'a command segment grows by more than 8192 characters after variable expansion'
+      refused [...]: names the limit that was hit: want 'a command segment is longer than 8192 characters after variable expansion', got 'a command segment grows by more than 8192 characters after variable expansion'
+  FAIL W10 SC-21al bf: the copy limit holds for the braced form too — a substituted whole command of exactly 8192 cha
+      refused [...]: names the limit that was hit: want 'the command is longer than 8192 characters after variable expansion', got ''
+      refused [...]: Chinese split line (命令过大): want 'yes', got 'no'
+      refused [...]: not the finding text: want 'no', got 'yes'
+  FAIL W10 SC-21ao bf: whole-command mode obeys the copy limit — a whole copy of exactly 8192 characters is judged an
+      refused [...]: names the limit that was hit: want 'the command is longer than 8192 characters after variable expansion', got ''
+      refused [...]: Chinese split line (命令过大): want 'yes', got 'no'
+      refused [...]: not the finding text: want 'no', got 'yes'
+  FAIL SC-13: 头注释计数同步
+      顶部 'Coverage: 831 cases' != 本次实跑总数 814 -- 回填 secret-guard.test.sh 顶部 Coverage 数 (+ secret-hygiene.md 三处 + proposal SC-11 正文, 权威值=实跑 N)。
+# 2026-10-22T17:08:03Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 9f61db0e7b8b | load 3.59 3.94 3.27

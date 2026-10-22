@@ -1,0 +1,13 @@
+#!/bin/sh
+# Test shim for sc-cases.sh (installed as shim/jq and shim/sed): the FIRST call in one run -- an atomic mkdir under $SC_SHIM_STATE decides it -- sleeps
+# SC_DELAY_<name> seconds; every call then execs the real tool (SC_REAL_<name>). Used to put a fixed, machine-independent delay at a known point of the hook:
+# jq's first call is the stdin parse (after the hard-deadline anchor), sed's first call is the first block text's command echo (_sg_redact_echo).
+n=${0##*/}
+case $n in
+  jq)  d=${SC_DELAY_jq:-};  r=${SC_REAL_jq:-} ;;
+  sed) d=${SC_DELAY_sed:-}; r=${SC_REAL_sed:-} ;;
+  *) echo "delay-first: unknown name $n" >&2; exit 127 ;;
+esac
+[ -n "$r" ] || { echo "delay-first: SC_REAL_$n not set" >&2; exit 127; }
+if [ -n "$d" ] && [ -n "${SC_SHIM_STATE:-}" ] && mkdir "$SC_SHIM_STATE/$n.first" 2>/dev/null; then sleep "$d"; fi
+exec "$r" "$@"

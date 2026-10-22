@@ -1,0 +1,15 @@
+# 2026-10-22T16:51:11Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 9f61db0e7b8b | load 2.18 2.16 1.93
+## 1. the W10 size-blocked class (W1: 138 commands; the baseline blocks all of them for size), the hook under test (instrumented copy), bash 5.2
+  outcome allow      136
+  outcome growth     1
+  outcome oversize   1
+    136   W1 class size   -> allow
+      1   W1 class size   -> growth
+      1   W1 class value  -> oversize
+  allow wall (s): n=136 p50=0.76 p90=1.70 p99=2.43 max=2.79
+  every outcome within max(trigger, 3 s) + 0.3 s: 0 of 138 over the bound
+## 2. outside the class: rc + sha256(stderr) of base vs the hook under test on 300 sampled commands (ident-300.lst), bash 5.2
+identical=300 different=0
+## 3. bash 3.2 (no relaxation): base vs the hook under test on 40 sampled W1 commands (w1-sample40.lst)
+identical=40 different=0
+# 2026-10-22T16:57:06Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 9f61db0e7b8b | load 3.49 2.95 2.36
