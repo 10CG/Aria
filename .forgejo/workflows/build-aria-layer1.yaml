@@ -1,0 +1,131 @@
+# aria-layer1 Docker 镜像构建 — 4 个 periodic job 的运行时镜像 CI 化
+#
+# 与 build-aria-orchestrator.yaml 同法 (PR #248 模式): 消灭「registry 里躺着
+# 手工构建 digest (63e623d8), 无机器路径可复现」的状态 — orchestrator 镜像
+# 2026-10-22 已收口, layer1 是最后一个手工产物镜像。
+#
+# 镜像特性 (与 orchestrator 不同): stdlib-only, 无 pip/vendor/certifi —
+# certifi 物种不适用; TLS 走系统 CA (/etc/ssl/certs), Verify 断言改为
+# aria_layer1 可导入 + 布局完整 (m6 snapshot 脚本 + config.json) + 系统 CA
+# bundle 在位。
+#
+# 触发: 手动 dispatch (image_tag 必填) 或 master 上 aria-orchestrator gitlink 变更
+
+name: Build aria-layer1
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'DEPLOY_ENV gate (must be "internal")'
+        required: true
+        default: 'internal'
+      image_tag:
+        description: 'Image tag (e.g. ci-verify-20261022)'
+        required: true
+
+  push:
+    branches: [master]
+    paths:
+      - 'aria-orchestrator/**'
+
+jobs:
+  build:
+    name: Build & Push aria-layer1
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (without submodules)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Init submodules via internal HTTP
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        run: |
+          git config --global url."http://forge:${FORGEJO_TOKEN}@192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
+          git submodule update --init --recursive
+
+      - name: Verify DEPLOY_ENV gate
+        run: |
+          DEPLOY_ENV="${{ github.event.inputs.deploy_env || 'internal' }}"
+          if [ "$DEPLOY_ENV" != "internal" ]; then
+            echo "::error::DEPLOY_ENV must be 'internal', got '$DEPLOY_ENV'"
+            exit 1
+          fi
+
+      - name: Verify build inputs
+        run: |
+          test -f aria-orchestrator/deploy/Dockerfile.layer1 || { echo "::error::Dockerfile.layer1 missing"; exit 1; }
+          test -f aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1/__init__.py 2>/dev/null || \
+            test -d aria-orchestrator/hermes-extensions/aria-layer1/aria_layer1 || { echo "::error::aria_layer1 package missing"; exit 1; }
+          test -f aria-orchestrator/acceptance/m6-cost-snapshot.py || { echo "::error::m6-cost-snapshot.py missing"; exit 1; }
+
+      - name: Set image tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.image_tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.sha }}"; fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "full=forgejo.10cg.pub/10cg/aria-layer1:$TAG" >> $GITHUB_OUTPUT
+          echo "sha=forgejo.10cg.pub/10cg/aria-layer1:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
+      - name: Login to Forgejo Registry
+        uses: docker/login-action@v3
+        with:
+          registry: forgejo.10cg.pub
+          username: ${{ secrets.FORGEJO_USER }}
+          password: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: aria-orchestrator/deploy/Dockerfile.layer1
+          push: false
+          load: true
+          tags: |
+            ${{ steps.tag.outputs.full }}
+            ${{ steps.tag.outputs.sha }}
+
+      - name: Verify image (package import + layout + system CA)
+        run: |
+          IMG=${{ steps.tag.outputs.full }}
+          docker image inspect $IMG >/dev/null
+          echo "--- image size ---"
+          docker image ls $IMG --format "{{.Size}}"
+          docker run --rm --entrypoint python $IMG -c '
+            import os, aria_layer1
+            assert os.path.getsize("/opt/aria-orchestrator/acceptance/m6-cost-snapshot.py") > 0, "m6 snapshot missing"
+            assert os.path.getsize("/opt/aria-orchestrator/.aria/config.json") > 0, "config.json missing"
+            ca = "/etc/ssl/certs/ca-certificates.crt"
+            assert os.path.getsize(ca) > 100000, f"system CA bundle too small: {ca}"
+            print("VERIFY-OK: aria_layer1 importable, layout + system CA intact")
+          '
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.tag.outputs.full }}
+          docker push ${{ steps.tag.outputs.sha }}
+          echo "✅ Pushed: ${{ steps.tag.outputs.full }}"
+          echo "✅ Pushed: ${{ steps.tag.outputs.sha }}"
+
+      - name: Record image SHA256
+        run: |
+          SHA=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ steps.tag.outputs.full }} 2>/dev/null || docker inspect --format='{{.Id}}' ${{ steps.tag.outputs.full }})
+          {
+            echo "## aria-layer1 Build Summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Tag | \`${{ steps.tag.outputs.full }}\` |"
+            echo "| Digest | \`$SHA\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Submodule | \`$(git -C aria-orchestrator rev-parse HEAD)\` |"
+          } >> $GITHUB_STEP_SUMMARY
