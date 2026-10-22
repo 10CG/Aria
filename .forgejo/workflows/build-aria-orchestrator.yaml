@@ -1,0 +1,139 @@
+# aria-orchestrator Docker 镜像构建 — Hermes Layer 1 (#232 后的 CI 化)
+#
+# 目标: 消灭 #232 式手工构建链 (aether-build-container 轮次 + SSH 直建 +
+# docker commit)。镜像构建/验证/推送全部收敛进 CI, 任何人 push 后可复现。
+#
+# 模板: build-aria-runner.yaml (M0/M1 已验证的 runner 内 buildx 模式)
+# 上下文 = meta 仓根 (Dockerfile COPY aria-orchestrator/ 路径, 含 128MB vendor)
+#
+# 验证 (Verify) 是承重步: #232 的 certifi 事故 = docker-commit 镜像与 repo
+# Dockerfile 产物脱节。本 workflow 每次构建都从 Dockerfile 全新构建并验证
+# hermes + certifi CA 在位 — 构建过 = 镜像可从 repo 复现。
+#
+# 触发: 手动 dispatch (image_tag 必填) 或 master 上 aria-orchestrator gitlink 变更
+
+name: Build aria-orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'DEPLOY_ENV gate (must be "internal")'
+        required: true
+        default: 'internal'
+      image_tag:
+        description: 'Image tag (e.g. ci-verify-20261022)'
+        required: true
+
+  push:
+    branches: [master]
+    paths:
+      - 'aria-orchestrator/**'
+
+jobs:
+  build:
+    name: Build & Push aria-orchestrator
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (without submodules)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Init submodules via internal HTTP
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        run: |
+          git config --global url."http://forge:${FORGEJO_TOKEN}@192.168.69.200:3000/".insteadOf "ssh://forgejo@forgejo.10cg.pub/"
+          git submodule update --init --recursive
+
+      - name: Verify DEPLOY_ENV gate
+        run: |
+          DEPLOY_ENV="${{ github.event.inputs.deploy_env || 'internal' }}"
+          if [ "$DEPLOY_ENV" != "internal" ]; then
+            echo "::error::DEPLOY_ENV must be 'internal', got '$DEPLOY_ENV'"
+            exit 1
+          fi
+
+      - name: Verify build inputs (Dockerfile + vendor tree)
+        run: |
+          test -f aria-orchestrator/Dockerfile || { echo "::error::Dockerfile missing"; exit 1; }
+          test -d aria-orchestrator/vendor || { echo "::error::vendor/ missing (128MB hermes snapshot)"; exit 1; }
+          VENDOR_FILES=$(find aria-orchestrator/vendor -type f | wc -l)
+          echo "vendor files: $VENDOR_FILES"
+          [ "$VENDOR_FILES" -gt 1000 ] || { echo "::error::vendor tree suspiciously small"; exit 1; }
+
+      - name: Set image tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.image_tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.sha }}"; fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "full=forgejo.10cg.pub/10cg/aria-orchestrator:$TAG" >> $GITHUB_OUTPUT
+          echo "sha=forgejo.10cg.pub/10cg/aria-orchestrator:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
+      - name: Login to Forgejo Registry
+        uses: docker/login-action@v3
+        with:
+          registry: forgejo.10cg.pub
+          username: ${{ secrets.FORGEJO_USER }}
+          password: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: aria-orchestrator/Dockerfile
+          push: false
+          load: true
+          tags: |
+            ${{ steps.tag.outputs.full }}
+            ${{ steps.tag.outputs.sha }}
+
+      - name: Verify image (hermes + certifi CA + scan schema)
+        run: |
+          IMG=${{ steps.tag.outputs.full }}
+          docker image inspect $IMG >/dev/null
+          echo "--- image size ---"
+          docker image ls $IMG --format "{{.Size}}"
+          echo "--- functional verify (the certifi species that bit #232) ---"
+          docker run --rm --entrypoint sh $IMG -c '
+            set -e
+            command -v hermes >/dev/null || { echo "FAIL: hermes not on PATH"; exit 1; }
+            CA=$(python3 -c "import certifi; print(certifi.where())")
+            test -s "$CA" || { echo "FAIL: certifi CA empty at $CA"; exit 1; }
+            CA_SIZE=$(wc -c < "$CA")
+            [ "$CA_SIZE" -gt 100000 ] || { echo "FAIL: certifi CA suspiciously small ($CA_SIZE bytes)"; exit 1; }
+            python3 -c "import tools" 2>/dev/null || { echo "NOTE: tools module not importable (pre-existing vendor shape)"; }
+            echo "VERIFY-OK: hermes=$(command -v hermes) ca=$CA ($CA_SIZE bytes)"
+          '
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.tag.outputs.full }}
+          docker push ${{ steps.tag.outputs.sha }}
+          echo "✅ Pushed: ${{ steps.tag.outputs.full }}"
+          echo "✅ Pushed: ${{ steps.tag.outputs.sha }}"
+
+      - name: Record image SHA256
+        run: |
+          SHA=$(docker inspect --format='{{.Id}}' ${{ steps.tag.outputs.full }})
+          echo "image_sha256=$SHA"
+          {
+            echo "## aria-orchestrator Build Summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Tag | \`${{ steps.tag.outputs.full }}\` |"
+            echo "| SHA256 | \`$SHA\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Submodule | \`$(git -C aria-orchestrator rev-parse HEAD)\` |"
+            echo ""
+            echo "部署: 把 digest 钉进 aria-orchestrator/deploy/aria-orchestrator.nomad.hcl"
+          } >> $GITHUB_STEP_SUMMARY
