@@ -73,6 +73,27 @@ task + SIGKILL 下全部成立, 判据 A1-A6 全绿。生产化前要消化: 锐
 锐边 4 (graceful stop 语义)、锐边 6 的 reschedule 边界。**验证的是耐久执行模型,
 不是 cost-sentinel 的业务逻辑** — 真实接入 (Forgejo API 用量采集) 是下一步评估。
 
+## PoC-L — 轻节点可行性 (exec driver, 零 Docker) (added 2026-10-22)
+
+回应「docker 太重」的原始担忧: 同一 sentinel 以 **exec task** (chroot + cgroup,
+无容器层) 跑在 light-4 (1GiB 节点, 当前最空 935MB 可用)。运行时与依赖经 artifact
+分发: 官方 Node 22.23.3 tarball (30MB, 自包含 glibc 构建) + npm ci bundle
+(91 包, 15MB, lock 内无 photon)。heavy 版实测 RSS 39.7MiB / 256MiB 预留。
+
+验收判据 (演练前写定):
+
+| # | 判据 | 结果 |
+|---|------|------|
+| L1 | exec task 在 light-4 启动: artifact 解包 + node 起来 + boot 日志 | 待测 |
+| L2 | 实测 RSS ≤ 150MB (memory 预留), 不挤压 1GiB 节点其余负载 | 待测 |
+| L3 | mid-gather kill -9 → MEMO-HIT 续跑 (同 A3) | 待测 |
+| L4 | mid-wait kill -9 → 醒在原 deadline (同 A4) | 待测 |
+| L5 | 全程零 Docker (driver=exec, 无 image/auth) | 待测 |
+
+**PoC-L 局限**: artifact 走 `file:///opt/aether-dist/` 本机手工 staging — 生产化
+分发候选是 Forgejo generic packages (内网 HTTP) + artifact `header` 带 package-read
+token (token 不落 job spec 明文的问题要单独解, e.g. agent 侧 mirror)。
+
 ## 布局
 
 - `src/sentinel.mjs` — 全部逻辑 (~200 行, 无框架壳)
