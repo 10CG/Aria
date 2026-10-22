@@ -1,0 +1,1 @@
+| **aria-plugin** | `aria/` (子模块) | v1.76.0 | `aria/.claude-plugin/plugin.json` | MINOR on new Skill/Agent; PATCH on bug fix | 独立于 Aria main repo；**不随 Aria 2.0 同 bump** |

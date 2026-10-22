@@ -1,0 +1,136 @@
+........claim_schema soft_error event=claim_schema_unknown_version detail=schema_version='2' is not '1'; returning unknown-status sentinel; reconcile will skip this claim
+...................................................................................................................................................................................coordination_ref.fetch_coordination_ref: fetch failed (rc=128, kind=auth_failed, remote=origin)
+..coordination_ref.fetch_coordination_ref: fetch failed (rc=128, kind=fetch_failed, remote=origin)
+.coordination_ref.fetch_coordination_ref: fetch failed (rc=128, kind=fetch_failed, remote=origin)
+....coordination_ref.fetch_coordination_ref: fetch failed (rc=124, kind=network, remote=origin)
+........collector soft error: state_checks_unsupported_version — version='[bad flow]', expected '1'
+.collector soft error: state_checks_unsupported_version — version='2', expected '1'
+.....................................................failure_handlers.resilient_push: max_retries_exhausted after 3 attempts
+.failure_handlers.resilient_push: fetch_replay_failed during non-ff retry (attempt 1)
+.failure_handlers.resilient_push: auth_failed on attempt 1 (remote=origin) — not retrying
+.failure_handlers.resilient_push: auth_failed on attempt 1 (remote=origin) — not retrying
+.failure_handlers.resilient_push: auth_failed on attempt 1 (remote=origin) — not retrying
+.failure_handlers.resilient_push: push_failed (kind=network) on attempt 1 (remote=origin)
+.failure_handlers.resilient_push: push_failed (kind=push_failed) on attempt 1 (remote=origin)
+.failure_handlers.resilient_push: push_failed (kind=network) on attempt 1 (remote=origin)
+.failure_handlers.resilient_write_claim: bootstrap failed: commit_tree_failed
+...failure_handlers.resilient_write_claim: OSError during write_claim (errno=28, disk_full=True) — skipping claim (case e)
+.failure_handlers.resilient_write_claim: OSError during write_claim (errno=13, disk_full=False) — skipping claim (case e)
+.failure_handlers.resilient_write_claim: OSError during write_claim (errno=28, disk_full=True) — skipping claim (case e)
+.failure_handlers.health_check_fetch: fetch failed (kind=network) — marking partial_fetch
+...failure_handlers.health_check_fetch: ref SHA regressed (before=abc123abc123 after=def456def456) — marking partial_fetch (case f)
+..............................................................collector soft error: not_a_git_repo — rc=128
+...collector soft error: git_status_failed — git status other (rc=1)
+..................collector soft error: git_dir_unresolved — git rev-parse --git-dir failed
+.............................................................................collector soft error: handoff_frontmatter_missing — good.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.......collector soft error: handoff_frontmatter_missing — 2026-06-01-adhoc.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+..collector soft error: handoff_frontmatter_missing — 2026-06-01-legacy.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+..collector soft error: handoff_stat_failed — [Errno 2] No such file or directory: '/tmp/ss-proj-xnjm1c45/docs/handoff/2026-06-01-ghost.md'
+.collector soft error: handoff_frontmatter_missing — foo.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_frontmatter_missing — 2020-01-01-old-name.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+..collector soft error: handoff_frontmatter_missing — 2026-05-01-real.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+..collector soft error: handoff_frontmatter_missing — b.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_frontmatter_missing — real.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_frontmatter_missing — 2026-05-15-real-latest.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_pointer_target_missing — latest.md points to '2026-99-99-deleted.md' but it is absent in docs/handoff/; fell back to mtime latest 'exists.md'
+collector soft error: handoff_frontmatter_missing — exists.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+...collector soft error: handoff_frontmatter_missing — ok.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_canonical_scan_failed — /tmp/ss-proj-mgwyfwv2/docs/handoff: [Errno 13] Permission denied: '/tmp/ss-proj-mgwyfwv2/docs/handoff'
+.collector soft error: handoff_frontmatter_missing — foo.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.collector soft error: handoff_frontmatter_missing — foo.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.........................................collector soft error: handoff_multibranch_undecodable_path — undecodable path on branch 'master': '2026-�-bad.md' (name is not valid UTF-8)
+..collector soft error: handoff_multibranch_unexpected_path_prefix — enumerated path outside docs/handoff on branch 'master': docs/other/2026-05-04-stray.md
+handoff_multibranch: enumerated path outside docs/handoff on branch 'master': docs/other/2026-05-04-stray.md
+.collector soft error: handoff_multibranch_branch_list_failed — git for-each-ref permission denied (rc=128)
+.collector soft error: handoff_multibranch_git_show_failed — [master/archive/unreadable.md] git show failed: git show failed for <ref> (other, rc=128)
+........collector soft error: worktree_scan_cap — 2 other worktrees exceed cap 1; scanning first 1 by path order
+.collector soft error: handoff_canonical_scan_failed — /tmp/wt-coll-y2ice7xn/wt2: /tmp/wt-coll-y2ice7xn/wt2/docs/handoff: [Errno 13] Permission denied: '/tmp/wt-coll-y2ice7xn/wt2/docs/handoff'
+.collector soft error: worktree_unreachable — /tmp/wt-coll-wpv7scyj/wt2: prunable (working tree gone or gitdir stale)
+......collector soft error: worktree_enumeration_failed — git worktree list other (rc=1)
+..collector soft error: handoff_pointer_target_missing — /tmp/wt-coll-ul4w1u84/wt2: latest.md points to '2026-99-99-deleted.md' but it is absent in docs/handoff/; fell back to mtime latest 'real.md'
+.........................................collector soft error: workflow_state_corrupted — Expecting value: line 1 column 1 (char 0)
+.collector soft error: workflow_state_corrupted — Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+..................................................................................collector soft error: cli_missing — platform=forgejo
+..collector soft error: platform_unknown — remote=''
+.collector soft error: platform_unknown — path=sub
+.collector soft error: parse_error — path=sub remote=totally invalid url
+..collector soft error: no_origin_remote — path=sub
+.collector soft error: submodule_not_initialized — path=uninit-sub
+.......................collector soft error: network_unavailable — repo=foo/bar (offline)
+..collector soft error: network_unavailable — repo=foo/bar (offline)
+collector soft error: network_unavailable — repo=foo/sub (offline)
+......issue_scan: cache read failed: Expecting value: line 1 column 1 (char 0)
+................................................................................................................................................collector soft error: handoff_multibranch_branch_cap — Remote branch count (21) exceeds cap (20); scanning only the first 20 branches (most-recent by committerdate).
+handoff_multibranch: Remote branch count (21) exceeds cap (20); scanning only the first 20 branches (most-recent by committerdate).
+..collector soft error: handoff_multibranch_branch_cap — Remote branch count (21) exceeds cap (5); scanning only the first 5 branches (most-recent by committerdate).
+handoff_multibranch: Remote branch count (21) exceeds cap (5); scanning only the first 5 branches (most-recent by committerdate).
+....................................................................phase1_gate: container-id label 'devbox-A' 仍参与协调身份: claims/devbox-A/ 下 active=2; S2 (uuid 优先) 前请留空 label 或迁移这些 claim (owner-container-identity-key T3b)
+..release_gate: container-id label 'devbox-A' 仍参与协调身份: claims/devbox-A/ 下 active=2; S2 (uuid 优先) 前请留空 label 或迁移这些 claim (owner-container-identity-key T3b)
+..........collector soft error: multi_remote_not_a_git_repo — rc=128
+.............collector soft error: enforced_set_empty — remote policy excluded every discovered remote (mirror, origin); overall_parity is fail-CLOSED false on zero participating remotes — check enforced_remotes / read_only_remotes (skill-level or top-level multi_remote)
+.....collector soft error: enforced_set_empty — remote policy excluded every discovered remote (mirror, origin); overall_parity is fail-CLOSED false on zero participating remotes — check enforced_remotes / read_only_remotes (skill-level or top-level multi_remote)
+...............................................................collector soft error: archive_type_unreadable — 2026-04-01-old-changes-sub: proposal.md not found
+collector soft error: layout_drift — openspec/ exists but openspec/changes/ is missing (archive/ has content) — active changes (if any) are invisible and new specs may be misplaced. Restore changes/ (e.g. add openspec/changes/.gitkeep so the dir persists when empty).
+...............collector soft error: archive_type_unreadable — 2026-04-01-my-feature: proposal.md not found
+collector soft error: archive_type_unreadable — no-date-format: proposal.md not found
+...collector soft error: status_field_truncated — big-spec: Status field head exceeds 200 chars with no separator — lifecycle keyword may be lost
+..................................................................collector soft error: detailed_tasks_read_failed — bad-yaml: [Errno 13] Permission denied: '/tmp/ss-proj-f9n_xbbp/openspec/changes/bad-yaml/detailed-tasks.yaml'
+.....collector soft error: archive_type_unreadable — 2026-06-01-bad-spec: unrecognized archive_type 'garbage'
+.collector soft error: archive_type_unreadable — 2026-06-01-empty-spec: proposal.md not found
+.............collector soft error: layout_drift — openspec/ exists but openspec/changes/ is missing (archive/ has content) — active changes (if any) are invisible and new specs may be misplaced. Restore changes/ (e.g. add openspec/changes/.gitkeep so the dir persists when empty).
+..collector soft error: layout_drift — openspec/ exists but openspec/changes/ is missing (archive/ has content) — active changes (if any) are invisible and new specs may be misplaced. Restore changes/ (e.g. add openspec/changes/.gitkeep so the dir persists when empty).
+.collector soft error: layout_drift — openspec/ exists but openspec/changes/ is missing (misplaced: my-change-proposal.md) — active changes (if any) are invisible and new specs may be misplaced. Restore changes/ (e.g. add openspec/changes/.gitkeep so the dir persists when empty).
+.collector soft error: layout_drift — openspec/ exists but openspec/changes/ is missing (misplaced: some-feature/) — active changes (if any) are invisible and new specs may be misplaced. Restore changes/ (e.g. add openspec/changes/.gitkeep so the dir persists when empty).
+..collector soft error: openspec_scan_failed — openspec/archive/ unreadable: denied
+.collector soft error: openspec_scan_failed — openspec/ unreadable: denied
+.................collector soft error: handoff_frontmatter_missing — 2026-05-20-real-doc.md: latest handoff lacks §2.3.1 frontmatter — multi-track board will show owner=unknown
+.......collector soft error: handoff_multibranch_branch_cap — Remote branch count (21) exceeds cap (20); scanning only the first 20 branches (most-recent by committerdate).
+handoff_multibranch: Remote branch count (21) exceeds cap (20); scanning only the first 20 branches (most-recent by committerdate).
+.......phase1_gate.run_gate: clock_skew_conflict on track=carry-dedup-golden (max_skew_s=60) — prompting user
+.phase1_gate.run_gate: clock_skew_conflict on track=carry-dedup-golden (max_skew_s=60) — prompting user
+.phase1_gate.run_gate: clock_skew_conflict on track=carry-dedup-golden (max_skew_s=60) — prompting user
+phase1_gate.run_gate: push failed (kind=non_ff_exhausted) — advisory proceed (claim written locally, not synced)
+.phase1_gate.run_gate: push failed (kind=non_ff_exhausted) — advisory proceed (claim written locally, not synced)
+...phase1_gate.run_gate: push failed (kind=non_ff_exhausted) — advisory proceed (claim written locally, not synced)
+..phase1_gate.run_gate: push failed (kind=non_ff_exhausted) — prompting user for override
+...........phase1_gate.run_gate: not_a_git_repo path=/tmp/tmpod87k6ew
+...................collector soft error: plugin_json_read_failed — Expecting value: line 1 column 1 (char 0)
+.................................reconcile: claimed_at unparseable for devbox-A/s-001 — routing to unknown bucket
+.....................................................................claim_schema soft_error event=claim_schema_invalid detail=field 'linked_issue' must be str, got int
+.....................................................collector soft error: status_field_truncated — prd-big.md: Status field head exceeds 200 chars with no separator — lifecycle keyword may be lost
+....................................................................................collector soft error: platform_unknown — remote=''
+......................................................................................................................collector soft error: git_status_failed — git status other (rc=128)
+collector soft error: git_log_failed — git log other (rc=128)
+................collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+......collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+collector soft error: gitmodules_parse_failed — rc=1
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+...collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+..collector soft error: not_a_git_repo — rc=128
+.collect_sync_state: multi_remote_data is None but state_scanner.multi_remote.enabled is not false — evidence_grade will resolve to 'expired' for all fields. Caller should collect multi_remote FIRST and pass its .data (see module docstring).
+collector soft error: not_a_git_repo — rc=128
+...........collector soft error: rev_list_failed — git rev-list other (rc=128)
+.collector soft error: rev_list_parse_failed — non-integer counts: 'x\ty\n'
+.collector soft error: rev_list_parse_failed — unexpected output: 'weird-output\n'
+............collector soft error: submodule_behind_count_failed — path=vendor/lib tree=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa remote=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+collector soft error: submodule_ahead_count_failed — path=vendor/lib remote=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb tree=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+.collector soft error: submodule_head_failed — path=vendor/lib err=other (rc=128)
+.collector soft error: submodule_ls_tree_failed — path=vendor/lib err=other (rc=1)
+.........................collector soft error: handoff_path_escapes_project — ../../../etc/x.md
+........collector soft error: unsupported_path_format — handoff_doc URL: https://example.com/x.md
+...collector soft error: upm_block_not_found — UPMv2-STATE marker missing
+...........................
+----------------------------------------------------------------------
+Ran 1650 tests in 267.550s
+
+OK
+NO PRODUCTION RECORDS — run_gate never invoked via the CLI (dead-code risk); dogfood (TASK-019) should produce ≥1
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records
+NO PRODUCTION RECORDS — run_gate never invoked via the CLI (dead-code risk); dogfood (TASK-019) should produce ≥1
+OK (1 recent production run_gate invocation(s) recorded)
+OK (coordination gate disabled)
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records

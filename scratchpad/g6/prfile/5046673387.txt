@@ -1,0 +1,46 @@
+{
+  "expectations": [
+    {
+      "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+      "passed": true,
+      "evidence": "response.md L20-24 给出完整可执行命令行: python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\", 两参数均带具体实值, 且 L26-28 逐一解释参数语义 (own-spec-dir=自命中排除键, repo-path=探针不假定 cwd)。与 SKILL.md L132 及 execution-modes.md L279-281 的权威调用串同构 (仅占位符替换为场景实值, 路径前缀 ${CLAUDE_PLUGIN_ROOT:-aria} 逐字保留)。源码复核: scripts/sibling_spec_probe.py L660-661 两个 argparse 参数均为 required=True, 参数名拼写一致。"
+    },
+    {
+      "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+      "passed": true,
+      "evidence": "response.md L84-91 与 L93-102 两种形态 (非终轮 / 终轮) 均渲染逐字行: 「- Sibling probe: 🔴 检测到 1 份同 issue 的竞品 Spec: 2026-08-22-phase-c-integrator-ci-path-coverage (已完成的 Spec)」。N=1 有推导依据 (L106: hits 按 spec_dir 去重后恰 1 个, 不按 hits 条数); 「已完成的 Spec」标注有 archive 推导 (L107: 唯一命中项 corpus == \"archive\", path 在 openspec/archive/ 下 ⇒ 已 ship 并归档)。与 execution-modes.md L319 消费措辞表 sibling_found 档逐字吻合 (🔴 + N 份 + spec_dir 列表 + archive ⇒ 已完成的 Spec), L110 另给出聚合报告同义形式 (N=1, M=1) 对齐 report-format.md L61 模板行。"
+    },
+    {
+      "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+      "passed": true,
+      "evidence": "response.md 第 (3) 节 L117-121 逐项展开: 「结论先行: 三项均零影响 —— 探针是 advisory 副机制」+ 三个编号点分别论证对 verdict 无影响 (L119: 探针命中不进入 conclusion_record, 无四元组, 结构上无污染通道)、对收敛判定无影响 (L120: 判定输入集不含探针结果)、对是否进 Round 3 无影响 (L121: 路由只看四终局优先级链, 且不存在探针失败⇒中止的反向分支); Step B (L39) 亦重申。与 execution-modes.md L325 「不阻断: 探针是 advisory 副机制 —— 不改 verdict 计算、不改收敛判定、不改轮次路由」条款一致, 并正确延伸到「告警交人裁」的行为层分工 (L123)。"
+    },
+    {
+      "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+      "passed": true,
+      "evidence": "response.md L8 明确 Step 0 anchor 已在 Round 1 启动前一次性固化、审计周期内不可变、Round 2 入口不重做; L10 「Round 1 入口也跑过一次竞品探针 (每轮入口含 Round 1); Round 2 入口重跑, 不复用上一轮结果」; Step A 标题即「每轮入口: 竞品 spec 探针」(L16); L70 「Round 3 入口再次重跑 Step A 探针」。与 SKILL.md L129 (「与上方 Step 0 (Round 1 启动前一次性) 显式消歧: 本探针每轮入口跑, 不沿用 Step 编号」) 及 execution-modes.md L274 (「它与 Step 0 (Anchor 固化, Round 1 启动前一次性) 是两回事」) 的消歧方向一致。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+        "reason": "断言只验两 flag 存在, 不验实值形态。--own-spec-dir 传完整相对路径 (如 \"openspec/changes/demo-spec\") 也能过本断言, 但脚本 L339 的自命中排除是 entry.spec_dir == own_spec_dir 精确匹配, 传路径会使排除键永不相等 ⇒ 自命中泄漏, 属实质错误输出。建议收紧为: 要求实值为裸目录名 \"demo-spec\" 与 repo root \"/work/Demo\"。(本 run 实值正确, 未触发该缺口。)"
+      },
+      {
+        "reason": "无断言覆盖「竞品探针 vs pre-merge completeness gate」的混淆面 —— 这正是本轮 Rule #6 周期的主题。response 正确指出 completeness gate 是 pre_merge 专属、不随 Round 重跑、本 checkpoint (post_planning) 不跑 (L28, 与 SKILL.md L144/L153 一致), 但一个把 completeness gate 误当每轮入口步骤跑的 response 仍能全过现有 4 条断言。建议补一条: 步骤清单不得包含 completeness_gate.py 调用 (post_planning checkpoint 下不跑该门)。"
+      },
+      {
+        "reason": "题设 stdout 只锻炼了 sibling_found 措辞档; fail-closed 义务 (exit≠0 / 非 JSON / schema_version 未知 ⇒ 「未能核实」, 禁止渲染为无竞品)、degraded 后缀分支 (「(覆盖不完整: <reason>)」)、以及「不得从 hits==[] 反推结论」规则均未被本 eval 检验。建议增加 sibling eval 变体: 同场景但 stdout 给 status=degraded+reason 或 verdict=not_established, 断言渲染为对应措辞且不渲染为「无竞品」。response 对这些分支的陈述 (L32, L108-109) 与 execution-modes.md L305-323 一致, 但当前 fixture 无法区分真掌握与照抄模板。"
+      }
+    ],
+    "overall": "4/4 通过且非表面合规: response 不只抄措辞表, 还给出了消费方推导链 (fail-closed 三查、verdict 一等字段优先于 hits 反推、spec_dir 去重计数、archive ⇒ 已完成标注的语料层论证), 全部对 execution-modes.md L270-325 与 sibling_spec_probe.py 源码核实成立; 附录声称的两点源码事实 (run_probe verdict 判定次序 hits 先行, assemble_hits 以 (remote, corpus, spec_dir, key) 去重) 经只读复核均准确 (scripts L640-645, L345)。form_ok: L4 显式声明「未实际执行任何命令」, 全文以推演语气给出命令面, 无任何实际执行声称。timing: executor 196.7s / 97,497 tokens (timing.json), 对该推演深度合理。eval 侧主要缺口是 fixture 只覆盖单档措辞与断言不验命令实值形态, 见 suggestions。"
+  }
+}

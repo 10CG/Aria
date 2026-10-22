@@ -1,0 +1,224 @@
+snapshot-timestamp: 2026-10-15T06:14:52Z
+=== main git rev-parse HEAD
+b207ca1b91b0471bce7abba0da48de02765861bf
+[exit=0]
+=== main git status --porcelain
+ M aria
+?? aria-plugin-benchmarks/ab-results/2026-10-15-pre-merge-completeness-gate-rule6/
+?? openspec/changes/pre-merge-completeness-gate-change-scope/verification-ledger.md
+[exit=0]
+=== main git branch --list
+  feature/agent-router-auto-project-agent-injection
+  feature/handoff-multibranch-subdir-path-fidelity
+  feature/linked-issue-normalization
+  feature/owner-container-identity-key-and-collision-parser
+* feature/pre-merge-completeness-gate-change-scope
+  feature/rule6-description-change-trigger-eval-lane
+  master
+[exit=0]
+=== aria git rev-parse HEAD
+53b8e5cf233b661d53a901b9def7efa4b207fe20
+[exit=0]
+=== aria git status --porcelain
+[exit=0]
+=== aria git branch --list
+  feat/v1.47.0-issue-sweep
+  feature/agent-router-auto-project-agent-injection
+  feature/agent-router-baseline-semantics-99
+  feature/agent-team-audit-project-agent-augmentation
+  feature/aria-submodule-pointer-gate
+  feature/ci-backend-abstraction
+  feature/concurrent-session-upm-safety
+  feature/forgejo-hosts-parameterization
+  feature/handoff-multibranch-subdir-path-fidelity
+  feature/linked-issue-normalization
+  feature/owner-container-identity-key-and-collision-parser
+* feature/pre-merge-completeness-gate-change-scope
+  feature/secret-guard-manifest-precision
+  feature/secret-guard-multiline-anchor-fix
+  feature/secret-guard-nul-guard-hotfix
+  feature/secret-guard-partB-cmdpos
+  feature/secret-guard-per-segment-evaluation
+  feature/session-closer-synthesis
+  feature/state-scanner-stale-refs-false-parity
+  feature/v1.49.0-block-flip
+  fix/196-bare-issue-refs-message-and-dotted-repo
+  master
+[exit=0]
+=== main ls-remote origin refs/heads/master
+66752917371181142073e59a8db18717ba729cf6	refs/heads/master
+[exit=0]
+=== main ls-remote github refs/heads/master
+66752917371181142073e59a8db18717ba729cf6	refs/heads/master
+[exit=0]
+=== standards ls-remote origin refs/heads/master
+96565008e0677e07034495c6f236e6880ddf825a	refs/heads/master
+[exit=0]
+=== standards ls-remote github refs/heads/master
+2bc1c4c619c5125a1bb2963864c1683fd9a87739	refs/heads/master
+[exit=0]
+=== aria ls-remote origin refs/heads/master
+268da8f39d8bc33967e7cdaa5681e3a221fb9e4b	refs/heads/master
+[exit=0]
+=== aria ls-remote github refs/heads/master
+268da8f39d8bc33967e7cdaa5681e3a221fb9e4b	refs/heads/master
+[exit=0]
+=== aria-orchestrator ls-remote origin refs/heads/master
+237045ac2cfed9849c201e18434e9f6cb9036ab5	refs/heads/master
+[exit=0]
+=== aria-orchestrator ls-remote github refs/heads/master
+237045ac2cfed9849c201e18434e9f6cb9036ab5	refs/heads/master
+[exit=0]
+=== aria ls-remote --tags origin
+27fc895a6f2602bd21aae0c64479b71f806a2e07	refs/tags/v1.17.7
+7e11e6a7c30dbc755aade5e19565ed0c0951e631	refs/tags/v1.17.7^{}
+e426cc0869e961e1efad5bce4feb3a689ba42dec	refs/tags/v1.20.0
+899f3fa2fc9167fc26c4bc8f07643703124989fb	refs/tags/v1.20.0^{}
+43ff30a423f0ecaa4eadf555b22d0b4d68c1ac7f	refs/tags/v1.21.0
+4b6a6b81de29a6d75d17af5a4b0472a23359ea6a	refs/tags/v1.21.0^{}
+52083e946e391748b32c4492b92cfe99a9e0c29a	refs/tags/v1.21.1
+2438548ea3e85b50759b86b79f16b60c40b6fe78	refs/tags/v1.21.1^{}
+e585c8c1d1bf9bcbd4a35325253d633269b22ff0	refs/tags/v1.21.2
+c7724247fb25835d12d378576317e4f42a93b6d0	refs/tags/v1.21.2^{}
+762256c127223e3100c118b413c0b442e467ff3c	refs/tags/v1.21.3
+1db66350f80679fe08e72207f1941977cc0b7db3	refs/tags/v1.21.3^{}
+b1b651f649520b283ec8a19505b21c9783e5020d	refs/tags/v1.3.1
+6896cdcafbfd37b0b9a38762f9a504977659139e	refs/tags/v1.3.1^{}
+dbe2831adf4e6b9a1a04e12035ea6413bd107192	refs/tags/v1.3.2
+5f76d7425685fb365970a32d59b12714ebe3b2bf	refs/tags/v1.3.2^{}
+7bad6aeb8b55c06e783fdbc0a14f81a698f002ef	refs/tags/v1.5.1
+727aec5686bb8f564daa7fc8941361bebdfa6aaf	refs/tags/v1.5.1^{}
+86b163d681e76819c48e805c63b01951dc84750f	refs/tags/v1.6.0
+a0e83942df937b7e1743f20b62a87034095f0cbd	refs/tags/v1.6.0^{}
+0e2eda2c7666ec508dc96fb41c8a79e5cd43efe0	refs/tags/v1.66.0
+868355195eeb1c5699f8cc54d64212b9b65e3812	refs/tags/v1.66.0^{}
+84eb57487b3be665faefab87b7bc1727ad50fd70	refs/tags/v1.66.1
+3b97c35c45f45ffbdb472658d002e8859545f9ed	refs/tags/v1.66.1^{}
+13e55b69ac1c450271f352e8cb2ca0a837c38d24	refs/tags/v1.66.2
+5c32ac7e9800b4b67abd2c2a76e4867c0c464799	refs/tags/v1.66.2^{}
+d2f7076cc790314d68e30c8d9acd8d1c9a763c3b	refs/tags/v1.66.3
+c7a37e2fed44adf4ffb323cdc823d23b41ab831f	refs/tags/v1.66.3^{}
+73a17f8970dd2977e8ee415f03db1f8a7d302ef6	refs/tags/v1.66.4
+9e6a17cd5b60a444ce92ba838d45b0a67e3b3c93	refs/tags/v1.66.4^{}
+31fea2bdb90ef8cc265c7b8f2759e445030069f0	refs/tags/v1.66.5
+a0fe72013988fa45d89d791b13d3164d27a7d4e5	refs/tags/v1.66.5^{}
+571760e548660d885757483855a1701c0e6490bd	refs/tags/v1.67.0
+ca52d1c6c5a261016618d5f9e1cbbaa067ce1d9a	refs/tags/v1.67.0^{}
+bfe3a3473fac1bdb9571c1095d2594438dca919d	refs/tags/v1.67.1
+58a49e7a5b3416100b1b5704bf66d5ac88520a3f	refs/tags/v1.67.1^{}
+e837217e088fac060897e93fd50b63c35e97b71c	refs/tags/v1.67.2
+d69091dfdeb0c6cd83b03da2492812d33cec3712	refs/tags/v1.67.2^{}
+c6aad0dc1dd53a519ea4edb4da9656312e2846c0	refs/tags/v1.68.0
+fe324414f3d8e0ad5284afa82e0154f18ea049d6	refs/tags/v1.68.0^{}
+5b9de8e041311b7bc84f8275c20df74fd273ef93	refs/tags/v1.68.1
+d1caa66cb375c2799f55def453ca232c66a18c22	refs/tags/v1.68.1^{}
+164cb7188173664b1102a0860994688240882812	refs/tags/v1.68.2
+4c6489ca222adaada4c96c93157faa81d042e017	refs/tags/v1.68.2^{}
+3eaab5f00b4b16cc506e61dcf5b7ce842fbb68f0	refs/tags/v1.69.0
+2eca24b0e495cf3dd2b6e3ce069e2a1ac83adf5a	refs/tags/v1.69.0^{}
+1098ab1e15ebd2952457128106913c5cecfa4489	refs/tags/v1.69.1
+7dd0135ae7d18dd3647aeb541cb85056c5d09a27	refs/tags/v1.69.1^{}
+e15c8764647dd05d6519f4cc036c946121ea0a01	refs/tags/v1.70.0
+0545f86ece56beeafad99fe0990e8afc79cc8aaf	refs/tags/v1.70.0^{}
+84931bc8b2c68e08ad3e3d5d6d7049dc7029249d	refs/tags/v1.71.0
+985e6295af998fb7973472f3ce83c28d5cf9db01	refs/tags/v1.71.0^{}
+dae414d15c3776f1618c76130947120478cff744	refs/tags/v1.71.1
+301641b1c893477f387a1f85d1e90d105ebf0db9	refs/tags/v1.71.1^{}
+fde38d0de064808c9a303175567955e7ba565a10	refs/tags/v1.73.0
+6726df1f2ec8cc2f554e255d146ab20ada10424b	refs/tags/v1.73.0^{}
+83c0ffd19afbac7a400aa4b1877f7228165a418f	refs/tags/v1.73.1
+44f00d1c12a7ded15ec287101cb1e8c305a2c6a6	refs/tags/v1.73.1^{}
+d8c0450efdbc9467f6b6294d14ad976e8d290f9f	refs/tags/v1.73.2
+5a973e7ff55b2fb8634e6fc5d6f873f7ee14e8cb	refs/tags/v1.73.2^{}
+b29d43479ff8160b82600f5a5bbe001a0610aec3	refs/tags/v1.73.3
+1cb387218935433312fde4067c276754b77686a8	refs/tags/v1.73.3^{}
+f951d1ec87aa1c57de1964b8673c1afa9862b281	refs/tags/v1.74.0
+5215cf20c467535ca9cdcea2b1ecf34f94887732	refs/tags/v1.74.0^{}
+8c23b7b5cb9d45780d7a7dd97e785a10190f4a81	refs/tags/v1.74.1
+268da8f39d8bc33967e7cdaa5681e3a221fb9e4b	refs/tags/v1.74.1^{}
+[exit=0]
+=== aria ls-remote --tags github
+27fc895a6f2602bd21aae0c64479b71f806a2e07	refs/tags/v1.17.7
+7e11e6a7c30dbc755aade5e19565ed0c0951e631	refs/tags/v1.17.7^{}
+e426cc0869e961e1efad5bce4feb3a689ba42dec	refs/tags/v1.20.0
+899f3fa2fc9167fc26c4bc8f07643703124989fb	refs/tags/v1.20.0^{}
+43ff30a423f0ecaa4eadf555b22d0b4d68c1ac7f	refs/tags/v1.21.0
+4b6a6b81de29a6d75d17af5a4b0472a23359ea6a	refs/tags/v1.21.0^{}
+52083e946e391748b32c4492b92cfe99a9e0c29a	refs/tags/v1.21.1
+2438548ea3e85b50759b86b79f16b60c40b6fe78	refs/tags/v1.21.1^{}
+e585c8c1d1bf9bcbd4a35325253d633269b22ff0	refs/tags/v1.21.2
+c7724247fb25835d12d378576317e4f42a93b6d0	refs/tags/v1.21.2^{}
+762256c127223e3100c118b413c0b442e467ff3c	refs/tags/v1.21.3
+1db66350f80679fe08e72207f1941977cc0b7db3	refs/tags/v1.21.3^{}
+b1b651f649520b283ec8a19505b21c9783e5020d	refs/tags/v1.3.1
+6896cdcafbfd37b0b9a38762f9a504977659139e	refs/tags/v1.3.1^{}
+dbe2831adf4e6b9a1a04e12035ea6413bd107192	refs/tags/v1.3.2
+5f76d7425685fb365970a32d59b12714ebe3b2bf	refs/tags/v1.3.2^{}
+7bad6aeb8b55c06e783fdbc0a14f81a698f002ef	refs/tags/v1.5.1
+727aec5686bb8f564daa7fc8941361bebdfa6aaf	refs/tags/v1.5.1^{}
+86b163d681e76819c48e805c63b01951dc84750f	refs/tags/v1.6.0
+a0e83942df937b7e1743f20b62a87034095f0cbd	refs/tags/v1.6.0^{}
+0e2eda2c7666ec508dc96fb41c8a79e5cd43efe0	refs/tags/v1.66.0
+868355195eeb1c5699f8cc54d64212b9b65e3812	refs/tags/v1.66.0^{}
+84eb57487b3be665faefab87b7bc1727ad50fd70	refs/tags/v1.66.1
+3b97c35c45f45ffbdb472658d002e8859545f9ed	refs/tags/v1.66.1^{}
+13e55b69ac1c450271f352e8cb2ca0a837c38d24	refs/tags/v1.66.2
+5c32ac7e9800b4b67abd2c2a76e4867c0c464799	refs/tags/v1.66.2^{}
+d2f7076cc790314d68e30c8d9acd8d1c9a763c3b	refs/tags/v1.66.3
+c7a37e2fed44adf4ffb323cdc823d23b41ab831f	refs/tags/v1.66.3^{}
+73a17f8970dd2977e8ee415f03db1f8a7d302ef6	refs/tags/v1.66.4
+9e6a17cd5b60a444ce92ba838d45b0a67e3b3c93	refs/tags/v1.66.4^{}
+31fea2bdb90ef8cc265c7b8f2759e445030069f0	refs/tags/v1.66.5
+a0fe72013988fa45d89d791b13d3164d27a7d4e5	refs/tags/v1.66.5^{}
+571760e548660d885757483855a1701c0e6490bd	refs/tags/v1.67.0
+ca52d1c6c5a261016618d5f9e1cbbaa067ce1d9a	refs/tags/v1.67.0^{}
+bfe3a3473fac1bdb9571c1095d2594438dca919d	refs/tags/v1.67.1
+58a49e7a5b3416100b1b5704bf66d5ac88520a3f	refs/tags/v1.67.1^{}
+e837217e088fac060897e93fd50b63c35e97b71c	refs/tags/v1.67.2
+d69091dfdeb0c6cd83b03da2492812d33cec3712	refs/tags/v1.67.2^{}
+c6aad0dc1dd53a519ea4edb4da9656312e2846c0	refs/tags/v1.68.0
+fe324414f3d8e0ad5284afa82e0154f18ea049d6	refs/tags/v1.68.0^{}
+5b9de8e041311b7bc84f8275c20df74fd273ef93	refs/tags/v1.68.1
+d1caa66cb375c2799f55def453ca232c66a18c22	refs/tags/v1.68.1^{}
+164cb7188173664b1102a0860994688240882812	refs/tags/v1.68.2
+4c6489ca222adaada4c96c93157faa81d042e017	refs/tags/v1.68.2^{}
+3eaab5f00b4b16cc506e61dcf5b7ce842fbb68f0	refs/tags/v1.69.0
+2eca24b0e495cf3dd2b6e3ce069e2a1ac83adf5a	refs/tags/v1.69.0^{}
+1098ab1e15ebd2952457128106913c5cecfa4489	refs/tags/v1.69.1
+7dd0135ae7d18dd3647aeb541cb85056c5d09a27	refs/tags/v1.69.1^{}
+e15c8764647dd05d6519f4cc036c946121ea0a01	refs/tags/v1.70.0
+0545f86ece56beeafad99fe0990e8afc79cc8aaf	refs/tags/v1.70.0^{}
+84931bc8b2c68e08ad3e3d5d6d7049dc7029249d	refs/tags/v1.71.0
+985e6295af998fb7973472f3ce83c28d5cf9db01	refs/tags/v1.71.0^{}
+dae414d15c3776f1618c76130947120478cff744	refs/tags/v1.71.1
+301641b1c893477f387a1f85d1e90d105ebf0db9	refs/tags/v1.71.1^{}
+fde38d0de064808c9a303175567955e7ba565a10	refs/tags/v1.73.0
+6726df1f2ec8cc2f554e255d146ab20ada10424b	refs/tags/v1.73.0^{}
+83c0ffd19afbac7a400aa4b1877f7228165a418f	refs/tags/v1.73.1
+44f00d1c12a7ded15ec287101cb1e8c305a2c6a6	refs/tags/v1.73.1^{}
+d8c0450efdbc9467f6b6294d14ad976e8d290f9f	refs/tags/v1.73.2
+5a973e7ff55b2fb8634e6fc5d6f873f7ee14e8cb	refs/tags/v1.73.2^{}
+b29d43479ff8160b82600f5a5bbe001a0610aec3	refs/tags/v1.73.3
+1cb387218935433312fde4067c276754b77686a8	refs/tags/v1.73.3^{}
+f951d1ec87aa1c57de1964b8673c1afa9862b281	refs/tags/v1.74.0
+5215cf20c467535ca9cdcea2b1ecf34f94887732	refs/tags/v1.74.0^{}
+8c23b7b5cb9d45780d7a7dd97e785a10190f4a81	refs/tags/v1.74.1
+268da8f39d8bc33967e7cdaa5681e3a221fb9e4b	refs/tags/v1.74.1^{}
+[exit=0]
+=== coordination local (git rev-parse refs/aria/coordination)
+ad08b18e77173cba90ec1a330b7379313effa714
+[exit=0]
+=== coordination origin (ls-remote)
+ad08b18e77173cba90ec1a330b7379313effa714	refs/aria/coordination
+[exit=0]
+=== forgejo GET /repos/10CG/Aria/pulls?state=open
+[]
+[exit=0]
+[json_array_parse=0]
+=== forgejo GET /repos/10CG/aria-plugin/pulls?state=open
+[]
+[exit=0]
+[json_array_parse=0]
+=== find aria/skills -maxdepth 1 -name '*-workspace' | sort
+aria/skills/issue-triage-workspace
+[exit=0]

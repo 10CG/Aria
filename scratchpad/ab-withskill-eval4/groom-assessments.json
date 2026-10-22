@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "assessments": {
+    "Aria#211": {
+      "suspected_fixed": {
+        "verdict": true,
+        "rationale": "该 issue 的诉求 (Rule #6 description 变动照跑 AB 的触发面/评测车道) 已由已 ship 工作解决: openspec/archive/2026-09-17-rule6-description-change-trigger-eval-lane/ 归档 (2026-09-17, 晚于 issue 创建 2026-09-09); merge commit df3c274617cce7d28990e0bca45154ff17948db2 subject 同时含 '(#215) from feature/rule6-description-change-trigger-eval-lane' 与 '10CG/Aria#211'; CLAUDE.md 状态行明载 '场景 4b 地板守卫已 ship (Aria#211, 2026-09-17, PR #215 df3c274 ...)'。跟进项 Aria#213 / Aria#214 / aria-plugin#200 是独立 issue (仍 open), 不构成本条未修的证据。关单动作本身属 owner/tracker 面 (P1 只产不写, 裁定-8), 本判断仅为可关单建议。"
+      },
+      "provenance": {
+        "harness": "claude-code",
+        "model_id": "luxeno-an,glm-5.3"
+      },
+      "created_at": "2026-10-19T18:26:33Z",
+      "context_key": "ae63be965b1622962f9118858ffa26cb62df94236268868be1a2d4a3b72c46b4"
+    },
+    "Aria#229": {
+      "suspected_fixed": {
+        "verdict": false,
+        "rationale": "三源检索均无修复迹: (1) openspec/archive 按 secret-guard / guard-bypass 主题命中 8 条归档 (2026-05-23-aria-secret-guard-plugin-default / 2026-07-11-secret-guard-multiline-and-anchor-fix / 2026-08-21-subprocess-decode-hardening 等) 全部归档日 ≤ 2026-08-22, 早于 issue 创建 2026-10-07 且属不同 facet (同主题历史归档不构成本条已修); (2) git log (创建后) grep '229|guard-bypass' 零命中; (3) CHANGELOG 无 #229 关单记载。判 not-fixed, 保持 open 待办。"
+      },
+      "provenance": {
+        "harness": "claude-code",
+        "model_id": "luxeno-an,glm-5.3"
+      },
+      "created_at": "2026-10-19T18:26:33Z",
+      "context_key": "ae63be965b1622962f9118858ffa26cb62df94236268868be1a2d4a3b72c46b4"
+    }
+  }
+}

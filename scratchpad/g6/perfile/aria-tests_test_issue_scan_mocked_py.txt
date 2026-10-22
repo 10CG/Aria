@@ -1,0 +1,20 @@
+from _helpers import past_last_issues_page, tmp_project, tmp_repo, write_file
+        if past_last_issues_page(key):
+            return (0, "[]", "")
+            items, ferr, source, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            # gh has no page parameter: it is asked for the ceiling (1000) + 1 in one call
+             "--limit", "1001", "--json", "number,title,labels,url,body"): (0, body, ""),
+            items, ferr, source, *_ = _fetch_repo("github", "foo/bar", 20, [], 5)
+        items, ferr, source, *_ = _fetch_repo("gitlab", "foo/bar", 20, [], 5)
+            items, ferr, source, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            items, ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            items, ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            items, ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            _items, ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            _items, ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+            items, _ferr, _src, *_ = _fetch_repo("forgejo", "foo/bar", 20, ["bug"], 5)
+            items, ferr, source, *_ = _fetch_repo("forgejo", "foo/bar", 20, [], 5)
+                "schema_version": SCHEMA_VERSION,
+                if past_last_issues_page(cmd_t):
+                    return (0, "[]", "")
+                "schema_version": SCHEMA_VERSION,

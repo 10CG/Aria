@@ -1,0 +1,5 @@
+groom: repos=4 issues=154
+groom: tier_a baseline=True new=154 reused=0 reclassify=154 closed=0
+groom: tier_b reusable=0 stale=0 orphaned=0 ttl=None
+groom: schema self-check ok (v1.1)
+groom: state saved -> scratchpad/ab-withskill-eval4/groom-state.json

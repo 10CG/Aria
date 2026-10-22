@@ -1,0 +1,41 @@
+{
+  "expectations": [
+    {
+      "text": "Commit message must start with conventional type (feat/fix/refactor/test)",
+      "passed": true,
+      "evidence": "response.md L50 (§4 最终产物) 与 L91 (§6 命令形式) 的 commit subject 均为 `feat(auth): 添加 GitHub OAuth2 社交登录`, 以列表内类型 `feat` 开头; L42 给出判定依据 (三文件共同实现新功能 oauth2-social-login, 全部为新增 A, 纯增量 → feat)。类型选择对场景正确。"
+    },
+    {
+      "text": "Commit should include a scope in parentheses",
+      "passed": true,
+      "evidence": "response.md L50: `feat(auth)` 含括号 scope; L44 给出 scope 判定理由: 三文件横跨 api/auth/、models/、tests/ 三层但业务域唯一 (认证/OAuth 账号关联), scope 取业务域优于取目录层, 并与 commit-msg-generator SKILL 示例同构 (快照 skills/commit-msg-generator/SKILL.md L82 `feat(auth): 添加JWT认证` 属实)。scope 选择有据且形式正确。"
+    },
+    {
+      "text": "Commit body or footer should reference the OpenSpec",
+      "passed": false,
+      "evidence": "FAIL。最终 commit message (response.md L49-55, §6 L89-96 命令形式完整重写) 的 body 仅三条描述文件的 bullet, footer 整体缺失 — L61 明示: \"本任务输入未提供关联 issue 编号或 OpenSpec change_id, 不虚构 → 省略\"。断言要求 commit 的 body 或 footer 引用 OpenSpec, 实际交付的 commit message 两处均无 (L61 的 \"实际执行时会以 Refs <change_id> 关联\" 是外围 prose 讨论, 不在 commit message 内)。任务输入给了 Feature: oauth2-social-login, 可作 change 引用而未用。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.67
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Commit body or footer should reference the OpenSpec",
+        "reason": "本条是三断言中唯一有区分度的 (抓到 without_skill 臂的省略), 但 eval prompt 未提供 OpenSpec change_id — 严格按断言评分会奖励虚构 change_id 的输出 (与 Aria 不虚构规范相冲)。建议 prompt 显式给定 change_id, 或在断言/评分口径中接受以 prompt 里的 feature slug (oauth2-social-login) 作 Refs 引用。"
+      },
+      {
+        "reason": "无断言覆盖 body 内容正确性: 本 run 的三条 bullet 与三个 staged 文件一一对应、单 commit 不拆分决策 (response.md L45, L52-54) 是高质量行为, 但虚构的 body bullet 同样能通过全部三条断言。可加一条 body-文件对应断言。"
+      },
+      {
+        "reason": "断言 1+2 合起来是 conventional-commits 基线, 任何合理输出 (无论有无 skill) 都能过, 对 A/B 区分度趋零; 本 eval 的 A/B 信号几乎全部压在断言 3 一条上。"
+      }
+    ],
+    "overall": "2/3 通过。form_ok=true: response 通篇守住描述性推演体裁 — L3 显式推演声明 (未执行任何 git 命令), 全部命令以\"将运行/将要运行\"给出 (L34-35, §6 标题即\"推演, 不实际执行\"), 输出 SHA 留占位并注明\"推演不伪造\" (L113), 无任何声称实际执行的段落。流程性描述经 skill 快照抽查全部属实: 跳过规则 (phase-c-integrator SKILL.md L780/L789 git status --porcelain 空→跳 C.1)、C.1 委托参数 enhanced_markers:true + 三 from_context (L103-110)、hook 拒绝 action:stop (L924-925)、commit-msg-generator 不使用场景指向 strategic-commit-orchestrator (L27)、ENHANCED_MARKERS_SPEC v1.3.0 三标记各空一行 (spec L68) — 后者反而与 phase-c-integrator SKILL.md 自带示例 (三标记连排无空行, 该示例较 spec 陈旧) 不一致, response 取的是 spec 正确形态。唯一失分是断言 3: commit message 未落 OpenSpec 引用 (显式省略 footer, L61)。timing: 84923 tokens / 175.3s (timing.json), 单断言成本合理。"
+  }
+}

@@ -1,0 +1,3 @@
+from _helpers import past_last_issues_page, tmp_repo, write_file  # noqa: E402
+                if past_last_issues_page(key):
+                    return (0, "[]", "")

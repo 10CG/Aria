@@ -1,0 +1,289 @@
+================================================================
+TASK-027 step 7 merged-tree in-place regression — 2026-10-17T03:07:20Z
+spec: pre-merge-completeness-gate-change-scope (10CG/Aria#199)
+================================================================
+
+[P0] precondition assertions
+-- P0.1 aria branch/HEAD:
+master
+500e6c250e5bd85ad561dad113a9e46b35df0703
+-- P0.2 aria porcelain (expect empty, rc=0):
+rc=0
+-- P0.3 HEAD^2 == feature HEAD a4e7028 (merge shape):
+a4e70282a14f222837c6520aae01cb6e26f3a1b4
+-- P0.4 no_push_requested_by_env (expect rc=1 => var absent):
+rc=1
+
+[P1] SC-12 three suites (subshell each; baseline Ran = 133 / 1650 / 148)
+
+-- P1.1 audit-engine/tests:
+.................................origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+origin: default_branch=master
+origin: fetch failed (other)
+origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+.................origin: default_branch=master
+origin: fetch ok
+origin: proposals cap total=1001 kept=1000 dropped_from='openspec/archive/2026-01-01-a0500/proposal.md'
+............R: default branch unresolved (bad_symref_prefix)
+.R: default branch unresolved (no_symref)
+.R: default branch unresolved (network)
+.R: default branch unresolved (timeout)
+.github: default_branch=master
+github: fetch ok
+origin: default_branch=master
+origin: fetch ok
+.......................origin: default_branch=master
+origin: fetch ok
+..origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+..origin: default_branch=master
+origin: fetch ok
+origin: refs cap total=3 kept=1 dropped_from='origin/b'
+..github: default_branch=master
+github: fetch failed (network)
+origin: default_branch=master
+origin: fetch ok
+.github: default_branch=master
+github: fetch failed (network)
+origin: default_branch=master
+origin: fetch ok
+....origin: default_branch=master
+origin: fetch ok
+.origin: default_branch=master
+origin: fetch ok
+origin: proposals cap total=2 kept=1 dropped_from='openspec/archive/2026-01-01-a-spec/proposal.md'
+........................
+----------------------------------------------------------------------
+Ran 133 tests in 22.172s
+
+OK
+rc=0
+cwd_after=/home/dev/Aria/aria
+
+-- P1.2 state-scanner/tests:
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records
+NO PRODUCTION RECORDS — run_gate never invoked via the CLI (dead-code risk); dogfood (TASK-019) should produce ≥1
+OK (1 recent production run_gate invocation(s) recorded)
+OK (coordination gate disabled)
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records
+pipeline_rc_note: unittest rc follows
+=== rerun with rc capture ===
+rc=0
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records
+NO PRODUCTION RECORDS — run_gate never invoked via the CLI (dead-code risk); dogfood (TASK-019) should produce ≥1
+OK (1 recent production run_gate invocation(s) recorded)
+OK (coordination gate disabled)
+STALE — no production run_gate record within 14d (wired but not recently called → dead-code risk); or partition holds only non-production / malformed records
+full output saved: /home/dev/Aria/scratchpad/g6/logs/task027-step7-state-scanner.full.txt (136 lines)
+128:Ran 1650 tests in 267.550s
+130:OK
+134:OK (1 recent production run_gate invocation(s) recorded)
+135:OK (coordination gate disabled)
+-- P1.3 phase-c-integrator/tests:
+....................................................................................................................................................
+----------------------------------------------------------------------
+Ran 148 tests in 6.959s
+
+OK
+pipeline_rc_note: capturing rc separately
+rc=0
+
+[P1 verdict] 133 / 1650 / 148 baseline vs actual — see per-suite lines above; attribution below.
+========================================================================
+[P2] TASK-018 doc checks — merged tree (aria master 500e6c2)
+========================================================================
+
+-- P2.a SC-13 entries (proposal :469; baseline = metadata.sc13_baseline)
+PASS  [SC13.1] EM '{checkpoint_name}-*.md' wildcard count 0 (rc=1,count=0); got rc=1 count=0
+PASS  [SC13.2] AE fenced bash/sh blocks contain 'scripts/completeness_gate.py' exactly 1; got 1
+        blocks=2, whole-file 'completeness_gate.py' mentions=2
+PASS  [SC13.3] PC 'change_id' >= 4 (baseline 3, +>=1); got rc=0 count=4
+PASS  [SC13.4] grep -rn timestamp pattern over aria/skills/: rc=1 (expect 1), stdout empty
+PASS  [SC13.5] RS '不计入' >= 1; got rc=0 count=2
+PASS  [SC13.6] RS '子目录内的报告不计入完整性证据' == 1; got rc=0 count=1
+PASS  [SC13.7] RS '三个桶都不收' == 1; got rc=0 count=1
+PASS  [SC13.8] EM 'adaptive_rules' >= 4 (baseline 3, +>=1); got rc=0 count=7
+FAIL  [SC13.9] EM bypassed WARN lines identical (2 hits)
+        '→ 记录 [WARN] incomplete checkpoint gate bypassed: missing={cp}@{change_id},... ; scope_unresolved={0|1}, 写入 audit trail' | '**豁免设计原则**: `allow_incomplete_checkpoints` 默认 `false`, 需在 `.aria/config.json` 显式声明才能开启。豁免模式下 pre_merge 审计仍逐对评估三态并全部留痕, 只把 missing / scope_unresolved / spec_level_undetermined / no_spec_unverifiable 降为 bypassed 并短路终止求值 (no_spec_contradicted / change_id_unanchored 不被本键豁免), audit trail 必须记录 `[WARN] incomplete checkpoint gate bypassed: missing={cp}@{change_id},... ; scope_unresolved={0|1}`。'
+PASS  [SC13.10] EM Step4:..Step5: slice 'scripts/completeness_gate.py' exactly 1; got 1 (slice lines 123..159)
+PASS  [SC13.12a] PC 'checkpoints 显式值 > adaptive_rules 推导值' >= 1; got rc=0 count=1
+PASS  [SC13.12b] PC 'anchor_base' >= 1; got rc=0 count=1
+PASS  [SC13.13] R5(1) EM 'stdout 非 JSON' ==1 (rc=0, count=1) and paragraph contains '不得按 PASS': True
+PASS  [SC13.14a] PC '4.5 completeness gate 三态处置' == 1; got rc=0 count=1
+PASS  [SC13.14b] PC 'not_applicable → workflow report 必带' >=1 (1) and 'unattributed_count > 0' >=1 (1)
+PASS  [SC13.15] R5(3) EM 入口逻辑 section contains both literals (lines 4..67)
+PASS  [SC13.16a] R5(4) EM old sentence count 0 (rc must be 1); got rc=1 count=0
+PASS  [SC13.16b] R5(4) EM '仍逐对评估三态并全部留痕' >= 1; got rc=0 count=2
+PASS  [SC13.17] R5(5) PC convergence 1 / challenge 1 / 照常调用门 4 all >=1
+
+-- P2.b metadata.new_checks exec'd verbatim (n1/n2/n3/n4/n8)
+Traceback (most recent call last):
+  File "/home/dev/Aria/scratchpad/g6/logs/task027_step7_checks.py", line 164, in <module>
+    exec(M["new_checks"]["code"], ns)
+         ~^^^^^^^^^^^^^^
+KeyError: 'new_checks'
+P2_script_rc=1
+========================================================================
+[P2] TASK-018 doc checks — merged tree (aria master 500e6c2)
+========================================================================
+
+-- P2.a SC-13 entries (proposal :469; baseline = metadata.sc13_baseline)
+PASS  [SC13.1] EM '{checkpoint_name}-*.md' wildcard count 0 (rc=1,count=0); got rc=1 count=0
+PASS  [SC13.2] AE fenced bash/sh blocks contain 'scripts/completeness_gate.py' exactly 1; got 1
+        blocks=2, whole-file 'completeness_gate.py' mentions=2
+PASS  [SC13.3] PC 'change_id' >= 4 (baseline 3, +>=1); got rc=0 count=4
+PASS  [SC13.4] grep -rn timestamp pattern over aria/skills/: rc=1 (expect 1), stdout empty
+PASS  [SC13.5] RS '不计入' >= 1; got rc=0 count=2
+PASS  [SC13.6] RS '子目录内的报告不计入完整性证据' == 1; got rc=0 count=1
+PASS  [SC13.7] RS '三个桶都不收' == 1; got rc=0 count=1
+PASS  [SC13.8] EM 'adaptive_rules' >= 4 (baseline 3, +>=1); got rc=0 count=7
+FAIL  [SC13.9] EM bypassed WARN literals: exactly 2, identical
+        '`[WARN] incomplete checkpoint gate bypassed: missing={cp}@{change_id},... ; scope_unresolved={0|1}`'
+PASS  [SC13.10] EM Step4:..Step5: slice 'scripts/completeness_gate.py' exactly 1; got 1 (slice lines 123..159)
+PASS  [SC13.12a] PC 'checkpoints 显式值 > adaptive_rules 推导值' >= 1; got rc=0 count=1
+PASS  [SC13.12b] PC 'anchor_base' >= 1; got rc=0 count=1
+PASS  [SC13.13] R5(1) EM 'stdout 非 JSON' ==1 (rc=0, count=1) and paragraph contains '不得按 PASS': True
+PASS  [SC13.14a] PC '4.5 completeness gate 三态处置' == 1; got rc=0 count=1
+PASS  [SC13.14b] PC 'not_applicable → workflow report 必带' >=1 (1) and 'unattributed_count > 0' >=1 (1)
+PASS  [SC13.15] R5(3) EM 入口逻辑 section contains both literals (lines 4..67)
+PASS  [SC13.16a] R5(4) EM old sentence count 0 (rc must be 1); got rc=1 count=0
+PASS  [SC13.16b] R5(4) EM '仍逐对评估三态并全部留痕' >= 1; got rc=0 count=2
+PASS  [SC13.17] R5(5) PC convergence 1 / challenge 1 / 照常调用门 4 all >=1
+
+-- P2.b metadata.new_checks exec'd verbatim (n1/n2/n3/n4/n8)
+Traceback (most recent call last):
+  File "/home/dev/Aria/scratchpad/g6/logs/task027_step7_checks.py", line 171, in <module>
+    canonical_lines = M["canonical_call"].rstrip("\n").split("\n")
+                      ~^^^^^^^^^^^^^^^^^^
+KeyError: 'canonical_call'
+P2_script_rc=1
+========================================================================
+[P2] TASK-018 doc checks — merged tree (aria master 500e6c2)
+========================================================================
+
+-- P2.a SC-13 entries (proposal :469; baseline = metadata.sc13_baseline)
+PASS  [SC13.1] EM '{checkpoint_name}-*.md' wildcard count 0 (rc=1,count=0); got rc=1 count=0
+PASS  [SC13.2] AE fenced bash/sh blocks contain 'scripts/completeness_gate.py' exactly 1; got 1
+        blocks=2, whole-file 'completeness_gate.py' mentions=2
+PASS  [SC13.3] PC 'change_id' >= 4 (baseline 3, +>=1); got rc=0 count=4
+PASS  [SC13.4] grep -rn timestamp pattern over aria/skills/: rc=1 (expect 1), stdout empty
+PASS  [SC13.5] RS '不计入' >= 1; got rc=0 count=2
+PASS  [SC13.6] RS '子目录内的报告不计入完整性证据' == 1; got rc=0 count=1
+PASS  [SC13.7] RS '三个桶都不收' == 1; got rc=0 count=1
+PASS  [SC13.8] EM 'adaptive_rules' >= 4 (baseline 3, +>=1); got rc=0 count=7
+PASS  [SC13.9] EM bypassed: old spelling count 0 (got 0), unified spelling exactly 2 (got 2)
+PASS  [SC13.10] EM Step4:..Step5: slice 'scripts/completeness_gate.py' exactly 1; got 1 (slice lines 123..159)
+PASS  [SC13.12a] PC 'checkpoints 显式值 > adaptive_rules 推导值' >= 1; got rc=0 count=1
+PASS  [SC13.12b] PC 'anchor_base' >= 1; got rc=0 count=1
+PASS  [SC13.13] R5(1) EM 'stdout 非 JSON' ==1 (rc=0, count=1) and paragraph contains '不得按 PASS': True
+PASS  [SC13.14a] PC '4.5 completeness gate 三态处置' == 1; got rc=0 count=1
+PASS  [SC13.14b] PC 'not_applicable → workflow report 必带' >=1 (1) and 'unattributed_count > 0' >=1 (1)
+PASS  [SC13.15] R5(3) EM 入口逻辑 section contains both literals (lines 4..67)
+PASS  [SC13.16a] R5(4) EM old sentence count 0 (rc must be 1); got rc=1 count=0
+PASS  [SC13.16b] R5(4) EM '仍逐对评估三态并全部留痕' >= 1; got rc=0 count=2
+PASS  [SC13.17] R5(5) PC convergence 1 / challenge 1 / 照常调用门 4 all >=1
+
+-- P2.b metadata.new_checks exec'd verbatim (n1/n2/n3/n4/n8)
+PASS  [N1] n1 (Step3 exclusion lines) on execution-modes.md
+PASS  [N2] n2 (Step2 rewrite sentence) on execution-modes.md
+PASS  [N3] n3 (stdlib-only imports) on completeness_gate.py
+PASS  [N4] n4 call strings == canonical_call (AE blocks + EM Step4..5 slice)
+PASS  [N8] n8 (no literal-key gate, priority-chain anchors)
+
+-- P2.c metadata.crlf_guard exec'd verbatim (both CRLF files)
+PASS  [CRLF[skills/phase-b-developer/SKILL.md]] crlf_guard() -> True (eol: i/crlf  w/crlf  attr/                 	skills/phase-b-developer/SKILL.md)
+        eol half discriminative; numstat half vacuous-true on committed tree (5.1/5.3 same-form reading)
+PASS  [CRLF[skills/phase-c-integrator/SKILL.md]] crlf_guard() -> True (eol: i/crlf  w/crlf  attr/                 	skills/phase-c-integrator/SKILL.md)
+        eol half discriminative; numstat half vacuous-true on committed tree (5.1/5.3 same-form reading)
+
+-- P2.d frontmatter of four SKILL.md vs feature HEAD a4e7028 (merge must not touch it)
+PASS  [FM[skills/audit-engine/SKILL.md]] frontmatter identical to a4e7028 (LF, non-empty, has description:)
+        cur_block=16 lines, desc=True, ref_block=16 lines, desc=True
+PASS  [FM[skills/phase-c-integrator/SKILL.md]] frontmatter identical to a4e7028 (CRLF, non-empty, has description:)
+        cur_block=9 lines, desc=True, ref_block=9 lines, desc=True
+PASS  [FM[skills/phase-b-developer/SKILL.md]] frontmatter identical to a4e7028 (CRLF, non-empty, has description:)
+        cur_block=9 lines, desc=True, ref_block=9 lines, desc=True
+PASS  [FM[skills/phase-a-planner/SKILL.md]] frontmatter identical to a4e7028 (LF, non-empty, has description:)
+        cur_block=8 lines, desc=True, ref_block=8 lines, desc=True
+
+-- P2.e (supporting) merge did not touch group-3 seven files + four SKILL.md vs a4e7028
+PASS  [P2.e] git diff a4e7028..HEAD over group-3 files + 4 SKILL.md is empty
+        group-3 commit 97d4d0eb files: ['skills/audit-engine/SKILL.md', 'skills/audit-engine/references/execution-modes.md', 'skills/audit-engine/references/pre-write-validation.md', 'skills/audit-engine/references/report-storage.md', 'skills/phase-a-planner/SKILL.md', 'skills/phase-b-developer/SKILL.md', 'skills/phase-c-integrator/SKILL.md']
+
+[P2 summary] pass=31 fail=0
+P2_script_rc=0
+
+[P3] sc12_liveness (acceptance for this step: L2 true; L1/L3 recorded)
+-- P3.1 guard_config_hooks criterion (pinned at main repo root):
+rc=0
+-- guard verdict: rc must be 0 or 1 with NO output lines before it
+extracted sc12_liveness.code -> scratchpad/g6/logs/sc12_liveness_step7.py 1610 chars
+-- P3.2 sc12_liveness.py --force-checked (main repo root):
+{"L1": true, "L2": true, "L3": true, "status": "alive", "alive_categories": ["aria_plugin_integration", "code_reference", "generic_path_call"], "gate_verdict": "pass", "unverified_claims": []}
+liveness_rc=0
+extracted command -> scratchpad/g6/logs/no_unresolved_step7.sh
+
+[P4] no-unresolved-version-placeholder (enabled) — command verbatim at main repo root:
+OK (aria/ 交付面无 <vNEXT> 占位符)
+check_rc=0
+
+[P4 criterion] pass = rc 0 and first line starts with OK
+================================================================
+[POST] post-run state (read-only discipline check)
+-- aria branch/HEAD (expect master 500e6c2...):
+master
+500e6c250e5bd85ad561dad113a9e46b35df0703
+-- aria porcelain (expect empty):
+rc=0
+-- main repo porcelain (scratchpad/ untracked only; tracked files untouched):
+ M aria
+ M openspec/changes/pre-merge-completeness-gate-change-scope/verification-ledger.md
+?? scratchpad/
+rc=0
+
+[SUMMARY] TASK-027 step 7 — merged-tree in-place regression @ aria master 500e6c2
+  P0 preconditions ............ PASS (master / HEAD=merge SHA 500e6c2 / porcelain empty /
+                                 HEAD^2=a4e7028 / NO_PUSH absent rc=1)
+  P1 SC-12 three suites ....... PASS  audit-engine Ran 133 OK (22.2s) /
+                                 state-scanner Ran 1650 OK (267.6s) /
+                                 phase-c-integrator Ran 148 OK (7.0s);
+                                 all rc=0, no skipped; vs 5.3 baseline 133/1650/148:
+                                 zero drift, attribution = none needed (merge parents
+                                 08db1c0+a4e7028 touched no tests/ files; step-4 checks
+                                 already proved zero prescription drift on both parents)
+  P2 TASK-018 doc checks ...... PASS 31/31 (SC-13 19 entries incl. two rc=1-and-0 greps
+                                 and grep -rn timestamp rc=1 empty; n1/n2/n3/n4/n8 verbatim
+                                 exec from yaml metadata; crlf_guard both files eol-true,
+                                 numstat half vacuous on committed tree per 5.1/5.3
+                                 same-form reading; 4 SKILL.md frontmatter identical to
+                                 a4e7028, all non-empty with description:; supporting:
+                                 diff a4e7028..HEAD over group-3 7 files + 4 SKILL.md empty)
+  P3 sc12_liveness ............ PASS  guard rc=0 no output before it; --force-checked:
+                                 L1 true L2 true L3 true, status=alive,
+                                 alive_categories incl. aria_plugin_integration,
+                                 gate_verdict=pass (L2 = acceptance for this step)
+  P4 no-unresolved-version-placeholder ... PASS  first line 'OK (aria/ 交付面无 <vNEXT>
+                                 占位符)', rc=0
+  VERDICT: step 7 ALL PASS — regression green on merge tree; step 8 (tag v1.76.0)
+           may proceed
+================================================================

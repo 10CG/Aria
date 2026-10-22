@@ -1,0 +1,86 @@
+{
+ "sampled_at": "2026-10-18",
+ "purpose": "指纹① body/comments 分量的 fixture 真形态语料 (issue detail + comments 端点)",
+ "items": [
+  {
+   "repo": "Aria",
+   "number": 233,
+   "body_len": 7340,
+   "body_head": "## Bug Report\n\n**描述**: Layer L 的 durable sweep (`release_gate.py --sweep-stale` → `gc.sweep_stale_active`, 阈值 `SWEEP_TTL` = 24h) 会把一个**仍在使用中的会话**持有的 claim 永久改写成 `abandoned`。这是三件事叠在一起的结果:\n\n1. **心跳只在 `/",
+   "comments_count_field": 1,
+   "comments_endpoint_shape": [
+    {
+     "id": 28794,
+     "created_at": "2026-10-15T16:58:30Z",
+     "updated_at": "2026-10-15T16:58:30Z",
+     "body_len": 9033
+    }
+   ]
+  },
+  {
+   "repo": "Aria",
+   "number": 213,
+   "body_len": 1283,
+   "body_head": "## 背景\n\nSpec `rule6-description-change-trigger-eval-lane` (`10CG/Aria#211`) 把**场景 4b「description 地板守卫」**写成 Rule #6 的义务 (standards `conventions/skill-benchmark-exemption.md` §2, Version 1.1.0)。场景 4b 需要每",
+   "comments_count_field": 0,
+   "comments_endpoint_shape": []
+  },
+  {
+   "repo": "aria-plugin",
+   "number": 110,
+   "body_len": 4755,
+   "body_head": "## 摘要\n\n`state-scanner` 是十步循环的**统一入口** (Rule #2: 不能跳过 Phase A)。它的 `sync_status` **会报假的「已同步」** —— 本地 remote-tracking ref 陈旧时报 `parity: equal` / `overall_parity: true`, 而工作树实际落后远程。\n\n**后果**: AI 基于落后工作树开工 ",
+   "comments_count_field": 3,
+   "comments_endpoint_shape": [
+    {
+     "id": 15789,
+     "created_at": "2026-07-15T01:16:25Z",
+     "updated_at": "2026-07-15T01:16:25Z",
+     "body_len": 561
+    },
+    {
+     "id": 16240,
+     "created_at": "2026-07-19T15:10:51Z",
+     "updated_at": "2026-07-19T15:10:51Z",
+     "body_len": 1368
+    },
+    {
+     "id": 27451,
+     "created_at": "2026-09-30T22:19:30Z",
+     "updated_at": "2026-09-30T22:19:30Z",
+     "body_len": 16374
+    }
+   ]
+  },
+  {
+   "repo": "Aether",
+   "number": 521,
+   "body_len": 1410,
+   "body_head": "#518 B/C 修复轮 post_implementation R1 (CR Important-1 + SFH F1, 两路独立实锤) 拆出的新缺口 —— 全仓最后一条「空观测域照报 PASS」活缺口。\n\n## 现象\n\n空 `/v1/jobs` (200 `[]`, err==nil) 时 `registry_image_availability` 报 **PASS «no images fo",
+   "comments_count_field": 1,
+   "comments_endpoint_shape": [
+    {
+     "id": 29148,
+     "created_at": "2026-10-18T03:33:52Z",
+     "updated_at": "2026-10-18T03:33:52Z",
+     "body_len": 400
+    }
+   ]
+  },
+  {
+   "repo": "SilkNode",
+   "number": 1251,
+   "body_len": 989,
+   "body_head": "#1184 监控侧合并前审计（挑战模式）第 1 轮裁决为「合并后跟进、不挡本 PR」的三项。报告：`.aria/audit-reports/pre_merge-R1-*-balance-quota-deepseek-glm-monitor-{backend-architect,tech-lead}.md`。\n\n## 1. 进程在写检查记录之后、发告警之前被杀，会永久丢一次边沿告警\n\n`cron-r",
+   "comments_count_field": 1,
+   "comments_endpoint_shape": [
+    {
+     "id": 28937,
+     "created_at": "2026-10-16T19:26:38Z",
+     "updated_at": "2026-10-16T19:26:38Z",
+     "body_len": 185
+    }
+   ]
+  }
+ ]
+}

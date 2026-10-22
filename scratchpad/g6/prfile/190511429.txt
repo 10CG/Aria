@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "merge-conflict-handling",
+  "prompt": "Phase C C.2 merge: Attempting to merge feature/oauth2-social-login into main. Conflict detected in backend/config/settings.py. Handle gracefully.",
+  "assertions": [
+    "Should detect and report the merge conflict",
+    "Should identify which files have conflicts",
+    "Should guide the developer through conflict resolution"
+  ]
+}

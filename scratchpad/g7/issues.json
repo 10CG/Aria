@@ -1,0 +1,37 @@
+[
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "completeness gate: --no-spec 声明与 refs/aria/coordination active claim 交叉核验",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) 裁定 2。\n\n`completeness_gate.py` 的 `--no-spec` (Level 1 无 spec 声明) 目前不与 `refs/aria/coordination` 上的 active claim 交叉核验 —— 声明 Level 1 但该 track 实际有 claim/在飞 spec 时门照常按 no-spec 路径走。应加交叉核验: 声明与协调层状态矛盾时报错或告警。\n\n- 触发面: `skills/audit-engine/scripts/completeness_gate.py`\n- 裁定原文: 10CG/Aria#199 决策单裁定 2\n- 版本: v1.76.0 (10CG/Aria#234) 随 spec 落地主体, 本单只跟踪交叉核验缺口"
+ },
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "产出侧四个 checkpoint 调用方按字面键早退, 对 adaptive_rules 推导失明",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) 裁定 13 (CHANGELOG v1.76.0 迁移第 11 条)。\n\nphase-a-planner/SKILL.md:246 · task-planner/SKILL.md:123 · phase-b-developer/SKILL.md:255 (:49) · brainstorm/SKILL.md:141 四处产出侧调用点均按**字面键**早退 (`audit.checkpoints.<key> != \"off\"`), 而 config-loader 不解析 `adaptive_rules` ⇒ adaptive 档新纳入的 checkpoint 其报告在产出侧调用链上结构性地不产出, pre_merge 完整性门对这批采用方给出假红 (ERROR Fix 已补「显式写 checkpoint」的可执行条, 但根治须接线改造)。\n\n改造 = 四处调用点改读与门相同的优先级链 (config 显式值 > adaptive_rules 推导, adaptive 取上界)。属放行面/触点面扩张, 按 Rule #10 归 owner 裁定后的执行单。"
+ },
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "config 注册面缺口: allow_incomplete_checkpoints / allow_dangling_change_ids 未进 DEFAULTS.json, config.template.json 无 audit 块",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) F8。\n\ncompleteness gate 直读的两个豁免键 `audit.allow_incomplete_checkpoints` / `audit.allow_dangling_change_ids` (语义见 v1.76.0 CHANGELOG 迁移第 2/4/6/10 条) 未进 `config-loader/DEFAULTS.json` 的 audit 缺省集; `config.template.json` 无 audit 块 ⇒ 采用方无从发现这两个键。补注册面 + 模板示例。"
+ },
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "写侧审计报告命名约定无强制 (unattributed 计数面)",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199)。\n\ncompleteness gate 按文件名末段 `-<change_id>` 归属报告, 但写侧 (各 Phase Skill 落报告时) 无命名约定强制 ⇒ 走样的文件名落入 unattributed 计数。附 spec 冻结语料 corpus-freeze.md §3 的争议表与实测 unattributed 计数 (见 10CG/Aria 主仓 aria-plugin-benchmarks/ab-results/2026-10-15-pre-merge-completeness-gate-rule6/ 的 RESULT.md §3 与 runs/)。处置候选: 写侧统一经机械命名器或校验探针。"
+ },
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "config-loader 无程序化入口 ⇒ 消费方内联第二副本 (相等性断言封漂移)",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) proposal §5。\n\nconfig-loader 只有散文 SKILL.md 无程序化入口, completeness_gate.py 被迫内联 (a) DEFAULTS.json 的 audit 缺省集与 (b) 旧配置兼容映射表 —— 第二副本没有消失只是换了内容, 当前以 SC-21 相等性断言 (测试期对插件树逐字比对) 封漂移。根治 = config-loader 提供可 import 的程序化入口。"
+ },
+ {
+  "repo": "10CG/aria-plugin",
+  "title": "AB 套件覆盖缺口: audit-engine 对 pre_merge completeness gate 无场景覆盖; 两套件均不覆盖 hotfix lane",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) rule6_note 第三义务 (套件缺口 issue)。\n\n- v1.76.0 照跑用的定向覆盖是 ab-suite/audit-engine.json eval id 3 (单 fixture), 套件尚无对 completeness gate 各判定格 (三态/豁免/跨仓) 的成场景覆盖;\n- ab-suite/audit-engine.json 与 ab-suite/phase-c-integrator.json 两套件均不覆盖 hotfix lane (Level 1 快修路径);\n- 实测与区分力解读: 10CG/Aria 主仓 aria-plugin-benchmarks/ab-results/2026-10-15-pre-merge-completeness-gate-rule6/ (delta +0.27 / 定向 0.2<1.0 / phase-c 零回归)。"
+ },
+ {
+  "repo": "10CG/Aria",
+  "title": "ab-suite/phase-c-integrator-pre-merge-gate.json: 三条 node id 缺口 (两条无 node id, 一条过期)",
+  "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) TASK-024/031。\n\ncatalog 8 条 fixture 中 3 条不可执行: `wait_then_green` 与 `NEG-2-timeout` 的条目无 `test_case_in_unit_tests` node id; `NEG-1-malformed` 的 node id 过期 (catalog 写 `test_case_e_malformed_aether_routes_fail`, 真实方法 `test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_main_leg_routes_fail`, 跑字面 id 报 AttributeError)。可执行 5/8 三条命令与输出见同仓结果目录 RESULT.md §5.3。修法: 补/改 node id 或给这两条建单测宿主。"
+ }
+]

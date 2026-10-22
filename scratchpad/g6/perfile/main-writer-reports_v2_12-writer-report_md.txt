@@ -1,0 +1,237 @@
+---
+version: v2.12
+base_sha: 493ba0e
+dispatch_sha256_16: 0e1ec01c92bca6d5
+closed: 11/11
+not_fixed: 0
+changes_executor_action: 8
+---
+
+下文 `<S>` 指 `/tmp/claude-1000/-home-dev-Aria/cbe6f623-7c3c-4217-8ccb-fd07680a5525/scratchpad/rework-v2.12`，`W` 指 `<S>/writer-work`。所有改动只在返修副本 `<S>/repo` 里做，基线是主仓 `493ba0e`、aria `88689aa`。
+
+**终版三个文件**
+
+| 文件 | sha256 前 16 位 | numstat |
+|---|---|---|
+| tasks.md | `4b3a046c76ad04c8` | +17/-11 |
+| detailed-tasks.yaml | `f24735e17009f9b5` | +24/-15 |
+| gen_yaml.py | `126591dd13963021` | +19/-11 |
+
+**结论**
+- 生成器重跑结果为 `REGEN_IDENTICAL`。
+- 三态证据三种跑法的输出都与 v2.11 嵌入的输出逐字节相同。
+- 归档门的状态与基线相同，只有 `d_payload` 里 2.6 那一行变了。
+
+## 逐项
+
+| 子项 | 处置 | 落点 |
+|---|---|---|
+| 3A.1 `6c7e3a62` | 改 | TASK-013 新增「diff 判据」条，含两条机检，详见下一节第 3 行。结构约束条删去两句：「不动 tests/test_completeness_gate.py」和「diff 只落在类内」，改为指向 diff 判据条。提交条的文件集与 diff 判据条逐一相同。判法是逐行判，不按整个 hunk 判：git 对齐空行时，会把插入块末尾的空行算到方法之外，按 hunk 判会误报红 |
+| 3A.2 `63a8700c` | 改 | 反事实条里 (ii)(iii)(iv) 的补丁记录，改取 porcelain 与 `git diff --no-index /dev/null <文件>` 的原样输出，退出 1 才算比成。这一形态同时登进 hard_constraints 第 14 条第 (3) 点 |
+| 3A.3 `09d6a438` | 改 | 加 (iv) 一跑；实测结果见「反事实实测」 |
+| 3A.4 `f89a8d20` | 改：对齐，不写成例外 | 补丁构造者改为 qa-engineer 新实例，要求未参与 TASK-004~006、TASK-008~012，也未参与 2.6 的两处测试改动；主控不再可以构造。第 13 条加链接注 |
+| 3A.5 `4a37c9ec` | 改 | 第 73 条的授权来源改为决策单第 7 项加第 8 项第 1 条，写明 R11 不构成授权，原句照录在改写注里。全文检索 R11 共 7 处，作授权来源的只有这一处 |
+| 3A.6 `f49493cf` | 改 | 新增第 78 条（请裁 6）和第 79 条（请裁 7）。第 77 条末句删去「与 TASK-013 的 Ran 口径」；剩下的「补回 enabled_by 不属判断」仍成立，因为它照的是 proposal 原文和决策单第 3 项第 3 条 |
+| 3A.7 `f5aadec7` | 改 | 读前必看第 32 条：误数只出现在依据列的引文里，执行口径列没有，所以第 75 条不受影响；依据列原文照录，后面加勘误注。两份计划文件里只有这一处。测试文件里 SC-15.10 的夹具提交说明：要改，由 2.6 补格的同一测试实例在同一次改动里做。SC-15.7 照 proposal 原文写的同类措辞不改。见第 82 条 |
+| 3A.8 `857e5034` | 改 | (1) 工时 1-2 改为 3-4，complexity 由 S 改为 M，合计工时由 97-143 变为 99-145。(2) 追踪锚点放两处：TASK-013 对 docstring 的要求（写主仓路径加「A.2 显式约束」），以及台账存证。不在 TASK-031 新增 issue。见第 83 条 |
+| 3B.1 | 改 | 与 3A.5 同一处修改。第 73 条末尾加批准注；读前必看第 33 条与 TASK-013 结构约束条加链接注 |
+| 3B.2 | 改 | 追认注加在第 75 条（请裁 2、4、5）、第 76 条（请裁 3）、第 78 条（请裁 6）、第 79 条（请裁 7）。请裁 6 的附带要求写进 TASK-013 提交条 |
+| 3B.3 | 改 | 改了哪些地方见下一节。登记处：TASK-006 新增登记条，SC 映射 SC-15 行，读前必看第 32 条，第 76 条加链接注，新增第 80 条。`stage_cells` 不动 |
+
+**3B.3 补格的几个取舍**
+- 格名用 `SC-15.10-typo-mode-lazy-when-inclusion-nonempty`，与原 SC-15.10 同族：两格锁的是同一裁定（第 6 项 lazy）的两半。
+- 由改结构约束的同一个测试侧新实例来补。「测试与实现分由不同实例」分开的是测试侧与实现侧，这两处都是测试侧改动，合并做不削弱这一分离。
+- mode 取 `'typo-mode'`，与 `SC-15.5-typo-mode` 同值，两格只差 checkpoints 块。
+- 锚点带 Level 行，这样新格只剩 mode 这一个触发因素。
+
+## 改变执行者动作的改动
+
+| 改动 | 改前 | 改后 | 实测 |
+|---|---|---|---|
+| TASK-013 结构约束条 | 不许动 test_completeness_gate.py；diff 只落在类内 | 两处范围都交给 diff 判据条机检；docstring 多写一句归档锚点，台账同记一句存证 | — |
+| TASK-013 SC-15 新格条（新增） | 没有 | 同一测试侧实例在 SC-15.10 原格之后补一个 subTest，同时改 SC-15.10 的提交说明；用 cell_status 核三格，各恰执行一次且通过 | 三格都是 pass |
+| TASK-013 diff 判据条（新增） | 只有一句「只落在类内」 | 两条机检：文件集与 hunk 位置 | 正确改动通过，七种越界改动各自不通过 |
+| TASK-013 提交条 | 只 add test_sibling_spec_probe.py | add 两个测试文件；提交正文注明接续 WIP `88689aa` | — |
+| 反事实：加一跑 | 四跑 | 第五跑 (iv) 作正向对照 | 正确改法为绿，坏改法为红 |
+| 反事实：补丁记录 | 记 `git diff` | 未跟踪文件改记 porcelain 加 no-index 输出 | `git diff` 为 rc 0、0 字节；no-index 为 rc 1 |
+| 反事实：构造者 | 执笔实例之外的实例或主控 | 另派一个 qa-engineer 新实例 | — |
+| TASK-020 第 (10) 条与第二个补丁 | 只此格红 | eager 补丁下两格都红；另加「加载期校验 mode」补丁，只新格红 | failures=2 / failures=1 |
+
+## 补格的期望值实测
+
+用 aria `88689aa` 的脚本，脚本在 `W/newcell_probe.py`，输出在 `W/runs/newcell_expected.out`。
+
+**新格的构造**
+- checkpoints 写四键：`post_spec` 为 convergence，`post_brainstorm` / `post_planning` / `post_implementation` 为 off。
+- mode 为 `typo-mode`，`pre_merge` 不写。
+- 锚点为 `level=2`，含 `## Tasks`；参数 `--change-id x --base master`。
+
+**新格的原样输出**
+- `exit=1`
+- stdout 节选：`{"change_ids": ["x"], "checked_checkpoints": ["post_spec"], "error_kind": null, "results": [{"change_id": "x", "checkpoint": "post_spec", "enabled_by": "explicit", "matched": [], "matched_count": 0, "reason": null, "status": "missing"}], "scope_source": "explicit", "verdict": "fail"}`
+- stderr：`[WARN] completeness gate: .aria/audit-reports/ 不存在, 按零报告评估`，接着是 `ERROR: pre_merge audit 前序 checkpoint 报告缺失: post_spec@x 配置 "convergence" …`，不含 config_unreadable。
+
+**对照：SC-15.5-typo-mode 形态**（同一个 mode 值，不写 checkpoints）
+- `exit=2`，`error_kind: "config_unreadable"`，`verdict: "error"`，`checked_checkpoints: []`。
+- stderr：`[ERROR] completeness gate: config_unreadable — audit.mode 的值 'typo-mode' 不属于四值枚举 …`
+- 两格因此分得开：同一个 mode，只因 checkpoints 块不同，一个退出 1、一个退出 2。
+
+**写成 subTest 后的复跑**
+- `W/sim_edit.py` 在 `W/m/aria` 里模拟 2.6 的测试侧改动。`W/m` 是副本的 `--shared` 主仓克隆，`cc1bdef` 可达。
+- `test_completeness_gate`：`Ran 29` / `OK`。
+- cell_status 查四格（SC-15.10 两格、SC-15.5 两格）都是 `["pass"]`。
+- 目录全量 discover：`Ran 133` / `OK`，不带 skipped。
+
+## 反事实实测
+
+**TASK-013 反事实**
+脚本 `W/cf13.py`，在模拟提交 `a9465f7` 上按三步法跑，各跑单独施加、不累积，输出在 `W/runs/cf13.out`。
+
+| 跑 | 结果 | 补丁记录 |
+|---|---|---|
+| 不打补丁 | OK | — |
+| (i) 允许集退回两项 | FAILED `['completeness_gate.py'] != []` | `git diff` rc 0，805 字节 |
+| (ii) 加空文件 git_utils.py | FAILED `['git_utils.py']` | porcelain `?? skills/audit-engine/scripts/git_utils.py`；`git diff` rc 0、0 字节；no-index rc 1，输出 `diff --git … new file mode 100644 / index 0000000..e69de29`。此时 `worktree remove` 得 rc 128 |
+| (iii) 加空文件 completeness_gate_helpers.py | FAILED `['completeness_gate_helpers.py']` | 同 (ii) 的形态 |
+| (iv) 加空文件 sibling_spec_probe_util.py | OK | 同 (ii) 的形态 |
+| 坏改法（删掉前缀子句） | 不打补丁、(i)、(ii)、(iii) 四跑都与正确改法相同；只在 (iv) 下 FAILED `['sibling_spec_probe_util.py']` | — |
+
+**diff 判据的反事实**
+脚本 `W/ds_variants.py`，参考实现是 `W/diffscope.py`。做法：在 `88689aa` 的 worktree 上施加模拟改动但不提交，再逐个叠加坏改动。
+
+| 改法 | 新判据 | v2.11 旧判据 |
+|---|---|---|
+| V0 正确改动 | 通过 | **不成立**（因为 test_completeness_gate.py 也有改动） |
+| V1 误改同类另一个用例 | 不通过（报第 419 行） | 只做结构约束改动时放行（V1'） |
+| V2 类体内多一行注释 | 不通过 | — |
+| V3 改弱 SC-15.5-typo-mode 的断言 | 不通过 | — |
+| V4 在新格前插一行 return | 不通过 | — |
+| V5 scripts/ 下多一个未跟踪文件 | 文件集不通过 | — |
+| V6 顺带改 SKILL.md | 文件集不通过 | — |
+| V7 实现另有改动、台账未列 | 不通过 | — |
+| V7 同上、台账已列 | 通过 | — |
+| V8 前导注释与 with 之间隔一个空行 | 通过 | — |
+
+**TASK-020 反事实**
+脚本 `W/cf20.py`，在同一模拟提交上跑；不打补丁时 `Ran 29` / `OK`。
+- **eager 补丁**：在 `resolve_inclusion` 之后无条件调用 `resolve_pre_merge_axes`，1 行。结果 `Ran 29` / `FAILED (failures=2)`：
+  - `SC-15.10-pre-merge-…`：`AssertionError: 2 != 1 : [ERROR] … spec_level_undetermined …`
+  - `SC-15.10-typo-mode-…`：`AssertionError: 2 != 1 : [ERROR] … config_unreadable …`
+  - 因此第 (10) 条原写的「只此格红 / 其余格不变」已经不准，已改为「两格红，首个失败断言都是退出码那条」。
+- **加载期校验补丁**：在 `load_config` 合并完配置后，mode 不在四值枚举内就报 config_unreadable，2 行。结果 `Ran 29` / `FAILED (failures=1)`：只有新格红（2 != 1，config_unreadable）；SC-15.10 原格与 SC-15.5-typo-mode 仍绿。
+
+## 结构化比对 (机器输出)
+
+`W/struct_diff.py`（v2.11 → v2.12），输出在 `W/runs/struct_diff_final.out`：
+- `top-level keys: ['metadata', 'tasks'] -> ['metadata', 'tasks'] | last key tasks: True`
+- `metadata changed keys: ['title', 'container', 'estimated_hours', 'hard_constraints', 'rule6_note', 'revision_log'] | unchanged 29`
+- container 与 rule6_note.note：只有插入；hard_constraints 第 14 条（下标 13）：只有插入。
+- `revision_log: list 83->88 insert [83:83]->[83:88]`；前 83 条：`True`。
+- owner_gates 不变，19 项；stage_cells 不变，39 格。
+- TASK-006：verification 由 6 条变 7 条，`insert [3:3]->[3:4]`。
+- TASK-013 字段变化：
+  - title、reason
+  - complexity 由 S 改 M，estimated_hours 由 1-2 改 3-4
+  - deliverables 加 test_completeness_gate.py
+  - verification 由 5 条变 7 条
+- TASK-013 verification 的对应关系：
+  - 旧第 0 条 → 新第 0 条：只有插入
+  - 新第 1、2 条：新增
+  - 旧第 1 条 → 新第 3 条：删 3 字、增 34 字
+  - n3 条：不变
+  - 提交条：删 47 字、增 325 字
+  - 反事实条：删 6 字、增 816 字
+- TASK-020：verification 第 1 条改写。
+- 其余 28 个 TASK 不变。
+- tasks.md（284 → 290 行）改了这些行：
+  - Status 行
+  - 读前必看第 32、33 条
+  - 判断清单第 13、73 – 77 条，新增第 78 – 83 条
+  - 2.6 行
+  - SC-15 映射行
+
+## 三态证据复跑与差异归因
+
+复跑环境 `W/state-base`：主仓 `a563192` 用 file:// 从副本克隆，aria `1cb3872` 嵌套克隆后执行 `submodule init`，push URL 已禁用。每次跑完，两层 porcelain 都是 0/0。用完已删除，按工具 README 可以重建。
+
+| 跑法 | rc | stderr | 大小 | sha256 前 16 位 | 与嵌入输出比 |
+|---|---|---|---|---|---|
+| a2 | 0 | 空 | 2396 | `5ebe2c78a6d2665f` | 逐字节相同 |
+| v2 不带种子 | 0 | 空 | 9957 | `491fc6fb1f4d12fb` | 逐字节相同 |
+| v2 带种子（种子 = 副本） | 0 | 空 | 9957 | `491fc6fb1f4d12fb` | 逐字节相同；副本 ref 哈希前后都是 `70118d5e3c08d78c` |
+
+**为什么没有差异**
+- a2 只读勾选行。新 2.6 行不含集成类关键词（集成 / 接线 / wire / integration / 调用 / registered / hook），也不含方括号记号。
+- v2 只读 yaml 里各检查的 code 键，这些键都没变。
+
+**归档门**
+- `complete=False` / `verdict=pass`，其余四个列表都为 0，与基线相同。
+- `d_payload` 里只有 parent `2.6` 一项变了，body 相应差 2 行。
+
+## 计数联动 (机器输出)
+
+`W/count_linkage.py`，输出在 `W/runs/count_final.out`：
+- TASK 数（yaml / 勾选行 / total_tasks）：`(31, 31, 31)`。
+- owner_gates 19 项，编号 1–12、13a、13b、14–18；等待点表 19 行，与 owner_gates 一致。
+- 判断清单 83 条、读前必看 33 条，都连续。
+- stage_cells 39 格；SC 映射 25 行；hard_constraints / rulings / c25 = `(14, 13, 5)`；revision_log 88 条。
+- 计数短语（tasks.md, yaml）与 v2.11 相同：
+  - '16 个版本点' (3, 7)
+  - '六个文件' (6, 22)
+  - '九个取值点' (2, 4)
+  - '九个版本同步面' (3, 6)
+- 'Ran 133' 为 (2, 5)，不变。
+- 有变化的计数，都来自新写条目：
+  - 'Ran 129' 由 (0, 2) 变为 (1, 2)，来自第 79 条。
+  - '七张 issue' 由 (2, 1) 变为 (3, 1)，来自第 83 条。
+- 引用解析（v2.11 → v2.12）：
+  - 判断清单引用 89 → 112，无越界。
+  - 读前必看引用 76 → 85，无越界。
+  - hard_constraints 引用 29 → 32，无越界。
+  - 等待点引用 116，无法解析的只有既有的「原等待点 13」。
+
+## 自检结果
+
+| 项 | 结果 |
+|---|---|
+| 越界 | 开工标记之后，整个副本（含 .git）里改过的文件恰好是这三个。porcelain 只多了三个 ` M`。HEAD、副本 ref 哈希、aria ref 哈希、stash 0、被忽略文件集合哈希 `2561a0f26694baef`（12 项）、aria worktree 列表都没变 |
+| 真仓 | HEAD `493ba0e`、aria `88689aa`、两个 ref 哈希、porcelain 都没变；只做过只读查询 |
+| 生成器 | `REGEN_IDENTICAL`；一律用 `-B` 跑；`compile()` 每次通过 |
+| 结构 | 31 个 TASK，顶层末键为 `tasks` |
+| NUL / CR | 三个文件都是 0 / 0 |
+| 新增行（17 / 24 / 19 行） | 禁用字形 0（扫描器用 `chr()` 拼码点，正向样本能报出 2 处）。裸引用 0（仓内检查器 rc 0，正向样本 rc 1）。序号式 TASK 引用 0；自引行号 0 |
+| 不变量 | revision_log 前 83 条逐字不变；owner_gates 19 项、stage_cells 39 格都不变 |
+| 纪律 | 没有派子代理，没有外向动作；副本内没有 git 写操作。一次性副本没用派单写的 worktree add / archive，而是用 `clone --shared`：它不往副本 gitdir 写任何东西，又能让 `cc1bdef` 可达。模拟提交与 worktree 只在 `W/m/aria` 里做，用完的 worktree 都已移除。`W/m` 保留，供复跑 cf13 / cf20 / ds_variants |
+
+## 自报薄弱点
+
+1. diff 判据在计划里是文字描述。执行者要自己写脚本，参考实现 `W/diffscope.py` 不在仓里，两者可能有出入。
+2. 新格的期望值来自我模拟的 subTest。Phase B 的实例会自写代码，计划钉死了配置与断言，但提交说明等细节会不同。
+3. eager 与加载期校验两个补丁是我构造的一种写法。换一种写法，首个失败断言的文字可能不同。
+4. Ran 133 是在 `W/m` 里测的，不是在真仓里测的。
+5. 「空白行不计」意味着任何位置只改空白行都能过 diff 判据。这是有意的折中。
+6. SC-15.7 的措辞仍写「four non-excluded」，与勘误口径不一致，只靠第 82 条说明。
+7. complexity 由 S 改 M，超出派单明说的范围（只说了重估工时）。
+8. revision_log 里「复跑相同」的断言以这三个终版文件为准，主控再改任何字都要重跑。
+9. Status 行末的「待主控核验」提交后就过期，沿用前几版的写法。
+
+## 请裁项
+
+1. 新格同族命名为 SC-15.10-…。备选：另起 SC-15.11。
+2. mode 取 `typo-mode`，锚点带 Level 行。备选：用 tl 实测时的 `convergnce`，或锚点不带 Level 行。
+3. 新格与结构约束由同一个测试侧实例做。备选：分派两个实例。
+4. SC-15.10 的提交说明在 2.6 改正，SC-15.7 不改。备选：两处都不改，或两处一起改。
+5. 反事实构造者完全对齐第 13 条。备选：写成例外，允许主控。
+6. test_completeness_gate.py 的允许段取窄：只含新格 `with` 块、其前导注释和 SC-15.10 的 `_commit` 调用。备选：取整个方法。
+7. 工时 3-4，complexity 改 M。备选：工时 2-3，complexity 不动。
+8. 归档漂移只放 docstring 与台账两个锚点，不在 TASK-031 开 issue。备选：开 issue，但要连带改等待点第 10 项的「七张」。
+9. hard_constraints 第 14 条第 (3) 点与 rule6_note.note 各补一句，这两处超出 8 键的直接范围。备选：不补。
+
+## 范围外观察
+
+1. 台账「组 2 收口」也照录了「四个非排除 checkpoint 全显式」；台账由主控执笔。
+2. 执行 2.6 时，台账要按 TASK-013 补一句归档锚点存证。
+3. proposal 里写于裁定 1 之前的「四个非排除」措辞共 6 处，由读前必看第 6 条统一改口径。
+4. `writer-reports/README.md` 仍写「v2.11 的 8 条请裁待 … owner 裁定」，已过期；不在我的可写范围。
+5. TASK-019/020/022 共用的三步法写法，仍是「记补丁 diff」。它们的补丁都改已跟踪文件，暂不受影响；以后若出现加新文件的补丁，要比照 TASK-013 的写法。
+6. `<S>/main-verify` 是主控的目录，我没有动。

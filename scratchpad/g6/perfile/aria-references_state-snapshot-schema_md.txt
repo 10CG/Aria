@@ -1,0 +1,24 @@
+schema_version: str             # writer always "1.2"; reader accepts {"1.2"} (1.0 / 1.1 caches predate pagination → cold)
+open_count: int                 # sum over repos; a lower bound when `truncated` is true
+truncated: bool                 # true iff any repo listing ended early (see repos[*].truncated_reason)
+  truncated: bool,                # this repo's listing ended before the end
+  truncated_reason: str|null,     # "max_items" | "pagination_stalled" | null
+### Pagination and truncation (10CG/aria-plugin#182)
+
+`state_scanner.issue_scan.limit` is the **page size** of each request (clamped to 1..50, Forgejo's default
+maximum), not a total cap. Forgejo is listed page by page until the server returns an **empty** page; a short
+page does not end the listing because a server may clamp the page size below what was asked. The first request
+URL is byte-identical to the pre-pagination one (no `page=`); page 2 onward append `&page=N`. GitHub is one
+`gh issue list --limit 1001` call (ceiling + 1 as the probe row), since `gh` has no page parameter.
+
+`truncated` is `true` only when the listing stopped before the end. `truncated_reason` is a closed set:
+
+| Value | Meaning |
+|---|---|
+| `max_items` | the per-repo safety ceiling (1000, honoured in whole pages) was reached and more issues exist |
+| `pagination_stalled` | the server returned a whole page of issues already seen (it ignores `page`) |
+
+A repo with `truncated: true` reports a lower-bound `open_count`. A page that fails after the first fails the
+**whole repo** (`fetch_error` set, `items` empty) rather than returning a silently partial list. `truncated`
+only says the listing ended early: `label_filter` removing issues does not set it.
+

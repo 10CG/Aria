@@ -1,0 +1,1 @@
+| aria-plugin | v1.76.0 | `aria/.claude-plugin/plugin.json` |

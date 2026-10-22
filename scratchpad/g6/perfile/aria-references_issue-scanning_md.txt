@@ -1,0 +1,34 @@
+  schema_version: "1.1"                 # v1.1.0 样例; 现行 writer 写 "1.2", 见下方「v1.2 — 翻页与截断可见」
+**v1.2 — 翻页与截断可见** (10CG/aria-plugin#182; `scan.py` writer 现行版本, 始终写 `schema_version: "1.2"`):
+
+```yaml
+issue_status:
+  schema_version: "1.2"
+  open_count: 130                       # 各 repo 完整列出后的总数; truncated=true 时只是下界
+  truncated: false                      # 新增: 任一 repo 的列举提前结束 → true (逐 repo 见 repos[*].truncated_reason)
+  repos:
+    "10CG/Aria":
+      open_count: 46
+      truncated: false                  # 新增: 该 repo 的列举是否提前结束
+      truncated_reason: null            # 新增: null | "max_items" | "pagination_stalled" (封闭枚举)
+      # ... 其余字段同 v1.1
+```
+
+- `limit` 是**每页条数**, 不是总量上限。Forgejo 翻页直到服务端返回**空页**为止; 不以「短页」判终点 (服务端页大小可能被夹小, 短页不等于最后一页)。首页请求 URL 与翻页前逐字节相同, 第 2 页起追加 `&page=N`。
+- `max_items` = 触及单 repo 安全上限 (1000, 按整页取整) 且仍有更多; `pagination_stalled` = 服务端整页返回已见过的条目 (忽略 `page`)。二者都表示 `open_count` 只是下界。
+- 首页之后的某一页失败 → **整个 repo** 记 `fetch_error`, 不返回残缺列表。GitHub 一次 `gh issue list --limit 1001` (上限 + 1 作探针行), 不翻页。
+- `1.0` / `1.1` 缓存写于翻页之前 (每 repo 至多 `limit` 条, 且无法判断是否被截断), reader 视为冷缓存, 一次性重新拉取。
+
+- **v1.1.0+ schema_version**: 必填字段. `"1.0"` = 仅主 repo 扁平结构, `"1.1"` = 含 `repos` 分组视图. 读取端应先判断 `schema_version` 再决定消费策略; `"1.2"` = 另含 `truncated` / `truncated_reason` (writer 现行版本, reader 只接受 1.2)
+    "1.2")
+      : # 兼容, 继续 (1.0 / 1.1 写于翻页之前, 可能被截断, 走冷缓存)
+      echo "[info] cache schema $cache_schema is not 1.2 (older caches may be truncated), treating as cold cache (one-time re-fetch)"
+| 缺失 / `"0.0"` / `"0.x"` | 视为旧 cache, **忽略内容**, 一次性 re-fetch, 下次写回时附带 `"1.2"` |
+| `"1.0"` / `"1.1"` | 写于翻页之前 (每 repo 至多 `limit` 条, 无法判断是否被截断), **忽略内容**, 一次性 re-fetch |
+| `"1.2"` | 完整读取 (`items[]` + `repos{}` 分组视图 + `truncated` / `truncated_reason`) |
+| 高于 `"1.2"` | 未来版本, 视为 downgrade 场景, 保守 fail-soft 重新 fetch + warning |
+> ⚠️ 本节与后面的「缓存写回」是**手工 prose 路径** (`mechanical_mode=false`, 计划移除): 它只取**首页**, 也不写 `truncated` / `schema_version: "1.2"`。完整翻页只在 `scan.py` (`collectors/issue_scan.py`) 实现 (10CG/aria-plugin#182), 以其输出为准。
+
+| `limit` | integer | `20` | **每页**请求条数 (夹到 1..50), 翻页取完, 不是总量上限; GitHub 不使用 (一次调用取上限) |
+> ⚠️ 手工 prose 路径写出的 `schema_version: "1.1"` cache, 会被 `scan.py` 的 reader 视为冷缓存 (一次性重新拉取), 无害; 现行格式见上方「v1.2 — 翻页与截断可见」。
+

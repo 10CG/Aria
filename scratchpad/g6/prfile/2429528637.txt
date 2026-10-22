@@ -1,0 +1,2 @@
+  aria-plugin 方法论轨: v1.52.0–v1.76.0 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
+版本: aria-plugin v1.76.0 | 主项目 v1.7.5 | aria-orchestrator v2.0.0 (86bb684); Layer 2 主力

@@ -1,0 +1,1362 @@
+[
+ {
+  "repo": "Aria",
+  "number": 236,
+  "title": "[archived] pre-merge-completeness-gate-change-scope 归档跟踪 (10CG/Aria#199, v1.76.0)",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 233,
+  "title": "[Layer L] 长会话里的在制 claim 会被对方例行收尾的 --sweep-stale 永久标成 abandoned, 原持有方只收到 benign 的 claim_not_found",
+  "labels": [],
+  "created": "2026-10-15",
+  "updated": "2026-10-15",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 232,
+  "title": "[infra/security] aria-orchestrator 与 4 个 aria-layer1 周期 job 迁出 Nomad raw_exec（Aether 将关闭 light-1 的 raw_exec）",
+  "labels": [],
+  "created": "2026-10-14",
+  "updated": "2026-10-14",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 231,
+  "title": "branch-manager 任务描述里有 api 就判高风险、直接走 worktree；branch-finisher 把本地构建列为阻塞项，和 config-loader 默认值对不上",
+  "labels": [],
+  "created": "2026-10-11",
+  "updated": "2026-10-11",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 230,
+  "title": "[prompt-audit] aria 1.74.1 在 Claude Opus 5.5 下的提示审计：100 条发现（高置信 38 条）",
+  "labels": [],
+  "created": "2026-10-08",
+  "updated": "2026-10-08",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 229,
+  "title": "secret-guard: guard-bypass.log 每条记录末尾缺换行（被命令替换吞掉），多次放行的记录粘成一行 —— #160 ③ 的「一行一条」只在单条时成立",
+  "labels": [
+   "bug"
+  ],
+  "created": "2026-10-07",
+  "updated": "2026-10-07",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 223,
+  "title": "[bug] phase-c-integrator: submodule_gate.sh 写死 origin/master —— 默认分支为 main 的仓库里对子模块指针回退空扫放行 (mode=block 也 exit 0)",
+  "labels": [
+   "bug"
+  ],
+  "created": "2026-09-28",
+  "updated": "2026-09-28",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 221,
+  "title": "secret-guard 缺口: 进程列举可旁路凭据保护 (拦得住读取路径, 拦不住进程表)",
+  "labels": [
+   "bug"
+  ],
+  "created": "2026-09-24",
+  "updated": "2026-10-15",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 220,
+  "title": "session-closer / phase-d-closer: latest.md 子步骤 1 (History prepend) 声明「不可跳过」却无任何机械核验 — 一次整文件重写静默删掉 88 条, 7 次收尾跨 2 容器无人发现",
+  "labels": [],
+  "created": "2026-09-24",
+  "updated": "2026-09-29",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 219,
+  "title": "[Feature] 提供「开发项目进度状态查看」的只读机读接口 —— 10cg-ops-console 的 aria-ops-mcp 在等它（U13）",
+  "labels": [],
+  "created": "2026-09-22",
+  "updated": "2026-10-16",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 218,
+  "title": "state-scanner: handoff 无指针时按工作树 mtime 判最新 — rebase/checkout/新建 worktree 后指错文件（多 track 仓库是主路径）",
+  "labels": [
+   "bug"
+  ],
+  "created": "2026-09-22",
+  "updated": "2026-10-14",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 217,
+  "title": "session-closer: handoff_autofill.py / consistency_check.py 的 stdout 跟随 OS locale — Windows GBK 下遇 ⏸ 即崩（#61/#131 的编码侧对偶）",
+  "labels": [
+   "bug"
+  ],
+  "created": "2026-09-22",
+  "updated": "2026-10-14",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 216,
+  "title": "[Archive Tracker] rule6-description-change-trigger-eval-lane — 上游 skill-creator 反馈未发出 (归档残留)",
+  "labels": [],
+  "created": "2026-09-17",
+  "updated": "2026-10-16",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 214,
+  "title": "[跟进 spec][自主运行时] description 变动的完整处理 — 现在只有一句禁令, 告警与原因传递缺失",
+  "labels": [],
+  "created": "2026-09-17",
+  "updated": "2026-09-17",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 213,
+  "title": "[benchmark] 41 个 skill 没有 trigger 套件 — 场景 4b 成为 Rule #6 义务后, 它们的下一次 description 变动会被挡住",
+  "labels": [],
+  "created": "2026-09-17",
+  "updated": "2026-09-17",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 212,
+  "title": "[规范缺口] openspec CLI 的统一口径：是否应装、怎么装不违反归档目录等规范、版本钉法 —— 请 Aria 验证测试后给出",
+  "labels": [],
+  "created": "2026-09-13",
+  "updated": "2026-10-11",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 211,
+  "title": "[AB评测台] Rule #6 第二行要求 description 变动零裁量照跑 AB, 而 AB 臂被直接喂 SKILL.md — 触发面按构造绕过, 「照跑了」不含任何 description 信息",
+  "labels": [],
+  "created": "2026-09-09",
+  "updated": "2026-09-19",
+  "comments": 3
+ },
+ {
+  "repo": "Aria",
+  "number": 210,
+  "title": "[Archive Tracker] archive-gate-registration-class-and-skill-drift — 归档残留待办",
+  "labels": [],
+  "created": "2026-09-08",
+  "updated": "2026-09-08",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 208,
+  "title": "[缺陷][归档闸门] C 分级死码检查对非 Python 符号结构性失明 — 任何 shell/yaml/配置类交付物都得「判不了死码 → warn」",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 207,
+  "title": "[AB结果文档] DEFECTS.md 与 SCORES.md 的回归断言分母四个数互不相同, 且「含否定断言 = 0」经实测在任何口径下均不成立 (最窄口径实测 21 条, 含 7 条字面 Should NOT)",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 206,
+  "title": "[缺陷] standards 版本号两处不一致 (root VERSION:25 = v2.2.3 vs standards/openspec/project.md:3 = 2.2.2) —— 已成文待裁但无任何机械检查守它",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 205,
+  "title": "[AB评测台] 单个臂可吃光全局 subagent 配额 —— 两臂都被并发上限截断, 且 eval-1 是唯一两臂都缺 timing.json 的 eval",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 204,
+  "title": "[AB评测台] 评测跑在活仓上, 结果不可复现 —— 运行中 origin/master 前进一次, 两臂落在不同 scan generation (107 vs 108)",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-09",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 203,
+  "title": "[AB评测台] 语料泄漏三通道: 快照内嵌 raw_status / docs/handoff/ / AB 目录名与分支名 —— 前两条是 SKILL.md 硬性要求, 臂躲不开",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 201,
+  "title": "[Archive Tracker] a1-entry-claim-duplicate-work-guard — 归档残留待办",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 200,
+  "title": "[bug] issue-triage: version collector 在 monorepo 下 5 条路径全 miss — 每次 triage 恒 exit 10, triage_tool_version 恒 unknown",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-30",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 198,
+  "title": "[tracker] owner-container-identity-key S2 后续: get_container_id flip / T3b 发布门 / a1-entry SC-3 改写 / #135 08-13 时间线",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 196,
+  "title": "[契约][aria-orchestrator] unattended 的 Layer 1→2 env 传递三腿契约未定义 — 缺 import 会静默 fallback 到 false",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-09-17",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 192,
+  "title": "[Archive Tracker] sibling-spec-probe — 归档残留待办",
+  "labels": [],
+  "created": "2026-09-04",
+  "updated": "2026-09-05",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 188,
+  "title": "[bug] 四维一致性检查恒假阳性 + UPM collector 认不到仓库根 UPM.md（两者复合）",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-09-20",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 184,
+  "title": "[enhancement] aria:brainstorm 被共装插件静默绕过 → 决策文档落错目录且无机械检查捕获",
+  "labels": [],
+  "created": "2026-08-19",
+  "updated": "2026-08-19",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 182,
+  "title": "[缺陷] handoff frontmatter 的 status 从不收口 — 31 条 5 月的历史交接仍报 active, 使「多 track」判据不可用并逼停 latest.md 的机械写入",
+  "labels": [],
+  "created": "2026-08-17",
+  "updated": "2026-09-06",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 180,
+  "title": "coordination claim 的 collision surface 在 30 分钟后静默失效 — heartbeat() 零生产调用点",
+  "labels": [],
+  "created": "2026-08-09",
+  "updated": "2026-10-15",
+  "comments": 1
+ },
+ {
+  "repo": "Aria",
+  "number": 178,
+  "title": "[规范] hook 类 Spec 的 SC 须显式声明测的是哪份副本 — canonical 直调 vs harness hook 链 (#172 建议 3)",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-08-11",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 177,
+  "title": "[governance] CLAUDE.md:81 发布同步面那行是漏同步面的类级根因 — 四错一行 (文件数口径 / 漏 CLAUDE.md 自己 / 漏 Plugin Version 行 / 「机械兜底」是假绿主张)",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-09-30",
+  "comments": 6
+ },
+ {
+  "repo": "Aria",
+  "number": 176,
+  "title": "[bug][state-scanner] AC-5 一致性检测未排除本仓不存在的 remote — 单 remote 主仓 + 双 remote 子模块布局下退出码恒为 10",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 175,
+  "title": "[governance] 契约 2 重写为「数据卫生纪律 + 法务结论适用范围声明」两条 — 原文与 Aria 通用方法论定位自相矛盾 (需 Level 2 Spec)",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-08-08",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 174,
+  "title": "Layer L claim 无法检测跨 track-id 的同源重叠 — 两容器对同一 deferral 档各起 change，双方 gate 均 passed，导致完整重复实现",
+  "labels": [],
+  "created": "2026-08-05",
+  "updated": "2026-09-30",
+  "comments": 5
+ },
+ {
+  "repo": "Aria",
+  "number": 173,
+  "title": "[bug][state-scanner] gate_result: 无任何任务文件时静默 pass — 与 #166 已修的 yaml-only 分支判据倒置 (证据越少越宽松)",
+  "labels": [],
+  "created": "2026-08-05",
+  "updated": "2026-08-06",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 171,
+  "title": "[知识层] 新增 convention: CLI 默认输出格式随 stdout 是否为 TTY 变化 — AI/CI 环境常与交互式相反",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-08-02",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 170,
+  "title": "aether-build-container T4 push 凭据经 nomad var put 回显泄漏 — secret-guard 拦 curl PUT 促使改用不安全替代",
+  "labels": [],
+  "created": "2026-07-22",
+  "updated": "2026-08-18",
+  "comments": 5
+ },
+ {
+  "repo": "Aria",
+  "number": 169,
+  "title": "[refactor] AC-5 跨 collector 自洽检测搬出 scan.py 装配层 → 独立 collector (post_planning M-I)",
+  "labels": [],
+  "created": "2026-07-20",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 168,
+  "title": "[tracker] state-scanner-stale-refs-false-parity 归档 deferred 项 (3.16/3.5d/5.5/7.2/11.1/3.10/13.7) + AC-5 裁决级未实现",
+  "labels": [],
+  "created": "2026-07-19",
+  "updated": "2026-10-15",
+  "comments": 4
+ },
+ {
+  "repo": "Aria",
+  "number": 167,
+  "title": "FR: Forgejo API 调用层支持可插拔 HTTP 传输 (解决 macOS curl TLS 兼容)",
+  "labels": [],
+  "created": "2026-07-19",
+  "updated": "2026-07-19",
+  "comments": 2
+ },
+ {
+  "repo": "Aria",
+  "number": 165,
+  "title": "[reliability] GitHub 镜像漏推第三次复发 — 子模块服务端合并 + gitlink bump 无序 → orphaned gitlink (clone --recursive 断裂)",
+  "labels": [],
+  "created": "2026-07-15",
+  "updated": "2026-09-30",
+  "comments": 7
+ },
+ {
+  "repo": "Aria",
+  "number": 164,
+  "title": "aria 初始化: 第三方项目指令文件加入'aria 工具问题优先上报而非自解决'约定 (advisory 建议)",
+  "labels": [],
+  "created": "2026-07-14",
+  "updated": "2026-07-17",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 151,
+  "title": "[credentials] 确认 aria-runner-bot / aria-runner-bot-prod-20260523-v2-full-scope 两个 10cg-ci-bot token 是否 Aria 项目所有",
+  "labels": [],
+  "created": "2026-07-02",
+  "updated": "2026-09-02",
+  "comments": 2
+ },
+ {
+  "repo": "Aria",
+  "number": 136,
+  "title": "[security] cost-sentinel 在 INFO 日志打印完整 Feishu webhook URL (secret-in-logs) — 轮换 + 脱敏",
+  "labels": [],
+  "created": "2026-05-31",
+  "updated": "2026-09-30",
+  "comments": 2
+ },
+ {
+  "repo": "Aria",
+  "number": 120,
+  "title": "[adoption] Switch aria-runner build: aria-build container workaround → aether-build-container skill (v1.10.9 GA)",
+  "labels": [],
+  "created": "2026-05-22",
+  "updated": "2026-07-22",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 59,
+  "title": "propose: 三档 dispatch payload 作为 aria-orchestrator v2.0 (Phase 3c) reference 实现",
+  "labels": [],
+  "created": "2026-05-02",
+  "updated": "2026-05-23",
+  "comments": 0
+ },
+ {
+  "repo": "Aria",
+  "number": 5,
+  "title": "[Feature] Pulse 项目集成 — AI-native 通讯层 (Matrix + Conduit + Element)",
+  "labels": [],
+  "created": "2026-04-08",
+  "updated": "2026-09-05",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 226,
+  "title": "phase-c-integrator: pre-merge-gate NEG-2-timeout fixture 缺单测宿主 (subprocess timeout + 3-retry 路径零覆盖)",
+  "labels": [],
+  "created": "2026-10-18",
+  "updated": "2026-10-18",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 225,
+  "title": "AB 套件覆盖缺口: audit-engine 对 pre_merge completeness gate 无场景覆盖; 两套件均不覆盖 hotfix lane",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-18",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 224,
+  "title": "config-loader 无程序化入口 ⇒ 消费方内联第二副本 (相等性断言封漂移)",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 223,
+  "title": "写侧审计报告命名约定无强制 (unattributed 计数面)",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 222,
+  "title": "config 注册面缺口: allow_incomplete_checkpoints / allow_dangling_change_ids 未进 DEFAULTS.json, config.template.json 无 audit 块",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 221,
+  "title": "产出侧四个 checkpoint 调用方按字面键早退, 对 adaptive_rules 推导失明",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 220,
+  "title": "completeness gate: --no-spec 声明与 refs/aria/coordination active claim 交叉核验",
+  "labels": [],
+  "created": "2026-10-17",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 219,
+  "title": "[安全][hooks][平台] v1.75.0 secret-guard/secret-scan 仅 Linux 验证 — Windows/MINGW64 实测缺口（grep/sed 差异 + 进程 ~10× 慢放大 5s 超时 fail-open；#154 报告环境即 MINGW64）",
+  "labels": [],
+  "created": "2026-10-15",
+  "updated": "2026-10-16",
+  "comments": 2
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 218,
+  "title": "[安全][hooks][容器] 验证 aria-runner 容器内 secret-guard 真实加载 + CC 版本下限（W1 PostToolUseFailure 前向兼容）",
+  "labels": [],
+  "created": "2026-10-14",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 217,
+  "title": "[安全][secret-guard] W10 fail-closed 误拦面收窄 — 按膨胀量判 + for 列表跨行 + 只拦被引用值",
+  "labels": [],
+  "created": "2026-10-14",
+  "updated": "2026-10-14",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 216,
+  "title": "[安全][secret-guard] hook 5 s 超时后 fail-open —— W10/W9 新能力缩短到超时悬崖的距离",
+  "labels": [],
+  "created": "2026-10-13",
+  "updated": "2026-10-16",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 215,
+  "title": "委派默认值偏重与 git 操作风险：并行提交、.git/worktrees、字符串拼 JSON",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 214,
+  "title": "跨文件规则冲突：TDD 配置、UPM 定位、任务粒度、认领段 skip 与 config-loader",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-11",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 213,
+  "title": "phase-b / phase-c / phase-d 补丁堆积：同一步骤多套定义，内联脚本与真实脚本漂移",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 212,
+  "title": "插件安装后解析不到的路径与命令：开发仓路径、项目级 .claude/skills 链接、不存在的斜杠命令",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 211,
+  "title": "agent 路由与 agent 契约不一致：code-reviewer 路由不到、context-manager 读不到主会话",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 210,
+  "title": "编排链依赖模型调不到的 skill 和不存在的机制（workflow-runner / agent-team-audit / TDD hook / SIGINT）",
+  "labels": [],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 209,
+  "title": "audit-engine: 收敛模式没有成本闸, 大文档上收敛判据几乎不可达 (WP-A post_spec 5 轮未收敛, 约 40% 周额度, 代码 0 行)",
+  "labels": [],
+  "created": "2026-10-07",
+  "updated": "2026-10-07",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 208,
+  "title": "[缺陷][issue-triage] 开放 PR 与评论列表都是单次 limit=50 请求 —— 超过 50 条静默丢数据 (同 10CG/aria-plugin#182 形态)",
+  "labels": [],
+  "created": "2026-09-30",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 207,
+  "title": "[缺陷][phase-c-integrator] Rule #8 gate 盲区: 只由 pull_request 触发的 workflow —— Forgejo 把 run 记在分支名「#<PR号>」下 ⇒ (a) 腿按 PR 分支名查恒 not_found ⇒ 恒 wait",
+  "labels": [],
+  "created": "2026-09-30",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 206,
+  "title": "[缺陷][state-scanner/归档门] 纯文档改动的 tasks.md 声称行恒报 no extractable symbol (fail-soft) —— 每个改规范文档的 Spec 归档都带一条假 warn 并默认建 tracker",
+  "labels": [],
+  "created": "2026-09-28",
+  "updated": "2026-09-28",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 205,
+  "title": "[AB套件][state-scanner] 套件结构上测不到 tracks_multibranch collector 输出 —— 只改 collector / writer 的 cycle 照跑 AB 恒得 delta≈0",
+  "labels": [],
+  "created": "2026-09-27",
+  "updated": "2026-09-28",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 204,
+  "title": "[遗留缺口][state-scanner] handoff 读侧仍按扁平布局：子目录下的指针读不回，读侧也认不出「没有真指针」（10CG/Aria#195 明确不修的面）",
+  "labels": [],
+  "created": "2026-09-27",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 203,
+  "title": "[安全][secret-guard] 真实泄露事件：服务端配置文件不在名单 + 路径经 shell 变量间接即绕过全部文件名规则（附复现矩阵，关联 #154 / #92）",
+  "labels": [],
+  "created": "2026-09-26",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 202,
+  "title": "[缺陷][Layer L] phase1_gate 的 self-resume 按 (container, session) 匹配 — 同容器换 session 再认领会新建第二条 active claim",
+  "labels": [],
+  "created": "2026-09-18",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 201,
+  "title": "[缺陷][openspec-archive] 「归档不吞未完成」对 Level 2 spec 结构性失效 — d_payload 只看 tasks.md/detailed-tasks.yaml, proposal 里的 deferred 项根本没看",
+  "labels": [],
+  "created": "2026-09-17",
+  "updated": "2026-09-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 200,
+  "title": "[enhancement][spec-drafter / task-planner] 模板加 rule6_note 五字段 — SOT §4.1 已定模板, authoring 路径未跟上",
+  "labels": [],
+  "created": "2026-09-17",
+  "updated": "2026-09-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 199,
+  "title": "[缺陷][state-scanner] check_bare_issue_refs.py 把序数形态的 #<n> (表格行号 / 复议条目号 / 交叉引用) 判为裸 issue 引用 — fail-CLOSED 下卡住任何带编号表格的 spec",
+  "labels": [],
+  "created": "2026-09-12",
+  "updated": "2026-09-19",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 198,
+  "title": "[缺陷][state-scanner] `_normalize_status` 把 `Approved (Draft → Approved …)` 判成 pending —— 括号里的状态历史参与了归类",
+  "labels": [],
+  "created": "2026-09-12",
+  "updated": "2026-09-13",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 195,
+  "title": "[缺陷][Layer L] refs/aria/coordination 的权威 remote 无校验 — 非权威 remote 上可躺一块「看似协调板、实际已死 3.5 个月」的 ref, 读到即空板 ⇒ 恒判无碰撞 (fail-OPEN)",
+  "labels": [],
+  "created": "2026-09-09",
+  "updated": "2026-10-17",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 193,
+  "title": "[缺陷][spec-drafter] SKILL.md 三处指示运行未安装的 openspec validate --strict",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 192,
+  "title": "[缺陷][state-scanner] unverified_claims / unverified_ack frontmatter 只写不读 — reader 被留给一个未落地的 TASK",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 191,
+  "title": "[AB套件][openspec-archive] 三个涉归档路径的 eval 全缺 YYYY-MM-DD- 前缀, 且 cli-bug-fix 的期望路径与 SOT 相反",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 190,
+  "title": "[AB套件][openspec-archive] 固定套件零覆盖 Step 7 / D auto-issue 维度 — 4 个 eval 选 2, 且四个都不触及归档后的 tracker 建单",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 2
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 189,
+  "title": "[缺陷][openspec-archive] Step 7 的 SHA 回链填充没有调用宿主 —— 6 次执行 4 种形态, #185 填了句不含 SHA 的话无人发现",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-10-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 188,
+  "title": "[类级][设计已完成] 归档闸门认不出 `python -m pkg.mod` 调用 —— 谓词设计 V4 + 21 用例已备, 但生产触达实测为 0 故从 Spec 拆出",
+  "labels": [],
+  "created": "2026-09-07",
+  "updated": "2026-09-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 187,
+  "title": "[缺陷][test-harness] run_all_tests.sh 对 pytest 风格裸函数套件收集到 0 个测试却报 OK —— phase-d-closer 的 11 个测试 (含一条 Rule #7 凭证不泄漏断言) 现在就从未被跑过",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 186,
+  "title": "[类级] 归档闸门调用面: `python -m pkg.mod` 与非 CI runtime yaml 不被识别 — v1.71.1 只修了实例",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 185,
+  "title": "[清理] aria/skills/session-closeout/ 是空的未跟踪残留目录 —— 解释 43 目录 vs 42 SKILL.md 的计数差",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 184,
+  "title": "[清理][state-scanner] state_scanner.sync_check.* 是死配置 —— 零可执行代码读取, 却仍活在 DEFAULTS.json / config.template.json / 用户 config",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-30",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 183,
+  "title": "[缺陷][文档冲突][state-scanner] 📝 README 同步状态: output-formats.md 定为独立区块, SKILL.md 降级为条件子项且改了名 —— 实际输出率 3/30",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 181,
+  "title": "[缺陷][state-scanner] README skill 名册漏列 issue-triage / session-closer —— 名册无任何机械检查覆盖, 漂移活过三个月绿灯",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-09",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 180,
+  "title": "[缺陷][state-scanner] 快照写入非原子 + 输出路径被 SKILL.md 钉死为单一固定路径 —— 并发扫描互相截断 (AB 20+ 臂实证)",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 179,
+  "title": "[AB套件] phase-a-planner eval 4「五要素」用包含谓词而非克制谓词 —— 截断 claimed_at、缩写 linked_issue 的臂仍判 pass, 且判定在两轮间摆动",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 178,
+  "title": "[AB套件] branch-manager eval 1 标尺在断言外 + 漏测本轮真实区分点 —— old 臂自行编 --raw-track-id TASK-001-user-auth 落进可执行命令, 两臂仍同判 2/2",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 177,
+  "title": "[AB套件] state-scanner eval 1/3/5/7 一批断言在本仓语料下不可能区分 —— 恒真 / 前件恒假 / 只测做没做不测对不对 (附: DEFECTS.md A11 经复核不成立)",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-27",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 176,
+  "title": "[AB套件] spec-drafter eval 3 五条断言结构性零区分度 —— 本 cycle diff 零触及 Linked Issue, 且断言 3 是断言 2 的推论、断言 5 会误判理解更深的臂",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 175,
+  "title": "[AB套件] phase-b-developer eval 2 单侧承重语料污染 —— 满分臂的替身任务取自在制 Spec 目录 (3 vs 0), 该 3:1 不得计为区分力",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 174,
+  "title": "[P0][AB套件] phase-a-planner eval 1 A4 只考顺序不考闸门 —— on_audit_fail 判 FAIL 后闯闸跑 A.2/A.3 的臂仍 4/4 满分",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 173,
+  "title": "[P0][AB套件] phase-b-developer eval 2 断言奖励假绿 —— 拒绝拿别的套件顶替验证的臂 1/3, 换任务跑通的臂 3/3",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 172,
+  "title": "[P0][AB套件] phase-d-closer eval 1 断言奖励虚构 —— 拒绝编造进度的臂 0/3, 用 TASK-001~006 占位编记录的臂 3/3",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-08",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 171,
+  "title": "[benchmark] phase-a-planner / spec-drafter 套件零覆盖 A.1 入口认领编排行为 (调 phase1_gate / 按 status 请裁 / 降级措辞 / unattended)",
+  "labels": [],
+  "created": "2026-09-06",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 169,
+  "title": "[缺陷][Layer L] resilient_push 的 non-FF 恢复路径结构上必失败 — 非强制 fetch 遇分叉必被 reject, 且从不重放本地 claim 写入",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-10-15",
+  "comments": 5
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 168,
+  "title": "[coordination] audit-engine 轮内不触发 heartbeat — 长审计轮期间 claim 对 reconcile 恒呈 stale",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 167,
+  "title": "[schema][Layer L] ClaimRecord 缺 swept 标记 — abandoned 分辨不出显式 release 与 --sweep-stale 的 GC 产物",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 166,
+  "title": "[权限面][Layer L] 跨容器定向 release 未支持 — 写别人的 claim 需独立评估 (D6)",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 165,
+  "title": "[文档][phase-b-developer] B.0 的 YAML-键形态应升为标题级",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-09-05",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 164,
+  "title": "[增强][Layer L] unknown_schema_claims 只给 count 不给路径/身份 — 需扩 ReadClaimsResult 字段",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-09-05",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 163,
+  "title": "[缺陷][文档措辞] 三处把 --sweep-stale 的 SWEEP_TTL 行为写成 STALE_TTL",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-10-15",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 162,
+  "title": "[缺陷][audit-engine/state-scanner] 汇总报告的文件名约定只存在于消费方代码里 — 照文档产出的汇总会让 last_audit 永久恒 null（#149 follow-up）",
+  "labels": [],
+  "created": "2026-09-02",
+  "updated": "2026-09-02",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 160,
+  "title": "[缺陷][state-scanner/test] 两个同名 `lib` 包 (`state-scanner/lib/` vs `state-scanner/scripts/lib/`) 在同一 pytest 进程只能绑一个 — 全量 pytest 恒 2 collection error, 与调用顺序相关; #134 单模块修复不覆盖此层",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-08-23",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 159,
+  "title": "[规范待裁][workflow-runner] Exit condition 2.5 `abort` 取「verdict=fail 语义」, 但 `gate_state.status` 是否由 `waiting` 翻 `fail` 未明说; 现有 CLI 无「翻 status 且保留 no_run_observations」路径",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-08-23",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 158,
+  "title": "[缺陷][workflow-runner] §wait_recoverable Exit condition 2 的 `retry_count > max` — `max` 从未定义 (SKILL.md / §C.2.4 配置表均无), 该腿只能靠 elapsed 触发",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-08-23",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 157,
+  "title": "[benchmark][state-scanner] ab-suite 对 SKILL.md Layer L / --linked-issue 段零覆盖 — 11 条既有 eval 全不触及 claim 认领与 linked_issue 重叠告警",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-09-30",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 156,
+  "title": "[缺陷][phase-c-integrator] Rule #8 (b) 腿对未被领取的 main run 不可见 — /actions/tasks 只列已领任务, 「main 无 in-flight」与「main 刚 push、run 已建未被领」折叠成空 runs (分钟级 fail-open)",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-08-23",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 154,
+  "title": "[安全][hooks] L3 tripwire: PostToolUse 凭据形状检测-告警 — 不能撤回但把「泄了没人知道」变「泄了立刻知道→轮换」",
+  "labels": [],
+  "created": "2026-08-20",
+  "updated": "2026-10-16",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 150,
+  "title": "[benchmark] Rule #6 判据表第三行的兜底「缺一照跑」对 14/43 个 skill 结构上不可执行 — 它们根本没有 AB 套件",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 148,
+  "title": "[refactor] 重试循环两份实现 — pre_merge_gate.py 与 aether.py 共享常量却各写一遍 backoff 循环",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-16",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 146,
+  "title": "[实现][secret-guard] `!` 命令位置分支左侧无边界 (+ do/then/else/elif 同类, fail-safe 无安全后果)",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-16",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 144,
+  "title": "[可移植性][secret-guard] 非 glibc / 低版本 bash 平台两个未验证面",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 143,
+  "title": "[缺陷][secret-guard] fail-safe 判据不封闭的残余误报面",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-19",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 142,
+  "title": "[缺陷][secret-guard] `$(…)` / 反引号 / heredoc 内部欠拦 — 降级为现状",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-16",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 141,
+  "title": "[缺陷][secret-guard] `&` / 换行 两个切分记号未纳入",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-16",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 140,
+  "title": "[缺陷][secret-guard] `ssh host '…'` / `sh -c '…'` 外壳逃逸",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-09-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 139,
+  "title": "[缺陷][secret-guard] 块结构内的泄漏 — fail-safe 降级为现状, 未修复",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-16",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 138,
+  "title": "[架构][secret-guard] 跨段 pattern fail-open — 逐段判定引入的唯一 fail-open 方向 (v1.66.1)",
+  "labels": [],
+  "created": "2026-08-16",
+  "updated": "2026-08-23",
+  "comments": 3
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 136,
+  "title": "[缺陷][branch-manager] 合并动作是 repo-type-agnostic 的服务端 API merge — CLAUDE.md 硬约束 1「子模块一律本地 merge」在插件层零实现 (疑为 Aria #165 三次复发的根因)",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-08-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 135,
+  "title": "[state-scanner/coordination] 认领机制三处缺口致跨容器重复劳动 4 次: 快照不解析 claim / 闸门只覆盖 Phase B / 容器身份键不稳",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-09-30",
+  "comments": 3
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 133,
+  "title": "[缺陷][Layer L] _TERMINAL_STATUSES 4 处定义 2 种成员集 — release --status yielded 静默不释放 (三轮审计点名无号)",
+  "labels": [],
+  "created": "2026-08-08",
+  "updated": "2026-09-30",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 132,
+  "title": "[增强] BLOCKED 提示按 pattern 给定向建议 — 须先解决 set -u 下的缺省初始化",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-08-02",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 131,
+  "title": "[缺陷] 既有 pattern 尾边界缺失 + FP 面 — 单 session 内 5 次误拦实证",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-08-02",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 130,
+  "title": "[缺陷] guard:ack 文案与实现不符 — 实现要求首 token ≥8 字符, 文案写「reason ≥8 chars」",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-08-02",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 129,
+  "title": "[缺陷] stderr 假阴家族 — 纯 stdout redirect 挡不住 -v/-verbose, 且 2>&1 顺序敏感",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-08-02",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 127,
+  "title": "[benchmark] phase-c-integrator AB 两套件均覆盖不到 C.2.4 的 D9 surface 措辞 — 该义务自 v1.65.0 起零 eval 覆盖",
+  "labels": [],
+  "created": "2026-08-02",
+  "updated": "2026-09-06",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 123,
+  "title": "[session-closer] handoff_autofill 第三形态盲区: proposal-inline 任务 (Level 2 proposal-only spec) 报 0 未完成 (#121 范围让渡)",
+  "labels": [],
+  "created": "2026-08-01",
+  "updated": "2026-08-01",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 120,
+  "title": "[state-scanner] yaml-only spec 的 C-gate liveness parity — 属实性轴仍是 scoped 披露, symbol-liveness 未覆盖",
+  "labels": [],
+  "created": "2026-07-22",
+  "updated": "2026-07-22",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 117,
+  "title": "[benchmark] AB 测试集缺 authoring 维度 — 全套件零 eval 覆盖「作者读处方性向导做判断」类行为",
+  "labels": [],
+  "created": "2026-07-20",
+  "updated": "2026-09-06",
+  "comments": 1
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 114,
+  "title": "[state-scanner] 归档门 artifact 分类器路径正则硬编码 ab-results|ab-suite — 非-AB dogfood 声称结构性恒 warn",
+  "labels": [],
+  "created": "2026-07-19",
+  "updated": "2026-07-19",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 110,
+  "title": "[state-scanner] sync_status 撒谎: 陈旧 remote-tracking ref 下报 parity=equal / overall_parity=true (十步循环统一入口的假绿)",
+  "labels": [],
+  "created": "2026-07-12",
+  "updated": "2026-09-30",
+  "comments": 3
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 109,
+  "title": "[coordination follow-up] claim 强制点 (Phase B) 在重复成本点 (issue-pick/Phase A) 下游 — 双子星撞车亲历者反馈",
+  "labels": [],
+  "created": "2026-07-12",
+  "updated": "2026-08-08",
+  "comments": 0
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 107,
+  "title": "[coordination follow-up] heartbeat 生产接线 — heartbeat_at 冻结在 acquire, SWEEP_TTL 被迫 24h",
+  "labels": [],
+  "created": "2026-07-11",
+  "updated": "2026-10-15",
+  "comments": 2
+ },
+ {
+  "repo": "aria-plugin",
+  "number": 92,
+  "title": "[feature] secret-scan 防御反馈闭环 — 泄露事件记录 → aria-report 人工闸门 issue → 升级 PreToolUse (B, split from #91)",
+  "labels": [],
+  "created": "2026-07-03",
+  "updated": "2026-09-26",
+  "comments": 0
+ },
+ {
+  "repo": "aria-standards",
+  "number": 19,
+  "title": "[convention] owner-container 与 claim container 段口径不统一 — handoff frontmatter 规范需成文二者关系",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-standards",
+  "number": 18,
+  "title": "[缺陷+enhancement] git-commit 禁止 AI 署名, 但没说与 harness 注入指令谁优先 — 8 个月 19 次事实失效; 附会话溯源 trailer 提案",
+  "labels": [],
+  "created": "2026-09-05",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-standards",
+  "number": 17,
+  "title": "[convention] skill-benchmark-exemption: 单 Skill 局部变更的 Rule #6 AB lane 缺成文 — 「Tier 1 全量 10 Skill」与实际三次先例 (单 Skill 全套件 + 定向 fixture) 不一致",
+  "labels": [],
+  "created": "2026-08-23",
+  "updated": "2026-09-17",
+  "comments": 1
+ },
+ {
+  "repo": "aria-standards",
+  "number": 16,
+  "title": "[缺陷] openspec/project.md 内部对 Level 3 交付物给出两种口径 (:21 含 detailed-tasks.yaml, :118 不含) — 归档实测出现四种组合",
+  "labels": [],
+  "created": "2026-08-17",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-standards",
+  "number": 15,
+  "title": "[enhancement] concurrent-session-write-safety 的 fetch 原则应扩到「以 ref 为输入的写操作」+ 补冲突解法分类 — 生产发布漏 6 commit 实例",
+  "labels": [],
+  "created": "2026-08-10",
+  "updated": "2026-09-06",
+  "comments": 0
+ },
+ {
+  "repo": "aria-orchestrator",
+  "number": 31,
+  "title": "[coordination] 自主 bot dispatch 时强制 claim — defect a 的 Layer 2 维度 (插件管不到)",
+  "labels": [],
+  "created": "2026-07-11",
+  "updated": "2026-07-11",
+  "comments": 0
+ },
+ {
+  "repo": "aria-orchestrator",
+  "number": 5,
+  "title": "feat: abstract reusable \"Hermes on Aether\" deployment template",
+  "labels": [],
+  "created": "2026-04-23",
+  "updated": "2026-05-27",
+  "comments": 0
+ }
+]

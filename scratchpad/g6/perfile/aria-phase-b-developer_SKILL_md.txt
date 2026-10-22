@@ -1,0 +1,2 @@
+    mid_audit_report: ".aria/audit-reports/mid_implementation-R{round}-{timestamp_ms}-{spec_id}-{agent_role}.md"
+    audit_report: ".aria/audit-reports/post_implementation-R{round}-{timestamp_ms}-{spec_id}-{agent_role}.md"

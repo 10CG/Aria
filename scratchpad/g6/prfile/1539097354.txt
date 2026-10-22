@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+      "passed": true,
+      "evidence": "response.md L17-24 Step A 给出完整命令行 (bash 代码块): `python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" \\\\n  --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\"`。两参数均带具体值且与题面场景一致 (spec 目录名 demo-spec / repo root /work/Demo), 非占位符、非「跑探针」式略写。与 skill 快照 SKILL.md L124 调用模板及 scripts/sibling_spec_probe.py L660-661 (argparse 中 `--own-spec-dir` / `--repo-path` 均 required=True, 语义分别为「目录名」与「仓库根」) 逐项吻合。"
+    },
+    {
+      "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+      "passed": true,
+      "evidence": "response.md L79-87 的 `### Round 2` 模板渲染含 L82: `- Sibling probe: 🔴 检测到 1 份同 issue 的竞品 Spec: 2026-08-22-phase-c-integrator-ci-path-coverage (已完成的 Spec)`。🔴 / N=1 / spec_dir 名 / 「已完成的 Spec」标注四要素齐全, 且 archive 依据有显式推导: L35「唯一命中项 corpus == \\\"archive\\\" → 追加标注已完成的 Spec (M = 1)」、L94-97 推导表、L115「本例命中落在 archive/ 语料」。与 report-format.md L61 模板行 (`- Sibling probe: {🔴 检测到 N 份同 issue 的竞品 Spec (含 M 份已完成的 Spec) | ...}`) 及 execution-modes.md L199 三档消费措辞 (sibling_found ⇒ 🔴 + spec_dir 列表 + archive 命中标「已完成的 Spec」) 一致; L96 并自行注明与模板形「(含 1 份已完成的 Spec)」等价。"
+    },
+    {
+      "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+      "passed": true,
+      "evidence": "response.md L105 开门见山: 「**结论: 三者全部零影响 —— 探针是 advisory 副机制, 『不阻断』**」; L107-112 表格逐行覆盖 verdict / 收敛判定 (converged) / 轮次路由 (是否 Round 3) 三个判定面, 「探针是否参与」列全为「否」并给出实际决定因素。另 L38 (Step A 第 7 条) 「不改 verdict、不改收敛判定、不改轮次路由 (见 (3))」与 L113 引用 SKILL.md「不阻断」条 + execution-modes.md advisory 措辞原文, 与 skill 源码 SKILL.md L129 / execution-modes.md L205 的「不阻断: 不改 verdict 计算、不改收敛判定、不改轮次路由 (advisory)」逐字对应。"
+    },
+    {
+      "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+      "passed": true,
+      "evidence": "response.md 正确区分两机制: L8 把 Step 0 Anchor 固化描述为「Round 1 启动前**一次性**执行…Round 2 入口**不**重新固化」(即 Step 0 是锚固化, 根本不含探针); L17 Step A 标题显式消歧「每轮入口, Round 2 含; 与 Step 0 显式消歧: 本探针每轮跑, 不沿用 Step 编号」; L69 进一步规定 Round 3 入口「**再次**执行 Step A 同一探针命令 (每轮重跑; 不复用 remote_refresh 缓存, 也不复用本轮结果)」。与 SKILL.md L121「每轮 (Round 1, 2, …, N) 的入口先跑竞品 spec 探针 —— 与 Step 0 (Round 1 启动前一次性) 显式消歧…不沿用 Step 编号」及 execution-modes.md L154 一致。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.00
+  },
+  "form_ok": true,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数",
+        "reason": "断言只验 flag 出现, 不验取值正确。--own-spec-dir 按脚本 docstring 须传目录名 (demo-spec) 而非完整路径 (openspec/changes/demo-spec), --repo-path 须是仓库根 —— 写错形态的命令行同样能过。可补「参数值分别为 demo-spec 与 /work/Demo」。"
+      },
+      {
+        "assertion": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」",
+        "reason": "本 fixture 仅 1 条 hit, N=1 不经任何去重即成立, 检不出响应是否理解 execution-modes.md 的 spec_dir 去重规则 (「同一 Spec 在 origin/github 两镜像各成一条 hits[] 项须去重」)。若加一个双镜像双 hit 同 spec_dir 的变体 eval, 能区分真理解与凑数渲染。响应 L35 自称理解了去重规则但此断言无法证实。"
+      }
+    ],
+    "overall": "4/4 全过且证据扎实: 命令行逐 token 对齐 SKILL.md 模板与脚本 argparse, 渲染行同时满足 🔴/N=1/归档标注且给出 corpus==archive 推导链, advisory 三面零影响有表格 + SOT 引文双重表达, Step 0 vs per-round 消歧与 SKILL.md L121 原文一字不差 (响应还额外正确覆盖了 fail-closed 边界、status==ok 不加「覆盖不完整」后缀、探针成本不混入 Duration 行等未列入断言的规范细节, 无一处与 skill 快照源码矛盾)。form_ok=true: L3「以下全部为推演, 不实际执行任何命令」开篇声明, 全文无任何实际执行声明。timing.json: 执行臂 228.1s / 93680 tokens, 与该体量 (11894 字符输出) 的 descriptive 推演相称, 无超时或异常信号。两条 suggestion 均为断言加固方向, 非响应缺陷。"
+  }
+}

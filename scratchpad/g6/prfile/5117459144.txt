@@ -1,0 +1,91 @@
+# 10CG/Aria#199 A.2/A.3 v2.12 返修派单 (执笔实例, 新派; 只修 R11 minor 并落 owner 裁定; 不重审)
+
+> 派单人 = 主控 (容器 simonfish/bfe8285d, 2026-10-01, Phase B 执行会话)。分工同前: 你出稿, 主控逐项独立核验后提交。本版按决策单 2026-09-27 第 3a 项**不重开 post_planning** (owner 2026-10-01 裁定, 决策单 2026-09-30 第 8 项第 4 条), 主控核验是唯一一道关 —— 每条改写的判据都请做反事实, 能实跑的都实跑。v2.4 – v2.11 的派单与执笔报告在仓内 `.aria/notes/2026-09-17-199-a2-a3-tooling/writer-reports/`, 做法照它们来 (v2.11 那两份最相关)。
+
+## 0. 一句话
+
+post_planning R11 审 v2.11: 五席全票 PASS、0C/0M, raw 10 条 minor 去重为 8 键, 维持收敛。owner 2026-10-01 裁定 (决策单 `.aria/decisions/2026-09-30-199-b2-group1-spec-drift-rulings.md` 第 8 项与其后的「勘误」): 请裁第 1 条批准 (a); 请裁第 2 – 7 条全部追认; 请裁第 8 条补一格 (owner 答「你给建议」, 主控建议补格); 出 v2.12 修 8 键 minor 并落这三项, 不重审, 主控核验后从 2.6 续跑。
+
+## 1. 环境
+
+`<S>` = `/tmp/claude-1000/-home-dev-Aria/cbe6f623-7c3c-4217-8ccb-fd07680a5525/scratchpad/rework-v2.12`, `<COPY>` = `<S>/repo`。
+
+| 项 | 值 |
+|---|---|
+| 返修副本 (唯一工作面) | `<COPY>` —— 真仓 feature 分支 `feature/pre-merge-completeness-gate-change-scope` 在 **`493ba0e`** 的全量副本 (`cp -a`; 含 R11 报告 `ff83d86` 与决策单第 8 项 `493ba0e`)。aria = `88689aa`, standards `2bc1c4c`, aria-orchestrator `237045a`; 三个子模块 gitdir 指向副本自身, 全部 remote 的 push URL 已禁。副本里 `aria` gitlink 显示为改动、`verification-ledger.md` 为未跟踪 —— 执行期既有状态, 不归你动 |
+| 草稿目录 | `<S>/writer-work/` |
+| v2.11 基线 (主控在本副本实跑) | `REGEN_IDENTICAL`; 归档门 `complete=False` / `verdict=pass` / `blocking_reasons` 0 / `warnings` 0 / `unverified_claims` 0 / `soft_errors` 0。原始输出在 `<S>/main-baseline/` |
+| 计数 (主控实数) | 31 个 TASK; `owner_gates` 19 项; 读前必看 33 条; 判断清单 77 条; `revision_log` 83 条; `stage_cells` 39 格 |
+
+真仓 `/home/dev/Aria` 零写入。三态证据的复跑环境按工具 README 在 `<S>/writer-work/` 下自建, 基准快照不动。
+
+## 2. 必读
+
+1. R11 聚合报告 `<COPY>/.aria/audit-reports/post_planning-R11-2026-10-01T165056-000Z-pre-merge-completeness-gate-change-scope-aggregated.md` 全文: 8 键的内容、席位修法、主控复核、请裁表态与单席风险。需要细节时读同目录对应席位报告原文。
+2. 决策单第 6 – 8 项与「勘误」。
+3. v2.11 的派单与执笔报告 (`writer-reports/v2.11-dispatch.md` / `v2.11-writer-report.md`)。
+4. 计划本体 v2.11 (`tasks.md` / `detailed-tasks.yaml`)、生成器 `gen_yaml.py` 与工具 README。
+5. aria (只读): `skills/audit-engine/tests/test_completeness_gate.py` 的 `test_empty_checkpoint_set_three_buckets` (SC-15 各 subTest, 尤其 `SC-15.5-typo-mode` 与 `SC-15.10-pre-merge-lazy-when-inclusion-nonempty`); `skills/audit-engine/scripts/completeness_gate.py`; `skills/audit-engine/tests/test_sibling_spec_probe.py` 的 `TestStructuralConstraints`。
+6. 台账 (只读): 「组 2 收口」与「停下与上报」的 2.6 一节。
+
+## 3. 本轮范围 (每个子项处置三选一: 改 / 不改 (写理由, 进请裁项) / 已失效 (附实测))
+
+### 3A. R11 的 8 键 minor (修法以聚合表里的席位建议为起点; 你有更好的写法可以换, 但要说明)
+
+1. `6c7e3a62` —— TASK-013 既有结构约束条的机检「`git -C aria diff` 只落在 `TestStructuralConstraints` 类内」: 拆成文件集与 hunk 位置两条机检, 并与提交条「WIP 之后另有改动一并 add」以及本版 3B 第 3 项新增的测试改动互相一致 (同一执行面上不能出现两条相反的指令)。
+2. `63a8700c` —— 反事实里加的是未跟踪文件时, 补丁记录不得取空的 `git diff`; 写明改取 `git status --porcelain` 与 `git diff --no-index /dev/null <文件>` 的原样输出 (后者有内容时退出 1), 或你认为更好的、可复核的取法。
+3. `09d6a438` —— TASK-013 反事实补一跑正向对照: 加空文件 `sibling_spec_probe_util.py` ⇒ 仍绿。主控已复现区分力 (正确改法 OK; 删掉前缀子句的坏改法 FAILED `['sibling_spec_probe_util.py']`), 你在一次性副本里再实跑一次并记报告。
+4. `f89a8d20` —— TASK-013 反事实条的实例要求与判断清单第 13 条、TASK-019 第 2 条对齐, 或写明是例外及理由。
+5. `4a37c9ec` —— 判断清单第 73 条的授权来源改为决策单第 7 项与第 8 项第 1 条 (owner 2026-10-01 批准 (a)), 不再把 post_planning R11 列为授权来源; 全文同义处一并核。
+6. `f49493cf` —— 请裁第 6、7 条的两项取舍进判断清单 (新条目, 写取舍、备选、代价与 owner 追认); 删去第 77 条末句里的「与 TASK-013 的 Ran 口径」(该句其余部分是否仍成立, 判并说明)。
+7. `f5aadec7` —— 读前必看第 32 条照录了决策单第 6 项的误数「四个非排除 checkpoint」。判断清单第 75 条要求执行口径列逐字取裁定原文: 判清楚怎样既守第 75 条又不传播误数 (例如原文照录后加按决策单勘误的注), 并全文检索同一误数的其它出处。`test_completeness_gate.py` 里 SC-15.10 夹具提交说明的 "four non-excluded explicit" 改不改 —— 若改, 只能由 Phase B 的测试实例在 3B 第 3 项的同一次改动里做, 计划写明; 不改则说明理由。
+8. `857e5034` —— 两件事: (1) TASK-013 的 `estimated_hours` 按 v2.12 之后的实际工作量重估; (2) 归档 sibling-spec-probe 计划文本仍写两项允许集, 给它一个可追溯锚点 —— 落点自选 (例如 TASK-013 对该用例 docstring 的要求里写明「归档计划文本仍是两项, 以本用例为准」, 用路径和锚点短语, 不写行号; 和/或台账存证; 和/或 TASK-031 登记), 说明理由。注意 TASK-031 的 issue 都是 5.9 的外向动作, 若新增一张须有授权路径 (`owner_gates` / 等待点), 不要无意间扩大外向动作面。
+
+### 3B. 落 owner 裁定 (决策单第 8 项)
+
+1. **请裁第 1 条 (批准 (a))**: 与 3A 第 5 项同一处修改; 相关链接注同步。
+2. **请裁第 2 – 7 条 (追认)**: 相应判断条目末尾加 owner 追认注 (格式照前几版的追认注)。请裁第 6 条的附带要求落进 TASK-013 的提交条: 2.6 的提交正文注明 WIP `88689aa` 已被接续。
+3. **请裁第 8 条 (补格)**, 落点至少包括:
+   - **谁、何时**: 由非实现者的测试实例在 2.6 提交之前补。能否与 TASK-013 改结构约束的同一个测试侧新实例合并做, 按本计划「测试与实现分由不同实例」的口径判并说明。
+   - **写什么**: 在 `test_empty_checkpoint_set_three_buckets` 里新增一个 subTest (不新增测试方法, 使 TASK-013 的 discover 仍恰为 Ran 133)。格名自定 (与 SC-15.10 同族或另起编号, 判并说明; 核 `stage_cells` 与 SC 映射要不要动, 预期 `stage_cells` 不动)。配置: 三个非排除 checkpoint 全显式 (参照 SC-15.10 的写法), `pre_merge` 不写, `audit.mode` 写成四值枚举之外的值。期望值以 lazy 读法下的实跑为准 —— 预期 exit 1、`error_kind` 为 None、`verdict == 'fail'` (R11 tl 实测如此); 你在一次性副本里构造这一格实跑确认, 把期望值与原样输出写进报告。它要与既有 `SC-15.5-typo-mode` (`checkpoints=None` ⇒ exit 2、`config_unreadable`) 分得开。
+   - **登记**: TASK-006 的 SC-15 登记条、SC 映射、读前必看第 32 条与判断清单第 76 条 (它写过「只锁住一半」) 相应更新。
+   - **TASK-013 联动**: 提交条与 3A 第 1 项的 diff 判据覆盖这次对 `tests/test_completeness_gate.py` 的改动 (一并 add、台账逐个列出); discover 判据「恰 133、不带 skipped」不变。
+   - **TASK-020 (4.2)**: 新增一条针对新格的反事实 —— 在配置加载时就校验 `audit.mode` (补丁形状自定, 例如读完 config 后对枚举外的 mode 直接报 `config_unreadable`) ⇒ 只有新格变红、SC-15.10 原格仍绿; 并复核第 (10) 条 eager 补丁的期望写法在新格加入后是否仍准确 (eager 下新格是否也红、「只有 SC-15.10 红」与「首个失败断言」的措辞是否要改)。两种补丁都在你的一次性副本里实跑取证, 原样输出写进报告; 新格与补丁都只在你的副本里构造, 不进 aria 真仓。
+
+## 4. 连带必做
+
+1. 版本标识四处 (yaml 头注释 / `metadata.title` / `metadata.updated` / tasks.md Status 行) → v2.12 / 实际完成日期; Status 行如实写「v2.12 只修 R11 minor 并落决策单第 8 项, 按 2026-09-27 第 3a 项不重审, 主控核验后从 2.6 续跑」; `metadata.container` 补 v2.12 记录。
+2. `revision_log` 追加 v2.12 条目; **前 83 条逐字不动**。
+3. 判断清单: 本轮新登记的条目标 `(v2.12)`, 编号从 78 起; 旧条目只加链接注或追认注。
+4. `tasks.md` 改动后按工具 README 重跑两份三态证据, 与 v2.11 嵌入输出逐字节比对, 差异逐处归因。
+5. 计数与编号联动: 脚本全文检索核一遍 (31 个 TASK、`owner_gates` 19 项、等待点表 19 行、判断清单条数、读前必看条数、`stage_cells` 39 格、Ran 133 / 129、「九个取值点」「六个文件」「16 个版本点」等)。
+6. 报告里单列「改变执行者动作的改动」一节。
+
+## 5. 不在范围内 (一字不动)
+
+proposal 与 13 条裁定; `revision_log` 前 83 条; 两份三态证据的基准快照; aria 里的实现与测试文件 (只读; 补格与 docstring 的真实改动在 Phase B 由测试实例做, 你只在一次性副本里实跑取证); 台账、决策单、R11 审计报告 (只读); `CLAUDE.md`; 插件侧与 standards 侧; 另一份 spec 的归档目录。若不改某处就与本轮改动自相矛盾, 停下写请裁项。
+
+## 6. 硬性纪律 (同 v2.11)
+
+可写集恰三文件 (`tasks.md` / `gen_yaml.py` / 经生成器产出的 `detailed-tasks.yaml`, 均在 `<COPY>` 内) 加你自己的 `<S>/writer-work/`; 真仓零写入; 副本内不 commit / branch / stash / reset / checkout / tag / push / add (取证用的临时仓与一次性副本不在此限; 一次性副本用 `git -C <COPY>/aria worktree add <S>/writer-work/<名字> 88689aa` 或 `git archive` 取出, 用完移除); 不调 `/state-scanner`、`phase1_gate.py`、`release_gate.py`; 不做任何外向动作; **禁止派子代理**; yaml 只经生成器产出; 新写内容零禁用字形 (扫描器用 `chr()` 拼码点, 源码与散文里都不写出字形本身, 也不描述违规形态本身)、零裸 issue 引用 (一律 `<org>/<repo>#<n>`); 新写的互引用锚点式 (稳定编号沿用, 不写自引行号); 用 Python 改文件、逐处独立替换并打印命中数, 改完 `gen_yaml.py` 跑 `compile()`; 每条改写的判据做反事实; 不静默改写历史; 含反引号的文本不走未加引号的 heredoc。本机 shell 的 `grep` 是 ugrep 包装函数, 需要正则时用 Python `re`。**输出要小**: 改文件分段做, 最终回复控制在 15000 字以内。
+
+## 7. 出稿前自检 (主控会独立重跑)
+
+越界只三文件 / `REGEN_IDENTICAL` / 31 TASK 与顶层末键 `tasks` / 归档门与第 1 节基线同态 (若变须归因) / 三文件零 NUL / 新增行禁用字形 0、裸引用 0 / `revision_log` 前 83 条逐字不变 / `owner_gates` 19 项编号不变 / `stage_cells` 39 格不变 (若变须归因) / 两份三态证据复跑与差异归因 / 用脚本对 v2.11 与 v2.12 两版 yaml 做结构化比对, 报告的「改了什么」以机器比对为准 / 第 3 节逐项有处置。
+
+## 8. 报告
+
+**不要尝试写报告文件**。直接把报告全文作为你的最终回复, 第一行就是 `---`, 以下列 frontmatter 开头 (不要放进代码块, 前面不加任何文字):
+
+```
+---
+version: v2.12
+base_sha: 493ba0e
+dispatch_sha256_16: <本派单文件 sha256 前 16 位>
+closed: <n>/<n>
+not_fixed: <n>
+changes_executor_action: <n>
+---
+```
+
+正文各节: `## 逐项` · `## 改变执行者动作的改动` · `## 补格的期望值实测` · `## 反事实实测` (TASK-013 四跑加正向对照; TASK-020 第 (10) 条与新增条) · `## 结构化比对 (机器输出)` · `## 三态证据复跑与差异归因` · `## 计数联动 (机器输出)` · `## 自检结果` · `## 自报薄弱点` · `## 请裁项` · `## 范围外观察`。做不完就如实写已完成的部分并停下。

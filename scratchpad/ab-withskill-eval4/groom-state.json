@@ -1,0 +1,4111 @@
+{
+  "issues": {
+    "Aria#120": {
+      "issue_key": "0ad2e1a615f29ad032e37bd480ff3af2e3184a502364eb6e7c6f9b4cef7e0d9a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#136": {
+      "issue_key": "502c24796be578aae603acf63b7cf7a29835193d053b67a4c792e94513d74e27",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[security]",
+            "value": "[security]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#151": {
+      "issue_key": "814589346e0154c12e06d3703a97ba7ff3295c472033aae017acf9bebd003556",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#164": {
+      "issue_key": "f46b27ecc8fb70e796f1cde7391536a916491c1812b721430e33045ec5498467",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#165": {
+      "issue_key": "d4420ecbb2f392ed52eb8e93dd3ca5c459357f3c81167525721b9096faf5ef4d",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#167": {
+      "issue_key": "60cf3a11f8ad040e7b3fa171ba3578f87c76564037762c38e5c6480c02b8b9a4",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#168": {
+      "issue_key": "ff0762b4555ec03420e80685e424c97d6dbc638d15154dcd299fcd1b2818b419",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[tracker]",
+            "value": "[tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#169": {
+      "issue_key": "7a6ecf7ae4dfdd6a6a40c07f17886aa2496c65a9293bc38ea47f7752dd53510b",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#170": {
+      "issue_key": "7d5df9f57b25a6364bb68d4f678985ac891ff7a0287fa21c9e31ad119bb8815d",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#171": {
+      "issue_key": "439bb9a2ab7cc4048cb848eacae86b45e3bed140d139eab88b8c2a5279c944bb",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#173": {
+      "issue_key": "4618d2ef8217b06715985d593b4e36f0566c2212212625645ab70bacf6a94e1c",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[bug]",
+            "value": "[bug]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#174": {
+      "issue_key": "29bedaa610dc7fafe51c9e3dc6808fe51feaa05c4493ddfc582e917e9341a81c",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#175": {
+      "issue_key": "5f3c72b84ddfd8eb55b5b3f97d8c7beb5235f0de737730fa0a644a318ba9a0c0",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#176": {
+      "issue_key": "67832a63b0ddea5c2a7c81f985c70f3f4b183bec541f96abbf1346e8bc78ce2f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[bug]",
+            "value": "[bug]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#177": {
+      "issue_key": "fd8f0155fc5fbfe62723d9050948575332acf0eed730e8891ad4caf8334e7656",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#178": {
+      "issue_key": "37f962ef1eaa11d6295fef306ea07bf7e1673d32f637df8c36ee13bd133f893f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#180": {
+      "issue_key": "b1ab802b8b03202814e5bd8e31d5ac85589a51377bf1578b6ccfb07edf618d93",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#182": {
+      "issue_key": "1002d10173ce845117f2127dacf435b37ffe6063eb1e57bbacaf7a4b91aae301",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#184": {
+      "issue_key": "9b6d62fd058283fc33ab700eb3c5d8aa058032e5d0427d0aa87c490bd11d7720",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[enhancement]",
+            "value": "[enhancement]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#188": {
+      "issue_key": "2873a6ad5cb898e1839d38c2ebb5e22165dd0e2a2820a70bcdbc23841ef37e39",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[bug]",
+            "value": "[bug]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#192": {
+      "issue_key": "ae427b1683bc22383cf406a9749cb3883b6e783681d9399620ba0f47dffcdf4c",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Archive Tracker]",
+            "value": "[Archive Tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#196": {
+      "issue_key": "42516edafe8f453c76c8026c8f0d0dfb7e5d49d422f31e00854b99d93099db9a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#198": {
+      "issue_key": "402a79ffb64b2909c72eedb4d736484afedc228e5e542de895e5c025aee11dc6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[tracker]",
+            "value": "[tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#200": {
+      "issue_key": "51acd931dfde042498965fe14efa9d9a2ba858a68657f7e62b5a751282130564",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[bug]",
+            "value": "[bug]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#201": {
+      "issue_key": "5eb1c38f997c642bd1b09c3ecea34d00485bb5377cd9aea11a477f699d70160c",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Archive Tracker]",
+            "value": "[Archive Tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#203": {
+      "issue_key": "60f9f98ba42486a535e62bb452436063bf031b5619c7004ede02229ba52d9e05",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#204": {
+      "issue_key": "f9a24601dec01c197b3bc9348ee3be50e60f6ba284d35da8f8af4ee02154aebb",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#205": {
+      "issue_key": "3ff3ba94f7983ecb701bf3c53774bb9fe7c2de77b237ed5818e0999cf2329022",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#206": {
+      "issue_key": "22161faab8b5df14f10e808ebdc63d4ae04a4ca646f6504b2c5800e68331ff4d",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#207": {
+      "issue_key": "902a89db30635f3f4a0f7f19a07d08eac20576d06768cc1bd2460ed1a038ee85",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#208": {
+      "issue_key": "a60c9a697feb4b5ff8b2c600f371e5533c4416e129fd5d6f4967e2a00adf44eb",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#210": {
+      "issue_key": "27df5d51b7d85a2b7f2f5a628dfe52a1a143723d7a2fb988a2db2618398a2e35",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Archive Tracker]",
+            "value": "[Archive Tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#211": {
+      "issue_key": "905e5ed41a431b0eb8c12d30971a560d0511ba8939617e3514e3e45dc4fdf049",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "Aria#212": {
+      "issue_key": "e544ef336a72b9499beeecdf1bd28fe048e2c5cca1b8ad157e069ddbd0015887",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#213": {
+      "issue_key": "dc9f7d5fb7fea8116bcfe7371e6a2f00215c51edb5073390e018396a98c82fc1",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#214": {
+      "issue_key": "79a93a51b701fb8731303dff2b90ed3b9f0a43b5f9bca757475b6ff619d564ec",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#216": {
+      "issue_key": "76528055e2039301411da502f17ea2e564f61c37393b69b91516ffadb102ea70",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "tracker",
+        "signals": [
+          {
+            "category": "tracker",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Archive Tracker]",
+            "value": "[Archive Tracker]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#217": {
+      "issue_key": "3ec6f839e606a2e25ebb0a9a32b1bbff077534126b5b6e25d8081dd406a5ebcc",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "label",
+            "source": "label:bug",
+            "value": "bug"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#218": {
+      "issue_key": "68c09fd495a47633037493361edd17d35527adccb08bc7b2c2d4e26cc16679d6",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "label",
+            "source": "label:bug",
+            "value": "bug"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#219": {
+      "issue_key": "733334d4e16153e7635aed09b969baa5bf66dd7df787b6a960ba004d2a7bff87",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Feature]",
+            "value": "[Feature]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#220": {
+      "issue_key": "7b6367de964c5ef23251a3230dc609e4a25e81b7ed1018338487795e1bcc8a2e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#221": {
+      "issue_key": "e693fb25fe49d00ffabaab03d04b4d6c14339d172685363734819512e86dcc68",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "label",
+            "source": "label:bug",
+            "value": "bug"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#223": {
+      "issue_key": "5a20396db46df488d97968537634cbeae3d230ae4b817fc2ce02eeb414e91029",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[bug]",
+            "value": "[bug]"
+          },
+          {
+            "category": "bug",
+            "kind": "label",
+            "source": "label:bug",
+            "value": "bug"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#229": {
+      "issue_key": "8092bd67d27ca18cc2c88156256eab5b4c6d61111d1c5ea553e843322640cde3",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "label",
+            "source": "label:bug",
+            "value": "bug"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#230": {
+      "issue_key": "feca6ea47feb6ddbb4e1c4fda0bb28ae1b115258085cac0e43b76c71bba4bcfe",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#231": {
+      "issue_key": "bff38765250a9eecfa49052489778ea3e07f2dbfb4840fda70020e36db4a958b",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#232": {
+      "issue_key": "186b98be85c9ae042d59120a9fbcea99a6aaca7aef19e1fb95d8eed5564ca873",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#233": {
+      "issue_key": "c2286d2d400b9c621389af81c611345288b475e1fd24243bdeed904875d59c1d",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#236": {
+      "issue_key": "7a9bdf87f551e466e041da5379984faabf33b3d004fa3cf636f02cdf6ff78e88",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#238": {
+      "issue_key": "232daa40879ae26d8eec2317e7bb0e9ab92251a7492ea5aa06f778af8c237b53",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[feature]",
+            "value": "[feature]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#239": {
+      "issue_key": "f79e7cb1b4263a7396a740a74400fedd270d375bf1528c50474243068df21f59",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#240": {
+      "issue_key": "fb73c1fbae3edfece216d03e20d52d6385294346e091edbac975d958d3a5c499",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#241": {
+      "issue_key": "1f51a4eb867fe76546bf8a2cff385796292bd525422f4045fbf92cb1edf37559",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "Aria#5": {
+      "issue_key": "6bbbd4392b306745344f9caecdb6c0b24a81d3408e7d46bb32860929168b8309",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[Feature]",
+            "value": "[Feature]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "Aria#59": {
+      "issue_key": "8c4247eebca7086b7189860ac9dc5a85345d670680638cffcc0b29a5ca2d5540",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-orchestrator#31": {
+      "issue_key": "ad8842bb702ae53e15881739a0967814f4450b42534660ff5add942cf2430675",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-orchestrator#5": {
+      "issue_key": "4f2319a9bbd04c33b1ab47949bff6433104519c7234d865745ce1745075bc9c6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#107": {
+      "issue_key": "b6d6b145522ccd6493d605d1e8000799cdeb594f3b629e3510d058f7b9c313cc",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#109": {
+      "issue_key": "8ea1f505f14e5d15da34bb18e3592fe97c47e2f485e87e24ed49ea613a6281fa",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#110": {
+      "issue_key": "2fa76c4077de848d2e0f826a9ba55223abd38a6a12ae362142887c1266a60b77",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "aria-plugin#114": {
+      "issue_key": "2d34324006968a4a98300dce06aa89f696e959c4c9fbdd14207a8c6b469d9124",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": ">90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:>90d",
+            "value": ">90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#117": {
+      "issue_key": "f2c24ff032139164aa49e9c2c817566ee848b7b3b08ee66f88805b15f58f47fe",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#120": {
+      "issue_key": "7f2520b273fecd6b481c6487187cfba6d5c38d1c91babb031a10990851ec9e34",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#123": {
+      "issue_key": "edaa1c852c606b70fecfc74f1fbf37f51c53ca12b42c0391281ff03b534feac7",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#127": {
+      "issue_key": "fc2798f038ffe4e807085db0f876931f3aee1c6447243eb47dafa07bae00dd6d",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#129": {
+      "issue_key": "4104ef2c569e77a9020eef38fd44e148a9e3ea7cdb1bea3cd45d546d4a2a9ca5",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#130": {
+      "issue_key": "6ded2d03f1b0ae85591a46dd456f9f792499920d6f263ddb9b367e3461b356b1",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#131": {
+      "issue_key": "a939c2b93dce3dc71aa31ee67bf0bedb40c497414ec35ccf16cdc98582e2480f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#132": {
+      "issue_key": "c1e39df6657a6f1f55c904ab85d99ea34aef1f745a7d21ca7a17322ef80a427d",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#133": {
+      "issue_key": "82693bc7653e2367b2a9445ea5c0c0de0f7af1e51e5779999bbc33b2c95722c6",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#135": {
+      "issue_key": "a57bdc0d24f95d1836a512de21a90a810d820df58af1e0ac735ae4cdca689016",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "aria-plugin#136": {
+      "issue_key": "9df0196a217f09eda1ac2309cf04224bf29e27a2c9674fd65b7473bc28013d3a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#138": {
+      "issue_key": "707b2bdfe4421149b00df1ae080b9be5ffd79d11e2cb47cb42b943be2ed66cb4",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "aria-plugin#139": {
+      "issue_key": "f217879bd26271eb263efbad0c936270d0a7bfe4b7c918ab4e341ba1d689d1ce",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#140": {
+      "issue_key": "163d66dc5097a81bb2a626e6f757bbac8c6b1d2f6e93e42e27f8ddb3cd15b70a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#141": {
+      "issue_key": "bec70239998746233755925c7616745a1e0d1a73a2368d59391be5bb399f1482",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#142": {
+      "issue_key": "75c89cc776790a6a752f0071928db397d3e8bab649e4f58720fbbf8f69ee82a6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#143": {
+      "issue_key": "546b96c8965b3fcf7e5939a350dc227e929fb483f74cd3696c57a7800ba3199a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#144": {
+      "issue_key": "2b4f63250bfc6b3c5ce3c6b2cf6c12f69cce0f93d4dfdc1597ec4fa27dc1f035",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#146": {
+      "issue_key": "8863ea21bf4b56dbe766c15b220d6bf5924132bc756e81b76c70d42b99be0130",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#148": {
+      "issue_key": "4668fc34ede27387d3a4517635f524e67eb4c8761eafe5e36c09982133002c02",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#150": {
+      "issue_key": "8e4afdc19d352ed8a498f6ac91d6aa5d4f68ac9bb55cd51e28db8a32fec246eb",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#154": {
+      "issue_key": "e4e9ea7cc74acf9a610d0e39d4df5069bafd872c3c96af4f03cdee7bfb040dcb",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#156": {
+      "issue_key": "df7b367f5a002a7a5ea15de024b9a7dfe94df399bef843362553355f9afcbda2",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#157": {
+      "issue_key": "f7247550344c46d0d2dd214651909bd8401a5ff65605eb6c086fea27eb0d0230",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#158": {
+      "issue_key": "5f7631a299db032b4c1c100e9cd77033867a108b6a4897dcd95ba250d432d501",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#159": {
+      "issue_key": "3e7500380521e374786608f67ac296788cec48d929f5bb6709206591a57b263e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#160": {
+      "issue_key": "5ffcb990aac4d04a30ca2182b004d6cb7e686a0ff8d450b050671638559401ac",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#162": {
+      "issue_key": "c4c7abc3f54e82982d4e45a549c5db6e4e1a2cefa36e6a6786b4af09cd616150",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#163": {
+      "issue_key": "d5ec751c4df0eca67dcb12890c6926351380b9f2501ec9330c9ffcba6f50945d",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#164": {
+      "issue_key": "fa52bc2e5c39146078b297a8d493af74935622d6ecef0b9fbcfb1534aab4b734",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#165": {
+      "issue_key": "85c76d7454575018e422f97046b8732c96d3863fa64b724596cdd53f8dd85806",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#166": {
+      "issue_key": "741e3e70776f7949a0eae4133fcde96f49e60f923087026c411406d9b979c91d",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#167": {
+      "issue_key": "5fd002508360b2ad186885fcd409209c3a76e6ea71067e25473b2634beee7b15",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#168": {
+      "issue_key": "82bdb54702905364a3383a37f3fcf0ac5ba88864d972e04cf169d18ae977b39c",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#169": {
+      "issue_key": "11b094648e2c27409c08e72b5746f8e19f824ed69ffa6ea13e608897b184590c",
+      "judgement_inputs": {
+        "activity_tier": "3-9",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:3-9",
+            "value": "3-9"
+          }
+        ]
+      }
+    },
+    "aria-plugin#171": {
+      "issue_key": "d9f19933e2923298ebde52d3abb26a882f11ce459835a453c776956e178d3d13",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#172": {
+      "issue_key": "e7556fc724bca8a16749858f7ff2b2d68143fe13acc0b55db90deb735cea127b",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#173": {
+      "issue_key": "4f4e6a3fba0fade7f95941ae6af28f12e3c1ad6abf13c697d9cb02c0e595b278",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#174": {
+      "issue_key": "38f185d9a7ab2d1e224535bd3c5b479c506c9bbfe3163e195e21f793a20ede18",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#175": {
+      "issue_key": "cd7ce833870013aea66240b1b8f63b90aedc4ebb2491303769fd96aa25f7f49b",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#176": {
+      "issue_key": "84e711b707117b147bc1b55b7407ef1cbba2547bbbe374a4c568a4218debd996",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#177": {
+      "issue_key": "7112ce03c643a5cb488dd9deb489ab1504e75415df6d448eb2870012d5bcd4d6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#178": {
+      "issue_key": "90bae3ef4efe4ae7ecc17f2d5bb049b2b3f13b58ff5537fbc49ec995224c869b",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#179": {
+      "issue_key": "a95c26439d405ada53645d36b2aa703ac5e2c57be6f5d664c2a45b66b64c5ced",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#180": {
+      "issue_key": "51492aef71ceff65c09c648598af886774df17667fd35ac9a4e030afb8bf6764",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#181": {
+      "issue_key": "78705ee714c12ee067fc547f2f73e8b1abb22768d9391d1607431b06df45ac17",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#183": {
+      "issue_key": "8e18681e58804f4fe3bc0961772fe1826e7ad6d9a28d4c5c31fbede5d193e120",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#184": {
+      "issue_key": "753f6558b729e9a7f080adbcd5c5d5cfa3283852e7439b7613f1a601dd035a79",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#185": {
+      "issue_key": "50bee651db158060c814f26b2450ec9a5baa8d2ab30a79e5d26e564250af5f7f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#186": {
+      "issue_key": "55b1baa9ecce15853a280889f24b62f9fe422c8b14f976d6cae9613a7cc77ef8",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#187": {
+      "issue_key": "284d0d6162886fb46c4632a8d4e242e316a0b4a76a9a25c548d7964a2c987180",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#188": {
+      "issue_key": "9354c675d26bc5c733498375187c65fdc806c2ddf38b94ddaf2e85266b31fb5e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#189": {
+      "issue_key": "0577ae5fa2ea0cc51660cd1bfe561e6544f08fa5fbd08a8e52a99e5c103bb1a3",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#190": {
+      "issue_key": "43b1536342da657a603623a0cb7a579bd1e2881b7b77b4d3896e69e81e09f018",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#191": {
+      "issue_key": "9b138cb9b2863e1c902ff14ff9ccbc22055993f4dc481ccec67f7412528401be",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#192": {
+      "issue_key": "383a1a3f62c20ea6e2bed6d3721d245f5657eff2678e523ff7216a2f93a21e3f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#193": {
+      "issue_key": "981acfec2bd1d8b6418f03ea92ade9e348357167eb545c297e2005984b0f2b27",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#195": {
+      "issue_key": "50d16416f29a4120aa1ccd6815512f12881617d224fc61dcc79f3c21524afd1a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#198": {
+      "issue_key": "37acba8bd8dfbb22712d410e9a788da99697827fc3da320d2cdff5085a24c6db",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#199": {
+      "issue_key": "55cb8a2dcc22baa772b165352d6cb8d6a619aa28209c55b8c940030b27b76db2",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#200": {
+      "issue_key": "cf4fa58fc1fac827de5375b575324065f13fb0eaeffaf1ee2831974ffd1284bd",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[enhancement]",
+            "value": "[enhancement]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#201": {
+      "issue_key": "82e26460a6618f9aa5a6bfcc294c5858ee6d860c4b7e0679ef924b2778c70e48",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#202": {
+      "issue_key": "53e50a29f883f9e80667c1af6783751dbfeb3bc3b6b759a1b847f85878549e90",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#203": {
+      "issue_key": "2617d49d233dd0a808bfed034350ab1011318cb2dd2716065b6b119939c9a7d3",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#204": {
+      "issue_key": "4c45c02e478c5276c1003fb869476a2be5765c9f1b77b37190479d0114105607",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#205": {
+      "issue_key": "8970eb8e80f81aa1de79e30bfb29bccd7c4573b9db004c21c72415c67bd1932e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#206": {
+      "issue_key": "0d93a4404867dd74ca995d02bbc3ee79b164ab717da1b2311d3fb2f85094a140",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#207": {
+      "issue_key": "0ebb447697fb71ae0cccb7e6edf5a2c83c803d92d0c5ac89fc2809f55ec55df9",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#208": {
+      "issue_key": "274abe7369494e65414b53bcaae23d27cfa3bb0e5cc040004ba6bb5543a53fc8",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#209": {
+      "issue_key": "db7d87b6dbfc4b9bd70063a97e4b1b6a86125afc25b72090016a54f924d99070",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#210": {
+      "issue_key": "d7cfa44b7f9b25aa801453118c3c6833b2ce7a5a887b30678d31bff07c07f282",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#211": {
+      "issue_key": "f9b655c593f0e0561fadef946b1fae77040ce52f3ecc099856a21dd93e6090eb",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#212": {
+      "issue_key": "517e059f2fdbb0e98253107fd26d4428b3b85d76e7c9fce360cee35eec7e6cb5",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#213": {
+      "issue_key": "a05b0fcc349597528e3085636130abddc15718b5355b198c83f94a0090eb60d6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#214": {
+      "issue_key": "25f231bfeda4b2193da6967973e0b9893a00496af19b58910bfa0704e65f032f",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#215": {
+      "issue_key": "a682826e504dab7f6e6d667f060e5adaf92236297c5d2747be4c12ac1b7bfb96",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#216": {
+      "issue_key": "40a598130d2786f7d41ce0ec95f7bece2e69dac80a7ca261854b522eccdb1724",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#217": {
+      "issue_key": "5227658191d917164c77da7c3da7ee7e91268289608c7233c7ce08e5b334534b",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#218": {
+      "issue_key": "c8bfca6244cc56b40f731d5595209e442c2bd1dc338bf1d369e719872bb3aa8f",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#219": {
+      "issue_key": "8894958897d648d555b304e33633346916bc63b0dc22630dc094cb780523e2a0",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "security",
+        "signals": [
+          {
+            "category": "security",
+            "kind": "title-prefix",
+            "source": "title-prefix:[安全]",
+            "value": "[安全]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-plugin#220": {
+      "issue_key": "27d57c1ff2724daa2b3a3e1bd813a597091d57e37f5010e92d571b7d2f107560",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#221": {
+      "issue_key": "a60c69c3395b5f8d26315130336ebd2040fafbd004ae61edcc2d3b41ac08892d",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#222": {
+      "issue_key": "dfadd4a3deebcdfb294d0c48d56afd0a14e02e98075a09de95d05eefcc0dd79a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#223": {
+      "issue_key": "561c76541ff8420b9803a406d3136bc3f7a20846e291ae368a972c390a0632d6",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#224": {
+      "issue_key": "4446ec4893e63eeccd706c902d2da4da5a859bbd500e24a15e95947eef255b2c",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#225": {
+      "issue_key": "2c37265472de1b19155bdf285f3c9e5c6f479d9747e558f55251dce5ca139a5e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#226": {
+      "issue_key": "e56271bddbc0cbe9deeff7642519006ec0af1b75815efd838ec511513d3dc26a",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "<7d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:<7d",
+            "value": "<7d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-plugin#92": {
+      "issue_key": "7230c8de77d6c986eb86150b63a1364a383e6e82f8abf58db73dc87223172c6e",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "7-30d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[feature]",
+            "value": "[feature]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:7-30d",
+            "value": "7-30d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-standards#15": {
+      "issue_key": "571192e6b3db9a8f0556584a7bfec037c84589204b876d05cd7000734d0f4d49",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "feature",
+        "signals": [
+          {
+            "category": "feature",
+            "kind": "title-prefix",
+            "source": "title-prefix:[enhancement]",
+            "value": "[enhancement]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-standards#16": {
+      "issue_key": "aa0aaff2b6cce3e249e878a32bebc7cfcb290f0c4492381251c2e35775053120",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "bug",
+        "signals": [
+          {
+            "category": "bug",
+            "kind": "title-prefix",
+            "source": "title-prefix:[缺陷]",
+            "value": "[缺陷]"
+          },
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-standards#17": {
+      "issue_key": "9953e2c5d5180978821689a8c98075d2f9cf48404986bef0183ec86ef3c71658",
+      "judgement_inputs": {
+        "activity_tier": "1-2",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:1-2",
+            "value": "1-2"
+          }
+        ]
+      }
+    },
+    "aria-standards#18": {
+      "issue_key": "a2a748e48a5559d78fcfd9cef3a71c765c128a9e17472144fdb06aa84dc267e1",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    },
+    "aria-standards#19": {
+      "issue_key": "33a61696f37493922b280ec27cd0ed0263c950bf98691881930db687449e6462",
+      "judgement_inputs": {
+        "activity_tier": "0",
+        "staleness_tier": "30-90d",
+        "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+      },
+      "last_classified_at": "2026-10-19T18:25:03Z",
+      "tier_a": {
+        "category": "unknown",
+        "signals": [
+          {
+            "kind": "staleness",
+            "source": "staleness:30-90d",
+            "value": "30-90d"
+          },
+          {
+            "kind": "activity",
+            "source": "activity:0",
+            "value": "0"
+          }
+        ]
+      }
+    }
+  },
+  "last_run": {
+    "context_fingerprint": {
+      "degraded": [],
+      "git_heads": {
+        "/home/dev/Aria": "925c6bf450fab81363134b1ee898e29dd380ef30",
+        "/home/dev/Aria/aria": "8b1e9203d3f7272edf6103d9006d4dcc66e9cacd",
+        "/home/dev/Aria/aria-orchestrator": "237045ac2cfed9849c201e18434e9f6cb9036ab5",
+        "/home/dev/Aria/standards": "a6111366c404415f0362f7894e075015e044b9cc"
+      },
+      "handoff_pointer": "2026-10-18-235-cycle-done-ab-catalog-node-ids-fixed.md",
+      "openspec_changes_hash": "856fe7c16597aff877777af9551d620e1264a2efb38b2ecb080b5a3af96081cd",
+      "taxonomy_hash": "fea18a3021db9d369b36601443a22a7d39e82a3c778b4a472fbcd8353b2ac55c"
+    },
+    "context_key": "ae63be965b1622962f9118858ffa26cb62df94236268868be1a2d4a3b72c46b4",
+    "provenance": {
+      "harness": "claude-code",
+      "model_id": "luxeno-an,glm-5.3"
+    },
+    "scope_degraded": []
+  },
+  "schema_version": 1
+}

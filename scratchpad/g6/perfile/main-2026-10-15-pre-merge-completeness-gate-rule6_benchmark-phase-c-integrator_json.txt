@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "skill_name": "phase-c-integrator",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-10-15T12:03:01Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 246.0,
+        "tokens": 103015,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Commit message must start with conventional type (feat/fix/refactor/test)",
+          "passed": true,
+          "evidence": "response.md L154 (\u00a74.1 \u6700\u7ec8\u4ea7\u7269) \u9996\u884c\u5373 `feat(auth): \u6dfb\u52a0 GitHub OAuth2 \u793e\u4ea4\u767b\u5f55 / Add GitHub OAuth2 social login` \u2014 \u4ee5\u679a\u4e3e\u5185\u7684 `feat` \u5f00\u5934; \u00a75 \u5408\u89c4\u6e05\u5355 L220 \u4ea6\u52fe\u9009 \"Type \u6b63\u786e: feat (\u65b0\u529f\u80fd)\"\u3002\u7c7b\u578b\u88c1\u5b9a\u8fc7\u7a0b\u89c1 L105-108 (\u00a73.3: \u5168\u90e8\u53d8\u66f4\u662f\u65b0\u529f\u80fd\u4ea4\u4ed8 \u2192 feat)\u3002skill \u6e90\u7801\u4f50\u8bc1: git-commit.md \u00a72 \u5b9a\u4e49 feat=\u65b0\u529f\u80fd; commit-msg-generator \u6267\u884c\u6d41\u7a0b\u6b65\u9aa4 3 \u5373 '\u5206\u6790\u53d8\u66f4\u7c7b\u578b\uff0c\u786e\u5b9a type \u548c scope'\u3002"
+        },
+        {
+          "text": "Commit should include a scope in parentheses",
+          "passed": true,
+          "evidence": "response.md L154 \u540c\u4e00\u884c: `feat(auth): ...` \u2014 type \u540e\u7d27\u8ddf\u62ec\u53f7 scope `auth`\u3002\u88c1\u5b9a\u7406\u7531\u89c1 L110-114 (\u00a73.3): \u53d8\u66f4\u6a2a\u8de8 api/models/tests \u4e09\u76ee\u5f55, \u5171\u540c\u4e3b\u9898\u662f\u8ba4\u8bc1, \u53d6\u529f\u80fd\u7ea7 scope\u3002skill \u6e90\u7801\u4f50\u8bc1: standards/conventions/git-commit.md \u00a73.2 \u529f\u80fd\u7ea7 scope \u8868\u539f\u6587 `auth | \u8ba4\u8bc1\u76f8\u5173`, \u00a79.1 \u540c\u7c7b\u573a\u666f\u5148\u4f8b `feat(auth): \u6dfb\u52a0OAuth\u767b\u5f55\u652f\u6301 / Add OAuth login support` \u2014 response \u5f15\u7528\u4e0e\u6e90\u6587\u4ef6\u9010\u5b57\u4e00\u81f4 (git-commit.md L73/L393 \u5b9e\u6838)\u3002"
+        },
+        {
+          "text": "Commit body or footer should reference the OpenSpec",
+          "passed": true,
+          "evidence": "response.md L162 (\u00a74.1 commit message footer) \u4e0e L179 (\u00a74.2 git commit heredoc \u547d\u4ee4\u5185) \u5747\u542b `Spec: openspec/changes/oauth2-social-login/proposal.md`; \u00a75 \u6e05\u5355 L226 \u52fe\u9009 \"\u5173\u8054 Spec\"\u3002\u4e14\u8def\u5f84\u53d6\u7684\u662f Rule #5 \u5f53\u524d\u5f62\u6001 (`openspec/changes/<change_id>/proposal.md`), \u6b63\u786e\u907f\u5f00\u4e86 git-commit.md \u00a76.2 \u4ecd\u6b8b\u7559\u7684\u65e7\u793a\u4f8b\u8def\u5f84 `standards/openspec/changes/{feature}/spec.md` (\u6e90\u6587\u4ef6 L195 \u5b9e\u6838) \u2014 \u811a\u6ce8 L123-124 \u660e\u793a\u4e86\u8fd9\u4e00\u65b0\u65e7\u5e03\u5c40\u5dee\u5f02\u53ca '\u771f\u5b9e\u6267\u884c\u65f6\u4ee5\u4ed3\u5185\u5b9e\u9645\u6587\u4ef6\u540d\u6821\u6b63' \u7684\u4fdd\u7559\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 208.8,
+        "tokens": 97755,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect and report the merge conflict",
+          "passed": true,
+          "evidence": "response.md L1 \u6807\u9898\u5373\u70b9\u540d\u51b2\u7a81 (\u300e\u51b2\u7a81\u4e8e backend/config/settings.py\u300f); L16 \u5b9a\u4f4d\u7ed3\u8bba\u628a conflict \u8bc6\u522b\u4e3a SOT \u660e\u6587\u7684\u5e38\u89c1\u5206\u652f\u800c\u975e\u5f02\u5e38; L52-54 \u7ed9\u51fa\u673a\u68b0\u68c0\u6d4b\u9762: \u300egit status --porcelain + git diff --name-only --diff-filter=U \u2192 \u786e\u8ba4\u51b2\u7a81\u6587\u4ef6\u6e05\u5355\u300f\u300egit log --oneline --merge -- backend/config/settings.py\u300f\u300egit diff (\u5e26\u51b2\u7a81\u6807\u8bb0) \u2192 \u8bfb <<<<<<< / ======= / >>>>>>> \u4e09\u6bb5\u300f; L105 \u89c4\u5b9a\u62a5\u544a\u4e49\u52a1: workflow report \u5fc5\u542b\u51b2\u7a81\u6587\u4ef6\u6e05\u5355\u3001\u51b2\u7a81\u59ff\u52bf (rebase/merge)\u3001\u53cc\u4fa7\u610f\u56fe\u6458\u8981\u3002descriptive \u63a8\u6f14\u4f53\u88c1\u4e0b\u68c0\u6d4b+\u4e0a\u62a5\u4ee5\u300e\u89c4\u5b9a\u68c0\u6d4b\u547d\u4ee4 + \u62a5\u544a\u843d\u70b9\u300f\u7684\u5f62\u5f0f\u5b8c\u6574\u5728\u573a\u3002skill \u6e90\u7801\u4f50\u8bc1: branch-manager SKILL.md L898 \u9519\u8bef\u5904\u7406\u8868\u786e\u6709 Rebase \u51b2\u7a81\u884c, SOT standards/core/ten-step-cycle/phase-c-integration.md L272-284 \u00a7Merge Conflicts \u786e\u6709\u65e2\u5b9a\u5904\u7f6e\u7a0b\u5e8f\u3002"
+        },
+        {
+          "text": "Should identify which files have conflicts",
+          "passed": true,
+          "evidence": "response.md L52: \u300egit diff --name-only --diff-filter=U \u2192 \u786e\u8ba4\u51b2\u7a81\u6587\u4ef6\u6e05\u5355\u3002\u672c\u573a\u666f = backend/config/settings.py \u5355\u6587\u4ef6; \u82e5\u5b9e\u9645\u6e05\u5355\u66f4\u957f, \u4ee5\u5b9e\u6d4b\u4e3a\u51c6\u9010\u6587\u4ef6\u5904\u7406\u300f; L53 \u5bf9\u8be5\u6587\u4ef6\u8dd1 git log --merge \u770b\u4e24\u4fa7\u6539\u52a8; L105 workflow report \u5fc5\u542b\u300e\u51b2\u7a81\u6587\u4ef6\u6e05\u5355 (backend/config/settings.py)\u300f\u3002\u65e2\u70b9\u540d\u4e86\u672c\u573a\u666f\u7684\u51b2\u7a81\u6587\u4ef6, \u53c8\u7ed9\u51fa\u4e86\u4e0d\u4f9d\u8d56\u9898\u9762\u7684\u673a\u68b0\u679a\u4e3e\u547d\u4ee4\u4e0e\u591a\u6587\u4ef6\u515c\u5e95, \u975e paralysis \u4e8e\u9898\u9762\u590d\u8ff0\u3002"
+        },
+        {
+          "text": "Should guide the developer through conflict resolution",
+          "passed": true,
+          "evidence": "response.md \u00a72 (L48-85) \u662f\u9010\u6761\u5f15\u5bfc\u7a0b\u5e8f: 2.1 \u53ea\u8bfb\u4fa6\u5bdf + \u7981\u6b62\u52a8\u4f5c (\u88f8 force / reset --hard / -X ours|theirs \u76f2\u9009\u8fb9); 2.2 \u8bed\u4e49\u89e3\u51b3 = \u53cc\u4fa7\u610f\u56fe\u5e76\u96c6 + Rule #7 secret \u4e0d\u56de\u663e + python \u5bfc\u5165\u5192\u70df\u9a8c\u8bc1; 2.3 git add \u2192 rebase --continue / merge --continue (\u59ff\u52bf\u5224\u522b\u89c1 L39-42, ours/theirs \u8bed\u4e49\u5728 rebase \u4e0e merge \u4e0b\u76f8\u53cd); 2.4 \u51b2\u7a81\u89e3\u51b3\u91cd\u5f00 B.2 \u9a8c\u8bc1\u4e49\u52a1; 2.5 \u5931\u8d25\u56de\u9000 git rebase --abort / merge --abort; 2.6 rebase \u540e --force-with-lease \u63a8\u9001\u3002\u00a75 (L113-124) \u4e00\u5c4f\u5904\u7f6e\u6e05\u5355\u3002\u6e90\u7801\u590d\u6838: branch-manager SKILL.md L510 \u786e\u5b9e\u660e\u6587\u300erebase \u540e\u9700\u8981: git push --force-with-lease\u300f, L898 \u51b2\u7a81\u5904\u7f6e\u884c\u4e0e L909\u300e\u5982\u679c rebase \u51fa\u9519\uff0c\u4e2d\u6b62\u300f\u4e0e response \u5f15\u6587\u4e00\u81f4, \u5f15\u7528\u65e0\u5931\u771f\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 203.5,
+        "tokens": 94613,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+          "passed": true,
+          "evidence": "response.md L64 \u786e\u5b9a ENFORCED_REMOTES={origin, github}; L100-105 (\u00a75c) \u5bf9\u6bcf\u4e2a REMOTE \u8c03\u7528 `bash aria/skills/git-remote-helper/scripts/push_all_remotes.sh --repo=/home/dev/Aria/aria --branch=master --remotes=<REMOTE>`; L233-247 (\u00a79) JSON \u8986\u76d6\u4e24 remote\u3002\u4e0e SKILL.md:628-631 \u6b65\u9aa4 4a/4c \u4e00\u81f4 (per-REMOTE \u8c03\u7528, \u4e24\u4e2a enforced remote \u5747\u8986\u76d6) \u2014 \u65ad\u8a00\u7684\u5b57\u9762\u5355\u8c03\u7528\u8bfb\u6cd5\u53cd\u800c\u4e0e\u65ad\u8a00 3 \u7684 per-remote \u77e9\u9635\u51b2\u7a81, \u6309 skill \u6743\u5a01\u6d41\u7a0b\u5224 PASS"
+        },
+        {
+          "text": "Should snapshot expected_sha = local HEAD before any push",
+          "passed": true,
+          "evidence": "response.md L42 `expected_sha=$(git -C /home/dev/Aria/aria rev-parse HEAD)`, L45 \u300c\u53d6\u5408\u5e76\u540e\u672c\u5730 master HEAD\u2026\u4f5c\u4e3a\u540e\u7eed\u6240\u6709 post-push \u9a8c\u8bc1\u7684\u552f\u4e00\u671f\u671b\u503c\u300d; \u8be5 Step 1 (\u00a72) \u4f4d\u4e8e Step 4 \u63a8\u9001 (\u00a75) \u4e4b\u524d\u3002\u4e0e SKILL.md:625 \u6b65\u9aa4 1 \u9010\u5b57\u5bf9\u5e94"
+        },
+        {
+          "text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+          "passed": true,
+          "evidence": "response.md L68 \u300c\u5bf9\u6bcf\u4e2a REMOTE \u2208 {origin, github} \u72ec\u7acb\u6267\u884c a\u2192e\u300d; \u00a75a (L70-92) \u5148\u63a8\u5b50\u6a21\u5757, \u00a75c (L100-105) \u300c\u5b50\u6a21\u5757\u5168\u90e8\u6210\u529f \u2192 \u4e3b\u4ed3 (aria) \u63a8\u9001\u300d, \u00a75b \u7ed9\u51fa gitlink \u987a\u5e8f\u4e0d\u53d8\u91cf\u7406\u7531\u3002\u4e0e SKILL.md:628-631 Per-Remote Matrix Gating 4a\u21924c \u4e00\u81f4"
+        },
+        {
+          "text": "Should call verify_parity_post_push with expected_sha after main repo push",
+          "passed": true,
+          "evidence": "response.md \u00a75d (L111-115) \u4e3b\u4ed3\u63a8\u9001\u6210\u529f\u540e\u8c03\u7528 `python3 aria/skills/git-remote-helper/scripts/verify_post_push.py --repo=/home/dev/Aria/aria --branch=master --expected-sha=<expected_sha> --remotes=<REMOTE>`\u3002verify_post_push.py \u5373 api.md:186 \u7684 verify_parity_post_push API; \u6e90\u7801\u6838\u5bf9 --expected-sha \u8bed\u4e49/retry/\u9000\u51fa\u7801\u5747\u4e0e response L116-123 \u63cf\u8ff0\u543b\u5408 (verify_post_push.py:40-58, 238)"
+        },
+        {
+          "text": "Should NOT rely on 'Everything up-to-date' as success signal \u2014 require SHA comparison",
+          "passed": true,
+          "evidence": "response.md L85-89 \u300c\u4e25\u683c success \u5224\u5b9a (\u4e0d\u4fe1\u6587\u672c\u56de\u6267): success = (exit_code == 0) AND (post_remote_head == pre_local_head)\u300d; L91 \u300c\u4e0d\u89e3\u6790 Everything up-to-date \u6587\u672c \u2014 \u5df2\u540c\u6b65 no-op \u573a\u666f\u7ecf SHA \u6bd4\u8f83\u81ea\u7136\u901a\u8fc7\u300d\u3002\u6e90\u7801\u4f50\u8bc1: push_all_remotes.sh:114-127 (\u6ce8\u91ca 'We do NOT parse the message text')"
+        },
+        {
+          "text": "Should block when any remote fails (fail_on_partial_push: true default)",
+          "passed": true,
+          "evidence": "response.md \u00a76.1 \u51b3\u7b56\u8868 L140 \u300cfail_on_partial_push: true (\u9ed8\u8ba4) + \u975e read_only | \u963b\u65ad, \u8f93\u51fa\u4fee\u590d\u547d\u4ee4\u300d; \u00a77 L195-197 \u90e8\u5206\u5931\u8d25\u4f8b (github SUB \u274c \u2192 \u963b\u65ad)\u3002\u4e0e SKILL.md:642 \u4e00\u81f4"
+        },
+        {
+          "text": "Should handle read_only_remotes exception: push failure \u2192 warning downgrade, not block",
+          "passed": true,
+          "evidence": "response.md \u00a76.1 \u51b3\u7b56\u8868\u9996\u884c L138 \u300cremote \u2208 read_only_remotes | warning \u964d\u7ea7, \u7ee7\u7eed (\u6700\u9ad8\u4f18\u5148\u7ea7)\u300d\u3002\u4e0e SKILL.md:640 \u9010\u5b57\u4e00\u81f4"
+        },
+        {
+          "text": "Should output per-remote status report for all enforced remotes",
+          "passed": true,
+          "evidence": "response.md \u00a77 (L186-198) per-remote \u5168\u666f\u77e9\u9635 (origin/github \u5404\u81ea SUB/aria/verify \u72b6\u6001); \u00a79 (L233-247) verify JSON results \u6570\u7ec4\u542b origin \u4e0e github \u4e24\u6761\u76ee (remote/match/attempts/total_seconds), push JSON \u540c\u6784 (L214-231)\u3002descriptive \u4f53\u88c1\u4e0b\u4ea7\u51fa\u5951\u7ea6\u5373\u4e3a output \u89c4\u683c\u63cf\u8ff0"
+        },
+        {
+          "text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X",
+          "passed": true,
+          "evidence": "response.md \u00a75b L96 \u300c\u4efb\u4e00\u5b50\u6a21\u5757\u5bf9 REMOTE \u63a8\u9001 success=false \u2192 \u2026\u5224\u963b\u65ad\u65f6, \u8df3\u8fc7\u672c REMOTE \u7684\u4e3b\u4ed3 (aria) \u63a8\u9001\u300d, L98 \u7ed9\u51fa gitlink \u65ad\u94fe\u7406\u7531; \u00a77 L197 \u5b9e\u4f8b \u300cgithub: SUB \u274c \u2192 \u8df3\u8fc7 aria \u7684 github \u63a8\u9001\u300d\u3002\u4e0e SKILL.md:630 \u6b65\u9aa4 4b \u4e00\u81f4"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 175.3,
+        "tokens": 84923,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Commit message must start with conventional type (feat/fix/refactor/test)",
+          "passed": true,
+          "evidence": "response.md L50 (\u00a74 \u6700\u7ec8\u4ea7\u7269) \u4e0e L91 (\u00a76 \u547d\u4ee4\u5f62\u5f0f) \u7684 commit subject \u5747\u4e3a `feat(auth): \u6dfb\u52a0 GitHub OAuth2 \u793e\u4ea4\u767b\u5f55`, \u4ee5\u5217\u8868\u5185\u7c7b\u578b `feat` \u5f00\u5934; L42 \u7ed9\u51fa\u5224\u5b9a\u4f9d\u636e (\u4e09\u6587\u4ef6\u5171\u540c\u5b9e\u73b0\u65b0\u529f\u80fd oauth2-social-login, \u5168\u90e8\u4e3a\u65b0\u589e A, \u7eaf\u589e\u91cf \u2192 feat)\u3002\u7c7b\u578b\u9009\u62e9\u5bf9\u573a\u666f\u6b63\u786e\u3002"
+        },
+        {
+          "text": "Commit should include a scope in parentheses",
+          "passed": true,
+          "evidence": "response.md L50: `feat(auth)` \u542b\u62ec\u53f7 scope; L44 \u7ed9\u51fa scope \u5224\u5b9a\u7406\u7531: \u4e09\u6587\u4ef6\u6a2a\u8de8 api/auth/\u3001models/\u3001tests/ \u4e09\u5c42\u4f46\u4e1a\u52a1\u57df\u552f\u4e00 (\u8ba4\u8bc1/OAuth \u8d26\u53f7\u5173\u8054), scope \u53d6\u4e1a\u52a1\u57df\u4f18\u4e8e\u53d6\u76ee\u5f55\u5c42, \u5e76\u4e0e commit-msg-generator SKILL \u793a\u4f8b\u540c\u6784 (\u5feb\u7167 skills/commit-msg-generator/SKILL.md L82 `feat(auth): \u6dfb\u52a0JWT\u8ba4\u8bc1` \u5c5e\u5b9e)\u3002scope \u9009\u62e9\u6709\u636e\u4e14\u5f62\u5f0f\u6b63\u786e\u3002"
+        },
+        {
+          "text": "Commit body or footer should reference the OpenSpec",
+          "passed": false,
+          "evidence": "FAIL\u3002\u6700\u7ec8 commit message (response.md L49-55, \u00a76 L89-96 \u547d\u4ee4\u5f62\u5f0f\u5b8c\u6574\u91cd\u5199) \u7684 body \u4ec5\u4e09\u6761\u63cf\u8ff0\u6587\u4ef6\u7684 bullet, footer \u6574\u4f53\u7f3a\u5931 \u2014 L61 \u660e\u793a: \"\u672c\u4efb\u52a1\u8f93\u5165\u672a\u63d0\u4f9b\u5173\u8054 issue \u7f16\u53f7\u6216 OpenSpec change_id, \u4e0d\u865a\u6784 \u2192 \u7701\u7565\"\u3002\u65ad\u8a00\u8981\u6c42 commit \u7684 body \u6216 footer \u5f15\u7528 OpenSpec, \u5b9e\u9645\u4ea4\u4ed8\u7684 commit message \u4e24\u5904\u5747\u65e0 (L61 \u7684 \"\u5b9e\u9645\u6267\u884c\u65f6\u4f1a\u4ee5 Refs <change_id> \u5173\u8054\" \u662f\u5916\u56f4 prose \u8ba8\u8bba, \u4e0d\u5728 commit message \u5185)\u3002\u4efb\u52a1\u8f93\u5165\u7ed9\u4e86 Feature: oauth2-social-login, \u53ef\u4f5c change \u5f15\u7528\u800c\u672a\u7528\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 236.6,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should detect and report the merge conflict",
+          "passed": true,
+          "evidence": "response.md L1 \u6807\u9898\u5373\u5b9a\u6027\u51b2\u7a81\u573a\u666f ('Phase C C.2 merge \u51b2\u7a81\u5904\u7f6e \u2014 feature/oauth2-social-login \u2192 main, \u51b2\u7a81\u6587\u4ef6 backend/config/settings.py'); \u00a71 (L5-10) \u7ed9\u51fa\u6839\u56e0\u7c7b\u522b ('\u786e\u5b9a\u6027\u3001\u53ef\u6062\u590d\u7684\u96c6\u6210\u5931\u8d25... main \u53c8\u524d\u8fdb\u4e86... \u4e0d\u662f gate \u5931\u8d25'); Step 0 (L14-31) \u89c4\u5b9a\u68c0\u6d4b\u9762 \u2014 L19 'git status --porcelain # \u786e\u8ba4 both-modified \u53ea\u6709 backend/config/settings.py' + L20 'git log --merge' \u53d6\u4e24\u4fa7\u610f\u56fe, L31 \u89c4\u5b9a\u62a5\u544a\u5185\u5bb9 ('\u51b2\u7a81\u6587\u4ef6\u4e0e hunk \u6570\u3001\u4e24\u4fa7\u610f\u56fe\u5404\u662f\u4ec0\u4e48...\u5904\u7f6e\u8ba1\u5212...\u9884\u8ba1\u5f71\u54cd'); \u00a75 (L120) \u8fdb\u4e00\u6b65\u62a5\u544a\u6267\u884c\u72b6\u6001\u5f71\u54cd ('success \u7ef4\u6301 false, steps_executed \u4e2d C.2 \u672a\u5b8c\u6210... \u6574\u6761\u4e0b\u6e38\u6682\u505c')\u3002\u68c0\u6d4b\u4e0e\u62a5\u544a\u4e24\u9762\u5747\u6709\u5b9e\u8d28\u5185\u5bb9, \u975e\u8868\u9762\u5408\u89c4\u3002"
+        },
+        {
+          "text": "Should identify which files have conflicts",
+          "passed": true,
+          "evidence": "\u51b2\u7a81\u6587\u4ef6\u88ab\u70b9\u540d\u5e76\u8d2f\u7a7f\u5168\u6587: L1 '\u51b2\u7a81\u6587\u4ef6 backend/config/settings.py'; L19-20 \u8bca\u65ad\u547d\u4ee4\u663e\u5f0f\u4ee5\u8be5\u6587\u4ef6\u4e3a\u76ee\u6807\u4e14 L19 \u8981\u6c42\u6838\u5b9e\u5b83\u662f\u552f\u4e00 both-modified ('\u786e\u8ba4 both-modified \u53ea\u6709 backend/config/settings.py'); L69 \u63d0\u4ea4 trailer 'Conflict-File: backend/config/settings.py'; L116 \u53cd\u6a21\u5f0f\u6761\u6b3e\u540c\u6837\u951a\u5b9a\u8be5\u6587\u4ef6\u3002\u6ce8: prompt \u672c\u8eab\u5df2\u7ed9\u51fa\u6587\u4ef6\u540d, \u6b64\u65ad\u8a00\u533a\u5206\u5ea6\u5f31 (\u89c1 eval_feedback)\u3002"
+        },
+        {
+          "text": "Should guide the developer through conflict resolution",
+          "passed": true,
+          "evidence": "\u00a72 (L12-100) \u7ed9\u51fa Step 0-Step 9 \u5b8c\u6574\u53ef\u8ddf\u968f\u6d41\u7a0b: \u5148\u8bca\u65ad\u4e0d\u52a8\u624b (Step 0) \u2192 \u4e0d\u5728 main \u4e0a\u89e3\u51b2\u7a81, 'git merge --abort' \u6062\u590d\u5e72\u51c0 (Step 1, L33-39) \u2192 \u56de feature \u5206\u652f merge origin/main (Step 2, L41-50, \u542b merge vs rebase \u53d6\u820d) \u2192 \u8bed\u4e49\u89e3\u51b2\u7a81\u4e13\u9879\u6307\u5f15 (Step 3, L52-57: \u76ee\u6807\u6001=\u4e24\u4fa7\u610f\u56fe\u5e76\u96c6, \u7981\u6b62 '-X ours/-X theirs', \u9010 hunk, \u540c key \u4e0d\u517c\u5bb9\u8f6c\u5347\u7ea7) \u2192 \u5408\u5e76\u7ed3\u679c\u9a8c\u8bc1 (Step 4) \u2192 Conventional Commit \u6a21\u677f (Step 5, L65-70) \u2192 \u4ec5\u63a8 origin (Step 6) \u2192 \u5168\u94fe\u91cd\u8fc7\u95f8 (Step 7, L78-88) \u2192 merge \u4e0e C.2.5/C.2.6 \u540e\u7eed\u94fe (Step 8) \u2192 \u8bb0\u5f55\u4e0e handoff (Step 9)\u3002\u00a73 (L102-106) \u8865\u5347\u7ea7\u6761\u4ef6 (\u540c key \u4e0d\u517c\u5bb9\u503c \u2192 owner \u88c1\u5b9a + OpenSpec), \u00a74 (L108-116) \u7ed9 7 \u6761 anti-pattern\u3002\u6307\u5bfc\u5b8c\u6574\u4e14\u542b\u53d6\u820d\u5224\u636e, \u975e\u6a21\u677f\u5957\u8bdd\u3002"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 347.6,
+        "tokens": 12277,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Should call git-remote-helper.push_all_remotes with main_repo, branch, [origin, github]",
+          "passed": true,
+          "evidence": "response.md L70 \u786e\u5b9a ENFORCED_REMOTES = {origin, github}; L91-96 (\u6b65\u9aa4 4c) \u4e3b\u4ed3\u817f\u8c03\u7528 `bash aria/skills/git-remote-helper/scripts/push_all_remotes.sh --repo=/home/dev/Aria/aria --branch=master --remotes=<REMOTE>`, \u914d\u5408 L48-56 \u6d41\u7a0b\u56fe\u5bf9 origin \u4e0e github \u5404\u8dd1\u4e00\u817f\u3002\u8fd9\u662f SKILL.md L617-619 \u89c4\u5b9a\u7684 per-remote \u5355 remote \u767d\u540d\u5355\u5f62\u6001 (helper.push_all_remotes(main_repo, branch, [REMOTE])), \u4e24\u817f\u5e76\u96c6\u5373 [origin, github], \u7b26\u5408\u65ad\u8a00\u5b9e\u8d28\u3002\u5b50\u6a21\u5757\u817f\u540c\u6b3e\u8c03\u7528\u89c1 L77-79\u3002"
+        },
+        {
+          "text": "Should snapshot expected_sha = local HEAD before any push",
+          "passed": true,
+          "evidence": "response.md L58-62: '**\u6b65\u9aa4 1 \u2014 \u5feb\u7167\u671f\u671b SHA** (\u5fc5\u987b\u5728\u4efb\u4f55 push \u4e4b\u524d\u53d6, \u4e4b\u540e\u6240\u6709\u6bd4\u8f83\u90fd\u7528\u8fd9\u4e2a\u51bb\u7ed3\u503c): expected_sha=$(git -C /home/dev/Aria/aria rev-parse HEAD)', \u4e14\u6d41\u7a0b\u56fe L49 \u663e\u793a\u5feb\u7167\u5148\u4e8e\u4e00\u5207\u679a\u4e3e/\u63a8\u9001\u3002\u4e0e SKILL.md L613 \u6d41\u7a0b\u7b2c 1 \u6b65\u4e00\u81f4\u3002"
+        },
+        {
+          "text": "Should apply Per-Remote Matrix Gating: per REMOTE, push submodules first then main",
+          "passed": true,
+          "evidence": "response.md L72 (\u6b65\u9aa4 4 \u6807\u9898): 'Per-Remote Matrix Gating (\u5bf9\u6bcf\u4e2a REMOTE \u2208 {origin, github} \u5404\u8dd1\u4e00\u817f; ...\u540c\u4e00\u817f\u5185\u5fc5\u987b\u5b50\u6a21\u5757\u5148\u4e8e\u4e3b\u4ed3 \u2014\u2014 \u4e3b\u4ed3 gitlink \u82e5\u5148\u63a8...clone --recursive \u5373\u65ad\u94fe'), a=\u5148\u63a8\u5b50\u6a21\u5757 (L74-79), b=\u5b50\u6a21\u5757\u5931\u8d25\u963b\u65ad\u5219\u8df3\u8fc7\u4e3b\u4ed3 (L89), c=\u5b50\u6a21\u5757\u5168\u6210\u529f\u624d\u63a8\u4e3b\u4ed3 (L91-96)\u3002\u4e0e SKILL.md L616-619 \u7684 a/b/c \u7ed3\u6784\u9010\u6761\u5bf9\u5e94\u3002"
+        },
+        {
+          "text": "Should call verify_parity_post_push with expected_sha after main repo push",
+          "passed": true,
+          "evidence": "response.md L98-105 (\u6b65\u9aa4 4d): '\u4e3b\u4ed3\u63a8\u9001\u6210\u529f \u2192 post-push SHA \u6743\u5a01\u6838\u9a8c' \u8c03\u7528 `python3 aria/skills/git-remote-helper/scripts/verify_post_push.py --repo=/home/dev/Aria/aria --branch=master --expected-sha=<expected_sha> --remotes=<REMOTE>`\u3002verify_parity_post_push \u5373 verify_post_push.py \u7684 helper \u540d (\u811a\u672c\u5934\u6ce8\u91ca\u5f15\u7528 references/schema.md \u7684 verify_parity_post_push schema)\u3002\u65f6\u5e8f\u4e0a\u660e\u786e\u5728\u4e3b\u4ed3 push \u4e4b\u540e\u3002"
+        },
+        {
+          "text": "Should NOT rely on 'Everything up-to-date' as success signal \u2014 require SHA comparison",
+          "passed": true,
+          "evidence": "response.md L86: '\u4e25\u683c success \u5224\u5b9a (\u4e0d parse \u8f93\u51fa\u6587\u672c): success = (exit_code == 0) AND (post_remote_head == pre_local_head)\u3002\"Everything up-to-date\" \u7684 no-op \u573a\u666f\u5929\u7136\u517c\u5bb9 (\u6b64\u65f6 post == pre_local \u4ecd\u6210\u7acb)'; L112: 'push \u9000\u51fa\u7801\u4e0e\u672c\u5730 tracking ref \u90fd\u53ef\u80fd\u662f\u5047\u8c61 \u2014\u2014 \u552f\u72ec\u7acb ls-remote \u8bfb\u6570\u4f5c\u6570'\u3002\u5df2\u5bf9\u5feb\u7167\u6e90\u7801\u590d\u6838: push_all_remotes.sh L114-127 \u5b9e\u73b0\u5b8c\u5168\u4e00\u81f4 ('We do NOT parse the message text'), references/api.md L180-181 \u4ea6\u660e\u6587\u3002"
+        },
+        {
+          "text": "Should block when any remote fails (fail_on_partial_push: true default)",
+          "passed": true,
+          "evidence": "response.md L165-169 \u5931\u8d25\u4f18\u5148\u7ea7\u51b3\u7b56\u8868\u5b8c\u6574\u590d\u73b0 SKILL.md L625-630, \u4e14 L169 \u5224\u5b9a\u672c\u573a\u666f: '\u4e24 remote \u5747\u975e read_only\u3001fail_on_partial_push=true \u2192 \u4efb\u4f55\u817f\u5931\u8d25\u5373\u963b\u65ad'; \u00a75.2 L179 \u6f14\u793a\u534a\u5931\u8d25\u5f62\u6001\u7684\u7ec8\u6001: '\u6700\u7ec8 C.2.5 return failure, \u8f93\u51fa\u5931\u8d25 leg (github/SUB) + \u4fee\u590d\u547d\u4ee4'\u3002L29 \u4ea6\u6807\u51fa fail_on_partial_push=true \u4e3a\u9ed8\u8ba4\u503c\u3002"
+        },
+        {
+          "text": "Should handle read_only_remotes exception: push failure \u2192 warning downgrade, not block",
+          "passed": true,
+          "evidence": "response.md L165 (\u00a75.1 \u51b3\u7b56\u8868\u9996\u884c, \u6807\u6ce8'\u6700\u9ad8\u4f18\u5148\u7ea7'): 'remote \u2208 read_only_remotes | warning \u964d\u7ea7, \u7ee7\u7eed'\u3002\u4e0e SKILL.md L628 \u539f\u8868\u9010\u5b57\u5bf9\u5e94\u3002L36 \u540c\u65f6\u6ce8\u660e\u672c\u573a\u666f read_only_remotes \u4e3a\u7a7a (\u9ed8\u8ba4\u8def\u5f84), \u4f46\u964d\u7ea7\u89c4\u5219\u672c\u8eab\u88ab\u663e\u5f0f\u8868\u8ff0\u3002"
+        },
+        {
+          "text": "Should output per-remote status report for all enforced remotes",
+          "passed": true,
+          "evidence": "response.md \u00a74 L128-157 \u7ed9\u51fa canonical JSON: push_all_remotes \u7684 results[] \u542b per-remote \u6761\u76ee (remote/exit_code/success/pre_remote_head/post_remote_head), verify_parity_post_push \u7684 results[] L152-153 \u540c\u65f6\u8986\u76d6 origin \u4e0e github \u4e24\u4e2a enforced remote ('\u5b9e\u9645\u6309\u817f\u5404\u8c03\u4e00\u6b21, \u6b64\u5904\u5408\u5e76\u793a\u610f'); \u00a75.2 L174-175 \u534a\u5931\u8d25\u793a\u4f8b\u4ea6\u9010 remote \u62a5\u72b6\u6001 (origin \u817f\u5b8c\u6210 / github SUB \u5931\u8d25); \u6b65\u9aa4 6 L118-123 \u8981\u6c42\u963b\u65ad\u65f6\u8f93\u51fa\u5177\u4f53\u5931\u8d25 remote + \u4fee\u590d\u547d\u4ee4\u3002"
+        },
+        {
+          "text": "Should prevent main repo pushing remote X when any submodule has NOT been pushed to remote X",
+          "passed": true,
+          "evidence": "response.md L89 (\u6b65\u9aa4 4b): '\u5b50\u6a21\u5757\u817f\u4efb\u4e00\u5931\u8d25 \u2192 \u67e5 \u00a75.1 \u5931\u8d25\u4f18\u5148\u7ea7\u51b3\u7b56\u8868; \u963b\u65ad \u2192 \u8df3\u8fc7\u672c REMOTE \u7684\u4e3b\u4ed3\u63a8\u9001'; L175 (\u00a75.2): 'github: SUB \u274c (network timeout) \u2192 \u8df3\u8fc7 aria main@github; verify@github \u4e0d\u6267\u884c'\u3002L72 \u5e76\u7ed9\u51fa\u673a\u5236\u7406\u7531 (gitlink \u5148\u63a8\u4f1a\u9020\u6210 orphaned gitlink)\u3002\u4e0e SKILL.md L618 \u4e00\u81f4\u3002"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 219.4333,
+        "stddev": 23.1595,
+        "min": 203.5,
+        "max": 246.0
+      },
+      "tokens": {
+        "mean": 98461.0,
+        "stddev": 4245.2595,
+        "min": 94613,
+        "max": 103015
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.89,
+        "stddev": 0.1905,
+        "min": 0.67,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 253.1667,
+        "stddev": 87.3365,
+        "min": 175.3,
+        "max": 347.6
+      },
+      "tokens": {
+        "mean": 32400.0,
+        "stddev": 45898.5874,
+        "min": 0,
+        "max": 84923
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.11",
+      "time_seconds": "-33.7",
+      "tokens": "+66061"
+    }
+  },
+  "notes": []
+}
