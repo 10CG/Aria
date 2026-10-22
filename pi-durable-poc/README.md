@@ -95,7 +95,8 @@ Phase-2 候选。
 ### PoC-L 打包发现 (Nomad artifact 边界, 2026-10-22)
 
 1. **artifact getter 不支持 `file://`** (这版 Nomad): 改走节点本机 http.server
-   (systemd-run 起的 `aether-dist.service`, PoC 边界)
+   (`aether-dist.service` — 2026-10-22 收编为永久 systemd unit, enabled, 重启存活;
+   内容仍手工 scp staging)
 2. **tar 解包有 4096 文件上限** — Node 官方 tarball 5866 个文件直接超限。裁掉
    `lib/node_modules/{npm,corepack}` + share + include → **11 个文件** 28MB,
    `node --version` 及全部运行不受影响 (运行时不需要 npm)
@@ -112,7 +113,8 @@ Phase-2 候选。
 压缩格式/运行时裁剪都要自己管 — 这正是 docker 在重节点替我们扛掉的复杂度。分发通道
 (file:// 不支持 → 本机 http.server) 是生产化前最大缺口, 见下。
 
-**PoC-L 局限**: artifact 走 light-4 本机 http.server (systemd-run, PoC 边界; 这版 Nomad getter 不支持 file://) — 生产化
+**PoC-L 局限**: artifact 走 light-4 本机 http.server (永久 systemd unit `aether-dist.service`,
+2026-10-22 收编, enabled 重启存活; 内容仍手工 scp staging; 这版 Nomad getter 不支持 file://) — 生产化
 分发候选是 Forgejo generic packages (内网 HTTP) + artifact `header` 带 package-read
 token (token 不落 job spec 明文的问题要单独解, e.g. agent 侧 mirror)。
 

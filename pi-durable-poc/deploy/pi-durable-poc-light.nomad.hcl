@@ -7,7 +7,9 @@
 #   - 依赖: npm ci (91 包, 无 photon) 打的 bundle, 同走 artifact
 #   - 存储: NOMAD_ALLOC_DIR/data, 同 heavy 版 (锐边 6 教训)
 #
-# PoC 边界 (诚实): artifact 走 file:// 本机 staging (/opt/aether-dist, 手工 scp) —
+# PoC 边界 (诚实): artifact 走本机 aether-dist http.server (light-4 永久 systemd
+# unit /etc/systemd/system/aether-dist.service, enabled — 2026-10-22 收编, 重启存活;
+# 内容仍手工 scp staging; 这版 Nomad getter 不支持 file://) —
 # 生产化候选是 Forgejo generic packages + artifact header 带 package-read token,
 # 见 README「PoC-L 局限」。
 #
