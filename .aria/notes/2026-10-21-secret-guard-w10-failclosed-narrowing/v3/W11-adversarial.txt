@@ -1,0 +1,38 @@
+# 2026-10-22T05:57:43Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | baseline sha256 e83c5e30f2cc | load 2.43 3.59 3.65
+# matrix.sh: one e2e call per input, bash 5, no project extension (CLAUDE_PROJECT_DIR unset)
+## base
+apply-heavy            rc=2   wall=  0.37s oversize(the command is longer than )
+apply-heavy-seg        rc=2   wall=  0.41s oversize(the command is longer than )
+apply-heavy-cjk        rc=2   wall=  2.02s oversize(the command is longer than )
+shrink                 rc=2   wall=  0.10s oversize(the command is longer than )
+segfinding             rc=2   wall=  0.71s oversize(a command segment is longer t)
+f5like                 rc=2   wall=  0.77s oversize(a command segment is longer t)
+km-ext                 rc=2   wall=  0.16s oversize(the command is longer than )
+## v3
+apply-heavy            rc=0   wall=  1.41s -
+apply-heavy-seg        rc=0   wall=  1.41s -
+apply-heavy-cjk        rc=2   wall=  3.04s oversize(the command is longer than )
+shrink                 rc=0   wall=  0.15s -
+segfinding             rc=2   wall=  1.22s finding
+f5like                 rc=2   wall=  3.03s oversize(a command segment is longer t)
+km-ext                 rc=0   wall=  0.24s -
+# extension project (CLAUDE_PROJECT_DIR=<dir with .aria/secret-guard.paths listing the read path>)
+## base
+km-ext                 rc=2   wall=  0.16s oversize(the command is longer than )
+km-ext-small           rc=2   wall=  0.11s ext-finding
+## v3
+km-ext                 rc=2   wall=  0.16s oversize(the command is longer than )
+km-ext-small           rc=2   wall=  0.10s ext-finding
+# suite shapes (probe21.sh)
+## base
+21ab#1   rc=2 oversize:a command segment is longer than 8192 characters       0.88s len=4206
+21ab#2   rc=2 oversize:a command segment is longer than 8192 characters       3.52s len=9012
+21ab#3   rc=2 oversize:a command segment is longer than 8192 characters       2.51s len=9012
+21ac#3   rc=2 oversize:the command is longer than 8192 characters after       0.26s len=4124
+21al#2   rc=2 oversize:the command is longer than 8192 characters after       0.08s len=4216
+## v3
+21ab#1   rc=2 longline                                                        0.71s len=4206
+21ab#2   rc=0 -                                                               2.39s len=9012
+21ab#3   rc=0 -                                                               2.67s len=9012
+21ac#3   rc=2 longline                                                        0.32s len=4124
+21al#2   rc=2 longline                                                        0.13s len=4216

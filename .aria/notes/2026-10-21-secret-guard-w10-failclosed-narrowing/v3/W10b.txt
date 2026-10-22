@@ -1,0 +1,12 @@
+# 2026-10-22T06:07:01Z | bash 5.2.15(1)-release | load 1.33 2.24 2.96
+## P6 fallback = baseline (stderr sha256), inputs that fall back on v3 under the deadline
+apply-heavy-cjk  run 1 base=c0116bf36fe14823 v3=c0116bf36fe14823 IDENTICAL
+apply-heavy-cjk  run 2 base=c0116bf36fe14823 v3=c0116bf36fe14823 IDENTICAL
+f5like           run 1 base=ef8754e3e64e085e v3=ef8754e3e64e085e IDENTICAL
+f5like           run 2 base=ef8754e3e64e085e v3=ef8754e3e64e085e IDENTICAL
+## P10 rows-only path (direct call of _sg_judge_one ... nocredit on a single line of about 9000 characters)
+extracted: risky_patterns=149 rows, function _sg_judge_one, function _sg_redact_echo
+environ single-key read, long line, nocredit: rc=0 (want 0)
+  first line: [secret-guard] BLOCKED: command reads a secret-bearing source, and after variabl
+credential-path read, long line, nocredit: rc=2 (want 2)
+same read, normal path: rc=2 (want 2)

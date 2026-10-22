@@ -1,0 +1,8 @@
+# 2026-10-22T06:04:09Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | load 2.76 2.86 3.26
+## second replay of the 138 W1 commands, v3 prototype, bash 5
+  outcome allow      137
+  outcome oversize   1
+  allow wall (s): n=137 p50=0.54 p90=1.05 p99=1.51 max=1.60
+## commands whose outcome differs between the two replays (W12-replay-138.tsv vs W12b-replay-138.tsv)
+  differing: 0
+# end 2026-10-22T06:05:44Z | load 2.21 2.63 3.14

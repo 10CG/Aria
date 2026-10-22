@@ -1,0 +1,19 @@
+# 2026-10-22T05:57:38Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | baseline sha256 e83c5e30f2cc | load 2.64 3.65 3.67
+# v3unit.sh: relaxed rerun with a stubbed judgement, deadline 1 s
+PASS S1-allow                   rc=0 (want 0) wall=0.00s (max 0.3) stderr=''
+PASS S2-block                   rc=2 (want 2) wall=0.00s (max 0.3) stderr=BLOCK\ TEXT
+PASS S3-block-no-text           rc=4 (want 4) wall=0.00s (max 0.3) stderr=''
+PASS S4-slow-judge              rc=4 (want 4) wall=1.00s (max 1.3) stderr=''
+PASS S5-pipe-holder             rc=4 (want 4) wall=1.00s (max 1.3) stderr=''
+PASS S6-spoof-tail-0            rc=4 (want 4) wall=1.00s (max 1.3) stderr=''
+PASS S7-time-checkpoint         rc=4 (want 4) wall=0.00s (max 0.3) stderr=''
+PASS S8-internal-error          rc=4 (want 4) wall=0.00s (max 0.3) stderr=''
+PASS G1-gate-open (linux, time left, no extension)
+PASS G2-darwin: no relaxation
+PASS G3-msys: no relaxation
+PASS G4-extension: no relaxation
+PASS G5-nested: no relaxation
+PASS G6-no-time-left: no relaxation
+PASS G7-no-anchor: no relaxation
+PASS G8-budget-0: no relaxation
+# leftover stub processes (exact name match): 0

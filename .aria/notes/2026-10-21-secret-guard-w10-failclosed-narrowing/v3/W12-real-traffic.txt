@@ -1,0 +1,12 @@
+# 2026-10-22T05:58:13Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | load 2.40 3.47 3.61
+## 1. the W10 size-blocked class (W1: 138 commands; the baseline blocks all of them for size), v3 prototype, bash 5
+  outcome allow      137
+  outcome oversize   1
+    137   W1 class size   -> allow
+      1   W1 class value  -> oversize
+  allow wall (s): n=137 p50=0.53 p90=1.07 p99=1.55 max=1.80
+## 2. outside the class: rc + sha256(stderr) of base vs v3 on 300 sampled commands (baseline allow/finding under 1 s; list: ident-300.lst), bash 5
+identical=300 different=0
+## 3. bash 3.2 (no EPOCHREALTIME -> no relaxation): base vs v3 on 40 sampled W1 commands (list: w1-sample40.lst)
+identical=40 different=0
+# 2026-10-22T06:03:18Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | load 2.47 2.77 3.26
