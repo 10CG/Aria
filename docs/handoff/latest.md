@@ -1,7 +1,8 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-10-21-session-close-238-full-cycle-issue-groomer-v1.77.0.md](./2026-10-21-session-close-238-full-cycle-issue-groomer-v1.77.0.md)
+**Latest**: [2026-10-22-cycle-done-v1.77.1-dual-track-231-233.md](./2026-10-22-cycle-done-v1.77.1-dual-track-231-233.md)
+**Superseded (前一 Latest · 238 会话收尾)**: [2026-10-21-session-close-238-full-cycle-issue-groomer-v1.77.0.md](./2026-10-21-session-close-238-full-cycle-issue-groomer-v1.77.0.md)
 **Superseded (本轨周期收尾)**: [2026-10-21-238-cycle-done-issue-groomer-v1.77.0-shipped.md](./2026-10-21-238-cycle-done-issue-groomer-v1.77.0-shipped.md)
 **Superseded (前一 Latest · 199 会话收尾)**: [2026-10-17-session-close-199-v1.76.0-full-cycle-shipped.md](./2026-10-17-session-close-199-v1.76.0-full-cycle-shipped.md)
 **Superseded (本轨周期收尾)**: [2026-10-17-199-cycle-done-pre-merge-completeness-gate-v1.76.0-archived.md](./2026-10-17-199-cycle-done-pre-merge-completeness-gate-v1.76.0-archived.md)
