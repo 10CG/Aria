@@ -48,6 +48,8 @@ job "poc-soak-review-reminder" {
         data        = <<EOH
 {{- with nomadVar "nomad/jobs/aria-orchestrator" }}
 ARIA_FEISHU_WEBHOOK_URL={{ .ARIA_FEISHU_WEBHOOK_URL }}
+docker_auth_user={{ .docker_auth_user }}
+docker_auth_password={{ .docker_auth_password }}
 {{- end }}
 EOH
       }
