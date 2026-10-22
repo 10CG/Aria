@@ -71,7 +71,9 @@ ssh root@192.168.69.81 "docker ps --filter name=pi-durable --format '{{.ID}}' | 
 耐久语义三承诺 (checkpoint 续跑 / durable timer / task 身份稳定) 在 Nomad docker
 task + SIGKILL 下全部成立, 判据 A1-A6 全绿。生产化前要消化: 锐边 1/2 (静默 fault)、
 锐边 4 (graceful stop 语义)、锐边 6 的 reschedule 边界。**验证的是耐久执行模型,
-不是 cost-sentinel 的业务逻辑** — 真实接入 (Forgejo API 用量采集) 是下一步评估。
+不是 cost-sentinel 的业务逻辑** — 真实业务是 M6 cost snapshot (Zhipu 30d 阈值告警 +
+Luxeno 量下限 + 飞书卡片, 见 aria-layer1-cost-sentinel.nomad.hcl 头注), 接入是
+Phase-2 候选。
 
 ## PoC-L — 轻节点可行性 (exec driver, 零 Docker) (added 2026-10-22)
 
