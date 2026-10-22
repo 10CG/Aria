@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "must: disposition:\\s*保持不动|disposition:\\s*untouched",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: 7d|SWEEP_TTL_CROSS|168",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

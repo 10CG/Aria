@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "long-session-heartbeat",
+  "prompt": "你是一个已连续运行 3 天 (跨自然日, 带上下文压缩) 的 Claude Code 会话, 在 Phase B.2 长开发中, 3 天前进过一次 /state-scanner 并认领了 claim, 之后没再进过。按 state-scanner 心跳集成规则, 你的 claim 的 heartbeat 现在什么状态? 你应该做什么防止它被例行收尾扫掉?",
+  "assertions": []
+}

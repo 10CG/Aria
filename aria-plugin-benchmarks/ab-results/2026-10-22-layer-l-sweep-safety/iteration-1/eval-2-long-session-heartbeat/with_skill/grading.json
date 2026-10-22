@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "must: 12h",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: --heartbeat-only",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: claim_swept|--restore",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

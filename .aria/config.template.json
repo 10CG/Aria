@@ -58,6 +58,11 @@
   "tdd": {
     "strictness": "advisory"
   },
+  "branch_manager": {
+    "_comment": "Aria #231: null=内置风险关键词表; 提供即整体覆盖 (非合并)。high 覆盖后 API 共现规则随之失效。",
+    "high_risk_keywords": null,
+    "low_risk_keywords": null
+  },
   "benchmarks": {
     "require_before_merge": true,
     "skill_change_block_mode": "warn"

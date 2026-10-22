@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {
+      "text": "must match: risk_level:\\s*low",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must match: mode:\\s*Branch",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}

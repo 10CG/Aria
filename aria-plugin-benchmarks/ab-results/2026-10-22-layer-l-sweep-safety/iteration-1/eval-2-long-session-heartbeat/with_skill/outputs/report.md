@@ -1,0 +1,3 @@
+heartbeat_state: 心跳冻结约 72h, 已越过本容器 24h 阈 (SWEEP_TTL) — 本容器下一次例行收尾一跑即被扫; 72h < 7d 仍在其他容器保守层 (SWEEP_TTL_CROSS) 保护内。依据 state-scanner「Layer L A.1 heartbeat 集成」: 心跳只在 /state-scanner 入口与 phase1_gate 调用刷新 (Aria #233), 两处 3 天未触发 ⇒ 冻结点 = 3 天前 acquire。claim 大概率仍 active 但判定不靠猜: 下一次 heartbeat 返回 error=claim_swept (+swept_by/swept_at, 非 benign) 即证实被扫; claim_not_found 才是 benign。
+action: 立即补一次心跳, 之后 ≤12h 间隔周期刷直到 B/C 结束 (「长会话义务 (Aria #233)」明文; 12h 在 24h 自身 TTL 内留双次余量): phase1_gate --heartbeat-only --raw-track-id <同串> --phase A.1 --repo-path <root>。看返回: claim_swept 且本轨仍干活 → 先 release_gate --raw-track-id <同串> --restore (仅本容器可恢复, 结构性防伪) 再继续周期刷。fail-soft: 失败只记遥测不阻断 B.2; 拿不到 carry-id 照样调记 skipped_no_track。收尾走 D.2b 正常释放 (看 push_success 非仅 exit code)。
+(注: 子代理 Write 被 harness 拒, 内容由主控从其最终回复落盘)

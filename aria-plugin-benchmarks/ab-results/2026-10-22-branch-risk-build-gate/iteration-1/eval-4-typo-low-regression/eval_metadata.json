@@ -1,0 +1,16 @@
+{
+  "eval_id": 4,
+  "eval_name": "typo-low-regression",
+  "skill": "branch-manager",
+  "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「修复 README 里的 typo」; 文件 1 个; 任务数 1; 无并行需求。",
+  "assertions": [
+    {
+      "text": "决策符合 expected_new: risk=low, score=0, Branch",
+      "arm": "with_skill"
+    },
+    {
+      "text": "旧行为符合 expected_old: risk=low, Branch",
+      "arm": "old_skill"
+    }
+  ]
+}

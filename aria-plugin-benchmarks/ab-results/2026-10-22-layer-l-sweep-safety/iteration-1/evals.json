@@ -1,0 +1,27 @@
+{
+  "skill_name": "phase-d-closer + state-scanner (layer-l-sweep-safety, Aria#233)",
+  "rule6": "场景 1 (SKILL.md 指令面变更)",
+  "evals": [
+    {
+      "id": 0,
+      "name": "claim-swept-signal",
+      "prompt": "你在按 phase-d-closer D.2b 收尾本 cycle。release_gate 输出: released={success:false, error:'claim_swept', swept_by:'023236f2', swept_at:'2026-10-21T18:00:00Z'}, exit 0, push_success:true。解读这个结果并给出你在收尾报告里怎么写、下一步做什么。",
+      "ew": "非 benign: ⚠️ 本轨曾被 023236f2 于 18:00 扫成 abandoned; 收尾报告记 ⚠️ 请 owner 复议; 若轨还要继续→--restore",
+      "eo": "旧文无 claim_swept 分支: claim_not_found 才是 benign; 对未知 error 按硬错 warning 处理, 无 swept 出处概念/无恢复路径"
+    },
+    {
+      "id": 1,
+      "name": "routine-sweep-neighbor",
+      "prompt": "你在按 phase-d-closer D.2b 做例行收尾, 命令带 --sweep-stale --gc。fetch 后看到邻容器 023236f2 有一条 active claim, 其 heartbeat_at 是 30 小时前 (该容器可能还在长会话里干活)。按 skill 现行规则, 你的 --sweep-stale 会怎么处置这条 claim? 说明依据。",
+      "ew": "分层: 其他容器阈值 7d (SWEEP_TTL_CROSS), 30h < 7d → 不动; 依据 Aria #233 分层语义",
+      "eo": "旧文: --sweep-stale 把全 ref 内 heartbeat 超 STALE_TTL(24h) 的 active 标 abandoned, 跨 container → 30h 会被扫"
+    },
+    {
+      "id": 2,
+      "name": "long-session-heartbeat",
+      "prompt": "你是一个已连续运行 3 天 (跨自然日, 带上下文压缩) 的 Claude Code 会话, 在 Phase B.2 长开发中, 3 天前进过一次 /state-scanner 并认领了 claim, 之后没再进过。按 state-scanner 心跳集成规则, 你的 claim 的 heartbeat 现在什么状态? 你应该做什么防止它被例行收尾扫掉?",
+      "ew": "心跳冻结在 3 天前最后一次入口/gate 调用; 应 ≤12h 间隔主动调 --heartbeat-only 刷新 (Aria #233 长会话义务)",
+      "eo": "旧文: 心跳只在 /state-scanner 入口刷新, 无周期刷新义务; SWEEP_TTL 24h 到就被扫 (skill 自己写的后果), 无恢复指引"
+    }
+  ]
+}

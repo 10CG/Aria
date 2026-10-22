@@ -1,0 +1,16 @@
+{
+  "eval_id": 3,
+  "eval_name": "keyword-override-empty",
+  "skill": "branch-manager",
+  "prompt": "项目 .aria/config.json 有 \"branch_manager\": {\"high_risk_keywords\": []}。按 branch-manager skill 的模式选择算法, 对以下任务给出决策: 任务描述「重构登录流程」; 文件 4 个; 任务数 3; 无并行需求。",
+  "assertions": [
+    {
+      "text": "决策符合 expected_new: 覆盖生效: 不判 high → medium, Branch",
+      "arm": "with_skill"
+    },
+    {
+      "text": "旧行为符合 expected_old: 不读该配置 → high, Worktree",
+      "arm": "old_skill"
+    }
+  ]
+}

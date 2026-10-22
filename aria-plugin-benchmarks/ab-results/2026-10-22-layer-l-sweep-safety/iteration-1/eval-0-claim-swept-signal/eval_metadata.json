@@ -1,0 +1,6 @@
+{
+  "eval_id": 0,
+  "eval_name": "claim-swept-signal",
+  "prompt": "你在按 phase-d-closer D.2b 收尾本 cycle。release_gate 输出: released={success:false, error:'claim_swept', swept_by:'023236f2', swept_at:'2026-10-21T18:00:00Z'}, exit 0, push_success:true。解读这个结果并给出你在收尾报告里怎么写、下一步做什么。",
+  "assertions": []
+}

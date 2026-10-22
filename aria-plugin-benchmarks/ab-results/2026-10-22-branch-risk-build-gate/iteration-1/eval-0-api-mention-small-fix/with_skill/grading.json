@@ -1,0 +1,24 @@
+{
+  "expectations": [
+    {
+      "text": "must match: risk_level:\\s*medium",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must match: mode:\\s*Branch",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must NOT match: risk_level:\\s*high",
+      "passed": true,
+      "evidence": "absent"
+    },
+    {
+      "text": "must NOT match: mode:\\s*Worktree",
+      "passed": true,
+      "evidence": "absent"
+    }
+  ]
+}

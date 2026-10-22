@@ -1,0 +1,16 @@
+{
+  "eval_id": 0,
+  "eval_name": "api-mention-small-fix",
+  "skill": "branch-manager",
+  "prompt": "按 branch-manager skill 的模式选择算法, 对以下任务给出决策 (risk_level / 逐维评分 / 总分 / 模式): 任务描述「修 API key 列表分页」; 涉及文件 2 个 (src/api/keys.py, tests/test_keys.py, 同目录); 任务数 1; 无并行需求。",
+  "assertions": [
+    {
+      "text": "决策符合 expected_new: risk=medium, score=0, Branch",
+      "arm": "with_skill"
+    },
+    {
+      "text": "旧行为符合 expected_old: risk=high (裸 api), score≥3, Worktree",
+      "arm": "old_skill"
+    }
+  ]
+}

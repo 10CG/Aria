@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "text": "must: interpretation:\\s*非\\s*benign",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: claim_swept",
+      "passed": true,
+      "evidence": "found"
+    },
+    {
+      "text": "must: --restore",
+      "passed": true,
+      "evidence": "found"
+    }
+  ]
+}
