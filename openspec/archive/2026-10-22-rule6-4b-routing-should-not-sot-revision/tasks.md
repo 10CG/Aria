@@ -11,7 +11,7 @@
 - [x] T4 套件标注: `ab-suite/trigger/issue-groomer.json` 10 条 should-not 标 `type` (4 routing / 6 capability, 两可从严) + `ab-suite/version.yaml` → 1.8.0
 - [x] T5 重判 dogfood: 见 `rejudge-demo.md` (三臂 fail 集 3→2 / 9→5 / 9→5 分流; 门布尔值均维持 FAIL — capability 残留误触如实报告)
 - [x] T6 A 跟进轨: Forgejo **#253** (P2): `run_eval.py --sibling-placeholders` runner 增强; ship 后 routing 类恢复设门
-- [ ] T7 集成: standards 子模块本地 merge → 双推 (逐 remote ls-remote 核验) + 主仓 gitlink bump + Conventional Commits
+- [x] T7 集成: standards `81300e0` → 本地 merge `79ecd75` → 双推 (origin+github ls-remote 核验一致); 主仓 `3222480` + `cf84934` → PR **#255** → Forgejo merge `52ff227` → 双推核验一致 (Rule #8: 触面零 CI 触发, `no_ci_fallback` 显式降级; master 无 in-flight run 双核验过)
 - [x] T8 验证: 对抗 review (非作者席 aria:code-reviewer) **PASS** — 0 Critical / 1 Important (已修: 未标注 `type` 硬规则 fail-CLOSED, 防整面空转) / 4 Minor (3 已修: :285 限 capability / rejudge.py 入库+idx 对齐 / proposal 裁定记录注; 1 预存不阻塞: issue-groomer SKILL.md description 重复段落, 下次触碰时清+照跑 4b)。独立重分类 10/10 一致; 重算数字逐格吻合。SC-1/2/3 全绿 (修复后复验)。
 
 ## 结构化校验 (SC, deterministic substitute)

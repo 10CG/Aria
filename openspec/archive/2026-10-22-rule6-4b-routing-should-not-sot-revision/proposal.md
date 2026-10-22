@@ -1,7 +1,7 @@
 # rule6-4b-routing-should-not-sot-revision — 4b 单技能沙箱对「路由类 should-not」结构性失效的 SOT 修订
 
 > **Level**: Analysis + Decision Request (Phase A 产物) → **实施 spec** (裁定后升级, tasks 见同目录 `tasks.md`)
-> **Status**: ✅ **Approved — 实施中** (owner 2026-10-22 裁**方向 C**: B 立即 + A P2 跟进; 实施即方向 B 落地)。裁定记录: Forgejo `10CG/Aria#243` owner comment 2026-10-22T10:19Z (方向 C, 实施单保持 open) + 周期 handoff `2026-10-22-cycle-done-v1.77.1-dual-track-231-233.md` §1.5/§6 (三裁定项已全裁)。裁定项 2/3 按 proposal §Owner 裁定项明示建议执行 (项 2: 套件内标注 + 报告呈现, `rule6_note` 五字段不动; 项 3: 既有套件不回溯, 下次触碰时标)。**注**: owner comment 原文只逐项裁了方向 (项 1); 项 2/3 无独立 owner 逐项文本, 兜底闸 = 手册 :301「首次加标 `type` 须经 owner 审阅后才能作门」(审阅点即项 2/3 的实际批准面)。
+> **Status**: ✅ **done — 方向 B 已落地** (PR #255 merge `52ff227`, 2026-10-22; standards SOT `79ecd75` 双端; issue #243 关单, A 跟进 = #253)。**遗留义务**: `trigger/issue-groomer.json` type 标注待 owner 审阅后作门 (裁量记录见 rejudge-demo.md)。原裁定链: owner 2026-10-22 裁**方向 C**: B 立即 + A P2 跟进; 实施即方向 B 落地)。裁定记录: Forgejo `10CG/Aria#243` owner comment 2026-10-22T10:19Z (方向 C, 实施单保持 open) + 周期 handoff `2026-10-22-cycle-done-v1.77.1-dual-track-231-233.md` §1.5/§6 (三裁定项已全裁)。裁定项 2/3 按 proposal §Owner 裁定项明示建议执行 (项 2: 套件内标注 + 报告呈现, `rule6_note` 五字段不动; 项 3: 既有套件不回溯, 下次触碰时标)。**注**: owner comment 原文只逐项裁了方向 (项 1); 项 2/3 无独立 owner 逐项文本, 兜底闸 = 手册 :301「首次加标 `type` 须经 owner 审阅后才能作门」(审阅点即项 2/3 的实际批准面)。
 > **Created**: 2026-10-22
 > **Linked Issue**: `10CG/Aria#243` (同族: `10CG/Aria#214` 自主运行时 description 处理)
 > **证据**: `aria-plugin-benchmarks/ab-results/2026-10-19-issue-groomer-rule6/RESULT.md` + 三轮 trigger 套件 (`ab-results/2026-10-19-issue-groomer-trigger/{real-v1-prefix,real-v2-broad,real}/`)
