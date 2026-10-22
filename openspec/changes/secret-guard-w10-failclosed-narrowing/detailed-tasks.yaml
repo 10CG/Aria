@@ -1,0 +1,120 @@
+meta:
+  change: secret-guard-w10-failclosed-narrowing
+  level: 2
+  revision: "v3 (2026-10-22): A.2 of the design-pinned proposal v3. post_spec R1 FAIL -> v2; R2 FAIL (2C/14M/13m), stop rule triggered; owner 2026-10-22: 先钉设计、再实现优先, post_spec closed with overridden_by_user: true; A.2 + post_planning run as configured"
+  linked_issue: "10CG/aria-plugin#217 (closing keyword only in the phase-D main-repo commit, TASK-007); assoc #228 #139 #142 #229 #230 #154 #216 #219"
+  owner_ruling: "A 放宽 / B 保留 fail-closed / C 保留 fail-closed (2026-10-21); D 撤回 (2026-10-21); E 未实测平台维持基线拦 (2026-10-22); post_spec 以 R2 结论由 owner 关闭 (2026-10-22)"
+  baseline_freeze: "aria v1.76.1 59e333c (= v1.77.0 f2e801d for hooks/); standards a611136; evidence .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/ (evidence/ W0-W7, v3/ W8-W12)"
+  rule6_note:
+    decision_table_row: "n/a"
+    description_changed: "no"
+    scenario1: "n/a"
+    scenario4b: "n/a"
+    negctrl: "n/a"
+    note: "hook-only change (aria/hooks/secret-guard.sh + its suite + comments + CHANGELOG); zero SKILL.md / description / references, so not a Skill change; verified by substitute: SC-V1..V12, suite regression, non-author bad-implementation matrix BI-1..BI-13 (TASK-003), real-traffic replay (TASK-004). AI-facing text hunks judged on their own (WP-A owner ruling: hook substitute, prompt-text hunks judged separately): the longline template reuses the two instruction lines of the existing oversize template verbatim and adds only a description of why the command is blocked; the two growth reason strings are descriptive Limit-hit lines; SOT §2 row 1 (descriptive) for all three, substituted by verbatim assertions (SC-V7 wpa_x_longline, SC-V8 wpa_L_grow_whole / wpa_L_grow_seg)"
+  cost_reporting: "每完成一条任务报一行成本: 墙钟 / 子代理调用数 / 产出"
+
+invariants:
+  - id: INV-1
+    rule: "实现以 v3/mkv3.py 生成的原型 (v3/W8-v3.diff) 为起点, 行为以 proposal v3 为准; 原型与 Spec 冲突时以 Spec 为准并上报"
+  - id: INV-2
+    rule: "代码改造面只限 aria/hooks/secret-guard.sh 与 aria/hooks/tests/secret-guard.test.sh; 文档面只限 aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数, 以及 TASK-006 的发布同步面"
+  - id: INV-3
+    rule: "放宽只在 What 1 的两个触发点进入; 触发点之外的代码路径行为逐字节不变 (P1)。实现时若发现必须改动触发点之外的路径, 停下上报"
+  - id: INV-4
+    rule: "(继承 WP-A) 被 _sg_judge_one / _sg_per_segment_eval 直接或间接调用的函数 (含 _sg_relax_* 与 _sg_vx_big_judge) 定义在 source 闸门之上; 既有 SC-8 的抽取 / 阈值 / 口径 / 档位不改"
+  - id: INV-5
+    rule: "(继承 WP-A) Rule #7: 夹具运行时拼装, 不打印任何像凭据的值; 实验只在 scratchpad, HOME 指向私有目录"
+  - id: INV-6
+    rule: "(继承 WP-A) 提交页脚与 PR 描述对 10CG/aria-plugin#154、10CG/aria-plugin#203、10CG/Aria#221 只写 Refs, 不写 Closes / Fixes / Resolves; 10CG/aria-plugin#217 的关闭关键词只出现在 TASK-007 的主仓提交"
+  - id: INV-7
+    rule: "(继承 WP-A) 同一时刻只跑一个重实验; 时档类测量只在一分钟负载低于 2 时串行跑。硬截止 (P3) 是绝对上界, 与负载无关; 收益数字 (W12 第 1 节) 随负载变化, 按本条测"
+
+tasks:
+  - id: TASK-001
+    parent: "B.1"
+    title: "入场: 续用认领、建分支、重锚行号; 先开残余 issue; #228 与 #217 留言; 基线红"
+    status: pending
+    agent: main-loop
+    depends_on: []
+    deliverables: ["aria 分支 feature/secret-guard-w10-failclosed-narrowing @ master", "两张残余 issue (for 列表续行感知; _sg_vx_collect 误收 heredoc 内赋值形文本)", "#228 留言 (Decision 12 的选项 + 证据位置)", "#217 留言 (指向 Spec 与裁定 A-E)"]
+    design:
+      - "认领: phase1_gate --phase B --raw-track-id secret-guard-w10-failclosed-narrowing-023236f2 --linked-issue 10CG/aria-plugin#217 (advisory)"
+      - "重锚: proposal 与 commentsync.py 引用的基线行号在 master 上逐个核对; v1.77.0 的 hooks/ 与 59e333c 零差异, 预期全部不变"
+      - "基线红: SC-V2 (e2e 扩展项目除外)、SC-V3、SC-V4、SC-V5、SC-V7、SC-V8、SC-V10 在基线上实跑为红 (基线没有这些函数或结局); SC-V1、SC-V6、SC-V9 在基线上为绿, 标注为回归闸"
+      - "残余 issue 号写进 CHANGELOG 草稿的「已知限制」"
+    acceptance: ["两张残余 issue 已开, 号已写进 proposal 与 CHANGELOG 草稿", "#228、#217 留言已发, 链接记进本任务 notes", "基线红 / 绿逐条记录"]
+
+  - id: TASK-002
+    parent: "B.2"
+    title: "实现: 按 W8 落地 What 1-5、7; What 6 单独提交; 套件按 SC-V1..V12 改写"
+    status: pending
+    agent: implementer
+    reason: "新执笔席 (fix-writer-bottleneck); 主控不亲写 hook 码, 独立复核"
+    depends_on: [TASK-001]
+    deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
+    design:
+      - "代码: 以 v3/mkv3.py 的补丁为准逐字落地 (常量、_SG_P0 锚点、_sg_vx_apply 的 lim、_sg_vx_pass 两个触发点与三个时间检查点、_sg_vx_big_judge、_sg_relax_left / _sg_relax_ok / _sg_relax_job / _sg_relax_run、_sg_judge_one nocredit、longline 模板、_sg_per_segment_eval 的回落); 新函数在 source 闸门之上 (INV-4)"
+      - "What 6: 删 :666 死代码, 单独一个提交, 套件全绿"
+      - "注释: What 7 的封闭清单, 改完 python3 v3/commentsync.py <hook> <suite> target 为 GREEN"
+      - "套件: 6 组既有用例按 W9 改断言 (21ab 第 2、3 条换成首遍便宜的形状); 新增 wpa_x_longline、wpa_L_grow_whole、wpa_L_grow_seg; SC-V1..V12 逐条落成用例, 直调类用例自设 _SG_P0=$EPOCHREALTIME; 新用例插在 SC-13 断言之前; 头注释计数改为实跑数"
+      - "SC-V5 的残留进程计数按进程名与参数精确匹配 (不要用 pgrep -f: 会匹配到写出脚本的 shell 自己的命令行)"
+      - "直调 _sg_judge_one 的用例 (SC-V10 等): risky_patterns / _sg_judge_one / _sg_redact_echo 在 source 闸门之下, 照 SC-8 按锚点抽取后再 source; 否则得到 127 的假失败 (v3/w10b.sh 有现成写法)"
+    acceptance: ["套件全绿 (bash 5.2); bash 3.2.57 下套件全绿", "commentsync.py target GREEN", "新函数定义在 source 闸门之上"]
+
+  - id: TASK-003
+    parent: "B.2"
+    title: "非作者对抗复核: 独立构造 BI-1..BI-13, 全部要被套件抓住; 对抗耗时矩阵"
+    status: pending
+    agent: qa-engineer
+    reason: "坏实现须由非作者独立构造 (memory adversarial-fixture); 本项目 post_implementation 闸门为 off, 自愿补上"
+    depends_on: [TASK-002]
+    deliverables: [".aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v3/W13-bad-implementations.txt (由脚本生成)"]
+    design:
+      - "每个 BI 是「好实现 + 一个像真实执笔错误的改动」, 由本席自己写, 不看 TASK-002 的用例怎么测"
+      - "对抗耗时矩阵: W11 的形状 + 本席自己想到的形状; 判据: 墙钟 ≤ max(首遍 + 基线前段, 3 s) + 0.3 s, 结局只能是放行、拦截文案或基线回落"
+    acceptance: ["BI-1..BI-13 每个都至少让一条用例变红", "耗时矩阵无越界"]
+
+  - id: TASK-004
+    parent: "B.2"
+    title: "验收: 在真实实现上重跑 W9-W12; bash 3.2 逐字节"
+    status: pending
+    agent: main-loop
+    depends_on: [TASK-002, TASK-003]
+    deliverables: [".aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v3/W14-acceptance.txt (由脚本生成)"]
+    design:
+      - "run-w9 / run-w10-w11 / w10b / run-w12 改成接受实现 hook 路径 (而不是由 mkv3.py 生成), 其余不变"
+      - "W12 第 1 节按 INV-7 在一分钟负载 < 2 时串行跑; 记录负载"
+    acceptance: ["W12 第 1 节放行数不低于原型 (136/137), 且无任何越过 max(首遍 + 基线前段, 3 s) + 0.3 s 的放行", "W12 第 2、3 节逐字节相同", "P6 回落逐字节相同"]
+
+  - id: TASK-005
+    parent: "B.2"
+    title: "独立代码审查"
+    status: pending
+    agent: code-reviewer
+    reason: "本项目 post_implementation / pre_merge 闸门为 off, 自愿补上 (owner 2026-10-22 选项【1】)"
+    depends_on: [TASK-002]
+    deliverables: [".aria/audit-reports/ 下的审查报告"]
+    acceptance: ["无未处置的 Critical / Major"]
+
+  - id: TASK-006
+    parent: "C"
+    title: "发版 (owner 门): 版本号、发布同步面、双推与 ls-remote 核验"
+    status: pending
+    agent: main-loop
+    depends_on: [TASK-004, TASK-005]
+    design:
+      - "版本号由 owner 定 (v1.77.x PATCH); 同步面按 proposal Impact 列全; 机械兜底 m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match"
+      - "子模块合并本地做, 禁 Forgejo 服务端合并; 双推后逐个 ls-remote 核验"
+    acceptance: ["owner 授权", "三项机械检查全绿", "origin / github 两边 ls-remote 一致"]
+
+  - id: TASK-007
+    parent: "D"
+    title: "收口: #217 逐项对账后关闭"
+    status: pending
+    agent: main-loop
+    depends_on: [TASK-006]
+    design:
+      - "对账: 第 1 项完成; 小项完成; 第 2 项转残余 issue; 第 3 项 owner 撤回; count 轴不变; 评论 28512 第 2 点 (扩展整串口径) 已评估、维持绝对门、写明残余"
+      - "关闭关键词只出现在本任务的主仓提交; 推送前做 INV-6 关键词核对"
+    acceptance: ["#217 对账评论逐项列出 完成 / 转 #NNN / owner 撤回 / 不变", "残余 issue 号已落在 CHANGELOG 与对账评论"]
