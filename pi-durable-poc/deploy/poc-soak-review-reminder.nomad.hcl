@@ -1,0 +1,61 @@
+# PoC soak 复查提醒 — 一次性 (2026-10-29 10:00 北京 = 02:00 UTC 触发)
+#
+# Owner 指令 (2026-10-22): "7 天后复查 PoC soak, 到时候提醒我"。
+# 会话内 cron 活不过 7 天 → 用 Nomad periodic 一次性触发 + 飞书 webhook 主动提醒;
+# 被动层 (memory + handoff §0-2 基线) 已另记。
+#
+# 镜像复用 CI 产物 aria-layer1 (c3290150, python stdlib — 零新构建);
+# webhook 从 nomad/jobs/aria-orchestrator var 注入 (与 cost-sentinel 同源, 不落明文)。
+# 触发后 parent job 变 dead 留档; 复查完成时 nomad job stop -purge 清掉。
+#
+# Deploy: nomad job run pi-durable-poc/deploy/poc-soak-review-reminder.nomad.hcl
+
+job "poc-soak-review-reminder" {
+  type        = "batch"
+  datacenters = ["dc1"]
+
+  constraint {
+    attribute = "${node.class}"
+    value     = "heavy_workload"
+  }
+
+  periodic {
+    crons            = ["0 2 29 10 *"] # 2026-10-29 02:00 UTC = 10:00 北京
+    time_zone        = "UTC"
+    prohibit_overlap = true
+  }
+
+  group "remind" {
+    task "notify" {
+      driver = "docker"
+
+      config {
+        image   = "forgejo.10cg.pub/10cg/aria-layer1@sha256:c3290150e3ef035801e5ee7ff52ca7c33606c047fdcd8fd7a3499c59952dc874"
+        command = "python"
+        args    = ["-c", "import os,json,urllib.request;t='PoC soak 复查到期 (7天前基线 2026-10-22T16:52Z):\\nPoC-H heavy-2: cycle 1562 / RSS 55.6MiB (较晨间 +40% 漂移, 主观察项)\\nPoC-L light-4: cycle 1031 / cgroup 61.8MB / SQLite 主库 643KB+WAL 4.4MB\\n\\n复查动作: nomad alloc logs 对照 cycle 数与漂移; cgroup/docker stats 看 RSS; 决定去留 (转真实业务/继续观察/下线)。\\n详见 Aria handoff 2026-10-22 会话收尾 §0-2 (含基线数字)。';urllib.request.urlopen(urllib.request.Request(os.environ['ARIA_FEISHU_WEBHOOK_URL'],data=json.dumps({'msg_type':'text','content':{'text':t}}).encode(),headers={'Content-Type':'application/json'})).read();print('FEISHU-SENT')"]
+
+        auth {
+          username = "${docker_auth_user}"
+          password = "${docker_auth_password}"
+        }
+      }
+
+      template {
+        destination = "secrets/feishu.env"
+        perms       = "0600"
+        env         = true
+        change_mode = "noop"
+        data        = <<EOH
+{{- with nomadVar "nomad/jobs/aria-orchestrator" }}
+ARIA_FEISHU_WEBHOOK_URL={{ .ARIA_FEISHU_WEBHOOK_URL }}
+{{- end }}
+EOH
+      }
+
+      resources {
+        cpu    = 50
+        memory = 64
+      }
+    }
+  }
+}
