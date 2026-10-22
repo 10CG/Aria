@@ -21,6 +21,11 @@ updated-at: 2026-10-22T10:10:00Z
 2. **PoC 两 job 去留** — `pi-durable-poc` (heavy-2 docker) / `pi-durable-poc-light`
    (light-4 exec) 持续在跑 (~40MB 工作集 ×2); 转真实业务 (M6 cost snapshot 的
    pi-durable 版) / 保持观察 / 下线, 均可
+   - **Soak 基线 (2026-10-22T16:52Z, 复查时对照)**: H = 23.4h / cycle 1562 /
+     RSS 55.6MiB (较晨间 39.7MiB **+40% 漂移**, 主观察项); L = 15.4h / cycle 1031 /
+     cgroup 61.8MB (自 116 回落) / SQLite 主库 643KB + WAL 4.4MB。
+     **复查建议 ~7 天后或 Phase-2 启动时**; 期间不 redeploy (调间隔会换 alloc 丢
+     状态, 污染连续性 — 2026-10-22 已裁定不动)
 3. ~~**PoC-L 分发通道生产化**~~ **已落地收编** (2026-10-22 当日, PR #252): transient
    systemd-run → 永久 `/etc/systemd/system/aether-dist.service` (enabled, 重启存活);
    剩余手工面 = 内容 scp staging, 生产化候选 (Forgejo generic + token 不落明文) 仍开放
