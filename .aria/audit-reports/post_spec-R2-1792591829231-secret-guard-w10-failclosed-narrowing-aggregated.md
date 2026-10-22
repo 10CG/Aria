@@ -4,7 +4,7 @@ mode: convergence
 rounds: 2
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 drift_terminated: false
 drift_check_skipped: false
@@ -229,3 +229,17 @@ R2 进行期间，aria v1.77.0（`f2e801d`）合入主仓 master（`7143f3c`）�
   - 新增的 Critical R2-A1 落在 v2 新写的参考实现上。
   - Major 14 → 14。每一轮的 Major 都主要落在当轮新写的文本上。
 - **停止规则**：两条都满足，见页首。主控不再加轮，按 R1 汇总的约定上报 owner，选项里包含「实现优先」。
+
+## Owner 裁定（2026-10-22）
+
+1. **下一步：先钉设计，再实现优先**（选项【1】）。
+   - post_spec 以本轮结论关闭，`overridden_by_user: true`。这是 Rule #10 允许的 owner 覆盖，不是 AI 自行豁免。
+   - v3 只做「设计钉死」（见上文「若继续」1–6），之后不再跑 post_spec。A.2 与 post_planning 照配置跑。
+   - 配置里 post_implementation 与 pre_merge 是关的，所以写完代码后，主控补做自愿复核：非作者构造坏实现矩阵、对抗耗时矩阵、独立代码审查，以及用实际实现在真实流量上量收益与耗时。
+2. **未实测平台维持基线拦**（关闭 R2-A29）。
+   - 放宽只在实测过的平台生效，目前只有 Linux。Windows / macOS 与现行版本行为一致，实测通过后另行放开。
+   - 这是姿态 B（时间护栏 fail-closed）在新机制上的延伸，由 owner 裁定。
+3. **（与 #217 无关）GitHub 镜像**：owner 授权主控补推。
+   - aria-orchestrator #34 在 Forgejo 上合并后没推到 GitHub，主仓 GitHub master 指向的 `ef5506d` 在 GitHub 镜像里不存在。
+   - 主控已把 aria-orchestrator master 快进推到 GitHub（`237045a..a9f0658`），`ls-remote` 核验一致；随后双推主仓。
+
