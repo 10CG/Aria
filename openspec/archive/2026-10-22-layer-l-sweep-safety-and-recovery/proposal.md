@@ -104,4 +104,4 @@ notes: >
 1. `SWEEP_TTL_CROSS` 取 7d (本 spec 主张) 还是 72h (更紧, 死 claim 清得快但保护窗短)?
 2. 例行 `--sweep-stale` 对 cross-container 是否干脆**默认不扫** (只 own), 7d 兜底仅 `--sweep-stale-all`? (更保守; 代价: 死容器 claim 要等显式运维)
 
-> 归档 SHA 回链: `092d228`
+> 归档 SHA 回链: `665e686` (归档 mv 提交; 本行由后继钉正提交固定)
