@@ -84,11 +84,31 @@ task + SIGKILL 下全部成立, 判据 A1-A6 全绿。生产化前要消化: 锐
 
 | # | 判据 | 结果 |
 |---|------|------|
-| L1 | exec task 在 light-4 启动: artifact 解包 + node 起来 + boot 日志 | 待测 |
-| L2 | 实测 RSS ≤ 150MB (memory 预留), 不挤压 1GiB 节点其余负载 | 待测 |
-| L3 | mid-gather kill -9 → MEMO-HIT 续跑 (同 A3) | 待测 |
-| L4 | mid-wait kill -9 → 醒在原 deadline (同 A4) | 待测 |
-| L5 | 全程零 Docker (driver=exec, 无 image/auth) | 待测 |
+| L1 | exec task 在 light-4 启动: artifact 解包 + node 起来 + boot 日志 | ✅ 01:22:36 boot → cycle 0 完整 |
+| L2 | 实测 RSS ≤ 150MB (memory 预留), 不挤压 1GiB 节点其余负载 | ✅ cgroup 115.9MB (含 file cache; docker 版工作集 39.7MiB) < 150MB 预留, light-4 尚有 935MB 可用 |
+| L3 | mid-gather kill -9 → MEMO-HIT 续跑 (同 A3) | ✅ 01:24:28 kill → resume `MEMO-HIT skip (value=…2267 逐字同)`, 2/3 补算, report 复用旧值 |
+| L4 | mid-wait kill -9 → 醒在原 deadline (同 A4) | ✅ kill 后续睡 remaining 32.9s, 醒在 deadline+2ms |
+| L5 | 全程零 Docker (driver=exec, 无 image/auth) | ✅ 同 alloc 7d097f08 内 pkill 重启两次, 状态不丢 |
+
+### PoC-L 打包发现 (Nomad artifact 边界, 2026-10-22)
+
+1. **artifact getter 不支持 `file://`** (这版 Nomad): 改走节点本机 http.server
+   (systemd-run 起的 `aether-dist.service`, PoC 边界)
+2. **tar 解包有 4096 文件上限** — Node 官方 tarball 5866 个文件直接超限。裁掉
+   `lib/node_modules/{npm,corepack}` + share + include → **11 个文件** 28MB,
+   `node --version` 及全部运行不受影响 (运行时不需要 npm)
+3. **依赖树同样超限**: npm ci 全量 13775 文件 — pi-ai 静态拖进全部 provider SDK
+   (openai 3589 / @smithy 1924 / @anthropic-ai 1829 / @aws-sdk 1577 文件), 我们零
+   provider。剥 `.ts/.map/.md` + 整删 provider SDK → **2663 文件**, 本地 kill 演练
+   复验 MEMO-HIT 不回归, gzip 后 4MB
+4. **`.tgz` 后缀必须真 gzip** — `tar -cf` 裸 tar 命名 .tgz, getter 按后缀当 gzip 解,
+   报download failed。`file <tar>` 先验再传
+5. `nomad job run` 默认会阻塞等部署 — 脚本里用 `-detach`
+
+**轻节点结论**: 可行。耐久语义与 heavy docker 版逐判据等价 (L3/L4 与 A3/A4 同形),
+零容器层, 内存足迹不构成约束。代价是把「镜像构建」换成了「bundle 工程」: 文件数/
+压缩格式/运行时裁剪都要自己管 — 这正是 docker 在重节点替我们扛掉的复杂度。分发通道
+(file:// 不支持 → 本机 http.server) 是生产化前最大缺口, 见下。
 
 **PoC-L 局限**: artifact 走 light-4 本机 http.server (systemd-run, PoC 边界; 这版 Nomad getter 不支持 file://) — 生产化
 分发候选是 Forgejo generic packages (内网 HTTP) + artifact `header` 带 package-read
