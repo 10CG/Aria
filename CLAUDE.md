@@ -135,15 +135,14 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
   - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门); 遥测 spec aria-2.0-m6-cost-model-telemetry
     Track-1 完成 (feature/m6-cost-model-telemetry, 合并 gate input-delivery), 168h AC-6 须其独立 ship
   M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
-  aria-plugin 方法论轨: v1.52.0–v1.77.2 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
+  aria-plugin 方法论轨: v1.52.0–v1.77.3 已 ship — 逐版本史见 aria/CHANGELOG.md (SOT);
     残余 deferred 挂 Aria #168; 并发 in-flight track 见 docs/handoff/latest.md
   Rule #6 description 维度: 4b 地板守卫 (Aria#211) + should-not 二分均已 ship — #243 方向 C·B
     落地 (PR #255: 门只计 capability 类 / routing 观察面; 套件 type 标注待 owner 审阅作门; A 跟进 #253)
   2026-10-22 双子星分界: 双子星轨 = #217 secret-guard (owner 裁「钉设计后实现优先」, R2 五席 FAIL
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
-版本: aria-plugin v1.77.2 (双 PATCH 合发 Aria#223 gate 基线 ref 解析 fail-loud / #218 handoff
-  frontmatter 仲裁键; #246 发布收尾三步入 standards §6.4 v1.2.0; 对抗 review 债务 → #257 v1.77.3
-  待办) | 主项目 v1.7.5 |
+版本: aria-plugin v1.77.3 (review 债务清偿 Aria#257: I-1 SKILL §C.2.4.5 摘录同步 / I-2 枚举面 7 处 /
+  M-4/M-5 + 附带 rev-parse 回显 bug; 前版 v1.77.2 #223/#218/#246; 套件缺口 #258) | 主项目 v1.7.5 |
   aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
