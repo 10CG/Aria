@@ -4,7 +4,7 @@ mode: convergence
 rounds: 2
 converged: false
 oscillation: false
-overridden_by_user: false
+overridden_by_user: true
 degraded: false
 drift_terminated: false
 drift_check_skipped: false
@@ -21,6 +21,8 @@ agents: [qa-engineer, code-reviewer, tech-lead, backend-architect, knowledge-man
 > **Verdict：PASS_WITH_WARNINGS**。去重后 0 Critical / 20 Major / 24 Minor（44 簇，原始 82 条）。五席都是 PASS_WITH_WARNINGS，都有 Major，按 REVISE 计。未收敛。**停止规则触发**：Major 簇数从 23 降到 20，但其中 18 个落在 v3.1 新写的表面上，超过一半。按约定不再加轮，上报 owner（见「主控处置建议」）。
 >
 > 本文件是有损汇总。每个簇都回链到席位原编号：CR = code-reviewer（F*n*，下文写作 CR-F*n*），QA = qa-engineer（QA-*n*），TL = tech-lead（TL2-*n*），BA = backend-architect（BA2-F*n*），KM = knowledge-manager（KM2-*n*）；括号里是该席的定级（M = Major，m = Minor）。各席自己构造的坏实现保留原编号并加席位前缀：CR-MA–ME、QA-M01–M30、TL-M1–M10、BA-M1–M14。细节以各席报告为准（同目录、同时间戳 `1792689337848` 的五份文件）。簇号写作 PP2-*x*（Major）与 PP2-m*n*（Minor）；PP1-A*n* 是 R1 的簇号。
+
+> **Owner 裁定（2026-10-23）**：1. 第 2 轮到此为止，走「实现优先」：主控只改任务计划与 proposal 的文字，不改设计、不再开第 3 轮；验收用例的补强写进 TASK-002 作为必交项，由新执笔席用五席的探针补齐，每个漏网的坏实现都要被指定用例抓住；实现完成后由新席位复核：TASK-003 做非作者对抗，TASK-005 做独立代码审查。上呈时选项描述误写成「照常做 post_implementation 审计」；本项目该检查点为 off，实际对应的就是这两项，已向 owner 更正。2. PP2-S 的两类既有缺口按裁定 A「沿用现有判定语义」点名申报，并在 TASK-001 各定一个跟踪载体。frontmatter 的 `overridden_by_user` 据此置为 true。3. （同日追加）PP2-m7 按姿态题上呈：准入门按实测范围收紧，只对 x86_64 的 GNU/Linux 放宽，WSL（WSL1 与 WSL2）一律维持基线；owner 先选排除 WSL1，随即追加 WSL2。
 
 ## 一句话
 
@@ -177,7 +179,7 @@ v3.1 原型的机制，第 2 轮五个全新席位都没有找到缺陷；加上
 
 - **设计不用动**。两轮十席没有证伪机制；Decision 14–16 无异议；PP2-m16（计数上限到顶时静默止步）与 PP2-m6（ε）是细节，不改姿态。
 - **R2 的 Major 都能在不改设计的前提下修掉**，而且大多已经有现成材料：QA 的 17 个确定性直调探针，BA、TL、CR 的演示脚本，五席的坏实现与预测文件。
-- **再审一轮的边际产出是负的**：要审的会是新补的用例与新改的条款，正是本轮 Major 的来源。验收用例真正的长期宿主是 aria 套件，它在 B.2 才写进仓；post_implementation 审计（已配置开启）会用新席位去审它。
+- **再审一轮的边际产出是负的**：要审的会是新补的用例与新改的条款，正是本轮 Major 的来源。验收用例真正的长期宿主是 aria 套件，它在 B.2 才写进仓；实现之后由 TASK-003（非作者变异测试）与 TASK-005（独立代码审查）用新席位去审它。（勘误 2026-10-23：首版此处写成「post_implementation 审计（已配置开启）」，不对。本项目 config 的 post_implementation 检查点是 off，这两项是 owner 2026-10-22 选的自愿补位。）
 
 ### 若 owner 选「实现优先」，主控的做法
 

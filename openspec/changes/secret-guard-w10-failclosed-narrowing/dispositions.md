@@ -121,3 +121,62 @@
 | A39 | m | `run-evidence.sh` 先写工作目录、阶段完成才复制；README 重写；W8 的行数由 `fill31.py` 从 diff 计算；「17」改为只陈述 SC-8 与 SC-9a 两组在非 git 副本里不跑 |
 
 **本轮之外的一条**：用户转来旁路便条，问「构造命令拖过 5 秒」该不该作为 owner 的选择上呈。核对结论：时间护栏的姿态已由裁定 B（2026-10-21）与裁定 E（2026-10-22）定下，v3 起的硬截止就是它的实现；本轮找到的三个截止旁路（A2–A4）都已修成拦。与 `10CG/aria-plugin#228` 同类、仍待 owner 的只有「≤ 8192 的判定可超 5 s」这一残余的载体，已列入 TASK-001 的上呈清单。
+
+## post_planning R2 处置对照（v3.1 → v3.2，2026-10-23）
+
+汇总：`.aria/audit-reports/post_planning-R2-1792689337848-secret-guard-w10-failclosed-narrowing-aggregated.md`。R2 判 PASS_WITH_WARNINGS（去重 0C/20M/24m，44 簇，原始 82 条），停止规则触发。owner 2026-10-23 选「实现优先」：R2 以 owner 覆盖收口，不开第 3 轮；v3.2 只改计划与 proposal 的文字，原型（W8，sha256 前缀 `9f61db0e7b8b`）与证据不变。处置分三类：
+
+1. **TASK-002 必交**：验收补强由新执笔席用五席的探针补齐，在实现上验证（下表写「TASK-002 (x)」，x 指 `detailed-tasks.yaml` TASK-002 的「R2 补强」各条）。
+2. **文字修正**：计划、proposal 模板与 README 在 v3.2 已改（下表写「已改」）；proposal 由 `fill31.py` 重新生成。
+3. **owner 当日裁定**：两类既有缺口点名申报；准入门按实测范围收紧，WSL（WSL1 与 WSL2）一律维持基线。
+
+| PP2 簇 | 级别 | v3.2 处置 |
+|---|---|---|
+| A | M | TASK-002 (a)：上界类用例在负载超门槛时整批 SKIP 并单列，`run()` 先建文件再取锚点。INV-7 扩到 W13、套件计时类与 TASK-003 矩阵，并加「取不到低负载窗口就上报」；proposal Success Criteria 与 README 改正「与负载无关」的说法（已改） |
+| B | M | TASK-002 (a)：垫片只在作业的进程组里停顿（或缩到 4 s），deadline 类用例见到停顿时长判 INCONCLUSIVE，不判 FAIL |
+| C | M | TASK-002 (a)：`V3-E5` 的预算改为 2，窗口 1.85..2.6 |
+| D | M | TASK-002 (b)：分段触发点问准入门、项目根只经 stdin `cwd` 给出，各一条用例；对应坏实现从 BI-24 起并入 |
+| E | M | TASK-002 (b)：重跑内三个时间检查点返回 3 且不写文案的直调用例 |
+| F | M | TASK-002 (b)：超长行加过滤器在整串与分段都拦（含首尾空白撑长的行）；整串分支返回 `_sg_vx_big_judge` 的结论；LMAX 8192 / 8193 边界与量不出行长时的哨兵 |
+| G | M | TASK-002 (b)：增长超限在整串与分段都拦（kind=growth） |
+| H | M | TASK-002 (b)、(c)：重跑内的 for 计数与 VMAX 各一条用例；BI-17 另拆出三个各漏一处的坏实现；等价的 QA-M29 改跑一轮常量扰动 |
+| I | M | TASK-002 (b)：分段回落原因串与基线逐字节相同（桩掉 `_sg_relax_run` 的确定性用例） |
+| J | M | TASK-002 (b)：作业在非组长 shell 里返回 9 的直调用例；proposal What 3 写明这条拒绝分支在实测的 bash 上从不触发（已改） |
+| K | M | TASK-002 (d)：桩用每轮唯一的参数（含进程号），观察前留不超过 1 s 的宽限 |
+| L | M | TASK-002 (d)：金丝雀、`sc-direct.sh` 末行哨兵、应出现的用例编号清单；TASK-002 验收加「两种环境错误下报 SETUP 或 FAIL、退出码非 0」（已改） |
+| M | M | TASK-002 (e)：commentsync 改为逐句核对并绑定站点内的新句子，覆盖 What 7 补充；proposal What 7 改正对它能力的描述；验收要求插字符绕过与整块删除两种构造都报 RED（已改） |
+| N | M | INV-1 改为「原型 + 三类且仅三类内容差」（What 1 补充、What 6、What 7 补充，字面在 proposal）；TASK-004 的 W8 判据同步（已改） |
+| O | M | INV-2 开出 `v31/impl/`；TASK-004 先给 `run-evidence.sh` 加输出目录参数，对照对象写死为 `git show 95cf1de7:<路径>`；INV-8 加用例脚本的哈希与 W14；proposal「证据与复现」与 README 改正「不会覆盖」的说法（已改） |
+| P | M | TASK-002 验收加「每个坏实现在移植后的套件上也变红」；搬入方式写定（shapes 改写成 bash，shim 复制，只有新用例按 `SC_BASH`）；TASK-003 补的用例两边都写（已改） |
+| Q | M | TASK-001 照 WP-A 先例分两组上呈授权（一次性四类、逐次五类）；TASK-007 的评论与关闭挂到一次性授权上；owner 亲手更新插件缓存写成前置；上呈不阻塞 TASK-002 开工（已改） |
+| R | M | TASK-006 按三处锚点、每处两个数核对，secret-scan 那一行不动；CHANGELOG 草稿的占位改名，一个名字只指一样东西（已改） |
+| S | M | owner 2026-10-23 裁定点名申报：R-a、CHANGELOG 放宽面申报、残余 8 与 hook 头注释（What 7 补充第 3 条）都点名这两类；载体由 TASK-001 定（已改，Decision 20） |
+| T | M | 块 B 改按 SOT §2 第 3 行三件套（技术判定，已通报 owner）：逐字断言由 TASK-002 (e) 补，AB 套件缺口的 issue 随 TASK-001 上呈，三件缺一即照跑；CHANGELOG 删去「待 owner 复议」（已改） |
+| m1 | m | TASK-002 (f)：`deadline()` 在非放宽的 bash 上也传附加变量 |
+| m2 | m | TASK-002 (d)：root 下先探测 `ulimit -u` 是否生效，不生效则 V5-S10 一组 SKIP；SETUP 单列，不算抓住 |
+| m3 | m | `fill31.py` 去掉空元素，并断言 hunk 数等于 `@@` 行数；proposal 重新生成，计数为 18 / 14 / 4；heredoc 内以 `#` 开头的行的分类限制写进脚本头注释（已改） |
+| m4 | m | 两处注释列为 What 7 补充第 1、2 条（已改） |
+| m5 | m | Why 表 W1 一行注明是基线计数上限下量的增长，n=1053 在 W12 落入增长超限（已改） |
+| m6 | m | proposal What 3 的 ε 改写：低负载 0.1 s 以内，负载约 10 时 0.2–1.2 s，hook 启动前的时间不在上界里；列入残余 9 与 CHANGELOG 已知限制。启动作业前预算回落文案属逻辑改动，不在 v3.2 范围（已改） |
+| m7 | m | 作为姿态题上呈：owner 2026-10-23 裁定按实测范围收紧，只放宽 x86_64 的 GNU/Linux，WSL（WSL1 与 WSL2）一律维持基线（What 1 补充，Decision 21）；「探测出错」改写成「找不到项目根即视为无扩展」（已改） |
+| m8 | m | What 1 补充只用只读的构建信息与内核信息；TASK-002 (f) 的环境毒化把 `OSTYPE`、`MACHTYPE`、`HOSTTYPE` 一起改 |
+| m9 | m | TASK-002 (f)：`V7-E15` 换成必须放行的确定形状 |
+| m10 | m | TASK-002 的最后一步与 TASK-004 的 W13 验收都分「缺失 / 判错」两栏 |
+| m11 | m | TASK-004 给 `run-evidence.sh` 加 `BASH32` 与各 bash 的存在性检查、W8 页眉；W12 的上界只核对进入重跑的结局，其余与基线逐字节相同；README 补上复原脚本的位置与行数口径（已改） |
+| m12 | m | TASK-002 (b)：TERM 被忽略时截止仍生效的用例 |
+| m13 | m | TASK-002 (f)：`_SG_LEFT` 零填充的直调用例 |
+| m14 | m | TASK-002 (f)：直调用例先清掉环境里的 `SECRET_GUARD_TIME_BUDGET_S` |
+| m15 | m | TASK-002 的搬入方式写定，见 P（已改） |
+| m16 | m | proposal What 2 写明「取消」实为 1,000,000 的上限、到顶静默止步，列入残余 9；改成到顶回落属逻辑改动，不在 v3.2 范围（已改） |
+| m17 | m | INV-7 加「取不到低负载窗口就上报」，TASK-003 的耗时矩阵纳入；INV-8 加 W14（已改） |
+| m18 | m | TASK-006 的阶段 C 顺序写成编号步骤（已改） |
+| m19 | m | TASK-007 的上线后复验：先核插件缓存里 hook 的 sha256，断言诱饵路径不存在，经 harness 发出调用（已改） |
+| m20 | m | INV-2 列出计划自己的产出，并写明 proposal 由模板生成、不手改；W14 的脚本命名为 `v31/impl/w14.sh`（已改） |
+| m21 | m | 发布同步面的样板改为 v1.77.2（主仓 `028b458a`、`e360908c`，后者修了主仓根 `VERSION` 表）；TASK-006 含主仓根 `VERSION` 的 aria 行（已改） |
+| m22 | m | 编号约定里定义席位原编号；README 改正「只有一类」；本文件「R2 处置对照（v2 → v3）」一节里的两处裸号属只追加的旧段，不改写（其余已改） |
+| m23 | m | SC-V2 改为真实编号，P5 补上 `V5-S13`，SC 表下注明与 BI 表的 5 处交叉以 BI 表为准（已改） |
+| m24 | m | 「137 → 73」注明出处（R1 汇总的复跑表，原始输出未入库）；「6 组」限定为非 git 副本里跑到的用例；W13 的 SKIP 恒为 0 已注明；计划里不再引用 memory 名（已改） |
+
+**说法勘误**：上呈 owner 的选项里写了「实现完成后照常做 post_implementation 审计」。本项目 config 的 post_implementation 检查点是 off，实际对应的是 TASK-003（非作者对抗）与 TASK-005（独立代码审查），两项都用新席位；已向 owner 更正，R2 汇总同步勘误。
+
+**旁路提醒的处置**：用户转来旁路便条，指出准入门按 `*-linux-gnu*` 判平台，WSL 里也会放宽，与裁定 E 可能冲突，而 owner 的主力机是 Windows。核对结论：WSL1 已在第一问里排除；WSL2 是主控在选项里按「真 Linux 内核」默认放进放宽的，选项描述没有写明，等于替 owner 收窄了决定空间。随即单独上呈，owner 选 WSL 一律维持基线（判据另看 WSL 的互操作标记与环境变量，它们只能把放宽关掉）。

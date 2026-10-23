@@ -32,14 +32,15 @@ SC_BASH=<bash> bash sc-cases.sh <hook> [基线 hook]       # 单独跑验收用�
 ```
 
 - 基线一律取自 aria `59e333c`（`git show` / `git archive`）并断言 sha256 前缀，不读工作树里的 hook。实现落地后工作树里就是实现，拿它当基线会让所有对比变成自己比自己。
-- 每个阶段先写工作目录，完成后才复制到本目录，失败或中断不会覆盖已提交的证据。每份输出首行记日期、平台、两个 sha256 前缀与负载。
-- `sc-cases.sh` 的环境变量：`SC_BASH` 是执行 hook 的 bash，期望值随它而定（GNU/Linux 上的 5.0–5.3 期望放宽生效，其余期望与基线逐字节相同）；`SC_ONLY` 按编号过滤；`SC_DIRECT=0` 跳过直调用例；`SC_NICE=0` 不加 `taskset` 与 `nice`。
-- W12 需要 `TRAFFIC_DIR`（冻结语料，仓外；抽取与复原见 `../../2026-10-20-secret-guard-scan-cost-and-firstpass-cap/traffic/`，只认 W0 的 sha256）与 `BASH32`（bash 3.2 二进制）。
+- 每个阶段先写工作目录，成功后复制回本目录：失败或中断不会覆盖已提交的证据，成功的阶段会覆盖同名证据（post_planning R2 PP2-O）。TASK-004 先给脚本加输出目录参数，实现那一轮写到 `impl/`，对照对象取 `git show 95cf1de7:<路径>`。每份输出首行记日期、平台、两个 sha256 前缀与负载；W8 的头两行带生成时的临时路径，复现时只有这两行不同。脚本只能在 Aria 主仓的检出里运行（它用 `git rev-parse --show-toplevel` 找 aria 子模块）。
+- W8 的行数：proposal 写 +187 / −49（含 4 行空行）；`run-evidence.sh` 的控制台输出写 `added 183 (blank 4)`，183 不含空行，两者说的是同一件事。
+- `sc-cases.sh` 的环境变量：`SC_BASH` 是执行 hook 的 bash，期望值随它而定（GNU/Linux 上的 5.0–5.3 期望放宽生效，其余期望与基线逐字节相同；v3.2 的准入门收紧到 x86_64、不在 WSL 里（WSL1 与 WSL2 都维持基线），由 TASK-002 落地，本目录的原型与脚本仍按收紧前）；`SC_ONLY` 按编号过滤；`SC_DIRECT=0` 跳过直调用例；`SC_NICE=0` 不加 `taskset` 与 `nice`。
+- W12 需要 `TRAFFIC_DIR`（冻结语料，仓外；抽取用 `../../2026-10-20-secret-guard-scan-cost-and-firstpass-cap/traffic/extract.py`，按 W0 的 sha256 复原编号用 `../traffic/refreeze.py`，只认哈希）与 `BASH32`（bash 3.2 二进制）。W13 的第五轮（bash 3.2）也靠 `BASH32`：不设时脚本静默只跑四个 bash。
 
 ## 本机依赖
 
 - GNU/Linux；系统 bash 5.2.15；`/proc`；coreutils `sleep`（小数秒）；`taskset`、`nice`、`jq`、`python3`、`sha256sum`、`gpgv`（只用于构建）、awk、`git`。
 - 另建的 bash：`~/.aria/tools/bash-5.0.18`、`bash-5.1.16`、`bash-5.3.20`（`build-bash.sh`，2026-10-22 构建，签名均已校验）；`bash-3.2.57` 由本机更早的会话构建，配方没有留下记录。
-- 计时判据由 shim 的固定延迟给出，与负载无关；真实流量的收益与耗时数字随负载变化，每份输出的首行都记了负载（INV-7）。
+- 计时判据的下界由 shim 的固定延迟给出，与负载无关；上界与「重跑须在截止前跑完」类用例依赖本机速度，负载 8–12 下未改动的原型也会红（post_planning R2 PP2-A），按 INV-7 在低负载下跑。真实流量的收益与耗时数字同样随负载变化，每份输出的首行都记了负载。
 - `sc-cases.sh` 的 `V5-S10` 用 `ulimit -u 1` 制造 fork 失败，bash 会先重试约 15 s；整轮用时约 45 s。
-- `check_bare_issue_refs.py` 会把代码里的 bash 取长度写法（如 `${#1}`）当成裸 issue 引用；对 proposal 运行时报出的只有这一类。
+- `check_bare_issue_refs.py` 会把代码里的 bash 取长度写法（如 `${#1}`）当成裸 issue 引用；对 proposal 运行时报出的是这一类，外加 proposal 引用的一处基线 hook 注释里的裸号（共 5 处）。

@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """fill31.py <proposal template> <v3.1 hook> <evidence dir (v31/)> <out> : fills the proposal's placeholders from the evidence, so every quoted block and number
 equals the prototype and the runs. Asserts that EVERY hunk of W8-v31.diff is either quoted in <<<CODE-LOGIC>>> or a comment-only hunk (What 7 lists those by
-site): post_planning R1 PP1-A30 found a logic line that v3's fill.py had silently dropped."""
+site): post_planning R1 PP1-A30 found a logic line that v3's fill.py had silently dropped. post_planning R2 PP2-m3: the split used to count
+the empty string before the first @@ as a comment-only hunk (19 / 5 instead of 18 / 4); empty pieces are dropped now and the hunk count must equal the number
+of @@ lines. Known limit: a hunk whose changed lines all sit inside a heredoc and start with '#' would be classed as comment-only (W8 has none)."""
 import re, sys, os, csv, subprocess, tempfile
 tpl, hook, ev, out = sys.argv[1:5]
 t = open(tpl, encoding='utf-8').read(); H = open(hook, encoding='utf-8').read()
 P = lambda n: os.path.join(ev, n)
 D = open(P('W8-v31.diff'), encoding='utf-8').read()
-hunks = re.split(r'(?m)^(?=@@ )', D.split('\n', 2)[2])
+hunks = [h for h in re.split(r'(?m)^(?=@@ )', D.split('\n', 2)[2]) if h.startswith('@@ ')]
+assert len(hunks) == sum(1 for l in D.split('\n') if l.startswith('@@ ')), 'the hunk split lost or invented a hunk'
 def comment_only(h):
     ch = [l[1:] for l in h.split('\n')[1:] if l[:1] in '+-']
     return all((not c.strip()) or c.lstrip().startswith('#') for c in ch)
