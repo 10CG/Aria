@@ -39,9 +39,10 @@ echo "=== P3: cron create + tick ==="
 hermes cron create --name poc-tick --no-agent --script poc-tick.sh '*/1 * * * *' 'poc deterministic tick' 2>&1 | tail -2
 hermes cron tick 2>&1 | tail -3
 sleep 3
-RUNS=$(hermes cron runs --name poc-tick 2>/dev/null || hermes cron history --name poc-tick 2>/dev/null || true)
-echo "$RUNS" | grep -qi "poc-cron-tick\|success\|completed\|run" \
-  && verdict "P3-PASS: cron tick 产生运行记录" \
+# 注: `cron runs` 无 --name 过滤 (首跑实测), 全表 grep 本 job 的 completed
+RUNS=$(hermes cron runs 2>/dev/null || true)
+echo "$RUNS" | grep -qi "completed" \
+  && verdict "P3-PASS: cron 真跑产生 completed 运行记录" \
   || verdict "P3-FAIL: 未见运行记录 ($RUNS)"
 
 # ---------- P4: claude -p dispatch 冒烟 (luxeno 路由) ----------

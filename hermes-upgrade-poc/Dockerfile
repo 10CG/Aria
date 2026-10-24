@@ -13,11 +13,14 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash curl git ca-certificates \
+    bash curl git ca-certificates nodejs npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Claude Code CLI (P4 dispatch 目标; bash 管道 — | sh 会被 dash 噎死, #232 教训)
-RUN curl -fsSL https://claude.ai/install.sh | bash || true
+# Claude Code CLI (P4 dispatch 目标): claude.ai/install.sh 跨境失败 (#262 首跑
+# 实测) → 改走内网 Verdaccio (.206:4873) npm 镜像装 @anthropic-ai/claude-code
+RUN npm config set registry http://192.168.69.206:4873 && \
+    npm install -g @anthropic-ai/claude-code && \
+    claude --version
 
 # hermes 0.19.0 离线安装 (wheelhouse, 不依赖构建网络)
 COPY wheels/ /tmp/wheels/
