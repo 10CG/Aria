@@ -30,7 +30,7 @@ job "hermes-upgrade-poc" {
       driver = "docker"
 
       config {
-        image = "forgejo.10cg.pub/10cg/hermes-upgrade-poc@sha256:LATEST-BUILD-SHA"
+        image = "forgejo.10cg.pub/10cg/hermes-upgrade-poc@sha256:d6c94c8ec5c517b532638a50f6d5434db08e787f2d6271a0725531f6107ec493"
         auth {
           username = "${docker_auth_user}"
           password = "${docker_auth_password}"
