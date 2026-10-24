@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:10:46Z | hook c4bd560cfe54 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V5-S9-child-left-behind|V5-S13b-nothing-outlives-the-run)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V5-S9-child-left-behind rc=0 (want 0) wall=1.00s (want 0..0.3) stderr='' (want '') [wall>hi]
+FAIL V5-S13b-nothing-outlives-the-run a child that does not hold the pipe, alive within 1 s after _sg_relax_run returned: 1 (want 0; sleep 7.7773047171 is unique to this run) [leftover]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 0.97 1.13 1.27 end 1.05 1.15 1.28 | timing batch: judged

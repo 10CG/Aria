@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:10:16Z | hook 0c5532f240e4 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V5-S10c-dead-timer-no-judgement|V5-S10d-no-judgement-with-dead-timer)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V5-S10c-dead-timer-no-judgement rc=0 (want 4) wall=0.00s (want 0..0.3) stderr='' (want '') [rc]
+FAIL V5-S10d-no-judgement-with-dead-timer judgement started: yes (want no) [judged]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 0.99 1.15 1.28 end 0.99 1.15 1.28 | timing batch: judged

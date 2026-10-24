@@ -1,0 +1,5 @@
+# run-mutants.sh | 2026-10-24T16:09:50Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | sc-cases e537079f6738 | SC_BASH bash on PATH | scope designated | load 0.68 1.11 1.28
+BI-8    CAUGHT       VMAX relaxed too | seats: author | V9-E12-vmax-unchanged=red | load start 0.68 1.11 1.28 end 0.68 1.11 1.28 | timing batch: judged
+BI-24   CAUGHT       the segment-mode trigger point does not ask the gate: it returns 4 unconditionally | seats: CR-MA | V2-G12-segment-trigger-asks-gate=red | load start 0.68 1.11 1.28 end 0.71 1.11 1.27 | timing batch: judged
+# 2 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 2)
+# perturbation round: 0 not as expected | load at the end 0.71 1.11 1.27

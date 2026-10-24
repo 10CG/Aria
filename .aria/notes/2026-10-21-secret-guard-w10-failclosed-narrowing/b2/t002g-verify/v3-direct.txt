@@ -1,0 +1,12 @@
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V1-E16-p1-small-benign$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 1 / 3
+FAIL: 2 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH  (? ?.?) -> relaxation expected: no | load start 0.84 0.70 0.93 end 0.84 0.70 0.93 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V1-E16-p1-small-benign]: [setup] SC_BASH does not run (/nonexistent-v3d/sub/bash);
+  FAIL [W10-port V0-H1-direct-complete]: [setup] SC_BASH does not run (/nonexistent-v3d/sub/bash); [harness]
+

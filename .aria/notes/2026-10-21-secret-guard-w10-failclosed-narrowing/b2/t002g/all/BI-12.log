@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:10:32Z | hook b2e92607b8bd | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V7-N5-read-big-judge-short-lines|V7-E13-multiline-copy-normal-text)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V7-N5-read-big-judge-short-lines rc=2 text=longline (want rc=2 text=finding) [kind]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V7-E13-multiline-copy-normal-text hook rc=2 longline 0.19s | gate-closed rc=2 oversize 0.14s | stderr DIFFERENT (want rc=2 text=finding within 4.5 s) [kind]
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.15 1.17 1.29 end 1.15 1.17 1.29 | timing batch: judged

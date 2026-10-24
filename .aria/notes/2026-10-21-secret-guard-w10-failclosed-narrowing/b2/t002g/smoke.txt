@@ -1,0 +1,6 @@
+# run-mutants.sh | 2026-10-24T16:09:54Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | suite mode: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria (secret-guard.test.sh 60f7f95525cd, helper 213d01379695, run-suite.sh 7584c219c4ba) | SC_BASH bash on PATH | scope designated | load 0.71 1.11 1.27
+BI-1    CAUGHT       verdict read from the last line of the output text (v2) | seats: author | V4-S6-spoofed-tail-0=red | load start 0.71 1.11 1.27 end 0.71 1.11 1.27 | timing batch: judged
+BI-8    CAUGHT       VMAX relaxed too | seats: author | V9-E12-vmax-unchanged=red[reference] | load start 0.71 1.11 1.27 end 0.73 1.10 1.27 | timing batch: judged
+BI-24   CAUGHT       the segment-mode trigger point does not ask the gate: it returns 4 unconditionally | seats: CR-MA | V2-G12-segment-trigger-asks-gate=red | load start 0.73 1.10 1.27 end 0.73 1.10 1.27 | timing batch: judged
+# 3 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 3)
+# perturbation round: 0 not as expected | load at the end 0.73 1.10 1.27

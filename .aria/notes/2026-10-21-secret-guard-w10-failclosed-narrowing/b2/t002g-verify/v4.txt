@@ -1,0 +1,124 @@
+# run-suite.sh | 2026-10-24T16:33:21Z | hook e83c5e30f2cc | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY . | load 1.06 0.86 0.98
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=.): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 24 / 136
+FAIL: 112 / 136
+SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.06 0.86 0.98 end 1.12 0.89 0.98 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V2-G1-gate]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.0]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.1]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.3]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:aarch64-unknown-linux-gnu:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.4]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:6.0]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:4.4]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-unknown-linux-gnu:3.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-apple-darwin23.0.0:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-msys:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-cygwin:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-alpine-linux-musl:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:aarch64-unknown-linux-android:5.2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl1]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2-2020]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-WSL-tag]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:wsl-mark]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-empty]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G2-platform:x86_64-pc-linux-gnu:5.2:three-args]: [missing] the hook under test does not define _sg_relax_platform
+  FAIL [W10-port V2-G3-gate-calls-platform]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G3b-gate-uses-build-facts]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G4-project-without-extension-file]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G4-extension-file-with-entry]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G4-empty-extension-file]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G4-extension-path-is-a-directory]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G5-nested]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G6-no-time-left]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G7-no-anchor]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G8-budget-0]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G11-flag-not-from-environment]: a hook sourced with _SG_RELAXED=1 in its environment holds [1] (want []) [value]
+  FAIL [W10-port V2-G14-cwd-extension-file-with-entry]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G15-cwd-project-without-extension-file]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G16-environment-root-before-cwd]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G17-wsl-distro-name-closes-gate]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V2-G18-wsl-interop-closes-gate]: [missing] the hook under test does not define _sg_relax_ok
+  FAIL [W10-port V11-S5-longline-head-verbatim]: the description of the longline text equals proposal What 5 (7 lines) [text] < [secret-guard] BLOCKED: command reads a secret-bearing source without a < value-REDACTING filter. Matched pattern: PAT-X 
+  FAIL [W10-port V11-S6-longline-chinese-line-verbatim]: the line in Chinese equals proposal What 5 [text] got [  ... # guard:ack: <reason ≥ 8 NON-WHITESPACE chars describing why>]
+  FAIL [W10-port V11-S7-longline-text-verbatim]: the whole longline text equals proposal What 5 (855 bytes) [text] < [secret-guard] BLOCKED: command reads a secret-bearing source without a < value-REDACTING filter. Matched pattern: PAT-X 
+  FAIL [W10-port V3-G9-clock-backwards]: [missing] the hook under test does not define _sg_relax_left
+  FAIL [W10-port V3-G10-cap-3]: [missing] the hook under test does not define _sg_relax_left
+  FAIL [W10-port V3-G12-time-left-zero-padded]: [missing] the hook under test does not define _sg_relax_left
+  FAIL [W10-port V4-S1-allow]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S2-block-with-text]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S3-block-without-text]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V3-S4-slow-judgement]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S5-pipe-holder]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S6-spoofed-tail-0]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S7-time-checkpoint]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S8-internal-error]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S9-child-left-behind]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S13-detached-child]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S13b-nothing-outlives-the-run]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S11-bare-zero]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S10-timer-fork-fails]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S10b-no-judgement-without-timer]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S10c-dead-timer-no-judgement]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S10d-no-judgement-with-dead-timer]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S14-failing-sleep-kills-at-once]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V5-S15-job-refuses-outside-group-leader]: [missing] the hook under test does not define _sg_relax_job
+  FAIL [W10-port V4-S19-block-text-bytes]: [missing] the hook under test does not define _sg_relax_run
+  FAIL [W10-port V4-S16-rerun-collect-checkpoint]: budget 0 inside the rerun, whole mode: status 2, stderr 820 bytes time (want 3 and no text) [status] [stderr]
+  FAIL [W10-port V4-S17-rerun-whole-checkpoint]: budget 0 inside the rerun, whole mode: status 2, stderr 804 bytes time (want 3 and no text) [status] [stderr]
+  FAIL [W10-port V4-S18-rerun-segment-checkpoint]: budget 0 inside the rerun, segment mode: status 2, stderr 804 bytes time (want 3 and no text) [status] [stderr]
+  FAIL [W10-port V6-S20-segment-fallback-text]: gate open, a segment copy over 8192: status/mode/text-bytes [2 none 719] (want [4 segment 0]); fallback text 0 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 719 bytes: DIFFERENT, first line [] [status] [bytes]
+  FAIL [W10-port V6-S21-whole-fallback-text]: gate open, a whole copy over 8192: status/mode/text-bytes [2 none 721] (want [4 whole 0]); fallback text 0 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 721 bytes: DIFFERENT, first line [] [status] [bytes]
+  FAIL [W10-port V8-D1-late-references-plain]: apply status 2 growth 0 (want status 0; the growth limit _SGV_GMAX is 8192) [status]
+  FAIL [W10-port V8-D1-late-references-braced]: apply status 2 growth 0 (want status 0; the growth limit _SGV_GMAX is 8192) [status]
+  FAIL [W10-port V8-D2-growth-8192-plain]: apply status 2 growth 0 (want status 0; the growth limit _SGV_GMAX is 8192) [status]
+  FAIL [W10-port V8-D2-growth-8192-braced]: apply status 2 growth 0 (want status 0; the growth limit _SGV_GMAX is 8192) [status]
+  FAIL [W10-port V8-D4-growth-text-whole]: status 2 (want 2), first line [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command is longer than 8192 characters after variable expansion] (want [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command grows by more than 8192 characters after variable expansion]) [text]
+  FAIL [W10-port V8-D5-growth-text-segment]: status 2 (want 2), first line [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: a command segment is longer than 8192 characters after variable expansion] (want [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: a command segment grows by more than 8192 characters after variable expansion]) [text]
+  FAIL [W10-port V9-C1-assignments-rerun]: collected 16 of 20 inside the rerun (want 20) [value]
+  FAIL [W10-port V9-C2-references-rerun-c12]: references left unexpanded inside the rerun: left (want none) [value]
+  FAIL [W10-port V9-C2-references-rerun-cb12]: references left unexpanded inside the rerun: left (want none) [value]
+  FAIL [W10-port V9-C3-for-statements-rerun]: collected 8 of 12 for statements inside the rerun (want 12) [value]
+  FAIL [W10-port V9-C4-value-limit-in-rerun]: the 17th assignment holds a value over 4096 (only the rerun collects it): status/text [2 oversize] (want [2 vmax]) [kind]
+  FAIL [W10-port V10-N2-read-rows-only]: rc=2 text=finding (want rc=2 text=longline) [kind]
+  FAIL [W10-port V10-N3-environ-big-judge]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V10-N4-read-big-judge]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-N5-read-big-judge-short-lines]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V10-N6-filtered-long-line-rows-only]: rc=0 text=none (want rc=2 text=longline) [status] [kind]
+  FAIL [W10-port V7-N7-big-judge-filtered-long-line]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-N10-blank-padded-long-line]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-N11-lmax-edge-normal]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-N12-lmax-edge-rows-only]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-N8-whole-branch-returns-big-judge]: rerun, whole copy over 8192 with a line over 8192, a read and a filter elsewhere: status/text/block-headers [2 oversize 1] (want [2 longline 1]) [kind]
+  FAIL [W10-port V7-N9-segment-routes-to-big-judge]: rerun, segment copy over 8192 with a line over 8192, a read and a filter in the segment: status/text [2 oversize] (want [2 longline]) [kind]
+  FAIL [W10-port V7-N13-unmeasured-length-rows-only]: [missing] the hook under test does not define _sg_vx_big_judge
+  FAIL [W10-port V7-E1-benign-big-allowed]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.13s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E3-anchor-at-hook-start]: hook rc=2 oversize 1.60s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E4-cap-3-at-budget-4]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E5-budget-2]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 1.85..2.6) [wall<lo]
+  FAIL [W10-port V2-E6-flag-from-environment-ignored]: hook rc=2 oversize 0.12s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V2-E8-ostype-from-environment-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V9-E10-count-axis-read-blocked]: hook rc=2 oversize 0.12s | gate-closed rc=2 oversize 0.12s | stderr IDENTICAL (want rc=2 text=finding|longline within 4.5 s) [fallback]
+  FAIL [W10-port V9-E11-tmax-in-rerun]: hook rc=2 oversize 0.76s | gate-closed rc=2 oversize 0.71s | stderr IDENTICAL (want rc=2 text=tmax within 4.5 s) [fallback]
+  FAIL [W10-port V7-E13-multiline-copy-normal-text]: hook rc=2 oversize 0.16s | gate-closed rc=2 oversize 0.12s | stderr IDENTICAL (want rc=2 text=finding within 4.5 s) [fallback]
+  FAIL [W10-port V7-E14-long-line-from-expansion]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.08s | stderr IDENTICAL (want rc=2 text=longline within 4.5 s) [fallback]
+  FAIL [W10-port V7-E15-credit-as-normal]: hook rc=2 oversize 0.07s | gate-closed rc=2 oversize 0.07s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V5-E19-deadline-with-term-ignored]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V11-S1-above-gate:_sg_vx_big_judge]: [missing] _sg_vx_big_judge is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_left]: [missing] _sg_relax_left is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_ok]: [missing] _sg_relax_ok is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_platform]: [missing] _sg_relax_platform is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_noext]: [missing] _sg_relax_noext is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_job]: [missing] _sg_relax_job is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S1-above-gate:_sg_relax_run]: [missing] _sg_relax_run is not defined in the hook (sourcing gate at line 926)
+  FAIL [W10-port V11-S3-longline-instructions-verbatim]: oversize [Split it into smaller commands and run them one at a time:/ ] longline [] [text]
+
+# run-suite.sh end | load 1.12 0.89 0.98 | suite exit 1

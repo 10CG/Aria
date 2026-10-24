@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:11:40Z | hook be43d308a558 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V5-S14-failing-sleep-kills-at-once)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V5-S14-failing-sleep-kills-at-once rc=0 (want 4) wall=40.84s (want 0..0.3) stderr='' (want '') [rc]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.25 1.19 1.29 end 1.29 1.21 1.29 | timing batch: judged

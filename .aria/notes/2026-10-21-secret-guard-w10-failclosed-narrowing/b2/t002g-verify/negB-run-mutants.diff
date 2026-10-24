@@ -1,0 +1,11 @@
+--- v31/run-mutants.sh
++++ negB/run-mutants.sh
+@@ -34,7 +34,7 @@
+ SCOPE=${MUT_SCOPE:-designated}
+ SUITE=''; RES=.txt   # suite mode: the aria checkout, and the verdicts read $W/<ID>.log instead of $W/<ID>.txt
+ REFIDS='V1-E16-p1-small-benign V1-E16-p1-small-read-filter V1-E16-p1-var-mid V1-E16-p1-small-read V1-E16-p1-var-read V1-E16-p1-var-mid-read'
+-REFIDS+=' V9-E12-vmax-unchanged V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2'
++REFIDS+=' V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2'
+ REFIDS+=' V2-E6-flag-from-environment-ignored V2-E7-no-time-left V2-E8-ostype-from-environment-ignored V2-E9-extension-project V9-E10-count-axis-read-blocked'
+ REFIDS+=' V9-E11-tmax-in-rerun V7-E13-multiline-copy-normal-text V7-E14-long-line-from-expansion V7-E15-credit-as-normal V2-E18-extension-via-stdin-cwd'
+ REFIDS+=' V5-E19-deadline-with-term-ignored V6-S20-segment-fallback-text V6-S21-whole-fallback-text'

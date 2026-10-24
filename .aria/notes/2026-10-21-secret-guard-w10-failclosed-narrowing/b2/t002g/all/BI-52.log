@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:12:36Z | hook 04dd8d5d2b7e | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V8-D4-growth-text-whole)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V8-D4-growth-text-whole status 2 (want 2), first line [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command is longer than 8192 characters after variable expansion] (want [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command grows by more than 8192 characters after variable expansion]) [text]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 2.27 1.51 1.39 end 2.27 1.51 1.39 | timing batch: SKIP [load]

@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T16:12:26Z | hook a13691490bb4 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V2-G3b-gate-uses-build-facts)$ | load 1.88 1.41 1.35
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V2-G3b-gate-uses-build-facts)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 3
+FAIL: 1 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.88 1.41 1.35 end 1.88 1.41 1.35 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V2-G3b-gate-uses-build-facts]: platform check got [x86_64-apple-darwin23.0.0|5|2|6.17.9-1-pve|], want [x86_64-pc-linux-gnu|5|2|6.17.9-1-pve|] (OSTYPE, MACHTYPE and HOSTTYPE set to darwin / aarch64: R2 PP2-m8) [value]
+
+# run-suite.sh end | load 1.88 1.41 1.35 | suite exit 1

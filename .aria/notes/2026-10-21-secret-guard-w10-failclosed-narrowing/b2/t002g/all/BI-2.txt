@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T16:10:07Z | hook 445525104afc | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V5-S5-pipe-holder|V6-E2-deadline-fallback-bytes)$ | load 1.07 1.17 1.29
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V5-S5-pipe-holder|V6-E2-deadline-fallback-bytes)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.07 1.17 1.29 end 0.99 1.15 1.28 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V5-S5-pipe-holder]: rc=4 (want 4) wall=6.22s (want 0.85..1.3) stderr='' (want '') [wall>hi]
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 longline 0.14s | gate-closed rc=2 oversize 0.09s | stderr DIFFERENT sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [bytes] [wall<lo]
+
+# run-suite.sh end | load 0.99 1.15 1.28 | suite exit 1

@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:10:18Z | hook 0ac3c4adf007 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V2-G4-extension-file-with-entry|V2-E9-extension-project)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V2-G4-extension-file-with-entry status 0 (want 1) [status]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V2-E9-extension-project hook rc=0 none 0.26s | gate-closed rc=2 oversize 0.14s | stderr DIFFERENT [bytes]
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 0.99 1.15 1.28 end 0.99 1.14 1.28 | timing batch: judged

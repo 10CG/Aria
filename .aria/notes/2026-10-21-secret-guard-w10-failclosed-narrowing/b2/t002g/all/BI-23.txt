@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T16:10:58Z | hook be43d308a558 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V5-S14-failing-sleep-kills-at-once)$ | load 1.25 1.19 1.29
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V5-S14-failing-sleep-kills-at-once)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 3
+FAIL: 1 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.25 1.19 1.29 end 1.29 1.21 1.29 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V5-S14-failing-sleep-kills-at-once]: rc=0 (want 4) wall=40.84s (want 0..0.3) stderr='' (want '') [rc]
+
+# run-suite.sh end | load 1.29 1.21 1.29 | suite exit 1

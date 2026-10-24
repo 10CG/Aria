@@ -31,3 +31,8 @@
   - 没收：三个构造的整份 hook 副本（由三个 diff 复现）。
 - `t002f-verify/`：主控对 3c2 的独立复核（2026-10-24 15:34–15:54 UTC）。`PREDICT.md` 是 3c2 交回之前写下的预期，`VERIFY.md` 是逐项结果；`mkcons.py` 构造主控自己的两个坏态（作业 0.5 s 后就失败 `c5`、作业 2.05 s 后结束 `c3p`，对实现的改动见 `*-hook.diff`），`drive.sh` / `drive.log` 是串行驱动；`c5.txt`、`c3p.txt`、`impl.txt` 是三轮输出。结论：预期全部相符；关门重跑只量一次的余量不够，改为至多 3 次，交 3e。
 - `BRIEF-T002c-3d.md`：第三步 3d（`run-mutants.sh` 的套件模式；全部坏实现与扰动、两种环境错误、基线红集在套件上复跑）的任务书，派出前按计划 notes「3d 任务书调整」改过两处。
+- `T002c-3d-report.md`：第三步 3d 的执笔席报告（2026-10-24），任务书是上面的 `BRIEF-T002c-3d.md`。结果是主仓 `../v31/run-mutants.sh` 的套件模式（`MUT_SUITE`）。报告里的相对路径相对 `t002g/`。
+- `t002g/`：3d 的过程材料：全部坏实现与扰动的套件模式全量轮 `all*`（每个编号的 `.txt` 与逐条结果 `.log`，`mut/` 下只留三张表）；首跑计时批未判者的低负载重跑 `rerun-load*`；P-0 单独重跑 `p0-rerun*`；改前改后的非套件模式对照 `before*`、`after*`、`before-after.diff`；现状轮 `s0-*`、冒烟 `smoke*`；环境错误 `env/`；基线红集 `base/`（逐编号对齐 `align.txt`）；`run-mutants.sh` 的改前、改后与 diff；驱动 `drv.sh`、对照表生成 `gen-table.py` 与 `table.md`。
+  - 没收：坏实现的整份 hook（`*/mut/*.sh`，可用 `../v31/mutants.py` 复现）；环境错误用的 aria 检出副本 `env/*-aria/`；59e333c 的 hook（由 git 得到）。
+- `t002g-verify/`：主控对 3d 的独立复核（2026-10-24 16:28–16:34 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是逐项结果；`v1.txt` 是主控挑的正样本；`v2-negA.txt`、`v2-negB.txt` 是原因表负控（副本对 v31 的改动见 `neg-mutants.diff`、`negB-run-mutants.diff`）；`v3-*.txt` 复现 `run-suite.sh` 吞错；`v4.txt` 与 `v4-cmp.txt` 是基线红集与另写的比对（`cmp-base.py`）。结论：预期全部相符；`run-suite.sh` 吞错属实，修法并入 3e。
+- `BRIEF-T002c-3e.md`：第三步 3e（关门重跑至多 3 次、注释去掉 hook 前缀、`run-suite.sh` 不再吞掉环境错误）的任务书。

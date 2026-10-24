@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T16:12:03Z | hook c2716e410e59 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V5-E19-deadline-with-term-ignored)$ | load 2.05 1.38 1.34
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V5-E19-deadline-with-term-ignored)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 3
+FAIL: 1 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 2.37 1.46 1.37 end 2.22 1.46 1.37 | timing batch: SKIP [load]
+
+Failures:
+  FAIL [W10-port V5-E19-deadline-with-term-ignored]: hook rc=2 longline 10.16s | gate-closed rc=2 oversize 0.12s | stderr DIFFERENT sed-stall=uncut (want IDENTICAL, wall window 2.85..3.6) [uncut]
+
+# run-suite.sh end | load 2.22 1.46 1.37 | suite exit 1

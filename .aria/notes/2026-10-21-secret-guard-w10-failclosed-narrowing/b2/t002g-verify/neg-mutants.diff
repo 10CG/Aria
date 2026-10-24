@@ -1,0 +1,20 @@
+--- v31/mutants.py
++++ negA/mutants.py
+@@ -31,7 +31,7 @@
+ 
+ # ---------------- BI-1..BI-23 (author) ----------------
+ RUN_OLD = base[base.index('  out="$( exec 2>/dev/null; set -m'):base.index('  return 4\n}', base.index('  out="$( exec 2>/dev/null; set -m')) + len('  return 4\n}')]
+-mut('BI-1', [('V4-S6-spoofed-tail-0', r'\[rc\]')], 'verdict read from the last line of the output text (v2)',
++mut('BI-1', [('V4-S6-spoofed-tail-0', r'\[bytes\]')], 'verdict read from the last line of the output text (v2)',
+     [('  [[ $rc -eq 77 ]] && return 0\n', '  [[ $rc -eq 77 || "${out##*$\'\\n\'}" == 0 ]] && return 0\n')])
+ mut('BI-2', [('V5-S5-pipe-holder', r'\[wall>hi\]'), ('V6-E2-deadline-fallback-bytes', r'\[bytes\]')], 'no process group and no group-leader self-check: the job PID alone is killed',
+     [('out="$( exec 2>/dev/null; set -m\n', 'out="$( exec 2>/dev/null\n'),
+@@ -49,7 +49,7 @@
+       '  [[ "${OSTYPE:-}" == linux* && -n "${EPOCHREALTIME:-}" ]] || return 1')])
+ mut('BI-7', [('V6-E2-deadline-fallback-bytes', r'\[time-text\]|\[bytes\]')], 'the fallback writes a time text of its own instead of the baseline size text',
+     [('{ _sg_emit_blocked "$_SG_OV_PAT" "$cmd" "$_SG_OV_MODE" oversize; return 2; }', '{ _sg_emit_blocked "time" "$cmd" "$_SG_OV_MODE" timeout; return 2; }')])
+-mut('BI-8', [('V9-E12-vmax-unchanged', r'\[bytes\]')], 'VMAX relaxed too', [('_SGV_VMAX=4096\n', '_SGV_VMAX=8192\n')])
++mut('BI-8', [('V9-E12-vmax-unchanged', r'\[status\]')], 'VMAX relaxed too', [('_SGV_VMAX=4096\n', '_SGV_VMAX=8192\n')])
+ mut('BI-9', [('V8-D3-growth-8193-plain', r'\[status\]'), ('V8-D3-growth-8193-braced', r'\[status\]')], 'the growth limit is recomputed from the rewritten string, per variable',
+     [('    n="${_SGV_N[i]}"; v="${_SGV_V[i]}"\n    [[ -n "$v" ]] || continue\n    if [[ "$s" == *"\\${$n}"* ]]',
+       '    n="${_SGV_N[i]}"; v="${_SGV_V[i]}"\n    [[ -n "${_SG_RELAXED:-}" ]] && lim=$(( ${#s} + _SGV_GMAX ))\n    [[ -n "$v" ]] || continue\n    if [[ "$s" == *"\\${$n}"* ]]')])

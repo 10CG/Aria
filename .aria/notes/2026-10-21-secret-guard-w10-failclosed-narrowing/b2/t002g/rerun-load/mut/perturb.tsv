@@ -1,0 +1,7 @@
+P-0	all	the constants perturbed: _SGV_GMAX=8190, _SGV_LMAX=8200 (every case must stay green: the cases read the constants from the hook)
+P-M29	V7-N11-lmax-edge-normal	QA-M29 on P-0: the longest-line edge compares with _SGV_SMAX instead of _SGV_LMAX
+P-L-sentinel	V7-N13-unmeasured-length-rows-only	on P-0: the unmeasured-length sentinel is _SGV_SMAX + 1 instead of _SGV_LMAX + 1
+P-L-text	V11-S5-longline-head-verbatim V11-S7-longline-text-verbatim	on P-0: the longline text names _SGV_SMAX instead of _SGV_LMAX
+P-G-limit	V8-D3-growth-8193-plain V8-D3-growth-8193-braced	on P-0: the growth limit of the rerun is the input length + _SGV_SMAX instead of + _SGV_GMAX
+P-G-text-whole	V8-D4-growth-text-whole	on P-0: the whole-mode growth reason names _SGV_SMAX instead of _SGV_GMAX
+P-G-text-segment	V8-D5-growth-text-segment	on P-0: the segment-mode growth reason names _SGV_SMAX instead of _SGV_GMAX

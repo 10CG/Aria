@@ -1,0 +1,4 @@
+BI-8: v31 CAUGHT V9-E12-vmax-unchanged=red | suite CAUGHT V9-E12-vmax-unchanged=red[reference]
+P-0: v31 GREEN  | suite NOT-JUDGED 
+ids: v31 64, suite 64; caught with [reference]: 1
+  ref: BI-8 V9-E12-vmax-unchanged=red[reference]

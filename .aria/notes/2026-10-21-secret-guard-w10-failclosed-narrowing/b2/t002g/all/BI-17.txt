@@ -1,0 +1,15 @@
+# run-suite.sh | 2026-10-24T16:10:47Z | hook 3e02d2b8e542 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V9-C1-assignments-rerun|V9-C2-references-rerun-c12|V9-E10-count-axis-read-blocked)$ | load 1.05 1.15 1.28
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V9-C1-assignments-rerun|V9-C2-references-rerun-c12|V9-E10-count-axis-read-blocked)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 5
+FAIL: 3 / 5
+SKIP: 0 / 5 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.05 1.15 1.28 end 1.21 1.18 1.29 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V9-C1-assignments-rerun]: collected 16 of 20 inside the rerun (want 20) [value]
+  FAIL [W10-port V9-C2-references-rerun-c12]: references left unexpanded inside the rerun: left (want none) [value]
+  FAIL [W10-port V9-E10-count-axis-read-blocked]: hook rc=0 none 0.19s | gate-closed rc=2 oversize 0.12s | stderr DIFFERENT (want rc=2 text=finding|longline within 4.5 s) [rc] [kind]
+
+# run-suite.sh end | load 1.21 1.18 1.29 | suite exit 1

@@ -1,0 +1,5 @@
+# run-mutants.sh | 2026-10-24T16:31:53Z | hook af4658b6f935 | mutants.py 9bbe928aa4c6 | suite mode: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria (secret-guard.test.sh 60f7f95525cd, helper 213d01379695, run-suite.sh 7584c219c4ba) | SC_BASH bash on PATH | scope designated | load 0.84 0.70 0.93
+BI-1    WRONG-REASON verdict read from the last line of the output text (v2) | seats: author | V4-S6-spoofed-tail-0=red-for-another-reason(want \[bytes\]) | load start 0.85 0.70 0.93 end 0.85 0.70 0.93 | timing batch: judged
+BI-8    WRONG-REASON VMAX relaxed too | seats: author | V9-E12-vmax-unchanged=red-for-another-reason(want \[status\]) | load start 0.85 0.70 0.93 end 0.85 0.70 0.93 | timing batch: judged
+# 0 caught, 0 missed, 2 wrong reason, 0 not judged, 0 setup (of 2)
+# perturbation round: 0 not as expected | load at the end 0.85 0.70 0.93

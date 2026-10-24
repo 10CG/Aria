@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:13:30Z | hook 9dba29a74000 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V11-S5-longline-head-verbatim|V11-S7-longline-text-verbatim)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V11-S5-longline-head-verbatim the description of the longline text equals proposal What 5 (7 lines) [text] < expansion it has a line longer than 8192 characters. Matched pattern: PAT-X > expansion it has a line longer than 8200 characters. Matched pattern: PAT-X 
+FAIL V11-S7-longline-text-verbatim the whole longline text equals proposal What 5 (855 bytes) [text] < expansion it has a line longer than 8192 characters. Matched pattern: PAT-X > expansion it has a line longer than 8200 characters. Matched pattern: PAT-X 
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 2.08 1.56 1.41 end 2.08 1.56 1.41 | timing batch: SKIP [load]

@@ -1,0 +1,57 @@
+BI-1	V4-S6-spoofed-tail-0	verdict read from the last line of the output text (v2)	author
+BI-2	V5-S5-pipe-holder V6-E2-deadline-fallback-bytes	no process group and no group-leader self-check: the job PID alone is killed	author
+BI-3	V5-S10c-dead-timer-no-judgement V5-S10d-no-judgement-with-dead-timer	the judgement starts without checking that the timer runs	author
+BI-4	V6-E2-deadline-fallback-bytes	the relaxed rerun runs in-process: no job, no hard deadline	author
+BI-5	V2-G4-extension-file-with-entry V2-E9-extension-project	the gate does not ask about a project extension	author
+BI-6	V2-G3-gate-calls-platform V2-G3b-gate-uses-build-facts V2-E8-ostype-from-environment-ignored	the platform is read from the environment (OSTYPE, EPOCHREALTIME present)	author
+BI-7	V6-E2-deadline-fallback-bytes	the fallback writes a time text of its own instead of the baseline size text	author
+BI-8	V9-E12-vmax-unchanged	VMAX relaxed too	author
+BI-9	V8-D3-growth-8193-plain V8-D3-growth-8193-braced	the growth limit is recomputed from the rewritten string, per variable	author
+BI-10	V7-E14-long-line-from-expansion	the longest line is measured on the raw command, not on the copy	author
+BI-11	V10-N3-environ-big-judge V11-S4-one-rule-loop	rows only through a rule loop of its own, which skips the W12 neutralisation	author
+BI-12	V7-N5-read-big-judge-short-lines V7-E13-multiline-copy-normal-text	the line length is tested with [[ =~ .{8193,} ]] (it matches across newlines)	author
+BI-13	V3-E3-anchor-at-hook-start	the deadline is anchored after the stdin parse, not at the hook start	author
+BI-14	V3-G10-cap-3 V3-E4-cap-3-at-budget-4	the deadline uses the whole budget, not min(budget, 3)	author
+BI-15	V5-S9-child-left-behind V5-S13b-nothing-outlives-the-run	the group is not killed after the job ends	author
+BI-16	V2-G11-flag-not-from-environment V2-E6-flag-from-environment-ignored	the relaxed flag is taken from the environment (not initialised)	author
+BI-17	V9-C1-assignments-rerun V9-C2-references-rerun-c12 V9-E10-count-axis-read-blocked	the count bounds also hold inside the rerun	author
+BI-17a	V9-C1-assignments-rerun	BI-17 split: only the assignment bound (16) still holds inside the rerun	author
+BI-17b	V9-C3-for-statements-rerun	BI-17 split: only the for-statement bound (8) still holds inside the rerun (the rerun lifts the assignment bound only)	CR-MB QA-M12 TL-M1
+BI-17c	V9-C2-references-rerun-c12 V9-C2-references-rerun-cb12	BI-17 split: only the replacement bound (8 per variable) still holds inside the rerun, in _sg_vx_replace and in _sg_vx_apply	author
+BI-18	V9-E11-tmax-in-rerun	TMAX is not checked inside the rerun	author
+BI-19	V4-S11-bare-zero	a bare 0 from the job counts as allowed	author
+BI-20	V2-G4-empty-extension-file	an empty extension file counts as no extension	author
+BI-21	V3-G9-clock-backwards	a clock that went backwards extends the deadline (time left not capped)	author
+BI-22	V2-G6-no-time-left V2-G7-no-anchor V2-G8-budget-0	the gate does not ask for time left	author
+BI-23	V5-S14-failing-sleep-kills-at-once	the timer kills only after a successful sleep (&& instead of ;): a failing sleep leaves no deadline	author
+BI-24	V2-G12-segment-trigger-asks-gate	the segment-mode trigger point does not ask the gate: it returns 4 unconditionally	CR-MA
+BI-25	V2-G12-segment-trigger-asks-gate	the segment-mode trigger point asks `true` instead of the gate	QA-M02
+BI-26	V2-G14-cwd-extension-file-with-entry	the gate takes the project root from CLAUDE_PROJECT_DIR only: the stdin cwd route of _sg_ext_root is lost	QA-M01 TL-M8 BA-M1
+BI-27	V9-C4-value-limit-in-rerun	inside the rerun a value over VMAX (status 2 of _sg_vx_collect) is ignored: the partly collected copy is judged	QA-M24
+BI-28	V4-S17-rerun-whole-checkpoint	the whole-mode time checkpoint inside the rerun returns 0 (allow) instead of 3	QA-M06
+BI-29	V4-S18-rerun-segment-checkpoint	the segment-loop time checkpoint inside the rerun returns 0 (allow) instead of 3	QA-M07
+BI-30	V4-S16-rerun-collect-checkpoint	the chaining time checkpoint (status 3 of _sg_vx_collect) inside the rerun returns 0 (allow) instead of 3	QA-M08
+BI-31	V4-S16-rerun-collect-checkpoint V4-S17-rerun-whole-checkpoint V4-S18-rerun-segment-checkpoint	the three time checkpoints inside the rerun write the time text and return 2 (the "return 3" lines removed)	BA-M8
+BI-32	V4-S18-rerun-segment-checkpoint	the segment-loop time checkpoint inside the rerun writes the time text (its "return 3" line removed)	TL-M5
+BI-33	V10-N6-filtered-long-line-rows-only V7-N7-big-judge-filtered-long-line	credit is evaluated first; a line over _SGV_LMAX gets the longline text only when credit is 0 (ruling C broken: a filtered long line is allowed)	CR-MC BA-M4
+BI-34	V7-N8-whole-branch-returns-big-judge	the whole-mode branch calls _sg_vx_big_judge but drops its verdict (no return $?): the credit judgement follows	TL-M2
+BI-35	V7-N9-segment-routes-to-big-judge	segment mode never routes a big copy to _sg_vx_big_judge (only the whole-mode hunk applied)	CR-MD TL-M3 BA-M11
+BI-36	V7-N9-segment-routes-to-big-judge	segment mode judges a big copy with the normal _sg_judge_one in both branches	QA-M10
+BI-37	V7-N10-blank-padded-long-line	the line-length loop reads without IFS= (leading and trailing blanks are trimmed from the measured line)	QA-M28 TL-M4
+BI-38	V8-D4-growth-text-whole	a whole-mode growth overrun inside the rerun returns 0 (allow) instead of the growth block	QA-M18 BA-M9
+BI-39	V8-D5-growth-text-segment	a segment-mode growth overrun inside the rerun skips the segment (continue) instead of blocking	QA-M17
+BI-40	V8-D5-growth-text-segment	a segment-mode growth overrun inside the rerun returns 0 (allow) instead of the growth block	BA-M10
+BI-41	V5-S15-job-refuses-outside-group-leader	the group-leader self-check of the job is removed (set -m kept)	BA-M7
+BI-42	V5-E19-deadline-with-term-ignored	the timer and the group kill after the job use TERM instead of KILL	QA-M20
+BI-43	V5-E19-deadline-with-term-ignored	the timer uses TERM instead of KILL (the group kill after the job keeps KILL)	QA-M30
+BI-44	V2-G3b-gate-uses-build-facts	the machine argument of the platform check is $MACHTYPE (the environment can rewrite it) instead of BASH_VERSINFO[5]	QA-M04 BA-M14
+BI-45	V6-S20-segment-fallback-text	the segment-mode trigger point keeps the whole-command reason string for the fallback text	QA-M09 BA-M5
+BI-46	V7-N11-lmax-edge-normal	the longest-line edge is >= _SGV_LMAX instead of > _SGV_LMAX	QA-M13 TL-M9 BA-M6
+BI-47	V7-N13-unmeasured-length-rows-only	a length that could not be measured routes to the credit path (max=0) instead of rows only	QA-M14
+BI-48	V7-N13-unmeasured-length-rows-only	the "length could not be measured -> rows only" sentinel of _sg_vx_big_judge is removed	BA-M3
+BI-49	V4-S19-block-text-bytes	the relaxed block text is printed again without its final newline	QA-M15
+BI-50	V3-G12-time-left-zero-padded	the time left is printed as %d.%d: the microseconds are not zero-padded (2.050000 s becomes 2.50000)	BA-M2
+BI-51	V11-S5-longline-head-verbatim V11-S7-longline-text-verbatim	the longline description gains a prescriptive sentence (end the command with a guard:ack line)	KM-M1
+BI-52	V8-D4-growth-text-whole	the whole-mode growth reason string reverts to the baseline wording (the command is longer than _SGV_SMAX)	KM-M2
+BI-53	V8-D5-growth-text-segment	the segment-mode growth reason string reverts to the baseline wording (a command segment is longer than _SGV_SMAX)	KM-M3
+BI-54	V11-S6-longline-chinese-line-verbatim V11-S7-longline-text-verbatim	the line in Chinese of the longline text gains a prescriptive clause (add a guard:ack line)	KM-M6

@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T16:21:31Z | hook 291aba10399a | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V11-S5-longline-head-verbatim|V11-S7-longline-text-verbatim)$ | load 1.09 1.15 1.27
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V11-S5-longline-head-verbatim|V11-S7-longline-text-verbatim)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.09 1.15 1.27 end 1.09 1.15 1.27 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V11-S5-longline-head-verbatim]: the description of the longline text equals proposal What 5 (7 lines) [text] < If you are sure the command is safe, end it with a guard:ack: <reason> line and run it again. 
+  FAIL [W10-port V11-S7-longline-text-verbatim]: the whole longline text equals proposal What 5 (855 bytes) [text] < If you are sure the command is safe, end it with a guard:ack: <reason> line and run it again. 
+
+# run-suite.sh end | load 1.09 1.15 1.27 | suite exit 1

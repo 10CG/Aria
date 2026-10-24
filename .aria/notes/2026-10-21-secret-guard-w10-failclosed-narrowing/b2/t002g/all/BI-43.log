@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:12:26Z | hook f47648d639f1 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V5-E19-deadline-with-term-ignored)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V5-E19-deadline-with-term-ignored hook rc=2 longline 10.14s | gate-closed rc=2 oversize 0.11s | stderr DIFFERENT sed-stall=uncut (want IDENTICAL, wall window 2.85..3.6) [uncut]
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 2.22 1.46 1.37 end 1.88 1.41 1.35 | timing batch: SKIP [load]

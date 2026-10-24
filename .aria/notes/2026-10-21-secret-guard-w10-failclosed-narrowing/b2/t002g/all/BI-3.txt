@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T16:10:15Z | hook 0c5532f240e4 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V5-S10c-dead-timer-no-judgement|V5-S10d-no-judgement-with-dead-timer)$ | load 0.99 1.15 1.28
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V5-S10c-dead-timer-no-judgement|V5-S10d-no-judgement-with-dead-timer)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 0.99 1.15 1.28 end 0.99 1.15 1.28 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V5-S10c-dead-timer-no-judgement]: rc=0 (want 4) wall=0.00s (want 0..0.3) stderr='' (want '') [rc]
+  FAIL [W10-port V5-S10d-no-judgement-with-dead-timer]: judgement started: yes (want no) [judged]
+
+# run-suite.sh end | load 0.99 1.15 1.28 | suite exit 1

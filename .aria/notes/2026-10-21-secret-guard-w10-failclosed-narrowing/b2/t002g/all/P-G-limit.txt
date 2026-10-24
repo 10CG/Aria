@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T16:13:30Z | hook 66d98e496d70 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V8-D3-growth-8193-plain|V8-D3-growth-8193-braced)$ | load 2.08 1.56 1.41
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V8-D3-growth-8193-plain|V8-D3-growth-8193-braced)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 2.08 1.56 1.41 end 2.08 1.56 1.41 | timing batch: SKIP [load]
+
+Failures:
+  FAIL [W10-port V8-D3-growth-8193-plain]: apply status 0 growth 8191 (want status 2; the growth limit _SGV_GMAX is 8190) [status]
+  FAIL [W10-port V8-D3-growth-8193-braced]: apply status 0 growth 8191 (want status 2; the growth limit _SGV_GMAX is 8190) [status]
+
+# run-suite.sh end | load 2.08 1.56 1.41 | suite exit 1

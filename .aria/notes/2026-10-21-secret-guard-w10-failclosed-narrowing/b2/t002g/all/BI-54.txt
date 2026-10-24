@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T16:12:37Z | hook f52775c79e42 | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V11-S6-longline-chinese-line-verbatim|V11-S7-longline-text-verbatim)$ | load 2.27 1.51 1.39
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V11-S6-longline-chinese-line-verbatim|V11-S7-longline-text-verbatim)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 2.27 1.51 1.39 end 2.27 1.51 1.39 | timing batch: SKIP [load]
+
+Failures:
+  FAIL [W10-port V11-S6-longline-chinese-line-verbatim]: the line in Chinese equals proposal What 5 [text] got [命令读取含密钥的来源, 且变量展开后有超长的行, 可在命令末尾加 guard:ack 行后重试, 请拆成更小的命令]
+  FAIL [W10-port V11-S7-longline-text-verbatim]: the whole longline text equals proposal What 5 (855 bytes) [text] < 命令读取含密钥的来源, 且变量展开后有超长的行, 可在命令末尾加 guard:ack 行后重试, 请拆成更小的命令 > 命令读取含密
+
+# run-suite.sh end | load 2.27 1.51 1.39 | suite exit 1

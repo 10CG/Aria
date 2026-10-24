@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T16:11:46Z | hook 4c090b97757e | suite 60f7f95525cd | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V4-S18-rerun-segment-checkpoint)$ | load 1.27 1.21 1.29
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V4-S18-rerun-segment-checkpoint)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 3
+FAIL: 1 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.27 1.21 1.29 end 1.27 1.21 1.29 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V4-S18-rerun-segment-checkpoint]: budget 0 inside the rerun, segment mode: status 0, stderr 0 bytes  (want 3 and no text) [status] 
+
+# run-suite.sh end | load 1.27 1.21 1.29 | suite exit 1

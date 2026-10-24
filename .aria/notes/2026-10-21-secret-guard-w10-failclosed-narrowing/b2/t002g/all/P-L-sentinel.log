@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:13:29Z | hook cf1d35106dea | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V7-N13-unmeasured-length-rows-only)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V7-N13-unmeasured-length-rows-only a filtered read whose line length cannot be measured: status/text [0 none] (want [2 longline]) [status] [kind]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 2.08 1.56 1.41 end 2.08 1.56 1.41 | timing batch: SKIP [load]

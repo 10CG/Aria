@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T16:10:50Z | hook abb872bc93fb | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V9-C3-for-statements-rerun)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V9-C3-for-statements-rerun collected 8 of 12 for statements inside the rerun (want 12) [value]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.21 1.18 1.29 end 1.21 1.18 1.29 | timing batch: judged

@@ -1,0 +1,6 @@
+aligned ids: 137
+state differences: 1; tag differences: 0
+STATE V12-C1-hook-comments FAIL [text] NONE NONE
+suite log states:  112 FAIL 24 PASS ; [missing] 74; [reference] 0
+# load start 1.12 1.33 1.35 end 1.73 1.46 1.39 | timing batch: judged
+reasons.tsv rows checked: 86 (/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002g/all/mut/reasons.tsv)
