@@ -216,16 +216,16 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 
 **仍然拦**：增长 > 8192；任一值 > 4096（是否被引用都拦）；分段副本总和 > 65536；超长单行命中规则；放宽重跑没在截止前完成；准入门不成立时的一切基线拦截。
 
-**残余（不在本变更内；载体由 owner 在 TASK-001 定，见 `detailed-tasks.yaml` TASK-001 的对外动作清单）**：
+**残余（不在本变更内；载体已于 2026-10-24 在 TASK-001 定，见各条）**：
 
 1. 首遍不计时：`10CG/aria-plugin#228`。
-2. ≤ 8192 的判定只受协作式时间预算约束，单次判定可以超过 5 s（R2 TL2-F5：一个 8 KB、4000 行、需要算 credit 的副本，基线 e2e 7–19 s 并放行）。这是基线已有的 fail-open，与 `10CG/aria-plugin#228` 同类；v1.76.1 CHANGELOG 的「永不 fail-open」对它不成立，本次 CHANGELOG 订正。
-3. count 轴，小命令一侧：第 17 个赋值、每个变量第 9 次引用、第 9 个 for 不收集也不代入，读取藏在它们后面就看不到（基线已有，`10CG/aria-plugin#217` 正文建议暂不改）。`10CG/aria-plugin#217` 关闭后需要一个开着的载体。
-4. `10CG/aria-plugin#217` 第 2 项（for 列表止于换行）：撤下（Decision 10）。
-5. `_sg_vx_collect` 把 heredoc 正文里形似赋值的文本当成 shell 赋值（Decision 9）。
-6. 裁定 E 的放开：macOS、Windows、musl 等平台要放宽，先要一个不依赖 `/proc` 的组长自检与实测；aarch64 等其他架构与 WSL（WSL1、WSL2）要放宽，先要在该平台上实测（What 1 补充）。
+2. ≤ 8192 的判定只受协作式时间预算约束，单次判定可以超过 5 s（R2 TL2-F5：一个 8 KB、4000 行、需要算 credit 的副本，基线 e2e 7–19 s 并放行）。这是基线已有的 fail-open，与 `10CG/aria-plugin#228` 同类，记在它的留言里；v1.76.1 CHANGELOG 的「永不 fail-open」对它不成立，本次 CHANGELOG 订正。
+3. count 轴，小命令一侧：第 17 个赋值、每个变量第 9 次引用、第 9 个 for 不收集也不代入，读取藏在它们后面就看不到（基线已有，`10CG/aria-plugin#217` 正文建议暂不改）。载体：`10CG/aria-plugin#231`。
+4. `10CG/aria-plugin#217` 第 2 项（for 列表止于换行）：撤下（Decision 10），续行感知转 `10CG/aria-plugin#231`。
+5. `_sg_vx_collect` 把 heredoc 正文里形似赋值的文本当成 shell 赋值（Decision 9）；载体 `10CG/aria-plugin#231`。
+6. 裁定 E 的放开：macOS、Windows、musl 等平台要放宽，先要一个不依赖 `/proc` 的组长自检与实测；aarch64 等其他架构与 WSL（WSL1、WSL2）要放宽，先要在该平台上实测（What 1 补充）。记在 `10CG/aria-plugin#219` 的留言里（与它的「仅 Linux 验证」同类）。
 7. 评论 28512 第 2 点（扩展项目整串口径）：已评估，维持扩展的绝对尺寸门；放宽对扩展项目不生效。
-8. 两类既有代入语义缺口（重复赋值时首值胜出；分段模式下值里的 shell 语法被代入），见 R-a。小命令与大命令一并修，载体由 TASK-001 定。
+8. 两类既有代入语义缺口（重复赋值时首值胜出；分段模式下值里的 shell 语法被代入），见 R-a。小命令与大命令一并修，载体 `10CG/aria-plugin#231`。
 9. 截止之后的收尾 ε 随负载增长，hook 启动之前的 shell 启动时间不在耗时上界里（PP2-m6）；重跑的计数上限实为 1,000,000，到顶静默止步，几 MB 以下的命令到不了（PP2-m16）。
 
 ## Owner 裁定点
@@ -246,7 +246,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 1. PP1-A1 count 轴：TL 席把它定为 owner 的姿态题，给了「申报放行」与「计数触顶即回落」两个选项。主控取第三种（Decision 14）：重跑里取消计数上限，判定完整后按结果判。这是裁定 A 的字面，判不完就回落拦截（裁定 B）。与 v3 相比，大多数情形是多拦：藏在第 9 个引用之后的读取被看到。也有反方向的个例：脱敏过滤（如 `>/dev/null`）藏在第 9 个引用之后时，v3 看不到它、照拦，v3.1 看到它、给 credit 后放行——这与小命令的判定完全一致，属 R-a 申报的 credit 语义（`10CG/aria-plugin#139`），不是新的一类。真实流量收益：v3 137 条，「触顶即回落」73 条（post_planning R1 汇总「主控核验与补充」PP1-A1 行，主控在 v3 原型的变体上重放；原始输出未入库），v3.1 见 W12 第 1 节。
 2. 放行用专用退出码 77（Decision 15）、bash 版本只认实测过的 5.0–5.3（Decision 16）：都是 fail-closed 方向的编码与范围限定。post_planning R2 五席对 Decision 14–16 的技术挑战无异议。
 
-**Rule #6 块 B**（v3.2 改判，技术判定，已通报 owner）：AI 可见的新文字（`longline` 描述句、两条增长原因串）与路由带来的文案变化落在 SOT §2 的「拿不准」格。v3.1 先按第 1 行豁免、待复议，声称的逐字断言其实不存在（post_planning R2 PP2-T）。v3.2 改按第 3 行三件套处理：点名行为（见 `rule6_note`）；可证伪的定向 fixture（`V11-S3`，加上 TASK-002 补的逐字断言，R2 的 KM-M1–M3、M6 必须在其上变红）；「AB 套件不覆盖 hook 文案」的 issue 随 TASK-001 上呈。三件缺一，照跑。
+**Rule #6 块 B**（v3.2 改判，技术判定，已通报 owner）：AI 可见的新文字（`longline` 描述句、两条增长原因串）与路由带来的文案变化落在 SOT §2 的「拿不准」格。v3.1 先按第 1 行豁免、待复议，声称的逐字断言其实不存在（post_planning R2 PP2-T）。v3.2 改按第 3 行三件套处理：点名行为（见 `rule6_note`）；可证伪的定向 fixture（`V11-S3`，加上 TASK-002 补的逐字断言，R2 的 KM-M1–M3、M6 必须在其上变红）；「AB 套件不覆盖 hook 文案」的 issue 已开（`10CG/Aria#261`）。三件缺一，照跑。
 
 ## Success Criteria
 
@@ -311,12 +311,12 @@ W13 的 SKIP 目前恒为 0：没有任何用例会 SKIP。TASK-002 加入负载
 - **修复**: 在原来按总长拦的两处, 若满足放宽条件, 改为在一个硬截止作业里按放宽规则重判 W10: 副本上限改按增长 (`_SGV_GMAX` = 8192); 重判里不设计数上限 (所有赋值与引用都代入); 超过 8192 的副本照常完整判定, 其中行长超过 8192 的只匹配规则、不评估脱敏过滤 (新 `longline` 文案)。截止 = hook 启动 + min(`SECRET_GUARD_TIME_BUDGET_S`, 3) s; 作业自成进程组, 到点整组终止; 截止前没判完、或任何异常, 一律按原来的「过大」文案拦 (逐字节相同)。
 - **放宽条件**: x86_64 GNU/Linux 上的 bash 5.0–5.3 (实测 5.0.18 / 5.1.16 / 5.2.15 / 5.3.20), 不在 WSL 里、项目没有启用 `.aria/secret-guard.paths` 扩展、hook 启动后未满截止。其他平台 (macOS / Windows 原生 / WSL1 与 WSL2 / musl / aarch64 等其他架构)、其他 bash 版本、启用扩展的项目: 行为与之前完全相同。还依赖 `/proc` 与支持小数秒的 `sleep`; 缺了它们放宽不生效, 行为同旧版。
 - **行为变更**: 本机真实流量里, 被尺寸上限拦下的 137 条命令在 Linux 上放行 <N_allowed> 条 (TASK-004 实测); 这类命令被拦时, 文案由「过大」变为增长超限、TMAX、`longline` 或普通命中文案; 重判没在截止前完成的, 照旧按「过大」拦, 但要等到截止 (约 3 s; 以前在触发点当即拦, 通常 2 s 以内); `SECRET_GUARD_TIME_BUDGET_S` 设为 4 时截止仍封顶 3 s, 设得更小时截止随之缩短。
-- **放宽面申报**: 这些大命令沿用现有的判定语义, 所以判定语义上的既有缺口覆盖到更多大命令 —— 块结构命令整串判定、命令里任一处脱敏过滤都会给整条命令 credit (`10CG/aria-plugin#139`; 例: 读一个凭据路径的命令, 只要别处有一个无关的 `>/dev/null`, 就会放行并读出凭据); `10CG/aria-plugin#138` / `10CG/aria-plugin#140` / `10CG/aria-plugin#141` / `10CG/aria-plugin#142` / `10CG/aria-plugin#229` 同理。原串或中间副本超过 8192、代入后变短的命令同样按普通判定。另有两类 W10 代入语义的既有缺口同样覆盖到大命令: 同名变量赋值两次时代入用第一个值 (bash 读后一个); 分段模式下值里的 shell 语法 (如 `G='| jq keys'`) 代入后成了语法, 读取因此得到 bash 并不施加的过滤 credit (载体 `<carrier_subst_gaps>`)。
-- **已知限制**: 首遍判定不计时 (`10CG/aria-plugin#228`); 不超过 8192 的副本判定只受协作式时间预算约束, 单次可超过 5 s —— v1.76.1 条目里的「永不 fail-open」对此不成立, 特此订正 (载体 `<carrier_le8192>`); 小命令的 count 轴缺口不变 (载体 `<carrier_count_axis>`); for 列表跨换行误拦与 heredoc 内赋值形文本误收集 (残余 issue `<issue_for_newline>`、`<issue_heredoc>`); 截止之后的收尾随负载增长 (负载约 10 时实测 0.2–1.2 s)。
-- **Rule #6**: hook 不是 Skill; 逻辑与套件不属 Skill 变更。AI 可见的新文字 (`longline` 模板、两条增长原因串) 与路由带来的文案变化按 Rule #6 SOT §2 第 3 行处理: 点名行为、逐字断言作定向 fixture、AB 套件不覆盖 hook 文案的缺口记在 `<issue_ab_hook_text>`。
+- **放宽面申报**: 这些大命令沿用现有的判定语义, 所以判定语义上的既有缺口覆盖到更多大命令 —— 块结构命令整串判定、命令里任一处脱敏过滤都会给整条命令 credit (`10CG/aria-plugin#139`; 例: 读一个凭据路径的命令, 只要别处有一个无关的 `>/dev/null`, 就会放行并读出凭据); `10CG/aria-plugin#138` / `10CG/aria-plugin#140` / `10CG/aria-plugin#141` / `10CG/aria-plugin#142` / `10CG/aria-plugin#229` 同理。原串或中间副本超过 8192、代入后变短的命令同样按普通判定。另有两类 W10 代入语义的既有缺口同样覆盖到大命令: 同名变量赋值两次时代入用第一个值 (bash 读后一个); 分段模式下值里的 shell 语法 (如 `G='| jq keys'`) 代入后成了语法, 读取因此得到 bash 并不施加的过滤 credit (载体 `10CG/aria-plugin#231`)。
+- **已知限制**: 首遍判定不计时 (`10CG/aria-plugin#228`); 不超过 8192 的副本判定只受协作式时间预算约束, 单次可超过 5 s —— v1.76.1 条目里的「永不 fail-open」对此不成立, 特此订正 (载体 `10CG/aria-plugin#228`); 小命令的 count 轴缺口不变, for 列表跨换行误拦与 heredoc 内赋值形文本误收集同样未修 (载体 `10CG/aria-plugin#231`); 截止之后的收尾随负载增长 (负载约 10 时实测 0.2–1.2 s)。
+- **Rule #6**: hook 不是 Skill; 逻辑与套件不属 Skill 变更。AI 可见的新文字 (`longline` 模板、两条增长原因串) 与路由带来的文案变化按 Rule #6 SOT §2 第 3 行处理: 点名行为、逐字断言作定向 fixture、AB 套件不覆盖 hook 文案的缺口记在 `10CG/Aria#261`。
 - 测试: `secret-guard.test.sh` <N_cases> 例 (无 zsh <N_cases_nozsh> 例; 新增 <n_new> 例; 6 组既有用例按新语义改断言); bash 3.2.57 + 5.0.18 + 5.1.16 + 5.2.15 + 5.3.20; 真实流量回放 (只出汇总)。
 
-Refs 10CG/aria-plugin#217, 10CG/aria-plugin#228, 10CG/aria-plugin#139
+Refs 10CG/aria-plugin#217, 10CG/aria-plugin#228, 10CG/aria-plugin#139, 10CG/aria-plugin#231, 10CG/Aria#261
 ```
 
 ## 证据与复现

@@ -23,7 +23,7 @@ meta:
       scenario1: "not_required (SOT §2 第 3 行三件套; 三件缺一即照跑)"
       scenario4b: "not_required (description 未变)"
       negctrl: "n/a"
-      note: "v3.2 改判 (技术判定, 已通报 owner): 这一块落在 SOT §2 的「拿不准」格 —— 新写的只有描述句 (为什么拦、增长超限), longline 的四行指令与 oversize 模板逐字相同, 但路由会让更多大命令看到含处方性指引的普通命中文案; v3.1 先按第 1 行豁免、待复议, 且声称的 SC-V7 / SC-V8 逐字断言并不存在 (post_planning R2 PP2-T)。hook 文案 AB 结构上测不到, 落第 3 行三件套: (1) 点名行为: 上面 covers 所列; (2) 可证伪的定向 fixture: V11-S3 (指令行逐字相同, 改一个字即红) 加 TASK-002 补的逐字断言 (longline 描述句、两条增长原因串、中文行全文), R2 的 KM-M1-M3、M6 必须在其上变红; (3) 「AB 套件不覆盖 hook 文案」的 issue, 随 TASK-001 上呈 owner。三件缺一即照跑, 停下上报"
+      note: "v3.2 改判 (技术判定, 已通报 owner): 这一块落在 SOT §2 的「拿不准」格 —— 新写的只有描述句 (为什么拦、增长超限), longline 的四行指令与 oversize 模板逐字相同, 但路由会让更多大命令看到含处方性指引的普通命中文案; v3.1 先按第 1 行豁免、待复议, 且声称的 SC-V7 / SC-V8 逐字断言并不存在 (post_planning R2 PP2-T)。hook 文案 AB 结构上测不到, 落第 3 行三件套: (1) 点名行为: 上面 covers 所列; (2) 可证伪的定向 fixture: V11-S3 (指令行逐字相同, 改一个字即红) 加 TASK-002 补的逐字断言 (longline 描述句、两条增长原因串、中文行全文), R2 的 KM-M1-M3、M6 必须在其上变红; (3) 「AB 套件不覆盖 hook 文案」的 issue: 10CG/Aria#261 (2026-10-24 开)。三件缺一即照跑, 停下上报"
   cost_reporting: "每完成一条任务报一行成本: 墙钟 / 子代理调用数 / 产出"
   audit_closure: "post_planning R2 (时间戳 1792689337848) PASS_WITH_WARNINGS 0C/20M/24m, 停止规则触发, owner 2026-10-23 覆盖收口 (overridden_by_user: true); 汇总 .aria/audit-reports/post_planning-R2-1792689337848-secret-guard-w10-failclosed-narrowing-aggregated.md"
 
@@ -51,10 +51,16 @@ tasks:
   - id: TASK-001
     parent: "B.1"
     title: "入场: 续用认领、建分支、重锚行号; 对外动作先上呈 owner"
-    status: pending
+    status: done
     agent: main-loop
     depends_on: []
     deliverables: ["aria 分支 feature/secret-guard-w10-failclosed-narrowing (基于当时的 aria master)", "owner 对对外动作的决定 (记进本任务 notes)", "获准后的残余 issue / 载体 / 留言链接"]
+    notes:
+      - "2026-10-23 认领: phase1_gate --phase B --linked-issue 10CG/aria-plugin#217 -> passed, push_success, linked_issue_overlap [] (协调 ref 9f4ca996, ls-remote 一致)"
+      - "分支: aria feature/secret-guard-w10-failclosed-narrowing 建在 origin/master 8614066 (另一会话的 v1.77.4 在制合并, 主仓 gitlink 当时仍指 a5ee63b; 两者的 hooks/ 都与基线零差异); 只建 ref, 未检出。本地 aria master 停在 a5ee63b (与主仓 gitlink 一致), 所以「本地 master == origin/master」那条断言不成立, 分支按计划取 origin/master"
+      - "重锚: mkv31.py 在 8614066 的 hooks/secret-guard.sh 上生成的原型与 W8 原型逐字节相同 (sha256 9f61db0e7b8b); commentsync.py baseline 模式 GREEN"
+      - "owner 决定 (2026-10-23 至 10-24): 一次性授权四类全给 (feature 分支推送、开 PR、issue 评论、issue 关闭); 逐次请示五类照旧; 证据与审计报告 (只动 .aria/ 与 openspec/ 下的文档) 直推主仓 master, 不再逐次问 (推前 fetch, 双推后逐个 ls-remote); 残余按合并方案发"
+      - "已发: 10CG/aria-plugin#231 (W10 代入语义的既有缺口: 残余 3、4、5、8); 10CG/Aria#261 (AB 套件不覆盖 hook 文案, rule6_note 块 B 第三件); 留言 10CG/aria-plugin#219 (评论 30515, 其他平台放开的前提, 残余 6: 发现已有同根的 10CG/aria-plugin#219, 改为留言、不新开, 已向 owner 说明)、10CG/aria-plugin#228 (评论 30517, 残余 2 与 Decision 12)、10CG/aria-plugin#217 (评论 30518, 进展记录与评论 28512 第 2 点; 不关闭)。每条都经 GET 核对正文一致"
     design:
       - "认领: phase1_gate --phase B --raw-track-id secret-guard-w10-failclosed-narrowing-023236f2 --linked-issue 10CG/aria-plugin#217 (advisory)"
       - "新鲜度: fetch 后断言本地 aria master == origin/master, 再建分支 (本地 master 长期不 fetch 会静默落后)"
@@ -152,7 +158,7 @@ tasks:
     deliverables: ["aria: hook + 套件 + CHANGELOG 终稿 + 版本文件", "standards: conventions/secret-hygiene.md 三处计数", "主仓: 发布同步面 + aria / standards gitlink", "tag"]
     design:
       - "合并前新鲜度: fetch 后重核当时的最新版本号与本地 master == origin/master; 版本号由 owner 定 (v1.77.x PATCH)"
-      - "CHANGELOG 终稿: 一个占位名只指一样东西 (PP2-R) —— <date>、<N_allowed> (TASK-004 W12 的放行数)、<N_cases> 与 <N_cases_nozsh> (本任务在待发版 SHA 的 git 检出里现跑)、<n_new>、<carrier_le8192>、<carrier_count_axis>、<carrier_subst_gaps>、<issue_for_newline>、<issue_heredoc>、<issue_ab_hook_text> (TASK-001); 跑 check_bare_issue_refs.py, 报出的只能是代码里的 bash 取长度写法"
+      - "CHANGELOG 终稿: 一个占位名只指一样东西 (PP2-R) —— <date>、<N_allowed> (TASK-004 W12 的放行数)、<N_cases> 与 <N_cases_nozsh> (本任务在待发版 SHA 的 git 检出里现跑)、<n_new>; 载体与残余 issue 的编号已由 TASK-001 填好; 跑 check_bare_issue_refs.py, 报出的只能是代码里的 bash 取长度写法"
       - "standards: conventions/secret-hygiene.md 里写 secret-guard 自测数的三处 (Path 3 那一行的 self-tests、hooks 表里 secret-guard.test.sh 那一行的 regression cases、实证边界段的 self-test), 每处两个数 (含 zsh / 无 zsh), 都改为 <N_cases> / <N_cases_nozsh>; secret-scan 那一行 (129) 不动; 走 standards 自己的提交与双推"
       - "发布同步面: 以 v1.77.2 的发版提交为样板逐项列 (主仓 028b458a 与 e360908c; proposal Impact), 含主仓根 VERSION 的 aria 行; tag 按 version-management.md"
       - "顺序写死 (CLAUDE.md 约束 1、2; PP2-m18): 1. aria 本地合并 (禁 Forgejo 服务端合并) -> 双推 -> 两边 ls-remote; 2. standards 本地提交 -> 双推 -> 两边 ls-remote; 3. 只在 1、2 都核验后, 主仓 bump aria / standards gitlink -> 推送或开 PR (主仓 PR 合并前跑 C.2.4 pre-merge gate) -> 两边 ls-remote; 4. tag 两边。aria 合并不开 PR 时 C.2.4 不适用, 开 PR 时照跑"
