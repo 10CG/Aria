@@ -86,11 +86,13 @@ _sg_relax_ok() {   # status 0 when the relaxation is in effect for this command;
   [[ "$( _sg_relax_noext 2>/dev/null )" == none ]]
 }
 _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x86_64 GNU/Linux build of a bash version the mechanism was measured on, 5.0 to 5.3, outside WSL (owner ruling E, 2026-10-22 and 2026-10-23: an untested platform -- macOS, Windows, WSL1 and WSL2, musl, Android, aarch64 and other architectures, another bash -- keeps the baseline)
-  [[ "$1" == x86_64-*-linux-gnu* && -n "$4" && "$4" != *[Mm]icrosoft* && "$4" != *WSL* && -z "${5:-}" ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
+  [[ "${1:-}" == x86_64-*-linux-gnu* && -n "${4:-}" && "${4:-}" != *[Mm]icrosoft* && "${4:-}" != *WSL* && -z "${5:-}" ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
 }
 ```
 
 `/proc/sys/kernel/osrelease` 读不到时第四个参数为空，准入门关闭。WSL1 的内核串形如 `4.4.0-19041-Microsoft`，WSL2 形如 `5.15.153.1-microsoft-standard-WSL2`；自编内核的 WSL2 未必带这些字样，所以另看 `/proc/sys/fs/binfmt_misc/WSLInterop` 与 `WSL_DISTRO_NAME`、`WSL_INTEROP` 两个环境变量。环境变量能被改写，但它们只能把放宽关掉，不能打开。owner 2026-10-23 先选排除 WSL1，随即追加 WSL2：WSL2 虽是真 Linux 内核，也没有实测过。这是往更严方向的改动，姿态不变。
+
+每个参数都带缺省（2026-10-24 改，B.2 TASK-002 第一步发现）：hook 开着 `set -u`，少传一个参数就会让调用方整体中止，在 hook 里中止即退出码不是 2，等于放行；带缺省之后，缺参数时准入门关闭。
 
 ### 2. 放宽重跑的规则（`_SG_RELAXED=1`，只在作业里生效）
 
@@ -188,7 +190,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 
 改写后的文字是否准确，由 TASK-005 的代码审查把关；这项检查只保证锚点句不再出现。
 
-**What 7 补充：三处注释**（v3.2；INV-1 允许的内容差之一。TASK-002 在原型之上逐字落地，并为它们补上 commentsync 的核对）。原型里这三处仍按收紧前、计数上限未申报前的说法写着（post_planning R2 PP2-m4、PP2-S、PP2-m7）：
+**What 7 补充：四处注释**（v3.2；INV-1 允许的内容差之一。TASK-002 在原型之上逐字落地，并为它们补上 commentsync 的核对）。原型里这四处仍按收紧前、计数上限未申报前的说法写着（post_planning R2 PP2-m4、PP2-S、PP2-m7；第 4 处是 B.2 TASK-002 第一步发现的，2026-10-24 补）：
 
 1. W10 块头（原型 `:576-578`）：第 3 行「`# most 16 assignments and 8 replacements per variable); every segment (the whole command when it degraded) that mentions $NAME or ${NAME} is judged once more with the`」换成下面两行：
 
@@ -226,6 +228,13 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 #     ruling A, 2026-10-23). Arrays, `read <<<`, quote-spliced paths, `cd` + a relative
 #     name, globs, `set --`, `$(printf ...)` and variables across two tool calls pass;
 #     the output side is left to secret-scan.sh.
+```
+
+4. 重跑块头（原型 `:792-793`，`_sg_vx_big_judge` 之前那块注释里的两行）：「`# deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on a Linux`」与「`# build of bash 5.0-5.3 on GNU/Linux (the versions and the platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own`」换成：
+
+```
+# deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on an x86_64
+# GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
 ```
 
 ### 参考实现（`v31/W8-v31.diff` 的全部逻辑 hunk）
@@ -713,7 +722,7 @@ W13 的 SKIP 目前恒为 0：没有任何用例会 SKIP。TASK-002 加入负载
 - **aria `hooks/secret-guard.sh`**：
   - 改：`_sg_vx_collect`（重跑内无计数上限；死代码另行提交）、`_sg_vx_replace`（重跑内无计数上限）、`_sg_vx_apply`、`_sg_vx_pass`、`_sg_per_segment_eval`、`_sg_judge_one`（第三参数）、`_sg_emit_blocked`（`longline` 分支）。
   - 新：常量 `_SGV_GMAX`、`_SGV_LMAX`；顶层 `_SG_P0`、`_SG_RELAXED`；函数 `_sg_vx_big_judge`、`_sg_relax_left`、`_sg_relax_ok`、`_sg_relax_platform`、`_sg_relax_noext`、`_sg_relax_job`、`_sg_relax_run`。
-  - 注释：What 7 的 8 块与 What 7 补充的 3 处；准入门按 What 1 补充收紧。
+  - 注释：What 7 的 8 块与 What 7 补充的 4 处；准入门按 What 1 补充收紧。
 - **aria `hooks/tests/secret-guard.test.sh`**：搬入 `v31/sc-cases.sh` 的全部用例（含 `shim/` 与 `shapes.py` 的输入）；6 组既有用例按 W9 改断言，标题与注释块按 What 7 改写；新增区分普通命中与 `longline` 的断言 helper（`wpa_x_finding` 会把 `longline` 文案当成普通命中，PP1-A12）；头注释计数；post_planning R2 的补强用例（TASK-002 必交，见 Success Criteria）。
 - **aria `CHANGELOG.md`**：草稿见下，终稿归 TASK-006。
 - **standards `conventions/secret-hygiene.md`**：`:23`、`:316`、`:352` 三处测试计数改为发版时实跑的权威值。基线上已经漂移（三处写 822 / 816，套件头注释写 831，非 git 副本实跑 814），所以一律以 TASK-006 在待发版 SHA 的 git 检出里现跑的数为准，每处两个数（含 zsh / 无 zsh）。改它要走 standards 自己的提交与 gitlink 更新（TASK-006）。

@@ -29,7 +29,7 @@ meta:
 
 invariants:
   - id: INV-1
-    rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (三处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认"
+    rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认"
   - id: INV-2
     rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim 与输入生成); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
   - id: INV-3
@@ -79,7 +79,7 @@ tasks:
     depends_on: [TASK-001]
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     design:
-      - "代码: 用 mkv31.py 的补丁逐字落地 (INV-1), 包括 What 7 的 8 块 hook 注释; 再按 proposal 的 What 1 补充 (准入门收紧) 与 What 7 补充 (三处注释) 逐字改; 新函数在 source 闸门之上 (INV-4)"
+      - "代码: 用 mkv31.py 的补丁逐字落地 (INV-1), 包括 What 7 的 8 块 hook 注释; 再按 proposal 的 What 1 补充 (准入门收紧) 与 What 7 补充 (四处注释) 逐字改; 新函数在 source 闸门之上 (INV-4)"
       - "What 6: 删 :666 死代码, 单独一个提交, 套件全绿"
       - "套件 (1) 搬入方式 (PP2-P、PP2-m15): sc-cases.sh 与 sc-direct.sh 的用例改写成套件里的 bash 用例, 编号不变 (V<k>-...); 断言与期望值照搬, 下面 R2 补强改动的除外。shim/delay-first 以文件复制进 tests/, jq、sed 两个名字用符号链接, 写进套件头注释; shapes.py 不搬 Python, 改写成 bash 的输入生成函数 (套件头注释「python3 只给 SC-20 用」保持为真)。只有新用例按 SC_BASH 选执行 hook 的 bash, 旧用例照旧; 被测 bash 的能力探测问的是执行 hook 的那个 bash。直调用例用 _SG_P0=${EPOCHREALTIME:-} (set -u 下 3.2 没有该变量)"
       - "R2 补强 (a) 计时类 (PP2-A、PP2-B、PP2-C): 下界与字节比对保留; 上界与「重跑须在截止前跑完」类用例在负载超过 INV-7 门槛时整批 SKIP 并单独计数 (或改为按同轮基线的自然耗时校准); 直调的 run() 先建临时文件, 再取锚点与起秒表; sed 垫片停顿前核对自己在作业的进程组里, 不在就不停 (或停顿缩到 4 s), deadline 类用例见到墙钟 >= 停顿时长判 INCONCLUSIVE, 不判 FAIL; V3-E5 的预算改为 2, 窗口改为 1.85..2.6"
