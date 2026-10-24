@@ -1,89 +1,107 @@
 {
- "schema_version": "1.0",
- "triage_tool_version": "1.76.0",
- "issue_ref": "10CG/Aria#235",
- "generated_at": "2026-10-18T02:26:12Z",
- "steps": {
-  "step1_issue": {
-   "collection_status": "ok",
-   "number": 235,
-   "title": "ab-suite/phase-c-integrator-pre-merge-gate.json: 三条 node id 缺口 (两条无 node id, 一条过期)",
-   "body": "来源: pre-merge-completeness-gate-change-scope (10CG/Aria#199) TASK-024/031。\n\ncatalog 8 条 fixture 中 3 条不可执行: `wait_then_green` 与 `NEG-2-timeout` 的条目无 `test_case_in_unit_tests` node id; `NEG-1-malformed` 的 node id 过期 (catalog 写 `test_case_e_malformed_aether_routes_fail`, 真实方法 `test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_main_leg_routes_fail`, 跑字面 id 报 AttributeError)。可执行 5/8 三条命令与输出见同仓结果目录 RESULT.md §5.3。修法: 补/改 node id 或给这两条建单测宿主。",
-   "state": "open",
-   "labels": [],
-   "comments": [],
-   "url": "https://forgejo.10cg.pub/10CG/Aria/issues/235",
-   "created_at": "2026-10-17T04:14:54Z",
-   "updated_at": "2026-10-17T04:19:21Z"
-  },
-  "step2_version": {
-   "collection_status": "ok",
-   "reported": null,
-   "current": "1.76.0",
-   "gap": null
-  },
-  "step3_code": {
-   "collection_status": "skipped",
-   "cited_paths": [],
-   "matches_description": null
-  },
-  "step4_history": {
-   "collection_status": "skipped",
-   "likely_fix_candidates": []
-  },
-  "step5_inflight": {
-   "collection_status": "ok",
-   "remote_prs": [],
-   "local_branches": [],
-   "worktrees": [
-    {
-     "path": "/home/dev/Aria",
-     "branch": "master",
-     "is_main": true,
-     "head": "d17cf874a6972087e494973761f134eb771abec8"
+  "schema_version": "1.0",
+  "triage_tool_version": "1.77.4",
+  "issue_ref": "10CG/Aria#262",
+  "generated_at": "2026-10-24T08:07:22Z",
+  "steps": {
+    "step1_issue": {
+      "collection_status": "ok",
+      "number": 262,
+      "title": "hermes 0.7.0 → 0.22.x 升级评估 — 上游活着 (v021 Bots Mode/A2A/多网关), 激活路径",
+      "body": "## 背景 (2026-10-24 调研翻案)\n\n#232 期间的「供应链已死」结论系误判: hermes 0.7.0 只是被 PyPI 索引淘汰, 上游\nNousResearch/hermes-agent **活跃发版至 v0.22.x** (Python 3.11-3.13), 其中\n**v0.21 新增 Bots Mode / Agent-2-Agent / 多网关持久连接 / subagent steering** —\n与 Layer 1 的方向 (Aether #548 多 harness 并行) 直接相关。\n\nOwner 定调 (2026-10-24): 尝试重新接入上游激活; **自维护 fork 是最后选择**。\n\n## 评估范围\n\n1. **兼容性**: 0.7.0 → 0.22.x 大版本跳 — config (hermes-config.yaml) / skills /\n   scan.sh / cron 目录约定 / gateway 生命周期 (Lark WS) 逐项差异评估\n2. **Bots Mode vs 自建 Lark 逻辑**: v021 的 bot 模式能否替代/简化现役的\n   Lark WebSocket 接入层 (extension.py 等)\n3. **129MB venv vendor 退役路径**: 活源后 vendor 快照可换回正常 pip 钉版安装\n4. **与 DEC-20261022-001 Phase-2 的关系**: 底座对比矩阵须加入 hermes 0.22\n   (不再是 frozen 项) — pi-durable vs dsh vs hermes0.22 三方对比\n\n## 关联\n\n- Aether #543 R4 (目录条目 legacy-pinned → 升级评估中)\n- Aether #548 (首批候选含 hermes 0.22)\n- 本仓 DEC-20261018-002 (评估轨) / DEC-20261022-001 (Phase-1 结论)\n\n## 建议判据先行\n\n升级 PoC 走 Aether #543 目录准入门槛同款: 一个验证格子 (判据先行) —\ngateway 起 + Lark 连通 + 一轮 cron 真跑, 通过才谈替换现役。\n",
+      "state": "open",
+      "labels": [],
+      "comments": [
+        {
+          "id": 30643,
+          "body": "## 升级评估报告 (2026-10-24, 桌面调研 + 本地 0.19.0 冒烟)\n\n### 三判据全绿\n\n| 判据 | 结果 | 证据 |\n|---|---|---|\n| 上游活着 | ✅ | PyPI 0.19.0 (pip 直装成功); GitHub v0.22.x (0.21/0.22 走源装渠道) |\n| **Lark/Feishu 原生支持** | ✅✅ | `plugins/platforms/feishu/adapter.py`: **WebSocket 长连 + Webhook 双传输**, DM/群@, 跨重启去重, per-chat 串行, Typing/CrossMark reaction, **卡片按钮→COMMAND 事件**; 比我们 0.7 自接入层更完整 (平台全家 21 个, 中国三件套 dingtalk/feishu/wecom 齐) |\n| 兼容迁移路径 | ✅ | 0.7 config (v0) 被 0.19 解析, 内置 `config migrate` (v0→33); `~/.hermes/config.yaml` 位置约定不变; zai/glm provider 代码痕迹在 (runtime_provider/setup/doctor) |\n\n### 性质与风险 (诚实)\n\n**这是「迁移到新产品」, 不是小版本升级**: 0.19 CLI 80+ 子命令 (gateway/cron/skills/plugins/mcp/dashboard/desktop...), v0.22 \"Threshold\" 是 2.4 万 commit 的产品大改。我们只用其 ~5% 面 (gateway+cron+skills+claude dispatch), 升级 = 背上全部表面积。风险: ①zai 主模型 + luxeno fallback 的 config 键存活要 migrate 实测 ②cron 目录→cron store 化 ③AIAgent 的 claude -p dispatch/hooks 兼容 ④PyPI 停在 0.19.0, 0.22 要源装渠道。\n\n### 渠道选型建议\n\nPoC **钉 PyPI 0.19.0** (供应简单, feishu 插件已含); 0.22.x 后置 (其增量 = Connectors/桌面端/pm, 非我们依赖面)。\n\n### PoC 判据 (判据先行, 全过才谈替换现役)\n\n- **P1** config migrate 后 zai/glm 主模型 + luxeno fallback 解析成功 (`config show` 实证)\n- **P2** gateway 起 + feishu 通道 WS 连接 (adapter 实连, 非仅配置)\n- **P3** 一轮 cron 真跑 (heartbeat-scan 形态)\n- **P4** claude -p dispatch 冒烟 (AIAgent 路径)\n- **P5** 平行部署不打扰现役: 独立 job `hermes-upgrade-poc` + 独立 hermes-home (不动 0.7 的卷)\n\n### 关联\n\n进 DEC-20261022-001 Phase-2 三方对比矩阵 (pi-durable vs dsh vs **hermes 0.19**)。\n",
+          "user": "simonfish",
+          "created_at": "2026-10-24T06:51:44Z"
+        }
+      ],
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/262",
+      "created_at": "2026-10-24T06:28:53Z",
+      "updated_at": "2026-10-24T07:45:19Z"
+    },
+    "step2_version": {
+      "collection_status": "ok",
+      "reported": null,
+      "current": "1.77.4",
+      "gap": null
+    },
+    "step3_code": {
+      "collection_status": "ok",
+      "cited_paths": [
+        {
+          "file_path": "plugins/platforms/feishu/adapter.py",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        },
+        {
+          "file_path": "~/.hermes/config.yaml",
+          "line": null,
+          "format": "backtick",
+          "exists": false,
+          "line_in_range": null,
+          "snippet": null,
+          "warning": "file not found"
+        }
+      ],
+      "matches_description": false
+    },
+    "step4_history": {
+      "collection_status": "skipped",
+      "likely_fix_candidates": []
+    },
+    "step5_inflight": {
+      "collection_status": "ok",
+      "remote_prs": [],
+      "local_branches": [],
+      "worktrees": [
+        {
+          "path": "/home/dev/Aria",
+          "branch": "master",
+          "is_main": true,
+          "head": "61d2e27ee8fa6e125603aeb7c4a9cd10480002cb"
+        },
+        {
+          "path": "/tmp/a-wt/aria232-fix",
+          "branch": "poc/hermes-019-upgrade",
+          "is_main": false,
+          "head": "2ebaf04ac7edae9e2be629ad74cefca0f6df4aa1"
+        },
+        {
+          "path": "/tmp/a-wt/r8-ctx",
+          "branch": null,
+          "is_main": false,
+          "head": "7ec9e3f902b0ba8f65ec183364265362671bffc2"
+        }
+      ]
     }
-   ]
-  }
- },
- "repro": {
-  "exit_mode": "auto",
-  "cases": [
-   {
-    "case_id": "case-1",
-    "input": "cd aria/skills/phase-c-integrator/tests && python3 -m unittest 'test_pre_merge_gate.GateCheckTests.test_case_e_malformed_aether_routes_fail'",
-    "expected_behavior": "issue 声称: 跑 catalog 字面 node id 报 AttributeError (方法名过期)",
-    "actual_behavior": "FAILED (errors=1): AttributeError: type object 'GateCheckTests' has no attribute 'test_case_e_malformed_aether_routes_fail'",
-    "match": true
-   },
-   {
-    "case_id": "case-2",
-    "input": "pytest test_pre_merge_gate.py::GateCheckTests::test_case_e_malformed_aether_main_leg_routes_fail",
-    "expected_behavior": "issue 声称的真实方法应存在且可通过 (修法锚点)",
-    "actual_behavior": "1 passed in 0.04s",
-    "match": true
-   },
-   {
-    "case_id": "case-3",
-    "input": "pytest 'test_pre_merge_gate.py::GateCheckTests::test_gate_state_helper polling tests + integration'",
-    "expected_behavior": "wait_then_green 条目无有效 node id, 不可执行",
-    "actual_behavior": "no tests ran in 0.05s (prose 描述非合法 node id; 真实宿主在 aria/skills/workflow-runner/tests/test_gate_state_helper.py GateStateLifecycleTests)",
-    "match": true
-   },
-   {
-    "case_id": "case-4",
-    "input": "pytest 'test_pre_merge_gate.py::GateCheckTests::test_pre_merge_gate (timeout path; integration scenario)'",
-    "expected_behavior": "NEG-2-timeout 条目无有效 node id, 不可执行",
-    "actual_behavior": "no tests ran in 0.00s; test_pre_merge_gate.py 内无 subprocess timeout+3-retry 路径单测 (grep timeout 仅命中 _verify_branch_exists 形参) — 缺单测宿主",
-    "match": true
-   }
-  ],
-  "hit_count": 4,
-  "total_count": 4,
-  "hit_rate": "4/4"
- },
- "verdict": "confirmed",
- "severity": "minor",
- "recommended_action": "next-cycle",
- "deviation_note": null,
- "errors": []
+  },
+  "repro": {
+    "exit_mode": "skip",
+    "hit_count": 0,
+    "total_count": 1,
+    "hit_rate": "0/1",
+    "cases": [
+      {
+        "case_id": "case-1",
+        "input": "N/A — 评估类 issue (hermes 0.7.0→0.22.x 升级评估/激活路径), 无缺陷复现体; Step 6 走 skip 模式",
+        "expected_behavior": "issue 诉求 = 判据先行 PoC 验证格子 (gateway 起 + Lark 连通 + 一轮 cron 真跑), 非 defect 复现",
+        "actual_behavior": "未执行 — 复现不适用; 且 PoC 已由另一实例 in-flight 执行中 (worktree poc/hermes-019-upgrade, tip fe2fdd0 @ 2026-10-24 08:07 UTC, ahead 6 未推)",
+        "match": null,
+        "notes": "上游核实 (GitHub releases / PyPI) 已完成, 结果记录于 triage-comment.md"
+      }
+    ]
+  },
+  "verdict": "needs-info",
+  "severity": "minor",
+  "recommended_action": "next-cycle",
+  "deviation_note": null,
+  "errors": []
 }
