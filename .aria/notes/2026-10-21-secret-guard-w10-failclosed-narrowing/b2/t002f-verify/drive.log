@@ -1,0 +1,8 @@
+15:36:03 suite 60f7f95525cd impl af4658b6f935 c5 a4b04f1f97cf c3p dfe1220440bc | load 0.90 1.29 1.69
+15:36:03 V-C5 start | load 0.90 1.29 1.69
+15:40:41 V-C5 end rc=1 | load 2.20 1.64 1.71
+15:41:41 V-C3p start | load 1.14 1.44 1.64
+15:46:58 V-C3p end rc=1 | load 1.52 1.60 1.66
+15:47:58 V-impl full worktree start | load 0.95 1.42 1.59
+15:53:31 V-impl end rc=0 | load 1.80 1.67 1.65
+15:53:31 done | load 1.80 1.67 1.65

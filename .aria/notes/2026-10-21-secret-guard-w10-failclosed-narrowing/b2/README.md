@@ -26,3 +26,8 @@
 - `t002e/`：3c 的过程材料：参照表的测量 `base-*`（59e333c）、`impl-*`（实现）与合表 `reftab-*.txt`（`reftab.sh` 生成）；现状轮 `s0a.*`、`s0b.*`；坏实现抽查 `mut-*`；整轮 `full.*`；两个构造的输出 `c1.txt`、`c2.txt` 与对实现的改动 `c1-hook.diff`、`c2-hook.diff`；改动脚本 `patch3c.py`；驱动 `drive2.sh`、`drive3.sh`、`step0.sh`、`lib.sh` 与时间线 `drive.log`；commentsync 套件一侧 `commentsync-suite.txt`。
   - 没收：59e333c 与两个构造的整份 hook 副本（由 git 与两个 diff 可复现）；坏实现的整份 hook（`mut/`，可用 `../v31/mutants.py` 复现）；临时目录 `stage/`、`work/`。
 - `t002e-verify/`：主控对 3c 的独立复核（2026-10-24 14:20–14:40 UTC）。`PREDICT.md` 是实测前写下的预期，`VERIFY.md` 是逐项结果；`branches.py` 对照 6 组两支，`refcheck.sh` 拿参照表对原始日志，`mkprobe.py` 构造参照负控副本，`drive.sh` / `drive.log` 是串行驱动；`r1`-`r4` 是四轮输出，`bi8-hook.diff` 是主控自己构造的 BI-8。结论：行为全部相符，过滤轮的计数预期漏算了恒在的 V0-H1 / V0-H2；复核 hook 时发现截止回落下界 2.85 s 的另一侧洞（重跑自己的时间检查点），改定的判法交 3c2，任务书 `BRIEF-T002c-3c2.md`。
+- `T002c-3c2-report.md`：第三步 3c2（6 组截止回落按 hook 推出的三条路判，取代 3b 的 2.85 s 下界）的执笔席报告（2026-10-24），任务书是上面的 `BRIEF-T002c-3c2.md`。结果是 aria 分支提交 `df2d629`。报告里的相对路径相对 `t002f/`。
+- `t002f/`：3c2 的过程材料：旧判法上的构造 C3 `c3-old*.txt` 与预期 `expect-0-c3-old.md`；新判法上的 C1、C2、C3 `c*-new.txt` 与预期 `expect-2-new.md`；实现整轮 `impl.*`；三个构造对实现的改动 `c1-hook.diff`、`c2-hook.diff`、`c3-hook.diff`；改动脚本 `patch3c2.py`；驱动 `phase1.sh`、`phase2.sh`、`lib.sh`、`waitpid.sh`、`summ.sh`、`mkc.py` 与时间线 `drive.log`；commentsync `commentsync.txt`。
+  - 没收：三个构造的整份 hook 副本（由三个 diff 复现）。
+- `t002f-verify/`：主控对 3c2 的独立复核（2026-10-24 15:34–15:54 UTC）。`PREDICT.md` 是 3c2 交回之前写下的预期，`VERIFY.md` 是逐项结果；`mkcons.py` 构造主控自己的两个坏态（作业 0.5 s 后就失败 `c5`、作业 2.05 s 后结束 `c3p`，对实现的改动见 `*-hook.diff`），`drive.sh` / `drive.log` 是串行驱动；`c5.txt`、`c3p.txt`、`impl.txt` 是三轮输出。结论：预期全部相符；关门重跑只量一次的余量不够，改为至多 3 次，交 3e。
+- `BRIEF-T002c-3d.md`：第三步 3d（`run-mutants.sh` 的套件模式；全部坏实现与扰动、两种环境错误、基线红集在套件上复跑）的任务书，派出前按计划 notes「3d 任务书调整」改过两处。
