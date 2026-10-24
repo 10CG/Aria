@@ -1,0 +1,14 @@
+17:23:05 suite d4168aace3e8 run-suite new 46052595bf14 old 7584c219c4ba c3 d201cc906e33 c5 a4b04f1f97cf | load 0.78 1.19 1.40
+17:23:05 V-R2 exit=3 | load 0.78 1.19 1.40
+17:23:05 V-R1 exit=1 | load 0.78 1.19 1.40
+17:23:08 V-R3 old exit=0 | load 0.78 1.19 1.40
+17:23:10 V-R3 new exit=0 | load 0.88 1.20 1.41
+17:24:11 V-stall2 start | load 0.50 1.03 1.33
+17:30:29 V-stall2 end rc=1 | load 1.87 1.43 1.39
+17:32:09 V-stall3 start | load 1.08 1.30 1.35
+17:38:40 V-stall3 end rc=1 | load 1.98 1.59 1.45
+17:40:20 V-C5 start | load 1.16 1.41 1.40
+17:44:58 V-C5 end rc=1 | load 1.59 1.50 1.43
+17:45:58 V-impl start | load 0.82 1.30 1.37
+17:51:30 V-impl end rc=0 | load 2.29 1.69 1.49
+17:51:30 done | load 2.29 1.69 1.49

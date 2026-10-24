@@ -1,0 +1,1 @@
+run-suite.sh: SG_W10_LOG /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002h/no-such-dir/w10.log: its directory does not exist (or the path cannot be made absolute); the log asked for cannot be written

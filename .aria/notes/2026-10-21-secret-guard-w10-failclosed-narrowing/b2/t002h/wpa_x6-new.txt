@@ -1,0 +1,31 @@
+wpa_x6() {   # <the relaxed assertion: longline | pass (exit 0) | growth (wpa_L_gseg)> <the baseline branch's limit line for this command> <command>
+  local how=$1 lim=$2 c=$3 input e wus ws r b fb='' bad='' g='?' p="${3//$wpa_nl/ }" wpa_x6_out wpa_x6_us wpa_x6_s
+  input="$(wpa_in Bash "$c")"   # built before the clock starts: W is the hook's run alone
+  wpa_x6_hook "$input"; e=$wpa_x6_out; wus=$wpa_x6_us; ws=$wpa_x6_s
+  wpa_x6_n=$((wpa_x6_n + 1))
+  r=$(wpa_x6_eval "$e" "$how" "$lim" "$c"); [[ ${r%%$'\t'*} == 0 ]] && return 0   # (1) the relaxed branch's assertion holds
+  b=$(wpa_x6_eval "$e" toolarge "$lim" "$c")
+  if [[ ${b%%$'\t'*} != 0 ]]; then   # (2) nor does the baseline branch's
+    bad="relaxed ($how):${r#*$'\t'} | baseline branch:${b#*$'\t'} | wall ${ws}s"
+  elif (( wus >= 3000000 )); then   # (3a) F1, F2 or a late F3
+    fb="${ws}s"
+  elif (( wus > 2000000 )); then   # (3b) F3 or a gate closed early: the same input with the gate closed, up to three runs 1 s apart (a reading of 0 is no reading)
+    local try tbs=''
+    for try in 1 2 3; do
+      (( try > 1 )) && sleep 1
+      wpa_x6_hook "$input" WSL_DISTRO_NAME=Ubuntu
+      tbs+="${tbs:+, }${wpa_x6_s}s"
+      if (( wpa_x6_us > 0 && wpa_x6_us <= wus - 1000000 )); then fb="${ws}s/Tb ${wpa_x6_s}s"; (( try > 1 )) && fb+=" (try $try)"; break; fi
+    done
+    [[ -n $fb ]] || bad="baseline block at wall ${ws}s, gate-closed Tb' ${tbs} (want <= wall - 1.0 s): 关门那一遍同样慢：是准入门提前关，不是重跑的检查点"
+  else   # (3c) W <= 2.0 s
+    bad="baseline block at wall ${ws}s (want > 2.0 s): 因时间的回落不会这么早结束"
+  fi
+  if [[ -n $fb ]]; then
+    [[ $_wpa_name =~ SC-(21a[a-z]) ]] && g=${BASH_REMATCH[1]}
+    wpa_x6_fb=$((wpa_x6_fb + 1)); wpa_x6_where+="$g $fb; "; return 0
+  fi
+  _wpa_nbad=$((_wpa_nbad + 1))
+  [[ $_wpa_nbad -le 6 ]] && _wpa_bad="$_wpa_bad {Bash ${p:0:72}: $bad}"
+  return 0
+}

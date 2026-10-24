@@ -1,0 +1,4 @@
+7c7
+< W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.19 1.62 1.50 end 1.19 1.62 1.50 | timing batch: judged
+---
+> W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.13 1.58 1.48 end 1.13 1.58 1.48 | timing batch: judged

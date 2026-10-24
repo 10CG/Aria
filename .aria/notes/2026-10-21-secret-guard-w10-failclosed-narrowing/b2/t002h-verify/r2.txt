@@ -1,0 +1,1 @@
+run-suite.sh: SG_W10_LOG /nonexistent-v3e/x.log: its directory does not exist (or the path cannot be made absolute); the log asked for cannot be written

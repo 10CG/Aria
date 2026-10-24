@@ -1,0 +1,10 @@
+--- impl
++++ c3
+@@ -842,6 +842,7 @@
+   ( sleep "$_SG_LEFT"; kill -KILL -- "-$me" ) >/dev/null 2>&1 </dev/null &
+   tp=${!:-}
+   [[ -n "$tp" ]] && kill -0 "$tp" 2>/dev/null || return 9   # no running timer, no judgement: the deadline must exist before the first expensive step
++  sleep 2.2; return 1   # construction C3 (3c2): the rerun's checkpoint sends it back 2.2 s after the job starts
+   _SG_RELAXED=1
+   _sg_vx_pass "$1" "$_SG_MODE"
+   case $? in 0) return 77 ;; 2) return 2 ;; *) return 1 ;; esac   # allow only as 77: a bare 0 reaching _sg_relax_run from anywhere else falls back

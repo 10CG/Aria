@@ -1,0 +1,7 @@
+# run-suite.sh | 2026-10-24T16:55:48Z | hook 7884d94e0c1b | suite d4168aace3e8 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY <none> | load 1.13 1.58 1.48
+PASS: 910 / 950
+FAIL: 40 / 950
+W10 older groups 21ab 21ac 21ag 21aj 21al 21ao: relaxed branch (new outcomes) | bash on PATH /usr/bin/bash 5.2.15(1)-release (machtype x86_64-pc-linux-gnu) | osrelease 6.17.9-1-pve | WSLInterop no | WSL_DISTRO_NAME '' WSL_INTEROP '' | deadline fallback (截止回落) 10 / 10 (21ab 2.82s/Tb 0.64s (try 2); 21ab 3.01s; 21ab 3.01s; 21ac 2.49s/Tb 0.26s (try 2); 21ag 3.01s; 21aj 2.81s/Tb 0.64s (try 2); 21aj 2.87s/Tb 0.72s (try 2); 21aj 2.89s/Tb 1.14s (try 2); 21al 2.48s/Tb 0.30s (try 2); 21ao 2.73s/Tb 0.33s (try 2))
+21ab pass  21ac pass  21ag pass  21aj pass  21al pass  21ao pass  
+  FAIL [W10 SC-21ak rg: the pass-wide limit bounds the work too — after it is used up the pass stops applying (11 entries of _sg_vx_apply, not 14)]: 1 check(s) off: {_sg_vx_apply entries: want '11', got '0'}
+# run-suite.sh end | load 1.44 1.57 1.50 | suite exit 1

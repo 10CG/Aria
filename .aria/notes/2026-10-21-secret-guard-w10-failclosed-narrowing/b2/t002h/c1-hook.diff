@@ -1,0 +1,10 @@
+--- impl
++++ c1
+@@ -817,6 +817,7 @@
+   printf -v _SG_LEFT '%d.%06d' $(( now / 1000000 )) $(( now % 1000000 ))
+ }
+ _sg_relax_ok() {   # status 0 when the relaxation is in effect for this command; the extension is asked inside a command substitution, like every extension call
++  return 1   # construction C1 (3c): the admission gate is always closed
+   [[ -z "${_SG_RELAXED:-}" ]] || return 1
+   local osr= wsl=
+   { IFS= read -r osr < /proc/sys/kernel/osrelease; } 2>/dev/null

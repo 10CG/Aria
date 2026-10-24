@@ -1,0 +1,58 @@
+16:48:49 begin | worktree df2d629 status [] | load 1.00 1.69 1.42
+16:48:49 snapshot: old suite 60f7f95525cd | run-suite-before 7584c219c4ba | impl hook af4658b6f935 | load 1.00 1.69 1.42
+16:48:49 c1 hook 93c7f2fac02a | load 1.00 1.69 1.42
+16:48:49 c3 hook 2a9e3d898705 | load 1.00 1.69 1.42
+16:48:49 c5 hook a4b04f1f97cf | load 1.00 1.69 1.42
+16:48:49 c5 reference (t002f-verify/c5.txt): hook a4b04f1f97cf | load 1.00 1.69 1.42
+16:48:49 c6 wrapper 7884d94e0c1b | load 1.00 1.69 1.42
+16:48:49 PHASE0 begin | load 1.00 1.69 1.42
+16:48:49 waitlow ok at 1.00 after 0s | load 1.00 1.69 1.42
+16:48:49 c6-old start | load 1.00 1.69 1.42
+16:54:34   -> c6-old.txt rc=1 | load 1.93 1.79 1.54
+16:54:34 c6-old end | # run-suite.sh end | load 1.93 1.79 1.54 | suite exit 1 | load 1.93 1.79 1.54
+16:54:34   c6-old marks: 23 inputs stalled, 31 gate-closed calls | load 1.93 1.79 1.54
+16:55:24 waitlow ok at 1.19 after 50s | load 1.19 1.62 1.50
+16:55:24 filt-before start | load 1.19 1.62 1.50
+16:55:27   -> filt-before.txt rc=0 | load 1.19 1.62 1.50
+16:55:27 waitlow ok at 1.19 after 0s | load 1.19 1.62 1.50
+16:55:27 scbash-before start | load 1.19 1.62 1.50
+16:55:29   -> scbash-before.txt rc=0 | load 1.25 1.63 1.50
+16:55:39 waitlow ok at 1.14 after 10s | load 1.14 1.59 1.49
+16:55:39 log-before start | load 1.14 1.59 1.49
+16:55:42   -> log-before.txt rc=0 | load 1.14 1.59 1.49
+16:55:42   log-before: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002h/no-such-dir exists? no | load 1.14 1.59 1.49
+16:55:42 PHASE0 DONE | load 1.14 1.59 1.49
+16:55:42 PHASE2 begin | worktree status [ M hooks/tests/secret-guard.test.sh ] | suite d4168aace3e8 | run-suite 46052595bf14 | load 1.14 1.59 1.49
+16:55:42 log-after start | load 1.14 1.59 1.49
+16:55:42   -> log-after.txt rc=3 | load 1.14 1.59 1.49
+16:55:42   log-after: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002h/no-such-dir exists? no | load 1.14 1.59 1.49
+16:55:42 waitlow ok at 1.14 after 0s | load 1.14 1.59 1.49
+16:55:42 filt-after-old start | load 1.14 1.59 1.49
+16:55:45   -> filt-after-old.txt rc=0 | load 1.13 1.58 1.48
+16:55:45 waitlow ok at 1.13 after 0s | load 1.13 1.58 1.48
+16:55:45 filt-after-new start | load 1.13 1.58 1.48
+16:55:47   -> filt-after-new.txt rc=0 | load 1.13 1.58 1.48
+16:55:47   cmp filt-before vs filt-after-old: log raw rc=1 (20 lines), log norm rc=1, output norm rc=1 | lines 10/10 | load 1.13 1.58 1.48
+16:55:47   cmp filt-before vs filt-after-new: log raw rc=1 (22 lines), log norm rc=1, output norm rc=1 | lines 10/10 | load 1.13 1.58 1.48
+16:55:47 waitlow ok at 1.13 after 0s | load 1.13 1.58 1.48
+16:55:47 scbash-after start | load 1.13 1.58 1.48
+16:55:48   -> scbash-after.txt rc=1 | load 1.13 1.58 1.48
+16:55:48   scbash-after: FAIL: 135 / 136 | # run-suite.sh end | load 1.13 1.58 1.48 | suite exit 1 | load 1.13 1.58 1.48
+16:55:48 waitlow ok at 1.13 after 0s | load 1.13 1.58 1.48
+16:55:48 c6-new start | load 1.13 1.58 1.48
+17:01:45   -> c6-new.txt rc=1 | load 1.44 1.57 1.50
+17:01:45 c6-new end | # run-suite.sh end | load 1.44 1.57 1.50 | suite exit 1 | load 1.44 1.57 1.50
+17:01:45   c6-new marks: 23 inputs stalled, 38 gate-closed calls | load 1.44 1.57 1.50
+17:02:05 waitlow ok at 1.17 after 20s | load 1.17 1.50 1.48
+17:02:05 c1-new start | load 1.17 1.50 1.48
+17:06:33   -> c1-new.txt rc=1 | load 2.01 1.72 1.57
+17:06:33 c1-new end | # run-suite.sh end | load 2.01 1.72 1.57 | suite exit 1 | load 2.01 1.72 1.57
+17:07:43 waitlow ok at 1.10 after 70s | load 1.10 1.51 1.50
+17:07:43 c5-new start | load 1.10 1.51 1.50
+17:12:31   -> c5-new.txt rc=1 | load 1.83 1.71 1.58
+17:12:31 c5-new end | # run-suite.sh end | load 1.83 1.71 1.58 | suite exit 1 | load 1.83 1.71 1.58
+17:13:21 waitlow ok at 1.08 after 50s | load 1.08 1.52 1.52
+17:13:21 impl start | load 1.08 1.52 1.52
+17:18:50   -> impl.txt rc=0 | load 1.70 1.70 1.59
+17:18:50 impl end | FAIL: 0 / 961 | load 1.70 1.70 1.59
+17:18:50 PHASE2 DONE | load 1.70 1.70 1.59

@@ -1,0 +1,41 @@
+# run-suite.sh | 2026-10-24T17:02:05Z | hook 93c7f2fac02a | suite d4168aace3e8 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY <none> | load 1.17 1.50 1.48
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SKIP] SC-9a pre-change comparison: af87cae not reachable via git show (shallow clone?) — post-change assertions still run below
+  [SKIP] SC-8 performance benchmark (TASK-022): af87cae not reachable via git show (shallow clone?)
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test
+PASS: 925 / 950
+FAIL: 25 / 950
+SKIP: 0 / 950 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.17 1.50 1.48 end 1.08 1.43 1.46 | timing batch: judged
+W10 older groups 21ab 21ac 21ag 21aj 21al 21ao: relaxed branch (new outcomes) | bash on PATH /usr/bin/bash 5.2.15(1)-release (machtype x86_64-pc-linux-gnu) | osrelease 6.17.9-1-pve | WSLInterop no | WSL_DISTRO_NAME '' WSL_INTEROP '' | deadline fallback (截止回落) 0 / 10
+
+Failures:
+  FAIL [W10-port V2-G1-gate]: this bash: status 1 (want 0) [status]
+  FAIL [W10-port V2-G3b-gate-uses-build-facts]: platform check got [], want [x86_64-pc-linux-gnu|5|2|6.17.9-1-pve|] (OSTYPE, MACHTYPE and HOSTTYPE set to darwin / aarch64: R2 PP2-m8) [value]
+  FAIL [W10-port V2-G4-project-without-extension-file]: status 1 (want 0) [status]
+  FAIL [W10-port V2-G15-cwd-project-without-extension-file]: the project root only through the stdin cwd, no extension file: status 1 (want 0) [status]
+  FAIL [W10-port V2-G16-environment-root-before-cwd]: CLAUDE_PROJECT_DIR without an extension, a stdin cwd with one: status 1 (want 0: the environment's root comes first) [status]
+  FAIL [W10-port V7-E1-benign-big-allowed]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E3-anchor-at-hook-start]: hook rc=2 oversize 1.60s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E4-cap-3-at-budget-4]: hook rc=2 oversize 0.12s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E5-budget-2]: hook rc=2 oversize 0.11s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 1.85..2.6) [wall<lo]
+  FAIL [W10-port V2-E6-flag-from-environment-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V2-E8-ostype-from-environment-ignored]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V9-E10-count-axis-read-blocked]: hook rc=2 oversize 0.11s | gate-closed rc=2 oversize 0.12s | stderr IDENTICAL (want rc=2 text=finding|longline within 4.5 s) [fallback]
+  FAIL [W10-port V9-E11-tmax-in-rerun]: hook rc=2 oversize 0.75s | gate-closed rc=2 oversize 0.71s | stderr IDENTICAL (want rc=2 text=tmax within 4.5 s) [fallback]
+  FAIL [W10-port V7-E13-multiline-copy-normal-text]: hook rc=2 oversize 0.11s | gate-closed rc=2 oversize 0.11s | stderr IDENTICAL (want rc=2 text=finding within 4.5 s) [fallback]
+  FAIL [W10-port V7-E14-long-line-from-expansion]: hook rc=2 oversize 0.08s | gate-closed rc=2 oversize 0.08s | stderr IDENTICAL (want rc=2 text=longline within 4.5 s) [fallback]
+  FAIL [W10-port V7-E15-credit-as-normal]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.08s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V5-E19-deadline-with-term-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10 SC-21ab bf: copy limit exceeded — 8193 characters, or a 9000-character segment with a one-character value: refused as too large where the relaxation is not in effect; where it is, each copy is judged in full: the reader is blocked with the longline text, the two commands with no reader pass]: 3 check(s) off: {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.64s (want > 2.0 s): 因时间的回落不会这么早结束} {Bash f=x; echo $f yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: baseline block at wall 2.36s, gate-closed Tb' 2.34s, 2.34s, 2.31s (want <= wall - 1.0 s): 关门那一遍同样慢：是准入门提前关，不是重跑的检查点} {Bash f=x; echo $f a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a: baseline block at wall 2.43s, gate-closed Tb' 2.52s, 2.43s, 2.38s (want <= wall - 1.0 s): 关门那一遍同样慢：是准入门提前关，不是重跑的检查点}
+  FAIL [W10 SC-21ac bf: value limit, last accepted — a collected value of exactly 4096 characters is expanded and its read blocked]: 1 check(s) off: {Bash for f in /dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd: baseline block at wall 0.28s (want > 2.0 s): 因时间的回落不会这么早结束}
+  FAIL [W10 SC-21ag bf: the dense shape of the review (15 assignments of 300 B, 8 references each: a 36 KB copy; 16 x 300 B x 8 took 5.4 s) is refused as too large on every platform — by the copy limit where the relaxation is not in effect, by the growth limit where it is]: 1 check(s) off: {Bash v0=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: baseline block at wall 1.56s (want > 2.0 s): 因时间的回落不会这么早结束}
+  FAIL [W10 SC-21aj bf: a segment over the copy limit that also grows over the growth limit ends the pass — with one, seven or eight of them in front of the reader the command is refused as too large (the copy limit, or the growth limit where the relaxation is in effect) and the reader is never judged]: 3 check(s) off: {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.61s (want > 2.0 s): 因时间的回落不会这么早结束} {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.74s (want > 2.0 s): 因时间的回落不会这么早结束} {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.71s (want > 2.0 s): 因时间的回落不会这么早结束}
+  FAIL [W10 SC-21al bf: the braced form meets the same copy limit — a substituted whole command of exactly 8192 characters is judged and blocked; 8193 is refused as too large where the relaxation is not in effect and blocked with the longline text where it is]: 1 check(s) off: {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.16s (want > 2.0 s): 因时间的回落不会这么早结束}
+  FAIL [W10 SC-21ao bf: whole-command mode meets the same copy limit — a whole copy of exactly 8192 characters is judged and blocked; 8193 is refused as too large where the relaxation is not in effect and blocked with the longline text where it is]: 1 check(s) off: {Bash f=/etc/forgejo/app.ini; p=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: baseline block at wall 0.26s (want > 2.0 s): 因时间的回落不会这么早结束}
+  FAIL [SC-13: 头注释计数同步]: 顶部 'Coverage: 967 cases' != 本次实跑总数 950 -- 回填 secret-guard.test.sh 顶部 Coverage 数 (+ secret-hygiene.md 三处 + proposal SC-11 正文, 权威值=实跑 N)。
+
+# run-suite.sh end | load 2.01 1.72 1.57 | suite exit 1

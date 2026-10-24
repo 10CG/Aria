@@ -1,0 +1,3 @@
+# extra (written before the run): cwd deleted, relative values: readlink -m cannot make them absolute and prints nothing (rc 1).
+# SG_W10_LOG=rel.log -> the original value goes on, it is not absolute -> exit 3 with the stderr line, no suite run.
+# SC_BASH=rel-bash -> header 'SC_BASH rel-bash' (the original), the suite cannot run it -> FAIL, exit 1.

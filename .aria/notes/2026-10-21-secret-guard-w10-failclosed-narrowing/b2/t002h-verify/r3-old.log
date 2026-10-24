@@ -1,0 +1,10 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T17:23:08Z | hook af4658b6f935 | direct 213d01379695 | shim 5c5c04525a67 | filter ^V1-E16 | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V1-E16-p1-small-benign hook rc=0 none 0.07s | gate-closed rc=0 none 0.07s | stderr IDENTICAL
+PASS V1-E16-p1-small-read hook rc=2 finding 0.07s | gate-closed rc=2 finding 0.07s | stderr IDENTICAL
+PASS V1-E16-p1-small-read-filter hook rc=0 none 0.06s | gate-closed rc=0 none 0.07s | stderr IDENTICAL
+PASS V1-E16-p1-var-read hook rc=2 finding 0.08s | gate-closed rc=2 finding 0.07s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid hook rc=0 none 0.19s | gate-closed rc=0 none 0.19s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid-read hook rc=2 finding 0.23s | gate-closed rc=2 finding 0.19s | stderr IDENTICAL
+PASS V0-H2-case-list all 6 expected case ids reported once (mode relax; one list on every platform)
+# load start 0.78 1.19 1.40 end 0.78 1.19 1.40 | timing batch: judged
