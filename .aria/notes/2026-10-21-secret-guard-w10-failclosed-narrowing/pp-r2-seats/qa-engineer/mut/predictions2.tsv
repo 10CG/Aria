@@ -1,0 +1,5 @@
+M22	V9-E11-tmax-in-rerun	the job judges the whole command (kind growth) instead of per segment (kind tmax)	the job hard-codes whole mode instead of $_SG_MODE
+M24	NONE (expected survivor)	V9-E12 hits VMAX in the baseline pass; no case reaches a value over VMAX that only the rerun collects (the 17th assignment)	inside the rerun a value over VMAX (status 2 of _sg_vx_collect) is ignored instead of blocking
+M28	NONE (expected survivor)	the long lines of V10/V7-N5 have no leading or trailing whitespace; read without IFS= trims it	the line-length loop reads without IFS= (leading/trailing blanks are trimmed from the measured line)
+M29	NONE (expected survivor)	all three constants are 8192, so naming the wrong one (SMAX / LMAX / GMAX) is not observable	rows-only edge uses _SGV_SMAX instead of _SGV_LMAX (numerically equal today)
+M30	NONE (expected survivor)	nothing starts the hook with SIGHUP/SIGTERM ignored; KILL vs TERM only matters there (same as M20, but for the post-wait group kill alone)	only the timer uses TERM (group kill after wait keeps KILL)

@@ -1,0 +1,14 @@
+M1 | load 1.08->1.29 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M2 | load 1.29->2.53 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M3 | load 2.53->3.22 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M4 | load 3.22->3.58 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M5 | load 3.58->2.39 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M6 | load 2.39->2.20 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M7 | load 2.20->1.66 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M8 | load 1.66->2.96 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M9 | load 2.96->1.93 | # totals: PASS 94  FAIL 0  SKIP 0 | RED: none
+M10 | load 1.93->1.99 | # totals: PASS 93  FAIL 1  SKIP 0 | RED: V5-S13b-nothing-outlives-the-run 
+M11 | load 1.99->2.58 | # totals: PASS 93  FAIL 1  SKIP 0 | RED: V5-S13b-nothing-outlives-the-run 
+M12 | load 2.58->2.63 | # totals: PASS 89  FAIL 5  SKIP 0 | RED: V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-1 V2-E6-flag-from-environment-ignored 
+M13 | load 2.63->4.07 | # totals: PASS 83  FAIL 10  SKIP 0 | RED: V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V5-S10-timer-fork-fails V5-S14-failing-sleep-kills-at-once V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-1 V2-E6-flag-from-environment-ignored 
+done

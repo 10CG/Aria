@@ -1,0 +1,11 @@
+--- v31.sh
++++ MB.sh
+@@ -640,7 +640,7 @@
+ _sg_vx_collect() {
+   _SG_T0=$SECONDS; _sg_time_budget   # reset the time-budget clock + resolve the budget once here: the single choke point every expensive leg (this collect's i×j chaining, _sg_vx_pass, the W9 extension look) passes first
+   local rest="$1" m name val i j n=0 dup pre ca=16 cf=8
+-  [[ -n "${_SG_RELAXED:-}" ]] && ca=1000000 cf=1000000   # 10CG/aria-plugin#217 relaxed rerun: no count bound (the deadline caps the cost)
++  [[ -n "${_SG_RELAXED:-}" ]] && ca=1000000   # 10CG/aria-plugin#217 relaxed rerun: no count bound (the deadline caps the cost)
+   local _q="'" _d='"' _b='`'
+   _SGV_N=(); _SGV_V=()
+   [[ "$rest" == *'$'* && "$rest" == *=* ]] || [[ "$rest" == *'$'* && "$rest" == *' in '* ]] || return 0

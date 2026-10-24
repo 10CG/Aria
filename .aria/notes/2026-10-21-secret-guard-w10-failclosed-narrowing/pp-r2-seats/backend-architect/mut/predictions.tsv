@@ -1,0 +1,14 @@
+M1	MISSED (V2-E9 / V2-G4 all set CLAUDE_PROJECT_DIR; no case drives the extension via stdin cwd)	noext: project root from CLAUDE_PROJECT_DIR only, the stdin cwd route is dropped
+M2	MISSED (no case has a remaining time whose fraction is < 0.1 s; V3-G10 / G9 / all e2e have fractions >= .5)	time left printed as %d.%d instead of %d.%06d (2.050000 s becomes "2.50000")
+M3	MISSED (no case makes the here-string read loop run zero times)	big_judge: the "length could not be measured -> rows only" sentinel removed
+M4	MISSED (V10-N2 / V7-E14 / V9-E10 have no value-redacting filter, so credit is 0 and the longline text appears either way)	judge_one: nocredit check moved behind the credit evaluation (a filtered long line is allowed by credit)
+M5	MISSED (every deadline/fallback e2e case is whole mode: the shapes start with a parenthesis)	segment trigger keeps the whole-mode baseline reason string for the fallback text
+M6	MISSED (no case has a copy whose longest line is exactly 8192 characters)	big_judge: max > _SGV_LMAX became max >= _SGV_LMAX
+M7	MISSED (set -m works on every measured bash, so the refusal branch never runs; no case calls _sg_relax_job outside a leader)	relax_job: the /proc group-leader self-check removed, set -m kept
+M8	MISSED (no case drives _sg_vx_pass under _SG_RELAXED with an exhausted budget)	vx_pass: the three "rerun -> return 3" checkpoint lines removed (the rerun writes the time text and returns 2)
+M9	MISSED by sc-cases.sh (growth > 8192 is only checked at _sg_vx_apply status level, V8-D*; no e2e shape has growth > 8192)	vx_pass whole mode, rerun: growth overrun returns 0 (allow) instead of the growth block
+M10	MISSED by sc-cases.sh (same as M9, segment branch)	vx_pass segment mode, rerun: growth overrun returns 0 (allow) instead of the growth block
+M11	MISSED (the longline e2e shapes are whole mode; no segment-mode copy > 8192 with a reader)	vx_pass segment mode: _sg_vx_big_judge not used, every segment copy goes to the normal judgement
+M12	CAUGHT by V6-E2 (fallback must exit 2)	per_segment_eval: the fallback writes the baseline text but returns 0 (fail-open)
+M13	CAUGHT by V6-E2 / V3-E3.. (deadline not enforced: the kill goes to the wrong group)	relax_job: timer kills -$$ instead of -$BASHPID (hook pid instead of job pid)
+M14	MISSED (V2-G3b varies OSTYPE only; MACHTYPE and HOSTTYPE are equally environment-rewritable, but no case sets them)	gate: platform string read from $MACHTYPE (environment-rewritable) instead of BASH_VERSINFO[5]

@@ -1,0 +1,11 @@
+--- v31.sh
++++ ME.sh
+@@ -830,7 +830,7 @@
+   st="${st##*) }"; f=( $st )
+   [[ "${f[2]:-}" == "$BASHPID" ]] || return 9
+   local me=$BASHPID tp
+-  ( sleep "$_SG_LEFT"; kill -KILL -- "-$me" ) >/dev/null 2>&1 </dev/null &
++  ( sleep "$(( _SG_TIME_BUDGET < 3 ? _SG_TIME_BUDGET : 3 ))"; kill -KILL -- "-$me" ) >/dev/null 2>&1 </dev/null &
+   tp=${!:-}
+   [[ -n "$tp" ]] && kill -0 "$tp" 2>/dev/null || return 9   # no running timer, no judgement: the deadline must exist before the first expensive step
+   _SG_RELAXED=1

@@ -1,0 +1,22 @@
+M01 rc=0 64s FAIL: V2-E7-no-time-left 
+M02 rc=0 71s FAIL: 
+M03 rc=0 64s FAIL: V2-E9-extension-project V9-E11-tmax-in-rerun 
+M04 rc=0 87s FAIL: V3-S4-slow-judgement V4-S7-time-checkpoint V5-S14-failing-sleep-kills-at-once V3-E4-cap-3-at-budget-4 V9-E11-tmax-in-rerun 
+M05 rc=0 55s FAIL: V2-G2-platform:x86_64-pc-linux-gnu:5.4 
+M06 rc=0 68s FAIL: V9-E11-tmax-in-rerun 
+M07 rc=0 72s FAIL: V9-E11-tmax-in-rerun 
+M08 rc=0 71s FAIL: V9-E11-tmax-in-rerun 
+M09 rc=0 81s FAIL: V3-E3-anchor-at-hook-start 
+M10 rc=0 71s FAIL: V5-S12-no-leftovers 
+M11 rc=0 132s FAIL: V5-S13-detached-child V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-1 V2-E6-flag-from-environment-ignored V2-E7-no-time-left V9-E11-tmax-in-rerun V7-E14-long-line-from-expansion 
+M12 rc=0 74s FAIL: V3-E3-anchor-at-hook-start 
+M13 rc=0 67s FAIL: 
+M14 rc=0 76s FAIL: 
+M15 rc=0 72s FAIL: V9-E11-tmax-in-rerun 
+M16 rc=0 57s FAIL: V4-S3-block-without-text 
+M17 rc=0 51s FAIL: 
+M18 rc=0 63s FAIL: V9-E11-tmax-in-rerun 
+M19 rc=0 76s FAIL: V5-S5-pipe-holder V4-S6-spoofed-tail-0 V4-S11-bare-zero V5-S10-timer-fork-fails V5-S10c-dead-timer-no-judgement V5-S14-failing-sleep-kills-at-once V6-E2-deadline-fallback-bytes V3-E4-cap-3-at-budget-4 V2-E6-flag-from-environment-ignored V9-E11-tmax-in-rerun 
+M20 rc=0 77s FAIL: V7-E1-benign-big-allowed V3-E3-anchor-at-hook-start 
+M21 rc=0 110s FAIL: V2-G6-no-time-left V2-G8-budget-0 V3-G9-clock-backwards V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V3-E5-budget-1 V2-E6-flag-from-environment-ignored V2-E7-no-time-left V9-E11-tmax-in-rerun 
+DONE

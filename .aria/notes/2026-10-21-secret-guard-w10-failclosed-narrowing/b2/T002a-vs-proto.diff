@@ -1,0 +1,90 @@
+--- proto.sh	2026-10-24 02:20:32.329514859 +0000
++++ /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria/hooks/secret-guard.sh	2026-10-24 02:44:03.327057835 +0000
+@@ -85,18 +85,24 @@
+ #     retry that follows the text is blocked again; the text is unchanged on
+ #     purpose (secret-hygiene.md §2.5, note).
+ #   - Shell variable indirection (`f=...; cat "$f"`) is covered only in part: literal
+-#     assignments are expanded in a second pass (at most 16 assignments and 8 replacements
+-#     per variable in the baseline pass; beyond those COUNTS the variable passes). The SIZE of
+-#     the expansion is bounded too: a value over 4096 characters, or more than 65536
+-#     characters of substituted text per command, blocks the command (fail-closed, owner
+-#     ruling 2026-10-14). A substituted copy over 8192 characters is blocked for its size
+-#     only where the relaxed rerun of 10CG/aria-plugin#217 is not in effect; where it is
+-#     (a Linux build of bash 5.0-5.3, no project extension, time left), the pass is re-run
+-#     under a hard deadline with no count bound, the growth over the input as the limit
+-#     and the copy judged in full, and growth over 8192 characters, the deadline or any
+-#     failure of the rerun still blocks. Arrays, `read <<<`, quote-spliced paths, `cd`
+-#     + a relative name, globs, `set --`, `$(printf ...)` and variables across two tool
+-#     calls pass; the output side is left to secret-scan.sh.
++#     assignments are expanded in a second pass (at most 16 assignments, 8 for lists and 8
++#     replacements per variable in the baseline pass; beyond those COUNTS the variable
++#     passes). The SIZE of the expansion is bounded too: a value over 4096 characters, or
++#     more than 65536 characters of substituted text per command, blocks the command
++#     (fail-closed, owner ruling 2026-10-14). A substituted copy over 8192 characters is
++#     blocked for its size only where the relaxed rerun of 10CG/aria-plugin#217 is not in
++#     effect; where it is (an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL, no
++#     project extension, time left), the pass is re-run under a
++#     hard deadline with no count bound, the growth over the input as the limit and the
++#     copy judged in full, and growth over 8192 characters, the deadline or any failure of
++#     the rerun still blocks. The pass substitutes text; it does not run the shell: a
++#     variable assigned twice is replaced by its FIRST value (bash reads the last), and in
++#     segment mode a value holding shell syntax (`G='| jq keys'`) becomes syntax in the
++#     copy, so a read can earn a filter credit that bash never applies. Both pass, in small
++#     commands since the baseline and, with the rerun, in big ones (declared under owner
++#     ruling A, 2026-10-23). Arrays, `read <<<`, quote-spliced paths, `cd` + a relative
++#     name, globs, `set --`, `$(printf ...)` and variables across two tool calls pass;
++#     the output side is left to secret-scan.sh.
+ #
+ # === History ===
+ #   v1.0: PR #429 initial — basic regex blacklist for Bash tool only
+@@ -575,7 +581,8 @@
+ 
+ # W10 -- path through a shell variable (partial coverage): a SECOND pass that runs only after EVERY built-in verdict allowed (_sg_vx_pass), so the built-in verdict is never
+ # postponed or changed and the pass can only add blocks. Literal assignments are collected from the whole command (NAME=value, `for NAME in list`, one level of chaining; at
+-# most 16 assignments and 8 replacements per variable); every segment (the whole command when it degraded) that mentions $NAME or ${NAME} is judged once more with the
++# most 16 assignments, 8 for lists and 8 replacements per variable in the baseline pass, none in the relaxed rerun of 10CG/aria-plugin#217); every segment (the whole
++# command when it degraded) that mentions $NAME or ${NAME} is judged once more with the
+ # values substituted in. TEXT ONLY: prefix + suffix concatenation with the remainder taken BY LENGTH (${s:N}); no eval (a value may hold a command substitution or back
+ # quotes: they must never run inside the hook), no ${s//p/r} (bash 5.2 patsub_replacement and the quote semantics of bash < 4.3 disagree about quotes and `&` in the
+ # replacement), no ${s#*"$pat"} (O(n^2) when the hit sits late in a long string).
+@@ -623,8 +630,8 @@
+ _sg_over_budget() {   # return 0 (true) once this judgement has spent >= the budget since _SG_T0 (budget resolved once at each reset site, not per checkpoint)
+   (( SECONDS - _SG_T0 >= _SG_TIME_BUDGET ))
+ }
+-# _sg_vx_replace S PAT REP [MAX] : literal replace-all of PAT in S, at most 8 replacements -> _SG_RP; with MAX (characters) it stops with status 1 as soon as the result would be
+-# longer than MAX (_SG_RP is then S unchanged)
++# _sg_vx_replace S PAT REP [MAX] : literal replace-all of PAT in S, at most 8 replacements in the baseline pass (no bound in the relaxed rerun) -> _SG_RP; with MAX
++# (characters) it stops with status 1 as soon as the result would be longer than MAX (_SG_RP is then S unchanged)
+ _sg_vx_replace() {
+   local s="$1" pat="$2" rep="$3" max="${4:-0}" out="" g=0 pre gc=8
+   [[ -n "${_SG_RELAXED:-}" ]] && gc=1000000   # 10CG/aria-plugin#217 relaxed rerun: no count bound
+@@ -789,8 +796,8 @@
+ # deadline: _SG_P0 (hook start) + min(_SG_TIME_BUDGET, 3) s. The job leads its own process group (set -m); its timer runs inside the group and is started
+ # before the first expensive step; the deadline kills the whole group, and so does _sg_relax_run once the job has ended, so nothing of the job outlives it
+ # or holds the pipe. The verdict is the job's exit status, never parsed from text: 77 allows, 2 blocks with the job's own text; any other outcome -- the
+-# deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on a Linux
+-# build of bash 5.0-5.3 on GNU/Linux (the versions and the platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
++# deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on an x86_64
++# GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
+ # absolute limit anyway), and with time left before the deadline.
+ _sg_vx_big_judge() {   # COPY MODE: the longest line (one linear read loop) routes the copy -- longer than _SGV_LMAX: rows only, no credit; otherwise the normal judgement
+   local line max=0 seen=0
+@@ -812,12 +819,15 @@
+ }
+ _sg_relax_ok() {   # status 0 when the relaxation is in effect for this command; the extension is asked inside a command substitution, like every extension call
+   [[ -z "${_SG_RELAXED:-}" ]] || return 1
+-  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" || return 1   # read-only build facts, which the environment cannot rewrite (OSTYPE can be)
++  local osr= wsl=
++  { IFS= read -r osr < /proc/sys/kernel/osrelease; } 2>/dev/null
++  [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" || -e /proc/sys/fs/binfmt_misc/WSLInterop ]] && wsl=wsl   # WSL marks; the environment can only switch the relaxation off with them
++  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" "$osr" "$wsl" || return 1   # read-only build and kernel facts, which the environment cannot rewrite (OSTYPE, MACHTYPE and HOSTTYPE can be)
+   _sg_relax_left || return 1
+   [[ "$( _sg_relax_noext 2>/dev/null )" == none ]]
+ }
+-_sg_relax_platform() {   # MACHINE MAJOR MINOR: status 0 on a GNU/Linux build of a bash version the mechanism was measured on, 5.0 to 5.3 (owner ruling E: an untested platform -- macOS, Windows, musl, Android, another bash -- keeps the baseline)
+-  [[ "$1" == *-linux-gnu* ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
++_sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x86_64 GNU/Linux build of a bash version the mechanism was measured on, 5.0 to 5.3, outside WSL (owner ruling E, 2026-10-22 and 2026-10-23: an untested platform -- macOS, Windows, WSL1 and WSL2, musl, Android, aarch64 and other architectures, another bash -- keeps the baseline)
++  [[ "${1:-}" == x86_64-*-linux-gnu* && -n "${4:-}" && "${4:-}" != *[Mm]icrosoft* && "${4:-}" != *WSL* && -z "${5:-}" ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
+ }
+ _sg_relax_noext() {   # prints "none" only when no extension can be in effect: no project root, or no .aria/secret-guard.paths under it. A file in any state, or an error, keeps the relaxation off
+   local root

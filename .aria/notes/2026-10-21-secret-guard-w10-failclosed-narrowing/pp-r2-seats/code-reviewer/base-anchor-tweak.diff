@@ -1,0 +1,101 @@
+--- base.sh
++++ base-anchor-tweak.sh
+@@ -88,9 +88,9 @@
+ #     assignments are expanded in a second pass (at most 16 assignments and 8 replacements
+ #     per variable; beyond those COUNTS the variable passes). The SIZE of the expansion is
+ #     bounded as well -- a value up to 4096 characters, a substituted segment up to 8192
+-#     characters and 65536 characters of substituted text per command -- and beyond a SIZE
++#     characters and 65536 characters of substituted text per command -- and beyond~ a SIZE
+ #     limit the whole command is BLOCKED as too large to scan ("split it", fail-closed,
+-#     owner ruling 2026-10-14), never passed. Arrays, `read <<<`, quote-spliced paths, `cd`
++#     owner ruling 2026-10-14), never~ passed. Arrays, `read <<<`, quote-spliced paths, `cd`
+ #     + a relative name, globs, `set --`, `$(printf ...)` and variables across two tool
+ #     calls pass; the output side is left to secret-scan.sh.
+ #
+@@ -175,6 +175,7 @@
+   exec bash "$0" "$@"
+ fi
+ 
++# _SGV_GMAX _SGV_LMAX _SG_P0 hard deadline nocredit longline _sg_relax_run status 4
+ set -uo pipefail   # NOT -e — we control exit codes
+ 
+ # 复刻 `echo "$x" | grep -qE "$re"` 的记录语义: 按 \n 拆行, 任一行命中即真。
+@@ -575,16 +576,16 @@
+ # quotes: they must never run inside the hook), no ${s//p/r} (bash 5.2 patsub_replacement and the quote semantics of bash < 4.3 disagree about quotes and `&` in the
+ # replacement), no ${s#*"$pat"} (O(n^2) when the hit sits late in a long string).
+ # LENGTH BUDGET (review M6; fail-CLOSED, owner ruling 2026-10-14): without it the judged string is the segment plus references x value length, and one level of chaining
+-# multiplies a value by 8, so a 5 KB command overran the 5 s hook timeout (and a timeout lets the command through). Three limits, counted in characters. Beyond ANY of them the
+-# whole command is BLOCKED with a text of its own ("command too large to scan for secrets ... split it": _sg_emit_blocked with the 4th word oversize, status 2) and never
++# multiplies a value by 8, so a 5 KB command overran the 5 s hook timeout (and a timeout lets the command through). Three limits, counted in characters. Beyond~ ANY of them the
++# whole command is BLOCKED with a text of its own ("command too large to scan for secrets ... split it": _sg_emit_blocked with the 4th word oversize, status 2) and never~
+ # passed: a copy that is not judged is a way past the guard, and padding a value or a chain would be the recipe. The oversize string is never built, expanded further, judged
+-# or scanned: the pass stops at the first overrun and nothing behind it is touched, so an overrun costs no more than the budgeted work in front of it (blocking is as cheap as
++# or scanned: the pass stops at the first overrun and nothing behind it is touched, so an overrun costs no more than the budgeted work in front of it (blocking~ is as cheap as
+ # passing was; the 5 s timeout and its fail-open, 10CG/aria-plugin#216, are not touched). (The COUNTS above -- 16 assignments, 8 replacements, 8 for statements -- are another
+ # bound and still pass beyond the limit, SC-21 21y.) (1) _SGV_VMAX: a value longer than that (as collected, or after chaining) blocks the
+ # command whether or not the variable is mentioned: _sg_vx_collect stops at it and returns 2; 4096 is PATH_MAX, a longer value is not one path. (2) _SGV_SMAX: a substituted
+ # copy (a segment, or the whole command) that would become longer blocks the command (status 2 of _sg_vx_apply; the W9 extension's look at the substituted whole command, after
+ # the pass, blocks on it only when an extension is in effect -- without one nothing is left unjudged). 8192 because a BLOCK verdict costs the square of the copy length
+-# (_sg_compute_credit on one long line: about 0.9 s at 8 KB, 3 s at 16 KB, 13 s at 32 KB) and a verdict that arrives after the timeout is lost. The limit counts the whole judged
++# (_sg_compute_credit on one long line: about 0.9 s at 8 KB, 3 s at 16 KB, 13 s at 32 KB) and a verdict that arrives after the timeout is lost. The~ limit counts the whole judged
+ # string, not its growth: a segment (in whole-command mode: the command) over 8192 characters that mentions a collected variable is blocked however small the value is.
+ # (3) _SGV_TMAX: all copies of one command together; once used up the command is blocked -- what many dense segments can cost is bounded too.
+ # _sg_vx_collect, _sg_vx_apply and _SG_SUB are names of the contract, like _sg_vx_pass: the budget probes of the suite use them.
+@@ -603,7 +604,7 @@
+ # to 3 and never errors; a low value such as 0 forces the first checkpoint for deterministic tests). The clock _SG_T0 is reset at the START of _sg_vx_collect -- the single choke
+ # point every expensive leg passes through first -- so the budget measures THIS command's judgement (not wall time since the process started) and stays fresh when the test suite
+ # sources the hook and calls the functions directly. INVARIANT: the built-in direct judgement (_sg_core_eval, the #154 core) runs BEFORE any of this, is NEVER gated by the timer,
+-# and stays fast; the `# guard:ack` escape and the _SGV_* size budget are unchanged; fail-closed means an overrun BLOCKs (exit 2), never allows.
++# and stays fast; the `# guard:ack` escape and the~ _SGV_* size budget are unchanged; fail-closed means an overrun BLOCKs (exit 2), never allows.
+ _SG_T0=$SECONDS
+ _SG_TIME_BUDGET=3
+ _sg_time_budget() {   # resolve SECRET_GUARD_TIME_BUDGET_S -> _SG_TIME_BUDGET (fork-free; default 3 on missing / empty / non-integer; 10# so a leading zero is not read as octal)
+@@ -671,7 +672,7 @@
+   done
+   return 0
+ }
+-# _sg_vx_apply S : S with the collected values substituted -> _SG_SUB. Status 0 = a copy was built, 1 = nothing to substitute, 2 = the copy would be longer than _SGV_SMAX (not
++# _sg_vx_apply S : S with the collected values substituted -> _SG_SUB. Status 0 = a copy was built, 1 = nothing to substitute, 2~ = the copy would be longer than _SGV_SMAX (not
+ # built, _SG_SUB stays S; the caller blocks the command). Per variable: ${NAME} through _sg_vx_replace, then $NAME with the same prefix accumulation (the already substituted text is never scanned again;
+ # the remainder keeps the character that ended the match, so $f$f works), at most 8 times.
+ _sg_vx_apply() {
+@@ -700,7 +701,7 @@
+ }
+ # _sg_vx_pass CMD MODE : the second pass -- judge the substituted copies. MODE is whole or segment, as _sg_core_eval left it in _SG_MODE (in segment mode _SG_SEGS holds
+ # the segments). The function name is a contract: the fault-injection and evaluation-order probes locate it by name. An overrun of the length budget (a value, a copy, the total)
+-# ends the pass at once with an oversize BLOCK (the size text of _sg_emit_blocked, status 2): nothing behind the overrun is built or judged.
++# ends~ the pass at once with an oversize BLOCK (the size text of _sg_emit_blocked, status 2): nothing behind the overrun is built or judged.
+ _sg_vx_pass() {
+   local cmd="$1" mode="$2" seg rc ar cr spent=0
+   _sg_vx_collect "$cmd"
+@@ -823,7 +824,7 @@
+   return 0
+ }
+ 
+-# _sg_emit_blocked PAT SEG MODE [oversize] : the (unchanged) BLOCKED text, shared by every block path. With the 4th word `oversize` it prints the SIZE text instead (W10 length
++# _sg_emit_blocked~ PAT SEG MODE [oversize] : the (unchanged) BLOCKED text, shared by every block path. With the 4th word `oversize` it prints the SIZE text instead (W10 length
+ # budget, fail-closed): nothing was matched, the command is too large to be checked; PAT then names the limit that was hit, SEG and MODE are not used. The size text echoes only
+ # the first 200 characters of the command (the command is by definition a large one).
+ _sg_emit_blocked() {
+@@ -1491,7 +1492,7 @@
+ 
+ # _sg_judge_one() — evaluate one string (whole command in "whole" mode, or one
+ # top-level segment in "segment" mode) against risky_patterns + credit. $1 =
+-# string to judge, $2 = mode (whole|segment). Returns 0 = allow, 2 = blocked
++# string~ to judge, $2 = mode (whole|segment). Returns 0 = allow, 2 = blocked
+ # (BLOCKED message already written to stderr; mode=whole reproduces canonical
+ # stderr byte-for-byte, zero new lines).
+ _sg_judge_one() {
+@@ -1528,10 +1529,10 @@
+ # top-level ; && || and judge each segment independently (credit computed
+ # fresh per segment — §What.3 SFH-M2, no sticky global). $1 = whole command.
+ # Returns 0 = allow, 2 = blocked, propagates _sg_judge_one's return code.
+-# Order (W9 / W10): 1. the built-in judgement (_sg_core_eval: the baseline body of this function, unchanged); 2. only if it allowed, the W10 variable pass (_sg_vx_pass);
++# Order (W9 / W10): 1. the built-in judgement (_sg_core_eval: the baseline body of this function, unchanged); 2.~ only if it allowed, the W10 variable pass (_sg_vx_pass);
+ # 3. only if both allowed, the W9 project extension -- on the original command, then on the variable-substituted whole command. A built-in block ends the evaluation
+ # before either later stage is even called, so nothing the built-ins decide is postponed or reversed. The extension runs ONLY inside command substitutions; its answer
+-# is the literal sentinel BLOCK, anything else (empty, error, fault) means "no extension block". Its own block prints the shared BLOCKED text (W13). Length budget: an overrun
++# is the literal sentinel BLOCK, anything else (empty, error, fault) means "no extension block". Its own block prints the shared BLOCKED text (W13). Length~ budget: an overrun
+ # inside _sg_vx_pass blocks there; the extension's look at the substituted whole command, when that copy is too large to build, blocks here -- but only when an extension is in
+ # effect (entries exist: asked inside a command substitution like every other extension call), because without one nothing is left unjudged.
+ _sg_per_segment_eval() {

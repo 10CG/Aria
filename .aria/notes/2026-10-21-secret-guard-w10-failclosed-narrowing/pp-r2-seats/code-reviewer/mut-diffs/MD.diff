@@ -1,0 +1,11 @@
+--- v31.sh
++++ MD.sh
+@@ -775,7 +775,7 @@
+       _sg_emit_blocked "the command segments together are longer than $_SGV_TMAX characters after variable expansion" "$cmd" segment oversize
+       return 2
+     fi
+-    if [[ -n "${_SG_RELAXED:-}" ]] && (( ${#_SG_SUB} > _SGV_SMAX )); then _sg_vx_big_judge "$_SG_SUB" segment; else _sg_judge_one "$_SG_SUB" segment; fi
++    _sg_judge_one "$_SG_SUB" segment
+     rc=$?
+     [[ $rc -ne 0 ]] && return "$rc"
+   done

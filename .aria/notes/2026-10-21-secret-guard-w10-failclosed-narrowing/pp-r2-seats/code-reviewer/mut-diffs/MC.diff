@@ -1,0 +1,19 @@
+--- v31.sh
++++ MC.sh
+@@ -1635,15 +1635,11 @@
+   fi
+   for pat in "${risky_patterns[@]}"; do
+     if [[ "$subj" =~ $pat ]]; then
+-      if [[ "$nocredit" == nocredit ]]; then   # 10CG/aria-plugin#217: a big copy with a line longer than _SGV_LMAX -- the match alone blocks, credit is not evaluated
+-        _sg_emit_blocked "$pat" "$seg" "$mode" longline
+-        return 2
+-      fi
+       if [[ -z "$credit" ]]; then
+         if _sg_compute_credit "$seg"; then credit=1; else credit=0; fi
+       fi
+       if [[ "$credit" == "0" ]]; then
+-        _sg_emit_blocked "$pat" "$seg" "$mode"
++        if [[ "$nocredit" == nocredit ]]; then _sg_emit_blocked "$pat" "$seg" "$mode" longline; else _sg_emit_blocked "$pat" "$seg" "$mode"; fi
+         return 2
+       fi
+       break

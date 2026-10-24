@@ -31,7 +31,7 @@ invariants:
   - id: INV-1
     rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认"
   - id: INV-2
-    rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim 与输入生成); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
+    rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim 与输入生成); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); pp-r2-seats/ (post_planning R2 五席的坏实现生成脚本、探针与逐个结果, 2026-10-24 从会话临时目录收进来, 只追加) 与 b2/ (B.2 各步的执笔席报告与补丁); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
   - id: INV-3
     rule: "放宽只在 What 1 的两个触发点进入; 触发点之外的代码路径行为逐字节不变 (P1)。实现时若发现必须改动触发点之外的路径, 停下上报"
   - id: INV-4
@@ -76,7 +76,13 @@ tasks:
     status: pending
     agent: implementer
     reason: "新执笔席 (主控执笔是瓶颈, owner 的处方是换人执笔); 主控不亲写 hook 码, 独立复核"
+    status: in_progress
     depends_on: [TASK-001]
+    notes:
+      - "第一步 代码落地 (2026-10-23 至 10-24, 新执笔席): aria 分支提交 96f9083 (What 6, 落在基线上, 便于单独审与回退) 与 21a37ea (原型 + What 1 补充 + What 7 补充), hook 的 sha256 前缀 af4658b6f935, 已推 origin (ls-remote 一致)。执笔席报告与 diff 在 .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/b2/"
+      - "第一步发现两处规格问题, 按 INV-1 先改规格再改代码 (主仓 0fa20e1a): _sg_relax_platform 每个参数带缺省 (set -u 下少传参数会让调用方中止, 在 hook 里即放行); What 7 补充加第 4 处 (原型 :792-793 的平台措辞)"
+      - "第一步还暴露: 旧 sc-direct.sh 的 V2-G2 按三参数调用, 在旧函数体上让直调段整段中止且不报错 —— 正是 R2 补强 (d) 的哨兵与编号清单要抓的形状, 已写进第二步任务书"
+      - "第二步 按 R2 补强可执行验收: 进行中 (任务书在会话临时目录, 要点已记在本任务 design 的 R2 补强 (a)-(f))"
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     design:
       - "代码: 用 mkv31.py 的补丁逐字落地 (INV-1), 包括 What 7 的 8 块 hook 注释; 再按 proposal 的 What 1 补充 (准入门收紧) 与 What 7 补充 (四处注释) 逐字改; 新函数在 source 闸门之上 (INV-4)"

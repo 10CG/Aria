@@ -1,0 +1,14 @@
+Non-author mutants of the v3.1 prototype (sha256 9f61db0e7b8b), written BEFORE running sc-cases.sh (2026-10-22, code-reviewer seat, post_planning R2)
+MA  segment-mode trigger returns 4 without asking _sg_relax_ok (the gate kept only in whole mode)
+    expect: NOT caught. V2-G* call _sg_relax_ok directly (unchanged); V2-E9 extension case is whole mode ("(x=1; ..." ); tmax-rerun (only segment e2e) has the gate open anyway;
+    on bash 3.2 _sg_relax_run fails _sg_relax_left -> fallback bytes = baseline. Impact probe: extension project + segment-mode big read of the listed path -> mutant rc 0, baseline rc 2.
+MB  rerun lifts the assignment bound but keeps the for-statement bound (ca=1000000 only, cf stays 8)
+    expect: NOT caught. V9-C1 counts assignments, V9-C2 references, V9-E10 uses an assignment; no case has >= 9 for statements.
+    Impact probe: big whole-mode command, 8 dummy for loops, read through the 9th for variable -> prototype blocks (finding), mutant rc 0.
+MC  nocredit honoured only when credit is 0 (credit evaluated on long-line copies; longline text kept for the uncredited case)
+    expect: NOT caught. V10-N2/N4, V7-E14, stall-read have no redacting filter -> credit 0 -> same longline text; deadline cases fall back either way.
+    Impact probe: whole-mode one-line copy > 8192 with "cat $F" and an unrelated ">/dev/null" -> prototype longline block, mutant rc 0 (ruling C violated).
+MD  segment branch of _sg_vx_pass calls _sg_judge_one for every copy (big_judge routing only in whole mode)
+    expect: NOT caught. The only segment-mode e2e shape (tmax-rerun) has no reader; V10-N* call the functions directly.
+ME  timer sleeps min(budget, 3) from the job start instead of the time left (_SG_LEFT)
+    expect: CAUGHT by V3-E3-anchor-at-hook-start (jq stall 1.5 s -> fallback at ~T_trigger + 3 = ~4.7 s, outside 2.85..3.6); V6-E2/V3-E4 may stay green (T_trigger ~0.2 s).

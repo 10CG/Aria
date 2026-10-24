@@ -1,0 +1,21 @@
+M01	NONE (expected survivor)	V2-G4 and V2-E9 reach the project only through CLAUDE_PROJECT_DIR; no case gives the project through the stdin cwd	the gate resolves the project root from CLAUDE_PROJECT_DIR only, not through _sg_ext_root (stdin cwd is forgotten)
+M02	NONE (expected survivor)	the only e2e case that sets an extension (V2-E9) is whole mode; the segment-mode trigger point is exercised only with the gate open	segment-mode trigger point does not ask the gate (copy-paste slip: if true)
+M03	V2-E9-extension-project	whole-mode trigger point without the gate: the extension project reruns and is allowed (rc 0 vs baseline rc 2)	whole-mode trigger point does not ask the gate (if true)
+M04	NONE (expected survivor)	V2-G3b and V2-E8 poison OSTYPE only; MACHTYPE equals BASH_VERSINFO[5] unless the environment sets it	the platform argument is $MACHTYPE (environment-writable) instead of ${BASH_VERSINFO[5]}
+M05	V2-G2-platform:x86_64-pc-linux-gnu:5.4	control: the version table has a 5.4 row	bash minor limit <= 9 instead of <= 3
+M06	NONE (expected survivor)	V4-S7 stubs _sg_vx_pass itself; no case runs the real whole-mode checkpoint inside the rerun	whole-mode time checkpoint inside the rerun returns 0 (allow) instead of 3
+M07	NONE (expected survivor)	same: the segment-loop checkpoint inside the rerun is never run for real	segment-mode time checkpoint inside the rerun returns 0 (allow) instead of 3
+M08	NONE (expected survivor)	same: the chaining checkpoint result (status 3 of _sg_vx_collect) inside the rerun is never run for real	collect-chaining time checkpoint inside the rerun returns 0 (allow) instead of 3
+M09	NONE (expected survivor)	no e2e case reaches the deadline fallback in segment mode (V6-E2 and the other fallback cases are whole mode)	the segment-mode fallback text names the whole-command limit (copy-paste slip in _SG_OV_PAT)
+M10	NONE (expected survivor)	V10-N* and V7-N5 call _sg_vx_big_judge directly; V7-E13/E14 are whole mode; V9-E11 (segment) has no read	segment mode inside the rerun judges a big copy with the normal _sg_judge_one (no routing to _sg_vx_big_judge)
+M11	V7-E14-long-line-from-expansion	control: whole mode with a >8192 line after expansion must give the longline text	whole mode inside the rerun judges a big copy with the normal _sg_judge_one
+M17	NONE (expected survivor)	V8-D1..D3 call _sg_vx_apply directly (status only); no sc-cases e2e has a growth overrun (kind growth is never wanted)	segment growth overrun inside the rerun skips the segment instead of blocking (fail-open)
+M18	NONE (expected survivor)	same for the whole-command growth overrun	whole growth overrun inside the rerun returns 0 (allow) instead of blocking (fail-open)
+M12	NONE (expected survivor)	V9-C1 counts assignments, V9-C2 references; nothing counts for statements inside the rerun	the rerun lifts the assignment bound but keeps the 8-for-statement bound
+M13	NONE (expected survivor)	V10 uses a 9000-character line, V7-N5 short lines: nothing probes the 8192 / 8193 edge of the longest line	the longest-line edge is >= 8192 instead of > 8192
+M14	NONE (expected survivor)	no case makes the line-length read loop fail to run (seen=0)	the unmeasurable-length sentinel routes to the credit path (max=0) instead of rows only
+M15	NONE (expected survivor)	V4-S2 reads stderr through $(cat) which strips the trailing newline; no e2e case compares the bytes of a relaxed block text	the relaxed block text is re-printed without its final newline
+M16	V4-S3-block-without-text	control: a block without text must fall back	a job exit 2 without a text counts as a block
+M19	V6-E2-deadline-fallback-bytes (if bash prints the job-kill notice)	the command substitution would print the job-termination notice into the hook stderr	the command substitution keeps stderr (no exec 2>/dev/null)
+M20	NONE (expected survivor)	nothing runs the hook with SIGTERM ignored	the timer and the post-wait group kill use TERM instead of KILL
+M21	NONE (expected survivor)	cap=3 is only visible when the budget differs from 3; V3-E5 (budget 1) would catch a constant cap, but a floor of the cap at the default cannot be seen	time-left is computed with cap=3 only (a budget of 1 or 2 is ignored)

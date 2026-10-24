@@ -1,0 +1,6 @@
+M22 rc=0 88s FAIL: V6-E2-deadline-fallback-bytes V3-E4-cap-3-at-budget-4 V9-E11-tmax-in-rerun 
+M24 rc=0 179s FAIL: V7-E1-benign-big-allowed V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-1 V2-E6-flag-from-environment-ignored V2-E7-no-time-left V9-E11-tmax-in-rerun 
+M28 rc=0 115s FAIL: V4-S2-block-with-text V4-S3-block-without-text V3-S4-slow-judgement V2-E7-no-time-left 
+M29 rc=0 121s FAIL: V4-S2-block-with-text V5-S14-failing-sleep-kills-at-once V3-E5-budget-1 V2-E7-no-time-left 
+M30 rc=0 92s FAIL: V2-E6-flag-from-environment-ignored V2-E7-no-time-left V9-E11-tmax-in-rerun 
+DONE

@@ -1,0 +1,96 @@
+# sc-cases.sh | 2026-10-22T17:35:54Z | hook sha256 c917caaa1e6f | base sha256 e83c5e30f2cc | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load 7.69 7.66 5.84
+PASS V2-G1-gate this bash: status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.0 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.1 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.3 status 0 (want 0)
+PASS V2-G2-platform:aarch64-unknown-linux-gnu:5.2 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:6.0 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:4.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-unknown-linux-gnu:3.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-apple-darwin23.0.0:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-msys:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-cygwin:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-alpine-linux-musl:5.2 status 1 (want 1)
+PASS V2-G2-platform:aarch64-unknown-linux-android:5.2 status 1 (want 1)
+PASS V2-G3-gate-calls-platform status 1 with the platform check failing (want 1)
+PASS V2-G3b-gate-uses-build-facts platform check got [x86_64-pc-linux-gnu|5|2], want [x86_64-pc-linux-gnu|5|2] (OSTYPE set to darwin21)
+PASS V2-G4-project-without-extension-file status 0 (want 0)
+PASS V2-G4-extension-file-with-entry status 1 (want 1)
+PASS V2-G4-empty-extension-file status 1 (want 1)
+PASS V2-G4-extension-path-is-a-directory status 1 (want 1)
+PASS V2-G5-nested status 1 (want 1)
+PASS V2-G6-no-time-left status 1 (want 1)
+PASS V2-G7-no-anchor status 1 (want 1)
+PASS V2-G8-budget-0 status 1 (want 1)
+PASS V2-G11-flag-not-from-environment a hook sourced with _SG_RELAXED=1 in its environment holds [] (want [])
+PASS V3-G9-clock-backwards time left 1.000000 with the anchor 5 s in the future, budget 1 (want 0 < left <= 1.000000)
+PASS V3-G10-cap-3 time left 2.999789 at budget 4 (want 2.9 < left <= 3.000000: min(budget, 3))
+PASS V4-S1-allow rc=0 (want 0) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V4-S2-block-with-text rc=2 (want 2) wall=0.01s (want 0..0.3) stderr=BLOCK\ TEXT (want BLOCK\ TEXT)
+PASS V4-S3-block-without-text rc=4 (want 4) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V3-S4-slow-judgement rc=4 (want 4) wall=1.01s (want 0.85..1.3) stderr='' (want '')
+PASS V5-S5-pipe-holder rc=4 (want 4) wall=1.03s (want 0.85..1.3) stderr='' (want '')
+PASS V4-S6-spoofed-tail-0 rc=4 (want 4) wall=1.01s (want 0.85..1.3) stderr='' (want '')
+PASS V4-S7-time-checkpoint rc=4 (want 4) wall=0.04s (want 0..0.3) stderr='' (want '')
+PASS V4-S8-internal-error rc=4 (want 4) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V5-S9-child-left-behind rc=0 (want 0) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V5-S13-detached-child rc=0 (want 0) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V5-S13b-nothing-outlives-the-run a child that does not hold the pipe, still alive right after _sg_relax_run returned: 0 (want 0)
+PASS V4-S11-bare-zero rc=4 (want 4) wall=0.00s (want 0..0.3) stderr='' (want '')
+PASS V5-S10-timer-fork-fails rc=4 (want 4) wall=15.03s (want 0..16.5) stderr='' (want '')
+PASS V5-S10b-no-judgement-without-timer judgement started: no (want no)
+PASS V5-S10c-dead-timer-no-judgement rc=4 (want 4) wall=0.02s (want 0..0.3) stderr='' (want '')
+PASS V5-S10d-no-judgement-with-dead-timer judgement started: no (want no)
+PASS V5-S14-failing-sleep-kills-at-once rc=4 (want 4) wall=0.01s (want 0..0.3) stderr='' (want '')
+PASS V5-S12-no-leftovers stub processes still alive after the cases: 0 (want 0)
+PASS V8-D1-late-references-plain apply status 0 growth 3996 (want status 0)
+PASS V8-D1-late-references-braced apply status 0 growth 3992 (want status 0)
+PASS V8-D2-growth-8192-plain apply status 0 growth 8192 (want status 0)
+PASS V8-D3-growth-8193-plain apply status 2 growth 0 (want status 2)
+PASS V8-D2-growth-8192-braced apply status 0 growth 8192 (want status 0)
+PASS V8-D3-growth-8193-braced apply status 2 growth 0 (want status 2)
+PASS V9-C1-assignments-rerun collected 20 of 20 inside the rerun (want 20)
+PASS V9-C1b-assignments-baseline collected 16 of 20 in the baseline pass (want 16, unchanged)
+PASS V9-C2-references-rerun-c12 references left unexpanded inside the rerun: none (want none)
+PASS V9-C2b-references-baseline-c12 references left unexpanded in the baseline pass: left (want left, unchanged)
+PASS V9-C2-references-rerun-cb12 references left unexpanded inside the rerun: none (want none)
+PASS V9-C2b-references-baseline-cb12 references left unexpanded in the baseline pass: left (want left, unchanged)
+PASS V10-N1-environ-rows-only rc=0 text=none (want rc=0 text=none)
+PASS V10-N2-read-rows-only rc=2 text=longline (want rc=2 text=longline)
+PASS V10-N3-environ-big-judge rc=0 text=none (want rc=0 text=none)
+PASS V10-N4-read-big-judge rc=2 text=longline (want rc=2 text=longline)
+PASS V7-N5-read-big-judge-short-lines rc=2 text=finding (want rc=2 text=finding)
+PASS V7-E1-benign-big-allowed hook rc=0 none 0.76s | base rc=2 oversize 0.73s | stderr DIFFERENT
+PASS V6-E2-deadline-fallback-bytes hook rc=2 oversize 3.09s | base rc=2 oversize 1.78s | stderr IDENTICAL (wall window 2.85..3.6)
+FAIL V3-E3-anchor-at-hook-start hook rc=2 oversize 3.67s | base rc=2 oversize 0.43s | stderr IDENTICAL (want IDENTICAL, wall window 2.85..3.6)
+PASS V3-E4-cap-3-at-budget-4 hook rc=2 oversize 3.05s | base rc=2 oversize 0.26s | stderr IDENTICAL (wall window 2.85..3.6)
+PASS V3-E5-budget-1 hook rc=2 oversize 1.03s | base rc=2 oversize 0.19s | stderr IDENTICAL (wall window 0.85..1.6)
+PASS V2-E6-flag-from-environment-ignored hook rc=2 oversize 3.03s | base rc=2 oversize 0.19s | stderr IDENTICAL (wall window 2.85..3.6)
+PASS V2-E7-no-time-left hook rc=2 oversize 3.45s | base rc=2 oversize 0.24s | stderr IDENTICAL (wall window 3.2..4.3)
+PASS V2-E8-ostype-from-environment-ignored hook rc=0 none 0.36s | base rc=2 oversize 0.21s | stderr DIFFERENT
+PASS V2-E9-extension-project hook rc=2 oversize 0.29s | base rc=2 oversize 0.29s | stderr IDENTICAL
+PASS V9-E10-count-axis-read-blocked hook rc=2 finding 0.73s | base rc=2 oversize 0.40s | stderr DIFFERENT
+PASS V9-E11-tmax-in-rerun hook rc=2 tmax 1.89s | base rc=2 oversize 2.72s | stderr DIFFERENT
+PASS V9-E12-vmax-unchanged hook rc=2 oversize 1.84s | base rc=2 oversize 1.49s | stderr IDENTICAL
+PASS V7-E13-multiline-copy-normal-text hook rc=2 finding 2.03s | base rc=2 oversize 0.49s | stderr DIFFERENT
+PASS V7-E14-long-line-from-expansion hook rc=2 longline 0.36s | base rc=2 oversize 0.30s | stderr DIFFERENT
+PASS V7-E15-credit-as-normal hook rc=2 oversize 3.99s | base rc=2 oversize 0.19s | stderr IDENTICAL (want allowed, or the baseline bytes if the deadline cut it)
+PASS V1-E16-p1-small-benign hook rc=0 none 0.42s | base rc=0 none 0.66s | stderr IDENTICAL
+PASS V1-E16-p1-small-read hook rc=2 finding 0.48s | base rc=2 finding 0.37s | stderr IDENTICAL
+PASS V1-E16-p1-small-read-filter hook rc=0 none 0.30s | base rc=0 none 0.83s | stderr IDENTICAL
+PASS V1-E16-p1-var-read hook rc=2 finding 0.32s | base rc=2 finding 0.87s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid hook rc=0 none 0.72s | base rc=0 none 0.61s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid-read hook rc=2 finding 2.07s | base rc=2 finding 1.75s | stderr IDENTICAL
+PASS V11-S1-above-gate:_sg_vx_big_judge line 795 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_left line 801 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_ok line 813 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_platform line 819 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_noext line 822 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_job line 827 < sourcing gate 1048
+PASS V11-S1-above-gate:_sg_relax_run line 840 < sourcing gate 1048
+PASS V11-S3-longline-instructions-verbatim the longline instruction lines equal the oversize ones (4 lines)
+PASS V11-S4-one-rule-loop loops over risky_patterns: 1 (baseline 1)
+PASS V12-C1-hook-comments commentsync --hook-only target: GREEN
+# totals: PASS 93  FAIL 1  SKIP 0

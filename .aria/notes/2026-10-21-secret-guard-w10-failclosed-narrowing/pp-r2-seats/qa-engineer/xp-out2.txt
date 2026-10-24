@@ -1,0 +1,19 @@
+# start 2026-10-22T18:16:30Z after waiting 60s, load 9.36 10.13 10.14
+######## xp-fo M28 (padding evasion, hook level)
+== M28  (load 9.36)
+  baseline  rc=2 oversize wall=2.44s
+  good      rc=2 longline wall=0.95s
+  M28       rc=0 none wall=1.94s
+== M28  (load 9.01)
+  baseline  rc=2 oversize wall=0.88s
+  good      rc=2 longline wall=0.93s
+  M28       rc=2 longline wall=0.94s
+######## xp-term (SIGTERM ignored behind timeout)
+v31      default      rc=2 oversize  wall=3.62s
+v31      term-ignored rc=2 oversize  wall=4.22s
+M20      default      rc=2 oversize  wall=5.31s
+M20      term-ignored rc=2 longline  wall=11.24s
+M30      default      rc=2 oversize  wall=3.04s
+M30      term-ignored rc=2 longline  wall=10.80s
+# end 2026-10-22T18:17:17Z load 9.65 10.07 10.12
+XP2DONE

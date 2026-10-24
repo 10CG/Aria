@@ -1,0 +1,20 @@
+=== TL-M1 start 18:35:57 load 1.11 2.58 5.72
+=== TL-M1 end 18:36:43 load 1.12 2.36 5.50 0 FAIL: 
+=== TL-M2 start 18:36:43 load 1.12 2.36 5.50
+=== TL-M2 end 18:37:29 load 1.12 2.19 5.29 0 FAIL: 
+=== TL-M3 start 18:37:29 load 1.12 2.19 5.29
+=== TL-M3 end 18:38:13 load 1.47 2.11 5.11 0 FAIL: 
+=== TL-M4 start 18:38:13 load 1.47 2.11 5.11
+=== TL-M4 end 18:38:58 load 1.21 1.94 4.91 0 FAIL: 
+=== TL-M5 start 18:38:58 load 1.21 1.94 4.91
+=== TL-M5 end 18:39:46 load 3.10 2.38 4.90 0 FAIL: 
+=== TL-M6 start 18:39:46 load 3.10 2.38 4.90
+=== TL-M6 end 18:40:32 load 3.29 2.53 4.83 1 FAIL: V4-S3-block-without-text 
+=== TL-M7 start 18:40:32 load 3.29 2.53 4.83
+=== TL-M7 end 18:41:18 load 2.94 2.56 4.74 11 FAIL: V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V4-S11-bare-zero V5-S10-timer-fork-fails V5-S10c-dead-timer-no-judgement V5-S14-failing-sleep-kills-at-once V6-E2-deadline-fallback-bytes V3-E4-cap-3-at-budget-4 V3-E5-budget-1 V2-E6-flag-from-environment-ignored 
+=== TL-M8 start 18:41:18 load 2.94 2.56 4.74
+=== TL-M8 end 18:42:07 load 2.89 2.56 4.62 0 FAIL: 
+=== TL-M9 start 18:42:07 load 2.89 2.56 4.62
+=== TL-M9 end 18:42:52 load 1.86 2.32 4.44 0 FAIL: 
+=== TL-M10 start 18:42:52 load 1.86 2.32 4.44
+=== TL-M10 end 18:43:38 load 3.31 2.54 4.41 1 FAIL: V2-G4-extension-path-is-a-directory 

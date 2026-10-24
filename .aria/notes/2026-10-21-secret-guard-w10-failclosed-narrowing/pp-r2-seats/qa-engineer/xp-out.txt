@@ -1,0 +1,63 @@
+# start 2026-10-22T18:10:52Z after waiting 240s, load 10.97 11.08 10.25
+######## xp-fo (hook-level consequences of the fail-open survivors)
+== M24  (load 10.97)
+  baseline  rc=124 none wall=12.09s
+  good      rc=124 none wall=12.16s
+  M24       rc=124 none wall=12.08s
+== M17  (load 12.67)
+  baseline  rc=2 oversize wall=3.81s
+  good      rc=2 growth wall=2.88s
+  M17       rc=2 oversize wall=3.48s
+== M18  (load 12.51)
+  baseline  rc=2 oversize wall=0.27s
+  good      rc=2 growth wall=1.22s
+  M18       rc=0 none wall=0.40s
+== M28  (load 12.39)
+  baseline  rc=2 oversize wall=0.38s
+  good      rc=2 longline wall=0.76s
+  M28       rc=2 longline wall=1.13s
+== M28  (load 12.39)
+  baseline  rc=2 oversize wall=1.19s
+  good      rc=2 longline wall=1.56s
+  M28       rc=2 longline wall=1.02s
+######## xp-ext (extension projects)
+== A. segment mode, project via CLAUDE_PROJECT_DIR (extension lists the path that is read) ==
+baseline : rc=2 oversize-text wall=7.19s
+v3.1 good: rc=2 oversize-text wall=8.59s
+M02      : rc=2 oversize-text wall=6.30s
+== B. whole mode, project via the stdin cwd only (no CLAUDE_PROJECT_DIR) ==
+baseline : rc=2 oversize-text wall=0.68s
+v3.1 good: rc=2 oversize-text wall=1.28s
+M01      : rc=0 none          wall=0.98s
+######## xp-term (SIGTERM ignored)
+v31      default      rc=2 oversize  wall=3.17s
+v31      term-ignored rc=2 oversize  wall=3.71s
+M20      default      rc=2 oversize  wall=4.14s
+M20      term-ignored rc=2 oversize  wall=3.36s
+M30      default      rc=2 oversize  wall=3.22s
+M30      term-ignored rc=2 oversize  wall=3.58s
+######## xp-tick (SECONDS tick phase sweep over the V3-E5 invocation)
+# hook v31.sh, load 10.89 11.21 10.40
+start phase .00  rc=2  oversize  wall=11.97s
+start phase .05  rc=2  TIME-TEXT wall=11.30s
+start phase .10  rc=2  oversize  wall=11.46s
+start phase .15  rc=2  oversize  wall=1.15s
+start phase .20  rc=2  oversize  wall=1.07s
+start phase .25  rc=2  oversize  wall=11.27s
+start phase .30  rc=124  none      wall=12.29s
+start phase .35  rc=2  oversize  wall=11.99s
+start phase .40  rc=2  oversize  wall=11.49s
+start phase .45  rc=2  oversize  wall=11.21s
+start phase .50  rc=2  oversize  wall=1.03s
+start phase .55  rc=2  oversize  wall=1.03s
+start phase .60  rc=2  oversize  wall=1.06s
+start phase .65  rc=2  oversize  wall=1.09s
+start phase .70  rc=2  oversize  wall=1.08s
+start phase .75  rc=2  oversize  wall=1.12s
+start phase .80  rc=2  oversize  wall=1.10s
+start phase .85  rc=2  oversize  wall=1.15s
+start phase .90  rc=2  oversize  wall=11.31s
+start phase .95  rc=2  oversize  wall=1.08s
+# 1 of 20 start phases gave the time text instead of the size text (V3-E5 wants the size text at 0.85..1.6 s)
+# end 2026-10-22T18:14:47Z load 9.08 10.55 10.27
+XPDONE

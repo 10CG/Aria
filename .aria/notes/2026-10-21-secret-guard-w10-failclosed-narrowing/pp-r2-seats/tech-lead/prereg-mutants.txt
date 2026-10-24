@@ -1,0 +1,29 @@
+# tech-lead seat, pre-registered BEFORE reading sc-cases.sh / sc-direct.sh / mutants.py (only W8-v31.diff read so far)
+# Each: id | one-line realistic writer error | behavior that must turn red
+T1 | collect: relax ca (assignments) but forget cf (for statements stay at 8) -- partial fix of the count axis | a for-list with >8 for statements, cred path in the 9th, big copy -> must block, mutant allows
+T2 | _sg_vx_replace: forget the relaxed gc (braced ${N} still capped at 8) -- partial fix | braced ref count axis: 9th ${f} carries the path -> mutant allows
+T3 | _sg_relax_left: cap = _SG_TIME_BUDGET (forget min(...,3)) | SECRET_GUARD_TIME_BUDGET_S=10 -> deadline becomes 10 s > 5 s
+T4 | _sg_relax_left: forget the clock-backwards clamp | _SG_P0 in the future -> left > cap
+T5 | _sg_vx_big_judge: >= instead of > on LMAX (line of exactly 8192 goes nocredit) | boundary case line==8192 with a redacting filter must allow
+T6 | _sg_relax_noext: -f instead of -e (a directory .aria/secret-guard.paths counts as no extension) | dir-shaped paths file must keep relaxation off
+T7 | _sg_relax_run: drop the -n "$out" condition on rc 2 | job exits 2 with no text must fall back to baseline bytes
+T8 | _sg_relax_platform: *-linux* instead of *-linux-gnu* | musl MACHTYPE must be rejected
+T9 | _sg_relax_platform: (( $2 == 5 )) only (minor unchecked) | 5.4 must be rejected
+T10 | _sg_judge_one: nocredit branch placed before the W12 neutralisation (matches on seg not subj) | os.environ.get-shaped big copy must not block via nocredit
+T11 | _sg_vx_pass: in the relaxed rerun keep emitting the time text instead of return 3 | rerun checkpoint must fall back to the baseline oversize bytes
+T12 | _sg_relax_job: timer started AFTER _SG_RELAXED=1 / no kill -0 check | (timer must exist before judging)
+T13 | _sg_vx_big_judge: measures the longest line of the ORIGINAL command ($cmd) instead of the copy | copy has a long line only after expansion
+T14 | _sg_relax_run: treat 0 as allow too ([[ $rc -eq 77 || $rc -eq 0 ]]) | bare 0 must fall back
+
+# ---- predictions, written AFTER reading sc-cases.sh / sc-direct.sh / shapes.py / mutants.py and BEFORE running any mutant ----
+# (author's BI-1..23 already cover my T3=BI-14, T4=BI-21, T13=BI-10, T14=BI-19, T12~BI-3; dropped those)
+TL-M1 (T1)  forget cf only (for statements stay at 8 in rerun)          -> predict SURVIVES: V9-C1 counts assignments, V9-C2/V9-E10 count references; no case has >8 for statements
+TL-M2 (T23) whole mode: big judge result not returned (falls through to _sg_judge_one with credit) -> predict SURVIVES sc-cases (V7-E14 has no filter; kind() greps longline first); custom probe longline+filter: proto blocks longline, mutant allows
+TL-M3 (T24) segment mode not routed through _sg_vx_big_judge (only whole-mode hunk applied) -> predict SURVIVES (no segment-mode longline case; V9-E11 tmax-rerun has no match); custom probe segment longline+filter: mutant allows
+TL-M4 (T15) big judge read loop without IFS= (leading/trailing blanks not counted) -> predict SURVIVES (no long line with leading blanks); custom probe: mutant gives credit on a >8192 line
+TL-M5 (T11) segment-loop checkpoint inside the rerun keeps the time text (one of three sites) -> predict SURVIVES (only stub V4-S7); not a security regression (still blocks), P6 bytes only
+TL-M6 (T7)  _sg_relax_run drops -n "$out" on rc 2                       -> predict CAUGHT by V4-S3-block-without-text (rc 2 instead of 4)
+TL-M7 (T29) no exec 2>/dev/null in the command substitution              -> predict CAUGHT by V6-E2/V3-E3..E5/V2-E6 (kill ESRCH message leaks before the fallback text) -- possibly racy
+TL-M8 (T25) _sg_relax_noext takes the root from CLAUDE_PROJECT_DIR only (ignores the stdin cwd) -> predict SURVIVES (V2-G4/V2-E9 only use CLAUDE_PROJECT_DIR); custom probe ext project via cwd: mutant allows the listed path
+TL-M9 (T5)  big judge boundary >= instead of > (line of exactly 8192 goes rows-only) -> predict SURVIVES (no boundary case); stricter direction, not a security regression
+TL-M10 (T6) noext uses -f instead of -e                                 -> predict CAUGHT by V2-G4-extension-path-is-a-directory

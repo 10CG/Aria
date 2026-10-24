@@ -1,0 +1,5 @@
+# sc-cases.sh | 2026-10-22T18:45:09Z | hook sha256 9f61db0e7b8b | base sha256 e83c5e30f2cc | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load 2.40 2.38 4.17
+PASS V5-S13-detached-child rc=0 (want 0) wall=0.00s (want 0..0.3) stderr='' (want '')
+FAIL V5-S13b-nothing-outlives-the-run a child that does not hold the pipe, still alive right after _sg_relax_run returned: 1 (want 0)
+FAIL V5-S12-no-leftovers stub processes still alive after the cases: 2 (want 0)
+# totals: PASS 1  FAIL 2  SKIP 0
