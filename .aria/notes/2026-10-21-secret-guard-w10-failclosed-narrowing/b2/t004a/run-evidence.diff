@@ -1,0 +1,50 @@
+diff --git a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/run-evidence.sh b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/run-evidence.sh
+index 9a5df2da..ed5bab87 100755
+--- a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/run-evidence.sh
++++ b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/run-evidence.sh
+@@ -4,3 +4,7 @@
+-# baseline's). Every output is written into the work dir first and copied next to this script only when its stage has finished, so a failed or partial run
+-# never overwrites committed evidence. Every output's first line records the date, the platform, both sha256 prefixes and the load.
+-# Needs: Linux, bash 5 on PATH, jq, python3, taskset, nice; W12 also TRAFFIC_DIR (the frozen corpus, outside the repo) and BASH32 (a bash 3.2 binary).
++# baseline's). Every output is written into the work dir first and copied to OUT only when its stage has finished, so a failed or partial run never
++# overwrites committed evidence; OUT=<an existing directory> (TASK-004: v31/impl), default this script's directory, which reproduces the evidence of 95cf1de7.
++# Every output's first line records the date, the platform, the sha256 prefixes of both hooks and of sc-cases.sh, sc-direct.sh and mutants.py (INV-8) and
++# the load; the W8 diff starts with that line too (patch and git apply skip the text before a diff).
++# Needs: Linux, bash 5 on PATH, jq, python3, taskset, nice; W13 and W12 also BASH32 (a bash 3.2 binary), W12 also TRAFFIC_DIR (the frozen corpus, outside the
++# repo). A bash under test that is missing or not executable, an OUT that is not a writable directory, or a work dir that cannot be created exits 3 before
++# any file is written.
+@@ -8,2 +12,7 @@ set -u
+-HERE="$(cd "$(dirname "$0")" && pwd)"; W=$(readlink -f "$1"); shift; STAGES=${*:-W8 W13 W11 W12 W9}
+-ROOT=$(git -C "$HERE" rev-parse --show-toplevel); mkdir -p "$W"
++HERE="$(cd "$(dirname "$0")" && pwd)"; W=$(readlink -m "$1"); shift; STAGES=${*:-W8 W13 W11 W12 W9}; OUT=${OUT:-$HERE}
++B13=(/home/dev/.aria/tools/bash-5.0.18/bash /home/dev/.aria/tools/bash-5.1.16/bash /usr/bin/bash /home/dev/.aria/tools/bash-5.3.20/bash)   # W13: one run each, then BASH32
++NB=(); for st in $STAGES; do case $st in W13) NB+=("${B13[@]}" "${BASH32:-}");; W12) NB+=("${BASH32:-}" "$(command -v bash)");; W11|W9) NB+=("$(command -v bash)");; esac; done
++for b in "${NB[@]}"; do [[ -n "$b" && -f "$b" && -x "$b" ]] || { echo "a bash under test is missing or not executable: '$b' (W13 and W12 need BASH32)"; exit 3; }; done
++for f in sc-cases.sh sc-direct.sh mutants.py; do [[ -f "$HERE/$f" ]] || { echo "missing $HERE/$f (its sha256 goes into every header, INV-8)"; exit 3; }; done
++[[ -d "$OUT" && -w "$OUT" ]] || { echo "OUT is not a writable directory: $OUT"; exit 3; }
++ROOT=$(git -C "$HERE" rev-parse --show-toplevel); [[ -n "$W" ]] && mkdir -p "$W" || { echo "cannot create the work dir: ${W:-<empty>}"; exit 3; }
+@@ -14 +23,2 @@ BS=$(sha256sum < "$W/base.sh" | cut -c1-12); IS=$(sha256sum < "$W/impl.sh" | cut
+-hdr() { printf '# %s | %s | bash %s | base sha256 %s | hook sha256 %s | load %s\n' "$(date -u +%FT%TZ)" "$(uname -sr)" "$BASH_VERSION" "$BS" "$IS" "$(cut -d' ' -f1-3 /proc/loadavg)"; }
++hdr() { printf '# %s | %s | bash %s | base sha256 %s | hook sha256 %s' "$(date -u +%FT%TZ)" "$(uname -sr)" "$BASH_VERSION" "$BS" "$IS"
++  for f in sc-cases.sh sc-direct.sh mutants.py; do printf ' | %s sha256 %s' "$f" "$(sha256sum < "$HERE/$f" | cut -c1-12)"; done; printf ' | load %s\n' "$(cut -d' ' -f1-3 /proc/loadavg)"; }
+@@ -17 +27 @@ for st in $STAGES; do case $st in
+-W8) diff -u "$W/base.sh" "$W/impl.sh" | sed '1,2s/\t.*//' > "$W/W8-v31.diff"
++W8) { hdr; diff -u "$W/base.sh" "$W/impl.sh" | sed '1,2s/\t.*//'; } > "$W/W8-v31.diff"
+@@ -19 +29 @@ W8) diff -u "$W/base.sh" "$W/impl.sh" | sed '1,2s/\t.*//' > "$W/W8-v31.diff"
+-    cp "$W/W8-v31.diff" "$HERE/"; echo "W8 done: $(cat "$W/W8-count.txt")" ;;
++    cp "$W/W8-v31.diff" "$OUT/"; echo "W8 done: $(cat "$W/W8-count.txt")" ;;
+@@ -21 +31 @@ W13) { hdr; echo "## 1. the hook under test, one run per bash (SC_BASH); relaxat
+-      for b in /home/dev/.aria/tools/bash-5.0.18/bash /home/dev/.aria/tools/bash-5.1.16/bash /usr/bin/bash /home/dev/.aria/tools/bash-5.3.20/bash ${BASH32:-}; do
++      for b in "${B13[@]}" "$BASH32"; do
+@@ -31 +41 @@ W13) { hdr; echo "## 1. the hook under test, one run per bash (SC_BASH); relaxat
+-    cp "$W/W13-sc-cases.txt" "$HERE/"; echo "W13 done" ;;
++    cp "$W/W13-sc-cases.txt" "$OUT/"; echo "W13 done" ;;
+@@ -39 +49 @@ W11) mkdir -p "$W/adv" "$W/ext/proj/.aria"; printf '%s\n' "billing/conf/prod.tom
+-      hdr; } > "$W/W11-adversarial.txt"; cp "$W/W11-adversarial.txt" "$HERE/"; echo "W11 done" ;;
++      hdr; } > "$W/W11-adversarial.txt"; cp "$W/W11-adversarial.txt" "$OUT/"; echo "W11 done" ;;
+@@ -52 +62 @@ W12) : "${TRAFFIC_DIR:?W12 needs TRAFFIC_DIR}" "${BASH32:?W12 needs BASH32}"; W1
+-      hdr; } > "$W/W12-real-traffic.txt"; cp "$W/W12-real-traffic.txt" "$W/W12-replay-138.tsv" "$HERE/"; echo "W12 done" ;;
++      hdr; } > "$W/W12-real-traffic.txt"; cp "$W/W12-real-traffic.txt" "$W/W12-replay-138.tsv" "$OUT/"; echo "W12 done" ;;
+@@ -69 +79 @@ for ln in sys.stdin:
+-'; done; hdr; } > "$W/W9-suite.txt"; cp "$W/W9-suite.txt" "$HERE/"; echo "W9 done" ;;
++'; done; hdr; } > "$W/W9-suite.txt"; cp "$W/W9-suite.txt" "$OUT/"; echo "W9 done" ;;

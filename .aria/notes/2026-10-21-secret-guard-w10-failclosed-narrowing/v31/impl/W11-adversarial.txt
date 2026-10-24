@@ -1,0 +1,26 @@
+# 2026-10-24T21:50:10Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 af4658b6f935 | sc-cases.sh sha256 7d29c3cd0f5b | sc-direct.sh sha256 fb3418921bca | mutants.py sha256 2060d2e0c17f | load 0.41 0.85 0.98
+# the adversarial shapes of v3 (../v3/gen-v3.py), one e2e call each, bash 5.2, LC_ALL=C.UTF-8 (the CJK shape depends on a multibyte locale)
+## base
+apply-heavy            rc=2   wall=  0.38s oversize(the command is longer than )
+apply-heavy-seg        rc=2   wall=  0.43s oversize(the command is longer than )
+apply-heavy-cjk        rc=2   wall=  2.00s oversize(the command is longer than )
+shrink                 rc=2   wall=  0.09s oversize(the command is longer than )
+segfinding             rc=2   wall=  0.68s oversize(a command segment is longer t)
+f5like                 rc=2   wall=  0.75s oversize(a command segment is longer t)
+km-ext                 rc=2   wall=  0.15s oversize(the command is longer than )
+## impl
+apply-heavy            rc=2   wall=  3.02s oversize(the command is longer than )
+apply-heavy-seg        rc=2   wall=  3.02s oversize(the command is longer than )
+apply-heavy-cjk        rc=2   wall=  3.04s oversize(the command is longer than )
+shrink                 rc=0   wall=  0.15s -
+segfinding             rc=2   wall=  1.11s finding
+f5like                 rc=2   wall=  3.01s oversize(a command segment is longer t)
+km-ext                 rc=0   wall=  0.24s -
+# extension project (CLAUDE_PROJECT_DIR=<dir with .aria/secret-guard.paths listing the read path>)
+## base
+km-ext                 rc=2   wall=  0.15s oversize(the command is longer than )
+km-ext-small           rc=2   wall=  0.09s ext-finding
+## impl
+km-ext                 rc=2   wall=  0.15s oversize(the command is longer than )
+km-ext-small           rc=2   wall=  0.10s ext-finding
+# 2026-10-24T21:50:30Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 af4658b6f935 | sc-cases.sh sha256 7d29c3cd0f5b | sc-direct.sh sha256 fb3418921bca | mutants.py sha256 2060d2e0c17f | load 1.05 0.97 1.01

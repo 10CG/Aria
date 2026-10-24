@@ -1,0 +1,6 @@
+22:04:55 base e83c5e30f2cc proto 9f61db0e7b8b impl af4658b6f935 | load 0.86 1.23 1.35
+22:04:55 old suite on proto start | load 0.86 1.23 1.35
+22:08:36 old suite on proto end rc=1 | load 2.28 1.70 1.51
+22:10:16 old suite on impl2 start | load 1.18 1.49 1.45
+22:13:50 old suite on impl2 end rc=1 | load 2.07 1.76 1.56
+22:14:50 done | load 1.17 1.57 1.51

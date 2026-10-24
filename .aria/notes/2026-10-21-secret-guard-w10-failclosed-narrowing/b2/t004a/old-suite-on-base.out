@@ -1,0 +1,12 @@
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SKIP] SC-9a pre-change comparison: af87cae not reachable via git show (shallow clone?) — post-change assertions still run below
+  [SKIP] SC-8 performance benchmark (TASK-022): af87cae not reachable via git show (shallow clone?)
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test
+PASS: 813 / 814
+FAIL: 1 / 814
+
+Failures:
+  FAIL [SC-13: 头注释计数同步]: 顶部 'Coverage: 831 cases' != 本次实跑总数 814 -- 回填 secret-guard.test.sh 顶部 Coverage 数 (+ secret-hygiene.md 三处 + proposal SC-11 正文, 权威值=实跑 N)。
+

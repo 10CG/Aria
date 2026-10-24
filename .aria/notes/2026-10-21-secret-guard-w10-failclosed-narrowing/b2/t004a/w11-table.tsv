@@ -1,0 +1,18 @@
+main	base	apply-heavy	old rc=2 oversize(the command is longer than ) wall=0.36	new rc=2 oversize(the command is longer than ) wall=0.38	same
+main	base	apply-heavy-cjk	old rc=2 oversize(the command is longer than ) wall=1.97	new rc=2 oversize(the command is longer than ) wall=2.00	same
+main	base	apply-heavy-seg	old rc=2 oversize(the command is longer than ) wall=0.41	new rc=2 oversize(the command is longer than ) wall=0.43	same
+main	base	f5like	old rc=2 oversize(a command segment is longer t) wall=0.74	new rc=2 oversize(a command segment is longer t) wall=0.75	same
+main	base	km-ext	old rc=2 oversize(the command is longer than ) wall=0.14	new rc=2 oversize(the command is longer than ) wall=0.15	same
+main	base	segfinding	old rc=2 oversize(a command segment is longer t) wall=0.69	new rc=2 oversize(a command segment is longer t) wall=0.68	same
+main	base	shrink	old rc=2 oversize(the command is longer than ) wall=0.11	new rc=2 oversize(the command is longer than ) wall=0.09	same
+main	impl	apply-heavy	old rc=2 oversize(the command is longer than ) wall=3.02	new rc=2 oversize(the command is longer than ) wall=3.02	same
+main	impl	apply-heavy-cjk	old rc=2 oversize(the command is longer than ) wall=3.04	new rc=2 oversize(the command is longer than ) wall=3.04	same
+main	impl	apply-heavy-seg	old rc=2 oversize(the command is longer than ) wall=3.02	new rc=2 oversize(the command is longer than ) wall=3.02	same
+main	impl	f5like	old rc=2 oversize(a command segment is longer t) wall=3.02	new rc=2 oversize(a command segment is longer t) wall=3.01	same
+main	impl	km-ext	old rc=0 - wall=0.32	new rc=0 - wall=0.24	same
+main	impl	segfinding	old rc=2 finding wall=1.18	new rc=2 finding wall=1.11	same
+main	impl	shrink	old rc=0 - wall=0.17	new rc=0 - wall=0.15	same
+ext	base	km-ext	old rc=2 oversize(the command is longer than ) wall=0.22	new rc=2 oversize(the command is longer than ) wall=0.15	same
+ext	base	km-ext-small	old rc=2 ext-finding wall=0.16	new rc=2 ext-finding wall=0.09	same
+ext	impl	km-ext	old rc=2 oversize(the command is longer than ) wall=0.26	new rc=2 oversize(the command is longer than ) wall=0.15	same
+ext	impl	km-ext-small	old rc=2 ext-finding wall=0.27	new rc=2 ext-finding wall=0.10	same

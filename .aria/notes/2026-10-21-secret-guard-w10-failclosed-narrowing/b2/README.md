@@ -52,3 +52,8 @@
   - 没收：生成的输入 `shapes/`（凭据形路径是运行时拼装进去的，由 `../v3/gen-v3.py` 与 `../v31/impl/w14-shapes.py` 复现）、埋点副本与基线副本、扩展项目夹具 `ext/`、每次运行的临时目录 `runs/`。
 - `t003b-verify/`：主控对第二段的独立复核（2026-10-24 21:29–21:34 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是逐项结果；`measure.py` 是主控自己的量法（不经 `w14-matrix.sh`），`own.txt` 是它在实现上的读数；`cover-hook.diff` 是越界构造（作业停掉计时器后再等 4 s），`over-calib.txt`（经 `w14-matrix.sh calib`）与 `own-over.txt`（主控量法）都报越界；`drive.sh` / `drive.log` 是串行驱动。结论：判法能红，主控量的读数与矩阵同量级、都不越界。
 - `BRIEF-T004a.md`：TASK-004 第一段（还原真实流量语料、改 `../v31/run-evidence.sh`、在实现上重跑 W8 / W11 / W9 并对照原型那一轮）的任务书；TASK-004 改为分段派新实例执行、主控复核，见计划 notes。
+- `T004a-report.md`：TASK-004 第一段的执行席报告（2026-10-24），任务书是上面的 `BRIEF-T004a.md`。结果是 `../v31/run-evidence.sh` 的改动与 `../v31/impl/` 下的 `W8-v31.diff`、`W11-adversarial.txt`（W9 因负载在第二段重跑）。
+- `t004a/`：第一段的过程材料（不含任何真实流量的命令文本）：预期 `predictions.md`、各项检查的日志 `check*.log`、`run-evidence.sh` 的 diff、原型与实现的 diff `proto-impl.diff` 与归类脚本 `classify_w8.py`、比对脚本 `compare.py`、`w9diff.py`、语料核对 `corpus_check.py`、W11 对照表、旧套件在基线与实现上的输出 `old-suite-on-*.out`、报告生成 `mkreport.sh`。
+  - 没收：工作目录里的 hook 副本、旧套件的两份拷贝树与生成的对抗输入（凭据形路径是运行时拼装进去的）。
+- `t004a-verify/`：主控对第一段的独立复核（2026-10-24 22:03–22:16 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是结果：低负载下原型与实现的旧套件六组检查清单逐条相同（`suite-proto.out`、`suite-impl2.out`，比对 `cmp-w9.py`，驱动 `w9probe.sh` / `drive.log`），W9 与 95cf1de7 的差异来自原型那一轮的负载。
+- `BRIEF-T004b.md`：TASK-004 第二段（W9 低负载重跑、W13 含全量坏实现与套件模式、W12 真实流量含延迟代价）的任务书。
