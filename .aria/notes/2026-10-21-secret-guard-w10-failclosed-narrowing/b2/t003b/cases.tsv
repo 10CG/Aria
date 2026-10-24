@@ -1,0 +1,40 @@
+apply-heavy	apply-heavy	gen-v3	C.UTF-8	whole mode (leading subshell), 60 KB: 16 variables x 16 references, the reference block twice; apply cost of the rerun, which has no count bound	0
+apply-heavy-seg	apply-heavy-seg	gen-v3	C.UTF-8	the same without the subshell: segment mode, one 60 KB segment	0
+apply-heavy-cjk	apply-heavy-cjk	gen-v3	C.UTF-8	multibyte filler (characters != bytes) around the same reference block: string operations cost more per character	0
+shrink	shrink	gen-v3	C.UTF-8	two 600-character variable names referenced 8 times each (copies shrink), a source read after them	0
+segfinding	segfinding	gen-v3	C.UTF-8	4000-character value referenced twice, 12 filler lines, a source read last: a finding that is found late	0
+f5like	f5like	gen-v3	C.UTF-8	a relaxable big segment followed by three expensive small segments (credit ~1 s each): the rerun runs into the deadline	0
+km-ext	km-ext	gen-v3	C.UTF-8	24000-character line inside a subshell, run WITHOUT a project extension (the relaxation is in effect)	0
+km-ext-small	km-ext-small	gen-v3	C.UTF-8	the 100-character sibling of km-ext (control)	0
+lmax-below	lmax-below	w14	C.UTF-8	whole mode, 3 lines of exactly 8192 characters (= _SGV_LMAX, the credit path, ~0.9 s per line)	0
+lmax-race	lmax-race	w14	C.UTF-8	lmax-below plus a fourth credit line of 4000 characters: the rerun needs about as long as the deadline leaves (~2.9 s of 3.0 s), so some runs finish and some are killed	0
+lmax-above	lmax-above	w14	C.UTF-8	like lmax-below but the first line has 8193 characters: the rows-only path (longline text), should be fast	0
+gmax-exact	gmax-exact	w14	C.UTF-8	growth over the input exactly 8192 (= _SGV_GMAX), whole mode: the largest copy the rerun accepts, judged in full	0
+gmax-over	gmax-over	w14	C.UTF-8	growth 8193 (limit + 1): the growth text without any judgement, should be fast	0
+caps-old-limits	caps-old-limits	w14	C.UTF-8	just past the old counts: the 17th assignment holds the path, 9 for-lists, 9 references to one variable; two 8100-character credit lines	0
+multiline-cred	multiline-cred	w14	C.UTF-8	whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline	0
+assign-storm	assign-storm	w14	C.UTF-8	whole mode, a trigger segment, then 3000 assignments: the baseline collects 16, the rerun collects all (regex per assignment, O(n^2) de-duplication)	0
+forlist-storm	forlist-storm	w14	C.UTF-8	whole mode, a trigger segment, then 250 for-lists of 20 words: the baseline takes 8, the rerun all; O(vars^2) chaining on 140-character values	0
+repl-storm	repl-storm	w14	C.UTF-8	whole mode, one 45 KB command with 15000 references to one variable: the baseline stops at the first replacement, the rerun replaces them all	0
+repl-storm-cjk	repl-storm-cjk	w14	C.UTF-8	the same with CJK words between 6000 references (UTF-8: every offset computation scans characters)	0
+cjk-lines-lmax	cjk-lines-lmax	w14	C.UTF-8	whole mode, 3 lines of exactly 8192 CJK characters (24.5 KB each in bytes): characters != bytes at the LMAX edge	0
+cjk-bytes-lmax	cjk-bytes-lmax	w14	C.UTF-8	whole mode, 3 lines of exactly 8192 BYTES of CJK text (2730 characters each): small in UTF-8, the LMAX edge in the C locale	0
+late-core2	late-core2	w14	C.UTF-8	trigger point late: two raw lines of 8131 characters with a literal source read (credit ~0.9 s each) come before the oversize copy; the rerun repeats them	0
+late-core3	late-core3	w14	C.UTF-8	the same with three lines: the first pass takes ~2.6 s, the rerun starts with little time left and runs into the deadline	0
+late-core4	late-core4	w14	C.UTF-8	four raw lines of 7151 characters: the first pass takes ~2.9 s, so the rerun begins with about 0.1 s left and repeats the credit lines	0
+late-near3	late-near3	w14	C.UTF-8	three raw lines of 8611 characters (over LMAX): the first pass ends at ~2.9 s, right at the deadline: the rerun begins with almost no time left, or not at all	0
+late-long3	late-long3	w14	C.UTF-8	three raw lines of 8431 characters (over LMAX): slow first pass, but the rerun takes the rows-only path (fast), so the rerun begins late and ends at once	0
+late-core2-storm	late-core2-storm	w14	C.UTF-8	late-core2 plus a 1500-assignment storm: the rerun has to collect the storm and repeat the credit lines	0
+seg-assign-1700	seg-assign-1700	w14	C.UTF-8	segment mode (no subshell), a trigger segment, then 1700 assignments: the baseline first pass alone takes ~6 s (10CG/aria-plugin#228), no rerun	0
+seg-late2	seg-late2	w14	C.UTF-8	segment-mode twin of late-core2: the baseline first pass takes ~10 s (10CG/aria-plugin#228), no rerun	0
+many-segs	many-segs	w14	C.UTF-8	120 tiny reference segments before the oversize copy (segment mode): the first pass and the rerun both walk all of them	0
+degrade-late	degrade-late	w14	C.UTF-8	120 CJK reference segments, the subshell that forces whole mode only at the very end (whole and segment handling mixed)	0
+multi-big-seg	multi-big-seg	w14	C.UTF-8	7 segments, each 8308 characters after substitution (each could enter a rerun), 58 KB together = under _SGV_TMAX	0
+tmax-edge	tmax-edge	w14	C.UTF-8	8 such segments: 66 KB together, the rerun reaches _SGV_TMAX at the 8th	0
+heredoc-vars	heredoc-vars	w14	C.UTF-8	realistic: a 30 KB unquoted heredoc with two variable references per line, growth 7250 (under the limit), no secret source	0
+cjk-bytes-lmax@C	cjk-bytes-lmax	w14	C	whole mode, 3 lines of exactly 8192 BYTES of CJK text (2730 characters each): small in UTF-8, the LMAX edge in the C locale  [run under LC_ALL=C: a character is a byte]	0
+km-ext@ext	km-ext	gen-v3	C.UTF-8	24000-character line inside a subshell, run WITHOUT a project extension (the relaxation is in effect)  [run WITH a project extension (.aria/secret-guard.paths listing the read path): the relaxation is off, no rerun by design]	1
+km-ext-small@ext	km-ext-small	gen-v3	C.UTF-8	the 100-character sibling of km-ext (control)  [run WITH a project extension (.aria/secret-guard.paths listing the read path): the relaxation is off, no rerun by design]	1
+multiline-cred@en_US	multiline-cred	w14	en_US.UTF-8	whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]	0
+assign-storm@en_US	assign-storm	w14	en_US.UTF-8	whole mode, a trigger segment, then 3000 assignments: the baseline collects 16, the rerun collects all (regex per assignment, O(n^2) de-duplication)  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]	0
+late-core3@en_US	late-core3	w14	en_US.UTF-8	the same with three lines: the first pass takes ~2.6 s, the rerun starts with little time left and runs into the deadline  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]	0

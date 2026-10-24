@@ -1,0 +1,2 @@
+cover-segfinding run 1 rc=2 size     W= 4.737 T_trigger= 0.702 bound=3.300 over=YES
+cover-segfinding run 2 rc=2 size     W= 4.725 T_trigger= 0.691 bound=3.300 over=YES

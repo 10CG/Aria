@@ -1,0 +1,13 @@
+21:32:20 V-own segfinding start | load 0.97 1.02 1.17
+21:32:24 V-own segfinding end rc=0 | load 1.05 1.04 1.18
+21:32:24 V-own many-segs start | load 1.05 1.04 1.18
+21:32:32 V-own many-segs end rc=0 | load 1.42 1.12 1.20
+21:32:52 V-own apply-heavy-cjk start | load 1.08 1.06 1.18
+21:33:02 V-own apply-heavy-cjk end rc=0 | load 1.07 1.06 1.18
+21:33:02 V-own km-ext-small start | load 1.07 1.06 1.18
+21:33:02 V-own km-ext-small end rc=0 | load 1.07 1.06 1.18
+21:33:02 V-over calib start | load 1.07 1.06 1.18
+21:33:15 V-over calib end rc=0 | load 0.97 1.04 1.17
+21:33:15 V-over-own start | load 0.97 1.04 1.17
+21:33:24 V-over-own end rc=0 | load 0.89 1.02 1.16
+21:33:24 done | load 0.89 1.02 1.16

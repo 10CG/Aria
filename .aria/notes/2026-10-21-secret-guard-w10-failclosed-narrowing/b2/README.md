@@ -47,3 +47,7 @@
   - 没收：31 个坏实现的整份 hook（`mut/`，只在 scratchpad；由 `../v31/impl/w14-mutants.py` 从实现复现）。
 - `t003a-verify/`：主控对第一段的独立复核（2026-10-24 19:50–20:13 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是逐项结果；`W14-rerun.txt` 是主控在自己的目录里用 `w14.sh` 重新生成并复跑 31 个坏实现的结果（与交付记录逐个相同）；`sc.txt`、`w10-*.txt`、`full.txt` 是实现上的各轮；`drive.sh` / `drive.log` 是串行驱动。结论：预期全部相符。
 - `BRIEF-T003b.md`：TASK-003 第二段（对抗耗时矩阵）的任务书。
+- `T003b-report.md`：TASK-003 第二段（对抗耗时矩阵）的执笔席报告（2026-10-24），任务书是上面的 `BRIEF-T003b.md`。交付在 `../v31/impl/`（`w14-matrix.sh`、`w14-shapes.py`、`W14-timing-matrix.txt`）。
+- `t003b/`：第二段的过程材料：情形清单 `cases.tsv`、逐次读数 `rows.tsv`、`batch.rows`、排序 `rank.tsv`、5.2 的汇总表 `table-52.tsv`、与基线 hook 的耗时对照 `cmp-base.txt`、`cmp-impl.txt`、进度 `progress.log`。
+  - 没收：生成的输入 `shapes/`（凭据形路径是运行时拼装进去的，由 `../v3/gen-v3.py` 与 `../v31/impl/w14-shapes.py` 复现）、埋点副本与基线副本、扩展项目夹具 `ext/`、每次运行的临时目录 `runs/`。
+- `t003b-verify/`：主控对第二段的独立复核（2026-10-24 21:29–21:34 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是逐项结果；`measure.py` 是主控自己的量法（不经 `w14-matrix.sh`），`own.txt` 是它在实现上的读数；`cover-hook.diff` 是越界构造（作业停掉计时器后再等 4 s），`over-calib.txt`（经 `w14-matrix.sh calib`）与 `own-over.txt`（主控量法）都报越界；`drive.sh` / `drive.log` 是串行驱动。结论：判法能红，主控量的读数与矩阵同量级、都不越界。

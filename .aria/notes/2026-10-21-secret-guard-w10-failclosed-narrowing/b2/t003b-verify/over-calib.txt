@@ -1,0 +1,5 @@
+calib bash 5.2.15, timeout 60s, load at start: 1.14 1.08 1.19 2/985 1940329
+segfinding         rc=2   size-seg   W=  4.698 trig=  0.688 reruns=1 job=  4.004 firstpass=  0.681 over=1 surv=0
+many-segs          rc=2   size-seg   W=  5.988 trig=  1.977 reruns=1 job=  4.004 firstpass=  1.251 over=1 surv=0
+km-ext-small       rc=0   allow      W=  0.076 trig=      - reruns=0 job=      - firstpass=  0.056 over=0 surv=0
+load at end: 0.97 1.04 1.17 1/985 1940597

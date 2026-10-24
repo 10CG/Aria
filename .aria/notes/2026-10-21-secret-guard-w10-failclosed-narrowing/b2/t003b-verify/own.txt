@@ -1,0 +1,12 @@
+segfinding run 1 rc=2 finding  W= 1.168 T_trigger= 0.710 bound=3.300 over=no
+segfinding run 2 rc=2 finding  W= 1.267 T_trigger= 0.706 bound=3.300 over=no
+segfinding run 3 rc=2 finding  W= 1.167 T_trigger= 0.687 bound=3.300 over=no
+many-segs run 1 rc=0 allow    W= 2.837 T_trigger= 1.937 bound=3.300 over=no
+many-segs run 2 rc=0 allow    W= 2.922 T_trigger= 2.105 bound=3.300 over=no
+many-segs run 3 rc=0 allow    W= 2.774 T_trigger= 1.961 bound=3.300 over=no
+apply-heavy-cjk run 1 rc=2 size     W= 3.074 T_trigger= 1.889 bound=3.300 over=no
+apply-heavy-cjk run 2 rc=2 size     W= 3.075 T_trigger= 2.073 bound=3.300 over=no
+apply-heavy-cjk run 3 rc=2 size     W= 3.072 T_trigger= 2.330 bound=3.300 over=no
+km-ext-small run 1 rc=0 allow    W= 0.114 T_trigger=- bound=3.300 over=no
+km-ext-small run 2 rc=0 allow    W= 0.115 T_trigger=- bound=3.300 over=no
+km-ext-small run 3 rc=0 allow    W= 0.115 T_trigger=- bound=3.300 over=no

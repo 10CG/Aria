@@ -1,0 +1,8 @@
+seg-late2              rc=2   wall= 10.81s oversize(a command segment is longer t)
+seg-late2              rc=2   wall= 10.89s oversize(a command segment is longer t)
+seg-assign-1700        rc=2   wall=  7.28s oversize(a command segment is longer t)
+seg-assign-1700        rc=2   wall=  8.60s oversize(a command segment is longer t)
+heredoc-vars           rc=2   wall=  2.34s oversize(the command is longer than )
+heredoc-vars           rc=2   wall=  2.95s oversize(the command is longer than )
+multiline-cred         rc=2   wall=  3.02s oversize(the command is longer than )
+multiline-cred         rc=2   wall=  3.02s oversize(the command is longer than )
