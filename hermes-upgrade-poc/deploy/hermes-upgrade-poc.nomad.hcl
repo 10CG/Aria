@@ -51,6 +51,7 @@ job "hermes-upgrade-poc" {
         data        = <<EOH
 {{- with nomadVar "nomad/jobs/aria-orchestrator" }}
 LUXENO_API_KEY={{ .LUXENO_API_KEY }}
+ANTHROPIC_API_KEY={{ .LUXENO_API_KEY }}
 docker_auth_user={{ .docker_auth_user }}
 docker_auth_password={{ .docker_auth_password }}
 {{- end }}
