@@ -169,7 +169,7 @@ tasks:
   - id: TASK-004
     parent: "B.2"
     title: "验收: 用 run-evidence.sh 在真实实现上重跑 W8-W13"
-    status: pending
+    status: in_progress
     agent: main-loop
     depends_on: [TASK-002, TASK-003]
     deliverables: ["v31/impl/ 下的 W8 / W9 / W11 / W12 / W13 (IMPL=实现生成; 首行记两个 hook 与用例脚本的 sha256); v31/ 下的原型证据不动"]
@@ -189,6 +189,8 @@ tasks:
       - "W11: 每个形状的结局与 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W11-adversarial.txt 相同"
       - "W12 第 1 节: 进入重跑的结局都在 max(T_trigger, 3 s) + 0.3 s 内, 没有进入重跑的与基线逐字节相同 (PP2-m11); SMAX 类 137 条放行数 >= git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W12-real-traffic.txt 里原型那一轮的数减 1, 少掉的那条必须是回落 (基线字节) 而不是别的拦截, 并记下它的编号; VMAX 那 1 条照旧拦"
       - "W12 第 2、3 节: 300 / 300 与 40 / 40 逐字节相同"
+    notes:
+      - "执行方式调整 (2026-10-24, 主控): 计划原定本任务 agent: main-loop; 改为分段派新实例执行, 主控做独立复核 —— 第一段 (任务书 b2/BRIEF-T004a.md) 还原真实流量语料、改 run-evidence.sh (design 2、6)、在实现上跑 W8 / W11 / W9 并对照验收 1、3、4; 第二段跑 W13 与 W12 (design 5、7、8) 并对照验收 2、5、6。理由: 主会话上下文很大, 每次调用成本高 (成本 = 上下文 x 调用数), 新实例从小上下文起步; 真实流量的纪律 (命令文本只在 scratchpad、不读进对话、只看计数编号与 sha256、会话结束删除) 写进任务书。这是主控的流程判断, 写进会话交接请 owner 复议"
 
   - id: TASK-005
     parent: "B.2"
