@@ -1,0 +1,19 @@
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=2.72 2.25 2.02 2/1044 2143560
+  [SC-8] tier (a): old=26.0ms/call new=13.2ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-49.5%, median old=283927us new=142961us]
+  [SC-8] tier (b): old=26.3ms/call new=20.3ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-22.9%, median old=290149us new=222749us]
+  [SC-8] tier (c): old=27.8ms/call new=15.9ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-42.9%, median old=316678us new=173308us]
+  [SC-8] tier (d): old=28.2ms/call new=27.8ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-1.3%, median old=319509us new=369969us]
+  [SC-8] tier (e): old=27.5ms/call new=56.0ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=103.9%, median old=298457us new=584703us]
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test
+PASS: 902 / 961
+FAIL: 1 / 961
+SKIP: 58 / 961 (platform 58, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /home/dev/.aria/tools/bash-3.2.57/bash (x86_64-unknown-linux-gnu 3.2) -> relaxation expected: no | load start 1.02 1.93 1.90 end 2.04 2.08 1.95 | timing batch: void (SKIP [void]): run again
+W10 older groups 21ab 21ac 21ag 21aj 21al 21ao: relaxed branch (new outcomes) | bash on PATH /usr/bin/bash 5.2.15(1)-release (machtype x86_64-pc-linux-gnu) | osrelease 6.17.9-1-pve | WSLInterop no | WSL_DISTRO_NAME '' WSL_INTEROP ''
+
+Failures:
+  FAIL [W10 SC-21ab bf: copy limit exceeded — 8193 characters, or a 9000-character segment with a one-character value: refused as too large where the relaxation is not in effect; where it is, each copy is judged in full: the reader is blocked with the longline text, the two commands with no reader pass]: 1 check(s) off: {Bash f=x; echo $f a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a: want exit 0, got 2}
+

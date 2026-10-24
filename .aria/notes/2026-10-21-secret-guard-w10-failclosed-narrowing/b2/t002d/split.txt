@@ -1,0 +1,42 @@
+== site 9: base runs 1, worktree runs 1, same text True; next line: 'wpa_rep() { printf \'%*s\' "$2" \'\' | tr \' \' "$1"; }           '
+  9.1 ── review M6 (TASK-014): the second pass has a LENGTH BUDGET -- three limits, each pinned to the character on both sides (21aa-21ap) ── Without them the judged copy is the segment plus references x value length, one level of chaining multiplies a value by 8 per level, and the pass overran the 5 s hook timeout on a 5 KB command (a timeout lets the command through).
+  9.2 Owner ruling 2026-10-14: beyond a limit the command is BLOCKED -- exit 2 with the "command too large to scan for secrets ...
+  9.3 split it" text, NOT the finding text -- never passed (the COUNT bounds, 21y, still pass).
+  9.4 After the flip both sides of a limit exit 2, so the exit code alone no longer tells "judged" from "refused": the text does.
+  9.5 wpa_x_finding = the call was judged and blocked as a finding (the shared BLOCKED text, not the size text);
+  9.6 wpa_x_toolarge = it was refused as too large (the size text, not the finding text).
+  9.7 The inside of every limit asserts the first, the outside the second: a limit that is one too low or too high swaps the text of a side and turns the case red;
+  9.8 an overrun that passes (the fail-open M6, exit 0) or is blocked with the finding text turns the outside red.
+  9.9 The numbers are part of the contract (_SGV_SMAX 8192 = one substituted copy, _SGV_VMAX 4096 = one collected value, _SGV_TMAX 65536 = all copies of one command);
+  9.10 changing one means changing these cases.
+  9.11 The pad value p has 4000 characters: every `$p` adds 3998 to a copy, the reader `$f` (the 20-character app.ini name) adds 18.
+== site 10: base runs 1, worktree runs 1, same text True; next line: 'wpa_vx_cmd() { printf \'f=%s; p=%s; echo $p $p%s | cat $f\' "$'
+  10.1 21aa / 21ab: the segment ` echo $p $p<filler> | cat $f` has 20 characters + the filler and becomes 2 x 4000 + 34 + filler: a 158-character filler makes exactly 8192, 159 makes 8193.
+  10.2 21aa is judged (the reader is found), 21ab is refused.
+  10.3 21ab's second command pins what the limit counts: the WHOLE judged string, not its growth -- a 9000-character segment with a one-character value and one reference is refused as well (so is a big heredoc that happens to hold `x=1` and `$x`): a decision of the owner's ruling, pinned here so that narrowing it is deliberate.
+  10.4 The third command is made of short words (nothing the echo's redaction would cut away): the size text echoes only the START of the command.
+  10.5 Red when (21ab): the 8193-character copy or the 9000-character segment passes (exit 0 -- the fail-open M6), is refused with the finding text or by another limit line, or the limit is 8191 / 8193 (21aa and 21ab swap sides);
+  10.6 the whole command is echoed back.
+== site 11: base runs 1, worktree runs 1, same text True; next line: 'wpa_vx_val() { printf \'/%s%s\' "$(wpa_rep d $(( $1 - 21 )))" '
+  11.1 21ac / 21ad: a collected value of exactly 4096 characters (a path that ends in the app.ini name) is expanded and its read found, one character more refuses the command.
+  11.2 The list of a for statement is the third place a value is collected: 3000 characters are expanded (not 4096: the list stays in the command, so its copy holds the list twice and 2 x 4096 is over the copy limit -- which is how a 4096-character list is refused: by the COPY limit, not by the value limit), 4097 refuses the command by the value limit.
+  11.3 21ad's second command pins the posture of the value limit: the variable does not have to be MENTIONED -- an oversize assignment blocks the command on its own ("absolutely not passed"), as soon as the command holds a `$` at all (the collector's entry gate: with no `$` nothing could be expanded and nothing is refused).
+  11.4 A reference check would narrow that, and narrowing is the owner's call, not the code's.
+  11.5 Red when (21ad): an oversize value is dropped and the command passes (exit 0 -- the fail-open M6), in the assignment, in the for list or in the command that never mentions it, or the value is refused by another limit line;
+  11.6 (21ac): the 4096-character for list is refused by the value limit instead of the copy limit.
+== site 12: base runs 1, worktree runs 1, same text True; next line: 'wpa_begin_bash_case "W10 SC-21ag bf: the dense shape of the '
+  12.1 Red when (21ag): the 36 KB dense copy passes (exit 0 -- the fail-open M6), or is refused by another limit line.
+== site 13: base runs 1, worktree runs 1, same text True; next line: 'wpa_vx_over() {   # <n> -> n segments of three 4000-characte'
+  13.1 21aj: a segment whose copy is over the copy limit ends the pass -- the command is refused at once, and the reader behind it is never judged.
+  13.2 (The fail-open M6 refused such a segment cheaply but counted it as a whole copy, 8192, against the pass-wide limit: after seven of them the reader was still judged and blocked, after eight it passed.) Red when (21aj): such a segment is skipped or counted instead of refused -- the finding text after seven of them, exit 0 after eight (the fail-open M6).
+== site 14: base runs 1, worktree runs 1, same text True; next line: 'wpa_begin_bash_case "W10 SC-21al bf: the copy limit holds fo'
+  14.1 Red when (21al): the braced 8193-character whole copy passes (exit 0 -- the fail-open M6), or the edge moves by one (the two commands swap sides).
+== site 15: base runs 1, worktree runs 1, same text True; next line: 'wpa_begin_bash_case "W10 SC-21ao bf: whole-command mode obey'
+  15.1 Red when (21ao): the 8193-character whole copy passes (exit 0 -- the fail-open M6), or the edge moves by one (the two commands swap sides).
+== site 21: base runs 1, worktree runs 1, same text True; next line: "wpa_vx_braced() { printf 'f=%s; p=%s; echo ${p} ${p}%s | cat"
+  21.1 21al: the copy limit holds for the braced form ${NAME} too (it goes through _sg_vx_replace, not through the $NAME loop).
+  21.2 A brace makes the command unsafe to split, so the unit is the WHOLE command: with a 2700-character pad value, `f=<app.ini>;
+  21.3 p=<pad>;
+  21.4 echo ${p} ${p}<filler> | cat ${f}` has 53 + 2700 + filler characters and its copy 2 x 2696 + 16 more -- 8161 + filler, so a 31-character filler makes exactly 8192
+== site 22: base runs 1, worktree runs 1, same text True; next line: "wpa_vx_whole() { printf 'f=%s; p=%s; echo $p $p%s | cat $f; "
+  22.1 21ao: whole-command mode (the command degrades because of a `(`) obeys the same copy limit -- the unit is the whole command: 6069 + filler, so a 2123-character filler makes 8192

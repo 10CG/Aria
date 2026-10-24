@@ -18,3 +18,7 @@
 - `t002c/`：3a 的过程材料，挑选后收入：基线轮 `base-suite.txt`；只跑移植用例的各轮 `w10-bash-*`、`filt-bash-*`；整轮 `full-bash-*`（计时批都是 SKIP [load]，原因见报告第 6 节第 1 条）与第一版驱动的 `round-bash-5.2.*`；等价核对 `equiv-sc-cases.txt`、`equiv-diff.txt`；坏实现抽查 `mut-BI-*` 与实现对照 `ctl-impl.*`；驱动 `drive.sh`、`drive2.sh` 与读数 `drive.log`；helper 的生成脚本 `patch3a.py`。
   - 没收：坏实现的整份 hook 副本（`mut/*.sh`，可用 `../v31/mutants.py` 复现，`mut/` 下只留三张表）；输入形状的两份导出 `shapes/`（各 15 个文件，执笔席用 `diff -rq` 核过逐字节相同；可由 `../v31/shapes.py` 与套件的 `sg_w10_shape` 重新生成）；移植块的草稿 `w10-block.sh`（内容已在提交里）。
 - `t002c-verify/`：主控对 3a 的独立复核（2026-10-24 10:47–11:03 UTC）。`PREDICT.md` 是实测前写下的预期，`VERIFY.md` 是逐项结果，`check.py` 做比对（只输出数字与编号），`drive.sh` / `drive.log` 是串行驱动与每轮首尾负载。坏实现由主控用 `../v31/mutants.py` 重新构造（只留三张表）。结论：除 BI-8 外与预期全部一致；BI-8 在套件的指定用例上漏抓，是主控定的口径 (ii) 的漏洞，补法记在计划 TASK-002 的 notes 里。
+- `BRIEF-T002c-3b.md`、`T002c-3b-report.md`：第三步 3b（W10 移植批移到套件最前、6 组既有用例按平台分两支、套件注释与标题、头注释、commentsync 套件一侧逐句核对）的任务书与执笔席报告（2026-10-24）。结果是 aria 分支提交 `fee1a65` 与主仓 `../v31/commentsync.py` 的 `SUITE_TEXT`。报告里的相对路径相对 `t002d/`。
+- `t002d/`：3b 的过程材料：各整轮的输出 `b-*.out`、移植用例日志 `*.w10log` 与读数 `*.meta`；commentsync 各模式 `cs-*.txt` 与三种构造的结果 `cons/*.txt`；21ab 计时材料 `m21ab/`；改动脚本 `apply3b.py`。
+  - 没收：59e333c 的 hook 与套件、3a 提交的套件、构造出来的套件副本（都可由 git 或报告里的说明重新得到），改动前的 `commentsync.py`。
+- `t002d-verify/`：主控对 3b 的独立复核（2026-10-24 12:37–12:57 UTC）。`PREDICT.md` 是实测前写下的预期，`VERIFY.md` 是逐项结果；`probe21ab.sh` 与 `probe.txt` 是 21ab 两条放行命令的计时（「关门不到 1 s」的预期不对，见 VERIFY.md）；`cs/` 是 commentsync 的各模式与两个构造（`cons.py` 生成）；`full-path.*`、`full-interop.*` 是两整轮。

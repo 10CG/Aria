@@ -1,0 +1,8 @@
+b#1 rc=0 wall=2.37 size-text=no load=1.17
+c#1 rc=0 wall=2.52 size-text=no load=1.64
+b#2 rc=0 wall=2.48 size-text=no load=1.64
+c#2 rc=0 wall=2.54 size-text=no load=1.59
+b#3 rc=0 wall=2.39 size-text=no load=1.59
+c#3 rc=0 wall=2.58 size-text=no load=1.54
+b gate-closed rc=2 wall=2.39 size-text=yes load=1.54
+c gate-closed rc=2 wall=3.08 size-text=yes load=1.66

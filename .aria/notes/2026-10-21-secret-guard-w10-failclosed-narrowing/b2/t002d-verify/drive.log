@@ -1,0 +1,11 @@
+12:37:42 R4 probe start | load 1.17 1.60 1.87
+12:38:03 R4 probe end rc=0 | load 1.66 1.69 1.89
+12:38:03 R3 target rc=0 | load 1.66 1.69 1.89
+12:38:03 R3 baseline rc=0 | load 1.66 1.69 1.89
+12:38:03 R3 c1 rc=1 | load 1.66 1.69 1.89
+12:38:03 R3 c2 rc=1 | load 1.66 1.69 1.89
+12:42:43 R1 full PATH bash start | load 1.15 1.52 1.78
+12:48:35 R1 full PATH bash end rc=0 | load 3.35 2.51 2.12
+12:51:15 R2 full WSL_INTEROP start | load 1.07 1.89 1.95
+12:57:00 R2 full WSL_INTEROP end rc=0 | load 3.13 2.78 2.32
+12:57:00 done | load 3.13 2.78 2.32

@@ -1,0 +1,13 @@
+[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: a command segment is longer than 8192 characters after variable expansion
+
+Nothing was matched. After variable expansion the command is bigger than the guard
+can check reliably, and a command that cannot be checked is blocked (fail-closed),
+not allowed.
+
+Split it into smaller commands and run them one at a time:
+  - keep every variable value, and every command after expansion, short;
+  - do not repeat one long $VAR many times in a single command;
+  - write long files with the Write / Edit tool instead of a heredoc.
+命令过大, 无法扫描其中是否含密钥, 请拆成更小的命令
+
+Command was (first 200 characters): f=[REDACTED] echo $f a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a

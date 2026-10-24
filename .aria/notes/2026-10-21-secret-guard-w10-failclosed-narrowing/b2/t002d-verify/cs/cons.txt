@@ -1,0 +1,2 @@
+c1: changed the unique word rulings of a new sentence of site 9
+c2: deleted 4 comment lines before the 21ag case
