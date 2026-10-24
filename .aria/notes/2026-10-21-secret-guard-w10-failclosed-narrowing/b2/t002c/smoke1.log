@@ -1,0 +1,12 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T06:52:51Z | hook af4658b6f935 | direct 265a7b8d9b63 | shim 637c52c10bbf | filter ^(V2-G1-gate|V11-S4-one-rule-loop|V11-S1-above-gate:_sg_relax_ok|V1-E16-p1-small-benign|V2-E17-wsl-mark-keeps-baseline|V6-S21-whole-fallback-text|V7-E1-benign-big-allowed|V5-S12-no-leftovers)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V2-G1-gate this bash: status 0 (want 0)
+PASS V5-S12-no-leftovers stub processes of this run (arguments ending in 3781383) still alive after the cases: 0 (want 0)
+PASS V6-S21-whole-fallback-text gate open, a whole copy over 8192: status/mode/text-bytes [4 whole 0] (want [4 whole 0]); fallback text 721 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2) 721 bytes: IDENTICAL
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+SKIP V7-E1-benign-big-allowed [load] hook rc=0 none 0.15s | gate-closed rc=2 oversize 0.10s | stderr DIFFERENT (want rc=0 text=none within 4.5 s)
+PASS V1-E16-p1-small-benign hook rc=0 none 0.06s | gate-closed rc=0 none 0.07s | stderr IDENTICAL
+PASS V2-E17-wsl-mark-keeps-baseline hook with WSL_DISTRO_NAME=Ubuntu: rc=2 oversize 0.09s (want rc=2 text=oversize: the gate stays closed, the baseline's size block)
+PASS V11-S1-above-gate:_sg_relax_ok line 819 < sourcing gate 1057
+PASS V11-S4-one-rule-loop loops over risky_patterns: 1 (want exactly 1, the baseline's count)
+PASS V0-H2-case-list all 8 expected case ids reported once (mode relax; one list on every platform)
+# load start 2.17 2.59 2.67 end 2.17 2.59 2.67 | timing batch: SKIP [load]

@@ -12,6 +12,7 @@
 | `shim/delay-first`（`shim/jq`、`shim/sed`） | 在已知位置注入固定延迟：`jq` 的首次调用是 stdin 解析（锚点之后、触发点之前），`sed` 只在重跑作业的进程组里停顿（组外的调用不停，也不占「第一次」），停顿开始写 `sed.stall`，停满写 `sed.uncut`；停满说明截止没切断作业，判 FAIL。下界由它决定，不依赖本机速度 |
 | `mutants.py`、`run-mutants.sh` | 57 个坏实现，各在被测 hook（实现）上改一处：BI-1–23 是作者自建（BI-17 拆成 17a、17b、17c），BI-24–54 是 post_planning R2 五席漏网的 45 个（逐字节相同的写法合成一个，列出全部席位编号）；另有 7 个常量扰动变体（P-0 必须全绿，其余 6 个各用错一处常量）。逐个只跑指定用例；指定用例全红、且失败细节带 `reasons.tsv` 写明的原因标签，才算抓住。是对用例的自检，不替代 TASK-003 |
 | `commentsync.py` | What 7 与 What 7 补充的逐句核对（`--hook-only`、`--suite-only`；baseline / proto / target 模式）。hook 一侧 10 个站点：被改写删掉的旧句须为 0 次，新句须出现在本站点的注释段里；句子从基线、原型与 proposal 机械导出。套件一侧目前只核旧句与旧标题，新句等套件移植写出后再绑定 |
+| `run-suite.sh` | 在 aria 回归套件（移植了本目录用例的 `hooks/tests/secret-guard.test.sh`）上跑任意 hook：把 `<aria>/hooks` 复制到临时目录、换上被测 hook 再跑；`SC_BASH`、`SG_W10_ONLY`（只跑编号匹配的移植用例）、`SG_W10_LOG`（逐条结果，本目录格式）照传。副本不是 git 检出，SC-8、SC-9a 不跑，SC-13 在副本里必红，只看 git 检出里的整轮（TASK-002 第三步） |
 | `mkdbg31.py`、`replay138.sh`、`ident.sh`、`ident32.sh` | W12：埋点副本（按代码行锚定）、138 条回放、逐字节对比 |
 | `fill31.py`、`proposal-template.md` | 从模板与证据生成 proposal：代码块、注释清单表与实测数字都机械填入，并断言 W8 的每个逻辑 hunk 都被引用 |
 | `run-evidence.sh` | 生成全部 W 文件；见下 |
@@ -31,6 +32,7 @@ IMPL=<实现的 hook> bash run-evidence.sh <工作目录> …     # TASK-004：�
 SC_BASH=<bash> bash sc-cases.sh <hook> [基线 hook]       # 单独跑验收用例；基线默认取自 aria 59e333c
 SC_BASH=<bash> bash run-mutants.sh <hook> <工作目录>    # 坏实现与常量扰动；MUT_ONLY=<正则> 只跑部分，MUT_SCOPE=full 跑全量并列出其他红
 python3 commentsync.py --hook-only <hook> target        # What 7 逐句核对；baseline、proto 模式见脚本头
+SC_BASH=<bash> SG_W10_ONLY=<正则> bash run-suite.sh <aria 检出> <hook> [<工作目录>]   # 在移植后的 aria 套件上跑
 ```
 
 - 基线一律取自 aria `59e333c`（`git show` / `git archive`）并断言 sha256 前缀，不读工作树里的 hook。实现落地后工作树里就是实现，拿它当基线会让所有对比变成自己比自己。

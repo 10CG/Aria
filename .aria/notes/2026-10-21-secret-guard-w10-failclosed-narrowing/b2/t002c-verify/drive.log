@@ -1,0 +1,29 @@
+10:47:38 R1 w10 5.2 start | load 0.91 0.85 1.03
+10:48:28 R1 w10 5.2 end rc=0 | load 1.12 0.93 1.05
+10:48:28 R1 w10 5.0 start | load 1.12 0.93 1.05
+10:49:17 R1 w10 5.0 end rc=0 | load 1.35 1.00 1.06
+10:49:38 R1 w10 5.1 start | load 0.96 0.93 1.04
+10:50:28 R1 w10 5.1 end rc=0 | load 1.68 1.09 1.09
+10:52:08 R1 w10 5.3 start | load 1.05 1.08 1.08
+10:52:58 R1 w10 5.3 end rc=0 | load 1.29 1.12 1.09
+10:53:18 R1 w10 3.2 start | load 1.06 1.07 1.08
+10:53:55 R1 w10 3.2 end rc=0 | load 1.81 1.29 1.16
+10:54:55 R2 sc-cases start | load 0.96 1.16 1.12
+10:55:44 R2 sc-cases end rc=0 | load 0.79 1.09 1.09
+10:55:44 R4 BI-8 start (V9-E12-vmax-unchanged) | load 0.79 1.09 1.09
+10:55:47 R4 BI-8 end rc=0 | load 0.97 1.12 1.10
+10:55:47 R4 BI-5 start (V2-G4-extension-file-with-entry V2-E9-extension-project) | load 0.97 1.12 1.10
+10:55:48 R4 BI-5 end rc=1 | load 0.97 1.12 1.10
+10:55:48 R4 BI-45 start (V6-S20-segment-fallback-text) | load 0.97 1.12 1.10
+10:55:49 R4 BI-45 end rc=1 | load 0.97 1.12 1.10
+10:55:49 R4 BI-24 start (V2-G12-segment-trigger-asks-gate) | load 0.97 1.12 1.10
+10:55:50 R4 BI-24 end rc=1 | load 1.21 1.17 1.12
+10:56:50 R4 BI-7 start (V6-E2-deadline-fallback-bytes) | load 1.18 1.19 1.13
+10:56:54 R4 BI-7 end rc=1 | load 1.18 1.19 1.13
+10:56:54 R4 BI-11 start (V10-N3-environ-big-judge V11-S4-one-rule-loop) | load 1.18 1.19 1.13
+10:56:55 R4 BI-11 end rc=1 | load 1.17 1.19 1.13
+10:56:55 R4 ctl start | load 1.17 1.19 1.13
+10:57:02 R4 ctl end rc=0 | load 1.07 1.17 1.12
+10:57:02 R3 full 5.2 start | load 1.07 1.17 1.12
+11:02:42 R3 full 5.2 end rc=1 | load 2.02 2.32 1.69
+11:02:42 done | load 2.02 2.32 1.69

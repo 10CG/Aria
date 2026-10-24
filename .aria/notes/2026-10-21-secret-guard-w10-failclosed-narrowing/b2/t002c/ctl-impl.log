@@ -1,0 +1,8 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T06:55:42Z | hook af4658b6f935 | direct 265a7b8d9b63 | shim 637c52c10bbf | filter ^(V2-G12-segment-trigger-asks-gate|V6-E2-deadline-fallback-bytes|V10-N3-environ-big-judge|V11-S4-one-rule-loop)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V2-G12-segment-trigger-asks-gate the platform check failing, a segment copy over 8192: status/text [2 oversize] (want [2 oversize], never 4)
+PASS V10-N3-environ-big-judge rc=0 text=none (want rc=0 text=none)
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V6-E2-deadline-fallback-bytes hook rc=2 oversize 3.02s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=job (want IDENTICAL, wall window 2.85..3.6)
+PASS V11-S4-one-rule-loop loops over risky_patterns: 1 (want exactly 1, the baseline's count)
+PASS V0-H2-case-list all 4 expected case ids reported once (mode relax; one list on every platform)
+# load start 0.92 1.93 2.40 end 0.92 1.91 2.39 | timing batch: judged

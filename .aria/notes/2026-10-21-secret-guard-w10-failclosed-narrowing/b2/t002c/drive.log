@@ -1,0 +1,46 @@
+06:55:37 DRIVE START load 0.92 1.93 2.40 hook af4658b6f935
+06:55:37 suite-copy ctl-impl try 1 start load 0.92 1.93 2.40
+06:55:42 suite-copy ctl-impl try 1 rc=0 | timing batch: judged | PASS: 6 / 6 FAIL: 0 / 6 SKIP: 0 / 6 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+06:55:42 suite-copy mut-BI-24 try 1 start load 0.92 1.91 2.39
+06:55:43 suite-copy mut-BI-24 try 1 rc=1 | timing batch: judged | PASS: 2 / 3 FAIL: 1 / 3 SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+06:55:43 verdict BI-24: V2-G12-segment-trigger-asks-gate=red(reason \[status\])
+06:55:43 suite-copy mut-BI-7 try 1 start load 0.92 1.91 2.39
+06:55:47 suite-copy mut-BI-7 try 1 rc=1 | timing batch: judged | PASS: 2 / 3 FAIL: 1 / 3 SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+06:55:47 verdict BI-7: V6-E2-deadline-fallback-bytes=red(reason \[time-text\]|\[bytes\])
+06:55:47 suite-copy mut-BI-11 try 1 start load 0.93 1.89 2.38
+06:55:48 suite-copy mut-BI-11 try 1 rc=1 | timing batch: judged | PASS: 2 / 4 FAIL: 2 / 4 SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+06:55:48 verdict BI-11: V10-N3-environ-big-judge=red(reason \[status\]) V11-S4-one-rule-loop=red(reason \[count\])
+06:55:48 round bash-5.2 try 1 start load 0.93 1.89 2.38
+07:01:21 round bash-5.2 try 1 rc=1 end load 2.19 2.13 2.34 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+07:01:41 round bash-5.2 try 2 start load 1.71 2.03 2.30
+07:07:07 round bash-5.2 try 2 rc=1 end load 1.72 2.24 2.35 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+07:07:07 round bash-5.2 try 3 start load 1.72 2.24 2.35
+07:09:06 switch: old driver pid 3787875, its children (waited for, not killed): 3964621 
+07:09:06 switch: stopped old driver pid 3787875 only; drive2 pid 4014295
+07:12:41 drive2 start: the old driver is stopped and its last suite run has ended; load 1.43 2.17 2.33
+07:12:41 w10-only bash-5.2 try 1 start load 1.43 2.17 2.33
+07:13:30 w10-only bash-5.2 try 1 rc=0 end load 1.03 1.94 2.25 | timing batch: judged | PASS: 136 / 136 FAIL: 0 / 136 SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+07:13:30 w10-only bash-5.0.18 try 1 start load 1.03 1.94 2.25
+07:14:19 w10-only bash-5.0.18 try 1 rc=0 end load 0.81 1.74 2.16 | timing batch: judged | PASS: 136 / 136 FAIL: 0 / 136 SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+07:14:19 w10-only bash-5.1.16 try 1 start load 0.81 1.74 2.16
+07:15:09 w10-only bash-5.1.16 try 1 rc=0 end load 1.40 1.72 2.13 | timing batch: judged | PASS: 136 / 136 FAIL: 0 / 136 SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+07:15:09 w10-only bash-5.3.20 try 1 start load 1.40 1.72 2.13
+07:15:58 w10-only bash-5.3.20 try 1 rc=0 end load 1.34 1.66 2.08 | timing batch: judged | PASS: 136 / 136 FAIL: 0 / 136 SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0) 
+07:15:58 w10-only bash-3.2.57 try 1 start load 1.34 1.66 2.08
+07:16:31 w10-only bash-3.2.57 try 1 rc=0 end load 1.48 1.66 2.07 | timing batch: judged | PASS: 78 / 136 FAIL: 0 / 136 SKIP: 58 / 136 (platform 58, load 0, void 0, inconclusive 0, root 0, other 0) 
+07:16:31 sc-cases try 1 start load 1.48 1.66 2.07
+07:17:20 sc-cases try 1 rc=0 | timing batch: judged | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)
+07:17:20 equivalence: 1 difference line(s); # ids in both: 136
+07:17:30 full bash-5.2 start load 0.91 1.47 1.98
+07:23:14 full bash-5.2 rc=1 end load 2.04 2.16 2.14 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+07:27:14 full bash-5.0.18 start load 0.91 1.71 1.97
+07:33:56 full bash-5.0.18 rc=1 end load 3.33 3.16 2.56 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+07:43:57 wait: load 2.33 2.73 2.55 after 600 s (limit 1.0)
+07:43:57 full bash-5.1.16 start load 2.33 2.73 2.55
+07:51:35 full bash-5.1.16 rc=1 end load 7.07 5.60 3.90 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+08:01:36 wait: load 2.62 4.01 3.93 after 600 s (limit 1.0)
+08:01:36 full bash-5.3.20 start load 2.62 4.01 3.93
+08:07:22 full bash-5.3.20 rc=1 end load 2.35 3.04 3.53 | timing batch: SKIP [load] | PASS: 926 / 961 FAIL: 6 / 961 SKIP: 29 / 961 (platform 0, load 29, void 0, inconclusive 0, root 0, other 0) 
+08:12:43 full bash-3.2.57 start load 0.88 1.79 2.83
+08:17:56 full bash-3.2.57 rc=1 end load 2.28 2.03 2.63 | timing batch: SKIP [load] | PASS: 897 / 961 FAIL: 6 / 961 SKIP: 58 / 961 (platform 58, load 0, void 0, inconclusive 0, root 0, other 0) 
+08:17:56 DRIVE DONE load 2.28 2.03 2.63

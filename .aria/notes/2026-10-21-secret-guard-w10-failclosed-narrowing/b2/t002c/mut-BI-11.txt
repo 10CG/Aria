@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T06:55:47Z | hook 2ba0bfed3d0c | suite 53f1eaefaf72 | SC_BASH /usr/bin/bash | SG_W10_ONLY ^(V10-N3-environ-big-judge|V11-S4-one-rule-loop)$ | load 0.93 1.89 2.38
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V10-N3-environ-big-judge|V11-S4-one-rule-loop)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 0.93 1.89 2.38 end 0.93 1.89 2.38 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V10-N3-environ-big-judge]: rc=2 text=longline (want rc=0 text=none) [status] [kind]
+  FAIL [W10-port V11-S4-one-rule-loop]: loops over risky_patterns: 2 (want exactly 1, the baseline's count) [count]
+
+# run-suite.sh end | load 0.93 1.89 2.38 | suite exit 1
