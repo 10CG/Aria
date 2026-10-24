@@ -1,0 +1,35 @@
+awk: cannot open /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002e/base-32.log (No such file or directory)
+V1-E16-p1-small-benign                       5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-small-read                         5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V1-E16-p1-small-read-filter                  5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-var-mid                            5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-var-mid-read                       5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V1-E16-p1-var-read                           5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V2-E18-extension-via-stdin-cwd               5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E6-flag-from-environment-ignored          5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E7-no-time-left                           5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E8-ostype-from-environment-ignored        5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E9-extension-project                      5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E3-anchor-at-hook-start                   5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E4-cap-3-at-budget-4                      5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E5-budget-2                               5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V5-E19-deadline-with-term-ignored            5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-E2-deadline-fallback-bytes                5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-S20-segment-fallback-text                 5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-S21-whole-fallback-text                   5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E13-multiline-copy-normal-text            5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E14-long-line-from-expansion              5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E15-credit-as-normal                      5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E1-benign-big-allowed                     5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E10-count-axis-read-blocked               5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E11-tmax-in-rerun                         5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E12-vmax-unchanged                        5.0:2 vmax  5.1:2 vmax  5.2:2 vmax  5.3:2 vmax
+5.0: [reference] 0, FAIL 15, PASS 13, SKIP 0
+5.1: [reference] 0, FAIL 15, PASS 13, SKIP 0
+5.2: [reference] 0, FAIL 15, PASS 13, SKIP 0
+5.3: [reference] 0, FAIL 15, PASS 13, SKIP 0
+grep: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002e/base-32.log: No such file or directory
+grep: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002e/base-32.log: No such file or directory
+grep: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002e/base-32.log: No such file or directory
+grep: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002e/base-32.log: No such file or directory
+3.2: [reference] , FAIL , PASS , SKIP 

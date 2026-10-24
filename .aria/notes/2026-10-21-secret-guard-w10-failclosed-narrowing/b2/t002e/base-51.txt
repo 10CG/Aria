@@ -1,0 +1,27 @@
+# run-suite.sh | 2026-10-24T13:17:21Z | hook e83c5e30f2cc | suite d085afae6834 | helper 213d01379695 | SC_BASH /home/dev/.aria/tools/bash-5.1.16/bash | SG_W10_ONLY ^V[0-9]+-E[0-9]|^V6-S2[01] | load 1.81 2.64 2.64
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V[0-9]+-E[0-9]|^V6-S2[01]): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 13 / 28
+FAIL: 15 / 28
+SKIP: 0 / 28 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /home/dev/.aria/tools/bash-5.1.16/bash (x86_64-pc-linux-gnu 5.1) -> relaxation expected: yes | load start 1.91 2.65 2.64 end 1.77 2.59 2.62 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V6-S20-segment-fallback-text]: gate open, a segment copy over 8192: status/mode/text-bytes [2 none 719] (want [4 segment 0]); fallback text 0 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 719 bytes: DIFFERENT, first line [] [status] [bytes]
+  FAIL [W10-port V6-S21-whole-fallback-text]: gate open, a whole copy over 8192: status/mode/text-bytes [2 none 721] (want [4 whole 0]); fallback text 0 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 721 bytes: DIFFERENT, first line [] [status] [bytes]
+  FAIL [W10-port V7-E1-benign-big-allowed]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E3-anchor-at-hook-start]: hook rc=2 oversize 1.60s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E4-cap-3-at-budget-4]: hook rc=2 oversize 0.10s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V3-E5-budget-2]: hook rc=2 oversize 0.11s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 1.85..2.6) [wall<lo]
+  FAIL [W10-port V2-E6-flag-from-environment-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+  FAIL [W10-port V2-E8-ostype-from-environment-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V9-E10-count-axis-read-blocked]: hook rc=2 oversize 0.15s | gate-closed rc=2 oversize 0.11s | stderr IDENTICAL (want rc=2 text=finding|longline within 4.5 s) [fallback]
+  FAIL [W10-port V9-E11-tmax-in-rerun]: hook rc=2 oversize 0.74s | gate-closed rc=2 oversize 0.81s | stderr IDENTICAL (want rc=2 text=tmax within 4.5 s) [fallback]
+  FAIL [W10-port V7-E13-multiline-copy-normal-text]: hook rc=2 oversize 0.11s | gate-closed rc=2 oversize 0.12s | stderr IDENTICAL (want rc=2 text=finding within 4.5 s) [fallback]
+  FAIL [W10-port V7-E14-long-line-from-expansion]: hook rc=2 oversize 0.12s | gate-closed rc=2 oversize 0.08s | stderr IDENTICAL (want rc=2 text=longline within 4.5 s) [fallback]
+  FAIL [W10-port V7-E15-credit-as-normal]: hook rc=2 oversize 0.07s | gate-closed rc=2 oversize 0.07s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+  FAIL [W10-port V5-E19-deadline-with-term-ignored]: hook rc=2 oversize 0.13s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [wall<lo]
+
+# run-suite.sh end | load 1.77 2.59 2.62 | suite exit 1

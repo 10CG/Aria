@@ -1,0 +1,15 @@
+# run-suite.sh | 2026-10-24T14:32:22Z | hook af4658b6f935 | suite c78bd64fc434 | helper 50ee7c53c804 | SC_BASH bash on PATH | SG_W10_ONLY ^(V7-E1-benign-big-allowed|V1-E16-p1-small-benign|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text)$ | load 0.84 1.78 2.60
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V7-E1-benign-big-allowed|V1-E16-p1-small-benign|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 3 / 6
+FAIL: 3 / 6
+SKIP: 0 / 6 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 0.84 1.78 2.60 end 0.84 1.78 2.60 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V6-S20-segment-fallback-text]: gate closed by WSL_DISTRO_NAME: status 2 oversize, reference (59e333c, the same copy and mode) 2 vmax [reference]
+  FAIL [W10-port V7-E1-benign-big-allowed]: hook rc=0 none 0.15s | gate-closed rc=2 oversize 0.09s | stderr DIFFERENT (want rc=0 text=none within 4.5 s) | gate-closed arm rc=2 oversize, reference (59e333c) rc=2 vmax [reference]
+  FAIL [W10-port V1-E16-p1-small-benign]: hook rc=0 none 0.07s | gate-closed rc=0 none 0.07s | stderr IDENTICAL | gate-closed arm rc=0 none, reference (59e333c) rc=unrecorded - [reference]
+
+# run-suite.sh end | load 0.84 1.78 2.60 | suite exit 1

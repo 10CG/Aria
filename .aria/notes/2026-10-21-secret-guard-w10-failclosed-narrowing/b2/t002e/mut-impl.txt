@@ -1,0 +1,9 @@
+# run-suite.sh | 2026-10-24T13:41:30Z | hook af4658b6f935 | suite d085afae6834 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V9-E12-vmax-unchanged|V2-G4-extension-file-with-entry|V2-E9-extension-project|V6-S20-segment-fallback-text)$ | load 1.15 1.32 1.65
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V9-E12-vmax-unchanged|V2-G4-extension-file-with-entry|V2-E9-extension-project|V6-S20-segment-fallback-text)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 6 / 6
+FAIL: 0 / 6
+SKIP: 0 / 6 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.15 1.32 1.65 end 1.30 1.35 1.66 | timing batch: judged
+# run-suite.sh end | load 1.30 1.35 1.66 | suite exit 0

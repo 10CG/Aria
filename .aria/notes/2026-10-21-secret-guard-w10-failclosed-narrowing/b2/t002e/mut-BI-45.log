@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T13:41:30Z | hook 7529c4e49cf2 | direct 213d01379695 | shim 5c5c04525a67 | filter ^(V6-S20-segment-fallback-text)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V6-S20-segment-fallback-text gate open, a segment copy over 8192: status/mode/text-bytes [4 segment 0] (want [4 segment 0]); fallback text 713 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 719 bytes: DIFFERENT, first line [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command is longer than 8192 characters aft] [bytes]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.15 1.32 1.65 end 1.15 1.32 1.65 | timing batch: judged

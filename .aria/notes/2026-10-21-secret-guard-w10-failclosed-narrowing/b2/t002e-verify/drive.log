@@ -1,0 +1,11 @@
+14:32:20 built: impl af4658b6f935 bi8 ff9f7a43eb7e | load 0.83 1.79 2.61
+probe checkout built
+14:32:20 R2 BI-8 start | load 0.83 1.79 2.61
+14:32:22 R2 end rc=1 | load 0.84 1.78 2.60
+14:32:22 R3 probes start | load 0.84 1.78 2.60
+14:32:24 R3 end rc=1 | load 0.84 1.78 2.60
+14:32:24 R1 W10-only start | load 0.84 1.78 2.60
+14:33:13 R1 end rc=0 | load 1.03 1.69 2.52
+14:34:13 R4 full worktree start | load 0.88 1.52 2.41
+14:39:52 R4 end rc=0 | load 2.68 2.24 2.44
+14:39:52 done | load 2.68 2.24 2.44

@@ -6,7 +6,8 @@
 # relative paths in them are made absolute first.
 # The copy is not a git checkout: the cases that read an old hook through git show (SC-8, SC-9a) do not run in it, so the total that SC-13 counts differs
 # from the header's Coverage numbers and SC-13 is red in the copy. Read SC-13 only from a run in a git checkout; a filtered round (SG_W10_ONLY) has no SC-13.
-# Output: the suite's stdout and stderr. The first line records the date, the sha256 prefixes of <hook> and of the suite, and the one-minute loads; the
+# Output: the suite's stdout and stderr. The first line records the date, the sha256 prefixes of <hook>, of the suite and of its direct-call helper
+# (hooks/tests/lib/secret-guard-w10-direct.sh; "missing" when the copy has none), and the one-minute loads; the
 # last line the loads at the end and the suite's exit status, which is also this script's (3 when the copy cannot be built).
 set -u
 [[ $# -ge 2 && -f "$1/hooks/tests/secret-guard.test.sh" && -f "$2" && -r "$2" ]] || { echo "usage: run-suite.sh <aria checkout> <hook> [<work dir>]" >&2; exit 3; }
@@ -17,8 +18,9 @@ cp -a "$A/hooks" "$T/hooks" && cp "$HK" "$T/hooks/secret-guard.sh" && chmod 755 
 [[ -n "${SC_BASH:-}" ]] && export SC_BASH="$(readlink -f "$SC_BASH")"
 [[ -n "${SG_W10_LOG:-}" ]] && export SG_W10_LOG="$(readlink -f "$SG_W10_LOG")"
 [[ -n "${SG_W10_ONLY:-}" ]] && export SG_W10_ONLY
-printf '# run-suite.sh | %s | hook %s | suite %s | SC_BASH %s | SG_W10_ONLY %s | load %s\n' "$(date -u +%FT%TZ)" "$(sha256sum < "$HK" | cut -c1-12)" \
-  "$(sha256sum < "$T/hooks/tests/secret-guard.test.sh" | cut -c1-12)" "${SC_BASH:-bash on PATH}" "${SG_W10_ONLY:-<none>}" "$(cut -d' ' -f1-3 /proc/loadavg)"
+HL="$T/hooks/tests/lib/secret-guard-w10-direct.sh"
+printf '# run-suite.sh | %s | hook %s | suite %s | helper %s | SC_BASH %s | SG_W10_ONLY %s | load %s\n' "$(date -u +%FT%TZ)" "$(sha256sum < "$HK" | cut -c1-12)" \
+  "$(sha256sum < "$T/hooks/tests/secret-guard.test.sh" | cut -c1-12)" "$([[ -f "$HL" ]] && sha256sum < "$HL" | cut -c1-12 || echo missing)" "${SC_BASH:-bash on PATH}" "${SG_W10_ONLY:-<none>}" "$(cut -d' ' -f1-3 /proc/loadavg)"
 ( cd "$T" && exec taskset -c 0,1 nice -n 19 bash hooks/tests/secret-guard.test.sh ) 2>&1; rc=$?
 printf '# run-suite.sh end | load %s | suite exit %s\n' "$(cut -d' ' -f1-3 /proc/loadavg)" "$rc"
 exit "$rc"

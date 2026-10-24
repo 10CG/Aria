@@ -1,0 +1,30 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T13:18:42Z | hook e83c5e30f2cc | direct 213d01379695 | shim 5c5c04525a67 | filter ^V[0-9]+-E[0-9]|^V6-S2[01] | SC_BASH /home/dev/.aria/tools/bash-3.2.57/bash (x86_64-unknown-linux-gnu 3.2) -> relaxation expected: no
+SKIP V6-S20-segment-fallback-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V6-S21-whole-fallback-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (norelax) ran to its sentinel and exited 0
+PASS V7-E1-benign-big-allowed hook rc=2 oversize 0.30s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V6-E2-deadline-fallback-bytes hook rc=2 oversize 0.29s | gate-closed rc=2 oversize 0.30s | stderr IDENTICAL
+PASS V3-E3-anchor-at-hook-start hook rc=2 oversize 0.33s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V3-E4-cap-3-at-budget-4 hook rc=2 oversize 0.47s | gate-closed rc=2 oversize 0.38s | stderr IDENTICAL
+PASS V3-E5-budget-2 hook rc=2 oversize 0.28s | gate-closed rc=2 oversize 0.28s | stderr IDENTICAL
+PASS V2-E6-flag-from-environment-ignored hook rc=2 oversize 0.29s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V2-E7-no-time-left hook rc=2 oversize 0.26s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V2-E8-ostype-from-environment-ignored hook rc=2 oversize 0.30s | gate-closed rc=2 oversize 0.26s | stderr IDENTICAL
+PASS V2-E9-extension-project hook rc=2 oversize 0.83s | gate-closed rc=2 oversize 0.67s | stderr IDENTICAL
+PASS V9-E10-count-axis-read-blocked hook rc=2 oversize 0.33s | gate-closed rc=2 oversize 0.35s | stderr IDENTICAL
+PASS V9-E11-tmax-in-rerun hook rc=2 oversize 5.69s | gate-closed rc=2 oversize 5.80s | stderr IDENTICAL
+PASS V9-E12-vmax-unchanged hook rc=2 vmax 4.41s | gate-closed rc=2 vmax 5.49s | stderr IDENTICAL
+PASS V7-E13-multiline-copy-normal-text hook rc=2 oversize 0.30s | gate-closed rc=2 oversize 0.29s | stderr IDENTICAL
+PASS V7-E14-long-line-from-expansion hook rc=2 oversize 0.18s | gate-closed rc=2 oversize 0.17s | stderr IDENTICAL
+PASS V7-E15-credit-as-normal hook rc=2 oversize 0.14s | gate-closed rc=2 oversize 0.13s | stderr IDENTICAL
+PASS V1-E16-p1-small-benign hook rc=0 none 0.11s | gate-closed rc=0 none 0.10s | stderr IDENTICAL
+PASS V1-E16-p1-small-read hook rc=2 finding 0.08s | gate-closed rc=2 finding 0.11s | stderr IDENTICAL
+PASS V1-E16-p1-small-read-filter hook rc=0 none 0.07s | gate-closed rc=0 none 0.09s | stderr IDENTICAL
+PASS V1-E16-p1-var-read hook rc=2 finding 0.09s | gate-closed rc=2 finding 0.10s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid hook rc=0 none 0.53s | gate-closed rc=0 none 0.54s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid-read hook rc=2 finding 0.55s | gate-closed rc=2 finding 0.55s | stderr IDENTICAL
+PASS V2-E17-wsl-mark-keeps-baseline hook with WSL_DISTRO_NAME=Ubuntu: rc=2 oversize 0.29s (want rc=2 text=oversize: the gate stays closed, the baseline's size block)
+PASS V2-E18-extension-via-stdin-cwd hook rc=2 oversize 1.18s | gate-closed rc=2 oversize 0.68s | stderr IDENTICAL
+PASS V5-E19-deadline-with-term-ignored hook rc=2 oversize 0.28s | gate-closed rc=2 oversize 0.31s | stderr IDENTICAL
+PASS V0-H2-case-list all 26 expected case ids reported once (mode norelax; one list on every platform)
+# load start 1.96 2.56 2.61 end 2.06 2.52 2.60 | timing batch: void (SKIP [void]): run again

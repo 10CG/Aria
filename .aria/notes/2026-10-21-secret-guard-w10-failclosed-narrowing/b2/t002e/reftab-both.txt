@@ -1,0 +1,35 @@
+V1-E16-p1-small-benign                       b3.2:0 none  b5.0:0 none  b5.1:0 none  b5.2:0 none  b5.3:0 none  i3.2:0 none  i5.0:0 none  i5.1:0 none  i5.2:0 none  i5.3:0 none
+V1-E16-p1-small-read                         b3.2:2 finding  b5.0:2 finding  b5.1:2 finding  b5.2:2 finding  b5.3:2 finding  i3.2:2 finding  i5.0:2 finding  i5.1:2 finding  i5.2:2 finding  i5.3:2 finding
+V1-E16-p1-small-read-filter                  b3.2:0 none  b5.0:0 none  b5.1:0 none  b5.2:0 none  b5.3:0 none  i3.2:0 none  i5.0:0 none  i5.1:0 none  i5.2:0 none  i5.3:0 none
+V1-E16-p1-var-mid                            b3.2:0 none  b5.0:0 none  b5.1:0 none  b5.2:0 none  b5.3:0 none  i3.2:0 none  i5.0:0 none  i5.1:0 none  i5.2:0 none  i5.3:0 none
+V1-E16-p1-var-mid-read                       b3.2:2 finding  b5.0:2 finding  b5.1:2 finding  b5.2:2 finding  b5.3:2 finding  i3.2:2 finding  i5.0:2 finding  i5.1:2 finding  i5.2:2 finding  i5.3:2 finding
+V1-E16-p1-var-read                           b3.2:2 finding  b5.0:2 finding  b5.1:2 finding  b5.2:2 finding  b5.3:2 finding  i3.2:2 finding  i5.0:2 finding  i5.1:2 finding  i5.2:2 finding  i5.3:2 finding
+V2-E18-extension-via-stdin-cwd               b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V2-E6-flag-from-environment-ignored          b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V2-E7-no-time-left                           b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V2-E8-ostype-from-environment-ignored        b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V2-E9-extension-project                      b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V3-E3-anchor-at-hook-start                   b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V3-E4-cap-3-at-budget-4                      b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V3-E5-budget-2                               b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V5-E19-deadline-with-term-ignored            b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V6-E2-deadline-fallback-bytes                b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V6-S20-segment-fallback-text                 b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V6-S21-whole-fallback-text                   b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V7-E13-multiline-copy-normal-text            b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V7-E14-long-line-from-expansion              b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V7-E15-credit-as-normal                      b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V7-E1-benign-big-allowed                     b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V9-E10-count-axis-read-blocked               b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V9-E11-tmax-in-rerun                         b3.2:2 oversize  b5.0:2 oversize  b5.1:2 oversize  b5.2:2 oversize  b5.3:2 oversize  i3.2:2 oversize  i5.0:2 oversize  i5.1:2 oversize  i5.2:2 oversize  i5.3:2 oversize
+V9-E12-vmax-unchanged                        b3.2:2 vmax  b5.0:2 vmax  b5.1:2 vmax  b5.2:2 vmax  b5.3:2 vmax  i3.2:2 vmax  i5.0:2 vmax  i5.1:2 vmax  i5.2:2 vmax  i5.3:2 vmax
+b5.0: [reference] 0, FAIL 15, PASS 13, SKIP 0
+b5.1: [reference] 0, FAIL 15, PASS 13, SKIP 0
+b5.2: [reference] 0, FAIL 15, PASS 13, SKIP 0
+b5.3: [reference] 0, FAIL 15, PASS 13, SKIP 0
+b3.2: [reference] 0, FAIL 0, PASS 26, SKIP 2
+i5.0: [reference] 0, FAIL 0, PASS 136, SKIP 0
+i5.1: [reference] 0, FAIL 0, PASS 136, SKIP 0
+i5.2: [reference] 0, FAIL 0, PASS 136, SKIP 0
+i5.3: [reference] 0, FAIL 0, PASS 136, SKIP 0
+i3.2: [reference] 0, FAIL 0, PASS 78, SKIP 58

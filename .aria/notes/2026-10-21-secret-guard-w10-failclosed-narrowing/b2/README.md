@@ -22,3 +22,7 @@
 - `t002d/`：3b 的过程材料：各整轮的输出 `b-*.out`、移植用例日志 `*.w10log` 与读数 `*.meta`；commentsync 各模式 `cs-*.txt` 与三种构造的结果 `cons/*.txt`；21ab 计时材料 `m21ab/`；改动脚本 `apply3b.py`。
   - 没收：59e333c 的 hook 与套件、3a 提交的套件、构造出来的套件副本（都可由 git 或报告里的说明重新得到），改动前的 `commentsync.py`。
 - `t002d-verify/`：主控对 3b 的独立复核（2026-10-24 12:37–12:57 UTC）。`PREDICT.md` 是实测前写下的预期，`VERIFY.md` 是逐项结果；`probe21ab.sh` 与 `probe.txt` 是 21ab 两条放行命令的计时（「关门不到 1 s」的预期不对，见 VERIFY.md）；`cs/` 是 commentsync 的各模式与两个构造（`cons.py` 生成）；`full-path.*`、`full-interop.*` 是两整轮。
+- `BRIEF-T002c-3c.md`、`T002c-3c-report.md`：第三步 3c（关门臂对照 59e333c 的已知结局 `[reference]`、6 组放宽支的截止回落判法初版、`run-suite.sh` 首行记 helper 前缀、垫片头注释）的任务书与执笔席报告（2026-10-24）。结果是 aria 分支提交 `5afef08` 与主仓 `../v31/run-suite.sh`。报告里的相对路径相对 `t002e/`。
+- `t002e/`：3c 的过程材料：参照表的测量 `base-*`（59e333c）、`impl-*`（实现）与合表 `reftab-*.txt`（`reftab.sh` 生成）；现状轮 `s0a.*`、`s0b.*`；坏实现抽查 `mut-*`；整轮 `full.*`；两个构造的输出 `c1.txt`、`c2.txt` 与对实现的改动 `c1-hook.diff`、`c2-hook.diff`；改动脚本 `patch3c.py`；驱动 `drive2.sh`、`drive3.sh`、`step0.sh`、`lib.sh` 与时间线 `drive.log`；commentsync 套件一侧 `commentsync-suite.txt`。
+  - 没收：59e333c 与两个构造的整份 hook 副本（由 git 与两个 diff 可复现）；坏实现的整份 hook（`mut/`，可用 `../v31/mutants.py` 复现）；临时目录 `stage/`、`work/`。
+- `t002e-verify/`：主控对 3c 的独立复核（2026-10-24 14:20–14:40 UTC）。`PREDICT.md` 是实测前写下的预期，`VERIFY.md` 是逐项结果；`branches.py` 对照 6 组两支，`refcheck.sh` 拿参照表对原始日志，`mkprobe.py` 构造参照负控副本，`drive.sh` / `drive.log` 是串行驱动；`r1`-`r4` 是四轮输出，`bi8-hook.diff` 是主控自己构造的 BI-8。结论：行为全部相符，过滤轮的计数预期漏算了恒在的 V0-H1 / V0-H2；复核 hook 时发现截止回落下界 2.85 s 的另一侧洞（重跑自己的时间检查点），改定的判法交 3c2，任务书 `BRIEF-T002c-3c2.md`。

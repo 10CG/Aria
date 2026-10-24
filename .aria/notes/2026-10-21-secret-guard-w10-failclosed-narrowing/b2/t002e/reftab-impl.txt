@@ -1,0 +1,30 @@
+V1-E16-p1-small-benign                       3.2:0 none  5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-small-read                         3.2:2 finding  5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V1-E16-p1-small-read-filter                  3.2:0 none  5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-var-mid                            3.2:0 none  5.0:0 none  5.1:0 none  5.2:0 none  5.3:0 none
+V1-E16-p1-var-mid-read                       3.2:2 finding  5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V1-E16-p1-var-read                           3.2:2 finding  5.0:2 finding  5.1:2 finding  5.2:2 finding  5.3:2 finding
+V2-E18-extension-via-stdin-cwd               3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E6-flag-from-environment-ignored          3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E7-no-time-left                           3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E8-ostype-from-environment-ignored        3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V2-E9-extension-project                      3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E3-anchor-at-hook-start                   3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E4-cap-3-at-budget-4                      3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V3-E5-budget-2                               3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V5-E19-deadline-with-term-ignored            3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-E2-deadline-fallback-bytes                3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-S20-segment-fallback-text                 5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V6-S21-whole-fallback-text                   5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E13-multiline-copy-normal-text            3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E14-long-line-from-expansion              3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E15-credit-as-normal                      3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V7-E1-benign-big-allowed                     3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E10-count-axis-read-blocked               3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E11-tmax-in-rerun                         3.2:2 oversize  5.0:2 oversize  5.1:2 oversize  5.2:2 oversize  5.3:2 oversize
+V9-E12-vmax-unchanged                        3.2:2 vmax  5.0:2 vmax  5.1:2 vmax  5.2:2 vmax  5.3:2 vmax
+5.0: [reference] 0, FAIL 0, PASS 136, SKIP 0
+5.1: [reference] 0, FAIL 0, PASS 136, SKIP 0
+5.2: [reference] 0, FAIL 0, PASS 136, SKIP 0
+5.3: [reference] 0, FAIL 0, PASS 136, SKIP 0
+3.2: [reference] 0, FAIL 0, PASS 78, SKIP 58

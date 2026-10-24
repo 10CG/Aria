@@ -1,0 +1,11 @@
+--- impl
++++ bi8
+@@ -602,7 +602,7 @@
+ _SGV_N=(); _SGV_V=()
+ _SG_SUB=""
+ _SG_RP=""
+-_SGV_VMAX=4096
++_SGV_VMAX=8192
+ _SGV_SMAX=8192
+ _SGV_TMAX=65536
+ _SGV_GMAX=8192   # 10CG/aria-plugin#217 relaxed rerun: a copy may grow by at most this many characters over its input
