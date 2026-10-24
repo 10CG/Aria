@@ -40,6 +40,7 @@ job "hermes-upgrade-poc" {
       env {
         # P4: claude -p 走 luxeno 路由 (与现役 orchestrator 同款接线)
         ANTHROPIC_BASE_URL = "https://api.luxeno.ai"
+        ANTHROPIC_MODEL    = "glm-4.5-air"
         TZ                 = "UTC"
       }
 
