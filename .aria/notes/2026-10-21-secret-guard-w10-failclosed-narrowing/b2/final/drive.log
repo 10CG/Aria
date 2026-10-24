@@ -1,0 +1,21 @@
+17:52:58 aria acb644b dirty=0 hook af4658b6f935 suite d4168aace3e8 helper 213d01379695 | load 1.36 1.51 1.44
+17:53:18 F sc_bash 5.2 start | load 1.19 1.46 1.43
+17:58:51 F sc_bash 5.2 end rc=0 | load 2.08 1.79 1.58
+17:59:51 F sc_bash 5.0 start | load 1.04 1.54 1.51
+18:05:25 F sc_bash 5.0 end rc=0 | load 2.08 2.04 1.77
+18:07:25 F sc_bash 5.1 start | load 1.17 1.69 1.67
+18:12:51 F sc_bash 5.1 end rc=0 | load 2.30 2.03 1.82
+18:13:51 F sc_bash 5.3 start | load 1.18 1.77 1.74
+18:19:15 F sc_bash 5.3 end rc=0 | load 1.79 1.87 1.80
+18:20:35 F sc_bash 3.2 start | load 0.95 1.60 1.71
+18:25:46 F sc_bash 3.2 end rc=0 | load 1.99 1.94 1.84
+18:26:46 F wsl_distro start | load 1.12 1.71 1.76
+18:32:11 F wsl_distro end rc=0 | load 2.09 2.01 1.88
+18:33:31 F wsl_interop start | load 0.99 1.68 1.78
+18:38:56 F wsl_interop end rc=0 | load 1.62 1.69 1.75
+18:38:56 commentsync target rc=0 | load 1.62 1.69 1.75
+18:38:57 commentsync baseline rc=0 (base hook e83c5e30f2cc) | load 1.62 1.69 1.75
+18:38:57 done | load 1.62 1.69 1.75
+18:40:45 F sc_bash 5.0 rerun start (the first round's timing batch was void: end load 2.06) | load 0.78 1.40 1.64
+18:46:20 F sc_bash 5.0 rerun end rc=0 | load 2.10 1.86 1.76
+18:46:20 rerun done | load 2.10 1.86 1.76
