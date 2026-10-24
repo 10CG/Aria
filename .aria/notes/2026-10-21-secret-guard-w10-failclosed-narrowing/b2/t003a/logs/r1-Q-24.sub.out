@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T19:15:41Z | hook 899014e4d653 | suite d4168aace3e8 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V3-E3-anchor-at-hook-start)$ | load 1.13 1.07 1.03
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V3-E3-anchor-at-hook-start)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 3
+FAIL: 1 / 3
+SKIP: 0 / 3 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.13 1.07 1.03 end 1.04 1.05 1.02 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V3-E3-anchor-at-hook-start]: hook rc=2 oversize 4.60s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [wall>hi]
+
+# run-suite.sh end | load 1.04 1.05 1.02 | suite exit 1

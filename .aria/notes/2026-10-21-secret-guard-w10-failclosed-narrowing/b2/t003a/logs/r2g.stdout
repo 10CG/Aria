@@ -1,0 +1,6 @@
+Q-7: caught by the added case (V14-G1-triggers-return-4-with-the-baseline-reason )
+Q-15: caught by the added case (V14-N1-nocredit-never-runs-credit )
+Q-22: caught by the added case (V14-N2-longline-pattern-is-a-rule )
+Q-29: caught by the added case (V14-F1-status-4-falls-back-to-the-baseline-block )
+Q-31: caught by the added case (V14-G2-growth-limit-follows-gmax )
+# end | 2026-10-24T19:25:48Z | load 1.03 0.91 0.94 | caught as predicted 0, caught by the added case 5, caught elsewhere 0, not judged 0, NOT CAUGHT 0

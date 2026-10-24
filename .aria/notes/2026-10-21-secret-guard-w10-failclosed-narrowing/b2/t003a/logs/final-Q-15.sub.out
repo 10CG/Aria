@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T19:35:37Z | hook 0d016c37051c | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V7-E14-long-line-from-expansion|V14-N1-nocredit-never-runs-credit)$ | load 1.18 1.51 1.28
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V7-E14-long-line-from-expansion|V14-N1-nocredit-never-runs-credit)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 3 / 4
+FAIL: 1 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.18 1.51 1.28 end 1.18 1.51 1.28 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V14-N1-nocredit-never-runs-credit]: nocredit on a matching line over 8192: status/text/credit [2 longline credit-run] (want [2 longline credit-skipped]); the credit must not be computed before the longline block [judged]
+
+# run-suite.sh end | load 1.18 1.51 1.28 | suite exit 1

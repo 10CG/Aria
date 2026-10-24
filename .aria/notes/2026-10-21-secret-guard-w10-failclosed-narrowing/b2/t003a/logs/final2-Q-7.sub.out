@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T19:42:49Z | hook 976120036a12 | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V2-G12-segment-trigger-asks-gate|V14-G1-triggers-return-4-with-the-baseline-reason)$ | load 1.18 1.38 1.30
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V2-G12-segment-trigger-asks-gate|V14-G1-triggers-return-4-with-the-baseline-reason)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 3 / 4
+FAIL: 1 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.18 1.38 1.30 end 1.18 1.38 1.30 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V14-G1-triggers-return-4-with-the-baseline-reason]: gate stubbed open, baseline pass, a copy over 8192: whole [4|the command is longer than 8192 characters after variable expansion|whole] (want [4|the command is longer than 8192 characters after variable expansion|whole]); segment [] (want [4|a command segment is longer than 8192 characters after variable expansion|segment]) [status] [text]
+
+# run-suite.sh end | load 1.18 1.38 1.30 | suite exit 1

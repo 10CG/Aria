@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:43:34Z | hook f9d5c4080019 | direct 4f467588aef1 | shim 5c5c04525a67 | filter ^(V6-E2-deadline-fallback-bytes|V6-S20-segment-fallback-text)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V6-S20-segment-fallback-text gate open, a segment copy over 8192: status/mode/text-bytes [4 segment 0] (want [4 segment 0]); fallback text 719 bytes vs the same hook's block with the gate closed by WSL_DISTRO_NAME (status 2 oversize) 719 bytes: IDENTICAL
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V6-E2-deadline-fallback-bytes hook rc=2 oversize 3.02s | gate-closed rc=2 oversize 0.09s | stderr DIFFERENT sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [bytes]
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.03 1.33 1.28 end 1.11 1.34 1.29 | timing batch: judged

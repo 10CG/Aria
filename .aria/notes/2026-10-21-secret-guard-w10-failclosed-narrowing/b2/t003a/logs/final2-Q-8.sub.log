@@ -1,0 +1,5 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:42:51Z | hook c0c0e52c5cfc | direct 4f467588aef1 | shim 5c5c04525a67 | filter ^(V2-G4-extension-path-is-a-directory)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V2-G4-extension-path-is-a-directory status 0 (want 1) [status]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.41 1.42 1.31 end 1.41 1.42 1.31 | timing batch: judged

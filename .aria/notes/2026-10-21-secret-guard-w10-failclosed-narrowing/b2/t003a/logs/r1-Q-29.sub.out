@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-24T19:15:59Z | hook 577ec261106a | suite d4168aace3e8 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY ^(V6-E2-deadline-fallback-bytes|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text)$ | load 1.03 1.05 1.02
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V6-E2-deadline-fallback-bytes|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 4 / 5
+FAIL: 1 / 5
+SKIP: 0 / 5 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.03 1.05 1.02 end 1.18 1.08 1.03 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 other 3.01s | gate-closed rc=2 oversize 0.12s | stderr DIFFERENT sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [bytes]
+
+# run-suite.sh end | load 1.18 1.08 1.03 | suite exit 1

@@ -1,0 +1,143 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:27:10Z | hook af4658b6f935 | direct 4f467588aef1 | shim 5c5c04525a67 | filter . | SC_BASH /home/dev/.aria/tools/bash-3.2.57/bash (x86_64-unknown-linux-gnu 3.2) -> relaxation expected: no
+PASS V2-G1-gate this bash: status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.0 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.1 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.3 status 0 (want 0)
+PASS V2-G2-platform:aarch64-unknown-linux-gnu:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:6.0 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:4.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-unknown-linux-gnu:3.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-apple-darwin23.0.0:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-msys:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-cygwin:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-alpine-linux-musl:5.2 status 1 (want 1)
+PASS V2-G2-platform:aarch64-unknown-linux-android:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl1 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2-2020 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-WSL-tag status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:wsl-mark status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-empty status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:three-args status 1 (want 1)
+PASS V2-G3-gate-calls-platform status 1 with the platform check failing (want 1)
+PASS V2-G3b-gate-uses-build-facts platform check got [x86_64-unknown-linux-gnu|3|2|6.17.9-1-pve|], want [x86_64-unknown-linux-gnu|3|2|6.17.9-1-pve|] (OSTYPE, MACHTYPE and HOSTTYPE set to darwin / aarch64: R2 PP2-m8)
+PASS V2-G4-project-without-extension-file status 1 (want 1)
+PASS V2-G4-extension-file-with-entry status 1 (want 1)
+PASS V2-G4-empty-extension-file status 1 (want 1)
+PASS V2-G4-extension-path-is-a-directory status 1 (want 1)
+PASS V2-G5-nested status 1 (want 1)
+PASS V2-G6-no-time-left status 1 (want 1)
+PASS V2-G7-no-anchor status 1 (want 1)
+PASS V2-G8-budget-0 status 1 (want 1)
+PASS V2-G11-flag-not-from-environment a hook sourced with _SG_RELAXED=1 in its environment holds [] (want [])
+PASS V2-G12-segment-trigger-asks-gate the platform check failing, a segment copy over 8192: status/text [2 oversize] (want [2 oversize], never 4)
+PASS V2-G13-whole-trigger-asks-gate the platform check failing, a whole copy over 8192: status/text [2 oversize] (want [2 oversize], never 4)
+PASS V2-G14-cwd-extension-file-with-entry the project root only through the stdin cwd, its extension file has an entry: status 1 (want 1)
+PASS V2-G15-cwd-project-without-extension-file the project root only through the stdin cwd, no extension file: status 1 (want 1)
+PASS V2-G16-environment-root-before-cwd CLAUDE_PROJECT_DIR without an extension, a stdin cwd with one: status 1 (want 1: the environment's root comes first)
+PASS V2-G17-wsl-distro-name-closes-gate WSL_DISTRO_NAME set: status 1 (want 1)
+PASS V2-G18-wsl-interop-closes-gate WSL_INTEROP set: status 1 (want 1)
+PASS V11-S5-longline-head-verbatim the description of the longline text equals proposal What 5 (7 lines)
+PASS V11-S6-longline-chinese-line-verbatim the line in Chinese equals proposal What 5
+PASS V11-S7-longline-text-verbatim the whole longline text equals proposal What 5 (855 bytes)
+SKIP V3-G9-clock-backwards [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V3-G10-cap-3 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V3-G12-time-left-zero-padded [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S1-allow [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S2-block-with-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S3-block-without-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V3-S4-slow-judgement [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S5-pipe-holder [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S6-spoofed-tail-0 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S7-time-checkpoint [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S8-internal-error [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S9-child-left-behind [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S13-detached-child [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S13b-nothing-outlives-the-run [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S11-bare-zero [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S10-timer-fork-fails [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S10b-no-judgement-without-timer [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S10c-dead-timer-no-judgement [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S10d-no-judgement-with-dead-timer [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S14-failing-sleep-kills-at-once [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S15-job-refuses-outside-group-leader [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S19-block-text-bytes [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V5-S12-no-leftovers [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S16-rerun-collect-checkpoint [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S17-rerun-whole-checkpoint [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V4-S18-rerun-segment-checkpoint [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V6-S20-segment-fallback-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V6-S21-whole-fallback-text [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D1-late-references-plain [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D1-late-references-braced [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D2-growth-8192-plain [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D3-growth-8193-plain [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D2-growth-8192-braced [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D3-growth-8193-braced [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D4-growth-text-whole [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V8-D5-growth-text-segment [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C1-assignments-rerun [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C1b-assignments-baseline [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C2-references-rerun-c12 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C2b-references-baseline-c12 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C2-references-rerun-cb12 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C2b-references-baseline-cb12 [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C3-for-statements-rerun [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C3b-for-statements-baseline [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V9-C4-value-limit-in-rerun [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V10-N1-environ-rows-only [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V10-N2-read-rows-only [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V10-N3-environ-big-judge [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V10-N4-read-big-judge [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N5-read-big-judge-short-lines [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V10-N6-filtered-long-line-rows-only [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N7-big-judge-filtered-long-line [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N10-blank-padded-long-line [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N11-lmax-edge-normal [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N12-lmax-edge-rows-only [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N8-whole-branch-returns-big-judge [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N9-segment-routes-to-big-judge [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V7-N13-unmeasured-length-rows-only [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V14-N1-nocredit-never-runs-credit [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V14-N2-longline-pattern-is-a-rule [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V14-G1-triggers-return-4-with-the-baseline-reason [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V14-G2-growth-limit-follows-gmax [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+SKIP V14-F1-status-4-falls-back-to-the-baseline-block [platform] the relaxation is not expected on this bash (x86_64-unknown-linux-gnu 3.2, kernel 6.17.9-1-pve): MODE norelax
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (norelax) ran to its sentinel and exited 0
+PASS V7-E1-benign-big-allowed hook rc=2 oversize 0.26s | gate-closed rc=2 oversize 0.24s | stderr IDENTICAL
+PASS V6-E2-deadline-fallback-bytes hook rc=2 oversize 0.23s | gate-closed rc=2 oversize 0.24s | stderr IDENTICAL
+PASS V3-E3-anchor-at-hook-start hook rc=2 oversize 0.25s | gate-closed rc=2 oversize 0.27s | stderr IDENTICAL
+PASS V3-E4-cap-3-at-budget-4 hook rc=2 oversize 0.26s | gate-closed rc=2 oversize 0.24s | stderr IDENTICAL
+PASS V3-E5-budget-2 hook rc=2 oversize 0.31s | gate-closed rc=2 oversize 0.27s | stderr IDENTICAL
+PASS V2-E6-flag-from-environment-ignored hook rc=2 oversize 0.26s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V2-E7-no-time-left hook rc=2 oversize 0.29s | gate-closed rc=2 oversize 0.28s | stderr IDENTICAL
+PASS V2-E8-ostype-from-environment-ignored hook rc=2 oversize 0.25s | gate-closed rc=2 oversize 0.23s | stderr IDENTICAL
+PASS V2-E9-extension-project hook rc=2 oversize 0.64s | gate-closed rc=2 oversize 0.56s | stderr IDENTICAL
+PASS V9-E10-count-axis-read-blocked hook rc=2 oversize 0.31s | gate-closed rc=2 oversize 0.31s | stderr IDENTICAL
+PASS V9-E11-tmax-in-rerun hook rc=2 oversize 4.93s | gate-closed rc=2 oversize 4.90s | stderr IDENTICAL
+PASS V9-E12-vmax-unchanged hook rc=2 vmax 4.69s | gate-closed rc=2 vmax 4.66s | stderr IDENTICAL
+PASS V7-E13-multiline-copy-normal-text hook rc=2 oversize 0.28s | gate-closed rc=2 oversize 0.27s | stderr IDENTICAL
+PASS V7-E14-long-line-from-expansion hook rc=2 oversize 0.17s | gate-closed rc=2 oversize 0.18s | stderr IDENTICAL
+PASS V7-E15-credit-as-normal hook rc=2 oversize 0.13s | gate-closed rc=2 oversize 0.16s | stderr IDENTICAL
+PASS V1-E16-p1-small-benign hook rc=0 none 0.08s | gate-closed rc=0 none 0.08s | stderr IDENTICAL
+PASS V1-E16-p1-small-read hook rc=2 finding 0.07s | gate-closed rc=2 finding 0.07s | stderr IDENTICAL
+PASS V1-E16-p1-small-read-filter hook rc=0 none 0.07s | gate-closed rc=0 none 0.08s | stderr IDENTICAL
+PASS V1-E16-p1-var-read hook rc=2 finding 0.11s | gate-closed rc=2 finding 0.09s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid hook rc=0 none 0.63s | gate-closed rc=0 none 0.60s | stderr IDENTICAL
+PASS V1-E16-p1-var-mid-read hook rc=2 finding 0.51s | gate-closed rc=2 finding 0.59s | stderr IDENTICAL
+PASS V2-E17-wsl-mark-keeps-baseline hook with WSL_DISTRO_NAME=Ubuntu: rc=2 oversize 0.23s (want rc=2 text=oversize: the gate stays closed, the baseline's size block)
+PASS V2-E18-extension-via-stdin-cwd hook rc=2 oversize 0.55s | gate-closed rc=2 oversize 0.56s | stderr IDENTICAL
+PASS V5-E19-deadline-with-term-ignored hook rc=2 oversize 0.26s | gate-closed rc=2 oversize 0.25s | stderr IDENTICAL
+PASS V11-S1-above-gate:_sg_vx_big_judge line 801 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_left line 807 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_ok line 819 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_platform line 828 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_noext line 831 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_job line 836 < sourcing gate 1057
+PASS V11-S1-above-gate:_sg_relax_run line 849 < sourcing gate 1057
+PASS V11-S3-longline-instructions-verbatim the longline instruction lines equal the oversize ones (4 lines)
+PASS V11-S4-one-rule-loop loops over risky_patterns: 1 (want exactly 1, the baseline's count)
+PASS V0-H2-case-list all 139 expected case ids reported once (mode norelax; one list on every platform)
+# load start 1.06 0.95 0.95 end 1.18 0.99 0.97 | timing batch: judged

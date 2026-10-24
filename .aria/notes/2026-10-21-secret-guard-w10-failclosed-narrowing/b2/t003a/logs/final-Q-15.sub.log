@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:35:38Z | hook 0d016c37051c | direct 4f467588aef1 | shim 5c5c04525a67 | filter ^(V7-E14-long-line-from-expansion|V14-N1-nocredit-never-runs-credit)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V14-N1-nocredit-never-runs-credit nocredit on a matching line over 8192: status/text/credit [2 longline credit-run] (want [2 longline credit-skipped]); the credit must not be computed before the longline block [judged]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V7-E14-long-line-from-expansion hook rc=2 longline 0.38s | gate-closed rc=2 oversize 0.08s | stderr DIFFERENT (want rc=2 text=longline within 4.5 s)
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.18 1.51 1.28 end 1.18 1.51 1.28 | timing batch: judged

@@ -1,0 +1,7 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:43:58Z | hook 60e1bedda384 | direct 4f467588aef1 | shim 5c5c04525a67 | filter ^(V3-G10-cap-3|V3-E5-budget-2|V3-E4-cap-3-at-budget-4)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+FAIL V3-G10-cap-3 time left 3.999864 at budget 4 (want 2.9 < left <= 3.000000: min(budget, 3)) [value]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V3-E4-cap-3-at-budget-4 hook rc=2 oversize 4.02s | gate-closed rc=2 oversize 0.10s | stderr IDENTICAL sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [wall>hi]
+FAIL V3-E5-budget-2 hook rc=2 oversize 3.02s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL sed-stall=job (want IDENTICAL, wall window 1.85..2.6) [wall>hi]
+PASS V0-H2-case-list all 3 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.07 1.32 1.28 end 1.13 1.33 1.28 | timing batch: judged

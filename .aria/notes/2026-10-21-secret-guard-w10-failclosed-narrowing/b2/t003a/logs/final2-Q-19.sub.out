@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T19:43:35Z | hook b3ca88212e21 | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V5-S13b-nothing-outlives-the-run|V5-S9-child-left-behind)$ | load 1.11 1.34 1.29
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V5-S13b-nothing-outlives-the-run|V5-S9-child-left-behind)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.11 1.34 1.29 end 1.18 1.35 1.29 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V5-S9-child-left-behind]: rc=0 (want 0) wall=1.00s (want 0..0.3) stderr='' (want '') [wall>hi]
+  FAIL [W10-port V5-S13b-nothing-outlives-the-run]: a child that does not hold the pipe, alive within 1 s after _sg_relax_run returned: 1 (want 0; sleep 7.777470709 is unique to this run) [leftover]
+
+# run-suite.sh end | load 1.18 1.35 1.29 | suite exit 1

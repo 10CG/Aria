@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T19:43:48Z | hook ea956f733f8d | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V2-G11-flag-not-from-environment|V2-E6-flag-from-environment-ignored)$ | load 1.07 1.32 1.28
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V2-G11-flag-not-from-environment|V2-E6-flag-from-environment-ignored)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.07 1.32 1.28 end 1.07 1.32 1.28 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V2-G11-flag-not-from-environment]: a hook sourced with _SG_RELAXED=1 in its environment holds [1] (want []) [value]
+  FAIL [W10-port V2-E6-flag-from-environment-ignored]: hook rc=2 longline 0.12s | gate-closed rc=2 oversize 0.09s | stderr DIFFERENT sed-stall=none (want IDENTICAL, wall window 2.85..3.6) [bytes] [wall<lo]
+
+# run-suite.sh end | load 1.07 1.32 1.28 | suite exit 1

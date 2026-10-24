@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T19:42:47Z | hook a13691490bb4 | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V2-G3b-gate-uses-build-facts|V2-E8-ostype-from-environment-ignored)$ | load 1.18 1.38 1.30
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V2-G3b-gate-uses-build-facts|V2-E8-ostype-from-environment-ignored)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 2 / 4
+FAIL: 2 / 4
+SKIP: 0 / 4 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.18 1.38 1.30 end 1.18 1.38 1.30 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V2-G3b-gate-uses-build-facts]: platform check got [x86_64-apple-darwin23.0.0|5|2|6.17.9-1-pve|], want [x86_64-pc-linux-gnu|5|2|6.17.9-1-pve|] (OSTYPE, MACHTYPE and HOSTTYPE set to darwin / aarch64: R2 PP2-m8) [value]
+  FAIL [W10-port V2-E8-ostype-from-environment-ignored]: hook rc=2 oversize 0.09s | gate-closed rc=2 oversize 0.09s | stderr IDENTICAL (want rc=0 text=none within 4.5 s) [fallback]
+
+# run-suite.sh end | load 1.18 1.38 1.30 | suite exit 1

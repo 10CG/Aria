@@ -42,3 +42,8 @@
 - `t002h-verify/`：主控对 3e 的独立复核（2026-10-24 17:20–17:52 UTC）。`PREDICT.md` 是 3e 交回之前写下的预期，`VERIFY.md` 是逐项结果；主控自己的构造以 `c3-hook.diff` 为底，`stall2.sh` / `stall3.sh` 是包装脚本（按输入只让关门调用前 2 / 3 次各卡 1.5 s），`c5-hook.diff` 是快速失败构造；`r1`-`r3` 是 `run-suite.sh` 的三项检查，`stall2.excerpt.txt`、`stall3.excerpt.txt`（两轮包装构造只收 `excerpt.py` 生成的摘录，原因同 `t002h/` 的「没收」）、`c5.txt`、`impl.txt` 是四个整轮；`drive.sh` / `drive.log` 是串行驱动。结论：预期相符，快速失败构造里漏写了一处已记录的固有限度。
 - `final/`：TASK-002 的最终整轮（主控，2026-10-24 17:53–18:46 UTC，aria `acb644b` 的 git 检出）。`PREDICT.md` 是开跑前写下的预期，`VERIFY.md` 是逐轮结果；`full-<bash>.txt` 是 5 个 `SC_BASH` 的整轮（5.0 首轮因 W10 批尾负载 2.06 作废，`full-5.0-r2.txt` 是低负载补跑），`full-wsldistro.txt`、`full-wslinterop.txt` 是导出两种 WSL 标记的整轮，`cs-target.txt`、`cs-baseline.txt` 是 commentsync；驱动 `drive.sh`、`rerun50.sh` 与时间线 `drive.log`。全部 FAIL 0，预期全部相符；TASK-002 的完成判定记在计划 notes。
 - `BRIEF-T003a.md`：TASK-003 第一段（QA 席非作者独立构造坏实现，盲构造并冻结、预先写下抓它的用例、上机核对、缺口补用例）的任务书。
+- `T003a-report.md`：TASK-003 第一段（QA 席非作者独立构造坏实现）的执笔席报告（2026-10-24），任务书是上面的 `BRIEF-T003a.md`。交付在 `../v31/impl/`（`w14.sh`、`w14-mutants.py`、`W14-independent-mutants.txt`）；补的 5 个直调用例在 aria 提交 `2893bcc` 与 `../v31/sc-direct.sh`。
+- `t003a/`：第一段的过程材料：冻结的清单 `list.md`、预测 `predict.md` 与冻结记录 `FROZEN.sha`；缺口到补用例的对照 `gapmap.tsv`；补用例的补丁脚本 `patch-v14.py`；生成器输出 `gen.*`；每次运行的原始输出 `logs/`（`r1-*` 第一轮、`final2-*` 终轮、`impl-*` 实现各轮）。
+  - 没收：31 个坏实现的整份 hook（`mut/`，只在 scratchpad；由 `../v31/impl/w14-mutants.py` 从实现复现）。
+- `t003a-verify/`：主控对第一段的独立复核（2026-10-24 19:50–20:13 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是逐项结果；`W14-rerun.txt` 是主控在自己的目录里用 `w14.sh` 重新生成并复跑 31 个坏实现的结果（与交付记录逐个相同）；`sc.txt`、`w10-*.txt`、`full.txt` 是实现上的各轮；`drive.sh` / `drive.log` 是串行驱动。结论：预期全部相符。
+- `BRIEF-T003b.md`：TASK-003 第二段（对抗耗时矩阵）的任务书。

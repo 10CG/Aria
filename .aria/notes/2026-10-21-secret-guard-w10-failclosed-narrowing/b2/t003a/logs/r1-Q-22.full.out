@@ -1,0 +1,9 @@
+# run-suite.sh | 2026-10-24T19:14:11Z | hook fc5ad3fab886 | suite d4168aace3e8 | helper 213d01379695 | SC_BASH bash on PATH | SG_W10_ONLY . | load 1.20 1.03 1.02
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=.): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 136 / 136
+FAIL: 0 / 136
+SKIP: 0 / 136 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.20 1.03 1.02 end 1.19 1.03 1.02 | timing batch: judged
+# run-suite.sh end | load 1.19 1.03 1.02 | suite exit 0

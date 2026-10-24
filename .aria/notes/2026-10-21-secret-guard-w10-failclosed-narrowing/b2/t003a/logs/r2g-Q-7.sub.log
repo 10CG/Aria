@@ -1,0 +1,6 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-24T19:25:40Z | hook 976120036a12 | direct 4f467588aef1 | shim 5c5c04525a67 | filter ^(V2-G12-segment-trigger-asks-gate|V14-G1-triggers-return-4-with-the-baseline-reason)$ | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V2-G12-segment-trigger-asks-gate the platform check failing, a segment copy over 8192: status/text [2 oversize] (want [2 oversize], never 4)
+FAIL V14-G1-triggers-return-4-with-the-baseline-reason gate stubbed open, baseline pass, a copy over 8192: whole [4|the command is longer than 8192 characters after variable expansion|whole] (want [4|the command is longer than 8192 characters after variable expansion|whole]); segment [] (want [4|a command segment is longer than 8192 characters after variable expansion|segment]) [status] [text]
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 2 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.13 0.93 0.94 end 1.13 0.93 0.94 | timing batch: judged

@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-24T19:25:43Z | hook 577ec261106a | suite 3351b47da825 | helper 4f467588aef1 | SC_BASH bash on PATH | SG_W10_ONLY ^(V6-E2-deadline-fallback-bytes|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text|V14-F1-status-4-falls-back-to-the-baseline-block)$ | load 1.12 0.93 0.94
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^(V6-E2-deadline-fallback-bytes|V6-S20-segment-fallback-text|V6-S21-whole-fallback-text|V14-F1-status-4-falls-back-to-the-baseline-block)$): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 4 / 6
+FAIL: 2 / 6
+SKIP: 0 / 6 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.12 0.93 0.94 end 1.03 0.91 0.94 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V14-F1-status-4-falls-back-to-the-baseline-block]: _sg_per_segment_eval with a rerun that falls back (status 4): status 4 (want 2), first line [] (want [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command is longer than 8192 characters after variable expansion]) [status] [text]
+  FAIL [W10-port V6-E2-deadline-fallback-bytes]: hook rc=2 other 3.01s | gate-closed rc=2 oversize 0.09s | stderr DIFFERENT sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [bytes]
+
+# run-suite.sh end | load 1.03 0.91 0.94 | suite exit 1
