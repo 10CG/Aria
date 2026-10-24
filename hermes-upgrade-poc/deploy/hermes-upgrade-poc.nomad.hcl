@@ -56,6 +56,10 @@ ANTHROPIC_API_KEY={{ .LUXENO_API_KEY }}
 docker_auth_user={{ .docker_auth_user }}
 docker_auth_password={{ .docker_auth_password }}
 {{- end }}
+{{- with nomadVar "nomad/jobs/hermes-upgrade-poc" }}
+FEISHU_APP_ID={{ .FEISHU_APP_ID }}
+FEISHU_APP_SECRET={{ .FEISHU_APP_SECRET }}
+{{- end }}
 EOH
       }
 
