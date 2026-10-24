@@ -1,0 +1,27 @@
+RED anchor  9 test :2510-2518 W10 block head         n=1  beyond a limit the command is BLOCKED
+RED anchor  9 test :2510-2518 W10 block head         n=1  _SGV_SMAX 8192 = one substituted copy
+RED block   9 test :2510-2518 W10 block head         n=1  the baseline block is still there
+RED anchor  10 test :2544-2549 21aa/21ab             n=1  the WHOLE judged string, not its growth
+RED block   10 test :2544-2549 21aa/21ab             n=1  the baseline block is still there
+RED anchor  11 test :2556-2562 21ac/21ad             n=1  which is how a 4096-character list is refused
+RED block   11 test :2556-2562 21ac/21ad             n=1  the baseline block is still there
+RED anchor  12 test :2578-2585 21af/21ag             n=1  Red when (21ag): the 36 KB dense copy passes
+RED block   12 test :2578-2585 21af/21ag             n=1  the baseline block is still there
+RED anchor  13 test :2597-2599 21aj                  n=1  Red when (21aj): such a segment is skipped or counted instead of refused
+RED block   13 test :2597-2599 21aj                  n=1  the baseline block is still there
+RED anchor  14 test :2628-2632 21al                  n=1  Red when (21al): the braced 8193-character whole copy passes
+RED block   14 test :2628-2632 21al                  n=1  the baseline block is still there
+RED anchor  15 test :2679-2681 21ao                  n=1  Red when (21ao): the 8193-character whole copy passes
+RED block   15 test :2679-2681 21ao                  n=1  the baseline block is still there
+RED anchor  21 test :2628-2630 21al head             n=1  the copy limit holds for the braced form ${NAME} too
+RED block   21 test :2628-2630 21al head             n=1  the baseline block is still there
+RED anchor  22 test :2679 21ao head                  n=1  whole-command mode (the command degrades because of a `(`) obeys the same copy limit
+RED block   22 test :2679 21ao head                  n=1  the baseline block is still there
+RED title   16 test :2552 21ab title                 n=1  W10 SC-21ab bf: copy limit exceeded is refused — 8193 characters: the copy is not judged, the command is block
+RED title   17 test :2586 21ag title                 n=1  W10 SC-21ag bf: the dense shape of the review (15 assignments of 300 B, 8 references each: a 36 KB copy; 16 x 
+RED title   18 test :2605 21aj title                 n=1  W10 SC-21aj bf: a segment over the copy limit ends the pass — with one, seven or eight of them in front of the
+RED title   19 test :2633 21al title                 n=1  W10 SC-21al bf: the copy limit holds for the braced form too — a substituted whole command of exactly 8192 cha
+RED title   20 test :2682 21ao title                 n=1  W10 SC-21ao bf: whole-command mode obeys the copy limit — a whole copy of exactly 8192 characters is judged an
+RED add     test                                     n=0  _SGV_GMAX
+RED add     test                                     n=0  longline
+target --suite-only: RED (26)

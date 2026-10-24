@@ -1,0 +1,6 @@
+# sc-cases.sh | 2026-10-24T05:17:45Z | hook 7529c4e49cf2 | base e83c5e30f2cc | sc-cases e537079f6738 sc-direct e97513c59e58 mutants 2060d2e0c17f shim 637c52c10bbf shapes 12ec06e470da commentsync cdab1c8debca | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 1.47 1.67 3.68 -> timing batch judged (SC_LOAD_MAX 2)
+FAIL V6-S20-segment-fallback-text gate open, a segment copy over 8192: status/mode/text-bytes [4 segment 0] (want [4 segment 0]); fallback text 713 bytes vs the baseline's block (status 2) 719 bytes: DIFFERENT, first line [[secret-guard] BLOCKED: command too large to scan for secrets. Limit hit: the command is longer than 8192 characters aft] [bytes]
+PASS V0-H1-direct-complete sc-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids of mode relax reported once
+# load start 1.47 1.67 3.68 end 1.43 1.66 3.66 | timing batch: judged
+# totals: PASS 2  FAIL 1  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

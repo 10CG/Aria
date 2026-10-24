@@ -1,0 +1,7 @@
+# sc-cases.sh | 2026-10-24T05:15:46Z | hook b2e92607b8bd | base e83c5e30f2cc | sc-cases e537079f6738 sc-direct e97513c59e58 mutants 2060d2e0c17f shim 637c52c10bbf shapes 12ec06e470da commentsync cdab1c8debca | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 1.37 1.76 3.97 -> timing batch judged (SC_LOAD_MAX 2)
+FAIL V7-N5-read-big-judge-short-lines rc=2 text=longline (want rc=2 text=finding) [kind]
+PASS V0-H1-direct-complete sc-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V7-E13-multiline-copy-normal-text hook rc=2 longline 0.16s | base rc=2 oversize 0.11s | stderr DIFFERENT (want rc=2 text=finding within 4.5 s) [kind]
+PASS V0-H2-case-list all 2 expected case ids of mode relax reported once
+# load start 1.37 1.76 3.97 end 1.37 1.76 3.97 | timing batch: judged
+# totals: PASS 2  FAIL 2  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

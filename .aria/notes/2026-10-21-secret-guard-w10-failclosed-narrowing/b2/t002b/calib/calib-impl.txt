@@ -1,0 +1,16 @@
+# load start 0.77 2.59 4.13
+benign-big           rc=0 wall=0.18 kind=[] bytes=0
+benign-big           rc=0 wall=0.18 kind=[] bytes=0
+multiline-credit     rc=0 wall=0.52 kind=[] bytes=0
+multiline-credit     rc=0 wall=0.49 kind=[] bytes=0
+tmax-rerun           rc=2 wall=1.13 kind=[too large to scan] bytes=733
+tmax-rerun           rc=2 wall=1.08 kind=[too large to scan] bytes=733
+count-axis           rc=2 wall=0.29 kind=[value-REDACTING filter] bytes=3927
+count-axis           rc=2 wall=0.41 kind=[value-REDACTING filter] bytes=3927
+count-axis-ctl       rc=2 wall=0.38 kind=[value-REDACTING filter] bytes=3927
+count-axis-ctl       rc=2 wall=0.29 kind=[value-REDACTING filter] bytes=3927
+longline-expansion   rc=2 wall=0.13 kind=[has a line longer than] bytes=1155
+longline-expansion   rc=2 wall=0.13 kind=[has a line longer than] bytes=1155
+stall-read           rc=2 wall=0.18 kind=[has a line longer than] bytes=1187
+stall-read           rc=2 wall=0.18 kind=[has a line longer than] bytes=1187
+# load end 0.87 2.58 4.12

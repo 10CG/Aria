@@ -1,0 +1,9 @@
+# run-mutants.sh | 2026-10-24T05:14:33Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | sc-cases e537079f6738 | SC_BASH /usr/bin/bash | scope designated | load 1.44 1.93 4.21
+BI-2    CAUGHT       no process group and no group-leader self-check: the job PID alone is killed | seats: author | V5-S5-pipe-holder=red V6-E2-deadline-fallback-bytes=red | load start 1.44 1.93 4.21 end 1.37 1.90 4.18 | timing batch: judged
+BI-6    CAUGHT       the platform is read from the environment (OSTYPE, EPOCHREALTIME present) | seats: author | V2-G3-gate-calls-platform=red V2-G3b-gate-uses-build-facts=red V2-E8-ostype-from-environment-ignored=red | load start 1.37 1.90 4.18 end 1.37 1.90 4.18 | timing batch: judged
+BI-7    CAUGHT       the fallback writes a time text of its own instead of the baseline size text | seats: author | V6-E2-deadline-fallback-bytes=red | load start 1.37 1.90 4.18 end 1.26 1.87 4.15 | timing batch: judged
+BI-13   CAUGHT       the deadline is anchored after the stdin parse, not at the hook start | seats: author | V3-E3-anchor-at-hook-start=red | load start 1.26 1.87 4.15 end 1.16 1.83 4.13 | timing batch: judged
+BI-14   CAUGHT       the deadline uses the whole budget, not min(budget, 3) | seats: author | V3-G10-cap-3=red V3-E4-cap-3-at-budget-4=red | load start 1.16 1.83 4.13 end 1.07 1.80 4.11 | timing batch: judged
+BI-15   CAUGHT       the group is not killed after the job ends | seats: author | V5-S9-child-left-behind=red V5-S13b-nothing-outlives-the-run=red | load start 1.07 1.80 4.11 end 1.22 1.82 4.10 | timing batch: judged
+# 6 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 6)
+# perturbation round: 0 not as expected | load at the end 1.22 1.82 4.10

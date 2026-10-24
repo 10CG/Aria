@@ -1,0 +1,1 @@
+bash-5.2.15    exit 1 wall   9.1s | load start 9.41 11.20 13.25 end 9.58 11.18 13.22 | timing batch: SKIP [load] | # totals: PASS 13  FAIL 26  MISSING 74  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

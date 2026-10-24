@@ -1,0 +1,7 @@
+# sc-cases.sh | 2026-10-24T05:15:54Z | hook e661d12363e4 | base e83c5e30f2cc | sc-cases e537079f6738 sc-direct e97513c59e58 mutants 2060d2e0c17f shim 637c52c10bbf shapes 12ec06e470da commentsync cdab1c8debca | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 1.26 1.73 3.95 -> timing batch judged (SC_LOAD_MAX 2)
+FAIL V3-G10-cap-3 time left 3.999852 at budget 4 (want 2.9 < left <= 3.000000: min(budget, 3)) [value]
+PASS V0-H1-direct-complete sc-direct.sh (relax) ran to its sentinel and exited 0
+FAIL V3-E4-cap-3-at-budget-4 hook rc=2 oversize 4.02s | base rc=2 oversize 0.11s | stderr IDENTICAL sed-stall=job (want IDENTICAL, wall window 2.85..3.6) [wall>hi]
+PASS V0-H2-case-list all 2 expected case ids of mode relax reported once
+# load start 1.26 1.73 3.95 end 1.16 1.70 3.93 | timing batch: judged
+# totals: PASS 2  FAIL 2  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

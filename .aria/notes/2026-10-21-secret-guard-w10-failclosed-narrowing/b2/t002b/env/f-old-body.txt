@@ -1,0 +1,27 @@
+# sc-cases.sh | 2026-10-24T04:23:59Z | hook 5f7ca38b26e9 | base e83c5e30f2cc | sc-cases 6f269d80155a sc-direct a6d00c180871 mutants 2060d2e0c17f shim 637c52c10bbf shapes 12ec06e470da commentsync cdab1c8debca | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 10.06 12.25 13.93 -> timing batch SKIP [load] (SC_LOAD_MAX 2)
+PASS V2-G1-gate this bash: status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.0 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.1 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2 status 0 (want 0)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.3 status 0 (want 0)
+PASS V2-G2-platform:aarch64-unknown-linux-gnu:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:6.0 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:4.4 status 1 (want 1)
+PASS V2-G2-platform:x86_64-unknown-linux-gnu:3.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-apple-darwin23.0.0:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-msys:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-cygwin:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-alpine-linux-musl:5.2 status 1 (want 1)
+PASS V2-G2-platform:aarch64-unknown-linux-android:5.2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl1 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2-2020 status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-WSL-tag status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:wsl-mark status 1 (want 1)
+PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-empty status 1 (want 1)
+FAIL V0-H1-direct-complete sc-direct.sh (relax): last line [PASS V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-empty status 1 (want 1)] (want END sc-direct), exit 1 (want 0); stderr: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t002b/env/impl-old-platform-body.sh: line 829: $4: unbound variable  [harness]
+PASS V1-E16-p1-small-benign hook rc=0 none 0.39s | base rc=0 none 0.80s | stderr IDENTICAL
+FAIL V0-H2-case-list expected 42 ids, reported 22; missing: [V2-G2-platform:x86_64-pc-linux-gnu:5.2:three-args V2-G3-gate-calls-platform V2-G3b-gate-uses-build-facts V2-G4-project-without-extension-file V2-G4-extension-file-with-entry V2-G4-empty-extension-file V2-G4-extension-path-is-a-directory V2-G5-nested V2-G6-no-time-left V2-G7-no-anchor V2-G8-budget-0 V2-G11-flag-not-from-environment V2-G12-segment-trigger-asks-gate V2-G13-whole-trigger-asks-gate V2-G14-cwd-extension-file-with-entry V2-G15-cwd-project-without-extension-file V2-G16-environment-root-before-cwd V2-G17-wsl-distro-name-closes-gate V2-G18-wsl-interop-closes-gate V11-S5-longline-head-verbatim] unexpected: [] reported twice: [] [harness]
+# load start 10.06 12.25 13.93 end 10.42 12.26 13.92 | timing batch: SKIP [load]
+# totals: PASS 22  FAIL 2  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

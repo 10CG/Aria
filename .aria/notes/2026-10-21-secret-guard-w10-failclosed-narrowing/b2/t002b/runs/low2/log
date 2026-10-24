@@ -1,0 +1,15 @@
+05:08:00 start impl-bash-5.2.15 try 1 load 1.27 2.95 5.61 3/978 4120452
+05:08:50 end   impl-bash-5.2.15 try 1 load 1.42 2.75 5.40 1/978 4124490 |       1 timing batch: judged  | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:08:50 start impl-bash-5.0.18 try 1 load 1.42 2.75 5.40 1/978 4124507
+05:09:39 end   impl-bash-5.0.18 try 1 load 1.76 2.64 5.22 1/979 4128556 |       1 timing batch: judged  | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:09:59 start impl-bash-5.1.16 try 1 load 1.32 2.48 5.11 1/977 4128978
+05:10:49 end   impl-bash-5.1.16 try 1 load 1.69 2.39 4.94 1/976 4132611 |       1 timing batch: judged  | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:10:59 start impl-bash-5.3.20 try 1 load 1.43 2.31 4.89 4/975 4132777
+05:11:49 end   impl-bash-5.3.20 try 1 load 2.39 2.50 4.82 1/977 4136240 |       1 timing batch: void (SKIP [void]): run again  | # totals: PASS 108  FAIL 0  MISSING 0  SETUP 0  SKIP 29 (load 0, void 29, inconclusive 0, root 0) 
+05:13:09 start impl-bash-5.3.20 try 2 load 1.35 2.14 4.50 7/978 4137692
+05:13:58 end   impl-bash-5.3.20 try 2 load 0.76 1.86 4.28 1/973 4141086 |       1 timing batch: judged  | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:13:58 start impl-bash-3.2.57 try 1 load 0.76 1.86 4.28 1/973 4141103
+05:14:33 end   impl-bash-3.2.57 try 1 load 1.44 1.93 4.21 1/975 4143642 |       1 timing batch: judged  | # totals: PASS 79  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:14:33 start mut-timing try 1 load 1.44 1.93 4.21 1/975 4143657
+05:15:01 end   mut-timing try 1 load 1.22 1.82 4.10 3/978 4146347 |       6 timing batch: judged  | # 6 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 6) 
+05:15:01 done

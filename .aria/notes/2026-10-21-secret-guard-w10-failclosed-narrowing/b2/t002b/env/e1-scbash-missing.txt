@@ -1,0 +1,1 @@
+SETUP: SC_BASH does not run: /home/dev/.aria/tools/bash-9.9/bash

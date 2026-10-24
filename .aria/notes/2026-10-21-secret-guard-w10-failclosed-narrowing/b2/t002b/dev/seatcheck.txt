@@ -1,0 +1,57 @@
+SAME   BI-17b CR-MB
+SAME   BI-17b QA-M12
+SAME   BI-17b TL-M1
+SAME   BI-24 CR-MA
+SAME   BI-25 QA-M02
+SAME   BI-26 QA-M01
+SAME   BI-26 TL-M8
+SAME   BI-26 BA-M1
+SAME   BI-27 QA-M24
+SAME   BI-28 QA-M06
+SAME   BI-29 QA-M07
+SAME   BI-30 QA-M08
+SAME   BI-31 BA-M8
+SAME   BI-32 TL-M5
+SAME   BI-33 CR-MC
+SAME   BI-33 BA-M4
+SAME   BI-34 TL-M2
+SAME   BI-35 CR-MD
+SAME   BI-35 TL-M3
+SAME   BI-35 BA-M11
+SAME   BI-36 QA-M10
+SAME   BI-37 QA-M28
+SAME   BI-37 TL-M4
+SAME   BI-38 QA-M18
+SAME   BI-38 BA-M9
+SAME   BI-39 QA-M17
+SAME   BI-40 BA-M10
+SAME   BI-41 BA-M7
+SAME   BI-42 QA-M20
+SAME   BI-43 QA-M30
+DIFF   BI-44 QA-M04
+1,2c1,2
+< -  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" || return 1   # read-only build facts, which the environment c
+< +  _sg_relax_platform "${MACHTYPE:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" || return 1   # read-only build facts, which the environment cannot re
+---
+> -  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" "$osr" "$wsl" || return 1   # read-only build and kernel facts
+> +  _sg_relax_platform "${MACHTYPE:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" "$osr" "$wsl" || return 1   # read-only build and kernel facts, which 
+DIFF   BI-44 BA-M14
+1,2c1,2
+< -  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" || return 1   # read-only build facts, which the environment c
+< +  _sg_relax_platform "${MACHTYPE:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" || return 1   # read-only build facts, which the environment cannot re
+---
+> -  _sg_relax_platform "${BASH_VERSINFO[5]:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" "$osr" "$wsl" || return 1   # read-only build and kernel facts
+> +  _sg_relax_platform "${MACHTYPE:-}" "${BASH_VERSINFO[0]:-0}" "${BASH_VERSINFO[1]:-0}" "$osr" "$wsl" || return 1   # read-only build and kernel facts, which 
+SAME   BI-45 QA-M09
+SAME   BI-45 BA-M5
+SAME   BI-46 QA-M13
+SAME   BI-46 TL-M9
+SAME   BI-46 BA-M6
+SAME   BI-47 QA-M14
+SAME   BI-48 BA-M3
+SAME   BI-49 QA-M15
+SAME   BI-50 BA-M2
+SAME   BI-51 KM-M1
+SAME   BI-52 KM-M2
+SAME   BI-53 KM-M3
+SAME   BI-54 KM-M6

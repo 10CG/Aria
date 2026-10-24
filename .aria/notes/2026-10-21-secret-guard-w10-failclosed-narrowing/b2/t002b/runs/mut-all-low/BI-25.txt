@@ -1,0 +1,6 @@
+# sc-cases.sh | 2026-10-24T05:16:59Z | hook 7cf5d14378a7 | base e83c5e30f2cc | sc-cases e537079f6738 sc-direct e97513c59e58 mutants 2060d2e0c17f shim 637c52c10bbf shapes 12ec06e470da commentsync cdab1c8debca | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 1.37 1.66 3.77 -> timing batch judged (SC_LOAD_MAX 2)
+FAIL V2-G12-segment-trigger-asks-gate the platform check failing, a segment copy over 8192: status/text [4 none] (want [2 oversize], never 4) [status] [kind]
+PASS V0-H1-direct-complete sc-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 1 expected case ids of mode relax reported once
+# load start 1.37 1.66 3.77 end 1.66 1.72 3.78 | timing batch: judged
+# totals: PASS 2  FAIL 1  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

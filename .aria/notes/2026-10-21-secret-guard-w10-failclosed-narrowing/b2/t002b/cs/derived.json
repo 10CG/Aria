@@ -1,0 +1,566 @@
+[
+ {
+  "site": "1 header: shell variable indirection",
+  "loc": [
+   "has",
+   "Shell variable indirection"
+  ],
+  "base": [
+   2,
+   163
+  ],
+  "proto": [
+   2,
+   167
+  ],
+  "target": [
+   2,
+   173
+  ],
+  "untrue": [
+   [
+    "cat \"$f\"`) is covered only in part: literal assignments are expanded in a second pass (at most 16 assignments and 8 replacements per variable;",
+    true,
+    false
+   ],
+   [
+    "The SIZE of the expansion is bounded as well -- a value up to 4096 characters, a substituted segment up to 8192 characters and 65536 characters of substituted text per command -- and beyond a SIZE limit the whole command is BLOCKED as too large to scan (\"split it\", fail-closed, owner ruling 2026-10-14), never passed.",
+    true,
+    false
+   ],
+   [
+    "cat \"$f\"`) is covered only in part: literal assignments are expanded in a second pass (at most 16 assignments and 8 replacements per variable in the baseline pass;",
+    false,
+    true
+   ],
+   [
+    "where it is (a Linux build of bash 5.0-5.3, no project extension, time left), the pass is re-run under a hard deadline with no count bound, the growth over the input as the limit and the copy judged in full, and growth over 8192 characters, the deadline or any failure of the rerun still blocks.",
+    false,
+    true
+   ]
+  ],
+  "new": [
+   [
+    "cat \"$f\"`) is covered only in part: literal assignments are expanded in a second pass (at most 16 assignments, 8 for lists and 8 replacements per variable in the baseline pass;",
+    false
+   ],
+   [
+    "The SIZE of the expansion is bounded too: a value over 4096 characters, or more than 65536 characters of substituted text per command, blocks the command (fail-closed, owner ruling 2026-10-14).",
+    true
+   ],
+   [
+    "A substituted copy over 8192 characters is blocked for its size only where the relaxed rerun of 10CG/aria-plugin#217 is not in effect;",
+    true
+   ],
+   [
+    "where it is (an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL, no project extension, time left), the pass is re-run under a hard deadline with no count bound, the growth over the input as the limit and the copy judged in full, and growth over 8192 characters, the deadline or any failure of the rerun still blocks.",
+    false
+   ],
+   [
+    "The pass substitutes text;",
+    false
+   ],
+   [
+    "it does not run the shell: a variable assigned twice is replaced by its FIRST value (bash reads the last), and in segment mode a value holding shell syntax (`G='| jq keys'`) becomes syntax in the copy, so a read can earn a filter credit that bash never applies.",
+    false
+   ],
+   [
+    "Both pass, in small commands since the baseline and, with the rerun, in big ones (declared under owner ruling A, 2026-10-23).",
+    false
+   ]
+  ]
+ },
+ {
+  "site": "2 W10 head + LENGTH BUDGET",
+  "loc": [
+   "next",
+   "_SGV_N=(); _SGV_V=()"
+  ],
+  "base": [
+   571,
+   590
+  ],
+  "proto": [
+   576,
+   594
+  ],
+  "target": [
+   582,
+   601
+  ],
+  "untrue": [
+   [
+    "at most 16 assignments and 8 replacements per variable);",
+    true,
+    true
+   ],
+   [
+    "fail-CLOSED, owner ruling 2026-10-14): without it the judged string is the segment plus references x value length, and one level of chaining multiplies a value by 8, so a 5 KB command overran the 5 s hook timeout (and a timeout lets the command through).",
+    true,
+    false
+   ],
+   [
+    "Beyond ANY of them the whole command is BLOCKED with a text of its own (\"command too large to scan for secrets ...",
+    true,
+    false
+   ],
+   [
+    "split it\": _sg_emit_blocked with the 4th word oversize, status 2) and never passed: a copy that is not judged is a way past the guard, and padding a value or a chain would be the recipe.",
+    true,
+    false
+   ],
+   [
+    "The oversize string is never built, expanded further, judged or scanned: the pass stops at the first overrun and nothing behind it is touched, so an overrun costs no more than the budgeted work in front of it (blocking is as cheap as passing was;",
+    true,
+    false
+   ],
+   [
+    "the 5 s timeout and its fail-open, 10CG/aria-plugin#216, are not touched).",
+    true,
+    false
+   ],
+   [
+    "(The COUNTS above -- 16 assignments, 8 replacements, 8 for statements -- are another bound and still pass beyond the limit, SC-21 21y.) (1) _SGV_VMAX: a value longer than that (as collected, or after chaining) blocks the command whether or not the variable is mentioned: _sg_vx_collect stops at it and returns 2;",
+    true,
+    false
+   ],
+   [
+    "(2) _SGV_SMAX: a substituted copy (a segment, or the whole command) that would become longer blocks the command (status 2 of _sg_vx_apply;",
+    true,
+    false
+   ],
+   [
+    "the W9 extension's look at the substituted whole command, after the pass, blocks on it only when an extension is in effect -- without one nothing is left unjudged).",
+    true,
+    false
+   ],
+   [
+    "8192 because a BLOCK verdict costs the square of the copy length (_sg_compute_credit on one long line: about 0.9 s at 8 KB, 3 s at 16 KB, 13 s at 32 KB) and a verdict that arrives after the timeout is lost.",
+    true,
+    false
+   ],
+   [
+    "The limit counts the whole judged string, not its growth: a segment (in whole-command mode: the command) over 8192 characters that mentions a collected variable is blocked however small the value is.",
+    true,
+    false
+   ],
+   [
+    "_sg_vx_collect, _sg_vx_apply and _SG_SUB are names of the contract, like _sg_vx_pass: the budget probes of the suite use them.",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "at most 16 assignments, 8 for lists and 8 replacements per variable in the baseline pass, none in the relaxed rerun of 10CG/aria-plugin#217);",
+    false
+   ],
+   [
+    "fail-CLOSED, owner ruling 2026-10-14;",
+    true
+   ],
+   [
+    "narrowed by 10CG/aria-plugin#217): without it the judged string is the segment plus references x value length, and one level of chaining multiplies a value by 8, so a 5 KB command overran the 5 s hook timeout (and a timeout lets the command through).",
+    true
+   ],
+   [
+    "Both block with a text of their own (\"command too large to scan for secrets ...",
+    true
+   ],
+   [
+    "split it\": _sg_emit_blocked with the 4th word oversize, status 2), and the oversize string is never built, expanded further, judged or scanned.",
+    true
+   ],
+   [
+    "(2) _SGV_SMAX: a substituted copy (a segment, or the whole command) that would become longer than 8192 characters ends the baseline pass at that copy (status 2 of _sg_vx_apply), because a BLOCK verdict costs the square of the copy length (_sg_compute_credit on one long line: about 0.9 s at 8 KB, 3 s at 16 KB, 13 s at 32 KB) and a verdict that arrives after the 5 s timeout is lost.",
+    true
+   ],
+   [
+    "What follows depends on _sg_relax_ok: where the relaxation is in effect, _sg_vx_pass returns status 4 and _sg_per_segment_eval re-runs the pass in a background job under a hard deadline (_sg_relax_run);",
+    true
+   ],
+   [
+    "there the copy limit is the growth over the input (_SGV_GMAX), and a copy over 8192 characters is judged in full by _sg_vx_big_judge (a line longer than _SGV_LMAX is matched against the rows only: nocredit, the longline text).",
+    true
+   ],
+   [
+    "Elsewhere, and whenever the rerun does not finish in time, the command is blocked with the size text, byte for byte as before (the W9 extension's look at the substituted whole command, after the pass, blocks on such a copy only when an extension is in effect).",
+    true
+   ],
+   [
+    "(The COUNTS above -- 16 assignments, 8 replacements, 8 for statements -- bound the baseline pass and still pass beyond the limit, SC-21 21y;",
+    true
+   ],
+   [
+    "the relaxed rerun has no count bound, the deadline caps its cost.)",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "3 time budget",
+  "loc": [
+   "next",
+   "_SG_T0=$SECONDS"
+  ],
+  "base": [
+   597,
+   606
+  ],
+  "proto": [
+   603,
+   613
+  ],
+  "target": [
+   610,
+   620
+  ],
+  "untrue": [
+   [
+    "the `# guard:ack` escape and the _SGV_* size budget are unchanged;",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "the `# guard:ack` escape is unchanged;",
+    true
+   ],
+   [
+    "the relaxed rerun of 10CG/aria-plugin#217 has a hard deadline of its own (_SG_P0 + min(budget, 3) s, see _sg_relax_run) and its checkpoints fall back to the size block, never to the time text;",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "4 _sg_vx_apply",
+  "loc": [
+   "next",
+   "_sg_vx_apply() {"
+  ],
+  "base": [
+   674,
+   676
+  ],
+  "proto": [
+   683,
+   686
+  ],
+  "target": [
+   690,
+   693
+  ],
+  "untrue": [
+   [
+    "Status 0 = a copy was built, 1 = nothing to substitute, 2 = the copy would be longer than _SGV_SMAX (not built, _SG_SUB stays S;",
+    true,
+    false
+   ],
+   [
+    "the caller blocks the command).",
+    true,
+    false
+   ],
+   [
+    "the remainder keeps the character that ended the match, so $f$f works), at most 8 times.",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "Status 0 = a copy was built, 1 = nothing to substitute, 2 = the copy would be over the limit (not built, _SG_SUB stays S;",
+    true
+   ],
+   [
+    "the caller decides): the limit is _SGV_SMAX in the baseline pass and the input length + _SGV_GMAX in the relaxed rerun (_SG_RELAXED).",
+    true
+   ],
+   [
+    "the remainder keeps the character that ended the match, so $f$f works), at most 8 times in the baseline pass and with no count bound in the relaxed rerun.",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "5 _sg_vx_pass",
+  "loc": [
+   "next",
+   "_sg_vx_pass() {"
+  ],
+  "base": [
+   701,
+   703
+  ],
+  "proto": [
+   712,
+   717
+  ],
+  "target": [
+   719,
+   724
+  ],
+  "untrue": [
+   [
+    "An overrun of the length budget (a value, a copy, the total) ends the pass at once with an oversize BLOCK (the size text of _sg_emit_blocked, status 2): nothing behind the overrun is built or judged.",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "A value or total overrun stops the pass with an oversize BLOCK (status 2).",
+    true
+   ],
+   [
+    "A copy over _SGV_SMAX ends the baseline pass too: with status 4 when the relaxation is in effect (_sg_relax_ok;",
+    true
+   ],
+   [
+    "the baseline block text is kept in _SG_OV_PAT / _SG_OV_MODE for the fallback), else with the oversize BLOCK.",
+    true
+   ],
+   [
+    "Inside the relaxed rerun (_SG_RELAXED) a growth overrun blocks with the growth text, a copy over _SGV_SMAX goes to _sg_vx_big_judge, and a time checkpoint returns 3 (no time text: the caller falls back to the baseline block).",
+    true
+   ],
+   [
+    "Nothing behind an overrun is built or judged.",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "6 _sg_emit_blocked",
+  "loc": [
+   "next",
+   "_sg_emit_blocked() {"
+  ],
+  "base": [
+   826,
+   828
+  ],
+  "proto": [
+   927,
+   930
+  ],
+  "target": [
+   937,
+   940
+  ],
+  "untrue": [
+   [
+    "_sg_emit_blocked PAT SEG MODE [oversize] : the (unchanged) BLOCKED text, shared by every block path.",
+    true,
+    false
+   ],
+   [
+    "The size text echoes only the first 200 characters of the command (the command is by definition a large one).",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "_sg_emit_blocked PAT SEG MODE [oversize|timeout|longline] : the BLOCKED text, shared by every block path.",
+    true
+   ],
+   [
+    "With `longline` (10CG/aria-plugin#217) it prints the text for a big copy that matched a row on a line longer than _SGV_LMAX, where credit is not evaluated;",
+    true
+   ],
+   [
+    "PAT is the row.",
+    true
+   ],
+   [
+    "The size, time and longline texts echo only the first 200 characters of the command (the command is by definition a large one).",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "7 _sg_judge_one",
+  "loc": [
+   "next",
+   "_sg_judge_one() {"
+  ],
+  "base": [
+   1492,
+   1496
+  ],
+  "proto": [
+   1614,
+   1621
+  ],
+  "target": [
+   1624,
+   1631
+  ],
+  "untrue": [
+   [
+    "$1 = string to judge, $2 = mode (whole|segment).",
+    true,
+    false
+   ],
+   [
+    "Returns 0 = allow, 2 = blocked (BLOCKED message already written to stderr;",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "$1 = string to judge, $2 = mode (whole|segment), $3 = nocredit or empty: with nocredit (10CG/aria-plugin#217: a big copy with a line longer than _SGV_LMAX) a matched row blocks at once with the longline text and credit is not evaluated;",
+    true
+   ],
+   [
+    "the W12 neutralisation still runs first.",
+    true
+   ],
+   [
+    "Return 0 = allow, 2 = blocked (BLOCKED message already written to stderr;",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "8 _sg_per_segment_eval",
+  "loc": [
+   "next",
+   "_sg_per_segment_eval() {"
+  ],
+  "base": [
+   1526,
+   1536
+  ],
+  "proto": [
+   1655,
+   1668
+  ],
+  "target": [
+   1665,
+   1678
+  ],
+  "untrue": [
+   [
+    "only if it allowed, the W10 variable pass (_sg_vx_pass);",
+    true,
+    false
+   ],
+   [
+    "Length budget: an overrun inside _sg_vx_pass blocks there;",
+    true,
+    false
+   ]
+  ],
+  "new": [
+   [
+    "only if it allowed, the W10 variable pass (_sg_vx_pass), and when that pass returns status 4 (a copy over _SGV_SMAX with the relaxation in effect), the relaxed rerun under the hard deadline (_sg_relax_run, 10CG/aria-plugin#217): its allow or block is final -- the relaxation is in effect only when no extension is, so stage 3 would add nothing -- and any failure of the rerun falls back to the baseline size block;",
+    true
+   ],
+   [
+    "Length budget: a value or total overrun inside _sg_vx_pass blocks there;",
+    true
+   ]
+  ]
+ },
+ {
+  "site": "9 _sg_vx_replace (supplement 2)",
+  "loc": [
+   "next",
+   "_sg_vx_replace() {"
+  ],
+  "base": [
+   619,
+   620
+  ],
+  "proto": [
+   626,
+   627
+  ],
+  "target": [
+   633,
+   634
+  ],
+  "untrue": [
+   [
+    "_sg_vx_replace S PAT REP [MAX] : literal replace-all of PAT in S, at most 8 replacements -> _SG_RP;",
+    true,
+    true
+   ]
+  ],
+  "new": [
+   [
+    "_sg_vx_replace S PAT REP [MAX] : literal replace-all of PAT in S, at most 8 replacements in the baseline pass (no bound in the relaxed rerun) -> _SG_RP;",
+    false
+   ]
+  ]
+ },
+ {
+  "site": "10 relaxed rerun block (supplement 4)",
+  "loc": [
+   "next",
+   "_sg_vx_big_judge() {"
+  ],
+  "base": null,
+  "proto": [
+   785,
+   794
+  ],
+  "target": [
+   792,
+   801
+  ],
+  "untrue": [
+   [
+    "In effect only on a Linux build of bash 5.0-5.3 on GNU/Linux (the versions and the platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own absolute limit anyway), and with time left before the deadline.",
+    false,
+    true
+   ]
+  ],
+  "new": [
+   [
+    "10CG/aria-plugin#217 relaxed rerun.",
+    true
+   ],
+   [
+    "When the relaxation is in effect (_sg_relax_ok), a copy over _SGV_SMAX is not blocked for its size alone: _sg_vx_pass returns 4 instead and keeps the baseline block text in _SG_OV_PAT / _SG_OV_MODE, and _sg_per_segment_eval re-runs the W10 pass with the relaxed rules (_SG_RELAXED: the copy limit is the growth over the input, _SGV_GMAX;",
+    true
+   ],
+   [
+    "a copy over _SGV_SMAX is judged in full, _sg_vx_big_judge;",
+    true
+   ],
+   [
+    "the counts -- 16 assignments, 8 for statements, 8 replacements per variable -- are not bounded, so every reference is expanded) in a background job under a HARD deadline: _SG_P0 (hook start) + min(_SG_TIME_BUDGET, 3) s.",
+    true
+   ],
+   [
+    "The job leads its own process group (set -m);",
+    true
+   ],
+   [
+    "its timer runs inside the group and is started before the first expensive step;",
+    true
+   ],
+   [
+    "the deadline kills the whole group, and so does _sg_relax_run once the job has ended, so nothing of the job outlives it or holds the pipe.",
+    true
+   ],
+   [
+    "The verdict is the job's exit status, never parsed from text: 77 allows, 2 blocks with the job's own text;",
+    true
+   ],
+   [
+    "any other outcome -- the deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte.",
+    true
+   ],
+   [
+    "In effect only on an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own absolute limit anyway), and with time left before the deadline.",
+    false
+   ]
+  ]
+ }
+]

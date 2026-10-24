@@ -1,0 +1,5 @@
+05:06:20 start base-bash-5.2.15 try 1 load 1.32 3.57 6.09 2/975 4112588
+05:06:35 end   base-bash-5.2.15 try 1 load 1.70 3.54 6.04 2/974 4115151 |       1 timing batch: judged  | # totals: PASS 24  FAIL 39  MISSING 74  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:06:55 start p0-full try 1 load 1.44 3.36 5.92 6/976 4115682
+05:07:44 end   p0-full try 1 load 1.37 3.05 5.68 1/979 4119531 |       1 timing batch: judged  | # totals: PASS 137  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) 
+05:07:44 done

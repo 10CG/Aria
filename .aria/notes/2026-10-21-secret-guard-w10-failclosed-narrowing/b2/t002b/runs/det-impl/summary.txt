@@ -1,0 +1,5 @@
+bash-5.2.15    exit 0 wall  35.3s | load start 9.73 11.95 13.77 end 11.09 12.03 13.73 | timing batch: SKIP [load] | # totals: PASS 98  FAIL 0  MISSING 0  SETUP 0  SKIP 15 (load 15, void 0, inconclusive 0, root 0)
+bash-5.0.18    exit 0 wall  32.8s | load start 11.09 12.03 13.73 end 10.32 11.73 13.56 | timing batch: SKIP [load] | # totals: PASS 98  FAIL 0  MISSING 0  SETUP 0  SKIP 15 (load 15, void 0, inconclusive 0, root 0)
+bash-5.1.16    exit 0 wall  29.5s | load start 10.32 11.73 13.56 end 10.52 11.68 13.50 | timing batch: SKIP [load] | # totals: PASS 98  FAIL 0  MISSING 0  SETUP 0  SKIP 15 (load 15, void 0, inconclusive 0, root 0)
+bash-5.3.20    exit 0 wall  27.8s | load start 10.52 11.68 13.50 end 9.15 11.25 13.30 | timing batch: SKIP [load] | # totals: PASS 98  FAIL 0  MISSING 0  SETUP 0  SKIP 15 (load 15, void 0, inconclusive 0, root 0)
+bash-3.2.57    exit 0 wall   5.3s | load start 9.15 11.25 13.30 end 9.30 11.24 13.28 | timing batch: SKIP [load] | # totals: PASS 55  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)

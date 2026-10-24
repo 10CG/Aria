@@ -1,0 +1,1 @@
+SETUP: SC_BASH does not run: /usr/bin/nonexistent-bash

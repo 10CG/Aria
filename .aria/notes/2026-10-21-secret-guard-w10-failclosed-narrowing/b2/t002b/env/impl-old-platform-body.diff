@@ -1,0 +1,11 @@
+--- secret-guard.sh (af4658b6f935)
++++ impl-old-platform-body.sh
+@@ -826,7 +826,7 @@
+   [[ "$( _sg_relax_noext 2>/dev/null )" == none ]]
+ }
+ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x86_64 GNU/Linux build of a bash version the mechanism was measured on, 5.0 to 5.3, outside WSL (owner ruling E, 2026-10-22 and 2026-10-23: an untested platform -- macOS, Windows, WSL1 and WSL2, musl, Android, aarch64 and other architectures, another bash -- keeps the baseline)
+-  [[ "${1:-}" == x86_64-*-linux-gnu* && -n "${4:-}" && "${4:-}" != *[Mm]icrosoft* && "${4:-}" != *WSL* && -z "${5:-}" ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
++  [[ "$1" == x86_64-*-linux-gnu* && -n "$4" && "$4" != *[Mm]icrosoft* && "$4" != *WSL* && -z "${5:-}" ]] && (( ${2:-0} == 5 && ${3:-0} <= 3 ))
+ }
+ _sg_relax_noext() {   # prints "none" only when no extension can be in effect: no project root, or no .aria/secret-guard.paths under it. A file in any state, or an error, keeps the relaxation off
+   local root

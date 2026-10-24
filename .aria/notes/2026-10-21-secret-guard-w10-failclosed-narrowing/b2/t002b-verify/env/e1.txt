@@ -1,0 +1,1 @@
+SETUP: SC_BASH does not run: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/verify2b/env/nope/bash

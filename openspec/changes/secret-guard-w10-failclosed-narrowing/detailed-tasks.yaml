@@ -31,7 +31,7 @@ invariants:
   - id: INV-1
     rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认"
   - id: INV-2
-    rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim 与输入生成); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); pp-r2-seats/ (post_planning R2 五席的坏实现生成脚本、探针与逐个结果, 2026-10-24 从会话临时目录收进来, 只追加) 与 b2/ (B.2 各步的执笔席报告与补丁); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
+    rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim 与输入生成); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); pp-r2-seats/ (post_planning R2 五席的坏实现生成脚本、探针与逐个结果, 2026-10-24 从会话临时目录收进来, 只追加) 与 b2/ (B.2 各步的执笔席报告、补丁与过程材料, 及主控的独立复核记录); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
   - id: INV-3
     rule: "放宽只在 What 1 的两个触发点进入; 触发点之外的代码路径行为逐字节不变 (P1)。实现时若发现必须改动触发点之外的路径, 停下上报"
   - id: INV-4
@@ -41,7 +41,7 @@ invariants:
   - id: INV-6
     rule: "关闭关键词白名单为空: 本变更的任何提交、合并提交与 PR 描述都不写 close / closes / closed / fix / fixes / fixed / resolve / resolves / resolved 紧跟 issue 引用 (主仓里不带仓名的 217 号引用会指向 10CG/Aria#217, 一张开着的无关 issue; Forgejo 的跨仓关闭语义也未核实)。10CG/aria-plugin#217 由 TASK-007 在对账评论后显式关闭 (先例 10CG/aria-plugin#216); 10CG/aria-plugin#154、10CG/aria-plugin#203、10CG/Aria#221 只写 Refs。每次推送前对待推区间与 PR 正文跑: git log --format=%B <待推区间> | grep -inE '(clos|fix|resolv)[a-z]*[[:space:]:]+[^[:space:]]*#[0-9]+' —— 期望 0 行"
   - id: INV-7
-    rule: "(继承 WP-A, v3.2 改写) 同一时刻只跑一个重实验。计时类判定在一分钟负载低于 2 时串行跑: W12 第 1 节、W13 与套件里的计时窗口类和「重跑须在截止前跑完」类用例 (post_planning R2 PP2-A: 它们的上界依赖本机速度, 负载 8-12 下未改动的原型也会红)、TASK-003 的耗时矩阵。开始与结束各记一次 /proc/loadavg, 任一读数 >= 2 即作废重跑; 套件里这批用例在负载超门槛时整批 SKIP 并单独计数。下界与字节比对不受负载影响, 照常跑。连续 3 次或 6 小时内取不到低负载窗口, 附读数上报 owner, 不放宽判据"
+    rule: "(继承 WP-A, v3.2 改写) 同一时刻只跑一个重实验。计时类判定在一分钟负载低于 2 时串行跑: W12 第 1 节、W13 与套件里的计时窗口类和「重跑须在截止前跑完」类用例 (post_planning R2 PP2-A: 它们的上界依赖本机速度, 负载 8-12 下未改动的原型也会红)、TASK-003 的耗时矩阵。开始与结束各记一次 /proc/loadavg, 任一读数 >= 2 即作废重跑; 套件里这批用例在负载超门槛时整批 SKIP 并单独计数。下界与字节比对不受负载影响, 照常跑 (2026-10-24 B.2 第二步实测修正: 负载 15-20 时字节比对也会受影响 —— hook 自己的整秒时间预算只在一臂触发, 或一臂撞上装置的 12 s 超时; 这两种情形按计时类处理, 与上界同批判)。连续 3 次或 6 小时内取不到低负载窗口, 附读数上报 owner, 不放宽判据"
   - id: INV-8
     rule: "证据绑定 hook: W8-W14 与 TASK-003 / 004 的每份输出首行记基线与被测 hook 的 sha256 前缀, 以及 sc-cases.sh、sc-direct.sh、mutants.py 的 sha256 前缀 (run-evidence.sh 自动写; W8 阶段也写)。TASK-004 或 TASK-005 之后 hook 只要再改一个字节, 两者都作废: TASK-004 重跑, TASK-005 复审新增的 diff。TASK-006 核对待发版 hook 的 sha256 等于最后一份 W13 与 W12 页眉里记的值"
   - id: INV-9
@@ -73,7 +73,6 @@ tasks:
   - id: TASK-002
     parent: "B.2"
     title: "实现: 按 W8-v31 落地 What 1-5、7 与 What 1 补充、What 7 补充; What 6 单独提交; 把 sc-cases.sh 搬进套件并按 post_planning R2 补强 (必交)"
-    status: pending
     agent: implementer
     reason: "新执笔席 (主控执笔是瓶颈, owner 的处方是换人执笔); 主控不亲写 hook 码, 独立复核"
     status: in_progress
@@ -82,17 +81,21 @@ tasks:
       - "第一步 代码落地 (2026-10-23 至 10-24, 新执笔席): aria 分支提交 96f9083 (What 6, 落在基线上, 便于单独审与回退) 与 21a37ea (原型 + What 1 补充 + What 7 补充), hook 的 sha256 前缀 af4658b6f935, 已推 origin (ls-remote 一致)。执笔席报告与 diff 在 .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/b2/"
       - "第一步发现两处规格问题, 按 INV-1 先改规格再改代码 (主仓 0fa20e1a): _sg_relax_platform 每个参数带缺省 (set -u 下少传参数会让调用方中止, 在 hook 里即放行); What 7 补充加第 4 处 (原型 :792-793 的平台措辞)"
       - "第一步还暴露: 旧 sc-direct.sh 的 V2-G2 按三参数调用, 在旧函数体上让直调段整段中止且不报错 —— 正是 R2 补强 (d) 的哨兵与编号清单要抓的形状, 已写进第二步任务书"
-      - "第二步 按 R2 补强可执行验收: 进行中 (任务书在会话临时目录, 要点已记在本任务 design 的 R2 补强 (a)-(f))"
+      - "第二步 按 R2 补强可执行验收 (2026-10-24, 新执笔席): 只改 v31/ 下 6 个脚本 (sc-cases.sh、sc-direct.sh、shim/delay-first、mutants.py、run-mutants.sh、commentsync.py), 用例 94 → 137 个编号 (新增 43, V3-E5 后缀随预算改为 budget-2), 坏实现 57 个 (BI-1-23、BI-17a/b/c、BI-24-54) 加 7 个常量扰动变体。执笔席报告与过程材料在 b2/T002b-report.md 与 b2/t002b/"
+      - "第二步主控独立复核 (2026-10-24 05:22-05:36 UTC, 负载 1.2-1.7, 预期先写): 实现在 5.0.18 / 5.1.16 / 5.2.15 / 5.3.20 上各 PASS 137、3.2.57 上 PASS 79, FAIL 与 SKIP 均为 0, 计时批都判过; 基线红集 PASS 24 / 判错 39 / 缺失 74; 57 个坏实现全部被指定用例按指定原因抓住, P-0 全绿, 6 个扰动全抓住; 两种环境错误分别报 SETUP (退出码 3) 与 V0-H1、V0-H2 FAIL (退出码 1); commentsync 实现 GREEN, 未改动基线上插字符绕过 RED (64)、整块删除 RED (57), 旧版两者都 GREEN。长行文案的期望文本由主控另行核对: proposal What 5、实现 heredoc、sc-direct.sh 三者逐字节相同 (执笔席报告所称的 textcheck/ 为空)。记录在 b2/t002b-verify/"
+      - "第二步与规格字面不同处, 主控裁定 (技术口径, 不动姿态; 已写进下面 design 与 INV-7): (1) INCONCLUSIVE 只给「墙钟到了停顿时长而垫片没有停满记录」的情形, 停满判 FAIL [uncut] —— 字面的「墙钟 >= 停顿时长一律 INCONCLUSIVE」会让 (b) 第 12 类「TERM 被忽略时截止仍生效」的坏实现 (QA-M20、QA-M30) 永远抓不住; (2) 端到端字节比对里一臂撞上装置的 12 s 超时、或 hook 整秒时间预算只在一臂触发, 按计时类处理; (3) V5-S13 这一对预算改为 3, 否则 1 s 宽限碰上 1 s 截止, BI-15 抓不住; (4) V3-E5 编号不变, 后缀 budget-1 改为 budget-2, 名字与所测一致"
+      - "第二步留给后续的: 套件一侧 commentsync 只核了旧句与 KM2-14 的两处相邻失实注释, 新句等第三步写出套件注释后绑定; _sg_relax_ok 里 /proc/sys/fs/binfmt_misc/WSLInterop 那一项与 root 探测分支本机造不出, 只有代码审读覆盖 (已写进 TASK-005 design); 坏实现的「其他红」 (W13 第 3 节那一栏) 未统计, 交 TASK-004; v31/README.md 已由主控按新脚本改写 (执笔席指出的第 12-14、37、44-45 行, 另补复现命令与 W 文件的来源说明)"
+      - "第三步 套件移植: 待派"
     deliverables: [aria/hooks/secret-guard.sh, aria/hooks/tests/secret-guard.test.sh]
     design:
       - "代码: 用 mkv31.py 的补丁逐字落地 (INV-1), 包括 What 7 的 8 块 hook 注释; 再按 proposal 的 What 1 补充 (准入门收紧) 与 What 7 补充 (四处注释) 逐字改; 新函数在 source 闸门之上 (INV-4)"
       - "What 6: 删 :666 死代码, 单独一个提交, 套件全绿"
       - "套件 (1) 搬入方式 (PP2-P、PP2-m15): sc-cases.sh 与 sc-direct.sh 的用例改写成套件里的 bash 用例, 编号不变 (V<k>-...); 断言与期望值照搬, 下面 R2 补强改动的除外。shim/delay-first 以文件复制进 tests/, jq、sed 两个名字用符号链接, 写进套件头注释; shapes.py 不搬 Python, 改写成 bash 的输入生成函数 (套件头注释「python3 只给 SC-20 用」保持为真)。只有新用例按 SC_BASH 选执行 hook 的 bash, 旧用例照旧; 被测 bash 的能力探测问的是执行 hook 的那个 bash。直调用例用 _SG_P0=${EPOCHREALTIME:-} (set -u 下 3.2 没有该变量)"
-      - "R2 补强 (a) 计时类 (PP2-A、PP2-B、PP2-C): 下界与字节比对保留; 上界与「重跑须在截止前跑完」类用例在负载超过 INV-7 门槛时整批 SKIP 并单独计数 (或改为按同轮基线的自然耗时校准); 直调的 run() 先建临时文件, 再取锚点与起秒表; sed 垫片停顿前核对自己在作业的进程组里, 不在就不停 (或停顿缩到 4 s), deadline 类用例见到墙钟 >= 停顿时长判 INCONCLUSIVE, 不判 FAIL; V3-E5 的预算改为 2, 窗口改为 1.85..2.6"
+      - "R2 补强 (a) 计时类 (PP2-A、PP2-B、PP2-C): 下界与字节比对保留; 上界与「重跑须在截止前跑完」类用例在负载超过 INV-7 门槛时整批 SKIP 并单独计数 (或改为按同轮基线的自然耗时校准); 直调的 run() 先建临时文件, 再取锚点与起秒表; sed 垫片停顿前核对自己在作业的进程组里, 不在就不停 (或停顿缩到 4 s), deadline 类用例见到墙钟 >= 停顿时长判 INCONCLUSIVE, 不判 FAIL; V3-E5 的预算改为 2, 窗口改为 1.85..2.6。(2026-10-24 第二步实测后主控改定: 垫片只在作业的进程组里停顿, 停顿开始写 sed.stall、停满写 sed.uncut; 有停满记录判 FAIL [uncut], 墙钟到了停顿时长而没有停满记录才记 SKIP [inconclusive]; 端到端字节比对里一臂撞上装置的 12 s 超时、或 hook 整秒时间预算只在一臂触发, 按计时类处理; V3-E5 后缀改为 budget-2)"
       - "R2 补强 (b) 放行方向 (PP2-D 到 PP2-J、PP2-m12): 为 R2 汇总「非作者变异测试汇总」的 12 类各补至少一条确定性用例 (优先直调, 不靠墙钟): 分段触发点问准入门; 项目根只经 stdin cwd 给出; 重跑内的 for 计数; 重跑内的 VMAX; 重跑内三个时间检查点返回 3 且不写文案; 超长行加过滤器在整串与分段都拦 (含首尾空白撑长的行); 整串分支调 _sg_vx_big_judge 后返回它的结论; 增长超限在整串与分段都拦 (kind=growth); 作业在非组长 shell 里返回 9; TERM 被忽略时截止仍生效; 分段回落原因串与基线逐字节相同; LMAX 8192 / 8193 边界与量不出行长时的哨兵。材料: QA 的 xp-newcases.sh (17 个确定性探针)、BA 的 demo78.sh 与 stub-*.sh、TL 的 probes*.py、CR 的 probes/mk.py, 路径见 .aria/audit-reports/post_planning-R2-1792689337848-secret-guard-w10-failclosed-narrowing-aggregated.md"
       - "R2 补强 (c) 坏实现: R2 五席漏网的坏实现并入 mutants.py, 从 BI-24 起编号, 每个绑定指定用例; 等价的 QA-M29 改跑一轮常量扰动 (_SGV_GMAX 改 8190、_SGV_LMAX 改 8200, 让每个用法各自可观察); 并把 BI-17 拆出三个各漏一处的坏实现 (只漏赋值上限、只漏 for 上限、只漏替换次数上限), 各绑定指定用例"
-      - "R2 补强 (d) 用例脚本自身 (PP2-K、PP2-L、PP2-m2): 残余进程用例的桩用每轮唯一的参数 (含 $$), 观察前留不超过 1 s 的宽限轮询; 金丝雀 —— 起手 SC_BASH -c : 必须成功, 基线对 p1-small-read 必须 rc=2 且为普通命中、对 p1-small-benign 必须 rc=0, 否则 SETUP 失败退出; sc-direct.sh 末行输出哨兵, 缺哨兵或退出非 0 即 FAIL; 每种模式维护应出现的用例编号清单, 缺一即 FAIL; SETUP 单列, 不计 FAIL, 也不算抓住; root 下先探测 ulimit -u 是否生效, 不生效则 V5-S10 一组 SKIP"
-      - "R2 补强 (e) 文字核对 (PP2-M、PP2-T): commentsync 改成每处列出全部会失实的句子 (各要求 0 次), 并绑定站点内必须出现的新句子, 覆盖 What 7 补充的三处与套件里邻近的失实注释; Rule #6 块 B 的逐字断言: longline 描述句、两条增长原因串、中文行全文, R2 的 KM-M1-M3、M6 必须在其上变红"
+      - "R2 补强 (d) 用例脚本自身 (PP2-K、PP2-L、PP2-m2): 残余进程用例的桩用每轮唯一的参数 (含 $$), 观察前留不超过 1 s 的宽限轮询; 金丝雀 —— 起手 SC_BASH -c : 必须成功, 基线对 p1-small-read 必须 rc=2 且为普通命中、对 p1-small-benign 必须 rc=0, 否则 SETUP 失败退出; sc-direct.sh 末行输出哨兵, 缺哨兵或退出非 0 即 FAIL; 每种模式维护应出现的用例编号清单, 缺一即 FAIL; SETUP 单列, 不计 FAIL, 也不算抓住; root 下先探测 ulimit -u 是否生效, 不生效则 V5-S10 一组 SKIP (判据: uid 0 或持有 CAP_SYS_RESOURCE、CAP_SYS_ADMIN, 与 getrlimit(2) 一致)。(2026-10-24 实测后改定: V5-S13 这一对的预算为 3, 宽限仍 1 s —— 预算 1 时作业自己的计时器在 1 s 把残留杀掉, BI-15 抓不住)"
+      - "R2 补强 (e) 文字核对 (PP2-M、PP2-T): commentsync 改成每处列出全部会失实的句子 (各要求 0 次), 并绑定站点内必须出现的新句子, 覆盖 What 7 补充的四处与套件里邻近的失实注释 (套件一侧的新句在第三步写出套件注释后绑定); Rule #6 块 B 的逐字断言: longline 描述句、两条增长原因串、中文行全文, R2 的 KM-M1-M3、M6 必须在其上变红"
       - "R2 补强 (f) 准入门收紧与其余 (What 1 补充、PP2-m1、m8、m9、m10、m13、m14): V2-G2 表按五个参数改写 (x86_64-pc-linux-gnu 加普通内核串放宽; aarch64-unknown-linux-gnu、WSL1 内核串、WSL2 内核串、带 WSL 标记、空内核串都维持基线); 另加一条端到端: 设了 WSL_DISTRO_NAME 时准入门关闭、与基线逐字节相同; 环境毒化同时改 OSTYPE、MACHTYPE、HOSTTYPE; deadline() 在非放宽 bash 上也传附加变量; V7-E15 换成必须放行的确定形状; 基线红集把状态 127 记成 MISSING, 与判错分栏; _SG_LEFT 零填充的直调用例; 直调用例先清掉环境里的 SECRET_GUARD_TIME_BUDGET_S"
       - "套件 (2) 6 组既有用例 21ab、21ac、21ag、21aj、21al、21ao 按 W9 改断言; 其中出 longline 文案的断言用新 helper (要求出现 has a line longer than 与 Matched pattern:), 出普通命中文案的断言要求出现 value-REDACTING filter 且不出现 has a line longer than —— 不再用 wpa_x_finding 区分两者 (PP1-A12)"
       - "套件 (3) What 7 的套件 7 块注释与 5 个用例标题整块改写; 新用例插在 SC-13 断言之前; 头注释计数改为在 git 检出里实跑的数 (非 git 副本里 SC-8 / SC-9a 不跑)"
@@ -100,9 +103,9 @@ tasks:
       - "最后一步: 用写好的新套件对基线 (git show 59e333c:hooks/secret-guard.sh, INV-9) 跑一遍, 记录红集, 分「缺失 (127)」与「判错」两栏; 与 W13 第 2 节的基线红集逐条对照, 不一致的逐条解释 (R2 补强新增的用例单列)"
     acceptance:
       - "套件在 git 检出里全绿: bash 5.2 跑套件、SC_BASH 依次取 5.0.18 / 5.1.16 / 5.2.15 / 5.3.20 / 3.2.57 (3.2 下期望放宽不生效、端到端与基线逐字节相同); 计时类按 INV-7; SKIP 单独列出, 不计入 PASS"
-      - "每个坏实现 (BI-1-23 与 BI-24 起的 R2 坏实现, 等价的除外) 在 v31/sc-cases.sh 与移植后的套件上各跑一遍指定用例, 全部变红; 原型与实现上全绿 (PP2-P)"
+      - "每个坏实现 (BI-1-23 与 BI-24 起的 R2 坏实现, 等价的除外) 在 v31/sc-cases.sh 与移植后的套件上各跑一遍指定用例, 全部变红; 实现上全绿 (PP2-P; v3.2 起用例按收紧后的准入门判, 收紧前的原型不再是全绿对象, 它与实现只差 INV-1 的三类内容差)"
       - "两种环境错误 (SC_BASH 指向不存在的文件; sc-direct.sh 一启动就崩) 下, 用例脚本与套件都报 SETUP 或 FAIL, 退出码非 0 (PP2-L)"
-      - "改造后的 commentsync.py target 为 GREEN (hook 与套件两部分, 含 What 7 补充的三处); 对未改动的基线 hook 插字符绕过与整块删除两种构造都报 RED"
+      - "改造后的 commentsync.py target 为 GREEN (hook 与套件两部分, 含 What 7 补充的四处); 对未改动的基线 hook 插字符绕过与整块删除两种构造都报 RED"
       - "新套件对基线的红集与 W13 第 2 节逐栏一致 (缺失 / 判错), 或逐条解释"
       - "INV-6 核对命令对本任务的全部提交输出 0 行"
 
@@ -135,6 +138,7 @@ tasks:
       - "先改 run-evidence.sh (PP2-O、PP2-m11): 加输出目录参数 OUT (默认仍是脚本所在目录, 以便复现 95cf1de7 的证据); BASH32 或任一被测 bash 不存在即报错退出; W8 阶段补页眉; 页眉加记用例脚本的 sha256 (INV-8)"
       - "IMPL=<aria/hooks/secret-guard.sh 的实现> OUT=v31/impl bash v31/run-evidence.sh <工作目录> W8 W13 W11 W12 W9 —— 基线由脚本取自 59e333c 并断言哈希 (INV-9); W12、W13 按 INV-7"
       - "对照对象一律取 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/<文件> (原型那一轮的证据), 不取工作树"
+      - "W13 第 3 节 (各坏实现的其他红) 用 MUT_SCOPE=full 跑, 只在低负载时段 (64 个变体, 每个约 1 分钟); TASK-002 第二步只跑了指定用例"
     acceptance:
       - "W8: diff 原型 实现 恰好是 INV-1 的三类内容差 (What 1 补充、What 6、What 7 补充, 字面见 proposal), 别无他差 (PP2-N)"
       - "W13: 实现在 5 个 bash 上 FAIL 为 0 (计时类按 INV-7, SKIP 单列); 基线红集与 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W13-sc-cases.txt 第 2 节逐栏一致 (缺失 / 判错; R2 补强新增或改写的用例单列); BI-1-23 与 BI-24 起的坏实现全部被指定用例抓住, 在 sc-cases.sh 与移植后的套件上各跑一遍 (坏实现由 mutants.py 从实现构造)"
@@ -153,6 +157,7 @@ tasks:
     deliverables: [".aria/audit-reports/ 下的审查报告 (记审查的 SHA)"]
     design:
       - "审 TASK-003 结束后的代码; 之后任何改动 (含 TASK-004 发现的问题) 都按 INV-8 复审新增的 diff"
+      - "审读重点含用例覆盖不到的: _sg_relax_ok 里 /proc/sys/fs/binfmt_misc/WSLInterop 那一项 (无 root 造不出该文件)、sc-direct.sh 的 root 探测分支 (本机 uid 1000); 以及 What 7 改写后的 hook 与套件注释是否准确 (commentsync 只核有没有, 不核对不对)"
     acceptance: ["无未处置的 Critical / Major", "报告记录的 SHA 等于待发版的 SHA (否则复审增量)"]
 
   - id: TASK-006
