@@ -1,0 +1,7 @@
+101c101,104
+< #     block. The pass substitutes text; it does not run the shell: a
+---
+> #     block. The one exception (What 4): a fatal error of bash itself inside the rerun that
+> #     makes it exit with status 2 and write its error message is passed on as the block
+> #     text -- the command is still blocked, but with bash's message instead of the size
+> #     block's text. The pass substitutes text; it does not run the shell: a

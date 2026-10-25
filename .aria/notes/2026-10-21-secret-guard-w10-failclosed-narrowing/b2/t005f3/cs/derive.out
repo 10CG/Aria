@@ -1,0 +1,4 @@
+hook sites [('1 header: shell variable indirection', 2, 3), ('2 W10 head + LENGTH BUDGET', 1, 1), ('5 _sg_vx_pass', 1, 1), ('10 relaxed rerun block (supplement 4)', 1, 2)] suite sites [('9 test W10 block head (3b)', 2, 2)]
+hook 10 relaxed rerun block (supplement 4): new unit already in the baseline/prototype run, left out: '_sg_per_segment_eval re-runs the W10 pass with the relaxed rules (_SG_RELAXED: the copy limit is the growth over the input, _SGV_GMAX;'
+suite: a changed comment run outside every site: 'Regression test suite for secret-guard.sh PreToolUse hook. Run: bash aria/hooks/tests/secr'
+suite: a changed comment run outside every site: '_sg_relax_nowslfs (What 1 supplement 2, v3.4), written apart from it, never sourced or cal'

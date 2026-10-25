@@ -1,0 +1,11 @@
+hook-5f3 rc=0 load-start 1.00 1.49 1.49 load-end 1.00 1.49 1.49
+ME-empty-as-none rc=1 load-start 1.00 1.49 1.49 load-end 1.00 1.49 1.49
+MF-first-line rc=1 load-start 1.00 1.49 1.49 load-end 1.00 1.49 1.49
+MG-glob rc=1 load-start 1.00 1.49 1.49 load-end 1.00 1.48 1.49
+MI-inverted rc=1 load-start 1.00 1.48 1.49 load-end 1.00 1.48 1.49
+MN-one-name rc=1 load-start 1.00 1.48 1.49 load-end 1.08 1.49 1.49
+MO-before-platform rc=1 load-start 1.08 1.49 1.49 load-end 1.08 1.49 1.49
+MS-result-ignored rc=1 load-start 1.08 1.49 1.49 load-end 1.15 1.50 1.49
+MW-while-read rc=1 load-start 1.15 1.50 1.49 load-end 1.22 1.50 1.50
+MX-no-search-check rc=1 load-start 1.15 1.45 1.48 load-end 1.14 1.44 1.47
+done

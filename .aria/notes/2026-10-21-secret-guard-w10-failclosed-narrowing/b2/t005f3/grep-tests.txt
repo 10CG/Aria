@@ -1,0 +1,127 @@
+##### /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria/hooks/tests/lib/secret-guard-w10-direct.sh 614
+6:# relaxation is reported once, as SKIP [platform], so both modes report the same ids). Changed from v31: the fallback-text cases (V6-S20, V6-S21) compare
+10:# green (the suite's [reference]; the time text there is TIMED). A case whose tool is missing on the platform (ps) is SKIP [platform], not FAIL.
+72:V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"   # the cases of MODE relax; SK
+73:wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+82:OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLM=''; wslmark && WSLM=wsl
+169:# What 1 supplement 2 (TASK-005 D-1, D-2): _sg_relax_nowslfs looks at the WSLInterop* entries only under a mounted binfmt_misc, so the look never
+171:if need _sg_relax_nowslfs; then
+175:  w1() {   # id mounts entry want what : _sg_relax_nowslfs MOUNTS DIR, DIR holding only ENTRY; status and stderr (the last line of each table does not match)
+177:    r=$( _sg_relax_nowslfs "$2" "$w1d" 2>"$X/w1e"; echo $? )
+181:  sel V15-W1a-autofs-mount-point-not-looked-at && w1 V15-W1a-autofs-mount-point-not-looked-at "$X/w1-autofs" WSLInterop 0 "an autofs mount point at DIR (nothing mount
+182:  sel V15-W1b-binfmt-misc-with-wslinterop-late && w1 V15-W1b-binfmt-misc-with-wslinterop-late "$X/w1-mounted" WSLInterop-late 1 "binfmt_misc mounted at DIR, holding W
+183:  sel V15-W1c-binfmt-misc-without-entry && w1 V15-W1c-binfmt-misc-without-entry "$X/w1-mounted" status 0 "binfmt_misc mounted at DIR, no WSLInterop* entry"
+184:  sel V15-W1d-unreadable-mount-table && w1 V15-W1d-unreadable-mount-table "$X/w1-none/mounts" WSLInterop 1 "a mount table that cannot be read"
+185:else miss V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table; fi
+557:  # ---------------- TASK-005 (review m-6; What 1 supplement 2): load-independent direct cases, each in a subshell on a freshly sourced hook ----------------
+571:  if sel V15-T2-anchor-taken-once-at-hook-start; then   # the anchor _SG_P0 is taken once, at the hook start: (a) one assignment, on the line after set -uo pipefail;
+578:      if [[ ! -s "$X/t2-pse.sh" ]]; then out SETUP V15-T2-anchor-taken-once-at-hook-start "_sg_per_segment_eval not found by anchor"
+589:        [[ -z "$t" ]]; chk $? V15-T2-anchor-taken-once-at-hook-start "assignments to _SG_P0 / of them on the line after set -uo pipefail [$t2s] (want [1 1]); anchor 2
+591:    else miss V15-T2-anchor-taken-once-at-hook-start; fi
+601:  if sel V15-W1e-gate-closed-by-wsl-file-system; then   # What 1 supplement 2: the gate's second WSL line -- _sg_relax_nowslfs failing closes the gate on this relaxin
+602:    if need _sg_relax_ok _sg_relax_nowslfs; then
+603:      r=$( v15src; _sg_relax_nowslfs() { return 1; }; _SG_P0=${EPOCHREALTIME:-}; gate )
+604:      [[ $r == 1 ]]; chk $? V15-W1e-gate-closed-by-wsl-file-system "_sg_relax_nowslfs stubbed to fail (a WSLInterop* entry, or a mount table that cannot be read) on a
+605:    else miss V15-W1e-gate-closed-by-wsl-file-system; fi
+608:  # MODE norelax: the relaxation is not expected on this bash. Each of its cases is reported once, as SKIP [platform], so the list of ids is the same
+##### /home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-direct.sh 571
+51:wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+60:OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLM=''; wslmark && WSLM=wsl
+147:# What 1 supplement 2 (TASK-005 D-1, D-2): _sg_relax_nowslfs looks at the WSLInterop* entries only under a mounted binfmt_misc, so the look never
+149:if need _sg_relax_nowslfs; then
+153:  w1() {   # id mounts entry want what : _sg_relax_nowslfs MOUNTS DIR, DIR holding only ENTRY; status and stderr (the last line of each table does not match)
+155:    r=$( _sg_relax_nowslfs "$2" "$w1d" 2>"$X/w1e"; echo $? )
+159:  sel V15-W1a-autofs-mount-point-not-looked-at && w1 V15-W1a-autofs-mount-point-not-looked-at "$X/w1-autofs" WSLInterop 0 "an autofs mount point at DIR (nothing mount
+160:  sel V15-W1b-binfmt-misc-with-wslinterop-late && w1 V15-W1b-binfmt-misc-with-wslinterop-late "$X/w1-mounted" WSLInterop-late 1 "binfmt_misc mounted at DIR, holding W
+161:  sel V15-W1c-binfmt-misc-without-entry && w1 V15-W1c-binfmt-misc-without-entry "$X/w1-mounted" status 0 "binfmt_misc mounted at DIR, no WSLInterop* entry"
+162:  sel V15-W1d-unreadable-mount-table && w1 V15-W1d-unreadable-mount-table "$X/w1-none/mounts" WSLInterop 1 "a mount table that cannot be read"
+163:else miss V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table; fi
+520:  # ---------------- TASK-005 (review m-6; What 1 supplement 2): load-independent direct cases, each in a subshell on a freshly sourced hook ----------------
+534:  if sel V15-T2-anchor-taken-once-at-hook-start; then   # the anchor _SG_P0 is taken once, at the hook start: (a) one assignment, on the line after set -uo pipefail;
+541:      if [[ ! -s "$X/t2-pse.sh" ]]; then out SETUP V15-T2-anchor-taken-once-at-hook-start "_sg_per_segment_eval not found by anchor"
+552:        [[ -z "$t" ]]; chk $? V15-T2-anchor-taken-once-at-hook-start "assignments to _SG_P0 / of them on the line after set -uo pipefail [$t2s] (want [1 1]); anchor 2
+554:    else miss V15-T2-anchor-taken-once-at-hook-start; fi
+564:  if sel V15-W1e-gate-closed-by-wsl-file-system; then   # What 1 supplement 2: the gate's second WSL line -- _sg_relax_nowslfs failing closes the gate on this relaxin
+565:    if need _sg_relax_ok _sg_relax_nowslfs; then
+566:      r=$( v15src; _sg_relax_nowslfs() { return 1; }; _SG_P0=${EPOCHREALTIME:-}; gate )
+567:      [[ $r == 1 ]]; chk $? V15-W1e-gate-closed-by-wsl-file-system "_sg_relax_nowslfs stubbed to fail (a WSLInterop* entry, or a mount table that cannot be read) on a
+568:    else miss V15-W1e-gate-closed-by-wsl-file-system; fi
+##### /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria/hooks/tests/secret-guard.test.sh 3798
+7:# runs the hook in the ported W10 cases, is not bound by this). External tools: jq; python3 (the #128 SC-20
+9:# census, corpus_census.py); timeout from coreutils (the ported W10 end-to-end cases); ps (two ported W10 cases in
+10:# lib/secret-guard-w10-direct.sh, SKIP [platform] without it); git (SC-8 and the pre-change part of SC-9a read the
+12:# counted). zsh is optional: 6 cases run only with it.
+16:# Coverage: 981 cases (975 without zsh), counted in a git checkout of aria, across Bash (block/allow), Read/Edit (block/allow),
+144:# SKIP [platform] where it is not expected, so every id is reported exactly once on every platform and under any load. Timing (INV-7): upper bounds and
+162:# the ids every platform reports (V0-H2); the second group is the relaxation's (SKIP [platform] where it is not expected)
+163:SGW_EXP_DIRECT="V2-G1-gate
+189:V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table V15-T1-timer-sleeps
+190:SGW_EXP_E2E="V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-igno
+194:SGW_EXP_STATIC="V11-S1-above-gate:_sg_vx_big_judge V11-S1-above-gate:_sg_relax_left V11-S1-above-gate:_sg_relax_ok V11-S1-above-gate:_sg_relax_platform
+195:V11-S1-above-gate:_sg_relax_nowslfs V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-ver
+234:sg_w10_wslfs() {   # [MOUNTS [DIR]] -> status 0 where the gate must see a WSL mark in the file system (WSLF in sg_w10_cases, wpa_rx6_wslf): the rule of the hook's
+235:  # _sg_relax_nowslfs (What 1 supplement 2), written apart from it, never sourced or called (status 0 here is status 1 there) -- the mount table (default
+350:  for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_nowslfs _sg_relax_noext _sg_relax_job _sg_relax_run; do
+384:  OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; sg_w10_wslfs && WSLF=yes
+391:    for i in $SGW_EXP_DIRECT $SGW_EXP_E2E $SGW_EXP_STATIC; do sg_w10_sel "$i" && sg_w10_res FAIL "$i" "[setup] ${setup% }"; done
+410:      for i in $SGW_EXP_E2E; do sg_w10_sel "$i" && sg_w10_res SKIP "$i" "[platform] timeout (coreutils) not found: every end-to-end run is bounded by it"; done
+445:  for i in $SGW_EXP_DIRECT $SGW_EXP_E2E $SGW_EXP_STATIC; do sg_w10_sel "$i" && want+="$i "; done
+477:# The ported W10 cases run here, once, first: before every older case (3a ruling (1), 2026-10-24). Run at the end of the suite, their timing batch read a
+2942:sg_w10_wslfs && wpa_rx6_wslf=yes
+3761:# (the W10 cases ported from v31 ran first, before every older case: see the call right after the definition of sg_w10_cases; SC-13 below counts their SKIP)
+##### /home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh 279
+9:#            it, and no WSL mark in the file system (wslmark below, the rule of What 1 supplement 2 written apart from the hook's _sg_relax_nowslfs: a
+13:#   SC_ONLY  a regex: run and report only the cases whose id matches.   SC_DIRECT=0  skip the direct cases.   SC_NICE=0  no taskset / nice.
+49:wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+58:OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; wslmark && WSLF=yes
+195:for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_nowslfs _sg_relax_noext _sg_relax_job _sg_relax_run; do
+218:EXP_DIRECT_BOTH="V2-G1-gate
+230:V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table"
+231:EXP_DIRECT_RELAX="V3-G9-clock-backwards V3-G10-cap-3 V3-G12-time-left-zero-padded
+244:V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"
+245:EXP_E2E="V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-ignored
+249:EXP_STATIC="V11-S1-above-gate:_sg_vx_big_judge V11-S1-above-gate:_sg_relax_left V11-S1-above-gate:_sg_relax_ok V11-S1-above-gate:_sg_relax_platform
+250:V11-S1-above-gate:_sg_relax_nowslfs V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-ver
+254:if [[ "${SC_DIRECT:-1}" != 0 ]]; then add_want "$EXP_DIRECT_BOTH"; [[ $RELAX == yes ]] && add_want "$EXP_DIRECT_RELAX"; fi
+255:add_want "$EXP_E2E"; add_want "$EXP_STATIC"
+##### diff helper vs sc-direct
+2,10c2,4
+< # lib/secret-guard-w10-direct.sh HOOK MODE : the direct-call cases of the W10 fail-closed narrowing (10CG/aria-plugin#217), ported from v31/sc-direct.sh:
+< # ids, assertions, wanted values, reason tags and the sentinel unchanged. secret-guard.test.sh (sg_w10_cases) runs it with SC_BASH, the bash being tested,
+< # and turns its lines into PASS, FAIL or SKIP. MODE relax = a bash the relaxation is expected on (the gate must open; mechanism cases with a stubbed
+< # judgement at a 1 s deadline; growth, count, checkpoint and rows-only cases) | norelax = any other bash (the gate must stay closed; every case of the
+< # relaxation is reported once, as SKIP [platform], so both modes report the same ids). Changed from v31: the fallback-text cases (V6-S20, V6-S21) compare
+< # with the block the same hook writes when the gate is closed by WSL_DISTRO_NAME, set in the shell that sources it (no baseline file, no git history);
+< # that gate-closed call must itself give the status and text kind 59e333c gives for the same copy and mode (fbref, measured on the five bash in 3c), else
+< # FAIL [reference]: it runs the hook under test, so a slip in code or a constant both calls share would move both alike and the byte comparison would stay
+< # green (the suite's [reference]; the time text there is TIMED). A case whose tool is missing on the platform (ps) is SKIP [platform], not FAIL.
+---
+> # sc-direct.sh HOOK MODE [BASE] : the direct-call cases of sc-cases.sh, run under the bash being tested. MODE relax = a bash the relaxation is expected on
+> # (the gate must open; mechanism cases with a stubbed judgement at a 1 s deadline; growth, count, checkpoint and rows-only cases) | norelax = any other
+> # bash (the gate must stay closed). BASE, the baseline hook, is needed by the cases that compare a text with the baseline's own bytes.
+14,16c8,9
+< #                                            SETUP: the case could not be built (an injection anchor not found). The suite reports both as FAIL.
+< #   SKIP <id> [reason] <detail>             [platform]: see above; [root]: RLIMIT_NPROC does not bind this process, so no fork failure can be made
+< #                                            (post_planning R2 PP2-m2)
+---
+> #                                            SETUP: the case could not be built (an injection anchor not found, no baseline given)
+> #   SKIP <id> [reason] <detail>             [root]: RLIMIT_NPROC does not bind this process, so no fork failure can be made (post_planning R2 PP2-m2)
+19c12
+< #                                            deadline". The suite turns it into PASS, FAIL or SKIP by the load rule of INV-7 (post_planning R2 PP2-A).
+---
+> #                                            deadline". sc-cases.sh turns it into PASS, FAIL or SKIP by the load rule of INV-7 (post_planning R2 PP2-A).
+21,23c14,16
+< # [wall>hi] [fallback] [reference]. The last line is the sentinel "END sc-direct": a run that stops early (set -u, a crash) has none, and the suite reports that
+< # (V0-H1). SC_ONLY (set by the suite from SG_W10_ONLY) skips the slow cases that are not selected; the suite filters the lines again.
+< H=$1; MODE=$2
+---
+> # [wall>hi] [fallback]. The last line is the sentinel "END sc-direct": a run that stops early (set -u, a crash) has none, and sc-cases.sh reports
+> # that (post_planning R2 PP2-L). SC_ONLY (exported by sc-cases.sh) skips the slow cases that are not selected; sc-cases.sh filters the lines again.
+> H=$1; MODE=$2; BASE=${3:-}
+58,72d50
+< RELAX_IDS="V3-G9-clock-backwards V3-G10-cap-3 V3-G12-time-left-zero-padded
+< V4-S1-allow V4-S2-block-with-text V4-S3-block-without-text V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V4-S7-time-checkpoint V4-S8-internal-error
+< V5-S9-child-left-behind V5-S13-detached-child V5-S13b-nothing-outlives-the-run V4-S11-bare-zero V5-S10-timer-fork-fails V5-S10b-no-judgement-without-timer
+< V5-S10c-dead-timer-no-judgement V5-S10d-no-judgement-with-dead-timer V5-S14-failing-sleep-kills-at-once V5-S15-job-refuses-outside-group-leader
+< V4-S19-block-text-bytes V5-S12-no-leftovers V4-S16-rerun-collect-checkpoint V4-S17-rerun-whole-checkpoint V4-S18-rerun-segment-checkpoint
+< V6-S20-segment-fallback-text V6-S21-whole-fallback-text

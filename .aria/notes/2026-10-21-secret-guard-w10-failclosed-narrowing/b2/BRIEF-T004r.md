@@ -1,6 +1,6 @@
 # TASK-004 重跑任务书（4r）：hook 经 TASK-005 修复轮改动后，在最终实现上重新生成 W8-W14 并对照（10CG/aria-plugin#217）
 
-你是 TASK-004 重跑段的执行席（全新实例）。TASK-005 修复轮改了 hook（What 1 补充 2：WSL 标记的读法；What 7 补充 2：注释），按 INV-8 绑定在旧 hook（`af4658b6f935`）上的 W8-W14 全部作废，要在最终实现上重新生成。主控做独立复核。
+你是 TASK-004 重跑段的执行席（全新实例）。TASK-005 修复轮（共三段）改了 hook（What 1 补充 2：WSL 标记的读法，现为 proposal v3.4；What 7 补充 2：注释），按 INV-8 绑定在旧 hook（`af4658b6f935`）上的 W8-W14 全部作废，要在最终实现上重新生成。主控做独立复核。（本任务书第一次派出时对象是 `710a36d`，因复审第二轮的 Major 在开跑后不久被主控停掉；这一次对象已换成第三段之后的定稿。）
 
 ## 先读：真实流量的纪律（硬约束）
 
@@ -8,7 +8,7 @@ W12 回放的是从本机会话记录抽出的真实大命令，文本可能含�
 
 ## 对象
 
-- 最终实现：aria worktree `/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria`，提交 `710a36d`，hook sha256 前缀 `834dee6db0d0`。基线 aria `59e333c`（`e83c5e30f2cc`）。
+- 最终实现：aria worktree `/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria`，提交 `3ed6c24`，hook sha256 前缀 `16996eb7db21`。基线 aria `59e333c`（`e83c5e30f2cc`）。
 - 计划 TASK-004（design 1-8、acceptance 1-6、notes 里两段的结果与裁定、「重跑」那一条）；TASK-005 notes 里修复轮的裁定 (5)：v31 模式 P-0 要在低负载下单跑补上、TASK-003（acceptance 2：耗时矩阵无一越界）、INV-1（现为五类内容差）、INV-7、INV-8。proposal 的 What 1 补充、What 1 补充 2、What 6、What 7 补充、What 7 补充 2（字面）。
 - 证据目录 `/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/`：`v31/run-evidence.sh`（已含 OUT、BASH32、TRAFFIC_DIR 核对与 W12 的 1b 小节）、`v31/run-mutants.sh`、`v31/impl/w14.sh`、`v31/impl/w14-matrix.sh`。上一版实现的证据就在 `v31/impl/` 下（它们将被覆盖；对照前先 `git show HEAD:<路径>` 取出旧版）。原型那一轮的证据用 `git show 95cf1de7:...`。
 
@@ -22,7 +22,7 @@ W12 回放的是从本机会话记录抽出的真实大命令，文本可能含�
 ## 对照（各写预期再比；有不一致就停下逐条写进报告，不要改 hook、套件或期望值）
 
 - W8（验收 1）：`diff 原型 实现` 恰好是 INV-1 的五类内容差，逐 hunk 归类，每类与 proposal 的字面逐字对上。
-- W11（验收 4）、W9（验收 3）、W13（验收 2）、W12（验收 5、6）：判据同 TASK-004 notes；另与上一版实现的结果逐项比：结局应完全相同（hook 的行为差只在 WSL 标记的读法，本机不在 WSL、没有 binfmt_misc 挂载，两版的准入门结论相同），差异只能在页眉与墙钟。1b 的数如实报出。
+- W11（验收 4）、W9（验收 3）、W13（验收 2）、W12（验收 5、6）：判据同 TASK-004 notes；另与上一版实现的结果逐项比：结局应完全相同（hook 的行为差只在 WSL 标记的读法：本机不在 WSL、没有 binfmt_misc 挂载，两版的准入门结论相同；v3.4 把这一项挪到平台与时间判据之后、多一次 awk 的 fork，计时类读数可能差几毫秒），差异只能在页眉与墙钟。套件与 sc-cases 多了 V15-W1f 至 W1n 九条（修复轮第三段；套件整轮 990，无 zsh 时 984）：与上一版比较时这九条列为新增，其余编号的结局逐项比。V15-W1n 每次在私有挂载命名空间里叠 1000 层 tmpfs（约 2 s），它自己是计时用例。1b 的数如实报出。
 - W14：31 个坏实现全抓住（26 按预期 + 5 由补的用例）；耗时矩阵无一越界，与上一版的读数同量级。
 
 ## 报告

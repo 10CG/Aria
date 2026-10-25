@@ -1,0 +1,22 @@
+--- /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t005f3/pre/w14m-w14-mutants.py	2026-10-25 07:27:21.823330976 +0000
++++ /home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py	2026-10-25 07:27:21.830664332 +0000
+@@ -11,7 +11,7 @@
+ import os
+ import sys
+ 
+-IMPL_SHA12 = "834dee6db0d0"
++IMPL_SHA12 = "16996eb7db21"
+ 
+ # (id, short title, [(original, replacement), ...])
+ MUTANTS = [
+@@ -156,8 +156,8 @@
+ 
+     ("Q-30", "gate: the time-left test is dropped from _sg_relax_ok (_sg_relax_run tests it again, so the output should not change)",
+      [('''  _sg_relax_left || return 1
+-  [[ "$( _sg_relax_noext''',
+-       '''  [[ "$( _sg_relax_noext''')]),
++  _sg_relax_nowslfs''',
++       '''  _sg_relax_nowslfs''')]),
+ 
+     ("Q-31", "rerun: the growth limit uses _SGV_SMAX instead of _SGV_GMAX (both are 8192 today)",
+      [(r'''lim=$(( ${#1} + _SGV_GMAX ))''',

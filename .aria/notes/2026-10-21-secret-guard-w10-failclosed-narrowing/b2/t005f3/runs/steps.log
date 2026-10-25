@@ -1,0 +1,19 @@
+perf-good-5.2.15 rc=0 load0=[1.08 0.89 0.96] load1=[1.07 0.89 0.96] secs=2
+perf-v33fn-5.2.15 rc=0 load0=[1.07 0.89 0.96] load1=[1.07 0.89 0.96] secs=4
+w10-5.0.18 rc=0 load0=[1.07 0.89 0.96] load1=[1.45 1.01 1.00] secs=49
+perf-good-5.0.18 rc=0 load0=[1.09 0.99 0.99] load1=[1.17 1.00 1.00] secs=52
+w10-5.1.16 rc=0 load0=[1.17 1.00 1.00] load1=[0.82 0.93 0.97] secs=51
+perf-good-5.1.16 rc=0 load0=[0.82 0.93 0.97] load1=[0.82 0.93 0.97] secs=2
+w10-5.2.15 rc=0 load0=[0.82 0.93 0.97] load1=[1.05 0.96 0.98] secs=49
+w10-5.3.20 rc=0 load0=[1.05 0.96 0.98] load1=[0.79 0.90 0.96] secs=50
+perf-good-5.3.20 rc=0 load0=[0.79 0.90 0.96] load1=[0.79 0.90 0.96] secs=2
+w10-3.2.57 rc=0 load0=[0.79 0.90 0.96] load1=[1.46 1.06 1.02] secs=38
+full-path rc=0 load0=[1.04 0.99 0.99] load1=[2.26 1.76 1.31] secs=350
+full-wsl rc=0 load0=[1.13 1.55 1.27] load1=[1.98 1.87 1.49] secs=396
+sc-cases rc=0 load0=[1.05 1.64 1.43] load1=[1.07 1.55 1.41] secs=101
+mut-v31 rc=0 load0=[1.07 1.55 1.41] load1=[1.56 1.53 1.43] secs=218
+mut-suite rc=1 load0=[1.02 1.39 1.39] load1=[1.54 1.76 1.56] secs=254
+mut-suite-nj rc=0 load0=[1.05 1.60 1.52] load1=[1.07 1.51 1.49] secs=112
+mut-suite-p0 rc=0 load0=[1.07 1.51 1.49] load1=[1.35 1.50 1.48] secs=51
+w14 rc=0 load0=[1.04 1.41 1.46] load1=[0.80 1.28 1.41] secs=105
+ALL DONE 2026-10-25T08:06:59Z load [0.80 1.28 1.41]

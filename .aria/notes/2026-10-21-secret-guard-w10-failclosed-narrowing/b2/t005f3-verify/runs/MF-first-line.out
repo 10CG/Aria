@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-25T08:13:11Z | hook df5f24c8c287 | suite 13c33c587273 | helper 4b8346365e86 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.00 1.49 1.49
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 18 / 19
+FAIL: 1 / 19
+SKIP: 0 / 19 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.00 1.49 1.49 end 1.00 1.49 1.49 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-W1g-autofs-on-top-of-binfmt-misc-not-looked-at]: binfmt_misc at DIR with autofs mounted on top of it (the topmost mount decides: not looked at), DIR holding WSLInterop: status 1 (want 0), stderr 0 bytes (want 0) [status]
+
+# run-suite.sh end | load 1.00 1.49 1.49 | suite exit 1

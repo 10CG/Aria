@@ -69,3 +69,5 @@
 - `t005f-verify/`：主控对修复轮的复核（2026-10-25）。`PREDICT.md` 是 5f2 交回前写下的预期；`mkmut.py` 构造主控自己的四个坏实现，`*.txt` 是它们与实现在 `^V15-` 上的结果（全按预测）；`backfill.py` / `backfill.md` 由 git diff 机械导出回填 proposal What 7 补充 2 的逐字文本。
 - `BRIEF-T004r.md`、`BRIEF-T005r.md`：hook 改后 TASK-004 的重跑（W8-W14）与 TASK-005 的增量复审的任务书。
 - `BRIEF-T005f3.md`：TASK-005 修复轮第三段的任务书：按复审第二轮（主仓 `.aria/audit-reports/post_implementation-R2-*`）与 proposal v3.4 改 WSL 标记的读法（awk 一次读表、只看最上层挂载、精确名、目录不可查算有、挪到平台与时间判据之后），补直调用例与叠挂载开销用例。第一次派出的 4r 因复审第二轮的 M-1 被主控停掉，`BRIEF-T004r.md` 待 hook 定稿后换上新的 commit 与前缀再用。
+- `T005f3-report.md`、`t005f3/`：修复轮第三段的执笔席报告与过程材料（整份 hook、套件的拷贝与坏实现不入库）；主控复核在 `t005f3-verify/`（`VERIFY.md`，预期 `PREDICT.md`，主控独立拼的预期 hook 的生成脚本 `mkexp.py`、9 个坏实现的生成脚本 `mkmut3.py`、逐条结果 `runs/`，以及 What 7 补充 2 本次回填的 `backfill.md`）。
+- `BRIEF-T005r3.md`：TASK-005 第三轮增量复审（审 aria `3ed6c24`）的任务书；4r 第二次派出仍用 `BRIEF-T004r.md`（已换上新的提交与前缀）。

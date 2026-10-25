@@ -149,7 +149,7 @@ _sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entr
 - **结论只取退出码**：作业在 `_sg_vx_pass` 返回 0 时以 **77** 退出，返回 2 时以 2 退出，其余以 1 退出。`_sg_relax_run` 只把 77 当放行；2 且有文本就原样写出文本；其他一律返回 4。文本从不参与判定，裸 `0`（例如 `wait` 对一个继承来的旧 PID 返回 0）也不会被当成放行（PP1-A28，Decision 15，`V4-S11`）。
 - **作业结束后再杀一次组**：`wait` 返回后对作业的进程组 `kill -KILL`，计时器与判定留下的任何后代都不会活过 `_sg_relax_run`，也不会占住管道把结论拖过截止（PP1-A3，`V5-S9`、`V5-S13b`）。组里已没有成员时这一步静默失败。
 - **竞争窗口**：作业正常结束、组杀之前若恰好到点，计时器会对正在退出的进程组发一次 KILL。组内进程被回收之前 PID 不会复用，所以只会杀到本作业自己的进程，可以忽略。
-- **耗时上界**：hook 结束时间 ≤ max(T_trigger, `_SG_P0` + min(预算, 3) s) + ε。T_trigger 是到达触发点的时刻，即 hook 启动 + 首遍 + 基线 W10 前段 + 准入门（含一次扩展探测）；ε 是截止之后的收尾：命令替换返回、回落文案里 fork 的 `sed`、进程退出，以及计时器起得比算出 `_SG_LEFT` 晚的那段 fork 延迟（TASK-005 m-5）。低负载实测在 0.1 s 以内，负载约 10 时实测 0.2–1.2 s（PP2-m6）；hook 启动之前的 shell 启动时间也不在上界里。首遍本身不计时，属 `10CG/aria-plugin#228`。这些项都随宿主负载变化；不随负载变化的只有截止本身（PP1-A29）。
+- **耗时上界**：hook 结束时间 ≤ max(T_trigger, `_SG_P0` + min(预算, 3) s) + ε。T_trigger 是到达触发点的时刻，即 hook 启动 + 首遍 + 基线 W10 前段 + 准入门（含一次挂载表读取与一次扩展探测，都在 `_sg_relax_left` 之后）；ε 是截止之后的收尾：命令替换返回、回落文案里 fork 的 `sed`、进程退出，以及计时器起得比算出 `_SG_LEFT` 晚的那段 fork 延迟（TASK-005 m-5）。低负载实测在 0.1 s 以内，负载约 10 时实测 0.2–1.2 s（PP2-m6）；hook 启动之前的 shell 启动时间也不在上界里。首遍本身不计时，属 `10CG/aria-plugin#228`。这些项都随宿主负载变化；不随负载变化的只有截止本身（PP1-A29）。
 
 ### 4. 回落 = 基线
 
@@ -283,9 +283,9 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 7. 重跑块头里与第 4 处同类的那句（「keeps the baseline block text in _SG_OV_PAT / _SG_OV_MODE」）：同样改成存的是原因与模式（TASK-005 修复轮第二段补，为不超出该段行宽写作「reason and mode」）。
 8. hook 头注释「Shell variable indirection」那条：补上第 5 处的同一个例外（bash 自身致命错误以 2 退出时原样写出它的报错，仍是拦），措辞与重跑块头同义，延续该段行宽（v3.4，复审第二轮 m-2 第 2 部分）。
 
-**落地的逐字文本**（aria `710a36d`，由 `git diff 2893bcc 710a36d -- hooks/secret-guard.sh` 机械导出，逐 hunk 列改前改后；第 6、7 处与 What 1 补充 2 的代码都在其中。v3.4 注：下面仍是 710a36d 的 v3.3 写法，与 What 1 补充 2 现行的 v3.4 代码不同是预期的；修复轮第三段提交后按新提交重新导出，覆盖本段）：
+**落地的逐字文本**（aria `3ed6c24`，由 `git diff 2893bcc 3ed6c24 -- hooks/secret-guard.sh` 机械导出（脚本 `b2/t005f-verify/backfill.py`，本次输出另存 `b2/t005f3-verify/backfill.md`），逐 hunk 列改前改后；第 6、7、8 处与 What 1 补充 2 的代码都在其中）：
 
-1. `-93,6 +93,9`（只有注释）
+1. `-93,6 +93,12`（只有注释）
 
    改前：
 
@@ -309,10 +309,13 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 #     growth text, a value over 4096 characters with the value text (the rerun reaches
 #     values that the counts cut off in the baseline pass), and the deadline, a time
 #     checkpoint, the self-check or any other failure of the rerun falls back to that size
-#     block. The pass substitutes text; it does not run the shell: a
+#     block. The one exception (What 4): a fatal error of bash itself inside the rerun that
+#     makes it exit with status 2 and write its error message is passed on as the block
+#     text -- the command is still blocked, but with bash's message instead of the size
+#     block's text. The pass substitutes text; it does not run the shell: a
 ```
 
-2. `-599,3 +602,4`（只有注释）
+2. `-599,3 +605,4`（只有注释）
 
    改前：
 
@@ -331,7 +334,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 # limit, SC-21 21y; the relaxed rerun has no count bound, the deadline caps its cost.)
 ```
 
-3. `-720,4 +724,4`（只有注释）
+3. `-720,4 +727,4`（只有注释）
 
    改前：
 
@@ -351,7 +354,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 # the caller falls back to the baseline block). Nothing behind an overrun is built or judged.
 ```
 
-4. `-792 +796`（只有注释）
+4. `-792 +799`（只有注释）
 
    改前：
 
@@ -365,7 +368,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 # returns 4 instead and keeps the baseline reason and mode in _SG_OV_PAT / _SG_OV_MODE; _sg_per_segment_eval re-runs the W10 pass with the relaxed rules
 ```
 
-5. `-798,2 +802,4`（只有注释）
+5. `-798,2 +805,4`（只有注释）
 
    改前：
 
@@ -383,7 +386,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 # versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
 ```
 
-6. `-823 +829,2`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+6. `-823 +832`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
 
    改前：
 
@@ -395,10 +398,23 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 
 ```
   [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" ]] && wsl=wsl   # WSL marks in the environment; the environment can only switch the relaxation off with them
-  [[ -n "$wsl" ]] || _sg_relax_nowslfs || wsl=wsl   # a WSLInterop* entry under a mounted binfmt_misc, or a mount table that cannot be read
 ```
 
-7. `-831 +838,8`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+7. `-825,0 +835`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+
+   改前：
+
+```
+
+```
+
+   改后：
+
+```
+  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (a WSLInterop entry under binfmt_misc, or a mount table that cannot be read), asked only where the platform and the time would relax: elsewhere the mount table is never read
+```
+
+8. `-831 +841,10`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
 
    改前：
 
@@ -409,11 +425,13 @@ _sg_relax_noext() {   # prints "none" only when no extension can be in effect: n
    改后：
 
 ```
-_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads, and no binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc), or one is and holds no entry named WSLInterop*. The entries are looked at only under a mounted binfmt_misc, so the look never triggers an automount (an autofs mount point there that nobody serves can hold a stat until the hook is killed, and a killed hook lets the command through); a mount table that cannot be read keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
-  local d="${2:-/proc/sys/fs/binfmt_misc}" l e m=0
-  { while IFS= read -r l; do if [[ "$l" == *" $d binfmt_misc "* ]]; then m=1; fi; done; } 2>/dev/null < "${1:-/proc/self/mounts}" || return 1   # if, not &&: a last line that does not match must not make the loop's status 1 (that would read as an unreadable table); 2>/dev/null before <, so a table that cannot be opened writes nothing to stderr
-  (( m )) || return 0
-  for e in "$d"/WSLInterop*; do [[ -e "$e" ]] && return 1; done
+_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; the table's last line for it) is not a binfmt_misc file system, or it is, DIR can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; the two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+  local d="${2:-/proc/sys/fs/binfmt_misc}" r
+  r=$(awk -v d="$d" '$2 == d { t = $3 } END { print NR, t }' "${1:-/proc/self/mounts}" 2>/dev/null) || return 1
+  [[ "${r%% *}" =~ ^[1-9][0-9]*$ ]] || return 1   # no line read: a table that cannot be read
+  [[ "${r#* }" == binfmt_misc ]] || return 0   # binfmt_misc is not the topmost mount at DIR: no interop entry can be registered there, and nothing under DIR is looked at
+  [[ -x "$d" ]] || return 1   # DIR cannot be searched: the entries cannot be seen, so they may exist
+  [[ -e "$d/WSLInterop" || -e "$d/WSLInterop-late" ]] && return 1
   return 0
 }
 _sg_relax_noext() {   # prints "none" only when no extension can be in effect: no project root is found (_sg_ext_root prints nothing, which includes a cwd that jq cannot read: without a root no extension can be in effect), or there is no .aria/secret-guard.paths under it. A file there, in any state, keeps the relaxation off

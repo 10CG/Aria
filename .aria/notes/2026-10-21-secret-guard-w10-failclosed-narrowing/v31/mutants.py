@@ -90,7 +90,7 @@ mut('BI-20', [('V2-G4-empty-extension-file', r'\[status\]')], 'an empty extensio
 mut('BI-21', [('V3-G9-clock-backwards', r'\[value\]')], 'a clock that went backwards extends the deadline (time left not capped)',
     [('  (( now > cap * 1000000 )) && now=$(( cap * 1000000 ))   # a clock that went backwards never extends the deadline\n', '')])
 mut('BI-22', [('V2-G6-no-time-left', r'\[status\]'), ('V2-G7-no-anchor', r'\[status\]'), ('V2-G8-budget-0', r'\[status\]')], 'the gate does not ask for time left',
-    [('  _sg_relax_left || return 1\n  [[ "$( _sg_relax_noext', '  [[ "$( _sg_relax_noext')])
+    [('  _sg_relax_left || return 1\n  _sg_relax_nowslfs', '  _sg_relax_nowslfs')])
 mut('BI-23', [('V5-S14-failing-sleep-kills-at-once', r'\[rc\]|\[wall>hi\]')], 'the timer kills only after a successful sleep (&& instead of ;): a failing sleep leaves no deadline',
     [('( sleep "$_SG_LEFT"; kill -KILL -- "-$me" )', '( sleep "$_SG_LEFT" && kill -KILL -- "-$me" )')])
 

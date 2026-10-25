@@ -1,0 +1,15 @@
+# run-suite.sh | 2026-10-25T08:13:14Z | hook 1b93dbd2de55 | suite 13c33c587273 | helper 4b8346365e86 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.00 1.49 1.49
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 16 / 19
+FAIL: 3 / 19
+SKIP: 0 / 19 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.00 1.49 1.49 end 1.00 1.48 1.49 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-W1i-noglob-binfmt-misc-with-wslinterop-late]: under set -f (noglob, which the environment can import): binfmt_misc mounted at DIR, holding WSLInterop-late: status 0 (want 1), stderr 0 bytes (want 0) [status]
+  FAIL [W10-port V15-W1j-failglob-binfmt-misc-without-entry]: under shopt -s failglob: binfmt_misc mounted at DIR, neither name in it: status  (want 0), stderr 218 bytes (want 0) [status] [stderr]
+  FAIL [W10-port V15-W1l-unlistable-directory-with-wslinterop-late]: binfmt_misc mounted at DIR, DIR of mode 0311 (searched, not listed) holding WSLInterop-late: status 0 (want 1), stderr 0 bytes (want 0) [status]
+
+# run-suite.sh end | load 1.00 1.48 1.49 | suite exit 1

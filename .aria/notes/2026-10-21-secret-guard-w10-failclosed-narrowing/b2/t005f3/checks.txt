@@ -1,0 +1,19 @@
+helper vs sc-direct.sh hunks: before 14, after 14
+change in the text that differs between them (want: only the RELAX_IDS line of the helper):
+44c44
+< < V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"   # the cases of MOD
+---
+> < V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system V15-W1n-mount-table-r
+leftover w1 dirs under /tmp: 0
+runall3 pid 2446093 alive: 0
+worktree status:
+ M hooks/secret-guard.sh
+ M hooks/tests/lib/secret-guard-w10-direct.sh
+ M hooks/tests/secret-guard.test.sh
+main repo status:
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/commentsync.py
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/mutants.py
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-direct.sh
+ M openspec/changes/secret-guard-w10-failclosed-narrowing/proposal.md

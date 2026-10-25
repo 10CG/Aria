@@ -1,0 +1,173 @@
+## uptime
+ 07:10:49 up 96 days, 17:19, 14 users,  load average: 0.58, 0.95, 1.47
+4
+## wt
+710a36d fix(secret-guard): 准入门的 WSL 文件标记先读挂载表, 不再穿过 binfmt_misc 的自动挂载点; 复审指出的注释与用例 (10CG/aria-plugin#217)
+## ls CH
+detailed-tasks.yaml
+dispositions.md
+proposal.md
+## ls N
+b2
+evidence
+pp-r2-seats
+traffic
+v3
+v31
+BRIEF-T002b.md
+BRIEF-T002c-3a.md
+BRIEF-T002c-3b.md
+BRIEF-T002c-3c2.md
+BRIEF-T002c-3c.md
+BRIEF-T002c-3d.md
+BRIEF-T002c-3e.md
+BRIEF-T003a.md
+BRIEF-T003b.md
+BRIEF-T004a.md
+BRIEF-T004b.md
+BRIEF-T004r.md
+BRIEF-T005f2.md
+BRIEF-T005f3.md
+BRIEF-T005f.md
+BRIEF-T005.md
+BRIEF-T005r.md
+final
+README.md
+T002a-report.md
+T002a-vs-proto.diff
+t002b
+T002b-report.md
+t002b-verify
+t002c
+T002c-3a-report.md
+T002c-3b-report.md
+T002c-3c2-report.md
+T002c-3c-report.md
+T002c-3d-report.md
+T002c-3e-report.md
+t002c-verify
+t002d
+t002d-verify
+t002e
+t002e-verify
+t002f
+t002f-verify
+t002g
+t002g-verify
+t002h
+t002h-verify
+t003a
+T003a-report.md
+t003a-verify
+t003b
+T003b-report.md
+t003b-verify
+t004a
+T004a-report.md
+## find v31
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/mutants.py
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/run-mutants.sh
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-direct.sh
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/commentsync.py
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v3/commentsync.py
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14.sh
+/home/dev/Aria/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
+## ls probes
+/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/spec-probe2:
+total 84
+drwxr-xr-x  3 dev dev 4096 Oct 25 07:06 .
+drwxr-xr-x 35 dev dev 4096 Oct 25 07:10 ..
+-rw-r--r--  1 dev dev  882 Oct 25 07:05 cases3.sh
+-rw-r--r--  1 dev dev  735 Oct 25 06:55 cases.sh
+-rw-r--r--  1 dev dev 1000 Oct 25 07:06 err.txt
+-rw-r--r--  1 dev dev 1757 Oct 25 07:06 fromprop.body
+drwxr-xr-x  7 dev dev 4096 Oct 25 07:05 fx
+-rw-r--r--  1 dev dev  351 Oct 25 06:55 new.sh
+-rw-r--r--  1 dev dev 1154 Oct 25 06:55 old.sh
+-rw-r--r--  1 dev dev  764 Oct 25 06:56 perf.sh
+-rw-r--r--  1 dev dev   72 Oct 25 07:00 run1.sh
+-rw-r--r--  1 dev dev   73 Oct 25 07:05 run3.sh
+-rw-r--r--  1 dev dev  603 Oct 25 07:06 spec3.body
+-rw-r--r--  1 dev dev 1605 Oct 25 07:05 spec3.sh
+-rw-r--r--  1 dev dev 1503 Oct 25 07:00 spec.sh
+-rw-r--r--  1 dev dev  179 Oct 25 06:55 t-autofs
+-rw-r--r--  1 dev dev    0 Oct 25 06:55 t-empty
+-rw-r--r--  1 dev dev  187 Oct 25 06:55 t-late
+-rw-r--r--  1 dev dev  144 Oct 25 07:05 t-listless
+-rw-r--r--  1 dev dev  164 Oct 25 06:55 t-none
+-rw-r--r--  1 dev dev  144 Oct 25 07:05 t-nosearch
+-rw-r--r--  1 dev dev  295 Oct 25 06:55 t-stacked
+
+/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t005f:
+total 124
+drwxr-xr-x 10 dev dev  4096 Oct 25 04:48 .
+drwxr-xr-x 35 dev dev  4096 Oct 25 07:10 ..
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:11 bad
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:12 cs
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:48 diffs
+-rw-r--r--  1 dev dev 11833 Oct 25 04:10 edit_cases.py
+-rw-r--r--  1 dev dev  5710 Oct 25 00:52 edit_hook.py
+-rw-r--r--  1 dev dev  1427 Oct 25 04:16 expect.md
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:13 gen-new-v31
+-rw-r--r--  1 dev dev    74 Oct 25 04:13 gen-new-v31.out
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:13 gen-new-w14
+-rw-r--r--  1 dev dev  3395 Oct 25 04:13 gen-new-w14.out
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:13 gen-old-v31
+-rw-r--r--  1 dev dev    74 Oct 25 04:13 gen-old-v31.out
+drwxr-xr-x  2 dev dev  4096 Oct 25 04:13 gen-old-w14
+-rw-r--r--  1 dev dev  3395 Oct 25 04:13 gen-old-w14.out
+-rw-r--r--  1 dev dev 10547 Oct 25 00:52 hook.diff
+-rw-r--r--  1 dev dev  1793 Oct 25 04:11 mkbad.py
+-rw-r--r--  1 dev dev  5947 Oct 25 04:17 mkreport.py
+-rw-r--r--  1 dev dev   779 Oct 25 04:11 prove-helper.txt
+-rwxr-xr-x  1 dev dev   720 Oct 25 04:11 prove.sh
+-rw-r--r--  1 dev dev  2028 Oct 25 04:14 quick-sc.txt
+-rw-r--r--  1 dev dev   561 Oct 25 04:14 quick-suite.txt
+-rw-r--r--  1 dev dev     0 Oct 25 04:16 runall.log
+-rw-r--r--  1 dev dev  2948 Oct 25 04:16 runall.sh
+drwxr-xr-x  7 dev dev  4096 Oct 25 04:50 runs
+
+/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t005f2:
+total 140
+drwxr-xr-x  7 dev dev 4096 Oct 25 05:39 .
+drwxr-xr-x 35 dev dev 4096 Oct 25 07:10 ..
+drwxr-xr-x  2 dev dev 4096 Oct 25 05:37 bad
+-rw-r--r--  1 dev dev    0 Oct 25 05:35 bash-n.err
+drwxr-xr-x  2 dev dev 4096 Oct 25 05:37 cs
+-rw-r--r--  1 dev dev  347 Oct 25 05:34 edit5f2.out
+-rw-r--r--  1 dev dev 8288 Oct 25 05:34 edit5f2.py
+-rw-r--r--  1 dev dev 1548 Oct 25 06:17 expect.md
+-rw-r--r--  1 dev dev  739 Oct 25 05:37 expect-proofs.md
+-rw-r--r--  1 dev dev 2678 Oct 25 05:35 helper-5f2.diff
+-rw-r--r--  1 dev dev  321 Oct 25 05:35 hook-5f2.diff
+drwxr-xr-x  3 dev dev 4096 Oct 25 05:38 inv4
+-rw-r--r--  1 dev dev  707 Oct 25 05:38 inv4-sc5f-B10.txt
+-rw-r--r--  1 dev dev  968 Oct 25 05:38 inv4-suite-5f-B10.log
+-rw-r--r--  1 dev dev  559 Oct 25 05:38 inv4-suite-5f-B10.txt
+-rw-r--r--  1 dev dev 1038 Oct 25 05:38 inv4-suite-new-B10.log
+-rw-r--r--  1 dev dev  658 Oct 25 05:38 inv4-suite-new-B10.txt
+-rw-r--r--  1 dev dev 1039 Oct 25 05:38 inv4-suite-new-real.log
+-rw-r--r--  1 dev dev  563 Oct 25 05:38 inv4-suite-new-real.txt
+-rw-r--r--  1 dev dev   12 Oct 25 05:37 mkbad.out
+drwxr-xr-x  2 dev dev 4096 Oct 25 05:34 pre
+-rw-r--r--  1 dev dev 2000 Oct 25 05:37 prove-34.sh
+-rw-r--r--  1 dev dev 1275 Oct 25 05:38 prove-34.txt
+-rw-r--r--  1 dev dev  957 Oct 25 05:35 prove-w1-3.2.57.txt
+## hook files
+6:.github/secret_scanning.yml
+25:hooks/handoff-location-guard.sh
+27:hooks/host-docker-logout-guard.sh
+28:hooks/secret-guard.sh
+29:hooks/secret-scan.sh
+34:hooks/tests/host-docker-logout-guard.test.sh
+35:hooks/tests/jq-crlf-guard.sh
+36:hooks/tests/jq-crlf-guard.test.sh
+38:hooks/tests/lib/secret-guard-w10-direct.sh
+42:hooks/tests/secret-guard.test.sh
+43:hooks/tests/secret-scan.test.sh
+95:skills/aria-doctor/scripts/check_secret_guard_install.sh
+97:skills/aria-doctor/tests/check_secret_guard_install.test.sh
+225:skills/issue-triage/tests/test_secret_hygiene.py
+531:tests/test_subprocess_decode_guard.py

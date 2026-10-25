@@ -1,0 +1,26 @@
+expected-v34              5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+ME-empty-as-none          5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:0 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MF-first-line             5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:1 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MG-glob                   5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:0 failglob+none:nosearch(000):1 listless(0311)+late:
+MI-inverted               5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MN-one-name               5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:0 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:0 failglob+none:0 nosearch(000):1 listless(0311)+late:0 
+
+MO-before-platform        5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MS-result-ignored         5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MW-while-read             5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):1 listless(0311)+late:1 
+
+MX-no-search-check        5.2.15  host:0 autofs+WSLInterop:0 binfmt+late:1 binfmt+none:0 autofs-on-top+WSLInterop:0 empty:1 unreadable:1 dir-as-table:1 noglob+late:1 failglob+none:0 nosearch(000):0 listless(0311)+late:1 
+
+stderr bytes: 520
+
+## 与 PREDICT.md 第一节对照（主控）
+- 7 / 9 与预期逐项一致：MF、MX、MO、MS、MI、MW、MN。
+- ME 预期错一处：预期 dir-as-table 0，实测 1。原因：本机 awk 是 mawk，读目录时 mawk 自己报错、以非 0 退出，走的是 `|| return 1`，不经 0 行判定；gawk 是跳过目录、照常退出 0，那时才由 0 行判定兜住。所以在本机，ME 只靠「空表」那条抓住。
+- MG 预期错一处：预期 failglob 中止之后两条都跑不到，实测 failglob 只中止了那一行（shopt -u 没执行到，failglob 一直开着）；不可查那条先过 -x 检查返回 1，不经通配；可查不可列那条在通配上再次中止。抓住与否不受影响。
+- 预测写在 PREDICT.md（实测之前），错处原样保留。

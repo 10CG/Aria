@@ -1,0 +1,27 @@
+load0 0.91 0.86 0.95
+mkbad rc=0 v3.3 function of the pre hook == spec-probe2/old.sh: True built nox order v33fn w1e-a w1e-b 
+good   FAIL [] (want []) PASS 13 other 0 | 
+v33fn  FAIL [fghijkl] (want [fghijkl]) PASS 6 other 0 | f:[status]  g:[status]  h:[status]  i:[status]  j:[status] [stderr]  k:[status]  l:[status]  
+nox    FAIL [k] (want [k]) PASS 12 other 0 | k:[status]  
+order  FAIL [m] (want [m]) PASS 12 other 0 | m:[platform] [time]  
+w1e-a  FAIL [em] (want [em]) PASS 11 other 0 | m:[control]  e:[closed]  
+w1e-b  FAIL [e] (want [e]) PASS 12 other 0 | e:[open] [closed]  
+cmp 3.2.57: # 3.2.57: 12 cases, 0 not ok
+cmp 5.0.18: # 5.0.18: 12 cases, 0 not ok
+cmp 5.1.16: # 5.1.16: 12 cases, 0 not ok
+cmp 5.2.15: # 5.2.15: 12 cases, 0 not ok
+cmp 5.3.20: # 5.3.20: 12 cases, 0 not ok
+gen v31 rc=0 57 bad implementations, 7 perturbation variants; hook sha256 16996eb7db21
+gen w14 rc=0 lines 31 Q-31	83db84f17745	rerun: the growth limit uses _SGV_SMAX instead of _SGV_GMAX (both are 8192 today)
+derive rc=0 hook sites [('1 header: shell variable indirection', 2, 3), ('2 W10 head + LENGTH BUDGET', 1, 1), ('5 _sg_vx_pass', 1, 1), ('10 relaxed rerun block (supplement 
+commentsync 5f2 -> 5f3: 2 diff lines
+constr: hook anchors 12 insert: anchors left 0 | delete: lines removed 217 suite anchors 10 insert: anchors left 0 | delete: lines removed 32 
+cs target rc=0 target: GREEN
+cs baseline rc=0 baseline: GREEN
+cs proto rc=0 proto --hook-only: GREEN
+cs hook-c1-insert rc=1 target --hook-only: RED (78)
+cs hook-c2-delete rc=1 target --hook-only: RED (60)
+cs suite-c1-insert rc=1 target --suite-only: RED (58)
+cs suite-c2-delete rc=1 target --suite-only: RED (57)
+load1 1.08 0.89 0.96
+runall3 started, pid 2446093

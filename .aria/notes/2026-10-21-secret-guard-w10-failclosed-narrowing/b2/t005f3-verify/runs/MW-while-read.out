@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-25T08:13:28Z | hook f6fa3a739456 | suite 13c33c587273 | helper 4b8346365e86 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.15 1.50 1.49
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 18 / 19
+FAIL: 1 / 19
+SKIP: 0 / 19 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.15 1.50 1.49 end 1.22 1.50 1.50 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-W1n-mount-table-read-in-one-pass]: 1000 tmpfs mounts stacked in a private mount namespace (1000 made, the table 1041 lines): _sg_relax_nowslfs on the real table returned 0 (want 0) in 3.126 s (want <= 0.5), stderr 0 bytes (want 0)
+
+# run-suite.sh end | load 1.22 1.50 1.50 | suite exit 1

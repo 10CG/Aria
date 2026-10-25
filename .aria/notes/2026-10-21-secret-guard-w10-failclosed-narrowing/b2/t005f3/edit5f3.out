@@ -1,0 +1,6 @@
+A1 WSL line already identical to the v3.4 first line: True
+A3 header bullet lines 87-108, width 91
+new hook sha256 prefix 16996eb7db21
+written: hook, helper, suite, scdirect, sccases, mutants, w14m
+new both-mode ids: V15-W1f-empty-mount-table V15-W1g-autofs-on-top-of-binfmt-misc-not-looked-at V15-W1h-directory-as-mount-table V15-W1i-noglob-binfmt-misc-with-wslinterop-late V15-W1j-failglob-binfmt-misc-without-entry V15-W1k-unsearchable-directory V15-W1l-unlistable-directory-with-wslinterop-late V15-W1m-mount-table-read-only-after-platform-and-time
+new relax id: V15-W1n-mount-table-read-in-one-pass

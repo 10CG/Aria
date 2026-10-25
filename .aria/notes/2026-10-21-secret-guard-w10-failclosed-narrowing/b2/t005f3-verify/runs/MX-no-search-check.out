@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-25T08:14:54Z | hook 0200501dcfe3 | suite 13c33c587273 | helper 4b8346365e86 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.15 1.45 1.48
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 18 / 19
+FAIL: 1 / 19
+SKIP: 0 / 19 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.14 1.44 1.47 end 1.14 1.44 1.47 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-W1k-unsearchable-directory]: binfmt_misc mounted at DIR, DIR of mode 000 (cannot be searched; nothing in it): status 0 (want 1), stderr 0 bytes (want 0) [status]
+
+# run-suite.sh end | load 1.14 1.44 1.47 | suite exit 1

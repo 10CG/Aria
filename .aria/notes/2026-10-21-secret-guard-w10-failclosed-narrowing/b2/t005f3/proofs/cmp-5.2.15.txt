@@ -1,0 +1,13 @@
+host                 hook=0 (want 0) stderr=0 | helper=1 scdirect=1 suite=1 sccases=1  ok
+autofs+WSLInterop    hook=0 (want 0) stderr=0 | helper=1 scdirect=1 suite=1 sccases=1  ok
+binfmt+late          hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+binfmt+none          hook=0 (want 0) stderr=0 | helper=1 scdirect=1 suite=1 sccases=1  ok
+stacked+WSLInterop   hook=0 (want 0) stderr=0 | helper=1 scdirect=1 suite=1 sccases=1  ok
+empty                hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+unreadable           hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+dir-as-table         hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+noglob+late          hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+failglob+none        hook=0 (want 0) stderr=0 | helper=1 scdirect=1 suite=1 sccases=1  ok
+nosearch-000         hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+listless-0311+late   hook=1 (want 1) stderr=0 | helper=0 scdirect=0 suite=0 sccases=0  ok
+# 5.2.15: 12 cases, 0 not ok

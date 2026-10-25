@@ -11,7 +11,7 @@ import hashlib
 import os
 import sys
 
-IMPL_SHA12 = "834dee6db0d0"
+IMPL_SHA12 = "16996eb7db21"
 
 # (id, short title, [(original, replacement), ...])
 MUTANTS = [
@@ -156,8 +156,8 @@ Command was (first 200 characters): $(_sg_redact_echo "${seg:0:200}")''')]),
 
     ("Q-30", "gate: the time-left test is dropped from _sg_relax_ok (_sg_relax_run tests it again, so the output should not change)",
      [('''  _sg_relax_left || return 1
-  [[ "$( _sg_relax_noext''',
-       '''  [[ "$( _sg_relax_noext''')]),
+  _sg_relax_nowslfs''',
+       '''  _sg_relax_nowslfs''')]),
 
     ("Q-31", "rerun: the growth limit uses _SGV_SMAX instead of _SGV_GMAX (both are 8192 today)",
      [(r'''lim=$(( ${#1} + _SGV_GMAX ))''',

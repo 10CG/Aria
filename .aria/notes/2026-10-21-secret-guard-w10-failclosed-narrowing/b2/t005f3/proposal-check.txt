@@ -1,0 +1,4 @@
+proposal mtime 2026-10-25 07:13:58; edit5f3.out mtime 2026-10-25 07:27:21; HEAD 7f9989b8 docs(openspec): secret-guard-w10-failclosed-narrowi
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+@@ -152 +152 @@ _sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no 
+current proposal v3.4 blocks still in the hook verbatim: line1 True line2 True function True

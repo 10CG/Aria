@@ -1,0 +1,21 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-25T08:13:22Z | hook d25618ab69b5 | direct 4b8346365e86 | shim 5c5c04525a67 | filter ^V15- | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V15-W1a-autofs-mount-point-not-looked-at an autofs mount point at DIR (nothing mounted) that holds WSLInterop: status 0 (want 0), stderr 0 bytes (want 0)
+FAIL V15-W1b-binfmt-misc-with-wslinterop-late binfmt_misc mounted at DIR, holding WSLInterop-late: status 0 (want 1), stderr 0 bytes (want 0) [status]
+PASS V15-W1c-binfmt-misc-without-entry binfmt_misc mounted at DIR, neither WSLInterop nor WSLInterop-late in it: status 0 (want 0), stderr 0 bytes (want 0)
+PASS V15-W1d-unreadable-mount-table a mount table that cannot be read: status 1 (want 1), stderr 0 bytes (want 0)
+PASS V15-W1f-empty-mount-table a mount table that reads empty (0 lines; no WSL entry in DIR): status 1 (want 1), stderr 0 bytes (want 0)
+PASS V15-W1g-autofs-on-top-of-binfmt-misc-not-looked-at binfmt_misc at DIR with autofs mounted on top of it (the topmost mount decides: not looked at), DIR holding WSLInterop: status 0 (want 0), stderr 0 bytes (want 0)
+PASS V15-W1h-directory-as-mount-table a directory given as the mount table (no WSL entry in DIR): status 1 (want 1), stderr 0 bytes (want 0)
+FAIL V15-W1i-noglob-binfmt-misc-with-wslinterop-late under set -f (noglob, which the environment can import): binfmt_misc mounted at DIR, holding WSLInterop-late: status 0 (want 1), stderr 0 bytes (want 0) [status]
+PASS V15-W1j-failglob-binfmt-misc-without-entry under shopt -s failglob: binfmt_misc mounted at DIR, neither name in it: status 0 (want 0), stderr 0 bytes (want 0)
+PASS V15-W1k-unsearchable-directory binfmt_misc mounted at DIR, DIR of mode 000 (cannot be searched; nothing in it): status 1 (want 1), stderr 0 bytes (want 0)
+FAIL V15-W1l-unlistable-directory-with-wslinterop-late binfmt_misc mounted at DIR, DIR of mode 0311 (searched, not listed) holding WSLInterop-late: status 0 (want 1), stderr 0 bytes (want 0) [status]
+PASS V15-W1m-mount-table-read-only-after-platform-and-time _sg_relax_nowslfs calls in one _sg_relax_ok: the platform fails 0 (want 0), no time left 0 (want 0), both pass 1 (want 1: the stub is reached)
+PASS V15-T1-timer-sleeps-time-left the timer's sleep argument [1.234567] (want [1.234567], the _SG_LEFT that _sg_relax_left set; 1 sleep call(s) recorded, _sg_relax_run status 0)
+PASS V15-T2-anchor-taken-once-at-hook-start assignments to _SG_P0 / of them on the line after set -uo pipefail [1 1] (want [1 1]); anchor 2.0 s back, budget 3: the judgement in the job saw _SG_LEFT [0.990407] (want 0 < left <= 1.0; _sg_per_segment_eval status 0)
+PASS V15-T3-job-errors-silenced a job killed the way the deadline kills it (kill -KILL on itself): _sg_relax_run status 4 (want 4), stderr [] (want empty)
+PASS V15-W1e-gate-closed-by-wsl-file-system every check before it passing: _sg_relax_nowslfs stubbed to return 0 -> _sg_relax_ok status 0 (want 0), stubbed to return 1 (a WSLInterop entry, a DIR that cannot be searched, a mount table that cannot be read or reads empty) -> 1 (want 1)
+PASS V15-W1n-mount-table-read-in-one-pass 1000 tmpfs mounts stacked in a private mount namespace (1000 made, the table 1041 lines): _sg_relax_nowslfs on the real table returned 0 (want 0) in 0.008 s (want <= 0.5), stderr 0 bytes (want 0)
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V0-H2-case-list all 17 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.08 1.49 1.49 end 1.08 1.49 1.49 | timing batch: judged

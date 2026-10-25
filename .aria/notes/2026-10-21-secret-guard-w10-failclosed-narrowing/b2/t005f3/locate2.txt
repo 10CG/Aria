@@ -1,0 +1,111 @@
+-rw-r--r--  1 dev dev  658 Oct 25 05:38 inv4-suite-new-B10.txt
+-rw-r--r--  1 dev dev 1039 Oct 25 05:38 inv4-suite-new-real.log
+-rw-r--r--  1 dev dev  563 Oct 25 05:38 inv4-suite-new-real.txt
+-rw-r--r--  1 dev dev   12 Oct 25 05:37 mkbad.out
+drwxr-xr-x  2 dev dev 4096 Oct 25 05:34 pre
+-rw-r--r--  1 dev dev 2000 Oct 25 05:37 prove-34.sh
+-rw-r--r--  1 dev dev 1275 Oct 25 05:38 prove-34.txt
+-rw-r--r--  1 dev dev  957 Oct 25 05:35 prove-w1-3.2.57.txt
+## hook files
+6:.github/secret_scanning.yml
+25:hooks/handoff-location-guard.sh
+27:hooks/host-docker-logout-guard.sh
+28:hooks/secret-guard.sh
+29:hooks/secret-scan.sh
+34:hooks/tests/host-docker-logout-guard.test.sh
+35:hooks/tests/jq-crlf-guard.sh
+36:hooks/tests/jq-crlf-guard.test.sh
+38:hooks/tests/lib/secret-guard-w10-direct.sh
+42:hooks/tests/secret-guard.test.sh
+43:hooks/tests/secret-scan.test.sh
+95:skills/aria-doctor/scripts/check_secret_guard_install.sh
+97:skills/aria-doctor/tests/check_secret_guard_install.test.sh
+225:skills/issue-triage/tests/test_secret_hygiene.py
+531:tests/test_subprocess_decode_guard.py
+## proposal grep
+8:97:**What 1 补充 2：WSL 标记的读法不触发自动挂载，且读表的开销随挂载数线性增长**（v3.3 起于 2026-10-25 TASK-005 复审 D-1、D-2；v3.4 同日按复审第二轮 M-1、m-1 与疑点改写；技术口径，姿态不变：只会把放宽关掉，不会打开。INV-1 允许的内容差之一）。
+9:101:v3.4 的做法：
+10:110:  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (a WSLInterop entry under binfmt_misc, or a mount table that cannot be read), asked only where the platform and the time would relax: elsewhere the mount table is never read
+11:116:_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; the table's last line for it) is not a binfmt_misc file system, or it is, DIR can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; the two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+12:129:直调用例（TASK-005 修复轮补）：上面各情形各一条（假挂载表与目录建在 helper 自己的临时目录下；目录不可查那一条在 uid 0 下不适用——root 可查任何目录——记 SKIP [platform]）；把 `_sg_relax_nowslfs` 桩成返回 1 时，放宽平台上的 `_sg_relax_ok` 返回 1；另有一条开销用例：在私有挂载命名空间里叠 1000 个 tmpfs 后读真实的挂载表，函数须在 0.5 s 内返回（没有 `unshare -rm` 的宿主上 SKIP [platform]）。
+44:275:**What 7 补充 2：TASK-005 复审指出的注释**（v3.3，2026-10-25；INV-1 允许的内容差之一。下列每处要说的意思由本节钉住，落地的逐字文本在 TASK-005 修复轮提交后回填到这里，回填前以修复轮报告为准）：
+45:282:6. 准入门 WSL 那一行的注释随 What 1 补充 2 改写（代码见上）。
+46:284:8. hook 头注释「Shell variable indirection」那条：补上第 5 处的同一个例外（bash 自身致命错误以 2 退出时原样写出它的报错，仍是拦），措辞与重跑块头同义，延续该段行宽（v3.4，复审第二轮 m-2 第 2 部分）。
+47:286:**落地的逐字文本**（aria `710a36d`，由 `git diff 2893bcc 710a36d -- hooks/secret-guard.sh` 机械导出，逐 hunk 列改前改后；第 6、7 处与 What 1 补充 2 的代码都在其中。v3.4 注：下面仍是 710a36d 的 v3.3 写法，与 What 1 补充 2 现行的 v3.4 代码不同是预期的；修复轮第三段提交后按新提交重新导出，覆盖本段）：
+86:386:6. `-823 +829,2`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+87:398:  [[ -n "$wsl" ]] || _sg_relax_nowslfs || wsl=wsl   # a WSLInterop* entry under a mounted binfmt_misc, or a mount table that cannot be read
+88:401:7. `-831 +838,8`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+89:412:_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads, and no binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc), or one is and holds no entry named WSLInterop*. The entries are looked at only under a mounted binfmt_misc, so the look never triggers an automount (an autofs mount point there that nobody serves can hold a stat until the hook is killed, and a killed hook lets the command through); a mount table that cannot be read keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+99:979:22. **WSL 标记读法加固与复审指出的注释**（2026-10-25，主控，技术口径；TASK-005 复审 D-1、D-2、m-1–m-6、D-3）：`/proc/sys/fs/binfmt_misc` 在 systemd 宿主上多是自动挂载点，`-e` 穿过它可能在自动挂载没人服务时一直阻塞，hook 被 Claude Code 超时杀掉即放行——基线从不碰这里，这是放宽带来的新放行路径。改为先读挂载表、只在 binfmt_misc 已挂上时看 `WSLInterop*` 项、读不出挂载表即当作 WSL（What 1 补充 2）。只会把放宽关得更严，姿态不变，不另请 owner 裁定，告知 owner。同轮补申报 VMAX 文案（What 5、R-c），并按 What 7 补充 2 改正注释。
+## review grep
+18:# post_implementation R2（单席 code-reviewer，增量复审）— secret-guard W10 尺寸误拦收窄（10CG/aria-plugin#217，TASK-005）
+20:> **Verdict：PASS_WITH_WARNINGS**。0 Critical / 1 Major / 3 Minor，另列 1 条疑点和 1 条自报的运行影响。审查对象是 aria `710a36d`，worktree 实测 hook 的 sha256 前缀为 `834dee6db0d0`。增量面是 `2893bcc..710a36d -- hooks/`（3 个文件，+140 / −36），加上主仓 `a948862d..ba48f6e2` 里 v31 的 4 个文件。规格来源：任务书 `r217impl/BRIEF-T005r.md`。
+22:## 审查范围与方法
+34:## 阶段 1：规格符合 — PASS
+41:| What 3 / 4 / 5、R-c | 一致 | m-5、D-3、m-1 的文档补充都在：:133、:145、:154、:784，以及 CHANGELOG 草稿的 :915、:928。 |
+42:| 范围 | 无越界 | hook 只改了上面这些。测试侧的改动对应 m-3、m-4、m-6、What 1 补充 2 的用例与四份 WSL 判据。计数（981 / 975、150）与各 ids 清单已同步。 |
+44:## 阶段 2：代码质量与安全
+46:### 优点
+55:### Critical
+59:### Major
+61:**M-1 准入门逐行读挂载表，在 procfs 上开销超线性；挂载多的宿主上，单这一步就能把 hook 拖过 Claude Code 的 5 s，hook 被杀后命令放行**
+88:### Minor
+90:**m-1 环境变量和目录权限能让「文件里的 WSL 标记」判成没有，与「环境只能把放宽关掉」相悖；failglob 下则变成内部错误拦截**
+103:**m-2 新注释有两处说得比代码宽**
+106:   - 实际上只有「打不开」时才关门；能打开却读不出时，按没挂上处理。这是主控已经认可的已知边角，这里只说措辞，不重提行为。m-1 的三种情形也会返回 0。
+111:**m-3 V15-T2 的注释把归零发生的位置说错了**
+117:### 疑点（未核实，单列）
+119:**疑点 1：表里「有一行」不等于「最上层就是它」。**
+125:- 如果按 M-1 改成整表读，可以顺手改成取挂载点为 DIR 的最后一行来判类型。
+134:## 第一轮各条的处置结论
+138:| m-1（VMAX 申报） | 到位 | 已补在 What 5 表 :154、R-c :784、CHANGELOG 草稿 :915 / :928；hook 头注释 :96-98 也写了 value text。 |
+139:| m-2（四处注释） | 到位 | 四处都已改，意思与代码对得上；另外补了重跑块头的同类一句（:796）。回填文本 50/50 行逐字一致。新注释另有两处偏宽，见本轮 m-2。 |
+140:| m-3 | 到位 | 注释与 chk 文案改为 closed pole，并点名 open pole 是 V14-G1；ids 未动；helper 与 sc-direct.sh 一致。 |
+143:| m-6 | 到位 | T1 / T2 / T3 都能为对的原因变红（第 3 项）；T2 会因 M-1 连带假红。 |
+145:| D-2 | 部分到位 | 核心部分（只在已挂上时看项、读不出就关门）已做，并由 W1a / W1d 钉住。第一轮建议的后半「挪到平台判据之后」没有做，裁定里也没有提。修法本身又引入了 M-1。另见疑点 1。 |
+146:| D-3 | 到位（文档） | What 4 :145 与重跑块头（:795-806）写明了例外；头注释没有带上，见本轮 m-2 第 2 处。 |
+148:## 第 1 项：What 1 补充 2 逐点
+152:  - 表能打开却读不出：返回 0（已知边角）。我认为它不比主控判断的更危险：WSL 主要靠内核串识别，这一项只在自编内核上起作用。M-1 的整表读法可以顺带把它收掉。
+155:  - 已挂上但目录不可列：返回 0（m-1）。上面又叠了 autofs：照样看目录（疑点 1）。
+159:- glob 选项：nullglob 下结果正确；noglob 与 failglob 见 m-1。
+161:- 性能：见 M-1。
+163:## 第 3 项：新用例与测试侧判据
+174:- **V15-T2**：静态部分数 `_SG_P0=` 的赋值行，以及它是否紧跟在 `set -uo pipefail` 之后。动态部分在准入门、run 或作业里重取锚点时会得到约 3 s，因而变红。负载方面的余量是 1.0 s；注释的措辞见 m-3，连带问题见 M-1。
+177:  - 与 hook 的函数同义，只在已知边角上结论相反（见 m-2）。
+181:## 第 4 项：注释
+183:hook 里改写的 7 处注释我逐一对过代码：头注释 :92-101、LENGTH BUDGET :602 起、`_sg_vx_pass` 说明 :724 起、重跑块头 :795-806、准入门两行 :829-830、`_sg_relax_nowslfs` 函数头 :838、`_sg_relax_noext` 函数头。除 m-2 的两处之外都属实。其中 `_sg_relax_noext` 的新说法（找不到项目根时，包括 jq 读不了 cwd，算作没有扩展）与第一轮 P6 的实测相符。
+185:## 建议汇总（按优先级）
+187:1. M-1：整表一次读入，并把这一项挪到平台与时间判据之后；先改 proposal，发版前用 unshare 加叠挂载量一次。
+188:2. m-1：glob 之前，对 noglob、failglob 和不可读目录一律关门。
+189:3. m-2、m-3：只改措辞。
+## tasks grep
+32:    rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认 (2026-10-25 TASK-005 复审后增补两类, 字面同样在 proposal 里: (4) What 1 补充 2 —— _sg_relax_ok 的 WSL 一行改写、_sg_relax_left 之后加一行 (v3.4; v3.3 是 WSL 一行换成两行), 新函数 _sg_relax_nowslfs; (5) What 7 补充 2 —— 复审指出的注释, 逐字文本在修复轮提交后回填 proposal)"
+46:    rule: "证据绑定 hook: W8-W14 与 TASK-003 / 004 的每份输出首行记基线与被测 hook 的 sha256 前缀, 以及 sc-cases.sh、sc-direct.sh、mutants.py 的 sha256 前缀 (run-evidence.sh 自动写; W8 阶段也写)。TASK-004 或 TASK-005 之后 hook 只要再改一个字节, 两者都作废: TASK-004 重跑, TASK-005 复审新增的 diff。TASK-006 核对待发版 hook 的 sha256 等于最后一份 W13 与 W12 页眉里记的值"
+86:      - "第二步与规格字面不同处, 主控裁定 (技术口径, 不动姿态; 已写进下面 design 与 INV-7): (1) INCONCLUSIVE 只给「墙钟到了停顿时长而垫片没有停满记录」的情形, 停满判 FAIL [uncut] —— 字面的「墙钟 >= 停顿时长一律 INCONCLUSIVE」会让 (b) 第 12 类「TERM 被忽略时截止仍生效」的坏实现 (QA-M20、QA-M30) 永远抓不住; (2) 端到端字节比对里一臂撞上装置的 12 s 超时、或 hook 整秒时间预算只在一臂触发, 按计时类处理; (3) V5-S13 这一对预算改为 3, 否则 1 s 宽限碰上 1 s 截止, BI-15 抓不住; (4) V3-E5 编号不变, 后缀 budget-1 改为 budget-2, 名字与所测一致"
+87:      - "第二步留给后续的: 套件一侧 commentsync 只核了旧句与 KM2-14 的两处相邻失实注释, 新句等第三步写出套件注释后绑定; _sg_relax_ok 里 /proc/sys/fs/binfmt_misc/WSLInterop 那一项与 root 探测分支本机造不出, 只有代码审读覆盖 (已写进 TASK-005 design); 坏实现的「其他红」 (W13 第 3 节那一栏) 未统计, 交 TASK-004; v31/README.md 已由主控按新脚本改写 (执笔席指出的第 12-14、37、44-45 行, 另补复现命令与 W 文件的来源说明)"
+91:      - "3a 主控裁定 (技术口径, 不动姿态): (1) 移植用例整批放到套件最前, 与过滤轮同一处 —— 放在 SC-13 前时, 开批时的一分钟负载含套件自身前约 5 分钟旧用例的负载, 3a 的 8 次整轮与主控的 1 次全部 >= 2.10, 计时批恒为 SKIP [load], 等于这批用例在整轮里从不判; 负载门槛 2 与「本批首尾各读一次」都不变, 不是放宽 (3b 做); (2) V2-E17 单臂里出现 rc 124 或时间文案时按计时类处理 (第二步慢宿主口径的单臂形式), 低负载下照判 FAIL; (3) helper 的 MISSING / SETUP 在套件里记 FAIL, 带 [missing] / [setup]; (4) run-suite.sh 首行另记 helper 的 sha256 前缀, 垫片头注释改成套件里的用法 (3c 做); (5) 移植的编号里没有依赖字符数与字节数差异的用例 (输入全是 ASCII, V11-S6 比的是整行文本), design「显式 LC_ALL=C.UTF-8」一条在移植部分无适用对象; (6) 套件头注释「python3 只给 SC-20 用」在改动前就不实 (SC-19 的 census 也调用 python3), 计划与 3a 任务书照抄这句而没有实查, 3b 把 Expects 行改成实查的依赖清单; (7) 有 zsh 时的总数 967 是推算 (本机无 zsh)"
+96:      - "3b 主控裁定 (技术口径, 不动姿态): 6 组放宽支里触发点上的命令 (副本超过 8192 的那些), 放宽支断言成立即通过; 否则同一份输出满足基线支断言、且墙钟 >= 2.85 s (截止已到, What 4 的回落, P3 / P6) 也通过并计为截止回落; 都不成立为 FAIL。不用负载门: 6 组排在套件后部, 3b 的 7 次与主控的 2 次整轮结束时负载都 >= 2.21, 加门后几乎每轮 SKIP, 等于没有这组断言。_sg_relax_left 只在截止已过时才关门, 所以因时间回落时墙钟约 >= 3 s, 下界 2.85 s 与截止类用例同口径; 这几次 hook 调用清掉 SECRET_GUARD_TIME_BUDGET_S, 使截止固定为 3 s。3c 做"
+100:      - "3c 主控裁定 (技术口径, 不动姿态): (1) 3b 定的截止回落下界 2.85 s 作废 —— 它从截止类用例抄来, 没有从 hook 推。hook 里因时间而回落只有三条路: 准入门因没时间关门 (_sg_relax_left 在 _SG_P0 + 3 s 之后才关); 截止杀作业 (计时器在 _SG_LEFT 算出之后才起, 杀在 _SG_P0 + 3 s 之后); 重跑自己的时间检查点 (_sg_vx_collect 重置 _SG_T0=$SECONDS, 整秒差 >= 3 时重跑返回 3 而回落, 即重跑开始后 2-3 s; 重跑开始在基线那一遍到触发点之后)。量墙钟的起点早于 _SG_P0。所以前两条墙钟 > 3 s, 第三条墙钟 > 基线那一遍的耗时 Tb + 2 s (Tb < 1 s 的命令会落在 2-3 s 之间), 任何因时间的回落都 > 2 s; 准入门提前关时墙钟约等于 Tb。2.85 s 两侧都有洞: 2-2.85 s 之间会判红合法的检查点回落 (主控复核 hook 时发现, 3b 裁定只想到准入门与截止两条路), 2.85-3 s 之间分不开检查点回落与提前关门 (3c 报告第 6 节第 1 条)。改定: 基线支断言成立时, W >= 3.0 s 记截止回落; 2.0 s < W < 3.0 s 时关门再跑同一输入一次、量 Tb', Tb' <= W - 1.0 s 记截止回落 (1 s 取在 2 s 间隔正中), 否则 FAIL; W <= 2.0 s 为 FAIL; 墙钟按微秒比较、不先四舍五入; Summary 列出每次回落的组名、W 与 Tb'。基线那一遍本身超过 3 s 的命令仍分不开 (输出与合法的没时间关门相同), 属固有限度, 由每组至少一条基线快的命令与移植用例兜住。构造: C1 准入门恒关 (W < 3.0 s 的都须红)、C2 作业拖过截止 (全认回落)、新增 C3 作业开始 2.2 s 后返回 1, 模拟检查点 (先在 3c 代码上证明它会红, 新代码上全认回落)。(2) fbt 的关门调用出现时间文案记 TIMED [time-text]: 认可, 与端到端三类同口径。(3) identity 两臂都出现时间文案时按计时类处理: 认可 —— 参照是低负载实测, 关门臂因时间偏离参照属计时事件, 交负载规则判"
+102:      - "第三步 3c2 (2026-10-24, 新实例, 19 次调用, 上下文最高约 20 万、缓存读约 220 万; aria 提交 df2d629): wpa_x6 按 3c 主控裁定 (1) 改写 (新 helper wpa_x6_hook; 墙钟按微秒整数比较、显示截断两位; 关门重跑读数为 0 当作没有读数, 记不符), 注释块写出 F1-F3 的推导与判法, Summary 的 6 组行列出每次回落的组名、W 与 Tb'。实跑: 旧判法上的 C3 (作业开始 2.2 s 后返回 1) 四组红 (W 2.38-2.84 s), 证明构造能红; 新判法上 C3 6 组全过、截止回落 10 / 10 (7 条走 (b)); C1 6 组全红, 只有 21ab 一条 W 3.35 s 记回落 (固有限度); C2 10 / 10 (W 3.01-3.02 s); 实现整轮 961/961、0 / 10; commentsync GREEN"
+104:      - "3c2 主控裁定 (技术口径, 不动姿态): (1) 执笔席自定的五处小取舍认可四处 (显示截断两位; Tb' 读数为 0 记不符; 中文句前加英文上下文; 取不到组名写 ?); 注释里钉的 hook 前缀 af4658b6f935 去掉, 只留函数名 —— 长期留在测试注释里的 sha 在下次改 hook (如 TASK-005 复审) 后会静默过时, 没有检查发现得了, 函数名改了反而显眼。(2) 只量一次 Tb' 余量不够: 执笔席 C3 里一条 W 2.86 s、Tb' 1.74 s (那条平时约 0.66 s, 关门那一遍被主机卡了约 1.1 s), 离界只差 0.12 s; 合法的 (b) 只在重跑被拖过 2 s 时出现, 那时主机正忙, 紧接着量的 Tb' 也容易被卡, 两者相关。改为: 关门重跑至多 3 次、两次之间等 1 s, 有一次 Tb' <= W - 1.0 s 即认回落, 都不满足记不符并列出全部读数。准入门提前关时每次读数都约等于 W, 照样红; 假绿仍须 W 自身被拖长 1 s 以上 (重试只让 Tb' 少受卡顿影响)"
+106:      - "第三步再分段 (3c2 复核后): 3d 照任务书派出 (坏实现、扰动、环境错误与基线红集都是过滤轮, 不经 6 组); 3e = 3c2 主控裁定的两处改动, 加 C1、C3 与主控的快速失败构造重跑和一次整轮, 排在 3d 之后; 之后主控做最终整轮"
+107:      - "第三步 3d (2026-10-24, 新实例, 31 次调用, 上下文最高约 22 万、缓存读约 420 万; 主仓 v31/run-mutants.sh 66 -> 104 行): 套件模式 MUT_SUITE —— 每个坏实现与扰动经 run-suite.sh 跑指定用例的过滤轮, 判定读 SG_W10_LOG; 走关门臂的 25 个编号上细节带 [reference] 即算对的原因; helper 的 MISSING 记 FAIL [missing], 对不上原因表落 WRONG-REASON; P-0 有 [platform] 以外的 SKIP 判 NOT-JUDGED。不设 MUT_SUITE 时输出与改前逐字相同 (BI-8|BI-24 两轮 diff 为空)。实跑: 57 个坏实现全 CAUGHT, 6 个扰动 CAUGHT, P-0 低负载重跑 GREEN (全量轮里排在最后, 负载 2.09, 判 NOT-JUDGED); 与第二步 mut-summary.txt 逐个比只有 BI-8 不同 (v31 [bytes], 套件 [reference]: _SGV_VMAX 两臂共用, 关门臂也放行); 首跑计时批未判的 21 个在低负载下重跑结论相同。两种环境错误: SC_BASH 指向不存在的文件 FAIL 135、退出 1; helper 一启动就 exit 7, FAIL 2 (V0-H1、V0-H2)、退出 1。基线红集: 59e333c 上 PASS 24 / FAIL 112 ([missing] 74, [reference] 0), 与 base-5.2.15.txt 按编号逐个相同, 只差不移植的 V12-C1。另查出 run-suite.sh 吞掉一种环境错误 (见 3d 主控裁定 (1))"
+109:      - "3d 主控裁定 (技术口径, 不动姿态): (1) run-suite.sh 吞错要修 —— 测试工具把环境错误跑成全绿, 正是 fail-closed 要防的: SC_BASH、SG_W10_LOG 改用 readlink -m, 原值交给套件自己报错; SG_W10_LOG 的目录不存在时 run-suite.sh 退出 3; 并查 v31 其余脚本同形状的 readlink -f。并入 3e; 验收「两种环境错误都须报 FAIL」在 3e 修完后用父目录也不存在的写法再验一次。(2) REFIDS 写死在脚本里: 认可 —— 少列只会更严, 多列也放不过 (不走关门臂的用例不会出现 [reference])。(3) P-0 遇 [platform] 以外的 SKIP 判 NOT-JUDGED: 认可, 与其余「负载挡住了判定」同一个词, 计入未如预期、退出 1。(4) 全量连跑到第 40 个左右负载过 2, 排在最后的 P-0 多半 NOT-JUDGED: 记为操作要求 —— TASK-004 跑全量时 P-0 另在低负载下单独跑一次, 两次读数都记"
+110:      - "第三步再分段 (3d 复核后): 3e = 3c2 主控裁定的两处 + 3d 主控裁定 (1) (任务书 b2/BRIEF-T002c-3e.md); 之后主控做最终整轮 (5 个 SC_BASH, 导出 WSL_DISTRO_NAME 与导出 WSL_INTEROP 各一轮) 与 commentsync"
+113:      - "3e 主控裁定 (技术口径, 不动姿态): (1) 执笔席自加的两处 (readlink -m 失败时原值照传、日志路径非绝对即退出 3) 都是失败即关, 认可。(2) 日志目录存在但不可写不拦: 认可 —— 套件写不进时 bash 会在输出里报错, 不是静默。(3) readlink -f 清单: run-evidence.sh:8 要改 (工作目录的父目录也不存在时 W 为空, 之后的路径落到文件系统根下), 列为 TASK-004 的前置; run-mutants.sh:32 的空值会让 mutants.py 读不到 hook 而退出 3, 不改; 其余两处紧接空串检查。(4) 包装构造多出来的红在 6 组之外, 认可"
+121:      - "套件 (1) 搬入方式 (PP2-P、PP2-m15): sc-cases.sh 与 sc-direct.sh 的用例改写成套件里的 bash 用例, 编号不变 (V<k>-...); 断言与期望值照搬, 下面 R2 补强改动的除外。shim/delay-first 以文件复制进 tests/, jq、sed 两个名字用符号链接, 写进套件头注释; shapes.py 不搬 Python, 改写成 bash 的输入生成函数 (套件头注释「python3 只给 SC-20 用」保持为真; 2026-10-24 注: 这句改动前已不实, 见 notes 的 3a 主控裁定 (6))。只有新用例按 SC_BASH 选执行 hook 的 bash, 旧用例照旧; 被测 bash 的能力探测问的是执行 hook 的那个 bash。直调用例用 _SG_P0=${EPOCHREALTIME:-} (set -u 下 3.2 没有该变量)"
+128:      - "套件 (1) 补充 (2026-10-24 第三步派出前主控定下, 技术口径, 不动姿态): (i) 直调用例放进 helper hooks/tests/lib/secret-guard-w10-direct.sh (由 v31/sc-direct.sh 改来, 由 SC_BASH 执行, 末行哨兵), 端到端与静态用例写在 secret-guard.test.sh 里, 垫片放 hooks/tests/lib/sg-shim/; (ii) 套件不依赖 git 历史: 端到端里「与基线逐字节相同」的一臂, 取同一 hook 在环境里设了 WSL_DISTRO_NAME (准入门的关门开关) 时的输出, v31 照旧与 59e333c 比; 因此 V2-E17 在套件里改判结局 (退出码 2 与尺寸文案); 关门臂另须对上基线的已知结局 (2026-10-24 补, 见 notes「口径 (ii) 的漏洞」); (iii) 每个移植的编号在任何平台、任何负载下恰好报一次 (PASS、FAIL 或 SKIP [原因]), SC-13 的总数计入 SKIP, 汇总单列 SKIP, SKIP 不影响退出码; 平台不放宽时不适用的用例记 SKIP [platform], 所以计数与平台无关; (iv) 6 组既有用例按「跑它的 bash 上放宽是否生效」分两支断言: 生效处断言新结局, 其余平台保持原断言 (裁定 E); 判据与 sc-cases.sh 的 RELAX 相同, 另计环境里的 WSL 变量; (v) V11-S4 在套件里改成固定判据 (恰好一处遍历 risky_patterns, 与基线同数, 使 BI-11 在套件上仍抓得住), V12-C1 只留在 v31 (注释同步由 v31/commentsync.py 核对、TASK-005 审读); (vi) 套件加两个开关: 只跑编号匹配的移植用例 (其余跳过, 供坏实现与计时批用); 逐条输出 v31 格式的结果行 (原因标签照旧, 供 run-mutants.sh 解析)"
+129:      - "套件 (2) 6 组既有用例 21ab、21ac、21ag、21aj、21al、21ao 按 W9 改断言 (2026-10-24 补: 放宽支里触发点上的命令另认截止回落, 见 notes 的 3b 主控裁定; 判法 3c 复核后改定, 见 notes 的 3c 主控裁定; 关门重跑的重试见 3c2 主控裁定); 其中出 longline 文案的断言用新 helper (要求出现 has a line longer than 与 Matched pattern:), 出普通命中文案的断言要求出现 value-REDACTING filter 且不出现 has a line longer than —— 不再用 wpa_x_finding 区分两者 (PP1-A12)"
+130:      - "套件 (3) What 7 的套件 7 块注释与 5 个用例标题整块改写; 新用例插在 SC-13 断言之前 (2026-10-24 改为整批放在套件最前, 见 notes 的 3a 主控裁定 (1)); 头注释计数改为在 git 检出里实跑的数 (非 git 副本里 SC-8 / SC-9a 不跑)"
+131:      - "依赖字符数与字节数差异的用例 (CJK 填充等) 显式 LC_ALL=C.UTF-8, 先断言 locale charmap 为 UTF-8, 否则 SKIP 并单独计数 (R2-A22 的处置在此落地, PP1-A35; 2026-10-24 注: 移植的编号里没有这类用例, 见 notes 的 3a 主控裁定 (5))"
+162:      - "第一段主控裁定 (技术口径, 不动姿态): (1) Q-16、Q-24 (V3-E3) 与 Q-17 (V6-E2) 只被计时类端到端用例抓住, 负载 >= 2 时那批 SKIP: 认可, 不补 —— 验收要的是「被预先写下的用例按预期抓住」, 已满足; 高负载时整批记 SKIP [load] / [void] 并要求重跑, 不是静默放过 (INV-7)。执笔席建议的与负载无关的直调用例 (桩住 sleep 记计时器参数应等于 _SG_LEFT、_sg_vx_collect 不得重取 _SG_P0、作业里 exec 2>/dev/null) 记给 TASK-005 权衡。(2) V2-G12 / G13 只验关门一极 (平台检查失败时 2 oversize、绝不 4), 名字「触发点问准入门」比它验的宽; 开门一极由 V14-G1 补上, 两条合起来才是完整的「问准入门」—— 用例不改, 名字与注释的准确性记给 TASK-005。(3) 阶段 2 不完全盲: 认可 —— 独立性要的是坏实现的点子出自本席, 阶段 1 冻结在先已保证; 预测略有依据不改变缺口判定 (三个未抓住的根本没红)。(4) WSLInterop 文件分支在非 WSL 主机造不出: 已是 TASK-005 的审读项。(5) 计数 136 / 967 / 961 变为 141 / 972 / 966: 套件头注释已改; 下游文档由 TASK-006 按待发版 SHA 现跑的数同步 (design2、design3 已写)。(6) 成本: 本段缓存读约 1060 万, 是第三步各段的 2-5 倍 (上下文最高 36 万); 第二段换新实例, 调用上限 50"
+166:      - "第二段主控裁定 (技术口径, 不动姿态): 执笔席拿不准的六项都认可 —— (1)「最重的 4 个」两种读法取并集跑了 6 个; (2) 末行同时给出两种读法; (3) T_trigger 取第一个 relax-start (236 个里没有出现过两个); (4) 没做 CPU 争用下的运行 (INV-7 不许同时跑第二个重负载)、sh / zsh 拉起再 re-exec 的路径、预算变量取别的值 (套件 V3-E4、V3-E5 已覆盖 4 与 2); (5) 全程 nice 19 加 2 核的量法限制照实记; (6) 校准、补充、对照三类运行没走批闸门, 只引读数有效的块。附带观察 (重跑判不完时多等 2.3-3.0 s 换来同样的拦截) 是放宽本身的延迟代价, 不违反判据; 真实流量上的量由 TASK-004 的 W12 第 1 节另报 (见 TASK-004 design 新增一条), 结果随 TASK-006 的 owner 门呈报"
+182:      - "前置 (2026-10-24 TASK-002 3e 复核后补): run-evidence.sh:8 的 W=$(readlink -f \"$1\") 在工作目录的父目录也不存在时为空, 之后的路径会落到文件系统根下 (/base.sh): 改 readlink -m, 并核 mkdir -p 成功, 否则退出 3; 用父目录不存在的工作目录跑一次, 须在写任何文件前退出 3 (2026-10-24 第一段复核后订正: 父目录不存在但建得出来的照常建出并继续, 只有建不出来的工作目录才退出 3, 见 notes 第一段主控裁定 (2))"
+196:      - "第一段主控裁定 (技术口径, 不动姿态): (1) 验收 3 实质成立 (低负载下原型与实现逐条相同), 与 95cf1de7 的差异按上条解释记入; 但 W9 的结局对负载敏感 (近截止的命令), 所以 W9 也按 INV-7 跑: 首尾一分钟负载都 < 2, 页眉记开始时的负载 (run-evidence.sh 的 W9 页眉原写在套件跑完之后) —— 第二段改 run-evidence.sh 的 W9 页眉并在低负载下重跑 W9, 替换 4a 这一份 (它的收尾读数 2.79)。(2) design 6 的检查我写得不准: 要修的是旧写法下工作目录为空、文件落到文件系统根下; 改用 readlink -m 后工作目录不会为空, 父目录不存在但建得出来的照常建出并继续, 建不出来的 (如父路径是普通文件) 才在写任何文件前退出 3 —— 认可执笔席的读法。(3) W8 加页眉后不设 OUT 重跑, W8-v31.diff 不再与 95cf1de7 那份逐字节相同、正文相同: 认可 (各阶段的页眉本就随时间变)。(4) 原有设计的两处空白交第二段: W12 缺 TRAFFIC_DIR 时要在写任何文件前退出 3 (现为跑到 W12 才以 1 退出); W12-replay-138.tsv 没有页眉 (INV-8), 加一行以 # 开头的页眉并让下游 awk 跳过 # 行。(5) proposal 状态行把原型 hook 的 sha 前缀 9f61db0e7b8b 写在 v31/W8-v31.diff 后面, 读起来像 diff 文件的 sha (该文件是 9fc20fdbb419): 措辞歧义, 与状态行仍写 Draft 一并写进会话交接"
+199:      - "第二段主控裁定 (技术口径, 不动姿态): (1) 1b 的逐字节比对取自 ident.sh 另跑的一遍 (replay138.sh 不记 stderr 的 sha, 本段不许改它): 认可, 用到的只有没进重跑的 n=666, 结果确定。(2)「回落」按「输出与基线逐字节相同」读, 0 条; n=1053 进入重跑后被增长限拦下 (growth 文案, 基线是 oversize), 是放宽判定本身的拦截 (What 2、P8), 已在 1b 单列 (多等 0.124 s), 原型那一轮也是 growth。(3) W13 文件第 2 节只列 FAIL 与 PASS, 74 个 MISSING 在文件里看不见: 把那一轮基线的原始输出收作补充证据 v31/impl/W13-sc-base.txt (首行记全部 sha); run-evidence.sh 这次不改, 让已提交的 W13 与生成它的脚本保持一致 —— 第 2 节加一行 missing 记为待办, 下次有人改 run-evidence.sh 或需要重跑本任务之前补上。(4) run-mutants.sh 自己写的首行: 套件模式只记实际用到的文件 (实现、mutants.py、套件、helper、run-suite.sh), 认可这个口径; v31 模式缺基线 hook 与 sc-direct.sh 的 sha, 记为待办 (W13 主文件的页眉是完整的)。(5) v31/impl/ 下多出的 W12-replay-138-base.tsv、W12-ident-138.txt、W13-P0-v31.txt、W13-P0-suite.txt 都收进提交。(6) 执笔席自陈一个空等 stdin 的进程, 已按 PID 清掉, 不影响结果"
+200:      - "TASK-004 完成判定 (2026-10-25, 主控): 验收 1 (W8, 第一段)、验收 4 (W11, 第一段)、验收 3 (W9: 第二段在低负载下重跑, 与原型那一轮的差异只在 SC-21ab 那 3 处并已由原型那一轮的负载解释)、验收 2 (W13)、验收 5、6 (W12) 都成立, 状态改为 done。延迟代价 (1b) 的数随 TASK-006 的 owner 门呈报。下一步 TASK-005 (独立代码审查, 审 aria 2893bcc 的代码)"
+201:      - "重跑 (2026-10-25, 主控): TASK-005 修复轮改了 hook (af4658b6f935 -> 834dee6db0d0, aria 710a36d), 按 INV-8 上面判完成的 W8-W14 作废, 状态改回 in_progress; 重跑段任务书 b2/BRIEF-T004r.md (含 TASK-003 的两份 W14), 对照判据同上, 另与上一版实现逐项比"
+202:      - "4r 第一次 (2026-10-25, 主控): 与 TASK-005 增量复审并行派出; 复审第二轮报出 M-1 (hook 还要改) 后主控停掉它 (驱动已因信号退出, 11 次调用), 不留证据, v31/impl 下被动过的 W8 / W9 / W11 从 git 复原; 复审席的叠挂载探针 06:42-06:44 把 1 分钟负载推到 6.94, 正压在这次的开头, 本来也要按 INV-7 作废。hook 定稿后按 b2/BRIEF-T004r.md 换上新的 commit 与 hook 前缀再派"
+204:  - id: TASK-005
+215:      - "(2026-10-24 TASK-003 第一段复核后补) 另审: V2-G12 / G13 的名字与注释只该说它验的那一极 (关门时绝不返回 4), 开门一极在 V14-G1; 只被计时类端到端用例抓住的三处 (计时器睡的是剩余时间 _SG_LEFT、锚点 _SG_P0 只在 hook 起点取一次、作业里 exec 2>/dev/null) 要不要补与负载无关的直调用例 (见 TASK-003 notes 第一段主控裁定 (1))"
+220:      - "主控裁定 (2026-10-25, 技术口径, 姿态不变或更严): 开 TASK-005 修复轮, 不带着 D-2 发版 —— D-2 是本变更新引入的潜在放行路径, 加固只会把放宽关得更严, 属不改姿态的技术改动, 由主控定并告知 owner。规格先改 (proposal v3.3): What 1 补充 2 钉到字面 (先读挂载表, 只在 binfmt_misc 已挂上时看 WSLInterop* 项, 读不出挂载表即当作 WSL; D-1 一并覆盖; 主控交付前在 3.2.57、5.0.18、5.2.15、5.3.20 上实跑过这段代码, 抓出并改掉两个 bug: 循环末行不匹配时 while 的退出码为 1 会被读成挂载表读不出、读不出时的报错漏到 stderr); What 5、R-c 与 CHANGELOG 草稿补 VMAX 一类 (m-1); What 3 写明 fork 延迟算进 ε (m-5, 只改文档); What 4 写明 D-3 的例外; What 7 补充 2 列出 m-2 四处、D-3 与 WSL 行的注释各自要说的意思, 逐字文本修复轮后回填; 用例一侧 m-3、m-4、m-6 与 What 1 补充 2 的直调用例一并补。INV-1 增补这两类内容差。之后: 主控复核 -> TASK-004 重跑 (hook 改了, INV-8) 加耗时矩阵最重形状的复跑 -> 本任务对新增 diff 复审 -> TASK-006 (owner 门)。修复轮任务书 b2/BRIEF-T005f.md"
