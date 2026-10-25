@@ -127,10 +127,11 @@ _sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entr
 主控交付前在 3.2.57、5.0.18、5.2.15、5.3.20 上对这段代码（v3.5）实跑：真实路径 0；只有 autofs（目录里有 `WSLInterop`）0；binfmt_misc 加 `WSLInterop-late` 1；binfmt_misc 无项 0；binfmt_misc 之上叠 autofs（目录里有 `WSLInterop`）0；空表 1；读不出 1；把目录当表 1；`set -f` 下 binfmt_misc 加 `WSLInterop-late` 1；`shopt -s failglob` 下 binfmt_misc 无项 0；binfmt_misc 目录不可查（000）1；可查不可列（0311）加 `WSLInterop-late` 1；DIR 是 0755 的普通文件 1；stderr 全程 0 字节（uid 1000；本机的 awk 是 mawk，程序只用 POSIX awk 的写法）。v3.4 只在最后一种上不同（返回 0：`-x` 对可执行的普通文件为真，随后 `-e` 得 ENOTDIR）；去掉 `-d` 与 `-x` 那一行时，目录不可查与普通文件两条变成 0。v3.3 的写法在前十种情形里有五处不符（叠 autofs 1、空表 0、目录当表 0、noglob 下 0、failglob 下报错中止）；复审第二轮实测它在目录不可列时返回 0。
 
 已知边角（v3.5 记录，不改代码；复审第三轮疑点 1、2 与 m-1）：
-- 「表里该挂载点的最后一条」当作最上层是近似。移动过的挂载（`mount --move` 保留原来的序号）、`move_mount` 的 `MOVE_MOUNT_BENEATH`（6.5 起）、以及父目录被重新挂载（例如 `/proc` 上又挂了新的 procfs，`unshare --mount-proc`、`bwrap --proc` 都会如此）时，最后一条可能不是路径实际到达的那一层。前两种要有人刻意对 DIR 做挂载操作（systemd 不会在已经是挂载点的路径上启动 automount），后果是可能去看一个没人服务的 autofs、落回 D-2 的阻塞；第三种会漏看被遮住的 `WSLInterop`。用 mountinfo 的父子关系判最上层也解决不了第三种。
+- 「表里该挂载点的最后一条」当作最上层是近似。移动过的挂载（`mount --move` 保留原来的序号）、`move_mount` 的 `MOVE_MOUNT_BENEATH`（6.5 起）、以及父目录被重新挂载（例如 `/proc` 上又挂了新的 procfs，`unshare --mount-proc`、`bwrap --proc` 都会如此）时，最后一条可能不是路径实际到达的那一层。前两种与平台无关，前提是有人刻意对 DIR 做挂载操作（systemd 不会在已经是挂载点的路径上启动 automount）；后果是可能去看一个没人服务的 autofs、落回 D-2 的阻塞——hook 超过 Claude Code 的 5 s 被杀，命令就放行了，这在放宽生效的非 WSL 平台上同样会发生（复审第四轮 m-3 订正：此前最后一条把它也概括成只在 WSL2 上才有后果）。第三种会漏看被遮住的 `WSLInterop`。用 mountinfo 的父子关系判最上层也解决不了第三种。
 - binfmt_misc 之上叠着别的挂载时，下层 binfmt_misc 里登记的项不看、按没有算——为了不触发自动挂载，宁可不看。
 - LSM 允许查目录、却拒绝对其中的项做 getattr 时，`-e` 判成没有。
-- 这几种都只在不带其他 WSL 标记的 WSL2 上才有后果：内核是自编的、版本串里没有 microsoft 或 WSL，进程环境里也没有 `WSL_DISTRO_NAME` / `WSL_INTEROP`。
+- 「漏看」类的后果（第三种情形、下层的项不看、LSM 这三项）只在不带其他 WSL 标记的 WSL2 上才有：内核是自编的、版本串里没有 microsoft 或 WSL，进程环境里也没有 `WSL_DISTRO_NAME` / `WSL_INTEROP`。
+- 改进方向（复审第四轮提出，未核实，留作后续）：改读 mountinfo，取 DIR 的最后一条；它是 binfmt_misc 时，把它的 `major:minor` 与 stat DIR 得到的设备号比较，对不上就当作有标记、也不去看项（stat 对路径的最后一个分量不触发自动挂载）。上面三种情形都会对不上而关门；代价是多起一个外部 `stat` 进程。
 
 直调用例（TASK-005 修复轮补）：上面各情形各一条（假挂载表与目录建在 helper 自己的临时目录下；目录不可查与可查不可列两条在 uid 0 下不适用——root 可查、可列任何目录，后一条在 root 下区分不了逐名查与通配——记 SKIP [platform]）；把 `_sg_relax_nowslfs` 桩成返回 1 时，放宽平台上的 `_sg_relax_ok` 返回 1；另有一条开销用例：在私有挂载命名空间里叠 1000 个 tmpfs 后读真实的挂载表，函数须在 0.5 s 内返回（没有 `unshare -rm`、或叠不满 1000 层的宿主上 SKIP [platform]）。
 
