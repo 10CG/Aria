@@ -1,7 +1,8 @@
 # Latest Session Handoff
 
 **Active (parallel predecessor)**: [2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md](./2026-09-05-m6-six-test-hardenings-landed-awaiting-submodule-push-auth.md) — aria-2-0-m6-dispatch-input-delivery @ phase=B.2 (status=active) — M6 六处测试补强落地 + owner 两裁定落地 (9 TASK→done, 账目 27/30; 反事实全红) + 两个生产级修复 (HCL 未声明 meta 三键 / S1_SCAN 复合 issue_id 键漂移) → aria-orchestrator feature 9ec1fcc 已双推 (owner 授权, ls-remote 两端 MATCH) updated=2026-09-05
-**Latest**: [2026-10-24-session-close-intake-observation-262-triage.md](./2026-10-24-session-close-intake-observation-262-triage.md) — session-close-20261024-262-triage-intake @ phase=session-close (status=done) — 双热轨零侵入收进 (#217 B.2 观测 + #262 PoC 占用回避) + #262 triage 双源勘正 (v0.22 GitHub-only / PyPI 停 0.19 / 2 CVE, comment 30779, 工件 dc9d659); carry: #217 终局复核待收笔 / #262 版本策略待 PoC 出格 / #258 材料 updated=2026-10-24
+**Latest**: [2026-10-25-session-close-3b-intake-rule6-ruling-materials.md](./2026-10-25-session-close-3b-intake-rule6-ruling-materials.md) — session-close-20261025-rule6-ruling-materials @ phase=session-close (status=done) — 3b 收进观测 + #258/#261 裁定材料上 owner 面 (comment 30854/30857, 零默认); carry: owner 同批三裁 / #217 v3.3 修复轮在途 / #262 PoC 静默待外因 updated=2026-10-25
+**Superseded (前一 Latest · #262 triage 会话收尾)**: [2026-10-24-session-close-intake-observation-262-triage.md](./2026-10-24-session-close-intake-observation-262-triage.md)
 **Superseded (前一 Latest · 三周期会话收尾)**: [2026-10-24-session-close-triple-cycle-v1.77.1-to-v1.77.4.md](./2026-10-24-session-close-triple-cycle-v1.77.1-to-v1.77.4.md)
 **Superseded (前一 Latest · v1.77.3+4 周期收尾)**: [2026-10-23-cycle-done-v1.77.3-4-review-debt.md](./2026-10-23-cycle-done-v1.77.3-4-review-debt.md)
 **Superseded (前一 Latest · v1.77.2 三轨周期收尾)**: [2026-10-22-cycle-done-223-218-246.md](./2026-10-22-cycle-done-223-218-246.md)
