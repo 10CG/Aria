@@ -1,0 +1,10 @@
+P0-v31-a1.txt:  load 0.81 0.94 1.03 ->  load at the end 0.61 0.86 0.99
+P0-suite-a1.txt:  load 0.61 0.86 0.99 ->  load at the end 0.89 0.89 1.00
+P0-v31-a1.txt: {'GREEN': 1} | ids 1 (BI 0, P 1) | with other red: 0 (cases 0)
+    # run-mutants.sh | 2026-10-24T23:44:00Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | sc-cases 7d29c3cd0f5b | SC_BASH /usr/bin/bash | scope designat
+    # 0 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 0)
+    # perturbation round: 0 not as expected | load at the end 0.61 0.86 0.99
+P0-suite-a1.txt: {'GREEN': 1} | ids 1 (BI 0, P 1) | with other red: 0 (cases 0)
+    # run-mutants.sh | 2026-10-24T23:44:50Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | suite mode: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3
+    # 0 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 0)
+    # perturbation round: 0 not as expected | load at the end 0.89 0.89 1.00

@@ -1,0 +1,7 @@
+W12 rows 138 outcomes {'allow': 136, 'oversize': 1, 'growth': 1} over 0
+1b allowed after rerun n 136 p50 0.272 p90 0.638 max 1.771
+1b fallback to the baseline kind 0
+1b other rerun outcomes [('1053', 'growth', 'oversize')] no rerun [('666', 'oversize')]
+W13 base red set: 95cf1de7 red 73 green 19 | now {'FAIL': 43, 'MISSING': 74, 'PASS': 25}
+  common 91 differences (MISSING as FAIL) [('V5-S13b-nothing-outlives-the-run', 'PASS', 'MISSING'), ('V7-E15-credit-as-normal', 'PASS', 'FAIL')]
+  only in 95cf1de7 ['V3-E5-budget-1'] | only now 51

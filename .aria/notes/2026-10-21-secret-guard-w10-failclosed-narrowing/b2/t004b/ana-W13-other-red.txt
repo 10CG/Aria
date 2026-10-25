@@ -1,0 +1,17 @@
+BI-2     CAUGHT  (10) V3-S4-slow-judgement V4-S6-spoofed-tail-0 V5-S9-child-left-behind V5-S13b-nothing-outlives-the-run V5-S15-job-refuses-outside-group-leader V3-E3-ancho
+BI-4     CAUGHT  (11) V4-S3-block-without-text V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V0-H1-direct-complete V3-E3-anchor-at-hook-start V3-E4-cap-3-at-b
+BI-5     CAUGHT  (4) V2-G4-empty-extension-file V2-G4-extension-path-is-a-directory V2-G14-cwd-extension-file-with-entry V2-E18-extension-via-stdin-cwd 
+BI-6     CAUGHT  (5) V2-G12-segment-trigger-asks-gate V2-G13-whole-trigger-asks-gate V2-G17-wsl-distro-name-closes-gate V2-G18-wsl-interop-closes-gate V2-E17-wsl-mark-keep
+BI-7     CAUGHT  (6) V14-F1-status-4-falls-back-to-the-baseline-block V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-ignored
+BI-8     CAUGHT  (1) V9-C4-value-limit-in-rerun 
+BI-10    CAUGHT  (2) V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge 
+BI-12    CAUGHT  (2) V7-N13-unmeasured-length-rows-only V7-E15-credit-as-normal 
+BI-13    CAUGHT  (1) V2-E7-no-time-left 
+BI-17    CAUGHT  (3) V9-C2-references-rerun-cb12 V9-C3-for-statements-rerun V9-C4-value-limit-in-rerun 
+BI-17a   CAUGHT  (1) V9-C4-value-limit-in-rerun 
+BI-17c   CAUGHT  (1) V9-E10-count-axis-read-blocked 
+BI-23    CAUGHT  (2) V5-S10c-dead-timer-no-judgement V5-S10d-no-judgement-with-dead-timer 
+BI-26    CAUGHT  (1) V2-E18-extension-via-stdin-cwd 
+BI-33    CAUGHT  (5) V7-N10-blank-padded-long-line V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only V14-N1-nocredi
+BI-44    CAUGHT  (1) V2-E8-ostype-from-environment-ignored 
+BI-45    CAUGHT  (1) V14-G1-triggers-return-4-with-the-baseline-reason 

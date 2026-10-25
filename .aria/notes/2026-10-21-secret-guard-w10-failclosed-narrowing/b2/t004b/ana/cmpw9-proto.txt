@@ -1,0 +1,12 @@
+SC-21ab mine=11 proto=11
+SC-21ac mine=3 proto=3
+SC-21ag mine=1 proto=1
+SC-21aj mine=3 proto=3
+SC-21al mine=3 proto=3
+SC-21ao mine=3 proto=3
+  SC-21ab: mine vs proto identical check lists: True
+  SC-21ac: mine vs proto identical check lists: True
+  SC-21ag: mine vs proto identical check lists: True
+  SC-21aj: mine vs proto identical check lists: True
+  SC-21al: mine vs proto identical check lists: True
+  SC-21ao: mine vs proto identical check lists: True

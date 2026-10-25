@@ -1,0 +1,56 @@
+sc-base now: {'MISSING': 74, 'FAIL': 43, 'PASS': 25} | 95cf1de7 red 73 green 19 | common ids 91 | 95cf ids absent now ['V3-E5-budget-1']
+common: 95cf red -> now {'MISSING': 51, 'FAIL': 21} | 95cf green -> now {'PASS': 17, 'MISSING': 1, 'FAIL': 1}
+flips: [('V5-S13b-nothing-outlives-the-run', 'green', 'MISSING'), ('V7-E15-credit-as-normal', 'green', 'FAIL')]
+new ids 51 {'PASS': 8, 'FAIL': 21, 'MISSING': 22}
+  V0-H1-direct-complete                                          PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V0-H2-case-list                                                PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V10-N6-filtered-long-line-rows-only                            FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V11-S5-longline-head-verbatim                                  FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V11-S6-longline-chinese-line-verbatim                          FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V11-S7-longline-text-verbatim                                  FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V14-F1-status-4-falls-back-to-the-baseline-block               FAIL    first touched after 95cf1de7: 382bb001 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — TASK-003 第一段: 非作者独立
+  V14-G1-triggers-return-4-with-the-baseline-reason              FAIL    first touched after 95cf1de7: 382bb001 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — TASK-003 第一段: 非作者独立
+  V14-G2-growth-limit-follows-gmax                               FAIL    first touched after 95cf1de7: 382bb001 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — TASK-003 第一段: 非作者独立
+  V14-N1-nocredit-never-runs-credit                              FAIL    first touched after 95cf1de7: 382bb001 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — TASK-003 第一段: 非作者独立
+  V14-N2-longline-pattern-is-a-rule                              PASS    first touched after 95cf1de7: 382bb001 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — TASK-003 第一段: 非作者独立
+  V2-E17-wsl-mark-keeps-baseline                                 PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-E18-extension-via-stdin-cwd                                 PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G12-segment-trigger-asks-gate                               PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G13-whole-trigger-asks-gate                                 PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G14-cwd-extension-file-with-entry                           MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G15-cwd-project-without-extension-file                      MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G16-environment-root-before-cwd                             MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G17-wsl-distro-name-closes-gate                             MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G18-wsl-interop-closes-gate                                 MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-WSL-tag       MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-empty         MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl1          MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2          MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:osrelease-wsl2-2020     MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:three-args              MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V2-G2-platform:x86_64-pc-linux-gnu:5.2:wsl-mark                MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V3-E5-budget-2                                                 FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V3-G12-time-left-zero-padded                                   MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V4-S16-rerun-collect-checkpoint                                FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V4-S17-rerun-whole-checkpoint                                  FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V4-S18-rerun-segment-checkpoint                                FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V4-S19-block-text-bytes                                        MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V5-E19-deadline-with-term-ignored                              FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V5-S10b-no-judgement-without-timer                             MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V5-S10d-no-judgement-with-dead-timer                           MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V5-S15-job-refuses-outside-group-leader                        MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V6-S20-segment-fallback-text                                   FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V6-S21-whole-fallback-text                                     FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N10-blank-padded-long-line                                  MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N11-lmax-edge-normal                                        MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N12-lmax-edge-rows-only                                     MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N13-unmeasured-length-rows-only                             MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N7-big-judge-filtered-long-line                             MISSING first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N8-whole-branch-returns-big-judge                           FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-N9-segment-routes-to-big-judge                              FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V8-D4-growth-text-whole                                        FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V8-D5-growth-text-segment                                      FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V9-C3-for-statements-rerun                                     FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V9-C3b-for-statements-baseline                                 PASS    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V9-C4-value-limit-in-rerun                                     FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post
+  V7-E15-credit-as-normal                                        FAIL    first touched after 95cf1de7: 8f66e393 2026-10-24 docs(evidence): secret-guard-w10-failclosed-narrowing — B.2 第二步: 验收脚本按 post

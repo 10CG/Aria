@@ -1,0 +1,27 @@
+== CR bytes in run-evidence.sh before: 0
+patched: newlines 81 -> 121
+== CR bytes after: 0 | bash -n: ok | mode 755
+== diff: +51 -11 | other v31 changes: 0
+== 2. TRAFFIC_DIR: exit 3 before any file (new script); the old script (HEAD) for contrast
+  tA   W12       rc=3 wd=absent out-files=0 | W12 needs TRAFFIC_DIR, the frozen corpus with its cmds directory: ''
+  tB   W12       rc=3 wd=absent out-files=0 | W12 needs TRAFFIC_DIR, the frozen corpus with its cmds directory: '/tmp/claude-1
+  tC   W12       rc=3 wd=absent out-files=0 | W12 needs TRAFFIC_DIR, the frozen corpus with its cmds directory: ''
+  tE   W8 W12    rc=3 wd=absent out-files=0 | W12 needs TRAFFIC_DIR, the frozen corpus with its cmds directory: ''
+  tD   W8        rc=0 wd=created out-files=1 | W8 done: added 199 (blank 4) removed 56
+  OLD  W12       rc=127 wd=created files-in-wd=2 | ./run-evidence.sh: line 50: TRAFFIC_DIR: W12 needs TRAFFIC_DIR
+== 3. section 1 of W12: old readers on the TSV without a header vs new readers on it with a header (95cf1de7's TSV)
+  readers: old 4 lines, new 4 lines, new lines reading the TSV 4
+  SAME: old on rows vs new on header+rows (8 lines)
+  SAME as 95cf1de7 W12-real-traffic.txt lines 3-10
+  negative control: old readers on header+rows differ in 4 lines
+== 4. 1b on synthetic inputs (95cf1de7 rows as the hook under test; a made-up baseline at 0.200 s; ident DIFF for the allowed ones)
+  extracted 29 lines; rows 138 allow 136 | relax-start present: 137 | kinds with relax-start: ['allow', 'growth']
+  baseline replay outcomes: oversize 137 growth 1
+  entered the rerun, fell back to the size text of the baseline (relax-start, rc 2, the kind of the baseline): 1
+    n=1053   W 0.265  base W 0.200  extra 0.065  (growth; ident pass: identical)
+    extra (s): n=1 p50=0.065 p90=0.065 max=0.065
+  entered the rerun and allowed: extra (s): n=136 p50=0.562 p90=1.542 max=2.587
+  entered the rerun, any other outcome: 0
+  did not enter the rerun: 1; rc + sha256(stderr) identical to the baseline (ident pass): 1 of 1
+  ident pass over the 138: identical=2 different=136
+== drive.sh: bash -n ok | load 0.50 0.59 0.82

@@ -1,0 +1,12 @@
+SC-21ab mine=11 impl2=11
+SC-21ac mine=3 impl2=3
+SC-21ag mine=1 impl2=1
+SC-21aj mine=3 impl2=3
+SC-21al mine=3 impl2=3
+SC-21ao mine=3 impl2=3
+  SC-21ab: mine vs impl2 identical check lists: True
+  SC-21ac: mine vs impl2 identical check lists: True
+  SC-21ag: mine vs impl2 identical check lists: True
+  SC-21aj: mine vs impl2 identical check lists: True
+  SC-21al: mine vs impl2 identical check lists: True
+  SC-21ao: mine vs impl2 identical check lists: True

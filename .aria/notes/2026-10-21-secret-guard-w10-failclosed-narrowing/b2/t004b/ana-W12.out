@@ -1,0 +1,30 @@
+W12-real-traffic.txt: # 2026-10-24T23:49:31Z load 1.00 1.12 1.08 -> # 2026-10-24T23:57:41Z load 1.48 1.50 1.28
+## 1. the W10 size-blocked class (W1: 138 commands; the baseline blocks all of them for size), the hook under test (instrumented copy), bash 5.2
+  outcome allow      136
+  outcome growth     1
+  outcome oversize   1
+    136   W1 class size   -> allow
+      1   W1 class size   -> growth
+      1   W1 class value  -> oversize
+  allow wall (s): n=136 p50=0.59 p90=1.18 p99=1.59 max=2.29
+  every outcome within max(trigger, 3 s) + 0.3 s: 0 of 138 over the bound
+## 1b. latency cost: the same 138 replayed on the baseline hook (replay138.sh fed base.sh: no probes, so no trigger time), aligned by n; extra = wall of the hook under te
+  bytes: ident.sh (rc + sha256(stderr), the baseline vs the uninstrumented hook under test) on the same 138 in a separate pass (W12-ident-138.txt)
+  baseline replay outcomes: oversize 138
+  entered the rerun, fell back to the size text of the baseline (relax-start, rc 2, the kind of the baseline): 0
+    extra (s): n=0
+  entered the rerun and allowed: extra (s): n=136 p50=0.272 p90=0.638 max=1.771
+  entered the rerun, any other outcome: 1
+    n=1053   rc 2 growth (baseline oversize)  W 0.255  base W 0.131
+  did not enter the rerun: 1; rc + sha256(stderr) identical to the baseline (ident pass): 1 of 1
+  ident pass over the 138: identical=1 different=137
+## 2. outside the class: rc + sha256(stderr) of base vs the hook under test on 300 sampled commands (ident-300.lst), bash 5.2
+identical=300 different=0
+## 3. bash 3.2 (no relaxation): base vs the hook under test on 40 sampled W1 commands (w1-sample40.lst)
+identical=40 different=0
+  VMAX n=666 now oversize rc 2 relax-start - | baseline oversize | 95cf1de7 oversize
+  SMAX allowed: now 136, 95cf1de7 136 (floor 135)
+  section 1 readers, this run: old-on-rows vs new-on-tsv SAME | vs the file SAME | tsv first line # 2026-10-24 rows 138
+  W12-replay-138.tsv: header sha prefixes e83c5e30f2cc af4658b6f935 7d29c3cd0f5b fb3418921bca 2060d2e0c17f
+  W12-replay-138-base.tsv: header sha prefixes e83c5e30f2cc af4658b6f935 7d29c3cd0f5b fb3418921bca 2060d2e0c17f
+  W12-ident-138.txt: header sha prefixes e83c5e30f2cc af4658b6f935 7d29c3cd0f5b fb3418921bca 2060d2e0c17f

@@ -1,0 +1,5 @@
+suite-mutants-a1.txt:  load 0.90 0.90 1.00 ->  load at the end 1.56 1.22 1.11
+suite-mutants-a1.txt: {'CAUGHT': 63, 'GREEN': 1} | ids 64 (BI 57, P 7) | with other red: 0 (cases 0)
+    # run-mutants.sh | 2026-10-24T23:45:39Z | hook af4658b6f935 | mutants.py 2060d2e0c17f | suite mode: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3
+    # 57 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 57)
+    # perturbation round: 0 not as expected | load at the end 1.56 1.22 1.11

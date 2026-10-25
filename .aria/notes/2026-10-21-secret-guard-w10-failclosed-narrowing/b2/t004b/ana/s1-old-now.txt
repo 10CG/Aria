@@ -1,0 +1,8 @@
+  outcome allow      136
+  outcome growth     1
+  outcome oversize   1
+    136   W1 class size   -> allow
+      1   W1 class size   -> growth
+      1   W1 class value  -> oversize
+  allow wall (s): n=136 p50=0.59 p90=1.18 p99=1.59 max=2.29
+  every outcome within max(trigger, 3 s) + 0.3 s: 0 of 138 over the bound

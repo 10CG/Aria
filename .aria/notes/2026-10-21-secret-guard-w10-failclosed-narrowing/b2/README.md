@@ -57,3 +57,7 @@
   - 没收：工作目录里的 hook 副本、旧套件的两份拷贝树与生成的对抗输入（凭据形路径是运行时拼装进去的）。
 - `t004a-verify/`：主控对第一段的独立复核（2026-10-24 22:03–22:16 UTC）。`PREDICT.md` 是实跑前写下的预期，`VERIFY.md` 是结果：低负载下原型与实现的旧套件六组检查清单逐条相同（`suite-proto.out`、`suite-impl2.out`，比对 `cmp-w9.py`，驱动 `w9probe.sh` / `drive.log`），W9 与 95cf1de7 的差异来自原型那一轮的负载。
 - `BRIEF-T004b.md`：TASK-004 第二段（W9 低负载重跑、W13 含全量坏实现与套件模式、W12 真实流量含延迟代价）的任务书。
+- `T004b-report.md`：TASK-004 第二段的执行席报告（2026-10-24/25），任务书是上面的 `BRIEF-T004b.md`。结果是 `../v31/run-evidence.sh` 的四处改动与 `../v31/impl/` 下的 W9、W13（含 `W13-suite-mutants.txt`、`W13-P0-*.txt`、补充证据 `W13-sc-base.txt`）、W12（含 `W12-replay-138*.tsv`、`W12-ident-138.txt`、1b 延迟代价小节）。
+- `t004b/`：第二段的过程材料（不含任何真实流量的命令文本）：预期 `PREDICT.md`、驱动 `drive.sh` / `drive.log`、`run-evidence.sh` 的 diff 与改动核对 `patch-and-check.*`、各项对照 `ana-*.out` 与 `ana/`、合成输入的检查 `chk/`、分析脚本 `analyze.sh`。
+  - 没收：各阶段的工作目录（hook 副本、坏实现、套件拷贝）。
+- `t004b-verify/`：主控对第二段的复核（2026-10-25 00:02–00:10 UTC）：从原始输出重算（`recompute.py`、`recompute.txt`），没有另跑新实验；执笔席报的数逐项相符。

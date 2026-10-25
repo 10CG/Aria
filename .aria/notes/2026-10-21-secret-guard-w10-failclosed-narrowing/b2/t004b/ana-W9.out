@@ -1,0 +1,34 @@
+W9-suite.txt: # 2026-10-24T22:37:49Z load 0.45 0.58 0.81 -> # 2026-10-24T22:45:07Z load 1.93 1.61 1.25
+summary base: PASS: 813 / 814 / FAIL: 1 / 814 | impl: PASS: 807 / 814 / FAIL: 7 / 814
+95cf1de7 summary base: PASS: 813 / 814 / FAIL: 1 / 814 | impl: PASS: 807 / 814 / FAIL: 7 / 814
+groups that change base -> impl: SC-21ab SC-21ac SC-21ag SC-21aj SC-21al SC-21ao
+FAIL entries identical in base and impl: SC-13
+impl vs 95cf1de7 impl (entries that differ):
+    SC-21ab | checks now 6 95cf1de7 3 | check lines only now 2 only 95cf1de7 0
+impl entries identical to 95cf1de7: 6 of 7 (95cf1de7 has 7 )
+-- cmp-w9.py (lead): mine vs proto, mine vs impl2 (low load)
+SC-21ab mine=11 proto=11
+SC-21ac mine=3 proto=3
+SC-21ag mine=1 proto=1
+SC-21aj mine=3 proto=3
+SC-21al mine=3 proto=3
+SC-21ao mine=3 proto=3
+  SC-21ab: mine vs proto identical check lists: True
+  SC-21ac: mine vs proto identical check lists: True
+  SC-21ag: mine vs proto identical check lists: True
+  SC-21aj: mine vs proto identical check lists: True
+  SC-21al: mine vs proto identical check lists: True
+  SC-21ao: mine vs proto identical check lists: True
+--
+SC-21ab mine=11 impl2=11
+SC-21ac mine=3 impl2=3
+SC-21ag mine=1 impl2=1
+SC-21aj mine=3 impl2=3
+SC-21al mine=3 impl2=3
+SC-21ao mine=3 impl2=3
+  SC-21ab: mine vs impl2 identical check lists: True
+  SC-21ac: mine vs impl2 identical check lists: True
+  SC-21ag: mine vs impl2 identical check lists: True
+  SC-21aj: mine vs impl2 identical check lists: True
+  SC-21al: mine vs impl2 identical check lists: True
+  SC-21ao: mine vs impl2 identical check lists: True
