@@ -1,0 +1,5 @@
+# run-mutants.sh | 2026-10-25T13:17:14Z | hook 628652570ce3 | mutants.py 9e832c0f7bfa | sc-cases 54f6038db77d | SC_BASH /usr/bin/bash | scope full | load 1.14 1.74 2.22
+BI-14   CAUGHT       the deadline uses the whole budget, not min(budget, 3) | seats: author | V3-G10-cap-3=red V3-E4-cap-3-at-budget-4=red | load start 1.14 1.74 2.22 end 1.05 1.61 2.15 | timing batch: judged
+BI-15   CAUGHT       the group is not killed after the job ends | seats: author | V5-S9-child-left-behind=red V5-S13b-nothing-outlives-the-run=red | load start 1.05 1.61 2.15 end 1.10 1.54 2.09 | timing batch: judged
+# 2 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 2)
+# perturbation round: 0 not as expected | load at the end 1.10 1.54 2.09

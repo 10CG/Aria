@@ -1,0 +1,202 @@
+TOPKEYS ['meta', 'invariants', 'tasks']
+##### INV-1
+id: INV-1
+rule: '实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z "${_SGV_V[j]}" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/
+ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认 (2026-10-25 TASK-005 复审后增补两类, 字面同样在 proposal 里: (4) What 1 补充 2 —— _sg_relax_ok 的 WSL 一行换成两行, 新函数 _sg_relax_nowslfs; (5) What 7 补充 2 —— 复审指出的注释, 逐字文本在修复轮提交后回填 proposal)'
+
+##### INV-7
+id: INV-7
+rule: '(继承 WP-A, v3.2 改写) 同一时刻只跑一个重实验。计时类判定在一分钟负载低于 2 时串行跑: W12 第 1 节、W13 与套件里的计时窗口类和「重跑须在截止前跑完」类用例 (post_planning R2 PP2-A: 它们的上界依赖本机速度, 负载 8-12 下未改动的原型也会红)、TASK-003 的耗时矩阵。开始与结束各记一次 /proc/loadavg, 任一读数 >= 2 即作废重跑; 套件里这批用例在负载超门槛时整批 SKIP 并单独计数。下界与字节比对不受负载影响, 
+照常跑 (2026-10-24 B.2 第二步实测修正: 负载 15-20 时字节比对也会受影响 —— hook 自己的整秒时间预算只在一臂触发, 或一臂撞上装置的 12 s 超时; 这两种情形按计时类处理, 与上界同批判)。连续 3 次或 6 小时内取不到低负载窗口, 附读数上报 owner, 不放宽判据'
+
+##### INV-8
+id: INV-8
+rule: '证据绑定 hook: W8-W14 与 TASK-003 / 004 的每份输出首行记基线与被测 hook 的 sha256 前缀, 以及 sc-cases.sh、sc-direct.sh、mutants.py 的 sha256 前缀 (run-evidence.sh 自动写; W8 阶段也写)。TASK-004 或 TASK-005 之后 hook 只要再改一个字节, 两者都作废: TASK-004 重跑, TASK-005 复审新增的 diff。TASK-006 核对待发版 hook 的 
+sha256 等于最后一份 W13 与 W12 页眉里记的值'
+
+##### TASK-003 keys ['id', 'parent', 'title', 'status', 'agent', 'reason', 'depends_on', 'deliverables', 'design', 'acceptance', 'notes']
+acceptance:
+- '每个坏实现要么被预先写下的用例抓住 (红的原因与预期一致), 要么记为缺口: 补用例、在实现上复跑为绿、在该坏实现上复跑为红; 无关断言碰红不算抓住'
+- 耗时矩阵无一越界
+
+##### TASK-004
+acceptance:
+- 'W8: diff 原型 实现 恰好是 INV-1 的三类内容差 (What 1 补充、What 6、What 7 补充, 字面见 proposal), 别无他差 (PP2-N)'
+- 'W13: 实现在 5 个 bash 上 FAIL 为 0 (计时类按 INV-7, SKIP 单列); 基线红集与 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W13-sc-cases.txt 第 2 节逐栏一致 (缺失 / 判错; R2 补强新增或改写的用例单列); BI-1-23 与 BI-24 起的坏实现全部被指定用例抓住, 在 sc-cases.sh 与移植后的套件上各跑一遍 
+(坏实现由 mutants.py 从实现构造)'
+- 'W9: 旧套件在实现上恰好 21ab、21ac、21ag、21aj、21al、21ao 六组变化, 每条变化的断言与 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W9-suite.txt 逐条相同; SC-13 的计数差在基线与原型那一轮同样出现 (非 git 副本), 不算变化'
+- 'W11: 每个形状的结局与 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W11-adversarial.txt 相同'
+- 'W12 第 1 节: 进入重跑的结局都在 max(T_trigger, 3 s) + 0.3 s 内, 没有进入重跑的与基线逐字节相同 (PP2-m11); SMAX 类 137 条放行数 >= git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/W12-real-traffic.txt 里原型那一轮的数减 1, 少掉的那条必须是回落 (基线字节) 而不是别的拦截, 并记下它的编号; VMAX 那
+ 1 条照旧拦'
+- 'W12 第 2、3 节: 300 / 300 与 40 / 40 逐字节相同'
+agent: main-loop
+deliverables:
+- v31/impl/ 下的 W8 / W9 / W11 / W12 / W13 (IMPL=实现生成; 首行记两个 hook 与用例脚本的 sha256); v31/ 下的原型证据不动
+depends_on:
+- TASK-002
+- TASK-003
+design:
+- '前置: 复原 TRAFFIC_DIR (extract.py + refreeze.py, 按 W0 的 sha256 逐条核对 138 + 300 + 40 条; 缺失或哈希不符就报告, 不跳过)'
+- '先改 run-evidence.sh (PP2-O、PP2-m11): 加输出目录参数 OUT (默认仍是脚本所在目录, 以便复现 95cf1de7 的证据); BASH32 或任一被测 bash 不存在即报错退出; W8 阶段补页眉; 页眉加记用例脚本的 sha256 (INV-8)'
+- IMPL=<aria/hooks/secret-guard.sh 的实现> OUT=v31/impl bash v31/run-evidence.sh <工作目录> W8 W13 W11 W12 W9 —— 基线由脚本取自 59e333c 并断言哈希 (INV-9); W12、W13 按 INV-7
+- 对照对象一律取 git show 95cf1de7:.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/<文件> (原型那一轮的证据), 不取工作树
+- W13 第 3 节 (各坏实现的其他红) 用 MUT_SCOPE=full 跑, 只在低负载时段 (64 个变体, 每个约 1 分钟); TASK-002 第二步只跑了指定用例
+- '前置 (2026-10-24 TASK-002 3e 复核后补): run-evidence.sh:8 的 W=$(readlink -f "$1") 在工作目录的父目录也不存在时为空, 之后的路径会落到文件系统根下 (/base.sh): 改 readlink -m, 并核 mkdir -p 成功, 否则退出 3; 用父目录不存在的工作目录跑一次, 须在写任何文件前退出 3 (2026-10-24 第一段复核后订正: 父目录不存在但建得出来的照常建出并继续, 只有建不出来的工作目录才退出 3, 见 
+notes 第一段主控裁定 (2))'
+- '(2026-10-24 TASK-002 3d 复核后补) run-mutants.sh 全量连跑时 P-0 排在最后, 多半被负载挡住 (NOT-JUDGED): 另在低负载下单跑一次 P-0, 两次读数都记'
+- '(2026-10-24 TASK-003 第二段复核后补) W12 第 1 节另报一项延迟代价: 进入重跑但没在截止前判完、回落成尺寸文案的结局, 逐条列出比基线多等的时间 (实现 W 减基线 W), 给出条数与分布 —— 耗时矩阵里这类结局要多等 2.3-3.0 s 换来同样的拦截, 真实流量上有多少由本任务量出, 随 TASK-006 的 owner 门呈报'
+id: TASK-004
+notes:
+- '执行方式调整 (2026-10-24, 主控): 计划原定本任务 agent: main-loop; 改为分段派新实例执行, 主控做独立复核 —— 第一段 (任务书 b2/BRIEF-T004a.md) 还原真实流量语料、改 run-evidence.sh (design 2、6)、在实现上跑 W8 / W11 / W9 并对照验收 1、3、4; 第二段跑 W13 与 W12 (design 5、7、8) 并对照验收 2、5、6。理由: 主会话上下文很大, 每次调用成本高 (成本 = 上下文 x 调用数), 
+新实例从小上下文起步; 真实流量的纪律 (命令文本只在 scratchpad、不读进对话、只看计数编号与 sha256、会话结束删除) 写进任务书。这是主控的流程判断, 写进会话交接请 owner 复议'
+- '第一段 (2026-10-24, 新实例, 19 次调用, 上下文最高约 19 万、缓存读约 230 万; 任务书 b2/BRIEF-T004a.md): 语料按 W0 清单还原 2412 / 2412 (字节数与 sha256 都对), W1 的 138、ident-300、w1-sample40 全在, 放在 scratchpad 的 traffic-fresh / traffic-frozen (会话收尾删除)。run-evidence.sh 按 design 2、6 改: OUT 
+(默认脚本所在目录)、写任何文件前核对被测 bash (W13 与 W12 要 BASH32)、三个用例脚本与 OUT 可写、工作目录 readlink -m 且 mkdir -p 成功, 否则退出 3; 页眉另记 sc-cases.sh、sc-direct.sh、mutants.py 的 sha 前缀 (INV-8), W8 的 diff 也以页眉开头。在实现上跑 W8 / W11 / W9 (OUT=v31/impl): 验收 1 成立 (原型与实现之间 6 个 hunk, 恰好是 What 1 
+补充一处、What 6 一处、What 7 补充四处; 原型与 95cf1de7 的 W8 正文逐字节相同); 验收 4 成立 (W11 的 18 个形状 rc 与文案种类全同); 验收 3 不一致 —— SC-21ab 比 95cf1de7 多 3 处检查不符 (`f=x; echo $f <9000 字符填充>` 实现放行、原型那一轮拦下), 执笔席按任务书停下'
+- '第一段主控独立复核 (2026-10-24 22:03-22:16 UTC, 预期先写, 记录在 b2/t004a-verify/): 低负载下原型 (9f61db0e7b8b) 与实现各跑一次 59e333c 的旧套件, 六组的检查清单逐条相同 (SC-21ab 都是 11 处), 与 4a 那一轮也相同 —— W9 与 95cf1de7 的差异来自原型那一轮跑 W9 时的负载 (页眉读数 3.59; 这条命令整个 hook 约 2.4-2.6 s, 离 3 s 截止很近, 主机一忙就回落成尺寸拦截), 
+不是实现与原型的行为差, 不涉及 INV-1 / INV-3。另核: 语料 2412 / 2412 逐条相符; W8 的 6 个 hunk; W11 18 行全同'
+- '第一段主控裁定 (技术口径, 不动姿态): (1) 验收 3 实质成立 (低负载下原型与实现逐条相同), 与 95cf1de7 的差异按上条解释记入; 但 W9 的结局对负载敏感 (近截止的命令), 所以 W9 也按 INV-7 跑: 首尾一分钟负载都 < 2, 页眉记开始时的负载 (run-evidence.sh 的 W9 页眉原写在套件跑完之后) —— 第二段改 run-evidence.sh 的 W9 页眉并在低负载下重跑 W9, 替换 4a 这一份 (它的收尾读数 2.79)。(2) design 6
+ 的检查我写得不准: 要修的是旧写法下工作目录为空、文件落到文件系统根下; 改用 readlink -m 后工作目录不会为空, 父目录不存在但建得出来的照常建出并继续, 建不出来的 (如父路径是普通文件) 才在写任何文件前退出 3 —— 认可执笔席的读法。(3) W8 加页眉后不设 OUT 重跑, W8-v31.diff 不再与 95cf1de7 那份逐字节相同、正文相同: 认可 (各阶段的页眉本就随时间变)。(4) 原有设计的两处空白交第二段: W12 缺 TRAFFIC_DIR 时要在写任何文件前退出 3 
+(现为跑到 W12 才以 1 退出); W12-replay-138.tsv 没有页眉 (INV-8), 加一行以 # 开头的页眉并让下游 awk 跳过 # 行。(5) proposal 状态行把原型 hook 的 sha 前缀 9f61db0e7b8b 写在 v31/W8-v31.diff 后面, 读起来像 diff 文件的 sha (该文件是 9fc20fdbb419): 措辞歧义, 与状态行仍写 Draft 一并写进会话交接'
+- '第二段 (2026-10-24/25, 新实例, 26 次调用, 上下文最高约 30 万、缓存读约 360 万; 任务书 b2/BRIEF-T004b.md): run-evidence.sh 四处改动 (W9 页眉开跑前也写一次; 选了 W12 而缺 TRAFFIC_DIR 时在写任何文件前退出 3; W12-replay-138.tsv 首行页眉、下游 awk 跳过 # 行; W12 加 1b 延迟代价小节, 138 条在基线上也回放一次按编号对齐)。六个阶段都在低负载下一次有效 (首尾读数最高 
+1.93)。W9: 六组变化与主控低负载的原型、实现两轮逐条相同, 与 95cf1de7 只差 SC-21ab 那 3 处。W13: 实现在 5 个 bash 上 FAIL 0、SKIP 0; 57 个坏实现在 sc-cases.sh 全量模式与移植后的套件上都被指定用例抓住, 扰动全如预期; P-0 三次读数 (全量轮里、v31 模式单跑、套件模式单跑) 都 GREEN; 基线红集与 95cf1de7 逐编号一致, 单列 V5-S13b、V7-E15 变色 (R2 补强在 8f66e393 
+改写过)、V3-E5-budget-1 改名为 V3-E5-budget-2、新增 51 个编号。W12: 越界 0 / 138; SMAX 类放行 136 (与原型那一轮相同, 没有少掉的); VMAX 那 1 条照旧拦; 没进重跑的 1 条与基线逐字节相同; 第 2、3 节 300 / 300、40 / 40。1b: 进入重跑并放行的 136 条比基线多等 p50 0.272 s、p90 0.638 s、max 1.771 s; 回落成基线字节的 0 条'
+- '第二段主控复核 (2026-10-25 00:02-00:10 UTC, 记录在 b2/t004b-verify/): 从原始输出重算 (没有另跑新实验, 预期值就是执笔席报的数, 照实记下): W12 的结局计数、越界、1b 的分位数、回落条数, W13 各段汇总与 P-0, 基线红集逐编号 —— 全部相符'
+- '第二段主控裁定 (技术口径, 不动姿态): (1) 1b 的逐字节比对取自 ident.sh 另跑的一遍 (replay138.sh 不记 stderr 的 sha, 本段不许改它): 认可, 用到的只有没进重跑的 n=666, 结果确定。(2)「回落」按「输出与基线逐字节相同」读, 0 条; n=1053 进入重跑后被增长限拦下 (growth 文案, 基线是 oversize), 是放宽判定本身的拦截 (What 2、P8), 已在 1b 单列 (多等 0.124 s), 原型那一轮也是 
+growth。(3) W13 文件第 2 节只列 FAIL 与 PASS, 74 个 MISSING 在文件里看不见: 把那一轮基线的原始输出收作补充证据 v31/impl/W13-sc-base.txt (首行记全部 sha); run-evidence.sh 这次不改, 让已提交的 W13 与生成它的脚本保持一致 —— 第 2 节加一行 missing 记为待办, 下次有人改 run-evidence.sh 或需要重跑本任务之前补上。(4) run-mutants.sh 自己写的首行: 
+套件模式只记实际用到的文件 (实现、mutants.py、套件、helper、run-suite.sh), 认可这个口径; v31 模式缺基线 hook 与 sc-direct.sh 的 sha, 记为待办 (W13 主文件的页眉是完整的)。(5) v31/impl/ 下多出的 W12-replay-138-base.tsv、W12-ident-138.txt、W13-P0-v31.txt、W13-P0-suite.txt 都收进提交。(6) 执笔席自陈一个空等 stdin 的进程, 已按 PID 清掉, 
+不影响结果'
+- 'TASK-004 完成判定 (2026-10-25, 主控): 验收 1 (W8, 第一段)、验收 4 (W11, 第一段)、验收 3 (W9: 第二段在低负载下重跑, 与原型那一轮的差异只在 SC-21ab 那 3 处并已由原型那一轮的负载解释)、验收 2 (W13)、验收 5、6 (W12) 都成立, 状态改为 done。延迟代价 (1b) 的数随 TASK-006 的 owner 门呈报。下一步 TASK-005 (独立代码审查, 审 aria 2893bcc 的代码)'
+- '重跑 (2026-10-25, 主控): TASK-005 修复轮改了 hook (af4658b6f935 -> 834dee6db0d0, aria 710a36d), 按 INV-8 上面判完成的 W8-W14 作废, 状态改回 in_progress; 重跑段任务书 b2/BRIEF-T004r.md (含 TASK-003 的两份 W14), 对照判据同上, 另与上一版实现逐项比'
+parent: B.2
+status: in_progress
+title: '验收: 用 run-evidence.sh 在真实实现上重跑 W8-W13'
+
+##### TASK-005 keys ['id', 'parent', 'title', 'status', 'agent', 'reason', 'depends_on', 'deliverables', 'design', 'acceptance', 'notes']
+notes:
+- '开始 (2026-10-25, 主控): 审查对象 aria 2893bcc (hook af4658b6f935), 改动面 8614066..2893bcc 的 hooks/; 单席 aria:code-reviewer, 两阶段 (规格符合 / 代码质量与安全), 任务书 b2/BRIEF-T005.md; 报告进 .aria/audit-reports/ 并记 reviewed_sha'
+- '审查结果 (2026-10-25, 单席 aria:code-reviewer, 31 次调用, 上下文最高约 27 万、缓存读约 350 万; 报告 .aria/audit-reports/post_implementation-R1-1792888152945-secret-guard-w10-failclosed-narrowing-code-reviewer.md, reviewed_sha 2893bcc): verdict PASS —— 0 Critical、0 Major、6 Minor、3 
+条疑点。阶段 1 规格符合全部成立 (INV-1 抽查、INV-3、INV-4、What 1-5、每条出错路径都失败即关, 放行只经 77)。Minor: m-1 重跑里可能按 VMAX 拦, What 5 与 R-c 漏申报这类文案; m-2 四处注释过宽或与代码相反 (_sg_relax_noext 的「an error keeps the relaxation off」与代码相反, 代码的行为才是 What 1 表要的); m-3 V2-G12 / G13 只验关门一极; m-4 nproc_binds 
+快路径用有效 UID、CapEff 读的是 awk 自己 (只会假红); m-5 杀组比 _SG_P0 + cap 晚一段 fork 延迟; m-6 三处只被计时类用例抓住, 建议补直调用例。疑点: D-1 较新的 WSL 可能登记 WSLInterop-late; D-2 /proc/sys/fs/binfmt_misc 在 systemd 宿主上多是 autofs 自动挂载点, 没人服务时 stat 可能一直阻塞, hook 超时被杀即放行, 而基线从不碰这里 —— 放宽带来的新放行路径; D-3 作业里 
+bash 自身致命错误以 2 退出时原样写出它的报错 (仍是拦)'
+- '主控裁定 (2026-10-25, 技术口径, 姿态不变或更严): 开 TASK-005 修复轮, 不带着 D-2 发版 —— D-2 是本变更新引入的潜在放行路径, 加固只会把放宽关得更严, 属不改姿态的技术改动, 由主控定并告知 owner。规格先改 (proposal v3.3): What 1 补充 2 钉到字面 (先读挂载表, 只在 binfmt_misc 已挂上时看 WSLInterop* 项, 读不出挂载表即当作 WSL; D-1 一并覆盖; 主控交付前在 
+3.2.57、5.0.18、5.2.15、5.3.20 上实跑过这段代码, 抓出并改掉两个 bug: 循环末行不匹配时 while 的退出码为 1 会被读成挂载表读不出、读不出时的报错漏到 stderr); What 5、R-c 与 CHANGELOG 草稿补 VMAX 一类 (m-1); What 3 写明 fork 延迟算进 ε (m-5, 只改文档); What 4 写明 D-3 的例外; What 7 补充 2 列出 m-2 四处、D-3 与 WSL 行的注释各自要说的意思, 逐字文本修复轮后回填; 
+用例一侧 m-3、m-4、m-6 与 What 1 补充 2 的直调用例一并补。INV-1 增补这两类内容差。之后: 主控复核 -> TASK-004 重跑 (hook 改了, INV-8) 加耗时矩阵最重形状的复跑 -> 本任务对新增 diff 复审 -> TASK-006 (owner 门)。修复轮任务书 b2/BRIEF-T005f.md'
+- '修复轮第一段 5f (2026-10-25, 新实例, 52 次调用; 执笔席写报告文件被运行环境拒绝, 主控从它的消息存入 b2/T005f-report.md): hook 按 What 1 补充 2 逐字换上准入门两行与 _sg_relax_nowslfs, What 7 补充 2 第 1-5 处注释; 套件 W10 块头同义句、编号与计数; helper 与 v31/sc-direct.sh 做 m-3、m-4、m-6 并新增 V15-T1/T2/T3、V15-W1a-e, 
+九个坏实现上新用例都按预测变红; mutants.py 不用改 (锚点未被碰), impl/w14-mutants.py 只改绑定的 hook 前缀; commentsync 按 3b 的做法机械导出, target / baseline / proto GREEN, 四个构造 RED。实跑: 移植用例 5 个 bash 全过、整轮 974/974、导出 WSL_DISTRO_NAME 的整轮 FAIL 0、sc-cases 150 PASS、坏实现两种模式全抓住、w14 31/31。它列出的尾巴: 
+重跑块头还有一句同类失实、测试侧四处 WSL 判据还是旧写法、V15-T2 余量偏紧、INV-4 静态清单漏新函数'
+- '修复轮第二段 5f2 (2026-10-25, 新实例, 31 次调用; b2/T005f2-report.md): 收上条的尾巴 —— hook :796 一行注释 (只这一行, 写作 reason and mode 以不超出该段行宽; hook 前缀 834dee6db0d0); 测试侧 WSL 判据按同一语义独立写成四份 (helper 与 sc-direct.sh 的 wslmark、套件两处共用的 sg_w10_wslfs、sc-cases.sh 的 wslmark), 在 W1a-d 
+加三种假挂载表上与 hook 的函数在 5 个 bash 上 7/7 一致, 本机真实路径仍判没有; V15-T2 改为锚点减 2.0 s、断言 <= 1.0 s; INV-4 静态清单补上新函数 (挪到闸门之下的坏实现上变红, 旧清单在它上面全绿); w14 绑定前缀与 commentsync 同步。实跑全部达标 (移植用例 150/150、3.2 为 83 + 67 SKIP [platform]; 整轮 975/975, 导出 WSL_DISTRO_NAME 的整轮 975/975; sc-cases 151
+ PASS; 坏实现两种模式各 63 个全抓住; w14 31/31)。aria 提交 710a36d'
+- '修复轮主控复核 (2026-10-25, 预期先写, 记录在 b2/t005f-verify/): hook 相对 2893bcc 只有 7 个 hunk —— 准入门两行、新函数与 7 处注释, 非注释的改动只有准入门两行与新函数; 新函数与 proposal 的代码块逐字节相同, 在 source 闸门 (:1069) 之上。主控自己的四个坏实现 (只认精确名 WSLInterop、读不出挂载表反而放行、准入门里取反、计时器睡整个预算) 全被新用例按预测抓住 (V15-W1b、W1d、W1e 加 
+T2、T1), 实现上 V15 十条全过。proposal 的 What 7 补充 2 已回填逐字文本 (由 git diff 机械导出)'
+- '修复轮主控裁定 (技术口径, 姿态不变): (1) w14-mutants.py 的 IMPL_SHA12 随 hook 改: 认可 (是绑定值不是锚点)。(2) :796 写作 reason and mode: 认可, 意思与第 4 处相同。(3) 挂载表路径能打开却读不出 (例如是目录) 时函数按没挂上处理: 认可, 不改代码, 写进 What 1 补充 2 的已知边角 (真实的 /proc/self/mounts 不会如此; /proc 读不了时作业自检也失败、放宽照样回落)。(4) INV-4 
+清单在套件与 sc-cases.sh 里: 认可。(5) v31 模式 P-0 的收尾负载 2.22 / 2.23, 计时部分不算数: 由 4r 在低负载下单跑补上。(6) 套件摘要与 SKIP 文案里的「WSLInterop」字样、v31/README.md 那一行现在指更宽的 WSL 标记: 措辞小差, 认可, 留着。TASK-004 的证据按 INV-8 作废 (hook 已是 834dee6db0d0), 状态改回 in_progress; 下一步 4r 重跑 W8-W14 
+(b2/BRIEF-T004r.md) 与本任务对 2893bcc..710a36d 的增量复审 (b2/BRIEF-T005r.md) 并行 —— 复审只读、不跑重实验'
+
+##### PROPOSAL markers
+1: # secret-guard W10 尺寸预算收窄：超 8192 的副本在硬截止下按增长量重判（10CG/aria-plugin#217）
+4: > **Status**: Draft v3.2 —— post_planning R2 判 PASS_WITH_WARNINGS（去重 0C / 20M / 24m），停止规则触发。owner 2026-10-23 选「实现优先」：R2 以 owner 覆盖收口，不开第 3 轮（Decision 19）。v3.2 只改本文与任务计划的文字，原型（`v31/W8-v31.diff`，sha256 
+17: > **编号约定**：跨仓引用一律写全 `<org>/<repo>#<n>`（standards `conventions/content-integrity.md` §4.4 规则 1）；「`10CG/aria-plugin#217` 第 N 项」指该 issue 正文的条目。本文自己的条目写作 What 1–7（v3.2 另有 What 1 补充、What 7 补充）、P1–P10、BI-1–
+20: ## Why
+22: ### 现状
+34: ### 真实流量（本机 Claude Code 会话记录）
+46: ### 8192 原本要防什么
+57: ## What Changes
+59: 只改 `hooks/secret-guard.sh`。参考实现是 `v31/W8-v31.diff`（+187 / −49 行，新增里 4 行空行），由 `v31/mkv31.py` 从基线机械生成（生成前先校验基线的 sha256 前缀 `e83c5e30f2cc`）。「参考实现」一节逐字列出 W8 的全部逻辑 hunk，只有注释 hunk 不列（What 7 按处列出）；这份完整性由 `v31
+61: ### 1. 触发点与准入门
+72: | `_sg_relax_platform "${BASH_VERSINFO[5]}" "${BASH_VERSINFO[0]}" "${BASH_VERSINFO[1]}" "<osrelease>" "<wsl>"`：x86_64 的 GNU/Linux 构建（`x86_64-*-linux-gnu*`）、bash 5.0–5.3、不在 WSL 里（WSL1 与 WSL2 都算：内核串 `/p
+76: **What 1 补充：准入门按实测范围收紧**（v3.2，owner 2026-10-23，Decision 21）。原型（W8）的 `_sg_relax_platform` 认任何 `*-linux-gnu*` 构建，会放进没实测过的 aarch64 与 WSL（post_planning R2 PP2-m7）。TASK-002 在原型之上把 `_sg_relax_ok` 与 `_sg_rel
+97: **What 1 补充 2：WSL 标记的读法不触发自动挂载**（v3.3，2026-10-25，TASK-005 复审 D-1、D-2；技术口径，姿态不变：两处都只会把放宽关掉，不会打开。INV-1 允许的内容差之一）。What 1 补充里 `-e /proc/sys/fs/binfmt_misc/WSLInterop` 在多数 systemd 宿主上会穿过 autofs 自动挂载点：一般毫秒内
+120: ### 2. 放宽重跑的规则（`_SG_RELAXED=1`，只在作业里生效）
+131: ### 3. 硬截止作业
+143: ### 4. 回落 = 基线
+147: ### 5. 文案（逐字）
+180: ### 6. 小项：删 `:666` 的死代码（`10CG/aria-plugin#217` 小项）
+184: ### 7. 注释同步（块级封闭清单）
+217: **What 7 补充：四处注释**（v3.2；INV-1 允许的内容差之一。TASK-002 在原型之上逐字落地，并为它们补上 commentsync 的核对）。原型里这四处仍按收紧前、计数上限未申报前的说法写着（post_planning R2 PP2-m4、PP2-S、PP2-m7；第 4 处是 B.2 TASK-002 第一步发现的，2026-10-24 补）：
+222: # most 16 assignments, 8 for lists and 8 replacements per variable in the baseline pass, none in the relaxed rerun of 10CG/aria-plugin#217); every segment (the whole
+223: # command when it degraded) that mentions $NAME or ${NAME} is judged once more with the
+229: # _sg_vx_replace S PAT REP [MAX] : literal replace-all of PAT in S, at most 8 replacements in the baseline pass (no bound in the relaxed rerun) -> _SG_RP; with MAX
+230: # (characters) it stops with status 1 as soon as the result would be longer than MAX (_SG_RP is then S unchanged)
+236: #   - Shell variable indirection (`f=...; cat "$f"`) is covered only in part: literal
+237: #     assignments are expanded in a second pass (at most 16 assignments, 8 for lists and 8
+238: #     replacements per variable in the baseline pass; beyond those COUNTS the variable
+239: #     passes). The SIZE of the expansion is bounded too: a value over 4096 characters, or
+240: #     more than 65536 characters of substituted text per command, blocks the command
+241: #     (fail-closed, owner ruling 2026-10-14). A substituted copy over 8192 characters is
+242: #     blocked for its size only where the relaxed rerun of 10CG/aria-plugin#217 is not in
+243: #     effect; where it is (an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL, no
+244: #     project extension, time left), the pass is re-run under a
+245: #     hard deadline with no count bound, the growth over the input as the limit and the
+246: #     copy judged in full, and growth over 8192 characters, the deadline or any failure of
+247: #     the rerun still blocks. The pass substitutes text; it does not run the shell: a
+248: #     variable assigned twice is replaced by its FIRST value (bash reads the last), and in
+249: #     segment mode a value holding shell syntax (`G='| jq keys'`) becomes syntax in the
+250: #     copy, so a read can earn a filter credit that bash never applies. Both pass, in small
+251: #     commands since the baseline and, with the rerun, in big ones (declared under owner
+252: #     ruling A, 2026-10-23). Arrays, `read <<<`, quote-spliced paths, `cd` + a relative
+253: #     name, globs, `set --`, `$(printf ...)` and variables across two tool calls pass;
+254: #     the output side is left to secret-scan.sh.
+260: # deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on an x86_64
+261: # GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
+264: **What 7 补充 2：TASK-005 复审指出的注释**（v3.3，2026-10-25；INV-1 允许的内容差之一。下列每处要说的意思由本节钉住，落地的逐字文本在 TASK-005 修复轮提交后回填到这里，回填前以修复轮报告为准）：
+266: 1. hook 头注释「Shell variable indirection」那条（What 7 补充 3）与套件 W10 块头：去掉「only where … not in effect」里的 only —— 放宽生效时，截止、检查点、自检等回落也按尺寸拦，重跑里还可能按 VMAX 拦（m-2 第 1 处）。
+271: 6. 准入门 WSL 那一行的注释随 What 1 补充 2 改写（代码见上）。
+274: **落地的逐字文本**（aria `710a36d`，由 `git diff 2893bcc 710a36d -- hooks/secret-guard.sh` 机械导出，逐 hunk 列改前改后；第 6、7 处与 What 1 补充 2 的代码都在其中）：
+281: #     blocked for its size only where the relaxed rerun of 10CG/aria-plugin#217 is not in
+282: #     effect; where it is (an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL, no
+283: #     project extension, time left), the pass is re-run under a
+284: #     hard deadline with no count bound, the growth over the input as the limit and the
+285: #     copy judged in full, and growth over 8192 characters, the deadline or any failure of
+286: #     the rerun still blocks. The pass substitutes text; it does not run the shell: a
+292: #     blocked for its size wherever the relaxed rerun of 10CG/aria-plugin#217 is not in
+293: #     effect, and also where it is (an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL,
+294: #     no project extension, time left) whenever that rerun falls back. The rerun runs the
+295: #     pass again under a hard deadline with no count bound, the growth over the input as
+296: #     the limit and the copy judged in full: growth over 8192 characters blocks with the
+297: #     growth text, a value over 4096 characters with the value text (the rerun reaches
+298: #     values that the counts cut off in the baseline pass), and the deadline, a time
+299: #     checkpoint, the self-check or any other failure of the rerun falls back to that size
+300: #     block. The pass substitutes text; it does not run the shell: a
+308: # rows only: nocredit, the longline text). Elsewhere, and whenever the rerun does not finish in time, the command is blocked with the size text, byte for byte as before (the
+309: # W9 extension's look at the substituted whole command, after the pass, blocks on such a copy only when an extension is in effect). (The COUNTS above -- 16 assignments, 8
+310: # replacements, 8 for statements -- bound the baseline pass and still pass beyond the limit, SC-21 21y; the relaxed rerun has no count bound, the deadline caps its cost.)
+316: # rows only: nocredit, the longline text). Elsewhere, and whenever the rerun neither allows nor blocks on its own (the deadline, a time checkpoint, the self-check, any other
+317: # failure), the command is blocked with the size text, byte for byte as before (the W9 extension's look at the substituted whole command, after the pass, blocks on such a
+318: # copy only when an extension is in effect). (The COUNTS above -- 16 assignments, 8 replacements, 8 for statements -- bound the baseline pass and still pass beyond the
+319: # limit, SC-21 21y; the relaxed rerun has no count bound, the deadline caps its cost.)
+327: # BLOCK (status 2). A copy over _SGV_SMAX ends the baseline pass too: with status 4 when the relaxation is in effect (_sg_relax_ok; the baseline block text is kept
+328: # in _SG_OV_PAT / _SG_OV_MODE for the fallback), else with the oversize BLOCK. Inside the relaxed rerun (_SG_RELAXED) a growth overrun blocks with the growth text, a copy
+329: # over _SGV_SMAX goes to _sg_vx_big_judge, and a time checkpoint returns 3 (no time text: the caller falls back to the baseline block). Nothing behind an overrun is built
+330: # or judged.
+336: # BLOCK (status 2). A copy over _SGV_SMAX ends the baseline pass too: with status 4 when the relaxation is in effect (_sg_relax_ok; the baseline reason string and mode are
+337: # kept in _SG_OV_PAT / _SG_OV_MODE -- not a text: on a fallback _sg_emit_blocked writes the baseline block text from them again), else with the oversize BLOCK. Inside the
+338: # relaxed rerun (_SG_RELAXED) a growth overrun blocks with the growth text, a copy over _SGV_SMAX goes to _sg_vx_big_judge, and a time checkpoint returns 3 (no time text:
+339: # the caller falls back to the baseline block). Nothing behind an overrun is built or judged.
+347: # returns 4 instead and keeps the baseline block text in _SG_OV_PAT / _SG_OV_MODE, and _sg_per_segment_eval re-runs the W10 pass with the relaxed rules
+353: # returns 4 instead and keeps the baseline reason and mode in _SG_OV_PAT / _SG_OV_MODE; _sg_per_segment_eval re-runs the W10 pass with the relaxed rules
+361: # deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on an x86_64
+362: # GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
+368: # deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. The one exception (What 4):
+369: # a fatal error of bash itself inside the job that makes it exit with status 2 and write its error message is passed on as the block text -- the command is
+370: # still blocked, but with bash's message instead of the baseline text. In effect only on an x86_64 GNU/Linux build of bash 5.0-5.3 outside WSL (the
+371: # versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
+374: 6. `-823 +829,2`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+389: 7. `-831 +838,8`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
+413: ### 参考实现（`v31/W8-v31.diff` 的全部逻辑 hunk）
+765: ## 性质（P）与放宽面
+796: 6. 裁定 E 的放开：macOS、Windows、musl 等平台要放宽，先要一个不依赖 `/proc` 的组长自检与实测；aarch64 等其他架构与 WSL（WSL1、WSL2）要放宽，先要在该平台上实测（What 1 补充）。记在 `10CG/aria-plugin#219` 的留言里（与它的「仅 Linux 验证」同类）。
+801: ## Owner 裁定点
+809: | E | 硬截止未实测的平台（Windows、macOS 等） | 维持基线拦（2026-10-22）；实测通过后另行放开。v3.1 按同一原则把范围落到实测过的 GNU/Linux bash 5.0–5.3（Decision 16）；2026-10-23 再收紧到实测过的 x86_64，WSL（WSL1、WSL2）一律维持基线（What 1 补充，Decision 21） |
+821: ## Success Criteria
+829: 被测的 bash 决定期望值：x86_64 GNU/Linux（不在 WSL 里）上的 5.0–5.3 期望放宽生效（原型与 `v31/sc-cases.sh` 仍按收紧前的 `*-linux-gnu*`，TASK-002 随 What 1 补充一起改）；其他任何 bash 期望准入门关闭、端到端结局与基线逐字节相同（PP1-A13）。
+892: ## Impact
+898:   - 注释：What 7 的 8 块与 What 7 补充的 4 处；准入门按 What 1 补充收紧。
+908: ## [1.77.x] - <date> — secret-guard W10 尺寸误拦收窄 (`10CG/aria-plugin#217`; PATCH: 只因尺寸被拦的大命令改为完整判定; 判定语义的既有缺口随之覆盖更多大命令, 见放宽面申报)
+910: ### Security — PreToolUse secret-guard (W10 尺寸预算按增长量判 + 硬截止重判)
+924: ## 证据与复现
+944: ## Decision record
+966: 21. **准入门按实测范围收紧**（owner 2026-10-23）：`*-linux-gnu*` 会放进没实测过的 aarch64 与 WSL。按裁定 E 收紧到 x86_64，WSL 一律维持基线：WSL1 是翻译层，WSL2 虽是真 Linux 内核也没有实测过（owner 先选排除 WSL1，随即追加 WSL2）。往更严方向，姿态不变（What 1 补充）。
+967: 22. **WSL 标记读法加固与复审指出的注释**（2026-10-25，主控，技术口径；TASK-005 复审 D-1、D-2、m-1–m-6、D-3）：`/proc/sys/fs/binfmt_misc` 在 systemd 宿主上多是自动挂载点，`-e` 穿过它可能在自动挂载没人服务时一直阻塞，hook 被 Claude Code 超时杀掉即放行——基线从不碰这里，这是放宽带来的新放行路径
+969: ## Tasks（A.2 细化为 detailed-tasks.yaml）
+974: | TASK-002 | B.2 | 按 W8 落地 What 1–5、7，加上 What 1 补充与 What 7 补充；What 6 单独提交；把 `v31/sc-cases.sh` 的全部用例搬进套件并按 post_planning R2 补强（必交），6 组既有用例按 W9 改断言，套件注释与标题按 What 7 改写 | 新执笔席 |

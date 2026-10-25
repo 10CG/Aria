@@ -1,0 +1,9 @@
+mut ids old 64 new 64 | verdicts new: CAUGHT=63 NOT-JUDGED=1
+verdict differs: P-0 GREEN->NOT-JUDGED
+designated-state field differs: none
+P totals differ: none
+other-red changes on old ids: none
+other-red additions that are only new V15-W1f..o ids: none
+timing batch not judged (new): BI-23 BI-24 BI-25 BI-26 BI-27 BI-28 BI-29 BI-30 BI-31 BI-32 BI-33 BI-34 BI-35 BI-36 BI-37 BI-38 BI-39 BI-40 BI-41 BI-42 BI-43 BI-44 BI-45 BI-46 BI-47 BI-48 BI-49 BI-50 BI-51 BI-52 BI-53 BI-54 P-0
+summary old: # 57 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 57) || # perturbation round: 0 not as expected 
+summary new: # 57 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 57) || # perturbation round: 1 not as expected 

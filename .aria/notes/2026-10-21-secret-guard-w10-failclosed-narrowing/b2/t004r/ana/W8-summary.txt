@@ -1,0 +1,4 @@
+base->proto body vs 95cf1de7 W8 body: IDENTICAL
+proto->prev: 6 hunks, +30 -21; changed lines found: none 12, substr 9, whole-block 30
+prev->impl: 5 hunks, +37 -18; changed lines found: whole-block 55
+proto->impl: 8 hunks, +58 -30; changed lines found: exact 28, none 12, substr 9, whole-block 39

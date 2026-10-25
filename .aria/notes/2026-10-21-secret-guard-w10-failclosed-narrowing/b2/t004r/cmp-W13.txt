@@ -1,0 +1,17 @@
+s1 bash 3.2.57(2)-release old [PASS 79  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)] new [PASS 93  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)]
+s1 bash 5.0.18(1)-release old [PASS 142  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)] new [PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)]
+s1 bash 5.1.16(1)-release old [PASS 142  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)] new [PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)]
+s1 bash 5.2.15(1)-release old [PASS 142  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)] new [PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)]
+s1 bash 5.3.20(1)-release old [PASS 142  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)] new [PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)]
+s1 FAIL lines old 0 new 0 
+s2 red: old 43 new 43 | new-only  | old-only 
+s2 green: old 25 new 25 | new-only  | old-only 
+mut ids old 64 new 64 | verdicts new: CAUGHT=61 GREEN=1 NOT-JUDGED=2
+verdict differs: BI-14 CAUGHT->NOT-JUDGED BI-15 CAUGHT->NOT-JUDGED
+designated-state field differs: BI-14 BI-15
+P totals differ: P-0 [# totals: PASS 142  FAIL 0  MISSING 0  SETUP 0  SKIP 0 ]->[# totals: PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 ]
+other-red changes on old ids: BI-13 +[V15-T2-anchor-taken-once-at-hook-start] -[]
+other-red additions that are only new V15-W1f..o ids: BI-6 +[V15-W1m-mount-table-read-only-after-platform-and-time] ; BI-22 +[V15-W1m-mount-table-read-only-after-platform-and-time]
+timing batch not judged (new): BI-14 BI-15
+summary old: s2 # totals: PASS 25  FAIL 43  MISSING 74  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) || # 57 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 57) || # perturbation round: 0 not as expected 
+summary new: s2 # totals: PASS 25  FAIL 43  MISSING 93  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0) || # 55 caught, 0 missed, 0 wrong reason, 2 not judged, 0 setup (of 57) || # perturbation round: 0 not as expected 

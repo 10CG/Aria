@@ -1,0 +1,3 @@
+W8 rc=0
+W11 try=1 rc=0 secs=20 W11-adversarial.txt=1.16/1.57 void=0
+W9 try=1 rc=0 secs=510 W9-suite.txt=1.19/2.71 void=1

@@ -1,0 +1,2 @@
+W8 old (added, blank, removed, hunks) (199, 4, 56, 19) new (213, 4, 56, 19) | new header: # 2026-10-25T06:39:36Z | Linux 6.17.9-1-pve | bash 5.2.15(1)-release | base sha256 e83c5e30f2cc | hook sha256 834dee6db0d0 | sc-cases.sh sha256 45b1ef
+W11 vs old impl: 0 | vs proto 95cf1de7: 0 (normalized differing lines)

@@ -1,0 +1,86 @@
+2026-10-25T06:38:46Z driver start pid 2164938
+2026-10-25T06:39:36Z   pre-start 1-min 1.16 < 1.2 (waited 50 s)
+2026-10-25T06:39:36Z W8 start | loadavg 1.16 1.31 1.30
+2026-10-25T06:39:36Z W8 end rc=0 | loadavg 1.16 1.31 1.30
+2026-10-25T06:39:36Z   pre-start 1-min 1.16 < 1.2 (waited 0 s)
+2026-10-25T06:39:36Z W11 try 1 start | loadavg 1.16 1.31 1.30
+2026-10-25T06:39:56Z W11 try 1 end rc=0 after 20 s | 1-min start/end: W11-adversarial.txt=1.16/1.57 | loadavg 1.57 1.39 1.33 | void=0
+2026-10-25T06:41:06Z   pre-start 1-min 1.19 < 1.2 (waited 70 s)
+2026-10-25T06:41:06Z W9 try 1 start | loadavg 1.19 1.37 1.33
+2026-10-25T06:49:36Z W9 try 1 end rc=0 after 510 s | 1-min start/end: W9-suite.txt=1.19/2.71 | loadavg 2.71 2.71 2.10 | void=1
+2026-10-25T06:52:56Z   pre-start 1-min 1.15 < 1.2 (waited 200 s)
+2026-10-25T06:52:56Z W9 try 2 start | loadavg 1.15 2.20 2.03
+2026-10-25T06:54:44Z driver got a signal
+2026-10-25T08:34:45Z driver start pid 2765625 aria 3ed6c24 dirty 0 stages: all
+2026-10-25T08:34:45Z W11 a1 START load 1.07 1.05 1.11
+2026-10-25T08:35:06Z W11 a1 END load 1.52 1.15 1.14 rc 0 dur 21s VALID
+2026-10-25T08:35:36Z W9 a1 START load 1.05 1.08 1.12
+2026-10-25T08:42:54Z W9 a1 END load 2.31 1.92 1.50 rc 0 dur 438s VOID
+2026-10-25T08:43:54Z W9 a2 START load 1.16 1.69 1.44
+2026-10-25T10:05:23Z driver start, pid 3266708, hook 628652570ce3
+2026-10-25T10:05:23Z W8 #1 start, load 0.73 0.91 1.14
+2026-10-25T10:05:24Z W8 #1 end rc 0, load 0.73 0.91 1.14
+2026-10-25T10:05:24Z W8 #1 valid, copied: W8-v31.diff
+2026-10-25T10:05:24Z W11 #1 start, load 0.73 0.91 1.14
+2026-10-25T10:05:44Z W11 #1 end rc 0, load 1.02 0.97 1.15
+2026-10-25T10:05:44Z W11 #1 valid, copied: W11-adversarial.txt
+2026-10-25T10:05:44Z W9 #1 start, load 1.02 0.97 1.15
+2026-10-25T10:13:02Z W9 #1 end rc 0, load 2.41 2.00 1.58
+2026-10-25T10:13:02Z W9 #1 VOID (INV-7)
+2026-10-25T10:14:12Z W9 #2 start, load 1.17 1.71 1.51
+2026-10-25T10:21:36Z W9 #2 end rc 0, load 3.43 2.57 1.96
+2026-10-25T10:21:36Z W9 #2 VOID (INV-7)
+2026-10-25T10:23:36Z W9 #3 start, load 1.19 2.02 1.83
+2026-10-25T10:30:56Z W9 #3 end rc 0, load 2.58 2.26 2.01
+2026-10-25T10:30:56Z W9 #3 VOID (INV-7)
+2026-10-25T10:30:56Z W9: no valid attempt
+2026-10-25T10:32:41Z W13 #1 start, load 1.18 1.90 1.91
+2026-10-25T11:32:39Z W13 #1 end rc 0, load 1.14 1.19 1.19
+2026-10-25T11:32:39Z W13 #1 valid, copied: W13-sc-cases.txt W13-sc-base.txt
+2026-10-25T11:32:39Z P0v31 #1 start, load 1.14 1.19 1.19
+2026-10-25T11:33:30Z P0v31 #1 end rc 0, load 1.06 1.16 1.18
+2026-10-25T11:33:30Z P0v31 #1 valid, copied: W13-P0-v31.txt
+2026-10-25T11:33:30Z P0suite #1 start, load 1.06 1.16 1.18
+2026-10-25T11:34:22Z P0suite #1 end rc 0, load 1.21 1.18 1.19
+2026-10-25T11:34:22Z P0suite #1 valid, copied: W13-P0-suite.txt
+2026-10-25T11:34:27Z Msuite #1 start, load 1.19 1.18 1.19
+2026-10-25T11:37:51Z Msuite #1 end rc 1, load 1.57 1.57 1.35
+2026-10-25T11:37:51Z Msuite #1 valid, copied: W13-suite-mutants.txt
+2026-10-25T11:38:16Z W12 #1 start, load 1.11 1.46 1.32
+2026-10-25T11:46:35Z W12 #1 end rc 0, load 2.01 1.89 1.59
+2026-10-25T11:46:35Z W12 #1 VOID (INV-7)
+2026-10-25T11:47:20Z W12 #2 start, load 1.19 1.69 1.53
+2026-10-25T11:55:40Z W12 #2 end rc 0, load 2.33 2.19 1.85
+2026-10-25T11:55:40Z W12 #2 VOID (INV-7)
+2026-10-25T11:57:10Z W12 #3 start, load 1.10 1.82 1.75
+2026-10-25T12:07:03Z W12 #3 end rc 0, load 4.77 3.37 2.55
+2026-10-25T12:07:03Z W12 #3 VOID (INV-7)
+2026-10-25T12:07:03Z W12: no valid attempt
+2026-10-25T12:09:06Z d2 stopped by the executor (pid 3916765) before it ran anything: replaced by driver2b (adds a fourth W12 attempt)
+2026-10-25T12:15:33Z W14i #1 start, load 1.15 1.79 2.09
+2026-10-25T12:17:03Z W14i #1 end rc 0, load 1.19 1.63 2.00
+2026-10-25T12:17:03Z W14i #1 valid, copied: W14-independent-mutants.txt
+2026-10-25T12:17:03Z W14m #1 start, load 1.19 1.63 2.00
+2026-10-25T13:04:40Z executor: stopped driver2b (pid 4043097, still waiting) and driver.sh (process group 3266708, during W14m) to free the host for W12 and the reruns the coordinator asked for; replaced by driver3
+2026-10-25T13:05:05Z d3 driver3 start, pid 130614
+2026-10-25T13:06:50Z d3 W12r #1 start, load 1.17 2.15 2.59
+2026-10-25T13:15:14Z d3 W12r #1 end rc 0, load 1.97 2.06 2.37
+2026-10-25T13:15:14Z d3 W12r #1 valid
+2026-10-25T13:15:14Z d3 W12r #1 copied: W12-real-traffic.txt W12-replay-138.tsv W12-replay-138-base.tsv W12-ident-138.txt
+2026-10-25T13:17:14Z d3 BI1415 #1 start, load 1.14 1.74 2.22
+2026-10-25T13:19:01Z d3 BI1415 #1 end rc 0, load 1.10 1.54 2.09
+2026-10-25T13:19:01Z d3 BI1415 #1 valid
+2026-10-25T13:19:01Z d3 BI1415 #1 copied: W13-rerun-BI-14-15.txt
+2026-10-25T13:19:01Z d3 Msuiter #1 start, load 1.10 1.54 2.09
+2026-10-25T13:22:26Z d3 Msuiter #1 end rc 1, load 1.50 1.60 2.01
+2026-10-25T13:22:26Z d3 Msuiter #1 VOID-not-judged
+2026-10-25T13:22:51Z d3 Msuiter #2 start, load 1.12 1.50 1.96
+2026-10-25T13:26:20Z d3 Msuiter #2 end rc 0, load 1.63 1.68 1.95
+2026-10-25T13:26:20Z d3 Msuiter #2 VOID-not-judged
+2026-10-25T13:26:20Z d3 Msuiter: no valid attempt
+2026-10-25T13:26:55Z d3 W9r #1 start, load 1.12 1.55 1.90
+2026-10-25T13:34:05Z d3 W9r #1 end rc 0, load 2.01 1.94 1.95
+2026-10-25T13:34:05Z d3 W9r #1 VOID-load
+2026-10-25T13:34:05Z d3 W9r: no valid attempt
+2026-10-25T13:34:05Z d3 driver3 end
+2026-10-25T13:34:43Z executor: v31/impl/W13-suite-mutants.txt restored to the HEAD version (Msuite #1 is void under the coordinator rule: 32 SKIP [load] + 1 void; its file stays in so/Msuite.1)

@@ -1,0 +1,15 @@
+proto 9f61db0e7b8b impl 834dee6db0d0 prev(2893bcc) af4658b6f935 | proposal sections (0-based start line): {'What1补充': 76, 'What1补充2': 97, 'What6': 180, 'What7补充': 217, 'What7补充2': 264}
+hunks proto->impl (diff -u): 8 | diff -U0 hunks: 11 | prev->impl (diff -u) hunks: 6
+H1 @@ -85,18 +85,27 @@ | -12 +21 | + lines verbatim in: What7补充,What7补充2 | + lines not verbatim in any of the five: 0 | - lines found in: -
+H2 @@ -575,7 +584,8 @@ _sg_compute_credit() { | -1 +2 | + lines verbatim in: What7补充 | + lines not verbatim in any of the five: 0 | - lines found in: What7补充
+H3 @@ -589,9 +599,10 @@ _sg_compute_credit() { | -3 +4 | + lines verbatim in: What7补充2 | + lines not verbatim in any of the five: 0 | - lines found in: What7补充2
+H4 @@ -623,8 +634,8 @@ _sg_time_budget() {   # resolve SECRET_G | -2 +2 | + lines verbatim in: What7补充 | + lines not verbatim in any of the five: 0 | - lines found in: -
+H5 @@ -672,7 +683,6 @@ _sg_vx_collect() { | -1 +0 | + lines verbatim in: - | + lines not verbatim in any of the five: 0 | - lines found in: What6
+H6 @@ -711,10 +721,10 @@ _sg_vx_apply() { | -4 +4 | + lines verbatim in: What7补充2 | + lines not verbatim in any of the five: 0 | - lines found in: What7补充2
+H7 @@ -783,14 +793,16 @@ _sg_vx_pass() { | -3 +5 | + lines verbatim in: What7补充2 | + lines not verbatim in any of the five: 0 | - lines found in: What7补充,What7补充2
+H8 @@ -812,14 +824,25 @@ _sg_relax_left() {   # sets _SG_LEFT to | -4 +15 | + lines verbatim in: What1补充,What1补充2,What7补充2 | + lines not verbatim in any of the five: 0 | - lines found in: What7补充2
+reverse What1补充     fenced non-blank lines  12: in impl  11 | not in impl but in prev 1 | only in proto 0 | in none 0
+reverse What1补充2    fenced non-blank lines   9: in impl   9 | not in impl but in prev 0 | only in proto 0 | in none 0
+reverse What6       fenced non-blank lines   0: in impl   0 | not in impl but in prev 0 | only in proto 0 | in none 0
+reverse What7补充     fenced non-blank lines  25: in impl  17 | not in impl but in prev 8 | only in proto 0 | in none 0
+reverse What7补充2    fenced non-blank lines  50: in impl  32 | not in impl but in prev 18 | only in proto 0 | in none 0

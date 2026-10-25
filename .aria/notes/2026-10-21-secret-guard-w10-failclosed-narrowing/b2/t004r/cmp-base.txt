@@ -1,0 +1,5 @@
+ids old 142 new 161 | changed 0: 
+new ids 19: V11-S1-above-gate:_sg_relax_nowslfs=MISSING V15-T1-timer-sleeps-time-left=MISSING V15-T2-anchor-taken-once-at-hook-start=MISSING V15-T3-job-errors-silenced=MISSING V15-W1a-autofs-mount-point-not-looked-at=MISSING V15-W1b-binfmt-misc-with-wslinterop-late=MISSING V15-W1c-binfmt-misc-without-entry=MISSING V15-W1d-unreadable-mount-table=MISSING V15-W1e-gate-closed-by-wsl-file-system=MISSING V15-W1f-empty-mount-table=MISSING V15-W1g-autofs-on-top-of-binfmt-misc-not-looked-at=MISSING V15-W1h-directory-as-mount-table=MISSING V15-W1i-noglob-binfmt-misc-with-wslinterop-late=MISSING V15-W1j-failglob-binfmt-misc-without-entry=MISSING V15-W1k-unsearchable-directory=MISSING V15-W1l-unlistable-directory-with-wslinterop-late=MISSING V15-W1m-mount-table-read-only-after-platform-and-time=MISSING V15-W1n-mount-table-read-in-one-pass=MISSING V15-W1o-regular-file-as-directory=MISSING
+gone ids 0: 
+totals old: # totals: PASS 25  FAIL 43  MISSING 74  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)
+totals new: # totals: PASS 25  FAIL 43  MISSING 93  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)
