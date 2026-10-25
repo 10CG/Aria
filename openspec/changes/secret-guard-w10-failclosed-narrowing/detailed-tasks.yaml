@@ -29,7 +29,7 @@ meta:
 
 invariants:
   - id: INV-1
-    rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认"
+    rule: "实现 = v31/mkv31.py 生成的原型 (v31/W8-v31.diff), 加上三类且仅三类内容差, 字面都在 proposal 里: (1) What 1 补充 (准入门收紧: _sg_relax_ok 与 _sg_relax_platform 两段); (2) What 6 (删 :666 那一行 [[ -z \"${_SGV_V[j]}\" ]] && continue); (3) What 7 补充 (四处注释)。其余逻辑与注释逐字落地, 只重锚行号 (B.1 时 aria hooks/ 与基线零差异, 正常情况下连行号都不漂)。必须再偏离时先停下, 改 proposal (附理由与重跑的 W13), 再改代码; 不允许实现先行、规格事后追认 (2026-10-25 TASK-005 复审后增补两类, 字面同样在 proposal 里: (4) What 1 补充 2 —— _sg_relax_ok 的 WSL 一行换成两行, 新函数 _sg_relax_nowslfs; (5) What 7 补充 2 —— 复审指出的注释, 逐字文本在修复轮提交后回填 proposal)"
   - id: INV-2
     rule: "改动面: aria 的 hooks/secret-guard.sh 与 hooks/tests/secret-guard.test.sh (含搬入的 shim、输入生成, 与直调用例的 helper hooks/tests/lib/secret-guard-w10-direct.sh —— 2026-10-24 第三步派出前补); 文档面: aria/CHANGELOG.md、standards conventions/secret-hygiene.md 三处计数、TASK-006 的发布同步面; 证据面: .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/ (TASK-003 / 004 的产出, 不覆盖 v31/ 下的原型证据), 以及 v31/ 下的验收脚本 (TASK-002 的补强、TASK-003 补的用例、TASK-004 给 run-evidence.sh 加的输出目录参数; 每处改动在提交说明里列出); pp-r2-seats/ (post_planning R2 五席的坏实现生成脚本、探针与逐个结果, 2026-10-24 从会话临时目录收进来, 只追加) 与 b2/ (B.2 各步的执笔席报告、补丁与过程材料, 及主控的独立复核记录); 计划面: 本目录的 detailed-tasks.yaml、dispositions.md (只追加) 与 proposal.md —— proposal.md 由 v31/fill31.py 从 v31/proposal-template.md 生成, 改模板再生成, 不手改。其余文件不动, 需要动时停下上报"
   - id: INV-3
@@ -214,6 +214,8 @@ tasks:
     acceptance: ["无未处置的 Critical / Major", "报告记录的 SHA 等于待发版的 SHA (否则复审增量)"]
     notes:
       - "开始 (2026-10-25, 主控): 审查对象 aria 2893bcc (hook af4658b6f935), 改动面 8614066..2893bcc 的 hooks/; 单席 aria:code-reviewer, 两阶段 (规格符合 / 代码质量与安全), 任务书 b2/BRIEF-T005.md; 报告进 .aria/audit-reports/ 并记 reviewed_sha"
+      - "审查结果 (2026-10-25, 单席 aria:code-reviewer, 31 次调用, 上下文最高约 27 万、缓存读约 350 万; 报告 .aria/audit-reports/post_implementation-R1-1792888152945-secret-guard-w10-failclosed-narrowing-code-reviewer.md, reviewed_sha 2893bcc): verdict PASS —— 0 Critical、0 Major、6 Minor、3 条疑点。阶段 1 规格符合全部成立 (INV-1 抽查、INV-3、INV-4、What 1-5、每条出错路径都失败即关, 放行只经 77)。Minor: m-1 重跑里可能按 VMAX 拦, What 5 与 R-c 漏申报这类文案; m-2 四处注释过宽或与代码相反 (_sg_relax_noext 的「an error keeps the relaxation off」与代码相反, 代码的行为才是 What 1 表要的); m-3 V2-G12 / G13 只验关门一极; m-4 nproc_binds 快路径用有效 UID、CapEff 读的是 awk 自己 (只会假红); m-5 杀组比 _SG_P0 + cap 晚一段 fork 延迟; m-6 三处只被计时类用例抓住, 建议补直调用例。疑点: D-1 较新的 WSL 可能登记 WSLInterop-late; D-2 /proc/sys/fs/binfmt_misc 在 systemd 宿主上多是 autofs 自动挂载点, 没人服务时 stat 可能一直阻塞, hook 超时被杀即放行, 而基线从不碰这里 —— 放宽带来的新放行路径; D-3 作业里 bash 自身致命错误以 2 退出时原样写出它的报错 (仍是拦)"
+      - "主控裁定 (2026-10-25, 技术口径, 姿态不变或更严): 开 TASK-005 修复轮, 不带着 D-2 发版 —— D-2 是本变更新引入的潜在放行路径, 加固只会把放宽关得更严, 属不改姿态的技术改动, 由主控定并告知 owner。规格先改 (proposal v3.3): What 1 补充 2 钉到字面 (先读挂载表, 只在 binfmt_misc 已挂上时看 WSLInterop* 项, 读不出挂载表即当作 WSL; D-1 一并覆盖; 主控交付前在 3.2.57、5.0.18、5.2.15、5.3.20 上实跑过这段代码, 抓出并改掉两个 bug: 循环末行不匹配时 while 的退出码为 1 会被读成挂载表读不出、读不出时的报错漏到 stderr); What 5、R-c 与 CHANGELOG 草稿补 VMAX 一类 (m-1); What 3 写明 fork 延迟算进 ε (m-5, 只改文档); What 4 写明 D-3 的例外; What 7 补充 2 列出 m-2 四处、D-3 与 WSL 行的注释各自要说的意思, 逐字文本修复轮后回填; 用例一侧 m-3、m-4、m-6 与 What 1 补充 2 的直调用例一并补。INV-1 增补这两类内容差。之后: 主控复核 -> TASK-004 重跑 (hook 改了, INV-8) 加耗时矩阵最重形状的复跑 -> 本任务对新增 diff 复审 -> TASK-006 (owner 门)。修复轮任务书 b2/BRIEF-T005f.md"
 
   - id: TASK-006
     parent: "C"

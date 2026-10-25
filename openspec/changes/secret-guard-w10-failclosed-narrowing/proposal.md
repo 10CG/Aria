@@ -94,6 +94,27 @@ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x
 
 每个参数都带缺省（2026-10-24 改，B.2 TASK-002 第一步发现）：hook 开着 `set -u`，少传一个参数就会让调用方整体中止，在 hook 里中止即退出码不是 2，等于放行；带缺省之后，缺参数时准入门关闭。
 
+**What 1 补充 2：WSL 标记的读法不触发自动挂载**（v3.3，2026-10-25，TASK-005 复审 D-1、D-2；技术口径，姿态不变：两处都只会把放宽关掉，不会打开。INV-1 允许的内容差之一）。What 1 补充里 `-e /proc/sys/fs/binfmt_misc/WSLInterop` 在多数 systemd 宿主上会穿过 autofs 自动挂载点：一般毫秒内挂上，但自动挂载没人服务时（例如继承了宿主 autofs 挂载点的容器或 chroot）stat 可能一直阻塞，hook 超过 Claude Code 的 5 s 被杀后命令就放行了，而基线从不碰这个目录、本会按尺寸拦——这是放宽带来的新放行路径。另外较新的 WSL 可能把互操作项登记成 `WSLInterop-late`。改法：环境里的两个 WSL 变量照旧；文件那一项改由下面的函数看，先读挂载表，只在 `/proc/sys/fs/binfmt_misc` 上确实挂着 binfmt_misc 文件系统时才看那里的项（已挂上就不会再触发自动挂载），认以 `WSLInterop` 开头的任何项；挂载表读不出来时当作可能在 WSL 里，准入门关闭。`_sg_relax_ok` 里 WSL 那一行换成两行：
+
+```bash
+  [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" ]] && wsl=wsl   # WSL marks in the environment; the environment can only switch the relaxation off with them
+  [[ -n "$wsl" ]] || _sg_relax_nowslfs || wsl=wsl   # a WSLInterop* entry under a mounted binfmt_misc, or a mount table that cannot be read
+```
+
+新函数（与其余 `_sg_relax_*` 一样定义在 source 闸门之上，INV-4）：
+
+```bash
+_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads, and no binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc), or one is and holds no entry named WSLInterop*. The entries are looked at only under a mounted binfmt_misc, so the look never triggers an automount (an autofs mount point there that nobody serves can hold a stat until the hook is killed, and a killed hook lets the command through); a mount table that cannot be read keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+  local d="${2:-/proc/sys/fs/binfmt_misc}" l e m=0
+  { while IFS= read -r l; do if [[ "$l" == *" $d binfmt_misc "* ]]; then m=1; fi; done; } 2>/dev/null < "${1:-/proc/self/mounts}" || return 1   # if, not &&: a last line that does not match must not make the loop's status 1 (that would read as an unreadable table); 2>/dev/null before <, so a table that cannot be opened writes nothing to stderr
+  (( m )) || return 0
+  for e in "$d"/WSLInterop*; do [[ -e "$e" ]] && return 1; done
+  return 0
+}
+```
+
+直调用例（TASK-005 修复轮补）：假挂载表只有 autofs 那一行 → 0；假挂载表列出一个临时目录为 binfmt_misc、目录里有 `WSLInterop-late` → 1；目录里没有 `WSLInterop*` → 0；挂载表路径读不出 → 1；把 `_sg_relax_nowslfs` 桩成返回 1 时，放宽平台上的 `_sg_relax_ok` 返回 1。
+
 ### 2. 放宽重跑的规则（`_SG_RELAXED=1`，只在作业里生效）
 
 - **副本上限按增长**：`_sg_vx_apply` 入口 `lim=$_SGV_SMAX`；放宽时 `lim=$(( ${#1} + _SGV_GMAX ))`。必须用 `${#1}`，因为循环里 `s` 会被改写（BI-9）。增长恰为 8192 放行、8193 拦，两种引用拼写一致（`V8-D2`、`V8-D3`）。超限的原因串见 What 5。放宽之外 `lim` 就是 `_SGV_SMAX`，函数契约不变。
@@ -107,7 +128,7 @@ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x
 
 ### 3. 硬截止作业
 
-- **截止**：`_SG_P0` + `min(_SG_TIME_BUDGET, 3)` 秒，微秒精度。首遍的时间也算在里面：Claude Code 的 5 s 从 hook 启动算起（BI-13，`V3-E3`）。
+- **截止**：`_SG_P0` + `min(_SG_TIME_BUDGET, 3)` 秒，微秒精度。首遍的时间也算在里面：Claude Code 的 5 s 从 hook 启动算起（BI-13，`V3-E3`）。计时器睡的是 `_sg_relax_run` 里算出的剩余时间 `_SG_LEFT`，计时器在 fork 出作业之后才起，所以杀组实际落在这个时刻之后一段 fork 延迟上；这段延迟算在下面耗时上界的 ε 里（TASK-005 m-5，2026-10-25 补）。
 - **作业**：`_sg_relax_run` 在命令替换里先 `exec 2>/dev/null`（赋值语句后面的重定向管不到命令替换本身，PP1-A25），再 `set -m`，后台作业因此自成进程组。
 - **自检**：作业开工前读 `/proc/$BASHPID/stat`，确认自己是进程组组长，否则以 9 退出（回落）。`set -m` 不生效的 bash 由此安全退化。这条拒绝分支在实测的五个 bash 上从不触发，由 TASK-002 补的直调用例钉住（PP2-J）。
 - **计时器在作业里**：自检之后、第一步判定之前，作业自己起计时器 `( sleep "$_SG_LEFT"; kill -KILL -- "-$me" )`，并用 `kill -0` 确认它在跑，否则以 9 退出、不判定（BI-3，`V5-S10c`）。计时器写成 `sleep …; kill …` 而不是 `&&`：`sleep` 失败（不存在、或不认小数秒）时计时器立即杀组，同样是回落（`V5-S14`；BI-23）。
@@ -119,7 +140,7 @@ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x
 
 ### 4. 回落 = 基线
 
-`_sg_relax_run` 返回 4（截止、时间检查点、自检、计时器未起、内部错误、拦截却无文本、裸 0）时，`_sg_per_segment_eval` 用存下的 `_SG_OV_PAT`、`_SG_OV_MODE` 写 oversize 文案并返回 2，与基线逐字节相同（P6）。放宽重跑放行时直接返回 0：准入门已保证没有扩展生效，扩展腿本来就是空操作。
+`_sg_relax_run` 返回 4（截止、时间检查点、自检、计时器未起、内部错误、拦截却无文本、裸 0）时，`_sg_per_segment_eval` 用存下的 `_SG_OV_PAT`、`_SG_OV_MODE` 写 oversize 文案并返回 2，与基线逐字节相同（P6）。一个例外：作业里 bash 自身的致命错误若以状态 2 退出并往 stderr 写了报错（例如内存分配失败），`_sg_relax_run` 会把它当作「2 且有文本」原样写出——结局仍是拦，文案却是 bash 的报错，不是基线文案（TASK-005 D-3，依赖 bash 的实现，未实测，2026-10-25 补）。放宽重跑放行时直接返回 0：准入门已保证没有扩展生效，扩展腿本来就是空操作。
 
 ### 5. 文案（逐字）
 
@@ -128,6 +149,7 @@ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x
 | 增长超限，整串 | `"the command grows by more than $_SGV_GMAX characters after variable expansion" "$cmd" whole oversize` | oversize；`Limit hit:` 行即左列原因串 |
 | 增长超限，分段 | `"a command segment grows by more than $_SGV_GMAX characters after variable expansion" "$cmd" segment oversize` | 同上 |
 | 重跑里分段副本总和超过 65536 | 基线的 TMAX 原因串，一字不变 | oversize（基线文案；以前这类命令先被 SMAX 拦，现在可能看到 TMAX 文案，见 R-c） |
+| 重跑里任一值超过 4096（基线那一遍只收集前 16 个赋值与前 8 个 for，后面的值看不到；重跑全部收集） | 基线的 VMAX 原因串，一字不变 | oversize（基线文案；以前这类命令先被 SMAX 拦，现在可能看到 VMAX 文案，见 R-c；TASK-005 m-1，2026-10-25 补） |
 | 超长单行命中规则 | `"$pat" "$seg" "$mode" longline` | 新模板，见下 |
 | 截止、时间检查点及其他失败 | （回落）基线原因串 | 基线 oversize 文案，逐字节不变 |
 
@@ -236,6 +258,17 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 # deadline, a time checkpoint, the self-check, an internal error, a bare 0 -- falls back to the baseline block, byte for byte. In effect only on an x86_64
 # GNU/Linux build of bash 5.0-5.3 outside WSL (the versions, architecture and platform measured), with no project extension in effect (with one, the extension blocks a copy over _SGV_SMAX by its own
 ```
+
+**What 7 补充 2：TASK-005 复审指出的注释**（v3.3，2026-10-25；INV-1 允许的内容差之一。下列每处要说的意思由本节钉住，落地的逐字文本在 TASK-005 修复轮提交后回填到这里，回填前以修复轮报告为准）：
+
+1. hook 头注释「Shell variable indirection」那条（What 7 补充 3）与套件 W10 块头：去掉「only where … not in effect」里的 only —— 放宽生效时，截止、检查点、自检等回落也按尺寸拦，重跑里还可能按 VMAX 拦（m-2 第 1 处）。
+2. hook LENGTH BUDGET 块里「whenever the rerun does not finish in time」：改成「whenever the rerun neither allows nor blocks on its own (the deadline, a checkpoint, any failure)」一类的完整说法（m-2 第 2 处）。
+3. `_sg_relax_noext` 的行尾注释：「or an error, keeps the relaxation off」与代码相反（取项目根出错时 `_sg_ext_root` 输出空串，本函数照样打印 none，这正是 What 1 表要的行为）。改成：项目根下的扩展文件不论什么状态都关掉放宽；找不到项目根（包括 jq 读不出 cwd）就不可能有扩展生效（m-2 第 3 处）。
+4. `_sg_vx_pass` 的说明：存在 `_SG_OV_PAT` / `_SG_OV_MODE` 里的是基线的原因串与模式，不是文案（文案回落时由 `_sg_emit_blocked` 重新生成）（m-2 第 4 处）。
+5. 重跑块头「an internal error, a bare 0 -- falls back to the baseline block, byte for byte」：补上 What 4 的那个例外（bash 自身致命错误以 2 退出时原样写出它的报错，仍是拦）（D-3）。
+6. 准入门 WSL 那一行的注释随 What 1 补充 2 改写（代码见上）。
+
+用例一侧（不属 hook 的内容差）：V2-G12 / G13 的注释与 chk 文案改成只说关门一极，开门一极指向 V14-G1，编号不变（m-3）；helper 与 `v31/sc-direct.sh` 的 `nproc_binds` 快路径改用真实 UID（`id -ru`），CapEff 由 bash 自己从 `/proc/$BASHPID/status` 读（m-4）；补三条与负载无关的直调用例：计时器睡的恰是 `_SG_LEFT`、锚点 `_SG_P0` 只在 hook 起点取一次、作业的命令替换里 `exec 2>/dev/null`（m-6，写法见复审报告第 5 项）。
 
 ### 参考实现（`v31/W8-v31.diff` 的全部逻辑 hunk）
 
@@ -608,7 +641,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 
 - R-a：代入后副本 > 8192、但增长不超过 8192 的命令，改为完整判定。没有规则命中、或 credit 成立，就放行。判定沿用现有语义，所以判定语义上的既有缺口覆盖到更多大命令：块结构命令整串判定、命令里任一处脱敏过滤（比如无关位置的 `>/dev/null`）都会给整份副本 credit（`10CG/aria-plugin#139`；`.aria/notes/2026-10-20-secret-guard-scan-cost-and-firstpass-cap/evidence/E11-real-traffic.txt`：超过 4 KB 的真实命令里，整串模式靠 credit 放行的有 71 条，是基线已放行的命令）；`10CG/aria-plugin#138`、`10CG/aria-plugin#140`、`10CG/aria-plugin#141`、`10CG/aria-plugin#142`、`10CG/aria-plugin#229` 同理。另有两类 W10 自身的代入语义缺口（post_planning R2 PP2-S；owner 2026-10-23 裁定点名申报，Decision 20）：同名变量赋值两次时，代入用第一个值，bash 读的是后一个；分段模式下，值里的 shell 语法（如 `G='| jq keys'`）代入后成了语法，读取段因此得到一个 bash 并不施加的过滤 credit。两类在小命令上基线就放行；在大命令上基线按尺寸拦，现在放行。载体见残余 8。
 - R-b：缩短类，即原串或中间副本 > 8192、最终副本 ≤ 8192。按普通判定，同样受 R-a 的 credit 语义约束。R2 的 TL2-F4 构造：读一个凭据形路径，另有一处无关的 `echo done >/dev/null`，基线按尺寸拦，现在放行，凭据会被读出（W11 shrink）。这正是裁定 A 的字面：「只因尺寸被拦」的命令改为完整判定、按结果判。
-- R-c：这类命令被拦时，文案由「过大」变为增长、TMAX、`longline` 或普通命中文案。普通命中文案照基线打印整条命令（经 `_sg_redact_echo`），大命令的拦截文本会更长。
+- R-c：这类命令被拦时，文案由「过大」变为增长、TMAX、VMAX、`longline` 或普通命中文案（VMAX 一类 2026-10-25 补，TASK-005 m-1）。普通命中文案照基线打印整条命令（经 `_sg_redact_echo`），大命令的拦截文本会更长。
 - count 轴：大命令在重跑里没有计数上限，读取藏在第 9 个引用之后也会被看到（TL 的构造：基线按尺寸拦，v3 放行，v3.1 按普通命中拦，`V9-E10`）。所以放宽**没有**把 count 轴的既有缺口带到大命令上；小命令一侧的缺口不变，见残余。
 
 **仍然拦**：增长 > 8192；任一值 > 4096（是否被引用都拦）；分段副本总和 > 65536；超长单行命中规则；放宽重跑没在截止前完成；准入门不成立时的一切基线拦截。
@@ -739,7 +772,7 @@ W13 的 SKIP 目前恒为 0：没有任何用例会 SKIP。TASK-002 加入负载
 - **问题**: W10 (变量展开第二遍) 的副本上限按**总长**计: 任何超过 8192 字符、又引用了已赋值变量的命令都按「过大」拦下, 哪怕展开只多几个字符。维护者本机会话记录里 > 8 KB 的 Bash 命令有 17.6% 因此被拦 (739 条中 130 条); > 4 KB 的命令里被拦的 138 条中 137 条属这一类 (另 1 条是值过长)。
 - **修复**: 在原来按总长拦的两处, 若满足放宽条件, 改为在一个硬截止作业里按放宽规则重判 W10: 副本上限改按增长 (`_SGV_GMAX` = 8192); 重判里不设计数上限 (所有赋值与引用都代入); 超过 8192 的副本照常完整判定, 其中行长超过 8192 的只匹配规则、不评估脱敏过滤 (新 `longline` 文案)。截止 = hook 启动 + min(`SECRET_GUARD_TIME_BUDGET_S`, 3) s; 作业自成进程组, 到点整组终止; 截止前没判完、或任何异常, 一律按原来的「过大」文案拦 (逐字节相同)。
 - **放宽条件**: x86_64 GNU/Linux 上的 bash 5.0–5.3 (实测 5.0.18 / 5.1.16 / 5.2.15 / 5.3.20), 不在 WSL 里、项目没有启用 `.aria/secret-guard.paths` 扩展、hook 启动后未满截止。其他平台 (macOS / Windows 原生 / WSL1 与 WSL2 / musl / aarch64 等其他架构)、其他 bash 版本、启用扩展的项目: 行为与之前完全相同。还依赖 `/proc` 与支持小数秒的 `sleep`; 缺了它们放宽不生效, 行为同旧版。
-- **行为变更**: 本机真实流量里, 被尺寸上限拦下的 137 条命令在 Linux 上放行 <N_allowed> 条 (TASK-004 实测); 这类命令被拦时, 文案由「过大」变为增长超限、TMAX、`longline` 或普通命中文案; 重判没在截止前完成的, 照旧按「过大」拦, 但要等到截止 (约 3 s; 以前在触发点当即拦, 通常 2 s 以内); `SECRET_GUARD_TIME_BUDGET_S` 设为 4 时截止仍封顶 3 s, 设得更小时截止随之缩短。
+- **行为变更**: 本机真实流量里, 被尺寸上限拦下的 137 条命令在 Linux 上放行 <N_allowed> 条 (TASK-004 实测); 这类命令被拦时, 文案由「过大」变为增长超限、TMAX、VMAX、`longline` 或普通命中文案; 重判没在截止前完成的, 照旧按「过大」拦, 但要等到截止 (约 3 s; 以前在触发点当即拦, 通常 2 s 以内); `SECRET_GUARD_TIME_BUDGET_S` 设为 4 时截止仍封顶 3 s, 设得更小时截止随之缩短。
 - **放宽面申报**: 这些大命令沿用现有的判定语义, 所以判定语义上的既有缺口覆盖到更多大命令 —— 块结构命令整串判定、命令里任一处脱敏过滤都会给整条命令 credit (`10CG/aria-plugin#139`; 例: 读一个凭据路径的命令, 只要别处有一个无关的 `>/dev/null`, 就会放行并读出凭据); `10CG/aria-plugin#138` / `10CG/aria-plugin#140` / `10CG/aria-plugin#141` / `10CG/aria-plugin#142` / `10CG/aria-plugin#229` 同理。原串或中间副本超过 8192、代入后变短的命令同样按普通判定。另有两类 W10 代入语义的既有缺口同样覆盖到大命令: 同名变量赋值两次时代入用第一个值 (bash 读后一个); 分段模式下值里的 shell 语法 (如 `G='| jq keys'`) 代入后成了语法, 读取因此得到 bash 并不施加的过滤 credit (载体 `10CG/aria-plugin#231`)。
 - **已知限制**: 首遍判定不计时 (`10CG/aria-plugin#228`); 不超过 8192 的副本判定只受协作式时间预算约束, 单次可超过 5 s —— v1.76.1 条目里的「永不 fail-open」对此不成立, 特此订正 (载体 `10CG/aria-plugin#228`); 小命令的 count 轴缺口不变, for 列表跨换行误拦与 heredoc 内赋值形文本误收集同样未修 (载体 `10CG/aria-plugin#231`); 截止之后的收尾随负载增长 (负载约 10 时实测 0.2–1.2 s)。
 - **Rule #6**: hook 不是 Skill; 逻辑与套件不属 Skill 变更。AI 可见的新文字 (`longline` 模板、两条增长原因串) 与路由带来的文案变化按 Rule #6 SOT §2 第 3 行处理: 点名行为、逐字断言作定向 fixture、AB 套件不覆盖 hook 文案的缺口记在 `10CG/Aria#261`。
@@ -791,6 +824,7 @@ Refs 10CG/aria-plugin#217, 10CG/aria-plugin#228, 10CG/aria-plugin#139, 10CG/aria
 19. **post_planning R2 之后实现优先**（owner 2026-10-23）：R2 的 Major 簇从 23 降到 20，但 18 个落在 v3.1 新写的表面上，停止规则触发。再审一轮审的会是新补的用例，所以不开第 3 轮：v3.2 只改文字，验收补强写进 TASK-002 作必交项，由新执笔席用五席的探针补齐；实现之后由 TASK-003、TASK-005 的新席位复核（本项目 config 的 post_implementation 检查点为 off，这两项是 owner 2026-10-22 选的自愿补位）。
 20. **两类既有代入语义缺口点名申报**（owner 2026-10-23）：它们在小命令上本来就放行；按裁定 A「沿用现有判定语义」，大命令同样放行。不为它们改设计，申报并给载体（R-a、残余 8）。
 21. **准入门按实测范围收紧**（owner 2026-10-23）：`*-linux-gnu*` 会放进没实测过的 aarch64 与 WSL。按裁定 E 收紧到 x86_64，WSL 一律维持基线：WSL1 是翻译层，WSL2 虽是真 Linux 内核也没有实测过（owner 先选排除 WSL1，随即追加 WSL2）。往更严方向，姿态不变（What 1 补充）。
+22. **WSL 标记读法加固与复审指出的注释**（2026-10-25，主控，技术口径；TASK-005 复审 D-1、D-2、m-1–m-6、D-3）：`/proc/sys/fs/binfmt_misc` 在 systemd 宿主上多是自动挂载点，`-e` 穿过它可能在自动挂载没人服务时一直阻塞，hook 被 Claude Code 超时杀掉即放行——基线从不碰这里，这是放宽带来的新放行路径。改为先读挂载表、只在 binfmt_misc 已挂上时看 `WSLInterop*` 项、读不出挂载表即当作 WSL（What 1 补充 2）。只会把放宽关得更严，姿态不变，不另请 owner 裁定，告知 owner。同轮补申报 VMAX 文案（What 5、R-c），并按 What 7 补充 2 改正注释。
 
 ## Tasks（A.2 细化为 detailed-tasks.yaml）
 
