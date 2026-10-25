@@ -1,4 +1,4 @@
-# W14 timing matrix | date 2026-10-24 20:49:32 +0000 | load 1.13 1.48 1.59 1/977 1877150 | implementation secret-guard.sh sha256 af4658b6f935 | instrumented copy (mkdbg31.py, diff +3 -0) c329a5b830af | gen-v3.py a271badaaae5 | w14-shapes.py 2f5cf9bdad16
+# W14 timing matrix | date 2026-10-25 13:42:48 +0000 | load 0.97 1.25 1.55 1/977 2215031 | implementation secret-guard.sh sha256 628652570ce3 | instrumented copy (mkdbg31.py, diff +3 -0) 68d8e2d7267b | gen-v3.py a271badaaae5 | w14-shapes.py 2f5cf9bdad16
 # TASK-003 second segment, 10CG/aria-plugin#217 | w14-matrix.sh 8b0a98e6d46b | mkdbg31.py 7d442b142eb7 | bash 5.2.15 (PATH), 5.0.18, 5.3.20 | taskset 0,1 nice 19 | hook timeout 60s
 # one e2e call per run (JSON on stdin through a pipe, stderr to a file, HOME and cwd a scratch dir); W = wall clock of the call; T_trigger = the relax-start probe of the instrumented copy, relative to the same launch (W itself when no rerun began);
 # parameters: floor 3000000 us, slack 300000 us, void at 200 (hundredths of the 1-minute load), runs 5/3, wait cap 120 s, cases: all
@@ -6,530 +6,543 @@
 
 ## apply-heavy  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 61536 characters / 61536 bytes
 what: whole mode (leading subshell), 60 KB: 16 variables x 16 references, the reference block twice; apply cost of the rerun, which has no count bound
-load before: 1.13 1.48 1.59 2/977 1877185 | after: 1.25 1.49 1.60 1/983 1877740 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.383 s  bound= 3.300 s  over=no  reruns=1  job=  2.627 s  survivors=0
-  run 2  rc=2   size-whole W=  3.021 s  T_trigger=  0.373 s  bound= 3.300 s  over=no  reruns=1  job=  2.638 s  survivors=0
-  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.387 s  bound= 3.300 s  over=no  reruns=1  job=  2.624 s  survivors=0
-  run 4  rc=2   size-whole W=  3.018 s  T_trigger=  0.454 s  bound= 3.300 s  over=no  reruns=1  job=  2.557 s  survivors=0
-  run 5  rc=2   size-whole W=  3.019 s  T_trigger=  0.379 s  bound= 3.300 s  over=no  reruns=1  job=  2.632 s  survivors=0
+load before: 0.97 1.25 1.55 1/977 2215066 | after: 1.13 1.27 1.56 2/977 2215784 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.378 s  bound= 3.300 s  over=no  reruns=1  job=  2.632 s  survivors=0
+  run 2  rc=2   size-whole W=  3.017 s  T_trigger=  0.371 s  bound= 3.300 s  over=no  reruns=1  job=  2.639 s  survivors=0
+  run 3  rc=2   size-whole W=  3.023 s  T_trigger=  0.373 s  bound= 3.300 s  over=no  reruns=1  job=  2.641 s  survivors=0
+  run 4  rc=2   size-whole W=  3.032 s  T_trigger=  0.438 s  bound= 3.300 s  over=no  reruns=1  job=  2.575 s  survivors=0
+  run 5  rc=2   size-whole W=  3.080 s  T_trigger=  0.539 s  bound= 3.300 s  over=no  reruns=1  job=  2.534 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## apply-heavy-seg  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 61533 characters / 61533 bytes
 what: the same without the subshell: segment mode, one 60 KB segment
-load before: 1.13 1.45 1.58 2/985 1877919 | after: 1.60 1.55 1.61 1/984 1878348 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.025 s  T_trigger=  0.438 s  bound= 3.300 s  over=no  reruns=1  job=  2.578 s  survivors=0
-  run 2  rc=2   size-whole W=  3.025 s  T_trigger=  0.542 s  bound= 3.300 s  over=no  reruns=1  job=  2.472 s  survivors=0
-  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.509 s  bound= 3.300 s  over=no  reruns=1  job=  2.502 s  survivors=0
-  run 4  rc=2   size-whole W=  3.019 s  T_trigger=  0.418 s  bound= 3.300 s  over=no  reruns=1  job=  2.593 s  survivors=0
-  run 5  rc=2   size-whole W=  3.018 s  T_trigger=  0.398 s  bound= 3.300 s  over=no  reruns=1  job=  2.611 s  survivors=0
+load before: 1.13 1.27 1.56 1/977 2215803 | after: 1.47 1.33 1.57 1/978 2216635 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.427 s  bound= 3.300 s  over=no  reruns=1  job=  2.582 s  survivors=0
+  run 2  rc=2   size-whole W=  3.017 s  T_trigger=  0.506 s  bound= 3.300 s  over=no  reruns=1  job=  2.504 s  survivors=0
+  run 3  rc=2   size-whole W=  3.022 s  T_trigger=  0.408 s  bound= 3.300 s  over=no  reruns=1  job=  2.604 s  survivors=0
+  run 4  rc=2   size-whole W=  3.021 s  T_trigger=  0.436 s  bound= 3.300 s  over=no  reruns=1  job=  2.576 s  survivors=0
+  run 5  rc=2   size-whole W=  3.019 s  T_trigger=  0.418 s  bound= 3.300 s  over=no  reruns=1  job=  2.593 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## apply-heavy-cjk  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 61534 characters / 161542 bytes
 what: multibyte filler (characters != bytes) around the same reference block: string operations cost more per character
-load before: 1.18 1.45 1.58 2/983 1879212 | after: 1.53 1.51 1.59 1/982 1879624 | waited 45s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.060 s  T_trigger=  1.996 s  bound= 3.300 s  over=no  reruns=1  job=  1.027 s  survivors=0
-  run 2  rc=2   size-whole W=  3.048 s  T_trigger=  2.054 s  bound= 3.300 s  over=no  reruns=1  job=  0.969 s  survivors=0
-  run 3  rc=2   size-whole W=  3.041 s  T_trigger=  1.983 s  bound= 3.300 s  over=no  reruns=1  job=  1.033 s  survivors=0
-  run 4  rc=2   size-whole W=  3.048 s  T_trigger=  2.009 s  bound= 3.300 s  over=no  reruns=1  job=  1.014 s  survivors=0
-  run 5  rc=2   size-whole W=  3.043 s  T_trigger=  2.094 s  bound= 3.300 s  over=no  reruns=1  job=  0.924 s  survivors=0
+load before: 1.12 1.26 1.54 3/978 2217236 | after: 1.32 1.30 1.55 1/977 2218157 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.051 s  T_trigger=  2.025 s  bound= 3.300 s  over=no  reruns=1  job=  0.997 s  survivors=0
+  run 2  rc=2   size-whole W=  3.052 s  T_trigger=  2.106 s  bound= 3.300 s  over=no  reruns=1  job=  0.911 s  survivors=0
+  run 3  rc=2   size-whole W=  3.044 s  T_trigger=  1.887 s  bound= 3.300 s  over=no  reruns=1  job=  1.131 s  survivors=0
+  run 4  rc=2   size-whole W=  3.042 s  T_trigger=  2.231 s  bound= 3.300 s  over=no  reruns=1  job=  0.785 s  survivors=0
+  run 5  rc=2   size-whole W=  3.046 s  T_trigger=  2.161 s  bound= 3.300 s  over=no  reruns=1  job=  0.859 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## shrink  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 10974 characters / 10974 bytes
 what: two 600-character variable names referenced 8 times each (copies shrink), a source read after them
-load before: 1.19 1.43 1.56 1/982 1880567 | after: 1.19 1.43 1.56 2/987 1880713 | waited 40s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.155 s  T_trigger=  0.098 s  bound= 3.300 s  over=no  reruns=1  job=  0.056 s  survivors=0
-  run 2  rc=0   allow      W=  0.158 s  T_trigger=  0.095 s  bound= 3.300 s  over=no  reruns=1  job=  0.061 s  survivors=0
-  run 3  rc=0   allow      W=  0.159 s  T_trigger=  0.102 s  bound= 3.300 s  over=no  reruns=1  job=  0.056 s  survivors=0
-  run 4  rc=0   allow      W=  0.160 s  T_trigger=  0.097 s  bound= 3.300 s  over=no  reruns=1  job=  0.062 s  survivors=0
-  run 5  rc=0   allow      W=  0.154 s  T_trigger=  0.094 s  bound= 3.300 s  over=no  reruns=1  job=  0.059 s  survivors=0
+load before: 1.12 1.26 1.53 1/978 2219082 | after: 1.11 1.25 1.53 6/987 2219295 | waited 25s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.159 s  T_trigger=  0.097 s  bound= 3.300 s  over=no  reruns=1  job=  0.061 s  survivors=0
+  run 2  rc=0   allow      W=  0.188 s  T_trigger=  0.120 s  bound= 3.300 s  over=no  reruns=1  job=  0.066 s  survivors=0
+  run 3  rc=0   allow      W=  0.156 s  T_trigger=  0.098 s  bound= 3.300 s  over=no  reruns=1  job=  0.056 s  survivors=0
+  run 4  rc=0   allow      W=  0.230 s  T_trigger=  0.166 s  bound= 3.300 s  over=no  reruns=1  job=  0.062 s  survivors=0
+  run 5  rc=0   allow      W=  0.186 s  T_trigger=  0.106 s  bound= 3.300 s  over=no  reruns=1  job=  0.077 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## segfinding  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 4374 characters / 4374 bytes
 what: 4000-character value referenced twice, 12 filler lines, a source read last: a finding that is found late
-load before: 1.19 1.43 1.56 2/987 1880732 | after: 1.17 1.42 1.56 1/981 1881061 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   finding    W=  1.160 s  T_trigger=  0.697 s  bound= 3.300 s  over=no  reruns=1  job=  0.461 s  survivors=0
-  run 2  rc=2   finding    W=  1.117 s  T_trigger=  0.680 s  bound= 3.300 s  over=no  reruns=1  job=  0.436 s  survivors=0
-  run 3  rc=2   finding    W=  1.187 s  T_trigger=  0.723 s  bound= 3.300 s  over=no  reruns=1  job=  0.462 s  survivors=0
-  run 4  rc=2   finding    W=  1.122 s  T_trigger=  0.676 s  bound= 3.300 s  over=no  reruns=1  job=  0.445 s  survivors=0
-  run 5  rc=2   finding    W=  1.204 s  T_trigger=  0.741 s  bound= 3.300 s  over=no  reruns=1  job=  0.462 s  survivors=0
+load before: 1.11 1.25 1.53 3/986 2219315 | after: 1.18 1.27 1.53 2/982 2219646 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   finding    W=  1.209 s  T_trigger=  0.764 s  bound= 3.300 s  over=no  reruns=1  job=  0.443 s  survivors=0
+  run 2  rc=2   finding    W=  1.150 s  T_trigger=  0.685 s  bound= 3.300 s  over=no  reruns=1  job=  0.463 s  survivors=0
+  run 3  rc=2   finding    W=  1.133 s  T_trigger=  0.692 s  bound= 3.300 s  over=no  reruns=1  job=  0.439 s  survivors=0
+  run 4  rc=2   finding    W=  1.200 s  T_trigger=  0.735 s  bound= 3.300 s  over=no  reruns=1  job=  0.464 s  survivors=0
+  run 5  rc=2   finding    W=  1.154 s  T_trigger=  0.696 s  bound= 3.300 s  over=no  reruns=1  job=  0.457 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## f5like  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 4421 characters / 4421 bytes
 what: a relaxable big segment followed by three expensive small segments (credit ~1 s each): the rerun runs into the deadline
-load before: 1.17 1.42 1.56 2/981 1881080 | after: 1.21 1.42 1.55 1/981 1881524 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W=  3.015 s  T_trigger=  0.726 s  bound= 3.300 s  over=no  reruns=1  job=  2.284 s  survivors=0
-  run 2  rc=2   size-seg   W=  3.014 s  T_trigger=  0.717 s  bound= 3.300 s  over=no  reruns=1  job=  2.291 s  survivors=0
-  run 3  rc=2   size-seg   W=  3.017 s  T_trigger=  0.735 s  bound= 3.300 s  over=no  reruns=1  job=  2.276 s  survivors=0
-  run 4  rc=2   size-seg   W=  3.015 s  T_trigger=  0.743 s  bound= 3.300 s  over=no  reruns=1  job=  2.266 s  survivors=0
-  run 5  rc=2   size-seg   W=  3.015 s  T_trigger=  0.742 s  bound= 3.300 s  over=no  reruns=1  job=  2.268 s  survivors=0
+load before: 1.18 1.27 1.53 2/982 2219665 | after: 1.22 1.27 1.53 4/973 2221322 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-seg   W=  3.019 s  T_trigger=  0.763 s  bound= 3.300 s  over=no  reruns=1  job=  2.251 s  survivors=0
+  run 2  rc=2   size-seg   W=  3.015 s  T_trigger=  0.778 s  bound= 3.300 s  over=no  reruns=1  job=  2.232 s  survivors=0
+  run 3  rc=2   size-seg   W=  3.016 s  T_trigger=  0.769 s  bound= 3.300 s  over=no  reruns=1  job=  2.242 s  survivors=0
+  run 4  rc=2   size-seg   W=  3.018 s  T_trigger=  0.730 s  bound= 3.300 s  over=no  reruns=1  job=  2.280 s  survivors=0
+  run 5  rc=2   size-seg   W=  3.016 s  T_trigger=  0.990 s  bound= 3.300 s  over=no  reruns=1  job=  2.019 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## km-ext  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 24044 characters / 24044 bytes
 what: 24000-character line inside a subshell, run WITHOUT a project extension (the relaxation is in effect)
-load before: 1.11 1.39 1.55 1/980 1881634 | after: 1.11 1.39 1.55 1/977 1881786 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.252 s  T_trigger=  0.158 s  bound= 3.300 s  over=no  reruns=1  job=  0.092 s  survivors=0
-  run 2  rc=0   allow      W=  0.253 s  T_trigger=  0.142 s  bound= 3.300 s  over=no  reruns=1  job=  0.110 s  survivors=0
-  run 3  rc=0   allow      W=  0.244 s  T_trigger=  0.148 s  bound= 3.300 s  over=no  reruns=1  job=  0.094 s  survivors=0
-  run 4  rc=0   allow      W=  0.248 s  T_trigger=  0.156 s  bound= 3.300 s  over=no  reruns=1  job=  0.091 s  survivors=0
-  run 5  rc=0   allow      W=  0.235 s  T_trigger=  0.143 s  bound= 3.300 s  over=no  reruns=1  job=  0.091 s  survivors=0
+load before: 1.13 1.25 1.52 2/974 2221891 | after: 1.13 1.25 1.52 1/974 2222042 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.255 s  T_trigger=  0.155 s  bound= 3.300 s  over=no  reruns=1  job=  0.099 s  survivors=0
+  run 2  rc=0   allow      W=  0.254 s  T_trigger=  0.150 s  bound= 3.300 s  over=no  reruns=1  job=  0.102 s  survivors=0
+  run 3  rc=0   allow      W=  0.254 s  T_trigger=  0.159 s  bound= 3.300 s  over=no  reruns=1  job=  0.094 s  survivors=0
+  run 4  rc=0   allow      W=  0.244 s  T_trigger=  0.149 s  bound= 3.300 s  over=no  reruns=1  job=  0.094 s  survivors=0
+  run 5  rc=0   allow      W=  0.242 s  T_trigger=  0.150 s  bound= 3.300 s  over=no  reruns=1  job=  0.091 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## km-ext-small  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 144 characters / 144 bytes
 what: the 100-character sibling of km-ext (control)
-load before: 1.11 1.39 1.55 1/977 1881805 | after: 1.10 1.39 1.54 1/980 1881988 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.078 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=0   allow      W=  0.073 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.13 1.25 1.52 1/974 2222061 | after: 1.13 1.25 1.52 1/974 2222242 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.072 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=0   allow      W=  0.080 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
   run 3  rc=0   allow      W=  0.074 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 4  rc=0   allow      W=  0.077 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=0   allow      W=  0.075 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=0   allow      W=  0.076 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=0   allow      W=  0.077 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 5 runs; over the bound in 0
 
 ## lmax-below  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 24559 characters / 24559 bytes
 what: whole mode, 3 lines of exactly 8192 characters (= _SGV_LMAX, the credit path, ~0.9 s per line)
-load before: 1.10 1.39 1.54 1/980 1882007 | after: 1.23 1.41 1.55 5/983 1882399 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  2.881 s  T_trigger=  0.163 s  bound= 3.300 s  over=no  reruns=1  job=  2.716 s  survivors=0
-  run 2  rc=0   allow      W=  2.871 s  T_trigger=  0.154 s  bound= 3.300 s  over=no  reruns=1  job=  2.716 s  survivors=0
-  run 3  rc=0   allow      W=  2.748 s  T_trigger=  0.154 s  bound= 3.300 s  over=no  reruns=1  job=  2.593 s  survivors=0
-  run 4  rc=0   allow      W=  2.810 s  T_trigger=  0.163 s  bound= 3.300 s  over=no  reruns=1  job=  2.646 s  survivors=0
-  run 5  rc=0   allow      W=  2.892 s  T_trigger=  0.153 s  bound= 3.300 s  over=no  reruns=1  job=  2.738 s  survivors=0
+load before: 1.13 1.25 1.52 3/974 2222261 | after: 1.33 1.29 1.53 6/989 2223066 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  0.152 s  bound= 3.300 s  over=no  reruns=1  job=  2.857 s  survivors=0
+  run 2  rc=2   size-whole W=  3.015 s  T_trigger=  0.160 s  bound= 3.300 s  over=no  reruns=1  job=  2.848 s  survivors=0
+  run 3  rc=0   allow      W=  2.928 s  T_trigger=  0.173 s  bound= 3.300 s  over=no  reruns=1  job=  2.753 s  survivors=0
+  run 4  rc=2   size-whole W=  3.026 s  T_trigger=  0.186 s  bound= 3.300 s  over=no  reruns=1  job=  2.828 s  survivors=0
+  run 5  rc=2   size-whole W=  3.108 s  T_trigger=  0.271 s  bound= 3.300 s  over=no  reruns=1  job=  2.763 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## lmax-race  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 28544 characters / 28544 bytes
 what: lmax-below plus a fourth credit line of 4000 characters: the rerun needs about as long as the deadline leaves (~2.9 s of 3.0 s), so some runs finish and some are killed
-load before: 1.12 1.38 1.54 5/982 1882604 | after: 1.31 1.41 1.54 2/980 1883075 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.018 s  T_trigger=  0.211 s  bound= 3.300 s  over=no  reruns=1  job=  2.800 s  survivors=0
-  run 2  rc=2   size-whole W=  3.015 s  T_trigger=  0.187 s  bound= 3.300 s  over=no  reruns=1  job=  2.822 s  survivors=0
-  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  0.169 s  bound= 3.300 s  over=no  reruns=1  job=  2.842 s  survivors=0
-  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  0.178 s  bound= 3.300 s  over=no  reruns=1  job=  2.831 s  survivors=0
-  run 5  rc=2   size-whole W=  3.017 s  T_trigger=  0.167 s  bound= 3.300 s  over=no  reruns=1  job=  2.842 s  survivors=0
+load before: 1.19 1.28 1.50 1/974 2228937 | after: 1.29 1.30 1.50 1/970 2229349 | waited 120s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.181 s  bound= 3.300 s  over=no  reruns=1  job=  2.829 s  survivors=0
+  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  0.187 s  bound= 3.300 s  over=no  reruns=1  job=  2.822 s  survivors=0
+  run 3  rc=2   size-whole W=  3.018 s  T_trigger=  0.178 s  bound= 3.300 s  over=no  reruns=1  job=  2.832 s  survivors=0
+  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  0.174 s  bound= 3.300 s  over=no  reruns=1  job=  2.835 s  survivors=0
+  run 5  rc=2   size-whole W=  3.016 s  T_trigger=  0.171 s  bound= 3.300 s  over=no  reruns=1  job=  2.839 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## lmax-above  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 24560 characters / 24560 bytes
 what: like lmax-below but the first line has 8193 characters: the rows-only path (longline text), should be fast
-load before: 1.18 1.38 1.53 3/985 1883233 | after: 1.17 1.37 1.53 1/982 1883471 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   longline   W=  0.258 s  T_trigger=  0.173 s  bound= 3.300 s  over=no  reruns=1  job=  0.083 s  survivors=0
-  run 2  rc=2   longline   W=  0.229 s  T_trigger=  0.159 s  bound= 3.300 s  over=no  reruns=1  job=  0.069 s  survivors=0
-  run 3  rc=2   longline   W=  0.222 s  T_trigger=  0.150 s  bound= 3.300 s  over=no  reruns=1  job=  0.071 s  survivors=0
-  run 4  rc=2   longline   W=  0.225 s  T_trigger=  0.153 s  bound= 3.300 s  over=no  reruns=1  job=  0.071 s  survivors=0
-  run 5  rc=2   longline   W=  0.268 s  T_trigger=  0.187 s  bound= 3.300 s  over=no  reruns=1  job=  0.079 s  survivors=0
+load before: 1.16 1.27 1.49 2/970 2229528 | after: 1.23 1.28 1.49 2/971 2229786 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   longline   W=  0.310 s  T_trigger=  0.235 s  bound= 3.300 s  over=no  reruns=1  job=  0.074 s  survivors=0
+  run 2  rc=2   longline   W=  0.227 s  T_trigger=  0.154 s  bound= 3.300 s  over=no  reruns=1  job=  0.072 s  survivors=0
+  run 3  rc=2   longline   W=  0.248 s  T_trigger=  0.177 s  bound= 3.300 s  over=no  reruns=1  job=  0.071 s  survivors=0
+  run 4  rc=2   longline   W=  0.239 s  T_trigger=  0.167 s  bound= 3.300 s  over=no  reruns=1  job=  0.071 s  survivors=0
+  run 5  rc=2   longline   W=  0.223 s  T_trigger=  0.151 s  bound= 3.300 s  over=no  reruns=1  job=  0.071 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## gmax-exact  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 20112 characters / 20112 bytes
 what: growth over the input exactly 8192 (= _SGV_GMAX), whole mode: the largest copy the rerun accepts, judged in full
-load before: 1.17 1.37 1.53 1/982 1883490 | after: 1.15 1.36 1.53 1/980 1883782 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  1.751 s  T_trigger=  0.138 s  bound= 3.300 s  over=no  reruns=1  job=  1.612 s  survivors=0
-  run 2  rc=0   allow      W=  1.728 s  T_trigger=  0.156 s  bound= 3.300 s  over=no  reruns=1  job=  1.570 s  survivors=0
-  run 3  rc=0   allow      W=  1.792 s  T_trigger=  0.167 s  bound= 3.300 s  over=no  reruns=1  job=  1.624 s  survivors=0
-  run 4  rc=0   allow      W=  1.674 s  T_trigger=  0.137 s  bound= 3.300 s  over=no  reruns=1  job=  1.536 s  survivors=0
-  run 5  rc=0   allow      W=  1.674 s  T_trigger=  0.145 s  bound= 3.300 s  over=no  reruns=1  job=  1.528 s  survivors=0
+load before: 1.13 1.26 1.49 1/970 2230208 | after: 1.12 1.26 1.48 2/971 2230452 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  1.687 s  T_trigger=  0.143 s  bound= 3.300 s  over=no  reruns=1  job=  1.543 s  survivors=0
+  run 2  rc=0   allow      W=  1.800 s  T_trigger=  0.175 s  bound= 3.300 s  over=no  reruns=1  job=  1.624 s  survivors=0
+  run 3  rc=0   allow      W=  1.718 s  T_trigger=  0.152 s  bound= 3.300 s  over=no  reruns=1  job=  1.565 s  survivors=0
+  run 4  rc=0   allow      W=  1.821 s  T_trigger=  0.183 s  bound= 3.300 s  over=no  reruns=1  job=  1.636 s  survivors=0
+  run 5  rc=0   allow      W=  1.742 s  T_trigger=  0.168 s  bound= 3.300 s  over=no  reruns=1  job=  1.573 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## gmax-over  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 20113 characters / 20113 bytes
 what: growth 8193 (limit + 1): the growth text without any judgement, should be fast
-load before: 1.15 1.36 1.53 1/980 1883801 | after: 1.14 1.36 1.52 1/982 1884000 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   growth     W=  0.204 s  T_trigger=  0.147 s  bound= 3.300 s  over=no  reruns=1  job=  0.056 s  survivors=0
-  run 2  rc=2   growth     W=  0.212 s  T_trigger=  0.154 s  bound= 3.300 s  over=no  reruns=1  job=  0.057 s  survivors=0
-  run 3  rc=2   growth     W=  0.204 s  T_trigger=  0.140 s  bound= 3.300 s  over=no  reruns=1  job=  0.063 s  survivors=0
-  run 4  rc=2   growth     W=  0.203 s  T_trigger=  0.145 s  bound= 3.300 s  over=no  reruns=1  job=  0.057 s  survivors=0
-  run 5  rc=2   growth     W=  0.202 s  T_trigger=  0.144 s  bound= 3.300 s  over=no  reruns=1  job=  0.057 s  survivors=0
+load before: 1.19 1.28 1.48 1/974 2232528 | after: 1.19 1.28 1.48 1/973 2232715 | waited 40s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   growth     W=  0.201 s  T_trigger=  0.141 s  bound= 3.300 s  over=no  reruns=1  job=  0.059 s  survivors=0
+  run 2  rc=2   growth     W=  0.206 s  T_trigger=  0.149 s  bound= 3.300 s  over=no  reruns=1  job=  0.056 s  survivors=0
+  run 3  rc=2   growth     W=  0.201 s  T_trigger=  0.143 s  bound= 3.300 s  over=no  reruns=1  job=  0.057 s  survivors=0
+  run 4  rc=2   growth     W=  0.200 s  T_trigger=  0.146 s  bound= 3.300 s  over=no  reruns=1  job=  0.053 s  survivors=0
+  run 5  rc=2   growth     W=  0.198 s  T_trigger=  0.143 s  bound= 3.300 s  over=no  reruns=1  job=  0.054 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## caps-old-limits  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 17182 characters / 17182 bytes
 what: just past the old counts: the 17th assignment holds the path, 9 for-lists, 9 references to one variable; two 8100-character credit lines
-load before: 1.14 1.36 1.52 1/982 1884019 | after: 1.42 1.41 1.54 2/988 1884333 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  2.127 s  T_trigger=  0.184 s  bound= 3.300 s  over=no  reruns=1  job=  1.942 s  survivors=0
-  run 2  rc=0   allow      W=  2.210 s  T_trigger=  0.194 s  bound= 3.300 s  over=no  reruns=1  job=  2.015 s  survivors=0
-  run 3  rc=0   allow      W=  2.154 s  T_trigger=  0.190 s  bound= 3.300 s  over=no  reruns=1  job=  1.963 s  survivors=0
-  run 4  rc=0   allow      W=  2.243 s  T_trigger=  0.188 s  bound= 3.300 s  over=no  reruns=1  job=  2.054 s  survivors=0
-  run 5  rc=0   allow      W=  2.101 s  T_trigger=  0.185 s  bound= 3.300 s  over=no  reruns=1  job=  1.914 s  survivors=0
+load before: 1.19 1.28 1.48 1/973 2232734 | after: 1.24 1.29 1.48 1/976 2233766 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  2.239 s  T_trigger=  0.196 s  bound= 3.300 s  over=no  reruns=1  job=  2.042 s  survivors=0
+  run 2  rc=0   allow      W=  2.262 s  T_trigger=  0.202 s  bound= 3.300 s  over=no  reruns=1  job=  2.059 s  survivors=0
+  run 3  rc=0   allow      W=  2.247 s  T_trigger=  0.196 s  bound= 3.300 s  over=no  reruns=1  job=  2.049 s  survivors=0
+  run 4  rc=0   allow      W=  2.190 s  T_trigger=  0.212 s  bound= 3.300 s  over=no  reruns=1  job=  1.977 s  survivors=0
+  run 5  rc=0   allow      W=  2.559 s  T_trigger=  0.197 s  bound= 3.300 s  over=no  reruns=1  job=  2.362 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## multiline-cred  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 63108 characters / 63108 bytes
 what: whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline
-load before: 1.19 1.36 1.52 2/986 1884683 | after: 1.51 1.42 1.54 1/978 1885084 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.021 s  T_trigger=  0.342 s  bound= 3.300 s  over=no  reruns=1  job=  2.671 s  survivors=0
-  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.307 s  bound= 3.300 s  over=no  reruns=1  job=  2.704 s  survivors=0
-  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  0.313 s  bound= 3.300 s  over=no  reruns=1  job=  2.696 s  survivors=0
-  run 4  rc=2   size-whole W=  3.021 s  T_trigger=  0.313 s  bound= 3.300 s  over=no  reruns=1  job=  2.698 s  survivors=0
-  run 5  rc=2   size-whole W=  3.020 s  T_trigger=  0.519 s  bound= 3.300 s  over=no  reruns=1  job=  2.492 s  survivors=0
+load before: 1.13 1.27 1.47 1/973 2236966 | after: 1.84 1.43 1.52 3/979 2238162 | waited 45s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.028 s  T_trigger=  0.325 s  bound= 3.300 s  over=no  reruns=1  job=  2.694 s  survivors=0
+  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.315 s  bound= 3.300 s  over=no  reruns=1  job=  2.696 s  survivors=0
+  run 3  rc=2   size-whole W=  3.021 s  T_trigger=  0.324 s  bound= 3.300 s  over=no  reruns=1  job=  2.688 s  survivors=0
+  run 4  rc=2   size-whole W=  3.019 s  T_trigger=  0.307 s  bound= 3.300 s  over=no  reruns=1  job=  2.704 s  survivors=0
+  run 5  rc=2   size-whole W=  3.021 s  T_trigger=  0.314 s  bound= 3.300 s  over=no  reruns=1  job=  2.697 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## assign-storm  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 26334 characters / 26334 bytes
 what: whole mode, a trigger segment, then 3000 assignments: the baseline collects 16, the rerun collects all (regex per assignment, O(n^2) de-duplication)
-load before: 1.15 1.35 1.51 1/983 1885488 | after: 1.43 1.39 1.53 1/982 1885947 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  0.190 s  bound= 3.300 s  over=no  reruns=1  job=  2.820 s  survivors=0
-  run 2  rc=2   size-whole W=  3.017 s  T_trigger=  0.214 s  bound= 3.300 s  over=no  reruns=1  job=  2.797 s  survivors=0
-  run 3  rc=2   size-whole W=  3.015 s  T_trigger=  0.204 s  bound= 3.300 s  over=no  reruns=1  job=  2.805 s  survivors=0
-  run 4  rc=2   size-whole W=  3.017 s  T_trigger=  0.208 s  bound= 3.300 s  over=no  reruns=1  job=  2.801 s  survivors=0
-  run 5  rc=2   size-whole W=  3.015 s  T_trigger=  0.194 s  bound= 3.300 s  over=no  reruns=1  job=  2.815 s  survivors=0
+load before: 1.18 1.34 1.48 3/979 2241933 | after: 1.21 1.34 1.48 1/976 2243945 | waited 65s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.333 s  bound= 3.300 s  over=no  reruns=1  job=  2.678 s  survivors=0
+  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.197 s  bound= 3.300 s  over=no  reruns=1  job=  2.812 s  survivors=0
+  run 3  rc=2   size-whole W=  3.017 s  T_trigger=  0.262 s  bound= 3.300 s  over=no  reruns=1  job=  2.748 s  survivors=0
+  run 4  rc=2   size-whole W=  3.016 s  T_trigger=  0.209 s  bound= 3.300 s  over=no  reruns=1  job=  2.800 s  survivors=0
+  run 5  rc=2   size-whole W=  3.016 s  T_trigger=  0.203 s  bound= 3.300 s  over=no  reruns=1  job=  2.806 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## forlist-storm  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 48578 characters / 48578 bytes
 what: whole mode, a trigger segment, then 250 for-lists of 20 words: the baseline takes 8, the rerun all; O(vars^2) chaining on 140-character values
-load before: 1.16 1.34 1.50 2/981 1886339 | after: 1.49 1.40 1.52 1/982 1886753 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  2.471 s  T_trigger=  0.279 s  bound= 3.300 s  over=no  reruns=1  job=  2.182 s  survivors=0
-  run 2  rc=2   size-whole W=  2.958 s  T_trigger=  0.428 s  bound= 3.300 s  over=no  reruns=1  job=  2.523 s  survivors=0
-  run 3  rc=2   size-whole W=  2.971 s  T_trigger=  0.275 s  bound= 3.300 s  over=no  reruns=1  job=  2.688 s  survivors=0
-  run 4  rc=2   size-whole W=  2.973 s  T_trigger=  0.297 s  bound= 3.300 s  over=no  reruns=1  job=  2.669 s  survivors=0
-  run 5  rc=2   size-whole W=  2.974 s  T_trigger=  0.273 s  bound= 3.300 s  over=no  reruns=1  job=  2.693 s  survivors=0
+load before: 1.10 1.31 1.46 1/975 2247125 | after: 1.22 1.33 1.47 1/976 2247520 | waited 25s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  0.274 s  bound= 3.300 s  over=no  reruns=1  job=  2.735 s  survivors=0
+  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  0.276 s  bound= 3.300 s  over=no  reruns=1  job=  2.733 s  survivors=0
+  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  0.276 s  bound= 3.300 s  over=no  reruns=1  job=  2.733 s  survivors=0
+  run 4  rc=2   size-whole W=  3.016 s  T_trigger=  0.280 s  bound= 3.300 s  over=no  reruns=1  job=  2.729 s  survivors=0
+  run 5  rc=2   size-whole W=  3.017 s  T_trigger=  0.280 s  bound= 3.300 s  over=no  reruns=1  job=  2.730 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## repl-storm  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 45017 characters / 45017 bytes
 what: whole mode, one 45 KB command with 15000 references to one variable: the baseline stops at the first replacement, the rerun replaces them all
-load before: 1.10 1.31 1.49 2/983 1887313 | after: 1.23 1.33 1.49 1/978 1887781 | waited 30s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.018 s  T_trigger=  0.235 s  bound= 3.300 s  over=no  reruns=1  job=  2.776 s  survivors=0
-  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.235 s  bound= 3.300 s  over=no  reruns=1  job=  2.775 s  survivors=0
-  run 3  rc=2   size-whole W=  3.020 s  T_trigger=  0.254 s  bound= 3.300 s  over=no  reruns=1  job=  2.759 s  survivors=0
-  run 4  rc=2   size-whole W=  3.018 s  T_trigger=  0.230 s  bound= 3.300 s  over=no  reruns=1  job=  2.780 s  survivors=0
-  run 5  rc=2   size-whole W=  3.017 s  T_trigger=  0.226 s  bound= 3.300 s  over=no  reruns=1  job=  2.783 s  survivors=0
+load before: 1.11 1.30 1.45 3/973 2249569 | after: 1.30 1.33 1.46 1/975 2249951 | waited 25s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.048 s  T_trigger=  0.237 s  bound= 3.300 s  over=no  reruns=1  job=  2.795 s  survivors=0
+  run 2  rc=2   size-whole W=  3.017 s  T_trigger=  0.231 s  bound= 3.300 s  over=no  reruns=1  job=  2.779 s  survivors=0
+  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.260 s  bound= 3.300 s  over=no  reruns=1  job=  2.753 s  survivors=0
+  run 4  rc=2   size-whole W=  3.019 s  T_trigger=  0.236 s  bound= 3.300 s  over=no  reruns=1  job=  2.775 s  survivors=0
+  run 5  rc=2   size-whole W=  3.016 s  T_trigger=  0.234 s  bound= 3.300 s  over=no  reruns=1  job=  2.775 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## repl-storm-cjk  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 36017 characters / 60017 bytes
 what: the same with CJK words between 6000 references (UTF-8: every offset computation scans characters)
-load before: 1.13 1.31 1.48 1/979 1887835 | after: 1.39 1.36 1.50 1/982 1888359 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.021 s  T_trigger=  0.485 s  bound= 3.300 s  over=no  reruns=1  job=  2.526 s  survivors=0
-  run 2  rc=2   size-whole W=  3.024 s  T_trigger=  0.537 s  bound= 3.300 s  over=no  reruns=1  job=  2.474 s  survivors=0
-  run 3  rc=2   size-whole W=  3.020 s  T_trigger=  0.486 s  bound= 3.300 s  over=no  reruns=1  job=  2.525 s  survivors=0
-  run 4  rc=2   size-whole W=  3.023 s  T_trigger=  0.472 s  bound= 3.300 s  over=no  reruns=1  job=  2.542 s  survivors=0
-  run 5  rc=2   size-whole W=  3.027 s  T_trigger=  0.569 s  bound= 3.300 s  over=no  reruns=1  job=  2.444 s  survivors=0
+load before: 1.11 1.29 1.44 2/974 2251539 | after: 1.32 1.33 1.45 1/971 2252702 | waited 40s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.030 s  T_trigger=  0.512 s  bound= 3.300 s  over=no  reruns=1  job=  2.507 s  survivors=0
+  run 2  rc=2   size-whole W=  3.026 s  T_trigger=  0.542 s  bound= 3.300 s  over=no  reruns=1  job=  2.473 s  survivors=0
+  run 3  rc=2   size-whole W=  3.022 s  T_trigger=  0.500 s  bound= 3.300 s  over=no  reruns=1  job=  2.511 s  survivors=0
+  run 4  rc=2   size-whole W=  3.031 s  T_trigger=  0.538 s  bound= 3.300 s  over=no  reruns=1  job=  2.477 s  survivors=0
+  run 5  rc=2   size-whole W=  3.024 s  T_trigger=  0.543 s  bound= 3.300 s  over=no  reruns=1  job=  2.471 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## cjk-lines-lmax  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 24559 characters / 73525 bytes
 what: whole mode, 3 lines of exactly 8192 CJK characters (24.5 KB each in bytes): characters != bytes at the LMAX edge
-load before: 1.18 1.32 1.48 1/982 1888982 | after: 1.33 1.35 1.49 3/982 1889217 | waited 35s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  1.159 s  T_trigger=  0.704 s  bound= 3.300 s  over=no  reruns=1  job=  0.453 s  survivors=0
-  run 2  rc=0   allow      W=  1.334 s  T_trigger=  0.792 s  bound= 3.300 s  over=no  reruns=1  job=  0.541 s  survivors=0
-  run 3  rc=0   allow      W=  1.208 s  T_trigger=  0.747 s  bound= 3.300 s  over=no  reruns=1  job=  0.460 s  survivors=0
-  run 4  rc=0   allow      W=  1.175 s  T_trigger=  0.718 s  bound= 3.300 s  over=no  reruns=1  job=  0.455 s  survivors=0
-  run 5  rc=0   allow      W=  1.713 s  T_trigger=  0.974 s  bound= 3.300 s  over=no  reruns=1  job=  0.738 s  survivors=0
+load before: 1.19 1.30 1.44 1/972 2252904 | after: 1.24 1.30 1.44 1/971 2253143 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  1.250 s  T_trigger=  0.737 s  bound= 3.300 s  over=no  reruns=1  job=  0.512 s  survivors=0
+  run 2  rc=0   allow      W=  1.201 s  T_trigger=  0.727 s  bound= 3.300 s  over=no  reruns=1  job=  0.472 s  survivors=0
+  run 3  rc=0   allow      W=  1.208 s  T_trigger=  0.755 s  bound= 3.300 s  over=no  reruns=1  job=  0.452 s  survivors=0
+  run 4  rc=0   allow      W=  1.267 s  T_trigger=  0.789 s  bound= 3.300 s  over=no  reruns=1  job=  0.476 s  survivors=0
+  run 5  rc=0   allow      W=  1.294 s  T_trigger=  0.779 s  bound= 3.300 s  over=no  reruns=1  job=  0.514 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## cjk-bytes-lmax  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 8239 characters / 24559 bytes
 what: whole mode, 3 lines of exactly 8192 BYTES of CJK text (2730 characters each): small in UTF-8, the LMAX edge in the C locale
-load before: 1.15 1.31 1.47 1/980 1889639 | after: 1.22 1.32 1.47 2/988 1889824 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.714 s  T_trigger=  0.276 s  bound= 3.300 s  over=no  reruns=1  job=  0.437 s  survivors=0
-  run 2  rc=0   allow      W=  0.724 s  T_trigger=  0.295 s  bound= 3.300 s  over=no  reruns=1  job=  0.428 s  survivors=0
-  run 3  rc=0   allow      W=  0.720 s  T_trigger=  0.286 s  bound= 3.300 s  over=no  reruns=1  job=  0.432 s  survivors=0
-  run 4  rc=0   allow      W=  0.704 s  T_trigger=  0.277 s  bound= 3.300 s  over=no  reruns=1  job=  0.426 s  survivors=0
-  run 5  rc=0   allow      W=  0.722 s  T_trigger=  0.271 s  bound= 3.300 s  over=no  reruns=1  job=  0.449 s  survivors=0
+load before: 1.14 1.28 1.43 1/971 2253902 | after: 1.14 1.28 1.43 1/968 2254069 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.706 s  T_trigger=  0.288 s  bound= 3.300 s  over=no  reruns=1  job=  0.416 s  survivors=0
+  run 2  rc=0   allow      W=  0.719 s  T_trigger=  0.297 s  bound= 3.300 s  over=no  reruns=1  job=  0.421 s  survivors=0
+  run 3  rc=0   allow      W=  0.737 s  T_trigger=  0.289 s  bound= 3.300 s  over=no  reruns=1  job=  0.446 s  survivors=0
+  run 4  rc=0   allow      W=  0.731 s  T_trigger=  0.292 s  bound= 3.300 s  over=no  reruns=1  job=  0.438 s  survivors=0
+  run 5  rc=0   allow      W=  0.696 s  T_trigger=  0.282 s  bound= 3.300 s  over=no  reruns=1  job=  0.413 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## late-core2  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 16284 characters / 16284 bytes
 what: trigger point late: two raw lines of 8131 characters with a literal source read (credit ~0.9 s each) come before the oversize copy; the rerun repeats them
-load before: 1.12 1.30 1.46 1/983 1889934 | after: 1.30 1.33 1.47 1/984 1890342 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.022 s  T_trigger=  1.802 s  bound= 3.300 s  over=no  reruns=1  job=  1.212 s  survivors=0
-  run 2  rc=2   size-whole W=  3.014 s  T_trigger=  1.749 s  bound= 3.300 s  over=no  reruns=1  job=  1.260 s  survivors=0
-  run 3  rc=2   size-whole W=  3.015 s  T_trigger=  1.885 s  bound= 3.300 s  over=no  reruns=1  job=  1.123 s  survivors=0
-  run 4  rc=2   size-whole W=  3.017 s  T_trigger=  1.763 s  bound= 3.300 s  over=no  reruns=1  job=  1.248 s  survivors=0
-  run 5  rc=2   size-whole W=  3.014 s  T_trigger=  1.722 s  bound= 3.300 s  over=no  reruns=1  job=  1.286 s  survivors=0
+load before: 1.14 1.28 1.43 1/968 2254088 | after: 1.32 1.32 1.44 1/974 2254602 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.015 s  T_trigger=  1.845 s  bound= 3.300 s  over=no  reruns=1  job=  1.163 s  survivors=0
+  run 2  rc=2   size-whole W=  3.014 s  T_trigger=  1.832 s  bound= 3.300 s  over=no  reruns=1  job=  1.176 s  survivors=0
+  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  1.881 s  bound= 3.300 s  over=no  reruns=1  job=  1.129 s  survivors=0
+  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  1.807 s  bound= 3.300 s  over=no  reruns=1  job=  1.202 s  survivors=0
+  run 5  rc=2   size-whole W=  3.016 s  T_trigger=  1.835 s  bound= 3.300 s  over=no  reruns=1  job=  1.175 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## late-core3  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 24416 characters / 24416 bytes
 what: the same with three lines: the first pass takes ~2.6 s, the rerun starts with little time left and runs into the deadline
-load before: 1.18 1.30 1.46 2/983 1890599 | after: 1.22 1.30 1.46 1/982 1891022 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  2.733 s  bound= 3.300 s  over=no  reruns=1  job=  0.276 s  survivors=0
-  run 2  rc=2   size-whole W=  3.020 s  T_trigger=  2.969 s  bound= 3.300 s  over=no  reruns=1  job=  0.043 s  survivors=0
-  run 3  rc=2   size-whole W=  3.017 s  T_trigger=  2.836 s  bound= 3.300 s  over=no  reruns=1  job=  0.175 s  survivors=0
-  run 4  rc=2   size-whole W=  3.018 s  T_trigger=  2.707 s  bound= 3.300 s  over=no  reruns=1  job=  0.304 s  survivors=0
-  run 5  rc=2   size-whole W=  3.016 s  T_trigger=  2.622 s  bound= 3.300 s  over=no  reruns=1  job=  0.388 s  survivors=0
-  summary: a rerun began in 5 of 5 runs; over the bound in 0
+load before: 1.17 1.31 1.43 1/973 2257587 | after: 1.20 1.31 1.43 5/973 2258947 | waited 50s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.015 s  T_trigger=  2.621 s  bound= 3.300 s  over=no  reruns=1  job=  0.388 s  survivors=0
+  run 2  rc=2   size-whole W=  3.018 s  T_trigger=  2.679 s  bound= 3.300 s  over=no  reruns=1  job=  0.331 s  survivors=0
+  run 3  rc=2   size-whole W=  3.025 s  T_trigger=      - s  bound= 3.325 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   size-whole W=  3.016 s  T_trigger=  2.744 s  bound= 3.300 s  over=no  reruns=1  job=  0.266 s  survivors=0
+  run 5  rc=2   size-whole W=  3.017 s  T_trigger=  2.845 s  bound= 3.300 s  over=no  reruns=1  job=  0.165 s  survivors=0
+  summary: a rerun began in 4 of 5 runs; over the bound in 0
 
 ## late-core4  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 28628 characters / 28628 bytes
 what: four raw lines of 7151 characters: the first pass takes ~2.9 s, so the rerun begins with about 0.1 s left and repeats the credit lines
-load before: 1.12 1.28 1.45 1/982 1891466 | after: 1.24 1.30 1.45 1/982 1891873 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  2.783 s  bound= 3.300 s  over=no  reruns=1  job=  0.226 s  survivors=0
-  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  2.744 s  bound= 3.300 s  over=no  reruns=1  job=  0.265 s  survivors=0
-  run 3  rc=2   size-whole W=  3.015 s  T_trigger=  2.901 s  bound= 3.300 s  over=no  reruns=1  job=  0.107 s  survivors=0
-  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  2.750 s  bound= 3.300 s  over=no  reruns=1  job=  0.259 s  survivors=0
-  run 5  rc=2   size-whole W=  3.015 s  T_trigger=  2.820 s  bound= 3.300 s  over=no  reruns=1  job=  0.189 s  survivors=0
-  summary: a rerun began in 5 of 5 runs; over the bound in 0
+load before: 1.10 1.28 1.42 2/964 2259033 | after: 1.34 1.33 1.44 1/971 2260146 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.020 s  T_trigger=  2.973 s  bound= 3.300 s  over=no  reruns=1  job=  0.039 s  survivors=0
+  run 2  rc=2   size-whole W=  3.342 s  T_trigger=      - s  bound= 3.642 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  2.881 s  bound= 3.300 s  over=no  reruns=1  job=  0.128 s  survivors=0
+  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  2.740 s  bound= 3.300 s  over=no  reruns=1  job=  0.269 s  survivors=0
+  run 5  rc=2   size-whole W=  3.018 s  T_trigger=  2.888 s  bound= 3.300 s  over=no  reruns=1  job=  0.124 s  survivors=0
+  summary: a rerun began in 4 of 5 runs; over the bound in 0
 
 ## late-near3  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 25856 characters / 25856 bytes
 what: three raw lines of 8611 characters (over LMAX): the first pass ends at ~2.9 s, right at the deadline: the rerun begins with almost no time left, or not at all
-load before: 1.14 1.28 1.44 1/979 1891982 | after: 1.18 1.28 1.44 3/982 1892443 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.015 s  T_trigger=  2.979 s  bound= 3.300 s  over=no  reruns=1  job=  0.030 s  survivors=0
-  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  2.950 s  bound= 3.300 s  over=no  reruns=1  job=  0.060 s  survivors=0
-  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  2.998 s  bound= 3.300 s  over=no  reruns=1  job=  0.012 s  survivors=0
-  run 4  rc=2   size-whole W=  3.471 s  T_trigger=      - s  bound= 3.771 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=2   longline   W=  3.006 s  T_trigger=  2.944 s  bound= 3.300 s  over=no  reruns=1  job=  0.061 s  survivors=0
-  summary: a rerun began in 4 of 5 runs; over the bound in 0
+load before: 1.11 1.28 1.42 1/965 2261090 | after: 1.31 1.32 1.43 1/973 2261519 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   longline   W=  2.946 s  T_trigger=  2.884 s  bound= 3.300 s  over=no  reruns=1  job=  0.060 s  survivors=0
+  run 2  rc=2   size-whole W=  3.025 s  T_trigger=      - s  bound= 3.325 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  2.955 s  bound= 3.300 s  over=no  reruns=1  job=  0.055 s  survivors=0
+  run 4  rc=2   size-whole W=  3.079 s  T_trigger=      - s  bound= 3.379 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=2   size-whole W=  3.044 s  T_trigger=      - s  bound= 3.344 s  over=no  reruns=0  job=      - s  survivors=0
+  summary: a rerun began in 2 of 5 runs; over the bound in 0
 
 ## late-long3  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 25316 characters / 25316 bytes
 what: three raw lines of 8431 characters (over LMAX): slow first pass, but the rerun takes the rows-only path (fast), so the rerun begins late and ends at once
-load before: 1.18 1.28 1.44 2/982 1892462 | after: 1.44 1.33 1.46 1/976 1892915 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   longline   W=  2.996 s  T_trigger=  2.932 s  bound= 3.300 s  over=no  reruns=1  job=  0.063 s  survivors=0
-  run 2  rc=2   longline   W=  2.897 s  T_trigger=  2.837 s  bound= 3.300 s  over=no  reruns=1  job=  0.058 s  survivors=0
-  run 3  rc=2   longline   W=  2.869 s  T_trigger=  2.778 s  bound= 3.300 s  over=no  reruns=1  job=  0.090 s  survivors=0
-  run 4  rc=2   size-whole W=  3.019 s  T_trigger=  2.967 s  bound= 3.300 s  over=no  reruns=1  job=  0.043 s  survivors=0
-  run 5  rc=2   longline   W=  2.880 s  T_trigger=  2.817 s  bound= 3.300 s  over=no  reruns=1  job=  0.061 s  survivors=0
-  summary: a rerun began in 5 of 5 runs; over the bound in 0
+load before: 1.11 1.27 1.41 2/968 2261663 | after: 1.30 1.31 1.42 1/970 2262086 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.552 s  T_trigger=      - s  bound= 3.852 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   longline   W=  2.915 s  T_trigger=  2.849 s  bound= 3.300 s  over=no  reruns=1  job=  0.064 s  survivors=0
+  run 3  rc=2   size-whole W=  3.016 s  T_trigger=  3.000 s  bound= 3.300 s  over=no  reruns=1  job=  0.010 s  survivors=0
+  run 4  rc=2   longline   W=  2.875 s  T_trigger=  2.800 s  bound= 3.300 s  over=no  reruns=1  job=  0.074 s  survivors=0
+  run 5  rc=2   longline   W=  2.853 s  T_trigger=  2.794 s  bound= 3.300 s  over=no  reruns=1  job=  0.058 s  survivors=0
+  summary: a rerun began in 4 of 5 runs; over the bound in 0
 
 ## late-core2-storm  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 28290 characters / 28290 bytes
 what: late-core2 plus a 1500-assignment storm: the rerun has to collect the storm and repeat the credit lines
-load before: 1.16 1.27 1.43 1/983 1893338 | after: 1.57 1.36 1.46 3/985 1893818 | waited 25s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  2.089 s  bound= 3.300 s  over=no  reruns=1  job=  0.921 s  survivors=0
-  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  1.991 s  bound= 3.300 s  over=no  reruns=1  job=  1.018 s  survivors=0
-  run 3  rc=2   size-whole W=  3.017 s  T_trigger=  1.986 s  bound= 3.300 s  over=no  reruns=1  job=  1.024 s  survivors=0
-  run 4  rc=2   size-whole W=  3.021 s  T_trigger=  2.017 s  bound= 3.300 s  over=no  reruns=1  job=  0.998 s  survivors=0
-  run 5  rc=2   size-whole W=  3.023 s  T_trigger=  1.983 s  bound= 3.300 s  over=no  reruns=1  job=  1.029 s  survivors=0
+load before: 1.14 1.28 1.41 1/971 2262377 | after: 1.19 1.28 1.41 2/976 2262820 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.015 s  T_trigger=  2.095 s  bound= 3.300 s  over=no  reruns=1  job=  0.914 s  survivors=0
+  run 2  rc=2   size-whole W=  3.015 s  T_trigger=  2.013 s  bound= 3.300 s  over=no  reruns=1  job=  0.996 s  survivors=0
+  run 3  rc=2   size-whole W=  3.015 s  T_trigger=  1.955 s  bound= 3.300 s  over=no  reruns=1  job=  1.053 s  survivors=0
+  run 4  rc=2   size-whole W=  3.023 s  T_trigger=  2.086 s  bound= 3.300 s  over=no  reruns=1  job=  0.931 s  survivors=0
+  run 5  rc=2   size-whole W=  3.018 s  T_trigger=  1.989 s  bound= 3.300 s  over=no  reruns=1  job=  1.020 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## seg-assign-1700  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 15926 characters / 15926 bytes
 what: segment mode (no subshell), a trigger segment, then 1700 assignments: the baseline first pass alone takes ~6 s (10CG/aria-plugin#228), no rerun
-load before: 1.14 1.29 1.43 1/982 1894878 | after: 1.30 1.32 1.44 2/982 1895659 | waited 55s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W=  7.029 s  T_trigger=      - s  bound= 7.329 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W=  6.893 s  T_trigger=      - s  bound= 7.193 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W=  6.965 s  T_trigger=      - s  bound= 7.265 s  over=no  reruns=0  job=      - s  survivors=0
-  run 4  rc=2   size-seg   W=  6.805 s  T_trigger=      - s  bound= 7.105 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=2   size-seg   W=  6.951 s  T_trigger=      - s  bound= 7.251 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.19 1.28 1.41 2/976 2262839 | after: 1.31 1.29 1.41 1/969 2264495 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-seg   W=  7.279 s  T_trigger=      - s  bound= 7.579 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W=  7.036 s  T_trigger=      - s  bound= 7.336 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W=  7.448 s  T_trigger=      - s  bound= 7.748 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   size-seg   W=  6.970 s  T_trigger=      - s  bound= 7.270 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=2   size-seg   W=  6.948 s  T_trigger=      - s  bound= 7.248 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 5 runs; over the bound in 0
 
 ## seg-late2  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 18586 characters / 18586 bytes
 what: segment-mode twin of late-core2: the baseline first pass takes ~10 s (10CG/aria-plugin#228), no rerun
-load before: 1.19 1.30 1.42 3/986 1897000 | after: 1.45 1.35 1.44 1/982 1898061 | waited 65s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W= 10.914 s  T_trigger=      - s  bound=11.214 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W= 10.901 s  T_trigger=      - s  bound=11.201 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W= 11.458 s  T_trigger=      - s  bound=11.758 s  over=no  reruns=0  job=      - s  survivors=0
-  run 4  rc=2   size-seg   W= 10.880 s  T_trigger=      - s  bound=11.180 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=2   size-seg   W= 10.794 s  T_trigger=      - s  bound=11.094 s  over=no  reruns=0  job=      - s  survivors=0
+  VOID attempt 1: 1-minute load 1.13 before / 2.31 after (a reading >= 2.00); batch discarded, run again
+load before: 1.13 1.38 1.43 1/972 2269418 | after: 1.86 1.58 1.50 1/972 2271642 | waited 70s | pre-run 1-minute load < 1.2 | attempt 2
+  run 1  rc=2   size-seg   W= 11.108 s  T_trigger=      - s  bound=11.408 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W= 17.786 s  T_trigger=      - s  bound=18.086 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W= 12.878 s  T_trigger=      - s  bound=13.178 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   size-seg   W= 10.912 s  T_trigger=      - s  bound=11.212 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=2   size-seg   W= 11.114 s  T_trigger=      - s  bound=11.414 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 5 runs; over the bound in 0
 
 ## many-segs  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 3405 characters / 3405 bytes
 what: 120 tiny reference segments before the oversize copy (segment mode): the first pass and the rerun both walk all of them
-load before: 1.12 1.28 1.41 1/984 1898995 | after: 1.17 1.28 1.41 2/988 1899340 | waited 50s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  2.703 s  T_trigger=  1.914 s  bound= 3.300 s  over=no  reruns=1  job=  0.788 s  survivors=0
-  run 2  rc=0   allow      W=  2.817 s  T_trigger=  1.949 s  bound= 3.300 s  over=no  reruns=1  job=  0.868 s  survivors=0
-  run 3  rc=0   allow      W=  2.788 s  T_trigger=  1.967 s  bound= 3.300 s  over=no  reruns=1  job=  0.819 s  survivors=0
-  run 4  rc=0   allow      W=  2.766 s  T_trigger=  1.941 s  bound= 3.300 s  over=no  reruns=1  job=  0.824 s  survivors=0
-  run 5  rc=0   allow      W=  2.704 s  T_trigger=  1.900 s  bound= 3.300 s  over=no  reruns=1  job=  0.802 s  survivors=0
+load before: 1.14 1.47 1.47 2/974 2273241 | after: 1.18 1.46 1.47 1/966 2273585 | waited 90s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  2.673 s  T_trigger=  1.912 s  bound= 3.300 s  over=no  reruns=1  job=  0.760 s  survivors=0
+  run 2  rc=0   allow      W=  2.641 s  T_trigger=  1.858 s  bound= 3.300 s  over=no  reruns=1  job=  0.781 s  survivors=0
+  run 3  rc=0   allow      W=  2.828 s  T_trigger=  2.004 s  bound= 3.300 s  over=no  reruns=1  job=  0.823 s  survivors=0
+  run 4  rc=0   allow      W=  2.757 s  T_trigger=  1.927 s  bound= 3.300 s  over=no  reruns=1  job=  0.830 s  survivors=0
+  run 5  rc=0   allow      W=  2.642 s  T_trigger=  1.877 s  bound= 3.300 s  over=no  reruns=1  job=  0.764 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## degrade-late  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 3775 characters / 4255 bytes
 what: 120 CJK reference segments, the subshell that forces whole mode only at the very end (whole and segment handling mixed)
-load before: 1.17 1.28 1.41 3/988 1899359 | after: 1.48 1.34 1.42 1/983 1899570 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.455 s  T_trigger=  0.357 s  bound= 3.300 s  over=no  reruns=1  job=  0.097 s  survivors=0
-  run 2  rc=0   allow      W=  0.428 s  T_trigger=  0.329 s  bound= 3.300 s  over=no  reruns=1  job=  0.098 s  survivors=0
-  run 3  rc=0   allow      W=  0.516 s  T_trigger=  0.413 s  bound= 3.300 s  over=no  reruns=1  job=  0.101 s  survivors=0
-  run 4  rc=0   allow      W=  0.549 s  T_trigger=  0.447 s  bound= 3.300 s  over=no  reruns=1  job=  0.101 s  survivors=0
-  run 5  rc=0   allow      W=  0.460 s  T_trigger=  0.360 s  bound= 3.300 s  over=no  reruns=1  job=  0.099 s  survivors=0
+load before: 1.18 1.46 1.47 1/966 2273604 | after: 1.18 1.46 1.47 1/969 2273782 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.447 s  T_trigger=  0.348 s  bound= 3.300 s  over=no  reruns=1  job=  0.098 s  survivors=0
+  run 2  rc=0   allow      W=  0.425 s  T_trigger=  0.327 s  bound= 3.300 s  over=no  reruns=1  job=  0.097 s  survivors=0
+  run 3  rc=0   allow      W=  0.458 s  T_trigger=  0.351 s  bound= 3.300 s  over=no  reruns=1  job=  0.106 s  survivors=0
+  run 4  rc=0   allow      W=  0.450 s  T_trigger=  0.343 s  bound= 3.300 s  over=no  reruns=1  job=  0.105 s  survivors=0
+  run 5  rc=0   allow      W=  0.512 s  T_trigger=  0.411 s  bound= 3.300 s  over=no  reruns=1  job=  0.100 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## multi-big-seg  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 4228 characters / 4228 bytes
 what: 7 segments, each 8308 characters after substitution (each could enter a rerun), 58 KB together = under _SGV_TMAX
-load before: 1.17 1.29 1.40 1/979 1900364 | after: 1.16 1.29 1.40 4/988 1900666 | waited 45s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.921 s  T_trigger=  0.693 s  bound= 3.300 s  over=no  reruns=1  job=  0.228 s  survivors=0
-  run 2  rc=0   allow      W=  0.948 s  T_trigger=  0.706 s  bound= 3.300 s  over=no  reruns=1  job=  0.240 s  survivors=0
-  run 3  rc=0   allow      W=  0.907 s  T_trigger=  0.678 s  bound= 3.300 s  over=no  reruns=1  job=  0.228 s  survivors=0
-  run 4  rc=0   allow      W=  1.026 s  T_trigger=  0.721 s  bound= 3.300 s  over=no  reruns=1  job=  0.304 s  survivors=0
-  run 5  rc=0   allow      W=  0.984 s  T_trigger=  0.741 s  bound= 3.300 s  over=no  reruns=1  job=  0.241 s  survivors=0
+load before: 1.18 1.46 1.47 1/969 2273801 | after: 1.16 1.45 1.47 2/973 2274070 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.997 s  T_trigger=  0.708 s  bound= 3.300 s  over=no  reruns=1  job=  0.288 s  survivors=0
+  run 2  rc=0   allow      W=  0.942 s  T_trigger=  0.705 s  bound= 3.300 s  over=no  reruns=1  job=  0.236 s  survivors=0
+  run 3  rc=0   allow      W=  0.926 s  T_trigger=  0.697 s  bound= 3.300 s  over=no  reruns=1  job=  0.228 s  survivors=0
+  run 4  rc=0   allow      W=  0.971 s  T_trigger=  0.744 s  bound= 3.300 s  over=no  reruns=1  job=  0.226 s  survivors=0
+  run 5  rc=0   allow      W=  0.964 s  T_trigger=  0.712 s  bound= 3.300 s  over=no  reruns=1  job=  0.250 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## tmax-edge  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 4546 characters / 4546 bytes
 what: 8 such segments: 66 KB together, the rerun reaches _SGV_TMAX at the 8th
-load before: 1.16 1.29 1.40 2/988 1900685 | after: 1.22 1.30 1.41 4/989 1900890 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   tmax       W=  1.026 s  T_trigger=  0.784 s  bound= 3.300 s  over=no  reruns=1  job=  0.241 s  survivors=0
-  run 2  rc=2   tmax       W=  1.043 s  T_trigger=  0.791 s  bound= 3.300 s  over=no  reruns=1  job=  0.251 s  survivors=0
-  run 3  rc=2   tmax       W=  1.016 s  T_trigger=  0.777 s  bound= 3.300 s  over=no  reruns=1  job=  0.237 s  survivors=0
-  run 4  rc=2   tmax       W=  1.039 s  T_trigger=  0.797 s  bound= 3.300 s  over=no  reruns=1  job=  0.241 s  survivors=0
-  run 5  rc=2   tmax       W=  1.019 s  T_trigger=  0.782 s  bound= 3.300 s  over=no  reruns=1  job=  0.236 s  survivors=0
+load before: 1.16 1.45 1.47 2/973 2274089 | after: 1.23 1.46 1.47 3/974 2274297 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   tmax       W=  1.016 s  T_trigger=  0.783 s  bound= 3.300 s  over=no  reruns=1  job=  0.231 s  survivors=0
+  run 2  rc=2   tmax       W=  1.008 s  T_trigger=  0.776 s  bound= 3.300 s  over=no  reruns=1  job=  0.231 s  survivors=0
+  run 3  rc=2   tmax       W=  1.006 s  T_trigger=  0.765 s  bound= 3.300 s  over=no  reruns=1  job=  0.240 s  survivors=0
+  run 4  rc=2   tmax       W=  0.994 s  T_trigger=  0.753 s  bound= 3.300 s  over=no  reruns=1  job=  0.240 s  survivors=0
+  run 5  rc=2   tmax       W=  1.015 s  T_trigger=  0.775 s  bound= 3.300 s  over=no  reruns=1  job=  0.238 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## heredoc-vars  [w14]  bash 5.2.15  LC_ALL=C.UTF-8  command 28570 characters / 28570 bytes
 what: realistic: a 30 KB unquoted heredoc with two variable references per line, growth 7250 (under the limit), no secret source
-load before: 1.17 1.29 1.40 1/985 1901179 | after: 1.37 1.32 1.41 2/985 1901645 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  2.801 s  T_trigger=  0.271 s  bound= 3.300 s  over=no  reruns=1  job=  2.524 s  survivors=0
-  run 2  rc=2   size-whole W=  2.975 s  T_trigger=  0.276 s  bound= 3.300 s  over=no  reruns=1  job=  2.692 s  survivors=0
-  run 3  rc=2   size-whole W=  2.974 s  T_trigger=  0.279 s  bound= 3.300 s  over=no  reruns=1  job=  2.688 s  survivors=0
-  run 4  rc=2   size-whole W=  2.969 s  T_trigger=  0.251 s  bound= 3.300 s  over=no  reruns=1  job=  2.711 s  survivors=0
-  run 5  rc=2   size-whole W=  2.971 s  T_trigger=  0.295 s  bound= 3.300 s  over=no  reruns=1  job=  2.669 s  survivors=0
+load before: 1.18 1.43 1.46 3/968 2274844 | after: 1.29 1.45 1.46 1/965 2275300 | waited 30s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  2.781 s  T_trigger=  0.280 s  bound= 3.300 s  over=no  reruns=1  job=  2.495 s  survivors=0
+  run 2  rc=2   size-whole W=  2.973 s  T_trigger=  0.251 s  bound= 3.300 s  over=no  reruns=1  job=  2.715 s  survivors=0
+  run 3  rc=2   size-whole W=  2.974 s  T_trigger=  0.267 s  bound= 3.300 s  over=no  reruns=1  job=  2.700 s  survivors=0
+  run 4  rc=2   size-whole W=  2.974 s  T_trigger=  0.259 s  bound= 3.300 s  over=no  reruns=1  job=  2.708 s  survivors=0
+  run 5  rc=2   size-whole W=  2.963 s  T_trigger=  0.314 s  bound= 3.300 s  over=no  reruns=1  job=  2.643 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## cjk-bytes-lmax@C  [w14]  bash 5.2.15  LC_ALL=C  command 8239 characters / 24559 bytes
 what: whole mode, 3 lines of exactly 8192 BYTES of CJK text (2730 characters each): small in UTF-8, the LMAX edge in the C locale  [run under LC_ALL=C: a character is a byte]
-load before: 1.12 1.27 1.39 1/986 1901972 | after: 1.12 1.27 1.39 1/983 1902134 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=0   allow      W=  0.434 s  T_trigger=  0.116 s  bound= 3.300 s  over=no  reruns=1  job=  0.317 s  survivors=0
-  run 2  rc=0   allow      W=  0.396 s  T_trigger=  0.102 s  bound= 3.300 s  over=no  reruns=1  job=  0.293 s  survivors=0
-  run 3  rc=0   allow      W=  0.402 s  T_trigger=  0.106 s  bound= 3.300 s  over=no  reruns=1  job=  0.295 s  survivors=0
-  run 4  rc=0   allow      W=  0.403 s  T_trigger=  0.102 s  bound= 3.300 s  over=no  reruns=1  job=  0.300 s  survivors=0
-  run 5  rc=0   allow      W=  0.411 s  T_trigger=  0.108 s  bound= 3.300 s  over=no  reruns=1  job=  0.302 s  survivors=0
+load before: 1.19 1.42 1.45 1/965 2275352 | after: 1.17 1.41 1.45 1/968 2275575 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=0   allow      W=  0.400 s  T_trigger=  0.105 s  bound= 3.300 s  over=no  reruns=1  job=  0.293 s  survivors=0
+  run 2  rc=0   allow      W=  0.453 s  T_trigger=  0.106 s  bound= 3.300 s  over=no  reruns=1  job=  0.345 s  survivors=0
+  run 3  rc=0   allow      W=  0.432 s  T_trigger=  0.124 s  bound= 3.300 s  over=no  reruns=1  job=  0.307 s  survivors=0
+  run 4  rc=0   allow      W=  0.399 s  T_trigger=  0.103 s  bound= 3.300 s  over=no  reruns=1  job=  0.294 s  survivors=0
+  run 5  rc=0   allow      W=  0.402 s  T_trigger=  0.108 s  bound= 3.300 s  over=no  reruns=1  job=  0.293 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## km-ext@ext  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 24044 characters / 24044 bytes
 what: 24000-character line inside a subshell, run WITHOUT a project extension (the relaxation is in effect)  [run WITH a project extension (.aria/secret-guard.paths listing the read path): the relaxation is off, no rerun by design]
-load before: 1.12 1.27 1.39 1/983 1902153 | after: 1.12 1.27 1.39 3/982 1902384 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  0.157 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-whole W=  0.150 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-whole W=  0.166 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 4  rc=2   size-whole W=  0.196 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=2   size-whole W=  0.153 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.17 1.41 1.45 1/968 2275594 | after: 1.17 1.41 1.45 1/965 2275794 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  0.150 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-whole W=  0.155 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-whole W=  0.158 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   size-whole W=  0.158 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=2   size-whole W=  0.146 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 5 runs; over the bound in 0
 
 ## km-ext-small@ext  [gen-v3]  bash 5.2.15  LC_ALL=C.UTF-8  command 144 characters / 144 bytes
 what: the 100-character sibling of km-ext (control)  [run WITH a project extension (.aria/secret-guard.paths listing the read path): the relaxation is off, no rerun by design]
-load before: 1.12 1.27 1.39 3/982 1902403 | after: 1.12 1.27 1.39 1/982 1902753 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   ext-finding W=  0.107 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   ext-finding W=  0.122 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   ext-finding W=  0.120 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 4  rc=2   ext-finding W=  0.097 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
-  run 5  rc=2   ext-finding W=  0.100 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.17 1.41 1.45 2/965 2275813 | after: 1.17 1.41 1.45 2/971 2276141 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   ext-finding W=  0.113 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   ext-finding W=  0.112 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   ext-finding W=  0.117 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   ext-finding W=  0.111 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
+  run 5  rc=2   ext-finding W=  0.124 s  T_trigger=      - s  bound= 3.300 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 5 runs; over the bound in 0
 
 ## multiline-cred@en_US  [w14]  bash 5.2.15  LC_ALL=en_US.UTF-8  command 63108 characters / 63108 bytes
 what: whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]
-load before: 1.12 1.27 1.39 1/982 1902772 | after: 1.25 1.29 1.39 1/986 1903206 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  0.351 s  bound= 3.300 s  over=no  reruns=1  job=  2.657 s  survivors=0
-  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  0.321 s  bound= 3.300 s  over=no  reruns=1  job=  2.688 s  survivors=0
-  run 3  rc=2   size-whole W=  3.018 s  T_trigger=  0.318 s  bound= 3.300 s  over=no  reruns=1  job=  2.691 s  survivors=0
-  run 4  rc=2   size-whole W=  3.019 s  T_trigger=  0.352 s  bound= 3.300 s  over=no  reruns=1  job=  2.660 s  survivors=0
-  run 5  rc=2   size-whole W=  3.021 s  T_trigger=  0.364 s  bound= 3.300 s  over=no  reruns=1  job=  2.650 s  survivors=0
+load before: 1.17 1.41 1.45 3/971 2276160 | after: 1.28 1.43 1.45 1/970 2276607 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.335 s  bound= 3.300 s  over=no  reruns=1  job=  2.674 s  survivors=0
+  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.312 s  bound= 3.300 s  over=no  reruns=1  job=  2.698 s  survivors=0
+  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.371 s  bound= 3.300 s  over=no  reruns=1  job=  2.640 s  survivors=0
+  run 4  rc=2   size-whole W=  3.016 s  T_trigger=  0.341 s  bound= 3.300 s  over=no  reruns=1  job=  2.668 s  survivors=0
+  run 5  rc=2   size-whole W=  3.018 s  T_trigger=  0.300 s  bound= 3.300 s  over=no  reruns=1  job=  2.710 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## assign-storm@en_US  [w14]  bash 5.2.15  LC_ALL=en_US.UTF-8  command 26334 characters / 26334 bytes
 what: whole mode, a trigger segment, then 3000 assignments: the baseline collects 16, the rerun collects all (regex per assignment, O(n^2) de-duplication)  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]
-load before: 1.13 1.26 1.38 1/985 1903418 | after: 1.29 1.29 1.39 1/986 1903857 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.014 s  T_trigger=  0.202 s  bound= 3.300 s  over=no  reruns=1  job=  2.805 s  survivors=0
-  run 2  rc=2   size-whole W=  3.018 s  T_trigger=  0.211 s  bound= 3.300 s  over=no  reruns=1  job=  2.800 s  survivors=0
-  run 3  rc=2   size-whole W=  3.017 s  T_trigger=  0.206 s  bound= 3.300 s  over=no  reruns=1  job=  2.802 s  survivors=0
-  run 4  rc=2   size-whole W=  3.017 s  T_trigger=  0.216 s  bound= 3.300 s  over=no  reruns=1  job=  2.795 s  survivors=0
-  run 5  rc=2   size-whole W=  3.015 s  T_trigger=  0.193 s  bound= 3.300 s  over=no  reruns=1  job=  2.816 s  survivors=0
+load before: 1.14 1.39 1.44 1/969 2276886 | after: 1.26 1.40 1.45 1/969 2277330 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.016 s  T_trigger=  0.209 s  bound= 3.300 s  over=no  reruns=1  job=  2.801 s  survivors=0
+  run 2  rc=2   size-whole W=  3.014 s  T_trigger=  0.196 s  bound= 3.300 s  over=no  reruns=1  job=  2.812 s  survivors=0
+  run 3  rc=2   size-whole W=  3.014 s  T_trigger=  0.195 s  bound= 3.300 s  over=no  reruns=1  job=  2.813 s  survivors=0
+  run 4  rc=2   size-whole W=  3.014 s  T_trigger=  0.195 s  bound= 3.300 s  over=no  reruns=1  job=  2.812 s  survivors=0
+  run 5  rc=2   size-whole W=  3.015 s  T_trigger=  0.196 s  bound= 3.300 s  over=no  reruns=1  job=  2.814 s  survivors=0
   summary: a rerun began in 5 of 5 runs; over the bound in 0
 
 ## late-core3@en_US  [w14]  bash 5.2.15  LC_ALL=en_US.UTF-8  command 24416 characters / 24416 bytes
 what: the same with three lines: the first pass takes ~2.6 s, the rerun starts with little time left and runs into the deadline  [run under LC_ALL=en_US.UTF-8: collation-aware bracket expressions]
-load before: 1.17 1.27 1.38 1/984 1904089 | after: 1.42 1.32 1.39 1/979 1904545 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.015 s  T_trigger=  2.806 s  bound= 3.300 s  over=no  reruns=1  job=  0.202 s  survivors=0
-  run 2  rc=2   size-whole W=  3.016 s  T_trigger=  2.737 s  bound= 3.300 s  over=no  reruns=1  job=  0.272 s  survivors=0
-  run 3  rc=2   size-whole W=  3.023 s  T_trigger=  2.756 s  bound= 3.300 s  over=no  reruns=1  job=  0.260 s  survivors=0
-  run 4  rc=2   size-whole W=  3.015 s  T_trigger=  2.737 s  bound= 3.300 s  over=no  reruns=1  job=  0.272 s  survivors=0
-  run 5  rc=2   size-whole W=  3.014 s  T_trigger=  2.862 s  bound= 3.300 s  over=no  reruns=1  job=  0.146 s  survivors=0
-  summary: a rerun began in 5 of 5 runs; over the bound in 0
+load before: 1.16 1.38 1.44 2/967 2277448 | after: 1.12 1.36 1.43 1/969 2277926 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.014 s  T_trigger=  2.808 s  bound= 3.300 s  over=no  reruns=1  job=  0.200 s  survivors=0
+  run 2  rc=2   size-whole W=  3.015 s  T_trigger=  2.798 s  bound= 3.300 s  over=no  reruns=1  job=  0.211 s  survivors=0
+  run 3  rc=2   size-whole W=  3.060 s  T_trigger=      - s  bound= 3.360 s  over=no  reruns=0  job=      - s  survivors=0
+  run 4  rc=2   size-whole W=  3.014 s  T_trigger=  2.807 s  bound= 3.300 s  over=no  reruns=1  job=  0.201 s  survivors=0
+  run 5  rc=2   size-whole W=  3.066 s  T_trigger=      - s  bound= 3.366 s  over=no  reruns=0  job=      - s  survivors=0
+  summary: a rerun began in 3 of 5 runs; over the bound in 0
 
 ## the heaviest shapes (by the median W of the 5 runs under bash 5.2.15); the brief does not say which of two readings is meant, so both are run:
-   A: among the shapes where a relaxed rerun began, the 4 with the highest median W (many end at the deadline, ~3.0 s, so ties are broken by name):  apply-heavy-cjk repl-storm-cjk multiline-cred apply-heavy 
+   A: among the shapes where a relaxed rerun began, the 4 with the highest median W (many end at the deadline, ~3.0 s, so ties are broken by name):  apply-heavy-cjk repl-storm-cjk late-near3 apply-heavy 
    B: among all shapes, the 4 with the highest median W:                                                                                         seg-late2 seg-assign-1700 apply-heavy-cjk repl-storm-cjk 
-   run under bash 5.0.18 and 5.3.20 (3 runs each), the union:                                                                                    apply-heavy-cjk repl-storm-cjk multiline-cred apply-heavy seg-late2 seg-assign-1700 
-   median W (s) of every case under bash 5.2.15: seg-late2=10.90 seg-assign-1700=6.95 apply-heavy-cjk=3.05* repl-storm-cjk=3.02* multiline-cred=3.02* apply-heavy=3.02* apply-heavy-seg=3.02* multiline-cred@en_US=3.02* repl-storm=3.02* late-core3=3.02* assign-storm@en_US=3.02* late-core2-storm=3.02* lmax-race=3.02* assign-storm=3.02* late-near3=3.02* f5like=3.02* late-core4=3.02* late-core3@en_US=3.02* late-core2=3.01* heredoc-vars=2.97* forlist-storm=2.97* late-long3=2.90* lmax-below=2.87* many-segs=2.77* caps-old-limits=2.15* gmax-exact=1.73* cjk-lines-lmax=1.21* segfinding=1.16* tmax-edge=1.03* multi-big-seg=0.95* cjk-bytes-lmax=0.72* degrade-late=0.46* cjk-bytes-lmax@C=0.40* km-ext=0.25* lmax-above=0.23* gmax-over=0.20* shrink=0.16* km-ext@ext=0.16 km-ext-small@ext=0.11 km-ext-small=0.07    (* = a rerun began)
+   run under bash 5.0.18 and 5.3.20 (3 runs each), the union:                                                                                    apply-heavy-cjk repl-storm-cjk late-near3 apply-heavy seg-late2 seg-assign-1700 
+   median W (s) of every case under bash 5.2.15: seg-late2=11.11 seg-assign-1700=7.04 apply-heavy-cjk=3.05* repl-storm-cjk=3.03* late-near3=3.02* apply-heavy=3.02* multiline-cred=3.02* apply-heavy-seg=3.02* repl-storm=3.02* late-core4=3.02* multiline-cred@en_US=3.02* late-core3=3.02* assign-storm=3.02* lmax-race=3.02* forlist-storm=3.02* lmax-below=3.02* f5like=3.02* late-core3@en_US=3.02* late-core2-storm=3.02* late-core2=3.02* assign-storm@en_US=3.01* heredoc-vars=2.97* late-long3=2.91* many-segs=2.67* caps-old-limits=2.25* gmax-exact=1.74* cjk-lines-lmax=1.25* segfinding=1.15* tmax-edge=1.01* multi-big-seg=0.96* cjk-bytes-lmax=0.72* degrade-late=0.45* cjk-bytes-lmax@C=0.40* km-ext=0.25* lmax-above=0.24* gmax-over=0.20* shrink=0.19* km-ext@ext=0.15 km-ext-small@ext=0.11 km-ext-small=0.08    (* = a rerun began)
 
 ## apply-heavy-cjk  [gen-v3]  bash 5.0.18  LC_ALL=C.UTF-8  command 61534 characters / 161542 bytes
 what: multibyte filler (characters != bytes) around the same reference block: string operations cost more per character
-load before: 1.17 1.27 1.38 1/982 1905178 | after: 1.16 1.26 1.37 1/983 1905474 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.053 s  T_trigger=  2.458 s  bound= 3.300 s  over=no  reruns=1  job=  0.567 s  survivors=0
-  run 2  rc=2   size-whole W=  3.043 s  T_trigger=  2.283 s  bound= 3.300 s  over=no  reruns=1  job=  0.734 s  survivors=0
-  run 3  rc=2   size-whole W=  3.044 s  T_trigger=  2.504 s  bound= 3.300 s  over=no  reruns=1  job=  0.513 s  survivors=0
+load before: 1.12 1.36 1.43 2/969 2278284 | after: 1.25 1.38 1.44 1/970 2278627 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.052 s  T_trigger=  2.524 s  bound= 3.300 s  over=no  reruns=1  job=  0.500 s  survivors=0
+  run 2  rc=2   size-whole W=  3.055 s  T_trigger=  2.527 s  bound= 3.300 s  over=no  reruns=1  job=  0.491 s  survivors=0
+  run 3  rc=2   size-whole W=  3.050 s  T_trigger=  2.256 s  bound= 3.300 s  over=no  reruns=1  job=  0.766 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
 ## repl-storm-cjk  [w14]  bash 5.0.18  LC_ALL=C.UTF-8  command 36017 characters / 60017 bytes
 what: the same with CJK words between 6000 references (UTF-8: every offset computation scans characters)
-load before: 1.16 1.26 1.37 1/983 1905493 | after: 1.37 1.31 1.39 2/978 1905739 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.031 s  T_trigger=  0.618 s  bound= 3.300 s  over=no  reruns=1  job=  2.394 s  survivors=0
-  run 2  rc=2   size-whole W=  3.028 s  T_trigger=  0.858 s  bound= 3.300 s  over=no  reruns=1  job=  2.157 s  survivors=0
-  run 3  rc=2   size-whole W=  3.027 s  T_trigger=  0.557 s  bound= 3.300 s  over=no  reruns=1  job=  2.456 s  survivors=0
+load before: 1.18 1.36 1.43 1/969 2279679 | after: 1.39 1.40 1.44 1/970 2279899 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.024 s  T_trigger=  0.607 s  bound= 3.300 s  over=no  reruns=1  job=  2.404 s  survivors=0
+  run 2  rc=2   size-whole W=  3.024 s  T_trigger=  0.559 s  bound= 3.300 s  over=no  reruns=1  job=  2.454 s  survivors=0
+  run 3  rc=2   size-whole W=  3.024 s  T_trigger=  0.626 s  bound= 3.300 s  over=no  reruns=1  job=  2.387 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
-## multiline-cred  [w14]  bash 5.0.18  LC_ALL=C.UTF-8  command 63108 characters / 63108 bytes
-what: whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline
-load before: 1.14 1.26 1.37 2/982 1906266 | after: 1.41 1.32 1.38 2/981 1906535 | waited 30s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.020 s  T_trigger=  0.420 s  bound= 3.300 s  over=no  reruns=1  job=  2.592 s  survivors=0
-  run 2  rc=2   size-whole W=  3.017 s  T_trigger=  0.364 s  bound= 3.300 s  over=no  reruns=1  job=  2.645 s  survivors=0
-  run 3  rc=2   size-whole W=  3.018 s  T_trigger=  0.381 s  bound= 3.300 s  over=no  reruns=1  job=  2.630 s  survivors=0
-  summary: a rerun began in 3 of 3 runs; over the bound in 0
+## late-near3  [w14]  bash 5.0.18  LC_ALL=C.UTF-8  command 25856 characters / 25856 bytes
+what: three raw lines of 8611 characters (over LMAX): the first pass ends at ~2.9 s, right at the deadline: the rerun begins with almost no time left, or not at all
+load before: 1.17 1.34 1.42 1/970 2282145 | after: 1.30 1.37 1.43 6/1013 2283854 | waited 30s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   longline   W=  2.798 s  T_trigger=  2.746 s  bound= 3.300 s  over=no  reruns=1  job=  0.051 s  survivors=0
+  run 2  rc=2   size-whole W=  3.152 s  T_trigger=      - s  bound= 3.452 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-whole W=  3.614 s  T_trigger=      - s  bound= 3.914 s  over=no  reruns=0  job=      - s  survivors=0
+  summary: a rerun began in 1 of 3 runs; over the bound in 0
 
 ## apply-heavy  [gen-v3]  bash 5.0.18  LC_ALL=C.UTF-8  command 61536 characters / 61536 bytes
 what: whole mode (leading subshell), 60 KB: 16 variables x 16 references, the reference block twice; apply cost of the rerun, which has no count bound
-load before: 1.19 1.27 1.37 1/976 1906803 | after: 1.16 1.26 1.36 1/977 1907058 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.025 s  T_trigger=  0.488 s  bound= 3.300 s  over=no  reruns=1  job=  2.529 s  survivors=0
-  run 2  rc=2   size-whole W=  3.020 s  T_trigger=  0.490 s  bound= 3.300 s  over=no  reruns=1  job=  2.522 s  survivors=0
-  run 3  rc=2   size-whole W=  3.018 s  T_trigger=  0.460 s  bound= 3.300 s  over=no  reruns=1  job=  2.550 s  survivors=0
+load before: 1.19 1.34 1.42 2/968 2284691 | after: 1.16 1.33 1.42 1/971 2285656 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.444 s  bound= 3.300 s  over=no  reruns=1  job=  2.565 s  survivors=0
+  run 2  rc=2   size-whole W=  3.022 s  T_trigger=  0.462 s  bound= 3.300 s  over=no  reruns=1  job=  2.552 s  survivors=0
+  run 3  rc=2   size-whole W=  3.018 s  T_trigger=  0.472 s  bound= 3.300 s  over=no  reruns=1  job=  2.539 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
 ## seg-late2  [w14]  bash 5.0.18  LC_ALL=C.UTF-8  command 18586 characters / 18586 bytes
 what: segment-mode twin of late-core2: the baseline first pass takes ~10 s (10CG/aria-plugin#228), no rerun
-  VOID attempt 1: 1-minute load 1.16 before / 2.18 after (a reading >= 2.00); batch discarded, run again
-load before: 1.15 1.34 1.39 1/977 1908766 | after: 1.67 1.44 1.42 1/984 1909605 | waited 50s | pre-run 1-minute load < 1.2 | attempt 2
-  run 1  rc=2   size-seg   W= 13.487 s  T_trigger=      - s  bound=13.787 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W= 13.988 s  T_trigger=      - s  bound=14.288 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W= 13.618 s  T_trigger=      - s  bound=13.918 s  over=no  reruns=0  job=      - s  survivors=0
+  VOID attempt 1: 1-minute load 1.16 before / 2.71 after (a reading >= 2.00); batch discarded, run again
+  VOID attempt 2: 1-minute load 1.10 before / 2.31 after (a reading >= 2.00); batch discarded, run again
+load before: 1.18 1.48 1.48 1/971 2296247 | after: 1.86 1.61 1.53 3/993 2297804 | waited 85s | pre-run 1-minute load < 1.2 | attempt 3
+  run 1  rc=2   size-seg   W= 13.355 s  T_trigger=      - s  bound=13.655 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W= 14.129 s  T_trigger=      - s  bound=14.429 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W= 15.433 s  T_trigger=      - s  bound=15.733 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 3 runs; over the bound in 0
 
 ## seg-assign-1700  [w14]  bash 5.0.18  LC_ALL=C.UTF-8  command 15926 characters / 15926 bytes
 what: segment mode (no subshell), a trigger segment, then 1700 assignments: the baseline first pass alone takes ~6 s (10CG/aria-plugin#228), no rerun
-load before: 1.10 1.33 1.38 1/983 1910758 | after: 1.42 1.39 1.40 1/983 1911273 | waited 55s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W=  6.695 s  T_trigger=      - s  bound= 6.995 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W=  6.601 s  T_trigger=      - s  bound= 6.901 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W=  6.742 s  T_trigger=      - s  bound= 7.042 s  over=no  reruns=0  job=      - s  survivors=0
+  VOID attempt 1: 1-minute load 1.70 before / 2.32 after (a reading >= 2.00); batch discarded, run again
+load before: 1.20 1.60 1.56 1/981 2335977 | after: 1.21 1.56 1.55 1/977 2336476 | waited 120s | pre-run 1-minute load HIGH (>= 1.2 after the bounded wait) | attempt 2
+  run 1  rc=2   size-seg   W=  6.640 s  T_trigger=      - s  bound= 6.940 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W=  7.028 s  T_trigger=      - s  bound= 7.328 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W=  6.673 s  T_trigger=      - s  bound= 6.973 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 3 runs; over the bound in 0
 
 ## apply-heavy-cjk  [gen-v3]  bash 5.3.20  LC_ALL=C.UTF-8  command 61534 characters / 161542 bytes
 what: multibyte filler (characters != bytes) around the same reference block: string operations cost more per character
-load before: 1.14 1.33 1.38 1/985 1911907 | after: 1.28 1.35 1.38 2/985 1912118 | waited 35s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.050 s  T_trigger=  2.317 s  bound= 3.300 s  over=no  reruns=1  job=  0.702 s  survivors=0
-  run 2  rc=2   size-whole W=  3.045 s  T_trigger=  2.263 s  bound= 3.300 s  over=no  reruns=1  job=  0.755 s  survivors=0
-  run 3  rc=2   size-whole W=  3.058 s  T_trigger=  2.278 s  bound= 3.300 s  over=no  reruns=1  job=  0.741 s  survivors=0
+load before: 1.11 1.54 1.54 2/977 2336525 | after: 1.10 1.53 1.54 1/978 2336795 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.051 s  T_trigger=  2.293 s  bound= 3.300 s  over=no  reruns=1  job=  0.728 s  survivors=0
+  run 2  rc=2   size-whole W=  3.043 s  T_trigger=  2.367 s  bound= 3.300 s  over=no  reruns=1  job=  0.650 s  survivors=0
+  run 3  rc=2   size-whole W=  3.043 s  T_trigger=  2.297 s  bound= 3.300 s  over=no  reruns=1  job=  0.720 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
 ## repl-storm-cjk  [w14]  bash 5.3.20  LC_ALL=C.UTF-8  command 36017 characters / 60017 bytes
 what: the same with CJK words between 6000 references (UTF-8: every offset computation scans characters)
-load before: 1.17 1.33 1.38 2/980 1912286 | after: 1.31 1.35 1.38 1/981 1912537 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.023 s  T_trigger=  0.567 s  bound= 3.300 s  over=no  reruns=1  job=  2.445 s  survivors=0
-  run 2  rc=2   size-whole W=  3.026 s  T_trigger=  0.554 s  bound= 3.300 s  over=no  reruns=1  job=  2.457 s  survivors=0
-  run 3  rc=2   size-whole W=  3.023 s  T_trigger=  0.542 s  bound= 3.300 s  over=no  reruns=1  job=  2.471 s  survivors=0
+load before: 1.10 1.53 1.54 2/978 2336814 | after: 1.24 1.55 1.54 1/973 2337108 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.025 s  T_trigger=  0.563 s  bound= 3.300 s  over=no  reruns=1  job=  2.449 s  survivors=0
+  run 2  rc=2   size-whole W=  3.022 s  T_trigger=  0.628 s  bound= 3.300 s  over=no  reruns=1  job=  2.382 s  survivors=0
+  run 3  rc=2   size-whole W=  3.024 s  T_trigger=  0.555 s  bound= 3.300 s  over=no  reruns=1  job=  2.456 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
-## multiline-cred  [w14]  bash 5.3.20  LC_ALL=C.UTF-8  command 63108 characters / 63108 bytes
-what: whole mode, 8 lines of 7900 characters, each reads the credential-shaped path through $C only after substitution: eight credit computations under one deadline
-load before: 1.16 1.32 1.37 2/984 1912801 | after: 1.29 1.34 1.38 1/984 1913096 | waited 15s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.018 s  T_trigger=  0.370 s  bound= 3.300 s  over=no  reruns=1  job=  2.640 s  survivors=0
-  run 2  rc=2   size-whole W=  3.018 s  T_trigger=  0.385 s  bound= 3.300 s  over=no  reruns=1  job=  2.625 s  survivors=0
-  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.383 s  bound= 3.300 s  over=no  reruns=1  job=  2.628 s  survivors=0
-  summary: a rerun began in 3 of 3 runs; over the bound in 0
+## late-near3  [w14]  bash 5.3.20  LC_ALL=C.UTF-8  command 25856 characters / 25856 bytes
+what: three raw lines of 8611 characters (over LMAX): the first pass ends at ~2.9 s, right at the deadline: the rerun begins with almost no time left, or not at all
+load before: 1.14 1.52 1.53 2/977 2337152 | after: 1.35 1.55 1.54 1/976 2337421 | waited 5s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.116 s  T_trigger=      - s  bound= 3.416 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-whole W=  3.015 s  T_trigger=  2.984 s  bound= 3.300 s  over=no  reruns=1  job=  0.025 s  survivors=0
+  run 3  rc=2   longline   W=  2.966 s  T_trigger=  2.895 s  bound= 3.300 s  over=no  reruns=1  job=  0.070 s  survivors=0
+  summary: a rerun began in 2 of 3 runs; over the bound in 0
 
 ## apply-heavy  [gen-v3]  bash 5.3.20  LC_ALL=C.UTF-8  command 61536 characters / 61536 bytes
 what: whole mode (leading subshell), 60 KB: 16 variables x 16 references, the reference block twice; apply cost of the rerun, which has no count bound
-load before: 1.12 1.30 1.36 1/982 1913476 | after: 1.10 1.29 1.36 1/984 1913739 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-whole W=  3.017 s  T_trigger=  0.448 s  bound= 3.300 s  over=no  reruns=1  job=  2.561 s  survivors=0
-  run 2  rc=2   size-whole W=  3.019 s  T_trigger=  0.448 s  bound= 3.300 s  over=no  reruns=1  job=  2.562 s  survivors=0
-  run 3  rc=2   size-whole W=  3.019 s  T_trigger=  0.462 s  bound= 3.300 s  over=no  reruns=1  job=  2.549 s  survivors=0
+load before: 1.14 1.50 1.53 2/976 2337610 | after: 1.28 1.52 1.53 1/977 2337901 | waited 10s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-whole W=  3.021 s  T_trigger=  0.475 s  bound= 3.300 s  over=no  reruns=1  job=  2.535 s  survivors=0
+  run 2  rc=2   size-whole W=  3.018 s  T_trigger=  0.520 s  bound= 3.300 s  over=no  reruns=1  job=  2.491 s  survivors=0
+  run 3  rc=2   size-whole W=  3.017 s  T_trigger=  0.454 s  bound= 3.300 s  over=no  reruns=1  job=  2.556 s  survivors=0
   summary: a rerun began in 3 of 3 runs; over the bound in 0
 
 ## seg-late2  [w14]  bash 5.3.20  LC_ALL=C.UTF-8  command 18586 characters / 18586 bytes
 what: segment-mode twin of late-core2: the baseline first pass takes ~10 s (10CG/aria-plugin#228), no rerun
-load before: 1.10 1.29 1.36 1/984 1913758 | after: 1.77 1.42 1.40 1/986 1914669 | waited 0s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W= 14.097 s  T_trigger=      - s  bound=14.397 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W= 14.361 s  T_trigger=      - s  bound=14.661 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W= 17.217 s  T_trigger=      - s  bound=17.517 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.19 1.48 1.52 5/983 2339464 | after: 1.27 1.46 1.51 1/995 2340702 | waited 30s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-seg   W= 14.710 s  T_trigger=      - s  bound=15.010 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W= 14.810 s  T_trigger=      - s  bound=15.110 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W= 14.388 s  T_trigger=      - s  bound=14.688 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 3 runs; over the bound in 0
 
 ## seg-assign-1700  [w14]  bash 5.3.20  LC_ALL=C.UTF-8  command 15926 characters / 15926 bytes
 what: segment mode (no subshell), a trigger segment, then 1700 assignments: the baseline first pass alone takes ~6 s (10CG/aria-plugin#228), no rerun
-load before: 1.18 1.34 1.37 1/984 1916346 | after: 1.20 1.33 1.37 2/988 1916796 | waited 90s | pre-run 1-minute load < 1.2 | attempt 1
-  run 1  rc=2   size-seg   W=  6.983 s  T_trigger=      - s  bound= 7.283 s  over=no  reruns=0  job=      - s  survivors=0
-  run 2  rc=2   size-seg   W=  7.145 s  T_trigger=      - s  bound= 7.445 s  over=no  reruns=0  job=      - s  survivors=0
-  run 3  rc=2   size-seg   W=  7.382 s  T_trigger=      - s  bound= 7.682 s  over=no  reruns=0  job=      - s  survivors=0
+load before: 1.11 1.41 1.50 1/978 2341623 | after: 1.16 1.40 1.49 4/977 2342396 | waited 20s | pre-run 1-minute load < 1.2 | attempt 1
+  run 1  rc=2   size-seg   W=  7.065 s  T_trigger=      - s  bound= 7.365 s  over=no  reruns=0  job=      - s  survivors=0
+  run 2  rc=2   size-seg   W=  7.084 s  T_trigger=      - s  bound= 7.384 s  over=no  reruns=0  job=      - s  survivors=0
+  run 3  rc=2   size-seg   W=  7.472 s  T_trigger=      - s  bound= 7.772 s  over=no  reruns=0  job=      - s  survivors=0
   summary: a rerun began in 0 of 3 runs; over the bound in 0
 
 ## outcomes over 3 s with no relaxed rerun (outside the bound by definition: the baseline first pass, 10CG/aria-plugin#228):
-  bash 5.2.15  late-near3  run 4  rc=2 size-whole  W=3.471 s
-  bash 5.2.15  seg-assign-1700  run 1  rc=2 size-seg  W=7.029 s
-  bash 5.2.15  seg-assign-1700  run 2  rc=2 size-seg  W=6.893 s
-  bash 5.2.15  seg-assign-1700  run 3  rc=2 size-seg  W=6.965 s
-  bash 5.2.15  seg-assign-1700  run 4  rc=2 size-seg  W=6.805 s
-  bash 5.2.15  seg-assign-1700  run 5  rc=2 size-seg  W=6.951 s
-  bash 5.2.15  seg-late2  run 1  rc=2 size-seg  W=10.914 s
-  bash 5.2.15  seg-late2  run 2  rc=2 size-seg  W=10.901 s
-  bash 5.2.15  seg-late2  run 3  rc=2 size-seg  W=11.458 s
-  bash 5.2.15  seg-late2  run 4  rc=2 size-seg  W=10.880 s
-  bash 5.2.15  seg-late2  run 5  rc=2 size-seg  W=10.794 s
-  bash 5.0.18  seg-late2  run 1  rc=2 size-seg  W=13.487 s
-  bash 5.0.18  seg-late2  run 2  rc=2 size-seg  W=13.988 s
-  bash 5.0.18  seg-late2  run 3  rc=2 size-seg  W=13.618 s
-  bash 5.0.18  seg-assign-1700  run 1  rc=2 size-seg  W=6.695 s
-  bash 5.0.18  seg-assign-1700  run 2  rc=2 size-seg  W=6.601 s
-  bash 5.0.18  seg-assign-1700  run 3  rc=2 size-seg  W=6.742 s
-  bash 5.3.20  seg-late2  run 1  rc=2 size-seg  W=14.097 s
-  bash 5.3.20  seg-late2  run 2  rc=2 size-seg  W=14.361 s
-  bash 5.3.20  seg-late2  run 3  rc=2 size-seg  W=17.217 s
-  bash 5.3.20  seg-assign-1700  run 1  rc=2 size-seg  W=6.983 s
-  bash 5.3.20  seg-assign-1700  run 2  rc=2 size-seg  W=7.145 s
-  bash 5.3.20  seg-assign-1700  run 3  rc=2 size-seg  W=7.382 s
-## runs that left a process behind (found by cwd and killed): 0; batches voided by load: 1; confirmation runs over the bound: 0 of 0
+  bash 5.2.15  late-core3  run 3  rc=2 size-whole  W=3.025 s
+  bash 5.2.15  late-core4  run 2  rc=2 size-whole  W=3.342 s
+  bash 5.2.15  late-near3  run 2  rc=2 size-whole  W=3.025 s
+  bash 5.2.15  late-near3  run 4  rc=2 size-whole  W=3.079 s
+  bash 5.2.15  late-near3  run 5  rc=2 size-whole  W=3.044 s
+  bash 5.2.15  late-long3  run 1  rc=2 size-whole  W=3.552 s
+  bash 5.2.15  seg-assign-1700  run 1  rc=2 size-seg  W=7.279 s
+  bash 5.2.15  seg-assign-1700  run 2  rc=2 size-seg  W=7.036 s
+  bash 5.2.15  seg-assign-1700  run 3  rc=2 size-seg  W=7.448 s
+  bash 5.2.15  seg-assign-1700  run 4  rc=2 size-seg  W=6.970 s
+  bash 5.2.15  seg-assign-1700  run 5  rc=2 size-seg  W=6.948 s
+  bash 5.2.15  seg-late2  run 1  rc=2 size-seg  W=11.108 s
+  bash 5.2.15  seg-late2  run 2  rc=2 size-seg  W=17.786 s
+  bash 5.2.15  seg-late2  run 3  rc=2 size-seg  W=12.878 s
+  bash 5.2.15  seg-late2  run 4  rc=2 size-seg  W=10.912 s
+  bash 5.2.15  seg-late2  run 5  rc=2 size-seg  W=11.114 s
+  bash 5.2.15  late-core3@en_US  run 3  rc=2 size-whole  W=3.060 s
+  bash 5.2.15  late-core3@en_US  run 5  rc=2 size-whole  W=3.066 s
+  bash 5.0.18  late-near3  run 2  rc=2 size-whole  W=3.152 s
+  bash 5.0.18  late-near3  run 3  rc=2 size-whole  W=3.614 s
+  bash 5.0.18  seg-late2  run 1  rc=2 size-seg  W=13.355 s
+  bash 5.0.18  seg-late2  run 2  rc=2 size-seg  W=14.129 s
+  bash 5.0.18  seg-late2  run 3  rc=2 size-seg  W=15.433 s
+  bash 5.0.18  seg-assign-1700  run 1  rc=2 size-seg  W=6.640 s
+  bash 5.0.18  seg-assign-1700  run 2  rc=2 size-seg  W=7.028 s
+  bash 5.0.18  seg-assign-1700  run 3  rc=2 size-seg  W=6.673 s
+  bash 5.3.20  late-near3  run 1  rc=2 size-whole  W=3.116 s
+  bash 5.3.20  seg-late2  run 1  rc=2 size-seg  W=14.710 s
+  bash 5.3.20  seg-late2  run 2  rc=2 size-seg  W=14.810 s
+  bash 5.3.20  seg-late2  run 3  rc=2 size-seg  W=14.388 s
+  bash 5.3.20  seg-assign-1700  run 1  rc=2 size-seg  W=7.065 s
+  bash 5.3.20  seg-assign-1700  run 2  rc=2 size-seg  W=7.084 s
+  bash 5.3.20  seg-assign-1700  run 3  rc=2 size-seg  W=7.472 s
+## runs that left a process behind (found by cwd and killed): 0; batches voided by load: 4; confirmation runs over the bound: 0 of 0
 every outcome within max(trigger, 3 s) + 0.3 s: 236 of 236 (over the bound: 0)
