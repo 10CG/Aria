@@ -289,7 +289,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
 7. 重跑块头里与第 4 处同类的那句（「keeps the baseline block text in _SG_OV_PAT / _SG_OV_MODE」）：同样改成存的是原因与模式（TASK-005 修复轮第二段补，为不超出该段行宽写作「reason and mode」）。
 8. hook 头注释「Shell variable indirection」那条：补上第 5 处的同一个例外（bash 自身致命错误以 2 退出时原样写出它的报错，仍是拦），措辞与重跑块头同义，延续该段行宽（v3.4，复审第二轮 m-2 第 2 部分）。
 
-**落地的逐字文本**（aria `3ed6c24`，由 `git diff 2893bcc 3ed6c24 -- hooks/secret-guard.sh` 机械导出（脚本 `b2/t005f-verify/backfill.py`，本次输出另存 `b2/t005f3-verify/backfill.md`），逐 hunk 列改前改后；第 6、7、8 处与 What 1 补充 2 的代码都在其中）：
+**落地的逐字文本**（aria `b1d3111`，由 `git diff 2893bcc b1d3111 -- hooks/secret-guard.sh` 机械导出（脚本 `b2/t005f-verify/backfill.py`，本次输出另存 `b2/t005f4-verify/backfill.md`），逐 hunk 列改前改后；第 6、7、8 处与 What 1 补充 2 的代码都在其中）：
 
 1. `-93,6 +93,12`（只有注释）
 
@@ -417,7 +417,7 @@ hook 的 8 处已由原型整块重写（`mkv31.py` 第 10 步），`commentsync
    改后：
 
 ```
-  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (a WSLInterop entry under binfmt_misc, or a mount table that cannot be read), asked only where the platform and the time would relax: elsewhere the mount table is never read
+  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (_sg_relax_nowslfs: a WSLInterop or WSLInterop-late entry seen under a topmost binfmt_misc, a DIR there that cannot be searched, or a mount table that cannot be read or reads empty), asked only where the platform and the time would relax: elsewhere the mount table is never read
 ```
 
 8. `-831 +841,10`（含代码行：What 1 补充 2 的那部分以上文代码块为准）
@@ -431,12 +431,12 @@ _sg_relax_noext() {   # prints "none" only when no extension can be in effect: n
    改后：
 
 ```
-_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; the table's last line for it) is not a binfmt_misc file system, or it is, DIR can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; the two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry is seen -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; taken to be the table's last line for it) is not a binfmt_misc file system, or it is, DIR is a directory that can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; an entry under a lower mount (a binfmt_misc with another mount on top of it) is not looked for and counts as none. The two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off, and so does a DIR that is not a directory that can be searched. The two arguments exist for the direct-call cases only; the gate calls it with none
   local d="${2:-/proc/sys/fs/binfmt_misc}" r
   r=$(awk -v d="$d" '$2 == d { t = $3 } END { print NR, t }' "${1:-/proc/self/mounts}" 2>/dev/null) || return 1
-  [[ "${r%% *}" =~ ^[1-9][0-9]*$ ]] || return 1   # no line read: a table that cannot be read
-  [[ "${r#* }" == binfmt_misc ]] || return 0   # binfmt_misc is not the topmost mount at DIR: no interop entry can be registered there, and nothing under DIR is looked at
-  [[ -x "$d" ]] || return 1   # DIR cannot be searched: the entries cannot be seen, so they may exist
+  [[ "${r%% *}" =~ ^[1-9][0-9]*$ ]] || return 1   # no line read: a table that cannot be read, or reads empty
+  [[ "${r#* }" == binfmt_misc ]] || return 0   # binfmt_misc is not the topmost mount at DIR: nothing under DIR is looked at (an entry under a lower mount is not looked for: looking could trigger an automount)
+  [[ -d "$d" && -x "$d" ]] || return 1   # DIR is not a directory that can be searched: the entries cannot be seen, so they may exist
   [[ -e "$d/WSLInterop" || -e "$d/WSLInterop-late" ]] && return 1
   return 0
 }

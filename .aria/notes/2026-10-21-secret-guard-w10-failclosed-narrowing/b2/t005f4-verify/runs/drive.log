@@ -1,0 +1,12 @@
+hook-5f4 rc=0 load-start 1.04 1.08 1.35 load-end 1.04 1.08 1.35
+MD-no-dir-check rc=1 load-start 1.04 1.08 1.35 load-end 1.04 1.08 1.35
+ME-empty-as-none rc=1 load-start 1.04 1.08 1.35 load-end 1.60 1.19 1.39
+MF-first-line rc=1 load-start 1.17 1.19 1.36 load-end 1.17 1.19 1.36
+MG-glob rc=1 load-start 1.17 1.19 1.36 load-end 1.16 1.18 1.36
+MI-inverted rc=1 load-start 1.16 1.18 1.36 load-end 1.30 1.22 1.37
+MN-one-name rc=1 load-start 1.10 1.17 1.35 load-end 1.10 1.17 1.35
+MO-before-platform rc=1 load-start 1.10 1.17 1.35 load-end 1.10 1.17 1.35
+MS-result-ignored rc=1 load-start 1.10 1.17 1.35 load-end 1.10 1.17 1.35
+MW-while-read rc=1 load-start 1.10 1.17 1.35 load-end 1.33 1.22 1.37
+MX-no-dir-search-check rc=1 load-start 1.17 1.19 1.35 load-end 1.15 1.18 1.35
+done

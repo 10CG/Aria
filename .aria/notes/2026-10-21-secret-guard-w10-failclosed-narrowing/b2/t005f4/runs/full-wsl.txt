@@ -1,0 +1,15 @@
+  [SKIP] zsh not installed — zsh end-to-end cases skipped (static assertions cover portability)
+  [SC-8] N=10 calls/round, rounds=20, min-of-rounds, in-process (EPOCHREALTIME), ceiling=max(100ms, old x 1.5)/call, BASH_VERSION=5.2.15(1)-release, load=1.78 1.64 1.43 2/987 586548
+  [SC-8] tier (a): old=25.8ms/call new=13.0ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-49.6%, median old=266667us new=156277us]
+  [SC-8] tier (b): old=27.6ms/call new=20.1ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-27.1%, median old=379199us new=231723us]
+  [SC-8] tier (c): old=26.3ms/call new=15.0ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-42.7%, median old=281813us new=165543us]
+  [SC-8] tier (d): old=26.1ms/call new=20.1ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=-23.0%, median old=280107us new=214083us]
+  [SC-8] tier (e): old=26.9ms/call new=54.6ms/call ceiling=100.0ms (absolute)  [审计参考: increase(min)=102.9%, median old=287411us new=581426us]
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test
+PASS: 985 / 985
+FAIL: 0 / 985
+SKIP: 0 / 985 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.16 1.56 1.39 end 1.23 1.52 1.38 | timing batch: judged
+W10 older groups 21ab 21ac 21ag 21aj 21al 21ao: baseline branch (assertions as before) | bash on PATH /usr/bin/bash 5.2.15(1)-release (machtype x86_64-pc-linux-gnu) | osrelease 6.17.9-1-pve | WSLInterop no | WSL_DISTRO_NAME 'Ubuntu' WSL_INTEROP '' | deadline fallback (截止回落) 0 / 0

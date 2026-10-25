@@ -72,3 +72,5 @@
 - `T005f3-report.md`、`t005f3/`：修复轮第三段的执笔席报告与过程材料（整份 hook、套件的拷贝与坏实现不入库）；主控复核在 `t005f3-verify/`（`VERIFY.md`，预期 `PREDICT.md`，主控独立拼的预期 hook 的生成脚本 `mkexp.py`、9 个坏实现的生成脚本 `mkmut3.py`、逐条结果 `runs/`，以及 What 7 补充 2 本次回填的 `backfill.md`）。
 - `BRIEF-T005r3.md`：TASK-005 第三轮增量复审（审 aria `3ed6c24`）的任务书；4r 第二次派出仍用 `BRIEF-T004r.md`（已换上新的提交与前缀）。
 - `BRIEF-T005f4.md`：TASK-005 修复轮第四段的任务书：按复审第三轮（主仓 `.aria/audit-reports/post_implementation-R3-*`，PASS，4 Minor）与 proposal v3.5 改准 hook 注释、目录判据改为 `[[ -d && -x ]]`、补「DIR 是普通文件」直调用例，W1l 在 uid 0 下与 W1n 叠不满时记 SKIP。4r 第二次派出约 25 分钟后因此被主控停掉。
+- `T005f4-report.md`、`t005f4/`：修复轮第四段的执笔席报告与过程材料（整份 hook、套件的拷贝与坏实现不入库）；主控复核在 `t005f4-verify/`（`VERIFY.md`、预期 `PREDICT.md`、预期 hook 的生成脚本 `mkexp4.py`、10 个坏实现的生成脚本 `mkmut4.py`、逐条结果 `runs/`、What 7 补充 2 本次回填的 `backfill.md`）。
+- `BRIEF-T005r4.md`：TASK-005 第四轮增量复审（审 aria `b1d3111`）的任务书；4r 第三次派出仍用 `BRIEF-T004r.md`（已换上 `b1d3111` 与 `628652570ce3`）。

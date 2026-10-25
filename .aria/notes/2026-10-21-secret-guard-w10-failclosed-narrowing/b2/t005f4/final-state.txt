@@ -1,0 +1,11 @@
+$ git -C wt217/aria status --short
+ M hooks/secret-guard.sh
+ M hooks/tests/lib/secret-guard-w10-direct.sh
+ M hooks/tests/secret-guard.test.sh
+$ git -C /home/dev/Aria status --short
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
+ M .aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-direct.sh
+hook sha256 prefix: 628652570ce3
+processes whose command line names t005f4 (want none):
+(end of list)

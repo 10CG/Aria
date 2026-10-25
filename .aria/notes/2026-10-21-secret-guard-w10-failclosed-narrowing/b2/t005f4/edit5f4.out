@@ -1,0 +1,11 @@
+A0 proposal function == spec-probe2/spec5.sh: True
+A1 hook v3.4 function == spec3.sh: False | lines 9 -> 9
+   first difference at char 299 : hook 'fmt_misc file system, or it is, DIR can be searched, and it holds neither WSLInt' | spec3 'fmt_misc file system, or it is and holds neither WSLInterop nor WSLInterop-late.'
+A2 function lines changed (0-based): [0, 3, 4, 5]
+A3 hook: lines 1756 -> 1756 | -5 +5
+A4 new hook sha256 prefix 628652570ce3
+B1 helper lines 681 -> 692
+B1 scdirect lines 638 -> 649
+B2 helper vs sc-direct: the differing lines are the same before and after the edit (INV-2): True | differing lines 77
+C1 mutants.py / w14 Q-30 anchor present in the new hook: True
+written hook helper suite scdirect sccases w14mut

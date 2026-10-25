@@ -1,0 +1,14 @@
+# run-suite.sh | 2026-10-25T09:53:59Z | hook 5f5b76a80a3d | suite 2f5cc04cf8d2 | helper 28b0788a0a6c | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.16 1.18 1.36
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 18 / 20
+FAIL: 2 / 20
+SKIP: 0 / 20 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.16 1.18 1.36 end 1.30 1.22 1.37 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-T2-anchor-taken-once-at-hook-start]: assignments to _SG_P0 / of them on the line after set -uo pipefail [1 1] (want [1 1]); anchor 2.0 s back, budget 3: the judgement in the job saw _SG_LEFT [] (want 0 < left <= 1.0; _sg_per_segment_eval status 2) [value]
+  FAIL [W10-port V15-W1e-gate-closed-by-wsl-file-system]: every check before it passing: _sg_relax_nowslfs stubbed to return 0 -> _sg_relax_ok status 1 (want 0), stubbed to return 1 (a WSLInterop entry, a DIR that cannot be searched, a mount table that cannot be read or reads empty) -> 0 (want 1) [open] [closed]
+
+# run-suite.sh end | load 1.30 1.22 1.37 | suite exit 1

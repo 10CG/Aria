@@ -1,0 +1,2 @@
+sc-cases: # totals: PASS 161  FAIL 0  MISSING 0  SETUP 0  SKIP 0 (load 0, void 0, inconclusive 0, root 0)
+mut-v31: 57 CAUGHT, 0 not caught/judged | P-0 GREEN | # perturbation round: 0 not as expected | load at the end 2.21 1.87 1.63

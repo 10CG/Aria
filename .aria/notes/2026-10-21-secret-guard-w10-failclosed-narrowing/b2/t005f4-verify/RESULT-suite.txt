@@ -1,0 +1,11 @@
+hook-5f4                 FAIL/SKIP:                        |                                | 
+MD-no-dir-check          FAIL/SKIP: W1o                    | [status]                       | 
+ME-empty-as-none         FAIL/SKIP: W1f                    | [status]                       | 
+MF-first-line            FAIL/SKIP: W1g                    | [status]                       | 
+MG-glob                  FAIL/SKIP: W1i W1j W1l            | [status] [status] [stderr] [status]  | 
+MI-inverted              FAIL/SKIP: T2 W1e                 | [value] [open] [closed]        | 
+MN-one-name              FAIL/SKIP: W1b W1i W1l            | [status] [status] [status]     | 
+MO-before-platform       FAIL/SKIP: W1m                    | [platform] [time]              | 
+MS-result-ignored        FAIL/SKIP: W1e                    | [closed]                       | 
+MW-while-read            FAIL/SKIP: W1n                    |                                | 
+MX-no-dir-search-check   FAIL/SKIP: W1k W1o                | [status] [status]              | 

@@ -1,0 +1,35 @@
+load0 0.79 0.99 1.15 (waited 1 x 10 s at most)
+bash -n: 25 checks, stderr 0 bytes
+mkbad rc=0 built donly nodx v33fn v34fn 
+good   FAIL [] (want []) PASS 14 other 0 | 
+v34fn  FAIL [o] (want [o]) PASS 13 other 0 | FAIL V15-W1o-regular-file-as-directory binfmt_misc listed at DIR, DIR an empty regular file of mode 0755 (not a directory): status 0 (want 1), stderr  
+nodx   FAIL [ko] (want [ko]) PASS 12 other 0 | FAIL V15-W1k-unsearchable-directory binfmt_misc mounted at DIR, DIR of mode 000 (cannot be searched; nothing in it): status 0 (want 1), stderr 0 bytes FAIL V15-W1o-regular-file-as-directory binfmt_misc listed at DIR, DIR an empty regular file of mode 0755 (not a directory): status 0 (want 1), stderr  
+donly  FAIL [k] (want [k]) PASS 13 other 0 | FAIL V15-W1k-unsearchable-directory binfmt_misc mounted at DIR, DIR of mode 000 (cannot be searched; nothing in it): status 0 (want 1), stderr 0 bytes 
+norelax 3.2.57 good (want PASS): PASS V15-W1o-regular-file-as-directory binfmt_misc listed at DIR, DIR an empty regular file of mode 0755 (not a directory): status 1 (want 1), stderr 0 bytes (want 0)
+norelax 3.2.57 v34fn (want FAIL): FAIL V15-W1o-regular-file-as-directory binfmt_misc listed at DIR, DIR an empty regular file of mode 0755 (not a directory): status 0 (want 1), stderr 0 bytes (want 0) [status]
+w1n stop501 (fails from call 501; calls made 501): SKIP V15-W1n-mount-table-read-in-one-pass [platform] the stacking stopped after 500 of 1000 tmpfs mounts (a low fs.mount-max, say), so the table the case needs cannot be made here
+w1n stop1 (fails from call 1; calls made 1): SKIP V15-W1n-mount-table-read-in-one-pass [platform] tmpfs cannot be mounted in a private mount namespace here
+w1n pre-stop501 (fails from call 501; calls made 501): TIMED V15-W1n-mount-table-read-in-one-pass bad ok 1000 tmpfs mounts stacked in a private mount namespace (500 made, the table 541 lines): _sg_relax_nowslfs on the real table returned 0 (want 0) in 0.003 s (want <= 0.5), stderr 0 bytes (want 0)
+tw-helper: same as in 5f3 (13 lines)
+tw-scdirect: same as in 5f3 (13 lines)
+tw-suite: same as in 5f3 (13 lines)
+tw-sccases: same as in 5f3 (13 lines)
+cmp 3.2.57: # 3.2.57: 13 cases, 0 not ok
+cmp 5.0.18: # 5.0.18: 13 cases, 0 not ok
+cmp 5.1.16: # 5.1.16: 13 cases, 0 not ok
+cmp 5.2.15: # 5.2.15: 13 cases, 0 not ok
+cmp 5.3.20: # 5.3.20: 13 cases, 0 not ok
+gen v31 rc=0 57 bad implementations, 7 perturbation variants; hook sha256 628652570ce3
+gen w14 rc=0 lines 31 Q-31	747ea3a40957	rerun: the growth limit uses _SGV_SMAX instead of _SGV_GMAX (both are 8192 today)
+derive rc=0 hook sites [('1 header: shell variable indirection', 2, 3), ('2 W10 head + LENGTH BUDGET', 1, 1), ('5 _sg_vx_pass', 1, 1), ('10 relaxed rerun block (supplement 
+commentsync 5f3 -> 5f4: 0 diff lines
+constr: hook anchors 12 insert: anchors left 0 | delete: lines removed 217 suite anchors 10 insert: anchors left 0 | delete: lines removed 32 
+cs target rc=0 target: GREEN
+cs baseline rc=0 baseline: GREEN
+cs proto rc=0 proto --hook-only: GREEN
+cs hook-c1-insert rc=1 target --hook-only: RED (78)
+cs hook-c2-delete rc=1 target --hook-only: RED (60)
+cs suite-c1-insert rc=1 target --suite-only: RED (58)
+cs suite-c2-delete rc=1 target --suite-only: RED (57)
+load1 0.90 1.01 1.16
+runall4 started, pid 2941784

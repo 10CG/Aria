@@ -1,0 +1,4 @@
+# run-mutants.sh | 2026-10-25T09:41:58Z | hook 628652570ce3 | mutants.py 9e832c0f7bfa | suite mode: /tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/wt217/aria (secret-guard.test.sh 2f5cc04cf8d2, helper 28b0788a0a6c, run-suite.sh 46052595bf14) | SC_BASH bash on PATH | scope designated | load 0.78 1.46 1.61
+# 0 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 0)
+P-0               GREEN        the constants perturbed: _SGV_GMAX=8190, _SGV_LMAX=8200 (every case must stay green: the cases read the constants from the hook) | # run-suite.sh end | load 1.08 1.43 1.59 | suite exit 0 | load start 0.78 1.46 1.61 end 1.08 1.43 1.59 | timing batch: judged
+# perturbation round: 0 not as expected | load at the end 1.08 1.43 1.59

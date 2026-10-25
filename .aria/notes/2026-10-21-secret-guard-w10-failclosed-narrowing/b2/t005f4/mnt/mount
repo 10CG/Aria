@@ -1,0 +1,5 @@
+#!/bin/bash
+# test double (scratchpad only): the real mount until call MOUNT_FAIL_FROM - 1, then status 32
+c=$(( $(cat "${MOUNT_COUNT_FILE:?}" 2>/dev/null || echo 0) + 1 )); echo "$c" > "$MOUNT_COUNT_FILE"
+(( c < ${MOUNT_FAIL_FROM:?} )) || { echo "mount: test double refuses call $c" >&2; exit 32; }
+exec /usr/bin/mount "$@"

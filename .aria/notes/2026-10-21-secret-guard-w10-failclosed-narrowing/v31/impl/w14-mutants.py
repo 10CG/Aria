@@ -11,7 +11,7 @@ import hashlib
 import os
 import sys
 
-IMPL_SHA12 = "16996eb7db21"
+IMPL_SHA12 = "628652570ce3"
 
 # (id, short title, [(original, replacement), ...])
 MUTANTS = [
