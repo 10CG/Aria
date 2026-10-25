@@ -94,39 +94,45 @@ _sg_relax_platform() {   # MACHINE MAJOR MINOR OSRELEASE [WSL]: status 0 on an x
 
 每个参数都带缺省（2026-10-24 改，B.2 TASK-002 第一步发现）：hook 开着 `set -u`，少传一个参数就会让调用方整体中止，在 hook 里中止即退出码不是 2，等于放行；带缺省之后，缺参数时准入门关闭。
 
-**What 1 补充 2：WSL 标记的读法不触发自动挂载，且读表的开销随挂载数线性增长**（v3.3 起于 2026-10-25 TASK-005 复审 D-1、D-2；v3.4 同日按复审第二轮 M-1、m-1 与疑点改写；技术口径，姿态不变：只会把放宽关掉，不会打开。INV-1 允许的内容差之一）。
+**What 1 补充 2：WSL 标记的读法不触发自动挂载，且读表的开销随挂载数线性增长**（v3.3 起于 2026-10-25 TASK-005 复审 D-1、D-2；v3.4 同日按复审第二轮 M-1、m-1 与疑点改写；v3.5 同日按复审第三轮 m-1、m-3 改注释与目录判据；技术口径，姿态不变：只会把放宽关掉，不会打开。INV-1 允许的内容差之一）。
 
 为什么：What 1 补充里 `-e /proc/sys/fs/binfmt_misc/WSLInterop` 在多数 systemd 宿主上会穿过 autofs 自动挂载点：一般毫秒内挂上，但自动挂载没人服务时（例如继承了宿主 autofs 挂载点的容器或 chroot）stat 可能一直阻塞，hook 超过 Claude Code 的 5 s 被杀后命令就放行了，而基线从不碰这个目录、本会按尺寸拦——这是放宽带来的新放行路径（D-2）。较新的 WSL 还可能把互操作项登记成 `WSLInterop-late`（D-1）。v3.3 改为先读挂载表、只在 binfmt_misc 已挂上时看项，但用 bash 的 `while read` 逐行读 `/proc/self/mounts`：bash 读完每一行都往回 seek，procfs 每次都从头重新生成这张表，开销随挂载数成平方增长（复审第二轮 M-1；主控在私有挂载命名空间里叠 tmpfs 实测：500 条 0.34 s、1000 条 2.24 s、2000 条 17.2 s），而读表在硬截止之外——挂载多的宿主上又成了一条超时放行的路径，而且是 v3.3 自己引入的。v3.3 还有三处说法与做法不符：用通配 `WSLInterop*` 看项，环境导入的 `noglob` 会让它看不见、`failglob` 会让它报错中止（m-1）；空表或「能打开却读不出」的表按「没挂上」处理；同一挂载点上 binfmt_misc 之上若又叠了 autofs，仍会去看项、触发自动挂载（疑点）。
 
-v3.4 的做法：
+做法（v3.4；v3.5 只补了目录判据并改准注释）：
 - 挂载表交给 awk 一次读完（开销线性：同样的叠挂载下 500 / 1000 / 2000 条为 0.003 / 0.008 / 0.026 s），只取该挂载点的**最后一条**（最上层的挂载）的文件系统类型；表读不出、或读出 0 行，都当作可能在 WSL 里，准入门关闭。
-- 只有最上层是 binfmt_misc 时才看项，逐个看 `WSLInterop` 与 `WSLInterop-late` 两个名字，不用通配——环境导入的 shell 选项改变不了结论，目录可查不可列时也照样看得到；目录不可查（没有搜索权限，项在不在看不到）时当作有标记，准入门关闭（复审第二轮 m-1：看不了就当作有标记）。
+- 只有最上层是 binfmt_misc 时才看项，逐个看 `WSLInterop` 与 `WSLInterop-late` 两个名字，不用通配——环境导入的 shell 选项改变不了结论，目录可查不可列时也照样看得到；目录不可查（没有搜索权限，项在不在看不到）时当作有标记，准入门关闭（复审第二轮 m-1：看不了就当作有标记）；DIR 不是目录时同样当作有标记（v3.5，复审第三轮 m-3：准入门走不到这种输入——表里最后一条是 binfmt_misc 时 DIR 是它的挂载根，必是目录——只为与测试侧判据同义）。
 - 这一项挪到平台判据与时间判据之后：非放宽平台、或已没有时间时，挂载表根本不读。
 
 `_sg_relax_ok` 相对 What 1 补充，WSL 那一行换成下面第一行，并在 `_sg_relax_left` 之后加第二行：
 
 ```bash
   [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" ]] && wsl=wsl   # WSL marks in the environment; the environment can only switch the relaxation off with them
-  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (a WSLInterop entry under binfmt_misc, or a mount table that cannot be read), asked only where the platform and the time would relax: elsewhere the mount table is never read
+  _sg_relax_nowslfs || return 1   # the WSL mark of the file system (_sg_relax_nowslfs: a WSLInterop or WSLInterop-late entry seen under a topmost binfmt_misc, a DIR there that cannot be searched, or a mount table that cannot be read or reads empty), asked only where the platform and the time would relax: elsewhere the mount table is never read
 ```
 
 新函数（与其余 `_sg_relax_*` 一样定义在 source 闸门之上，INV-4）：
 
 ```bash
-_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry can exist -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; the table's last line for it) is not a binfmt_misc file system, or it is, DIR can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; the two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off. The two arguments exist for the direct-call cases only; the gate calls it with none
+_sg_relax_nowslfs() {   # [MOUNTS [DIR]]: status 0 only when no WSL interop entry is seen -- the mount table (default /proc/self/mounts) reads and is not empty, and the topmost mount at DIR (default /proc/sys/fs/binfmt_misc; taken to be the table's last line for it) is not a binfmt_misc file system, or it is, DIR is a directory that can be searched, and it holds neither WSLInterop nor WSLInterop-late. awk reads the table in one pass: a line-by-line read of /proc/self/mounts in bash costs O(n^2) (bash seeks back after every line and procfs regenerates the table from the start), seconds on a host with a few thousand mounts, outside the hard deadline. The entries are looked at only when binfmt_misc is the topmost mount there, so the look never triggers an automount; an entry under a lower mount (a binfmt_misc with another mount on top of it) is not looked for and counts as none. The two names are tested one by one, not by a glob, so noglob or failglob imported from the environment cannot change the look. A table that cannot be read, or reads empty, keeps the relaxation off, and so does a DIR that is not a directory that can be searched. The two arguments exist for the direct-call cases only; the gate calls it with none
   local d="${2:-/proc/sys/fs/binfmt_misc}" r
   r=$(awk -v d="$d" '$2 == d { t = $3 } END { print NR, t }' "${1:-/proc/self/mounts}" 2>/dev/null) || return 1
-  [[ "${r%% *}" =~ ^[1-9][0-9]*$ ]] || return 1   # no line read: a table that cannot be read
-  [[ "${r#* }" == binfmt_misc ]] || return 0   # binfmt_misc is not the topmost mount at DIR: no interop entry can be registered there, and nothing under DIR is looked at
-  [[ -x "$d" ]] || return 1   # DIR cannot be searched: the entries cannot be seen, so they may exist
+  [[ "${r%% *}" =~ ^[1-9][0-9]*$ ]] || return 1   # no line read: a table that cannot be read, or reads empty
+  [[ "${r#* }" == binfmt_misc ]] || return 0   # binfmt_misc is not the topmost mount at DIR: nothing under DIR is looked at (an entry under a lower mount is not looked for: looking could trigger an automount)
+  [[ -d "$d" && -x "$d" ]] || return 1   # DIR is not a directory that can be searched: the entries cannot be seen, so they may exist
   [[ -e "$d/WSLInterop" || -e "$d/WSLInterop-late" ]] && return 1
   return 0
 }
 ```
 
-主控交付前在 3.2.57、5.0.18、5.2.15、5.3.20 上对这段代码实跑：真实路径 0；只有 autofs（目录里有 `WSLInterop`）0；binfmt_misc 加 `WSLInterop-late` 1；binfmt_misc 无项 0；binfmt_misc 之上叠 autofs（目录里有 `WSLInterop`）0；空表 1；读不出 1；把目录当表 1；`set -f` 下 binfmt_misc 加 `WSLInterop-late` 1；`shopt -s failglob` 下 binfmt_misc 无项 0；binfmt_misc 目录不可查（000）1；可查不可列（0311）加 `WSLInterop-late` 1；stderr 全程 0 字节（uid 1000；本机的 awk 是 mawk，程序只用 POSIX awk 的写法）。去掉 `-x` 那一行时只有目录不可查那一条变成 0。v3.3 的写法在前十种情形里有五处不符（叠 autofs 1、空表 0、目录当表 0、noglob 下 0、failglob 下报错中止，后两种情形因此没跑到；复审第二轮实测它在目录不可列时返回 0）。
+主控交付前在 3.2.57、5.0.18、5.2.15、5.3.20 上对这段代码（v3.5）实跑：真实路径 0；只有 autofs（目录里有 `WSLInterop`）0；binfmt_misc 加 `WSLInterop-late` 1；binfmt_misc 无项 0；binfmt_misc 之上叠 autofs（目录里有 `WSLInterop`）0；空表 1；读不出 1；把目录当表 1；`set -f` 下 binfmt_misc 加 `WSLInterop-late` 1；`shopt -s failglob` 下 binfmt_misc 无项 0；binfmt_misc 目录不可查（000）1；可查不可列（0311）加 `WSLInterop-late` 1；DIR 是 0755 的普通文件 1；stderr 全程 0 字节（uid 1000；本机的 awk 是 mawk，程序只用 POSIX awk 的写法）。v3.4 只在最后一种上不同（返回 0：`-x` 对可执行的普通文件为真，随后 `-e` 得 ENOTDIR）；去掉 `-d` 与 `-x` 那一行时，目录不可查与普通文件两条变成 0。v3.3 的写法在前十种情形里有五处不符（叠 autofs 1、空表 0、目录当表 0、noglob 下 0、failglob 下报错中止）；复审第二轮实测它在目录不可列时返回 0。
 
-直调用例（TASK-005 修复轮补）：上面各情形各一条（假挂载表与目录建在 helper 自己的临时目录下；目录不可查那一条在 uid 0 下不适用——root 可查任何目录——记 SKIP [platform]）；把 `_sg_relax_nowslfs` 桩成返回 1 时，放宽平台上的 `_sg_relax_ok` 返回 1；另有一条开销用例：在私有挂载命名空间里叠 1000 个 tmpfs 后读真实的挂载表，函数须在 0.5 s 内返回（没有 `unshare -rm` 的宿主上 SKIP [platform]）。
+已知边角（v3.5 记录，不改代码；复审第三轮疑点 1、2 与 m-1）：
+- 「表里该挂载点的最后一条」当作最上层是近似。移动过的挂载（`mount --move` 保留原来的序号）、`move_mount` 的 `MOVE_MOUNT_BENEATH`（6.5 起）、以及父目录被重新挂载（例如 `/proc` 上又挂了新的 procfs，`unshare --mount-proc`、`bwrap --proc` 都会如此）时，最后一条可能不是路径实际到达的那一层。前两种要有人刻意对 DIR 做挂载操作（systemd 不会在已经是挂载点的路径上启动 automount），后果是可能去看一个没人服务的 autofs、落回 D-2 的阻塞；第三种会漏看被遮住的 `WSLInterop`。用 mountinfo 的父子关系判最上层也解决不了第三种。
+- binfmt_misc 之上叠着别的挂载时，下层 binfmt_misc 里登记的项不看、按没有算——为了不触发自动挂载，宁可不看。
+- LSM 允许查目录、却拒绝对其中的项做 getattr 时，`-e` 判成没有。
+- 这几种都只在不带其他 WSL 标记的 WSL2 上才有后果：内核是自编的、版本串里没有 microsoft 或 WSL，进程环境里也没有 `WSL_DISTRO_NAME` / `WSL_INTEROP`。
+
+直调用例（TASK-005 修复轮补）：上面各情形各一条（假挂载表与目录建在 helper 自己的临时目录下；目录不可查与可查不可列两条在 uid 0 下不适用——root 可查、可列任何目录，后一条在 root 下区分不了逐名查与通配——记 SKIP [platform]）；把 `_sg_relax_nowslfs` 桩成返回 1 时，放宽平台上的 `_sg_relax_ok` 返回 1；另有一条开销用例：在私有挂载命名空间里叠 1000 个 tmpfs 后读真实的挂载表，函数须在 0.5 s 内返回（没有 `unshare -rm`、或叠不满 1000 层的宿主上 SKIP [platform]）。
 
 ### 2. 放宽重跑的规则（`_SG_RELAXED=1`，只在作业里生效）
 
