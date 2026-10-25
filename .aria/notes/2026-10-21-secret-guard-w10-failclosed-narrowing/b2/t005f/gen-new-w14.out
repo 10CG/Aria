@@ -1,0 +1,31 @@
+Q-1	c4f2f1f61aeb	platform: bash minor bound <= 3 written as < 3 (5.3 leaves the measured range)
+Q-2	6b1c29b748ee	platform: bash major test == 5 written as >= 5 (a future 6.x is admitted)
+Q-3	cb448580cb2e	platform: build glob x86_64-*-linux-gnu* loosened to x86_64-*-linux-* (musl and other libc admitted)
+Q-4	d1a1cb0207df	platform: kernel string test *[Mm]icrosoft* written as *Microsoft* (lower-case microsoft not recognised)
+Q-5	45b52f936f61	gate: platform argument 1 read from $MACHTYPE (the environment can rewrite it) instead of BASH_VERSINFO[5]
+Q-6	faf01d6630a6	gate: _sg_relax_noext || written as && (relaxation only when no project root is found)
+Q-7	db6332501d91	trigger: the segment-mode trigger point never relaxes (only the whole-command one does)
+Q-8	f77757703bbf	gate: extension probe -e written as -f (a directory at .aria/secret-guard.paths counts as no extension)
+Q-9	c95f50371aed	rerun: growth limit recomputed per variable from the already rewritten s instead of the input length (BI-9)
+Q-10	87d18e7d5a88	rerun: the 8-for-statements count bound is not lifted (only the 16-assignment bound is)
+Q-11	8f949cc95f7e	rerun: the 8-replacements bound of the ${NAME} spelling (_sg_vx_replace) is not lifted
+Q-12	421d0a269d84	rerun: the 8-replacements bound of the $NAME spelling (_sg_vx_apply loop) is not lifted
+Q-13	cf5048ff711b	rerun: longest-line test max > _SGV_LMAX written as >= (a line of exactly 8192 loses its credit path)
+Q-14	e3ea4d5e8310	rerun: the longest-line read loop forgets IFS= (leading and trailing blanks are trimmed from the measure)
+Q-15	826ced69eb0e	rerun: the nocredit branch is moved behind the credit computation (order swapped)
+Q-16	fb90ce83cc67	job: the timer sleeps the whole budget instead of the time left to the deadline
+Q-17	168fff249e0b	job: the command substitution does not silence its own stderr (exec 2>/dev/null dropped)
+Q-18	d4cbeed7d6c4	job: the job's block text is replayed without its final newline
+Q-19	6a570a9f408b	job: the group kill after wait is dropped (nothing cleans up behind the job)
+Q-20	6a566c3d7ca1	fallback: the segment trigger stores the whole-command reason string (copy-paste between the two trigger lines)
+Q-21	39f8909f0942	text: the segment-mode growth text uses the whole-command wording
+Q-22	c1b6fbd1621c	text: the longline call passes segment and pattern in swapped order (the copy is shown as the matched pattern)
+Q-23	39935110fb1f	text: the longline text echoes the first 200 characters of the substituted copy instead of the command
+Q-24	6ef4a5b6e50f	anchor: the deadline anchor is re-taken where the time-budget clock is reset (start of the W10 pass, not of the hook)
+Q-25	679cc77f6fdf	anchor: _SG_RELAXED is initialised from the environment (reads a value it must not trust)
+Q-26	701e059c0214	budget: the deadline cap min(budget, 3) written as max(budget, 3)
+Q-27	437f0d4c9562	budget: time left printed with %d.%d instead of %d.%06d (0.05 s reads as 0.5 s)
+Q-28	14db355d51fd	budget: the 'a clock that went backwards never extends the deadline' cap is dropped
+Q-29	e20fd3c3961c	fallback: the status 4 test in _sg_per_segment_eval is written -eq 3 (status 4 leaks to the caller)
+Q-30	db079390d63f	gate: the time-left test is dropped from _sg_relax_ok (_sg_relax_run tests it again, so the output should not change)
+Q-31	184010abb569	rerun: the growth limit uses _SGV_SMAX instead of _SGV_GMAX (both are 8192 today)

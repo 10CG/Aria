@@ -1,0 +1,28 @@
+51c51,60
+< OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLM=''; [[ -e /proc/sys/fs/binfmt_misc/WSLInterop ]] && WSLM=wsl
+---
+> wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+>   # written apart from it, never sourced or called (status 0 here is status 1 there): the mount table (default /proc/self/mounts) cannot be read, or a
+>   # binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc) and holds an entry named WSLInterop*. DIR is listed only when that mount is
+>   # in the table, so the check never triggers an automount. The two arguments exist to check it against the hook's function; WSLM below calls it with none
+>   local t l d="${2:-/proc/sys/fs/binfmt_misc}"
+>   t=$(cat -- "${1:-/proc/self/mounts}" 2>/dev/null) || return 0
+>   awk -v d="$d" '$2 == d && $3 == "binfmt_misc" { m = 1 } END { exit !m }' <<< "$t" || return 1
+>   l=$'\n'$(ls -A -- "$d" 2>/dev/null); [[ $l == *$'\n'WSLInterop* ]]
+> }
+> OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLM=''; wslmark && WSLM=wsl
+526c535,536
+<     # (b) with the anchor 2.5 s back and budget 3 the judgement inside the job sees at most 0.5 s left (a fresh anchor in the gate, the run or the job gives about 3 s)
+---
+>     # (b) with the anchor 2.0 s back and budget 3 the judgement inside the job sees 0 < left <= 1.0 s: a fresh anchor in the gate, the run or the job
+>     # (a bad implementation) gives about 3 s there, and a slow host only makes the value smaller (it reaches 0 only after 1.0 s from here to the judgement)
+537c547
+<              _SG_P0=$(awk -v e="${EPOCHREALTIME:-0}" 'BEGIN{sub(",",".",e); printf "%.6f", e-2.5}'); command=$t2c
+---
+>              _SG_P0=$(awk -v e="${EPOCHREALTIME:-0}" 'BEGIN{sub(",",".",e); printf "%.6f", e-2.0}'); command=$t2c
+541,542c551,552
+<         awk -v l="$t2a" 'BEGIN{exit !(l != "" && l+0 > 0 && l+0 <= 0.5)}' || t+='[value]'
+<         [[ -z "$t" ]]; chk $? V15-T2-anchor-taken-once-at-hook-start "assignments to _SG_P0 / of them on the line after set -uo pipefail [$t2s] (want [1 1]); anchor 2.5 s back, budget 3: the judgement in the job saw _SG_LEFT [$t2a] (want 0 < left <= 0.5; _sg_per_segment_eval status $r)" "${t% }"
+---
+>         awk -v l="$t2a" 'BEGIN{exit !(l != "" && l+0 > 0 && l+0 <= 1.0)}' || t+='[value]'
+>         [[ -z "$t" ]]; chk $? V15-T2-anchor-taken-once-at-hook-start "assignments to _SG_P0 / of them on the line after set -uo pipefail [$t2s] (want [1 1]); anchor 2.0 s back, budget 3: the judgement in the job saw _SG_LEFT [$t2a] (want 0 < left <= 1.0; _sg_per_segment_eval status $r)" "${t% }"

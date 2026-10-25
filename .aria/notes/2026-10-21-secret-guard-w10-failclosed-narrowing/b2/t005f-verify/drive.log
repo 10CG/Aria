@@ -1,0 +1,6 @@
+06:24:06 impl rc=0 | load 1.06 1.41 1.47
+06:24:08 M-A-exact-name-only rc=1 | load 1.06 1.41 1.47
+06:24:09 M-B-unreadable-table-opens rc=1 | load 1.13 1.42 1.47
+06:24:10 M-D-gate-inverted rc=1 | load 1.13 1.42 1.47
+06:24:11 M-E-timer-sleeps-budget rc=1 | load 1.13 1.42 1.47
+06:24:11 done | load 1.13 1.42 1.47

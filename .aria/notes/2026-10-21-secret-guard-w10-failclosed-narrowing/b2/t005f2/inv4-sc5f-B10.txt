@@ -1,0 +1,4 @@
+# sc-cases.sh | 2026-10-25T05:38:27Z | hook 5c0ff97fdcdd | base e83c5e30f2cc | sc-cases - sc-direct - mutants - shim - shapes - commentsync - | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2, kernel 6.17.9-1-pve) -> relaxation expected: yes | load 1.06 0.92 0.92 -> timing batch judged (SC_LOAD_MAX 2)
+python3: can't open file '/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t005f2/pre/shapes.py': [Errno 2] No such file or directory
+/tmp/claude-1000/-home-dev-Aria/d97ed439-6e11-46f3-83bd-93caeddb60ff/scratchpad/r217impl/t005f2/pre/sc-cases-5f.sh: line 74: /tmp/tmp.PdChhmEMHF/in/ext-read.txt: No such file or directory
+SETUP: cannot build the input ext-read-cwd

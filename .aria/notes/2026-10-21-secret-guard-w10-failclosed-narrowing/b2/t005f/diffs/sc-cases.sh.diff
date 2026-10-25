@@ -1,0 +1,24 @@
+diff --git a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
+index 90350545..22c56d43 100755
+--- a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
++++ b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/sc-cases.sh
+@@ -215,7 +215,8 @@ V2-G3-gate-calls-platform V2-G3b-gate-uses-build-facts V2-G4-project-without-ext
+ V2-G4-extension-path-is-a-directory V2-G5-nested V2-G6-no-time-left V2-G7-no-anchor V2-G8-budget-0 V2-G11-flag-not-from-environment
+ V2-G12-segment-trigger-asks-gate V2-G13-whole-trigger-asks-gate V2-G14-cwd-extension-file-with-entry V2-G15-cwd-project-without-extension-file
+ V2-G16-environment-root-before-cwd V2-G17-wsl-distro-name-closes-gate V2-G18-wsl-interop-closes-gate
+-V11-S5-longline-head-verbatim V11-S6-longline-chinese-line-verbatim V11-S7-longline-text-verbatim"
++V11-S5-longline-head-verbatim V11-S6-longline-chinese-line-verbatim V11-S7-longline-text-verbatim
++V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table"
+ EXP_DIRECT_RELAX="V3-G9-clock-backwards V3-G10-cap-3 V3-G12-time-left-zero-padded
+ V4-S1-allow V4-S2-block-with-text V4-S3-block-without-text V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V4-S7-time-checkpoint V4-S8-internal-error
+ V5-S9-child-left-behind V5-S13-detached-child V5-S13b-nothing-outlives-the-run V4-S11-bare-zero V5-S10-timer-fork-fails V5-S10b-no-judgement-without-timer
+@@ -228,7 +229,8 @@ V9-C1-assignments-rerun V9-C1b-assignments-baseline V9-C2-references-rerun-c12 V
+ V9-C2b-references-baseline-cb12 V9-C3-for-statements-rerun V9-C3b-for-statements-baseline V9-C4-value-limit-in-rerun
+ V10-N1-environ-rows-only V10-N2-read-rows-only V10-N3-environ-big-judge V10-N4-read-big-judge V7-N5-read-big-judge-short-lines
+ V10-N6-filtered-long-line-rows-only V7-N7-big-judge-filtered-long-line V7-N10-blank-padded-long-line V7-N11-lmax-edge-normal V7-N12-lmax-edge-rows-only
+-V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block"
++V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block
++V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"
+ EXP_E2E="V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-ignored
+ V2-E7-no-time-left V2-E8-ostype-from-environment-ignored V2-E9-extension-project V9-E10-count-axis-read-blocked V9-E11-tmax-in-rerun V9-E12-vmax-unchanged
+ V7-E13-multiline-copy-normal-text V7-E14-long-line-from-expansion V7-E15-credit-as-normal V1-E16-p1-small-benign V1-E16-p1-small-read V1-E16-p1-small-read-filter

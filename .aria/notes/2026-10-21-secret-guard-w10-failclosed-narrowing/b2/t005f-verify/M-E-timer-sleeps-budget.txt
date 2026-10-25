@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-25T06:24:10Z | hook 1750578accaa | suite 8b12c77a8adf | helper 76079b33ae40 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.13 1.42 1.47
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 9 / 10
+FAIL: 1 / 10
+SKIP: 0 / 10 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.13 1.42 1.47 end 1.13 1.42 1.47 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-T1-timer-sleeps-time-left]: the timer's sleep argument [3] (want [1.234567], the _SG_LEFT that _sg_relax_left set; 1 sleep call(s) recorded, _sg_relax_run status 0) [value]
+
+# run-suite.sh end | load 1.13 1.42 1.47 | suite exit 1

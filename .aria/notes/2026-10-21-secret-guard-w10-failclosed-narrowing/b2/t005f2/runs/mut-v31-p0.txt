@@ -1,0 +1,4 @@
+# run-mutants.sh | 2026-10-25T06:19:59Z | hook 834dee6db0d0 | mutants.py 2060d2e0c17f | sc-cases 45b1ef20ff2a | SC_BASH bash on PATH | scope designated | load 1.14 1.40 1.45
+# 0 caught, 0 missed, 0 wrong reason, 0 not judged, 0 setup (of 0)
+P-0               GREEN        the constants perturbed: _SGV_GMAX=8190, _SGV_LMAX=8200 (every case must stay green: the cases read the constants from the hook) | # totals: PASS 122  FAIL 0  MISSING 0  SETUP 0  SKIP 29 (load 0, void 29, inconclusive 0, root 0) | load start 1.14 1.40 1.45 end 2.23 1.73 1.57 | timing batch: void (SKIP [void]): run again
+# perturbation round: 0 not as expected | load at the end 2.23 1.73 1.57

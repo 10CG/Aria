@@ -1,0 +1,4 @@
+site 10 relaxed rerun block (supplement 4)
+ old p When the relaxation is in effect (_sg_relax_ok), a copy over _SGV_SMAX is not blocked for its size alone: _sg_vx_pass returns 4 instead and keeps the baseline block text in _SG_OV_PAT / _SG_OV_MODE, and _sg_per_segment_eval re-runs the W10 pass with the relaxed rules (_SG_RELAXED: the copy limit is the growth over the input, _SGV_GMAX;
+ new When the relaxation is in effect (_sg_relax_ok), a copy over _SGV_SMAX is not blocked for its size alone: _sg_vx_pass returns 4 instead and keeps the baseline reason and mode in _SG_OV_PAT / _SG_OV_MODE;
+ new The one exception (What 4): a fatal error of bash itself inside the job that makes it exit with status 2 and write its error message is passed on as the block text -- the command is still blocked, but with bash's message instead of the baseline text.

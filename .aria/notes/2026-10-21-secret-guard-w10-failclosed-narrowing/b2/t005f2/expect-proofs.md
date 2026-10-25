@@ -1,0 +1,3 @@
+# t005f2 proofs: expectations written before the runs (2026-10-25)
+- item 3 (V15-T2, anchor now-2.0 s, 0 < left <= 1.0): real hook PASS in the helper and in sc-direct.sh (left about 1.0 minus the time from setting the anchor to the judgement, so inside (0, 1.0]); B5 / B7 / B8 (made by 5f's mkbad.py from the new hook) FAIL in both, [value] (left near 3 s: a fresh anchor), B5 also [static].
+- item 4 (INV-4 list): new sc-cases.sh and new suite, SC_ONLY / SG_W10_ONLY '^V11-S1': real hook 8 x PASS (nowslfs included); B10 (nowslfs moved below the sourcing gate) V11-S1-above-gate:_sg_relax_nowslfs FAIL [value], the other 7 PASS; the 5f versions of both files on B10: 7 x PASS and no nowslfs id at all (the old list did not see the move).

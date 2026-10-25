@@ -1,0 +1,16 @@
+load0 1.08 0.91 0.92
+T2 secret-guard           secret-guard-w10-direct.sh PASS saw _SG_LEFT [0.985854] 
+T2 secret-guard           sc-direct.sh               PASS saw _SG_LEFT [0.989806] 
+T2 B5-anchor-in-job       secret-guard-w10-direct.sh FAIL saw _SG_LEFT [2.999859] [static] [value]
+T2 B5-anchor-in-job       sc-direct.sh               FAIL saw _SG_LEFT [2.999906] [static] [value]
+T2 B7-anchor-in-run       secret-guard-w10-direct.sh FAIL saw _SG_LEFT [2.999920] [static] [value]
+T2 B7-anchor-in-run       sc-direct.sh               FAIL saw _SG_LEFT [2.999946] [static] [value]
+T2 B8-anchor-in-gate      secret-guard-w10-direct.sh FAIL saw _SG_LEFT [2.995964] [static] [value]
+T2 B8-anchor-in-gate      sc-direct.sh               FAIL saw _SG_LEFT [2.996056] [static] [value]
+sc-cases new  real: PASS:_sg_vx_big_judge PASS:_sg_relax_left PASS:_sg_relax_ok PASS:_sg_relax_platform PASS:_sg_relax_nowslfs PASS:_sg_relax_noext PASS:_sg_relax_job PASS:_sg_relax_run 
+sc-cases new  B10 : PASS:_sg_vx_big_judge PASS:_sg_relax_left PASS:_sg_relax_ok PASS:_sg_relax_platform FAIL:_sg_relax_nowslfs PASS:_sg_relax_noext PASS:_sg_relax_job PASS:_sg_relax_run 
+sc-cases 5f   B10 : 
+suite    new  real: 
+suite    new  B10 : FAIL:[W10-port 
+suite    5f   B10 : 
+load1 1.15 0.93 0.93

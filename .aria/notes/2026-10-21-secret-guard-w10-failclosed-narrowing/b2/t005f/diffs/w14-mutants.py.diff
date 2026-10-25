@@ -1,0 +1,13 @@
+diff --git a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
+index 7d348a6b..c647324c 100644
+--- a/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
++++ b/.aria/notes/2026-10-21-secret-guard-w10-failclosed-narrowing/v31/impl/w14-mutants.py
+@@ -11,7 +11,7 @@ import hashlib
+ import os
+ import sys
+ 
+-IMPL_SHA12 = "af4658b6f935"
++IMPL_SHA12 = "50ce186a28c9"
+ 
+ # (id, short title, [(original, replacement), ...])
+ MUTANTS = [

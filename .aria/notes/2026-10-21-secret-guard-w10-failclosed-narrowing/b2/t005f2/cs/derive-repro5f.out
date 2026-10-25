@@ -1,0 +1,2 @@
+hook sites [('1 header: shell variable indirection', 2, 2), ('2 W10 head + LENGTH BUDGET', 1, 1), ('5 _sg_vx_pass', 1, 1), ('10 relaxed rerun block (supplement 4)', 0, 1)] suite sites [('9 test W10 block head (3b)', 2, 2)]
+suite: a changed comment run outside every site: 'Regression test suite for secret-guard.sh PreToolUse hook. Run: bash aria/hooks/tests/secr'

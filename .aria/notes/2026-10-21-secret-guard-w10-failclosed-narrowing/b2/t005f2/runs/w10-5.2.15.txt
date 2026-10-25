@@ -1,0 +1,7 @@
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=.): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 150 / 150
+FAIL: 0 / 150
+SKIP: 0 / 150 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.14 1.07 0.99 end 1.20 1.09 1.00 | timing batch: judged

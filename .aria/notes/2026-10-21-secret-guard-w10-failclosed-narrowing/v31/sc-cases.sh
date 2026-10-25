@@ -6,8 +6,10 @@
 #   BASE  the baseline hook; default: aria 59e333c:hooks/secret-guard.sh. Its sha256 prefix must be e83c5e30f2cc.
 #   SC_BASH  the bash that runs the hook (default: bash on PATH). The relaxation is expected exactly where the gate of What 1 and its supplement opens: an
 #            x86_64 GNU/Linux build (BASH_VERSINFO[5] x86_64-*-linux-gnu*) of bash 5.0-5.3, a readable kernel string with no Microsoft, microsoft or WSL in
-#            it, no /proc/sys/fs/binfmt_misc/WSLInterop. Every run of the hook clears WSL_DISTRO_NAME and WSL_INTEROP (only the WSL case sets one), and so
-#            does sc-direct.sh. On any other bash every e2e outcome must equal the baseline's and the gate must stay closed.
+#            it, and no WSL mark in the file system (wslmark below, the rule of What 1 supplement 2 written apart from the hook's _sg_relax_nowslfs: a
+#            mount table that cannot be read, or a WSLInterop* entry under a binfmt_misc mounted at /proc/sys/fs/binfmt_misc). Every run of the hook clears
+#            WSL_DISTRO_NAME and WSL_INTEROP (only the WSL case sets one), and so does sc-direct.sh. On any other bash every e2e outcome must equal the
+#            baseline's and the gate must stay closed.
 #   SC_ONLY  a regex: run and report only the cases whose id matches.   SC_DIRECT=0  skip the direct cases.   SC_NICE=0  no taskset / nice.
 #   SC_LOAD_MAX  the one-minute load below which the timing batch is judged (default 2, INV-7); the header records the value used.
 # Timing (INV-7; post_planning R2 PP2-A, B, C). Lower bounds and byte comparisons are always judged. Upper bounds and "the rerun / the job must finish
@@ -44,7 +46,16 @@ fi
 BASE=$(readlink -f "$BASE")
 [[ "$(sha256sum < "$BASE" | cut -c1-12)" == e83c5e30f2cc ]] || setup "BASE is not the baseline hook (sha256 prefix e83c5e30f2cc)"
 read -r MACH MAJ MIN < <("$SC_BASH" -c 'echo "${BASH_VERSINFO[5]} ${BASH_VERSINFO[0]} ${BASH_VERSINFO[1]}"')
-OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; [[ -e /proc/sys/fs/binfmt_misc/WSLInterop ]] && WSLF=yes
+wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+  # written apart from it, never sourced or called (status 0 here is status 1 there): the mount table (default /proc/self/mounts) cannot be read, or a
+  # binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc) and holds an entry named WSLInterop*. DIR is listed only when that mount is
+  # in the table, so the check never triggers an automount. The two arguments exist to check it against the hook's function; WSLF below calls it with none
+  local t l d="${2:-/proc/sys/fs/binfmt_misc}"
+  t=$(cat -- "${1:-/proc/self/mounts}" 2>/dev/null) || return 0
+  awk -v d="$d" '$2 == d && $3 == "binfmt_misc" { m = 1 } END { exit !m }' <<< "$t" || return 1
+  l=$'\n'$(ls -A -- "$d" 2>/dev/null); [[ $l == *$'\n'WSLInterop* ]]
+}
+OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; wslmark && WSLF=yes
 RELAX=no   # the same rule as the gate (What 1 supplement); the WSL variables are cleared for every run of the hook, so only the kernel facts count here
 [[ "$MACH" == x86_64-*-linux-gnu* && -n "$OSR" && "$OSR" != *[Mm]icrosoft* && "$OSR" != *WSL* && $WSLF == no ]] && (( MAJ == 5 && MIN <= 3 )) && RELAX=yes
 sh12() { if [[ -r "$1" ]]; then sha256sum < "$1" | cut -c1-12; else echo -; fi; }
@@ -181,7 +192,7 @@ HWRAP=()
 
 # ---------------- static checks of the hook text ----------------
 g=$(grep -n '^if \[\[ "${BASH_SOURCE\[0\]}" != "$0" \]\]; then' "$HOOK" | head -1 | cut -d: -f1)
-for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_noext _sg_relax_job _sg_relax_run; do
+for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_nowslfs _sg_relax_noext _sg_relax_job _sg_relax_run; do
   id="V11-S1-above-gate:$f"; sel "$id" || continue
   l=$(grep -n "^$f() {" "$HOOK" | head -1 | cut -d: -f1)
   if [[ -z "$l" ]]; then res MISSING "$id" "[missing] $f is not defined in the hook (sourcing gate at line ${g:-missing})"
@@ -215,7 +226,8 @@ V2-G3-gate-calls-platform V2-G3b-gate-uses-build-facts V2-G4-project-without-ext
 V2-G4-extension-path-is-a-directory V2-G5-nested V2-G6-no-time-left V2-G7-no-anchor V2-G8-budget-0 V2-G11-flag-not-from-environment
 V2-G12-segment-trigger-asks-gate V2-G13-whole-trigger-asks-gate V2-G14-cwd-extension-file-with-entry V2-G15-cwd-project-without-extension-file
 V2-G16-environment-root-before-cwd V2-G17-wsl-distro-name-closes-gate V2-G18-wsl-interop-closes-gate
-V11-S5-longline-head-verbatim V11-S6-longline-chinese-line-verbatim V11-S7-longline-text-verbatim"
+V11-S5-longline-head-verbatim V11-S6-longline-chinese-line-verbatim V11-S7-longline-text-verbatim
+V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table"
 EXP_DIRECT_RELAX="V3-G9-clock-backwards V3-G10-cap-3 V3-G12-time-left-zero-padded
 V4-S1-allow V4-S2-block-with-text V4-S3-block-without-text V3-S4-slow-judgement V5-S5-pipe-holder V4-S6-spoofed-tail-0 V4-S7-time-checkpoint V4-S8-internal-error
 V5-S9-child-left-behind V5-S13-detached-child V5-S13b-nothing-outlives-the-run V4-S11-bare-zero V5-S10-timer-fork-fails V5-S10b-no-judgement-without-timer
@@ -228,13 +240,14 @@ V9-C1-assignments-rerun V9-C1b-assignments-baseline V9-C2-references-rerun-c12 V
 V9-C2b-references-baseline-cb12 V9-C3-for-statements-rerun V9-C3b-for-statements-baseline V9-C4-value-limit-in-rerun
 V10-N1-environ-rows-only V10-N2-read-rows-only V10-N3-environ-big-judge V10-N4-read-big-judge V7-N5-read-big-judge-short-lines
 V10-N6-filtered-long-line-rows-only V7-N7-big-judge-filtered-long-line V7-N10-blank-padded-long-line V7-N11-lmax-edge-normal V7-N12-lmax-edge-rows-only
-V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block"
+V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block
+V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"
 EXP_E2E="V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-ignored
 V2-E7-no-time-left V2-E8-ostype-from-environment-ignored V2-E9-extension-project V9-E10-count-axis-read-blocked V9-E11-tmax-in-rerun V9-E12-vmax-unchanged
 V7-E13-multiline-copy-normal-text V7-E14-long-line-from-expansion V7-E15-credit-as-normal V1-E16-p1-small-benign V1-E16-p1-small-read V1-E16-p1-small-read-filter
 V1-E16-p1-var-read V1-E16-p1-var-mid V1-E16-p1-var-mid-read V2-E17-wsl-mark-keeps-baseline V2-E18-extension-via-stdin-cwd V5-E19-deadline-with-term-ignored"
 EXP_STATIC="V11-S1-above-gate:_sg_vx_big_judge V11-S1-above-gate:_sg_relax_left V11-S1-above-gate:_sg_relax_ok V11-S1-above-gate:_sg_relax_platform
-V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-verbatim V11-S4-one-rule-loop
+V11-S1-above-gate:_sg_relax_nowslfs V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-verbatim V11-S4-one-rule-loop
 V12-C1-hook-comments"
 want=" "; got=" "; dup=''
 add_want() { local i; for i in $1; do sel "$i" && want+="$i "; done; }

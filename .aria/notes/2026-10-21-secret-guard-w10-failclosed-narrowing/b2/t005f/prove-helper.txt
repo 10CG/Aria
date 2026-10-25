@@ -1,0 +1,11 @@
+real-5.2-relax         PASS=8 |
+real-3.2-norelax       SKIP=4 PASS=4 | SKIP:V15-T1-t[platform] SKIP:V15-T2-a[platform] SKIP:V15-T3-j[platform] SKIP:V15-W1e-[platform]
+B1-wsl-old-line        PASS=7 FAIL=1 | FAIL:V15-W1e-[status]
+B2-and-m1              PASS=5 FAIL=3 | FAIL:V15-W1a-[status] FAIL:V15-W1c-[status] FAIL:V15-T2-a[value]
+B3-redirect-order      PASS=7 FAIL=1 | FAIL:V15-W1d-[stderr]
+B4-timer-sleeps-3      PASS=7 FAIL=1 | FAIL:V15-T1-t[value]
+B5-anchor-in-job       PASS=7 FAIL=1 | FAIL:V15-T2-a[static][value]
+B6-no-exec-2           PASS=7 FAIL=1 | FAIL:V15-T3-j[stderr]
+B7-anchor-in-run       PASS=7 FAIL=1 | FAIL:V15-T2-a[static][value]
+B8-anchor-in-gate      PASS=7 FAIL=1 | FAIL:V15-T2-a[static][value]
+B9-looks-unmounted     PASS=7 FAIL=1 | FAIL:V15-W1a-[status]

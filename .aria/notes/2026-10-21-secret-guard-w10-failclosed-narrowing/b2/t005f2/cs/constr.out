@@ -1,0 +1,2 @@
+hook anchors 12 insert: anchors left 0 | delete: lines removed 217
+suite anchors 10 insert: anchors left 0 | delete: lines removed 32

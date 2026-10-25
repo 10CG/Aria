@@ -1,0 +1,29 @@
+9,10c9,12
+< #            it, no /proc/sys/fs/binfmt_misc/WSLInterop. Every run of the hook clears WSL_DISTRO_NAME and WSL_INTEROP (only the WSL case sets one), and so
+< #            does sc-direct.sh. On any other bash every e2e outcome must equal the baseline's and the gate must stay closed.
+---
+> #            it, and no WSL mark in the file system (wslmark below, the rule of What 1 supplement 2 written apart from the hook's _sg_relax_nowslfs: a
+> #            mount table that cannot be read, or a WSLInterop* entry under a binfmt_misc mounted at /proc/sys/fs/binfmt_misc). Every run of the hook clears
+> #            WSL_DISTRO_NAME and WSL_INTEROP (only the WSL case sets one), and so does sc-direct.sh. On any other bash every e2e outcome must equal the
+> #            baseline's and the gate must stay closed.
+47c49,58
+< OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; [[ -e /proc/sys/fs/binfmt_misc/WSLInterop ]] && WSLF=yes
+---
+> wslmark() {   # [MOUNTS [DIR]] : status 0 where the gate must see a WSL mark in the file system -- the rule of the hook's _sg_relax_nowslfs (What 1 supplement 2),
+>   # written apart from it, never sourced or called (status 0 here is status 1 there): the mount table (default /proc/self/mounts) cannot be read, or a
+>   # binfmt_misc file system is mounted at DIR (default /proc/sys/fs/binfmt_misc) and holds an entry named WSLInterop*. DIR is listed only when that mount is
+>   # in the table, so the check never triggers an automount. The two arguments exist to check it against the hook's function; WSLF below calls it with none
+>   local t l d="${2:-/proc/sys/fs/binfmt_misc}"
+>   t=$(cat -- "${1:-/proc/self/mounts}" 2>/dev/null) || return 0
+>   awk -v d="$d" '$2 == d && $3 == "binfmt_misc" { m = 1 } END { exit !m }' <<< "$t" || return 1
+>   l=$'\n'$(ls -A -- "$d" 2>/dev/null); [[ $l == *$'\n'WSLInterop* ]]
+> }
+> OSR=$(cat /proc/sys/kernel/osrelease 2>/dev/null); WSLF=no; wslmark && WSLF=yes
+184c195
+< for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_noext _sg_relax_job _sg_relax_run; do
+---
+> for f in _sg_vx_big_judge _sg_relax_left _sg_relax_ok _sg_relax_platform _sg_relax_nowslfs _sg_relax_noext _sg_relax_job _sg_relax_run; do
+239c250
+< V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-verbatim V11-S4-one-rule-loop
+---
+> V11-S1-above-gate:_sg_relax_nowslfs V11-S1-above-gate:_sg_relax_noext V11-S1-above-gate:_sg_relax_job V11-S1-above-gate:_sg_relax_run V11-S3-longline-instructions-verbatim V11-S4-one-rule-loop

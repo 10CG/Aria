@@ -1,0 +1,45 @@
+diff --git a/hooks/tests/secret-guard.test.sh b/hooks/tests/secret-guard.test.sh
+index 6df7510..c4dc201 100755
+--- a/hooks/tests/secret-guard.test.sh
++++ b/hooks/tests/secret-guard.test.sh
+@@ -13,12 +13,12 @@
+ # Outputs PASS/FAIL per case + summary at end.
+ # Exit code: 0 if all pass, 1 if any fail.
+ #
+-# Coverage: 972 cases (966 without zsh), counted in a git checkout of aria, across Bash (block/allow), Read/Edit (block/allow),
++# Coverage: 980 cases (974 without zsh), counted in a git checkout of aria, across Bash (block/allow), Read/Edit (block/allow),
+ # guard:ack escapes, jq fail-closed paths, Round 1 audit bypass attempts, and
+ # the Nomad var WRITE direction (#170). Keep this number in sync — a stale
+ # count here has already misled one spec into planning against "~50".
+ #
+-# 141 of those cases are the W10 fail-closed narrowing (10CG/aria-plugin#217) acceptance cases ported from
++# 149 of those cases are the W10 fail-closed narrowing (10CG/aria-plugin#217) acceptance cases ported from
+ # v31 (sg_w10_cases, defined after the helpers and run once, before every older case; ids V<k>-... and the harness checks V0-H1 / V0-H2): the direct calls in
+ # lib/secret-guard-w10-direct.sh, the end-to-end and static ones in this file. They run the hook with SC_BASH
+ # (default: bash on PATH); every older case runs it as before. lib/sg-shim/delay-first, linked as jq and sed
+@@ -185,7 +185,8 @@ V9-C2b-references-baseline-cb12 V9-C3-for-statements-rerun V9-C3b-for-statements
+ V10-N1-environ-rows-only V10-N2-read-rows-only V10-N3-environ-big-judge V10-N4-read-big-judge V7-N5-read-big-judge-short-lines
+ V10-N6-filtered-long-line-rows-only V7-N7-big-judge-filtered-long-line V7-N10-blank-padded-long-line V7-N11-lmax-edge-normal V7-N12-lmax-edge-rows-only
+ V7-N8-whole-branch-returns-big-judge V7-N9-segment-routes-to-big-judge V7-N13-unmeasured-length-rows-only
+-V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block"
++V14-N1-nocredit-never-runs-credit V14-N2-longline-pattern-is-a-rule V14-G1-triggers-return-4-with-the-baseline-reason V14-G2-growth-limit-follows-gmax V14-F1-status-4-falls-back-to-the-baseline-block
++V15-W1a-autofs-mount-point-not-looked-at V15-W1b-binfmt-misc-with-wslinterop-late V15-W1c-binfmt-misc-without-entry V15-W1d-unreadable-mount-table V15-T1-timer-sleeps-time-left V15-T2-anchor-taken-once-at-hook-start V15-T3-job-errors-silenced V15-W1e-gate-closed-by-wsl-file-system"
+ SGW_EXP_E2E="V7-E1-benign-big-allowed V6-E2-deadline-fallback-bytes V3-E3-anchor-at-hook-start V3-E4-cap-3-at-budget-4 V3-E5-budget-2 V2-E6-flag-from-environment-ignored
+ V2-E7-no-time-left V2-E8-ostype-from-environment-ignored V2-E9-extension-project V9-E10-count-axis-read-blocked V9-E11-tmax-in-rerun V9-E12-vmax-unchanged
+ V7-E13-multiline-copy-normal-text V7-E14-long-line-from-expansion V7-E15-credit-as-normal V1-E16-p1-small-benign V1-E16-p1-small-read V1-E16-p1-small-read-filter
+@@ -2876,10 +2877,11 @@ wpa_use_none
+ # Without them the judged copy is the segment plus references x value length, one level of chaining multiplies a value by 8 per level, and the pass overran the 5 s hook
+ # timeout on a 5 KB command (a timeout lets the command through). Owner ruling 2026-10-14, narrowed by 10CG/aria-plugin#217 (owner rulings A and E, 2026-10-23): a value
+ # over the value limit, or copies over the pass-wide limit, block the command on every platform -- exit 2 with the "command too large to scan for secrets ... split it"
+-# text, not the finding text -- and are never passed (P9); a copy over the copy limit is blocked that way only where the relaxation is not in effect (What 1 and its
+-# supplement: another platform or bash version, WSL, a project extension, or no time left; P2). Where it is in effect the pass is re-run under a hard deadline with the
+-# relaxed rules (What 1): a copy that grows by more than _SGV_GMAX over its input is blocked with the growth text (P8, What 5), a copy over _SGV_SMAX whose longest line is
+-# longer than _SGV_LMAX is matched against the rows only and a match blocks with the longline text (P7, What 5), and any other copy is judged as usual, so it may pass
++# text, not the finding text -- and are never passed (P9); a copy over the copy limit is blocked that way wherever the relaxation is not in effect (What 1 and its
++# supplement: another platform or bash version, WSL, a project extension, or no time left; P2), and also where it is whenever the rerun falls back (the deadline, a time
++# checkpoint, the self-check, any other failure: What 4). Where it is in effect the pass is re-run under a hard deadline with the relaxed rules (What 1): a copy that grows
++# by more than _SGV_GMAX over its input is blocked with the growth text (P8, What 5), a copy over _SGV_SMAX whose longest line is longer than _SGV_LMAX is matched against
++# the rows only and a match blocks with the longline text (P7, What 5), and any other copy is judged as usual, so it may pass
+ # (R-a). The COUNT bounds of the baseline pass, 21y, still pass (P9). After the flip both sides of a limit exit 2 wherever a row matches (in the relaxed branch the outside
+ # of the copy limit passes when none does, 21ab), so the exit code alone does not tell "judged" from "refused": the text does. wpa_x_finding = the call was judged and
+ # blocked as a finding (the shared BLOCKED text, not the size text); wpa_x_toolarge = it was refused as too large (the size text, not the finding text). Every limit is

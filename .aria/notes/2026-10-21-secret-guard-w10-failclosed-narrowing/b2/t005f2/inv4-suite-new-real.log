@@ -1,0 +1,12 @@
+# secret-guard.test.sh W10 ported cases | 2026-10-25T05:38:28Z | hook 834dee6db0d0 | direct 76079b33ae40 | shim 5c5c04525a67 | filter ^V11-S1 | SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes
+PASS V0-H1-direct-complete lib/secret-guard-w10-direct.sh (relax) ran to its sentinel and exited 0
+PASS V11-S1-above-gate:_sg_vx_big_judge line 807 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_left line 813 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_ok line 825 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_platform line 835 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_nowslfs line 838 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_noext line 845 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_job line 850 < sourcing gate 1071
+PASS V11-S1-above-gate:_sg_relax_run line 863 < sourcing gate 1071
+PASS V0-H2-case-list all 8 expected case ids reported once (mode relax; one list on every platform)
+# load start 1.06 0.92 0.92 end 1.06 0.92 0.92 | timing batch: judged

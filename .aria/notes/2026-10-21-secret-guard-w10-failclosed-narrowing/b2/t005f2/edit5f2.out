@@ -1,0 +1,5 @@
+hook: 1 line changed (796), width 151 -> 152, block max 155; sha12 834dee6db0d0
+secret-guard-w10-direct.sh: -5 +15 lines
+sc-direct.sh: -5 +15 lines
+INV-2 helper vs sc-direct.sh changed lines identical: True
+widest new comment line per file: {'secret-guard-w10-direct.sh': 156, 'sc-direct.sh': 156, 'secret-guard.test.sh': 158, 'sc-cases.sh': 156}

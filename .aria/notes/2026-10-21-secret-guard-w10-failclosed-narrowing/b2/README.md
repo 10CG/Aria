@@ -63,3 +63,8 @@
 - `t004b-verify/`：主控对第二段的复核（2026-10-25 00:02–00:10 UTC）：从原始输出重算（`recompute.py`、`recompute.txt`），没有另跑新实验；执笔席报的数逐项相符。
 - `BRIEF-T005.md`：TASK-005（独立代码审查，审 aria `2893bcc`）的任务书；报告进主仓 `.aria/audit-reports/`。
 - `BRIEF-T005f.md`：TASK-005 修复轮（What 1 补充 2 的 WSL 标记读法加固、复审指出的注释与用例、坏实现锚点与 commentsync 同步）的任务书；独立代码审查报告在主仓 `.aria/audit-reports/post_implementation-R1-1792888152945-…-code-reviewer.md`。
+- `T005f-report.md`、`T005f2-report.md`：TASK-005 修复轮两段的执笔席报告（2026-10-25；第一段的报告由主控从执笔席的消息存入，执笔席写文件被运行环境拒绝），任务书是 `BRIEF-T005f.md`、`BRIEF-T005f2.md`。结果是 aria 提交 `710a36d`（hook `834dee6db0d0`）与 `../v31/` 的 `sc-direct.sh`、`sc-cases.sh`、`commentsync.py`、`impl/w14-mutants.py`。
+- `t005f/`、`t005f2/`：两段的过程材料：改动脚本、各文件的 diff、预期、坏实现生成脚本（坏实现本身不收）、「能红」的证明、各轮输出 `runs/*.txt` 与 `steps.log`、commentsync 的导出脚本与各模式输出 `cs/`。
+  - 没收：坏实现、生成的坏实现、改前副本 `pre/`、INV-4 构造的拷贝树、坏实现的工作目录；`cs/` 下 hook 与套件的整份副本（59e333c、2893bcc、原型与两种构造；由 git 与 `cs/constr.py` 复现，且其中的规则与夹具文本带大量凭据形状）。
+- `t005f-verify/`：主控对修复轮的复核（2026-10-25）。`PREDICT.md` 是 5f2 交回前写下的预期；`mkmut.py` 构造主控自己的四个坏实现，`*.txt` 是它们与实现在 `^V15-` 上的结果（全按预测）；`backfill.py` / `backfill.md` 由 git diff 机械导出回填 proposal What 7 补充 2 的逐字文本。
+- `BRIEF-T004r.md`、`BRIEF-T005r.md`：hook 改后 TASK-004 的重跑（W8-W14）与 TASK-005 的增量复审的任务书。

@@ -1,0 +1,13 @@
+# run-suite.sh | 2026-10-25T06:24:08Z | hook 3b33479629c0 | suite 8b12c77a8adf | helper 76079b33ae40 | SC_BASH bash on PATH | SG_W10_ONLY ^V15- | load 1.06 1.41 1.47
+
+──────────────────────────────────────────────────
+secret-guard.sh regression test -- FILTERED ROUND (SG_W10_ONLY=^V15-): only the ported W10 cases whose id matches ran; no other case, no SC-13
+PASS: 9 / 10
+FAIL: 1 / 10
+SKIP: 0 / 10 (platform 0, load 0, void 0, inconclusive 0, root 0, other 0)
+W10 ported cases: SC_BASH /usr/bin/bash (x86_64-pc-linux-gnu 5.2) -> relaxation expected: yes | load start 1.06 1.41 1.47 end 1.13 1.42 1.47 | timing batch: judged
+
+Failures:
+  FAIL [W10-port V15-W1d-unreadable-mount-table]: a mount table that cannot be read: status 0 (want 1), stderr 0 bytes (want 0) [status]
+
+# run-suite.sh end | load 1.13 1.42 1.47 | suite exit 1
