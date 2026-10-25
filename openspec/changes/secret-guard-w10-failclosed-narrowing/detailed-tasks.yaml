@@ -202,7 +202,7 @@ tasks:
   - id: TASK-005
     parent: "B.2"
     title: "独立代码审查 (审最终代码, 审后改动必复审)"
-    status: pending
+    status: in_progress
     agent: code-reviewer
     reason: "本项目 post_implementation / pre_merge 闸门为 off, 自愿补上 (owner 2026-10-22 选项【1】)"
     depends_on: [TASK-003]
@@ -212,6 +212,8 @@ tasks:
       - "审读重点含用例覆盖不到的: _sg_relax_ok 里 /proc/sys/fs/binfmt_misc/WSLInterop 那一项 (无 root 造不出该文件)、sc-direct.sh 的 root 探测分支 (本机 uid 1000); 以及 What 7 改写后的 hook 与套件注释是否准确 (commentsync 只核有没有, 不核对不对)"
       - "(2026-10-24 TASK-003 第一段复核后补) 另审: V2-G12 / G13 的名字与注释只该说它验的那一极 (关门时绝不返回 4), 开门一极在 V14-G1; 只被计时类端到端用例抓住的三处 (计时器睡的是剩余时间 _SG_LEFT、锚点 _SG_P0 只在 hook 起点取一次、作业里 exec 2>/dev/null) 要不要补与负载无关的直调用例 (见 TASK-003 notes 第一段主控裁定 (1))"
     acceptance: ["无未处置的 Critical / Major", "报告记录的 SHA 等于待发版的 SHA (否则复审增量)"]
+    notes:
+      - "开始 (2026-10-25, 主控): 审查对象 aria 2893bcc (hook af4658b6f935), 改动面 8614066..2893bcc 的 hooks/; 单席 aria:code-reviewer, 两阶段 (规格符合 / 代码质量与安全), 任务书 b2/BRIEF-T005.md; 报告进 .aria/audit-reports/ 并记 reviewed_sha"
 
   - id: TASK-006
     parent: "C"

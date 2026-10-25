@@ -61,3 +61,4 @@
 - `t004b/`：第二段的过程材料（不含任何真实流量的命令文本）：预期 `PREDICT.md`、驱动 `drive.sh` / `drive.log`、`run-evidence.sh` 的 diff 与改动核对 `patch-and-check.*`、各项对照 `ana-*.out` 与 `ana/`、合成输入的检查 `chk/`、分析脚本 `analyze.sh`。
   - 没收：各阶段的工作目录（hook 副本、坏实现、套件拷贝）。
 - `t004b-verify/`：主控对第二段的复核（2026-10-25 00:02–00:10 UTC）：从原始输出重算（`recompute.py`、`recompute.txt`），没有另跑新实验；执笔席报的数逐项相符。
+- `BRIEF-T005.md`：TASK-005（独立代码审查，审 aria `2893bcc`）的任务书；报告进主仓 `.aria/audit-reports/`。
