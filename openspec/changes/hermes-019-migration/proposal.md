@@ -14,6 +14,8 @@ evidence_base:
 
 # hermes 0.7.0 → 0.19.0 真迁移
 
+> **Linked Issue**: `10CG/Aria#262`
+
 ## Why
 
 - **供应链复活**: 0.7.0 已被 PyPI 索引淘汰, 129MB 死 venv vendor; 0.19.0 活源
