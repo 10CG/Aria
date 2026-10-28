@@ -169,7 +169,7 @@ tasks:
   - id: TASK-004
     parent: "B.2"
     title: "验收: 用 run-evidence.sh 在真实实现上重跑 W8-W13"
-    status: in_progress
+    status: done
     agent: main-loop
     depends_on: [TASK-002, TASK-003]
     deliverables: ["v31/impl/ 下的 W8 / W9 / W11 / W12 / W13 (IMPL=实现生成; 首行记两个 hook 与用例脚本的 sha256); v31/ 下的原型证据不动"]
@@ -207,6 +207,7 @@ tasks:
       - "4r 第三次主控复核与裁定 (2026-10-25, b2/t004r-verify/VERIFY.md; 技术口径, 不放宽 INV-7): W11、W12-ident、W14 独立坏实现去掉墙钟与负载后与上一版逐行相同; 基线红集上一版的每个状态加编号都在, 多出的 19 个在基线上全是 MISSING。(1) 新增编号数: 修复轮之前的 sc-cases.sh (7d29c3cd0f5b, 与上一版证据页眉同) 到现在多出 19 个 (V11-S1 准入门之上静态项、V15-T1 至 T3、V15-W1a 至 W1o), 是三段修复轮合计; 任务书写的 10 条是主控的错。(2) 主控补发规则第 2 条对坏实现写得过严, 修正为: PASS / GREEN 类结论 (套件整轮、sc-cases、P-0) 须计时批已判; 坏实现的 CAUGHT 只看指定用例按指定原因变红, 同一次运行里其他用例的计时批被跳过不会造出 CAUGHT, 不因此作废; NOT-JUDGED 逐个重跑到判定 (BI-14、BI-15 的单独重跑即按此)。据此套件模式取第二次重跑那一轮 (开始 1.12、结束 1.63; 57 个抓住、0 未判, P-0 GREEN, 6 个扰动全抓住) 入 v31/impl/W13-suite-mutants.txt。这条修正是看到结果之后做的, 写进 handoff 请 owner 复议。(3) 补发规则不适用于 W9: W9 跑的是 59e333c 的旧套件, 没有 W10 移植批与那一行; W9 只按 INV-7 的首尾负载判。(4) INV-7 上报: W9 连续 4 次、W12 连续 3 次作废 (第 4 次合规), 附读数上报 owner, 不放宽判据。(5) W9 与耗时矩阵由主控驱动 r217impl/t004w/driver.sh 重跑: 先跑矩阵 (按批次自带 INV-7), 再在安静窗口 (1 分钟 < 0.6、5 分钟 < 1.0) 跑 W9, 最多 6 次; 有效才拷进 v31/impl。在此之前 v31/impl 的 W9-suite.txt 与 W14-timing-matrix.txt 仍绑定 af4658b6f935, 按 INV-8 不能用, TASK-004 保持 in_progress"
       - "主控驱动 t004w (2026-10-25 13:42-19:31Z): (1) 耗时矩阵在 628652570ce3 上跑完 (14:19Z), 236 个结局全在 max(T_trigger, 3 s) + 0.3 s 以内 (越界 0), 4 个批次因负载作废后重跑成功, 未解决 0, 残留进程 0, 已入 v31/impl/W14-timing-matrix.txt (TASK-003 验收 2 在定稿 hook 上成立)。(2) W9 仍无有效轮: 第 5 次 (14:24Z) 开始负载 0.55、结束 2.22, 作废 (内容与上一版有效的 W9 逐行相同: 基线 813 / 814, 实现 807 / 814, FAIL 清单一致); 其后 5 小时宿主机负载极高 (1 分钟一度 76.52, 5 分钟 28.12), 每次等 1 小时都等不到安静窗口。按 INV-7 第二次附读数上报 owner (连续 5 次作废, 且已超过 6 小时), 不放宽判据; 主控另起过夜驱动 t004w2, 在更严的安静窗口 (1 分钟 < 0.4、5 分钟 < 0.7、15 分钟 < 1.0) 重跑 W9, 最多 12 次、每次最多等 1 小时; owner 若另有裁定以 owner 为准"
       - "W9 结构性数据 (2026-10-28, 主控; INV-7 第三次上报, 判据未动): 过夜驱动 t004w2 12 次都没等到窗口 (宿主常驻负载 0.83-1.34, 高于其门槛)。t004w3 驱动 (run-evidence.sh 增加 SC_TASKSET 覆盖, 默认行为不变): 单核尝试 (kind B) 起点 0.77 -> 结束 2.47; 两核尝试 (kind A) 起点 0.37 (三天来最安静的一次) -> 结束 2.14, 差 0.14。结论: W9 的可运行任务数贡献约 1.7, 与核数无关 (loadavg 计的是可运行任务数, 单核不减少它), 且 /proc/loadavg 是宿主全局的 (外部租户的负载计入我们的读数)。至此七次作废尝试 (4r 四次、t004w 一次、t004w3 两次) 的内容全部一致: 基线 813/814、实现 807/814、FAIL 清单相同, 且与上一版 af4658b6f935 那次有效 W9 的内容一致。在当前外部负载持续期间, 合规的 W9 在本宿主上结构性取不到; 驱动继续跑到 11-01, owner 可随时改裁 (采信七次一致内容, 或维持等待), 未经 owner 不放宽判据"
+      - "owner 裁定 (2026-10-28): 按七次一致内容采信 W9, 进 TASK-006 —— 对本 hook 的 W9 豁免 INV-7 的结束负载判据 (读数已三次上报), 其余 W8-W14 各项在 628652570ce3 上均正常通过 INV-7。归档: 取七次中最安静的一次 (t004w3 第 3 次, kind A, 起点 0.37、结束 2.14), 连同裁定注释存 v31/impl/W9-suite.txt (页眉 hook 628652570ce3); 驱动日志存 b2/t004w3/。TASK-004 验收 3 以此成立"
 
   - id: TASK-005
     parent: "B.2"
@@ -245,7 +246,7 @@ tasks:
   - id: TASK-006
     parent: "C"
     title: "发版 (owner 门): 版本号、CHANGELOG 终稿、standards 计数、发布同步面、tag、双推核验"
-    status: pending
+    status: in_progress
     agent: main-loop
     depends_on: [TASK-004, TASK-005]
     deliverables: ["aria: hook + 套件 + CHANGELOG 终稿 + 版本文件", "standards: conventions/secret-hygiene.md 三处计数", "主仓: 发布同步面 + aria / standards gitlink", "tag"]
