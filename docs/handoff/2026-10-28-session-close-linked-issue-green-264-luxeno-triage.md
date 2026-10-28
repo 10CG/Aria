@@ -3,7 +3,7 @@ track-id: session-close-20261028-linked-issue-264-triage
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-10-28T13:22:09Z
+updated-at: 2026-10-28T18:32:13Z
 ---
 
 # Aria — Session Handoff (2026-10-28) — Linked Issue 归绿 + #264 luxeno 路由 triage 定案
@@ -86,3 +86,13 @@ flags = active_change_not_in_upm advisory ×N — 既有已知 (无运行时 UPM
 - **watchdog 双发现**: ① `luxeno-cf-waf-watchdog` (04-30 注册, 周一 00:00, 6-UA 探针矩阵 403→FAIL_WAF) UA 清单不含 Python-urllib ⇒ 对本类封禁**结构性盲区** (UA 封禁系 ≥04-30 已知风险面); ② 其 payload 模型 `claude-haiku-4-5-20251001` 已 400 (claude-* 下架 Messages 通道) ⇒ **每周误报 `FAIL_OTHER` exit 5, broken-by-drift** — 修法建议 (带代价) 已写进 comment
 - **载体**: #264 comment **#31323** (考古全文 + 修法) + memory `project_luxeno_cf_waf_bans_python_urllib_ua` 考古补充段
 - **会话终态**: repo `cae88b75` 三方一致 (追记一已推); #264 2 条 comment (31209/31323) 待 C8 后由双子星/owner 关单; hermes 轨全程零接触; hermes-019 状态见 追记一 + memory `project_hermes_019_migration_shipped`
+
+## 追记三 (2026-10-28T18:32Z) — hermes-019 接管核查 + owner [A] 收口 (spec 诚实账目)
+
+追记二后 owner 告知「双子星已换对话」⇒ 撤销等待 (取消 18:30Z 挂查), 本侧接管 hermes-019 残余。深核推翻原轨「C1-C8 全绿」宣称:
+
+- **C8 深核** (13:48Z/16:27Z/18:0xZ 三轮巡检 + alloc/stderr/cron store 排查): gateway 真绿 (`Total Restarts=0` 26h+, 1 次 WS 瞬断 11s SDK 自愈; ⚠️ 险些把 allocations API 缺场的 TaskStates 误记「0 重启 PASS」— 零数据≠零重启, 终以 `nomad alloc status` 定案); **cron 缺口**: 生产 `hermes cron list` 空, 0.7 常驻条目从未迁入 (分支 11 提交零 cron 工件; TASK-009 导出随 in-place 替换丢失; 0 重启排除「建后丢失」) — 影响: Layer 1 核心周期职责未被波及 (`aria-layer1-*` 4 nomad 轨全按点: comment-poll 每分钟/cron/reconcile/cost-sentinel), 损失面=0.7 条目独占职责 (不可知)
+- **owner [A] 保守收口已执行**: issue **#266** (缺口+待裁); orchestrator master FF→`fca7e8bc` 双推 (子模块镜像 github 10-22 落后治愈, 三方核验); 主仓 gitlink `9726b321` (原轨中间态 e4c2e2ba 取代; **归档提交 `209bd272` 不并**); spec 诚实账目 `2192feb8` (C1-C7 绿/C8 部分, tasks 16 勾+017 部分+018 阻塞, Linked Issue + #266)
+- **撞车 1 次**: 双子星新对话同期推 W10 双收尾 handoff (`18821496`/`d937cf70`, #217/#261 已关) — 零文件交叠, rebase 干净解决; 它活着且在 w10 域活跃, hermes 域仍无人碰
+- **hermes 轨唯一待决 = #266 owner 裁定**: 裁「aria-layer1-* 已覆盖」→ C8 判绿 → TASK-018 (0.7 purge+旧镜像+CLAUDE.md hermes 行) + 归档收尾; 裁「否」→ 需 owner 供 0.7 cron 排程重建。#264 关单挂 #266 之后
+- memory `project_hermes_019_migration_shipped` 已更新至接管后状态 (含 nomad TaskStates 缺场陷阱)
