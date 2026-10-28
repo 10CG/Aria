@@ -3,7 +3,7 @@ track-id: session-close-20261028-linked-issue-264-triage
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-10-28T18:32:13Z
+updated-at: 2026-10-28T18:55:00Z
 ---
 
 # Aria — Session Handoff (2026-10-28) — Linked Issue 归绿 + #264 luxeno 路由 triage 定案
@@ -96,3 +96,14 @@ flags = active_change_not_in_upm advisory ×N — 既有已知 (无运行时 UPM
 - **撞车 1 次**: 双子星新对话同期推 W10 双收尾 handoff (`18821496`/`d937cf70`, #217/#261 已关) — 零文件交叠, rebase 干净解决; 它活着且在 w10 域活跃, hermes 域仍无人碰
 - **hermes 轨唯一待决 = #266 owner 裁定**: 裁「aria-layer1-* 已覆盖」→ C8 判绿 → TASK-018 (0.7 purge+旧镜像+CLAUDE.md hermes 行) + 归档收尾; 裁「否」→ 需 owner 供 0.7 cron 排程重建。#264 关单挂 #266 之后
 - memory `project_hermes_019_migration_shipped` 已更新至接管后状态 (含 nomad TaskStates 缺场陷阱)
+
+## 追记四 (2026-10-28T18:55Z) — owner 裁定 #266 → hermes-019 全周期收口 (归档完成)
+
+追记三后 owner 裁定: **「aria-layer1 已覆盖, C8 判绿」** (#266)。执行五件套:
+
+- **C8 终判**: TASK-017 勾结 (gateway 26h+ Total Restarts=0 + WS 瞬断自愈 + cron 面按裁定覆盖)
+- **TASK-018**: 0.7 无残留 job 对象 (in-place 同名替换, 实测核 — 无可 purge); 旧镜像 `20f9cb5a` 退役记录; CLAUDE.md Layer 1 行 → **hermes 0.19 (glm-4.6 via Luxeno Anthropic Messages)** + 状态段 +1 行
+- **归档** `openspec/archive/2026-10-28-hermes-019-migration/` (openspec-archive skill 全流程: gate complete=18/18 ∧ verdict=warn 1 条 unverified → overlay 落盘 + tracker **#268** 建立并即时证据闭环 [测试/生产 HCL 在子模块 master fca7e8bc] + 回链校验 rc0)
+- **三单闭环**: #266 (裁定记录 c31513) / #264 (处置 c31516, triage next-cycle 落点兑现) / #268 (证据补链 c31509) — 全 closed
+- 提交: 归档 `3d3eded3` + 本追记; 双推核验
+- **hermes-019-migration 轨终结**: 生产 = 0.19 @ `e8d3ef3d`, spec 归档, 原 `migrate/hermes-019-phase0` 分支 (主仓 `209bd272` / orchestrator tip 已并) 可删未删 (归属 owner 分支卫生)
