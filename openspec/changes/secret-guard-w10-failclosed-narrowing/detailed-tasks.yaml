@@ -246,7 +246,7 @@ tasks:
   - id: TASK-006
     parent: "C"
     title: "发版 (owner 门): 版本号、CHANGELOG 终稿、standards 计数、发布同步面、tag、双推核验"
-    status: in_progress
+    status: done
     agent: main-loop
     depends_on: [TASK-004, TASK-005]
     deliverables: ["aria: hook + 套件 + CHANGELOG 终稿 + 版本文件", "standards: conventions/secret-hygiene.md 三处计数", "主仓: 发布同步面 + aria / standards gitlink", "tag"]
@@ -257,6 +257,7 @@ tasks:
       - "发布同步面: 以 v1.77.2 的发版提交为样板逐项列 (主仓 028b458a 与 e360908c; proposal Impact), 含主仓根 VERSION 的 aria 行; tag 按 version-management.md"
       - "顺序写死 (CLAUDE.md 约束 1、2; PP2-m18): 1. aria 本地合并 (禁 Forgejo 服务端合并) -> 双推 -> 两边 ls-remote; 2. standards 本地提交 -> 双推 -> 两边 ls-remote; 3. 只在 1、2 都核验后, 主仓 bump aria / standards gitlink -> 推送或开 PR (主仓 PR 合并前跑 C.2.4 pre-merge gate) -> 两边 ls-remote; 4. tag 两边。aria 合并不开 PR 时 C.2.4 不适用, 开 PR 时照跑"
       - "INV-6 核对命令覆盖本任务全部提交与 PR 正文; INV-8 核对待发版 hook 的 sha256"
+      - "执行记录 (2026-10-28, owner 批 v1.77.5 与四步顺序): 0. 现跑计数轮 (b2/t006-count-run.txt): PASS 985/985, FAIL 0, SKIP 0 —— N_cases_nozsh=985, N_cases=991 (头注释), n_new=160 (831->991), N_allowed=136。1. aria: 发版提交 9f2b719 (五文件, CHANGELOG 终稿无占位符) -> 本地合并 0ade987 -> 双推, ls-remote 两边一致。2. standards: 三处计数 822/816 -> 991/985 (第四处 822/816 是版本史 1.2.0 行的历史记录, 不动), 版本 1.2.1 + 版本史行 (1.1.2 计数同步先例), 028a92d 双推核验。3. 主仓: gitlink aria 0ade987 / standards 028a92d + README×4 + VERSION + arch docs×2 + CLAUDE.md 版本行, c9a02e8f 双推核验; m6-version-badge-match / i18n-readme-translation-currency / plugin-version-arch-docs-match 三项手动按 command 全绿 (badge=plugin=1.77.5; arch 两行 1.77.5; i18n 三份 translated-from=v1.77.5)。4. tag v1.77.5 (附注 tag df055c19 -> 0ade987) 双边推, 两边 ls-remote 在。INV-6 扫描 4 条提交消息 0 命中; INV-8: 发版 master hook sha256 628652570ce3 == W13/W12 页眉。未开 PR (直接本地合并推送, 属批准的顺序); C.2.4 不适用 (无 PR)"
     acceptance:
       - "owner 授权 (版本号与发版时点)"
       - "secret-hygiene.md 的三处、每处两个数, 与套件头注释的计数, 都等于本任务现跑的 <N_cases> / <N_cases_nozsh> (按上面三处的锚点逐行核对); secret-scan 那一行未动"
