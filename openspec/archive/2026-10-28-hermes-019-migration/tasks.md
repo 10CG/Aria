@@ -28,8 +28,8 @@
 
 ## Phase 3 — 观察 + 收尾
 
-- [ ] TASK-017: 24h 观察 (C8: gateway 零重启 + cron 按时 + 零事故) — **[部分 2026-10-28 接管核查]** gateway 零重启 (Total Restarts=0, 26h+) + 零事故绿 (1 次 WS 瞬断 11s 自愈); **cron 面缺口**: 生产 `hermes cron list` 空, 0.7 条目未迁 (#266) — C8 终判挂起
-- [ ] TASK-018: 关 0.7 job (purge) + 归档旧镜像 + 更新文档 (CLAUDE.md hermes 版本) — **[阻塞于 #266]** 0.7 保留中 (回滚保险)
+- [x] TASK-017: 24h 观察 (C8: gateway 零重启 + cron 按时 + 零事故) — **[终判绿 2026-10-28]** gateway 实测 Total Restarts=0 26h+ / 零事故 (1 次 WS 瞬断 11s 自愈); cron 面经 owner 裁定 (#266): 0.7 hermes cron 职责由 aria-layer1-* 4 nomad 轨覆盖
+- [x] TASK-018: 关 0.7 job (purge) + 归档旧镜像 + 更新文档 (CLAUDE.md hermes 版本) — **[执行 2026-10-28]** 0.7 无残留 job 对象 (cutover 时 in-place 同名替换, 无可 purge, 实测核); 旧镜像 digest 20f9cb5a 退役记录于本归档; CLAUDE.md Layer 1 行 → hermes 0.19 (glm-4.6)
 
 ## 依赖
 

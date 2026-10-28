@@ -141,9 +141,11 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
     落地 (PR #255: 门只计 capability 类 / routing 观察面; 套件 type 标注已 owner 追认作门 (2026-10-27 #243; 5 条 capability 残留误触定性留观察面); A 跟进 #253)
   2026-10-22 双子星分界: 双子星轨 = #217 secret-guard (owner 裁「钉设计后实现优先」, R2 五席 FAIL
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
+  hermes-019-migration 全周期收口 (2026-10-28): 0.19 生产 cutover 10-27 (#262), C8 判绿 (#266 裁
+    aria-layer1-* 覆盖 cron 面), spec 已归档; 旧 0.7 镜像 20f9cb5a 退役
 版本: aria-plugin v1.77.5 (aria-plugin#217 secret-guard W10 尺寸误拦收窄: >8KB 大命令按增长量在硬截止内完整重判, 放宽 x86_64 GNU/Linux bash 5.0-5.3 非 WSL;
   套件 831→991 例, 真实流量放行 136/137; 前版 v1.77.4 Aria#257 收口; 套件缺口 #258/#261 已裁 10-27) | 主项目 v1.7.5 |
-  aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
+  aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = hermes 0.19 (glm-4.6 via Luxeno Anthropic Messages, cutover 2026-10-27)
 ```
 
 进展查询: `/state-scanner` (live) | session 史 → `docs/handoff/` (Rule #9 canonical) | 版本史 → `aria/CHANGELOG.md` (SOT) | 活跃 spec 详情 → `openspec/changes/*/proposal.md`
