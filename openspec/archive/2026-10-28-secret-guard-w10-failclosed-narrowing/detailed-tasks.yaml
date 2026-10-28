@@ -269,7 +269,7 @@ tasks:
   - id: TASK-007
     parent: "D"
     title: "收口: 上线后复验; 对账后显式关闭 10CG/aria-plugin#217; 认领释放、归档、handoff"
-    status: pending
+    status: done
     agent: main-loop
     depends_on: [TASK-006]
     design:
@@ -278,6 +278,7 @@ tasks:
       - "对账评论: 第 1 项完成; 小项完成; 第 2 项转 <残余 issue>; 第 3 项 owner 撤回; count 轴大命令一侧已修、小命令一侧转 <载体>; 评论 28512 第 2 点已评估、维持绝对门; 然后经 Forgejo API 显式关闭 (先例 10CG/aria-plugin#216), 不用关闭关键词; 评论与关闭属 TASK-001 一次性授权的两类, 未获授权则逐次请示"
       - "D.1 进度更新; D.2 归档 (先把本文件全部任务置为 done, 否则归档会自动建 tracker); 认领释放 (release_gate.py); 周期 handoff 写 docs/handoff/"
       - "跟进项 (2026-10-25 记, owner 同意侧席提醒): secret-guard 套件给只看退出码的自动流程一个严格开关 —— 计时批整批 SKIP (未判) 时整轮以非 0 退出; 另有 W1o 在 noexec 临时目录上抓不住去掉 -d 的坏实现 (复审第四轮 m-2)、函数注释两处说满 (复审第四轮 m-1)、WSL 文件标记改用 mountinfo 设备号比对 (复审第四轮的改进方向, 未核实)。对账评论里列为转出项, 载体随 TASK-006 的 owner 门一并请示"
+      - "执行记录 (2026-10-28): 前置 — owner 已更新插件缓存并重启, 本会话即新缓存会话。上线复验 — 缓存 hook sha256 = 628652570ce3 (aria/1.77.5); 经 harness 实发两条: 13.9 KB 含赋值引用命令 (echo 数字列表 | wc -c) 放行; 多层倍增赋值 (展开值 >4096) 拦截, 文案为 VMAX 绝对门 (探针形状不含任何凭据形内容, 无惰性诱饵)。对账 — 10CG/aria-plugin#217 comment 31403 逐项对账后显式 closed (GET 核对); 第 2 项与 28512 第 1 点转 #231, 第 3 项记 owner 撤回, 28512 第 2 点已评估维持绝对门; 10CG/Aria#261 comment 31406 回贴逐字断言最终形态 (落点路径 + commentsync 四构造 RED 78/60/58/57) 后按 2026-10-27 裁定闭环条件 closed。发版后跟进项清单 (严格开关 / W1o noexec / mountinfo 方向) 已在 TASK-007 design, 载体待 owner 定 (对账评论中未新开)"
     acceptance:
       - "上线后复验两次结局与预期一致, 记录生效 hook 的 sha256; 诱饵路径不存在已断言"
       - "10CG/aria-plugin#217 状态为 closed (GET 核对); 10CG/Aria#217 状态未变"
