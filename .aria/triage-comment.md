@@ -8,64 +8,53 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | (issue 未报版本 — 基建排查型) |
-| Current | aria-plugin 1.77.4 / hermes 0.19.0 (PoC) |
-| Gap | 不适用 |
+| Reported | (无版本锚 — 部署态缺口类 issue) |
+| Current | aria-plugin 1.77.5 / aria-orchestrator 0.19 生产 |
+| Gap | n/a |
+
+非代码版本类 issue, 版本核对不适用。
 
 ### Code Path
 
-issue 不引代码路径 (外部 API 排查型)。相关配置面已核: `hermes-upgrade-poc/config.yaml` (provider=custom + `glm-4.7-flashx` + `base_url: https://api.luxeno.ai/v1`) 与 `deploy/hermes-upgrade-poc.nomad.hcl` (P4 三件套接线, key 来自 nomad var `nomad/jobs/aria-orchestrator` 的 `LUXENO_API_KEY`) — 均与描述一致。
+issue 未引用代码路径 (step3/4 合法 skipped)。核对落点由 triage 补选: `aria-orchestrator/deploy/aria-orchestrator-019-prod.nomad.hcl` (origin/master) + `openspec/changes/hermes-019-migration/tasks.md` — 均与 issue 描述一致。
 
 ### Git History
 
-No recent commits matched on cited files (无代码变更涉入)。
+- `migrate/hermes-019-phase0` (11 commits, **已全部并入 origin/master**): 净增仅 4 文件 (Dockerfile.019 / config-019.yaml / 两份 019 HCL), **零 cron 迁移工件** — 与「TASK-009 导出从未落盘」一致。
+- 019 生产 HCL 无 cron 建立步骤、无 hermes-home 挂载 — 与「条目从未进入生产」一致。
 
 ### In-flight
 
 | Category | Matches |
 |----------|---------|
 | Remote PRs | none |
-| Local branches | none (triage 时点无 luxeno 相关修复分支) |
-| Worktrees | `migrate/hermes-019-phase0` (@/tmp/a-wt/aria232-fix, Phase 0 迁移在途 — 本 issue 解阻其 Phase 2) |
+| Local branches | none (迁移分支已并入 master) |
+| Worktrees | 仅主 worktree @ d937cf70 |
 
 ### Reproduction
 
-**Mode**: `auto` | **Hit rate**: `5/7` (2026-10-28 实测, 差分矩阵 14+ 探针)
+**Mode**: `auto` | **Hit rate**: 3 confirmed + **1 refuted** + 1 not-executed
 
-| Case | 输入 | 结果 | match |
-|---|---|---|---|
-| 1 | PoC P4 原样路径 (claude-cli UA + x-api-key + `glm-4.5-air` + `api.luxeno.ai/v1/messages`) | **HTTP 200** — 路由全通 | ❌ 不复现「不通」 |
-| 2 | 同上但 UA=Python-urllib (代理/直连两种 egress) | **HTTP 403**, body=`error code: 1010` | ✅ 403 复现 |
-| 3 | 假凭据对照 (同 case-2) | 403 与真凭据**完全同形** — 拒绝发生在凭据校验之前 | ✅ |
-| 4 | `glm-4-5-air` (SDK 归一形态) | 400 "Model not available via the Anthropic Messages API" | ✅ SDK 归一化缺陷独立确认 |
-| 5 | `glm-4.7-flashx` 双通道 | **双通道均 400** (新发现: PoC config 模型已不可用) | ✅ |
-| 6 | `glm-4.5-air` / `deepseek-v4-pro` @ chat-completions | **双 200** (与 PoC 10-25 的 400 相反 — 网关已变更) | ❌ |
-| 7 | 本地 router 127.0.0.1:3457 sanity | 200 | ✅ |
+| case | 主张 | 结果 |
+|------|------|------|
+| 1 | 迁移分支无 cron 工件 | ✅ 证实 |
+| 2 | 019 生产 HCL 无 cron 建立面 | ✅ 证实 |
+| 3 | TASK-009/010/011/018 未完成 | ✅ 证实 (tasks.md 全未勾) |
+| 4 | **「0.7 清单已失」** | ❌ **证伪** — 见下 |
+| 5 | 0.19 生产 store 空 | 未独立执行 (结构性佐证 + 开单人当日实测) |
 
-### 四个排查方向 — 逐一回答
+**证伪证据 (case-4)**: 0.7 cron store 完整存于 NFS 卷 `heavy-*:/opt/aether-volumes/aria-layer1/hermes-home/cron/jobs.json` (1153B, mtime 2026-10-27T15:45 = cutover 前 41min; TASK-018 purge 未执行故未清)。**全程仅 1 条**:
 
-1. **403 是否限流?** ❌ 否。`x-ratelimit-remaining: 238` (充足); 真假凭据 403 完全同形; 403 响应体为 **Cloudflare `error code: 1010`** (官方定义: "banned based on your browser's signature") — 是 **CF WAF 按 User-Agent 签名封禁**, 不是限流也不是权限层。无需等待恢复。
-2. **模型名规范化?** ✅ 独立真缺陷 (但与 403 无关): `glm-4-5-air` → 400 "not available"; 而 `Anthropic/Python` SDK 的 UA 本身**不在封禁面** (实测 200)。即: SDK 路径死于模型 id 归一化, 探针路径死于 UA 封禁 — 两个独立故障叠加成了「全灭」观感。
-3. **正确的调用方式?** `POST https://api.luxeno.ai/v1/messages` + `x-api-key`(或 `Authorization: Bearer`) + `anthropic-version: 2023-06-01` + `model=glm-4.5-air`, **任何 UA 除了裸 `Python-urllib/*`** (curl / claude-cli / browser / requests / httpx / OpenAI-SDK / Anthropic-SDK / axios / Go 实测全 200)。
-4. **chat-completions 可用模型?** ✅ **glm-4.5-air 现已可用** (今日 200, PoC 时点 400 — 网关 10-25 后已开放), `deepseek-v4-pro` 亦通; 但 **`glm-4.7-flashx` 双通道均 400**。
-
-### 新发现 (issue 未提, 对迁移直接相关)
-
-- **`glm-4.5-air` 请求实际 serve `glm-5.3-flash`** (响应 `model` 字段, 3 次探针一致) — 网关静默改路由, glm-4.5-air 疑似已退役/映射。
-- **hermes 0.19 PoC config 的 `glm-4.7-flashx` 双通道不可用** — 迁移 config.yaml 必须换模型 (见下)。
-- **封禁面极窄**: 仅 `Python-urllib/*` 签名被封。生产 Layer 1 (aria-orchestrator, httpx/requests 系客户端) 不受影响 — nomad 实测 job `running`、部署 successful。
-- `nomad/jobs/luxeno-cf-waf-watchdog` 在跑 — CF WAF 封禁是既有运维面; 回看其近期 run 可定位封禁规则生效时间窗 (10-24 探针曾通 → 规则可能在 10-24~10-27 间新增, 或当时探针 UA 不同 — 建议回看 10-27 探针脚本实现定论)。
-
-### hermes 0.19 迁移 Phase 2 解阻路径 (无需 zai 备胎)
-
-1. `config.yaml` model `glm-4.7-flashx` → `glm-4.5-air` (注意实际 serve glm-5.3-flash) 或 `deepseek-v4-pro`; chat-completions 与 Messages 两通道今均可用
-2. 探针/巡检脚本避开裸 `Python-urllib` (requests / httpx / curl 均可)
-3. 若走 Anthropic SDK: 注意模型 id 归一化缺陷; 或直接用 claude CLI 三件套 (P4 路径, 今日复跑 200)
+- `aria-heartbeat` — skill `heartbeat-scan`, every 60m, deliver feishu, created 2026-04-08
+- **`last_status: "error"`** (`No module named 'pydantic_core'`); output 史停在 `2026-10-21_11-27` ⇒ **10-21 #232 docker 迁移当天即坏, 静默错 6 天至 cutover**
+- `dispatch-development` 从非 0.7 cron 条目 (C5 的两个 skill 只有 heartbeat-scan 被 cron 化)
 
 ### Verdict Rationale
 
-403 现象在 `Python-urllib` UA 下 100% 复现 (case-2/3), 但其根因是 CF WAF 浏览器签名封禁而非模型路由故障 — P4 原样路径今日 200 (case-1), 与 issue「路由不通、阻塞 Phase 2」的定性实质偏离, 故 `partial-repro`。生产零影响 (封禁面不含 httpx/requests, Layer 1 running), 迁移解阻仅需 config 级调整 (模型名 + 探针客户端), 故 `minor`。建议落点: 并入 `hermes-019-migration` 既有 cycle 的 Phase 2 config 任务 (无需新 spec), Phase 2 config 落地后本 issue 可关闭, 故 `next-cycle`。
+核心缺口成立: 0.7 cron 条目从未迁移 (C4 未满足, 分支/HCL/tasks 三处证实), 原轨「C1-C8 全绿」宣称与实测不符成立。但待裁问题的事实前提被证伪一半: 清单未失 (TASK-009 现在可执行, 本 comment 即其产出), 且唯一条目在 cutover 前已坏了 6 天 — 「0.7 独占职责」的实际损失面 ≈ 一条早已不在服务的 hourly feishu 汇报, Layer 1 核心周期 (aria-layer1-* 4 轨, AD-M2-8 Nomad-native by design) 未受波及。
+
+**裁定面相应收窄为**: ① 判该条目职责已被 aria-layer1-* 覆盖 / 已无价值 → C8 判绿, spec 收口, 执行 TASK-018 (含本次找到的 jobs.json 一并处理); 或 ② 在 0.19 重建 aria-heartbeat (0.19 侧 builtin 已有一次成功运行佐证 2026-10-28T02:18)。
 
 ---
 
-*Generated by `/issue-triage` v1.77.4 — Ref: 10CG/Aria#264*
+*Generated by `/issue-triage` v1.77.5 — Ref: 10CG/Aria#266*

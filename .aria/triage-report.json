@@ -1,25 +1,25 @@
 {
   "schema_version": "1.0",
-  "triage_tool_version": "1.77.4",
-  "issue_ref": "10CG/Aria#264",
-  "generated_at": "2026-10-28T06:06:18Z",
+  "triage_tool_version": "1.77.5",
+  "issue_ref": "10CG/Aria#266",
+  "generated_at": "2026-10-28T18:29:40Z",
   "steps": {
     "step1_issue": {
       "collection_status": "ok",
-      "number": 264,
-      "title": "luxeno API 模型路由排查 — hermes 0.19 迁移的模型供应侧",
-      "body": "## 背景 (#262 Phase 1 遗留)\n\nhermes 0.19 迁移的 feishu/config/cron/skills 全部验证通过, 但**模型路由**不通。\nluxeno 是当前唯一的模型供应商 (LUXENO_API_KEY), 需要排查恢复。\n\n## 已试路径 (2026-10-27 实测)\n\n| 路径 | 结果 |\n|---|---|\n| OpenAI chat-completions (`/v1/chat/completions`) | 400/403: glm 模型不走此端点 |\n| `/anthropic` 路径 (Anthropic Messages) | 404: luxeno 无此路径 |\n| `anthropic` provider (原生 SDK, Anthropic Messages) | 400: SDK 把 `glm-4.5-air` 规范化为 `glm-4-5-air` |\n| 直连 probe `x-api-key` + `anthropic-version` | **全 403** (10-24 时 glm-4.5-air 曾通!) |\n\n## 排查方向\n\n1. **403 是否限流**: 三天密集测试 (~20 次调用), 是否触发 rate limit? 等多久恢复?\n2. **模型名规范化**: Anthropic SDK 把 `.` 换成 `-` (命名惯例); luxeno 是否也接受 `glm-4-5-air`?\n3. **正确的调用方式**: luxeno 的 API 文档 (`/docs/api`) 到底怎么调?\n4. **是否有 chat-completions 可用的模型**: 之前只测了 glm 系, 可能有其他模型走 chat-completions\n\n## 依赖\n\n- 阻塞 hermes 0.19 迁移 Phase 2 (cutover 前须解)\n- 替代方案: 拿一个智谱 API key (zai provider 原生支持)\n",
+      "number": 266,
+      "title": "[hermes-019][C8 缺口] 生产 0.19 hermes 无常驻 cron — 0.7 条目未迁移 (清单已失); 待裁 aria-layer1-* 覆盖面",
+      "body": "### 现状 (2026-10-28 接管核查实测)\n\n- 生产 `aria-orchestrator` job (0.19, cutover 2026-10-27T16:26:36Z) 连续运行, `Total Restarts = 0`; 1 次 WS 瞬断 (14:27:32→43, 11s SDK 自愈), 无其他异常 — gateway/零事故面绿\n- **`hermes cron list` = \"No scheduled jobs\"** — 生产 0.19 cron store **零常驻条目**\n- `hermes cron runs` 仅 1 条 builtin 记录 (2026-10-28T02:18, `aria-heartbeat` + agent 会话 `cron_6d20f2ac21a5_20261028_021858`, glm-4.6, 成功)\n- 迁移分支 `migrate/hermes-019-phase0` (11 提交) **无任何 cron 迁移工件** (TASK-009 的 0.7 hermes-home 导出从未落盘); 生产 HCL 无 cron 建立步骤、无 hermes-home 卷 ⇒ 0.7 周期条目**从未进入生产** (非建后丢失 — 0 重启排除了重启丢 store)\n\n### 影响面评估\n\n- `aria-layer1-*` 4 个 nomad 轨 (不变面, hermes 无关) 全部按点运行: comment-poll **每分钟** / cron 每小时 / reconcile 每 30min / cost-sentinel — **Layer 1 核心周期职责未被本缺口波及**\n- 真实损失面 = 0.7 hermes-home 条目的**独占职责** (条目清单已随 in-place 替换丢失)\n\n### 待 owner 裁定\n\n1. 0.7 hermes cron 条目 (heartbeat-scan / dispatch-development 等) 是否已被 `aria-layer1-*` nomad 轨覆盖?\n   - **是** → C8 按修订判据判绿, hermes-019 spec 收口归档, TASK-018 (0.7 purge + 旧镜像归档 + CLAUDE.md hermes 版本行) 可执行\n   - **否** → 需重建 cron 条目 (0.7 排程来源已失, 需 owner 提供)\n2. 原轨 2026-10-28T07:48Z 终关 comment (#262 c#31206) 宣称「C1-C8 全绿」与本实测不符 — 归档提交 `209bd272` 按 owner [A] 裁定不并, spec 留 `openspec/changes/` 待终判\n\n### 关联\n\n#262 (已关; 本缺口 = 其 TASK-009/010 生产侧未完成项) · #264 (triage 顺延一并处置) · handoff 2026-10-28 (接管核查记录)\n",
       "state": "open",
       "labels": [],
       "comments": [],
-      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/264",
-      "created_at": "2026-10-27T13:02:10Z",
-      "updated_at": "2026-10-27T13:02:29Z"
+      "url": "https://forgejo.10cg.pub/10CG/Aria/issues/266",
+      "created_at": "2026-10-28T18:23:35Z",
+      "updated_at": "2026-10-28T18:23:35Z"
     },
     "step2_version": {
       "collection_status": "ok",
       "reported": null,
-      "current": "1.77.4",
+      "current": "1.77.5",
       "gap": null
     },
     "step3_code": {
@@ -40,83 +40,55 @@
           "path": "/home/dev/Aria",
           "branch": "master",
           "is_main": true,
-          "head": "4bf2039d867bbb5e1781d9cc318e6032d5f1db4c"
-        },
-        {
-          "path": "/tmp/a-wt/aria232-fix",
-          "branch": "migrate/hermes-019-phase0",
-          "is_main": false,
-          "head": "9dea3b1ddd4c74aeda465e57f51d16609b46cef3"
-        },
-        {
-          "path": "/tmp/a-wt/r8-ctx",
-          "branch": null,
-          "is_main": false,
-          "head": "7ec9e3f902b0ba8f65ec183364265362671bffc2"
+          "head": "d937cf70a33bec6d431827a94eecbd7f6339662f"
         }
       ]
     }
   },
   "repro": {
     "exit_mode": "auto",
-    "hit_count": 5,
-    "total_count": 7,
-    "hit_rate": "5/7",
+    "hit_rate": "3/5 confirmed + 1 refuted + 1 not-executed",
     "cases": [
       {
         "case_id": "case-1",
-        "input": "POST https://api.luxeno.ai/v1/messages | x-api-key=<nomad LUXENO_API_KEY> | anthropic-version: 2023-06-01 | model=glm-4.5-air | UA=claude-cli/2.0.0 (PoC P4 原样三件套)",
-        "expected_behavior": "issue 定性: 模型路由不通, 全 403",
-        "actual_behavior": "HTTP 200 (2.4s, type=message); 注意: 响应 model=glm-5.3-flash (网关静默改路由)",
-        "match": false
+        "input": "git: aria-orchestrator migrate/hermes-019-phase0 (11 commits, 已全并入 origin/master) 净增文件清单",
+        "expected_behavior": "issue: 迁移分支无任何 cron 迁移工件 (TASK-009 0.7 hermes-home 导出从未落盘)",
+        "actual_behavior": "净增仅 4 文件: Dockerfile.019 / config-019.yaml / deploy/aria-orchestrator-019-{test,prod}.nomad.hcl; 零 cron 工件",
+        "match": true
       },
       {
         "case_id": "case-2",
-        "input": "POST https://api.luxeno.ai/v1/messages | x-api-key=<real> | model=glm-4.5-air | UA=Python-urllib/3.11 (代理与直连两种 egress 各一次)",
-        "expected_behavior": "issue 声称: 直连 probe x-api-key + anthropic-version 全 403",
-        "actual_behavior": "HTTP 403 (0.4-0.5s) 两种 egress 同形; 响应体 17 字节 'error code: 1010' (CF 浏览器签名封禁)",
+        "input": "deploy/aria-orchestrator-019-prod.nomad.hcl (origin/master) 全文",
+        "expected_behavior": "issue: 生产 HCL 无 cron 建立步骤、无 hermes-home 卷",
+        "actual_behavior": "确认: 无 cron 建立步骤、无 hermes-home 挂载 (无任何 host_volume)",
         "match": true
       },
       {
         "case_id": "case-3",
-        "input": "同 case-2 但 x-api-key=<fake-key-control-000000000000> (假凭据对照)",
-        "expected_behavior": "若 403 属凭据/权限层, 真假凭据应产生可区分响应 (401 vs 403 或不同报文)",
-        "actual_behavior": "HTTP 403 与真凭据完全同形 (同 17B body, 同延迟量级) — 拒绝发生在凭据校验之前 (边缘层)",
+        "input": "openspec/changes/hermes-019-migration/tasks.md TASK-009/010/011/018",
+        "expected_behavior": "cron 迁移任务未完成",
+        "actual_behavior": "TASK-009 (0.7 cron 清单导出) / TASK-010 (逐条 0.19 create) / TASK-011 (skills 迁移) / TASK-018 (0.7 purge) 全部未勾",
         "match": true
       },
       {
         "case_id": "case-4",
-        "input": "POST /v1/messages | model=glm-4-5-air (Anthropic SDK 归一形态: . → -) | UA=claude-cli",
-        "expected_behavior": "issue 声称: SDK 把 glm-4.5-air 规范化为 glm-4-5-air 致 400",
-        "actual_behavior": "HTTP 400 invalid_request_error: \"Model 'glm-4-5-air' is not available via the Anthropic Messages API\" — 独立真缺陷, 与 403/WAF 无关",
-        "match": true
-      },
-      {
-        "case_id": "case-5",
-        "input": "POST /v1/messages 与 /v1/chat/completions | model=glm-4.7-flashx (hermes 0.19 PoC config.yaml 实际模型) | UA=claude-cli",
-        "expected_behavior": "PoC (10-25) 记录: flashx 走 chat-completions 400 (仅 Messages 通道 glm 可用)",
-        "actual_behavior": "双通道均 400: 'not available via the Anthropic Messages API' / 'not available via the OpenAI Chat Completions API' — 新发现: 迁移 config 的模型已双通道不可用",
-        "match": true
-      },
-      {
-        "case_id": "case-6",
-        "input": "POST /v1/chat/completions | Bearer <real> | model=glm-4.5-air / deepseek-v4-pro | UA=claude-cli",
-        "expected_behavior": "issue/PoC 定性: glm 模型不走 chat-completions 端点 (400)",
-        "actual_behavior": "HTTP 200 (glm-4.5-air 2.1s; deepseek-v4-pro 3.0s) — 网关 10-25 后已开放 glm 于 chat-completions, 与 PoC 时点结论相反",
+        "input": "ssh heavy-1 cat /opt/aether-volumes/aria-layer1/hermes-home/cron/jobs.json (0.7 NFS 卷, TASK-018 purge 未执行故未清)",
+        "expected_behavior": "issue: 0.7 条目清单已随 in-place 替换丢失",
+        "actual_behavior": "清单未失 — jobs.json 完整在卷上 (1153B, mtime 2026-10-27T15:45, cutover 前 41min)。全程仅 1 条: aria-heartbeat (skill heartbeat-scan, every 60m, feishu); last_status=error (No module named pydantic_core); output 史停在 2026-10-21_11-27 ⇒ 10-21 #232 docker 迁移当天即坏, 静默错 6 天至 cutover。dispatch-development 从非 0.7 cron 条目",
         "match": false
       },
       {
-        "case_id": "case-7",
-        "input": "POST http://127.0.0.1:3457/v1/messages (本 dev 容器 Claude Code harness 同款本地 router) | Bearer <ANTHROPIC_AUTH_TOKEN> | model=glm-5.3-flash",
-        "expected_behavior": "本地 router → luxeno 链路健康 (本会话正运行其上)",
-        "actual_behavior": "HTTP 200 (2.4-2.9s, type=message) — 本地路由链正常",
-        "match": true
+        "case_id": "case-5",
+        "input": "生产 0.19 hermes cron list / nomad job 状态 (需 alloc exec 生产容器)",
+        "expected_behavior": "issue: No scheduled jobs; Total Restarts=0",
+        "actual_behavior": "未独立执行 — 结构性佐证成立 (019 HCL 无 cron 建立面 ⇒ store 必空) + reporter 当日实测; 本 triage 不重复触生产",
+        "match": null
       }
     ]
   },
   "verdict": "partial-repro",
   "severity": "minor",
   "recommended_action": "next-cycle",
-  "deviation_note": "403 现象本身复现 (Python-urllib UA 下 100%), 但 issue 的定性「模型路由不通」不成立: PoC P4 原样路径 (claude-cli UA + x-api-key + glm-4.5-air + api.luxeno.ai/v1/messages) 今日复跑 HTTP 200。403 根因 = Cloudflare WAF 对 Python-urllib 浏览器签名的封禁 (响应体 'error code: 1010' = CF 官方「banned based on browser's signature」), 与凭据无关 (真假 key 403 完全同形)、与限流无关 (x-ratelimit-remaining 238)。curl/claude-cli/browser/requests/httpx/OpenAI-SDK/Anthropic-SDK/axios/Go UA 全部 200。",
+  "deviation_note": "核心缺口成立 (0.7 cron 条目从未迁移, C4 未满足), 但「清单已失」被证伪: 0.7 store 完整存于 NFS 卷 /opt/aether-volumes/aria-layer1/hermes-home/cron/jobs.json (TASK-018 purge 未执行); 全程仅 1 条 aria-heartbeat(heartbeat-scan, 60m), 且自 2026-10-21 #232 docker 迁移起 error(pydantic_core) 静默 6 天 — cutover 时该职责本已不在服务。影响面相应收窄: Layer 1 核心周期 (aria-layer1-* 4 轨, AD-M2-8 Nomad-native) 未受波及, 独占损失面 = 一条已坏了 6 天的 hourly feishu 汇报。",
   "errors": []
 }
