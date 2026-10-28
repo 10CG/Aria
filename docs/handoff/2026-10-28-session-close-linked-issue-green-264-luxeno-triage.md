@@ -3,7 +3,7 @@ track-id: session-close-20261028-linked-issue-264-triage
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-10-28T12:37:52Z
+updated-at: 2026-10-28T13:22:09Z
 ---
 
 # Aria — Session Handoff (2026-10-28) — Linked Issue 归绿 + #264 luxeno 路由 triage 定案
@@ -77,3 +77,12 @@ flags = active_change_not_in_upm advisory ×N — 既有已知 (无运行时 UPM
 - **终关**: 10-28 07:48Z C1-C8 全绿 (10-24~28), **#262 已 closed**。证据: comment **#31206** + 主仓分支 `migrate/hermes-019-phase0` 归档提交 `209bd272` (纯 `git mv`)
 - **残余 (归双子星轨承接, 本侧勿动)**: 分支合 master (⚠️ 子模块 gitlink `e4c2e2ba` 只在 orchestrator origin、**github 无此分支** — 合并序 = 子模块先本地 merge 双推 → 再合主仓, 否则 orphaned gitlink) / tasks.md 0/18 勾选簿记 / C8 24h 观察窗 (~10-28 16:26Z 到期) / TASK-018 (purge 0.7 + 归档旧镜像 + CLAUDE.md hermes 版本行) / #264 关单时机 (C8 后)
 - 会话本侧零 repo 写入退出; 同事实已固化 memory `project_hermes_019_migration_shipped` (双保险: latest.md 指针行的旧 carry 摘要待双子星下一份 handoff 接替时自然消解)
+
+## 追记二 (2026-10-28T13:22:09Z) — WAF 考古完成 (§2 可选项闭环)
+
+追记一后 owner 又指派了 §2 的可选项「WAF watchdog run 史回看」, 已完成并双载体落档:
+
+- **定日结论**: Python-urllib 封禁生效时间不可精确判定 (watchdog children 已 GC / 无 IaC), 但**无需假设 10-24~10-27 窗口内新增规则** — 「10-24 曾通」的直接证据是 PoC P4 走 claude CLI (UA 不封), 10-27 全 403 探针反推必为 urllib (requests/httpx/curl/双 SDK 实测全 200, 唯 urllib 403)
+- **watchdog 双发现**: ① `luxeno-cf-waf-watchdog` (04-30 注册, 周一 00:00, 6-UA 探针矩阵 403→FAIL_WAF) UA 清单不含 Python-urllib ⇒ 对本类封禁**结构性盲区** (UA 封禁系 ≥04-30 已知风险面); ② 其 payload 模型 `claude-haiku-4-5-20251001` 已 400 (claude-* 下架 Messages 通道) ⇒ **每周误报 `FAIL_OTHER` exit 5, broken-by-drift** — 修法建议 (带代价) 已写进 comment
+- **载体**: #264 comment **#31323** (考古全文 + 修法) + memory `project_luxeno_cf_waf_bans_python_urllib_ua` 考古补充段
+- **会话终态**: repo `cae88b75` 三方一致 (追记一已推); #264 2 条 comment (31209/31323) 待 C8 后由双子星/owner 关单; hermes 轨全程零接触; hermes-019 状态见 追记一 + memory `project_hermes_019_migration_shipped`
