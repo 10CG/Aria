@@ -3,7 +3,7 @@ track-id: session-close-20261028-linked-issue-264-triage
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-10-28T10:13:05Z
+updated-at: 2026-10-28T12:37:52Z
 ---
 
 # Aria — Session Handoff (2026-10-28) — Linked Issue 归绿 + #264 luxeno 路由 triage 定案
@@ -27,7 +27,7 @@ updated-at: 2026-10-28T10:13:05Z
 
 ## §2 未完成 / Carry-forward
 
-- **hermes-019-migration Phase 2 config 解阻** (既有 cycle; 对方轨 — PR #263 由对方合入, 见 10-27 §2 「本侧不接」; 接前先查 #264 与该 spec 状态防撞车): config.yaml 模型 `glm-4.7-flashx` → `glm-4.5-air`/`deepseek-v4-pro` + 探针避开裸 urllib; 全径已载 comment `#31209`
+- **hermes-019-migration Phase 2 config 解阻** ⚠️ **[追记 12:37Z: 本条已过时 — 双子星轨已全程 ship, 见文末追记; 勿据本条开工]** (既有 cycle; 对方轨 — PR #263 由对方合入, 见 10-27 §2 「本侧不接」; 接前先查 #264 与该 spec 状态防撞车): config.yaml 模型 `glm-4.7-flashx` → `glm-4.5-air`/`deepseek-v4-pro` + 探针避开裸 urllib; 全径已载 comment `#31209`
 - **(可选) WAF watchdog 考古**: 回看 `nomad/jobs/luxeno-cf-waf-watchdog` run 史 → 定 CF 封禁规则生效窗 (10-24 直连探针曾通 ⇒ 疑 10-24~10-27 新增, 或当时探针 UA 不同)
 - **#264 保持 open** 至 Phase 2 config 落地 (triage 裁 next-cycle; 届时关单)
 - [机械补漏] M6 cost-model tasks 未勾族 + M6/M7 owner/infra 门 (Luxeno Blocker 4 等) — spec 轨既知项顺延 (同 10-27 §2)
@@ -68,3 +68,12 @@ flags = active_change_not_in_upm advisory ×N — 既有已知 (无运行时 UPM
 ## §8 Memory entries (本段)
 
 新增 2: `project_luxeno_cf_waf_bans_python_urllib_ua` (project — UA 封禁面 + glm 路由现状 + nomad var 读法 + 探针方法论) · `feedback_memory_index_compaction_method` (feedback — 索引压缩第二轮法 + set-diff 验证)。索引同步压缩维护 (27.3→16.5KB, 182 条零丢失)。
+
+## 追记 (2026-10-28T12:37:52Z) — hermes-019 Phase 2 已由双子星轨 ship, §2 首条 carry 作废
+
+本 handoff 落库后 owner 曾指示本侧「开工 hermes-019 Phase 2」, recon (fetch 全远程 + #262 comments + nomad 实证) 发现**对方轨已全程完成**, 本侧零接触退出:
+
+- **Phase 2 cutover**: 10-27 16:26Z (nomad `aria-orchestrator` job 重启时刻实证) — C7 全绿 (生产 DM 往返 glm-4.6 应答)。证据: #262 comment **#31157**
+- **终关**: 10-28 07:48Z C1-C8 全绿 (10-24~28), **#262 已 closed**。证据: comment **#31206** + 主仓分支 `migrate/hermes-019-phase0` 归档提交 `209bd272` (纯 `git mv`)
+- **残余 (归双子星轨承接, 本侧勿动)**: 分支合 master (⚠️ 子模块 gitlink `e4c2e2ba` 只在 orchestrator origin、**github 无此分支** — 合并序 = 子模块先本地 merge 双推 → 再合主仓, 否则 orphaned gitlink) / tasks.md 0/18 勾选簿记 / C8 24h 观察窗 (~10-28 16:26Z 到期) / TASK-018 (purge 0.7 + 归档旧镜像 + CLAUDE.md hermes 版本行) / #264 关单时机 (C8 后)
+- 会话本侧零 repo 写入退出; 同事实已固化 memory `project_hermes_019_migration_shipped` (双保险: latest.md 指针行的旧 carry 摘要待双子星下一份 handoff 接替时自然消解)
