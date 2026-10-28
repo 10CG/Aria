@@ -1,7 +1,7 @@
 ---
 name: hermes-019-migration
 level: 2
-status: Proposed (spec, 判据先行; PoC 六绿是直接证据输入)
+status: 实施完成待 C8 终判 — Phase 0-2 已落地 (cutover 2026-10-27T16:26:36Z, 证据 #262 c#31157/c#31206); C1-C7 绿; C8 部分: gateway 零重启 + 零事故绿 (2026-10-28 接管核查实测 26h+), 但 hermes 常驻 cron 未迁生产 (0.7 清单已失) → 10CG/Aria#266 待 owner 裁 aria-layer1-* 覆盖面; 原轨归档提交 209bd272 (「C1-C8 全绿」宣称与实测不符) 经 owner [A] 裁定不并
 module: aria-orchestrator (子模块: Dockerfile + config + deploy HCL) + Aria (CI workflow)
 created: 2026-10-26
 issue: https://forgejo.10cg.pub/10CG/Aria/issues/262
@@ -14,7 +14,7 @@ evidence_base:
 
 # hermes 0.7.0 → 0.19.0 真迁移
 
-> **Linked Issue**: `10CG/Aria#262`
+> **Linked Issue**: `10CG/Aria#262, 10CG/Aria#266`
 
 ## Why
 
