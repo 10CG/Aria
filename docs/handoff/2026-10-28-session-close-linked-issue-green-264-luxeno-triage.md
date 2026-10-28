@@ -3,7 +3,7 @@ track-id: session-close-20261028-linked-issue-264-triage
 owner-container: simonfish/bfe8285d
 phase: session-close
 status: done
-updated-at: 2026-10-28T18:55:00Z
+updated-at: 2026-10-28T19:02:00Z
 ---
 
 # Aria — Session Handoff (2026-10-28) — Linked Issue 归绿 + #264 luxeno 路由 triage 定案
@@ -107,3 +107,7 @@ flags = active_change_not_in_upm advisory ×N — 既有已知 (无运行时 UPM
 - **三单闭环**: #266 (裁定记录 c31513) / #264 (处置 c31516, triage next-cycle 落点兑现) / #268 (证据补链 c31509) — 全 closed
 - 提交: 归档 `3d3eded3` + 本追记; 双推核验
 - **hermes-019-migration 轨终结**: 生产 = 0.19 @ `e8d3ef3d`, spec 归档, 原 `migrate/hermes-019-phase0` 分支 (主仓 `209bd272` / orchestrator tip 已并) 可删未删 (归属 owner 分支卫生)
+
+## 追记五 (2026-10-28T19:02Z) — 分支卫生执行 (owner 指令)
+
+`migrate/hermes-019-phase0` 三处全删 (主仓 origin + 本地 `-D` [两个未并提交 `9dea3b1d`/`209bd272` 均已被 `9726b321`/`3d3eded3` 取代] + orchestrator origin [tip `fca7e8bc` 已在 master]); 占位 worktree `/tmp/a-wt/aria232-fix` 手动清除 (git 拒移含子模块的 worktree → rm -rf + prune; 树净无独占内容) + `git worktree prune`。ls-remote 两仓核验分支已不存在。`poc/hermes-019-upgrade` / `spec/hermes-019-migration` 分支未动 (owner 未指)。**hermes-019 全域零残留。**
