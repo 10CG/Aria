@@ -141,8 +141,8 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
     落地 (PR #255: 门只计 capability 类 / routing 观察面; 套件 type 标注已 owner 追认作门 (2026-10-27 #243; 5 条 capability 残留误触定性留观察面); A 跟进 #253)
   2026-10-22 双子星分界: 双子星轨 = #217 secret-guard (owner 裁「钉设计后实现优先」, R2 五席 FAIL
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
-版本: aria-plugin v1.77.4 (Aria#257 二轮收口: M-6 exit 严重度实修 + I-1 摘录 exit 码 + I-3 SC 行族收口;
-  v1.77.3 一轮清偿 3I/6M; 前版 v1.77.2 #223/#218/#246; 套件缺口 #258/#261 已裁 2026-10-27: 258 (b) substitute 常驻 wontfix · 261 (b) 逐字断言 + (a) P2 → #265) | 主项目 v1.7.5 |
+版本: aria-plugin v1.77.5 (aria-plugin#217 secret-guard W10 尺寸误拦收窄: >8KB 大命令按增长量在硬截止内完整重判, 放宽 x86_64 GNU/Linux bash 5.0-5.3 非 WSL;
+  套件 831→991 例, 真实流量放行 136/137; 前版 v1.77.4 Aria#257 收口; 套件缺口 #258/#261 已裁 10-27) | 主项目 v1.7.5 |
   aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = glm-4.5-air
 ```
 
