@@ -1,6 +1,6 @@
 ## Triage Report
 
-**Verdict**: `needs-info` | **Severity**: `minor` | **Recommended Action**: `next-cycle`
+**Verdict**: `partial-repro` | **Severity**: `minor` | **Recommended Action**: `next-cycle`
 
 ---
 
@@ -8,46 +8,64 @@
 
 | Field | Value |
 |-------|-------|
-| Reported | (未报版本 — 评估类 issue) |
-| Current | aria-plugin 1.77.4 (issue 的版本轴是被评估对象 hermes: 现役 0.7.0 vendor → 目标 0.22.x, 非 aria-plugin) |
-| Gap | n/a |
+| Reported | (issue 未报版本 — 基建排查型) |
+| Current | aria-plugin 1.77.4 / hermes 0.19.0 (PoC) |
+| Gap | 不适用 |
 
 ### Code Path
 
-- `plugins/platforms/feishu/adapter.py` — 不在本仓 (属 hermes 运行时部署面)
-- `~/.hermes/config.yaml` — 主机路径, 不在仓内
-
-引用路径均属 hermes 运行时侧, 与 Aria 仓不重叠, 符合「运行时升级评估」性质。
+issue 不引代码路径 (外部 API 排查型)。相关配置面已核: `hermes-upgrade-poc/config.yaml` (provider=custom + `glm-4.7-flashx` + `base_url: https://api.luxeno.ai/v1`) 与 `deploy/hermes-upgrade-poc.nomad.hcl` (P4 三件套接线, key 来自 nomad var `nomad/jobs/aria-orchestrator` 的 `LUXENO_API_KEY`) — 均与描述一致。
 
 ### Git History
 
-Step 4 skipped — cited paths 不在仓内, 无命中对象。
+No recent commits matched on cited files (无代码变更涉入)。
 
 ### In-flight
 
 | Category | Matches |
 |----------|---------|
 | Remote PRs | none |
-| Local branches | `poc/hermes-019-upgrade` — **活跃执行中** (worktree `/tmp/a-wt/aria232-fix`, triage 观测窗 tip `fe2fdd0` (08:07 UTC) → POST 前已至 `6b6a36c` (11:48, P2b 真实 feishu WS 实连: 连接+往返双判据), 本地未推; 关键提交 `#262 PoC digest 钉入 (0.19.0-poc)` / `P4 claude 走内网 npm 镜像` / `P4 终版 ANTHROPIC_MODEL=glm-4.5-air`) |
-| Worktrees | 同上 (非本 triage 会话所属 — 占用中, 不并行接手) |
+| Local branches | none (triage 时点无 luxeno 相关修复分支) |
+| Worktrees | `migrate/hermes-019-phase0` (@/tmp/a-wt/aria232-fix, Phase 0 迁移在途 — 本 issue 解阻其 Phase 2) |
 
 ### Reproduction
 
-**Mode**: `skip` | **Hit rate**: `0/1`
+**Mode**: `auto` | **Hit rate**: `5/7` (2026-10-28 实测, 差分矩阵 14+ 探针)
 
-- case-1: 评估类 issue 无缺陷复现体, 未执行; PoC 验证格子 (gateway 起 + Lark 连通 + cron 真跑) 属 in-flight PoC 轨范围, 不在 triage 内代跑。
+| Case | 输入 | 结果 | match |
+|---|---|---|---|
+| 1 | PoC P4 原样路径 (claude-cli UA + x-api-key + `glm-4.5-air` + `api.luxeno.ai/v1/messages`) | **HTTP 200** — 路由全通 | ❌ 不复现「不通」 |
+| 2 | 同上但 UA=Python-urllib (代理/直连两种 egress) | **HTTP 403**, body=`error code: 1010` | ✅ 403 复现 |
+| 3 | 假凭据对照 (同 case-2) | 403 与真凭据**完全同形** — 拒绝发生在凭据校验之前 | ✅ |
+| 4 | `glm-4-5-air` (SDK 归一形态) | 400 "Model not available via the Anthropic Messages API" | ✅ SDK 归一化缺陷独立确认 |
+| 5 | `glm-4.7-flashx` 双通道 | **双通道均 400** (新发现: PoC config 模型已不可用) | ✅ |
+| 6 | `glm-4.5-air` / `deepseek-v4-pro` @ chat-completions | **双 200** (与 PoC 10-25 的 400 相反 — 网关已变更) | ❌ |
+| 7 | 本地 router 127.0.0.1:3457 sanity | 200 | ✅ |
 
-### 上游核实 (事实核对, 2026-10-24 WebFetch)
+### 四个排查方向 — 逐一回答
 
-- ✅ 「上游活着」**成立**: GitHub `NousResearch/hermes-agent` releases 最新 **v0.22.5 (2026-10-22)**, 近两周连发 v0.22.0–v0.22.5。
-- ⚠️ 勘正 1 — **分发面**: v0.22.x 只在 GitHub releases; **PyPI `hermes-agent` 停在 0.19.0 (2026-07-20)**。评估范围 3 (129MB vendor → 正常 pip 钉版) 在 0.20+ 上结构受限: pip 可钉到的最新即 0.19.0 (与 in-flight PoC 钉 `0.19.0-poc` 相互印证); 0.22 激活需走 git tag / 官方分发渠道 (v0.22 已转 signed desktop packages / MS Store 方向)。
-- ⚠️ 勘正 2 — feature 归属松动: release notes 未见 "Bots Mode/A2A" 字样; Bot Screen (v0.22.0) / Bot relay mailbox RPC (v0.22.1) / steering + subagent picker (v0.22.3) / pluggable delegation backends (v0.22.5) 均落在 **v0.22 系**。评估范围 2 (Bot 模式 vs 自建 Lark 接入层) 的对象版本应指 v0.22, 非 v0.21。
-- 🔴 安全: PyPI 页面挂 **2 条公开可利用 advisory (CVE-2026-10221 / CVE-2026-10224), `fixed_in` 空** — 若影响 0.19 线, PoC 目标版本本身带未修 CVE; 评估范围 1 须把 CVE 面 (Lark token / 凭据处理) 纳入兼容性矩阵。
+1. **403 是否限流?** ❌ 否。`x-ratelimit-remaining: 238` (充足); 真假凭据 403 完全同形; 403 响应体为 **Cloudflare `error code: 1010`** (官方定义: "banned based on your browser's signature") — 是 **CF WAF 按 User-Agent 签名封禁**, 不是限流也不是权限层。无需等待恢复。
+2. **模型名规范化?** ✅ 独立真缺陷 (但与 403 无关): `glm-4-5-air` → 400 "not available"; 而 `Anthropic/Python` SDK 的 UA 本身**不在封禁面** (实测 200)。即: SDK 路径死于模型 id 归一化, 探针路径死于 UA 封禁 — 两个独立故障叠加成了「全灭」观感。
+3. **正确的调用方式?** `POST https://api.luxeno.ai/v1/messages` + `x-api-key`(或 `Authorization: Bearer`) + `anthropic-version: 2023-06-01` + `model=glm-4.5-air`, **任何 UA 除了裸 `Python-urllib/*`** (curl / claude-cli / browser / requests / httpx / OpenAI-SDK / Anthropic-SDK / axios / Go 实测全 200)。
+4. **chat-completions 可用模型?** ✅ **glm-4.5-air 现已可用** (今日 200, PoC 时点 400 — 网关 10-25 后已开放), `deepseek-v4-pro` 亦通; 但 **`glm-4.7-flashx` 双通道均 400**。
+
+### 新发现 (issue 未提, 对迁移直接相关)
+
+- **`glm-4.5-air` 请求实际 serve `glm-5.3-flash`** (响应 `model` 字段, 3 次探针一致) — 网关静默改路由, glm-4.5-air 疑似已退役/映射。
+- **hermes 0.19 PoC config 的 `glm-4.7-flashx` 双通道不可用** — 迁移 config.yaml 必须换模型 (见下)。
+- **封禁面极窄**: 仅 `Python-urllib/*` 签名被封。生产 Layer 1 (aria-orchestrator, httpx/requests 系客户端) 不受影响 — nomad 实测 job `running`、部署 successful。
+- `nomad/jobs/luxeno-cf-waf-watchdog` 在跑 — CF WAF 封禁是既有运维面; 回看其近期 run 可定位封禁规则生效时间窗 (10-24 探针曾通 → 规则可能在 10-24~10-27 间新增, 或当时探针 UA 不同 — 建议回看 10-27 探针脚本实现定论)。
+
+### hermes 0.19 迁移 Phase 2 解阻路径 (无需 zai 备胎)
+
+1. `config.yaml` model `glm-4.7-flashx` → `glm-4.5-air` (注意实际 serve glm-5.3-flash) 或 `deepseek-v4-pro`; chat-completions 与 Messages 两通道今均可用
+2. 探针/巡检脚本避开裸 `Python-urllib` (requests / httpx / curl 均可)
+3. 若走 Anthropic SDK: 注意模型 id 归一化缺陷; 或直接用 claude CLI 三件套 (P4 路径, 今日复跑 200)
 
 ### Verdict Rationale
 
-评估类 issue, 无缺陷复现体 (skip 模式 → `needs-info`)。「上游活着」前提经 GitHub releases 证实, 但新增三个评估必须吸收的事实: 0.22 分发面 GitHub-only (PyPI 停 0.19)、feature 归属实际在 v0.22、2 条未修 CVE。PoC 已 in-flight (0.19.0-poc), 本 triage 不并行接手, 仅回填事实核对供 PoC 轨与 owner 使用; `next-cycle` = 评估按 issue 末节「判据先行」格子正式走 (与 in-flight 方向一致)。
+403 现象在 `Python-urllib` UA 下 100% 复现 (case-2/3), 但其根因是 CF WAF 浏览器签名封禁而非模型路由故障 — P4 原样路径今日 200 (case-1), 与 issue「路由不通、阻塞 Phase 2」的定性实质偏离, 故 `partial-repro`。生产零影响 (封禁面不含 httpx/requests, Layer 1 running), 迁移解阻仅需 config 级调整 (模型名 + 探针客户端), 故 `minor`。建议落点: 并入 `hermes-019-migration` 既有 cycle 的 Phase 2 config 任务 (无需新 spec), Phase 2 config 落地后本 issue 可关闭, 故 `next-cycle`。
 
 ---
 
-*Generated by `/issue-triage` v1.77.4 — Ref: 10CG/Aria#262*
+*Generated by `/issue-triage` v1.77.4 — Ref: 10CG/Aria#264*
