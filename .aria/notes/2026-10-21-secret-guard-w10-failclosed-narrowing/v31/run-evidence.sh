@@ -24,7 +24,8 @@ if [[ -n "${IMPL:-}" ]]; then cp "$IMPL" "$W/impl.sh"; else python3 "$HERE/mkv31
 BS=$(sha256sum < "$W/base.sh" | cut -c1-12); IS=$(sha256sum < "$W/impl.sh" | cut -c1-12)
 hdr() { printf '# %s | %s | bash %s | base sha256 %s | hook sha256 %s' "$(date -u +%FT%TZ)" "$(uname -sr)" "$BASH_VERSION" "$BS" "$IS"
   for f in sc-cases.sh sc-direct.sh mutants.py; do printf ' | %s sha256 %s' "$f" "$(sha256sum < "$HERE/$f" | cut -c1-12)"; done; printf ' | load %s\n' "$(cut -d' ' -f1-3 /proc/loadavg)"; }
-N=(taskset -c 0,1 nice -n 19)
+TS=${SC_TASKSET:--c 0,1}   # SC_TASKSET: the taskset arguments for the stages (default both cores; a quieter single-core run is a resource choice, not a criterion)
+N=(taskset $TS nice -n 19)
 for st in $STAGES; do case $st in
 W8) { hdr; diff -u "$W/base.sh" "$W/impl.sh" | sed '1,2s/\t.*//'; } > "$W/W8-v31.diff"
     printf 'added %s (blank %s) removed %s\n' "$(grep -c '^+[^+]' "$W/W8-v31.diff")" "$(grep -c '^+$' "$W/W8-v31.diff")" "$(grep -c '^-[^-]' "$W/W8-v31.diff")" > "$W/W8-count.txt"
