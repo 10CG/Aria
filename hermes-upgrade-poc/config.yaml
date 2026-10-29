@@ -1,0 +1,29 @@
+# hermes-upgrade-poc 配置 — P1 迁移产物 (0.7 config v0 → 0.19 v33) 基础上
+# 仅改 model 默认: zai → luxeno custom (PoC 无 zai key; zai 键存活 P1 已证)。
+# 其余键 (fallback/terminal/skills/toolsets/cron) 逐字保留迁移产物。
+model:
+  provider: custom
+  model: glm-4.7-flashx
+  base_url: https://api.luxeno.ai/v1
+  api_key_env: LUXENO_API_KEY
+fallback_model:
+  provider: custom
+  model: glm-4.7-flashx
+  base_url: https://api.luxeno.ai/v1
+  api_key_env: LUXENO_API_KEY
+terminal:
+  backend: local
+  cwd: .
+  timeout: 600
+  lifetime_seconds: 660
+skills:
+  nudge_interval: 0
+  external_dirs:
+    - ./skills
+toolsets:
+  platform_toolsets:
+    cli:
+      - terminal
+      - cronjob
+      - skills
+      - todo
