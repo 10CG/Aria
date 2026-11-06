@@ -1,0 +1,801 @@
+# 双层任务规划：parent 只引用既有 tasks.md 编号；本文件不是 Phase B/C/D 授权。
+metadata:
+  feature: audit-executor-minimal-repair
+  created: "2026-11-02"
+  spec: openspec/changes/audit-executor-minimal-repair/proposal.md
+  datasource: tasks.md
+  total_tasks: 21
+  estimated_hours: "72-142"
+  estimate_basis: "传统人工颗粒度参考，不是实际 AI 耗时预测；不得据此裁减 enabled gate。"
+  planning_authorization: approved
+  implementation_authorization: granted
+  revision: 2
+  execution_pause: null
+  revision2_audits: {post_spec: passed, post_planning: accepted_by_owner_not_converged}
+  revision2_boundary: "revision1绿灯不代替revision2审查；revision2 post_spec R3按现行legacy规则收敛，post_planning R5未收敛、5轮耗尽，2026-11-03真实owner选择接受当前结论继续实现（R5/owner-disposition.json绑定原始head和问答）。不改票、不加轮、不改预算或模型；TASK-002完整独立两阶段任务审查及三项Important修复复核已PASS；仅完成契约交付，不代表产品实现或Phase C/D授权。"
+  integration_authorization: not_granted
+  closure_authorization: not_granted
+  current_write_scope: [aria/skills/audit-engine/, aria/skills/config-loader/, .aria/config.json, .aria/config.template.json, .aria/audit-reports/audit-executor-minimal-repair/, .aria/notes/2026-11-02-audit-executor-implementation/, openspec/changes/audit-executor-minimal-repair/, docs/handoff/]
+  approval_boundary: "2026-11-02用户通过goal明确批准Phase B、Agent team与动态Workflow，按TASK-001..019推进，含规格内配置接入、真实探针和Rule #6。Phase C/D、提交推送发布、部署及PR #38恢复仍未授权；每个执行者只写本任务明确文件域。"
+  run_from: "项目根目录；下列命令中的 aria/ 为插件源码目录。实现与测试必须由文件位置或显式参数定位资源，不依赖规划机绝对路径。"
+  paths:
+    executor: &executor aria/skills/audit-engine/scripts/audit_executor.py
+    tests: &tests aria/skills/audit-engine/tests/test_audit_executor.py
+    fixtures: &fixtures aria/skills/audit-engine/tests/fixtures/audit_executor/
+    contract: &contract aria/skills/audit-engine/references/executor-contract.md
+    engine_skill: &engine_skill aria/skills/audit-engine/SKILL.md
+    execution_modes: &execution_modes aria/skills/audit-engine/references/execution-modes.md
+    convergence: &convergence aria/skills/audit-engine/references/convergence-algorithm.md
+    defaults: &defaults aria/skills/config-loader/DEFAULTS.json
+    config_skill: &config_skill aria/skills/config-loader/SKILL.md
+    evidence_root: .aria/audit-reports/audit-executor-minimal-repair/
+  success_criteria: [SC-1, SC-2, SC-3, SC-4, SC-5, SC-6, SC-7, SC-8, SC-9, SC-10]
+  parent_mapping:
+    "1.1":
+      title: "固化Workflow后端能力边界、原生身份与计时契约，以及portable历史回放输入。"
+      tasks: [TASK-002, TASK-003]
+    "1.2":
+      title: "实现受控执行脚本构建与原生记录收集入口，不依赖未公开的取消或模块加载API。"
+      tasks: [TASK-004, TASK-005]
+    "2.1":
+      title: "实现互斥状态分类、右删失时间、迟到raw隔离与终态证据。"
+      tasks: [TASK-006]
+    "2.2":
+      title: "保持未返回调用的资源槽约束，显式处理无法确认终态的情况，不伪称清理完成。"
+      tasks: [TASK-007]
+    "3.1":
+      title: "实现显式opt-in的相邻轮实际参评集合守卫，保留同一部分角色可收敛语义。"
+      tasks: [TASK-008]
+    "3.2":
+      title: "注册默认false及严格类型检查，接入本仓显式true并同步配置示例；不改旧报告或旧审计预算。"
+      tasks: [TASK-009, TASK-015]
+    "4.1":
+      title: "将构建、Workflow调用、收集和报告消费接入真实audit-engine路径。"
+      tasks: [TASK-010, TASK-012]
+    "4.2":
+      title: "完成边界、坏输入、坏实现负控和旧行为兼容测试。"
+      tasks: [TASK-011, TASK-013]
+    "4.3":
+      title: "完成独立目标的真实接线探针及Rule #6验证，保留可复核执行证据。"
+      tasks: [TASK-016, TASK-017]
+    "5.1":
+      title: "同步执行契约、收敛规则与采用说明；按规范完成后续审计和发布同步。"
+      tasks: [TASK-014, TASK-019, TASK-020, TASK-021]
+    "5.2":
+      title: "明确本次变更与PR #38原暂停周期的边界，不重置其轮数、不借验收重开该PR审计。"
+      tasks: [TASK-001, TASK-018]
+  contracts:
+    cli:
+      build: "python3 -I aria/skills/audit-engine/scripts/audit_executor.py build --repo-path REPO --manifest MANIFEST --output-dir RUN_DIR"
+      collect: "python3 -I aria/skills/audit-engine/scripts/audit_executor.py collect --repo-path REPO --manifest MANIFEST --build-record BUILD_RECORD --workflow-run-id RUN_ID --native-record NATIVE_RECORD --output ROUND_RESULT"
+      prepare_policy: "在collect完整基础参数上加 --prepare-policy，与--check-result互斥；只封存审计证据/生成policy-request及必要的独立checker脚本，不发布round-result/MD，不表示审计通过。"
+      previous_round: "prepare/final/check的--previous-round指紧邻有效轮，必须等于manifest.evidence.previous_round及固定scope有效head；有效round=1省略，void尝试由完整账本保留。"
+      check_result: "最终collect的相同输入上增加 --check-result ROUND_RESULT；只读重算base/存在的合法disposition sidecar，不写锁、账本或文件。prepare后native参数指冻结副本。参数名遵循proposal revision2，不新增取消、动态加载或重试服务接口。"
+      arguments: "大写参数指执行时由宿主取得的实际值，不将示例变量写进产品报告；RUN_DIR/ROUND_RESULT 均使用本次 run-key，不能指向 PR #38 旧报告。"
+    manifest:
+      required: [audit_cycle_id, client_round_id, checkpoint, change_id, round, attempt_index, candidate_sha, roles, single_agent_ms, round_ms, max_parallel, require_same_admitted_roles, evidence]
+      roles: "每项包含 role_id、agentType、model_alias、冻结 prompt；role_id/agentType 逐项等于项目显式团队数组的完整注册名，保持顺序且唯一。模型别名只追溯，不作为 agent model 覆载。"
+      identities: "两个 id 在 VM 外生成；audit_cycle_id 跨轮/会话续用，不能因不可比、全失败或恢复会话自动换 id 重置预算。"
+      policy_inputs: "executor-contract §10.2：运行前FileRef为cycle_origin/previous_round/dispatch_preflight/policy_inputs；三个post_*_index_path是未来locator，不伪填hash/runId。首次null由固定scope无旧周期来源扫描判定，genesis由build生成后被build-record引用；后续null/换cycle拒绝。"
+      round_semantics: "round为有效逻辑轮号，attempt_index含void单调递增；void不耗额度、不推进round、不替换previous/stability、不进normal序列、不完成refocus义务。skipped不增也不清零consecutive_refocus_count。"
+      native_indexes: "audit-engine capture adapter取真实runId/Transcript入口/显式路径，写audit/drift/disposition索引；这些是新wrapper而非native字段。Python验证agent/uuid/完整原件并封存，损坏引用拒绝，未提供终态引用才unknown。"
+    config_source: "固定读取 REPO/.aria/config.json 与当前插件 DEFAULTS；manifest 只有期望值，没有覆盖权。严格校验原始 JSON 与守卫布尔类型，然后合并；true 下须有 checkpoint 显式团队且实际 mode=convergence。"
+    budgets: {single_agent_ms: 120000, round_ms: 300000, max_parallel: 2}
+    timing: "准入 q=原生 queuedAt，C=startedAt+durationMs，D=原生 Workflow startTime+300000；C-q<=120000 且 C<D。调度从 VM timer 安装 S0 起计 300000，control_native_alignment=unknown；不得猜 S0 与原生时间偏移。"
+    state_priority: [not_dispatched, dispatched_no_completion, completed_late, completed_no_result, completed_parse_error, completed_admitted]
+    termination_evidence: [completed, interrupted_observed, unknown]
+    pair_guard: "只配对同cycle/checkpoint/change且有效round相邻、固定账本最新有效head的真实准入集合；完整重算前史，void不替换head；candidate/model只追溯。"
+    result_consumption: "true路径build → 真实审计Workflow(scriptPath,args) → collect --prepare-policy → 必要的独立drift Workflow → 最终collect → 同源--check-result → 消费commit完整的JSON/MD及存在的合法sidecar；false完整legacy。"
+    schema_details: "executor-contract §10为revision2字符级SOT；原生/双时钟/六态/raw主体保留，不执行历史脚本。revision2检查点已通过/由本次真实owner依法接受未收敛结论；仍须TASK-002完整独立两阶段任务审查接受后才实现目标接口。"
+    cycle_storage: "固定 .aria/audit-reports/_executor-ledgers/<sha256(C([checkpoint,change_id]))>/，不含cycle/candidate；genesis+连续reserve/commit/observe/disposition+POSIX flock短锁。pending禁止重派；同reservation/同输入/同字节才窄恢复，不覆盖，不自动rollover。"
+    freeze_order: "前源字节/manifest→genesis→script→reserve→build-record；audit→index→冻结闭包→policy-request→checker script；drift→index→最终闭包→result/MD→commit。result不引用自身/未来commit，genesis不反引build-record；当前固定源漂移拒绝，历史读冻结字节不执行旧代码。"
+    canonical_aggregation: "canonical_v1：仅准入findings；精确category/scope bucket最高severity，每type一结论保留该type所有完整C(finding) variants与members；差异标unresolved_variants不冒充语义矛盾，完整四元组比较/排序，短id仅展示，禁止prior_id/路径归一化。阈值使用binary64 /与>=，不换Decimal/Fraction。"
+    human_disposition: "真实AskUserQuestion/tool_result关联tool_use_id/sourceToolAssistantUUID及toolUseResult.questions/answers/annotations；绑定cycle/耗尽head/三选项，一次性消费。旧样本只证schema；同collect参数另写sidecar/disposition不改base，increase固定+2，accept/degrade保持converged=false。"
+    amendment_vectors: "proposal A-1..A-6映射原SC，contract §10.8正常链及四组坏态；非作者QA独立构造坏态并验证指定原因，不能靠自报boolean或短hash绿灯。"
+  execution_policy:
+    authorization: "用户goal已授权TASK-001..019的Phase B及动态Workflow；TASK-015/016/017按该授权执行规格内配置接入、真实探针与Rule #6，仍须核实实际平台/启动条件，不将授权扩张到范围外操作。TASK-020/021仍分别须Phase C/D授权；依赖完成不构成授权。"
+    gates: "主控按实际配置在原定时点执行 enabled mid_implementation、条件触发 mid_post_spec、post_implementation、pre_merge、post_closure；不得攒到收尾补跑、降级、关门或改序。post_planning 不由本文件作者执行。"
+    scheduling: "dependencies 为必要前置，execution_order 为一种实填拓扑序；无依赖不自动许可并行，仍须文件域不相交。测试/实现同一文件必须串行，不能按 Agent 名不同并行。"
+    serialized_write_domains:
+      - paths: [*executor, *tests]
+        order: [TASK-004, TASK-005, TASK-006, TASK-007, TASK-008, TASK-010, TASK-013]
+      - paths: [*engine_skill, *execution_modes]
+        order: [TASK-012, TASK-014]
+      - paths: [*contract]
+        order: [TASK-002, TASK-014]
+    allowed_parallel_groups:
+      - [TASK-003, TASK-009]
+    max_audit_concurrency: 2
+    max_heavy_experiments: 1
+    resource_reference: "沿用已注入的 shared-host-throttle / feedback_shared_host_cpu_throttle_experiments 与 aria-plugin-benchmarks/AB_TEST_OPERATIONS.md §并发控制；不把容器本地 memory 路径变成产品依赖。"
+    resource_discipline: "重实验前按既有纪律限制会话进程树 nice=19、ionice class 2/nice 7、CPU 0-1；同刻单一重实验，审计席并发<=2，探针全量每席<=2次，坏实现只跑相关子集。时档测试沿用一分钟负载<2的串行准入，不改阈值、不把 loadavg 当核数；无合格窗口则 NOT-JUDGED 并阻断相应验收。"
+    tdd: "各代码任务先写可失败断言、保存指定原因 RED，再最小实现 GREEN；首次缺模块的 import error 只证明宿主未建，不能替代后续行为 RED。GREEN 必须有实际 judged 用例，不以 exit 0 掩盖整批 skip。负控是正确实现通过、故障实现被指定断言判红，不接受坏态也绿。"
+    historical_data: "R2-R5 portable fixtures 只读；不执行 sources/ 的历史 JS/Python 文本，不依赖原机器绝对路径，不伪造历史 build-record 或把旧报告补成新准入证据。"
+    phase_b_exit: "SC-1..SC-10 的证据须同时包含单测、非作者坏实现负控、真实完整接线探针和 skill-creator Rule #6；Spec/规划审计通过不等于实现完成。"
+    invalidation: "后续若改动已验文件/指令，重跑受影响测试；Skill 指令或 description 变化使 TASK-017 对应结果失效，须重跑后才能进入发布。"
+  rule6_obligation:
+    decision_table_row: 2
+    planned_description_change: false
+    scenario1: required
+    scenario4b: required_if_description_changes
+    executor: skill-creator
+    references: [standards/conventions/skill-benchmark-exemption.md, aria-plugin-benchmarks/AB_TEST_OPERATIONS.md]
+    evidence_rule: "当前未执行，不填充伪结果；TASK-017 实跑后在本任务的 rule6_note 写 SOT §4.1 五字段与真实结果目录。单测、结构测试和实际 Workflow 探针都不能替代场景1。"
+  version_policy: "不预定版本号。实现/发布时重新实取 aria/.claude-plugin/plugin.json 与版本管理规范，再决定兼容级别和同步面；产品交付面不写版本占位符。"
+  protected_boundary: "PR #38 继续暂停；保留旧 source/报告、原 cycle_id、轮数、converged/merge_clearance 和 max_rounds=5。本 Spec 的审计/探针属于独立目标，不恢复、回填或重开 PR #38。"
+
+execution_order:
+  - TASK-001
+  - TASK-002
+  - TASK-003
+  - TASK-009
+  - TASK-004
+  - TASK-005
+  - TASK-006
+  - TASK-007
+  - TASK-008
+  - TASK-010
+  - TASK-012
+  - TASK-011
+  - TASK-013
+  - TASK-014
+  - TASK-015
+  - TASK-016
+  - TASK-017
+  - TASK-018
+  - TASK-019
+  - TASK-020
+  - TASK-021
+
+tasks:
+  - id: TASK-001
+    parent: "5.2"
+    title: "建立实施前的只读保护基线与授权边界"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: []
+    deliverables:
+      - .aria/audit-reports/audit-executor-minimal-repair/integrity-before.json
+    agent: tech-lead
+    reason: "需要跨主仓、插件和旧审计周期建立证据边界，避免将新机制验收变成旧周期重启。"
+    sc_coverage: [SC-9, SC-10]
+    interfaces:
+      input: ".aria/notes/2026-11-01-pr38-audit-execution-diagnosis/{sources.json,verification.json}、其列出的原件、PR #38 旧报告及原审计配置。"
+      output: "按项目相对路径记录原件 SHA-256/大小、旧报告内容 hash、原 cycle/轮数及 max_rounds=5；仅写新 evidence 文件，不读写 secret 值。"
+    steps:
+      - "另获 Phase B 授权后，主控先核验并发在制轨与当前边界；本任务不 acquire/release claim，不修改 PR #38 状态。"
+      - "用 stdlib 哈希读取 sources.json 所指原件，校验已有保全清单；记录本次保护总体，不重复分析根因、不执行历史脚本。"
+      - "记录 PR #38 保持暂停、本 Spec change_id 与未来独立探针 context；若原 max_rounds 不再为5或原件与保全不符，停止并报告，不能覆盖基线掩盖差异。"
+    verification:
+      - "对清单每个原件独立重算 SHA-256 后与记录逐一相等；缺文件、少一项或 hash 不等均失败，不能以文件数量相等代替。"
+      - "新 evidence 不含新审计票、旧 cycle 的新 round 或 PR #38 写回；TASK-018 将使用同一总体作 before/after 对照。"
+
+  - id: TASK-002
+    parent: "1.1"
+    title: "固化 build/collect/check-result 与证据来源契约"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-6"
+    dependencies: [TASK-001]
+    deliverables: [*contract]
+    agent: backend-architect
+    reason: "先将已批准 Spec 转成实现与测试共用的严格接口，防止各自补齐出不同语义。"
+    revision2:
+      input: "主控implementation-ruling、两份设计及真实human-decision shape；proposal revision2 amendment。"
+      files: [*contract]
+      interface: "补prepare、manifest.evidence/attempt_index、前后索引、原字节闭包、固定scope/genesis/锁/窄恢复、问答sidecar、canonical_v1；保留原生/双时钟/六态。"
+      acceptance: "A-1..A-6均有全字段无环正常链及指定拒绝；B_*设计闭合不等于实现通过。完整独立两阶段任务审查及三项Important修复复核已PASS，TASK-002仅契约交付completed；post_planning的owner接受不替代本任务审查，产品实现仍须后续验证。"
+    sc_coverage: [SC-1, SC-5, SC-6, SC-7, SC-8]
+    interfaces:
+      input: "proposal What §2-6、公开 Workflow 接口、诊断 README 和 sources/workflow-R5-script.txt 的 parse 契约；后者仅作为文本依据。"
+      output: "executor-contract.md固定manifest/build-record/原生映射/round-result/raw/错误表，以及build、collect --prepare-policy、最终collect、只读check与处置sidecar的闭合接口和冻结时序。"
+    steps:
+      - "逐字段列出 native startTime/queuedAt/startedAt/durationMs、run_id、嵌入 script、标签/agentType、完成/中断原件和完整性标记的真实来源；路径由外部显式传入，不从 subagents 顶层猜测。"
+      - "将 JSON 或整体 fenced JSON raw 契约钉为 vote、coverage_complete、findings、pending、prior_findings；finding 的 severity/type/category/scope/file/line/failure_scenario 沿用既有验证，coverage不足、pending或Major/Critical要求REVISE。仅 PASS/REVISE 票进入既有投票语义。"
+      - "列出配置/defaults/生成 script/native/previous 等输入 hash、双时钟、六态 first-match、termination_evidence 和迟到 raw 引用字段；将实际 model 标签与配置别名分开。"
+      - "定位旧汇总层的 verdict/drift/轮数输入及消费者；需要进入可重算输出的既有 policy 输入必须有可校验来源与 hash，不新设漂移策略、不将人工结论当成可验证输入。"
+      - "明确 false 的 legacy 分支、true 的 Workflow/convergence/显式团队限制、unsupported 分支和 unknown 终态阻断新增派发；若真实接口无法表达批准契约，停下提 Spec 欠定，不发明取消/导入能力。"
+    verification:
+      - "对 build/collect/check-result 每个结果字段均能回链到输入字段、公式或既有 policy 来源；无来源的 boolean 不得以 false/true 默认补齐。"
+      - "调用契约不出现 VM 内 Node/文件系统/本地模块、Date.now/随机 API 或单席取消；label 可由 client_round_id+索引确定且完整注册名逐项可校验。"
+      - "首轮、缺证、非法类型、脚本内容错配、非相邻轮、unknown 终态的指定失败/非通过结果可直接派生测试，而不是笼统要求‘正确处理异常’。"
+
+  - id: TASK-003
+    parent: "1.1"
+    title: "提取只读 portable R2-R5 与时间边界数据夹具"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-002]
+    deliverables:
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt
+    agent: qa-engineer
+    reason: "由独立测试席保全真实样本和期望值，避免实现者按自己的结果塑造 fixture。"
+    sc_coverage: [SC-2, SC-9]
+    interfaces:
+      input: ".aria/notes/2026-11-01-pr38-audit-execution-diagnosis/{replay-fixture.json,sources.json,analysis.json,sources/}，只读数据。"
+      output: "四轮原生身份/逐角色时序/完成与中断证据/raw及脚本文本的必要切片；fixture 引用自身目录内相对路径并附源 hash、提取关系和预期结果。"
+    steps:
+      - "提取而不运行历史 JS/Python；将原绝对路径留作非解引用来源说明或转换为 fixture 内引用，测试不得访问原机器路径。对转换前原件 hash 与转换后数据 hash 分开记录。"
+      - "保留 R2 不同 candidate 和独立确认事实通道说明，不将其六条历史结论伪造为两份准入票的新聚合输出；历史角色标签与原生 agentType 的映射有原件依据，不给生产添加别名规则。"
+      - "记录派发6/7/6/5、准入2/4/2/1；12个旧占位对应8个已派发无C、4个未派发。未知C用null，8个中断标记只证明interrupted_observed。"
+      - "增加纯合成时间边界、timer安装偏移20ms及物理并发记录数据；历史/合成明确分区。probe-target.txt 只描述本执行器接口验收，不含 PR #38 待审代码。"
+    verification:
+      - "fixture 复制到临时目录、原诊断目录不可访问时仍能被 stdlib JSON 读取；内容不含需解引用的本机绝对路径，也不含可执行 import/脚本入口。"
+      - "history-provenance 的源条目与 TASK-001 基线逐项相符；提取不改原件。历史回放调用后续真实 normalize/classify 代码，不伪造历史 build-record 绕过生产脚本完整性校验。"
+
+  - id: TASK-004
+    parent: "1.2"
+    title: "TDD 实现严格配置来源、manifest 校验和 build CLI"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-003, TASK-009]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "代码宿主须先建立严格输入边界，不能让通用配置回落逻辑绕过 opt-in。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "实现_load_fixed_policy/_freeze_policy_inputs/_freeze_closure/_load_scope/_reserve_build；固定scope文件域仅为本独立目标的_executor-ledgers与本run-dir，不触旧PR目录。冻结blob/origin、真实fallback/Span与genesis initial limit。"
+      acceptance: "A-1首次null bootstrap成功且无自hash；已有scope null/换cycle/回退head拒绝，源漂移不能增加额度；锁占用E_SCOPE_BUSY，pending resume_only不重派，所有hash独立重算。"
+    sc_coverage: [SC-1, SC-5, SC-8]
+    interfaces:
+      input: "build --repo-path/--manifest/--output-dir；固定项目 .aria/config.json、插件 DEFAULTS 与 TASK-002 manifest schema。"
+      output: "可调用 stdlib argparse 入口；build-record 保存原始源 hash、有效守卫、显式团队、固定预算及生成脚本 hash。"
+    steps:
+      - "RED：在 test_audit_executor.py 建立 BuildContractTests；覆盖缺省false、显式true、字符串/null/0/数组值、损坏JSON、manifest守卫相反、团队删减/重排/重复和预算非120000/300000/2。"
+      - "GREEN：先校验原始 JSON 和布尔类型，再合并默认值；manifest 不可覆盖；true 下缺显式团队、人工覆盖、动态增补、model/agents_config覆载或非convergence模式均明确unsupported。"
+      - "将路径锚定 repo-path 与当前插件资源，禁止依赖 cwd 猜配置；hash 固定原文件内容，CLI 错误非零且不覆盖已有 build 产物。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k BuildContractTests -v"
+      - "每类拒绝输入均命中指定校验原因；不能只因尚未生成workflow.js或模块缺失而红。缺省false不要求采用方补团队或新历史字段，生产legacy分流由TASK-012/013另验。"
+      - "在临时 repo/config/defaults 副本运行，不改真实项目配置；build-record 的 hash 由测试独立用 hashlib 重算相等。"
+
+  - id: TASK-005
+    parent: "1.2"
+    title: "TDD 构建可供真实 Workflow 执行的字面量脚本"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-004]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "将指令面承诺落到生成脚本，保留公开运行时能力边界。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "唯一生成审计脚本及_render_policy_workflow；后者仅消费已冻结request，嵌入完整anchor/conclusions/hash，使用配置第一注册agentType的新独立checker实例、独立label与60000timer，不混入审计roles。"
+      acceptance: "request先写/hash后生成checker script，无反向环；受控VM执行证明自身timer/异常/返回证据可区分，脚本不增加FS/Date.now/取消接口，不以审计timeout当checker失败。"
+    sc_coverage: [SC-1, SC-6]
+    interfaces:
+      input: "已验证 manifest、冻结 prompts 与固定预算。"
+      output: "RUN_DIR/workflow.js 和最终 build-record.json；脚本返回深拷贝的逐角色 attempted/标签索引/已返回 raw 快照。"
+    steps:
+      - "RED：GeneratedScriptTests 验证文件以纯字面量 export const meta 开头，恶意引号/换行/反引号的 prompt 经 JSON 编码不能逃逸成代码；相同输入的脚本 hash 可复核。"
+      - "GREEN：仅使用公开 agent/log/phase、Promise 和已观察运行的timer；在 agent 调用前记录 attempted 与 label，在相对300000ms timer置stop后不再调用agent。"
+      - "返回时做不可共享的深拷贝快照，截止后 callback 不得修改已返回对象；不把 attempted 直接当作原生已启动证据，raw 的最终准入由 collector 原生时间判定。"
+      - "不使用 Node、fs、VM本地import、Date.now、随机API、opts.model 覆载或取消API；build-record 对实际输出 script 计算 hash。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k GeneratedScriptTests -v"
+      - "独立断言生成脚本允许接口集合及 prompt 编码，恶意输入不会产生额外 agent 调用；生成文本存在仅是结构GREEN，不标作真实Workflow通过。"
+      - "控制行为与深拷贝必须由TASK-013的受控timer执行测试和TASK-016真实调用继续验证；不得靠搜索关键词声称调度已被运行。"
+
+  - id: TASK-006
+    parent: "2.1"
+    title: "TDD 实现原生映射、双时钟与六态分类"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-005]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "准入与状态必须来自原生记录，而非占位结果长度或AI摘要。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "_classify_native/_verify_termination消费audit/drift index、冻结native及TerminationLink/JSONL；index非native，路径来自显式capture入口，保留原origin解析嵌套引用。"
+      acceptance: "A-3串run/agent/uuid/坏hash/正文损坏E_NATIVE_EVIDENCE；无终态引用才unknown且阻断新派发。live源封存后增长不补旧票，冻结blob篡改必须拒绝。"
+    sc_coverage: [SC-2, SC-5, SC-6]
+    interfaces:
+      input: "collect 的 manifest/build-record/workflow-run-id/native-record；fixture 回放使用相同原生归一化与分类函数，但不冒充生产已校验结果。"
+      output: "逐角色 q/startedAt/C/D、execution_state、unfinished_at_native_deadline、终态原件引用、实际model、迟到raw hash/ref。"
+    steps:
+      - "RED：NativeEvidenceTests/StatePartitionTests 覆盖 run_id、client_round_id+索引label、agentType、嵌入script内容hash和完整原生记录；重复/串轮/未映射/attempted与节点矛盾、done缺完成字段、非整数或倒序时间直接错误。"
+      - "GREEN：使用原生startTime作D起点、queuedAt作单席起点、startedAt+durationMs作C；未完成C保留null，不从tool回执收到时间倒推。控制时钟单列alignment=unknown并显影D后派发。"
+      - "按六态首个命中退出：无节点且未attempted；有节点无C；已知C越窗；窗内raw=null；窗内raw契约坏；窗内有效报告。late优先于null/parse_error。"
+      - "将 unfinished_at_native_deadline 与 collect时证据视图分开；completed/interrupted_observed/unknown 引用原件，迟到 raw 只保存引用不投票。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k NativeEvidenceTests -v"
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k StatePartitionTests -v"
+      - "q=0/C=120000准入，120001为late；q=200000/C=300000为late；130000/null先late；已知310000保留该C且late；未知C才null。D后queuedAt须显影且拒票。"
+      - "R2-R5回放精确得到派发6/7/6/5、准入2/4/2/1和占位8+4分区；中断标记不伪造成完成报告，不要求原共享scriptPath仍保存旧脚本。"
+
+  - id: TASK-007
+    parent: "2.2"
+    title: "TDD 保持物理槽生命周期并输出未确认终态"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-006]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "单席准入超时不等于调用结束，资源约束必须独立于收敛票据。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "_apply_preflight/_resource_view重算所有attempted及auxiliary checker调用，含void与跨会话残留；验证较晚同run/script/agent/q/start证据后只append observe，不改旧C/raw/admitted。"
+      acceptance: "审计占满2槽时不得派checker或伪造skipped，报E_RESOURCE_PENDING；unknown阻断下轮零新调用。真实checker fail-open与其unknown资源状态独立，不把timeout当取消。"
+    sc_coverage: [SC-5, SC-6, SC-9]
+    interfaces:
+      input: "生成脚本的未返回 agent Promise、原生终态标记与 collect 逐角色记录。"
+      output: "同轮未返回调用上界2；round-result 中可定位的 unknown 终态角色/调用引用，供 TASK-012 的下一轮入口阻断使用。"
+    steps:
+      - "RED：SlotLifecycleTests 用可控 agent Promise/timer 测超时未返回、最终返回和整轮stop；断言120s失去准入后仍占槽，不能用逻辑worker数量替代实际未返回调用数。"
+      - "GREEN：仅调用真实返回后同轮才能用回该槽；轮timer触发停止新增，不宣称取消已发送调用。unknown不清空、不伪称清理完成。"
+      - "给下一轮/跨会话入口导出原件引用和未确认终态；interrupted_observed 只描述运行时中断，不能写成所有OS进程退出或新的用户授权。"
+      - "终态约束不新增票据否决、不作废已有有效票、不重置cycle/round；TASK-012按同一未确认列表暂停全部新增派发并上报。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k SlotLifecycleTests -v"
+      - "超时未返回场景的实际未完成 agent 调用始终<=2；在120000ms释放槽但未取消的故障形状会达到4，必须使断言红。"
+      - "整轮返回后未知C/终态仍可追溯；只有可验证原生终态才能改变unknown，不能靠等待固定秒数或清空数组宣称释放。"
+
+  - id: TASK-008
+    parent: "3.1"
+    title: "TDD 实现相邻轮实际准入集合守卫与关闭向量"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-007]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "守卫比较实际角色身份，保持原部分角色可收敛语义而不引入7/7门。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "_aggregate_admitted/_replay_history/_apply_policy为唯一canonical_v1/历史/政策内核；前史闭包从固定genesis和连续reserve/commit重算，不信previous布尔或short id。"
+      acceptance: "A-2有效1→void2→有效2的attempt1/2/3、charged1/1/2、比较基线1；void保留refocus义务、skipped保留count。A-4循环/跳轮拒绝；A-5最高severity/不同type/完整variant与members守恒、短id碰撞不吞key。"
+    sc_coverage: [SC-3, SC-4, SC-5, SC-8]
+    interfaces:
+      input: "当前 completed_admitted 逐角色记录、可验证的紧邻 previous-round、有效布尔守卫与旧四元组/投票/作废语义。"
+      output: "conclusion_keys_equal、population_comparable/reason、conclusions_stable、converged、incomplete/all_failed_void。"
+    steps:
+      - "RED：PopulationGuardTests 覆盖同人数不同身份、不同人数、同一非空部分角色、首轮、旧参与证据缺席、空集、重复id、非相邻round、串cycle/checkpoint/change；保持候选/model变更只追溯。"
+      - "GREEN：集合只能从completed_admitted取得；first_round/missing_participant_evidence/empty_population/population_changed均不可比；重复或损坏/串cycle记录是错误，不新建基线。"
+      - "实现stable=keys_equal AND (NOT guard OR comparable)，converged=stable AND既有unanimous_pass AND NOT all_failed_void；不能覆盖既有drift/error阻断。"
+      - "关闭比较向量返回population_comparable=null/reason=disabled并遵循旧算法；该纯函数覆盖不表示生产关闭路径已切到新宿主，生产分流另由TASK-012验证。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k PopulationGuardTests -v"
+      - "同一部分角色、相同keys、准入票PASS、incomplete=true仍可converge；keys相同但{qa-engineer}与{tech-lead}或同人数交叉集合，guard=true必须false/population_changed，false保持legacy结果。"
+      - "first_round/缺证/空集均不能借空四元组集合相等通过；候选SHA或模型标签变化而角色相等不被偷偷新增为阻断项。"
+
+  - id: TASK-009
+    parent: "3.2"
+    title: "注册默认 false 与配置错误的严格例外"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-002]
+    deliverables:
+      - *defaults
+      - *config_skill
+      - aria/skills/audit-engine/tests/test_audit_executor_config.py
+    agent: knowledge-manager
+    reason: "配置注册与通用回落规则存在直接接缝，需同步文档并以独立结构断言防漏。"
+    sc_coverage: [SC-8]
+    interfaces:
+      input: "DEFAULTS audit块、config-loader错误处理表/字段规则、proposal What §2和§5。"
+      output: "audit.require_same_admitted_roles=false；原始JSON损坏或该键非法类型报错，不能通过通用默认回落静默关门。"
+    steps:
+      - "RED：ConfigRegistrationTests 在基线断言默认键存在且是bool false，以及config-loader指令明确该键的严格例外；缺键或保留无例外的回落指令应红。"
+      - "GREEN：仅新增默认键与对应严格类型/解析失败例外，明确受控入口先读原始配置；不改变其他字段既有容错、checkpoint启用或团队配置。"
+      - "本任务不触真实 .aria/config.json/template，不能提前激活true；行为级拒绝交给TASK-004 CLI测试，结构测试不声称验证过真实采用。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor_config.py -v"
+      - "JSON解析后的type(value)为bool且值false；文档严格例外与通用错误表不矛盾。非法字符串等的真实非零拒绝仍须TASK-004测试通过。"
+
+  - id: TASK-010
+    parent: "4.1"
+    title: "TDD 实现原子报告输出与只读重算校验"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-008, TASK-009]
+    deliverables: [*executor, *tests]
+    agent: backend-architect
+    reason: "必须让报告消费者可拒绝被篡改的集合与收敛域，而不是相信文件存在或helper声明。"
+    revision2:
+      files: [*executor, *tests]
+      interface: "同collect子命令实现_make_policy_request/_prepare_policy/_collect_final/_publish_and_commit/_parse_human_disposition；复用TASK-008纯内核。写域为本run-dir请求/冻结证据/JSON/MD/sidecar及固定scope事件，不扩通用服务。"
+      acceptance: "A-1 prepare exit0不发布报告/commit；A-3 required drift无真实源final拒绝。A-6同reservation同字节可补半发布、不同字节冲突；check零写入。真实tool_result关联/schema/耗尽head不符或重放不加2；合法sidecar不改base与converged。"
+    sc_coverage: [SC-5, SC-7, SC-8]
+    interfaces:
+      input: "同源collect全部参数、可选previous-round；check-result额外接收待校验round-result.json。"
+      output: "项目 .aria/audit-reports/ 明确run-key的round-result JSON及既有命名/frontmatter语义的MD聚合报告；check-result只读并用退出码表明可消费性。"
+    steps:
+      - "RED：ResultIntegrityTests 对run_id、嵌入script内容hash、身份/输入hash、逐角色状态/时序、集合、keys、policy及每个收敛布尔域分别篡改；纯展示生成时间变化不应失败。"
+      - "GREEN：collect/check-result重读固定项目配置与DEFAULTS并对比build-record hash；原生嵌入script为执行内容依据，不读取可能被覆盖的scriptPath证明旧内容。"
+      - "共用同一计算路径生成JSON/MD与check-result预期值，原子写新run-key、不覆盖既有已验证产物；校验失败非零且原JSON/MD字节不变。"
+      - "保持checkpoint/round/context与质量verdict语义，附加参与信息；迟到票只留引用，不进入四元组/投票，不将PASS当converged或merge gate。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor.py -k ResultIntegrityTests -v"
+      - "build后分别改源config、DEFAULTS、生成script或替换native嵌入script：collect/check-result命中指定漂移/完整性错误，不降为false/legacy；无native原件直接失败。"
+      - "对每个篡改向量校验前后hash不变；错误不得覆盖先前有效结果。未篡改新run-key正常collect→check成功，JSON/MD核心域一致。"
+
+  - id: TASK-011
+    parent: "4.2"
+    title: "由非实现作者独立构造并判红坏实现负控"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-010, TASK-012]
+    deliverables:
+      - aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json
+      - .aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json
+    agent: qa-engineer
+    reason: "测试拒绝能力须由非实现作者独立构造真实故障形状，避免同源盲区。"
+    sc_coverage: [SC-4, SC-5, SC-6, SC-7, SC-8, SC-10]
+    interfaces:
+      input: "已冻结executor-contract、批准SC和当前正确宿主；不得由实现席提供一套自证负控取代独立构造。"
+      output: "隔离临时副本上的故障实现/输入、指定失败断言及逐项CAUGHT证据；不将mutant写入产品脚本。"
+    negative_controls:
+      - shape: ignore_roles
+        fault: "stable只比较四元组，不看角色。"
+        must_fail: "keys相等而角色不同，断言stable=false/converged=false/population_changed；故障输出true使测试红。"
+      - shape: cardinality_only
+        fault: "用admitted_count相等替代role_id集合相等。"
+        must_fail: "两轮各两席但仅一席相同，人数均2仍必须population_changed；故障输出comparable=true使测试红。"
+      - shape: release_without_cancel
+        fault: "120000ms超时就补派，但原agent Promise未返回且无取消确认。"
+        must_fail: "可控调度记录实际未返回调用峰值4；<=2断言红，不能只观察两个逻辑worker后说通过。"
+      - shape: tampered_result
+        fault: "改converged或admitted_roles后check-result仍返回0，或报告消费者跳过check。"
+        must_fail: "指定篡改必须非零且报告未变，消费者不消费；故障接受/继续消费使断言红。"
+      - shape: missing_evidence_fallback_false
+        fault: "缺native/previous参与证据或配置非法时回落guard=false再按legacy放行。"
+        must_fail: "缺native/非法配置应错误，旧previous缺证应comparable=false/stable=false；故障回落后true或exit0使断言红。"
+    steps:
+      - "测试席与TASK-004..010实际实现作者必须为不同执行者；依据接口独立构造以上五类，可添加同根坏输入但不扩大产品功能。"
+      - "先用正确实现跑指定场景得GREEN，再只替换隔离副本的对应故障点，保存故障diff/hash、实际执行分支和指定原因RED；非零崩溃但未到指定断言不算CAUGHT。"
+      - "按相关子集串行跑物理并发/时间类负控；不建自研AB runner、不运行历史脚本、不触真实LLM。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor_negative_controls.py -v"
+      - "五类均记录correct=GREEN、fault=CAUGHT及指定断言；证明错误实现被拒绝，不能只记当前结果false。测试作者身份/实现作者身份与故障来源可追溯。"
+      - "若timer/进程/mtime被控制，相关时钟与状态源必须完整冻结；整批SKIP记NOT-JUDGED，逐例补跑后才允许验收。"
+
+  - id: TASK-012
+    parent: "4.1"
+    title: "接入真实 audit-engine 调用链与下一轮终态闸门"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-010, TASK-007, TASK-009]
+    deliverables: [*engine_skill, *execution_modes]
+    agent: tech-lead
+    reason: "实际消费者目前位于Skill与execution-modes，必须改真实入口而非仅新增helper。"
+    revision2:
+      files: [*engine_skill, *execution_modes]
+      interface: "真实capture adapter在已显式Transcript入口定位原件并生成audit/drift/disposition index；调用prepare后只按冻结request运行独立checker，再final/check/消费commit。同步true汇总指令指向canonical_v1，不保留临时persist或直接collect的另一规范。"
+      acceptance: "A-1/A-3完整顺序和原件映射可实测；prepare成功不得提前消费，required checker缺源必须停，非零不回legacy。人工提问包含可解析cycle/target/limit上下文与三选项；resume_only不再次Workflow。"
+    sc_coverage: [SC-1, SC-7, SC-8, SC-9]
+    interfaces:
+      input: "当前audit-engine配置/模式/团队入口、每轮context与固定anchor、旧轮预算/终态证据；TASK-002 CLI接口。"
+      output: "true+Workflow+convergence真实build→审计Workflow(scriptPath,args)→prepare→必要的独立drift Workflow→final collect→check→消费commit的JSON/MD与存在的合法sidecar；false仍走原生产编排。"
+    steps:
+      - "将原始守卫严格校验放在可能通用回落之前；false沿用原入口/默认团队/聚合/报告，不要求新manifest或旧报告补字段。非Workflow保持原路径且不声称守卫得到新宿主保障；缺参与证据不得宣称稳定。"
+      - "true先核显式团队/模式、冻结manifest并build；真实审计Workflow返回后capture audit index→prepare→按request必要的独立drift Workflow/capture drift index→final collect，不把label/scriptPath当run_id或prepare当发布；resume_only不得重新调用Workflow。"
+      - "正常消费前用完全相同输入调用--check-result；非零/缺原件/漂移/unsupported立即阻断，不回退AI散文、legacy或直接采信MD。仅从已校验JSON取得准入集合、稳定性、收敛布尔域。"
+      - "每次下一轮或恢复会话前查看同cycle既往未确认调用及原件，unknown则暂停全部新增派发并上报，不宣称清理/释放；这一入口也覆盖all-failed作废后拟补跑的分支，不借作废绕开槽约束。"
+      - "保留既有completeness gate、每轮sibling probe、anchor/drift与轮数路由；守卫只AND收紧，不获得额外轮次、换cycle、改120/300/2或自动恢复PR #38的权力。"
+    verification:
+      - "TASK-013 WiringContractTests须在真实SKILL/execution-modes分支断言build、审计scriptPath调用、capture、prepare、必要的独立checker、final/check/消费顺序及失败即停；不能仅检查executor存在或保留旧直接collect分支。"
+      - "TASK-016以真实工具事件证明本入口被调用；本任务文字接线完成本身不满足SC-1/SC-7。"
+      - "下一轮入口存在unknown终态时观察到零次新Workflow/agent调用，并呈现调用引用；与本轮已有有效票或converged布尔值无相互篡改。"
+
+  - id: TASK-013
+    parent: "4.2"
+    title: "完成受控执行、坏输入与 legacy/drift/max_rounds 兼容矩阵"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-011, TASK-012]
+    deliverables:
+      - *tests
+      - aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json
+      - .aria/audit-reports/audit-executor-minimal-repair/unit-evidence.json
+    agent: qa-engineer
+    reason: "跨调度、守卫和旧汇总语义做接缝验证，独立于逐个实现任务的自测。"
+    revision2:
+      files: [*tests, *fixtures, .aria/audit-reports/audit-executor-minimal-repair/unit-evidence.json]
+      interface: "非作者QA独立构造A-1..A-6、contract §10.8四坏态组；运行真实生成JS及同CLI离线prepare/final/check/sidecar，不从实现者自带fixture继承全部期望。"
+      acceptance: "同时有无环健康链GREEN和循环/缺policy/串agent/换cycle/篡改/吞variant坏实现指定原因RED；void/skipped/refocus分布与binary64阈值边界均判定。离线健康不冒充真实Workflow，skip为NOT-JUDGED。"
+    sc_coverage: [SC-2, SC-3, SC-4, SC-5, SC-6, SC-7, SC-8]
+    interfaces:
+      input: "真实生成workflow.js、portable历史/边界fixtures、当前SKILL/execution-modes、既有收敛/漂移SOT。"
+      output: "可重复运行的GeneratedWorkflowRuntimeTests/WiringContractTests/CompatibilityTests及逐项judged证据；只修改测试与fixture，不偷偷修生产实现。"
+    steps:
+      - "RED：在测试进程内提供受控agent/log/phase/Promise/timer宿主来执行真实生成JS；可使用外部测试工具但不让生成脚本获得Node/fs能力。脚本内容必须来自build输出，不能另抄一个Python调度模型代替。"
+      - "测timer安装偏移20ms、原生D后槽才空出且VM stop尚未触发的fixture：允许观测到越窗派发，但必须显影并拒票；再推进stop后不得新增agent，返回快照不被迟到callback改写。"
+      - "WiringContractTests对实际入口检查并执行同CLI离线build/prepare/必要的checker证据/final/check/消费链；缺prepare、required checker缺源仍放行、缺check/无视非零均须失败。离线不替代TASK-016真实Workflow。"
+      - "CompatibilityTests分别锁住guard缺省/false的整个legacy分流、开启后的同部分角色收敛、全失败作废不耗轮、部分失败incomplete不否决、票REVISE阻止收敛及质量verdict独立。"
+      - "按既有SOT锁住drift WARN阻断、drift-check失败既有标记、REFOCUS占配额及替换stability基线、振荡normal序列、DRIFT_TERMINATED与MAX_ROUNDS边界优先级、max_rounds<3/1；不借guard重置预算。"
+      - "GREEN后只跑本域回归；如发现生产缺陷，回退对应实现任务修复再复验，不在QA任务无边界扩大写域。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p 'test_audit_executor*.py' -v"
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_completeness_gate.py -v"
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_sibling_spec_probe.py -v"
+      - "正反控制均到目标分支，受控JS确实执行了build产物；若测试运行时依赖缺失则明确NOT-JUDGED，不将skip当通过，不要求VM自身具备该外部测试工具。"
+      - "兼容输入在旧行为与目标行为上按预期分区；drift/error仍可阻断，守卫不能覆盖，现有timeout/max_rounds/quality verdict未被改变。"
+
+  - id: TASK-014
+    parent: "5.1"
+    title: "同步最终执行契约、收敛公式和采用边界"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-012, TASK-013, TASK-009]
+    deliverables: [*contract, *convergence, *engine_skill, *execution_modes]
+    agent: knowledge-manager
+    reason: "收敛型文档须与已实现接口一致，尤其避免旧并发/超时描述被误读为取消承诺。"
+    sc_coverage: [SC-1, SC-3, SC-4, SC-6, SC-7, SC-8, SC-9]
+    interfaces:
+      input: "最终CLI --help、实际生成/收集结果、测试证据、原文档与已批准proposal。"
+      output: "一致的执行/消费示例、双时钟和六态说明、opt-in公式/失败原因、关闭legacy路径和采用说明。"
+    steps:
+      - "对照实际字段和退出语义同步文档，不手工写不存在的函数/参数；SKILL与权威execution-modes都指向同一条强制接线。"
+      - "明确两次300000的不同起点、native硬截止未保证、unknown终态不得新增派发；说明原生wall-clock不是纯推理，interrupted不等于OS全退出。"
+      - "写明同一部分角色可收敛、旧参与证据缺席不可比、候选/model不新增门；converged与quality verdict/merge gate分开，drift及max_rounds仍用既有规则。"
+      - "配置采用说明区分插件false与本仓Phase B显式true；PR #38继续暂停，历史不回填。计划不改description；若确需改，更新TASK-017场景4b义务并遵守现有授权/运行模式限制。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p 'test_audit_executor*.py' -v"
+      - "文档中的实际示例由CLI/脚本产物生成或逐字核对；交叉引用到目标文件检查存在，不能只在本文件声明‘已接线’。"
+      - "审查所有新增承诺：不出现7/7门、120s取消、精确原生D停派发、OS全清理或默认采用方强制升级；指令变动全部进入Rule #6而非描述性豁免。"
+
+  - id: TASK-015
+    parent: "3.2"
+    title: "在受控授权下激活本仓 true 并同步模板"
+    status: completed
+    phase: B
+    authorization: phase_b_and_runtime_config_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-009, TASK-011, TASK-013, TASK-014]
+    deliverables:
+      - .aria/config.json
+      - .aria/config.template.json
+      - .aria/audit-reports/audit-executor-minimal-repair/config-adoption-evidence.json
+    agent: tech-lead
+    reason: "运行配置激活须在实现/拒绝能力就绪后，且不能顺带调整审计模式、团队或预算。"
+    sc_coverage: [SC-8, SC-9]
+    interfaces:
+      input: "当前原始主仓配置与模板、插件DEFAULTS、TASK-001保护基线、明确配置变更授权。"
+      output: "两处audit.require_same_admitted_roles显式true；DEFAULTS继续false，其余原配置保持原义。"
+    steps:
+      - "先实取当前配置的模式和显式团队，确认所选接线目标被本后端支持；若不支持则报告阻断，不改模式/角色、不放宽unsupported、不自动绕回legacy。"
+      - "仅在实际运行配置/模板新增true，不补齐#222其他配置、不改120/300/2或max_rounds=5；修改前后解析比对去掉该键后的JSON结构完全相等。"
+      - "使用临时repo副本验证本仓期望true下manifest false、删角色、改预算均build非零，以及配置hash漂移的collect/check拒绝。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p test_audit_executor_config.py -v"
+      - "两文件均解析为bool true、DEFAULTS为bool false；除该键外结构相等，真实max_rounds仍5且PR #38未恢复。"
+      - "不在真实仓执行破坏性漂移输入；源hash与临时副本拒绝证据均保存。若缺配置授权，本任务保持pending而非以Spec批准代替。"
+
+  - id: TASK-016
+    parent: "4.3"
+    title: "执行独立目标的一次真实完整接线探针"
+    status: completed
+    phase: B
+    authorization: phase_b_and_real_workflow_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-015]
+    deliverables:
+      - .aria/audit-reports/audit-executor-minimal-repair/probe-evidence.json
+    agent: qa-engineer
+    reason: "只有真实工具事件能证明新宿主被生产指令调用；单测和文件存在都不足。"
+    revision2:
+      files: [.aria/audit-reports/audit-executor-minimal-repair/probe-evidence.json]
+      interface: "真实探针顺序改为build→审计Workflow→prepare→按request必要的独立drift Workflow→final→check→消费者；保存genesis/reservation/输入闭包/index/request/commit及真实工具对应。"
+      acceptance: "首轮first_round合法，不为求绿增加轮；required checker适配器另以独立目标在原授权/探针次数限制内取得真实来源证据，未触及分支记未覆盖而非通过。prepare不是最终发布，未知终态零新增派发，不能用基础wf_66b9c96d-5c1代替本次新宿主证据。"
+    sc_coverage: [SC-1, SC-7, SC-9, SC-10]
+    interfaces:
+      input: "本Spec change_id、fixtures/audit_executor/probe-target.txt独立context、真实显式团队/固定预算/守卫true，以及真实Workflow原生记录可取得的执行条件。"
+      output: "本次新run_id、manifest/build-record/嵌入script hash、原生记录引用、collect/check回执与报告消费证据；实际产物路径和hash登记于probe-evidence.json。"
+    steps:
+      - "执行前核验真实Workflow/原生记录获取能力、资源窗口和调用授权；若当前会话缺启动时前置条件，报执行条件不具备，不以此豁免验收或伪造离线等价。"
+      - "通过TASK-012真实入口对独立context运行build→审计Workflow(scriptPath,args)→capture/prepare→request要求时独立drift Workflow/capture→final collect→check→消费；不能手调helper冒充Skill。首轮合法not_required，非空结论适配器分支的真实证据另明确归属，不强求新轮求绿。"
+      - "保存工具事件/原生run_id与本次新产物对应关系，独立重算嵌入script hash；运行后查看已生成调用终态，unknown则停后续派发并上报，不以新cycle或补轮求绿。"
+      - "检查实际消费者从已校验JSON读取角色/布尔域，MD一致渲染；首轮first_round/converged=false是合法预期，不强求PASS/收敛或7席全到。保留既有每轮入口及预算规则。"
+      - "探针仅属于audit-executor-minimal-repair目标；不读取PR #38待审代码作本次context，不恢复其pre_merge、不生成R6、不改原max_rounds。"
+    verification:
+      - "证据覆盖上述完整有序链，区分审计与独立checker的run_id、capture index、request hash及各自原件，保存最终commit/check/消费报告hash；not_required原因可重算。命令计划、准备产物、基础旧工作流或模拟记录不得冒充本任务真实接线。"
+      - "对本次实际结果运行相同输入的collect --check-result为0；在独立临时副本篡改converged/参与集合后非零，原实际报告保持不变。"
+      - "记录build/collect宿主耗时和两时钟界限、实际越窗/缺席及终态，而非据此放宽预算；探针失败如实阻断，不重复轮次直到看似稳定。"
+
+  - id: TASK-017
+    parent: "4.3"
+    title: "通过 skill-creator 完成 Rule #6 并绑定最终指令版本"
+    status: completed
+    phase: B
+    authorization: phase_b_and_benchmark_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-016, TASK-014]
+    deliverables:
+      - .aria/audit-reports/audit-executor-minimal-repair/rule6-evidence.json
+      - aria-plugin-benchmarks/ab-results/
+      - openspec/changes/audit-executor-minimal-repair/detailed-tasks.yaml
+    agent: qa-engineer
+    reason: "运行时指令面变化必须测AI行为，结构单测与真实一次接线均不能替代Rule #6。"
+    rule6_note:
+      decision_table_row: 2
+      description_changed: "no"
+      scenario1: aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/
+      scenario4b: not_required
+      negctrl: n/a
+    rule6_status: "26臂全部JUDGED；audit-engine差值97/150、config-loader差值2/9，新增行为断言无失败；固定case1格式FAIL原样保留。已收到展示输出的真实反馈‘已审阅，无修改意见’（TASK-017/human-feedback.json真实问答UUID/行hash），不声称逐项打开HTML；首次及第二次INCOMPLETE/NOT_RUN原判保留；回执校验修复后由独立收口席完成全Phase1 PASS/Phase2 PASS，亲跑实际materialize健康26份与8类坏态拒绝/零发布；主控据task017-review-final.json与367保护实核于11-04 10:52接受，见task017-acceptance.json。可进入TASK018，TASK019仍受其依赖；评分/格式FAIL/限制原样保留。最终源与未知token、n=1局限见rule6-evidence.json。"
+    sc_coverage: [SC-10]
+    interfaces:
+      input: "最终audit-engine/config-loader指令diff、各自既有eval套件、修改前后版本与运行前置；以SOT决定实际受影响套件。"
+      output: "skill-creator实际结果目录、逐调用健康/评分/基线对照、指令hash与rule6_note五字段；rule6-evidence索引真实目录而不是预填结果。"
+    steps:
+      - "调用 /skill-creator 执行场景1，覆盖本次受影响指令行为；既有套件如有覆盖缺口先如实记录并按skill-creator工作流补定向eval，不自建AB runner或用SC单测代跑。"
+      - "基线的全部输入对齐修改前世界，不能让co-landing proposal/contract或新配置泄露目标行为后仍声称基线有区分力；记录污染边界，不以基线也绿随意删断言。"
+      - "本计划description不变；实测diff若有description变化，按已审套件另跑场景4b及其健康/负控规则，fail/void不视为完成；不因本次主要改代码而豁免场景1。"
+      - "遵守现有benchmark隔离规则；套件若触达协调CLI，要求会话启动时ARIA_COORDINATION_NO_PUSH等既有前置，不在缺失时现场绕过，也不让合成claim外发。"
+      - "在本任务新增rule6_note，实填decision_table_row、description_changed、scenario1真实路径、scenario4b结果或not_required、negctrl实际值或n/a；各结果绑定最终Skill文件hash。"
+    verification:
+      - "skill-creator场景1按手册实际判据产生可复核、已judged结果，不能只有任务启动/exit0；场景4b仅在description实际改动时另验，不能冒称证明description改善。"
+      - "各运行臂输入/执行形态可比、健康状态合格；NOT-JUDGED/skip/void明确未完成。连续作废和其他阻断按既有规范升级，不自行关门。"
+      - "Rule #6结果与单测、负控、真实探针四类证据各自独立，任一缺失不满足SC-10；之后指令变更须使本任务重新验收。"
+
+  - id: TASK-018
+    parent: "5.2"
+    title: "核验源完整性、旧周期不变和独立目标归属"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-017]
+    deliverables:
+      - .aria/audit-reports/audit-executor-minimal-repair/integrity-after.json
+    agent: qa-engineer
+    reason: "不修改历史的承诺必须通过同一保护总体的实读核验，而非重复声明。"
+    revision2:
+      files: [.aria/audit-reports/audit-executor-minimal-repair/integrity-after.json]
+      interface: "保全原TASK-001总体；新增revision2契约/proposal/计划hash及post_spec/post_planning归属，固定scope/新attempt/sidecar与旧PR周期逐一分开。"
+      acceptance: "旧原件/报告/max_rounds=5/暂停均未变；v1绿灯未归到v2，void/pending/换cycle没有清零额度，SC-9证据不靠截断status清单。"
+    sc_coverage: [SC-9, SC-10]
+    interfaces:
+      input: "TASK-001完整基线、所有原件/旧PR报告、当前配置和本Spec新增执行/审计记录。"
+      output: "逐文件before/after hash对照、原max_rounds/暂停与轮数核对、本Spec独立run/change/cycle归属清单。"
+    steps:
+      - "逐项重读TASK-001同一总体，不以截断的git status或文件数相等断言未改；核验历史source/报告字节不变。"
+      - "核验原max_rounds仍5、未向PR #38旧cycle追加轮次/报告、未更换id重置预算，旧converged/merge_clearance值不变；本Spec报告单独归属。"
+      - "检查portable fixture和探针未执行复制历史脚本、未从原机器绝对路径偷偷读入依赖；将任何偏离阻断回相关任务，不回填假合规证据。"
+    verification:
+      - "每个受保护原件有同一路径和两次相同hash，缺项即失败；新增本Spec记录不得混入PR #38的round序列。"
+      - "将SC-1..SC-10索引到具体judged证据，新机制真实调用、Rule #6与历史保全均齐备；不以Spec审计PASS替代实现证据。"
+
+  - id: TASK-019
+    parent: "5.1"
+    title: "实施完成检查与按配置执行后续审计"
+    status: completed
+    phase: B
+    authorization: phase_b_approval_required
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-018]
+    deliverables:
+      - .aria/audit-reports/audit-executor-minimal-repair/implementation-acceptance.json
+    agent: tech-lead
+    reason: "统一核对Spec合规、质量与enabled检查点，避免任务完成数代替真实验收。"
+    revision2:
+      files: [.aria/audit-reports/audit-executor-minimal-repair/implementation-acceptance.json]
+      interface: "核验revision2 post_spec/post_planning确有绑定修订hash的主控报告后才核算后续实现审查；A-1..A-6映射回原SC，Rule #6不被结构检查替代。"
+      acceptance: "revision2 pending不允许以TASK状态或v1R3替代；准备证据、单测、负控、真实接线、Rule #6分别有judged来源，任一缺失不宣称TASK-002/整体实现完成，不跨Phase C/D。"
+    sc_coverage: [SC-10]
+    interfaces:
+      input: "最终diff、21项任务状态、SC映射、四类实现证据、实际启用检查点及其报告。"
+      output: "实现验收索引与所需审计真实报告路径/结论；保留缺证、unsupported或审计失败的阻断状态。"
+    steps:
+      - "按实际diff做两阶段代码审查，先proposal/SC合规后质量；检查mid_implementation和条件mid_post_spec已在规定时点执行，未执行不得静默补成PASS。"
+      - "主控按配置运行本Spec独立post_implementation，不改变模式/席位/预算或将unsupported切回legacy；所需运行条件不具备时报告阻断。"
+      - "聚合前复核每个finding处置和SC证据，保留尚未判定项；审计修复若改Skill指令/代码，重开对应任务和失效的Rule #6/探针证据后复验。"
+    verification:
+      - "python3 -I -m unittest discover -s aria/skills/audit-engine/tests -p 'test_audit_executor*.py' -v"
+      - "所有SC各有可重查的指定证据，所需enabled gates有真实执行及合法结论；无证据不得标实现完成。"
+      - "本任务通过仅表示Phase B可交付，不等于Phase C提交推送、发布、恢复PR #38或Phase D已获授权。"
+
+  - id: TASK-020
+    parent: "5.1"
+    title: "另获授权后执行版本同步、集成和发布门"
+    status: pending
+    phase: C
+    authorization: phase_c_commit_push_and_release_approval_required
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-019]
+    deliverables:
+      - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+      - VERSION
+      - README.md
+      - docs/architecture/system-architecture.md
+      - docs/architecture/version-scheme.md
+      - .aria/audit-reports/audit-executor-minimal-repair/integration-evidence.json
+    agent: tech-lead
+    reason: "跨仓版本/文档/gitlink同步和pre-merge权限门需统一集成，不由子任务自行发布。"
+    sc_coverage: [SC-8, SC-9, SC-10]
+    interfaces:
+      input: "明确Phase C及外发授权、当前plugin.json版本SOT、standards/conventions/version-management.md和各仓实时主干/CI状态。"
+      output: "按实际兼容级别确定的真实版本同步、主仓gitlink、独立PR/CI与多远端SHA证据；不预定版本号，不带占位版本发货。"
+    steps:
+      - "获授权时重新读取版本SOT与版本规范，决定本次SemVer级别；同步5文件、主仓gitlink/VERSION/README badge及两份架构版本行。仅正文实质变更时按既有路径同步i18n README，不猜译文或漏掉必要面。"
+      - "先核验当前主干/并发落地，保持文档和实现同步；检查merge后的版本号在当时仍正确，不能因同值合并无冲突就沿用已发布号。"
+      - "按Conventional Commits组织提交，遵守项目禁止AI署名约定；提交/推送/PR创建只在授权覆盖内做。pre_merge审计与C.2.4 CI gate按SOT执行，stub backend必须abort，不自创降级。"
+      - "子模块只能本地merge并双推，不能Forgejo服务端合并；逐remote独立git ls-remote比对本地master，全部一致才算成功，再更新主仓到post-merge gitlink。"
+      - "发布同步引发新的Skill语义变更则先退回TASK-017重验；PR #38仍暂停，不借本次集成修改其历史/预算或恢复业务。"
+    verification:
+      - "运行现有m6-version-badge-match、plugin-version-arch-docs-match及适用的i18n-readme-translation-currency检查；记录真实命令/结果，不声称本规划已运行。"
+      - "pre_merge/CI门具备该PR、该候选的实际通过证据及main无in-flight CI；无backend按已成文no_ci_fallback处理，非自行跳过。"
+      - "每个remote的master SHA与本地一致，主仓gitlink等于已验证子模块post-merge SHA；最后执行不带路径的git status核验同步面，无未解释残余。"
+
+  - id: TASK-021
+    parent: "5.1"
+    title: "另获授权后完成周期收口、归档与handoff"
+    status: pending
+    phase: D
+    authorization: phase_d_closure_approval_required
+    complexity: S
+    estimated_hours: "2-4"
+    dependencies: [TASK-020]
+    deliverables:
+      - docs/handoff/
+      - openspec/archive/
+      - .aria/audit-reports/audit-executor-minimal-repair/closure-evidence.json
+    agent: knowledge-manager
+    reason: "收口须将已验证事实、采用边界与原PR暂停状态保留下来，不能归档后丢失证据。"
+    sc_coverage: [SC-9, SC-10]
+    interfaces:
+      input: "已授权并完成的集成/发布证据、真实任务状态、SC索引、post_closure配置与session-handoff/归档规范。"
+      output: "按执行当日实际命名的归档目录、docs/handoff下合规周期记录及closure-evidence索引；不提前写已归档或已恢复PR。"
+    steps:
+      - "核对所有parent子任务确实完成才同步tasks.md，不提前勾选；由主控按规范更新周期进度并归档，验证归档后锚点/引用与可复核证据仍可访问。"
+      - "按当前配置在原定顺序执行post_closure，保留合法单轮语义；审计/归档不得重置PR #38轮数或给它追加新票。"
+      - "周期handoff写docs/handoff，含规范要求的5字段及未决阻断；会话收尾是另一入口，不写.aria/handoff，也不因本任务存在冒称当前会话已收尾。"
+      - "再次核对TASK-001受保护原件、旧报告与max_rounds=5不变，记录PR #38继续暂停，只有另获合法处置才可恢复。"
+    verification:
+      - "归档实际路径、handoff frontmatter及全部证据引用独立读取成功；若只完成一部分，保留pending/阻断，不能用文案替代。"
+      - "不带路径的git status核验所有仓的实际残余与主仓gitlink；closure-evidence不把Phase B/C/D之外的PR恢复、部署或168h写成已交付。"
