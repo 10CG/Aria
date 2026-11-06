@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "change_id": "audit-executor-minimal-repair",
+  "status": "local_C1_selected_groups_only_not_release",
+  "recorded_at": "2026-11-06T05:17:15.662615+00:00",
+  "authorization": {
+    "user_instruction": "遵循aria规范，执行提交",
+    "scope": "本地C.1；前序不推送限制继续适用",
+    "source_boundary": "本对话直接用户指令的主控记录，不冒充原生问答认证文件"
+  },
+  "commits": [
+    {
+      "repo": "aria",
+      "sha": "3ed43ff3095107624a71c579247b04fef31cbbd2",
+      "files": 17,
+      "committed_blob_hashes_match_accepted_bindings": true
+    },
+    {
+      "repo": ".",
+      "sha": "89ec4cf1a3e03d419d79cc9cee74e5d6ec259aa4",
+      "files": 6,
+      "spec_config_blob_hashes_match_scope": true,
+      "gitlink": "3ed43ff3095107624a71c579247b04fef31cbbd2"
+    }
+  ],
+  "next_record_commit": {
+    "self_sha_not_embedded": true,
+    "scope": "4 prior preservation records + 4 current-track handoffs + this record and README; resolve containing commit via git log -- <path>"
+  },
+  "validation": {
+    "accepted_product_and_config_hashes_verified": 19,
+    "staged_diff_check": "passed for both completed commits",
+    "git_hooks": "No active executable hooks at preflight; commit invoked normally without bypass flags",
+    "pattern_screen": {
+      "scope": "local_commit_candidate_files_only",
+      "files": 30,
+      "existing_patterns": 38,
+      "hits": [],
+      "boundary": "Existing pattern screening only, not comprehensive secret detection or public-egress approval."
+    },
+    "tests": "未重跑产品测试；11-04的297 judged/0fail-error-skip是既有TASK019接受证据，不称本次新运行",
+    "independent_review": "TASK019 Phase1/2 PASS原文件hash与接受记录一致；17产品原字节全同受审repository entries"
+  },
+  "preservation": {
+    "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-043056",
+    "archive_sha256": "eeb5a42cd946f7f6f41ab318aea5cc0d6aa9e280fefded719511cf8d92921123",
+    "decrypted_verification_passed": true,
+    "same_disk_only": true,
+    "source_receipt": ".aria/notes/2026-11-06-audit-executor-local-preservation/preservation-receipt.json"
+  },
+  "gitlink_boundary": "本地主仓feature gitlink，尚未合并/双推，不是post-merge发布SHA。未来C.2必须按规则先子模块本地merge+双推核验，再更新主仓post-merge gitlink；本轮禁止push。",
+  "left_uncommitted": {
+    "formal_audit_acceptance_files": 76,
+    "benchmark_files": 292,
+    "large_nested_native_evidence": "仍原地及加密快照保全；未准入Git，不声明引用闭包或外发检查完成",
+    "shared_latest": "docs/handoff/latest.md 为多轨混合History，未整份暂存",
+    "legacy_PR38_evidence_and_other_track_handoffs": "不纳入本轨提交；不改旧字节或原状态"
+  },
+  "unrelated_existing_commits_preserved_not_rewritten": [
+    "cf0b25d220dd981eaead25ab834e7f96932aa559\tdocs(handoff): 保留 triage 历史入口 / preserve triage history entry",
+    "fd986e21f591b0e7463b315372a6ff655858920c\tdocs(triage): 保存 #267 核对与交接 / record #267 triage and handoff"
+  ],
+  "version_and_old_protection": "版本不变，plugin.json与旧保护记录/接受源均不改",
+  "not_performed": [
+    "push",
+    "coordination_ref_push",
+    "PR",
+    "merge",
+    "tag_or_release",
+    "deploy",
+    "version_sync",
+    "spec_archive",
+    "phase_D",
+    "resume_PR38"
+  ],
+  "future_integration": "原主仓分支已有两条#267祖先提交；本轮新增提交边界独立可选，后续干净集成只取授权新提交，不默认推整条混合分支。",
+  "TASK020_TASK021": "未完成；本轮仅C.1准入组，不把局部提交当整阶段完成"
+}

@@ -1,0 +1,2144 @@
+{
+  "schema_version": 1,
+  "change_id": "audit-executor-minimal-repair",
+  "status": "local_scope_preparation_only_not_staged_or_committed",
+  "created_at": "2026-11-06T04:35:05.258672+00:00",
+  "authorization": {
+    "local_preservation": true,
+    "scope_preparation": true,
+    "stage": false,
+    "commit": false,
+    "push": false,
+    "branch_creation_or_checkout": false,
+    "version_change": false,
+    "PR_or_merge_or_release": false,
+    "phase_D": false,
+    "resume_PR38": false
+  },
+  "base_refs_at_preparation": {
+    "main_origin_master": "932443e8e5d03b1e64a67fa9cb2ea50925aabd46",
+    "aria_origin_master": "0ade987b8dac6c928c19fb0ccff36488d3937f98",
+    "refresh_requirement": "Future integration must refresh and verify again; this preparation is not a merge gate."
+  },
+  "groups": [
+    {
+      "id": "aria-product",
+      "repo": "aria",
+      "admission": "candidate_product_unit_no_stage_authorization",
+      "files": [
+        {
+          "path": "aria/skills/audit-engine/SKILL.md",
+          "bytes": 30620,
+          "sha256": "5d2b14e3e3576f7d81e3a5050133470ee2d6e3c20f3b543cd9165126f6344ecf"
+        },
+        {
+          "path": "aria/skills/audit-engine/references/convergence-algorithm.md",
+          "bytes": 17660,
+          "sha256": "23076f21a95eab9ab2e42557b8d839c86e42800aeb69b9c209baf31841737005"
+        },
+        {
+          "path": "aria/skills/audit-engine/references/execution-modes.md",
+          "bytes": 48289,
+          "sha256": "67afaaa853824464668c06ba40d44df5107dfa97d6e1139741f68af50c47e451"
+        },
+        {
+          "path": "aria/skills/audit-engine/references/executor-contract.md",
+          "bytes": 79472,
+          "sha256": "fffc43e80c9346482dda9ab471878c883289e891be18522e69742619f8426bcc"
+        },
+        {
+          "path": "aria/skills/audit-engine/scripts/audit_executor.py",
+          "bytes": 240127,
+          "sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json",
+          "bytes": 22573,
+          "sha256": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json",
+          "bytes": 79163,
+          "sha256": "088513752a11bab2039ac530b99830b56581292ed0e675c8ff1c83f5cb6815d1"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json",
+          "bytes": 78276,
+          "sha256": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json",
+          "bytes": 155153,
+          "sha256": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json",
+          "bytes": 3057,
+          "sha256": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt",
+          "bytes": 787,
+          "sha256": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/test_audit_executor.py",
+          "bytes": 343268,
+          "sha256": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/test_audit_executor_config.py",
+          "bytes": 4524,
+          "sha256": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py",
+          "bytes": 21591,
+          "sha256": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf"
+        },
+        {
+          "path": "aria/skills/audit-engine/tests/test_sibling_spec_probe.py",
+          "bytes": 105166,
+          "sha256": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8"
+        },
+        {
+          "path": "aria/skills/config-loader/DEFAULTS.json",
+          "bytes": 6616,
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        {
+          "path": "aria/skills/config-loader/SKILL.md",
+          "bytes": 16339,
+          "sha256": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122"
+        }
+      ]
+    },
+    {
+      "id": "main-spec-adoption",
+      "repo": ".",
+      "admission": "candidate_paths_no_stage_authorization",
+      "files": [
+        {
+          "path": ".aria/config.json",
+          "bytes": 5642,
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        {
+          "path": ".aria/config.template.json",
+          "bytes": 4839,
+          "sha256": "1f37cb75f46267b28f4544946453b5a81e4003c15da5cddaded41565af5d0666"
+        },
+        {
+          "path": "openspec/changes/audit-executor-minimal-repair/detailed-tasks.yaml",
+          "bytes": 69727,
+          "sha256": "c3d1c8c5e06493d8cb74951f77529708637de57b378f76783706a73626378e4e"
+        },
+        {
+          "path": "openspec/changes/audit-executor-minimal-repair/proposal.md",
+          "bytes": 26923,
+          "sha256": "cdb6dffa8473578dad3f3c11967a53bfcc0ece7ac625227a7e3d10b7cf24ea76"
+        },
+        {
+          "path": "openspec/changes/audit-executor-minimal-repair/tasks.md",
+          "bytes": 1884,
+          "sha256": "9a5fd91eb105419ce67ef8a22f833dcade751654b112f1d6f5f4f1bd65ca3b33"
+        }
+      ]
+    },
+    {
+      "id": "main-formal-audit-and-acceptance-indexes",
+      "repo": ".",
+      "admission": "requires_reference_closure_and_egress_review_before_any_git_add",
+      "files": [
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/config-adoption-evidence.json",
+          "bytes": 95477,
+          "sha256": "35a94be42fe7a34ddbe32113ee4522bf7986c61f2ea2a403430b4308b53e5ca4"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/implementation-acceptance.json",
+          "bytes": 101014,
+          "sha256": "3af0018802f2b0945d62ce5e2f264b4f2cf8cffafd2aa8493267ad56bc355bbe"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/integrity-after.json",
+          "bytes": 6423965,
+          "sha256": "7be066ce80869569ad7290786d84f354fb41172d846d2109c992cad192b2b55b"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/integrity-before.json",
+          "bytes": 77578,
+          "sha256": "5a5015ab2abfcb3f45f32a74c4a208251e8bc349d8926ab26e92d67f60e52c50"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json",
+          "bytes": 14894,
+          "sha256": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/probe-evidence.json",
+          "bytes": 4143,
+          "sha256": "6c89383b2e89c46a639d565b9fbc6400c399d705ba58c403e20b9918d2fd17b1"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/rule6-evidence.json",
+          "bytes": 8686,
+          "sha256": "8cb34434f9ce24955f6e3fa9a45025a888a19e02b322e72ea7b910a1ff14601d"
+        },
+        {
+          "path": ".aria/audit-reports/audit-executor-minimal-repair/unit-evidence.json",
+          "bytes": 131854,
+          "sha256": "b373e5182939ee67c2828bc7b800e03af8c2d5ecf781afb6931fcc2b6defb815"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T165109-389Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 3163,
+          "sha256": "555ce35645158bc4e0c3a6e037278796c4f107901130e542148e61f97f3fda4e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T165109-389Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 2223,
+          "sha256": "92acc791b69de7fb7071ade4b73f2ec291a6fb08b4d1f6fdc8455560aa943f5e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T165109-389Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 916,
+          "sha256": "42e45442590552fbc40ecc4ded085720173c6e5db665d17174b46d3d541250c3"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T165109-389Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 1887,
+          "sha256": "29614c3bb08fdee75c228a7a3ccf3f0da5630df8ed1d4b833feeb242f423afdb"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T165109-389Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2181,
+          "sha256": "04b0169f750eff86eb868b87fd7e19f6ad27c98be6bfa70e0e66f166095c554e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T230122-635Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 1132,
+          "sha256": "b7d21c8def09200160d6ecb0cec571579bd5af1ead2d10bc7d47ee262e79971d"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T230122-635Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 2523,
+          "sha256": "047ce749de1e342a7b6db3c1ab264bcedebce8bc0877e273ffe95d9265a96670"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T230122-635Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2337,
+          "sha256": "bdb8c244af54bce0f5e14392de38ae53e455a7c9fba30544ff7021872197bf48"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T230122-635Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 3141,
+          "sha256": "4ddbce38ae152fd31b737c253f776f94d93d827634da30674ac633b863fd8a12"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R1-2026-11-02T230122-635Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2915,
+          "sha256": "19b82d344762f419656e17d0b8abbb4da744c1f121f25adc0abffbde052b2ee3"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 1917,
+          "sha256": "12a03e84eb1309e53fcdca059fe8be1fe45da79788c72992d3836c50bf5d07c9"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 927,
+          "sha256": "67f595520b2273381f26f28969d93e095b45637af446548d49de4b35723ee038"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 919,
+          "sha256": "5da1c6fc9bd46cb5173dc0dba0c9cd09393da1f9ff9b11b14282705a97e01c98"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 841,
+          "sha256": "0dcff2fde15f34236ba3a6596c3bc7ccf1648ab1f4cb31d3b42bacfc9403fabc"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 915,
+          "sha256": "223ddf622fc53e917fd5274f04da171d67a6ddec3f144d64e3370e098c72204e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T170431-723Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 911,
+          "sha256": "4f48ae530c1dd8a02549e93c1b907fa802211467d6c1275f7c77a4d7480c59a6"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 982,
+          "sha256": "3c2327a3f30403efe0d7f83bd1cfe61efa98795c718c9aed89bd8294ed0b637f"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 2536,
+          "sha256": "7d8f4736da43a84f7991b47a7981a01e96abff40ab146b95c72b4dcbfa095af9"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2856,
+          "sha256": "3f6054ec54460a8d0fcb3e03f27a41323a8b96dbb238d10bf11367784d3aa0b3"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 2817,
+          "sha256": "f46112224a850fc0d80d8dfc140ae9a9798df263b0a2fa21768abb55298fb3c5"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 2442,
+          "sha256": "502a565414763f8082ebc4e813307c91702adfaed82b135f3f2dd5df0e3cd74e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R2-2026-11-02T231645-545Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2328,
+          "sha256": "cd5185f06e4a0cb66300ed1572540d3d3b99fddd596baf6541be677894f8d73d"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 2669,
+          "sha256": "8196ebe1354d9756cbda55bde376c3be40a5b62ff1fc8b87013ed9a744917428"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 897,
+          "sha256": "5c8721a9aec3a0e72b0f955acf035ab24d6887429eac857e5c6844f3e2afa391"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 892,
+          "sha256": "add4230bc253e7c90b292c6a90bbcef94b32e753655661c1e020fc14e0792696"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 867,
+          "sha256": "37def022ef7d4ce4e355d3ba7b5dc84dba1c39eca27bef3fb0552c5f98ebbccf"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 855,
+          "sha256": "8eff7f0a25180efd53878d8a234932540ab052ab2d106bd3c6959e61122c9c0e"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T171050-883Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 881,
+          "sha256": "e51230bb7d38620b124b343d6ded08ccd71f19235f9eeaaea848c22ba5f340ba"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 1057,
+          "sha256": "52d3357d9491a4f12bea246306b9de86f2774b688d80b8c2ab30f9fd58f81851"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 2207,
+          "sha256": "e8b20842d53c64e96789549e416ad8bd57d0ffc7f49b279f910fe066ec97d4b1"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2855,
+          "sha256": "9828f2307e002e7e659dd2d399e789c9057ebac416b71e4ddc5641573e2eeac8"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 3301,
+          "sha256": "afa997452d12f064e2f96d1078cbf78d7c91da201d476e4b2ba5aeacdb5df631"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 2830,
+          "sha256": "22db8dc04877d00cfded3548dd95235569cc32d8bc2c93a0a57bef3016c12194"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R3-2026-11-02T232348-974Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2185,
+          "sha256": "b043cb3510887f0b4dd29969f97ca6aa172a2b52afd1093f2ea0e6e244dcd60f"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R5-2026-11-03T004444-211Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 5393,
+          "sha256": "80957cdcac50f3efea6ad835df0229e04317e4ee52b3524d1fb8c11718e4c9eb"
+        },
+        {
+          "path": ".aria/audit-reports/post_planning-R5-2026-11-03T025925-000Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 3071,
+          "sha256": "40ab7700d53595f58ba4f6b6ad319003c693df6e6f520a3b046ab286a4717ada"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-01T063043-815Z-audit-executor-minimal-repair-aggregated.json",
+          "bytes": 10089,
+          "sha256": "93dcd5ced685195c5ae5482a94e669ec18cb03d68e07fd1039c354de6d172557"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-01T063043-815Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 7909,
+          "sha256": "b88e2b59a3cedd0c4072200f63f0fac0fcdbe92bab3e1ca05056968e07cec209"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-01T063043-815Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 4318,
+          "sha256": "bc234a19d0a2e9835fc84d31a9bcb68b065dfb5e41314e479acc4536f4bcf872"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-01T063043-815Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 4138,
+          "sha256": "4c70a712f7513303b61ebde5b89b4fb129c6d6be6813dfc7c199a239348f2bbb"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-02T193912-279Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 2964,
+          "sha256": "a388eacfa840813dc78b12a11fcd985127b21f58e4969dec2919c51e45a71440"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-02T193912-279Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2117,
+          "sha256": "78ee62766fe29e606977f132e74ccdbb353c89a06dece10d949d2c4b9129edb6"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-02T193912-279Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 2128,
+          "sha256": "36841a399f89ef2844b51f156005a72bb50254ebb9dafc7c063dbe8c4163520d"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-02T193912-279Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 3664,
+          "sha256": "b4a0028d92bb5777187b570f7235ccf55b75264b1a74a9b311b3705d6a62f762"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R1-2026-11-02T193912-279Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2210,
+          "sha256": "2552e2587c04363baa2b3a517404b51aa6f370d664b34264b570a5c2a03de8fd"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-aggregated.json",
+          "bytes": 5526,
+          "sha256": "72c245b85473dd1df9802aedb0ee41478abfd1d2877f9c076260ae88785fb45e"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 3852,
+          "sha256": "864279bc3dd7c03c1fed0ced28f1d63105db996b999322be6963ca8ebce7ac0a"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 1696,
+          "sha256": "fcb6136e99bbe0fc69b5799a4ca97d9d2018a21f0c7ae2ebc74ce3854d145fdf"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 1721,
+          "sha256": "eff760abdf2631aa5fa4040b7510589f49df43788f6275d8ec5c3b5fd6615384"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 1832,
+          "sha256": "1db61b8ecb2d33b448d9ce353c6da41956544c39e114ce3f0cfadb8939f34d87"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-01T065354-153Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 1791,
+          "sha256": "7ab900eac63a67bda47985a9230fe9ce43cf133bae4f72193608d6f9baac15ba"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 1137,
+          "sha256": "fe2c9d37dfc8d9c15285bf14016168954c299f4602f4841c3da5da0aba052eef"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 2218,
+          "sha256": "d80dbc86b379a5a0b487cf198a7a98eb64d501089e182d2f644a1bf95786fac3"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2157,
+          "sha256": "63937a2873f48ff472de83d0dfc82d4875cfba0e2e5cda36b39d905c6568131b"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 2238,
+          "sha256": "a7b7e0739736ca49dda590ed7fafbd6a9221673ddc0463035ef6c0dbba4dcb14"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 2474,
+          "sha256": "05f436177e6993f87302dfbd188a04af97965e3467e9ad165ce4b47ee2ee0a08"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R2-2026-11-02T220112-010Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2552,
+          "sha256": "a64a62a4ecc130bbfdc43a3edbf9a4a78e03dd93c73c465bfea1f28cf406e1ef"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-aggregated.json",
+          "bytes": 5662,
+          "sha256": "5610bc860e3e8a1ecfae0f83547a30a03d624f029f73e479a056b2985812af91"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 3852,
+          "sha256": "62b9f23953882b71a391b6289f2459738fea87cc37848fbde4b9abf1a74b7a91"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-backend-architect.md",
+          "bytes": 1938,
+          "sha256": "1565627b87865f781a57399b4eb6320b151ba144568adbc2ceb98b0313d65090"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-code-reviewer.md",
+          "bytes": 2272,
+          "sha256": "16411425eebd17717b4fc1ed0409de65c4554b15c8fd8c018604cab38e177de7"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 1611,
+          "sha256": "c424fbeda793a3c1ba6b79420ed66acf533f00050ef0d04682f3f699779e2013"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 2010,
+          "sha256": "2633ad3de5a0f8f16987bf9e8cfedb090a0febb797c9c46546a0134c5ff581ac"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-01T070157-958Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 1541,
+          "sha256": "fa6acb7be083fe551c876ce01fd34c381d4a1056047c30c343a252834d8bc02e"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-02T222842-470Z-audit-executor-minimal-repair-aggregated.md",
+          "bytes": 1582,
+          "sha256": "3c1c1da102a6e0478a84525e851a05c179360d914194e0ad2ca5dc778db3c116"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-02T222842-470Z-audit-executor-minimal-repair-knowledge-manager.md",
+          "bytes": 2359,
+          "sha256": "736d94092c898a911651713301f1fea965952d8a8626ed3644616d197a31a2cb"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-02T222842-470Z-audit-executor-minimal-repair-qa-engineer.md",
+          "bytes": 2388,
+          "sha256": "02a4d8f7f22dfcd790e1439d33079e6967096e497a3198f05c123456c78631dd"
+        },
+        {
+          "path": ".aria/audit-reports/post_spec-R3-2026-11-02T222842-470Z-audit-executor-minimal-repair-tech-lead.md",
+          "bytes": 2392,
+          "sha256": "5ed9c74605c4ca7780818016b71cffc98c926c445ba24435376cfad5aed13ef1"
+        }
+      ]
+    },
+    {
+      "id": "main-rule6-benchmark",
+      "repo": ".",
+      "admission": "requires_TASK017_source_pairing_and_egress_review",
+      "files": [
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/analysis-notes.json",
+          "bytes": 2202,
+          "sha256": "7cd378f23899901af3b39c4325567b46e9febeef20b6376f92b6574e6e7c66f2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/before-analysis/benchmark.json",
+          "bytes": 64553,
+          "sha256": "50274c72554b5351d3adb78ae18cd3989edfc442ae064c69ec13b8469ce981ec"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/before-analysis/benchmark.md",
+          "bytes": 953,
+          "sha256": "d60a25fbb12c304cab9ab4f350f15d54e0183b873f3e98d9f69ffded1a14996a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/before-analysis/review.html",
+          "bytes": 643549,
+          "sha256": "97dffd8ea3cac36bd24d7647fa570fc7022cb050f90ee644f0c47c62da17bcd5"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/benchmark.json",
+          "bytes": 67065,
+          "sha256": "88a2f6744b20c8fb6d54f0a2c06dae7068543e69cea02d938475dc657c82a8bb"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/benchmark.md",
+          "bytes": 3140,
+          "sha256": "636e58b62377406be82472a853b7dd30105f683051bb26f85651627803370491"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/eval_metadata.json",
+          "bytes": 2350,
+          "sha256": "6a354b27ef83d19800178b9fb7d3700be43910d335ae365e9fa007bb52f6b090"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/grading.json",
+          "bytes": 7977,
+          "sha256": "77d1af92e77486a3bbabc7f88d8a4c9472bfa83a5f57989a5ec5da6b472698e3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/intake-verification.json",
+          "bytes": 2026,
+          "sha256": "99e8e0fb0b5768ddb85d355ffcd0dfc1ef497cf10aa05487e778f3166183eb96"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/outputs/decision.json",
+          "bytes": 9653,
+          "sha256": "81f7209e316f524518d1b524771956d19a2511bf40322f6b346bf4464daeeba7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/public-events.json",
+          "bytes": 113626,
+          "sha256": "344bc52f152b5f22733f563ac291be7ef362dbc2680cabc39ea976fb1a18392c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "855c5a0e94f94b46e5bcf93af358f8680af39959d97459a2960a8970a31bd668"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/transcript.md",
+          "bytes": 112650,
+          "sha256": "2c3db333d6284d1a0efd11c134620e9d7a841b20230dcfea6d9f63f265fc631c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/usage-observations.json",
+          "bytes": 14225,
+          "sha256": "e439a4535cb93f97ecd9bf53e143a8060935a49231684a724146e4a5e88f4933"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/grading.json",
+          "bytes": 8121,
+          "sha256": "ff87facba79474c86b2be0b451bbed635d72ccd725eeae5273c23a59054ff9a2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/intake-verification.json",
+          "bytes": 967,
+          "sha256": "325f9350d851e00c2253ce6c9b3b3a2bdb1b8cd4839805bb67a1d2886b925a82"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/outputs/decision.json",
+          "bytes": 9868,
+          "sha256": "df3402df455ae3db49a463d63223865e2fc714498ae3c1fa0b11d1ff91207902"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/public-events.json",
+          "bytes": 14660,
+          "sha256": "c6d13c57d07126196a8b7beb0686bf702dc8993ffdea6639fee9357ade4f3393"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/timing.raw.json",
+          "bytes": 573,
+          "sha256": "a30b3f15c6b18173a4a0791d3c7197cdac6626b223a48a2ac15bf77ce417d50a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/transcript.md",
+          "bytes": 15444,
+          "sha256": "cb3c1f929cc9b021018464d43393a56f631837c2830d590146112e0a30b651c4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/usage-observations.json",
+          "bytes": 4769,
+          "sha256": "d03364211d7e02e8afd96746043d7ca17a320b83faa844912f1af0ae4b5ff0bc"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/eval_metadata.json",
+          "bytes": 1171,
+          "sha256": "ee291b49ba3772dab63d42ae480efcd0e81c4d23e50beec94fdfb768431f34d1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/grading.json",
+          "bytes": 6968,
+          "sha256": "ba698389ec932b07e7a1bacf09b44268da2fff512c5335e7086d80a275d7a8c8"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/intake-verification.json",
+          "bytes": 1286,
+          "sha256": "5c383e28a6669896840003b20397a880a7f088cd07acee8feae31a58e5ace5dd"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/outputs/decision.json",
+          "bytes": 3972,
+          "sha256": "e778187cdffefd2920f6c0390c2efc03f72c57de9d96eae46be752d582f42b59"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/public-events.json",
+          "bytes": 65554,
+          "sha256": "d770b7d724bf81b33f6fcc20ab95f6714c3212fa479f0aab19ca85e122432d5d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "b3afcc65b5b79dc5a74c2df5779a5c88dbf12573537890a3f804218c978382c4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/transcript.md",
+          "bytes": 64895,
+          "sha256": "74a5c0f1b661e44b2f341c1d9641cb40d27e1e365bed315bbbcce39963a30f85"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/usage-observations.json",
+          "bytes": 6487,
+          "sha256": "16e0625c0fccf4446a587db00e8d4de2b691a44170f0245317b1e22800b9603d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/grading.json",
+          "bytes": 7344,
+          "sha256": "bfaff15c4177491ba7260a0aa4cb1ce8e6d42491fc84438b2e478ed22aa12e82"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/intake-verification.json",
+          "bytes": 950,
+          "sha256": "026db36647d17d6a029db1156f6331dc4e17254c01fd3d504f9f2f9dc59817aa"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/outputs/decision.json",
+          "bytes": 2690,
+          "sha256": "2a07f6ec5043ebd8f42bc4cb070aa7c344113c5e4428d1bc578b84ddb4320676"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/public-events.json",
+          "bytes": 5940,
+          "sha256": "e9935ab3ea29a59f4181ec7e036fc739b074f09bbea26b4f051cc84ca7885ff9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "4c5363b2b987cdc22816769966d5a4d39e07a756227e6ba992e0325a90e481b7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/transcript.md",
+          "bytes": 5857,
+          "sha256": "640363c78721ec5c322572591b15be45c0e144e2263beb20e957ec342fdcca87"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/usage-observations.json",
+          "bytes": 3908,
+          "sha256": "21e6253b4550998ca0cf92a4329aad2b1597615d4e22b1a6afd252fcb94ed3d2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/eval_metadata.json",
+          "bytes": 1271,
+          "sha256": "cdbadaa9fe17d53ed364a1be5864f2cceb5d6ba87bc9e6838cde42e326fbff94"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/grading.json",
+          "bytes": 7799,
+          "sha256": "78a2a55b8431a2fcfa8c5b25f6c8f855ff334014c8c612601cb43afcf23253c1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/intake-verification.json",
+          "bytes": 2544,
+          "sha256": "bcf05def0de02dc1cde0b7c06f6cf75ef4fd248a4fb6c1c0041d7b348dd6eabb"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/outputs/decision.json",
+          "bytes": 11907,
+          "sha256": "0908c38cc6d294172326ed751da0e075c1ccb3940d154ec5a96b32e0b2b7026c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/public-events.json",
+          "bytes": 145880,
+          "sha256": "8a98eb2057222b7ca8b54349e50c236acb7e2039a21feca989711d48850b0dcb"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "d1b23c74054d36800626129815984eb304d3a3f2b69d01783d544874044d7ab2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/transcript.md",
+          "bytes": 143244,
+          "sha256": "61f4f9f04ae9f152981746ed6b9f1bab6e98173da1e82a782779c4a31ffddb03"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/usage-observations.json",
+          "bytes": 15081,
+          "sha256": "7a7c49c222d4067d71d580691699fe3a490d127e847ddb4c22491a839dc1e6b4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/grading.json",
+          "bytes": 7533,
+          "sha256": "e201becf29b6fc008018f9d004c92c48625adec8d58fdc53da4054f71fd9eee9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/intake-verification.json",
+          "bytes": 944,
+          "sha256": "8db7085c77c0869b159f017a1ac3b630223d758c862d5f14d8523b5b02376c53"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/outputs/decision.json",
+          "bytes": 5449,
+          "sha256": "d1749a4a3581650eeca9a03b2b759c494abc1487a8b2dc6c107ce728d07776f0"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/public-events.json",
+          "bytes": 8876,
+          "sha256": "82e2a81fbafc95c62658fcca98bd62d8745f365a541e095e051c38e4b79c4df9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "9f64757e77d194442ceee07eb408b5977d98ac1636df75c5fc023917dd54365d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/transcript.md",
+          "bytes": 8840,
+          "sha256": "7dbf182616b5e0dc52234823aec4045e185cd50033cf89ac4387562ea4af05bf"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "6c60ba85fbf9c936926ef96b25d587acc082901598a3b103a870d4e929747b79"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/eval_metadata.json",
+          "bytes": 2020,
+          "sha256": "a2e417bb0984131dd320c4b52fa8d97657e81248a3b8a305832846962ef2cc24"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/grading.json",
+          "bytes": 9375,
+          "sha256": "6a122773504dc804827b3f62ca3cf03f3eeda37ebacb0ff0b5a2075a7976903f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/intake-verification.json",
+          "bytes": 2026,
+          "sha256": "70158ab63abd0d56b318f63b115b47d594672294891c886efea7e786842819cf"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/outputs/decision.json",
+          "bytes": 12444,
+          "sha256": "e3bf01c960eb9a41492e0b2ea128cab4e5bb28f6d6606f8f12a73c708ce29aab"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/public-events.json",
+          "bytes": 177065,
+          "sha256": "ac852d424a7c04ceec03fd60cd4c4b95a9c4b995d7583479a753848c7fb4b3ec"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "62746b98f40d47672fb40ef1aeab143b08119da89b1d1c83524cd865a30a8c02"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/transcript.md",
+          "bytes": 175721,
+          "sha256": "1404f962a97b4fb669b804a468f41504584e8e9f9d1e76cf0d8617b70f0a7918"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/usage-observations.json",
+          "bytes": 14229,
+          "sha256": "c097615522484076a18196c8329017032c0815e775f9a67e935d13b6eefbda00"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/grading.json",
+          "bytes": 8771,
+          "sha256": "63e8b77e75e79badafc485f5cee2c339e2ef680662c92141e23d5701816c5c2a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/intake-verification.json",
+          "bytes": 958,
+          "sha256": "024ba508aeb3c5310fa71b90aca44bd80aa9e92dc88afc4d4874dd27e85f0f76"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/outputs/decision.json",
+          "bytes": 7187,
+          "sha256": "a3b73ecb5d592b8a9ee0416441a1b10734c882940cacd622261f3a0fc37a2d06"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/public-events.json",
+          "bytes": 11125,
+          "sha256": "29dfd84cf3deb7cf6a493cd32815b10a2204a932e797bd3a695cd9256084a544"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "b40f4be2e008e705054800e7dfae215b900e1219f6d200531563f2742e25d66e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/transcript.md",
+          "bytes": 11541,
+          "sha256": "062612679f722c9620df4205f08992bea567986a0562cb630feb97e0fb9ede31"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/usage-observations.json",
+          "bytes": 5628,
+          "sha256": "fc72c5a7773f6202dacb6ff778128d667e277575ed12084f7e058a97a139bbff"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/eval_metadata.json",
+          "bytes": 1859,
+          "sha256": "494041d9f80f6d5f42b0d3ec61acf083a38228af76d3dbeea6db7d771a691c94"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/grading.json",
+          "bytes": 8427,
+          "sha256": "a845984f25870114c8f42d1f7a5c066c120382eeaf085ea3fd78d30bff2affd3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/intake-verification.json",
+          "bytes": 1666,
+          "sha256": "6a430efdba1b656201f597111869d2bd95af6f0bdf8f6e041c2b718350b291d1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/outputs/decision.json",
+          "bytes": 10182,
+          "sha256": "0eeb01c4a97cad80e746f7418f82a29da47e5b41260f9464c6cedaeaee15b690"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/public-events.json",
+          "bytes": 146586,
+          "sha256": "9e8596b329c42fa2a87dbea6b51072d8dd7234f905454851ae774c88c0e08f22"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "169f54abb789d3986354bcca9786e6773a5761ca9f905c5227e264791eb6e31c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/transcript.md",
+          "bytes": 145667,
+          "sha256": "4273cdabf103914cd69a360d659b1dcd6751f06c31be6be7562e9ad83b82e655"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/usage-observations.json",
+          "bytes": 9067,
+          "sha256": "24f89ad47e29c084339be2eaace516f723593b7cf7760835aab5bec43ad36ee1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/grading.json",
+          "bytes": 8717,
+          "sha256": "d0ed66535922f16300013b07d017c58852ecc7889b04bd723093843d9c6569da"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/intake-verification.json",
+          "bytes": 966,
+          "sha256": "024515775eeed2156637731e986a77e17f30dba165d6fec930b804107e6c7024"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/outputs/decision.json",
+          "bytes": 7210,
+          "sha256": "bd0b5288fb4ce9a8fec0dbabd2231d13abd26cf04da7e9f863df62fe14302101"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/public-events.json",
+          "bytes": 10913,
+          "sha256": "7bf129890f6a446ce740af69a60f5f591ad06feacf867cb14bb56c8cd6d944ea"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "0d53231c89f70b738e6a32d5783e7bed8f62817b11167cd52d9a49a28b992b99"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/transcript.md",
+          "bytes": 11162,
+          "sha256": "b69f79892cdd33106c60980fc0494280f251caf92596297f68ceb6612e6a8f51"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "0abc926d3442c17af49193c821b8365787a983c3626074fb1c91b0e0250bafbf"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/eval_metadata.json",
+          "bytes": 1323,
+          "sha256": "7e3508f146b490aee05ad1938324a64d6c58af8ebe7c1bbcfc5006f712157688"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/grading.json",
+          "bytes": 6994,
+          "sha256": "16c5ef8afbc5c6f9bc5522a6028150feccf130734f5f09759febbe4024bb7a78"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/intake-verification.json",
+          "bytes": 1648,
+          "sha256": "d004a5656168097189b6cd4720c421c21da00b5097e75cb5c6b45dab92264920"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/outputs/decision.json",
+          "bytes": 7903,
+          "sha256": "6a43605813664714ee6c7f8fa5fddb9ad2a51b30cf733aff36489ed649b8d14e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/public-events.json",
+          "bytes": 135448,
+          "sha256": "05450fdd7d024c2da1d90b0e52aa1b768d7bee52e6cae1777a54bd6296d90c5a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "870ad73096d6d3a06f4e4389010749d71f199158c7342bcfded71efd24d5b031"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/transcript.md",
+          "bytes": 134253,
+          "sha256": "56cb94e934b874d2500a3643ad960e54016eafeb244f5de4200b443112b29547"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/usage-observations.json",
+          "bytes": 9068,
+          "sha256": "a49a572162b4f5d8aaa20f8ae6674df1a277b69c584a93f9021b7dd249ef575d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/grading.json",
+          "bytes": 7048,
+          "sha256": "0dc3af26396548c96e46372a1043648dd92f2150b74844c006d8a5599d231701"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/intake-verification.json",
+          "bytes": 948,
+          "sha256": "de3bdd389d2a57dda9e719f0d6216c0bfcba08658eb81a492d3be705ef048d92"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/outputs/decision.json",
+          "bytes": 5678,
+          "sha256": "3bd7742f148414cdab949fbce1ebf294fd25b23fe1f038396bd7c40a0ad370bc"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/public-events.json",
+          "bytes": 9022,
+          "sha256": "62506b0f45779bb5c8145cd698071752581b42002718195925955da1ccc6ec54"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "11d5b4981372b159ebc16087882a855bf492358bab580651a5e957e84c9c6c9e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/transcript.md",
+          "bytes": 8995,
+          "sha256": "7e467044337676f049a76fc737473977a79353398aca885d350d7512aecaacfc"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "ac0ac721d94d74d607b0bb96588cd72f65ee5742a5b2a2bd83de48ae4a168a24"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/eval_metadata.json",
+          "bytes": 1257,
+          "sha256": "47ce82c399edc963afd1e535276fc041ca487b4b418fd77d7280d42b5d67484b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/grading.json",
+          "bytes": 6389,
+          "sha256": "f487cbbb019404740e20979a075513130fb4baebd32f621ce1e6bfbeba82a4a9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/intake-verification.json",
+          "bytes": 1286,
+          "sha256": "81c69f68b92239c678d5189fd90b462564b51231ca80a2ca9e61331c107e6d0d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/outputs/decision.json",
+          "bytes": 6418,
+          "sha256": "7438d15492a67d6505d07cb08027674ef3ebd236f96b32574298d51544c742ff"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/public-events.json",
+          "bytes": 67803,
+          "sha256": "d7d05ad3c632d5d79e610354034822b653f63b114c78b08c3921563bba618dee"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "70209d3eeac1015c5dad14bbae332e44e0eeff00f85229ea0a77df3373ead5ab"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/transcript.md",
+          "bytes": 67203,
+          "sha256": "a1ab499acfa5342191b6e99833b968d4044e8cf34bc807091afdcc8f0e447852"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/usage-observations.json",
+          "bytes": 6487,
+          "sha256": "0a97afbf4988e147ce923272ae10961371107f1c72d166b5ecd51e0b967a4ae6"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/grading.json",
+          "bytes": 7208,
+          "sha256": "fd711d9158d3df533ab34a26a88e92642ef2fa12b6799d718e0b79b7ec4ca0ea"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/intake-verification.json",
+          "bytes": 950,
+          "sha256": "7be20752f5aee68ede3232d3896e0e0f3ef152a00876e6da2c22a68352dc451c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/outputs/decision.json",
+          "bytes": 6354,
+          "sha256": "c18439fcb58939af71ddc3abfe1b58f0e8f78e455f9580e5e17c8bf15b389d1a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/public-events.json",
+          "bytes": 9786,
+          "sha256": "57da05506bcf02cd9b2ec30b08cbc5d9c5d39ad8e613d97d2045fc89c263d66e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "58691da8d70048f886fcdcac435e32ce2dbe937b04cbef7911796f68eed4f1df"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/transcript.md",
+          "bytes": 9762,
+          "sha256": "b81de57052b547f551dd94733fd6a0cf1eaccaf9159bdb3a3bfbc6aa47a32b5c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "a075e3f31aafe0d9f400d823ca4afd2a0f82a864721242f98d0b9fd7a3af898e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/eval_metadata.json",
+          "bytes": 1355,
+          "sha256": "6f38cfb3abdff155349278d17b9c56351a107bd0a3656dc9dfe2543172b02523"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/grading.json",
+          "bytes": 7779,
+          "sha256": "d6c8d2af1fc4ba9caa9eca0c3524d5b90f29544b349cc1ada346c72b533ba902"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/intake-verification.json",
+          "bytes": 1828,
+          "sha256": "2bacd5b83403ce1db8e522525b9860cc2d7a34b82293ec0a034d8265ab5142f3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/outputs/decision.json",
+          "bytes": 10101,
+          "sha256": "6ad4df2014d08239d0064095e0bf00831adfc6108e01ff2efebbc0c7910f2428"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/public-events.json",
+          "bytes": 157674,
+          "sha256": "c41030a999b30d6d405d4368bd1f3ddb24e78c529292ae769c7edad48b469b36"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/timing.raw.json",
+          "bytes": 574,
+          "sha256": "0d8da94db92f2733bf6f061ce46dda0f05e9d3b9398e29fb821c03329f1055c8"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/transcript.md",
+          "bytes": 156133,
+          "sha256": "9ba0862cc0575b2f96da64f949304515217d6a0bcfdf0ef28b4756318978457e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/usage-observations.json",
+          "bytes": 11648,
+          "sha256": "528a6774e401c94962fd995cdc02c495690b31de6eb53ea9ab3d2ed1d0a3997e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/grading.json",
+          "bytes": 7249,
+          "sha256": "bcd95d51c89c8602d1901b576be55caa07a0121df121f822958e277d02f7cc71"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/intake-verification.json",
+          "bytes": 948,
+          "sha256": "a88ca568ab2c2cef12fcb60774334bfa8be8ae86a0c5f06d7ad3fafb39f87a39"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/outputs/decision.json",
+          "bytes": 6858,
+          "sha256": "7a7b740edb24b89ed5447b7e7a7725678c8ed8de2f8afed2f2543e2bdb0aeff5"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/public-events.json",
+          "bytes": 10249,
+          "sha256": "5d31f68abfe21f724f6f9f41027e8e4af29e23fd0ce113663c549f8700e77d93"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/timing.raw.json",
+          "bytes": 577,
+          "sha256": "764b4c00633d56d3c28c1b5062b267885c4e2ac6ee490c6f1302240eabec4ffe"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/transcript.md",
+          "bytes": 10172,
+          "sha256": "504deb26ea6423500e2b70fe59d4cd45bf099074b402cf133d2383ad761eb0d4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/usage-observations.json",
+          "bytes": 4769,
+          "sha256": "1b22c7e054f8e4fbb47a615381ea2e0138b2961fe1e57a4fe5cc7c005abd0510"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/eval_metadata.json",
+          "bytes": 2063,
+          "sha256": "25ec290674f25342b443e3b3605836fcfbb99c3881c61babceebec2ef6b30968"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/grading.json",
+          "bytes": 8504,
+          "sha256": "e06f229ebfe1ec80ac11ff60088979a7235caaf0cb523cef915ea33d07fd8255"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/intake-verification.json",
+          "bytes": 1481,
+          "sha256": "60351ab9b76e46905323b2e8ccd0f7f847ccbcf3b53c7b43819ae8860ab58a35"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/outputs/decision.json",
+          "bytes": 5722,
+          "sha256": "817f49bf4340ab38ec875ac576846df26d664d0f097541b8684c7e8ea90ed742"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/public-events.json",
+          "bytes": 80535,
+          "sha256": "b80b33f2bc942ee9529641098b8f29eb215dac56b6996cf0709a0e68fb4dabba"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "0074c33e209bb4b905a2213f5e60580cfb38898540bcaa37693c3aaf49d03cf9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/transcript.md",
+          "bytes": 80184,
+          "sha256": "d48b523b492166468ea0e726140d6516e769b7834425669f32181910f172fc74"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/usage-observations.json",
+          "bytes": 8208,
+          "sha256": "ea31fc859cb4c2d36128c3b66c254230c91053448fac5baa495c39892608e663"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/grading.json",
+          "bytes": 7963,
+          "sha256": "e8a63f1237904f147d984fcfc583eee901d5c15f3b614e6544327702a552b0d3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/intake-verification.json",
+          "bytes": 965,
+          "sha256": "be7f953d6ee79a272146cf811861a00514272220e6f41e13675105630f712930"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/outputs/decision.json",
+          "bytes": 4728,
+          "sha256": "25183be9be40c6460cf3d3712824dbf868dee4a7e3b14ff89257eb42c567e2cd"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/public-events.json",
+          "bytes": 8817,
+          "sha256": "57ab755af53d4f6c02d6592d1886e4a481d3ea2b7d4bc8868fdb7b34c48fb6d7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/timing.raw.json",
+          "bytes": 573,
+          "sha256": "bc1fd910585567e07f652a565acb1a12d854113eba66b3df701e4bf556d6d4f3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/transcript.md",
+          "bytes": 9338,
+          "sha256": "ae3fe0c621eecba7e9d783f8d5fe2498e7e093104f95f0b4fdf0eceb79893f3b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/usage-observations.json",
+          "bytes": 4769,
+          "sha256": "b0f42754ff598283fb4a767d6339d5221c88269943a306f1b5c31c0b22943331"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/eval_metadata.json",
+          "bytes": 3970,
+          "sha256": "facd06b10fed3b0c5557084ad6c9bd9ef113e7a1ea4d939429fb3aec6816ffc5"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/grading.json",
+          "bytes": 10332,
+          "sha256": "08dc9ab809e41092e39c7d7565784fbf7ad240c1916de5bda762932098ecfd0a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/intake-verification.json",
+          "bytes": 2040,
+          "sha256": "0c8d646a358567f414294be006693767073fe4e31b35d752337de9dd5041b04b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/outputs/decision.json",
+          "bytes": 8732,
+          "sha256": "06937989fb4cb3ef759c82eaa7df45d275c216f0955e5d5cee45a37c1a652a00"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/public-events.json",
+          "bytes": 132699,
+          "sha256": "b06ab5ec944c0fe01957df148547d673826a77885aa846189f8aae2a592aa2c3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "394ae602dccf2a53f863444fe8d5e46a3e2415023121fd2f3bd96fe18567390e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/transcript.md",
+          "bytes": 132336,
+          "sha256": "a9e0f048a7f00bf49d37e5f5d6d9f632d6995b2a1d45e2d50d4c40dae331135b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/usage-observations.json",
+          "bytes": 14224,
+          "sha256": "3d6ad58633879380b3ec2404dd27cf910106721226c0db217a7ec5fb0aff539f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/grading.json",
+          "bytes": 10143,
+          "sha256": "8f2208870d5091ad23bb0434566c111fd9272c17033e425d33b25e186bb69380"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/intake-verification.json",
+          "bytes": 987,
+          "sha256": "7af82b9ada837e34c4d2f035129e218b50576bfe8de50e73c0673d20c7ec1085"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/outputs/decision.json",
+          "bytes": 6307,
+          "sha256": "a58c98bddd815daee2dc88340ba0efa8bfefa6606e9f7ead798ca685c8dde203"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/public-events.json",
+          "bytes": 11354,
+          "sha256": "d8861c7458b8ed00848cbccedd870f50c3ecae3bc7871d5fe2a9fa460645a02f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/timing.raw.json",
+          "bytes": 573,
+          "sha256": "8c5a05bbeaedf64a059cccca17ef169cac9811a09e2c714939c5c536b8a9bcb0"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/transcript.md",
+          "bytes": 12751,
+          "sha256": "620d6b081adfc0c36dbf8efa08218237cef502c9742f0c28a692e990a2dd740e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/usage-observations.json",
+          "bytes": 4769,
+          "sha256": "da1bf70c8b571f1602ce2bfc67307c17c5b8c56351a38f31eaf7268981f8aa5d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/eval_metadata.json",
+          "bytes": 2350,
+          "sha256": "6a354b27ef83d19800178b9fb7d3700be43910d335ae365e9fa007bb52f6b090"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/run-1/grading.json",
+          "bytes": 7977,
+          "sha256": "77d1af92e77486a3bbabc7f88d8a4c9472bfa83a5f57989a5ec5da6b472698e3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "3695999155bbd3ce6e46b693c4081bdef47b4801acdffc1afbe45faf1ec9e3d8"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/run-1/grading.json",
+          "bytes": 8121,
+          "sha256": "ff87facba79474c86b2be0b451bbed635d72ccd725eeae5273c23a59054ff9a2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "479ff097fb06306124145d9032e7f857e1aa11781ba679fa97c9d2383062dc03"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-101-raw-guard-before-disabled-fallback/eval_metadata.json",
+          "bytes": 1171,
+          "sha256": "ee291b49ba3772dab63d42ae480efcd0e81c4d23e50beec94fdfb768431f34d1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/run-1/grading.json",
+          "bytes": 6968,
+          "sha256": "ba698389ec932b07e7a1bacf09b44268da2fff512c5335e7086d80a275d7a8c8"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "b73e4553d8c6f81dfffa48112598864ee22bb6c2c3f4aeb64e7169b4b255980f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/run-1/grading.json",
+          "bytes": 7344,
+          "sha256": "bfaff15c4177491ba7260a0aa4cb1ce8e6d42491fc84438b2e478ed22aa12e82"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "4c303ceec3b67076b76f870fda45decfc4abe79477e59c6abd8a27560850707c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-102-false-preserves-complete-legacy/eval_metadata.json",
+          "bytes": 1271,
+          "sha256": "cdbadaa9fe17d53ed364a1be5864f2cceb5d6ba87bc9e6838cde42e326fbff94"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/run-1/grading.json",
+          "bytes": 7799,
+          "sha256": "78a2a55b8431a2fcfa8c5b25f6c8f855ff334014c8c612601cb43afcf23253c1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-102-false-preserves-complete-legacy/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "fc1ca7b704f70777a90b4d494a4cc6c21928f992b326145d76a8e797bd4edb59"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/run-1/grading.json",
+          "bytes": 7533,
+          "sha256": "e201becf29b6fc008018f9d004c92c48625adec8d58fdc53da4054f71fd9eee9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "f28e6e2687070996b3b1e9835fa913b5fe08b88f9e826be303e6393fe2871f32"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-103-true-first-round-exclusive-publication/eval_metadata.json",
+          "bytes": 2020,
+          "sha256": "a2e417bb0984131dd320c4b52fa8d97657e81248a3b8a305832846962ef2cc24"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/run-1/grading.json",
+          "bytes": 9375,
+          "sha256": "6a122773504dc804827b3f62ca3cf03f3eeda37ebacb0ff0b5a2075a7976903f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "ce782eebcd520965f822977cf25c7642675fb28ebab9832fa6211be5086cd507"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/run-1/grading.json",
+          "bytes": 8771,
+          "sha256": "63e8b77e75e79badafc485f5cee2c339e2ef680662c92141e23d5701816c5c2a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-103-true-first-round-exclusive-publication/without_skill/run-1/timing.json",
+          "bytes": 86,
+          "sha256": "2bfeb2c205ee68ccabc3de3fa25c757677f7e1e5f1cc9fa9990c25a85ad285ec"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-104-required-checker-frozen-final-and-consumer/eval_metadata.json",
+          "bytes": 1859,
+          "sha256": "494041d9f80f6d5f42b0d3ec61acf083a38228af76d3dbeea6db7d771a691c94"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/run-1/grading.json",
+          "bytes": 8427,
+          "sha256": "a845984f25870114c8f42d1f7a5c066c120382eeaf085ea3fd78d30bff2affd3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "59ace4199cc7a3b9a6d5835ca074c8ba231941b535eb669c7886868cc67b6043"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/run-1/grading.json",
+          "bytes": 8717,
+          "sha256": "d0ed66535922f16300013b07d017c58852ecc7889b04bd723093843d9c6569da"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-104-required-checker-frozen-final-and-consumer/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "3cfacf5c65f2b48a6669ec00143a26ec25adf7c8be43d73c5fe03e2b49e9f29f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-105-unknown-cycle-resource-and-resume/eval_metadata.json",
+          "bytes": 1323,
+          "sha256": "7e3508f146b490aee05ad1938324a64d6c58af8ebe7c1bbcfc5006f712157688"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/run-1/grading.json",
+          "bytes": 6994,
+          "sha256": "16c5ef8afbc5c6f9bc5522a6028150feccf130734f5f09759febbe4024bb7a78"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-105-unknown-cycle-resource-and-resume/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "2a5999d0cfafb4c247eef7f1444eaaec95595bac4255e8fea5e15d0c5ab553f1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/run-1/grading.json",
+          "bytes": 7048,
+          "sha256": "0dc3af26396548c96e46372a1043648dd92f2150b74844c006d8a5599d231701"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "634d11df3603030d962c13dfcf5bdaf7cc35d651186bc00feffb92c39c888f88"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-106-true-unsupported-does-not-fallback/eval_metadata.json",
+          "bytes": 1257,
+          "sha256": "47ce82c399edc963afd1e535276fc041ca487b4b418fd77d7280d42b5d67484b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/run-1/grading.json",
+          "bytes": 6389,
+          "sha256": "f487cbbb019404740e20979a075513130fb4baebd32f621ce1e6bfbeba82a4a9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "2a08783fe8c5d3ddb99b3b451e5d1d97b59a3ffb6577d303694b70d6b48c8771"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/run-1/grading.json",
+          "bytes": 7208,
+          "sha256": "fd711d9158d3df533ab34a26a88e92642ef2fa12b6799d718e0b79b7ec4ca0ea"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-106-true-unsupported-does-not-fallback/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "191b7acb03729236fef9fdcf3bccf32c8e2c49e8ea512b22ec06d4ecd391fb6e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-107-exhaustion-needs-real-disposition/eval_metadata.json",
+          "bytes": 1355,
+          "sha256": "6f38cfb3abdff155349278d17b9c56351a107bd0a3656dc9dfe2543172b02523"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/run-1/grading.json",
+          "bytes": 7779,
+          "sha256": "d6c8d2af1fc4ba9caa9eca0c3524d5b90f29544b349cc1ada346c72b533ba902"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "4f33492d93f6e65eca71a874022d70997ed242b6f9a0a0efa15cf869d2ac0ff1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/run-1/grading.json",
+          "bytes": 7249,
+          "sha256": "bcd95d51c89c8602d1901b576be55caa07a0121df121f822958e277d02f7cc71"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "1c73a27a676661d7b956ad7c03bf6252bb687d7f663c2e703039a8a6061f7ae1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/eval_metadata.json",
+          "bytes": 2063,
+          "sha256": "25ec290674f25342b443e3b3605836fcfbb99c3881c61babceebec2ef6b30968"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/run-1/grading.json",
+          "bytes": 8504,
+          "sha256": "e06f229ebfe1ec80ac11ff60088979a7235caaf0cb523cef915ea33d07fd8255"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "06bd0f24b8bcae2d8ba649f9e06622248abe7e5e4b61ad215a83f51cf3112e8e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/run-1/grading.json",
+          "bytes": 7963,
+          "sha256": "e8a63f1237904f147d984fcfc583eee901d5c15f3b614e6544327702a552b0d3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "394589a5409045ba3669ab8f2e71c18aa42dc4cdeaf68165fe6732369ea24a58"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/eval_metadata.json",
+          "bytes": 3970,
+          "sha256": "facd06b10fed3b0c5557084ad6c9bd9ef113e7a1ea4d939429fb3aec6816ffc5"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/run-1/grading.json",
+          "bytes": 10332,
+          "sha256": "08dc9ab809e41092e39c7d7565784fbf7ad240c1916de5bda762932098ecfd0a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/with_skill/run-1/timing.json",
+          "bytes": 89,
+          "sha256": "1ad8454eda62ed18e4067e1ff4e9096f290397711ea45da52a0fd4a2bafa4a0a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/run-1/grading.json",
+          "bytes": 10143,
+          "sha256": "8f2208870d5091ad23bb0434566c111fd9272c17033e425d33b25e186bb69380"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-export/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "21e094701524f5303ce52257133e894d66620c95e2b65a6fa1999297e6ef574e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/aggregate.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/aggregate.stdout",
+          "bytes": 390,
+          "sha256": "e70e623591a04ebc693f6e6a627236384b6fd61a606240841bd56ce42352d3f9"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/benchmark.json",
+          "bytes": 89271,
+          "sha256": "2052e617b47764f08502c187f8c563114ff9d23606d6d1ba1de0413a8e7d1580"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/benchmark.md",
+          "bytes": 431,
+          "sha256": "421a18b84c2ae556d622edef29fa3641832bac19292beebca116d9134ec7b429"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/compatibility-status.json",
+          "bytes": 1195,
+          "sha256": "eeb23d74478d68a0790a18cdbbf4dc44484d9ba43fcbd4395640053071ca9b04"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/review.html",
+          "bytes": 647646,
+          "sha256": "d430db5a0dbf50ad4c3f2c53bc39e334db528ecc67e039424d77917f9d33a9a4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/viewer-final.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/viewer-final.stdout",
+          "bytes": 151,
+          "sha256": "453a4ab8d659f3ac3fa02ee98082a000e92885b251e8d6bf5b07a7f63318011f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/viewer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/viewer.stdout",
+          "bytes": 151,
+          "sha256": "453a4ab8d659f3ac3fa02ee98082a000e92885b251e8d6bf5b07a7f63318011f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/analysis-notes.json",
+          "bytes": 1305,
+          "sha256": "63f195a73aab2671d53596fc4ca3c212658c63593524a7f3314c8d8f391e81fa"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/before-analysis/benchmark.json",
+          "bytes": 16894,
+          "sha256": "e7360fdd29a9e57e1e9be9253db851da71cf162ec659b01e283ebc20c66be417"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/before-analysis/benchmark.md",
+          "bytes": 952,
+          "sha256": "3eedff60a6aaeb2249ba421d3de81e9aa23f40c940953bfb624b953edd9d7f2c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/before-analysis/review.html",
+          "bytes": 204586,
+          "sha256": "26ded9427e29e4bc1250c8f04e440ec148e9e6f469269412325c41ae0d12c866"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/benchmark.json",
+          "bytes": 18506,
+          "sha256": "bd5270cff00393481f5db20bc715fd9bcaf4df2a3042a0a0275120f212e03e42"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/benchmark.md",
+          "bytes": 2248,
+          "sha256": "29abc16593c7ba18f768af19759699834cefa638d2ea58481c026cd487a7da65"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/eval_metadata.json",
+          "bytes": 1089,
+          "sha256": "26a4d03172943760c953d5e52bfbcb5aa2f38dc38161488ce518e6b426baaf59"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/grading.json",
+          "bytes": 6798,
+          "sha256": "1a9127ee48a4531ae581c0094b0d5763bd200ddf734e47eff876f7eb6a964a15"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/intake-verification.json",
+          "bytes": 1095,
+          "sha256": "a64419a9cec3de6d5b89f493cf368458b5b9a4f1897cffc4011f358ad3ab53d8"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/outputs/decision.json",
+          "bytes": 6503,
+          "sha256": "fd9ea0e84614e9dba6de87fc50a089e6fcc0bb336cdd03dfa119b0d6c155e45d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/public-events.json",
+          "bytes": 29575,
+          "sha256": "3c402e358d34b740006fafe9a09f05b3be3144babd99dfb1404613152ce355ec"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "ae229b31eaa38e46e05bfd797c7fbd6ced6e467eb745446f7385649b308e7d04"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/transcript.md",
+          "bytes": 29136,
+          "sha256": "c65239eb9df8170aba46dc136dfa491ec5b8b0330372a0b41718d4679bb34fa2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/usage-observations.json",
+          "bytes": 4767,
+          "sha256": "554178c8043d762cb8278af904980501ce8cd0d52cb3b11bc5d85ea77d834464"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/grading.json",
+          "bytes": 6684,
+          "sha256": "9dbff07f3368c95c01a16bdc92466f553b295c3bdd4a9d4e7c4e364cc43b871b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/intake-verification.json",
+          "bytes": 938,
+          "sha256": "5677241c61fe5c0837b07369d0ae0634aebad0366e27e92b836f35251b81d449"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/outputs/decision.json",
+          "bytes": 7587,
+          "sha256": "fa991710523d36da794f98405eda5d1966d2534f0bc308d2da77cf8a219704fe"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/public-events.json",
+          "bytes": 11229,
+          "sha256": "0d1d93310b300fe7d1995c0452fd71a53e56c5675bd2bcef38388eac760c8d06"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "2722f30c7f677b9bb882fbb0f61c85701f99271e6c824771f45e8110b2035f33"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/transcript.md",
+          "bytes": 11070,
+          "sha256": "c0117fdb4d57e386e3a62b950c665ad2c82484c90b5deb117e0643a6d0760c90"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/usage-observations.json",
+          "bytes": 3909,
+          "sha256": "e64b8bc73ae052fb22964973e3ce5762c04b1e3336eb8a735310a7bdaedfb8e4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/eval_metadata.json",
+          "bytes": 1158,
+          "sha256": "740a9d8f2a25c004e0b28f85452e51a6cb5309dcc22a72b46cc59fd52cf78b2e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/grading.json",
+          "bytes": 6683,
+          "sha256": "5797068cd69198adf4e39bc94d6b909fcb1852b9f04a3cefbd554d530dc725e2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/intake-verification.json",
+          "bytes": 1109,
+          "sha256": "81a13b64b5fe96b5da66437f935d27f66c462c8cc7e9881bfe993d67f1c8f307"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/outputs/decision.json",
+          "bytes": 6306,
+          "sha256": "5374a8725c3c3d4036958b974acc23cfbefda9192305fff195d0b6c6b9dee4a4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/public-events.json",
+          "bytes": 29452,
+          "sha256": "8526d635633d92478e7f13121079ea8a9e990b2a52e93d2573392a7fdf69652f"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "04246b5ccfa45b7683f07259727c4b6840475bef2b07ee4835b0b389e8fd01c4"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/transcript.md",
+          "bytes": 29085,
+          "sha256": "e41236a0e0ecc85c309c2d5720500a6fd86819e50296f292aa4a198a3b3152f7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "15937fccf9efa62861a76fa61831b8dd561cba8165ef598e20f38caca3b12793"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/grading.json",
+          "bytes": 6647,
+          "sha256": "7535a81000944b792ee53761bdef67520f35191955a5154a9703e6a145148916"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/intake-verification.json",
+          "bytes": 952,
+          "sha256": "25f2494c0b9cb286f5c74ab7c6d03f3b69a18572b431e4487d2e79ea69905275"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/outputs/decision.json",
+          "bytes": 7194,
+          "sha256": "8ea4fe453cdce6b98595a2818b3c550e9250ad4115f4e97b72ba31f8447787e6"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/public-events.json",
+          "bytes": 10720,
+          "sha256": "c96d13c0474dcf2c8f1b6d6bae58384378e3907128634cadc003d0d12f61dc19"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "788656be06f83f4cf8e2a71d087dcc80f1e621224ed147b781228faaee44fafb"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/transcript.md",
+          "bytes": 10633,
+          "sha256": "77f598860eabbb3fc46baa8a4093583030b9094454aed8f7f875753f199b9954"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "c2e3ee244cb68777d3c2ccd4071baf0fef20936003fd2dc2d9d3170aa72eae2c"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/eval_metadata.json",
+          "bytes": 1341,
+          "sha256": "98a01d8ae8590785edcfbe2db6dcaf057b19e2bee98b45f23a13097884d5dec3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/grading.json",
+          "bytes": 7381,
+          "sha256": "a6e9d0bf93740621011b52c01bc2d208249ef03a1f8116c34238ae58feb1c859"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/intake-verification.json",
+          "bytes": 1145,
+          "sha256": "46c606498d9c19aee5bcc2de3aceae216b6c4dd5d975dc46f62f3adc687b6ded"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/outputs/decision.json",
+          "bytes": 6180,
+          "sha256": "e69268287a9237bd8490f4a94325b1ae35e50923c09f331fb45365185f3e0137"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/public-events.json",
+          "bytes": 29297,
+          "sha256": "3df87dd25821252b8b3085a4c8f0edf5427b7c70f2810560a24d43c6753fc40d"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/timing.raw.json",
+          "bytes": 572,
+          "sha256": "024f7eca3b5c6f3ddac0c494bd78b0ca68f7743597e749c5199b80c7a1a38561"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/transcript.md",
+          "bytes": 28973,
+          "sha256": "099d9699d64a8124fda325c0a4a3e03534911b0c16bee84032c2e06c1fda0c72"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/usage-observations.json",
+          "bytes": 4768,
+          "sha256": "585974d875042f788912bc3c98d07344bd9426f02c1b4aceb005cfaace307bd1"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/grading.json",
+          "bytes": 7726,
+          "sha256": "e75a77c25358f7ae0aa6a8f4ef3fb7a4aafc756b693c5cb28efd0128d1ea488a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/intake-verification.json",
+          "bytes": 988,
+          "sha256": "e8cec8a50981b639d9db20bed32a503692f8d66130733e333e9958ccfc425a5b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/outputs/decision.json",
+          "bytes": 7046,
+          "sha256": "3d2b21cef7c372c04c7a4af201eafa3277742d011a21741b6102c98f1b16fd86"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/public-events.json",
+          "bytes": 10677,
+          "sha256": "8a9019d638f9d38a21159b25e43103518314157dc811c9920adaf0eee1cc91a7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/timing.raw.json",
+          "bytes": 575,
+          "sha256": "fe66edf1f01b3c066dbf0c8b28957b8ab7f5ddaf29930c075076aeaff4e372db"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/transcript.md",
+          "bytes": 10633,
+          "sha256": "b9c589a201895c86bf6a1b1b20b90b2b858f7eb7fbd906d2216b4af72910e120"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/usage-observations.json",
+          "bytes": 4770,
+          "sha256": "c64f3186b8beb7141f7e7242cd25bd477c28390fd5b1e8582b09db9dbf862379"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-201-strict-boolean-value-matrix/eval_metadata.json",
+          "bytes": 1089,
+          "sha256": "26a4d03172943760c953d5e52bfbcb5aa2f38dc38161488ce518e6b426baaf59"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/run-1/grading.json",
+          "bytes": 6798,
+          "sha256": "1a9127ee48a4531ae581c0094b0d5763bd200ddf734e47eff876f7eb6a964a15"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-201-strict-boolean-value-matrix/with_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "2fc3ddc9620ae55b5100fa6a4fb6c687308a9942dd9bc64adc1e36faa1b81dd7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/run-1/grading.json",
+          "bytes": 6684,
+          "sha256": "9dbff07f3368c95c01a16bdc92466f553b295c3bdd4a9d4e7c4e364cc43b871b"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "afbad244884ef1cc67acb294cf19e64b9256c4e5421539aff2204fb38ee83e68"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-202-strict-source-syntax-and-structure/eval_metadata.json",
+          "bytes": 1158,
+          "sha256": "740a9d8f2a25c004e0b28f85452e51a6cb5309dcc22a72b46cc59fd52cf78b2e"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/run-1/grading.json",
+          "bytes": 6683,
+          "sha256": "5797068cd69198adf4e39bc94d6b909fcb1852b9f04a3cefbd554d530dc725e2"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-202-strict-source-syntax-and-structure/with_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "24d7289e4983cb27a3ea2c2753d3a195637681cc5d41e4760638ff73d4dcc7c5"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/run-1/grading.json",
+          "bytes": 6647,
+          "sha256": "7535a81000944b792ee53761bdef67520f35191955a5154a9703e6a145148916"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "7c8880a86cb4390643615c998d0c2e96bc2ac03afcdf2ce2678955a2f21be2f0"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/eval_metadata.json",
+          "bytes": 1341,
+          "sha256": "98a01d8ae8590785edcfbe2db6dcaf057b19e2bee98b45f23a13097884d5dec3"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/run-1/grading.json",
+          "bytes": 7381,
+          "sha256": "a6e9d0bf93740621011b52c01bc2d208249ef03a1f8116c34238ae58feb1c859"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/with_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "c8560389337f8f67d992ab025eced5b56bb205e451cf727e34151c3b28e809a7"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/run-1/grading.json",
+          "bytes": 7726,
+          "sha256": "e75a77c25358f7ae0aa6a8f4ef3fb7a4aafc756b693c5cb28efd0128d1ea488a"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1/eval-203-missing-versus-broken-defaults-and-generic-tolerance/without_skill/run-1/timing.json",
+          "bytes": 87,
+          "sha256": "9edf2861c3f36d682187896e45e87347a2ef1e3b1838ad727dcf075b43deae15"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/aggregate.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/aggregate.stdout",
+          "bytes": 393,
+          "sha256": "1c3e10ffa86ff2e5e9c2c037833cf6c073eee887784f78b3bb93893fdea19678"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/benchmark.json",
+          "bytes": 22497,
+          "sha256": "3b1a7d824151b8fc5e39a19cc6e248e927f9b89633fad21df77b78b57457dcdb"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/benchmark.md",
+          "bytes": 397,
+          "sha256": "3a113776a7361fb3ba9ff56fcae3593db1decdad8951043ab75f1da10ac00918"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/compatibility-status.json",
+          "bytes": 1199,
+          "sha256": "74a1520cc43af27bd9d7a924f2c7a00e95f8471e5507491f4f0b2eff19402ed6"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/review.html",
+          "bytes": 207050,
+          "sha256": "6414de9c6b230f48502f6562f1ca0fe2f8dc82b98e24d02b1de523864d1a0fef"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/viewer-final.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/viewer-final.stdout",
+          "bytes": 152,
+          "sha256": "3dc030a7607a5f29cdd2198d4f00ca5329a2b30e50f9fa21023b93492b2d78b0"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/viewer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/viewer.stdout",
+          "bytes": 152,
+          "sha256": "3dc030a7607a5f29cdd2198d4f00ca5329a2b30e50f9fa21023b93492b2d78b0"
+        }
+      ]
+    },
+    {
+      "id": "main-current-track-handoff",
+      "repo": ".",
+      "admission": "candidate_paths_no_stage_authorization",
+      "files": [
+        {
+          "path": "docs/handoff/2026-11-01-audit-executor-minimal-repair-session-handoff.md",
+          "bytes": 14714,
+          "sha256": "1ec3325ce8c17d53f28d6c3e11f8cd2d93a2c0a28ffe168787339fd6e94af2f1"
+        },
+        {
+          "path": "docs/handoff/2026-11-02-audit-executor-a3-progress.md",
+          "bytes": 3633,
+          "sha256": "608729d59b0aa28ea123166d70626b053ecd2518dc989446eb55b091516e0ba5"
+        },
+        {
+          "path": "docs/handoff/2026-11-02-audit-executor-phase-b-entry.md",
+          "bytes": 68684,
+          "sha256": "f0ad352475ce72953ac141809a63c6467daacda910fdd76738d1ca3f23d0dab2"
+        },
+        {
+          "path": "docs/handoff/2026-11-05-audit-executor-phase-b-complete-session.md",
+          "bytes": 19261,
+          "sha256": "0ccc1d9962fc7ff17c7bb274a276286a7d8f23378592e23a258d566c7b0a0068"
+        }
+      ]
+    },
+    {
+      "id": "release-metadata-future-only",
+      "admission": "not_authorized_and_not_modified",
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "bytes": 14476,
+          "sha256": "dc6fa0a47ab1d5b382674343b81f149b332007a86c494ec84151f52b642a3e42"
+        },
+        {
+          "path": "README.ja.md",
+          "bytes": 11531,
+          "sha256": "11b051327757d02bff28a08aa61c8130f35cb8f55a6d88b6677bd784ddaa66b2"
+        },
+        {
+          "path": "README.ko.md",
+          "bytes": 10623,
+          "sha256": "e4b0dcaa0367af1fd90701d24cab8ebd40829da302cfd3124526be5ad9a0facc"
+        },
+        {
+          "path": "README.md",
+          "bytes": 9736,
+          "sha256": "f2b065b07fe3602b6ff8dcca94ff30beb395f2ad7a3c5393cc8a6bec694933a9"
+        },
+        {
+          "path": "README.zh.md",
+          "bytes": 9158,
+          "sha256": "e4dfbaf25119d3e31a81b66beaf1b5ea8bb6298c7490d9bb6b799b2238258df0"
+        },
+        {
+          "path": "VERSION",
+          "bytes": 1274,
+          "sha256": "7a9a914e5a682aa8fae84ce204c53a8271c465174c1b4dcae623dd0df6c16632"
+        },
+        {
+          "path": "aria/.claude-plugin/marketplace.json",
+          "bytes": 965,
+          "sha256": "90fe0f992197d2c006d1994208548dde33ee4e01d55e3654d79f2740cfa6e813"
+        },
+        {
+          "path": "aria/.claude-plugin/plugin.json",
+          "bytes": 367,
+          "sha256": "15bea0d95d6cd68dda9dc1dbe7908bbfc8a64039183c40f40e1ac7287e52db84"
+        },
+        {
+          "path": "aria/CHANGELOG.md",
+          "bytes": 403009,
+          "sha256": "803d1a67c08b6d8f39a2ca5e4ca7f6791ecedeb36775a2b1e1746f4470c72e6e"
+        },
+        {
+          "path": "aria/README.md",
+          "bytes": 10369,
+          "sha256": "390f8fd114f72b1a971482fb9bc6975851ad63648431f1c26ee7a2b78f0f13bf"
+        },
+        {
+          "path": "aria/README.zh.md",
+          "bytes": 9921,
+          "sha256": "1a20b65f913b7bd4596ae1a04d83e3e5c9638a2cccf4f17b16dc8e37bb55012c"
+        },
+        {
+          "path": "aria/VERSION",
+          "bytes": 93561,
+          "sha256": "90960ffba21b2f00f139e6526bdd93232955cb393dc28ba5e7c7b5be8c13c3bb"
+        },
+        {
+          "path": "docs/architecture/system-architecture.md",
+          "bytes": 45512,
+          "sha256": "29770d80de17be544b31fb12bc5de5d95ddf85fb14df5c7a930ce77c6bced275"
+        },
+        {
+          "path": "docs/architecture/version-scheme.md",
+          "bytes": 7043,
+          "sha256": "8299e5a8bb23a8af39526420fce1445a73e6f91c49f2f053d3021c22d8d9ac46"
+        }
+      ],
+      "additional_future_path": "aria post-merge gitlink"
+    }
+  ],
+  "not_whole_file_admissible": [
+    {
+      "path": "docs/handoff/latest.md",
+      "reason": "Mixed current execution-track, PR38 and #267 history; preserve complete original, select only appropriate hunks later."
+    }
+  ],
+  "preserve_only_not_recursive_git_add": [
+    ".aria/notes/2026-11-02-audit-executor-implementation/",
+    "embedded .git directories and their worktrees",
+    "native session originals",
+    "legacy PR38 source/report history",
+    "/home/dev/aria-local-preservation/audit-executor-20261106-043056",
+    "/home/dev/aria-local-preservation/keys"
+  ],
+  "unrelated_commits_excluded_from_future_clean_integration": [
+    "cf0b25d220dd981eaead25ab834e7f96932aa559\tdocs(handoff): 保留 triage 历史入口 / preserve triage history entry",
+    "fd986e21f591b0e7463b315372a6ff655858920c\tdocs(triage): 保存 #267 核对与交接 / record #267 triage and handoff"
+  ],
+  "integration_branch_created": false,
+  "future_branch_strategy": "Keep original branch/commits untouched. A later explicitly authorized clean integration branch must start from freshly verified master and include only approved execution-track changes; do not push current mixed main branch by default.",
+  "release_evidence_bridge": {
+    "path": "aria/.claude-plugin/plugin.json",
+    "historical_policy": "immutable_history",
+    "phase_B_expected_sha256": "15bea0d95d6cd68dda9dc1dbe7908bbfc8a64039183c40f40e1ac7287e52db84",
+    "live_sha256_at_capture": "15bea0d95d6cd68dda9dc1dbe7908bbfc8a64039183c40f40e1ac7287e52db84",
+    "verified_archive_sha256": "15bea0d95d6cd68dda9dc1dbe7908bbfc8a64039183c40f40e1ac7287e52db84",
+    "snapshot_inventory": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/inventory.jsonl",
+    "snapshot_inventory_sha256": "c982af6135de1fe2fde3b7b3cf2073b67295cefba14dbb7b335039d20a56e572",
+    "status": "old_bytes_preserved_and_verified_no_release_delta_performed",
+    "old_manifests_or_acceptance_rewritten": false,
+    "future_requirement": "Keep original records and Git object/capsule binding. Separately record authorized release metadata delta and final candidate in integration evidence; never relabel old live-byte checks as a new candidate pass."
+  },
+  "remaining": [
+    "No proven minimal transitive evidence closure or public-egress allowlist.",
+    "No isolated integration branch, stage, commit or version synchronization.",
+    "No final candidate CI/pre-merge gate or Phase D."
+  ]
+}
