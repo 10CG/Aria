@@ -1,0 +1,19 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/106-true-unsupported-does-not-fallback.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-106-true-unsupported-does-not-fallback/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 4,
+  "agent_id": "a06d18ae0af8ae858",
+  "output_sha256": "7438d15492a67d6505d07cb08027674ef3ebd236f96b32574298d51544c742ff",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_72498675-9ca/agent-a06d18ae0af8ae858.jsonl",
+  "original_sha256": "71e7b2c006c351f8fed416a4d0e6f8cf171ec70b0ad216872dc54ad00975d01d",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

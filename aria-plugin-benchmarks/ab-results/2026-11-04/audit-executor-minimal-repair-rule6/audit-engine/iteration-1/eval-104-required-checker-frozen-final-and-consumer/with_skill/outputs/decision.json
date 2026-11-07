@@ -1,0 +1,70 @@
+{
+  "性质": "以下仅根据题设 mock 和获准读取的冻结 Skill 作描述性推演。未访问 /work/Demo 或任何 /mock 文件，未执行命令、Workflow、Agent、checker、capture、final 或 check；不把 mock 回执当作真实调用证据。",
+  "决定": "保持 guard=true 的 Workflow/convergence 独占路径。冻结 request.required=true，必须在同一周期、同一 reservation 内完成独立 checker 及证据 capture，然后用冻结审计副本作 final 和同基础参数的只读 check。prepare 成功不等于结果已发布。消费只在 check exit=0 且完整引用验证成功后开放；另一分支 check exit=1 时，即使 MD 写 PASS 也必须停止消费和放行。",
+  "必要检查": {
+    "冻结请求与资源": [
+      "先按 prepare 回执中 policy_request 和 policy_script 的 FileRef，核对各自原始字节及 hash，读取冻结 request，并确认其 identity、attempt_index、anchor、conclusions 与原 build、prepare、reservation 证据一致。required 的合法性由 helper 从固定源重算，不能由主控自行改成 false。",
+      "资源核验覆盖同 cycle 全部既往 attempted 审计和 auxiliary 调用的可验证终态，不仅看 audit-201 的顶层状态。题设资源表仅剩一个可用槽，在该资源表已正确重算的前提下，允许只使用这一个槽启动必要 checker，不额外并行派其他席。它是当前 reservation 的辅助检查，不是下一轮，因此不能把下一轮的零 unknown 前提误套成此处必须两槽全空。若复核实际已无可用槽，则暂停并报告资源阻断，不能伪造 checker 失败、等待软超时后自行释放槽或扩大并发。"
+    ],
+    "独立调用的拟议参数": {
+      "scriptPath": "/mock/checker.js，来自已核验的 prepare.policy_script.path",
+      "args.identity": "冻结 request.identity",
+      "args.request_sha256": "prepare.policy_request.sha256，题设记为 reqhash",
+      "args.anchor": "解引用冻结 request.anchor 所指 AnchorRecord 后的 value，不是 AnchorRecord 外壳、FileRef 或重新提取的当前 anchor",
+      "args.conclusions": "冻结 request.conclusions，不重新从增长后的 live 审计文件生成"
+    },
+    "独立性与回执": [
+      "拟议调用是新的独立 checker 实例，不能复用审计 agentId、不能由审计席自评，也不增加审计投票角色。保持生成脚本绑定的 agentType、label 和独立 60000ms 检查预算，不将其挤入审计的 300000ms 预算。",
+      "若按题设取得 checker-202 回执，则以它自己的 runId、显式 native 原件和 Transcript 入口作 capture drift，binding 使用原 prepare 回执，输出到原 manifest 的 post_drift_index_path。不能将 audit-201 当 checker 的 runId，也不能因原件可读就声称 checker 已验证成功。",
+      "随后由 helper 校验请求、脚本、args、独立 run/agent 身份、原生时间和完整 checker raw。成功 classifications 必须恰好覆盖冻结 conclusions 的每个完整 key 一次；缺项、重复、额外 key 或来源漂移应拒绝，而不是作为可忽略的 checker 失败。若冻结锚属于 partial anchor，还须按固定脚本契约只允许 on_topic/adjacent，不能因 scope 数组为空而跳过 required checker。",
+      "缺 native、缺 Transcript 入口、缺合法 capture 或 hash 不符，均不能伪造 drift_check_skipped 来放行。只有具备真实且匹配的 spawn 失败或 checker 自身超时证据时，才可由 helper 导出既有失败政策；失败本身也不证明调用已经终结或资源槽已释放。题设允许返回可读原件，不构成这种失败证据。"
+    ]
+  },
+  "数据选择": [
+    "final 与 check 的审计 native 都取 prepare.native_record.path=/mock/frozen-audit.json，并校验题设记为 frozenhash 的冻结字节身份。即使 live audit 文件后来增长，也不改回 live 路径，不补旧 C、raw、准入集合或票。",
+    "首次 final 重用 prepare 已封存的 audit origins，仅对新 checker 的 index/native/必要 JSONL 来源实读、校验并冻结进 final closure。旧 live 文件增长不等于冻结副本漂移；冻结副本或新 checker 必需来源自身不符则停止。",
+    "嵌套 FileRef 的相对路径保留原始 carrier 上下文，按 closure 的 origin/hash 映射取得 blob，不能将 blob 目录当成新的相对路径基准。hash 绑定所用字节，不额外声称它认证任意外部原件的真实性。",
+    "以后若取得审计或 checker 调用的较晚终态，只能按合法 preflight 更新资源观察；不得将其回填本轮已冻结的时间、raw、票或参与证据。若任何既往已派发调用仍 unknown，则后续新一轮仍被资源门阻断，不能因为本轮 check 成功就自动派下一轮。"
+  ],
+  "发布": {
+    "prepare边界": "prepare 只冻结审计输入并产生请求和必要 checker 脚本，尚未发布 round-result JSON/MD 或提交成功轮；不能在此时手写报告、临时 persist 或直接消费结论。",
+    "final与check的共同基础输入": {
+      "repo_path": "/work/Demo",
+      "manifest": "原 reservation 的同一 manifest",
+      "build_record": "原同一 build-record",
+      "workflow_run_id": "audit-201，不能替换成 checker-202",
+      "native_record": "/mock/frozen-audit.json",
+      "previous_round": "原 manifest.evidence.previous_round 对应的同一实际路径；逻辑 R1 省略，R>1 保持原引用，不因接续或 checker 而换前轮",
+      "output": "原 reservation 的同一 ROUND_RESULT 路径，题设未提供其字面值，不编造"
+    },
+    "顺序": [
+      "在 required checker capture 和证据验证具备后，拟议进行 final collect；不带 prepare-policy，不把它当新审计轮或新 reservation。",
+      "final 成功后，用完全相同的上述基础输入进行只读 check，只增加 check-result 指向同一 ROUND_RESULT。不能换 native、previous、output 或 build-record。check 不补文件、不写锁/快照/账本，也不重新接受变化后的 hash。",
+      "完整发布要求 JSON、配套 MD、对应账本 commit 齐全，并通过 check；单个文件已落盘不是可消费状态。部分发布只允许在同 reservation、同全部冻结输入且既有字节完全等于重算产物时幂等补齐缺文件或 commit，再重新 check；不重派审计、不覆盖不同字节、不用重新生成展示时间绕过冲突。"
+    ]
+  },
+  "报告消费的两条分支": {
+    "check成功": [
+      "仅在 check exit=0 后，逐项验证 stdout 中 result、markdown、commit 的 FileRef 与完整性，确认同一 run-key/identity，commit 确实对应本 reservation。若存在 disposition sidecar，也只能消费经同次 check 验证合法的引用和当前 head 视图；不能自行生成授权或沿用别周期处置。",
+      "题设成功 check 返回的 result FileRef 指向 blob 原件，应按该返回引用解引用并验证 blob 字节。不要换成展示 round.json，不要重新计算展示文件 hash 冒充返回的 result 身份，也不要因为两者展示 generated_at 不同就重建引用。",
+      "判断只读已校验 JSON 的 configured_roles、dispatched_roles、admitted_roles、population_comparable、conclusion_keys_equal、conclusions_stable、converged 与 policy。canonical_v1 由 helper 唯一计算，不另做 AI 去重、投票、矛盾判定或根据 MD 推导布尔值。incomplete 与收敛/资源门正交，不自行添加全员准入条件。",
+      "check exit=0 仅表示证据、产物及重算相符，不等于审计质量必为 PASS、必已收敛或 merge gate 已通过。后续按已校验 policy 的收敛、漂移、振荡、额度与资源状态路由；不将 checker 当额外 PASS 票。"
+    ],
+    "check_exit_1但MD为PASS": [
+      "停止消费此结果，不对后续阶段或合并放行，不采用 MD 的 PASS、frontmatter、AI 摘要或文件存在作为替代证据，也不回退 legacy 路径。",
+      "保留原文件与证据，报告 check 的实际 error_code、错误信息所指输入引用，以及 JSON/MD/commit 的验证尚未通过。题设只给 exit=1，不能擅自断定一定是 E_RESULT_MISMATCH、哪一个 hash 损坏或审计发现了 Critical。执行器拒绝与审计质量 FAIL 是不同结果。",
+      "只可在错误来源明确且满足同 reservation、同冻结输入的窄恢复条件时考虑幂等补齐，再执行相同基础参数的 check。若是缺源、漂移、身份错误或不同字节冲突，则保持阻断，不通过改 MD、改报告 boolean、换输入或重派来掩盖。"
+    ]
+  },
+  "未知与假设": [
+    "接受题设 guard 为 boolean true、显式团队和 Workflow 有效、audit capture 成功，以及当前有一可用槽等作为推演前提；没有核验真实配置、历史账本、资源或原件。",
+    "reqhash、scripthash、frozenhash 是题设 mock 标签，不是本次计算所得或已通过格式验证的 SHA-256。真实运行需要原字节的完整合法 hash，不能把这些标签直接写入生产证据。",
+    "题设未给出 checkpoint、具体轮号、manifest/build/output/previous 的实际路径、完整 prepare_record/audit_index/input_closure 引用、anchor 内容、conclusions、checker 分类结果、原生完成时间和最终 policy。推演假定省略项在同一合法证据链中可取得；真实阶段若必需项缺失则停止，不向真实仓补猜或编造。",
+    "没有足够数据确定 drift_ratio、drift_action、verdict、converged、剩余额度或下一轮是否可派发，也不能声称 checker-202、final、check 或发布已经真实发生。"
+  ],
+  "依据": [
+    "冻结 audit-engine/SKILL.md 的生产入口分流及资源与恢复条款。",
+    "冻结 references/execution-modes.md 的受守卫 Workflow/convergence 步骤 5–8 与 Capture adapter。",
+    "冻结 references/executor-contract.md 的 FileRef/闭包规则、CLI 生产路由、资源终态、10.3 发布恢复、10.4 独立 drift、10.5 sidecar 和消费者边界。"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "-I",
+    "-B",
+    "-c",
+    "load BuildContractTests + LegacyCompatTests"
+  ],
+  "actual_returncode": 0,
+  "result": {
+    "tests_run": 56,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "successful": true
+  },
+  "typecheck": {
+    "filesAnalyzed": 2,
+    "errorCount": 0,
+    "warningCount": 0,
+    "informationCount": 0,
+    "timeInSec": 4.543
+  },
+  "kind": "new_compatibility_regression_not_old_phase_b_reacceptance"
+}

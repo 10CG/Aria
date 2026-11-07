@@ -130,8 +130,8 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
 
 ```
 当前阶段: v2.0 M6 执行中 (M1-M5 shipped)。168h 自主跑三门未清:
-  - Blocker 3 输入投递 spec aria-2.0-m6-dispatch-input-delivery: B.2 完成
-    (aria-orchestrator feature/m6-dispatch-input-delivery), 卡 C.2 于 4 owner/infra 门
+  - Blocker 3 输入投递 spec aria-2.0-m6-dispatch-input-delivery: PR #38 保持暂停;
+    原审计处置及后续门见该 Spec 和 docs/handoff/（本轮不恢复业务）
   - Blocker 4: Luxeno 后端延迟 45-54s (owner/基建门); 遥测 spec aria-2.0-m6-cost-model-telemetry
     Track-1 完成 (feature/m6-cost-model-telemetry, 合并 gate input-delivery), 168h AC-6 须其独立 ship
   M6 release-closeout + M7 两 sub-Spec: Approved 待 Phase B (受门顺序, 详见各 proposal.md)
@@ -143,8 +143,7 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
   hermes-019-migration 全周期收口 (2026-10-28): 0.19 生产 cutover 10-27 (#262), C8 判绿 (#266 裁
     aria-layer1-* 覆盖 cron 面), spec 已归档; 旧 0.7 镜像 20f9cb5a 退役
-版本: aria-plugin v1.77.5 (aria-plugin#217 secret-guard W10 尺寸误拦收窄: >8KB 大命令按增长量在硬截止内完整重判, 放宽 x86_64 GNU/Linux bash 5.0-5.3 非 WSL;
-  套件 831→991 例, 真实流量放行 136/137; 前版 v1.77.4 Aria#257 收口; 套件缺口 #258/#261 已裁 10-27) | 主项目 v1.7.5 |
+版本: aria-plugin v1.78.0 (审计执行可靠性改进; 版本史与验证边界见 aria/CHANGELOG.md) | 主项目 v1.7.5 |
   aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = hermes 0.19 (glm-4.6 via Luxeno Anthropic Messages, cutover 2026-10-27)
 ```
 

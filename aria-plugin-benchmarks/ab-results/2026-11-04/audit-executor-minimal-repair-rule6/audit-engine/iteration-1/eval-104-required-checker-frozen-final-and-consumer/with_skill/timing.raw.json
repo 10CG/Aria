@@ -1,0 +1,16 @@
+{
+  "duration_ms": 133482,
+  "total_duration_seconds": 133.482,
+  "total_tokens": null,
+  "source": {
+    "path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_72498675-9ca.json",
+    "sha256": "7035f55a20ae2e45449784d87da0a9e2c2ee0b2a2c16ae11af6b8d199a0ad8bc",
+    "agent_id": "a3c1d5266cae73f6b",
+    "label": "eval-104-with_skill-r1",
+    "field": "workflowProgress.durationMs"
+  },
+  "context_metric_not_consumption": 70709,
+  "model": "Codex API/gpt-6.1-sol",
+  "started_at": 1793754512312,
+  "queued_at": 1793754512308
+}

@@ -1,0 +1,22 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/107-exhaustion-needs-real-disposition.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 7,
+  "agent_id": "a593ae9194955b45d",
+  "output_sha256": "6ad4df2014d08239d0064095e0bf00831adfc6108e01ff2efebbc0c7910f2428",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_72498675-9ca/agent-a593ae9194955b45d.jsonl",
+  "original_sha256": "f67fe64c7c8b6722a0ebe8d30df730409a46cf6c6fa125df36c84aff0ae07e16",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

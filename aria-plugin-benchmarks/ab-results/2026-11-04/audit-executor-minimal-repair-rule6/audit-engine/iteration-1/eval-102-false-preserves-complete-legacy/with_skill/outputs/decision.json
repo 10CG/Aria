@@ -1,0 +1,94 @@
+{
+  "case_id": 102,
+  "性质": "仅依据给定配置与获准冻结资料进行描述性推演；没有对 /work/Demo 执行命令、审计、模型或 Workflow 调用。",
+  "决定": {
+    "入口": "严格配置校验之后，继续完整的 legacy 生产入口。",
+    "checkpoint": "post_planning",
+    "resolved_mode": "convergence",
+    "require_same_admitted_roles": false,
+    "默认审计团队": ["tech-lead", "qa-engineer", "context-manager"],
+    "给定旧输入是否阻断": false,
+    "结论": "无需项目显式 teams、无需 manifest，也无需给前轮旧报告补参与角色集合；不能把 false 分支变成只保留旧比较公式、其它步骤却强制迁入新执行器的混合路径。"
+  },
+  "完整处理": [
+    {
+      "步骤": "1. 严格配置校验与入口分流",
+      "说明": "运行时应先依 execution-modes.md 的严格入口规则校验当前插件 DEFAULTS 与项目原始 JSON，再进入 config-loader 的通用加载和回落，不能先用回落掩盖类型错误、重复键或缺省注册错误。题给项目配置中的 require_same_admitted_roles 是 boolean false，插件 DEFAULTS 同样注册 boolean false，在这些给定事实和其余前置满足的假设下，选择 false 分支。这一入口校验本身不创建 manifest、不 build，也不迁移旧报告。false 仅关闭新参与集合守卫，不关闭 audit.enabled=true 的审计。维护者希望保持现状与该显式配置一致，不构成改成 true 的理由。"
+    },
+    {
+      "步骤": "2. 确认检查点启用及模式",
+      "说明": "原始 audit.checkpoints 中显式存在 post_planning=convergence，级 1 命中即止，优先于全局 audit.mode=manual；因此本检查点不能因 manual 而静默返回。没有另外给定 mode 覆盖时，本次执行 convergence，不按 adaptive_rules 重新推导成 off 或 challenge。file-scope 二次过滤即使命中也不改变已经为 convergence 的结果。post_planning 不是 pre_merge，不在这里运行 pre_merge completeness gate。"
+    },
+    {
+      "步骤": "3. 团队选择",
+      "说明": "沿用 agents_config 参数 > 项目 teams[checkpoint] > 默认分组的旧优先级。题目没有给 agents_config，项目也没有显式 teams，故取冻结 DEFAULTS.audit.teams.post_planning.convergence，即 tech-lead、qa-engineer、context-manager。团队缺省是合法回落，不是 unsupported；不借用 Aria 本仓其它检查点的席位，也不要求维护者复制一份显式 teams。"
+    },
+    {
+      "步骤": "4. 共享的旧前置与单轮执行",
+      "说明": "保留 Step 0：在本审计周期首轮前，从 post_planning 对应 proposal.md 的 Why/Goal 固化不可变 anchor，记录在报告正文 drift_metrics 中，不在审计途中换锚。每轮入口仍应执行 sibling spec probe，并据结果表述为发现竞品、完整扫描未发现或未能核实；探针失败或无法核实仅 advisory，不能说成无竞品。随后由 audit-engine 编排既有 agent-team-audit 单轮引擎，派发上述 convergence 团队，各 Agent 独立分析并返回 issues 与 PASS/REVISE 票。dispatch prompt 必须原文嵌入 agent-dispatch-contract.md 的完整 frontmatter 模板，并追加既有三个 drift 字段，已知字段填实际值。保留旧执行后端与既有接口，不强制改用新 helper 的 Workflow 链，也不增加新 raw JSON 协议。这里仅说明这些运行时动作，未实际派发或执行探针。"
+    },
+    {
+      "步骤": "5. 并发、失败与漂移策略",
+      "说明": "沿用 legacy 的 max_parallel=2、hard_cap=3、单 Agent 120s、每轮 300s、轮间串行约束。spawn 失败或超时跳过该 Agent并置当轮 incomplete=true；skipped Agent 不参与投票，部分失败本身不阻止旧收敛判定。529 按既有规则等待 30s 重试一次，仍失败则跳过。全部审计 Agent 失败则当轮作废、输出错误报告且不计入 max_rounds，不能靠空票宣称通过。项目没有显式打开 convergence drift guard，冻结 DEFAULTS.drift_guard.convergence_mode=false，故不擅自激活该可选守卫；既有 anchor 和报告字段仍保留。不把 true 分支的全 cycle unknown 资源重放、原生证据闭包等新增门套进 false。"
+    },
+    {
+      "步骤": "6. 沿用 legacy 汇总引擎",
+      "说明": "合并本轮各 Agent 原始 issues，按 category、scope 去重，合并 found_by并取最高 severity；同 scope 的矛盾意见保留双方并标记 conflicted，不自行裁决。再按旧规则从自由文本提取 type、severity、category、scope 与 summary，形成结论记录；finding.id 按 sha256(category + ':' + scope + ':' + severity + ':' + type) 的前 8 位确定性生成。该分支仍允许既有自由文本结构化与汇总，不要求改由 audit_executor.py 的 canonical_v1 唯一发布。"
+    },
+    {
+      "步骤": "7. 前轮旧报告与收敛判定",
+      "说明": "题目已说明前轮旧报告有效，故继续按旧 reader 与汇总约定读取其结论作为前轮比较输入，不因为缺参与角色集合而拒绝它，不补造实际参与角色、也不把配置名单或 frontmatter.agents 冒充新协议的 admitted_roles。false 的稳定性仍只比较本轮和前轮完整四元组集合 (type, severity, category, scope)，summary 不参与；稳定且本轮所有未被跳过的投票者均 PASS，且没有适用的既有政策阻断时，按旧规则判收敛。不额外 AND population_comparable，不发出新守卫的 missing_participant_evidence 阻断。缺角色证据只意味着不能宣称获得了新守卫的同参与集合保障，不意味着旧路径不能工作。若实际没有合法可比较前轮，则仍按旧首轮规则不能立即收敛；本题不能仅因前轮缺参与字段就把它当作不存在。"
+    },
+    {
+      "步骤": "8. 轮次路由",
+      "说明": "收敛则计算质量 verdict并生成最终报告；符合既有 N 与 N-2 相同且不同于 N-1 的振荡条件时，取最后轮结论并标记 oscillation。尚未收敛且有余量则继续下一轮，默认 max_rounds=5；结论稳定但仍有 REVISE 时不能算收敛。额度耗尽则沿用展示末轮结论、四元组变化和未收敛原因后的三路径：接受当前结论并记录 overridden_by_user=true、增加两轮、或降级为单轮并记录 degraded=true；接受或降级均保留 converged=false。本次仅描述分支，不向用户提问、不替用户作选择、不视为已经授权增轮。"
+    },
+    {
+      "步骤": "9. 写盘、旧报告兼容与报告消费",
+      "说明": "新报告仍走既有写盘前 change_id 锚点校验：应有 /work/Demo/openspec/changes/{change_id}/proposal.md 或匹配的归档 proposal.md；allow_dangling_change_ids 默认 false。题设称其它前置满足，故不额外推断悬空引用，但也不捏造 change_id 或具体锚点存在的实测证据。writer 使用 /work/Demo/.aria/audit-reports/{checkpoint}-R{round}-{timestamp_ms}-{spec_id}-{agent_role}.md 格式及既有 frontmatter、结论、轮次、drift_metrics 等正文；不要求旧报告补新参与字段，不要求新 helper 的 JSON/MD/commit 三件套、FileRef、check 回执或 sidecar 才能消费。reader 继续接受旧新文件名；真正旧两字段文件按既有规则视为 R1、role=legacy，在对应 checkpoint 的 R1 汇总中合并，这只是旧 reader 的表示法，不是实际角色证据。旧报告若缺 frontmatter，已有 dashboard markdown-header fallback 可兜底；新报告仍须强制 frontmatter，不反向要求历史回填。质量 verdict 仍按 0 Critical且0 Major 为 PASS、0 Critical且有 Major 为 PASS_WITH_WARNINGS、有 Critical 为 FAIL，converged 独立记录；收敛不等于无缺陷，报告 PASS 也不等于已收敛或已获 merge 放行。未来 pre_merge 的 completeness gate 有自身的报告归属规则，真正无 change_id 的两字段旧文件不计入该门证据；这不构成本次 post_planning 的新增阻断。"
+    }
+  ],
+  "逐项阻断判断": [
+    {"输入": "audit.mode=manual，同时显式 post_planning=convergence", "是否阻断": false, "原因": "检查点显式值优先，照常执行 convergence。"},
+    {"输入": "require_same_admitted_roles=false", "是否阻断": false, "原因": "完整采用 legacy 路径，不是关闭审计，也不是要求升级。"},
+    {"输入": "项目没有显式 teams", "是否阻断": false, "原因": "合法选用默认 post_planning convergence 团队。"},
+    {"输入": "没有 manifest", "是否阻断": false, "原因": "false 不要求 manifest 或新 helper 证据链。"},
+    {"输入": "有效旧前轮报告未记录参与角色集合", "是否阻断": false, "原因": "旧报告原样消费；不启用新参与集合可比性门，不回填或伪造参与证据。"}
+  ],
+  "未知与假设": [
+    "假设没有额外 agents_config 或 mode 参数覆盖；若存在，应按旧入口的相应优先级重新选择，而不是自动采用 true 分支。",
+    "接受题目关于其它既有前置均满足、前轮旧报告有效的设定；未读取 /work/Demo 的真实配置、上下文、Spec、报告、git SHA 或原始执行证据。",
+    "没有本轮实际 findings、投票或探针回执，无法给出真实 conclusions_stable、converged、verdict、incomplete 或发现竞品的结果；只给条件式路由。",
+    "agent-team-audit 的 Skill 文件不在本次许可清单中，未补读。此处单轮接口、默认团队及超时等描述依据获准的 audit-engine 文档与 DEFAULTS，不声称验证了未读依赖的内部实现。"
+  ],
+  "依据": [
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+      "范围": "89-100：严格分流及完整 false 路径；239-266：旧汇总；342-368：旧错误和资源策略。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+      "范围": "9-26：严格配置入口；267-328：legacy 优先级与团队；466-495：convergence 单轮、汇总与路由。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/config-loader/DEFAULTS.json",
+      "范围": "109-118：guard、轮数与漂移缺省；195-209：post_planning 默认团队。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/convergence-algorithm.md",
+      "范围": "8-28：false 与 opt-in 适用边界；34-116：旧集合、首轮与投票语义。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/agent-dispatch-contract.md",
+      "范围": "5-48：dispatch 模板及 drift 字段；59-63：旧报告 fallback、不强制 backfill。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/report-storage.md",
+      "范围": "5-43：存储与旧 reader 兼容；49-99：质量 verdict、收敛独立性及 frontmatter。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/pre-write-validation.md",
+      "范围": "8-50：所有 checkpoint 的既有写盘前锚点校验。"
+    }
+  ]
+}

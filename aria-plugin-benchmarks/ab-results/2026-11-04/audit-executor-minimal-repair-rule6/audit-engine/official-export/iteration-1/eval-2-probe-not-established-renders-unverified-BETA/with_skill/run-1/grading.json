@@ -1,0 +1,99 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": true,
+      "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形A.探针记录行是“- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed；origin 的 error_kind=network，scanned=0、refs_scanned=0)。”报告位置明确为 ### Round 1，未将结果渲染为无竞品。"
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": true,
+      "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形B.探针记录行明确“**未能核实**……原因: 探针 exit=1，stdout 为空、无可解析 JSON；stderr 为 Python traceback，具体异常原因未知”。理由又说明 not_established 是消费方兜底类别，不伪造脚本返回字段，也不把 traceback 当阴性扫描结果。"
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": true,
+      "evidence": "case 2 的 /candidate-1/outputs/decision.json，共同规则.流程边界明确“不阻断本轮，不改变审计 verdict、收敛判定或轮次路由”；情形 A、B 的影响字段分别确认继续既定 Challenge，不据 fetch_failed 或 exit=1 改审计 verdict，也不额外制造收敛或不收敛条件。兜底处理只将报告归为未能核实，未套用 pre_merge 门的阻断规则。"
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形A.能否断言没有竞品答“不能……只是没有取得命中证据，不是完整扫描后的阴性证据”；情形 B 同字段答“不能……只能说明本轮未能核实，不能说明没有同 issue 的竞品 Spec”。两种情形均无相反结论。"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "情形 A 的 exit 0 不代表完整扫描或无竞品，应消费 verdict=not_established。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 2 mock 同时给出 exit=0、status=degraded、reason=fetch_failed、verdict=not_established 与零扫描计数；内嵌 /frozen-reference/skills/audit-engine/references/execution-modes.md:567-585 明确业务 verdict 与退出码不同。"
+    },
+    {
+      "claim": "情形 B 的 not_established 是消费方兜底类别，不是脚本实际输出的 JSON 字段。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 2 prompt 指定 stdout 为空；内嵌 execution-modes.md:585 要求 exit 非零或非 JSON 一律按 not_established 处置。/candidate-1/outputs/decision.json 保持了原始输出事实与兜底处理的区别。"
+    },
+    {
+      "claim": "Challenge 原有收敛条件要求 objections 全部 resolved。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "case 2 的 /candidate-1/outputs/decision.json 在情形 A 收敛说明中逐字写“objections 全部 resolved”。它符合该 packet 内嵌 execution-modes.md:523 的简述，但本组 case 1 内嵌的 /frozen-reference/skills/audit-engine/references/convergence-algorithm.md:121-129 明确 obj.status != \"new\"，overruled 也视为已处理。因此不能将“必须全部为 resolved”核实为完整条件；这不改变本题探针不影响收敛的四项得分。"
+    },
+    {
+      "claim": "没有实际运行探针、审计、Agent 或 Workflow。",
+      "type": "process",
+      "verified": true,
+      "evidence": "case 2 candidate-1 public_transcript 记录四次 Read，以及 line 33 向 /candidate-1/outputs/decision.json 的 Write；health.tool_calls=5，无命令或审计派发事件。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "应加入覆盖完整、own_keys 非空且 verdict=no_sibling_found 的无命中对照，检验候选不是无条件输出“未能核实”。本组当前没有该健康阴性分支。",
+      "第 4 条可直接由 fetch 失败、零扫描和空 stdout 作一般推理得出；它是有价值的安全结果，但单独通过不证明掌握 Skill 的固定消费契约。",
+      "候选附带的 Challenge 收敛条件暴露了内嵌简述与详细算法对 overruled 的不一致；若要验证完整 Challenge 条件，应增加 overruled 的具体控制例，避免本题满分被扩大解释为整套收敛算法正确。"
+    ],
+    "overall": "四项探针消费断言全部满足，且有具体报告行与两种独立影响说明。附带的 resolved-only 收敛表述不够完整，已单独记录为未核实 claim，而非遗漏或擅自增加评分项。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 5,
+    "output_chars": 3150,
+    "transcript_chars": 60471,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-fixed",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按逐项证据、无部分分、claim 核验及 eval critique 方法评分；最终仅返回要求的结构化结果，未写文件。",
+      "已完整读取本组三个 packet，均未依赖截断文本：/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-1.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-2.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-3.json。覆盖 case 1、2、3 的两个 candidate，共 26 项布尔评分。",
+      "全部六个 candidate 的 packet 均给出 intake_verified=true、完整 decision_json_text 和公开工具事件；没有证据显示输入损坏、缺失、截断或真实环境故障，全部为 JUDGED。候选对规范保留未知或只给条件性回答，均按实际交付是否满足断言评分，未转作 NOT_JUDGED。",
+      "所有场景都是 mock 描述性推演，不要求实际运行计划中的命令。已区分候选真正发生的 Read/Write 与其拟执行探针、gate、审计步骤；未把计划或写入回执当作生产执行证据。",
+      "claim 的规则核验仅使用三个 packet 内嵌的冻结资料与题设；没有另读仓库、真实配置、controller 映射、其它组结果或其它 Skill。引用 /frozen-reference/ 和 /candidate-N/ 的路径均是 packet 提供的中性标签，不宣称这些是 grader 独立打开的真实文件。",
+      "本次仅部分遮蔽：正文中的 source-snapshot 路径、来源说明及可见读取内容可能提示候选来源，因此不是完全盲评；没有据此预设任一 candidate 应获胜。",
+      "可用执行元数据来自 packet：case 1 的 candidate-1/2 分别 2/8 次工具调用、94.312/122.122 秒；case 2 为 5/2 次、184.773/62.375 秒；case 3 为 2/8 次、68.701/114.453 秒。这些是提供的执行元数据，不是 grader 重新测量；未提供独立 user_notes、metrics.json 或 timing.json，未越过读取边界寻找。",
+      "原 expectations 保持逐字与原顺序；指定圆点和“未能核实”的固定格式要求未用语义近似偷偷放宽。相关格式与语义的耦合已在 eval_feedback 如实指出，没有改动本次标准。"
+    ],
+    "raw_summary": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "expectations": [
+    {
+      "text": "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json，逐对结论的 post_planning 为“适用但缺失”，理由明确“完整目录清单中没有 widget-export-pipeline 的 post_planning 报告。post_planning-R1-catalog-sync-retry.md 属于另一个变更，不能计入”；ERROR 行也明确排除此报告。它实际将无关报告排除，并判本 change 缺失，而非仅笼统谈报告归属。"
+    },
+    {
+      "text": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+      "passed": false,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json，post_spec 虽被判“已满足报告存在性要求”，但唯一匹配解释是“检查点与变更标识均匹配”。没有明确说明去扩展名后的末段界定，也没有说明无需中缀双侧连字符；存在报告这一结论不足以满足要求解释匹配规则的子项。"
+    },
+    {
+      "text": "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+      "passed": false,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json 确有 [INFO] 行及无实现代码的解释，但把判定写成“结构性不适用（条件性推演）”，并明确“实际 gate 是否定义并识别这一 Phase-A-only 分支……仍属未核实假设”“若实际规则未定义此分支，不能自行补造豁免”。它没有确认题设同仓且三路径满足规定时应判 not_applicable；核心分类仍以未知规则为条件，不能只凭 INFO 和 Phase-A-only 词样判 PASS。"
+    },
+    {
+      "text": "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+      "passed": false,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json，问题1_调用命令行.完整可执行命令=null；只列两个路径参数的语义约束，未给 completeness_gate.py 调用、--base 或 --change-id 调用参数。说明两个路径应相同，只满足其中一部分。"
+    },
+    {
+      "text": "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail",
+      "passed": false,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json 的确拒绝进入 pre_merge，并以缺 post_planning 为决定性原因；但最终给的是“完整性gate推演verdict”:“BLOCK”，actual exit_code=null，只把 1 放在“仅当实际 CLI 约定……”的条件性示例中。没有交付明确的 verdict=fail、exit=1 这一完整协议结论。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "claims": [
+    {
+      "claim": "catalog-sync-retry 的既有 post_planning 报告不能替 widget-export-pipeline 补位。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题设报告文件名指向 catalog-sync-retry；本组内嵌 /frozen-reference/skills/audit-engine/references/execution-modes.md:392-396 要求逐 change 的中缀或末段有界匹配。该文件不命中 widget-export-pipeline。"
+    },
+    {
+      "claim": "audit.mode=manual 不会关闭已经显式配置 convergence 的这三个 checkpoint。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 3 题设三个 checkpoint 都有显式值；内嵌 execution-modes.md:358-367 先取显式键，只有无显式键才走 manual→off 分支。"
+    },
+    {
+      "claim": "仅有匹配报告不能证明该审计已经 PASS 或已收敛。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "内嵌完整性门按文件名归属和存在性判 present，未要求此处从报告正文判断质量。/candidate-1/outputs/decision.json 对机械完整性与审计质量作了正确区分。"
+    },
+    {
+      "claim": "完整性 gate 的拟定 verdict 可以写为 BLOCK。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "case 3 的 /candidate-1/outputs/decision.json 最终使用 BLOCK；packet 内嵌 execution-modes.md:418-420 的 gate 枚举是 pass、fail、bypassed、error，本例任一 missing 对应 fail/exit 1。BLOCK 能表达意图，但不是所问协议输出。"
+    },
+    {
+      "claim": "未执行命令或实际审计，仅按输入写出推演。",
+      "type": "process",
+      "verified": true,
+      "evidence": "case 3 candidate-1 的完整 public_transcript 是 line 15 的输入 Read 和 line 23 写 /candidate-1/outputs/decision.json；health.tool_calls=2，没有 gate 或审计调用。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "题设未给仓库绝对路径和确切 base ref；建议明确允许已解释的变量或假设，避免把“完整命令参数”误解为必须凭空补真实路径。本次仍因完全未给调用串而 FAIL，并非因缺真实路径。",
+      "增加相同三文件形态但 repo-path 与 diff-repo-path 属于不同 git toplevel 的对照，检验候选不是仅凭“没有实现代码”猜不适用。",
+      "增加已有匹配 post_implementation 报告的 Phase A-only 对照，检验 present 优先于 not_applicable 的 first-match 顺序；当前场景不能区分这两项的求值先后。"
+    ],
+    "overall": "准确排除跨 change 报告并阻止放行，但末段匹配解释、确定的 Phase A-only 规则、调用串和精确退出协议未完整交付。条件性分类不算已确认规范，输入健康仍可评分。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 3703,
+    "transcript_chars": 8977,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-fixed",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按逐项证据、无部分分、claim 核验及 eval critique 方法评分；最终仅返回要求的结构化结果，未写文件。",
+      "已完整读取本组三个 packet，均未依赖截断文本：/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-1.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-2.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-3.json。覆盖 case 1、2、3 的两个 candidate，共 26 项布尔评分。",
+      "全部六个 candidate 的 packet 均给出 intake_verified=true、完整 decision_json_text 和公开工具事件；没有证据显示输入损坏、缺失、截断或真实环境故障，全部为 JUDGED。候选对规范保留未知或只给条件性回答，均按实际交付是否满足断言评分，未转作 NOT_JUDGED。",
+      "所有场景都是 mock 描述性推演，不要求实际运行计划中的命令。已区分候选真正发生的 Read/Write 与其拟执行探针、gate、审计步骤；未把计划或写入回执当作生产执行证据。",
+      "claim 的规则核验仅使用三个 packet 内嵌的冻结资料与题设；没有另读仓库、真实配置、controller 映射、其它组结果或其它 Skill。引用 /frozen-reference/ 和 /candidate-N/ 的路径均是 packet 提供的中性标签，不宣称这些是 grader 独立打开的真实文件。",
+      "本次仅部分遮蔽：正文中的 source-snapshot 路径、来源说明及可见读取内容可能提示候选来源，因此不是完全盲评；没有据此预设任一 candidate 应获胜。",
+      "可用执行元数据来自 packet：case 1 的 candidate-1/2 分别 2/8 次工具调用、94.312/122.122 秒；case 2 为 5/2 次、184.773/62.375 秒；case 3 为 2/8 次、68.701/114.453 秒。这些是提供的执行元数据，不是 grader 重新测量；未提供独立 user_notes、metrics.json 或 timing.json，未越过读取边界寻找。",
+      "原 expectations 保持逐字与原顺序；指定圆点和“未能核实”的固定格式要求未用语义近似偷偷放宽。相关格式与语义的耦合已在 eval_feedback 如实指出，没有改动本次标准。"
+    ],
+    "raw_summary": {
+      "passed": 1,
+      "failed": 4,
+      "total": 5,
+      "pass_rate": 0.2
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

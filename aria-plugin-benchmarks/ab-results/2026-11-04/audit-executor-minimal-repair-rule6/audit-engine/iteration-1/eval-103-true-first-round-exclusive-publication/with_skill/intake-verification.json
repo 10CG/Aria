@@ -1,0 +1,23 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/103-true-first-round-exclusive-publication.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/agent-dispatch-contract.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-103-true-first-round-exclusive-publication/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 8,
+  "agent_id": "af24bbf8714b69538",
+  "output_sha256": "e3bf01c960eb9a41492e0b2ea128cab4e5bb28f6d6606f8f12a73c708ce29aab",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_fc94b3a9-f28/agent-af24bbf8714b69538.jsonl",
+  "original_sha256": "b3832858aa2d55d2d7700996e9fca3d07154cc491cc754405a734c36c27f81ae",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

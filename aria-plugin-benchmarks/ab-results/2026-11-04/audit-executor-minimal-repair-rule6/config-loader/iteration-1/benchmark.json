@@ -1,0 +1,315 @@
+{
+  "metadata": {
+    "skill_name": "config-loader",
+    "skill_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/config-loader",
+    "executor_model": "Codex API/gpt-6.1-sol",
+    "analyzer_model": "inline_controller_identity_not_separately_metered",
+    "timestamp": "2026-11-04T01:39:13.503215+00:00",
+    "evals_run": [
+      201,
+      202,
+      203
+    ],
+    "runs_per_configuration": 1,
+    "aggregation_method": "official_schema_manual_derived_metrics",
+    "metrics_unknown": [
+      "tokens"
+    ],
+    "statistical_unit": "one executor per case per arm; across-case distribution",
+    "analysis_notes_ref": {
+      "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/analysis-notes.json",
+      "sha256": "63f195a73aab2671d53596fc4ca3c212658c63593524a7f3314c8d8f391e81fa"
+    }
+  },
+  "runs": [
+    {
+      "eval_id": 201,
+      "eval_name": "strict-boolean-value-matrix",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 65.556,
+        "tokens": null,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "逐项正确接受true和false并保留原布尔值；逐项拒绝字符串false、null、0、1、数组、对象六种非法类型，不将0/1视作bool。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的 items[0..1]分别保留 effective_require_same_admitted_roles=true、false并允许继续；items[2..7]对字符串、null、0、1、[]、{}分别判定“配置错误并中止受控入口”，can_continue_loading 均为 false。0 项指出数值相等或可转换仍“不满足 type(value) is bool”；1 项也明确禁止转成 true。"
+        },
+        {
+          "text": "非法值报配置错误并停止受控入口，不采用通用警告+默认false，不truthy或字符串转换。",
+          "passed": true,
+          "evidence": "六个非法项都停止且说明未产生可执行的有效配置；字符串项禁止按内容或 truthy 转换，null 项禁止当成未设置，数字与容器项禁止转换和默认回落。caller_handling 进一步要求六项在选择 legacy 或新执行器之前中止，明确拒绝调用方的“类型错误时警告后取默认值”。"
+        },
+        {
+          "text": "验证原始项目源与DEFAULTS后才合并，不因合并结果为false掩盖原始非法值；不改变audit启用/团队/预算。",
+          "passed": true,
+          "evidence": "decision_basis.rule 明确“在合并默认值前，分别严格解析两份原始 JSON”并验证原始字段；defaults 对给定原始文本单独确认 object 结构与 boolean false 注册，items 逐项验证项目原始值。caller_handling 禁止以默认 false 绕过守卫；assumptions_and_unknowns 明确“本例外不启用检查点、不改变团队和预算”。公开 transcript line 16 所载冻结规则第46至50行与这些决定一致。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    },
+    {
+      "eval_id": 202,
+      "eval_name": "strict-source-syntax-and-structure",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 79.596,
+        "tokens": null,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A/F两源语法损坏均错误停止；B/G重复object key均拒绝，不按最后一个值覆盖后当成功。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的 cases A、F分别将项目截断文本和 DEFAULTS 截断判为 JSON 语法错误，continue=false。B 在原始解析阶段拒绝重复 audit.require_same_admitted_roles，明确不能后值覆盖、先值优先或任选；G 对 DEFAULTS 任意位置的重复 object key 同样停止，禁止在解析器折叠重复键后声称通过。"
+        },
+        {
+          "text": "C非有限数值拒绝；D/H顶层非object拒绝；E/I存在的audit非object拒绝，即使相关guard未出现也不能绕过。",
+          "passed": true,
+          "evidence": "cases C 明确拒绝 x 中的 NaN，并说明严格限制覆盖整份原始源、不能因与 guard 无关而忽略；D、H分别拒绝项目与 DEFAULTS 的顶层 array；E 拒绝存在但为 null 的 audit，禁止以 guard 未出现回落；I 拒绝 DEFAULTS.audit=[]，禁止视为缺失后补 guard=false。上述五项 continue 均为 false。"
+        },
+        {
+          "text": "九种情况均不警告后返回默认值或回落false继续；校验发生在通用容错/合并/分流之前，保持缺失与损坏区分。",
+          "passed": true,
+          "evidence": "cases A 至 I 九项全部 continue=false，summary 明确不能警告后返回默认值或以 guard=false 转 legacy。basis.rule 要求两份原始源分别通过严格解析、结构及原始 guard 校验后才合并，且严格例外优先于通用容错；common_error_handling 禁止合并、分流前绕过。A 明确文件存在但损坏不等于文件缺失，E 同样区分 null 与缺失。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    },
+    {
+      "eval_id": 203,
+      "eval_name": "missing-versus-broken-defaults-and-generic-tolerance",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 65.134,
+        "tokens": null,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A项目确缺与B键缺采用已合法注册DEFAULTS false，C保留显式false，均不强制启用新执行器或要求参与证据；不把读取失败冒充确实不存在。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的“逐项结果”A、B分别因文件确缺、合法 {} 缺键而采用合法 DEFAULTS false，C保留项目显式 boolean false；三项均允许继续并明确“保持 legacy”，没有要求新执行器或参与证据。A依题设的确实不存在处理，未出现把实际读取错误改称文件缺失的行为。"
+        },
+        {
+          "text": "D DEFAULTS缺失、E缺注册、F注册true、G注册字符串均错误停止；DEFAULTS必须显式boolean false，不能把这些当项目缺省成功。",
+          "passed": true,
+          "evidence": "“逐项结果”D、E、F、G均为“是否继续”:false并报告配置错误：D不能硬编码false或用项目值绕过；E不能由通用回落补false；F明确 boolean true虽类型正确仍违反默认必须false的额外契约；G拒绝字符串转换或回落。“未知与假设”进一步说明 D至G未给出的项目内容不影响停止决定。"
+        },
+        {
+          "text": "H只对无关超范围字段沿用既有clamp至100且保留guard=false，不把strict例外扩成所有字段必停；所有情形不自行写回/激活项目配置、不变团队预算。",
+          "passed": true,
+          "evidence": "H明确普通越界发警告并在有效配置中 clamp为100，给出的配置片段同时保留 require_same_admitted_roles=false；允许继续且保持legacy，不改用默认90也不扩大严格例外。A至H的“配置是否应被写回”全部false；H强调仅调整返回的有效配置、不改原文件，未知说明也不补造检查点、团队或预算事实，没有自行激活或改动这些配置。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    },
+    {
+      "eval_id": 201,
+      "eval_name": "strict-boolean-value-matrix",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 69.048,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "逐项正确接受true和false并保留原布尔值；逐项拒绝字符串false、null、0、1、数组、对象六种非法类型，不将0/1视作bool。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“逐项决定”完整列出八项：前两项有效值分别为 true、false，且均允许继续；后六项分别将字符串、null、0、1、[]、{}判为类型错误，均不允许继续。数字项明确说明“JSON number 0 不是 boolean false”和“JSON number 1 不是 boolean true”，没有接受数值与布尔值之间的隐式等同。"
+        },
+        {
+          "text": "非法值报配置错误并停止受控入口，不采用通用警告+默认false，不truthy或字符串转换。",
+          "passed": true,
+          "evidence": "“逐项决定”中六个非法项均给出错误位置 $.audit.require_same_admitted_roles、配置校验“类型错误”、“是否可以继续”:false、“是否回退默认值”:false。字符串项明确“不做字符串转布尔，也不按非空字符串的真值判断”；“对调用方习惯的决定”明确拒绝警告后取默认值，并要求“显式坏值返回配置失败”。"
+        },
+        {
+          "text": "验证原始项目源与DEFAULTS后才合并，不因合并结果为false掩盖原始非法值；不改变audit启用/团队/预算。",
+          "passed": true,
+          "evidence": "“默认源”对给定原始 JSON 单独记录解析成功、boolean false及字段校验通过；八个项目源也逐项保留原始文本和类型判断。对 {} 叶子明确“不能把它当作无覆盖的空配置对象递归合并，从而悄悄保留默认 false”，共同处理还禁止坏值在合并或归一化阶段消失。false 项说明“不代表关闭整个审计或豁免其他检查点”；方案只决定该字段，没有改变审计启用、团队或预算。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    },
+    {
+      "eval_id": 202,
+      "eval_name": "strict-source-syntax-and-structure",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 79.242,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A/F两源语法损坏均错误停止；B/G重复object key均拒绝，不按最后一个值覆盖后当成功。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的 cases A、F均为 json_syntax_error 且 continue=false；A 不把解析失败当项目未配置，F 不用合法项目源或现场补造默认值继续。B 要在保留原始键值对的解析阶段拒绝重复 guard，禁止后值优先、前值优先或自行选 true；G 对 DEFAULTS 重复键同样停止，禁止项目覆盖或后值优先掩盖错误。"
+        },
+        {
+          "text": "C非有限数值拒绝；D/H顶层非object拒绝；E/I存在的audit非object拒绝，即使相关guard未出现也不能绕过。",
+          "passed": true,
+          "evidence": "case C 将 NaN 判为 non_json_constant，明确即使在无关 x 字段也使整个源不合法；D、H分别拒绝项目和 DEFAULTS 的顶层 []；E、I分别拒绝 audit=null和audit=[]，明确不将它们当作缺省节点。五项全部 continue=false，I 还禁止根据题目的 guard=false 跳过结构错误。"
+        },
+        {
+          "text": "九种情况均不警告后返回默认值或回落false继续；校验发生在通用容错/合并/分流之前，保持缺失与损坏区分。",
+          "passed": true,
+          "evidence": "九个 cases 的 continue 均为 false。assumptions[0]要求两源先独立严格校验，再合并和 guard 判定；assumptions[3]明确“配置已经存在但内容无效，不等同于配置缺失”，不丢弃错误源或回退 guard=false。各项 handling 禁止默认替代、转换空容器或合并覆盖掩盖错误；没有通过通用容错继续的分支。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    },
+    {
+      "eval_id": 203,
+      "eval_name": "missing-versus-broken-defaults-and-generic-tolerance",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "pass_rate": 0.3333333333333333,
+        "time_seconds": 87.266,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A项目确缺与B键缺采用已合法注册DEFAULTS false，C保留显式false，均不强制启用新执行器或要求参与证据；不把读取失败冒充确实不存在。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的 cases A、B从 DEFAULTS 得到 boolean false，C保留来源为 project 的显式 false；三项 continue=true，均说明该 guard 不启用，没有要求新执行器或参与证据。A 按题设的“确实不存在”处理，B 明确“空对象与解析失败不同”；公开记录没有真实读取失败被冒充缺失的行为。"
+        },
+        {
+          "text": "D DEFAULTS缺失、E缺注册、F注册true、G注册字符串均错误停止；DEFAULTS必须显式boolean false，不能把这些当项目缺省成功。",
+          "passed": false,
+          "evidence": "case F 明确给出 effective_guard=true、continue=true，理由是“是否禁止默认 true 取决于题面未给出的注册契约”，与必须显式注册 boolean false、错误停止的要求相反。conditional_alternative 仅在额外条件成立时才停止，不能替代本项实际给出的继续决定。D、E、G虽给停止，D/E还被限定为“在需要默认值的假设下”，未确立 DEFAULTS 无条件先验。"
+        },
+        {
+          "text": "H只对无关超范围字段沿用既有clamp至100且保留guard=false，不把strict例外扩成所有字段必停；所有情形不自行写回/激活项目配置、不变团队预算。",
+          "passed": false,
+          "evidence": "case H保留 guard=false且允许继续，但明确说“不擅自把 130 截断为 100、恢复默认值或写回”，只报告范围异常，没有在有效配置中 clamp 到100，直接违反本条要求。八项 write_back 均为 false，未提出改变团队预算，但这些满足的子项不能抵消 H 的 clamp 子项失败。"
+        }
+      ],
+      "notes": [],
+      "partition": "config-loader-targeted"
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 70.09533333333333,
+        "stddev": 8.230523758141603,
+        "min": 65.134,
+        "max": 79.596
+      },
+      "tokens": null
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.7777777777777778,
+        "stddev": 0.3849001794597505,
+        "min": 0.3333333333333333,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 78.51866666666668,
+        "stddev": 9.130514187784463,
+        "min": 69.048,
+        "max": 87.266
+      },
+      "tokens": null
+    },
+    "delta": {
+      "pass_rate": "+0.222222",
+      "time_seconds": "-8.423",
+      "tokens": null
+    }
+  },
+  "notes": [
+    "每case/臂实际n=1；跨case标准差不是重复运行稳定性；临时定向eval不外推生产成功率。",
+    "Token usage未知（null），未拿上下文指标、字符数或0替代。官方viewer省略未知token行，此处明确缺失。",
+    "实际执行仅mock/描述性决策层，不替代TASK016真实接线。",
+    "官方raw聚合已亲跑并保留；其写死n=3/token fallback不采信。本JSON为官方允许的真实统计派生，不修改官方库。",
+    "只作部分来源遮蔽，不声称完全盲评；所有饱和断言保留。",
+    "真实人类review/feedback尚未收到，TASK017未验收。",
+    "本轮9条配对断言中，7条两臂都通过、2条仅with_skill通过，没有两臂都失败或仅without_skill通过的项。",
+    "case201布尔值矩阵、case202语法/重复key/结构矩阵均两臂全过；该六条饱和断言全部保留，不能把它们当成本轮Skill正收益来源。",
+    "全部增益来自case203：without_skill允许DEFAULTS注册true，并对无关阈值130拒绝既有clamp；with_skill按DEFAULTS必须显式false及无关字段仍容错clamp至100处理。with_skill为9/9，without_skill为7/9，精确主差值2/9。",
+    "with_skill平均70.095333秒、without_skill平均78.518667秒；每case每臂n=1，该小样本差值不证明Skill普遍更快，跨case标准差不是重复方差。",
+    "这是3个临时定向case，不是已版本化的独立固定config-loader套件，也不外推生产成功率；原固定suite/version未改。",
+    "当前Skill与无Skill主比较没有独立测量相对旧Skill的边际收益；公共CLAUDE和工具metadata仍可能自动入场，不声称零context或技术ACL。",
+    "token消耗未知而非0；官方raw聚合写死n=3及token fallback原件保留、不采信，官方允许的schema统计按实际n=1呈现。",
+    "真实人类review/feedback尚未收到，TASK017及后续TASK018/019未验收。"
+  ],
+  "partitions": {
+    "config-loader-targeted": {
+      "with_skill": {
+        "runs": 3,
+        "mean": 1.0,
+        "exact_mean": "1",
+        "passed_expectations": 9,
+        "total_expectations": 9
+      },
+      "without_skill": {
+        "runs": 3,
+        "mean": 0.7777777777777778,
+        "exact_mean": "7/9",
+        "passed_expectations": 7,
+        "total_expectations": 9
+      }
+    }
+  },
+  "exact_primary": {
+    "with_skill": "1",
+    "without_skill": "7/9",
+    "delta": "2/9",
+    "delta_positive": true
+  },
+  "new_behavior_failures_with_skill": [],
+  "human_feedback_received": false
+}

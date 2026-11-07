@@ -1,0 +1,73 @@
+{
+  "execution_status": "descriptive_only",
+  "scope": "以下仅按冻结 SKILL.md、获准 references 与题给 mock 推演。没有运行探针、命令、审计 Agent、Workflow 或网络请求，也没有读取 /work/Demo 的真实配置或 Spec。报告片段是拟写内容，不是已经完成的审计报告。",
+  "decision": "Round 2 入口仍须重新运行每轮竞品 spec 探针，不能复用 Round 1 的扫描结果。按题给 mock，应记录检测到 1 份同 issue 的竞品 Spec，并明确它是 archive 中的已完成的 Spec。该结果只作 advisory 告警，不自行改变质量 verdict、收敛判定或 Round 3 路由。",
+  "round_2_entry_steps": [
+    {
+      "step": 1,
+      "action": "沿用本审计周期 Round 1 前已固化的不可变 anchor、既定 convergence 模式和 Round 1 证据。Step 0 是周期内一次性步骤，不在 Round 2 重做或因命中竞品而换锚。当前 checkpoint 为 post_planning，不运行仅适用于 pre_merge 的 completeness_gate.py。",
+      "precondition": "题目把场景设在 Round 2 入口；这不意味着可以绕过既有配置、轮次额度或资源前提。若项目启用了 require_same_admitted_roles，进入下一轮前仍须核同 cycle 全部既往 attempted 审计及辅助调用的原件和资源终态，unknown 时不得新增派发。"
+    },
+    {
+      "step": 2,
+      "action": "在本轮审计 Agent 开始前重新调用探针。--own-spec-dir 传目录名 demo-spec，而不是 openspec/changes/demo-spec/ 整段路径；--repo-path 显式传 /work/Demo。",
+      "command": "python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\"",
+      "command_scope": "这是 Skill 规定的拟执行完整调用串，本次不执行。插件实际安装根未提供；真实运行时须使 CLAUDE_PLUGIN_ROOT 指向实际插件根，或保证默认相对 aria 路径可解析。探针内部自带 fetch，不另加一次外部 fetch，也不把它说成纯本地或无成本扫描。"
+    },
+    {
+      "step": 3,
+      "action": "检查退出码，解析 stdout 恰一个 JSON，并核 schema_version 和 probe 身份。题给 exit=0、schema_version=\"1\"、probe=sibling_spec_probe，因此按一等判定字段 verdict=sibling_found 消费；不能把 status=ok 或 exit=0 解释为审计 PASS，也不能只按 hits 是否为空猜结论。",
+      "mock_interpretation": {
+        "status": "ok",
+        "reason": null,
+        "verdict": "sibling_found",
+        "unique_spec_count": 1,
+        "completed_spec_count": 1,
+        "same_issue_key": ["k", "aria-plugin", 122],
+        "spec_dir": "2026-08-22-phase-c-integrator-ci-path-coverage",
+        "corpus": "archive",
+        "remote_ref": "origin/master",
+        "proposal_path": "openspec/archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md",
+        "field_line": 22,
+        "own_layer": "canonical",
+        "hit_layer": "url_fallback",
+        "probe_elapsed_seconds": 18.342
+      },
+      "interpretation_notes": "份数按去重后的 spec_dir 计算，不按 remote、refs 或镜像条数计算。本例只有 1 个不同目录，其中 1 个 corpus=archive，必须标注已完成的 Spec。命中层 url_fallback 与本轨 canonical 层共享同一个规范化 issue key；不因层不同而丢弃该命中。status=ok、reason=null、caps_applied=[]，无需追加覆盖不完整后缀。扫描数量 149、refs_scanned=3 只是题给 mock 元数据，不是实际实测。"
+    },
+    {
+      "step": 4,
+      "action": "把命中告警写入当轮 ### Round 2 的 Sibling probe 行，并保留到聚合报告。不能写成未发现竞品、未能核实或重复劳动已坐实。使用红色告警文字标识，保留目录名、已完成的 Spec 标注与来源，方便核对。",
+      "failure_branch": "若实际出现 exit 非零、stdout 非 JSON 或 schema_version 未知，应改写为未能核实并说明原因，不能写成无竞品；这些不是本题给定 mock 的分支。"
+    },
+    {
+      "step": 5,
+      "action": "在既有入口和资源条件允许的前提下，继续原有 convergence 单轮审计，而不是因为探针命中就停止、改 mode 或跳过 Agent。guard=false 时按 agent-team-audit 单轮引擎执行独立分析、汇总、去重、冲突保留和结论提取，再与 Round 1 比较并核票；guard=true 时只走规定的 manifest/build/Workflow/capture/prepare/必要 checker/final/check 链，消费已校验 JSON，不回 legacy 手工聚合。题目未给团队、manifest、回执或实际配置，因此不虚构这些调用的参数、结果或已执行状态。"
+    }
+  ],
+  "round_2_report": {
+    "status": "入口时可确定的拟写片段；其余字段待本轮真实审计证据产生后填写。",
+    "markdown": "### Round 2\n- Agents: 待填本轮实际参与名单（题目未提供）\n- Sibling probe: <span style=\"color: red\">检测到 1 份同 issue 的竞品 Spec（含 1 份已完成的 Spec）: `2026-08-22-phase-c-integrator-ci-path-coverage`</span>。同 issue: `aria-plugin#122`；来源: `origin/master`，`openspec/archive/2026-08-22-phase-c-integrator-ci-path-coverage/proposal.md:22`（`archive`，已完成的 Spec；命中层 `url_fallback`）。此行为题给 mock 的描述性渲染，不表示实际扫描已发生。\n- Conclusions: 待本轮审计汇总后填写，不能由探针命中数推得\n- Delta vs Round 1: 待比较两轮审计结论四元组集合后填写\n- Vote: 待实际审计票据产生后填写，不能由探针 exit=0 或 status=ok 推得\n- Duration: 待本轮结束后填写；题给探针耗时为 18.342s，不等于 Round 2 总耗时\n",
+    "rendering_note": "红色仅表示探针命中告警，不是 FAIL 或 Critical 标记。若报告阅读器不支持内联 HTML，保留“红色告警：检测到 1 份同 issue 的竞品 Spec（含 1 份已完成的 Spec）”的文字，不能隐藏命中。"
+  },
+  "effects": {
+    "quality_verdict": "探针的 sibling_found 不进入质量 verdict 枚举，也不自动增加 Critical/Major/Minor、生成 issue finding 或把 PASS 改成 PASS_WITH_WARNINGS/FAIL。质量 verdict 仍依据实际审计结论：0 Critical 且 0 Major 为 PASS；0 Critical 且至少 1 Major 为 PASS_WITH_WARNINGS；至少 1 Critical 为 FAIL。既有 drift_terminated 覆盖规则仍独立有效。本题没有实际审计结论，无法确定本轮质量 verdict。",
+    "convergence": "命中不改变四元组集合比较或投票规则。legacy convergence 仍要求两轮结论集合稳定且有效投票全 PASS，并服从适用的 drift/policy；guard=true 时还须满足相邻有效轮实际非空 admitted role_id 集合相同，且只能消费 helper 校验后的 canonical_v1 和 policy，不从散文重算。探针命中不能单独让审计收敛，也不能单独阻止本来满足条件的收敛。题目未给 Round 1/2 keys、票或参与证据，不能声称已经收敛。",
+    "round_3": "不因 sibling_found 而强制继续 Round 3、提前终止、自动增轮或切换 challenge。Round 2 若按既有规则收敛，就结束并生成报告；若未收敛且有轮次余量及其它必要条件满足，才进入 Round 3，并在 Round 3 入口再次跑探针。仅有 Round 1 与 Round 2 不足以满足至少 3 个 normal rounds 的振荡检测。若额度耗尽，则保留既有接受当前结论、增加两轮或降级单轮的三路径处置；本次不询问用户、不代替用户选择，也不宣称获得授权。guard=true 的资源 unknown 等既有条件仍可能阻止下一轮派发，这不是探针带来的阻断。",
+    "meaning_of_archive_hit": "archive 命中必须作为已完成的 Spec 显示，但同 issue 不等于重复劳动。它可能是有意拆分、前置工作或相关方案；未读取双方 proposal 的完整内容，不能认定 demo-spec 已被替代、工作已上线或应自动取消本轨。"
+  },
+  "unknowns_and_assumptions": [
+    "假定题给 stdout 与 exit code 就是本次描述性推演的输入，不声称其真实性已独立核验。",
+    "假定 Round 1 的初始化已按原流程完成；不重新固化 anchor，不伪造其内容或 source_sha。",
+    "/work/Demo 的 require_same_admitted_roles、团队、max_rounds、drift guard、实际资源终态和 Round 1 结果均未提供。不能把冻结文档里 Aria 本仓显式 true 的记录泛化为 Demo 的配置，也不能自行断言 Demo 为 false。",
+    "本轮 Agents、结论数、差异、Vote、总时长和最终 verdict/收敛状态均未知，报告中明确待填，不填 0、PASS 或 true。",
+    "agent-team-audit 的完整依赖正文不在本次许可清单内；这里只使用已读主 Skill 与 references 中明确给出的编排契约，不补读真实仓或编造该依赖内部细节。"
+  ],
+  "source_basis": [
+    "冻结 audit-engine/SKILL.md：生产入口分流、Step 0、per-round 入口探针与 pre_merge completeness gate 的边界。",
+    "冻结 references/execution-modes.md：受守卫的 Workflow/convergence；Convergence 模式；竞品 spec 探针 per-round 入口的调用、stdout 契约、去重计数、三档措辞与不阻断条款。",
+    "冻结 references/report-format.md：完整报告模板中的 ### Round 2 与 Sibling probe 行。",
+    "冻结 references/convergence-algorithm.md：legacy 与 opt-in 的适用边界、实际参与集合守卫及至少三轮的振荡条件。",
+    "冻结 references/report-storage.md：质量 verdict 计算与 drift_terminated override。"
+  ]
+}

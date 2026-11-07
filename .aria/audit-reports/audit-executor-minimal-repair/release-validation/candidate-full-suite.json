@@ -1,0 +1,27 @@
+{
+  "kind": "release_candidate_regression_after_new_parser_change_not_old_acceptance_rewrite",
+  "command": [
+    "/usr/bin/python3",
+    "-I",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "aria/skills/audit-engine/tests",
+    "-p",
+    "test_audit_executor*.py",
+    "-v"
+  ],
+  "started_at": "2026-11-07T12:48:02.795086+00:00",
+  "ended_at": "2026-11-07T12:52:22.934507+00:00",
+  "returncode": 0,
+  "reported_tests": 312,
+  "summary_line": "OK",
+  "skipped": 0,
+  "ok_results": 312,
+  "logs": [
+    "candidate-full-suite.stdout",
+    "candidate-full-suite.stderr"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "-I",
+    "/home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/scripts/aggregate_benchmark.py",
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-export/iteration-1",
+    "--skill-name",
+    "config-loader",
+    "--skill-path",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/config-loader",
+    "--output",
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/benchmark.json"
+  ],
+  "exit": 0,
+  "raw_results_retained": true,
+  "accepted_as_complete_official_aggregation": false,
+  "reason": "Official hard-codes n=3 and converts unknown tokens to output_chars/zero; neither is this experiment.",
+  "raw_runs_per_configuration": 3,
+  "derived_report_method": "Skill Creator explicitly allows manual official-schema statistics. No model runner/library patch.",
+  "unknown_tokens": "all 26 original raw values remain null; context metrics/output characters never promoted to usage"
+}

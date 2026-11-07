@@ -1,0 +1,78 @@
+{
+  "schema_version": "task016_evidence_packaging_v1",
+  "task_id": "TASK-016",
+  "status": "EVIDENCE_PACKAGING_GREEN_NOT_ACCEPTED",
+  "authoritative_state": {
+    "task_accepted": true,
+    "ready": true,
+    "phase1_review": "PASS",
+    "phase2_review": "PASS",
+    "completed_tasks": 16,
+    "total_tasks": 19,
+    "acceptance_owner": "actual_main_controller",
+    "main_R1_full_check_consumption": true,
+    "main_full_audit_attempts": 1,
+    "main_full_audit_physical_seat_calls": 5,
+    "independent_checker_transport_calls": 1,
+    "checker_upstream": "authored_synthetic",
+    "public_tool_chain": "canonical_real_events_exported",
+    "rule6_passed": false,
+    "rule6_status": "not_claimed_by_packaging",
+    "new_business_or_model_calls_in_packaging": 0,
+    "not_covered": [
+      "required_checker_adapter_tool_error_branch_real_origin",
+      "non_admitted_native_six_state_branches_in_this_real_run",
+      "exact_120000_or_300000_native_boundary_case_in_this_real_run",
+      "multi_round_population_comparability_or_convergence_in_this_real_run",
+      "full_required_two_round_product_chain_not_claimed_adapter_only"
+    ],
+    "not_covered_explanation": "真实完整两轮、真实 tool_error、未触及的五个 native 状态、精确 120000/300000 边界、多轮可比与收敛仍未覆盖；adapter 仅真实 transport。",
+    "remaining": {
+      "charged_rounds": 1,
+      "effective_limit": 5,
+      "further_dispatch_authorized_by_this_task": false,
+      "next_round_dispatch_allowed_in_resource_view": true,
+      "remaining_full_audit_attempts_under_current_limit": 0,
+      "remaining_rounds": 4
+    },
+    "authority_scope": "当前 root.authoritative_state 是唯一当前状态；旧 root/旧提案/consumer 0-call/preparation 0-call 仅历史，不代表 parent checker 没调用。",
+    "accepted_at": "2026-11-04T00:27:51.387645+00:00",
+    "acceptance_source": "task016-acceptance.json",
+    "acceptance_boundary": "TASK016 only; as-of acceptance count, not future live progress; Rule6 and C/D still pending"
+  },
+  "current_evidence_index": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/packaging-index.json",
+    "sha256": "f9ded75ea2391fcf87c61a680cdc8ecf91144c381c901c413c63d6697696e050"
+  },
+  "independent_real_checker_adapter": {
+    "preparation_manifest": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/preparation-manifest.current-resolution-view.json",
+      "sha256": "7ff4a1c55c9ffd949e37ceee5d40a24fbccc05cc549ff9c677e58950096f392e"
+    },
+    "origin_mapping": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/origin-mapping.json",
+      "sha256": "6db951c5b5dd0b6535b250e9ec74a96101a4a1b0412132f8536c93a00256e589"
+    },
+    "attribution": "真实 transport 一次；上游仍为 authored_synthetic"
+  },
+  "actual_public_tool_chain": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/ordered-public-tools.canonical.jsonl",
+    "sha256": "28cd64a2b2d0f46c54149c1c71979c11637153ebb64a514d1f43877be5a120a7"
+  },
+  "actual_public_tool_chain_manifest": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/public-chain-manifest.json",
+    "sha256": "6e70a3e63c6e9ebd8967bb55840407db49b10ea36765e24c3c28c5b142ca84cc"
+  },
+  "historical_only": {
+    "previous_root": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-016/evidence-packaging-repair/probe-evidence.before-packaging.json",
+      "sha256": "602333462c68b3220faf157e4a9f622e8cb7b3d3098029c3814747723d70ed3d"
+    },
+    "interpretation": "旧 pending/notcovered/consumer 0-call 与计划是历史，不与当前状态并列裁决；所有失败历史不删。"
+  },
+  "self_hash_included": false,
+  "task_accepted": false,
+  "ready": false,
+  "C_D_commit_push_release_deployment_or_PR38_resume_performed": false,
+  "TASK017_started": false
+}

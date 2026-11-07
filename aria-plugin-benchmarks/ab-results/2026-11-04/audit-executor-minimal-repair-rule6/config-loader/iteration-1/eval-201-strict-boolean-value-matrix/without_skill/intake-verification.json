@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/config-loader-targeted/201-strict-boolean-value-matrix.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-201-strict-boolean-value-matrix/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a314dac6a7045de50",
+  "output_sha256": "fa991710523d36da794f98405eda5d1966d2534f0bc308d2da77cf8a219704fe",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_a388a6fa-199/agent-a314dac6a7045de50.jsonl",
+  "original_sha256": "3351dd63c28ff2e87f2773ca7cfeddd68160692b115ddfd6a1d58dc67774f961",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

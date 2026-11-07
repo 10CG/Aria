@@ -1,0 +1,7 @@
+Generated: /home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/benchmark.json
+Generated: /home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/benchmark.md
+
+Summary:
+  With Skill: 97.5% pass rate
+  Without Skill: 32.8% pass rate
+  Delta:         +0.65

@@ -1,0 +1,97 @@
+{
+  "expectations": [
+    {
+      "text": "严格解析成功后守卫false走完整legacy：原配置入口、默认团队、agent-team-audit单轮、旧汇总与旧报告消费，而非只说false兼容。",
+      "passed": true,
+      "evidence": "/candidate-1/outputs/decision.json 的“完整处理”步骤1先严格验证两源再走 config-loader 原入口；步骤2解释显式 post_planning=convergence 优先于 manual；步骤3按旧优先级选择默认 tech-lead、qa-engineer、context-manager；步骤4明确经 agent-team-audit 单轮执行；步骤6说明按 category/scope 去重、合并 found_by、取最高 severity 和保留冲突；步骤7、9说明旧前轮比较及旧报告 reader/fallback 消费。完整链路不是一句“兼容”。"
+    },
+    {
+      "text": "不因无显式团队、无manifest或旧报告缺角色证据阻断，也不强制执行新helper/build/prepare。",
+      "passed": true,
+      "evidence": "/candidate-1/outputs/decision.json 的“逐项阻断判断”分别把无显式 teams、无 manifest、有效旧报告缺参与集合列为不阻断。“完整处理”步骤1说明入口不 build、不创建 manifest；步骤4不强制 helper Workflow 链，步骤7不加入 population_comparable/missing_participant_evidence 门，步骤9不要求 helper JSON/MD/commit、check 或 sidecar 才能消费旧报告。"
+    },
+    {
+      "text": "保留一次性anchor、每轮sibling probe及既有收敛/预算/耗尽规则，不把新true资源限制反向套到false；post_planning不额外运行pre_merge gate。",
+      "passed": true,
+      "evidence": "/candidate-1/outputs/decision.json 步骤4规定首轮前一次性固化不可变 anchor、每轮执行 sibling probe，保留三态 advisory。步骤5沿用 legacy max_parallel=2/hard_cap=3、120s/Agent、300s/轮和失败规则，明确不套 true 的全 cycle unknown 资源重放。步骤7、8保留四元组稳定与有效投票、振荡、默认 max_rounds=5 和耗尽三路径；步骤2明确“post_planning 不是 pre_merge，不在这里运行 pre_merge completeness gate”。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "显式 post_planning=convergence 优先于全局 manual，本 case 仍应进入 convergence。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 30 载入的 /frozen-reference/skills/audit-engine/references/execution-modes.md:275-298 给出显式 checkpoint 优先、命中即止及模式解析规则；答案步骤2据此处理，没有因 manual 提前返回。"
+    },
+    {
+      "claim": "默认 post_planning convergence 团队是 tech-lead、qa-engineer、context-manager。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 34 载入的 /frozen-reference/skills/config-loader/DEFAULTS.json:195-200 正是这三个角色，顺序也与答案一致。"
+    },
+    {
+      "claim": "guard=false 保留旧汇总及旧报告消费，不要求 manifest 或参与集合证据。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开来源 SKILL.md:93 明确完整 legacy 与不强制 helper；report-storage.md:34-43 支持旧文件 reader 行为；convergence-algorithm.md:8 明确不得向 false 添加新参与守卫或 unknown 资源门。"
+    },
+    {
+      "claim": "旧路径的 skipped Agent 不参与投票，全失败轮作废且不计入 max_rounds。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 37 的 convergence-algorithm.md:114-116 支持 skipped 不投票；line 16 的 SKILL.md:346-350 支持部分失败 incomplete 与全失败轮不计费。答案步骤5没有将部分失败直接当成功或将全失败当空票通过。"
+    },
+    {
+      "claim": "已给出完整处理推演，但没有执行真实审计。",
+      "type": "quality",
+      "verified": true,
+      "evidence": "答案步骤1-9覆盖三条断言的所有环节，未知项保留为条件式；公开 transcript 的11次工具调用是10次资料 Read 和1次答案 Write，没有命令、Workflow 或审计 Agent 执行。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "建议为 manual 与 checkpoint 显式值的优先级增加直接断言，并配上 checkpoint 缺失、显式 off 的对照；当前“原配置入口”表述较宽，容易掩盖对 manual 语义的含混解释。"
+    ],
+    "overall": "三条均通过。答案不仅拒绝不必要的迁移门槛，还正确展开默认团队、旧引擎、旧汇总、历史报告消费和共享前置；资源策略也明确限定在 false 分支。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 11,
+    "output_chars": 7295,
+    "transcript_chars": 110101,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-a",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分方法依据完整读取的 /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md；采用逐断言语义证据、复合项全满足才通过、实质 claims 核验及 eval 反馈。按本任务指定接口直接返回结构化结果，不写 grading.json。",
+      "完整证据 packet 为 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-101.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-102.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-103.json。每份均包括两个候选的 decision_json_text、完整公开 transcript 及 health；本组六个候选全部 JUDGED。",
+      "仅依据给定 packet 内原 prompt、答案字节文本和公开事件评分。证据中 /candidate-1、/candidate-2 与 /frozen-reference 是公开记录中的中性化定位标签；未另行读取这些路径或当前真实配置。来源正文和部分路径仍可能提示来源，因此这是部分遮蔽评估，不是完全盲评。",
+      "任务为描述性 mock 推演：不要求候选真实调用 build、Workflow、Agent、capture 或 collect。答案必须给出断言要求的计划语义；Read/Write 素材和交付记录不充当真实审计运行证据，谨慎声明未知也不自动变成 NOT_JUDGED。",
+      "三份 packet 的六个 health.intake_verified 均为 true，公开记录未见输入损坏、答案截断或执行环境故障。未展开必要规则的候选按断言 FAIL，不作为环境问题排除。",
+      "packet 提供的 executor 指标：case 101 candidate-1 为2次工具调用、38.175秒，candidate-2 为4次、64.127秒；case 102 candidate-1 为11次、197.312秒，candidate-2 为2次、69.113秒；case 103 candidate-1 为2次、75.44秒，candidate-2 为8次、132.121秒。这些是作答过程指标，不是 mock 审计的真实运行时长。",
+      "packet 未提供单独 user_notes.md、metrics.json 或 timing.json 的正文，未对它们的实际存在性作推断；本次未因此省略任何 case、candidate 或 expectation。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

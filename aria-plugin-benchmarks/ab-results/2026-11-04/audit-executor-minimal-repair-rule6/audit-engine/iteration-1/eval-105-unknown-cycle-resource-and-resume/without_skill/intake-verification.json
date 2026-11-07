@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/105-unknown-cycle-resource-and-resume.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-105-unknown-cycle-resource-and-resume/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "af65f1baf7a17b246",
+  "output_sha256": "3bd7742f148414cdab949fbce1ebf294fd25b23fe1f038396bd7c40a0ad370bc",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_72498675-9ca/agent-af65f1baf7a17b246.jsonl",
+  "original_sha256": "205ce9763f4e6c06259f7f055294e2386ff196dad5c249fbe139857c1b9ee2d9",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

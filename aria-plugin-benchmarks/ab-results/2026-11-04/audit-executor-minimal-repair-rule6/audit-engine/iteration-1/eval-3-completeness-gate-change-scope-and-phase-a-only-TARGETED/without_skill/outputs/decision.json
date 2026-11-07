@@ -1,0 +1,75 @@
+{
+  "执行性质": "仅描述性推演；没有执行命令、调用审计 Agent、运行 gate 或读取真实配置。",
+  "来源边界": {
+    "已知": "只使用给定 case 的 prompt、自动注入的项目规则和一般推理。",
+    "未知": "未读取且本任务不允许读取 SKILL.md 或 references/execution-modes.md，因此不知道 completeness gate 的实际入口、完整参数、三态英文枚举、标准人读模板及退出码定义。下述自拟措辞与条件性结论不能冒充这些来源的原文或真实运行结果。"
+  },
+  "问题1_调用命令行": {
+    "完整可执行命令": null,
+    "理由": "给定信息不足以确定完整命令行。prompt 只明确提供 --repo-path 与 --diff-repo-path 两个参数名，未提供实际仓库路径、base 分支名称、gate 入口及其它参数契约。不能根据当前工作目录替场景填值，也不能杜撰脚本名或参数名。",
+    "已知参数约束": {
+      "--repo-path": "场景中被审仓库的路径，具体值未给定",
+      "--diff-repo-path": "与 --repo-path 完全相同"
+    },
+    "完整语义输入": {
+      "触发检查点": "pre_merge",
+      "被审变更": "widget-export-pipeline",
+      "比较范围": "本次 PR 相对其 base 分支的差异",
+      "差异文件": [
+        "openspec/changes/widget-export-pipeline/proposal.md",
+        "openspec/changes/widget-export-pipeline/tasks.md",
+        ".aria/audit-reports/post_spec-R2-widget-export-pipeline.md"
+      ],
+      "配置来源": "prompt 给出的 audit 块，不读取当前真实配置",
+      "运行次序": "任何审计 Agent 调用之前"
+    },
+    "说明": "以上是将来调用所需的语义约束，不是已经调用，也不是已核实的 CLI 语法。"
+  },
+  "判定原则与假设": [
+    "完整性按 (checkpoint, change_id) 配对核验，不以目录中存在任意同名 checkpoint 报告代替该变更的报告。",
+    "本次差异只涉及 widget-export-pipeline；既有且与 PR 无关的 catalog-sync-retry 不应被扩展为本次核验对象，其报告也不能给 widget-export-pipeline 补位。",
+    "audit.enabled=true，且三个前置 checkpoint 均配置为 convergence；manual 不能仅凭字面被解释成关闭这些检查点或免做完整性核验。本场景已经明确要求进行 pre_merge 前置核验。",
+    "proposal.md 与 tasks.md 都在本次差异中，说明规划对象存在。因此推演将 post_spec 与 post_planning 视为适用，不以 Phase-A-only 为由免除 post_planning。",
+    "差异中完全没有实现代码，推演按实现对象尚未产生处理 post_implementation 的结构性不适用。这不是把已启用检查点改成 off，也不是因改动小而豁免。实际 gate 是否定义并识别这一 Phase-A-only 分支，因未提供其规则文本，仍属未核实假设。",
+    "推演将给定 post_spec 报告视为文件存在性证据；未提供报告正文，不能由文件名推断该次审计已经 PASS、已收敛或内容有效。"
+  ],
+  "问题2与3_逐对三态结论及人读行": [
+    {
+      "checkpoint": "post_spec",
+      "change_id": "widget-export-pipeline",
+      "三态判定": "已满足报告存在性要求",
+      "依据": "顶层清单包含 post_spec-R2-widget-export-pipeline.md，检查点与变更标识均匹配。",
+      "人读行": "[OK] checkpoint=post_spec change_id=widget-export-pipeline：找到该变更的前置报告 .aria/audit-reports/post_spec-R2-widget-export-pipeline.md。",
+      "限制": "该结论只表示已找到匹配报告，不表示已审阅报告内容或证实其通过。"
+    },
+    {
+      "checkpoint": "post_planning",
+      "change_id": "widget-export-pipeline",
+      "三态判定": "适用但缺失",
+      "依据": "tasks.md 已存在且属于本次变更，post_planning 已启用；完整目录清单中没有 widget-export-pipeline 的 post_planning 报告。post_planning-R1-catalog-sync-retry.md 属于另一个变更，不能计入。",
+      "人读行": "ERROR checkpoint=post_planning change_id=widget-export-pipeline：缺少该变更的前置报告；post_planning-R1-catalog-sync-retry.md 属于 catalog-sync-retry，不能满足本变更要求。"
+    },
+    {
+      "checkpoint": "post_implementation",
+      "change_id": "widget-export-pipeline",
+      "三态判定": "结构性不适用（条件性推演）",
+      "依据": "本次 PR 仅含 proposal.md、tasks.md 与 post_spec 报告，没有实现代码；按上述 Phase-A-only 假设，不要求为尚未产生的实现提供 post_implementation 报告。",
+      "人读行": "[INFO] checkpoint=post_implementation change_id=widget-export-pipeline：本次 PR 仅有规划文档与审计报告，无实现代码；按 Phase-A-only 结构性不适用分支，不要求本检查点报告。",
+      "限制": "这是对适用性的条件性判定，不是报告存在，也不是该检查点审计 PASS；若实际规则未定义此分支，不能自行补造豁免。"
+    }
+  ],
+  "人读行说明": "以上三句是本次推演拟输出的逐句措辞，不声称与未读取的实现模板逐字一致。三态中文标签也不是已核实的机器枚举。",
+  "问题4_最终结果": {
+    "完整性gate推演verdict": "BLOCK",
+    "决定性理由": "widget-export-pipeline 自己的 post_planning 报告缺失；已有的无关变更报告不能替代。即使 post_implementation 可按 Phase-A-only 不适用处理，也不能消除这一缺口。",
+    "允许进入正常pre_merge审计流程": false,
+    "正常pre_merge审计verdict": "尚未产生；前置完整性核验阻断，不应启动任何审计 Agent，也不能把阻断说成已完成一轮审计后 FAIL。",
+    "退出状态要求": "应以失败的非零状态结束完整性核验。",
+    "实际exit_code": null,
+    "条件性exit_code示例": {
+      "exit_code": 1,
+      "前提": "仅当实际 CLI 约定以 1 表示完整性缺失时成立；给定材料没有退出码定义，故不能把 1 报成已确认的准确退出码。"
+    },
+    "解除阻断的条件": "在允许的实际工作流中取得 widget-export-pipeline 的有效 post_planning 审计报告，再重新核验完整性；本次没有执行补审或生成任何审计报告。"
+  }
+}

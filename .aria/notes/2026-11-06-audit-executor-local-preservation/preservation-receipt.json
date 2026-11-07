@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "status": "local_encrypted_snapshot_byte_verified",
+  "change_id": "audit-executor-minimal-repair",
+  "capture": {
+    "schema_version": 1,
+    "purpose": "local_preservation_only_not_release_or_gate",
+    "created_at": "2026-11-06T04:32:53.925007+00:00",
+    "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-043056",
+    "archive": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/payload.tar.gpg",
+    "archive_bytes": 961245960,
+    "archive_sha256": "eeb5a42cd946f7f6f41ab318aea5cc0d6aa9e280fefded719511cf8d92921123",
+    "key_file": "/home/dev/aria-local-preservation/keys/audit-executor-20261106-043056.passphrase",
+    "inventory": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/inventory.jsonl",
+    "inventory_sha256": "c982af6135de1fe2fde3b7b3cf2073b67295cefba14dbb7b335039d20a56e572",
+    "regular_files": 120735,
+    "logical_source_bytes": 3270778079,
+    "directories": 45542,
+    "symlinks": 0,
+    "source_content_changes_during_capture": [],
+    "git_states_unchanged": true,
+    "decrypted_payload_verified": false,
+    "same_filesystem_only": true,
+    "not_performed": [
+      "stage",
+      "commit",
+      "push",
+      "branch_create_or_checkout",
+      "version_change",
+      "PR",
+      "merge",
+      "release",
+      "deploy",
+      "archive_spec",
+      "resume_PR38"
+    ]
+  },
+  "verification": {
+    "schema_version": 1,
+    "verified_at": "2026-11-06T04:33:41.844891+00:00",
+    "verification": "decrypt_stream_and_hash_every_tar_member_no_extraction_or_execution",
+    "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-043056",
+    "inventory_sha256": "c982af6135de1fe2fde3b7b3cf2073b67295cefba14dbb7b335039d20a56e572",
+    "archive_sha256": "eeb5a42cd946f7f6f41ab318aea5cc0d6aa9e280fefded719511cf8d92921123",
+    "gpg_exit": 0,
+    "regular_files_verified": 120735,
+    "directories_verified": 45542,
+    "hardlink_members_verified": 0,
+    "expected_members": 166277,
+    "seen_members": 166277,
+    "missing": [],
+    "failures": [],
+    "passed": true,
+    "same_filesystem_only": true,
+    "restore_execution_test_performed": false
+  },
+  "capture_record": {
+    "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/capture-result.json",
+    "sha256": "4fb6c49a1b39ff4fc319668d872297ce34a25c18504312ef6754bf218f1c918e"
+  },
+  "verification_record": {
+    "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/verification-result.json",
+    "sha256": "eb8763ebbb17657fc5cf45a0175b06f0e589aff5cbfc3646cc099affc62103ae"
+  },
+  "ciphertext_hash_rechecked": true,
+  "key_material_not_in_repository_or_archive": true,
+  "same_disk_not_disaster_recovery": true,
+  "prior_attempts": [
+    {
+      "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-042253",
+      "status": "not_accepted",
+      "error_record": null,
+      "verification_record": null
+    },
+    {
+      "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-042349",
+      "status": "not_accepted",
+      "error_record": "/home/dev/aria-local-preservation/audit-executor-20261106-042349/operation-error.json",
+      "verification_record": null
+    },
+    {
+      "capsule": "/home/dev/aria-local-preservation/audit-executor-20261106-042419",
+      "status": "not_accepted",
+      "error_record": null,
+      "verification_record": "/home/dev/aria-local-preservation/audit-executor-20261106-042419/verification-result.json"
+    }
+  ]
+}

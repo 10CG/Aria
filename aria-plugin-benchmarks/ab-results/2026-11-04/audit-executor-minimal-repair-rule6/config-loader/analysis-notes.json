@@ -1,0 +1,10 @@
+[
+  "本轮9条配对断言中，7条两臂都通过、2条仅with_skill通过，没有两臂都失败或仅without_skill通过的项。",
+  "case201布尔值矩阵、case202语法/重复key/结构矩阵均两臂全过；该六条饱和断言全部保留，不能把它们当成本轮Skill正收益来源。",
+  "全部增益来自case203：without_skill允许DEFAULTS注册true，并对无关阈值130拒绝既有clamp；with_skill按DEFAULTS必须显式false及无关字段仍容错clamp至100处理。with_skill为9/9，without_skill为7/9，精确主差值2/9。",
+  "with_skill平均70.095333秒、without_skill平均78.518667秒；每case每臂n=1，该小样本差值不证明Skill普遍更快，跨case标准差不是重复方差。",
+  "这是3个临时定向case，不是已版本化的独立固定config-loader套件，也不外推生产成功率；原固定suite/version未改。",
+  "当前Skill与无Skill主比较没有独立测量相对旧Skill的边际收益；公共CLAUDE和工具metadata仍可能自动入场，不声称零context或技术ACL。",
+  "token消耗未知而非0；官方raw聚合写死n=3及token fallback原件保留、不采信，官方允许的schema统计按实际n=1呈现。",
+  "真实人类review/feedback尚未收到，TASK017及后续TASK018/019未验收。"
+]

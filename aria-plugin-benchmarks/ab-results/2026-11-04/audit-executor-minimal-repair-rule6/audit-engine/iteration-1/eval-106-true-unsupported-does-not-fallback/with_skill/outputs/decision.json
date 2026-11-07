@@ -1,0 +1,80 @@
+{
+  "execution_kind": "描述性推演",
+  "summary": "A、B、C、D 按原请求均无受支持入口，须报告 unsupported 并停止；E 的入口条件受支持，但 helper build 非零使执行阻塞，须保留错误和输入引用后停止。五项均不能回退 legacy、绕过已启用的门或据此放行依赖该审计的 Phase B 后续步骤。",
+  "assumptions": [
+    "按题设，/work/Demo 的项目配置 JSON 有效，audit.require_same_admitted_roles 均为 JSON boolean true；没有读取真实项目配置。",
+    "各项所述条件和 E 的 helper 回执均作为题设 mock，不代表本次真实执行。未实际执行 build、Workflow、Agent、模型或命令。",
+    "正常 Phase B 批准不包含改配置、关闭守卫、自动更换模式、团队、模型或后端的授权。"
+  ],
+  "cases": [
+    {
+      "case": "A",
+      "supported_entry": false,
+      "decision": "unsupported：虽为 post_planning=convergence，但缺少项目 checkpoint 的显式团队。",
+      "reason": "guard=true 只支持从项目固定源取得的显式团队；默认团队和旧 agent-team-audit 入口只在 guard=false 分支保留，不能借用它们补齐本请求。",
+      "next_actions": [
+        "停止此请求，不 build、不派发，不自行填默认团队或改项目配置。",
+        "记录缺失项为 audit.teams.post_planning 的显式团队。后续须由有权方明确补齐固定配置，再对新请求重新核验入口；当前不实施该修改。"
+      ],
+      "source_lines": ["skill:89-95", "execution_modes:26-30"]
+    },
+    {
+      "case": "B",
+      "supported_entry": false,
+      "decision": "unsupported：调用者附带 agents_config/model 覆盖，即使显式团队存在也不受支持。",
+      "reason": "true 分支禁止 caller 团队或模型覆盖，也禁止动态换席。不能用覆盖值继续，更不能悄悄丢弃参数后声称原请求已被支持。",
+      "next_actions": [
+        "停止当前带覆盖的请求，指出具体不受支持的覆盖参数，不执行派发。",
+        "后续可由调用方明确重提无覆盖、遵循项目固定团队与模型来源的请求，再重新核验；本次不替调用方改写请求，也不改配置。"
+      ],
+      "source_lines": ["skill:93-95", "execution_modes:26-30"]
+    },
+    {
+      "case": "C",
+      "supported_entry": false,
+      "decision": "unsupported：固定配置解析为 challenge，而受守卫入口仅支持固定源可解析为 convergence 的请求。",
+      "reason": "challenge 即使在 legacy 路径有定义，也不是 true 分支可自动采用的入口。不能把它改成 convergence，也不能用 caller mode、file-scope 或 lane 降级掩盖固定源不合格。",
+      "next_actions": [
+        "保留固定源解析结果并停止；不调用 legacy challenge，不自动换 mode 或关闭守卫。",
+        "后续只有在有权方明确决策、使请求与受支持的固定配置相符后，才能重新核验。正常 Phase B 批准不提供这一配置变更授权。"
+      ],
+      "source_lines": ["skill:94-95", "execution_modes:26-30"]
+    },
+    {
+      "case": "D",
+      "supported_entry": false,
+      "decision": "unsupported：当前环境没有 Workflow 工具，合格的模式和团队不能弥补后端入口缺失。",
+      "reason": "true 分支要求受守卫的 Workflow/convergence 完整配方；不能自动换后端、手工拼审计结果或转走旧单轮执行入口。",
+      "next_actions": [
+        "报告 Workflow 工具不可用并停止，不用直接 Agent、其它后端或 legacy 补跑。",
+        "待既定 Workflow 工具恢复可用后再核验原请求；工具恢复之前，不声称已审计或已通过。"
+      ],
+      "source_lines": ["skill:94-95", "execution_modes:28-30", "execution_modes:40-45"]
+    },
+    {
+      "case": "E",
+      "supported_entry": true,
+      "execution_status": "helper_build_failed",
+      "decision": "入口形态受支持，但按题设 build 非零，必须在该失败点停止，不能继续 Workflow 或下游收集与发布。",
+      "reason": "入口受支持不等于执行成功。完整配方要求核 helper 退出码，任一非零都必须呈现 error_code 与输入引用，禁止回 legacy、临时 persist、直接 collect 跳准备、AI 重算或从 MD/PASS 猜结果。",
+      "next_actions": [
+        "在真实处置中保留 build 的原始退出码、error_code、输入引用及捕获的错误输出，按实际回执原样报告；本推演不编造其具体值。",
+        "不派发审计 Workflow，不执行 prepare/final/check，不生成替代审计结论，也不自动改配置或改参数来绕过错误。",
+        "后续按该错误及所引输入诊断和修复，重新核验后才考虑受控恢复。若涉及既有 reservation 或已尝试调用，必须遵循原身份与资源恢复约束，不能以失败为由新建 cycle 重派。"
+      ],
+      "error_code": null,
+      "input_references": null,
+      "missing_details": "题设说回执带有 error_code 与输入引用，但未提供具体内容；不能据此判定根因、修复方案或可否直接重试。",
+      "source_lines": ["skill:95-98", "execution_modes:30-40", "execution_modes:47-72"]
+    }
+  ],
+  "authorization_boundary": "不把正常 Phase B 批准解释成审计豁免或配置修改授权。当前五项都未取得可消费的成功审计结果；应记录具体阻塞，保持依赖该门的后续步骤暂停，不标记 PASS、收敛或已完成。这里只描述后续条件，不向用户提问、不实施任何配置修复。",
+  "unknowns": [
+    "未提供 A 的候选团队、B 的具体覆盖内容、C 的完整配置、D 的工具不可用原因。结论只针对题设条件，不补造根因。",
+    "未提供 E 的具体 error_code、退出码数值或输入引用，也未提供任何既有 reservation、cycle 或资源终态，不能声称资源已释放或恢复已获准。"
+  ],
+  "sources": {
+    "skill": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "execution_modes": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-fixed/1-per-round-sibling-probe-entry-and-render-ALPHA.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-1-per-round-sibling-probe-entry-and-render-ALPHA/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a8976cdbba23f53d3",
+  "output_sha256": "df3402df455ae3db49a463d63223865e2fc714498ae3c1fa0b11d1ff91207902",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_81eac8d9-6d6/agent-a8976cdbba23f53d3.jsonl",
+  "original_sha256": "30565f97b6c466263011385316024694148145aca9d3c930874a8f31fd6f00fd",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

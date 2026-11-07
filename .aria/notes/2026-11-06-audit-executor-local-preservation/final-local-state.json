@@ -1,0 +1,64 @@
+{
+  "status": "verified_local_preparation_only",
+  "candidate_file_hash_checks": 408,
+  "all_candidate_files_unchanged": true,
+  "git_states": {
+    ".": {
+      "head_same": true,
+      "refs_same": true,
+      "index_same": true,
+      "removed_status_entries": 0,
+      "added_status_entries": [
+        "?? .aria/notes/2026-11-06-audit-executor-local-preservation/README.md",
+        "?? .aria/notes/2026-11-06-audit-executor-local-preservation/integration-scope.json",
+        "?? .aria/notes/2026-11-06-audit-executor-local-preservation/preservation-receipt.json"
+      ]
+    },
+    "aria": {
+      "head_same": true,
+      "refs_same": true,
+      "index_same": true,
+      "removed_status_entries": 0,
+      "added_status_entries": []
+    },
+    "standards": {
+      "head_same": true,
+      "refs_same": true,
+      "index_same": true,
+      "removed_status_entries": 0,
+      "added_status_entries": []
+    },
+    "aria-orchestrator": {
+      "head_same": true,
+      "refs_same": true,
+      "index_same": true,
+      "removed_status_entries": 0,
+      "added_status_entries": []
+    }
+  },
+  "archive_and_inventory_hash_rechecked": true,
+  "decrypted_verification_passed": true,
+  "capsule_mode": "0o700",
+  "key_mode": "0o600",
+  "operational_scripts": [
+    {
+      "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/procedures/aria-preserve-20261106.py",
+      "sha256": "822f5056edab356365673b8b2df5d13139f571c39df132d3cadd9e6dc58fbcf5"
+    },
+    {
+      "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/procedures/aria-preserve-run-20261106.py",
+      "sha256": "4723a701d6b36e17707d4341fc5c4c27adf973101823c35af7793b2e0f6d0a15"
+    },
+    {
+      "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/procedures/aria-preserve-verify-20261106.py",
+      "sha256": "efff46352be6de571556ed0a6c2b9e1099821fe34e3a028f7d9cbf990cfacb65"
+    },
+    {
+      "path": "/home/dev/aria-local-preservation/audit-executor-20261106-043056/procedures/aria-scope-20261106.py",
+      "sha256": "bcbea29f403b169a468dde290518cddda00842d68449816901c4ec8dcb1d48fe"
+    }
+  ],
+  "self_record_addition": "final-local-state.json is written after these checks; no source or Git metadata is modified",
+  "push_performed": false,
+  "stage_or_commit_performed": false
+}

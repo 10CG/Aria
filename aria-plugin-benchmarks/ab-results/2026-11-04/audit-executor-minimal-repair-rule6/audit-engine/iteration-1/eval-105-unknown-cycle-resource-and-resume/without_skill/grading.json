@@ -1,0 +1,86 @@
+{
+  "expectations": [
+    {
+      "text": "检查全部既往attempt审计及auxiliary，列unknown调用/原件引用；即使PASS或单字段允许仍零新增派发，包括下一轮与void补跑，不宣称OS已清理。",
+      "passed": false,
+      "evidence": "packet 中 /candidate-1/outputs/decision.json 的 decision.reason 正确识别 checker-old unknown，不能用 audit-old 终态、PASS 或 next_round_dispatch_allowed=true 替代；dispatch.current 禁止下一轮新增调用。但没有给出逐项检查全部既往 attempted 审计及 auxiliary 原件、列出 native/termination 引用的计划，只有 after_verified_terminal 笼统要求各 attempt 无其他未决调用；也未明确将 void 补跑纳入该历史检查范围。unknowns 承认完整清单与原件未提供，不能代替所要求的引用枚举计划。其未声称 OS 已清理，但不足以使整个矩阵通过。"
+    },
+    {
+      "text": "resume_only=true仅恢复原manifest/build/回执链，不再次Workflow；缺回执暂停，不能新cycle/attempt掩盖潜在已启动调用。",
+      "passed": true,
+      "evidence": "decision.json 总决定为“只可沿原链继续恢复证据与核验状态，不能重新启动调用”；recovery.resume_only 说明只能恢复既有执行，不是再运行许可；missing_original_receipt 要沿原 cycle/build/attempt/runId 查回原件，不拼造原工具输出或恢复参数。dispatch.new_cycle_proposal 拒绝换 cycle 补跑，recovery.history 明确新 attempt 不能使历史 checker-old 未决项消失。结合当前禁止重启的决定，语义上保持原链、缺回执等待且不借新身份重派。"
+    },
+    {
+      "text": "120s不是取消或释放槽，true并发最多2不因hard_cap=3放宽；较晚原件仅按同身份重放资源终态，不改旧C/raw/票，不越额度/终局/accept或degrade。",
+      "passed": false,
+      "evidence": "decision.json dispatch.timeout_proposal 正确拒绝按 120 秒释放槽，evidence.proposed_checks/on_success/immutable_content 也要求同调用原链核验，仅更新资源且旧 C/raw/票不变。但没有给出并发上限 2 或 hard_cap=3 不适用的规则，也没有明确剩余额度、终局及 accept/degrade 的禁止继续派发条件；“其余守卫与下一轮派发条件”不足以证明这些列举子项均被应用。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.3333333333333333
+  },
+  "claims": [
+    {
+      "claim": "audit-old 已终态、内容 PASS 和单个允许字段不能消除 checker-old 的 unknown 资源阻断。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "该结论直接应用 prompt 的已知状态，并符合 packet 内嵌 execution-modes.md:32 和 executor-contract.md:220 的全 cycle 资源规则。"
+    },
+    {
+      "claim": "较晚终态只能更新原调用的资源证据，不能倒写旧 C/raw/票。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "decision.json evidence.on_success 与 immutable_content 明确保留历史；packet 内嵌 executor-contract.md:415、427–429 支持这种资源视图和内容证据分离。"
+    },
+    {
+      "claim": "本次仅描述恢复与证据处理，没有实际恢复、派发或释放资源。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript 仅 Read case 输入和 Write /candidate-1/outputs/decision.json，没有命令、Workflow、Agent 或资源操作。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "把第一项的“调用/原件引用”要求明确成描述性输出规范：题目未提供字面引用时列明未提供，并说明需取得哪些 native/termination 引用，避免把诚实缺值和漏做引用盘点混为一谈。",
+      "增加较晚原件合法、回执找回、全 cycle 无 unknown 且额度/终局均允许的正向对照，要求说明何时可继续；否则长期保持 BLOCKED 的泛化回答容易遮蔽恢复能力缺口。"
+    ],
+    "overall": "候选正确阻止重复执行并保护旧证据，但未完整覆盖引用盘点、void 范围、并发数字及政策阻断。三项按完整矩阵评分，不给部分通过。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 2748,
+    "transcript_chars": 5361,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 1,
+      "failed": 2,
+      "total": 3,
+      "pass_rate": 0.3333333333333333
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

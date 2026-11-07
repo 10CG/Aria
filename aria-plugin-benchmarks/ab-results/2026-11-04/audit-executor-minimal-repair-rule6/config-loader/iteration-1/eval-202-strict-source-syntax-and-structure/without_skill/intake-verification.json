@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/config-loader-targeted/202-strict-source-syntax-and-structure.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/eval-202-strict-source-syntax-and-structure/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a6f326d44556c9a14",
+  "output_sha256": "8ea4fe453cdce6b98595a2818b3c550e9250ad4115f4e97b72ba31f8447787e6",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_a388a6fa-199/agent-a6f326d44556c9a14.jsonl",
+  "original_sha256": "0b5a617aa6a9bd6fc50f0af689fb1401cb2dea0efbd706c112216c55f96a2de2",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

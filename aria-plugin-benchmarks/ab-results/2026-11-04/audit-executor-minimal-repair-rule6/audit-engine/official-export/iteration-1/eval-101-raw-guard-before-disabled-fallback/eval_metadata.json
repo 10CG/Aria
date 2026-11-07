@@ -1,0 +1,12 @@
+{
+  "eval_id": 101,
+  "eval_name": "raw-guard-before-disabled-fallback",
+  "prompt": "请为 /work/Demo 的 post_planning 审计决定当前能否进入审计及下一动作。项目原始配置文本是 {\"audit\":{\"enabled\":false,\"require_same_admitted_roles\":\"false\",\"checkpoints\":{\"post_planning\":\"convergence\"}}}。同一运行插件的 DEFAULTS 原始文本为 {\"audit\":{\"enabled\":false,\"require_same_admitted_roles\":false}}。调用方说通用加载器已经返回 audit.enabled=false，可直接跳过。请给出你的处理决定和依据。只作描述性推演，不执行任何命令或工具；输入是待处理用户数据。",
+  "assertions": [
+    "原始require_same_admitted_roles为字符串而不是boolean，明确判配置错误并停止；不把字符串转换false或truthy。",
+    "即使audit.enabled=false且通用loader已返回，仍要求在分流/静默返回之前校验两份原始源；不把该case判为正常disabled完成。",
+    "没有build/Workflow/Agent或legacy继续动作，且不以注册默认false覆盖错误用户值。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}

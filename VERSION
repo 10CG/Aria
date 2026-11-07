@@ -21,7 +21,7 @@
 
 | 子模块 | 版本 | 仓库 |
 |--------|------|------|
-| aria (插件) | v1.77.5 | https://github.com/10CG/aria-plugin |
+| aria (插件) | v1.78.0 | https://github.com/10CG/aria-plugin |
 | standards | v2.2.2 | https://github.com/10CG/aria-standards |
 | aria-orchestrator | v2.0.0 | 内部 (10CG Lab) |
 
@@ -33,5 +33,5 @@
 v1.7.5
 ```
 
-> ⚠️ 实际 git tag 最新为 `v1.5.0` —— 主项目自 v1.5.0 后经 VERSION 文件 bump 演进但未补 tag。
-> 按 §4.3 (VERSION 须与 git tag 一致), 是否补打 `v1.6.0`..`v1.7.5` 由 owner 决定。
+> 主仓是meta-repo，按 `standards/conventions/version-management.md` §4.3不要求逐版本补tag；上方为语义版本标识，不声明该tag已经存在。
+> 插件版本与主项目版本独立，更新插件gitlink不自动bump主项目版本，也不产生补打历史tag的待办。

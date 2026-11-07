@@ -1,0 +1,98 @@
+{
+  "expectations": [
+    {
+      "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+      "passed": true,
+      "evidence": "case 1 的 /candidate-2/outputs/decision.json，round_2_entry_steps[1].command 给出完整拟调用串：python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\"。两个参数均已绑定题设值，并说明本次不执行。"
+    },
+    {
+      "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+      "passed": false,
+      "evidence": "case 1 的 /candidate-2/outputs/decision.json，round_2_report.markdown 的 Sibling probe 行为 <span style=\"color: red\">检测到 1 份同 issue 的竞品 Spec（含 1 份已完成的 Spec）…</span>，并正确给出 archive 来源。但该拟写行没有断言明确要求的红色圆点；HTML 红色文字不等于“带指定圆点”。计数、issue 和归档标注满足，其余子项缺失，整条仍 FAIL。"
+    },
+    {
+      "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+      "passed": true,
+      "evidence": "case 1 的 /candidate-2/outputs/decision.json，decision 写“只作 advisory 告警，不自行改变质量 verdict、收敛判定或 Round 3 路由”；step 5 明确不因命中停止审计；effects 分别说明不改变 severity/verdict、不改变稳定性与投票条件、不强制继续或终止 Round 3。其它资源或配置门被明确区分为独立条件。"
+    },
+    {
+      "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+      "passed": true,
+      "evidence": "case 1 的 /candidate-2/outputs/decision.json，step 1 明确“Step 0 是周期内一次性步骤，不在 Round 2 重做”；step 2 在本轮 Agent 开始前重新调用探针；decision 又写“不能复用 Round 1 的扫描结果”。effects.round_3 还要求进入 Round 3 时再次跑探针。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  },
+  "claims": [
+    {
+      "claim": "该 mock 应计为一份同 issue 的 Spec，其中一份为 archive 中已完成的 Spec。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 1 prompt 的 hits 只有一个 spec_dir 且 corpus=archive；/candidate-2/outputs/decision.json 的 unique_spec_count=1、completed_spec_count=1 与拟写报告一致。内嵌 execution-modes.md:577-581 明确去重与 archive 标注规则。"
+    },
+    {
+      "claim": "探针的 sibling_found 不进入质量 verdict、收敛或轮次路由的计算。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 1 public_transcript 内嵌 /frozen-reference/skills/audit-engine/SKILL.md:148-150 及 execution-modes.md:587 明确该机制为 advisory，且不改上述三种判定；与 effects 各字段相符。"
+    },
+    {
+      "claim": "探针耗时 18.342 秒不是 Round 2 的总耗时。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题给 elapsed_ms=18342，换算为 18.342 秒。题目没有整轮审计时间；/candidate-2/outputs/decision.json 的 Duration 保持待填，没有拿探针耗时代替整轮耗时。"
+    },
+    {
+      "claim": "仅读取冻结资料并写出描述性答案，没有实际运行探针、审计 Agent 或 Workflow。",
+      "type": "process",
+      "verified": true,
+      "evidence": "case 1 candidate-2 public_transcript 的工具事件是七次 Read 和 line 45 的 /candidate-2/outputs/decision.json Write，health.tool_calls=8；没有 Bash、Agent 或 Workflow 调用。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "第 2 条把固定圆点格式、红色展示、计数和归档解释捆在一起。本候选的语义信息正确，但以红色 HTML 替代圆点仍按原断言 FAIL；后续可拆分格式契约与语义断言，避免总分掩盖具体失败维度。",
+      "单个 hit 不检验跨镜像去重；应加入两个 remote 命中同一 spec_dir 的控制输入。"
+    ],
+    "overall": "完整调用、每轮入口和 advisory 行为有充分依据。唯一失败是拟写报告未包含断言规定的圆点，不应将其描述成计数或归档语义错误，也不能据此修改本次标准。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 8,
+    "output_chars": 5907,
+    "transcript_chars": 85419,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-fixed",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按逐项证据、无部分分、claim 核验及 eval critique 方法评分；最终仅返回要求的结构化结果，未写文件。",
+      "已完整读取本组三个 packet，均未依赖截断文本：/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-1.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-2.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-3.json。覆盖 case 1、2、3 的两个 candidate，共 26 项布尔评分。",
+      "全部六个 candidate 的 packet 均给出 intake_verified=true、完整 decision_json_text 和公开工具事件；没有证据显示输入损坏、缺失、截断或真实环境故障，全部为 JUDGED。候选对规范保留未知或只给条件性回答，均按实际交付是否满足断言评分，未转作 NOT_JUDGED。",
+      "所有场景都是 mock 描述性推演，不要求实际运行计划中的命令。已区分候选真正发生的 Read/Write 与其拟执行探针、gate、审计步骤；未把计划或写入回执当作生产执行证据。",
+      "claim 的规则核验仅使用三个 packet 内嵌的冻结资料与题设；没有另读仓库、真实配置、controller 映射、其它组结果或其它 Skill。引用 /frozen-reference/ 和 /candidate-N/ 的路径均是 packet 提供的中性标签，不宣称这些是 grader 独立打开的真实文件。",
+      "本次仅部分遮蔽：正文中的 source-snapshot 路径、来源说明及可见读取内容可能提示候选来源，因此不是完全盲评；没有据此预设任一 candidate 应获胜。",
+      "可用执行元数据来自 packet：case 1 的 candidate-1/2 分别 2/8 次工具调用、94.312/122.122 秒；case 2 为 5/2 次、184.773/62.375 秒；case 3 为 2/8 次、68.701/114.453 秒。这些是提供的执行元数据，不是 grader 重新测量；未提供独立 user_notes、metrics.json 或 timing.json，未越过读取边界寻找。",
+      "原 expectations 保持逐字与原顺序；指定圆点和“未能核实”的固定格式要求未用语义近似偷偷放宽。相关格式与语义的耦合已在 eval_feedback 如实指出，没有改动本次标准。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 1,
+      "total": 4,
+      "pass_rate": 0.75
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

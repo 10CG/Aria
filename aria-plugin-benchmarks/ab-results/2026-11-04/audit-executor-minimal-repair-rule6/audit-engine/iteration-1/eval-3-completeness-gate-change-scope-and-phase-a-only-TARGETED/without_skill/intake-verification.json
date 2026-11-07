@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-fixed/3-completeness-gate-change-scope-and-phase-a-only-TARGETED.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-3-completeness-gate-change-scope-and-phase-a-only-TARGETED/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a24dd30e672938ef7",
+  "output_sha256": "a58c98bddd815daee2dc88340ba0efa8bfefa6606e9f7ead798ca685c8dde203",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_81eac8d9-6d6/agent-a24dd30e672938ef7.jsonl",
+  "original_sha256": "05303e6196b2c0f67fb14795bf9b4f2ded47d9ec969c98a7a397b1e0e1a9bbf2",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

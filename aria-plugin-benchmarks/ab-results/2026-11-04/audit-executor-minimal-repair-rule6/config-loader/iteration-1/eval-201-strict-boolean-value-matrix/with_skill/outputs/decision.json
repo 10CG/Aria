@@ -1,0 +1,97 @@
+{
+  "eval_id": 201,
+  "analysis_mode": "仅根据输入原始 JSON 和冻结 config-loader Skill 作描述性推演；未运行加载器、执行命令或读取真实项目配置。下列结果及错误是预期决定，不是真实运行回执。",
+  "decision_basis": {
+    "source": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/config-loader/SKILL.md",
+    "lines": "42–50",
+    "rule": "审计执行器受控入口（包括分流选择）必须在合并默认值前，分别严格解析两份原始 JSON，检查重复 object key、非有限数字、顶层及存在的 audit 块的 object 结构，并验证原始 audit.require_same_admitted_roles。该键存在时仅接受 JSON true 或 false，即 type(value) is bool；非法值必须报配置错误并中止，不能转换或回落默认 false。DEFAULTS 必须存在且显式将本键注册为 boolean false。"
+  },
+  "defaults": {
+    "raw_json": "{\"audit\":{\"require_same_admitted_roles\":false}}",
+    "expected_validation": "有效：顶层与 audit 均为 object，本键显式存在，值为 JSON boolean false。给定文本没有重复 key 或非有限数字。",
+    "fallback_scope": "项目配置文件或本键缺失才采用此 false；显式的非法值不是缺失。本题八项都显式提供了本键。"
+  },
+  "items": [
+    {
+      "value_label": "JSON true",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":true}}",
+      "json_syntax": "有效",
+      "original_value_type": "boolean",
+      "expected_decision": "接受",
+      "effective_require_same_admitted_roles": true,
+      "can_continue_loading": true,
+      "reason": "原始值为严格 boolean，符合本键类型要求；项目 true 覆盖 DEFAULTS 的 false。后续按 true 分支处理，不代表已触发审计或审计已通过。"
+    },
+    {
+      "value_label": "JSON false",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":false}}",
+      "json_syntax": "有效",
+      "original_value_type": "boolean",
+      "expected_decision": "接受",
+      "effective_require_same_admitted_roles": false,
+      "can_continue_loading": true,
+      "reason": "原始值为严格 boolean；显式 false 是合法配置，不是错误后的默认回落。保持 legacy 路径，不因 DEFAULTS 注册了此键而强制采用新执行器。"
+    },
+    {
+      "value_label": "字符串 \"false\"",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":\"false\"}}",
+      "json_syntax": "有效",
+      "original_value_type": "string",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "字符串不是 boolean，即使内容恰为 false 也不例外。不得按字符串含义转换为 false，也不得按 truthy 转换或警告后采用默认值。未产生可供执行的有效配置。"
+    },
+    {
+      "value_label": "JSON null",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":null}}",
+      "json_syntax": "有效",
+      "original_value_type": "null",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "本键显式存在而值为 null，不属于键缺失；null 不是 boolean。不得将其视作未设置而采用默认 false。未产生可供执行的有效配置。"
+    },
+    {
+      "value_label": "JSON 0",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":0}}",
+      "json_syntax": "有效",
+      "original_value_type": "number（整数）",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "数字 0 不是 JSON boolean；即使某些语言中它与 false 相等或可转换为 false，也不满足 type(value) is bool。禁止转换和默认回落。未产生可供执行的有效配置。"
+    },
+    {
+      "value_label": "JSON 1",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":1}}",
+      "json_syntax": "有效",
+      "original_value_type": "number（整数）",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "数字 1 不是 JSON boolean；不能将其转换为 true，也不能因类型错误改用默认 false。未产生可供执行的有效配置。"
+    },
+    {
+      "value_label": "JSON []",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":[]}}",
+      "json_syntax": "有效",
+      "original_value_type": "array",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "空数组不是 boolean；其空值或 truthy 语义与本键验证无关。禁止转换和默认回落。未产生可供执行的有效配置。"
+    },
+    {
+      "value_label": "JSON {}",
+      "project_raw_json": "{\"audit\":{\"require_same_admitted_roles\":{}}}",
+      "json_syntax": "有效",
+      "original_value_type": "object",
+      "expected_decision": "配置错误并中止受控入口",
+      "can_continue_loading": false,
+      "reason": "本键的值必须是 boolean，不能是 object。顶层及 audit 块要求为 object，不意味着本键也允许 object；禁止转换和默认回落。未产生可供执行的有效配置。"
+    }
+  ],
+  "caller_handling": "调用方习惯的‘类型错误时警告后取默认值’属于通用容错，不适用于 audit.require_same_admitted_roles。这里的严格例外优先于通用错误处理及分流选择；六种非法类型均须在选择 legacy 或新执行器之前中止，不能借默认 false 静默绕过守卫。",
+  "assumptions_and_unknowns": [
+    "八项按彼此独立的候选项目源推演，不把它们视作同一配置中的八个重复 key；每项原始文本严格按题目给定的嵌套结构构造，没有额外字段。",
+    "插件 DEFAULTS 使用题目明确提供的原始 JSON，不用真实项目文件或真实插件默认文件替换它。",
+    "题目未提供实际加载器调用、日志或异常类名称，因此只报告预期配置错误，不声称已经观察到异常或测试结果。",
+    "加载可继续只表示本题给定源通过相关严格校验；不等于允许跳过检查点，也不代表审计被启动或通过。本例外不启用检查点、不改变团队和预算；这些后续条件未在题目中提供。"
+  ]
+}

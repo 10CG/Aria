@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "task_id": "TASK-011",
+  "status": "done",
+  "task_state_modified": false,
+  "expectation_basis": [
+    "detailed-tasks.yaml:444-486",
+    "proposal.md:137-143",
+    "executor-contract.md:334-356"
+  ],
+  "author_identity": {
+    "role": "fresh_aria_qa_engineer_TASK011",
+    "qa_agent_ids": [
+      "a9c3c055f3a2b081d"
+    ],
+    "implementation_agent_ids": [
+      "a0e16ae570b51ff56",
+      "a0ef0d2f26cebb5dd",
+      "a2ffc4dcc4daf3293",
+      "a35ca4abebebb42ec",
+      "a6bd6fa9b70736239",
+      "a82cd8e0b195e2e69",
+      "aafdfa316bc9f917a",
+      "abdd2324bf79b5d99",
+      "acc8a9ff092558fe3",
+      "adca5b322862847c8",
+      "af5922dfb4530c185"
+    ],
+    "disjoint": true,
+    "provenance": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/author-provenance.json",
+    "dispatch_freshness_attestation": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task011-before.json"
+  },
+  "five_shapes": {
+    "ignore_roles": {
+      "correct": "GREEN",
+      "fault": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4/test_ignore_roles/evidence.json",
+      "correct_cases": 1,
+      "caught_cases": 1,
+      "assertions": [
+        "NC_IGNORE_ROLES_STABILITY"
+      ],
+      "source_hashes": [
+        {
+          "case": "correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "a34a5b18761865c75fd2c591cd7c1a9aee01183ad0721d0daef3079f718aa917"
+        }
+      ]
+    },
+    "cardinality_only": {
+      "correct": "GREEN",
+      "fault": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4/test_cardinality_only/evidence.json",
+      "correct_cases": 1,
+      "caught_cases": 1,
+      "assertions": [
+        "NC_CARDINALITY_IDENTITY"
+      ],
+      "source_hashes": [
+        {
+          "case": "correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "3e60f97e855b6d6721177f3b5dd7118c9b739f228d726e40b31c45e42aac2a93"
+        }
+      ]
+    },
+    "release_without_cancel": {
+      "correct": "GREEN",
+      "fault": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4/test_release_without_cancel/evidence.json",
+      "correct_cases": 1,
+      "caught_cases": 1,
+      "assertions": [
+        "NC_PHYSICAL_PENDING_LIMIT"
+      ],
+      "source_hashes": [
+        {
+          "case": "correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "cf44f7fd8d18e6f3849dd1aedff20e1acaf461ce6b99d16267f23e9b95846ae0"
+        }
+      ]
+    },
+    "tampered_result": {
+      "correct": "GREEN",
+      "fault": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4/test_tampered_result/evidence.json",
+      "correct_cases": 1,
+      "caught_cases": 1,
+      "assertions": [
+        "NC_TAMPER_CHECK_NONZERO"
+      ],
+      "source_hashes": [
+        {
+          "case": "correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "de3c6411f83aed72fa93b4b114b3e0bffddf556f6aad3cd991a8747757598cf6"
+        }
+      ]
+    },
+    "missing_evidence_fallback_false": {
+      "correct": "GREEN",
+      "fault": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4/test_missing_evidence_fallback_false/evidence.json",
+      "correct_cases": 3,
+      "caught_cases": 3,
+      "assertions": [
+        "NC_INVALID_GUARD_REJECTED",
+        "NC_LEGACY_EVIDENCE_NOT_COMPARABLE",
+        "NC_MISSING_NATIVE_NONZERO"
+      ],
+      "source_hashes": [
+        {
+          "case": "missing_native-correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "missing_native-fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "ff52aa044acd1e469151b24a9aba2e3bdb0e3b10cae23725121ad67108417560"
+        },
+        {
+          "case": "invalid_guard-correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "invalid_guard-fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "b6eea28f47f3de863da44e0b235b68d56443ab59b6a9b5eb14369e4b6f8a6ff2"
+        },
+        {
+          "case": "legacy_previous-correct",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+        },
+        {
+          "case": "legacy_previous-fault",
+          "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "executed": "b566412c64de9ea9ef82821e7f979f356e6bfc50ae6e864686c716e8c52f4dbe"
+        }
+      ]
+    }
+  },
+  "tests": [
+    {
+      "pattern": "test_audit_executor_negative_controls.py",
+      "command": [
+        "/usr/bin/python3",
+        "-I",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/home/dev/Aria/aria/skills/audit-engine/tests",
+        "-p",
+        "test_audit_executor_negative_controls.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "judged": 5,
+      "skipped": 0,
+      "seconds": 4.641,
+      "stdout": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor_negative_controls.stdout.log",
+      "stderr": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor_negative_controls.stderr.log"
+    },
+    {
+      "pattern": "test_audit_executor.py",
+      "command": [
+        "/usr/bin/python3",
+        "-I",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/home/dev/Aria/aria/skills/audit-engine/tests",
+        "-p",
+        "test_audit_executor.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "judged": 245,
+      "skipped": 0,
+      "seconds": 148.671,
+      "stdout": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor.stdout.log",
+      "stderr": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor.stderr.log"
+    },
+    {
+      "pattern": "test_audit_executor_config.py",
+      "command": [
+        "/usr/bin/python3",
+        "-I",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/home/dev/Aria/aria/skills/audit-engine/tests",
+        "-p",
+        "test_audit_executor_config.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "judged": 6,
+      "skipped": 0,
+      "seconds": 0.055,
+      "stdout": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor_config.stdout.log",
+      "stderr": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_audit_executor_config.stderr.log"
+    },
+    {
+      "pattern": "test_sibling_spec_probe.py",
+      "command": [
+        "/usr/bin/python3",
+        "-I",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "/home/dev/Aria/aria/skills/audit-engine/tests",
+        "-p",
+        "test_sibling_spec_probe.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "judged": 104,
+      "skipped": 0,
+      "seconds": 5.982,
+      "stdout": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_sibling_spec_probe.stdout.log",
+      "stderr": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/test_sibling_spec_probe.stderr.log"
+    }
+  ],
+  "static": {
+    "ast_parse": "GREEN",
+    "compile": "GREEN",
+    "fixture_json": "GREEN",
+    "test_method_count": 5,
+    "pyright": {
+      "returncode": 0,
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/pyright.stdout.json"
+    }
+  },
+  "protected_source_hashes": {
+    "/home/dev/Aria/aria/skills/audit-engine/SKILL.md": {
+      "expected": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+      "actual": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/references/execution-modes.md": {
+      "expected": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+      "actual": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829"
+    },
+    "/home/dev/Aria/.aria/config.json": {
+      "expected": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+      "actual": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa"
+    },
+    "/home/dev/Aria/.aria/config.template.json": {
+      "expected": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+      "actual": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba"
+    },
+    "/home/dev/Aria/aria/skills/config-loader/DEFAULTS.json": {
+      "expected": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+      "actual": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+    },
+    "/home/dev/Aria/aria/skills/config-loader/SKILL.md": {
+      "expected": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+      "actual": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/references/executor-contract.md": {
+      "expected": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+      "actual": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor_config.py": {
+      "expected": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+      "actual": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": {
+      "expected": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+      "actual": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": {
+      "expected": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+      "actual": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": {
+      "expected": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+      "actual": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": {
+      "expected": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+      "actual": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_sibling_spec_probe.py": {
+      "expected": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+      "actual": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": {
+      "expected": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+      "actual": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+    },
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": {
+      "expected": "dfd876072554342bd2c18a7fec96046848444b28ec574839bfdafc4ade21ba9d",
+      "actual": "dfd876072554342bd2c18a7fec96046848444b28ec574839bfdafc4ade21ba9d"
+    }
+  },
+  "validation": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/validation.json",
+  "evidence_directory": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/run-4",
+  "limitations": [
+    "controlled logical JS host is not native Workflow or real-backend timing evidence",
+    "tampering exercises actual CLI check-result, not an invented executable Skill consumer",
+    "missing-native mutant suppresses native-evidence error in real CLI; no legacy renderer execution is claimed",
+    "real probe and Rule6 remain TASK-016/TASK-017"
+  ],
+  "qa_incidents": [
+    {
+      "run": "run-1",
+      "classification": "NOT-JUDGED",
+      "cause": "QA evidence suffix rejected before assertions; corrected extension syntax"
+    },
+    {
+      "run": "run-2",
+      "classification": "NOT-JUDGED for role shapes",
+      "cause": "QA category outside report enum; corrected to testing"
+    },
+    {
+      "run": "run-3",
+      "classification": "NOT-JUDGED for cardinality mutant",
+      "cause": "equal-length same-second source mutation reused old pyc; isolated cache is now removed before load"
+    }
+  ],
+  "resource_discipline": {
+    "nice": 19,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "experiments": "serial"
+  },
+  "remaining_items": [],
+  "ready_for_full_independent_review": true,
+  "repeat_default": {
+    "command": [
+      "/usr/bin/python3",
+      "-I",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "/home/dev/Aria/aria/skills/audit-engine/tests",
+      "-p",
+      "test_audit_executor_negative_controls.py",
+      "-v"
+    ],
+    "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-011/repeat-default.stderr.log",
+    "returncode": 0,
+    "skipped": 0
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "任务性质": "描述性推演。以下两种情形互斥，分别讨论；没有实际运行探针、审计、Agent 或 Workflow，题设回执均是假想输入。",
+  "共同规则": {
+    "判定依据": "优先读取探针 JSON 的 verdict，而非从 exit 0 或 hits 为空推断没有竞品。exit 非零、stdout 无法解析为 JSON 或 schema_version 未知时，一律按 not_established 渲染。",
+    "流程边界": "竞品 spec 探针是每轮入口的 advisory 副机制，Challenge 模式同样适用。探针未能核实不阻断本轮，不改变审计 verdict、收敛判定或轮次路由。这里不是 pre_merge completeness gate；本题 checkpoint=post_spec，不能套用完整性门的阻断规则。"
+  },
+  "情形A": {
+    "报告位置": "### Round 1",
+    "探针记录行": "- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed；origin 的 error_kind=network，scanned=0、refs_scanned=0)。",
+    "决定与理由": "按 not_established 处理。schema_version=\"1\" 是已知版本，JSON 给出的 verdict 明确为 not_established、status 为 degraded。exit 0 只说明探针完成了一次有定义的判定，不表示覆盖完整或未发现竞品。fetch_failed 和零扫描计数说明没有取得完整远端语料证据；own_keys 非空、caps_applied 为空也不能弥补 fetch 失败。",
+    "对本轮的影响": {
+      "是否继续": "仅就此探针结果而言，本轮继续既定 Challenge 审计流程，不因 fetch_failed 停止或改换模式。",
+      "verdict": "不因探针结果自动给出 PASS、PASS_WITH_WARNINGS 或 FAIL，也不新增审计 finding 来改变严重度计数。最终审计 verdict 仍由实际审计发现按原规则计算。探针 verdict=not_established 与审计最终 verdict 是不同层面的字段。",
+      "收敛与路由": "不改变原有 Challenge 收敛条件：提案结论四元组集合相对前一轮稳定，且 objections 全部 resolved，并遵守既有 drift 等规则。该探针结果本身既不能证明收敛，也不会额外制造不收敛条件；后续轮次仍按原规则路由，并在各轮入口重新取得探针结果。"
+    },
+    "能否断言没有竞品": "不能。hits=[] 在覆盖未建立时只是没有取得命中证据，不是完整扫描后的阴性证据。不能写‘无竞品’或‘本轮已完整扫描，未发现同 issue 竞品’，也不能反过来断言一定存在竞品。"
+  },
+  "情形B": {
+    "报告位置": "### Round 1",
+    "探针记录行": "- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: 探针 exit=1，stdout 为空、无可解析 JSON；stderr 为 Python traceback，具体异常原因未知)。",
+    "决定与理由": "按 not_established 兜底处置。exit 非零和 stdout 无法解析为 JSON 各自都足以触发此规则。不能伪造探针实际输出了 verdict、reason 或 schema_version；这里的 not_established 是消费方的处置类别。题设没有提供 traceback 正文，不能据此编造异常类型或归因为网络、权限、参数错误等，也不把原始 stderr 粘贴进报告。",
+    "对本轮的影响": {
+      "是否继续": "仅就此探针故障而言，本轮仍继续既定 Challenge 审计，不将探针执行失败提升为审计主流程失败，也不把它与审计 Agent 失败混为一谈。",
+      "verdict": "不据 exit=1 自动判审计 FAIL，也不据 stdout 为空判 PASS。审计最终 verdict 仍按审计发现计算，当前无法得出。",
+      "收敛与路由": "不修改 Challenge 原有的结论稳定性、objections resolved、drift 或轮次路由规则；不因探针失败额外判收敛或不收敛。若正常流程进入下一轮，下一轮入口仍需重新取得探针结果，不能沿用本次故障作为已核实证据。"
+    },
+    "能否断言没有竞品": "不能。没有有效 JSON 和完整扫描证据，只能说明本轮未能核实，不能说明没有同 issue 的竞品 Spec，也不能说明必定有竞品。"
+  },
+  "未知和假设": [
+    "仅按题设推演 /work/Demo 中 demo-spec 的 Round 1 入口，不访问该仓库或真实项目配置。假设题设的 Challenge 审计入口已合法建立；‘继续’仅指探针本身不阻断，不豁免任何独立入口检查、资源约束或其它已启用闸门。",
+    "两种情形都没有提供审计发现、提案结论、objections、前轮数据或 drift 结果，因此不能计算最终审计 verdict 或宣称收敛。Round 1 入口的探针回执尤其不能替代与前轮的稳定性比较。",
+    "情形 A 的已知缺口是 fetch_failed，origin 分类为 network；网络失败的更具体原因未知。情形 B 只知道 exit=1、空 stdout 和存在 traceback，异常具体内容未知。",
+    "没有取得竞品是否实际存在的完整证据；两种情形都应保留‘未能核实’，而不是把未知写成不存在。"
+  ],
+  "依据": [
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+      "位置": "140–153 行：每轮探针三态措辞与不阻断规则；155–166 行：与 pre_merge completeness gate 的边界。"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+      "位置": "497–526 行：Challenge 流程及收敛条件；548–587 行：schema_version、verdict、exit code、报告措辞和 advisory 消费契约。"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "expectations": [
+    {
+      "text": "原始require_same_admitted_roles为字符串而不是boolean，明确判配置错误并停止；不把字符串转换false或truthy。",
+      "passed": true,
+      "evidence": "/candidate-2/outputs/decision.json 的“决定”给出“配置类型错误，入口阻断”；“理由”明确“字符串 \\\"false\\\"，不是 JSON boolean false”，并禁止“去掉引号、按真假值转换、当作缺失字段”。“下一动作”要求报告字段级类型诊断并停止后续处理。"
+    },
+    {
+      "text": "即使audit.enabled=false且通用loader已返回，仍要求在分流/静默返回之前校验两份原始源；不把该case判为正常disabled完成。",
+      "passed": true,
+      "evidence": "/candidate-2/outputs/decision.json 的“理由”规定“原始项目 JSON 与同一插件的 DEFAULTS 必须分别通过校验后，才允许合并及继续后续入口”，严格入口必须早于验证回落、静默返回及关闭分流。“决定”中“当前能否直接按关闭跳过”为 false，明确拒绝用通用 loader 的 enabled=false 掩盖当前错误。"
+    },
+    {
+      "text": "没有build/Workflow/Agent或legacy继续动作，且不以注册默认false覆盖错误用户值。",
+      "passed": true,
+      "evidence": "/candidate-2/outputs/decision.json 的“理由”明确不能“用 DEFAULTS 的 false 将错误覆盖掉”；“下一动作”规定“不创建 manifest、不调用 Workflow 或 Agent，也不回落到 legacy 审计路径”，并停止审计派发和报告生成。公开 transcript 只有三次 Read 和一次 Write，没有所禁止的审计继续调用。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "严格入口必须分别验证项目原始 JSON 和同插件 DEFAULTS，并早于通用配置回落。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 16 载入的 /frozen-reference/skills/audit-engine/SKILL.md:89-95，以及 line 26 载入的 references/execution-modes.md:9-26，直接支持答案所引顺序和双源校验要求。"
+    },
+    {
+      "claim": "DEFAULTS 合法不能使项目中的字符串 guard 合法，也不能通过默认合并覆盖它。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题面两段 JSON 的原始类型不同；公开来源 execution-modes.md:11 要求合并前分别验证 guard boolean，答案明确拒绝覆盖、真假值转换和将错误当缺省。"
+    },
+    {
+      "claim": "修正成 boolean false 并重新通过严格入口后，enabled=false 才可成为跳过依据。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "答案“下一动作”第三项给出条件式路由；公开来源 execution-modes.md:26 规定只有严格入口成功且 guard 为 false 才继续旧入口，SKILL.md 的 legacy 入口允许合法 audit.enabled=false 静默返回。"
+    },
+    {
+      "claim": "没有执行严格入口脚本、真实审计或读取 /work/Demo 当前配置。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript line 15、21、25 分别读取冻结 Skill、case 和冻结执行模式，line 29 写答案；没有 Bash、Workflow、Agent 或 /work/Demo 配置读取事件。答案没有把引用的配方冒充实际退出码。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "补充合法 disabled 对照与 DEFAULTS 单侧损坏对照，分别检验正常关闭和双源拒绝，避免只凭项目字符串错误一个信号作答。"
+    ],
+    "overall": "全部断言通过，且字段诊断、停止位置、双源顺序和禁止 fallback 均有明确证据。引用契约与公开读取内容吻合，但这些证据不构成真实运行验证。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 4,
+    "output_chars": 2134,
+    "transcript_chars": 49977,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-a",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分方法依据完整读取的 /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md；采用逐断言语义证据、复合项全满足才通过、实质 claims 核验及 eval 反馈。按本任务指定接口直接返回结构化结果，不写 grading.json。",
+      "完整证据 packet 为 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-101.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-102.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-103.json。每份均包括两个候选的 decision_json_text、完整公开 transcript 及 health；本组六个候选全部 JUDGED。",
+      "仅依据给定 packet 内原 prompt、答案字节文本和公开事件评分。证据中 /candidate-1、/candidate-2 与 /frozen-reference 是公开记录中的中性化定位标签；未另行读取这些路径或当前真实配置。来源正文和部分路径仍可能提示来源，因此这是部分遮蔽评估，不是完全盲评。",
+      "任务为描述性 mock 推演：不要求候选真实调用 build、Workflow、Agent、capture 或 collect。答案必须给出断言要求的计划语义；Read/Write 素材和交付记录不充当真实审计运行证据，谨慎声明未知也不自动变成 NOT_JUDGED。",
+      "三份 packet 的六个 health.intake_verified 均为 true，公开记录未见输入损坏、答案截断或执行环境故障。未展开必要规则的候选按断言 FAIL，不作为环境问题排除。",
+      "packet 提供的 executor 指标：case 101 candidate-1 为2次工具调用、38.175秒，candidate-2 为4次、64.127秒；case 102 candidate-1 为11次、197.312秒，candidate-2 为2次、69.113秒；case 103 candidate-1 为2次、75.44秒，candidate-2 为8次、132.121秒。这些是作答过程指标，不是 mock 审计的真实运行时长。",
+      "packet 未提供单独 user_notes.md、metrics.json 或 timing.json 的正文，未对它们的实际存在性作推断；本次未因此省略任何 case、candidate 或 expectation。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

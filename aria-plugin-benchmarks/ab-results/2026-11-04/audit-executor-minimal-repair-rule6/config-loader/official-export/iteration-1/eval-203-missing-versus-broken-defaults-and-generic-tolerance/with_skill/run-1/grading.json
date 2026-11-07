@@ -1,0 +1,97 @@
+{
+  "expectations": [
+    {
+      "text": "A项目确缺与B键缺采用已合法注册DEFAULTS false，C保留显式false，均不强制启用新执行器或要求参与证据；不把读取失败冒充确实不存在。",
+      "passed": true,
+      "evidence": "/candidate-2/outputs/decision.json 的“逐项结果”A、B分别因文件确缺、合法 {} 缺键而采用合法 DEFAULTS false，C保留项目显式 boolean false；三项均允许继续并明确“保持 legacy”，没有要求新执行器或参与证据。A依题设的确实不存在处理，未出现把实际读取错误改称文件缺失的行为。"
+    },
+    {
+      "text": "D DEFAULTS缺失、E缺注册、F注册true、G注册字符串均错误停止；DEFAULTS必须显式boolean false，不能把这些当项目缺省成功。",
+      "passed": true,
+      "evidence": "“逐项结果”D、E、F、G均为“是否继续”:false并报告配置错误：D不能硬编码false或用项目值绕过；E不能由通用回落补false；F明确 boolean true虽类型正确仍违反默认必须false的额外契约；G拒绝字符串转换或回落。“未知与假设”进一步说明 D至G未给出的项目内容不影响停止决定。"
+    },
+    {
+      "text": "H只对无关超范围字段沿用既有clamp至100且保留guard=false，不把strict例外扩成所有字段必停；所有情形不自行写回/激活项目配置、不变团队预算。",
+      "passed": true,
+      "evidence": "H明确普通越界发警告并在有效配置中 clamp为100，给出的配置片段同时保留 require_same_admitted_roles=false；允许继续且保持legacy，不改用默认90也不扩大严格例外。A至H的“配置是否应被写回”全部false；H强调仅调整返回的有效配置、不改原文件，未知说明也不补造检查点、团队或预算事实，没有自行激活或改动这些配置。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "DEFAULTS 必须存在并显式注册 boolean false，即使项目已有合法覆盖值也不能绕过默认源校验。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 16所载冻结 Skill 第46、49行规定两源独立校验与默认注册要求；输出 C 的理由和 D至G 的无条件停止决定实际应用了这条规则。"
+    },
+    {
+      "claim": "DEFAULTS true 与项目源 true 的合法性不同，F必须停止而非启用新执行器。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "F明确区分项目 guard可用true/false与默认注册必须false，停止且不自动改成false继续，符合默认源额外约束。"
+    },
+    {
+      "claim": "H应在内存有效配置中将阈值130 clamp为100，同时保留guard=false，不写回。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "H的有效配置片段明确给出confidence_threshold=100和guard=false；冻结规则第40行规定普通超范围clamp，第64至67行给出0至100范围。"
+    },
+    {
+      "claim": "只作推演，没有执行配置加载、审计、命令或读取当前仓配置。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript只含读取冻结 Skill、读取指定case、写decision.json三次工具调用；输出将“是否继续”限定为预期配置前置校验结果，没有冒充真实审计完成。"
+    },
+    {
+      "claim": "所有情况均不自动写回项目配置或 DEFAULTS。",
+      "type": "quality",
+      "verified": true,
+      "evidence": "八项写回决定全部false；D至G把默认源修复作为后续所需操作而非本次已执行操作，H明确区分返回配置clamp与原始文件持久化。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "第一条包含“不把读取失败冒充确实不存在”，但 A 已明确保证文件确实不存在，没有权限拒绝、I/O错误等对照项。当前只能检查是否编造事实，不能证明读取错误分类能力；可新增真实读取失败的描述性独立项，要求不得当作缺省成功。",
+      "D至G未明确项目是否存在合法显式覆盖值。可增加“项目显式 false + DEFAULTS 缺失、缺注册、true或字符串”的交叉项，直接检验默认源必须无条件验证，而非只在需要回落时验证。"
+    ],
+    "overall": "全部三条通过。F检验默认值必须固定false、H检验严格例外与普通clamp的边界，本对候选在这两条上形成了实质评分差异；结论仅限当前描述性任务，不外推为加载器已真实运行。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 3,
+    "output_chars": 3484,
+    "transcript_chars": 22113,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "config-loader-targeted",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分材料为指定官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，以及 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-201.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-202.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-203.json 的完整内容；未读取其他文件、真实配置或 controller-only 映射。",
+      "覆盖三个case的两个candidate，共18条原文期望；矩阵均按全部子项判断，结果为16条通过、2条失败。所有candidate均为JUDGED，假设、未知和错误决定未被改记为输入损坏。",
+      "证据同时来自packet内原decision_json_text和完整公开transcript；冻结Skill内容仅作为packet中已经包含的执行证据使用，没有另行读取。路径和正文仍可能透露来源，因此不是完全盲评。",
+      "全部配置任务均为描述性推演。正确的处理方案可满足断言，但Read/Write记录不能证明配置加载器、审计或错误恢复已真实执行；process claims仅按公开记录核验。",
+      "六份packet候选的intake_verified均为true。附带的工具调用数及执行时长分别为201/candidate-1：2次、69.048秒；201/candidate-2：3次、65.556秒；202/candidate-1：3次、79.596秒；202/candidate-2：2次、79.242秒；203/candidate-1：2次、87.266秒；203/candidate-2：3次、65.134秒。这些元数据不作为配置语义正确性的替代证据。",
+      "packet未附独立user_notes.md、metrics.json或timing.json正文；未越过允许的读取范围查找，不据此补造执行指标或判为NOT_JUDGED。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

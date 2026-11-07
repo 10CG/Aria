@@ -1,0 +1,98 @@
+{
+  "expectations": [
+    {
+      "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+      "passed": false,
+      "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形A.Round_1_探针记录行写“竞品 Spec 探针：UNVERIFIED（status=degraded；reason=fetch_failed；verdict=not_established）”。它正确保留原因并拒绝无竞品结论，但报告行没有逐字包含要求的“未能核实”，故不能通过这条复合断言。"
+    },
+    {
+      "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+      "passed": false,
+      "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形B.Round_1_探针记录行是“竞品 Spec 探针：UNVERIFIED（执行异常；exit=1；stdout 为空；stderr 为 Python traceback）”。没有错误断言无竞品，也未把 traceback 当阴性证据，但没有渲染规定的“未能核实”消费措辞。"
+    },
+    {
+      "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+      "passed": false,
+      "evidence": "case 2 的 /candidate-2/outputs/decision.json，共同判断.规则边界写“不能声称已核实实际引擎一定继续或一定中止”；A、B 均列“若探针是提示性观察项”可继续、“若……强制入口条件”不可越过的分支，且说可能存在收口前提。没有确认实际规则是 advisory、只影响措辞，不阻断及不改判定。"
+    },
+    {
+      "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+      "passed": true,
+      "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形 A、B 的“能否断言没有同issue的竞品Spec”均为 false；A 写“hits=[]……不证明没有同 issue 的竞品 Spec”，B 写“未取得可解析的探针结果，无法判断是否存在”。这不是仅凭关键词出现，而是两种情形均明确否定不存在结论。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "claims": [
+    {
+      "claim": "情形 A 的空 hits 不证明没有同 issue 的竞品 Spec。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题设 A 的 fetch_failed、scanned=0、refs_scanned=0 与 not_established 均表明覆盖未建立；与 /candidate-2/outputs/decision.json 的证据解释一致。"
+    },
+    {
+      "claim": "情形 B 没有取得探针业务 verdict，不能声称脚本实际输出了 not_established。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 2 prompt 指定空 stdout；候选没有把 A 的字段借给 B。消费方仍应按 not_established 兜底，这是脚本原始输出与处理规范的区别。"
+    },
+    {
+      "claim": "以 UNVERIFIED（未验证）作为这两种情形的规范报告措辞足以完成所问输出。",
+      "type": "quality",
+      "verified": false,
+      "evidence": "case 2 的 /candidate-2/outputs/decision.json 将 UNVERIFIED 作为建议报告状态；本组内嵌 /frozen-reference/skills/audit-engine/references/execution-modes.md:583-585 则规定渲染“未能核实”。候选没有交付该固定消费措辞，尽管存在性解释基本正确。"
+    },
+    {
+      "claim": "没有实际执行命令或生成 /work/Demo 下的审计报告。",
+      "type": "process",
+      "verified": true,
+      "evidence": "case 2 candidate-2 public_transcript 只有输入 Read 和 line 23 写 /candidate-2/outputs/decision.json 两次工具调用，health.tool_calls=2；未出现访问 /work/Demo、Bash 或审计派发。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "前两条对固定中文消费措辞的要求应与存在性语义分别统计。本候选的“不证明没有竞品”解释成立，但原断言要求的措辞仍未满足；不能把两者混同为同一种能力错误。",
+      "第 4 条在该故障输入上具有较强的一般推理可得性；增加健康无命中的 no_sibling_found 对照，才能检验候选是否会按证据区分三态，而非只保守回答未知。"
+    ],
+    "overall": "存在性边界正确，但固定报告措辞和明确 advisory 路由均未交付。条件性讨论不是环境故障，也不能算已回答实际引擎规则。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 2192,
+    "transcript_chars": 6112,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-fixed",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按逐项证据、无部分分、claim 核验及 eval critique 方法评分；最终仅返回要求的结构化结果，未写文件。",
+      "已完整读取本组三个 packet，均未依赖截断文本：/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-1.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-2.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-3.json。覆盖 case 1、2、3 的两个 candidate，共 26 项布尔评分。",
+      "全部六个 candidate 的 packet 均给出 intake_verified=true、完整 decision_json_text 和公开工具事件；没有证据显示输入损坏、缺失、截断或真实环境故障，全部为 JUDGED。候选对规范保留未知或只给条件性回答，均按实际交付是否满足断言评分，未转作 NOT_JUDGED。",
+      "所有场景都是 mock 描述性推演，不要求实际运行计划中的命令。已区分候选真正发生的 Read/Write 与其拟执行探针、gate、审计步骤；未把计划或写入回执当作生产执行证据。",
+      "claim 的规则核验仅使用三个 packet 内嵌的冻结资料与题设；没有另读仓库、真实配置、controller 映射、其它组结果或其它 Skill。引用 /frozen-reference/ 和 /candidate-N/ 的路径均是 packet 提供的中性标签，不宣称这些是 grader 独立打开的真实文件。",
+      "本次仅部分遮蔽：正文中的 source-snapshot 路径、来源说明及可见读取内容可能提示候选来源，因此不是完全盲评；没有据此预设任一 candidate 应获胜。",
+      "可用执行元数据来自 packet：case 1 的 candidate-1/2 分别 2/8 次工具调用、94.312/122.122 秒；case 2 为 5/2 次、184.773/62.375 秒；case 3 为 2/8 次、68.701/114.453 秒。这些是提供的执行元数据，不是 grader 重新测量；未提供独立 user_notes、metrics.json 或 timing.json，未越过读取边界寻找。",
+      "原 expectations 保持逐字与原顺序；指定圆点和“未能核实”的固定格式要求未用语义近似偷偷放宽。相关格式与语义的耦合已在 eval_feedback 如实指出，没有改动本次标准。"
+    ],
+    "raw_summary": {
+      "passed": 1,
+      "failed": 3,
+      "total": 4,
+      "pass_rate": 0.25
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}
