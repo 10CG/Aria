@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/107-exhaustion-needs-real-disposition.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-107-exhaustion-needs-real-disposition/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a06f0e2f697142bda",
+  "output_sha256": "7a7b740edb24b89ed5447b7e7a7725678c8ed8de2f8afed2f2543e2bdb0aeff5",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_72498675-9ca/agent-a06f0e2f697142bda.jsonl",
+  "original_sha256": "7e9a5fe21958a9ff8095494cb58393713abae9141ec2255ed15389d6cec3f9a5",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

@@ -1,0 +1,12 @@
+{
+  "eval_id": 202,
+  "eval_name": "strict-source-syntax-and-structure",
+  "prompt": "请逐项处理审计入口配置。除指定异常外两源为合法JSON object且DEFAULTS注册guard=false。九种独立情况：A项目文本截断为{；B项目原始文本{\"audit\":{\"require_same_admitted_roles\":true,\"require_same_admitted_roles\":false}}；C项目文本{\"x\":NaN}；D项目顶层[]；E项目{\"audit\":null}；F DEFAULTS文本截断；G DEFAULTS有重复object key；H DEFAULTS顶层[]；I DEFAULTS={\"audit\":[]}。请分别给出应否继续及如何处理错误。只作描述性推演，不执行代码、不读取真实配置。",
+  "assertions": [
+    "A/F两源语法损坏均错误停止；B/G重复object key均拒绝，不按最后一个值覆盖后当成功。",
+    "C非有限数值拒绝；D/H顶层非object拒绝；E/I存在的audit非object拒绝，即使相关guard未出现也不能绕过。",
+    "九种情况均不警告后返回默认值或回落false继续；校验发生在通用容错/合并/分流之前，保持缺失与损坏区分。"
+  ],
+  "partition": "config-loader-targeted",
+  "runs_per_configuration": 1
+}

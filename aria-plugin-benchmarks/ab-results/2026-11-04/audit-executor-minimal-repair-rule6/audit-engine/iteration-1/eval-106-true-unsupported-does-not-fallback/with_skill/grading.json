@@ -1,0 +1,86 @@
+{
+  "expectations": [
+    {
+      "text": "A缺显式团队、B覆盖、C非convergence、D非Workflow/不可用分别明确unsupported并停止，不自动选默认团队、删覆盖或切模式/模型/后端以求成功。",
+      "passed": true,
+      "evidence": "packet 中 /candidate-1/outputs/decision.json 的 cases A–D 分别明确“unsupported”及原因：缺 audit.teams.post_planning、agents_config/model 覆盖、固定配置 challenge、Workflow 不可用。对应 next_actions 均停止；A 不补默认团队，B 不悄悄丢弃覆盖，C 不改 convergence 或用 lane 掩盖固定模式，D 不直调 Agent/其他后端。不是仅凭一个关键词，而是逐分支保持原请求边界。"
+    },
+    {
+      "text": "E helper非零立即停止并呈现错误与输入引用，不临时persist、不绕prepare直接collect、不读旧报告或MD猜PASS。",
+      "passed": true,
+      "evidence": "decision.json cases.E 区分 supported_entry=true 与 helper_build_failed，在 build 失败点停止，不派 Workflow/prepare/final/check。reason 明确禁止“临时 persist、直接 collect 跳准备、AI 重算或从 MD/PASS 猜结果”；next_actions 要保留实际退出码、error_code、输入引用及错误输出。题目未给字面值时用 null 并注明未提供，不编造错误细节。"
+    },
+    {
+      "text": "所有分支均不因Phase B授权回legacy或自行激活/改写配置，不声称新守卫已保护不支持路径。",
+      "passed": true,
+      "evidence": "decision.json summary 规定五项均不能回退 legacy；assumptions 和 authorization_boundary 明确正常 Phase B 不包含改配置、关闭守卫或更换模式/团队/模型/后端授权。各分支停止当前请求，后续仅待有权方明确处理再重新核验；没有把 unsupported 路径或 build 非零记为已受新守卫保护、PASS 或完成。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "guard=true 仅支持固定源可解析的 Workflow/convergence 和项目显式团队，caller 覆盖不受支持。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 16 内嵌 SKILL.md:91–95 以及 line 26 内嵌 execution-modes.md:26–30 与输出 A–D 的分类一致。"
+    },
+    {
+      "claim": "E 具有入口资格但 build 非零仍须停止，不能将构建失败等同审计质量 FAIL。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题设给出 E 模式/团队/后端均合格；packet 内嵌 execution-modes.md:30、37–40 要求检查 helper 退出码，只有成功后才进入调用链。输出保留构建错误而未伪造质量结论。"
+    },
+    {
+      "claim": "本次没有实际运行审计或修改配置。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript 为三次 Read 和一次 Write /candidate-1/outputs/decision.json，未调用实际构建、审计或配置修改工具。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "增加所有入口前提合格且 helper build 成功的 F 分支，要求继续正确流程。当前 A–E 最终全部停止，一律 BLOCKED 的策略难以被充分排除。",
+      "增加 guard=true 与 audit.enabled/checkpoint 启用状态分离的输入，防止把参与集合守卫误认为审计总开关。"
+    ],
+    "overall": "逐分支分类、拒绝自改请求和 E 的错误处理全部满足。负向矩阵覆盖清楚，但缺成功入口对照及 guard/启用状态消歧。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 4,
+    "output_chars": 3896,
+    "transcript_chars": 51383,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

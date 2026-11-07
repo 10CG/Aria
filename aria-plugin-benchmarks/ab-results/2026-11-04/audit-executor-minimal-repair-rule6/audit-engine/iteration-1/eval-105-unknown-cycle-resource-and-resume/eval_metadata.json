@@ -1,0 +1,12 @@
+{
+  "eval_id": 105,
+  "eval_name": "unknown-cycle-resource-and-resume",
+  "prompt": "请决定 /work/Demo 守卫true的审计能否恢复或进入下一轮。已有有效票及PASS，next_round_dispatch_allowed字段为true；同cycle此前attempt的auxiliary调用runId=checker-old仍unknown，审计调用audit-old已终态。当前build的mock回执resume_only=true，原工具回执暂找不到。有人建议新建cycle补一次，或按120秒已过释放槽后重发。另一个分支给出了较晚的同调用资源终态原件，但仍需按原链复核，旧C/raw/票不变。请分别给出恢复、派发与证据处理决定。只描述，不执行任何命令、Agent或Workflow。",
+  "assertions": [
+    "检查全部既往attempt审计及auxiliary，列unknown调用/原件引用；即使PASS或单字段允许仍零新增派发，包括下一轮与void补跑，不宣称OS已清理。",
+    "resume_only=true仅恢复原manifest/build/回执链，不再次Workflow；缺回执暂停，不能新cycle/attempt掩盖潜在已启动调用。",
+    "120s不是取消或释放槽，true并发最多2不因hard_cap=3放宽；较晚原件仅按同身份重放资源终态，不改旧C/raw/票，不越额度/终局/accept或degrade。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}

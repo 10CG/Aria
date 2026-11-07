@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-fixed/2-probe-not-established-renders-unverified-BETA.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a76635725a9b642d2",
+  "output_sha256": "25183be9be40c6460cf3d3712824dbf868dee4a7e3b14ff89257eb42c567e2cd",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_81eac8d9-6d6/agent-a76635725a9b642d2.jsonl",
+  "original_sha256": "77e49b2238ca715499f766adf55e54e07590406a2a5fcd1a8052cd120ea98e15",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

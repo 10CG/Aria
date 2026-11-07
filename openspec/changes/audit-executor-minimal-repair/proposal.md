@@ -2,7 +2,7 @@
 
 > **Level**: Full (Level 3 Spec)
 > **Status**: Approved — revision2 post_spec R3按现行legacy规则收敛；post_planning R5未收敛、5轮耗尽，2026-11-03 owner经真实AskUserQuestion选择“接受当前结论，继续实现”，仅本检查点 overridden_by_user=true，不改票、不加轮
-> **Implementation Authorization**: 原 Phase B 授权继续生效；先完成 TASK-002 完整独立两阶段任务审查，再按详细任务推进产品代码、配置与探针。规划审查的接受决定及真实问答关联见 `.aria/notes/2026-11-02-audit-executor-implementation/revision2-audits/post_planning/R5/owner-disposition.json`；不等于产品验收通过，不含 Phase C/D、提交推送发布或 PR #38 恢复。
+> **Implementation Authorization**: Phase B TASK-001～019的原接受记录保留；2026-11-07用户新`/goal`要求完成原交付，继续TASK-020/021的集成、发布同步与周期收口。发布前legacy读取兼容另有真实owner裁定，见[release-amendment.md](./release-amendment.md)。旧规划审查接受仍只属于其原检查点，不泛化为新票；PR #38恢复、构建部署及168h仍不在本轮范围。
 > **Created**: 2026-11-01
 > **Linked Issue**: `10CG/aria-plugin#210, 10CG/aria-plugin#209`
 > **Module**: aria-plugin / audit-engine；主仓仅配置接入与规范证据

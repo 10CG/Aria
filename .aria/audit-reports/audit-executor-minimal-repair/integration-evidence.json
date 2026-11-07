@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "change_id": "audit-executor-minimal-repair",
+  "status": "PLUGIN_RELEASED_MAIN_INTEGRATION_PENDING",
+  "recorded_at": "2026-11-07T12:56:29.524631+00:00",
+  "goal_scope": "original executor delivery; separate recommendation change Phase A only; PR38 remains paused",
+  "plugin": {
+    "version": "1.78.0",
+    "merge_commit": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+    "pr": 239,
+    "pr_url": "https://forgejo.10cg.pub/10CG/aria-plugin/pulls/239",
+    "forgejo_state": "closed",
+    "forgejo_merged_flag": false,
+    "integration_proof": "actual local merge parents and dual-remote master SHA; no server merge",
+    "remote_verification": [
+      {
+        "remote": "origin",
+        "push_exit": 0,
+        "master_sha": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+        "match": true
+      },
+      {
+        "remote": "github",
+        "push_exit": 0,
+        "master_sha": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+        "match": true
+      }
+    ],
+    "tag": "v1.78.0",
+    "tag_verification": [
+      {
+        "remote": "origin",
+        "peeled_commit": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+        "match": true
+      },
+      {
+        "remote": "github",
+        "peeled_commit": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+        "match": true
+      }
+    ]
+  },
+  "main": {
+    "branch": "release/1.78.0",
+    "prepared_on_head": "9f6e11395a333c0851292a1f895c6b380092838d",
+    "pr": null,
+    "merge_commit": null,
+    "state": "pending_actual_commit_and_gates"
+  },
+  "regression": {
+    "original_accepted_phase_b_tests": 297,
+    "new_candidate_tests": 312,
+    "judged_ok": 312,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source": {
+      "path": ".aria/audit-reports/audit-executor-minimal-repair/release-validation/candidate-full-suite.json",
+      "sha256": "f5ee621531eed65f668d77f36c5d21e52a70185fb79d39e4b57b9589f9dbf9a5"
+    },
+    "new_parser_details": {
+      "path": ".aria/audit-reports/audit-executor-minimal-repair/release-compatibility-evidence.json",
+      "sha256": "3eab570fde060b87f50cb3e9df18775780fe71dc21fd25a8baa02e874e9c38d7"
+    }
+  },
+  "rule6": {
+    "original_instruction_results": {
+      "path": ".aria/audit-reports/audit-executor-minimal-repair/rule6-evidence.json",
+      "sha256": "8cb34434f9ce24955f6e3fa9a45025a888a19e02b322e72ea7b910a1ff14601d"
+    },
+    "original_limits_preserved": [
+      "n=1",
+      "fixed_case1_format_FAIL",
+      "baseline_limitations"
+    ],
+    "new_parser_hunks": "SOT row1 deterministic substitute; no SKILL.md/description changes"
+  },
+  "evidence_delivery": {
+    "formal_report_and_acceptance_files": 76,
+    "benchmark_files": 292,
+    "all_368_hashes_match_previously_reviewed_selection": true,
+    "restricted_native_sources": "retained outside Git; source locators/hashes only, not complete public native-source closure",
+    "preservation_payload_and_keys": "not_published",
+    "mixed_latest_md": "not_staged"
+  },
+  "version_checks": {
+    "passed": 15,
+    "failed": 1,
+    "skipped": 0,
+    "warning": "plugin-cache-currency: installed1.77.5 versus published source1.78.0; current audit uses explicit source host",
+    "scope": "warning severity remains advisory; not claimed all green"
+  },
+  "ci_gate": {
+    "verdict": "green",
+    "pr_ci_status": "not_applicable",
+    "in_flight_runs": [],
+    "primitive_used": "aether-ci-cli",
+    "primitive_version_sha": "f29abee",
+    "raw_message": "path_coverage: no workflow covers changed files (reason=no-triggering-paths); PR CI wait skipped (not_applicable); main in-flight clear",
+    "path_coverage": {
+      "decision": "not_applicable",
+      "workflows_scanned": 1,
+      "matched_workflows": [],
+      "changed_files_count": 23,
+      "reason": "no-triggering-paths",
+      "dispatchable_workflows": []
+    }
+  },
+  "pointer_gate": {
+    "verdict": "PASS",
+    "mode": "block",
+    "reason": "no_gitmodules_and_no_gitlinks",
+    "primitive_exit": 0,
+    "new_telemetry_record": false
+  },
+  "main_integration_complete": false
+}

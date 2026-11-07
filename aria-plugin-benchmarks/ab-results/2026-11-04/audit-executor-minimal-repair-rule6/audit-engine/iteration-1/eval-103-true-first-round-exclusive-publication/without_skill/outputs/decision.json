@@ -1,0 +1,87 @@
+{
+  "execution_status": "descriptive_only",
+  "scope": {
+    "project": "/work/Demo",
+    "checkpoint": "post_planning",
+    "context": "/work/Demo/input.txt",
+    "statement": "以下仅据单 case prompt 推演。没有运行命令、Workflow、Agent 或模型，没有读取真实项目、配置、报告或插件实现；所有运行结果均为题设 mock，不能作为实际执行证据。"
+  },
+  "decision": {
+    "audit_enabled": true,
+    "trigger_mode": "manual",
+    "audit_mode": "convergence",
+    "backend": "Workflow",
+    "roles": ["qa-engineer", "code-reviewer"],
+    "require_same_admitted_roles": true,
+    "round": 1,
+    "reasoning": [
+      "原始 enabled=true 是 JSON boolean，不应误当字符串、误判为未配置，或被插件 DEFAULTS 的 guard=false 覆盖。本案按项目明确启用的审计处理；未知的内部 guard 字段映射不自行补造。",
+      "manual 表示不能因处于检查点就擅自宣称已经自动运行；本题明确要求首轮推演，因此描述本次手工启动路径，不将其扩大为真实调用授权。",
+      "检查点指定 convergence，角色为 qa-engineer 与 code-reviewer，backend 为 Workflow；没有覆盖参数，不另选模式、角色或 backend。",
+      "没有旧 scope 或未结束调用，且 build mock 返回 resume_only=false，因此走新调用路径，不借用历史报告，也不走恢复旧调用路径。"
+    ]
+  },
+  "planned_key_actions": [
+    {
+      "step": 1,
+      "action": "在假设允许真实执行的环境中，按上述项目、检查点、context、配置和角色进行 build。保留返回的 build_record 与 workflow_script，绑定本次调用的 scope/reservation 身份。",
+      "boundary": "题设没有提供具体命令、参数 schema 或路径值，不编造这些细节；本次没有真正 build。"
+    },
+    {
+      "step": 2,
+      "action": "因 resume_only=false，按 build 产出的 workflow_script 启动本次 Workflow 审计，不改成直接调用 Agent 或另开一条手工汇总路径。",
+      "expected_mock": "记录 runId=audit-101，并取得该调用的可读 native/Transcript。",
+      "boundary": "runId 和可读 Transcript 只能说明假设中的审计执行结果可定位，不能单独证明正式报告已发布或审计已收敛。"
+    },
+    {
+      "step": 3,
+      "action": "将本次 native/Transcript 经准备步骤冻结为后续处理的输入，沿用本次 build_record/reservation，而非手写另一份正式结果。",
+      "expected_mock": {
+        "request.required": false,
+        "reason": "first_round",
+        "native_record.path": "/mock/frozen-audit.json"
+      },
+      "interpretation": "这是首轮，不存在可比较的上一轮，因此跳过该 request 所指的比较/裁决调用。不为凑流程额外调用模型，也不伪造比较结果。required=false 不是跳过最终 check、跳过正式发布或宣布收敛的依据；frozen native 仍只是输入记录。"
+    },
+    {
+      "step": 4,
+      "action": "沿本次 reservation 完成最终 check/正式发布路径。正式 result、markdown 和 commit 标记仅认这一条发布路径产生的关联 FileRef，不提前写报告、不以 Transcript 或 frozen native 冒充发布物、不另造 sidecar 或并行发布者。",
+      "expected_mock": "最终 check exit=0，返回同一 reservation 的 result/markdown/commit FileRef，无 sidecar；正式 result JSON 中 converged=false。",
+      "boundary": "commit FileRef 在此作为报告发布关联物讨论，不能据此宣称发生了 git commit、push 或 PR 操作。"
+    },
+    {
+      "step": 5,
+      "action": "消费最终 check 返回的正式 FileRef，读取 result 中的机器结论并结合 markdown 展示报告；保持 scope/reservation 与本轮调用一致。require_same_admitted_roles 在首轮没有上一轮可比较，不能虚构历史角色集合；也不能仅凭配置列表声称实际 admitted roles 已验证。后续轮次若比较角色，应以实际 admitted roles 的证据为准。"
+    }
+  ],
+  "safe_consumption": {
+    "earliest_point": "按题设 mock，直到最终 check 成功返回同 reservation 的 result/markdown/commit FileRef，才到达正式报告可消费的检查点。不能在 build 成功、拿到 runId、读到 Transcript、准备返回 required=false，或看到 frozen native 路径时提前消费为正式报告。",
+    "conditions": [
+      "最终 check 确认成功，不只依赖某个文件碰巧存在，也不只拿脱离回执内容的退出码作结论。",
+      "result、markdown、commit FileRef 属于同一 reservation，且对应本次项目、检查点和调用，而不是旧轮次、旧 scope 或其他发布者的文件。",
+      "使用 check 返回的关联 FileRef；真实消费时这些引用应可解析、可读取，并满足发布协议要求的完整性。题设没有给出 FileRef 具体值或完整协议，不能声称已实际核验。",
+      "本案无 sidecar，不自行补建一个，也不把它的缺席当成缺少比较结果的失败。正式结论取自发布后的 result JSON，不从 native 文本自行拼装。"
+    ],
+    "publication_vs_convergence": "可安全读取一份正式报告，不等于该报告判定审计收敛。converged=false 不阻止消费已完整发布的报告，却阻止把它当作收敛通过凭据。"
+  },
+  "final_conclusions": {
+    "conditional_mock_outcome": "若题设 mock 在真实允许执行时依次成立，则本次首轮审计获得一组可消费的正式发布引用；最终机器结论明确为未收敛。",
+    "converged": false,
+    "may_claim": [
+      "在题设假设下，新 Workflow 调用可定位为 audit-101。",
+      "首轮准备不要求该比较/裁决 request，但仍须经过最终 check/发布。",
+      "最终 check 成功后可以消费同 reservation 的正式报告，即使其结论为未收敛。"
+    ],
+    "must_not_claim": [
+      "不能声称真实执行过工具、读取过 /work/Demo/input.txt 或验证过 /mock/frozen-audit.json。",
+      "不能把 exit=0、required=false 或报告发布成功解释为审计 PASS、收敛或允许后续流程放行。",
+      "不能从 converged=false 推出具体缺陷数量、严重级别、投票结果、角色实际出席情况或收敛失败原因。"
+    ],
+    "next_step": "若流程还需满足 convergence 闸门，应依据正式报告及真实配置决定修复和后续轮次；本题未给出报告内容、轮次上限或完整停止规则，不能断言必须立即开第二轮，也不能自行豁免闸门。"
+  },
+  "unknowns_and_assumptions": [
+    "未加载 Skill 或实现文件，不知道 build、准备、check 的真实工具名、参数、FileRef schema、发布原子性实现和 commit 校验格式；以上描述不冒充这些接口的精确规范。",
+    "将题设的最终 check 成功回执视为本案指定的正式发布成功信号；它不构成对任何实际文件系统或运行时状态的测量。",
+    "prompt 未提供正式 markdown/result 的完整内容、实际 admitted roles、投票和 findings，不补造这些信息。"
+  ]
+}

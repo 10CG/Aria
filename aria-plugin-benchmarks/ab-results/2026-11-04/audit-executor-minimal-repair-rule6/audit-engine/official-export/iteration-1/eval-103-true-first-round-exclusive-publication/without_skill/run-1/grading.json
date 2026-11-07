@@ -1,0 +1,97 @@
+{
+  "expectations": [
+    {
+      "text": "给出冻结manifest和真实helper build所需的计划后，从build回执workflow_script及build_record.identity/manifest hash构造audit Workflow(scriptPath,args)，不自造dispatcher或改成legacy。",
+      "passed": false,
+      "evidence": "/candidate-1/outputs/decision.json 的 planned_key_actions 步骤1只泛称按项目、context、配置和角色 build，并保留 build_record/workflow_script；步骤2只说按 workflow_script 启动 Workflow。没有冻结 manifest 的计划，也没有从 build_record.identity 与 build_record.manifest.sha256 组成 args 的绑定方式，反而注明“不知道……参数”。虽然没有改成 legacy 或自造 dispatcher，仍缺失该断言的关键正向子项。"
+    },
+    {
+      "text": "按实际回执runId/native/Transcript做capture audit index后prepare；prepare不是发布，不跳过它直接collect或手工persist。",
+      "passed": false,
+      "evidence": "/candidate-1/outputs/decision.json 步骤2记录 mock runId=audit-101 与 native/Transcript；步骤3直接说“将本次 native/Transcript 经准备步骤冻结”。没有说明 capture audit、绑定 build-record、写 manifest audit locator/index，再执行 prepare 的顺序。答案正确拒绝在准备阶段消费正式报告，也未手写结果，但 generic“准备步骤”不能替代缺失的 capture/index 接线。"
+    },
+    {
+      "text": "request.required=false的首轮不发checker、不伪造drift index；仍用prepare返回的冻结native进行final和同基础参数check（check仅多check-result）。",
+      "passed": false,
+      "evidence": "/candidate-1/outputs/decision.json 步骤3知道 required=false/first_round，不额外调用比较模型，且在 expected_mock 中列出 /mock/frozen-audit.json；但步骤4仅合称“最终 check/正式发布路径”。没有计划独立 final collect 与只读 check，没有把两者绑定到准备返回的冻结 native，也没有相同基础参数及 check 只增加 --check-result 的约束；drift index 的处理也未说明。首轮跳调用这一部分正确，整体复合断言仍失败。"
+    },
+    {
+      "text": "仅check成功后核同reservation JSON/MD/commit与可选合法sidecar，消费check实际返回FileRef和已校验JSON；不重hash展示文件或用MD/PASS重算canonical_v1；接受converged=false首轮，不额外开轮求绿。",
+      "passed": true,
+      "evidence": "/candidate-1/outputs/decision.json 的 safe_consumption.earliest_point 明确只有最终 check 成功并返回同 reservation 的 result/markdown/commit FileRef 才可消费；conditions 要求同项目/检查点/调用、引用可解析及完整性，并说明本案无 sidecar、不补建。步骤5固定消费 check 返回引用，机器结论取 result JSON，markdown 仅展示，没有以展示文件新 hash 替换引用或从 MD/PASS 另算结论的方案。publication_vs_convergence 接受可消费但 converged=false；final_conclusions 明确不能把 exit=0 当 PASS，也不能断言必须立即开第二轮。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "claims": [
+    {
+      "claim": "描述中的 runId、准备结果和 check 结果只是 mock，不是实际执行证据。",
+      "type": "process",
+      "verified": true,
+      "evidence": "prompt 明确提供假设工具结果；该候选公开 transcript 只有 Read case 与 Write 答案，没有 build、Workflow、capture、prepare、final 或 check 的实际调用。答案也明确保留这一边界。"
+    },
+    {
+      "claim": "首轮 request.required=false 不允许把准备包当成正式报告，也不表示审计已经收敛。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "答案步骤3及 safe_consumption 明确这两点；packet 内公开 executor-contract.md:76 规定 prepare 不发布结果，:346、:355-359 规定首轮不可比、keys_equal/stable/converged 为 false。"
+    },
+    {
+      "claim": "最终 check 成功、同 reservation 的正式引用完整后，可以消费 converged=false 的报告，但不能据此宣称 PASS 或合并放行。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "答案 safe_consumption 和 final_conclusions 给出这一条件式区分；公开 executor-contract.md:83-84、:326-332 将完整发布与进程成功、未收敛、质量和 merge clearance 分开。"
+    },
+    {
+      "claim": "已涵盖拟采取的关键动作。",
+      "type": "quality",
+      "verified": false,
+      "evidence": "公开 transcript line 27 的交付声明称涵盖关键动作，但 planned_key_actions 缺 manifest 冻结和 Workflow args 绑定、capture audit index，以及以冻结 native 执行分开的 final/check。消费边界虽正确，关键执行计划仍不完整。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "第4条可在缺失前端接线的答案中独立通过，不能把它的 PASS 解读为整条执行链完整。可增加展示文件 generated_at 改变、check 实际 FileRef 指向冻结 blob 的 mock，直接检验是否错误重 hash 或替换引用。",
+      "增加 final 已完成但 check 尚未通过、或 check 返回跨 reservation 引用的对照，要求明确拒绝消费；另可直接断言 check 为只读而非发布步骤。"
+    ],
+    "overall": "前三条因缺少关键计划语义失败，而不是因为没有真实调用工具。第4条通过依据是实质性的消费时点、引用来源与未收敛边界，不要求机械复述 canonical_v1 等 token；该局部通过不补足前面缺失的接线。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 4271,
+    "transcript_chars": 7821,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-a",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分方法依据完整读取的 /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md；采用逐断言语义证据、复合项全满足才通过、实质 claims 核验及 eval 反馈。按本任务指定接口直接返回结构化结果，不写 grading.json。",
+      "完整证据 packet 为 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-101.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-102.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-103.json。每份均包括两个候选的 decision_json_text、完整公开 transcript 及 health；本组六个候选全部 JUDGED。",
+      "仅依据给定 packet 内原 prompt、答案字节文本和公开事件评分。证据中 /candidate-1、/candidate-2 与 /frozen-reference 是公开记录中的中性化定位标签；未另行读取这些路径或当前真实配置。来源正文和部分路径仍可能提示来源，因此这是部分遮蔽评估，不是完全盲评。",
+      "任务为描述性 mock 推演：不要求候选真实调用 build、Workflow、Agent、capture 或 collect。答案必须给出断言要求的计划语义；Read/Write 素材和交付记录不充当真实审计运行证据，谨慎声明未知也不自动变成 NOT_JUDGED。",
+      "三份 packet 的六个 health.intake_verified 均为 true，公开记录未见输入损坏、答案截断或执行环境故障。未展开必要规则的候选按断言 FAIL，不作为环境问题排除。",
+      "packet 提供的 executor 指标：case 101 candidate-1 为2次工具调用、38.175秒，candidate-2 为4次、64.127秒；case 102 candidate-1 为11次、197.312秒，candidate-2 为2次、69.113秒；case 103 candidate-1 为2次、75.44秒，candidate-2 为8次、132.121秒。这些是作答过程指标，不是 mock 审计的真实运行时长。",
+      "packet 未提供单独 user_notes.md、metrics.json 或 timing.json 的正文，未对它们的实际存在性作推断；本次未因此省略任何 case、candidate 或 expectation。"
+    ],
+    "raw_summary": {
+      "passed": 1,
+      "failed": 3,
+      "total": 4,
+      "pass_rate": 0.25
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

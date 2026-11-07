@@ -13,10 +13,13 @@ metadata:
   execution_pause: null
   revision2_audits: {post_spec: passed, post_planning: accepted_by_owner_not_converged}
   revision2_boundary: "revision1绿灯不代替revision2审查；revision2 post_spec R3按现行legacy规则收敛，post_planning R5未收敛、5轮耗尽，2026-11-03真实owner选择接受当前结论继续实现（R5/owner-disposition.json绑定原始head和问答）。不改票、不加轮、不改预算或模型；TASK-002完整独立两阶段任务审查及三项Important修复复核已PASS；仅完成契约交付，不代表产品实现或Phase C/D授权。"
-  integration_authorization: not_granted
-  closure_authorization: not_granted
-  current_write_scope: [aria/skills/audit-engine/, aria/skills/config-loader/, .aria/config.json, .aria/config.template.json, .aria/audit-reports/audit-executor-minimal-repair/, .aria/notes/2026-11-02-audit-executor-implementation/, openspec/changes/audit-executor-minimal-repair/, docs/handoff/]
-  approval_boundary: "2026-11-02用户通过goal明确批准Phase B、Agent team与动态Workflow，按TASK-001..019推进，含规格内配置接入、真实探针和Rule #6。Phase C/D、提交推送发布、部署及PR #38恢复仍未授权；每个执行者只写本任务明确文件域。"
+  integration_authorization: granted_by_goal_20261107
+  closure_authorization: granted_by_goal_20261107
+  release_compatibility: owner_approved_20261107_112952Z
+  release_amendment: openspec/changes/audit-executor-minimal-repair/release-amendment.md
+  current_write_scope: [aria/skills/audit-engine/, aria/skills/config-loader/, aria/.claude-plugin/, aria/VERSION, aria/CHANGELOG.md, aria/README.md, .aria/config.json, .aria/config.template.json, .aria/audit-reports/audit-executor-minimal-repair/, .aria/notes/2026-11-02-audit-executor-implementation/, .aria/notes/2026-11-07-goal-delivery-and-phase-a/, openspec/changes/audit-executor-minimal-repair/, docs/handoff/, VERSION, README.md, README.zh.md, README.ja.md, README.ko.md, CLAUDE.md, docs/architecture/system-architecture.md, docs/architecture/version-scheme.md]
+  prior_phase_b_authorization: "2026-11-02用户通过goal明确批准Phase B、Agent team与动态Workflow，按TASK-001..019推进，含规格内配置接入、真实探针和Rule #6。Phase C/D、提交推送发布、部署及PR #38恢复仍未授权；每个执行者只写本任务明确文件域。"
+  approval_boundary: "2026-11-07真实goal要求完成原交付，已授权TASK-020/021对应的集成、版本同步、发布和周期收口；11:29:52Z真实问答批准仅读取侧兼容可识别旧格式。保留原报告/接受/周期预算，不关闭守卫；PR #38恢复、构建部署和168h仍不在本轮范围。"
   run_from: "项目根目录；下列命令中的 aria/ 为插件源码目录。实现与测试必须由文件位置或显式参数定位资源，不依赖规划机绝对路径。"
   paths:
     executor: &executor aria/skills/audit-engine/scripts/audit_executor.py

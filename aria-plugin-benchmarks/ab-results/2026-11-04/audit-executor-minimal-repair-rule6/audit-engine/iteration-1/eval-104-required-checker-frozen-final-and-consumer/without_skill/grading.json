@@ -1,0 +1,103 @@
+{
+  "expectations": [
+    {
+      "text": "核request原字节/hash与资源，使用新独立checker Workflow而非复用审计实例/加投票席；scriptPath取policy_script.path，args包含identity、request_sha256、anchor记录value、conclusions。",
+      "passed": false,
+      "evidence": "packet 中 /candidate-2/outputs/decision.json 的 required_check.resource_decision 正确保留最后一槽，data_selection.selection_rule 也计划核字节摘要；但 planned_execution 只有“使用 prepare 返回的 policy_script 和 policy_request 运行该必要 checker”。没有给出所要求的四项 args，尤其没有 request_sha256 传参和解引用 AnchorRecord.value；也未明确新建 checker 实例、禁止复用审计 agentId/增加投票席。列出 identity、anchor FileRef、conclusions 的来源不等于给出正确调用。"
+    },
+    {
+      "text": "用checker自身runId/native/Transcript做capture drift并绑定prepare回执；不把audit runId或顶层status当checker/逐席完成，不用缺源伪造失败放行。",
+      "passed": false,
+      "evidence": "decision.json required_check.evidence_attribution 正确要求用 checker-202 自己的 native/Transcript，禁止用 audit-201 冒充，并在缺证时阻断。但只说“取得、捕获并核验”“保留……关联”，没有计划 capture drift 模式，也没有将 capture binding 绑定原 prepare 回执。它不能完整满足本项所要求的具体捕获链。"
+    },
+    {
+      "text": "final与check使用同一prepare.native_record冻结路径及相同repo/manifest/build/runId/previous/output，不回live增长文件补票；check只额外check-result。",
+      "passed": false,
+      "evidence": "decision.json data_selection 正确选择 /mock/frozen-audit.json 并禁止混入 live 新 conclusions；但 publication.sequence 只笼统要求保持输入、取得最终 check，没有明确 final collect 与 check 的同一 repo/manifest/build/audit runId/previous/output 参数集合，也没有说明 check 只增加 check-result。unknowns_and_assumptions 反而明示不知道 helper 精确参数，因此不能把“同一输入集合”当作完整参数协议已满足。"
+    },
+    {
+      "text": "check成功消费其原FileRef映射及同reservation JSON/MD/commit/合法sidecar，不重hash展示文件或AI重算；check失败分支即使MD写PASS也停止消费，不宣称发布通过。",
+      "passed": false,
+      "evidence": "decision.json publication.result_reference 正确保留 blob 的原 FileRef，不替换成展示 round.json 摘要；report_consumption.failed_branch 也正确拒绝 exit=1/MD PASS。但没有要求同 reservation 的 JSON、MD、账本 commit 齐全并验证合法 sidecar，也没有明确 helper 唯一重算与结构化 policy 消费。publication.sequence 还将“最终 check 成功”放在发布之前，未说明 final 先发布完整产物再只读 check 的协议。矩阵中的完整发布消费链未满足。"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  },
+  "claims": [
+    {
+      "claim": "本答复没有执行实际 checker、Workflow、Agent、命令或网络调用。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript 仅有读取 case 输入及写 /candidate-2/outputs/decision.json；没有实际审计操作。未加载额外 Skill 的声明也与该 transcript 一致。"
+    },
+    {
+      "claim": "live audit 增长不能改变本次冻结输入，成功 check 返回的 blob FileRef 不应换成展示文件身份。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "输出 data_selection.live_growth 和 publication.result_reference 与同 packet 内嵌 execution-modes.md:65–72、executor-contract.md:80、400 的冻结及引用规则一致。"
+    },
+    {
+      "claim": "required checker 的必要步骤失败就不能进入通过发布。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "publication.sequence[1] 把“必要步骤缺失或失败”一并阻断通过发布，未区分合法的 checker 自身 spawn 失败/超时。该 packet 内嵌 executor-contract.md:439 明确允许有真实匹配失败证据时由 helper 导出 skipped/ratio=null/action=NONE；不能把所有 checker 失败都当作必须阻断发布。"
+    },
+    {
+      "claim": "仅凭 check exit=1，业务判定不通过、证据校验失败和执行错误都仍可能是原因。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "report_consumption.failure_classification 保留了业务判定不通过这一可能性，但同 packet 内嵌 executor-contract.md:84 指定 exit=1 为执行器拒绝或文件系统错误，审计 REVISE/FAIL 是有效计算结果，不等于 collector 进程错误。"
+    },
+    {
+      "claim": "应先取得成功最终 check，再发布该已检查结果。",
+      "type": "process",
+      "verified": false,
+      "evidence": "publication.sequence[2–3] 提议该顺序；同 packet 内嵌 executor-contract.md:81–83 和 execution-modes.md:65–72 要求 final 产生 JSON/MD/commit 后，check 只读重算，再允许消费者消费。这是计划顺序缺陷，不是一次真实执行故障。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "成功分支应增加有效 FAIL/未收敛结果的 mock，明确 final 发布、只读 check、后续放行是三个不同阶段，可抓住本候选把发布限定为通过结果以及颠倒发布/check 顺序的问题。",
+      "增加合法 checker 失败与缺证伪失败的成对输入，防止泛化的“失败一律阻断”回答规避失败证据协议。"
+    ],
+    "overall": "冻结数据、blob 身份和 exit=1 停止消费等一般原则正确，但四项复合断言都缺少至少一个承重协议环节。输入健康，按能力缺口判 FAIL，而非 NOT_JUDGED。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 3772,
+    "transcript_chars": 7018,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 0,
+      "failed": 4,
+      "total": 4,
+      "pass_rate": 0
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

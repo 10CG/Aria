@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "kind": "release_compatibility_evidence_not_old_acceptance_rewrite",
+  "recorded_at": "2026-11-07T12:29:12.989947+00:00",
+  "change_id": "audit-executor-minimal-repair",
+  "plugin_version": "1.78.0",
+  "plugin_merge_commit": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+  "owner_decision": {
+    "action": "read_side_compatibility_for_identifiable_legacy_only",
+    "at": "2026-11-07T11:29:52.270Z",
+    "restricted_source": {
+      "path": ".aria/notes/2026-11-07-goal-delivery-and-phase-a/legacy-compat-owner-decision.json",
+      "sha256": "14f2262494595ef63ba02e5404665927adbc9bb0eb5113a6f06a4da3ab7aa18b"
+    },
+    "native_source_not_publicly_distributed": true
+  },
+  "new_regression": {
+    "tests": 56,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "receipt": {
+      "path": ".aria/notes/2026-11-07-goal-delivery-and-phase-a/controller-regression.json",
+      "sha256": "f0ae11f83b21aab4bb501f44a3dfac6a51d2900ecb16435f1dd72d8100feac3f"
+    }
+  },
+  "independent_controls": {
+    "normal_assertions": 18,
+    "bad_implementations_caught": 2,
+    "receipt": {
+      "path": ".aria/notes/2026-11-07-goal-delivery-and-phase-a/independent-legacy-checks-rerun/results.json",
+      "sha256": "2c23fc2448e0a08adecf7e2ef0fd34400a72693768ac8d9f9ecd39e7c2154bf2"
+    },
+    "protected_files_unchanged": true
+  },
+  "typecheck": {
+    "product_files_analyzed": 2,
+    "fixture_files_analyzed": 1,
+    "errors": 0,
+    "warnings": 0,
+    "receipts": [
+      {
+        "path": ".aria/notes/2026-11-07-goal-delivery-and-phase-a/pyright-final.json",
+        "sha256": "ba9b4c27723a47d0ed724f0611d2a7bea3d3d5fd9b303180ddce084ada417448"
+      },
+      {
+        "path": ".aria/notes/2026-11-07-goal-delivery-and-phase-a/pyright-independent-final.json",
+        "sha256": "4ec02fe2d5447d33b4ea27eb2143a3f38579a906bd69fcd73d73c90c19fd7ac2"
+      }
+    ]
+  },
+  "original_report": {
+    "path": ".aria/audit-reports/post_spec-R2-1783054040265-dispatch-input-delivery-code-reviewer.md",
+    "sha256": "d6c9e0d25ead1d408ce5ece6adb58473b1b7e7311c90e3270158f38020721861",
+    "equals_published_original": true
+  },
+  "real_repo_build_observation": {
+    "build_record": {
+      "path": ".aria/audit-reports/post_spec-R1-post-spec-r1-b90419711b0348f0b5ac3672aa8ab3a6-state-scanner-goal-aligned-recommendations/build-record.json",
+      "sha256": "b55c363f1f9175d75de9a29ceb914913b34889847127a99f15707d0a96715a66"
+    },
+    "legacy_warning_observed": true,
+    "not_dependent_on_new_spec_audit_convergence": true
+  },
+  "rule6_note": {
+    "decision_table_row": 1,
+    "description_changed": "no",
+    "scenario1": "not_required",
+    "scenario4b": "not_required",
+    "negctrl": "n/a"
+  },
+  "prior_rule6": {
+    "root": {
+      "path": ".aria/audit-reports/audit-executor-minimal-repair/rule6-evidence.json",
+      "sha256": "8cb34434f9ce24955f6e3fa9a45025a888a19e02b322e72ea7b910a1ff14601d"
+    },
+    "preserved_limits": [
+      "n=1",
+      "fixed_case1_format_FAIL_preserved",
+      "baseline_contamination_limit_preserved"
+    ],
+    "runtime_instruction_bytes_unchanged_since_accepted_phase_b": true
+  },
+  "publication_boundary": {
+    "native_sessions_and_keys": "not_in_git",
+    "preservation_payload": "not_in_git",
+    "proof_access": "public test/benchmark/index files plus owner-accessible restricted provenance; no claim of complete public native-source closure"
+  }
+}

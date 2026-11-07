@@ -1,0 +1,20 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-fixed/2-probe-not-established-renders-unverified-BETA.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-2-probe-not-established-renders-unverified-BETA/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 5,
+  "agent_id": "a583a3186aece5078",
+  "output_sha256": "817f49bf4340ab38ec875ac576846df26d664d0f097541b8684c7e8ea90ed742",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_81eac8d9-6d6/agent-a583a3186aece5078.jsonl",
+  "original_sha256": "011e62ed1cd0c6ec7a0d75087f8685500067e2666042ab6bbe65ff2bceb9a741",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

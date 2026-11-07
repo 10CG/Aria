@@ -1,0 +1,92 @@
+{
+  "expectations": [
+    {
+      "text": "A缺显式团队、B覆盖、C非convergence、D非Workflow/不可用分别明确unsupported并停止，不自动选默认团队、删覆盖或切模式/模型/后端以求成功。",
+      "passed": false,
+      "evidence": "packet 中 /candidate-2/outputs/decision.json 确实停止 A–D 且不自动替换团队/覆盖/模式/后端，但 support_boundary_assumption 将入口边界整体声明为未核实假设。cases.C 明确写“其他 challenge 入口是否存在未知”，后续等待能证明 challenge 入口的契约，未给出 guard=true 下非 convergence 请求就是不支持的确定结论；D 仅判执行工具缺失，未确认其属于本守卫支持边界的 unsupported。失败依据是支持边界仍欠定，而非没有使用某个精确英文词。"
+    },
+    {
+      "text": "E helper非零立即停止并呈现错误与输入引用，不临时persist、不绕prepare直接collect、不读旧报告或MD猜PASS。",
+      "passed": true,
+      "evidence": "decision.json summary 规定 E build 失败“不能继续执行或视为审计通过”；cases.E 禁止使用“不完整构建产物、旧产物或手写等价物”继续，要求把非零、原始 error_code 和输入引用传回调用方，停止后续 Workflow，且“不回退到旧入口，不绕过 build，不生成虚假的审计结论或完成标记”。这些整体停止及禁止替代产物的约束语义上排除了临时 persist、绕 prepare 收集或借旧展示结果猜 PASS，并不要求逐字复述工具名。具体错误值未给出，诚实保留 null。"
+    },
+    {
+      "text": "所有分支均不因Phase B授权回legacy或自行激活/改写配置，不声称新守卫已保护不支持路径。",
+      "passed": true,
+      "evidence": "decision.json summary 明确五项不得转旧路径、临时拼团队、直调模型或关闭检查点，正常 Phase B 不授权改配置或绕门；shared_rules 禁止 guard 改 false、补写团队、改模式/模型以及跳过后标通过。A–E 后续动作也保持停止或等待授权，不声称已执行或守卫已保护不支持路径。"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "pass_rate": 0.6666666666666666
+  },
+  "claims": [
+    {
+      "claim": "本次没有执行审计、helper、Workflow、模型或命令，也没有读取或修改项目配置。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript 仅读取指定 case JSON 并写 /candidate-2/outputs/decision.json；无实际项目配置访问或执行调用。"
+    },
+    {
+      "claim": "项目 guard=true 表示相应检查点已经启用。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "decision.json shared_rules[0] 作此等同。该 packet 内嵌 SKILL.md:91、404–417 分别定义 require_same_admitted_roles、audit.enabled、checkpoints 与 drift 等开关；守卫 boolean 本身不是检查点启用状态。题设也未提供足以支持该等同的额外配置。"
+    },
+    {
+      "claim": "guard=true 时 challenge 是否存在另一受支持入口仍不能确定。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "输出 support_boundary_assumption、cases.C 和 unknowns 保留这种未知；同 packet 内嵌 SKILL.md:94 和 execution-modes.md:30 已明确 true 只支持 Workflow/convergence，不能固定解析为 convergence 就 unsupported，不回 legacy。"
+    },
+    {
+      "claim": "helper build 非零不证明审计内容已经被判 FAIL。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "输出 cases.E 正确区分构建错误和审计质量结果；题设只给构建失败，该 packet 的支持入口及 helper 退出码流程也未授权由构建失败推出内容 FAIL。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "增加完全合格且 build 成功的正向分支，检测是否只会对所有请求一律停止。",
+      "单独检查 guard 与 audit.enabled/checkpoints 的区别；本候选把 guard=true 当检查点启用，现有三条断言没有直接覆盖这一实质性错误。"
+    ],
+    "overall": "E 的停止及授权边界语义上满足，未因缺少精确术语而扣分；A–D 的支持边界仍被当作假设，尤其保留 true/challenge 另有入口的未知，因此第一项不通过。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 3342,
+    "transcript_chars": 6006,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3,
+      "pass_rate": 0.6666666666666666
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "expectations": [
+    {
+      "text": "先呈现耗尽原因/结论与变化，不能把旧cycle接受或自动推进授权当本周期选择；当前未回答就保持等待，不伪造approved=true。",
+      "passed": false,
+      "evidence": "packet 中 /candidate-1/outputs/decision.json 的 current_decision 正确保持等待，拒绝旧 cycle 接受和自动推进充当新选择，并禁止伪造回答/sidecar；human_disposition_evidence.proposed_process[0] 计划展示身份、轮数、converged=false 和未解决问题摘要。但没有计划呈现跨轮结论变化/新增移除四元组，也没有针对哪些结论变化分析未收敛原因。当前缺具体内容不要求编造，但仍应描述该展示步骤，故整个矩阵不通过。"
+    },
+    {
+      "text": "计划从成功CHECK回执经capture question生成单题单选三选项的真实AskUserQuestion输入及唯一ASCII context绑定；之后用真实session及提问/回答UUID做capture disposition，不能拿工具通知当回答。",
+      "passed": false,
+      "evidence": "decision.json human_disposition_evidence 只有通用展示、等待真实回答、保存“实际问答记录或消息引用”和使用项目支持入口的计划；schema_caveat 明示不知道记录命令及消费协议。没有 CHECK_RECEIPT→capture question→真实 AskUserQuestion 的单题单选固定三选项，没有唯一 ASCII context，也没有 session/提问与回答 UUID 的 capture disposition 计划。普通消息引用不能替代这一原生问答链。"
+    },
+    {
+      "text": "处置后同基础参数final/check消费合法不可变sidecar，不覆盖旧JSON/MD或重跑审计；接受/降级仍converged=false且禁止继续派发，+2最多一次且须真实选择。",
+      "passed": false,
+      "evidence": "decision.json future_acceptance 正确保留 converged=false，future_additional_rounds 也禁止同一处置重复累加；但没有同基础参数 final/check、不可变 sidecar/base view、不改旧 JSON/MD且不重跑审计的完整处置协议，没有降级分支或接受/降级后禁止继续派发规则。增轮被描述为用户明确给定的任意获准增量，甚至要求数量另行明确，而非固定一次 +2。"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 3,
+    "total": 3,
+    "pass_rate": 0.0
+  },
+  "claims": [
+    {
+      "claim": "旧 cycle 的接受和本轮自动推进授权都不是当前耗尽 head 的人类选择。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "这与 prompt 明确给定的授权边界一致；packet 内嵌 execution-modes.md:263–265、executor-contract.md:445–449 也要求当前 head 专属问答证据。"
+    },
+    {
+      "claim": "选择增加轮次时，如果人类没有明确新增数量，就不能确定可执行的增轮预算。",
+      "type": "factual",
+      "verified": false,
+      "evidence": "human_disposition_evidence.proposed_process[2] 和 future_additional_rounds 要求额外数量；同 packet 内嵌 execution-modes.md:263–265、executor-contract.md:449 已将固定标签“增加轮次”绑定为一次 +2，无需用户另报数字。"
+    },
+    {
+      "claim": "人类接受未收敛结果不能改写成自然收敛，converged 应保持 false。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "decision.json future_acceptance.handling[0] 与 packet 内嵌 executor-contract.md:449 的 accept_current view 规则一致。"
+    },
+    {
+      "claim": "本次没有真实问答、审计操作或伪造处置 sidecar。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript 仅 Read case 输入和 Write /candidate-1/outputs/decision.json；不存在 AskUserQuestion、capture、审计调用或 sidecar 写入。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "提供具体但明确标为 mock 的结论变化及耗尽原因，要求规划或渲染相应摘要，可使第一项不止检测一般性的等待授权。",
+      "增加固定“增加轮次”标签、未填写数字的合法回答，以及普通消息/工具通知、过时 head、重复回答等负例，检验固定 +2 和原生问答绑定，而非通用保存人类意见。"
+    ],
+    "overall": "候选授权态度谨慎且没有伪造证据，但没有给出可消费的具体问答/sidecar 协议，并误把固定 +2 当作未知增量。三条复合断言均有实质缺口。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 3256,
+    "transcript_chars": 5884,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 0,
+      "failed": 3,
+      "total": 3,
+      "pass_rate": 0
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

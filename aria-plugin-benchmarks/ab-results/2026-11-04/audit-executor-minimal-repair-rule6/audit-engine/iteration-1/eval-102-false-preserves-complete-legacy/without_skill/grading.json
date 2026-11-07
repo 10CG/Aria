@@ -1,0 +1,92 @@
+{
+  "expectations": [
+    {
+      "text": "严格解析成功后守卫false走完整legacy：原配置入口、默认团队、agent-team-audit单轮、旧汇总与旧报告消费，而非只说false兼容。",
+      "passed": false,
+      "evidence": "/candidate-2/outputs/decision.json 的 processing 只说“读取有效审计配置”“原有单轮审计流程”“汇总的具体字段和算法须遵守原有约定，本题未提供其定义”。没有给出通用加载前双源严格解析，也没有确定 agent-team-audit 单轮接口或实际旧汇总步骤。assumptions_and_unknowns 还明确不能准确列出团队优先级、默认角色、汇总接口及收敛算法。它确实描述了旧报告可消费，但未满足完整 legacy 链的全部子项。"
+    },
+    {
+      "text": "不因无显式团队、无manifest或旧报告缺角色证据阻断，也不强制执行新helper/build/prepare。",
+      "passed": true,
+      "evidence": "/candidate-2/outputs/decision.json 的 decision.legacy_inputs_block_entry=false；legacy_compatibility 三项分别要求默认团队回退、不把 manifest 追溯设为旧路径必需输入、缺角色集合的有效旧报告“保持可消费”。processing 入口明确“不因本次输入缺少新元数据而强制迁移执行路径”，整份计划没有要求进入 helper/build/prepare 新链。"
+    },
+    {
+      "text": "保留一次性anchor、每轮sibling probe及既有收敛/预算/耗尽规则，不把新true资源限制反向套到false；post_planning不额外运行pre_merge gate。",
+      "passed": false,
+      "evidence": "/candidate-2/outputs/decision.json 全文没有一次性 anchor、每轮 sibling probe、预算约束、耗尽三路径或 pre_merge 专属 gate 的处理。报告消费阶段仅泛称“按既有 convergence 规则”，unknowns 明确“不提供……投票阈值、收敛算法和最大轮数”。未强加 true 资源门或 pre_merge gate 本身不足以抵消缺失的正向保留动作，因此该复合断言失败。"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.3333333333333333
+  },
+  "claims": [
+    {
+      "claim": "无显式 teams、无 manifest、有效旧报告缺参与集合这三项本身不应阻断 false 路径。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "答案 decision 和 legacy_compatibility 逐项作出该决定；packet 内公开契约 SKILL.md:93 明确 false 使用默认团队、不要求 manifest 或旧报告补参与字段。"
+    },
+    {
+      "claim": "require_same_admitted_roles=false 不等于 audit.enabled=false，也不能把有效旧历史冒充本轮结果。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题面 enabled=true、checkpoint=convergence；答案保留审计并将旧报告仅作为前轮比较输入。该决定与可见的完整 legacy 分流和跨轮比较语义一致。"
+    },
+    {
+      "claim": "已包含完整处理链。",
+      "type": "quality",
+      "verified": false,
+      "evidence": "公开 transcript line 26 的最终回复声称“包含完整处理链”，但答案未展开严格入口、指定单轮引擎、旧汇总算法、anchor、sibling probe、预算及耗尽路由；unknowns 将多项必要环节留为未知。列出五个阶段标题不能证明完整处理语义。"
+    },
+    {
+      "claim": "本次没有实际执行命令、Skill、Agent、Workflow 或修改项目配置。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript line 15 读取 case，line 23 只写 /candidate-2/outputs/decision.json；没有其它执行工具事件。未掌握规则属于本次答案的能力覆盖不足，不是输入或环境故障。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "将“沿用原有规则”与可核验的实际处理内容区分清楚：保留当前完整性断言，并为团队选择、汇总和预算分别提供明确 oracle，减少泛称旧流程被误当完整答案的空间。",
+      "增加 checkpoint 显式 convergence 覆盖 manual 的直接决策断言及 off/缺省对照，避免“既有 manual 路径”这种含混表述掩盖错误路由。"
+    ],
+    "overall": "仅不新增阻断的兼容性断言通过。其余两条所需的正向处理内容缺失，不能以谨慎声明未知替代，也不能将这种缺失改判 NOT_JUDGED。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "output_chars": 2729,
+    "transcript_chars": 5476,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-a",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分方法依据完整读取的 /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md；采用逐断言语义证据、复合项全满足才通过、实质 claims 核验及 eval 反馈。按本任务指定接口直接返回结构化结果，不写 grading.json。",
+      "完整证据 packet 为 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-101.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-102.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-103.json。每份均包括两个候选的 decision_json_text、完整公开 transcript 及 health；本组六个候选全部 JUDGED。",
+      "仅依据给定 packet 内原 prompt、答案字节文本和公开事件评分。证据中 /candidate-1、/candidate-2 与 /frozen-reference 是公开记录中的中性化定位标签；未另行读取这些路径或当前真实配置。来源正文和部分路径仍可能提示来源，因此这是部分遮蔽评估，不是完全盲评。",
+      "任务为描述性 mock 推演：不要求候选真实调用 build、Workflow、Agent、capture 或 collect。答案必须给出断言要求的计划语义；Read/Write 素材和交付记录不充当真实审计运行证据，谨慎声明未知也不自动变成 NOT_JUDGED。",
+      "三份 packet 的六个 health.intake_verified 均为 true，公开记录未见输入损坏、答案截断或执行环境故障。未展开必要规则的候选按断言 FAIL，不作为环境问题排除。",
+      "packet 提供的 executor 指标：case 101 candidate-1 为2次工具调用、38.175秒，candidate-2 为4次、64.127秒；case 102 candidate-1 为11次、197.312秒，candidate-2 为2次、69.113秒；case 103 candidate-1 为2次、75.44秒，candidate-2 为8次、132.121秒。这些是作答过程指标，不是 mock 审计的真实运行时长。",
+      "packet 未提供单独 user_notes.md、metrics.json 或 timing.json 的正文，未对它们的实际存在性作推断；本次未因此省略任何 case、candidate 或 expectation。"
+    ],
+    "raw_summary": {
+      "passed": 1,
+      "failed": 2,
+      "total": 3,
+      "pass_rate": 0.3333333333333333
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "expectations": [
+    {
+      "text": "检查全部既往attempt审计及auxiliary，列unknown调用/原件引用；即使PASS或单字段允许仍零新增派发，包括下一轮与void补跑，不宣称OS已清理。",
+      "passed": true,
+      "evidence": "packet 中 /candidate-2/outputs/decision.json 的“派发决定.已知调用清单”逐项列 audit-old 和 checker-old，native_ref/termination_ref 为 null 并明确表示题目未提供，不冒充实核；要求恢复时纳入全历史回放并展示实际引用。“后续轮条件”核同 cycle 全部既往 attempted 审计和 auxiliary，不能只看前轮；“当前新派发”明确禁止全部下一轮及 all-failed void 补跑，PASS/单字段无权覆盖，失败处理不宣称 OS 已清理。"
+    },
+    {
+      "text": "resume_only=true仅恢复原manifest/build/回执链，不再次Workflow；缺回执暂停，不能新cycle/attempt掩盖潜在已启动调用。",
+      "passed": true,
+      "evidence": "decision.json“恢复决定”明确保持原 audit_cycle_id、manifest 字节、client_round_id、attempt_index、build-record、脚本及 reservation，不新建 cycle/attempt，不自动 void pending；缺真实回执、原件或活性 unknown 时暂停，找不到回执不能证明未启动。后续始终“resume_only=true 路径……零重派”，只回收真实 runId/Transcript/原件。"
+    },
+    {
+      "text": "120s不是取消或释放槽，true并发最多2不因hard_cap=3放宽；较晚原件仅按同身份重放资源终态，不改旧C/raw/票，不越额度/终局/accept或degrade。",
+      "passed": true,
+      "evidence": "decision.json“120秒释放槽建议”说明 120000ms 是软超时/准入窗口而非取消，最多两个未返回 Promise，hard_cap=3 不放宽。“较晚原件与证据处理.原链核验”核 run/script/startTime/agentId/label/agentType/queuedAt 与时间单调性，通过 dispatch_preflight/helper 重放 prefix；“历史不变”禁止补旧 C/raw/票。“后续轮条件/解除范围”明确资源解除仍不能越额度、CONVERGED/DRIFT_TERMINATED/OSCILLATION、accept_current/degrade_single。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "同 reservation 精确恢复中的 commit 是执行器账本事件，不是 Git 提交。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "decision.json“恢复决定.后续条件”的消歧与公开 transcript 内嵌 executor-contract.md:404–410、421 的 reserve/commit 事件定义一致。"
+    },
+    {
+      "claim": "合法中断可导出 interrupted_observed，但 C 仍为 null，也不证明 OS 子进程退出。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "packet 内嵌 executor-contract.md:210–220、429 明确该语义；输出没有把中断或较晚观察变成旧票完成时间。"
+    },
+    {
+      "claim": "已知 startedAt/durationMs/C 不得在较晚观察中改写，比较应包含已验证 observe。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 33 内嵌 executor-contract.md:427 逐项规定相同约束，输出“原链核验”据此设计复核。"
+    },
+    {
+      "claim": "本次没有真实执行 build、capture、Workflow、Agent 或重算。",
+      "type": "process",
+      "verified": true,
+      "evidence": "完整公开 transcript 工具事件为五次 Read 和一次 Write，符合 health.tool_calls=6；无实际恢复或派发操作。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "增加合法较晚终态且所有其他政策条件允许时的正向恢复对照，防止只会暂停而不会识别解除条件的回答通过。",
+      "提供一份具体的已知 startedAt 较晚被改写原件及一份合法 null 补全原件，要求分别拒绝/接受；当前描述性答案能陈述单调性，但未实际辨别一对证据。"
+    ],
+    "overall": "三项完整满足，调用范围、恢复身份、资源与政策分离均有具体证据。现有案例仍主要检验阻断路径，适合补可继续路径与单调证据对照。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 6,
+    "output_chars": 4183,
+    "transcript_chars": 94364,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

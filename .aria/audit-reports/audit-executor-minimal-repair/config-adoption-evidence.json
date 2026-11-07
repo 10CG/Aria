@@ -1,0 +1,1355 @@
+{
+  "C_D_commit_push_release_deploy_performed": false,
+  "configuration_comparisons": {
+    ".aria/config.json": {
+      "after": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/sources/config.json.after.txt",
+        "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+      },
+      "after_origin_path": "/home/dev/Aria/.aria/config.json",
+      "after_top_level_key_count": 10,
+      "before": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/before/config.json.txt",
+        "sha256": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa"
+      },
+      "before_origin_path": "/home/dev/Aria/.aria/config.json",
+      "before_top_level_key_count": 10,
+      "full_tree_leaf_differences": [
+        {
+          "after": true,
+          "after_present": true,
+          "before_present": false,
+          "path": "/audit/require_same_admitted_roles"
+        }
+      ],
+      "negative_controls": {
+        "added_audit_sibling_rejected": true,
+        "changed_existing_unrelated_value_rejected": true
+      },
+      "newline_style": "LF",
+      "other_configuration_values_equal": true,
+      "raw_leaf_only_equal": true,
+      "removed_necessary_parent_paths": [],
+      "restored_target_setting_equal": true,
+      "trailing_newline_preserved": true
+    },
+    ".aria/config.template.json": {
+      "after": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/sources/config.template.json.after.txt",
+        "sha256": "1f37cb75f46267b28f4544946453b5a81e4003c15da5cddaded41565af5d0666"
+      },
+      "after_origin_path": "/home/dev/Aria/.aria/config.template.json",
+      "after_top_level_key_count": 11,
+      "before": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/before/config.template.json.txt",
+        "sha256": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba"
+      },
+      "before_origin_path": "/home/dev/Aria/.aria/config.template.json",
+      "before_top_level_key_count": 10,
+      "full_tree_leaf_differences": [
+        {
+          "after": true,
+          "after_present": true,
+          "before_present": false,
+          "path": "/audit/require_same_admitted_roles"
+        }
+      ],
+      "negative_controls": {
+        "added_audit_sibling_rejected": true,
+        "changed_existing_unrelated_value_rejected": true
+      },
+      "newline_style": "LF",
+      "other_configuration_values_equal": true,
+      "raw_leaf_only_equal": false,
+      "removed_necessary_parent_paths": [
+        "/audit"
+      ],
+      "restored_target_setting_equal": true,
+      "trailing_newline_preserved": true
+    }
+  },
+  "current_project_policy": {
+    "audit_enabled": true,
+    "budgets": {
+      "max_parallel": 2,
+      "round_ms": 300000,
+      "single_agent_ms": 120000
+    },
+    "defaults_guard": false,
+    "enabled_checkpoints": {
+      "post_planning": "convergence",
+      "post_spec": "convergence"
+    },
+    "explicit_teams": {
+      "post_planning": [
+        "aria:tech-lead",
+        "aria:backend-architect",
+        "aria:qa-engineer",
+        "aria:code-reviewer",
+        "aria:knowledge-manager"
+      ],
+      "post_spec": [
+        "aria:tech-lead",
+        "aria:backend-architect",
+        "aria:qa-engineer",
+        "aria:code-reviewer",
+        "aria:knowledge-manager"
+      ]
+    },
+    "max_rounds": 5,
+    "mode": "convergence"
+  },
+  "delivery_status": "DELIVERED_PENDING_INDEPENDENT_REVIEW",
+  "diff_check": {
+    "main": {
+      "exit_code": 0,
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/main-diff-check.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/main-diff-check.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "plugin": {
+      "exit_code": 0,
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/plugin-diff-check.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/plugin-diff-check.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "duration_ms": 25306,
+  "experiments": [
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 170,
+      "exit_code": 0,
+      "label": "post_spec-healthy-build",
+      "recorded_at": "2026-11-03T22:10:56.158390+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-build/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-build/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-build/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-build/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-build/stdout.txt",
+        "sha256": "236a39ac338b9409ee1f136ab8bee399d7df973f4fb9b4d7719dfaeb8d92bd15"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 101,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_spec-manifest-false",
+      "output_tree_unchanged": true,
+      "reason": "guard_mismatch",
+      "recorded_at": "2026-11-03T22:10:56.277741+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false/manifest.input.json.txt",
+          "sha256": "b6ab49a2965756032ec0b6991fcb4370cb49bbea663a267c7a1a275300b25733"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false/stderr.txt",
+        "sha256": "32ee32b6e6076c99773d073c222f3d6279e82c451802fcb6a7cd1d3f648b8edd"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 178,
+      "exit_code": 0,
+      "label": "post_spec-manifest-false-healthy-control",
+      "recorded_at": "2026-11-03T22:10:56.457322+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-ntaxyy80/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false-healthy-control/manifest.input.json.txt",
+          "sha256": "922577e11639ebcbae7a80b00ff484e88b5cf1a267b2aa3c7788e26725351509"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-manifest-false-healthy-control/stdout.txt",
+        "sha256": "2e181a137b4265a8eef0805b3cbc16b8ae13d3afc7ffb4f0331f5d3a6d4964d7"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 117,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_spec-deleted-role",
+      "output_tree_unchanged": false,
+      "reason": "team_mismatch",
+      "recorded_at": "2026-11-03T22:10:56.590881+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role/manifest.input.json.txt",
+          "sha256": "2c16485d29a8e7f85f91bfc9402e7c43d4d57be0bf904d7f891ffb82cec4a7f1"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role/stderr.txt",
+        "sha256": "023bf59926ba6f3035646c2ed41a69f81b3dcc40f4b4b4f168dab7c850f48ce7"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 183,
+      "exit_code": 0,
+      "label": "post_spec-deleted-role-healthy-control",
+      "recorded_at": "2026-11-03T22:10:56.775500+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-3hlak4y7/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role-healthy-control/manifest.input.json.txt",
+          "sha256": "cde643d82fde99189f1301cb017e00fbeaf365977e752d8e959d7c739055270a"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-deleted-role-healthy-control/stdout.txt",
+        "sha256": "c733b0ee8fca3e6a6cafc3c3161eecb8ed56b18dee2ad66bd38766b5ecc1b5b5"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 94,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_spec-changed-budget",
+      "output_tree_unchanged": true,
+      "reason": "budget_mismatch",
+      "recorded_at": "2026-11-03T22:10:56.889799+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget/manifest.input.json.txt",
+          "sha256": "85a08daa99349fbba90706fac3f8b47634bbd03f7fde0137377e6910ec244641"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget/stderr.txt",
+        "sha256": "da078035eccaeb304df959e929adc9cb9f71775d20d4dd05067a85ccff8c9375"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 164,
+      "exit_code": 0,
+      "label": "post_spec-changed-budget-healthy-control",
+      "recorded_at": "2026-11-03T22:10:57.055064+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-dh_38hme/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget-healthy-control/manifest.input.json.txt",
+          "sha256": "e47e06d0b5bde90cbc0f72b4aa8440292a2b9d6b40a5b4033fbb9b7fcc25646b"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-changed-budget-healthy-control/stdout.txt",
+        "sha256": "01596e8022bdb0eb9f579d99a6f349824a3285992236fec806d318163d9847a4"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/native.json",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json",
+        "--prepare-policy"
+      ],
+      "duration_ms": 173,
+      "exit_code": 0,
+      "label": "post_spec-healthy-prepare",
+      "recorded_at": "2026-11-03T22:10:57.230187+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-prepare/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-prepare/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-prepare/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-prepare/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-prepare/stdout.txt",
+        "sha256": "9f9149f29f059869f252afe6ad84c0a4454d6d18a36a4b2e11b0fd1a9b888a48"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/_executor-ledgers/36eb2e06928d7eb4a8ae7fb615c6af9bff0638b843e548c4d52bc5cd8bac48a8/blobs/fd8610333ade864ffbd1ac47e90bd630606efc45e65878ee266de496be1b84b7.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 225,
+      "exit_code": 0,
+      "label": "post_spec-healthy-final",
+      "recorded_at": "2026-11-03T22:10:57.456065+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-final/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-final/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-final/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-final/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-final/stdout.txt",
+        "sha256": "c82dcaa7bdf44976917486b082cfc3c804faa06e14b326807178cbd4974a8d22"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/_executor-ledgers/36eb2e06928d7eb4a8ae7fb615c6af9bff0638b843e548c4d52bc5cd8bac48a8/blobs/fd8610333ade864ffbd1ac47e90bd630606efc45e65878ee266de496be1b84b7.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json",
+        "--check-result",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 177,
+      "exit_code": 0,
+      "label": "post_spec-healthy-check",
+      "output_tree_unchanged": true,
+      "recorded_at": "2026-11-03T22:10:57.639016+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-check/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-check/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-check/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-check/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-healthy-check/stdout.txt",
+        "sha256": "c82dcaa7bdf44976917486b082cfc3c804faa06e14b326807178cbd4974a8d22"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/_executor-ledgers/36eb2e06928d7eb4a8ae7fb615c6af9bff0638b843e548c4d52bc5cd8bac48a8/blobs/fd8610333ade864ffbd1ac47e90bd630606efc45e65878ee266de496be1b84b7.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 90,
+      "error_code": "E_SOURCE_DRIFT",
+      "exit_code": 1,
+      "input_ref": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+      "label": "post_spec-config-drift-collect",
+      "output_tree_unchanged": true,
+      "reason": "source_hash_mismatch",
+      "recorded_at": "2026-11-03T22:10:57.738846+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-collect/config.input.json.txt",
+          "sha256": "98ef4630de8b479fd2b9ec24129c1866df9e70dc973f217519ca765956404fa2"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-collect/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-collect/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-collect/stderr.txt",
+        "sha256": "dab752799d930351944bf3da1b759db5db37f3588981b7fa363559ad86f9928f"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-collect/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/_executor-ledgers/36eb2e06928d7eb4a8ae7fb615c6af9bff0638b843e548c4d52bc5cd8bac48a8/blobs/fd8610333ade864ffbd1ac47e90bd630606efc45e65878ee266de496be1b84b7.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json",
+        "--check-result",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/audit-reports/post_spec-R1-task015-client-task015-isolated-aggregated/post_spec-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 95,
+      "error_code": "E_SOURCE_DRIFT",
+      "exit_code": 1,
+      "input_ref": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+      "label": "post_spec-config-drift-check",
+      "output_tree_unchanged": true,
+      "reason": "source_hash_mismatch",
+      "recorded_at": "2026-11-03T22:10:57.842578+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-check/config.input.json.txt",
+          "sha256": "98ef4630de8b479fd2b9ec24129c1866df9e70dc973f217519ca765956404fa2"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-check/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_spec-g2zk4ncm/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-check/manifest.input.json.txt",
+          "sha256": "e8ddb1a67489e04f3d1855338b890f0caa58657d2dd783c8849eb445136a682c"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-check/stderr.txt",
+        "sha256": "dab752799d930351944bf3da1b759db5db37f3588981b7fa363559ad86f9928f"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_spec-config-drift-check/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 165,
+      "exit_code": 0,
+      "label": "post_planning-healthy-build",
+      "recorded_at": "2026-11-03T22:10:58.028277+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-build/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-build/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-build/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-build/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-build/stdout.txt",
+        "sha256": "7ef3613f3380ef49ec4c261dbcf73784d47ef69436964fe0e1f6994315594ca2"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 93,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_planning-manifest-false",
+      "output_tree_unchanged": true,
+      "reason": "guard_mismatch",
+      "recorded_at": "2026-11-03T22:10:58.138729+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false/manifest.input.json.txt",
+          "sha256": "0eaf6052495e2c3596c6ce5b727f9bfe4adee85580d152815d63c4fa8c4ccdf2"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false/stderr.txt",
+        "sha256": "32ee32b6e6076c99773d073c222f3d6279e82c451802fcb6a7cd1d3f648b8edd"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 167,
+      "exit_code": 0,
+      "label": "post_planning-manifest-false-healthy-control",
+      "recorded_at": "2026-11-03T22:10:58.306907+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-nf9bck_y/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false-healthy-control/manifest.input.json.txt",
+          "sha256": "c14c7baaca4bb51acd471422a34adc3fb85635f294bbef9a483367d9f2c8848a"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-manifest-false-healthy-control/stdout.txt",
+        "sha256": "5de7c49a3b95e7dfa07e3d6eb2f76d3d23b7e37866172dfdfaca1ec3527c2316"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 119,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_planning-deleted-role",
+      "output_tree_unchanged": false,
+      "reason": "team_mismatch",
+      "recorded_at": "2026-11-03T22:10:58.444533+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role/manifest.input.json.txt",
+          "sha256": "a81793f0d5a2ba9c8c662c6c5ceda65210d5d3ffea9a9fadfbee76d1fcb359c2"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role/stderr.txt",
+        "sha256": "023bf59926ba6f3035646c2ed41a69f81b3dcc40f4b4b4f168dab7c850f48ce7"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 203,
+      "exit_code": 0,
+      "label": "post_planning-deleted-role-healthy-control",
+      "recorded_at": "2026-11-03T22:10:58.648887+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-jaq956nh/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role-healthy-control/manifest.input.json.txt",
+          "sha256": "dd4f20348c6544924921b290bbe49c5d7c42cf12ad3ea321455d8a4061f00167"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-deleted-role-healthy-control/stdout.txt",
+        "sha256": "2a94df5660700f8c7f1fd3b1a48bac7ddc9b65949a3d40c5006005a1a5d1544a"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "build_scope_metadata_observation": "Build may create scope metadata before rejecting; no no-write claim is made for build. Collect/check separately assert full unchanged output trees.",
+      "duration_ms": 99,
+      "error_code": "E_MANIFEST_MISMATCH",
+      "exit_code": 1,
+      "input_ref": "",
+      "label": "post_planning-changed-budget",
+      "output_tree_unchanged": true,
+      "reason": "budget_mismatch",
+      "recorded_at": "2026-11-03T22:10:58.769609+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget/manifest.input.json.txt",
+          "sha256": "85fa82441d5d9fbf2300581793c99be62b645b04d9e3efeee5e70fe8a9cca6c8"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget/stderr.txt",
+        "sha256": "da078035eccaeb304df959e929adc9cb9f71775d20d4dd05067a85ccff8c9375"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "build",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/manifest.json",
+        "--output-dir",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated"
+      ],
+      "duration_ms": 163,
+      "exit_code": 0,
+      "label": "post_planning-changed-budget-healthy-control",
+      "recorded_at": "2026-11-03T22:10:58.933296+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget-healthy-control/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget-healthy-control/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-ecar3ub0/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget-healthy-control/manifest.input.json.txt",
+          "sha256": "d95233315c0f0cab4c6512ab4c3e22441ea2646b7e4174e0bd48187c0f5a4343"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget-healthy-control/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-changed-budget-healthy-control/stdout.txt",
+        "sha256": "f6817593d58a80a87d9c0425e345fba61c342f606ac30ece50e29efd152fe9b3"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/native.json",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json",
+        "--prepare-policy"
+      ],
+      "duration_ms": 161,
+      "exit_code": 0,
+      "label": "post_planning-healthy-prepare",
+      "recorded_at": "2026-11-03T22:10:59.095689+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-prepare/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-prepare/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-prepare/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-prepare/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-prepare/stdout.txt",
+        "sha256": "3623e4010829ecb2f6d4ec7cc03f056b047ee03214fa05a3fcab1929a1288bde"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/_executor-ledgers/39e9a7743d00229cb723f7d85dc7a5f357869942836a6e165817b00a532d1ff7/blobs/d15585bdee25a67a9ffea12c9470ecbdba9cb926e1c442f90901cf5e8aa6309a.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 231,
+      "exit_code": 0,
+      "label": "post_planning-healthy-final",
+      "recorded_at": "2026-11-03T22:10:59.327909+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-final/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-final/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-final/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-final/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-final/stdout.txt",
+        "sha256": "2c3a3fc95ea04a817f2a729b688b84b81b4280f7f52ffd45c4ba244fa807a735"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/_executor-ledgers/39e9a7743d00229cb723f7d85dc7a5f357869942836a6e165817b00a532d1ff7/blobs/d15585bdee25a67a9ffea12c9470ecbdba9cb926e1c442f90901cf5e8aa6309a.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json",
+        "--check-result",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 175,
+      "exit_code": 0,
+      "label": "post_planning-healthy-check",
+      "output_tree_unchanged": true,
+      "recorded_at": "2026-11-03T22:10:59.508178+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-check/config.input.json.txt",
+          "sha256": "954edb4ae35a52f2b5de3dbc583568606c6f22208830267cf407eab009ef1a21"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-check/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-check/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-check/stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-healthy-check/stdout.txt",
+        "sha256": "2c3a3fc95ea04a817f2a729b688b84b81b4280f7f52ffd45c4ba244fa807a735"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/_executor-ledgers/39e9a7743d00229cb723f7d85dc7a5f357869942836a6e165817b00a532d1ff7/blobs/d15585bdee25a67a9ffea12c9470ecbdba9cb926e1c442f90901cf5e8aa6309a.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 115,
+      "error_code": "E_SOURCE_DRIFT",
+      "exit_code": 1,
+      "input_ref": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+      "label": "post_planning-config-drift-collect",
+      "output_tree_unchanged": true,
+      "reason": "source_hash_mismatch",
+      "recorded_at": "2026-11-03T22:10:59.633378+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-collect/config.input.json.txt",
+          "sha256": "98ef4630de8b479fd2b9ec24129c1866df9e70dc973f217519ca765956404fa2"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-collect/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-collect/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-collect/stderr.txt",
+        "sha256": "d642cbe8104782860247afc78dcc094cb5d0a4203bb79069848eceb63471bdb0"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-collect/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "collect",
+        "--repo-path",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo",
+        "--manifest",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+        "--build-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/build-record.json",
+        "--workflow-run-id",
+        "task015-synthetic-run",
+        "--native-record",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/_executor-ledgers/39e9a7743d00229cb723f7d85dc7a5f357869942836a6e165817b00a532d1ff7/blobs/d15585bdee25a67a9ffea12c9470ecbdba9cb926e1c442f90901cf5e8aa6309a.blob",
+        "--output",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json",
+        "--check-result",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/audit-reports/post_planning-R1-task015-client-task015-isolated-aggregated/post_planning-R1-task015-client-task015-isolated-aggregated.json"
+      ],
+      "duration_ms": 91,
+      "error_code": "E_SOURCE_DRIFT",
+      "exit_code": 1,
+      "input_ref": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+      "label": "post_planning-config-drift-check",
+      "output_tree_unchanged": true,
+      "reason": "source_hash_mismatch",
+      "recorded_at": "2026-11-03T22:10:59.733932+00:00",
+      "source_refs": {
+        "config": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/.aria/config.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-check/config.input.json.txt",
+          "sha256": "98ef4630de8b479fd2b9ec24129c1866df9e70dc973f217519ca765956404fa2"
+        },
+        "defaults": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/plugin/skills/config-loader/DEFAULTS.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-check/defaults.input.json.txt",
+          "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+        },
+        "manifest": {
+          "origin_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/post_planning-g00ofre6/repo/manifest.json",
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-check/manifest.input.json.txt",
+          "sha256": "5c93e58241704b29927ed4eff2726a23c221188db7316f405e3cb3d60b6e5d91"
+        }
+      },
+      "stderr": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-check/stderr.txt",
+        "sha256": "d642cbe8104782860247afc78dcc094cb5d0a4203bb79069848eceb63471bdb0"
+      },
+      "stdout": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/observations/post_planning-config-drift-check/stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "experiments_all_judged": true,
+  "followups": [
+    {
+      "kind": "documentation_temporal_qualification",
+      "needed": "Task014 documents stating adoption is pending TASK015 describe the pre-adoption synchronization time. After this adoption, qualify these as historical timestamps or reference this evidence in a separately authorized documentation pass. Protected documentation was not edited here.",
+      "task_id": "TASK-014"
+    },
+    {
+      "kind": "real_entry_validation_pending",
+      "task_id": "TASK-016"
+    },
+    {
+      "kind": "formal_rule6_pending",
+      "task_id": "TASK-017"
+    }
+  ],
+  "not_judged": [],
+  "pr38_resumed": false,
+  "protected_source_count": 19,
+  "protected_sources_after": {
+    ".aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+    ".aria/audit-reports/audit-executor-minimal-repair/unit-evidence.json": "b373e5182939ee67c2828bc7b800e03af8c2d5ecf781afb6931fcc2b6defb815",
+    "aria/skills/audit-engine/SKILL.md": "fe271d5e2dd0997a830a5a68329f8649aa9452bbdbc4d6173fc8c9391de3fe49",
+    "aria/skills/audit-engine/references/convergence-algorithm.md": "e4d8318f32fb3d4efa539967e2070b7eeefbab39b338bdfdf98251ec644ee3b9",
+    "aria/skills/audit-engine/references/execution-modes.md": "d3917d753fb73a8aa3c09f81be09890aea515e3f4e28b71bde814a647d2f0bb3",
+    "aria/skills/audit-engine/references/executor-contract.md": "c218b2e01247299a2d0ff89ab63ef561b5d3b7ac697d1355f82a49ddae1cfdf6",
+    "aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "088513752a11bab2039ac530b99830b56581292ed0e675c8ff1c83f5cb6815d1",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+    "aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+    "aria/skills/audit-engine/tests/test_audit_executor_config.py": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+    "aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+    "aria/skills/audit-engine/tests/test_sibling_spec_probe.py": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+    "aria/skills/config-loader/DEFAULTS.json": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+    "aria/skills/config-loader/SKILL.md": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122"
+  },
+  "protected_sources_before": {
+    ".aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+    ".aria/audit-reports/audit-executor-minimal-repair/unit-evidence.json": "b373e5182939ee67c2828bc7b800e03af8c2d5ecf781afb6931fcc2b6defb815",
+    "aria/skills/audit-engine/SKILL.md": "fe271d5e2dd0997a830a5a68329f8649aa9452bbdbc4d6173fc8c9391de3fe49",
+    "aria/skills/audit-engine/references/convergence-algorithm.md": "e4d8318f32fb3d4efa539967e2070b7eeefbab39b338bdfdf98251ec644ee3b9",
+    "aria/skills/audit-engine/references/execution-modes.md": "d3917d753fb73a8aa3c09f81be09890aea515e3f4e28b71bde814a647d2f0bb3",
+    "aria/skills/audit-engine/references/executor-contract.md": "c218b2e01247299a2d0ff89ab63ef561b5d3b7ac697d1355f82a49ddae1cfdf6",
+    "aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "088513752a11bab2039ac530b99830b56581292ed0e675c8ff1c83f5cb6815d1",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+    "aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+    "aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+    "aria/skills/audit-engine/tests/test_audit_executor_config.py": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+    "aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+    "aria/skills/audit-engine/tests/test_sibling_spec_probe.py": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+    "aria/skills/config-loader/DEFAULTS.json": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+    "aria/skills/config-loader/SKILL.md": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122"
+  },
+  "protected_sources_equal": true,
+  "real_build_collect_invoked": false,
+  "recorded_at": "2026-11-03T22:11:21.257407+00:00",
+  "runner": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/typing-followup/verify_adoption.before.py",
+    "sha256": "6d7aeb1cbaf8c24135b0569b4dd2f685396cf065ea428fa80a6e4c647707450d"
+  },
+  "schema_version": 1,
+  "source_refs": {
+    "authority": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/phase-b-authority.json",
+      "sha256": "b40fa321129dd175b9f48979c9fdf08d65b4a3047a24e04b24de3efaf407cd5c"
+    },
+    "defaults": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/sources/defaults.json.txt",
+      "sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+    },
+    "executor": {
+      "path": "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py",
+      "sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe"
+    },
+    "frozen_before_record": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task015-before.json",
+      "sha256": "d31671e26638f49693ee8cdf600d126fbbf870971db44541c8af80aea45b57cb"
+    }
+  },
+  "source_sha": {
+    "main": "cf0b25d220dd981eaead25ab834e7f96932aa559",
+    "plugin": "0ade987b8dac6c928c19fb0ccff36488d3937f98"
+  },
+  "started_at": "20261103T221055950557Z",
+  "structural_interpretation": {
+    "necessary_parent_path": "/audit",
+    "raw_leaf_only_equal": {
+      "config": true,
+      "template": false
+    },
+    "restored_target_setting_equal": {
+      "config": true,
+      "template": true
+    },
+    "review_disposition": "Independent reviewer must assess exact Spec wording; no exception or acceptance claimed.",
+    "rule": "Only prune the newly introduced audit parent when before has no audit and after.audit minus the target is exactly an empty object; preserve existing parents and any sibling.",
+    "template_parent_new": true
+  },
+  "task_accepted": false,
+  "task_id": "TASK-015",
+  "tests": {
+    "config-suite": {
+      "duration_ms": 3,
+      "errors": 0,
+      "failures": 0,
+      "judged": 6,
+      "log": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/config-suite.log",
+        "sha256": "4b36f4d395067c91a4047a31ffacf8c21564b8fd7697857988e57845b954ccd3"
+      },
+      "passed": true,
+      "skipped": 0,
+      "tests_run": 6
+    },
+    "offline-related": {
+      "duration_ms": 21014,
+      "errors": 0,
+      "failures": 0,
+      "judged": 75,
+      "log": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/offline-related.log",
+        "sha256": "65120f746a864aa6a526d24e47e2a2f87469201d0889a0e5a2c6a67b81d12264"
+      },
+      "passed": true,
+      "skipped": 0,
+      "tests_run": 75
+    }
+  },
+  "workflow_or_llm_invoked": false,
+  "workspace_status": {
+    "main": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/main-status.txt",
+      "sha256": "6d964609e7a6a275aebb433ffba8c4dfd0926f615c4d638633c45dfd3b218af7"
+    },
+    "plugin": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-015/runs/20261103T221055950557Z/plugin-status.txt",
+      "sha256": "31f8ed5648616144d30a76a51e6716cd9a5f497bfd42d40a2b4d86ee66f138ff"
+    }
+  }
+}

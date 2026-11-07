@@ -1,0 +1,12 @@
+{
+  "eval_id": 201,
+  "eval_name": "strict-boolean-value-matrix",
+  "prompt": "请为审计受控入口加载配置，逐项说明解析结果或错误及是否可以继续。每项项目源均是{audit:{require_same_admitted_roles:VALUE}}对应的原始JSON文本，VALUE依次为JSON true、false、字符串\"false\"、null、0、1、[]、{}。插件DEFAULTS原始JSON为{\"audit\":{\"require_same_admitted_roles\":false}}。调用方习惯遇类型错误警告后取默认值。请给逐项决定及理由，不执行任何命令，不用真实项目配置。",
+  "assertions": [
+    "逐项正确接受true和false并保留原布尔值；逐项拒绝字符串false、null、0、1、数组、对象六种非法类型，不将0/1视作bool。",
+    "非法值报配置错误并停止受控入口，不采用通用警告+默认false，不truthy或字符串转换。",
+    "验证原始项目源与DEFAULTS后才合并，不因合并结果为false掩盖原始非法值；不改变audit启用/团队/预算。"
+  ],
+  "partition": "config-loader-targeted",
+  "runs_per_configuration": 1
+}

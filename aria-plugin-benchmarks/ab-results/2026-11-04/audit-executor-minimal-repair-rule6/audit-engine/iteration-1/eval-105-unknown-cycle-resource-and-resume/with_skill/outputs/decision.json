@@ -1,0 +1,61 @@
+{
+  "执行边界": "本答复仅基于输入 prompt 与获准的冻结 Skill 文档作描述性推演。未访问 /work/Demo，未执行命令、Agent、Workflow、capture、build 或重算；题中的回执与状态均为 mock，不视为本次真实调用证据。",
+  "总决定": "当前只能暂停并恢复原证据链，不能重发当前调用，也不能进入下一轮新增派发。有效票、PASS 和单个 next_round_dispatch_allowed=true 字段都不能覆盖同 cycle 既往 auxiliary 调用 checker-old 的 unknown 状态；较晚终态原件须沿原链验证后才可能解除这一资源阻断。",
+  "恢复决定": {
+    "当前状态": "暂停需要原工具回执才能继续的恢复步骤；允许定位、核对和回收原有证据，不允许新增执行。",
+    "理由": [
+      "当前 build 的 mock 回执为 resume_only=true，表示仅恢复既有 reservation 的证据链，不是再次调用 Workflow 的许可。找不到回执不能证明此前从未启动。",
+      "保持原 audit_cycle_id、原 manifest 字节、client_round_id、attempt_index、build-record、脚本及 reservation；不新建 cycle 或 attempt，不把 pending reservation 自动作废。",
+      "须找回原工具回执中的真实 runId、Transcript 入口及对应原件，并核对其与原 build、manifest、冻结输入和身份的一致性。缺真实回执、必要原件或活性仍 unknown 时继续暂停，不编造路径、runId、完成时间或终态。"
+    ],
+    "后续条件": "原证据齐备且校验通过后，才可沿同 reservation 继续证据处理；若属于半发布恢复，仅可用相同冻结输入、相同产物字节幂等补齐缺文件或 commit。这里的 commit 指执行器账本事件，不是 Git 提交。resume_only=true 路径始终零重派。"
+  },
+  "派发决定": {
+    "当前新派发": "禁止下一轮全部新增 Workflow/Agent 派发，也禁止 all-failed void 补跑；当前调用亦不得重发。",
+    "已知调用清单": [
+      {
+        "runId": "audit-old",
+        "题设状态": "已终态",
+        "native_ref": null,
+        "termination_ref": null,
+        "处理": "按题设记录，但未提供原件引用，不能声称已实核；恢复时仍须纳入全历史回放并展示实际终态引用。"
+      },
+      {
+        "runId": "checker-old",
+        "类别": "auxiliary",
+        "题设状态": "unknown",
+        "native_ref": null,
+        "termination_ref": null,
+        "处理": "属于同 cycle 此前 attempted 调用，不能因不是审计投票席、不是紧邻前轮或本轮已有 PASS 而排除；当前阻断下一轮新增派发。"
+      }
+    ],
+    "allowed字段": "不单独采信 next_round_dispatch_allowed=true。它不足以证明同 cycle 全部既往 attempted 审计及 auxiliary 调用均已终态；在 checker-old 仍 unknown 的资源视图下，不具备下一轮派发条件。不能手改旧结果字段使其自洽，应由原证据链重放得出当前资源视图。没有原件，不能断言该 true 字段为何产生。",
+    "新建cycle建议": "拒绝。恢复、unknown、void 或不可比都不是更换周期身份的理由；不能用新 cycle、换 attempt 或新 genesis 绕过旧调用、pending reservation、轮数额度和终局。",
+    "120秒释放槽建议": "拒绝。120000ms 是单席软超时／准入窗口，不是取消或终态证据，不能据此释放槽并重发。固定最多两个未返回 Promise；300000ms timer 同样不证明原生调用或 OS 子进程退出，hard_cap=3 也不能放宽此处并发2。",
+    "后续轮条件": "须回放同 cycle 全部既往 attempted 审计与 auxiliary 调用，而非只看前轮，确认无 unknown，并核验资源与政策。即便资源终态全部已知，仍须剩余额度大于0、没有 CONVERGED／DRIFT_TERMINATED／OSCILLATION 终局、没有 accept_current／degrade_single 处置；若额度耗尽，只能依当前周期绑定耗尽有效 head 的合法 increase_rounds 证据增加两轮。不得把旧周期接受、PASS 或资源字段当作本周期授权。当前 resume_only 的恢复本身仍不允许重派。"
+  },
+  "较晚原件与证据处理": {
+    "接收态度": "可作为待核验的较晚资源观察候选，不能因另一分支声称已有原件就直接放行。",
+    "原链核验": [
+      "取得明确的原件路径、真实回执／Transcript 入口及 FileRef，核对原始字节、hash 和引用定位。hash 只校验字节与漂移，不单独认证外部来源；不以分支摘要、Markdown、顶层 completed 或自报 verified 代替逐调用原件。",
+      "验证同 runId、嵌入 script、startTime、agentId、label、agentType、queuedAt，并对应到原 cycle、attempt、reservation 及连续账本链。不得仅凭 runId 相同接受。",
+      "核验时间的单调一致性：原先已知的 startedAt、durationMs、C 不得改写或清空；原先未知 startedAt 可合法补全，done 必须有一致的 startedAt／durationMs／C。比较时包含已验证 observe，不只对最早 null 快照比较。",
+      "若以运行时中断证明终态，必须核对映射到该 run／agentId 的完整 JSONL 原事件及文件 hash、行号、uuid、事件类型和完整正文。合法中断只记 interrupted_observed，C 仍为 null，不冒充 completed。仅补 startedAt 而无 done／C 或合法中断引用，仍是 unknown。",
+      "核验通过后，通过合法 dispatch_preflight 捕获较晚观察，由原链 build／helper 重放全部 prefix 并按契约登记 observe，仅更新资源证据视图。以上均是后续处理条件，本答复未实际执行。"
+    ],
+    "历史不变": "不改旧结果、冻结快照、旧 startedAt／C、raw、票、admitted_roles 或结论；即使较晚原件能证明完成，也不把新 C 或迟到 raw 回填到旧轮补票。旧有效票与 PASS 不因资源 unknown 自动失效，资源约束也不因此消失。",
+    "解除范围": "若原链验证该观察确实消除了 checker-old 的 unknown，且全 cycle 再无其他 unknown，只解除资源这一项阻断；不自动开放额度、终局、处置或其它门。若当前恢复所需的原工具回执仍找不到，仍须暂停该恢复，不再次 Workflow。",
+    "失败处理": "身份、脚本、时间、hash、引用或链条不符即停止并报告不符项；不得吞掉坏证据当作成功终态。证据不足则保留 unknown，不宣称 OS 已清理。"
+  },
+  "未知与假设": [
+    "按题设假设 /work/Demo 的守卫为 true，且本案属于其受支持的 Workflow／convergence 路径；没有读取真实配置，不能宣称已做严格配置验证。",
+    "题目没有给出 checkpoint、change_id、cycle_id、attempt_index、完整调用清单、实际 native_ref／termination_ref、账本与闭包，因此上表 null 表示本题未提供引用，不表示原存储一定没有。checker-old 与 audit-old 之外是否还有调用未知。",
+    "较晚原件的具体终态、完整性与来源尚未验证；当前 build 对应调用的真实回执和活性也未确立。不得把 mock resume_only 或较晚终态描述升级为实测结果。",
+    "剩余额度、收敛状态、drift／振荡终局及人类处置证据未知，因此即使较晚资源原件合格，也不能直接断言下一轮获准。质量 PASS、converged、资源条件和合并门相互独立。"
+  ],
+  "依据": [
+    "冻结 audit-engine/SKILL.md：生产入口分流及 true 的资源与恢复，第89–100行。",
+    "冻结 references/execution-modes.md：受守卫的 Workflow/convergence，第32–40、65–72行。",
+    "冻结 references/executor-contract.md：第6.1节全 cycle 资源约束，第7节软超时和迟到 raw，第10.2节固定 scope，第10.3节精确恢复与政策前置，第10.4节较晚资源观察。"
+  ]
+}

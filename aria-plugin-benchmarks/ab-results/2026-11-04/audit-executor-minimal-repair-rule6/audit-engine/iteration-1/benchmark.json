@@ -1,0 +1,890 @@
+{
+  "metadata": {
+    "skill_name": "audit-engine",
+    "skill_path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine",
+    "executor_model": "Codex API/gpt-6.1-sol",
+    "analyzer_model": "inline_controller_identity_not_separately_metered",
+    "timestamp": "2026-11-04T01:39:13.461884+00:00",
+    "evals_run": [
+      1,
+      2,
+      3,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107
+    ],
+    "runs_per_configuration": 1,
+    "aggregation_method": "official_schema_manual_derived_metrics",
+    "metrics_unknown": [
+      "tokens"
+    ],
+    "statistical_unit": "one executor per case per arm; across-case distribution",
+    "analysis_notes_ref": {
+      "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/analysis-notes.json",
+      "sha256": "7cd378f23899901af3b39c4325567b46e9febeef20b6376f92b6574e6e7c66f2"
+    }
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "per-round-sibling-probe-entry-and-render-ALPHA",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "pass_rate": 0.75,
+        "time_seconds": 122.122,
+        "tokens": null,
+        "tool_calls": 8,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+          "passed": true,
+          "evidence": "case 1 的 /candidate-2/outputs/decision.json，round_2_entry_steps[1].command 给出完整拟调用串：python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/sibling_spec_probe.py\" --own-spec-dir \"demo-spec\" --repo-path \"/work/Demo\"。两个参数均已绑定题设值，并说明本次不执行。"
+        },
+        {
+          "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+          "passed": false,
+          "evidence": "case 1 的 /candidate-2/outputs/decision.json，round_2_report.markdown 的 Sibling probe 行为 <span style=\"color: red\">检测到 1 份同 issue 的竞品 Spec（含 1 份已完成的 Spec）…</span>，并正确给出 archive 来源。但该拟写行没有断言明确要求的红色圆点；HTML 红色文字不等于“带指定圆点”。计数、issue 和归档标注满足，其余子项缺失，整条仍 FAIL。"
+        },
+        {
+          "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+          "passed": true,
+          "evidence": "case 1 的 /candidate-2/outputs/decision.json，decision 写“只作 advisory 告警，不自行改变质量 verdict、收敛判定或 Round 3 路由”；step 5 明确不因命中停止审计；effects 分别说明不改变 severity/verdict、不改变稳定性与投票条件、不强制继续或终止 Round 3。其它资源或配置门被明确区分为独立条件。"
+        },
+        {
+          "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+          "passed": true,
+          "evidence": "case 1 的 /candidate-2/outputs/decision.json，step 1 明确“Step 0 是周期内一次性步骤，不在 Round 2 重做”；step 2 在本轮 Agent 开始前重新调用探针；decision 又写“不能复用 Round 1 的扫描结果”。effects.round_3 还要求进入 Round 3 时再次跑探针。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "probe-not-established-renders-unverified-BETA",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "pass_rate": 1.0,
+        "time_seconds": 184.773,
+        "tokens": null,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+          "passed": true,
+          "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形A.探针记录行是“- Sibling probe: **未能核实** —— 本轮竞品扫描未取到完整证据 (原因: fetch_failed；origin 的 error_kind=network，scanned=0、refs_scanned=0)。”报告位置明确为 ### Round 1，未将结果渲染为无竞品。"
+        },
+        {
+          "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+          "passed": true,
+          "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形B.探针记录行明确“**未能核实**……原因: 探针 exit=1，stdout 为空、无可解析 JSON；stderr 为 Python traceback，具体异常原因未知”。理由又说明 not_established 是消费方兜底类别，不伪造脚本返回字段，也不把 traceback 当阴性扫描结果。"
+        },
+        {
+          "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+          "passed": true,
+          "evidence": "case 2 的 /candidate-1/outputs/decision.json，共同规则.流程边界明确“不阻断本轮，不改变审计 verdict、收敛判定或轮次路由”；情形 A、B 的影响字段分别确认继续既定 Challenge，不据 fetch_failed 或 exit=1 改审计 verdict，也不额外制造收敛或不收敛条件。兜底处理只将报告归为未能核实，未套用 pre_merge 门的阻断规则。"
+        },
+        {
+          "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+          "passed": true,
+          "evidence": "case 2 的 /candidate-1/outputs/decision.json，情形A.能否断言没有竞品答“不能……只是没有取得命中证据，不是完整扫描后的阴性证据”；情形 B 同字段答“不能……只能说明本轮未能核实，不能说明没有同 issue 的竞品 Spec”。两种情形均无相反结论。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "completeness-gate-change-scope-and-phase-a-only-TARGETED",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "pass_rate": 1.0,
+        "time_seconds": 114.453,
+        "tokens": null,
+        "tool_calls": 8,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_planning status=missing、matched=[]、matched_count=0，理由明确 catalog-sync-retry 报告“不能抵充 widget-export-pipeline”。ERROR 行还列出本 change 所需的中缀或 .md 末段匹配条件；同时以 tasks.md 存在排除 no-a2-artifact 通道。"
+        },
+        {
+          "text": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_spec status=present、matched_count=1；理由逐项说明以 post_spec- 开头、以 .md 结尾，“去掉扩展名后以 -widget-export-pipeline 结尾，满足本 change 的报告归属匹配”。这是明确采用末段分支，而非错误要求中缀双连字符。人读行是“[OK] post_spec@widget-export-pipeline: 1 份”。"
+        },
+        {
+          "text": "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_implementation status=not_applicable、reason=phase-a-only-no-implementation；解释同一 git toplevel、非空 diff 和全部三文件的目录条件。拟输出为“[INFO] completeness gate: post_implementation@widget-export-pipeline not_applicable (phase-a-only-no-implementation); 依据 = diff 3 文件全部在 openspec/changes/widget-export-pipeline/ 或 .aria/audit-reports/ 下 (Phase A-only)”。"
+        },
+        {
+          "text": "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-2/outputs/decision.json，调用命令给出 python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_gate.py\"，并含 --repo-path \"$PR_REPO_ROOT\"、--diff-repo-path \"$PR_REPO_ROOT\"、--base \"origin/master\"、--anchor-base \"origin/master\"、--change-id \"widget-export-pipeline\"。解释两个路径绑定同一绝对根，并将未提供的 base 名显式列为假设，不冒充真实运行值。"
+        },
+        {
+          "text": "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-2/outputs/decision.json，最终路由明确 verdict=fail、exit_code=1、bypassed=false、允许进入正常pre_merge审计=false；说明“任何一个……对为 missing”即失败，not_applicable 不能抵消其它 missing，并要求在任何 Agent 调用之前停止。ERROR 附补审、改配置、豁免选项，另明确当前未授权执行这些变更。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 101,
+      "eval_name": "raw-guard-before-disabled-fallback",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 64.127,
+        "tokens": null,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "原始require_same_admitted_roles为字符串而不是boolean，明确判配置错误并停止；不把字符串转换false或truthy。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的“决定”给出“配置类型错误，入口阻断”；“理由”明确“字符串 \\\"false\\\"，不是 JSON boolean false”，并禁止“去掉引号、按真假值转换、当作缺失字段”。“下一动作”要求报告字段级类型诊断并停止后续处理。"
+        },
+        {
+          "text": "即使audit.enabled=false且通用loader已返回，仍要求在分流/静默返回之前校验两份原始源；不把该case判为正常disabled完成。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的“理由”规定“原始项目 JSON 与同一插件的 DEFAULTS 必须分别通过校验后，才允许合并及继续后续入口”，严格入口必须早于验证回落、静默返回及关闭分流。“决定”中“当前能否直接按关闭跳过”为 false，明确拒绝用通用 loader 的 enabled=false 掩盖当前错误。"
+        },
+        {
+          "text": "没有build/Workflow/Agent或legacy继续动作，且不以注册默认false覆盖错误用户值。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的“理由”明确不能“用 DEFAULTS 的 false 将错误覆盖掉”；“下一动作”规定“不创建 manifest、不调用 Workflow 或 Agent，也不回落到 legacy 审计路径”，并停止审计派发和报告生成。公开 transcript 只有三次 Read 和一次 Write，没有所禁止的审计继续调用。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 102,
+      "eval_name": "false-preserves-complete-legacy",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 197.312,
+        "tokens": null,
+        "tool_calls": 11,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "严格解析成功后守卫false走完整legacy：原配置入口、默认团队、agent-team-audit单轮、旧汇总与旧报告消费，而非只说false兼容。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“完整处理”步骤1先严格验证两源再走 config-loader 原入口；步骤2解释显式 post_planning=convergence 优先于 manual；步骤3按旧优先级选择默认 tech-lead、qa-engineer、context-manager；步骤4明确经 agent-team-audit 单轮执行；步骤6说明按 category/scope 去重、合并 found_by、取最高 severity 和保留冲突；步骤7、9说明旧前轮比较及旧报告 reader/fallback 消费。完整链路不是一句“兼容”。"
+        },
+        {
+          "text": "不因无显式团队、无manifest或旧报告缺角色证据阻断，也不强制执行新helper/build/prepare。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“逐项阻断判断”分别把无显式 teams、无 manifest、有效旧报告缺参与集合列为不阻断。“完整处理”步骤1说明入口不 build、不创建 manifest；步骤4不强制 helper Workflow 链，步骤7不加入 population_comparable/missing_participant_evidence 门，步骤9不要求 helper JSON/MD/commit、check 或 sidecar 才能消费旧报告。"
+        },
+        {
+          "text": "保留一次性anchor、每轮sibling probe及既有收敛/预算/耗尽规则，不把新true资源限制反向套到false；post_planning不额外运行pre_merge gate。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 步骤4规定首轮前一次性固化不可变 anchor、每轮执行 sibling probe，保留三态 advisory。步骤5沿用 legacy max_parallel=2/hard_cap=3、120s/Agent、300s/轮和失败规则，明确不套 true 的全 cycle unknown 资源重放。步骤7、8保留四元组稳定与有效投票、振荡、默认 max_rounds=5 和耗尽三路径；步骤2明确“post_planning 不是 pre_merge，不在这里运行 pre_merge completeness gate”。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 103,
+      "eval_name": "true-first-round-exclusive-publication",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "pass_rate": 1.0,
+        "time_seconds": 132.121,
+        "tokens": null,
+        "tool_calls": 8,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "给出冻结manifest和真实helper build所需的计划后，从build回执workflow_script及build_record.identity/manifest hash构造audit Workflow(scriptPath,args)，不自造dispatcher或改成legacy。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的关键动作步骤2冻结 manifest、六项 identity、顺序不变的 role_id=agentType、完整 prompt、120000/300000/2 预算、policy_inputs 和未来 locator；步骤3计划调用 build。步骤4给出准确绑定“Workflow({scriptPath: build_receipt.workflow_script, args: {identity: build_record.identity, manifest_sha256: build_record.manifest.sha256}})”，并限定 resume_only=false；入口明确独占 Workflow/helper，不回 legacy。"
+        },
+        {
+          "text": "按实际回执runId/native/Transcript做capture audit index后prepare；prepare不是发布，不跳过它直接collect或手工persist。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 步骤5计划从回执取 mock audit-101 与显式 native/Transcript，核对 /runId、/script、/args、/result、/workflowProgress；“capture audit 绑定 build-record，并写 manifest 的 audit locator”，随后执行 collect --prepare-policy，首轮不传 previous。明确“prepare 只是冻结证据，不能在此时消费 round-result 或宣称发布”；步骤8同时禁止手工 persist 和 legacy 汇总。"
+        },
+        {
+          "text": "request.required=false的首轮不发checker、不伪造drift index；仍用prepare返回的冻结native进行final和同基础参数check（check仅多check-result）。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 步骤6按冻结 request.required=false、reason=first_round 明确“不调用独立 drift-checker Workflow，不 capture drift，不伪造 drift index”。步骤7分开 final 发布与只读 check，两者 --native-record 都取 prepare 的 /mock/frozen-audit.json，repo/manifest/build-record/runId/output/previous 保持相同，首轮都省略 previous，check 仅多 --check-result 指向同 ROUND_RESULT。"
+        },
+        {
+          "text": "仅check成功后核同reservation JSON/MD/commit与可选合法sidecar，消费check实际返回FileRef和已校验JSON；不重hash展示文件或用MD/PASS重算canonical_v1；接受converged=false首轮，不额外开轮求绿。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 步骤8及“可安全消费报告的条件”要求 final 完成、同冻结输入 check exit=0，逐项核 result/markdown/commit 的 hash、schema、identity 和 reservation 提交关系；可选 sidecar 必须同次 check 合法验证，本案无则不补造。明确采用 check 返回的真实 FileRef/闭包映射，“不改成自行 hash 展示 ROUND_RESULT”，canonical_v1 只认 helper JSON、不凭 MD/PASS 重算。最终结论接受首轮 converged=false，后续只按已校验 policy/额度/终态路由，不为求绿自行增轮或授权。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 104,
+      "eval_name": "required-checker-frozen-final-and-consumer",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "pass_rate": 1.0,
+        "time_seconds": 133.482,
+        "tokens": null,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "核request原字节/hash与资源，使用新独立checker Workflow而非复用审计实例/加投票席；scriptPath取policy_script.path，args包含identity、request_sha256、anchor记录value、conclusions。",
+          "passed": true,
+          "evidence": "packet 中 /candidate-1/outputs/decision.json 的“必要检查.冻结请求与资源”要求核对 policy_request/policy_script“各自原始字节及 hash”，并核全 cycle 资源，仅用剩余一槽。其“独立调用的拟议参数”逐项指定 scriptPath=/mock/checker.js 来自 prepare.policy_script.path，identity=request.identity、request_sha256=prepare.policy_request.sha256、anchor=解引用 AnchorRecord 后的 value、conclusions=request.conclusions；“独立性与回执”明确“新的独立 checker 实例，不能复用审计 agentId……也不增加审计投票角色”。这是具体拟议调用，而非声称已经执行。"
+        },
+        {
+          "text": "用checker自身runId/native/Transcript做capture drift并绑定prepare回执；不把audit runId或顶层status当checker/逐席完成，不用缺源伪造失败放行。",
+          "passed": true,
+          "evidence": "decision.json“必要检查.独立性与回执”明确以 checker-202 自己的 runId、native 和 Transcript 入口作 capture drift，“binding 使用原 prepare 回执”，写原 post_drift_index_path；明确不能将 audit-201 当 checker runId。资源检查不能只看 audit 顶层状态，后续还须核独立身份、原生时间和完整 raw/classifications。缺 native、Transcript、capture 或 hash 不符时不能伪造 drift_check_skipped；只有匹配的真实 spawn 失败或 checker 自身超时证据才可导出失败政策。"
+        },
+        {
+          "text": "final与check使用同一prepare.native_record冻结路径及相同repo/manifest/build/runId/previous/output，不回live增长文件补票；check只额外check-result。",
+          "passed": true,
+          "evidence": "decision.json“数据选择”指定两者均用 prepare.native_record.path=/mock/frozen-audit.json，live 增长不补旧 C/raw/票。“发布.final与check的共同基础输入”完整列出 /work/Demo、原 manifest、原 build-record、audit-201、冻结 native、原 previous_round 和原 output；“顺序”要求 check 用完全相同基础输入，“只增加 check-result 指向同一 ROUND_RESULT”，不得换 native、previous、output 或 build-record。"
+        },
+        {
+          "text": "check成功消费其原FileRef映射及同reservation JSON/MD/commit/合法sidecar，不重hash展示文件或AI重算；check失败分支即使MD写PASS也停止消费，不宣称发布通过。",
+          "passed": true,
+          "evidence": "decision.json“报告消费的两条分支.check成功”要求核 stdout 的 result/markdown/commit FileRef、同 run-key/identity 和本 reservation commit，并只消费同次 check 合法验证的 sidecar；按返回引用读取 blob，不换展示 round.json、不重算其 hash，canonical_v1 只由 helper 计算。失败分支明确 check exit=1 即“停止消费此结果，不对后续阶段或合并放行”，MD PASS、frontmatter 和文件存在均不能替代校验。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 105,
+      "eval_name": "unknown-cycle-resource-and-resume",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 102.374,
+        "tokens": null,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "检查全部既往attempt审计及auxiliary，列unknown调用/原件引用；即使PASS或单字段允许仍零新增派发，包括下一轮与void补跑，不宣称OS已清理。",
+          "passed": true,
+          "evidence": "packet 中 /candidate-2/outputs/decision.json 的“派发决定.已知调用清单”逐项列 audit-old 和 checker-old，native_ref/termination_ref 为 null 并明确表示题目未提供，不冒充实核；要求恢复时纳入全历史回放并展示实际引用。“后续轮条件”核同 cycle 全部既往 attempted 审计和 auxiliary，不能只看前轮；“当前新派发”明确禁止全部下一轮及 all-failed void 补跑，PASS/单字段无权覆盖，失败处理不宣称 OS 已清理。"
+        },
+        {
+          "text": "resume_only=true仅恢复原manifest/build/回执链，不再次Workflow；缺回执暂停，不能新cycle/attempt掩盖潜在已启动调用。",
+          "passed": true,
+          "evidence": "decision.json“恢复决定”明确保持原 audit_cycle_id、manifest 字节、client_round_id、attempt_index、build-record、脚本及 reservation，不新建 cycle/attempt，不自动 void pending；缺真实回执、原件或活性 unknown 时暂停，找不到回执不能证明未启动。后续始终“resume_only=true 路径……零重派”，只回收真实 runId/Transcript/原件。"
+        },
+        {
+          "text": "120s不是取消或释放槽，true并发最多2不因hard_cap=3放宽；较晚原件仅按同身份重放资源终态，不改旧C/raw/票，不越额度/终局/accept或degrade。",
+          "passed": true,
+          "evidence": "decision.json“120秒释放槽建议”说明 120000ms 是软超时/准入窗口而非取消，最多两个未返回 Promise，hard_cap=3 不放宽。“较晚原件与证据处理.原链核验”核 run/script/startTime/agentId/label/agentType/queuedAt 与时间单调性，通过 dispatch_preflight/helper 重放 prefix；“历史不变”禁止补旧 C/raw/票。“后续轮条件/解除范围”明确资源解除仍不能越额度、CONVERGED/DRIFT_TERMINATED/OSCILLATION、accept_current/degrade_single。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 106,
+      "eval_name": "true-unsupported-does-not-fallback",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 104.507,
+        "tokens": null,
+        "tool_calls": 4,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A缺显式团队、B覆盖、C非convergence、D非Workflow/不可用分别明确unsupported并停止，不自动选默认团队、删覆盖或切模式/模型/后端以求成功。",
+          "passed": true,
+          "evidence": "packet 中 /candidate-1/outputs/decision.json 的 cases A–D 分别明确“unsupported”及原因：缺 audit.teams.post_planning、agents_config/model 覆盖、固定配置 challenge、Workflow 不可用。对应 next_actions 均停止；A 不补默认团队，B 不悄悄丢弃覆盖，C 不改 convergence 或用 lane 掩盖固定模式，D 不直调 Agent/其他后端。不是仅凭一个关键词，而是逐分支保持原请求边界。"
+        },
+        {
+          "text": "E helper非零立即停止并呈现错误与输入引用，不临时persist、不绕prepare直接collect、不读旧报告或MD猜PASS。",
+          "passed": true,
+          "evidence": "decision.json cases.E 区分 supported_entry=true 与 helper_build_failed，在 build 失败点停止，不派 Workflow/prepare/final/check。reason 明确禁止“临时 persist、直接 collect 跳准备、AI 重算或从 MD/PASS 猜结果”；next_actions 要保留实际退出码、error_code、输入引用及错误输出。题目未给字面值时用 null 并注明未提供，不编造错误细节。"
+        },
+        {
+          "text": "所有分支均不因Phase B授权回legacy或自行激活/改写配置，不声称新守卫已保护不支持路径。",
+          "passed": true,
+          "evidence": "decision.json summary 规定五项均不能回退 legacy；assumptions 和 authorization_boundary 明确正常 Phase B 不包含改配置、关闭守卫或更换模式/团队/模型/后端授权。各分支停止当前请求，后续仅待有权方明确处理再重新核验；没有把 unsupported 路径或 build 非零记为已受新守卫保护、PASS 或完成。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 107,
+      "eval_name": "exhaustion-needs-real-disposition",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 199.316,
+        "tokens": null,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "先呈现耗尽原因/结论与变化，不能把旧cycle接受或自动推进授权当本周期选择；当前未回答就保持等待，不伪造approved=true。",
+          "passed": true,
+          "evidence": "packet 中 /candidate-2/outputs/decision.json 的 current_decision.status 保持等待且暂停新增派发；reason 明确历史接受和自动推进均非当前选择；allowed_now[0] 要展示最后有效轮结论、完整四元组新增/移除及有证据的未收敛原因，缺具体数据不编造。forbidden_now 禁止 approved=true、伪造回答/index/sidecar；human_disposition_evidence step 2 要求先展示上述内容再提问。"
+        },
+        {
+          "text": "计划从成功CHECK回执经capture question生成单题单选三选项的真实AskUserQuestion输入及唯一ASCII context绑定；之后用真实session及提问/回答UUID做capture disposition，不能拿工具通知当回答。",
+          "passed": true,
+          "evidence": "decision.json human_disposition_evidence steps 1–4 从成功 CHECK_RECEIPT 取实际 FileRef，capture question 生成恰一题、multiSelect=false、固定三标签及 action 顺序的真实 AskUserQuestion 输入；正文唯一 audit-disposition-context= 后接 canonical ASCII JSON，绑定 cycle/checkpoint/change/target_result/used_rounds/effective_limit。真实回答后，用显式 session JSONL、assistant.uuid 和 user.uuid 作为 call-uuid/response-uuid 做 capture disposition 写原 locator，明确通知、任务正文、普通散文或中断不能冒充回答；step 5 还核 tool_use_id/sourceToolAssistantUUID 等。"
+        },
+        {
+          "text": "处置后同基础参数final/check消费合法不可变sidecar，不覆盖旧JSON/MD或重跑审计；接受/降级仍converged=false且禁止继续派发，+2最多一次且须真实选择。",
+          "passed": true,
+          "evidence": "decision.json human_disposition_evidence step 6 要用原 final/check 全部基础参数及冻结输入，发布不可变 sidecar/账本事件，不改旧 JSON/MD、不重跑审计，并经 check 验证后消费 base+sidecar。if_real_answer_accept_current 标 overridden_by_user=true、converged=false 且不能新增轮；third_option 同样规定 degraded=true/false 收敛及禁止派发。increase_rounds 明确真实当前 head 回答、固定 +2、question uuid/tool_use_id/response uuid 一次消费，重复同字节只幂等返回。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "per-round-sibling-probe-entry-and-render-ALPHA",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "pass_rate": 0.25,
+        "time_seconds": 94.312,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "步骤清单里明确写出调用 sibling_spec_probe.py 的完整命令行, 含 `--own-spec-dir` 与 `--repo-path` 两个参数 (只写「跑探针」不写命令行不算)",
+          "passed": false,
+          "evidence": "case 1 的 /candidate-1/outputs/decision.json 中，commands.complete_probe_command=null；round2_entry_steps[1] 仅称“在本轮入口安排 sibling_spec_probe”，并明确“真实实现的命令行……未提供”。没有给出脚本调用及两个指定参数，描述性任务也不能以拒绝提供命令代替所问调用串。"
+        },
+        {
+          "text": "`### Round 2` 记录里渲染了一条带 🔴 的探针结果行, 写明检测到 1 份同 issue 的竞品 Spec 且标注该命中是「已完成的 Spec」(命中在 archive/ 下)",
+          "passed": false,
+          "evidence": "case 1 的 /candidate-1/outputs/decision.json，round2_report 虽列出“命中 1 条”、corpus=archive 和归档 proposal 路径，但没有要求的红色圆点，也未将命中标成“已完成的 Spec”；反而写“不能将其等同于……当前需求已交付”。同 issue 不证明重复劳动这一谨慎说明，不能替代规定的归档状态标注。"
+        },
+        {
+          "text": "明确说明探针结果不阻断本轮、不改变本轮 verdict、不改变收敛判定与是否进入下一轮的路由 (advisory)",
+          "passed": false,
+          "evidence": "case 1 的 /candidate-1/outputs/decision.json，round2_report 写“专用探针 gate 语义：未知……不能宣称该命中已按正式规则阻断或放行”，unknowns_and_assumptions 又写“不知道……是否将 sibling_found 定义为 advisory、阻断信号或其他类别”。它区分了探针与审计证据，但没有明确确认不阻断及不改轮次路由的规范。"
+        },
+        {
+          "text": "没有把探针放在 Round 1 前一次性执行的 Step 0 (Anchor 固化) 里, 而是作为每轮入口 (per-round) 步骤",
+          "passed": true,
+          "evidence": "case 1 的 /candidate-1/outputs/decision.json，decision.round_entry 写“本次进入 Round 2 时……安排本轮探针，而不是凭 Round 1 已结束就省略它”；round2_entry_steps[1] 进一步写“本轮有独立的探针检查点”。这是肯定的本轮入口安排，不是仅凭未出现 Step 0 判通过。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "probe-not-established-renders-unverified-BETA",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "pass_rate": 0.25,
+        "time_seconds": 62.375,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "情形 A 的 Round 1 记录行渲染为「未能核实」(逐字含这四个字) 并带上原因 fetch_failed, 而不是渲染成「无竞品」/「未发现竞品」/「没有竞品」",
+          "passed": false,
+          "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形A.Round_1_探针记录行写“竞品 Spec 探针：UNVERIFIED（status=degraded；reason=fetch_failed；verdict=not_established）”。它正确保留原因并拒绝无竞品结论，但报告行没有逐字包含要求的“未能核实”，故不能通过这条复合断言。"
+        },
+        {
+          "text": "情形 B (exit≠0 / stdout 非 JSON) 同样渲染为「未能核实」, 不渲染成「无竞品」类措辞, 也不把 traceback 当作「没有竞品」的证据",
+          "passed": false,
+          "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形B.Round_1_探针记录行是“竞品 Spec 探针：UNVERIFIED（执行异常；exit=1；stdout 为空；stderr 为 Python traceback）”。没有错误断言无竞品，也未把 traceback 当阴性证据，但没有渲染规定的“未能核实”消费措辞。"
+        },
+        {
+          "text": "两个情形都明确: 探针结果不阻断本轮、不改变 verdict、不改变收敛判定 (advisory, fail-closed 只作用于措辞)",
+          "passed": false,
+          "evidence": "case 2 的 /candidate-2/outputs/decision.json，共同判断.规则边界写“不能声称已核实实际引擎一定继续或一定中止”；A、B 均列“若探针是提示性观察项”可继续、“若……强制入口条件”不可越过的分支，且说可能存在收口前提。没有确认实际规则是 advisory、只影响措辞，不阻断及不改判定。"
+        },
+        {
+          "text": "对 (3) 明确回答「不能断言没有竞品」(零证据不当正证据), 而不是给出「可以认为没有竞品」的结论",
+          "passed": true,
+          "evidence": "case 2 的 /candidate-2/outputs/decision.json，情形 A、B 的“能否断言没有同issue的竞品Spec”均为 false；A 写“hits=[]……不证明没有同 issue 的竞品 Spec”，B 写“未取得可解析的探针结果，无法判断是否存在”。这不是仅凭关键词出现，而是两种情形均明确否定不存在结论。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "completeness-gate-change-scope-and-phase-a-only-TARGETED",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 4,
+        "total": 5,
+        "pass_rate": 0.2,
+        "time_seconds": 68.701,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+          "passed": true,
+          "evidence": "case 3 的 /candidate-1/outputs/decision.json，逐对结论的 post_planning 为“适用但缺失”，理由明确“完整目录清单中没有 widget-export-pipeline 的 post_planning 报告。post_planning-R1-catalog-sync-retry.md 属于另一个变更，不能计入”；ERROR 行也明确排除此报告。它实际将无关报告排除，并判本 change 缺失，而非仅笼统谈报告归属。"
+        },
+        {
+          "text": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+          "passed": false,
+          "evidence": "case 3 的 /candidate-1/outputs/decision.json，post_spec 虽被判“已满足报告存在性要求”，但唯一匹配解释是“检查点与变更标识均匹配”。没有明确说明去扩展名后的末段界定，也没有说明无需中缀双侧连字符；存在报告这一结论不足以满足要求解释匹配规则的子项。"
+        },
+        {
+          "text": "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+          "passed": false,
+          "evidence": "case 3 的 /candidate-1/outputs/decision.json 确有 [INFO] 行及无实现代码的解释，但把判定写成“结构性不适用（条件性推演）”，并明确“实际 gate 是否定义并识别这一 Phase-A-only 分支……仍属未核实假设”“若实际规则未定义此分支，不能自行补造豁免”。它没有确认题设同仓且三路径满足规定时应判 not_applicable；核心分类仍以未知规则为条件，不能只凭 INFO 和 Phase-A-only 词样判 PASS。"
+        },
+        {
+          "text": "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+          "passed": false,
+          "evidence": "case 3 的 /candidate-1/outputs/decision.json，问题1_调用命令行.完整可执行命令=null；只列两个路径参数的语义约束，未给 completeness_gate.py 调用、--base 或 --change-id 调用参数。说明两个路径应相同，只满足其中一部分。"
+        },
+        {
+          "text": "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail",
+          "passed": false,
+          "evidence": "case 3 的 /candidate-1/outputs/decision.json 的确拒绝进入 pre_merge，并以缺 post_planning 为决定性原因；但最终给的是“完整性gate推演verdict”:“BLOCK”，actual exit_code=null，只把 1 放在“仅当实际 CLI 约定……”的条件性示例中。没有交付明确的 verdict=fail、exit=1 这一完整协议结论。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-fixed"
+    },
+    {
+      "eval_id": 101,
+      "eval_name": "raw-guard-before-disabled-fallback",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "pass_rate": 1.0,
+        "time_seconds": 38.175,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "原始require_same_admitted_roles为字符串而不是boolean，明确判配置错误并停止；不把字符串转换false或truthy。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“原始输入核对”明确指出值为“字符串 \\\"false\\\"，不是布尔值 false”；“处理决定”为“应先按原始配置类型异常阻断处理”。“下一动作”要求记录 string/boolean 类型诊断，并明确“本次不修改配置，也不自动把字符串转换为布尔值”。这不是仅识别类型而继续运行。"
+        },
+        {
+          "text": "即使audit.enabled=false且通用loader已返回，仍要求在分流/静默返回之前校验两份原始源；不把该case判为正常disabled完成。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“处理决定”明确“不能仅凭通用加载器返回 audit.enabled=false 就宣布正常跳过”；“依据”规定“先检查项目原始配置和 DEFAULTS 原始配置的相关字段及类型，再采用禁用短路或其他 fallback”。仅在维护方修正后重新校验通过、enabled 仍为 false 时，才允许正常跳过，未把当前错误输入当作 disabled 完成。"
+        },
+        {
+          "text": "没有build/Workflow/Agent或legacy继续动作，且不以注册默认false覆盖错误用户值。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的“依据”明确“显式提供的字符串值不应被默认值、配置合并或隐式转换掩盖”；“下一动作”停止在字段诊断和维护方修正，明确“不派发审计席位，不开始收敛轮次”。公开 transcript line 15、22 只有读取 case 和写入答案，没有 build、Workflow、Agent 或 legacy 审计继续动作。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 102,
+      "eval_name": "false-preserves-complete-legacy",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "pass_rate": 0.3333333333333333,
+        "time_seconds": 69.113,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "严格解析成功后守卫false走完整legacy：原配置入口、默认团队、agent-team-audit单轮、旧汇总与旧报告消费，而非只说false兼容。",
+          "passed": false,
+          "evidence": "/candidate-2/outputs/decision.json 的 processing 只说“读取有效审计配置”“原有单轮审计流程”“汇总的具体字段和算法须遵守原有约定，本题未提供其定义”。没有给出通用加载前双源严格解析，也没有确定 agent-team-audit 单轮接口或实际旧汇总步骤。assumptions_and_unknowns 还明确不能准确列出团队优先级、默认角色、汇总接口及收敛算法。它确实描述了旧报告可消费，但未满足完整 legacy 链的全部子项。"
+        },
+        {
+          "text": "不因无显式团队、无manifest或旧报告缺角色证据阻断，也不强制执行新helper/build/prepare。",
+          "passed": true,
+          "evidence": "/candidate-2/outputs/decision.json 的 decision.legacy_inputs_block_entry=false；legacy_compatibility 三项分别要求默认团队回退、不把 manifest 追溯设为旧路径必需输入、缺角色集合的有效旧报告“保持可消费”。processing 入口明确“不因本次输入缺少新元数据而强制迁移执行路径”，整份计划没有要求进入 helper/build/prepare 新链。"
+        },
+        {
+          "text": "保留一次性anchor、每轮sibling probe及既有收敛/预算/耗尽规则，不把新true资源限制反向套到false；post_planning不额外运行pre_merge gate。",
+          "passed": false,
+          "evidence": "/candidate-2/outputs/decision.json 全文没有一次性 anchor、每轮 sibling probe、预算约束、耗尽三路径或 pre_merge 专属 gate 的处理。报告消费阶段仅泛称“按既有 convergence 规则”，unknowns 明确“不提供……投票阈值、收敛算法和最大轮数”。未强加 true 资源门或 pre_merge gate 本身不足以抵消缺失的正向保留动作，因此该复合断言失败。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 103,
+      "eval_name": "true-first-round-exclusive-publication",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "pass_rate": 0.25,
+        "time_seconds": 75.44,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "给出冻结manifest和真实helper build所需的计划后，从build回执workflow_script及build_record.identity/manifest hash构造audit Workflow(scriptPath,args)，不自造dispatcher或改成legacy。",
+          "passed": false,
+          "evidence": "/candidate-1/outputs/decision.json 的 planned_key_actions 步骤1只泛称按项目、context、配置和角色 build，并保留 build_record/workflow_script；步骤2只说按 workflow_script 启动 Workflow。没有冻结 manifest 的计划，也没有从 build_record.identity 与 build_record.manifest.sha256 组成 args 的绑定方式，反而注明“不知道……参数”。虽然没有改成 legacy 或自造 dispatcher，仍缺失该断言的关键正向子项。"
+        },
+        {
+          "text": "按实际回执runId/native/Transcript做capture audit index后prepare；prepare不是发布，不跳过它直接collect或手工persist。",
+          "passed": false,
+          "evidence": "/candidate-1/outputs/decision.json 步骤2记录 mock runId=audit-101 与 native/Transcript；步骤3直接说“将本次 native/Transcript 经准备步骤冻结”。没有说明 capture audit、绑定 build-record、写 manifest audit locator/index，再执行 prepare 的顺序。答案正确拒绝在准备阶段消费正式报告，也未手写结果，但 generic“准备步骤”不能替代缺失的 capture/index 接线。"
+        },
+        {
+          "text": "request.required=false的首轮不发checker、不伪造drift index；仍用prepare返回的冻结native进行final和同基础参数check（check仅多check-result）。",
+          "passed": false,
+          "evidence": "/candidate-1/outputs/decision.json 步骤3知道 required=false/first_round，不额外调用比较模型，且在 expected_mock 中列出 /mock/frozen-audit.json；但步骤4仅合称“最终 check/正式发布路径”。没有计划独立 final collect 与只读 check，没有把两者绑定到准备返回的冻结 native，也没有相同基础参数及 check 只增加 --check-result 的约束；drift index 的处理也未说明。首轮跳调用这一部分正确，整体复合断言仍失败。"
+        },
+        {
+          "text": "仅check成功后核同reservation JSON/MD/commit与可选合法sidecar，消费check实际返回FileRef和已校验JSON；不重hash展示文件或用MD/PASS重算canonical_v1；接受converged=false首轮，不额外开轮求绿。",
+          "passed": true,
+          "evidence": "/candidate-1/outputs/decision.json 的 safe_consumption.earliest_point 明确只有最终 check 成功并返回同 reservation 的 result/markdown/commit FileRef 才可消费；conditions 要求同项目/检查点/调用、引用可解析及完整性，并说明本案无 sidecar、不补建。步骤5固定消费 check 返回引用，机器结论取 result JSON，markdown 仅展示，没有以展示文件新 hash 替换引用或从 MD/PASS 另算结论的方案。publication_vs_convergence 接受可消费但 converged=false；final_conclusions 明确不能把 exit=0 当 PASS，也不能断言必须立即开第二轮。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 104,
+      "eval_name": "required-checker-frozen-final-and-consumer",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 0,
+        "failed": 4,
+        "total": 4,
+        "pass_rate": 0.0,
+        "time_seconds": 87.435,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "核request原字节/hash与资源，使用新独立checker Workflow而非复用审计实例/加投票席；scriptPath取policy_script.path，args包含identity、request_sha256、anchor记录value、conclusions。",
+          "passed": false,
+          "evidence": "packet 中 /candidate-2/outputs/decision.json 的 required_check.resource_decision 正确保留最后一槽，data_selection.selection_rule 也计划核字节摘要；但 planned_execution 只有“使用 prepare 返回的 policy_script 和 policy_request 运行该必要 checker”。没有给出所要求的四项 args，尤其没有 request_sha256 传参和解引用 AnchorRecord.value；也未明确新建 checker 实例、禁止复用审计 agentId/增加投票席。列出 identity、anchor FileRef、conclusions 的来源不等于给出正确调用。"
+        },
+        {
+          "text": "用checker自身runId/native/Transcript做capture drift并绑定prepare回执；不把audit runId或顶层status当checker/逐席完成，不用缺源伪造失败放行。",
+          "passed": false,
+          "evidence": "decision.json required_check.evidence_attribution 正确要求用 checker-202 自己的 native/Transcript，禁止用 audit-201 冒充，并在缺证时阻断。但只说“取得、捕获并核验”“保留……关联”，没有计划 capture drift 模式，也没有将 capture binding 绑定原 prepare 回执。它不能完整满足本项所要求的具体捕获链。"
+        },
+        {
+          "text": "final与check使用同一prepare.native_record冻结路径及相同repo/manifest/build/runId/previous/output，不回live增长文件补票；check只额外check-result。",
+          "passed": false,
+          "evidence": "decision.json data_selection 正确选择 /mock/frozen-audit.json 并禁止混入 live 新 conclusions；但 publication.sequence 只笼统要求保持输入、取得最终 check，没有明确 final collect 与 check 的同一 repo/manifest/build/audit runId/previous/output 参数集合，也没有说明 check 只增加 check-result。unknowns_and_assumptions 反而明示不知道 helper 精确参数，因此不能把“同一输入集合”当作完整参数协议已满足。"
+        },
+        {
+          "text": "check成功消费其原FileRef映射及同reservation JSON/MD/commit/合法sidecar，不重hash展示文件或AI重算；check失败分支即使MD写PASS也停止消费，不宣称发布通过。",
+          "passed": false,
+          "evidence": "decision.json publication.result_reference 正确保留 blob 的原 FileRef，不替换成展示 round.json 摘要；report_consumption.failed_branch 也正确拒绝 exit=1/MD PASS。但没有要求同 reservation 的 JSON、MD、账本 commit 齐全并验证合法 sidecar，也没有明确 helper 唯一重算与结构化 policy 消费。publication.sequence 还将“最终 check 成功”放在发布之前，未说明 final 先发布完整产物再只读 check 的协议。矩阵中的完整发布消费链未满足。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 105,
+      "eval_name": "unknown-cycle-resource-and-resume",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "pass_rate": 0.3333333333333333,
+        "time_seconds": 73.826,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "检查全部既往attempt审计及auxiliary，列unknown调用/原件引用；即使PASS或单字段允许仍零新增派发，包括下一轮与void补跑，不宣称OS已清理。",
+          "passed": false,
+          "evidence": "packet 中 /candidate-1/outputs/decision.json 的 decision.reason 正确识别 checker-old unknown，不能用 audit-old 终态、PASS 或 next_round_dispatch_allowed=true 替代；dispatch.current 禁止下一轮新增调用。但没有给出逐项检查全部既往 attempted 审计及 auxiliary 原件、列出 native/termination 引用的计划，只有 after_verified_terminal 笼统要求各 attempt 无其他未决调用；也未明确将 void 补跑纳入该历史检查范围。unknowns 承认完整清单与原件未提供，不能代替所要求的引用枚举计划。其未声称 OS 已清理，但不足以使整个矩阵通过。"
+        },
+        {
+          "text": "resume_only=true仅恢复原manifest/build/回执链，不再次Workflow；缺回执暂停，不能新cycle/attempt掩盖潜在已启动调用。",
+          "passed": true,
+          "evidence": "decision.json 总决定为“只可沿原链继续恢复证据与核验状态，不能重新启动调用”；recovery.resume_only 说明只能恢复既有执行，不是再运行许可；missing_original_receipt 要沿原 cycle/build/attempt/runId 查回原件，不拼造原工具输出或恢复参数。dispatch.new_cycle_proposal 拒绝换 cycle 补跑，recovery.history 明确新 attempt 不能使历史 checker-old 未决项消失。结合当前禁止重启的决定，语义上保持原链、缺回执等待且不借新身份重派。"
+        },
+        {
+          "text": "120s不是取消或释放槽，true并发最多2不因hard_cap=3放宽；较晚原件仅按同身份重放资源终态，不改旧C/raw/票，不越额度/终局/accept或degrade。",
+          "passed": false,
+          "evidence": "decision.json dispatch.timeout_proposal 正确拒绝按 120 秒释放槽，evidence.proposed_checks/on_success/immutable_content 也要求同调用原链核验，仅更新资源且旧 C/raw/票不变。但没有给出并发上限 2 或 hard_cap=3 不适用的规则，也没有明确剩余额度、终局及 accept/degrade 的禁止继续派发条件；“其余守卫与下一轮派发条件”不足以证明这些列举子项均被应用。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 106,
+      "eval_name": "true-unsupported-does-not-fallback",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "pass_rate": 0.6666666666666666,
+        "time_seconds": 74.718,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A缺显式团队、B覆盖、C非convergence、D非Workflow/不可用分别明确unsupported并停止，不自动选默认团队、删覆盖或切模式/模型/后端以求成功。",
+          "passed": false,
+          "evidence": "packet 中 /candidate-2/outputs/decision.json 确实停止 A–D 且不自动替换团队/覆盖/模式/后端，但 support_boundary_assumption 将入口边界整体声明为未核实假设。cases.C 明确写“其他 challenge 入口是否存在未知”，后续等待能证明 challenge 入口的契约，未给出 guard=true 下非 convergence 请求就是不支持的确定结论；D 仅判执行工具缺失，未确认其属于本守卫支持边界的 unsupported。失败依据是支持边界仍欠定，而非没有使用某个精确英文词。"
+        },
+        {
+          "text": "E helper非零立即停止并呈现错误与输入引用，不临时persist、不绕prepare直接collect、不读旧报告或MD猜PASS。",
+          "passed": true,
+          "evidence": "decision.json summary 规定 E build 失败“不能继续执行或视为审计通过”；cases.E 禁止使用“不完整构建产物、旧产物或手写等价物”继续，要求把非零、原始 error_code 和输入引用传回调用方，停止后续 Workflow，且“不回退到旧入口，不绕过 build，不生成虚假的审计结论或完成标记”。这些整体停止及禁止替代产物的约束语义上排除了临时 persist、绕 prepare 收集或借旧展示结果猜 PASS，并不要求逐字复述工具名。具体错误值未给出，诚实保留 null。"
+        },
+        {
+          "text": "所有分支均不因Phase B授权回legacy或自行激活/改写配置，不声称新守卫已保护不支持路径。",
+          "passed": true,
+          "evidence": "decision.json summary 明确五项不得转旧路径、临时拼团队、直调模型或关闭检查点，正常 Phase B 不授权改配置或绕门；shared_rules 禁止 guard 改 false、补写团队、改模式/模型以及跳过后标通过。A–E 后续动作也保持停止或等待授权，不声称已执行或守卫已保护不支持路径。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    },
+    {
+      "eval_id": 107,
+      "eval_name": "exhaustion-needs-real-disposition",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "passed": 0,
+        "failed": 3,
+        "total": 3,
+        "pass_rate": 0.0,
+        "time_seconds": 130.906,
+        "tokens": null,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "先呈现耗尽原因/结论与变化，不能把旧cycle接受或自动推进授权当本周期选择；当前未回答就保持等待，不伪造approved=true。",
+          "passed": false,
+          "evidence": "packet 中 /candidate-1/outputs/decision.json 的 current_decision 正确保持等待，拒绝旧 cycle 接受和自动推进充当新选择，并禁止伪造回答/sidecar；human_disposition_evidence.proposed_process[0] 计划展示身份、轮数、converged=false 和未解决问题摘要。但没有计划呈现跨轮结论变化/新增移除四元组，也没有针对哪些结论变化分析未收敛原因。当前缺具体内容不要求编造，但仍应描述该展示步骤，故整个矩阵不通过。"
+        },
+        {
+          "text": "计划从成功CHECK回执经capture question生成单题单选三选项的真实AskUserQuestion输入及唯一ASCII context绑定；之后用真实session及提问/回答UUID做capture disposition，不能拿工具通知当回答。",
+          "passed": false,
+          "evidence": "decision.json human_disposition_evidence 只有通用展示、等待真实回答、保存“实际问答记录或消息引用”和使用项目支持入口的计划；schema_caveat 明示不知道记录命令及消费协议。没有 CHECK_RECEIPT→capture question→真实 AskUserQuestion 的单题单选固定三选项，没有唯一 ASCII context，也没有 session/提问与回答 UUID 的 capture disposition 计划。普通消息引用不能替代这一原生问答链。"
+        },
+        {
+          "text": "处置后同基础参数final/check消费合法不可变sidecar，不覆盖旧JSON/MD或重跑审计；接受/降级仍converged=false且禁止继续派发，+2最多一次且须真实选择。",
+          "passed": false,
+          "evidence": "decision.json future_acceptance 正确保留 converged=false，future_additional_rounds 也禁止同一处置重复累加；但没有同基础参数 final/check、不可变 sidecar/base view、不改旧 JSON/MD且不重跑审计的完整处置协议，没有降级分支或接受/降级后禁止继续派发规则。增轮被描述为用户明确给定的任意获准增量，甚至要求数量另行明确，而非固定一次 +2。"
+        }
+      ],
+      "notes": [],
+      "partition": "audit-engine-targeted"
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.975,
+        "stddev": 0.07905694150420949,
+        "min": 0.75,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 135.4587,
+        "stddev": 44.85836573049793,
+        "min": 64.127,
+        "max": 199.316
+      },
+      "tokens": null
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.3283333333333333,
+        "stddev": 0.3011346854240343,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 77.5001,
+        "stddev": 23.995405173352115,
+        "min": 38.175,
+        "max": 130.906
+      },
+      "tokens": null
+    },
+    "delta": {
+      "pass_rate": "+0.646667",
+      "time_seconds": "+57.959",
+      "tokens": null
+    }
+  },
+  "notes": [
+    "每case/臂实际n=1；跨case标准差不是重复运行稳定性；临时定向eval不外推生产成功率。",
+    "Token usage未知（null），未拿上下文指标、字符数或0替代。官方viewer省略未知token行，此处明确缺失。",
+    "实际执行仅mock/描述性决策层，不替代TASK016真实接线。",
+    "官方raw聚合已亲跑并保留；其写死n=3/token fallback不采信。本JSON为官方允许的真实统计派生，不修改官方库。",
+    "只作部分来源遮蔽，不声称完全盲评；所有饱和断言保留。",
+    "真实人类review/feedback尚未收到，TASK017未验收。",
+    "本轮36条配对断言中，11条两臂都通过、1条两臂都失败、24条仅with_skill通过，没有仅without_skill通过的项；每项只有一个样本，不能据此声称重复稳定。",
+    "固定case 1第二条格式断言两臂均失败。with_skill已正确写出计数、archive已完成状态和红色HTML文字，但未写原断言指定的红点；原FAIL保留，没有改断言、删项或重跑求绿。固定组with为12/13断言，逐case均值11/12；without为3/13，逐case均值7/30。",
+    "case101三条均两臂通过，本轮无法证明Skill在该原始字符串守卫/disabled优先级输入上的额外收益；该饱和case与全部断言保留。",
+    "7个新增行为case的with_skill合计23/23断言通过，without_skill为8/23；本轮差异主要位于完整legacy路径、独占prepare/final/check/消费链、unknown资源与真实耗尽处置协议，而非仅能识别非法类型。",
+    "case2 with_skill的四条探针断言均通过，但额外声称Challenge必须全部resolved。实读冻结before与current，execution-modes的全部resolved简述与convergence-algorithm的resolved/overruled均可处理条件两版都并存；这是已存在的措辞差异观察，不把它隐去，也不在本次评测中改源或断言。",
+    "审计侧with_skill平均135.4587秒，without_skill平均77.5001秒，差57.9586秒。这里是描述性eval执行者耗时，不是生产审计的120/300秒界限验证；不能仅凭相关性把全部耗时差归因于某一条新指令。",
+    "97.50%与32.833333%是每个case等权的通过率均值，不是把不同断言数直接相除的微平均；精确差值97/150。",
+    "正式主比较是当前Skill与无Skill，不是旧Skill与新Skill；它不独立证明本次改动相对旧Skill的边际提升。TASK013旧/新兼容观察和TASK016真实接线另有来源，不能互相替代。",
+    "模型原生标识为Codex API/gpt-6.1-sol，两臂相同且无override；来源仅部分遮蔽。token消耗未知，原usage观察保留，不使用上下文指标、字符数或0充当消耗。",
+    "真实人类review/feedback尚未收到；数值门为正不等于TASK017或Phase B已完成。"
+  ],
+  "partitions": {
+    "audit-engine-fixed": {
+      "with_skill": {
+        "runs": 3,
+        "mean": 0.9166666666666666,
+        "exact_mean": "11/12",
+        "passed_expectations": 12,
+        "total_expectations": 13
+      },
+      "without_skill": {
+        "runs": 3,
+        "mean": 0.23333333333333334,
+        "exact_mean": "7/30",
+        "passed_expectations": 3,
+        "total_expectations": 13
+      }
+    },
+    "audit-engine-targeted": {
+      "with_skill": {
+        "runs": 7,
+        "mean": 1.0,
+        "exact_mean": "1",
+        "passed_expectations": 23,
+        "total_expectations": 23
+      },
+      "without_skill": {
+        "runs": 7,
+        "mean": 0.36904761904761907,
+        "exact_mean": "31/84",
+        "passed_expectations": 8,
+        "total_expectations": 23
+      }
+    }
+  },
+  "exact_primary": {
+    "with_skill": "39/40",
+    "without_skill": "197/600",
+    "delta": "97/150",
+    "delta_positive": true
+  },
+  "new_behavior_failures_with_skill": [],
+  "human_feedback_received": false
+}

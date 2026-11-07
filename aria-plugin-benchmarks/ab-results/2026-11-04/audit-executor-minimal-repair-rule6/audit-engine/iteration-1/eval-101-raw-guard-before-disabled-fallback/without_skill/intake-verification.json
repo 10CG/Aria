@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/101-raw-guard-before-disabled-fallback.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "ad730b69f2c0c8204",
+  "output_sha256": "2a07f6ec5043ebd8f42bc4cb070aa7c344113c5e4428d1bc578b84ddb4320676",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_fc94b3a9-f28/agent-ad730b69f2c0c8204.jsonl",
+  "original_sha256": "e290ec0247620aba9739fd57bcd0f1b5a64e6fb52aad968c446e8bfb40ee92ea",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

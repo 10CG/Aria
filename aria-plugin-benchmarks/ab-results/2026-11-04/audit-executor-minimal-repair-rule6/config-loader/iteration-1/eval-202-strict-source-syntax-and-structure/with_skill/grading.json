@@ -1,0 +1,91 @@
+{
+  "expectations": [
+    {
+      "text": "A/F两源语法损坏均错误停止；B/G重复object key均拒绝，不按最后一个值覆盖后当成功。",
+      "passed": true,
+      "evidence": "/candidate-1/outputs/decision.json 的 cases A、F分别将项目截断文本和 DEFAULTS 截断判为 JSON 语法错误，continue=false。B 在原始解析阶段拒绝重复 audit.require_same_admitted_roles，明确不能后值覆盖、先值优先或任选；G 对 DEFAULTS 任意位置的重复 object key 同样停止，禁止在解析器折叠重复键后声称通过。"
+    },
+    {
+      "text": "C非有限数值拒绝；D/H顶层非object拒绝；E/I存在的audit非object拒绝，即使相关guard未出现也不能绕过。",
+      "passed": true,
+      "evidence": "cases C 明确拒绝 x 中的 NaN，并说明严格限制覆盖整份原始源、不能因与 guard 无关而忽略；D、H分别拒绝项目与 DEFAULTS 的顶层 array；E 拒绝存在但为 null 的 audit，禁止以 guard 未出现回落；I 拒绝 DEFAULTS.audit=[]，禁止视为缺失后补 guard=false。上述五项 continue 均为 false。"
+    },
+    {
+      "text": "九种情况均不警告后返回默认值或回落false继续；校验发生在通用容错/合并/分流之前，保持缺失与损坏区分。",
+      "passed": true,
+      "evidence": "cases A 至 I 九项全部 continue=false，summary 明确不能警告后返回默认值或以 guard=false 转 legacy。basis.rule 要求两份原始源分别通过严格解析、结构及原始 guard 校验后才合并，且严格例外优先于通用容错；common_error_handling 禁止合并、分流前绕过。A 明确文件存在但损坏不等于文件缺失，E 同样区分 null 与缺失。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "九种指定异常都必须停止本次审计受控入口。",
+      "type": "quality",
+      "verified": true,
+      "evidence": "输出九个 case 均明确停止，并分别给出语法、重复键、非有限数字或结构错误的理由；没有把 DEFAULTS false 当作消除错误的依据。"
+    },
+    {
+      "claim": "重复键与非有限数字限制作用于整个源，而非仅 guard 字段。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case C 针对无关字段 x 拒绝 NaN；case G 明确不要求重复键恰为 guard。公开记录所载冻结规则第47行也是对两份源的整体限制。"
+    },
+    {
+      "claim": "已依据冻结 config-loader 第42至50行进行推演，但没有实际解析配置或修复文件。",
+      "type": "process",
+      "verified": true,
+      "evidence": "公开 transcript line 15至16确实读取并返回冻结 Skill；line 21读取 case，line 25写 decision.json。记录中没有加载器、命令、真实配置读取或修复调用。"
+    },
+    {
+      "claim": "F 的具体截断位置、G 的具体重复键位置未知，不能给出精确行列。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "题设仅说“DEFAULTS文本截断”和“DEFAULTS有重复object key”，未给出原始文本位置；输出没有编造行列、具体重复键名或实际异常码。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "C 只给项目源 NaN，未覆盖 DEFAULTS 中的非有限值，也没有覆盖 Infinity、-Infinity等其他非有限表示。可增加两源对称的具体文本项，防止只处理项目 NaN 的窄规则通过。",
+      "B 是 guard 的冲突重复键，G 未给具体重复文本。可增加无关嵌套 object 的同值重复键实例，要求仍拒绝，以区分拒绝任意重复键与仅拒绝 guard 值冲突。"
+    ],
+    "overall": "九项均逐项给出正确停止决定和错误归属，满足全部三条。断言有具体类型与顺序要求，不是单靠出现“严格”一词通过；本例未观察到两候选的评分差异。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 3,
+    "output_chars": 3782,
+    "transcript_chars": 22417,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "config-loader-targeted",
+    "candidate_id": "candidate-1",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "评分材料为指定官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，以及 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-201.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-202.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-203.json 的完整内容；未读取其他文件、真实配置或 controller-only 映射。",
+      "覆盖三个case的两个candidate，共18条原文期望；矩阵均按全部子项判断，结果为16条通过、2条失败。所有candidate均为JUDGED，假设、未知和错误决定未被改记为输入损坏。",
+      "证据同时来自packet内原decision_json_text和完整公开transcript；冻结Skill内容仅作为packet中已经包含的执行证据使用，没有另行读取。路径和正文仍可能透露来源，因此不是完全盲评。",
+      "全部配置任务均为描述性推演。正确的处理方案可满足断言，但Read/Write记录不能证明配置加载器、审计或错误恢复已真实执行；process claims仅按公开记录核验。",
+      "六份packet候选的intake_verified均为true。附带的工具调用数及执行时长分别为201/candidate-1：2次、69.048秒；201/candidate-2：3次、65.556秒；202/candidate-1：3次、79.596秒；202/candidate-2：2次、79.242秒；203/candidate-1：2次、87.266秒；203/candidate-2：3次、65.134秒。这些元数据不作为配置语义正确性的替代证据。",
+      "packet未附独立user_notes.md、metrics.json或timing.json正文；未越过允许的读取范围查找，不据此补造执行指标或判为NOT_JUDGED。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

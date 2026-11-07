@@ -1,0 +1,95 @@
+{
+  "推演边界": "以下仅依据题设和获准冻结 Skill 文档作描述性推演。没有读取 /work/Demo 的真实文件，没有执行命令、Skill、Workflow、Agent 或网络调用；audit-101、准备回执和 check 回执均为题设 mock，不是本次真实执行证据。",
+  "入口决定": {
+    "是否执行审计": true,
+    "解析模式": "convergence",
+    "守卫分支": "require_same_admitted_roles=true 的独占 Workflow/helper 路径",
+    "理由": [
+      "项目 audit.enabled=true，且原始 checkpoints.post_planning 显式指定 convergence。该 checkpoint 的显式值优先于全局 mode=manual，不能因为 manual 就把本检查点当 off。",
+      "项目原始 guard 为 JSON boolean true，覆盖 DEFAULTS 的 boolean false。须先严格检查两份源的 JSON、重复键、类型和 DEFAULTS 注册，再作有效配置解析；不能让通用 config-loader 的回落先把守卫关掉。",
+      "backend=Workflow、显式团队存在、没有团队或模型等覆盖参数，固定源可解析为 convergence，满足 true 路径的支持前提。不切换后端、mode 或模型，也不回到 legacy 手工汇总或 persist。",
+      "项目根显式采用 /work/Demo，审计输入为 /work/Demo/input.txt。此处不是 pre_merge，不运行 pre_merge 专属 completeness gate；Step 0 anchor 和每轮 sibling probe 仍适用。"
+    ],
+    "配置角色顺序": ["qa-engineer", "code-reviewer"]
+  },
+  "拟采取的关键动作": [
+    {
+      "步骤": 1,
+      "动作": "严格校验固定配置、确认 scope 与资源状态，并在首轮前冻结 anchor。",
+      "约束": "题设无旧 scope 或未结束调用，可按新周期首轮推演；真实执行仍应由 helper 在固定 scope 锁内检查 genesis、reservation、历史归属与资源，而不是只信 caller 布尔值。anchor 按 post_planning 的 proposal 优先链及适用 fallback 取得实际来源；缺观察原件不得冒称 anchor missing。不能把 context 路径本身当作已读的 Goal 内容。"
+    },
+    {
+      "步骤": 2,
+      "动作": "在 VM 外确定周期身份，冻结 manifest、policy_inputs、完整角色 prompt 和来源引用。",
+      "约束": "本次为逻辑 round=1、首次 attempt_index=1；audit_cycle_id 在周期内复用，client_round_id 对本物理 attempt 唯一。六项 identity 包含 audit_cycle_id/client_round_id/checkpoint/change_id/round/candidate_sha，不能编造题设未给出的 change_id 或 candidate_sha。roles 按原团队顺序逐项保持 role_id=agentType=原字符串，model_alias 仅追溯，不添加 model override。冻结完整审计上下文、原 dispatch/frontmatter 契约与 raw JSON 的 vote/coverage_complete/findings/pending/prior_findings 要求，不能拿 frontmatter verdict 代替有效 raw 票。预算固定 single_agent_ms=120000、round_ms=300000、max_parallel=2。新 scope 经核实后，evidence 的 cycle_origin/previous_round/dispatch_preflight 可为 null；policy_inputs 为已存在真实 FileRef，三个 post_*_index_path 只是本 run-dir 的未来 locator，不提前填未来 hash 或 runId。报告与 run-dir 位于 /work/Demo/.aria/audit-reports/ 的本次唯一 run-key 下。"
+    },
+    {
+      "步骤": 3,
+      "动作": "在本轮入口作 sibling probe，再调用 build。",
+      "约束": "probe 命中只作 advisory；未核实、非零、坏 JSON 或未知 schema 不能写成无竞品。题设没有 probe 结果，因此本推演不声称扫描成功或没有竞品。build 本身只生成冻结脚本、build-record 与 reservation，不等于派发或审计通过。所有拟运行 helper/capture 命令都应捕获 stdout/stderr 并检查退出码，错误即停。"
+    },
+    {
+      "步骤": 4,
+      "动作": "读取 build 回执及真实 build-record，然后按生成脚本派发审计 Workflow。",
+      "mock推演": "题设 build 返回 resume_only=false，因此在政策和资源允许时，拟调用 Workflow({scriptPath: build_receipt.workflow_script, args: {identity: build_record.identity, manifest_sha256: build_record.manifest.sha256}})。回执中的 build_record/workflow_script 是路径字符串，不能误当 FileRef。若实际得到 resume_only=true，则只恢复既有证据链，绝不再派发；本 case 不走该分支。"
+    },
+    {
+      "步骤": 5,
+      "动作": "保存审计工具回执，定位原件，capture audit 后执行 collect --prepare-policy。",
+      "mock推演": "采用题设的真实回执位置语义：拟将 mock runId audit-101 作为 workflow-run-id，并由 mock 提供的 native/Transcript 显式入口取得完整原件，核对 /runId、/script、/args、/result 和 /workflowProgress 的身份与映射。不能用 label、scriptPath 或顶层 completed 状态替代逐席证据。capture audit 绑定 build-record，并写 manifest 的 audit locator；首轮 prepare 不传 --previous-round。prepare 只是冻结证据，不能在此时消费 round-result 或宣称发布。"
+    },
+    {
+      "步骤": 6,
+      "动作": "核验准备回执及冻结 policy-request，按 required 分支处理 checker。",
+      "mock推演": "题设 request.required=false、reason=first_round。按冻结来源校验该请求后，本轮不调用独立 drift-checker Workflow，不 capture drift，不伪造 drift index；这属于契约规定的首轮 not-required 分支，不是 AI 自行豁免，也不是 checker 失败。仍读取和核验 prepare_record、policy_request、audit_index、input_closure 与 native_record 的 FileRef；引用按各自原始 carrier 解析并校验字节 hash，不把 blob 所在目录当成相对路径基准。"
+    },
+    {
+      "步骤": 7,
+      "动作": "先 final 发布，再以完全相同基础参数作只读 check。",
+      "mock推演": "final 与 check 的 --native-record 均固定使用准备回执的 native_record.path，即 /mock/frozen-audit.json，不返回 live native 重新取票。repo、manifest、build-record、workflow-run-id=audit-101、output 和 previous 参数保持相同；首轮两次均省略 --previous-round，check 仅增加 --check-result 指向同 ROUND_RESULT。final 负责 JSON/MD 与账本 commit，check 不补文件、不改账本。这里的 commit 是 executor reservation 的账本提交，不是 git commit。"
+    },
+    {
+      "步骤": 8,
+      "动作": "完成消费核验后，仅消费 helper 的已验证 JSON/MD/commit，然后从 true 分支返回。",
+      "mock推演": "题设最终 check exit=0，返回同 reservation 的 result/markdown/commit FileRef，且无 sidecar。在引用完整、hash 与身份核验也通过的前提下，可消费这份首轮已发布结果。采用 check 返回的 result FileRef 及其实际闭包映射，即使它指向冻结 blob，也不改成自行 hash 展示 ROUND_RESULT。canonical_v1 的聚合、准入集合、keys、稳定性与 policy 以 helper 校验后的 JSON 为唯一依据，不再调用 legacy agent-team-audit 汇总、不手工 persist、不由 AI 重算 type/scope/票或依据 MD 的 PASS 猜结果。"
+    }
+  ],
+  "可安全消费报告的条件": [
+    "不是 build 成功、Workflow 返回或 prepare 成功就可消费；必须 final 完成且相同冻结输入下 check exit=0。任一步 helper/capture 非零、缺源、unsupported、身份不符或来源漂移都停止，不转 legacy 兜底。",
+    "逐项解引用 check 返回的 result/markdown/commit，核对 SHA-256、schema、同一六项 identity，以及 commit 确实提交本 reservation 的 result/MD/闭包；三者必须齐全。文件已存在或工具说成功本身不够。",
+    "本 case 没有 sidecar，不能推断用户已接受、已降级或已增轮。若以后存在 sidecar，只有同次 check 合法验证、绑定当前有效 head 的 sidecar 才可合并消费。",
+    "读取 JSON 中 configured_roles、dispatched_roles、admitted_roles、population_comparable、conclusion_keys_equal、conclusions_stable、converged 和 policy，不将配置人数或 Workflow agentCount 直接当作实际准入人数。",
+    "JSON/MD/commit 没有跨文件事务。若只落了一部分，不能提前消费；仅允许同 reservation、同冻结输入、相同字节的幂等补齐，不重派、不覆盖不同字节。"
+  ],
+  "最终可下的结论": {
+    "条件性消费结论": "按题设 mock 成功链及上述引用核验，可消费一份 post_planning 的首轮已发布、已校验审计记录；不能声称本会话真实生成或校验了该记录。",
+    "收敛结论": "converged=false。首轮没有合法前一有效轮，population_comparable=false、population_reason=first_round，conclusion_keys_equal=false，因而 conclusions_stable=false。即使两席都准入、全票 PASS、零 findings，首轮也不能据此收敛。",
+    "checker结论": "本轮无需 drift-checker，原因是经 helper 校验的 first_round，而不是 checker 已运行、失败或证明没有漂移。",
+    "质量与流程边界": "check exit=0 只表示执行器重算/产物一致性成功，不表示审计质量 verdict=PASS，更不表示已收敛或合并放行。题设未给 findings、有效票、逐席时间及质量 verdict，不能补造。",
+    "后续路由": "继续、void 补跑、耗尽或其它终局均以已校验 JSON.policy 决定。若为有效 R1 且仍有额度、无终局并且同 cycle 全部 attempted 审计与 auxiliary 调用的终态均可核验，才可计划下一轮；任一已派发调用仍 unknown，则下一轮全部新增派发暂停，不以本轮可消费或 PASS 释放资源。同一部分角色也可能在后续满足相同非空 admitted 集合、相同完整 keys、准入票全 PASS 与既有 policy 条件后收敛，不额外加全员准入门。若全失败 void 则不耗有效额度但保留 attempt 史。首轮不自动豁免额度；若实际有效上限为 1，则有效 R1 已耗尽。没有合法人类处置 sidecar 时，不自行接受、加两轮或降级；本推演也不向用户发问。"
+  },
+  "未知与假设": [
+    "假定题设 mock 的 build、capture/prepare、final/check 所需证据与其声明一致；实际工具可用性、来源真实性和这些文件是否存在均未在本会话验证。内容 hash 也不认证工具外人工伪造的整套来源。",
+    "题设未给 change_id、候选 SHA、context 内容、proposal/fallback 原件和 anchor 片段。真实执行需从获准实际来源取得并冻结，不能由本推演填写；first_round 不要求 checker，但不免除政策输入与 anchor 观察证据。",
+    "题设未给原生逐席 q/C、raw、终态、实际准入集合及最终 policy 额度字段。因此不能声称两席都完成、incomplete=false、资源已释放、OS 子进程已退出、下一轮必可派发或具体质量结论。120000ms 是准入窗口，不是取消授权；VM timer 与原生时钟对齐仍未知。",
+    "未读取冻结包清单外的 agent-team-audit Skill 或真实项目配置，也未追读其外部 Spec、历史采用证据。它们不能作为本 case 已验证证据；本次关键路由和消费条件来自已获准的主 Skill 与执行器契约。"
+  ],
+  "所用冻结来源": [
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+      "定位": "生产入口分流、Step 0、per-round 探针、收敛与资源边界"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+      "定位": "严格配置入口；受守卫的 Workflow/convergence 步骤 1–8；checkpoint 显式配置优先级"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md",
+      "定位": "§3–4、§6–9、§10.2–10.7 的冻结、身份、首轮、发布与只读重算契约"
+    },
+    {
+      "文件": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/agent-dispatch-contract.md",
+      "定位": "dispatch prompt 模板和漂移字段要求"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/101-raw-guard-before-disabled-fallback.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-101-raw-guard-before-disabled-fallback/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 4,
+  "agent_id": "a90a837a6b6221e04",
+  "output_sha256": "e778187cdffefd2920f6c0390c2efc03f72c57de9d96eae46be752d582f42b59",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_fc94b3a9-f28/agent-a90a837a6b6221e04.jsonl",
+  "original_sha256": "c8477c60cf3bb84cffc21f2aaf68c35b0506115202657c4370b2f20da1029138",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

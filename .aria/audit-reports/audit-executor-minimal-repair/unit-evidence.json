@@ -1,0 +1,1840 @@
+{
+  "schema_version": 2,
+  "task_id": "TASK-013",
+  "status": "B2_FOUR_GAPS_JUDGED_TASK013_NOT_ACCEPTED",
+  "completed": false,
+  "accepted_by_controller": false,
+  "evidence_kind": "offline_synthetic_not_real_workflow",
+  "matrix": [
+    {
+      "amendment": "A-1",
+      "bad_state_group": "正常链",
+      "test_id": "test_audit_executor.WiringContractTests.test_real_cli_fences_required_checker_frozen_native_and_commit",
+      "expected": "live增长后冻结native完成final/check；同CLI准入、checker与commit",
+      "actual": "FAIL",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_cli_fences_required_checker_frozen_native_and_commit/source-mesp2cpu"
+      ],
+      "note": "required checker在final重读live native；R1及required缺源分支已判，增长成功路径失败"
+    },
+    {
+      "amendment": "A-1",
+      "bad_state_group": "正常链",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_required_checker_cli_health_and_tamper_without_live_growth",
+      "expected": "无live增长的相同CLI checker健康链及最终boolean篡改E_RESULT_MISMATCH",
+      "actual": "PASS",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": []
+    },
+    {
+      "amendment": "A-2",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_real_fold_void_charge_mutant",
+      "expected": "真实折叠void错误计费命中QA_REAL_VOID_CHARGE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2"
+      ]
+    },
+    {
+      "amendment": "A-2",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_real_fold_void_replaces_baseline_mutant",
+      "expected": "真实折叠void替换有效baseline命中QA_REAL_VOID_BASELINE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn"
+      ]
+    },
+    {
+      "amendment": "A-2",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_real_fold_skipped_clears_count_mutant",
+      "expected": "真实折叠skipped清零命中QA_REAL_SKIP_COUNT",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8"
+      ]
+    },
+    {
+      "amendment": "A-2",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.CompatibilityTests.test_refocus_void_skipped_distribution_and_normal_oscillation",
+      "expected": "void/refocus/skipped分布及normal振荡",
+      "actual": "PASS",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_refocus_void_skipped_distribution_and_normal_oscillation/source-pt5slju5"
+      ]
+    },
+    {
+      "amendment": "A-2",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.CompatibilityTests.test_limits_and_terminal_priority_from_fixture",
+      "expected": "max_rounds=1/2/3及终局边界优先级",
+      "actual": "PASS",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_limits_and_terminal_priority_from_fixture/source-vut7u62m"
+      ]
+    },
+    {
+      "amendment": "A-3",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_jsonl_cross_agent_and_corrupt_selected_line",
+      "expected": "LF-JSONL健康中断→串agent/坏JSON指定E_NATIVE_EVIDENCE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_jsonl_cross_agent_and_corrupt_selected_line/source-5e35leus",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_jsonl_cross_agent_and_corrupt_selected_line/source-ch9t5ehl"
+      ]
+    },
+    {
+      "amendment": "A-3",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_wrong_carrier_origin_not_equal_content",
+      "expected": "健康链→同字节错误anchor/audit_index/input_closure origin指定E_POLICY_SOURCE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_wrong_carrier_origin_not_equal_content/source-ut8ofo2s",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_wrong_carrier_origin_not_equal_content/source-ip6o4rrb",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_wrong_carrier_origin_not_equal_content/source-4q33mhy_",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_wrong_carrier_origin_not_equal_content/source-x3y4x93_"
+      ]
+    },
+    {
+      "amendment": "A-3",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_real_cli_pending_and_unknown_slots",
+      "expected": "真实CLI pending仅resume_only；unknown无终态引用E_RESOURCE_PENDING",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_real_cli_pending_and_unknown_slots/source-_0c04paf"
+      ]
+    },
+    {
+      "amendment": "A-3",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_real_cli_unknown_auxiliary_slot",
+      "expected": "真实CLI checker尚未完成仍占槽；skipped不等资源释放",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_real_cli_unknown_auxiliary_slot/source-0yp4thvn"
+      ]
+    },
+    {
+      "amendment": "A-3",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_partial_anchor_required_legal_and_off_topic",
+      "expected": "partial完整on_topic/adjacent健康；off_topic拒绝E_POLICY_SOURCE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_partial_anchor_required_legal_and_off_topic/source-e1expfpf",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_partial_anchor_required_legal_and_off_topic/source-30rphwc2"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_bootstrap_reset_config_and_head_rejections",
+      "expected": "有效前史→null/cycle/较早head E_PREVIOUS_IDENTITY；config增额E_SOURCE_DRIFT",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_bootstrap_reset_config_and_head_rejections/source-ep1p3skl",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_bootstrap_reset_config_and_head_rejections/source-sbx31xeq",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_bootstrap_reset_config_and_head_rejections/source-79qmhsdh",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_bootstrap_reset_config_and_head_rejections/source-8rtp60re"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_exhaustion_and_converged_precede_reserve",
+      "expected": "耗尽/CONVERGED先于新reserve拒绝E_POLICY_BLOCKED",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_exhaustion_and_converged_precede_reserve/source-4izhjrms",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_exhaustion_and_converged_precede_reserve/source-bngwdq5q"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_drift_and_oscillation_terminal_no_reserve",
+      "expected": "剩余额度>0仍DRIFT_TERMINATED/OSCILLATION禁止新reserve",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_drift_and_oscillation_terminal_no_reserve/source-8qg4zrc4",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_drift_and_oscillation_terminal_no_reserve/source-k7z5r9ie"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.CompatibilityTests.test_independent_acyclic_chain_and_cycle_precedes_hash_error",
+      "expected": "独立无环健康链→错误hash回边E_HISTORY_CYCLE优先",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_acyclic_chain_and_cycle_precedes_hash_error/source-eoav4969",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_acyclic_chain_and_cycle_precedes_hash_error/source-p_wh92qd"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.CompatibilityTests.test_independent_missing_policy_leaf_and_changed_cycle_fail_closed",
+      "expected": "缺冻结policy E_POLICY_SOURCE/换cycle E_PREVIOUS_IDENTITY",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_missing_policy_leaf_and_changed_cycle_fail_closed/source-lannfwu5",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_missing_policy_leaf_and_changed_cycle_fail_closed/source-_whybgt6"
+      ]
+    },
+    {
+      "amendment": "A-4",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.CompatibilityTests.test_independent_result_tampering_recomputed_not_trusted",
+      "expected": "篡改incomplete/converged/admitted指定E_RESULT_MISMATCH",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_result_tampering_recomputed_not_trusted/source-30_9t1rh",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_result_tampering_recomputed_not_trusted/source-9pl4ydz5",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_result_tampering_recomputed_not_trusted/source-sftqdpk5",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_result_tampering_recomputed_not_trusted/source-ainj7tce"
+      ]
+    },
+    {
+      "amendment": "A-5",
+      "bad_state_group": "规范化",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_real_short_id_collision_and_merging_mutant",
+      "expected": "真实SHA256短id碰撞保留完整keys；真实合并源码坏实现指定断言红",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom"
+      ]
+    },
+    {
+      "amendment": "A-5",
+      "bad_state_group": "规范化",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_real_swallowed_variant_mutant",
+      "expected": "真实吞variant源码坏实现指定QA_REAL_VARIANT_CONSERVATION红",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo"
+      ]
+    },
+    {
+      "amendment": "A-5",
+      "bad_state_group": "规范化",
+      "test_id": "test_audit_executor.CompatibilityTests.test_independent_canonical_members_variants_and_real_fault_function",
+      "expected": "独立不同claim/type与Critical提升及实际吞member函数变体",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_canonical_members_variants_and_real_fault_function/source-cecjkwwx"
+      ]
+    },
+    {
+      "amendment": "A-6",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_increase_sidecar_duplicate_and_real_next_build",
+      "expected": "合法+2/重复不增额/新问答重放拒绝/sidecar不改base及后继真build",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_increase_sidecar_duplicate_and_real_next_build/source-9c9lu9dy"
+      ]
+    },
+    {
+      "amendment": "A-6",
+      "bad_state_group": "bootstrap/额度",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_accept_degrade_and_bad_question_sources",
+      "expected": "accept/degrade禁止reserve；通知和跨cycle问答E_POLICY_SOURCE",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_accept_degrade_and_bad_question_sources/source-vfiapq51",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_accept_degrade_and_bad_question_sources/source-35fo4zfm"
+      ]
+    },
+    {
+      "amendment": "A-6",
+      "bad_state_group": "历史",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_missing_commit_exact_recovery_and_conflict",
+      "expected": "同reservation同字节仅补缺commit；不同字节E_OUTPUT_CONFLICT且不覆盖",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_missing_commit_exact_recovery_and_conflict/source-c6xga93h"
+      ]
+    },
+    {
+      "amendment": "A-6",
+      "bad_state_group": "policy/终态",
+      "test_id": "test_audit_executor.IndependentSeamTests.test_independent_monotonic_preflight_and_rewritten_start",
+      "expected": "T0=0 q=100 null→150→C170健康；前次observe的start改151 E_NATIVE_TIME",
+      "actual": "CAUGHT",
+      "evidence": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+      "source_fixture_dirs": [
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_independent_monotonic_preflight_and_rewritten_start/source-mozy7d32"
+      ]
+    }
+  ],
+  "remaining": [
+    "B3真实模型输出评分/完整复核",
+    "主控合并B3后fresh完整Phase1→Phase2",
+    "TASK013未接受；TASK016/017真实调用/正式AB不在本片授权内"
+  ],
+  "regression": {
+    "result": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/ref-closure-repair/regression-ref-repair/full-result-ee8a8401cebaf37ee484daf05a56dee51d51b69ad8a2811bf99c34144e042fe2.json",
+      "sha256": "ee8a8401cebaf37ee484daf05a56dee51d51b69ad8a2811bf99c34144e042fe2"
+    },
+    "tests_run": 430,
+    "unique_ids": 430,
+    "passed": 430,
+    "skipped": [],
+    "per_module": {
+      "test_audit_executor": 286,
+      "test_audit_executor_config": 6,
+      "test_audit_executor_negative_controls": 5,
+      "test_completeness_gate": 29,
+      "test_sibling_spec_probe": 104
+    },
+    "elapsed_seconds": 237.14216322099674,
+    "failed_test_ids": [],
+    "errors": 0,
+    "failure_entries": 0,
+    "detail": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/ref-closure-repair/regression-ref-repair/full-result-ee8a8401cebaf37ee484daf05a56dee51d51b69ad8a2811bf99c34144e042fe2.json"
+  },
+  "fresh_added_tests": {
+    "count": 18,
+    "passed": 18,
+    "ids": [
+      "test_audit_executor.IndependentSeamTests.test_independent_accept_degrade_and_bad_question_sources",
+      "test_audit_executor.IndependentSeamTests.test_independent_bootstrap_reset_config_and_head_rejections",
+      "test_audit_executor.IndependentSeamTests.test_independent_drift_and_oscillation_terminal_no_reserve",
+      "test_audit_executor.IndependentSeamTests.test_independent_exhaustion_and_converged_precede_reserve",
+      "test_audit_executor.IndependentSeamTests.test_independent_increase_sidecar_duplicate_and_real_next_build",
+      "test_audit_executor.IndependentSeamTests.test_independent_jsonl_cross_agent_and_corrupt_selected_line",
+      "test_audit_executor.IndependentSeamTests.test_independent_missing_commit_exact_recovery_and_conflict",
+      "test_audit_executor.IndependentSeamTests.test_independent_monotonic_preflight_and_rewritten_start",
+      "test_audit_executor.IndependentSeamTests.test_independent_partial_anchor_required_legal_and_off_topic",
+      "test_audit_executor.IndependentSeamTests.test_independent_real_cli_pending_and_unknown_slots",
+      "test_audit_executor.IndependentSeamTests.test_independent_real_cli_unknown_auxiliary_slot",
+      "test_audit_executor.IndependentSeamTests.test_independent_wrong_carrier_origin_not_equal_content",
+      "test_audit_executor.IndependentSeamTests.test_real_fold_skipped_clears_count_mutant",
+      "test_audit_executor.IndependentSeamTests.test_real_fold_void_charge_mutant",
+      "test_audit_executor.IndependentSeamTests.test_real_fold_void_replaces_baseline_mutant",
+      "test_audit_executor.IndependentSeamTests.test_real_short_id_collision_and_merging_mutant",
+      "test_audit_executor.IndependentSeamTests.test_real_swallowed_variant_mutant",
+      "test_audit_executor.IndependentSeamTests.test_required_checker_cli_health_and_tamper_without_live_growth"
+    ]
+  },
+  "previous_16": {
+    "count": 16,
+    "passed": 15,
+    "failed": [
+      "test_audit_executor.WiringContractTests.test_real_cli_fences_required_checker_frozen_native_and_commit"
+    ],
+    "note": "原15项健康无回归；原live增长链仍红，另以无增长健康链定位产品接缝。helper修正checker raw为schema要求的string而不放宽parser。"
+  },
+  "preservation": {
+    "original_test_definitions": 282,
+    "current_test_definitions": 286,
+    "added_test_definitions": 4,
+    "original_top_level_definitions": 24,
+    "all_original_top_level_definitions_exact_bytes_unchanged": true,
+    "original_definition_hashes": {
+      "load_module": "5b7b3af50af3031d08cab12f4cef0fee2d1a5e9ad23b88a5ec98ff3fdbf59cf3",
+      "encode": "655474fa9b484dd3a7454716fb045c9800b299e03274d86f2c8175ce8d7a1c15",
+      "ref": "030e171d3f1873d3c9393508cb7149877b28bc0efde9216922987c5116a70fb6",
+      "PreparePolicyTests": "01caedd6c8d6104c9386c1be288f76bceeec16cb3c79253451cdacf7f8685c5b",
+      "GeneratedScriptTests": "9a6e90dad67b333c9b632c6145166dd8574ef43fc3d0bf0d9542522e3dca23d1",
+      "BuildContractTests": "596478fe1a239174578ac8e0c673ba0a6b3627ec78f07e0ec81dc929b2b35fbe",
+      "NativeEvidenceTests": "6ca73bd580b29e67bb989c3025e798723d9f78ecf58610e5545fbdbacd2ab138",
+      "StatePartitionTests": "e684e9c59e6a2dccb6c13a35898fea55d5401f5bdd5ca8569f70a965f32858b2",
+      "DriftEvidenceTests": "94dfa3edc278634d56770f384aa07f3b2dd522799c1fe2bae654817cc604958d",
+      "_CanonicalPolicyFixture": "84d7a531d5caac449a7b727d3108483dc818df87cc830671c1a688f4fbd73a1b",
+      "CanonicalAggregationTests": "4d9820e8387796e132d545890fa0a288d0cc981bfabfcec9183915b0137a54f7",
+      "PopulationGuardTests": "75f222cbca426ae4ff96c6495a7024b22093203749639d2551eefaa38965c1cf",
+      "PolicyKernelTests": "d1f6b9eb0251b9859434aaff05960ca8779940ae3302543539ca481b19777a5e",
+      "SlotLifecycleTests": "edc99fb182a61ce182cd0a99a88eb578750dd085904ef3b4826cdf9fee336d3d",
+      "HistoricalReplayTests": "5fe82ac5e99c8d136d7519dbd5e057d66a6c33d7f4adf67ecd0d6eb31843d045",
+      "CarrierReplayTests": "85e277883747977512a4c35428ed42e1d82d0281b57eb8fa47f2fb2691627de7",
+      "ResultIntegrityTests": "2ab53d069d04fa5b6dcc6e4380fff7505c95f05399eb8c43ff0cf7c7f8f79764",
+      "HumanDispositionTests": "04a1daccce686e471b7051d5f51c7deac9eca0b39302c5916f668d85f7b296f6",
+      "qa_fixture": "716b8ad769755d1109565a0228c6ccb942a3d4191c5f7fac02fb6c8443171771",
+      "GeneratedWorkflowRuntimeTests": "46918cfd1689e468a5c221095b8fc1fc8c83aafdc9707b75641eef935c43089f",
+      "WiringContractTests": "756a6dcb8501cecaa22fff0b534bce9abce2ae53c88f1735d25af35c0085930b",
+      "CompatibilityTests": "f26dbe5fa599240ce4c35f74311e7fe40ae109ff855f154c533dd90646077447",
+      "IndependentSeamTests": "bbd39c2c944639aa29766fe32428bd107dd4d2e4975453a45bd998070a38b975",
+      "RequiredCheckerFrozenSourceTests": "83b4695171ba32cdc1473128d365386986327d15e67972063b3c650f78ad6046"
+    },
+    "frozen_before": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/before/test_audit_executor.py.txt",
+      "sha256": "ad43851769b95d22ba2f77ac18070c203312aed680b019110b598e86d13115c2"
+    },
+    "original16_unchanged_and_one_authorized_repair": true,
+    "protected_sources": {
+      "aria/skills/audit-engine/SKILL.md": {
+        "original_sha256": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+        "current_sha256": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/references/execution-modes.md": {
+        "original_sha256": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+        "current_sha256": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      ".aria/config.json": {
+        "original_sha256": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+        "current_sha256": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      ".aria/config.template.json": {
+        "original_sha256": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+        "current_sha256": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/config-loader/DEFAULTS.json": {
+        "original_sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+        "current_sha256": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/config-loader/SKILL.md": {
+        "original_sha256": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+        "current_sha256": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/references/executor-contract.md": {
+        "original_sha256": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+        "current_sha256": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/test_audit_executor_config.py": {
+        "original_sha256": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+        "current_sha256": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": {
+        "original_sha256": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+        "current_sha256": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": {
+        "original_sha256": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+        "current_sha256": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": {
+        "original_sha256": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+        "current_sha256": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": {
+        "original_sha256": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+        "current_sha256": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/test_sibling_spec_probe.py": {
+        "original_sha256": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+        "current_sha256": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/scripts/audit_executor.py": {
+        "original_sha256": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+        "current_sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+        "unchanged_original": false,
+        "authorized_repaired": true
+      },
+      "aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py": {
+        "original_sha256": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+        "current_sha256": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json": {
+        "original_sha256": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+        "current_sha256": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      },
+      ".aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json": {
+        "original_sha256": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+        "current_sha256": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+        "unchanged_original": true,
+        "authorized_repaired": false
+      }
+    },
+    "original_task013_before": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task013-before.json",
+      "sha256": "5885340d843550688ed75d121c03d253ac2bcc97e44c827234284fe63e9be22c"
+    },
+    "before_files_rewritten": false,
+    "testcase_inheritance_added": false
+  },
+  "static": {
+    "result": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/pyright-final.json",
+      "sha256": "7050491ff4d0561b7804f385cd3b4768dd596861c187d0d12adad3b6d6dfe204"
+    },
+    "summary": {
+      "filesAnalyzed": 3,
+      "errorCount": 0,
+      "warningCount": 0,
+      "informationCount": 0,
+      "timeInSec": 6.491
+    },
+    "invocation": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/static-invocation.json",
+      "sha256": "ce3f88d483efba0be1c53846a2329178b7441f56fbecce3c34abaaea0c19f0c7"
+    }
+  },
+  "diff_check": {
+    "/home/dev/Aria": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "/home/dev/Aria/aria": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "mutants": [
+    {
+      "name": "skip-clears-count",
+      "diff": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count.diff.txt",
+      "diff_sha256": "ce5aa696bac6ff9cc8a9dc571a839bdb85d4f7ee1ff39598d2c92d1814cf309f",
+      "files": {
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count.mutant.py.txt": "4d89b7311dc3aeac3b9ec66332194d979a4d737358003aff8b4b33a3e500f751",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count-healthy.json": "d1f73f63177dbf3e1368d6f19ac3e75a0ad26f05dbf0bb7685b77b8edc38c6a3",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count.source.py.txt": "c0bcf339d2052b9fe6f0104389a9e11f39fcf78db76bdd77a09c6888223cfdeb",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count.diff.txt": "ce5aa696bac6ff9cc8a9dc571a839bdb85d4f7ee1ff39598d2c92d1814cf309f",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count-actual-bad.json": "529e26665031f3a8833c40dd1720e3e2756cf2e7ff461e71180fa0fc526d532e",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_skipped_clears_count_mutant/source-lf5pbfd8/skip-clears-count-hashes.json": "c230894134843e1e5ab985d68c6d8f2229c5918c987cdbc1020c72ffa01ec08b"
+      }
+    },
+    {
+      "name": "void-charges",
+      "diff": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges.diff.txt",
+      "diff_sha256": "c8df9d28092e7eb1bcce82a1ab6f5568506bee8d9abfbaff77df55dcf6a82285",
+      "files": {
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges.source.py.txt": "c0bcf339d2052b9fe6f0104389a9e11f39fcf78db76bdd77a09c6888223cfdeb",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges-actual-bad.json": "c3af4d8266954ccd2e4aae7e8835c49d4c518bca0ba8b5dd22bbd16ce7c5ab47",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges.diff.txt": "c8df9d28092e7eb1bcce82a1ab6f5568506bee8d9abfbaff77df55dcf6a82285",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges-hashes.json": "3958a21fe7c40147cac81ecb5f3b3a89557afafbd098822b667c19930483d078",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges-healthy.json": "0b98f32d60919652d98bdacdb13d95033b901c8e4491235eea2174e40465395f",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_charge_mutant/source-j1d96uz2/void-charges.mutant.py.txt": "5b57a384dc317ef97f5bd77bce981ce3bf7cccd584c3e5fafb89407da41d0289"
+      }
+    },
+    {
+      "name": "void-baseline",
+      "diff": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline.diff.txt",
+      "diff_sha256": "c584e7cca035c669dd2132001b24dd76a0fc54e3e11ebfc4217496460ec51955",
+      "files": {
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline.diff.txt": "c584e7cca035c669dd2132001b24dd76a0fc54e3e11ebfc4217496460ec51955",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline-healthy.json": "6395285513c710218ca31d6b4a7a0f47fb3036d6434aaec8af184ecc690eee2c",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline-hashes.json": "82372f62d2ecacc171492d90788788b23a8e7a38761d8d70c1ee86420f10b74f",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline.mutant.py.txt": "163dc4efdd1ae21e36d2266e6d4bcb33fba78061a03ded3be95e711a60d4a8a5",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline-actual-bad.json": "be3afc41da807b14b1a24bb740bc0a6febdeacd1671ee738e40f2f574375c7e9",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_fold_void_replaces_baseline_mutant/source-_onp26yn/void-baseline.source.py.txt": "c0bcf339d2052b9fe6f0104389a9e11f39fcf78db76bdd77a09c6888223cfdeb"
+      }
+    },
+    {
+      "name": "short-id-merges-keys",
+      "diff": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys.diff.txt",
+      "diff_sha256": "580bf730b297d13dca058b27614cf2cb411ee5749902fbd79274d183aee75a62",
+      "files": {
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys-hashes.json": "10793a1d957157954add38e901e6eec2476fe2426c6438d6fb2458601326b5b2",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys.diff.txt": "580bf730b297d13dca058b27614cf2cb411ee5749902fbd79274d183aee75a62",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys.source.py.txt": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys-healthy.json": "e088cb3e9abbb3e4f16d4e4e8f8f9a72fe7c8a9f1a175728562eaef4096237f2",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys-actual-bad.json": "6ec03295782cb19b31486b173bb77576ebf96eff1f955d8ddc1387419ea7a0fd",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_short_id_collision_and_merging_mutant/source-u54huaom/short-id-merges-keys.mutant.py.txt": "90b4e2f695057126d74e9e834493288a58a308788152ece1c3db54909574b263"
+      }
+    },
+    {
+      "name": "swallowed-variant",
+      "diff": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant.diff.txt",
+      "diff_sha256": "a6a7ad873639690d684e1cf10d8b215d420087f49e55f9e4b0ffebcb7f3a6749",
+      "files": {
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant-actual-bad.json": "d898ed73440e654f5c614ddcce441a41b3ef72f19c9caba075372f17a1b5632b",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant.mutant.py.txt": "1840ed5f3292486c6612df618097f72accaade3a2a0a3eb4e0cb19f99a49d34d",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant.diff.txt": "a6a7ad873639690d684e1cf10d8b215d420087f49e55f9e4b0ffebcb7f3a6749",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant-hashes.json": "bece3100905bc9af35286e15d23210cb32389fbaceb0d49b9f06e7fe9cf6ffdb",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant.source.py.txt": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/fixtures/runs/test_real_swallowed_variant_mutant/source-fierhwlo/swallowed-variant-healthy.json": "d390cfc5c7caeb1725279642b8266e2782c36776d6174d89ff0909776b2a903a"
+      }
+    }
+  ],
+  "product_defects": [
+    {
+      "id": "required_checker_final_reopens_live_audit_native",
+      "status": "CONFIRMED_BY_OFFLINE_PAIR",
+      "product_changed": false,
+      "healthy": "test_audit_executor.IndependentSeamTests.test_required_checker_cli_health_and_tamper_without_live_growth",
+      "failing": "test_audit_executor.WiringContractTests.test_real_cli_fences_required_checker_frozen_native_and_commit",
+      "actual": "R2已prepare且命令传native blob；原native仅加LF，final经_verify_drift重新打开live audit native并报E_NATIVE_EVIDENCE/source_hash_mismatch。",
+      "source": "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py",
+      "lines": [
+        3864,
+        3868,
+        2811
+      ],
+      "cause": "_collect_final创建空new_inputs=_Inputs后校验checker，未携带已验证audit_frozen/capture原字节。_verify_drift沿request/audit-index原origin解引用。",
+      "trace": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/wiring-direct-trace.txt",
+      "source_sha256": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+      "handoff": "移交主控回实现任务修复冻结输入接缝；本QA未修改产品、未放宽parser或用改输入假装此项通过。"
+    }
+  ],
+  "I1": "B1已被主控接受；旧失败留在regression_history_before_B2。",
+  "I2": "本片四项独立输入/真实源码坏实现已判GREEN/CAUGHT；仍待fresh完整Phase1→Phase2。",
+  "I3": {
+    "status": "REAL_MODEL_OUTPUT_ACQUIRED_SCORING_AND_FULL_REVIEW_PENDING",
+    "closed": false,
+    "note": "另一reader独立notes域；本片不读取/改语料、expected、输出或评分。"
+  },
+  "I4": "void计费/替换baseline/skipped清零均执行真实生产函数隔离源码变体，指定AssertionError已捕获；源diff/hash/实际错输出齐全。",
+  "I5": "精确分析测试、生产module与新增runner共3文件，0errors/0warnings。前次48文件混入fixture与后续3文件12项harness诊断均保留，不采作零错。",
+  "old_void_output_mutation": "保留原测试但仅属assertion_sensitivity；本次CAUGHT引用真实源码mutant，不再引用手改数组作为实现反证。",
+  "source_hashes": {
+    "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "088513752a11bab2039ac530b99830b56581292ed0e675c8ff1c83f5cb6815d1",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/run_b2.py": "f71ec6e7091b0a3b16a50386212584a2ae7290a90d0a9313e9f43b55fa6ec46b"
+  },
+  "evidence_paths": {
+    "run": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json",
+    "legacy": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/legacy-fixture-inputs/behavior-fixture.json",
+    "trace": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/wiring-direct-trace.txt",
+    "previous_unit": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/unit-evidence-before.json"
+  },
+  "authorization": {
+    "real_workflow": false,
+    "external_llm": false,
+    "commit_push": false,
+    "phase_C_D_release_deploy_PR38": false
+  },
+  "can_continue": false,
+  "regression_history": [
+    {
+      "kind": "prior_423_one_failure",
+      "record": {
+        "tests_run": 423,
+        "unique_ids": 423,
+        "passed": 422,
+        "failed_test_ids": [
+          "test_audit_executor.WiringContractTests.test_real_cli_fences_required_checker_frozen_native_and_commit"
+        ],
+        "failure_entries": 1,
+        "errors": 0,
+        "skipped": [],
+        "per_module": {
+          "test_audit_executor": 279,
+          "test_audit_executor_config": 6,
+          "test_audit_executor_negative_controls": 5,
+          "test_completeness_gate": 29,
+          "test_sibling_spec_probe": 104
+        },
+        "detail": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json"
+      },
+      "frozen_report": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/before/unit-evidence.json.txt"
+    },
+    {
+      "kind": "authorized_TASK010_repair_current426",
+      "record": {
+        "task_id": "TASK-010",
+        "status": "reaccepted_after_contract_preserving_fix",
+        "accepted_at": "2026-11-03T19:25:21.021136+00:00",
+        "review_run_id": "wf_12afb0f2-8aa",
+        "review_result": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-010/required-checker-frozen-repair/workflow-result.json",
+        "phase1": "PASS",
+        "phase2": "PASS",
+        "issues": [],
+        "independent_full_suite_judged": 426,
+        "independent_boundary_probes_judged": 7,
+        "parent_targeted_judged": 4,
+        "parent_targeted_skipped": 0,
+        "parent_full_suite": "NOT_JUDGED_TIMEOUT_180s",
+        "parent_logs": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-010/required-checker-frozen-repair/controller-validation",
+        "unchanged_protected_sources": 16,
+        "authorized_delta": [
+          {
+            "path": "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py",
+            "before_sha256": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+            "after_sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe"
+          },
+          {
+            "path": "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py",
+            "before_sha256": "65c9a61365f75d0bf72a44125498ae8eed44034ceb444a25c94295904471e0c2",
+            "after_sha256": "ad43851769b95d22ba2f77ac18070c203312aed680b019110b598e86d13115c2"
+          }
+        ],
+        "original_task013_before_unchanged": true,
+        "old_acceptance_retained_as_history": true,
+        "Task013_accepted": false,
+        "real_invocation": "pending_TASK016",
+        "Rule6": "pending_TASK017",
+        "C_D_commit_push_authorized": false
+      },
+      "source": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task010-reacceptance-frozen-inputs.json",
+      "parent_180s_timeout": "NOT-JUDGED，不是产品失败/skip；独立426 GREEN与主控4定点已保留"
+    }
+  ],
+  "B2_final_gaps": {
+    "task_id": "TASK-013",
+    "status": "B2_four_gaps_verified_not_task_acceptance",
+    "completed": false,
+    "B1": "已由主控接受TASK010冻结旧审计/新checker接缝修复",
+    "B3": "真实模型输出已取得；评分与完整复核未完成；本片不读取或修改其他reader语料/expected/输出/评分，不关闭I3",
+    "scenarios": [
+      {
+        "id": "bootstrap_future_hash_self_genesis",
+        "test_id": "test_audit_executor.FinalGapIndependentTests.test_bootstrap_future_hash_and_self_referential_genesis",
+        "input": "合法完整M1，cycle_origin/previous=null且未来locator不存在；另构造先引用尚未存在audit-index完整hash，以及完整genesis的policy_inputs回指自身origin、故意错误hash",
+        "healthy": "真实CLI首次build成功；真实_HistoryGraph验证完整正常genesis成功",
+        "rejection": "E_POLICY_SOURCE引用未来文件；E_HISTORY_CYCLE/structural_origin_reentry拒绝自引用，无SHA固定点",
+        "error_codes": [
+          "E_POLICY_SOURCE",
+          "E_HISTORY_CYCLE"
+        ],
+        "status": "GREEN",
+        "evidence": [
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-53x23smb/bootstrap-healthy.json",
+            "sha256": "bd6fec3086758be00c843d457682fdddf9428f205e18327be8bcda581aa60271"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-70nz05a_/bootstrap-healthy.json",
+            "sha256": "632a55909d53bb7a2bf1dbc700e1c088685c4075bf1ebb9efe90732595dd3482"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-um1hsarp/bootstrap-healthy.json",
+            "sha256": "4940124fd675b87cf6a85c19e7e6876be2dee11ff35d6ee09d9b47d6a3c33ffd"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-wplu2q9_/bootstrap-healthy.json",
+            "sha256": "d181f3ae30ded9ab6c3e1fef56c3b8e7280ac0a86b8707410432e21746037b6f"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-yhlbfijn/bootstrap-healthy.json",
+            "sha256": "3b5162a88075092b018e04d41f6e3378629f6500544dc551543c10742a0cf659"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-9lvrk0v_/future-hash-rejection.json",
+            "sha256": "fd2067b4aa19fc2b4f54abfc93b94d76efda8841a8ade34a80d816dc2c3b9423"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-bpj8chtj/future-hash-rejection.json",
+            "sha256": "1e4d559fb18959f24e9912e439c17b284e32b26068c6d6fa397fb71e6a087907"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-muudsf2q/future-hash-rejection.json",
+            "sha256": "4d21ada60dd20e866214a72807b1c4fc6463a6630f165955f4d5e0dcb65401af"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-p7zf965n/future-hash-rejection.json",
+            "sha256": "46457abdee5c0aed01766a45671e71793b8be374652be2d9796f957e35cb5390"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-sq7md9mz/future-hash-rejection.json",
+            "sha256": "f2bc2b31525418c252b1d9bcda58f9e9be5ae524ec21b3ab76227f1d5151c102"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-53x23smb/self-genesis-rejection.json",
+            "sha256": "eacf366d0b121ffb46e77dbbc39550d7dc16336b06804a1bff877b22de876424"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-70nz05a_/self-genesis-rejection.json",
+            "sha256": "f81a345b5a1c4ba8f30edd17d94245cba2a75056348dee389102718910a0dedc"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-um1hsarp/self-genesis-rejection.json",
+            "sha256": "ccbcda5885fc348fee46b5ad34dc30fdcc4027a0a573b23c8b1e864868f457e2"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-wplu2q9_/self-genesis-rejection.json",
+            "sha256": "dbb4d444e29a0aea4d32617e5f9ee292b2e06bd70acbddb5b40eda14a2830c8d"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-yhlbfijn/self-genesis-rejection.json",
+            "sha256": "77f4b90a6316f3200b89d9b63d5000464074c7d5d2775e5709559d6994cb33df"
+          }
+        ]
+      },
+      {
+        "id": "policy_only_round_resource_bad_implementation",
+        "test_id": "test_audit_executor.FinalGapIndependentTests.test_policy_ignored_source_mutant_really_reserves_terminal_head",
+        "input": "真实MAX_ROUNDS_EXHAUSTED与CONVERGED有效head，资源unknown_calls=[]且next_round_dispatch_allowed=true，round/attempt均连续",
+        "healthy": "未变CLI均E_POLICY_BLOCKED/prefix_policy_forbids_dispatch，ledger无变化且不生成script",
+        "source_counterexample": "仅在隔离module实际_require_dispatch_policy源码的if加入False and；build、资源和序号校验仍为真实生产实现；两坏态均真实新增reserve事件并生成script",
+        "designated_red": "QA_B2_POLICY_NO_RESERVE",
+        "error_codes": [
+          "E_POLICY_BLOCKED"
+        ],
+        "mutant_error_code": null,
+        "status": "CAUGHT",
+        "evidence": [
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-53x23smb/bootstrap-healthy.json",
+            "sha256": "bd6fec3086758be00c843d457682fdddf9428f205e18327be8bcda581aa60271"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-70nz05a_/bootstrap-healthy.json",
+            "sha256": "632a55909d53bb7a2bf1dbc700e1c088685c4075bf1ebb9efe90732595dd3482"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-um1hsarp/bootstrap-healthy.json",
+            "sha256": "4940124fd675b87cf6a85c19e7e6876be2dee11ff35d6ee09d9b47d6a3c33ffd"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-wplu2q9_/bootstrap-healthy.json",
+            "sha256": "d181f3ae30ded9ab6c3e1fef56c3b8e7280ac0a86b8707410432e21746037b6f"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_bootstrap_future_hash_and_self_referential_genesis/source-yhlbfijn/bootstrap-healthy.json",
+            "sha256": "3b5162a88075092b018e04d41f6e3378629f6500544dc551543c10742a0cf659"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-healthy.json",
+            "sha256": "4be9aa3b7a069d0a2fbf134b9a7900e3c70f64dcdc4a6db0f041d7e1d72f175e"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-healthy.json",
+            "sha256": "6245d1057e6d98590b390eda7a5a1c8186367e5691d14ce1328656a8f522fac1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-healthy.json",
+            "sha256": "c701c9e86d188589d972fd13ddd3163d6df2fa51ba138352c3247849da885d43"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-healthy.json",
+            "sha256": "26cd3b719b4abfb425f5303cc8a91fefd2ed10a2a69984bb950fe9bceadad0a4"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-healthy.json",
+            "sha256": "a6f09a078689d22e356eec2a9ace35a92c13b8997c69ea277c45ba2f02bda959"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED-healthy.json",
+            "sha256": "bdc52206c6a48e214efb6081d13c29db5f519f3864240e4cca5088e203cf8e37"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED-healthy.json",
+            "sha256": "52316f97f0ec9afc7fc3ca768c56fb2d9fab3dba918a8bd360fac126e0366f5b"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED-healthy.json",
+            "sha256": "f8b917c9267c45a87b3ee66c9385e614848714d0381941b125de5b762696b64e"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED-healthy.json",
+            "sha256": "3e10b289320325a973169e3ef5a269c6e7f8964ee2649f55bf5fa792478de351"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED-healthy.json",
+            "sha256": "9feabe983aff12f8752a91a8cd255fb6c02d51ef96799f9823b55499486e89aa"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED-healthy.json",
+            "sha256": "f0dbba39701ae377f18180c8c3b434c1382e460234b23f7c43cd6ef58d895ea2"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED-healthy.json",
+            "sha256": "fbf94fda6ab5ab265f6328b8c3548cd4197be13b99e01856b203f015cbba8a13"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED-healthy.json",
+            "sha256": "e8bf0dd00b31bd9d34a69d4af3d2e0dddc3a71c42f4ac6ad4c68676903eb5996"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED-healthy.json",
+            "sha256": "39eaaa771dd3c69ac01adc07a87204221d01c337bada57499df14cec0411e547"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED-healthy.json",
+            "sha256": "b744bf00f2b4cb89c2306b8c14b1cc6ef1acd6f7581d010a37fe46c01fdedd70"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED-caught.json",
+            "sha256": "7e27f73069ae112e629b968221ac80831538311e6281d306013f4a77d6d689de"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED-caught.json",
+            "sha256": "62d2ea6eda21c0a0b060c3e6d90679e5b61e44e17db8a5116a47bd0bf501f797"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED-caught.json",
+            "sha256": "96db72c31d1380231f9f1047165ff02727d93a8209be7afcd76a37cc3521048b"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED-caught.json",
+            "sha256": "263658d6e00428792c8e5e64f63a46569779cc06f281ddc959eb4adbe0595d8c"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED-caught.json",
+            "sha256": "1c80e7ecfc5f96bd94d8fb9eed79422001e822a027ba8dd42c4f62d68d7b9709"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED-caught.json",
+            "sha256": "d5188d8c8e1990281c71896ff4d7134e1dffccd629724a2329532451d49814e8"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED-caught.json",
+            "sha256": "3fd0427c71996a06d5258861d0616fe9abe15965ed23b4d98e4069bfd1a4201c"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED-caught.json",
+            "sha256": "10c22153f9a9d3a19dcf885c9e6bbce892523a1a42850ce8aa5043c67ccb25eb"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED-caught.json",
+            "sha256": "46d68cac3679339019cba669a65e73b935970accd285b35cb217209c4a579c01"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED-caught.json",
+            "sha256": "7f7dea7fbe368320acabf39b9581d53a062e2cc152ede52c68196aa1a68dc562"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization-source-hashes.json",
+            "sha256": "4a61fef3e95ecc36d1b527ba0f0b9196d71398dacd3041b5c86c81413db5c3b6"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization-source-hashes.json",
+            "sha256": "96f2e1fc1d0133baab7c1968e7e2ab3771b1a2f2d9f8a2b329eb388c23578014"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization-source-hashes.json",
+            "sha256": "3eb525f726a4c23a3757713ccccf0893af9475a3905b4bfec006c59afc6ee869"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization-source-hashes.json",
+            "sha256": "ee672d17efc5d7a4c4ad4c664bfdd0dbf344e18a896470bc8e649ad7d3106972"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization-source-hashes.json",
+            "sha256": "7acc1fa8e59d9b45bec1a9fd0fe0616cd9b4d4cd4f0ffd472f92d1046bce9f4b"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+            "sha256": "bfde450d3289f2ee297be42154a0680c6b7932db9f068f1481a2826614fd1431"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED-source-hashes.json",
+            "sha256": "71b93ae1fb8f4673f7c2d3b5064d22ea114d306232ae1c6439c3f0d266273c0d"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED-source-hashes.json",
+            "sha256": "277e16249b91b5604d03dd519174bdd0a4d42611ada59fc96e71b2669d5ef0de"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+            "sha256": "bd3dba0f53cf4a24fd4a91a961717016d8df13a46596ab412ceef93d8d745071"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED-source-hashes.json",
+            "sha256": "dcfc252a59453be6bb5a9d2e3c24ab56607f830def4b7deb31770f1ed94e0510"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+            "sha256": "acb6585647a175f1889e0be57d29c33b50ff92b680a3e520e728507780591249"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED-source-hashes.json",
+            "sha256": "2e1384e56be000b81fc7007e6ab53c689d4210a5d502e70f3c482586b0e1b64a"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+            "sha256": "fc62dce25ff8fd6a2bae4430ebd7b31189e6654f80fa85b6511bc84454c7fbb7"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED-source-hashes.json",
+            "sha256": "4c0f8c5655444805e2f1a6c74458ee0bcc10e53b4c7d1aff268fc9dbcc97798f"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+            "sha256": "64284dba1d1ce3359f36f491b03adb3d43eec3fa60dc1457e37e80401484f36c"
+          }
+        ]
+      },
+      {
+        "id": "normalizing_scope_bad_implementation",
+        "test_id": "test_audit_executor.FinalGapIndependentTests.test_exact_scope_normalization_source_mutant",
+        "input": "Scope前后空白、大小写、全角Unicode，以及Café的NFC/NFD六种精确scope；两席各包含每个scope",
+        "healthy": "独立expected完整六keys/buckets，逐scope检查variant、found_by与两members的role/finding索引",
+        "source_counterexample": "真实_aggregate_admitted隔离函数仅将bucket scope引入NFKC+strip+casefold归一化，输出来自函数实跑，未改expected/生产源",
+        "designated_red": "QA_B2_EXACT_SCOPE_KEYS",
+        "error_codes": [],
+        "mutant_error_code": null,
+        "status": "CAUGHT",
+        "evidence": [
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-healthy.json",
+            "sha256": "4be9aa3b7a069d0a2fbf134b9a7900e3c70f64dcdc4a6db0f041d7e1d72f175e"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-input.json",
+            "sha256": "286aa26eb427942cc75517c6b7daa2fde4a291a5e55c905abaab60358d18c257"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/exact-scope-mutant-output.json",
+            "sha256": "e8be1df9cef2fb427f759056460deffb673b34e8c0cd88ca024c27d45c03d388"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-healthy.json",
+            "sha256": "6245d1057e6d98590b390eda7a5a1c8186367e5691d14ce1328656a8f522fac1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-input.json",
+            "sha256": "1d6691af55949173e8792579ccea0cb2afebc593eac2fac44691603d6b2d6843"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/exact-scope-mutant-output.json",
+            "sha256": "3cadd32bddbdd297445b4e8519ba594ff17a638be18da944e8f98710337b13dc"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-healthy.json",
+            "sha256": "c701c9e86d188589d972fd13ddd3163d6df2fa51ba138352c3247849da885d43"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-input.json",
+            "sha256": "255d4ffeb11b3bcab4b9c8345b539d1d0ecf905137de91cd21690bfe01330da9"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/exact-scope-mutant-output.json",
+            "sha256": "0f1a74ca3ba9d3e604073e36bbb136282ec8fef1eca5999cbf347e5c0582bbbb"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-healthy.json",
+            "sha256": "26cd3b719b4abfb425f5303cc8a91fefd2ed10a2a69984bb950fe9bceadad0a4"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-input.json",
+            "sha256": "09acb38e19c9c34e48a440b12fdf4203fb04e3adfb0c6f3a4d298c1b29248add"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/exact-scope-mutant-output.json",
+            "sha256": "c782692a0056864dc6045af5c15461305dcd1d392e8506d534ab4db6e805bbb0"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-caught.json",
+            "sha256": "ce08ef73d2cb27f21e0b4d1f4dd6e7bc9cacc9484ae2543186327860c9f9d8a1"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-healthy.json",
+            "sha256": "a6f09a078689d22e356eec2a9ace35a92c13b8997c69ea277c45ba2f02bda959"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-input.json",
+            "sha256": "a2910dbd5e519c457927622085b518a8b557c4da127c797cc8b06834ce43047e"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/exact-scope-mutant-output.json",
+            "sha256": "154b90b7974db7ab2a8793d11578249bdf421909ba9389be2cead5a2247c7c7b"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization-source-hashes.json",
+            "sha256": "4a61fef3e95ecc36d1b527ba0f0b9196d71398dacd3041b5c86c81413db5c3b6"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization-source-hashes.json",
+            "sha256": "96f2e1fc1d0133baab7c1968e7e2ab3771b1a2f2d9f8a2b329eb388c23578014"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization-source-hashes.json",
+            "sha256": "3eb525f726a4c23a3757713ccccf0893af9475a3905b4bfec006c59afc6ee869"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization-source-hashes.json",
+            "sha256": "ee672d17efc5d7a4c4ad4c664bfdd0dbf344e18a896470bc8e649ad7d3106972"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization-source-hashes.json",
+            "sha256": "7acc1fa8e59d9b45bec1a9fd0fe0616cd9b4d4cd4f0ffd472f92d1046bce9f4b"
+          }
+        ]
+      },
+      {
+        "id": "same_round_changed_client_pending",
+        "test_id": "test_audit_executor.FinalGapIndependentTests.test_pending_same_round_changed_client_cli_rejected",
+        "input": "真实CLI完成首次reservation并原client正证resume_only，再同round/attempt仅换client及其run/manifest路径和未来locators，绑定真实既存genesis、previous仍null",
+        "healthy": "首次resume_only=false；原client重入resume_only=true且证据字节不变",
+        "rejection": "E_RESOURCE_PENDING/pending_reservation_resume_only；未借scope_origin_or_head提前失败；仍仅1个原client reserve，无新script/派发/证据覆盖",
+        "error_codes": [
+          "E_RESOURCE_PENDING"
+        ],
+        "status": "GREEN",
+        "evidence": [
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_pending_same_round_changed_client_cli_rejected/source-e7cy9l5_/pending-client-rejection.json",
+            "sha256": "641b852d88f557de8055ac3dfe757984bbdf462aac569aad00b0b67e25b36c39"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_pending_same_round_changed_client_cli_rejected/source-ovezbmck/pending-client-rejection.json",
+            "sha256": "848ef350e78798b0a355e5058417fd1d9f5efc97a40b11d5fb60a28bd72512af"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_pending_same_round_changed_client_cli_rejected/source-pd_kc8ba/pending-client-rejection.json",
+            "sha256": "c401083cc0aa1c0b03088be075093a3b4599f5b2e6902f9918ef603a7f5b3cb8"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_pending_same_round_changed_client_cli_rejected/source-s4vazu0t/pending-client-rejection.json",
+            "sha256": "633cf5f4b21842e5c12a01e57976008351c9d9fdfc8b919960e6702acdef3cfc"
+          },
+          {
+            "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_pending_same_round_changed_client_cli_rejected/source-vmndkwhi/pending-client-rejection.json",
+            "sha256": "371150fe832c94bb323849534a324579610bb6fbea239791fd98adff95dd098c"
+          }
+        ]
+      }
+    ],
+    "source_mutants": [
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization-source-hashes.json",
+          "sha256": "4a61fef3e95ecc36d1b527ba0f0b9196d71398dacd3041b5c86c81413db5c3b6"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization.source.py.txt",
+          "sha256": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization.mutant.py.txt",
+          "sha256": "db8196dfa38068db4536f92d7f89a35652d752c5238b55622431c2c02ce1e9b3"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-0mpbuq7r/scope-normalization.diff.txt",
+          "sha256": "5e2c0912faa4319de6538ce3d9cd0d424940d9a91dad66cb4bce41dac45132ff"
+        },
+        "function": "_aggregate_admitted"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization-source-hashes.json",
+          "sha256": "96f2e1fc1d0133baab7c1968e7e2ab3771b1a2f2d9f8a2b329eb388c23578014"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization.source.py.txt",
+          "sha256": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization.mutant.py.txt",
+          "sha256": "db8196dfa38068db4536f92d7f89a35652d752c5238b55622431c2c02ce1e9b3"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-6i4e5qky/scope-normalization.diff.txt",
+          "sha256": "5e2c0912faa4319de6538ce3d9cd0d424940d9a91dad66cb4bce41dac45132ff"
+        },
+        "function": "_aggregate_admitted"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization-source-hashes.json",
+          "sha256": "3eb525f726a4c23a3757713ccccf0893af9475a3905b4bfec006c59afc6ee869"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization.source.py.txt",
+          "sha256": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization.mutant.py.txt",
+          "sha256": "db8196dfa38068db4536f92d7f89a35652d752c5238b55622431c2c02ce1e9b3"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-d5q1t1_5/scope-normalization.diff.txt",
+          "sha256": "5e2c0912faa4319de6538ce3d9cd0d424940d9a91dad66cb4bce41dac45132ff"
+        },
+        "function": "_aggregate_admitted"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization-source-hashes.json",
+          "sha256": "ee672d17efc5d7a4c4ad4c664bfdd0dbf344e18a896470bc8e649ad7d3106972"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization.source.py.txt",
+          "sha256": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization.mutant.py.txt",
+          "sha256": "db8196dfa38068db4536f92d7f89a35652d752c5238b55622431c2c02ce1e9b3"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-v4a_pew0/scope-normalization.diff.txt",
+          "sha256": "5e2c0912faa4319de6538ce3d9cd0d424940d9a91dad66cb4bce41dac45132ff"
+        },
+        "function": "_aggregate_admitted"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization-source-hashes.json",
+          "sha256": "7acc1fa8e59d9b45bec1a9fd0fe0616cd9b4d4cd4f0ffd472f92d1046bce9f4b"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization.source.py.txt",
+          "sha256": "ea3d33076f1d5e34ae2e72a9603556008d833bd05b92c358133f7ee1dd5a97ae"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization.mutant.py.txt",
+          "sha256": "db8196dfa38068db4536f92d7f89a35652d752c5238b55622431c2c02ce1e9b3"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_exact_scope_normalization_source_mutant/source-zkdso1m3/scope-normalization.diff.txt",
+          "sha256": "5e2c0912faa4319de6538ce3d9cd0d424940d9a91dad66cb4bce41dac45132ff"
+        },
+        "function": "_aggregate_admitted"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+          "sha256": "bfde450d3289f2ee297be42154a0680c6b7932db9f068f1481a2826614fd1431"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-0ysnlbm9/MAX_ROUNDS_EXHAUSTED.diff.txt",
+          "sha256": "4169a11da2abec61c0513e6844d7603aaa38b079b65fad987a470e7fac4554db"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED-source-hashes.json",
+          "sha256": "71b93ae1fb8f4673f7c2d3b5064d22ea114d306232ae1c6439c3f0d266273c0d"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-63r81qwc/CONVERGED.diff.txt",
+          "sha256": "cec36df6a92e5383e60cbe8ffeeb2d587920afa6c98dfcb94fc3152970675e7d"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED-source-hashes.json",
+          "sha256": "277e16249b91b5604d03dd519174bdd0a4d42611ada59fc96e71b2669d5ef0de"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-aqm4vu3r/CONVERGED.diff.txt",
+          "sha256": "cec36df6a92e5383e60cbe8ffeeb2d587920afa6c98dfcb94fc3152970675e7d"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+          "sha256": "bd3dba0f53cf4a24fd4a91a961717016d8df13a46596ab412ceef93d8d745071"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-errm2drh/MAX_ROUNDS_EXHAUSTED.diff.txt",
+          "sha256": "4169a11da2abec61c0513e6844d7603aaa38b079b65fad987a470e7fac4554db"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED-source-hashes.json",
+          "sha256": "dcfc252a59453be6bb5a9d2e3c24ab56607f830def4b7deb31770f1ed94e0510"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-ezmv0u1t/CONVERGED.diff.txt",
+          "sha256": "cec36df6a92e5383e60cbe8ffeeb2d587920afa6c98dfcb94fc3152970675e7d"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+          "sha256": "acb6585647a175f1889e0be57d29c33b50ff92b680a3e520e728507780591249"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-hmn_lott/MAX_ROUNDS_EXHAUSTED.diff.txt",
+          "sha256": "4169a11da2abec61c0513e6844d7603aaa38b079b65fad987a470e7fac4554db"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED-source-hashes.json",
+          "sha256": "2e1384e56be000b81fc7007e6ab53c689d4210a5d502e70f3c482586b0e1b64a"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-plig4w7l/CONVERGED.diff.txt",
+          "sha256": "cec36df6a92e5383e60cbe8ffeeb2d587920afa6c98dfcb94fc3152970675e7d"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+          "sha256": "fc62dce25ff8fd6a2bae4430ebd7b31189e6654f80fa85b6511bc84454c7fbb7"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uevxg0pv/MAX_ROUNDS_EXHAUSTED.diff.txt",
+          "sha256": "4169a11da2abec61c0513e6844d7603aaa38b079b65fad987a470e7fac4554db"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED-source-hashes.json",
+          "sha256": "4c0f8c5655444805e2f1a6c74458ee0bcc10e53b4c7d1aff268fc9dbcc97798f"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-uu9x7j3c/CONVERGED.diff.txt",
+          "sha256": "cec36df6a92e5383e60cbe8ffeeb2d587920afa6c98dfcb94fc3152970675e7d"
+        },
+        "function": "_require_dispatch_policy"
+      },
+      {
+        "record": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED-source-hashes.json",
+          "sha256": "64284dba1d1ce3359f36f491b03adb3d43eec3fa60dc1457e37e80401484f36c"
+        },
+        "source": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED.source.py.txt",
+          "sha256": "4dede41cd2e3871d38a3e195cf1f4261dcb813b73ee9b2445ced456aff9cc87a"
+        },
+        "mutant": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED.mutant.py.txt",
+          "sha256": "9f9fdbf9d5834b557f3684ae78288d32301c7d271b92339282175ddc1691890d"
+        },
+        "diff": {
+          "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/retained/final-gaps/runs/test_policy_ignored_source_mutant_really_reserves_terminal_head/source-znnrbdn5/MAX_ROUNDS_EXHAUSTED.diff.txt",
+          "sha256": "4169a11da2abec61c0513e6844d7603aaa38b079b65fad987a470e7fac4554db"
+        },
+        "function": "_require_dispatch_policy"
+      }
+    ],
+    "source_hashes": {
+      "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+      "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+      "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/run_b2.py": "f71ec6e7091b0a3b16a50386212584a2ae7290a90d0a9313e9f43b55fa6ec46b",
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "088513752a11bab2039ac530b99830b56581292ed0e675c8ff1c83f5cb6815d1"
+    },
+    "targeted": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/targeted-result.json",
+      "sha256": "c4b867f26d903afdead7eae6bf739ee7d024c8032205b76c5a34ade044ab1d3e"
+    },
+    "full": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/ref-closure-repair/regression-ref-repair/full-result-ee8a8401cebaf37ee484daf05a56dee51d51b69ad8a2811bf99c34144e042fe2.json",
+      "sha256": "ee8a8401cebaf37ee484daf05a56dee51d51b69ad8a2811bf99c34144e042fe2"
+    },
+    "full_counts": {
+      "judged": 430,
+      "unique_ids": 430,
+      "passed": 430,
+      "skipped": [],
+      "per_module": {
+        "test_audit_executor": 286,
+        "test_audit_executor_config": 6,
+        "test_audit_executor_negative_controls": 5,
+        "test_completeness_gate": 29,
+        "test_sibling_spec_probe": 104
+      },
+      "elapsed_seconds": 237.14216322099674
+    },
+    "static": {
+      "result": {
+        "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/ref-closure-repair/leaves/pyright-final-7050491ff4d0561b7804f385cd3b4768dd596861c187d0d12adad3b6d6dfe204.json",
+        "sha256": "7050491ff4d0561b7804f385cd3b4768dd596861c187d0d12adad3b6d6dfe204"
+      },
+      "summary": {
+        "filesAnalyzed": 3,
+        "errorCount": 0,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 6.491
+      },
+      "targets": [
+        "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py",
+        "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py",
+        "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/run_b2.py"
+      ],
+      "prior_attempts": [
+        {
+          "file": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/pyright.json",
+          "status": "NOT_ACCEPTED",
+          "reason": "默认隐藏目录过滤使runner未纳入，仅2文件"
+        },
+        {
+          "file": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/pyright-explicit.json",
+          "status": "NOT_ACCEPTED",
+          "reason": "absolute include不被pyright接受导致错误扫描157份含fixture文件；未将此结果当产品失败或静态通过"
+        }
+      ]
+    },
+    "preservation": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/ref-closure-repair/leaves/preservation-4fcf791dbfdc5a7beb51bd5c325cbed17f61a8a4a3f1090d67dd89528c0a3746.json",
+      "sha256": "4fcf791dbfdc5a7beb51bd5c325cbed17f61a8a4a3f1090d67dd89528c0a3746"
+    },
+    "remaining": [
+      "B3真实模型输出评分/完整复核",
+      "主控合并B3后fresh完整Phase1→Phase2",
+      "TASK013未接受；TASK016/017真实调用/正式AB不在本片授权内"
+    ],
+    "boundaries": {
+      "only_allowed_product_files": true,
+      "no_executor_skill_contract_config_spec_state_changes": true,
+      "no_C_D_commit_push_release_deploy_PR38_restore": true,
+      "no_real_backend_or_AB_runner": true,
+      "nice": 19,
+      "cpus": [
+        0,
+        1
+      ],
+      "python_isolated": true,
+      "serial": true
+    },
+    "final_fixture_regression": true
+  },
+  "preservation_before_B2": {
+    "original_245_ast_unchanged": true,
+    "original_test_count": 245,
+    "all_17_hashes_unchanged": true,
+    "protected_sources": {
+      "/home/dev/Aria/aria/skills/audit-engine/SKILL.md": {
+        "before": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+        "after": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/references/execution-modes.md": {
+        "before": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+        "after": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829"
+      },
+      "/home/dev/Aria/.aria/config.json": {
+        "before": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+        "after": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa"
+      },
+      "/home/dev/Aria/.aria/config.template.json": {
+        "before": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+        "after": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba"
+      },
+      "/home/dev/Aria/aria/skills/config-loader/DEFAULTS.json": {
+        "before": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+        "after": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9"
+      },
+      "/home/dev/Aria/aria/skills/config-loader/SKILL.md": {
+        "before": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+        "after": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/references/executor-contract.md": {
+        "before": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+        "after": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor_config.py": {
+        "before": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+        "after": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": {
+        "before": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+        "after": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": {
+        "before": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+        "after": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": {
+        "before": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+        "after": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": {
+        "before": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+        "after": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/test_sibling_spec_probe.py": {
+        "before": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+        "after": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": {
+        "before": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+        "after": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py": {
+        "before": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+        "after": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf"
+      },
+      "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json": {
+        "before": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+        "after": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615"
+      },
+      "/home/dev/Aria/.aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json": {
+        "before": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+        "after": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be"
+      }
+    }
+  },
+  "static_before_B2": {
+    "exit": 0,
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/pyright.json",
+    "summary": {
+      "filesAnalyzed": 3,
+      "errorCount": 0,
+      "warningCount": 0,
+      "informationCount": 0,
+      "timeInSec": 6.647
+    }
+  },
+  "source_hashes_before_B2": {
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": "65c9a61365f75d0bf72a44125498ae8eed44034ceb444a25c94295904471e0c2",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "618d1f0867eb8eac2622028a253c0be3ea5d36d3260bbea32ee23fa01b355ddd",
+    "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/run_fresh_qa.py": "6d839028c1760eb065971c7da4e37b960df5f18fa669b4b18d2101947bbff41a"
+  },
+  "remaining_history_before_B2": [
+    "B3真实模型输出评分/完整复核",
+    "主控合并B3后fresh完整Phase1→Phase2",
+    "TASK013未接受；TASK016/017真实调用/正式AB不在本片授权内"
+  ],
+  "regression_history_before_B2": {
+    "prior_unit": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/unit-evidence-before-update.json",
+      "sha256": "b95b362e1931a032f99247d100c7785ceae922842644f8402fa2e45611bca3cb"
+    },
+    "prior_regression": {
+      "tests_run": 430,
+      "unique_ids": 430,
+      "passed": 430,
+      "failures": 0,
+      "errors": 0,
+      "skipped": [],
+      "per_module": {
+        "test_audit_executor": 286,
+        "test_audit_executor_config": 6,
+        "test_audit_executor_negative_controls": 5,
+        "test_completeness_gate": 29,
+        "test_sibling_spec_probe": 104
+      },
+      "detail": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/full-result.json",
+      "elapsed_seconds": 340.0290493629873
+    },
+    "old_423_with_one_failure_retained": {
+      "tests_run": 423,
+      "unique_ids": 423,
+      "passed": 422,
+      "failed_test_ids": [
+        "test_audit_executor.WiringContractTests.test_real_cli_fences_required_checker_frozen_native_and_commit"
+      ],
+      "failure_entries": 1,
+      "errors": 0,
+      "skipped": [],
+      "per_module": {
+        "test_audit_executor": 279,
+        "test_audit_executor_config": 6,
+        "test_audit_executor_negative_controls": 5,
+        "test_completeness_gate": 29,
+        "test_sibling_spec_probe": 104
+      },
+      "detail": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/fresh-qa-20261103T183441506252Z/result.json"
+    },
+    "accepted_426_repair": {
+      "task_id": "TASK-010",
+      "status": "reaccepted_after_contract_preserving_fix",
+      "accepted_at": "2026-11-03T19:25:21.021136+00:00",
+      "review_run_id": "wf_12afb0f2-8aa",
+      "review_result": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-010/required-checker-frozen-repair/workflow-result.json",
+      "phase1": "PASS",
+      "phase2": "PASS",
+      "issues": [],
+      "independent_full_suite_judged": 426,
+      "independent_boundary_probes_judged": 7,
+      "parent_targeted_judged": 4,
+      "parent_targeted_skipped": 0,
+      "parent_full_suite": "NOT_JUDGED_TIMEOUT_180s",
+      "parent_logs": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-010/required-checker-frozen-repair/controller-validation",
+      "unchanged_protected_sources": 16,
+      "authorized_delta": [
+        {
+          "path": "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py",
+          "before_sha256": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+          "after_sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe"
+        },
+        {
+          "path": "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py",
+          "before_sha256": "65c9a61365f75d0bf72a44125498ae8eed44034ceb444a25c94295904471e0c2",
+          "after_sha256": "ad43851769b95d22ba2f77ac18070c203312aed680b019110b598e86d13115c2"
+        }
+      ],
+      "original_task013_before_unchanged": true,
+      "old_acceptance_retained_as_history": true,
+      "Task013_accepted": false,
+      "real_invocation": "pending_TASK016",
+      "Rule6": "pending_TASK017",
+      "C_D_commit_push_authorized": false
+    },
+    "parent_180s_timeout": "NOT-JUDGED; not product failure, not skipped"
+  },
+  "B1": {
+    "status": "ACCEPTED",
+    "reference": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task010-reacceptance-frozen-inputs.json",
+      "sha256": "fc78303d7dcc6181f8e704ef7ebc0c835a933971b75f588d39853ba5b3e112aa"
+    }
+  },
+  "preservation_final_gaps": {
+    "original_protected_unchanged": 16,
+    "authorized_repaired_protected_source": "aria/skills/audit-engine/scripts/audit_executor.py",
+    "authorized_repaired_sha256": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "all_17_original_unchanged": false,
+    "protected_sources": {
+      "aria/skills/audit-engine/SKILL.md": {
+        "original": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+        "current": "bf1f1eb9e5f48b5fad01cd99ecf253ac357435845b6636cc37c5020f5b0a730c",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/references/execution-modes.md": {
+        "original": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+        "current": "e71f1aee7bf90afa003590164fe25e2519ca69564a45125838a53063f0448829",
+        "unchanged": true
+      },
+      ".aria/config.json": {
+        "original": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+        "current": "c0277c65b40604e27cd2039900bc8d95cd2f665bc59108969862d80bd7694caa",
+        "unchanged": true
+      },
+      ".aria/config.template.json": {
+        "original": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+        "current": "1457db4cd001acd424381407c11e00cbc54d04ea9d2b53dd897118a45b5d42ba",
+        "unchanged": true
+      },
+      "aria/skills/config-loader/DEFAULTS.json": {
+        "original": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+        "current": "7bdec7a5e893ceb3406a6d9a004dde8dce0ae851f7ff88e86d421bfbcb4b07d9",
+        "unchanged": true
+      },
+      "aria/skills/config-loader/SKILL.md": {
+        "original": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+        "current": "2046c8c82131e9cbbb8a6bf04f1fea7648d3e9a785d6cfe433f2b5276f174122",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/references/executor-contract.md": {
+        "original": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+        "current": "b5ac955cca1bc1925406dbf0d680312a16c341220f0b37548a63fbaccee45efc",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/test_audit_executor_config.py": {
+        "original": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+        "current": "c289bbb807f15e69bf88306603a8f41817f9aaca6d3362a281701b6df7e0a66a",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/boundary-cases.json": {
+        "original": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+        "current": "ec126b7179d2be1a70509a940679ab85b4dcbbcfe1144ad6b057f209d3f8e63a",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/probe-target.txt": {
+        "original": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+        "current": "31c9ae231d1080c5c44931528edf40b74cebe47d746258f126c3aabd0d9ed0e7",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/history-provenance.json": {
+        "original": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+        "current": "49b148d86de03f2247df398fdc504c37b5b1a4fc74fcef2b7fe846aac0dcd2ac",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/history-r2-r5.json": {
+        "original": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+        "current": "54ed1097fba7264b28e20b85a0a0521f9a2a0051da777718b14e28e88193696f",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/test_sibling_spec_probe.py": {
+        "original": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+        "current": "8ec072d9f925b31b2680132331c4b8675703cf52dc9342340c259c00b4b044a8",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/scripts/audit_executor.py": {
+        "original": "7058da68e999329724949a738c7ca2e94a23d13152c8273972ee565b374a8ab4",
+        "current": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+        "unchanged": false
+      },
+      "aria/skills/audit-engine/tests/test_audit_executor_negative_controls.py": {
+        "original": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+        "current": "5fb572c5cd8f345acb874f55ca5ef071b8e39028b4e07ab66a6ddf0d144a0abf",
+        "unchanged": true
+      },
+      "aria/skills/audit-engine/tests/fixtures/audit_executor/negative-controls.json": {
+        "original": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+        "current": "492703b7908ec8cb7fd1302a2ea69471145dc3cf0f2b43630a4fe135c8f76615",
+        "unchanged": true
+      },
+      ".aria/audit-reports/audit-executor-minimal-repair/negative-controls-evidence.json": {
+        "original": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+        "current": "2c2f526c660294153fca67486787e81031a37f3421d22e0af25c3b72d420d3be",
+        "unchanged": true
+      }
+    },
+    "original_282_test_methods_exact_definition_bytes_preserved": true,
+    "all_existing_top_level_definitions_preserved": true,
+    "preserved_top_level_count": 24,
+    "added_classes": [
+      "FinalGapIndependentTests"
+    ],
+    "added_test_methods": 4,
+    "before_test": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/before/test_audit_executor.py.txt",
+      "sha256": "ad43851769b95d22ba2f77ac18070c203312aed680b019110b598e86d13115c2"
+    },
+    "original_task013_before": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task013-before.json",
+      "sha256": "5885340d843550688ed75d121c03d253ac2bcc97e44c827234284fe63e9be22c"
+    },
+    "authorized_delta": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task013-authorized-repair-delta.json",
+      "sha256": "48ccc4cd44c57aa0508e3a16b8892f6e2577e8ad0aa754fbf68e5b1a8eeb3ec5"
+    }
+  },
+  "source_hashes_final_gaps": {
+    "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/run_b2.py": "f71ec6e7091b0a3b16a50386212584a2ae7290a90d0a9313e9f43b55fa6ec46b"
+  },
+  "historical_source_hashes_before_B2": {
+    "/home/dev/Aria/aria/skills/audit-engine/scripts/audit_executor.py": "e6e05dcbb81d6ce7d4fa83e8fbfd3406ba665214fe77b7aca4fc3d99410a33fe",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/test_audit_executor.py": "31917434340b0ec48e5732b5ec80a5580addb94c8a6512a10f870d8c62fe690c",
+    "/home/dev/Aria/aria/skills/audit-engine/tests/fixtures/audit_executor/compatibility-cases.json": "9780eadaf047bfab48ca6e28ba398eb03b30aa9c9f3d57b4fada2114e1aae309",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-013/final-gaps/run_b2.py": "f71ec6e7091b0a3b16a50386212584a2ae7290a90d0a9313e9f43b55fa6ec46b"
+  },
+  "fresh_added_tests_final_gaps": [
+    "test_audit_executor.FinalGapIndependentTests.test_bootstrap_future_hash_and_self_referential_genesis",
+    "test_audit_executor.FinalGapIndependentTests.test_exact_scope_normalization_source_mutant",
+    "test_audit_executor.FinalGapIndependentTests.test_pending_same_round_changed_client_cli_rejected",
+    "test_audit_executor.FinalGapIndependentTests.test_policy_ignored_source_mutant_really_reserves_terminal_head"
+  ]
+}

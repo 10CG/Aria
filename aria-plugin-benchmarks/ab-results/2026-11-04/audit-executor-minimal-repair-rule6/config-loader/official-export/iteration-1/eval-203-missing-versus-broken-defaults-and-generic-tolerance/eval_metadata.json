@@ -1,0 +1,12 @@
+{
+  "eval_id": 203,
+  "eval_name": "missing-versus-broken-defaults-and-generic-tolerance",
+  "prompt": "请独立判断审计入口这些配置来源。A项目config文件确实不存在，DEFAULTS含audit.require_same_admitted_roles=false；B项目文件为{}，DEFAULTS同A；C项目显式boolean false，DEFAULTS同A；D DEFAULTS文件不存在；E DEFAULTS存在但audit中未注册该键；F DEFAULTS注册该键为true；G DEFAULTS注册为字符串false；H项目guard为boolean false，但无关state_scanner.confidence_threshold=130，其既有范围0..100，DEFAULTS同A。每项给结果、是否继续及配置是否应被写回。只推演，不执行命令，不读当前仓配置。",
+  "assertions": [
+    "A项目确缺与B键缺采用已合法注册DEFAULTS false，C保留显式false，均不强制启用新执行器或要求参与证据；不把读取失败冒充确实不存在。",
+    "D DEFAULTS缺失、E缺注册、F注册true、G注册字符串均错误停止；DEFAULTS必须显式boolean false，不能把这些当项目缺省成功。",
+    "H只对无关超范围字段沿用既有clamp至100且保留guard=false，不把strict例外扩成所有字段必停；所有情形不自行写回/激活项目配置、不变团队预算。"
+  ],
+  "partition": "config-loader-targeted",
+  "runs_per_configuration": 1
+}

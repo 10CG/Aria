@@ -1,0 +1,94 @@
+{
+  "产出形态": "descriptive（描述性推演）",
+  "执行边界": "只读取获准的 case 与冻结 Skill 包，并写入本 decision.json；没有执行命令、运行 completeness gate、调用审计 Agent 或核查真实项目配置。以下命令、输出和退出码均为依据题设的推演，不是真实运行回执。",
+  "结论": "post_spec 为 present，post_planning 为 missing，post_implementation 为 not_applicable。completeness gate 最终 verdict=fail、exit code=1，不允许进入正常 pre_merge 审计流程。",
+  "调用命令": {
+    "命令行": "python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_gate.py\" \\\n  --repo-path \"$PR_REPO_ROOT\" \\\n  --diff-repo-path \"$PR_REPO_ROOT\" \\\n  --base \"origin/master\" \\\n  --anchor-base \"origin/master\" \\\n  --change-id \"widget-export-pipeline\"",
+    "参数绑定与假设": [
+      "PR_REPO_ROOT 表示本次 PR 所在同一仓的绝对根路径，调用前须明确绑定；两个路径参数使用同一个值，不从 cwd 推断。题设没有给出该仓实际绝对路径，因此不擅自把当前真实工作区路径当作 case 的仓路径。",
+      "题设没有给出 base 的确切 ref 名；此命令以 origin/master 是本次 PR 主干远程跟踪 ref 为显式假设，并显式将 anchor-base 设为相同 ref。若实际 ref 不同，两个参数均替换为题设所指的真实远程跟踪 ref，并确保其产生的 diff 正是题给三文件。",
+      "脚本位置沿用 Skill 的插件入口写法；这里只展示调用，不执行或解析环境变量。",
+      "传入唯一被审 change_id=widget-export-pipeline；不把无关的 catalog-sync-retry 加入作用域。不传 --no-spec，因为本次明确有 Spec，且该 flag 与 --change-id 互斥。"
+    ]
+  },
+  "纳入规则": {
+    "待校验检查点": ["post_spec", "post_planning", "post_implementation"],
+    "理由": "audit.enabled=true；三个前序检查点均显式配置 convergence，显式配置优先于 audit.mode=manual。pre_merge 自身排除于前序完整性依赖，其余未显式配置的检查点在 manual 下为 off。未声明的 allow_incomplete_checkpoints 缺省为 false，不能自行启用豁免。",
+    "是否需要解析OpenSpec_Level": "不需要。三个待校验检查点及 pre_merge 均有显式模式，未进入 adaptive 的 Level 解析分支。"
+  },
+  "逐对判定": [
+    {
+      "checkpoint": "post_spec",
+      "change_id": "widget-export-pipeline",
+      "resolved_mode": "convergence",
+      "status": "present",
+      "reason": null,
+      "matched": ["post_spec-R2-widget-export-pipeline.md"],
+      "matched_count": 1,
+      "理由": "该顶层报告以 post_spec- 开头、以 .md 结尾，去掉扩展名后以 -widget-export-pipeline 结尾，满足本 change 的报告归属匹配。不存在题设已知 id 之间的有界包含冲突。三态按序 first-match，命中报告即 present；不需要读取报告正文或推测审计质量。",
+      "人读行": "[OK] post_spec@widget-export-pipeline: 1 份"
+    },
+    {
+      "checkpoint": "post_planning",
+      "change_id": "widget-export-pipeline",
+      "resolved_mode": "convergence",
+      "status": "missing",
+      "reason": null,
+      "matched": [],
+      "matched_count": 0,
+      "理由": "目录中唯一的 post_planning 报告属于 catalog-sync-retry，不能抵充 widget-export-pipeline 的报告。本 change 存在 tasks.md，已经有 A.2 产物，因此不满足 post_planning 的 no-a2-artifact 不适用条件。Phase A-only 也不是 post_planning 的不适用通道。",
+      "人读行": "ERROR: pre_merge audit 前序 checkpoint 报告缺失: post_planning@widget-export-pipeline 配置 \"convergence\" 但未找到 .aria/audit-reports/ 下含 \"-widget-export-pipeline-\" 或以 \"-widget-export-pipeline.md\" 结尾的 post_planning 报告 (真 legacy 不计入: 0; 归属不明: 0, 见下方清单)。Fix: (1) 补跑缺失 checkpoint 审计 (对应 Phase Skill 重新调用); (2) 或在 audit.checkpoints 里显式写该 checkpoint —— adaptive 推导出的 checkpoint 其报告在产出侧调用链上不产出, 重新调用 Phase Skill 会再次早退; (3) 把该 checkpoint 改 \"off\"; (4) 临时开 allow_incomplete_checkpoints"
+    },
+    {
+      "checkpoint": "post_implementation",
+      "change_id": "widget-export-pipeline",
+      "resolved_mode": "convergence",
+      "status": "not_applicable",
+      "reason": "phase-a-only-no-implementation",
+      "matched": [],
+      "matched_count": 0,
+      "理由": "没有本 change 的 post_implementation 报告，但满足专属不适用通道：repo-path 与 diff-repo-path 的 git toplevel 相同，diff 非空且恰为三个文件，全部位于 openspec/changes/widget-export-pipeline/ 或 .aria/audit-reports/ 下。因此这是 Phase A-only 的机械判定，不是 AI 以变更简单为由豁免审计。",
+      "人读行": "[INFO] completeness gate: post_implementation@widget-export-pipeline not_applicable (phase-a-only-no-implementation); 依据 = diff 3 文件全部在 openspec/changes/widget-export-pipeline/ 或 .aria/audit-reports/ 下 (Phase A-only)"
+    }
+  ],
+  "报告归属与输出通道": {
+    "excluded_legacy_count": 0,
+    "unattributed_count": 0,
+    "unattributed": [],
+    "scanned_dir_depth": 1,
+    "scan_status": "ok",
+    "说明": "题设目录存在且只有两份顶层报告。catalog-sync-retry 是已知既有 change，因此其 post_planning 报告有明确归属；它既不属于本次被审 change，也不属于真 legacy 或归属不明报告。不额外生成 unattributed WARN。上述逐对人读行应写往 stderr，stdout 只承载一个机器 JSON；这里并未真的向该脚本的 stdout/stderr 输出。",
+    "Fix模板限制": "ERROR 中的 Fix 文本是冻结执行器的固定诊断文案，不代表授权修改配置。此例 post_planning 已显式启用，重复写该键不会补出报告；应补跑本 change 的 post_planning 并取得归属正确的报告。当前推演不执行补跑，不将检查点改 off，也不开豁免。"
+  },
+  "最终路由": {
+    "gate": "completeness_gate",
+    "verdict": "fail",
+    "exit_code": 1,
+    "bypassed": false,
+    "允许进入正常pre_merge审计": false,
+    "理由": "任何一个纳入校验的 (checkpoint, change_id) 对为 missing，即 verdict=fail、exit 1；此处缺失 post_planning@widget-export-pipeline，且未配置豁免。post_implementation 的 not_applicable 必须单独呈现，但不能抵消另一对 missing。这是完整性失败，不是输入或环境错误的 error/exit 2。",
+    "pre_merge模式": "显式 convergence；只有门放行后才可进入该审计模式。本次门失败，应拒绝执行 pre_merge 审计，在任何审计 Agent 被调用之前停止，不能把 Phase A-only 泛化为整个门通过或自行降级放行。"
+  },
+  "未知与前提": [
+    "仓的实际绝对路径、确切 base ref、插件实际安装路径、git 可用性和 ref 能否解析均未通过真实调用验证；命令中的绑定与 origin/master 假设已明确列出。结论以题设文件清单和同仓条件成立、输入环境可正常读取为前提。",
+    "proposal.md 的 Level 与正文内容未给出；本例显式模式和已存在的 tasks.md 足以完成所问判定，不需补读未获准的 Spec。",
+    "没有真实运行，无法给出真实 elapsed_ms，也不伪造完整脚本执行回执。报告存在只证明该完整性门所要求的机械归属事实，不证明报告结论 PASS 或审计已收敛。"
+  ],
+  "依据": [
+    {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+      "lines": "155-166, 424-428",
+      "用途": "pre_merge 专属、Agent 前执行、fail/error 阻断及缺省豁免规则。"
+    },
+    {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+      "lines": "330-464",
+      "用途": "调用参数、逐 change 报告归属、三态 first-match、Phase A-only 与 A.2 产物条件、输出模板、verdict 和退出码路由。"
+    },
+    {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/scripts/completeness_gate.py",
+      "lines": "1098-1161, 1209-1289, 1302-1358, 1378-1446",
+      "用途": "只按需读取代码段以核对 reason token、排除计数及逐句人读行；未运行执行器。"
+    }
+  ]
+}

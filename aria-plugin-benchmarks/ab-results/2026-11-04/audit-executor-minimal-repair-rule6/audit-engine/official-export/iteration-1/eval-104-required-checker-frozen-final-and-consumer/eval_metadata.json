@@ -1,0 +1,13 @@
+{
+  "eval_id": 104,
+  "eval_name": "required-checker-frozen-final-and-consumer",
+  "prompt": "接续 /work/Demo 同一convergence审计周期，guard为boolean true、显式团队及Workflow均有效。下面全是mock而非真实事件：audit回执runId=audit-201，capture audit已成功；prepare回执含policy_request={path:/mock/request.json,sha256:reqhash}、policy_script={path:/mock/checker.js,sha256:scripthash}、native_record={path:/mock/frozen-audit.json,sha256:frozenhash}。冻结request.required=true，含identity、anchor FileRef和conclusions，资源表仅剩一可用槽。live audit文件其后增长，冻结副本不变。checker可返回独立runId=checker-202及可读native/Transcript；成功check的result FileRef指向blob原件而不是展示round.json。另一消费分支中check exit=1，MD仍写PASS。请分别说明接下来如何处理必要检查、数据选择、发布与报告消费。只推演，不执行工具/命令/Workflow/Agent。",
+  "assertions": [
+    "核request原字节/hash与资源，使用新独立checker Workflow而非复用审计实例/加投票席；scriptPath取policy_script.path，args包含identity、request_sha256、anchor记录value、conclusions。",
+    "用checker自身runId/native/Transcript做capture drift并绑定prepare回执；不把audit runId或顶层status当checker/逐席完成，不用缺源伪造失败放行。",
+    "final与check使用同一prepare.native_record冻结路径及相同repo/manifest/build/runId/previous/output，不回live增长文件补票；check只额外check-result。",
+    "check成功消费其原FileRef映射及同reservation JSON/MD/commit/合法sidecar，不重hash展示文件或AI重算；check失败分支即使MD写PASS也停止消费，不宣称发布通过。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}

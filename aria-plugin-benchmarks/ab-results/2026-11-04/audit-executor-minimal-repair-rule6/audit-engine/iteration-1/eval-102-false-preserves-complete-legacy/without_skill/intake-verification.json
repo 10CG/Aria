@@ -1,0 +1,17 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/102-false-preserves-complete-legacy.json"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-102-false-preserves-complete-legacy/without_skill/outputs/decision.json"
+  ],
+  "tool_calls": 2,
+  "agent_id": "a4278ad6c589c0d5c",
+  "output_sha256": "d1749a4a3581650eeca9a03b2b759c494abc1487a8b2dc6c107ce728d07776f0",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_fc94b3a9-f28/agent-a4278ad6c589c0d5c.jsonl",
+  "original_sha256": "311816a11e544574751bfbc5426f5724c5e95162b92946c4b9ee3286b9d7dfe4",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

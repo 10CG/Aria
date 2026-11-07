@@ -1,0 +1,98 @@
+{
+  "expectations": [
+    {
+      "text": "先呈现耗尽原因/结论与变化，不能把旧cycle接受或自动推进授权当本周期选择；当前未回答就保持等待，不伪造approved=true。",
+      "passed": true,
+      "evidence": "packet 中 /candidate-2/outputs/decision.json 的 current_decision.status 保持等待且暂停新增派发；reason 明确历史接受和自动推进均非当前选择；allowed_now[0] 要展示最后有效轮结论、完整四元组新增/移除及有证据的未收敛原因，缺具体数据不编造。forbidden_now 禁止 approved=true、伪造回答/index/sidecar；human_disposition_evidence step 2 要求先展示上述内容再提问。"
+    },
+    {
+      "text": "计划从成功CHECK回执经capture question生成单题单选三选项的真实AskUserQuestion输入及唯一ASCII context绑定；之后用真实session及提问/回答UUID做capture disposition，不能拿工具通知当回答。",
+      "passed": true,
+      "evidence": "decision.json human_disposition_evidence steps 1–4 从成功 CHECK_RECEIPT 取实际 FileRef，capture question 生成恰一题、multiSelect=false、固定三标签及 action 顺序的真实 AskUserQuestion 输入；正文唯一 audit-disposition-context= 后接 canonical ASCII JSON，绑定 cycle/checkpoint/change/target_result/used_rounds/effective_limit。真实回答后，用显式 session JSONL、assistant.uuid 和 user.uuid 作为 call-uuid/response-uuid 做 capture disposition 写原 locator，明确通知、任务正文、普通散文或中断不能冒充回答；step 5 还核 tool_use_id/sourceToolAssistantUUID 等。"
+    },
+    {
+      "text": "处置后同基础参数final/check消费合法不可变sidecar，不覆盖旧JSON/MD或重跑审计；接受/降级仍converged=false且禁止继续派发，+2最多一次且须真实选择。",
+      "passed": true,
+      "evidence": "decision.json human_disposition_evidence step 6 要用原 final/check 全部基础参数及冻结输入，发布不可变 sidecar/账本事件，不改旧 JSON/MD、不重跑审计，并经 check 验证后消费 base+sidecar。if_real_answer_accept_current 标 overridden_by_user=true、converged=false 且不能新增轮；third_option 同样规定 degraded=true/false 收敛及禁止派发。increase_rounds 明确真实当前 head 回答、固定 +2、question uuid/tool_use_id/response uuid 一次消费，重复同字节只幂等返回。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "成功 check 表示结果重算一致，不等于收敛、质量 PASS 或合并放行。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "decision.json current_decision.reason 与 packet 内嵌 executor-contract.md:81–84、455、490 的退出及质量语义一致。"
+    },
+    {
+      "claim": "只有真实 AskUserQuestion 的关联 tool_use/tool_result、固定选项和当前 head context 才能形成所需处置证据。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "公开 transcript line 37 内嵌 executor-contract.md:445–447 明确 session、UUID、tool_use_id/sourceToolAssistantUUID、questions/answers 和 context 校验；输出 steps 2–5 将这些要求用于后续计划。"
+    },
+    {
+      "claim": "合法增轮事件固定 +2 且同一问答最多消费一次，不能借旧 cycle/head 增额。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "packet 内嵌 executor-contract.md:449、457 支持该规则；输出 if_real_answer_increase_rounds 同时保留历史 charged_rounds、资源和其他终局门。"
+    },
+    {
+      "claim": "接受或降级只改变已校验 base+sidecar view，旧结果不变且仍 converged=false，并阻止本周期继续审计派发。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "输出接受及第三选项分支与 packet 内嵌 execution-modes.md:265、executor-contract.md:449 相符。"
+    },
+    {
+      "claim": "本次没有真实发问、生成处置 index/sidecar 或执行审计。",
+      "type": "process",
+      "verified": true,
+      "evidence": "完整公开 transcript 为六次 Read 和一次 Write /candidate-2/outputs/decision.json，符合 health.tool_calls=7；没有 AskUserQuestion、capture 或审计执行事件。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "补一组具体 mock session 问答及错误 head/工具通知/重复提交对照，要求给出可消费与拒绝的不同结论；当前主要验证协议陈述，不能证明对实际记录的辨别能力。",
+      "提供具体 mock 结论变化，让耗尽摘要必须包含正确新增/移除及未收敛成因，增强第一项的语义区分力。"
+    ],
+    "overall": "三项全部有完整且具体的计划证据，正确区分描述性流程与真实执行。可以用具体问答记录和结论变化进一步检验实际消费判断。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 7,
+    "output_chars": 6039,
+    "transcript_chars": 109649,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-targeted-b",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按其逐项证据判断、实质 claims 核验及 eval critique 方法评分；最终使用本任务要求的 StructuredOutput，未写报告文件。",
+      "已完整读取 /home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-104.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-105.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-106.json、/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-107.json；四案八个 candidate、共 26 个 expectation 判断均已覆盖。",
+      "证据中的 /candidate-1/outputs/decision.json 和 /candidate-2/outputs/decision.json 是各 packet 内的中性化产物标签；评分使用 packet 提供的原 decision_json_text 和完整公开 transcript，没有另读这些输出路径。",
+      "各 packet 均记录 intake_verified=true，提供完整 decision、公开工具事件及 executor_duration_seconds；未发现实际输入损坏、缺失、读取截断或环境故障，因此全部 JUDGED。候选声明不知道契约、缺少精确参数或作出假设属于能力表现，不转记 NOT_JUDGED。",
+      "所有操作要求按 mock/描述性计划判断，不要求候选真正执行审计、问答或 helper；仅加载文档不能替代正确计划，拟议操作也不当作真实运行证据。",
+      "没有读取 controller-only 映射、其他组结果、当前真实配置或仓库文件，也没有执行命令、调用 Skill/Agent/Workflow、联网或写文件。",
+      "本次仅路径标签部分中性化；正文及内嵌来源仍可能透露来源信息，不能称为完全盲评。"
+    ],
+    "raw_summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

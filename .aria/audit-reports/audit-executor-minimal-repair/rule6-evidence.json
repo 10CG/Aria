@@ -1,0 +1,165 @@
+{
+  "schema_version": "1",
+  "recorded_at": "2026-11-04T01:47:34.184584+00:00",
+  "change_id": "audit-executor-minimal-repair",
+  "task_id": "TASK-017",
+  "status": "ACCEPTED_TASK017",
+  "task_accepted": true,
+  "method": "skill-creator:skill-creator Scenario 1; actual paired fresh executors, official semantic grader, actual official aggregate, official local static viewer",
+  "cases": 13,
+  "executor_results": 26,
+  "runs_per_case_per_arm": 1,
+  "all_healthy_and_judged": true,
+  "new_behavior_with_skill_failures": 0,
+  "numerical_conditions": {
+    "skills": {
+      "audit-engine": {
+        "exact_delta": "97/150",
+        "delta_positive": true,
+        "new_behavior_failure_count": 0,
+        "report": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/benchmark.json"
+      },
+      "config-loader": {
+        "exact_delta": "2/9",
+        "delta_positive": true,
+        "new_behavior_failure_count": 0,
+        "report": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/benchmark.json"
+      }
+    },
+    "numerical_conditions_met": true,
+    "human_feedback_received": false,
+    "Task017_accepted": false
+  },
+  "fixed_regression_failure": {
+    "case_id": 1,
+    "expectation_index": 2,
+    "status": "FAIL_PRESERVED",
+    "reason": "red HTML text instead of required red-circle glyph; counts/archive/advisory correct",
+    "waived_or_rewritten": false
+  },
+  "source_bindings": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/final-before-human-verification.json",
+    "sha256": "89990e36764443ac31bee8020fdccc8a61bf7aaaf0c35c87f67cddd4b4a7e7a4"
+  },
+  "grading": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-materialization.json",
+    "sha256": "89400634d23267f1d91ccd57a9eeb5be568aeec0b898c50908473873e8ecaaa8"
+  },
+  "raw_grader_result": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-return.raw.json",
+    "sha256": "4b32b607eb5cd659e97bd7cfae55fdf975410b960ed9f7493c0926c792dae09d"
+  },
+  "runtime_plan": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/runtime-plan.json",
+    "sha256": "839dffadca178af35a9ee5d5e8e77472fc088af56cf3a6fd5ef0e83b4e071b3d"
+  },
+  "reports": {
+    "audit-engine": {
+      "benchmark": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/benchmark.json",
+        "sha256": "88a2f6744b20c8fb6d54f0a2c06dae7068543e69cea02d938475dc657c82a8bb"
+      },
+      "analysis": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/analysis-notes.json",
+        "sha256": "7cd378f23899901af3b39c4325567b46e9febeef20b6376f92b6574e6e7c66f2"
+      },
+      "viewer": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/review.html",
+        "sha256": "d430db5a0dbf50ad4c3f2c53bc39e334db528ecc67e039424d77917f9d33a9a4"
+      },
+      "official_compatibility": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/official-raw/compatibility-status.json",
+        "sha256": "eeb23d74478d68a0790a18cdbbf4dc44484d9ba43fcbd4395640053071ca9b04"
+      }
+    },
+    "config-loader": {
+      "benchmark": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/iteration-1/benchmark.json",
+        "sha256": "bd5270cff00393481f5db20bc715fd9bcaf4df2a3042a0a0275120f212e03e42"
+      },
+      "analysis": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/analysis-notes.json",
+        "sha256": "63f195a73aab2671d53596fc4ca3c212658c63593524a7f3314c8d8f391e81fa"
+      },
+      "viewer": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/review.html",
+        "sha256": "6414de9c6b230f48502f6562f1ca0fe2f8dc82b98e24d02b1de523864d1a0fef"
+      },
+      "official_compatibility": {
+        "path": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/config-loader/official-raw/compatibility-status.json",
+        "sha256": "74a1520cc43af27bd9d7a924f2c7a00e95f8471e5507491f4f0b2eff19402ed6"
+      }
+    }
+  },
+  "viewer_functional_check": {
+    "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/viewer-functional-check.json",
+    "sha256": "211ce8b37154d1307ce7494193c2e44749cc0709b524a090ab97604896e7bab9"
+  },
+  "official_tool_defects_not_hidden": "raw n=3 hard-code/token fallback preserved; canonical n=1/unknown tokens derived per official schema permission, no library patch",
+  "token_usage": "unknown_not_zero_not_context_metric_not_character_proxy",
+  "baseline_limitations": "public root CLAUDE/tool metadata; partial masking; with/without does not independently establish new-vs-old marginal effect",
+  "description_changed": false,
+  "rule6_note": {
+    "decision_table_row": 2,
+    "description_changed": "no",
+    "scenario1": "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6",
+    "scenario4b": "not_required",
+    "negctrl": "n/a"
+  },
+  "human_review": {
+    "required": true,
+    "received": true,
+    "feedback_source": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/human-feedback.json",
+      "sha256": "384548f16770ebebd32ece00325bb18ba4a89e58baa57c5800dffbd28ffdc105"
+    },
+    "answer": "已审阅，无修改意见",
+    "scope": "实际展示的评测输出摘要、case1真实片段及说明；不声称逐项打开全部HTML",
+    "automatic_goal_is_not_feedback": true
+  },
+  "historical_metadata_boundary": "numerical_conditions及benchmark/HTML中的human_feedback_received=false与pending文案是生成时状态；原件保留不回写。本root.human_review为唯一当前反馈状态，真实来源另存，不改评分或固定FAIL。",
+  "full_independent_task_review": {
+    "required": true,
+    "status": "PASS",
+    "phase1": "PASS",
+    "phase2": "PASS",
+    "coverage_complete": true,
+    "findings": [],
+    "final_review": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/task017-review-final.json",
+      "sha256": "6204e75bf4a14bf05b9597685e409a79db4c48abb91aa886e5f5d901bae7455b"
+    },
+    "original_incomplete_reviews_preserved": true,
+    "tested_materialize_grades": 26,
+    "integration_rejections_without_publication": 8
+  },
+  "Task018_Task019": "pending_dependency_TASK017_not_accepted",
+  "phase_b_accepted_tasks": 17,
+  "C_D_commit_push_authorized": false,
+  "helper_static": {
+    "filesAnalyzed": 5,
+    "errorCount": 0,
+    "warningCount": 0,
+    "receipt": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/helper-static/five-files.stdout.json",
+      "sha256": "ff64d026d7a1f7a8ac32634a20b2e42ba22204a4dd75d898ce22a6fd8abd89e5"
+    }
+  },
+  "accepted_at": "2026-11-04T10:52:18.264341+00:00",
+  "receipt_health_repair": {
+    "controller_verification": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/controller-verification-20261104T102802Z/controller-result.json",
+      "sha256": "ec7f19e7f402886a512cc24f4c5d3e63a7f190cdba32b4eacd900dd846e80311"
+    },
+    "independent_final_preservation": {
+      "path": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/final-review-completion/codex-independent-20261104/final-preservation.json",
+      "sha256": "c71d2325dd1322b97716f36894aae517a9f8f4872389611e5a76a3f1a498f471"
+    },
+    "current_producer_hashes": {
+      "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/capture_eval_evidence.py": "c811b049ff35fd45706fec18b5c1d97c63b39a2f30ac1f1388967dbab8479f83",
+      "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/materialize_grades.py": "5f46c844cb699997e78ac66910bafd785b21e49f9626544284145c086b144564"
+    },
+    "old_raw_26_untouched": true
+  },
+  "current_state_boundary": "This root is current task acceptance. Old report/numerical/preparation pending flags and original failed/incomplete reviews remain historical, not recomputed. Scores and fixed FAIL unchanged."
+}

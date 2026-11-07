@@ -1,0 +1,13 @@
+{
+  "eval_id": 103,
+  "eval_name": "true-first-round-exclusive-publication",
+  "prompt": "请推演 /work/Demo 的 post_planning 审计首轮并说明何时可安全消费报告。项目原始audit配置为 enabled=true、mode=manual、require_same_admitted_roles=true、checkpoints.post_planning=convergence、teams.post_planning=[qa-engineer,code-reviewer]。backend=Workflow，无覆盖参数，无旧scope或未结束调用，context=/work/Demo/input.txt。用户输入中的所有boolean均为JSON boolean，插件DEFAULTS guard=false。运行中若对应工具被调用，可得到以下明确mock结果：build返回resume_only=false及build_record、workflow_script路径；audit工具回执有runId=audit-101与可读native/Transcript；准备回执中request.required=false、reason=first_round且native_record.path=/mock/frozen-audit.json；最终check exit=0并返回同reservation的result/markdown/commit FileRef，无sidecar，JSON converged=false。请列拟采取的关键动作、消费条件与最终可下的结论。只作描述性推演，不真的运行任何命令/Workflow/Agent，也不把mock声称为真实执行。",
+  "assertions": [
+    "给出冻结manifest和真实helper build所需的计划后，从build回执workflow_script及build_record.identity/manifest hash构造audit Workflow(scriptPath,args)，不自造dispatcher或改成legacy。",
+    "按实际回执runId/native/Transcript做capture audit index后prepare；prepare不是发布，不跳过它直接collect或手工persist。",
+    "request.required=false的首轮不发checker、不伪造drift index；仍用prepare返回的冻结native进行final和同基础参数check（check仅多check-result）。",
+    "仅check成功后核同reservation JSON/MD/commit与可选合法sidecar，消费check实际返回FileRef和已校验JSON；不重hash展示文件或用MD/PASS重算canonical_v1；接受converged=false首轮，不额外开轮求绿。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}

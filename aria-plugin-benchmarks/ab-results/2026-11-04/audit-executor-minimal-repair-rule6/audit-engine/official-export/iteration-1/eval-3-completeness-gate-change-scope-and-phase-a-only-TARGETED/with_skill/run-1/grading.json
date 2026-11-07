@@ -1,0 +1,109 @@
+{
+  "expectations": [
+    {
+      "text": "(post_planning, widget-export-pipeline) 的结论是 missing: 不得因为目录里存在 `post_planning-R1-catalog-sync-retry.md` 就判定该 checkpoint 通过 —— 那份报告属于另一个 change (`catalog-sync-retry`), 文件名既不含 `-widget-export-pipeline-` 也不以 `-widget-export-pipeline` 结尾, 按规则必须被排除在 widget-export-pipeline 的证据之外",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_planning status=missing、matched=[]、matched_count=0，理由明确 catalog-sync-retry 报告“不能抵充 widget-export-pipeline”。ERROR 行还列出本 change 所需的中缀或 .md 末段匹配条件；同时以 tasks.md 存在排除 no-a2-artifact 通道。"
+    },
+    {
+      "text": "(post_spec, widget-export-pipeline) 的结论是 present, 且明确说明 `post_spec-R2-widget-export-pipeline.md` 之所以计入, 是因为文件名以 `-widget-export-pipeline` 结尾 (末段界定), 不要求 `-widget-export-pipeline-` 两侧都有连字符的中缀形态",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_spec status=present、matched_count=1；理由逐项说明以 post_spec- 开头、以 .md 结尾，“去掉扩展名后以 -widget-export-pipeline 结尾，满足本 change 的报告归属匹配”。这是明确采用末段分支，而非错误要求中缀双连字符。人读行是“[OK] post_spec@widget-export-pipeline: 1 份”。"
+    },
+    {
+      "text": "(post_implementation, widget-export-pipeline) 的结论是 not_applicable (Phase A-only: diff 的 3 个文件全部落在 `openspec/changes/widget-export-pipeline/` 或 `.aria/audit-reports/` 之下, 没有任何实现代码变更), 并且在人读行里用 `[INFO]` 开头把这一结论 surface 出来, 不是略去不提, 也不是当成 missing、用 ERROR 行报告",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-2/outputs/decision.json，post_implementation status=not_applicable、reason=phase-a-only-no-implementation；解释同一 git toplevel、非空 diff 和全部三文件的目录条件。拟输出为“[INFO] completeness gate: post_implementation@widget-export-pipeline not_applicable (phase-a-only-no-implementation); 依据 = diff 3 文件全部在 openspec/changes/widget-export-pipeline/ 或 .aria/audit-reports/ 下 (Phase A-only)”。"
+    },
+    {
+      "text": "命令行显式给出 `--repo-path` 与 `--diff-repo-path` 两个必填参数 (并说明二者在本例中相同, 即同仓), 还带上 `--base` 与 `--change-id widget-export-pipeline`, 调用对象是 `completeness_gate.py`",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-2/outputs/decision.json，调用命令给出 python3 \"${CLAUDE_PLUGIN_ROOT:-aria}/skills/audit-engine/scripts/completeness_gate.py\"，并含 --repo-path \"$PR_REPO_ROOT\"、--diff-repo-path \"$PR_REPO_ROOT\"、--base \"origin/master\"、--anchor-base \"origin/master\"、--change-id \"widget-export-pipeline\"。解释两个路径绑定同一绝对根，并将未提供的 base 名显式列为假设，不冒充真实运行值。"
+    },
+    {
+      "text": "最终结论是整体 verdict=fail、exit code 1, pre_merge 审计被拒绝执行 (需先补 post_planning 的报告, 或把该 checkpoint 改配置, 或开 `allow_incomplete_checkpoints` 豁免) —— 不能因为 post_spec 与 post_implementation 两对都合格就得出『三对里两对通过, 可以放行』的结论, 三态判定逐对 first-match 且全部非 missing 才 pass, 一对 missing 即整体 fail",
+      "passed": true,
+      "evidence": "case 3 的 /candidate-2/outputs/decision.json，最终路由明确 verdict=fail、exit_code=1、bypassed=false、允许进入正常pre_merge审计=false；说明“任何一个……对为 missing”即失败，not_applicable 不能抵消其它 missing，并要求在任何 Agent 调用之前停止。ERROR 附补审、改配置、豁免选项，另明确当前未授权执行这些变更。"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "本例只需校验三个显式启用的前序 checkpoint，不因 audit.mode=manual 跳过，也不需要解析 OpenSpec Level。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 3 的题设三项均显式 convergence；packet 内嵌 /frozen-reference/skills/audit-engine/references/execution-modes.md:358-384 给出显式优先、adaptive 时才惰性解析 Level，以及 pre_merge 自身等结构性排除。"
+    },
+    {
+      "claim": "无关 catalog-sync-retry 报告既不计入当前 change，也不属于 legacy 或归属不明。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 3 题设 catalog-sync-retry 为已知 change。内嵌 /frozen-reference/skills/audit-engine/scripts/completeness_gate.py:1135-1161 对任何已知 id 已命中的报告不计入两个排除桶；本例候选输出两个计数均为 0，与该分类规则一致。"
+    },
+    {
+      "claim": "人读 OK、INFO、ERROR 应走 stderr，stdout 只承载机器 JSON。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "case 3 public_transcript 内嵌 execution-modes.md:414-420 与 completeness_gate.py:51-53、1421-1436 均有明确通道规定；/candidate-2/outputs/decision.json 也说明这些是拟写内容，没有假称实际向脚本通道输出。"
+    },
+    {
+      "claim": "本例 missing 对应 fail/exit 1，不是环境输入错误的 error/exit 2。",
+      "type": "factual",
+      "verified": true,
+      "evidence": "packet 内嵌 execution-modes.md:418-420 和 completeness_gate.py:101-104 明确映射；题设材料足以构造 post_planning 缺失，未给任何实际输入损坏或运行故障。"
+    },
+    {
+      "claim": "只读取获准冻结资料并写出推演，没有运行 completeness gate 或审计 Agent。",
+      "type": "process",
+      "verified": true,
+      "evidence": "case 3 candidate-2 public_transcript 记录七次 Read，包括冻结脚本按段读取，以及 line 45 写 /candidate-2/outputs/decision.json；health.tool_calls=8。没有 Bash、Workflow 或 Agent 执行。"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      "明确完整调用允许绑定变量及解释 base 假设，因题设没有实际仓根或 base ref；本候选的写法可判参数完整，但不应被当成已经验证的真实命令。",
+      "补充跨仓相同路径负控，以及 Phase A-only 已有 post_implementation 报告时必须优先判 present 的对照，分别检验同仓前提与 first-match 顺序，而非只检验当前三种输出值。"
+    ],
+    "overall": "五条断言全部有实质证据，包含逐 change 匹配、末段界定、结构性不适用显影、完整参数和整体 fail-closed 路由。结果仅证明该描述性场景的回答正确，不证明 gate 已真实运行。"
+  },
+  "execution_metrics": {
+    "total_tool_calls": 8,
+    "output_chars": 5936,
+    "transcript_chars": 103507,
+    "errors_encountered": 0
+  },
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "provenance": {
+    "native": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/workflows/wf_5e00d101-b5b.json",
+    "native_sha256": "8d70c9273e3f68f84591255867824d26d15b78422f9a14d0d696f3a42be26cbe",
+    "group_id": "audit-fixed",
+    "candidate_id": "candidate-2",
+    "status": "JUDGED",
+    "coverage_notes": [
+      "已完整读取官方 grader /home/dev/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/agents/grader.md，并按逐项证据、无部分分、claim 核验及 eval critique 方法评分；最终仅返回要求的结构化结果，未写文件。",
+      "已完整读取本组三个 packet，均未依赖截断文本：/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-1.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-2.json；/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/grading-inputs/eval-3.json。覆盖 case 1、2、3 的两个 candidate，共 26 项布尔评分。",
+      "全部六个 candidate 的 packet 均给出 intake_verified=true、完整 decision_json_text 和公开工具事件；没有证据显示输入损坏、缺失、截断或真实环境故障，全部为 JUDGED。候选对规范保留未知或只给条件性回答，均按实际交付是否满足断言评分，未转作 NOT_JUDGED。",
+      "所有场景都是 mock 描述性推演，不要求实际运行计划中的命令。已区分候选真正发生的 Read/Write 与其拟执行探针、gate、审计步骤；未把计划或写入回执当作生产执行证据。",
+      "claim 的规则核验仅使用三个 packet 内嵌的冻结资料与题设；没有另读仓库、真实配置、controller 映射、其它组结果或其它 Skill。引用 /frozen-reference/ 和 /candidate-N/ 的路径均是 packet 提供的中性标签，不宣称这些是 grader 独立打开的真实文件。",
+      "本次仅部分遮蔽：正文中的 source-snapshot 路径、来源说明及可见读取内容可能提示候选来源，因此不是完全盲评；没有据此预设任一 candidate 应获胜。",
+      "可用执行元数据来自 packet：case 1 的 candidate-1/2 分别 2/8 次工具调用、94.312/122.122 秒；case 2 为 5/2 次、184.773/62.375 秒；case 3 为 2/8 次、68.701/114.453 秒。这些是提供的执行元数据，不是 grader 重新测量；未提供独立 user_notes、metrics.json 或 timing.json，未越过读取边界寻找。",
+      "原 expectations 保持逐字与原顺序；指定圆点和“未能核实”的固定格式要求未用语义近似偷偷放宽。相关格式与语义的耦合已在 eval_feedback 如实指出，没有改动本次标准。"
+    ],
+    "raw_summary": {
+      "passed": 5,
+      "failed": 0,
+      "total": 5,
+      "pass_rate": 1
+    },
+    "summary_normalization": "pass_rate mathematically recomputed from unchanged Boolean expectations; raw summary preserved"
+  }
+}

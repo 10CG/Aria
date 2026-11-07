@@ -1,0 +1,21 @@
+{
+  "healthy": true,
+  "failures": [],
+  "read_paths": [
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/SKILL.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/case-inputs/audit-engine-targeted/104-required-checker-frozen-final-and-consumer.json",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/execution-modes.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md",
+    "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/audit-engine/references/executor-contract.md"
+  ],
+  "write_paths": [
+    "/home/dev/Aria/aria-plugin-benchmarks/ab-results/2026-11-04/audit-executor-minimal-repair-rule6/audit-engine/iteration-1/eval-104-required-checker-frozen-final-and-consumer/with_skill/outputs/decision.json"
+  ],
+  "tool_calls": 6,
+  "agent_id": "a3c1d5266cae73f6b",
+  "output_sha256": "0eeb01c4a97cad80e746f7418f82a29da47e5b41260f9464c6cedaeaee15b690",
+  "original_path": "/home/dev/.claude/projects/-home-dev-Aria/4e9d71a4-937c-4f4c-acef-9df9ff1a8653/subagents/workflows/wf_72498675-9ca/agent-a3c1d5266cae73f6b.jsonl",
+  "original_sha256": "7dfa4c955ad57bf8b9f632da4146999db65240d7ae4d69db4d8bc62121ac4a28",
+  "hidden_reasoning_exported": false,
+  "zero_context_or_technical_acl_claim": false
+}

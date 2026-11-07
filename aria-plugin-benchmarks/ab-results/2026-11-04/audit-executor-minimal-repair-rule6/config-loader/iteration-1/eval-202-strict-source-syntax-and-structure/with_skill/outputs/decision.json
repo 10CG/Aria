@@ -1,0 +1,98 @@
+{
+  "eval_id": 202,
+  "mode": "descriptive_only",
+  "summary": "九种情况均不得继续审计入口执行，均应报告配置错误并中止，不能警告后返回默认值，也不能回落 guard=false 转入 legacy 路径。以下是基于题面 mock 输入的描述性推演，不代表实际解析、校验或执行结果。",
+  "basis": {
+    "source": "/home/dev/Aria/.aria/notes/2026-11-02-audit-executor-implementation/TASK-017/preparation/source-snapshot/with-current/aria/skills/config-loader/SKILL.md",
+    "lines": "42–50",
+    "rule": "审计执行器受控入口包含分流选择：项目 .aria/config.json 与运行中插件 DEFAULTS.json 的原始 JSON 必须分别通过严格解析、object 结构校验及原始 guard 类型校验，之后才可合并默认值。任一源 JSON 损坏、含重复 object key、含非有限数字或结构不合法，都必须报配置错误并中止；该严格例外优先于通用容错。"
+  },
+  "assumptions": [
+    "A 至 I 为彼此独立的情况，不累积异常；除各项指定异常外，两源均为合法 JSON object，DEFAULTS 显式注册 audit.require_same_admitted_roles 为 boolean false。",
+    "所讨论的是审计执行器受控入口，不是其他字段的一般配置加载。",
+    "题面给出的文本和结构按原样判断，不预先修复、覆盖重复键、转换类型或丢弃异常字段。"
+  ],
+  "cases": [
+    {
+      "case": "A",
+      "source": "项目 .aria/config.json",
+      "input": "文本截断为 {",
+      "continue": false,
+      "error": "JSON 语法错误：object 未完成，原始源无法严格解析。",
+      "handling": "报告项目配置 JSON 截断错误并中止入口；文件存在但损坏不等于文件缺失，不能用 DEFAULTS 替代后继续。"
+    },
+    {
+      "case": "B",
+      "source": "项目 .aria/config.json",
+      "input": "audit 对象内重复出现 require_same_admitted_roles，依次为 true、false",
+      "continue": false,
+      "error": "重复 object key：audit.require_same_admitted_roles。",
+      "handling": "在原始 JSON 严格解析阶段拒绝重复键并中止入口；不能采用后值覆盖前值、先值优先或任意挑选其中一值。即使通常解析后的结果会是 false，也不能据此转入 legacy 路径。"
+    },
+    {
+      "case": "C",
+      "source": "项目 .aria/config.json",
+      "input": "{\"x\":NaN}",
+      "continue": false,
+      "error": "含非有限数字 NaN，不能作为严格 JSON 源接受。",
+      "handling": "报告项目配置非法数字错误并中止入口；严格限制覆盖整份原始源，不仅覆盖 audit 块，因此 x 与 guard 无关也不能忽略、删除该值或以默认配置继续。"
+    },
+    {
+      "case": "D",
+      "source": "项目 .aria/config.json",
+      "input": "顶层 []",
+      "continue": false,
+      "error": "结构错误：顶层为 array，而要求为 object。",
+      "handling": "即使该文本可解析为 JSON，仍须在结构校验阶段报告错误并中止入口；不能把空数组视为空配置或缺失文件后合并默认值。"
+    },
+    {
+      "case": "E",
+      "source": "项目 .aria/config.json",
+      "input": "{\"audit\":null}",
+      "continue": false,
+      "error": "结构错误：audit 块存在但为 null，而要求为 object。",
+      "handling": "报告 audit 块类型错误并中止入口；null 不等于 audit 块缺失，不能先以默认 audit 对象替换它，也不能仅以 guard 未出现为由回落 false。"
+    },
+    {
+      "case": "F",
+      "source": "运行中插件 DEFAULTS.json",
+      "input": "文本截断",
+      "continue": false,
+      "error": "JSON 语法错误：DEFAULTS 原始源截断，无法严格解析。",
+      "handling": "报告默认配置源 JSON 损坏并中止入口；项目源合法也不能掩盖 DEFAULTS 损坏，不得使用硬编码 false、项目值或其他默认配置代替后继续。"
+    },
+    {
+      "case": "G",
+      "source": "运行中插件 DEFAULTS.json",
+      "input": "含重复 object key，具体键和位置未给出",
+      "continue": false,
+      "error": "重复 object key；拒绝条件覆盖整份 DEFAULTS，不要求重复键恰好是 guard。",
+      "handling": "在 DEFAULTS 原始 JSON 严格解析阶段报告重复键错误并中止入口；不能在通常的解析器折叠重复键后再声称校验通过，也不能以项目覆盖值消除此错误。"
+    },
+    {
+      "case": "H",
+      "source": "运行中插件 DEFAULTS.json",
+      "input": "顶层 []",
+      "continue": false,
+      "error": "结构错误：DEFAULTS 顶层为 array，而要求为 object。",
+      "handling": "报告默认配置源顶层结构错误并中止入口；不能把数组转为空对象或使用通用默认值兜底。"
+    },
+    {
+      "case": "I",
+      "source": "运行中插件 DEFAULTS.json",
+      "input": "{\"audit\":[]}",
+      "continue": false,
+      "error": "结构错误：DEFAULTS 的 audit 块为 array，而要求为 object；该结构也不能提供规定的 boolean false guard 注册。",
+      "handling": "报告 DEFAULTS.audit 结构错误并中止入口；不能将空数组视为缺失 audit 块、补入 guard=false 或依赖项目源覆盖后继续。"
+    }
+  ],
+  "common_error_handling": [
+    "诊断应指出出错源和错误类别；在输入或解析诊断可提供时，指出键路径或语法位置。不要编造具体行列、异常类名称或退出码。",
+    "这些错误必须在默认值合并和执行器分流前阻断，不能派发审计，也不能转入 legacy 路径。不能把错误包装为警告后返回默认配置。",
+    "修正出错的原始配置源后，应重新严格校验两源，全部通过后才可合并并依据有效 guard 值分流；此处仅描述处理要求，未修改文件或实际重试。合法 false 保持 legacy 路径，但本题九种坏源均不具备该前提。"
+  ],
+  "unknowns": [
+    "G 的重复键名称及位置、F 的具体截断文本没有提供；这不影响必须中止的决定，但不能据此提供精确错误位置。",
+    "未读取真实项目配置、真实运行中插件 DEFAULTS 或执行代码，因此没有真实解析器日志、运行状态或配置修复结果。"
+  ]
+}

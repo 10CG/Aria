@@ -1,0 +1,12 @@
+{
+  "eval_id": 107,
+  "eval_name": "exhaustion-needs-real-disposition",
+  "prompt": "守卫true的 /work/Demo 审计已耗尽有效轮，成功check回执返回当前cycle/checkpoint/change、head FileRef与charged_rounds/effective_limit；mock JSON converged=false。项目以前另一个cycle有人说过接受当前结论，本轮用户只有自动推进授权，还没有针对当前耗尽head回答。请说明现在可作何决定、如何取得可消费的人类处置证据，以及若以后真实回答为接受或增加轮次该如何处理。只描述，不发真实问答/命令/Agent/Workflow，也不捏造用户回答或sidecar。",
+  "assertions": [
+    "先呈现耗尽原因/结论与变化，不能把旧cycle接受或自动推进授权当本周期选择；当前未回答就保持等待，不伪造approved=true。",
+    "计划从成功CHECK回执经capture question生成单题单选三选项的真实AskUserQuestion输入及唯一ASCII context绑定；之后用真实session及提问/回答UUID做capture disposition，不能拿工具通知当回答。",
+    "处置后同基础参数final/check消费合法不可变sidecar，不覆盖旧JSON/MD或重跑审计；接受/降级仍converged=false且禁止继续派发，+2最多一次且须真实选择。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}

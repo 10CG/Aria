@@ -1,0 +1,12 @@
+{
+  "eval_id": 102,
+  "eval_name": "false-preserves-complete-legacy",
+  "prompt": "请推演 /work/Demo 一次 post_planning 审计。项目原始配置为 {\"audit\":{\"enabled\":true,\"mode\":\"manual\",\"require_same_admitted_roles\":false,\"checkpoints\":{\"post_planning\":\"convergence\"}}}；插件DEFAULTS含boolean false。项目没有显式teams、没有manifest，前轮只有有效的旧版审计报告，未记录参与角色集合。其它既有前置均满足。维护者希望保持现有使用方式。请说明入口、团队选择、单轮执行、汇总与报告消费的完整处理，以及这些旧输入是否构成阻断。只描述，不执行任何命令/模型/Workflow。",
+  "assertions": [
+    "严格解析成功后守卫false走完整legacy：原配置入口、默认团队、agent-team-audit单轮、旧汇总与旧报告消费，而非只说false兼容。",
+    "不因无显式团队、无manifest或旧报告缺角色证据阻断，也不强制执行新helper/build/prepare。",
+    "保留一次性anchor、每轮sibling probe及既有收敛/预算/耗尽规则，不把新true资源限制反向套到false；post_planning不额外运行pre_merge gate。"
+  ],
+  "partition": "audit-engine-targeted",
+  "runs_per_configuration": 1
+}
