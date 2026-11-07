@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "change_id": "audit-executor-minimal-repair",
-  "status": "PLUGIN_RELEASED_MAIN_INTEGRATION_PENDING",
-  "recorded_at": "2026-11-07T12:56:29.524631+00:00",
+  "status": "INTEGRATION_AND_CYCLE_CLOSURE_COMPLETE",
+  "recorded_at": "2026-11-07T13:48:29.708766+00:00",
   "goal_scope": "original executor delivery; separate recommendation change Phase A only; PR38 remains paused",
   "plugin": {
     "version": "1.78.0",
@@ -38,14 +38,115 @@
         "peeled_commit": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
         "match": true
       }
-    ]
+    ],
+    "ci_gate": {
+      "verdict": "green",
+      "pr_ci_status": "not_applicable",
+      "in_flight_runs": [],
+      "primitive_used": "aether-ci-cli",
+      "primitive_version_sha": "f29abee",
+      "raw_message": "path_coverage: no workflow covers changed files (reason=no-triggering-paths); PR CI wait skipped (not_applicable); main in-flight clear",
+      "path_coverage": {
+        "decision": "not_applicable",
+        "workflows_scanned": 1,
+        "matched_workflows": [],
+        "changed_files_count": 23,
+        "reason": "no-triggering-paths",
+        "dispatchable_workflows": []
+      }
+    },
+    "pointer_gate": {
+      "verdict": "PASS",
+      "mode": "block",
+      "reason": "no_gitmodules_and_no_gitlinks",
+      "primitive_exit": 0,
+      "new_telemetry_record": false
+    }
   },
   "main": {
     "branch": "release/1.78.0",
     "prepared_on_head": "9f6e11395a333c0851292a1f895c6b380092838d",
-    "pr": null,
-    "merge_commit": null,
-    "state": "pending_actual_commit_and_gates"
+    "pr": 270,
+    "merge_commit": "012fc3927bc6587da15d0ddc6e92a19086e668fe",
+    "state": "integrated",
+    "candidate": "66e9803fa76f4254991f3c1fdd259cabae860af2",
+    "pr_url": "https://forgejo.10cg.pub/10CG/Aria/pulls/270",
+    "forgejo_state": "closed",
+    "forgejo_merged_flag": false,
+    "remote_verification": [
+      {
+        "remote": "origin",
+        "push_exit": 0,
+        "master_sha": "012fc3927bc6587da15d0ddc6e92a19086e668fe",
+        "match": true
+      },
+      {
+        "remote": "github",
+        "push_exit": 0,
+        "master_sha": "012fc3927bc6587da15d0ddc6e92a19086e668fe",
+        "match": true
+      }
+    ],
+    "all_new_history_gitlinks": {
+      "aria": [
+        "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+        "3ed43ff3095107624a71c579247b04fef31cbbd2"
+      ],
+      "standards": [
+        "028a92dc5d997057c24c83eb610d19c535058d2b"
+      ],
+      "aria-orchestrator": [
+        "fca7e8bc95d1f678bf30602b750816fbd2a80f18"
+      ]
+    },
+    "remote_matrix": [
+      {
+        "remote": "origin",
+        "children": [
+          {
+            "submodule": "aria",
+            "remote_master": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": false
+          },
+          {
+            "submodule": "standards",
+            "remote_master": "028a92dc5d997057c24c83eb610d19c535058d2b",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": false
+          },
+          {
+            "submodule": "aria-orchestrator",
+            "remote_master": "b75695869970a56418c0f5f4e95944f5621c0c39",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": true
+          }
+        ]
+      },
+      {
+        "remote": "github",
+        "children": [
+          {
+            "submodule": "aria",
+            "remote_master": "2d8e223f2d7ae03ff07a9ddde67290704ac2f231",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": false
+          },
+          {
+            "submodule": "standards",
+            "remote_master": "028a92dc5d997057c24c83eb610d19c535058d2b",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": false
+          },
+          {
+            "submodule": "aria-orchestrator",
+            "remote_master": "b75695869970a56418c0f5f4e95944f5621c0c39",
+            "all_new_gitlinks_reachable": true,
+            "unchanged_detached_not_pushed": true
+          }
+        ]
+      }
+    ]
   },
   "regression": {
     "original_accepted_phase_b_tests": 297,
@@ -99,19 +200,34 @@
     "raw_message": "path_coverage: no workflow covers changed files (reason=no-triggering-paths); PR CI wait skipped (not_applicable); main in-flight clear",
     "path_coverage": {
       "decision": "not_applicable",
-      "workflows_scanned": 1,
+      "workflows_scanned": 5,
       "matched_workflows": [],
-      "changed_files_count": 23,
+      "changed_files_count": 404,
       "reason": "no-triggering-paths",
       "dispatchable_workflows": []
     }
   },
   "pointer_gate": {
-    "verdict": "PASS",
+    "timestamp": "2026-11-07T13:32:32Z",
+    "pr_id": "270",
     "mode": "block",
-    "reason": "no_gitmodules_and_no_gitlinks",
-    "primitive_exit": 0,
-    "new_telemetry_record": false
+    "verdict": "PASS",
+    "affected_count": 0,
+    "exit_code": 0
   },
-  "main_integration_complete": false
+  "main_integration_complete": true,
+  "prior_candidate_record_commit": "66e9803fa76f4254991f3c1fdd259cabae860af2",
+  "lifecycle": {
+    "TASK-020": "completed",
+    "TASK-021": "completed",
+    "spec_archive": "openspec/archive/2026-11-07-audit-executor-minimal-repair",
+    "archive_verdict": "warn",
+    "archive_tracker": 271,
+    "handoff": "docs/handoff/2026-11-07-audit-executor-v1-78-cycle-closeout.md",
+    "closure_evidence": ".aria/audit-reports/audit-executor-minimal-repair/closure-evidence.json",
+    "claim_release": "local_done_remote_not_synchronized",
+    "estimator_capture": "audit-executor-minimal-repair-39078739",
+    "no_false_completed_checkbox": true,
+    "closeout_documents_publication": "included_in_separate_closeout_commit_not_claimed_already_published_at_capture"
+  }
 }
