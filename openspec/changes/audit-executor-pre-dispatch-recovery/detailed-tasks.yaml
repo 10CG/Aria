@@ -1,0 +1,432 @@
+# Level 3 路径 A：需求和算法以 proposal.md、design.md 为 SOT。
+metadata:
+  feature: audit-executor-pre-dispatch-recovery
+  created: "2026-11-09"
+  updated: "2026-11-11"
+  spec: openspec/changes/audit-executor-pre-dispatch-recovery/proposal.md
+  datasource: "tasks.md"
+  total_tasks: 20
+  estimated_hours: "80-160"
+  execution_order: [TASK-001, TASK-002, TASK-003, TASK-004, TASK-005, TASK-006, TASK-008, TASK-007, TASK-009, TASK-010, TASK-011, TASK-012, TASK-013, TASK-014, TASK-015, TASK-016, TASK-017, TASK-018, TASK-019, TASK-020]
+  planning_gate: "已真实执行post_planning R1..R5；R5 check终态OSCILLATION、末轮PASS、两席准入/三席未准入、converged=false，依既有振荡路由采用末轮，不能说已收敛或五席通过。A.1另有真实accept_current sidecar。全流程修复授权及这两项合法终态允许进入B；后续所有启用闸门仍按配置执行。"
+  prior_disposition: "post_spec R5 三席准入全 PASS、两席未准入，5/5 耗尽后 owner 真实选择 accept_current；canonical collect/check 已追加 seq17 disposition，checked sidecar SHA256 f197f9c92498cdb461213b53ea53084a44160cef85c20395c560a2e36f0c848d，overridden_by_user=true、converged=false；不是收敛或全员通过。"
+  execution_rules:
+    - "任务进度以各项 status 为准；子代理不提交，主控统一协调、提交和集成；同一文件写域严格按 dependencies 串行，修复审查反馈亦先取得该写域。"
+    - "重实验同一时刻仅一个，nice 19、限 2 核；审计并发不超过 2；按实际运行记录资源与结果。"
+    - "测试必须有 judged 明细；SKIP、not_judged、编译失败不能算 PASS 或 CAUGHT；坏实现须编译并命中指定业务断言。"
+    - "PR #38 继续暂停，不部署、不启动 168h；旧已接受 B19/19 不重做；旧 297 与新回归分开记，广域 #209/#210 不自动关闭。"
+    - "完整原生记录、ledger、保全 payload、secret 不入公开 Git；只公开允许的筛选结果、哈希和非敏感证据。"
+    - "Rule6证据只覆盖其实际输入和hunk：审查反馈、版本/文档同步或集成冲突处理改变交付diff后，必须对变化hunk重新判性质并实际执行适用substitute/skill-creator场景；记录新输入版本/文件hash及rule6_note，旧输入不冒充最终验证。TASK-016/017必须对照最终包核其适用面；不符返工TASK-014/015，不以重生成catalog代替重验证。"
+
+rule6_note:
+  decision_table_row: 1
+  description_changed: "no"
+  scenario1: ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB"
+  scenario4b: "not_required"
+  negctrl: "n/a"
+  status: "current_130e_R8_independent_Task014_completion_review_PASS_task_completed"
+  references: ["standards/conventions/skill-benchmark-exemption.md:24-33,57-72", "aria-plugin-benchmarks/AB_TEST_OPERATIONS.md:201-220"]
+  per_hunk_classification: "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/Rule6-hunk-classification-current.json"
+  hunk_counts: {"total": 91, "row1": 87, "row4": 4, "R7_delta_total": 22, "R7_delta_row1": 22}
+  input_fingerprints: {"aria/skills/audit-engine/scripts/audit_executor.py": "130e1a3ec88c7642324c8244c23951ec56dd635e871ad285ae076d1a32647817", "aria/skills/audit-engine/references/executor-contract.md": "2d5f5ff8a60cef3d08b25ab3294eba17914234ccc5dfce005b7f411c2f1ddc98", "aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json": "08f2ea8711b93d58a591dd463f89bf12031eb7184e2cbacd16cd00505269a845", "aria/skills/audit-engine/tests/test_pre_dispatch_recovery_legacy_locator.py": "7ea460b099cf54950cd0089276c61861091f1031bd8023a595db4cc91c894c87", "aria/skills/audit-engine/tests/test_pre_dispatch_recovery_history.py": "5d329146e4dc3997b10b1ee73c0ac1c768ce227a9fee365dec8e47a62d2eb30e", "aria/skills/audit-engine/tests/test_pre_dispatch_recovery_binding_source_closure.py": "5cea8f88ff92a1f570ec98ace79cbe40a4dc54f927677f30bd2d44519ac4d096", "aria/skills/audit-engine/tests/test_pre_dispatch_recovery_carrier_enumeration.py": "8fa449a356a21f151617c8bb28000e9124c971b430bb3e5961b605198312a5b8", "aria/skills/audit-engine/tests/test_pre_dispatch_recovery_late_index.py": "7b9bbe1b1071508c371dc7e0156dc94293fd66c5a0501fa59f9c16dfc918a469"}
+  deterministic_evidence: {"A": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/raw/A-independent-qualified.json", "bytes": 110726, "sha256": "a0fb0175d54364977ece8e65a8a06151bde4e7dd764889d66c5fb3c07ecf3521"}, "B": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/raw/B-independent-qualified.json", "bytes": 45792, "sha256": "e8ca36622150f00e04ac2bfe34e02366cdeb7c47220063cd12826eb88094f325"}, "SC": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/SC-current-final.json", "bytes": 1034654, "sha256": "0627578b752398188defae7dd6b25a4cb3123a9b1836c97939c580b67d72f89d"}, "late_baseline": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/late-eight-RED-current-GREEN.json", "bytes": 57894, "sha256": "75b1eca19230d497348993e503d93b676bcf36109e629d2299c47d3c5d299961"}, "hunks": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/Rule6-hunk-classification-current.json", "bytes": 1158607, "sha256": "0c4b0c55ee38531e0151b6c7513a235aca33878426af17c215c6c15cade6e9ad"}, "historical_AB": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/delivery/AB-current-applicability.json", "bytes": 7867, "sha256": "6816b0153c8bac4265fdeb88476db2f3af031b0bfc2a05cca7ceb477744ab592"}, "exact_field_inverse": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/delivery/control-record-field-reversal.json", "bytes": 28505, "sha256": "ae7372ca568010d155fb21914471eedd296c75716843886f2dda48e9ec5459b8"}, "own_types": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/own-helper-types-final-v2.json", "bytes": 10279, "sha256": "046f499e6588451835e39d958bdf4d4d91a3f743c173903579a198b95a4271a1"}, "preservation": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/preservation-final.json", "bytes": 13177, "sha256": "b817e4931c542c3ae5896dc52aa41484c97d42903c7fff522170d6e4f01e0f37"}}
+  current_measured_counts: {"A_modules": 20, "A_unique_success": 1008, "same_source_qualified_reused": 8, "new": 1000, "B_groups": 19, "B_method_invocations": 120, "B_unique": 49, "B_duplicates": 71, "B_subtests": 62, "B_designated_AssertionErrors": 39}
+  scenario1_applicability: {"current_scope_evidence": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/delivery/AB-current-applicability.json", "snapshot": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB/input-manifest.json", "snapshot_files": 561, "formerly_pending_full_delivery_hunks": ["R4-delivery-H079", "R4-delivery-H081", "R4-delivery-H082"], "scope": "R8实际22差异hunks均为程序实现/描述性事实，当前独立确定性substitute已核；R4 AB仅有限采信精确逆变后的历史读取面，不称130e包跑过AB或三Spec条款边际收益已证。", "uncertainty_fallback": "若后续出现AI指令/实际消费材料变化或性质拿不准，按SOT row2/4重跑场景1；description变化另4b，不据本次有限适用免除。", "current_program_snapshot": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/input-before.json", "bytes": 264016, "sha256": "39c307d33d18293fe79d75e2bd31a67f4b1f63a40d226825dc2ac980b0574bee"}, "current_program_snapshot_files": 564, "current_program_package_AB": false, "fact_control_inverse": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/delivery/control-record-field-reversal.json", "bytes": 28505, "sha256": "ae7372ca568010d155fb21914471eedd296c75716843886f2dda48e9ec5459b8"}}
+  scenario1_results: {"with_skill": {"passed": 12, "total": 13, "macro": 0.9166666666666666}, "without_skill": {"passed": 5, "total": 13, "macro": 0.3833333333333333}, "macro_delta": 0.5333333333333333, "numeric_acceptance_met": true, "all_original_expectations_passed": false, "original_grades_preserved": true, "local_viewer": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB/skill-review.html", "aggregation_record": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB/aggregation-record.json", "human_feedback_received": true, "human_feedback_file": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB/feedback.json", "human_review_mode": "inline_plain_language_summary_actual_root_UI_reply", "human_review_result": "本来结果应该接受，确认有效。但需要针对唯一未过进行修正，但不用再重新AB测试，只重新测试修正未过项即可。", "human_review_scope": "确认本轮结果有效；仅修唯一展示失项并仅定向重测，不重跑整套AB；不是未来Skill变更的豁免或审计override。"}
+  owner_directed_targeted_retest: {"result": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/AB/targeted-display-correction/qa/result.json", "status": "PASS", "expectations_judged": 1, "report_variants_judged": 5, "original_RED": true, "corrected_GREEN": true, "independent_bad_reports_RED": 3, "scope": "仅新独立报告副本两处展示文字；Skill及生产未改，不宣称修了不存在的renderer或未来模型稳定遵守；原AB仍12/13 vs5/13。"}
+  historical_evidence: {"R3_report": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R3/stage-R3-report.json", "previous_canonical_yaml": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R4/controller-canonical-note-before.yaml", "previous_scenario1": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-ab", "previous_scores": "12/13 vs4/13；旧反馈只对旧轮，未冒充当前反馈。", "R4_final_review": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-review/r4-currentf1dc/fresh-20261111-01/review-verdict.json", "R4_code_finding": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task015/review-r4-full.json", "pre_R5_canonical_yaml": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R5/controller-canonical-note-before.yaml", "pre_R7_canonical_yaml": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R7/controller-adoption/canonical-note-before.yaml", "R5_current_note_and_completion_scope": "原R5/b1已完成审查仅保留原输入资格；不冒充当前c611资格。", "R5_completion_review": {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-review/r5-currentb1/fresh-20261111-01/review-verdict.json", "sha256": "34d03b88153a6058002b47d4c7dac82919dbca3918d93dc5e6d4db8b214ba1a6", "bytes": 22307}, "pre_R8_canonical_yaml": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/controller-adoption/canonical-note-before.yaml"}
+  known_limits: ["当前130e/R8已完成Task014–017含真实只读预检、源码与发布fresh审查；主仓采用、采用后再次预检及实际恢复仍未完成。", "R4 skill-creator AB原12/13 vs5/13、单项展示1 expectation/5 judged variants只在精确逆变后的历史读取面有限保留；不称130e已跑AB，不证明三Spec边际效果，不重开裁定。", "新8为5个业务RED方法/15失败事件和3健康；只链接本轮130e当前GREEN。作者19仅定位，旧38cd的92/93不移算。", "drift/disposition新测试只证明typed schema/leaf采集，不是真正签字；额外家庭/组合控制的作者原局限保持。", "B120调用=49unique+71重复，62subtest与39指定AssertionError不相加；12公共CAUGHT+2组件/公共冗余+5附加指定捕获不称19生产失败。", "A carrier235具名标签映射已完成assert源码轨迹，binding1085为具名比较馈入聚合断言；locator167子案不加到1008方法。", "原件basic诊断与失败日志保留；最终22生产目标+65helper目标含4可逆视图，原件本身不假称零诊断。新4个Cdriver及3support共7 exact basic零错误；opt-in info未启用。", "旧保全refs中的合法package与事实控制差异逐项记录，不声称历史hash永不变化。", "不运行1008/19/AB，不调用真实旧对象recover/check-only/Workflow/部署，不读nonce/完整真实会话/agent.output/ELF/private平台模块；无commit/push/claim/委派/hooks/canonical写入。", "本席checker失败只属QA适配；失败版本与日志保留，最终证据另指；模型真实tokens费用unknown。"]
+  R5_stage_report: "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R5/stage-R5-report.json"
+  R5_independent_completion_review: "原b1包已完成审查并曾允许标014；仅历史资格，不覆盖当前c611。"
+  hunk_algorithm: "difflib unified_diff n=0 on complete tracked+untracked delivery; historical context segmentation is not a comparable count"
+  R7_independent_stage_report: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R7/C/assessment/proposed-stage-R7-report.json", "sha256": "430cb942ce82099225a85164c15688cc5ec5b6eb350188eec2ff943116886647", "bytes": 7217}
+  R7_helper_types_supplement: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R7/C/helper-types-closeout-20261111-01/stage-helper-types-report.json", "sha256": "cdf6f107ed6bd184cff79d89872c95cc4d636f8d36c635dffdebc95dfe60d5f6", "bytes": 9772}
+  R7_independent_completion_review: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-review/r7-currentc611/fresh-20261111-01/review-verdict.json", "sha256": "010a600ce21a550c8659ce04949b102bac77ef4e8c970620710c8ee6884f90e9", "phase1": "PASS", "phase2": "PASS", "may_complete_task014": true, "scope": "仅Task014；不替代Task015当前源码总审或Task016真实预检"}
+  R8_independent_stage_report: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-rework/R8/C/stage-C-report.json", "bytes": 8820, "sha256": "00f313139da50270f53aa103974c0dcff9dac373df95b2fe860154074af3d3ef"}
+  R8_independent_completion_review: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task014-review/r8-current130e/fresh-20261111-01/review-verdict.json", "sha256": "befead59ae6517484a0f5f157e69b92bf3ac973dceb5769d8cabac295f1c6e1c", "phase1": "PASS", "phase2": "PASS", "may_complete_task014": true, "scope": "仅当前130e/R8 Task014，不代替Task015源码复审或Task016真实预检"}
+  R8_Task015_current_source_review: {"path": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task015/review-r8-full.json", "sha256": "bdbd92f1c9baf8a50dc3aaec452b6cc961885c2c2a5286e3152547a8960ca98f", "both_seats_phase1_phase2": "PASS", "findings": 0, "scope": "仅Task015当前130e源码复审，不代替Task016真实预检"}
+  R8_Task016_real_check_only: {"result": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task016-current130e-preflight/result.json", "exit": 0, "eligible": true, "target_objects_unchanged": 1382, "scope_events_after": 1, "review": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/B-task016-current130e-completion-review/review-verdict.json", "review_sha256": "5472ae0df65e7629968d82d9c5fc69f775e4c35c520f1caaeeca081bb6eb4761", "phase1": "PASS", "phase2": "PASS", "scope": "仅发版前完整只读预检；发布采用后须重验，不构成实际恢复"}
+  Task017_release_version_substitute: {"version": "1.79.0", "decision_table_row": 1, "description_changed": "no", "new_version_fact_hunks": 7, "evidence": ".aria/notes/2026-11-07-executor-pre-dispatch-recovery/Task017-final-version-verification/rule6-supplement.json", "baseline_RED_failed_checks": 13, "current_GREEN_checks": 21, "independent_bad_states_rejected": 3, "source_contract_catalog_unchanged": true, "scope": "仅新增版本/历史验证事实hunks；不扩张原AB、不替代原功能验证。最终tag名称和准备阶段的过去时边界取代会发布后过时的pending措辞；旧准备profile及原结果保留。"}
+  Task017_release_completion: {"plugin_version": "1.79.0", "post_merge_master": "fd5a3c883f8a01f3b80a5a0300cf90925ac21f9f", "origin_github_master_tag_verified": true, "CI_gate": "green_not_applicable_paths_main_inflight_clear", "PR241_state": "closed_platform_merged_false_Git_merged_locally", "review": "/home/dev/Aria/.aria/notes/2026-11-07-executor-pre-dispatch-recovery/Task017-completion-review/review-verdict.json", "review_sha256": "eb8696a2d91dfbefaa400a609cd72c82e9cb51fe3346457d3be135756e8da12d", "phase1": "PASS", "phase2": "PASS", "scope": "插件分发完成；主仓采用和真实恢复仍属后续门"}
+
+tasks:
+  - id: TASK-001
+    parent: "3.1"
+    title: 完成规划闸门并安全建立两个开发分支
+    status: completed
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: []
+    deliverables:
+      - openspec/changes/audit-executor-pre-dispatch-recovery/detailed-tasks.yaml
+      - .aria/notes/2026-11-07-executor-pre-dispatch-recovery/
+    agent: aria:tech-lead
+    reason: 跨仓写域、规划闸门与原件保全须统一协调。
+    verification:
+      - "按实际配置完成全部启用 post_planning 审计及其合法处置；未达准入则停止，不提前进入 Phase B。"
+      - "B.1 在主仓与 aria 各自建立新分支；先核对并保全原件及混合 WIP，不覆盖、不挪作本变更提交；记录分支和基线。"
+    acceptance_criteria: [SC-9, SC-10]
+
+  - id: TASK-002
+    parent: "3.1"
+    title: 独立编写容量、来源与全链 RED 测试
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-001]
+    deliverables:
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery.py
+      - aria/skills/audit-engine/tests/pre_dispatch_recovery_fixtures.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_protocol.py
+      - aria/skills/audit-engine/tests/test_audit_executor.py
+    agent: aria:qa-engineer
+    reason: 非实现作者先建立可证伪的测试与旧基线。
+    verification:
+      - "复用现有 Fixture，按 design §2、§3、§5、§6.1、§7 写分域 RED；容量等既有入口须在旧基线命中指定业务断言。新增 CLI/事件尚无宿主时以明确的功能缺失断言记录 FEATURE_NOT_IMPLEMENTED_TDD_RED，不把 import/setup 崩溃当 RED，不宣称已跑到未来业务分支或 CAUGHT；其行为验收在 TASK-012/014 实现后逐个 judged。"
+      - "覆盖真实 L−1/L/L+1、中文转义小 manifest 大 JS、零写树、checker、旧同源超限 resume 和仅源码变更 E_SOURCE_DRIFT、健康合规 pending。"
+      - "准备两种真实 UI 布局正控、拒绝与双闭包、合法 seq2 直接 build、离线 replay 等 fixture；测试文件独占，后续同文件修改串行。"
+    acceptance_criteria: [SC-1, SC-2, SC-3, SC-4, SC-5, SC-6, SC-7]
+
+  - id: TASK-003
+    parent: "1.1"
+    title: 实现主 build 容量前检和精确 resume
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-002]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+    agent: aria:backend-architect
+    reason: 容量顺序和原子写入需要生产执行器实现。
+    verification:
+      - "按 design §2 在任何锁及 scope/run 写入前对唯一渲染的最终 bytes 固定 L=524288 检查并原样发布；E_WORKFLOW_CAPACITY 不泄露 prompt。"
+      - "六源兼容且尺寸合规的 pending 保持精确 resume；不承诺旧源码超限 pending 跨源 resume，不伪造来源或先写 record。"
+    acceptance_criteria: [SC-1]
+
+  - id: TASK-004
+    parent: "1.1"
+    title: 为 checker 发布加入同一容量不变量
+    status: completed
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-003]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+    agent: aria:backend-architect
+    reason: 同文件串行实现 checker 边界并保留现有协议。
+    verification:
+      - "按 design §2、§7 在 checker 新脚本发布前检查最终 bytes；超限无 checker.js 或成功 prepare-record，不声称整个 prepare 零写入。"
+      - "正常 checker 与真实 tool_error 路径不变，不新增 checker 恢复协议。"
+    acceptance_criteria: [SC-2]
+
+  - id: TASK-005
+    parent: "1.2"
+    title: 实现原生容量拒绝及静态顺序证据解析
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-004]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_native.py
+    agent: aria:backend-architect
+    reason: 严格原生记录匹配与静态取证需要 fail-closed 实现。
+    verification:
+      - "按 design §3.1–3.2 稳定读取可信 root，验证 request/response、script 和精确错误、静态窗口/hash及 loader→resolver→Tool call 次序；不执行私有模块。"
+      - "small/等于 L、错误工具、窗口、绑定、timeout/network、无回执、伪原件均拒绝；静态依据不冒充历史执行映像身份。"
+    acceptance_criteria: [SC-3]
+
+  - id: TASK-006
+    parent: "1.2"
+    title: 实现两份真实问答的独立 authority adapter
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-005]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_authority.py
+    agent: aria:backend-architect
+    reason: 两套封闭 UI 语义与完整对象绑定不能交由 locator 自证。
+    verification:
+      - "按 design §3.2.1、§3.3 分别实现 operator 与 EvidenceAcceptance adapter，重读真实 root questions/answers/annotations.preview，校验封闭模板、完整 TargetBinding、FileRef 与 snapshot；不放宽旧 disposition parser。"
+      - "两种已观察 UI 各有正控；缺或错政策、错对象、拒绝、非 root、模拟答复、API 副本、仅信 locator 布尔、自选模板均拒绝；不重签。"
+    acceptance_criteria: [SC-3, SC-7, SC-10]
+
+  - id: TASK-007
+    parent: "2.1"
+    title: 实现只读预检和单一拒绝事件事务
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-008]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_transaction.py
+    agent: aria:backend-architect
+    reason: 单首 reserve 状态转换和证据冻结由 canonical executor 承担。
+    verification:
+      - "按 design §3.4–§4、§6 核唯一首 reserve、旧绑定、两项独立 authority 与已知反证；check-only 不锁写、不 mkdir、不 freeze。"
+      - "锁内 CAS 只追加一个 dispatch_rejected，冻结完整证据与传递叶子；原 genesis/reserve/manifest/script/record 不改，不造票、不变预算和有效轮。"
+      - "已知成功或未知关联运行即使有两份签字仍否决；不把本机观察写成全平台保证。"
+    acceptance_criteria: [SC-3, SC-4, SC-6]
+
+  - id: TASK-008
+    parent: "2.2"
+    title: 实现六源兼容清单验证与双闭包
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-006]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_sources.py
+    agent: aria:backend-architect
+    reason: 受限版本转换与同路径跨代读取须保持完整来源身份。
+    verification:
+      - "按 design §5 实现固定路径封闭 compat catalog 的精确 from/to 配对检查，四项逻辑源完整 FileRef 不变、guard 和预算不变；不接受 caller 自选或 stale 清单。"
+      - "旧 build.sources 经旧闭包及 genesis blob 字节绑定，新 active sources 经新闭包；独立 reader 处理同 live 路径不同 hash，不覆盖 genesis.initial_sources。"
+      - "本任务同时建立清单消费与机械生成机制，先按当时实际 executor/contract 字节生成工作清单；此后任何任务只要改 executor/contract（含 TASK-007 及 TASK-009..013）均须刷新工作 to。TASK-012 每个 good/mutant 隔离包按该包实际字节生成一致清单，避免 stale/源不匹配提前挡住指定业务断言。TASK-014 回归前再刷新工作包；TASK-016 才固定最终交付指纹，不是第一次使清单可用。"
+    acceptance_criteria: [SC-5]
+
+  - id: TASK-009
+    parent: "2.2"
+    title: 接通恢复事件的全链历史和结果消费者
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-007]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_history.py
+    agent: aria:backend-architect
+    reason: 防止局部 loader 正常而 replay、结果链或来源闸门断裂。
+    verification:
+      - "按 design §4–§5 贯通 _load_scope、_replay_history、_HistoryGraph、build、_native_build、prepare、collect、check；普通 scope 的来源漂移仍拒绝。"
+      - "reserve1→rejection→reserve2→真实格式结果可重放，attempt 2/round 1、原 cycle 和预算不变；旧被拒绝 build 不能作为真实运行 collect。"
+    acceptance_criteria: [SC-4, SC-5]
+
+  - id: TASK-010
+    parent: "2.3"
+    title: 实现恢复幂等、崩溃与并发控制
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-009]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_idempotence.py
+    agent: aria:backend-architect
+    reason: 锁、head 和证据身份的一致性必须由同一宿主保证。
+    verification:
+      - "按 design §3.5、§6 以 reservation、拒绝及两问答工具对和 TargetBinding 定义幂等身份；任何幂等成功/回执短路前重读当前已知来源并扫反证。合法后继的目标过期分支及无法归属载体的拒绝仍遵守 design §3.4–3.5，不以派生概括覆盖 SOT。"
+      - "覆盖 head 变化、同证据重入、不同证据冲突、并发、event 前孤立 blob 与 event 后丢回执；仅一事件，不重签、不派发。"
+    acceptance_criteria: [SC-6]
+
+  - id: TASK-011
+    parent: "2.3"
+    title: 实现首次续接 live capture 与 reserve 最终复核
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-010]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_handoff.py
+    agent: aria:backend-architect
+    reason: 首次实际 build 必须在真实生产调用链消除旧快照与活数据的接缝。
+    verification:
+      - "按 design §6.1 从合法 seq2 直接 build 消费必需 recovery-sources，用独立 live reader 捕获完整 root 与新增已知来源，反证以 recovery_handoff_counterevidence 拒绝。"
+      - "冻结绑定 seq2、successor manifest/script、来源 snapshot 的 handoff；_reserve_build 紧靠发布前再核全部 live bytes，不能只读旧 snapshot。"
+      - "_record/_native_build/_HistoryGraph/_replay_history/_resume_build 条件校验 handoff；合法 attempt2 pending 只从冻结记录 resume、不重派，历史离线检查不读 live root。"
+    acceptance_criteria: [SC-4, SC-6, SC-7]
+
+  - id: TASK-012
+    parent: "3.1"
+    title: 非作者构造真实坏实现并独立验证
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-011]
+    deliverables:
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_mutants.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery.py
+      - aria/skills/audit-engine/tests/pre_dispatch_recovery_fixtures.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_protocol.py
+      - aria/skills/audit-engine/tests/test_audit_executor.py
+    agent: aria:qa-engineer
+    reason: 独立于生产实现作者构造对抗坏态，避免同源盲区。
+    verification:
+      - "先验证每组合法对照，独立构造晚检查、量 manifest、未知错误解锁、错绑定/伪原生、只信 locator、漏真人、签字覆盖反证、幂等早返回。"
+      - "从合法 seq2 直接 build，分别捕获漏 live capture 和 reserve 仅读旧 snapshot；核原 root 尾追加、已知第二 root、capture 后变更、handoff 缺失/错绑。"
+      - "每个坏实现须编译并进入指定业务断言才记 CAUGHT；分别列出 judged、SKIP、not_judged 及旧基线和新回归。"
+    acceptance_criteria: [SC-1, SC-3, SC-4, SC-5, SC-6, SC-7]
+
+  - id: TASK-013
+    parent: "3.1"
+    title: 同步执行器契约与实现事实
+    status: completed
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-012]
+    deliverables:
+      - aria/skills/audit-engine/references/executor-contract.md
+    agent: aria:knowledge-manager
+    reason: 保持代码、测试与对外程序事实同步，不混入未授权流程。
+    verification:
+      - "依据 design §2–§6.1 与实际实现记录 CLI、事件、双闭包、两种 authority、live handoff、拒绝和有限信任边界。"
+      - "不宣称旧 Skill 已自动选择恢复，不写入原生记录、secret 或私有 ledger；对新增运行时 AI 指令逐 hunk 标注供 Rule6 判定。"
+    acceptance_criteria: [SC-3, SC-4, SC-5, SC-6, SC-8]
+
+  - id: TASK-014
+    parent: "3.1"
+    title: 执行完整回归与逐 hunk Rule6 处置
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-012, TASK-013]
+    deliverables:
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery.py
+      - aria/skills/audit-engine/tests/pre_dispatch_recovery_fixtures.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_protocol.py
+      - aria/skills/audit-engine/tests/test_audit_executor.py
+      - .aria/notes/2026-11-07-executor-pre-dispatch-recovery/
+    agent: aria:qa-engineer
+    reason: 独立 QA 汇总真实 RED/GREEN、回归和 benchmark 判定证据。
+    verification:
+      - "回归前先按当前 executor/contract 机械刷新工作 catalog.to，记录指纹；在完整一致包上运行定向、全链、既有回归与类型检查，逐项记录 judged、退出原因和基线失败；TASK-002 的功能缺失 RED 须在此落实实际业务断言，零 SKIP 冒充通过，旧 297 与新增测试分别统计。"
+      - "对每个 hunk 按实际行为及套件覆盖审定 Rule6 并记录 rule6_note；纯代码或描述性内容可按成文规则用 baseline-failing substitute，不提前自判豁免。"
+      - "运行时 AI 指令或流程改动须用 skill-creator 场景 1；description 改动另跑场景 4b；失败、SKIP、not_judged 不作通过。"
+    acceptance_criteria: [SC-1, SC-2, SC-3, SC-4, SC-5, SC-6, SC-7, SC-8]
+
+  - id: TASK-015
+    parent: "3.1"
+    title: 独立审查源码、测试、契约及跨文件接缝
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-014]
+    deliverables:
+      - aria/skills/audit-engine/scripts/audit_executor.py
+      - aria/skills/audit-engine/references/executor-contract.md
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery.py
+      - aria/skills/audit-engine/tests/pre_dispatch_recovery_fixtures.py
+      - aria/skills/audit-engine/tests/test_pre_dispatch_recovery_protocol.py
+    agent: aria:code-reviewer
+    reason: 由非实现作者按规范符合性及质量两阶段审查。
+    verification:
+      - "检查完整生产调用链、双来源读写、两 authority、counterevidence、§6.1 最终复核与测试实际命中；审查问题交主控协调作者修复并重新验证。"
+      - "落实所有配置启用的实现后、合并前等检查点，不以代码审查替代它们。审查修复造成任何交付hunk变化，均将TASK-014适用测试、Rule6逐hunk判定/必要benchmark及本TASK-015复核显式返工留痕；运行时AI指令变化须场景1、description另4b，不按文件目录或此前结果自免。全部适用验证与复核对应最终diff后才可进入TASK-016；源码/契约变化另机械刷新catalog。"
+    acceptance_criteria: [SC-3, SC-4, SC-5, SC-6, SC-7, SC-8]
+
+  - id: TASK-016
+    parent: "3.3"
+    title: 固定最终来源并对真实旧对象只读预检
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-015]
+    deliverables:
+      - aria/skills/audit-engine/references/pre-dispatch-recovery-compat.json
+      - .aria/notes/2026-11-07-executor-pre-dispatch-recovery/
+    agent: aria:tech-lead
+    reason: 分发指纹必须绑定最终源码并在真实对象上验证而不改状态。
+    verification:
+      - "源码及 contract 稳定后按 design §5 机械生成 catalog.to，验证旧固定 from、当前 to、四项源、双闭包和 stale 拒绝；不可手填或 caller 覆盖。"
+      - "可在发版前对真实旧对象做完整 check-only，复用两份既有真实问答及静态依据，确认旧 scope/原件字节不变；缺承重输入列明字段并阻塞，不签字、不实际恢复。"
+      - "任一 executor/contract 字节再变则重新生成 catalog 并重验相关测试和真实 check-only；check-only 不等于恢复或派发许可。"
+      - "封存前对照当前最终交付diff，核rule6_note及证据索引的输入版本/文件hash与覆盖hunks，含TASK-015反馈修复；未覆盖变化必须返工TASK-014判定/适用substitute或AB及TASK-015复核，不得只刷新来源指纹即发布。"
+    acceptance_criteria: [SC-5, SC-9, SC-10]
+
+  - id: TASK-017
+    parent: "3.2"
+    title: 完成插件版本、真实 CI 闸门及本地双远程发布
+    status: completed
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-016]
+    deliverables:
+      - aria/.claude-plugin/plugin.json
+      - aria/.claude-plugin/marketplace.json
+      - aria/VERSION
+      - aria/CHANGELOG.md
+      - aria/README.md
+    agent: aria:tech-lead
+    reason: 插件发布需要跨远程一致性及启用闸门的统一执行。
+    verification:
+      - "根据实际变更选择真实 SemVer 并同步插件五文件，不预写未来占位版本；任何版本/README/契约等后续hunk均按最终内容补Rule6性质判定与适用验证，行为指令变化不得沿用旧benchmark；受影响时返工TASK-014/015/016。版本调整若改变 executor/contract 还须重生成catalog并重验，所有证据对应最终发布包。"
+      - "合并前执行启用审计、Rule8 真 CI backend：本 PR passing 且主干无 in-flight；backend 不可用只按成文 fallback，stub NotImplementedError 必须 abort。"
+      - "执行子模块指针阻断门并 fetch 后断言本地 master 等于 origin/master；aria 本地 merge，不服务端合并，主控本地双推，逐 remote ls-remote 核 SHA 均等于本地主干。"
+    acceptance_criteria: [SC-8, SC-9]
+
+  - id: TASK-018
+    parent: "3.2"
+    title: 主仓采用 post-merge 插件并完成发布同步
+    status: in_progress
+    complexity: L
+    estimated_hours: "4-8"
+    dependencies: [TASK-017]
+    deliverables:
+      - aria
+      - VERSION
+      - README.md
+      - docs/architecture/system-architecture.md
+      - docs/architecture/version-scheme.md
+      - README.zh.md
+      - README.ja.md
+      - README.ko.md
+    agent: aria:tech-lead
+    reason: 主仓 gitlink 必须指向已在两端验证的真实子模块合并 SHA。
+    verification:
+      - "主仓 gitlink 指向 aria post-merge master，按实际发布版本同步 VERSION、README badge、i18n 机械版本与两份架构版本行；仅正文实质改变才重译。"
+      - "核对全仓状态和安装缓存/覆盖边界；主仓合并前同样执行已启用审计、Rule8 真 CI、无 in-flight、指针门与 fresh 本地主干断言。"
+      - "完成主仓采用并记录真实 SHA、各远端和验证证据；不提交完整 native/ledger/secret。"
+    acceptance_criteria: [SC-9]
+
+  - id: TASK-019
+    parent: "3.3"
+    title: 发布采用后恢复唯一旧 reserve 并完成原规划审计
+    status: pending
+    complexity: XL
+    estimated_hours: "4-8"
+    dependencies: [TASK-018]
+    deliverables:
+      - .aria/notes/2026-11-07-executor-pre-dispatch-recovery/
+      - openspec/changes/state-scanner-goal-aligned-recommendations/
+    agent: aria:tech-lead
+    reason: 真实旧周期恢复、原材料与审计预算需要主控统一负责。
+    verification:
+      - "已发布修复重新对真实目标 check-only 后才 mutation；复用两项真实 authority、锁内复核并只恢复原唯一 reserve，原 cycle 和预算不重置；来源不足具体报阻塞。"
+      - "紧凑 manifest 通过冻结引用完整提供原四项审计材料，派发前后核 hash、角色读全并报告 coverage，不以摘要或删角色替代。"
+      - "实际执行旧 post_planning build→Workflow→capture→prepare→必要 checker→collect→check，按配置走足后续轮或真实合法处置；fixture 不能替代真实调用。"
+      - "推荐机制仅 Phase A 完成，10 项实现任务仍 pending；不恢复 PR #38、不部署、不启动 168h。"
+    acceptance_criteria: [SC-4, SC-6, SC-9, SC-10]
+
+  - id: TASK-020
+    parent: "3.3"
+    title: 准备周期收尾输入并封存功能交付证据
+    status: pending
+    complexity: M
+    estimated_hours: "4-8"
+    dependencies: [TASK-019]
+    deliverables:
+      - .aria/notes/2026-11-07-executor-pre-dispatch-recovery/closure-ready-evidence.json
+    agent: aria:knowledge-manager
+    reason: 先完成可核验的功能交付证据，避免将归档本身设为归档准入前置。
+    verification:
+      - "核对TASK-001..019的实际完成证据、真实发布采用与旧准备物恢复及原规划审计终态；缺项即保持本任务pending，不伪报功能交付。"
+      - "生成closure-ready-evidence.json，索引真实版本/SHA、测试、两项authority、原scope事件/旧原件hash、check回执及未解决限制；列明Phase D动作尚未执行，不把计划当回执。"
+      - "证据包生成并核对后才能完成本任务及parent3.3；归档、最终handoff、claim释放、estimator等仍是post_delivery_obligations，发生后另记，不是本任务完成的前提。"
+    acceptance_criteria: [SC-9, SC-10]
+
+post_delivery_obligations:
+  - "本区不是tasks数组，也不是可提前勾选的已完成声称。全部功能tasks真实完成之后仍必须执行D.1进度核对；完整goal此时尚未完成。"
+  - "D.2须照跑正常归档gate，complete/tri-state verdict按SOT消费，通过后才实际归档并验证落点；不使用design-only、skip-verification或Status假完成解除循环。"
+  - "D.2b真实尝试释放本轨claim并记录本地/远端结果，不把失败写成功。D.3归档后写docs/handoff五字段及latest本条History增量，保留混合WIP。"
+  - "D.4按实际可观测区间采集estimator，保留共享成本口径；post_closure若启用必须执行。每项实际发生后更新周期交接/closure证据，全部后置义务完成后才宣告完整goal完成。"

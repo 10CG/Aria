@@ -143,7 +143,7 @@ v2.0 严格遵守全部 10 条不可协商规则 (由 Layer 2 内 aria-plugin �
     overridden) + pi-durable PoC (DEC-20261022-001) + orchestrator CI 化 (PR #248/#249)
   hermes-019-migration 全周期收口 (2026-10-28): 0.19 生产 cutover 10-27 (#262), C8 判绿 (#266 裁
     aria-layer1-* 覆盖 cron 面), spec 已归档; 旧 0.7 镜像 20f9cb5a 退役
-版本: aria-plugin v1.78.0 (审计执行可靠性改进; 版本史与验证边界见 aria/CHANGELOG.md) | 主项目 v1.7.5 |
+版本: aria-plugin v1.79.0 (审计执行可靠性改进; 版本史与验证边界见 aria/CHANGELOG.md) | 主项目 v1.7.5 |
   aria-orchestrator v2.0.0; Layer 2 主力 LLM = glm-5.2 via Luxeno, Layer 1 = hermes 0.19 (glm-4.6 via Luxeno Anthropic Messages, cutover 2026-10-27)
 ```
 
